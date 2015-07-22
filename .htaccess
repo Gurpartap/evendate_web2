@@ -1,0 +1,14 @@
+#RewriteEngine On
+#RewriteCond %{HTTP_HOST}  ^www\.(.+)$  [NC]
+#RewriteRule ^(.*)         http://%1/$1 [L,R=301]
+#RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteCond %{REQUEST_FILENAME} !-d
+#RewriteRule ^(.*)$ index.php?q=$1
+
+<Files "config.json">
+Order Allow,Deny
+Deny from all
+</Files>
+
+#"C:\Program Files (x86)\nodejs\node.exe" server.js
+#"C:\Program Files (x86)\nodejs\npm.cmd" server.js
