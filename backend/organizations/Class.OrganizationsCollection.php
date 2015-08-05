@@ -17,7 +17,7 @@ class OrganizationsCollection{
 	public function getAllActive(){
 		$q_get_organizations = 'SELECT organizations.id, organizations.description,
 			organizations.name, organizations.type_id, organizations.img_url,
-			 organizations.status, organization_types.name AS type_name
+			 organizations.status, organizations.short_name, organization_types.name AS type_name
 			FROM organizations
 			INNER JOIN organization_types ON organization_types.id = organizations.type_id
 			WHERE organizations.status = 1';
@@ -29,7 +29,7 @@ class OrganizationsCollection{
 		if ($this->user instanceof User == false) throw new InvalidArgumentException('USER_IS_NOT_SET');
 		$q_get_subscriptions = 'SELECT
 			organizations.name, organizations.type_id,
-			 organizations.status, subscriptions.organization_id, subscriptions.id AS subscription_id
+			 organizations.status, organizations.short_name, subscriptions.organization_id, subscriptions.id AS subscription_id
 			FROM organizations
 			INNER JOIN subscriptions ON subscriptions.organization_id = organizations.id
 			WHERE organizations.status = 1
@@ -72,7 +72,6 @@ class OrganizationsCollection{
 					$organization['subscription_id'] = (int) $subscription_id;
 				}
 			}
-
 		}
 		return new Result(true, '', $organizations);
 	}

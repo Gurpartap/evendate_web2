@@ -15,9 +15,15 @@ class EventsCollection{
 		$statement_array = array();
 		foreach($filters as $name => $value){
 			switch($name){
-				case 'date':{
+				case 'date': {
 					$q_get_events .= ' AND ((events.event_start_date >= DATE(:date) AND events.event_end_date <= DATE(:date)) OR (DATE(events.event_start_date) = DATE(:date) AND DATE(events.event_end_date) = DATE(:date)))';
 					$statement_array[':date'] = $value;
+					break;
+				}
+				case 'organization': {
+					if ($value instanceof Organization == false) break;
+					$q_get_events .= ' AND (organizations.id = :organization_id)';
+					$statement_array[':organization_id'] = $value->getId();
 					break;
 				}
 			}

@@ -1,38 +1,64 @@
 $(document).ready(function(){
 
-	var _file = null, _file_name = null;
+	var _files = {
+			vertical: null,
+			horizontal: null
+		},
+		_file_names = {
+			vertical: null,
+			horizontal: null
+		};
 
 	function handleFileSelect(evt) {
-		var $canvas_wrapper = $('.image-preview-canvas').addClass('hidden'),
+		var file_orientation = $(evt.target).is('#filestyle-0') ? 'vertical' : 'horizontal',
+			aspect_ratio = file_orientation == 'vertical' ? 7 / 10 : 10 / 7,
+			CUTTER_HEIGHT = 600,
+			CUTTER_WIDTH = 600,
+			$label_btn = $('label.' + file_orientation + '-btn'),
+			$canvas_wrapper = $('.image-cropper-wrapper')
+				.height(window.innerHeight)
+				.width(window.innerWidth)
+				.addClass('hidden'),
 			$btn = $('.img-crop-btn').addClass('disabled').off('click'),
-			$panel = $('.img-preview-panel').removeClass('hidden'),
-			$image = $('.event-img-container img'),
-			$pulser = $('.img-loading-pulse').removeClass('hidden');
+			$cancel_btn = $('.img-crop-cancel').addClass('disabled').off('click'),
+			$image_cutter = $('.image-cutter').css({
+				height: CUTTER_HEIGHT,
+				width: CUTTER_WIDTH
+			}),
+			$image = $image_cutter.find('img'),
+			$loader = $('.whirl.image-cropper').removeClass('hidden');
 		$image.addClass('hidden');
+
 		var files = evt.target.files; // FileList object
 		for(var i = 0, f; f = files[i]; i++) {
 			if (!f.type.match('image.*')) {
 				continue;
 			}
 			if (f.size / 1024 > 4096){
-				alert('Извините, максимально допустимый развер изображения - 4 МБ. Уменьште изображение.');
+				showNotifier({status: false, text: 'Извините, максимально допустимый размер изображения - 4 МБ. Уменьште изображение.'});
 				return;
 			}
 			var reader = new FileReader();
 			reader.onload = (function(the_file) {
 				return function(e) {
-					_file = e.target.result;
-					_file_name = the_file.name;
+					$canvas_wrapper.removeClass('hidden');
+					$image_cutter.css({
+						'left': (window.innerWidth - CUTTER_WIDTH) / 2,
+						'top': (window.innerHeight - CUTTER_HEIGHT) / 2
+					});
+					_files[file_orientation] = e.target.result;
+					_file_names[file_orientation] = the_file.name;
 
 
-					$image.attr('src', _file).removeClass('hidden');
+					$image.attr('src', _files[file_orientation]).removeClass('hidden');
 					$image.cropper('destroy');
+
 					$image.cropper({
 						data: {
 							x: 420,
 							y: 60,
-							width: 640,
-							height: 360
+							width: CUTTER_WIDTH,
+							height: CUTTER_HEIGHT
 						},
 						strict: false,
 						responsive: false,
@@ -62,22 +88,27 @@ $(document).ready(function(){
 						minContainerWidth: 320,
 						minContainerHeight: 180,
 
-						aspectRatio: 7 / 10,
+						aspectRatio: aspect_ratio,
 						preview: '.img-preview'
 					});
 
 
-					$pulser.addClass('hidden');
+					$loader.addClass('hidden');
 					$image.removeClass('hidden');
+
 					$btn.removeClass('disabled').on('click', function(){
 						var result = $image.cropper('getCroppedCanvas', {
-							width: 500
+							width: $label_btn.width()
 						});
 						$image.cropper('destroy').addClass('hidden');
 						$btn.addClass('disabled').off('click');
-						$canvas_wrapper.html(result).removeClass('hidden');
 
+						$label_btn
+							.css('padding-top', '0px')
+							.html(result);
+						$canvas_wrapper.addClass('hidden');
 					});
+
 				};
 			})(f);
 			reader.readAsDataURL(f);
@@ -86,49 +117,18 @@ $(document).ready(function(){
 
 
 	$('#filestyle-0').on('change', handleFileSelect);
-	var options = {
-		locale: 'ru'
-		},
-		$cal1 = $('#datetimepicker1'),
-		$cal2 = $('#datetimepicker2');
+	$('#filestyle-1').on('change', handleFileSelect);
 
-	$cal1.datetimepicker(options).on("dp.change", function (e) {
-		$cal2.data("DateTimePicker").minDate(e.date);
-	});
-	$cal2.datetimepicker(options).on("dp.change", function (e) {
-		$cal1.data("DateTimePicker").minDate(e.date);
-	});
-	$('#map-canvas').locationpicker({
-		location: {latitude: 55.755826, longitude: 37.6173},
-		radius: 1,
-		inputBinding: {
-			latitudeInput: $('#latitute'),
-			longitudeInput: $('#longitude'),
-			radiusInput: null,
-			locationNameInput: $('#event-place')
-		},
-		enableAutocomplete: true,
-		onchanged: function(currentLocation) {
-			console.log("Location changed. New location (" + currentLocation.latitude + ", " + currentLocation.longitude + ")");
-		}
-	});
-	$('.btn-toggle-map').on('click', function(){
-		var $map = $('#map-canvas');
-		$map.toggleClass('hidden');
-		$(this).toggleClass('active');
-	});
 
 	$('.create-event-btn').on('click', function(){
 		var $canvas = $('.image-preview-canvas canvas'),
 			send_data = {
-				file: _file,
-				file_name: _file_name,
-				cropped_file: $canvas.length != 0 ? $canvas.get(0).toDataURL() : null,
-				event_start_date: $cal1.data('DateTimePicker').date().format('YYYY-MM-DD HH:mm:ss'),
-				event_end_date: $cal2.data('DateTimePicker').date().format('YYYY-MM-DD HH:mm:ss')
+				files: _files,
+				file_names: _file_names,
+				cropped_file: $canvas.length != 0 ? $canvas.get(0).toDataURL() : null
 			};
 
-		if (_file != null || _file_name != null){
+		if (_files != null || _file_names != null){
 			if ($canvas.length == 0){
 				alert('Извините, но выбранное изображение необходимо кадрировать');
 				return;

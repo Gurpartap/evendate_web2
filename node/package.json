@@ -1,0 +1,14 @@
+{
+  "name": "Evendate",
+  "version": "0.0.1",
+  "description": "",
+  "dependencies": {
+    "mysql": "^2.5.0",
+    "nodemailer": "^1.4.0",
+    "nodemailer-smtp-transport": "^1.0.3",
+    "restler": "^3.2.2",
+    "socket.io": "^1.1.0",
+    "moment": "2.10.3",
+    "winston": "^0.7.3"
+  }
+}

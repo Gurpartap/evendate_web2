@@ -29,6 +29,46 @@
     "db": {
       "host": "localhost",
       "user": "root",
+      "password": "Trwnp7LUCwW7mp4J",
+      "database": "evendate",
+      "port": 3306
+    },
+    "VK":{
+      "APP_ID": 4970729,
+      "SECURE_KEY": "sUNY9yhthCsJDAliNdf7"
+    },
+    "domain": "evendate.ru"
+  },
+  "local":{
+    "google":{
+      "web": {
+        "client_id": "403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv.apps.googleusercontent.com",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://accounts.google.com/o/oauth2/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_email": "403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv@developer.gserviceaccount.com",
+        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv%40developer.gserviceaccount.com",
+        "client_secret": "5rK7ElK7fA7G1tylhkzsnE4Q",
+        "redirect_uris": [
+          "http://evendate.ru/oauth2callback",
+          "https://evendate.ru/oauth2callback",
+          "http://localhost/evendate/oauth2callback",
+          "http://evendate.com/oauth2callback"
+        ],
+        "javascript_origins": [
+          "http://evendate.ru",
+          "https://evendate.ru",
+          "http://localhost",
+          "http://evendate.com"
+        ]
+      },
+      "maps_api_v3":{
+        "key": "AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg"
+      }
+    },
+    "db": {
+      "host": "localhost",
+      "user": "root",
       "password": "",
       "database": "evendate",
       "port": 3306

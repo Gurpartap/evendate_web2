@@ -2,16 +2,70 @@
  * Created by Инал on 20.06.2015.
  */
 
+paceOptions = {
+	ajax: false, // disabled
+	document: false, // disabled
+	eventLag: false, // disabled
+	elements: {}
+};
+var MODAL_OFFSET = 200;
+
+function bindEventHandlers(){
+	$('.more-info-btn').off('click').on('click', function(){
+		$(this).parents('.tl-panel-block').toggleClass('closed');
+	});
+}
+
+function showOrganizationalModal(organization_id){
+	$.ajax({
+		url: 'api/organizations/' + organization_id + '?with_events=true',
+		success: function(res){
+			var $events = $('<div>'),
+				$body = $('body'),
+				$modal = $('#organization-modal');
+			if (res.data && res.data.hasOwnProperty('events')){
+				res.data.events.forEach(function(event){
+					$events.append(tmpl('short-event', event));
+				});
+				$modal.remove();
+				res.data.events = $events;
+				$modal = tmpl('organization-modal', res.data);
+				var modal_height = window.innerHeight - MODAL_OFFSET + 70;
+				$modal.find('.modal-body').css('max-height', modal_height);
+				$modal
+					.appendTo($body)
+					.on('shown.bs.modal', function(){
+						var events_block_height = modal_height
+							- $modal.find('.modal-header').outerHeight()
+							- $modal.find('.organization-content-header').outerHeight()
+							- $modal.find('.organization-info').outerHeight();
+						events_block_height = events_block_height < 110 ? 110 : events_block_height ;
+						$modal.find('.last-events-list>div')
+							.slimscroll({
+								height: events_block_height
+							});
+					})
+					.modal();
+
+			}
+		}
+	});
+}
+
 function printSubscribedOrganizations(){
-	var $table = $('.organizations-list').empty(),
-		$loader = $('.subscribed-list-loader').show();
+	var $list = $('.organizations-list').empty(),
+		$loader = $('.organizations-loading').show();
 	$.ajax({
 		'url': 'api/organizations/?with_subscriptions=true',
 		success: function(res){
 			$loader.hide();
 			res.data.forEach(function(organization){
 				if (organization.subscribed){
-					tmpl('organizations-table-item', organization).appendTo($table);
+					tmpl('organizations-item', organization)
+						.appendTo($list)
+						.on('click', function(){
+							showOrganizationalModal($(this).data('organization-id'));
+						});
 				}
 			});
 		}
@@ -22,12 +76,11 @@ function showNotifier(response){
 	$.notify({
 		'message': response.text,
 		'pos': response.pos ? response.pos : 'top-right',
-		'status': response.status ? 'sucess' : 'danger',
+		'status': response.status ? 'success' : 'danger'
 	});
 }
 
 $(document).ready(function(){
-	var ACTIVE_CLASS = 'active';
 
 	(function(){
 		var current_month = moment(),
@@ -49,30 +102,6 @@ $(document).ready(function(){
 
 		function deleteDays(){
 			$calendar.find('.calendar-days-line').remove();
-		}
-
-		function setSurroundMonths(){
-			var $el,
-				selected = '',
-				$list = $('.month-names-list').empty();
-			for (var k = -3; k < 4; k++){
-				var month = current_month.clone();
-				month.add(k, 'months');
-				selected = k == 0 ? ACTIVE_CLASS : '';
-				$el = tmpl('month-name-line', {
-					name: month.lang('ru').format("MMMM YYYY"),
-					number: month.month(),
-					year: month.format('YYYY'),
-					selected: selected,
-					index: k
-				});
-				$el.on('click', function(){
-					setMonth($(this).data('month-index'));
-					renderTable();
-				});
-				$list.append($el);
-
-			}
 		}
 
 		function setMonthName(){
@@ -180,7 +209,6 @@ $(document).ready(function(){
 			deleteDays();
 			buildTable();
 			setMonthName();
-			setSurroundMonths();
 			bindOnClickEvents();
 			clickSelectedDate();
 		}
@@ -211,12 +239,10 @@ $(document).ready(function(){
 		renderTable();
 		selectToday();
 
-		var height = $('.calendar-app').height();
 
-		$('#right-col')
-			.height(height)
+		$('.add-event-modal .modal-body')
 			.slimScroll({
-				height: height
+				height: window.innerHeight - MODAL_OFFSET
 			});
 	})(jQuery, window, undefined);
 
@@ -261,57 +287,36 @@ $(document).ready(function(){
 		});
 	}
 
-	function toggleSideBlocks(){
-		var $events_block = $('.events-list-block'),
-			$organizations = $('.organizations-list-block');
-		if ($events_block.hasClass('hidden')){
-			$organizations.toggleClass('bounceOutLeft bounceInLeft');
-			setTimeout(function(){
-				$organizations.toggleClass('hidden');
-				$events_block.removeClass('hidden').toggleClass('bounceInRight bounceOutRight');
-			}, 1000);
-		}else{
-			$events_block.toggleClass('bounceInRight bounceOutRight');
-			setTimeout(function(){
-				$events_block.toggleClass('hidden');
-				$organizations.removeClass('hidden').toggleClass('bounceOutLeft bounceInLeft');
-			}, 1000);
-		}
-	}
-
-	$('.btn-organizations, .hide-organizations-btn').on('click', function (e) {
-		var $loader = $('.organizations-loading').show(),
-			$list = $('.organizations-and-subs-list'),
-			$search_field = $('.organizations-search').hide();
-		$list.empty();
-		$('.btn-organizations').toggleClass('active btn-default btn-info');
-
-		toggleSideBlocks();
-
-		if ($(e.target).is('.hide-organizations-btn')) return;
-		$.ajax({
-			url: 'api/organizations/?with_subscriptions=true',
-			dataType: 'JSON',
-			success: function(res){
-				$list.empty();
-				$loader.hide();
-				res.data.forEach(function(organization){
-					if (organization.subscribed){
-						organization.sub_btn_class = 'danger';
-						organization.sub_btn_text = 'Отписаться';
-					}else{
-						organization.sub_btn_class = 'success';
-						organization.sub_btn_text = 'Подписаться';
-					}
-					var $org = tmpl('organizations-and-subs-list-item', organization);
-					bindSubscribeBtn($org.find('.subscribe-to'));
-					$list.append($org);
-					$search_field.show();
-				});
-			}
+	$('input.daterange').daterangepicker(
+		{
+			locale: {
+				format: 'DD/MM/YYYY',
+				applyLabel: 'Выбрать',
+				cancelLabel: 'Отмена',
+				firstDay: 1,
+				daysOfWeek: [
+					'Пн','Вт','Ср','Чт','Пт','Сб','Вс'
+				],
+				monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
+			},
+			startDate: moment(),
+			endDate: moment(),
+			minDate: moment(),
+			maxDate: moment().add(3, 'months'),
+			applyClass: 'btn-pink',
+			cancelClass: 'btn-pink-empty'
+		},
+		function(start, end, label) {
+			console.log(start, end, label)
 		});
+
+	$('input.input-hours').inputmask('Regex', {
+		regex: "([01]?[0-9]|2[0-3])"
 	});
-
-
+	$('input.input-minutes').inputmask('Regex', {
+		regex: "[0-5][0-9]"
+	});
+	$(".placepicker").placepicker();
 	printSubscribedOrganizations();
+	bindEventHandlers();
 });

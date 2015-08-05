@@ -1,9 +1,26 @@
 <?php
-	//require_once 'backend/bin/db.php';
-	//require_once 'backend/users/Class.AbstractUser.php';
-	//require_once 'backend/users/Class.User.php';
+	require_once 'backend/bin/db.php';
+	require_once 'backend/users/Class.AbstractUser.php';
+	require_once 'backend/users/Class.User.php';
+	$user = new User($db);
 
-	//$user = new User($db);
+class DemoUser{
+
+
+    public function getAvatarUrl(){
+        return "http://cs622126.vk.me/v622126000/ea78/AvzbE0ET104.jpg";
+    }
+
+    public function getFirstName(){
+        return "Kardanov";
+    }
+
+    public function getLastName(){
+        return "Inal";
+    }
+}
+
+$user = new DemoUser();
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -13,6 +30,8 @@
    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
    <title>Evendate</title>
    <!-- =============== VENDOR STYLES ===============-->
+    <!-- Google ROBOTO-->
+    <link href='http://fonts.googleapis.com/css?family=Roboto&subset=latin,cyrillic-ext' rel='stylesheet' type='text/css'>
    <!-- FONT AWESOME-->
    <link rel="stylesheet" href="vendor/fontawesome/css/font-awesome.min.css">
    <!-- SIMPLE LINE ICONS-->
@@ -34,8 +53,10 @@
 	<link rel="stylesheet" href="app/vendor/loaders.css/loaders.css">
    <!-- =============== APP STYLES ===============-->
    <link rel="stylesheet" href="app/css/app.css" id="maincss">
-	<!-- DATETIMEPICKER-->
-	<link rel="stylesheet" href="vendor/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css">
+	<!-- DATERANGEPICKER-->
+	<link rel="stylesheet" href="vendor/daterangepicker/daterangepicker.css">
+	<!-- Pace-->
+	<link rel="stylesheet" href="vendor/pace/pace.css">
 </head>
 
 <body>
@@ -48,10 +69,10 @@
                    <!-- START user info-->
                    <div class="user-info">
                        <div class="col-md-3">
-                           <img src="http://cs622126.vk.me/v622126000/ea78/AvzbE0ET104.jpg" alt="Avatar" class="img-thumbnail img-circle">
+                           <img src="<?=$user->getAvatarUrl()?>" alt="Avatar" class="img-thumbnail img-circle">
                        </div>
                        <div class="col-md-8">
-                           <span class="user-block-name">Инал Карданов</span>
+                           <span class="user-block-name"><?=$user->getFirstName().' '.$user->getLastName()?></span>
                            <span class="user-is-editor label label-black-blue">Редактор</span>
                        </div>
                        <div class="col-xs-1">
@@ -74,15 +95,7 @@
                                <button type="button" class="btn btn-xs btn-black-blue pressed prev-button">
                                    <span class="fa fa-chevron-left"></span>
                                </button>
-                               <div class="btn-group btn-xs">
-                                   <button data-toggle="dropdown" class="btn btn-xs btn-black-blue btn-default" aria-expanded="true">
-                                       <span id="month-name"></span>
-                                       <b class="caret"></b>
-                                   </button>
-                                   <ul role="menu" class="dropdown-menu animated flipInX month-names-list">
-
-                                   </ul>
-                               </div>
+                               <span id="month-name"></span>
                                <button type="button" class="btn btn-xs btn-black-blue pressed next-button">
                                    <span class="fa fa-chevron-right"></span>
                                </button>
@@ -104,10 +117,9 @@
                            </div>
                        </div>
 					   <span class="side-block-container">Подписки</span>
-                       <div class="whirl duo organizations-loading">
-
+                       <div class="whirl duo organizations-loading"></div>
+					   <div class="organizations-list">
                        </div>
-					   <table class="table table-striped table-bordered table-hover organizations-list"></table>
 				   </ul>
 				   <!-- END sidebar nav-->
 			   </nav>
@@ -118,6 +130,15 @@
       <section>
          <!-- Page content-->
          <div class="content-wrapper">
+             <div class="head-row col-xs-10 header blurheader">
+                 <div class="col-sm-4"></div>
+                 <div class="col-sm-4">
+                     <input type="text" class="form-control search-input" placeholder="Поиск мероприятий, огранизаций, #тегов">
+                 </div>
+                 <div class="col-sm-4">
+                     <span class="help-block m-b-none advanced-search-text">Расширенный поиск.</span>
+                 </div>
+             </div>
             <!-- START row-->
             <div class="calendar-app">
                <div class="row">
@@ -127,7 +148,7 @@
                        <!-- START panel-->
                          <div id="wrapper">
                              <div id="tl-outer-wrap">
-                                 <div id="timeline-wrap"><hr id="timeline"></div>
+                                 <hr id="timeline">
                                  <div class="tl-block">
                                      <div class="tl-part tl-header"><span class="tl-timespot">ВТ, 30/06</span></div>
                                      <div class="tl-part active"><span class="tl-timespot">17:30</span></div>
@@ -140,8 +161,86 @@
                                  </div>
                              </div><div id="blocks-outer-wrap">
                                  <div class="panel panel-default">
-                                     <div class="panel-heading">Panel heading without title</div>
-                                     <div class="tl-panel-block">Например блок</div>
+                                     <div class="panel-heading">
+                                         <div class="row">
+                                             <div class="col-xs-7">Вторник, 30 июня</div>
+                                             <div class="col-xs-5">
+                                                 <span class="pull-right panel-events-count">Мероприятий:
+                                                     <span class="label label-pink">3</span>
+                                                 </span></div>
+                                         </div>
+                                     </div>
+                                     <div class="tl-panel-block closed">
+                                         <div class="row">
+                                             <div class="col-xs-10">
+                                                 <div class="event-title">Голос ГУУ</div>
+                                                 <div class="even-attrs col-xs-6">
+                                                     <div class="col-xs-12"><i class="fa fa-clock-o"></i> 17:30 - 19:00</div>
+                                                     <div class="col-xs-12"><i class="fa fa-map-marker"></i> Рязанский проспект 99</div>
+                                                     <div class="col-xs-12"><i class="fa fa-tags"></i> Музыка, ГУУ</div>
+                                                 </div>
+                                                 <div class="even-attrs col-xs-6">
+	                                                 <div class="row col-xs-12" data-organization-id="1">
+		                                                 <div class="col-xs-3">
+			                                                 <div class="organization-img-wrapper blue">
+				                                                 <img src="organizations_images/guu.png" title="Государственный университет управления">
+			                                                 </div>
+		                                                 </div>
+		                                                 <div class="col-xs-9 organization-name">
+			                                                 <span>ГУУ</span>
+		                                                 </div>
+	                                                 </div>
+                                                     <div class="col-xs-12">
+                                                         <div class="liked-users row">
+                                                             <div class="user-img-wrapper">
+                                                                 <img src="organizations_images/guu.png" class="liked-user-avatar">
+                                                             </div>
+                                                             <div class="user-img-wrapper">
+                                                                 <img src="organizations_images/guu.png" class="liked-user-avatar">
+                                                             </div>
+                                                             <div class="user-img-wrapper">
+                                                                 <img src="organizations_images/guu.png" class="liked-user-avatar">
+                                                             </div>
+                                                             <div class="user-img-wrapper">
+                                                                 <img src="organizations_images/guu.png" class="liked-user-avatar">
+                                                             </div>
+                                                             <div class="user-img-wrapper">
+                                                                 <img src="organizations_images/guu.png" class="liked-user-avatar">
+                                                             </div>
+                                                         </div>
+                                                         <div class="liked-users-count">
+                                                             127 участников
+                                                         </div>
+                                                     </div>
+                                                     <div class="col-xs-12"><button class="btn btn-pink-empty">В избранное</button></div>
+                                                 </div>
+                                                 <div class="event-additional-attrs">
+                                                 </div>
+                                                 <div class="event-description">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum</div>
+                                             </div>
+                                             <div class="col-xs-2">
+                                                 <img src="event_images/12.jpg" class="event-image img-rounded">
+                                             </div>
+
+
+                                             <div class="row col-xs-12 event-bottom-block">
+                                                 <div class="col-xs-5 external-link-wrapper">
+                                                     <span class="external-link">
+                                                         <i class="fa fa-external-link"></i> Страница мероприятия
+                                                     </span>
+                                                 </div>
+                                                 <div class="col-xs-7">
+                                                     <span class="social-links">
+                                                         <i class="fa fa-vk"></i>
+                                                         <i class="fa fa-facebook-f"></i>
+                                                         <i class="fa fa-google-plus"></i>
+                                                         <i class="fa fa-twitter"></i>
+                                                     </span>
+                                                 </div>
+                                             </div>
+                                             <div class="more-info-btn"><span class="fa fa-chevron-up"></span></div>
+                                         </div>
+                                     </div>
                                      <div class="tl-panel-block">Например блок</div>
                                  </div>
                                  <div class="panel panel-default">
@@ -160,16 +259,12 @@
             </div>
          </div>
       </section>
-      <!-- Page footer-->
-      <footer>
-         <span>&copy; 2015 - Evendate</span>
-      </footer>
    </div>
    <!-- Button trigger modal -->
 
    <!-- Modal -->
    <div class="modal fade" id="modal-add-event" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-     <div class="modal-dialog" role="document">
+     <div class="modal-dialog add-event-modal" role="document">
        <div class="modal-content">
          <div class="modal-header">
            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -178,117 +273,114 @@
          <div class="modal-body">
            <form class="form-horizontal" id="create-event-form">
              <div class="form-group">
-               <label class="col-sm-2 control-label">Название</label>
-               <div class="col-sm-10">
+               <label class="control-label">Название</label>
+               <div class="col-sm-12">
                  <input type="text" class="form-control" placeholder="Название мероприятия" name="title">
                </div>
              </div>
-             <div class="form-group">
-               <label class="col-sm-2 control-label">Описание</label>
-               <div class="col-sm-10">
-                 <textarea class="form-control" rows="3" placeholder="Описание мероприятия, до 500 символов" name="description"></textarea>
-               </div>
-             </div>
+
 	           <div class="form-group">
-		           <label class="col-sm-2 control-label">Ссылка на подробное описание</label>
-		           <div class="col-sm-10">
-			           <input type="text" class="form-control" placeholder="Ссылка на описание" name="detail_info_url">
+		           <label class="control-label">Дата</label>
+		           <div class="col-sm-12">
+			           <input type="text" class="form-control daterange" placeholder="Название мероприятия" name="title">
+		           </div>
+	           </div>
+	           <div class="form-group row">
+		           <div class="col-sm-5"><label class="control-label">Время</label></div>
+		           <div class="col-sm-7">
+			           <div class="checkbox c-checkbox needsclick">
+				           <label class="needsclick">
+					           <input type="checkbox" value="" class="needsclick">
+					           <span class="fa fa-check"></span>Весь день</label>
+			           </div>
+		           </div>
+	           </div>
+	           <div class="form-group row">
+		           <div class="col-xs-2">Начало</div>
+		           <div class="col-xs-4 form-inline">
+			           <input class="form-control input-hours">
+			           :
+			           <input class="form-control input-minutes">
+		           </div>
+		           <div class="col-xs-2">Конец</div>
+		           <div class="col-xs-4 form-inline">
+			           <input class="form-control input-hours">
+			           :
+			           <input class="form-control input-minutes">
 		           </div>
 	           </div>
 	           <div class="form-group">
-		           <label class="col-sm-2 control-label">Теги</label>
-		           <div class="col-sm-10">
+		           <label class="control-label">Ссылка на подробное описание</label>
+		           <div class="col-sm-12">
+			           <input type="text" class="form-control" placeholder="Ссылка на описание" name="detail_info_url">
+		           </div>
+	           </div>
+
+	           <div class="form-group">
+		           <label class="control-label">Описание</label>
+		           <div class="col-sm-12">
+			           <textarea class="form-control" rows="3" placeholder="Описание мероприятия, до 500 символов" name="description"></textarea>
+		           </div>
+	           </div>
+	           <div class="form-group">
+		           <label class="control-label">Теги</label>
+		           <div class="col-sm-12">
 			           <input type="text" class="form-control" data-role="tagsinput" placeholder="Теги" name="tags">
 		           </div>
 	           </div>
              <div class="form-group">
-               <label class="col-sm-2 control-label">Место проведения</label>
-               <div class="col-sm-10">
-	               <div class="input-group">
-		               <input type="text" class="form-control" id="event-place" name="location" placeholder="Введите местоположение" autocomplete="off">
-		               <input type="hidden" id="longitude" name="longitude">
-		               <input type="hidden" id="latitute" name="latitude">
-                   <span class="input-group-btn">
-                     <button type="button" class="btn btn-default btn-toggle-map">
-	                     <span class="fa fa-map-marker"></span> Показать на карте
-                     </button>
-                   </span>
+               <label class="control-label">Место проведения</label>
+               <div class="col-sm-12">
+	               <div class="form-group">
+		               <input class="placepicker form-control" data-map-container-id="collapseOne"/>
 	               </div>
-	               <div id="map-canvas" style="width: 100%; height: 400px;" class="hidden"></div>
-               </div>
-             </div>
-             <div class="form-group">
-               <label class="col-sm-2 control-label">Дата проведения</label>
-	             <div class="col-sm-10">
-		             <div class="container">
-			             <div class='col-md-5'>
-				             <div class="form-group">
-					             <div class='input-group date' id='datetimepicker1'>
-
-                <span class="input-group-addon">
-                    C
-                </span>
-						             <input type='text' class="form-control" id="event_start_date"/>
-                <span class="input-group-addon">
-                    <span class="fa fa-calendar"></span>
-                </span>
-					             </div>
-				             </div>
-			             </div>
-			             <div class='col-md-5'>
-				             <div class="form-group">
-					             <div class='input-group date' id='datetimepicker2'>
-                <span class="input-group-addon">
-                    До
-                </span>
-						             <input type='text' class="form-control" id="event_end_date"/>
-                <span class="input-group-addon">
-                    <span class="fa fa-calendar"></span>
-                </span>
-					             </div>
-				             </div>
-			             </div>
-		             </div>
-               </div>
-             </div>
-             <div class="form-group">
-               <label class="col-sm-2 control-label">Изображение</label>
-               <div class="col-sm-10">
-                 <input type="file" data-classbutton="btn btn-default" data-classinput="form-control inline" class="form-control filestyle" id="filestyle-0" tabindex="-1" style="position: absolute; clip: rect(0px 0px 0px 0px);"><div class="bootstrap-filestyle input-group">
-                       <input type="text" class="form-control " disabled=""> <span class="group-span-filestyle input-group-btn" tabindex="0"><label for="filestyle-0" class="btn btn-default "><span class="glyphicon glyphicon-folder-open"></span> Выбрать файл</label></span></div>
-	               <div class="panel panel-info img-preview-panel hidden">
-		               <div class="panel-heading">Кадрирование изображения
-		               </div>
-		               <div class="panel-body img-container event-img-container">
-			               <div class="ball-pulse img-loading-pulse">
-				               <div></div>
-				               <div></div>
-				               <div></div>
-			               </div>
-			               <img src="" class="hidden img-cropper-preview">
-			               <div class="image-preview-canvas hidden"></div>
-		               </div>
-		               <div class="panel-footer">
-			               <button type="button" class="btn btn-labeled btn-success img-crop-btn disabled">
-                           <span class="btn-label"><i class="fa fa-check"></i>
-                           </span>Применить</button>
-		               </div>
+	               <div id="collapseOne" class="collapse">
+		               <div class="placepicker-map thumbnail"></div>
 	               </div>
                </div>
-               <div class="cropper-example-1">
-
-               </div>
              </div>
+	           <div class="form-group">
+		           <label class="control-label">Изображения</label>
+		           <div class="row add-images">
+                       <div class="col-sm-5">
+                           <input type="file" data-classbutton="btn btn-default" data-classinput="form-control inline" class="form-control filestyle" id="filestyle-0" tabindex="-1" style="position: absolute; clip: rect(0px 0px 0px 0px);">
+                           <div class="bootstrap-filestyle input-group vertical">
+                               <span class="group-span-filestyle input-group-btn" tabindex="0">
+                                   <label for="filestyle-0" class="btn btn-default vertical-btn" style="height: 213px;width: 153px;padding-top: 84px;">
+                                       <span>Выбрать файл</span>
+                                   </label>
+                               </span>
+                           </div>
+			           </div>
+                       <div class="col-sm-7">
+                           <input type="file" data-classbutton="btn btn-default" data-classinput="form-control inline" class="form-control filestyle" id="filestyle-1" tabindex="-1" style="position: absolute; clip: rect(0px 0px 0px 0px);">
+                           <div class="bootstrap-filestyle input-group horizontal">
+                               <span class="group-span-filestyle input-group-btn" tabindex="0">
+                                   <label for="filestyle-1" class="btn btn-default horizontal-btn" style="height: 143px;width: 202px;padding-top: 60px;">
+                                       <span>Выбрать файл</span>
+                                   </label>
+                               </span>
+                           </div>
+                       </div>
+		           </div>
+	           </div>
            </form>
          </div>
          <div class="modal-footer">
-           <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
-           <button type="button" class="btn btn-primary create-event-btn">Создать</button>
+           <button type="button" class="btn btn-pink-empty" data-dismiss="modal">Отмена</button>
+           <button type="button" class="btn btn-pink create-event-btn">Создать</button>
          </div>
        </div>
      </div>
+	   <div class="image-cropper-wrapper hidden">
+		   <div class="image-cutter">
+			   <img src="">
+			   <div class="whirl duo image-cropper"></div>
+			   <a href="#" class="btn btn-pink img-crop-btn disabled"> Кадрировать</a>
+			   <a href="#" class="btn btn-pink-empty img-crop-cancel"> Отмена</a>
+		   </div>
+	   </div>
    </div>
-  <!-- Modal Subscriptions-->
    <!-- =============== VENDOR SCRIPTS ===============-->
    <!-- MODERNIZR-->
    <script src="vendor/modernizr/modernizr.js"></script>
@@ -312,22 +404,22 @@
    <script src="app/js/demo/demo-rtl.js"></script>
    <!-- TAGS INPUT-->
    <script src="vendor/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js"></script>
-   <!-- =============== PAGE VENDOR SCRIPTS ===============-->
-   <!-- JQUERY UI-->
-   <script src="vendor/jquery-ui/ui/core.js"></script>
-   <script src="vendor/jquery-ui/ui/widget.js"></script>
-   <script src="vendor/jquery-ui/ui/mouse.js"></script>
-   <script src="vendor/jquery-ui/ui/draggable.js"></script>
-   <script src="vendor/jquery-ui/ui/droppable.js"></script>
-   <script src="vendor/jquery-ui/ui/sortable.js"></script>
-   <script src="vendor/jqueryui-touch-punch/jquery.ui.touch-punch.min.js"></script>
    <!-- MOMENT JS-->
    <script src="vendor/moment/min/moment-with-locales.min.js"></script>
-   <!-- DATETIMEPICKER-->
-   <script type="text/javascript" src="vendor/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
+   <!-- DATERANGEINPUTS-->
+   <script src="vendor/daterangepicker/daterangepicker.js"></script>
+   <!-- INPUTMASKS-->
+   <script src="vendor/jquery.inputmask/dist/jquery.inputmask.bundle.min.js"></script>
+   <!-- Blur Header-->
+   <script src="vendor/blurheader/html2canvas.js"></script>
+   <script src="vendor/blurheader/StackBlur.js"></script>
   <!-- Google MAPS-->
-   <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=false&libraries=places"></script>
-   <script type="text/javascript" src="vendor/jquery.locationpicker/locationpicker.jquery.min.js"></script>
+   <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=true&libraries=places"></script>
+   <script type="text/javascript" src="vendor/placepicker/jquery.placepicker.min.js"></script>
+   <!-- INPUTMASKS-->
+   <script src="vendor/pace/pace.min.js"></script>
+
+
    <!-- =============== APP SCRIPTS ===============-->
    <script src="http://localhost:8080/socket.io/socket.io.js" type="text/javascript"></script>
    <script src="app/js/app.js"></script>
@@ -337,21 +429,30 @@
    <script type="javascript/template" id="tmpl-calendar-line">
      <tr class="calendar-days-line"></tr>
    </script>
+
    <script type="javascript/template" id="tmpl-month-name-line">
 	   <li class="set-month-item {selected}" data-month-number="{number}" data-month-index="{index}" data-yaer="{year}"><a href="#">{name}</a></li>
    </script>
+
    <script type="javascript/template" id="tmpl-calendar-day">
      <td class="td-day day-{day_number} {today}" data-date="{date}"><div class="content centering"><span class="day-number">{number}</span></div></td>
    </script>
+
    <script type="javascript/template" id="tmpl-event-type-dropdown-item">
 	   <li class="event-type-line {is_active}" data-event-type-id="{event_type_id}" data-organization-id="{organization_id}"><a href="#">{event_type_name}</a></li>
    </script>
 
-   <script type="javascript/template" id="tmpl-organizations-table-item">
-	   <tr data-organization-id="{id}" class="organization-logo-16 text-center">
-		   <td class="image-td"><img src="{img_url}"></td>
-		   <td>{name}</td>
-	   </tr>
+   <script type="javascript/template" id="tmpl-organizations-item">
+       <div class="row organizations-item"  data-organization-id="{id}" >
+           <div class="organizations-item-wrapper">
+               <div class="col-xs-3">
+	               <div class="organization-img-wrapper">
+		               <img src="{img_url}" title="{name}">
+	               </div>
+               </div>
+               <span class="col-xs-9">{short_name}</span>
+           </div>
+       </div>
    </script>
 
    <script type="javascript/template" id="tmpl-organizations-and-subs-list-item">
@@ -372,6 +473,81 @@
 	   </div>
    </script>
 
+   <script type="javascript/template" id="tmpl-organization-modal">
+       <div class="modal fade organization-modal" id="organization-modal" tabindex="-1" role="dialog" aria-labelledby="organization-label">
+           <div class="modal-dialog" role="document">
+               <div class="modal-content">
+                   <div class="modal-body">
+                       <div class="modal-header">
+                           <span>{short_name}</span>
+                       </div>
+                       <div class="organization-content-header">
+                           <img src="{background_img_url}">
+                       </div>
+
+                       <div class="organization-full-name">{name}</div>
+                       <div class="organization-logo">
+                           <img src="{img_url}">
+                       </div>
+                       <div class="organization-info">
+                           <div class="description">
+                               <div class="description-text">{description}</div>
+                               <div class="col-xs-12 liked-users-wrapper">
+                                   <div class="liked-users row">
+                                       <div class="user-img-wrapper">
+                                           <img src="http://cs624029.vk.me/v624029543/2a7b0/ZkMV14mud2s.jpg" class="liked-user-avatar" style="">
+                                       </div>
+                                       <div class="user-img-wrapper">
+                                           <img src="http://cs629126.vk.me/v629126000/aa4e/lS7YaihK728.jpg" class="liked-user-avatar">
+                                       </div>
+                                       <div class="user-img-wrapper">
+                                           <img src="http://cs421321.vk.me/v421321015/4c1a/pQRr1LJ31Zw.jpg" class="liked-user-avatar">
+                                       </div>
+                                       <div class="user-img-wrapper">
+                                           <img src="http://vk.com/images/camera_50.png" class="liked-user-avatar">
+                                       </div>
+                                       <div class="user-img-wrapper">
+                                           <img src="http://cs613529.vk.me/v613529757/1a171/6RWDHlGyFkg.jpg" class="liked-user-avatar">
+                                       </div>
+                                   </div>
+                                   <div class="subscribe-btn-wrapper">
+                                       <button class="btn btn-primary">Подписаться</button>
+                                   </div>
+                               </div>
+                               <div class="liked-users-count">
+
+                               </div>
+                           </div>
+                       </div>
+	                   <div class="col-xs-12 last-events-list">
+		                   {events}
+	                   </div>
+                   </div>
+               </div>
+           </div>
+       </div>
+</script>
+
+   <script type="javascript/template" id="tmpl-short-event">
+       <div class="col-xs-12 short-event">
+           <div class="event-image-circle">
+               <img src="{img_url_vertical}">
+           </div>
+           <div class="event-info">
+               <div class="event-name">
+                   {title}
+               </div>
+               <div class="event-attributes">
+                   <span class="event-attribute">
+                       <span class="fa fa-users"></span> 172
+                   </span>
+                   <span class="event-attribute">
+                       <span class="fa fa-clock-o"></span> 30/06
+                   </span>
+               </div>
+           </div>
+       </div>
+</script>
    <script type="javascript/template" id="tmpl-event">
 	   <div class="panel widget">
 		   <div class="event-type-line {event_type_latin_name}"></div>

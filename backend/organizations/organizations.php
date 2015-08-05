@@ -1,13 +1,26 @@
 <?php
 
 require_once $ROOT_PATH.'backend/organizations/Class.OrganizationsCollection.php';
+require_once $ROOT_PATH.'backend/organizations/Class.Organization.php';
+require_once $ROOT_PATH.'backend/events/Class.EventsCollection.php';
 
 $__modules['organizations'] = array(
 	'GET' => array(
 		'all' => function () use ($__db, $__request, $__user) {
+
 		},
 		'my' => function() use ($__db, $__request, $__user){
-			//return $collection->
+
+		},
+		'{{/(id:[0-9]+)}}' => function($id) use ($__db, $__request, $__user){
+			$organization = new Organization($id, $__db);
+			$result = $organization->getFullParams()->getData();
+			if (isset($__request['with_events']) && $__request['with_events'] == true){
+				$result['events'] = EventsCollection::filter($__db, array(
+					'organization' => $organization
+				))->getData();
+			}
+			return new Result(true, '', $result);
 		},
 		'' => function () use ($__db, $__request, $__user) { /*MY EVENTS!*/
 			$collection = new OrganizationsCollection($__db, $__user);

@@ -15,7 +15,6 @@ try {
 	require_once "../backend/bin/Class.Result.php";
 	require_once "../backend/users/Class.AbstractUser.php";
 	require_once "../backend/users/Class.User.php";
-	//require_once "../backend/users/Class.ApiApplication.php";
 	require_once "../backend/users/Class.Editor.php";
 
 
