@@ -1,3 +1,6 @@
+<?php
+require_once 'backend/bin/db.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -7,7 +10,7 @@
 	<meta name="description" content="Bootstrap Admin App + jQuery">
 	<meta name="keywords" content="app, responsive, jquery, bootstrap, dashboard, admin">
 	<meta name="google-signin-client_id" content="403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv.apps.googleusercontent.com">
-	<title>Angle - Bootstrap Admin Template</title>
+	<title>Evendate - Авторизация ВКонтакте</title>
 	<!-- =============== VENDOR STYLES ===============-->
 	<!-- FONT AWESOME-->
 	<link rel="stylesheet" href="vendor/fontawesome/css/font-awesome.min.css">
@@ -19,6 +22,9 @@
 	<link rel="stylesheet" href="app/vendor/loaders.css/loaders.css">
 	<!-- =============== APP STYLES ===============-->
 	<link rel="stylesheet" href="app/css/app.css" id="maincss">
+	<!-- WHIRL (spinners)-->
+	<link rel="stylesheet" href="vendor/whirl/dist/whirl.css">
+
 </head>
 
 <body>
@@ -29,13 +35,18 @@
 			<div class="panel panel-default">
 				<div class="panel-heading">Загрузка данных</div>
 				<div class="panel-body loader-demo">
-					<div class="ball-pulse">
-						<div></div>
-						<div></div>
-						<div></div>
-					</div>
+					<div class="whirl duo"></div>
 				</div>
 			</div>
+
+		<div class="panel panel-danger hidden">
+			<div class="panel-heading">Ошибка авторизации - отсутствует Email</div>
+			<div class="panel-body">
+				В Вашем аккаунте vk.com не указан email. Авторзация невозможна.
+				Укажите, пожауйста, в Вашем аккаунте
+				<a href="https://vk.com/settings#chgmail" target="_blank">https://vk.com/settings</a> email и попробуйте еще раз.
+			</div>
+		</div>
 
 
 		<!-- END panel-->
@@ -58,11 +69,8 @@
 <script src="vendor/jQuery-Storage-API/jquery.storageapi.js"></script>
 <!-- PARSLEY-->
 <script src="vendor/parsleyjs/dist/parsley.min.js"></script>
-<!-- GOOGLE PLATFORM FOR GOOGLE PLUS AUTHORIZATION-->
-<script src="https://apis.google.com/js/platform.js" async defer></script>
 <!-- VK OPEN API FOR AUTHORIZATION-->
-<script src="https://vk.com/js/api/openapi.js" type="text/javascript"></script>
-<script src="http://localhost:8080/socket.io/socket.io.js" type="text/javascript"></script>
+<script src="http://<?=App::$DOMAIN?>:8080/socket.io/socket.io.js" type="text/javascript"></script>
 
 
 <!-- =============== APP SCRIPTS ===============-->
@@ -70,21 +78,11 @@
 
 <script>
 	window.resizeTo(530, 400);
-	socket.emit('auth.vkOauthDone', searchToObject());
-	socket.on('auth', function(data){
-		$.ajax({
-			url: 'auth.php',
-			type: 'POST',
-			data: data,
-			success: function(res){
-				if (res.status){
-					window.opener.location = 'calendar.php';
-					window.close();
-				}else{
-					alert(res.text);
-				}
-			}
-		});
+	var data = searchToObject();
+	data.type = 'vk';
+	socket.emit('auth.oauthDone', data);
+	socket.on('vk.needEmail', function(){
+		$('.panel').toggleClass('hidden');
 	});
 
 </script>

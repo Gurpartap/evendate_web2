@@ -8,7 +8,7 @@ $__modules['subscriptions'] = array(
 		'my' => function() use ($__db, $__request, $__user){
 			//return $collection->
 		},
-		'' => function () use ($__db, $__request, $__user) { /*MY EVENTS!*/
+		'' => function () use ($__db, $__request, $__user) {
 			$collection = new OrganizationsCollection($__db, $__user);
 			if (isset($__request['with_subscriptions'])){
 				$collection->setUser($__user);
@@ -30,7 +30,8 @@ $__modules['subscriptions'] = array(
 	'DELETE' => array(
 		'{/(id:[0-9]+)}' => function ($id) use ($__db, $__request, $__user){
 			$subscription = new Subscription($id, $__db);
-			return $subscription->delete($__user);
+			$result = $subscription->delete($__user);
+			return $result;
 		},
 	)
 );

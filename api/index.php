@@ -32,6 +32,7 @@ try {
 
 	$__request = array_merge($_REQUEST, RequestParser::put());
 	$__request['payload'] = RequestParser::payload();
+	$__headers = getallheaders();
 	$__request['__files'] = '';
 	$act = explode('/', $_REQUEST['_url']);
 	$__url = $_REQUEST['_url'];
@@ -50,16 +51,12 @@ try {
 
 	$__request_method = $_SERVER['REQUEST_METHOD'];
 	try{
-		if (isset($__request['token'])){
-			$token = $__request['token'];
-		}else{
-			$token = null;
-		}
+		$token = isset($__headers['Authorization']) ? $__headers['Authorization'] : null;
 		$__user = new User($__db, $token);
 	}catch(Exception $e){
 		try{
-			if (!isset($__request['public_key']) || !isset($__request['time'])) throw new LogicException("You should set time and public_key");
-			$__api_app = new ApiApplication($__db, $__request['public_key'], $__request['time'],$__request['token']);
+			//if (!isset($__request['public_key']) || !isset($__request['time'])) throw new LogicException("You should set time and public_key");
+			//$__api_app = new ApiApplication($__db, $__request['public_key'], $__request['time'],$__request['token']);
 		}catch(Exception $e){
 			echo new Result(false, $e->getMessage(), array('refresh' => true));
 			die();

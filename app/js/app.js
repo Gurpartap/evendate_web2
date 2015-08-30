@@ -2760,8 +2760,11 @@ function tmpl(template_type, items, addTo, direction){
 /**===========================================================
  * Query search part to object
  * */
+if (window['moment'] != undefined){
+    moment.lang(navigator.language);
+}
 
- function searchToObject() {
+function searchToObject() {
 	var pairs = window.location.search.substring(1).split("&"),
 		obj = {},
 		pair,
@@ -2777,4 +2780,42 @@ function tmpl(template_type, items, addTo, direction){
 	return obj;
 }
 
+function hashToObject() {
+	var pairs = window.location.hash.substring(1).split("&"),
+		obj = {},
+		pair,
+		i;
+	for ( i in pairs ) {
+		if ( pairs[i] === '' ) continue;
+
+		pair = pairs[i].split("=");
+		obj[ decodeURIComponent( pair[0] ) ] = decodeURIComponent( pair[1] );
+	}
+	return obj;
+}
+
 window.socket = io.connect(':8080');
+
+socket.on('auth', function(data){
+    if (data.hasOwnProperty('mobile') && data.mobile == true){
+        window.location.href = '/mobileAuthDone.php?token=' + data.token + '&email=' + data.email;
+    }else{
+        $.ajax({
+            url: 'auth.php',
+            type: 'POST',
+            data: data,
+            success: function(res){
+                if (res.status){
+                    window.opener.location = 'calendar.php';
+                    window.close();
+                }else{
+                    alert(res.text);
+                }
+            }
+        });
+    }
+});
+
+socket.on('log', function(data){
+    console.log(data);
+})

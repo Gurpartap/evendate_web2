@@ -20,7 +20,7 @@ class App {
 	 * init config options for deploy and versioning
 	 * */
 	static function init(){
-		$_SERVER['ENV'] = isset($_SERVER['ENV']) ? $_SERVER['ENV'] : 'local';
+		$_SERVER['ENV'] = isset($_SERVER['ENV']) ? $_SERVER['ENV'] : 'dev';
 		$filename = 'config.json';
 		$counter = 0;
 		if (file_exists($filename) == false){

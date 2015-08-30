@@ -1,12 +1,15 @@
 <?php
 
-	require_once $ROOT_PATH.'backend/events/Class.Event.php';
+	require_once $ROOT_PATH . 'backend/events/Class.Event.php';
 
 	class Editor extends User{
 
 		protected function addNewEvent(array $data){
 			return Event::create($this->db, array_merge($data, array(
-				'image_ext' => $this->getImageExtension($data['file_name']),
+				'image_extensions' => array(
+					'vertical' => $this->getImageExtension($data['file_names']['vertical']),
+					'horizontal' => $this->getImageExtension($data['file_names']['horizontal'])
+				),
 				'organization_id' => $this->getOrganizationId(),
 				'creator_id' => $this->getId()
 			)));

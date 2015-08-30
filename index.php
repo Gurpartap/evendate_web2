@@ -1,13 +1,14 @@
+<?php
+require_once 'backend/bin/db.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
    <meta charset="utf-8">
    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-   <meta name="description" content="Bootstrap Admin App + jQuery">
-   <meta name="keywords" content="app, responsive, jquery, bootstrap, dashboard, admin">
   <meta name="google-signin-client_id" content="403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv.apps.googleusercontent.com">
-   <title>Angle - Bootstrap Admin Template</title>
+   <title>Evendate</title>
    <!-- =============== VENDOR STYLES ===============-->
    <!-- FONT AWESOME-->
    <link rel="stylesheet" href="vendor/fontawesome/css/font-awesome.min.css">
@@ -32,6 +33,8 @@
             <div class="panel-body">
               <div>
                 <button class="btn btn-primary vk-auth-btn">VK.com</button>
+                <button class="btn btn-danger google-plus-btn">Google Plus</button>
+                <button class="btn btn-black-blue facebook-btn">Facebook</button>
               </div>
             </div>
          </div>
@@ -55,8 +58,6 @@
    <script src="vendor/jQuery-Storage-API/jquery.storageapi.js"></script>
    <!-- PARSLEY-->
    <script src="vendor/parsleyjs/dist/parsley.min.js"></script>
-   <!-- VK OPEN API FOR AUTHORIZATION-->
-   <script src="https://vk.com/js/api/openapi.js" type="text/javascript"></script>
 
 
    <!-- =============== APP SCRIPTS ===============-->
@@ -68,7 +69,17 @@
   }
 
   $('.vk-auth-btn').on('click', function(){
-    window.open('https://oauth.vk.com/authorize?client_id=4970729&scope=friends,email,offline,nohttps&redirect_uri=http://localhost/evendate/vkOauthDone.php&response_type=code', 'VK_AUTH_WINDOW',
+    window.open('https://oauth.vk.com/authorize?client_id=5029623&scope=friends,email,offline,nohttps&redirect_uri=http://<?=App::$DOMAIN?>/vkOauthDone.php?mobile=false&response_type=code', 'VK_AUTH_WINDOW',
+            'status=1,toolbar=0,menubar=0&height=500,width=700');
+  });
+
+  $('.google-plus-btn').on('click', function(){
+    window.open('https://accounts.google.com/o/oauth2/auth?scope=email profile https://www.googleapis.com/auth/plus.login &redirect_uri=http://<?=App::$DOMAIN?>/googleOauthDone.php?mobile=false&response_type=token&client_id=403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv.apps.googleusercontent.com', 'GOOGLE_AUTH_WINDOW',
+            'status=1,toolbar=0,menubar=0&height=500,width=700');
+  });
+
+  $('.facebook-btn').on('click', function(){
+    window.open('https://www.facebook.com/dialog/oauth?client_id=1692270867652630&response_type=code&scope=public_profile,email,user_friends&display=popup&redirect_uri=http://<?=App::$DOMAIN?>/fbOauthDone.php?mobile=false', 'FB_AUTH_WINDOW',
             'status=1,toolbar=0,menubar=0&height=500,width=700');
   });
 

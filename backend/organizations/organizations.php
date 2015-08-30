@@ -14,11 +14,11 @@ $__modules['organizations'] = array(
 		},
 		'{{/(id:[0-9]+)}}' => function($id) use ($__db, $__request, $__user){
 			$organization = new Organization($id, $__db);
-			$result = $organization->getFullParams()->getData();
+			$result = $organization->getFullParams($__user)->getData();
 			if (isset($__request['with_events']) && $__request['with_events'] == true){
-				$result['events'] = EventsCollection::filter($__db, array(
+				$result['events'] = EventsCollection::filter($__db, $__user, array(
 					'organization' => $organization
-				))->getData();
+				), ' ORDER BY events.id DESC')->getData();
 			}
 			return new Result(true, '', $result);
 		},

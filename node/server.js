@@ -12,176 +12,441 @@ var server = require('http'),
 config = _fs.readFileSync('../config.json');
 config = JSON.parse(config);
 
-
 var config_index = process.env.ENV ? process.env.ENV : 'dev';
-
 var real_config = config[config_index],
 	connection = mysql.createConnection(real_config.db);
-var mess_args = {
-	headers: {
-	},
-	data:{
-	}
-};
+
 	var URLs = {
 		"VK":{
 			'GET_ACCESS_TOKEN': 'https://oauth.vk.com/access_token?client_id='+
 				real_config.VK.APP_ID+
 				'&client_secret=' +
 				real_config.VK.SECURE_KEY +
-				'&redirect_uri=http://localhost/evendate/vkOauthDone.php&code=',
-			'GET_SUBSCRIPTIONS_LIST': 'https://api.vk.com/method/friends.get',
+				'&redirect_uri=http://' + real_config.domain + '/vkOauthDone.php?mobile=',
+			'GET_FRIENDS_LIST': 'https://api.vk.com/method/friends.get',
 			'GET_USER_INFO': 'https://api.vk.com/method/users.get'
+		},
+		"GOOGLE":{
+			'GET_ACCESS_TOKEN': 'https://www.googleapis.com/oauth2/v1/tokeninfo',
+			'GET_USER_INFO': 'https://www.googleapis.com/plus/v1/people/me',
+			'GET_FRIENDS_LIST': "https://www.googleapis.com/plus/v1/people/me/people/visible"
+		},
+		"FACEBOOK":{
+			'GET_ACCESS_TOKEN': 'https://graph.facebook.com/v2.3/oauth/access_token?'
+				+ 'client_id=' + real_config.facebook.app_id
+				+ '&client_secret=' + real_config.facebook.app_secret
+				+ '&redirect_uri=http://' + real_config.domain + '/fbOauthDone.php?mobile=',
+			'GET_USER_INFO': 'https://graph.facebook.com/me?fields=first_name,last_name,email,middle_name,picture&access_token=',
+			'GET_FRIENDS_LIST': "https://graph.facebook.com/me/friends?access_token="
 		}
 	};
 
-
 io.on('connection', function (socket){
 
-	socket.on('auth.vkOauthDone', function(oauth_data){
+	function makeId(){
+		var text = "";
+		var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+		for( var i=0; i < 64; i++ ){
+			text += possible.charAt(Math.floor(Math.random() * possible.length));
+		}
+		return text;
+	}
 
-		var friends = [];
+	function handleError(err, code){
+		console.log(err, code);
+	}
 
-		function getAccessToken(data, callback){
-			rest
-				.get(URLs.VK.GET_ACCESS_TOKEN + data.code, {})
-				.on('complete', function(res){
-					if (callback instanceof Function){
-						callback(res);
-					}
-				});
+	function saveDataInDB(data, callback){
+
+		function escapeArray(array){
+			var _result = [];
+			array.forEach(function(value){
+				_result.push(connection.escape(value));
+			});
+			return _result.join(', ');
 		}
 
-		function getUsersInfo(data, callback){
-			rest
-				.get(URLs.VK.GET_USER_INFO, {
-					query:{
-						user_ids: data.user_id,
-						fields: 'photo_50,photo_100,photo_max_orig',
-						name_case: 'nom'
-					}
-				})
-				.on('complete', function(res){
-					if (callback instanceof Function){
-						res = res.hasOwnProperty('response') ? res.response[0]: null;
-						callback(res);
-					}
-				});
-		}
-
-		function getFriendsList(data, callback){
-			var FRIENDS_COUNT = 5000;
-			rest
-				.get(URLs.VK.GET_SUBSCRIPTIONS_LIST, {
-					query: {
-						order: 'hints',
-						user_id: data.uid,
-						fields: 'city,domain',
-						count: FRIENDS_COUNT
-					}
-				})
-				.on('complete', function(data){
-					if (callback instanceof Function){
-						var res = data.hasOwnProperty('response') ? data.response : null;
-						callback(res);
-					}
-				});
-		}
-
-		function saveDataInDB(data, callback){
-
-			function makeId(){
-				var text = "";
-				var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-				for( var i=0; i < 64; i++ ){
-					text += possible.charAt(Math.floor(Math.random() * possible.length));
+		function getUIDValues(){
+			var result = {
+				google_uid: null,
+				facebook_uid: null,
+				vk_uid: null
+			};
+			switch (data.type){
+				case 'vk': {
+					result.vk_uid = data.access_data.user_id;
+					break;
 				}
-				return text;
+				case 'facebook': {
+					result.facebook_uid = data.user_info.id;
+					break;
+				}
+				case 'google': {
+					result.google_uid = data.user_info.id;
+					break;
+				}
 			}
+			return result;
+		}
 
-			function handleError(err, code){
-				console.log(err, code);
-			}
+		var UIDs = getUIDValues(),
+			user_token = data.access_data.access_token + data.access_data.secret + makeId(),
+			q_ins_user = 'INSERT INTO users(first_name, last_name, email, token, avatar_url, vk_uid, facebook_uid, google_uid, created_at) ' +
+				' VALUES(' +
+					escapeArray([ data.user_info.first_name, data.user_info.last_name, data.access_data.email,
+						user_token, data.user_info.photo_100, UIDs.vk_uid, UIDs.facebook_uid, UIDs.google_uid]) +
+				', NOW()) ' +
+				'ON DUPLICATE KEY UPDATE ' +
+				'first_name = ' + connection.escape(data.user_info.first_name) + ', ' +
+				'last_name = ' + connection.escape(data.user_info.last_name) + ', ' +
+				'avatar_url = ' + connection.escape(data.user_info.photo_100) + ', ' +
+				'vk_uid = ' + (UIDs.vk_uid != null ? connection.escape(UIDs.vk_uid) : ' vk_uid ') + ', ' +
+				'facebook_uid = ' + (UIDs.facebook_uid != null ?connection.escape(UIDs.facebook_uid) : ' facebook_uid ') + ', ' +
+				'google_uid = ' + (UIDs.google_uid != null ?connection.escape(UIDs.google_uid) : ' google_uid ') + ', ' +
+				'token = ' + connection.escape(user_token);
+		console.log(q_ins_user);
+		/*INSERT IN users TABLE*/
+		connection.query(q_ins_user, function(user_err, result){
+			socket.emit('log', data);
+			if (user_err) return handleError(user_err, 'CANT_INSERT_USER');
+			var user_id = result.insertId,
+				q_ins_sign_in = '';
 
-
-			var user_token = data.access_data.access_token + data.access_data.secret + makeId(),
-				q_ins_user = 'INSERT INTO users(first_name, last_name, email, token, avatar_url, created_at) ' +
-					' VALUES(' +
-					connection.escape(data.user_info.first_name) + ', ' +
-					connection.escape(data.user_info.last_name) + ', ' +
-					connection.escape(data.access_data.email) + ', ' +
-					connection.escape(user_token) + ', ' +
-					connection.escape(data.user_info.photo_100) + ', ' +
-					'NOW()) ' +
-						'ON DUPLICATE KEY UPDATE ' +
-						'first_name = ' + connection.escape(data.user_info.first_name) + ', ' +
-						'last_name = ' + connection.escape(data.user_info.last_name) + ', ' +
-						'avatar_url = ' + connection.escape(data.user_info.photo_100) + ', ' +
-						'token = ' + connection.escape(user_token);
-			/*INSERT IN users TABLE*/
-			connection.query(q_ins_user, function(user_err, result){
-				if (user_err) return handleError(user_err, 'CANT_INSERT_USER');
-				var user_id = result.insertId,
-					q_ins_vk_sign_in = 'INSERT INTO vk_sign_in(uid, access_token, expires_in, secret, user_id, photo_50,' +
+			switch(data.type){
+				case 'vk': {
+					q_ins_sign_in = 'INSERT INTO vk_sign_in(uid, access_token, expires_in, secret, user_id, photo_50,' +
 						'   photo_100, photo_max_orig, created_at) ' +
 						'VALUES(' +
-						connection.escape(data.access_data.user_id) + ', ' +
-						connection.escape(data.access_data.access_token) + ', ' +
-						connection.escape(data.access_data.expires_in) + ', ' +
-						connection.escape(data.access_data.secret) + ', ' +
-						connection.escape(user_id) + ', ' +
-						connection.escape(data.user_info.photo_50) + ', ' +
-						connection.escape(data.user_info.photo_100) + ', ' +
-						connection.escape(data.user_info.photo_orig_max) + ', ' +
-						'NOW()) ' +
-							'ON DUPLICATE KEY UPDATE ' +
-							'access_token = ' + connection.escape(data.access_data.access_token) + ', ' +
-							'expires_in = ' + connection.escape(data.access_data.expires_in) + ', ' +
-							'photo_50 = ' + connection.escape(data.user_info.photo_50) + ', ' +
-							'photo_100 = ' + connection.escape(data.user_info.photo_100) + ', ' +
-							'photo_orig_max = ' + connection.escape(data.user_info.photo_orig_max) + ', ' +
-							'secret = ' + connection.escape(data.access_data.secret);
+						escapeArray([ data.access_data.user_id, data.access_data.access_token, data.access_data.expires_in,
+							data.access_data.secret, user_id, data.user_info.photo_50, data.user_info.photo_100,
+							data.user_info.photo_orig_max]) +
+						', NOW()) ' +
+						'ON DUPLICATE KEY UPDATE ' +
+						'access_token = ' + connection.escape(data.access_data.access_token) + ', ' +
+						'expires_in = ' + connection.escape(data.access_data.expires_in) + ', ' +
+						'photo_50 = ' + connection.escape(data.user_info.photo_50) + ', ' +
+						'photo_100 = ' + connection.escape(data.user_info.photo_100) + ', ' +
+						'photo_max_orig = ' + connection.escape(data.user_info.photo_orig_max) + ', ' +
+						'secret = ' + connection.escape(data.access_data.secret);
+					break;
+				}
+				case 'google':{
+					q_ins_sign_in = 'INSERT INTO google_sign_in(google_id, access_token, expires_in, etag, ' +
+					' user_id, cover_photo_url, created_at) ' +
+					'VALUES(' +
+						escapeArray([
+								data.user_info.id,
+								data.oauth_data.access_token,
+								data.oauth_data.expires_in,
+								data.user_info.etag,
+								user_id,
+								data.user_info.cover.coverPhoto.url]
+						) +
+					', NOW()) ' +
+					'ON DUPLICATE KEY UPDATE ' +
+					'access_token = ' + connection.escape(data.oauth_data.access_token) + ', ' +
+					'expires_in = ' + connection.escape(data.oauth_data.expires_in) + ', ' +
+					'etag = ' + connection.escape(data.user_info.etag) + ', ' +
+					'cover_photo_url = ' + connection.escape(data.user_info.cover.coverPhoto.url)
+					break;
+				}
+				case 'facebook':{
+					q_ins_sign_in = 'INSERT INTO facebook_sign_in(uid, access_token, expires_in' +
+						',user_id, created_at) ' +
+					'VALUES(' +
+						escapeArray([
+								data.user_info.id,
+								data.access_data.access_token,
+								data.access_data.expires_in,
+								user_id]
+						) +
+					', NOW()) ' +
+					'ON DUPLICATE KEY UPDATE ' +
+					'access_token = ' + connection.escape(data.access_data.access_token) + ', ' +
+					'expires_in = ' + connection.escape(data.access_data.expires_in)
+					break;
+				}
 
-				/*INSERT IN vk_sing_in TABLE*/
-				connection.query(q_ins_vk_sign_in, function(sign_in_err, result){
-					if (user_err) return handleError(sign_in_err, 'CANT_INSERT_SIGN_IN_INFO');
+			}
 
 
-					var created_at = moment().format("YYYY-MM-DD HH:mm:ss"),
+			function insertToken(){
+				var token_type = (data.oauth_data.hasOwnProperty('mobile') && data.oauth_data.mobile == 'true') ? 'mobile' : 'bearer',
+					token_time = token_type == 'mobile' ? moment(0).add(1, 'months').unix() : moment(0).add(1, 'weeks').unix(),
+					created_at = moment().unix(),
+					expires_on = created_at + token_time,
+					q_ins_token = 'INSERT INTO tokens(token, user_id, token_type, expires_on, created_at) VALUES(' +
+						escapeArray([
+							user_token,
+							user_id,
+							token_type,
+							expires_on]
+						) + ', FROM_UNIXTIME(' + created_at + ')) ';
+				connection.query(q_ins_token, function(err){
+					if (err) return handleError(err, 'CANT_INSERT_TOKEN');
+					socket.emit('auth', {
+						email: data.access_data.email,
+						token: user_token,
+						mobile: token_type == 'mobile'
+					});
+				});
+			}
+
+			/*INSERT IN TYPE_sing_in TABLE*/
+			connection.query(q_ins_sign_in, function(sign_in_err, result){
+				if (sign_in_err) return handleError(sign_in_err, 'CANT_INSERT_SIGN_IN_INFO');
+
+				var created_at = moment().format("YYYY-MM-DD HH:mm:ss"),
+					q_ins_friends = '',
+					values = [],
+					uid_key_name;
+
+				switch (data.type){
+					case 'vk':{
 						q_ins_friends = "INSERT INTO vk_friends (user_id, friend_uid, created_at) VALUES ? " +
-							" ON DUPLICATE KEY UPDATE created_at=NOW()",
-						values = [];
+							" ON DUPLICATE KEY UPDATE created_at = NOW()";
+						uid_key_name = 'uid';
+						break;
+					}
+					case 'google':{
+						q_ins_friends = "INSERT INTO google_friends (user_id, friend_uid, created_at) VALUES ? " +
+							" ON DUPLICATE KEY UPDATE created_at = NOW()";
+						uid_key_name = 'id';
+						break;
+					}
+					case 'facebook':{
+						q_ins_friends = "INSERT INTO facebook_friends (user_id, friend_uid, created_at) VALUES ? " +
+							" ON DUPLICATE KEY UPDATE created_at = NOW()";
+						uid_key_name = 'id';
+						break;
+					}
+				}
 
+				if (data.friends_data.length == 0){
+					socket.emit('auth', {
+						email: data.access_data.email,
+						token: user_token,
+						mobile: data.oauth_data.hasOwnProperty('mobile') && data.oauth_data.mobile == 'true'
+					});
+					insertToken();
+				}else{
 					data.friends_data.forEach(function(value){
-						values.push([user_id,value.uid,created_at]);
+						values.push([user_id, value[uid_key_name], created_at]);
 					});
 					connection.query(q_ins_friends, [values], function(err){
 						if (err) return handleError(err, 'CANT_INSERT_FRIENDS');
-						socket.emit('auth', {
-							email: data.access_data.email,
-							token: user_token
-						});
+						insertToken();
 					});
-				});
+				}
 			});
+		});
+	}
+
+	function getAccessToken(data, callback){
+		var _url,
+			req_params;
+
+		switch (data.type){
+			case 'vk':{
+				_url = URLs.VK.GET_ACCESS_TOKEN + (data.hasOwnProperty('mobile') && data.mobile == 'true') + '&code=' + data.code;
+				req_params = {};
+				break;
+			}
+			case 'google':{
+				if (callback instanceof Function){
+					callback(data);
+				}
+				return;
+			}
+			case 'facebook':{
+				_url = URLs.FACEBOOK.GET_ACCESS_TOKEN + (data.hasOwnProperty('mobile') && data.mobile == 'true') + '&code=' + data.code;
+				req_params = {};
+				break;
+			}
 		}
 
-		getAccessToken(oauth_data, function(access_data){
-			getUsersInfo(access_data, function(user_info){
-				console.log(oauth_data, access_data, user_info);
-				getFriendsList(user_info, function(friends_data){
-					saveDataInDB({
-						oauth_data: oauth_data,
-						access_data: access_data,
-						user_info: user_info,
-						friends_data: friends_data
-					}, function(){
 
+		rest
+			.get(_url, req_params)
+			.on('complete', function(res){
+				if (callback instanceof Function){
+					callback(res);
+				}
+			});
+	}
+
+	function getUsersInfo(data, callback){
+		var _url = URLs[data.type.toUpperCase()].GET_USER_INFO,
+			req_params;
+
+		switch (data.type){
+			case 'vk':{
+				req_params = {
+					query: {
+						user_ids: data.user_id,
+						fields: 'photo_50, photo_100, photo_max_orig',
+						name_case: 'nom'
+					}
+				};
+				break;
+			}
+			case 'google':{
+				req_params = {
+					headers: {
+						'Authorization': 'Bearer ' + data.access_token
+					}
+				};
+				break;
+			}
+			case 'facebook':{
+				_url += data.access_token;
+				req_params = {};
+				break;
+			}
+		}
+		rest
+			.get(_url, req_params)
+			.on('complete', function(res){
+				if (callback instanceof Function){
+					callback(res);
+				}
+			});
+	}
+
+	function getFriendsList(data, callback){
+		var FRIENDS_COUNT = 5000,
+			_url = URLs[data.type.toUpperCase()].GET_FRIENDS_LIST,
+			req_params;
+
+
+		switch (data.type){
+			case 'vk':{
+				req_params = {
+					query: {
+						order: 'hints',
+						user_id: data.uid,
+						fields: 'city, domain',
+						count: FRIENDS_COUNT
+					}
+				};
+				break;
+			}
+			case 'google':{
+				req_params = {
+					headers: {
+						'Authorization': 'Bearer ' + data.access_token
+					}
+				};
+				break;
+			}
+			case 'facebook':{
+				_url += data.access_token;
+				break;
+			}
+		}
+		rest
+			.get(_url, req_params)
+			.on('complete', function(data){
+				if (callback instanceof Function){
+					callback(data);
+				}
+			});
+	}
+
+	function validateAccessToken(data, callback){
+		var _url,
+			req_params;
+
+		switch (data.type){
+			case 'vk':{
+				if (callback instanceof Function){
+					callback(data);
+					return;
+				}
+				break;
+			}
+			case 'google':{
+				_url = URLs.GOOGLE.GET_ACCESS_TOKEN + '?access_token=' + data.access_token;
+				req_params = {};
+				break;
+			}
+			case 'facebook':{
+				if (callback instanceof Function){
+					callback(data);
+					return;
+				}
+				break;
+			}
+		}
+		rest
+			.get(_url , req_params)
+			.on('complete', function(res){
+				if (res.audience != real_config.google.web.client_id){
+					console.log('ACCESS_TOKEN_CANT_BE_VERIFIED');
+				}else{
+					if (callback instanceof Function){
+						callback(res);
+					}
+				}
+			})
+	}
+
+	socket.on('auth.oauthDone', function(oauth_data){
+		function composeFullInfoObject(data){
+			switch (data.type){
+				case 'vk': {
+					return data;
+				}
+				case 'google': {
+					data.access_data.access_token = data.oauth_data.access_token;
+					data.access_data.secret = '';
+					data.access_data.email = data.user_info.emails[0].value;
+					data.user_info.first_name = data.user_info.name.givenName;
+					data.user_info.last_name = data.user_info.name.familyName;
+					data.user_info.photo_100 = data.user_info.image.url;
+					return data;
+				}
+				case 'facebook': {
+					data.access_data.email = data.user_info.email;
+					return data;
+				}
+			}
+		}
+
+
+		getAccessToken(oauth_data, function(access_data){
+			access_data.type = oauth_data.type;
+			validateAccessToken(access_data, function(){
+				getUsersInfo(access_data, function(user_info){
+					if (oauth_data.type == 'vk'){user_info = user_info.response[0];}
+					user_info.type = oauth_data.type;
+					user_info.access_token = access_data.access_token;
+
+					getFriendsList(user_info, function(friends_data) {
+						if (oauth_data.type == 'vk') {
+							friends_data = friends_data.response;
+							if (access_data.email == null) {
+								socket.emit('vk.needEmail');
+								return;
+							}
+						}else if (oauth_data.type == 'google') {
+							friends_data = friends_data.items;
+						}else if (oauth_data.type == 'facebook') {
+							friends_data = friends_data.data;
+							user_info.photo_100 = user_info.picture.data.url;
+						}
+
+						saveDataInDB(composeFullInfoObject({
+							oauth_data: oauth_data,
+							access_data: access_data,
+							user_info: user_info,
+							friends_data: friends_data,
+							type: access_data.type
+						}));
 					});
 				});
 			});
 		})
-
 	});
 });
 

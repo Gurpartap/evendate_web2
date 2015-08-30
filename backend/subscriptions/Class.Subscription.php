@@ -1,7 +1,7 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: Инал
+ * User: РРЅР°Р»
  * Date: 13.07.2015
  * Time: 0:48
  */
@@ -36,10 +36,9 @@ class Subscription{
 		$this->status = $row['status'];
 	}
 
-
 	public static function create(User $user, Organization $organization, PDO $db){
 		$q_ins_sub = 'INSERT INTO subscriptions(organization_id, user_id, created_at, `status`)
-			VALUES(:organization_id, :user_id, NOW(), :status)
+			VALUES(:organization_id, :user_id, NOW(), 1)
 			ON DUPLICATE KEY UPDATE `status` = 1';
 
 		$p_ins_sub = $db->prepare($q_ins_sub);
@@ -49,8 +48,7 @@ class Subscription{
 		));
 
 		if ($result === FALSE) throw new DBQueryException('SUBSCRIPTION_QUERY_ERROR', $db);
-		if ($p_ins_sub->rowCount() !== 1) throw new LogicException('CANT_CREATE_SUBSCRIPTION');
-		return new Result(true, 'Подписка успешно оформлена', array('subscription_id' => $db->lastInsertId()));
+		return new Result(true, 'РџРѕРґРїРёСЃРєР° СѓСЃРїРµС€РЅРѕ РѕС„РѕСЂРјР»РµРЅР°', array('subscription_id' => $db->lastInsertId()));
 	}
 
 	public function delete(User $user){
@@ -61,10 +59,10 @@ class Subscription{
 		$p_upd_sub = $this->db->prepare($q_upd_sub);
 		$p_upd_sub->execute(array(
 			':id' => $this->id,
-			':user_id' => $user->getId(),
+			':user_id' => $user->getId()
 		));
 
-		return new Result(true, 'Подписка успешно отменена');
+		return new Result(true, 'РџРѕРґРїРёСЃРєР° СѓСЃРїРµС€РЅРѕ РѕС‚РјРµРЅРµРЅР°');
 	}
 
 

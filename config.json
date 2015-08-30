@@ -9,18 +9,7 @@
         "client_email": "403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv@developer.gserviceaccount.com",
         "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv%40developer.gserviceaccount.com",
         "client_secret": "5rK7ElK7fA7G1tylhkzsnE4Q",
-        "redirect_uris": [
-          "http://evendate.ru/oauth2callback",
-          "https://evendate.ru/oauth2callback",
-          "http://localhost/evendate/oauth2callback",
-          "http://evendate.com/oauth2callback"
-        ],
-        "javascript_origins": [
-          "http://evendate.ru",
-          "https://evendate.ru",
-          "http://localhost",
-          "http://evendate.com"
-        ]
+        "redirect_uri": ""
       },
       "maps_api_v3":{
         "key": "AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg"
@@ -34,13 +23,19 @@
       "port": 3306
     },
     "VK":{
-      "APP_ID": 4970729,
-      "SECURE_KEY": "sUNY9yhthCsJDAliNdf7"
+      "APP_ID": 5029623,
+      "SECURE_KEY": "gCfYONn6zlmdQZzu8Z6G",
+      "redirect_uri": ""
+    },
+    "facebook":{
+      "app_id": "1692270867652630",
+      "app_secret": "0ecd87ecde79a4ab4e4feb8c2718e845",
+      "redirect_uri": ""
     },
     "domain": "evendate.ru"
   },
   "local":{
-    "google":{
+    "google": {
       "web": {
         "client_id": "403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv.apps.googleusercontent.com",
         "auth_uri": "https://accounts.google.com/o/oauth2/auth",
@@ -49,18 +44,7 @@
         "client_email": "403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv@developer.gserviceaccount.com",
         "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv%40developer.gserviceaccount.com",
         "client_secret": "5rK7ElK7fA7G1tylhkzsnE4Q",
-        "redirect_uris": [
-          "http://evendate.ru/oauth2callback",
-          "https://evendate.ru/oauth2callback",
-          "http://localhost/evendate/oauth2callback",
-          "http://evendate.com/oauth2callback"
-        ],
-        "javascript_origins": [
-          "http://evendate.ru",
-          "https://evendate.ru",
-          "http://localhost",
-          "http://evendate.com"
-        ]
+        "redirect_uri": ""
       },
       "maps_api_v3":{
         "key": "AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg"
@@ -73,10 +57,16 @@
       "database": "evendate",
       "port": 3306
     },
-    "VK":{
-      "APP_ID": 4970729,
-      "SECURE_KEY": "sUNY9yhthCsJDAliNdf7"
+    "VK": {
+      "APP_ID": 5029623,
+      "SECURE_KEY": "gCfYONn6zlmdQZzu8Z6G",
+      "redirect_uri": ""
     },
-    "domain": "localhost/evendate/"
+    "facebook":{
+      "app_id": "1692270867652630",
+      "app_secret": "0ecd87ecde79a4ab4e4feb8c2718e845",
+      "redirect_uri": ""
+    },
+    "domain": "dev.evendate.org"
   }
 }
