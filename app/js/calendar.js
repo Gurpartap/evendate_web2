@@ -166,7 +166,9 @@ function bindEventHandlers(){
 	});
 
 	$view.find('.likes-block').on('click', function(){
-		$(this).toggleClass('open');
+		var $this = $(this);
+		if ($this.find('.all-friends li').length == 0) return;
+		$this.toggleClass('open');
 	});
 
 	$view.find('.social-links i').on('click', function(){
