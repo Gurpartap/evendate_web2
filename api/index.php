@@ -1,5 +1,8 @@
 <?php
 
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Headers: Authorization');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 	//error_reporting(0);
 $format = (isset($_REQUEST['format']) && $_REQUEST['format'] == 'xml') ? 'xml' : 'json';
 $download = (isset($_REQUEST['download']) && ($_REQUEST['download'] == '1' || $_REQUEST['download'] == 'true')) ? true : false;
@@ -18,7 +21,6 @@ try {
 	require_once "../backend/users/Class.Editor.php";
 
 
-
 	function __autoload($class_name) {
 		global $ROOT_PATH;
 		$class_file_name = "{$ROOT_PATH}/backend/exceptions/{$class_name}.php";
@@ -27,17 +29,19 @@ try {
 			require_once $class_file_name;
 			return;
 		}
-}
+	}
 
-
-	$__request = array_merge($_REQUEST, RequestParser::put());
+	$__request = $_REQUEST;
 	$__request['payload'] = RequestParser::payload();
+	if ($_SERVER['REQUEST_METHOD'] == 'PUT' && $__request['payload'] == null){
+		$__request = array_merge($_REQUEST, RequestParser::put());
+	}
 	$__headers = getallheaders();
 	$__request['__files'] = '';
 	$act = explode('/', $_REQUEST['_url']);
 	$__url = $_REQUEST['_url'];
 	$__class_name = $act[1];
-	$__method_name = ($act[2] == '') ? NULL : $act[2];
+	$__method_name = isset($act[2]) ? $act[2] : '';
 	$__args = array();
 	$__api_app = null;
 	$__ip = $_SERVER['REMOTE_ADDR'] ? : ($_SERVER['HTTP_X_FORWARDED_FOR']?:$_SERVER['HTTP_CLIENT_IP']);
@@ -87,28 +91,29 @@ try {
 		}
 	}
 
-	require_once $class_path . $class_file_name;
-
 
 	$q_ins_request = 'INSERT INTO log_requests(created_at, body, user_id, method, class, args, method_name, response_status, time)
 		VALUES(NOW(), :request_body, :user_id, :request_method, :request_class, :request_args, :request_method_name, :response_status, FROM_UNIXTIME(:time))';
 	$p_ins_req = $__db->prepare($q_ins_request);
-	if (isset($__request['payload']['file'])){
-		$__request['payload']['file'] = null;
+
+	$req_copy = $__request;
+	if (isset($req_copy['payload']['files'])){
+		$req_copy['payload']['files'] = null;
 	}
-	if (isset($__request['payload']['cropped_file'])){
-		$__request['payload']['cropped_file'] = null;
+	if (isset($req_copy['payload']['cropped_file'])){
+		$req_copy['payload']['cropped_file'] = null;
 	}
 	$ins_data = array(
-		':request_body' => json_encode($__request),
+		':request_body' => json_encode($req_copy),
 		':user_id' => (isset($__user) && ($__user instanceof User)) ? $__user->getId(): null,
 		':request_method' => $__request_method,
 		':request_class' => $__class_name,
 		':request_method_name' => $__method_name,
 		':request_args' => json_encode($__args),
 		':time' => $req_came_time
-
 	);
+
+	require_once $class_path . $class_file_name;
 
 	if (isset($__modules[$__class_name]) && isset($__modules[$__class_name][$__request_method]) && isset($__modules[$__class_name][$__request_method][$__method_name])) {
 		$__result = call_user_func_array($__modules[$__class_name][$__request_method][$__method_name], $__args);
@@ -134,6 +139,8 @@ try {
 			}
 		}
 	}
+
+
 
 }catch(Exception $e){
 	$__result = new Result(false, 'Ошибка! '. $e->getMessage());

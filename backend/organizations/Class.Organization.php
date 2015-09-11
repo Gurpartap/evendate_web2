@@ -15,10 +15,11 @@ class Organization {
 	private $background_img_url;
 	private $subscribed_count;
 	private $subscribed_friends;
+	private $site_url;
 
 
 	public function __construct($id, PDO $db) {
-		$p_get_organization = $db->prepare('SELECT id,
+		$p_get_organization = $db->prepare('SELECT id, site_url,
 			description, img_url, type_id, `status`, short_name, `name`,
 			background_img_url, (
 				SELECT COUNT(id) AS subscribed_count
@@ -43,6 +44,7 @@ class Organization {
 		$this->name = $row['name'];
 		$this->type_id = $row['type_id'];
 		$this->img_url = $row['img_url'];
+		$this->site_url = $row['site_url'];
 		$this->description = $row['description'];
 		$this->short_name = $row['short_name'];
 		$this->background_img_url = $row['background_img_url'];
@@ -113,6 +115,15 @@ class Organization {
 		return $this->subscribed_count;
 	}
 
+	/**
+	 * @return mixed
+	 */
+	public function getSiteUrl() {
+		return $this->site_url;
+	}
+
+
+
 	public function getFullParams(User $user){
 
 		$subscribe_status = $this->getIsSubscribed($user);
@@ -127,18 +138,21 @@ class Organization {
 			'is_subscribed' => $subscribe_status['is_subscribed'],
 			'subscription_id' => $subscribe_status['subscription_id'],
 			'subscribed_count' => $this->getSubscribedCount(),
+			'site_url' => $this->getSiteUrl(),
 			'subscribed_friends' => $this->getSubscribedFriends($user)->getData()
 		));
 	}
 
 	private function getSubscribedFriends(User $user) {
 
-		$q_get_subscribed_friends = 'SELECT users.first_name, users.last_name, users.avatar_url
+		$q_get_subscribed_friends = 'SELECT DISTINCT
+			users.first_name, users.last_name, users.avatar_url
 			FROM users
 			 INNER JOIN view_friends ON view_friends.friend_id = users.id
 			 INNER JOIN subscriptions ON subscriptions.user_id = users.id
 			 WHERE view_friends.user_id = :user_id
 			 AND subscriptions.organization_id = :organization_id
+			 AND subscriptions.status = 1
 			';
 		$p_get_friends = $this->db->prepare($q_get_subscribed_friends);
 		$result  = $p_get_friends->execute(array(

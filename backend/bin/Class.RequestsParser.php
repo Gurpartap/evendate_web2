@@ -13,6 +13,7 @@ class RequestParser{
 		/* PUT data comes in on the stdin stream */
 		$putdata = fopen("php://input", "r");
 
+
 		/* Open a file for writing */
 		// $fp = fopen("myputfile.ext", "w");
 

@@ -1,22 +1,53 @@
 <?php
 
+require_once 'Class.Event.php';
+
 class EventsCollection{
 
+	static $URLs = array(
+		'facebook' => 'https://facebook.com/',
+		'google' => 'https://plus.google.com/',
+		'vk' => 'http://vk.com/id',
+	);
 
+	private static function getLinkToSocialNetwork($type, $uid){
+		return self::$URLs[$type] . $uid;
+	}
 	public static function filter(PDO $db, User $user, array $filters = null, $order_by = '') {
-		$q_get_events = 'SELECT events.*, event_types.latin_name as event_type_latin_name, organizations.img_url as organization_img_url,
+		$q_get_events = 'SELECT DISTINCT events.*, event_types.latin_name as event_type_latin_name, organizations.img_url as organization_img_url,
 			organizations.name as organization_name, organization_types.name as organization_type_name, organizations.short_name as organization_short_name,
-			(SELECT COUNT(*) AS liked_count FROM favorite_events WHERE status = 1 AND event_id = events.id) AS liked_users_count
+			(SELECT COUNT(*) AS liked_count FROM favorite_events WHERE status = 1 AND event_id = events.id) AS liked_users_count,
+			(SELECT COUNT(users_organizations.user_id) AS can_edit
+				FROM users_organizations
+				WHERE users_organizations.organization_id = organizations.id
+				AND users_organizations.status = 1
+				AND users_organizations.user_id = :user_id) > 0 AS can_edit
 			FROM events
 			INNER JOIN organizations ON organizations.id = events.organization_id
 			INNER JOIN organization_types ON organization_types.id = organizations.type_id
 			INNER JOIN event_types ON event_types.id = events.event_type_id
-			WHERE organizations.status = 1';
-		$statement_array = array();
+			LEFT JOIN events_tags ON events.id = events_tags.event_id
+			LEFT JOIN tags ON tags.id = events_tags.tag_id
+			WHERE organizations.status = 1
+			AND events.status = 1';
+		$statement_array = array(
+			':user_id' => $user->getId()
+		);
 		foreach($filters as $name => $value){
 			switch($name){
 				case 'date': {
-					$q_get_events .= ' AND ((events.event_start_date >= DATE(:date) AND events.event_end_date <= DATE(:date)) OR (DATE(events.event_start_date) = DATE(:date) AND DATE(events.event_end_date) = DATE(:date)))';
+					$q_get_events .= '
+					AND ((
+						DATE(events.event_start_date) <= DATE(:date)
+							AND
+						DATE(events.event_end_date) >= DATE(:date)
+						)
+						OR
+						(
+						DATE(events.event_start_date) = DATE(:date)
+							AND
+						DATE(events.event_end_date) = DATE(:date)
+						))';
 					$statement_array[':date'] = $value;
 					break;
 				}
@@ -31,6 +62,11 @@ class EventsCollection{
 						subscriptions.user_id = :user_id AND
 						subscriptions.status = 1)) ';
 					$statement_array[':user_id'] = $value->getId();
+					break;
+				}
+				case 'id': {
+					$q_get_events .= ' AND (events.id = :event_id)';
+					$statement_array[':event_id'] = $value->getId();
 					break;
 				}
 				case 'type': {
@@ -68,12 +104,14 @@ class EventsCollection{
 					break;
 				}
 				case 'title':{
-					$q_get_events .= ' AND events.title LIKE :title';
-					$statement_array[':title'] = '%' . trim($value) . '%';
+					$value = trim($value);
+					if (empty($value)) break;
+					$q_get_events .= ' AND (events.title LIKE :title OR events.description LIKE :title)';
+					$statement_array[':title'] = '%' . $value . '%';
 					break;
 				}
 				case 'description':{
-					$q_get_events .= ' AND events.description LIKE :description';
+					$q_get_events .= ' AND (events.description LIKE :description OR events.title LIKE :description)';
 					$statement_array[':description'] = '%' . trim($value) . '%';
 					break;
 				}
@@ -81,9 +119,8 @@ class EventsCollection{
 					if (is_array($value)){
 						$q_part = array();
 						foreach($value as $key => $tag){
-							$q_part[] = '(:tag_' . $key . ' IN (SELECT tags.name
-											FROM tags
-											INNER JOIN events_tags ON tags.id = events_tags.tag_id))';
+							$tag = str_replace('#', '', $tag);
+							$q_part[] = '(:tag_' . $key . ' = tags.name )';
 							$statement_array[':tag_' . $key] = trim($tag);
 						}
 						if (count($q_part) > 0){
@@ -108,16 +145,21 @@ class EventsCollection{
 						'id' => $_event['id'],
 						'title' => $_event['title'],
 						'event_start_date' => $_event['event_start_date'],
-						'event_end_date' => $_event['event_end_date']
+						'event_end_date' => $_event['event_end_date'],
+						'image_vertical' => $_event['image_vertical'],
+						'image_vertical_url' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . $_event['image_vertical'],
+						'image_horizontal' => $_event['image_horizontal'],
+						'image_horizontal_url' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . $_event['image_horizontal']
 					);
 				}
 			}
 		}
 
-		$p_get_favorite_days = $db->prepare('SELECT id, event_date
-												FROM favorite_events
-												WHERE event_id = :event_id
-												AND user_id = :user_id');
+		$p_get_is_favorite = $db->prepare('SELECT favorite_events.id
+			FROM favorite_events
+			WHERE favorite_events.status = 1
+			AND favorite_events.user_id = :user_id
+			AND favorite_events.event_id = :event_id');
 
 		$p_get_tags = $db->prepare('SELECT tags.id, tags.name
 			FROM  tags
@@ -126,8 +168,9 @@ class EventsCollection{
 			AND tags.status = 1
 			AND events_tags.event_id = :event_id');
 
-		$p_get_liked_users = $db->prepare('SELECT users.first_name, users.last_name,
-			users.middle_name, users.id, favorite_events.event_date, users.avatar_url
+		$p_get_liked_users = $db->prepare('SELECT DISTINCT users.first_name, users.last_name,
+			users.middle_name, users.id, users.avatar_url, view_friends.friend_uid,
+			view_friends.type
 			FROM view_friends
 			INNER JOIN users ON users.id = view_friends.friend_id
 			INNER JOIN favorite_events ON favorite_events.user_id = view_friends.friend_id
@@ -135,12 +178,13 @@ class EventsCollection{
 				view_friends.user_id = :user_id
 			AND favorite_events.event_id = :event_id
 			AND favorite_events.status = 1
-			AND users.show_to_friends = 1');
+			AND users.show_to_friends = 1
+			AND users.id != :user_id');
 
 		foreach($events as &$event){
-			$p_get_favorite_days->execute(array(
-				':event_id' => $event['id'],
-				':user_id' => $user->getId()
+			$p_get_is_favorite->execute(array(
+				':user_id' => $user->getId(),
+				':event_id' => $event['id']
 			));
 
 			$p_get_liked_users->execute(array(
@@ -152,26 +196,19 @@ class EventsCollection{
 				':event_id' => $event['id']
 			));
 
-			$event['favorite_dates'] = array();
 			$event['favorite_friends'] = array();
 
-			if ($p_get_favorite_days->rowCount() != 0){
-				$dates = $p_get_favorite_days->fetchAll();
-				foreach($dates as $event_date){
-					$event['favorite_dates'][] = $event_date['event_date'];
+			if ($p_get_liked_users->rowCount() != 0){
+				$event['favorite_friends'] = $p_get_liked_users->fetchAll();
+				foreach($event['favorite_friends'] as &$friend){
+					$friend['link'] = self::getLinkToSocialNetwork($friend['type'], $friend['friend_uid']);
 				}
 			}
 
-			if ($p_get_liked_users->rowCount() != 0){
-				$friends = $p_get_liked_users->fetchAll();
-				foreach($friends as $friend){
-					if (!isset($event['favorite_friends'][$friend['event_date']])){
-						$event['favorite_friends'][$friend['event_date']] = array();
-					}
-					$event['favorite_friends'][$friend['event_date']][] = $friend;
-				}
-			}
 			$event['tags'] = $p_get_tags->fetchAll();
+			$event['is_favorite'] = $p_get_is_favorite->rowCount() > 0;
+			$event['image_vertical_url'] = App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . $event['image_vertical'];
+			$event['image_horizontal_url'] = App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . $event['image_horizontal'];
 		}
 
 		return new Result(true, '', $events);

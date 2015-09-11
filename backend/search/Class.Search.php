@@ -111,6 +111,7 @@ class GlobalSearch{
 	}
 
 	public function find(User $user){
+
 		return new Result(true, '', array(
 			'organizations' => OrganizationsCollection::filter($this->db, $user, array(
 				'name' => $this->query,
@@ -119,11 +120,10 @@ class GlobalSearch{
 			), ' ORDER BY organizations.id LIMIT 50')->getData(),
 			'events' => EventsCollection::filter($this->db, $user, array(
 				'title' => $this->query,
-				'description' => $this->query,
 				'since_date' => $this->parseDates('since_date'),
 				'till_date' => $this->parseDates('till_date'),
 				'tags' => $this->tags
-			), ' ORDER BY events.id DESC LIMIT 50')->getData(),
+			), ' ORDER BY events.event_start_date LIMIT 50')->getData(),
 			'query' => $this->initial_query
 		));
 	}

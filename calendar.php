@@ -4,8 +4,13 @@
 	require_once 'backend/users/Class.AbstractUser.php';
 	require_once 'backend/users/Class.User.php';
 	require_once 'backend/tags/Class.TagsCollection.php';
-	$user = new User($db);
-    $add_event_btn_hidden = $user->isEditor() ? '' : 'hidden';
+    try{
+        $user = new User($db);
+        $add_event_btn_hidden = $user->isEditor() ? '' : 'hidden';
+        $profile_is_editor = $user->isEditor() ? 'is-editor' : '';
+    }catch(exception $e){
+        header('Location: /');
+    }
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -15,8 +20,8 @@
    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
    <title>Evendate</title>
    <!-- =============== VENDOR STYLES ===============-->
-    <!-- Google ROBOTO-->
-    <link href='http://fonts.googleapis.com/css?family=Roboto&subset=latin,cyrillic-ext' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,800italic,800,700italic,700,600italic,600,400italic,300italic,300' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Didact+Gothic&subset=latin,cyrillic,cyrillic-ext' rel='stylesheet' type='text/css'>
    <!-- FONT AWESOME-->
    <link rel="stylesheet" href="vendor/fontawesome/css/font-awesome.min.css">
    <!-- SIMPLE LINE ICONS-->
@@ -31,7 +36,7 @@
    <!-- FULLCALENDAR-->
    <link rel="stylesheet" href="vendor/fullcalendar/dist/fullcalendar.css">
    <!-- =============== CROPPER STYLES ===============-->
-   <link rel="stylesheet" href="vendor/cropper/css/cropper.min.css">
+   <link rel="stylesheet" href="vendor/cropper/css/cropper.css">
    <!-- =============== BOOTSTRAP STYLES ===============-->
    <link rel="stylesheet" href="app/css/bootstrap.css" id="bscss">
 	<!-- Loaders.css-->
@@ -52,40 +57,22 @@
 		   <!-- START Sidebar (left)-->
 		   <div class="aside-inner">
 			   <nav data-sidebar-anyclick-close="" class="sidebar">
-				   <!-- START sidebar nav-->
-                   <!-- START user info-->
-                   <div class="user-info">
-                       <div class="col-md-3">
-                           <img src="<?=$user->getAvatarUrl()?>" alt="Avatar" class="img-thumbnail img-circle">
-                       </div>
-                       <div class="col-md-8">
-                           <span class="user-block-name"><?=$user->getFirstName().' '.$user->getLastName()?></span>
-                           <span class="user-is-editor label label-black-blue <?=$add_event_btn_hidden?>">Редактор</span>
-                       </div>
-                       <div class="col-xs-1 log-out-icon">
-                           <i class="fa fa-sign-out"></i>
-                       </div>
+                   <div class="brand-name">
+                       <a href="/">
+                           <img src="app/img/logo_500.png" width="30" height="30">
+                           <span>Evendate</span>
+                       </a>
                    </div>
                    <!-- END user info-->
 				   <ul class="nav">
-					   <!-- Iterates over all sidebar items-->
-                       <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button active show-my-timeline-btn">
-                           <span>Моя лента</span>
-                       </a>
-					   <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button create-event-menu-btn <?=$add_event_btn_hidden?>">
-						   <span>Создать событие</span>
-					   </a>
-                       <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button show-organizations-btn">
-                           <span>Каталог организаций</span>
-                       </a>
-                       <div class="panel side-calendar-panel">
+					   <div class="panel side-calendar-panel">
                            <div class="panel-body">
                                <button type="button" class="btn btn-xs btn-black-blue pressed prev-button">
-                                   <span class="fa fa-chevron-left"></span>
+                                   <span class="icon-arrow-left"></span>
                                </button>
                                <span id="month-name"></span>
                                <button type="button" class="btn btn-xs btn-black-blue pressed next-button">
-                                   <span class="fa fa-chevron-right"></span>
+                                   <span class="icon-arrow-right"></span>
                                </button>
                                <table class="sidebar-calendar-table" id="calendar-table">
                                    <thead>
@@ -104,17 +91,25 @@
                                </table>
                            </div>
                        </div>
-					   <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button show-favorites-btn">
-						   <span>Избранное</span>
-					   </a>
-                       <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button">
-                           <span>Настройки</span>
+                       <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn" data-page="timeline">
+                           <i class="icon-home"></i> <span>Моя лента</span>
                        </a>
-                       <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button hidden show-statistics-btn <?=$add_event_btn_hidden?>">
+                       <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn <?=$add_event_btn_hidden?>" data-controller="showAddEventModal">
+                           <i class="icon-note"></i> <span>Создать событие</span>
+                       </a>
+                       <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn" data-page="organizations">
+                           <i class="icon-list"></i> <span>Каталог организаций</span>
+                       </a>
+					   <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn" data-page="favorites">
+                           <i class="icon-pin"></i> <span>Избранное</span>
+					   </a>
+                       <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn" data-controller="showSettingsModal">
+                           <i class="icon-settings"></i> <span>Настройки</span>
+                       </a>
+                       <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button hidden show-statistics-btn <?=$add_event_btn_hidden?>" data-page="statistics">
                            <span>Статистика</span>
                        </a>
 					   <span class="side-block-container">Подписки</span>
-                       <div class="whirl duo organizations-loading"></div>
 					   <div class="organizations-list">
                        </div>
 				   </ul>
@@ -128,23 +123,57 @@
          <!-- Page content-->
          <div class="content-wrapper">
              <div class="head-row col-xs-10 header blurheader">
-                 <div class="col-sm-4"></div>
-                 <div class="col-sm-4">
+                 <div class="col-md-4 col-xs-2"></div>
+                 <div class="col-md-4 col-xs-4">
                      <input type="text" class="form-control search-input" placeholder="Поиск мероприятий, огранизаций, #тегов">
                  </div>
-                 <div class="col-sm-2">
-                     <span class="help-block m-b-none advanced-search-text hidden">Расширенный поиск</span>
+                 <div class="col-lg-2 col-md-4 col-xs-4 pull-right user-info-block <?=$profile_is_editor?>">
+                     <img class="pull-left" src="<?=$user->getAvatarUrl()?>" title="<?=$user->getLastName() . ' ' . $user->getFirstName()?>">
+                     <div class="user-name">
+                         <div class="log-out-icon pull-right">
+                             <i class="icon-login"></i>
+                         </div>
+                         <p> <?=$user->getLastName() . ' ' . $user->getFirstName()?></p>
+                         <div class="label label-blue">Редактор</div>
+                     </div>
                  </div>
              </div>
             <!-- START row-->
-            <div class="calendar-app screen-view">
+            <div class="calendar-app hidden screen-view">
                <div class="row main-row">
                  <div class="col-md-12">
                    <div class="row">
-                     <div class="col-md-12">
+                     <div class="col-md-12" data-controller="MyTimeline">
                        <!-- START panel-->
-                         <div id="wrapper" class="timeline-wrapper">
-                             <div id="tl-outer-wrap" class="tl-outer-wrap"><hr id="timeline" class="timeline"></div><div id="blocks-outer-wrap" class="blocks-outer-wrap"></div>
+                         <div class="timeline-wrapper">
+                             <div id="tl-outer-wrap" class="tl-outer-wrap hidden"><hr class="timeline"></div><div id="blocks-outer-wrap" class="blocks-outer-wrap"></div>
+                         </div>
+                       <!-- END panel-->
+                     </div>
+                   </div>
+                 </div>
+                   <div class="load-more-btn hidden" data-page-number="0">
+                       <button class="btn btn-lg disabled btn-pink-empty"> Загрузить еще... </button>
+                   </div>
+               </div>
+                <div class="row sad-eve hidden">
+                    <img src="/app/img/sad_eve.png" title="Как насчет того, чтобы подписаться на организации?">
+                    <div class="alert alert-black-blue">Событий для показа пока нет. Рекомендуем
+                        <a href="#" class="show-organizations-btn">подписаться на новые организации.</a>
+                    </div>
+                </div>
+            </div>
+             <!-- END row-->
+
+            <!-- START row-->
+            <div class="day-app hidden screen-view">
+               <div class="row main-row">
+                 <div class="col-md-12">
+                   <div class="row">
+                     <div class="col-md-12" data-controller="OneDay">
+                       <!-- START panel-->
+                         <div class="timeline-wrapper">
+                             <div id="tl-outer-wrap" class="tl-outer-wrap hidden"><hr class="timeline"></div><div id="blocks-outer-wrap" class="blocks-outer-wrap"></div>
                          </div>
                        <!-- END panel-->
                      </div>
@@ -153,39 +182,49 @@
                </div>
                 <div class="row sad-eve hidden">
                     <img src="/app/img/sad_eve.png" title="Как насчет того, чтобы подписаться на организации?">
-                    <div class="alert alert-black-blue">Событий для показа пока нет. Можем рекомендовать
+                    <div class="alert alert-black-blue">Событий для показа нет. Рекомендуем
                         <a href="#" class="show-organizations-btn">подписаться на новые организации.</a>
                     </div>
                 </div>
-               <!-- END row-->
             </div>
-             <div class="organizations-app hidden screen-view">
-             </div>
+             <!-- END row-->
 
-             <div class="search-app hidden screen-view">
+             <!-- START row-->
+             <div class="organizations-app hidden screen-view" data-controller="OrganizationsList">
+             </div>
+             <!-- END row-->
+
+             <!-- START row-->
+             <div class="search-app hidden screen-view" data-controller="Search">
                  <div class="search-organizations"></div>
                  <div class="search-events"></div>
              </div>
+             <!-- END row-->
 
+             <!-- START row-->
              <div class="favorites-app hidden screen-view">
                  <div class="row main-row">
                      <div class="col-md-12">
                          <div class="row">
-                             <div class="col-md-12">
+                             <div class="col-md-12" data-controller="FavoredEvents">
                                  <!-- START panel-->
-                                 <div class="wrapper timeline-wrapper">
-                                     <div class="tl-outer-wrap"><hr class="timeline"></div><div class="blocks-outer-wrap"></div>
+                                 <div class="timeline-wrapper">
+                                     <div id="tl-outer-wrap" class="tl-outer-wrap hidden"><hr class="timeline"></div><div id="blocks-outer-wrap" class="blocks-outer-wrap"></div>
                                  </div>
                                  <!-- END panel-->
                              </div>
                          </div>
                      </div>
+                     <div class="load-more-btn hidden" data-page-number="0">
+                         <button class="btn btn-lg disabled btn-pink-empty"> Загрузить еще... </button>
+                     </div>
                  </div>
-                 <div class="row no-favorites hidden">
-                     <div class="alert alert-black-blue">События в избранном отсутсвуют.
+                 <div class="row sad-eve hidden">
+                     <div class="alert alert-black-blue"> Избранные закончились. Вы можете выбрать новые <a href="#" class="show-timeline-btn">в ленте</a>
                      </div>
                  </div>
              </div>
+             <!-- END row-->
          </div>
       </section>
    </div>
@@ -198,20 +237,14 @@
    <script src="vendor/jquery/dist/jquery.js"></script>
    <!-- BOOTSTRAP-->
    <script src="vendor/bootstrap/dist/js/bootstrap.js"></script>
-   <!-- STORAGE API-->
-   <script src="vendor/jQuery-Storage-API/jquery.storageapi.js"></script>
    <!-- JQUERY EASING-->
    <script src="vendor/jquery.easing/js/jquery.easing.js"></script>
    <!-- ANIMO-->
    <script src="vendor/animo.js/animo.js"></script>
    <!-- SLIMSCROLL-->
    <script src="vendor/slimScroll/jquery.slimscroll.min.js"></script>
-   <!-- LOCALIZE-->
-   <script src="vendor/jquery-localize-i18n/dist/jquery.localize.js"></script>
    <!-- IMG CROPPER-->
-   <script src="vendor/cropper/js/cropper.min.js"></script>
-   <!-- RTL demo-->
-   <script src="app/js/demo/demo-rtl.js"></script>
+   <script src="vendor/cropper/js/cropper.js"></script>
    <!-- TAGS INPUT-->
    <script src="vendor/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js"></script>
    <!-- MOMENT JS-->
@@ -220,9 +253,6 @@
    <script src="vendor/daterangepicker/daterangepicker.js"></script>
    <!-- INPUTMASKS -->
    <script src="vendor/jquery.inputmask/dist/jquery.inputmask.bundle.min.js"></script>
-   <!-- Blur Header -->
-   <script src="vendor/blurheader/html2canvas.js"></script>
-   <script src="vendor/blurheader/StackBlur.js"></script>
   <!-- Google MAPS -->
    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=true&libraries=places"></script>
    <script type="text/javascript" src="vendor/placepicker/jquery.placepicker.min.js"></script>
@@ -230,6 +260,10 @@
    <script src="vendor/pace/pace.min.js"></script>
    <!-- SELECT2 -->
    <script src="vendor/select2/js/select2.full.min.js"></script>
+   <!-- HISTORY API -->
+   <script src="vendor/history/jquery.history.js"></script>
+   <!-- NOTIFICATIONS API -->
+   <script src="vendor/notify/notify.js"></script>
 
 
    <!-- =============== APP SCRIPTS ===============-->
@@ -241,6 +275,7 @@
 
 <?php
     require 'templates.html';
+    require 'footer.php';
 ?>
 
 </body>

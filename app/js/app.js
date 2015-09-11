@@ -18,7 +18,6 @@
     // Restore body classes
     // ----------------------------------- 
     var $body = $('body');
-    new StateToggler().restoreState( $body );
     
     // enable settings toggle after restore
     $('#chk-fixed').prop('checked', $body.hasClass('layout-fixed') );
@@ -2806,7 +2805,7 @@ socket.on('auth', function(data){
             data: data,
             success: function(res){
                 if (res.status){
-                    window.opener.location = 'calendar.php';
+                    window.opener.location = 'timeline';
                     window.close();
                 }else{
                     alert(res.text);
@@ -2818,4 +2817,200 @@ socket.on('auth', function(data){
 
 socket.on('log', function(data){
     console.log(data);
-})
+});
+
+
+function showOrganizationalModal(organization_id){
+    $.ajax({
+        url: 'api/organizations/' + organization_id + '?with_events=true',
+        success: function(res){
+            var $events = $('<div>'),
+                $friends = tmpl('subscribed-users-row', {
+                    subscribed_count: res.data.subscribed_count,
+                    subscribed_count_text: getUnitsText(res.data.subscribed_count, __C.TEXTS.SUBSCRIBERS)
+                }),
+                $body = $('body'),
+                $modal = $('#organization-modal');
+            if (res.data && res.data.hasOwnProperty('events')){
+                event.dates = '';
+
+                res.data.events.forEach(function(event){
+                    $events.append(tmpl('short-event', event));
+                });
+
+                res.data.subscribed_friends.forEach(function(friend){
+                    $friends.prepend(tmpl('subscribed-friend', friend));
+                });
+
+                $modal.remove();
+                res.data.events = $events;
+                res.data.subscribed_friends = $friends;
+                res.data.site_url_short = res.data.site_url.replace('http://', '')
+                $modal = tmpl('organization-modal', $.extend(true, res.data, {
+                    subscribe_btn_text: res.data.is_subscribed ? __C.TEXTS.REMOVE_SUBSCRIPTION : __C.TEXTS.ADD_SUBSCRIPTION,
+                    subscribe_btn_class: res.data.is_subscribed ? __C.CLASSES.SUBSCRIBE_DELETE : __C.CLASSES.SUBSCRIBE_ADD
+                }));
+
+                $modal.find('.modal-subscribe-btn').on('click', function(){
+                    var $btn = $(this),
+                        org_id = $btn.data('organization-id'),
+                        sub_id = $btn.data('subscription-id');
+                    if ($btn.hasClass(__C.CLASSES.DISABLED)) return true;
+
+                    $btn.addClass(__C.CLASSES.DISABLED);
+
+                    if ($btn.hasClass(__C.CLASSES.SUBSCRIBE_DELETE)){
+                        toggleSubscriptionState(false, sub_id, function(){
+                            $btn
+                                .toggleClass(__C.CLASSES.SUBSCRIBE_DELETE + ' ' +
+                                __C.CLASSES.SUBSCRIBE_ADD + ' ' +
+                                __C.CLASSES.DISABLED)
+                                .text(__C.TEXTS.ADD_SUBSCRIPTION);
+                            hideOrganizationItem(org_id);
+                        });
+                    }else{
+                        toggleSubscriptionState(true, org_id, function(){
+                            $btn
+                                .toggleClass(__C.CLASSES.SUBSCRIBE_DELETE + ' ' +
+                                __C.CLASSES.SUBSCRIBE_ADD + ' ' +
+                                __C.CLASSES.DISABLED)
+                                .text(__C.TEXTS.REMOVE_SUBSCRIPTION);
+                            printSubscribedOrganizations();
+                        });
+                    }
+                });
+
+                $modal.find('.short-event').on('click', function(){
+                    $modal.find('.event-alone').html(tmpl('whirl-loader', {}));
+                    var $this = $(this),
+                        $modal_dialog = $modal.find('.modal-dialog'),
+                        margin_left;
+                    $this.siblings().removeClass(__C.CLASSES.ACTIVE);
+                    $this.addClass(__C.CLASSES.ACTIVE);
+
+                    $.ajax({
+                        url: '/api/events/' + $this.data('event-id'),
+                        success: function(res){
+
+                            var _event = generateEventAttributes(res.data[0]);
+                            if (_event.one_day){_event.dates = $('<span>' + _event.day_name.capitalize() + '<br>' + _event.dates + '</span>')}
+                            var $event_content = tmpl('event-modal-content', _event),
+                                $event_alone = $modal.find('.event-alone');
+
+                            if ($event_alone.length > 0){
+                                $event_alone.html($event_content);
+                            }else{
+                                $event_alone = tmpl('event-modal', {
+                                    event_content: $event_content
+                                }).appendTo($modal_dialog);
+
+
+                                margin_left = (window.innerWidth - EVENT_MODAL_WIDTH - $modal_dialog.width()) / 2;
+                                $modal_dialog.css('z-index', 99).animate({
+                                    'margin-left': margin_left
+                                });
+                                $event_alone
+                                    .css({
+                                        left: margin_left - $modal_dialog.width(),
+                                        height: $modal_dialog.height(),
+                                        'z-index': 9
+                                    })
+                                    .animate({
+                                        left: $modal_dialog.width() - 3,
+                                        opacity: 1
+                                    }, 800);
+                            }
+
+                            $event_alone.find('.make-favorite-btn').on('click', function(){
+                                toggleFavorite($(this), $('.screen-view:not(.hidden)'), true);
+                            });
+
+                            $event_alone.find('.social-links i').on('click', function(){
+                                var $this = $(this),
+                                    _link = tmpl( $this.data('share-type') + '-share-link', _event).attr('href');
+
+                                window.open(_link, 'SHARE_WINDOW',
+                                    'status=1,toolbar=0,menubar=0&height=300,width=500');
+                            });
+
+                            $event_alone.find('.close').on('click', function(){
+                                $event_alone.animate({
+                                    left: 0,
+                                    opacity: 0
+                                }, 600, function(){
+                                    $event_alone.remove();
+                                });
+                                $modal_dialog.attr('style', '');
+                            });
+                        }
+                    });
+                });
+
+                $modal
+                    .appendTo($body)
+                    .on('shown.bs.modal', function(){
+                        $modal.find('.modal-body').slimscroll({
+                            height: 650
+                        });
+                    })
+                    .modal();
+
+            }
+        }
+    });
+}
+
+function showSettingsModal(){
+    var $modal = $('#settings-modal');
+    $modal.remove();
+
+    $.ajax({
+        url: '/api/users/settings',
+        type: 'GET',
+        success: function(res){
+            $modal = tmpl('settings-modal', res.data);
+            $modal
+                .appendTo($('body'))
+                .on('shown.bs.modal', function(){
+                    if (res.data.hasOwnProperty('show_to_friends')){
+                        $modal.find('.show-to-friends').prop('checked', res.data.show_to_friends);
+                    }
+                    if (res.data.hasOwnProperty('notify_in_browser')){
+                        $modal.find('.notify-in-browser').prop('checked', res.data.notify_in_browser);
+                    }
+                    $modal.find('.notify-in-browser').on('change', function(e){
+                        var $this = $(this);
+                        if ($this.prop('checked')){
+                            if (Notify.needsPermission) {
+                                Notify.requestPermission(function(){}, function(){
+                                    $this.prop('checked', false);
+                                    showNotifier({status: false, text: 'Мы не можем включить уведомления в браузере. Вы запретили их для нас :('});
+                                });
+                            }
+                        }
+                    })
+                })
+                .modal();
+            $modal
+                .find('.save-settings-btn')
+                .off('click')
+                .on('click', function(){
+                    var _data = {};
+                    $modal.find('input').each(function(){
+                        var $this = $(this);
+                        _data[$this.attr('name')] = $this.prop('checked');
+                    });
+
+                    Pace.ignore(function(){
+                        $.ajax({
+                            url: '/api/users/settings',
+                            type: 'PUT',
+                            data: _data
+                        });
+                    });
+                    $modal.modal('hide');
+                }) ;
+        }
+    });
+}
+

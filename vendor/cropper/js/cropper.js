@@ -1092,7 +1092,7 @@
 
         if (this.cropping) {
           this.cropping = false;
-          this.$dragBox.toggleClass(CLASS_MODAL, this.cropped && this.options.modal);
+          //this.$dragBox.toggleClass(CLASS_MODAL, this.cropped && this.options.modal);
         }
 
         this.dragType = '';
@@ -1983,7 +1983,7 @@
     checkImageOrigin: true, // Check if the target image is cross origin
 
     modal: true, // Show the black modal
-    guides: true, // Show the dashed lines for guiding
+    guides: false, // Show the dashed lines for guiding
     highlight: true, // Show the white modal to highlight the crop box
     background: true, // Show the grid background
 
@@ -2035,8 +2035,6 @@
     <div class="cropper-drag-box"></div>
     <div class="cropper-crop-box">
       <span class="cropper-view-box"></span>
-      <span class="cropper-dashed dashed-h"></span>
-      <span class="cropper-dashed dashed-v"></span>
       <span class="cropper-face"></span>
       <span class="cropper-line line-e" data-drag="e"></span>
       <span class="cropper-line line-n" data-drag="n"></span>

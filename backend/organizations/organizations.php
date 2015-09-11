@@ -6,9 +6,6 @@ require_once $ROOT_PATH.'backend/events/Class.EventsCollection.php';
 
 $__modules['organizations'] = array(
 	'GET' => array(
-		'all' => function () use ($__db, $__request, $__user) {
-
-		},
 		'my' => function() use ($__db, $__request, $__user){
 
 		},
@@ -23,6 +20,15 @@ $__modules['organizations'] = array(
 			return new Result(true, '', $result);
 		},
 		'' => function () use ($__db, $__request, $__user) { /*MY EVENTS!*/
+			$collection = new OrganizationsCollection($__db, $__user);
+			if (isset($__request['with_subscriptions'])){
+				$collection->setUser($__user);
+				return $collection->getUserOrganizations();
+			}else{
+				return $collection->getAllActive();
+			}
+		},
+		'all' => function () use ($__db, $__request, $__user) {
 			$collection = new OrganizationsCollection($__db, $__user);
 			if (isset($__request['with_subscriptions'])){
 				$collection->setUser($__user);

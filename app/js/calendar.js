@@ -2,7 +2,9 @@
  * Created by Инал on 20.06.2015.
  */
 
-paceOptions = {
+"use strict";
+
+var paceOptions = {
 	ajax: false, // disabled
 	document: false, // disabled
 	eventLag: false, // disabled
@@ -10,44 +12,59 @@ paceOptions = {
 	search_is_active: false,
 	search_query: null,
 	search_xhr: null
-};
+	},
+	__C = {
+		TEXTS:{
+			REMOVE_FAVORITE: 'Удалить из избранного',
+			ADD_FAVORITE: 'В избранное',
+			SUBSCRIBERS:{
+				NOM: ' подписчик',
+				GEN: ' подписчика',
+				PLU: ' подписчиков'
+			},
+			FAVORED:{
+				NOM: ' участник',
+				GEN: ' участника',
+				PLU: ' участников'
+			},
+			ADD_SUBSCRIPTION: 'Подписаться',
+			REMOVE_SUBSCRIPTION: 'Отписаться'
+		},
+		DATA_NAMES:{
+			DATE: 'date'
+		},
+		CLASSES: {
+			ACTIVE: 'active',
+			NO_BORDERS: 'no-borders',
+			SUBSCRIBE_ADD: 'btn-pink-empty',
+			SUBSCRIBE_DELETE: 'btn-pink',
+			DISABLED: 'disabled',
+			HIDDEN: 'hidden'
+		},
+		DATE_FORMAT: 'YYYY-MM-DD'
+	},
+	__STATES = {
+		timeline: MyTimeline,
+		organizations: OrganizationsList,
+		favorites: FavoredEvents,
+		search: Search,
+		refreshState: function(){
+			var page = this.getCurrentState(),
+				$view = $('.screen-view:not(.hidden)');
+			this[page]($view, $view.find('[data-controller]'));
+		},
+		getCurrentState: function(){
+			return window.location.pathname.replace('/', '');
+		}
+	};
 
-var __C = {
-	TEXTS:{
-		REMOVE_FAVORITE: 'Удалить из избранного',
-		ADD_FAVORITE: 'В избранное',
-		SUBSCRIBERS:{
-			NOM: ' подписчик',
-			GEN: ' подписчика',
-			PLU: ' подписчиков'
-		},
-		FAVORED:{
-			NOM: ' участник',
-			GEN: ' участника',
-			PLU: ' участников'
-		},
-		ADD_SUBSCRIPTION: 'Подписаться',
-		REMOVE_SUBSCRIPTION: 'Отписаться'
-	},
-	DATA_NAMES:{
-		DATE: 'date'
-	},
-	CLASSES: {
-		ACTIVE: 'active',
-		NO_BORDERS: 'no-borders',
-		SUBSCRIBE_ADD: 'btn-default empty',
-		SUBSCRIBE_DELETE: 'btn-danger',
-		DISABLED: 'disabled'
-	},
-	DATE_FORMAT: 'YYYY-MM-DD'
+
+String.prototype.capitalize = function() {
+	return this.charAt(0).toUpperCase() + this.slice(1);
 };
 
 var MODAL_OFFSET = 185,
-	MODAL_FOOTER_HEIGHT = 65,
-	events_page_number = 0,
-	favorites_page_number = 0,
-	_events = {},
-	_favorite_events = {},
+	EVENT_MODAL_WIDTH = 660,
 	_selected_month = moment();
 
 /**
@@ -77,25 +94,60 @@ function getUnitsText(num, cases) {
 	return word;
 }
 
-function setSelectedMenu(class_name){
-	$('.nav .mb-compose-button')
-		.removeClass(__C.CLASSES.ACTIVE)
-		.filter('.' + class_name)
-		.addClass(__C.CLASSES.ACTIVE);
+function getTagsString(tags){
+	var _tags = [];
+	if (tags instanceof Array == false) return null;
+	tags.forEach(function(tag){
+		_tags.push(tag.name);
+	});
+	return _tags.join(', ');
+}
 
-	if (class_name != 'search'){
-		$('.search-input').val('');
+function toggleFavorite($btn, $view, refresh){
+	var $liked_count = $btn.parents('.tl-panel-block').find('.liked-users-count-number'),
+		$liked_count_text = $btn.parents('.tl-panel-block').find('.liked-users-count-text'),
+		_event_id = $btn.data('event-id'),
+		_date = $btn.parents('.tl-panel-block').data(__C.DATA_NAMES.DATE),
+		params = {
+			url: '/api/events/favorites/',
+			type: 'POST',
+			data: {
+				event_id: _event_id
+			}
+		};
+
+	$btn.toggleClass(__C.CLASSES.NO_BORDERS);
+	$btn.text($btn.hasClass(__C.CLASSES.NO_BORDERS) ? __C.TEXTS.REMOVE_FAVORITE : __C.TEXTS.ADD_FAVORITE);
+	$view.find('.timeline-' + _event_id + '-' + _date).toggleClass(__C.CLASSES.ACTIVE);
+
+	var new_count;
+	if (!$btn.hasClass(__C.CLASSES.NO_BORDERS)){
+		params.type = 'DELETE';
+		params.url = '/api/events/favorites/' + $btn.data('event-id');
+		new_count = parseInt($liked_count.text()) - 1;
+		$liked_count.text(new_count);
+	}else{
+		new_count = parseInt($liked_count.text()) + 1;
+		$liked_count.text(new_count);
 	}
+	$liked_count_text.text(getUnitsText(new_count, __C.TEXTS.FAVORED));
 
+	$.ajax(params)
+		.always(function(){
+			setDaysWithEvents();
+			if (window.location.pathname.replace('/', '') == 'favorites' && refresh == true){
+				__STATES.refreshState();
+			}
+		});
 }
 
 function bindEventHandlers(){
+
 	var $view = $('.screen-view:not(.hidden)');
 	$view.find('.tl-part:not(.tl-header)').each(function(){
 		var $this = $(this);
 		$this.height($view.find('.event-' + $this.data('event-id') + '-' + $this.data(__C.DATA_NAMES.DATE)).outerHeight());
 	});
-
 
 	$view.find('.more-info-btn').off('click').on('click', function(){
 		var $panel_block = $(this).parents('.tl-panel-block');
@@ -105,44 +157,16 @@ function bindEventHandlers(){
 	});
 
 	$view.find('.add-to-favorites').on('click', function(){
-		var $btn = $(this),
-			$liked_count = $btn.parents('.tl-panel-block').find('.liked-users-count-number'),
-			$liked_count_text = $btn.parents('.tl-panel-block').find('.liked-users-count-text'),
-			_event_id = $btn.data('event-id'),
-			_date = $btn.parents('.tl-panel-block').data(__C.DATA_NAMES.DATE),
-			params = {
-				url: '/api/events/favorites/',
-				type: 'POST',
-				data: {
-					event_id: _event_id,
-					event_date: _date
-				},
-				success: showNotifier
-			};
-
-		$btn.toggleClass(__C.CLASSES.NO_BORDERS);
-		$btn.text($btn.hasClass(__C.CLASSES.NO_BORDERS) ? __C.TEXTS.REMOVE_FAVORITE : __C.TEXTS.ADD_FAVORITE);
-		$view.find('.timeline-' + _event_id + '-' + _date).toggleClass(__C.CLASSES.ACTIVE);
-
-		var new_count;
-		if (!$btn.hasClass(__C.CLASSES.NO_BORDERS)){
-			params.type = 'DELETE';
-			params.url = '/api/events/favorites/' + $btn.data('event-id');
-			params.success = null;
-			new_count = parseInt($liked_count.text()) - 1;
-			$liked_count.text(new_count);
-		}else{
-			new_count = parseInt($liked_count.text()) + 1;
-			$liked_count.text(new_count);
-		}
-		$liked_count_text.text(getUnitsText(new_count, __C.TEXTS.FAVORED));
-
-		$.ajax(params);
+		toggleFavorite($(this), $view)
 	});
 
 
 	$view.find('.organization-in-event').on('click', function(){
 		showOrganizationalModal($(this).data('organization-id'));
+	});
+
+	$view.find('.likes-block').on('click', function(){
+		$(this).toggleClass('open');
 	});
 
 	$view.find('.social-links i').on('click', function(){
@@ -152,118 +176,50 @@ function bindEventHandlers(){
 		window.open($block.data('share')[_type], 'SHARE_WINDOW',
 			'status=1,toolbar=0,menubar=0&height=300,width=500');
 	});
-}
 
-function walkEventActiveDates(events, cb){
-	events.forEach(function(event){
-		var m_event_start_date = moment(event.event_start_date),
-			m_event_end_date = moment(event.event_end_date),
-			end_date = m_event_end_date.format(__C.DATE_FORMAT),
-			current_date = m_event_start_date,
-			event_date;
-		do{
-			if (current_date.unix() < moment().unix()){
-				current_date.add(1, 'days');
-			}else{
-				event_date = current_date.format(__C.DATE_FORMAT);
-				if (cb && cb instanceof Function){
-					cb(event, event_date);
-				}
-				current_date.add(1, 'days');
-			}
-		}while(end_date != event_date && current_date.unix() < m_event_end_date.unix());
-	});
-}
-
-function normalizeEventsArray(events, events_type){
-	walkEventActiveDates(events, function(event, event_date){
-		if (!window[events_type].hasOwnProperty(event_date)){
-			window[events_type][event_date] = {
-				events: {},
-				count: 0
-			};
-		}
-		var event_clone = $.extend(true, {}, event);
-		event_clone.date = event_date;
-		event_clone.is_favorite = event.favorite_dates.indexOf(event_date) != -1;
-		event_clone.favorite_this_day_friends = event.favorite_friends.hasOwnProperty(event_date) ? event['favorite_friends'][event_date] : [];
-
-		if (window[events_type][event_date].events.hasOwnProperty('_' + event_clone.id) == false){
-			if (events_type == '_favorite_events' && event_clone.is_favorite == false){
-				return true;
-			}
-			window[events_type][event_date].events['_' + event_clone.id] = event_clone;
-			window[events_type][event_date].count++;
-		}
-	});
-}
-
-function buildMyTimeline(res, events_type){
-	normalizeEventsArray(res.data, events_type);
-
-	var $tl_outer_wrap = $('.screen-view:not(.hidden) .tl-outer-wrap'),
-		$blocks_wrapper = $('.screen-view:not(.hidden) .blocks-outer-wrap'),
-		events_count = 0;
-
-	$.each(window[events_type], function(day_date, value){
-		if (value.count == 0) return true;
-		events_count++;
-		var $day_wrapper = $blocks_wrapper.find('.events-' + day_date),
-			$timeline_wrapper = $tl_outer_wrap.find('.timeline-' + day_date),
-			m_date = moment(day_date, __C.DATE_FORMAT);
-		if ($day_wrapper.length == 0){
-			$day_wrapper = tmpl('events-day-wrapper', {
-				day_name: m_date.format('dddd'),
-				day_number: m_date.format('DD'),
-				month_name: m_date.format('MMMM'),
-				events_count: value.count,
-				date: m_date.format(__C.DATE_FORMAT)
-			}).appendTo($blocks_wrapper);
-
-			$timeline_wrapper = tmpl('timeline-day', {
-				day_short_name: m_date.format('ddd').toUpperCase(),
-				day_number: m_date.format('DD'),
-				month_number: m_date.format('MM'),
-				date: day_date
-			}).appendTo($tl_outer_wrap);
-		}
-		$.each(value.events, function(_key, event){
-			$day_wrapper.find('.event-' + event.id + '-' + day_date).remove();
-			$timeline_wrapper.find('.timeline-' + event.id + '-' + day_date).remove();
-			event = generateEventAttributes(event);
-
-			event.date = day_date;
-			var $event = tmpl('event-item', event);
-			$event.data('share', {
-				'vk': tmpl('vk-share-link', event).attr('href'),
-				'facebook': tmpl('facebook-share-link', event).attr('href'),
-				'twitter': tmpl('twitter-share-link', event).attr('href')
-			});
-			$day_wrapper.append($event);
-			$timeline_wrapper.append(tmpl('timeline-event', event));
-		});
-	});
-
-	if (events_type == '_events'){
-		if (events_count == 0){
-			$tl_outer_wrap.addClass('hidden');
-			$('.main-row').addClass('hidden');
-			$('.sad-eve').removeClass('hidden');
-		}else{
-			$tl_outer_wrap.removeClass('hidden');
-			$('.main-row').removeClass('hidden');
-			$('.sad-eve').addClass('hidden');
-		}
-	}
-	bindEventHandlers();
-
+	$view.find('.btn-edit').on('click', function(){
+		var $this = $(this),
+			event_id = $this.data('event-id');
+		showEditEventModal(event_id);
+	})
 }
 
 function generateEventAttributes(event){
+
+	var st_date = moment(event.event_start_date),
+		end_date = moment(event.event_end_date);
+
 	event.date =  moment(event.event_start_date).format(__C.DATE_FORMAT);
+	event.tags_text = getTagsString(event.tags);
 	event.begin_time = moment(event.begin_time, 'HH:mm:ss').format('HH:mm');
 	event.end_time = moment(event.end_time, 'HH:mm:ss').format('HH:mm');
 	event.time = event.begin_time == '00:00' && event.end_time == '00:00' ? ' Весь день': event.begin_time + ' - ' + event.end_time;
+	event.dates = end_date.format('DD MMMM') ;
+	event.day_name = end_date.format('dddd');
+	if (end_date.format(__C.DATE_FORMAT) != st_date.format(__C.DATE_FORMAT)){
+		event.one_day = false;
+		if (end_date.format('MM') == st_date.format('MM')){
+			event.dates = st_date.format('DD') + ' - ' + end_date.format('DD MMMM')
+		}else{
+			event.dates = st_date.format('DD MMMM') + ' - ' + end_date.format('DD MMMM')
+		}
+	}else{
+		event.one_day = true;
+	}
+	event.friends = $('<div>');
+	event.all_friends = tmpl('liked-dropdown-wrapper', {});
+
+	event.can_edit_hidden = event.can_edit != 1 ? 'hidden':'';
+
+	var short_firends_count = 0;
+	if (event.favorite_friends != undefined){
+		event.favorite_friends.forEach(function(user){
+			if (short_firends_count < 5){
+				event.friends.append(tmpl('liked-user', user));
+			}
+			event.all_friends.append(tmpl('liked-dropdown-item', user))
+		})
+	}
 
 	event.favorite_btn_class = event.is_favorite ? __C.CLASSES.NO_BORDERS : '';
 	event.favorite_btn_text = event.is_favorite ? __C.TEXTS.REMOVE_FAVORITE : __C.TEXTS.ADD_FAVORITE;
@@ -272,94 +228,8 @@ function generateEventAttributes(event){
 	return event;
 }
 
-function showFavoriteEvents(){
-	setSelectedMenu('show-favorites-btn');
-
-	var $view = $('.favorites-app');
-	$('.screen-view').addClass('hidden');
-	$view.removeClass('hidden');
-
-	$view.find('.blocks-outer-wrap').empty();
-	$view.find('.tl-block').remove();
-
-	favorites_page_number = 0;
-	$.ajax({
-		url: '/api/events/favorites',
-		data: {
-			page: favorites_page_number
-		},
-		success: function(res){
-			buildMyTimeline(res, '_favorite_events');
-		}
-	});
-}
-
-//TODO: Прицепить к кнопке
-function showSettingsModal(){
-	var $modal = $('#settings-modal');
-	$modal.remove();
-
-	$.ajax({
-		url: '/api/users/my/settings',
-		type: 'GET',
-		success: function(res){
-			$modal = tmpl('settings-modal', res.data);
-		}
-	});
-}
-
-function buildSearchResults(res){
-	var $events_wrapper = $('.search-events').empty(),
-		$organizations_wrapper = $('.search-organizations').empty();
-
-	res.data.events.forEach(function(event){
-		$events_wrapper.append(tmpl('search-event-item', generateEventAttributes(event)));
-	});
-
-	res.data.organizations.forEach(function(organization){
-		$organizations_wrapper.append(tmpl('organization-search-item', organization));
-	});
-
-
-}
-
-function handleSearch(query){
-	if (paceOptions.search_is_active){
-		paceOptions.search_xhr.abort();
-	}
-
-	paceOptions.search_is_active = true;
-	paceOptions.search_query = query;
-	setSelectedMenu('search');
-
-	var $view = $('.search-app');
-	$('.screen-view').addClass('hidden');
-	$view.removeClass('hidden');
-
-
-	paceOptions.search_xhr = $.ajax({
-		url: '/api/search/',
-		data: {
-			q: paceOptions.search_query
-		},
-		success: function(res){
-			paceOptions.search_is_active = false;
-			paceOptions.search_xhr = null;
-			if (paceOptions.search_query == res.data.query){
-				buildSearchResults(res);
-			}
-		}
-	});
-}
-
-function clearEvents(){
-	_events = {};
-	$('#blocks-outer-wrap div, #tl-outer-wrap div').remove();
-	events_page_number = 0;
-}
-
 /**
- *
+ * Нажатие на кнопку подписаться/отписаться
  * @param state
  * @param entity_id ID подписки или ID организации в зависимости от типа совершаемого события
  * @param callback
@@ -368,29 +238,134 @@ function toggleSubscriptionState(state, entity_id, callback){
 	var options = (state == false) ? {
 		url: 'api/subscriptions/' + entity_id,
 		type: 'DELETE',
-		success: callback
+		success: function(res){
+			setDaysWithEvents();
+			callback(res);
+		}
 	} : {
 		url: 'api/subscriptions/',
 		data:{organization_id: entity_id},
 		type: 'POST',
-		success: callback
+		success: function(res){
+			setDaysWithEvents();
+			callback(res);
+			if (__STATES.getCurrentState() == 'timeline' || __STATES.getCurrentState() == 'organizations'){
+				__STATES.refreshState();
+			}
+		}
 	};
-
 	$.ajax(options);
 }
 
-function hideOrganizationItem(org_id){
-	var $organization_item = $('.animated.organization-' + org_id).addClass('bounceOutLeft');
-	setTimeout(function(){
-		$organization_item.remove()
-	}, 1000);
+function walkEventActiveDates(events, cb){
+	events.forEach(function(event){
+		var m_event_start_date = moment(event.event_start_date),
+			m_event_end_date = moment(event.event_end_date),
+			end_date = m_event_end_date.format(__C.DATE_FORMAT),
+			current_date = m_event_start_date,
+			event_date; // event should be only one time in object
+		do{
+
+			if (current_date.unix() < moment(moment().format('YYYY-MM-DD') + ' 00:00:00').unix()){
+				current_date.add(1, 'days');
+			}else{
+				event_date = current_date.format(__C.DATE_FORMAT);
+				if (cb && cb instanceof Function){
+					cb(event, event_date);
+				}
+				current_date.add(1, 'days');
+			}
+		}while(end_date != event_date && current_date.unix() <= m_event_end_date.unix());
+	});
 }
 
-function showAllOrganizations(){
-	setSelectedMenu('show-organizations-btn');
-	var $view = $('.organizations-app').empty();
-	$('.screen-view').addClass('hidden');
-	$view.removeClass('hidden');
+function printEventsInTimeline($view, res){
+	var $tl_outer_wrap = $view.find('.tl-outer-wrap'),
+		$blocks_wrapper = $view.find('.blocks-outer-wrap');
+
+	res.data.forEach(function(value) {
+		var m_date = moment(value.event_start_date).unix() < moment().unix()
+				? moment() : moment(value.event_start_date),
+			day_date = m_date.format(__C.DATE_FORMAT);
+		var $day_wrapper = $blocks_wrapper.find('.events-' + day_date),
+			$timeline_wrapper = $tl_outer_wrap.find('.timeline-' + day_date);
+
+		if ($day_wrapper.length == 0) {
+			$day_wrapper = tmpl('events-day-wrapper', {
+				day_name: m_date.format('dddd').capitalize(),
+				day_number: m_date.format('DD MMMM'),
+				events_count: 1,
+				date: m_date.format(__C.DATE_FORMAT)
+			}).data('events-count', 1).appendTo($blocks_wrapper);
+
+			$timeline_wrapper = tmpl('timeline-day', {
+				day_short_name: m_date.format('ddd').capitalize(),
+				day_number: m_date.format('DD'),
+				month_number: m_date.format('MM'),
+				date: day_date
+			}).appendTo($tl_outer_wrap);
+		}else{
+			$day_wrapper
+				.data('events-count', $day_wrapper.data('events-count') + 1)
+				.find('.events-count')
+				.text($day_wrapper.data('events-count'));
+		}
+
+		$day_wrapper.find('.event-' + value.id + '-' + day_date).remove();
+		$timeline_wrapper.find('.timeline-' + value.id + '-' + day_date).remove();
+		var event = generateEventAttributes(value);
+
+		var $event = tmpl('event-item', event);
+		$event.data('share', {
+			'vk': tmpl('vk-share-link', event).attr('href'),
+			'facebook': tmpl('facebook-share-link', event).attr('href'),
+			'twitter': tmpl('twitter-share-link', event).attr('href')
+		});
+		$day_wrapper.append($event);
+		$timeline_wrapper.append(tmpl('timeline-event', event));
+	});
+
+	if (res.data.length == 0) {
+		//$view.find('.main-row').addClass(__C.CLASSES.HIDDEN);
+		$view.find('.load-more-btn').addClass(__C.CLASSES.HIDDEN);
+		$view.find('.sad-eve').removeClass(__C.CLASSES.HIDDEN);
+	} else {
+		//$view.find('.main-row').removeClass(__C.CLASSES.HIDDEN);
+		$view.find('.load-more-btn')
+			.removeClass(__C.CLASSES.HIDDEN)
+			.find('.btn').removeClass(__C.CLASSES.DISABLED);
+		$view.find('.sad-eve').addClass(__C.CLASSES.HIDDEN);
+	}
+	if ($tl_outer_wrap.find('.tl-block').length != 0){
+		$tl_outer_wrap.removeClass(__C.CLASSES.HIDDEN);
+	}else{
+		$tl_outer_wrap.addClass(__C.CLASSES.HIDDEN);
+	}
+	bindEventHandlers();
+}
+
+/* PAGE CONTROLLERS */
+function MyTimeline($view, $content_block){
+	$view.find('.tl-outer-wrap').addClass(__C.CLASSES.HIDDEN);
+	setDaysWithEvents();
+	var $load_btn = $view.find('.load-more-btn').addClass(__C.CLASSES.HIDDEN).data('page-number', 0),
+		getEvents = function(){
+			var page_number = $load_btn.data('page-number');
+			$load_btn.data('page-number', page_number + 1);
+			$.ajax({
+				url: '/api/events/my?page=' + page_number,
+				success: function(res){
+					printEventsInTimeline($view, res);
+				}
+			});
+		};
+
+	$view.find('.panel-default,.tl-block').remove();
+	$load_btn.find('.btn').on('click', getEvents);
+	getEvents();
+}
+
+function OrganizationsList($view, $content_block){
 	$.ajax({
 		url: 'api/organizations/?with_subscriptions=true',
 		success: function(res){
@@ -422,9 +397,8 @@ function showAllOrganizations(){
 				});
 				$div.append($wrapper)
 			});
-			$div.appendTo($view);
+			$view.html($div);
 			$div.find('.subscribe-btn').on('click', function(){
-				clearEvents();
 				var $btn = $(this),
 					to_delete_state = !$btn.hasClass('btn-success'),
 					sub_id = $btn.data('subscription-id'),
@@ -445,123 +419,112 @@ function showAllOrganizations(){
 					toggleSubscriptionState(true, org_id, function(res){
 						$btn.data('subscription-id', res.data.subscription_id);
 						$btn.removeClass(__C.CLASSES.DISABLED);
-						showNotifier(res);
 						printSubscribedOrganizations();
 					});
 				}
 			});
+			$view.find('.load-more-btn').removeClass(__C.CLASSES.HIDDEN);
 		}
 	})
 }
 
-function getEventsList(){
+function FavoredEvents($view, $content_block){
+	$view.find('.tl-outer-wrap').addClass(__C.CLASSES.HIDDEN);
+	var $load_btn = $view.find('.load-more-btn').addClass(__C.CLASSES.HIDDEN).data('page-number', 0),
+		getEvents = function(){
+			var page_number = $load_btn.data('page-number');
+			$load_btn.data('page-number', page_number + 1);
+			$.ajax({
+				url: '/api/events/favorites?page=' + page_number,
+				success: function(res){
+					printEventsInTimeline($view, res);
+				}
+			});
+		};
+
+	$view.find('.panel-default,.tl-block').remove();
+	$load_btn.find('.btn').on('click', getEvents);
+	getEvents();
+}
+
+function Search($view, $content_block){
+	$view.find('.tl-outer-wrap').addClass(__C.CLASSES.HIDDEN);
+	var _search = searchToObject();
+	if (_search.hasOwnProperty('q')){
+		$('.search-input').val(_search.q);
+	}
 	$.ajax({
-		url: '/api/events/my?page=' + events_page_number,
+		url: '/api/search/',
+		data: _search,
 		success: function(res){
-			buildMyTimeline(res, '_events');
+			var $events_wrapper = $view.find('.search-events').empty(),
+				$organizations_wrapper = $view.find('.search-organizations').empty();
+
+			res.data.events.forEach(function(event){
+				var $event = tmpl('search-event-item', generateEventAttributes(event));
+
+				$event.data('share', {
+					'vk': tmpl('vk-share-link', event).attr('href'),
+					'facebook': tmpl('facebook-share-link', event).attr('href'),
+					'twitter': tmpl('twitter-share-link', event).attr('href')
+				});
+				$events_wrapper.append($event);
+			});
+
+			res.data.organizations.forEach(function(organization){
+				var $organization = tmpl('organization-search-item', organization);
+				$organizations_wrapper.append($organization);
+				$organization.on('click', function(){
+					showOrganizationalModal(organization.id);
+				})
+			});
+
+			if (res.data.events.length == 0){
+				$events_wrapper.append(tmpl('search-no-events', {}));
+			}
+			if (res.data.organizations == 0){
+				$organizations_wrapper.append(tmpl('search-no-organizations', {}));
+			}
+
+			bindEventHandlers();
 		}
 	});
 }
 
-function showOrganizationalModal(organization_id){
+
+function OneDay($view, $content_block){
+	$view.find('.panel-default,.tl-block').remove();
+	var date = __STATES.getCurrentState();
 	$.ajax({
-		url: 'api/organizations/' + organization_id + '?with_events=true',
+		url: 'api/events/my?date=' + date,
+		type: 'GET',
+		dataType: 'JSON',
 		success: function(res){
-			var $events = $('<div>'),
-				$friends = tmpl('subscribed-users-row', {
-					subscribed_count: res.data.subscribed_count,
-					subscribed_count_text: getUnitsText(res.data.subscribed_count, __C.TEXTS.SUBSCRIBERS)
-				}),
-				$body = $('body'),
-				$modal = $('#organization-modal');
-			if (res.data && res.data.hasOwnProperty('events')){
-				res.data.events.forEach(function(event){
-					$events.append(tmpl('short-event', event));
-				});
-
-				res.data.subscribed_friends.forEach(function(friend){
-					$friends.prepend(tmpl('subscribed-friend', friend));
-				});
-
-
-				$modal.remove();
-				res.data.events = $events;
-				res.data.subscribed_friends = $friends;
-
-				$modal = tmpl('organization-modal', $.extend(true, res.data, {
-					subscribe_btn_text: res.data.is_subscribed ? __C.TEXTS.REMOVE_SUBSCRIPTION : __C.TEXTS.ADD_SUBSCRIPTION,
-					subscribe_btn_class: res.data.is_subscribed ? __C.CLASSES.SUBSCRIBE_DELETE : __C.CLASSES.SUBSCRIBE_ADD
-				}));
-
-				$modal.find('.modal-subscribe-btn').on('click', function(){
-					var $btn = $(this),
-						org_id = $btn.data('organization-id'),
-						sub_id = $btn.data('subscription-id');
-					if ($btn.hasClass(__C.CLASSES.DISABLED)) return true;
-
-					$btn.addClass(__C.CLASSES.DISABLED);
-
-					if ($btn.hasClass(__C.CLASSES.SUBSCRIBE_DELETE)){
-						toggleSubscriptionState(false, sub_id, function(res){
-							$btn
-								.toggleClass(__C.CLASSES.SUBSCRIBE_DELETE + ' ' +
-									__C.CLASSES.SUBSCRIBE_ADD + ' ' +
-									__C.CLASSES.DISABLED)
-								.text(__C.TEXTS.ADD_SUBSCRIPTION);
-							showNotifier(res);
-							hideOrganizationItem(org_id);
-							clearEvents();
-							getEventsList();
-						});
-					}else{
-						toggleSubscriptionState(true, org_id, function(res){
-							$btn
-								.toggleClass(__C.CLASSES.SUBSCRIBE_DELETE + ' ' +
-								__C.CLASSES.SUBSCRIBE_ADD + ' ' +
-								__C.CLASSES.DISABLED)
-								.text(__C.TEXTS.REMOVE_SUBSCRIPTION);
-							showNotifier(res);
-							printSubscribedOrganizations();
-						});
-					}
-				});
-
-				var modal_height = window.innerHeight - MODAL_OFFSET + MODAL_FOOTER_HEIGHT;
-				$modal
-					.appendTo($body)
-					.on('shown.bs.modal', function(){
-						var events_block_height =
-							modal_height
-							- $modal.find('.modal-header').outerHeight()
-							- $modal.find('.organization-content-header').outerHeight()
-							- $modal.find('.organization-info').outerHeight()
-							- 20;
-						events_block_height = events_block_height < 110 ? 110 : events_block_height ;
-						$modal
-							.find('.last-events-list>div')
-							.css('max-height', events_block_height + 'px')
-							.slimscroll({
-								height: events_block_height
-							});
-					})
-					.modal();
-
-			}
+			printEventsInTimeline($view, res);
+			$view.find('.tl-outer-wrap ').css('visibility', 'hidden');
+			var active_date = moment(date, __C.DATE_FORMAT);
+			$('.day-events-header .day-name').text(active_date.format('dddd').capitalize() + ', ' +
+				active_date.format('DD MMMM'));
 		}
 	});
+}
+
+function hideOrganizationItem(org_id){
+	var $organization_item = $('.animated.organization-' + org_id).addClass('fadeOutLeftBig');
+	setTimeout(function(){
+		$organization_item.remove()
+	}, 1000);
 }
 
 function printSubscribedOrganizations(){
-	var $list = $('.organizations-list').empty(),
-		$loader = $('.organizations-loading').show();
+	var $list = $('.organizations-list');
 	$.ajax({
 		'url': 'api/organizations/?with_subscriptions=true',
 		success: function(res){
-			$list.empty();
-			$loader.hide();
 			res.data.forEach(function(organization){
-				if (organization.subscribed){
+				if (organization.subscribed && $list.find('.organization-' + organization.id).length == 0){
 					tmpl('organizations-item', organization)
+						.addClass('fadeInLeftBig')
 						.appendTo($list)
 						.on('click', function(){
 							showOrganizationalModal($(this).data('organization-id'));
@@ -572,35 +535,42 @@ function printSubscribedOrganizations(){
 	});
 }
 
-function showNotifier(response){
-	$.notify({
-		'message': response.text,
-		'pos': response.pos ? response.pos : 'top-right',
-		'status': response.status ? 'success' : 'danger'
-	});
-}
-
-function showTimeline(){
-	getEventsList();
-	setSelectedMenu('show-my-timeline-btn');
-	var $view = $('.calendar-app');
-	$('.screen-view').addClass('hidden');
-	$view.removeClass('hidden');
-}
-
 
 function setDaysWithEvents(){
 	$.ajax({
-		url: '/api/events/search',
+		url: '/api/events/my',
 		data: {
 			since_date: _selected_month.startOf('month').format(__C.DATE_FORMAT),
 			till_date: _selected_month.endOf('month').format(__C.DATE_FORMAT),
 			type: 'short'
 		},
 		success: function(res){
+			$('.td-day').removeClass('click-able has-favorites').addClass(__C.CLASSES.DISABLED);
 			walkEventActiveDates(res.data, function(event, event_date){
-				$('.td-day[data-date="' + event_date + '"]').addClass('click-able');
+				var add_has_favorites = event.is_favorite ? 'has-favorites' : '';
+				$('.td-day[data-date="' + event_date + '"]')
+					.addClass('click-able')
+					.addClass(add_has_favorites)
+					.removeClass(__C.CLASSES.DISABLED);
+				__STATES[event_date] = OneDay;
 			});
+			bindOnClick();
+		}
+	});
+}
+
+function bindOnClick(){
+	$('[data-page], a[data-controller]').off('click.pageRender').on('click.pageRender', function(){
+		var $this = $(this),
+			page_name = $this.data('page'),
+			controller_name = $this.data('controller');
+		if ($this.hasClass(__C.CLASSES.DISABLED)) return true;
+		if (page_name != undefined){
+			History.pushState({page: page_name}, $this.data('title') ? $this.data('title'): $this.text(), page_name);
+		}else{
+			if (window[controller_name] != undefined && window[controller_name] instanceof Function){
+				window[controller_name]();
+			}
 		}
 	});
 }
@@ -610,8 +580,8 @@ $(document)
 		Pace.restart()
 	})
 	.ready(function(){
-
-	(function(){
+		//Отрисовака календаря
+		(function(){
 		var current_month = moment(),
 			$calendar = $('#calendar-table'),
 			_today = moment(),
@@ -634,7 +604,7 @@ $(document)
 		}
 
 		function setMonthName(){
-			$month_name.text(current_month.lang('ru').format("MMMM YYYY"));
+			$month_name.text(current_month.lang('ru').format("MMMM YYYY").capitalize());
 		}
 
 		function buildTable(){
@@ -650,8 +620,10 @@ $(document)
 					number: current_month.date(),
 					day_number: current_month.day(),
 					today: today,
-					date: current_month.format(__C.DATE_FORMAT)
-				}))
+					date: current_month.format(__C.DATE_FORMAT),
+					date_text: current_month.format('DD MMMM YYYY')
+				}));
+				__STATES[current_month.format(__C.DATE_FORMAT)] = OneDay;
 			}
 			var curr_month_clone = moment(current_month._d);
 			if (first_day_in_month != 1){
@@ -702,44 +674,20 @@ $(document)
 			$calendar.append($tbody);
 		}
 
-		function bindOnClickEvents(){
-			var $day_events = $('.day-events'),
-				$no_events_text = $('.no-events-text'),
-				$loading = $('.events-loading-pulse');
-			$('.td-day').on('click', function(){
-				var $this = $(this);
-				$('#events-list-date').text(moment($this.data(__C.DATA_NAMES.DATE)).locale('ru').format('DD MMMM YYYY'));
-				$('.td-day').removeClass('selected');
-				$this.addClass('selected');
-				$day_events.find(':not(.no-events-text)').remove();
-				$loading.show();
-				$no_events_text.addClass('hidden');
-				$.ajax({
-					url: 'api/events/' + $this.data(__C.DATA_NAMES.DATE),
-					type: 'GET',
-					dataType: 'JSON',
-					success: function(res){
-						//TODO: Сделать нажатие на клик
-					}
-				});
-			});
-		}
-
 		function clickSelectedDate(){
-			$('.td-day.selected').click();
+			$('.td-day.' + __C.CLASSES.ACTIVE).click();
 		}
 
 		function renderTable(){
 			deleteDays();
 			buildTable();
 			setMonthName();
-			bindOnClickEvents();
 			clickSelectedDate();
 			setDaysWithEvents();
 		}
 
 		function selectToday(){
-			$('.td-day.today').addClass('selected');
+			$('.td-day.today').addClass(__C.CLASSES.ACTIVE);
 		}
 
 
@@ -767,22 +715,48 @@ $(document)
 
 	})(jQuery, window, undefined);
 
-		$('.show-organizations-btn').on('click', showAllOrganizations);
-		$('.show-my-timeline-btn').on('click', showTimeline);
-		$('.show-favorites-btn').on('click', showFavoriteEvents);
+		function renderState(){
+			var state = History.getState(),
+				page = __STATES.getCurrentState();
+			if (__STATES.hasOwnProperty(page)){
+				var $content_block = $('[data-controller="'  + __STATES[page].name + '"]'),
+					$view = $content_block.parents('.screen-view');
+				$view = $view.length == 1 ? $view : $content_block;
+				$('.screen-view').not($view).addClass(__C.CLASSES.HIDDEN);
+				$view.removeClass(__C.CLASSES.HIDDEN);
+				__STATES[page]($view, $content_block);
+			}else{
+				console.error('PAGE RENDERING ERROR');
+			}
+			if (page != 'search'){
+				$('.search-input').val('');
+			}
+			$('[data-page]').removeClass(__C.CLASSES.ACTIVE);
+			$('[data-page="' + page + '"]').addClass(__C.CLASSES.ACTIVE);
+		}
 
-	$('.log-out-icon').on('click', function(){
-		window.location.href = '../../index.php';
+		History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
+			renderState(); // Note: We are using History.getState() instead of event.state\
+		});
+
+
+		bindOnClick();
+		$('.log-out-icon').on('click', function(){
+		window.location.href = 'index.php?logout=true';
 	});
 		$('.search-input')
-			.on('input', function(e){
-				handleSearch(this.value);
-			})
 			.on('keypress', function(e){
-			if (e.which == 13){
-				handleSearch(this.value);
-			}
+				if (e.which == 13){
+					History.pushState({page: 'search'}, 'Поиск: ' + this.value, 'search?q=' + encodeURIComponent(this.value));
+				}
 		});
-	printSubscribedOrganizations();
-	getEventsList();
+		printSubscribedOrganizations();
+		renderState();
+
+		$('.show-organizations-btn').on('click', function(){
+			History.pushState({page: 'organizations'}, 'Каталог организаций', 'organizations');
+		})
+		$('.show-timeline-btn').on('click', function(){
+			History.pushState({page: 'timeline'}, 'Моя лента', 'timeline');
+		})
 });

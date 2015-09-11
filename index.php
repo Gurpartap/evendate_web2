@@ -1,5 +1,19 @@
 <?php
-require_once 'backend/bin/db.php';
+    require_once 'backend/bin/db.php';
+    require_once 'backend/bin/Class.Result.php';
+    require_once 'backend/users/Class.AbstractUser.php';
+    require_once 'backend/users/Class.User.php';
+    require_once 'backend/tags/Class.TagsCollection.php';
+    try{
+        $user = new User($db);
+        if (isset($_GET['logout']) && $_GET['logout'] == true){
+            $user->logout();
+        }else{
+            header('Location: /timeline');
+            die();
+        }
+    }catch(Exception $e){
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -54,19 +68,16 @@ require_once 'backend/bin/db.php';
    <script src="vendor/jquery/dist/jquery.js"></script>
    <!-- BOOTSTRAP-->
    <script src="vendor/bootstrap/dist/js/bootstrap.js"></script>
-   <!-- STORAGE API-->
-   <script src="vendor/jQuery-Storage-API/jquery.storageapi.js"></script>
    <!-- PARSLEY-->
    <script src="vendor/parsleyjs/dist/parsley.min.js"></script>
 
-
    <!-- =============== APP SCRIPTS ===============-->
    <script src="app/js/app.js"></script>
+   <!-- NOTIFICATIONS API -->
+   <script src="vendor/notify/notify.js"></script>
 
-<script>
-  function onSignIn(data){
-    console.log(data);
-  }
+
+   <script>
 
   $('.vk-auth-btn').on('click', function(){
     window.open('https://oauth.vk.com/authorize?client_id=5029623&scope=friends,email,offline,nohttps&redirect_uri=http://<?=App::$DOMAIN?>/vkOauthDone.php?mobile=false&response_type=code', 'VK_AUTH_WINDOW',
@@ -83,7 +94,19 @@ require_once 'backend/bin/db.php';
             'status=1,toolbar=0,menubar=0&height=500,width=700');
   });
 
+  $('.vk-auth-btn,.google-plus-btn,.facebook-btn').on('click', function(){
+      if (Notify.needsPermission) {
+          Notify.requestPermission(function(){}, function(){
+              showNotifier({status: false, text: 'Мы не можем включить уведомления в браузере. Вы запретили их для нас :('});
+          });
+      }
+  });
+
 </script>
+
+   <?php
+    require 'footer.php';
+   ?>
 
 </body>
 

@@ -12,9 +12,18 @@ var server = require('http'),
 config = _fs.readFileSync('../config.json');
 config = JSON.parse(config);
 
-var config_index = process.env.ENV ? process.env.ENV : 'dev';
-var real_config = config[config_index],
-	connection = mysql.createConnection(real_config.db);
+var config_index = process.env.ENV ? process.env.ENV : 'dev',
+	real_config = config[config_index],
+	connection = mysql.createConnection(real_config.db),
+	logger = new (winston.Logger)({
+		transports: [
+			new winston.transports.File({ filename: __dirname + '/debug.log', json: false })
+		],
+		exceptionHandlers: [
+			new winston.transports.File({ filename: __dirname + '/exceptions.log', json: false })
+		],
+		exitOnError: false
+});
 
 	var URLs = {
 		"VK":{
@@ -131,6 +140,7 @@ io.on('connection', function (socket){
 					break;
 				}
 				case 'google':{
+					var cover_photo_url = data.user_info.hasOwnProperty('cover') && data.user_info.cover.hasOwnProperty('coverPhoto') ? data.user_info.cover.coverPhoto.url: null;
 					q_ins_sign_in = 'INSERT INTO google_sign_in(google_id, access_token, expires_in, etag, ' +
 					' user_id, cover_photo_url, created_at) ' +
 					'VALUES(' +
@@ -140,14 +150,14 @@ io.on('connection', function (socket){
 								data.oauth_data.expires_in,
 								data.user_info.etag,
 								user_id,
-								data.user_info.cover.coverPhoto.url]
+								cover_photo_url]
 						) +
 					', NOW()) ' +
 					'ON DUPLICATE KEY UPDATE ' +
 					'access_token = ' + connection.escape(data.oauth_data.access_token) + ', ' +
 					'expires_in = ' + connection.escape(data.oauth_data.expires_in) + ', ' +
 					'etag = ' + connection.escape(data.user_info.etag) + ', ' +
-					'cover_photo_url = ' + connection.escape(data.user_info.cover.coverPhoto.url)
+					'cover_photo_url = ' + connection.escape(cover_photo_url);
 					break;
 				}
 				case 'facebook':{

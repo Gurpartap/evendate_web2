@@ -92,10 +92,25 @@
         //data-api options will be overwritten with custom javascript options
         options = $.extend(this.element.data(), options);
 
+        var active_btn_classes = 'btn-pink active',
+            inactive_btn_class = 'btn-pink-empty',
+            one_date_classes = options.singleDatePicker ? active_btn_classes : inactive_btn_class,
+            multidate_btn_classes = options.singleDatePicker ? inactive_btn_class : active_btn_classes;
+
         //html template for the picker UI
         if (typeof options.template !== 'string')
-            options.template = '<div class="daterangepicker dropdown-menu">' +
+            options.template = '<div class="daterangepicker dropdown-menu">'
+                +'<div class="col-xs-12 text-center" style="float: initial;"><div data-toggle="buttons" class="btn-group">' +
+                '<label class="btn ' + one_date_classes + ' change-date-range-type" data-single-date="true">' +
+                '<input id="option1" type="radio" name="options" checked="">Один день' +
+                '</label>' +
+                '<label class="btn ' + multidate_btn_classes + ' change-date-range-type" data-single-date="false">' +
+                '<input id="option3" type="radio" name="options">Несколько дней' +
+                '</label>' +
+                '</div>' +
+                '</div>' +
                 '<div class="calendar left">' +
+
                     '<div class="daterangepicker_input">' +
                       '<input class="input-mini" type="text" name="daterangepicker_start" value="" />' +
                       '<i class="fa fa-calendar"></i>' +
@@ -116,13 +131,13 @@
                       '</div>' +
                     '</div>' +
                     '<div class="calendar-table"></div>' +
-                '</div>' +
-                '<div class="ranges">' +
-                    '<div class="range_inputs">' +
-                        '<button class="applyBtn" disabled="disabled" type="button"></button> ' +
-                        '<button class="cancelBtn" type="button"></button>' +
+                    '<div class="ranges pull-right">' +
+                        '<div class="range_inputs">' +
+                            '<button class="applyBtn" disabled="disabled" type="button"></button> ' +
+                            '<button class="cancelBtn" type="button"></button>' +
+                        '</div>' +
                     '</div>' +
-                '</div>' +
+                '</div>'
             '</div>';
 
         this.parentEl = (options.parentEl && $(options.parentEl).length) ? $(options.parentEl) : $(this.parentEl);

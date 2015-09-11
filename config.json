@@ -32,7 +32,8 @@
       "app_secret": "0ecd87ecde79a4ab4e4feb8c2718e845",
       "redirect_uri": ""
     },
-    "domain": "evendate.ru"
+    "domain": "evendate.ru",
+    "schema": "http://"
   },
   "local":{
     "google": {
@@ -67,6 +68,7 @@
       "app_secret": "0ecd87ecde79a4ab4e4feb8c2718e845",
       "redirect_uri": ""
     },
-    "domain": "dev.evendate.org"
+    "domain": "dev.evendate.org",
+    "schema": "http://"
   }
 }

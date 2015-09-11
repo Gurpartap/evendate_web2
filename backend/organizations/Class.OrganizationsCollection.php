@@ -91,7 +91,6 @@ class OrganizationsCollection{
 		return new Result(true, '', $organizations);
 	}
 
-
 	public static function filter(PDO $db, User $user, array $filters = null, $order_by = ''){
 		$q_get_organizations = 'SELECT organizations.id, organizations.description,
 			organizations.name, organizations.type_id, organizations.img_url,

@@ -9,7 +9,11 @@ class User extends AbstractUser{
 	protected $email;
 	protected $token;
 	protected $avatar_url;
-	protected $organization_id;
+	protected $is_editor;
+
+
+	protected $show_to_friends;
+	protected $notify_in_browser;
 
 	private $editor_instance;
 
@@ -22,7 +26,8 @@ class User extends AbstractUser{
 			throw new LogicException('Пользователь с такими данными не найден');
 		}
 		if (isset($_SESSION['id'])){
-			$p_get_user = $db->prepare('SELECT users.*
+			$p_get_user = $db->prepare('SELECT users.*,
+				(SELECT COUNT(user_id) FROM users_organizations WHERE user_id = users.id AND status = 1) > 0 AS is_editor
 				FROM users
 				INNER JOIN tokens ON tokens.user_id = users.id
 				WHERE users.id = :id
@@ -33,7 +38,8 @@ class User extends AbstractUser{
 				':token' => $_SESSION['token']
 			);
 		}else{
-			$p_get_user = $db->prepare('SELECT users.*
+			$p_get_user = $db->prepare('SELECT users.*,
+				(SELECT COUNT(user_id) FROM users_organizations WHERE user_id = users.id AND status = 1) > 0 AS is_editor
 				FROM users
 				INNER JOIN tokens ON tokens.user_id = users.id
 				WHERE
@@ -58,7 +64,10 @@ class User extends AbstractUser{
 		$this->email = $row['email'];
 		$this->token = $row['token'];
 		$this->avatar_url = $row['avatar_url'];
-		$this->organization_id = $row['organization_id'];
+		$this->is_editor = $row['is_editor'];
+
+		$this->show_to_friends = $row['show_to_friends'];
+		$this->notify_in_browser = $row['notify_in_browser'];
 	}
 
 	public function getId() {
@@ -66,7 +75,7 @@ class User extends AbstractUser{
 	}
 
 	public function isEditor(){
-		return is_numeric($this->organization_id);
+		return $this->is_editor;
 	}
 
 	public function getEditorInstance(){
@@ -101,37 +110,69 @@ class User extends AbstractUser{
 
 	}
 
-	public function addFavoriteEvent(Event $event, $event_date){
-		$q_ins_favorite = 'INSERT INTO favorite_events(user_id, event_id, status, event_date, created_at)
-			VALUES (:user_id, :event_id, 1, :event_date, NOW())
+	public function addFavoriteEvent(Event $event){
+		$q_ins_favorite = 'INSERT INTO favorite_events(user_id, event_id, status, created_at)
+			VALUES (:user_id, :event_id, 1, NOW())
 			ON DUPLICATE KEY UPDATE status = 1';
 		$p_ins_favorite = $this->db->prepare($q_ins_favorite);
 		$result = $p_ins_favorite->execute(array(
 			':user_id' => $this->getId(),
-			':event_date' => $event_date,
 			':event_id' => $event->getId()
 		));
 		if ($result === FALSE) throw new DBQueryException('CANT_MAKE_FAVORITE', $this->db);
 		return new Result(true, 'Событие успешно добавлено в избранное', array('favorite_id' => $this->db->lastInsertId()));
 	}
 
-	public function deleteFavoriteEvent(Event $event, $event_date){
+	public function deleteFavoriteEvent(Event $event){
 		$q_upd_favorite = 'UPDATE favorite_events SET status = 0
 			WHERE  user_id = :user_id
-			 AND event_id = :event_id
-			 AND event_date = :event_date';
+			 AND event_id = :event_id';
 		$p_ins_favorite = $this->db->prepare($q_upd_favorite);
 		$result = $p_ins_favorite->execute(array(
 			':user_id' => $this->getId(),
-			':event_date' => $event_date,
 			':event_id' => $event->getId()
 		));
 		if ($result === FALSE) throw new DBQueryException('CANT_DELETE_FAVORITE', $this->db);
 		return new Result(true, 'Событие успешно удалено из избранных');
 	}
 
-	public function updateSettings($__request) {
+	public function hasFavoriteEvent(Event $event){
+		$q_get_is_fav = 'SELECT * FROM favorite_events
+			WHERE
+			user_id = :user_id
+			AND event_id = :event_id
+			AND status = 1';
+		$p_get_is_fav = $this->db->prepare($q_get_is_fav);
+		$p_get_is_fav->execute(array(
+			':user_id' => $this->getId(),
+			':event_id' => $event->getId()
+		));
+		if ($p_get_is_fav === FALSE) return new Result(false, '', false);
+		return new Result(true, '', $p_get_is_fav->rowCount() != 1);
+	}
 
+	public function updateSettings($__request) {
+		if (isset($__request['notify-in-browser'])){
+			$this->notify_in_browser = $__request['notify-in-browser'] == 'true' ? 1 : 0;
+		}
+		if (isset($__request['show-to-friends'])){
+			$this->show_to_friends = $__request['show-to-friends'] == 'true' ? 1 : 0;
+		}
+		$q_upd = 'UPDATE users SET
+			show_to_friends = :show_to_friends,
+			notify_in_browser = :notify_in_browser
+			WHERE users.id = :user_id';
+		$p_upd = $this->db->prepare($q_upd);
+
+		$result = $p_upd->execute(array(
+			':show_to_friends' => $this->show_to_friends,
+			':notify_in_browser' => $this->notify_in_browser,
+			':user_id' => $this->getId()
+		));
+
+		if ($result === FALSE) throw new DBQueryException('', $this->db);
+
+		return new Result(true, '');
 	}
 
 	public function getMainInfo(){
@@ -142,6 +183,19 @@ class User extends AbstractUser{
 			'avatar_url' => $this->getAvatarUrl(),
 			'middle_name' => $this->getMiddleName(),
 			'is_editor' => $this->isEditor()
+		));
+	}
+
+	public function logout() {
+		session_unset();
+		session_destroy();
+		session_write_close();
+	}
+
+	public function getSettings() {
+		return new Result(true, '', array(
+			'show_to_friends' => (boolean) $this->show_to_friends,
+			'notify_in_browser' => (boolean) $this->notify_in_browser,
 		));
 	}
 }

@@ -2,11 +2,24 @@
 
 require_once $ROOT_PATH.'backend/subscriptions/Class.Subscription.php';
 require_once $ROOT_PATH.'backend/organizations/Class.Organization.php';
+require_once $ROOT_PATH.'backend/organizations/Class.OrganizationsCollection.php';
 
 $__modules['subscriptions'] = array(
 	'GET' => array(
 		'my' => function() use ($__db, $__request, $__user){
 			//return $collection->
+		},
+		'{/(id:[0-9]+)}' => function () use ($__db, $__request, $__user){
+			return $__user->createEvent($__request['payload']);
+		},
+		'all' => function () use ($__db, $__request, $__user) {
+			$collection = new OrganizationsCollection($__db, $__user);
+			if (isset($__request['with_subscriptions'])){
+				$collection->setUser($__user);
+				return $collection->getUserOrganizations();
+			}else{
+				return $collection->getAllActive();
+			}
 		},
 		'' => function () use ($__db, $__request, $__user) {
 			$collection = new OrganizationsCollection($__db, $__user);
@@ -16,9 +29,6 @@ $__modules['subscriptions'] = array(
 			}else{
 				return $collection->getAllActive();
 			}
-		},
-		'{/(id:[0-9]+)}' => function () use ($__db, $__request, $__user){
-			return $__user->createEvent($__request['payload']);
 		},
 	),
 	'POST' => array(

@@ -14,6 +14,7 @@ class App {
 	public static $DB_PASSWORD;
 	public static $DB_NAME;
 	public static $DOMAIN;
+	public static $SCHEMA;
 
 
 	/*
@@ -38,6 +39,7 @@ class App {
 		self::$DB_USER = self::$obj->db->user;
 		self::$DB_PASSWORD = self::$obj->db->password;
 		self::$DOMAIN = self::$obj->domain;
+		self::$SCHEMA = self::$obj->schema;
 	}
 
 	static function getVar($name){

@@ -3,7 +3,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-calendar-day">
-  <td class="td-day day-{day_number} {today}" data-date="{date}">
+  <td class="td-day day-{day_number} {today} disabled" data-date="{date}" data-page="{date}" data-title="{date_text}">
     <div class="content centering"><span class="day-number">{number}</span></div>
   </td>
 </script>
@@ -11,15 +11,10 @@
 <script type="javascript/template" id="tmpl-organizations-item">
   <div class="row organizations-item animated organization-{id}" data-organization-id="{id}">
     <div class="organizations-item-wrapper">
-      <div class="col-xs-3">
-        <div class="organization-img-wrapper">
-          <img src="{img_url}" title="{name}">
-        </div>
+      <div class="organization-img-wrapper">
+        <img src="{img_url}" title="{name}">
       </div>
-      <span class="col-xs-9">
-        {short_name}
-
-      </span>
+      <div class="organization-item-name">{short_name}</div>
     </div>
   </div>
 </script>
@@ -31,7 +26,8 @@
       <div class="modal-content">
         <div class="modal-body">
           <div class="modal-header">
-            <span>{short_name}</span>
+            <span class="organization-modal-header-text">{short_name}</span>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Закрыть"><span aria-hidden="true">×</span></button>
           </div>
           <div class="organization-content-header">
             <img src="{background_img_url}">
@@ -43,7 +39,6 @@
           </div>
           <div class="organization-info">
             <div class="description">
-              <div class="description-text">{description}</div>
               <div class="col-xs-12 liked-users-wrapper">
                 {subscribed_friends}
                 <div class="subscribe-btn-wrapper">
@@ -52,15 +47,21 @@
                   </button>
                 </div>
               </div>
-              <div class="liked-users-count">
-
+              <div class="description-text">
+                {description}
               </div>
+              <div class="description-text">
+
+                <a href="{site_url}" target="_blank"><i class="fa fa-external-link"></i> {site_url_short}</a>
+              </div>
+              <div class="liked-users-count"></div>
             </div>
           </div>
           <div class="col-xs-12 last-events-list">
             {events}
           </div>
         </div>
+      </div>
       </div>
     </div>
   </div>
@@ -75,11 +76,29 @@
           <span>Настройки</span>
         </div>
         <div class="modal-body">
+          <div class="form-group row">
+            <div class="col-sm-12">
+              <div class="checkbox c-checkbox needsclick">
+                <label class="needsclick">
+                  <input type="checkbox" value="1" class="needsclick show-to-friends" name="show-to-friends">
+                  <span class="fa fa-check"></span> Показывать друзьям избранные мной события</label>
+              </div>
+            </div>
+          </div>
 
+          <div class="form-group row">
+            <div class="col-sm-12">
+              <div class="checkbox c-checkbox needsclick">
+                <label class="needsclick">
+                  <input type="checkbox" value="1" class="needsclick notify-in-browser" name="notify-in-browser">
+                  <span class="fa fa-check"></span> Показывать уведомления в браузере </label>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-pink-empty" data-dismiss="modal">Отмена</button>
-          <button type="button" class="btn btn-success save-settings-btn">Сохранить</button>
+          <button type="button" class="btn btn-pink save-settings-btn">Сохранить</button>
         </div>
       </div>
     </div>
@@ -99,20 +118,20 @@
 </script>
 
 <script type="javascript/template" id="tmpl-short-event">
-  <div class="col-xs-12 short-event">
+  <div class="col-xs-12 short-event" data-event-id="{id}">
     <div class="event-image-circle">
-      <img src="/event_images/{id}-vertical.{image_vertical_ext}">
+      <img src="{image_vertical_url}">
     </div>
     <div class="event-info">
       <div class="event-name">
         {title}
       </div>
       <div class="event-attributes">
-                   <span class="event-attribute">
-                       <span class="fa fa-users"></span> 172
+                   <span class="event-attribute-first">
+                       <span class="fa fa-users"></span> {liked_users_count}
                    </span>
                    <span class="event-attribute">
-                       <span class="fa fa-clock-o"></span> 30/06
+                       <span class="fa fa-clock-o"></span> {dates}
                    </span>
       </div>
     </div>
@@ -135,18 +154,18 @@
 
 <script type="javascript/template" id="tmpl-liked-user">
   <div class="user-img-wrapper">
-    <img src="organizations_images/guu.png" class="liked-user-avatar">
+    <img src="{avatar_url}" title="{first_name} {last_name}" class="liked-user-avatar">
   </div>
 </script>
 
 <script type="javascript/template" id="tmpl-events-day-wrapper">
-  <div class="panel panel-default events-{date} bounceInRight">
-    <div class="panel-heading day-events-header-{date}">
+  <div class="panel panel-default events-{date} fadeInLeftBig">
+    <div class="panel-heading day-events-header day-events-header-{date}">
       <div class="row">
-        <div class="col-xs-7">{day_name}, {day_number} {month_name}</div>
+        <div class="col-xs-7 day-name">{day_name}, {day_number}</div>
         <div class="col-xs-5">
           <span class="pull-right panel-events-count">Мероприятий
-            <span class="label label-pink">{events_count}</span>
+            <span class="label label-blue events-count">{events_count}</span>
           </span>
         </div>
       </div>
@@ -158,58 +177,65 @@
   <div class="tl-panel-block closed event-{id}-{date}" data-event-id="{id}" data-date="{date}">
     <div class="row">
       <div class="col-xs-9">
-        <div class="event-title">{title}</div>
-        <div class="even-attrs col-xs-6">
-          <div class="col-xs-12"><i class="fa fa-clock-o"></i> {time}</div>
-          <div class="col-xs-12"><i class="fa fa-map-marker"></i> {location}</div>
-          <div class="col-xs-12"><i class="fa fa-tags"></i> {tags}</div>
-        </div>
-        <div class="even-attrs col-xs-6">
-          <div class="row col-xs-12 organization-in-event" data-organization-id="{organization_id}">
-            <div class="col-xs-3">
+        <div class="event-title">{title} <a href="#"  data-event-id="{id}" class="btn btn-edit {can_edit_hidden}"><i class="icon-pencil"></i></a></div>
+        <div class="row row-attributes">
+          <div class="even-attrs col-xs-6">
+            <div class="col-xs-12"><i class="fa fa-clock-o"></i> {dates}, {time}</div>
+            <div class="col-xs-12"><i class="fa fa-map-marker"></i> {location}</div>
+            <div class="col-xs-12"><i class="fa fa-tags"></i> {tags_text}</div>
+          </div>
+
+          <div class="even-attrs col-xs-6">
+
+            <div class="row col-xs-12 organization-in-event" data-organization-id="{organization_id}">
               <div class="organization-img-wrapper blue">
                 <img src="{organization_img_url}" title="{organization_name}">
               </div>
+              <div class="organization-name">
+                <span> {organization_short_name}</span>
+              </div>
             </div>
-            <div class="col-xs-9 organization-name">
-              <span> {organization_short_name}</span>
+
+
+            <div class="col-xs-12 likes-block">
+              <div class="liked-users row">
+                {friends}
+              </div>
+              <div class="liked-users-count">
+                <span class="liked-users-count-number">{liked_users_count}</span>
+                <span class="liked-users-count-text">{favored_text}</span>
+              </div>
+              {all_friends}
             </div>
-          </div>
-          <div class="col-xs-12">
-            <div class="liked-users row">
-              {likes_users}
+            <div class="col-xs-12">
+              <button class="btn btn-pink-empty add-to-favorites {favorite_btn_class}" data-event-id="{id}">{favorite_btn_text}</button>
             </div>
-            <div class="liked-users-count">
-              <span class="liked-users-count-number">{liked_users_count}</span>
-              <span class="liked-users-count-text">{favored_text}</span>
-            </div>
-          </div>
-          <div class="col-xs-12">
-            <button class="btn btn-pink-empty add-to-favorites {favorite_btn_class}" data-event-id="{id}">{favorite_btn_text}</button>
           </div>
         </div>
+
+
         <div class="event-additional-attrs">
         </div>
         <div class="event-description">
           {description}
         </div>
       </div>
-      <div class="col-xs-3">
-        <img src="event_images/{id}-vertical.{image_vertical_ext}" class="event-image img-rounded">
-      </div>
-      <div class="row col-xs-12 event-bottom-block">
-        <div class="col-xs-5 external-link-wrapper">
-          <a class="external-link" href="{detail_info_url}" target="_blank">
-            <i class="fa fa-external-link"></i> Страница мероприятия
-          </a>
-        </div>
-        <div class="col-xs-7">
+      <div class="col-xs-3 text-center">
+        <img src="{image_vertical_url}" class="event-image img-rounded">
+        <div class="col-xs-12 text-center social-links-wrapper">
           <span class="social-links">
             <i class="fa fa-vk" data-share-type="vk"></i>
             <i class="fa fa-facebook-f" data-share-type="facebook"></i>
             <i class="fa fa-google-plus hidden" data-share-type="google-plus"></i>
             <i class="fa fa-twitter" data-share-type="twitter"></i>
           </span>
+        </div>
+      </div>
+      <div class="row col-xs-12 event-bottom-block">
+        <div class="col-xs-5 external-link-wrapper">
+          <a class="external-link" href="{detail_info_url}" target="_blank">
+            <i class="fa fa-external-link"></i> Подробнее
+          </a>
         </div>
       </div>
       <div class="more-info-btn"><span class="fa fa-chevron-up"></span></div>
@@ -222,12 +248,21 @@
     <div class="modal-dialog add-event-modal" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
-                  aria-hidden="true">&times;</span></button>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Закрыть"><span aria-hidden="true">&times;</span></button>
           <h4 class="modal-title" id="myModalLabel">Новое событие</h4>
         </div>
         <div class="modal-body">
           <form class="form-horizontal" id="create-event-form">
+            <div class="form-group {hidden_organizations}">
+              <label class="control-label">Организация</label>
+
+              <div class="col-sm-12">
+                <select class="to-select2 organizations" name="organization_id" style="width: 100%" title="Выберите организацию">
+                  {organizations}
+                </select>
+              </div>
+            </div>
+
             <div class="form-group">
               <label class="control-label">Название</label>
 
@@ -240,7 +275,7 @@
               <label class="control-label">Дата</label>
 
               <div class="col-sm-12">
-                <input type="text" class="form-control daterange" placeholder="Название мероприятия" name="date">
+                <input type="text" class="form-control daterange" placeholder="Дата проведения" name="date">
               </div>
             </div>
             <div class="form-group row">
@@ -256,15 +291,15 @@
             <div class="form-group row">
               <div class="col-xs-2">Начало</div>
               <div class="col-xs-4 form-inline">
-                <input class="form-control input-hours" name="begin-hours">
+                <input class="form-control input-hours input-1" data-input-number="1" name="begin-hours">
                 :
-                <input class="form-control input-minutes" name="begin-minutes">
+                <input class="form-control input-minutes input-2" data-input-number="2" name="begin-minutes">
               </div>
               <div class="col-xs-2">Конец</div>
               <div class="col-xs-4 form-inline">
-                <input class="form-control input-hours" name="end-hours">
+                <input class="form-control input-hours input-3" data-input-number="3" name="end-hours">
                 :
-                <input class="form-control input-minutes" name="end-minutes">
+                <input class="form-control input-minutes input-4" data-input-number="4" name="end-minutes">
               </div>
             </div>
             <div class="form-group">
@@ -347,8 +382,16 @@
                 <div class="checkbox c-checkbox needsclick">
                   <label class="needsclick">
                     <input type="checkbox" value="1" class="notification-time needsclick"
-                           name="notification-before-two-hours">
-                    <span class="fa fa-check"></span>За 2 часа</label>
+                           name="notification-now">
+                    <span class="fa fa-check"></span>При публикации</label>
+                </div>
+              </div>
+              <div class="col-sm-12">
+                <div class="checkbox c-checkbox needsclick">
+                  <label class="needsclick">
+                    <input type="checkbox" value="1" class="notification-time needsclick"
+                           name="notification-before-three-hours">
+                    <span class="fa fa-check"></span>За 3 часа</label>
                 </div>
               </div>
               <div class="col-sm-12">
@@ -375,20 +418,12 @@
                     <span class="fa fa-check"></span>За неделю</label>
                 </div>
               </div>
-              <div class="col-sm-12">
-                <div class="checkbox c-checkbox needsclick">
-                  <label class="needsclick">
-                    <input type="checkbox" value="1" class="notification-time needsclick"
-                           name="notification-before-month">
-                    <span class="fa fa-check"></span>За месяц</label>
-                </div>
-              </div>
             </div>
           </form>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-pink-empty" data-dismiss="modal">Отмена</button>
-          <button type="button" class="btn btn-pink create-event-btn">Создать</button>
+          <button type="button" class="btn btn-pink create-event-btn">Опубликовать</button>
         </div>
       </div>
     </div>
@@ -397,8 +432,8 @@
         <img src="">
 
         <div class="whirl duo image-cropper"></div>
-        <a href="#" class="btn btn-black-blue img-crop-btn disabled"> Кадрировать</a>
-        <a href="#" class="btn btn-default img-crop-cancel"> Отмена</a>
+        <a href="#" class="btn btn-pink img-crop-btn disabled hidden"> Кадрировать</a>
+        <a href="#" class="btn btn-pink-empty img-crop-cancel hidden"> Отмена</a>
       </div>
     </div>
   </div>
@@ -418,23 +453,27 @@
 </script>
 
 <script type="javascript/template" id="tmpl-vk-share-link">
-  <a href="http://vk.com/share.php?url=http://evendate.ru&title={title}&description={description}&image={id}-horizontal.{image_horizontal_ext}&noparse=false"></a>
+  <a href="http://vk.com/share.php?url=http://evendate.ru/event.php?id={id}&title={title}&description={description}&image={image_horizontal_url}&noparse=false"></a>
 </script>
 
 <script type="javascript/template" id="tmpl-facebook-share-link">
-  <a href="http://www.facebook.com/sharer.php?s=100&p[title]={title}&p[summary]={description}&p[url]=http://evendate.ru&p[images][0]={id}-horizontal.{image_horizontal_ext}"></a>
+  <a href="http://www.facebook.com/sharer.php?s=100&p[title]={title}&p[summary]={description}&p[url]=http://evendate.ru/event.php?id={id}&p[images][0]={image_horizontal_url}"></a>
 </script>
 
 <script type="javascript/template" id="tmpl-twitter-share-link">
-  <a href="https://twitter.com/share?url=http://evendate.ru&text={title}&via=evendate.ru&hashtags={hashtags} #evendate"></a>
+  <a href="https://twitter.com/share?url=http://evendate.ru/event.php?id={id}&text={title}&via=evendate.ru&hashtags={hashtags} #evendate"></a>
 </script>
 
 <script type="javascript/template" id="tmpl-google-plus-share-link">
-  <a href="https://twitter.com/share?url=http://evendate.ru&text={title}&via=evendate.ru&hashtags={hashtags}"></a>
+  <a href="https://twitter.com/share?url=http://evendate.ru/event.php?id={id}&text={title}&via=evendate.ru&hashtags={hashtags}"></a>
 </script>
 
 <script type="javascript/template" id="tmpl-tag-option">
   <option value="{id}">{name}</option>
+</script>
+
+<script type="javascript/template" id="tmpl-organization-option">
+  <option value="{id}"><img src="{img_url}"> {name}</option>
 </script>
 
 <script type="javascript/template" id="tmpl-organization-item">
@@ -453,7 +492,7 @@
 
 <script type="javascript/template" id="tmpl-organization-search-item">
   <div class="organization-search-item">
-    <div >
+    <div>
       <img src="{img_url}" title="{name}" class="search-organization-img" data-organization-id="{id}">
     </div>
     <div class="search-organization-text">
@@ -466,29 +505,28 @@
 </script>
 
 <script type="javascript/template" id="tmpl-search-event-item">
-  <div class="tl-panel-block closed event-{id}-{date}" data-event-id="{id}" data-date="{date}">
+  <div class="tl-panel-block event-{id}-{date}" data-event-id="{id}" data-date="{date}">
     <div class="row">
       <div class="col-xs-9">
-        <div class="event-title">{title}</div>
+        <div class="event-title">{title} </div>
         <div class="even-attrs col-xs-6">
-          <div class="col-xs-12"><i class="fa fa-clock-o"></i> {time}</div>
+          <div class="col-xs-12"><i class="fa fa-clock-o"></i> {dates}, {time}</div>
           <div class="col-xs-12"><i class="fa fa-map-marker"></i> {location}</div>
-          <div class="col-xs-12"><i class="fa fa-tags"></i> {tags}</div>
+          <div class="col-xs-12"><i class="fa fa-tags"></i> {tags_text}</div>
         </div>
         <div class="even-attrs col-xs-6">
           <div class="row col-xs-12 organization-in-event" data-organization-id="{organization_id}">
-            <div class="col-xs-3">
-              <div class="organization-img-wrapper blue">
-                <img src="{organization_img_url}" title="{organization_name}">
-              </div>
+            <div class="organization-img-wrapper blue">
+              <img src="{organization_img_url}" title="{organization_name}">
             </div>
-            <div class="col-xs-9 organization-name">
+            <div class="organization-name">
               <span> {organization_short_name}</span>
             </div>
           </div>
           <div class="col-xs-12">
             <div class="liked-users row">
-              {likes_users}
+              {friends}
+              {all_friends}
             </div>
             <div class="liked-users-count">
               <span class="liked-users-count-number">{liked_users_count}</span>
@@ -505,24 +543,118 @@
           {description}
         </div>
       </div>
-      <div class="col-xs-3">
-        <img src="event_images/{id}-vertical.{image_vertical_ext}" class="event-image img-rounded">
+      <div class="col-xs-3 text-center">
+        <img src="{image_vertical_url}" class="event-image img-rounded">
+          <div class="col-xs-12 text-center social-links-wrapper">
+                <span class="social-links">
+                  <i class="fa fa-vk" data-share-type="vk"></i>
+                  <i class="fa fa-facebook-f" data-share-type="facebook"></i>
+                  <i class="fa fa-google-plus hidden" data-share-type="google-plus"></i>
+                  <i class="fa fa-twitter" data-share-type="twitter"></i>
+                </span>
+        </div>
       </div>
       <div class="row col-xs-12 event-bottom-block">
         <div class="col-xs-5 external-link-wrapper">
           <a class="external-link" href="{detail_info_url}" target="_blank">
-            <i class="fa fa-external-link"></i> Страница мероприятия
+            <i class="fa fa-external-link"></i> Подробнее
           </a>
-        </div>
-        <div class="col-xs-7">
-          <span class="social-links">
-            <i class="fa fa-vk" data-share-type="vk"></i>
-            <i class="fa fa-facebook-f" data-share-type="facebook"></i>
-            <i class="fa fa-google-plus hidden" data-share-type="google-plus"></i>
-            <i class="fa fa-twitter" data-share-type="twitter"></i>
-          </span>
         </div>
       </div>
     </div>
   </div>
+</script>
+
+<script type="javascript/template" id="tmpl-search-no-events">
+  <div class="no-events text-center">
+    По запросу не найдено событий.
+  </div>
+</script>
+
+<script type="javascript/template" id="tmpl-search-no-organizations">
+  <div class="no-organizations text-center">
+    По запросу не найдено организаций.
+  </div>
+</script>
+
+<script type="javascript/template" id="tmpl-event-modal-content">
+    <div class="left-col">
+      <div class="event-image" style="background: url('{image_vertical_url}');background-size: 100%; width: 283px;height: 325px;display: table-cell;" title="{title}"></div>
+      <div class="event-left-info">
+        <div class="day-name">{dates}</div>
+        <div class="time">
+          {time}
+        </div>
+        <div class="address">
+          {location}
+        </div>
+        <div class="liked-users-wrapper">
+          <span class="pull-right liked-users-count">
+            {liked_users_count} {favored_text}
+          </span>
+          {friends}
+        </div>
+        <div class="organization-info-block">
+          <div class="organization-logo-with-short-name">
+            <img src="{organization_img_url}" title="{organization_name}">
+          </div>
+          <span class="organization-name">{organization_short_name}</span>
+        </div>
+      </div>
+    </div>
+    <div class="middle-col">
+      <button type="button" class="close" aria-label="Закрыть"><span aria-hidden="true">×</span></button>
+      <div class="event-title">{title} <a href="#" class="btn btn-edit {can_edit_hidden}" data-event-id="{id}"><i class="icon-pencil"></i></a></div>
+      <div class="event-description">{description}</div>
+      <div class="external-link-wrapper">
+        <a href="{detail_info_url}" target="_blank"><i class="fa fa-external-link"></i> Подробнее</a>
+      </div>
+      <div class="tags"><i class="fa fa-tags"></i> {tags_text}</div>
+      <div class="event-buttons">
+        <button class="btn make-favorite-btn btn-pink-empty col-xs-6 {favorite_btn_class}" data-event-id="{id}" data-organization-id="{organization_id}">
+          {favorite_btn_text}
+        </button>
+      </div>
+      <div class="event-bottom-block row">
+        <div class="col-xs-10 pull-right">
+          <span class="share-text">Поделиться</span>
+             <span class="social-links">
+              <i class="fa fa-vk" data-share-type="vk"></i>
+              <i class="fa fa-facebook-f" data-share-type="facebook"></i>
+              <i class="fa fa-twitter" data-share-type="twitter"></i>
+            </span>
+        </div>
+      </div>
+    </div>
+</script>
+
+<script type="javascript/template" id="tmpl-event-modal">
+  <div class="event-alone in-modal">
+    {event_content}
+  </div>
+</script>
+
+<script type="javascript/template" id="tmpl-whirl-loader">
+  <div class="whirl duo" style="margin: 0 auto;"></div>
+</script>
+
+<script type="javascript/template" id="tmpl-liked-dropdown-wrapper">
+  <ul role="menu" class="dropdown-menu animated pulse all-friends">
+  </ul>
+</script>
+
+<script type="javascript/template" id="tmpl-liked-dropdown-item">
+    <li class="user-info-block">
+      <a href="{link}" target="_blank">
+        <div>
+          <img src="{avatar_url}" class="pull-left">
+          <div>
+            {last_name} {first_name}
+          </div>
+          <div>
+            <span class="social-{type}">{type}</span>
+          </div>
+        </div>
+      </a>
+    </li>
 </script>

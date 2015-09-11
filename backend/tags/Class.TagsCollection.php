@@ -6,9 +6,30 @@ class TagsCollection{
 
 
 
-	public static function all(PDO $db){
-		$result = $db->query('SELECT * FROM tags WHERE status = 1');
-		return new Result(true, '', $result->fetchAll());
+	public static function all(PDO $db, User $user = null){
+
+		$res_array = array(
+			'tags' => $db->query('SELECT * FROM tags WHERE status = 1')->fetchAll(),
+			'organizations' => array()
+		);
+
+		if ($user instanceof User){
+			$p_get_organizations = $db->prepare('SELECT DISTINCT organizations.name, organizations.id, organizations.img_url,
+			organizations.short_name
+ 			FROM  organizations
+ 			 INNER JOIN users_organizations ON users_organizations.organization_id = organizations.id
+ 			 LEFT JOIN events ON events.creator_id = user_id
+			WHERE users_organizations.status = 1
+			AND users_organizations.user_id = :user_id
+			ORDER BY events.created_at DESC, organizations.name ASC');
+
+			$res = $p_get_organizations->execute(array(':user_id' => $user->getId()));
+			if ($res !== FALSE){
+				$res_array['organizations'] = $p_get_organizations->fetchAll();
+			}
+		}
+
+		return new Result(true, '', $res_array);
 	}
 
 }
