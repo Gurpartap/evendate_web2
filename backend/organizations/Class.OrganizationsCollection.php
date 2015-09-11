@@ -62,31 +62,21 @@ class OrganizationsCollection{
 
 		$organizations = $this->getAllActive()->getData();
 
-		$event_types = Event::getEventTypes($this->db)->getData();
-
 		foreach($organizations as &$organization){
 			$organization['id'] = (int) $organization['id'];
 			$organization['type_id'] = (int) $organization['type_id'];
 			$organization['status'] = (boolean) $organization['status'];
 			$organization['subscribed'] = false;
 			$organization['subscribed_details'] = array();
-			foreach($event_types as $event_type){
-				if (isset($normalized_subs["{$organization['id']}"])){
-					$subscribed = true;
-					$subscription_id = $normalized_subs["{$organization['id']}"];
-				}else{
-					$subscribed = false;
-					$subscription_id = null;
-				}
-				$organization['subscribed_details'][] = array(
-					'event_type_id' => (int) $event_type['id'],
-					'subscribed' => $subscribed
-				);
-				if ($subscribed){
-					$organization['subscribed'] = $subscribed;
-					$organization['subscription_id'] = (int) $subscription_id;
-				}
+			if (isset($normalized_subs["{$organization['id']}"])){
+				$subscribed = true;
+				$subscription_id = (int) $normalized_subs["{$organization['id']}"];
+			}else{
+				$subscribed = false;
+				$subscription_id = null;
 			}
+			$organization['subscribed'] = $subscribed;
+			$organization['subscription_id'] = $subscription_id;
 		}
 		return new Result(true, '', $organizations);
 	}

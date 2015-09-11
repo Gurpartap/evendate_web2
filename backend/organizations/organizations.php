@@ -37,10 +37,5 @@ $__modules['organizations'] = array(
 				return $collection->getAllActive();
 			}
 		},
-	),
-	'POST' => array(
-		'' => function () use ($__db, $__request, $__user){
-			return $__user->createEvent($__request['payload']);
-		},
 	)
 );

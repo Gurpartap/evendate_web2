@@ -12,8 +12,7 @@
             header('Location: /timeline');
             die();
         }
-    }catch(Exception $e){
-    }
+    }catch(Exception $e){}
 ?>
 <!DOCTYPE html>
 <html lang="en">
