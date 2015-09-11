@@ -58,13 +58,18 @@ class EventsCollection{
 					break;
 				}
 				case 'my': {
+					if ($value instanceof User == false) break;
 					$q_get_events .= ' AND (organizations.id IN (SELECT organization_id FROM subscriptions WHERE
 						subscriptions.user_id = :user_id AND
 						subscriptions.status = 1)) ';
+					/*
+					 * в массиве уже есть user_id + value и user ссылаются на одно и то же, или можно получиться подписки не на себя7
+					 */
 					$statement_array[':user_id'] = $value->getId();
 					break;
 				}
 				case 'id': {
+					if ($value instanceof Event == false) break;
 					$q_get_events .= ' AND (events.id = :event_id)';
 					$statement_array[':event_id'] = $value->getId();
 					break;

@@ -12,7 +12,7 @@ $__modules['organizations'] = array(
 		'{{/(id:[0-9]+)}}' => function($id) use ($__db, $__request, $__user){
 			$organization = new Organization($id, $__db);
 			$result = $organization->getFullParams($__user)->getData();
-			if (isset($__request['with_events']) && $__request['with_events'] == true){
+			if (isset($__request['with_events']) && $__request['with_events'] == 'true'){
 				$result['events'] = EventsCollection::filter($__db, $__user, array(
 					'organization' => $organization
 				), ' ORDER BY events.id DESC')->getData();
@@ -21,7 +21,7 @@ $__modules['organizations'] = array(
 		},
 		'' => function () use ($__db, $__request, $__user) { /*MY EVENTS!*/
 			$collection = new OrganizationsCollection($__db, $__user);
-			if (isset($__request['with_subscriptions'])){
+			if (isset($__request['with_subscriptions']) && $__request['with_subscriptions'] == 'true'){
 				$collection->setUser($__user);
 				return $collection->getUserOrganizations();
 			}else{
@@ -30,7 +30,7 @@ $__modules['organizations'] = array(
 		},
 		'all' => function () use ($__db, $__request, $__user) {
 			$collection = new OrganizationsCollection($__db, $__user);
-			if (isset($__request['with_subscriptions'])){
+			if (isset($__request['with_subscriptions']) && $__request['with_subscriptions'] == 'true'){
 				$collection->setUser($__user);
 				return $collection->getUserOrganizations();
 			}else{
