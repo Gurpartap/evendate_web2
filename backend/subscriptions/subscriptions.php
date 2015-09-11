@@ -7,29 +7,9 @@ require_once $ROOT_PATH.'backend/organizations/Class.OrganizationsCollection.php
 $__modules['subscriptions'] = array(
 	'GET' => array(
 		'my' => function() use ($__db, $__request, $__user){
-			//return $collection->
-		},
-		'{/(id:[0-9]+)}' => function () use ($__db, $__request, $__user){
-			return $__user->createEvent($__request['payload']);
-		},
-		'all' => function () use ($__db, $__request, $__user) {
-			$collection = new OrganizationsCollection($__db, $__user);
-			if (isset($__request['with_subscriptions'])){
-				$collection->setUser($__user);
-				return $collection->getUserOrganizations();
-			}else{
-				return $collection->getAllActive();
-			}
-		},
-		'' => function () use ($__db, $__request, $__user) {
-			$collection = new OrganizationsCollection($__db, $__user);
-			if (isset($__request['with_subscriptions'])){
-				$collection->setUser($__user);
-				return $collection->getUserOrganizations();
-			}else{
-				return $collection->getAllActive();
-			}
-		},
+			$collection = new SubscriptionsCollection($__db, $__user);
+			return $collection->get();
+		}
 	),
 	'POST' => array(
 		'' => function () use ($__db, $__request, $__user){
