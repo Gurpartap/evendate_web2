@@ -17,7 +17,7 @@
 	<!-- =============== BOOTSTRAP STYLES ===============-->
 	<link rel="stylesheet" href="app/css/bootstrap.css" id="bscss">
 	<!-- Loaders.css-->
-	<link rel="stylesheet" href="app/vendor/loaders.css/loaders.css">
+	<link rel="stylesheet" href="/vendor/loaders.css/loaders.css">
 	<!-- =============== APP STYLES ===============-->
 	<link rel="stylesheet" href="app/css/app.css" id="maincss">
 	<!-- WHIRL (spinners)-->
@@ -52,10 +52,6 @@
 <script src="vendor/jquery/dist/jquery.js"></script>
 <!-- BOOTSTRAP-->
 <script src="vendor/bootstrap/dist/js/bootstrap.js"></script>
-<!-- STORAGE API-->
-<script src="vendor/jQuery-Storage-API/jquery.storageapi.js"></script>
-<!-- PARSLEY-->
-<script src="vendor/parsleyjs/dist/parsley.min.js"></script>
 <!-- VK OPEN API FOR AUTHORIZATION-->
 <script src="http://<?=App::$DOMAIN?>:8080/socket.io/socket.io.js" type="text/javascript"></script>
 

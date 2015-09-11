@@ -42,7 +42,7 @@ $__modules['events'] = array(
 		},
 	),
 	'PUT' => array(
-		'{{/(id:[0-9]+)}}' => function ($id) use ($__db, $__request, $__user) {
+		'{/(id:[0-9]+)}' => function ($id) use ($__db, $__request, $__user) {
 			$event = new Event($id, $__db);
 
 			if (!isset($__request['payload'])) throw new BadMethodCallException('Bad Request');
@@ -56,7 +56,7 @@ $__modules['events'] = array(
 		}
 	),
 	'DELETE' => array(
-		'favorites/{{/(id:[0-9]+)}}' => function ($id) use ($__db, $__request, $__user){
+		'{favorites/(id:[0-9]+)}' => function ($id) use ($__db, $__request, $__user){
 			$event = new Event($id, $__db);
 			return $__user->deleteFavoriteEvent($event);
 		},

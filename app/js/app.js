@@ -64,266 +64,6 @@
 // Custom jQuery
 // ----------------------------------- 
 
-
-(function(window, document, $, undefined){
-
-  if(!$.fn.fullCalendar) return;
-
-  // When dom ready, init calendar and events
-  $(function() {
-
-      // The element that will display the calendar
-      var calendar = $('#calendar');
-
-      var demoEvents = createDemoEvents();
-
-      initExternalEvents(calendar);
-
-      initCalendar(calendar, demoEvents);
-
-  });
-
-
-  // global shared var to know what we are dragging
-  var draggingEvent = null;
-
-  /**
-   * ExternalEvent object
-   * @param jQuery Object elements Set of element as jQuery objects
-   */
-  var ExternalEvent = function (elements) {
-      
-      if (!elements) return;
-      
-      elements.each(function() {
-          var $this = $(this);
-          // create an Event Object (http://arshaw.com/fullcalendar/docs/event_data/Event_Object/)
-          // it doesn't need to have a start or end
-          var calendarEventObject = {
-              title: $.trim($this.text()) // use the element's text as the event title
-          };
-
-          // store the Event Object in the DOM element so we can get to it later
-          $this.data('calendarEventObject', calendarEventObject);
-
-          // make the event draggable using jQuery UI
-          $this.draggable({
-              zIndex: 1070,
-              revert: true, // will cause the event to go back to its
-              revertDuration: 0  //  original position after the drag
-          });
-
-      });
-  };
-
-  /**
-   * Invoke full calendar plugin and attach behavior
-   * @param  jQuery [calElement] The calendar dom element wrapped into jQuery
-   * @param  EventObject [events] An object with the event list to load when the calendar displays
-   */
-  function initCalendar(calElement, events) {
-
-      // check to remove elements from the list
-      var removeAfterDrop = $('#remove-after-drop');
-
-      calElement.fullCalendar({
-          // isRTL: true,
-          header: {
-              left:   'prev,next today',
-              center: 'title',
-              right:  'month,agendaWeek,agendaDay'
-          },
-          buttonIcons: { // note the space at the beginning
-              prev:    ' fa fa-caret-left',
-              next:    ' fa fa-caret-right'
-          },
-          buttonText: {
-              today: 'today',
-              month: 'month',
-              week:  'week',
-              day:   'day'
-          },
-          editable: true,
-          droppable: true, // this allows things to be dropped onto the calendar 
-          drop: function(date, allDay) { // this function is called when something is dropped
-              
-              var $this = $(this),
-                  // retrieve the dropped element's stored Event Object
-                  originalEventObject = $this.data('calendarEventObject');
-
-              // if something went wrong, abort
-              if(!originalEventObject) return;
-
-              // clone the object to avoid multiple events with reference to the same object
-              var clonedEventObject = $.extend({}, originalEventObject);
-
-              // assign the reported date
-              clonedEventObject.start = date;
-              clonedEventObject.allDay = allDay;
-              clonedEventObject.backgroundColor = $this.css('background-color');
-              clonedEventObject.borderColor = $this.css('border-color');
-
-              // render the event on the calendar
-              // the last `true` argument determines if the event "sticks" 
-              // (http://arshaw.com/fullcalendar/docs/event_rendering/renderEvent/)
-              calElement.fullCalendar('renderEvent', clonedEventObject, true);
-              
-              // if necessary remove the element from the list
-              if(removeAfterDrop.is(':checked')) {
-                $this.remove();
-              }
-          },
-          eventDragStart: function (event, js, ui) {
-            draggingEvent = event;
-          },
-          // This array is the events sources
-          events: events
-      });
-  }
-
-  /**
-   * Inits the external events panel
-   * @param  jQuery [calElement] The calendar dom element wrapped into jQuery
-   */
-  function initExternalEvents(calElement){
-    // Panel with the external events list
-    var externalEvents = $('.external-events');
-
-    // init the external events in the panel
-    new ExternalEvent(externalEvents.children('div'));
-
-    // External event color is danger-red by default
-    var currColor = '#f6504d';
-    // Color selector button
-    var eventAddBtn = $('.external-event-add-btn');
-    // New external event name input
-    var eventNameInput = $('.external-event-name');
-    // Color switchers
-    var eventColorSelector = $('.external-event-color-selector .circle');
-
-    // Trash events Droparea 
-    $('.external-events-trash').droppable({
-      accept:       '.fc-event',
-      activeClass:  'active',
-      hoverClass:   'hovered',
-      tolerance:    'touch',
-      drop: function(event, ui) {
-        
-        // You can use this function to send an ajax request
-        // to remove the event from the repository
-        
-        if(draggingEvent) {
-          var eid = draggingEvent.id || draggingEvent._id;
-          // Remove the event
-          calElement.fullCalendar('removeEvents', eid);
-          // Remove the dom element
-          ui.draggable.remove();
-          // clear
-          draggingEvent = null;
-        }
-      }
-    });
-
-    eventColorSelector.click(function(e) {
-        e.preventDefault();
-        var $this = $(this);
-
-        // Save color
-        currColor = $this.css('background-color');
-        // De-select all and select the current one
-        eventColorSelector.removeClass('selected');
-        $this.addClass('selected');
-    });
-
-    eventAddBtn.click(function(e) {
-        e.preventDefault();
-        
-        // Get event name from input
-        var val = eventNameInput.val();
-        // Dont allow empty values
-        if ($.trim(val) === '') return;
-        
-        // Create new event element
-        var newEvent = $('<div/>').css({
-                            'background-color': currColor,
-                            'border-color':     currColor,
-                            'color':            '#fff'
-                        })
-                        .html(val);
-
-        // Prepends to the external events list
-        externalEvents.prepend(newEvent);
-        // Initialize the new event element
-        new ExternalEvent(newEvent);
-        // Clear input
-        eventNameInput.val('');
-    });
-  }
-
-  /**
-   * Creates an array of events to display in the first load of the calendar
-   * Wrap into this function a request to a source to get via ajax the stored events
-   * @return Array The array with the events
-   */
-  function createDemoEvents() {
-    // Date for the calendar events (dummy data)
-    var date = new Date();
-    var d = date.getDate(),
-        m = date.getMonth(),
-        y = date.getFullYear();
-
-    return  [
-              {
-                  title: 'All Day Event',
-                  start: new Date(y, m, 1),
-                  backgroundColor: '#f56954', //red 
-                  borderColor: '#f56954' //red
-              },
-              {
-                  title: 'Long Event',
-                  start: new Date(y, m, d - 5),
-                  end: new Date(y, m, d - 2),
-                  backgroundColor: '#f39c12', //yellow
-                  borderColor: '#f39c12' //yellow
-              },
-              {
-                  title: 'Meeting',
-                  start: new Date(y, m, d, 10, 30),
-                  allDay: false,
-                  backgroundColor: '#0073b7', //Blue
-                  borderColor: '#0073b7' //Blue
-              },
-              {
-                  title: 'Lunch',
-                  start: new Date(y, m, d, 12, 0),
-                  end: new Date(y, m, d, 14, 0),
-                  allDay: false,
-                  backgroundColor: '#00c0ef', //Info (aqua)
-                  borderColor: '#00c0ef' //Info (aqua)
-              },
-              {
-                  title: 'Birthday Party',
-                  start: new Date(y, m, d + 1, 19, 0),
-                  end: new Date(y, m, d + 1, 22, 30),
-                  allDay: false,
-                  backgroundColor: '#00a65a', //Success (green)
-                  borderColor: '#00a65a' //Success (green)
-              },
-              {
-                  title: 'Open Google',
-                  start: new Date(y, m, 28),
-                  end: new Date(y, m, 29),
-                  url: '//google.com/',
-                  backgroundColor: '#3c8dbc', //Primary (light-blue)
-                  borderColor: '#3c8dbc' //Primary (light-blue)
-              }
-          ];
-  }
-
-})(window, document, window.jQuery);
-
-
-
 // Start Bootstrap JS
 // ----------------------------------- 
 
@@ -847,322 +587,6 @@
 
 })(window, document, window.jQuery);
 
-// CLASSYLOADER
-// ----------------------------------- 
-
-(function(window, document, $, undefined){
-
-  $(function(){
-
-    var $scroller       = $(window),
-        inViewFlagClass = 'js-is-in-view'; // a classname to detect when a chart has been triggered after scroll
-
-    $('[data-classyloader]').each(initClassyLoader);
-    
-    function initClassyLoader() {
-    
-      var $element = $(this),
-          options  = $element.data();
-      
-      // At lease we need a data-percentage attribute
-      if(options) {
-        if( options.triggerInView ) {
-
-          $scroller.scroll(function() {
-            checkLoaderInVIew($element, options);
-          });
-          // if the element starts already in view
-          checkLoaderInVIew($element, options);
-        }
-        else
-          startLoader($element, options);
-      }
-    }
-    function checkLoaderInVIew(element, options) {
-      var offset = -20;
-      if( ! element.hasClass(inViewFlagClass) &&
-          $.Utils.isInView(element, {topoffset: offset}) ) {
-        startLoader(element, options);
-      }
-    }
-    function startLoader(element, options) {
-      element.ClassyLoader(options).addClass(inViewFlagClass);
-    }
-
-  });
-
-})(window, document, window.jQuery);
-
-/**=========================================================
- * Module: clear-storage.js
- * Removes a key from the browser storage via element click
- =========================================================*/
-
-(function($, window, document){
-  'use strict';
-
-  var Selector = '[data-reset-key]';
-
-  $(document).on('click', Selector, function (e) {
-      e.preventDefault();
-      var key = $(this).data('resetKey');
-      
-      if(key) {
-        $.localStorage.remove(key);
-        // reload the page
-        window.location.reload();
-      }
-      else {
-        $.error('No storage key specified for reset.');
-      }
-  });
-
-}(jQuery, window, document));
-
-// GLOBAL CONSTANTS
-// ----------------------------------- 
-
-
-(function(window, document, $, undefined){
-
-  window.APP_COLORS = {
-    'primary':                '#5d9cec',
-    'success':                '#27c24c',
-    'info':                   '#23b7e5',
-    'warning':                '#ff902b',
-    'danger':                 '#f05050',
-    'inverse':                '#131e26',
-    'green':                  '#37bc9b',
-    'pink':                   '#f532e5',
-    'purple':                 '#7266ba',
-    'dark':                   '#3a3f51',
-    'yellow':                 '#fad732',
-    'gray-darker':            '#232735',
-    'gray-dark':              '#3a3f51',
-    'gray':                   '#dde6e9',
-    'gray-light':             '#e4eaec',
-    'gray-lighter':           '#edf1f2'
-  };
-  
-  window.APP_MEDIAQUERY = {
-    'desktopLG':             1200,
-    'desktop':                992,
-    'tablet':                 768,
-    'mobile':                 480
-  };
-
-})(window, document, window.jQuery);
-
-
-// MARKDOWN DOCS
-// ----------------------------------- 
-
-
-(function(window, document, $, undefined){
-
-  $(function(){
-
-    $('.flatdoc').each(function(){
-
-      Flatdoc.run({
-        
-        fetcher: Flatdoc.file('documentation/readme.md'),
-
-        // Setup custom element selectors (markup validates)
-        root:    '.flatdoc',
-        menu:    '.flatdoc-menu',
-        title:   '.flatdoc-title',
-        content: '.flatdoc-content'
-
-      });
-
-    });
-
-
-  });
-
-})(window, document, window.jQuery);
-
-// FULLSCREEN
-// ----------------------------------- 
-
-(function(window, document, $, undefined){
-
-  if ( typeof screenfull === 'undefined' ) return;
-
-  $(function(){
-
-    var $doc = $(document);
-    var $fsToggler = $('[data-toggle-fullscreen]');
-
-    if ( ! $fsToggler.is(':visible') ) // hidden on mobiles
-      return;
-
-    $fsToggler.on('click', function (e) {
-        e.preventDefault();
-
-        if (screenfull.enabled) {
-          
-          screenfull.toggle();
-          
-          // Switch icon indicator
-          toggleFSIcon( $fsToggler );
-
-        } else {
-          console.log('Fullscreen not enabled');
-        }
-    });
-
-    if ( screenfull.raw && screenfull.raw.fullscreenchange)
-      $doc.on(screenfull.raw.fullscreenchange, function () {
-          toggleFSIcon($fsToggler);
-      });
-
-    function toggleFSIcon($element) {
-      if(screenfull.isFullscreen)
-        $element.children('em').removeClass('fa-expand').addClass('fa-compress');
-      else
-        $element.children('em').removeClass('fa-compress').addClass('fa-expand');
-    }
-
-  });
-
-})(window, document, window.jQuery);
-
-/**=========================================================
- * Module: gmap.js
- * Init Google Map plugin
- =========================================================*/
-
-(function($, window, document){
-  'use strict';
-
-  // -------------------------
-  // Map Style definition
-  // -------------------------
-
-  // Custom core styles
-  // Get more styles from http://snazzymaps.com/style/29/light-monochrome
-  // - Just replace and assign to 'MapStyles' the new style array
-  var MapStyles = [{featureType:'water',stylers:[{visibility:'on'},{color:'#bdd1f9'}]},{featureType:'all',elementType:'labels.text.fill',stylers:[{color:'#334165'}]},{featureType:'landscape',stylers:[{color:'#e9ebf1'}]},{featureType:'road.highway',elementType:'geometry',stylers:[{color:'#c5c6c6'}]},{featureType:'road.arterial',elementType:'geometry',stylers:[{color:'#fff'}]},{featureType:'road.local',elementType:'geometry',stylers:[{color:'#fff'}]},{featureType:'transit',elementType:'geometry',stylers:[{color:'#d8dbe0'}]},{featureType:'poi',elementType:'geometry',stylers:[{color:'#cfd5e0'}]},{featureType:'administrative',stylers:[{visibility:'on'},{lightness:33}]},{featureType:'poi.park',elementType:'labels',stylers:[{visibility:'on'},{lightness:20}]},{featureType:'road',stylers:[{color:'#d8dbe0',lightness:20}]}];
-
-
-  // -------------------------
-  // Custom Script
-  // -------------------------
-
-  var mapSelector = '[data-gmap]';
-
-  if($.fn.gMap) {
-      var gMapRefs = [];
-      
-      $(mapSelector).each(function(){
-          
-          var $this   = $(this),
-              addresses = $this.data('address') && $this.data('address').split(';'),
-              titles    = $this.data('title') && $this.data('title').split(';'),
-              zoom      = $this.data('zoom') || 14,
-              maptype   = $this.data('maptype') || 'ROADMAP', // or 'TERRAIN'
-              markers   = [];
-
-          if(addresses) {
-            for(var a in addresses)  {
-                if(typeof addresses[a] == 'string') {
-                    markers.push({
-                        address:  addresses[a],
-                        html:     (titles && titles[a]) || '',
-                        popup:    true   /* Always popup */
-                      });
-                }
-            }
-
-            var options = {
-                controls: {
-                       panControl:         true,
-                       zoomControl:        true,
-                       mapTypeControl:     true,
-                       scaleControl:       true,
-                       streetViewControl:  true,
-                       overviewMapControl: true
-                   },
-                scrollwheel: false,
-                maptype: maptype,
-                markers: markers,
-                zoom: zoom
-                // More options https://github.com/marioestrada/jQuery-gMap
-            };
-
-            var gMap = $this.gMap(options);
-
-            var ref = gMap.data('gMap.reference');
-            // save in the map references list
-            gMapRefs.push(ref);
-
-            // set the styles
-            if($this.data('styled') !== undefined) {
-              
-              ref.setOptions({
-                styles: MapStyles
-              });
-
-            }
-          }
-
-      }); //each
-  }
-
-}(jQuery, window, document));
-
-// LOAD CUSTOM CSS
-// ----------------------------------- 
-
-(function(window, document, $, undefined){
-
-  $(function(){
-
-    $('[data-load-css]').on('click', function (e) {
-        
-      var element = $(this);
-
-      if(element.is('a'))
-        e.preventDefault();
-      
-      var uri = element.data('loadCss'),
-          link;
-
-      if(uri) {
-        link = createLink(uri);
-        if ( !link ) {
-          $.error('Error creating stylesheet link element.');
-        }
-      }
-      else {
-        $.error('No stylesheet location defined.');
-      }
-
-    });
-  });
-
-  function createLink(uri) {
-    var linkId = 'autoloaded-stylesheet',
-        oldLink = $('#'+linkId).attr('id', linkId + '-old');
-
-    $('head').append($('<link/>').attr({
-      'id':   linkId,
-      'rel':  'stylesheet',
-      'href': uri
-    }));
-
-    if( oldLink.length ) {
-      oldLink.remove();
-    }
-
-    return $('#'+linkId);
-  }
-
-
-})(window, document, window.jQuery);
-
 // TRANSLATION
 // ----------------------------------- 
 
@@ -1226,228 +650,7 @@
 
 })(window, document, window.jQuery);
 
-// JVECTOR MAP 
-// ----------------------------------- 
 
-(function(window, document, $, undefined){
-
-  window.defaultColors = {
-      markerColor:  '#23b7e5',      // the marker points
-      bgColor:      'transparent',      // the background
-      scaleColors:  ['#878c9a'],    // the color of the region in the serie
-      regionFill:   '#bbbec6'       // the base region color
-  };
-
-  window.VectorMap = function(element, seriesData, markersData) {
-    
-    if ( ! element || !element.length) return;
-
-    var attrs       = element.data(),
-        mapHeight   = attrs.height || '300',
-        options     = {
-          markerColor:  attrs.markerColor  || defaultColors.markerColor,
-          bgColor:      attrs.bgColor      || defaultColors.bgColor,
-          scale:        attrs.scale        || 1,
-          scaleColors:  attrs.scaleColors  || defaultColors.scaleColors,
-          regionFill:   attrs.regionFill   || defaultColors.regionFill,
-          mapName:      attrs.mapName      || 'world_mill_en'
-        };
-    
-    element.css('height', mapHeight);
-    
-    init( element , options, seriesData, markersData);
-    
-    function init($element, opts, series, markers) {
-        
-        $element.vectorMap({
-          map:             opts.mapName,
-          backgroundColor: opts.bgColor,
-          zoomMin:         1,
-          zoomMax:         8,
-          zoomOnScroll:    false,
-          regionStyle: {
-            initial: {
-              'fill':           opts.regionFill,
-              'fill-opacity':   1,
-              'stroke':         'none',
-              'stroke-width':   1.5,
-              'stroke-opacity': 1
-            },
-            hover: {
-              'fill-opacity': 0.8
-            },
-            selected: {
-              fill: 'blue'
-            },
-            selectedHover: {
-            }
-          },
-          focusOn:{ x:0.4, y:0.6, scale: opts.scale},
-          markerStyle: {
-            initial: {
-              fill: opts.markerColor,
-              stroke: opts.markerColor
-            }
-          },
-          onRegionLabelShow: function(e, el, code) {
-            if ( series && series[code] )
-              el.html(el.html() + ': ' + series[code] + ' visitors');
-          },
-          markers: markers,
-          series: {
-              regions: [{
-                  values: series,
-                  scale: opts.scaleColors,
-                  normalizeFunction: 'polynomial'
-              }]
-          },
-        });
-
-      }// end init
-  };
-
-})(window, document, window.jQuery);
-
-// Morris
-// ----------------------------------- 
-
-(function(window, document, $, undefined){
-
-  $(function(){
-
-    if ( typeof Morris === 'undefined' ) return;
-
-    var chartdata = [
-        { y: "2006", a: 100, b: 90 },
-        { y: "2007", a: 75,  b: 65 },
-        { y: "2008", a: 50,  b: 40 },
-        { y: "2009", a: 75,  b: 65 },
-        { y: "2010", a: 50,  b: 40 },
-        { y: "2011", a: 75,  b: 65 },
-        { y: "2012", a: 100, b: 90 }
-    ];
-
-    var donutdata = [
-      {label: "Download Sales", value: 12},
-      {label: "In-Store Sales",value: 30},
-      {label: "Mail-Order Sales", value: 20}
-    ];
-
-    // Line Chart
-    // ----------------------------------- 
-
-    new Morris.Line({
-      element: 'morris-line',
-      data: chartdata,
-      xkey: 'y',
-      ykeys: ["a", "b"],
-      labels: ["Serie A", "Serie B"],
-      lineColors: ["#31C0BE", "#7a92a3"],
-      resize: true
-    });
-
-    // Donut Chart
-    // ----------------------------------- 
-    new Morris.Donut({
-      element: 'morris-donut',
-      data: donutdata,
-      colors: [ '#f05050', '#fad732', '#ff902b' ],
-      resize: true
-    });
-
-    // Bar Chart
-    // ----------------------------------- 
-    new Morris.Bar({
-      element: 'morris-bar',
-      data: chartdata,
-      xkey: 'y',
-      ykeys: ["a", "b"],
-      labels: ["Series A", "Series B"],
-      xLabelMargin: 2,
-      barColors: [ '#23b7e5', '#f05050' ],
-      resize: true
-    });
-
-    // Area Chart
-    // ----------------------------------- 
-    new Morris.Area({
-      element: 'morris-area',
-      data: chartdata,
-      xkey: 'y',
-      ykeys: ["a", "b"],
-      labels: ["Serie A", "Serie B"],
-      lineColors: [ '#7266ba', '#23b7e5' ],
-      resize: true
-    });
-
-  });
-
-})(window, document, window.jQuery);
-
-// NAVBAR SEARCH
-// ----------------------------------- 
-
-
-(function(window, document, $, undefined){
-
-  $(function(){
-    
-    var navSearch = new navbarSearchInput();
-    
-    // Open search input 
-    var $searchOpen = $('[data-search-open]');
-
-    $searchOpen
-      .on('click', function (e) { e.stopPropagation(); })
-      .on('click', navSearch.toggle);
-
-    // Close search input
-    var $searchDismiss = $('[data-search-dismiss]');
-    var inputSelector = '.navbar-form input[type="text"]';
-
-    $(inputSelector)
-      .on('click', function (e) { e.stopPropagation(); })
-      .on('keyup', function(e) {
-        if (e.keyCode == 27) // ESC
-          navSearch.dismiss();
-      });
-      
-    // click anywhere closes the search
-    $(document).on('click', navSearch.dismiss);
-    // dismissable options
-    $searchDismiss
-      .on('click', function (e) { e.stopPropagation(); })
-      .on('click', navSearch.dismiss);
-
-  });
-
-  var navbarSearchInput = function() {
-    var navbarFormSelector = 'form.navbar-form';
-    return {
-      toggle: function() {
-        
-        var navbarForm = $(navbarFormSelector);
-
-        navbarForm.toggleClass('open');
-        
-        var isOpen = navbarForm.hasClass('open');
-        
-        navbarForm.find('input')[isOpen ? 'focus' : 'blur']();
-
-      },
-
-      dismiss: function() {
-        $(navbarFormSelector)
-          .removeClass('open')      // Close control
-          .find('input[type="text"]').blur() // remove focus
-          .val('')                    // Empty input
-          ;
-      }
-    };
-
-  }
-
-})(window, document, window.jQuery);
 /**=========================================================
  * Module: notify.js
  * Create toggleable notifications that fade out automatically.
@@ -1670,219 +873,6 @@
 
 }(jQuery, window, document));
 
-// NOW TIMER
-// ----------------------------------- 
-
-(function(window, document, $, undefined){
-
-  $(function(){
-
-    $('[data-now]').each(function(){
-      var element = $(this),
-          format = element.data('format');
-
-      function updateTime() {
-        var dt = moment( new Date() ).format(format);
-        element.text(dt);
-      }
-
-      updateTime();
-      setInterval(updateTime, 1000);
-    
-    });
-  });
-
-})(window, document, window.jQuery);
-
-/**=========================================================
- * Module: panel-tools.js
- * Dismiss panels
- * [data-tool="panel-dismiss"]
- *
- * Requires animo.js
- =========================================================*/
-(function($, window, document){
-  'use strict';
-  
-  var panelSelector = '[data-tool="panel-dismiss"]',
-      removeEvent   = 'panel.remove',
-      removedEvent  = 'panel.removed';
-
-  $(document).on('click', panelSelector, function () {
-    
-    // find the first parent panel
-    var parent = $(this).closest('.panel');
-    var deferred = new $.Deferred();
-
-    // Trigger the event and finally remove the element
-    parent.trigger(removeEvent, [parent, deferred]);
-    // needs resolve() to be called
-    deferred.done(removeElement);
-
-    function removeElement() {
-      if($.support.animation) {
-        parent.animo({animation: 'bounceOut'}, destroyPanel);
-      }
-      else destroyPanel();
-    }
-
-    function destroyPanel() {
-      var col = parent.parent();
-      
-      $.when(parent.trigger(removedEvent, [parent]))
-       .done(function(){
-          parent.remove();
-          // remove the parent if it is a row and is empty and not a sortable (portlet)
-          col
-            .trigger(removedEvent) // An event to catch when the panel has been removed from DOM
-            .filter(function() {
-            var el = $(this);
-            return (el.is('[class*="col-"]:not(.sortable)') && el.children('*').length === 0);
-          }).remove();
-       });
-
-      
-
-    }
-
-  });
-
-}(jQuery, window, document));
-
-
-/**
- * Collapse panels
- * [data-tool="panel-collapse"]
- *
- * Also uses browser storage to keep track
- * of panels collapsed state
- */
-(function($, window, document) {
-  'use strict';
-  var panelSelector = '[data-tool="panel-collapse"]',
-      storageKeyName = 'jq-panelState';
-
-  // Prepare the panel to be collapsable and its events
-  $(panelSelector).each(function() {
-    // find the first parent panel
-    var $this        = $(this),
-        parent       = $this.closest('.panel'),
-        wrapper      = parent.find('.panel-wrapper'),
-        collapseOpts = {toggle: false},
-        iconElement  = $this.children('em'),
-        panelId      = parent.attr('id');
-    
-    // if wrapper not added, add it
-    // we need a wrapper to avoid jumping due to the paddings
-    if( ! wrapper.length) {
-      wrapper =
-        parent.children('.panel-heading').nextAll() //find('.panel-body, .panel-footer')
-          .wrapAll('<div/>')
-          .parent()
-          .addClass('panel-wrapper');
-      collapseOpts = {};
-    }
-
-    // Init collapse and bind events to switch icons
-    wrapper
-      .collapse(collapseOpts)
-      .on('hide.bs.collapse', function() {
-        setIconHide( iconElement );
-        savePanelState( panelId, 'hide' );
-        wrapper.prev('.panel-heading').addClass('panel-heading-collapsed');
-      })
-      .on('show.bs.collapse', function() {
-        setIconShow( iconElement );
-        savePanelState( panelId, 'show' );
-        wrapper.prev('.panel-heading').removeClass('panel-heading-collapsed');
-      });
-
-    // Load the saved state if exists
-    var currentState = loadPanelState( panelId );
-    if(currentState) {
-      setTimeout(function() { wrapper.collapse( currentState ); }, 0);
-      savePanelState( panelId, currentState );
-    }
-
-  });
-
-  // finally catch clicks to toggle panel collapse
-  $(document).on('click', panelSelector, function () {
-    
-    var parent = $(this).closest('.panel');
-    var wrapper = parent.find('.panel-wrapper');
-
-    wrapper.collapse('toggle');
-
-  });
-
-  /////////////////////////////////////////////
-  // Common use functions for panel collapse //
-  /////////////////////////////////////////////
-  function setIconShow(iconEl) {
-    iconEl.removeClass('fa-plus').addClass('fa-minus');
-  }
-
-  function setIconHide(iconEl) {
-    iconEl.removeClass('fa-minus').addClass('fa-plus');
-  }
-
-  function savePanelState(id, state) {
-    var data = $.localStorage.get(storageKeyName);
-    if(!data) { data = {}; }
-    data[id] = state;
-    $.localStorage.set(storageKeyName, data);
-  }
-
-  function loadPanelState(id) {
-    var data = $.localStorage.get(storageKeyName);
-    if(data) {
-      return data[id] || false;
-    }
-  }
-
-
-}(jQuery, window, document));
-
-
-/**
- * Refresh panels
- * [data-tool="panel-refresh"]
- * [data-spinner="standard"]
- */
-(function($, window, document){
-  'use strict';
-  var panelSelector  = '[data-tool="panel-refresh"]',
-      refreshEvent   = 'panel.refresh',
-      whirlClass     = 'whirl',
-      defaultSpinner = 'standard';
-
-  // method to clear the spinner when done
-  function removeSpinner(){
-    this.removeClass(whirlClass);
-  }
-
-  // catch clicks to toggle panel refresh
-  $(document).on('click', panelSelector, function () {
-      var $this   = $(this),
-          panel   = $this.parents('.panel').eq(0),
-          spinner = $this.data('spinner') || defaultSpinner
-          ;
-
-      // start showing the spinner
-      panel.addClass(whirlClass + ' ' + spinner);
-
-      // attach as public method
-      panel.removeSpinner = removeSpinner;
-
-      // Trigger the event and send the panel object
-      $this.trigger(refreshEvent, [panel]);
-
-  });
-
-
-}(jQuery, window, document));
-
 /**=========================================================
  * Module: play-animation.js
  * Provides a simple way to run animation with a trigger
@@ -1956,559 +946,6 @@
   });
 
 }(jQuery, window, document));
-
-/**=========================================================
- * Module: portlet.js
- * Drag and drop any panel to change its position
- * The Selector should could be applied to any object that contains
- * panel, so .col-* element are ideal.
- =========================================================*/
-
-(function($, window, document){
-  'use strict';
-
-  // Component is optional
-  if(!$.fn.sortable) return;
-
-  var Selector = '[data-toggle="portlet"]',
-      storageKeyName = 'jq-portletState';
-
-  $(function(){
-
-    $( Selector ).sortable({
-      connectWith:          Selector,
-      items:                'div.panel',
-      handle:               '.portlet-handler',
-      opacity:              0.7,
-      placeholder:          'portlet box-placeholder',
-      cancel:               '.portlet-cancel',
-      forcePlaceholderSize: true,
-      iframeFix:            false,
-      tolerance:            'pointer',
-      helper:               'original',
-      revert:               200,
-      forceHelperSize:      true,
-      update:               savePortletOrder,
-      create:               loadPortletOrder
-    })
-    // optionally disables mouse selection
-    //.disableSelection()
-    ;
-
-  });
-
-  function savePortletOrder(event, ui) {
-    
-    var data = $.localStorage.get(storageKeyName);
-    
-    if(!data) { data = {}; }
-
-    data[this.id] = $(this).sortable('toArray');
-
-    if(data) {
-      $.localStorage.set(storageKeyName, data);
-    }
-    
-  }
-
-  function loadPortletOrder() {
-    
-    var data = $.localStorage.get(storageKeyName);
-
-    if(data) {
-      
-      var porletId = this.id,
-          panels   = data[porletId];
-
-      if(panels) {
-        var portlet = $('#'+porletId);
-        
-        $.each(panels, function(index, value) {
-           $('#'+value).appendTo(portlet);
-        });
-      }
-
-    }
-
-  }
-
-}(jQuery, window, document));
-
-
-// Rickshaw
-// ----------------------------------- 
-
-(function(window, document, $, undefined){
-
-  $(function(){
-    
-    if ( typeof Rickshaw === 'undefined' ) return;
-
-    var seriesData = [ [], [], [] ];
-    var random = new Rickshaw.Fixtures.RandomData(150);
-
-    for (var i = 0; i < 150; i++) {
-      random.addData(seriesData);
-    }
-
-    var series1 = [
-      {
-        color: "#c05020",
-        data: seriesData[0],
-        name: 'New York'
-      }, {
-        color: "#30c020",
-        data: seriesData[1],
-        name: 'London'
-      }, {
-        color: "#6060c0",
-        data: seriesData[2],
-        name: 'Tokyo'
-      }
-    ];
-
-    var graph1 = new Rickshaw.Graph( {
-        element: document.querySelector("#rickshaw1"), 
-        series:series1,
-        renderer: 'area'
-    });
-     
-    graph1.render();
-
-
-    // Graph 2
-    // ----------------------------------- 
-
-    var graph2 = new Rickshaw.Graph( {
-      element: document.querySelector("#rickshaw2"),
-      renderer: 'area',
-      stroke: true,
-      series: [ {
-        data: [ { x: 0, y: 40 }, { x: 1, y: 49 }, { x: 2, y: 38 }, { x: 3, y: 30 }, { x: 4, y: 32 } ],
-        color: '#f05050'
-      }, {
-        data: [ { x: 0, y: 40 }, { x: 1, y: 49 }, { x: 2, y: 38 }, { x: 3, y: 30 }, { x: 4, y: 32 } ],
-        color: '#fad732'
-      } ]
-    } );
-
-    graph2.render();
-
-    // Graph 3
-    // ----------------------------------- 
-
-
-    var graph3 = new Rickshaw.Graph({
-      element: document.querySelector("#rickshaw3"),
-      renderer: 'line',
-      series: [{
-        data: [ { x: 0, y: 40 }, { x: 1, y: 49 }, { x: 2, y: 38 }, { x: 3, y: 30 }, { x: 4, y: 32 } ],
-        color: '#7266ba'
-      }, {
-        data: [ { x: 0, y: 20 }, { x: 1, y: 24 }, { x: 2, y: 19 }, { x: 3, y: 15 }, { x: 4, y: 16 } ],
-        color: '#23b7e5'
-      }]
-    });
-    graph3.render();
-
-
-    // Graph 4
-    // ----------------------------------- 
-
-
-    var graph4 = new Rickshaw.Graph( {
-      element: document.querySelector("#rickshaw4"),
-      renderer: 'bar',
-      series: [ 
-        {
-          data: [ { x: 0, y: 40 }, { x: 1, y: 49 }, { x: 2, y: 38 }, { x: 3, y: 30 }, { x: 4, y: 32 } ],
-          color: '#fad732'
-        }, {
-          data: [ { x: 0, y: 20 }, { x: 1, y: 24 }, { x: 2, y: 19 }, { x: 3, y: 15 }, { x: 4, y: 16 } ],
-          color: '#ff902b'
-
-      } ]
-    } );
-    graph4.render();
-
-
-  });
-
-})(window, document, window.jQuery);
-
-// SIDEBAR
-// ----------------------------------- 
-
-
-(function(window, document, $, undefined){
-
-  var $win;
-  var $html;
-  var $body;
-  var $sidebar;
-  var mq;
-
-  $(function(){
-
-    $win     = $(window);
-    $html    = $('html');
-    $body    = $('body');
-    $sidebar = $('.sidebar');
-    mq       = APP_MEDIAQUERY;
-    
-    // AUTOCOLLAPSE ITEMS 
-    // ----------------------------------- 
-
-    var sidebarCollapse = $sidebar.find('.collapse');
-    sidebarCollapse.on('show.bs.collapse', function(event){
-
-      event.stopPropagation();
-      if ( $(this).parents('.collapse').length === 0 )
-        sidebarCollapse.filter('.in').collapse('hide');
-
-    });
-    
-    // SIDEBAR ACTIVE STATE 
-    // ----------------------------------- 
-    
-    // Find current active item
-    var currentItem = $('.sidebar .active').parents('li');
-
-    // hover mode don't try to expand active collapse
-    if ( ! useAsideHover() )
-      currentItem
-        .addClass('active')     // activate the parent
-        .children('.collapse')  // find the collapse
-        .collapse('show');      // and show it
-
-    // remove this if you use only collapsible sidebar items
-    $sidebar.find('li > a + ul').on('show.bs.collapse', function (e) {
-      if( useAsideHover() ) e.preventDefault();
-    });
-
-    // SIDEBAR COLLAPSED ITEM HANDLER
-    // ----------------------------------- 
-
-
-    var eventName = isTouch() ? 'click' : 'mouseenter' ;
-    var subNav = $();
-    $sidebar.on( eventName, '.nav > li', function() {
-
-      if( isSidebarCollapsed() || useAsideHover() ) {
-
-        subNav.trigger('mouseleave');
-        subNav = toggleMenuItem( $(this) );
-
-        // Used to detect click and touch events outside the sidebar          
-        sidebarAddBackdrop();
-      }
-
-    });
-
-    var sidebarAnyclickClose = $sidebar.data('sidebarAnyclickClose');
-
-    // Allows to close
-    if ( typeof sidebarAnyclickClose !== 'undefined' ) {
-
-      $('.wrapper').on('click.sidebar', function(e){
-        // don't check if sidebar not visible
-        if( ! $body.hasClass('aside-toggled')) return;
-
-        var $target = $(e.target);
-        if( ! $target.parents('.aside').length && // if not child of sidebar
-            ! $target.is('#user-block-toggle') && // user block toggle anchor
-            ! $target.parent().is('#user-block-toggle') // user block toggle icon
-          ) {
-                $body.removeClass('aside-toggled');          
-        }
-
-      });
-    }
-
-  });
-
-  function sidebarAddBackdrop() {
-    var $backdrop = $('<div/>', { 'class': 'dropdown-backdrop'} );
-    $backdrop.insertAfter('.aside').on("click mouseenter", function () {
-      removeFloatingNav();
-    });
-  }
-
-  // Open the collapse sidebar submenu items when on touch devices 
-  // - desktop only opens on hover
-  function toggleTouchItem($element){
-    $element
-      .siblings('li')
-      .removeClass('open')
-      .end()
-      .toggleClass('open');
-  }
-
-  // Handles hover to open items under collapsed menu
-  // ----------------------------------- 
-  function toggleMenuItem($listItem) {
-
-    removeFloatingNav();
-
-    var ul = $listItem.children('ul');
-    
-    if( !ul.length ) return $();
-    if( $listItem.hasClass('open') ) {
-      toggleTouchItem($listItem);
-      return $();
-    }
-
-    var $aside = $('.aside');
-    var $asideInner = $('.aside-inner'); // for top offset calculation
-    // float aside uses extra padding on aside
-    var mar = parseInt( $asideInner.css('padding-top'), 0) + parseInt( $aside.css('padding-top'), 0);
-
-    var subNav = ul.clone().appendTo( $aside );
-    
-    toggleTouchItem($listItem);
-
-    var itemTop = ($listItem.position().top + mar) - $sidebar.scrollTop();
-    var vwHeight = $win.height();
-
-    subNav
-      .addClass('nav-floating')
-      .css({
-        position: isFixed() ? 'fixed' : 'absolute',
-        top:      itemTop,
-        bottom:   (subNav.outerHeight(true) + itemTop > vwHeight) ? 0 : 'auto'
-      });
-
-    subNav.on('mouseleave', function() {
-      toggleTouchItem($listItem);
-      subNav.remove();
-    });
-
-    return subNav;
-  }
-
-  function removeFloatingNav() {
-    $('.sidebar-subnav.nav-floating').remove();
-    $('.dropdown-backdrop').remove();
-    $('.sidebar li.open').removeClass('open');
-  }
-
-  function isTouch() {
-    return $html.hasClass('touch');
-  }
-  function isSidebarCollapsed() {
-    return $body.hasClass('aside-collapsed');
-  }
-  function isSidebarToggled() {
-    return $body.hasClass('aside-toggled');
-  }
-  function isMobile() {
-    return $win.width() < mq.tablet;
-  }
-  function isFixed(){
-    return $body.hasClass('layout-fixed');
-  }
-  function useAsideHover() {
-    return $body.hasClass('aside-hover');
-  }
-
-})(window, document, window.jQuery);
-// SKYCONS
-// ----------------------------------- 
-
-(function(window, document, $, undefined){
-
-  $(function(){
-
-    $('[data-skycon]').each(function(){
-      var element = $(this),
-          skycons = new Skycons({'color': (element.data('color') || 'white')});
-      
-      element.html('<canvas width="' + element.data('width') + '" height="' + element.data('height') + '"></canvas>');
-
-      skycons.add(element.children()[0], element.data('skycon'));
-
-      skycons.play();
-    });
-
-  });
-
-})(window, document, window.jQuery);
-// SLIMSCROLL
-// ----------------------------------- 
-
-(function(window, document, $, undefined){
-
-  $(function(){
-
-    $('[data-scrollable]').each(function(){
-
-      var element = $(this),
-          defaultHeight = 250;
-      
-      element.slimScroll({
-          height: (element.data('height') || defaultHeight)
-      });
-      
-    });
-  });
-
-})(window, document, window.jQuery);
-
-// SPARKLINE
-// ----------------------------------- 
-
-(function(window, document, $, undefined){
-
-  $(function(){
-
-    $('[data-sparkline]').each(initSparkLine);
-
-    function initSparkLine() {
-      var $element = $(this),
-          options = $element.data(),
-          values  = options.values && options.values.split(',');
-
-      options.type = options.type || 'bar'; // default chart is bar
-      options.disableHiddenCheck = true;
-
-      $element.sparkline(values, options);
-
-      if(options.resize) {
-        $(window).resize(function(){
-          $element.sparkline(values, options);
-        });
-      }
-    }
-  });
-
-})(window, document, window.jQuery);
-
-// Custom jQuery
-// ----------------------------------- 
-
-
-(function(window, document, $, undefined){
-
-  $(function(){
-
-    $('[data-check-all]').on('change', function() {
-      var $this = $(this),
-          index= $this.index() + 1,
-          checkbox = $this.find('input[type="checkbox"]'),
-          table = $this.parents('table');
-      // Make sure to affect only the correct checkbox column
-      table.find('tbody > tr > td:nth-child('+index+') input[type="checkbox"]')
-        .prop('checked', checkbox[0].checked);
-
-    });
-
-  });
-
-})(window, document, window.jQuery);
-
-
-// TOGGLE STATE
-// ----------------------------------- 
-
-(function(window, document, $, undefined){
-
-  $(function(){
-
-    var $body = $('body');
-        toggle = new StateToggler();
-
-    $('[data-toggle-state]')
-      .on('click', function (e) {
-        // e.preventDefault();
-        e.stopPropagation();
-        var element = $(this),
-            classname = element.data('toggleState'),
-            noPersist = (element.attr('data-no-persist') !== undefined);
-
-        if(classname) {
-          if( $body.hasClass(classname) ) {
-            $body.removeClass(classname);
-            if( ! noPersist)
-              toggle.removeState(classname);
-          }
-          else {
-            $body.addClass(classname);
-            if( ! noPersist)
-              toggle.addState(classname);
-          }
-          
-        }
-        // some elements may need this when toggled class change the content size
-        // e.g. sidebar collapsed mode and jqGrid
-        $(window).resize();
-
-    });
-
-  });
-
-  // Handle states to/from localstorage
-  window.StateToggler = function() {
-
-    var storageKeyName  = 'jq-toggleState';
-
-    // Helper object to check for words in a phrase //
-    var WordChecker = {
-      hasWord: function (phrase, word) {
-        return new RegExp('(^|\\s)' + word + '(\\s|$)').test(phrase);
-      },
-      addWord: function (phrase, word) {
-        if (!this.hasWord(phrase, word)) {
-          return (phrase + (phrase ? ' ' : '') + word);
-        }
-      },
-      removeWord: function (phrase, word) {
-        if (this.hasWord(phrase, word)) {
-          return phrase.replace(new RegExp('(^|\\s)*' + word + '(\\s|$)*', 'g'), '');
-        }
-      }
-    };
-
-    // Return service public methods
-    return {
-      // Add a state to the browser storage to be restored later
-      addState: function(classname){
-        var data = $.localStorage.get(storageKeyName);
-        
-        if(!data)  {
-          data = classname;
-        }
-        else {
-          data = WordChecker.addWord(data, classname);
-        }
-
-        $.localStorage.set(storageKeyName, data);
-      },
-
-      // Remove a state from the browser storage
-      removeState: function(classname){
-        var data = $.localStorage.get(storageKeyName);
-        // nothing to remove
-        if(!data) return;
-
-        data = WordChecker.removeWord(data, classname);
-
-        $.localStorage.set(storageKeyName, data);
-      },
-      
-      // Load the state string and restore the classlist
-      restoreState: function($elem) {
-        var data = $.localStorage.get(storageKeyName);
-        
-        // nothing to restore
-        if(!data) return;
-        $elem.addClass(data);
-      }
-
-    };
-  };
-
-})(window, document, window.jQuery);
-
 /**=========================================================
  * Module: utils.js
  * jQuery Utility functions library 
@@ -2675,25 +1112,11 @@
     $html.addClass($.support.touch ? "touch" : "no-touch");
 
 }(jQuery, window, document));
-// Custom jQuery
-// ----------------------------------- 
-
-
-(function(window, document, $, undefined){
-
-  $(function(){
-
-    // document ready
-
-  });
-
-})(window, document, window.jQuery);
 
 
 /**===========================================================
  * Templates for jQuery
  * */
-
 function tmpl(template_type, items, addTo, direction){
 
 	var	htmlEntities = function(str) {
@@ -2763,6 +1186,34 @@ if (window['moment'] != undefined){
     moment.lang(navigator.language);
 }
 
+/**
+ * Возвращает единицу измерения с правильным окончанием
+ *
+ * @param {Number} num      Число
+ * @param {Object} cases    Варианты слова {nom: 'час', gen: 'часа', plu: 'часов'}
+ * @return {String}
+ */
+function getUnitsText(num, cases) {
+    num = Math.abs(num);
+
+    var word = '';
+
+    if (num.toString().indexOf('.') > -1) {
+        word = cases.GEN;
+    } else {
+        word = (
+            num % 10 == 1 && num % 100 != 11
+                ? cases.NOM
+                : num % 10 >= 2 && num % 10 <= 4 && (num % 100 < 10 || num % 100 >= 20)
+                ? cases.GEN
+                : cases.PLU
+        );
+    }
+
+    return word;
+}
+
+
 function searchToObject() {
 	var pairs = window.location.search.substring(1).split("&"),
 		obj = {},
@@ -2770,10 +1221,12 @@ function searchToObject() {
 		i;
 
 	for ( i in pairs ) {
-		if ( pairs[i] === "" ) continue;
+        if (pairs.hasOwnProperty(i)){
+            if ( pairs[i] === "" ) continue;
 
-		pair = pairs[i].split("=");
-		obj[ decodeURIComponent( pair[0] ) ] = decodeURIComponent( pair[1] );
+            pair = pairs[i].split("=");
+            obj[ decodeURIComponent( pair[0] ) ] = decodeURIComponent( pair[1] );
+        }
 	}
 
 	return obj;
@@ -2785,10 +1238,12 @@ function hashToObject() {
 		pair,
 		i;
 	for ( i in pairs ) {
-		if ( pairs[i] === '' ) continue;
+        if (pairs.hasOwnProperty(i)) {
+            if (pairs[i] === '') continue;
 
-		pair = pairs[i].split("=");
-		obj[ decodeURIComponent( pair[0] ) ] = decodeURIComponent( pair[1] );
+            pair = pairs[i].split("=");
+            obj[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
+        }
 	}
 	return obj;
 }
@@ -2835,7 +1290,7 @@ function showOrganizationalModal(organization_id){
                 event.dates = '';
 
                 res.data.events.forEach(function(event){
-                    $events.append(tmpl('short-event', event));
+                    $events.append(tmpl('short-event', generateEventAttributes(event)));
                 });
 
                 res.data.subscribed_friends.forEach(function(friend){
@@ -2845,7 +1300,7 @@ function showOrganizationalModal(organization_id){
                 $modal.remove();
                 res.data.events = $events;
                 res.data.subscribed_friends = $friends;
-                res.data.site_url_short = res.data.site_url.replace('http://', '')
+                res.data.site_url_short = res.data.site_url.replace('http://', '');
                 $modal = tmpl('organization-modal', $.extend(true, res.data, {
                     subscribe_btn_text: res.data.is_subscribed ? __C.TEXTS.REMOVE_SUBSCRIPTION : __C.TEXTS.ADD_SUBSCRIPTION,
                     subscribe_btn_class: res.data.is_subscribed ? __C.CLASSES.SUBSCRIBE_DELETE : __C.CLASSES.SUBSCRIBE_ADD
@@ -2978,7 +1433,7 @@ function showSettingsModal(){
                     if (res.data.hasOwnProperty('notify_in_browser')){
                         $modal.find('.notify-in-browser').prop('checked', res.data.notify_in_browser);
                     }
-                    $modal.find('.notify-in-browser').on('change', function(e){
+                    $modal.find('.notify-in-browser').on('change', function(){
                         var $this = $(this);
                         if ($this.prop('checked')){
                             if (Notify.needsPermission) {
@@ -3014,3 +1469,82 @@ function showSettingsModal(){
     });
 }
 
+function toggleFavorite($btn, $view, refresh){
+    var $liked_count = $btn.parents('.tl-panel-block').find('.liked-users-count-number'),
+        $liked_count_text = $btn.parents('.tl-panel-block').find('.liked-users-count-text'),
+        _event_id = $btn.data('event-id'),
+        _date = $btn.parents('.tl-panel-block').data(__C.DATA_NAMES.DATE),
+        params = {
+            url: '/api/events/favorites/',
+            type: 'POST',
+            data: {
+                event_id: _event_id
+            }
+        };
+
+    $btn.toggleClass(__C.CLASSES.NO_BORDERS);
+    $btn.text($btn.hasClass(__C.CLASSES.NO_BORDERS) ? __C.TEXTS.REMOVE_FAVORITE : __C.TEXTS.ADD_FAVORITE);
+    $view.find('.timeline-' + _event_id + '-' + _date).toggleClass(__C.CLASSES.ACTIVE);
+
+    var new_count;
+    if (!$btn.hasClass(__C.CLASSES.NO_BORDERS)){
+        params.type = 'DELETE';
+        params.url = '/api/events/favorites/' + $btn.data('event-id');
+        new_count = parseInt($liked_count.text()) - 1;
+        $liked_count.text(new_count);
+    }else{
+        new_count = parseInt($liked_count.text()) + 1;
+        $liked_count.text(new_count);
+    }
+    $liked_count_text.text(getUnitsText(new_count, __C.TEXTS.FAVORED));
+
+    $.ajax(params)
+        .always(function(){
+            if (setDaysWithEvents) setDaysWithEvents();
+            if (window.location.pathname.replace('/', '') == 'favorites' && refresh == true){
+                __STATES.refreshState();
+            }
+        });
+}
+
+$(document).ready(function(){
+    window.paceOptions = {
+        ajax: false, // disabled
+        document: false, // disabled
+        eventLag: false, // disabled
+        elements: {},
+        search_is_active: false,
+        search_query: null,
+        search_xhr: null
+    };
+    window.__C = {
+            TEXTS:{
+                REMOVE_FAVORITE: 'Удалить из избранного',
+                ADD_FAVORITE: 'В избранное',
+                SUBSCRIBERS:{
+                    NOM: ' подписчик',
+                    GEN: ' подписчика',
+                    PLU: ' подписчиков'
+                },
+                FAVORED:{
+                    NOM: ' участник',
+                    GEN: ' участника',
+                    PLU: ' участников'
+                },
+                ADD_SUBSCRIPTION: 'Подписаться',
+                REMOVE_SUBSCRIPTION: 'Отписаться'
+            },
+            DATA_NAMES:{
+                DATE: 'date'
+            },
+            CLASSES: {
+                ACTIVE: 'active',
+                NO_BORDERS: 'no-borders',
+                SUBSCRIBE_ADD: 'btn-pink-empty',
+                SUBSCRIBE_DELETE: 'btn-pink',
+                DISABLED: 'disabled',
+                HIDDEN: 'hidden'
+            },
+            DATE_FORMAT: 'YYYY-MM-DD'
+        };
+})

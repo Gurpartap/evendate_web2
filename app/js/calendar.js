@@ -4,61 +4,6 @@
 
 "use strict";
 
-var paceOptions = {
-	ajax: false, // disabled
-	document: false, // disabled
-	eventLag: false, // disabled
-	elements: {},
-	search_is_active: false,
-	search_query: null,
-	search_xhr: null
-	},
-	__C = {
-		TEXTS:{
-			REMOVE_FAVORITE: 'Удалить из избранного',
-			ADD_FAVORITE: 'В избранное',
-			SUBSCRIBERS:{
-				NOM: ' подписчик',
-				GEN: ' подписчика',
-				PLU: ' подписчиков'
-			},
-			FAVORED:{
-				NOM: ' участник',
-				GEN: ' участника',
-				PLU: ' участников'
-			},
-			ADD_SUBSCRIPTION: 'Подписаться',
-			REMOVE_SUBSCRIPTION: 'Отписаться'
-		},
-		DATA_NAMES:{
-			DATE: 'date'
-		},
-		CLASSES: {
-			ACTIVE: 'active',
-			NO_BORDERS: 'no-borders',
-			SUBSCRIBE_ADD: 'btn-pink-empty',
-			SUBSCRIBE_DELETE: 'btn-pink',
-			DISABLED: 'disabled',
-			HIDDEN: 'hidden'
-		},
-		DATE_FORMAT: 'YYYY-MM-DD'
-	},
-	__STATES = {
-		timeline: MyTimeline,
-		organizations: OrganizationsList,
-		favorites: FavoredEvents,
-		search: Search,
-		refreshState: function(){
-			var page = this.getCurrentState(),
-				$view = $('.screen-view:not(.hidden)');
-			this[page]($view, $view.find('[data-controller]'));
-		},
-		getCurrentState: function(){
-			return window.location.pathname.replace('/', '');
-		}
-	};
-
-
 String.prototype.capitalize = function() {
 	return this.charAt(0).toUpperCase() + this.slice(1);
 };
@@ -67,32 +12,6 @@ var MODAL_OFFSET = 185,
 	EVENT_MODAL_WIDTH = 660,
 	_selected_month = moment();
 
-/**
- * Возвращает единицу измерения с правильным окончанием
- *
- * @param {Number} num      Число
- * @param {Object} cases    Варианты слова {nom: 'час', gen: 'часа', plu: 'часов'}
- * @return {String}
- */
-function getUnitsText(num, cases) {
-	num = Math.abs(num);
-
-	var word = '';
-
-	if (num.toString().indexOf('.') > -1) {
-		word = cases.GEN;
-	} else {
-		word = (
-			num % 10 == 1 && num % 100 != 11
-				? cases.NOM
-				: num % 10 >= 2 && num % 10 <= 4 && (num % 100 < 10 || num % 100 >= 20)
-				? cases.GEN
-				: cases.PLU
-		);
-	}
-
-	return word;
-}
 
 function getTagsString(tags){
 	var _tags = [];
@@ -101,44 +20,6 @@ function getTagsString(tags){
 		_tags.push(tag.name);
 	});
 	return _tags.join(', ');
-}
-
-function toggleFavorite($btn, $view, refresh){
-	var $liked_count = $btn.parents('.tl-panel-block').find('.liked-users-count-number'),
-		$liked_count_text = $btn.parents('.tl-panel-block').find('.liked-users-count-text'),
-		_event_id = $btn.data('event-id'),
-		_date = $btn.parents('.tl-panel-block').data(__C.DATA_NAMES.DATE),
-		params = {
-			url: '/api/events/favorites/',
-			type: 'POST',
-			data: {
-				event_id: _event_id
-			}
-		};
-
-	$btn.toggleClass(__C.CLASSES.NO_BORDERS);
-	$btn.text($btn.hasClass(__C.CLASSES.NO_BORDERS) ? __C.TEXTS.REMOVE_FAVORITE : __C.TEXTS.ADD_FAVORITE);
-	$view.find('.timeline-' + _event_id + '-' + _date).toggleClass(__C.CLASSES.ACTIVE);
-
-	var new_count;
-	if (!$btn.hasClass(__C.CLASSES.NO_BORDERS)){
-		params.type = 'DELETE';
-		params.url = '/api/events/favorites/' + $btn.data('event-id');
-		new_count = parseInt($liked_count.text()) - 1;
-		$liked_count.text(new_count);
-	}else{
-		new_count = parseInt($liked_count.text()) + 1;
-		$liked_count.text(new_count);
-	}
-	$liked_count_text.text(getUnitsText(new_count, __C.TEXTS.FAVORED));
-
-	$.ajax(params)
-		.always(function(){
-			setDaysWithEvents();
-			if (window.location.pathname.replace('/', '') == 'favorites' && refresh == true){
-				__STATES.refreshState();
-			}
-		});
 }
 
 function bindEventHandlers(){
@@ -197,14 +78,16 @@ function generateEventAttributes(event){
 	event.end_time = moment(event.end_time, 'HH:mm:ss').format('HH:mm');
 	event.time = event.begin_time == '00:00' && event.end_time == '00:00' ? ' Весь день': event.begin_time + ' - ' + event.end_time;
 	event.dates = end_date.format('DD MMMM') ;
+	event.short_dates = end_date.format('DD/MM') ;
 	event.day_name = end_date.format('dddd');
 	if (end_date.format(__C.DATE_FORMAT) != st_date.format(__C.DATE_FORMAT)){
 		event.one_day = false;
 		if (end_date.format('MM') == st_date.format('MM')){
-			event.dates = st_date.format('DD') + ' - ' + end_date.format('DD MMMM')
+			event.dates = st_date.format('DD') + ' - ' + end_date.format('DD MMMM');
 		}else{
 			event.dates = st_date.format('DD MMMM') + ' - ' + end_date.format('DD MMMM')
 		}
+		event.short_dates = st_date.format('DD/MM') + ' - ' + end_date.format('DD/MM')
 	}else{
 		event.one_day = true;
 	}
@@ -582,6 +465,22 @@ $(document)
 		Pace.restart()
 	})
 	.ready(function(){
+
+		window.__STATES = {
+			timeline: MyTimeline,
+			organizations: OrganizationsList,
+			favorites: FavoredEvents,
+			search: Search,
+			refreshState: function(){
+				var page = this.getCurrentState(),
+					$view = $('.screen-view:not(.hidden)');
+				this[page]($view, $view.find('[data-controller]'));
+			},
+			getCurrentState: function(){
+				return window.location.pathname.replace('/', '');
+			}
+		};
+
 		//Отрисовака календаря
 		(function(){
 		var current_month = moment(),
@@ -757,7 +656,7 @@ $(document)
 
 		$('.show-organizations-btn').on('click', function(){
 			History.pushState({page: 'organizations'}, 'Каталог организаций', 'organizations');
-		})
+		});
 		$('.show-timeline-btn').on('click', function(){
 			History.pushState({page: 'timeline'}, 'Моя лента', 'timeline');
 		})

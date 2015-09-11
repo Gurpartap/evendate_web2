@@ -40,7 +40,7 @@
    <!-- =============== BOOTSTRAP STYLES ===============-->
    <link rel="stylesheet" href="app/css/bootstrap.css" id="bscss">
 	<!-- Loaders.css-->
-	<link rel="stylesheet" href="app/vendor/loaders.css/loaders.css">
+	<link rel="stylesheet" href="/vendor/loaders.css/loaders.css">
    <!-- =============== APP STYLES ===============-->
    <link rel="stylesheet" href="app/css/app.css" id="maincss">
 	<!-- DATERANGEPICKER-->
@@ -267,7 +267,7 @@
 
 
    <!-- =============== APP SCRIPTS ===============-->
-   <script src="http://localhost:8080/socket.io/socket.io.js" type="text/javascript"></script>
+   <script src="http://<?=App::$DOMAIN?>:8080/socket.io/socket.io.js" type="text/javascript"></script>
    <script src="app/js/app.js"></script>
    <script src="app/js/calendar.js"></script>
    <script src="app/js/add.js"></script>

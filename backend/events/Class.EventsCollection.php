@@ -115,6 +115,11 @@ class EventsCollection{
 					$statement_array[':description'] = '%' . trim($value) . '%';
 					break;
 				}
+				case 'updated_since':{
+					$q_get_events .= ' AND (events.created_at > :updated_since OR events.updated_at > :updated_since)';
+					$statement_array[':updated_since'] = trim($value);
+					break;
+				}
 				case 'tags':{
 					if (is_array($value)){
 						$q_part = array();

@@ -148,7 +148,7 @@ class User extends AbstractUser{
 			':event_id' => $event->getId()
 		));
 		if ($p_get_is_fav === FALSE) return new Result(false, '', false);
-		return new Result(true, '', $p_get_is_fav->rowCount() != 1);
+		return new Result(true, '', $p_get_is_fav->rowCount() == 1);
 	}
 
 	public function updateSettings($__request) {

@@ -67,41 +67,23 @@
    <script src="vendor/jquery/dist/jquery.js"></script>
    <!-- BOOTSTRAP-->
    <script src="vendor/bootstrap/dist/js/bootstrap.js"></script>
-   <!-- PARSLEY-->
-   <script src="vendor/parsleyjs/dist/parsley.min.js"></script>
 
    <!-- =============== APP SCRIPTS ===============-->
+   <script src="http://<?=App::$DOMAIN?>:8080/socket.io/socket.io.js" type="text/javascript"></script>
    <script src="app/js/app.js"></script>
    <!-- NOTIFICATIONS API -->
    <script src="vendor/notify/notify.js"></script>
 
 
    <script>
-
-  $('.vk-auth-btn').on('click', function(){
-    window.open('https://oauth.vk.com/authorize?client_id=5029623&scope=friends,email,offline,nohttps&redirect_uri=http://<?=App::$DOMAIN?>/vkOauthDone.php?mobile=false&response_type=code', 'VK_AUTH_WINDOW',
-            'status=1,toolbar=0,menubar=0&height=500,width=700');
-  });
-
-  $('.google-plus-btn').on('click', function(){
-    window.open('https://accounts.google.com/o/oauth2/auth?scope=email profile https://www.googleapis.com/auth/plus.login &redirect_uri=http://<?=App::$DOMAIN?>/googleOauthDone.php?mobile=false&response_type=token&client_id=403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv.apps.googleusercontent.com', 'GOOGLE_AUTH_WINDOW',
-            'status=1,toolbar=0,menubar=0&height=500,width=700');
-  });
-
-  $('.facebook-btn').on('click', function(){
-    window.open('https://www.facebook.com/dialog/oauth?client_id=1692270867652630&response_type=code&scope=public_profile,email,user_friends&display=popup&redirect_uri=http://<?=App::$DOMAIN?>/fbOauthDone.php?mobile=false', 'FB_AUTH_WINDOW',
-            'status=1,toolbar=0,menubar=0&height=500,width=700');
-  });
-
-  $('.vk-auth-btn,.google-plus-btn,.facebook-btn').on('click', function(){
+       $('.vk-auth-btn,.google-plus-btn,.facebook-btn').on('click', function(){
       if (Notify.needsPermission) {
           Notify.requestPermission(function(){}, function(){
               showNotifier({status: false, text: 'Мы не можем включить уведомления в браузере. Вы запретили их для нас :('});
           });
       }
   });
-
-</script>
+   </script>
 
    <?php
     require 'footer.php';

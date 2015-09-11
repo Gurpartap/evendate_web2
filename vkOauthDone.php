@@ -7,8 +7,6 @@ require_once 'backend/bin/db.php';
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-	<meta name="description" content="Bootstrap Admin App + jQuery">
-	<meta name="keywords" content="app, responsive, jquery, bootstrap, dashboard, admin">
 	<meta name="google-signin-client_id" content="403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv.apps.googleusercontent.com">
 	<title>Evendate - Авторизация ВКонтакте</title>
 	<!-- =============== VENDOR STYLES ===============-->
@@ -19,7 +17,7 @@ require_once 'backend/bin/db.php';
 	<!-- =============== BOOTSTRAP STYLES ===============-->
 	<link rel="stylesheet" href="app/css/bootstrap.css" id="bscss">
 	<!-- Loaders.css-->
-	<link rel="stylesheet" href="app/vendor/loaders.css/loaders.css">
+	<link rel="stylesheet" href="/vendor/loaders.css/loaders.css">
 	<!-- =============== APP STYLES ===============-->
 	<link rel="stylesheet" href="app/css/app.css" id="maincss">
 	<!-- WHIRL (spinners)-->
@@ -65,13 +63,8 @@ require_once 'backend/bin/db.php';
 <script src="vendor/jquery/dist/jquery.js"></script>
 <!-- BOOTSTRAP-->
 <script src="vendor/bootstrap/dist/js/bootstrap.js"></script>
-<!-- STORAGE API-->
-<script src="vendor/jQuery-Storage-API/jquery.storageapi.js"></script>
-<!-- PARSLEY-->
-<script src="vendor/parsleyjs/dist/parsley.min.js"></script>
 <!-- VK OPEN API FOR AUTHORIZATION-->
 <script src="http://<?=App::$DOMAIN?>:8080/socket.io/socket.io.js" type="text/javascript"></script>
-
 
 <!-- =============== APP SCRIPTS ===============-->
 <script src="app/js/app.js"></script>

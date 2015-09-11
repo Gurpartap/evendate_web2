@@ -155,17 +155,32 @@
 						</div>
 						<div class="event-buttons">
 							<?php
-								if ($user != null && $user->hasFavoriteEvent($event)){
+								if ($user != null && $user->hasFavoriteEvent($event)->getData()){
 									$btn_text = 'Убрать из избранного';
 									$btn_class = 'no-borders';
 								}else{
 									$btn_text = 'В избранное';
 									$btn_class = '';
 								}
-							?>
-							<button class="btn modal-subscribe-btn btn-pink-empty <?=$btn_class?>" data-organization-id="<?=$event->getOrganizationId()?>">
-								<?=$btn_text?>
-							</button>
+
+
+							if ($user == null){
+								echo "<div class='btn-group'>
+											<button data-toggle='dropdown' class='btn btn-pink-empty' aria-expanded='true'>В избранное <b class='caret'></b></button>
+											<ul role='menu' class='dropdown-menu social-links auth-links'>
+												<span style='width: 100%; display: inherit; color: #ccc' class='text-center'>Войти с помощью</span>
+												<li><a href='#' class='vk-auth-btn'><i class='fa fa-vk' data-auth-type='vk'></i> VK</a></li>
+												<li><a href='#' class='facebook-btn'><i class='fa fa-facebook-f' data-auth-type='facebook'></i> Facebook</a></li>
+												<li><a href='#' class='google-plus-btn'><i class='fa fa-google-plus' data-auth-type='google-plus'></i> Google+</a></li>
+
+											</ul>
+									  </div>";
+									}else{
+										echo "<button class='btn modal-subscribe-btn btn-pink-empty {$btn_class}' data-event-id='{$event_id}' data-organization-id='{$event->getOrganizationId()}'>";
+										echo $btn_text;
+										echo '</button>';
+									}
+								?>
 						</div>
 						<div class="event-bottom-block row">
 							<div class="col-xs-7">
@@ -216,7 +231,7 @@
 						<?php
 							$_users = $liked_users->getData();
 							foreach($_users as $_user){
-								if ($_user['user_id'] == $user->getId()) continue;
+								if ($_user['id'] == $user->getId()) continue;
 								echo "
 									<div class='liked-users-big'>
 										<div class='liked-user-big'>
@@ -254,7 +269,7 @@
 
 
 <!-- =============== APP SCRIPTS ===============-->
-<script src="http://localhost:8080/socket.io/socket.io.js" type="text/javascript"></script>
+<script src="http://<?=App::$DOMAIN?>:8080/socket.io/socket.io.js" type="text/javascript"></script>
 <script src="app/js/app.js"></script>
 </body>
 
@@ -262,21 +277,22 @@
 	$(document).ready(function(){
 		$('.right-col, .middle-col').css('height', $('.left-col').height());
 
-		$('.vk-auth-btn').on('click', function(){
-			window.open('https://oauth.vk.com/authorize?client_id=5029623&scope=friends,email,offline,nohttps&redirect_uri=http://<?=App::$DOMAIN?>/vkOauthDone.php?mobile=false&response_type=code', 'VK_AUTH_WINDOW',
-				'status=1,toolbar=0,menubar=0&height=500,width=700');
-		});
+		$('.modal-subscribe-btn').on('click', function(){
+			var $this = $(this);
+			if ($this.find('ul').length != 0){
+				$this.toggleClass('open');
+			}else{
+				toggleFavorite($this, $(), false);
+			}
+		})
 
-		$('.google-plus-btn').on('click', function(){
-			window.open('https://accounts.google.com/o/oauth2/auth?scope=email profile https://www.googleapis.com/auth/plus.login &redirect_uri=http://<?=App::$DOMAIN?>/googleOauthDone.php?mobile=false&response_type=token&client_id=403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv.apps.googleusercontent.com', 'GOOGLE_AUTH_WINDOW',
-				'status=1,toolbar=0,menubar=0&height=500,width=700');
-		});
-
-		$('.facebook-btn').on('click', function(){
-			window.open('https://www.facebook.com/dialog/oauth?client_id=1692270867652630&response_type=code&scope=public_profile,email,user_friends&display=popup&redirect_uri=http://<?=App::$DOMAIN?>/fbOauthDone.php?mobile=false', 'FB_AUTH_WINDOW',
-				'status=1,toolbar=0,menubar=0&height=500,width=700');
-		});
 	});
 </script>
+
+<?php
+require 'footer.php';
+?>
+
+
 
 </html>
