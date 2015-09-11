@@ -1,6 +1,7 @@
 <?php
 
 require_once $ROOT_PATH.'backend/subscriptions/Class.Subscription.php';
+require_once $ROOT_PATH.'backend/subscriptions/Class.SubscriptionsCollection.php';
 require_once $ROOT_PATH.'backend/organizations/Class.Organization.php';
 require_once $ROOT_PATH.'backend/organizations/Class.OrganizationsCollection.php';
 
