@@ -10,12 +10,13 @@ class EventsCollection{
 		'vk' => 'http://vk.com/id',
 	);
 
-	private static function getLinkToSocialNetwork($type, $uid){
-		return self::$URLs[$type] . $uid;
-	}
 	public static function filter(PDO $db, User $user, array $filters = null, $order_by = '') {
 		$q_get_events = 'SELECT DISTINCT events.*, event_types.latin_name as event_type_latin_name, organizations.img_url as organization_img_url,
 			organizations.name as organization_name, organization_types.name as organization_type_name, organizations.short_name as organization_short_name,
+			UNIX_TIMESTAMP(event_start_date) as timestamp_event_start_date,
+			UNIX_TIMESTAMP(events.created_at) as timestamp_created_at,
+			UNIX_TIMESTAMP(event_end_date) as timestamp_event_end_date,
+			UNIX_TIMESTAMP(events.updated_at) as timestamp_updated_at,
 			(SELECT COUNT(*) AS liked_count FROM favorite_events WHERE status = 1 AND event_id = events.id) AS liked_users_count,
 			(SELECT COUNT(users_organizations.user_id) AS can_edit
 				FROM users_organizations
@@ -33,6 +34,8 @@ class EventsCollection{
 		$statement_array = array(
 			':user_id' => $user->getId()
 		);
+
+		$is_short = false;
 		foreach($filters as $name => $value){
 			switch($name){
 				case 'date': {
@@ -58,6 +61,7 @@ class EventsCollection{
 					break;
 				}
 				case 'my': {
+					if ($value instanceof User == false) break;
 					$q_get_events .= ' AND (organizations.id IN (SELECT organization_id FROM subscriptions WHERE
 						subscriptions.user_id = :user_id AND
 						subscriptions.status = 1)) ';
@@ -65,8 +69,14 @@ class EventsCollection{
 					break;
 				}
 				case 'id': {
+					if ($value instanceof Event == false) break;
 					$q_get_events .= ' AND (events.id = :event_id)';
 					$statement_array[':event_id'] = $value->getId();
+					break;
+				}
+				case 'organization_id': {
+					$q_get_events .= ' AND (events.organization_id = :organization_id)';
+					$statement_array[':organization_id'] = $value;
 					break;
 				}
 				case 'type': {
@@ -79,7 +89,13 @@ class EventsCollection{
 					}elseif ($value == 'favorites'){
 						$q_get_events .= ' AND (events.id IN (
 							SELECT DISTINCT event_id FROM favorite_events WHERE status=1 AND user_id = :user_id
-						))';
+						))  AND (
+								(DATE(NOW()) BETWEEN DATE(events.event_start_date) AND DATE(events.event_end_date))
+								OR
+								(DATE(NOW()) < DATE(events.event_start_date))
+							)';
+					}else{
+						$is_short = true;
 					}
 					break;
 				}
@@ -147,7 +163,7 @@ class EventsCollection{
 			if ($filters['type'] == 'short'){
 				foreach($events as &$_event){
 					$_event = array(
-						'id' => $_event['id'],
+						'id' => intval($_event['id']),
 						'title' => $_event['title'],
 						'event_start_date' => $_event['event_start_date'],
 						'event_end_date' => $_event['event_end_date'],
@@ -172,6 +188,12 @@ class EventsCollection{
 			WHERE events_tags.status = 1
 			AND tags.status = 1
 			AND events_tags.event_id = :event_id');
+
+		$p_get_dates = $db->prepare('SELECT events_dates.event_date
+			FROM events_dates
+			WHERE
+				events_dates.status = 1
+			AND events_dates.event_id = :event_id');
 
 		$p_get_liked_users = $db->prepare('SELECT DISTINCT users.first_name, users.last_name,
 			users.middle_name, users.id, users.avatar_url, view_friends.friend_uid,
@@ -201,16 +223,66 @@ class EventsCollection{
 				':event_id' => $event['id']
 			));
 
+			$p_get_dates->execute(array(
+				':event_id' => $event['id']
+			));
+
+			if (!$is_short){
+				$event['longitude'] = floatval($event['longitude']);
+				$event['latitude'] = floatval($event['latitude']);
+				$event['event_type_id'] = intval($event['event_type_id']);
+				$event['liked_users_count'] = intval($event['liked_users_count']);
+				$event['creator_id'] = intval($event['creator_id']);
+				$event['id'] = intval($event['id']);
+				$event['organization_id'] = intval($event['organization_id']);
+				$event['can_edit'] = boolval($event['can_edit']);
+				$event['timestamp_event_start_date'] = intval($event['timestamp_event_start_date']);
+				$event['timestamp_created_at'] = intval($event['timestamp_created_at']);
+				$event['timestamp_event_end_date'] = intval($event['timestamp_event_end_date']);
+				$event['timestamp_updated_at'] = intval($event['timestamp_updated_at']);
+				$event['organization_img_url'] = App::$SCHEMA . App::$DOMAIN . '/' . $event['organization_img_url'];
+			}
+
 			$event['favorite_friends'] = array();
+			$event['dates_range'] = array();
 
 			if ($p_get_liked_users->rowCount() != 0){
 				$event['favorite_friends'] = $p_get_liked_users->fetchAll();
 				foreach($event['favorite_friends'] as &$friend){
-					$friend['link'] = self::getLinkToSocialNetwork($friend['type'], $friend['friend_uid']);
+					$friend['id'] = intval($friend['id']);
+					$friend['link'] = User::getLinkToSocialNetwork($friend['type'], $friend['friend_uid']);
 				}
 			}
 
-			$event['tags'] = $p_get_tags->fetchAll();
+			if ($p_get_dates->rowCount() != 0){
+				$_dates = $p_get_dates->fetchAll();
+				foreach($_dates as $date){
+					$event['dates_range'][] = $date;
+				}
+			}else{
+				$end_date = new DateTime($event['event_end_date']);
+				$end_date->add(new DateInterval('P1D'));
+				$period = new DatePeriod(
+					new DateTime($event['event_start_date']),
+					new DateInterval('P1D'),
+					$end_date
+				);
+				foreach($period as $date){
+					$event['dates_range'][] = $date->format('Y-m-d H:i:s');
+				}
+				if (count($event['dates_range']) == 0 && $event['event_start_date'] == $event['event_end_date']){
+					$event['dates_range'][] = $event['event_start_date'];
+				}
+			}
+
+			$tags = $p_get_tags->fetchAll();
+			$event['tags'] = array();
+
+			foreach($tags as $tag){
+				$tag['id'] = intval($tag['id']);
+				$event['tags'][] = $tag;
+			}
+
 			$event['is_favorite'] = $p_get_is_favorite->rowCount() > 0;
 			$event['image_vertical_url'] = App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . $event['image_vertical'];
 			$event['image_horizontal_url'] = App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . $event['image_horizontal'];

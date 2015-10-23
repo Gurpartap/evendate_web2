@@ -48,6 +48,8 @@ class Event{
 				$this->$key = $value;
 			}
 		}
+		global $__user;
+		Statistics::Event($this, $__user, $db, Statistics::EVENT_VIEW);
 	}
 
 	private static function generateRandomString($length = 10) {
@@ -342,7 +344,7 @@ class Event{
 		return App::$SCHEMA . App::$DOMAIN . '/events.php?id=' . $this->getId();
 	}
 
-	public function getLikedUsers(User $user){
+	public function getLikedUsers(){
 		$q_get_users = 'SELECT users.first_name,
 			users.last_name,
 			 users.middle_name,
@@ -427,7 +429,7 @@ class Event{
 			$img_horizontal_filename = md5(self::generateRandomString() . '-horizontal') .  '.' . $data['image_extensions']['horizontal'];
 			$query_data[':image_horizontal'] = $img_horizontal_filename;
 			$q_upd_event .= ' image_horizontal = :image_horizontal,';
-			self::saveEventImage($data['files']['horizontal'], $img_horizontal_filename);
+			//self::saveEventImage($data['files']['horizontal'], $img_horizontal_filename);
 		}
 
 		if (isset($data['image_extensions'])
@@ -436,7 +438,7 @@ class Event{
 			$img_vertical_filename = md5(self::generateRandomString() . '-vertical') .  '.' . $data['image_extensions']['vertical'];
 			$query_data[':image_vertical'] = $img_vertical_filename;
 			$q_upd_event .= ' image_vertical = :image_vertical,';
-			self::saveEventImage($data['files']['vertical'], $img_vertical_filename);
+			//self::saveEventImage($data['files']['vertical'], $img_vertical_filename);
 		}
 
 		$q_upd_event .= ' status = 1 WHERE events.id = :event_id';

@@ -3,12 +3,14 @@
   "version": "0.0.1",
   "description": "",
   "dependencies": {
+    "access-control": "0.0.8",
+    "apn": "~1.7.4",
+    "moment": "2.10.3",
     "mysql": "^2.5.0",
-    "nodemailer": "^1.4.0",
+    "nodemailer": "^1.8.0",
     "nodemailer-smtp-transport": "^1.0.3",
     "restler": "^3.2.2",
     "socket.io": "^1.1.0",
-    "moment": "2.10.3",
     "winston": "^0.7.3"
   }
 }

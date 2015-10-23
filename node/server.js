@@ -7,14 +7,16 @@ var server = require('http'),
 	mysql = require('mysql'),
 	_fs = require("fs"),
 	moment = require("moment"),
-	config = {};
+	config = {},
+	smtpTransport = require('nodemailer-smtp-transport'),
+	nodemailer = require('nodemailer');
 
 config = _fs.readFileSync('../config.json');
 config = JSON.parse(config);
 
 var config_index = process.env.ENV ? process.env.ENV : 'dev',
 	real_config = config[config_index],
-	connection = mysql.createConnection(real_config.db),
+	connection = mysql.createPool(real_config.db),
 	logger = new (winston.Logger)({
 		transports: [
 			new winston.transports.File({ filename: __dirname + '/debug.log', json: false })
@@ -23,8 +25,17 @@ var config_index = process.env.ENV ? process.env.ENV : 'dev',
 			new winston.transports.File({ filename: __dirname + '/exceptions.log', json: false })
 		],
 		exitOnError: false
-});
+}),
+	transporter = nodemailer.createTransport(smtpTransport({
+		host: real_config.smtp.host,
+		port: real_config.smtp.port,
+		secure: false,
 
+		auth: {
+			user: real_config.smtp.user,
+			pass: real_config.smtp.password
+		}
+	}));
 	var URLs = {
 		"VK":{
 			'GET_ACCESS_TOKEN': 'https://oauth.vk.com/access_token?client_id='+
@@ -114,7 +125,6 @@ io.on('connection', function (socket){
 				'google_uid = ' + (UIDs.google_uid != null ?connection.escape(UIDs.google_uid) : ' google_uid ') + ', ' +
 				'token = ' + connection.escape(user_token);
 		console.log(q_ins_user);
-		/*INSERT IN users TABLE*/
 		connection.query(q_ins_user, function(user_err, result){
 			socket.emit('log', data);
 			if (user_err) return handleError(user_err, 'CANT_INSERT_USER');
@@ -232,7 +242,7 @@ io.on('connection', function (socket){
 					}
 				}
 
-				if (data.friends_data.length == 0){
+				if (!data.friends_data || data.friends_data.length == 0){
 					socket.emit('auth', {
 						email: data.access_data.email,
 						token: user_token,
@@ -443,7 +453,7 @@ io.on('connection', function (socket){
 							friends_data = friends_data.items;
 						}else if (oauth_data.type == 'facebook') {
 							friends_data = friends_data.data;
-							user_info.photo_100 = user_info.picture.data.url;
+							user_info.photo_100 = user_info.hasOwnProperty('picture') ? user_info.picture.data.url : '';
 						}
 
 						saveDataInDB(composeFullInfoObject({
@@ -457,6 +467,32 @@ io.on('connection', function (socket){
 				});
 			});
 		})
+	});
+
+	socket.on('feedback', function(data){
+		logger.info(data);
+		var html = '';
+		for (var i in data){
+			if (data.hasOwnProperty(i)){
+				html += '<p><strong>' + i + ':</strong> ' + data[i] + '</p>';
+			}
+		}
+		console.log(html);
+		transporter.sendMail({
+			debug: true,
+			connectionTimeout: 50000,
+			greetingTimeout: 50000,
+			socketTimeout: 50000,
+			from: 'feedback@evendate.ru',
+			to: 'kardinal3094@gmail.com',
+			subject: 'Обратная связь!',
+			html: html
+		}, function(err, info){
+			if (err){
+				logger.info('EMAIL SEND ERROR', err);
+			}
+			logger.info('EMAIL_INFO', info);
+		});
 	});
 });
 

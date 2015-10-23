@@ -10,6 +10,7 @@ class User extends AbstractUser{
 	protected $token;
 	protected $avatar_url;
 	protected $is_editor;
+	protected $token_id;
 
 
 	protected $show_to_friends;
@@ -26,7 +27,7 @@ class User extends AbstractUser{
 			throw new LogicException('Пользователь с такими данными не найден');
 		}
 		if (isset($_SESSION['id'])){
-			$p_get_user = $db->prepare('SELECT users.*,
+			$p_get_user = $db->prepare('SELECT users.*, tokens.id AS token_id,
 				(SELECT COUNT(user_id) FROM users_organizations WHERE user_id = users.id AND status = 1) > 0 AS is_editor
 				FROM users
 				INNER JOIN tokens ON tokens.user_id = users.id
@@ -38,7 +39,7 @@ class User extends AbstractUser{
 				':token' => $_SESSION['token']
 			);
 		}else{
-			$p_get_user = $db->prepare('SELECT users.*,
+			$p_get_user = $db->prepare('SELECT users.*,tokens.id AS token_id,
 				(SELECT COUNT(user_id) FROM users_organizations WHERE user_id = users.id AND status = 1) > 0 AS is_editor
 				FROM users
 				INNER JOIN tokens ON tokens.user_id = users.id
@@ -62,12 +63,17 @@ class User extends AbstractUser{
 		$this->last_name = $row['last_name'];
 		$this->middle_name = $row['middle_name'];
 		$this->email = $row['email'];
-		$this->token = $row['token'];
+		$this->token = $token ? $token : $row['token'];
 		$this->avatar_url = $row['avatar_url'];
 		$this->is_editor = $row['is_editor'];
+		$this->token_id = $row['token_id'];
 
 		$this->show_to_friends = $row['show_to_friends'];
 		$this->notify_in_browser = $row['notify_in_browser'];
+	}
+
+	public static function getLinkToSocialNetwork($type, $uid) {
+		return EventsCollection::$URLs[$type] . $uid;
 	}
 
 	public function getId() {
@@ -120,6 +126,7 @@ class User extends AbstractUser{
 			':event_id' => $event->getId()
 		));
 		if ($result === FALSE) throw new DBQueryException('CANT_MAKE_FAVORITE', $this->db);
+		Statistics::Event($event, $this, $this->db, Statistics::EVENT_FAVE);
 		return new Result(true, 'Событие успешно добавлено в избранное', array('favorite_id' => $this->db->lastInsertId()));
 	}
 
@@ -133,6 +140,7 @@ class User extends AbstractUser{
 			':event_id' => $event->getId()
 		));
 		if ($result === FALSE) throw new DBQueryException('CANT_DELETE_FAVORITE', $this->db);
+		Statistics::Event($event, $this, $this->db, Statistics::EVENT_UNFAVE);
 		return new Result(true, 'Событие успешно удалено из избранных');
 	}
 
@@ -152,6 +160,7 @@ class User extends AbstractUser{
 	}
 
 	public function updateSettings($__request) {
+		print_r($__request);
 		if (isset($__request['notify-in-browser'])){
 			$this->notify_in_browser = $__request['notify-in-browser'] == 'true' ? 1 : 0;
 		}
@@ -163,6 +172,12 @@ class User extends AbstractUser{
 			notify_in_browser = :notify_in_browser
 			WHERE users.id = :user_id';
 		$p_upd = $this->db->prepare($q_upd);
+
+		print_r(array(
+			':show_to_friends' => $this->show_to_friends,
+			':notify_in_browser' => $this->notify_in_browser,
+			':user_id' => $this->getId()
+		));
 
 		$result = $p_upd->execute(array(
 			':show_to_friends' => $this->show_to_friends,
@@ -182,7 +197,7 @@ class User extends AbstractUser{
 			'id' => $this->getId(),
 			'avatar_url' => $this->getAvatarUrl(),
 			'middle_name' => $this->getMiddleName(),
-			'is_editor' => $this->isEditor()
+			'is_editor' => (boolean) $this->isEditor()
 		));
 	}
 
@@ -197,5 +212,44 @@ class User extends AbstractUser{
 			'show_to_friends' => (boolean) $this->show_to_friends,
 			'notify_in_browser' => (boolean) $this->notify_in_browser,
 		));
+	}
+
+	public function updateDeviceToken($device_token, $client_type){
+		$q_upd_device_token = 'UPDATE tokens SET
+			device_token = :device_token,
+			client_type = :client_type
+			WHERE user_id = :user_id
+			AND tokens.token = :token';
+		$p_upd = $this->db->prepare($q_upd_device_token);
+		$res = $p_upd->execute(array(
+			':device_token' => $device_token,
+			':user_id' => $this->getId(),
+			':token' => $this->token,
+			'client_type' => $client_type
+		));
+
+		if ($res === FALSE) throw new DBQueryException('', $this->db);
+		return new Result(true, '');
+	}
+
+	public function getTokenId() {
+		return $this->token_id;
+	}
+
+	public function getFriends() {
+		$q_get_friends = 'SELECT users.first_name, users.last_name, users.avatar_url,
+ 			view_friends.friend_uid, view_friends.type
+ 			FROM view_friends
+			 INNER JOIN users ON users.id = view_friends.friend_id
+			WHERE user_id = :user_id
+			GROUP BY friend_id';
+
+		$p_get_friends = $this->db->prepare($q_get_friends);
+		$result = $p_get_friends->execute(array(
+			':user_id' => $this->getId()
+		));
+		if ($result === FALSE) throw new DBQueryException('', $this->db);
+
+		return new Result(true, '', $p_get_friends->fetchAll());
 	}
 }

@@ -31,25 +31,47 @@ function bindEventHandlers(){
 	});
 
 	$view.find('.more-info-btn').off('click').on('click', function(){
-		var $panel_block = $(this).parents('.tl-panel-block');
+		var $panel_block = $(this).parents('.tl-panel-block'),
+			event_id = $panel_block.data('event-id');
 		$panel_block.toggleClass('closed');
 		$view.find('.timeline-' + $panel_block.data('event-id') + '-' + $panel_block.data(__C.DATA_NAMES.DATE))
 			.height($panel_block.outerHeight());
+
+		storeStat(event_id, __C.STATS.EVENT_ENTITY, __C.STATS.EVENT_VIEW_DETAIL);
 	});
 
 	$view.find('.add-to-favorites').on('click', function(){
 		toggleFavorite($(this), $view)
 	});
 
-
 	$view.find('.organization-in-event').on('click', function(){
 		showOrganizationalModal($(this).data('organization-id'));
 	});
 
 	$view.find('.likes-block').on('click', function(){
-		var $this = $(this);
-		if ($this.find('.all-friends li').length == 0) return;
-		$this.toggleClass('open');
+		var $this = $(this),
+			$event = $this.parents('.tl-panel-block'),
+			$all_friends = $('.friends-event-' + $event.data('event-id'));
+
+		if ($all_friends.hasClass('open')){
+			$all_friends
+				.removeClass('open')
+				.addClass('hidden')
+				.remove();
+		}else{
+			$all_friends.remove();
+			$all_friends = $event.data('friends');
+			if ($all_friends.find('li').length == 0) return;
+
+			$all_friends
+				.removeClass('hidden')
+				.addClass('open')
+				.css({
+					top: $this.offset().top + $this.height() + 'px',
+					left: $this.find('.user-img-wrapper:first').offset().left - $this.width() + 'px'
+				})
+				.prependTo($event.parent().addClass('open'));
+		}
 	});
 
 	$view.find('.social-links i').on('click', function(){
@@ -64,7 +86,13 @@ function bindEventHandlers(){
 		var $this = $(this),
 			event_id = $this.data('event-id');
 		showEditEventModal(event_id);
-	})
+	});
+
+	$view.find('.external-link').on('click', function(){
+		var $panel_block = $(this).parents('.tl-panel-block'),
+			event_id = $panel_block.data('event-id');
+		storeStat(event_id, __C.STATS.EVENT_ENTITY, __C.STATS.EVENT_OPEN_SITE);
+	});
 }
 
 function generateEventAttributes(event){
@@ -92,7 +120,7 @@ function generateEventAttributes(event){
 		event.one_day = true;
 	}
 	event.friends = $('<div>');
-	event.all_friends = tmpl('liked-dropdown-wrapper', {});
+	event.all_friends = tmpl('liked-dropdown-wrapper', {event_id: event.id});
 
 	event.can_edit_hidden = event.can_edit != 1 ? 'hidden':'';
 
@@ -164,14 +192,22 @@ function walkEventActiveDates(events, cb){
 	});
 }
 
-function printEventsInTimeline($view, res){
+function printEventsInTimeline($view, res, filter_date){
 	var $tl_outer_wrap = $view.find('.tl-outer-wrap'),
 		$blocks_wrapper = $view.find('.blocks-outer-wrap');
 
 	res.data.forEach(function(value) {
-		var m_date = moment(value.event_start_date).unix() < moment().unix()
-				? moment() : moment(value.event_start_date),
-			day_date = m_date.format(__C.DATE_FORMAT);
+		var m_date;
+		if (filter_date != null){
+			m_date = moment(filter_date, __C.DATE_FORMAT);
+		} else if (moment(value.event_start_date).unix() < moment().unix() && filter_date == null){
+			m_date = moment();
+		}else if (moment(value.event_start_date).unix() < moment().unix() && filter_date != null){
+			m_date = moment(filter_date, __C.DATE_FORMAT);
+		}else{
+			m_date = moment(value.event_start_date);
+		}
+			var day_date = m_date.format(__C.DATE_FORMAT);
 		var $day_wrapper = $blocks_wrapper.find('.events-' + day_date),
 			$timeline_wrapper = $tl_outer_wrap.find('.timeline-' + day_date);
 
@@ -206,8 +242,12 @@ function printEventsInTimeline($view, res){
 			'facebook': tmpl('facebook-share-link', event).attr('href'),
 			'twitter': tmpl('twitter-share-link', event).attr('href')
 		});
+		$event.data('friends', event.all_friends);
 		$day_wrapper.append($event);
 		$timeline_wrapper.append(tmpl('timeline-event', event));
+		$event.appear(function() {
+			storeStat(event.id, __C.STATS.EVENT_ENTITY, __C.STATS.EVENT_VIEW);
+		}, {accY: 100})
 	});
 
 	if (res.data.length == 0) {
@@ -251,6 +291,9 @@ function MyTimeline($view, $content_block){
 }
 
 function OrganizationsList($view, $content_block){
+
+	var ORGANIZATIONS_ON_ONE_LINE = 5;
+
 	$.ajax({
 		url: 'api/organizations/?with_subscriptions=true',
 		success: function(res){
@@ -259,29 +302,49 @@ function OrganizationsList($view, $content_block){
 			res.data.forEach(function(organization){
 				var _key = '_' + organization.type_id;
 				if (!_organizations_by_types.hasOwnProperty(_key)){
-					_organizations_by_types[_key] = {type_name: organization.type_name, organizations: []};
+					_organizations_by_types[_key] = {type_name: organization.type_name, organizations: [], count: 0};
 				}
 				_organizations_by_types[_key].organizations.push(organization);
+				_organizations_by_types[_key].count++;
 			});
-			$.each(_organizations_by_types, function(key, type){
-				var $wrapper = tmpl('organization-type-wrapper', type),
-					$organizations = $wrapper.find('.organizations');
-				type.organizations.forEach(function(organization){
-					if(organization.subscribed != true){
-						organization.btn_type_class = 'success';
-						organization.btn_type_icon = 'check';
-					}else{
-						organization.btn_type_class = 'pink';
-						organization.btn_type_icon = 'close';
-					}
-					var $organization = tmpl('organization-item', organization);
-					$organization.find('.organization-img').on('click', function(){
-						showOrganizationalModal(organization.id)
+
+			var sorted_keys = Object.keys(_organizations_by_types).sort(function(a,b){
+				return _organizations_by_types[b].count - _organizations_by_types[a].count
+			});
+
+			sorted_keys.forEach(function(key){
+					var type = _organizations_by_types[key],
+						$wrapper = tmpl('organization-type-wrapper', type),
+						$organizations = $wrapper.find('.organizations'),
+						$current_row = tmpl('organizations-line-wrapper', {}),
+						current_length = 0;
+					type.organizations.forEach(function(organization){
+						if(organization.is_subscribed != true){
+							organization.btn_type_class = 'success';
+							organization.btn_type_icon = 'check';
+							organization.btn_text = 'Подписаться';
+						}else{
+							organization.btn_type_class = 'pink';
+							organization.btn_type_icon = 'close';
+							organization.btn_text = 'Отписаться';
+						}
+						var $organization = tmpl('organization-item', organization);
+						$organization.find('.organization-img').on('click', function(){
+							showOrganizationalModal(organization.id)
+						});
+						$current_row.append($organization);
+						if (++current_length == ORGANIZATIONS_ON_ONE_LINE){
+							current_length = 0;
+							$organizations.append($current_row);
+							$current_row = tmpl('organizations-line-wrapper', {});
+						}
 					});
-					$organizations.append($organization)
+					if (current_length != 0){
+						$organizations.append($current_row);
+						$current_row = tmpl('organizations-line-wrapper', {});
+					}
+					$div.append($wrapper)
 				});
-				$div.append($wrapper)
-			});
 			$view.html($div);
 			$div.find('.subscribe-btn').on('click', function(){
 				var $btn = $(this),
@@ -296,11 +359,13 @@ function OrganizationsList($view, $content_block){
 					.toggleClass('fa-check fa-close');
 
 				if (to_delete_state){
+					$btn.find('span').text('Подписаться');
 					toggleSubscriptionState(false, sub_id, function(res){
 						$btn.removeClass(__C.CLASSES.DISABLED);
 						hideOrganizationItem(org_id);
 					});
 				}else{
+					$btn.find('span').text('Отписаться');
 					toggleSubscriptionState(true, org_id, function(res){
 						$btn.data('subscription-id', res.data.subscription_id);
 						$btn.removeClass(__C.CLASSES.DISABLED);
@@ -308,7 +373,6 @@ function OrganizationsList($view, $content_block){
 					});
 				}
 			});
-			$view.find('.load-more-btn').removeClass(__C.CLASSES.HIDDEN);
 		}
 	})
 }
@@ -357,6 +421,7 @@ function Search($view, $content_block){
 			});
 
 			res.data.organizations.forEach(function(organization){
+				organization.subscribed_count_text = getUnitsText(organization.subscribed_count, __C.TEXTS.FAVORED);
 				var $organization = tmpl('organization-search-item', organization);
 				$organizations_wrapper.append($organization);
 				$organization.on('click', function(){
@@ -372,6 +437,18 @@ function Search($view, $content_block){
 			}
 
 			bindEventHandlers();
+
+			$organizations_wrapper.slimscroll({
+				height: window.innerHeight - $('.header').height()
+			});
+			$organizations_wrapper
+				.css({
+					width: '350px'
+				})
+				.parent().css({
+				position: 'fixed',
+				width: '350px'
+			});
 		}
 	});
 }
@@ -381,11 +458,15 @@ function OneDay($view, $content_block){
 	$view.find('.panel-default,.tl-block').remove();
 	var date = __STATES.getCurrentState();
 	$.ajax({
-		url: 'api/events/my?date=' + date,
+		url: 'api/events/my',
+		data: {
+			date: date,
+			length: 100
+		},
 		type: 'GET',
 		dataType: 'JSON',
 		success: function(res){
-			printEventsInTimeline($view, res);
+			printEventsInTimeline($view, res, date);
 			$view.find('.tl-outer-wrap ').css('visibility', 'hidden');
 			var active_date = moment(date, __C.DATE_FORMAT);
 			$('.day-events-header .day-name').text(active_date.format('dddd').capitalize() + ', ' +
@@ -397,7 +478,7 @@ function OneDay($view, $content_block){
 function hideOrganizationItem(org_id){
 	var $organization_item = $('.animated.organization-' + org_id).addClass('fadeOutLeftBig');
 	setTimeout(function(){
-		$organization_item.remove()
+		$organization_item.remove();
 	}, 1000);
 }
 
@@ -407,10 +488,10 @@ function printSubscribedOrganizations(){
 		'url': 'api/organizations/?with_subscriptions=true',
 		success: function(res){
 			res.data.forEach(function(organization){
-				if (organization.subscribed && $list.find('.organization-' + organization.id).length == 0){
+				if (organization.is_subscribed && $list.find('.organization-' + organization.id).length == 0){
 					tmpl('organizations-item', organization)
 						.addClass('fadeInLeftBig')
-						.appendTo($list)
+						.prependTo($list)
 						.on('click', function(){
 							showOrganizationalModal($(this).data('organization-id'));
 						});
@@ -420,14 +501,15 @@ function printSubscribedOrganizations(){
 	});
 }
 
-
 function setDaysWithEvents(){
 	$.ajax({
 		url: '/api/events/my',
 		data: {
 			since_date: _selected_month.startOf('month').format(__C.DATE_FORMAT),
 			till_date: _selected_month.endOf('month').format(__C.DATE_FORMAT),
-			type: 'short'
+			type: 'short',
+			page: 0,
+			length: 500
 		},
 		success: function(res){
 			$('.td-day').removeClass('click-able has-favorites').addClass(__C.CLASSES.DISABLED);
@@ -660,4 +742,7 @@ $(document)
 		$('.show-timeline-btn').on('click', function(){
 			History.pushState({page: 'timeline'}, 'Моя лента', 'timeline');
 		})
+
+		var $list = $('.organizations-list');
+		$list.slimscroll({height: window.innerHeight - $list.offset().top});
 });

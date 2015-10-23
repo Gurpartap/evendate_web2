@@ -15,7 +15,7 @@ var BACKSPACE_CODE = 8,
 	_cropper_data = {
 		vertical: null,
 		horizontal: null
-	}
+	},
 	_location = null,
 	$text_length = $('.textarea-length-text');
 
@@ -28,9 +28,9 @@ var daterange_settings =
 		format: 'DD/MM/YYYY',
 		applyLabel: 'Выбрать',
 		cancelLabel: 'Отмена',
-		firstDay: 0,
+		firstDay: 1,
 		daysOfWeek: [
-			'Пн','Вт','Ср','Чт','Пт','Сб','Вс'
+			'Вс', 'Пн','Вт','Ср','Чт','Пт','Сб'
 		],
 		monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
 	},
@@ -189,11 +189,17 @@ function bindModalEvents(){
 
 
 	$('.organizations.to-select2').select2({
-		width: '100%'
+		width: '100%',
+		templateResult: function(state){
+			if (!state.id) { return state.text; }
+			var $state_element = $(state.element);
+
+			return $('<span><img src="' + $state_element.data('image-url') + '" class="img-30" /> ' + state.text + '</span>');
+		}
 	});
 	$('.tags.to-select2').select2({
 		placeholder: "Выберите до 5 тегов",
-		width: '100%',
+		//width: '100%',
 		maximumSelectionLength: 5,
 		multiple: true,
 		createSearchChoice: function() {
@@ -201,6 +207,7 @@ function bindModalEvents(){
 		}
 	});
 
+	$('.to-select2.tags').siblings('.select2').find('input').css('width', '100%');
 
 	$('input.daterange').daterangepicker(daterange_settings);
 	bindDatepickerChanger();
@@ -475,6 +482,7 @@ function showEditEventModal(event_id){
 
 				try{
 					var notifications = JSON.parse(_event.notifications_schema_json);
+					debugger;
 					$.each(notifications, function(key, value){
 						$modal.find('[name="' + key + '"]')
 							.prop('checked', value);

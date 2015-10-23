@@ -53,7 +53,7 @@ class SubscriptionsCollection{
 				'subscription_status' => (boolean) $sub['subscription_status'],
 				'created_at' => $sub['subscription_created_at'],
 				'updated_at' => $sub['subscription_updated_at'],
-				'organization' => array(
+				'organization' => Organization::normalizeOrganization(array(
 					'id' => $sub['id'],
 					'name' => $sub['name'],
 					'status' => $sub['status'],
@@ -66,7 +66,7 @@ class SubscriptionsCollection{
 					'background_img_url' => $sub['background_img_url'],
 					'site_url' => $sub['site_url'],
 					'organization_type' => $sub['organization_type'],
-				)
+				))
 			);
 		}
 		return new Result(true, '', $normalized_subs);

@@ -1,12 +1,18 @@
 <?php
 
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Headers: Authorization');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
-	//error_reporting(0);
-$format = (isset($_REQUEST['format']) && $_REQUEST['format'] == 'xml') ? 'xml' : 'json';
-$download = (isset($_REQUEST['download']) && ($_REQUEST['download'] == '1' || $_REQUEST['download'] == 'true')) ? true : false;
-$nude_data = (isset($_REQUEST['nude_data']) && ($_REQUEST['nude_data'] == '1' || $_REQUEST['nude_data'] == 'true')) ? true : false;
+
+if (isset($_SERVER['ENV']) && $_SERVER['ENV'] != 'prod'){
+	ini_set("display_errors", 1);
+	error_reporting(E_ALL);
+}
+
+	header('Access-Control-Allow-Origin: *');
+	header('Access-Control-Allow-Headers: Authorization');
+	header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+
+	$format = (isset($_REQUEST['format']) && $_REQUEST['format'] == 'xml') ? 'xml' : 'json';
+	$download = (isset($_REQUEST['download']) && ($_REQUEST['download'] == '1' || $_REQUEST['download'] == 'true')) ? true : false;
+	$nude_data = (isset($_REQUEST['nude_data']) && ($_REQUEST['nude_data'] == '1' || $_REQUEST['nude_data'] == 'true')) ? true : false;
 
 try {
 
@@ -19,6 +25,7 @@ try {
 	require_once "../backend/users/Class.AbstractUser.php";
 	require_once "../backend/users/Class.User.php";
 	require_once "../backend/users/Class.Editor.php";
+	require_once "../backend/statistics/Class.Statistics.php";
 
 
 	function __autoload($class_name) {
@@ -32,9 +39,10 @@ try {
 	}
 
 	$__request = $_REQUEST;
-	$__request['payload'] = RequestParser::payload();
+	$input = file_get_contents('php://input');
+	$__request['payload'] = RequestParser::payload($input);
 	if ($_SERVER['REQUEST_METHOD'] == 'PUT' && $__request['payload'] == null){
-		$__request = array_merge($_REQUEST, RequestParser::put());
+		$__request = array_merge($_REQUEST, RequestParser::put($input));
 	}
 	$__headers = getallheaders();
 	$__request['__files'] = '';

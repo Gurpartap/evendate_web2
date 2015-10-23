@@ -133,7 +133,7 @@
                          <div class="log-out-icon pull-right">
                              <i class="icon-login"></i>
                          </div>
-                         <p> <?=$user->getLastName() . ' ' . $user->getFirstName()?></p>
+                         <p class="header-user-name"> <?=$user->getLastName() . ' ' . $user->getFirstName()?></p>
                          <div class="label label-blue">Редактор</div>
                      </div>
                  </div>
@@ -254,8 +254,8 @@
    <!-- INPUTMASKS -->
    <script src="vendor/jquery.inputmask/dist/jquery.inputmask.bundle.min.js"></script>
   <!-- Google MAPS -->
-   <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?sensor=true&libraries=places"></script>
-   <script type="text/javascript" src="vendor/placepicker/jquery.placepicker.min.js"></script>
+   <script src="https://maps.googleapis.com/maps/api/js?sensor=true&libraries=places"></script>
+   <script src="vendor/placepicker/jquery.placepicker.min.js"></script>
    <!-- INPUTMASKS -->
    <script src="vendor/pace/pace.min.js"></script>
    <!-- SELECT2 -->
@@ -264,6 +264,8 @@
    <script src="vendor/history/jquery.history.js"></script>
    <!-- NOTIFICATIONS API -->
    <script src="vendor/notify/notify.js"></script>
+   <!-- JQUERY APPEAR-->
+   <script src="vendor/appear/jquery.appear.js"></script>
 
 
    <!-- =============== APP SCRIPTS ===============-->

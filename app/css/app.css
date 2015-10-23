@@ -84,6 +84,7 @@
   12.1 docs
 
  ========================================================================== */
+
 /* ========================================================================
    Component: bootstrap-reset.less
  ========================================================================== */
@@ -7980,8 +7981,11 @@ border-bottom-right-radius: 8px;
 }
 
 .all-friends{
-  margin-top: 10px;
+  margin-top: 20px;
   width: 250px;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 .likes-block{
   cursor: pointer;
@@ -8215,8 +8219,9 @@ border-bottom-right-radius: 8px;
   margin-top: 25px;
   border-bottom: 1px solid #ccc;
   margin-bottom: 7px;
-  font-size: 22px;
+  font-size: 24px;
   color: #7B7979;
+  font-weight: 700;
 }
 
 .subscribe-to-organization{
@@ -8283,6 +8288,7 @@ border-bottom-right-radius: 8px;
   position: fixed;
   width: 350px;
   padding-top: 30px;
+  overflow-y: scroll;
 }
 
 .search-events .tl-panel-block{
@@ -8474,11 +8480,13 @@ span.organization-modal-header-text{
 
 .organization-info-block{
   bottom: 25px;
+  width: 250px;
 }
 
 .event-alone .organization-name{
-  padding-top: 10px;
+  /*padding-top: 10px;*/
   padding-left: 15px;
+  max-width: 210px;
 }
 
 .address{
@@ -8757,4 +8765,22 @@ span.organization-modal-header-text{
 }
 .vertical-btn img, .horizontal-btn img{
   max-width: 100%;
+}
+
+.description .liked-users{
+  cursor: default;
+}
+
+.header-user-name{
+  text-overflow: initial;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.img-30{
+  width: 30px;
+  height: 30px;
+}
+
+.organization-name-wrapper{
+  display: inline-flex;
 }

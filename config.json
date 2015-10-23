@@ -32,6 +32,12 @@
       "app_secret": "0ecd87ecde79a4ab4e4feb8c2718e845",
       "redirect_uri": ""
     },
+    "smtp":{
+      "user": "feedback@evendate.ru",
+      "password": "Aues300694$$$",
+      "host": "smtp.yandex.ru",
+      "port": 25
+    },
     "domain": "evendate.ru",
     "schema": "http://"
   },
@@ -67,6 +73,12 @@
       "app_id": "1692270867652630",
       "app_secret": "0ecd87ecde79a4ab4e4feb8c2718e845",
       "redirect_uri": ""
+    },
+    "smtp":{
+      "user": "feedback@evendate.ru",
+      "password": "Aues300694$$$",
+      "host": "smtp.yandex.ru",
+      "port": 25
     },
     "domain": "dev.evendate.org",
     "schema": "http://"

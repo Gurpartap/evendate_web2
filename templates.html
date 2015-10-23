@@ -51,7 +51,6 @@
                 {description}
               </div>
               <div class="description-text">
-
                 <a href="{site_url}" target="_blank"><i class="fa fa-external-link"></i> {site_url_short}</a>
               </div>
               <div class="liked-users-count"></div>
@@ -205,7 +204,6 @@
                 <span class="liked-users-count-number">{liked_users_count}</span>
                 <span class="liked-users-count-text">{favored_text}</span>
               </div>
-              {all_friends}
             </div>
             <div class="col-xs-12">
               <button class="btn btn-pink-empty add-to-favorites {favorite_btn_class}" data-event-id="{id}">{favorite_btn_text}</button>
@@ -244,7 +242,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-add-event-modal">
-  <div class="modal fade" id="modal-add-event" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal fade" id="modal-add-event" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog add-event-modal" role="document">
       <div class="modal-content">
         <div class="modal-header">
@@ -473,7 +471,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-organization-option">
-  <option value="{id}"><img src="{img_url}"> {name}</option>
+  <option value="{id}" data-image-url="{img_url}"> {name}</option>
 </script>
 
 <script type="javascript/template" id="tmpl-organization-item">
@@ -481,11 +479,13 @@
     <div>
       <img src="{img_url}" title="{name}" class="organization-img" data-organization-id="{id}">
     </div>
-    <div>
+  <div>
+    <button type="button" class="btn btn-xs btn-{btn_type_class} subscribe-btn subscribe-to-organization" data-organization-id="{id}" data-subscription-id="{subscription_id}">
+      <i class="fa fa-{btn_type_icon}"></i> <span>{btn_text}</span>
+    </button>
+  </div>
+    <div class="organization-name-wrapper">
       <span class="organization-short-name">{short_name}</span>
-      <a href="#" class="btn btn-xs btn-{btn_type_class} subscribe-btn pull-right subscribe-to-organization" data-organization-id="{id}" data-subscription-id="{subscription_id}">
-        <i class="fa fa-{btn_type_icon}"></i>
-      </a>
     </div>
   </div>
 </script>
@@ -499,7 +499,7 @@
       <span class="organization-short-name">{short_name}</span>
     </div>
     <div>
-      <span class="organization-subscribers-count">{subscribed_count}</span> подписчика
+      <span class="organization-subscribers-count">{subscribed_count}</span> {subscribed_count_text}
     </div>
   </div>
 </script>
@@ -526,7 +526,6 @@
           <div class="col-xs-12">
             <div class="liked-users row">
               {friends}
-              {all_friends}
             </div>
             <div class="liked-users-count">
               <span class="liked-users-count-number">{liked_users_count}</span>
@@ -604,7 +603,7 @@
     </div>
     <div class="middle-col">
       <button type="button" class="close" aria-label="Закрыть"><span aria-hidden="true">×</span></button>
-      <div class="event-title">{title} <a href="#" class="btn btn-edit {can_edit_hidden}" data-event-id="{id}"><i class="icon-pencil"></i></a></div>
+      <div class="event-title">{title}</div>
       <div class="event-description">{description}</div>
       <div class="external-link-wrapper">
         <a href="{detail_info_url}" target="_blank"><i class="fa fa-external-link"></i> Подробнее</a>
@@ -639,8 +638,12 @@
 </script>
 
 <script type="javascript/template" id="tmpl-liked-dropdown-wrapper">
-  <ul role="menu" class="dropdown-menu animated pulse all-friends">
+  <ul role="menu" class="dropdown-menu animated pulse all-friends friends-event-{event_id}">
   </ul>
+</script>
+
+<script type="javascript/template" id="tmpl-organizations-line-wrapper">
+  <div class="row"></div>
 </script>
 
 <script type="javascript/template" id="tmpl-liked-dropdown-item">

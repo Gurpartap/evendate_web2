@@ -36,6 +36,10 @@ class Subscription{
 		$this->status = $row['status'];
 	}
 
+	private function getOrganization(){
+		return new Organization($this->organization_id, $this->db);
+	}
+
 	public static function create(User $user, Organization $organization, PDO $db){
 		$q_ins_sub = 'INSERT INTO subscriptions(organization_id, user_id, created_at, `status`)
 			VALUES(:organization_id, :user_id, NOW(), 1)
@@ -48,6 +52,9 @@ class Subscription{
 		));
 
 		if ($result === FALSE) throw new DBQueryException('SUBSCRIPTION_QUERY_ERROR', $db);
+
+		Statistics::Organization($organization, $user, $db, Statistics::ORGANIZATION_SUBSCRIBE);
+
 		return new Result(true, 'Подписка успешно оформлена', array('subscription_id' => $db->lastInsertId()));
 	}
 
@@ -61,7 +68,7 @@ class Subscription{
 			':id' => $this->id,
 			':user_id' => $user->getId()
 		));
-
+		Statistics::Organization($this->getOrganization(), $user, $this->db, Statistics::ORGANIZATION_UNSUBSCRIBE);
 		return new Result(true, 'Подписка успешно отменена');
 	}
 

@@ -14,8 +14,9 @@ $__modules['organizations'] = array(
 			$result = $organization->getFullParams($__user)->getData();
 			if (isset($__request['with_events']) && $__request['with_events'] == true){
 				$result['events'] = EventsCollection::filter($__db, $__user, array(
-					'organization' => $organization
-				), ' ORDER BY events.id DESC')->getData();
+					'organization' => $organization,
+					'type' => 'future'
+				), ' ORDER BY events.event_start_date, events.begin_time')->getData();
 			}
 			return new Result(true, '', $result);
 		},

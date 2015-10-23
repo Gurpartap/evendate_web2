@@ -14,22 +14,21 @@ $__modules['events'] = array(
 				array_merge(array('my' => $__user,
 					'type' => 'future'),
 					$__request),
-				' ORDER BY events.event_start_date LIMIT ' . ($__page * $__length) . ' , ' . $__length);
+				' ORDER BY events.event_start_date, events.begin_time LIMIT ' . ($__page * $__length) . ' , ' . $__length);
 		},
 		'search' => function() use ($__db, $__request, $__user){
 			return EventsCollection::filter($__db, $__user, $__request);
 		},
 		'favorites' => function () use ($__db, $__request, $__user, $__page, $__length) { /*MY EVENTS!*/
 			return EventsCollection::filter($__db, $__user,
-				array('my' => $__user,
-					'type' => 'favorites'),
-				' ORDER BY events.event_start_date LIMIT ' . ($__page * $__length) . ' , ' . $__length);
+				array('type' => 'favorites'),
+				' ORDER BY events.event_start_date, events.begin_time LIMIT ' . ($__page * $__length) . ' , ' . $__length);
 		},
 		'all' => function () use ($__db, $__request, $__user) {
-			return EventsCollection::filter($__db, $__user, array());
+			return EventsCollection::filter($__db, $__user, $__request);
 		},
 		'' => function () use ($__db, $__request, $__user) {
-			return EventsCollection::filter($__db, $__user, array());
+			return EventsCollection::filter($__db, $__user, $__request);
 		},
 	),
 	'POST' => array(
@@ -38,7 +37,7 @@ $__modules['events'] = array(
 		},
 		'favorites' => function () use ($__db, $__request, $__user){
 			$event = new Event($__request['event_id'], $__db);
-			return $__user->addFavoriteEvent($event, $__request['event_date']);
+			return $__user->addFavoriteEvent($event);
 		},
 	),
 	'PUT' => array(

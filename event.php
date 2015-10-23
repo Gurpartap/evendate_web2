@@ -9,11 +9,11 @@
 
 	try {
 		$user = new User($db);
-		$liked_users = $event->getLikedUsers($user);
+		$liked_users = $event->getLikedUsers();
 		$hide_auth_btn = 'hidden';
 	}catch (Exception $e){
 		$user = null;
-		$liked_users = new Result(true, '', array());
+		$liked_users = $event->getLikedUsers();
 		$hide_auth_btn = '';
 	}
 
@@ -231,7 +231,7 @@
 						<?php
 							$_users = $liked_users->getData();
 							foreach($_users as $_user){
-								if ($_user['id'] == $user->getId()) continue;
+								if ($user != null && $_user['id'] == $user->getId()) continue;
 								echo "
 									<div class='liked-users-big'>
 										<div class='liked-user-big'>
