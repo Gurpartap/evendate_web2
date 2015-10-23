@@ -20,23 +20,11 @@ $__modules['organizations'] = array(
 			}
 			return new Result(true, '', $result);
 		},
-		'' => function () use ($__db, $__request, $__user) { /*MY EVENTS!*/
-			$collection = new OrganizationsCollection($__db, $__user);
-			if (isset($__request['with_subscriptions'])){
-				$collection->setUser($__user);
-				return $collection->getUserOrganizations();
-			}else{
-				return $collection->getAllActive();
-			}
+		'' => function () use ($__db, $__request, $__user) {
+			return OrganizationsCollection::filter($__db, $__user, array());
 		},
 		'all' => function () use ($__db, $__request, $__user) {
-			$collection = new OrganizationsCollection($__db, $__user);
-			if (isset($__request['with_subscriptions'])){
-				$collection->setUser($__user);
-				return $collection->getUserOrganizations();
-			}else{
-				return $collection->getAllActive();
-			}
+			return OrganizationsCollection::filter($__db, $__user, array());
 		},
 	)
 );

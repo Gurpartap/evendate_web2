@@ -137,9 +137,16 @@ class Organization {
 
 	public static function normalizeOrganization(array $organization){
 		$organization['id'] = (int) $organization['id'];
-		$organization['type_id'] = (int) $organization['type_id'];
-		$organization['subscribed_count'] = (int) $organization['subscribed_count'];
-		$organization['status'] = isset($organization['status']) ? (boolean) $organization['status'] : true;
+
+		if (isset($organization['type_id'])){
+			$organization['type_id'] = (int) $organization['type_id'];
+		}
+		if (isset($organization['subscribed_count'])){
+			$organization['subscribed_count'] = (int) $organization['subscribed_count'];
+		}
+		if (isset($organization['status'])){
+			$organization['status'] = isset($organization['status']) ? (boolean) $organization['status'] : true;
+		}
 
 		$organization['background_img_url'] = App::$SCHEMA . App::$DOMAIN . '/' . $organization['background_img_url'];
 		$organization['img_url'] = App::$SCHEMA . App::$DOMAIN . '/' . $organization['img_url'];
@@ -155,6 +162,9 @@ class Organization {
 		}
 		if (isset($organization['timestamp_updated_at'])){
 			$organization['timestamp_updated_at'] = intval($organization['timestamp_updated_at']);
+		}
+		if (isset($organization['is_subscribed'])){
+			$organization['is_subscribed'] = $organization['is_subscribed'] == 1;
 		}
 		return $organization;
 	}
@@ -199,7 +209,7 @@ class Organization {
 			'subscription_id' => $subscribe_status['subscription_id'],
 			'subscribed_count' => $this->getSubscribedCount(),
 			'site_url' => $this->getSiteUrl(),
-			'subscribed_friends' => $this->getSubscribedFriends($user)->getData(),
+			'subscribed_friends' => self::getSubscribedFriends($this->db, $user, $this->getId())->getData(),
 
 			'img_url' => $this->getImgUrl(),
 			'img_url_path' => $this->getImgUrl(),
@@ -215,26 +225,31 @@ class Organization {
 		)));
 	}
 
-	private function getSubscribedFriends(User $user) {
-
+	public static function getSubscribedFriends(PDO $db, User $user, $organization_id) {
 		$q_get_subscribed_friends = 'SELECT DISTINCT
 			users.first_name, users.last_name,
-			users.middle_name, users.id, users.avatar_url, view_friends.friend_uid,
-			view_friends.type
-			FROM users
-			 INNER JOIN view_friends ON view_friends.friend_id = users.id
+			users.middle_name, users.id, view_friends.friend_id, users.avatar_url, view_friends.friend_uid,
+			view_friends.type,
+			IF (
+				(SELECT COUNT(view_friends.friend_id) FROM view_friends WHERE view_friends.user_id = :user_id AND view_friends.friend_id = users.id) > 0,
+			1, 0)
+				AS is_friend
+ 			FROM users
 			 INNER JOIN subscriptions ON subscriptions.user_id = users.id
-			 WHERE view_friends.user_id = :user_id
-			 AND subscriptions.organization_id = :organization_id
+			 LEFT JOIN view_friends ON view_friends.friend_id = users.id
+			 WHERE
+			 subscriptions.organization_id = :organization_id
 			 AND subscriptions.status = 1
-			';
-		$p_get_friends = $this->db->prepare($q_get_subscribed_friends);
+			 AND view_friends.friend_id IS NOT NULL
+			GROUP BY view_friends.friend_id
+			ORDER BY is_friend DESC ';
+		$p_get_friends = $db->prepare($q_get_subscribed_friends);
 		$result  = $p_get_friends->execute(array(
 			':user_id' => $user->getId(),
-			':organization_id' => $this->getId()
+			':organization_id' => $organization_id
 		));
 
-		if ($result === FALSE) throw new DBQueryException('CANT_GET_SUBSCRIBED_FRIENDS', $this->db);
+		if ($result === FALSE) throw new DBQueryException('CANT_GET_SUBSCRIBED_FRIENDS', $db);
 
 		$users = $p_get_friends->fetchAll();
 

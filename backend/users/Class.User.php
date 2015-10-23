@@ -250,6 +250,166 @@ class User extends AbstractUser{
 		));
 		if ($result === FALSE) throw new DBQueryException('', $this->db);
 
-		return new Result(true, '', $p_get_friends->fetchAll());
+		$friends = $p_get_friends->fetchAll();
+
+		foreach($friends as &$friend){
+			$friend['link'] = User::getLinkToSocialNetwork($friend['type'], $friend['friend_uid']);
+		}
+
+		return new Result(true, '', $friends);
+	}
+
+	public function getFriendsFeed($page, $length) {
+
+		/*EVENTS*/
+
+		$q_get_stat_events = "
+			(SELECT
+			   event_id,
+			   null as organization_id,
+			   stat_events.stat_type_id,
+			   stat_event_types.type_code,
+			   MAX(stat_events.created_at) as created_at,
+			   tokens.user_id,
+			   users.avatar_url,
+			   users.id,
+			   users.last_name,
+			   users.first_name,
+			   view_friends.friend_uid,
+			   view_friends.type,
+			   tokens.user_id,
+			   stat_event_types.entity,
+			   events.title,
+			   events.image_horizontal,
+			   events.image_vertical,
+			   events.event_end_date,
+			   events.event_start_date,
+			   null as name,
+			   null as short_name,
+			   null as background_img_url,
+			   null as background_medium_img_url,
+			   null as background_small_img_url,
+			   null as img_url,
+			   null as img_small_url,
+			   null as img_medium_url
+			  FROM stat_events
+			    INNER JOIN stat_event_types ON stat_event_types.id = stat_events.stat_type_id
+			    INNER JOIN tokens ON tokens.id = stat_events.token_id
+			    INNER JOIN view_friends ON view_friends.friend_id = tokens.user_id
+			    INNER JOIN events ON stat_events.event_id = events.id
+			    INNER JOIN users ON tokens.user_id = users.id
+			  WHERE
+			    (stat_event_types.type_code = :fave
+			    OR stat_event_types.type_code = :unfave)
+			    AND events.status = 1
+			    AND view_friends.user_id = :user_id
+			  GROUP BY stat_events.event_id, users.id)
+
+			UNION
+			(SELECT
+			   null as event_id,
+			   organization_id,
+			   stat_organizations.stat_type_id,
+			   stat_event_types.type_code,
+			   MAX(stat_organizations.created_at) as created_at,
+			   tokens.user_id,
+			   users.avatar_url,
+			   users.id,
+			   users.last_name,
+			   users.first_name,
+			   view_friends.friend_uid,
+			   view_friends.type,
+			   tokens.user_id,
+			   stat_event_types.entity,
+			   null as title,
+			   null as image_horizontal,
+			   null as image_vertical,
+			   null as event_end_date,
+			   null as event_start_date,
+			  organizations.name,
+			  organizations.short_name,
+			  organizations.background_img_url,
+			  organizations.background_medium_img_url,
+			  organizations.background_small_img_url,
+			  organizations.img_url,
+			  organizations.img_small_url,
+			  organizations.img_medium_url
+			  FROM stat_organizations
+			    INNER JOIN stat_event_types ON stat_event_types.id = stat_organizations.stat_type_id
+			    INNER JOIN tokens ON tokens.id = stat_organizations.token_id
+			    INNER JOIN view_friends ON view_friends.friend_id = tokens.user_id
+			    INNER JOIN organizations ON stat_organizations.organization_id = organizations.id
+			    INNER JOIN users ON tokens.user_id = users.id
+			WHERE
+			  (stat_event_types.type_code = :subscribe
+			    OR stat_event_types.type_code = :unsubscribe)
+			    AND organizations.status = 1
+			    AND view_friends.user_id = :user_id
+			GROUP BY stat_organizations.organization_id, users.id)
+			ORDER BY created_at DESC
+			LIMIT " . ($page * $length) ." , {$length}";
+
+		$prep_arr = array(
+			':fave' => Statistics::EVENT_FAVE,
+			':unfave' => Statistics::EVENT_UNFAVE,
+			':subscribe' => Statistics::ORGANIZATION_SUBSCRIBE,
+			':unsubscribe' => Statistics::ORGANIZATION_UNSUBSCRIBE,
+			':user_id' => $this->getId()
+		);
+
+		$p_get_stat = $this->db->prepare($q_get_stat_events);
+		$result = $p_get_stat->execute($prep_arr);
+
+		if ($result === FALSE) throw new DBQueryException('CANT_GET_FEED', $this->db);
+
+		$stat_events = $p_get_stat->fetchAll();
+
+		$result_array = array();
+
+		foreach($stat_events as $event){
+			$to_push = array(
+				'stat_type_id' => $event['stat_type_id'],
+				'type_code' => $event['type_code'],
+				'entity' => $event['entity'],
+				'created_at' => $event['created_at'],
+				'user' => array(
+					'id' => $event['user_id'],
+					'type' => $event['type'],
+					'friend_uid' => $event['friend_uid'],
+					'avatar_url' => $event['avatar_url'],
+					'first_name' => $event['first_name'],
+					'last_name' => $event['last_name'],
+					'link' => self::getLinkToSocialNetwork($event['type'], $event['friend_uid'])
+				)
+			);
+			if ($event['entity'] == Statistics::ENTITY_EVENT){
+				$_event = EventsCollection::makeImgUrls($event);
+				$_event = array_merge($_event, array(
+					'id' => $event['event_id'],
+					'title' => $event['title'],
+					'image_horizontal' => $event['image_horizontal'],
+					'image_vertical' => $event['image_vertical'],
+					'event_end_date' => $event['event_end_date'],
+					'event_start_date' => $event['event_start_date'],
+				));
+				$to_push['event'] = $_event;
+			}elseif ($event['entity'] == Statistics::ENTITY_ORGANIZATION){
+				$_organization = Organization::normalizeOrganization(array(
+					'id' => $event['organization_id'],
+					'name' => $event['name'],
+					'short_name' => $event['short_name'],
+					'background_img_url' => $event['background_img_url'],
+					'background_medium_img_url' => $event['background_medium_img_url'],
+					'background_small_img_url' => $event['background_small_img_url'],
+					'img_url' => $event['img_url'],
+					'img_small_url' => $event['img_small_url'],
+					'img_medium_url' => $event['img_medium_url']
+				));
+				$to_push['organization'] = $_organization;
+			}
+			$result_array[] = $to_push;
+		}
+
+		return new Result(true, '', $result_array);
 	}
 }

@@ -1,10 +1,10 @@
 <?php
 
 
-if (isset($_SERVER['ENV']) && $_SERVER['ENV'] != 'prod'){
+//if (isset($_SERVER['ENV']) && $_SERVER['ENV'] != 'prod'){
 	ini_set("display_errors", 1);
 	error_reporting(E_ALL);
-}
+//}
 
 	header('Access-Control-Allow-Origin: *');
 	header('Access-Control-Allow-Headers: Authorization');
@@ -26,6 +26,7 @@ try {
 	require_once "../backend/users/Class.User.php";
 	require_once "../backend/users/Class.Editor.php";
 	require_once "../backend/statistics/Class.Statistics.php";
+	require_once "../backend/events/Class.EventsCollection.php";
 
 
 	function __autoload($class_name) {

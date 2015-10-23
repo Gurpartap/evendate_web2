@@ -61,7 +61,9 @@ class EventsCollection{
 					break;
 				}
 				case 'my': {
-					if ($value instanceof User == false) break;
+					if ($value instanceof User == false){
+						$value = $user;
+					}
 					$q_get_events .= ' AND (organizations.id IN (SELECT organization_id FROM subscriptions WHERE
 						subscriptions.user_id = :user_id AND
 						subscriptions.status = 1)) ';
@@ -168,10 +170,10 @@ class EventsCollection{
 						'event_start_date' => $_event['event_start_date'],
 						'event_end_date' => $_event['event_end_date'],
 						'image_vertical' => $_event['image_vertical'],
-						'image_vertical_url' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . $_event['image_vertical'],
-						'image_horizontal' => $_event['image_horizontal'],
-						'image_horizontal_url' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . $_event['image_horizontal']
+						'image_horizontal' => $_event['image_horizontal']
 					);
+
+					$_event = array_merge($_event, self::makeImgUrls($_event));
 				}
 			}
 		}
@@ -197,16 +199,20 @@ class EventsCollection{
 
 		$p_get_liked_users = $db->prepare('SELECT DISTINCT users.first_name, users.last_name,
 			users.middle_name, users.id, users.avatar_url, view_friends.friend_uid,
-			view_friends.type
-			FROM view_friends
-			INNER JOIN users ON users.id = view_friends.friend_id
-			INNER JOIN favorite_events ON favorite_events.user_id = view_friends.friend_id
+			view_friends.type,
+			IF (
+				(SELECT COUNT(view_friends.friend_id) FROM view_friends WHERE view_friends.user_id = :user_id AND view_friends.friend_id = users.id) > 0,
+			1, 0)
+				AS is_friend
+			FROM users
+			INNER JOIN view_friends ON users.id = view_friends.friend_id
+			LEFT JOIN favorite_events ON favorite_events.user_id = view_friends.friend_id
 			WHERE
-				view_friends.user_id = :user_id
-			AND favorite_events.event_id = :event_id
+				favorite_events.event_id = :event_id
 			AND favorite_events.status = 1
 			AND users.show_to_friends = 1
-			AND users.id != :user_id');
+			AND users.id != :user_id
+			GROUP BY users.id');
 
 		foreach($events as &$event){
 			$p_get_is_favorite->execute(array(
@@ -284,10 +290,16 @@ class EventsCollection{
 			}
 
 			$event['is_favorite'] = $p_get_is_favorite->rowCount() > 0;
-			$event['image_vertical_url'] = App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . $event['image_vertical'];
-			$event['image_horizontal_url'] = App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . $event['image_horizontal'];
+			$event = array_merge($event, self::makeImgUrls($event));
 		}
 
 		return new Result(true, '', $events);
+	}
+
+	public static function makeImgUrls(array $event){
+		return array(
+			'image_vertical_url' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . $event['image_vertical'],
+			'image_horizontal_url' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . $event['image_horizontal']
+		);
 	}
 }
