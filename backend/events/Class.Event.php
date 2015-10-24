@@ -429,7 +429,7 @@ class Event{
 			$img_horizontal_filename = md5(self::generateRandomString() . '-horizontal') .  '.' . $data['image_extensions']['horizontal'];
 			$query_data[':image_horizontal'] = $img_horizontal_filename;
 			$q_upd_event .= ' image_horizontal = :image_horizontal,';
-			//self::saveEventImage($data['files']['horizontal'], $img_horizontal_filename);
+			self::saveEventImage($data['files']['horizontal'], $img_horizontal_filename);
 		}
 
 		if (isset($data['image_extensions'])
@@ -438,7 +438,7 @@ class Event{
 			$img_vertical_filename = md5(self::generateRandomString() . '-vertical') .  '.' . $data['image_extensions']['vertical'];
 			$query_data[':image_vertical'] = $img_vertical_filename;
 			$q_upd_event .= ' image_vertical = :image_vertical,';
-			//self::saveEventImage($data['files']['vertical'], $img_vertical_filename);
+			self::saveEventImage($data['files']['vertical'], $img_vertical_filename);
 		}
 
 		$q_upd_event .= ' status = 1 WHERE events.id = :event_id';
