@@ -9,7 +9,7 @@ class TagsCollection{
 	public static function all(PDO $db, User $user = null){
 
 		$res_array = array(
-			'tags' => $db->query('SELECT * FROM tags WHERE status = 1')->fetchAll(),
+			'tags' => $db->query('SELECT * FROM tags WHERE status = 1 ORDER BY tags.name')->fetchAll(),
 			'organizations' => array()
 		);
 
