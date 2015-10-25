@@ -236,13 +236,14 @@ class User extends AbstractUser{
 		return $this->token_id;
 	}
 
-	public function getFriends() {
+	public function getFriends($page, $length) {
 		$q_get_friends = 'SELECT users.first_name, users.last_name, users.avatar_url,
  			view_friends.friend_uid, view_friends.type
  			FROM view_friends
 			 INNER JOIN users ON users.id = view_friends.friend_id
 			WHERE user_id = :user_id
-			GROUP BY friend_id';
+			GROUP BY friend_id
+			LIMIT ' . ($page * $length) . " , {$length}";
 
 		$p_get_friends = $this->db->prepare($q_get_friends);
 		$result = $p_get_friends->execute(array(

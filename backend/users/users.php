@@ -8,8 +8,8 @@ $__modules['users'] = array(
 		'feed' => function () use ($__user, $__page, $__length, $__request) {
 			return $__user->getFriendsFeed($__page, $__length);
 		},
-		'friends' => function () use ($__user) {
-			return $__user->getFriends();
+		'friends' => function () use ($__user, $__page, $__length) {
+			return $__user->getFriends($__page, $__length);
 		},
 		'me' => function () use ($__user) {
 			return $__user->getMainInfo();
