@@ -100,7 +100,7 @@
 			</div>
 			<!-- START row-->
 			<div class="text-center">
-				<div class="event-alone">
+				<div class="event-alone full-height">
 					<div class="left-col">
 						<div class="event-image" style="max-width: 100%; background-image: url('<?= Event::IMAGES_PATH . $event->getImageVertical()?>');" title="<?=$event->getTitle()?>"></div>
 						<div class="event-left-info">
