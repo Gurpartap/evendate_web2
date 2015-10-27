@@ -112,10 +112,6 @@ class User extends AbstractUser{
 		return $this->middle_name;
 	}
 
-	public function subscribe(Organization $organization){
-
-	}
-
 	public function addFavoriteEvent(Event $event){
 		$q_ins_favorite = 'INSERT INTO favorite_events(user_id, event_id, status, created_at)
 			VALUES (:user_id, :event_id, 1, NOW())

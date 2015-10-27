@@ -16,7 +16,7 @@ class SubscriptionsCollection{
 	}
 
 	public function get(){
-		if ($this->user instanceof User == false) throw new InvalidArgumentException('USER_IS_NOT_DEFINED');
+		if (!$this->user) throw new InvalidArgumentException('USER_IS_NOT_DEFINED');
 		$q_get_subscriptions = 'SELECT
 			organizations.*, organization_types.name as organization_type,
 			 subscriptions.organization_id,
@@ -45,7 +45,7 @@ class SubscriptionsCollection{
 		if ($result === FALSE) throw new DBQueryException('QUERY_ERROR',$this->db);
 		$subs = $p_subs->fetchAll();
 		$normalized_subs = array();
-		foreach($subs as &$sub){
+		foreach($subs as $sub){
 			$normalized_subs[] = array(
 				'id' => (int) $sub['subscription_id'],
 				'organization_id' => (int) $sub['organization_id'],
