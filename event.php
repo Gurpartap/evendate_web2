@@ -1,5 +1,6 @@
 <?php
 	require_once 'backend/bin/db.php';
+	require_once 'backend/statistics/Class.Statistics.php';
 	require_once 'backend/bin/Class.Result.php';
 	require_once 'backend/users/Class.AbstractUser.php';
 	require_once 'backend/users/Class.User.php';

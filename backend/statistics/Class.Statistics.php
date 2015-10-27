@@ -36,7 +36,7 @@
 			return $p_get->fetchColumn(0);
 		}
 
-		public static function Event(Event $event, User $user, PDO $db, $type){
+		public static function Event(Event $event, User $user = null, PDO $db, $type){
 			try {
 				$type_id = self::getTypeId(self::ENTITY_EVENT, $type, $db);
 			}catch(Exception $e){
@@ -48,12 +48,12 @@
 			$p_ins = $db->prepare($q_ins_event);
 			$p_ins->execute(array(
 				':event_id' => $event->getId(),
-				':token_id' => $user->getTokenId(),
+				':token_id' => $user ? $user->getTokenId() : null,
 				':stat_type_id' => $type_id
 			));
 		}
 
-		public static function Organization(Organization $organization, User $user, PDO $db, $type){
+		public static function Organization(Organization $organization, User $user = null, PDO $db, $type){
 			try {
 				$type_id = self::getTypeId(self::ENTITY_ORGANIZATION, $type, $db);
 			}catch(Exception $e){
@@ -65,13 +65,13 @@
 			$p_ins = $db->prepare($q_ins_event);
 			$p_ins->execute(array(
 				':organization_id' => $organization->getId(),
-				':token_id' => $user->getTokenId(),
+				':token_id' => $user ? $user->getTokenId() : null,
 				':stat_type_id' => $type_id
 			));
 		}
 
 
-		public static function StoreBatch(array $events, User $user, PDO $db){
+		public static function StoreBatch(array $events, User $user = null, PDO $db){
 			foreach ($events as $event){
 				switch($event['entity_type']){
 					case self::ENTITY_EVENT: {
