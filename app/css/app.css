@@ -8014,9 +8014,12 @@ border-bottom-right-radius: 8px;
 }
 .liked-users{
   cursor: pointer;
-  float: left;
   margin-right: 10px;
   margin-left: 35px;
+}
+
+.modal .liked-users{
+  float: left;
 }
 
 .in-modal .liked-users-count{
@@ -8024,6 +8027,7 @@ border-bottom-right-radius: 8px;
 }
 .liked-users-count{
   padding-top: 9px;
+  padding-left: 29%;
 }
 
 .organization-modal .modal-content{
@@ -8659,6 +8663,9 @@ span.organization-modal-header-text{
   #month-name{
     font-size: 14px;
   }
+  .liked-users-count{
+    padding-left: 29%;
+  }
 }
 
 @media screen and (min-width: 1440px) {
@@ -8685,6 +8692,9 @@ span.organization-modal-header-text{
   }
   #month-name{
     font-size: 17px;
+  }
+  .liked-users-count{
+    padding-left: 70px;
   }
 }
 
