@@ -211,12 +211,12 @@
 								</span>
 							</div>
 							<div class="col-xs-5 external-link-wrapper">
-								<a href="<?=$event->getDetailInfoUrl()?>" target="_blank"><i class="fa fa-external-link"></i> Подробнее</a>
+								<a title="Перейти на страницу мероприятия" href="<?=$event->getDetailInfoUrl()?>" target="_blank"><i class="fa fa-external-link"></i> Подробнее</a>
 							</div>
 						</div>
 					</div><div class="right-col">
 						<div class="organization-logo-wrapper pull-right">
-							<img src="<?=$event->getOrganization()->getImgUrl();?>" title="<?=$event->getOrganization()->getName()?>">
+							<img title="<?=htmlspecialchars($event->getTitle())?>" src="<?=$event->getOrganization()->getImgUrl();?>" title="<?=$event->getOrganization()->getName()?>">
 						</div>
 						<div class="liked-users-big-count">
 							Добавили в избранное:

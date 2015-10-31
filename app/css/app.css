@@ -8776,7 +8776,7 @@ span.organization-modal-header-text{
   margin-right: 17px;
 }
 .dropdown-menu .user-info-block{
-  padding-top: 0px;
+  padding-top: 0;
 }
 .user-info-block{
   padding-top: 8px;
@@ -8819,5 +8819,21 @@ span.organization-modal-header-text{
 
 .event-alone.full-height{
   height: auto;
-  box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.50);
+  box-shadow: 0 1px 4px 0 rgba(0,0,0,0.50);
+}
+.no-border{
+  border: 0 !important;
+}
+
+.no-max-width{
+  max-width: none !important;
+  margin-right: 0 !important;
+}
+
+.event-title > a{
+  color: #4A4A4A;
+}
+
+.event-title > a:visited{
+  color: #4A4A4A;
 }

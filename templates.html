@@ -9,7 +9,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-organizations-item">
-  <div class="row organizations-item animated organization-{id}" data-organization-id="{id}">
+  <div class="row organizations-item animated organization-{id}" title="{name}" data-organization-id="{id}">
     <div class="organizations-item-wrapper">
       <div class="organization-img-wrapper">
         <img src="{img_url}" title="{name}">
@@ -42,7 +42,7 @@
               <div class="col-xs-12 liked-users-wrapper">
                 {subscribed_friends}
                 <div class="subscribe-btn-wrapper">
-                  <button class="btn modal-subscribe-btn {subscribe_btn_class} pull-right" data-subscription-id="{subscription_id}" data-organization-id="{id}">
+                  <button title="{subscribe_btn_text}" class="btn modal-subscribe-btn {subscribe_btn_class} pull-right" data-subscription-id="{subscription_id}" data-organization-id="{id}">
                     {subscribe_btn_text}
                   </button>
                 </div>
@@ -51,7 +51,7 @@
                 {description}
               </div>
               <div class="description-text">
-                <a href="{site_url}" target="_blank"><i class="fa fa-external-link"></i> {site_url_short}</a>
+                <a href="{site_url}" target="_blank" title="Перейти на официальный сайт организации"><i class="fa fa-external-link"></i> {site_url_short}</a>
               </div>
               <div class="liked-users-count"></div>
             </div>
@@ -105,7 +105,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-subscribed-users-row">
-  <div class="liked-users row">
+  <div class="liked-users row" title="Список подписчиков на организацию">
     <div class="organization-subscribed-count">{subscribed_count} {subscribed_count_text}</div>
   </div>
 </script>
@@ -119,11 +119,11 @@
 <script type="javascript/template" id="tmpl-short-event">
   <div class="col-xs-12 short-event" data-event-id="{id}">
     <div class="event-image-circle">
-      <img src="{image_vertical_url}">
+      <img src="{image_vertical_url}" title="{title}">
     </div>
     <div class="event-info">
       <div class="event-name">
-        {title}
+        <a href="event.php?id={id}" target="_blank">{title}</a>
       </div>
       <div class="event-attributes">
                    <span class="event-attribute-first">
@@ -176,7 +176,9 @@
   <div class="tl-panel-block closed event-{id}-{date}" data-event-id="{id}" data-date="{date}">
     <div class="row">
       <div class="col-xs-9">
-        <div class="event-title">{title} <a href="#"  data-event-id="{id}" class="btn btn-edit {can_edit_hidden}"><i class="icon-pencil"></i></a></div>
+        <div class="event-title">
+          <a href="event.php?id={id}" target="_blank">{title}</a>
+          <a href="#"  data-event-id="{id}" class="btn btn-edit {can_edit_hidden}"><i class="icon-pencil"></i></a></div>
         <div class="row row-attributes">
           <div class="even-attrs col-xs-6">
             <div class="col-xs-12"><i class="fa fa-clock-o"></i> {dates}, {time}</div>
@@ -508,7 +510,9 @@
   <div class="tl-panel-block event-{id}-{date}" data-event-id="{id}" data-date="{date}">
     <div class="row">
       <div class="col-xs-9">
-        <div class="event-title">{title} </div>
+        <div class="event-title">
+          <a href="event.php?id={id}" target="_blank">{title}</a>
+        </div>
         <div class="even-attrs col-xs-6">
           <div class="col-xs-12"><i class="fa fa-clock-o"></i> {dates}, {time}</div>
           <div class="col-xs-12"><i class="fa fa-map-marker"></i> {location}</div>
@@ -603,7 +607,9 @@
     </div>
     <div class="middle-col">
       <button type="button" class="close" aria-label="Закрыть"><span aria-hidden="true">×</span></button>
-      <div class="event-title">{title}</div>
+      <div class="event-title">
+        <a href="event.php?id={id}" target="_blank">{title}</a>
+      </div>
       <div class="event-description">{description}</div>
       <div class="external-link-wrapper">
         <a href="{detail_info_url}" target="_blank"><i class="fa fa-external-link"></i> Подробнее</a>
