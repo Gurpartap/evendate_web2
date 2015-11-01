@@ -8830,10 +8830,10 @@ span.organization-modal-header-text{
   margin-right: 0 !important;
 }
 
-.event-title > a{
+.event-title > a, .event-name > a{
   color: #4A4A4A;
 }
 
-.event-title > a:visited{
+.event-title > a:visited, .event-name > a{
   color: #4A4A4A;
 }
