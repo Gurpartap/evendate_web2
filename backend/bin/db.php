@@ -16,4 +16,8 @@
 	$db->exec("SET GLOBAL general_log = 1;");
 	$db->exec("SET GLOBAL time_zone = '+4:00';");
 	$db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+	if ($_SERVER['ENV'] == 'dev' || $_SERVER['ENV'] == 'local'){
+		$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	}
 	$__db = $db;

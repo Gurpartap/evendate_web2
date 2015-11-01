@@ -256,7 +256,7 @@
    <!-- INPUTMASKS -->
    <script src="vendor/pace/pace.min.js"></script>
    <!-- SELECT2 -->
-   <script src="vendor/select2/js/select2.full.min.js"></script>
+   <script src="vendor/select2/js/select2.full.js"></script>
    <!-- HISTORY API -->
    <script src="vendor/history/jquery.history.js"></script>
    <!-- NOTIFICATIONS API -->

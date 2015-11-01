@@ -94,7 +94,7 @@ class Event{
 		$data['latitude'] = isset($data['geo']['coordinates']['G']) ? $data['geo']['coordinates']['G'] : null;
 		$data['longitude'] = isset($data['geo']['coordinates']['K']) ? $data['geo']['coordinates']['K'] : null;
 
-
+		if ($data['date-start'] == null && $data['date-end'] == null && count($data['dates']) == 0) throw new LogicException('Отсутствует дата события');
 		if (!isset($data['tags'])) throw new LogicException('Укажите хотя бы один тег');
 		if (!is_array($data['tags'])) throw new LogicException('Укажите хотя бы один тег');
 
@@ -130,6 +130,11 @@ class Event{
 
 		self::saveEventTags($db, $event_id, $data['tags']);
 
+
+		if (isset($data['dates']) && count($data['dates']) > 0){
+			self::saveDates($data['dates'], $db, $event_id);
+		}
+
 		self::saveEventImage($data['files']['horizontal'], $img_horizontal_filename);
 		self::saveEventImage($data['files']['vertical'], $img_vertical_filename);
 
@@ -164,6 +169,12 @@ class Event{
 		return new Result(true, '', $p_get_event_types->fetchAll());
 	}
 
+	private static function mb_ucfirst($str) {
+		$str = mb_strtolower($str);
+		$fc = mb_strtoupper(mb_substr($str, 0, 1));
+		return $fc.mb_substr($str, 1);
+	}
+
 	private static function saveEventTags(PDO $db, $event_id, array $tags) {
 		$p_upd = $db->prepare('UPDATE events_tags SET status = 0 WHERE event_id = :event_id');
 		$p_upd->execute(array(':event_id' => $event_id));
@@ -171,14 +182,46 @@ class Event{
 		$q_ins_tags = 'INSERT INTO events_tags(event_id, tag_id, created_at, status)
 			VALUES(:event_id, :tag_id, NOW(), 1) ON DUPLICATE KEY UPDATE status = 1';
 		$p_ins_tags = $db->prepare($q_ins_tags);
+
+		$q_ins_tag = 'INSERT INTO tags(name, created_at, status)
+			VALUES(:name, NOW(), 1) ON DUPLICATE KEY UPDATE status = 1';
+		$p_ins_tag = $db->prepare($q_ins_tag);
 		$inserted_count = 0;
-		foreach($tags as $tag_id){
-			if ($inserted_count == 5) break;
+
+
+		foreach($tags as $tag){
+			if (is_numeric($tag)){
+				$tag_id = $tag;
+			}else{
+				$tag = preg_replace('/\s+/', ' ', self::mb_ucfirst($tag));
+				$p_ins_tag->execute(array(
+					':name' => $tag
+				));
+				$tag_id = $db->lastInsertId();
+			}
+
+			if ($inserted_count == self::TAGS_LIMIT) break;
 			$p_ins_tags->execute(array(
 				':event_id' => $event_id,
 				':tag_id' => $tag_id
 			));
 			$inserted_count++;
+		}
+	}
+
+	private static function saveDates($dates, PDO $db, $event_id) {
+
+		$p_set_inactive = $db->prepare('UPDATE events_dates SET status = 0 WHERE event_id = :event_id');
+		$p_set_inactive->execute(array(':event_id' => $event_id));
+
+		foreach($dates as $date){
+			$q_ins_dates = 'INSERT INTO events_dates(event_date, status, created_at, event_id)
+			VALUES(:event_date, 1, NOW(), :event_id)';
+			$p_ins_dates = $db->prepare($q_ins_dates);
+			$p_ins_dates->execute(array(
+				':event_date' => $date,
+				':event_id' => $event_id
+			));
 		}
 	}
 
@@ -393,6 +436,10 @@ class Event{
 		$data['latitude'] = isset($data['geo']['coordinates']['G']) ? $data['geo']['coordinates']['G'] : null;
 		$data['longitude'] = isset($data['geo']['coordinates']['K']) ? $data['geo']['coordinates']['K'] : null;
 
+		if ($data['date-start'] == null && $data['date-end'] == null && count($data['dates']) == 0){
+			throw new LogicException('Отсутствует дата события');
+		}
+
 		if (isset($data['file_names'])){
 			$data['image_extensions'] = array(
 				'vertical' => $editor->getImageExtension($data['file_names']['vertical']),
@@ -448,6 +495,11 @@ class Event{
 
 		if ($result === FALSE) throw new DBQueryException(implode(';', $this->db->errorInfo()), $this->db);
 		self::saveEventTags($this->db, $this->getId(), $data['tags']);
+
+
+		if (isset($data['dates']) && count($data['dates']) > 0){
+			self::saveDates($data['dates'], $this->db, $this->getId());
+		}
 
 		return new Result(true, 'Событие успешно сохранено!');
 	}

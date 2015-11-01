@@ -152,6 +152,9 @@ try {
 
 
 }catch(Exception $e){
+	if ($_SERVER['ENV'] == 'local'){
+		print_r($e);
+	}
 	$__result = new Result(false, 'Ошибка! '. $e->getMessage());
 	$__result->setFormat($format);
 	if (isset($p_ins_req) && isset($ins_data)){
