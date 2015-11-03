@@ -19,10 +19,7 @@ var BACKSPACE_CODE = 8,
 	_location = null,
 	$text_length = $('.textarea-length-text');
 
-
-
-var daterange_settings =
-{
+var daterange_settings = {
 	singleDatePicker: true,
 	locale: {
 		format: 'DD/MM/YYYY',
@@ -32,12 +29,13 @@ var daterange_settings =
 		daysOfWeek: [
 			'Вс', 'Пн','Вт','Ср','Чт','Пт','Сб'
 		],
+		rightDaysOfWeek: ['Пн','Вт','Ср','Чт','Пт','Сб', 'Вс'],
 		monthNames: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
 	},
 	startDate: moment(),
 	endDate: moment(),
 	minDate: moment(),
-	maxDate: moment().add(3, 'months'),
+	maxDate: moment().add(6, 'months'),
 	applyClass: 'btn-pink',
 	cancelClass: 'btn-pink-empty'
 };
@@ -50,14 +48,205 @@ function showNotifier(response){
 	});
 }
 
+
+function updateInputText($el){
+	var daterangepicker = $el.data('daterangepicker');
+	if (daterangepicker.singleDatePicker){
+		var dates = $el.data('dates'),
+			_dates_array = [],
+			text = '';
+		if (dates){
+			dates.forEach(function(date){
+				date = moment(date);
+				_dates_array.push(date.format('DD/MM'));
+			});
+			text = _dates_array.join(', ')
+		}
+	}else{
+
+	}
+	$el.val(text);
+}
+
+function initDayChooserCalendar(month, $el){
+
+	var _now = new Date(),
+		current_month = moment(),
+		today_date = current_month.format('YYYY-MM-DD'),
+		old_dates = $el.data('dates');
+
+	function getDay(m_day, classes){
+		var is_disabled, is_today, day_format = m_day.format('YYYY-MM-DD'),
+			_dates = $el.data('dates'), is_active;
+		is_disabled = m_day._d < _now ? 'disabled': '';
+		is_today = day_format == today_date ? 'today' : '';
+		is_active = _dates && _dates.indexOf(day_format) != -1 ? __C.CLASSES.ACTIVE : '';
+		return '<td data-date="' + day_format + '" class="day ' + ['week-day-' + m_day.day(),day_format, is_active, is_disabled, is_today, classes].join(' ') + '">' + m_day.date() + '</td>';
+	}
+
+	function generateHead(moment_month){
+		var _head = '<thead><tr>',
+			month_name = moment_month.format('MMMM YYYY').capitalize();
+
+		if (moment_month.startOf('month') > current_month.startOf('month')){
+			_head += '<th class="prev available"><i class="fa fa-chevron-left glyphicon glyphicon-chevron-left"></i></th>';
+		}else{
+			_head += '<th></th>';
+		}
+
+		_head += '<th colspan="5" class="month">' + month_name + '</th>';
+
+		if (moment_month.startOf('month') <= current_month.startOf('month').add(6, 'months')){
+			_head += '<th class="next available"><i class="fa fa-chevron-right glyphicon glyphicon-chevron-right"></i></th>';
+		}else{
+			_head += '<th></th>';
+		}
+
+		_head += '<tr>';
+		daterange_settings.locale.rightDaysOfWeek.forEach(function(name, index){
+			_head += '<th class="day-title" data-week-day="' + index +'">' + name + '</th>';
+		});
+		_head += '</tr></thead>';
+
+		return _head;
+	}
+
+	function generateBody(days){
+		var rows = [],
+			one_row = [];
+		days.forEach(function(day){
+			one_row.push(day);
+			if (one_row.length == 7){
+				rows.push('<tr>' + one_row.join('') + '</tr>');
+				one_row = [];
+			}
+		});
+		return rows.join('');
+	}
+
+	function createCalendar(type, moment_first_day){
+		moment_first_day = moment_first_day.startOf('month');
+
+		var reference_moment = moment_first_day.clone(),
+			start_month = moment_first_day.clone(),
+			days_in_month = moment_first_day.daysInMonth(),
+			days = [];
+		for(var k = 0; k < days_in_month; k++){
+			days.push(getDay(moment_first_day));
+			moment_first_day.add(1, 'days');
+		}
+		moment_first_day.add(-1, 'days'); // back to start month
+
+		do{
+			moment_first_day.add(1, 'days');
+			days.push(getDay(moment_first_day, 'next-month'));
+		}while(moment_first_day.day() != 0)
+
+		while(start_month.day() != 1){
+			start_month.add(-1, 'days');
+			days.unshift(getDay(start_month, 'prev-month'));
+		}
+
+		var _footer = '';
+
+		if (type == 'right'){
+			_footer = '<div class="ranges pull-right">' +
+				'<div class="range_inputs">' +
+				'<button class="applySingleBtn btn btn-sm btn-pink" type="button">Выбрать</button>' +
+				'<button class="cancelSingleBtn btn btn-sm btn-pink-empty" type="button">Отмена</button>' +
+				'</div>' +
+				'</div>';
+		}
+
+		return '<div class="calendar no-max-width ' + type + '" data-month=' + reference_moment.format('YYYY-MM-DD') +'><div class="calendar-table no-border">' +
+			'<table class="table-condensed">' +
+				generateHead(reference_moment) +
+			generateBody(days) +
+			'</table>' +
+			'</div>'
+				+ _footer +
+			'</div>';
+	}
+
+
+	function bindCalendarEvents($calendar){
+
+		var daterangepicker = $el.data('daterangepicker');
+
+		$calendar.find('.day').off('click').on('click', function(){
+			var $this = $(this);
+			if ($this.hasClass(__C.CLASSES.DISABLED) == false){
+				$this.toggleClass(__C.CLASSES.ACTIVE);
+			}
+			var dates = $el.data('dates'),
+				_date = $this.data('date');
+			if (!dates){
+				dates = [];
+			}
+			if ($this.hasClass(__C.CLASSES.ACTIVE)){
+				dates.push(_date);
+			}else{
+				dates.splice(dates.indexOf(_date), 1);
+			}
+			$el.data('dates', dates);
+
+			updateInputText($el);
+
+		});
+		$calendar.find('.day-title').off('click').on('click', function(){
+			var $this = $(this);
+			$this.parents('.calendar').find('.week-day-' + $this.data('week-day')+ ':not(.next-month,.prev-month,.disabled)').click();
+		});
+		$calendar.find('.next').off('click').on('click', function(){
+			debugger;
+			initDayChooserCalendar(month, $el);
+		});
+		$calendar.find('.prev').off('click').on('click', function(){
+			initDayChooserCalendar(month.add(-2, 'months'), $el);
+		});
+
+
+		$('.applySingleBtn').off('click').on('click', function(){
+			daterangepicker.hide();
+
+		});
+
+		$('.cancelSingleBtn').off('click').on('click', function(){
+			daterangepicker.hide()
+		});
+	}
+
+
+	if (month == null){
+		month = moment();
+	}
+
+	var $calendar = $(createCalendar('right', month)),
+		$picker = $('.daterangepicker');
+
+	$picker.find('.calendar').remove();
+	$picker.append($calendar);
+	bindCalendarEvents($calendar);
+	updateInputText($el);
+}
+
 function bindDatepickerChanger(){
-	$('.change-date-range-type').on('click', function(){
-		var $this = $(this);
-		$this.siblings('btn').removeClass('btn-pink').addClass('btn-pink-empty');
-		$this.addClass('btn-pink').removeClass('btn-pink-empty');
+	$('.change-date-range-type').off('click').on('click', function(){
+		var $this = $(this),
+			$input = $('input.daterange');
 		daterange_settings.singleDatePicker = $this.data('single-date');
-		$('input.daterange').daterangepicker(daterange_settings).click();
+
+		$input.data('single-date', daterange_settings.singleDatePicker);
+
+		if (daterange_settings.singleDatePicker){
+			$input.daterangepicker(daterange_settings).click();
+			initDayChooserCalendar(null, $input);
+		}else{
+			$input.daterangepicker(daterange_settings).click();
+		}
 		bindDatepickerChanger();
+		$('.change-date-range-type[data-single-date="' + daterange_settings.singleDatePicker + '"]').addClass('btn-pink').removeClass('btn-pink-empty');
+		$('.change-date-range-type[data-single-date="' + !daterange_settings.singleDatePicker + '"]').removeClass('btn-pink').addClass('btn-pink-empty');
 	});
 }
 
@@ -96,19 +285,24 @@ function bindModalEvents(){
 				dragCrop: true,
 				movable: true,
 				rotatable: true,
-				zoomable: false,
+				zoomable: true,
 				touchDragZoom: true,
 				mouseWheelZoom: true,
 				cropBoxMovable: true,
 				cropBoxResizable: true,
 				doubleClickToggle: true,
 
+				wheelZoomRatio: 0.05,
 				minCanvasWidth: 400,
 				minCanvasHeight: 600,
 				minCropBoxWidth: 400,
 				minCropBoxHeight: 600,
 				minContainerWidth: 400,
 				minContainerHeight: 600,
+
+				zoom: function(a, b, c){
+					console.log(a, b, c);
+				},
 
 				aspectRatio: aspect_ratio,
 				preview: '.img-preview'
@@ -198,18 +392,34 @@ function bindModalEvents(){
 		}
 	});
 	$('.tags.to-select2').select2({
+		tags: true,
 		placeholder: "Выберите до 5 тегов",
 		//width: '100%',
 		maximumSelectionLength: 5,
 		multiple: true,
-		createSearchChoice: function() {
-			return null;
+		ajax: {
+			url: '/api/tags/search',
+			dataType: 'JSON',
+			processResults: function(data) {
+				var _data = [];
+				data.data.forEach(function(value){
+					value.text = value.name;
+					_data.push(value);
+				});
+				return {
+					results: _data
+				}
+			}
 		}
 	});
 
 	$('.to-select2.tags').siblings('.select2').find('input').css('width', '100%');
 
-	$('input.daterange').daterangepicker(daterange_settings);
+	var $range_input = $('input.daterange'),
+		$date_range = $range_input.on('keydown', function(e){
+			e.preventDefault();
+			return false;
+		}).daterangepicker(daterange_settings);
 	bindDatepickerChanger();
 
 	function timeKeyup(e){
@@ -259,7 +469,6 @@ function bindModalEvents(){
 	$('#filestyle-0').on('change', handleFileSelect);
 	$('#filestyle-1').on('change', handleFileSelect);
 
-
 	$(".placepicker").placepicker({
 		placeChanged: function(e){
 			_location = {
@@ -295,8 +504,15 @@ function bindModalEvents(){
 			if ($input.attr('type') == 'checkbox') {
 				send_data[$input.attr('name')] = $input.is(':checked');
 			}else if ($input.hasClass('daterange')){
-				send_data[$input.attr('name') + '-start'] = $input.data('daterangepicker').startDate.format('YYYY-MM-DD');
-				send_data[$input.attr('name') + '-end'] = $input.data('daterangepicker').endDate.format('YYYY-MM-DD');
+				if ($input.data('single-date')){
+					send_data['dates'] = $input.data('dates');
+					send_data[$input.attr('name') + '-start'] = null;
+					send_data[$input.attr('name') + '-end'] = null;
+				}else{
+					send_data['dates'] = null;
+					send_data[$input.attr('name') + '-start'] = $input.data('daterangepicker').startDate.format('YYYY-MM-DD');
+					send_data[$input.attr('name') + '-end'] = $input.data('daterangepicker').endDate.format('YYYY-MM-DD');
+				}
 			}else{
 				send_data[$input.attr('name')] = $input.val();
 			}
@@ -325,6 +541,13 @@ function bindModalEvents(){
 			showNotifier({status: false, text: 'Укажите адрес события'});
 			to_send_flag = false;
 		}
+
+		if ((send_data['dates'] != null && send_data['dates'].length == 0) && (send_data['date-start'] == null || send_data['date-start'] == null)){
+			showNotifier({status: false, text: 'Укажите дату события'});
+			to_send_flag = false;
+		}
+
+		console.log(send_data);
 
 
 		if (to_send_flag == false) return false;
@@ -356,7 +579,7 @@ function bindModalEvents(){
 					showNotifier(res);
 				}
 			}
-		})
+		});
 	});
 }
 
@@ -364,12 +587,8 @@ function showAddEventModal(callback){
 	$.ajax({
 		url: 'api/tags/all',
 		success: function(res){
-			var _tag_options = $('<optgroup></optgroup>'),
-				_organizations_options = $('<optgroup></optgroup>'),
+			var _organizations_options = $('<optgroup></optgroup>'),
 				hidden_organizations = '';
-			res.data.tags.forEach(function(tag){
-				_tag_options.append(tmpl('tag-option',tag));
-			});
 
 			if (res.data.organizations.length > 1){
 				res.data.organizations.forEach(function(organization){
@@ -386,7 +605,6 @@ function showAddEventModal(callback){
 
 			$modal.remove();
 			$modal = tmpl('add-event-modal', {
-				tags: _tag_options,
 				organizations: _organizations_options,
 				hidden_organizations: hidden_organizations
 			});
@@ -453,15 +671,22 @@ function showEditEventModal(event_id){
 				}
 
 				var start_date = moment(_event.event_start_date),
-					end_date = moment(_event.event_end_date);
+					end_date = moment(_event.event_end_date),
+					is_single = start_date.format(__C.DATE_FORMAT) == end_date.format(__C.DATE_FORMAT) || _event.event_start_date == null || _event.event_end_date == null,
+					$input = $('input.daterange')
 
-				$('input.daterange')
+				$input
+					.data('dates', _event.dates_range)
+					.data('single-date', is_single)
 					.daterangepicker($.extend(daterange_settings, {
-						singleDatePicker: start_date.format(__C.DATE_FORMAT) == end_date.format(__C.DATE_FORMAT),
-						startDate: start_date,
-						endDate: end_date
-					}, true));
+						singleDatePicker: is_single,
+						startDate: _event.event_start_date == null ? null : start_date,
+						endDate: _event.event_end_date == null ? null :  end_date
+					}));
+
 				bindDatepickerChanger();
+
+				updateInputText($input);
 
 				$modal
 					.find('.create-event-btn')
@@ -482,7 +707,6 @@ function showEditEventModal(event_id){
 
 				try{
 					var notifications = JSON.parse(_event.notifications_schema_json);
-					debugger;
 					$.each(notifications, function(key, value){
 						$modal.find('[name="' + key + '"]')
 							.prop('checked', value);
@@ -501,11 +725,12 @@ function showEditEventModal(event_id){
 
 				var selected_tags = [];
 				_event.tags.forEach(function(tag){
-					selected_tags.push(tag.id);
+					selected_tags.push(tag.name);
 				});
 				$modal
 					.find('.to-select2.tags')
-					.select2('val', selected_tags);
+					.select2('val', selected_tags)
+					.siblings('.select2').find('input').css('width', '100%');
 			})
 		}
 	})

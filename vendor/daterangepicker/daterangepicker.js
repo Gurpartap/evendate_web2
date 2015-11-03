@@ -102,10 +102,10 @@
             options.template = '<div class="daterangepicker dropdown-menu">'
                 +'<div class="col-xs-12 text-center" style="float: initial;"><div data-toggle="buttons" class="btn-group">' +
                 '<label class="btn ' + one_date_classes + ' change-date-range-type" data-single-date="true">' +
-                '<input id="option1" type="radio" name="options" checked="">Один день' +
+                '<input id="option1" type="radio" name="options" checked="">Выбор дней' +
                 '</label>' +
                 '<label class="btn ' + multidate_btn_classes + ' change-date-range-type" data-single-date="false">' +
-                '<input id="option3" type="radio" name="options">Несколько дней' +
+                '<input id="option3" type="radio" name="options">Выбор интервала' +
                 '</label>' +
                 '</div>' +
                 '</div>' +
@@ -423,13 +423,14 @@
         // if attached to a text input, set the initial value
         //
 
-        if (this.element.is('input') && !this.singleDatePicker) {
+        if (this.element.is('input') && !this.singleDatePicker && !this.element.data('single-date')) {
             this.element.val(this.startDate.format(this.locale.format) + this.locale.separator + this.endDate.format(this.locale.format));
             this.element.trigger('change');
-        } else if (this.element.is('input')) {
-            this.element.val(this.startDate.format(this.locale.format));
-            this.element.trigger('change');
         }
+        //else if (this.element.is('input')) {
+        //    this.element.val(this.startDate.format(this.locale.format));
+        //    this.element.trigger('change');
+        //}
 
     };
 
@@ -925,6 +926,7 @@
         },
 
         updateFormInputs: function() {
+            if (this.singleDatePicker) return;
             this.container.find('input[name=daterangepicker_start]').val(this.startDate.format(this.locale.format));
             if (this.endDate)
                 this.container.find('input[name=daterangepicker_end]').val(this.endDate.format(this.locale.format));
@@ -1017,29 +1019,34 @@
             this.move();
             this.element.trigger('show.daterangepicker', this);
             this.isShowing = true;
+            if (this.singleDatePicker){
+                $('.change-date-range-type:first').click();
+            }
+
         },
 
         hide: function(e) {
             if (!this.isShowing) return;
 
             //incomplete date selection, revert to last values
-            if (!this.endDate) {
+            if (!this.singleDatePicker && !this.endDate) {
                 this.startDate = this.oldStartDate.clone();
                 this.endDate = this.oldEndDate.clone();
             }
 
             //if a new date range was selected, invoke the user callback function
-            if (!this.startDate.isSame(this.oldStartDate) || !this.endDate.isSame(this.oldEndDate))
-                this.callback(this.startDate, this.endDate, this.chosenLabel);
+            //if (!this.startDate.isSame(this.oldStartDate) || !this.endDate.isSame(this.oldEndDate))
+            //    this.callback(this.startDate, this.endDate, this.chosenLabel);
 
             //if picker is attached to a text input, update it
-            if (this.element.is('input') && !this.singleDatePicker) {
+            if (this.element.is('input') && !this.singleDatePicker && !this.element.data('single-date')) {
                 this.element.val(this.startDate.format(this.locale.format) + this.locale.separator + this.endDate.format(this.locale.format));
                 this.element.trigger('change');
-            } else if (this.element.is('input')) {
-                this.element.val(this.startDate.format(this.locale.format));
-                this.element.trigger('change');
             }
+            //else if (this.element.is('input')) {
+            //    this.element.val(this.startDate.format(this.locale.format));
+            //    this.element.trigger('change');
+            //}
 
             $(document).off('.daterangepicker');
             this.container.hide();
@@ -1205,9 +1212,9 @@
 
             if (this.singleDatePicker) {
                 this.setEndDate(this.startDate);
-                if (!this.timePicker)
-                    this.clickApply();
             }
+
+
 
             this.updateView();
 
@@ -1365,7 +1372,7 @@
         remove: function() {
             this.container.remove();
             this.element.off('.daterangepicker');
-            this.element.removeData();
+            //this.element.removeData();
         }
 
     };
