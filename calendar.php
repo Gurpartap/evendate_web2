@@ -58,7 +58,7 @@
 		   <div class="aside-inner">
 			   <nav data-sidebar-anyclick-close="" class="sidebar">
                    <div class="brand-name">
-                       <div class="logo"><a title="" href="#"><img src="app/img/logo_500.png"> Evendate</a></div>
+                       <div class="logo"><a title="Перейти к моей ленте" href="/timeline"><img src="app/img/logo_500.png"> Evendate</a></div>
                    </div>
                    <!-- END user info-->
 				   <ul class="nav">

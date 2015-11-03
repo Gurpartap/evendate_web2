@@ -8082,6 +8082,7 @@ border-bottom-right-radius: 8px;
 
 .organization-modal .organization-info .description-text{
   padding-left: 35px;
+  padding-right: 25px;
 }
 
 .organization-modal .organization-info .description{
@@ -8181,6 +8182,10 @@ border-bottom-right-radius: 8px;
 }
 .social-links .fa-twitter{
   background-color: #55ACEE;
+}
+
+.social-links i:last-child{
+  margin-right: 0!important;
 }
 .external-link-wrapper{
   cursor: pointer;
@@ -8470,6 +8475,7 @@ span.organization-modal-header-text{
 .event-description{
   text-align: left ;
   padding-top: 15px;
+  white-space: pre-line !important;
 }
 .event-alone .tags{
   text-align: left ;
@@ -8836,4 +8842,8 @@ span.organization-modal-header-text{
 
 .event-title > a:visited, .event-name > a{
   color: #4A4A4A;
+}
+
+.short-event.active .event-name > a{
+  color: #fff !important;
 }

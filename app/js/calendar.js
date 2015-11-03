@@ -104,9 +104,22 @@ function generateEventAttributes(event){
 		? moment(event.event_start_date).format(__C.DATE_FORMAT)
 		: moment(event.dates_range[0]).format(__C.DATE_FORMAT);
 	event.tags_text = getTagsString(event.tags);
+
 	event.begin_time = moment(event.begin_time, 'HH:mm:ss').format('HH:mm');
-	event.end_time = moment(event.end_time, 'HH:mm:ss').format('HH:mm');
-	event.time = event.begin_time == '00:00' && event.end_time == '00:00' ? ' Весь день': event.begin_time + ' - ' + event.end_time;
+
+	if (event.end_time == null){
+		event.time = event.begin_time;
+	}else{
+		event.end_time = moment(event.end_time, 'HH:mm:ss').format('HH:mm');
+		if (event.begin_time == '00:00' && event.end_time == '00:00'){
+			event.time = ' Весь день';
+		}else{
+			event.time = event.begin_time + ' - ' + event.end_time;
+		}
+	}
+
+
+
 	event.begin_time_for_timeline = event.begin_time == '00:00' && event.end_time == '00:00' ? '': event.begin_time;
 	if (event.event_start_date == null || event.event_end_date == null){
 		event.one_day = event.dates_range.length == 1;
@@ -136,10 +149,26 @@ function generateEventAttributes(event){
 			event.one_day = true;
 		}
 	}
+
+
+
+	var _a = document.createElement('a'),
+		_url = event.detail_info_url,
+		params_array = ['utm_source=Evendate', 'utm_campaign='+encodeURIComponent(event.title), 'utm_medium=affilate'];
+
+	_a.href = event.detail_info_url;
+
+	if (_a.search != ''){
+		_url += '&' + params_array.join('&')
+	}else{
+		_url += '?' + params_array.join('&')
+	}
+
+	event.detail_info_url = _url;
+	event.can_edit_hidden = event.can_edit != 1 ? 'hidden':'';
+
 	event.friends = $('<div>');
 	event.all_friends = tmpl('liked-dropdown-wrapper', {event_id: event.id});
-
-	event.can_edit_hidden = event.can_edit != 1 ? 'hidden':'';
 
 	var short_firends_count = 0;
 	if (event.favorite_friends != undefined){
@@ -212,6 +241,16 @@ function walkEventActiveDates(events, cb){
 function printEventsInTimeline($view, res, filter_date){
 	var $tl_outer_wrap = $view.find('.tl-outer-wrap'),
 		$blocks_wrapper = $view.find('.blocks-outer-wrap');
+
+	function compare(a,b) {
+		if (a.dates_range.length < b.dates_range.length)
+			return -1;
+		if (a.dates_range.length > b.dates_range.length)
+			return 1;
+		return 0;
+	}
+
+	res.data.sort(compare);
 
 	res.data.forEach(function(value) {
 		var m_date;

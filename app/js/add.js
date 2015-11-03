@@ -104,7 +104,7 @@ function initDayChooserCalendar(month, $el){
 
 		_head += '<tr>';
 		daterange_settings.locale.rightDaysOfWeek.forEach(function(name, index){
-			_head += '<th class="day-title" data-week-day="' + index +'">' + name + '</th>';
+			_head += '<th class="day-title" data-week-day="' + (index + 1) +'">' + name + '</th>';
 		});
 		_head += '</tr></thead>';
 
@@ -198,7 +198,6 @@ function initDayChooserCalendar(month, $el){
 			$this.parents('.calendar').find('.week-day-' + $this.data('week-day')+ ':not(.next-month,.prev-month,.disabled)').click();
 		});
 		$calendar.find('.next').off('click').on('click', function(){
-			debugger;
 			initDayChooserCalendar(month, $el);
 		});
 		$calendar.find('.prev').off('click').on('click', function(){
@@ -231,18 +230,22 @@ function initDayChooserCalendar(month, $el){
 }
 
 function bindDatepickerChanger(){
+	debugger;
+	var
+		$input = $('input.daterange');
 	$('.change-date-range-type').off('click').on('click', function(){
-		var $this = $(this),
-			$input = $('input.daterange');
+		var $this = $(this);
 		daterange_settings.singleDatePicker = $this.data('single-date');
 
 		$input.data('single-date', daterange_settings.singleDatePicker);
 
 		if (daterange_settings.singleDatePicker){
-			$input.daterangepicker(daterange_settings).click();
+			$input.daterangepicker(daterange_settings);
+			$input.data('daterangepicker').show(null, true);
 			initDayChooserCalendar(null, $input);
 		}else{
-			$input.daterangepicker(daterange_settings).click();
+			$input.daterangepicker(daterange_settings);
+			$input.data('daterangepicker').show();
 		}
 		bindDatepickerChanger();
 		$('.change-date-range-type[data-single-date="' + daterange_settings.singleDatePicker + '"]').addClass('btn-pink').removeClass('btn-pink-empty');
@@ -251,6 +254,7 @@ function bindDatepickerChanger(){
 }
 
 function bindModalEvents(){
+	debugger;
 	var $text_length = $('.textarea-length-text');
 
 	function handleFileSelect(evt){
@@ -384,6 +388,19 @@ function bindModalEvents(){
 		}
 	}
 
+	function timeKeyup(e){
+		var input_number = $(this).data('input-number'),
+			next_field,
+			svalue = String(this.value);
+		if (svalue.length == 2){
+			next_field = input_number + 1;
+		}else if (svalue.length == 0 && (e.which == DELETE_CODE || e.which == BACKSPACE_CODE)){
+			next_field = input_number - 1;
+		}
+		$('.input-' + next_field).focus();
+
+
+	}
 
 	$('.organizations.to-select2').select2({
 		width: '100%',
@@ -425,19 +442,6 @@ function bindModalEvents(){
 		}).daterangepicker(daterange_settings);
 	bindDatepickerChanger();
 
-	function timeKeyup(e){
-		var input_number = $(this).data('input-number'),
-			next_field,
-			svalue = String(this.value);
-		if (svalue.length == 2){
-			next_field = input_number + 1;
-		}else if (svalue.length == 0 && (e.which == DELETE_CODE || e.which == BACKSPACE_CODE)){
-			next_field = input_number - 1;
-		}
-		$('.input-' + next_field).focus();
-
-
-	}
 
 	$('input.input-hours').inputmask('Regex', {
 		regex: "([01]?[0-9]|2[0-3])"

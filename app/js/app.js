@@ -1296,16 +1296,25 @@ function showOrganizationalModal(organization_id){
                 }),
                 $body = $('body'),
                 $modal = $('#organization-modal');
+
+
+          res.data.friends = $('<div>');
+          res.data.all_friends = tmpl('liked-dropdown-wrapper', {event_id: res.data.id});
+
+          if (res.data.subscribed_friends != undefined){
+            res.data.subscribed_friends.forEach(function(user, index){
+              res.data.all_friends.append(tmpl('liked-dropdown-item', user));
+              if (index > 4) return;
+              var $friend = tmpl('subscribed-friend', user);
+              $friends.prepend($friend);
+            });
+          }
+
             if (res.data && res.data.hasOwnProperty('events')){
                 event.dates = '';
 
                 res.data.events.forEach(function(event){
                     $events.append(tmpl('short-event', generateEventAttributes(event)));
-                });
-
-                res.data.subscribed_friends.forEach(function(friend, index){
-                  if (index > 6) return false;
-                  $friends.prepend(tmpl('subscribed-friend', friend));
                 });
 
                 $modal.remove();
@@ -1346,7 +1355,41 @@ function showOrganizationalModal(organization_id){
                     }
                 });
 
-                $modal.find('.short-event').on('click', function(){
+              //$modal.find('.liked-users').data('friends', res.data.all_friends).on('click', function(){
+              //  var $this = $(this),
+              //      $all_friends = $('.friends-event-' + res.data.id);
+              //
+              //  if ($all_friends.hasClass('open')){
+              //    $all_friends
+              //        .removeClass('open')
+              //        .addClass('hidden')
+              //        .remove();
+              //  }else{
+              //    $all_friends.remove();
+              //    $all_friends = $this.data('friends');
+              //    if ($all_friends.find('li').length == 0) return;
+              //
+              //    var left_offset = $this.offset().left;
+              //    $all_friends
+              //        .removeClass('hidden')
+              //        .addClass('open')
+              //        .css({
+              //          top: $this.offset().top + $this.height() + 'px',
+              //          left: left_offset + 'px'
+              //        })
+              //        .prependTo();
+              //
+              //    $modal.addClass('open').append($all_friends);
+              //
+              //    $modal.find('.all-friends').slimscroll({
+              //          height: window.innerHeight - $this.offset().top - $this.height() - 50,
+              //          width: 250
+              //    });
+              //    $modal.find('.all-friends').parent().addClass('open');
+              //  }
+              //});
+
+              $modal.find('.short-event').on('click', function(){
                     $modal.find('.event-alone').html(tmpl('whirl-loader', {}));
                     var $this = $(this),
                         $modal_dialog = $modal.find('.modal-dialog'),
@@ -1399,6 +1442,9 @@ function showOrganizationalModal(organization_id){
                                     'status=1,toolbar=0,menubar=0&height=300,width=500');
                             });
 
+                            $event_alone.find('.btn-edit').on('click', function(){
+                              showEditEventModal(_event.id);
+                            });
                             $event_alone.find('.close').on('click', function(){
                                 $event_alone.animate({
                                     left: 0,
@@ -1412,9 +1458,7 @@ function showOrganizationalModal(organization_id){
                     });
                 });
 
-              $modal.find('.short-event')
-
-                $modal
+              $modal
                     .appendTo($body)
                     .on('shown.bs.modal', function(){
                         $modal.find('.modal-body').slimscroll({

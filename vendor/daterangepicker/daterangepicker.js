@@ -996,7 +996,7 @@
             }
         },
 
-        show: function(e) {
+        show: function(e, not_click) {
             if (this.isShowing) return;
 
             // Create a click proxy that is private to this instance of datepicker, for unbinding
@@ -1019,10 +1019,9 @@
             this.move();
             this.element.trigger('show.daterangepicker', this);
             this.isShowing = true;
-            if (this.singleDatePicker){
+            if (this.singleDatePicker && not_click !== true){
                 $('.change-date-range-type:first').click();
             }
-
         },
 
         hide: function(e) {
