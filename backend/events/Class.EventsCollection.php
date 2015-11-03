@@ -13,10 +13,15 @@ class EventsCollection{
 	public static function filter(PDO $db, User $user, array $filters = null, $order_by = '') {
 		$q_get_events = 'SELECT DISTINCT events.*, event_types.latin_name as event_type_latin_name, organizations.img_url as organization_img_url,
 			organizations.name as organization_name, organization_types.name as organization_type_name, organizations.short_name as organization_short_name,
+			IF(events.event_start_date IS NULL,
+			 	(SELECT MIN(event_date) FROM events_dates WHERE events_dates.event_id = events.id AND status = 1 AND DATE(event_date) >= DATE(NOW()) GROUP BY events_dates.event_id),
+			 	events.event_start_date
+				) AS first_date,
 			UNIX_TIMESTAMP(event_start_date) as timestamp_event_start_date,
 			UNIX_TIMESTAMP(events.created_at) as timestamp_created_at,
 			UNIX_TIMESTAMP(event_end_date) as timestamp_event_end_date,
 			UNIX_TIMESTAMP(events.updated_at) as timestamp_updated_at,
+			(SELECT MIN(event_date) FROM events_dates WHERE events_dates.event_id = events.id AND status = 1 AND DATE(event_date) >= DATE(NOW()) GROUP BY events_dates.event_id) as nearest_event_date,
 			(SELECT COUNT(*) AS liked_count FROM favorite_events WHERE status = 1 AND event_id = events.id) AS liked_users_count,
 			(SELECT COUNT(users_organizations.user_id) AS can_edit
 				FROM users_organizations
@@ -50,7 +55,9 @@ class EventsCollection{
 						DATE(events.event_start_date) = DATE(:date)
 							AND
 						DATE(events.event_end_date) = DATE(:date)
-						))';
+						)
+						OR (:date IN (SELECT events_dates.event_date FROM events_dates WHERE events.id = events_dates.event_id AND status = 1) AND events.event_start_date IS NULL)
+						)';
 					$statement_array[':date'] = $value;
 					break;
 				}
@@ -87,6 +94,8 @@ class EventsCollection{
 								(DATE(NOW()) BETWEEN DATE(events.event_start_date) AND DATE(events.event_end_date))
 								OR
 								(DATE(NOW()) < DATE(events.event_start_date))
+								OR
+								(events.event_end_date IS NULL AND (SELECT COUNT(*) FROM events_dates WHERE events_dates.event_id = events.id AND events_dates.status = 1 AND DATE(event_date) >= DATE(NOW())))
 							)';
 					}elseif ($value == 'favorites'){
 						$q_get_events .= ' AND (events.id IN (
@@ -95,6 +104,8 @@ class EventsCollection{
 								(DATE(NOW()) BETWEEN DATE(events.event_start_date) AND DATE(events.event_end_date))
 								OR
 								(DATE(NOW()) < DATE(events.event_start_date))
+								OR
+								(events.event_end_date IS NULL AND (SELECT COUNT(*) FROM events_dates WHERE events_dates.event_id = events.id AND events_dates.status = 1 AND DATE(event_date) >= DATE(NOW())))
 							)';
 					}else{
 						$is_short = true;
@@ -107,7 +118,12 @@ class EventsCollection{
 					}elseif($value == null){
 						break;
 					}
-					$q_get_events .= ' AND (DATE(events.event_start_date) >= DATE(:since_date) OR DATE(events.event_end_date) >= DATE(:since_date))';
+					$q_get_events .= ' AND (
+						(DATE(events.event_start_date) >= DATE(:since_date) OR DATE(events.event_end_date) >= DATE(:since_date))
+						OR
+						(SELECT COUNT(*) FROM events_dates WHERE DATE(events_dates.event_date) >= DATE(:since_date)) > 0
+					)
+						 ';
 					$statement_array[':since_date'] = $value;
 					break;
 				}
@@ -117,7 +133,11 @@ class EventsCollection{
 					}elseif($value == null){
 						break;
 					}
-					$q_get_events .= ' AND (DATE(events.event_start_date) <= DATE(:till_date) OR (DATE(events.event_end_date) <= DATE(:till_date)))';
+					$q_get_events .= ' AND (
+					(DATE(events.event_start_date) <= DATE(:till_date) OR (DATE(events.event_end_date) <= DATE(:till_date)))
+					OR
+					(SELECT COUNT(*) FROM events_dates WHERE DATE(events_dates.event_date) > DATE(:till_date)) > 0
+					)';
 					$statement_array[':till_date'] = $value;
 					break;
 				}
@@ -191,11 +211,13 @@ class EventsCollection{
 			AND tags.status = 1
 			AND events_tags.event_id = :event_id');
 
-		$p_get_dates = $db->prepare('SELECT events_dates.event_date
+		$p_get_dates = $db->prepare('SELECT DATE(events_dates.event_date) as event_date
 			FROM events_dates
 			WHERE
 				events_dates.status = 1
-			AND events_dates.event_id = :event_id');
+			AND events_dates.event_id = :event_id
+			AND events_dates.event_date > NOW()
+			ORDER BY events_dates.event_date');
 
 		$p_get_liked_users = $db->prepare('SELECT DISTINCT users.first_name, users.last_name,
 			users.middle_name, users.id, users.avatar_url, view_friends.friend_uid,
@@ -263,7 +285,7 @@ class EventsCollection{
 			if ($p_get_dates->rowCount() != 0){
 				$_dates = $p_get_dates->fetchAll();
 				foreach($_dates as $date){
-					$event['dates_range'][] = $date;
+					$event['dates_range'][] = $date['event_date'];
 				}
 			}else{
 				$end_date = new DateTime($event['event_end_date']);

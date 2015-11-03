@@ -97,27 +97,44 @@ function bindEventHandlers(){
 
 function generateEventAttributes(event){
 
-	var st_date = moment(event.event_start_date),
+	var st_date = event.event_start_date == null ? moment(event.dates_range[0]) :moment(event.event_start_date),
 		end_date = moment(event.event_end_date);
 
-	event.date =  moment(event.event_start_date).format(__C.DATE_FORMAT);
+	event.date =  event.event_start_date != null
+		? moment(event.event_start_date).format(__C.DATE_FORMAT)
+		: moment(event.dates_range[0]).format(__C.DATE_FORMAT);
 	event.tags_text = getTagsString(event.tags);
 	event.begin_time = moment(event.begin_time, 'HH:mm:ss').format('HH:mm');
 	event.end_time = moment(event.end_time, 'HH:mm:ss').format('HH:mm');
 	event.time = event.begin_time == '00:00' && event.end_time == '00:00' ? ' Весь день': event.begin_time + ' - ' + event.end_time;
-	event.dates = end_date.format('DD MMMM') ;
-	event.short_dates = end_date.format('DD/MM') ;
-	event.day_name = end_date.format('dddd');
-	if (end_date.format(__C.DATE_FORMAT) != st_date.format(__C.DATE_FORMAT)){
-		event.one_day = false;
-		if (end_date.format('MM') == st_date.format('MM')){
-			event.dates = st_date.format('DD') + ' - ' + end_date.format('DD MMMM');
-		}else{
-			event.dates = st_date.format('DD MMMM') + ' - ' + end_date.format('DD MMMM')
-		}
-		event.short_dates = st_date.format('DD/MM') + ' - ' + end_date.format('DD/MM')
+	event.begin_time_for_timeline = event.begin_time == '00:00' && event.end_time == '00:00' ? '': event.begin_time;
+	if (event.event_start_date == null || event.event_end_date == null){
+		event.one_day = event.dates_range.length == 1;
+		event.dates = st_date.format('DD MMMM') ;
+		event.short_dates = [];
+		event.dates = [];
+		event.dates_range.forEach(function(val){
+			event.dates.push(moment(val).format('DD/MM'));
+			event.short_dates.push(moment(val).format('DD/MM'));
+		});
+		event.dates = event.dates.join(', ') ;
+		event.short_dates = event.short_dates.join(', ') ;
+		event.day_name = st_date.format('dddd');
 	}else{
-		event.one_day = true;
+		event.dates = end_date.format('DD MMMM') ;
+		event.short_dates = end_date.format('DD/MM') ;
+		event.day_name = end_date.format('dddd');
+		if (end_date.format(__C.DATE_FORMAT) != st_date.format(__C.DATE_FORMAT)){
+			event.one_day = false;
+			if (end_date.format('MM') == st_date.format('MM')){
+				event.dates = st_date.format('DD') + ' - ' + end_date.format('DD MMMM');
+			}else{
+				event.dates = st_date.format('DD MMMM') + ' - ' + end_date.format('DD MMMM')
+			}
+			event.short_dates = st_date.format('DD/MM') + ' - ' + end_date.format('DD/MM')
+		}else{
+			event.one_day = true;
+		}
 	}
 	event.friends = $('<div>');
 	event.all_friends = tmpl('liked-dropdown-wrapper', {event_id: event.id});
@@ -200,6 +217,8 @@ function printEventsInTimeline($view, res, filter_date){
 		var m_date;
 		if (filter_date != null){
 			m_date = moment(filter_date, __C.DATE_FORMAT);
+		}else if (value.event_start_date == null){
+			m_date = moment(value.dates_range[0]);
 		} else if (moment(value.event_start_date).unix() < moment().unix() && filter_date == null){
 			m_date = moment();
 		}else if (moment(value.event_start_date).unix() < moment().unix() && filter_date != null){

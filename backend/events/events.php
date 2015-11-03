@@ -14,7 +14,7 @@ $__modules['events'] = array(
 				array_merge(array('my' => $__user,
 					'type' => 'future'),
 					$__request),
-				' ORDER BY events.event_start_date, events.begin_time LIMIT ' . ($__page * $__length) . ' , ' . $__length);
+				' ORDER BY first_date, events.event_start_date, events.begin_time LIMIT ' . ($__page * $__length) . ' , ' . $__length);
 		},
 		'search' => function() use ($__db, $__request, $__user){
 			return EventsCollection::filter($__db, $__user, $__request);
@@ -22,7 +22,7 @@ $__modules['events'] = array(
 		'favorites' => function () use ($__db, $__request, $__user, $__page, $__length) { /*MY EVENTS!*/
 			return EventsCollection::filter($__db, $__user,
 				array('type' => 'favorites'),
-				' ORDER BY events.event_start_date, events.begin_time LIMIT ' . ($__page * $__length) . ' , ' . $__length);
+				' ORDER BY first_date, events.event_start_date, events.begin_time LIMIT ' . ($__page * $__length) . ' , ' . $__length);
 		},
 		'all' => function () use ($__db, $__request, $__user) {
 			return EventsCollection::filter($__db, $__user, $__request);
