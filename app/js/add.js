@@ -255,7 +255,8 @@ function bindModalEvents(){
 
 	function handleFileSelect(evt){
 		if (evt.target.files.length == 0) return false;
-		var file_orientation = $(evt.target).is('#filestyle-0') ? 'vertical' : 'horizontal',
+		var $target = $(evt.target),
+			file_orientation = $target.is('#filestyle-0') ? 'vertical' : 'horizontal',
 			aspect_ratio = file_orientation == 'vertical' ? 7 / 10 : 10 / 7,
 			CUTTER_HEIGHT = window.innerHeight - 150,
 			CUTTER_WIDTH = window.innerWidth - 150,
@@ -329,6 +330,8 @@ function bindModalEvents(){
 
 			$cancel_btn.removeClass('disabled').on('click', function(){
 				$canvas_wrapper.addClass('hidden');
+				$target.wrap('<form>').closest('form').get(0).reset();
+				$target.unwrap();
 			});
 			$btn.removeClass('disabled').off('click').on('click', function(){
 				var result = $image.cropper('getCroppedCanvas', {
@@ -365,8 +368,8 @@ function bindModalEvents(){
 			if (!f.type.match('image.*')) {
 				continue;
 			}
-			if (f.size / 1024 > 4096){
-				showNotifier({status: false, text: 'Извините, максимально допустимый размер изображения - 4 МБ. Уменьште изображение.'});
+			if (f.size / 1024 > 10240){
+				showNotifier({status: false, text: 'Извините, максимально допустимый размер изображения - 10 МБ. Уменьште изображение.'});
 				return;
 			}
 			var reader = new FileReader();
@@ -524,9 +527,11 @@ function bindModalEvents(){
 				showNotifier({status: false, text: 'Укажите время начала события'});
 				to_send_flag = false;
 			}
-			if (send_data['end-hours'] == '' || send_data['end-minutes'] == ''){
-				showNotifier({status: false, text: 'Укажите время окончания события'});
-				to_send_flag = false;
+			if (send_data['end-hours'] == '' && send_data['end-minutes'] == ''){
+				//showNotifier({status: false, text: 'Укажите время окончания события'});
+				//to_send_flag = false;
+				send_data['end-hours'] = null;
+				send_data['end-minutes'] = null;
 			}
 		}
 		if (send_data['title'] == ''){
