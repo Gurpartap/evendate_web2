@@ -269,6 +269,7 @@ class EventsCollection{
 				$event['timestamp_event_end_date'] = intval($event['timestamp_event_end_date']);
 				$event['timestamp_updated_at'] = intval($event['timestamp_updated_at']);
 				$event['organization_img_url'] = App::$SCHEMA . App::$DOMAIN . '/' . $event['organization_img_url'];
+				$event['is_full_day'] = $event['end_time'] == '00:00:00' && $event['begin_time'] == '00:00:00';
 			}
 
 			$event['favorite_friends'] = array();

@@ -117,7 +117,7 @@ class GlobalSearch{
 				'name' => $this->query,
 				'description' => $this->query,
 				'short_name' => $this->query
-			), ' ORDER BY organizations.id LIMIT 50')->getData(),
+			), ' GROUP BY organizations.id ORDER BY organizations.id LIMIT 50')->getData(),
 			'events' => EventsCollection::filter($this->db, $user, array(
 				'title' => $this->query,
 				'since_date' => $this->parseDates('since_date'),

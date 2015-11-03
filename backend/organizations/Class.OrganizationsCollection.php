@@ -15,7 +15,7 @@ class OrganizationsCollection{
 	}
 
 	public static function filter(PDO $db, User $user, array $filters = null, $order_by = ''){
-		$q_get_organizations = 'SELECT organizations.id, organizations.description,
+		$q_get_organizations = 'SELECT DISTINCT organizations.id, organizations.description,
 			organizations.background_medium_img_url, organizations.background_small_img_url,
 			organizations.img_medium_url, organizations.img_small_url,
 			organizations.name, organizations.type_id, organizations.img_url, organizations.background_img_url,
@@ -55,6 +55,9 @@ class OrganizationsCollection{
 				}
 			}
 		}
+
+		$q_get_organizations .= $order_by;
+
 		$p_search = $db->prepare($q_get_organizations);
 		$p_search->execute($statement_array);
 		$organizations = $p_search->fetchAll();

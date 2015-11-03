@@ -119,7 +119,7 @@ class Event{
 			':event_type_id' => 1, // мероприятие
 			':detail_info_url' => $data['detail-info-url'],
 			':begin_time' => $data['begin-hours'] . ':' . $data['begin-minutes'] . ':00',
-			':end_time' => $data['end-hours'] . ':' . $data['end-minutes'] . ':00'
+			':end_time' => ($data['end-hours'] == null) ? null : $data['end-hours'] . ':' . $data['end-minutes'] . ':00',
 		);
 
 		$result = $p_ins_event->execute($query_data);
@@ -146,7 +146,7 @@ class Event{
 		$tmp = unserialize(serialize($file));
 		$img_size = memory_get_usage() - $start_memory;
 
-		if ($img_size / 1024 > 6144){ // CMP with 6 MB, coz var is not only image data
+		if ($img_size / 1024 > 14000){ // CMP with 6 MB, coz var is not only image data
 			throw new InvalidArgumentException('Файл слишком большого размера. Максимальный размер - 6МБ');
 		}
 
@@ -466,7 +466,7 @@ class Event{
 			':longitude' => $data['longitude'],
 			':detail_info_url' => $data['detail-info-url'],
 			':begin_time' => $data['begin-hours'] . ':' . $data['begin-minutes'] . ':00',
-			':end_time' => $data['end-hours'] . ':' . $data['end-minutes'] . ':00',
+			':end_time' => ($data['end-hours'] == null) ? null : $data['end-hours'] . ':' . $data['end-minutes'] . ':00',
 			':event_id' => $this->getId()
 		);
 
