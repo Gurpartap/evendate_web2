@@ -101,6 +101,14 @@ class Event{
 		$img_horizontal_filename = md5(self::generateRandomString() .  '-horizontal') .  '.' . $data['image_extensions']['horizontal'];
 		$img_vertical_filename = md5(self::generateRandomString() . '-vertical') .  '.' . $data['image_extensions']['vertical'];
 
+		$begin_time = $data['begin-hours'] . ':' . $data['begin-minutes'] . ':00';
+		$end_time = ($data['end-hours'] == null) ? null : $data['end-hours'] . ':' . $data['end-minutes'] . ':00';
+
+		if ($data['full-day'] == true){
+			$begin_time = '00:00:00';
+			$end_time = '00:00:00';
+		}
+
 		$query_data = array(
 			':title' => $data['title'],
 			':description' => $data['description'],
@@ -118,8 +126,8 @@ class Event{
 			':image_horizontal' => $img_horizontal_filename,
 			':event_type_id' => 1, // мероприятие
 			':detail_info_url' => $data['detail-info-url'],
-			':begin_time' => $data['begin-hours'] . ':' . $data['begin-minutes'] . ':00',
-			':end_time' => ($data['end-hours'] == null) ? null : $data['end-hours'] . ':' . $data['end-minutes'] . ':00',
+			':begin_time' => $begin_time,
+			':end_time' => $end_time,
 		);
 
 		$result = $p_ins_event->execute($query_data);
@@ -451,6 +459,14 @@ class Event{
 		if (!isset($data['tags'])) throw new LogicException('Укажите хотя бы один тег');
 		if (!is_array($data['tags'])) throw new LogicException('Укажите хотя бы один тег');
 
+		$begin_time = $data['begin-hours'] . ':' . $data['begin-minutes'] . ':00';
+		$end_time = ($data['end-hours'] == null) ? null : $data['end-hours'] . ':' . $data['end-minutes'] . ':00';
+
+		if ($data['full-day'] == true){
+			$begin_time = '00:00:00';
+			$end_time = '00:00:00';
+		}
+
 		$query_data = array(
 			':title' => $data['title'],
 			':description' => $data['description'],
@@ -465,8 +481,8 @@ class Event{
 			':latitude' => $data['latitude'],
 			':longitude' => $data['longitude'],
 			':detail_info_url' => $data['detail-info-url'],
-			':begin_time' => $data['begin-hours'] . ':' . $data['begin-minutes'] . ':00',
-			':end_time' => ($data['end-hours'] == null) ? null : $data['end-hours'] . ':' . $data['end-minutes'] . ':00',
+			':begin_time' => $begin_time,
+			':end_time' => $end_time,
 			':event_id' => $this->getId()
 		);
 

@@ -48,7 +48,10 @@
 	<!-- Pace -->
 	<link rel="stylesheet" href="vendor/pace/pace.css">
 	<!-- SELECT2 -->
-    <link href="vendor/select2/css/select2.css" rel="stylesheet" />
+    <link href="vendor/select2v3/select2.css" rel="stylesheet" />
+    <link href="vendor/select2v3/select2-bootstrap.css" rel="stylesheet" />
+
+<!--        <link href="vendor/select2/css/select2.css" rel="stylesheet" />-->
 </head>
 
 <body>
@@ -261,7 +264,8 @@
    <!-- INPUTMASKS -->
    <script src="vendor/pace/pace.min.js"></script>
    <!-- SELECT2 -->
-   <script src="vendor/select2/js/select2.full.js"></script>
+   <script src="vendor/select2v3/select2.min.js"></script>
+   <script src="vendor/select2v3/select2_locale_ru.js"></script>
    <!-- HISTORY API -->
    <script src="vendor/history/jquery.history.js"></script>
    <!-- NOTIFICATIONS API -->

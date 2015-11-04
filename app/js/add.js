@@ -44,11 +44,22 @@ var daterange_settings = {
 		placeholder: "Выберите до 5 тегов",
 		//width: '100%',
 		maximumSelectionLength: 5,
+		maximumSelectionSize: 5,
 		multiple: true,
+		createSearchChoice: function(term, data) {
+			if ($(data).filter(function() {
+					return this.text.localeCompare(term) === 0;
+				}).length === 0) {
+				return {
+					id: term,
+					text: term
+				};
+			}
+		},
 		ajax: {
 			url: '/api/tags/search',
 			dataType: 'JSON',
-			processResults: function(data) {
+			results: function(data) {
 				var _data = [];
 				data.data.forEach(function(value){
 					value.text = value.name;
@@ -425,7 +436,7 @@ function bindModalEvents(){
 
 	$('.organizations.to-select2').select2({
 		width: '100%',
-		templateResult: function(state){
+		formatResult: function(state){
 			if (!state.id) { return state.text; }
 			var $state_element = $(state.element);
 
@@ -741,14 +752,10 @@ function showEditEventModal(event_id){
 						text: tag.name
 					});
 				});
-				var _settings = $.extend(select2_settings, {
-						initSelection: function (element, callback) {
-							callback(selected_tags);
-						}
-					}, true);
 				$tags_input.select2('destroy');
 				$tags_input
-					.select2(_settings);
+					.select2(select2_settings)
+					.select2('data', selected_tags);
 				$tags_input.siblings('.select2').find('input').css('width', '100%');
 			})
 		}
