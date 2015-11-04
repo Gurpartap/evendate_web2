@@ -8937,6 +8937,7 @@ span.organization-modal-header-text{
   vertical-align: middle;
   line-height: 1.4em;
   display: table;
+  word-break: break-word;
 }
 
 .new-organization .subscribe-btn{

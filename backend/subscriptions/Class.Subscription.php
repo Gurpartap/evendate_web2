@@ -25,7 +25,7 @@ class Subscription{
 		));
 
 		if ($result === FALSE) throw new DBQueryException('CANT_GET_SUB_QUERY_ERROR', $db);
-		if ($p_get_sub->rowCount() != 1) throw new InvalidArgumentException('CANT_GET_SUB', $db);
+		if ($p_get_sub->rowCount() != 1) throw new InvalidArgumentException('CANT_GET_SUB');
 
 		$row = $p_get_sub->fetch();
 		$this->db = $db;
@@ -43,7 +43,7 @@ class Subscription{
 	public static function create(User $user, Organization $organization, PDO $db){
 		$q_ins_sub = 'INSERT INTO subscriptions(organization_id, user_id, created_at, `status`)
 			VALUES(:organization_id, :user_id, NOW(), 1)
-			ON DUPLICATE KEY UPDATE `status` = 1';
+			ON DUPLICATE KEY UPDATE `status` = 1, id = LAST_INSERT_ID(id)';
 
 		$p_ins_sub = $db->prepare($q_ins_sub);
 		$result = $p_ins_sub->execute(array(
@@ -53,9 +53,10 @@ class Subscription{
 
 		if ($result === FALSE) throw new DBQueryException('SUBSCRIPTION_QUERY_ERROR', $db);
 
+		$sub_id = $db->lastInsertId();
 		Statistics::Organization($organization, $user, $db, Statistics::ORGANIZATION_SUBSCRIBE);
 
-		return new Result(true, 'Подписка успешно оформлена', array('subscription_id' => $db->lastInsertId()));
+		return new Result(true, 'Подписка успешно оформлена', array('subscription_id' => $sub_id));
 	}
 
 	public function delete(User $user){
