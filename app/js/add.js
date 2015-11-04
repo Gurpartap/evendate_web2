@@ -38,7 +38,28 @@ var daterange_settings = {
 	maxDate: moment().add(6, 'months'),
 	applyClass: 'btn-pink',
 	cancelClass: 'btn-pink-empty'
-};
+},
+	select2_settings = {
+		tags: true,
+		placeholder: "Выберите до 5 тегов",
+		//width: '100%',
+		maximumSelectionLength: 5,
+		multiple: true,
+		ajax: {
+			url: '/api/tags/search',
+			dataType: 'JSON',
+			processResults: function(data) {
+				var _data = [];
+				data.data.forEach(function(value){
+					value.text = value.name;
+					_data.push(value);
+				});
+				return {
+					results: _data
+				}
+			}
+		}
+	};
 
 function showNotifier(response){
 	$.notify({
@@ -411,27 +432,7 @@ function bindModalEvents(){
 			return $('<span><img src="' + $state_element.data('image-url') + '" class="img-30" /> ' + state.text + '</span>');
 		}
 	});
-	$('.tags.to-select2').select2({
-		tags: true,
-		placeholder: "Выберите до 5 тегов",
-		//width: '100%',
-		maximumSelectionLength: 5,
-		multiple: true,
-		ajax: {
-			url: '/api/tags/search',
-			dataType: 'JSON',
-			processResults: function(data) {
-				var _data = [];
-				data.data.forEach(function(value){
-					value.text = value.name;
-					_data.push(value);
-				});
-				return {
-					results: _data
-				}
-			}
-		}
-	});
+	$('.tags.to-select2').select2(select2_settings);
 
 	$('.to-select2.tags').siblings('.select2').find('input').css('width', '100%');
 
@@ -732,14 +733,23 @@ function showEditEventModal(event_id){
 					.css('padding-top', '0px')
 					.html('<img src="' + _event.image_horizontal_url + '">');
 
-				var selected_tags = [];
+				var selected_tags = [],
+					$tags_input = $modal.find('.to-select2.tags');
 				_event.tags.forEach(function(tag){
-					selected_tags.push(tag.name);
+					selected_tags.push({
+						id: tag.id,
+						text: tag.name
+					});
 				});
-				$modal
-					.find('.to-select2.tags')
-					.select2('val', selected_tags)
-					.siblings('.select2').find('input').css('width', '100%');
+				var _settings = $.extend(select2_settings, {
+						initSelection: function (element, callback) {
+							callback(selected_tags);
+						}
+					}, true);
+				$tags_input.select2('destroy');
+				$tags_input
+					.select2(_settings);
+				$tags_input.siblings('.select2').find('input').css('width', '100%');
 			})
 		}
 	})
