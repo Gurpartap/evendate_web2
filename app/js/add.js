@@ -59,6 +59,12 @@ var daterange_settings = {
 		ajax: {
 			url: '/api/tags/search',
 			dataType: 'JSON',
+			data: function (term, page) {
+				return {
+					q: term // search term
+				};
+			},
+
 			results: function(data) {
 				var _data = [];
 				data.data.forEach(function(value){
@@ -95,7 +101,7 @@ function updateInputText($el){
 			text = _dates_array.join(', ')
 		}
 	}else{
-
+		text = [daterangepicker.startDate.format('DD/MM/YYYY'), daterangepicker.endDate.format('DD/MM/YYYY')].join(' - ');
 	}
 	$el.val(text);
 }
@@ -311,7 +317,7 @@ function bindModalEvents(){
 			$loader = $('.whirl.image-cropper').removeClass('hidden'),
 			cropper_options = {
 				data: _cropper_data[file_orientation],
-				strict: true,
+				strict: false,
 				responsive: false,
 				checkImageOrigin: false,
 
@@ -532,6 +538,8 @@ function bindModalEvents(){
 					send_data[$input.attr('name') + '-start'] = $input.data('daterangepicker').startDate.format('YYYY-MM-DD');
 					send_data[$input.attr('name') + '-end'] = $input.data('daterangepicker').endDate.format('YYYY-MM-DD');
 				}
+			}else if ($input.hasClass('to-select2')){
+				send_data[$input.attr('name')] = $input.select2('val');
 			}else{
 				send_data[$input.attr('name')] = $input.val();
 			}
