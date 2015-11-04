@@ -1311,7 +1311,6 @@ function showOrganizationalModal(organization_id){
           }
 
             if (res.data && res.data.hasOwnProperty('events')){
-                event.dates = '';
 
                 res.data.events.forEach(function(event){
                     $events.append(tmpl('short-event', generateEventAttributes(event)));

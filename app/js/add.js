@@ -251,7 +251,7 @@ function initDayChooserCalendar(month, $el){
 }
 
 function bindDatepickerChanger(){
-	debugger;
+	//debugger;
 	var
 		$input = $('input.daterange');
 	$('.change-date-range-type').off('click').on('click', function(){
@@ -275,7 +275,7 @@ function bindDatepickerChanger(){
 }
 
 function bindModalEvents(){
-	debugger;
+	//debugger;
 	var $text_length = $('.textarea-length-text');
 
 	function handleFileSelect(evt){

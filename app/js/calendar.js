@@ -401,7 +401,7 @@ function OrganizationsList($view, $content_block){
 
 
 					$organizations.find('.subscribe-btn').on('click', function(){
-						debugger;
+						//debugger;
 						organizations_refreshing_count++;
 						var $btn = $(this),
 							to_delete_state = $btn.hasClass('btn-empty'),
