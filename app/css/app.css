@@ -8227,7 +8227,7 @@ border-bottom-right-radius: 8px;
 
 .organizations-app{
   padding-top: 75px;
-  padding-left: 50px;
+  padding-left: 40px;
 }
 
 .organizations-app .organizations{
@@ -8702,6 +8702,10 @@ span.organization-modal-header-text{
   .liked-users-count{
     padding-left: 55px;
   }
+
+  .new-organizations-list{
+    margin-right: 10%;
+  }
 }
 
 .brand-name span{
@@ -8846,4 +8850,109 @@ span.organization-modal-header-text{
 
 .short-event.active .event-name > a{
   color: #fff !important;
+}
+
+/* New organizations list*/
+
+.new-organizations-categories{
+  height: 100%;
+  position: fixed;
+  width: 300px;
+  padding-top: 30px;
+  /* overflow-y: scroll; */
+}
+
+.new-organizations-list{
+  margin-left: 330px;
+  max-height: 100%;
+  padding-top: 45px;
+}
+
+.new-categories-title{
+  /*margin-bottom: 40px;*/
+  font-size: 2em;
+  border-bottom: 2px solid #ccc;
+}
+
+.new-category:hover{
+  cursor: pointer;
+  -webkit-box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.25);
+  -moz-box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.25);
+  box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.25);
+  -webkit-transition: all 0.5s;
+  -o-transition: all 0.5s;
+  transition: all 0.5s;
+}
+
+.new-category.active{
+  background-color: #6E88C5;
+  color: #fff;
+}
+.new-category{
+  height: 40px;
+  padding-top: 5px;
+  line-height: 30px;
+  background-color: #ffffff;
+  margin-top: 15px;
+  border-radius: 7px;
+  padding-left: 17px;
+  font-size: 1.2em;
+}
+
+.new-organization{
+  background-color: #ffffff;
+  border-radius: 7px;
+  border: 1px solid #ccc;
+  height: 170px;
+  padding-left: 0;
+  min-width: 355px;
+  margin-right: 15px;
+  margin-bottom: 20px;
+}
+
+.new-organization .content{
+  padding-top: 10px;
+}
+
+.new-organization img{
+  max-height: 100%;
+  float: left;
+  margin-right: 15px;
+  cursor: pointer;
+}
+
+.new-organization .heading span{
+  line-height: normal;
+  display: table-cell;
+  vertical-align: middle;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.new-organization .heading{
+  font-size: 1.4em;
+  max-height: 4.5em;
+  min-height: 4.5em;
+  overflow: hidden;
+  vertical-align: middle;
+  line-height: 1.4em;
+  display: table;
+}
+
+.new-organization .subscribe-btn{
+  position: absolute;
+  bottom: 10px;
+}
+
+.btn-empty{
+  background: none;
+  color: #6E88C5;
+}
+.btn-empty:hover{
+  background: none;
+  color: #6E88C5;
+}
+
+.new-organizations-categories-wrapper{
+  padding: 5px;
 }

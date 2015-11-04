@@ -669,3 +669,21 @@
       </a>
     </li>
 </script>
+
+<script type="javascript/template" id="tmpl-new-organizations-category">
+  <div class="new-category type-{type_id}" data-page="organizations?type={type_id}">{type_name}</div>
+</script>
+<script type="javascript/template" id="tmpl-new-organization-item">
+  <div class="new-organization col-xs-4 col-md-5 col-lg-5 organization-{id}">
+    <img src="{img_url}" class="organization-img" data-organization-id="{id}" title="{name}">
+    <div class="content">
+      <div class="heading">
+        <span>{short_name}</span>
+      </div>
+      <div class="subscribers-count"> {subscribed_count} {subscribed_count_text}</div>
+      <button type="button" class="btn btn-{btn_type_class} btn-sm subscribe-btn subscribe-to-organization" data-organization-id="{id}" data-subscription-id="{subscription_id}">
+        <span>{btn_text}</span>
+      </button>
+    </div>
+  </div>
+</script>

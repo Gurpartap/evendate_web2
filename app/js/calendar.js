@@ -10,7 +10,8 @@ String.prototype.capitalize = function() {
 
 var MODAL_OFFSET = 185,
 	EVENT_MODAL_WIDTH = 660,
-	_selected_month = moment();
+	_selected_month = moment(),
+	organizations_refreshing_count = 0;
 
 
 function getTagsString(tags){
@@ -194,25 +195,27 @@ function generateEventAttributes(event){
  * @param callback
  */
 function toggleSubscriptionState(state, entity_id, callback){
-	var options = (state == false) ? {
-		url: 'api/subscriptions/' + entity_id,
-		type: 'DELETE',
-		success: function(res){
+	var cb = function(res){
 			setDaysWithEvents();
-			callback(res);
-		}
-	} : {
-		url: 'api/subscriptions/',
-		data:{organization_id: entity_id},
-		type: 'POST',
-		success: function(res){
-			setDaysWithEvents();
-			callback(res);
-			if (__STATES.getCurrentState() == 'timeline' || __STATES.getCurrentState() == 'organizations'){
+			var for_prevent = callback(res);
+			if (__STATES.getCurrentState() == 'timeline'){
 				__STATES.refreshState();
 			}
-		}
-	};
+			if (--organizations_refreshing_count == 0 && __STATES.getCurrentState() == 'organizations' && for_prevent != false){
+				__STATES.refreshState();
+			}
+		},
+
+		options = (state == false) ? {
+			url: 'api/subscriptions/' + entity_id,
+			type: 'DELETE',
+			success: cb
+		} : {
+			url: 'api/subscriptions/',
+			data: {organization_id: entity_id},
+			type: 'POST',
+			success: cb
+		};
 	$.ajax(options);
 }
 
@@ -349,18 +352,16 @@ function MyTimeline($view, $content_block){
 }
 
 function OrganizationsList($view, $content_block){
-
-	var ORGANIZATIONS_ON_ONE_LINE = 5;
-
 	$.ajax({
 		url: 'api/organizations/?with_subscriptions=true',
 		success: function(res){
 			var _organizations_by_types = {},
-				$div = $('<div>');
+				$categories = $view.find('.new-organizations-categories-wrapper'),
+				$organizations = $view.find('.new-organizations-list');
 			res.data.forEach(function(organization){
 				var _key = '_' + organization.type_id;
 				if (!_organizations_by_types.hasOwnProperty(_key)){
-					_organizations_by_types[_key] = {type_name: organization.type_name, organizations: [], count: 0};
+					_organizations_by_types[_key] = {type_name: organization.type_name, organizations: [], count: 0, type_id: organization.type_id};
 				}
 				_organizations_by_types[_key].organizations.push(organization);
 				_organizations_by_types[_key].count++;
@@ -370,67 +371,73 @@ function OrganizationsList($view, $content_block){
 				return _organizations_by_types[b].count - _organizations_by_types[a].count
 			});
 
+			$categories.empty();
+
 			sorted_keys.forEach(function(key){
 					var type = _organizations_by_types[key],
-						$wrapper = tmpl('organization-type-wrapper', type),
-						$organizations = $wrapper.find('.organizations'),
-						$current_row = tmpl('organizations-line-wrapper', {}),
-						current_length = 0;
+						$category = tmpl('new-organizations-category', type);
+
+				$category.data('organizations', type.organizations).on('click', function(){
+					var $this = $(this);
+					$this.siblings().removeClass('active');
+					$this.addClass('active');
+					$organizations.empty();
 					type.organizations.forEach(function(organization){
-						if(organization.is_subscribed != true){
-							organization.btn_type_class = 'success';
-							organization.btn_type_icon = 'check';
-							organization.btn_text = 'Подписаться';
+						if(organization.is_subscribed){
+							organization.btn_type_class = 'empty';
+							organization.btn_text = 'Отписаться';
 						}else{
 							organization.btn_type_class = 'pink';
-							organization.btn_type_icon = 'close';
-							organization.btn_text = 'Отписаться';
+							organization.btn_text = 'Подписаться';
 						}
-						var $organization = tmpl('organization-item', organization);
-						$organization.find('.organization-img').on('click', function(){
+						organization.subscribed_count_text = getUnitsText(organization.subscribed_count, __C.TEXTS.SUBSCRIBERS);
+						var $organization = tmpl('new-organization-item', organization);
+						$organization.find('.organization-img, .heading>span').on('click', function(){
 							showOrganizationalModal(organization.id)
 						});
-						$current_row.append($organization);
-						if (++current_length == ORGANIZATIONS_ON_ONE_LINE){
-							current_length = 0;
-							$organizations.append($current_row);
-							$current_row = tmpl('organizations-line-wrapper', {});
+						$organizations.append($organization);
+					});
+
+
+
+					$organizations.find('.subscribe-btn').on('click', function(){
+						debugger;
+						organizations_refreshing_count++;
+						var $btn = $(this),
+							to_delete_state = $btn.hasClass('btn-empty'),
+							sub_id = $btn.data('subscription-id'),
+							org_id = $btn.data('organization-id');
+						if ($btn.hasClass(__C.CLASSES.DISABLED)) return;
+
+						$btn.
+							toggleClass('btn-empty btn-pink disabled');
+
+						if (to_delete_state){
+							$btn.find('span').text('Подписаться');
+							toggleSubscriptionState(false, sub_id, function(res){
+								$btn.removeClass(__C.CLASSES.DISABLED);
+								hideOrganizationItem(org_id);
+								return false;
+							});
+						}else{
+							$btn.find('span').text('Отписаться');
+							toggleSubscriptionState(true, org_id, function(res){
+								$btn.data('subscription-id', res.data.subscription_id);
+								$btn.removeClass(__C.CLASSES.DISABLED);
+								printSubscribedOrganizations();
+								return false;
+							});
 						}
 					});
-					if (current_length != 0){
-						$organizations.append($current_row);
-						$current_row = tmpl('organizations-line-wrapper', {});
-					}
-					$div.append($wrapper)
 				});
-			$view.html($div);
-			$div.find('.subscribe-btn').on('click', function(){
-				var $btn = $(this),
-					to_delete_state = !$btn.hasClass('btn-success'),
-					sub_id = $btn.data('subscription-id'),
-					org_id = $btn.data('organization-id');
-				if ($btn.hasClass(__C.CLASSES.DISABLED)) return;
-
-				$btn.
-					toggleClass('btn-success btn-pink disabled')
-					.find('i')
-					.toggleClass('fa-check fa-close');
-
-				if (to_delete_state){
-					$btn.find('span').text('Подписаться');
-					toggleSubscriptionState(false, sub_id, function(res){
-						$btn.removeClass(__C.CLASSES.DISABLED);
-						hideOrganizationItem(org_id);
-					});
-				}else{
-					$btn.find('span').text('Отписаться');
-					toggleSubscriptionState(true, org_id, function(res){
-						$btn.data('subscription-id', res.data.subscription_id);
-						$btn.removeClass(__C.CLASSES.DISABLED);
-						printSubscribedOrganizations();
-					});
-				}
+				$categories.append($category);
 			});
+			$view.find('.new-organizations-categories-wrapper').slimscroll({
+				height: window.innerHeight - $('.new-organizations-categories-wrapper').offset().top - 50
+			});
+			var selected_type = searchToObject().type ? searchToObject().type : 1;
+			$view.find('.new-category.type-' + selected_type).click();
+			bindOnClick();
 		}
 	})
 }
@@ -479,7 +486,7 @@ function Search($view, $content_block){
 			});
 
 			res.data.organizations.forEach(function(organization){
-				organization.subscribed_count_text = getUnitsText(organization.subscribed_count, __C.TEXTS.FAVORED);
+				organization.subscribed_count_text = getUnitsText(organization.subscribed_count, __C.TEXTS.SUBSCRIBERS);
 				var $organization = tmpl('organization-search-item', organization);
 				$organizations_wrapper.append($organization);
 				$organization.on('click', function(){
@@ -510,7 +517,6 @@ function Search($view, $content_block){
 		}
 	});
 }
-
 
 function OneDay($view, $content_block){
 	$view.find('.panel-default,.tl-block').remove();

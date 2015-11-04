@@ -188,6 +188,11 @@
 
              <!-- START row-->
              <div class="organizations-app hidden screen-view" data-controller="OrganizationsList">
+                 <div class="new-organizations-categories">
+                     <div class="new-categories-title">Категории</div>
+                     <div class="new-organizations-categories-wrapper"></div>
+                 </div>
+                 <div class="new-organizations-list"></div>
              </div>
              <!-- END row-->
 
