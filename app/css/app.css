@@ -7458,9 +7458,10 @@ fieldset[disabled] .flatdoc-wrapper .button.active {
 /*.calendar-days-line td.click-able:after{*/
 /*}*/
 
-.calendar-days-line td.click-able.active:after{
+.calendar-days-line td.click-able.has-favorites.active:after{
   color: #fff;
 }
+
 .calendar-days-line td.click-able.has-favorites:after{
   content: '__';
   display: block;
@@ -7468,6 +7469,7 @@ fieldset[disabled] .flatdoc-wrapper .button.active {
   font-weight: 900;
   color: #F82969;
 }
+
 .calendar-days-line td .content {
   position:absolute;
   top:0;
