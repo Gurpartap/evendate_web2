@@ -16,7 +16,7 @@ $__modules['organizations'] = array(
 				$result['events'] = EventsCollection::filter($__db, $__user, array(
 					'organization' => $organization,
 					'type' => 'future'
-				), ' ORDER BY events.event_start_date, events.begin_time')->getData();
+				), ' ORDER BY first_date, events.event_start_date, events.begin_time ')->getData();
 			}
 			return new Result(true, '', $result);
 		},
