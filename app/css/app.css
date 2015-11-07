@@ -7455,18 +7455,17 @@ fieldset[disabled] .flatdoc-wrapper .button.active {
   display:block;
   margin-top:100%;
 }
-.calendar-days-line td.click-able:after{
-  content: '__';
-  display: block;
-  margin-top: 8px;
-  color: #FFFFFF;
-  font-weight: 900;
-}
+/*.calendar-days-line td.click-able:after{*/
+/*}*/
 
 .calendar-days-line td.click-able.active:after{
   color: #fff;
 }
 .calendar-days-line td.click-able.has-favorites:after{
+  content: '__';
+  display: block;
+  margin-top: 8px;
+  font-weight: 900;
   color: #F82969;
 }
 .calendar-days-line td .content {
@@ -7588,6 +7587,8 @@ td.active{
   color: #ccc;
   margin-top: 22px;
   display: block;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.4);
 }
 
 .side-calendar-panel{
