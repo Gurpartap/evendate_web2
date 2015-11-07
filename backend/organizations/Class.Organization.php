@@ -135,6 +135,11 @@ class Organization {
 		return $this->site_url;
 	}
 
+	private static function getPathWithURL($path){
+		if ($path == null || $path == '') return null;
+		return App::$SCHEMA . App::$DOMAIN . '/' . $path;
+	}
+
 	public static function normalizeOrganization(array $organization){
 		$organization['id'] = (int) $organization['id'];
 
@@ -148,14 +153,14 @@ class Organization {
 			$organization['status'] = isset($organization['status']) ? (boolean) $organization['status'] : true;
 		}
 
-		$organization['background_img_url'] = App::$SCHEMA . App::$DOMAIN . '/' . $organization['background_img_url'];
-		$organization['img_url'] = App::$SCHEMA . App::$DOMAIN . '/' . $organization['img_url'];
+		$organization['background_img_url'] =  self::getPathWithURL($organization['background_img_url']);
+		$organization['img_url'] = self::getPathWithURL($organization['img_url']);
 
-		$organization['background_medium_img_url'] = App::$SCHEMA . App::$DOMAIN . '/' . $organization['background_medium_img_url'];
-		$organization['img_medium_url'] = App::$SCHEMA . App::$DOMAIN . '/' . $organization['img_medium_url'];
+		$organization['background_medium_img_url'] = self::getPathWithURL($organization['background_medium_img_url']);
+		$organization['img_medium_url'] = self::getPathWithURL($organization['img_medium_url']);
 
-		$organization['background_small_img_url'] = App::$SCHEMA . App::$DOMAIN . '/' . $organization['background_small_img_url'];
-		$organization['img_small_url'] = App::$SCHEMA . App::$DOMAIN . '/' . $organization['img_small_url'];
+		$organization['background_small_img_url'] = self::getPathWithURL($organization['background_small_img_url']);
+		$organization['img_small_url'] = self::getPathWithURL($organization['img_small_url']);
 
 		if (isset($organization['timestamp_created_at'])){
 			$organization['timestamp_created_at'] = intval($organization['timestamp_created_at']);
