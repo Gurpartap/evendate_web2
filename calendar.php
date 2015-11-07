@@ -106,9 +106,9 @@
                        <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn" data-controller="showSettingsModal">
                            <i class="icon-settings"></i> <span>Настройки</span>
                        </a>
-                       <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button hidden show-statistics-btn <?=$add_event_btn_hidden?>" data-page="statistics">
-                           <span>Статистика</span>
-                       </a>
+<!--                       <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button hidden show-statistics-btn --><?//=$add_event_btn_hidden?><!--" data-page="statistics">-->
+<!--                           <span>Статистика</span>-->
+<!--                       </a>-->
 					   <span class="side-block-container">Подписки</span>
 					   <div class="organizations-list">
                        </div>

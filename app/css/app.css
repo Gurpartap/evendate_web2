@@ -1146,7 +1146,7 @@ body {
 .sidebar {
   height: 100%;
   padding-bottom: 20px;
-  background-color: rgb(59, 77, 99);
+  background-color: #3F536A;
   overflow-x: hidden;
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
@@ -1525,8 +1525,9 @@ fieldset[disabled] .btn-green.active {
 
 .btn-black-blue.pressed{
   color: #ffffff;
-  background-color: rgb(44, 58, 78);
+  /*background-color: rgb(44, 58, 78);*/
   border-color: rgba(0, 0, 0, 0);
+  background-color: #3F536A;
 }
 
 .btn-black-blue:hover,
@@ -1536,13 +1537,14 @@ fieldset[disabled] .btn-green.active {
 .btn-black-blue.active,
 .open > .dropdown-toggle.btn-purple {
   color: #7BC6F8;
-  background-color: rgb(44, 58, 78);
+  /*background-color: rgb(44, 58, 78);*/
   border-color: rgba(0, 0, 0, 0);
 }
 .btn-black-blue {
   color: #ffffff;
-  background-color: rgb(57, 77, 99);
+  /*background-color: rgb(57, 77, 99);*/
   border-color: transparent;
+  background-color: #3F536A;
 }
 
 .btn-purple:hover,
@@ -7532,6 +7534,7 @@ td.active{
 .nav .btn-menu{
   text-align: left;
   padding-left: 15px;
+  box-shadow: none;
 }
 .btn-organization{
   width: 194px;
@@ -7583,19 +7586,23 @@ td.active{
   font-size: 13px;
   padding-left: 16px;
   color: #ccc;
+  margin-top: 22px;
+  display: block;
 }
 
 .side-calendar-panel{
-  margin: 15px 7px;
-  border: none;
+  /*margin: 15px 7px;*/
+  /*border: none;*/
   text-align: center;
-  border-radius: 7px;
-  margin-right: 12px;
-  margin-left: 12px;
+  /*border-radius: 7px;*/
+  /*margin-right: 12px;*/
+  /*margin-left: 12px;*/
+  margin-bottom: 15px;
+  background-color: #3F536A;
 }
 
 .side-calendar-panel > .panel-body{
-  background-color: rgb(46, 59, 75);
+  /*background-color: rgb(46, 59, 75);*/
   padding: 5px;
   border-radius: 5px;
 }
@@ -8686,8 +8693,8 @@ span.organization-modal-header-text{
   }
   .nav .btn-menu {
     font-size: 15px;
-    padding-top: 8px;
-    padding-bottom: 8px;
+    padding-top: 5px;
+    padding-bottom: 5px;
   }
   .calendar-days-line{
     height: 40px;
@@ -8956,4 +8963,11 @@ span.organization-modal-header-text{
 
 .new-organizations-categories-wrapper{
   padding: 5px;
+}
+
+.nav .active{
+  color: #ffffff;
+  /* background-color: rgb(44, 58, 78); */
+  border-color: rgba(0, 0, 0, 0);
+  background-color: #5379B8;
 }
