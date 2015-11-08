@@ -604,6 +604,24 @@ function bindModalEvents(){
 					if (__STATES.getCurrentState() != 'organizations'){
 						__STATES.refreshState();
 					}
+
+					_files = {
+						vertical: null,
+						horizontal: null
+					};
+					_cropped_files = {
+						vertical: null,
+						horizontal: null
+					};
+					_file_names = {
+						vertical: null,
+						horizontal: null
+					};
+					_cropper_data = {
+						vertical: null,
+						horizontal: null
+					};
+					_location = null;
 				}else{
 					showNotifier(res);
 				}
