@@ -410,8 +410,8 @@ function bindModalEvents(){
 			if (!f.type.match('image.*')) {
 				continue;
 			}
-			if (f.size / 1024 > 10240){
-				showNotifier({status: false, text: 'Извините, максимально допустимый размер изображения - 10 МБ. Уменьште изображение.'});
+			if (f.size / 1024 > 50120){
+				showNotifier({status: false, text: 'Извините, максимально допустимый размер изображения - 5 МБ. Выберите изображение меньшего размера.'});
 				return;
 			}
 			var reader = new FileReader();
