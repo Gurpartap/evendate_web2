@@ -1286,6 +1286,8 @@ socket.on('log', function(data){
 
 
 function showOrganizationalModal(organization_id){
+  if (window.organization_is_loading) return;
+  window.organization_is_loading = true;
     $.ajax({
         url: 'api/organizations/' + organization_id + '?with_events=true',
         success: function(res){
@@ -1458,13 +1460,16 @@ function showOrganizationalModal(organization_id){
                 });
 
               $modal
-                    .appendTo($body)
-                    .on('shown.bs.modal', function(){
-                        $modal.find('.modal-body').slimscroll({
+                  .appendTo($body)
+                  .on('shown.bs.modal', function(){
+                    $modal.find('.modal-body').slimscroll({
                             height: 650
                         });
-                    })
-                    .modal();
+                  })
+                  .on('hide.bs.modal', function(){
+                    window.organization_is_loading = false;
+                  })
+                  .modal();
 
             }
         }
