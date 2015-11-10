@@ -317,7 +317,7 @@ function bindModalEvents(){
 			$loader = $('.whirl.image-cropper').removeClass('hidden'),
 			cropper_options = {
 				data: _cropper_data[file_orientation],
-				strict: false,
+				strict: true,
 				responsive: false,
 				checkImageOrigin: false,
 

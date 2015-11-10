@@ -33,27 +33,35 @@ class OrganizationsCollection{
 			) as subscribed_count
 			FROM organizations
 			INNER JOIN organization_types ON organization_types.id = organizations.type_id AND organizations.status = 1
-			LEFT JOIN subscriptions ON subscriptions.organization_id = organizations.id AND subscriptions.user_id = :user_id AND subscriptions.status = 1';
+			LEFT JOIN subscriptions ON subscriptions.organization_id = organizations.id AND subscriptions.user_id = :user_id AND subscriptions.status = 1
+			WHERE 1 = 1 ';
 
 		$statement_array = array(':user_id' => $user->getId());
+
+		$search_fields = [];
+
 		foreach($filters as $name => $value) {
 			switch ($name) {
 				case 'name': {
-					$q_get_organizations .= ' OR organizations.name LIKE :name';
+					$search_fields[] = ' organizations.name LIKE :name';
 					$statement_array[':name'] = '%' . $value . '%';
 					break;
 				}
 				case 'description': {
-					$q_get_organizations .= ' OR organizations.description LIKE :description';
+					$search_fields[] = ' organizations.description LIKE :description';
 					$statement_array[':description'] = '%' . $value . '%';
 					break;
 				}
 				case 'short_name': {
-					$q_get_organizations .= ' OR organizations.short_name LIKE :short_name';
+					$search_fields[] = ' organizations.short_name LIKE :short_name';
 					$statement_array[':short_name'] = '%' . $value . '%';
 					break;
 				}
 			}
+		}
+
+		if (count($search_fields) > 0){
+			$q_get_organizations .= ' AND (' . implode(' OR ',$search_fields) . ')';
 		}
 
 		$q_get_organizations .= $order_by;
