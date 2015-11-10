@@ -136,7 +136,7 @@ class Organization {
 	}
 
 	private static function getPathWithURL($path){
-		if ($path == null || $path == '') return null;
+		if ($path == null || $path == '' || trim($path) == '') return null;
 		return App::$SCHEMA . App::$DOMAIN . '/' . $path;
 	}
 
