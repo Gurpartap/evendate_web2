@@ -127,8 +127,9 @@ function generateEventAttributes(event){
 		event.dates = st_date.format('DD MMMM') ;
 		event.short_dates = [];
 		event.dates = [];
+		var date_format = event.dates_range.length == 1 ? 'DD MMMM' : 'DD/MM';
 		event.dates_range.forEach(function(val){
-			event.dates.push(moment(val).format('DD/MM'));
+			event.dates.push(moment(val).format(date_format));
 			event.short_dates.push(moment(val).format('DD/MM'));
 		});
 		event.dates = event.dates.join(', ') ;
