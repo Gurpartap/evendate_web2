@@ -126,12 +126,17 @@ error_reporting(E_ALL);
 							</div>
 							<div class="time">
 								<?php
-									if ($event->getBeginTime() == '00:00:00' && $event->getEndTime() == '00:00:00'){
-										echo 'Весь день';
-									}else {
+									if ($event->getEndTime() == null){
 										$begin_dt = new DateTime($event->getBeginTime());
-										$end_dt = new DateTime($event->getEndTime());
-										echo $begin_dt->format('H:i') . ' - ' . $end_dt->format('H:i');
+										echo $begin_dt->format('H:i');
+									}else{
+										if ($event->getBeginTime() == '00:00:00' && $event->getEndTime() == '00:00:00'){
+											echo 'Весь день';
+										}else {
+											$begin_dt = new DateTime($event->getBeginTime());
+											$end_dt = new DateTime($event->getEndTime());
+											echo $begin_dt->format('H:i') . ' - ' . $end_dt->format('H:i');
+										}
 									}
 								?>
 							</div>

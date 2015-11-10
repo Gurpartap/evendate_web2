@@ -15,7 +15,10 @@ class EventsCollection{
 			organizations.name as organization_name, organization_types.name as organization_type_name, organizations.short_name as organization_short_name,
 			IF(events.event_start_date IS NULL,
 			 	(SELECT MIN(event_date) FROM events_dates WHERE events_dates.event_id = events.id AND status = 1 AND DATE(event_date) >= DATE(NOW()) GROUP BY events_dates.event_id),
-			 	events.event_start_date
+			 	IF(events.event_start_date  < NOW(),
+			 	 DATE(NOW()),
+			 	 events.event_start_date
+			 	)
 				) AS first_date,
 			UNIX_TIMESTAMP(event_start_date) as timestamp_event_start_date,
 			UNIX_TIMESTAMP(events.created_at) as timestamp_created_at,
@@ -216,7 +219,7 @@ class EventsCollection{
 			WHERE
 				events_dates.status = 1
 			AND events_dates.event_id = :event_id
-			AND events_dates.event_date > NOW()
+			AND DATE(events_dates.event_date) >= DATE(NOW())
 			ORDER BY events_dates.event_date');
 
 		$p_get_liked_users = $db->prepare('SELECT DISTINCT users.first_name, users.last_name,
