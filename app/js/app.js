@@ -1404,6 +1404,7 @@ function showOrganizationalModal(organization_id){
 
                             var _event = generateEventAttributes(res.data[0]);
                             if (_event.one_day){_event.dates = $('<span>' + _event.day_name.capitalize() + '<br>' + _event.dates + '</span>')}
+                            _event.style = _event.dates_range.length > 4 ? 'font-size: 14px;' : '';
                             var $event_content = tmpl('event-modal-content', _event),
                                 $event_alone = $modal.find('.event-alone');
 
