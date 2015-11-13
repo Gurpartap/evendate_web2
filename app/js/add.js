@@ -1,5 +1,6 @@
 var BACKSPACE_CODE = 8,
 	DELETE_CODE = 46,
+	NOTIFICATIONS_MAX_COUNT = 1,
 	_files = {
 		vertical: null,
 		horizontal: null
@@ -86,6 +87,24 @@ function showNotifier(response){
 	});
 }
 
+function disableNotificationCheckboxes(date){
+	var
+		$notification_checkboxes = $('.notification-time'),
+		_now = moment(moment().format('YYYY-MM-DD') + ' 00:00:00')
+	$notification_checkboxes.each(function(){
+		var $checkbox = $(this);
+		if (date.add($checkbox.data('diff-value'), $checkbox.data('diff-type')) <= _now){
+			$checkbox
+				.attr('disabled', 'disabled')
+				.prop('checked', false)
+				.addClass('too-small');
+		}else{
+			$checkbox
+				.removeAttr('disabled')
+				.removeClass('too-small');
+		}
+	});
+}
 
 function updateInputText($el){
 	var daterangepicker = $el.data('daterangepicker');
@@ -97,11 +116,13 @@ function updateInputText($el){
 			dates.forEach(function(date){
 				date = moment(date);
 				_dates_array.push(date.format('DD/MM'));
+				disableNotificationCheckboxes(date);
 			});
 			text = _dates_array.join(', ')
 		}
 	}else{
 		text = [daterangepicker.startDate.format('DD/MM/YYYY'), daterangepicker.endDate.format('DD/MM/YYYY')].join(' - ');
+		disableNotificationCheckboxes(daterangepicker.startDate);
 	}
 	$el.val(text);
 }
@@ -481,13 +502,14 @@ function bindModalEvents(){
 		$text_length.text(text_length + '/500');
 	});
 
-	$('.notification-time').on('change', function(e){
+	$('.notification-time').on('change', function(){
 		var selected_count = $('.notification-time:checked').length,
 			$not_checked = $('.notification-time:not(:checked)');
-		if (selected_count == 2){
+
+		if (selected_count == NOTIFICATIONS_MAX_COUNT){
 			$not_checked.attr('disabled', 'disabled');
 		}else{
-			$not_checked.removeAttr('disabled');
+			$not_checked.filter(':not(.too-small)').removeAttr('disabled');
 		}
 	});
 
