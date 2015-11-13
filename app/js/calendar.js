@@ -254,7 +254,7 @@ function printEventsInTimeline($view, res, filter_date){
 		return 0;
 	}
 
-	res.data.sort(compare);
+	//res.data.sort(compare);
 
 	res.data.forEach(function(value) {
 		var m_date;
@@ -285,6 +285,7 @@ function printEventsInTimeline($view, res, filter_date){
 				day_short_name: m_date.format('ddd').capitalize(),
 				day_number: m_date.format('DD'),
 				month_number: m_date.format('MM'),
+				month_name: m_date.format('DD MMMM'),
 				date: day_date
 			}).appendTo($tl_outer_wrap);
 		}else{
@@ -809,5 +810,11 @@ $(document)
 		})
 
 		var $list = $('.organizations-list');
-		$list.slimscroll({height: window.innerHeight - $list.offset().top});
+		if (window.innerHeight > 800){
+			$list.slimscroll({height: window.innerHeight - $list.offset().top});
+		}else{
+			$('.sidebar').slimscroll({
+				height: window.innerHeight
+			})
+		}
 });
