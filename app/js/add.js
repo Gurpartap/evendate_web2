@@ -644,6 +644,7 @@ function bindModalEvents(){
 						horizontal: null
 					};
 					_location = null;
+					socket.emit('event.resizeImages');
 				}else{
 					showNotifier(res);
 				}

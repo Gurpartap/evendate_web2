@@ -38,6 +38,19 @@
       "host": "smtp.yandex.ru",
       "port": 25
     },
+    "APN":{
+      "gateway": "gateway.push.apple.com",
+      "port": 2195,
+      "enhanced": true,
+      "production": false,
+      "cacheLength": 5,
+      "cert": "pushcert.pem",
+      "key": "pushkey.pem",
+      "passphrase": "maryashka2004"
+    },
+    "images": {
+      "events_path": "event_images"
+    },
     "domain": "evendate.ru",
     "schema": "http://"
   },
@@ -79,6 +92,19 @@
       "password": "Aues300694$$$",
       "host": "smtp.yandex.ru",
       "port": 25
+    },
+    "APN":{
+      "gateway": "gateway.push.apple.com",
+      "port": 2195,
+      "enhanced": true,
+      "production": false,
+      "cacheLength": 5,
+      "cert": "pushcert.pem",
+      "key": "pushkey.pem",
+      "passphrase": "maryashka2004"
+    },
+    "images": {
+      "events_path": "event_images"
     },
     "domain": "dev.evendate.org",
     "schema": "http://"

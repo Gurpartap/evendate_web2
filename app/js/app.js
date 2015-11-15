@@ -1256,6 +1256,11 @@ socket.on('connect', function(){
     data: {
       device_token: socket.id,
       client_type: 'browser'
+    },
+    success: function(data){
+      if (data.status){
+        socket.emit('session.set', data.data.token);
+      }
     }
   });
 });
@@ -1282,6 +1287,24 @@ socket.on('auth', function(data){
 
 socket.on('log', function(data){
     console.log(data);
+});
+
+socket.on('notification', function(data){
+  console.log(data);
+  if (!Notify.needsPermission) {
+    var myNotification = new Notify(data.note.alert, {
+      body: data.note.body,
+      icon: window.location.origin + __C.IMAGES_PATH + '/' + data.note.icon,
+      tag: data.note.payload.event_id,
+      notifyClick: function(){
+        window.open(window.location.origin + '/event.php?id=' + data.note.payload.event_id, '_blank', '_blank');
+      }}
+    );
+
+    myNotification.show();
+  } else if (Notify.isSupported()) {
+    Notify.requestPermission();
+  }
 });
 
 
@@ -1608,6 +1631,7 @@ $(document).ready(function(){
                 HIDDEN: 'hidden'
             },
             DATE_FORMAT: 'YYYY-MM-DD',
+            IMAGES_PATH: '/events_images',
             STATS: {
               EVENT_VIEW: 'view',
               EVENT_VIEW_DETAIL: 'view_detail',

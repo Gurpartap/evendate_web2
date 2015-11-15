@@ -14,7 +14,7 @@
 
 	$db = new PDO('mysql:host='. App::$DB_SERVER.';dbname='. App::$DB_NAME .';charset=utf8', App::$DB_USER, App::$DB_PASSWORD);
 	$db->exec("SET GLOBAL general_log = 1;");
-	$db->exec("SET GLOBAL time_zone = '+4:00';");
+	$db->exec("SET GLOBAL time_zone = '+3:00';");
 	$db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
 	if ($_SERVER['ENV'] == 'dev' || $_SERVER['ENV'] == 'local'){

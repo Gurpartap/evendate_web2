@@ -9,7 +9,11 @@ var server = require('http'),
 	moment = require("moment"),
 	config = {},
 	smtpTransport = require('nodemailer-smtp-transport'),
-	nodemailer = require('nodemailer');
+	nodemailer = require('nodemailer'),
+	CronJob = require('cron').CronJob,
+	notifications_manager = require('./notifications_manager.js'),
+	images_resize = require('./image_resizer.js'),
+	__rooms = {};
 
 config = _fs.readFileSync('../config.json');
 config = JSON.parse(config);
@@ -19,13 +23,16 @@ var config_index = process.env.ENV ? process.env.ENV : 'dev',
 	connection = mysql.createPool(real_config.db),
 	logger = new (winston.Logger)({
 		transports: [
+			new (winston.transports.Console)(),
 			new winston.transports.File({ filename: __dirname + '/debug.log', json: false })
 		],
 		exceptionHandlers: [
+			new (winston.transports.Console)(),
 			new winston.transports.File({ filename: __dirname + '/exceptions.log', json: false })
 		],
 		exitOnError: false
-}),
+	}),
+	cropper = config_index == 'local' ? '' : new images_resize({}),
 	transporter = nodemailer.createTransport(smtpTransport({
 		host: real_config.smtp.host,
 		port: real_config.smtp.port,
@@ -61,6 +68,220 @@ var config_index = process.env.ENV ? process.env.ENV : 'dev',
 		}
 	};
 
+function replaceTags(text, object){
+	for (var key in object){
+		if (object.hasOwnProperty(key)){
+			var value = object[key];
+			var key_expr = new RegExp('{'+key+'}', 'gim');
+			if (value == null){
+				value = '';
+			}
+			text = text ? text.replace(key_expr, value) : '';
+		}
+	}
+	var not_handled_keys = new RegExp(/\{.*?\}/gim);
+	text = text ? text.replace(not_handled_keys, '') : '';
+	return text;
+}
+
+function sendNotifications(){
+	var q_get_events_notifications = 'SELECT ' +
+			' events_notifications.*, ' +
+			' events.title, ' +
+			' events.image_vertical, ' +
+			' events.image_horizontal, ' +
+			' events.organization_id, ' +
+			' events.id as event_id, ' +
+			' notification_types.text as notification_type_text' +
+			' FROM events_notifications' +
+			' INNER JOIN events ON events_notifications.event_id = events.id' +
+			' INNER JOIN notification_types ON notification_types.id = events_notifications.notification_type_id' +
+			' WHERE ' +
+				' notification_time <= NOW() ' +
+				' AND done = 0' +
+				' AND events.status = 1',
+
+		q_get_to_send_devices = 'SELECT DISTINCT tokens.*, users.notify_in_browser ' +
+			' FROM tokens' +
+			' INNER JOIN subscriptions ON subscriptions.user_id = tokens.user_id' +
+			' INNER JOIN organizations ON organizations.id = subscriptions.organization_id' +
+			' INNER JOIN users ON users.id = tokens.user_id' +
+			' WHERE FROM_UNIXTIME(tokens.expires_on) >= NOW()' +
+			' AND organizations.id = ?' +
+			' AND subscriptions.status = 1' +
+			' ORDER BY tokens.id DESC LIMIT 1';
+
+
+
+	connection.query(q_get_events_notifications, function(err, rows){
+		if (err){
+			logger.error(err);
+		}
+		rows.forEach(function(event_notification){
+			connection.query(q_get_to_send_devices, event_notification.organization_id, function(errors, devices){
+				if (errors){
+					logger.error(errors);
+				}
+				devices.forEach(function(device){
+					var data = {
+						device: device,
+						note: {
+							alert: event_notification.title,
+							body: replaceTags(event_notification.notification_type_text, event_notification),
+							icon: real_config.schema + real_config.domain + '/event_images/square/' + event_notification.image_vertical,
+							payload: {
+								type: 'event_notification',
+								event_id: event_notification.event_id
+							}
+						},
+						type: device.client_type
+					};
+
+
+					if (device.client_type == 'browser'){
+						if (device.notify_in_browser === 0) return;
+						if (__rooms.hasOwnProperty(device.token) && __rooms[device.token].length > 0){
+							var room = __rooms[device.token];
+							io.to(room[0]).emit('notification', data);
+						}
+					}else{
+						//var notification = notifications_manager.create(data);
+						//notification.send(function(err){});
+					}
+				});
+			});
+		});
+	});
+}
+
+function escapeArray(array){
+	var _result = [];
+	array.forEach(function(value){
+		_result.push(connection.escape(value));
+	});
+	return _result.join(', ');
+}
+
+function getArrayDiff (a1, a2) {
+	var a = [], diff = [];
+	for (var i = 0; i < a1.length; i++) {
+		a[a1[i]] = true;
+	}
+	for (i = 0; i < a2.length; i++) {
+		if (a[a2[i]]) {
+			delete a[a2[i]];
+		} else {
+			a[a2[i]] = true;
+		}
+	}
+	for (var k in a) {
+		if (a.hasOwnProperty(k)){
+			diff.push(k);
+		}
+	}
+	return diff;
+}
+
+function resizeImages(){
+
+	var IMAGES_PATH = '../' + real_config.images.events_path + '/';
+	var LARGE_IMAGES = 'large';
+	var MEDIUM_IMAGES = 'medium';
+	var SMALL_IMAGES = 'small';
+	var VERTICAL_IMAGES = 'vertical';
+	var HORIZONTAL_IMAGES = 'horizontal';
+	var SQUARE_IMAGES = 'square';
+
+	_fs.readdir(IMAGES_PATH + LARGE_IMAGES, function(err, files){
+		if (err){
+			logger.error(err);
+			return;
+		}
+		getNotInFolder(files, MEDIUM_IMAGES, resizeImages);
+		getNotInFolder(files, SMALL_IMAGES, resizeImages);
+		getNotInFolder(files, SQUARE_IMAGES, function(size, diff){
+			diff = diff.splice(0, 100);
+			diff.forEach(function(filename){
+				cropper.cropToSquare({
+					source: IMAGES_PATH + LARGE_IMAGES + '/' + filename,
+					destination: IMAGES_PATH + SQUARE_IMAGES + '/' + filename
+				});
+			})
+		});
+	});
+
+	function resizeImages(size, diff){
+		if (diff.length == 0) return;
+		var q_get_images = 'SELECT image_vertical, image_horizontal ' +
+			'FROM events ' +
+			'WHERE image_vertical IN (' + escapeArray(diff) + ')' +
+			'OR image_horizontal IN (' + escapeArray(diff) + ')';
+
+
+		connection.query(q_get_images, function(err, rows) {
+			if (err) {
+				logger.error(err);
+				return;
+			}
+			var verticals = [],
+				horizontals = [];
+
+			rows.forEach(function(item){
+				verticals.push(item.image_vertical);
+				horizontals.push(item.image_horizontal);
+			});
+
+			diff = diff.splice(0, 100);
+
+			diff.forEach(function(value){
+				var orientation;
+				if (verticals.indexOf(value) != -1){
+					orientation = VERTICAL_IMAGES;
+				}else{
+					orientation = HORIZONTAL_IMAGES;
+				}
+				cropper.resizeFile({
+					source: IMAGES_PATH + LARGE_IMAGES + '/' + value,
+					destination: IMAGES_PATH + size + '/' + value,
+					orientation: orientation,
+					size: size
+				});
+			});
+		});
+	}
+
+	function getNotInFolder(large_files, size, cb){
+		_fs.readdir(IMAGES_PATH + size, function(err, files) {
+			if (err) {
+				logger.error(err);
+				return;
+			}
+			cb(size, getArrayDiff(files, large_files));
+		});
+	}
+}
+
+try {
+	if (config_index != 'local'){
+		new CronJob('*/2 * * * *', function(){
+			logger.info('Resizing start', 'START... ' + new Date().toString());
+			resizeImages();
+		}, null, true);
+	}
+} catch(ex) {
+	logger.error("CRON ERROR","cron pattern not valid");
+}
+
+try {
+	new CronJob('*/10 * * * *', function(){
+		logger.info('Notifications start', 'START...' + new Date().toString());
+		sendNotifications();
+	}, null, true);
+} catch(ex) {
+	logger.error("CRON ERROR","cron pattern not valid");
+}
+
+
 io.on('connection', function (socket){
 
 	function makeId(){
@@ -77,14 +298,6 @@ io.on('connection', function (socket){
 	}
 
 	function saveDataInDB(data, callback){
-
-		function escapeArray(array){
-			var _result = [];
-			array.forEach(function(value){
-				_result.push(connection.escape(value));
-			});
-			return _result.join(', ');
-		}
 
 		function getUIDValues(){
 			var result = {
@@ -192,7 +405,7 @@ io.on('connection', function (socket){
 
 			function insertToken(){
 				var token_type = (data.oauth_data.hasOwnProperty('mobile') && data.oauth_data.mobile == 'true') ? 'mobile' : 'bearer',
-					token_time = token_type == 'mobile' ? moment(0).add(1, 'months').unix() : moment(0).add(1, 'weeks').unix(),
+					token_time = token_type == 'mobile' ? moment().add(1, 'months').unix() : moment().add(10, 'days').unix(),
 					created_at = moment().unix(),
 					expires_on = created_at + token_time,
 					q_ins_token = 'INSERT INTO tokens(token, user_id, token_type, expires_on, created_at) VALUES(' +
@@ -494,6 +707,30 @@ io.on('connection', function (socket){
 			logger.info('EMAIL_INFO', info);
 		});
 	});
+
+
+	socket.on('session.set', function(token){
+		if (!__rooms.hasOwnProperty(token)){
+			__rooms[token] = [];
+		}
+		__rooms[token].push(socket.id);
+		socket.token = token;
+	});
+
+
+	socket.on('disconnect', function () {
+		var index = __rooms[socket.token].indexOf(socket.id);
+		__rooms[socket.token].splice(index, 1);
+		if (__rooms[socket.token].length == 0){
+			delete __rooms[socket.token];
+		}
+	});
+
+	socket.on('event.resizeImages', function () {
+		resizeImages();
+	});
+
+	socket.on('sendNotifications', sendNotifications);
 });
 
 io.listen(8080);

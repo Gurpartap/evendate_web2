@@ -140,7 +140,7 @@
 <script type="javascript/template" id="tmpl-timeline-day">
   <div class="tl-block timeline-{date}">
     <div class="tl-part tl-header tl-header-{date}">
-      <span class="tl-timespot">{day_short_name}, {day_number}/{month_number}</span>
+      <span class="tl-timespot">{day_short_name}, {month_name}</span>
     </div>
   </div>
 </script>
@@ -389,7 +389,7 @@
                 <div class="checkbox c-checkbox needsclick">
                   <label class="needsclick">
                     <input type="checkbox" value="1" class="notification-time needsclick"
-                           name="notification-before-three-hours">
+                           name="notification-before-three-hours" data-diff-type="hours" data-diff-value="-3">
                     <span class="fa fa-check"></span>За 3 часа</label>
                 </div>
               </div>
@@ -397,7 +397,7 @@
                 <div class="checkbox c-checkbox needsclick">
                   <label class="needsclick">
                     <input type="checkbox" value="1" class="notification-time needsclick"
-                           name="notification-before-day">
+                           name="notification-before-day" data-diff-type="days" data-diff-value="-1">
                     <span class="fa fa-check"></span>За день</label>
                 </div>
               </div>
@@ -405,7 +405,7 @@
                 <div class="checkbox c-checkbox needsclick">
                   <label class="needsclick">
                     <input type="checkbox" value="1" class="notification-time needsclick"
-                           name="notification-before-three-days">
+                           name="notification-before-three-days" data-diff-type="days" data-diff-value="-3">
                     <span class="fa fa-check"></span>За 3 дня</label>
                 </div>
               </div>
@@ -413,7 +413,7 @@
                 <div class="checkbox c-checkbox needsclick">
                   <label class="needsclick">
                     <input type="checkbox" value="1" class="notification-time needsclick"
-                           name="notification-before-week">
+                           name="notification-before-week" data-diff-type="days" data-diff-value="-6">
                     <span class="fa fa-check"></span>За неделю</label>
                 </div>
               </div>

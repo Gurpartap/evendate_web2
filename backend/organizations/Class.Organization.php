@@ -150,7 +150,10 @@ class Organization {
 			$organization['subscribed_count'] = (int) $organization['subscribed_count'];
 		}
 		if (isset($organization['status'])){
-			$organization['status'] = isset($organization['status']) ? (boolean) $organization['status'] : true;
+			$organization['status'] = (boolean) $organization['status'];
+		}
+		if (isset($organization['subscription_id'])){
+			$organization['subscription_id'] = (int) $organization['subscription_id'];
 		}
 
 		$organization['background_img_url'] =  self::getPathWithURL($organization['background_img_url']);

@@ -324,8 +324,24 @@ class EventsCollection{
 
 	public static function makeImgUrls(array $event){
 		return array(
-			'image_vertical_url' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . $event['image_vertical'],
-			'image_horizontal_url' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . $event['image_horizontal']
+			'image_vertical_url' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . Event::IMG_SIZE_TYPE_MEDIUM . '/' . $event['image_vertical'],
+			'image_horizontal_url' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . Event::IMG_SIZE_TYPE_MEDIUM . '/' . $event['image_horizontal'],
+			'image_square_url' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . Event::IMG_SIZE_TYPE_SQUARE . '/' .$event['image_vertical'],
+
+			'vertical_images' => array(
+				'large' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . Event::IMG_SIZE_TYPE_LARGE . '/' . $event['image_vertical'],
+				'medium' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . Event::IMG_SIZE_TYPE_MEDIUM . '/' . $event['image_vertical'],
+				'small' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . Event::IMG_SIZE_TYPE_SMALL . '/' . $event['image_vertical'],
+			),
+			'horizontal_images' => array(
+				'large' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . Event::IMG_SIZE_TYPE_LARGE . '/' . $event['image_horizontal'],
+				'medium' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . Event::IMG_SIZE_TYPE_MEDIUM . '/' . $event['image_horizontal'],
+				'small' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . Event::IMG_SIZE_TYPE_SMALL . '/' . $event['image_horizontal'],
+			),
+			'square_images' => array(
+				'vertical' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . Event::IMG_SIZE_TYPE_SQUARE . '/' . $event['image_vertical'],
+				'horizontal' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . Event::IMG_SIZE_TYPE_SQUARE . '/' . $event['image_horizontal'],
+			)
 		);
 	}
 }

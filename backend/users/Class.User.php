@@ -221,11 +221,11 @@ class User extends AbstractUser{
 			':device_token' => $device_token,
 			':user_id' => $this->getId(),
 			':token' => $this->token,
-			'client_type' => $client_type
+			':client_type' => $client_type
 		));
 
 		if ($res === FALSE) throw new DBQueryException('', $this->db);
-		return new Result(true, '');
+		return new Result(true, '', array('token' => $this->token));
 	}
 
 	public function getTokenId() {

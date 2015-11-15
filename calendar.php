@@ -50,8 +50,7 @@
 	<!-- SELECT2 -->
     <link href="vendor/select2v3/select2.css" rel="stylesheet" />
     <link href="vendor/select2v3/select2-bootstrap.css" rel="stylesheet" />
-
-<!--        <link href="vendor/select2/css/select2.css" rel="stylesheet" />-->
+    <!--<link href="vendor/select2/css/select2.css" rel="stylesheet" />-->
 </head>
 
 <body>

@@ -6,6 +6,16 @@ class Event{
 
 	const IMAGES_PATH = '/event_images/';
 
+	const IMG_ORIENTATION_TYPE_VERTICAL = 'vertical';
+	const IMG_ORIENTATION_TYPE_HORIZONTAL = 'horizontal';
+
+
+	const IMG_SIZE_TYPE_SMALL = 'small';
+	const IMG_SIZE_TYPE_MEDIUM = 'medium';
+	const IMG_SIZE_TYPE_LARGE = 'large';
+	const IMG_SIZE_TYPE_SQUARE = 'square';
+
+
 	private $db;
 	private $id;
 	private $title;
@@ -29,6 +39,7 @@ class Event{
 	private $tags;
 
 	const TAGS_LIMIT = 5;
+	const ORGANIZATION_NOTIFICATIONS_LIMIT = 2;
 	private $organization;
 
 
@@ -62,20 +73,154 @@ class Event{
 		return $randomString;
 	}
 
-	private static function generateNotificationsJSON(array $data){
+	private static function getNotificationOffsets(PDO $db){
+		return $db->query('SELECT * FROM notification_types')->fetchAll();
+	}
+
+	private static function generateNotificationsArray(array $data, PDO $db, $event_id = null){
+
 		$result = array();
 		$notifications_count = 0;
+
 		foreach($data as $key => $value){
 			$key_parts = explode('-', $key);
 			if ($key_parts[0] == 'notification'){
-				if ($value == true && $notifications_count == 2) $value = false;
+				if ($value == true && $notifications_count == self::ORGANIZATION_NOTIFICATIONS_LIMIT) $value = false;
 				$result[$key] = $value;
 			}
 		}
-		return json_encode($result);
+
+		if ($event_id != null){
+			$p_upd_notifications = $db->prepare('SELECT
+				events.notifications_schema_json,
+				done,
+				notification_type_id,
+				notification_types.type
+			FROM events
+			LEFT JOIN events_notifications ON events_notifications.event_id = events.id
+			LEFT JOIN notification_types ON notification_types.id = events_notifications.notification_type_id
+			WHERE events.id = :event_id');
+			$p_upd_notifications->execute(array(':event_id' => $event_id));
+
+			$r = $p_upd_notifications->fetchAll();
+
+			$done = [];
+			foreach($r as $notification){
+				if ($notification['done'] == 1){
+					$done[$notification['type']] = $notification;
+				}
+			}
+
+			$current = json_decode($r[0]['notifications_schema_json']);
+
+			$done_count = count($done);
+
+			if ($done_count >= self::ORGANIZATION_NOTIFICATIONS_LIMIT){ // can't change, coz all done
+				return $current;
+			}
+
+			foreach($result as $type => $val){ // switch off all not done
+				if ($val == false && !isset($done[$type])){ //not done and is true
+					$current[$type] = $val;
+				}
+			}
+
+			$switched_on = 0;
+			foreach($result as $type => $val) { // switch on till reach limit
+				if ($val == true
+					&& !isset($done[$type])
+					&& ($done_count + $switched_on) < self::ORGANIZATION_NOTIFICATIONS_LIMIT) {
+					$current[$type] = $val;
+					$switched_on++;
+				}
+			}
+			$final = $current;
+
+		}else{
+			$final = $result;
+		}
+		$final['notification-now'] = true; // NOW IS DEFAULT FOR ALL
+
+		$times = array();
+		$_offsets = self::getNotificationOffsets($db);
+		$offsets = array();
+
+		foreach($_offsets as $type){
+			$offsets[$type['type']] = $type['timediff'];
+		}
+
+
+		foreach($final as $type => $value){ // set times
+			if ($value == true && !isset($done[$type])){
+				if ($type == 'notification-now'){
+					$times[$type] = time() + $offsets[$type];
+				}else{
+					$times[$type] = $data['first_date']->getTimestamp() - $offsets[$type];
+				}
+			}
+		}
+
+		return array (
+			'types' => $final,
+			'times' => $times
+		);
+	}
+
+	private static function sortDates(array $dates){
+		function sortFunc($a, $b){
+			$datea = strtotime($a);
+			$dateb = strtotime($b);
+			if ($datea == $dateb){
+				return 0;
+			}
+			return ($datea < $dateb) ? -1 : 1;
+		}
+
+		usort($dates, "sortFunc");
+		return $dates;
+	}
+
+	private static function getFirstDate(array $data){
+		if (isset($data['dates']) && count($data['dates']) > 0){
+			$__date = new DateTime($data['dates'][0]);
+			return new DateTime($__date->format('Y-m-d') . ' ' . $data['formatted_begin_time']);
+		}else{
+			return new DateTime($data['date-start'] . ' ' . $data['formatted_begin_time']);
+		}
+	}
+
+	private static function generateQueryData(&$data, PDO $db){
+		$data['title'] = trim($data['title']);
+		$data['description'] = trim($data['description']);
+		$data['detail_info_url'] = trim($data['detail-info-url']);
+
+		$data['location'] = isset($data['address']) ? trim($data['address']) : null;
+		$data['latitude'] = isset($data['geo']['coordinates']['G']) ? $data['geo']['coordinates']['G'] : null;
+		$data['longitude'] = isset($data['geo']['coordinates']['K']) ? $data['geo']['coordinates']['K'] : null;
+
+		if ($data['date-start'] == null && $data['date-end'] == null && count($data['dates']) == 0) throw new LogicException('Отсутствует дата события');
+		if (!isset($data['tags'])) throw new LogicException('Укажите хотя бы один тег');
+		if (!is_array($data['tags'])) throw new LogicException('Укажите хотя бы один тег');
+
+
+		if ($data['full-day'] == true){
+			$data['formatted_begin_time'] = '00:00:00';
+			$data['formatted_end_time'] = '00:00:00';
+		}else{
+			$data['formatted_begin_time'] = $data['begin-hours'] . ':' . $data['begin-minutes'] . ':00';
+			$data['formatted_end_time'] = ($data['end-hours'] == null) ? null : $data['end-hours'] . ':' . $data['end-minutes'] . ':00';
+		}
+
+		if (isset($data['dates']) && count($data['dates']) > 0) {
+			$data['dates'] = self::sortDates($data['dates']);
+		}
+		$data['first_date'] = self::getFirstDate($data);
+		$data['notifications'] = self::generateNotificationsArray($data, $db);
+
 	}
 
 	public static function create(PDO $db, Organization $organization, array $data){
+
 		$q_ins_event = 'INSERT INTO `events`(created_at, title, description, location,
 						location_object, location_uri, event_start_date, event_end_date,
 						notifications_schema_json, creator_id, organization_id,
@@ -90,24 +235,16 @@ class Event{
 
 		$p_ins_event = $db->prepare($q_ins_event);
 
-		$data['location'] = isset($data['address']) ? $data['address'] : null;
-		$data['latitude'] = isset($data['geo']['coordinates']['G']) ? $data['geo']['coordinates']['G'] : null;
-		$data['longitude'] = isset($data['geo']['coordinates']['K']) ? $data['geo']['coordinates']['K'] : null;
 
-		if ($data['date-start'] == null && $data['date-end'] == null && count($data['dates']) == 0) throw new LogicException('Отсутствует дата события');
-		if (!isset($data['tags'])) throw new LogicException('Укажите хотя бы один тег');
-		if (!is_array($data['tags'])) throw new LogicException('Укажите хотя бы один тег');
 
 		$img_horizontal_filename = md5(self::generateRandomString() .  '-horizontal') .  '.' . $data['image_extensions']['horizontal'];
 		$img_vertical_filename = md5(self::generateRandomString() . '-vertical') .  '.' . $data['image_extensions']['vertical'];
 
-		$begin_time = $data['begin-hours'] . ':' . $data['begin-minutes'] . ':00';
-		$end_time = ($data['end-hours'] == null) ? null : $data['end-hours'] . ':' . $data['end-minutes'] . ':00';
 
-		if ($data['full-day'] == true){
-			$begin_time = '00:00:00';
-			$end_time = '00:00:00';
-		}
+		self::generateQueryData($data, $db);
+
+
+
 
 		$query_data = array(
 			':title' => $data['title'],
@@ -117,7 +254,7 @@ class Event{
 			':location_uri' => 'content://maps.google.com/lat=' . $data['latitude'] .'&long='.$data['longitude'],
 			':event_start_date' => $data['date-start'],
 			':event_end_date' => $data['date-end'],
-			':notifications_schema_json' => self::generateNotificationsJSON($data),
+			':notifications_schema_json' => json_encode($data['notifications']['types']),
 			':creator_id' => $data['creator_id'],
 			':organization_id' => $organization->getId(),
 			':latitude' => $data['latitude'],
@@ -126,8 +263,8 @@ class Event{
 			':image_horizontal' => $img_horizontal_filename,
 			':event_type_id' => 1, // мероприятие
 			':detail_info_url' => $data['detail-info-url'],
-			':begin_time' => $begin_time,
-			':end_time' => $end_time,
+			':begin_time' => $data['formatted_begin_time'],
+			':end_time' => $data['formatted_end_time'],
 		);
 
 		$result = $p_ins_event->execute($query_data);
@@ -136,17 +273,18 @@ class Event{
 
 		$event_id = $db->lastInsertId();
 
-		self::saveEventTags($db, $event_id, $data['tags']);
-
-
 		if (isset($data['dates']) && count($data['dates']) > 0){
 			self::saveDates($data['dates'], $db, $event_id);
 		}
 
+		self::saveEventTags($db, $event_id, $data['tags']);
+
+		self::saveNotifications($event_id, $data, $db);
+
 		self::saveEventImage($data['files']['horizontal'], $img_horizontal_filename);
 		self::saveEventImage($data['files']['vertical'], $img_vertical_filename);
 
-		return new Result(true, 'Событие успешно создано!');
+		return new Result(true, 'Событие успешно создано', array('event_id' => $event_id));
 	}
 
 	private static function saveEventImage($file, $filename){
@@ -162,7 +300,7 @@ class Event{
 		$file = $file[1];
 		if ($file){
 			global $ROOT_PATH;
-			$result = file_put_contents($ROOT_PATH . self::IMAGES_PATH . $filename, base64_decode($file));
+			$result = file_put_contents($ROOT_PATH . self::IMAGES_PATH . self::IMG_SIZE_TYPE_LARGE . '/' . $filename, base64_decode($file));
 			if (!$result) throw new RuntimeException('Ошибка сохранения файла');
 			return $result;
 		}else{
@@ -218,7 +356,6 @@ class Event{
 	}
 
 	private static function saveDates($dates, PDO $db, $event_id) {
-
 		$p_set_inactive = $db->prepare('UPDATE events_dates SET status = 0 WHERE event_id = :event_id');
 		$p_set_inactive->execute(array(':event_id' => $event_id));
 
@@ -229,6 +366,33 @@ class Event{
 			$p_ins_dates->execute(array(
 				':event_date' => $date,
 				':event_id' => $event_id
+			));
+		}
+	}
+
+	private static function saveNotifications($event_id, array $data, PDO $db) {
+		$p_upd_not_done = $db->prepare('UPDATE events_notifications SET `status` = 1 WHERE done = 0 AND event_id = :event_id');
+		$p_upd_not_done->execute(array(
+			':event_id' => $event_id
+		));
+
+		$p_ins_value = $db->prepare('INSERT INTO
+			events_notifications(created_at, event_id, notification_type_id, notification_time, `status`, done)
+			SELECT
+				NOW() as created_at,
+				  :event_id AS event_id,
+				  id as notification_type_id,
+				  FROM_UNIXTIME(:notification_time) as notification_time,
+				  1 as `status`,
+				  0 as done
+				FROM notification_types WHERE type = :type
+				ON DUPLICATE KEY UPDATE `status` = 1');
+
+		foreach($data['notifications']['times'] as $type => $notification_time){
+			$p_ins_value->execute(array(
+				':event_id' => $event_id,
+				':notification_time' => $notification_time,
+				':type' => $type
 			));
 		}
 	}
@@ -355,11 +519,11 @@ class Event{
 
 
 	public function getImageHorizontalUrl() {
-		return App::$SCHEMA . App::$DOMAIN . self::IMAGES_PATH . '/' . $this->image_horizontal;
+		return App::$SCHEMA . App::$DOMAIN . self::IMAGES_PATH . '/' . self::IMG_SIZE_TYPE_LARGE . '/' . $this->image_horizontal;
 	}
 
 	public function getImageVerticalUrl() {
-		return App::$SCHEMA . App::$DOMAIN . self::IMAGES_PATH . '/' . $this->image_vertical;
+		return App::$SCHEMA . App::$DOMAIN . self::IMAGES_PATH . '/' . self::IMG_SIZE_TYPE_LARGE . '/' . $this->image_vertical;
 	}
 
 	public function getTags(){
@@ -440,31 +604,14 @@ class Event{
 				';
 
 
-		$data['location'] = isset($data['address']) ? $data['address'] : null;
-		$data['latitude'] = isset($data['geo']['coordinates']['G']) ? $data['geo']['coordinates']['G'] : null;
-		$data['longitude'] = isset($data['geo']['coordinates']['K']) ? $data['geo']['coordinates']['K'] : null;
 
-		if ($data['date-start'] == null && $data['date-end'] == null && count($data['dates']) == 0){
-			throw new LogicException('Отсутствует дата события');
-		}
+		self::generateQueryData($data, $this->db);
 
 		if (isset($data['file_names'])){
 			$data['image_extensions'] = array(
 				'vertical' => $editor->getImageExtension($data['file_names']['vertical']),
 				'horizontal' => $editor->getImageExtension($data['file_names']['horizontal'])
 			);
-		}
-
-
-		if (!isset($data['tags'])) throw new LogicException('Укажите хотя бы один тег');
-		if (!is_array($data['tags'])) throw new LogicException('Укажите хотя бы один тег');
-
-		$begin_time = $data['begin-hours'] . ':' . $data['begin-minutes'] . ':00';
-		$end_time = ($data['end-hours'] == null) ? null : $data['end-hours'] . ':' . $data['end-minutes'] . ':00';
-
-		if ($data['full-day'] == true){
-			$begin_time = '00:00:00';
-			$end_time = '00:00:00';
 		}
 
 		$query_data = array(
@@ -475,14 +622,14 @@ class Event{
 			':location_uri' => 'content://maps.google.com/lat=' . $data['latitude'] .'&long='.$data['longitude'],
 			':event_start_date' => $data['date-start'],
 			':event_end_date' => $data['date-end'],
-			':notifications_schema_json' => self::generateNotificationsJSON($data),
+			':notifications_schema_json' => json_encode($data['notifications']['types']),
 			':creator_id' => $editor->getId(),
 			':organization_id' => $organization->getId(),
 			':latitude' => $data['latitude'],
 			':longitude' => $data['longitude'],
-			':detail_info_url' => $data['detail-info-url'],
-			':begin_time' => $begin_time,
-			':end_time' => $end_time,
+			':detail_info_url' => $data['detail_info_url'],
+			':begin_time' => $data['formatted_begin_time'],
+			':end_time' => $data['formatted_end_time'],
 			':event_id' => $this->getId()
 		);
 
@@ -512,12 +659,13 @@ class Event{
 		if ($result === FALSE) throw new DBQueryException(implode(';', $this->db->errorInfo()), $this->db);
 		self::saveEventTags($this->db, $this->getId(), $data['tags']);
 
-
 		if (isset($data['dates']) && count($data['dates']) > 0){
 			self::saveDates($data['dates'], $this->db, $this->getId());
 		}
 
-		return new Result(true, 'Событие успешно сохранено!');
+
+		self::saveNotifications($this->getId(), $data, $this->db);
+		return new Result(true, 'Событие успешно сохранено!', array('event_id' => $this->getId()));
 	}
 
 }
