@@ -8403,7 +8403,7 @@ span.organization-modal-header-text{
   width: 950px;
   margin: 130px auto;
   border: #ccc solid 1px;
-  border-radius: 5px;
+  border-radius: 10px;
   background-color: #fff;
   display: -webkit-inline-flex;
   display: -ms-inline-flexbox;
@@ -8629,7 +8629,7 @@ span.organization-modal-header-text{
   padding-left: 30px;
   padding-right: 5px;
   width: 430px;
-  border-radius: 5px;
+  border-radius: 10px;
   padding-top: 10px;
 }
 .event-alone.in-modal .left-col{

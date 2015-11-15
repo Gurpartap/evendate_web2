@@ -85,9 +85,10 @@ function replaceTags(text, object){
 }
 
 function sendNotifications(){
-	var q_get_events_notifications = 'SELECT ' +
+
+	var q_get_events_notifications = 'SELECT DISTINCT ' +
 			' events_notifications.*, ' +
-			' events.title, ' +
+			' events.title, organizations.short_name' +
 			' events.image_vertical, ' +
 			' events.image_horizontal, ' +
 			' events.organization_id, ' +
@@ -96,6 +97,7 @@ function sendNotifications(){
 			' FROM events_notifications' +
 			' INNER JOIN events ON events_notifications.event_id = events.id' +
 			' INNER JOIN notification_types ON notification_types.id = events_notifications.notification_type_id' +
+			' INNER JOIN organizations ON organizations.id = events.organization_id' +
 			' WHERE ' +
 				' notification_time <= NOW() ' +
 				' AND done = 0' +
@@ -109,18 +111,24 @@ function sendNotifications(){
 			' WHERE FROM_UNIXTIME(tokens.expires_on) >= NOW()' +
 			' AND organizations.id = ?' +
 			' AND subscriptions.status = 1' +
-			' ORDER BY tokens.id DESC LIMIT 1';
-
-
+			' ORDER BY tokens.id DESC';
 
 	connection.query(q_get_events_notifications, function(err, rows){
 		if (err){
 			logger.error(err);
+			return;
 		}
+
 		rows.forEach(function(event_notification){
+			connection.query('UPDATE events_notifications SET done = 1 WHERE id = ' + connection.escape(event_notification.id), function(err){
+				if (err){
+					logger.error(err);
+				}
+			});
 			connection.query(q_get_to_send_devices, event_notification.organization_id, function(errors, devices){
 				if (errors){
 					logger.error(errors);
+					return;
 				}
 				devices.forEach(function(device){
 					var data = {
@@ -141,8 +149,11 @@ function sendNotifications(){
 					if (device.client_type == 'browser'){
 						if (device.notify_in_browser === 0) return;
 						if (__rooms.hasOwnProperty(device.token) && __rooms[device.token].length > 0){
-							var room = __rooms[device.token];
-							io.to(room[0]).emit('notification', data);
+							var connections = __rooms[device.token];
+							connections.forEach(function(socket_id){
+								io.to(socket_id).emit('notification', data);
+							})
+
 						}
 					}else{
 						//var notification = notifications_manager.create(data);
@@ -337,7 +348,7 @@ io.on('connection', function (socket){
 				'facebook_uid = ' + (UIDs.facebook_uid != null ?connection.escape(UIDs.facebook_uid) : ' facebook_uid ') + ', ' +
 				'google_uid = ' + (UIDs.google_uid != null ?connection.escape(UIDs.google_uid) : ' google_uid ') + ', ' +
 				'token = ' + connection.escape(user_token);
-		console.log(q_ins_user);
+		logger.info(q_ins_user);
 		connection.query(q_ins_user, function(user_err, result){
 			socket.emit('log', data);
 			if (user_err) return handleError(user_err, 'CANT_INSERT_USER');
@@ -407,7 +418,7 @@ io.on('connection', function (socket){
 				var token_type = (data.oauth_data.hasOwnProperty('mobile') && data.oauth_data.mobile == 'true') ? 'mobile' : 'bearer',
 					token_time = token_type == 'mobile' ? moment().add(1, 'months').unix() : moment().add(10, 'days').unix(),
 					created_at = moment().unix(),
-					expires_on = created_at + token_time,
+					expires_on = token_time,
 					q_ins_token = 'INSERT INTO tokens(token, user_id, token_type, expires_on, created_at) VALUES(' +
 						escapeArray([
 							user_token,
@@ -708,7 +719,6 @@ io.on('connection', function (socket){
 		});
 	});
 
-
 	socket.on('session.set', function(token){
 		if (!__rooms.hasOwnProperty(token)){
 			__rooms[token] = [];
@@ -717,18 +727,17 @@ io.on('connection', function (socket){
 		socket.token = token;
 	});
 
-
 	socket.on('disconnect', function () {
-		var index = __rooms[socket.token].indexOf(socket.id);
-		__rooms[socket.token].splice(index, 1);
-		if (__rooms[socket.token].length == 0){
-			delete __rooms[socket.token];
+		if (__rooms.hasOwnProperty(socket.token)){
+			var index = __rooms[socket.token].indexOf(socket.id);
+			__rooms[socket.token].splice(index, 1);
+			if (__rooms[socket.token].length == 0){
+				delete __rooms[socket.token];
+			}
 		}
 	});
 
-	socket.on('event.resizeImages', function () {
-		resizeImages();
-	});
+	socket.on('event.resizeImages', resizeImages);
 
 	socket.on('sendNotifications', sendNotifications);
 });

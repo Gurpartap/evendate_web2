@@ -1257,9 +1257,10 @@ socket.on('connect', function(){
       device_token: socket.id,
       client_type: 'browser'
     },
-    success: function(data){
-      if (data.status){
-        socket.emit('session.set', data.data.token);
+    success: function(res){
+      if (res.status){
+        socket.emit('session.set', res.data.token);
+        console.log(res.data.token);
       }
     }
   });
@@ -1294,10 +1295,10 @@ socket.on('notification', function(data){
   if (!Notify.needsPermission) {
     var myNotification = new Notify(data.note.alert, {
       body: data.note.body,
-      icon: window.location.origin + __C.IMAGES_PATH + '/' + data.note.icon,
+      icon: data.note.icon,
       tag: data.note.payload.event_id,
       notifyClick: function(){
-        window.open(window.location.origin + '/event.php?id=' + data.note.payload.event_id, '_blank', '_blank');
+        $("<a>").attr("href", window.location.origin + '/event.php?id=' + data.note.payload.event_id).attr("target", "_blank")[0].click();
       }}
     );
 

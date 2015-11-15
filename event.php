@@ -105,7 +105,7 @@ error_reporting(E_ALL);
 			<div class="text-center">
 				<div class="event-alone full-height">
 					<div class="left-col">
-						<div class="event-image" style="max-width: 100%; background-image: url('<?= Event::IMAGES_PATH . $event->getImageVertical()?>');" title="<?=$event->getTitle()?>"></div>
+						<div class="event-image" style="max-width: 100%; background-image: url('<?= Event::IMAGES_PATH . Event::IMG_SIZE_TYPE_LARGE . '/' . $event->getImageVertical()?>');" title="<?=$event->getTitle()?>"></div>
 						<div class="event-left-info">
 							<div class="day-name">
 								<?php

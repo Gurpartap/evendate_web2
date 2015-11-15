@@ -63,7 +63,7 @@ class User extends AbstractUser{
 		$this->last_name = $row['last_name'];
 		$this->middle_name = $row['middle_name'];
 		$this->email = $row['email'];
-		$this->token = $token ? $token : $row['token'];
+		$this->token = $token ? $token : $_SESSION['token'];
 		$this->avatar_url = $row['avatar_url'];
 		$this->is_editor = $row['is_editor'];
 		$this->token_id = $row['token_id'];
