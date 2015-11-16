@@ -74,9 +74,15 @@ class EventsCollection{
 					if ($value instanceof User == false){
 						$value = $user;
 					}
-					$q_get_events .= ' AND (organizations.id IN (SELECT organization_id FROM subscriptions WHERE
-						subscriptions.user_id = :user_id AND
-						subscriptions.status = 1)) ';
+					$q_get_events .= ' AND (
+						(organizations.id IN (SELECT organization_id FROM subscriptions WHERE
+						    subscriptions.user_id = :user_id AND
+						    subscriptions.status = 1)
+						 )
+						 OR
+						 (events.id IN (SELECT event_id FROM favorite_events WHERE favorite_events.status = 1 AND favorite_events.user_id = :user_id))
+						 )
+						 AND (events.id NOT IN (SELECT event_id FROM hidden_events WHERE hidden_events.status = 1 AND hidden_events.user_id = :user_id))';
 					$statement_array[':user_id'] = $value->getId();
 					break;
 				}

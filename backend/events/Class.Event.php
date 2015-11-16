@@ -584,6 +584,38 @@ class Event{
 
 	}
 
+	public function hide(User $user){
+		$q_ins_hidden = 'INSERT INTO hidden_events(created_at, event_id, user_id, status)
+			VALUES(NOW(), :event_id, :user_id, 1)
+			ON DUPLICATE KEY UPDATE status = 1';
+		$p_ins_hidden = $this->db->prepare($q_ins_hidden);
+		$result = $p_ins_hidden->execute(array(
+			':event_id' => $this->getId(),
+			':user_id' => $user->getId()
+		));
+
+		if ($result === FALSE) throw new DBQueryException('', $this->db);
+		return new Result(true, 'Событие успешно скрыто');
+	}
+
+	public function show(User $user){
+		$q_upd_hidden = 'UPDATE hidden_events
+			SET status = 0
+			WHERE
+			user_id = :user_id
+			AND
+			event_id = :event_id
+			';
+		$p_upd_hidden = $this->db->prepare($q_upd_hidden);
+		$result = $p_upd_hidden->execute(array(
+			':event_id' => $this->getId(),
+			':user_id' => $user->getId()
+		));
+
+		if ($result === FALSE) throw new DBQueryException('', $this->db);
+		return new Result(true, 'Событие успешно удалено из скрытых');
+	}
+
 	public function update(array $data, Organization $organization, Editor $editor) {
 		$q_upd_event = 'UPDATE events SET
 				title = :title,

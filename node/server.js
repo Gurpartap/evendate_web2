@@ -88,7 +88,7 @@ function sendNotifications(){
 
 	var q_get_events_notifications = 'SELECT DISTINCT ' +
 			' events_notifications.*, ' +
-			' events.title, organizations.short_name' +
+			' events.title, organizations.short_name, ' +
 			' events.image_vertical, ' +
 			' events.image_horizontal, ' +
 			' events.organization_id, ' +
@@ -111,7 +111,9 @@ function sendNotifications(){
 			' WHERE FROM_UNIXTIME(tokens.expires_on) >= NOW()' +
 			' AND organizations.id = ?' +
 			' AND subscriptions.status = 1' +
-			' ORDER BY tokens.id DESC';
+			' ORDER BY tokens.id DESC',
+		q_ins_notification = 'INSERT INTO notifications(created_at, click_time, received, token_id, event_notification_id)' +
+			' VALUES(NOW(), NULL, 0, ?, ?)';
 
 	connection.query(q_get_events_notifications, function(err, rows){
 		if (err){
@@ -131,34 +133,40 @@ function sendNotifications(){
 					return;
 				}
 				devices.forEach(function(device){
-					var data = {
-						device: device,
-						note: {
-							alert: event_notification.title,
-							body: replaceTags(event_notification.notification_type_text, event_notification),
-							icon: real_config.schema + real_config.domain + '/event_images/square/' + event_notification.image_vertical,
-							payload: {
-								type: 'event_notification',
-								event_id: event_notification.event_id
+					connection.query(q_ins_notification, [device.id, event_notification.id], function(err, result){
+						if (err)logger.error(err);
+						var notification_id = result.insertId;
+						var data = {
+							device: device,
+							note: {
+								alert: event_notification.title,
+								body: replaceTags(event_notification.notification_type_text, event_notification),
+								icon: real_config.schema + real_config.domain + '/event_images/square/' + event_notification.image_vertical,
+								payload: {
+									type: 'event_notification',
+									event_id: event_notification.event_id
+								}
+							},
+							type: device.client_type,
+							notification_id: notification_id
+						};
+
+
+						if (device.client_type == 'browser'){
+							if (device.notify_in_browser === 0) return;
+							if (__rooms.hasOwnProperty(device.token) && __rooms[device.token].length > 0){
+								var connections = __rooms[device.token];
+								connections.forEach(function(socket_id){
+									io.to(socket_id).emit('notification', data);
+								});
 							}
-						},
-						type: device.client_type
-					};
-
-
-					if (device.client_type == 'browser'){
-						if (device.notify_in_browser === 0) return;
-						if (__rooms.hasOwnProperty(device.token) && __rooms[device.token].length > 0){
-							var connections = __rooms[device.token];
-							connections.forEach(function(socket_id){
-								io.to(socket_id).emit('notification', data);
-							})
-
+						}else{
+							//var notification = notifications_manager.create(data);
+							//notification.send(function(err){});
 						}
-					}else{
-						//var notification = notifications_manager.create(data);
-						//notification.send(function(err){});
-					}
+					});
+
+
 				});
 			});
 		});
@@ -740,6 +748,15 @@ io.on('connection', function (socket){
 	socket.on('event.resizeImages', resizeImages);
 
 	socket.on('sendNotifications', sendNotifications);
+
+	socket.on('notification.received', function(data){
+		connection.query('UPDATE notifications ' +
+			' SET received = 1, ' +
+			' click_time = ' + (data.click_time ? connection.escape(data.click_time) : null) +
+			' WHERE id = ' + connection.escape(data.notification_id), function(err){
+			if (err) logger.error(err);
+		})
+	});
 });
 
 io.listen(8080);

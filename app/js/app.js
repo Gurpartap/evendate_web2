@@ -1260,7 +1260,6 @@ socket.on('connect', function(){
     success: function(res){
       if (res.status){
         socket.emit('session.set', res.data.token);
-        console.log(res.data.token);
       }
     }
   });
@@ -1291,14 +1290,20 @@ socket.on('log', function(data){
 });
 
 socket.on('notification', function(data){
-  console.log(data);
   if (!Notify.needsPermission) {
+    socket.emit('notification.received', {
+      notification_id: data.notification_id
+    });
     var myNotification = new Notify(data.note.alert, {
       body: data.note.body,
       icon: data.note.icon,
       tag: data.note.payload.event_id,
       notifyClick: function(){
         $("<a>").attr("href", window.location.origin + '/event.php?id=' + data.note.payload.event_id).attr("target", "_blank")[0].click();
+        socket.emit('notification.received', {
+          notification_id: data.notification_id,
+          click_time: moment().format(__C.DATE_FORMAT + ' HH:MM:SS')
+        });
       }}
     );
 
@@ -1426,7 +1431,7 @@ function showOrganizationalModal(organization_id){
                         url: '/api/events/' + $this.data('event-id'),
                         success: function(res){
 
-                            var _event = generateEventAttributes(res.data[0]);
+                            var _event = generateEventAttributes(res.data);
                             if (_event.one_day){_event.dates = $('<span>' + _event.day_name.capitalize() + '<br>' + _event.dates + '</span>')}
                             _event.style = _event.dates_range.length > 4 ? 'font-size: 14px;' : '';
                             var $event_content = tmpl('event-modal-content', _event),

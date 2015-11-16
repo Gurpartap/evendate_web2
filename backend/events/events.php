@@ -6,8 +6,9 @@ require_once $ROOT_PATH.'backend/events/Class.EventsCollection.php';
 $__modules['events'] = array(
 	'GET' => array(
 		'{{/(id:[0-9]+)}}' => function ($id) use ($__db, $__request, $__user) { /*MY EVENTS!*/
-			return EventsCollection::filter($__db, $__user,
-				array('id' => new Event($id, $__db)), '');
+			$events = EventsCollection::filter($__db, $__user,
+				array('id' => new Event($id, $__db)), '')->getData();
+			return new Result(true, '', count($events) > 0 ? $events[0] : null);
 		},
 		'my' => function () use ($__db, $__request, $__user, $__page, $__length) { /*MY EVENTS!*/
 			return EventsCollection::filter($__db, $__user,
@@ -41,6 +42,15 @@ $__modules['events'] = array(
 		},
 	),
 	'PUT' => array(
+		'{(id:[0-9]+)/status}' => function($id) use ($__request, $__db, $__user){
+			$event = new Event($id, $__db);
+			if (!isset($__request['hidden'])) throw new BadMethodCallException('Bad Request');
+			if ($__request['hidden'] == 1){
+				return $event->hide($__user);
+			}else{
+				return $event->show($__user);
+			}
+		},
 		'{/(id:[0-9]+)}' => function ($id) use ($__db, $__request, $__user) {
 			$event = new Event($id, $__db);
 
