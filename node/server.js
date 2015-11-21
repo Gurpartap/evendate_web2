@@ -6,6 +6,7 @@ var server = require('http'),
 	rest = require('restler'),
 	mysql = require('mysql'),
 	_fs = require("fs"),
+	request = require('request'),
 	moment = require("moment"),
 	config = {},
 	smtpTransport = require('nodemailer-smtp-transport'),
@@ -280,11 +281,59 @@ function resizeImages(){
 	}
 }
 
+function blurImages(){
+
+	var downloadImage = function(uri, path, callback){
+		request.head(uri, function(err, res, body){
+			if (err){
+				logger.log(err);
+				return;
+			}
+			request(uri).pipe(_fs.createWriteStream(path)).on('close', callback);
+		});
+	};
+
+	var q_get_user_images = 'SELECT id, avatar_url ' +
+		'   FROM users ' +
+		'   WHERE ' +
+		'   (users.blurred_image_url IS NULL OR users.blurred_image_url != avatar_url)' +
+		'   AND users.avatar_url IS NOT NULL LIMIT 20';
+	connection.query(q_get_user_images, function(err, rows){
+		if (err){
+			logger.error(err);
+			return;
+		}
+
+		rows.forEach(function(image){
+			var img_path = '../' + real_config.images.user_images + '/default/' + image.id + '.jpg',
+				blurred_path = '../' + real_config.images.user_images + '/blurred/' + image.id + '.jpg';
+			downloadImage(image.avatar_url, img_path, function(){
+				cropper.blurImage({
+					src: img_path,
+					dest: blurred_path
+				}, function(err){
+					if (err){
+						logger.log(err);
+						return;
+					}
+					var q_upd_user = 'UPDATE users SET blurred_image_url = avatar_url WHERE id = ' + connection.escape(image.id);
+					connection.query(q_upd_user, function(err){
+						if (err){
+							logger.error(err);
+						}
+					})
+				});
+			});
+		});
+	});
+}
+
 try {
 	if (config_index != 'local'){
 		new CronJob('*/2 * * * *', function(){
 			logger.info('Resizing start', 'START... ' + new Date().toString());
 			resizeImages();
+			blurImages();
 		}, null, true);
 	}
 } catch(ex) {
@@ -748,6 +797,8 @@ io.on('connection', function (socket){
 	socket.on('event.resizeImages', resizeImages);
 
 	socket.on('sendNotifications', sendNotifications);
+
+	socket.on('blurImages', blurImages);
 
 	socket.on('notification.received', function(data){
 		connection.query('UPDATE notifications ' +

@@ -8143,6 +8143,14 @@ border-bottom-right-radius: 8px;
 .event-name{
   font-size: 20px;
 }
+.short-event .event-name{
+  font-size: 20px;
+  height: 45px;
+  overflow: hidden;
+  line-height: 22px;
+  text-overflow: ellipsis;
+  margin-bottom: 9px;
+}
 
 .event-attribute{
   padding-left: 35px;

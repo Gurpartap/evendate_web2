@@ -1298,6 +1298,7 @@ socket.on('notification', function(data){
       body: data.note.body,
       icon: data.note.icon,
       tag: data.note.payload.event_id,
+      timeout: 60,
       notifyClick: function(){
         $("<a>").attr("href", window.location.origin + '/event.php?id=' + data.note.payload.event_id).attr("target", "_blank")[0].click();
         socket.emit('notification.received', {

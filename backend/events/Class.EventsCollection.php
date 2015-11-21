@@ -279,6 +279,8 @@ class EventsCollection{
 				$event['timestamp_updated_at'] = intval($event['timestamp_updated_at']);
 				$event['organization_img_url'] = App::$SCHEMA . App::$DOMAIN . '/' . $event['organization_img_url'];
 				$event['is_full_day'] = $event['end_time'] == '00:00:00' && $event['begin_time'] == '00:00:00';
+				$event['location_object'] = $event['location_object'] == null ? null : $event['location_object'];
+				$event['status'] = $event['status'] == 1;
 			}
 
 			$event['favorite_friends'] = array();
@@ -288,6 +290,8 @@ class EventsCollection{
 				$event['favorite_friends'] = $p_get_liked_users->fetchAll();
 				foreach($event['favorite_friends'] as &$friend){
 					$friend['id'] = intval($friend['id']);
+					$friend['friend_uid'] = intval($friend['friend_uid']);
+					$friend['friend_id'] = isset($friend['friend_id']) ? intval($friend['friend_id']) : null;
 					$friend['link'] = User::getLinkToSocialNetwork($friend['type'], $friend['friend_uid']);
 				}
 			}

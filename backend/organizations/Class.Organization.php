@@ -263,6 +263,8 @@ class Organization {
 
 		foreach($users as &$friend){
 			$friend['id'] = intval($friend['id']);
+			$friend['friend_id'] = intval($friend['friend_id']);
+			$friend['is_friend'] = $friend['is_friend'] == 1;
 			$friend['link'] = User::getLinkToSocialNetwork($friend['type'], $friend['friend_uid']);
 		}
 

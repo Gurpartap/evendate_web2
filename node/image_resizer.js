@@ -1,7 +1,9 @@
 
 if (process.env.ENV == 'local') return ;
 
-var easyimage = require('easyimage');
+var easyimage = require('easyimage'),
+	gm = require('gm').subClass({imageMagick: true}),
+	fs = require('fs');
 
 const IMG_WIDTHS = {
 	'small': {
@@ -62,6 +64,13 @@ ImagesResize.prototype.cropToSquare = function(settings){
 			console.log(err);
 		}
 	);
+};
+
+ImagesResize.prototype.blurImage = function(settings, cb){
+	gm(settings.src)
+		.resize(500, 500)
+		.blur(30, 20)
+	.write(settings.dest, cb);
 };
 
 module.exports = ImagesResize;

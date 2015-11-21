@@ -365,12 +365,12 @@ class User extends AbstractUser{
 
 		foreach($stat_events as $event){
 			$to_push = array(
-				'stat_type_id' => $event['stat_type_id'],
+				'stat_type_id' => intval($event['stat_type_id']),
 				'type_code' => $event['type_code'],
 				'entity' => $event['entity'],
 				'created_at' => $event['created_at'],
 				'user' => array(
-					'id' => $event['user_id'],
+					'id' => intval($event['user_id']),
 					'type' => $event['type'],
 					'friend_uid' => $event['friend_uid'],
 					'avatar_url' => $event['avatar_url'],

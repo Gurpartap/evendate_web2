@@ -716,9 +716,9 @@ function showEditEventModal(event_id){
 		url: '/api/events/' + event_id,
 		success: function(res) {
 			if (res.status == false) return showNotifier(res);
-			if (res.data.length != 1) return showNotifier({status: false, text: 'Событие не найдено'});
+			if (res.data == null) return showNotifier({status: false, text: 'Событие не найдено'});
 
-			var _event = res.data[0],
+			var _event = res.data,
 				zero_dates = '00:00:00';
 			showAddEventModal(function($modal){
 

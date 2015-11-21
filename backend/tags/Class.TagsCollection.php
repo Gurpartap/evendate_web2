@@ -2,8 +2,11 @@
 
 class TagsCollection{
 
-
-
+	private static function normalizeTag(array $tag){
+		$tag['id'] = intval($tag['id']);
+		$tag['status'] = $tag['status'] == 1;
+		return $tag;
+	}
 
 
 	public static function all(PDO $db, $order_by = '', User $user = null){
@@ -27,6 +30,10 @@ class TagsCollection{
 			}
 		}
 
+		foreach($res_array['tags'] as &$tag){
+			$tag = self::normalizeTag($tag);
+		}
+
 		return new Result(true, '', $res_array);
 	}
 
@@ -39,7 +46,13 @@ class TagsCollection{
 		$p_get_tags->execute(array(
 			':name' => $name . '%'
 		));
-		return new Result(true, '', $p_get_tags->fetchAll());
+
+		$res_array  = $p_get_tags->fetchAll();
+		foreach($res_array as &$tag){
+			$tag = self::normalizeTag($tag);
+		}
+
+		return new Result(true, '', $res_array);
 	}
 
 }
