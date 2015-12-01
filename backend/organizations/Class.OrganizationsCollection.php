@@ -17,7 +17,7 @@ class OrganizationsCollection{
 	public static function filter(PDO $db, User $user, array $filters = null, $order_by = ''){
 		$q_get_organizations = 'SELECT DISTINCT organizations.id, organizations.description,
 			organizations.background_medium_img_url, organizations.background_small_img_url,
-			organizations.img_medium_url, organizations.img_small_url,
+			organizations.img_medium_url, organizations.img_small_url, organizations.site_url,
 			organizations.name, organizations.type_id, organizations.img_url, organizations.background_img_url,
 			 organizations.status, organizations.short_name, organization_types.name AS type_name,
 			 organizations.updated_at,
@@ -39,7 +39,9 @@ class OrganizationsCollection{
 
 		$statement_array = array(':user_id' => $user->getId());
 
+		$friends_subscriptions = false;
 		$search_fields = [];
+		$_friend = null;
 
 		foreach($filters as $name => $value) {
 			switch ($name) {
@@ -58,6 +60,13 @@ class OrganizationsCollection{
 					$statement_array[':short_name'] = '%' . $value . '%';
 					break;
 				}
+				case 'friend': {
+					if ($value instanceof Friend){
+						$_friend = $value;
+						$statement_array[':user_id'] = $value->getId();
+						$q_get_organizations .= ' AND subscriptions.user_id = :user_id';
+					}
+				}
 			}
 		}
 
@@ -72,7 +81,11 @@ class OrganizationsCollection{
 		$organizations = $p_search->fetchAll();
 		foreach($organizations as &$org){
 			$org = Organization::normalizeOrganization($org);
-			$org['subscribed_friends'] = Organization::getSubscribedFriends($db, $user, $org['id'])->getData();
+			$fr = $user;
+			if ($_friend != null){
+				$fr = $_friend;
+			}
+			$org['subscribed_friends'] = Organization::getSubscribedFriends($db, $fr, $org['id'])->getData();
 		}
 		return new Result(true, '', $organizations);
 	}

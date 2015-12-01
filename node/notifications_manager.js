@@ -1,6 +1,8 @@
 
 
-var apn = require('apn');
+var apn = require('apn'),
+	Pushwoosh = require('pushwoosh-client'),
+	client;
 
 
 
@@ -19,6 +21,7 @@ var apnConnection,
 
 function NotificationsManager(settings) {
 	this.settings = settings;
+	client = new Pushwoosh(settings.pushwoosh.app_code, settings.pushwoosh.app_token);
 	apnConnection = new apn.Connection(settings);
 	feedback = new apn.Feedback(feedBackOptions);
 	feedback.on('feedback', function(devices) {
@@ -44,7 +47,11 @@ NotificationsManager.prototype.create = function(notification){
 	function getDeviceInstance(device){
 		switch (device.client_type){
 			case DEVICE_TYPES.IOS: {
-				return new apn.Device(device.device_token);
+				//return new apn.Device(device.device_token);
+				return device.device_token;
+			}
+			default :{
+				throw new Error('Cant find device');
 			}
 		}
 	}
@@ -52,29 +59,40 @@ NotificationsManager.prototype.create = function(notification){
 	function getNote(client_type, note){
 		switch (client_type){
 			case DEVICE_TYPES.IOS: {
-				return new apn.Notification();
+				//return new apn.Notification();
+				return {};
 			}
 			case DEVICE_TYPES.ANDROID: {
 				return note;
+			}
+			default :{
+				throw new Error('Cant find type');
 			}
 		}
 	}
 
 	function sendToAPN(device, note){
-		if(apnConnection){
-			console.log('TRUE');
-			apnConnection.pushNotification(note, device);
-		}else{
-			console.log('false');
-		}
+		//if(apnConnection){
+		//	apnConnection.pushNotification(note, device);
+		//}else{
+		//	console.log('false');
+		//}
+		console.log(note.alert, device, {data: note.payload});
+		client.sendMessage(note.alert, device, {data: note.payload}, function(error, response) {
+			if (error) {
+				console.log('Some error occurs: ', error);
+			}
+			console.log('Pushwoosh API response is', response);
+		});
 	}
 
 	Notification.prototype.send = function(){
 		switch (this.type){
 			case DEVICE_TYPES.IOS:{
-				return sendToAPN(this.device);
+				return sendToAPN(this.device, this.note);
 			}
 		}
+
 	};
 
 	return new Notification(notification);

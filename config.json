@@ -46,7 +46,11 @@
       "cacheLength": 5,
       "cert": "pushcert.pem",
       "key": "pushkey.pem",
-      "passphrase": "maryashka2004"
+      "passphrase": "maryashka2004",
+      "pushwoosh": {
+        "app_code": "3874F-0C5E5",
+        "app_token": "gFVeR6D4frF2VImMkCSQbLgG5vkWCIm5Eetyt3mEgsR8qw3DICcfEX7T1ShRpMYxqaXoxqsZyOVpaBd6kpnw"
+      }
     },
     "images": {
       "events_path": "event_images",

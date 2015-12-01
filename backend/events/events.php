@@ -29,7 +29,8 @@ $__modules['events'] = array(
 			return EventsCollection::filter($__db, $__user, $__request);
 		},
 		'' => function () use ($__db, $__request, $__user) {
-			return EventsCollection::filter($__db, $__user, $__request);
+			return EventsCollection::filter($__db, $__user, $__request,
+				'ORDER BY first_date, events.begin_time');
 		},
 	),
 	'POST' => array(

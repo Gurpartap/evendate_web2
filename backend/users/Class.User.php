@@ -58,7 +58,7 @@ class User extends AbstractUser{
 		$row = $p_get_user->fetch();
 
 		$this->db = $db;
-		$this->id = $row['id'];
+		$this->id = intval($row['id']);
 		$this->first_name = $row['first_name'];
 		$this->last_name = $row['last_name'];
 		$this->middle_name = $row['middle_name'];
@@ -122,8 +122,9 @@ class User extends AbstractUser{
 			':event_id' => $event->getId()
 		));
 		if ($result === FALSE) throw new DBQueryException('CANT_MAKE_FAVORITE', $this->db);
+		$favorite_id = $this->db->lastInsertId();
 		Statistics::Event($event, $this, $this->db, Statistics::EVENT_FAVE);
-		return new Result(true, 'Событие успешно добавлено в избранное', array('favorite_id' => $this->db->lastInsertId()));
+		return new Result(true, 'Событие успешно добавлено в избранное', array('favorite_id' => $favorite_id));
 	}
 
 	public function deleteFavoriteEvent(Event $event){
@@ -232,33 +233,58 @@ class User extends AbstractUser{
 		return $this->token_id;
 	}
 
-	public function getFriends($page, $length) {
+	public function getFriends($page, $length, Friend $user_friend = null) {
+
+		if ($user_friend instanceof Friend){
+			$friend_part = ' AND view_friends.friend_id = :friend_id';
+			$data = array(':friend_id' => $user_friend->getId());
+		}else{
+			$friend_part = '';
+			$data = array();
+		}
+
 		$q_get_friends = 'SELECT users.first_name, users.last_name, users.avatar_url,
+			users.id,
  			view_friends.friend_uid, view_friends.type
  			FROM view_friends
 			 INNER JOIN users ON users.id = view_friends.friend_id
 			WHERE user_id = :user_id
+			AND view_friends.friend_id != :user_id
+			 ' . $friend_part . '
 			GROUP BY friend_id
 			LIMIT ' . ($page * $length) . " , {$length}";
 
 		$p_get_friends = $this->db->prepare($q_get_friends);
-		$result = $p_get_friends->execute(array(
+		$data = array_merge($data, array(
 			':user_id' => $this->getId()
 		));
+		$result = $p_get_friends->execute($data);
+
+
 		if ($result === FALSE) throw new DBQueryException('', $this->db);
 
 		$friends = $p_get_friends->fetchAll();
 
 		foreach($friends as &$friend){
+			$friend['id'] = intval($friend['id']);
 			$friend['link'] = User::getLinkToSocialNetwork($friend['type'], $friend['friend_uid']);
 		}
 
 		return new Result(true, '', $friends);
 	}
 
-	public function getFriendsFeed($page, $length) {
-
+	public function getFriendsFeed($page, $length, Friend $friend_user = null) {
 		/*EVENTS*/
+
+		$_data = array();
+		if ($friend_user instanceof Friend){
+			$filter = ' AND view_friends.friend_id = :friend_id';
+			$_data = array(
+				':friend_id' => $friend_user->getId()
+			);
+		}else{
+			$filter = '';
+		}
 
 		$q_get_stat_events = "
 			(SELECT
@@ -300,6 +326,8 @@ class User extends AbstractUser{
 			    OR stat_event_types.type_code = :unfave)
 			    AND events.status = 1
 			    AND view_friends.user_id = :user_id
+			    AND view_friends.friend_id != :user_id
+			    {$filter}
 			  GROUP BY stat_events.event_id, users.id)
 
 			UNION
@@ -342,6 +370,8 @@ class User extends AbstractUser{
 			    OR stat_event_types.type_code = :unsubscribe)
 			    AND organizations.status = 1
 			    AND view_friends.user_id = :user_id
+			    AND view_friends.friend_id != :user_id
+			    {$filter}
 			GROUP BY stat_organizations.organization_id, users.id)
 			ORDER BY created_at DESC
 			LIMIT " . ($page * $length) ." , {$length}";
@@ -353,6 +383,8 @@ class User extends AbstractUser{
 			':unsubscribe' => Statistics::ORGANIZATION_UNSUBSCRIBE,
 			':user_id' => $this->getId()
 		);
+
+		$prep_arr = array_merge($_data, $prep_arr);
 
 		$p_get_stat = $this->db->prepare($q_get_stat_events);
 		$result = $p_get_stat->execute($prep_arr);
@@ -382,7 +414,7 @@ class User extends AbstractUser{
 			if ($event['entity'] == Statistics::ENTITY_EVENT){
 				$_event = EventsCollection::makeImgUrls($event);
 				$_event = array_merge($_event, array(
-					'id' => $event['event_id'],
+					'id' => intval($event['event_id']),
 					'title' => $event['title'],
 					'image_horizontal' => $event['image_horizontal'],
 					'image_vertical' => $event['image_vertical'],
@@ -392,7 +424,7 @@ class User extends AbstractUser{
 				$to_push['event'] = $_event;
 			}elseif ($event['entity'] == Statistics::ENTITY_ORGANIZATION){
 				$_organization = Organization::normalizeOrganization(array(
-					'id' => $event['organization_id'],
+					'id' => intval($event['organization_id']),
 					'name' => $event['name'],
 					'short_name' => $event['short_name'],
 					'background_img_url' => $event['background_img_url'],

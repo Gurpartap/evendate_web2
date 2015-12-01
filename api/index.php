@@ -25,6 +25,7 @@ try {
 	require_once "../backend/users/Class.AbstractUser.php";
 	require_once "../backend/users/Class.User.php";
 	require_once "../backend/users/Class.Editor.php";
+	require_once "../backend/users/Class.Friend.php";
 	require_once "../backend/statistics/Class.Statistics.php";
 	require_once "../backend/events/Class.EventsCollection.php";
 

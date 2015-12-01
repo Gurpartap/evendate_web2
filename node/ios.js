@@ -18,7 +18,7 @@ config = JSON.parse(config);
 
 var config_index = process.env.ENV ? process.env.ENV : 'dev',
 	real_config = config[config_index],
-	connection = mysql.createConnection(real_config.db),
+	connection = mysql.createPool(real_config.db),
 	logger = new (winston.Logger)({
 		transports: [
 			new winston.transports.File({ filename: __dirname + '/debug.log', json: false })
@@ -29,60 +29,71 @@ var config_index = process.env.ENV ? process.env.ENV : 'dev',
 		exitOnError: false
 	});
 
+//
+//var options = {
+//	"cert": __dirname + '/pushcert.pem',
+//	"key":  __dirname + '/pushkey.pem',
+//	"passphrase": 'maryashka2004',
+//	"gateway": "gateway.push.apple.com",
+//	"port": 2195,
+//	"enhanced": true,
+//	production: false,
+//	"cacheLength": 5,
+//	errorCallback: function(err){
+//		console.log("APN Error:", JSON.stringify(err));
+//		console.log(err);
+//	}
+//};
 
-var options = {
-	"cert": __dirname + '/cert.pem',
-	"key":  __dirname + '/key.pem',
-	"passphrase": '1P8WhhcARgYMxxJH',
-	"gateway": "gateway.sandbox.push.apple.com",
-	"port": 2195,
-	"enhanced": true,
-	production: false,
-	"cacheLength": 5,
-	errorCallback: function(err){
-		console.log("APN Error:", JSON.stringify(err));
-		console.log(err);
-	}
-};
-
-var feedBackOptions = {
-	"batchFeedback": true,
-	"interval": 300
-};
-
-var apnConnection, feedback;
-
-apnConnection = new apn.Connection(options);
-
-feedback = new apn.Feedback(feedBackOptions);
-feedback.on("feedback", function(devices) {
-	devices.forEach(function(item) {
-		console.log(item);
-	});
-});
-
-
-var myDevice, note;
-
-myDevice = new apn.Device('ba24455eed3c97f95858712240a92a99dc61e53d86891d1c855d0230994ead6c');
-note = new apn.Notification();
-
-note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
-note.badge = 1;
-note.alert = 'Evendate приветствует тебя!';
-note.payload = {'messageFrom': 'Evendate'};
-
-if(apnConnection) {
-	apnConnection.pushNotification(note, myDevice);
-}
+//var feedBackOptions = {
+//	"batchFeedback": true,
+//	"interval": 300
+//};
+////
+//var apnConnection,
+//	feedback,
+//	q_get_devices = 'SELECT * ' +
+//		' FROM tokens ' +
+//		' WHERE ' +
+//		'   client_type="ios" ' +
+//		'   AND device_token IS NOT NULL';
+//
+//apnConnection = new apn.Connection(options);
+//
+//feedback = new apn.Feedback(feedBackOptions);
+//feedback.on("feedback", function(devices) {
+//	devices.forEach(function(item) {
+//		logger.log(item);
+//	});
+//});
+//
+//
+//
+//connection.query(q_get_devices, function(err, devices){
+//
+//	devices.forEach(function(device){
+//		var myDevice = new apn.Device(device.device_token),
+//			note = new apn.Notification();
+//
+//
+//		note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
+//		note.alert = 'Событие прилетело!';
+//		note.payload = {type: 'event_notification', event_id: 660};
+//
+//		if(apnConnection){
+//			console.log('TRUE');
+//			apnConnection.pushNotification(note, myDevice);
+//		}else{
+//			console.log('false');
+//		}
+//	});
+//});
 
 io.on('connection', function (socket){
 	socket.on('log', function(data){
-		logger.info(arguments);		
+		//logger.info(arguments);
 		console.log(arguments);
 	});
-
-
 });
 
 io.listen(443);

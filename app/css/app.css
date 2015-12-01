@@ -8143,6 +8143,11 @@ border-bottom-right-radius: 8px;
 .event-name{
   font-size: 20px;
 }
+
+.short-event{
+  border-bottom: 1px solid rgba(0,0,0,0.2);
+}
+
 .short-event .event-name{
   font-size: 20px;
   height: 45px;

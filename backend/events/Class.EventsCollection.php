@@ -19,12 +19,15 @@ class EventsCollection{
 			 	 DATE(NOW()),
 			 	 events.event_start_date
 			 	)
-				) AS first_date,
+			 	) AS nearest_event_date,
 			UNIX_TIMESTAMP(event_start_date) as timestamp_event_start_date,
 			UNIX_TIMESTAMP(events.created_at) as timestamp_created_at,
 			UNIX_TIMESTAMP(event_end_date) as timestamp_event_end_date,
 			UNIX_TIMESTAMP(events.updated_at) as timestamp_updated_at,
-			(SELECT MIN(event_date) FROM events_dates WHERE events_dates.event_id = events.id AND status = 1 AND DATE(event_date) >= DATE(NOW()) GROUP BY events_dates.event_id) as nearest_event_date,
+			IF(events.event_start_date IS NULL,
+			 	(SELECT MIN(event_date) FROM events_dates WHERE events_dates.event_id = events.id AND status = 1 GROUP BY events_dates.event_id),
+			 	events.event_start_date
+				) AS first_date,
 			(SELECT COUNT(*) AS liked_count FROM favorite_events WHERE status = 1 AND event_id = events.id) AS liked_users_count,
 			(SELECT COUNT(users_organizations.user_id) AS can_edit
 				FROM users_organizations
@@ -220,12 +223,11 @@ class EventsCollection{
 			AND tags.status = 1
 			AND events_tags.event_id = :event_id');
 
-		$p_get_dates = $db->prepare('SELECT DATE(events_dates.event_date) as event_date
+		$p_get_dates = $db->prepare('SELECT events_dates.event_date as event_date
 			FROM events_dates
 			WHERE
 				events_dates.status = 1
 			AND events_dates.event_id = :event_id
-			AND DATE(events_dates.event_date) >= DATE(NOW())
 			ORDER BY events_dates.event_date');
 
 		$p_get_liked_users = $db->prepare('SELECT DISTINCT users.first_name, users.last_name,
@@ -281,6 +283,8 @@ class EventsCollection{
 				$event['is_full_day'] = $event['end_time'] == '00:00:00' && $event['begin_time'] == '00:00:00';
 				$event['location_object'] = $event['location_object'] == null ? null : $event['location_object'];
 				$event['status'] = $event['status'] == 1;
+				$first_date_dt = new DateTime($event['first_date']);
+				$event['timestamp_first_date'] = $first_date_dt->getTimestamp();
 			}
 
 			$event['favorite_friends'] = array();
@@ -310,7 +314,7 @@ class EventsCollection{
 					$end_date
 				);
 				foreach($period as $date){
-					$event['dates_range'][] = $date->format('Y-m-d H:i:s');
+					$event['dates_range'][] = $date->format('Y-m-d');
 				}
 				if (count($event['dates_range']) == 0 && $event['event_start_date'] == $event['event_end_date']){
 					$event['dates_range'][] = $event['event_start_date'];

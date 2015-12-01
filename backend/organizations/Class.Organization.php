@@ -233,7 +233,7 @@ class Organization {
 		)));
 	}
 
-	public static function getSubscribedFriends(PDO $db, User $user, $organization_id) {
+	public static function getSubscribedFriends(PDO $db, AbstractUser $user, $organization_id) {
 		$q_get_subscribed_friends = 'SELECT DISTINCT
 			users.first_name, users.last_name,
 			users.middle_name, users.id, view_friends.friend_id, users.avatar_url, view_friends.friend_uid,

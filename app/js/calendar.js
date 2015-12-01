@@ -579,14 +579,19 @@ function setDaysWithEvents(){
 		},
 		success: function(res){
 			$('.td-day').removeClass('click-able has-favorites').addClass(__C.CLASSES.DISABLED);
-			walkEventActiveDates(res.data, function(event, event_date){
-				var add_has_favorites = event.is_favorite ? 'has-favorites' : '';
-				$('.td-day[data-date="' + event_date + '"]')
-					.addClass('click-able')
-					.addClass(add_has_favorites)
-					.removeClass(__C.CLASSES.DISABLED);
-				__STATES[event_date] = OneDay;
+
+			res.data.forEach(function(event){
+				event.dates_range.forEach(function(event_date){
+					var _event_date = moment(event_date).format(__C.DATE_FORMAT),
+						add_has_favorites = event.is_favorite ? 'has-favorites' : '';
+					$('.td-day[data-date="' + _event_date + '"]')
+						.addClass('click-able')
+						.addClass(add_has_favorites)
+						.removeClass(__C.CLASSES.DISABLED);
+					__STATES[event_date] = OneDay;
+				})
 			});
+
 			bindOnClick();
 		}
 	});

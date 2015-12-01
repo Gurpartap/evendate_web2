@@ -69,6 +69,7 @@ ImagesResize.prototype.cropToSquare = function(settings){
 ImagesResize.prototype.blurImage = function(settings, cb){
 	gm(settings.src)
 		.resize(500, 500)
+		.contrast(-6)
 		.blur(30, 20)
 	.write(settings.dest, cb);
 };

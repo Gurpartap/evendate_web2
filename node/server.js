@@ -12,7 +12,7 @@ var server = require('http'),
 	smtpTransport = require('nodemailer-smtp-transport'),
 	nodemailer = require('nodemailer'),
 	CronJob = require('cron').CronJob,
-	notifications_manager = require('./notifications_manager.js'),
+	NotificationsManager = require('./notifications_manager.js'),
 	images_resize = require('./image_resizer.js'),
 	__rooms = {};
 
@@ -33,12 +33,12 @@ var config_index = process.env.ENV ? process.env.ENV : 'dev',
 		],
 		exitOnError: false
 	}),
+	notifications_factory = new NotificationsManager(real_config.APN),
 	cropper = config_index == 'local' ? '' : new images_resize({}),
 	transporter = nodemailer.createTransport(smtpTransport({
 		host: real_config.smtp.host,
 		port: real_config.smtp.port,
 		secure: false,
-
 		auth: {
 			user: real_config.smtp.user,
 			pass: real_config.smtp.password
@@ -145,7 +145,10 @@ function sendNotifications(){
 								icon: real_config.schema + real_config.domain + '/event_images/square/' + event_notification.image_vertical,
 								payload: {
 									type: 'event_notification',
-									event_id: event_notification.event_id
+									title: event_notification.title,
+									event_id: event_notification.event_id,
+									body: replaceTags(event_notification.notification_type_text, event_notification),
+									icon: real_config.schema + real_config.domain + '/event_images/square/' + event_notification.image_vertical
 								}
 							},
 							type: device.client_type,
@@ -162,8 +165,16 @@ function sendNotifications(){
 								});
 							}
 						}else{
-							//var notification = notifications_manager.create(data);
-							//notification.send(function(err){});
+							try{
+								var notification = notifications_factory.create(data);
+								notification.send(function(err){
+									console.log(err);
+								});
+							}catch(e){
+								logger.error(e);
+								console.log(e.stack);
+							}
+
 						}
 					});
 
@@ -341,7 +352,7 @@ try {
 }
 
 try {
-	new CronJob('*/10 * * * *', function(){
+	new CronJob('*/1 * * * *', function(){
 		logger.info('Notifications start', 'START...' + new Date().toString());
 		sendNotifications();
 	}, null, true);

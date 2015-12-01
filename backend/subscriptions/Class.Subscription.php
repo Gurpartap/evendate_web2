@@ -56,7 +56,7 @@ class Subscription{
 		$sub_id = $db->lastInsertId();
 		Statistics::Organization($organization, $user, $db, Statistics::ORGANIZATION_SUBSCRIBE);
 
-		return new Result(true, 'Подписка успешно оформлена', array('subscription_id' => $sub_id));
+		return new Result(true, 'Подписка успешно оформлена', array('subscription_id' => intval($sub_id)));
 	}
 
 	public function delete(User $user){
