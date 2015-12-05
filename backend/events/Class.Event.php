@@ -401,6 +401,22 @@ class Event{
 		return $this->id;
 	}
 
+	public function getDates(){
+		$q_get_event_dates = 'SELECT *
+			FROM events_dates
+			WHERE event_id = :event_id
+				AND status = 1
+				ORDER BY events_dates.event_date ASC';
+		$p_get_dates = $this->db->prepare($q_get_event_dates);
+		$result = $p_get_dates->execute(array(
+			':event_id' => $this->getId()
+		));
+
+		if ($result === FALSE) throw new DBQueryException('CANT_GET_DATES', $this->db);
+
+		return new Result(true, '', $p_get_dates->fetchAll());
+	}
+
 	public function getTitle() {
 		return $this->title;
 	}

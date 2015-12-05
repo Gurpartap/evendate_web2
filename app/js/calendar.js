@@ -269,6 +269,11 @@ function printEventsInTimeline($view, res, filter_date){
 		}else{
 			m_date = moment(value.event_start_date);
 		}
+
+		m_date = moment(value.nearest_event_date);
+
+		console.log(m_date);
+
 			var day_date = m_date.format(__C.DATE_FORMAT);
 		var $day_wrapper = $blocks_wrapper.find('.events-' + day_date),
 			$timeline_wrapper = $tl_outer_wrap.find('.timeline-' + day_date);
@@ -335,7 +340,6 @@ function printEventsInTimeline($view, res, filter_date){
 /* PAGE CONTROLLERS */
 function MyTimeline($view, $content_block){
 	$view.find('.tl-outer-wrap').addClass(__C.CLASSES.HIDDEN);
-	setDaysWithEvents();
 	var $load_btn = $view.find('.load-more-btn').addClass(__C.CLASSES.HIDDEN).data('page-number', 0),
 		getEvents = function(){
 			var page_number = $load_btn.data('page-number');
@@ -351,6 +355,7 @@ function MyTimeline($view, $content_block){
 	$view.find('.panel-default,.tl-block').remove();
 	$load_btn.find('.btn').on('click', getEvents);
 	getEvents();
+	setDaysWithEvents();
 }
 
 function OrganizationsList($view, $content_block){
@@ -441,7 +446,8 @@ function OrganizationsList($view, $content_block){
 			$view.find('.new-category.type-' + selected_type).click();
 			bindOnClick();
 		}
-	})
+	});
+	setDaysWithEvents();
 }
 
 function FavoredEvents($view, $content_block){
@@ -461,6 +467,7 @@ function FavoredEvents($view, $content_block){
 	$view.find('.panel-default,.tl-block').remove();
 	$load_btn.find('.btn').on('click', getEvents);
 	getEvents();
+	setDaysWithEvents();
 }
 
 function Search($view, $content_block){
@@ -518,6 +525,7 @@ function Search($view, $content_block){
 			});
 		}
 	});
+	setDaysWithEvents();
 }
 
 function OneDay($view, $content_block){
@@ -737,7 +745,6 @@ $(document)
 			buildTable();
 			setMonthName();
 			clickSelectedDate();
-			setDaysWithEvents();
 		}
 
 		function selectToday(){

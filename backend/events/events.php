@@ -15,7 +15,7 @@ $__modules['events'] = array(
 				array_merge(array('my' => $__user,
 					'type' => 'future'),
 					$__request),
-				' ORDER BY first_date, events.begin_time LIMIT ' . ($__page * $__length) . ' , ' . $__length);
+				' ORDER BY nearest_event_date, events.begin_time LIMIT ' . ($__page * $__length) . ' , ' . $__length);
 		},
 		'search' => function() use ($__db, $__request, $__user){
 			return EventsCollection::filter($__db, $__user, $__request);

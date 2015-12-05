@@ -42,6 +42,7 @@ class EventsCollection{
 			LEFT JOIN tags ON tags.id = events_tags.tag_id
 			WHERE organizations.status = 1
 			AND events.status = 1';
+
 		$statement_array = array(
 			':user_id' => $user->getId()
 		);
@@ -248,25 +249,32 @@ class EventsCollection{
 			GROUP BY users.id');
 
 		foreach($events as &$event){
-			$p_get_is_favorite->execute(array(
-				':user_id' => $user->getId(),
-				':event_id' => $event['id']
-			));
-
-			$p_get_liked_users->execute(array(
-				':user_id' => $user->getId(),
-				':event_id' => $event['id']
-			));
-
-			$p_get_tags->execute(array(
-				':event_id' => $event['id']
-			));
 
 			$p_get_dates->execute(array(
 				':event_id' => $event['id']
 			));
 
+
+			$event['dates_range'] = array();
+			$event['tags'] = array();
+
+			$p_get_is_favorite->execute(array(
+				':user_id' => $user->getId(),
+				':event_id' => $event['id']
+			));
+
 			if (!$is_short){
+
+				$p_get_liked_users->execute(array(
+					':user_id' => $user->getId(),
+					':event_id' => $event['id']
+				));
+
+				$p_get_tags->execute(array(
+					':event_id' => $event['id']
+				));
+
+
 				$event['longitude'] = floatval($event['longitude']);
 				$event['latitude'] = floatval($event['latitude']);
 				$event['event_type_id'] = intval($event['event_type_id']);
@@ -285,20 +293,31 @@ class EventsCollection{
 				$event['status'] = $event['status'] == 1;
 				$first_date_dt = new DateTime($event['first_date']);
 				$event['timestamp_first_date'] = $first_date_dt->getTimestamp();
-			}
 
-			$event['favorite_friends'] = array();
-			$event['dates_range'] = array();
+				$event['favorite_friends'] = array();
 
-			if ($p_get_liked_users->rowCount() != 0){
-				$event['favorite_friends'] = $p_get_liked_users->fetchAll();
-				foreach($event['favorite_friends'] as &$friend){
-					$friend['id'] = intval($friend['id']);
-					$friend['friend_uid'] = intval($friend['friend_uid']);
-					$friend['friend_id'] = isset($friend['friend_id']) ? intval($friend['friend_id']) : null;
-					$friend['link'] = User::getLinkToSocialNetwork($friend['type'], $friend['friend_uid']);
+				if ($p_get_liked_users->rowCount() != 0){
+					$event['favorite_friends'] = $p_get_liked_users->fetchAll();
+					foreach($event['favorite_friends'] as &$friend){
+						$friend['id'] = intval($friend['id']);
+						$friend['is_friend'] = boolval($friend['is_friend']);
+						$friend['friend_uid'] = intval($friend['friend_uid']);
+						$friend['friend_id'] = isset($friend['friend_id']) ? intval($friend['friend_id']) : null;
+						$friend['link'] = User::getLinkToSocialNetwork($friend['type'], $friend['friend_uid']);
+					}
 				}
+
+				$tags = $p_get_tags->fetchAll();
+
+				foreach($tags as $tag){
+					$tag['id'] = intval($tag['id']);
+					$event['tags'][] = $tag;
+				}
+
+				$event = array_merge($event, self::makeImgUrls($event));
 			}
+
+
 
 			if ($p_get_dates->rowCount() != 0){
 				$_dates = $p_get_dates->fetchAll();
@@ -321,16 +340,7 @@ class EventsCollection{
 				}
 			}
 
-			$tags = $p_get_tags->fetchAll();
-			$event['tags'] = array();
-
-			foreach($tags as $tag){
-				$tag['id'] = intval($tag['id']);
-				$event['tags'][] = $tag;
-			}
-
 			$event['is_favorite'] = $p_get_is_favorite->rowCount() > 0;
-			$event = array_merge($event, self::makeImgUrls($event));
 		}
 
 		return new Result(true, '', $events);

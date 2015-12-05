@@ -112,16 +112,35 @@ error_reporting(E_ALL);
 									$begin_date = new DateTime($event->getEventStartDate());
 									$end_date = new DateTime($event->getEventEndDate());
 
-									if ($begin_date->format('Y-m-d') == $end_date->format('Y-m-d')){
-										echo strtr($begin_date->format('l'), $days) . '<br>' . $end_date->format('j') . ' ' . strtr($begin_date->format('F'), $trans);
+									if ($event->getEventStartDate() == null && $event->getEventEndDate() == null){
+										$dates = $event->getDates()->getData();
+										$_dates = array();
+										if (count($dates) < 3){
+											$long_format = true;
+										}
+										foreach($dates as $date){
+											$datetime = new DateTime($date['event_date']);
+											if ($long_format){
+												$_dates[] = $datetime->format('j ') . strtr($begin_date->format('F'), $trans);
+											}else{
+												$_dates[] = $datetime->format('j.m');
+											}
+										}
+										echo implode(', ', $_dates);
+
 									}else{
-										if ($begin_date->format('m') == $end_date->format('m')){
-											echo $begin_date->format('j') . ' - ' . $end_date->format('j') . ' ' .strtr($begin_date->format('F'), $trans);
+										if ($begin_date->format('Y-m-d') == $end_date->format('Y-m-d')){
+											echo strtr($begin_date->format('l'), $days) . '<br>' . $end_date->format('j') . ' ' . strtr($begin_date->format('F'), $trans);
 										}else{
-											echo $begin_date->format('j') . ' ' . strtr($begin_date->format('F'), $trans) .  ' - ';
-											echo $end_date->format('j') . ' ' .strtr($end_date->format('F'), $trans);
+											if ($begin_date->format('m') == $end_date->format('m')){
+												echo $begin_date->format('j') . ' - ' . $end_date->format('j') . ' ' .strtr($begin_date->format('F'), $trans);
+											}else{
+												echo $begin_date->format('j') . ' ' . strtr($begin_date->format('F'), $trans) .  ' - ';
+												echo $end_date->format('j') . ' ' .strtr($end_date->format('F'), $trans);
+											}
 										}
 									}
+
 								?>
 							</div>
 							<div class="time">

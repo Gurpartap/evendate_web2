@@ -6,7 +6,7 @@ var server = require('http'),
 	rest = require('restler'),
 	mysql = require('mysql'),
 	_fs = require("fs"),
-	request = require('request'),
+	//request = require('request'),
 	moment = require("moment"),
 	config = {},
 	smtpTransport = require('nodemailer-smtp-transport'),
@@ -14,6 +14,7 @@ var server = require('http'),
 	CronJob = require('cron').CronJob,
 	NotificationsManager = require('./notifications_manager.js'),
 	images_resize = require('./image_resizer.js'),
+	GCM = require('gcm').GCM;
 	__rooms = {};
 
 config = _fs.readFileSync('../config.json');
