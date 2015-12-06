@@ -90,10 +90,11 @@ function showNotifier(response){
 function disableNotificationCheckboxes(date){
 	var
 		$notification_checkboxes = $('.notification-time'),
-		_now = moment(moment().format('YYYY-MM-DD') + ' 00:00:00')
+		_now = moment(moment().format('YYYY-MM-DD') + ' 00:00:00');
 	$notification_checkboxes.each(function(){
+		var _date_clone = moment(date);
 		var $checkbox = $(this);
-		if (date.add($checkbox.data('diff-value'), $checkbox.data('diff-type')) <= _now){
+		if (_date_clone.add($checkbox.data('diff-value'), $checkbox.data('diff-type')).unix() <= _now.unix()){
 			$checkbox
 				.attr('disabled', 'disabled')
 				.prop('checked', false)
@@ -114,15 +115,15 @@ function updateInputText($el){
 			text = '';
 		if (dates){
 			dates.forEach(function(date){
-				date = moment(date);
-				_dates_array.push(date.format('DD/MM'));
+				var m_date = moment(date);
+				_dates_array.push(m_date.format('DD/MM'));
 				disableNotificationCheckboxes(date);
 			});
 			text = _dates_array.join(', ')
 		}
 	}else{
 		text = [daterangepicker.startDate.format('DD/MM/YYYY'), daterangepicker.endDate.format('DD/MM/YYYY')].join(' - ');
-		disableNotificationCheckboxes(daterangepicker.startDate);
+		disableNotificationCheckboxes(daterangepicker.startDate.format(__C.DATE_FORMAT));
 	}
 	$el.val(text);
 }
@@ -303,6 +304,12 @@ function bindDatepickerChanger(){
 			$input.data('daterangepicker').show(null, true);
 			initDayChooserCalendar(null, $input);
 		}else{
+			if (daterange_settings.startDate == null){
+				daterange_settings.startDate = moment();
+			}
+			if (daterange_settings.endDate == null){
+				daterange_settings.endDate = moment();
+			}
 			$input.daterangepicker(daterange_settings);
 			$input.data('daterangepicker').show();
 		}
