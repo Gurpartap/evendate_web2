@@ -13,8 +13,7 @@ var server = require('http'),
 	nodemailer = require('nodemailer'),
 	CronJob = require('cron').CronJob,
 	NotificationsManager = require('./notifications_manager.js'),
-	images_resize = require('./image_resizer.js'),
-	GCM = require('gcm').GCM;
+	images_resize = require('./image_resizer.js');
 	__rooms = {};
 
 config = _fs.readFileSync('../config.json');
@@ -34,7 +33,7 @@ var config_index = process.env.ENV ? process.env.ENV : 'dev',
 		],
 		exitOnError: false
 	}),
-	notifications_factory = new NotificationsManager(real_config.APN),
+	notifications_factory = new NotificationsManager(real_config),
 	cropper = config_index == 'local' ? '' : new images_resize({}),
 	transporter = nodemailer.createTransport(smtpTransport({
 		host: real_config.smtp.host,

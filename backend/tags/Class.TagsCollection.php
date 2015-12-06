@@ -18,7 +18,7 @@ class TagsCollection{
 
 		if ($user instanceof User){
 			$p_get_organizations = $db->prepare('SELECT DISTINCT organizations.name, organizations.id, organizations.img_url,
-				organizations.short_name
+				organizations.short_name, organizations.default_address
  			    FROM  organizations
  			     INNER JOIN users_organizations ON users_organizations.organization_id = organizations.id
 				WHERE users_organizations.status = 1

@@ -303,7 +303,7 @@ error_reporting(E_ALL);
 
 <script>
 	$(document).ready(function(){
-		$('.right-col, .middle-col').css('height', $('.left-col').height());
+		$('.right-col, .middle-col').css('height', $('.left-col').height() + $('.event-bottom-block').outerHeight());
 
 		$('.modal-subscribe-btn').on('click', function(){
 			var $this = $(this);

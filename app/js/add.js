@@ -321,7 +321,8 @@ function bindDatepickerChanger(){
 
 function bindModalEvents(){
 	//debugger;
-	var $text_length = $('.textarea-length-text');
+	var $text_length = $('.textarea-length-text'),
+		$organizations = $('.organizations.to-select2');
 
 	function handleFileSelect(evt){
 		if (evt.target.files.length == 0) return false;
@@ -468,13 +469,20 @@ function bindModalEvents(){
 
 	}
 
-	$('.organizations.to-select2').select2({
+	$organizations.select2({
 		width: '100%',
 		formatResult: function(state){
 			if (!state.id) { return state.text; }
 			var $state_element = $(state.element);
 
 			return $('<span><img src="' + $state_element.data('image-url') + '" class="img-30" /> ' + state.text + '</span>');
+		}
+	}).on('change',function(e){
+		var $btn = $('#default-address-btn');
+		if (!$(this).find('option:selected').data('default-address')){
+			$btn.hide();
+		}else{
+			$btn.show();
 		}
 	});
 	$('.tags.to-select2').select2(select2_settings);
@@ -533,6 +541,18 @@ function bindModalEvents(){
 			};
 		}
 	});
+
+	if ($organizations.find('option').length == 1 && !$organizations.find('option').data('default-address')){
+		//no default address
+	}else{
+
+		var $address_input = $('#placepicker-add');
+		$address_input.after(tmpl('default-address-btn', {}));
+
+		$('#default-address-btn').on('click', function(){
+			$address_input.val($organizations.find('option:selected').data('default-address'));
+		});
+	}
 
 	$('.create-event-btn').on('click', function(){
 		var $this = $(this),
@@ -667,11 +687,12 @@ function showAddEventModal(callback){
 			var _organizations_options = $('<optgroup></optgroup>'),
 				hidden_organizations = '';
 
-			if (res.data.organizations.length > 1){
-				res.data.organizations.forEach(function(organization){
-					_organizations_options.append(tmpl('organization-option',organization));
-				});
-			}else{
+
+			res.data.organizations.forEach(function(organization){
+				_organizations_options.append(tmpl('organization-option',organization));
+			});
+
+			if (res.data.organizations.length == 1){
 				hidden_organizations = 'hidden';
 			}
 

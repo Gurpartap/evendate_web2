@@ -52,6 +52,9 @@
         "app_token": "gFVeR6D4frF2VImMkCSQbLgG5vkWCIm5Eetyt3mEgsR8qw3DICcfEX7T1ShRpMYxqaXoxqsZyOVpaBd6kpnw"
       }
     },
+    "GCM": {
+      "api_key": "AIzaSyCUJjlz2FJ8RZTKLiiVpUNP4xA_NJaa3Co"
+    },
     "images": {
       "events_path": "event_images",
       "user_images": "user_images"
@@ -111,6 +114,9 @@
         "app_code": "3874F-0C5E5",
         "app_token": "gFVeR6D4frF2VImMkCSQbLgG5vkWCIm5Eetyt3mEgsR8qw3DICcfEX7T1ShRpMYxqaXoxqsZyOVpaBd6kpnw"
       }
+    },
+    "GCM": {
+      "api_key": "AIzaSyCUJjlz2FJ8RZTKLiiVpUNP4xA_NJaa3Co"
     },
     "images": {
       "events_path": "event_images",

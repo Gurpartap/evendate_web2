@@ -135,8 +135,11 @@ class Organization {
 		return $this->site_url;
 	}
 
-	private static function getPathWithURL($path){
-		if ($path == null || $path == '' || trim($path) == '') return null;
+	private static function getPathWithURL($path, $type = '', $size = ''){
+		if ($path == null || $path == '' || trim($path) == ''){
+			$ext = $type == 'backgrounds' ? '/default.jpg' : '/default.png';
+			return App::$SCHEMA . App::$DOMAIN . '/organizations_images/' . $type . '/' . $size . $ext;
+		}
 		return App::$SCHEMA . App::$DOMAIN . '/' . $path;
 	}
 
@@ -156,14 +159,14 @@ class Organization {
 			$organization['subscription_id'] = (int) $organization['subscription_id'];
 		}
 
-		$organization['background_img_url'] =  self::getPathWithURL($organization['background_img_url']);
-		$organization['img_url'] = self::getPathWithURL($organization['img_url']);
+		$organization['background_img_url'] =  self::getPathWithURL($organization['background_img_url'], 'backgrounds', 'large');
+		$organization['img_url'] = self::getPathWithURL($organization['img_url'], 'logos', 'large');
 
-		$organization['background_medium_img_url'] = self::getPathWithURL($organization['background_medium_img_url']);
-		$organization['img_medium_url'] = self::getPathWithURL($organization['img_medium_url']);
+		$organization['background_medium_img_url'] = self::getPathWithURL($organization['background_medium_img_url'], 'backgrounds', 'medium');
+		$organization['img_medium_url'] = self::getPathWithURL($organization['img_medium_url'], 'logos', 'medium');
 
-		$organization['background_small_img_url'] = self::getPathWithURL($organization['background_small_img_url']);
-		$organization['img_small_url'] = self::getPathWithURL($organization['img_small_url']);
+		$organization['background_small_img_url'] = self::getPathWithURL($organization['background_small_img_url'], 'backgrounds', 'small');
+		$organization['img_small_url'] = self::getPathWithURL($organization['img_small_url'], 'logos', 'small');
 
 		if (isset($organization['timestamp_created_at'])){
 			$organization['timestamp_created_at'] = intval($organization['timestamp_created_at']);

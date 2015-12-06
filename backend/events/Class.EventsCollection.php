@@ -206,7 +206,7 @@ class EventsCollection{
 						'image_horizontal' => $_event['image_horizontal']
 					);
 
-					$_event = array_merge($_event, self::makeImgUrls($_event));
+					$_event = array_merge($_event);
 				}
 			}
 		}
@@ -233,7 +233,7 @@ class EventsCollection{
 
 		$p_get_liked_users = $db->prepare('SELECT DISTINCT users.first_name, users.last_name,
 			users.middle_name, users.id, users.avatar_url, view_friends.friend_uid,
-			view_friends.type,
+			view_friends.type, view_friends.friend_id,
 			IF (
 				(SELECT COUNT(view_friends.friend_id) FROM view_friends WHERE view_friends.user_id = :user_id AND view_friends.friend_id = users.id) > 0,
 			1, 0)

@@ -11,6 +11,7 @@ String.prototype.capitalize = function() {
 var MODAL_OFFSET = 185,
 	EVENT_MODAL_WIDTH = 660,
 	_selected_month = moment(),
+	__pages_length = 10,
 	organizations_refreshing_count = 0;
 
 
@@ -197,7 +198,6 @@ function generateEventAttributes(event){
  */
 function toggleSubscriptionState(state, entity_id, callback){
 	var cb = function(res){
-			setDaysWithEvents();
 			var for_prevent = callback(res);
 			if (__STATES.getCurrentState() == 'timeline'){
 				__STATES.refreshState();
@@ -220,28 +220,6 @@ function toggleSubscriptionState(state, entity_id, callback){
 	$.ajax(options);
 }
 
-function walkEventActiveDates(events, cb){
-	events.forEach(function(event){
-		var m_event_start_date = moment(event.event_start_date),
-			m_event_end_date = moment(event.event_end_date),
-			end_date = m_event_end_date.format(__C.DATE_FORMAT),
-			current_date = m_event_start_date,
-			event_date; // event should be only one time in object
-		do{
-
-			if (current_date.unix() < moment(moment().format('YYYY-MM-DD') + ' 00:00:00').unix()){
-				current_date.add(1, 'days');
-			}else{
-				event_date = current_date.format(__C.DATE_FORMAT);
-				if (cb && cb instanceof Function){
-					cb(event, event_date);
-				}
-				current_date.add(1, 'days');
-			}
-		}while(end_date != event_date && current_date.unix() <= m_event_end_date.unix());
-	});
-}
-
 function printEventsInTimeline($view, res, filter_date){
 	var $tl_outer_wrap = $view.find('.tl-outer-wrap'),
 		$blocks_wrapper = $view.find('.blocks-outer-wrap');
@@ -260,19 +238,21 @@ function printEventsInTimeline($view, res, filter_date){
 		var m_date;
 		if (filter_date != null){
 			m_date = moment(filter_date, __C.DATE_FORMAT);
-		}else if (value.event_start_date == null){
-			m_date = moment(value.dates_range[0]);
-		} else if (moment(value.event_start_date).unix() < moment().unix() && filter_date == null){
-			m_date = moment();
-		}else if (moment(value.event_start_date).unix() < moment().unix() && filter_date != null){
-			m_date = moment(filter_date, __C.DATE_FORMAT);
-		}else{
-			m_date = moment(value.event_start_date);
+		}
+		//else if (value.event_start_date == null){
+		//	m_date = moment(value.dates_range[0]);
+		//} else if (moment(value.event_start_date).unix() < moment().unix() && filter_date == null){
+		//	m_date = moment();
+		//}else if (moment(value.event_start_date).unix() < moment().unix() && filter_date != null){
+		//	m_date = moment(filter_date, __C.DATE_FORMAT);
+		//}else{
+		//	m_date = moment(value.event_start_date);
+		//}
+		else{
+			m_date = moment(value.nearest_event_date);
 		}
 
-		m_date = moment(value.nearest_event_date);
-
-		console.log(m_date);
+		//console.log(m_date);
 
 			var day_date = m_date.format(__C.DATE_FORMAT);
 		var $day_wrapper = $blocks_wrapper.find('.events-' + day_date),
@@ -318,7 +298,7 @@ function printEventsInTimeline($view, res, filter_date){
 		}, {accY: 100})
 	});
 
-	if (res.data.length == 0) {
+	if (res.data.length == 0 || res.data.length < __pages_length) {
 		//$view.find('.main-row').addClass(__C.CLASSES.HIDDEN);
 		$view.find('.load-more-btn').addClass(__C.CLASSES.HIDDEN);
 		$view.find('.sad-eve').removeClass(__C.CLASSES.HIDDEN);
@@ -421,19 +401,18 @@ function OrganizationsList($view, $content_block){
 
 						if (to_delete_state){
 							$btn.find('span').text('Подписаться');
-							toggleSubscriptionState(false, sub_id, function(res){
-								$btn.removeClass(__C.CLASSES.DISABLED);
-								hideOrganizationItem(org_id);
-								return false;
-							});
+							toggleSubscriptionState(false, sub_id);
+							$btn.removeClass(__C.CLASSES.DISABLED);
+							hideOrganizationItem(org_id);
+							return false;
 						}else{
 							$btn.find('span').text('Отписаться');
 							toggleSubscriptionState(true, org_id, function(res){
 								$btn.data('subscription-id', res.data.subscription_id);
-								$btn.removeClass(__C.CLASSES.DISABLED);
-								printSubscribedOrganizations();
 								return false;
 							});
+							$btn.removeClass(__C.CLASSES.DISABLED);
+							printSubscribedOrganizations();
 						}
 					});
 				});
@@ -547,6 +526,7 @@ function OneDay($view, $content_block){
 				active_date.format('DD MMMM'));
 		}
 	});
+	setDaysWithEvents();
 }
 
 function hideOrganizationItem(org_id){
@@ -756,10 +736,12 @@ $(document)
 			$('.next-button').on('click', function(){
 				setMonth('next');
 				renderTable();
+				setDaysWithEvents();
 			});
 			$('.prev-button').on('click', function(){
 				setMonth('prev');
 				renderTable();
+				setDaysWithEvents();
 			});
 		}
 
@@ -812,6 +794,7 @@ $(document)
 				}
 		});
 		printSubscribedOrganizations();
+		setDaysWithEvents();
 		renderState();
 
 		$('.show-organizations-btn').on('click', function(){
@@ -819,7 +802,7 @@ $(document)
 		});
 		$('.show-timeline-btn').on('click', function(){
 			History.pushState({page: 'timeline'}, 'Моя лента', 'timeline');
-		})
+		});
 
 		var $list = $('.organizations-list');
 		if (window.innerHeight > 800){
