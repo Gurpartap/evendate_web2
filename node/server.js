@@ -87,7 +87,7 @@ function replaceTags(text, object){
 
 function sendNotifications(){
 
-	if (config_index == 'dev' || config_index == 'local') return;
+	if (config_index == 'test' || config_index == 'local') return;
 
 	var q_get_events_notifications = 'SELECT DISTINCT ' +
 			' events_notifications.*, ' +
