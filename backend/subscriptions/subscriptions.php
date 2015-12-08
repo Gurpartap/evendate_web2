@@ -8,8 +8,7 @@ require_once $ROOT_PATH.'backend/organizations/Class.OrganizationsCollection.php
 $__modules['subscriptions'] = array(
 	'GET' => array(
 		'my' => function() use ($__db, $__request, $__user){
-			$collection = new SubscriptionsCollection($__db, $__user);
-			return $collection->get();
+			return OrganizationsCollection::filter($__db, $__user, array('is_subscribed' => true));
 		}
 	),
 	'POST' => array(

@@ -87,6 +87,8 @@ function replaceTags(text, object){
 
 function sendNotifications(){
 
+	if (config_index == 'dev' || config_index == 'local') return;
+
 	var q_get_events_notifications = 'SELECT DISTINCT ' +
 			' events_notifications.*, ' +
 			' events.title, organizations.short_name, ' +
@@ -598,6 +600,9 @@ io.on('connection', function (socket){
 						user_ids: data.user_id,
 						fields: 'photo_50, photo_100, photo_max_orig',
 						name_case: 'nom'
+					},
+					headers: {
+						'Accept-Language': 'ru,en-us'
 					}
 				};
 				break;

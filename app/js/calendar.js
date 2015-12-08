@@ -12,6 +12,7 @@ var MODAL_OFFSET = 185,
 	EVENT_MODAL_WIDTH = 660,
 	_selected_month = moment(),
 	__pages_length = 10,
+	organizations_loaded = false,
 	organizations_refreshing_count = 0;
 
 
@@ -202,9 +203,9 @@ function toggleSubscriptionState(state, entity_id, callback){
 			if (__STATES.getCurrentState() == 'timeline'){
 				__STATES.refreshState();
 			}
-			if (--organizations_refreshing_count == 0 && __STATES.getCurrentState() == 'organizations' && for_prevent != false){
-				__STATES.refreshState();
-			}
+			//if (--organizations_refreshing_count == 0 && __STATES.getCurrentState() == 'organizations' && for_prevent != false){
+			//	__STATES.refreshState();
+			//}
 		},
 
 		options = (state == false) ? {
@@ -254,7 +255,7 @@ function printEventsInTimeline($view, res, filter_date){
 
 		//console.log(m_date);
 
-			var day_date = m_date.format(__C.DATE_FORMAT);
+		var day_date = m_date.format(__C.DATE_FORMAT);
 		var $day_wrapper = $blocks_wrapper.find('.events-' + day_date),
 			$timeline_wrapper = $tl_outer_wrap.find('.timeline-' + day_date);
 
@@ -338,19 +339,25 @@ function MyTimeline($view, $content_block){
 	setDaysWithEvents();
 }
 
+function Friends($view, $content_block){
+
+}
 function OrganizationsList($view, $content_block){
+
+	if (__STATES.getCurrentState() == 'organizations' && organizations_loaded) return;
 	$.ajax({
 		url: 'api/organizations/?with_subscriptions=true',
 		success: function(res){
+			organizations_loaded = true;
 			var _organizations_by_types = {},
 				$categories = $view.find('.new-organizations-categories-wrapper'),
 				$organizations = $view.find('.new-organizations-list');
 			res.data.forEach(function(organization){
 				var _key = '_' + organization.type_id;
 				if (!_organizations_by_types.hasOwnProperty(_key)){
-					_organizations_by_types[_key] = {type_name: organization.type_name, organizations: [], count: 0, type_id: organization.type_id};
+					_organizations_by_types[_key] = {type_name: organization.type_name, organizations: {}, count: 0, type_id: organization.type_id};
 				}
-				_organizations_by_types[_key].organizations.push(organization);
+				_organizations_by_types[_key].organizations['_' + organization.id] = organization;
 				_organizations_by_types[_key].count++;
 			});
 
@@ -369,7 +376,7 @@ function OrganizationsList($view, $content_block){
 					$this.siblings().removeClass('active');
 					$this.addClass('active');
 					$organizations.empty();
-					type.organizations.forEach(function(organization){
+					$.each(type.organizations, function(_id, organization){
 						if(organization.is_subscribed){
 							organization.btn_type_class = 'empty';
 							organization.btn_text = 'Отписаться';
@@ -388,7 +395,6 @@ function OrganizationsList($view, $content_block){
 
 
 					$organizations.find('.subscribe-btn').on('click', function(){
-						//debugger;
 						organizations_refreshing_count++;
 						var $btn = $(this),
 							to_delete_state = $btn.hasClass('btn-empty'),
@@ -396,12 +402,14 @@ function OrganizationsList($view, $content_block){
 							org_id = $btn.data('organization-id');
 						if ($btn.hasClass(__C.CLASSES.DISABLED)) return;
 
+						type.organizations['_' + org_id].is_subscribed = !to_delete_state;
+
 						$btn.
 							toggleClass('btn-empty btn-pink disabled');
 
 						if (to_delete_state){
 							$btn.find('span').text('Подписаться');
-							toggleSubscriptionState(false, sub_id);
+							toggleSubscriptionState(false, sub_id, function(){});
 							$btn.removeClass(__C.CLASSES.DISABLED);
 							hideOrganizationItem(org_id);
 							return false;
@@ -539,7 +547,7 @@ function hideOrganizationItem(org_id){
 function printSubscribedOrganizations(){
 	var $list = $('.organizations-list');
 	$.ajax({
-		'url': 'api/organizations/?with_subscriptions=true',
+		'url': 'api/subscriptions/my',
 		success: function(res){
 			res.data.forEach(function(organization){
 				if (organization.is_subscribed && $list.find('.organization-' + organization.id).length == 0){
@@ -612,6 +620,7 @@ $(document)
 			organizations: OrganizationsList,
 			favorites: FavoredEvents,
 			search: Search,
+			friends: Friends,
 			refreshState: function(){
 				var page = this.getCurrentState(),
 					$view = $('.screen-view:not(.hidden)');
@@ -678,7 +687,7 @@ $(document)
 						today: 'not-this-month'
 					}));
 					curr_month_clone.add(-1, 'days');
-				}while(curr_month_clone.day() != 0)
+				}while(curr_month_clone.day() != 0);
 			}
 
 			if (last_day_in_month != 0){
@@ -690,7 +699,7 @@ $(document)
 						day_number: curr_month_clone.day(),
 						today: 'not-this-month'
 					}));
-				}while(curr_month_clone.day() != 0)
+				}while(curr_month_clone.day() != 0);
 			}
 			var $tbody = $('<tbody>'),
 				tds_in_tr = 0,

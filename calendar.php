@@ -96,12 +96,15 @@
                        <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn <?=$add_event_btn_hidden?>" data-controller="showAddEventModal">
                            <i class="icon-note"></i> <span>Создать событие</span>
                        </a>
-                       <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn" data-page="organizations">
-                           <i class="icon-list"></i> <span>Каталог организаций</span>
-                       </a>
 					   <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn" data-page="favorites">
                            <i class="icon-pin"></i> <span>Избранное</span>
 					   </a>
+                       <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn" data-page="organizations">
+                           <i class="icon-list"></i> <span>Каталог организаций</span>
+                       </a>
+                       <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn" data-page="friends">
+                           <i class="icon-list"></i> <span>Мои друзья</span>
+                       </a>
                        <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn" data-controller="showSettingsModal">
                            <i class="icon-settings"></i> <span>Настройки</span>
                        </a>
@@ -195,6 +198,12 @@
                      <div class="new-organizations-categories-wrapper"></div>
                  </div>
                  <div class="new-organizations-list"></div>
+             </div>
+             <!-- END row-->
+
+             <!-- START row-->
+             <div class="friends-app hidden screen-view" data-controller="FriendsList">
+
              </div>
              <!-- END row-->
 

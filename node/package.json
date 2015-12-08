@@ -6,13 +6,14 @@
     "access-control": "0.0.8",
     "apn": "~1.7.4",
     "cron": "^1.0.9",
+    "easyimage": "~2.1.0",
+    "gm": "^1.21.1",
     "moment": "2.10.3",
     "mysql": "^2.5.0",
     "nodemailer": "^1.8.0",
     "nodemailer-smtp-transport": "^1.0.3",
     "restler": "^3.2.2",
     "socket.io": "^1.1.0",
-    "winston": "^0.7.3",
-    "easyimage": "~2.1.0"
+    "winston": "^0.7.3"
   }
 }

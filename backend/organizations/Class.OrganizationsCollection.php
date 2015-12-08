@@ -66,6 +66,11 @@ class OrganizationsCollection{
 						$statement_array[':user_id'] = $value->getId();
 						$q_get_organizations .= ' AND subscriptions.user_id = :user_id';
 					}
+					break;
+				}
+				case 'is_subscribed': {
+					$search_fields[] = ' subscriptions.id IS NOT NULL '; // . ($value ? 1 : 0);
+					break;
 				}
 			}
 		}
