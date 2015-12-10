@@ -1372,8 +1372,8 @@ function showOrganizationalModal(organization_id){
                                 __C.CLASSES.SUBSCRIBE_ADD + ' ' +
                                 __C.CLASSES.DISABLED)
                                 .text(__C.TEXTS.ADD_SUBSCRIPTION);
-                            hideOrganizationItem(org_id);
                         });
+                      hideOrganizationItem(org_id);
                     }else{
                         toggleSubscriptionState(true, org_id, function(){
                             $btn

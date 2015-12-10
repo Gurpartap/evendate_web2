@@ -225,7 +225,21 @@ class User extends AbstractUser{
 			':client_type' => $client_type
 		));
 
-		if ($res === FALSE) throw new DBQueryException('', $this->db);
+
+		//disable same tokens for this user (device tokens can duplicate)
+		$q_upd_token = 'UPDATE tokens SET expires_on = UNIX_TIMESTAMP(NOW())
+			WHERE user_id = :user_id
+			AND client_type = :client_type
+			AND device_token = :device_token
+			AND tokens.token != :token';
+		$p_upd_token = $this->db->prepare($q_upd_token);
+		$res2 = $p_upd_token->execute(array(
+			':device_token' => $device_token,
+			':user_id' => $this->getId(),
+			':token' => $this->token,
+			':client_type' => $client_type
+		));
+		if ($res === FALSE || $res2 === FALSE) throw new DBQueryException('CANT UPDATE TOKEN', $this->db);
 		return new Result(true, '', array('token' => $this->token));
 	}
 

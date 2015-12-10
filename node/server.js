@@ -90,7 +90,7 @@ function sendNotifications(){
 	if (config_index == 'test' || config_index == 'local') return;
 
 	var q_get_events_notifications = 'SELECT DISTINCT ' +
-			' events_notifications.*, ' +
+			' events_notifications.*, events.organization_id,' +
 			' events.title, organizations.short_name, ' +
 			' events.image_vertical, ' +
 			' events.image_horizontal, ' +
@@ -138,19 +138,21 @@ function sendNotifications(){
 				devices.forEach(function(device){
 					connection.query(q_ins_notification, [device.id, event_notification.id], function(err, result){
 						if (err)logger.error(err);
-						var notification_id = result.insertId;
+						var notification_id = result.insertId,
+							_text = replaceTags(event_notification.notification_type_text, event_notification);
 						var data = {
 							device: device,
 							note: {
-								alert: event_notification.title,
-								body: replaceTags(event_notification.notification_type_text, event_notification),
+								alert: _text,
+								body: _text,
 								icon: real_config.schema + real_config.domain + '/event_images/square/' + event_notification.image_vertical,
 								payload: {
 									type: 'event_notification',
 									title: event_notification.title,
 									event_id: event_notification.event_id,
-									body: replaceTags(event_notification.notification_type_text, event_notification),
-									icon: real_config.schema + real_config.domain + '/event_images/square/' + event_notification.image_vertical
+									body: _text,
+									icon: real_config.schema + real_config.domain + '/event_images/square/' + event_notification.image_vertical,
+									organization_logo: real_config.schema + real_config.domain + '/organizations_images/small/' + event_notification.organization_id + '.png'
 								}
 							},
 							type: device.client_type,

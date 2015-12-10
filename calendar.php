@@ -100,7 +100,7 @@
                            <i class="icon-pin"></i> <span>Избранное</span>
 					   </a>
                        <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn" data-page="organizations">
-                           <i class="icon-list"></i> <span>Каталог организаций</span>
+                           <i class="icon-list"></i> <span>Организаторы</span>
                        </a>
                        <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn" data-page="friends">
                            <i class="icon-list"></i> <span>Мои друзья</span>

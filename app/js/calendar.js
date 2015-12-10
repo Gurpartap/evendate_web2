@@ -375,6 +375,7 @@ function OrganizationsList($view, $content_block){
 					var $this = $(this);
 					$this.siblings().removeClass('active');
 					$this.addClass('active');
+					History.pushState({page: 'organizations?type=' + type.type_id}, type.type_name, 'organizations?type=' + type.type_id);
 					$organizations.empty();
 					$.each(type.organizations, function(_id, organization){
 						if(organization.is_subscribed){
@@ -385,14 +386,12 @@ function OrganizationsList($view, $content_block){
 							organization.btn_text = 'Подписаться';
 						}
 						organization.subscribed_count_text = getUnitsText(organization.subscribed_count, __C.TEXTS.SUBSCRIBERS);
-						var $organization = tmpl('new-organization-item', organization);
+						var $organization = tmpl('new-organization-item', organization).data('organization', organization);
 						$organization.find('.organization-img, .heading>span').on('click', function(){
 							showOrganizationalModal(organization.id)
 						});
 						$organizations.append($organization);
 					});
-
-
 
 					$organizations.find('.subscribe-btn').on('click', function(){
 						organizations_refreshing_count++;
@@ -419,8 +418,9 @@ function OrganizationsList($view, $content_block){
 								$btn.data('subscription-id', res.data.subscription_id);
 								return false;
 							});
+
 							$btn.removeClass(__C.CLASSES.DISABLED);
-							printSubscribedOrganizations();
+							printSubscribedOrganizations([$btn.parents('.new-organization').data('organization')]);
 						}
 					});
 				});
@@ -544,23 +544,34 @@ function hideOrganizationItem(org_id){
 	}, 1000);
 }
 
-function printSubscribedOrganizations(){
+function printSubscribedOrganizations(organization){
 	var $list = $('.organizations-list');
-	$.ajax({
-		'url': 'api/subscriptions/my',
-		success: function(res){
-			res.data.forEach(function(organization){
-				if (organization.is_subscribed && $list.find('.organization-' + organization.id).length == 0){
-					tmpl('organizations-item', organization)
-						.addClass('fadeInLeftBig')
-						.prependTo($list)
-						.on('click', function(){
-							showOrganizationalModal($(this).data('organization-id'));
-						});
-				}
-			});
+	if (organization){
+		if ($list.find('.organization-' + organization.id).length == 0){
+			tmpl('organizations-item', organization)
+				.addClass('fadeInLeftBig')
+				.prependTo($list)
+				.on('click', function(){
+					showOrganizationalModal($(this).data('organization-id'));
+				});
 		}
-	});
+	}else{
+		$.ajax({
+			'url': 'api/subscriptions/my',
+			success: function(res){
+				res.data.forEach(function(organization){
+					if (organization.is_subscribed && $list.find('.organization-' + organization.id).length == 0){
+						tmpl('organizations-item', organization)
+							.addClass('fadeInLeftBig')
+							.prependTo($list)
+							.on('click', function(){
+								showOrganizationalModal($(this).data('organization-id'));
+							});
+					}
+				});
+			}
+		});
+	}
 }
 
 function setDaysWithEvents(){
@@ -575,11 +586,12 @@ function setDaysWithEvents(){
 		},
 		success: function(res){
 			$('.td-day').removeClass('click-able has-favorites').addClass(__C.CLASSES.DISABLED);
-
+			var _now = moment();
 			res.data.forEach(function(event){
 				event.dates_range.forEach(function(event_date){
-					var _event_date = moment(event_date).format(__C.DATE_FORMAT),
-						add_has_favorites = event.is_favorite ? 'has-favorites' : '';
+					var m_date = moment(event_date),
+						_event_date = m_date.format(__C.DATE_FORMAT),
+						add_has_favorites = event.is_favorite && _now < m_date ? 'has-favorites' : '';
 					$('.td-day[data-date="' + _event_date + '"]')
 						.addClass('click-able')
 						.addClass(add_has_favorites)

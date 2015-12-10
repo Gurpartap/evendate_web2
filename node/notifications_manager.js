@@ -73,6 +73,8 @@ NotificationsManager.prototype.create = function(notification){
 			case DEVICE_TYPES.ANDROID: {
 				note['data.message'] = note.body;
 				note['data.event_id'] = note.payload.event_id;
+				note['data.organization_logo'] = note.payload.organization_logo;
+				note['data.organization_id'] = note.payload.organization_id;
 				return note
 			}
 			default :{
