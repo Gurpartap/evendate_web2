@@ -117,6 +117,8 @@ error_reporting(E_ALL);
 										$_dates = array();
 										if (count($dates) < 3){
 											$long_format = true;
+										}else{
+											$long_format = false;
 										}
 										foreach($dates as $date){
 											$datetime = new DateTime($date['event_date']);
@@ -304,6 +306,8 @@ error_reporting(E_ALL);
 <script>
 	$(document).ready(function(){
 		$('.right-col, .middle-col').css('height', $('.left-col').height() + $('.event-bottom-block').outerHeight());
+
+		$('.event-alone').css('margin-bottom', '40px');
 
 		$('.modal-subscribe-btn').on('click', function(){
 			var $this = $(this);
