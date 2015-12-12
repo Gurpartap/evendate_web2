@@ -1,9 +1,11 @@
+<IfModule mod_rewrite.c>
 RewriteEngine On
 RewriteCond %{HTTP_HOST}  ^www\.(.+)$  [NC]
 RewriteRule ^(.*)         http://%1/$1 [L,R=301]
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^(.*)$ calendar.php?q=$1
+</IfModule>
 
 <Files "config.json">
 Order Allow,Deny

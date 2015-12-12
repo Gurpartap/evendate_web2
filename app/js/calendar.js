@@ -158,14 +158,14 @@ function generateEventAttributes(event){
 
 	var _a = document.createElement('a'),
 		_url = event.detail_info_url,
-		params_array = ['utm_source=Evendate', 'utm_campaign='+encodeURIComponent(event.title), 'utm_medium=affilate'];
+		params_array = [];//['utm_source=Evendate', 'utm_campaign='+encodeURIComponent(event.title), 'utm_medium=affilate'];
 
 	_a.href = event.detail_info_url;
 
 	if (_a.search != ''){
-		_url += '&' + params_array.join('&')
+		//_url += '&' + params_array.join('&')
 	}else{
-		_url += '?' + params_array.join('&')
+		//_url += '?' + params_array.join('&')
 	}
 
 	event.detail_info_url = _url;

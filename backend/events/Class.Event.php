@@ -337,13 +337,22 @@ class Event{
 
 		foreach($tags as $tag){
 			if (is_numeric($tag)){
-				$tag_id = $tag;
+				$tag_id = intval($tag);
 			}else{
 				$tag = preg_replace('/\s+/', ' ', self::mb_ucfirst($tag));
-				$p_ins_tag->execute(array(
+				$p_get_tag = $db->prepare('SELECT id FROM tags WHERE name = :name');
+				$p_get_tag->execute(array(
 					':name' => $tag
 				));
-				$tag_id = $db->lastInsertId();
+				if ($p_get_tag->rowCount() == 0){
+					$p_ins_tag->execute(array(
+						':name' => $tag
+					));
+					$tag_id = $db->lastInsertId();
+				}else{
+					$tag_result = $p_get_tag->fetch();
+					$tag_id = $tag_result['id'];
+				}
 			}
 
 			if ($inserted_count == self::TAGS_LIMIT) break;
