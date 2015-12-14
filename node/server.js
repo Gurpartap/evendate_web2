@@ -91,11 +91,12 @@ function sendNotifications(){
 
 	var q_get_events_notifications = 'SELECT DISTINCT ' +
 			' events_notifications.*, events.organization_id,' +
-			' events.title, organizations.short_name, ' +
+			' events.title, organizations.short_name, organizations.notification_suffix, ' +
 			' events.image_vertical, ' +
 			' events.image_horizontal, ' +
 			' events.organization_id, ' +
 			' events.id as event_id, ' +
+			' notification_types.type as notification_type_name,' +
 			' notification_types.text as notification_type_text' +
 			' FROM events_notifications' +
 			' INNER JOIN events ON events_notifications.event_id = events.id' +
@@ -130,6 +131,9 @@ function sendNotifications(){
 					logger.error(err);
 				}
 			});
+			if (event_notification['notification_type_name'] != 'notification-now'){
+				event_notification['notification_suffix'] = event_notification['notification_suffix'].toLowerCase();
+			}
 			connection.query(q_get_to_send_devices, event_notification.organization_id, function(errors, devices){
 				if (errors){
 					logger.error(errors);
