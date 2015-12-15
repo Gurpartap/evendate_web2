@@ -15,7 +15,7 @@ $__modules['users'] = array(
 					return $__user->getFriendsFeed($__page, $__length, $friend);
 				}elseif (isset($__request['subscriptions'])){
 					$friend = new Friend($__request['friend_id'], $__user, $__db);
-					return $friend->getSubscriptions();
+					return $friend->getSubscriptions(isset($__request['with_friend_info']) && $__request['with_friend_info']);
 				}elseif (isset($__request['friends'])){
 					$friend = new Friend($__request['friend_id'], $__user, $__db);
 					return $__user->getFriends($__page, $__length, $friend);

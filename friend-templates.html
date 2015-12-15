@@ -1,0 +1,87 @@
+<script type="javascript/template" id="tmpl-friend-item">
+  <div class="friend-item friend-{id}" data-friend-id="{id}" data-name="{last_name} {first_name}">
+    <div class="friend-avatar">
+      <img src="{avatar_url}">
+    </div>
+    <div class="friend-name">{last_name} {first_name}</div>
+  </div>
+</script>
+
+
+<script type="javascript/template" id="tmpl-friends-feed-card">
+  <div class="friend-events-block">
+    <div class="events-header">
+      <div class="friend-avatar">
+        <img src="{avatar_url}">
+        <span class="events-date">{date}</span>
+        <span class="friend-name">{last_name} {first_name}</span>
+        <div class="event-type-name">{action_name}</div>
+      </div>
+    </div>
+    <div class="events-body">
+    </div>
+  </div>
+</script>
+
+
+<script type="javascript/template" id="tmpl-friends-feed-event">
+  <div class="friend-event favored">
+    <div>
+      <img src="{image_square_url}">
+      <div class="event-favored-wrapper">
+        <div class="event-name">{title}</div>
+        <div class="organizator-block">
+          <img src="{organization_logo_url}">
+          <span class="name">{organization_short_name}</span></div></div>
+    </div>
+  </div>
+</script>
+
+<script type="javascript/template" id="tmpl-friends-page-header">
+  <div class="user-info-content">
+    <div class="top-links">
+      <div class="back-to-friends-list"><i class="icon-arrow-left"></i> Вся лента</div>
+      <div class="user-profile-name"> {last_name} {first_name}</div>
+    </div>
+    <div class="friend-page-info-header">
+      <div class="top-part">
+        <div class="friend-avatar-big pull-left">
+          <img class="user-avatar" src="{avatar_url}">
+        </div>
+        <div class="user-name-wrapper">
+          <div class="friend-user-name"> {last_name} {first_name}</div>
+          <div class="friend-user-link">Профиль {type} <span class="icon-arrow-right"></span> </div>
+        </div>
+      </div>
+      <div class="user-btns-wrapper">
+        <div class="user-btn pull-left"> Активность</div>
+        <div class="user-btn pull-right active"> Подписки</div>
+      </div>
+    </div>
+    <div class="one-friend-content-wrapper" style="margin-top: 15px;">
+      <div class="one-friend-events hidden"></div>
+      <div class="one-friend-subscriptions">
+      </div>
+    </div>
+  </div>
+</script>
+
+<script type="javascript/template" id="tmpl-friends-subscription">
+  <div class="friend-subscription-block">
+    <img src="{img_medium_url}" class="pull-left friend-organization-logo">
+    <div class="friend-subscription-name">{short_name}</div>
+  </div>
+</script>
+<script type="javascript/template" id="tmpl-friends-feed-organization">
+  <div class="friend-event subscribed">
+    <div>
+      <div class="subscribed-img-wrapper">
+        <img src="{img_medium_url}" style="width: 28px;">
+      </div>
+      <div class="event-favored-wrapper">
+        <div class="event-name">{short_name}</div>
+        <div>
+          <span class="name">{subscribed_count} подписчиков</span></div></div>
+    </div>
+  </div>
+</script>

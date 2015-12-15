@@ -266,6 +266,7 @@ class User extends AbstractUser{
 			AND view_friends.friend_id != :user_id
 			 ' . $friend_part . '
 			GROUP BY friend_id
+			ORDER BY last_name, first_name
 			LIMIT ' . ($page * $length) . " , {$length}";
 
 		$p_get_friends = $this->db->prepare($q_get_friends);
@@ -303,7 +304,7 @@ class User extends AbstractUser{
 		$q_get_stat_events = "
 			(SELECT
 			   event_id,
-			   null as organization_id,
+			   organizations.id as organization_id,
 			   stat_events.stat_type_id,
 			   stat_event_types.type_code,
 			   MAX(stat_events.created_at) as created_at,
@@ -321,20 +322,22 @@ class User extends AbstractUser{
 			   events.image_vertical,
 			   events.event_end_date,
 			   events.event_start_date,
-			   null as name,
-			   null as short_name,
-			   null as background_img_url,
-			   null as background_medium_img_url,
-			   null as background_small_img_url,
-			   null as img_url,
-			   null as img_small_url,
-			   null as img_medium_url
+			   organizations.name as name,
+			   organizations.short_name as short_name,
+			   organizations.background_img_url as background_img_url,
+			   organizations.background_medium_img_url as background_medium_img_url,
+			   organizations.background_small_img_url as background_small_img_url,
+			   organizations.img_url as img_url,
+			   organizations.img_small_url as img_small_url,
+			   organizations.img_medium_url as img_medium_url,
+			   null as subscribed_count
 			  FROM stat_events
 			    INNER JOIN stat_event_types ON stat_event_types.id = stat_events.stat_type_id
 			    INNER JOIN tokens ON tokens.id = stat_events.token_id
 			    INNER JOIN view_friends ON view_friends.friend_id = tokens.user_id
 			    INNER JOIN events ON stat_events.event_id = events.id
 			    INNER JOIN users ON tokens.user_id = users.id
+			    INNER JOIN organizations ON organizations.id = events.organization_id
 			  WHERE
 			    (stat_event_types.type_code = :fave
 			    OR stat_event_types.type_code = :unfave)
@@ -347,7 +350,7 @@ class User extends AbstractUser{
 			UNION
 			(SELECT
 			   null as event_id,
-			   organization_id,
+			   stat_organizations.organization_id,
 			   stat_organizations.stat_type_id,
 			   stat_event_types.type_code,
 			   MAX(stat_organizations.created_at) as created_at,
@@ -372,12 +375,19 @@ class User extends AbstractUser{
 			  organizations.background_small_img_url,
 			  organizations.img_url,
 			  organizations.img_small_url,
-			  organizations.img_medium_url
+			  organizations.img_medium_url,
+			(
+				SELECT COUNT(id) AS subscribed_count
+				FROM subscriptions
+				WHERE subscriptions.status = 1
+				AND subscriptions.organization_id = organizations.id
+			) as subscribed_count
 			  FROM stat_organizations
 			    INNER JOIN stat_event_types ON stat_event_types.id = stat_organizations.stat_type_id
 			    INNER JOIN tokens ON tokens.id = stat_organizations.token_id
 			    INNER JOIN view_friends ON view_friends.friend_id = tokens.user_id
 			    INNER JOIN organizations ON stat_organizations.organization_id = organizations.id
+			    LEFT JOIN subscriptions ON subscriptions.organization_id = organizations.id AND subscriptions.user_id = :user_id AND subscriptions.status = 1
 			    INNER JOIN users ON tokens.user_id = users.id
 			WHERE
 			  (stat_event_types.type_code = :subscribe
@@ -427,20 +437,28 @@ class User extends AbstractUser{
 			);
 			if ($event['entity'] == Statistics::ENTITY_EVENT){
 				$_event = EventsCollection::makeImgUrls($event);
-				$_event = array_merge($_event, array(
+				$organization_info = $event;
+				$organization_info['id'] = $event['organization_id'];
+				$organization_info = Organization::normalizeOrganization($organization_info);
+
+				$_event = array_merge($_event, array_merge(array(
 					'id' => intval($event['event_id']),
 					'title' => $event['title'],
 					'image_horizontal' => $event['image_horizontal'],
 					'image_vertical' => $event['image_vertical'],
 					'event_end_date' => $event['event_end_date'],
 					'event_start_date' => $event['event_start_date'],
-				));
+					'organization_logo_url' => $organization_info['img_url'],
+					'organization_short_name' => $organization_info['short_name'],
+					'organization_id' => $event['organization_id'],
+				)));
 				$to_push['event'] = $_event;
 			}elseif ($event['entity'] == Statistics::ENTITY_ORGANIZATION){
 				$_organization = Organization::normalizeOrganization(array(
 					'id' => intval($event['organization_id']),
 					'name' => $event['name'],
 					'short_name' => $event['short_name'],
+					'subscribed_count' => $event['subscribed_count'],
 					'background_img_url' => $event['background_img_url'],
 					'background_medium_img_url' => $event['background_medium_img_url'],
 					'background_small_img_url' => $event['background_small_img_url'],

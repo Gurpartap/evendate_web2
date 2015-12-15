@@ -339,11 +339,138 @@ function MyTimeline($view, $content_block){
 	setDaysWithEvents();
 }
 
+function OneFriend($view, $content_block){
+	var friend_id = __STATES.getCurrentState().split('-')[1],
+		$content = $view.find('.one-friend-main-content');
+	$view.find('.friends-main-content').addClass(__C.CLASSES.HIDDEN);
+	$content.removeClass(__C.CLASSES.HIDDEN).empty();
+
+	$.ajax({
+		url: '/api/users/friends/',
+		data: {
+			subscriptions: true,
+			friend_id: friend_id,
+			with_friend_info: true
+		},
+		success: function(res){
+			$content.append(tmpl('friends-page-header', res.data.user));
+			tmpl('friends-subscription', res.data.subscriptions, $content.find('.one-friend-subscriptions'))
+			$content.find('.friend-subscription-block').each(function(index){
+				var $this = $(this);
+				setTimeout(function(){
+					$this.fadeIn(300);
+				}, index * 40 + 500);
+			});
+		}
+	});
+
+	calculateMargins($view);
+}
+
+function getFriendsList($friends_right_list, cb){
+	$.ajax({
+		url: '/api/users/friends?page=0&length=500',
+		success: function(res){
+			$friends_right_list.find('.friends-list').empty();
+			$friends_right_list.removeClass(__C.CLASSES.HIDDEN);
+			tmpl('friend-item', res.data, $friends_right_list.find('.friends-list'));
+			res.data.forEach(function(friend){
+				__STATES['friend-' + friend.id] = OneFriend;
+			});
+			$friends_right_list.find('.friends-count').text(res.data.length);
+			$friends_right_list.find('.friend-item').off('click').on('click', function(){
+				var $this = $(this);
+				$this.siblings().removeClass(__C.CLASSES.ACTIVE);
+				$this.addClass(__C.CLASSES.ACTIVE);
+				History.pushState({page: 'friend-' + $this.data('friend-id')}, $this.data('name'), 'friend-' + $this.data('friend-id'));
+			});
+			if ($friends_right_list.height() > window.innerHeight - 200){
+				$friends_right_list.find('.friends-list').slimscroll({
+					height: window.innerHeight - 200,
+					width: '100%'
+				});
+			}
+
+			if (cb) cb();
+		}
+	});
+}
+
+function calculateMargins($view){
+	var $main_content = $view.find('.friends-main-content'),
+		$friends_right_list = $view.find('.friends-right-bar'),
+		$user_content = $view.find('.one-friend-main-content'),
+		view_width = $view.width(),
+		content_width = $main_content.width() == 0 ? $user_content.width() : $main_content.width(),
+		friends_right_list_width = $friends_right_list.width(),
+		DISTANCE_BETWEEN = 150,
+		_margin = (view_width - content_width - friends_right_list_width - DISTANCE_BETWEEN) / 2;
+
+	$main_content.css('margin-left', _margin + 'px');
+	$friends_right_list.css('margin-left', _margin + content_width + DISTANCE_BETWEEN + 'px');
+	$user_content.css('margin-left', _margin + 'px');
+}
+
 function Friends($view, $content_block){
 
+	var page_number = 0;
+	function getFeed(){
+		if (page_number == 0){
+			$view.find('.friend-events-block').remove();
+		}
+		$.ajax({
+			url: 'api/users/feed?length=20&page=' + page_number++,
+			success: function(res){
+				var cards_by_users = {};
+				res.data.forEach(function(stat){
+					var date = moment(stat.created_at),
+						ent = stat[stat.entity],
+						key = [stat.entity, stat.stat_type_id, stat.user.id, date.format('DD.MM')].join('-');
+					if (cards_by_users.hasOwnProperty(key) == false){
+						cards_by_users[key] = {
+							user: stat.user,
+							entity: stat.entity,
+							type_code: stat.type_code,
+							date: date.format(__C.DATE_FORMAT) == moment().format(__C.DATE_FORMAT) ? 'Сегодня': date.format('DD.MM'),
+							action_name: __C.ACTION_NAMES[stat.type_code][0],
+							first_name: stat.user.first_name,
+							avatar_url: stat.user.avatar_url,
+							last_name: stat.user.last_name,
+							entities: []
+						};
+					}
+
+					cards_by_users[key].entities.push(ent);
+				});
+
+				$.each(cards_by_users, function(key, value){
+					var $card = tmpl('friends-feed-card', value),
+						item_tmpl_name = value.entity == __C.ENTITIES.EVENT ? 'friends-feed-event' : 'friends-feed-organization';
+
+					value.entities.forEach(function(ent){
+						$card.append(tmpl(item_tmpl_name, ent));
+					});
+					$load_btn.before($card);
+				});
+				$load_btn.removeClass(__C.CLASSES.HIDDEN).find('.btn').removeClass(__C.CLASSES.DISABLED);
+				calculateMargins($view);
+			}
+		})
+	}
+
+
+
+	var $main_content = $view.find('.friends-main-content').removeClass(__C.CLASSES.HIDDEN),
+		$friends_right_list = $view.find('.friends-right-bar'),
+		$load_btn = $view.find('.load-more-btn'),
+		$user_content = $view.find('.one-friend-main-content').addClass(__C.CLASSES.HIDDEN);
+
+
+	getFriendsList($friends_right_list, function(res){});
+	$load_btn.find('.btn').on('click', getFeed);
+	getFeed();
 }
 function OrganizationsList($view, $content_block){
-
 	if (__STATES.getCurrentState() == 'organizations' && organizations_loaded) return;
 	$.ajax({
 		url: 'api/organizations/?with_subscriptions=true',
@@ -782,14 +909,22 @@ $(document)
 		function renderState(){
 			var state = History.getState(),
 				page = __STATES.getCurrentState();
-			if (__STATES.hasOwnProperty(page)){
+			if (__STATES.hasOwnProperty(page) && state.hash.indexOf('friend-') == -1){
 				var $content_block = $('[data-controller="'  + __STATES[page].name + '"]'),
 					$view = $content_block.parents('.screen-view');
 				$view = $view.length == 1 ? $view : $content_block;
 				$('.screen-view').not($view).addClass(__C.CLASSES.HIDDEN);
 				$view.removeClass(__C.CLASSES.HIDDEN);
 				__STATES[page]($view, $content_block);
-			}else{
+			}else if (state.hash.indexOf('friend-') != -1){
+				var $friends_app = $('.friends-app');
+				$friends_app.removeClass(__C.CLASSES.HIDDEN).addClass(__C.CLASSES.ACTIVE);
+				getFriendsList($friends_app.find('.friends-right-bar'), function(){
+					$('.friend-item.' + state.data.page).addClass(__C.CLASSES.ACTIVE).siblings().removeClass(__C.CLASSES.ACTIVE);
+				});
+				OneFriend($friends_app);
+			}
+			else{
 				console.error('PAGE RENDERING ERROR');
 			}
 			if (page != 'search'){
@@ -799,15 +934,16 @@ $(document)
 			$('[data-page="' + page + '"]').addClass(__C.CLASSES.ACTIVE);
 		}
 
-		History.Adapter.bind(window,'statechange',function(){ // Note: We are using statechange instead of popstate
+		History.Adapter.bind(window, 'statechange', function(){ // Note: We are using statechange instead of popstate
 			renderState(); // Note: We are using History.getState() instead of event.state\
 		});
 
 
 		bindOnClick();
 		$('.log-out-icon').on('click', function(){
-		window.location.href = 'index.php?logout=true';
-	});
+			window.location.href = 'index.php?logout=true';
+		});
+
 		$('.search-input')
 			.on('keypress', function(e){
 				if (e.which == 13){
@@ -821,6 +957,7 @@ $(document)
 		$('.show-organizations-btn').on('click', function(){
 			History.pushState({page: 'organizations'}, 'Каталог организаций', 'organizations');
 		});
+
 		$('.show-timeline-btn').on('click', function(){
 			History.pushState({page: 'timeline'}, 'Моя лента', 'timeline');
 		});

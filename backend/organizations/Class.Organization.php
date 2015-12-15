@@ -236,7 +236,7 @@ class Organization {
 		)));
 	}
 
-	public static function getSubscribedFriends(PDO $db, AbstractUser $user, $organization_id) {
+	public static function getSubscribedFriends(PDO $db, AbstractUser $user, $organization_id, $limit = '') {
 		$q_get_subscribed_friends = 'SELECT DISTINCT
 			users.first_name, users.last_name,
 			users.middle_name, users.id, view_friends.friend_id, users.avatar_url, view_friends.friend_uid,
@@ -253,7 +253,7 @@ class Organization {
 			 AND subscriptions.status = 1
 			 AND view_friends.friend_id IS NOT NULL
 			GROUP BY view_friends.friend_id
-			ORDER BY is_friend DESC ';
+			ORDER BY is_friend DESC ' . $limit;
 		$p_get_friends = $db->prepare($q_get_subscribed_friends);
 		$result  = $p_get_friends->execute(array(
 			':user_id' => $user->getId(),

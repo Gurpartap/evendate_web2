@@ -1276,6 +1276,20 @@ socket.on('auth', function(data){
           window.location.href = '/mobileAuthDone.php?token=' + data.token + '&email=' + data.email;
         }else{
           window.opener.location = 'timeline';
+          switch(data.type){
+            case 'vk':{
+              yaCounter32442130.reachGoal('VkAuthDone');
+              break;
+            }
+            case 'facebook':{
+              yaCounter32442130.reachGoal('FacebookAuthDone');
+              break;
+            }
+            case 'google':{
+              yaCounter32442130.reachGoal('GoogleAuthDone');
+              break;
+            }
+          }
           window.close();
         }
       }else{
@@ -1646,6 +1660,16 @@ $(document).ready(function(){
               ORGANIZATION_OPEN_SITE: 'open_site',
               EVENT_ENTITY: 'event',
               ORGANIZATION_ENTITY: 'organization'
+            },
+            ACTION_NAMES: {
+              fave:           ['добавил(а) в избранное'],
+              unfave:         ['удалил(а) из избранного'],
+              subscribe:      ['добавил(а) подписки'],
+              unsubscribe:    ['удалил(а) подписки']
+            },
+            ENTITIES: {
+              EVENT: 'event',
+              ORGANIZATION: 'organization'
             }
         };
     window.__stats = [];

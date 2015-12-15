@@ -1,7 +1,7 @@
 <?php
 
-ini_set("display_errors", 1);
-error_reporting(E_ALL);
+echo $_SERVER["HTTP_REFERER"];
+
 	require_once 'backend/bin/db.php';
 	require_once 'backend/statistics/Class.Statistics.php';
 	require_once 'backend/bin/Class.Result.php';

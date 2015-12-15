@@ -26,14 +26,17 @@
 		}
 
 		$('.vk-auth-btn').on('click', function(){
+			yaCounter32442130.reachGoal('VkAuthStart');
 			openAuthLink('vk');
 		});
 
 		$('.google-plus-btn').on('click', function(){
+			yaCounter32442130.reachGoal('GoogleAuthStart');
 			openAuthLink('google');
 		});
 
 		$('.facebook-btn').on('click', function(){
+			yaCounter32442130.reachGoal('FacebookAuthStart');
 			openAuthLink('facebook');
 		});
 	})

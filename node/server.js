@@ -507,7 +507,8 @@ io.on('connection', function (socket){
 					socket.emit('auth', {
 						email: data.access_data.email,
 						token: user_token,
-						mobile: token_type == 'mobile'
+						mobile: token_type == 'mobile',
+						type: data.type
 					});
 				});
 			}

@@ -66,6 +66,9 @@ require_once 'backend/bin/db.php';
 <!-- VK OPEN API FOR AUTHORIZATION-->
 <script src="http://<?=App::$DOMAIN?>:8080/socket.io/socket.io.js" type="text/javascript"></script>
 
+<?php
+require_once 'footer.php';
+?>
 <!-- =============== APP SCRIPTS ===============-->
 <script src="app/js/app.js"></script>
 

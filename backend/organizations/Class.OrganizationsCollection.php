@@ -90,7 +90,7 @@ class OrganizationsCollection{
 			if ($_friend != null){
 				$fr = $_friend;
 			}
-			$org['subscribed_friends'] = Organization::getSubscribedFriends($db, $fr, $org['id'])->getData();
+			$org['subscribed_friends'] = Organization::getSubscribedFriends($db, $fr, $org['id'], ' LIMIT 10')->getData();
 		}
 		return new Result(true, '', $organizations);
 	}
