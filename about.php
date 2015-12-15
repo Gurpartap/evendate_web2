@@ -34,21 +34,21 @@ require_once 'backend/bin/db.php';
 		<div class="person"><div class="person-avatar"><img src="landing/img/persons/7.png"></div> <h3 class="person-name">Дмитрий Гордеев</h3><p class="person-description">Android Delevoper</p></div>
 		<div class="person"><div class="person-avatar"><img src="landing/img/persons/5.png"></div> <h3 class="person-name">Денис Оздемир</h3><p class="person-description">UX/UI</p></div>
 		<div class="person"><div class="person-avatar"><img src="landing/img/persons/18.png"></div><h3 class="person-name">Александр Сапронов</h3><p class="person-description">Designer </p></div>
-		<div class="person"><div class="person-avatar"><img src="landing/img/persons/16.png"></div><h3 class="person-name">Ибрагимов Ибрагим</h3><p class="person-description">Web-analyst</p></div>
+		<div class="person"><div class="person-avatar"><img src="landing/img/persons/16.png"></div><h3 class="person-name">Ибрагим Ибрагимов</h3><p class="person-description">Web-analyst</p></div>
 		<div class="person"><div class="person-avatar"><img src="landing/img/persons/3.png"></div> <h3 class="person-name">Олег Минтуш</h3><p class="person-description">Evangelist</p></div>
-		<div class="person"><div class="person-avatar"><img src="landing/img/persons/8.png"></div> <h3 class="person-name">Амир Абдулаев</h3><p class="person-description">Marketing manager</p></div>
+		<div class="person"><div class="person-avatar"><img src="landing/img/persons/8.png"></div> <h3 class="person-name">Амир Абдуллаев</h3><p class="person-description">Marketing manager</p></div>
 		<div class="person"><div class="person-avatar"><img src="landing/img/persons/19.png"></div><h3 class="person-name">Енот</h3><p class="person-description">Просто енот</p></div>
 		<div class="person"><div class="person-avatar"><img src="landing/img/persons/1.png"></div> <h3 class="person-name">Елена Каминская</h3><p class="person-description">Content manager</p></div>
-		<div class="person"><div class="person-avatar"><img src="landing/img/persons/2.png"></div> <h3 class="person-name">Саша Серкова</h3><p class="person-description">Content manager</p></div>
+		<div class="person"><div class="person-avatar"><img src="landing/img/persons/2.png"></div> <h3 class="person-name">Александра Серкова</h3><p class="person-description">Content manager</p></div>
 		<div class="person"><div class="person-avatar"><img src="landing/img/persons/6.png"></div> <h3 class="person-name">Ольга Санникова</h3><p class="person-description">Content manager</p></div>
 		<div class="person"><div class="person-avatar"><img src="landing/img/persons/9.png"></div> <h3 class="person-name">Елена Власова</h3><p class="person-description">Content manager</p></div>
 		<div class="person"><div class="person-avatar"><img src="landing/img/persons/10.png"></div><h3 class="person-name">Екатерина Мысливцева</h3><p class="person-description">Content manager</p></div>
 		<div class="person"><div class="person-avatar"><img src="landing/img/persons/11.png"></div><h3 class="person-name">Дарина Киреенко</h3><p class="person-description">Content manager</p></div>
 		<div class="person"><div class="person-avatar"><img src="landing/img/persons/12.png"></div><h3 class="person-name">Галия Халилулина</h3><p class="person-description">Content manager</p></div>
 		<div class="person"><div class="person-avatar"><img src="landing/img/persons/13.png"></div><h3 class="person-name">Татьяна Иванова</h3><p class="person-description">Content manager</p></div>
-		<div class="person"><div class="person-avatar"><img src="landing/img/persons/14.png"></div><h3 class="person-name">Екатерина Андреева</h3><p class="person-description">Content manager</p></div>
+		<div class="person"><div class="person-avatar"><img src="landing/img/persons/14.png"></div><h3 class="person-name">Екатерина Ховрина</h3><p class="person-description">Content manager</p></div>
 		<div class="person"><div class="person-avatar"><img src="landing/img/persons/15.png"></div><h3 class="person-name">Кристина Личинина</h3><p class="person-description">Content manager</p></div>
-		<div class="person"><div class="person-avatar"><img src="landing/img/persons/20.png"></div><h3 class="person-name">Анна Андронова</h3><p class="person-description">Content manager</p></div>
+		<div class="person"><div class="person-avatar"><img src="landing/img/persons/20.png"></div><h3 class="person-name">Анна Андрианова</h3><p class="person-description">Content manager</p></div>
 		<div class="person"><div class="person-avatar"><img src="landing/img/persons/21.png"></div><h3 class="person-name">Ярослав Попсуй-Шапко</h3><p class="person-description">Content manager</p></div>
 	</div>
 </div>

@@ -47,7 +47,7 @@ try{
 <div id="overlay" class="overlay">
 	<div id="mobiles">
 		<div id="mobiles-wrap">
-			<div id="mobile-1" class="mobile"><video id="mobile-1-video" width="100%" height="100%" src="landing/videos/apple_1.webm" muted></video></div>
+			<div id="mobile-1" class="mobile"><video id="mobile-1-video" width="100%" height="100%" src="landing/videos/apple_1.mp4" muted></video></div>
 			<div id="mobile-2" class="mobile"><video id="mobile-2-video" width="100%" height="100%" src="landing/videos/android_1.mp4" muted autoplay></video></div>
 		</div>
 		<div id="mobile-switch" class="centering"><div id="mobile-switch-wrap">

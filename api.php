@@ -26,7 +26,7 @@ require_once 'backend/bin/db.php';
 <div id="overlay" class="overlay h-centering">
 	<div style="margin-top: 90px"></div>
 	<p>Наши разработчики ежедневно дорабатывают продукт, чтобы сделать сервис интереснее.<br>Если вы хотите приобщиться к нашей миссии и сделать Evendate чуточку лучше,<br>то мы предлагаем воспользоваться нашим Beta REST API.</p>
-	<p class="thin">Заполните форму, и наша команда обязательно свяжется с Вами!</p>
+	<p>Заполните форму, и наша команда обязательно свяжется с Вами!</p>
 	<form class="form" autocomplete="off">
 		<div class="form-unit form-labeled">
 			<label for="name" class="form-label icon-user"></label>

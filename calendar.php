@@ -135,7 +135,7 @@ try{
                             <i class="icon-login"></i>
                         </div>
                         <p class="header-user-name"> <?=$user->getLastName() . ' ' . $user->getFirstName()?></p>
-                        <div class="label label-blue">Редактор</div>
+<!--                        <div class="label label-blue">Редактор</div>-->
                     </div>
                 </div>
             </div>
@@ -299,7 +299,6 @@ try{
 <script src="vendor/notify/notify.js"></script>
 <!-- JQUERY APPEAR-->
 <script src="vendor/appear/jquery.appear.js"></script>
-<script src="vendor/jquery.infinitescroll.min.js"></script>
 
 
 <!-- =============== APP SCRIPTS ===============-->

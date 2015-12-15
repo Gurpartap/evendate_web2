@@ -26,7 +26,7 @@ require_once 'backend/bin/db.php';
 <div id="overlay" class="overlay h-centering">
 	<div style="margin-top: 150px"></div>
 	<h1 class="regular">Остались вопросы?</h1>
-	<p class="thin">Заполните форму, и наша команда обязательно свяжется с Вами!</p>
+	<p>Заполните форму, и наша команда обязательно свяжется с Вами!</p>
 	<form class="form" autocomplete="off">
 		<div class="form-unit form-labeled">
 			<label for="name" class="form-label icon-user"></label>
