@@ -22,7 +22,7 @@ $__modules['organizations'] = array(
 		},
 		'' => function () use ($__db, $__request, $__user) {
 			if (isset($__request['without_friends'])){
-				$limit_friends = ' LIMIT 5';
+				$limit_friends = ' LIMIT 0';
 			}else{
 				$limit_friends = '';
 			}
