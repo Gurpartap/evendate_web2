@@ -218,9 +218,7 @@ try{
                                 <button class="btn btn-lg disabled btn-pink-empty"> Загрузить еще... </button>
                             </div>
                         </div>
-                        <div class="one-friend-profile one-friend-main-content">
-
-                        </div>
+                        <div class="one-friend-profile one-friend-main-content"></div>
                     </div>
                 </div>
             </div>
@@ -310,7 +308,6 @@ try{
 
 <?php
 require 'templates.html';
-require 'friend-templates.html';
 require 'footer.php';
 ?>
 

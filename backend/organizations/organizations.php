@@ -21,10 +21,20 @@ $__modules['organizations'] = array(
 			return new Result(true, '', $result);
 		},
 		'' => function () use ($__db, $__request, $__user) {
-			return OrganizationsCollection::filter($__db, $__user, array());
+			if (isset($__request['without_friends'])){
+				$limit_friends = ' LIMIT 5';
+			}else{
+				$limit_friends = '';
+			}
+			return OrganizationsCollection::filter($__db, $__user, array(), '', $limit_friends);
 		},
 		'all' => function () use ($__db, $__request, $__user) {
-			return OrganizationsCollection::filter($__db, $__user, array());
+			if (isset($__request['without_friends'])){
+				$limit_friends = ' LIMIT 5';
+			}else{
+				$limit_friends = '';
+			}
+			return OrganizationsCollection::filter($__db, $__user, array(), '', $limit_friends);
 		},
 	)
 );

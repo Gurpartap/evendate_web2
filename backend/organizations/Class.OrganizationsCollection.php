@@ -14,7 +14,7 @@ class OrganizationsCollection{
 		$this->user = $user;
 	}
 
-	public static function filter(PDO $db, User $user, array $filters = null, $order_by = ''){
+	public static function filter(PDO $db, User $user, array $filters = null, $order_by = '', $friends_limit = ''){
 		$q_get_organizations = 'SELECT DISTINCT organizations.id, organizations.description,
 			organizations.background_medium_img_url, organizations.background_small_img_url,
 			organizations.img_medium_url, organizations.img_small_url, organizations.site_url,
@@ -90,7 +90,7 @@ class OrganizationsCollection{
 			if ($_friend != null){
 				$fr = $_friend;
 			}
-			$org['subscribed_friends'] = Organization::getSubscribedFriends($db, $fr, $org['id'], ' LIMIT 10')->getData();
+			$org['subscribed_friends'] = Organization::getSubscribedFriends($db, $fr, $org['id'], $friends_limit)->getData();
 		}
 		return new Result(true, '', $organizations);
 	}

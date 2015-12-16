@@ -403,7 +403,7 @@ function OrganizationsList($view, $content_block){
 
 	if (__STATES.getCurrentState() == 'organizations' && organizations_loaded) return;
 	$.ajax({
-		url: 'api/organizations/?with_subscriptions=true',
+		url: 'api/organizations/?with_subscriptions=true&without_friends=true',
 		success: function(res){
 			organizations_loaded = true;
 			var _organizations_by_types = {},
@@ -572,13 +572,77 @@ function Search($view, $content_block){
 	setDaysWithEvents();
 }
 
+function bindFeedEvents($view){
+	$view.find('.feed-clickable').off('click').on('click', function(){
+		var $this = $(this);
+		if ($this.data('organization-id')){
+			showOrganizationalModal($this.data('organization-id'));
+		}else if ($this.data('event-id')){
+			window.open('/event.php?id=' + $this.data('event-id'), '_blank');
+		}else if ($this.data('friend-id')){
+			History.pushState({page: 'friend-' + $this.data('friend-id')}, $this.text(), 'friend-' + $this.data('friend-id'));
+		}
+	});
+}
 
 
 function OneFriend($view, $content_block){
 	var friend_id = __STATES.getCurrentState().split('-')[1],
-		$content = $view.find('.one-friend-main-content');
+		$content = $view.find('.one-friend-main-content'),
+		page_number = 0;
 	$view.find('.friends-main-content').addClass(__C.CLASSES.HIDDEN);
 	$content.removeClass(__C.CLASSES.HIDDEN).empty();
+
+	function getFriendFeed(){
+		var $load_btn = $content.find('.load-more-btn');
+		if (page_number == 0){
+			$content.find('.friend-events-block').remove();
+		}
+		$.ajax({
+			url: 'api/users/friends?friends=true&actions=true&length=20&friend_id=' + friend_id + '&page=' + page_number++,
+			success: function(res){
+				if ((res.data.length == 0 && page_number != 1) || res.data.length < 20){
+					$load_btn.addClass(__C.CLASSES.HIDDEN);
+					return;
+				}
+				var cards_by_users = {};
+				res.data.forEach(function(stat){
+					var date = moment(stat.created_at),
+						ent = stat[stat.entity],
+						key = [stat.entity, stat.stat_type_id, stat.user.id, date.format('DD.MM')].join('-');
+					if (cards_by_users.hasOwnProperty(key) == false){
+						cards_by_users[key] = {
+							user: stat.user,
+							entity: stat.entity,
+							type_code: stat.type_code,
+							date: date.format(__C.DATE_FORMAT) == moment().format(__C.DATE_FORMAT) ? 'Сегодня': date.format('DD.MM'),
+							action_name: __C.ACTION_NAMES[stat.type_code][0].capitalize(),
+							first_name: stat.user.first_name,
+							avatar_url: stat.user.avatar_url,
+							friend_id: stat.user.id,
+							last_name: stat.user.last_name,
+							entities: []
+						};
+					}
+
+					cards_by_users[key].entities.push(ent);
+				});
+
+				$.each(cards_by_users, function(key, value){
+					var $card = tmpl('friends-feed-card-short', value),
+						item_tmpl_name = value.entity == __C.ENTITIES.EVENT ? 'friends-feed-event' : 'friends-feed-organization';
+
+					value.entities.forEach(function(ent){
+						$card.append(tmpl(item_tmpl_name, ent));
+					});
+					$load_btn.before($card);
+				});
+				$load_btn.removeClass(__C.CLASSES.HIDDEN).find('.btn').removeClass(__C.CLASSES.DISABLED);
+				$load_btn.off('click').on('click', getFriendFeed);
+				bindFeedEvents($view);
+			}
+		});
+	}
 
 	$.ajax({
 		url: '/api/users/friends/',
@@ -609,8 +673,10 @@ function OneFriend($view, $content_block){
 			$view.find('.back-to-friends-list').on('click', function(){
 				History.pushState({page: 'friends'}, 'Мои друзья', 'friends');
 			});
+			getFriendFeed();
 		}
 	});
+
 
 	calculateMargins($view);
 }
@@ -681,6 +747,7 @@ function Friends($view, $content_block){
 							date: date.format(__C.DATE_FORMAT) == moment().format(__C.DATE_FORMAT) ? 'Сегодня': date.format('DD.MM'),
 							action_name: __C.ACTION_NAMES[stat.type_code][0],
 							first_name: stat.user.first_name,
+							friend_id: stat.user.id,
 							avatar_url: stat.user.avatar_url,
 							last_name: stat.user.last_name,
 							entities: []
@@ -701,15 +768,16 @@ function Friends($view, $content_block){
 				});
 				$load_btn.removeClass(__C.CLASSES.HIDDEN).find('.btn').removeClass(__C.CLASSES.DISABLED);
 				calculateMargins($view);
+				bindFeedEvents($view);
 			}
-		})
+		});
 	}
 
 
 
 	var $main_content = $view.find('.friends-main-content').removeClass(__C.CLASSES.HIDDEN),
 		$friends_right_list = $view.find('.friends-right-bar'),
-		$load_btn = $view.find('.load-more-btn'),
+		$load_btn = $view.find('.load-more-btn').addClass(__C.CLASSES.HIDDEN),
 		$user_content = $view.find('.one-friend-main-content').addClass(__C.CLASSES.HIDDEN);
 
 

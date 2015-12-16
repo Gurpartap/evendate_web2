@@ -19,6 +19,16 @@
   margin-bottom: 7px;
 }
 
+
+.friend-events-block.short .friend-avatar .event-type-name {
+  padding-left: 18px;
+  font-size: 17px;
+}
+.friend-events-block.short .events-header{
+  height: 40px;
+  font-size: 18px;
+}
+
 .friend-avatar img{
   float: left;
   border-radius: 99px;
@@ -244,6 +254,7 @@
   font-size: 13px;
   margin-top: 6px;
   color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
 }
 
 .user-name-wrapper{

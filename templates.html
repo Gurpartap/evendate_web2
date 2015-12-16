@@ -684,3 +684,110 @@
 <script type="javascript/template" id="tmpl-default-address-btn">
   <span class="input-group-btn" id="default-address-btn"><button type="button" class="btn btn-default"><span class="fa fa-building"></span></button></span>
 </script>
+
+<script type="javascript/template" id="tmpl-friend-item">
+  <div class="friend-item friend-{id}" data-friend-id="{id}" data-name="{last_name} {first_name}">
+    <div class="friend-avatar">
+      <img src="{avatar_url}">
+    </div>
+    <div class="friend-name">{last_name} {first_name}</div>
+  </div>
+</script>
+
+
+<script type="javascript/template" id="tmpl-friends-feed-card-short">
+  <div class="friend-events-block short">
+    <div class="events-header">
+      <div class="friend-avatar">
+        <span class="events-date">{date}</span>
+        <div class="event-type-name">{action_name}</div>
+      </div>
+    </div>
+    <div class="events-body">
+    </div>
+  </div>
+</script>
+
+<script type="javascript/template" id="tmpl-friends-feed-card">
+  <div class="friend-events-block">
+    <div class="events-header">
+      <div class="friend-avatar">
+        <img src="{avatar_url}">
+        <span class="events-date">{date}</span>
+        <span class="friend-name feed-clickable" data-friend-id="{friend_id}">{last_name} {first_name}</span>
+        <div class="event-type-name">{action_name}</div>
+      </div>
+    </div>
+    <div class="events-body">
+    </div>
+  </div>
+</script>
+
+
+<script type="javascript/template" id="tmpl-friends-feed-event">
+  <div class="friend-event favored">
+    <div>
+      <img src="{image_square_url}" class="feed-clickable" data-event-id="{id}">
+      <div class="event-favored-wrapper">
+        <div class="event-name feed-clickable" data-event-id="{id}">{title}</div>
+        <div class="organizator-block feed-clickable" data-organization-id="{organization_id}">
+          <img src="{organization_logo_url}">
+          <span class="name">{organization_short_name}</span></div></div>
+    </div>
+  </div>
+</script>
+
+<script type="javascript/template" id="tmpl-friends-page-header">
+  <div class="user-info-content">
+    <div class="top-links">
+      <div class="back-to-friends-list"><i class="icon-arrow-left"></i> Вся лента</div>
+      <div class="user-profile-name"> {last_name} {first_name}</div>
+    </div>
+    <div class="friend-page-info-header">
+      <div class="top-part">
+        <div class="friend-avatar-big pull-left">
+          <img class="user-avatar" src="{avatar_url}">
+        </div>
+        <div class="user-name-wrapper">
+          <div class="friend-user-name"> {last_name} {first_name}</div>
+          <div class="friend-user-link">Профиль {type} <span class="icon-arrow-right"></span> </div>
+        </div>
+      </div>
+      <div class="user-btns-wrapper">
+        <div class="user-btn pull-left" data-tab="one-friend-events"> Активность</div>
+        <div class="user-btn pull-right active" data-tab="one-friend-subscriptions"> Подписки</div>
+      </div>
+    </div>
+    <div class="one-friend-content-wrapper" style="margin-top: 15px;">
+      <div class="one-friend-events hidden">
+
+        <div class="load-more-btn hidden" data-page-number="0">
+          <button class="btn btn-lg disabled btn-pink-empty" style="margin-top: 25px;"> Загрузить еще... </button>
+        </div>
+      </div>
+      <div class="one-friend-subscriptions">
+      </div>
+    </div>
+  </div>
+</script>
+
+<script type="javascript/template" id="tmpl-friends-subscription">
+  <div class="friend-subscription-block feed-clickable" data-organization-id="{id}">
+    <img src="{img_medium_url}" class="pull-left friend-organization-logo">
+    <div class="friend-subscription-name">{short_name}</div>
+  </div>
+</script>
+
+<script type="javascript/template" id="tmpl-friends-feed-organization">
+  <div class="friend-event subscribed">
+    <div>
+      <div class="subscribed-img-wrapper feed-clickable" data-organization-id="{id}">
+        <img src="{img_medium_url}" style="width: 28px;">
+      </div>
+      <div class="event-favored-wrapper">
+        <div class="event-name feed-clickable" data-organization-id="{id}">{short_name}</div>
+        <div>
+          <span class="name">{subscribed_count} подписчиков</span></div></div>
+    </div>
+  </div>
+</script>

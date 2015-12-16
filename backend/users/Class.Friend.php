@@ -73,7 +73,7 @@ class Friend extends AbstractUser{
 	public function getSubscriptions($with_user_info = false){
 		$subscriptions = OrganizationsCollection::filter($this->db, $this->user, array(
 			'friend' => $this
-		));
+		), '', ' LIMIT 10');
 
 		if ($with_user_info){
 			return new Result(true, '', array(
