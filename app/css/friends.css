@@ -316,3 +316,31 @@
   margin-top: 5px;
   height: 48px;
 }
+
+.friend-events-block-no-activity .events-body{
+  height: 200px;
+  text-align: center;
+  padding-top: 76px;
+  font-size: 25px;
+}
+
+.no-friends-block{
+  width: 100%;
+  text-align: center;
+  padding-top: 150px;
+}
+
+
+.no-friends-text{
+  font-size: 36px;
+  font-weight: lighter;
+}
+
+.subtitle{
+  font-size: 19px;
+  padding-top: 36px;
+}
+
+.social-links a{
+  text-decoration: none;
+}

@@ -9147,3 +9147,11 @@ span.organization-modal-header-text{
   border-color: rgba(0, 0, 0, 0);
   background-color: #5379B8;
 }
+
+.search-events .event-image{
+  max-width: 180px;
+}
+.search-events .event-description{
+  opacity: 1;
+  visibility: visible;
+}

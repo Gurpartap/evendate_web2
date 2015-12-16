@@ -1293,7 +1293,8 @@ socket.on('auth', function(data){
           window.close();
         }
       }else{
-        alert(res.text);
+        $('.panel-body.loader-demo').text(res.text);
+        $('.panel-heading').hide();
       }
     }
   });
@@ -1301,6 +1302,11 @@ socket.on('auth', function(data){
 
 socket.on('log', function(data){
     console.log(data);
+});
+
+socket.on('error.retry', function() {
+  $('.panel-body.loader-demo').text('Во время загрузки данных произошла ошибка. Войдите с помощью другой социальной сети или попробуте чуть позже.');
+  $('.panel-heading').hide();
 });
 
 socket.on('notification', function(data){

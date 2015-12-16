@@ -7,7 +7,7 @@ require_once 'backend/tags/Class.TagsCollection.php';
 try{
     $user = new User($db);
     $add_event_btn_hidden = $user->isEditor() ? '' : 'hidden';
-    $profile_is_editor = $user->isEditor() ? 'is-editor' : '';
+    $profile_is_editor = $user->isEditor() ? '' : '';
 }catch(exception $e){
     header('Location: /');
 }
@@ -104,7 +104,7 @@ try{
                         <i class="icon-list"></i> <span>Организаторы</span>
                     </a>
                     <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn" data-page="friends">
-                        <i class="fa fa-users"></i> <span>Мои друзья</span>
+                        <i class="icon-people"></i> <span>Мои друзья</span>
                     </a>
                     <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn" data-controller="showSettingsModal">
                         <i class="icon-settings"></i> <span>Настройки</span>
@@ -204,6 +204,16 @@ try{
             <div class="friends-app hidden screen-view" data-controller="Friends">
                 <div class="row">
                     <div class="col-md-12" data-controller="Friends" style="padding-top: 100px;">
+
+                        <div class="no-friends-block hidden">
+                            <div class="no-friends-text">Ваших друзей пока нет в Evendate</div>
+                            <div class="subtitle">Вы можете пригласить их</div>
+                            <div class="share">
+                                <p class="social-links">
+                                    <a class="fa fa-vk" target="_blank" href="http://vk.com/share.php?url=http://evendate.ru/&title=Evendate.ru - будь в курсе событий&description=Я пользуюсь Evendate, чтобы не пропустить интересные события в своих любимых местах.&image=http://evendate.ru/app/img/logo_500.png&noparse=false" data-share-type="vk"></a>
+                                    <a class="fa fa-facebook-f" target="_blank" href="http://www.facebook.com/sharer.php?s=100&p[title]=Evendate.ru - будь в курсе событий&p[summary]=Я пользуюсь Evendate, чтобы не пропустить интересные события в своих любимых местах.&p[url]=http://evendate.ru/&p[images][0]=http://evendate.ru/app/img/logo_500.png" data-share-type="facebook"></a>
+                                    <a class="fa fa-twitter" target="_blank" href="https://twitter.com/share?url=http://evendate.ru/event.php?id={id}&text=Я пользуюсь Evendate, чтобы не пропустить интересные события в своих любимых местах.&via=evendate.ru&hashtags=#events #Москва #evendate" data-share-type="twitter"></a></p></div>
+                        </div>
 
                         <div class="friends-right-bar hidden">
                             <div class="friends-bar-header">

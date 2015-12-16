@@ -1,10 +1,10 @@
 <?php
 
 
-//if (isset($_SERVER['ENV']) && $_SERVER['ENV'] != 'prod'){
-	ini_set("display_errors", 1);
-	error_reporting(E_ALL);
-//}
+	if (isset($_SERVER['ENV']) && $_SERVER['ENV'] != 'dev'){
+		ini_set("display_errors", 1);
+		error_reporting(E_ALL);
+	}
 
 	header('Access-Control-Allow-Origin: *');
 	header('Access-Control-Allow-Headers: Authorization');

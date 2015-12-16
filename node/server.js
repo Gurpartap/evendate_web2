@@ -382,6 +382,7 @@ io.on('connection', function (socket){
 
 	function handleError(err, code){
 		console.log(err, code);
+		throw err;
 	}
 
 	function saveDataInDB(data, callback){
@@ -738,39 +739,43 @@ io.on('connection', function (socket){
 		}
 
 
-		getAccessToken(oauth_data, function(access_data){
-			access_data.type = oauth_data.type;
-			validateAccessToken(access_data, function(){
-				getUsersInfo(access_data, function(user_info){
-					if (oauth_data.type == 'vk'){user_info = user_info.response[0];}
-					user_info.type = oauth_data.type;
-					user_info.access_token = access_data.access_token;
+		try{
+			getAccessToken(oauth_data, function(access_data){
+				access_data.type = oauth_data.type;
+				validateAccessToken(access_data, function(){
+					getUsersInfo(access_data, function(user_info){
+						if (oauth_data.type == 'vk'){user_info = user_info.response[0];}
+						user_info.type = oauth_data.type;
+						user_info.access_token = access_data.access_token;
 
-					getFriendsList(user_info, function(friends_data) {
-						if (oauth_data.type == 'vk') {
-							friends_data = friends_data.response;
-							if (access_data.email == null) {
-								socket.emit('vk.needEmail');
-								return;
+						getFriendsList(user_info, function(friends_data) {
+							if (oauth_data.type == 'vk') {
+								friends_data = friends_data.response;
+								if (access_data.email == null) {
+									socket.emit('vk.needEmail');
+									return;
+								}
+							}else if (oauth_data.type == 'google') {
+								friends_data = friends_data.items;
+							}else if (oauth_data.type == 'facebook') {
+								friends_data = friends_data.data;
+								user_info.photo_100 = user_info.hasOwnProperty('picture') ? user_info.picture.data.url : '';
 							}
-						}else if (oauth_data.type == 'google') {
-							friends_data = friends_data.items;
-						}else if (oauth_data.type == 'facebook') {
-							friends_data = friends_data.data;
-							user_info.photo_100 = user_info.hasOwnProperty('picture') ? user_info.picture.data.url : '';
-						}
 
-						saveDataInDB(composeFullInfoObject({
-							oauth_data: oauth_data,
-							access_data: access_data,
-							user_info: user_info,
-							friends_data: friends_data,
-							type: access_data.type
-						}));
+							saveDataInDB(composeFullInfoObject({
+								oauth_data: oauth_data,
+								access_data: access_data,
+								user_info: user_info,
+								friends_data: friends_data,
+								type: access_data.type
+							}));
+						});
 					});
 				});
-			});
-		})
+			})
+		}catch(e){
+			socket.emit('error.retry');
+		}
 	});
 
 	socket.on('feedback', function(data){
@@ -781,7 +786,6 @@ io.on('connection', function (socket){
 				html += '<p><strong>' + i + ':</strong> ' + data[i] + '</p>';
 			}
 		}
-		console.log(html);
 		transporter.sendMail({
 			debug: true,
 			connectionTimeout: 50000,

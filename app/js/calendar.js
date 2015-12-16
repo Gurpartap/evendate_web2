@@ -603,7 +603,8 @@ function OneFriend($view, $content_block){
 			success: function(res){
 				if ((res.data.length == 0 && page_number != 1) || res.data.length < 20){
 					$load_btn.addClass(__C.CLASSES.HIDDEN);
-					return;
+				}else if (res.data.length == 0 && page_number == 1){
+					$load_btn.before(tmpl('no-activity', {}));
 				}
 				var cards_by_users = {};
 				res.data.forEach(function(stat){
@@ -653,7 +654,17 @@ function OneFriend($view, $content_block){
 		},
 		success: function(res){
 			$content.append(tmpl('friends-page-header', res.data.user));
-			tmpl('friends-subscription', res.data.subscriptions, $content.find('.one-friend-subscriptions'))
+			$content.find('.friend-user-link').on('click', function(){
+				window.open(res.data.user.link, '_blank');
+			});
+
+			if (res.data.subscriptions.length == 0){
+				tmpl('no-subscriptions', {}, $content.find('.one-friend-subscriptions'));
+			}else{
+				tmpl('friends-subscription', res.data.subscriptions, $content.find('.one-friend-subscriptions'))
+			}
+
+
 			$content.find('.friend-subscription-block').each(function(index){
 				var $this = $(this);
 				setTimeout(function(){
@@ -685,6 +696,11 @@ function getFriendsList($friends_right_list, cb){
 	$.ajax({
 		url: '/api/users/friends?page=0&length=500',
 		success: function(res){
+			if (res.data.length == 0){
+				$('.no-friends-block').removeClass(__C.CLASSES.HIDDEN);
+				$('.friends-right-bar, .friends-main-content, .one-friend-profile').addClass(__C.CLASSES.HIDDEN);
+				return;
+			}
 			$friends_right_list.find('.friends-list').empty();
 			$friends_right_list.removeClass(__C.CLASSES.HIDDEN);
 			tmpl('friend-item', res.data, $friends_right_list.find('.friends-list'));
@@ -705,7 +721,7 @@ function getFriendsList($friends_right_list, cb){
 				});
 			}
 
-			if (cb) cb();
+			if (cb) cb(res);
 		}
 	});
 }

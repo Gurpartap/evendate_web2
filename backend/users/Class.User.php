@@ -249,6 +249,8 @@ class User extends AbstractUser{
 
 	public function getFriends($page, $length, Friend $user_friend = null) {
 
+//		return new Result(true, '', array());
+
 		if ($user_friend instanceof Friend){
 			$friend_part = ' AND view_friends.friend_id = :friend_id';
 			$data = array(':friend_id' => $user_friend->getId());
