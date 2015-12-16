@@ -140,51 +140,54 @@ function sendNotifications(){
 					return;
 				}
 				devices.forEach(function(device){
-					connection.query(q_ins_notification, [device.id, event_notification.id], function(err, result){
-						if (err)logger.error(err);
-						var notification_id = result.insertId,
-							_text = replaceTags(event_notification.notification_type_text, event_notification);
-						var data = {
-							device: device,
-							note: {
-								alert: _text,
+
+					if (err)logger.error(err);
+					var notification_id = 0,
+						_text = replaceTags(event_notification.notification_type_text, event_notification);
+					var data = {
+						device: device,
+						note: {
+							alert: _text,
+							body: _text,
+							icon: real_config.schema + real_config.domain + '/event_images/square/' + event_notification.image_vertical,
+							payload: {
+								type: 'event_notification',
+								title: event_notification.title,
+								event_id: event_notification.event_id,
 								body: _text,
 								icon: real_config.schema + real_config.domain + '/event_images/square/' + event_notification.image_vertical,
-								payload: {
-									type: 'event_notification',
-									title: event_notification.title,
-									event_id: event_notification.event_id,
-									body: _text,
-									icon: real_config.schema + real_config.domain + '/event_images/square/' + event_notification.image_vertical,
-									organization_logo: real_config.schema + real_config.domain + '/organizations_images/small/' + event_notification.organization_id + '.png'
-								}
-							},
-							type: device.client_type,
-							notification_id: notification_id
-						};
-
-
-						if (device.client_type == 'browser'){
-							if (device.notify_in_browser === 0) return;
-							if (__rooms.hasOwnProperty(device.token) && __rooms[device.token].length > 0){
-								var connections = __rooms[device.token];
-								connections.forEach(function(socket_id){
-									io.to(socket_id).emit('notification', data);
-								});
+								organization_logo: real_config.schema + real_config.domain + '/organizations_images/small/' + event_notification.organization_id + '.png'
 							}
-						}else{
-							try{
-								var notification = notifications_factory.create(data);
-								notification.send(function(err){
-									console.log(err);
-								});
-							}catch(e){
-								logger.error(e);
-								console.log(e.stack);
-							}
+						},
+						type: device.client_type,
+						notification_id: notification_id
+					};
 
+
+					if (device.client_type == 'browser'){
+						if (device.notify_in_browser === 0) return;
+						if (__rooms.hasOwnProperty(device.token) && __rooms[device.token].length > 0){
+							var connections = __rooms[device.token];
+							connections.forEach(function(socket_id){
+								io.to(socket_id).emit('notification', data);
+							});
 						}
-					});
+					}else{
+						try{
+							var notification = notifications_factory.create(data);
+							notification.send(function(err){
+								console.log(err);
+							});
+						}catch(e){
+							logger.error(e);
+							console.log(e.stack);
+						}
+
+					}
+
+					//connection.query(q_ins_notification, [device.id, event_notification.id], function(err, result){
+					//
+					//});
 
 
 				});
@@ -349,7 +352,7 @@ function blurImages(){
 
 try {
 	if (config_index != 'local'){
-		new CronJob('*/2 * * * *', function(){
+		new CronJob('*/1 * * * *', function(){
 			logger.info('Resizing start', 'START... ' + new Date().toString());
 			resizeImages();
 			blurImages();
@@ -360,7 +363,7 @@ try {
 }
 
 try {
-	new CronJob('*/1 * * * *', function(){
+	new CronJob('*/10 * * * *', function(){
 		logger.info('Notifications start', 'START...' + new Date().toString());
 		sendNotifications();
 	}, null, true);
@@ -571,6 +574,7 @@ io.on('connection', function (socket){
 		switch (data.type){
 			case 'vk':{
 				_url = URLs.VK.GET_ACCESS_TOKEN + (data.hasOwnProperty('mobile') && data.mobile == 'true') + '&code=' + data.code;
+				logger.info('VK_GET_ACCESS_TOKEN', _url);
 				req_params = {};
 				break;
 			}
@@ -613,6 +617,7 @@ io.on('connection', function (socket){
 						'Accept-Language': 'ru,en-us'
 					}
 				};
+				logger.info('VK_GET_USERS_INFO_PARAMS', req_params);
 				break;
 			}
 			case 'google':{
@@ -632,6 +637,7 @@ io.on('connection', function (socket){
 		rest
 			.get(_url, req_params)
 			.on('complete', function(res){
+				logger.info('VK_GET_USERS_INFO_RESULT', res);
 				if (callback instanceof Function){
 					callback(res);
 				}
@@ -685,6 +691,7 @@ io.on('connection', function (socket){
 		switch (data.type){
 			case 'vk':{
 				if (callback instanceof Function){
+					logger.info('VK_VALIDATE_ACCESS_TOKEN', data);
 					callback(data);
 					return;
 				}
@@ -744,7 +751,11 @@ io.on('connection', function (socket){
 				access_data.type = oauth_data.type;
 				validateAccessToken(access_data, function(){
 					getUsersInfo(access_data, function(user_info){
-						if (oauth_data.type == 'vk'){user_info = user_info.response[0];}
+						if (oauth_data.type == 'vk'){
+							logger.info('VK_USER_INFO_HAS_RESPONSE', user_info.hasOwnProperty('response'));
+							logger.info('VK_USER_INFO_RESPONSE', user_info);
+							user_info = user_info.response[0];
+						}
 						user_info.type = oauth_data.type;
 						user_info.access_token = access_data.access_token;
 

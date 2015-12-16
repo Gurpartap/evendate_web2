@@ -601,10 +601,14 @@ function OneFriend($view, $content_block){
 		$.ajax({
 			url: 'api/users/friends?friends=true&actions=true&length=20&friend_id=' + friend_id + '&page=' + page_number++,
 			success: function(res){
-				if ((res.data.length == 0 && page_number != 1) || res.data.length < 20){
+				var hide_btn = false;
+				if ((res.data.length == 0 && page_number != 1) || (res.data.length < 20 && res.data.length > 0)){
 					$load_btn.addClass(__C.CLASSES.HIDDEN);
+					hide_btn = true;
 				}else if (res.data.length == 0 && page_number == 1){
 					$load_btn.before(tmpl('no-activity', {}));
+					$load_btn.addClass(__C.CLASSES.HIDDEN);
+					hide_btn = true;
 				}
 				var cards_by_users = {};
 				res.data.forEach(function(stat){
@@ -638,7 +642,9 @@ function OneFriend($view, $content_block){
 					});
 					$load_btn.before($card);
 				});
-				$load_btn.removeClass(__C.CLASSES.HIDDEN).find('.btn').removeClass(__C.CLASSES.DISABLED);
+				if (!hide_btn){
+					$load_btn.removeClass(__C.CLASSES.HIDDEN).find('.btn').removeClass(__C.CLASSES.DISABLED);
+				}
 				$load_btn.off('click').on('click', getFriendFeed);
 				bindFeedEvents($view);
 			}

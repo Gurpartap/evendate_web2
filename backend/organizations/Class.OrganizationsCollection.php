@@ -15,6 +15,7 @@ class OrganizationsCollection{
 	}
 
 	public static function filter(PDO $db, User $user, array $filters = null, $order_by = '', $friends_limit = ''){
+
 		$q_get_organizations = 'SELECT DISTINCT organizations.id, organizations.description,
 			organizations.background_medium_img_url, organizations.background_small_img_url,
 			organizations.img_medium_url, organizations.img_small_url, organizations.site_url,

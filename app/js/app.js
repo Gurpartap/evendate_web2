@@ -1317,7 +1317,7 @@ socket.on('notification', function(data){
     socket.emit('notification.received', {
       notification_id: data.notification_id
     });
-    var myNotification = new Notify(data.note.alert, {
+    var myNotification = new Notify(data.note.payload.title, {
       body: data.note.body,
       icon: data.note.icon,
       tag: data.note.payload.event_id,

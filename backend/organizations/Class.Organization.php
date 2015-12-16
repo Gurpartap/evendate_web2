@@ -239,24 +239,15 @@ class Organization {
 	public static function getSubscribedFriends(PDO $db, AbstractUser $user, $organization_id, $limit = '') {
 		$q_get_subscribed_friends = 'SELECT DISTINCT
 			users.first_name, users.last_name,
-			users.middle_name, users.id, view_friends.friend_id, users.avatar_url, view_friends.friend_uid,
-			view_friends.type,
-			IF (
-				(SELECT COUNT(view_friends.friend_id) FROM view_friends WHERE view_friends.user_id = :user_id AND view_friends.friend_id = users.id) > 0,
-			1, 0)
-				AS is_friend
+			users.middle_name, users.id, users.avatar_url,
+			0 AS is_friend
  			FROM users
 			 INNER JOIN subscriptions ON subscriptions.user_id = users.id
-			 LEFT JOIN view_friends ON view_friends.friend_id = users.id
-			 WHERE
-			 subscriptions.organization_id = :organization_id
+			 WHERE subscriptions.organization_id = :organization_id
 			 AND subscriptions.status = 1
-			 AND view_friends.friend_id IS NOT NULL
-			GROUP BY view_friends.friend_id
-			ORDER BY is_friend DESC ' . $limit;
+			ORDER BY is_friend DESC';
 		$p_get_friends = $db->prepare($q_get_subscribed_friends);
 		$result  = $p_get_friends->execute(array(
-			':user_id' => $user->getId(),
 			':organization_id' => $organization_id
 		));
 
@@ -266,9 +257,9 @@ class Organization {
 
 		foreach($users as &$friend){
 			$friend['id'] = intval($friend['id']);
-			$friend['friend_id'] = intval($friend['friend_id']);
-			$friend['is_friend'] = $friend['is_friend'] == 1;
-			$friend['link'] = User::getLinkToSocialNetwork($friend['type'], $friend['friend_uid']);
+			$friend['friend_id'] = intval($friend['id']);
+			$friend['is_friend'] = false;
+//			$friend['link'] = User::getLinkToSocialNetwork($friend['type'], $friend['friend_uid']);
 		}
 
 		return new Result(true, '', $users);

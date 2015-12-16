@@ -102,26 +102,26 @@ try {
 	}
 
 
-	$q_ins_request = 'INSERT INTO log_requests(created_at, body, user_id, method, class, args, method_name, response_status, time)
-		VALUES(NOW(), :request_body, :user_id, :request_method, :request_class, :request_args, :request_method_name, :response_status, FROM_UNIXTIME(:time))';
-	$p_ins_req = $__db->prepare($q_ins_request);
+//	$q_ins_request = 'INSERT INTO log_requests(created_at, body, user_id, method, class, args, method_name, response_status, time)
+//		VALUES(NOW(), :request_body, :user_id, :request_method, :request_class, :request_args, :request_method_name, :response_status, FROM_UNIXTIME(:time))';
+//	$p_ins_req = $__db->prepare($q_ins_request);
 
-	$req_copy = $__request;
-	if (isset($req_copy['payload']['files'])){
-		$req_copy['payload']['files'] = null;
-	}
-	if (isset($req_copy['payload']['cropped_file'])){
-		$req_copy['payload']['cropped_file'] = null;
-	}
-	$ins_data = array(
-		':request_body' => json_encode($req_copy),
-		':user_id' => (isset($__user) && ($__user instanceof User)) ? $__user->getId(): null,
-		':request_method' => $__request_method,
-		':request_class' => $__class_name,
-		':request_method_name' => $__method_name,
-		':request_args' => json_encode($__args),
-		':time' => $req_came_time
-	);
+//	$req_copy = $__request;
+//	if (isset($req_copy['payload']['files'])){
+//		$req_copy['payload']['files'] = null;
+//	}
+//	if (isset($req_copy['payload']['cropped_file'])){
+//		$req_copy['payload']['cropped_file'] = null;
+//	}
+//	$ins_data = array(
+//		':request_body' => json_encode($req_copy),
+//		':user_id' => (isset($__user) && ($__user instanceof User)) ? $__user->getId(): null,
+//		':request_method' => $__request_method,
+//		':request_class' => $__class_name,
+//		':request_method_name' => $__method_name,
+//		':request_args' => json_encode($__args),
+//		':time' => $req_came_time
+//	);
 
 	require_once $class_path . $class_file_name;
 
@@ -158,10 +158,10 @@ try {
 	}
 	$__result = new Result(false, 'Ошибка! '. $e->getMessage());
 	$__result->setFormat($format);
-	if (isset($p_ins_req) && isset($ins_data)){
-		$ins_data[':response_status'] = 0;
-		$p_ins_req->execute($ins_data);
-	}
+//	if (isset($p_ins_req) && isset($ins_data)){
+//		$ins_data[':response_status'] = 0;
+//		$p_ins_req->execute($ins_data);
+//	}
 }
 
 
@@ -174,7 +174,7 @@ if ((isset($__result) && $__result instanceof Result) || (isset($__class_name) &
 	echo new Result(false, 'Извините, сервер не вернул никаких данных');
 
 }
-if (isset($p_ins_req) && isset($ins_data)) {
-	$ins_data[':response_status'] = 1;
-	$p_ins_req->execute($ins_data);
-}
+//if (isset($p_ins_req) && isset($ins_data)) {
+//	$ins_data[':response_status'] = 1;
+//	$p_ins_req->execute($ins_data);
+//}
