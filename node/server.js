@@ -85,6 +85,10 @@ function replaceTags(text, object){
 	return text;
 }
 
+function lowerCaseFirstLetter(string) {
+	return string.charAt(0).toLowerCase() + string.slice(1);
+}
+
 function sendNotifications(){
 
 	if (config_index == 'test' || config_index == 'local') return;
@@ -116,8 +120,17 @@ function sendNotifications(){
 			' AND organizations.id = ?' +
 			' AND subscriptions.status = 1' +
 			' ORDER BY tokens.id DESC',
+		q_to_send_not_now_notification = 'SELECT DISTINCT tokens.*, users.notify_in_browser ' +
+			' FROM tokens' +
+			' INNER JOIN users ON users.id = tokens.user_id' +
+			' INNER JOIN favorite_events ON favorite_events.user_id = users.id' +
+			' WHERE FROM_UNIXTIME(tokens.expires_on) >= NOW()' +
+			' AND favorite_events.event_id = ?' +
+			' AND favorite_events.status = 1' +
+			' ORDER BY tokens.id DESC',
 		q_ins_notification = 'INSERT INTO notifications(created_at, click_time, received, token_id, event_notification_id)' +
-			' VALUES(NOW(), NULL, 0, ?, ?)';
+			' VALUES(NOW(), NULL, 0, ?, ?)',
+		q_data = null;
 
 	connection.query(q_get_events_notifications, function(err, rows){
 		if (err){
@@ -126,15 +139,21 @@ function sendNotifications(){
 		}
 
 		rows.forEach(function(event_notification){
+
+			if (event_notification['notification_type_name'] != 'notification-now'){
+				event_notification['notification_suffix'] = lowerCaseFirstLetter(event_notification['notification_suffix']);
+				q_get_to_send_devices = q_to_send_not_now_notification;
+				q_data = event_notification.event_id;
+			}else{
+				q_data = event_notification.organization_id;
+			}
+
 			connection.query('UPDATE events_notifications SET done = 1 WHERE id = ' + connection.escape(event_notification.id), function(err){
 				if (err){
 					logger.error(err);
 				}
 			});
-			if (event_notification['notification_type_name'] != 'notification-now'){
-				event_notification['notification_suffix'] = event_notification['notification_suffix'].toLowerCase();
-			}
-			connection.query(q_get_to_send_devices, event_notification.organization_id, function(errors, devices){
+			connection.query(q_get_to_send_devices, q_data, function(errors, devices){
 				if (errors){
 					logger.error(errors);
 					return;

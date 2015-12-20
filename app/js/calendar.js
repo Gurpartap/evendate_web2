@@ -235,7 +235,7 @@ function generateEventAttributes(event){
 	var short_firends_count = 0;
 	if (event.favorite_friends != undefined){
 		event.favorite_friends.forEach(function(user){
-			if (short_firends_count < 5){
+			if (short_firends_count++ < 5){
 				event.friends.append(tmpl('liked-user', user));
 			}
 			event.all_friends.append(tmpl('liked-dropdown-item', user))

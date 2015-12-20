@@ -123,7 +123,7 @@ echo $_SERVER["HTTP_REFERER"];
 										foreach($dates as $date){
 											$datetime = new DateTime($date['event_date']);
 											if ($long_format){
-												$_dates[] = $datetime->format('j ') . strtr($begin_date->format('F'), $trans);
+												$_dates[] = $datetime->format('j ') . strtr($datetime->format('F'), $trans);
 											}else{
 												$_dates[] = $datetime->format('j.m');
 											}

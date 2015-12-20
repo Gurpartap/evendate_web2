@@ -16,7 +16,17 @@ class OrganizationsCollection{
 
 	public static function filter(PDO $db, User $user, array $filters = null, $order_by = '', $friends_limit = ''){
 
-		$q_get_organizations = 'SELECT DISTINCT organizations.id, organizations.description,
+
+		$statement_array = array(':user_id' => $user->getId());
+
+		if (isset($filters['friend'])){
+			$is_subscribed_part = '(SELECT COUNT(id) > 0 as is_subscribed FROM subscriptions WHERE user_id = :real_user_id AND subscriptions.organization_id = oid AND status = 1) AS is_subscribed,';
+			$statement_array[':real_user_id']  = $user->getId();
+		}else{
+			$is_subscribed_part = 'IF(subscriptions.id IS NOT NULL, 1, 0) AS is_subscribed,';
+		}
+
+		$q_get_organizations = 'SELECT DISTINCT organizations.id, organizations.description, organizations.id as oid,
 			organizations.background_medium_img_url, organizations.background_small_img_url,
 			organizations.img_medium_url, organizations.img_small_url, organizations.site_url,
 			organizations.name, organizations.type_id, organizations.img_url, organizations.background_img_url,
@@ -24,7 +34,7 @@ class OrganizationsCollection{
 			 organizations.updated_at,
 			 organizations.created_at,
 			 subscriptions.id AS subscription_id,
-			 IF(subscriptions.id IS NOT NULL, 1, 0) AS is_subscribed,
+			 '. $is_subscribed_part. '
 			 UNIX_TIMESTAMP(organizations.updated_at) AS timestamp_updated_at,
 			 UNIX_TIMESTAMP(organizations.created_at) AS timestamp_created_at,
 			(
@@ -38,7 +48,6 @@ class OrganizationsCollection{
 			LEFT JOIN subscriptions ON subscriptions.organization_id = organizations.id AND subscriptions.user_id = :user_id AND subscriptions.status = 1
 			WHERE 1 = 1 ';
 
-		$statement_array = array(':user_id' => $user->getId());
 
 		$friends_subscriptions = false;
 		$search_fields = [];
