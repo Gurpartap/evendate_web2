@@ -14,7 +14,7 @@ require_once 'backend/bin/db.php';
 
 <header id="main-header">
 	<div class="overlay v-centering">
-		<a id="header-logo" class="odd unselectable" title="Evendate" href="#"><img src="landing/img/logo_500.png"><span>Evendate</span></a>
+		<a id="header-logo" class="odd unselectable" title="Evendate" href="/"><img src="landing/img/logo_500.png"><span>Evendate</span></a>
 		<nav class="nav header-nav">
 			<a class="nav-unit centering" href="index.php"><span>Главная</span></a>
 			<a class="nav-unit centering" href="about.php"><span>О нас</span></a>

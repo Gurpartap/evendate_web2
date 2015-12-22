@@ -40,8 +40,8 @@ require_once 'backend/bin/db.php';
 		<div class="panel panel-danger hidden">
 			<div class="panel-heading">Ошибка авторизации - отсутствует Email</div>
 			<div class="panel-body">
-				В Вашем аккаунте vk.com не указан email. Авторзация невозможна.
-				Укажите, пожауйста, в Вашем аккаунте
+				В Вашем аккаунте vk.com не указан email. Авторизация невозможна.
+				Укажите, пожалуйста, в Вашем аккаунте
 				<a href="https://vk.com/settings#chgmail" target="_blank">https://vk.com/settings</a> email и попробуйте еще раз.
 			</div>
 		</div>

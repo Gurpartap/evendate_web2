@@ -14,7 +14,7 @@ class OrganizationsCollection{
 		$this->user = $user;
 	}
 
-	public static function filter(PDO $db, User $user, array $filters = null, $order_by = '', $friends_limit = ''){
+	public static function filter(PDO $db, User $user, array $filters = null, $order_by = ' ORDER BY organization_types.order, organization_types.id ', $friends_limit = ''){
 
 
 		$statement_array = array(':user_id' => $user->getId());
@@ -33,6 +33,7 @@ class OrganizationsCollection{
 			 organizations.status, organizations.short_name, organization_types.name AS type_name,
 			 organizations.updated_at,
 			 organizations.created_at,
+			 organization_types.order AS organization_type_order,
 			 subscriptions.id AS subscription_id,
 			 '. $is_subscribed_part. '
 			 UNIX_TIMESTAMP(organizations.updated_at) AS timestamp_updated_at,

@@ -26,15 +26,15 @@ $__modules['organizations'] = array(
 			}else{
 				$limit_friends = '';
 			}
-			return OrganizationsCollection::filter($__db, $__user, array(), '', $limit_friends);
+			return OrganizationsCollection::filter($__db, $__user, array(), ' ORDER BY organization_types.order, organization_types.id ', $limit_friends);
 		},
 		'all' => function () use ($__db, $__request, $__user) {
 			if (isset($__request['without_friends'])){
-				$limit_friends = ' LIMIT 5';
+				$limit_friends = ' LIMIT 0';
 			}else{
 				$limit_friends = '';
 			}
-			return OrganizationsCollection::filter($__db, $__user, array(), '', $limit_friends);
+			return OrganizationsCollection::filter($__db, $__user, array(), ' ORDER BY organization_types.order, organization_types.id ', $limit_friends);
 		},
 	)
 );

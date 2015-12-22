@@ -581,7 +581,7 @@ class Event{
 	}
 
 	public function getUrl(){
-		return App::$SCHEMA . App::$DOMAIN . '/events.php?id=' . $this->getId();
+		return App::$SCHEMA . App::$DOMAIN . '/event.php?id=' . $this->getId();
 	}
 
 	public function getLikedUsers(){
