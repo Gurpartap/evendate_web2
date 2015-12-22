@@ -9160,3 +9160,16 @@ span.organization-modal-header-text{
   opacity: 1;
   visibility: visible;
 }
+
+.new-category.type-9.active{
+  -webkit-box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.25);
+  -moz-box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.25);
+  box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.25);
+}
+.new-category.type-9{
+  background: url("/app/img/new_year_btn.png") 100% 100% no-repeat !important;
+  background-position-x: 0 !important;
+  background-size: cover !important;
+  /*border-radius: 999px !important;*/
+  color: #fff;
+}

@@ -412,14 +412,14 @@ function OrganizationsList($view, $content_block){
 			res.data.forEach(function(organization){
 				var _key = '_' + organization.type_id;
 				if (!_organizations_by_types.hasOwnProperty(_key)){
-					_organizations_by_types[_key] = {type_name: organization.type_name, organizations: {}, count: 0, type_order: organization.organization_type_order, type_id: organization.type_id};
+					_organizations_by_types[_key] = {type_name: organization.type_name, organizations: {}, count: 0, type_order: parseInt(organization.organization_type_order), type_id: organization.type_id};
 				}
 				_organizations_by_types[_key].organizations['_' + organization.id] = organization;
 				_organizations_by_types[_key].count++;
 			});
 
 			var sorted_keys = Object.keys(_organizations_by_types).sort(function(a,b){
-				return _organizations_by_types[b].type_order - _organizations_by_types[a].type_order
+				return _organizations_by_types[a].type_order - _organizations_by_types[b].type_order;
 			});
 
 			$categories.empty();

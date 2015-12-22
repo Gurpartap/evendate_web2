@@ -245,7 +245,7 @@ class Organization {
 			 INNER JOIN subscriptions ON subscriptions.user_id = users.id
 			 WHERE subscriptions.organization_id = :organization_id
 			 AND subscriptions.status = 1
-			ORDER BY is_friend DESC';
+			ORDER BY is_friend DESC' . $limit;
 		$p_get_friends = $db->prepare($q_get_subscribed_friends);
 		$result  = $p_get_friends->execute(array(
 			':organization_id' => $organization_id
