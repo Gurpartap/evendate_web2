@@ -8801,7 +8801,12 @@ span.organization-modal-header-text{
   padding-left: 30px;
 }
 .event-alone.in-modal .close{
-  margin-right: 10px;
+  margin-right: 15px;
+  float: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  margin-top: 8px;
 }
 .event-alone.in-modal .middle-col{
   padding-left: 30px;
