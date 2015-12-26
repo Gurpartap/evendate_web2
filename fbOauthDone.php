@@ -1,5 +1,5 @@
 <?php
-	require_once 'backend/bin/db.php';
+	require_once 'v1-backend/bin/db.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -54,7 +54,7 @@
 <!-- BOOTSTRAP-->
 <script src="vendor/bootstrap/dist/js/bootstrap.js"></script>
 <!-- VK OPEN API FOR AUTHORIZATION-->
-<script src="http://<?=App::$DOMAIN?>:8080/socket.io/socket.io.js" type="text/javascript"></script>
+<script src="<?=App::$SCHEMA.App::$NODE_DOMAIN?>:8080/socket.io/socket.io.js" type="text/javascript"></script>
 
 
 <?php

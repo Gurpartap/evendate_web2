@@ -1,7 +1,7 @@
 <?php
 
-require_once $ROOT_PATH.'backend/events/Class.Event.php';
-require_once $ROOT_PATH.'backend/events/Class.EventsCollection.php';
+require_once $ROOT_PATH. $BACKEND_FOLDER . '/events/Class.Event.php';
+require_once $ROOT_PATH. $BACKEND_FOLDER . '/events/Class.EventsCollection.php';
 
 $__modules['events'] = array(
 	'GET' => array(

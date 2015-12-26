@@ -60,6 +60,7 @@
       "user_images": "user_images"
     },
     "domain": "evendate.ru",
+    "node_domain": "evendate.ru",
     "schema": "http://"
   },
   "test":{
@@ -123,6 +124,7 @@
       "user_images": "user_images"
     },
     "domain": "5.101.124.61",
+    "node_domain": "5.101.124.61",
     "schema": "http://"
   },
   "local":{
@@ -144,9 +146,9 @@
     "db": {
       "host": "localhost",
       "user": "postgres",
-      "password": "",
+      "password": "Trwnp7LUCwW7mp4J",
       "database": "evendate",
-      "port": 3306
+      "port": 5433
     },
     "VK": {
       "APP_ID": 5029623,
@@ -185,7 +187,8 @@
       "events_path": "event_images",
       "user_images": "user_images"
     },
-    "domain": "evendate.local",
+    "domain": "dev.evendate.org",
+    "node_domain": "dev.evendate.org",
     "schema": "http://"
   }
 }

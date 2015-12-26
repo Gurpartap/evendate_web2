@@ -1,6 +1,6 @@
 <?php
 
-require_once $ROOT_PATH.'backend/tags/Class.TagsCollection.php';
+require_once $ROOT_PATH. $BACKEND_FOLDER . '/tags/Class.TagsCollection.php';
 
 $__modules['tags'] = array(
 	'GET' => array(

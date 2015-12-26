@@ -1,6 +1,5 @@
 <?php
 
-
 	if (isset($_SERVER['ENV']) && $_SERVER['ENV'] != 'dev'){
 		ini_set("display_errors", 1);
 		error_reporting(E_ALL);
@@ -18,18 +17,18 @@ try {
 
 	$req_came_time = time();
 
-	$BACKEND_FOLDER = 'v1-backend';
+	$BACKEND_FOLDER = '/v1-backend';
 
-	require_once "../../{$BACKEND_FOLDER}/bin/Class.RequestsParser.php";
-	require_once "../../{$BACKEND_FOLDER}/bin/db.php";
-	require_once "../../{$BACKEND_FOLDER}/bin/Class.AbstractModule.php";
-	require_once "../../{$BACKEND_FOLDER}/bin/Class.Result.php";
-	require_once "../../{$BACKEND_FOLDER}/users/Class.AbstractUser.php";
-	require_once "../../{$BACKEND_FOLDER}/users/Class.User.php";
-	require_once "../../{$BACKEND_FOLDER}/users/Class.Editor.php";
-	require_once "../../{$BACKEND_FOLDER}/users/Class.Friend.php";
-	require_once "../../{$BACKEND_FOLDER}/statistics/Class.Statistics.php";
-	require_once "../../{$BACKEND_FOLDER}/events/Class.EventsCollection.php";
+	require_once "../..{$BACKEND_FOLDER}/bin/Class.RequestsParser.php";
+	require_once "../..{$BACKEND_FOLDER}/bin/db.php";
+	require_once "../..{$BACKEND_FOLDER}/bin/Class.AbstractModule.php";
+	require_once "../..{$BACKEND_FOLDER}/bin/Class.Result.php";
+	require_once "../..{$BACKEND_FOLDER}/users/Class.AbstractUser.php";
+	require_once "../..{$BACKEND_FOLDER}/users/Class.User.php";
+	require_once "../..{$BACKEND_FOLDER}/users/Class.Editor.php";
+	require_once "../..{$BACKEND_FOLDER}/users/Class.Friend.php";
+	require_once "../..{$BACKEND_FOLDER}/statistics/Class.Statistics.php";
+	require_once "../..{$BACKEND_FOLDER}/events/Class.EventsCollection.php";
 
 
 	function __autoload($class_name) {
@@ -105,27 +104,6 @@ try {
 	}
 
 
-//	$q_ins_request = 'INSERT INTO log_requests(created_at, body, user_id, method, class, args, method_name, response_status, time)
-//		VALUES(NOW(), :request_body, :user_id, :request_method, :request_class, :request_args, :request_method_name, :response_status, FROM_UNIXTIME(:time))';
-//	$p_ins_req = $__db->prepare($q_ins_request);
-
-//	$req_copy = $__request;
-//	if (isset($req_copy['payload']['files'])){
-//		$req_copy['payload']['files'] = null;
-//	}
-//	if (isset($req_copy['payload']['cropped_file'])){
-//		$req_copy['payload']['cropped_file'] = null;
-//	}
-//	$ins_data = array(
-//		':request_body' => json_encode($req_copy),
-//		':user_id' => (isset($__user) && ($__user instanceof User)) ? $__user->getId(): null,
-//		':request_method' => $__request_method,
-//		':request_class' => $__class_name,
-//		':request_method_name' => $__method_name,
-//		':request_args' => json_encode($__args),
-//		':time' => $req_came_time
-//	);
-
 	require_once $class_path . $class_file_name;
 
 	if (isset($__modules[$__class_name]) && isset($__modules[$__class_name][$__request_method]) && isset($__modules[$__class_name][$__request_method][$__method_name])) {
@@ -161,23 +139,14 @@ try {
 	}
 	$__result = new Result(false, 'Ошибка! '. $e->getMessage());
 	$__result->setFormat($format);
-//	if (isset($p_ins_req) && isset($ins_data)){
-//		$ins_data[':response_status'] = 0;
-//		$p_ins_req->execute($ins_data);
-//	}
 }
 
 
-if ((isset($__result) && $__result instanceof Result) || (isset($__class_name) && $__class_name == 'suggests')){
+if (isset($__result) && $__result instanceof Result){
 	$__result->setFormat($format);
 	$__result->setDownloadable($download);
 	$__result->setNude($nude_data);
 	echo $__result;
 }else{
 	echo new Result(false, 'Извините, сервер не вернул никаких данных');
-
 }
-//if (isset($p_ins_req) && isset($ins_data)) {
-//	$ins_data[':response_status'] = 1;
-//	$p_ins_req->execute($ins_data);
-//}

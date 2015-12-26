@@ -14,15 +14,16 @@ class App {
 	public static $DB_PASSWORD;
 	public static $DB_NAME;
 	public static $DOMAIN;
+	public static $NODE_DOMAIN;
 	public static $SCHEMA;
 
 
 	/*
-	 * init config options for deploy and versioning
+	 * init config options for deploy and visioning
 	 * */
 	static function init(){
-		$_SERVER['ENV'] = isset($_SERVER['ENV']) ? $_SERVER['ENV'] : 'dev';
-		$filename = 'config.json';
+		$_SERVER['ENV'] = isset($_SERVER['ENV']) ? $_SERVER['ENV'] : 'local';
+		$filename = 'v1-config.json';
 		$counter = 0;
 		if (file_exists($filename) == false){
 			do{
@@ -39,6 +40,7 @@ class App {
 		self::$DB_USER = self::$obj->db->user;
 		self::$DB_PASSWORD = self::$obj->db->password;
 		self::$DOMAIN = self::$obj->domain;
+		self::$NODE_DOMAIN = self::$obj->node_domain;
 		self::$SCHEMA = self::$obj->schema;
 	}
 

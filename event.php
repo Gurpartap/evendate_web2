@@ -1,11 +1,11 @@
 <?php
 
-	require_once 'backend/bin/db.php';
-	require_once 'backend/statistics/Class.Statistics.php';
-	require_once 'backend/bin/Class.Result.php';
-	require_once 'backend/users/Class.AbstractUser.php';
-	require_once 'backend/users/Class.User.php';
-	require_once 'backend/events/Class.Event.php';
+	require_once 'v1-backend/bin/db.php';
+	require_once 'v1-backend/statistics/Class.Statistics.php';
+	require_once 'v1-backend/bin/Class.Result.php';
+	require_once 'v1-backend/users/Class.AbstractUser.php';
+	require_once 'v1-backend/users/Class.User.php';
+	require_once 'v1-backend/events/Class.Event.php';
 	$event_id = isset($_REQUEST['id']) ? intval($_REQUEST['id']): null;
 	$event = new Event($event_id, $db);
 
@@ -297,7 +297,7 @@
 
 
 <!-- =============== APP SCRIPTS ===============-->
-<script src="http://<?=App::$DOMAIN?>:8080/socket.io/socket.io.js" type="text/javascript"></script>
+<script src="<?=App::$SCHEMA.App::$NODE_DOMAIN?>:8080/socket.io/socket.io.js" type="text/javascript"></script>
 <script src="app/js/app.js"></script>
 </body>
 

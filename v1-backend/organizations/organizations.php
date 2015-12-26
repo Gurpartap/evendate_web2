@@ -1,8 +1,8 @@
 <?php
 
-require_once $ROOT_PATH.'backend/organizations/Class.OrganizationsCollection.php';
-require_once $ROOT_PATH.'backend/organizations/Class.Organization.php';
-require_once $ROOT_PATH.'backend/events/Class.EventsCollection.php';
+require_once $ROOT_PATH. $BACKEND_FOLDER . '/organizations/Class.OrganizationsCollection.php';
+require_once $ROOT_PATH. $BACKEND_FOLDER . '/organizations/Class.Organization.php';
+require_once $ROOT_PATH. $BACKEND_FOLDER . '/events/Class.EventsCollection.php';
 
 $__modules['organizations'] = array(
 	'GET' => array(

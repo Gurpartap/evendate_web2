@@ -1,9 +1,9 @@
 <?php
 
-require_once $ROOT_PATH.'backend/subscriptions/Class.Subscription.php';
-require_once $ROOT_PATH.'backend/subscriptions/Class.SubscriptionsCollection.php';
-require_once $ROOT_PATH.'backend/organizations/Class.Organization.php';
-require_once $ROOT_PATH.'backend/organizations/Class.OrganizationsCollection.php';
+require_once $ROOT_PATH. $BACKEND_FOLDER . '/subscriptions/Class.Subscription.php';
+require_once $ROOT_PATH. $BACKEND_FOLDER . '/subscriptions/Class.SubscriptionsCollection.php';
+require_once $ROOT_PATH. $BACKEND_FOLDER . '/organizations/Class.Organization.php';
+require_once $ROOT_PATH. $BACKEND_FOLDER . '/organizations/Class.OrganizationsCollection.php';
 
 $__modules['subscriptions'] = array(
 	'GET' => array(
