@@ -1299,7 +1299,7 @@ $(document).ready(function(){
     window.__stats = [];
 
   window.storeStat = function(entity_id, entity_type, event_type){
-    __stats.push({
+      window.__stats.push({
       entity_id: entity_id,
       entity_type: entity_type,
       event_type: event_type
@@ -1307,9 +1307,9 @@ $(document).ready(function(){
   };
 
   setInterval(function(){
-    if (__stats.length != 0){
-      var batch = __stats;
-      __stats = [];
+    if (window.__stats.length != 0){
+        var batch = window.__stats;
+        window.__stats = [];
       $.ajax({
         url: '/api/statistics/batch',
         data: JSON.stringify(batch),
@@ -1317,8 +1317,7 @@ $(document).ready(function(){
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         error: function(){
-          debugger;
-          __stats.concat(batch);
+            window.__stats.concat(batch);
         }
       });
     }

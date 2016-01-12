@@ -15,8 +15,8 @@ class Subscription{
 
 
 	public function __construct($id, PDO $db) {
-		$p_get_sub = $db->prepare('SELECT id, organization_id,
-			user_id, `status`
+		$p_get_sub = $db->prepare('SELECT id::int, organization_id::int,
+			user_id::int, status::BOOLEAN
 			FROM subscriptions
 			WHERE subscriptions.id = :id');
 
@@ -43,7 +43,7 @@ class Subscription{
 	public static function create(User $user, Organization $organization, PDO $db){
 		$q_ins_sub = 'INSERT INTO subscriptions(organization_id, user_id, created_at, `status`)
 			VALUES(:organization_id, :user_id, NOW(), 1)
-			ON DUPLICATE KEY UPDATE `status` = 1, id = LAST_INSERT_ID(id)';
+			ON CONFLICT DO UPDATE SET status = TRUE RETURNING id;';
 
 		$p_ins_sub = $db->prepare($q_ins_sub);
 		$result = $p_ins_sub->execute(array(
@@ -61,7 +61,7 @@ class Subscription{
 
 	public function delete(User $user){
 		$q_upd_sub = 'UPDATE subscriptions
-			SET `status` = 0
+			SET status = FALSE
 			WHERE user_id = :user_id
 			AND id = :id';
 		$p_upd_sub = $this->db->prepare($q_upd_sub);

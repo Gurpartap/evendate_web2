@@ -8,20 +8,20 @@ try{
 		throw new InvalidArgumentException('Пользователь с указанными данными не существует');
 	}
 
-	require_once 'backend/bin/db.php';
-	require_once 'backend/bin/Class.Result.php';
+	require_once 'v1-backend/bin/db.php';
+	require_once 'v1-backend/bin/Class.Result.php';
 
 	$q_get_user = 'SELECT users.id as user_id, users.token, users.email
 				FROM users
 				WHERE users.email = :email
 					AND users.token = :token';
-	$p_get_user = $db->prepare($q_get_user);
+	$p_get_user = $__db->prepare($q_get_user);
 	$p_get_user->execute(array(
 		':email' => $_REQUEST['email'],
 		':token' => $_REQUEST['token']
 	));
 
-	if (!isset($p_get_user) || $p_get_user === FALSE) throw new DBQueryException(null, $db);
+	if (!isset($p_get_user) || $p_get_user === FALSE) throw new DBQueryException(null, $__db);
 	if ($p_get_user->rowCount() != 1) throw new LogicException('Пользователь с такими данными не найден');
 
 

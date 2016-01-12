@@ -23,6 +23,7 @@ var config_index = process.env.ENV ? process.env.ENV : 'dev',
 		real_config.db.user,
 		':', real_config.db.password,
 		'@', real_config.db.host,
+		':', real_config.db.port,
 		'/', real_config.db.database
 	].join(''),
 	logger = new (winston.Logger)({
@@ -67,7 +68,7 @@ var URLs = {
 		+ 'client_id=' + real_config.facebook.app_id
 		+ '&client_secret=' + real_config.facebook.app_secret
 		+ '&redirect_uri=http://' + real_config.domain + '/fbOauthDone.php?mobile=',
-		'GET_USER_INFO': 'https://graph.facebook.com/me?fields=first_name,last_name,email,middle_name,picture&access_token=',
+		'GET_USER_INFO': 'https://graph.facebook.com/me',
 		'GET_FRIENDS_LIST': "https://graph.facebook.com/me/friends"
 	}
 };
@@ -367,6 +368,8 @@ pg.connect(pg_conn_string, function(err, client, done) {
 
 		var saveDataInDB = function(data) {
 
+				console.log(data);
+
 				function getUIDValues() {
 					var result = {
 						google_uid: null,
@@ -395,28 +398,34 @@ pg.connect(pg_conn_string, function(err, client, done) {
 
 				var UIDs = getUIDValues(),
 					user_token = data.access_data.access_token + data.access_data.secret + Utils.makeId(),
-					q_get_user = 'SELECT id FROM public.users ' +
+					q_get_user = 'SELECT id::int, vk_uid, facebook_uid, google_uid FROM users ' +
 						' WHERE email = $1' +
 						' OR (vk_uid IS NOT NULL AND vk_uid = $2)' +
 						' OR (facebook_uid IS NOT NULL AND facebook_uid = $3)' +
 						' OR (google_uid IS NOT NULL AND google_uid = $4)',
 
-					q_ins_user = 'INSERT INTO users(first_name, last_name, email, token, avatar_url, vk_uid, facebook_uid, google_uid) ' +
-						' VALUES($1, $2, $3, $4, $5, $6, $7, $8)',
+					q_ins_user = 'INSERT INTO users(first_name, last_name, email, token, avatar_url, vk_uid, facebook_uid, google_uid, gender) ' +
+						' VALUES($1, $2, $3, $4, $5, ' +
+						(UIDs.vk_uid != null ? '$6,' : 'null,') +
+						(UIDs.facebook_uid != null ? '$6,' : 'null,') +
+						(UIDs.google_uid != null ? '$6,' : 'null,') +
+						' gender) RETURNING id',
 
 					q_upd_user = 'UPDATE users SET ' +
 						' first_name = $1,' +
-						'last_name = $2 , ' +
-						'token = $4 ' +
-						'avatar_url = $5 , ' +
-						(UIDs.vk_uid != null ? ' vk_uid = $6, ' : '') +
-						(UIDs.facebook_uid != null ? 'facebook_uid = $7, ' : '') +
-						(UIDs.google_uid != null ? 'google_uid = $8, ' : '') + +
-						' WHERE id = $9';
+						' last_name = $2 , ' +
+						' email = $3 , ' +
+						' token = $4, ' +
+						' avatar_url = $5 ' +
+						(UIDs.vk_uid != null ? ', vk_uid = $6, ' : '') +
+						(UIDs.facebook_uid != null ? ', facebook_uid = $6, ' : '') +
+						(UIDs.google_uid != null ? ', google_uid = $6, ' : '') +
+						' gender = $7' +
+						' WHERE id = $8';
 
-				client.query(q_get_user, [data.access_data.email, UIDs.vk_uid, UIDs.facebook_uid, UIDs.google_uid], function(err, result){
+				client.query(q_get_user, [data.access_data.email, UIDs.vk_uid, UIDs.facebook_uid, UIDs.google_uid], function(err, result) {
 
-					console.log(err, result);
+
 					if (handleError(err)) return;
 
 					var q_user = q_upd_user,
@@ -424,160 +433,200 @@ pg.connect(pg_conn_string, function(err, client, done) {
 							data.user_info.last_name,
 							data.access_data.email,
 							user_token,
-							data.user_info.photo_100,
-							UIDs.vk_uid,
-							UIDs.facebook_uid,
-							UIDs.google_uid];
+							data.user_info.photo_100],
+						is_new_user = false,
+						user;
 
 
-					if (result.length == 0){
-						q_user = q_ins_user;
-						query_params.push(result[0].id);
+					if (UIDs.vk_uid != null) {
+						query_params.push(UIDs.vk_uid);
+					}else if (UIDs.facebook_uid != null) {
+						query_params.push(UIDs.facebook_uid);
+					}else if (UIDs.google_uid != null) {
+						query_params.push(UIDs.google_uid);
 					}
 
-					logger.info(q_user);
-					logger.info(query_params);
 
-					client.query(q_user, query_params, function(user_err, result) {
+					if (data.user_info.hasOwnProperty('sex')){
+						if (data.user_info.sex == 2){
+							data.user_info.gender = 'male';
+						}else if (data.user_info.sex == 1){
+							data.user_info.gender = 'female';
+						}else{
+							data.user_info.gender = null;
+						}
+					}
+
+					query_params.push(data.user_info.gender);
+
+					if (result.rows.length == 0) {
+						q_user = q_ins_user;
+						is_new_user = true;
+					} else {
+						user = result.rows[0];
+						query_params.push(user.id);
+					}
+
+					client.query(q_user, query_params, function(user_err, ins_result) {
+
 						if (handleError(user_err)) return;
-						var user_id = result.insertId,
-							q_ins_sign_in = '';
+
+						if (is_new_user) {
+							user = {
+								id: ins_result.rows[0].id,
+								vk_uid: null,
+								facebook_uid: null,
+								google_uid: null
+							};
+						}
+
+						var q_ins_sign_in = '',
+							ins_data;
 
 						switch(data.type) {
 							case 'vk':
 							{
-								q_ins_sign_in = 'INSERT INTO vk_sign_in(uid, access_token, expires_in, secret, user_id, photo_50,' +
-									'   photo_100, photo_max_orig, created_at) ' +
-									'VALUES(' +
-									escapeArray([data.access_data.user_id, data.access_data.access_token, data.access_data.expires_in,
-										data.access_data.secret, user_id, data.user_info.photo_50, data.user_info.photo_100,
-										data.user_info.photo_orig_max]) +
-									', NOW()) ' +
-									'ON DUPLICATE KEY UPDATE ' +
-									'access_token = ' + connection.escape(data.access_data.access_token) + ', ' +
-									'expires_in = ' + connection.escape(data.access_data.expires_in) + ', ' +
-									'photo_50 = ' + connection.escape(data.user_info.photo_50) + ', ' +
-									'photo_100 = ' + connection.escape(data.user_info.photo_100) + ', ' +
-									'photo_max_orig = ' + connection.escape(data.user_info.photo_orig_max) + ', ' +
-									'secret = ' + connection.escape(data.access_data.secret);
+								if (user.vk_uid != null){ // user already exists in vk_users table
+									q_ins_sign_in = 'UPDATE vk_sign_in SET ' +
+										'uid = $1 , ' +
+										'access_token = $2 , ' +
+										'expires_in = $3 , ' +
+										'secret = $4 , ' +
+										'photo_50 = $5 , ' +
+										'photo_100 = $6 , ' +
+										'photo_max_orig = $7 ' +
+										'WHERE user_id = $8';
+									ins_data = [data.access_data.user_id, data.access_data.access_token, data.access_data.expires_in,
+										data.access_data.secret, data.user_info.photo_50, data.user_info.photo_100,
+										data.user_info.photo_max_orig, user.id];
+								}else{
+									q_ins_sign_in = 'INSERT INTO vk_sign_in(uid, access_token, expires_in, secret, user_id, photo_50,' +
+										'   photo_100, photo_max_orig) ' +
+										'VALUES($1, $2, $3, $4, $5, $6, $7, $8) ';
+									ins_data = [data.access_data.user_id, data.access_data.access_token, data.access_data.expires_in,
+										data.access_data.secret, user.id, data.user_info.photo_50, data.user_info.photo_100,
+										data.user_info.photo_max_orig];
+								}
+
 								break;
 							}
 							case 'google':
 							{
 								var cover_photo_url = data.user_info.hasOwnProperty('cover') && data.user_info.cover.hasOwnProperty('coverPhoto') ? data.user_info.cover.coverPhoto.url : null;
-								q_ins_sign_in = 'INSERT INTO google_sign_in(google_id, access_token, expires_in, etag, ' +
-									' user_id, cover_photo_url, created_at) ' +
-									'VALUES(' +
-									escapeArray([
-											data.user_info.id,
-											data.oauth_data.access_token,
-											data.oauth_data.expires_in,
-											data.user_info.etag,
-											user_id,
-											cover_photo_url]
-									) +
-									', NOW()) ' +
-									'ON DUPLICATE KEY UPDATE ' +
-									'access_token = ' + connection.escape(data.oauth_data.access_token) + ', ' +
-									'expires_in = ' + connection.escape(data.oauth_data.expires_in) + ', ' +
-									'etag = ' + connection.escape(data.user_info.etag) + ', ' +
-									'cover_photo_url = ' + connection.escape(cover_photo_url);
+
+								if (user.google_uid != null){
+									q_ins_sign_in = 'INSERT INTO google_sign_in(google_id, access_token, expires_in, etag, ' +
+										' user_id, cover_photo_url) ' +
+										'VALUES($1, $2, $3, $4, $5, $6)';
+									ins_data = [
+										data.user_info.id,
+										data.oauth_data.access_token,
+										data.oauth_data.expires_in,
+										data.user_info.etag,
+										user.id,
+										cover_photo_url
+									];
+								}else{
+									q_ins_sign_in = 'UPDATE google_sign_in' +
+										' SET access_token = $1, ' +
+										' expires_in = $2, ' +
+										' etag = $3, ' +
+										' cover_photo_url = $4 ' +
+										' WHERE user_id = $5';
+									ins_data = [
+										data.oauth_data.access_token,
+										data.oauth_data.expires_in,
+										data.user_info.etag,
+										cover_photo_url,
+										user.id
+									];
+									console.log(user);
+									console.log(q_ins_sign_in, ins_data);
+								}
 								break;
 							}
 							case 'facebook':
 							{
-								q_ins_sign_in = 'INSERT INTO facebook_sign_in(uid, access_token, expires_in' +
-									',user_id, created_at) ' +
-									'VALUES(' +
-									escapeArray([
-											data.user_info.id,
-											data.access_data.access_token,
-											data.access_data.expires_in,
-											user_id]
-									) +
-									', NOW()) ' +
-									'ON DUPLICATE KEY UPDATE ' +
-									'access_token = ' + connection.escape(data.access_data.access_token) + ', ' +
-									'expires_in = ' + connection.escape(data.access_data.expires_in)
+								if (user.facebook_uid != null){
+									q_ins_sign_in = 'INSERT INTO facebook_sign_in(uid, access_token, expires_in, user_id) ' +
+										'VALUES($1, $2, $3, $4)';
+									ins_data = [data.user_info.id,
+										data.oauth_data.access_token,
+										data.access_data.expires_in,
+										user.id];
+								}else{
+									q_ins_sign_in = 'UPDATE facebook_sign_in' +
+										' SET uid = $1, ' +
+										' access_token = $2, ' +
+										' expires_in = $3, ' +
+										' WHERE user_id = $4';
+									ins_data = [data.user_info.id,
+										data.oauth_data.access_token,
+										data.access_data.expires_in,
+										user.id];
+								}
 								break;
 							}
 
 						}
 
 
-						function insertToken() {
-							var token_type = (data.oauth_data.hasOwnProperty('mobile') && data.oauth_data.mobile == 'true') ? 'mobile' : 'bearer',
-								token_time = token_type == 'mobile' ? moment().add(1, 'months').unix() : moment().add(10, 'days').unix(),
-								created_at = moment().unix(),
-								expires_on = token_time,
-								q_ins_token = 'INSERT INTO tokens(token, user_id, token_type, expires_on, created_at) VALUES(' +
-									escapeArray([
-											user_token,
-											user_id,
-											token_type,
-											expires_on]
-									) + ', FROM_UNIXTIME(' + created_at + ')) ';
-							connection.query(q_ins_token, function(err) {
-								if (err) return handleError(err, 'CANT_INSERT_TOKEN');
-								socket.emit('auth', {
-									email: data.access_data.email,
-									token: user_token,
-									mobile: token_type == 'mobile',
-									type: data.type
+						var insertToken =function () {
+								var token_type = (data.oauth_data.hasOwnProperty('mobile') && data.oauth_data.mobile == 'true') ? 'mobile' : 'bearer',
+									token_time = token_type == 'mobile' ? moment().add(1, 'months').unix() : moment().add(10, 'days').unix(),
+									q_ins_token = 'INSERT INTO tokens(token, user_id, token_type, expires_on) VALUES($1, $2, $3, $4)';
+								client.query(q_ins_token, [user_token, user.id, token_type, token_time], function(err) {
+									if (err) return handleError(err, 'CANT_INSERT_TOKEN');
+									socket.emit('auth', {
+										email: data.access_data.email,
+										token: user_token,
+										mobile: token_type == 'mobile',
+										type: data.type
+									});
 								});
-							});
-						}
+							};
 
-						/*INSERT IN TYPE_sing_in TABLE*/
-						client.query(q_ins_sign_in, function(sign_in_err) {
-							if (sign_in_err) return handleError(sign_in_err, 'CANT_INSERT_SIGN_IN_INFO');
+
+						client.query(q_ins_sign_in, ins_data, function(sign_in_err) {
+							if (sign_in_err) return handleError({name: 'CANT_INSERT_SIGN_IN_INFO', err: sign_in_err});
 
 							//noinspection JSUnresolvedFunction
-							var created_at = moment().format("YYYY-MM-DD HH:mm:ss"),
-								q_ins_friends = '',
-								values = [],
+							var q_ins_friends = '',
 								uid_key_name;
 
 							switch(data.type) {
 								case 'vk':
 								{
-									q_ins_friends = "INSERT INTO vk_friends (user_id, friend_uid, created_at) VALUES ? " +
-										" ON DUPLICATE KEY UPDATE created_at = NOW()";
+									q_ins_friends = "INSERT INTO vk_friends (user_id, friend_uid) VALUES ($1, $2) ON CONFLICT DO NOTHING";
 									uid_key_name = 'uid';
 									break;
 								}
 								case 'google':
 								{
-									q_ins_friends = "INSERT INTO google_friends (user_id, friend_uid, created_at) VALUES ? " +
-										" ON DUPLICATE KEY UPDATE created_at = NOW()";
+									q_ins_friends = "INSERT INTO google_friends (user_id, friend_uid) VALUES ($1, $2) ON CONFLICT DO NOTHING";
 									uid_key_name = 'id';
 									break;
 								}
 								case 'facebook':
 								{
-									q_ins_friends = "INSERT INTO facebook_friends (user_id, friend_uid, created_at) VALUES ? " +
-										" ON DUPLICATE KEY UPDATE created_at = NOW()";
+									q_ins_friends = "INSERT INTO facebook_friends (user_id, friend_uid) VALUES ($1, $2) ON CONFLICT DO NOTHING";
 									uid_key_name = 'id';
 									break;
 								}
 							}
 
-							if (!data.friends_data || data.friends_data.length == 0) {
-								socket.emit('auth', {
-									email: data.access_data.email,
-									token: user_token,
-									mobile: data.oauth_data.hasOwnProperty('mobile') && data.oauth_data.mobile == 'true'
-								});
-								insertToken();
-							} else {
-								data.friends_data.forEach(function(value) {
-									values.push([user_id, value[uid_key_name], created_at]);
-								});
-								connection.query(q_ins_friends, [values], function(err) {
-									if (err) return handleError(err, 'CANT_INSERT_FRIENDS');
-									insertToken();
+							if (data.friends_data){
+								var query_name = data.type + '_q_ins_friends';
+								data.friends_data.forEach(function(value){
+									client.query({
+										text: q_ins_friends,
+										name: query_name,
+										values: [user.id, value[uid_key_name]]
+									}, handleError);
 								});
 							}
+
+							insertToken();
 						});
 					});
 				});
@@ -585,7 +634,8 @@ pg.connect(pg_conn_string, function(err, client, done) {
 			getAccessToken = function(data, callback) {
 				var req_params;
 				switch(data.type) {
-					case 'facebook': case 'vk':
+					case 'facebook':
+					case 'vk':
 					{
 						req_params = {
 							url: URLs[data.type.toUpperCase()].GET_ACCESS_TOKEN + (data.hasOwnProperty('mobile') && data.mobile == 'true') + '&code=' + data.code,
@@ -621,7 +671,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 							url: URLs[data.type.toUpperCase()].GET_USER_INFO,
 							qs: {
 								user_ids: data.user_id,
-								fields: 'photo_50, photo_100, photo_max_orig',
+								fields: 'photo_50, sex, photo_100, photo_max_orig, universities, education, activities, occupation, interests, music, movies, tv, books, games, about',
 								name_case: 'nom'
 							},
 							json: true,
@@ -629,7 +679,6 @@ pg.connect(pg_conn_string, function(err, client, done) {
 								'Accept-Language': 'ru,en-us'
 							}
 						};
-						logger.info('VK_GET_USERS_INFO_PARAMS', req_params);
 						break;
 					}
 					case 'google':
@@ -648,7 +697,8 @@ pg.connect(pg_conn_string, function(err, client, done) {
 						req_params = {
 							url: URLs[data.type.toUpperCase()].GET_USER_INFO,
 							qs: {
-								access_token: data.access_token
+								access_token: data.access_token,
+								fields: 'first_name,last_name,email,middle_name,picture,gender,about,education,books,events,movies,groups'
 							},
 							json: true
 						};
@@ -656,7 +706,6 @@ pg.connect(pg_conn_string, function(err, client, done) {
 					}
 				}
 				request(req_params, function(e, i, res) {
-					logger.info('VK_GET_USERS_INFO_RESULT', res);
 					if (handleError(e)) return;
 					if (callback instanceof Function) {
 						callback(res);
@@ -664,7 +713,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 				});
 			},
 			getFriendsList = function(data, callback) {
-				var FRIENDS_COUNT = 5000,
+				var FRIENDS_COUNT = 50000,
 					req_params;
 
 
@@ -743,6 +792,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 					if (handleError(e)) return;
 					if (res.audience != real_config.google.web.client_id) {
 						console.log('ACCESS_TOKEN_CANT_BE_VERIFIED');
+						handleError({emit: 'TOKEN_CANT_BE_VERIFIED'});
 					} else {
 						if (callback instanceof Function) {
 							callback(res);

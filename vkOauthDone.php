@@ -67,7 +67,7 @@ require_once 'v1-backend/bin/db.php';
 <script src="<?=App::$SCHEMA . App::$NODE_DOMAIN?>:8080/socket.io/socket.io.js" type="text/javascript"></script>
 
 <?php
-require_once 'footer.php';
+	require_once 'footer.php';
 ?>
 <!-- =============== APP SCRIPTS ===============-->
 <script src="app/js/app.js"></script>

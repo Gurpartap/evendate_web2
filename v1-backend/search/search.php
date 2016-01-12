@@ -1,6 +1,6 @@
 <?php
 
-require_once $ROOT_PATH.'backend/search/Class.Search.php';
+require_once $BACKEND_FULL_PATH . '/search/Class.Search.php';
 
 $__modules['search'] = array(
 	'GET' => array(

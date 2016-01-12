@@ -5,7 +5,7 @@ require_once 'v1-backend/users/Class.AbstractUser.php';
 require_once 'v1-backend/users/Class.User.php';
 require_once 'v1-backend/tags/Class.TagsCollection.php';
 try{
-    $user = new User($db);
+    $user = new User($__db);
     $add_event_btn_hidden = $user->isEditor() ? '' : 'hidden';
     $profile_is_editor = $user->isEditor() ? '' : '';
 }catch(exception $e){
@@ -28,8 +28,6 @@ try{
     <link rel="stylesheet" href="vendor/simple-line-icons/css/simple-line-icons.css">
     <!-- ANIMATE.CSS-->
     <link rel="stylesheet" href="vendor/animate.css/animate.min.css">
-    <!-- WHIRL (spinners)-->
-    <link rel="stylesheet" href="vendor/whirl/dist/whirl.css">
     <!-- =============== PAGE VENDOR STYLES ===============-->
     <!-- TAGS INPUT-->
     <link rel="stylesheet" href="vendor/bootstrap-tagsinput/dist/bootstrap-tagsinput.css">

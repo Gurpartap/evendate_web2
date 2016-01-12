@@ -1,6 +1,6 @@
 <?php
 
-	require_once $ROOT_PATH . 'backend/events/Class.Event.php';
+	require_once $BACKEND_FULL_PATH . '/events/Class.Event.php';
 
 	class Editor extends User{
 

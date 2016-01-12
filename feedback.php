@@ -4,8 +4,7 @@ require_once 'v1-backend/bin/db.php';
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8"><!--
-	<meta name="viewport" content="width=device-width">-->
+	<meta charset="utf-8">
 	<title>Evendate - обратная связь</title>
 	<link href="landing/style.css" rel="stylesheet" type="text/css">
 	<link href="http://fonts.googleapis.com/css?family=Roboto:400,100,300,700,500|Pacifico" rel="stylesheet" type="text/css">
@@ -51,10 +50,10 @@ require_once 'v1-backend/bin/db.php';
 <script src="vendor/bootstrap/dist/js/bootstrap.js"></script>
 
 <?php
-require 'footer.php';
+	require 'footer.php';
 ?>
 <!-- =============== APP SCRIPTS ===============-->
-<script src="<?=App::$SCHEMA.App::$NODE_DOMAIN?>:8080/socket.io/socket.io.js" type="text/javascript"></script>
+<script src="<?=App::$SCHEMA . App::$NODE_DOMAIN?>:8080/socket.io/socket.io.js" type="text/javascript"></script>
 <script src="app/js/app.js"></script>
 <script src="landing/js/main.js" type="text/javascript"></script>
 </body>

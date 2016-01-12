@@ -23,7 +23,7 @@
 
 
 		public static function getTypeId($entity_type, $type_name, PDO $db){
-			$q_get = 'SELECT id FROM stat_event_types
+			$q_get = 'SELECT id::int FROM stat_event_types
 				WHERE type_code = :type_code
 				AND entity = :entity';
 			$p_get = $db->prepare($q_get);

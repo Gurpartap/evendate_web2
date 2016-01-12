@@ -1,69 +1,107 @@
 <?php
 
 
-
 class Organization {
 
 	private $id;
+	private $description;
+	private $background_medium_img_url;
+	private $background_small_img_url;
+	private $img_medium_url;
+	private $img_small_url;
+	private $site_url;
 	private $name;
-	private $short_name;
-	private $status;
 	private $type_id;
 	private $img_url;
-	private $description;
-	private $is_subscribed;
 	private $background_img_url;
+	private $status;
+	private $short_name;
+	private $type_name;
+	private $organization_type_order;
+	private $organization_type_id;
+	private $updated_at;
+	private $created_at;
 	private $subscribed_count;
-	private $subscribed_friends;
-	private $site_url;
-	private $background_medium_img_url;
-	private $img_medium_url;
-	private $background_small_img_url;
-	private $img_small_url;
 
-
-	public function __construct($id, PDO $db) {
-		$p_get_organization = $db->prepare('SELECT id, site_url,
-			description, img_url, type_id, `status`, short_name, `name`,
-			background_medium_img_url, background_small_img_url,
-			img_medium_url, img_small_url,
-			background_img_url, (
-				SELECT COUNT(id) AS subscribed_count
+	public static $DEFAULT_FIELDS = array(
+		'id',
+		'name',
+		'type_id',
+		'img_url',
+		'background_img_url',
+		'status',
+		'short_name',
+		'type_name',
+		'organization_type_id',
+		'organization_type_order'
+	);
+	public static $ADDITIONAL_FIELDS = array(
+		'description',
+		'background_medium_img_url',
+		'img_medium_url',
+		'img_small_url',
+		'site_url',
+		'subscribed_count',
+		'created_at',
+		'updated_at',
+		'background_small_img_url',
+		'is_subscribed' => '(SELECT
+				id IS NOT NULL = TRUE
 				FROM subscriptions
-				WHERE subscriptions.status = 1
-				AND subscriptions.organization_id = organizations.id
-			) as subscribed_count
-			FROM organizations
-			WHERE organizations.id = :id');
+				WHERE organization_id = view_organizations.id
+					AND subscriptions.status = TRUE
+					AND user_id = :user_id) AS is_subscribed',
+		'subscription_id' => '(SELECT
+				id AS subscription_id
+				FROM subscriptions
+				WHERE organization_id = view_organizations.id
+					AND subscriptions.status = TRUE
+					AND user_id = :user_id) AS subscription_id'
+	);
 
-		$result = $p_get_organization->execute(array(
-			':id' => $id
-		));
+	const SUBSCRIBED_FIELD_NAME = 'subscribed';
+	const EVENTS_FIELD_NAME = 'events';
 
-		if ($result === FALSE) throw new DBQueryException('CANT_GET_ORGANIZATION_QUERY_ERROR', $db);
-		if ($p_get_organization->rowCount() == 0) throw new InvalidArgumentException('CANT_GET_ORGANIZATION');
 
-		$row = $p_get_organization->fetch();
-		$this->db = $db;
-		$this->id = $row['id'];
-		$this->status = $row['status'];
-		$this->name = $row['name'];
-		$this->type_id = $row['type_id'];
-		$this->subscribed_count = $row['subscribed_count'];
-		$this->site_url = $row['site_url'];
-		$this->description = $row['description'];
-		$this->short_name = $row['short_name'];
-		$this->background_img_url = $row['background_img_url'];
-		$this->img_url = $row['img_url'];
-		$this->background_medium_img_url = $row['background_medium_img_url'];
-		$this->img_medium_url = $row['img_medium_url'];
-		$this->background_small_img_url = $row['background_small_img_url'];
-		$this->img_small_url = $row['img_small_url'];
-
-		global $__user;
-		Statistics::Organization($this, $__user, $db, Statistics::ORGANIZATION_VIEW);
+	public function __construct() {
+		$this->db = App::DB();
+		Statistics::Organization($this, App::getCurrentUser(), $this->db, Statistics::ORGANIZATION_VIEW);
 	}
 
+	/**
+	 * @return mixed
+	 */
+	public function getTypeName() {
+		return $this->type_name;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getOrganizationTypeOrder() {
+		return $this->organization_type_order;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getOrganizationTypeId() {
+		return $this->organization_type_id;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getUpdatedAt() {
+		return $this->updated_at;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getCreatedAt() {
+		return $this->created_at;
+	}
 
 	/**
 	 * @return mixed
@@ -135,51 +173,6 @@ class Organization {
 		return $this->site_url;
 	}
 
-	private static function getPathWithURL($path, $type = '', $size = ''){
-		if ($path == null || $path == '' || trim($path) == ''){
-			$ext = $type == 'backgrounds' ? '/default.jpg' : '/default.png';
-			return App::$SCHEMA . App::$DOMAIN . '/organizations_images/' . $type . '/' . $size . $ext;
-		}
-		return App::$SCHEMA . App::$DOMAIN . '/' . $path;
-	}
-
-	public static function normalizeOrganization(array $organization){
-		$organization['id'] = (int) $organization['id'];
-
-		if (isset($organization['type_id'])){
-			$organization['type_id'] = (int) $organization['type_id'];
-		}
-		if (isset($organization['subscribed_count'])){
-			$organization['subscribed_count'] = (int) $organization['subscribed_count'];
-		}
-		if (isset($organization['status'])){
-			$organization['status'] = (boolean) $organization['status'];
-		}
-		if (isset($organization['subscription_id'])){
-			$organization['subscription_id'] = (int) $organization['subscription_id'];
-		}
-
-		$organization['background_img_url'] =  self::getPathWithURL($organization['background_img_url'], 'backgrounds', 'large');
-		$organization['img_url'] = self::getPathWithURL($organization['img_url'], 'logos', 'large');
-
-		$organization['background_medium_img_url'] = self::getPathWithURL($organization['background_medium_img_url'], 'backgrounds', 'medium');
-		$organization['img_medium_url'] = self::getPathWithURL($organization['img_medium_url'], 'logos', 'medium');
-
-		$organization['background_small_img_url'] = self::getPathWithURL($organization['background_small_img_url'], 'backgrounds', 'small');
-		$organization['img_small_url'] = self::getPathWithURL($organization['img_small_url'], 'logos', 'small');
-
-		if (isset($organization['timestamp_created_at'])){
-			$organization['timestamp_created_at'] = intval($organization['timestamp_created_at']);
-		}
-		if (isset($organization['timestamp_updated_at'])){
-			$organization['timestamp_updated_at'] = intval($organization['timestamp_updated_at']);
-		}
-		if (isset($organization['is_subscribed'])){
-			$organization['is_subscribed'] = $organization['is_subscribed'] == 1;
-		}
-		return $organization;
-	}
-
 	/**
 	 * @return mixed
 	 */
@@ -208,84 +201,84 @@ class Organization {
 		return $this->img_small_url;
 	}
 
-	public function getFullParams(User $user){
-		$subscribe_status = $this->getIsSubscribed($user);
-		return new Result(true, '', self::normalizeOrganization(array(
-			'id' => $this->getId(),
-			'name' => $this->getName(),
-			'short_name' => $this->getShortName(),
-			'type_id' => $this->getTypeId(),
-			'description' => $this->getDescription(),
-			'is_subscribed' => $subscribe_status['is_subscribed'],
-			'subscription_id' => $subscribe_status['subscription_id'],
-			'subscribed_count' => $this->getSubscribedCount(),
-			'site_url' => $this->getSiteUrl(),
-			'subscribed_friends' => self::getSubscribedFriends($this->db, $user, $this->getId())->getData(),
+	public function getParams(User $user, array $fields = null) {
+//		$subscribe_status = $this->getIsSubscribed($user);
+		$params = self::$DEFAULT_FIELDS;
+		$result_data = array();
+		$params = Fields::mergeFields(self::$ADDITIONAL_FIELDS, $fields, $params);
 
-			'img_url' => $this->getImgUrl(),
-			'img_url_path' => $this->getImgUrl(),
+		foreach($params as $key => $field){
+			$result_data[$field] = $this->$field;
+		}
 
-			'background_img_url' => $this->getBackgroundImgUrl(),
-			'background_img_url_path' => $this->getBackgroundImgUrl(),
+		if (!is_null(App::getFieldsValue(Organization::SUBSCRIBED_FIELD_NAME))){
+			$result_data[Organization::SUBSCRIBED_FIELD_NAME] = self::getSubscribed($this->db, $user, $this->id, App::getFieldsParam(Organization::SUBSCRIBED_FIELD_NAME, 'limit'))->getData();
+		}
 
-			'img_medium_url' => $this->getImgMediumUrl(),
-			'background_medium_img_url' => $this->getBackgroundMediumImgUrl(),
+		if (!is_null(App::getFieldsValue(Organization::EVENTS_FIELD_NAME))){
+			$result_data[Organization::EVENTS_FIELD_NAME] = $this->getEvents();
+		}
 
-			'img_small_url' => $this->getImgSmallUrl(),
-			'background_small_img_url' => $this->getBackgroundSmallImgUrl()
-		)));
+		return new Result(true, '', $result_data);
 	}
 
-	public static function getSubscribedFriends(PDO $db, AbstractUser $user, $organization_id, $limit = '') {
-		$q_get_subscribed_friends = 'SELECT DISTINCT
-			users.first_name, users.last_name,
-			users.middle_name, users.id, users.avatar_url,
-			0 AS is_friend
- 			FROM users
-			 INNER JOIN subscriptions ON subscriptions.user_id = users.id
-			 WHERE subscriptions.organization_id = :organization_id
-			 AND subscriptions.status = 1
-			ORDER BY is_friend DESC' . $limit;
-		$p_get_friends = $db->prepare($q_get_subscribed_friends);
-		$result  = $p_get_friends->execute(array(
-			':organization_id' => $organization_id
-		));
+	public static function getSubscribed(PDO $db, AbstractUser $user, $organization_id, $limit = null) {
+		$q_get_subscribed_friends = App::$QUERY_FACTORY->newSelect();
+		$cols = array(
+			'users.id::int',
+			'users.first_name',
+			'users.last_name',
+			'users.middle_name',
+			'users.avatar_url',
+			'users.gender',
+			'view_friends.user_id IS NOT NULL' => 'is_friend'
+		);
+
+		$q_get_subscribed_friends
+			->distinct()
+			->cols($cols)
+			->from('users')
+			->join('INNER', 'subscriptions', 'subscriptions.user_id = users.id')
+			->join('LEFT', 'view_friends', 'view_friends.user_id = subscriptions.user_id AND view_friends.friend_id = :user_id')
+			->where('subscriptions.organization_id = :organization_id')
+			->where('subscriptions.status = TRUE')
+			->orderBy(array('is_friend DESC'))
+			->limit($limit);
+		$p_get_friends = $db->prepare($q_get_subscribed_friends->getStatement());
+		$result = $p_get_friends->execute(array(':organization_id' => $organization_id, ':user_id' => $user->getId(),));
 
 		if ($result === FALSE) throw new DBQueryException('CANT_GET_SUBSCRIBED_FRIENDS', $db);
 
 		$users = $p_get_friends->fetchAll();
-
-		foreach($users as &$friend){
-			$friend['id'] = intval($friend['id']);
-			$friend['friend_id'] = intval($friend['id']);
-			$friend['is_friend'] = false;
-//			$friend['link'] = User::getLinkToSocialNetwork($friend['type'], $friend['friend_uid']);
-		}
-
 		return new Result(true, '', $users);
 
 	}
 
-	private function getIsSubscribed(User $user) {
-		$p_get_subscribed = $this->db->prepare('SELECT id
-			FROM subscriptions
-			WHERE subscriptions.user_id = :user_id
-			AND subscriptions.organization_id = :organization_id
-			AND subscriptions.status = 1');
-		$result = $p_get_subscribed->execute(array(
-			':user_id' => $user->getId(),
-			':organization_id' => $this->getId()
-		));
+	private function getEvents() {
+		return EventsCollection::filter($this->db, App::getCurrentUser())->getData();
+	}
+
+
+	private function isSubscribed(User $user) {
+		$q_get_subscribed = App::$QUERY_FACTORY->newSelect();
+		$q_get_subscribed
+			->cols(array(
+				'id::INT'
+			))
+			->from('subscriptions')
+			->where('subscriptions.user_id = :user_id')
+			->where('subscriptions.organization_id = :organization_id')
+			->where('subscriptions.status = TRUE');
+		$p_get_subscribed = $this->db->prepare($q_get_subscribed->getStatement());
+
+		$result = $p_get_subscribed->execute(array(':user_id' => $user->getId(), ':organization_id' => $this->getId()));
 
 		if ($result === FALSE) throw new DBQueryException('CANT_GET_SUBSCRIBE_STATUS', $this->db);
 
 		$result = array(
 			'is_subscribed' => $p_get_subscribed->rowCount() == 1,
-			'subscription_id' => null
+			'subscription_id' => $p_get_subscribed->rowCount() == 1 ? $p_get_subscribed->fetchColumn(0) : null
 		);
-		if ($result['is_subscribed']){
-			$result['subscription_id'] = $p_get_subscribed->fetchColumn(0);
-		}
 
 		return $result;
 	}

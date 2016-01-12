@@ -1,7 +1,7 @@
 <?php
 
-require_once $ROOT_PATH. $BACKEND_FOLDER . '/events/Class.Event.php';
-require_once $ROOT_PATH. $BACKEND_FOLDER . '/events/Class.EventsCollection.php';
+require_once $BACKEND_FULL_PATH . '/events/Class.Event.php';
+require_once $BACKEND_FULL_PATH . '/events/Class.EventsCollection.php';
 
 $__modules['events'] = array(
 	'GET' => array(
@@ -15,7 +15,7 @@ $__modules['events'] = array(
 				array_merge(array('my' => $__user,
 					'type' => 'future'),
 					$__request),
-				' ORDER BY nearest_event_date, events.begin_time LIMIT ' . ($__page * $__length) . ' , ' . $__length);
+				' ORDER BY nearest_event_date, events.begin_time LIMIT ' . $__length . ' OFFSET ' . ($__page * $__length));
 		},
 		'search' => function() use ($__db, $__request, $__user){
 			return EventsCollection::filter($__db, $__user, $__request);
@@ -23,10 +23,7 @@ $__modules['events'] = array(
 		'favorites' => function () use ($__db, $__request, $__user, $__page, $__length) { /*MY EVENTS!*/
 			return EventsCollection::filter($__db, $__user,
 				array('type' => 'favorites'),
-				' ORDER BY first_date, events.begin_time LIMIT ' . ($__page * $__length) . ' , ' . $__length);
-		},
-		'all' => function () use ($__db, $__request, $__user) {
-			return EventsCollection::filter($__db, $__user, $__request);
+				' ORDER BY first_date, events.begin_time LIMIT ' . $__length . ' OFFSET ' . ($__page * $__length));
 		},
 		'' => function () use ($__db, $__request, $__user) {
 			return EventsCollection::filter($__db, $__user, $__request,

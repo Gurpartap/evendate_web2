@@ -280,19 +280,12 @@
 <!-- Button trigger modal -->
 
 <!-- =============== VENDOR SCRIPTS ===============-->
-<!-- MODERNIZR-->
 <script src="vendor/modernizr/modernizr.js"></script>
-<!-- JQUERY-->
 <script src="vendor/jquery/dist/jquery.js"></script>
-<!-- BOOTSTRAP-->
 <script src="vendor/bootstrap/dist/js/bootstrap.js"></script>
-<!-- JQUERY EASING-->
 <script src="vendor/jquery.easing/js/jquery.easing.js"></script>
-<!-- ANIMO-->
 <script src="vendor/animo.js/animo.js"></script>
-<!-- SLIMSCROLL-->
 <script src="vendor/slimScroll/jquery.slimscroll.min.js"></script>
-<!-- MOMENT JS-->
 <script src="vendor/moment/min/moment-with-locales.min.js"></script>
 
 

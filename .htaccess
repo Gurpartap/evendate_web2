@@ -12,5 +12,10 @@ Order Allow,Deny
 Deny from all
 </Files>
 
+<Files "v1-config.json">
+Order Allow,Deny
+Deny from all
+</Files>
+
 #"C:\Program Files (x86)\nodejs\node.exe" server.js
 #"C:\Program Files (x86)\nodejs\npm.cmd" server.js

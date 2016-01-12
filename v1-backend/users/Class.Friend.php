@@ -1,7 +1,7 @@
 <?php
 
-require_once $ROOT_PATH.'backend/organizations/Class.OrganizationsCollection.php';
-require_once $ROOT_PATH.'backend/organizations/Class.Organization.php';
+require_once $BACKEND_FULL_PATH .'/organizations/Class.OrganizationsCollection.php';
+require_once $BACKEND_FULL_PATH .'/organizations/Class.Organization.php';
 
 class Friend extends AbstractUser{
 
@@ -17,8 +17,11 @@ class Friend extends AbstractUser{
 
 
 	public function __construct($id, User $user, PDO $db) {
-		$q_get_friend = 'SELECT users.id, users.first_name, users.last_name,
-			users.avatar_url, users.vk_uid, users.facebook_uid, users.google_uid
+		$q_get_friend = 'SELECT users.id::int,
+			users.first_name, users.last_name,
+			users.avatar_url, users.vk_uid,
+			users.facebook_uid,
+			users.google_uid
 			FROM users
 			WHERE users.id = :id';
 		$p_get = $db->prepare($q_get_friend);
@@ -79,7 +82,7 @@ class Friend extends AbstractUser{
 			return new Result(true, '', array(
 				'subscriptions' => $subscriptions->getData(),
 				'user' => array(
-					'id' => intval($this->id),
+					'id' => $this->id,
 					'first_name' => $this->first_name,
 					'last_name' => $this->last_name,
 					'link' => $this->link,

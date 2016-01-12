@@ -1,6 +1,6 @@
 <?php
 
-require_once 'vendor/Class.Array2xml.php';
+require_once $BACKEND_FULL_PATH . '/bin/vendor/Class.Array2xml.php';
 
 /*
  *

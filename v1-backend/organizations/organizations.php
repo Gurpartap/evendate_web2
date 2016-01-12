@@ -1,40 +1,29 @@
 <?php
 
-require_once $ROOT_PATH. $BACKEND_FOLDER . '/organizations/Class.OrganizationsCollection.php';
-require_once $ROOT_PATH. $BACKEND_FOLDER . '/organizations/Class.Organization.php';
-require_once $ROOT_PATH. $BACKEND_FOLDER . '/events/Class.EventsCollection.php';
+require_once $BACKEND_FULL_PATH . '/organizations/Class.OrganizationsCollection.php';
+require_once $BACKEND_FULL_PATH . '/organizations/Class.Organization.php';
+require_once $BACKEND_FULL_PATH . '/events/Class.EventsCollection.php';
 
 $__modules['organizations'] = array(
 	'GET' => array(
-		'my' => function() use ($__db, $__request, $__user){
-
-		},
 		'{{/(id:[0-9]+)}}' => function($id) use ($__db, $__request, $__user){
-			$organization = new Organization($id, $__db);
-			$result = $organization->getFullParams($__user)->getData();
-			if (isset($__request['with_events']) && $__request['with_events'] == true){
-				$result['events'] = EventsCollection::filter($__db, $__user, array(
-					'organization' => $organization,
-					'type' => 'future'
-				), ' ORDER BY first_date, events.event_start_date, events.begin_time ')->getData();
-			}
-			return new Result(true, '', $result);
+
+			$organization = OrganizationsCollection::filter(
+				$__db,
+				$__user,
+				array('id' => $id),
+				array('organization_type_order', 'organization_type_id'),
+				App::getFieldsParam('subscribed', 'limit'));
+
+			return new Result(true, '', array($organization->getParams($__user, App::$__FIELDS)->getData()));
 		},
-		'' => function () use ($__db, $__request, $__user) {
-			if (isset($__request['without_friends'])){
-				$limit_friends = ' LIMIT 0';
-			}else{
-				$limit_friends = '';
-			}
-			return OrganizationsCollection::filter($__db, $__user, array(), ' ORDER BY organization_types.order, organization_types.id ', $limit_friends);
-		},
-		'all' => function () use ($__db, $__request, $__user) {
-			if (isset($__request['without_friends'])){
-				$limit_friends = ' LIMIT 0';
-			}else{
-				$limit_friends = '';
-			}
-			return OrganizationsCollection::filter($__db, $__user, array(), ' ORDER BY organization_types.order, organization_types.id ', $limit_friends);
-		},
+		'' => function () use ($__db, $__request, $__user){
+			return OrganizationsCollection::filter(
+				$__db,
+				$__user,
+				$__request,
+				array('organization_type_order', 'organization_type_id'),
+				App::getFieldsParam('subscribed', 'limit'));
+		}
 	)
 );

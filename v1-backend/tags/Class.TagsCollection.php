@@ -2,17 +2,10 @@
 
 class TagsCollection{
 
-	private static function normalizeTag(array $tag){
-		$tag['id'] = intval($tag['id']);
-		$tag['status'] = $tag['status'] == 1;
-		return $tag;
-	}
-
-
 	public static function all(PDO $db, $order_by = '', User $user = null){
 
 		$res_array = array(
-			'tags' => $db->query('SELECT * FROM tags WHERE status = 1 ' . $order_by)->fetchAll(),
+			'tags' => $db->query('SELECT id::INT, name, status::BOOLEAN FROM tags WHERE status = 1 ' . $order_by)->fetchAll(),
 			'organizations' => array()
 		);
 
@@ -30,15 +23,14 @@ class TagsCollection{
 			}
 		}
 
-		foreach($res_array['tags'] as &$tag){
-			$tag = self::normalizeTag($tag);
-		}
-
 		return new Result(true, '', $res_array);
 	}
 
 	public static function search($name, PDO $db, $order_by = '', User $user) {
-		$q_get_tags = 'SELECT *
+		$q_get_tags = 'SELECT
+			id::INT,
+			name,
+			status::BOOL
 			FROM tags
 			WHERE name
 			LIKE :name ' . $order_by;
@@ -48,10 +40,6 @@ class TagsCollection{
 		));
 
 		$res_array  = $p_get_tags->fetchAll();
-		foreach($res_array as &$tag){
-			$tag = self::normalizeTag($tag);
-		}
-
 		return new Result(true, '', $res_array);
 	}
 

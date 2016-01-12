@@ -2,7 +2,7 @@
 	require_once 'v1-backend/bin/db.php';
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
 	<meta charset="utf-8">

@@ -27,28 +27,26 @@ class User extends AbstractUser{
 			throw new LogicException('Пользователь с такими данными не найден');
 		}
 		if (isset($_SESSION['id'])){
-			$p_get_user = $db->prepare('SELECT users.*, tokens.id AS token_id,
-				(SELECT COUNT(user_id) FROM users_organizations WHERE user_id = users.id AND status = 1) > 0 AS is_editor
+			$p_get_user = $db->prepare("SELECT users.*, tokens.id AS token_id,
+				(SELECT COUNT(user_id)::int FROM users_organizations WHERE user_id = users.id AND status = 1) > 0 AS is_editor
 				FROM users
 				INNER JOIN tokens ON tokens.user_id = users.id
 				WHERE users.id = :id
 				AND tokens.token = :token
-				AND tokens.expires_on > UNIX_TIMESTAMP(NOW())');
+				AND tokens.expires_on > DATE_PART('epoch', CURRENT_TIMESTAMP)::int");
 			$stm = array(
 				':id' => $_SESSION['id'],
 				':token' => $_SESSION['token']
 			);
 		}else{
-			$p_get_user = $db->prepare('SELECT users.*,tokens.id AS token_id,
+			$p_get_user = $db->prepare("SELECT users.*,tokens.id AS token_id,
 				(SELECT COUNT(user_id) FROM users_organizations WHERE user_id = users.id AND status = 1) > 0 AS is_editor
 				FROM users
 				INNER JOIN tokens ON tokens.user_id = users.id
 				WHERE
 					tokens.token = :token
-				AND tokens.expires_on > UNIX_TIMESTAMP(NOW())');
-			$stm = array(
-				':token' => $token
-			);
+				AND tokens.expires_on > DATE_PART('epoch', CURRENT_TIMESTAMP)::int");
+			$stm = array(':token' => $token);
 		}
 
 		$p_get_user->execute($stm);
@@ -58,7 +56,7 @@ class User extends AbstractUser{
 		$row = $p_get_user->fetch();
 
 		$this->db = $db;
-		$this->id = intval($row['id']);
+		$this->id = $row['id'];
 		$this->first_name = $row['first_name'];
 		$this->last_name = $row['last_name'];
 		$this->middle_name = $row['middle_name'];
@@ -128,7 +126,7 @@ class User extends AbstractUser{
 	}
 
 	public function deleteFavoriteEvent(Event $event){
-		$q_upd_favorite = 'UPDATE favorite_events SET status = 0
+		$q_upd_favorite = 'UPDATE favorite_events SET status = FALSE
 			WHERE  user_id = :user_id
 			 AND event_id = :event_id';
 		$p_ins_favorite = $this->db->prepare($q_upd_favorite);
@@ -142,11 +140,11 @@ class User extends AbstractUser{
 	}
 
 	public function hasFavoriteEvent(Event $event){
-		$q_get_is_fav = 'SELECT * FROM favorite_events
+		$q_get_is_fav = 'SELECT id::int FROM favorite_events
 			WHERE
 			user_id = :user_id
 			AND event_id = :event_id
-			AND status = 1';
+			AND status = TRUE';
 		$p_get_is_fav = $this->db->prepare($q_get_is_fav);
 		$p_get_is_fav->execute(array(
 			':user_id' => $this->getId(),
@@ -194,7 +192,7 @@ class User extends AbstractUser{
 			'id' => $this->getId(),
 			'avatar_url' => $this->getAvatarUrl(),
 			'middle_name' => $this->getMiddleName(),
-			'is_editor' => (boolean) $this->isEditor()
+			'is_editor' => $this->isEditor()
 		));
 	}
 
@@ -206,8 +204,8 @@ class User extends AbstractUser{
 
 	public function getSettings() {
 		return new Result(true, '', array(
-			'show_to_friends' => (boolean) $this->show_to_friends,
-			'notify_in_browser' => (boolean) $this->notify_in_browser,
+			'show_to_friends' => $this->show_to_friends,
+			'notify_in_browser' => $this->notify_in_browser,
 		));
 	}
 
@@ -227,11 +225,11 @@ class User extends AbstractUser{
 
 
 		//disable same tokens for this user (device tokens can duplicate)
-		$q_upd_token = 'UPDATE tokens SET expires_on = UNIX_TIMESTAMP(NOW())
+		$q_upd_token = "UPDATE tokens SET expires_on = DATE_PART('epoch', CURRENT_TIMESTAMP)::int
 			WHERE user_id = :user_id
 			AND client_type = :client_type
 			AND device_token = :device_token
-			AND tokens.token != :token';
+			AND tokens.token != :token";
 		$p_upd_token = $this->db->prepare($q_upd_token);
 		$res2 = $p_upd_token->execute(array(
 			':device_token' => $device_token,
@@ -260,7 +258,7 @@ class User extends AbstractUser{
 		}
 
 		$q_get_friends = 'SELECT users.first_name, users.last_name, users.avatar_url,
-			users.id,
+			users.id::int,
  			view_friends.friend_uid, view_friends.type
  			FROM view_friends
 			 INNER JOIN users ON users.id = view_friends.friend_id
@@ -269,7 +267,7 @@ class User extends AbstractUser{
 			 ' . $friend_part . '
 			GROUP BY friend_id
 			ORDER BY last_name, first_name
-			LIMIT ' . ($page * $length) . " , {$length}";
+			LIMIT ' . $length . ' OFFSET ' . ($page * $length);
 
 		$p_get_friends = $this->db->prepare($q_get_friends);
 		$data = array_merge($data, array(
@@ -283,7 +281,6 @@ class User extends AbstractUser{
 		$friends = $p_get_friends->fetchAll();
 
 		foreach($friends as &$friend){
-			$friend['id'] = intval($friend['id']);
 			$friend['link'] = User::getLinkToSocialNetwork($friend['type'], $friend['friend_uid']);
 		}
 
@@ -400,7 +397,7 @@ class User extends AbstractUser{
 			    {$filter}
 			GROUP BY stat_organizations.organization_id, users.id)
 			ORDER BY created_at DESC
-			LIMIT " . ($page * $length) ." , {$length}";
+			LIMIT " . $length .' OFFSET ' . ($page * $length);
 
 		$prep_arr = array(
 			':fave' => Statistics::EVENT_FAVE,

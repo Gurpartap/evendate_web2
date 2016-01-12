@@ -1,6 +1,6 @@
 <?php
 
-require_once $ROOT_PATH . '/' . $BACKEND_FOLDER . '/organizations/Class.Organization.php';
+require_once $BACKEND_FULL_PATH . '/organizations/Class.Organization.php';
 
 class Event{
 
