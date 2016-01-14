@@ -22,7 +22,7 @@ class OrganizationsCollection {
 		$_friend = null;
 		$return_one = false;
 
-		$cols = Fields::mergeFields(Organization::$ADDITIONAL_FIELDS, App::$__FIELDS, Organization::$DEFAULT_FIELDS);
+		$cols = Fields::mergeFields(Organization::$ADDITIONAL_COLS, App::$__FIELDS, Organization::$DEFAULT_COLS);
 		$select = APP::$QUERY_FACTORY->newSelect();
 
 		$select
@@ -54,7 +54,7 @@ class OrganizationsCollection {
 				}
 				case 'id':{
 					$return_one = true;
-					foreach(Organization::$ADDITIONAL_FIELDS as $key => $val){
+					foreach(Organization::$ADDITIONAL_COLS as $key => $val){
 						if (is_numeric($key)){
 							$cols[] = $val;
 						}else{

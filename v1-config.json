@@ -144,11 +144,11 @@
       }
     },
     "db": {
-      "host": "localhost",
+      "host": "192.168.33.22",
       "user": "postgres",
-      "password": "Trwnp7LUCwW7mp4J",
+      "password": "APASSWORD",
       "database": "evendate",
-      "port": 5433
+      "port": 5432
     },
     "VK": {
       "APP_ID": 5029623,

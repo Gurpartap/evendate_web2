@@ -10,19 +10,6 @@ class EventsCollection{
 		'vk' => 'http://vk.com/id',
 	);
 
-	static $DEFAULT_COLS = array(
-		'id',
-		'title',
-		'first_event_date',
-		'last_event_date',
-		'nearest_event_date',
-		'image_vertical_url',
-		'image_horizontal_url',
-		'image_horizontal_url',
-		'tags',
-		'is_favorite',
-		'id',
-	);
 
 	public static function filter(PDO $db, User $user, array $filters = null, $order_by = '') {
 		$q_get_events = App::$QUERY_FACTORY->newSelect();
@@ -40,7 +27,7 @@ class EventsCollection{
 		foreach($filters as $name => $value){
 			switch($name){
 				case 'date': {
-					$q_get_events->where();'
+					$q_get_events->where('
 					AND ((
 						DATE(events.event_start_date) <= DATE(:date)
 							AND
@@ -53,7 +40,7 @@ class EventsCollection{
 						DATE(events.event_end_date) = DATE(:date)
 						)
 						OR (:date IN (SELECT events_dates.event_date FROM events_dates WHERE events.id = events_dates.event_id AND status = 1) AND events.event_start_date IS NULL)
-						)';
+						)');
 					$statement_array[':date'] = $value;
 					break;
 				}
@@ -322,23 +309,23 @@ class EventsCollection{
 
 	public static function makeImgUrls(array $event){
 		return array(
-			'image_vertical_url' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . Event::IMG_SIZE_TYPE_MEDIUM . '/' . $event['image_vertical_url'],
-			'image_horizontal_url' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . Event::IMG_SIZE_TYPE_MEDIUM . '/' . $event['image_horizontal_url'],
-			'image_square_url' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . Event::IMG_SIZE_TYPE_SQUARE . '/' .$event['image_square_url'],
+			'image_vertical_url' => $event['image_vertical_url'],
+			'image_horizontal_url' => $event['image_horizontal_url'],
+			'image_square_url' => $event['image_square_url'],
 
 			'vertical_images' => array(
-				'large' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . Event::IMG_SIZE_TYPE_LARGE . '/' . $event['image_vertical'],
-				'medium' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . Event::IMG_SIZE_TYPE_MEDIUM . '/' . $event['image_vertical'],
-				'small' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . Event::IMG_SIZE_TYPE_SMALL . '/' . $event['image_vertical'],
+				'large' => $event['image_vertical_large'],
+				'medium' => $event['image_vertical_medium'],
+				'small' => $event['image_vertical_small'],
 			),
 			'horizontal_images' => array(
-				'large' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . Event::IMG_SIZE_TYPE_LARGE . '/' . $event['image_horizontal'],
-				'medium' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . Event::IMG_SIZE_TYPE_MEDIUM . '/' . $event['image_horizontal'],
-				'small' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . Event::IMG_SIZE_TYPE_SMALL . '/' . $event['image_horizontal'],
+				'large' => $event['image_horizontal_large'],
+				'medium' => $event['image_horizontal_medium'],
+				'small' => $event['image_horizontal_small'],
 			),
 			'square_images' => array(
-				'vertical' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . Event::IMG_SIZE_TYPE_SQUARE . '/' . $event['image_vertical'],
-				'horizontal' => App::$SCHEMA . App::$DOMAIN . Event::IMAGES_PATH . Event::IMG_SIZE_TYPE_SQUARE . '/' . $event['image_horizontal'],
+				'vertical' => $event['image_vertical_vertical'],
+				'horizontal' => $event['image_horizontal_horizontal'],
 			)
 		);
 	}

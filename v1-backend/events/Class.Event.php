@@ -15,6 +15,28 @@ class Event{
 	const IMG_SIZE_TYPE_LARGE = 'large';
 	const IMG_SIZE_TYPE_SQUARE = 'square';
 
+	const TAGS_LIMIT = 5;
+	const ORGANIZATION_NOTIFICATIONS_LIMIT = 2;
+
+
+
+	public static $DEFAULT_COLS = array(
+		'id',
+		'title',
+		'first_event_date',
+		'last_event_date',
+		'nearest_event_date',
+		'image_vertical_url',
+		'image_horizontal_url',
+		'image_horizontal_url',
+		'tags',
+		'is_favorite',
+		'id',
+	);
+
+	public static $ADDITIONAL_COLS = array(
+
+	);
 
 	private $db;
 	private $id;
@@ -38,8 +60,6 @@ class Event{
 	private $location_object;
 	private $tags;
 
-	const TAGS_LIMIT = 5;
-	const ORGANIZATION_NOTIFICATIONS_LIMIT = 2;
 	private $organization;
 
 

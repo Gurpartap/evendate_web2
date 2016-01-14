@@ -20,7 +20,6 @@ ALTER TABLE public.events ADD dates_range BOOLEAN DEFAULT FALSE NOT NULL;
 ALTER TABLE public.events ADD COLUMN images_domain VARCHAR(50) DEFAULT 'http://evendate.ru/' NULL;
 ALTER TABLE public.organizations ADD COLUMN images_domain VARCHAR(50) DEFAULT 'http://evendate.ru/' NULL;
 
-ALTER TABLE public.organizations ALTER COLUMN status TYPE BOOLEAN USING status :: BOOLEAN;
 ALTER TABLE public.organizations ADD vk_url_path TEXT DEFAULT NULL NULL;
 ALTER TABLE public.organizations ADD facebook_url_path TEXT DEFAULT NULL  NULL;
 
@@ -91,54 +90,53 @@ CREATE VIEW view_organizations AS
   SELECT DISTINCT
     organizations.id :: INT,
     organizations.description,
-                                                                                                                organizations.id :: INT                 AS oid,
-                                                                                                                organizations.images_domain
-                                                                                                                ||
-                                                                                                                organizations.background_medium_img_url AS background_medium_img_url,
-                                                                                                                organizations.images_domain
-                                                                                                                ||
-                                                                                                                organizations.background_small_img_url  AS background_small_img_url,
-                                                                                                                organizations.images_domain
-                                                                                                                ||
-                                                                                                                organizations.img_medium_url            AS img_medium_url,
-                                                                                                                organizations.images_domain
-                                                                                                                ||
-                                                                                                                organizations.img_small_url             AS img_small_url,
+    organizations.id :: INT                 AS oid,
+    organizations.images_domain
+    ||
+    organizations.background_medium_img_url AS background_medium_img_url,
+    organizations.images_domain
+    ||
+    organizations.background_small_img_url  AS background_small_img_url,
+    organizations.images_domain
+    ||
+    organizations.img_medium_url            AS img_medium_url,
+    organizations.images_domain
+    ||
+    organizations.img_small_url             AS img_small_url,
     organizations.site_url,
     organizations.name,
     organizations.type_id :: INT,
-                                                                                                                organizations.images_domain
-                                                                                                                ||
-                                                                                                                organizations.img_url                   AS img_url,
-                                                                                                                organizations.images_domain
-                                                                                                                ||
-                                                                                                                organizations.background_img_url        AS background_img_url,
-                                                                                                                TRUE                                    AS status,
+    organizations.images_domain
+    ||
+    organizations.img_url                   AS img_url,
+    organizations.images_domain
+    ||
+    organizations.background_img_url        AS background_img_url,
+    TRUE                                    AS status,
     organizations.short_name,
-                                                                                                                organization_types.name                 AS type_name,
-                                                                                                                organization_types."order" :: INT       AS organization_type_order,
-                                                                                                                organization_types."id" :: INT          AS organization_type_id,
-                                                                                                                DATE_PART(
-                                                                                                                    'epoch',
-                                                                                                                    organizations.updated_at) :: INT    AS updated_at,
-                                                                                                                DATE_PART(
-                                                                                                                    'epoch',
-                                                                                                                    organizations.created_at) :: INT    AS created_at,
-                                                                                                                (
-                                                                                                                  SELECT
-                                                                                                                COUNT(
-                                                                                                                    id) :: INT AS subscribed_count
-                                                                                                                  FROM
-                                                                                                                    subscriptions
-                                                                                                                  WHERE
-                                                                                                                    subscriptions.status
-                                                                                                                    =
-                                                                                                                    TRUE
-                                                                                                                    AND
-                                                                                                                    subscriptions.organization_id
-                                                                                                                    =
-                                                                                                                    organizations.id
-                                                                                                                )                                       AS subscribed_count
+    organization_types.name                 AS type_name,
+    organization_types."order" :: INT       AS organization_type_order,
+    organization_types."id" :: INT          AS organization_type_id,
+    DATE_PART(
+        'epoch',
+        organizations.updated_at) :: INT    AS updated_at,
+    DATE_PART(
+        'epoch',
+        organizations.created_at) :: INT    AS created_at,
+    (
+      SELECT COUNT(
+                 id) :: INT AS subscribed_count
+      FROM
+        subscriptions
+      WHERE
+        subscriptions.status
+        =
+        TRUE
+        AND
+        subscriptions.organization_id
+        =
+        organizations.id
+    )                                       AS subscribed_count
   FROM organizations
     INNER JOIN organization_types ON organization_types.id = organizations.type_id AND organizations.status = TRUE
   WHERE organizations.status = TRUE;
@@ -246,32 +244,32 @@ CREATE VIEW view_events AS
     events.longitude :: REAL,
     events.location,
     events.organization_id :: INT,
-    TRUE                                                                                            AS status,
+    TRUE                                                                      AS status,
     events.images_domain ||
-    events.image_vertical                                                                           AS image_vertical_url,
+    events.image_vertical                                                     AS image_vertical_url,
     events.images_domain ||
-    events.image_horizontal                                                                         AS image_horizontal_url,
+    events.image_horizontal                                                   AS image_horizontal_url,
     organizations.images_domain ||
-    organizations.img_url                                                                           AS organization_img_url,
-    organizations.name                                                                              AS organization_name,
-    organization_types.name                                                                         AS organization_type_name,
-    organizations.short_name                                                                        AS organization_short_name,
+    organizations.img_url                                                     AS organization_img_url,
+    organizations.name                                                        AS organization_name,
+    organization_types.name                                                   AS organization_type_name,
+    organizations.short_name                                                  AS organization_short_name,
     (SELECT DATE_PART('epoch', MIN(events_dates.event_date))
      FROM events_dates
      WHERE event_id = events.id AND events_dates.event_date > NOW() AND events_dates.status =
-                                                                        TRUE)                       AS nearest_event_date,
+                                                                        TRUE) AS nearest_event_date,
     (SELECT DATE_PART('epoch', MIN(events_dates.event_date))
      FROM events_dates
-     WHERE event_id = events.id AND events_dates.status = TRUE)                                     AS first_event_date,
+     WHERE event_id = events.id AND events_dates.status = TRUE)               AS first_event_date,
     (SELECT DATE_PART('epoch', MAX(events_dates.event_date))
      FROM events_dates
-     WHERE event_id = events.id AND events_dates.status = TRUE)                                     AS last_event_date,
-    DATE_PART('epoch', events.created_at) :: INT                                                    AS created_at,
-    DATE_PART('epoch', events.updated_at) :: INT                                                    AS updated_at,
+     WHERE event_id = events.id AND events_dates.status = TRUE)               AS last_event_date,
+    DATE_PART('epoch', events.created_at) :: INT                              AS created_at,
+    DATE_PART('epoch', events.updated_at) :: INT                              AS updated_at,
     (SELECT COUNT(id) :: INT AS favored_count
      FROM favorite_events
      WHERE status = TRUE AND event_id =
-                             events.id)                                                             AS favored_users_count
+                             events.id)                                       AS favored_users_count
   FROM events
     INNER JOIN organizations ON organizations.id = events.organization_id
     INNER JOIN organization_types ON organization_types.id = organizations.type_id

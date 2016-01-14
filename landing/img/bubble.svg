@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   width="100%"
+   height="100%"
+   viewBox="0 0 1200 650"
+   id="svg2"
+   version="1.1">
+  <defs
+     id="defs4">
+    <filter
+       style="color-interpolation-filters:sRGB"
+       id="filter3432">
+      <feFlood
+         flood-opacity="0.498039"
+         flood-color="rgb(0,0,0)"
+         result="flood"
+         id="feFlood3434" />
+      <feComposite
+         in="flood"
+         in2="SourceGraphic"
+         operator="in"
+         result="composite1"
+         id="feComposite3436" />
+      <feGaussianBlur
+         in="composite1"
+         stdDeviation="15"
+         result="blur"
+         id="feGaussianBlur3438" />
+      <feOffset
+         dx="0"
+         dy="0"
+         result="offset"
+         id="feOffset3440" />
+      <feComposite
+         in="SourceGraphic"
+         in2="offset"
+         operator="over"
+         result="composite2"
+         id="feComposite3442" />
+    </filter>
+  </defs>
+  <g id="Page-1" style="fill:none;fill-rule:evenodd;stroke:none;stroke-width:1;filter:url(#filter3432)" transform="translate(-27.974896,65.91909)">
+    <path id="Rectangle-1" d="m -0.02959852,546.55084 c 0,0 21.44859852,-34.58038 48.02959852,-76.60214 C 48,429.24011 48,69.994667 48,69.994667 48,31.33768 79.335376,0 117.99139,0 L 1182.0086,0 C 1220.6638,0 1252,31.332546 1252,69.992665 l 0,376.014665 C 1252,484.66322 1220.6551,516 1181.9979,516 L 110.71521,516 C 63.003017,525.97772 -0.02959852,546.55084 -0.02959852,546.55084 Z" style="fill:#ffffff" />
+  </g>
+</svg>

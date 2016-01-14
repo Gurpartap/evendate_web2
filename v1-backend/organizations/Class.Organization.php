@@ -23,7 +23,7 @@ class Organization {
 	private $created_at;
 	private $subscribed_count;
 
-	public static $DEFAULT_FIELDS = array(
+	public static $DEFAULT_COLS = array(
 		'id',
 		'name',
 		'type_id',
@@ -35,7 +35,7 @@ class Organization {
 		'organization_type_id',
 		'organization_type_order'
 	);
-	public static $ADDITIONAL_FIELDS = array(
+	public static $ADDITIONAL_COLS = array(
 		'description',
 		'background_medium_img_url',
 		'img_medium_url',
@@ -203,9 +203,9 @@ class Organization {
 
 	public function getParams(User $user, array $fields = null) {
 //		$subscribe_status = $this->getIsSubscribed($user);
-		$params = self::$DEFAULT_FIELDS;
+		$params = self::$DEFAULT_COLS;
 		$result_data = array();
-		$params = Fields::mergeFields(self::$ADDITIONAL_FIELDS, $fields, $params);
+		$params = Fields::mergeFields(self::$ADDITIONAL_COLS, $fields, $params);
 
 		foreach($params as $key => $field){
 			$result_data[$field] = $this->$field;
