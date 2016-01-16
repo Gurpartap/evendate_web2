@@ -21,6 +21,7 @@ class User extends AbstractUser{
 
 
 	public function __construct(PDO $db, $token = null){
+		var_dump($_SESSION);
 		if ((!isset($_SESSION['id']) || trim($_SESSION['id']) == ''
 			|| !isset($_SESSION['token']) || trim($_SESSION['token']) == '')
 			&& $token == null){

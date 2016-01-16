@@ -56,7 +56,7 @@ class EventsCollection{
 							subscriptions.user_id = :user_id
 							AND subscriptions.status = TRUE)
 					)
-						    OR
+					OR
 					(events.id
 						IN (SELECT event_id
 							FROM favorite_events
@@ -68,7 +68,7 @@ class EventsCollection{
 						NOT IN (SELECT event_id
 						FROM hidden_events
 						WHERE hidden_events.status = TRUE
-						AND hidden_events.user_id = :user_id))';
+						AND hidden_events.user_id = :user_id))');
 					$statement_array[':user_id'] = $value->getId();
 					break;
 				}

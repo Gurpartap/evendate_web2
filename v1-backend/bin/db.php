@@ -1,5 +1,7 @@
 <?php
 	require_once 'env_variables.php';
+
+	@session_start();
 	require_once $BACKEND_FULL_PATH. '/bin/app_config.php';
 	require_once $BACKEND_FULL_PATH. '/lib/aurasql/autoload.php';
 	App::init();
