@@ -21,7 +21,6 @@ class User extends AbstractUser{
 
 
 	public function __construct(PDO $db, $token = null){
-		var_dump($_SESSION);
 		if ((!isset($_SESSION['id']) || trim($_SESSION['id']) == ''
 			|| !isset($_SESSION['token']) || trim($_SESSION['token']) == '')
 			&& $token == null){
@@ -71,10 +70,6 @@ class User extends AbstractUser{
 		$this->notify_in_browser = $row['notify_in_browser'];
 	}
 
-	public static function getLinkToSocialNetwork($type, $uid) {
-		return EventsCollection::$URLs[$type] . $uid;
-	}
-
 	public function getId() {
 		return $this->id;
 	}
@@ -114,7 +109,7 @@ class User extends AbstractUser{
 	public function addFavoriteEvent(Event $event){
 		$q_ins_favorite = 'INSERT INTO favorite_events(user_id, event_id, status, created_at)
 			VALUES (:user_id, :event_id, 1, NOW())
-			ON DUPLICATE KEY UPDATE status = 1';
+			ON DUPLICATE KEY UPDATE status = TRUE';
 		$p_ins_favorite = $this->db->prepare($q_ins_favorite);
 		$result = $p_ins_favorite->execute(array(
 			':user_id' => $this->getId(),
@@ -320,8 +315,8 @@ class User extends AbstractUser{
 			   events.title,
 			   events.image_horizontal,
 			   events.image_vertical,
-			   events.event_end_date,
-			   events.event_start_date,
+			   events.last_event_date,
+			   events.first_event_date,
 			   organizations.name as name,
 			   organizations.short_name as short_name,
 			   organizations.background_img_url as background_img_url,
@@ -366,8 +361,8 @@ class User extends AbstractUser{
 			   null as title,
 			   null as image_horizontal,
 			   null as image_vertical,
-			   null as event_end_date,
-			   null as event_start_date,
+			   null as last_event_date,
+			   null as first_event_date,
 			  organizations.name,
 			  organizations.short_name,
 			  organizations.background_img_url,
@@ -446,8 +441,8 @@ class User extends AbstractUser{
 					'title' => $event['title'],
 					'image_horizontal' => $event['image_horizontal'],
 					'image_vertical' => $event['image_vertical'],
-					'event_end_date' => $event['event_end_date'],
-					'event_start_date' => $event['event_start_date'],
+					'last_event_date' => $event['last_event_date'],
+					'first_event_date' => $event['first_event_date'],
 					'organization_logo_url' => $organization_info['img_url'],
 					'organization_short_name' => $organization_info['short_name'],
 					'organization_id' => $event['organization_id'],

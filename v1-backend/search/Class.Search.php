@@ -123,7 +123,7 @@ class GlobalSearch{
 				'since_date' => $this->parseDates('since_date'),
 				'till_date' => $this->parseDates('till_date'),
 				'tags' => $this->tags
-			), ' ORDER BY events.event_start_date LIMIT 50')->getData(),
+			), ' ORDER BY events.first_event_date LIMIT 50')->getData(),
 			'query' => $this->initial_query
 		));
 	}

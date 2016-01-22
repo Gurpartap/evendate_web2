@@ -6,16 +6,28 @@ require_once $BACKEND_FULL_PATH . '/events/Class.EventsCollection.php';
 $__modules['events'] = array(
 	'GET' => array(
 		'{{/(id:[0-9]+)}}' => function ($id) use ($__db, $__request, $__user) { /*MY EVENTS!*/
-			$events = EventsCollection::filter($__db, $__user,
-				array('id' => new Event($id, $__db)), '')->getData();
-			return new Result(true, '', count($events) > 0 ? $events[0] : null);
+			$event = EventsCollection::filter(
+				$__db,
+				$__user,
+				array('id' => $id),
+				App::$__FIELDS,
+				null,
+				array('nearest_event_date', 'first_event_date'));
+			return new Result(true, '', array($event->getParams()));
 		},
 		'my' => function () use ($__db, $__request, $__user, $__page, $__length) { /*MY EVENTS!*/
-			return EventsCollection::filter($__db, $__user,
-				array_merge(array('my' => $__user,
-					'type' => 'future'),
-					$__request),
-				' ORDER BY nearest_event_date, events.begin_time LIMIT ' . $__length . ' OFFSET ' . ($__page * $__length));
+			return
+				EventsCollection::filter(
+					$__db,
+					$__user,
+					array_merge(array(
+						'my' => $__user,
+						'type' => 'future'),
+						$__request
+					),
+					App::$__FIELDS,
+					array('length' => App::$__LENGTH, 'offset' => App::$__OFFSET),
+					array('nearest_event_date', 'first_event_date'));
 		},
 		'search' => function() use ($__db, $__request, $__user){
 			return EventsCollection::filter($__db, $__user, $__request);
@@ -26,9 +38,14 @@ $__modules['events'] = array(
 				' ORDER BY first_date, events.begin_time LIMIT ' . $__length . ' OFFSET ' . ($__page * $__length));
 		},
 		'' => function () use ($__db, $__request, $__user) {
-			return EventsCollection::filter($__db, $__user, $__request,
-				'ORDER BY first_date, events.begin_time');
-		},
+			return EventsCollection::filter(
+				$__db,
+				$__user,
+				$__request,
+				App::$__FIELDS,
+				array('length' => App::$__LENGTH, 'offset' => App::$__OFFSET),
+				array('nearest_event_date', 'first_event_date'));
+		}
 	),
 	'POST' => array(
 		'' => function () use ($__db, $__request, $__user){

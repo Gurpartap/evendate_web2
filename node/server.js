@@ -496,9 +496,14 @@ pg.connect(pg_conn_string, function(err, client, done) {
 										'photo_100 = $6 , ' +
 										'photo_max_orig = $7 ' +
 										'WHERE user_id = $8';
-									ins_data = [data.access_data.user_id, data.access_data.access_token, data.access_data.expires_in,
-										data.access_data.secret, data.user_info.photo_50, data.user_info.photo_100,
-										data.user_info.photo_max_orig, user.id];
+									ins_data = [data.access_data.user_id,
+										data.access_data.access_token,
+										data.access_data.expires_in,
+										data.access_data.secret,
+										data.user_info.photo_50,
+										data.user_info.photo_100,
+										data.user_info.photo_max_orig,
+										user.id];
 								}else{
 									q_ins_sign_in = 'INSERT INTO vk_sign_in(uid, access_token, expires_in, secret, user_id, photo_50,' +
 										'   photo_100, photo_max_orig) ' +
@@ -515,18 +520,6 @@ pg.connect(pg_conn_string, function(err, client, done) {
 								var cover_photo_url = data.user_info.hasOwnProperty('cover') && data.user_info.cover.hasOwnProperty('coverPhoto') ? data.user_info.cover.coverPhoto.url : null;
 
 								if (user.google_uid != null){
-									q_ins_sign_in = 'INSERT INTO google_sign_in(google_id, access_token, expires_in, etag, ' +
-										' user_id, cover_photo_url) ' +
-										'VALUES($1, $2, $3, $4, $5, $6)';
-									ins_data = [
-										data.user_info.id,
-										data.oauth_data.access_token,
-										data.oauth_data.expires_in,
-										data.user_info.etag,
-										user.id,
-										cover_photo_url
-									];
-								}else{
 									q_ins_sign_in = 'UPDATE google_sign_in' +
 										' SET access_token = $1, ' +
 										' expires_in = $2, ' +
@@ -540,27 +533,48 @@ pg.connect(pg_conn_string, function(err, client, done) {
 										cover_photo_url,
 										user.id
 									];
-									console.log(user);
-									console.log(q_ins_sign_in, ins_data);
+								}else{
+									q_ins_sign_in = 'INSERT INTO google_sign_in(google_id, access_token, expires_in, etag, ' +
+										' user_id, cover_photo_url) ' +
+										'VALUES($1, $2, $3, $4, $5, $6)';
+									ins_data = [
+										data.user_info.id,
+										data.oauth_data.access_token,
+										data.oauth_data.expires_in,
+										data.user_info.etag,
+										user.id,
+										cover_photo_url
+									];
 								}
 								break;
 							}
 							case 'facebook':
 							{
 								if (user.facebook_uid != null){
-									q_ins_sign_in = 'INSERT INTO facebook_sign_in(uid, access_token, expires_in, user_id) ' +
-										'VALUES($1, $2, $3, $4)';
-									ins_data = [data.user_info.id,
-										data.oauth_data.access_token,
-										data.access_data.expires_in,
-										user.id];
-								}else{
+
 									q_ins_sign_in = 'UPDATE facebook_sign_in' +
 										' SET uid = $1, ' +
 										' access_token = $2, ' +
 										' expires_in = $3, ' +
 										' WHERE user_id = $4';
 									ins_data = [data.user_info.id,
+										data.oauth_data.access_token,
+										data.access_data.expires_in,
+										user.id];
+								}else{
+									q_ins_sign_in = 'INSERT INTO facebook_sign_in(uid, access_token, expires_in, user_id) ' +
+										'VALUES($1, $2, $3, $4) ' +
+										' ON CONFLICT(uid) ' +
+										' DO UPDATE SET ' +
+										' uid = $5, ' +
+										' access_token = $6, ' +
+										' expires_in = $7, ' +
+										' user_id = $8';
+									ins_data = [data.user_info.id,
+										data.oauth_data.access_token,
+										data.access_data.expires_in,
+										user.id,
+										data.user_info.id,
 										data.oauth_data.access_token,
 										data.access_data.expires_in,
 										user.id];

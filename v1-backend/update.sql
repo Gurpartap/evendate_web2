@@ -60,6 +60,18 @@ SET new_status = (CASE status
 ALTER TABLE public.favorite_events DROP status;
 ALTER TABLE public.favorite_events RENAME COLUMN new_status TO status;
 
+/*Event_Tags*/
+ALTER TABLE public.events_tags ADD new_status BOOLEAN DEFAULT TRUE NOT NULL;
+UPDATE public.events_tags
+SET new_status = (CASE status
+                  WHEN 1
+                    THEN TRUE
+                  WHEN 0
+                    THEN FALSE
+                  END);
+ALTER TABLE public.events_tags DROP status;
+ALTER TABLE public.events_tags RENAME COLUMN new_status TO status;
+
 
 /*Events*/
 ALTER TABLE public.events ADD new_status BOOLEAN DEFAULT TRUE NOT NULL;
@@ -254,14 +266,14 @@ CREATE VIEW view_events AS
     organizations.name                                                        AS organization_name,
     organization_types.name                                                   AS organization_type_name,
     organizations.short_name                                                  AS organization_short_name,
-    (SELECT DATE_PART('epoch', MIN(events_dates.event_date))
+    (SELECT DATE_PART('epoch', MIN(events_dates.event_date))::INT
      FROM events_dates
      WHERE event_id = events.id AND events_dates.event_date > NOW() AND events_dates.status =
                                                                         TRUE) AS nearest_event_date,
-    (SELECT DATE_PART('epoch', MIN(events_dates.event_date))
+    (SELECT DATE_PART('epoch', MIN(events_dates.event_date))::INT
      FROM events_dates
      WHERE event_id = events.id AND events_dates.status = TRUE)               AS first_event_date,
-    (SELECT DATE_PART('epoch', MAX(events_dates.event_date))
+    (SELECT DATE_PART('epoch', MAX(events_dates.event_date))::INT
      FROM events_dates
      WHERE event_id = events.id AND events_dates.status = TRUE)               AS last_event_date,
     DATE_PART('epoch', events.created_at) :: INT                              AS created_at,
@@ -279,3 +291,11 @@ CREATE VIEW view_events AS
         AND events.status = TRUE;
 
 
+CREATE VIEW view_tags AS select tags.id, tags.name,
+  count (events_tags.tag_id) AS events_count,
+                           DATE_PART('epoch', tags.created_at) :: INT                              AS created_at,
+                                                    DATE_PART('epoch', tags.updated_at) :: INT                              AS updated_at
+
+                         FROM tags
+  INNER JOIN events_tags ON events_tags.tag_id = tags.id AND events_tags.status = TRUE
+GROUP BY tags.id, events_tags.tag_id;

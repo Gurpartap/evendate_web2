@@ -5,6 +5,21 @@ require_once $BACKEND_FULL_PATH .'/organizations/Class.Organization.php';
 
 class Friend extends AbstractUser{
 
+	public static $DEFAULT_COLS = array(
+		'id',
+		'first_name',
+		'last_name',
+		'middle_name',
+		'gender',
+		'avatar_url',
+	);
+
+	public static $ADDITIONAL_COLS = array(
+		'type',
+		'is_friend' => 'view_friends.user_id IS NOT NULL AS is_friend',
+		'blurred_image_url',
+	);
+
 	private $id;
 	private $db;
 	private $first_name;
@@ -15,59 +30,7 @@ class Friend extends AbstractUser{
 
 	private $user;
 
-
-	public function __construct($id, User $user, PDO $db) {
-		$q_get_friend = 'SELECT users.id::int,
-			users.first_name, users.last_name,
-			users.avatar_url, users.vk_uid,
-			users.facebook_uid,
-			users.google_uid
-			FROM users
-			WHERE users.id = :id';
-		$p_get = $db->prepare($q_get_friend);
-
-		$result = $p_get->execute(array(
-			':id' => $id
-		));
-
-
-		if ($result === FALSE) throw new DBQueryException('', $db);
-		if ($p_get->rowCount() == 0) throw new LogicException('User is not your friend');
-		$row = $p_get->fetch();
-		$this->id = $id;
-		$this->db = $db;
-		$this->user = $user;
-		$this->first_name = $row['first_name'];
-		$this->last_name = $row['last_name'];
-		$social_info = self::getLinkToSocialNetwork($row);
-		$this->link = $social_info['link'];
-		$this->type = $social_info['type'];
-		$this->avatar_url = $row['avatar_url'];
-	}
-
-	private static function getLinkToSocialNetwork($row) {
-		if ($row['vk_uid'] != null){
-			return array(
-				'type' => 'vk.com',
-				'link' => User::getLinkToSocialNetwork('vk', $row['vk_uid'])
-			);
-		}elseif($row['facebook_uid'] != null){
-			return array(
-				'type' => 'Facebook',
-				'link' => User::getLinkToSocialNetwork('facebook', $row['facebook_uid'])
-			);
-		}elseif($row['google_uid'] != null){
-			return array(
-				'type' => 'Google +',
-				'link' => User::getLinkToSocialNetwork('google', $row['google_uid'])
-			);
-		}else{
-			return array(
-				'type' => '',
-				'link' => '',
-			);
-		}
-	}
+	const SUBSCRIPTIONS_FIELD_NAME = 'subscriptions';
 
 	public function getId(){
 		return $this->id;
@@ -92,6 +55,27 @@ class Friend extends AbstractUser{
 			));
 		}
 		return $subscriptions;
+	}
+
+	public function getParams(User $user, array $fields = null){
+		$result_data = array();
+
+		foreach(self::$DEFAULT_COLS as $field){
+			$result_data[$field] = $this->$field;
+		}
+
+		foreach($fields as $name => $value){
+			if (in_array($name, self::$ADDITIONAL_COLS) || isset(self::$ADDITIONAL_COLS[$name])){
+				$result_data[$name] = $this->$name;
+			}
+		}
+
+		if (isset($fields[self::SUBSCRIPTIONS_FIELD_NAME])){
+			$result_data[self::SUBSCRIPTIONS_FIELD_NAME] = $this->getSubscriptions()->getData();
+		}
+
+
+		return new Result(true, '', $result_data);
 	}
 
 }

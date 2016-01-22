@@ -29,14 +29,35 @@ class Event{
 		'image_vertical_url',
 		'image_horizontal_url',
 		'image_horizontal_url',
-		'tags',
-		'is_favorite',
-		'id',
+		'organization_id',
 	);
 
 	public static $ADDITIONAL_COLS = array(
-
+		'description',
+		'location',
+		'detail_info_url',
+		'creator_id',
+		'latitude',
+		'longitude',
+		'organization_id',
+		'organization_name',
+		'organization_type_name',
+		'organization_short_name',
+		'created_at',
+		'updated_at',
+		'favored_users_count',
+		'is_favorite' => '(SELECT id IS NOT NULL = TRUE
+			FROM favorite_events
+			WHERE favorite_events.status = TRUE
+			AND favorite_events.user_id = :user_id
+			AND favorite_events.event_id = view_events.id) AS is_favorite'
 	);
+
+	const IS_FAVORITE_COL_NAME = 'is_favorite';
+	const TAGS_COL_NAME = 'tags';
+	const DATES_COL_NAME = 'dates';
+	const FAVORED_USERS_COL_NAME = 'favored';
+	const CAN_EDIT = 'can_edit';
 
 	private $db;
 	private $id;
@@ -44,43 +65,35 @@ class Event{
 	private $description;
 	private $location;
 	private $location_uri;
-	private $event_start_date;
+	private $first_event_date;
 	private $notifications_schema_json;
 	private $creator_id;
 	private $organization_id;
 	private $latitude;
 	private $longitude;
-	private $event_end_date;
+	private $last_event_date;
 	private $image_vertical;
-	private $event_type_id;
 	private $detail_info_url;
-	private $begin_time;
-	private $end_time;
+	private $favored_users_count;
 	private $image_horizontal;
 	private $location_object;
+	private $organization_name;
+	private $organization_type_name;
+	private $organization_short_name;
+	private $is_favorite;
+
+
 	private $tags;
+	private $dates;
+	private $can_edit;
+	private $favored_users;
 
 	private $organization;
 
 
-	public function __construct($id, PDO $db) {
-		$this->db = $db;
-		$q_get_event = 'SELECT events.* FROM events WHERE events.id = :id';
-		$p_get_event = $this->db->prepare($q_get_event);
-		$result = $p_get_event->execute(array(
-			':id' => $id
-		));
-		if ($result === FALSE) throw new DBQueryException('DB_QUERY_ERROR', $db);
-		if ($p_get_event->rowCount() != 1) throw new InvalidArgumentException('CANT_FIND_EVENT');
-
-		$event = $p_get_event->fetch();
-		foreach($event as $key => $value){
-			if (property_exists('Event', $key)){
-				$this->$key = $value;
-			}
-		}
-		global $__user;
-		Statistics::Event($this, $__user, $db, Statistics::EVENT_VIEW);
+	public function __construct() {
+		$this->db = App::DB();
+		Statistics::Event($this, App::getCurrentUser(), App::DB(), Statistics::EVENT_VIEW);
 	}
 
 	private static function generateRandomString($length = 10) {
@@ -242,13 +255,13 @@ class Event{
 	public static function create(PDO $db, Organization $organization, array $data){
 
 		$q_ins_event = 'INSERT INTO `events`(created_at, title, description, location,
-						location_object, location_uri, event_start_date, event_end_date,
+						location_object, location_uri, first_event_date, last_event_date,
 						notifications_schema_json, creator_id, organization_id,
 						latitude, longitude, image_vertical, image_horizontal,
 						event_type_id, detail_info_url, begin_time, end_time)
 
 				VALUES(NOW(), :title, :description, :location, :location_object,
-						:location_uri, :event_start_date, :event_end_date,
+						:location_uri, :first_event_date, :last_event_date,
 						:notifications_schema_json, :creator_id, :organization_id,
 						:latitude, :longitude, :image_vertical, :image_horizontal,
 						:event_type_id, :detail_info_url, :begin_time, :end_time)';
@@ -272,8 +285,8 @@ class Event{
 			':location' => $data['location'],
 			':location_object' => json_encode($data['geo']),
 			':location_uri' => 'content://maps.google.com/lat=' . $data['latitude'] .'&long='.$data['longitude'],
-			':event_start_date' => $data['date-start'],
-			':event_end_date' => $data['date-end'],
+			':first_event_date' => $data['date-start'],
+			':last_event_date' => $data['date-end'],
 			':notifications_schema_json' => json_encode($data['notifications']['types']),
 			':creator_id' => $data['creator_id'],
 			':organization_id' => $organization->getId(),
@@ -326,13 +339,6 @@ class Event{
 		}else{
 			return FALSE;
 		}
-	}
-
-	public static function getEventTypes(PDO $db){
-		$p_get_event_types = $db->query('SELECT *
-			FROM event_types
-			WHERE status = 1');
-		return new Result(true, '', $p_get_event_types->fetchAll());
 	}
 
 	private static function mb_ucfirst($str) {
@@ -400,22 +406,22 @@ class Event{
 	}
 
 	private static function saveNotifications($event_id, array $data, PDO $db) {
-		$p_upd_not_done = $db->prepare('UPDATE events_notifications SET `status` = 1 WHERE done = 0 AND event_id = :event_id');
+		$p_upd_not_done = $db->prepare('UPDATE events_notifications SET status = 1 WHERE done = 0 AND event_id = :event_id');
 		$p_upd_not_done->execute(array(
 			':event_id' => $event_id
 		));
 
 		$p_ins_value = $db->prepare('INSERT INTO
-			events_notifications(created_at, event_id, notification_type_id, notification_time, `status`, done)
+			events_notifications(created_at, event_id, notification_type_id, notification_time, status, done)
 			SELECT
 				NOW() as created_at,
 				  :event_id AS event_id,
 				  id as notification_type_id,
 				  FROM_UNIXTIME(:notification_time) as notification_time,
-				  1 as `status`,
+				  1 as status,
 				  0 as done
 				FROM notification_types WHERE type = :type
-				ON DUPLICATE KEY UPDATE `status` = 1');
+				ON DUPLICATE KEY UPDATE status = 1');
 
 		foreach($data['notifications']['times'] as $type => $notification_time){
 			$p_ins_value->execute(array(
@@ -431,10 +437,10 @@ class Event{
 	}
 
 	public function getDates(){
-		$q_get_event_dates = 'SELECT *
+		$q_get_event_dates = 'SELECT event_date, start_time, end_time
 			FROM events_dates
 			WHERE event_id = :event_id
-				AND status = 1
+				AND status = TRUE
 				ORDER BY events_dates.event_date ASC';
 		$p_get_dates = $this->db->prepare($q_get_event_dates);
 		$result = $p_get_dates->execute(array(
@@ -446,145 +452,19 @@ class Event{
 		return new Result(true, '', $p_get_dates->fetchAll());
 	}
 
-	public function getTitle() {
-		return $this->title;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getDescription() {
-		return $this->description;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getLocation() {
-		return $this->location;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getLocationUri() {
-		return $this->location_uri;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getEventStartDate() {
-		return $this->event_start_date;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getNotificationsSchemaJson() {
-		return $this->notifications_schema_json;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getCreatorId() {
-		return $this->creator_id;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getOrganizationId() {
-		return $this->organization_id;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getLatitude() {
-		return $this->latitude;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getLongitude() {
-		return $this->longitude;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getEventEndDate() {
-		return $this->event_end_date;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getImageVertical() {
-		return $this->image_vertical;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getEventTypeId() {
-		return $this->event_type_id;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getDetailInfoUrl() {
-		return $this->detail_info_url;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getBeginTime() {
-		return $this->begin_time;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getEndTime() {
-		return $this->end_time;
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getImageHorizontal() {
-		return $this->image_horizontal;
-	}
-
-
-	public function getImageHorizontalUrl() {
-		return App::$SCHEMA . App::$DOMAIN . self::IMAGES_PATH . '/' . self::IMG_SIZE_TYPE_LARGE . '/' . $this->image_horizontal;
-	}
-
-	public function getImageVerticalUrl() {
-		return App::$SCHEMA . App::$DOMAIN . self::IMAGES_PATH . '/' . self::IMG_SIZE_TYPE_LARGE . '/' . $this->image_vertical;
-	}
-
 	public function getTags(){
 		if ($this->tags != null) return $this->tags;
-
-		$q_get_tags = 'SELECT * FROM tags
-			INNER JOIN events_tags ON tags.id = events_tags.tag_id
-			WHERE event_id = :event_id
-			AND tags.status = 1
-			AND events_tags.status = 1';
-		$p_get_tags = $this->db->prepare($q_get_tags);
-		$result = $p_get_tags->execute(array(':event_id' => $this->getId()));
-		if ($result === FALSE) throw new DBQueryException('', $this->db);
-
-		return new Result(true, '',$p_get_tags->fetchAll());
+		$this->tags = TagsCollection::filter($this->db,
+			array('event_id' => $this->getId())
+		)->getData();
+		return $this->tags;
 	}
+
+	public function getIsFavorite(){
+		return $this->is_favorite;
+	}
+
+	public function getFavoredUsers(){}
 
 	/**
 	 * @return mixed
@@ -595,38 +475,43 @@ class Event{
 
 	public function getOrganization() {
 		if ($this->organization instanceof Organization == false){
-			$this->organization = new Organization($this->getOrganizationId(), $this->db);
+			$this->organization = OrganizationsCollection::filter(
+				$this->db,
+				App::getCurrentUser(),
+				array('id' => $this->organization_id)
+			);
 		}
 		return $this->organization;
 	}
 
-	public function getUrl(){
-		return App::$SCHEMA . App::$DOMAIN . '/event.php?id=' . $this->getId();
-	}
+	public function getParams(User $user, $fields){
 
-	public function getLikedUsers(){
-		$q_get_users = 'SELECT users.first_name,
-			users.last_name,
-			 users.middle_name,
-			 users.avatar_url,
-			 users.id
-			FROM users
-			INNER JOIN favorite_events ON favorite_events.user_id = users.id
-			INNER JOIN events ON events.id = favorite_events.event_id
-			WHERE events.status = 1
-			AND favorite_events.status = 1
-			AND users.show_to_friends = 1
-			AND events.id = :event_id';
-		$p_get_users = $this->db->prepare($q_get_users);
+		foreach(self::$DEFAULT_COLS as $field){
+			$result_data[$field] = $this->$field;
+		}
 
-		$result = $p_get_users->execute(array(
-			':event_id' => $this->getId()
-		));
+		foreach($fields as $name => $value){
+			if (in_array($name, self::$ADDITIONAL_COLS) || isset(self::$ADDITIONAL_COLS[$name])){
+				$result_data[$name] = $this->$name;
+			}
+		}
 
-		if ($result === FALSE) throw new DBQueryException('CANT_GET_LIKED_USERS', $this->db);
+		if (isset($fields[Event::DATES_COL_NAME])){
+			$result_data[Event::DATES_COL_NAME] = $this->getDates()->getData();
+		}
 
-		return new Result(true, '', $p_get_users->fetchAll());
+		if (isset($fields[Event::FAVORED_USERS_COL_NAME])){
+			$_fields[] = Event::FAVORED_USERS_COL_NAME;
+		}
 
+		if (isset($fields[Event::TAGS_COL_NAME])){
+			$_fields[] = Event::TAGS_COL_NAME;
+		}
+		if (isset($fields[Event::CAN_EDIT])){
+			$_fields[] = Event::CAN_EDIT;
+		}
+
+		return new Result(true, '', $result_data);
 	}
 
 	public function hide(User $user){
@@ -668,13 +553,13 @@ class Event{
 				location = :location,
 				location_object = :location_object,
 				location_uri = :location_uri,
-				event_start_date = :event_start_date,
+				first_event_date = :first_event_date,
 				notifications_schema_json = :notifications_schema_json,
 				creator_id = :creator_id,
 				organization_id = :organization_id,
 				latitude = :latitude,
 				longitude = :longitude,
-				event_end_date = :event_end_date,
+				last_event_date = :last_event_date,
 				detail_info_url = :detail_info_url,
 				begin_time = :begin_time,
 				end_time = :end_time,
@@ -697,8 +582,8 @@ class Event{
 			':location' => $data['location'],
 			':location_object' => json_encode($data['geo']),
 			':location_uri' => 'content://maps.google.com/lat=' . $data['latitude'] .'&long='.$data['longitude'],
-			':event_start_date' => $data['date-start'],
-			':event_end_date' => $data['date-end'],
+			':first_event_date' => $data['date-start'],
+			':last_event_date' => $data['date-end'],
 			':notifications_schema_json' => json_encode($data['notifications']['types']),
 			':creator_id' => $editor->getId(),
 			':organization_id' => $organization->getId(),
@@ -744,5 +629,4 @@ class Event{
 		self::saveNotifications($this->getId(), $data, $this->db);
 		return new Result(true, 'Событие успешно сохранено!', array('event_id' => $this->getId()));
 	}
-
 }

@@ -4,42 +4,54 @@ require_once 'Class.Event.php';
 
 class EventsCollection{
 
-	static $URLs = array(
-		'facebook' => 'https://facebook.com/',
-		'google' => 'https://plus.google.com/',
-		'vk' => 'http://vk.com/id',
-	);
+	public static function filter(PDO $db,
+	                              User $user,
+	                              array $filters = null,
+	                              array $fields = null,
+	                              array $pagination = null,
+	                              array $order_by = array('id')) {
 
-
-	public static function filter(PDO $db, User $user, array $filters = null, $order_by = '') {
 		$q_get_events = App::$QUERY_FACTORY->newSelect();
 
 		$q_get_events
 			->distinct()
 			->from('view_events');
 
+		if (isset($pagination['offset'])){
+			$q_get_events->offset($pagination['offset']);
+		}
 
-		$statement_array = array(
-			':user_id' => $user->getId()
-		);
+		if (isset($pagination['length'])){
+			$q_get_events->limit($pagination['length']);
+		}
 
-		$is_short = false;
+		$_fields = Fields::mergeFields(Event::$ADDITIONAL_COLS, $fields, Event::$DEFAULT_COLS);
+
+		$q_get_events->cols($_fields);
+
+		$statement_array = array();
+		if (isset($fields[Event::IS_FAVORITE_COL_NAME])){
+			$statement_array[':user_id'] = $user->getId();
+		}
+
+		$is_one_event = false;
+
 		foreach($filters as $name => $value){
 			switch($name){
 				case 'date': {
 					$q_get_events->where('
 					AND ((
-						DATE(events.event_start_date) <= DATE(:date)
+						DATE(events.first_event_date) <= DATE(:date)
 							AND
-						DATE(events.event_end_date) >= DATE(:date)
+						DATE(events.last_event_date) >= DATE(:date)
 						)
 						OR
 						(
-						DATE(events.event_start_date) = DATE(:date)
+						DATE(events.first_event_date) = DATE(:date)
 							AND
-						DATE(events.event_end_date) = DATE(:date)
+						DATE(events.last_event_date) = DATE(:date)
 						)
-						OR (:date IN (SELECT events_dates.event_date FROM events_dates WHERE events.id = events_dates.event_id AND status = 1) AND events.event_start_date IS NULL)
+						OR (:date IN (SELECT events_dates.event_date FROM events_dates WHERE events.id = events_dates.event_id AND status = 1) AND events.first_event_date IS NULL)
 						)');
 					$statement_array[':date'] = $value;
 					break;
@@ -73,44 +85,46 @@ class EventsCollection{
 					break;
 				}
 				case 'id': {
-					if ($value instanceof Event == false) break;
 					$q_get_events->where('id = :event_id');
-					$statement_array[':event_id'] = $value->getId();
-					$liked_limit = '';
+					$statement_array[':event_id'] = $value;
+					$is_one_event = true;
 					break;
 				}
-				case 'organization_id': {
-					$q_get_events .= ' AND (events.organization_id = :organization_id)';
-					$statement_array[':organization_id'] = $value;
+				case 'organization': {
+					if ($value instanceof Organization){
+						$q_get_events->where('organization_id = :organization_id');
+						$statement_array[':organization_id'] = $value->getId();
+					}
 					break;
 				}
-				case 'type': {
-					if ($value == 'future'){
-						$q_get_events .= ' AND (
-								(DATE(NOW()) BETWEEN DATE(events.event_start_date) AND DATE(events.event_end_date))
-								OR
-								(DATE(NOW()) < DATE(events.event_start_date))
-								OR
-								(events.event_end_date IS NULL AND (SELECT COUNT(*) FROM events_dates WHERE events_dates.event_id = events.id AND events_dates.status = 1 AND DATE(event_date) >= DATE(NOW())))
-							)';
-					}elseif ($value == 'favorites'){
-						$q_get_events .= ' AND (events.id IN (
+				case 'future': {
+					$q_get_events .= ' AND (
+					(DATE(NOW()) BETWEEN DATE(events.first_event_date) AND DATE(events.last_event_date))
+					OR
+					(DATE(NOW()) < DATE(events.first_event_date))
+					OR
+					(events.last_event_date IS NULL AND (SELECT COUNT(*) FROM events_dates WHERE events_dates.event_id = events.id AND events_dates.status = 1 AND DATE(event_date) >= DATE(NOW())))
+					)';
+
+					break;
+				}
+				case 'favorites': {
+					$q_get_events .= ' AND (events.id IN (
 							SELECT DISTINCT event_id FROM favorite_events WHERE status=1 AND user_id = :user_id
 						))  AND (
-								(DATE(NOW()) BETWEEN DATE(events.event_start_date) AND DATE(events.event_end_date))
+								(DATE(NOW()) BETWEEN DATE(events.first_event_date) AND DATE(events.last_event_date))
 								OR
-								(DATE(NOW()) < DATE(events.event_start_date))
+								(DATE(NOW()) < DATE(events.first_event_date))
 								OR
-								(events.event_end_date IS NULL AND (SELECT COUNT(*) FROM events_dates WHERE events_dates.event_id = events.id AND events_dates.status = 1 AND DATE(event_date) >= DATE(NOW())))
+								(events.last_event_date IS NULL AND (SELECT COUNT(*) FROM events_dates WHERE events_dates.event_id = events.id AND events_dates.status = 1 AND DATE(event_date) >= DATE(NOW())))
 							)';
-					}else{
-						$is_short = true;
-					}
+
+					$statement_array[':user_id'] = $user->getId();
 					break;
 				}
 				case 'since_date':{
 					if ($value instanceof DateTime){
-						$value = $value->format('Y-m-d');
+						$value = $value->format('Y-m-d H:i:S');
 					}elseif($value == null){
 						break;
 					}
@@ -130,7 +144,7 @@ class EventsCollection{
 						break;
 					}
 					$q_get_events .= ' AND (
-					(DATE(events.event_start_date) <= DATE(:till_date) OR (DATE(events.event_end_date) <= DATE(:till_date)))
+					(DATE(events.first_event_date) <= DATE(:till_date) OR (DATE(events.last_event_date) <= DATE(:till_date)))
 					OR
 					(SELECT COUNT(*) FROM events_dates WHERE DATE(events_dates.event_date) > DATE(:till_date)) > 0
 					)';
@@ -170,163 +184,19 @@ class EventsCollection{
 				}
 			}
 		}
-		$q_get_events .= $order_by;
-		$p_get_events = $db->prepare($q_get_events);
+
+		$q_get_events->orderBy($order_by);
+		$p_get_events = $db->prepare($q_get_events->getStatement());
 		$result = $p_get_events->execute($statement_array);
 		if ($result === FALSE) throw new DBQueryException(implode(';', $db->errorInfo()), $db);
 
-		$events = $p_get_events->fetchAll();
-
-		if (isset($filters['type'])){
-			if ($filters['type'] == 'short'){
-				foreach($events as &$_event){
-					$_event = array(
-						'id' => $_event['id'],
-						'title' => $_event['title'],
-						'event_start_date' => $_event['event_start_date'],
-						'event_end_date' => $_event['event_end_date'],
-						'image_vertical' => $_event['image_vertical'],
-						'image_horizontal' => $_event['image_horizontal']
-					);
-					$_event = array_merge($_event);
-				}
-			}
+		$events = $p_get_events->fetchAll(PDO::FETCH_CLASS, 'Event');
+		if (count($events) == 0 && $is_one_event) throw new LogicException('CANT_FIND_EVENT');
+		$result_events = array();
+		if ($is_one_event) return $events[0];
+		foreach($events as $event){
+			$result_events[] = $event->getParams($user, $fields)->getData();
 		}
-
-		$p_get_is_favorite = $db->prepare('SELECT favorite_events.id::int
-			FROM favorite_events
-			WHERE favorite_events.status = 1
-			AND favorite_events.user_id = :user_id
-			AND favorite_events.event_id = :event_id');
-
-		$p_get_tags = $db->prepare('SELECT tags.id::int, tags.name
-			FROM  tags
-			INNER JOIN events_tags ON tags.id = events_tags.tag_id
-			WHERE events_tags.status = 1
-			AND tags.status = 1
-			AND events_tags.event_id = :event_id');
-
-		$p_get_dates = $db->prepare('SELECT events_dates.event_date as event_date
-			FROM events_dates
-			WHERE
-				events_dates.status = 1
-			AND events_dates.event_id = :event_id
-			ORDER BY events_dates.event_date');
-
-		$p_get_liked_users = $db->prepare('SELECT DISTINCT users.first_name, users.last_name,
-			users.middle_name, users.id::int, users.avatar_url, view_friends.friend_uid,
-			view_friends.type, view_friends.friend_id::int,
-			0 AS is_friend
-			FROM users
-			INNER JOIN view_friends ON users.id = view_friends.friend_id
-			LEFT JOIN favorite_events ON favorite_events.user_id = view_friends.friend_id
-			WHERE
-				favorite_events.event_id = :event_id
-			AND favorite_events.status = 1
-			AND users.show_to_friends = 1
-			AND users.id != :user_id
-			GROUP BY users.id ' . $liked_limit);
-
-		foreach($events as &$event){
-
-			$p_get_dates->execute(array(
-				':event_id' => $event['id']
-			));
-
-
-			$event['dates_range'] = array();
-			$event['tags'] = array();
-
-			$p_get_is_favorite->execute(array(
-				':user_id' => $user->getId(),
-				':event_id' => $event['id']
-			));
-
-			if (!$is_short){
-
-				$p_get_liked_users->execute(array(
-					':user_id' => $user->getId(),
-					':event_id' => $event['id']
-				));
-
-				$p_get_tags->execute(array(
-					':event_id' => $event['id']
-				));
-
-				$event['can_edit'] = boolval($event['can_edit']);
-				$event['is_full_day'] = $event['end_time'] == '00:00:00' && $event['begin_time'] == '00:00:00';
-				$first_date_dt = new DateTime($event['first_date']);
-				$event['timestamp_first_date'] = $first_date_dt->getTimestamp();
-				$event['favorite_friends'] = array();
-
-				if ($p_get_liked_users->rowCount() != 0){
-					$event['favorite_friends'] = $p_get_liked_users->fetchAll();
-					foreach($event['favorite_friends'] as &$friend){
-						$friend['is_friend'] = boolval($friend['is_friend']);
-						$friend['friend_id'] = isset($friend['friend_id']) ? intval($friend['friend_id']) : null;
-						$friend['link'] = User::getLinkToSocialNetwork($friend['type'], $friend['friend_uid']);
-					}
-				}
-
-				$tags = $p_get_tags->fetchAll();
-
-				foreach($tags as $tag){
-					$tag['id'] = intval($tag['id']);
-					$event['tags'][] = $tag;
-				}
-
-				$event = array_merge($event, self::makeImgUrls($event));
-			}
-
-
-
-			if ($p_get_dates->rowCount() != 0){
-				$_dates = $p_get_dates->fetchAll();
-				foreach($_dates as $date){
-					$event['dates_range'][] = $date['event_date'];
-				}
-			}else{
-				$end_date = new DateTime($event['event_end_date']);
-				$end_date->add(new DateInterval('P1D'));
-				$period = new DatePeriod(
-					new DateTime($event['event_start_date']),
-					new DateInterval('P1D'),
-					$end_date
-				);
-				foreach($period as $date){
-					$event['dates_range'][] = $date->format('Y-m-d');
-				}
-				if (count($event['dates_range']) == 0 && $event['event_start_date'] == $event['event_end_date']){
-					$event['dates_range'][] = $event['event_start_date'];
-				}
-			}
-
-			$event['is_favorite'] = $p_get_is_favorite->rowCount() > 0;
-		}
-
-		return new Result(true, '', $events);
-	}
-
-	public static function makeImgUrls(array $event){
-		return array(
-			'image_vertical_url' => $event['image_vertical_url'],
-			'image_horizontal_url' => $event['image_horizontal_url'],
-			'image_square_url' => $event['image_square_url'],
-
-			'vertical_images' => array(
-				'large' => $event['image_vertical_large'],
-				'medium' => $event['image_vertical_medium'],
-				'small' => $event['image_vertical_small'],
-			),
-			'horizontal_images' => array(
-				'large' => $event['image_horizontal_large'],
-				'medium' => $event['image_horizontal_medium'],
-				'small' => $event['image_horizontal_small'],
-			),
-			'square_images' => array(
-				'vertical' => $event['image_vertical_vertical'],
-				'horizontal' => $event['image_horizontal_horizontal'],
-			)
-		);
+		return new Result(true, '', $result_events);
 	}
 }

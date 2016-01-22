@@ -38,6 +38,7 @@ try {
 	require_once "{$BACKEND_FULL_PATH}/users/Class.Friend.php";
 	require_once "{$BACKEND_FULL_PATH}/statistics/Class.Statistics.php";
 	require_once "{$BACKEND_FULL_PATH}/events/Class.EventsCollection.php";
+	require_once "{$BACKEND_FULL_PATH}/users/Class.UsersCollection.php";
 
 	App::buildGlobal($__db);
 
@@ -63,6 +64,7 @@ try {
 
 	$__page    = App::$__PAGE;
 	$__length  = App::$__LENGTH;
+	$__offset  = App::$__OFFSET;
 	$__modules = array();
 
 	require_once "{$BACKEND_FULL_PATH}/{$_class_name}/{$_class_name}.php";

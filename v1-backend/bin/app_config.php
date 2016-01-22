@@ -40,6 +40,9 @@ class App {
 	private static $__IP;
 
 
+	const DEFAULT_LENGTH = 100;
+	const DEFAULT_OFFSET = 0;
+
 	/*
 	 * init config options for deploy and visioning
 	 * */
@@ -73,17 +76,6 @@ class App {
 		return self::$obj->$name;
 	}
 
-	static function v($name) {
-		global $$name;
-		return $$name;
-	}
-
-	private static function queryJSONDecode($s) {
-		$s = str_replace(array('"', "'"), array('\"', '"'), $s);
-		$s = preg_replace('/(\w+):/i', '"\1":', $s);
-		return json_decode($s, true);
-	}
-
 	static function buildGlobal(PDO $db) {
 		self::$RESPONSE_FORMAT = (isset($_REQUEST['format']) && $_REQUEST['format'] == 'xml') ? 'xml' : 'json';
 		self::$RESPONSE_DOWNLOAD = (isset($_REQUEST['download']) && ($_REQUEST['download'] == '1' || $_REQUEST['download'] == 'true')) ? true : false;
@@ -99,28 +91,17 @@ class App {
 
 		self::$__HEADERS = getallheaders();
 
-		$fields = isset(self::$__REQUEST['fields']) ? explode(',', self::$__REQUEST['fields']) : array();
-		self::$__FIELDS = array();
-		foreach ($fields as $field) {
-			if (strpos($field, '.') !== FALSE) {
-				$field_arr = explode('.', $field);
-				$name = trim($field_arr[0]);
-				self::$__FIELDS[$name] = self::queryJSONDecode(trim($field_arr[1]));
-			}
-			else {
-				self::$__FIELDS[$field] = array();
-			}
-		}
+		self::$__FIELDS = Fields::parseFields(self::$__REQUEST['fields'] ??  '');
+
 		self::$__PAGE = (isset($_REQUEST['page'])) ? (int)$_REQUEST['page'] : 0;
-		self::$__LENGTH = (isset($_REQUEST['length'])) ? (int)$_REQUEST['length'] : 10;
-		self::$__OFFSET = self::$__PAGE * self::$__LENGTH;
+		self::$__LENGTH = (isset($_REQUEST['length'])) ? (int)$_REQUEST['length'] : self::DEFAULT_LENGTH;
+		self::$__OFFSET = (isset($_REQUEST['offset'])) ? (int)$_REQUEST['offset'] : self::$__PAGE * self::$__LENGTH;
 
 		self::$__DB = $db;
 		self::$__IP = $__ip = $_SERVER['REMOTE_ADDR'] ?: ($_SERVER['HTTP_X_FORWARDED_FOR'] ?: $_SERVER['HTTP_CLIENT_IP']);;
 
 		self::$QUERY_FACTORY = new QueryFactory('pgsql', QueryFactory::COMMON);
 	}
-
 
 	static function getCurrentUser() {
 		if (self::$__USER instanceof User)
@@ -144,7 +125,7 @@ class App {
 		}
 	}
 
-	static public function DB() {
+	static public function DB() : PDO {
 		return self::$__DB;
 	}
 }

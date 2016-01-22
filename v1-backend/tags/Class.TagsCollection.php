@@ -2,45 +2,41 @@
 
 class TagsCollection{
 
-	public static function all(PDO $db, $order_by = '', User $user = null){
+	public static function filter(PDO $db, array $filters = null, array $fields = null, array $order_by = null){
 
-		$res_array = array(
-			'tags' => $db->query('SELECT id::INT, name, status::BOOLEAN FROM tags WHERE status = 1 ' . $order_by)->fetchAll(),
-			'organizations' => array()
-		);
+		$q_get_tags = App::$QUERY_FACTORY->newSelect();
+		$statements = array();
 
-		if ($user instanceof User){
-			$p_get_organizations = $db->prepare('SELECT DISTINCT organizations.name, organizations.id, organizations.img_url,
-				organizations.short_name, organizations.default_address
- 			    FROM  organizations
- 			     INNER JOIN users_organizations ON users_organizations.organization_id = organizations.id
-				WHERE users_organizations.status = 1
-				AND users_organizations.user_id = :user_id');
+		$q_get_tags->distinct()
+			->cols(Fields::mergeFields(Tag::$ADDITIONAL_COLS, $fields, Tag::$DEFAULT_COLS))
+			->from('view_tags')
+			->orderBy($order_by)
+			->limit(App::$__LENGTH)
+			->offset(App::$__OFFSET);
 
-			$res = $p_get_organizations->execute(array(':user_id' => $user->getId()));
-			if ($res !== FALSE){
-				$res_array['organizations'] = $p_get_organizations->fetchAll();
+		foreach ($filters as $name => $value) {
+			switch ($name) {
+				case 'id': {
+					$q_get_tags->where('id = :id');
+					$statements[':id'] = $value;
+					break;
+				}
+				case 'name': {
+					$q_get_tags->where('LOWER(name) LIKE LOWER(:name)');
+					$statements[':name'] = $value . '%';
+					break;
+				}
+				case 'event_id': {
+					$q_get_tags->where('events.id = :event_id)');
+					$statements[':event_id'] = $value;
+					break;
+				}
 			}
 		}
-
-		return new Result(true, '', $res_array);
-	}
-
-	public static function search($name, PDO $db, $order_by = '', User $user) {
-		$q_get_tags = 'SELECT
-			id::INT,
-			name,
-			status::BOOL
-			FROM tags
-			WHERE name
-			LIKE :name ' . $order_by;
-		$p_get_tags = $db->prepare($q_get_tags);
-		$p_get_tags->execute(array(
-			':name' => $name . '%'
+		$p_get_tags = $db->prepare($q_get_tags->getStatement());
+		$p_get_tags->execute($statements);
+		return new Result(true, '', array(
+			'tags' => $p_get_tags->fetchAll(),
 		));
-
-		$res_array  = $p_get_tags->fetchAll();
-		return new Result(true, '', $res_array);
 	}
-
 }

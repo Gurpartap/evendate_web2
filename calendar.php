@@ -9,8 +9,7 @@
         $add_event_btn_hidden = $user->isEditor() ? '' : 'hidden';
         $profile_is_editor = $user->isEditor() ? '' : '';
     }catch(exception $e){
-        echo $e;
-        //header('Location: /');
+        header('Location: /');
 }
 ?>
 <!DOCTYPE html>

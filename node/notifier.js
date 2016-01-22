@@ -35,7 +35,7 @@ try {
 			' INNER JOIN events_dates ON events.id = events_dates.event_id' +
 			' WHERE status = 1' +
 			' AND (' +
-			'       NOW() BETWEEN event_start_date AND event_end_date' +
+			'       NOW() BETWEEN first_event_date AND last_event_date' +
 			'       OR ' +
 			'       DATE(NOW()) = events_dates.event_date' +
 			')');

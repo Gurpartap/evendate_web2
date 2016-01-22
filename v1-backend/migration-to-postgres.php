@@ -2,7 +2,7 @@
 
 	require 'bin/db.php';
 
-	$result = $__db->query('SELECT id, event_start_date, event_end_date, end_time, begin_time,
+	$result = $__db->query('SELECT id, first_event_date, last_event_date, end_time, begin_time,
  		  (SELECT COUNT(*) FROM events_dates WHERE event_id = events.id AND status = 1) as dates_count
  		FROM events');
 	$rows = $result->fetchAll();
@@ -16,18 +16,18 @@
 	foreach($rows as $event){
 		if ($event['dates_count'] == 0){
 			$p_upd_event->execute(array(':is_range' => true));
-			$end_date = new DateTime($event['event_end_date']);
+			$end_date = new DateTime($event['last_event_date']);
 			$end_date->add(new DateInterval('P1D'));
 			$period = new DatePeriod(
-				new DateTime($event['event_start_date']),
+				new DateTime($event['first_event_date']),
 				new DateInterval('P1D'),
 				$end_date
 			);
 			foreach($period as $date){
 				$to_ins_dates[] = $date->format('Y-m-d');
 			}
-			if (count($event['dates_range']) == 0 && $event['event_start_date'] == $event['event_end_date']){
-				$_date = new DateTime($event['event_start_date']);
+			if (count($event['dates_range']) == 0 && $event['first_event_date'] == $event['last_event_date']){
+				$_date = new DateTime($event['first_event_date']);
 				$to_ins_dates[] = $_date->format('Y-m-d');
 			}
 

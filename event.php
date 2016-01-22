@@ -107,10 +107,10 @@
 						<div class="event-left-info">
 							<div class="day-name">
 								<?php
-									$begin_date = new DateTime($event->getEventStartDate());
-									$end_date = new DateTime($event->getEventEndDate());
+									$begin_date = new DateTime($event->getFirstEventDate());
+									$end_date = new DateTime($event->getLastEventDate());
 
-									if ($event->getEventStartDate() == null && $event->getEventEndDate() == null){
+									if ($event->getFirstEventDate() == null && $event->getLastEventDate() == null){
 										$dates = $event->getDates()->getData();
 										$_dates = array();
 										if (count($dates) < 3){
