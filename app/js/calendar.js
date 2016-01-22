@@ -819,6 +819,25 @@ function OneDay($view, $content_block){
 	setDaysWithEvents();
 }
 
+function AddEvent($view, $content_block){
+
+
+	$view.find('.full-day').on('change', function(){
+		if ($(this).is(':checked')){
+			$('.input-hours,.input-minutes')
+				.attr('disabled', 'true')
+		}else{
+
+			$('.input-hours,.input-minutes')
+				.removeAttr('disabled')
+		}
+	});
+
+	bindModalEvents();
+
+
+}
+
 function hideOrganizationItem(org_id){
 	var $organization_item = $('.animated.organization-' + org_id).addClass('fadeOutLeftBig');
 	setTimeout(function(){
@@ -915,6 +934,7 @@ $(document)
 			favorites: FavoredEvents,
 			search: Search,
 			friends: Friends,
+			add_event: AddEvent,
 			refreshState: function(){
 				var page = this.getCurrentState(),
 					$view = $('.screen-view:not(.hidden)');

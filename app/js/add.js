@@ -76,7 +76,9 @@ var daterange_settings = {
 					results: _data
 				}
 			}
-		}
+		},
+		containerCssClass: "form_select2",
+		dropdownCssClass: "form_select2_drop"
 	};
 
 function showNotifier(response){
@@ -322,7 +324,7 @@ function bindDatepickerChanger(){
 function bindModalEvents(){
 	//debugger;
 	var $text_length = $('.textarea-length-text'),
-		$organizations = $('.organizations.to-select2');
+		$organizations = $('.organizations.ToSelect2');
 
 	function handleFileSelect(evt){
 		if (evt.target.files.length == 0) return false;
@@ -476,7 +478,9 @@ function bindModalEvents(){
 			var $state_element = $(state.element);
 
 			return $('<span><img src="' + $state_element.data('image-url') + '" class="img-30" /> ' + state.text + '</span>');
-		}
+		},
+		containerCssClass: "form_select2",
+		dropdownCssClass: "form_select2_drop"
 	}).on('change',function(e){
 		var $btn = $('#default-address-btn');
 		if (!$(this).find('option:selected').data('default-address')){
@@ -485,9 +489,9 @@ function bindModalEvents(){
 			$btn.show();
 		}
 	});
-	$('.tags.to-select2').select2(select2_settings);
+	$('.tags.ToSelect2').select2(select2_settings);
 
-	$('.to-select2.tags').siblings('.select2').find('input').css('width', '100%');
+	$('.ToSelect2.tags').siblings('.select2').find('input').css('width', '100%');
 
 	var $range_input = $('input.daterange'),
 		$date_range = $range_input.on('keydown', function(e){
@@ -587,7 +591,7 @@ function bindModalEvents(){
 					send_data[$input.attr('name') + '-start'] = $input.data('daterangepicker').startDate.format('YYYY-MM-DD');
 					send_data[$input.attr('name') + '-end'] = $input.data('daterangepicker').endDate.format('YYYY-MM-DD');
 				}
-			}else if ($input.hasClass('to-select2')){
+			}else if ($input.hasClass('ToSelect2')){
 				send_data[$input.attr('name')] = $input.select2('val');
 			}else{
 				send_data[$input.attr('name')] = $input.val();
@@ -755,7 +759,7 @@ function showEditEventModal(event_id){
 				$modal.find('.description').val(_event.description);
 				$modal.find('.textarea-length-text').text(_event.description.length + '/500');
 				$modal.find('#placepicker-add').val(_event.location);
-				$modal.find('.organizations.to-select2').select2('val', _event.organization_id);
+				$modal.find('.organizations.ToSelect2').select2('val', _event.organization_id);
 
 				if (_event.begin_time == zero_dates && _event.end_time == zero_dates){
 					$modal.find('.full-day').prop('checked', true).trigger('change');
@@ -822,7 +826,7 @@ function showEditEventModal(event_id){
 					.html('<img src="' + _event.image_horizontal_url + '">');
 
 				var selected_tags = [],
-					$tags_input = $modal.find('.to-select2.tags');
+					$tags_input = $modal.find('.ToSelect2.tags');
 				_event.tags.forEach(function(tag){
 					selected_tags.push({
 						id: tag.id,
