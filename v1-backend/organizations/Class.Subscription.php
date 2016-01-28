@@ -22,5 +22,4 @@ class Subscription extends Organization{
 		return new Result(true, 'Подписка успешно отменена');
 	}
 
-
 }

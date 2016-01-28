@@ -5,14 +5,6 @@ class OrganizationsCollection {
 	private $db;
 	private $user;
 
-	public function __construct(PDO $db, User $user = null) {
-		$this->db = $db;
-		$this->user = $user;
-	}
-
-	public function setUser(User $user) {
-		$this->user = $user;
-	}
 
 	public static function filter(PDO $db,
 	                              User $user,
@@ -25,8 +17,8 @@ class OrganizationsCollection {
 		$_friend = null;
 		$return_one = isset($filters['id']);
 		$class_name = 'Organization';
-		$cols = Fields::mergeFields(Organization::$ADDITIONAL_COLS, $fields, Organization::$DEFAULT_COLS);
-		$select = APP::$QUERY_FACTORY->newSelect();
+		$cols = Fields::mergeFields(Organization::getAdditionalCols(), $fields, Organization::getDefaultCols());
+		$select = APP::queryFactory()->newSelect();
 
 		$select
 			->distinct()
@@ -37,17 +29,17 @@ class OrganizationsCollection {
 			switch ($name) {
 				case 'name': {
 					$select->orWhere('view_organizations.name LIKE :name');
-					$statement_array[':name'] = '%' . $value . '%';
+					$statement_array[':name'] = $value . '%';
 					break;
 				}
 				case 'description': {
 					$select->orWhere('view_organizations.description LIKE :description');
-					$statement_array[':description'] = '%' . $value . '%';
+					$statement_array[':description'] = $value . '%';
 					break;
 				}
 				case 'short_name': {
 					$select->orWhere('view_organizations.short_name LIKE :short_name');
-					$statement_array[':short_name'] = '%' . $value . '%';
+					$statement_array[':short_name'] = $value . '%';
 					break;
 				}
 				case 'type_id': {
@@ -56,7 +48,7 @@ class OrganizationsCollection {
 					break;
 				}
 				case 'id': {
-					foreach(Organization::$ADDITIONAL_COLS as $key => $val){
+					foreach(Organization::getAdditionalCols() as $key => $val){
 						if (is_numeric($key)){
 							$cols[] = $val;
 						}else{
@@ -65,11 +57,12 @@ class OrganizationsCollection {
 					}
 					$select->where('view_organizations.id = :id');
 					$statement_array[':id'] = $value;
+					break;
 				}
 				case (Organization::IS_SUBSCRIBED_FIELD_NAME): {
 					if ($return_one) break;
 					if (!isset($fields[Organization::IS_SUBSCRIBED_FIELD_NAME])){
-						$fields[] = Organization::$ADDITIONAL_COLS[Organization::IS_SUBSCRIBED_FIELD_NAME];
+						$fields[] = Organization::getAdditionalCols()[Organization::IS_SUBSCRIBED_FIELD_NAME];
 					}
 					$select->where('(SELECT
 						id IS NOT NULL = TRUE AS is_subscribed
@@ -81,14 +74,18 @@ class OrganizationsCollection {
 					$class_name = 'Subscription';
 					break;
 				}
-//				case 'friend': {
-//					if ($value instanceof Friend) {
-//						$_friend = $value;
-//						$statement_array[':user_id'] = $value->getId();
-//						$q_get_organizations .= ' AND subscriptions.user_id = :user_id AND is_subscribed = TRUE';
-//					}
-//					break;
-//				}
+				case 'friend': {
+					if ($value instanceof Friend) {
+						$user = $value;
+						$select->where('(SELECT
+							id IS NOT NULL = TRUE AS is_subscribed
+							FROM subscriptions
+							WHERE organization_id = "view_organizations"."id"
+								AND "subscriptions"."status" = TRUE
+								AND user_id = :user_id) = TRUE');
+					}
+					break;
+				}
 			}
 		}
 
@@ -115,9 +112,8 @@ class OrganizationsCollection {
 
 		$organizations = $p_search->fetchAll(PDO::FETCH_CLASS, $class_name);
 
-		if ($return_one){
-			return $organizations[0];
-		}
+		if ($return_one) return $organizations[0];
+
 
 		$result_array = array();
 
@@ -125,5 +121,20 @@ class OrganizationsCollection {
 			$result_array[] = $org->getParams($user, $fields)->getData();
 		}
 		return new Result(true, '', $result_array);
+	}
+
+	public static function one(PDO $db,
+	                           User $user,
+	                           int $id,
+	                           array $fields = null){
+
+		$organization = self::filter($db, $user, array('id' => $id), $fields);;
+		Statistics::Organization(
+			$organization,
+			$user,
+			$db,
+			Statistics::ORGANIZATION_VIEW
+		);
+		return $organization;
 	}
 }

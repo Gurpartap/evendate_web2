@@ -20,6 +20,7 @@ class App {
 	public static $SCHEMA;
 	public static $DB_DSN;
 	public static $DB_PORT;
+	public static $__ORDER_BY;
 
 	public static $QUERY_FACTORY;
 
@@ -76,6 +77,10 @@ class App {
 		return self::$obj->$name;
 	}
 
+	public static function queryFactory() : QueryFactory{
+		return self::$QUERY_FACTORY;
+	}
+
 	static function buildGlobal(PDO $db) {
 		self::$RESPONSE_FORMAT = (isset($_REQUEST['format']) && $_REQUEST['format'] == 'xml') ? 'xml' : 'json';
 		self::$RESPONSE_DOWNLOAD = (isset($_REQUEST['download']) && ($_REQUEST['download'] == '1' || $_REQUEST['download'] == 'true')) ? true : false;
@@ -92,6 +97,7 @@ class App {
 		self::$__HEADERS = getallheaders();
 
 		self::$__FIELDS = Fields::parseFields(self::$__REQUEST['fields'] ??  '');
+		self::$__ORDER_BY = Fields::parseOrderByFields(self::$__REQUEST['order_by'] ??  '', (bool) (self::$__REQUEST['desc'] ?? false));
 
 		self::$__PAGE = (isset($_REQUEST['page'])) ? (int)$_REQUEST['page'] : 0;
 		self::$__LENGTH = (isset($_REQUEST['length'])) ? (int)$_REQUEST['length'] : self::DEFAULT_LENGTH;
@@ -103,7 +109,7 @@ class App {
 		self::$QUERY_FACTORY = new QueryFactory('pgsql', QueryFactory::COMMON);
 	}
 
-	static function getCurrentUser() {
+	static function getCurrentUser() : User {
 		if (self::$__USER instanceof User)
 			return self::$__USER;
 		$token = isset(self::$__HEADERS['Authorization']) ? self::$__HEADERS['Authorization'] : null;

@@ -2,7 +2,7 @@
 
 require_once $BACKEND_FULL_PATH . '/organizations/Class.Organization.php';
 
-class Event{
+class Event extends AbstractEntity{
 
 	const IMAGES_PATH = '/event_images/';
 
@@ -20,7 +20,7 @@ class Event{
 
 
 
-	public static $DEFAULT_COLS = array(
+	protected static $DEFAULT_COLS = array(
 		'id',
 		'title',
 		'first_event_date',
@@ -32,7 +32,7 @@ class Event{
 		'organization_id',
 	);
 
-	public static $ADDITIONAL_COLS = array(
+	protected static $ADDITIONAL_COLS = array(
 		'description',
 		'location',
 		'detail_info_url',
@@ -59,28 +59,26 @@ class Event{
 	const FAVORED_USERS_COL_NAME = 'favored';
 	const CAN_EDIT = 'can_edit';
 
-	private $db;
-	private $id;
-	private $title;
-	private $description;
-	private $location;
-	private $location_uri;
-	private $first_event_date;
-	private $notifications_schema_json;
-	private $creator_id;
-	private $organization_id;
-	private $latitude;
-	private $longitude;
-	private $last_event_date;
-	private $image_vertical;
-	private $detail_info_url;
-	private $favored_users_count;
-	private $image_horizontal;
-	private $location_object;
-	private $organization_name;
-	private $organization_type_name;
-	private $organization_short_name;
-	private $is_favorite;
+	protected $title;
+	protected $description;
+	protected $location;
+	protected $location_uri;
+	protected $first_event_date;
+	protected $notifications_schema_json;
+	protected $creator_id;
+	protected $organization_id;
+	protected $latitude;
+	protected $longitude;
+	protected $last_event_date;
+	protected $image_vertical;
+	protected $detail_info_url;
+	protected $favored_users_count;
+	protected $image_horizontal;
+	protected $location_object;
+	protected $organization_name;
+	protected $organization_type_name;
+	protected $organization_short_name;
+	protected $is_favorite;
 
 
 	private $tags;
@@ -214,12 +212,8 @@ class Event{
 	}
 
 	private static function getFirstDate(array $data){
-		if (isset($data['dates']) && count($data['dates']) > 0){
-			$__date = new DateTime($data['dates'][0]);
-			return new DateTime($__date->format('Y-m-d') . ' ' . $data['formatted_begin_time']);
-		}else{
-			return new DateTime($data['date-start'] . ' ' . $data['formatted_begin_time']);
-		}
+		$__date = new DateTime($data['dates'][0]);
+		return new DateTime($__date->format('Y-m-d') . ' ' . $data['formatted_begin_time']);
 	}
 
 	private static function generateQueryData(&$data, PDO $db){
@@ -236,17 +230,11 @@ class Event{
 		if (!is_array($data['tags'])) throw new LogicException('Укажите хотя бы один тег');
 
 
-		if ($data['full-day'] == true){
-			$data['formatted_begin_time'] = '00:00:00';
-			$data['formatted_end_time'] = '00:00:00';
-		}else{
-			$data['formatted_begin_time'] = $data['begin-hours'] . ':' . $data['begin-minutes'] . ':00';
-			$data['formatted_end_time'] = ($data['end-hours'] == null) ? null : $data['end-hours'] . ':' . $data['end-minutes'] . ':00';
-		}
+		$data['formatted_begin_time'] = $data['begin-hours'] . ':' . $data['begin-minutes'] . ':00';
+		$data['formatted_end_time'] = ($data['end-hours'] == null) ? null : $data['end-hours'] . ':' . $data['end-minutes'] . ':00';
 
-		if (isset($data['dates']) && count($data['dates']) > 0) {
-			$data['dates'] = self::sortDates($data['dates']);
-		}
+
+		$data['dates'] = self::sortDates($data['dates']);
 		$data['first_date'] = self::getFirstDate($data);
 		$data['notifications'] = self::generateNotificationsArray($data, $db);
 
@@ -254,70 +242,56 @@ class Event{
 
 	public static function create(PDO $db, Organization $organization, array $data){
 
-		$q_ins_event = 'INSERT INTO `events`(created_at, title, description, location,
-						location_object, location_uri, first_event_date, last_event_date,
-						notifications_schema_json, creator_id, organization_id,
-						latitude, longitude, image_vertical, image_horizontal,
-						event_type_id, detail_info_url, begin_time, end_time)
+		try{
+			$db->beginTransaction();
 
-				VALUES(NOW(), :title, :description, :location, :location_object,
-						:location_uri, :first_event_date, :last_event_date,
-						:notifications_schema_json, :creator_id, :organization_id,
-						:latitude, :longitude, :image_vertical, :image_horizontal,
-						:event_type_id, :detail_info_url, :begin_time, :end_time)';
+			if (!isset($data['dates']) || count($data['dates']) == 0)
+				throw new InvalidArgumentException('Укажите, пожалуйста, даты','');
 
-		$p_ins_event = $db->prepare($q_ins_event);
+			$q_ins_event = App::queryFactory()->newInsert();
+			$random_string = self::generateRandomString();
+			$img_horizontal_filename = md5($random_string .  '-horizontal') .  '.' . $data['image_extensions']['horizontal'];
+			$img_vertical_filename = md5($random_string . '-vertical') .  '.' . $data['image_extensions']['vertical'];
 
 
+			self::generateQueryData($data, $db);
 
-		$img_horizontal_filename = md5(self::generateRandomString() .  '-horizontal') .  '.' . $data['image_extensions']['horizontal'];
-		$img_vertical_filename = md5(self::generateRandomString() . '-vertical') .  '.' . $data['image_extensions']['vertical'];
+			$q_ins_event
+				->into('events')
+				->cols(array(
+					'title' => $data['title'],
+					'description' => $data['description'],
+					'location' => $data['location'],
+					'location_object' => json_encode($data['geo']),
+					'creator_id' => $data['creator_id'],
+					'organization_id' => $organization->getId(),
+					'latitude' => $data['latitude'],
+					'longitude' => $data['longitude'],
+					'image_vertical' => $img_vertical_filename,
+					'image_horizontal' => $img_horizontal_filename,
+					'detail_info_url' => $data['detail-info-url'],
+				));
 
+			$p_ins_event = $db->prepare($q_ins_event->getStatement());
 
-		self::generateQueryData($data, $db);
+			$result = $p_ins_event->execute($q_ins_event->getBindValues());
 
+			if ($result === FALSE) throw new DBQueryException(implode(';', $db->errorInfo()), $db);
 
+			$event_id = $db->lastInsertId();
 
-
-		$query_data = array(
-			':title' => $data['title'],
-			':description' => $data['description'],
-			':location' => $data['location'],
-			':location_object' => json_encode($data['geo']),
-			':location_uri' => 'content://maps.google.com/lat=' . $data['latitude'] .'&long='.$data['longitude'],
-			':first_event_date' => $data['date-start'],
-			':last_event_date' => $data['date-end'],
-			':notifications_schema_json' => json_encode($data['notifications']['types']),
-			':creator_id' => $data['creator_id'],
-			':organization_id' => $organization->getId(),
-			':latitude' => $data['latitude'],
-			':longitude' => $data['longitude'],
-			':image_vertical' => $img_vertical_filename,
-			':image_horizontal' => $img_horizontal_filename,
-			':event_type_id' => 1, // мероприятие
-			':detail_info_url' => $data['detail-info-url'],
-			':begin_time' => $data['formatted_begin_time'],
-			':end_time' => $data['formatted_end_time'],
-		);
-
-		$result = $p_ins_event->execute($query_data);
-
-		if ($result === FALSE) throw new DBQueryException(implode(';', $db->errorInfo()), $db);
-
-		$event_id = $db->lastInsertId();
-
-		if (isset($data['dates']) && count($data['dates']) > 0){
 			self::saveDates($data['dates'], $db, $event_id);
+			self::saveEventTags($db, $event_id, $data['tags']);
+			self::saveNotifications($event_id, $data, $db);
+			self::saveEventImage($data['files']['horizontal'], $img_horizontal_filename);
+			self::saveEventImage($data['files']['vertical'], $img_vertical_filename);
+
+			$db->commit();
+			return new Result(true, 'Событие успешно создано', array('event_id' => $event_id));
+		}catch(Exception $e){
+			$db->rollBack();
+			throw $e;
 		}
-
-		self::saveEventTags($db, $event_id, $data['tags']);
-
-		self::saveNotifications($event_id, $data, $db);
-
-		self::saveEventImage($data['files']['horizontal'], $img_horizontal_filename);
-		self::saveEventImage($data['files']['vertical'], $img_vertical_filename);
-
-		return new Result(true, 'Событие успешно создано', array('event_id' => $event_id));
 	}
 
 	private static function saveEventImage($file, $filename){
@@ -337,48 +311,27 @@ class Event{
 			if (!$result) throw new RuntimeException('Ошибка сохранения файла');
 			return $result;
 		}else{
-			return FALSE;
+			throw new InvalidArgumentException();
 		}
 	}
 
-	private static function mb_ucfirst($str) {
-		$str = mb_strtolower($str);
-		$fc = mb_strtoupper(mb_substr($str, 0, 1));
-		return $fc.mb_substr($str, 1);
-	}
 
 	private static function saveEventTags(PDO $db, $event_id, array $tags) {
-		$p_upd = $db->prepare('UPDATE events_tags SET status = 0 WHERE event_id = :event_id');
+		$p_upd = $db->prepare('UPDATE events_tags SET status = FALSE WHERE event_id = :event_id');
 		$p_upd->execute(array(':event_id' => $event_id));
 
-		$q_ins_tags = 'INSERT INTO events_tags(event_id, tag_id, created_at, status)
-			VALUES(:event_id, :tag_id, NOW(), 1) ON DUPLICATE KEY UPDATE status = 1';
+		$q_ins_tags = 'INSERT INTO events_tags(event_id, tag_id, status)
+			VALUES(:event_id, :tag_id, TRUE)
+			ON CONFLICT DO UPDATE SET status = TRUE';
 		$p_ins_tags = $db->prepare($q_ins_tags);
 
-		$q_ins_tag = 'INSERT INTO tags(name, created_at, status)
-			VALUES(:name, NOW(), 1) ON DUPLICATE KEY UPDATE status = 1';
-		$p_ins_tag = $db->prepare($q_ins_tag);
 		$inserted_count = 0;
 
-
-		foreach($tags as $tag){
-			if (is_numeric($tag)){
-				$tag_id = intval($tag);
+		foreach($tags as $name){
+			if (is_numeric($name)){
+				$tag_id = intval($name);
 			}else{
-				$tag = preg_replace('/\s+/', ' ', self::mb_ucfirst($tag));
-				$p_get_tag = $db->prepare('SELECT id FROM tags WHERE name = :name');
-				$p_get_tag->execute(array(
-					':name' => $tag
-				));
-				if ($p_get_tag->rowCount() == 0){
-					$p_ins_tag->execute(array(
-						':name' => $tag
-					));
-					$tag_id = $db->lastInsertId();
-				}else{
-					$tag_result = $p_get_tag->fetch();
-					$tag_id = $tag_result['id'];
-				}
+				$tag_id = TagsCollection::create($db, $name)->getId();
 			}
 
 			if ($inserted_count == self::TAGS_LIMIT) break;
@@ -391,13 +344,13 @@ class Event{
 	}
 
 	private static function saveDates($dates, PDO $db, $event_id) {
-		$p_set_inactive = $db->prepare('UPDATE events_dates SET status = 0 WHERE event_id = :event_id');
+		$p_set_inactive = $db->prepare('UPDATE events_dates SET status = FALSE WHERE event_id = :event_id');
 		$p_set_inactive->execute(array(':event_id' => $event_id));
 
+		$q_ins_dates = 'INSERT INTO events_dates(event_date, status, event_id, start_time, end_time)
+			VALUES(:event_date, TRUE, :event_id, :start_time, :end_time)';
+		$p_ins_dates = $db->prepare($q_ins_dates);
 		foreach($dates as $date){
-			$q_ins_dates = 'INSERT INTO events_dates(event_date, status, created_at, event_id)
-			VALUES(:event_date, 1, NOW(), :event_id)';
-			$p_ins_dates = $db->prepare($q_ins_dates);
 			$p_ins_dates->execute(array(
 				':event_date' => $date,
 				':event_id' => $event_id
@@ -432,9 +385,6 @@ class Event{
 		}
 	}
 
-	public function getId() {
-		return $this->id;
-	}
 
 	public function getDates(){
 		$q_get_event_dates = 'SELECT event_date, start_time, end_time
@@ -484,17 +434,9 @@ class Event{
 		return $this->organization;
 	}
 
-	public function getParams(User $user, $fields){
+	public function getParams(User $user, array $fields = null) : Result{
 
-		foreach(self::$DEFAULT_COLS as $field){
-			$result_data[$field] = $this->$field;
-		}
-
-		foreach($fields as $name => $value){
-			if (in_array($name, self::$ADDITIONAL_COLS) || isset(self::$ADDITIONAL_COLS[$name])){
-				$result_data[$name] = $this->$name;
-			}
-		}
+		$result_data = parent::getParams($user, $fields)->getData();
 
 		if (isset($fields[Event::DATES_COL_NAME])){
 			$result_data[Event::DATES_COL_NAME] = $this->getDates()->getData();
@@ -505,19 +447,22 @@ class Event{
 		}
 
 		if (isset($fields[Event::TAGS_COL_NAME])){
-			$_fields[] = Event::TAGS_COL_NAME;
+			$result_data[] = TagsCollection::filter($this->db,
+				array('event' => $this),
+				$fields[Event::TAGS_COL_NAME]['fields'] ?? array(),
+				$fields[Event::TAGS_COL_NAME]['order_by'] ?? array());
 		}
 		if (isset($fields[Event::CAN_EDIT])){
-			$_fields[] = Event::CAN_EDIT;
+//			$result_data[] = $this->;
 		}
 
 		return new Result(true, '', $result_data);
 	}
 
 	public function hide(User $user){
-		$q_ins_hidden = 'INSERT INTO hidden_events(created_at, event_id, user_id, status)
-			VALUES(NOW(), :event_id, :user_id, 1)
-			ON DUPLICATE KEY UPDATE status = 1';
+		$q_ins_hidden = 'INSERT INTO hidden_events(event_id, user_id, status)
+			VALUES(:event_id, :user_id, TRUE)
+			ON CONFLICT DO UPDATE status = TRUE';
 		$p_ins_hidden = $this->db->prepare($q_ins_hidden);
 		$result = $p_ins_hidden->execute(array(
 			':event_id' => $this->getId(),
@@ -530,10 +475,8 @@ class Event{
 
 	public function show(User $user){
 		$q_upd_hidden = 'UPDATE hidden_events
-			SET status = 0
-			WHERE
-			user_id = :user_id
-			AND
+			SET status = FALSE
+			WHERE user_id = :user_id AND
 			event_id = :event_id
 			';
 		$p_upd_hidden = $this->db->prepare($q_upd_hidden);
@@ -553,16 +496,14 @@ class Event{
 				location = :location,
 				location_object = :location_object,
 				location_uri = :location_uri,
-				first_event_date = :first_event_date,
 				notifications_schema_json = :notifications_schema_json,
 				creator_id = :creator_id,
 				organization_id = :organization_id,
 				latitude = :latitude,
 				longitude = :longitude,
-				last_event_date = :last_event_date,
 				detail_info_url = :detail_info_url,
 				begin_time = :begin_time,
-				end_time = :end_time,
+				end_time = :end_time
 				';
 
 

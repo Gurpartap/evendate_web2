@@ -1,5 +1,10 @@
 <?php
 
+use Monolog\Logger;
+use Monolog\Handler\StreamHandler;
+use Monolog\Handler\FirePHPHandler;
+
+
 	if (isset($_SERVER['ENV']) && $_SERVER['ENV'] != 'dev'){
 		ini_set("display_errors", 1);
 		error_reporting(E_ALL);
@@ -32,6 +37,8 @@ try {
 	require_once "{$BACKEND_FULL_PATH}/bin/db.php";
 	require_once "{$BACKEND_FULL_PATH}/bin/Class.RequestsParser.php";
 	require_once "{$BACKEND_FULL_PATH}/bin/Class.Fields.php";
+	require_once "{$BACKEND_FULL_PATH}/bin/Class.AbstractEntity.php";
+	require_once "{$BACKEND_FULL_PATH}/bin/Class.AbstractCollection.php";
 	require_once "{$BACKEND_FULL_PATH}/users/Class.AbstractUser.php";
 	require_once "{$BACKEND_FULL_PATH}/users/Class.User.php";
 	require_once "{$BACKEND_FULL_PATH}/users/Class.Editor.php";
@@ -40,10 +47,13 @@ try {
 	require_once "{$BACKEND_FULL_PATH}/events/Class.EventsCollection.php";
 	require_once "{$BACKEND_FULL_PATH}/users/Class.UsersCollection.php";
 
+//	$logger = new Logger('my_logger');
+
 	App::buildGlobal($__db);
 
 	$__request = App::$__REQUEST;
 	$__headers = App::$__HEADERS;
+	$__fields = App::$__FIELDS;
 	$__user = App::getCurrentUser();
 
 	$act = explode('/', $_REQUEST['_url']);
@@ -61,10 +71,13 @@ try {
 
 	$_request_method = $_SERVER['REQUEST_METHOD'];
 
+	$_http_code = 200;
+	$_internal_code = 200;
 
 	$__page    = App::$__PAGE;
 	$__length  = App::$__LENGTH;
 	$__offset  = App::$__OFFSET;
+	$__order_by  = App::$__ORDER_BY;
 	$__modules = array();
 
 	require_once "{$BACKEND_FULL_PATH}/{$_class_name}/{$_class_name}.php";
@@ -94,20 +107,35 @@ try {
 		}
 	}
 
+}catch(AbstractException $ae){
+	$_http_code = $ae->getHttpCode();
+	$_internal_code = $ae->getInternalCode();
+	$e = $ae;
+}catch(InvalidArgumentException $iae){
+	$_http_code = BadArgumentException::HTTP_CODE;
+	$_internal_code = BadArgumentException::ERROR_CODE;
+	$e = $iae;
+}catch(BadMethodCallException $bmce){
+	$_http_code = BadArgumentException::HTTP_CODE;
+	$_internal_code = BadArgumentException::ERROR_CODE;
+	$e = $bmce;
 }catch(Exception $e){
-	if ($_SERVER['ENV'] == 'local'){
+	$_http_code = AbstractException::HTTP_CODE;
+	$_internal_code = AbstractException::ERROR_CODE;
+}finally{
+	if ($_SERVER['ENV'] == 'local' && isset($e)){
 		print_r($e);
 	}
-	$_result = new Result(false, 'Ошибка! '. $e->getMessage());
-	$_result->setFormat(App::$RESPONSE_FORMAT);
-}
 
-
-if (isset($_result) && $_result instanceof Result){
+	if (!isset($_result) || $_result instanceof Result == false){
+		$_result = new Result(false, 'Сервер не вернул никаких данных');
+		$_http_code = 404;
+		$_internal_code = 10404;
+	}
+	$_result->setHttpCode($_http_code);
+	$_result->setInternalCode($_internal_code);
 	$_result->setFormat(App::$RESPONSE_FORMAT);
 	$_result->setDownloadable(App::$RESPONSE_DOWNLOAD);
 	$_result->setNude(App::$RESPONSE_NUDE);
-	echo $_result;
-}else{
-	echo new Result(false, 'Извините, сервер не вернул никаких данных');
 }
+echo $_result;

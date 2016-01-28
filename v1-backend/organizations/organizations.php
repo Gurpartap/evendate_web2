@@ -7,32 +7,31 @@ require_once $BACKEND_FULL_PATH . '/events/Class.EventsCollection.php';
 
 $__modules['organizations'] = array(
 	'GET' => array(
-		'{{/(id:[0-9]+)}}' => function($id) use ($__db, $__request, $__user){
-			$organization = OrganizationsCollection::filter(
+		'{{/(id:[0-9]+)}}' => function($id) use ($__db, $__request, $__user, $__fields){
+			$organization = OrganizationsCollection::one(
 				$__db,
 				$__user,
-				array('id' => $id),
-				App::$__FIELDS,
-				array('organization_type_order', 'organization_type_id'));
+				$id,
+				$__fields);
 
 			return new Result(true, '', array($organization->getParams($__user, App::$__FIELDS)->getData()));
 		},
-		'' => function () use ($__db, $__request, $__user){
+		'' => function () use ($__db, $__request, $__user, $__fields){
 			return OrganizationsCollection::filter (
 				$__db,
 				$__user,
 				$__request,
-				App::$__FIELDS,
+				$__fields,
 				array('length' => App::$__LENGTH, 'offset' => App::$__OFFSET),
 				array('organization_type_order', 'organization_type_id')
 			);
 		},
-		'subscriptions' => function () use ($__db, $__request, $__user){
+		'subscriptions' => function () use ($__db, $__request, $__user, $__fields){
 			return OrganizationsCollection::filter (
 				$__db,
 				$__user,
 				array_merge($__request, array('is_subscribed' => true)),
-				App::$__FIELDS,
+				$__fields,
 				array('length' => App::$__LENGTH, 'offset' => App::$__OFFSET),
 				array('organization_type_order', 'organization_type_id')
 			);

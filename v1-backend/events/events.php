@@ -2,20 +2,20 @@
 
 require_once $BACKEND_FULL_PATH . '/events/Class.Event.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.EventsCollection.php';
+require_once $BACKEND_FULL_PATH . '/events/Class.EventDate.php';
+require_once $BACKEND_FULL_PATH . '/events/Class.EventsDatesCollection.php';
 
 $__modules['events'] = array(
 	'GET' => array(
-		'{{/(id:[0-9]+)}}' => function ($id) use ($__db, $__request, $__user) { /*MY EVENTS!*/
-			$event = EventsCollection::filter(
+		'{{/(id:[0-9]+)}}' => function ($id) use ($__db, $__request, $__user, $__fields) {
+			$event = EventsCollection::one(
 				$__db,
 				$__user,
-				array('id' => $id),
-				App::$__FIELDS,
-				null,
-				array('nearest_event_date', 'first_event_date'));
-			return new Result(true, '', array($event->getParams()));
+				intval($id),
+				$__fields);
+			return new Result(true, '', array($event->getParams($__user, $__fields)));
 		},
-		'my' => function () use ($__db, $__request, $__user, $__page, $__length) { /*MY EVENTS!*/
+		'my' => function () use ($__db, $__request, $__user, $__offset, $__length, $__fields, $__order_by) { /*MY EVENTS!*/
 			return
 				EventsCollection::filter(
 					$__db,
@@ -25,25 +25,48 @@ $__modules['events'] = array(
 						'type' => 'future'),
 						$__request
 					),
-					App::$__FIELDS,
-					array('length' => App::$__LENGTH, 'offset' => App::$__OFFSET),
-					array('nearest_event_date', 'first_event_date'));
+					$__fields,
+					array('length' => $__length, 'offset' => $__offset),
+					array('nearest_event_date', 'first_event_date')
+				);
 		},
-		'search' => function() use ($__db, $__request, $__user){
-			return EventsCollection::filter($__db, $__user, $__request);
-		},
-		'favorites' => function () use ($__db, $__request, $__user, $__page, $__length) { /*MY EVENTS!*/
-			return EventsCollection::filter($__db, $__user,
-				array('type' => 'favorites'),
-				' ORDER BY first_date, events.begin_time LIMIT ' . $__length . ' OFFSET ' . ($__page * $__length));
-		},
-		'' => function () use ($__db, $__request, $__user) {
+		'search' => function() use ($__db, $__request, $__user, $__offset, $__length, $__fields, $__order_by){
 			return EventsCollection::filter(
 				$__db,
 				$__user,
 				$__request,
-				App::$__FIELDS,
-				array('length' => App::$__LENGTH, 'offset' => App::$__OFFSET),
+				$__fields,
+				array('length' => $__length, 'offset' => $__offset),
+				$__order_by);
+		},
+		'favorites' => function () use ($__db, $__request, $__fields, $__user, $__order_by, $__offset, $__length) { /*MY EVENTS!*/
+			return EventsCollection::filter(
+				$__db,
+				$__user,
+				$__request,
+				$__fields,
+				array('length' => $__length, 'offset' => $__offset),
+				$__order_by);
+		},
+		'dates' => function () use ($__db, $__request,$__fields, $__user, $__offset, $__length) { /*MY EVENTS!*/
+			if (isset($__request['month'])){
+				$__request['month'] = new DateTime($__request['month']);
+			}
+			return EventsDatesCollection::filter(
+				$__db,
+				$__user,
+				$__request,
+				$__fields,
+				array('length' => $__length, 'offset' => $__offset),
+				array());
+		},
+		'' => function () use ($__db, $__request, $__user, $__fields, $__offset, $__length) {
+			return EventsCollection::filter(
+				$__db,
+				$__user,
+				$__request,
+				$__fields,
+				array('length' => $__length, 'offset' => $__offset),
 				array('nearest_event_date', 'first_event_date'));
 		}
 	),
@@ -51,8 +74,8 @@ $__modules['events'] = array(
 		'' => function () use ($__db, $__request, $__user){
 			return $__user->createEvent($__request['payload']);
 		},
-		'favorites' => function () use ($__db, $__request, $__user){
-			$event = new Event($__request['event_id'], $__db);
+		'favorites' => function () use ($__db, $__request, $__user, $__fields){
+			$event = EventsCollection::one($__db, $__user, intval($__request['event_id']));
 			return $__user->addFavoriteEvent($event);
 		},
 	),
@@ -67,10 +90,9 @@ $__modules['events'] = array(
 			}
 		},
 		'{/(id:[0-9]+)}' => function ($id) use ($__db, $__request, $__user) {
-			$event = new Event($id, $__db);
+			$event = EventsCollection::one($__db, $__user, intval($__request['event_id']));
 
 			if (!isset($__request['payload'])) throw new BadMethodCallException('Bad Request');
-
 			if (isset($__request['payload']['organization_id'])){
 				$organization = new Organization($__request['payload']['organization_id'], $__db);
 			}else{
@@ -81,7 +103,7 @@ $__modules['events'] = array(
 	),
 	'DELETE' => array(
 		'{favorites/(id:[0-9]+)}' => function ($id) use ($__db, $__request, $__user){
-			$event = new Event($id, $__db);
+			$event = EventsCollection::one($__db, $__user, intval($id));
 			return $__user->deleteFavoriteEvent($event);
 		},
 	)

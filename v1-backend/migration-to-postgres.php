@@ -2,32 +2,37 @@
 
 	require 'bin/db.php';
 
-	$result = $__db->query('SELECT id, first_event_date, last_event_date, end_time, begin_time,
- 		  (SELECT COUNT(*) FROM events_dates WHERE event_id = events.id AND status = 1) as dates_count
+	$result = $__db->query('SELECT id, event_start_date, event_end_date, end_time, begin_time,
+ 		  (SELECT COUNT(*) FROM events_dates WHERE event_id = events.id AND status = TRUE) as dates_count
  		FROM events');
 	$rows = $result->fetchAll();
 
-	$p_upd_event = $__db->prepare("UPDATE events SET dates_range = :is_range, images_domain = 'http://dn" . (rand(1, 4) . ".evendate.ru/'"));
+	$p_upd_event = $__db->prepare("UPDATE events SET dates_range = :is_range, images_domain = :images_domain WHERE id = :event_id");
 	$p_upd_event_dates = $__db->prepare("UPDATE events_dates SET start_time = :start_time, end_time = :end_time WHERE event_id = :event_id");
 
 	$p_ins_date = $__db->prepare('INSERT INTO events_dates(event_date, event_id, start_time, end_time, status)
 			VALUES(:date, :event_id, :start_time, :end_time, TRUE)');
 
 	foreach($rows as $event){
+		$p_upd_event->execute(array(
+			':is_range' => true,
+			':event_id' => $event['id'],
+			':images_domain' => 'http://dn' . rand(1, 4) . ".evendate.ru/"
+		));
 		if ($event['dates_count'] == 0){
-			$p_upd_event->execute(array(':is_range' => true));
-			$end_date = new DateTime($event['last_event_date']);
+			$end_date = new DateTime($event['event_end_date']);
 			$end_date->add(new DateInterval('P1D'));
 			$period = new DatePeriod(
-				new DateTime($event['first_event_date']),
+				new DateTime($event['event_start_date']),
 				new DateInterval('P1D'),
 				$end_date
 			);
+			$to_ins_dates = array();
 			foreach($period as $date){
 				$to_ins_dates[] = $date->format('Y-m-d');
 			}
-			if (count($event['dates_range']) == 0 && $event['first_event_date'] == $event['last_event_date']){
-				$_date = new DateTime($event['first_event_date']);
+			if ($event['dates_count'] == 0 && $event['event_start_date'] == $event['event_end_date']){
+				$_date = new DateTime($event['event_start_date']);
 				$to_ins_dates[] = $_date->format('Y-m-d');
 			}
 
@@ -35,15 +40,15 @@
 				$p_ins_date->execute(array(
 					':date' => $date,
 					':event_id' => $event['id'],
-					':start_time' => $event['start_time'],
+					':start_time' => $event['begin_time'],
 					':end_time' => $event['end_time'],
 				));
 			}
+		}else{
+			$p_upd_event_dates->execute(array(
+				':start_time' => $event['begin_time'],
+				':end_time' => $event['end_time'],
+				':event_id' => $event['id']
+			));
 		}
-
-		$p_upd_event_dates->execute(array(
-			':start_time' => $event['start_time'],
-			':end_time' => $event['end_time'],
-			':event_id' => $event['id']
-		));
 	}

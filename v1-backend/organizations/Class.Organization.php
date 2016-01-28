@@ -1,7 +1,7 @@
 <?php
 
 
-class Organization {
+class Organization extends AbstractEntity{
 
 
 
@@ -11,7 +11,6 @@ class Organization {
 	const SUBSCRIPTION_ID_FIELD_NAME = 'subscription_id';
 	const IS_SUBSCRIBED_FIELD_NAME = 'is_subscribed';
 
-	protected $id;
 	protected $description;
 	protected $background_medium_img_url;
 	protected $background_small_img_url;
@@ -32,7 +31,10 @@ class Organization {
 	protected $subscribed_count;
 	protected $is_subscribed;
 
-	public static $DEFAULT_COLS = array(
+
+	protected $db;
+
+	protected static $DEFAULT_COLS = array(
 		'id',
 		'name',
 		'type_id',
@@ -44,7 +46,7 @@ class Organization {
 		'organization_type_id',
 		'organization_type_order'
 	);
-	public static $ADDITIONAL_COLS = array(
+	protected static $ADDITIONAL_COLS = array(
 		'description',
 		'background_medium_img_url',
 		'img_medium_url',
@@ -70,7 +72,6 @@ class Organization {
 
 	public function __construct() {
 		$this->db = App::DB();
-		Statistics::Organization($this, App::getCurrentUser(), $this->db, Statistics::ORGANIZATION_VIEW);
 	}
 
 	/**
@@ -123,13 +124,6 @@ class Organization {
 		Statistics::Organization($this, $user, $this->db, Statistics::ORGANIZATION_SUBSCRIBE);
 
 		return new Result(true, 'Подписка успешно оформлена', array('subscription_id' => $sub_id));
-	}
-
-	/**
-	 * @return mixed
-	 */
-	public function getId() {
-		return $this->id;
 	}
 
 	/**
@@ -223,18 +217,8 @@ class Organization {
 		return $this->img_small_url;
 	}
 
-	public function getParams(User $user, array $fields = null) {
-		$result_data = array();
-
-		foreach(self::$DEFAULT_COLS as $field){
-			$result_data[$field] = $this->$field;
-		}
-
-		foreach($fields as $name => $value){
-			if (in_array($name, self::$ADDITIONAL_COLS) || isset(self::$ADDITIONAL_COLS[$name])){
-				$result_data[$name] = $this->$name;
-			}
-		}
+	public function getParams(User $user, array $fields = null) : Result {
+		$result_data = parent::getParams($user, $fields)->getData();
 
 		if (isset($fields[Organization::SUBSCRIBED_FIELD_NAME])){
 			$users_pagination = $fields[Organization::SUBSCRIBED_FIELD_NAME];
@@ -242,7 +226,7 @@ class Organization {
 				$this->db,
 				$user,
 				Fields::parseFields($users_pagination['fields'] ?? ''),
-				$users_pagination)->getData();
+				$users_pagination);
 		}
 
 		$events_field = $fields[Organization::EVENTS_FIELD_NAME] ?? null;
@@ -264,10 +248,10 @@ class Organization {
 			$db,
 			$user,
 			array('organization' => $this),
-			$pagination,
 			$fields,
+			$pagination,
 			array('last_name', 'first_name')
-		);
+		)->getData();
 
 	}
 
@@ -284,7 +268,7 @@ class Organization {
 
 
 	private function isSubscribed(User $user) {
-		$q_get_subscribed = App::$QUERY_FACTORY->newSelect();
+		$q_get_subscribed = App::queryFactory()->newSelect();
 		$q_get_subscribed
 			->cols(array(
 				'id::INT'

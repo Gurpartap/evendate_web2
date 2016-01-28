@@ -64,9 +64,28 @@ class Fields{
 		return $result;
 	}
 
+	public static function appendTableName($table_name, array $fields) : array{
+		foreach($fields as &$field){
+			$field = $table_name . $field;
+		}
+		return $fields;
+	}
+
 	public static function queryJSONDecode($s){
 		$s = str_replace(array('"', "'"), array('\"', '"'), $s);
 		$s = preg_replace('/(\w+):/i', '"\1":', $s);
 		return json_decode($s, true);
+	}
+
+	public static function parseOrderByFields(string $order_by_text, bool $desc = null) : array {
+		$result = array();
+		if ($order_by_text){
+			$result[] = $order_by_text . ($desc ? ' DESC' : '');
+		}
+		return $result;
+	}
+
+	public static function getOrderFields(array $possible){
+		$result = array();
 	}
 }

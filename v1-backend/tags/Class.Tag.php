@@ -1,13 +1,18 @@
 <?php
 
-class Tag{
+class Tag extends AbstractEntity{
 
-	public static $DEFAULT_COLS = array(
+	private $name;
+	private $created_at;
+	private $updated_at;
+	private $events_count;
+
+	protected static $DEFAULT_COLS = array(
 		'id',
 		'name',
 	);
 
-	public static $ADDITIONAL_COLS = array(
+	protected static $ADDITIONAL_COLS = array(
 		'created_at',
 		'updated_at',
 		'events_count'

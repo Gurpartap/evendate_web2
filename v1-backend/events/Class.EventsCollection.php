@@ -2,16 +2,16 @@
 
 require_once 'Class.Event.php';
 
-class EventsCollection{
+class EventsCollection extends AbstractCollection{
 
 	public static function filter(PDO $db,
 	                              User $user,
 	                              array $filters = null,
 	                              array $fields = null,
 	                              array $pagination = null,
-	                              array $order_by = array('id')) {
+	                              array $order_by = array('id')){
 
-		$q_get_events = App::$QUERY_FACTORY->newSelect();
+		$q_get_events = App::queryFactory()->newSelect();
 
 		$q_get_events
 			->distinct()
@@ -25,7 +25,7 @@ class EventsCollection{
 			$q_get_events->limit($pagination['length']);
 		}
 
-		$_fields = Fields::mergeFields(Event::$ADDITIONAL_COLS, $fields, Event::$DEFAULT_COLS);
+		$_fields = Fields::mergeFields(Event::getAdditionalCols(), $fields, Event::getDefaultCols());
 
 		$q_get_events->cols($_fields);
 
@@ -98,77 +98,68 @@ class EventsCollection{
 					break;
 				}
 				case 'future': {
-					$q_get_events .= ' AND (
-					(DATE(NOW()) BETWEEN DATE(events.first_event_date) AND DATE(events.last_event_date))
-					OR
-					(DATE(NOW()) < DATE(events.first_event_date))
-					OR
-					(events.last_event_date IS NULL AND (SELECT COUNT(*) FROM events_dates WHERE events_dates.event_id = events.id AND events_dates.status = 1 AND DATE(event_date) >= DATE(NOW())))
-					)';
-
+					$q_get_events->where("view_events.last_event_date > (SELECT DATE_PART('epoch', TIMESTAMP 'yesterday') :: INT)");
 					break;
 				}
 				case 'favorites': {
-					$q_get_events .= ' AND (events.id IN (
-							SELECT DISTINCT event_id FROM favorite_events WHERE status=1 AND user_id = :user_id
-						))  AND (
-								(DATE(NOW()) BETWEEN DATE(events.first_event_date) AND DATE(events.last_event_date))
-								OR
-								(DATE(NOW()) < DATE(events.first_event_date))
-								OR
-								(events.last_event_date IS NULL AND (SELECT COUNT(*) FROM events_dates WHERE events_dates.event_id = events.id AND events_dates.status = 1 AND DATE(event_date) >= DATE(NOW())))
-							)';
-
+					$q_get_events->where("id IN (SELECT DISTINCT event_id FROM favorite_events WHERE status = TRUE AND user_id = :user_id)");
 					$statement_array[':user_id'] = $user->getId();
 					break;
 				}
 				case 'since_date':{
 					if ($value instanceof DateTime){
-						$value = $value->format('Y-m-d H:i:S');
+						$value = $value->getTimestamp();
 					}elseif($value == null){
 						break;
 					}
-					$q_get_events->where('
-							SELECT COUNT(*)
-							FROM events_dates
-							WHERE
-							DATE(events_dates.event_date) >= DATE(:since_date) > 0
-						 ');
+					$q_get_events->where('first_event_date >= :since_date');
 					$statement_array[':since_date'] = $value;
 					break;
 				}
 				case 'till_date':{
 					if ($value instanceof DateTime){
-						$value = $value->format('Y-m-d');
+						$value = $value->getTimestamp();
 					}elseif($value == null){
 						break;
 					}
-					$q_get_events .= ' AND (
-					(DATE(events.first_event_date) <= DATE(:till_date) OR (DATE(events.last_event_date) <= DATE(:till_date)))
-					OR
-					(SELECT COUNT(*) FROM events_dates WHERE DATE(events_dates.event_date) > DATE(:till_date)) > 0
-					)';
+					$q_get_events->where('last_event_date <= :till_date');
 					$statement_array[':till_date'] = $value;
 					break;
 				}
 				case 'title':{
 					$value = trim($value);
 					if (empty($value)) break;
-					$q_get_events .= ' AND (events.title LIKE :title OR events.description LIKE :title)';
-					$statement_array[':title'] = '%' . $value . '%';
+					if (isset($filters['strict']) && $filters['strict'] == true){
+						$q_get_events->where('LOWER(title) = LOWER(:title)');
+						$statement_array[':title'] = $value;
+					}else{
+						$q_get_events->where('LOWER(title) LIKE LOWER(:title)');
+						$statement_array[':title'] = $value . '%';
+					}
 					break;
 				}
 				case 'description':{
-					$q_get_events .= ' AND (events.description LIKE :description OR events.title LIKE :description)';
-					$statement_array[':description'] = '%' . trim($value) . '%';
+					$value = trim($value);
+					if (isset($filters['strict']) && $filters['strict'] == true){
+						$q_get_events->where('LOWER(description) = LOWER(:description)');
+						$statement_array[':description'] = $value;
+					}else{
+						$q_get_events->where('LOWER(description) LIKE LOWER(:description)');
+						$statement_array[':description'] = '%'. $value . '%';
+					}
 					break;
 				}
-				case 'updated_since':{
-					$q_get_events .= ' AND (events.created_at > :updated_since OR events.updated_at > :updated_since)';
-					$statement_array[':updated_since'] = trim($value);
+				case 'changed_since': {
+					if ($value instanceof DateTime){
+						$value = $value->getTimestamp();
+					}elseif($value == null){
+						break;
+					}
+					$q_get_events->where('updated_at >= :changed_since');
+					$statement_array[':changed_since'] = $value;
 					break;
 				}
-				case 'tags':{
+				case 'tags': {
 					if (is_array($value)){
 						$q_part = array();
 						foreach($value as $key => $tag){
@@ -177,7 +168,7 @@ class EventsCollection{
 							$statement_array[':tag_' . $key] = trim($tag);
 						}
 						if (count($q_part) > 0){
-							$q_get_events .= ' AND (' . implode(' OR ', $q_part). ')';
+							$q_get_events->where('(' . implode(' OR ', $q_part) . ')');
 						}
 						break;
 					}
@@ -198,5 +189,21 @@ class EventsCollection{
 			$result_events[] = $event->getParams($user, $fields)->getData();
 		}
 		return new Result(true, '', $result_events);
+	}
+
+	public static function one(PDO $db,
+	                           User $user,
+	                           int $id,
+	                           array $fields = null) : Event{
+
+		$event = self::filter($db, $user, array('id' => $id), $fields);
+
+		Statistics::Event(
+			$event,
+			$user,
+			$db,
+			Statistics::EVENT_VIEW
+		);
+		return $event;
 	}
 }

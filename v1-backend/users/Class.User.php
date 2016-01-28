@@ -17,6 +17,7 @@ class User extends AbstractUser{
 	protected $notify_in_browser;
 
 	private $editor_instance;
+	private $db;
 
 
 
@@ -24,7 +25,7 @@ class User extends AbstractUser{
 		if ((!isset($_SESSION['id']) || trim($_SESSION['id']) == ''
 			|| !isset($_SESSION['token']) || trim($_SESSION['token']) == '')
 			&& $token == null){
-			throw new LogicException('Пользователь с такими данными не найден');
+			throw new PrivilegesException('Пользователь с такими данными не найден', $db);
 		}
 		if (isset($_SESSION['id'])){
 			$p_get_user = $db->prepare("SELECT users.*, tokens.id AS token_id,
@@ -72,6 +73,10 @@ class User extends AbstractUser{
 
 	public function getId() {
 		return $this->id;
+	}
+
+	protected function getDB() : PDO{
+		return $this->db;
 	}
 
 	public function isEditor(){

@@ -1,23 +1,22 @@
 <?php
 
-class UsersCollection{
+class UsersCollection extends AbstractCollection{
 
-	public static function filter(
-		PDO $db,
-		User $user,
-		array $filters = null,
-		array $pagination = null,
-		array $fields = null,
-		array $order_by = null){
+	public static function filter(PDO $db,
+	                              User $user,
+	                              array $filters = null,
+	                              array $fields = null,
+	                              array $pagination = null,
+	                              array $order_by = array('id')) : Result{
 
 
-		$default_cols = Friend::$DEFAULT_COLS;
+		$default_cols = Friend::getDefaultCols();
 
 		foreach($default_cols as &$col){
 			$col = 'users.'.$col;
 		}
 
-		$q_get_users = App::$QUERY_FACTORY->newSelect();
+		$q_get_users = App::queryFactory()->newSelect();
 
 
 		$q_get_users
@@ -33,7 +32,7 @@ class UsersCollection{
 			$q_get_users->limit($pagination['length']);
 		}
 
-		$_fields = Fields::mergeFields(Friend::$ADDITIONAL_COLS, $fields, $default_cols);
+		$_fields = Fields::mergeFields(Friend::getAdditionalCols(), $fields, $default_cols);
 
 		$q_get_users->cols($_fields);
 

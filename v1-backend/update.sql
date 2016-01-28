@@ -12,10 +12,23 @@ ALTER TABLE public.vk_friends ALTER COLUMN created_at SET DEFAULT CURRENT_TIMEST
 ALTER TABLE public.facebook_friends ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE public.google_friends ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
 
+ALTER TABLE public.events_dates ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE public.hidden_events ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE public.events_tags ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
+
 ALTER TABLE public.events_dates ALTER COLUMN event_date TYPE DATE USING event_date :: DATE;
 ALTER TABLE public.events_dates ADD start_time TIME DEFAULT NULL NULL;
 ALTER TABLE public.events_dates ADD end_time TIME DEFAULT NULL NULL;
+
 ALTER TABLE public.events ADD dates_range BOOLEAN DEFAULT FALSE NOT NULL;
+ALTER TABLE public.events ALTER COLUMN location_uri SET DEFAULT NULL;
+ALTER TABLE public.events ALTER COLUMN event_start_date SET DEFAULT NULL;
+ALTER TABLE public.events ALTER COLUMN notifications_schema_json SET DEFAULT NULL;
+ALTER TABLE public.events ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE public.events ALTER COLUMN event_end_date SET DEFAULT NULL;
+ALTER TABLE public.events ALTER COLUMN event_type_id SET DEFAULT NULL;
+ALTER TABLE public.events ALTER COLUMN begin_time SET DEFAULT NULL;
+ALTER TABLE public.events ALTER COLUMN end_time SET DEFAULT NULL;
 
 ALTER TABLE public.events ADD COLUMN images_domain VARCHAR(50) DEFAULT 'http://evendate.ru/' NULL;
 ALTER TABLE public.organizations ADD COLUMN images_domain VARCHAR(50) DEFAULT 'http://evendate.ru/' NULL;
@@ -71,6 +84,18 @@ SET new_status = (CASE status
                   END);
 ALTER TABLE public.events_tags DROP status;
 ALTER TABLE public.events_tags RENAME COLUMN new_status TO status;
+
+/*Hidden_Events*/
+ALTER TABLE public.hidden_events ADD new_status BOOLEAN DEFAULT TRUE NOT NULL;
+UPDATE public.hidden_events
+SET new_status = (CASE status
+                  WHEN 1
+                    THEN TRUE
+                  WHEN 0
+                    THEN FALSE
+                  END);
+ALTER TABLE public.hidden_events DROP status;
+ALTER TABLE public.hidden_events RENAME COLUMN new_status TO status;
 
 
 /*Events*/
@@ -299,3 +324,15 @@ CREATE VIEW view_tags AS select tags.id, tags.name,
                          FROM tags
   INNER JOIN events_tags ON events_tags.tag_id = tags.id AND events_tags.status = TRUE
 GROUP BY tags.id, events_tags.tag_id;
+
+CREATE VIEW view_dates AS select
+                            events_dates.id,
+  events_dates.event_id,
+                            DATE_PART('epoch', events_dates.event_date) :: INT   AS event_date,
+                            events_dates.start_time,
+                            events_dates.end_time,
+                            organization_id,
+                            DATE_PART('epoch', events_dates.created_at) :: INT                              AS created_at,
+                            DATE_PART('epoch', events_dates.updated_at) :: INT                              AS updated_at
+                         FROM events_dates
+  INNER JOIN events ON events_dates.event_id = events.id AND events_dates.status = TRUE;

@@ -19,16 +19,17 @@ class Result{
 	private $xsd_file_path;
 	private $downloadable;
 	private $is_nude;
+	private $http_code;
+	private $internal_code;
 
 	/*
 	 * */
-	public function __construct($status, $text = '', $data = '', $error_code = 0, $format = 'json', $xsd_file_path = null){
+	public function __construct($status, $text = '', $data = array(), $error_code = 0, $format = 'json'){
 		$this->setStatus($status);
 		$this->setText($text);
 		$this->setErrorCode($error_code);
 		$this->setData($data);
 		$this->setFormat($format);
-		$this->setXMLSchemaFilePath($xsd_file_path);
 	}
 
 	public function setFileName($filename){
@@ -62,17 +63,19 @@ class Result{
 		$this->data[$name] = $value;
 	}
 
-	public function setXMLSchemaFilePath($path){
-		$this->xsd_file_path = $path;
-	}
-
 	public function __toString(){
 		if ($this->format == 'json'){
 			header("Content-Type: application/json");
+			http_response_code($this->http_code ?? 200);
 			if ($this->getNude()){
 				$arr = $this->data;
 			}else{
-				$arr = array('status' => $this->status, 'text' => $this->text, 'data' => $this->data);
+				$arr = array(
+					'status' => $this->status,
+					'text' => $this->text,
+					'code' => $this->internal_code,
+					'data' => $this->data
+				);
 			}
 			$res = json_encode($arr);
 		}else{ // XML response
@@ -137,5 +140,13 @@ class Result{
 	//Only data without any additional status information
 	private function getNude() {
 		return $this->is_nude ? $this->is_nude : false;
+	}
+
+	public function setHttpCode(int $code){
+		$this->http_code = $code;
+	}
+
+	public function setInternalCode(int $internal_code){
+		$this->internal_code = $internal_code;
 	}
 }

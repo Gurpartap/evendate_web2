@@ -187,6 +187,12 @@
       "events_path": "event_images",
       "user_images": "user_images"
     },
+    "mongodb":{
+      "host": "localhost",
+      "user": "",
+      "password": "",
+      "port": 27017
+    },
     "domain": "dev.evendate.org",
     "node_domain": "dev.evendate.org",
     "schema": "http://"
