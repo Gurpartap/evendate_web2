@@ -156,7 +156,6 @@ class User extends AbstractUser{
 	}
 
 	public function updateSettings($__request) {
-		print_r($__request);
 		if (isset($__request['notify-in-browser'])){
 			$this->notify_in_browser = $__request['notify-in-browser'] == 'true' ? 1 : 0;
 		}
@@ -168,12 +167,6 @@ class User extends AbstractUser{
 			notify_in_browser = :notify_in_browser
 			WHERE users.id = :user_id';
 		$p_upd = $this->db->prepare($q_upd);
-
-		print_r(array(
-			':show_to_friends' => $this->show_to_friends,
-			':notify_in_browser' => $this->notify_in_browser,
-			':user_id' => $this->getId()
-		));
 
 		$result = $p_upd->execute(array(
 			':show_to_friends' => $this->show_to_friends,

@@ -126,9 +126,9 @@ class OrganizationsCollection {
 	public static function one(PDO $db,
 	                           User $user,
 	                           int $id,
-	                           array $fields = null){
+	                           array $fields = null) : Organization{
 
-		$organization = self::filter($db, $user, array('id' => $id), $fields);;
+		$organization = self::filter($db, $user, array('id' => $id), $fields);
 		Statistics::Organization(
 			$organization,
 			$user,

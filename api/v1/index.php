@@ -1,8 +1,8 @@
 <?php
 
-use Monolog\Logger;
-use Monolog\Handler\StreamHandler;
-use Monolog\Handler\FirePHPHandler;
+use Monolog\Logger as Logger;
+use Monolog\Handler\StreamHandler as StreamHandler;
+use Monolog\Handler\FirePHPHandler as FirePHPHandler;
 
 
 	if (isset($_SERVER['ENV']) && $_SERVER['ENV'] != 'dev'){
@@ -19,8 +19,10 @@ use Monolog\Handler\FirePHPHandler;
 
 
 function __autoload($class_name) {
+	echo $class_name;
 	global $BACKEND_FULL_PATH;
 	$class_file_name = "{$BACKEND_FULL_PATH}/exceptions/{$class_name}.php";
+	echo $class_file_name;
 	if (file_exists($class_file_name)) {
 		/** @noinspection PhpUndefinedClassInspection */
 		require_once $class_file_name;

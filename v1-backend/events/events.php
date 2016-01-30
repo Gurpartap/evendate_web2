@@ -52,6 +52,14 @@ $__modules['events'] = array(
 			if (isset($__request['month'])){
 				$__request['month'] = new DateTime($__request['month']);
 			}
+			if (isset($__request['organization_id'])){
+				$__request['organization'] = OrganizationsCollection::one(
+					$__db,
+					$__user,
+					intval($__request['organization_id']),
+					array()
+				);
+			}
 			return EventsDatesCollection::filter(
 				$__db,
 				$__user,
@@ -90,7 +98,7 @@ $__modules['events'] = array(
 			}
 		},
 		'{/(id:[0-9]+)}' => function ($id) use ($__db, $__request, $__user) {
-			$event = EventsCollection::one($__db, $__user, intval($__request['event_id']));
+			$event = EventsCollection::one($__db, $__user, intval($id));
 
 			if (!isset($__request['payload'])) throw new BadMethodCallException('Bad Request');
 			if (isset($__request['payload']['organization_id'])){
