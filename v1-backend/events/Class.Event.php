@@ -28,7 +28,6 @@ class Event extends AbstractEntity{
 		'nearest_event_date',
 		'image_vertical_url',
 		'image_horizontal_url',
-		'image_horizontal_url',
 		'organization_id',
 	);
 
@@ -39,14 +38,13 @@ class Event extends AbstractEntity{
 		'creator_id',
 		'latitude',
 		'longitude',
-		'organization_id',
 		'organization_name',
 		'organization_type_name',
 		'organization_short_name',
 		'created_at',
 		'updated_at',
 		'favored_users_count',
-		'is_favorite' => '(SELECT id IS NOT NULL = TRUE
+		self::IS_FAVORITE_COL_NAME => '(SELECT id IS NOT NULL = TRUE
 			FROM favorite_events
 			WHERE favorite_events.status = TRUE
 			AND favorite_events.user_id = :user_id

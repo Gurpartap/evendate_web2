@@ -12,12 +12,18 @@ abstract class AbstractEntity{
 		$result_data = array();
 
 		foreach(static::$DEFAULT_COLS as $field){
-			$result_data[$field] = $this->$field;
+			if (isset($this->$field)){
+				$result_data[$field] = $this->$field;
+			}
 		}
 
 		foreach($fields as $name => $value){
-			if (in_array($name, static::$ADDITIONAL_COLS) || isset(static::$ADDITIONAL_COLS[$name])){
-				$result_data[$name] = $this->$name;
+			if ((in_array($name, static::$ADDITIONAL_COLS) || isset(static::$ADDITIONAL_COLS[$name]))){
+				if (is_numeric($name)){
+					$result_data[$value] = $this->$value;
+				}else{
+					$result_data[$name] = $this->$name;
+				}
 			}
 		}
 
