@@ -13,7 +13,7 @@ $__modules['events'] = array(
 				$__user,
 				intval($id),
 				$__fields);
-			return new Result(true, '', array($event->getParams($__user, $__fields)));
+			return new Result(true, '', array($event->getParams($__user, $__fields)->getData()));
 		},
 		'my' => function () use ($__db, $__request, $__user, $__offset, $__length, $__fields, $__order_by) { /*MY EVENTS!*/
 			return
@@ -60,6 +60,14 @@ $__modules['events'] = array(
 					array()
 				);
 			}
+			if (isset($__request['event_id'])){
+				$__request['event'] = EventsCollection::one(
+					$__db,
+					$__user,
+					intval($__request['event_id']),
+					array()
+				);
+			}
 			return EventsDatesCollection::filter(
 				$__db,
 				$__user,
@@ -86,9 +94,27 @@ $__modules['events'] = array(
 			$event = EventsCollection::one($__db, $__user, intval($__request['event_id']));
 			return $__user->addFavoriteEvent($event);
 		},
+		'{(id:[0-9]+)/notifications}' => function($id) use ($__request, $__db, $__user){
+			$event = new Event($id, $__db);
+			if (!isset($__request['hidden'])) throw new BadMethodCallException('Bad Request');
+			if ($__request['hidden'] == 1){
+				return $event->hide($__user);
+			}else{
+				return $event->show($__user);
+			}
+		},
 	),
 	'PUT' => array(
 		'{(id:[0-9]+)/status}' => function($id) use ($__request, $__db, $__user){
+			$event = new Event($id, $__db);
+			if (!isset($__request['hidden'])) throw new BadMethodCallException('Bad Request');
+			if ($__request['hidden'] == 1){
+				return $event->hide($__user);
+			}else{
+				return $event->show($__user);
+			}
+		},
+		'{(id:[0-9]+)/notifications/(notification_id:[0-9]+)}' => function($id, $notification_id) use ($__request, $__db, $__user){
 			$event = new Event($id, $__db);
 			if (!isset($__request['hidden'])) throw new BadMethodCallException('Bad Request');
 			if ($__request['hidden'] == 1){
@@ -110,9 +136,18 @@ $__modules['events'] = array(
 		}
 	),
 	'DELETE' => array(
-		'{favorites/(id:[0-9]+)}' => function ($id) use ($__db, $__request, $__user){
+		'{(id:[0-9]+)/favorites}' => function ($id) use ($__db, $__request, $__user){
 			$event = EventsCollection::one($__db, $__user, intval($id));
 			return $__user->deleteFavoriteEvent($event);
+		},
+		'{(id:[0-9]+)/notifications/(notification_id:[0-9]+)}' => function($id, $notification_id) use ($__request, $__db, $__user){
+			$event = new Event($id, $__db);
+			if (!isset($__request['hidden'])) throw new BadMethodCallException('Bad Request');
+			if ($__request['hidden'] == 1){
+				return $event->hide($__user);
+			}else{
+				return $event->show($__user);
+			}
 		},
 	)
 );

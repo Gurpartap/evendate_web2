@@ -41,15 +41,15 @@ class EventsCollection extends AbstractCollection{
 				case 'date': {
 					$q_get_events->where('
 					AND ((
-						DATE(events.first_event_date) <= DATE(:date)
+						DATE(view_events.first_event_date) <= DATE(:date)
 							AND
-						DATE(events.last_event_date) >= DATE(:date)
+						DATE(view_events.last_event_date) >= DATE(:date)
 						)
 						OR
 						(
-						DATE(events.first_event_date) = DATE(:date)
+						DATE(view_events.first_event_date) = DATE(:date)
 							AND
-						DATE(events.last_event_date) = DATE(:date)
+						DATE(view_events.last_event_date) = DATE(:date)
 						)
 						OR (:date IN (SELECT events_dates.event_date FROM events_dates WHERE events.id = events_dates.event_id AND status = 1) AND events.first_event_date IS NULL)
 						)');
@@ -69,14 +69,14 @@ class EventsCollection extends AbstractCollection{
 							AND subscriptions.status = TRUE)
 					)
 					OR
-					(events.id
+					(view_events.id
 						IN (SELECT event_id
 							FROM favorite_events
 							WHERE favorite_events.status = TRUE
 							AND favorite_events.user_id = :user_id)
 					))
 					AND
-					(events.id
+					(view_events.id
 						NOT IN (SELECT event_id
 						FROM hidden_events
 						WHERE hidden_events.status = TRUE
@@ -106,7 +106,7 @@ class EventsCollection extends AbstractCollection{
 					$statement_array[':user_id'] = $user->getId();
 					break;
 				}
-				case 'since_date':{
+				case 'since':{
 					if ($value instanceof DateTime){
 						$value = $value->getTimestamp();
 					}elseif($value == null){
@@ -116,7 +116,7 @@ class EventsCollection extends AbstractCollection{
 					$statement_array[':since_date'] = $value;
 					break;
 				}
-				case 'till_date':{
+				case 'till':{
 					if ($value instanceof DateTime){
 						$value = $value->getTimestamp();
 					}elseif($value == null){

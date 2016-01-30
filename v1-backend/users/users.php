@@ -9,6 +9,9 @@ $__modules['users'] = array(
 			return $__user->getFriendsFeed($__page, $__length);
 		},
 		'friends' => function () use ($__user, $__page, $__length, $__request, $__db) {
+			return $__user->getFriends($__page, $__length);
+		},
+		'{/(id:[0-9]+)}' => function ($id) use ($__user, $__page, $__length, $__request, $__db) {
 			if (isset($__request['friend_id'])){
 				if (isset($__request['actions'])){
 					$friend = new Friend($__request['friend_id'], $__user, $__db); // to check is it friend or not

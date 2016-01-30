@@ -336,3 +336,18 @@ CREATE VIEW view_dates AS select
                             DATE_PART('epoch', events_dates.updated_at) :: INT                              AS updated_at
                          FROM events_dates
   INNER JOIN events ON events_dates.event_id = events.id AND events_dates.status = TRUE;
+
+ALTER TABLE public.tokens ADD device_name TEXT DEFAULT NULL NULL;
+
+CREATE VIEW view_devices AS
+  SELECT tokens.id,
+    tokens.token_type,
+    tokens.user_id,
+    tokens.expires_on,
+    tokens.device_token,
+    tokens.client_type,
+    tokens.device_name,
+    DATE_PART('epoch', tokens.created_at) :: INT AS created_at,
+    DATE_PART('epoch', tokens.updated_at) :: INT AS updated_at
+    FROM tokens
+  WHERE DATE_PART('epoch', NOW()) :: INT < tokens.expires_on

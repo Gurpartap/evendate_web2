@@ -288,14 +288,14 @@ function printEventsInTimeline($view, res, filter_date){
 		if (filter_date != null){
 			m_date = moment(filter_date, __C.DATE_FORMAT);
 		}
-		//else if (value.event_start_date == null){
+		//else if (value.first_event_date == null){
 		//	m_date = moment(value.dates_range[0]);
-		//} else if (moment(value.event_start_date).unix() < moment().unix() && filter_date == null){
+		//} else if (moment(value.first_event_date).unix() < moment().unix() && filter_date == null){
 		//	m_date = moment();
-		//}else if (moment(value.event_start_date).unix() < moment().unix() && filter_date != null){
+		//}else if (moment(value.first_event_date).unix() < moment().unix() && filter_date != null){
 		//	m_date = moment(filter_date, __C.DATE_FORMAT);
 		//}else{
-		//	m_date = moment(value.event_start_date);
+		//	m_date = moment(value.first_event_date);
 		//}
 		else{
 			m_date = moment(value.nearest_event_date);

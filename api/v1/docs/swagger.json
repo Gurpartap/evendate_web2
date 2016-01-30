@@ -4,7 +4,6 @@
     "description": "First version of Evendate API. Just take it and use.",
     "version": "1.0.0",
     "title": "Evendate API",
-    "termsOfService": "http://swagger.io/terms/",
     "contact": {
       "email": "api@evendate.ru"
     }
@@ -185,7 +184,7 @@
         }
       }
     },
-    "/organizations/subscriptions/{Id}": {
+    "/organizations/{Id}/subscriptions": {
       "delete": {
         "tags": [
           "Organization"
@@ -198,7 +197,7 @@
         ],
         "parameters": [
           {
-            "in": "query",
+            "in": "path",
             "name": "Id",
             "description": "ID of organization user wants to delete",
             "required": true,
@@ -265,7 +264,7 @@
         ],
         "parameters": [
           {
-            "in": "query",
+            "in": "path",
             "name": "Id",
             "description": "ID of tag",
             "required": true,
@@ -347,7 +346,7 @@
           },
           {
             "in": "query",
-            "name": "since_date",
+            "name": "since",
             "description": "events since date",
             "required": false,
             "type": "string",
@@ -373,7 +372,7 @@
           },
           {
             "in": "query",
-            "name": "till_date",
+            "name": "since",
             "description": "events till date",
             "required": false,
             "type": "string",
@@ -442,7 +441,7 @@
           },
           {
             "in": "query",
-            "name": "since_date",
+            "name": "since",
             "description": "events since date",
             "required": false,
             "type": "string",
@@ -468,7 +467,7 @@
           },
           {
             "in": "query",
-            "name": "till_date",
+            "name": "since",
             "description": "events till date",
             "required": false,
             "type": "string",
@@ -506,7 +505,6 @@
         }
       }
     },
-
     "/events/dates": {
       "post": {
         "tags": [
@@ -514,33 +512,64 @@
         ],
         "summary": "Create new event",
         "description": "",
-        "operationId": "addEvent",
-        "consumes": [
-          "application/json"
-        ],
+        "operationId": "getEventsDates",
         "produces": [
           "application/json"
         ],
         "parameters": [
           {
-            "name": "additionalMetadata",
-            "in": "formData",
-            "description": "Additional data to pass to server",
+            "name": "month",
+            "in": "query",
+            "description": "Get all dates in one month. Format: YYYY-MM",
             "required": false,
             "type": "string"
           },
           {
-            "name": "file",
-            "in": "formData",
-            "description": "file to upload",
+            "name": "since",
+            "in": "query",
+            "description": "Filter all dates since date.",
             "required": false,
-            "type": "file"
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "name": "till",
+            "in": "query",
+            "description": "Filter all dates till date.",
+            "required": false,
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "name": "event_id",
+            "in": "query",
+            "description": "Returns all dates for one event.",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "unique",
+            "in": "query",
+            "description": "[WARN!] Changes behavior. If equals TRUE dates can contain two additional fields: `events_count` and `favorites_count` otherwise can't. Main use case: filter by month and set to true to get all days in month with events and favorites.",
+            "required": false,
+            "type": "string",
+            "enum": ["true", "false"]
+          },
+          {
+            "name": "organization_id",
+            "in": "query",
+            "description": "Returns all dates for one organization.",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
           }
         ],
         "responses": {
           "200": {
             "description": "successful operation",
-            "schema": {
+            "type": "array",
+            "items": {
               "$ref": "#/definitions/ApiResponse"
             }
           }
@@ -560,7 +589,7 @@
         ],
         "parameters": [
           {
-            "in": "query",
+            "in": "path",
             "name": "Id",
             "description": "Event ID",
             "required": true,
@@ -583,7 +612,7 @@
         ],
         "summary": "Change event",
         "description": "",
-        "operationId": "addEvent",
+        "operationId": "updateEvent",
         "consumes": [
           "application/json"
         ],
@@ -611,7 +640,6 @@
         }
       }
     },
-
     "/events/{Id}/status": {
       "put": {
         "tags": [
@@ -639,7 +667,8 @@
             "in": "path",
             "description": "Event ID",
             "required": true,
-            "type": "file"
+            "type": "integer",
+            "format": "int64"
           }
         ],
         "responses": {
@@ -657,36 +686,28 @@
         "tags": [
           "Event"
         ],
-        "summary": "Create new event",
+        "summary": "Get all notifications for event[doing]",
         "description": "",
-        "operationId": "addEvent",
-        "consumes": [
-          "application/json"
-        ],
+        "operationId": "getEventNotifications",
         "produces": [
           "application/json"
         ],
         "parameters": [
           {
-            "name": "additionalMetadata",
-            "in": "formData",
-            "description": "Additional data to pass to server",
-            "required": false,
-            "type": "string"
-          },
-          {
-            "name": "file",
-            "in": "formData",
-            "description": "file to upload",
-            "required": false,
-            "type": "file"
+            "name": "Id",
+            "in": "path",
+            "description": "Event ID",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
           }
         ],
         "responses": {
           "200": {
             "description": "successful operation",
-            "schema": {
-              "$ref": "#/definitions/ApiResponse"
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/Notification"
             }
           }
         }
@@ -695,9 +716,9 @@
         "tags": [
           "Event"
         ],
-        "summary": "Create new event",
+        "summary": "Create new notification for event",
         "description": "",
-        "operationId": "addEvent",
+        "operationId": "addNotification",
         "consumes": [
           "application/json"
         ],
@@ -706,18 +727,22 @@
         ],
         "parameters": [
           {
-            "name": "additionalMetadata",
-            "in": "formData",
-            "description": "Additional data to pass to server",
+            "name": "notifications",
+            "in": "body",
+            "description": "Add new user notifications for event",
             "required": false,
-            "type": "string"
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/Notification"
+            }
           },
           {
-            "name": "file",
-            "in": "formData",
-            "description": "file to upload",
+            "name": "Id",
+            "in": "path",
+            "description": "Event ID",
             "required": false,
-            "type": "file"
+            "type": "integer",
+            "format": "int64"
           }
         ],
         "responses": {
@@ -731,13 +756,13 @@
       }
     },
     "/events/{Id}/notifications/{notificationId}": {
-      "delete": {
+      "put": {
         "tags": [
           "Event"
         ],
-        "summary": "Create new event",
+        "summary": "Update one specified user notification for event",
         "description": "",
-        "operationId": "addEvent",
+        "operationId": "updateNotification",
         "consumes": [
           "application/json"
         ],
@@ -746,18 +771,66 @@
         ],
         "parameters": [
           {
-            "name": "additionalMetadata",
-            "in": "formData",
-            "description": "Additional data to pass to server",
-            "required": false,
-            "type": "string"
+            "name": "body",
+            "in": "body",
+            "description": "New notification information",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Notification"
+            }
           },
           {
-            "name": "file",
-            "in": "formData",
-            "description": "file to upload",
-            "required": false,
-            "type": "file"
+            "name": "Id",
+            "in": "path",
+            "description": "Event ID",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "notificationId",
+            "in": "path",
+            "description": "Notification ID",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Event"
+        ],
+        "summary": "Remove (mute) one specified user notification for event",
+        "description": "",
+        "operationId": "deleteNotification",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "Event ID",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "notificationId",
+            "in": "path",
+            "description": "Notification ID",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
           }
         ],
         "responses": {
@@ -800,7 +873,7 @@
           },
           {
             "in": "query",
-            "name": "since_date",
+            "name": "since",
             "description": "events since date",
             "required": false,
             "type": "string",
@@ -826,7 +899,7 @@
           },
           {
             "in": "query",
-            "name": "till_date",
+            "name": "since",
             "description": "events till date",
             "required": false,
             "type": "string",
@@ -890,7 +963,7 @@
         }
       }
     },
-    "/events/favorites/{Id}": {
+    "/events/{Id}/favorites": {
       "delete": {
         "tags": [
           "Event"
@@ -966,125 +1039,77 @@
         "tags": [
           "User"
         ],
-        "summary": "Returns list of actions (feed) by friends",
+        "summary": "Returns friends' list of actions (feed)",
         "description": "",
         "operationId": "getFriendsFeed",
         "produces": [
           "application/json"
         ],
         "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "description": "List of user object",
-            "required": true,
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/User"
-              }
-            }
-          }
         ],
         "responses": {
-          "default": {
-            "description": "successful operation"
+          "200": {
+            "description": "successful operation",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/User"
+            }
           }
         }
       }
     },
-    "/users/friends/{Id}/actions": {
-      "post": {
+    "/users/friends/": {
+      "get": {
         "tags": [
-          "user"
+          "User"
         ],
-        "summary": "Creates list of users with given input array",
+        "summary": "Returns list of friends for current user",
         "description": "",
-        "operationId": "createUsersWithListInput",
+        "operationId": "getFriends",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        }
+      }
+    },
+    "/users/{Id}/": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Returns list of actions for one specified friend",
+        "description": "",
+        "operationId": "getFriendActions",
         "produces": [
           "application/json"
         ],
         "parameters": [
           {
-            "in": "body",
-            "name": "body",
-            "description": "List of user object",
+            "in": "path",
+            "name": "Id",
+            "description": "Friends ID",
             "required": true,
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/User"
-              }
-            }
+            "type": "integer",
+            "format": "int64"
           }
         ],
         "responses": {
-          "default": {
-            "description": "successful operation"
-          }
-        }
-      }
-    },
-    "/users/friends/{Id}/subscriptions": {
-      "post": {
-        "tags": [
-          "user"
-        ],
-        "summary": "Creates list of users with given input array",
-        "description": "",
-        "operationId": "createUsersWithListInput",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "description": "List of user object",
-            "required": true,
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/User"
-              }
+          "200": {
+            "description": "successful operation",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/User"
             }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "successful operation"
-          }
-        }
-      }
-    },
-    "/users/friends/{Id}/friends": {
-      "post": {
-        "tags": [
-          "user"
-        ],
-        "summary": "Creates list of users with given input array",
-        "description": "",
-        "operationId": "createUsersWithListInput",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "description": "List of user object",
-            "required": true,
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/User"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "successful operation"
           }
         }
       }
@@ -1092,30 +1117,15 @@
     "/users/me": {
       "get": {
         "tags": [
-          "user"
+          "User"
         ],
-        "summary": "Logs user into the system",
+        "summary": "Returns information about current user",
         "description": "",
         "operationId": "loginUser",
         "produces": [
           "application/json"
         ],
-        "parameters": [
-          {
-            "name": "username",
-            "in": "query",
-            "description": "The user name for login",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "password",
-            "in": "query",
-            "description": "The password for login in clear text",
-            "required": true,
-            "type": "string"
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "successful operation",
@@ -1141,30 +1151,38 @@
         }
       }
     },
-    "/users/me/device": {
-      "get": {
+    "/users/me/devices": {
+      "put": {
         "tags": [
-          "user"
+          "User"
         ],
-        "summary": "Logs user into the system",
+        "summary": "Updates user token and set's device type for token",
         "description": "",
-        "operationId": "loginUser",
+        "operationId": "updateDevice",
         "produces": [
           "application/json"
         ],
         "parameters": [
           {
-            "name": "username",
+            "name": "device_token",
             "in": "query",
-            "description": "The user name for login",
+            "description": "Device ID (socket id or push server id)",
             "required": true,
             "type": "string"
           },
           {
-            "name": "password",
+            "name": "client_type",
             "in": "query",
-            "description": "The password for login in clear text",
+            "description": "Type of client token is assigned",
             "required": true,
+            "type": "string",
+            "enum": ["browser", "ios", "android"]
+          },
+          {
+            "name": "device_name",
+            "in": "query",
+            "description": "Name for device (currently not showing to user)",
+            "required": false,
             "type": "string"
           }
         ],
@@ -1172,23 +1190,29 @@
           "200": {
             "description": "successful operation",
             "schema": {
-              "type": "string"
-            },
-            "headers": {
-              "X-Rate-Limit": {
-                "type": "integer",
-                "format": "int32",
-                "description": "calls per hour allowed by the user"
-              },
-              "X-Expires-After": {
-                "type": "string",
-                "format": "date-time",
-                "description": "date in UTC when token expires"
-              }
+              "$ref": "#/definitions/ApiResponse"
             }
-          },
-          "400": {
-            "description": "Invalid username/password supplied"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Get list of user's devices",
+        "description": "",
+        "operationId": "getUserDevices",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/Device"
+            }
           }
         }
       }
@@ -1328,6 +1352,18 @@
         },
         "[link]": {
           "type": "string"
+        },
+        "[actions]": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Action"
+          }
+        },
+        "[subscriptions]": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Organization"
+          }
         }
       }
     },
@@ -1350,6 +1386,35 @@
           "format": "int64"
         },
         "events_count": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "Notification": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "user_id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "event_id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "notification_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "created_at": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "updated_at": {
           "type": "integer",
           "format": "int64"
         }
@@ -1427,7 +1492,8 @@
       "properties": {
         "id": {
           "type": "integer",
-          "format": "int64"
+          "format": "int64",
+          "required": true
         },
         "title": {
           "type": "string"
@@ -1601,10 +1667,36 @@
       "properties": {
 
       }
+    },
+    "Device": {
+      "type": "object",
+      "properties": {
+        "device_token": {
+          "type": "string"
+        },
+        "client_type": {
+          "type": "string"
+        },
+        "[device_name]": {
+          "type": "string"
+        },
+        "[created_at]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[updated_at]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[expires_on]": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
     }
   },
   "externalDocs": {
-    "description": "Find out more about Evendate",
-    "url": "http://evendate.ru/api/docs"
+    "description": "Find out more about authorization flow, API requests and responses",
+    "url": "https://github.com/KardanovIR/evendate_web2/wiki/API"
   }
 }
