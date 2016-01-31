@@ -143,7 +143,7 @@ try {
 	$_result->setDownloadable(App::$RESPONSE_DOWNLOAD);
 	$_result->setNude(App::$RESPONSE_NUDE);
 
-	if ($_SERVER['ENV'] == 'local' && isset($e)){
+	if (($_SERVER['ENV'] == 'local' || $_SERVER['ENV'] == 'test') && isset($e)){
 		print_r($e);
 	}
 }

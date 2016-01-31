@@ -64,7 +64,7 @@
     "schema": "http://"
   },
   "test":{
-    "google":{
+    "google": {
       "web": {
         "client_id": "403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv.apps.googleusercontent.com",
         "auth_uri": "https://accounts.google.com/o/oauth2/auth",
@@ -81,12 +81,12 @@
     },
     "db": {
       "host": "localhost",
-      "user": "root",
-      "password": "H5VkcPwhN436f9eJ",
+      "user": "postgres",
+      "password": "APASSWORD",
       "database": "evendate",
-      "port": 3306
+      "port": 5432
     },
-    "VK":{
+    "VK": {
       "APP_ID": 5029623,
       "SECURE_KEY": "gCfYONn6zlmdQZzu8Z6G",
       "redirect_uri": ""
@@ -123,8 +123,14 @@
       "events_path": "event_images",
       "user_images": "user_images"
     },
-    "domain": "5.101.124.61",
-    "node_domain": "5.101.124.61",
+    "mongodb":{
+      "host": "localhost",
+      "user": "",
+      "password": "",
+      "port": 27017
+    },
+    "domain": "test.evendate.org",
+    "node_domain": "test.evendate.org",
     "schema": "http://"
   },
   "local":{
