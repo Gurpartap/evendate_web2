@@ -3,7 +3,6 @@
     require_once 'v1-backend/bin/Class.Result.php';
     require_once 'v1-backend/users/Class.AbstractUser.php';
     require_once 'v1-backend/users/Class.User.php';
-    require_once 'v1-backend/tags/Class.TagsCollection.php';
     try{
         $user = new User($__db);
         $add_event_btn_hidden = $user->isEditor() ? '' : 'hidden';
