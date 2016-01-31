@@ -7,7 +7,7 @@ class UsersCollection extends AbstractCollection{
 	                              array $filters = null,
 	                              array $fields = null,
 	                              array $pagination = null,
-	                              array $order_by = array('id')) : Result{
+	                              array $order_by = array('id')){
 
 
 		$default_cols = Friend::getDefaultCols();
@@ -62,10 +62,18 @@ class UsersCollection extends AbstractCollection{
 					break;
 				}
 				case 'id': {
-
+					$q_get_users->where('id = :id');
+					$statement_array[':id'] = $value;
+					$is_one_user = true;
+					break;
 				}
-				case 'friends': {
-
+				case 'user': {
+					if ($value instanceof User){
+						$q_get_users
+							->where('view_friends.user_id IS NOT NULL');
+						$statement_array[':user_id'] = $value->getId();
+					}
+					break;
 				}
 			}
 		}
@@ -87,6 +95,9 @@ class UsersCollection extends AbstractCollection{
 
 	}
 
+	public static function one(PDO $db, User $user, int $id, array $fields = null) : Friend {
+		return parent::one($db, $user, $id, $fields);
+	}
 
 
 }

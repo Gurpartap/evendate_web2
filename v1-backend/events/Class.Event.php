@@ -44,17 +44,18 @@ class Event extends AbstractEntity{
 		'created_at',
 		'updated_at',
 		'favored_users_count',
-		self::IS_FAVORITE_COL_NAME => '(SELECT id IS NOT NULL = TRUE
+		self::IS_FAVORITE_FIELD_NAME => '(SELECT id IS NOT NULL = TRUE
 			FROM favorite_events
 			WHERE favorite_events.status = TRUE
 			AND favorite_events.user_id = :user_id
 			AND favorite_events.event_id = view_events.id) AS is_favorite'
 	);
 
-	const IS_FAVORITE_COL_NAME = 'is_favorite';
-	const TAGS_COL_NAME = 'tags';
-	const DATES_COL_NAME = 'dates';
-	const FAVORED_USERS_COL_NAME = 'favored';
+	const IS_FAVORITE_FIELD_NAME = 'is_favorite';
+	const TAGS_FIELD_NAME = 'tags';
+	const DATES_FIELD_NAME = 'dates';
+	const FAVORED_USERS_FIELD_NAME = 'favored';
+	const NOTIFICATIONS_FIELD_NAME = 'notifications';
 	const CAN_EDIT = 'can_edit';
 
 	protected $title;
@@ -432,24 +433,49 @@ class Event extends AbstractEntity{
 		return $this->organization;
 	}
 
+	public function getNotifications(User $user, array $fields = null) : Result{
+		return NotificationsCollection::filter($this->db,
+			$user,
+			array('event' => $this),
+			$fields,
+			array(
+				'length' => $fields[self::NOTIFICATIONS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+				'offset' => $fields[self::NOTIFICATIONS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
+			),
+			$fields[self::NOTIFICATIONS_FIELD_NAME]['order_by'] ?? array()
+		);
+	}
+
 	public function getParams(User $user, array $fields = null) : Result{
+
 
 		$result_data = parent::getParams($user, $fields)->getData();
 
-		if (isset($fields[Event::DATES_COL_NAME])){
-			$result_data[Event::DATES_COL_NAME] = $this->getDates()->getData();
+		if (isset($fields[self::DATES_FIELD_NAME])){
+			$result_data[self::DATES_FIELD_NAME] = $this->getDates()->getData();
 		}
 
-		if (isset($fields[Event::FAVORED_USERS_COL_NAME])){
-			$_fields[] = Event::FAVORED_USERS_COL_NAME;
+		if (isset($fields[self::FAVORED_USERS_FIELD_NAME])){
+			$_fields[] = self::FAVORED_USERS_FIELD_NAME;
 		}
 
-		if (isset($fields[Event::TAGS_COL_NAME])){
-			$result_data[] = TagsCollection::filter($this->db,
+		if (isset($fields[self::TAGS_FIELD_NAME])){
+			$result_data[self::TAGS_FIELD_NAME] = TagsCollection::filter($this->db,
+				$user,
 				array('event' => $this),
-				$fields[Event::TAGS_COL_NAME]['fields'] ?? array(),
-				$fields[Event::TAGS_COL_NAME]['order_by'] ?? array());
+				Fields::parseFields($fields[self::TAGS_FIELD_NAME]['fields']) ?? array(),
+				array(
+					'length' => $fields[self::TAGS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+					'offset' => $fields[self::TAGS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
+				),
+				$fields[self::TAGS_FIELD_NAME]['order_by'] ?? array())->getData();
 		}
+
+		if (isset($fields[self::NOTIFICATIONS_FIELD_NAME])){
+			$result_data[self::NOTIFICATIONS_FIELD_NAME] = $this->getNotifications($user,
+				Fields::parseFields($fields[self::NOTIFICATIONS_FIELD_NAME]['fields'] ?? ''))->getData();
+		}
+
 		if (isset($fields[Event::CAN_EDIT])){
 //			$result_data[] = $this->;
 		}
@@ -567,5 +593,27 @@ class Event extends AbstractEntity{
 
 		self::saveNotifications($this->getId(), $data, $this->db);
 		return new Result(true, 'Событие успешно сохранено!', array('event_id' => $this->getId()));
+	}
+
+	public function addNotification(User $user, array $notification) {
+		$time = new DateTime($notification['notification_time']);
+		if ($time <= new DateTime()) throw new InvalidArgumentException('BAD_NOTIFICATION_TIME');
+		$q_ins_notification = App::queryFactory()->newInsert();
+		$q_ins_notification
+			->into('users_notifications')
+			->cols(array(
+				'user_id' => $user->getId(),
+				'event_id' => $this->getId(),
+				'notification_time' => $time->format('Y-m-d H:i:s'),
+				'status' => 'true',
+				'done' => 'false',
+				'sent_time' => null
+			))
+			->returning(array('uuid'));
+		$p_ins = $this->db->prepare($q_ins_notification->getStatement());
+		$result = $p_ins->execute($q_ins_notification->getBindValues());
+		if ($result === FALSE) throw new DBQueryException('', $this->db);
+		$result = $p_ins->fetch(PDO::FETCH_ASSOC);
+		return new Result(true, 'Уведомление успешно добавлено', $result);
 	}
 }

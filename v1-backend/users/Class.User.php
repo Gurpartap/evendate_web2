@@ -113,7 +113,7 @@ class User extends AbstractUser{
 
 	public function addFavoriteEvent(Event $event){
 		$q_ins_favorite = 'INSERT INTO favorite_events(user_id, event_id, status, created_at)
-			VALUES (:user_id, :event_id, 1, NOW())
+			VALUES (:user_id, :event_id, TRUE, NOW())
 			ON DUPLICATE KEY UPDATE status = TRUE';
 		$p_ins_favorite = $this->db->prepare($q_ins_favorite);
 		$result = $p_ins_favorite->execute(array(
@@ -237,48 +237,6 @@ class User extends AbstractUser{
 
 	public function getTokenId() {
 		return $this->token_id;
-	}
-
-	public function getFriends($page, $length, Friend $user_friend = null) {
-
-//		return new Result(true, '', array());
-
-		if ($user_friend instanceof Friend){
-			$friend_part = ' AND view_friends.friend_id = :friend_id';
-			$data = array(':friend_id' => $user_friend->getId());
-		}else{
-			$friend_part = '';
-			$data = array();
-		}
-
-		$q_get_friends = 'SELECT users.first_name, users.last_name, users.avatar_url,
-			users.id::int,
- 			view_friends.friend_uid, view_friends.type
- 			FROM view_friends
-			 INNER JOIN users ON users.id = view_friends.friend_id
-			WHERE user_id = :user_id
-			AND view_friends.friend_id != :user_id
-			 ' . $friend_part . '
-			GROUP BY friend_id
-			ORDER BY last_name, first_name
-			LIMIT ' . $length . ' OFFSET ' . ($page * $length);
-
-		$p_get_friends = $this->db->prepare($q_get_friends);
-		$data = array_merge($data, array(
-			':user_id' => $this->getId()
-		));
-		$result = $p_get_friends->execute($data);
-
-
-		if ($result === FALSE) throw new DBQueryException('', $this->db);
-
-		$friends = $p_get_friends->fetchAll();
-
-		foreach($friends as &$friend){
-			$friend['link'] = User::getLinkToSocialNetwork($friend['type'], $friend['friend_uid']);
-		}
-
-		return new Result(true, '', $friends);
 	}
 
 	public function getFriendsFeed($page, $length, Friend $friend_user = null) {

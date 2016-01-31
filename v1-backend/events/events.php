@@ -4,9 +4,21 @@ require_once $BACKEND_FULL_PATH . '/events/Class.Event.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.EventsCollection.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.EventDate.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.EventsDatesCollection.php';
+require_once $BACKEND_FULL_PATH . '/tags/Class.Tag.php';
+require_once $BACKEND_FULL_PATH . '/tags/Class.TagsCollection.php';
+require_once $BACKEND_FULL_PATH . '/events/Class.Notification.php';
+require_once $BACKEND_FULL_PATH . '/events/Class.NotificationsCollection.php';
 
 $__modules['events'] = array(
 	'GET' => array(
+		'{{/(id:[0-9]+)}/notifications}' => function ($id) use ($__db, $__request, $__user, $__fields) {
+			$event = EventsCollection::one(
+				$__db,
+				$__user,
+				intval($id),
+				$__fields);
+			return new Result(true, '', array($event->getNotifications($__user, $__fields)->getData()));
+		},
 		'{{/(id:[0-9]+)}}' => function ($id) use ($__db, $__request, $__user, $__fields) {
 			$event = EventsCollection::one(
 				$__db,
@@ -87,21 +99,21 @@ $__modules['events'] = array(
 		}
 	),
 	'POST' => array(
-		'' => function () use ($__db, $__request, $__user){
-			return $__user->createEvent($__request['payload']);
+		'{{/(id:[0-9]+)}/notifications}' => function ($id) use ($__db, $__request, $__user, $__fields) {
+			$event = EventsCollection::one(
+				$__db,
+				$__user,
+				intval($id),
+				$__fields);
+
+			return $event->addNotification($__user, $__request);
 		},
 		'favorites' => function () use ($__db, $__request, $__user, $__fields){
 			$event = EventsCollection::one($__db, $__user, intval($__request['event_id']));
 			return $__user->addFavoriteEvent($event);
 		},
-		'{(id:[0-9]+)/notifications}' => function($id) use ($__request, $__db, $__user){
-			$event = new Event($id, $__db);
-			if (!isset($__request['hidden'])) throw new BadMethodCallException('Bad Request');
-			if ($__request['hidden'] == 1){
-				return $event->hide($__user);
-			}else{
-				return $event->show($__user);
-			}
+		'' => function () use ($__db, $__request, $__user){
+			return $__user->createEvent($__request['payload']);
 		},
 	),
 	'PUT' => array(
@@ -114,14 +126,15 @@ $__modules['events'] = array(
 				return $event->show($__user);
 			}
 		},
-		'{(id:[0-9]+)/notifications/(notification_id:[0-9]+)}' => function($id, $notification_id) use ($__request, $__db, $__user){
-			$event = new Event($id, $__db);
-			if (!isset($__request['hidden'])) throw new BadMethodCallException('Bad Request');
-			if ($__request['hidden'] == 1){
-				return $event->hide($__user);
-			}else{
-				return $event->show($__user);
-			}
+		'{/(id:[0-9]+)/notifications/(uuid:\w+-\w+-\w+-\w+-\w+)}' => function($id, $notification_uuid) use ($__request, $__fields, $__db, $__user){
+
+			$notification = NotificationsCollection::oneByUUID(
+				$__db,
+				$__user,
+				$notification_uuid,
+				$__fields
+			);
+			return $notification->update($__db, $__request);
 		},
 		'{/(id:[0-9]+)}' => function ($id) use ($__db, $__request, $__user) {
 			$event = EventsCollection::one($__db, $__user, intval($id));
@@ -136,18 +149,18 @@ $__modules['events'] = array(
 		}
 	),
 	'DELETE' => array(
+		'{/(id:[0-9]+)/notifications/(uuid:\w+-\w+-\w+-\w+-\w+)}' => function($id, $notification_uuid) use ($__db, $__fields, $__user){
+			$notification = NotificationsCollection::oneByUUID(
+				$__db,
+				$__user,
+				$notification_uuid,
+				$__fields
+			);
+			return $notification->delete($__db);
+		},
 		'{(id:[0-9]+)/favorites}' => function ($id) use ($__db, $__request, $__user){
 			$event = EventsCollection::one($__db, $__user, intval($id));
 			return $__user->deleteFavoriteEvent($event);
-		},
-		'{(id:[0-9]+)/notifications/(notification_id:[0-9]+)}' => function($id, $notification_id) use ($__request, $__db, $__user){
-			$event = new Event($id, $__db);
-			if (!isset($__request['hidden'])) throw new BadMethodCallException('Bad Request');
-			if ($__request['hidden'] == 1){
-				return $event->hide($__user);
-			}else{
-				return $event->show($__user);
-			}
-		},
+		}
 	)
 );

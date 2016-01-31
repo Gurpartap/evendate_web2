@@ -61,6 +61,10 @@ class Fields{
 				$prev = $field;
 			}
 		}
+		$result['pagination'] = array(
+			$result['length'] ?? App::DEFAULT_LENGTH,
+			$result['offset'] ?? App::DEFAULT_OFFSET,
+		);
 		return $result;
 	}
 

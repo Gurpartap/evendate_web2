@@ -2,10 +2,10 @@
 
 class Tag extends AbstractEntity{
 
-	private $name;
-	private $created_at;
-	private $updated_at;
-	private $events_count;
+	protected $name;
+	protected $created_at;
+	protected $updated_at;
+	protected $events_count;
 
 	protected static $DEFAULT_COLS = array(
 		'id',
