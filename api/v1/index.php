@@ -18,16 +18,6 @@ use Monolog\Handler\FirePHPHandler as FirePHPHandler;
 
 
 
-require_once "{$BACKEND_FULL_PATH}/exceptions/AbstractException.php";
-require_once "{$BACKEND_FULL_PATH}/exceptions/BadArgumentException.php";
-require_once "{$BACKEND_FULL_PATH}/exceptions/DataFormatException.php";
-require_once "{$BACKEND_FULL_PATH}/exceptions/DBQueryException.php";
-require_once "{$BACKEND_FULL_PATH}/exceptions/FileNotFoundException.php";
-require_once "{$BACKEND_FULL_PATH}/exceptions/InvalidFileException.php";
-require_once "{$BACKEND_FULL_PATH}/exceptions/NoMethodException.php";
-require_once "{$BACKEND_FULL_PATH}/exceptions/PrivilegesException.php";
-
-
 try {
 
 	$request_time = time();
