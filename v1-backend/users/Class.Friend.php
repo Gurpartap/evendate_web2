@@ -33,8 +33,23 @@ class Friend extends AbstractEntity{
 	private $user;
 
 	const SUBSCRIPTIONS_FIELD_NAME = 'subscriptions';
+	const ACTIONS_FIELD_NAME = 'actions';
 
-	public function getSubscriptions($with_user_info = false){
+	public function getSubscriptions(array $fields,
+	                                 array $pagination,
+	                                 array $order_by){
+		$subscriptions = OrganizationsCollection::filter(
+			App::DB(),
+			App::getCurrentUser(),
+			array(
+				'friend' => $this
+			), $fields,
+			$pagination,
+			$order_by);
+		return $subscriptions;
+	}
+
+	public function getActions(){
 		$subscriptions = OrganizationsCollection::filter(
 			$this->db,
 			$this->user,
@@ -42,19 +57,6 @@ class Friend extends AbstractEntity{
 				'friend' => $this
 			), '', ' LIMIT 10');
 
-		if ($with_user_info){
-			return new Result(true, '', array(
-				'subscriptions' => $subscriptions->getData(),
-				'user' => array(
-					'id' => $this->id,
-					'first_name' => $this->first_name,
-					'last_name' => $this->last_name,
-					'link' => $this->link,
-					'type' => $this->type,
-					'avatar_url' => $this->avatar_url,
-				)
-			));
-		}
 		return $subscriptions;
 	}
 
@@ -62,7 +64,19 @@ class Friend extends AbstractEntity{
 		$result_data = parent::getParams($user, $fields)->getData();
 
 		if (isset($fields[self::SUBSCRIPTIONS_FIELD_NAME])){
-			$result_data[self::SUBSCRIPTIONS_FIELD_NAME] = $this->getSubscriptions()->getData();
+			$result_data[self::SUBSCRIPTIONS_FIELD_NAME] =
+				$this->getSubscriptions(
+					$fields[self::SUBSCRIPTIONS_FIELD_NAME]['fields'] ?? array(),
+					array(
+						'length' => $fields[self::SUBSCRIPTIONS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+						'offset' => $fields[self::SUBSCRIPTIONS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET,
+					),
+					$fields[self::SUBSCRIPTIONS_FIELD_NAME]['order_by'] ?? array()
+				)->getData();
+		}
+
+		if (isset($fields[self::ACTIONS_FIELD_NAME])){
+			$result_data[self::ACTIONS_FIELD_NAME] = $this->getActions()->getData();
 		}
 
 		return new Result(true, '', $result_data);

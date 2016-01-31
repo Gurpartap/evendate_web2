@@ -16,7 +16,6 @@ class OrganizationsCollection {
 		$statement_array = array();
 		$_friend = null;
 		$return_one = isset($filters['id']);
-		$class_name = 'Organization';
 		$cols = Fields::mergeFields(Organization::getAdditionalCols(), $fields, Organization::getDefaultCols());
 		$select = APP::queryFactory()->newSelect();
 
@@ -71,18 +70,17 @@ class OrganizationsCollection {
 							AND "subscriptions"."status" = TRUE
 							AND user_id = :user_id) = TRUE');
 					$statement_array[':user_id'] = $user->getId();
-					$class_name = 'Subscription';
 					break;
 				}
 				case 'friend': {
 					if ($value instanceof Friend) {
-						$user = $value;
 						$select->where('(SELECT
 							id IS NOT NULL = TRUE AS is_subscribed
 							FROM subscriptions
 							WHERE organization_id = "view_organizations"."id"
 								AND "subscriptions"."status" = TRUE
 								AND user_id = :user_id) = TRUE');
+						$statement_array[':user_id'] = $value->getId();
 					}
 					break;
 				}
@@ -110,7 +108,7 @@ class OrganizationsCollection {
 		$p_search = $db->prepare($select->getStatement());
 		$p_search->execute($statement_array);
 
-		$organizations = $p_search->fetchAll(PDO::FETCH_CLASS, $class_name);
+		$organizations = $p_search->fetchAll(PDO::FETCH_CLASS, 'Organization');
 
 		if ($return_one) return $organizations[0];
 

@@ -1,8 +1,13 @@
 <?php
 
-class TagsCollection{
+class TagsCollection extends AbstractCollection{
 
-	public static function filter(PDO $db, array $filters = null, array $fields = null, array $order_by = null){
+	public static function filter(PDO $db,
+	                              User $user,
+	                              array $filters = null,
+	                              array $fields = null,
+	                              array $pagination = null,
+	                              array $order_by = array('id')){
 
 		$q_get_tags = App::queryFactory()->newSelect();
 		$statements = array();
@@ -11,9 +16,16 @@ class TagsCollection{
 		$q_get_tags->distinct()
 			->cols(Fields::mergeFields(Tag::getAdditionalCols(), $fields, Tag::getDefaultCols()))
 			->from('view_tags')
-			->limit(App::$__LENGTH)
-			->orderBy($order_by)
-			->offset(App::$__OFFSET);
+			->orderBy($order_by);
+
+
+		if (isset($pagination['offset'])){
+			$q_get_tags->offset($pagination['offset']);
+		}
+
+		if (isset($pagination['length'])){
+			$q_get_tags->limit($pagination['length']);
+		}
 
 		foreach ($filters as $name => $value) {
 			switch ($name) {
@@ -35,7 +47,7 @@ class TagsCollection{
 				}
 				case 'event': {
 					if ($value instanceof Event){
-						$q_get_tags->where('events.id = :event_id)');
+						$q_get_tags->where('id IN (SELECT tag_id FROM events_tags WHERE event_id = :event_id AND status = TRUE)');
 						$statements[':event_id'] = $value->getId();
 						break;
 					}
@@ -48,11 +60,10 @@ class TagsCollection{
 		if (count($tags) == 0 && $is_one_tag) throw new LogicException('CANT_FIND_TAG');
 		$result_events = array();
 		foreach($tags as $tag){
-			$result_events[] = $tag->getParams($fields)->getData();
+			$result_events[] = $tag->getParams($user, $fields)->getData();
 		}
 		return new Result(true, '', $result_events);
 	}
-
 
 	private static function mb_ucfirst($str) {
 		$str = mb_strtolower($str);
@@ -75,10 +86,6 @@ class TagsCollection{
 		}else{
 			$tag_id = intval($tags[0]['id']);
 		}
-		return self::one($db, $tag_id);
-	}
-
-	public static function one(PDO $db, int $id) : Tag{
-		return self::filter($db, array('id' => $id));
+		return self::one($db, App::getCurrentUser(), $tag_id);
 	}
 }

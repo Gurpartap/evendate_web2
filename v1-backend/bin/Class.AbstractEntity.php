@@ -12,7 +12,7 @@ abstract class AbstractEntity{
 		$result_data = array();
 
 		foreach(static::$DEFAULT_COLS as $field){
-			if (isset($this->$field)){
+			if (property_exists($this, $field)){
 				$result_data[$field] = $this->$field;
 			}
 		}

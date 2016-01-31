@@ -18,17 +18,15 @@ use Monolog\Handler\FirePHPHandler as FirePHPHandler;
 
 
 
-function __autoload($class_name) {
-	echo $class_name;
-	global $BACKEND_FULL_PATH;
-	$class_file_name = "{$BACKEND_FULL_PATH}/exceptions/{$class_name}.php";
-	echo $class_file_name;
-	if (file_exists($class_file_name)) {
-		/** @noinspection PhpUndefinedClassInspection */
-		require_once $class_file_name;
-		return;
-	}
-}
+require_once "{$BACKEND_FULL_PATH}/exceptions/AbstractException.php";
+require_once "{$BACKEND_FULL_PATH}/exceptions/BadArgumentException.php";
+require_once "{$BACKEND_FULL_PATH}/exceptions/DataFormatException.php";
+require_once "{$BACKEND_FULL_PATH}/exceptions/DBQueryException.php";
+require_once "{$BACKEND_FULL_PATH}/exceptions/FileNotFoundException.php";
+require_once "{$BACKEND_FULL_PATH}/exceptions/InvalidFileException.php";
+require_once "{$BACKEND_FULL_PATH}/exceptions/NoMethodException.php";
+require_once "{$BACKEND_FULL_PATH}/exceptions/PrivilegesException.php";
+
 
 try {
 
@@ -69,27 +67,30 @@ try {
 			$_args[] = $act[$i];
 		}
 	}
-	$_result = '';
 
+	$_result = null;
 	$_request_method = $_SERVER['REQUEST_METHOD'];
-
 	$_http_code = 200;
 	$_internal_code = 200;
+	$_error_name = null;
+	$_function_called = false;
 
 	$__page    = App::$__PAGE;
 	$__length  = App::$__LENGTH;
 	$__offset  = App::$__OFFSET;
 	$__order_by  = App::$__ORDER_BY;
+	$__pagination  = array('length' => $__length, 'offset' => $__offset);
 	$__modules = array();
 
 	require_once "{$BACKEND_FULL_PATH}/{$_class_name}/{$_class_name}.php";
 
 	if (isset($__modules[$_class_name]) && isset($__modules[$_class_name][$_request_method]) && isset($__modules[$_class_name][$_request_method][$_method_name])) {
 		$_result = call_user_func_array($__modules[$_class_name][$_request_method][$_method_name], $_args);
+		$_function_called = true;
 	}else{
 		if (isset($__modules[$_class_name]) && $__modules[$_class_name][$_request_method]){
 			foreach ($__modules[$_class_name][$_request_method] as $key => $function){
-                if (!empty($_result)) break;
+                if ($_result != null) break;
 				if (preg_match('/{.*?}.*?/', $key)){ // is regexp
 					$pattern = preg_replace('#\((.*?):(.*?)\)#', '(?<$1>$2)', $key); // change names to PHP RegExp named groups format
 					$pattern = str_replace(array('{', '}'), '', $pattern); //remove {}
@@ -102,6 +103,7 @@ try {
 								array_unshift($_args, $match[0]);
 							}
 						}
+						$_function_called = true;
 						$_result = call_user_func_array($function, $_args);
 					}
 				}
@@ -112,32 +114,37 @@ try {
 }catch(AbstractException $ae){
 	$_http_code = $ae->getHttpCode();
 	$_internal_code = $ae->getInternalCode();
-	$e = $ae;
+	$_error_name = $ae->getMessage();
 }catch(InvalidArgumentException $iae){
 	$_http_code = BadArgumentException::HTTP_CODE;
 	$_internal_code = BadArgumentException::ERROR_CODE;
-	$e = $iae;
+	$_error_name = $iae->getMessage();
 }catch(BadMethodCallException $bmce){
 	$_http_code = BadArgumentException::HTTP_CODE;
 	$_internal_code = BadArgumentException::ERROR_CODE;
-	$e = $bmce;
+	$_error_name = $bmce->getMessage();
 }catch(Exception $e){
 	$_http_code = AbstractException::HTTP_CODE;
 	$_internal_code = AbstractException::ERROR_CODE;
+	$_error_name = $e->getMessage();
 }finally{
-	if ($_SERVER['ENV'] == 'local' && isset($e)){
-		print_r($e);
-	}
 
 	if (!isset($_result) || $_result instanceof Result == false){
-		$_result = new Result(false, 'Сервер не вернул никаких данных');
-		$_http_code = 404;
-		$_internal_code = 10404;
+		if (!$_function_called){
+			$_http_code = 404;
+			$_internal_code = 10404;
+			$_error_name = 'BAD_REQUEST:NOT_IMPLEMENTED';
+		}
+		$_result = new Result(false, $_error_name);
 	}
 	$_result->setHttpCode($_http_code);
 	$_result->setInternalCode($_internal_code);
 	$_result->setFormat(App::$RESPONSE_FORMAT);
 	$_result->setDownloadable(App::$RESPONSE_DOWNLOAD);
 	$_result->setNude(App::$RESPONSE_NUDE);
+
+	if (($_SERVER['ENV'] == 'local' || $_SERVER['ENV'] == 'test') && isset($e)){
+		print_r($e);
+	}
 }
 echo $_result;

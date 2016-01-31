@@ -10,6 +10,7 @@ class Organization extends AbstractEntity{
 	const EVENTS_FIELD_NAME = 'events';
 	const SUBSCRIPTION_ID_FIELD_NAME = 'subscription_id';
 	const IS_SUBSCRIBED_FIELD_NAME = 'is_subscribed';
+	const NEW_EVENTS_COUNT_FIELD_NAME = 'new_events_count';
 
 	protected $description;
 	protected $background_medium_img_url;

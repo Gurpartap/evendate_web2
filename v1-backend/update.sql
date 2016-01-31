@@ -122,6 +122,30 @@ SET new_status = (CASE status
 ALTER TABLE public.events_dates DROP status;
 ALTER TABLE public.events_dates RENAME COLUMN new_status TO status;
 
+/*Event Notifications*/
+ALTER TABLE public.events_notifications ADD new_status BOOLEAN DEFAULT TRUE NOT NULL;
+UPDATE public.events_notifications
+SET new_status = (CASE status
+                  WHEN 1
+                    THEN TRUE
+                  WHEN 0
+                    THEN FALSE
+                  END);
+ALTER TABLE public.events_notifications DROP status;
+ALTER TABLE public.events_notifications RENAME COLUMN new_status TO status;
+
+/*Event Notifications DONE*/
+ALTER TABLE public.events_notifications ADD new_done BOOLEAN DEFAULT TRUE NOT NULL;
+UPDATE public.events_notifications
+SET new_done = (CASE done
+                  WHEN 1
+                    THEN TRUE
+                  WHEN 0
+                    THEN FALSE
+                  END);
+ALTER TABLE public.events_notifications DROP done;
+ALTER TABLE public.events_notifications RENAME COLUMN new_done TO done;
+
 /*VIEW*/
 CREATE VIEW view_organizations AS
   SELECT DISTINCT
@@ -336,3 +360,71 @@ CREATE VIEW view_dates AS select
                             DATE_PART('epoch', events_dates.updated_at) :: INT                              AS updated_at
                          FROM events_dates
   INNER JOIN events ON events_dates.event_id = events.id AND events_dates.status = TRUE;
+
+ALTER TABLE public.tokens ADD device_name TEXT DEFAULT NULL NULL;
+
+CREATE VIEW view_devices AS
+  SELECT tokens.id,
+    tokens.token_type,
+    tokens.user_id,
+    tokens.expires_on,
+    tokens.device_token,
+    tokens.client_type,
+    tokens.device_name,
+    DATE_PART('epoch', tokens.created_at) :: INT AS created_at,
+    DATE_PART('epoch', tokens.updated_at) :: INT AS updated_at
+    FROM tokens
+  WHERE DATE_PART('epoch', NOW()) :: INT < tokens.expires_on;
+
+DROP TABLE users_notifications;
+DROP view view_notifications;
+
+
+CREATE EXTENSION "uuid-ossp";
+
+CREATE TABLE public.users_notifications
+(
+  id SERIAL PRIMARY KEY NOT NULL,
+  user_id INT NOT NULL,
+  event_id INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  notification_time TIMESTAMP NOT NULL,
+  status BOOLEAN DEFAULT TRUE,
+  done BOOLEAN DEFAULT FALSE,
+  sent_time TIMESTAMP DEFAULT NULL ,
+  uuid TEXT UNIQUE NOT NULL DEFAULT uuid_generate_v4(),
+  CONSTRAINT users_notifications_events_id_fk FOREIGN KEY (event_id) REFERENCES events (id),
+  CONSTRAINT users_notifications_users_id_fk FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+CREATE VIEW view_notifications AS
+  SELECT
+    users_notifications.uuid,
+    users_notifications.user_id,
+    users_notifications.event_id,
+    DATE_PART('epoch', users_notifications.notification_time) :: INT AS notification_time,
+    users_notifications.status,
+    nt1.id as notification_type_id,
+    'notification-custom' as notification_type,
+    users_notifications.done,
+    DATE_PART('epoch', users_notifications.sent_time) :: INT AS sent_time,
+    users_notifications.created_at,
+    users_notifications.updated_at
+FROM users_notifications
+    INNER JOIN notification_types nt1 ON nt1.type = 'notification-custom'
+UNION
+    SELECT
+      null as uuid,
+      null as user_id,
+      events_notifications.event_id,
+      DATE_PART('epoch', events_notifications.notification_time) :: INT AS notification_time,
+      events_notifications.status,
+      events_notifications.notification_type_id,
+      nt2.type as notification_type,
+      events_notifications.done,
+      null as sent_time,
+      events_notifications.created_at,
+      events_notifications.updated_at
+      FROM events_notifications
+      INNER JOIN notification_types nt2 ON events_notifications.notification_type_id = nt2.id;

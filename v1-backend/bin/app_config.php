@@ -106,7 +106,7 @@ class App {
 		self::$__DB = $db;
 		self::$__IP = $__ip = $_SERVER['REMOTE_ADDR'] ?: ($_SERVER['HTTP_X_FORWARDED_FOR'] ?: $_SERVER['HTTP_CLIENT_IP']);;
 
-		self::$QUERY_FACTORY = new QueryFactory('pgsql', QueryFactory::COMMON);
+		self::$QUERY_FACTORY = new QueryFactory('pgsql');
 	}
 
 	static function getCurrentUser() : User {
