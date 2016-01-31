@@ -108,8 +108,8 @@ $__modules['events'] = array(
 
 			return $event->addNotification($__user, $__request);
 		},
-		'favorites' => function () use ($__db, $__request, $__user, $__fields){
-			$event = EventsCollection::one($__db, $__user, intval($__request['event_id']));
+		'{{/(id:[0-9]+)}/favorites}' => function ($id) use ($__db, $__request, $__user, $__fields){
+			$event = EventsCollection::one($__db, $__user, intval($id));
 			return $__user->addFavoriteEvent($event);
 		},
 		'' => function () use ($__db, $__request, $__user){
