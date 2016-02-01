@@ -555,10 +555,10 @@ pg.connect(pg_conn_string, function(err, client, done) {
 									q_ins_sign_in = 'UPDATE facebook_sign_in' +
 										' SET uid = $1, ' +
 										' access_token = $2, ' +
-										' expires_in = $3, ' +
+										' expires_in = $3 ' +
 										' WHERE user_id = $4';
 									ins_data = [data.user_info.id,
-										data.oauth_data.access_token,
+										data.user_info.access_token,
 										data.access_data.expires_in,
 										user.id];
 								}else{
@@ -571,7 +571,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 										' expires_in = $7, ' +
 										' user_id = $8';
 									ins_data = [data.user_info.id,
-										data.oauth_data.access_token,
+										data.user_info.access_token,
 										data.access_data.expires_in,
 										user.id,
 										data.user_info.id,
@@ -600,6 +600,8 @@ pg.connect(pg_conn_string, function(err, client, done) {
 								});
 							};
 
+						console.log(q_ins_sign_in);
+						console.log(ins_data);
 
 						client.query(q_ins_sign_in, ins_data, function(sign_in_err) {
 							if (sign_in_err) return handleError({name: 'CANT_INSERT_SIGN_IN_INFO', err: sign_in_err});
