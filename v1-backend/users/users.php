@@ -12,8 +12,15 @@ $__modules['users'] = array(
 		'settings' => function () use ($__user) {
 			return $__user->getSettings();
 		},
-		'feed' => function () use ($__user, $__page, $__length, $__request) {
-			return $__user->getFriendsFeed($__page, $__length);
+		'feed' => function () use ($__user, $__db, $__order_by, $__fields, $__pagination) {
+			return ActionsCollection::filter(
+				$__db,
+				$__user,
+				array('user' => $__user),
+				$__fields,
+				$__pagination,
+				$__order_by
+			);
 		},
 		'friends' => function () use ($__user, $__request, $__fields, $__pagination, $__order_by, $__db) {
 			return UsersCollection::filter(
@@ -25,13 +32,27 @@ $__modules['users'] = array(
 				$__order_by
 			);
 		},
+		'{/(id:[0-9]+)/actions}' => function ($id) use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
+
+			return ActionsCollection::filter(
+				$__db,
+				$__user,
+				array_merge($__request, array('friend' => UsersCollection::one(
+					$__db,
+					$__user,
+					intval($id),
+					array()
+				))),
+				$__fields,
+				$__pagination,
+				$__order_by);
+		},
 		'{/(id:[0-9]+)}' => function ($id) use ($__user, $__fields, $__db) {
-			$friend = UsersCollection::one(
+			return UsersCollection::one(
 				$__db,
 				$__user,
 				$id,
-				array());
-			return $friend->getParams($__user, $__fields);
+				array())->getParams($__user, $__fields);
 		},
 		'{me/devices}' => function () use ($__user, $__request, $__db, $__fields, $__pagination, $__order_by) {
 			return DevicesCollection::filter($__db, $__user, $__request, $__fields,

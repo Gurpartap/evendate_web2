@@ -3,7 +3,6 @@
 class Device extends AbstractEntity{
 
 	protected static $DEFAULT_COLS = array(
-		'id',
 		'device_token',
 		'client_type'
 	);

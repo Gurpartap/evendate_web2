@@ -1,13 +1,13 @@
 <?php
 
-require_once $BACKEND_FULL_PATH . '/events/Class.Event.php';
-require_once $BACKEND_FULL_PATH . '/events/Class.EventsCollection.php';
-require_once $BACKEND_FULL_PATH . '/events/Class.EventDate.php';
-require_once $BACKEND_FULL_PATH . '/events/Class.EventsDatesCollection.php';
-require_once $BACKEND_FULL_PATH . '/tags/Class.Tag.php';
-require_once $BACKEND_FULL_PATH . '/tags/Class.TagsCollection.php';
-require_once $BACKEND_FULL_PATH . '/events/Class.Notification.php';
-require_once $BACKEND_FULL_PATH . '/events/Class.NotificationsCollection.php';
+	require_once $BACKEND_FULL_PATH . '/events/Class.Event.php';
+	require_once $BACKEND_FULL_PATH . '/events/Class.EventsCollection.php';
+	require_once $BACKEND_FULL_PATH . '/events/Class.EventDate.php';
+	require_once $BACKEND_FULL_PATH . '/events/Class.EventsDatesCollection.php';
+	require_once $BACKEND_FULL_PATH . '/tags/Class.Tag.php';
+	require_once $BACKEND_FULL_PATH . '/tags/Class.TagsCollection.php';
+	require_once $BACKEND_FULL_PATH . '/events/Class.Notification.php';
+	require_once $BACKEND_FULL_PATH . '/events/Class.NotificationsCollection.php';
 
 $__modules['events'] = array(
 	'GET' => array(

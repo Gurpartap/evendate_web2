@@ -43,10 +43,6 @@ class Fields{
 		}
 	}
 
-	public static function getEchoFields(array $possible, array $fields, array $append_to){
-
-	}
-
 	public static function parseFields(string $fields) : array{
 		// regexp from
 		// http://stackoverflow.com/questions/15233953/php-split-string-on-comma-but-not-when-between-braces-or-quotes

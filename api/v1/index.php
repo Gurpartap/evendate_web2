@@ -5,7 +5,9 @@ use Monolog\Handler\StreamHandler as StreamHandler;
 use Monolog\Handler\FirePHPHandler as FirePHPHandler;
 
 
-	if (isset($_SERVER['ENV']) && $_SERVER['ENV'] != 'dev'){
+$_function_called = false;
+
+	if (isset($_SERVER['ENV']) && ($_SERVER['ENV'] != 'dev' || $_SERVER['ENV'] != 'test')){
 		ini_set("display_errors", 1);
 		error_reporting(E_ALL);
 	}
@@ -63,7 +65,6 @@ try {
 	$_http_code = 200;
 	$_internal_code = 200;
 	$_error_name = null;
-	$_function_called = false;
 
 	$__page    = App::$__PAGE;
 	$__length  = App::$__LENGTH;

@@ -138,11 +138,11 @@ ALTER TABLE public.events_notifications RENAME COLUMN new_status TO status;
 ALTER TABLE public.events_notifications ADD new_done BOOLEAN DEFAULT TRUE NOT NULL;
 UPDATE public.events_notifications
 SET new_done = (CASE done
-                  WHEN 1
-                    THEN TRUE
-                  WHEN 0
-                    THEN FALSE
-                  END);
+                WHEN 1
+                  THEN TRUE
+                WHEN 0
+                  THEN FALSE
+                END);
 ALTER TABLE public.events_notifications DROP done;
 ALTER TABLE public.events_notifications RENAME COLUMN new_done TO done;
 
@@ -315,14 +315,14 @@ CREATE VIEW view_events AS
     organizations.name                                                        AS organization_name,
     organization_types.name                                                   AS organization_type_name,
     organizations.short_name                                                  AS organization_short_name,
-    (SELECT DATE_PART('epoch', MIN(events_dates.event_date))::INT
+    (SELECT DATE_PART('epoch', MIN(events_dates.event_date)) :: INT
      FROM events_dates
      WHERE event_id = events.id AND events_dates.event_date > NOW() AND events_dates.status =
                                                                         TRUE) AS nearest_event_date,
-    (SELECT DATE_PART('epoch', MIN(events_dates.event_date))::INT
+    (SELECT DATE_PART('epoch', MIN(events_dates.event_date)) :: INT
      FROM events_dates
      WHERE event_id = events.id AND events_dates.status = TRUE)               AS first_event_date,
-    (SELECT DATE_PART('epoch', MAX(events_dates.event_date))::INT
+    (SELECT DATE_PART('epoch', MAX(events_dates.event_date)) :: INT
      FROM events_dates
      WHERE event_id = events.id AND events_dates.status = TRUE)               AS last_event_date,
     DATE_PART('epoch', events.created_at) :: INT                              AS created_at,
@@ -340,31 +340,37 @@ CREATE VIEW view_events AS
         AND events.status = TRUE;
 
 
-CREATE VIEW view_tags AS select tags.id, tags.name,
-  count (events_tags.tag_id) AS events_count,
-                           DATE_PART('epoch', tags.created_at) :: INT                              AS created_at,
-                                                    DATE_PART('epoch', tags.updated_at) :: INT                              AS updated_at
+CREATE VIEW view_tags AS
+  SELECT
+    tags.id,
+    tags.name,
+    count(events_tags.tag_id)                  AS events_count,
+    DATE_PART('epoch', tags.created_at) :: INT AS created_at,
+    DATE_PART('epoch', tags.updated_at) :: INT AS updated_at
 
-                         FROM tags
-  INNER JOIN events_tags ON events_tags.tag_id = tags.id AND events_tags.status = TRUE
-GROUP BY tags.id, events_tags.tag_id;
+  FROM tags
+    INNER JOIN events_tags ON events_tags.tag_id = tags.id AND events_tags.status = TRUE
+  GROUP BY tags.id, events_tags.tag_id;
 
-CREATE VIEW view_dates AS select
-                            events_dates.id,
-  events_dates.event_id,
-                            DATE_PART('epoch', events_dates.event_date) :: INT   AS event_date,
-                            events_dates.start_time,
-                            events_dates.end_time,
-                            organization_id,
-                            DATE_PART('epoch', events_dates.created_at) :: INT                              AS created_at,
-                            DATE_PART('epoch', events_dates.updated_at) :: INT                              AS updated_at
-                         FROM events_dates
-  INNER JOIN events ON events_dates.event_id = events.id AND events_dates.status = TRUE;
+CREATE VIEW view_dates AS
+  SELECT
+    events_dates.id,
+    events_dates.event_id,
+    DATE_PART('epoch', events_dates.event_date) :: INT AS event_date,
+    events_dates.start_time,
+    events_dates.end_time,
+    organization_id,
+    DATE_PART('epoch', events_dates.created_at) :: INT AS created_at,
+    DATE_PART('epoch', events_dates.updated_at) :: INT AS updated_at
+  FROM events_dates
+    INNER JOIN events ON events_dates.event_id = events.id AND events_dates.status = TRUE;
 
 ALTER TABLE public.tokens ADD device_name TEXT DEFAULT NULL NULL;
 
 CREATE VIEW view_devices AS
-  SELECT tokens.id,
+  SELECT
+    tokens.id,
+    uuid,
     tokens.token_type,
     tokens.user_id,
     tokens.expires_on,
@@ -373,27 +379,27 @@ CREATE VIEW view_devices AS
     tokens.device_name,
     DATE_PART('epoch', tokens.created_at) :: INT AS created_at,
     DATE_PART('epoch', tokens.updated_at) :: INT AS updated_at
-    FROM tokens
+  FROM tokens
   WHERE DATE_PART('epoch', NOW()) :: INT < tokens.expires_on;
 
 DROP TABLE users_notifications;
-DROP view view_notifications;
+DROP VIEW view_notifications;
 
 
 CREATE EXTENSION "uuid-ossp";
 
 CREATE TABLE public.users_notifications
 (
-  id SERIAL PRIMARY KEY NOT NULL,
-  user_id INT NOT NULL,
-  event_id INT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  notification_time TIMESTAMP NOT NULL,
-  status BOOLEAN DEFAULT TRUE,
-  done BOOLEAN DEFAULT FALSE,
-  sent_time TIMESTAMP DEFAULT NULL ,
-  uuid TEXT UNIQUE NOT NULL DEFAULT uuid_generate_v4(),
+  id                SERIAL PRIMARY KEY NOT NULL,
+  user_id           INT                NOT NULL,
+  event_id          INT                NOT NULL,
+  created_at        TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP,
+  updated_at        TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP,
+  notification_time TIMESTAMP          NOT NULL,
+  status            BOOLEAN                     DEFAULT TRUE,
+  done              BOOLEAN                     DEFAULT FALSE,
+  sent_time         TIMESTAMP                   DEFAULT NULL,
+  uuid              TEXT UNIQUE        NOT NULL DEFAULT uuid_generate_v4(),
   CONSTRAINT users_notifications_events_id_fk FOREIGN KEY (event_id) REFERENCES events (id),
   CONSTRAINT users_notifications_users_id_fk FOREIGN KEY (user_id) REFERENCES users (id)
 );
@@ -405,26 +411,61 @@ CREATE VIEW view_notifications AS
     users_notifications.event_id,
     DATE_PART('epoch', users_notifications.notification_time) :: INT AS notification_time,
     users_notifications.status,
-    nt1.id as notification_type_id,
-    'notification-custom' as notification_type,
+    nt1.id                                                           AS notification_type_id,
+    'notification-custom'                                            AS notification_type,
     users_notifications.done,
-    DATE_PART('epoch', users_notifications.sent_time) :: INT AS sent_time,
+    DATE_PART('epoch', users_notifications.sent_time) :: INT         AS sent_time,
     users_notifications.created_at,
     users_notifications.updated_at
-FROM users_notifications
+  FROM users_notifications
     INNER JOIN notification_types nt1 ON nt1.type = 'notification-custom'
-UNION
-    SELECT
-      null as uuid,
-      null as user_id,
-      events_notifications.event_id,
-      DATE_PART('epoch', events_notifications.notification_time) :: INT AS notification_time,
-      events_notifications.status,
-      events_notifications.notification_type_id,
-      nt2.type as notification_type,
-      events_notifications.done,
-      null as sent_time,
-      events_notifications.created_at,
-      events_notifications.updated_at
-      FROM events_notifications
-      INNER JOIN notification_types nt2 ON events_notifications.notification_type_id = nt2.id;
+  UNION
+  SELECT
+    NULL                                                              AS uuid,
+    NULL                                                              AS user_id,
+    events_notifications.event_id,
+    DATE_PART('epoch', events_notifications.notification_time) :: INT AS notification_time,
+    events_notifications.status,
+    events_notifications.notification_type_id,
+    nt2.type                                                          AS notification_type,
+    events_notifications.done,
+    NULL                                                              AS sent_time,
+    events_notifications.created_at,
+    events_notifications.updated_at
+  FROM events_notifications
+    INNER JOIN notification_types nt2 ON events_notifications.notification_type_id = nt2.id;
+
+
+CREATE VIEW view_actions AS SELECT
+                              stat_events.stat_type_id,
+                              stat_events.event_id,
+                              stat_event_types.name,
+                              stat_event_types.entity,
+                              stat_event_types.type_code,
+                              tokens.user_id,
+                              NULL                                              AS organization_id,
+                              DATE_PART('epoch', stat_events.created_at) :: INT AS created_at
+                            FROM stat_events
+                              INNER JOIN stat_event_types ON stat_event_types.id = stat_events.stat_type_id
+                              INNER JOIN tokens ON tokens.id = stat_events.token_id
+                              INNER JOIN view_events ON view_events.id = stat_events.event_id
+                            WHERE
+                              view_events.status = TRUE
+
+                            UNION
+
+                            SELECT
+                              stat_organizations.stat_type_id,
+                              NULL                                                     AS event_id,
+                              stat_event_types.name,
+                              stat_event_types.entity,
+                              stat_event_types.type_code,
+                              tokens.user_id,
+                              stat_organizations.organization_id                       AS organization_id,
+                              DATE_PART('epoch', stat_organizations.created_at) :: INT AS created_at
+                            FROM stat_organizations
+                              INNER JOIN stat_event_types ON stat_event_types.id = stat_organizations.stat_type_id
+                              INNER JOIN tokens ON tokens.id = stat_organizations.token_id
+                              INNER JOIN view_organizations ON view_organizations.id = stat_organizations.organization_id
+                            WHERE
+                              view_organizations.status = TRUE;

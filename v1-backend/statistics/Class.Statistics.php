@@ -70,7 +70,6 @@
 			));
 		}
 
-
 		public static function StoreBatch(array $events, User $user = null, PDO $db){
 			foreach ($events as $event){
 				switch($event['entity_type']){

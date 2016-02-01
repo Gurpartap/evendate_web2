@@ -7,7 +7,7 @@ abstract class AbstractCollection{
 	                                       array $filters = null,
 	                                       array $fields = null,
 	                                       array $pagination = null,
-	                                       array $order_by = array('id'));
+	                                       array $order_by = array('created_at'));
 
 
 	public static function one(PDO $db,

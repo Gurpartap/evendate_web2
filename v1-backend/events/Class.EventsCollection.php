@@ -182,7 +182,7 @@ class EventsCollection extends AbstractCollection{
 		if ($result === FALSE) throw new DBQueryException(implode(';', $db->errorInfo()), $db);
 
 		$events = $p_get_events->fetchAll(PDO::FETCH_CLASS, 'Event');
-		if (count($events) == 0 && $is_one_event) throw new LogicException('CANT_FIND_EVENT');
+		if (count($events) == 0 && $is_one_event) throw new LogicException('CANT_FIND_EVENT:' . $filters['id']);
 		$result_events = array();
 		if ($is_one_event) return $events[0];
 		foreach($events as $event){

@@ -36,14 +36,6 @@ class EventsDatesCollection extends AbstractCollection{
 		$cols = $_fields;
 		$statement_array = array();
 
-		if (isset($pagination['offset'])){
-			$q_get_dates->offset($pagination['offset']);
-		}
-
-		if (isset($pagination['length'])){
-			$q_get_dates->limit($pagination['length']);
-		}
-
 		 foreach($filters as $name => $value){
 			 switch($name){
 				 case 'month': {

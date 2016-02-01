@@ -5,19 +5,74 @@ class Action extends AbstractEntity{
 	protected $created_at;
 	protected $stat_type_id;
 	protected $type_code;
-	protected $user;
+	protected $event_id;
+	protected $organization_id;
+	protected $user_id;
+
+	const EVENT_FIELD_NAME = Statistics::ENTITY_EVENT;
+	const ORGANIZATION_FIELD_NAME = Statistics::ENTITY_ORGANIZATION;
+	const USER_FIELD_NAME = 'user';
 
 	protected static $DEFAULT_COLS = array(
-		'entity',
-		'created_at',
 		'stat_type_id',
-		'type_code'
+		'organization_id',
+		'event_id',
+		'user_id',
+		'entity'
 	);
 
 	protected static $ADDITIONAL_COLS = array(
-		'type',
-		'is_friend' => 'view_friends.user_id IS NOT NULL AS is_friend',
-		'blurred_image_url',
+		'name',
+		'type_code',
+		'created_at'
 	);
+
+	protected static $ALLOWED_ACTION_TYPE_CODES = array(
+		Statistics::ORGANIZATION_SUBSCRIBE,
+		Statistics::ORGANIZATION_UNSUBSCRIBE,
+		Statistics::EVENT_FAVE,
+		Statistics::EVENT_UNFAVE
+	);
+
+	protected static $ALLOWED_ACTION_ENTITIES = array(
+		Statistics::ENTITY_EVENT, Statistics::ENTITY_ORGANIZATION
+	);
+
+	public function getParams(User $user, array $fields = null) : Result {
+		$result_data = parent::getParams($user, $fields)->getData();
+
+		if (isset($fields[self::EVENT_FIELD_NAME]) && $this->entity == self::EVENT_FIELD_NAME){
+			$event_fields = Fields::parseFields($fields[self::EVENT_FIELD_NAME]['fields'] ?? '');
+			$result_data[self::EVENT_FIELD_NAME] = EventsCollection::one(
+				App::DB(),
+				$user,
+				$this->event_id,
+				$event_fields
+			)->getParams($user, $event_fields)->getData();
+		}
+
+		if (isset($fields[self::ORGANIZATION_FIELD_NAME]) && $this->entity == self::ORGANIZATION_FIELD_NAME){
+			$org_fields = Fields::parseFields($fields[self::ORGANIZATION_FIELD_NAME]['fields'] ?? '');
+			$result_data[self::ORGANIZATION_FIELD_NAME] = OrganizationsCollection::one(
+				App::DB(),
+				$user,
+				$this->organization_id,
+				$org_fields
+			)->getParams($user, $org_fields)->getData();
+		}
+
+		if (isset($fields[self::USER_FIELD_NAME])){
+			$user_fields = Fields::parseFields($fields[self::USER_FIELD_NAME]['fields'] ?? '');
+			$result_data[self::USER_FIELD_NAME] = UsersCollection::one(
+				App::DB(),
+				$user,
+				$this->user_id,
+				$user_fields
+			)->getParams($user, $user_fields)->getData();
+		}
+
+		return new Result(true, '', $result_data);
+	}
+
 
 }
