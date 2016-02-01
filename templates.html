@@ -1,3 +1,5 @@
+
+<!-- OLD CALENDAR -->
 <script type="javascript/template" id="tmpl-calendar-line">
   <tr class="calendar-days-line"></tr>
 </script>
@@ -6,6 +8,39 @@
   <td class="td-day day-{day_number} {today} disabled" data-date="{date}" data-page="{date}" data-title="{date_text}">
     <div class="content centering"><span class="day-number">{number}</span></div>
   </td>
+</script>
+
+<!-- NEW CALENDAR -->
+<script type="javascript/template" id="tmpl-calendar">
+	<div class="{wrapper_class}">
+		<div class="{header_class}">
+			<button class="PrevMonth {prev_btn_class} {prev_btn_icon_class}" type="button"></button>
+			<button class="NextMonth {next_btn_class} {next_btn_icon_class}" type="button"></button>
+			<span class="MonthName {month_name_class}"></span>
+		</div>
+		<table class="CalendarTable">
+			<thead class="{thead_class}">
+				<tr class="{tr_class} {head_tr_class}">
+					<th class="{th_class}">Пн</th>
+					<th class="{th_class}">Вт</th>
+					<th class="{th_class}">Ср</th>
+					<th class="{th_class}">Чт</th>
+					<th class="{th_class}">Пт</th>
+					<th class="{th_class}">Сб</th>
+					<th class="{th_class}">Вс</th>
+				</tr>
+			</thead>
+			<tbody class="CalendarTableBody {tbody_class}"></tbody>
+		</table>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-calendar-row">
+	<tr class="{tr_class}"></tr>
+</script>
+
+<script type="javascript/template" id="tmpl-calendar-div">
+	<td class="{td_class} Day{day_number} {today}" data-date="{date}" data-page="{date}" data-title="{date_text}">{number}</td>
 </script>
 
 <script type="javascript/template" id="tmpl-organizations-item">
