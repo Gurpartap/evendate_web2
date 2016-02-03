@@ -1,5 +1,4 @@
 <?php
-
 	$ROOT_PATH = $_SERVER['DOCUMENT_ROOT'] . '/';
 	$BACKEND_FOLDER = 'v1-backend';
 	$BACKEND_FULL_PATH = $ROOT_PATH . $BACKEND_FOLDER;
