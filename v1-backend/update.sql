@@ -466,6 +466,18 @@ CREATE VIEW view_actions AS SELECT
                             FROM stat_organizations
                               INNER JOIN stat_event_types ON stat_event_types.id = stat_organizations.stat_type_id
                               INNER JOIN tokens ON tokens.id = stat_organizations.token_id
-                              INNER JOIN view_organizations ON view_organizations.id = stat_organizations.organization_id
+                              INNER JOIN view_organizations
+                                ON view_organizations.id = stat_organizations.organization_id
                             WHERE
                               view_organizations.status = TRUE;
+DROP VIEW view_organization_types;
+
+CREATE VIEW view_organization_types AS
+  SELECT DISTINCT organization_types.id:: INT,
+    organization_types.name,
+     DATE_PART('epoch', organization_types.created_at):: INT AS created_at,
+     DATE_PART('epoch', organization_types.updated_at):: INT AS updated_at,
+    organization_types."order" :: INT AS order_position
+  FROM organization_types
+    INNER JOIN organizations ON organization_types.id = organizations.type_id
+  WHERE organizations.status = TRUE;

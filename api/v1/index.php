@@ -13,7 +13,7 @@ $_function_called = false;
 	}
 	require_once '../../v1-backend/bin/env_variables.php';
 
-	header('Access-Control-Allow-Origin: *');
+//	header('Access-Control-Allow-Origin: *');
 	header('Access-Control-Allow-Headers: Authorization');
 	header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 	@session_start();
@@ -39,7 +39,26 @@ try {
 	require_once "{$BACKEND_FULL_PATH}/events/Class.EventsCollection.php";
 	require_once "{$BACKEND_FULL_PATH}/users/Class.UsersCollection.php";
 
-//	$logger = new Logger('my_logger');
+//	$MONGO_FORMATTER = array(
+//		'server'          => "mongodb://localhost:27017",
+//		'database'        => 'evendate_logs',
+//		'collection'      => 'logs',
+//		'log_level'       => Logger::DEBUG,
+//		'time_zone'       => 'UTC',
+//		'datetime_format' => 'Y-m-d H:i:s'
+//	);
+
+
+//	$logger = new Logger('api_v1');
+//	$mongoHandler = new Monolog\Handler\MongoDBHandler(
+//		new MongoClient(),
+//		'evendate_logs',
+//		'logs'
+//	);
+
+//	$logger->pushHandler($mongoHandler);
+
+
 
 	App::buildGlobal($__db);
 

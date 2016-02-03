@@ -1,7 +1,9 @@
 <?php
 
 require_once $BACKEND_FULL_PATH . '/organizations/Class.OrganizationsCollection.php';
+require_once $BACKEND_FULL_PATH . '/organizations/Class.OrganizationTypesCollection.php';
 require_once $BACKEND_FULL_PATH . '/organizations/Class.Organization.php';
+require_once $BACKEND_FULL_PATH . '/organizations/Class.OrganizationType.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.EventsCollection.php';
 
 $__modules['organizations'] = array(
@@ -15,24 +17,34 @@ $__modules['organizations'] = array(
 
 			return new Result(true, '', array($organization->getParams($__user, App::$__FIELDS)->getData()));
 		},
-		'' => function () use ($__db, $__request, $__user, $__fields){
+		'' => function () use ($__db, $__request, $__user, $__pagination, $__fields){
 			return OrganizationsCollection::filter (
 				$__db,
 				$__user,
 				$__request,
 				$__fields,
-				array('length' => App::$__LENGTH, 'offset' => App::$__OFFSET),
+				$__pagination,
 				array('organization_type_order', 'organization_type_id')
 			);
 		},
-		'subscriptions' => function () use ($__db, $__request, $__user, $__fields){
+		'subscriptions' => function () use ($__db, $__pagination, $__request, $__user, $__fields){
 			return OrganizationsCollection::filter (
 				$__db,
 				$__user,
 				array_merge($__request, array('is_subscribed' => true)),
 				$__fields,
-				array('length' => App::$__LENGTH, 'offset' => App::$__OFFSET),
+				$__pagination,
 				array('organization_type_order', 'organization_type_id')
+			);
+		},
+		'types' => function () use ($__db, $__request, $__request, $__pagination, $__user, $__fields){
+			return OrganizationTypesCollection::filter (
+				$__db,
+				$__user,
+				$__request,
+				$__fields,
+				$__pagination,
+				array('order_position', 'id')
 			);
 		}
 	),
