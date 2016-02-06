@@ -1,21 +1,45 @@
 <?php
 
-use Monolog\Logger as Logger;
-use Monolog\Handler\StreamHandler as StreamHandler;
-use Monolog\Handler\FirePHPHandler as FirePHPHandler;
+require_once '../../v1-backend/vendor/Psr/Log/LoggerInterface.php';
+require_once '../../v1-backend/vendor/Monolog/Logger.php';
+require_once '../../v1-backend/vendor/Monolog/Handler/HandlerInterface.php';
+require_once '../../v1-backend/vendor/Monolog/Handler/Handler.php';
+require_once '../../v1-backend/vendor/Monolog/Handler/AbstractHandler.php';
+require_once '../../v1-backend/vendor/Monolog/Handler/ProcessableHandlerInterface.php';
+require_once '../../v1-backend/vendor/Monolog/Handler/FormattableHandlerTrait.php';
+require_once '../../v1-backend/vendor/Monolog/Handler/ProcessableHandlerTrait.php';
+require_once '../../v1-backend/vendor/Monolog/Handler/FormattableHandlerInterface.php';
+require_once '../../v1-backend/vendor/Monolog/Handler/AbstractProcessingHandler.php';
+require_once '../../v1-backend/vendor/Monolog/Handler/MongoDBHandler.php';
+require_once '../../v1-backend/vendor/Monolog/Handler/ChromePHPHandler.php';
 
 
-$_function_called = false;
+require_once '../../v1-backend/vendor/Monolog/Formatter/FormatterInterface.php';
+require_once '../../v1-backend/vendor/Monolog/Formatter/NormalizerFormatter.php';
+require_once '../../v1-backend/vendor/Monolog/Formatter/LineFormatter.php';
+require_once '../../v1-backend/vendor/Monolog/Formatter/ChromePHPFormatter.php';
 
+
+
+use Monolog\Logger;
+use Monolog\Formatter\MongoDBFormatter;
+use Monolog\Handler\MongoDBHandler;
+
+	$logger = new Logger('api_v1_logs');
+
+//	$mongodb = new MongoDBHandler(new MongoClient("mongodb://localhost:27017"), "api_v1_logs", "prod");
+//	$logger->pushHandler($mongodb);
+
+	$chrome = new \Monolog\Handler\ChromePHPHandler();
+	$logger->pushHandler($chrome);
+
+	$_function_called = false;
 	if (isset($_SERVER['ENV']) && ($_SERVER['ENV'] != 'dev' || $_SERVER['ENV'] != 'test')){
 		ini_set("display_errors", 1);
 		error_reporting(E_ALL);
 	}
 	require_once '../../v1-backend/bin/env_variables.php';
 
-//	header('Access-Control-Allow-Origin: *');
-	header('Access-Control-Allow-Headers: Authorization');
-	header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 	@session_start();
 
 
@@ -38,25 +62,6 @@ try {
 	require_once "{$BACKEND_FULL_PATH}/statistics/Class.Statistics.php";
 	require_once "{$BACKEND_FULL_PATH}/events/Class.EventsCollection.php";
 	require_once "{$BACKEND_FULL_PATH}/users/Class.UsersCollection.php";
-
-//	$MONGO_FORMATTER = array(
-//		'server'          => "mongodb://localhost:27017",
-//		'database'        => 'evendate_logs',
-//		'collection'      => 'logs',
-//		'log_level'       => Logger::DEBUG,
-//		'time_zone'       => 'UTC',
-//		'datetime_format' => 'Y-m-d H:i:s'
-//	);
-
-
-//	$logger = new Logger('api_v1');
-//	$mongoHandler = new Monolog\Handler\MongoDBHandler(
-//		new MongoClient(),
-//		'evendate_logs',
-//		'logs'
-//	);
-
-//	$logger->pushHandler($mongoHandler);
 
 
 
@@ -138,7 +143,6 @@ try {
 	$_internal_code = AbstractException::ERROR_CODE;
 	$_error_name = $e->getMessage();
 }finally{
-
 	if (!isset($_result) || $_result instanceof Result == false){
 		if (!$_function_called){
 			$_http_code = 404;
@@ -153,8 +157,26 @@ try {
 	$_result->setDownloadable(App::$RESPONSE_DOWNLOAD);
 	$_result->setNude(App::$RESPONSE_NUDE);
 
+	echo $_result;
+
+	$logger->info('INFO', array(
+		'request' => $__request ?? array(),
+		'headers' => $__headers ?? array(),
+		'url' => $_url ?? '',
+		'fields' => $__fields ?? '',
+		'user_id' => isset($__user) && ($__user instanceof User) ? $__user->getId() : null,
+		'http_code' => $_http_code,
+		'internal_code' => $_internal_code,
+		'error_name' => $_error_name,
+		'response_format' => App::$RESPONSE_FORMAT,
+		'response_download' => App::$RESPONSE_DOWNLOAD,
+		'response_nude' => App::$RESPONSE_NUDE,
+		'pagination' => $__pagination,
+		'args' => $_args,
+		'order_by' => $__order_by ?? '',
+	));
+
 	if (($_SERVER['ENV'] == 'local' || $_SERVER['ENV'] == 'test') && isset($e)){
 		print_r($e);
 	}
 }
-echo $_result;

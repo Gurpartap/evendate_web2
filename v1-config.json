@@ -129,8 +129,8 @@
       "password": "",
       "port": 27017
     },
-    "domain": "test.evendate.org",
-    "node_domain": "test.evendate.org",
+    "domain": "test.evendate.ru",
+    "node_domain": "test.evendate.ru",
     "schema": "http://"
   },
   "local":{

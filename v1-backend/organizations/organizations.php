@@ -9,16 +9,14 @@ require_once $BACKEND_FULL_PATH . '/events/Class.EventsCollection.php';
 $__modules['organizations'] = array(
 	'GET' => array(
 		'{{/(id:[0-9]+)}}' => function($id) use ($__db, $__request, $__user, $__fields){
-			$organization = OrganizationsCollection::one(
+			return $organization = OrganizationsCollection::one(
 				$__db,
 				$__user,
 				$id,
-				$__fields);
-
-			return new Result(true, '', array($organization->getParams($__user, App::$__FIELDS)->getData()));
+				$__fields)->getParams($__user, $__fields);
 		},
 		'' => function () use ($__db, $__request, $__user, $__pagination, $__fields){
-			return OrganizationsCollection::filter (
+			return OrganizationsCollection::filter(
 				$__db,
 				$__user,
 				$__request,
@@ -28,7 +26,7 @@ $__modules['organizations'] = array(
 			);
 		},
 		'subscriptions' => function () use ($__db, $__pagination, $__request, $__user, $__fields){
-			return OrganizationsCollection::filter (
+			return OrganizationsCollection::filter(
 				$__db,
 				$__user,
 				array_merge($__request, array('is_subscribed' => true)),
@@ -38,7 +36,7 @@ $__modules['organizations'] = array(
 			);
 		},
 		'types' => function () use ($__db, $__request, $__request, $__pagination, $__user, $__fields){
-			return OrganizationTypesCollection::filter (
+			return OrganizationTypesCollection::filter(
 				$__db,
 				$__user,
 				$__request,
@@ -49,12 +47,12 @@ $__modules['organizations'] = array(
 		}
 	),
 	'POST' => array(
-		'subscriptions' => function () use ($__db, $__request, $__user){
+		'subscriptions' => function () use ($__db, $__request, $__user, $__fields){
 			$organization = OrganizationsCollection::one(
 				$__db,
 				$__user,
 				intval($__request['organization_id']),
-				App::$__FIELDS
+				$__fields
 			);
 			return $organization->addSubscription($__user);
 		},

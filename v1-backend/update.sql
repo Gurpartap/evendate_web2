@@ -470,7 +470,8 @@ CREATE VIEW view_actions AS SELECT
                                 ON view_organizations.id = stat_organizations.organization_id
                             WHERE
                               view_organizations.status = TRUE;
-DROP VIEW view_organization_types;
+
+
 
 CREATE VIEW view_organization_types AS
   SELECT DISTINCT organization_types.id:: INT,
