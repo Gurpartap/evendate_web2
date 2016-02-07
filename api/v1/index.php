@@ -171,8 +171,8 @@ try {
 		'response_format' => App::$RESPONSE_FORMAT,
 		'response_download' => App::$RESPONSE_DOWNLOAD,
 		'response_nude' => App::$RESPONSE_NUDE,
-		'pagination' => $__pagination,
-		'args' => $_args,
+		'pagination' => $__pagination ?? null,
+		'args' => $_args ?? array(),
 		'order_by' => $__order_by ?? '',
 	));
 
