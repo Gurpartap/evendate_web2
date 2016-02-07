@@ -3,6 +3,7 @@
 
 	@session_start();
 	require_once $BACKEND_FULL_PATH. '/bin/app_config.php';
+	require_once $BACKEND_FULL_PATH. '/vendor/aurasql/autoload.php';
 	App::init();
 
 	$driver_options = array(
