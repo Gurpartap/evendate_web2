@@ -47,11 +47,11 @@ $__modules['organizations'] = array(
 		}
 	),
 	'POST' => array(
-		'subscriptions' => function () use ($__db, $__request, $__user, $__fields){
+		'{(id:[0-9]+)/subscriptions}' => function ($organization_id) use ($__db, $__request, $__user, $__fields){
 			$organization = OrganizationsCollection::one(
 				$__db,
 				$__user,
-				intval($__request['organization_id']),
+				intval($organization_id),
 				$__fields
 			);
 			return $organization->addSubscription($__user);

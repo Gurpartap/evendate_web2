@@ -1,5 +1,6 @@
 ALTER TABLE public.users ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE public.tokens ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE public.subscriptions ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE public.users ADD gender BOOLEAN DEFAULT NULL  NULL;
 ALTER TABLE public.users ALTER COLUMN gender TYPE VARCHAR(50) USING gender :: VARCHAR(50);
 ALTER TABLE public.users ALTER COLUMN gender SET DEFAULT NULL;
@@ -482,3 +483,5 @@ CREATE VIEW view_organization_types AS
   FROM organization_types
     INNER JOIN organizations ON organization_types.id = organizations.type_id
   WHERE organizations.status = TRUE;
+
+ALTER TABLE subscriptions ADD CONSTRAINT user_id_organization_id UNIQUE (organization_id, user_id);
