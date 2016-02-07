@@ -485,3 +485,22 @@ CREATE VIEW view_organization_types AS
   WHERE organizations.status = TRUE;
 
 ALTER TABLE subscriptions ADD CONSTRAINT user_id_organization_id UNIQUE (organization_id, user_id);
+
+
+/*uSers_organizations*/
+ALTER TABLE public.users_organizations ADD new_status BOOLEAN DEFAULT TRUE NOT NULL;
+UPDATE public.users_organizations
+SET new_status = (CASE status
+                  WHEN 1
+                    THEN TRUE
+                  WHEN 0
+                    THEN FALSE
+                  END);
+ALTER TABLE public.users_organizations DROP status;
+ALTER TABLE public.users_organizations RENAME COLUMN new_status TO status;
+
+CREATE VIEW view_editors AS
+  SELECT users.*, users_organizations.organization_id, users_organizations.by_default
+  FROM users
+  INNER JOIN users_organizations ON users.id = users_organizations.user_id
+  WHERE users_organizations.status = TRUE;

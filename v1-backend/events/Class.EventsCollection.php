@@ -30,7 +30,7 @@ class EventsCollection extends AbstractCollection{
 		$q_get_events->cols($_fields);
 
 		$statement_array = array();
-		if (isset($fields[Event::IS_FAVORITE_FIELD_NAME])){
+		if (isset($fields[Event::IS_FAVORITE_FIELD_NAME]) || isset($fields[Event::CAN_EDIT_FIELD_NAME])){
 			$statement_array[':user_id'] = $user->getId();
 		}
 
