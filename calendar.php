@@ -9,7 +9,7 @@
         $profile_is_editor = $user->isEditor() ? '' : '';
     }catch(exception $e){
         header('Location: /');
-}
+    }
 ?>
 <!DOCTYPE html>
 <html lang="ru">

@@ -30,7 +30,7 @@ class EventsCollection extends AbstractCollection{
 		$q_get_events->cols($_fields);
 
 		$statement_array = array();
-		if (isset($fields[Event::IS_FAVORITE_FIELD_NAME])){
+		if (isset($fields[Event::IS_FAVORITE_FIELD_NAME]) || isset($fields[Event::CAN_EDIT_FIELD_NAME])){
 			$statement_array[':user_id'] = $user->getId();
 		}
 
@@ -97,6 +97,14 @@ class EventsCollection extends AbstractCollection{
 					}
 					break;
 				}
+				case 'organization_id': {
+					$organization = OrganizationsCollection::one($db, $user, intval($value));
+					if ($organization instanceof Organization){
+						$q_get_events->where('organization_id = :organization_id');
+						$statement_array[':organization_id'] = $organization->getId();
+					}
+					break;
+				}
 				case 'future': {
 					$q_get_events->where("view_events.last_event_date > (SELECT DATE_PART('epoch', TIMESTAMP 'yesterday') :: INT)");
 					break;
@@ -129,18 +137,18 @@ class EventsCollection extends AbstractCollection{
 				case 'title':{
 					$value = trim($value);
 					if (empty($value)) break;
-					if (isset($filters['strict']) && $filters['strict'] == true){
+					if (isset($filters['strict']) && boolval($filters['strict']) == true){
 						$q_get_events->where('LOWER(title) = LOWER(:title)');
 						$statement_array[':title'] = $value;
 					}else{
 						$q_get_events->where('LOWER(title) LIKE LOWER(:title)');
-						$statement_array[':title'] = $value . '%';
+						$statement_array[':title'] = '%'. $value . '%';
 					}
 					break;
 				}
 				case 'description':{
 					$value = trim($value);
-					if (isset($filters['strict']) && $filters['strict'] == true){
+					if (isset($filters['strict']) && boolval($filters['strict']) == true){
 						$q_get_events->where('LOWER(description) = LOWER(:description)');
 						$statement_array[':description'] = $value;
 					}else{

@@ -29,7 +29,7 @@ class User extends AbstractUser{
 		}
 		if (isset($_SESSION['id'])){
 			$p_get_user = $db->prepare("SELECT users.*, tokens.id AS token_id,
-				(SELECT COUNT(user_id)::int FROM users_organizations WHERE user_id = users.id AND status = 1) > 0 AS is_editor
+				(SELECT COUNT(user_id)::int FROM users_organizations WHERE user_id = users.id AND status = TRUE) > 0 AS is_editor
 				FROM users
 				INNER JOIN tokens ON tokens.user_id = users.id
 				WHERE users.id = :id
@@ -41,7 +41,7 @@ class User extends AbstractUser{
 			);
 		}else{
 			$p_get_user = $db->prepare("SELECT users.*,tokens.id AS token_id,
-				(SELECT COUNT(user_id) FROM users_organizations WHERE user_id = users.id AND status = 1) > 0 AS is_editor
+				(SELECT COUNT(user_id) FROM users_organizations WHERE user_id = users.id AND status = TRUE) > 0 AS is_editor
 				FROM users
 				INNER JOIN tokens ON tokens.user_id = users.id
 				WHERE

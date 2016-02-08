@@ -17,7 +17,12 @@ class Event extends AbstractEntity{
 
 	const TAGS_LIMIT = 5;
 	const ORGANIZATION_NOTIFICATIONS_LIMIT = 2;
-
+	const IS_FAVORITE_FIELD_NAME = 'is_favorite';
+	const TAGS_FIELD_NAME = 'tags';
+	const DATES_FIELD_NAME = 'dates';
+	const FAVORED_USERS_FIELD_NAME = 'favored';
+	const NOTIFICATIONS_FIELD_NAME = 'notifications';
+	const CAN_EDIT_FIELD_NAME = 'can_edit';
 
 
 	protected static $DEFAULT_COLS = array(
@@ -44,19 +49,15 @@ class Event extends AbstractEntity{
 		'created_at',
 		'updated_at',
 		'favored_users_count',
-		self::IS_FAVORITE_FIELD_NAME => '(SELECT id IS NOT NULL = TRUE
+		self::IS_FAVORITE_FIELD_NAME => '(SELECT id IS NOT NULL
 			FROM favorite_events
 			WHERE favorite_events.status = TRUE
 			AND favorite_events.user_id = :user_id
-			AND favorite_events.event_id = view_events.id) AS is_favorite'
+			AND favorite_events.event_id = view_events.id) IS NOT NULL AS is_favorite',
+		self::CAN_EDIT_FIELD_NAME => '(SELECT id IS NOT NULL
+			FROM view_editors
+			WHERE id = :user_id AND organization_id = view_events.organization_id) IS NOT NULL AS can_edit'
 	);
-
-	const IS_FAVORITE_FIELD_NAME = 'is_favorite';
-	const TAGS_FIELD_NAME = 'tags';
-	const DATES_FIELD_NAME = 'dates';
-	const FAVORED_USERS_FIELD_NAME = 'favored';
-	const NOTIFICATIONS_FIELD_NAME = 'notifications';
-	const CAN_EDIT = 'can_edit';
 
 	protected $title;
 	protected $description;
@@ -78,11 +79,11 @@ class Event extends AbstractEntity{
 	protected $organization_type_name;
 	protected $organization_short_name;
 	protected $is_favorite;
+	protected $can_edit;
 
 
 	private $tags;
 	private $dates;
-	private $can_edit;
 	private $favored_users;
 
 	private $organization;
@@ -448,7 +449,6 @@ class Event extends AbstractEntity{
 
 	public function getParams(User $user, array $fields = null) : Result{
 
-
 		$result_data = parent::getParams($user, $fields)->getData();
 
 		if (isset($fields[self::DATES_FIELD_NAME])){
@@ -456,14 +456,22 @@ class Event extends AbstractEntity{
 		}
 
 		if (isset($fields[self::FAVORED_USERS_FIELD_NAME])){
-			$_fields[] = self::FAVORED_USERS_FIELD_NAME;
+			$result_data[self::FAVORED_USERS_FIELD_NAME] = UsersCollection::filter($this->db, $user,
+				array('event' => $this),
+				Fields::parseFields($fields[self::FAVORED_USERS_FIELD_NAME]['fields'] ?? ''),
+				array(
+					'length' => $fields[self::FAVORED_USERS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+					'offset' => $fields[self::FAVORED_USERS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
+				),
+				$fields[self::FAVORED_USERS_FIELD_NAME]['order_by'] ?? array()
+			)->getData();
 		}
 
 		if (isset($fields[self::TAGS_FIELD_NAME])){
 			$result_data[self::TAGS_FIELD_NAME] = TagsCollection::filter($this->db,
 				$user,
 				array('event' => $this),
-				Fields::parseFields($fields[self::TAGS_FIELD_NAME]['fields']) ?? array(),
+				Fields::parseFields($fields[self::TAGS_FIELD_NAME]['fields'] ?? ''),
 				array(
 					'length' => $fields[self::TAGS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 					'offset' => $fields[self::TAGS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
@@ -474,10 +482,6 @@ class Event extends AbstractEntity{
 		if (isset($fields[self::NOTIFICATIONS_FIELD_NAME])){
 			$result_data[self::NOTIFICATIONS_FIELD_NAME] = $this->getNotifications($user,
 				Fields::parseFields($fields[self::NOTIFICATIONS_FIELD_NAME]['fields'] ?? ''))->getData();
-		}
-
-		if (isset($fields[Event::CAN_EDIT])){
-//			$result_data[] = $this->;
 		}
 
 		return new Result(true, '', $result_data);
