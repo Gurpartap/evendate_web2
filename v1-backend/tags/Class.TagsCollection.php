@@ -73,7 +73,7 @@ class TagsCollection extends AbstractCollection{
 
 	public static function create(PDO $db, string $name) : Tag{
 		$name = preg_replace('/\s+/', ' ', self::mb_ucfirst($name));
-		$tags = TagsCollection::filter($db, array('strict' => true, 'name' => $name))->getData();
+		$tags = TagsCollection::filter($db, App::getCurrentUser(), array('strict' => true, 'name' => $name))->getData();
 		if (count($tags) == 0){
 			$q_ins_tag = 'INSERT INTO tags(name, status)
 			VALUES(:name, TRUE) RETURNING id';
