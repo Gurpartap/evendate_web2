@@ -67,7 +67,7 @@ class EventsDatesCollection extends AbstractCollection{
 				 case 'event': {
 					 if ($value instanceof Event){
 						 $q_get_dates
-							 ->where('event_id = :event_id');
+							 ->where('view_dates.event_id = :event_id');
 						 $statement_array[':event_id'] = $value->getId();
 					 }
 					 break;

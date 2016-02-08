@@ -58,11 +58,11 @@ class Organization extends AbstractEntity{
 		'updated_at',
 		'background_small_img_url',
 		self::IS_SUBSCRIBED_FIELD_NAME => '(SELECT
-				id IS NOT NULL = TRUE AS is_subscribed
+				id IS NOT NULL AS is_subscribed
 				FROM subscriptions
 				WHERE organization_id = view_organizations.id
 					AND subscriptions.status = TRUE
-					AND user_id = :user_id) AS is_subscribed',
+					AND user_id = :user_id) IS NOT NULL AS is_subscribed',
 		self::SUBSCRIPTION_ID_FIELD_NAME => '(SELECT
 				id::int AS subscription_id
 				FROM subscriptions

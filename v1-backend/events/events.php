@@ -55,7 +55,7 @@ $__modules['events'] = array(
 			return EventsCollection::filter(
 				$__db,
 				$__user,
-				$__request,
+				array_merge($__request, array('favorites' => true)),
 				$__fields,
 				array('length' => $__length, 'offset' => $__offset),
 				$__order_by);
