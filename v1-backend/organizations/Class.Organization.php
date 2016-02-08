@@ -113,7 +113,7 @@ class Organization extends AbstractEntity{
 	public function addSubscription(User $user) {
 		$q_ins_sub = 'INSERT INTO subscriptions(organization_id, user_id, status)
 			VALUES(:organization_id, :user_id, TRUE)
-			ON CONFLICT DO UPDATE SET status = TRUE RETURNING id::int;';
+			ON CONFLICT(organization_id, user_id) DO UPDATE SET status = TRUE RETURNING id::int;';
 
 		$p_ins_sub = $this->db->prepare($q_ins_sub);
 		$result = $p_ins_sub->execute(array(':organization_id' => $this->getId(), ':user_id' => $user->getId()));
@@ -124,7 +124,7 @@ class Organization extends AbstractEntity{
 		$sub_id = $this->db->lastInsertId();
 		Statistics::Organization($this, $user, $this->db, Statistics::ORGANIZATION_SUBSCRIBE);
 
-		return new Result(true, 'Подписка успешно оформлена', array('subscription_id' => $sub_id));
+		return new Result(true, 'Подписка успешно оформлена');
 	}
 
 	public function deleteSubscription(User $user) {
@@ -278,7 +278,6 @@ class Organization extends AbstractEntity{
 			array('id')
 		)->getData();
 	}
-
 
 	private function isSubscribed(User $user) {
 		$q_get_subscribed = App::queryFactory()->newSelect();
