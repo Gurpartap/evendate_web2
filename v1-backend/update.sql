@@ -293,6 +293,7 @@ CREATE VIEW view_friends AS SELECT
                                     view_vk_friends.friend_id  AS friend_id
                                   FROM view_vk_friends;
 
+DROP VIEW view_events;
 CREATE VIEW view_events AS
   SELECT DISTINCT
     events.id :: INT,
@@ -312,7 +313,9 @@ CREATE VIEW view_events AS
     events.images_domain ||
     events.image_horizontal                                                   AS image_horizontal_url,
     organizations.images_domain ||
-    organizations.img_url                                                     AS organization_img_url,
+    events.images_domain || organizations.img_url                                                     AS organization_logo_large_url,
+    events.images_domain || organizations.img_medium_url                                                     AS organization_logo_medium_url,
+    events.images_domain || organizations.img_small_url                                                     AS organization_logo_small_url,
     organizations.name                                                        AS organization_name,
     organization_types.name                                                   AS organization_type_name,
     organizations.short_name                                                  AS organization_short_name,
@@ -371,7 +374,7 @@ ALTER TABLE public.tokens ADD device_name TEXT DEFAULT NULL NULL;
 CREATE VIEW view_devices AS
   SELECT
     tokens.id,
-    uuid,
+    "uuid",
     tokens.token_type,
     tokens.user_id,
     tokens.expires_on,
