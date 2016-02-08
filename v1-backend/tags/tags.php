@@ -13,7 +13,7 @@ $__modules['tags'] = array(
 			return TagsCollection::filter($__db, $__user, $__request, $__fields, $__pagination, $__order_by);
 		},
 		'{{/(id:[0-9]+)}}' => function ($id) use ($__db, $__user, $__length, $__page, $__fields, $__pagination, $__order_by) {
-			return TagsCollection::filter($__db, $__user, array('id' => $id), $__fields, $__pagination, $order_by);
+			return TagsCollection::filter($__db, $__user, array('id' => $id), $__fields, $__pagination, $__order_by);
 		}
 	)
 );
