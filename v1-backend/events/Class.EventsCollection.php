@@ -98,7 +98,7 @@ class EventsCollection extends AbstractCollection{
 					break;
 				}
 				case 'organization_id': {
-					$organization = OrganizationsCollection::one($db, $user, intval($value));
+					$organization = OrganizationsCollection::one($db, $user, intval($value), array());
 					if ($organization instanceof Organization){
 						$q_get_events->where('organization_id = :organization_id');
 						$statement_array[':organization_id'] = $organization->getId();

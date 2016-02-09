@@ -293,7 +293,6 @@ CREATE VIEW view_friends AS SELECT
                                     view_vk_friends.friend_id  AS friend_id
                                   FROM view_vk_friends;
 
-DROP VIEW view_events;
 CREATE VIEW view_events AS
   SELECT DISTINCT
     events.id :: INT,
@@ -312,7 +311,6 @@ CREATE VIEW view_events AS
     events.image_vertical                                                     AS image_vertical_url,
     events.images_domain ||
     events.image_horizontal                                                   AS image_horizontal_url,
-    organizations.images_domain ||
     events.images_domain || organizations.img_url                                                     AS organization_logo_large_url,
     events.images_domain || organizations.img_medium_url                                                     AS organization_logo_medium_url,
     events.images_domain || organizations.img_small_url                                                     AS organization_logo_small_url,
