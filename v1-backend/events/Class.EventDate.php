@@ -27,8 +27,8 @@ class EventDate extends AbstractEntity{
 		'created_at',
 		'updated_at',
 		'event_id',
-		EventDate::EVENTS_COUNT_FIELD_NAME => ' COUNT(event_date) AS ' . EventDate::EVENTS_COUNT_FIELD_NAME,
-		EventDate::FAVORED_COUNT_FIELD_NAME => ' COUNT(favorite_events.id) AS ' . EventDate::FAVORED_COUNT_FIELD_NAME,
+		self::EVENTS_COUNT_FIELD_NAME => ' COUNT(event_date) AS ' . self::EVENTS_COUNT_FIELD_NAME,
+		self::FAVORED_COUNT_FIELD_NAME => ' COUNT(favorite_events.id) AS ' . self::FAVORED_COUNT_FIELD_NAME,
 		'organization_id'
 	);
 

@@ -881,6 +881,7 @@ socket.on('connect', function(){
 });
 
 socket.on('auth', function(data){
+    console.log(data);
   $.ajax({
     url: 'auth.php',
     type: 'POST',

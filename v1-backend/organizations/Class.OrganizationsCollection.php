@@ -19,6 +19,10 @@ class OrganizationsCollection {
 		$cols = Fields::mergeFields(Organization::getAdditionalCols(), $fields, Organization::getDefaultCols());
 		$select = APP::queryFactory()->newSelect();
 
+		if (isset($filters[Organization::IS_SUBSCRIBED_FIELD_NAME])){
+			$cols[] =  Organization::getAdditionalCols()[Organization::IS_SUBSCRIBED_FIELD_NAME];
+		}
+
 		$select
 			->distinct()
 			->from('view_organizations');
@@ -61,14 +65,14 @@ class OrganizationsCollection {
 				case (Organization::IS_SUBSCRIBED_FIELD_NAME): {
 					if ($return_one) break;
 					if (!isset($fields[Organization::IS_SUBSCRIBED_FIELD_NAME])){
-						$fields[] = Organization::getAdditionalCols()[Organization::IS_SUBSCRIBED_FIELD_NAME];
+						$fields[] = Organization::IS_SUBSCRIBED_FIELD_NAME;
 					}
 					$select->where('(SELECT
-						id IS NOT NULL = TRUE AS is_subscribed
+						id IS NOT NULL = ' . (boolval($value) ? ' TRUE' : 'FALSE' ) . '
 						FROM subscriptions
 						WHERE organization_id = "view_organizations"."id"
 							AND "subscriptions"."status" = TRUE
-							AND user_id = :user_id) = TRUE');
+							AND user_id = :user_id) IS NOT NULL');
 					$statement_array[':user_id'] = $user->getId();
 					break;
 				}
@@ -105,6 +109,7 @@ class OrganizationsCollection {
 			$statement_array[':user_id'] = $user->getId();
 		}
 
+//		echo $select->getStatement();
 		$p_search = $db->prepare($select->getStatement());
 		$p_search->execute($statement_array);
 

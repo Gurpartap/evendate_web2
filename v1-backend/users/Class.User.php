@@ -114,16 +114,15 @@ class User extends AbstractUser{
 	public function addFavoriteEvent(Event $event){
 		$q_ins_favorite = 'INSERT INTO favorite_events(user_id, event_id, status, created_at)
 			VALUES (:user_id, :event_id, TRUE, NOW())
-			ON DUPLICATE KEY UPDATE status = TRUE';
+			ON CONFLICT (user_id, event_id) DO UPDATE SET status = TRUE RETURNING id::int';
 		$p_ins_favorite = $this->db->prepare($q_ins_favorite);
 		$result = $p_ins_favorite->execute(array(
 			':user_id' => $this->getId(),
 			':event_id' => $event->getId()
 		));
 		if ($result === FALSE) throw new DBQueryException('CANT_MAKE_FAVORITE', $this->db);
-		$favorite_id = $this->db->lastInsertId();
 		Statistics::Event($event, $this, $this->db, Statistics::EVENT_FAVE);
-		return new Result(true, 'Событие успешно добавлено в избранное', array('favorite_id' => $favorite_id));
+		return new Result(true, 'Событие успешно добавлено в избранное');
 	}
 
 	public function deleteFavoriteEvent(Event $event){

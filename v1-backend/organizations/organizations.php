@@ -9,11 +9,12 @@ require_once $BACKEND_FULL_PATH . '/events/Class.EventsCollection.php';
 $__modules['organizations'] = array(
 	'GET' => array(
 		'{{/(id:[0-9]+)}}' => function($id) use ($__db, $__request, $__user, $__fields){
-			return $organization = OrganizationsCollection::one(
+			$result = $organization = OrganizationsCollection::one(
 				$__db,
 				$__user,
 				$id,
-				$__fields)->getParams($__user, $__fields);
+				$__fields)->getParams($__user, $__fields)->getData();
+			return new Result(true, '', array($result));
 		},
 		'' => function () use ($__db, $__request, $__user, $__pagination, $__fields){
 			return OrganizationsCollection::filter(
@@ -59,7 +60,7 @@ $__modules['organizations'] = array(
 	),
 	'DELETE' => array(
 		'{(id:[0-9]+)/subscriptions}' => function ($id) use ($__db, $__request, $__user){
-			$organization = OrganizationsCollection::one($__db, $__user, $id);
+			$organization = OrganizationsCollection::one($__db, $__user, intval($id), array());
 			$result = $organization->deleteSubscription($__user);
 			return $result;
 		},
