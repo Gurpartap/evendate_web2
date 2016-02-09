@@ -60,7 +60,7 @@ $__modules['organizations'] = array(
 	),
 	'DELETE' => array(
 		'{(id:[0-9]+)/subscriptions}' => function ($id) use ($__db, $__request, $__user){
-			$organization = OrganizationsCollection::one($__db, $__user, $id);
+			$organization = OrganizationsCollection::one($__db, $__user, intval($id), array());
 			$result = $organization->deleteSubscription($__user);
 			return $result;
 		},
