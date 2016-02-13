@@ -505,3 +505,6 @@ CREATE VIEW view_editors AS
   FROM users
   INNER JOIN users_organizations ON users.id = users_organizations.user_id
   WHERE users_organizations.status = TRUE;
+
+
+

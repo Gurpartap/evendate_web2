@@ -119,6 +119,9 @@ class EventsCollection extends AbstractCollection{
 						$value = $value->getTimestamp();
 					}elseif($value == null){
 						break;
+					}else{
+						$dt = new DateTime($value);
+						$value = $dt->getTimestamp();
 					}
 					$q_get_events->where('first_event_date >= :since_date');
 					$statement_array[':since_date'] = $value;
@@ -129,6 +132,9 @@ class EventsCollection extends AbstractCollection{
 						$value = $value->getTimestamp();
 					}elseif($value == null){
 						break;
+					}else{
+						$dt = new DateTime($value);
+						$value = $dt->getTimestamp();
 					}
 					$q_get_events->where('last_event_date <= :till_date');
 					$statement_array[':till_date'] = $value;
@@ -162,6 +168,9 @@ class EventsCollection extends AbstractCollection{
 						$value = $value->getTimestamp();
 					}elseif($value == null){
 						break;
+					}else{
+						$dt = new DateTime($value);
+						$value = $dt->getTimestamp();
 					}
 					$q_get_events->where('updated_at >= :changed_since');
 					$statement_array[':changed_since'] = $value;

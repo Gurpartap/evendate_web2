@@ -17,6 +17,7 @@ require_once "{$BACKEND_FULL_PATH}/exceptions/FileNotFoundException.php";
 require_once "{$BACKEND_FULL_PATH}/exceptions/InvalidFileException.php";
 require_once "{$BACKEND_FULL_PATH}/exceptions/NoMethodException.php";
 require_once "{$BACKEND_FULL_PATH}/exceptions/PrivilegesException.php";
+require_once "{$BACKEND_FULL_PATH}/exceptions/AuthorizationException.php";
 
 
 

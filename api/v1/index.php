@@ -126,22 +126,31 @@ try {
 		}
 	}
 
-}catch(AbstractException $ae){
-	$_http_code = $ae->getHttpCode();
-	$_internal_code = $ae->getInternalCode();
-	$_error_name = $ae->getMessage();
 }catch(InvalidArgumentException $iae){
 	$_http_code = BadArgumentException::HTTP_CODE;
 	$_internal_code = BadArgumentException::ERROR_CODE;
 	$_error_name = $iae->getMessage();
+	$_function_called = true;
 }catch(BadMethodCallException $bmce){
 	$_http_code = BadArgumentException::HTTP_CODE;
 	$_internal_code = BadArgumentException::ERROR_CODE;
 	$_error_name = $bmce->getMessage();
+	$_function_called = true;
+}catch(AuthorizationException $authe){
+	$_http_code = AuthorizationException::HTTP_CODE;
+	$_internal_code = AuthorizationException::ERROR_CODE;
+	$_error_name = $authe->getMessage();
+	$_function_called = true;
+}catch(AbstractException $ae){
+	$_http_code = $ae->getHttpCode();
+	$_internal_code = $ae->getInternalCode();
+	$_error_name = $ae->getMessage();
+	$_function_called = true;
 }catch(Exception $e){
 	$_http_code = AbstractException::HTTP_CODE;
 	$_internal_code = AbstractException::ERROR_CODE;
 	$_error_name = $e->getMessage();
+	$_function_called = true;
 }finally{
 	if (!isset($_result) || $_result instanceof Result == false){
 		if (!$_function_called){
