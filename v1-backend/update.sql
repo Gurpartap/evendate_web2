@@ -153,27 +153,15 @@ CREATE VIEW view_organizations AS
     organizations.id :: INT,
     organizations.description,
     organizations.id :: INT                 AS oid,
-    organizations.images_domain
-    ||
-    organizations.background_medium_img_url AS background_medium_img_url,
-    organizations.images_domain
-    ||
-    organizations.background_small_img_url  AS background_small_img_url,
-    organizations.images_domain
-    ||
-    organizations.img_medium_url            AS img_medium_url,
-    organizations.images_domain
-    ||
-    organizations.img_small_url             AS img_small_url,
+    organizations.images_domain || 'organizations_images/backgrounds/medium/' || organizations.background_medium_img_url AS background_medium_img_url,
+    organizations.images_domain || 'organizations_images/backgrounds/small/' || organizations.background_small_img_url  AS background_small_img_url,
+    organizations.images_domain || 'organizations_images/logos/medium/' || organizations.img_medium_url            AS img_medium_url,
+    organizations.images_domain || 'organizations_images/logos/small/' || organizations.img_small_url             AS img_small_url,
     organizations.site_url,
     organizations.name,
     organizations.type_id :: INT,
-    organizations.images_domain
-    ||
-    organizations.img_url                   AS img_url,
-    organizations.images_domain
-    ||
-    organizations.background_img_url        AS background_img_url,
+    organizations.images_domain || 'organizations_images/logos/large/' || organizations.img_url                   AS img_url,
+    organizations.images_domain || 'organizations_images/background/large/' || organizations.background_img_url        AS background_img_url,
     TRUE                                    AS status,
     organizations.short_name,
     organization_types.name                 AS type_name,
@@ -293,6 +281,7 @@ CREATE VIEW view_friends AS SELECT
                                     view_vk_friends.friend_id  AS friend_id
                                   FROM view_vk_friends;
 
+
 CREATE VIEW view_events AS
   SELECT DISTINCT
     events.id :: INT,
@@ -307,16 +296,23 @@ CREATE VIEW view_events AS
     events.location,
     events.organization_id :: INT,
     TRUE                                                                      AS status,
-    events.images_domain ||
-    events.image_vertical                                                     AS image_vertical_url,
-    events.images_domain ||
-    events.image_horizontal                                                   AS image_horizontal_url,
-    events.images_domain || organizations.img_url                                                     AS organization_logo_large_url,
-    events.images_domain || organizations.img_medium_url                                                     AS organization_logo_medium_url,
-    events.images_domain || organizations.img_small_url                                                     AS organization_logo_small_url,
-    organizations.name                                                        AS organization_name,
+    events.images_domain || 'event_images/large/' || events.image_vertical AS image_vertical_url,
+    events.images_domain || 'event_images/large/' || events.image_horizontal  AS image_horizontal_url,
+
+    events.images_domain || 'event_images/large/' || events.image_vertical AS image_vertical_large_url,
+    events.images_domain || 'event_images/large/' || events.image_horizontal  AS image_horizontal_large_url,
+
+    events.images_domain || 'event_images/medium/' || events.image_vertical AS image_horizontal_medium_url,
+    events.images_domain || 'event_images/medium/' || events.image_horizontal  AS image_vertical_medium_url,
+
+    events.images_domain || 'event_images/small/' || events.image_vertical AS image_vertical_small_url,
+    events.images_domain || 'event_images/small/' || events.image_horizontal  AS image_horizontal_small_url,
+    view_organizations.img_medium_url AS organization_logo_medium_url,
+    view_organizations.img_url AS organization_logo_large_url,
+    view_organizations.img_small_url  AS organization_logo_small_url,
+    view_organizations.name                                                        AS organization_name,
     organization_types.name                                                   AS organization_type_name,
-    organizations.short_name                                                  AS organization_short_name,
+    view_organizations.short_name                                                  AS organization_short_name,
     (SELECT DATE_PART('epoch', MIN(events_dates.event_date)) :: INT
      FROM events_dates
      WHERE event_id = events.id AND events_dates.event_date > NOW() AND events_dates.status =
@@ -334,11 +330,11 @@ CREATE VIEW view_events AS
      WHERE status = TRUE AND event_id =
                              events.id)                                       AS favored_users_count
   FROM events
-    INNER JOIN organizations ON organizations.id = events.organization_id
-    INNER JOIN organization_types ON organization_types.id = organizations.type_id
+    INNER JOIN view_organizations ON view_organizations.id = events.organization_id
+    INNER JOIN organization_types ON organization_types.id = view_organizations.type_id
   --LEFT JOIN events_tags ON events.id = events_tags.event_id
   --LEFT JOIN tags ON tags.id = events_tags.tag_id
-  WHERE organizations.status = TRUE
+  WHERE view_organizations.status = TRUE
         AND events.status = TRUE;
 
 
@@ -505,3 +501,6 @@ CREATE VIEW view_editors AS
   FROM users
   INNER JOIN users_organizations ON users.id = users_organizations.user_id
   WHERE users_organizations.status = TRUE;
+
+
+

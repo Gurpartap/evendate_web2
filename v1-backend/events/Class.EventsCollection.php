@@ -39,21 +39,20 @@ class EventsCollection extends AbstractCollection{
 		foreach($filters as $name => $value){
 			switch($name){
 				case 'date': {
-					$q_get_events->where('
-					AND ((
-						DATE(view_events.first_event_date) <= DATE(:date)
+					if ($value instanceof DateTime == false){
+						$value = new DateTime($value);
+					}
+					$q_get_events->where(':date IN
+						(SELECT
+							events_dates.event_date
+							FROM events_dates
+							WHERE
+							view_events.id = events_dates.event_id
 							AND
-						DATE(view_events.last_event_date) >= DATE(:date)
-						)
-						OR
-						(
-						DATE(view_events.first_event_date) = DATE(:date)
-							AND
-						DATE(view_events.last_event_date) = DATE(:date)
-						)
-						OR (:date IN (SELECT events_dates.event_date FROM events_dates WHERE events.id = events_dates.event_id AND status = 1) AND events.first_event_date IS NULL)
-						)');
-					$statement_array[':date'] = $value;
+							status = TRUE
+							AND :time_part::TIME BETWEEN start_time AND end_time)');
+					$statement_array[':date'] = $value->format('Y-m-d');
+					$statement_array[':time_part'] = $value->format('H:i:s');
 					break;
 				}
 				case 'my': {
@@ -114,21 +113,27 @@ class EventsCollection extends AbstractCollection{
 					$statement_array[':user_id'] = $user->getId();
 					break;
 				}
-				case 'since':{
+				case 'since': {
 					if ($value instanceof DateTime){
 						$value = $value->getTimestamp();
 					}elseif($value == null){
 						break;
+					}else{
+						$dt = new DateTime($value);
+						$value = $dt->getTimestamp();
 					}
 					$q_get_events->where('first_event_date >= :since_date');
 					$statement_array[':since_date'] = $value;
 					break;
 				}
-				case 'till':{
+				case 'till': {
 					if ($value instanceof DateTime){
 						$value = $value->getTimestamp();
 					}elseif($value == null){
 						break;
+					}else{
+						$dt = new DateTime($value);
+						$value = $dt->getTimestamp();
 					}
 					$q_get_events->where('last_event_date <= :till_date');
 					$statement_array[':till_date'] = $value;
@@ -162,6 +167,9 @@ class EventsCollection extends AbstractCollection{
 						$value = $value->getTimestamp();
 					}elseif($value == null){
 						break;
+					}else{
+						$dt = new DateTime($value);
+						$value = $dt->getTimestamp();
 					}
 					$q_get_events->where('updated_at >= :changed_since');
 					$statement_array[':changed_since'] = $value;

@@ -25,7 +25,7 @@ class User extends AbstractUser{
 		if ((!isset($_SESSION['id']) || trim($_SESSION['id']) == ''
 			|| !isset($_SESSION['token']) || trim($_SESSION['token']) == '')
 			&& $token == null){
-			throw new PrivilegesException('Пользователь с такими данными не найден', $db);
+			throw new AuthorizationException('Пользователь с такими данными не найден', $db);
 		}
 		if (isset($_SESSION['id'])){
 			$p_get_user = $db->prepare("SELECT users.*, tokens.id AS token_id,
@@ -53,7 +53,7 @@ class User extends AbstractUser{
 		$p_get_user->execute($stm);
 
 		if ($p_get_user === FALSE) throw new DBQueryException('USER_NOT_EXIST', $db);
-		if ($p_get_user->rowCount() !== 1) throw new LogicException('Пользователь с такими данными не найден');
+		if ($p_get_user->rowCount() !== 1) throw new AuthorizationException('Пользователь с такими данными не найден', $db);
 		$row = $p_get_user->fetch();
 
 		$this->db = $db;
@@ -75,7 +75,7 @@ class User extends AbstractUser{
 		return $this->id;
 	}
 
-	protected function getDB() : PDO{
+	protected function getDB() : PDO {
 		return $this->db;
 	}
 

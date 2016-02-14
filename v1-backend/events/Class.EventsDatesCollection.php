@@ -73,18 +73,20 @@ class EventsDatesCollection extends AbstractCollection{
 					 break;
 				 }
 				 case 'unique': {
-					 $cols = array_merge(EventDate::getDefaultCols(), array(
-						 EventDate::getAdditionalCols()[EventDate::EVENTS_COUNT_FIELD_NAME],
-						 EventDate::getAdditionalCols()[EventDate::FAVORED_COUNT_FIELD_NAME],
-					 ));
-					 $_fields = array_merge(EventDate::getDefaultCols(),
-						 array(EventDate::EVENTS_COUNT_FIELD_NAME => '', EventDate::FAVORED_COUNT_FIELD_NAME => ''));
-					 $q_get_dates->join(
+					 if (boolval($value) === 'true'){
+						 $cols = array_merge(EventDate::getDefaultCols(), array(
+							 EventDate::getAdditionalCols()[EventDate::EVENTS_COUNT_FIELD_NAME],
+							 EventDate::getAdditionalCols()[EventDate::FAVORED_COUNT_FIELD_NAME],
+						 ));
+						 $_fields = array_merge(EventDate::getDefaultCols(),
+							 array(EventDate::EVENTS_COUNT_FIELD_NAME => '', EventDate::FAVORED_COUNT_FIELD_NAME => ''));
+						 $q_get_dates->join(
 							 'LEFT',
 							 'favorite_events',
 							 ' ON favorite_events.event_id = view_dates.event_id AND favorite_events.user_id = :user_id')
-						 ->groupBy(array('event_date'));
-					 $statement_array[':user_id'] = $user->getId();
+							 ->groupBy(array('event_date'));
+						 $statement_array[':user_id'] = $user->getId();
+					 }
 					 break;
 				 }
 				 case 'organization': {

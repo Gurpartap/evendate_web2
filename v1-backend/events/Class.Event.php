@@ -43,6 +43,12 @@ class Event extends AbstractEntity{
 		'creator_id',
 		'latitude',
 		'longitude',
+		'image_vertical_small_url',
+		'image_horizontal_small_url',
+		'image_vertical_medium_url',
+		'image_horizontal_medium_url',
+		'image_vertical_large_url',
+		'image_horizontal_large_url',
 		'organization_name',
 		'organization_type_name',
 		'organization_short_name',
@@ -389,20 +395,14 @@ class Event extends AbstractEntity{
 	}
 
 
-	public function getDates(){
-		$q_get_event_dates = 'SELECT event_date, start_time, end_time
-			FROM events_dates
-			WHERE event_id = :event_id
-				AND status = TRUE
-				ORDER BY events_dates.event_date ASC';
-		$p_get_dates = $this->db->prepare($q_get_event_dates);
-		$result = $p_get_dates->execute(array(
-			':event_id' => $this->getId()
-		));
-
-		if ($result === FALSE) throw new DBQueryException('CANT_GET_DATES', $this->db);
-
-		return new Result(true, '', $p_get_dates->fetchAll());
+	public function getDates(User $user, array $fields, array $pagination, $order_by){
+		return EventsDatesCollection::filter($this->db,
+			$user,
+			array('event' => $this),
+			$fields,
+			$pagination,
+			$order_by
+			);
 	}
 
 	public function getTags(){
@@ -455,7 +455,13 @@ class Event extends AbstractEntity{
 		$result_data = parent::getParams($user, $fields)->getData();
 
 		if (isset($fields[self::DATES_FIELD_NAME])){
-			$result_data[self::DATES_FIELD_NAME] = $this->getDates()->getData();
+			$result_data[self::DATES_FIELD_NAME] = $this->getDates($user,
+				Fields::parseFields($fields[self::DATES_FIELD_NAME]['fields'] ?? ''),
+				array(
+					'length' => $fields[self::DATES_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+					'offset' => $fields[self::DATES_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
+				),
+				$fields[self::DATES_FIELD_NAME]['order_by'] ?? array())->getData();
 		}
 
 		if (isset($fields[self::FAVORED_USERS_FIELD_NAME])){

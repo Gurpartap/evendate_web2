@@ -158,8 +158,8 @@ $__modules['events'] = array(
 			);
 			return $notification->delete($__db);
 		},
-		'{(id:[0-9]+)/favorites}' => function ($id) use ($__db, $__request, $__user){
-			$event = EventsCollection::one($__db, $__user, intval($id));
+		'{/(id:[0-9]+)/favorites}' => function ($id) use ($__db, $__request, $__user){
+			$event = EventsCollection::one($__db, $__user, intval($id), array());
 			return $__user->deleteFavoriteEvent($event);
 		}
 	)
