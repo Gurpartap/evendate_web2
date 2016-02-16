@@ -20,7 +20,11 @@ class OrganizationsCollection {
 		$select = APP::queryFactory()->newSelect();
 
 		if (isset($filters[Organization::IS_SUBSCRIBED_FIELD_NAME])){
-			$cols[] =  Organization::getAdditionalCols()[Organization::IS_SUBSCRIBED_FIELD_NAME];
+			$cols[] = Organization::getAdditionalCols()[Organization::IS_SUBSCRIBED_FIELD_NAME];
+		}
+		if (isset($fields[Organization::NEW_EVENTS_COUNT_FIELD_NAME])){
+			$cols[] = Organization::getAdditionalCols()[Organization::NEW_EVENTS_COUNT_FIELD_NAME];
+			$statement_array[':user_id'] = $user->getId();
 		}
 
 		$select

@@ -48,18 +48,21 @@ $__modules['users'] = array(
 				$__order_by);
 		},
 		'{/(id:[0-9]+)}' => function ($id) use ($__user, $__fields, $__db) {
-			return UsersCollection::one(
+			$data = UsersCollection::one(
 				$__db,
 				$__user,
 				$id,
-				array())->getParams($__user, $__fields);
+				array())->getParams($__user, $__fields)->getData();
+
+			return new Result(true, '', array($data));
 		},
 		'{me/devices}' => function () use ($__user, $__request, $__db, $__fields, $__pagination, $__order_by) {
 			return DevicesCollection::filter($__db, $__user, $__request, $__fields,
 				$__pagination, $__order_by);
 		},
 		'{me}' => function () use ($__user) {
-			return $__user->getMainInfo();
+			$data = $__user->getMainInfo()->getData();
+			return new Result(true, '', array($data));
 		}
 	),
 	'PUT' => array(

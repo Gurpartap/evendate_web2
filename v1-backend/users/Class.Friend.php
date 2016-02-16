@@ -63,10 +63,11 @@ class Friend extends AbstractEntity{
 	public function getParams(User $user, array $fields = null) : Result{
 		$result_data = parent::getParams($user, $fields)->getData();
 
+
 		if (isset($fields[self::SUBSCRIPTIONS_FIELD_NAME])){
 			$result_data[self::SUBSCRIPTIONS_FIELD_NAME] =
 				$this->getSubscriptions(
-					$fields[self::SUBSCRIPTIONS_FIELD_NAME]['fields'] ?? array(),
+					Fields::parseFields($fields[self::SUBSCRIPTIONS_FIELD_NAME]['fields']) ?? array(),
 					array(
 						'length' => $fields[self::SUBSCRIPTIONS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 						'offset' => $fields[self::SUBSCRIPTIONS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET,

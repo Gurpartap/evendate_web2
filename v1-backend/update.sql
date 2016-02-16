@@ -503,4 +503,10 @@ CREATE VIEW view_editors AS
   WHERE users_organizations.status = TRUE;
 
 
-
+CREATE VIEW view_stat_events AS SELECT
+                                  stat_events.*, tokens.user_id,
+  events.organization_id
+                                FROM stat_events
+                                  INNER JOIN tokens ON stat_events.token_id = tokens.id
+  INNER JOIN events ON stat_events.event_id = events.id
+  WHERE events.status = true;
