@@ -62,7 +62,23 @@ class Organization extends AbstractEntity{
 				FROM subscriptions
 				WHERE organization_id = view_organizations.id
 					AND subscriptions.status = TRUE
-					AND user_id = :user_id) IS NOT NULL AS ' . self::IS_SUBSCRIBED_FIELD_NAME
+					AND user_id = :user_id) IS NOT NULL AS ' . self::IS_SUBSCRIBED_FIELD_NAME,
+		self::NEW_EVENTS_COUNT_FIELD_NAME => '(
+		SELECT
+			COUNT(view_events.id)
+			FROM view_events
+			WHERE
+				organization_id = view_organizations.id
+				AND
+				view_events.last_event_date > DATE_PART(\'epoch\', NOW()) :: INT
+				AND
+				id NOT IN
+					(SELECT event_id
+						FROM view_stat_events
+					WHERE
+						user_id = :user_id
+					)
+				) AS '. self::NEW_EVENTS_COUNT_FIELD_NAME
 	);
 
 	public function __construct() {

@@ -73,7 +73,7 @@ class EventsDatesCollection extends AbstractCollection{
 					 break;
 				 }
 				 case 'unique': {
-					 if (boolval($value) === 'true'){
+					 if ($value == 'true'){
 						 $cols = array_merge(EventDate::getDefaultCols(), array(
 							 EventDate::getAdditionalCols()[EventDate::EVENTS_COUNT_FIELD_NAME],
 							 EventDate::getAdditionalCols()[EventDate::FAVORED_COUNT_FIELD_NAME],

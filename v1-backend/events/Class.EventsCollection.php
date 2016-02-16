@@ -105,7 +105,9 @@ class EventsCollection extends AbstractCollection{
 					break;
 				}
 				case 'future': {
-					$q_get_events->where("view_events.last_event_date > (SELECT DATE_PART('epoch', TIMESTAMP 'yesterday') :: INT)");
+					if ($value == 'true'){
+						$q_get_events->where("view_events.last_event_date > (SELECT DATE_PART('epoch', TIMESTAMP 'yesterday') :: INT)");
+					}
 					break;
 				}
 				case 'favorites': {
