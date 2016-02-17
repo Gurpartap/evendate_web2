@@ -1,0 +1,1223 @@
+* {
+	outline: 0;
+	margin: 0;
+	padding: 0;
+	position: relative;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+html {
+	font-size: 16px;
+}
+
+body {
+	font-family: "Roboto", sans-serif;
+	font-size: 1rem;
+	line-height: 1;
+	color: #656565;
+	background-color: #f5f7fa;
+}
+
+
+.-centering,
+.-h_centering {text-align: center}
+.-centering,
+.-h_centering > img {margin: 0 auto}
+
+.-centering:before,
+.-v_centering:before {
+	content: '';
+	display: inline-block;
+	height: 100%;
+	vertical-align: middle;
+}
+
+.-centering > *,
+.-v_centering > * {
+	display: inline-block !important;
+	vertical-align: middle !important;
+}
+
+.clear {clear: both}
+
+.cf:before,
+.cf:after {
+	content: "";
+	display: table;
+}
+.cf:after {clear: both}
+
+.-unselectable {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: -moz-none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.hidden {display: none}
+
+.fa_icon:before {
+	display: inline;
+	font: normal normal normal 1em/1 FontAwesome;
+	text-rendering: auto;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	transform: translate(0, 0);
+}
+
+/* Typography */
+
+h1, h2, h3, h4 {font-weight: 500}
+
+h1 {
+	font-size: 2.2rem;
+	margin: 1.5rem 0 .8rem;
+}
+
+h2 {
+	font-size: 1.9rem;
+	margin: 1.8rem 0 .6rem;
+}
+
+h3 {
+	font-size: 1.6rem;
+	margin: 1.4rem 0 .5rem;
+}
+h4 {
+	font-size: 1.1rem;
+	margin: 2.5em 0 .8em;
+}
+
+p {margin-bottom: .4rem}
+
+label {font-weight: inherit}
+
+/* /Typography */
+/* Forms */
+
+input, select, textarea, button {font-family: inherit}
+
+.form {margin: 0 auto}
+
+.form_unit {
+	margin-bottom: .875rem;
+	font-size: 1rem;
+}
+
+.form_unit:only-child {margin: 0}
+
+.form_unit > .form_unit,
+.form_unit > .form_group {margin-bottom: 0}
+.form_unit > .form_unit + .form_unit,
+.form_unit > .form_group + .form_unit,
+.form_unit > .form_unit + .form_group,
+.form_unit > .form_group + .form_group {margin-top: .5rem}
+
+.form_label {
+	display: block;
+	font-weight: normal;
+}
+
+.form_label:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) {
+	margin: 0;
+	font-size: .9rem;
+}
+
+
+.form_prompt {
+	font-size: .9rem;
+	text-align: right;
+	margin: .2em 0 0;
+}
+
+.form_input,
+.form_select,
+.form_textarea {
+	display: block;
+	width: 100%;
+	padding: 0 .6rem;
+	font-size: .9rem;
+	line-height: normal;
+	color: #656565;
+	border: 1px solid #d8d8d8;/*
+	border-top: 1px solid #aaa;*/
+	border-radius: 3px;/*
+	background-color: #fafafa;
+	box-shadow: inset 0 1px 3px #e6e6e6;*/
+}
+
+:not(.-status_disabled) .form_input:not(:disabled):not(.-status_disabled):focus,
+:not(.-status_disabled) .form_textarea:not(:disabled):not(.-status_disabled):focus {
+	border: 1px solid #4a90e2;
+	background-color: #fff;
+	box-shadow: 0 0 3px hsla(212,72%,59%,.5), inset 0 1px 3px #4a90e2;
+}
+
+.form_input:disabled,
+.form_textarea:disabled {opacity: .5}
+
+.form_input,
+.form_select {height: 2.2rem}
+
+.form_textarea {
+	min-height: 5em;
+	padding: .25rem .5rem;
+	resize: none;
+}
+.form_textarea:focus,
+.form_textarea:valid {min-height: 7em}
+
+.form_select {
+	-moz-appearance: none;
+	background: #fff;
+	border: 1px solid #e3e3e3;
+	box-shadow: 0 1px 2px #d9d9d9;
+	cursor: pointer;
+}
+
+:not(select).form_select > label {
+	margin-bottom: 0;
+	cursor: inherit;
+}
+
+:not(select).form_select:after {
+	content: "\f0d7";
+	position: absolute;
+	right: 0;
+	top: 0;
+	margin: .5rem;
+	font-family: FontAwesome;
+}
+
+/* Form Select2 */
+
+.form_select2 {
+	display: block;
+	width: 100%;
+	border-radius: 3px;
+	font-size: .9rem;
+}
+.form_select2 > .select2-choice {
+	height: 2rem;
+	padding: 0;
+	background: #fff;
+	border: 1px solid #e3e3e3;
+	border-radius: 3px;
+	box-shadow: 0 1px 2px #d9d9d9;
+}
+.form_select2.select2-dropdown-open > .select2-choice {border-radius: 3px 3px 0 0}
+
+.form_select2.select2-container > .select2-choice > .select2-chosen {
+	line-height: 1.9rem;
+	padding-left: 0.6rem;
+}
+.form_select2.select2-container.select2-container-disabled > .select2-choice {
+	border-color: #ddd;
+	background-color: inherit;
+	opacity: .5;
+}
+.form_select2.select2-container > .select2-choice > .select2-arrow {top: 0}
+.form_select2.select2-container.select2-container-disabled > .select2-choice > .select2-arrow {background-color: inherit}
+
+.form_select2.select2-container > .select2-choice > .select2-arrow > b {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	height: 26px;
+	margin: auto;
+}
+
+
+
+.form_select2_drop.select2-drop-active {
+	border-top: 1px solid;
+	border-color: #e3e3e3;
+	box-shadow: 0 1px 2px #d9d9d9;
+}
+
+.form_select2_drop > .select2-results {
+	margin: 5px 0;
+	padding: 0;
+}
+
+.form_select2_drop > .select2-results .select2-highlighted {
+	color: inherit;
+	background-color: #dadada;
+}
+
+
+
+.form_select2.form_input > .select2-choices,
+.form_select2.form_input.select2-container-active > .select2-choices {
+	border: 0;
+	box-shadow: none;
+}
+.form_select2.form_input.select2-container-multi > .select2-choices,
+.form_select2.form_input.select2-container-multi > .select2-choices > .select2-search-field > input {min-height: 2rem}
+.form_select2.form_input.select2-container-multi > .select2-choices > .select2-search-field > input {
+	padding: 0;
+	margin: 0;
+	font-family: inherit;
+	font-size: 1em;
+}
+
+/* /Form Select2 */
+/* Form Radio & Checkbox */
+
+.form_unit > input[type="radio"],
+.form_unit > input[type="checkbox"] {display: none}
+
+.form_radio + .form_label,
+.form_checkbox + .form_label {
+	display: block;
+	font-size: 0;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.form_radio + .form_label > span,
+.form_checkbox + .form_label > span {
+	display: inline-block;
+	vertical-align: middle;
+	width: calc(100% - 20px - 10px);
+	margin-left: 10px;
+	font-size: .9rem;
+	line-height: 1;
+	text-align: left;
+	white-space: normal;
+}
+
+.form_radio + .form_label:before,
+.form_checkbox + .form_label:before {
+	content: "";
+	display: inline-block;
+	vertical-align: middle;
+	width: 20px;
+	height: 20px;
+	border: 1px solid #aaa;
+	border-radius: 3px;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.form_radio + .form_label:before {border-radius: 1rem}
+
+.form_checkbox + .form_label:after {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	display: inline-block;
+	width: 13px;
+	height: 6px;
+	margin: auto 2px;
+	border-left: 2px solid transparent;
+	border-bottom: 2px solid transparent;
+	-webkit-transform: rotate(-45deg);
+	-moz-transform: rotate(-45deg);
+	-ms-transform: rotate(-45deg);
+	-o-transform: rotate(-45deg);
+	transform: rotate(-45deg);
+	transform-origin: top center;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+.form_radio + .form_label:after {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	margin: auto 5px;
+	background-color: transparent;
+}
+
+.form_radio + .form_label:hover:before,
+.form_radio:checked + .form_label:before,
+.form_checkbox + .form_label:hover:before {border: 2px solid}
+
+.form_unit > .form_checkbox:checked + .form_label:before {border: 0}
+
+.form_unit > .form_radio:checked + .form_label:after,
+.form_unit > .form_checkbox:checked + .form_label:after {border-color: #fff}
+
+
+.form_unit > .form_radio:checked + .form_label:after,
+.form_unit > .form_checkbox:checked + .form_label:before {background-color: #ff5f9e}
+.form_unit > .form_radio + .form_label:hover:before,
+.form_unit > .form_radio:checked + .form_label:before,
+.form_unit > .form_checkbox + .form_label:hover:before {border-color: #ff5f9e}
+
+/* /Form Radio & Checkbox */
+/* Form -inline */
+
+.form_unit.-inline {font-size: 0}
+
+.-inline > .form_label,
+.-inline > .form_unit,
+.-inline > .form_group,
+.-inline > .form_input,
+.-inline > .form_select,
+.-inline > .form_textarea {
+	display: inline-block;
+	vertical-align: top;
+	margin-bottom: 0;
+}
+
+.-inline > .form_label {
+	width: 30%;
+	margin-right: .5rem;
+	line-height: 2.2rem;
+	text-align: right;
+}
+
+.-inline > .form_unit,
+.-inline > .form_group,
+.-inline > .form_input,
+.-inline > .form_select,
+.-inline > .form_textarea {
+	width: -webkit-calc(100% - 30% - .5rem);
+	width: calc(100% - 30% - .5rem);
+}
+
+/* /Form -inline */
+/* /Form group */
+
+.form_group {
+	margin-bottom: .875rem;
+	font-size: 0;
+}
+.form_group > .form_unit {
+	display: inline-block;
+	vertical-align: top;
+	margin-bottom: 0;
+}
+
+.form_group.-parts_e_2 > .form_unit,
+.form_group.-parts_e_e > .form_unit {width: 49.5%}
+
+.form_group.-parts_1_2 > .form_unit:nth-child(2n+1),
+.form_group.-parts_2_1 > .form_unit:nth-child(2n+2) {width: 32.6666667%}
+.form_group.-parts_1_2 > .form_unit:nth-child(2n+2),
+.form_group.-parts_2_1 > .form_unit:nth-child(2n+1) {width: 66.3333333%}
+.form_group.-parts_1_3 > .form_unit:nth-child(2n+1),
+.form_group.-parts_3_1 > .form_unit:nth-child(2n+2) {width: 24.25%}
+.form_group.-parts_1_3 > .form_unit:nth-child(2n+2),
+.form_group.-parts_3_1 > .form_unit:nth-child(2n+1) {width: 74.75%}
+.form_group.-parts_2_3 > .form_unit:nth-child(2n+1),
+.form_group.-parts_3_2 > .form_unit:nth-child(2n+2) {width: 39.4%}
+.form_group.-parts_2_3 > .form_unit:nth-child(2n+2),
+.form_group.-parts_3_2 > .form_unit:nth-child(2n+1) {width: 59.6%}
+
+
+.form_group.-parts_e_2 > .form_unit:not(:nth-child(2n+1)),
+.form_group.-parts_e_e > .form_unit:not(:nth-child(2n+1)),
+.form_group.-parts_1_2 > .form_unit:not(:nth-child(2n+1)),
+.form_group.-parts_2_1 > .form_unit:not(:nth-child(2n+1)),
+.form_group.-parts_1_3 > .form_unit:not(:nth-child(2n+1)),
+.form_group.-parts_3_1 > .form_unit:not(:nth-child(2n+1)),
+.form_group.-parts_2_3 > .form_unit:not(:nth-child(2n+1)),
+.form_group.-parts_3_2 > .form_unit:not(:nth-child(2n+1)) {margin-left: 1%}
+
+.form_group.-parts_e_2 > .form_unit:nth-child(n+3),
+.form_group.-parts_e_e > .form_unit:nth-child(n+3),
+.form_group.-parts_1_2 > .form_unit:nth-child(n+3),
+.form_group.-parts_2_1 > .form_unit:nth-child(n+3),
+.form_group.-parts_1_3 > .form_unit:nth-child(n+3),
+.form_group.-parts_3_1 > .form_unit:nth-child(n+3),
+.form_group.-parts_2_3 > .form_unit:nth-child(n+3),
+.form_group.-parts_3_2 > .form_unit:nth-child(n+3) {margin-top: .875rem}
+
+
+.form_group.-parts_e_2 > .form_unit.-offset_1,
+.form_group.-parts_e_e > .form_unit.-offset_1 {margin-left: 50.5%}
+.form_group.-parts_1_2 > .form_unit.-offset_1,
+.form_group.-parts_2_1 > .form_unit.-offset_1 {margin-left: 33.6666667%}
+.form_group.-parts_1_3 > .form_unit.-offset_1,
+.form_group.-parts_3_1 > .form_unit.-offset_1 {margin-left: 25.25%}
+.form_group.-parts_2_3 > .form_unit.-offset_1,
+.form_group.-parts_3_2 > .form_unit.-offset_1 {margin-left: 20.7%}
+
+.form_group.-parts_1_2 > .form_unit.-offset_2 {margin-left: 67.3333333%}
+.form_group.-parts_1_3 > .form_unit.-offset_2 {margin-left: 50.5%}
+.form_group.-parts_2_3 > .form_unit.-offset_2,
+.form_group.-parts_3_2 > .form_unit.-offset_2 {margin-left: 41.4%}
+
+.form_group.-parts_1_3 > .form_unit.-offset_3 {margin-left: 75.75%}
+.form_group.-parts_2_3 > .form_unit.-offset_3 {margin-left: 60.6%}
+
+
+
+.form_group.-parts_e_3   > .form_unit,
+.form_group.-parts_e_e_e > .form_unit {width: 32.6666667%}
+
+.form_group.-parts_1_1_2 > .form_unit:nth-child(3n+3),
+.form_group.-parts_1_2_1 > .form_unit:nth-child(3n+2),
+.form_group.-parts_2_1_1 > .form_unit:nth-child(3n+1) {width: 49.5%}
+.form_group.-parts_1_1_2 > .form_unit:not(:nth-child(3n+3)),
+.form_group.-parts_1_2_1 > .form_unit:not(:nth-child(3n+2)),
+.form_group.-parts_2_1_1 > .form_unit:not(:nth-child(3n+1)) {width: 24.25%}
+
+.form_group.-parts_1_2_2 > .form_unit:nth-child(3n+1),
+.form_group.-parts_2_1_2 > .form_unit:nth-child(3n+2),
+.form_group.-parts_2_2_1 > .form_unit:nth-child(3n+3) {width: 19.2%}
+.form_group.-parts_1_2_2 > .form_unit:not(:nth-child(3n+1)),
+.form_group.-parts_2_1_2 > .form_unit:not(:nth-child(3n+2)),
+.form_group.-parts_2_2_1 > .form_unit:not(:nth-child(3n+3)) {width: 39.4%}
+
+.form_group.-parts_1_1_3 > .form_unit:nth-child(3n+3),
+.form_group.-parts_1_3_1 > .form_unit:nth-child(3n+2),
+.form_group.-parts_3_1_1 > .form_unit:nth-child(3n+1) {width: 59.6%}
+.form_group.-parts_1_1_3 > .form_unit:not(:nth-child(3n+3)),
+.form_group.-parts_1_3_1 > .form_unit:not(:nth-child(3n+2)),
+.form_group.-parts_3_1_1 > .form_unit:not(:nth-child(3n+1)) {width: 19.2%}
+
+
+.form_group.-parts_e_3   > .form_unit:not(:nth-child(3n+1)),
+.form_group.-parts_e_e_e > .form_unit:not(:nth-child(3n+1)),
+.form_group.-parts_1_1_2 > .form_unit:not(:nth-child(3n+1)),
+.form_group.-parts_1_2_1 > .form_unit:not(:nth-child(3n+1)),
+.form_group.-parts_2_1_1 > .form_unit:not(:nth-child(3n+1)),
+.form_group.-parts_1_2_2 > .form_unit:not(:nth-child(3n+1)),
+.form_group.-parts_2_1_2 > .form_unit:not(:nth-child(3n+1)),
+.form_group.-parts_2_2_1 > .form_unit:not(:nth-child(3n+1)),
+.form_group.-parts_1_1_3 > .form_unit:not(:nth-child(3n+1)),
+.form_group.-parts_1_3_1 > .form_unit:not(:nth-child(3n+1)),
+.form_group.-parts_3_1_1 > .form_unit:not(:nth-child(3n+1)) {margin-left: 1%}
+
+.form_group.-parts_e_3   > .form_unit.-offset_1,
+.form_group.-parts_e_e_e > .form_unit.-offset_1 {margin-left: 33.6666667%}
+.form_group.-parts_1_1_2 > .form_unit.-offset_1,
+.form_group.-parts_1_2_1 > .form_unit.-offset_1,
+.form_group.-parts_2_1_1 > .form_unit.-offset_1 {margin-left: 25.25%}
+.form_group.-parts_1_2_2 > .form_unit.-offset_1,
+.form_group.-parts_2_1_2 > .form_unit.-offset_1,
+.form_group.-parts_2_2_1 > .form_unit.-offset_1,
+.form_group.-parts_1_1_3 > .form_unit.-offset_1,
+.form_group.-parts_1_3_1 > .form_unit.-offset_1,
+.form_group.-parts_3_1_1 > .form_unit.-offset_1 {margin-left: 20.2%}
+
+.form_group.-parts_e_3   > .form_unit.-offset_2,
+.form_group.-parts_e_e_e > .form_unit.-offset_2 {margin-left: 67.3333333%}
+.form_group.-parts_1_1_2 > .form_unit.-offset_2,
+.form_group.-parts_1_2_1 > .form_unit.-offset_2,
+.form_group.-parts_2_1_1 > .form_unit.-offset_2 {margin-left: 50.5%}
+.form_group.-parts_1_2_2 > .form_unit.-offset_2,
+.form_group.-parts_2_1_2 > .form_unit.-offset_2,
+.form_group.-parts_2_2_1 > .form_unit.-offset_2,
+.form_group.-parts_1_1_3 > .form_unit.-offset_2,
+.form_group.-parts_1_3_1 > .form_unit.-offset_2,
+.form_group.-parts_3_1_1 > .form_unit.-offset_2 {margin-left: 40.4%}
+
+.form_group.-parts_1_1_2 > .form_unit.-offset_3,
+.form_group.-parts_1_2_1 > .form_unit.-offset_3 {margin-left: 75.75%}
+.form_group.-parts_1_2_2 > .form_unit.-offset_3,
+.form_group.-parts_2_1_2 > .form_unit.-offset_3,
+.form_group.-parts_2_2_1 > .form_unit.-offset_3,
+.form_group.-parts_1_1_3 > .form_unit.-offset_3,
+.form_group.-parts_1_3_1 > .form_unit.-offset_3 {margin-left: 60.6%}
+
+.form_group.-parts_1_2_2 > .form_unit.-offset_4,
+.form_group.-parts_1_1_3 > .form_unit.-offset_4,
+.form_group.-parts_1_3_1 > .form_unit.-offset_4 {margin-left: 80.8%}
+
+
+.form_group.-parts_e_3   > .form_unit:nth-child(n+4),
+.form_group.-parts_e_e_e > .form_unit:nth-child(n+4),
+.form_group.-parts_1_1_2 > .form_unit:nth-child(n+4),
+.form_group.-parts_1_2_1 > .form_unit:nth-child(n+4),
+.form_group.-parts_2_1_1 > .form_unit:nth-child(n+4),
+.form_group.-parts_1_2_2 > .form_unit:nth-child(n+4),
+.form_group.-parts_2_1_2 > .form_unit:nth-child(n+4),
+.form_group.-parts_2_2_1 > .form_unit:nth-child(n+4),
+.form_group.-parts_1_1_3 > .form_unit:nth-child(n+4),
+.form_group.-parts_1_3_1 > .form_unit:nth-child(n+4),
+.form_group.-parts_3_1_1 > .form_unit:nth-child(n+4) {margin-top: .875rem}
+
+
+
+.form_group.-parts_e_4     > .form_unit,
+.form_group.-parts_e_e_e_e > .form_unit {width: 24.25%}
+
+.form_group.-parts_1_1_1_2 > .form_unit:nth-child(4n+4),
+.form_group.-parts_1_1_2_1 > .form_unit:nth-child(4n+3),
+.form_group.-parts_1_2_1_1 > .form_unit:nth-child(4n+2),
+.form_group.-parts_2_1_1_1 > .form_unit:nth-child(4n+1) {width: 39.4%}
+.form_group.-parts_1_1_1_2 > .form_unit:not(:nth-child(4n+4)),
+.form_group.-parts_1_1_2_1 > .form_unit:not(:nth-child(4n+3)),
+.form_group.-parts_1_2_1_1 > .form_unit:not(:nth-child(4n+2)),
+.form_group.-parts_2_1_1_1 > .form_unit:not(:nth-child(4n+1)) {width: 19.2%}
+
+
+.form_group.-parts_e_4     > .form_unit.-offset_1,
+.form_group.-parts_e_e_e_e > .form_unit.-offset_1 {margin-left: 25.25%}
+.form_group.-parts_1_1_1_2 > .form_unit.-offset_1,
+.form_group.-parts_1_1_2_1 > .form_unit.-offset_1,
+.form_group.-parts_1_2_1_1 > .form_unit.-offset_1,
+.form_group.-parts_2_1_1_1 > .form_unit.-offset_1 {margin-left: 20.2%}
+
+.form_group.-parts_e_4     > .form_unit.-offset_2,
+.form_group.-parts_e_e_e_e > .form_unit.-offset_2 {margin-left: 50.5%}
+.form_group.-parts_1_1_1_2 > .form_unit.-offset_2,
+.form_group.-parts_1_1_2_1 > .form_unit.-offset_2,
+.form_group.-parts_1_2_1_1 > .form_unit.-offset_2,
+.form_group.-parts_2_1_1_1 > .form_unit.-offset_2 {margin-left: 40.4%}
+
+.form_group.-parts_e_4     > .form_unit.-offset_3,
+.form_group.-parts_e_e_e_e > .form_unit.-offset_3 {margin-left: 75.75%}
+.form_group.-parts_1_1_1_2 > .form_unit.-offset_3,
+.form_group.-parts_1_1_2_1 > .form_unit.-offset_3,
+.form_group.-parts_1_2_1_1 > .form_unit.-offset_3,
+.form_group.-parts_2_1_1_1 > .form_unit.-offset_3 {margin-left: 60.6%}
+
+.form_group.-parts_1_1_1_2 > .form_unit.-offset_4,
+.form_group.-parts_1_1_2_1 > .form_unit.-offset_4,
+.form_group.-parts_1_2_1_1 > .form_unit.-offset_4 {width: 80.8%}
+
+
+
+
+.form_group.-parts_e_4     > .form_unit:not(:nth-child(4n+1)),
+.form_group.-parts_e_e_e_e > .form_unit:not(:nth-child(4n+1)),
+.form_group.-parts_1_1_1_2 > .form_unit:not(:nth-child(4n+1)),
+.form_group.-parts_1_1_2_1 > .form_unit:not(:nth-child(4n+1)),
+.form_group.-parts_1_2_1_1 > .form_unit:not(:nth-child(4n+1)),
+.form_group.-parts_2_1_1_1 > .form_unit:not(:nth-child(4n+1)) {margin-left: 1%}
+
+.form_group.-parts_e_4     > .form_unit:nth-child(n+5),
+.form_group.-parts_e_e_e_e > .form_unit:nth-child(n+5),
+.form_group.-parts_1_1_1_2 > .form_unit:nth-child(n+5),
+.form_group.-parts_1_1_2_1 > .form_unit:nth-child(n+5),
+.form_group.-parts_1_2_1_1 > .form_unit:nth-child(n+5),
+.form_group.-parts_2_1_1_1 > .form_unit:nth-child(n+5) {margin-top: .875rem}
+
+
+
+.form_group.-parts_e_5       > .form_unit,
+.form_group.-parts_e_e_e_e_e > .form_unit {width: 19.2%}
+
+
+.form_group.-parts_e_5       > .form_unit:not(:nth-child(5n+1)),
+.form_group.-parts_e_e_e_e_e > .form_unit:not(:nth-child(5n+1)) {margin-left: 1%}
+
+.form_group.-parts_e_5       > .form_unit:nth-child(n+6),
+.form_group.-parts_e_e_e_e_e > .form_unit:nth-child(n+6) {margin-top: .875rem}
+
+
+
+
+.form_group.-time_input > .form_unit {
+	vertical-align: middle;
+	width: 2.4em;
+}
+.form_group.-time_input > .form_unit > .form_input {text-align: right}
+.form_group.-time_input > .divider {
+	display: inline-block;
+	vertical-align: middle;
+	margin: 0.3em;
+	font-size: 1rem;
+}
+
+/* /Form group */
+
+/* Form -status */
+
+.form_unit.-status_error {color: #f00}
+.form_unit.-status_error > .form_input:-moz-placeholder,
+.form_unit.-status_error > .form_textarea:-moz-placeholder {color: hsla(0,100%,50%,.65)}
+.form_unit.-status_error > .form_input::-webkit-input-placeholder,
+.form_unit.-status_error > .form_textarea::-webkit-input-placeholder {color: hsla(0,100%,50%,.65)}
+
+.form_unit.-status_error > .form_input,
+.form_unit.-status_error > .form_select,
+.form_unit.-status_error > .form_textarea  {
+	border: 1px solid #ff8080;
+	box-shadow: 0 0 3px #f98e9c;
+}
+.form_unit.status_error > .form_label,
+.form_unit.status_error > .form_checkbox {color: #e3000f}
+.form_unit.status_error > .form_input,
+.form_unit.status_error > .form_textarea {border-bottom: 2px solid #e3000f}
+
+
+.form_input.-status_disabled,
+.form_textarea.-status_disabled,
+.form_select.-status_disabled,
+.form_radio.-status_disabled,
+.form_checkbox.-status_disabled,
+.form_unit.-status_disabled > .form_label,
+.form_unit.-status_disabled > .form_input,
+.form_unit.-status_disabled > .form_textarea,
+.form_unit.-status_disabled > .form_select,
+.form_unit.-status_disabled > .form_radio,
+.form_unit.-status_disabled > .form_checkbox,
+.form_group.-status_disabled .form_input,
+.form_group.-status_disabled .form_textarea,
+.form_group.-status_disabled .form_select,
+.form_group.-status_disabled .form_radio,
+.form_group.-status_disabled .form_checkbox {opacity: .5}
+
+/* /Form -status */
+
+
+.form_unit.-labeled {font-size: 0}
+.form_unit.-labeled > .form_label,
+.form_unit.-labeled > .form_input {
+	display: inline-block;
+	vertical-align: top;
+}
+
+.form_unit.-labeled > .form_label {
+	height: 2.2rem;
+	width: 2.2rem;
+	font-size: 1.2rem;
+	line-height: 2rem;
+	color: #8f8f8f;
+	text-align: center;
+	border: 1px solid #aaa;
+	background-color: #e1e1e1;
+}
+
+.form_unit.-labeled > .form_input {
+	width: -webkit-calc(100% - 2.2rem);
+	width: calc(100% - 2.2rem);
+}
+
+.form_unit.-labeled > .form_label + .form_input,
+.form_unit.-labeled > .form_input + .form_label {
+	margin-left: 0;
+	border-left: 0;
+}
+
+/*/Forms*/
+/*Button*/
+
+.button {
+	display: inline-block;
+	vertical-align: bottom;
+	height: 2.2rem;
+	min-width: 2.2rem;
+	font-family: inherit;
+	font-size: .8em;
+	font-weight: lighter;
+	color: inherit;
+	border: 0;
+	border-radius: 3px;
+	background-color: transparent;
+	text-align: center;
+	text-transform: uppercase;
+	overflow: hidden;
+	cursor: pointer;
+}
+.button:not(:empty) {padding: 0 12px}
+.button[class*="-color_"]:not(:disabled):not(.-color_default):hover {box-shadow: 0 1px 6px #b3b3b3}
+
+.button:disabled,
+.button.-status_disabled {
+	cursor: default;
+	background-color: #ccc;
+}
+
+a.button {line-height: 2rem}
+a.button:hover {text-decoration: none}
+
+.button.-fill {width: 100%}
+
+.button.-color_default {color: #5379b8}
+
+.button[class*="-color_"]:not(.-color_default) {color: #fff}
+.button.-color_default {background-color: transparent}
+.button.-color_default:not(:disabled):hover,
+.button:not([class*="-color_"]):not(:disabled):hover {background-color: #f1f1f1}
+
+
+.button.-color_primary {background-color: #5379b8}
+
+
+.button.-color_alternative {background-color: #ff5f9e}
+
+
+/*
+.button:not(:empty):before {vertical-align: middle}*/
+
+
+
+.ripple {
+	position: absolute;
+	display: block;
+	border-radius: 100%;
+	background-color: hsla(0,0%,100%,.7);
+	transform: scale(0);
+}
+.button.-color_default > .ripple,
+.button:not([class*="-color_"]) > .ripple {background-color: #c1cde9}
+.ripple.animate {animation: ripple 0.65s linear;}
+@keyframes ripple {
+	100% {opacity: 0; transform: scale(2.5);}
+}
+
+
+/*/Button*/
+/*Unite*/
+
+.-unite {
+	font-size: 0;
+}
+
+.-unite > * {
+	display: inline-block;
+	vertical-align: top;
+	margin-left: 0;
+	margin-right: 0;
+}
+
+.-unite > *:not(:last-child) {border-right: 0}
+.-unite > *:not(:first-child):not(:last-child) {border-radius: 0}
+.-unite > :first-child {border-radius: 3px 0 0 3px}
+.-unite > :last-child {border-radius: 0 3px 3px 0}
+
+.-unite > .button {
+	padding: 0;
+	font-size: .8rem;
+}
+
+
+.-unite.-parts_e_e > * {width: 50%}
+
+.-unite.-parts_e_1 > *:nth-child(1),
+.-unite.-parts_1_e > *:nth-child(2) {width: -webkit-calc(100% - 2rem);width: calc(100% - 2rem);}
+.-unite.-parts_1_e > *:nth-child(1),
+.-unite.-parts_e_1 > *:nth-child(2) {width: 2rem}
+
+.-unite.-parts_e_2 > *:nth-child(1),
+.-unite.-parts_2_e > *:nth-child(2) {width: -webkit-calc(100% - 4rem);width: calc(100% - 4rem);}
+.-unite.-parts_2_e > *:nth-child(1),
+.-unite.-parts_e_2 > *:nth-child(2) {width: 4rem}
+
+.-unite.-parts_e_3 > *:nth-child(1),
+.-unite.-parts_3_e > *:nth-child(2) {width: -webkit-calc(100% - 6rem);width: calc(100% - 6rem);}
+.-unite.-parts_3_e > *:nth-child(1),
+.-unite.-parts_e_3 > *:nth-child(2) {width: 6rem}
+
+.-unite.-parts_e_4 > *:nth-child(1),
+.-unite.-parts_4_e > *:nth-child(2) {width: -webkit-calc(100% - 8rem);width: calc(100% - 8rem);}
+.-unite.-parts_4_e > *:nth-child(1),
+.-unite.-parts_e_4 > *:nth-child(2) {width: 8rem}
+
+
+
+.-unite.-parts_e_e_e > * {width: 33.333333333%}
+
+.-unite.-parts_e_e_1 > *:not(:nth-child(3)),
+.-unite.-parts_e_1_e > *:not(:nth-child(2)),
+.-unite.-parts_1_e_e > *:not(:nth-child(1)) {width: -webkit-calc((100% - 2rem) / 2);width: calc((100% - 2rem) / 2);}
+
+.-unite.-parts_e_e_1 > *:nth-child(3),
+.-unite.-parts_e_1_e > *:nth-child(2),
+.-unite.-parts_1_e_e > *:nth-child(1) {width: 2rem}
+
+.-unite.-parts_e_e_2 > *:not(:nth-child(3)),
+.-unite.-parts_e_2_e > *:not(:nth-child(2)),
+.-unite.-parts_2_e_e > *:not(:nth-child(1)) {width: -webkit-calc((100% - 4rem) / 2);width: calc((100% - 4rem) / 2);}
+
+.-unite.-parts_e_e_2 > *:nth-child(3),
+.-unite.-parts_e_2_e > *:nth-child(2),
+.-unite.-parts_2_e_e > *:nth-child(1) {width: 4rem}
+
+.-unite.-parts_e_e_3 > *:not(:nth-child(3)),
+.-unite.-parts_e_3_e > *:not(:nth-child(2)),
+.-unite.-parts_3_e_e > *:not(:nth-child(1)) {width: -webkit-calc((100% - 6rem) / 2);width: calc((100% - 6rem) / 2);}
+
+.-unite.-parts_e_e_3 > *:nth-child(3),
+.-unite.-parts_e_3_e > *:nth-child(2),
+.-unite.-parts_3_e_e > *:nth-child(1) {width: 6rem}
+
+.-unite.-parts_e_e_4 > *:not(:nth-child(3)),
+.-unite.-parts_e_4_e > *:not(:nth-child(2)),
+.-unite.-parts_4_e_e > *:not(:nth-child(1)) {width: -webkit-calc((100% - 8rem) / 2);width: calc((100% - 8rem) / 2);}
+
+.-unite.-parts_e_e_4 > *:nth-child(3),
+.-unite.-parts_e_4_e > *:nth-child(2),
+.-unite.-parts_4_e_e > *:nth-child(1) {width: 8rem}
+
+
+.-unite.-parts_e_1_1 > *:nth-child(1),
+.-unite.-parts_1_e_1 > *:nth-child(2),
+.-unite.-parts_1_1_e > *:nth-child(3) {width: -webkit-calc(100% - 4rem);width: calc(100% - 4rem);}
+
+.-unite.-parts_e_1_1 > *:not(:nth-child(1)),
+.-unite.-parts_1_e_1 > *:not(:nth-child(2)),
+.-unite.-parts_1_1_e > *:not(:nth-child(3)) {width: 2rem}
+
+.-unite.-parts_e_2_2 > *:nth-child(1),
+.-unite.-parts_2_e_2 > *:nth-child(2),
+.-unite.-parts_2_2_e > *:nth-child(3) {width: -webkit-calc(100% - 8rem);width: calc(100% - 8rem);}
+
+.-unite.-parts_e_2_2 > *:not(:nth-child(1)),
+.-unite.-parts_2_e_2 > *:not(:nth-child(2)),
+.-unite.-parts_2_2_e > *:not(:nth-child(3)) {width: 4rem}
+
+
+.-unite.-parts_e_1_2 > *:nth-child(1),
+.-unite.-parts_e_2_1 > *:nth-child(1),
+.-unite.-parts_1_e_2 > *:nth-child(2),
+.-unite.-parts_2_e_1 > *:nth-child(2),
+.-unite.-parts_1_2_e > *:nth-child(3),
+.-unite.-parts_2_1_e > *:nth-child(3) {width: -webkit-calc(100% - 6rem);width: calc(100% - 6rem);}
+
+.-unite.-parts_e_1_2 > *:nth-child(2),
+.-unite.-parts_e_2_1 > *:nth-child(3),
+.-unite.-parts_1_e_2 > *:nth-child(1),
+.-unite.-parts_2_e_1 > *:nth-child(3),
+.-unite.-parts_1_2_e > *:nth-child(1),
+.-unite.-parts_2_1_e > *:nth-child(2) {width: 2rem}
+
+.-unite.-parts_e_1_2 > *:nth-child(3),
+.-unite.-parts_e_2_1 > *:nth-child(2),
+.-unite.-parts_1_e_2 > *:nth-child(3),
+.-unite.-parts_2_e_1 > *:nth-child(1),
+.-unite.-parts_1_2_e > *:nth-child(2),
+.-unite.-parts_2_1_e > *:nth-child(1) {width: 4rem}
+
+
+.-unite.-parts_e_1_3 > *:nth-child(1),
+.-unite.-parts_e_3_1 > *:nth-child(1),
+.-unite.-parts_1_e_3 > *:nth-child(2),
+.-unite.-parts_3_e_1 > *:nth-child(2),
+.-unite.-parts_1_3_e > *:nth-child(3),
+.-unite.-parts_3_1_e > *:nth-child(3) {width: -webkit-calc(100% - 8rem);width: calc(100% - 8rem);}
+
+.-unite.-parts_e_1_3 > *:nth-child(2),
+.-unite.-parts_e_3_1 > *:nth-child(3),
+.-unite.-parts_1_e_3 > *:nth-child(1),
+.-unite.-parts_3_e_1 > *:nth-child(3),
+.-unite.-parts_1_3_e > *:nth-child(1),
+.-unite.-parts_3_1_e > *:nth-child(2) {width: 2rem}
+
+.-unite.-parts_e_1_3 > *:nth-child(3),
+.-unite.-parts_e_3_1 > *:nth-child(2),
+.-unite.-parts_1_e_3 > *:nth-child(3),
+.-unite.-parts_3_e_1 > *:nth-child(1),
+.-unite.-parts_1_3_e > *:nth-child(2),
+.-unite.-parts_3_1_e > *:nth-child(1) {width: 6rem}
+
+
+/* /Unite */
+/* Calendar */
+
+.calendar_wrapper {
+	display: inline-block;
+	min-height: -webkit-calc(2.4em * 7 + 3em); /* To make calendar with similar height either with 5 or 6 weeks */
+	min-height: calc((2.4em * 7) + 3em); /* 2.4em - cell height, 5px - cell spacing and 3em for header height */
+	font-size: 0.8rem;
+	cursor: default;
+}
+
+.calendar_header {
+	padding: 0 7px;
+	font-weight: 500;
+	color: #f82969;
+	text-align: center;
+}
+
+.calendar_prev_btn,
+.calendar_next_btn {
+	display: inline-block;
+	vertical-align: middle;
+	width: 2em;
+	height: 2em;
+	font-size: 1em;
+	color: inherit;
+	border: 0;
+	border-radius: 3px;
+	background-color: transparent;
+	cursor: pointer;
+}
+
+.calendar_month_name {
+	display: inline-block;
+	vertical-align: middle;
+	width: -webkit-calc(100% - 5em);
+	width: calc(100% - 5em);
+	padding: .5em;
+	margin: 0 .5em;
+	font-size: 1.1em;
+	border-radius: 3px;
+	text-transform: uppercase;
+
+}
+.-month_selection .calendar_month_name {cursor: pointer}
+/*
+.calendar_prev_btn:hover,
+.calendar_next_btn:hover,
+.-month_selection .calendar_month_name:hover {
+	color: #fff;
+	background-color: hsla(221,45%,60%,.8);
+}*/
+/*
+.calendar_month_name.active {
+	color: #fff;
+	background-color: #6b88c7;
+}*/
+
+
+.calendar_month {/*
+	border-collapse: separate;
+	border-spacing: 5px;*/
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+.calendar_cell {
+	width: 2.4em;
+	height: 2.4em;
+	text-align: center;/*
+	border-radius: 50%;*/
+}
+/*
+.calendar_day.today {
+	border: 2px solid #ff5f9e;
+}*/
+.calendar_cell.active {
+	color: #fff;
+	background-color: #6b88c7;
+}
+.calendar_weekday {text-align: inherit} /*FUB*/
+.-weekday_selection .calendar_weekday {cursor: pointer}
+
+.calendar_day {cursor: pointer}
+.calendar_day.not_this_month {opacity: .5}
+
+/* /Calendar */
+/* DatePicker */
+
+.date_picker {
+	position: absolute;
+	right: 0;
+	min-width: 260px;
+	padding: 20px;
+	font-size: 1rem;
+	background-color: #fff;
+	box-shadow: 0 2px 6px hsla(0,0%,0%,.28);
+	z-index: 10;
+}
+
+/* /DatePicker */
+/* User */
+
+.user_pic {
+	display: inline-block;
+	vertical-align: middle;
+	width: 70px;
+	height: 70px;
+	border: 2px solid #fff;
+}
+
+.user_pic.-rounded {border-radius: 50%}
+
+.user_pic.-size_40x40 {
+	width: 40px;
+	height: 40px;
+}
+.user_pic.-size_small,
+.user_pic.-size_50x50 {
+	width: 50px;
+	height: 50px;
+}
+
+/* /User */
+/* Page */
+
+.page_viewport {
+	margin: 70px 30px;
+}
+
+.page_wrapper {
+	margin: 0 auto;
+}
+
+.page {
+	width: 700px;
+	padding: 15px 30px;
+	background-color: #fff;
+	box-shadow: 0 2px 6px hsla(0,0%,0%,.28);
+}
+
+
+@media (min-width: 768px) and (max-width: 992px) {
+	.page_wrapper {
+		width: 500px;
+	}
+}
+@media (min-width: 993px) and (max-width: 1200px) {
+	.page_wrapper {
+		width: 700px;
+	}
+}
+@media (min-width: 1201px) and (max-width: 1600px) {
+	.page_wrapper {
+		width: 900px;
+	}
+}
+@media (min-width: 1601px) {
+	.page_wrapper {
+		width: 1200px;
+	}
+}
+
+
+/* /Page */
+
+
+/* MAIN */
+
+#wrapper {
+	padding: 50px 0 0 250px;
+}
+
+#overview_header {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 50px;
+	background-color: #fff;
+	border-bottom: 1px solid #d9d9d9;
+	box-shadow: 0 0 5px;
+	z-index: 100;
+}
+#overview_header > * {
+	display: inline-block;
+	vertical-align: top;
+	height: 100%;
+}
+
+.header_brand {
+	width: 250px;
+	padding: 2px 14px;
+	font-family: 'DesignosaurRegular', sans-serif;
+	font-size: 28px;
+	font-weight: 500;
+	color: #fff;
+}
+.header_brand > a {
+	color: #000;
+	text-decoration: none;
+}
+.header_brand > a > img {width: 40px}
+
+.header_search_block > .form_input {
+	width: 50%;
+	margin: auto;
+	min-width: 500px;
+}
+
+.header_search_block {
+	width: -webkit-calc(100% - 600px);
+	width: calc(100% - 600px);
+}
+
+.header_login_block {
+	width: 250px;
+}
+
+
+#sidebar_wrapper {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 250px;
+	height: 100%;
+	padding-top: 70px;
+	color: #fff;
+	background-color: #3F536A;
+	box-shadow: 0 0 5px #333;
+}
+
+
+#content_wrapper {
+	margin: 70px 30px;
+}
+
+/* ADD EVENT */
+
+.selected_days {
+	font-size: .8em;
+	margin-bottom: 10px;
+}
+
+.event_datepicker_form,
+.event_datepicker_calendar {
+	display: inline-block;
+	vertical-align: middle;
+}
+.event_datepicker_form {
+	width: -webkit-calc(100% - 270px);
+	width: calc(100% - 270px);
+}
+.event_datepicker_calendar {
+	width: 240px;
+	margin-right: 20px;
+}
+
+.event_datepicker_calendar .calendar_wrapper {
+	padding: 0 10px;
+}
+.event_datepicker_calendar .calendar_wrapper:after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 100%;
+	height: 80%;
+	margin: 10% 0;
+	border-right: 1px solid #d4d4d4;
+}
+
+.event_selected_days_wrapper {
+	width: -webkit-calc(100% + 60px);
+	width: calc(100% + 60px);
+	height: 0;
+	margin: 0 -30px;
+	background-color: #fafafa;
+	box-shadow: inset 0 5px 3px -3px #ccc, inset 0 -5px 3px -3px #ccc;
+	overflow: hidden;
+	text-align: center;
+	-webkit-transition: height .3s ease;
+	-moz-transition: height .3s ease;
+	-ms-transition: height .3s ease;
+	-o-transition: height .3s ease;
+	transition: height .3s ease;
+}
+.event_selected_days_table {width: 100%}
+
+.event_selected_days_table > thead > tr,
+.event_selected_days_table > tbody > tr {
+	border-bottom: 1px solid #ccc;
+}
+
+.event_selected_days_table > thead > tr > th {
+	padding: 15px 5px;
+	font-weight: 500;
+}
+
+.event_selected_days_table > tbody > tr > td {
+	padding: 15px 0;
+}
+
+.event_selected_days_table .remove_date {
+	display: block;
+	width: 100%;
+	height: 100%;
+	font-size: 1.3em;
+	border: 0;
+	background-color: transparent;
+}
+
+.event_selected_days_add_date {margin: 10px 0}

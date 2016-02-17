@@ -1,11 +1,102 @@
+
+<!-- OLD CALENDAR -->
 <script type="javascript/template" id="tmpl-calendar-line">
   <tr class="calendar-days-line"></tr>
 </script>
 
 <script type="javascript/template" id="tmpl-calendar-day">
   <td class="td-day day-{day_number} {today} disabled" data-date="{date}" data-page="{date}" data-title="{date_text}">
-    <div class="content centering"><span class="day-number">{number}</span></div>
+    <div class="content -centering"><span class="day-number">{number}</span></div>
   </td>
+</script>
+
+<!-- NEW CALENDAR -->
+<script type="javascript/template" id="tmpl-calendar">
+	<div class="{wrapper_class} -unselectable">
+		<div class="{header_class}">
+			<button class="PrevMonth {prev_btn_class} fa_icon fa-chevron-left" type="button"></button>
+			<span class="MonthName {month_name_class}"></span>
+			<button class="NextMonth {next_btn_class} fa_icon fa-chevron-right" type="button"></button>
+		</div>
+		<table class="CalendarTable {table_class}">
+			<colgroup>
+				<col valign="middle">
+				<col valign="middle">
+				<col valign="middle">
+				<col valign="middle">
+				<col valign="middle">
+				<col valign="middle">
+				<col valign="middle">
+			</colgroup>
+			<thead class="{thead_class}">
+				<tr class="{head_tr_class}">
+					<th class="{table_cell_class} {th_class} Week_1" data-weekday="1"><span>Пн</span></th>
+					<th class="{table_cell_class} {th_class} Week_2" data-weekday="2"><span>Вт</span></th>
+					<th class="{table_cell_class} {th_class} Week_3" data-weekday="3"><span>Ср</span></th>
+					<th class="{table_cell_class} {th_class} Week_4" data-weekday="4"><span>Чт</span></th>
+					<th class="{table_cell_class} {th_class} Week_5" data-weekday="5"><span>Пт</span></th>
+					<th class="{table_cell_class} {th_class} Week_6" data-weekday="6"><span>Сб</span></th>
+					<th class="{table_cell_class} {th_class} Week_0" data-weekday="0"><span>Вс</span></th>
+				</tr>
+			</thead>
+			<tbody class="CalendarTableBody {tbody_class}"></tbody>
+		</table>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-calendar-row">
+	<tr class="{tr_class}"></tr>
+</script>
+
+<script type="javascript/template" id="tmpl-calendar-div">
+	<td class="{table_cell_class} {td_class} Day_{date} DayOfWeek_{day_number} DayOfMonth_{month_number} {today} {active}" data-weekday="{day_number}" data-date="{date}" data-title="{date_text}"><span>{number}</span></td>
+</script>
+
+<script type="javascript/template" id="tmpl-selected-table-day">
+	<tr class="TableDay_{date}" data-date="{date}">
+		<td><button class="remove_date RemoveRow" type="button">&times;</button></td>
+		<td><input class="form_input DatePicker" value="{formatted_date}" data-selected_day="{date}"></td>
+		<td></td>
+		<td>
+			<div class="form_unit -inline">
+				<label class="form_label">Начало</label>
+				<div class="form_unit">
+					<div class="form_group -time_input TimeInput">
+						<div class="form_unit">
+							<input class="form_input StartHours" value="{start_hours}">
+						</div>
+						<span class="divider">:</span>
+						<div class="form_unit">
+							<input class="form_input StartMinutes" value="{start_minutes}">
+						</div>
+					</div>
+				</div>
+			</div>
+		</td>
+		<td>
+			<div class="form_unit -inline">
+				<label class="form_label">Конец</label>
+				<div class="form_unit">
+					<div class="form_group -time_input TimeInput">
+						<div class="form_unit">
+							<input class="form_input EndHours" value="{end_hours}">
+						</div>
+						<span class="divider">:</span>
+						<div class="form_unit">
+							<input class="form_input EndMinutes" value="{end_minutes}">
+						</div>
+					</div>
+				</div>
+			</div>
+		</td>
+	</tr>
+</script>
+
+<script type="javascript/template" id="tmpl-datepicker">
+	<div class="date_picker">
+		<div class="DatePickerCalendar"></div>
+		<button class="button -color_primary SubmitDatePicker" type="button">Готово</button>
+	</div>
 </script>
 
 <script type="javascript/template" id="tmpl-organizations-item">
@@ -238,6 +329,7 @@
   </div>
 </script>
 
+<!-- OLD -->
 <script type="javascript/template" id="tmpl-add-event-modal">
   <div class="modal fade" id="modal-add-event" role="dialog" aria-labelledby="myModalLabel">
     <div class="modal-dialog add-event-modal" role="document">
@@ -682,6 +774,7 @@
   </div>
 </script>
 
+<!-- OLD -->
 <script type="javascript/template" id="tmpl-default-address-btn">
   <span class="input-group-btn" id="default-address-btn"><button type="button" class="btn btn-default"><span class="fa fa-building"></span></button></span>
 </script>
