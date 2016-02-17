@@ -67,7 +67,7 @@ class Friend extends AbstractEntity{
 		if (isset($fields[self::SUBSCRIPTIONS_FIELD_NAME])){
 			$result_data[self::SUBSCRIPTIONS_FIELD_NAME] =
 				$this->getSubscriptions(
-					Fields::parseFields($fields[self::SUBSCRIPTIONS_FIELD_NAME]['fields']) ?? array(),
+					Fields::parseFields($fields[self::SUBSCRIPTIONS_FIELD_NAME]['fields'] ?? ''),
 					array(
 						'length' => $fields[self::SUBSCRIPTIONS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 						'offset' => $fields[self::SUBSCRIPTIONS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET,
