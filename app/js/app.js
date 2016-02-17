@@ -798,7 +798,7 @@ function tmpl(template_type, items, addTo, direction){
  * Query search part to object
  * */
 if (window['moment'] != undefined){
-    moment.lang(navigator.language);
+    moment.locale(navigator.language);
 }
 
 /**
