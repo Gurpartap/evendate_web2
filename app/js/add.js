@@ -322,7 +322,6 @@ function bindDatepickerChanger(){
 }
 
 function bindModalEvents(){
-	//debugger;
 	var $text_length = $('.textarea-length-text'),
 		$organizations = $('.organizations.ToSelect2');
 
@@ -471,7 +470,7 @@ function bindModalEvents(){
 
 	}
 
-	$organizations.select2({
+	$organizations/*.select2({
 		width: '100%',
 		formatResult: function(state){
 			if (!state.id) { return state.text; }
@@ -481,7 +480,7 @@ function bindModalEvents(){
 		},
 		containerCssClass: "form_select2",
 		dropdownCssClass: "form_select2_drop"
-	}).on('change',function(e){
+	})*/.on('change',function(e){
 		var $btn = $('#default-address-btn');
 		if (!$(this).find('option:selected').data('default-address')){
 			$btn.hide();
@@ -534,7 +533,6 @@ function bindModalEvents(){
 
 	$('#filestyle-0').on('change', handleFileSelect);
 	$('#filestyle-1').on('change', handleFileSelect);
-
 	$(".placepicker").placepicker({
 		placeChanged: function(e){
 			_location = {

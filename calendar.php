@@ -23,7 +23,7 @@
 	<!-- =============== VENDOR STYLES ===============-->
 	<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,800italic,800,700italic,700,600italic,600,400italic,300italic,300' rel='stylesheet' type='text/css'>
 	<link href='https://fonts.googleapis.com/css?family=Didact+Gothic&subset=latin,cyrillic,cyrillic-ext' rel='stylesheet' type='text/css'>
-	<link href='https://fonts.googleapis.com/css?family=Roboto&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,500,500italic&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
 	<!-- FONT AWESOME-->
 	<link rel="stylesheet" href="vendor/fontawesome/css/font-awesome.min.css">
 	<!-- SIMPLE LINE ICONS-->
@@ -275,278 +275,213 @@
 									<div class="page shifted">
 										<form class="form-horizontal" id="create-event-form">
 
+											<h3>Новое мероприятие</h3>
 
-											<div class="form_group -parts_1_2">
-												<div class="form_unit">
-													<label class="form_label">Организация</label>
-													<select class="organizations ToSelect2" name="organization_id" title="Выберите организацию">
-														<option>Организация</option>
-														<option>Организация</option>
-														<option>Организация</option>
-													</select>
-												</div>
-												<div class="form_unit">
-													<label class="form_label">Организация</label>
-													<select class="form_select" name="organization_id" title="Выберите организацию">
-														<option>Организация</option>
-														<option>Организация</option>
-														<option>Организация</option>
-													</select>
-												</div>
-												<div class="form_unit">
-													<label class="form_label">Организация</label>
-													<select class="form_select" name="organization_id" title="Выберите организацию">
-														<option>Организация</option>
-														<option>Организация</option>
-														<option>Организация</option>
-													</select>
-												</div>
-												<div class="form_unit">
-													<label class="form_label">Организация</label>
-													<select class="form_select" name="organization_id" title="Выберите организацию">
-														<option>Организация</option>
-														<option>Организация</option>
-														<option>Организация</option>
-													</select>
-												</div>
-											</div>
-
-
-											<div class="form_group -parts_e_2">
-												<div class="form_unit">
-													<div class="form_unit">
-														<input id="radio1" class="form_radio" type="radio" name="radio">
-														<label class="form_label" for="radio1"><span>Организация</span></label>
-													</div>
-													<div class="form_unit">
-														<input id="radio2" class="form_radio" type="radio" name="radio">
-														<label class="form_label" for="radio2"><span>Организация</span></label>
-													</div>
-													<div class="form_unit">
-														<input id="radio3" class="form_radio" type="radio" name="radio">
-														<label class="form_label" for="radio3"><span>Организация</span></label>
-													</div>
-												</div>
-												<div class="form_unit">
-													<div class="form_unit">
-														<input id="checkbox1" class="form_checkbox" type="checkbox" name="checkbox">
-														<label class="form_label" for="checkbox1"><span>Организация</span></label>
-													</div>
-													<div class="form_unit">
-														<input id="checkbox2" class="form_checkbox" type="checkbox" name="checkbox">
-														<label class="form_label" for="checkbox2"><span>Организация</span></label>
-													</div>
-													<div class="form_unit">
-														<input id="checkbox3" class="form_checkbox" type="checkbox" name="checkbox">
-														<label class="form_label" for="checkbox3"><span>Организация</span></label>
-													</div>
-												</div>
-											</div>
-
+											<h4 class="form_label"><label for="event_title">Название</label></h4>
 
 											<div class="form_unit">
-												<label class="form_label">Организация</label>
-												<input class="form_input" type="text" autocomplete="off" placeholder="Название мероприятия" name="title">
+												<input id="event_title" class="form_input LimitSize" type="text" name="title" autocomplete="off" placeholder="Название мероприятия" data-maxlength="60">
+												<p class="form_prompt">0/60</p>
 											</div>
 
-											<div class="form_unit -inline">
-												<label class="form_label">Организация</label>
-												<div class="form_group -parts_2_1">
+											<h4 class="form_label">Дата</h4>
+
+											<div class="event_datepicker">
+												<div class="EventDatesCalendar event_datepicker_calendar"></div>
+												<div class="event_datepicker_form">
+													<p>Выбраны даты:</p>
+													<div class="selected_days EventSelectedDaysText"><p>Даты не выбраны</p></div>
 													<div class="form_unit">
-														<input class="form_input" type="text" autocomplete="off" placeholder="Название мероприятия" name="title">
+														<input id="different_time" class="form_checkbox" type="checkbox" name="checkbox" tabindex="-1">
+														<label class="form_label" for="different_time"><span>Разное время каждый день</span></label>
 													</div>
+													<div class="form_group MainTime -parts_e_2">
+														<div class="form_unit -inline">
+															<label class="form_label">Начало</label>
+															<div class="form_unit">
+																<div class="form_group -time_input TimeInput">
+																	<div class="form_unit">
+																		<input class="form_input StartHours">
+																	</div>
+																	<span class="divider">:</span>
+																	<div class="form_unit">
+																		<input class="form_input StartMinutes">
+																	</div>
+																</div>
+															</div>
+														</div>
+														<div class="form_unit -inline">
+															<label class="form_label">Конец</label>
+															<div class="form_unit">
+																<div class="form_group -time_input TimeInput">
+																	<div class="form_unit">
+																		<input class="form_input EndHours">
+																	</div>
+																	<span class="divider">:</span>
+																	<div class="form_unit">
+																		<input class="form_input EndMinutes">
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+
+											<div class="event_selected_days_wrapper">
+												<div class="event_selected_days_content">
+													<table class="event_selected_days_table">
+														<colgroup>
+															<col width="7%">
+															<col width="21%">
+															<col width="10%">
+															<col width="31%">
+															<col width="31%">
+														</colgroup>
+														<thead>
+															<tr>
+																<th></th>
+																<th>День</th>
+																<th></th>
+																<th>Время начала</th>
+																<th>Время конца</th>
+															</tr>
+														</thead>
+														<tbody class="SelectedDaysRows">
+														</tbody>
+													</table>
+													<div style="display: inline-block">
+														<input id="new_date" type="hidden">
+														<button class="button -color_default event_selected_days_add_date AddDayToTable DatePicker RippleEffect" type="button"><span>Добавить день</span></button>
+													</div>
+												</div>
+											</div>
+
+											<h4 class="form_label"><label for="add_event_placepicker">Место проведения</label></h4>
+
+											<div class="form_group -parts_3_1">
+												<div class="form_unit">
+													<input class="form_input placepicker" id="add_event_placepicker" data-map-container-id="collapseOne">
+												</div>
+												<div class="form_unit">
+													<button class="button -color_primary -fill RippleEffect" type="button" tabindex="-1">По умолчанию</button>
+												</div>
+											</div>
+											<div id="collapseOne" class="collapse">
+												<div class="placepicker-map thumbnail"></div>
+											</div>
+
+											<h4 class="form_label"><label>Описание</label></h4>
+
+											<div class="form_unit">
+												<textarea class="form_textarea LimitSize" data-maxlength="150"></textarea>
+											</div>
+
+											<h4 class="form_label">Регистрация</h4>
+
+											<div class="form_unit">
+												<input id="checkbox1" class="form_checkbox" type="checkbox" name="checkbox">
+												<label class="form_label" for="checkbox1"><span>Обязательная регистрация</span></label>
+											</div>
+
+											<p>Крайний срок регистрации до:</p>
+											<div class="form_group -parts_2_3">
+												<div class="form_unit -inline">
+													<label class="form_label">Дата</label>
+													<div class="form_select -v_centering DatePicker"><label>Дата</label><input type="hidden"></div>
+												</div>
+												<div class="form_unit">
+													<div class="form_group -parts_e_2">
+														<div class="form_unit -inline">
+															<label class="form_label">Время</label>
+															<div class="form_unit">
+																<div class="form_group -time_input TimeInput">
+																	<div class="form_unit">
+																		<input class="form_input">
+																	</div>
+																	<span class="divider">:</span>
+																	<div class="form_unit">
+																		<input class="form_input">
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+
+											<h4 class="form_label"><label for="event_title">Ссылка на страницу мероприятия</label></h4>
+											<div class="form_unit">
+												<input id="event_title" class="form_input" type="text" name="title" autocomplete="off" placeholder="Ссылка">
+											</div>
+
+											<h4 class="form_label"><label for="event_tags">Теги</label></h4>
+											<div class="form_unit">
+												<input id="event_tags" class="form_input" type="text" name="title" autocomplete="off" >
+											</div>
+
+											<h4 class="form_label"><label for="event_title">Уведомления для пользователей</label></h4>
+											<div class="form_group -parts_2_3">
+
+												<div class="form_unit">
+													<div class="form_select -v_centering DatePicker"><label>Дата</label><input type="hidden"></div>
+												</div>
+
+												<div class="form_unit -inline">
+													<label class="form_label">Точное время</label>
 													<div class="form_unit">
-														<button class="button -fill" type="button" tabindex="-1">Отправить</button>
-													</div>
-												</div>
-											</div>
-
-											<div class="form_unit -inline">
-												<label class="form_label">Организация</label>
-												<div class="form_unit -unite -parts_1_e_3">
-													<button class="button -color-default fa_icon fa-map-marker" type="button" tabindex="-1"></button>
-													<input class="form_input" type="text" autocomplete="off" placeholder="Название мероприятия" name="title">
-													<button class="button -color-default" type="button" tabindex="-1">Отправить</button>
-												</div>
-											</div>
-
-											<div class="form_unit -inline">
-												<label class="form_label">Организация</label>
-												<input class="form_input" type="text" autocomplete="off" placeholder="Название мероприятия" name="title">
-											</div>
-
-											<div class="form_unit -inline">
-												<label class="form_label">Организация</label>
-												<textarea class="form_textarea" placeholder="Название мероприятия" name="title"></textarea>
-											</div>
-
-
-
-
-											<div class="form-group {hidden_organizations}">
-												<label class="control-label">Организация</label>
-
-												<div class="col-sm-12">
-													<select class="to-select2 organizations" name="organization_id" style="width: 100%" title="Выберите организацию">
-														{organizations}
-													</select>
-												</div>
-											</div>
-
-											<div class="form-group">
-												<label class="control-label">Название</label>
-
-												<div class="col-sm-12">
-													<input type="text" autocomplete="off" class="form-control" placeholder="Название мероприятия" name="title">
-												</div>
-											</div>
-
-											<div class="form-group">
-
-												<div class="col-sm-6">
-													<label class="control-label">Дата</label>
-													<input type="text" class="form-control daterange" autocomplete="off" placeholder="Дата проведения" name="date">
-												</div>
-											</div>
-											<div class="form-group row">
-												<div class="col-sm-5"><label class="control-label">Время</label></div>
-												<div class="col-sm-7">
-													<div class="checkbox c-checkbox needsclick">
-														<label class="needsclick">
-															<input type="checkbox" value="1" class="needsclick full-day" name="full-day">
-															<span class="fa fa-check"></span>Весь день</label>
-													</div>
-												</div>
-											</div>
-											<div class="form-group row">
-												<div class="col-xs-2">Начало</div>
-												<div class="col-xs-4 form-inline">
-													<input class="form-control input-hours input-1" data-input-number="1" name="begin-hours">
-													:
-													<input class="form-control input-minutes input-2" data-input-number="2" name="begin-minutes">
-												</div>
-												<div class="col-xs-2">Конец</div>
-												<div class="col-xs-4 form-inline">
-													<input class="form-control input-hours input-3" data-input-number="3" name="end-hours">
-													:
-													<input class="form-control input-minutes input-4" data-input-number="4" name="end-minutes">
-												</div>
-											</div>
-											<div class="form-group">
-												<label class="control-label">Ссылка на подробное описание</label>
-
-												<div class="col-sm-12">
-													<input type="text" class="form-control" placeholder="Ссылка на описание" name="detail-info-url">
-												</div>
-											</div>
-
-											<div class="form-group">
-												<label class="control-label">Описание</label>
-
-												<div class="col-sm-12">
-													<textarea maxlength="500" class="form-control only-vertical description" rows="3"
-																		placeholder="Описание мероприятия, до 500 символов" name="description"></textarea>
-													<span class="textarea-length-text pull-right">0/500</span>
-												</div>
-											</div>
-											<div class="form-group">
-												<label class="control-label">Теги</label>
-
-												<div class="col-sm-12">
-													<input class="to-select2 tags" name="tags" style="width: 100%" title="Теги">
-												</div>
-											</div>
-											<div class="form-group">
-												<label class="control-label">Место проведения</label>
-
-												<div class="col-sm-12">
-													<div class="form-group">
-														<input class="placepicker form-control"  autocomplete="off" name="address" id="placepicker-add"
-																	 data-map-container-id="collapseOne"/>
-													</div>
-													<div id="collapseOne" class="collapse">
-														<div class="placepicker-map thumbnail"></div>
-													</div>
-												</div>
-											</div>
-											<div class="form-group">
-												<label class="control-label">Изображения</label>
-												<div class="row add-images">
-													<div class="col-sm-5">
-														<input type="file" data-classbutton="btn btn-default" data-classinput="form-control inline"
-																	 class="form-control filestyle" id="filestyle-0" tabindex="-1"
-																	 style="position: absolute; clip: rect(0px 0px 0px 0px);">
-														<div class="bootstrap-filestyle input-group vertical">
-															<span class="group-span-filestyle input-group-btn" tabindex="0">
-																<label for="filestyle-0" class="btn btn-default vertical-btn"
-																			 style="height: 213px;width: 153px;padding-top: 84px;">
-																	<span>Выбрать файл</span>
-																</label>
-															</span>
+														<div class="form_group -time_input TimeInput">
+															<div class="form_unit">
+																<input class="form_input">
+															</div>
+															<span class="divider">:</span>
+															<div class="form_unit">
+																<input class="form_input">
+															</div>
 														</div>
-														<div class="crop-again hidden vertical"><a href="#">Кадрировать</a></div>
 													</div>
-													<div class="col-sm-7">
-														<input type="file" data-classbutton="btn btn-default" data-classinput="form-control inline"
-																	 class="form-control filestyle" id="filestyle-1" tabindex="-1"
-																	 style="position: absolute; clip: rect(0px 0px 0px 0px);">
-														<div class="bootstrap-filestyle input-group horizontal">
-															<span class="group-span-filestyle input-group-btn" tabindex="0">
-																<label for="filestyle-1" class="btn btn-default horizontal-btn"
-																			 style="height: 143px;width: 202px;padding-top: 60px;">
-																	<span>Выбрать файл</span>
-																</label>
-															</span>
+												</div>
+
+											</div>
+
+											<h4 class="form_label"></h4>
+
+											<div class="form_group -parts_e_2">
+
+												<div class="form_unit">
+													<input id="add_event_delayed_publication" class="form_checkbox" type="checkbox" name="delayed_publication">
+													<label class="form_label" for="add_event_delayed_publication"><span>Отложенная публикация</span></label>
+												</div>
+
+												<div class="form_unit">
+
+													<div class="form_unit -inline">
+														<label class="form_label">Дата</label>
+														<div class="form_select -v_centering DatePicker"><label>Дата</label><input type="hidden"></div>
+													</div>
+
+													<div class="form_unit -inline">
+														<label class="form_label">Точное время</label>
+														<div class="form_unit">
+															<div class="form_group -time_input TimeInput">
+																<div class="form_unit">
+																	<input class="form_input">
+																</div>
+																<span class="divider">:</span>
+																<div class="form_unit">
+																	<input class="form_input">
+																</div>
+															</div>
 														</div>
-														<div class="crop-again hidden horizontal"><a href="#">Кадрировать</a></div>
 													</div>
+
 												</div>
 											</div>
-											<div class="form-group row">
-												<div class="col-sm-12">
-													<label class="control-label">Уведомления</label>
-												</div>
-												<!--<div class="col-sm-12">-->
-												<!--<div class="checkbox c-checkbox needsclick">-->
-												<!--<label class="needsclick">-->
-												<!--<input type="checkbox" value="1" class="notification-time needsclick"-->
-												<!--name="notification-now">-->
-												<!--<span class="fa fa-check"></span>При публикации</label>-->
-												<!--</div>-->
-												<!--</div>-->
-												<div class="col-sm-12">
-													<div class="checkbox c-checkbox needsclick">
-														<label class="needsclick">
-															<input type="checkbox" value="1" class="notification-time needsclick"
-																		 name="notification-before-three-hours" data-diff-type="hours" data-diff-value="-3">
-															<span class="fa fa-check"></span>За 3 часа</label>
-													</div>
-												</div>
-												<div class="col-sm-12">
-													<div class="checkbox c-checkbox needsclick">
-														<label class="needsclick">
-															<input type="checkbox" value="1" class="notification-time needsclick"
-																		 name="notification-before-day" data-diff-type="days" data-diff-value="-1">
-															<span class="fa fa-check"></span>За день</label>
-													</div>
-												</div>
-												<div class="col-sm-12">
-													<div class="checkbox c-checkbox needsclick">
-														<label class="needsclick">
-															<input type="checkbox" value="1" class="notification-time needsclick"
-																		 name="notification-before-three-days" data-diff-type="days" data-diff-value="-3">
-															<span class="fa fa-check"></span>За 3 дня</label>
-													</div>
-												</div>
-												<div class="col-sm-12">
-													<div class="checkbox c-checkbox needsclick">
-														<label class="needsclick">
-															<input type="checkbox" value="1" class="notification-time needsclick"
-																		 name="notification-before-week" data-diff-type="days" data-diff-value="-6">
-															<span class="fa fa-check"></span>За неделю</label>
-													</div>
-												</div>
+
+											<div class="form_unit" align="center">
+												<button id="add_event_submit" class="button -color_alternative" type="button">Опубликовать</button>
 											</div>
+
 										</form>
 									</div>
 								</div>
@@ -593,7 +528,7 @@
 <!-- Google MAPS -->
 <script src="https://maps.googleapis.com/maps/api/js?sensor=true&libraries=places"></script>
 <script src="vendor/placepicker/jquery.placepicker.min.js"></script>
-<!-- INPUTMASKS -->
+<!-- PACE -->
 <script src="vendor/pace/pace.min.js"></script>
 <!-- SELECT2 -->
 <script src="vendor/select2v3/select2.min.js"></script>
@@ -611,6 +546,8 @@
 <script src="app/js/app.js"></script>
 <script src="app/js/calendar.js"></script>
 <script src="app/js/add.js"></script>
+<script src="app/js/Class.Calendar.js"></script>
+<script src="app/js/Class.DatePicker.js"></script>
 <script src="app/js/main.js"></script>
 
 

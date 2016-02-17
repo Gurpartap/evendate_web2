@@ -822,19 +822,251 @@ function OneDay($view, $content_block){
 function AddEvent($view, $content_block){
 
 
-	$view.find('.full-day').on('change', function(){
-		if ($(this).is(':checked')){
-			$('.input-hours,.input-minutes')
-				.attr('disabled', 'true')
-		}else{
 
-			$('.input-hours,.input-minutes')
-				.removeAttr('disabled')
+	function bindDatePickers($parent){
+		$parent.find('.DatePicker').not('.-Handled_DatePicker').each(function(i, elem){
+			(new DatePicker(elem, $(elem).data())).init();
+		});
+	}
+
+	function bindTimeInput($parent){
+		$parent.find('.TimeInput').not('.-Handled_TimeInput').each(function(i, elem){
+			initTimeInput(elem);
+		});
+	}
+
+	function bindSelect2($parent){
+		$parent.find('.ToSelect2').not('.-Handled_ToSelect2').select2({
+			containerCssClass: 'form_select2',
+			dropdownCssClass: 'form_select2_drop'
+		}).addClass('-Handled_ToSelect2');
+	}
+
+	bindDatePickers($view);
+	bindTimeInput($view);
+	bindSelect2($view);
+	limitInputSize();
+	bindRippleEffect();
+	initAddEventMainCalendar($view);
+
+	function initAddEventMainCalendar($view){
+		//TODO: Refactor this!! Make it more readable
+
+		var MainCalendar = new Calendar('.EventDatesCalendar', {weekday_selection: true, month_selection: true}),
+			$selected_days_text = $view.find('.EventSelectedDaysText'),
+			$selected_days_table_rows = $view.find('.SelectedDaysRows'),
+			dates = {},
+			genitive_month_names = {
+				'январь': 'января',
+				'февраль': 'февраля',
+				'март': 'марта',
+				'апрель': 'апреля',
+				'май': 'мая',
+				'июнь': 'июня',
+				'июль': 'июля',
+				'август': 'августа',
+				'сентябрь': 'сентября',
+				'октябрь': 'октября',
+				'ноябрь': 'ноября',
+				'декабрь': 'декабря'
+			},
+			$fucking_table = $();
+		MainCalendar.init();
+		MainCalendar.$calendar.on('days-changed.displayFormattedText', displayFormattedText);
+
+
+
+		function bindRemoveRow($parent){
+			$parent.find('.RemoveRow').not('.-Handled_RemoveRow').each(function(i, elem){
+				$(elem).on('click', function(){
+					MainCalendar.deselectDays($(this).closest('tr').data('date'));
+				}).addClass('-Handled_RemoveRow');
+			});
 		}
+
+		function displayFormattedText(){
+			dates = {};
+			MainCalendar.selected_days.forEach(function(date, i, days){
+				var _date = moment(date);
+
+				if(typeof dates[_date.month()] === 'undefined'){
+					dates[_date.month()] = {};
+					dates[_date.month()].selected_days = [];
+					dates[_date.month()].month_name = genitive_month_names[_date.format('MMMM')];
+				}
+				dates[_date.month()].selected_days.push(_date.date());
+			});
+
+			$selected_days_text.empty().removeClass('hidden');
+			if(Object.keys(dates).length){
+				$.each(dates, function(i, elem){
+					$selected_days_text.append($('<p>').text(elem.selected_days.join(', ') + ' ' + elem.month_name))
+				});
+			} else {
+				$selected_days_text.html('<p>Даты не выбраны</p>');
+			}
+		}
+
+
+		function doTheFuckingSort($rows, $parent){
+			$rows.sort(function(a,b){
+				var an = $(a).data('date'),
+					bn = $(b).data('date');
+
+				if(an > bn) return 1;
+				else if(an < bn) return -1;
+				else return 0;
+			});
+			$rows.detach().appendTo($parent);
+		}
+
+		function buildTable(selected_days){
+			//TODO: BUG. On multiple selection (month or weekday) duplicates appearing in table.
+			//TODO: Bind time on building table
+			var $output = $();
+			if(Array.isArray(selected_days)){
+				selected_days.forEach(function(day){
+					$output = $output.add(tmpl('selected-table-day', {
+						date: day,
+						formatted_date: day.split('-').reverse().join('.')
+					}));
+				});
+			}
+			else {
+				$output = tmpl('selected-table-day', {
+					date: selected_days,
+					formatted_date: selected_days.split('-').reverse().join('.')
+				});
+			}
+			bindDatePickers($output);
+			bindTimeInput($output);
+			bindRemoveRow($output);
+
+			console.log($fucking_table);
+			$fucking_table = $fucking_table.add($output);
+			$output.find('.DatePicker').each(function(){
+				var DP = $(this).data('datepicker');
+				DP.$input.on('date-picked', function(){
+					MainCalendar.deselectDays(DP.prev_selected_day).selectDays(DP.selected_day);
+					doTheFuckingSort($fucking_table, $selected_days_table_rows)
+				});
+			});
+			doTheFuckingSort($fucking_table, $selected_days_table_rows);
+		}
+
+		function BuildSelectedDaysTable(){
+			if(MainCalendar.last_action === 'select'){
+				buildTable(MainCalendar.last_selected_days);
+			}
+			else if(MainCalendar.last_action === 'deselect'){
+				if(Array.isArray(MainCalendar.last_selected_days)){
+					var classes = [];
+					MainCalendar.last_selected_days.forEach(function(day){
+						classes.push('.TableDay_'+day);
+					});
+					$fucking_table.detach(classes.join(', '));
+					$fucking_table = $fucking_table.not(classes.join(', '));
+				}
+				else {
+					$fucking_table.detach('.TableDay_'+MainCalendar.last_selected_days);
+					$fucking_table = $fucking_table.not('.TableDay_'+MainCalendar.last_selected_days);
+				}
+			}
+
+			doTheFuckingSort($fucking_table, $selected_days_table_rows);
+
+			//TODO: Do not forget to rename 'fucking' names
+			//TODO: Please, don't forget to rename 'fucking' names
+
+		}
+
+		$view.find('#different_time').on('change', function(){
+			var $table_wrapper = $view.find('.event_selected_days_wrapper'),
+				$table_content = $view.find('.event_selected_days_content');
+			if($(this).prop('checked')){
+				buildTable(MainCalendar.selected_days);
+				$table_wrapper.height($table_content.height()).one('transitionend', function(){
+					$table_wrapper.css({
+						'height': 'auto',
+						'overflow': 'visible'
+					})
+				});
+				MainCalendar.$calendar.on('days-changed.buildTable', BuildSelectedDaysTable);
+			} else {
+				$table_wrapper.css({
+					'height': $table_content.height(),
+					'overflow': 'hidden'
+				}).height(0);
+				$fucking_table.empty();
+				MainCalendar.$calendar.off('days-changed.buildTable');
+			}
+			$view.find('.MainTime').toggleStatus('disabled');
+		});
+
+		var AddRowDatePicker = $view.find('.AddDayToTable').data('datepicker');
+		AddRowDatePicker.$input.on('date-picked', function(){
+			MainCalendar.selectDays(AddRowDatePicker.selected_day);
+		});
+
+	}
+
+	//TODO: perepilit' placepicker
+	$(".placepicker").placepicker();
+	$('#event_tags').select2({
+		tags: true,
+		width: '100%',
+		placeholder: "Выберите до 5 тегов",
+		maximumSelectionLength: 5,
+		maximumSelectionSize: 5,
+		multiple: true,
+		createSearchChoice: function(term, data) {
+			if ($(data).filter(function() {
+					return this.text.localeCompare(term) === 0;
+				}).length === 0) {
+				return {
+					id: term,
+					text: term
+				};
+			}
+		},
+		ajax: {
+			url: '/api/tags/search',
+			dataType: 'JSON',
+			data: function (term, page) {
+				return {
+					q: term // search term
+				};
+			},
+
+			results: function(data) {
+				var _data = [];
+				data.data.forEach(function(value){
+					value.text = value.name;
+					_data.push(value);
+				});
+				return {
+					results: _data
+				}
+			}
+		},
+		containerCssClass: "form_select2",
+		dropdownCssClass: "form_select2_drop"
 	});
+/*
+	$('#default-address-btn').on('click', function(){
+		$address_input.val($organizations.find('option:selected').data('default-address'));
+	});*/
+	
+	
 
-	bindModalEvents();
+	//bindModalEvents(); // ?????
 
+
+}
+
+function Example($view, $content_block){
+
+	$('.daterange').daterangepicker({});
 
 }
 
@@ -935,6 +1167,7 @@ $(document)
 			search: Search,
 			friends: Friends,
 			add_event: AddEvent,
+			'example.php': Example,
 			refreshState: function(){
 				var page = this.getCurrentState(),
 					$view = $('.screen-view:not(.hidden)');
@@ -969,7 +1202,7 @@ $(document)
 			}
 
 			function setMonthName(){
-				$month_name.text(current_month.lang('ru').format("MMMM YYYY").capitalize());
+				$month_name.text(current_month.locale('ru').format("MMMM YYYY").capitalize());
 			}
 
 			function buildTable(){
@@ -1084,20 +1317,22 @@ $(document)
 		function renderState(){
 			var state = History.getState(),
 				page = __STATES.getCurrentState();
-			if (__STATES.hasOwnProperty(page) && state.hash.indexOf('friend-') == -1){
-				var $content_block = $('[data-controller="'  + __STATES[page].name + '"]'),
-					$view = $content_block.parents('.screen-view');
-				$view = $view.length == 1 ? $view : $content_block;
-				$('.screen-view').not($view).addClass(__C.CLASSES.HIDDEN);
-				$view.removeClass(__C.CLASSES.HIDDEN);
-				__STATES[page]($view, $content_block);
-			}else if (state.hash.indexOf('friend-') != -1){
+
+			if(state.hash.indexOf('friend-') !== -1){
 				var $friends_app = $('.friends-app');
 				$friends_app.removeClass(__C.CLASSES.HIDDEN).addClass(__C.CLASSES.ACTIVE);
 				getFriendsList($friends_app.find('.friends-right-bar'), function(){
 					$('.friend-item.' + state.data.page).addClass(__C.CLASSES.ACTIVE).siblings().removeClass(__C.CLASSES.ACTIVE);
 				});
 				OneFriend($friends_app);
+			}
+			else if(__STATES.hasOwnProperty(page)) {
+				var $content_block = $('[data-controller="'  + __STATES[page].name + '"]'),
+					$view = $content_block.parents('.screen-view');
+				$view = $view.length == 1 ? $view : $content_block;
+				$('.screen-view').not($view).addClass(__C.CLASSES.HIDDEN);
+				$view.removeClass(__C.CLASSES.HIDDEN);
+				__STATES[page]($view, $content_block);
 			}
 			else{
 				console.error('PAGE RENDERING ERROR');
@@ -1137,8 +1372,15 @@ $(document)
 		if (window.innerHeight > 800){
 			$list.slimscroll({height: window.innerHeight - $list.offset().top});
 		}else{
-			$('.sidebar').slimscroll({
-				height: window.innerHeight
-			})
+			var $sidebar;
+			if(($sidebar = $('#Sidebar')).length){
+				$sidebar.slimscroll({
+					height: window.innerHeight
+				})
+			} else {
+				$('.sidebar').slimscroll({
+					height: window.innerHeight
+				})
+			}
 		}
 	});

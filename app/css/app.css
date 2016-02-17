@@ -7456,6 +7456,7 @@ fieldset[disabled] .flatdoc-wrapper .button.active {
 .calendar-days-line td{
   cursor: pointer;
   width: 14.28888%;
+	height: 14.28888%;
   position:relative;
 }
 
@@ -7486,7 +7487,7 @@ fieldset[disabled] .flatdoc-wrapper .button.active {
   left:0;
   right:0;
 }
-td.active{
+.td-day.active{
   border-radius: 999px;
   background-color: rgb(107,136,199);;
   color: white;
@@ -7633,7 +7634,7 @@ td.active{
 
 }
 
-.td-day{
+.td-day:not(.not-this-month){
   color: #B9B8B7;
 }
 .td-day.click-able{
@@ -8925,6 +8926,7 @@ span.organization-modal-header-text{
 .sidebar .brand-name{
   font-weight: 500;
   font-size: 22px;
+	line-height: 1.5;
   padding-top: 13px;
   padding-left: 18px;
   color: #fff;
