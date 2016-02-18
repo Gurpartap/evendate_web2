@@ -1,5 +1,5 @@
 /**
- * Created by Инал on 25.12.2015.
+ * Created by пїЅпїЅпїЅпїЅ on 25.12.2015.
  */
 
 module.exports = {
@@ -67,5 +67,15 @@ module.exports = {
 				return data;
 			}
 		}
+	},
+	downloadImageFromUrl: function(request, url, callback){
+		request.get(url, function (error, response, body) {
+			if (!error && response.statusCode == 200) {
+				data = "data:" + response.headers["content-type"] + ";base64," + new Buffer(body).toString('base64');
+				callback(null, data)
+			}else{
+				callback(error);
+			}
+		});
 	}
 };

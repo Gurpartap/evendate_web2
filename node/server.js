@@ -906,6 +906,15 @@ pg.connect(pg_conn_string, function(err, client, done) {
 			}
 		});
 
+		socket.on('image.getFromURL', function(url) {
+			Utils.downloadImageFromUrl(request, url, function(error, data){
+				if (error){
+					handleError(error);
+					return;
+				}
+				socket.emit('image.getFromURLDone', {error: error, data: data});
+			});
+		});
 		socket.on('notification.received', function(data) {
 			connection.query('UPDATE notifications ' +
 				' SET received = 1, ' +
