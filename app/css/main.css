@@ -68,6 +68,11 @@ body {
 	transform: translate(0, 0);
 }
 
+.img_holder > img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
 /* Typography */
 
 h1, h2, h3, h4 {font-weight: 500}
@@ -122,7 +127,7 @@ input, select, textarea, button {font-family: inherit}
 }
 
 .form_label:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) {
-	margin: 0;
+	margin: 0 0 .5em;
 	font-size: .9rem;
 	text-align: left;
 }
@@ -774,8 +779,11 @@ a.button:hover {text-decoration: none}
 
 .button.-color_primary {background-color: #5379b8}
 
-
-.button.-color_alternative {background-color: #ff5f9e}
+.button.-color_secondary {background-color: #ff5f9e}
+.button.-color_secondary_alt {
+	color: #f9306e;
+	background-color: #ffdeeb;
+}
 
 
 /*

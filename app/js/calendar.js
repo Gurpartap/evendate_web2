@@ -848,6 +848,7 @@ function AddEvent($view, $content_block){
 	limitInputSize();
 	bindRippleEffect();
 	bindFileLoadButton();
+	bindLoadByURLButton();
 	initAddEventMainCalendar($view);
 
 	function initAddEventMainCalendar($view){
@@ -1011,8 +1012,8 @@ function AddEvent($view, $content_block){
 	}
 
 	//TODO: perepilit' placepicker
-	$(".placepicker").placepicker();
-	$('#event_tags').select2({
+	$view.find(".placepicker").placepicker();
+	$view.find('#event_tags').select2({
 		tags: true,
 		width: '100%',
 		placeholder: "Выберите до 5 тегов",
@@ -1057,19 +1058,20 @@ function AddEvent($view, $content_block){
 		$view.find('.DelayedPublication').toggleStatus('disabled');
 	});
 
-
 	$view.find('#add_event_registration_needed').on('change', function(){
 		$view.find('.RegistrationTill').toggleStatus('disabled');
 	});
+
+	socket.on('image.getFromURLDone', function(result){
+		window.current_load_button.data('loaded_img', result.data);
+		console.log(result.data);
+	});
+
+
 	/*
 	$('#default-address-btn').on('click', function(){
 		$address_input.val($organizations.find('option:selected').data('default-address'));
 	});*/
-	
-	
-
-	//bindModalEvents(); // ?????
-
 
 }
 
@@ -1176,7 +1178,7 @@ $(document)
 			search: Search,
 			friends: Friends,
 			add_event: AddEvent,
-			'example.php': Example,
+			example: Example,
 			refreshState: function(){
 				var page = this.getCurrentState(),
 					$view = $('.screen-view:not(.hidden)');

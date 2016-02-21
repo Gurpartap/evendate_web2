@@ -1,5 +1,5 @@
 function bindRippleEffect(){
-	$('.RippleEffect').not('-Handled_RippleEffect').click(function(e){
+	$('.RippleEffect').not('-Handled_RippleEffect').on('click', function(e){
 		var $this = $(this), $ripple, size, x, y;
 
 		if($this.children('.ripple').length == 0)
@@ -25,6 +25,14 @@ function bindFileLoadButton(){
 		var $this = $(this);
 		$this.children('input').get(0).click();
 	}).addClass('-Handled_FileLoadButton');
+}
+
+function bindLoadByURLButton(){
+	$('.LoadByURLButton').not('-Handled_LoadByURLButton').on('click', function(){
+		var $this = $(this);
+		socket.emit('image.getFromURL', $this.siblings('.LoadByURLInput').val());
+		window.current_load_button = $this;
+	}).addClass('-Handled_LoadByURLButton');
 }
 
 
