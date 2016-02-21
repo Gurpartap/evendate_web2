@@ -4,10 +4,6 @@
 
 "use strict";
 
-String.prototype.capitalize = function() {
-	return this.charAt(0).toUpperCase() + this.slice(1);
-};
-
 var MODAL_OFFSET = 185,
 	EVENT_MODAL_WIDTH = 660,
 	_selected_month = moment(),
@@ -821,25 +817,14 @@ function OneDay($view, $content_block){
 
 function AddEvent($view, $content_block){
 
-
-
-	function bindDatePickers($parent){
-		$parent.find('.DatePicker').not('.-Handled_DatePicker').each(function(i, elem){
-			(new DatePicker(elem, $(elem).data())).init();
-		});
-	}
-
-	function bindTimeInput($parent){
-		$parent.find('.TimeInput').not('.-Handled_TimeInput').each(function(i, elem){
-			initTimeInput(elem);
-		});
-	}
-
-	function bindSelect2($parent){
-		$parent.find('.ToSelect2').not('.-Handled_ToSelect2').select2({
-			containerCssClass: 'form_select2',
-			dropdownCssClass: 'form_select2_drop'
-		}).addClass('-Handled_ToSelect2');
+	function bindLoadByURLButton(){
+		$('.LoadByURLButton').not('-Handled_LoadByURLButton').on('click', function(){
+			var $this = $(this),
+				$input = $this.siblings('.LoadByURLInput');
+			socket.emit('image.getFromURL', $input.val());
+			$this.data('url', $input.val());
+			window.current_load_button = $this;
+		}).addClass('-Handled_LoadByURLButton');
 	}
 
 	bindDatePickers($view);
@@ -1012,7 +997,8 @@ function AddEvent($view, $content_block){
 	}
 
 	//TODO: perepilit' placepicker
-	$view.find(".placepicker").placepicker();
+	$view.find(".Placepicker").placepicker();
+
 	$view.find('#event_tags').select2({
 		tags: true,
 		width: '100%',
@@ -1053,7 +1039,6 @@ function AddEvent($view, $content_block){
 		dropdownCssClass: "form_select2_drop"
 	});
 
-
 	$view.find('#add_event_delayed_publication').on('change', function(){
 		$view.find('.DelayedPublication').toggleStatus('disabled');
 	});
@@ -1062,9 +1047,52 @@ function AddEvent($view, $content_block){
 		$view.find('.RegistrationTill').toggleStatus('disabled');
 	});
 
+	function handleImgUpload($context, source, filename){
+		var $parent = $context.closest('.AddEventImgLoadWrap'),
+			$preview = $parent.find('.AddEventImgPreview'),
+			$crop_again_button = $parent.find('.CropAgain'),
+			$file_name = $parent.find('.FileName');
+
+		$preview.data('source_img', source).attr('src', source);
+		$file_name.html('Загружен файл:<br>'+filename);
+		initCrop(source, $preview, {
+			'aspectRatio': eval($preview.data('aspect_ratio'))
+		});
+		$preview.on('crop-done', function(){
+			var $this = $(this),
+				$crop_data = $this.data('crop_data');
+
+			$crop_again_button.removeClass('-hidden').off('click').on('click', function(){
+				initCrop($preview.data('source_img'), $preview, {
+					'data': $crop_data,
+					'aspectRatio': eval($preview.data('aspect_ratio'))
+				});
+			});
+
+		})
+	}
+
 	socket.on('image.getFromURLDone', function(result){
-		window.current_load_button.data('loaded_img', result.data);
-		console.log(result.data);
+		var url = window.current_load_button.data('url');
+		handleImgUpload(window.current_load_button, result.data, url.split('/').reverse()[0]);
+	});
+
+	$view.find('.LoadImg').on('change', function(e){
+		var $this = $(e.target),
+			files = e.target.files;
+
+		if (files.length == 0) return false;
+		for(var i = 0, f; f = files[i]; i++) {
+			var reader = new FileReader();
+			if (!f.type.match('image.*'))	continue;
+			reader.onload = (function(the_file) {
+				return function(e) {
+					handleImgUpload($this, e.target.result, the_file.name);
+				};
+			})(f);
+			reader.readAsDataURL(f);
+		}
+
 	});
 
 

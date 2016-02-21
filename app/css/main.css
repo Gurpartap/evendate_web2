@@ -39,14 +39,14 @@ body {
 	vertical-align: middle !important;
 }
 
-.clear {clear: both}
+.-clear {clear: both}
 
-.cf:before,
-.cf:after {
+.-cf:before,
+.-cf:after {
 	content: "";
 	display: table;
 }
-.cf:after {clear: both}
+.-cf:after {clear: both}
 
 .-unselectable {
 	-webkit-touch-callout: none;
@@ -57,7 +57,7 @@ body {
 	user-select: none;
 }
 
-.hidden {display: none}
+.-hidden {display: none !important}
 
 .fa_icon:before {
 	display: inline;
@@ -68,9 +68,16 @@ body {
 	transform: translate(0, 0);
 }
 
+img:not([src]) {display: none}
+
 .img_holder > img {
 	max-width: 100%;
 	max-height: 100%;
+}
+
+.img_holder > .placeholder {
+	opacity: 0;
+	visibility: hidden;
 }
 
 /* Typography */
@@ -745,7 +752,7 @@ input, select, textarea, button {font-family: inherit}
 	min-width: 2.2rem;
 	font-family: inherit;
 	font-size: .8em;
-	font-weight: lighter;
+	font-weight: 400;
 	color: inherit;
 	border: 0;
 	border-radius: 3px;
@@ -771,7 +778,9 @@ a.button:hover {text-decoration: none}
 
 .button.-color_default {color: #5379b8}
 
-.button[class*="-color_"]:not(.-color_default) {color: #fff}
+.button.-color_primary,
+.button.-color_secondary {color: #fff}
+
 .button.-color_default {background-color: transparent}
 .button.-color_default:not(:disabled):hover,
 .button:not([class*="-color_"]):not(:disabled):hover {background-color: #f1f1f1}
@@ -952,6 +961,71 @@ a.button:hover {text-decoration: none}
 
 
 /* /Unite */
+/* Modal */
+
+.modal_wrapper {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	display: none;
+	overflow: hidden;
+	outline: 0;
+	-webkit-overflow-scrolling: touch;
+	background-color: hsla(217, 42%, 24%,0.7);
+	background-color: hsla(0, 0%, 0%,0.7);
+	z-index: 1050;
+}
+.modal_wrapper.-active {display: block}
+
+.modal_backface {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.modal_unit {
+	min-width: 500px;
+	max-width: 1200px;
+	max-height: 95%;
+	background-color: #fff;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+.modal_header {
+	padding: 10px 25px;
+	border-bottom: 1px solid #eee;
+	text-align: left;
+}
+.modal_header > h4 {
+	margin: 0;
+	font-size: 1.1rem;
+	color: #5379b8;
+}
+.modal_header > .button.-modal_destroyer {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	right: 0;
+	margin: auto 4px;
+}
+
+.modal_content {
+	padding: 25px;
+}
+
+.modal_footer {
+	padding: 15px 25px;
+	text-align: right;
+	border-top: 1px solid #eee;
+}
+
+
+/* /Modal */
 /* Calendar */
 
 .calendar_wrapper {
@@ -1117,6 +1191,12 @@ a.button:hover {text-decoration: none}
 
 /* /Page */
 
+/* FUCK YOU BOOTSTRAP */
+
+.wrapper > section {z-index: auto}
+.blurheader {z-index: 100}
+
+/* /FUCK YOU BOOTSTRAP */
 
 /* MAIN */
 
@@ -1263,3 +1343,32 @@ a.button:hover {text-decoration: none}
 }
 
 .event_selected_days_add_date {margin: 10px 0}
+
+.add_event_img_preview_hor,
+.add_event_img_preview_vert {
+	position: absolute;
+	/*
+	background-repeat: no-repeat;
+	background-size: contain;*/
+}
+
+.add_event_img_preview_hor {
+	top: 0;
+	left: 0;
+	width: 100%;
+	/*
+	background-image: url("/app/img/add_event/add_img_preview_hor.png");
+	background-size: contain;*/
+}
+
+.add_event_img_preview_vert {
+	top: 131px;
+	left: 7px;
+	width: 95px;
+	height: 135px;
+	/*
+	background-image: url("/app/img/add_event/add_img_preview_vert.png");
+	background-size: 95px 135px;
+	background-repeat: no-repeat;
+	background-position: 7px 131px;*/
+}

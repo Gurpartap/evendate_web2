@@ -1,3 +1,51 @@
+String.prototype.capitalize = function() {
+	return this.charAt(0).toUpperCase() + this.slice(1);
+};
+
+$.fn.extend({
+	toggleStatus: function(statuses) {
+		var $this = this;
+
+		if($this.is('.form_unit')){
+			statuses.split(' ').forEach(function(status){
+				if(status === 'disabled'){
+					var $form_elements = $this.find('input, select, textarea');
+					if($this.hasClass('-status_disabled')){
+						$form_elements.each(function(){$(this).removeAttr('disabled');});
+					} else {
+						$form_elements.each(function(){$(this).attr('disabled', true);});
+					}
+				}
+				$this.toggleClass('-status_'+status);
+			});
+		} else {
+			$this.find('.form_unit').toggleStatus(statuses);
+		}
+
+		return this;
+	}
+});
+
+function bindDatePickers($parent){
+	$parent.find('.DatePicker').not('.-Handled_DatePicker').each(function(i, elem){
+		(new DatePicker(elem, $(elem).data())).init();
+	});
+}
+
+function bindTimeInput($parent){
+	$parent.find('.TimeInput').not('.-Handled_TimeInput').each(function(i, elem){
+		initTimeInput(elem);
+	});
+}
+
+function bindSelect2($parent){
+	$parent.find('.ToSelect2').not('.-Handled_ToSelect2').select2({
+		containerCssClass: 'form_select2',
+		dropdownCssClass: 'form_select2_drop'
+	}).addClass('-Handled_ToSelect2');
+}
+
+
 function bindRippleEffect(){
 	$('.RippleEffect').not('-Handled_RippleEffect').on('click', function(e){
 		var $this = $(this), $ripple, size, x, y;
@@ -16,7 +64,12 @@ function bindRippleEffect(){
 		x = e.pageX - $this.offset().left - ($ripple.width() / 2);
 		y = e.pageY - $this.offset().top - ($ripple.height() / 2);
 
-		$ripple.css({top: y+'px', left: x+'px'}).addClass('animate');
+		$ripple
+			.css({top: y+'px', left: x+'px'})
+			.addClass('animate')
+			.one('animationend webkitAnimationEnd', function(){
+				$ripple.removeClass('animate');
+			});
 	}).addClass('-Handled_RippleEffect');
 }
 
@@ -26,15 +79,6 @@ function bindFileLoadButton(){
 		$this.children('input').get(0).click();
 	}).addClass('-Handled_FileLoadButton');
 }
-
-function bindLoadByURLButton(){
-	$('.LoadByURLButton').not('-Handled_LoadByURLButton').on('click', function(){
-		var $this = $(this);
-		socket.emit('image.getFromURL', $this.siblings('.LoadByURLInput').val());
-		window.current_load_button = $this;
-	}).addClass('-Handled_LoadByURLButton');
-}
-
 
 function limitInputSize(){
 	var $elements = $('.LimitSize').not('.-Handled_LimitSize');
@@ -78,27 +122,43 @@ function initTimeInput(time_field){
 	$time_field.addClass('-Handled_TimeInput');
 }
 
+function showModal(name){
+	var $modal = $('.'+name.capitalize()+'Modal');
 
-$.fn.extend({
-	toggleStatus: function(statuses) {
-		var $this = this;
-
-		if($this.is('.form_unit')){
-			statuses.split(' ').forEach(function(status){
-				if(status === 'disabled'){
-					var $form_elements = $this.find('input, select, textarea');
-					if($this.hasClass('-status_disabled')){
-						$form_elements.each(function(){$(this).removeAttr('disabled');});
-					} else {
-						$form_elements.each(function(){$(this).attr('disabled', true);});
-					}
-				}
-				$this.toggleClass('-status_'+status);
-			});
-		} else {
-			$this.find('.form_unit').toggleStatus(statuses);
-		}
-
-		return this;
+	if($modal.length > 0){
+		$('.modal_unit').removeClass('-active');
+		$modal.addClass('-active').parent().addClass('-active');
+		$('.modal_backface').off('click').on('click', closeModal);
+		$modal.find('.CloseModal').off('click').on('click', closeModal);
+	} else {
+		throw Error('Модального окна '+name+' нет');
 	}
-});
+
+}
+
+function closeModal(){
+	$('.modal_unit').removeClass('-active').parent().removeClass('-active').trigger('modal-close');
+}
+
+function initCrop(source, $endpoint_img, options){
+	var $img = $('.Cropper').children('img'),
+		$crop_button = $('.CropButton'),
+		$destroy_button = $('.DestroyCropButton');
+	options = typeof options == 'undefined' ? {} : options;
+
+	$img.cropper('destroy').attr('src', source).cropper(options);
+	showModal('cropper');
+
+	$img.closest('.CropperModal').on('modal-close', function(){
+		$img.cropper('destroy');
+		$crop_button.off('click');
+		$destroy_button.off('click');
+	});
+
+	$crop_button.off('click').one('click', function(){
+		$endpoint_img.attr('src', $img.cropper('getCroppedCanvas').toDataURL()).data('crop_data', $img.cropper('getData'));
+		$endpoint_img.trigger('crop-done');
+		closeModal();
+	});
+	$destroy_button.off('click').one('click', closeModal);
+}

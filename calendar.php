@@ -94,7 +94,7 @@
                     <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn" data-page="timeline">
                         <i class="icon-home"></i> <span>Моя лента</span>
                     </a>
-                    <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn <?=$add_event_btn_hidden?>" data-controller="showAddEventModal">
+                    <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn <?=$add_event_btn_hidden?>" data-page="add_event">
                         <i class="icon-note"></i> <span>Создать событие</span>
                     </a>
                     <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn" data-page="favorites">
@@ -283,7 +283,6 @@
 										</div>
 
 										<h4 class="form_label">Дата</h4>
-
 										<div class="event_datepicker">
 											<div class="EventDatesCalendar event_datepicker_calendar"></div>
 											<div class="event_datepicker_form">
@@ -356,10 +355,9 @@
 										</div>
 
 										<h4 class="form_label"><label for="add_event_placepicker">Место проведения</label></h4>
-
 										<div class="form_group -parts_3_1">
 											<div class="form_unit">
-												<input class="form_input placepicker" id="add_event_placepicker" data-map-container-id="collapseOne">
+												<input class="form_input Placepicker" id="add_event_placepicker" data-map-container-id="collapseOne">
 											</div>
 											<div class="form_unit">
 												<button class="button -color_primary -fill RippleEffect" type="button" tabindex="-1">По умолчанию</button>
@@ -370,13 +368,11 @@
 										</div>
 
 										<h4 class="form_label"><label>Описание</label></h4>
-
 										<div class="form_unit">
 											<textarea class="form_textarea LimitSize" data-maxlength="150"></textarea>
 										</div>
 
 										<h4 class="form_label">Регистрация</h4>
-
 										<div class="form_unit">
 											<input id="add_event_registration_needed" class="form_checkbox" type="checkbox" name="registration_needed">
 											<label class="form_label" for="add_event_registration_needed"><span>Обязательная регистрация</span></label>
@@ -418,12 +414,11 @@
 											<input id="event_tags" class="form_input" type="text" name="title" autocomplete="off" >
 										</div>
 
-										<h4 class="form_label"><label for="event_tags">Обложка для мероприятия</label></h4>
-										<div class="add_event_img_load_wrap form_group -parts_e_2">
+										<h4 class="form_label"><label>Обложка для мероприятия</label></h4>
+										<div class="AddEventImgLoadWrap form_group -parts_e_2">
 											<div class="form_unit -centering">
-
 												<div class="wrapper">
-													<h4 class="form_label"><label for="event_tags">Горизонтальная</label></h4>
+													<h4 class="form_label"><label>Горизонтальная</label></h4>
 													<div class="form_unit">
 														<label class="form_label">Загрузка по ссылке:</label>
 														<div class="-unite -parts_e_3">
@@ -434,52 +429,56 @@
 													<div class="form_unit">
 														<label class="form_label">Загрузка c компьютера:</label>
 														<div class="form_unit">
-															<button class="button -color_secondary RippleEffect FileLoadButton" type="button"><input class="hidden" type="file">Выбрать</button>
+															<button class="button -color_secondary RippleEffect FileLoadButton" type="button"><input class="LoadImg -hidden" type="file">Выбрать</button>
 														</div>
 													</div>
-
+													<p class="FileName"></p>
+													<div class="form_unit">
+														<button class="button -color_secondary_alt RippleEffect CropAgain -hidden" type="button">Кадрировать</button>
+													</div>
 												</div>
-
 											</div>
 											<div class="form_unit">
 												<div class="img_holder">
-													<img src="app/img/add_event/add_img_preview_hor.png">
+													<img class="add_event_img_preview_hor AddEventImgPreview" data-aspect_ratio="16/9">
+													<img src="app/img/add_event/add_event_img_placeholder_hor.png">
 												</div>
 											</div>
+										</div>
+										<div class="AddEventImgLoadWrap form_group -parts_e_2">
 											<div class="form_unit -centering">
-
 												<div class="wrapper">
-													<h4 class="form_label"><label for="event_tags">Вертикальная</label></h4>
+													<h4 class="form_label"><label>Вертикальная</label></h4>
 													<div class="form_unit">
 														<label class="form_label">Загрузка по ссылке:</label>
 														<div class="-unite -parts_e_3">
-															<input class="form_input LoadByURLInput" type="text" autocomplete="off" placeholder="Ссылка на изображение" name="h_image_url">
+															<input class="form_input LoadByURLInput" type="text" autocomplete="off" placeholder="Ссылка на изображение" name="v_image_url">
 															<button class="button -color_secondary RippleEffect LoadByURLButton" type="button" tabindex="-1">Загрузить</button>
 														</div>
 													</div>
 													<div class="form_unit">
 														<label class="form_label">Загрузка с компьютера:</label>
-														<button class="button -color_secondary RippleEffect FileLoadButton" type="button"><input class="hidden" type="file">Выбрать</button>
+														<button class="button -color_secondary RippleEffect FileLoadButton" type="button"><input class="LoadImg -hidden" type="file">Выбрать</button>
 													</div>
-
+													<p class="FileName"></p>
+													<div class="form_unit">
+														<button class="button -color_secondary_alt RippleEffect CropAgain -hidden" type="button">Кадрировать</button>
+													</div>
 												</div>
-
 											</div>
 											<div class="form_unit">
 												<div class="img_holder">
-													<img src="app/img/add_event/add_img_preview_vert.png">
+													<img class="add_event_img_preview_vert AddEventImgPreview" data-aspect_ratio="7/10">
+													<img src="app/img/add_event/add_event_img_placeholder_vert.png">
 												</div>
 											</div>
 										</div>
 
-
-										<h4 class="form_label"><label for="event_title">Уведомления для пользователей</label></h4>
+										<h4 class="form_label"><label>Уведомления для пользователей</label></h4>
 										<div class="form_group -parts_2_3">
-
 											<div class="form_unit">
 												<div class="form_select -v_centering DatePicker"><label>Дата</label><input type="hidden"></div>
 											</div>
-
 											<div class="form_unit -inline">
 												<label class="form_label">Точное время</label>
 												<div class="form_unit">
@@ -494,11 +493,9 @@
 													</div>
 												</div>
 											</div>
-
 										</div>
 
 										<h4 class="form_label"></h4>
-
 										<div class="form_group -parts_e_2">
 
 											<div class="form_unit">
@@ -531,7 +528,7 @@
 											</div>
 										</div>
 
-										<div class="form_unit" align="center">
+										<div class="form_unit -h_centering">
 											<button id="add_event_submit" class="button -color_secondary" type="button">Опубликовать</button>
 										</div>
 
@@ -539,6 +536,7 @@
 								</div>
 							</div>
 						</div>
+						<!--
 						<div class="image-cropper-wrapper hidden">
 							<div class="image-cutter">
 								<img src="">
@@ -547,7 +545,7 @@
 								<a href="#" class="btn btn-pink img-crop-btn disabled hidden"> Кадрировать</a>
 								<a href="#" class="btn btn-pink-empty img-crop-cancel hidden"> Отмена</a>
 							</div>
-						</div>
+						</div>-->
 					</div>
 						<!-- END row-->
 
@@ -678,6 +676,24 @@
 					</div>
         </div>
     </section>
+	<div class="modal_wrapper -centering">
+		<div class="modal_backface"></div>
+		<div class="modal_unit CropperModal">
+			<header class="modal_header">
+				<h4>Кадрирование</h4>
+				<button class="button -modal_destroyer fa_icon fa-times -color_default CloseModal RippleEffect"></button>
+			</header>
+			<div class="modal_content">
+				<div class="Cropper">
+					<img>
+				</div>
+			</div>
+			<footer class="modal_footer">
+				<button class="button -color_primary CropButton RippleEffect">Кадрировать</button>
+				<button class="button -color_default DestroyCropButton RippleEffect">Отмена</button>
+			</footer>
+		</div>
+	</div>
 </div>
 <!-- Button trigger modal -->
 
