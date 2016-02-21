@@ -85,7 +85,7 @@ class UsersCollection extends AbstractCollection{
 		if ($result === FALSE) throw new DBQueryException(implode(';', $db->errorInfo()), $db);
 
 		$users = $p_get_events->fetchAll(PDO::FETCH_CLASS, 'Friend');
-		if (count($users) == 0 && $is_one_user) throw new LogicException('CANT_FIND_EVENT');
+		if (count($users) == 0 && $is_one_user) throw new LogicException('CANT_FIND_USER');
 		$result_users = array();
 		if ($is_one_user) return $users[0];
 		foreach($users as $friend){
