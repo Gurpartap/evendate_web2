@@ -510,3 +510,14 @@ CREATE VIEW view_stat_events AS SELECT
                                   INNER JOIN tokens ON stat_events.token_id = tokens.id
   INNER JOIN events ON stat_events.event_id = events.id
   WHERE events.status = true;
+
+
+
+  ALTER TABLE public.log_requests ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
+  ALTER TABLE public.log_requests ADD headers JSON DEFAULT NULL  NULL;
+  ALTER TABLE public.log_requests ADD body_json JSON DEFAULT NULL  NULL;
+  ALTER TABLE public.log_requests ADD response_http_status INT DEFAULT 200 NOT NULL;
+  ALTER TABLE public.log_requests ADD response_error_name VARCHAR(255) DEFAULT NULL NULL;
+  ALTER TABLE public.log_requests ADD   uuid              TEXT UNIQUE        NOT NULL DEFAULT uuid_generate_v4();
+
+

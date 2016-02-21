@@ -1,37 +1,6 @@
 <?php
 
-require_once '../../v1-backend/vendor/Psr/Log/LoggerInterface.php';
-require_once '../../v1-backend/vendor/Monolog/Logger.php';
-require_once '../../v1-backend/vendor/Monolog/Handler/HandlerInterface.php';
-require_once '../../v1-backend/vendor/Monolog/Handler/Handler.php';
-require_once '../../v1-backend/vendor/Monolog/Handler/AbstractHandler.php';
-require_once '../../v1-backend/vendor/Monolog/Handler/ProcessableHandlerInterface.php';
-require_once '../../v1-backend/vendor/Monolog/Handler/FormattableHandlerTrait.php';
-require_once '../../v1-backend/vendor/Monolog/Handler/ProcessableHandlerTrait.php';
-require_once '../../v1-backend/vendor/Monolog/Handler/FormattableHandlerInterface.php';
-require_once '../../v1-backend/vendor/Monolog/Handler/AbstractProcessingHandler.php';
-require_once '../../v1-backend/vendor/Monolog/Handler/MongoDBHandler.php';
-require_once '../../v1-backend/vendor/Monolog/Handler/ChromePHPHandler.php';
-
-
-require_once '../../v1-backend/vendor/Monolog/Formatter/FormatterInterface.php';
-require_once '../../v1-backend/vendor/Monolog/Formatter/NormalizerFormatter.php';
-require_once '../../v1-backend/vendor/Monolog/Formatter/LineFormatter.php';
-require_once '../../v1-backend/vendor/Monolog/Formatter/ChromePHPFormatter.php';
-
-
-
-use Monolog\Logger;
-use Monolog\Formatter\MongoDBFormatter;
-use Monolog\Handler\MongoDBHandler;
-
-	$logger = new Logger('api_v1_logs');
-
-//	$mongodb = new MongoDBHandler(new MongoClient("mongodb://localhost:27017"), "api_v1_logs", "prod");
-//	$logger->pushHandler($mongodb);
-
-	$chrome = new \Monolog\Handler\ChromePHPHandler();
-	$logger->pushHandler($chrome);
+	$request_time = new DateTime();
 
 	$_function_called = false;
 	if (isset($_SERVER['ENV']) && ($_SERVER['ENV'] != 'dev' || $_SERVER['ENV'] != 'test')){
@@ -45,8 +14,6 @@ use Monolog\Handler\MongoDBHandler;
 
 
 try {
-
-	$request_time = time();
 
 
 	require_once "{$BACKEND_FULL_PATH}/bin/Class.Result.php";
@@ -166,26 +133,33 @@ try {
 	$_result->setDownloadable(App::$RESPONSE_DOWNLOAD);
 	$_result->setNude(App::$RESPONSE_NUDE);
 
-	echo $_result;
 
-	$logger->info('INFO', array(
-		'request' => $__request ?? array(),
-		'headers' => $__headers ?? array(),
-		'url' => $_url ?? '',
-		'fields' => $__fields ?? '',
-		'user_id' => isset($__user) && ($__user instanceof User) ? $__user->getId() : null,
-		'http_code' => $_http_code,
-		'internal_code' => $_internal_code,
-		'error_name' => $_error_name,
-		'response_format' => App::$RESPONSE_FORMAT,
-		'response_download' => App::$RESPONSE_DOWNLOAD,
-		'response_nude' => App::$RESPONSE_NUDE,
-		'pagination' => $__pagination ?? null,
-		'args' => $_args ?? array(),
-		'order_by' => $__order_by ?? '',
-	));
+	$q_ins_log = App::queryFactory()->newInsert();
+	$q_ins_log
+		->into('log_requests')
+		->cols(array(
+			'body' => json_encode($__request ?? array()),
+			'body_json' => json_encode($__request ?? array()),
+			'user_id' => isset($__user) && ($__user instanceof User) ? $__user->getId() : null,
+			'method' => $_request_method ?? '',
+			'class' => $_class_name ?? '',
+			'args' => json_encode($_args ?? array()),
+			'method_name' => $_method_name ?? '',
+			'response_status' => null,
+			'headers' => json_encode($__headers ?? array()),
+			'response_http_status' => $_http_code,
+			'time' => $request_time->format('Y-m-d H:i:s')
+		))
+		->returning(array('uuid'));
+	$p_ins_log = $__db->prepare($q_ins_log->getStatement());
+	$result = $p_ins_log->execute($q_ins_log->getBindValues());
+	$log_res = $p_ins_log->fetch(PDO::FETCH_ASSOC);
 
-	if (($_SERVER['ENV'] == 'local' || $_SERVER['ENV'] == 'test') && isset($e)){
+	$_result->setRequestUUID($log_res['uuid']);
+
+	if (($_SERVER['ENV'] == 'local' || $_SERVER['ENV'] == 'dev') && isset($e)){
 		print_r($e);
 	}
+
+	echo $_result;
 }

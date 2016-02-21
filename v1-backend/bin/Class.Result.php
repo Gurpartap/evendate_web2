@@ -10,13 +10,13 @@ class Result{
 
 	const XML_RESPONSE_ROOT = 'response';
 
+	protected $uuid;
 	private $status;
 	private $text;
 	private $data;
 	private $error_code;
 	private $format;
 	private $filename;
-	private $xsd_file_path;
 	private $downloadable;
 	private $is_nude;
 	private $http_code;
@@ -64,56 +64,22 @@ class Result{
 	}
 
 	public function __toString(){
-		if ($this->format == 'json'){
-			header("Content-Type: application/json");
-			http_response_code($this->http_code ?? 200);
-			if ($this->getNude()){
-				$arr = $this->data;
-			}else{
-				$arr = array(
-					'status' => $this->status,
-					'text' => $this->text,
-					'code' => $this->internal_code,
-					'data' => $this->data
-				);
-			}
-			$res = json_encode($arr);
-		}else{ // XML response
-			header("Content-Type: application/xml");
-			$arr = array('status' => $this->status, 'text' => $this->text);
-			if ($this->data != null){
-				$arr['data'] = $this->data;
-			}
-			if ($this->getNude()){
-				$arr = $this->data;
-				$root_tag = is_array($arr) ? key($arr) : self::XML_RESPONSE_ROOT;
-				$arr = $arr[$root_tag];
-			}else{
-				$root_tag = self::XML_RESPONSE_ROOT;
-			}
-
-			try{
-				$xmlStr = Array2XML::createXML($root_tag, $arr);
-				if ($this->xsd_file_path){
-					if (!$xmlStr->schemaValidate($this->xsd_file_path)){
-						$xmlStr = Array2XML::createXML(self::XML_RESPONSE_ROOT, array('status' => false, 'text' => 'XSD validation error', 'xml_str' => $xmlStr->saveHTML()));
-					}
-				}
-				$res = $xmlStr->saveXML();
-			}catch(Exception $e){
-				$arr = array('status' => false, 'text' => $e->getMessage());
-				$xmlStr = Array2XML::createXML(self::XML_RESPONSE_ROOT, $arr);
-				if ($this->xsd_file_path){
-					if (!$xmlStr->schemaValidate($this->xsd_file_path)){
-						$xmlStr = Array2XML::createXML(self::XML_RESPONSE_ROOT, array('status' => false, 'text' => 'XSD validation error', 'xml_str' => $xmlStr->saveHTML()));
-					}
-				}
-				$res = $xmlStr->saveXML();
-			}
-			if ($this->downloadable){
-				header('Content-Disposition: attachment; filename="' . $this->getFileName() .'.xml"');
+		header("Content-Type: application/json");
+		http_response_code($this->http_code ?? 200);
+		if ($this->getNude()){
+			$arr = $this->data;
+		}else{
+			$arr = array(
+				'status' => $this->status,
+				'text' => $this->text,
+				'code' => $this->internal_code,
+				'data' => $this->data
+			);
+			if ($this->uuid != null){
+				$arr['request_id'] = $this->uuid;
 			}
 		}
+		$res = json_encode($arr);
 		return $res;
 	}
 
@@ -135,6 +101,10 @@ class Result{
 
 	public function setNude($nude_data) {
 		$this->is_nude = $nude_data;
+	}
+
+	public function setRequestUUID(string $uuid){
+		$this->uuid = $uuid;
 	}
 
 	//Only data without any additional status information
