@@ -20,6 +20,13 @@ function bindRippleEffect(){
 	}).addClass('-Handled_RippleEffect');
 }
 
+function bindFileLoadButton(){
+	$('.FileLoadButton').not('-Handled_FileLoadButton').click(function(e){
+		var $this = $(this);
+		$this.children('input').get(0).click();
+	}).addClass('-Handled_FileLoadButton');
+}
+
 
 function limitInputSize(){
 	var $elements = $('.LimitSize').not('.-Handled_LimitSize');

@@ -847,6 +847,7 @@ function AddEvent($view, $content_block){
 	bindSelect2($view);
 	limitInputSize();
 	bindRippleEffect();
+	bindFileLoadButton();
 	initAddEventMainCalendar($view);
 
 	function initAddEventMainCalendar($view){
@@ -942,11 +943,10 @@ function AddEvent($view, $content_block){
 			bindTimeInput($output);
 			bindRemoveRow($output);
 
-			console.log($fucking_table);
 			$fucking_table = $fucking_table.add($output);
 			$output.find('.DatePicker').each(function(){
 				var DP = $(this).data('datepicker');
-				DP.$input.on('date-picked', function(){
+				DP.$datepicker.on('date-picked', function(){
 					MainCalendar.deselectDays(DP.prev_selected_day).selectDays(DP.selected_day);
 					doTheFuckingSort($fucking_table, $selected_days_table_rows)
 				});
@@ -1004,7 +1004,7 @@ function AddEvent($view, $content_block){
 		});
 
 		var AddRowDatePicker = $view.find('.AddDayToTable').data('datepicker');
-		AddRowDatePicker.$input.on('date-picked', function(){
+		AddRowDatePicker.$datepicker.on('date-picked', function(){
 			MainCalendar.selectDays(AddRowDatePicker.selected_day);
 		});
 
@@ -1030,14 +1030,13 @@ function AddEvent($view, $content_block){
 			}
 		},
 		ajax: {
-			url: '/api/tags/search',
+			url: '/api/v1/tags/',
 			dataType: 'JSON',
 			data: function (term, page) {
 				return {
 					q: term // search term
 				};
 			},
-
 			results: function(data) {
 				var _data = [];
 				data.data.forEach(function(value){
@@ -1052,7 +1051,17 @@ function AddEvent($view, $content_block){
 		containerCssClass: "form_select2",
 		dropdownCssClass: "form_select2_drop"
 	});
-/*
+
+
+	$view.find('#add_event_delayed_publication').on('change', function(){
+		$view.find('.DelayedPublication').toggleStatus('disabled');
+	});
+
+
+	$view.find('#add_event_registration_needed').on('change', function(){
+		$view.find('.RegistrationTill').toggleStatus('disabled');
+	});
+	/*
 	$('#default-address-btn').on('click', function(){
 		$address_input.val($organizations.find('option:selected').data('default-address'));
 	});*/

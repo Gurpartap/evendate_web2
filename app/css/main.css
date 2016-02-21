@@ -124,6 +124,7 @@ input, select, textarea, button {font-family: inherit}
 .form_label:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) {
 	margin: 0;
 	font-size: .9rem;
+	text-align: left;
 }
 
 
@@ -237,6 +238,7 @@ input, select, textarea, button {font-family: inherit}
 	border-color: #e3e3e3;
 	box-shadow: 0 1px 2px #d9d9d9;
 }
+.select2-drop.select2-drop-above.select2-drop-active {border-color: #e3e3e3}
 
 .form_select2_drop > .select2-results {
 	margin: 5px 0;
@@ -249,7 +251,7 @@ input, select, textarea, button {font-family: inherit}
 }
 
 
-
+.form_select2.form_input {overflow: hidden}
 .form_select2.form_input > .select2-choices,
 .form_select2.form_input.select2-container-active > .select2-choices {
 	border: 0;
@@ -262,6 +264,35 @@ input, select, textarea, button {font-family: inherit}
 	margin: 0;
 	font-family: inherit;
 	font-size: 1em;
+}
+
+
+.form_select2.form_input.select2-container-multi > .select2-choices {
+	white-space: nowrap;
+	overflow: auto;
+
+}
+
+.form_select2.form_input.select2-container-multi > .select2-choices > .select2-search-choice {
+	padding: 3px 5px 3px 18px;
+	margin: 0 5px 0 0;
+	background-color: #D8D8D8;
+	border: 1px solid #D8D8D8;
+	color: #424242;
+}
+
+.form_select2.form_input.select2-container-multi > .select2-choices > li {
+	display: inline-block;
+	float: none;
+}
+
+.form_select2.form_input.select2-container-multi > .select2-choices > .select2-search-choice > .select2-search-choice-close {
+	position: absolute;
+	right: auto;
+	top: 0;
+	bottom: 0;
+	margin: auto;
+	color: #424242;
 }
 
 /* /Form Select2 */
@@ -650,17 +681,20 @@ input, select, textarea, button {font-family: inherit}
 .form_input.-status_disabled,
 .form_textarea.-status_disabled,
 .form_select.-status_disabled,
+.form_select2.-status_disabled,
 .form_radio.-status_disabled,
 .form_checkbox.-status_disabled,
-.form_unit.-status_disabled > .form_label,
-.form_unit.-status_disabled > .form_input,
-.form_unit.-status_disabled > .form_textarea,
-.form_unit.-status_disabled > .form_select,
-.form_unit.-status_disabled > .form_radio,
-.form_unit.-status_disabled > .form_checkbox,
+.form_unit.-status_disabled .form_label,
+.form_unit.-status_disabled .form_input,
+.form_unit.-status_disabled .form_textarea,
+.form_unit.-status_disabled .form_select,
+.form_unit.-status_disabled .form_select2,
+.form_unit.-status_disabled .form_radio,
+.form_unit.-status_disabled .form_checkbox,
 .form_group.-status_disabled .form_input,
 .form_group.-status_disabled .form_textarea,
 .form_group.-status_disabled .form_select,
+.form_group.-status_disabled .form_select2,
 .form_group.-status_disabled .form_radio,
 .form_group.-status_disabled .form_checkbox {opacity: .5}
 

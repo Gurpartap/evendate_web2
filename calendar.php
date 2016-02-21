@@ -378,28 +378,28 @@
 											<h4 class="form_label">Регистрация</h4>
 
 											<div class="form_unit">
-												<input id="checkbox1" class="form_checkbox" type="checkbox" name="checkbox">
-												<label class="form_label" for="checkbox1"><span>Обязательная регистрация</span></label>
+												<input id="add_event_registration_needed" class="form_checkbox" type="checkbox" name="registration_needed">
+												<label class="form_label" for="add_event_registration_needed"><span>Обязательная регистрация</span></label>
 											</div>
 
 											<p>Крайний срок регистрации до:</p>
-											<div class="form_group -parts_2_3">
-												<div class="form_unit -inline">
+											<div class="form_group -parts_2_3 RegistrationTill">
+												<div class="form_unit -inline -status_disabled">
 													<label class="form_label">Дата</label>
-													<div class="form_select -v_centering DatePicker"><label>Дата</label><input type="hidden"></div>
+													<div class="form_select -v_centering DatePicker"><label>Дата</label><input type="hidden" disabled></div>
 												</div>
-												<div class="form_unit">
+												<div class="form_unit -status_disabled">
 													<div class="form_group -parts_e_2">
-														<div class="form_unit -inline">
+														<div class="form_unit -inline -status_disabled">
 															<label class="form_label">Время</label>
-															<div class="form_unit">
+															<div class="form_unit -status_disabled">
 																<div class="form_group -time_input TimeInput">
-																	<div class="form_unit">
-																		<input class="form_input">
+																	<div class="form_unit -status_disabled">
+																		<input class="form_input" disabled>
 																	</div>
 																	<span class="divider">:</span>
-																	<div class="form_unit">
-																		<input class="form_input">
+																	<div class="form_unit -status_disabled">
+																		<input class="form_input" disabled>
 																	</div>
 																</div>
 															</div>
@@ -417,6 +417,37 @@
 											<div class="form_unit">
 												<input id="event_tags" class="form_input" type="text" name="title" autocomplete="off" >
 											</div>
+
+											<h4 class="form_label"><label for="event_tags">Обложка для мероприятия</label></h4>
+											<div class="add_event_img_load_wrap form_group -parts_e_2">
+												<div class="form_unit -centering">
+
+													<div class="wrapper">
+														<div class="form_unit">
+															<label class="form_label">Загрузка по ссылке</label>
+															<div class="-unite -parts_e_3">
+																<input class="form_input" type="text" autocomplete="off" placeholder="Ссылка на изображение" name="h_image_url">
+																<button class="button -color_primary RippleEffect" type="button" tabindex="-1">Загрузить</button>
+															</div>
+														</div>
+														<div class="form_unit">
+															<button class="button -color_primary RippleEffect FileLoadButton" type="button"><input class="hidden" type="file">Загрузить</button>
+														</div>
+
+													</div>
+
+												</div>
+												<div class="form_unit">
+													<img src="http://www.gsati.com/sites/default/files/logo_dsa2lines.jpg">
+												</div>
+												<div class="form_unit">
+
+												</div>
+												<div class="form_unit">
+
+												</div>
+											</div>
+
 
 											<h4 class="form_label"><label for="event_title">Уведомления для пользователей</label></h4>
 											<div class="form_group -parts_2_3">
@@ -451,11 +482,11 @@
 													<label class="form_label" for="add_event_delayed_publication"><span>Отложенная публикация</span></label>
 												</div>
 
-												<div class="form_unit">
+												<div class="form_unit DelayedPublication -status_disabled">
 
 													<div class="form_unit -inline">
 														<label class="form_label">Дата</label>
-														<div class="form_select -v_centering DatePicker"><label>Дата</label><input type="hidden"></div>
+														<div class="form_select -v_centering DatePicker"><label>Дата</label><input type="hidden" disabled></div>
 													</div>
 
 													<div class="form_unit -inline">
@@ -463,11 +494,11 @@
 														<div class="form_unit">
 															<div class="form_group -time_input TimeInput">
 																<div class="form_unit">
-																	<input class="form_input">
+																	<input class="form_input" disabled>
 																</div>
 																<span class="divider">:</span>
 																<div class="form_unit">
-																	<input class="form_input">
+																	<input class="form_input" disabled>
 																</div>
 															</div>
 														</div>
