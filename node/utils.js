@@ -69,7 +69,7 @@ module.exports = {
 		}
 	},
 	downloadImageFromUrl: function(request, url, callback){
-		request.get(url, function (error, response, body) {
+		request({url: url, encoding: null}, function (error, response, body) {
 			if (!error && response.statusCode == 200) {
 				data = "data:" + response.headers["content-type"] + ";base64," + new Buffer(body).toString('base64');
 				callback(null, data)
