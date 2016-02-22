@@ -54,6 +54,15 @@ class OrganizationsCollection {
 					$statement_array[':type_id'] = $value;
 					break;
 				}
+				case 'privileges': {
+					if ($value == 'can_add'){
+						$select
+							->join('INNER', 'users_organizations', 'users_organizations.organization_id = view_organizations.id AND users_organizations.status = TRUE')
+							->where('users_organizations.user_id = :user_id');
+						$statement_array[':user_id'] = $user->getId();
+					}
+					break;
+				}
 				case 'id': {
 					foreach(Organization::getAdditionalCols() as $key => $val){
 						if (is_numeric($key)){
