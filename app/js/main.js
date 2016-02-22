@@ -127,8 +127,13 @@ function showModal(name){
 
 	if($modal.length > 0){
 		$('.modal_unit').removeClass('-active');
+		$('html').addClass('-open_modal');
 		$modal.addClass('-active').parent().addClass('-active');
-		$('.modal_backface').off('click').on('click', closeModal);
+		$('.modal_wrapper').off('click').on('click', function(e){
+			if(!$(e.target).closest($modal).length){
+				closeModal();
+			}
+		});
 		$modal.find('.CloseModal').off('click').on('click', closeModal);
 	} else {
 		throw Error('Модального окна '+name+' нет');
@@ -137,6 +142,7 @@ function showModal(name){
 }
 
 function closeModal(){
+	$('html').removeClass('-open_modal');
 	$('.modal_unit').removeClass('-active').parent().removeClass('-active').trigger('modal-close');
 }
 

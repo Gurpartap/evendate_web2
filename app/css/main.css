@@ -963,38 +963,37 @@ a.button:hover {text-decoration: none}
 /* /Unite */
 /* Modal */
 
+html.-open_modal {overflow: hidden}
+
 .modal_wrapper {
 	position: fixed;
 	top: 0;
 	left: 0;
 	width: 100%;
 	height: 100%;
-	display: none;
-	overflow: hidden;
+	display: none;/*
+	overflow: hidden;*/
+	overflow: auto;
 	outline: 0;
 	-webkit-overflow-scrolling: touch;
 	background-color: hsla(217, 42%, 24%,0.7);
 	background-color: hsla(0, 0%, 0%,0.7);
 	z-index: 1050;
 }
-.modal_wrapper.-active {display: block}
 
-.modal_backface {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-}
 
 .modal_unit {
-	min-width: 500px;
-	max-width: 1200px;
-	max-height: 95%;
+	display: none;
+	width: 800px;
+	max-width: 1200px;/*
+	max-height: 95%;*/
+	margin: 100px auto;
 	background-color: #fff;
 	border-radius: 3px;
 	overflow: auto;
 }
+.modal_unit.-active,
+.modal_wrapper.-active {display: block}
 
 .modal_header {
 	padding: 10px 25px;

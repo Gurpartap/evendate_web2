@@ -676,8 +676,7 @@
 					</div>
         </div>
     </section>
-	<div class="modal_wrapper -centering">
-		<div class="modal_backface"></div>
+	<div class="modal_wrapper">
 		<div class="modal_unit CropperModal">
 			<header class="modal_header">
 				<h4>Кадрирование</h4>
