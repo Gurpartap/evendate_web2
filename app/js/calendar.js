@@ -824,6 +824,20 @@ function AddEvent($view, $content_block){
 			socket.emit('image.getFromURL', $input.val());
 			$this.data('url', $input.val());
 			window.current_load_button = $this;
+			window.paceOptions = {
+				catchupTime : 10000,
+				maxProgressPerFrame:1,
+				ghostTime: Number.MAX_SAFE_INTEGER,
+				checkInterval :{
+					checkInterval: 10000
+				},
+				eventLag : {
+					minSamples: 1,
+					sampleCount: 30000000,
+					lagThreshold: 0.1
+				}
+			}; //хз зачем, все равно не работает
+			Pace.restart();
 		}).addClass('-Handled_LoadByURLButton');
 	}
 

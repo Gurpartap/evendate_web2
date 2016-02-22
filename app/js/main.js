@@ -149,10 +149,21 @@ function closeModal(){
 function initCrop(source, $endpoint_img, options){
 	var $img = $('.Cropper').children('img'),
 		$crop_button = $('.CropButton'),
-		$destroy_button = $('.DestroyCropButton');
-	options = typeof options == 'undefined' ? {} : options;
+		$destroy_button = $('.DestroyCropButton'),
+		opt = {
+			zoomable: false,
+			zoomOnWheel: false/*
+			minCanvasWidth: 500,
+			minCanvasHeight: 500,
+			minCropBoxWidth: 500,
+			minCropBoxHeight: 500,
+			minContainerWidth: 500,
+			minContainerHeight: 500*/
+		};
+	options = typeof options == 'object' ? options : {};
+	$.extend(opt, options);
 
-	$img.cropper('destroy').attr('src', source).cropper(options);
+	$img.cropper('destroy').attr('src', source).cropper(opt);
 	showModal('cropper');
 
 	$img.closest('.CropperModal').on('modal-close', function(){
