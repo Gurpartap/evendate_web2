@@ -19,7 +19,9 @@ $.fn.extend({
 				}
 				$this.toggleClass('-status_'+status);
 			});
-		} else {
+		} else if($this.is('input, textarea, select')){
+			$this.closest('.form_unit').toggleStatus(statuses);
+		}	else {
 			$this.find('.form_unit').toggleStatus(statuses);
 		}
 
