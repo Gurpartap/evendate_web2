@@ -1202,7 +1202,7 @@ function EditEvent($view, $content_block){
 
 		$.ajax({
 			url: url,
-			data: data,
+			data: JSON.stringify(data),
 			method: method,
 			success: function(res){
 				if(res.data.event_id){
