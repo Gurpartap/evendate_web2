@@ -8188,7 +8188,6 @@ fieldset[disabled] .flatdoc-wrapper .button.active {
   -webkit-box-shadow: 0 4px 8px -2px rgba(0,0,0,0.75);
   -moz-box-shadow: 0 4px 8px -2px rgba(0,0,0,0.75);
   box-shadow: 0 4px 8px -2px rgba(0,0,0,0.75);
-  z-index: 999;
 }
 
 .organization-modal .organization-content-header img{
@@ -8243,6 +8242,7 @@ fieldset[disabled] .flatdoc-wrapper .button.active {
   padding-top: 7px;
   text-align: center;
   border: 2px solid #6B89C6;
+	z-index: 10;
 }
 
 .event-image-circle > img{
@@ -8758,6 +8758,7 @@ span.organization-modal-header-text{
 
 .load-more-btn{
   text-align: center;
+	clear: both;
 }
 #modal-add-event .description{
   height: 300px;
