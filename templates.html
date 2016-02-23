@@ -55,7 +55,7 @@
 <script type="javascript/template" id="tmpl-selected-table-day">
 	<tr class="TableDay_{date}" data-date="{date}">
 		<td><button class="remove_date RemoveRow" type="button">&times;</button></td>
-		<td><input class="form_input DatePicker" value="{formatted_date}" data-selected_day="{date}"></td>
+		<td><input class="form_input DatePicker" value="{formatted_date}" data-selected_day="{date}" required></td>
 		<td></td>
 		<td>
 			<div class="form_unit -inline">
@@ -63,11 +63,11 @@
 				<div class="form_unit">
 					<div class="form_group -time_input TimeInput">
 						<div class="form_unit">
-							<input class="form_input StartHours" value="{start_hours}">
+							<input class="form_input StartHours" value="{start_hours}" required>
 						</div>
 						<span class="divider">:</span>
 						<div class="form_unit">
-							<input class="form_input StartMinutes" value="{start_minutes}">
+							<input class="form_input StartMinutes" value="{start_minutes}" required>
 						</div>
 					</div>
 				</div>
@@ -79,11 +79,11 @@
 				<div class="form_unit">
 					<div class="form_group -time_input TimeInput">
 						<div class="form_unit">
-							<input class="form_input EndHours" value="{end_hours}">
+							<input class="form_input EndHours" value="{end_hours}" required>
 						</div>
 						<span class="divider">:</span>
 						<div class="form_unit">
-							<input class="form_input EndMinutes" value="{end_minutes}">
+							<input class="form_input EndMinutes" value="{end_minutes}" required>
 						</div>
 					</div>
 				</div>
