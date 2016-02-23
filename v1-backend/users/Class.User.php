@@ -17,7 +17,7 @@ class User extends AbstractUser{
 	protected $notify_in_browser;
 
 	private $editor_instance;
-	private $db;
+	protected $db;
 
 
 

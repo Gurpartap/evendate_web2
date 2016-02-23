@@ -5,7 +5,6 @@
 	class Editor extends User{
 
 		protected function addNewEvent(array $data){
-
 			if (isset($data['organization_id'])){
 				$organization = OrganizationsCollection::one(
 					$this->getDB(),
@@ -19,14 +18,14 @@
 
 			return Event::create($this->getDB(), $organization, array_merge($data, array(
 				'image_extensions' => array(
-					'vertical' => $this->getImageExtension($data['file_names']['vertical']),
-					'horizontal' => $this->getImageExtension($data['file_names']['horizontal'])
+					'vertical' => App::getImageExtension($data['file_names']['vertical']),
+					'horizontal' => App::getImageExtension($data['file_names']['horizontal'])
 				),
 				'creator_id' => $this->getId()
 			)));
 		}
 
-		public function isEditor(Organization $organization = null) {
+		public function isEditor(Organization $organization = null) : boolean {
 			if ($organization instanceof Organization){
 				$q_get_org = 'SELECT users_organizations.organization_id
 					FROM users_organizations
@@ -45,13 +44,25 @@
 			}
 		}
 
-		public function getImageExtension($file_name){
-			if (!isset($file_name) || $file_name == ''){
-				return '';
-			}else{
-				$file_name_parts = explode('.', $file_name);
-				return end($file_name_parts);
-			}
+		public function isAdmin(User $user) : boolean {
+			$q_get = App::queryFactory()->newSelect();
+			$q_get
+				->cols(array('id'))
+				->from('users_organizations')
+				->join('INNER', 'users_roles', 'users_roles.id = users_organizations.role_id')
+				->where('user_id = :user_id')
+				->where('users_organizations.organization_id = :organization_id')
+				->where('users_roles.name = "admin"');
+
+			$p_get_data = $this->db->prepare($q_get->getStatement());
+
+			$result = $p_get_data->execute(array(
+				':user_id' => $user->getId(),
+				':organization_id' => $this->id
+			));
+
+			if ($result == FALSE) throw new DBQueryException('',$this->db);
+			return $p_get_data->rowCount() > 1;
 		}
 
 		public function getDefaultOrganization() : Organization {

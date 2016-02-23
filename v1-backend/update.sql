@@ -442,14 +442,18 @@ CREATE VIEW view_actions AS SELECT
                               stat_event_types.type_code,
                               tokens.user_id,
                               NULL                                              AS organization_id,
-                              DATE_PART('epoch', stat_events.created_at) :: INT AS created_at
+                              DATE_PART('epoch', MAX(stat_events.created_at)) :: INT AS created_at
                             FROM stat_events
                               INNER JOIN stat_event_types ON stat_event_types.id = stat_events.stat_type_id
                               INNER JOIN tokens ON tokens.id = stat_events.token_id
                               INNER JOIN view_events ON view_events.id = stat_events.event_id
                             WHERE
                               view_events.status = TRUE
-
+                              AND (stat_event_types.type_code = 'fave'
+                              OR stat_event_types.type_code = 'unfave')
+                            GROUP BY stat_events.event_id, tokens.user_id, stat_events.stat_type_id, stat_event_types.name,
+                              stat_event_types.entity,
+                              stat_event_types.type_code
                             UNION
 
                             SELECT
@@ -460,14 +464,17 @@ CREATE VIEW view_actions AS SELECT
                               stat_event_types.type_code,
                               tokens.user_id,
                               stat_organizations.organization_id                       AS organization_id,
-                              DATE_PART('epoch', stat_organizations.created_at) :: INT AS created_at
+                              DATE_PART('epoch', MAX(stat_organizations.created_at)) :: INT AS created_at
                             FROM stat_organizations
                               INNER JOIN stat_event_types ON stat_event_types.id = stat_organizations.stat_type_id
                               INNER JOIN tokens ON tokens.id = stat_organizations.token_id
                               INNER JOIN view_organizations
                                 ON view_organizations.id = stat_organizations.organization_id
-                            WHERE
-                              view_organizations.status = TRUE;
+                            WHERE (stat_event_types.type_code = 'subscribe'
+                                       OR stat_event_types.type_code = 'unsubscribe')
+                            GROUP BY stat_organizations.organization_id, tokens.user_id, stat_organizations.stat_type_id, stat_event_types.name,
+                              stat_event_types.entity,
+                              stat_event_types.type_code;
 
 
 
@@ -512,10 +519,34 @@ CREATE VIEW view_stat_events AS SELECT
   WHERE events.status = true;
 
 
+ALTER TABLE public.users ADD avatar_url_max TEXT DEFAULT NULL NULL;
+
+
+CREATE TABLE users_roles(
+  id                SERIAL PRIMARY KEY NOT NULL,
+  name VARCHAR(50)          NOT NULL,
+  description TEXT NULL DEFAULT NULL,
+  created_at        TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP,
+  updated_at        TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO users_roles(name, description)
+    VALUES('admin', 'Администратор и владелец организации');
+
+ALTER TABLE public.users_organizations ADD role_id TEXT DEFAULT 1 NOT NULL;
+
+
+ALTER TABLE public.events ADD registration_required BOOLEAN DEFAULT FALSE NOT NULL;
+ALTER TABLE public.events ADD registration_till TIMESTAMP DEFAULT NULL NULL;
+ALTER TABLE public.events ADD public_at TIMESTAMP DEFAULT NULL NULL;
+ALTER TABLE public.events ADD is_free BOOLEAN DEFAULT TRUE NOT NULL;
+ALTER TABLE public.events ADD min_price INT DEFAULT NULL NULL;
+
+
 
   ALTER TABLE public.log_requests ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
-  ALTER TABLE public.log_requests ADD headers JSON DEFAULT NULL  NULL;
-  ALTER TABLE public.log_requests ADD body_json JSON DEFAULT NULL  NULL;
+  ALTER TABLE public.log_requests ADD headers JSON DEFAULT NULL NULL;
+  ALTER TABLE public.log_requests ADD body_json JSON DEFAULT NULL NULL;
   ALTER TABLE public.log_requests ADD response_http_status INT DEFAULT 200 NOT NULL;
   ALTER TABLE public.log_requests ADD response_error_name VARCHAR(255) DEFAULT NULL NULL;
   ALTER TABLE public.log_requests ADD   uuid              TEXT UNIQUE        NOT NULL DEFAULT uuid_generate_v4();

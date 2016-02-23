@@ -17,9 +17,8 @@ var server = require('http'),
 
 
 var config_index = process.env.ENV ? process.env.ENV : 'dev',
-	real_config = config[config_index];
-	console.log(real_config.mysql_db);
-	var connection = mysql.createPool(real_config.mysql_db),
+	real_config = config[config_index],
+	connection = mysql.createPool(real_config.mysql_db),
 	pg_conn_string = [
 		'postgres://',
 		real_config.db.user,
@@ -108,24 +107,24 @@ pg.connect(pg_conn_string, function(err, client, done) {
 				' INNER JOIN organizations ON organizations.id = events.organization_id' +
 				' WHERE ' +
 				' notification_time <= NOW() ' +
-				' AND done = 0' +
-				' AND events.status = 1',
+				' AND done = FALSE' +
+				' AND events.status = TRUE',
 
 			q_get_to_send_devices = 'SELECT DISTINCT tokens.*, users.notify_in_browser ' +
 				' FROM tokens' +
 				' INNER JOIN subscriptions ON subscriptions.user_id = tokens.user_id' +
 				' INNER JOIN organizations ON organizations.id = subscriptions.organization_id' +
 				' INNER JOIN users ON users.id = tokens.user_id' +
-				' WHERE FROM_UNIXTIME(tokens.expires_on) >= NOW()' +
-				' AND organizations.id = ?' +
-				' AND subscriptions.status = 1' +
+				' WHERE tokens.expires_on >= DATE_PART("epoch",NOW()) ::INT' +
+				' AND organizations.id = $1' +
+				' AND subscriptions.status = TRUE' +
 				' ORDER BY tokens.id DESC',
 			q_to_send_not_now_notification = 'SELECT DISTINCT tokens.*, users.notify_in_browser ' +
 				' FROM tokens' +
 				' INNER JOIN users ON users.id = tokens.user_id' +
 				' INNER JOIN favorite_events ON favorite_events.user_id = users.id' +
-				' WHERE FROM_UNIXTIME(tokens.expires_on) >= NOW()' +
-				' AND favorite_events.event_id = ?' +
+				' WHERE tokens.expires_on >= >= DATE_PART("epoch",NOW()) ::INT' +
+				' AND favorite_events.event_id = $1' +
 				' AND favorite_events.status = 1' +
 				' ORDER BY tokens.id DESC',
 			q_ins_notification = 'INSERT INTO notifications(created_at, click_time, received, token_id, event_notification_id)' +
@@ -148,7 +147,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 					q_data = event_notification.organization_id;
 				}
 
-				connection.query('UPDATE events_notifications SET done = 1 WHERE id = ' + connection.escape(event_notification.id), function(err) {
+				connection.query('UPDATE events_notifications SET done = TRUE WHERE id = ' + connection.escape(event_notification.id), function(err) {
 					if (err) {
 						logger.error(err);
 					}
@@ -204,9 +203,9 @@ pg.connect(pg_conn_string, function(err, client, done) {
 
 						}
 
-						//connection.query(q_ins_notification, [device.id, event_notification.id], function(err, result){
-						//
-						//});
+						connection.query(q_ins_notification, [device.id, event_notification.id], function(err, result){
+
+						});
 
 
 					});

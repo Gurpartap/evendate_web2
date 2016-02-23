@@ -3,8 +3,8 @@
 	$request_time = new DateTime();
 
 	$_function_called = false;
-	if (isset($_SERVER['ENV']) && ($_SERVER['ENV'] != 'dev' || $_SERVER['ENV'] != 'test')){
-		ini_set("display_errors", 1);
+	if (isset($_SERVER['ENV']) && ($_SERVER['ENV'] != 'dev' && $_SERVER['ENV'] != 'test')){
+		ini_set("display_errors", 0);
 		error_reporting(E_ALL);
 	}
 	require_once '../../v1-backend/bin/env_variables.php';
@@ -157,7 +157,7 @@ try {
 
 	$_result->setRequestUUID($log_res['uuid']);
 
-	if (($_SERVER['ENV'] == 'local' || $_SERVER['ENV'] == 'dev') && isset($e)){
+	if (($_SERVER['ENV'] == 'local' || $_SERVER['ENV'] == 'dev' || $_SERVER['ENV'] == 'test') && isset($e)){
 		print_r($e);
 	}
 

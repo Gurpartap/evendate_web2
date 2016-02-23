@@ -20,6 +20,8 @@ $__modules['events'] = array(
 			return new Result(true, '', array($event->getNotifications($__user, $__fields)->getData()));
 		},
 		'{{/(id:[0-9]+)}}' => function ($id) use ($__db, $__request, $__user, $__fields) {
+
+			Statistics::Event($this, App::getCurrentUser(), App::DB(), Statistics::EVENT_VIEW);
 			$event = EventsCollection::one(
 				$__db,
 				$__user,

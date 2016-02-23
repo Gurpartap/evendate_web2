@@ -147,4 +147,44 @@ class App {
 	static public function DB() : PDO {
 		return self::$__DB;
 	}
+
+	static public function saveImage(&$file, $filename, $size){
+		$start_memory = memory_get_usage();
+		$tmp = unserialize(serialize($file));
+		$img_size = memory_get_usage() - $start_memory;
+
+		if ($img_size / 1024 > $size){
+			throw new InvalidArgumentException('Файл слишком большого размера. Максимальный размер - ' . $size . ' кбайт');
+		}
+		$file = explode(',', $file);
+		$file = $file[1];
+
+		if ($file) {
+			global $ROOT_PATH;
+			$result = file_put_contents($ROOT_PATH . $filename, base64_decode($file));
+			if (!$result) throw new RuntimeException('FILE_SAVING_ERROR');
+			return $result;
+		}else{
+			throw new InvalidArgumentException('IMAGE_FILE_NOT_FOUND');
+		}
+	}
+
+	static public function getImageExtension($file_name){
+		if (!isset($file_name) || $file_name == ''){
+			return '';
+		}else{
+			$file_name_parts = explode('.', $file_name);
+			return end($file_name_parts);
+		}
+	}
+
+	public static function generateRandomString($length = 10) {
+		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		$charactersLength = strlen($characters);
+		$randomString = '';
+		for ($i = 0; $i < $length; $i++) {
+			$randomString .= $characters[rand(0, $charactersLength - 1)];
+		}
+		return $randomString;
+	}
 }
