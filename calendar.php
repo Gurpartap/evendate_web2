@@ -370,7 +370,7 @@
 												<input class="form_input Placepicker" id="edit_event_placepicker" data-map-container-id="edit_event_map" name="location">
 											</div>
 											<div class="form_unit">
-												<button class="button -color_primary -fill RippleEffect" type="button" tabindex="-1">По умолчанию</button>
+												<button class="button -color_primary -fill RippleEffect EditEventDefaultAddress" type="button" tabindex="-1">По умолчанию</button>
 											</div>
 										</div>
 										<div id="edit_event_map" class="collapse">
@@ -585,7 +585,7 @@
 										</div>
 
 										<div class="form_unit -h_centering">
-											<button id="edit_event_submit" class="button RippleEffect EditEventDefaultAddress -color_secondary" type="button">Опубликовать</button>
+											<button id="edit_event_submit" class="button RippleEffect -color_secondary" type="button">Опубликовать</button>
 										</div>
 
 									</form>
