@@ -815,12 +815,12 @@ function OneDay($view, $content_block){
 	setDaysWithEvents();
 }
 
-function AddEvent($view, $content_block){
+function EditEvent($view, $content_block){
 
 	function bindLoadByURLButton(){
 		$('.LoadByURLButton').not('-Handled_LoadByURLButton').on('click', function(){
 			var $this = $(this),
-				$input = $this.siblings('.LoadByURLInput');
+				$input = $('#'+$this.data('load_input'));
 			socket.emit('image.getFromURL', $input.val());
 			$this.data('url', $input.val());
 			window.current_load_button = $this;
@@ -841,16 +841,7 @@ function AddEvent($view, $content_block){
 		}).addClass('-Handled_LoadByURLButton');
 	}
 
-	bindDatePickers($view);
-	bindTimeInput($view);
-	bindSelect2($view);
-	limitInputSize();
-	bindRippleEffect();
-	bindFileLoadButton();
-	bindLoadByURLButton();
-	initAddEventMainCalendar($view);
-
-	function initAddEventMainCalendar($view){
+	function initEditEventMainCalendar($view){
 		//TODO: Refactor this!! Make it more readable
 
 		var MainCalendar = new Calendar('.EventDatesCalendar', {weekday_selection: true, month_selection: true}),
@@ -907,7 +898,6 @@ function AddEvent($view, $content_block){
 				$selected_days_text.html('<p>Даты не выбраны</p>');
 			}
 		}
-
 
 		function doTheFuckingSort($rows, $parent){
 			$rows.sort(function(a,b){
@@ -980,7 +970,7 @@ function AddEvent($view, $content_block){
 
 		}
 
-		$view.find('#different_time').on('change', function(){
+		$view.find('#edit_event_different_time').on('change', function(){
 			var $table_wrapper = $view.find('.event_selected_days_wrapper'),
 				$table_content = $view.find('.event_selected_days_content');
 			if($(this).prop('checked')){
@@ -1010,15 +1000,87 @@ function AddEvent($view, $content_block){
 
 	}
 
+	function handleImgUpload($context, source, filename){
+		var $parent = $context.closest('.EditEventImgLoadWrap'),
+			$preview = $parent.find('.EditEventImgPreview'),
+			$crop_again_button = $parent.find('.CropAgain'),
+			$file_name_text = $parent.find('.FileNameText'),
+			$file_name = $parent.find('.FileName'),
+			$data_url = $parent.find('.DataUrl');
+
+		$preview.data('source_img', source).attr('src', source);
+		$data_url.val(source);
+		$file_name_text.html('Загружен файл:<br>'+filename);
+		$file_name.val(filename);
+		initCrop(source, $preview, {
+			'aspectRatio': eval($preview.data('aspect_ratio'))
+		});
+		$preview.on('crop-done', function(){
+			var $this = $(this),
+				$crop_data = $this.data('crop_data');
+
+			$data_url.val($preview.attr('src'));
+			$crop_again_button.removeClass('-hidden').off('click').on('click', function(){
+				initCrop($preview.data('source_img'), $preview, {
+					'data': $crop_data,
+					'aspectRatio': eval($preview.data('aspect_ratio'))
+				});
+			});
+
+		})
+	}
+
+	$.ajax({
+		url: 'api/v1/organizations',
+		method: 'GET',
+		data: {
+			privileges: 'can_add',
+			fields: 'default_address'
+		},
+		success: function(res){
+			var $wrapper = $('.EditEventOrganizations'),
+				organizations_options = $(),
+				$default_address_button = $view.find('.EditEventDefaultAddress');
+
+			res.data.forEach(function(organization){
+				organizations_options = organizations_options.add(tmpl('organization-option', organization));
+			});
+
+			$wrapper.find('select').append(organizations_options).select2({
+				containerCssClass: 'form_select2',
+				dropdownCssClass: 'form_select2_drop'
+			}).on('change', function(){
+				$default_address_button.data('default_address', $(this).children(":selected").data('default-address'));
+			});
+			if(organizations_options.length > 1){
+				$wrapper.removeClass('-hidden');
+			} else {
+				$wrapper.addClass('-hidden');
+			}
+			$default_address_button.data('default_address', res.data[0].default_address)
+		}
+	});
+
+	bindDatePickers($view);
+	bindTimeInput($view);
+	bindSelect2($view);
+	bindTabs($view);
+	limitInputSize();
+	bindRippleEffect();
+	bindFileLoadButton();
+	bindLoadByURLButton();
+	initEditEventMainCalendar($view);
+
 	//TODO: perepilit' placepicker
 	$view.find(".Placepicker").placepicker();
 
-	$view.find('#event_tags').select2({
+	$view.find('.EventTags').select2({
 		tags: true,
 		width: '100%',
 		placeholder: "Выберите до 5 тегов",
 		maximumSelectionLength: 5,
 		maximumSelectionSize: 5,
+		tokenSeparators: [',', ';'],
 		multiple: true,
 		createSearchChoice: function(term, data) {
 			if ($(data).filter(function() {
@@ -1053,38 +1115,22 @@ function AddEvent($view, $content_block){
 		dropdownCssClass: "form_select2_drop"
 	});
 
-	$view.find('#add_event_delayed_publication').on('change', function(){
+	$view.find('.EditEventDefaultAddress').on('click', function(){
+		var $this = $(this);
+		$this.closest('.form_group').find('input').val($this.data('default_address'))
+	});
+
+	$view.find('#edit_event_delayed_publication').on('change', function(){
 		$view.find('.DelayedPublication').toggleStatus('disabled');
 	});
 
-	$view.find('#add_event_registration_needed').on('change', function(){
+	$view.find('#edit_event_registration_required').on('change', function(){
 		$view.find('.RegistrationTill').toggleStatus('disabled');
 	});
 
-	function handleImgUpload($context, source, filename){
-		var $parent = $context.closest('.AddEventImgLoadWrap'),
-			$preview = $parent.find('.AddEventImgPreview'),
-			$crop_again_button = $parent.find('.CropAgain'),
-			$file_name = $parent.find('.FileName');
-
-		$preview.data('source_img', source).attr('src', source);
-		$file_name.html('Загружен файл:<br>'+filename);
-		initCrop(source, $preview, {
-			'aspectRatio': eval($preview.data('aspect_ratio'))
-		});
-		$preview.on('crop-done', function(){
-			var $this = $(this),
-				$crop_data = $this.data('crop_data');
-
-			$crop_again_button.removeClass('-hidden').off('click').on('click', function(){
-				initCrop($preview.data('source_img'), $preview, {
-					'data': $crop_data,
-					'aspectRatio': eval($preview.data('aspect_ratio'))
-				});
-			});
-
-		})
-	}
+	$view.find('#edit_event_free').on('change', function(){
+		$view.find('.MinPrice').toggleStatus('disabled');
+	});
 
 	socket.on('image.getFromURLDone', function(result){
 		var url = window.current_load_button.data('url');
@@ -1106,6 +1152,67 @@ function AddEvent($view, $content_block){
 			})(f);
 			reader.readAsDataURL(f);
 		}
+
+	});
+
+	$view.find('#edit_event_submit').on('click', function(){
+		var data = $view.find("#create-event-form").serializeForm(),
+			tags = data.tags.split(','),
+			url = 'api/v1/events/'+data.event_id,
+			method = data.event_id ? 'PUT' : 'POST';
+
+		data.tags = (tags.length === 1 && tags[0] === "") ? [] : tags;
+		data.filenames = {
+			vertical: data.filename_vertical,
+			horizontal: data.filename_horizontal
+		};
+		if(data.registration_required){
+			data.registration_till = ""+data.registration_till_date+'T'+data.registration_till_time_hours+':'+data.registration_till_time_minutes+':00'
+		}
+		if(data.delayed_publication){
+			data.public_at = ""+data.public_at_date+'T'+data.public_at_time_hours+':'+data.public_at_time_minutes+':00'
+		}
+
+		data.dates = [];
+		if(data.different_time){
+			var	selected_days_rows = $('.SelectedDaysRows').children();
+
+			selected_days_rows.each(function(){
+				var $this = $(this);
+				data.dates.push({
+					event_date: $this.find('.DatePicker').data('selected_day'),
+					start_time: $this.find('.StartHours').val() + ':' + $this.find('.StartMinutes').val(),
+					end_time: $this.find('.EndHours').val() + ':' + $this.find('.EndMinutes').val()
+				});
+			});
+		} else {
+			var	MainCalendar = $('.EventDatesCalendar').data('calendar'),
+				$main_time = $('.MainTime'),
+				start_time = $main_time.find('.StartHours').val() + ':' + $main_time.find('.StartMinutes').val(),
+				end_time = $main_time.find('.EndHours').val() + ':' + $main_time.find('.EndMinutes').val();
+
+			MainCalendar.selected_days.forEach(function(day){
+				data.dates.push({
+					event_date: day,
+					start_time: start_time,
+					end_time: end_time
+				})
+			});
+		}
+
+		$.ajax({
+			url: url,
+			data: data,
+			method: method,
+			success: function(res){
+				if(res.data.event_id){
+					$view.find('#edit_event_event_id').val(res.data.event_id);
+					showNotification('Мероприятие успешно добавлено', 3000);
+				} else {
+					showNotification('Мероприятие успешно обновлено', 3000);
+				}
+			}
+		});
 
 	});
 
@@ -1219,7 +1326,7 @@ $(document)
 			favorites: FavoredEvents,
 			search: Search,
 			friends: Friends,
-			add_event: AddEvent,
+			edit_event: EditEvent,
 			example: Example,
 			refreshState: function(){
 				var page = this.getCurrentState(),

@@ -70,7 +70,7 @@ DatePicker.prototype.openDialog = function(){
 		if(!self.$datepicker.is('input')){
 			self.$datepicker.find('label').text(self.formated_selected_day);
 		}
-		self.$input.val(self.formated_selected_day);
+		self.$input.val(self.selected_day);
 
 		if(self.options.close_on_pick){
 			self.destroy();

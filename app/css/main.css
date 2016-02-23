@@ -157,7 +157,7 @@ input, select, textarea, button {font-family: inherit}
 	color: #656565;
 	border: 1px solid #d8d8d8;/*
 	border-top: 1px solid #aaa;*/
-	border-radius: 3px;/*
+	border-radius: 2px;/*
 	background-color: #fafafa;
 	box-shadow: inset 0 1px 3px #e6e6e6;*/
 }
@@ -210,21 +210,21 @@ input, select, textarea, button {font-family: inherit}
 .form_select2 {
 	display: block;
 	width: 100%;
-	border-radius: 3px;
+	border-radius: 2px;
 	font-size: .9rem;
 }
 .form_select2 > .select2-choice {
-	height: 2rem;
+	height: 2.2rem;
 	padding: 0;
 	background: #fff;
 	border: 1px solid #e3e3e3;
-	border-radius: 3px;
+	border-radius: 2px;
 	box-shadow: 0 1px 2px #d9d9d9;
 }
 .form_select2.select2-dropdown-open > .select2-choice {border-radius: 3px 3px 0 0}
 
 .form_select2.select2-container > .select2-choice > .select2-chosen {
-	line-height: 1.9rem;
+	line-height: 2.2rem;
 	padding-left: 0.6rem;
 }
 .form_select2.select2-container.select2-container-disabled > .select2-choice {
@@ -246,6 +246,7 @@ input, select, textarea, button {font-family: inherit}
 
 
 .form_select2_drop.select2-drop-active {
+	font-size: .9rem;
 	border-top: 1px solid;
 	border-color: #e3e3e3;
 	box-shadow: 0 1px 2px #d9d9d9;
@@ -341,7 +342,7 @@ input, select, textarea, button {font-family: inherit}
 	width: 20px;
 	height: 20px;
 	border: 1px solid #aaa;
-	border-radius: 3px;
+	border-radius: 2px;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 }
@@ -539,7 +540,7 @@ input, select, textarea, button {font-family: inherit}
 .form_group.-parts_e_e_e > .form_unit.-offset_1 {margin-left: 33.6666667%}
 .form_group.-parts_1_1_2 > .form_unit.-offset_1,
 .form_group.-parts_1_2_1 > .form_unit.-offset_1,
-.form_group.-parts_2_1_1 > .form_unit.-offset_1 {margin-left: 25.25%}
+.form_group.-parts_2_1_1 > .form_unit.-offset_1 {margin-left: 26.25%}
 .form_group.-parts_1_2_2 > .form_unit.-offset_1,
 .form_group.-parts_2_1_2 > .form_unit.-offset_1,
 .form_group.-parts_2_2_1 > .form_unit.-offset_1,
@@ -655,6 +656,9 @@ input, select, textarea, button {font-family: inherit}
 
 
 
+.form_group > .form_unit > .form_radio + .form_label,
+.form_group > .form_unit > .form_checkbox + .form_label {margin: 7px 0 }
+
 
 .form_group.-time_input > .form_unit {
 	vertical-align: middle;
@@ -669,7 +673,6 @@ input, select, textarea, button {font-family: inherit}
 }
 
 /* /Form group */
-
 /* Form -status */
 
 .form_unit.-status_error {color: #f00}
@@ -708,7 +711,10 @@ input, select, textarea, button {font-family: inherit}
 .form_group.-status_disabled .form_select,
 .form_group.-status_disabled .form_select2,
 .form_group.-status_disabled .form_radio,
-.form_group.-status_disabled .form_checkbox {opacity: .5}
+.form_group.-status_disabled .form_checkbox {
+	opacity: .5;
+	cursor: default;
+}
 
 /* /Form -status */
 
@@ -755,7 +761,7 @@ input, select, textarea, button {font-family: inherit}
 	font-weight: 400;
 	color: inherit;
 	border: 0;
-	border-radius: 3px;
+	border-radius: 2px;
 	background-color: transparent;
 	text-align: center;
 	text-transform: uppercase;
@@ -798,7 +804,7 @@ a.button:hover {text-decoration: none}
 /*
 .button:not(:empty):before {vertical-align: middle}*/
 
-
+/* TODO: Ripple on checkboxes and radios */
 
 .ripple {
 	position: absolute;
@@ -961,6 +967,75 @@ a.button:hover {text-decoration: none}
 
 
 /* /Unite */
+/* Tabs */
+
+.tabs_header {
+	text-align: left;
+}
+
+.tab {
+	display: inline-block;
+	padding: 8px 1px;
+	margin-right: 1em;
+	font-size: .9rem;
+	font-weight: 500;
+	text-transform: uppercase;
+	border-bottom: 2px solid transparent;
+	cursor: pointer;
+}
+
+.tab.-active {border-color: inherit}
+
+.-color_primary .tab.-active,
+.tab.-color_primary.-active {
+	color: #5379b8;
+	border-color: #5379b8;
+}
+
+.-color_secondary .tab.-active,
+.tab.-color_secondary.-active {
+	color: #ff5f9e;
+	border-color: #ff5f9e;
+}
+
+.tab_bodies_wrap {padding: 20px 0}
+
+.tab_body {display: none}
+.tab_body.-active {display: block}
+
+/* /Tabs */
+/* Notification */
+
+#notification {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 40px;
+	color: #fff;
+	background: #FC7EB0 url(../img/notification_pattern.png) repeat-x;
+	-webkit-transform: translateY(0);
+	-moz-transform: translateY(0);
+	-ms-transform: translateY(0);
+	-o-transform: translateY(0);
+	transform: translateY(0);
+	-webkit-transition: transform .5s ease;
+	-moz-transition: transform .5s ease;
+	-ms-transition: transform .5s ease;
+	-o-transition: transform .5s ease;
+	transition: transform .5s ease;
+	z-index: 99;
+}
+
+#notification.-show {
+	-webkit-transform: translateY(60px);
+	-moz-transform: translateY(60px);
+	-ms-transform: translateY(60px);
+	-o-transform: translateY(60px);
+	transform: translateY(60px);
+}
+
+/* /Notification */
 /* Modal */
 
 html.-open_modal {overflow: hidden}
@@ -976,8 +1051,7 @@ html.-open_modal {overflow: hidden}
 	overflow: auto;
 	outline: 0;
 	-webkit-overflow-scrolling: touch;
-	background-color: hsla(217, 42%, 24%,0.7);
-	background-color: hsla(0, 0%, 0%,0.7);
+	background-color: hsla(0,0%,100%,.7);
 	z-index: 1050;
 }
 
@@ -989,7 +1063,8 @@ html.-open_modal {overflow: hidden}
 	max-height: 95%;*/
 	margin: 100px auto;
 	background-color: #fff;
-	border-radius: 3px;
+	box-shadow: 0 2px 15px hsla(0,0%,0%,.2);
+	border-radius: 2px;
 	overflow: auto;
 }
 .modal_unit.-active,
@@ -1051,7 +1126,7 @@ html.-open_modal {overflow: hidden}
 	font-size: 1em;
 	color: inherit;
 	border: 0;
-	border-radius: 3px;
+	border-radius: 2px;
 	background-color: transparent;
 	cursor: pointer;
 }
@@ -1064,7 +1139,7 @@ html.-open_modal {overflow: hidden}
 	padding: .5em;
 	margin: 0 .5em;
 	font-size: 1.1em;
-	border-radius: 3px;
+	border-radius: 2px;
 	text-transform: uppercase;
 
 }
@@ -1193,7 +1268,10 @@ html.-open_modal {overflow: hidden}
 /* FUCK YOU BOOTSTRAP */
 
 .wrapper > section {z-index: auto}
-.blurheader {z-index: 100}
+.blurheader {
+	opacity: 1;
+	z-index: 100;
+}
 
 /* /FUCK YOU BOOTSTRAP */
 
@@ -1267,7 +1345,7 @@ html.-open_modal {overflow: hidden}
 	margin: 70px 30px;
 }
 
-/* ADD EVENT */
+/* EDIT EVENT */
 
 .selected_days {
 	font-size: .8em;
@@ -1343,15 +1421,15 @@ html.-open_modal {overflow: hidden}
 
 .event_selected_days_add_date {margin: 10px 0}
 
-.add_event_img_preview_hor,
-.add_event_img_preview_vert {
+.edit_event_img_preview_hor,
+.edit_event_img_preview_vert {
 	position: absolute;
 	/*
 	background-repeat: no-repeat;
 	background-size: contain;*/
 }
 
-.add_event_img_preview_hor {
+.edit_event_img_preview_hor {
 	top: 0;
 	left: 0;
 	width: 100%;
@@ -1360,7 +1438,7 @@ html.-open_modal {overflow: hidden}
 	background-size: contain;*/
 }
 
-.add_event_img_preview_vert {
+.edit_event_img_preview_vert {
 	top: 131px;
 	left: 7px;
 	width: 95px;
