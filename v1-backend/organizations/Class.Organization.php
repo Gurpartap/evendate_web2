@@ -53,6 +53,7 @@ class Organization extends AbstractEntity{
 		'img_small_url',
 		'site_url',
 		'subscribed_count',
+		'default_address',
 		'created_at',
 		'updated_at',
 		'background_small_img_url',
