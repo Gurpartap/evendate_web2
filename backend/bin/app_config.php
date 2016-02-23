@@ -6,6 +6,7 @@
  * Time: 23:09
  */
 
+$BACKEND_FOLDER = 'backend';
 class App {
 
 	private static $obj;
@@ -31,9 +32,9 @@ class App {
 			}while(file_exists($filename) == false && $counter < 5);
 		}
 		$config_json = file_get_contents($filename);
-		self::$obj = json_decode($config_json);
+		self::$obj = json_decode($config_json, false);
 
-		self::$obj = self::$obj->$_SERVER['ENV'];
+		self::$obj = self::$obj->{$_SERVER['ENV']};
 		self::$DB_NAME = self::$obj->db->database;
 		self::$DB_SERVER = self::$obj->db->host;
 		self::$DB_USER = self::$obj->db->user;

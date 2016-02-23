@@ -1,6 +1,7 @@
 <?php
 
 require_once 'Class.Event.php';
+require_once $ROOT_PATH . 'backend/tags/Class.TagsCollection.php';
 
 class EventsCollection{
 
@@ -137,7 +138,7 @@ class EventsCollection{
 					$q_get_events .= ' AND (
 						(DATE(events.event_start_date) >= DATE(:since_date) OR DATE(events.event_end_date) >= DATE(:since_date))
 						OR
-						(SELECT COUNT(*) FROM events_dates WHERE DATE(events_dates.event_date) >= DATE(:since_date)) > 0
+						(SELECT COUNT(*) FROM events_dates WHERE DATE(events_dates.event_date) >= DATE(:since_date) AND event_id = events.id) > 0
 					)
 						 ';
 					$statement_array[':since_date'] = $value;
@@ -152,7 +153,7 @@ class EventsCollection{
 					$q_get_events .= ' AND (
 					(DATE(events.event_start_date) <= DATE(:till_date) OR (DATE(events.event_end_date) <= DATE(:till_date)))
 					OR
-					(SELECT COUNT(*) FROM events_dates WHERE DATE(events_dates.event_date) > DATE(:till_date)) > 0
+					(SELECT COUNT(*) FROM events_dates WHERE DATE(events_dates.event_date) > DATE(:till_date) AND event_id = events.id) > 0
 					)';
 					$statement_array[':till_date'] = $value;
 					break;
@@ -220,6 +221,13 @@ class EventsCollection{
 			AND favorite_events.user_id = :user_id
 			AND favorite_events.event_id = :event_id');
 
+		$p_get_tags = $db->prepare('SELECT tags.id, tags.name
+			FROM  tags
+			INNER JOIN events_tags ON tags.id = events_tags.tag_id
+			WHERE events_tags.status = 1
+			AND tags.status = 1
+			AND events_tags.event_id = :event_id');
+
 		$p_get_dates = $db->prepare('SELECT events_dates.event_date as event_date
 			FROM events_dates
 			WHERE
@@ -267,6 +275,26 @@ class EventsCollection{
 					':event_id' => $event['id']
 				));
 
+
+				$event['longitude'] = floatval($event['longitude']);
+				$event['latitude'] = floatval($event['latitude']);
+				$event['event_type_id'] = intval($event['event_type_id']);
+				$event['liked_users_count'] = intval($event['liked_users_count']);
+				$event['creator_id'] = intval($event['creator_id']);
+				$event['id'] = intval($event['id']);
+				$event['organization_id'] = intval($event['organization_id']);
+				$event['can_edit'] = boolval($event['can_edit']);
+				$event['timestamp_event_start_date'] = intval($event['timestamp_event_start_date']);
+				$event['timestamp_created_at'] = intval($event['timestamp_created_at']);
+				$event['timestamp_event_end_date'] = intval($event['timestamp_event_end_date']);
+				$event['timestamp_updated_at'] = intval($event['timestamp_updated_at']);
+				$event['organization_img_url'] = App::$SCHEMA . App::$DOMAIN . '/' . $event['organization_img_url'];
+				$event['is_full_day'] = $event['end_time'] == '00:00:00' && $event['begin_time'] == '00:00:00';
+				$event['location_object'] = $event['location_object'] == null ? null : $event['location_object'];
+				$event['status'] = $event['status'] == 1;
+				$first_date_dt = new DateTime($event['first_date']);
+				$event['timestamp_first_date'] = $first_date_dt->getTimestamp();
+
 				$event['favorite_friends'] = array();
 
 				if ($p_get_liked_users->rowCount() != 0){
@@ -280,7 +308,7 @@ class EventsCollection{
 					}
 				}
 
-				$tags = TagsCollection::filter($db, array('event_id' => $event['id']), array(), array('id'));
+				$tags = $p_get_tags->fetchAll();
 
 				foreach($tags as $tag){
 					$tag['id'] = intval($tag['id']);

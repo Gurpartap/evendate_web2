@@ -116,7 +116,7 @@ function bindEventHandlers(){
 			.animate({height: 100}, 300, "easeInBack");
 
 		$.ajax({
-			url: '/api/v1/events/' + event.id + '/status?hidden=1',
+			url: '/api/events/' + event.id + '/status?hidden=1',
 			type: 'PUT'
 		});
 	});
@@ -143,7 +143,7 @@ function bindEventHandlers(){
 			$panel_block.css({overflow: 'visible'});
 		});
 		$.ajax({
-			url: '/api/v1/events/' + event.id + '/status?hidden=0',
+			url: '/api/events/' + event.id + '/status?hidden=0',
 			type: 'PUT'
 		});
 
@@ -257,11 +257,11 @@ function toggleSubscriptionState(state, entity_id, callback){
 		},
 
 		options = (state == false) ? {
-			url: 'api/v1/subscriptions/' + entity_id,
+			url: 'api/subscriptions/' + entity_id,
 			type: 'DELETE',
 			success: cb
 		} : {
-			url: 'api/v1/subscriptions/',
+			url: 'api/subscriptions/',
 			data: {organization_id: entity_id},
 			type: 'POST',
 			success: cb
@@ -376,7 +376,7 @@ function MyTimeline($view, $content_block){
 			var page_number = $load_btn.data('page-number');
 			$load_btn.data('page-number', page_number + 1);
 			$.ajax({
-				url: '/api/v1/events/my?page=' + page_number,
+				url: '/api/events/my?page=' + page_number,
 				success: function(res){
 					printEventsInTimeline($view, res);
 				}
@@ -392,7 +392,7 @@ function MyTimeline($view, $content_block){
 function OrganizationsList($view, $content_block){
 	if (__STATES.getCurrentState() == 'organizations' && organizations_loaded) return;
 	$.ajax({
-		url: 'api/v1/organizations/?with_subscriptions=true&without_friends=true',
+		url: 'api/organizations/?with_subscriptions=true&without_friends=true',
 		success: function(res){
 			organizations_loaded = true;
 			var _organizations_by_types = {},
@@ -490,7 +490,7 @@ function FavoredEvents($view, $content_block){
 			var page_number = $load_btn.data('page-number');
 			$load_btn.data('page-number', page_number + 1);
 			$.ajax({
-				url: '/api/v1/events/favorites?page=' + page_number,
+				url: '/api/events/favorites?page=' + page_number,
 				success: function(res){
 					printEventsInTimeline($view, res);
 				}
@@ -510,7 +510,7 @@ function Search($view, $content_block){
 		$('.search-input').val(_search.q);
 	}
 	$.ajax({
-		url: '/api/v1/search/',
+		url: '/api/search/',
 		data: _search,
 		success: function(res){
 			var $events_wrapper = $view.find('.search-events').empty(),
@@ -588,7 +588,7 @@ function OneFriend($view, $content_block){
 			$content.find('.friend-events-block').remove();
 		}
 		$.ajax({
-			url: 'api/v1/users/friends?friends=true&actions=true&length=20&friend_id=' + friend_id + '&page=' + page_number++,
+			url: 'api/users/friends?friends=true&actions=true&length=20&friend_id=' + friend_id + '&page=' + page_number++,
 			success: function(res){
 				var hide_btn = false;
 				if ((res.data.length == 0 && page_number != 1) || (res.data.length < 20 && res.data.length > 0)){
@@ -641,7 +641,7 @@ function OneFriend($view, $content_block){
 	}
 
 	$.ajax({
-		url: '/api/v1/users/friends/',
+		url: '/api/users/friends/',
 		data: {
 			subscriptions: true,
 			friend_id: friend_id,
@@ -689,7 +689,7 @@ function OneFriend($view, $content_block){
 
 function getFriendsList($friends_right_list, cb){
 	$.ajax({
-		url: '/api/v1/users/friends?page=0&length=500',
+		url: '/api/users/friends?page=0&length=500',
 		success: function(res){
 			if (res.data.length == 0){
 				$('.no-friends-block').removeClass(__C.CLASSES.HIDDEN);
@@ -743,7 +743,7 @@ function Friends($view, $content_block){
 			$view.find('.friend-events-block').remove();
 		}
 		$.ajax({
-			url: 'api/v1/users/feed?length=20&page=' + page_number++,
+			url: 'api/users/feed?length=20&page=' + page_number++,
 			success: function(res){
 				var cards_by_users = {};
 				res.data.forEach(function(stat){
@@ -801,7 +801,7 @@ function OneDay($view, $content_block){
 	$view.find('.panel-default,.tl-block').remove();
 	var date = __STATES.getCurrentState();
 	$.ajax({
-		url: 'api/v1/events/my',
+		url: 'api/events/my',
 		data: {
 			date: date,
 			length: 100
@@ -1031,7 +1031,7 @@ function AddEvent($view, $content_block){
 			}
 		},
 		ajax: {
-			url: '/api/v1/tags/',
+			url: '/api/tags/',
 			dataType: 'JSON',
 			data: function (term, page) {
 				return {
@@ -1120,7 +1120,7 @@ function printSubscribedOrganizations(organization){
 
 function setDaysWithEvents(){
 	$.ajax({
-		url: '/api/v1/events/my',
+		url: '/api/events/my',
 		data: {
 			since_date: _selected_month.startOf('month').format(__C.DATE_FORMAT),
 			till_date: _selected_month.endOf('month').format(__C.DATE_FORMAT),

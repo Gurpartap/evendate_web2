@@ -17,7 +17,9 @@ var server = require('http'),
 
 
 var config_index = process.env.ENV ? process.env.ENV : 'dev',
-	real_config = config[config_index],
+	real_config = config[config_index];
+	console.log(real_config.mysql_db);
+	var connection = mysql.createPool(real_config.mysql_db),
 	pg_conn_string = [
 		'postgres://',
 		real_config.db.user,
@@ -85,9 +87,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 		return true;
 	};
 
-
 	if (handleError(err)) return;
-
 
 	function sendNotifications() {
 
@@ -396,6 +396,18 @@ pg.connect(pg_conn_string, function(err, client, done) {
 					return result;
 				}
 
+
+
+				if (data.user_info.hasOwnProperty('sex')){
+					if (data.user_info.sex == 2){
+						data.user_info.gender = 'male';
+					}else if (data.user_info.sex == 1){
+						data.user_info.gender = 'female';
+					}else{
+						data.user_info.gender = null;
+					}
+				}
+
 				var UIDs = getUIDValues(),
 					user_token = data.access_data.access_token + data.access_data.secret + Utils.makeId(),
 					q_get_user = 'SELECT id::int, vk_uid, facebook_uid, google_uid FROM users ' +
@@ -421,9 +433,16 @@ pg.connect(pg_conn_string, function(err, client, done) {
 						(UIDs.facebook_uid != null ? ', facebook_uid = $6, ' : '') +
 						(UIDs.google_uid != null ? ', google_uid = $6, ' : '') +
 						' gender = $7' +
-						' WHERE id = $8';
+						' WHERE id = $8',
+
+					q_ins_user_mysql = 'INSERT INTO users(first_name, last_name, email, token, avatar_url, vk_uid, facebook_uid, google_uid, gender) ' +
+						' VALUES ()';
+
+
+
 
 				client.query(q_get_user, [data.access_data.email, UIDs.vk_uid, UIDs.facebook_uid, UIDs.google_uid], function(err, result) {
+
 
 
 					if (handleError(err)) return;
@@ -447,16 +466,6 @@ pg.connect(pg_conn_string, function(err, client, done) {
 					}
 
 
-					if (data.user_info.hasOwnProperty('sex')){
-						if (data.user_info.sex == 2){
-							data.user_info.gender = 'male';
-						}else if (data.user_info.sex == 1){
-							data.user_info.gender = 'female';
-						}else{
-							data.user_info.gender = null;
-						}
-					}
-
 					query_params.push(data.user_info.gender);
 
 					if (result.rows.length == 0) {
@@ -466,6 +475,24 @@ pg.connect(pg_conn_string, function(err, client, done) {
 						user = result.rows[0];
 						query_params.push(user.id);
 					}
+
+					var q_upd_user_mysql = 'UPDATE users SET' +
+						' first_name = ' + connection.escape(data.user_info.first_name) +',' +
+						' last_name = ' + connection.escape(data.user_info.last_name) +',' +
+						' email = ' + connection.escape(data.access_data.email) +',' +
+						' token = ' + connection.escape(user_token) +',' +
+						' avatar_url = ' + connection.escape(data.user_info.photo_100) +
+						(UIDs.vk_uid != null ? ', vk_uid = ' + connection.escape(UIDs.vk_uid) + ',' : '') +
+						(UIDs.facebook_uid != null ? ', facebook_uid = ' + connection.escape(UIDs.facebook_uid) +',' : '') +
+						(UIDs.google_uid != null ? ', google_uid = ' + connection.escape(UIDs.google_uid) +',' : '') +
+						' gender = ' + connection.escape(data.user_info.gender) +
+						' WHERE id =' + connection.escape(user.id);
+
+
+					connection.query(q_upd_user_mysql, function(err, rows) {
+						console.log(q_upd_user_mysql);
+						console.log(err);
+					});
 
 					client.query(q_user, query_params, function(user_err, ins_result) {
 
@@ -588,7 +615,15 @@ pg.connect(pg_conn_string, function(err, client, done) {
 						var insertToken =function () {
 								var token_type = (data.oauth_data.hasOwnProperty('mobile') && data.oauth_data.mobile == 'true') ? 'mobile' : 'bearer',
 									token_time = token_type == 'mobile' ? moment().add(1, 'months').unix() : moment().add(10, 'days').unix(),
-									q_ins_token = 'INSERT INTO tokens(token, user_id, token_type, expires_on) VALUES($1, $2, $3, $4)';
+									q_ins_token = 'INSERT INTO tokens(token, user_id, token_type, expires_on) VALUES($1, $2, $3, $4)',
+									q_ins_token_mysql = 'INSERT INTO tokens(token, user_id, token_type, expires_on) VALUES(' +
+										connection.escape(user_token) + ', ' +
+										connection.escape(user.id) + ', ' +
+										connection.escape(token_type) + ', ' +
+										connection.escape(token_time) + ')';
+							connection.query(q_ins_token_mysql, function(err, rows){
+								console.log(err);
+							});
 								client.query(q_ins_token, [user_token, user.id, token_type, token_time], function(err) {
 									if (err) return handleError(err, 'CANT_INSERT_TOKEN');
 									socket.emit('auth', {
@@ -687,7 +722,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 							url: URLs[data.type.toUpperCase()].GET_USER_INFO,
 							qs: {
 								user_ids: data.user_id,
-								fields: 'photo_50, sex, photo_100, photo_max_orig, universities, education, activities, occupation, interests, music, movies, tv, books, games, about',
+								fields: 'photo_50, sex, photo_100, photo_max, photo_max_orig, universities, education, activities, occupation, interests, music, movies, tv, books, games, about',
 								name_case: 'nom'
 							},
 							json: true,
@@ -723,6 +758,8 @@ pg.connect(pg_conn_string, function(err, client, done) {
 				}
 				request(req_params, function(e, i, res) {
 					if (handleError(e)) return;
+
+					console.log(res);
 					if (callback instanceof Function) {
 						callback(res);
 					}
