@@ -547,11 +547,11 @@ ALTER TABLE public.events ADD min_price INT DEFAULT NULL NULL;
 
 
 
-  ALTER TABLE public.log_requests ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
-  ALTER TABLE public.log_requests ADD headers JSON DEFAULT NULL NULL;
-  ALTER TABLE public.log_requests ADD body_json JSON DEFAULT NULL NULL;
-  ALTER TABLE public.log_requests ADD response_http_status INT DEFAULT 200 NOT NULL;
-  ALTER TABLE public.log_requests ADD response_error_name VARCHAR(255) DEFAULT NULL NULL;
-  ALTER TABLE public.log_requests ADD   uuid              TEXT UNIQUE        NOT NULL DEFAULT uuid_generate_v4();
+ALTER TABLE public.log_requests ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE public.log_requests ADD headers JSON DEFAULT NULL NULL;
+ALTER TABLE public.log_requests ADD body_json JSON DEFAULT NULL NULL;
+ALTER TABLE public.log_requests ADD response_http_status INT DEFAULT 200 NOT NULL;
+ALTER TABLE public.log_requests ADD response_error_name VARCHAR(255) DEFAULT NULL NULL;
+ALTER TABLE public.log_requests ADD   uuid              TEXT UNIQUE        NOT NULL DEFAULT uuid_generate_v4();
 
 

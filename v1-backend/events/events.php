@@ -21,12 +21,12 @@ $__modules['events'] = array(
 		},
 		'{{/(id:[0-9]+)}}' => function ($id) use ($__db, $__request, $__user, $__fields) {
 
-			Statistics::Event($this, App::getCurrentUser(), App::DB(), Statistics::EVENT_VIEW);
 			$event = EventsCollection::one(
 				$__db,
 				$__user,
 				intval($id),
 				$__fields);
+			Statistics::Event($event, App::getCurrentUser(), App::DB(), Statistics::EVENT_VIEW);
 			return new Result(true, '', array($event->getParams($__user, $__fields)->getData()));
 		},
 		'my' => function () use ($__db, $__request, $__user, $__offset, $__length, $__fields, $__order_by) { /*MY EVENTS!*/

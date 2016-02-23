@@ -484,7 +484,6 @@ pg.connect(pg_conn_string, function(err, client, done) {
 						(UIDs.vk_uid != null ? ', vk_uid = ' + connection.escape(UIDs.vk_uid) + ',' : '') +
 						(UIDs.facebook_uid != null ? ', facebook_uid = ' + connection.escape(UIDs.facebook_uid) +',' : '') +
 						(UIDs.google_uid != null ? ', google_uid = ' + connection.escape(UIDs.google_uid) +',' : '') +
-						' gender = ' + connection.escape(data.user_info.gender) +
 						' WHERE id =' + connection.escape(user.id);
 
 

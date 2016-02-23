@@ -3,10 +3,10 @@
 	$request_time = new DateTime();
 
 	$_function_called = false;
-	if (isset($_SERVER['ENV']) && ($_SERVER['ENV'] != 'dev' && $_SERVER['ENV'] != 'test')){
-		ini_set("display_errors", 0);
+//	if (isset($_SERVER['ENV']) && ($_SERVER['ENV'] != 'dev' && $_SERVER['ENV'] != 'test')){
+		ini_set("display_errors", 1);
 		error_reporting(E_ALL);
-	}
+//	}
 	require_once '../../v1-backend/bin/env_variables.php';
 
 	@session_start();
@@ -152,10 +152,11 @@ try {
 		))
 		->returning(array('uuid'));
 	$p_ins_log = $__db->prepare($q_ins_log->getStatement());
-	$result = $p_ins_log->execute($q_ins_log->getBindValues());
 	$log_res = $p_ins_log->fetch(PDO::FETCH_ASSOC);
 
-	$_result->setRequestUUID($log_res['uuid']);
+	if ($log_res != FALSE){
+		$_result->setRequestUUID($log_res['uuid']);
+	}
 
 	if (($_SERVER['ENV'] == 'local' || $_SERVER['ENV'] == 'dev' || $_SERVER['ENV'] == 'test') && isset($e)){
 		print_r($e);
