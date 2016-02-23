@@ -227,7 +227,7 @@ function initTimeInput(time_field){
 
 	function onBlur(){
 		var $this = $(this);
-		if($this.val() == "0"){
+		if($this.val() == "0" || $this.val() === ""){
 			$this.val("00");
 		}
 		else if($this.val() <= 9){
