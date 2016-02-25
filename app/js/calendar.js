@@ -1093,7 +1093,7 @@ function EditEvent($view, $content_block){
 			}
 		},
 		ajax: {
-			url: '/api/tags/',
+			url: '/api/v1/tags/',
 			dataType: 'JSON',
 			data: function (term, page) {
 				return {
@@ -1156,10 +1156,12 @@ function EditEvent($view, $content_block){
 	});
 
 	$view.find('#edit_event_submit').on('click', function(){
-		var data = $view.find("#create-event-form").serializeForm(),
+		var $form = $view.find("#create-event-form"),
+			data = $form.serializeForm(),
 			tags = data.tags.split(','),
 			url = 'api/v1/events/'+data.event_id,
-			method = data.event_id ? 'PUT' : 'POST';
+			method = data.event_id ? 'PUT' : 'POST',
+			valid_form = true;
 
 		data.tags = (tags.length === 1 && tags[0] === "") ? [] : tags;
 		data.filenames = {
@@ -1200,19 +1202,54 @@ function EditEvent($view, $content_block){
 			});
 		}
 
-		$.ajax({
-			url: url,
-			data: data,
-			method: method,
-			success: function(res){
-				if(res.data.event_id){
-					$view.find('#edit_event_event_id').val(res.data.event_id);
-					showNotification('Мероприятие успешно добавлено', 3000);
-				} else {
-					showNotification('Мероприятие успешно обновлено', 3000);
+		$form.find(':required').not(':disabled').each(function(){
+			var $this = $(this);
+			if($this.val() === ""){
+				if(valid_form){
+					var scroll_top = Math.ceil($this.offset().top - 150);
+					$('body').stop().animate({scrollTop: scroll_top}, 1000, 'swing');
 				}
+				if(!$this.closest('form_unit').hasClass('-status_error')){
+					$this.toggleStatus('error').off('input.error change.error').one('input.error change.error', function(){
+						$this.toggleStatus('error');
+					})
+				}
+				valid_form = false;
 			}
 		});
+
+		$form.find('.DataUrl').each(function(){
+			var $this = $(this);
+			if($this.val() === ""){
+				if(valid_form){
+					var scroll_top = Math.ceil($this.closest('.EditEventImgLoadWrap').offset().top - 150);
+					$('body').stop().animate({scrollTop: scroll_top}, 1000, 'swing', function(){
+						alert('Пожалуйста, добавьте к мероприятию обложку')
+					});
+				}
+				valid_form = false;
+			}
+		});
+
+		if(valid_form){
+			$.ajax({
+				url: url,
+				data: JSON.stringify(data),
+				method: method,
+				success: function(res){
+					if(res.data.event_id){
+						$view.find('#edit_event_event_id').val(res.data.event_id);
+						$('body').stop().animate({scrollTop:0}, 1000, 'swing', function() {
+							showNotification('Мероприятие успешно добавлено', 3000);
+						});
+					} else {
+						$('body').stop().animate({scrollTop:0}, 1000, 'swing', function() {
+							showNotification('Мероприятие успешно обновлено', 3000);
+						});
+					}
+				}
+			});
+		}
 
 	});
 

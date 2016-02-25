@@ -288,7 +288,7 @@
 
 										<h4 class="form_label"><label for="edit_event_title">Название</label></h4>
 										<div class="form_unit">
-											<input id="edit_event_title" class="form_input LimitSize" type="text" name="title" autocomplete="off" placeholder="Название мероприятия" data-maxlength="60">
+											<input id="edit_event_title" class="form_input LimitSize" type="text" name="title" autocomplete="off" placeholder="Название мероприятия" data-maxlength="60" required>
 											<p class="form_prompt">0/60</p>
 										</div>
 
@@ -308,11 +308,11 @@
 														<div class="form_unit">
 															<div class="form_group -time_input TimeInput">
 																<div class="form_unit">
-																	<input class="form_input StartHours">
+																	<input class="form_input StartHours" required>
 																</div>
 																<span class="divider">:</span>
 																<div class="form_unit">
-																	<input class="form_input StartMinutes">
+																	<input class="form_input StartMinutes" required>
 																</div>
 															</div>
 														</div>
@@ -322,11 +322,11 @@
 														<div class="form_unit">
 															<div class="form_group -time_input TimeInput">
 																<div class="form_unit">
-																	<input class="form_input EndHours">
+																	<input class="form_input EndHours" required>
 																</div>
 																<span class="divider">:</span>
 																<div class="form_unit">
-																	<input class="form_input EndMinutes">
+																	<input class="form_input EndMinutes" required>
 																</div>
 															</div>
 														</div>
@@ -367,10 +367,10 @@
 										<h4 class="form_label"><label for="edit_event_placepicker">Место проведения</label></h4>
 										<div class="form_group -parts_3_1">
 											<div class="form_unit">
-												<input class="form_input Placepicker" id="edit_event_placepicker" data-map-container-id="edit_event_map" name="location">
+												<input class="form_input Placepicker" id="edit_event_placepicker" data-map-container-id="edit_event_map" name="location" required>
 											</div>
 											<div class="form_unit">
-												<button class="button -color_primary -fill RippleEffect" type="button" tabindex="-1">По умолчанию</button>
+												<button class="button -color_primary -fill RippleEffect EditEventDefaultAddress" type="button" tabindex="-1">По умолчанию</button>
 											</div>
 										</div>
 										<div id="edit_event_map" class="collapse">
@@ -379,7 +379,7 @@
 
 										<h4 class="form_label"><label for="edit_event_description">Описание</label></h4>
 										<div class="form_unit">
-											<textarea id="edit_event_description" class="form_textarea LimitSize" data-maxlength="500" name="description" placeholder="Не более 500 символов"></textarea>
+											<textarea id="edit_event_description" class="form_textarea LimitSize" data-maxlength="500" name="description" placeholder="Не более 500 символов" required></textarea>
 										</div>
 
 										<h4 class="form_label">Регистрация</h4>
@@ -391,7 +391,7 @@
 										<div class="form_group -parts_2_3 RegistrationTill">
 											<div class="form_unit -inline -status_disabled">
 												<label class="form_label">Дата</label>
-												<div class="form_select -v_centering DatePicker"><label>Дата</label><input name="registration_till_date" type="hidden" disabled></div>
+												<div class="form_select -v_centering DatePicker"><label>Дата</label><input name="registration_till_date" type="hidden" disabled required></div>
 											</div>
 											<div class="form_unit -status_disabled">
 												<div class="form_group -parts_e_2">
@@ -400,11 +400,11 @@
 														<div class="form_unit -status_disabled">
 															<div class="form_group -time_input TimeInput">
 																<div class="form_unit -status_disabled">
-																	<input class="form_input" name="registration_till_time_hours" disabled>
+																	<input class="form_input" name="registration_till_time_hours" disabled required>
 																</div>
 																<span class="divider">:</span>
 																<div class="form_unit -status_disabled">
-																	<input class="form_input" name="registration_till_time_minutes" disabled>
+																	<input class="form_input" name="registration_till_time_minutes" disabled required>
 																</div>
 															</div>
 														</div>
@@ -432,7 +432,7 @@
 
 										<h4 class="form_label"><label for="event_tags">Теги</label></h4>
 										<div class="form_unit">
-											<input id="event_tags" class="form_input EventTags" type="text" name="tags" autocomplete="off" >
+											<input id="event_tags" class="form_input EventTags" type="text" name="tags" autocomplete="off" required>
 										</div>
 
 										<h4 class="form_label"><label>Обложка для мероприятия</label></h4>
@@ -563,7 +563,7 @@
 
 												<div class="form_unit -inline">
 													<label class="form_label">Дата</label>
-													<div class="form_select -v_centering DatePicker"><label>Дата</label><input type="hidden" name="public_at_date" disabled></div>
+													<div class="form_select -v_centering DatePicker"><label>Дата</label><input type="hidden" name="public_at_date" disabled required></div>
 												</div>
 
 												<div class="form_unit -inline">
@@ -571,11 +571,11 @@
 													<div class="form_unit">
 														<div class="form_group -time_input TimeInput">
 															<div class="form_unit">
-																<input class="form_input" name="public_at_time_hours" disabled>
+																<input class="form_input" name="public_at_time_hours" disabled required>
 															</div>
 															<span class="divider">:</span>
 															<div class="form_unit">
-																<input class="form_input" name="public_at_time_minutes" disabled>
+																<input class="form_input" name="public_at_time_minutes" disabled required>
 															</div>
 														</div>
 													</div>
@@ -585,7 +585,7 @@
 										</div>
 
 										<div class="form_unit -h_centering">
-											<button id="edit_event_submit" class="button RippleEffect EditEventDefaultAddress -color_secondary" type="button">Опубликовать</button>
+											<button id="edit_event_submit" class="button RippleEffect -color_secondary" type="button">Опубликовать</button>
 										</div>
 
 									</form>

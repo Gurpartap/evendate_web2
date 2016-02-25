@@ -19,7 +19,9 @@ $.fn.extend({
 				}
 				$this.toggleClass('-status_'+status);
 			});
-		} else {
+		} else if($this.is('input, textarea, select')){
+			$this.closest('.form_unit').toggleStatus(statuses);
+		}	else {
 			$this.find('.form_unit').toggleStatus(statuses);
 		}
 
@@ -225,7 +227,7 @@ function initTimeInput(time_field){
 
 	function onBlur(){
 		var $this = $(this);
-		if($this.val() == "0"){
+		if($this.val() == "0" || $this.val() === ""){
 			$this.val("00");
 		}
 		else if($this.val() <= 9){
