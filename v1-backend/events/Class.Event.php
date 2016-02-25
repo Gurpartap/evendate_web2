@@ -1,6 +1,8 @@
 <?php
 
 require_once $BACKEND_FULL_PATH . '/organizations/Class.Organization.php';
+require_once $BACKEND_FULL_PATH . '/tags/Class.Tag.php';
+require_once $BACKEND_FULL_PATH . '/tags/Class.TagsCollection.php';
 
 class Event extends AbstractEntity{
 
