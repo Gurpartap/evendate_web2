@@ -231,7 +231,7 @@ function initTimeInput(time_field){
 			$this.val("00");
 		}
 		else if($this.val() <= 9){
-			$this.val("0"+$this.val());
+			$this.val("0"+parseInt($this.val()));
 		}
 	}
 

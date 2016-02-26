@@ -1224,7 +1224,7 @@ function EditEvent($view, $content_block){
 				if(valid_form){
 					var scroll_top = Math.ceil($this.closest('.EditEventImgLoadWrap').offset().top - 150);
 					$('body').stop().animate({scrollTop: scroll_top}, 1000, 'swing', function(){
-						alert('Пожалуйста, добавьте к мероприятию обложку')
+						showNotifier({message: 'Пожалуйста, добавьте к мероприятию обложку', status: false})
 					});
 				}
 				valid_form = false;
