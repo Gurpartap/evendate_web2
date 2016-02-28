@@ -5,11 +5,12 @@
 	class Editor extends User{
 
 		protected function addNewEvent(array $data){
+			$data['filenames'] = $data['filenames'] ?? $data['file_names'];
 			if (isset($data['organization_id'])){
 				$organization = OrganizationsCollection::one(
 					$this->getDB(),
 					$this,
-					intval($data['organization_id']));
+					intval($data['organization_id']), array());
 				if (!$this->isEditor($organization))
 					throw new PrivilegesException('Вы не являетесь редактором данной организации', $this->getDB());
 			}else{
@@ -18,18 +19,18 @@
 
 			return Event::create($this->getDB(), $organization, array_merge($data, array(
 				'image_extensions' => array(
-					'vertical' => App::getImageExtension($data['file_names']['vertical']),
-					'horizontal' => App::getImageExtension($data['file_names']['horizontal'])
+					'vertical' => App::getImageExtension($data['filenames']['vertical']),
+					'horizontal' => App::getImageExtension($data['filenames']['horizontal'])
 				),
 				'creator_id' => $this->getId()
 			)));
 		}
 
-		public function isEditor(Organization $organization = null) : boolean {
+		public function isEditor(Organization $organization = null) : bool {
 			if ($organization instanceof Organization){
 				$q_get_org = 'SELECT users_organizations.organization_id
 					FROM users_organizations
-					WHERE users_organizations.status = 1
+					WHERE users_organizations.status = TRUE
 					AND users_organizations.user_id = :user_id
 					AND users_organizations.organization_id = :organization_id;';
 				$p_get_default = $this->getDB()->prepare($q_get_org);

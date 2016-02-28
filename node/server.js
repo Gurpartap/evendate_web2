@@ -127,11 +127,11 @@ pg.connect(pg_conn_string, function(err, client, done) {
 				' AND favorite_events.event_id = $1' +
 				' AND favorite_events.status = 1' +
 				' ORDER BY tokens.id DESC',
-			q_ins_notification = 'INSERT INTO notifications(created_at, click_time, received, token_id, event_notification_id)' +
-				' VALUES(NOW(), NULL, 0, ?, ?)',
+			q_ins_notification = 'INSERT INTO notifications(click_time, received, token_id, event_notification_id)' +
+				' VALUES(NULL, FALSE, $1, $2)',
 			q_data = null;
 
-		connection.query(q_get_events_notifications, function(err, rows) {
+		client.query(q_get_events_notifications, function(err, rows) {
 			if (err) {
 				logger.error(err);
 				return;
@@ -142,17 +142,17 @@ pg.connect(pg_conn_string, function(err, client, done) {
 				if (event_notification['notification_type_name'] != 'notification-now') {
 					event_notification['notification_suffix'] = Utils.lowerCaseFirstLetter(event_notification['notification_suffix']);
 					q_get_to_send_devices = q_to_send_not_now_notification;
-					q_data = event_notification.event_id;
+					q_data = [event_notification.event_id];
 				} else {
-					q_data = event_notification.organization_id;
+					q_data = [event_notification.organization_id];
 				}
 
-				connection.query('UPDATE events_notifications SET done = TRUE WHERE id = ' + connection.escape(event_notification.id), function(err) {
+				client.query('UPDATE events_notifications SET done = TRUE WHERE id = $1', [event_notification.id], function(err) {
 					if (err) {
 						logger.error(err);
 					}
 				});
-				connection.query(q_get_to_send_devices, q_data, function(errors, devices) {
+				client.query(q_get_to_send_devices, q_data, function(errors, devices) {
 					if (errors) {
 						logger.error(errors);
 						return;
@@ -194,20 +194,18 @@ pg.connect(pg_conn_string, function(err, client, done) {
 							try {
 								var notification = notifications_factory.create(data);
 								notification.send(function(err) {
-									console.log(err);
+									handleError(err);
 								});
 							} catch(e) {
-								logger.error(e);
-								console.log(e.stack);
+								handleError(e);
+								handleError(e.stack);
 							}
 
 						}
 
-						connection.query(q_ins_notification, [device.id, event_notification.id], function(err, result){
-
+						client.query(q_ins_notification, [device.id, event_notification.id], function(err, result){
+							handleError(err);
 						});
-
-
 					});
 				});
 			});
@@ -244,13 +242,22 @@ pg.connect(pg_conn_string, function(err, client, done) {
 
 		function resizeImages(size, diff) {
 			if (diff.length == 0) return;
+
+			var _fields = [],
+				values = [], all_count = 1;
+			diff.forEach(function(value){
+				_fields.push("'" + value + "'");
+			});
+
 			var q_get_images = 'SELECT image_vertical, image_horizontal ' +
-				'FROM events ' +
-				'WHERE image_vertical IN (' + escapeArray(diff) + ')' +
-				'OR image_horizontal IN (' + escapeArray(diff) + ')';
+				' FROM events ' +
+				' WHERE image_vertical IN (' + _fields.join(', ') + ')' +
+				' OR image_horizontal IN (' + _fields.join(', ') + ')';
 
 
-			connection.query(q_get_images, function(err, rows) {
+			console.log(q_get_images, values);
+
+			client.query(q_get_images, values, function(err, result) {
 				if (err) {
 					logger.error(err);
 					return;
@@ -258,7 +265,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 				var verticals = [],
 					horizontals = [];
 
-				rows.forEach(function(item) {
+				result.rows.forEach(function(item) {
 					verticals.push(item.image_vertical);
 					horizontals.push(item.image_horizontal);
 				});
@@ -310,13 +317,13 @@ pg.connect(pg_conn_string, function(err, client, done) {
 			'   WHERE ' +
 			'   (users.blurred_image_url IS NULL OR users.blurred_image_url != avatar_url)' +
 			'   AND users.avatar_url IS NOT NULL LIMIT 20';
-		connection.query(q_get_user_images, function(err, rows) {
+		client.query(q_get_user_images, [], function(err, result) {
 			if (err) {
 				logger.error(err);
 				return;
 			}
 
-			rows.forEach(function(image) {
+			result.rows.forEach(function(image) {
 				var img_path = '../' + real_config.images.user_images + '/default/' + image.id + '.jpg',
 					blurred_path = '../' + real_config.images.user_images + '/blurred/' + image.id + '.jpg';
 				downloadImage(image.avatar_url, img_path, function() {
@@ -328,10 +335,10 @@ pg.connect(pg_conn_string, function(err, client, done) {
 							logger.log(err);
 							return;
 						}
-						var q_upd_user = 'UPDATE users SET blurred_image_url = avatar_url WHERE id = ' + connection.escape(image.id);
-						connection.query(q_upd_user, function(err) {
+						var q_upd_user = 'UPDATE users SET blurred_image_url = avatar_url WHERE id = $1';
+						client.query(q_upd_user, [image.id], function(err) {
 							if (err) {
-								logger.error(err);
+								handleError(err);
 							}
 						})
 					});
@@ -341,13 +348,13 @@ pg.connect(pg_conn_string, function(err, client, done) {
 	}
 
 	try {
-		if (config_index == 'prod') {
+		//if (config_index == 'prod') {
 			new CronJob('*/1 * * * *', function() {
 				logger.info('Resizing start', 'START... ' + new Date().toString());
 				resizeImages();
 				blurImages();
 			}, null, true);
-		}
+		//}
 	} catch(ex) {
 		logger.error("CRON ERROR", "cron pattern not valid");
 	}
@@ -366,8 +373,6 @@ pg.connect(pg_conn_string, function(err, client, done) {
 	io.on('connection', function(socket) {
 
 		var saveDataInDB = function(data) {
-
-				console.log(data);
 
 				function getUIDValues() {
 					var result = {
@@ -432,10 +437,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 						(UIDs.facebook_uid != null ? ', facebook_uid = $6, ' : '') +
 						(UIDs.google_uid != null ? ', google_uid = $6, ' : '') +
 						' gender = $7' +
-						' WHERE id = $8',
-
-					q_ins_user_mysql = 'INSERT INTO users(first_name, last_name, email, token, avatar_url, vk_uid, facebook_uid, google_uid, gender) ' +
-						' VALUES ()';
+						' WHERE id = $8';
 
 
 
@@ -481,15 +483,14 @@ pg.connect(pg_conn_string, function(err, client, done) {
 						' email = ' + connection.escape(data.access_data.email) +',' +
 						' token = ' + connection.escape(user_token) +',' +
 						' avatar_url = ' + connection.escape(data.user_info.photo_100) +
-						(UIDs.vk_uid != null ? ', vk_uid = ' + connection.escape(UIDs.vk_uid) + ',' : '') +
-						(UIDs.facebook_uid != null ? ', facebook_uid = ' + connection.escape(UIDs.facebook_uid) +',' : '') +
-						(UIDs.google_uid != null ? ', google_uid = ' + connection.escape(UIDs.google_uid) +',' : '') +
+						(UIDs.vk_uid != null ? ', vk_uid = ' + connection.escape(UIDs.vk_uid) : '') +
+						(UIDs.facebook_uid != null ? ', facebook_uid = ' + connection.escape(UIDs.facebook_uid) : '') +
+						(UIDs.google_uid != null ? ', google_uid = ' + connection.escape(UIDs.google_uid) : '') +
 						' WHERE id =' + connection.escape(user.id);
 
 
 					connection.query(q_upd_user_mysql, function(err, rows) {
-						console.log(q_upd_user_mysql);
-						console.log(err);
+						handleError(err);
 					});
 
 					client.query(q_user, query_params, function(user_err, ins_result) {
@@ -620,7 +621,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 										connection.escape(token_type) + ', ' +
 										connection.escape(token_time) + ')';
 							connection.query(q_ins_token_mysql, function(err, rows){
-								console.log(err);
+								handleError(err);
 							});
 								client.query(q_ins_token, [user_token, user.id, token_type, token_time], function(err) {
 									if (err) return handleError(err, 'CANT_INSERT_TOKEN');
@@ -633,8 +634,8 @@ pg.connect(pg_conn_string, function(err, client, done) {
 								});
 							};
 
-						console.log(q_ins_sign_in);
-						console.log(ins_data);
+						handleError(q_ins_sign_in);
+						handleError(ins_data);
 
 						client.query(q_ins_sign_in, ins_data, function(sign_in_err) {
 							if (sign_in_err) return handleError({name: 'CANT_INSERT_SIGN_IN_INFO', err: sign_in_err});
@@ -757,7 +758,6 @@ pg.connect(pg_conn_string, function(err, client, done) {
 				request(req_params, function(e, i, res) {
 					if (handleError(e)) return;
 
-					console.log(res);
 					if (callback instanceof Function) {
 						callback(res);
 					}
@@ -842,7 +842,6 @@ pg.connect(pg_conn_string, function(err, client, done) {
 				request(req_params, function(e, i, res) {
 					if (handleError(e)) return;
 					if (res.audience != real_config.google.web.client_id) {
-						console.log('ACCESS_TOKEN_CANT_BE_VERIFIED');
 						handleError({emit: 'TOKEN_CANT_BE_VERIFIED'});
 					} else {
 						if (callback instanceof Function) {
@@ -881,7 +880,6 @@ pg.connect(pg_conn_string, function(err, client, done) {
 									friends_data = friends_data.data;
 									user_info.photo_100 = user_info.hasOwnProperty('picture') ? user_info.picture.data.url : '';
 								}
-								console.log('GOT DATA!');
 								saveDataInDB(Utils.composeFullInfoObject({
 									oauth_data: oauth_data,
 									access_data: access_data,

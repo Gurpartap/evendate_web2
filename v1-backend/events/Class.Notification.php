@@ -27,6 +27,7 @@ class Notification extends AbstractEntity{
 	);
 
 	const NOTIFICATION_TYPE_NOW = 'notification-now';
+	const NOTIFICATION_TYPE_NOW_ID = 1;
 
 	const NOTIFICATION_TYPES = array(
 		self::NOTIFICATION_TYPE_NOW,

@@ -1,6 +1,8 @@
 ALTER TABLE public.users ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE public.tokens ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE public.subscriptions ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE public.events_notifications ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE public.notifications ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE public.users ADD gender BOOLEAN DEFAULT NULL  NULL;
 ALTER TABLE public.users ALTER COLUMN gender TYPE VARCHAR(50) USING gender :: VARCHAR(50);
 ALTER TABLE public.users ALTER COLUMN gender SET DEFAULT NULL;
@@ -73,6 +75,18 @@ SET new_status = (CASE status
                   END);
 ALTER TABLE public.favorite_events DROP status;
 ALTER TABLE public.favorite_events RENAME COLUMN new_status TO status;
+
+/*Notifications received*/
+ALTER TABLE public.notifications ADD new_received BOOLEAN DEFAULT FALSE NOT NULL;
+UPDATE public.notifications
+SET new_received = (CASE received
+                  WHEN 1
+                    THEN TRUE
+                  WHEN 0
+                    THEN FALSE
+                  END);
+ALTER TABLE public.notifications DROP received;
+ALTER TABLE public.notifications RENAME COLUMN new_received TO received;
 
 /*Event_Tags*/
 ALTER TABLE public.events_tags ADD new_status BOOLEAN DEFAULT TRUE NOT NULL;

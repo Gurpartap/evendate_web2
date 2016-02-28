@@ -1234,6 +1234,7 @@ function EditEvent($view, $content_block){
 		if(valid_form){
 			$.ajax({
 				url: url,
+				contentType: 'application/json',
 				data: JSON.stringify(data),
 				method: method,
 				success: function(res){

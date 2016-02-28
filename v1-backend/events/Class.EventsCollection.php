@@ -142,25 +142,25 @@ class EventsCollection extends AbstractCollection{
 					break;
 				}
 				case 'title':{
-					$value = trim($value);
+					$value = strtolower(trim($value));
 					if (empty($value)) break;
-					if (isset($filters['strict']) && boolval($filters['strict']) == true){
+					if (isset($filters['strict']) && $filters['strict'] == 'true'){
 						$q_get_events->where('LOWER(title) = LOWER(:title)');
 						$statement_array[':title'] = $value;
 					}else{
 						$q_get_events->where('LOWER(title) LIKE LOWER(:title)');
-						$statement_array[':title'] = '%'. $value . '%';
+						$statement_array[':title'] = $value . '%';
 					}
 					break;
 				}
 				case 'description':{
-					$value = trim($value);
-					if (isset($filters['strict']) && boolval($filters['strict']) == true){
+					$value = strtolower(trim($value));
+					if (isset($filters['strict']) && $filters['strict'] == 'true'){
 						$q_get_events->where('LOWER(description) = LOWER(:description)');
 						$statement_array[':description'] = $value;
 					}else{
 						$q_get_events->where('LOWER(description) LIKE LOWER(:description)');
-						$statement_array[':description'] = '%'. $value . '%';
+						$statement_array[':description'] = $value . '%';
 					}
 					break;
 				}
