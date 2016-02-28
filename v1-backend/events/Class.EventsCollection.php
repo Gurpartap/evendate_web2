@@ -27,7 +27,6 @@ class EventsCollection extends AbstractCollection{
 
 		$_fields = Fields::mergeFields(Event::getAdditionalCols(), $fields, Event::getDefaultCols());
 
-		$q_get_events->cols($_fields);
 
 		$statement_array = array();
 		if (isset($fields[Event::IS_FAVORITE_FIELD_NAME]) || isset($fields[Event::CAN_EDIT_FIELD_NAME])){
@@ -84,6 +83,11 @@ class EventsCollection extends AbstractCollection{
 					break;
 				}
 				case 'id': {
+					foreach(Event::getAdditionalCols() as $key => $val) {
+						if (is_numeric($key)) {
+							$_fields[] = $val;
+						}
+					}
 					$q_get_events->where('id = :event_id');
 					$statement_array[':event_id'] = $value;
 					$is_one_event = true;
@@ -194,6 +198,9 @@ class EventsCollection extends AbstractCollection{
 			}
 		}
 
+
+
+		$q_get_events->cols($_fields);
 		$q_get_events->orderBy($order_by);
 		$p_get_events = $db->prepare($q_get_events->getStatement());
 		$result = $p_get_events->execute($statement_array);

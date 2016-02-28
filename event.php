@@ -1,5 +1,7 @@
 <?php
 
+ini_set("display_errors", 1);
+error_reporting(E_ALL);
 	require_once 'v1-backend/bin/env_variables.php';
 	require_once 'v1-backend/bin/db.php';
 	require_once 'v1-backend/statistics/Class.Statistics.php';
@@ -28,7 +30,6 @@
 	$event = EventsCollection::one($__db, $user, $event_id, array('favored'))
 		->getParams($user, Fields::parseFields('organization_logo_large_url,organization_logo_medium_url,organization_logo_small_url,organization_name,organization_id,detail_info_url,dates,favored,location,address,description,tags,link'))->getData();
 
-	print_r($event);
 
 	$trans = array(
 		"January" => "января",
