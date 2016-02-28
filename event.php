@@ -119,8 +119,9 @@ error_reporting(E_ALL);
 						<div class="event-left-info">
 							<div class="day-name">
 								<?php
-									$begin_date = new DateTime($event['first_event_date']);
-									$end_date = new DateTime($event['last_event_date']);
+									$begin_date = DateTime::createFromFormat('U', $event['first_event_date']);
+									$end_date = DateTime::createFromFormat('U', $event['last_event_date']);
+
 										if ($begin_date->format('Y-m-d') == $end_date->format('Y-m-d')){
 											echo strtr($begin_date->format('l'), $days) . '<br>' . $end_date->format('j') . ' ' . strtr($begin_date->format('F'), $trans);
 										}else{
