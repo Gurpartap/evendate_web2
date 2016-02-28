@@ -1,23 +1,34 @@
 <?php
 
+	require_once 'v1-backend/bin/env_variables.php';
 	require_once 'v1-backend/bin/db.php';
 	require_once 'v1-backend/statistics/Class.Statistics.php';
 	require_once 'v1-backend/bin/Class.Result.php';
 	require_once 'v1-backend/users/Class.AbstractUser.php';
 	require_once 'v1-backend/users/Class.User.php';
 	require_once 'v1-backend/events/Class.Event.php';
+	require_once 'v1-backend/events/Class.EventsCollection.php';
+	require_once 'v1-backend/events/Class.EventDate.php';
+	require_once 'v1-backend/events/Class.EventsDatesCollection.php';
+	require_once 'v1-backend/users/Class.UsersCollection.php';
+	require_once 'v1-backend/users/Class.Friend.php';
+	require_once "v1-backend/bin/Class.RequestsParser.php";
+	require_once "v1-backend/bin/Class.Fields.php";
+
+	App::buildGlobal($__db);
 	$event_id = isset($_REQUEST['id']) ? intval($_REQUEST['id']): null;
-	$event = new Event($event_id, $db);
 
 	try {
-		$user = new User($db);
-		$liked_users = $event->getLikedUsers();
+		$user = new User($__db);
 		$hide_auth_btn = 'hidden';
 	}catch (Exception $e){
 		$user = null;
-		$liked_users = $event->getLikedUsers();
 		$hide_auth_btn = '';
 	}
+	$event = EventsCollection::one($__db, $user, $event_id, array('favored'))
+		->getParams($user, Fields::parseFields('organization_logo_large_url,organization_logo_medium_url,organization_logo_small_url,organization_name,organization_id,detail_info_url,dates,favored,location,address,description,tags,link'))->getData();
+
+	print_r($event);
 
 	$trans = array(
 		"January" => "января",
@@ -52,7 +63,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-	<title>Evendate - <?=$event->getTitle()?></title>
+	<title>Evendate - <?=$event['title']?></title>
 	<!-- =============== VENDOR STYLES ===============-->
 	<!-- Google ROBOTO-->
 	<link href='http://fonts.googleapis.com/css?family=Roboto&subset=latin,cyrillic-ext' rel='stylesheet' type='text/css'>
@@ -103,32 +114,12 @@
 			<div class="text-center">
 				<div class="event-alone full-height">
 					<div class="left-col">
-						<div class="event-image" style="max-width: 100%; background-image: url('<?= Event::IMAGES_PATH . Event::IMG_SIZE_TYPE_LARGE . '/' . $event->getImageVertical()?>');" title="<?=$event->getTitle()?>"></div>
+						<div class="event-image" style="max-width: 100%; background-image: url('<?=$event['image_vertical_url']?>');" title="<?=$event['title']?>"></div>
 						<div class="event-left-info">
 							<div class="day-name">
 								<?php
-									$begin_date = new DateTime($event->getFirstEventDate());
-									$end_date = new DateTime($event->getLastEventDate());
-
-									if ($event->getFirstEventDate() == null && $event->getLastEventDate() == null){
-										$dates = $event->getDates()->getData();
-										$_dates = array();
-										if (count($dates) < 3){
-											$long_format = true;
-										}else{
-											$long_format = false;
-										}
-										foreach($dates as $date){
-											$datetime = new DateTime($date['event_date']);
-											if ($long_format){
-												$_dates[] = $datetime->format('j ') . strtr($datetime->format('F'), $trans);
-											}else{
-												$_dates[] = $datetime->format('j.m');
-											}
-										}
-										echo implode(', ', $_dates);
-
-									}else{
+									$begin_date = new DateTime($event['first_event_date']);
+									$end_date = new DateTime($event['last_event_date']);
 										if ($begin_date->format('Y-m-d') == $end_date->format('Y-m-d')){
 											echo strtr($begin_date->format('l'), $days) . '<br>' . $end_date->format('j') . ' ' . strtr($begin_date->format('F'), $trans);
 										}else{
@@ -139,41 +130,40 @@
 												echo $end_date->format('j') . ' ' .strtr($end_date->format('F'), $trans);
 											}
 										}
-									}
 
 								?>
 							</div>
 							<div class="time">
 								<?php
-									if ($event->getEndTime() == null){
-										$begin_dt = new DateTime($event->getBeginTime());
-										echo $begin_dt->format('H:i');
-									}else{
-										if ($event->getBeginTime() == '00:00:00' && $event->getEndTime() == '00:00:00'){
-											echo 'Весь день';
-										}else {
-											$begin_dt = new DateTime($event->getBeginTime());
-											$end_dt = new DateTime($event->getEndTime());
-											echo $begin_dt->format('H:i') . ' - ' . $end_dt->format('H:i');
-										}
-									}
+//									if ($event->getEndTime() == null){
+//										$begin_dt = new DateTime($event->getBeginTime());
+//										echo $begin_dt->format('H:i');
+//									}else{
+//										if ($event->getBeginTime() == '00:00:00' && $event->getEndTime() == '00:00:00'){
+//											echo 'Весь день';
+//										}else {
+//											$begin_dt = new DateTime($event->getBeginTime());
+//											$end_dt = new DateTime($event->getEndTime());
+//											echo $begin_dt->format('H:i') . ' - ' . $end_dt->format('H:i');
+//										}
+//									}
 								?>
 							</div>
 							<div class="address">
-								<?=$event->getLocation()?>
+								<?=$event['location']?>
 							</div>
 						</div>
 					</div><div class="middle-col">
 						<div class="event-title">
-							<?=$event->getTitle()?>
+							<?=$event['title']?>
 						</div>
 						<div class="event-description">
-							<?=$event->getDescription()?>
+							<?=$event['description']?>
 						</div>
 						<div class="tags">
 							<i class="fa fa-tags"></i>
 							<?php
-								$tags = $event->getTags()->getData();
+								$tags = $event['tags'];
 								$_tags = array();
 								foreach($tags as $tag){
 									$_tags[] = $tag['name'];
@@ -204,7 +194,7 @@
 											</ul>
 									  </div>";
 									}else{
-										echo "<button class='btn modal-subscribe-btn btn-pink-empty {$btn_class}' data-event-id='{$event_id}' data-organization-id='{$event->getOrganizationId()}'>";
+										echo "<button class='btn modal-subscribe-btn btn-pink-empty {$btn_class}' data-event-id='{$event_id}' data-organization-id='{$event['organization_id']}'>";
 										echo $btn_text;
 										echo '</button>';
 									}
@@ -215,22 +205,22 @@
 								Поделиться:
 								<span class="social-links">
 
-									<a href="http://vk.com/share.php?url=<?=$event->getUrl()?>&title=<?=$event->getTitle()?>&description=<?=$event->getDescription()?>&image=<?=$event->getImageHorizontal()?>"
+									<a href="http://vk.com/share.php?url=<?=$event['link']?>&title=<?=$event['title']?>&description=<?=$event['description']?>&image=<?=$event['image_horizontal_url']?>"
 									   onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;">
 										<i class="fa fa-vk" data-share-type="vk"></i>
 									</a>
 
-									<a href="https://www.facebook.com/sharer/sharer.php?u=<?=$event->getUrl()?>"
+									<a href="https://www.facebook.com/sharer/sharer.php?u=<?=$event['link']?>"
 									   onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;">
 										<i class="fa fa-facebook-f" data-share-type="facebook"></i>
 									</a>
 
-									<a href="https://plus.google.com/share?url=<?=$event->getUrl()?>" class="hidden"
+									<a href="https://plus.google.com/share?url=<?=$event['link']?>" class="hidden"
 									   onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;">
 										<i class="fa fa-google-plus" data-share-type="google-plus"></i>
 									</a>
 
-									<a href="https://twitter.com/share?url=<?=$event->getUrl()?>&text=<?=$event->getDescription()?>&via=evendate.ru&hashtags=#evendate <?=implode(',', $_tags)?>"
+									<a href="https://twitter.com/share?url=<?=$event['link']?>&text=<?=$event['description']?>&via=evendate.ru&hashtags=#evendate <?=implode(',', $_tags)?>"
 									    onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;">
 										<i class="fa fa-twitter" data-share-type="twitter"></i>
 									</a>
@@ -238,17 +228,17 @@
 								</span>
 							</div>
 							<div class="col-xs-5 external-link-wrapper">
-								<a title="Перейти на страницу мероприятия" href="<?=$event->getDetailInfoUrl()?>" target="_blank"><i class="fa fa-external-link"></i> Подробнее</a>
+								<a title="Перейти на страницу мероприятия" href="<?=$event['detail_info_url']?>" target="_blank"><i class="fa fa-external-link"></i> Подробнее</a>
 							</div>
 						</div>
 					</div><div class="right-col">
 						<div class="organization-logo-wrapper pull-right">
-							<img title="<?=htmlspecialchars($event->getTitle())?>" src="<?=$event->getOrganization()->getImgUrl();?>" title="<?=$event->getOrganization()->getName()?>">
+							<img title="<?=htmlspecialchars($event['title'])?>" src="<?=$event['organization_logo_small_url']?>" title="<?=$event['organization_name']?>">
 						</div>
 						<div class="liked-users-big-count">
 							Добавили в избранное:
 							<?php
-								$count = count($liked_users->getData());
+								$count = count($event['favored']);
 								if ($count > 0){
 									echo "<span class='label label-blue'>{$count}</span>";
 								}else{
@@ -257,8 +247,7 @@
 							?>
 						</div>
 						<?php
-							$_users = $liked_users->getData();
-							foreach($_users as $_user){
+							foreach($event['favored'] as $_user){
 								if ($user != null && $_user['id'] == $user->getId()) continue;
 								echo "
 									<div class='liked-users-big'>

@@ -1,6 +1,8 @@
 <?php
 
 
+require_once $BACKEND_FULL_PATH . '/bin/Class.AbstractEntity.php';
+
 class Organization extends AbstractEntity{
 
 
@@ -240,7 +242,7 @@ class Organization extends AbstractEntity{
 		return $this->img_small_url;
 	}
 
-	public function getParams(User $user, array $fields = null) : Result {
+	public function getParams(User $user = null, array $fields = null) : Result {
 		$result_data = parent::getParams($user, $fields)->getData();
 
 		if (isset($fields[Organization::SUBSCRIBED_FIELD_NAME])){

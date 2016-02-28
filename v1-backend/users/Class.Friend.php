@@ -60,7 +60,7 @@ class Friend extends AbstractEntity{
 		return $subscriptions;
 	}
 
-	public function getParams(User $user, array $fields = null) : Result{
+	public function getParams(User $user = null, array $fields = null) : Result{
 		$result_data = parent::getParams($user, $fields)->getData();
 
 

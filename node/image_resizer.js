@@ -1,4 +1,6 @@
 
+if (process.env.ENV == 'local') return ;
+
 var easyimage = require('easyimage'),
 	gm = require('gm').subClass({imageMagick: true}),
 	fs = require('fs');

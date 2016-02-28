@@ -298,6 +298,7 @@ CREATE VIEW view_friends AS SELECT
                                     view_vk_friends.friend_id  AS friend_id
                                   FROM view_vk_friends;
 
+DROP VIEW view_events CASCADE ;
 
 CREATE VIEW view_events AS
   SELECT DISTINCT
@@ -312,6 +313,7 @@ CREATE VIEW view_events AS
     events.longitude :: REAL,
     events.location,
     events.organization_id :: INT,
+    'http://evendate.ru/event.php?id=' || events.id AS link,
     TRUE                                                                      AS status,
     events.images_domain || 'event_images/large/' || events.image_vertical AS image_vertical_url,
     events.images_domain || 'event_images/large/' || events.image_horizontal  AS image_horizontal_url,
@@ -508,7 +510,7 @@ CREATE VIEW view_organization_types AS
 ALTER TABLE subscriptions ADD CONSTRAINT user_id_organization_id UNIQUE (organization_id, user_id);
 
 
-/*uSers_organizations*/
+/*Users_organizations*/
 ALTER TABLE public.users_organizations ADD new_status BOOLEAN DEFAULT TRUE NOT NULL;
 UPDATE public.users_organizations
 SET new_status = (CASE status

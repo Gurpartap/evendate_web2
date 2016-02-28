@@ -255,8 +255,6 @@ pg.connect(pg_conn_string, function(err, client, done) {
 				' OR image_horizontal IN (' + _fields.join(', ') + ')';
 
 
-			console.log(q_get_images, values);
-
 			client.query(q_get_images, values, function(err, result) {
 				if (err) {
 					logger.error(err);
@@ -348,13 +346,13 @@ pg.connect(pg_conn_string, function(err, client, done) {
 	}
 
 	try {
-		//if (config_index == 'prod') {
+		if (config_index == 'prod') {
 			new CronJob('*/1 * * * *', function() {
 				logger.info('Resizing start', 'START... ' + new Date().toString());
 				resizeImages();
 				blurImages();
 			}, null, true);
-		//}
+		}
 	} catch(ex) {
 		logger.error("CRON ERROR", "cron pattern not valid");
 	}
@@ -372,7 +370,11 @@ pg.connect(pg_conn_string, function(err, client, done) {
 
 	io.on('connection', function(socket) {
 
-		var saveDataInDB = function(data) {
+		var
+			getVKGroups = function(data){
+
+			},
+			saveDataInDB = function(data) {
 
 				function getUIDValues() {
 					var result = {
@@ -640,7 +642,6 @@ pg.connect(pg_conn_string, function(err, client, done) {
 						client.query(q_ins_sign_in, ins_data, function(sign_in_err) {
 							if (sign_in_err) return handleError({name: 'CANT_INSERT_SIGN_IN_INFO', err: sign_in_err});
 
-							//noinspection JSUnresolvedFunction
 							var q_ins_friends = '',
 								uid_key_name;
 

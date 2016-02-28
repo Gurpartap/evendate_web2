@@ -3,7 +3,7 @@
 class EventsDatesCollection extends AbstractCollection{
 
 	public static function filter(PDO $db,
-	                              User $user,
+	                              User $user = null,
 	                              array $filters = null,
 	                              array $fields = null,
 	                              array $pagination = null,

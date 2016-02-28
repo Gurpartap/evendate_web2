@@ -5,7 +5,7 @@ require_once 'Class.Event.php';
 class EventsCollection extends AbstractCollection{
 
 	public static function filter(PDO $db,
-	                              User $user,
+	                              User $user = null,
 	                              array $filters = null,
 	                              array $fields = null,
 	                              array $pagination = null,
@@ -210,7 +210,7 @@ class EventsCollection extends AbstractCollection{
 	}
 
 	public static function one(PDO $db,
-	                           User $user,
+	                           User $user = null,
 	                           int $id,
 	                           array $fields = null) : Event{
 

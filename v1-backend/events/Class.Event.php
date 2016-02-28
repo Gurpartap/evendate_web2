@@ -38,6 +38,8 @@ class Event extends AbstractEntity{
 		'organization_id',
 	);
 
+	protected $title;
+
 	protected static $ADDITIONAL_COLS = array(
 		'description',
 		'location',
@@ -45,6 +47,7 @@ class Event extends AbstractEntity{
 		'creator_id',
 		'latitude',
 		'longitude',
+		'link',
 		'image_vertical_small_url',
 		'image_horizontal_small_url',
 		'image_vertical_medium_url',
@@ -55,7 +58,7 @@ class Event extends AbstractEntity{
 		'organization_type_name',
 		'organization_short_name',
 		'organization_logo_large_url',
-		'organization_logo_middle_url',
+		'organization_logo_medium_url',
 		'organization_logo_small_url',
 		'created_at',
 		'updated_at',
@@ -69,8 +72,6 @@ class Event extends AbstractEntity{
 			FROM view_editors
 			WHERE id = :user_id AND organization_id = view_events.organization_id) IS NOT NULL AS can_edit'
 	);
-
-	protected $title;
 	protected $description;
 	protected $location;
 	protected $location_uri;
@@ -375,7 +376,7 @@ class Event extends AbstractEntity{
 
 	}
 
-	public function getDates(User $user, array $fields, array $pagination, $order_by){
+	public function getDates(User $user = null, array $fields, array $pagination, $order_by){
 		return EventsDatesCollection::filter($this->db,
 			$user,
 			array('event' => $this),
@@ -418,7 +419,7 @@ class Event extends AbstractEntity{
 		);
 	}
 
-	public function getParams(User $user, array $fields = null) : Result{
+	public function getParams(User $user = null, array $fields = null) : Result{
 
 		$result_data = parent::getParams($user, $fields)->getData();
 
@@ -599,4 +600,14 @@ class Event extends AbstractEntity{
 		$result = $p_ins->fetch(PDO::FETCH_ASSOC);
 		return new Result(true, 'Уведомление успешно добавлено', $result);
 	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getTitle() {
+		return $this->title;
+	}
+
+
+
 }

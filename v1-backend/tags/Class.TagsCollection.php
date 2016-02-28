@@ -1,9 +1,12 @@
 <?php
 
+
+require_once $BACKEND_FULL_PATH . '/bin/Class.AbstractCollection.php';
+
 class TagsCollection extends AbstractCollection{
 
 	public static function filter(PDO $db,
-	                              User $user,
+	                              User $user = null,
 	                              array $filters = null,
 	                              array $fields = null,
 	                              array $pagination = null,

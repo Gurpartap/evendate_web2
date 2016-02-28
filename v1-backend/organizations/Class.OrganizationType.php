@@ -21,7 +21,7 @@ class OrganizationType extends AbstractEntity{
 		'updated_at'
 	);
 
-	public function getParams(User $user, array $fields = null) : Result {
+	public function getParams(User $user = null, array $fields = null) : Result {
 		$result_data = parent::getParams($user, $fields)->getData();
 
 		if (isset($fields[self::ORGANIZATIONS_FIELD_NAME])){

@@ -8,7 +8,7 @@ abstract class AbstractEntity{
 	protected $db;
 
 
-	public function getParams(User $user, array $fields = null) : Result{
+	public function getParams(User $user = null, array $fields = null) : Result{
 		$result_data = array();
 
 		foreach(static::$DEFAULT_COLS as $field){
