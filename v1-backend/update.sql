@@ -554,13 +554,11 @@ INSERT INTO users_roles(name, description)
 
 ALTER TABLE public.users_organizations ADD role_id TEXT DEFAULT 1 NOT NULL;
 
-
 ALTER TABLE public.events ADD registration_required BOOLEAN DEFAULT FALSE NOT NULL;
 ALTER TABLE public.events ADD registration_till TIMESTAMP DEFAULT NULL NULL;
 ALTER TABLE public.events ADD public_at TIMESTAMP DEFAULT NULL NULL;
 ALTER TABLE public.events ADD is_free BOOLEAN DEFAULT TRUE NOT NULL;
 ALTER TABLE public.events ADD min_price INT DEFAULT NULL NULL;
-
 
 
 ALTER TABLE public.log_requests ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
@@ -569,5 +567,8 @@ ALTER TABLE public.log_requests ADD body_json JSON DEFAULT NULL NULL;
 ALTER TABLE public.log_requests ADD response_http_status INT DEFAULT 200 NOT NULL;
 ALTER TABLE public.log_requests ADD response_error_name VARCHAR(255) DEFAULT NULL NULL;
 ALTER TABLE public.log_requests ADD   uuid              TEXT UNIQUE        NOT NULL DEFAULT uuid_generate_v4();
+
+
+
 
 

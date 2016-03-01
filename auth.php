@@ -1,7 +1,5 @@
 <?php
 
-error_reporting(E_ALL);
-
 try{
 	if (!isset($_REQUEST['email']) || trim($_REQUEST['email']) == '' ||
 		!isset($_REQUEST['token']) || trim($_REQUEST['token']) == ''){
