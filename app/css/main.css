@@ -1007,7 +1007,7 @@ a.button:hover {text-decoration: none}
 /* Notification */
 
 #notification {
-	position: absolute;
+	position: fixed;
 	top: 0;
 	left: 0;
 	width: 100%;
@@ -1271,6 +1271,15 @@ html.-open_modal {overflow: hidden}
 .blurheader {
 	opacity: 1;
 	z-index: 100;
+}
+
+#notification {padding: 5px}
+@media only screen and (min-width: 767px){
+	#notification {padding-left: 220px}
+}
+
+@media screen and (min-width: 1440px) {
+	#notification {padding-left: 300px}
 }
 
 /* /FUCK YOU BOOTSTRAP */

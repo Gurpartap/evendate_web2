@@ -139,8 +139,8 @@
                     </div>
                 </div>
             </div>
-					<div id="notification">
-						<p id="notification_text"></p>
+					<div id="notification" class="-centering">
+						<span id="notification_text"></span>
 					</div>
             <!-- START row-->
             <div class="calendar-app hidden screen-view">
