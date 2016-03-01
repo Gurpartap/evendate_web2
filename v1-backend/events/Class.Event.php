@@ -211,13 +211,29 @@ class Event extends AbstractEntity{
 		if (!is_array($data['tags'])) throw new LogicException('Укажите хотя бы один тег');
 
 		try{
-			$data['public_at'] = isset($data['public_at']) && $data['public_at'] != null ? new DateTime($data['public_at']) : null;
+			if (isset($data['public_at']) && $data['public_at'] != null){
+				$data['public_at'] =  new DateTime($data['public_at']);
+			}else{
+				$data['public_at'] =  new DateTime();
+			}
 			$data['notification_at'] = clone $data['public_at'];
 			$data['notification_at']->modify('+10 minutes');
 			$data['public_at'] = $data['public_at']->format('Y-m-d H:i:s');
 		}catch(Exception $e){
 			$data['public_at'] = null;
 			$data['notification_at'] = (new DateTime())->modify('+10 minutes');
+		}
+
+		$data['registration_required'] = isset($data['registration_required']) && $data['registration_required'] == 'true' ? 'true' : 'false';
+
+		try{
+			if (isset($data['registration_required']) && $data['registration_required'] != null){
+				$data['registration_till'] = isset($data['registration_till']) ? new DateTime($data['registration_till']) : null;
+			}else{
+				$data['registration_till'] =  null;
+			}
+		}catch(Exception $e){
+			$data['registration_till'] =  null;
 		}
 
 
@@ -257,7 +273,7 @@ class Event extends AbstractEntity{
 					'image_vertical' => $img_vertical_filename,
 					'image_horizontal' => $img_horizontal_filename,
 					'detail_info_url' => $data['detail_info_url'],
-					'registration_required' => $data['registration_required'] == 'true' ? 'true' : 'false',
+					'registration_required' => $data['registration_required'],
 					'registration_till' => $data['registration_till'],
 					'public_at' => $data['public_at'],
 					'is_free' => $data['is_free'] == 'true' ? 'true' : 'false',

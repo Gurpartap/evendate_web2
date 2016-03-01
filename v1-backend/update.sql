@@ -567,8 +567,3 @@ ALTER TABLE public.log_requests ADD body_json JSON DEFAULT NULL NULL;
 ALTER TABLE public.log_requests ADD response_http_status INT DEFAULT 200 NOT NULL;
 ALTER TABLE public.log_requests ADD response_error_name VARCHAR(255) DEFAULT NULL NULL;
 ALTER TABLE public.log_requests ADD   uuid              TEXT UNIQUE        NOT NULL DEFAULT uuid_generate_v4();
-
-
-
-
-
