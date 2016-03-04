@@ -13,19 +13,18 @@ function Calendar($calendar, options){
 			head_tr_class: 'calendar_weekdays_row',
 			th_class: 'calendar_weekday',
 			td_class: 'calendar_day',
+			td_disabled: 'calendar_day_disabled',
 			table_cell_class: 'calendar_cell'
 		},
 		selection_type: 'single',
 		multi_selection: false,
 		weekday_selection: false,
 		month_selection: false,
+		min_date: false,
+		max_date: false,
 		locale: 'ru',
 		labels: {}
 	};
-	$.extend(true, this.options, options);
-	if(this.options.weekday_selection === true || this.options.month_selection === true ) {
-		this.options.multi_selection = true;
-	}
 	switch(true){
 		case ($calendar instanceof Element):
 		case (typeof $calendar == "string"): {
@@ -36,6 +35,13 @@ function Calendar($calendar, options){
 				throw new Error("Элементов с заданным аргументов найдено несколько");
 		}
 		case ($calendar instanceof jQuery): {
+			$.extend(true, this.options, options, $calendar.data());
+			if(this.options.min_date !== false && this.options.max_date !== false && moment(this.options.max_date).diff(this.options.min_date, 'days') <= 0){
+				this.options.max_date = false;
+			}
+			if(this.options.weekday_selection === true || this.options.month_selection === true ) {
+				this.options.multi_selection = true;
+			}
 			this.selected_days = [];
 			this.selected_weeks = {};
 			this.selected_months = [];
@@ -93,17 +99,30 @@ Calendar.prototype.buildTable = function(){
 		first_day_in_month = this.current_month.date(1).day(),
 		last_day_in_month = this.current_month.date(days_count).day(),
 		td_days = [],
-		is_today = false;
+		td_classes = [],
+		this_day,
+		this_moment;
 	for(var day = 1; day <= days_count; day++){
 		this.current_month.date(day);
-		is_today = (this.current_month.format(__C.DATE_FORMAT) == this._today.format(__C.DATE_FORMAT));
+		this_day = this.current_month.format(__C.DATE_FORMAT);
+		this_moment = moment(this_day);
+
+		td_classes = [
+			this.options.classes.table_cell_class,
+			this.options.classes.td_class,
+			'Day_'+this_day,
+			'DayOfWeek_'+this.current_month.day(),
+			'DayOfMonth_'+this.current_month.month()
+		];
+		if((this.options.min_date !== false && !(this_moment.diff(this.options.min_date, 'd') >= 0) ) || (this.options.max_date !== false && !(this_moment.diff(this.options.max_date, 'd') <= 0)))
+			td_classes.push(this.options.classes.td_disabled);
+		if(this.current_month.format(__C.DATE_FORMAT) == this._today.format(__C.DATE_FORMAT))
+			td_classes.push('today');
+
 		td_days.push(tmpl('calendar-div', {
-			table_cell_class:  this.options.classes.table_cell_class,
-			td_class:  this.options.classes.td_class,
+			td_classes: td_classes.join(' '),
 			number: this.current_month.date(),
 			day_number: this.current_month.day(),
-			month_number: this.current_month.month(),
-			today: is_today ? 'today' : '',
 			date: this.current_month.format(__C.DATE_FORMAT),
 			date_text: this.current_month.format('DD MMMM YYYY')
 		}));
@@ -113,13 +132,23 @@ Calendar.prototype.buildTable = function(){
 		curr_month_clone.add(-1, 'months');
 		curr_month_clone.date(curr_month_clone.daysInMonth());
 		do {
+			this_day = curr_month_clone.format(__C.DATE_FORMAT);
+			this_moment = moment(this_day);
+			td_classes = [
+				this.options.classes.table_cell_class,
+				this.options.classes.td_class,
+				'Day_'+this_day,
+				'DayOfWeek_'+curr_month_clone.day(),
+				'DayOfMonth_'+curr_month_clone.month(),
+				'not_this_month'
+			];
+			if((this.options.min_date !== false && !(this_moment.diff(this.options.min_date, 'd') >= 0) ) || (this.options.max_date !== false && !(this_moment.diff(this.options.max_date, 'd') <= 0)))
+				td_classes.push(this.options.classes.td_disabled);
+
 			td_days.unshift(tmpl('calendar-div', {
-				table_cell_class:  this.options.classes.table_cell_class,
-				td_class:  this.options.classes.td_class,
+				td_classes: td_classes.join(' '),
 				number: curr_month_clone.date(),
 				day_number: curr_month_clone.day(),
-				month_number: curr_month_clone.month(),
-				today: 'not_this_month',
 				date: curr_month_clone.format(__C.DATE_FORMAT),
 				date_text: curr_month_clone.format('DD MMMM YYYY')
 			}));
@@ -131,13 +160,23 @@ Calendar.prototype.buildTable = function(){
 		curr_month_clone = moment(this.current_month._d);
 		do {
 			curr_month_clone.add(1, 'days');
+			this_day = curr_month_clone.format(__C.DATE_FORMAT);
+			this_moment = moment(this_day);
+			td_classes = [
+				this.options.classes.table_cell_class,
+				this.options.classes.td_class,
+				'Day_'+this_day,
+				'DayOfWeek_'+curr_month_clone.day(),
+				'DayOfMonth_'+curr_month_clone.month(),
+				'not_this_month'
+			];
+			if((this.options.min_date !== false && !(this_moment.diff(this.options.min_date, 'd') >= 0) ) || (this.options.max_date !== false && !(this_moment.diff(this.options.max_date, 'd') <= 0)))
+				td_classes.push(this.options.classes.td_disabled);
+
 			td_days.push(tmpl('calendar-div', {
-				table_cell_class:  this.options.classes.table_cell_class,
-				td_class:  this.options.classes.td_class,
+				td_classes: td_classes.join(' '),
 				number: curr_month_clone.date(),
 				day_number: curr_month_clone.day(),
-				month_number: curr_month_clone.month(),
-				today: 'not_this_month',
 				date: curr_month_clone.format(__C.DATE_FORMAT),
 				date_text: curr_month_clone.format('DD MMMM YYYY')
 			}));
@@ -171,7 +210,7 @@ Calendar.prototype.renderTable = function(){
 		.setMonthName();
 
 	if(this.options.multi_selection){
-		this.bindDragRangeSelection();
+		this.bindDragSelection();
 	} else {
 		this.bindDaySelection();
 	}
@@ -259,15 +298,30 @@ Calendar.prototype.selectDays = function(days){
 
 
 	if(Array.isArray(days)){
+		var removing_days = [];
 		days.forEach(function(day){
-			select(day);
+			if((self.options.min_date !== false && !(moment(day).diff(self.options.min_date) >= 0) ) || (self.options.max_date !== false && !(moment(day).diff(self.options.max_date) <= 0))){
+				removing_days.push(day);
+			} else {
+				select(day);
+			}
 		});
+		removing_days.forEach(function(day) {
+			days.splice(days.indexOf(day), 1)
+		})
 	} else {
-		select(days);
+		if((self.options.min_date !== false && !(moment(days).diff(self.options.min_date) >= 0) ) || (self.options.max_date !== false && !(moment(days).diff(self.options.max_date) <=0))){
+			days = [];
+		} else {
+			select(days);
+			days = [days];
+		}
 	}
-	self.last_action = 'select';
-	self.last_selected_days = days;
-	self.$calendar.trigger('days-changed');
+	if(days.length){
+		self.last_action = 'select';
+		self.last_selected_days = days;
+		self.$calendar.trigger('days-changed');
+	}
 	return this;
 };
 
@@ -393,7 +447,7 @@ Calendar.prototype.bindMonthArrows = function(){
 
 Calendar.prototype.bindDaySelection = function(){
 	var self = this,
-		$days = self.$calendar.find('.'+this.options.classes.td_class);
+		$days = self.$calendar.find('.'+this.options.classes.td_class).not('.'+this.options.classes.td_disabled);
 	$days.on('click', function(){
 		if(self.options.multi_selection === true && $(this).hasClass(__C.CLASSES.ACTIVE)){
 			self.deselectDays($(this).data('date'));
@@ -422,12 +476,12 @@ Calendar.prototype.bindMonthSelection = function(){
 	return this;
 };
 
-Calendar.prototype.bindDragRangeSelection = function(){
+Calendar.prototype.bindDragSelection = function(){
 	var self = this;
 
 	function selectDate($target){
 		$target = $target.is('.'+self.options.classes.td_class) ? $target : $target.closest('.'+self.options.classes.td_class);
-		if($target.length){
+		if($target.not('.'+self.options.classes.td_disabled).length){
 			if($target.hasClass(__C.CLASSES.ACTIVE)){
 				self.deselectDays($target.data('date'));
 			} else {
@@ -444,7 +498,7 @@ Calendar.prototype.bindDragRangeSelection = function(){
 		.off('mousedown.RangeSelection')
 		.on('mousedown.RangeSelection', function(e){
 			selectDate($(e.target));
-			self.$calendar.find('.'+self.options.classes.td_class).on('mouseenter.DragSelection', function(e){
+			self.$calendar.find('.'+self.options.classes.td_class).not('.'+self.options.classes.td_disabled).on('mouseenter.DragSelection', function(e){
 				e.preventDefault();
 				selectDate($(e.target));
 			});

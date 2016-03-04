@@ -1144,23 +1144,10 @@ html.-open_modal {overflow: hidden}
 
 }
 .-month_selection .calendar_month_name {cursor: pointer}
-/*
-.calendar_prev_btn:hover,
-.calendar_next_btn:hover,
-.-month_selection .calendar_month_name:hover {
-	color: #fff;
-	background-color: hsla(221,45%,60%,.8);
-}*/
-/*
-.calendar_month_name.active {
-	color: #fff;
-	background-color: #6b88c7;
-}*/
 
 
-.calendar_month {/*
-	border-collapse: separate;
-	border-spacing: 5px;*/
+
+.calendar_month {
 	border-collapse: collapse;
 	border-spacing: 0;
 }
@@ -1168,13 +1155,8 @@ html.-open_modal {overflow: hidden}
 .calendar_cell {
 	width: 2.4em;
 	height: 2.4em;
-	text-align: center;/*
-	border-radius: 50%;*/
+	text-align: center;
 }
-/*
-.calendar_day.today {
-	border: 2px solid #ff5f9e;
-}*/
 .calendar_cell.active {
 	color: #fff;
 	background-color: #6b88c7;
@@ -1182,8 +1164,9 @@ html.-open_modal {overflow: hidden}
 .calendar_weekday {text-align: inherit} /*FUB*/
 .-weekday_selection .calendar_weekday {cursor: pointer}
 
-.calendar_day {cursor: pointer}
-.calendar_day.not_this_month {opacity: .5}
+.calendar_day:not(.calendar_day_disabled) {cursor: pointer}
+.calendar_day.not_this_month,
+.calendar_day.calendar_day_disabled {opacity: .5}
 
 /* /Calendar */
 /* DatePicker */

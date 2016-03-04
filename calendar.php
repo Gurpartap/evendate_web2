@@ -391,7 +391,7 @@
 										<div class="form_group -parts_2_3 RegistrationTill">
 											<div class="form_unit -inline -status_disabled">
 												<label class="form_label">Дата</label>
-												<div class="form_select -v_centering DatePicker"><label>Дата</label><input name="registration_till_date" type="hidden" disabled required></div>
+												<div class="form_select -v_centering DatePicker" data-min_date="<?=(new DateTime())->format('Y-m-d')?>"><label>Дата</label><input name="registration_till_date" type="hidden" disabled required></div>
 											</div>
 											<div class="form_unit -status_disabled">
 												<div class="form_group -parts_e_2">
@@ -563,7 +563,7 @@
 
 												<div class="form_unit -inline">
 													<label class="form_label">Дата</label>
-													<div class="form_select -v_centering DatePicker"><label>Дата</label><input type="hidden" name="public_at_date" disabled required></div>
+													<div class="form_select -v_centering DatePicker" data-min_date="<?=(new DateTime())->format('Y-m-d')?>"><label>Дата</label><input type="hidden" name="public_at_date" disabled required></div>
 												</div>
 
 												<div class="form_unit -inline">
@@ -592,16 +592,6 @@
 								</div>
 							</div>
 						</div>
-						<!--
-						<div class="image-cropper-wrapper hidden">
-							<div class="image-cutter">
-								<img src="">
-
-								<div class="whirl duo image-cropper"></div>
-								<a href="#" class="btn btn-pink img-crop-btn disabled hidden"> Кадрировать</a>
-								<a href="#" class="btn btn-pink-empty img-crop-cancel hidden"> Отмена</a>
-							</div>
-						</div>-->
 					</div>
 						<!-- END row-->
 

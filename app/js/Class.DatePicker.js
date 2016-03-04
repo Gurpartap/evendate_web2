@@ -3,9 +3,10 @@ function DatePicker($datepicker, options){
 		classes: {
 		},
 		close_on_pick: true,
+		min_date: false,
+		max_date: false,
 		labels: {}
 	};
-	$.extend(true, this.options, options);
 
 	switch(true){
 		case ($datepicker instanceof Element):
@@ -17,6 +18,7 @@ function DatePicker($datepicker, options){
 				throw new Error('Элементов с заданным аргументов найдено несколько');
 		}
 		case ($datepicker instanceof jQuery): {
+			$.extend(true, this.options, options, $datepicker.data());
 			this.$datepicker = $datepicker;
 			this.$datepicker_modal = {};
 			this.$input = $datepicker.is('input') ? $datepicker : $datepicker.find('input');
@@ -61,7 +63,10 @@ DatePicker.prototype.openDialog = function(){
 
 	this.$datepicker.after(tmpl('datepicker', {}));
 	this.$datepicker_modal = this.$datepicker.siblings('.date_picker');
-	this.calendar = new Calendar(this.$datepicker_modal.children('.DatePickerCalendar'), {});
+	this.calendar = new Calendar(this.$datepicker_modal.children('.DatePickerCalendar'), {
+		min_date: this.options.min_date,
+		max_date: this.options.max_date
+	});
 	this.calendar.init();
 	this.calendar.$calendar.on('days-changed', function(){
 		self.prev_selected_day = self.selected_day;
