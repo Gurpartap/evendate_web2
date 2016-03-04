@@ -494,7 +494,6 @@ pg.connect(pg_conn_string, function(err, client, done) {
 
 		var
 			saveDataInDB = function(data) {
-
 				function getUIDValues() {
 					var result = {
 						google_uid: null,
@@ -517,7 +516,6 @@ pg.connect(pg_conn_string, function(err, client, done) {
 					}
 					return result;
 				}
-
 				if (data.user_info.hasOwnProperty('sex')) {
 					if (data.user_info.sex == 2) {
 						data.user_info.gender = 'male';
@@ -527,7 +525,6 @@ pg.connect(pg_conn_string, function(err, client, done) {
 						data.user_info.gender = null;
 					}
 				}
-
 				var UIDs = getUIDValues(),
 					user_token = data.access_data.access_token + data.access_data.secret + Utils.makeId(),
 					q_get_user =
@@ -595,8 +592,6 @@ pg.connect(pg_conn_string, function(err, client, done) {
 								' ' + connection.escape(UIDs.facebook_uid) + ', ' +
 								' ' + connection.escape(UIDs.google_uid) + ')';
 						}
-
-						console.log(q_user_mysql);
 
 						connection.query(q_user_mysql, function(err) {
 							handleError(err);
@@ -702,8 +697,6 @@ pg.connect(pg_conn_string, function(err, client, done) {
 
 						client.query(q_ins_sign_in, function(sign_in_err, sign_in_result) {
 							if (handleError(sign_in_err)) return;
-
-							console.log(sign_in_result);
 
 							var q_ins_friends = '',
 								uid_key_name;

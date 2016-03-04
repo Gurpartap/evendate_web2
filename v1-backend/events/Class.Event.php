@@ -240,7 +240,7 @@ class Event extends AbstractEntity{
 		$data['dates'] = self::sortDates($data['dates']);
 //		$data['first_date'] = self::getFirstDate($data);
 		$data['is_free'] = isset($data['is_free']) && strtolower($data['is_free']) == 'true';
-		$data['min_price'] = $data['is_free'] == true && is_numeric($data['min_price']) ? $data['min_price'] : null;
+		$data['min_price'] = $data['is_free'] == true && is_numeric($data['min_price']) ? (int) $data['min_price'] : null;
 
 	}
 
@@ -275,9 +275,9 @@ class Event extends AbstractEntity{
 					'detail_info_url' => $data['detail_info_url'],
 					'registration_required' => $data['registration_required'],
 					'registration_till' => $data['registration_till'],
-					'public_at' => $data['public_at'],
+					'public_at' => $data['public_at'] instanceof DateTime ? $data['public_at']->format('Y-m-d H:i:s') : 'null',
 					'is_free' => $data['is_free'] == 'true' ? 'true' : 'false',
-					'min_price' => is_numeric($data['min_price']) ? (int) $data['min_price'] : null,
+					'min_price' => $data['min_price'],
 					'status' => $data['public_at'] instanceof DateTime ? 'false' : 'true',
 				))->returning(array('id'));
 
@@ -411,7 +411,7 @@ class Event extends AbstractEntity{
 		return $this->tags;
 	}
 
-	public function getOrganization() {
+	public function getOrganization() : Organization{
 		if ($this->organization instanceof Organization == false){
 			$this->organization = OrganizationsCollection::filter(
 				$this->db,
@@ -446,7 +446,7 @@ class Event extends AbstractEntity{
 					'length' => $fields[self::DATES_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 					'offset' => $fields[self::DATES_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
 				),
-				$fields[self::DATES_FIELD_NAME]['order_by'] ?? array())->getData();
+				Fields::parseOrderBy($fields[self::DATES_FIELD_NAME]['order_by']))->getData();
 		}
 
 		if (isset($fields[self::FAVORED_USERS_FIELD_NAME])){
@@ -457,7 +457,7 @@ class Event extends AbstractEntity{
 					'length' => $fields[self::FAVORED_USERS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 					'offset' => $fields[self::FAVORED_USERS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
 				),
-				$fields[self::FAVORED_USERS_FIELD_NAME]['order_by'] ?? array()
+				Fields::parseOrderBy($fields[self::DATES_FIELD_NAME]['order_by'])
 			)->getData();
 		}
 
@@ -470,7 +470,7 @@ class Event extends AbstractEntity{
 					'length' => $fields[self::TAGS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 					'offset' => $fields[self::TAGS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
 				),
-				$fields[self::TAGS_FIELD_NAME]['order_by'] ?? array())->getData();
+				Fields::parseOrderBy($fields[self::DATES_FIELD_NAME]['order_by']))->getData();
 		}
 
 		if (isset($fields[self::NOTIFICATIONS_FIELD_NAME])){
@@ -512,7 +512,30 @@ class Event extends AbstractEntity{
 	}
 
 	public function update(array $data, Organization $organization, Editor $editor) {
-		$q_upd_event = 'UPDATE events SET
+
+		$q_upd_event = App::queryFactory()->newUpdate();
+
+		$q_upd_event
+			->table('events')
+			->cols(array(
+				'title' => $data['title'],
+				'description' => $data['description'],
+				'location' => $data['location'],
+				'location_object' => json_encode($data['geo'] ?? ''),
+				'creator_id' => intval($data['creator_id']),
+				'organization_id' => $organization->getId(),
+				'latitude' => is_numeric($data['latitude']) ? (float) $data['latitude'] : null,
+				'longitude' => is_numeric($data['longitude']) ? (float) $data['longitude'] : null,
+				'detail_info_url' => $data['detail_info_url'],
+				'registration_required' => $data['registration_required'],
+				'registration_till' => $data['registration_till'],
+				'public_at' => $data['public_at'] instanceof DateTime ? $data['public_at']->format('Y-m-d H:i:s') : 'null',
+				'is_free' => $data['is_free'] == 'true' ? 'true' : 'false',
+				'min_price' => $data['min_price'],
+				'status' => $data['public_at'] instanceof DateTime ? 'false' : 'true',
+			));
+
+		$q_upd_event_mysql = 'UPDATE events SET
 				title = :title,
 				description = :description,
 				location = :location,
@@ -528,8 +551,6 @@ class Event extends AbstractEntity{
 				end_time = :end_time
 				';
 
-
-
 		self::generateQueryData($data, $this->db);
 
 		if (isset($data['file_names'])){
@@ -538,6 +559,8 @@ class Event extends AbstractEntity{
 				'horizontal' => App::getImageExtension($data['file_names']['horizontal'])
 			);
 		}
+
+
 
 		$query_data = array(
 			':title' => $data['title'],
@@ -564,8 +587,11 @@ class Event extends AbstractEntity{
 		{
 			$img_horizontal_filename = md5(App::generateRandomString() . '-horizontal') .  '.' . $data['image_extensions']['horizontal'];
 			$query_data[':image_horizontal'] = $img_horizontal_filename;
-			$q_upd_event .= ' image_horizontal = :image_horizontal,';
-			self::saveEventImage($data['files']['horizontal'], $img_horizontal_filename);
+			$q_upd_event_mysql .= ' image_horizontal = :image_horizontal,';
+			App::saveImage($data['files']['horizontal'], $img_horizontal_filename, 16000);
+			$q_upd_event->cols(array(
+				'image_horizontal' => $img_horizontal_filename
+			));
 		}
 
 		if (isset($data['image_extensions'])
@@ -574,12 +600,16 @@ class Event extends AbstractEntity{
 		{
 			$img_vertical_filename = md5(App::generateRandomString() . '-vertical') .  '.' . $data['image_extensions']['vertical'];
 			$query_data[':image_vertical'] = $img_vertical_filename;
-			$q_upd_event .= ' image_vertical = :image_vertical,';
-			self::saveEventImage($data['files']['vertical'], $img_vertical_filename);
+			$q_upd_event_mysql .= ' image_vertical = :image_vertical,';
+			App::saveImage($data['files']['vertical'], $img_vertical_filename, 16000);
+			$q_upd_event->cols(array(
+				'image_vertical' => $img_vertical_filename
+			));
 		}
 
-		$q_upd_event .= ' status = 1 WHERE events.id = :event_id';
+		$q_upd_event_mysql .= ' WHERE events.id = :event_id';
 
+		$p_upd_event = $this->db->prepare($q_upd_event_mysql);
 		$p_upd_event = $this->db->prepare($q_upd_event);
 		$result = $p_upd_event->execute($query_data);
 

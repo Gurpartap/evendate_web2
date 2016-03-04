@@ -85,7 +85,22 @@ class Fields{
 		return $result;
 	}
 
-	public static function getOrderFields(array $possible){
+	public static function parseOrderBy(string $fields = null) : array{
 		$result = array();
+		if (is_null($fields) || empty($fields)) return $result;
+		$fields = explode(',', $fields);
+		foreach($fields as &$field){
+			$field = trim($field);
+			if (substr($field, 0, 1) == '-'){
+				$field = ltrim($field, '-');
+				$desc = true;
+			}else{
+				$desc = false;
+			}
+			if (isset($possible[$field]) || in_array($field, $possible)){
+				$result[] = $desc ? $field . ' DESC' : $field;
+			}
+		}
+		return $result;
 	}
 }
