@@ -133,7 +133,6 @@ class Organization extends AbstractEntity{
 		if ($result === FALSE)
 			throw new DBQueryException('SUBSCRIPTION_QUERY_ERROR', $this->db);
 
-		$sub_id = $this->db->lastInsertId();
 		Statistics::Organization($this, $user, $this->db, Statistics::ORGANIZATION_SUBSCRIBE);
 
 		return new Result(true, 'Подписка успешно оформлена');
@@ -251,6 +250,7 @@ class Organization extends AbstractEntity{
 				$this->db,
 				$user,
 				Fields::parseFields($users_pagination['fields'] ?? ''),
+				Fields::parseOrderBy($users_pagination['order_by'] ?? ''),
 				$users_pagination);
 		}
 
@@ -258,6 +258,7 @@ class Organization extends AbstractEntity{
 		if (is_array($events_field)){
 			$result_data[Organization::EVENTS_FIELD_NAME] = $this->getEvents(
 				Fields::parseFields($events_field['fields'] ?? ''),
+				Fields::parseOrderBy($events_field['order_by'] ?? ''),
 				array(
 					'length' => $events_field['length'] ?? App::DEFAULT_LENGTH,
 					'offset' => $events_field['offset'] ?? App::DEFAULT_OFFSET
@@ -268,7 +269,7 @@ class Organization extends AbstractEntity{
 		return new Result(true, '', $result_data);
 	}
 
-	private function getSubscribed(PDO $db, User $user, array $fields = null, array $pagination = null) {
+	private function getSubscribed(PDO $db, User $user, array $fields = null, array $order_by = null, array $pagination = null) {
 		return UsersCollection::filter(
 			$db,
 			$user,
@@ -280,7 +281,7 @@ class Organization extends AbstractEntity{
 
 	}
 
-	private function getEvents(array $fields = null, array $pagination = null) {
+	private function getEvents(array $fields = null, array $oder_by = null, array $pagination = null) {
 		return EventsCollection::filter(
 			$this->db,
 			App::getCurrentUser(),

@@ -19,7 +19,7 @@ $__modules['users'] = array(
 				array('user' => $__user),
 				$__fields,
 				$__pagination,
-				$__order_by
+				$__order_by ?? array()
 			);
 		},
 		'friends' => function () use ($__user, $__request, $__fields, $__pagination, $__order_by, $__db) {
@@ -29,7 +29,7 @@ $__modules['users'] = array(
 				array('user' => $__user),
 				$__fields,
 				$__pagination,
-				$__order_by
+				$__order_by ?? array()
 			);
 		},
 		'{/(id:[0-9]+)/actions}' => function ($id) use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
@@ -45,7 +45,7 @@ $__modules['users'] = array(
 				))),
 				$__fields,
 				$__pagination,
-				$__order_by);
+				$__order_by ?? array());
 		},
 		'{/(id:[0-9]+)}' => function ($id) use ($__user, $__fields, $__db) {
 			$data = UsersCollection::one(
@@ -58,7 +58,7 @@ $__modules['users'] = array(
 		},
 		'{me/devices}' => function () use ($__user, $__request, $__db, $__fields, $__pagination, $__order_by) {
 			return DevicesCollection::filter($__db, $__user, $__request, $__fields,
-				$__pagination, $__order_by);
+				$__pagination, $__order_by ?? array());
 		},
 		'{me}' => function () use ($__user) {
 			$data = $__user->getMainInfo()->getData();

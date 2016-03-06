@@ -77,14 +77,6 @@ class Fields{
 		return json_decode($s, true);
 	}
 
-	public static function parseOrderByFields(string $order_by_text, bool $desc = null) : array {
-		$result = array();
-		if ($order_by_text){
-			$result[] = $order_by_text . ($desc ? ' DESC' : '');
-		}
-		return $result;
-	}
-
 	public static function parseOrderBy(string $fields = null) : array{
 		$result = array();
 		if (is_null($fields) || empty($fields)) return $result;
@@ -93,12 +85,9 @@ class Fields{
 			$field = trim($field);
 			if (substr($field, 0, 1) == '-'){
 				$field = ltrim($field, '-');
-				$desc = true;
+				$result[] = $field . ' DESC';
 			}else{
-				$desc = false;
-			}
-			if (isset($possible[$field]) || in_array($field, $possible)){
-				$result[] = $desc ? $field . ' DESC' : $field;
+				$result[] = $field;
 			}
 		}
 		return $result;
