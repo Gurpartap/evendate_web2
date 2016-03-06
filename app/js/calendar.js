@@ -816,448 +816,603 @@ function OneDay($view, $content_block){
 }
 
 function EditEvent($view, $content_block){
+	var event_id = window.current_state_data.eventId;
 
-	function bindLoadByURLButton(){
-		$('.LoadByURLButton').not('-Handled_LoadByURLButton').on('click', function(){
-			var $this = $(this),
-				$input = $('#'+$this.data('load_input'));
-			socket.emit('image.getFromURL', $input.val());
-			$this.data('url', $input.val());
-			window.current_load_button = $this;
-			window.paceOptions = {
-				catchupTime : 10000,
-				maxProgressPerFrame:1,
-				ghostTime: Number.MAX_SAFE_INTEGER,
-				checkInterval :{
-					checkInterval: 10000
+	function initEditEventPage($view){
+
+		function bindLoadByURLButton(){
+			$('.LoadByURLButton').not('-Handled_LoadByURLButton').on('click', function(){
+				var $this = $(this),
+					$input = $('#'+$this.data('load_input'));
+				socket.emit('image.getFromURL', $input.val());
+				$this.data('url', $input.val());
+				window.current_load_button = $this;
+				window.paceOptions = {
+					catchupTime : 10000,
+					maxProgressPerFrame:1,
+					ghostTime: Number.MAX_SAFE_INTEGER,
+					checkInterval :{
+						checkInterval: 10000
+					},
+					eventLag : {
+						minSamples: 1,
+						sampleCount: 30000000,
+						lagThreshold: 0.1
+					}
+				}; //хз зачем, все равно не работает
+				Pace.restart();
+			}).addClass('-Handled_LoadByURLButton');
+		}
+
+		function initEditEventMainCalendar($view){
+			//TODO: Refactor this!! Make it more readable
+
+			var MainCalendar = new Calendar('.EventDatesCalendar', {weekday_selection: true, month_selection: true}),
+				$selected_days_text = $view.find('.EventSelectedDaysText'),
+				$selected_days_table_rows = $view.find('.SelectedDaysRows'),
+				dates = {},
+				genitive_month_names = {
+					'январь': 'января',
+					'февраль': 'февраля',
+					'март': 'марта',
+					'апрель': 'апреля',
+					'май': 'мая',
+					'июнь': 'июня',
+					'июль': 'июля',
+					'август': 'августа',
+					'сентябрь': 'сентября',
+					'октябрь': 'октября',
+					'ноябрь': 'ноября',
+					'декабрь': 'декабря'
 				},
-				eventLag : {
-					minSamples: 1,
-					sampleCount: 30000000,
-					lagThreshold: 0.1
-				}
-			}; //хз зачем, все равно не работает
-			Pace.restart();
-		}).addClass('-Handled_LoadByURLButton');
-	}
-
-	function initEditEventMainCalendar($view){
-		//TODO: Refactor this!! Make it more readable
-
-		var MainCalendar = new Calendar('.EventDatesCalendar', {weekday_selection: true, month_selection: true}),
-			$selected_days_text = $view.find('.EventSelectedDaysText'),
-			$selected_days_table_rows = $view.find('.SelectedDaysRows'),
-			dates = {},
-			genitive_month_names = {
-				'январь': 'января',
-				'февраль': 'февраля',
-				'март': 'марта',
-				'апрель': 'апреля',
-				'май': 'мая',
-				'июнь': 'июня',
-				'июль': 'июля',
-				'август': 'августа',
-				'сентябрь': 'сентября',
-				'октябрь': 'октября',
-				'ноябрь': 'ноября',
-				'декабрь': 'декабря'
-			},
-			$fucking_table = $();
-		MainCalendar.init();
-		MainCalendar.$calendar.on('days-changed.displayFormattedText', displayFormattedText);
+				$fucking_table = $();
+			MainCalendar.init();
+			MainCalendar.$calendar.on('days-changed.displayFormattedText', displayFormattedText);
 
 
 
-		function bindRemoveRow($parent){
-			$parent.find('.RemoveRow').not('.-Handled_RemoveRow').each(function(i, elem){
-				$(elem).on('click', function(){
-					MainCalendar.deselectDays($(this).closest('tr').data('date'));
-				}).addClass('-Handled_RemoveRow');
-			});
-		}
-
-		function displayFormattedText(){
-			dates = {};
-			MainCalendar.selected_days.forEach(function(date, i, days){
-				var _date = moment(date);
-
-				if(typeof dates[_date.month()] === 'undefined'){
-					dates[_date.month()] = {};
-					dates[_date.month()].selected_days = [];
-					dates[_date.month()].month_name = genitive_month_names[_date.format('MMMM')];
-				}
-				dates[_date.month()].selected_days.push(_date.date());
-			});
-
-			$selected_days_text.empty().removeClass('hidden');
-			if(Object.keys(dates).length){
-				$.each(dates, function(i, elem){
-					$selected_days_text.append($('<p>').text(elem.selected_days.join(', ') + ' ' + elem.month_name))
-				});
-			} else {
-				$selected_days_text.html('<p>Даты не выбраны</p>');
-			}
-		}
-
-		function doTheFuckingSort($rows, $parent){
-			$rows.sort(function(a,b){
-				var an = $(a).data('date'),
-					bn = $(b).data('date');
-
-				if(an > bn) return 1;
-				else if(an < bn) return -1;
-				else return 0;
-			});
-			$rows.detach().appendTo($parent);
-		}
-
-		function buildTable(selected_days){
-			//TODO: BUG. On multiple selection (month or weekday) duplicates appearing in table.
-			//TODO: Bind time on building table
-			var $output = $();
-			if(Array.isArray(selected_days)){
-				selected_days.forEach(function(day){
-					$output = $output.add(tmpl('selected-table-day', {
-						date: day,
-						formatted_date: day.split('-').reverse().join('.')
-					}));
+			function bindRemoveRow($parent){
+				$parent.find('.RemoveRow').not('.-Handled_RemoveRow').each(function(i, elem){
+					$(elem).on('click', function(){
+						MainCalendar.deselectDays($(this).closest('tr').data('date'));
+					}).addClass('-Handled_RemoveRow');
 				});
 			}
-			else {
-				$output = tmpl('selected-table-day', {
-					date: selected_days,
-					formatted_date: selected_days.split('-').reverse().join('.')
-				});
-			}
-			bindDatePickers($output);
-			bindTimeInput($output);
-			bindRemoveRow($output);
 
-			$fucking_table = $fucking_table.add($output);
-			$output.find('.DatePicker').each(function(){
-				var DP = $(this).data('datepicker');
-				DP.$datepicker.on('date-picked', function(){
-					MainCalendar.deselectDays(DP.prev_selected_day).selectDays(DP.selected_day);
-					doTheFuckingSort($fucking_table, $selected_days_table_rows)
-				});
-			});
-			doTheFuckingSort($fucking_table, $selected_days_table_rows);
-		}
+			function displayFormattedText(){
+				dates = {};
+				MainCalendar.selected_days.forEach(function(date, i, days){
+					var _date = moment(date);
 
-		function BuildSelectedDaysTable(){
-			if(MainCalendar.last_action === 'select'){
-				buildTable(MainCalendar.last_selected_days);
-			}
-			else if(MainCalendar.last_action === 'deselect'){
-				if(Array.isArray(MainCalendar.last_selected_days)){
-					var classes = [];
-					MainCalendar.last_selected_days.forEach(function(day){
-						classes.push('.TableDay_'+day);
+					if(typeof dates[_date.month()] === 'undefined'){
+						dates[_date.month()] = {};
+						dates[_date.month()].selected_days = [];
+						dates[_date.month()].month_name = genitive_month_names[_date.format('MMMM')];
+					}
+					dates[_date.month()].selected_days.push(_date.date());
+				});
+
+				$selected_days_text.empty().removeClass('hidden');
+				if(Object.keys(dates).length){
+					$.each(dates, function(i, elem){
+						$selected_days_text.append($('<p>').text(elem.selected_days.join(', ') + ' ' + elem.month_name))
 					});
-					$fucking_table.detach(classes.join(', '));
-					$fucking_table = $fucking_table.not(classes.join(', '));
+				} else {
+					$selected_days_text.html('<p>Даты не выбраны</p>');
+				}
+			}
+
+			function doTheFuckingSort($rows, $parent){
+				$rows.sort(function(a,b){
+					var an = $(a).data('date'),
+						bn = $(b).data('date');
+
+					if(an > bn) return 1;
+					else if(an < bn) return -1;
+					else return 0;
+				});
+				$rows.detach().appendTo($parent);
+			}
+
+			function buildTable(selected_days){
+				//TODO: BUG. On multiple selection (month or weekday) duplicates appearing in table.
+				//TODO: Bind time on building table
+				var $output = $();
+				if(Array.isArray(selected_days)){
+					selected_days.forEach(function(day){
+						$output = $output.add(tmpl('selected-table-day', {
+							date: day,
+							formatted_date: day.split('-').reverse().join('.')
+						}));
+					});
 				}
 				else {
-					$fucking_table.detach('.TableDay_'+MainCalendar.last_selected_days);
-					$fucking_table = $fucking_table.not('.TableDay_'+MainCalendar.last_selected_days);
+					$output = tmpl('selected-table-day', {
+						date: selected_days,
+						formatted_date: selected_days.split('-').reverse().join('.')
+					});
 				}
+				bindDatePickers($output);
+				bindTimeInput($output);
+				bindRemoveRow($output);
+
+				$fucking_table = $fucking_table.add($output);
+				$output.find('.DatePicker').each(function(){
+					var DP = $(this).data('datepicker');
+					DP.$datepicker.on('date-picked', function(){
+						MainCalendar.deselectDays(DP.prev_selected_day).selectDays(DP.selected_day);
+						doTheFuckingSort($fucking_table, $selected_days_table_rows)
+					});
+				});
+				doTheFuckingSort($fucking_table, $selected_days_table_rows);
 			}
 
-			doTheFuckingSort($fucking_table, $selected_days_table_rows);
+			function BuildSelectedDaysTable(){
+				if(MainCalendar.last_action === 'select'){
+					buildTable(MainCalendar.last_selected_days);
+				}
+				else if(MainCalendar.last_action === 'deselect'){
+					if(Array.isArray(MainCalendar.last_selected_days)){
+						var classes = [];
+						MainCalendar.last_selected_days.forEach(function(day){
+							classes.push('.TableDay_'+day);
+						});
+						$fucking_table.detach(classes.join(', '));
+						$fucking_table = $fucking_table.not(classes.join(', '));
+					}
+					else {
+						$fucking_table.detach('.TableDay_'+MainCalendar.last_selected_days);
+						$fucking_table = $fucking_table.not('.TableDay_'+MainCalendar.last_selected_days);
+					}
+				}
 
-			//TODO: Do not forget to rename 'fucking' names
-			//TODO: Please, don't forget to rename 'fucking' names
+				doTheFuckingSort($fucking_table, $selected_days_table_rows);
+
+				//TODO: Do not forget to rename 'fucking' names
+				//TODO: Please, don't forget to rename 'fucking' names
+
+			}
+
+			$view.find('#edit_event_different_time').on('change', function(){
+				var $table_wrapper = $view.find('.event_selected_days_wrapper'),
+					$table_content = $view.find('.event_selected_days_content');
+				if($(this).prop('checked')){
+					buildTable(MainCalendar.selected_days);
+					$table_wrapper.height($table_content.height()).one('transitionend', function(){
+						$table_wrapper.css({
+							'height': 'auto',
+							'overflow': 'visible'
+						})
+					});
+					MainCalendar.$calendar.on('days-changed.buildTable', BuildSelectedDaysTable);
+				} else {
+					$table_wrapper.css({
+						'height': $table_content.height(),
+						'overflow': 'hidden'
+					}).height(0);
+					$fucking_table.empty();
+					MainCalendar.$calendar.off('days-changed.buildTable');
+				}
+				$view.find('.MainTime').toggleStatus('disabled');
+			});
+
+			var AddRowDatePicker = $view.find('.AddDayToTable').data('datepicker');
+			AddRowDatePicker.$datepicker.on('date-picked', function(){
+				MainCalendar.selectDays(AddRowDatePicker.selected_day);
+			});
 
 		}
 
-		$view.find('#edit_event_different_time').on('change', function(){
-			var $table_wrapper = $view.find('.event_selected_days_wrapper'),
-				$table_content = $view.find('.event_selected_days_content');
-			if($(this).prop('checked')){
-				buildTable(MainCalendar.selected_days);
-				$table_wrapper.height($table_content.height()).one('transitionend', function(){
-					$table_wrapper.css({
-						'height': 'auto',
-						'overflow': 'visible'
-					})
+		function handleImgUpload($context, source, filename){
+			var $parent = $context.closest('.EditEventImgLoadWrap'),
+				$preview = $parent.find('.EditEventImgPreview'),
+				$crop_again_button = $parent.find('.CropAgain'),
+				$file_name_text = $parent.find('.FileNameText'),
+				$file_name = $parent.find('.FileName'),
+				$data_url = $parent.find('.DataUrl');
+
+			$preview.data('source_img', source).attr('src', source);
+			$data_url.val(source);
+			$file_name_text.html('Загружен файл:<br>'+filename);
+			$file_name.val(filename);
+			initCrop(source, $preview, {
+				'aspectRatio': eval($preview.data('aspect_ratio'))
+			});
+			$preview.off('crop-done').on('crop-done', function(){
+				var $this = $(this),
+					$crop_data = $this.data('crop_data');
+
+				$data_url.val($preview.attr('src'));
+				$crop_again_button.removeClass('-hidden').off('click').on('click', function(){
+					initCrop($preview.data('source_img'), $preview, {
+						'data': $crop_data,
+						'aspectRatio': eval($preview.data('aspect_ratio'))
+					});
 				});
-				MainCalendar.$calendar.on('days-changed.buildTable', BuildSelectedDaysTable);
-			} else {
-				$table_wrapper.css({
-					'height': $table_content.height(),
-					'overflow': 'hidden'
-				}).height(0);
-				$fucking_table.empty();
-				MainCalendar.$calendar.off('days-changed.buildTable');
+
+			})
+		}
+
+		$.ajax({
+			url: 'api/v1/organizations',
+			method: 'GET',
+			data: {
+				privileges: 'can_add',
+				fields: 'default_address'
+			},
+			success: function(res){
+				var $wrapper = $('.EditEventOrganizations'),
+					organizations_options = $(),
+					$default_address_button = $view.find('.EditEventDefaultAddress');
+
+				res.data.forEach(function(organization){
+					organizations_options = organizations_options.add(tmpl('organization-option', organization));
+				});
+
+				$wrapper.find('select').append(organizations_options).select2({
+					containerCssClass: 'form_select2',
+					dropdownCssClass: 'form_select2_drop'
+				}).on('change', function(){
+					$default_address_button.data('default_address', $(this).children(":selected").data('default-address'));
+				});
+				if(organizations_options.length > 1){
+					$wrapper.removeClass('-hidden');
+				} else {
+					$wrapper.addClass('-hidden');
+				}
+				$default_address_button.data('default_address', res.data[0].default_address)
 			}
-			$view.find('.MainTime').toggleStatus('disabled');
 		});
 
-		var AddRowDatePicker = $view.find('.AddDayToTable').data('datepicker');
-		AddRowDatePicker.$datepicker.on('date-picked', function(){
-			MainCalendar.selectDays(AddRowDatePicker.selected_day);
+		bindDatePickers($view);
+		bindTimeInput($view);
+		bindSelect2($view);
+		bindTabs($view);
+		limitInputSize();
+		bindRippleEffect();
+		bindFileLoadButton();
+		bindLoadByURLButton();
+		initEditEventMainCalendar($view);
+
+		//TODO: perepilit' placepicker
+		$view.find(".Placepicker").placepicker();
+
+		$view.find('.EventTags').select2({
+			tags: true,
+			width: '100%',
+			placeholder: "Выберите до 5 тегов",
+			maximumSelectionLength: 5,
+			maximumSelectionSize: 5,
+			tokenSeparators: [',', ';'],
+			multiple: true,
+			createSearchChoice: function(term, data) {
+				if ($(data).filter(function() {
+						return this.text.localeCompare(term) === 0;
+					}).length === 0) {
+					return {
+						id: term,
+						text: term
+					};
+				}
+			},
+			ajax: {
+				url: '/api/v1/tags/',
+				dataType: 'JSON',
+				data: function (term, page) {
+					return {
+						q: term // search term
+					};
+				},
+				results: function(data) {
+					var _data = [];
+					data.data.forEach(function(value){
+						value.text = value.name;
+						_data.push(value);
+					});
+					return {
+						results: _data
+					}
+				}
+			},
+			containerCssClass: "form_select2",
+			dropdownCssClass: "form_select2_drop"
 		});
 
+		$view.find('.EditEventDefaultAddress').off('click').on('click', function(){
+			var $this = $(this);
+			$this.closest('.form_group').find('input').val($this.data('default_address'))
+		});
+
+		$view.find('#edit_event_delayed_publication').off('change').on('change', function(){
+			$view.find('.DelayedPublication').toggleStatus('disabled');
+		});
+
+		$view.find('#edit_event_registration_required').off('change').on('change', function(){
+			$view.find('.RegistrationTill').toggleStatus('disabled');
+		});
+
+		$view.find('#edit_event_free').off('change').on('change', function(){
+			$view.find('.MinPrice').toggleStatus('disabled');
+		});
+
+		socket.on('image.getFromURLDone', function(result){
+			var url = window.current_load_button.data('url');
+			handleImgUpload(window.current_load_button, result.data, url.split('/').reverse()[0]);
+		});
+
+		$view.find('.LoadImg').off('change').on('change', function(e){
+			var $this = $(e.target),
+				files = e.target.files;
+
+			if (files.length == 0) return false;
+			for(var i = 0, f; f = files[i]; i++) {
+				var reader = new FileReader();
+				if (!f.type.match('image.*'))	continue;
+				reader.onload = (function(the_file) {
+					return function(e) {
+						handleImgUpload($this, e.target.result, the_file.name);
+					};
+				})(f);
+				reader.readAsDataURL(f);
+			}
+
+		});
+
+		$view.find('#edit_event_submit').off('click').on('click', function(){
+
+			function formValidation($form, for_edit){
+				var is_valid = true;
+
+				$form.find(':required').not(':disabled').each(function(){
+					var $this = $(this);
+					if($this.val() === ""){
+						if(is_valid){
+							var scroll_top = Math.ceil($this.offset().top - 150);
+							$('body').stop().animate({scrollTop: scroll_top}, 1000, 'swing');
+						}
+						if(!$this.closest('form_unit').hasClass('-status_error')){
+							$this.toggleStatus('error').off('input.error change.error').one('input.error change.error', function(){
+								$this.toggleStatus('error');
+							})
+						}
+						is_valid = false;
+					}
+				});
+
+				if(!for_edit){
+					$form.find('.DataUrl').each(function(){
+						var $this = $(this);
+						if($this.val() === ""){
+							if(is_valid){
+								var scroll_top = Math.ceil($this.closest('.EditEventImgLoadWrap').offset().top - 150);
+								$('body').stop().animate({scrollTop: scroll_top}, 1000, 'swing', function(){
+									showNotifier({text: 'Пожалуйста, добавьте к мероприятию обложку', status: false})
+								});
+							}
+							is_valid = false;
+						}
+					});
+				}
+				return is_valid;
+			}
+
+			var $form = $view.find("#edit-event-form"),
+				data = $form.serializeForm(),
+				tags = data.tags.split(','),
+				url = 'api/v1/events/'+data.event_id,
+				method = data.event_id ? 'PUT' : 'POST',
+				valid_form = formValidation($form, !!(data.event_id));
+
+			if(valid_form){
+
+				data.tags = (tags.length === 1 && tags[0] === "") ? [] : tags;
+				data.filenames = {
+					vertical: data.filename_vertical,
+					horizontal: data.filename_horizontal
+				};
+				if(data.registration_required){
+					data.registration_till = ""+data.registration_till_date+'T'+data.registration_till_time_hours+':'+data.registration_till_time_minutes+':00'
+				}
+				if(data.delayed_publication){
+					data.public_at = ""+data.public_at_date+'T'+data.public_at_time_hours+':'+data.public_at_time_minutes+':00'
+				}
+
+				data.dates = [];
+				if(data.different_time){
+					var	selected_days_rows = $('.SelectedDaysRows').children();
+
+					selected_days_rows.each(function(){
+						var $this = $(this);
+						data.dates.push({
+							event_date: $this.find('.DatePicker').data('selected_day'),
+							start_time: $this.find('.StartHours').val() + ':' + $this.find('.StartMinutes').val(),
+							end_time: $this.find('.EndHours').val() + ':' + $this.find('.EndMinutes').val()
+						});
+					});
+				} else {
+					var	MainCalendar = $('.EventDatesCalendar').data('calendar'),
+						$main_time = $('.MainTime'),
+						start_time = $main_time.find('.StartHours').val() + ':' + $main_time.find('.StartMinutes').val(),
+						end_time = $main_time.find('.EndHours').val() + ':' + $main_time.find('.EndMinutes').val();
+
+					MainCalendar.selected_days.forEach(function(day){
+						data.dates.push({
+							event_date: day,
+							start_time: start_time,
+							end_time: end_time
+						})
+					});
+				}
+/*
+				$.ajax({
+					url: url,
+					data: JSON.stringify(data),
+					method: method,
+					success: function(res){
+						if(res.status){
+							if(res.data.event_id){
+								$view.find('#edit_event_event_id').val(res.data.event_id);
+								$('body').stop().animate({scrollTop:0}, 1000, 'swing', function() {
+									showNotification('Мероприятие успешно добавлено', 3000);
+								});
+							} else {
+								$('body').stop().animate({scrollTop:0}, 1000, 'swing', function() {
+									showNotification('Мероприятие успешно обновлено', 3000);
+								});
+							}
+						} else {
+							showNotifier({text: res.text, status: false})
+						}
+					}
+				});*/
+				console.log(data);
+			}
+
+		});
+
+
+		/*
+		 $('#default-address-btn').on('click', function(){
+		 $address_input.val($organizations.find('option:selected').data('default-address'));
+		 });*/
 	}
 
-	function handleImgUpload($context, source, filename){
-		var $parent = $context.closest('.EditEventImgLoadWrap'),
-			$preview = $parent.find('.EditEventImgPreview'),
-			$crop_again_button = $parent.find('.CropAgain'),
-			$file_name_text = $parent.find('.FileNameText'),
-			$file_name = $parent.find('.FileName'),
-			$data_url = $parent.find('.DataUrl');
 
-		$preview.data('source_img', source).attr('src', source);
-		$data_url.val(source);
-		$file_name_text.html('Загружен файл:<br>'+filename);
-		$file_name.val(filename);
-		initCrop(source, $preview, {
-			'aspectRatio': eval($preview.data('aspect_ratio'))
+	function selectDates($view, dates_raw){
+		var	MainCalendar = $view.find('.EventDatesCalendar').data('calendar'),
+			dates = [];
+		dates_raw.forEach(function(date){
+			dates.push(moment(date).format('YYYY-MM-DD'));
 		});
-		$preview.on('crop-done', function(){
-			var $this = $(this),
-				$crop_data = $this.data('crop_data');
+		MainCalendar.selectDays(dates);
+	}
 
-			$data_url.val($preview.attr('src'));
-			$crop_again_button.removeClass('-hidden').off('click').on('click', function(){
-				initCrop($preview.data('source_img'), $preview, {
-					'data': $crop_data,
+	function selectTags($view, tags){
+		var	selected_tags = [];
+		tags.forEach(function(tag){
+			selected_tags.push({
+				id: tag.id,
+				text: tag.name
+			});
+		});
+
+		$view.find('#event_tags')
+			.select2('destroy')
+			.select2({
+				tags: true,
+				width: '100%',
+				placeholder: "Выберите до 5 тегов",
+				maximumSelectionLength: 5,
+				maximumSelectionSize: 5,
+				tokenSeparators: [',', ';'],
+				multiple: true,
+				createSearchChoice: function(term, data) {
+					if ($(data).filter(function() {
+							return this.text.localeCompare(term) === 0;
+						}).length === 0) {
+						return {
+							id: term,
+							text: term
+						};
+					}
+				},
+				ajax: {
+					url: '/api/v1/tags/',
+					dataType: 'JSON',
+					data: function (term, page) {
+						return {
+							q: term // search term
+						};
+					},
+					results: function(data) {
+						var _data = [];
+						data.data.forEach(function(value){
+							value.text = value.name;
+							_data.push(value);
+						});
+						return {
+							results: _data
+						}
+					}
+				},
+				containerCssClass: "form_select2",
+				dropdownCssClass: "form_select2_drop"
+			})
+			.select2('data', selected_tags);
+	}
+
+	function initRecrop($view){
+
+		var $crop_again_buttons = $view.find('.CropAgain');
+
+		$crop_again_buttons.each(function(){
+			var $button = $(this),
+				$parent = $button.closest('.EditEventImgLoadWrap'),
+				$preview = $parent.find('.EditEventImgPreview'),
+				$data_url = $parent.find('.DataUrl');
+
+			$button.removeClass('-hidden').off('click').on('click', function(){
+				initCrop($preview.attr('src'), $preview, {
 					'aspectRatio': eval($preview.data('aspect_ratio'))
 				});
 			});
 
-		})
+
+			$preview.off('crop-done').on('crop-done', function(){
+				var $this = $(this),
+					$crop_data = $this.data('crop_data');
+
+				$data_url.val($preview.attr('src'));
+				$button.removeClass('-hidden').off('click').on('click', function(){
+					initCrop($preview.data('source_img'), $preview, {
+						'data': $crop_data,
+						'aspectRatio': eval($preview.data('aspect_ratio'))
+					});
+				});
+
+			})
+		});
+
 	}
 
-	$.ajax({
-		url: 'api/v1/organizations',
-		method: 'GET',
-		data: {
-			privileges: 'can_add',
-			fields: 'default_address'
-		},
-		success: function(res){
-			var $wrapper = $('.EditEventOrganizations'),
-				organizations_options = $(),
-				$default_address_button = $view.find('.EditEventDefaultAddress');
+	if(typeof event_id === 'undefined'){
+		$view.find('.page_wrapper').html(tmpl('edit-event-page', {
+			event_id: event_id,
+			current_date: moment().format(__C.DATE_FORMAT)
+		}));
+		initEditEventPage($view);
+	} else {
 
-			res.data.forEach(function(organization){
-				organizations_options = organizations_options.add(tmpl('organization-option', organization));
-			});
 
-			$wrapper.find('select').append(organizations_options).select2({
-				containerCssClass: 'form_select2',
-				dropdownCssClass: 'form_select2_drop'
-			}).on('change', function(){
-				$default_address_button.data('default_address', $(this).children(":selected").data('default-address'));
-			});
-			if(organizations_options.length > 1){
-				$wrapper.removeClass('-hidden');
-			} else {
-				$wrapper.addClass('-hidden');
-			}
-			$default_address_button.data('default_address', res.data[0].default_address)
-		}
-	});
-
-	bindDatePickers($view);
-	bindTimeInput($view);
-	bindSelect2($view);
-	bindTabs($view);
-	limitInputSize();
-	bindRippleEffect();
-	bindFileLoadButton();
-	bindLoadByURLButton();
-	initEditEventMainCalendar($view);
-
-	//TODO: perepilit' placepicker
-	$view.find(".Placepicker").placepicker();
-
-	$view.find('.EventTags').select2({
-		tags: true,
-		width: '100%',
-		placeholder: "Выберите до 5 тегов",
-		maximumSelectionLength: 5,
-		maximumSelectionSize: 5,
-		tokenSeparators: [',', ';'],
-		multiple: true,
-		createSearchChoice: function(term, data) {
-			if ($(data).filter(function() {
-					return this.text.localeCompare(term) === 0;
-				}).length === 0) {
-				return {
-					id: term,
-					text: term
-				};
-			}
-		},
-		ajax: {
-			url: '/api/v1/tags/',
-			dataType: 'JSON',
-			data: function (term, page) {
-				return {
-					q: term // search term
-				};
+		var url = 'api/v1/events/'+event_id;
+		$.ajax({
+			url: url,
+			method: 'GET',
+			data: {
+				fields: 'location,description,tags,dates,detail_info_url,min_price'
 			},
-			results: function(data) {
-				var _data = [];
-				data.data.forEach(function(value){
-					value.text = value.name;
-					_data.push(value);
-				});
-				return {
-					results: _data
-				}
-			}
-		},
-		containerCssClass: "form_select2",
-		dropdownCssClass: "form_select2_drop"
-	});
-
-	$view.find('.EditEventDefaultAddress').on('click', function(){
-		var $this = $(this);
-		$this.closest('.form_group').find('input').val($this.data('default_address'))
-	});
-
-	$view.find('#edit_event_delayed_publication').on('change', function(){
-		$view.find('.DelayedPublication').toggleStatus('disabled');
-	});
-
-	$view.find('#edit_event_registration_required').on('change', function(){
-		$view.find('.RegistrationTill').toggleStatus('disabled');
-	});
-
-	$view.find('#edit_event_free').on('change', function(){
-		$view.find('.MinPrice').toggleStatus('disabled');
-	});
-
-	socket.on('image.getFromURLDone', function(result){
-		var url = window.current_load_button.data('url');
-		handleImgUpload(window.current_load_button, result.data, url.split('/').reverse()[0]);
-	});
-
-	$view.find('.LoadImg').on('change', function(e){
-		var $this = $(e.target),
-			files = e.target.files;
-
-		if (files.length == 0) return false;
-		for(var i = 0, f; f = files[i]; i++) {
-			var reader = new FileReader();
-			if (!f.type.match('image.*'))	continue;
-			reader.onload = (function(the_file) {
-				return function(e) {
-					handleImgUpload($this, e.target.result, the_file.name);
-				};
-			})(f);
-			reader.readAsDataURL(f);
-		}
-
-	});
-
-	$view.find('#edit_event_submit').on('click', function(){
-		var $form = $view.find("#create-event-form"),
-			data = $form.serializeForm(),
-			tags = data.tags.split(','),
-			url = 'api/v1/events/'+data.event_id,
-			method = data.event_id ? 'PUT' : 'POST',
-			valid_form = true;
-
-		data.tags = (tags.length === 1 && tags[0] === "") ? [] : tags;
-		data.filenames = {
-			vertical: data.filename_vertical,
-			horizontal: data.filename_horizontal
-		};
-		if(data.registration_required){
-			data.registration_till = ""+data.registration_till_date+'T'+data.registration_till_time_hours+':'+data.registration_till_time_minutes+':00'
-		}
-		if(data.delayed_publication){
-			data.public_at = ""+data.public_at_date+'T'+data.public_at_time_hours+':'+data.public_at_time_minutes+':00'
-		}
-
-		data.dates = [];
-		if(data.different_time){
-			var	selected_days_rows = $('.SelectedDaysRows').children();
-
-			selected_days_rows.each(function(){
-				var $this = $(this);
-				data.dates.push({
-					event_date: $this.find('.DatePicker').data('selected_day'),
-					start_time: $this.find('.StartHours').val() + ':' + $this.find('.StartMinutes').val(),
-					end_time: $this.find('.EndHours').val() + ':' + $this.find('.EndMinutes').val()
-				});
-			});
-		} else {
-			var	MainCalendar = $('.EventDatesCalendar').data('calendar'),
-				$main_time = $('.MainTime'),
-				start_time = $main_time.find('.StartHours').val() + ':' + $main_time.find('.StartMinutes').val(),
-				end_time = $main_time.find('.EndHours').val() + ':' + $main_time.find('.EndMinutes').val();
-
-			MainCalendar.selected_days.forEach(function(day){
-				data.dates.push({
-					event_date: day,
-					start_time: start_time,
-					end_time: end_time
-				})
-			});
-		}
-
-		$form.find(':required').not(':disabled').each(function(){
-			var $this = $(this);
-			if($this.val() === ""){
-				if(valid_form){
-					var scroll_top = Math.ceil($this.offset().top - 150);
-					$('body').stop().animate({scrollTop: scroll_top}, 1000, 'swing');
-				}
-				if(!$this.closest('form_unit').hasClass('-status_error')){
-					$this.toggleStatus('error').off('input.error change.error').one('input.error change.error', function(){
-						$this.toggleStatus('error');
-					})
-				}
-				valid_form = false;
-			}
-		});
-
-		$form.find('.DataUrl').each(function(){
-			var $this = $(this);
-			if($this.val() === ""){
-				if(valid_form){
-					var scroll_top = Math.ceil($this.closest('.EditEventImgLoadWrap').offset().top - 150);
-					$('body').stop().animate({scrollTop: scroll_top}, 1000, 'swing', function(){
-						showNotifier({message: 'Пожалуйста, добавьте к мероприятию обложку', status: false})
-					});
-				}
-				valid_form = false;
-			}
-		});
-
-		if(valid_form){
-			$.ajax({
-				url: url,
-				data: JSON.stringify(data),
-				method: method,
-				success: function(res){
-					if(res.data.event_id){
-						$view.find('#edit_event_event_id').val(res.data.event_id);
-						$('body').stop().animate({scrollTop:0}, 1000, 'swing', function() {
-							showNotification('Мероприятие успешно добавлено', 3000);
-						});
-					} else {
-						$('body').stop().animate({scrollTop:0}, 1000, 'swing', function() {
-							showNotification('Мероприятие успешно обновлено', 3000);
-						});
+			success: function(res){
+				console.log(res);
+				if(res.status){
+					if(Array.isArray(res.data)){
+						res.data = res.data[0];
 					}
+					$.extend(true, res.data, {
+						current_date: moment().format(__C.DATE_FORMAT)
+					});
+					$view.find('.page_wrapper').html(tmpl('edit-event-page', res.data));
+					initEditEventPage($view);
+					selectDates($view, res.data.dates);
+					selectTags($view, res.data.tags);
+
+					initRecrop($view);
+
+				} else {
+					showNotifier({text: res.text, status: false})
 				}
-			});
-		}
-
-	});
-
-
-	/*
-	$('#default-address-btn').on('click', function(){
-		$address_input.val($organizations.find('option:selected').data('default-address'));
-	});*/
+			}
+		});
+	}
 
 }
 
@@ -1341,6 +1496,7 @@ function bindOnClick(){
 			page_name = $this.data('page'),
 			controller_name = $this.data('controller');
 		if ($this.hasClass(__C.CLASSES.DISABLED)) return true;
+		window.current_state_data = $this.data();
 		if (page_name != undefined){
 			History.pushState({page: page_name}, $this.data('title') ? $this.data('title'): $this.text(), page_name);
 		}else{
@@ -1374,6 +1530,7 @@ $(document)
 				return window.location.pathname.replace('/', '');
 			}
 		};
+		window.current_state_data = {};
 
 		//Отрисовака календаря
 		(function(){
@@ -1525,8 +1682,7 @@ $(document)
 			}
 			else if(__STATES.hasOwnProperty(page)) {
 				var $content_block = $('[data-controller="'  + __STATES[page].name + '"]'),
-					$view = $content_block.parents('.screen-view');
-				$view = $view.length == 1 ? $view : $content_block;
+					$view = $content_block.closest('.screen-view');
 				$('.screen-view').not($view).addClass(__C.CLASSES.HIDDEN);
 				$view.removeClass(__C.CLASSES.HIDDEN);
 				__STATES[page]($view, $content_block);

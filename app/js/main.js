@@ -202,11 +202,13 @@ function limitInputSize(){
 		var $this = $(e),
 			$form_unit = $this.closest('.form_unit'),
 			max = $this.data('maxlength'),
-			$prompt;
-		if(!$this.siblings('.form_prompt').length){
+			$prompt = $this.siblings('.form_prompt');
+		if(!$prompt.length){
 			$this.after($('<p>').addClass('form_prompt').text($this.val().length+'/'+max));
+			$prompt = $this.siblings('.form_prompt');
+		} else {
+			$prompt.text($this.val().length+'/'+max);
 		}
-		$prompt = $this.siblings('.form_prompt');
 		$this.on('input', function(){
 			var length = $this.val().length;
 			if(length > max){
