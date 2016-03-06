@@ -110,7 +110,7 @@ class App {
 		self::$__HEADERS = getallheaders();
 
 		self::$__FIELDS = Fields::parseFields(self::$__REQUEST['fields'] ??  '');
-		self::$__ORDER_BY = Fields::parseOrderByFields(self::$__REQUEST['order_by'] ??  '', (bool) (self::$__REQUEST['desc'] ?? false));
+		self::$__ORDER_BY = isset(self::$__REQUEST['order_by']) ? Fields::parseOrderBy(self::$__REQUEST['order_by']) : null;
 
 		self::$__PAGE = (isset($_REQUEST['page'])) ? (int)$_REQUEST['page'] : 0;
 		self::$__LENGTH = (isset($_REQUEST['length'])) ? (int)$_REQUEST['length'] : self::DEFAULT_LENGTH;

@@ -16,34 +16,34 @@ $__modules['organizations'] = array(
 				$__fields)->getParams($__user, $__fields)->getData();
 			return new Result(true, '', array($result));
 		},
-		'' => function () use ($__db, $__request, $__user, $__pagination, $__fields){
+		'' => function () use ($__db, $__request, $__user, $__pagination, $__fields, $__order_by){
 			return OrganizationsCollection::filter(
 				$__db,
 				$__user,
 				$__request,
 				$__fields,
 				$__pagination,
-				array('organization_type_order', 'organization_type_id')
+				$__order_by ?? array('organization_type_order', 'organization_type_id')
 			);
 		},
-		'subscriptions' => function () use ($__db, $__pagination, $__request, $__user, $__fields){
+		'subscriptions' => function () use ($__db, $__pagination, $__request, $__user, $__fields, $__order_by){
 			return OrganizationsCollection::filter(
 				$__db,
 				$__user,
 				array_merge($__request, array('is_subscribed' => true)),
 				$__fields,
 				$__pagination,
-				array('organization_type_order', 'organization_type_id')
+				$__order_by ?? array('organization_type_order', 'organization_type_id')
 			);
 		},
-		'types' => function () use ($__db, $__request, $__request, $__pagination, $__user, $__fields){
+		'types' => function () use ($__db, $__request, $__request, $__pagination, $__user, $__fields, $__order_by){
 			return OrganizationTypesCollection::filter(
 				$__db,
 				$__user,
 				$__request,
 				$__fields,
 				$__pagination,
-				array('order_position', 'id')
+				$__order_by ?? array('order_position', 'id')
 			);
 		}
 	),

@@ -17,10 +17,11 @@ $__modules['events'] = array(
 				$__user,
 				intval($id),
 				$__fields);
-			return new Result(true, '', array($event->getNotifications($__user, $__fields)->getData()));
+
+			return new Result(true, '', array($event->getNotifications(
+				$__user, $__fields)->getData()));
 		},
 		'{{/(id:[0-9]+)}}' => function ($id) use ($__db, $__request, $__user, $__fields) {
-
 			$event = EventsCollection::one(
 				$__db,
 				$__user,
@@ -41,7 +42,7 @@ $__modules['events'] = array(
 					),
 					$__fields,
 					array('length' => $__length, 'offset' => $__offset),
-					array('nearest_event_date', 'first_event_date')
+					$__order_by ?? array('nearest_event_date', 'first_event_date')
 				);
 		},
 		'search' => function() use ($__db, $__request, $__user, $__offset, $__length, $__fields, $__order_by){
@@ -51,7 +52,7 @@ $__modules['events'] = array(
 				$__request,
 				$__fields,
 				array('length' => $__length, 'offset' => $__offset),
-				$__order_by);
+				$__order_by ?? array('nearest_event_date', 'first_event_date'));
 		},
 		'favorites' => function () use ($__db, $__request, $__fields, $__user, $__order_by, $__offset, $__length) { /*MY EVENTS!*/
 			return EventsCollection::filter(
@@ -60,7 +61,7 @@ $__modules['events'] = array(
 				array_merge($__request, array('favorites' => true)),
 				$__fields,
 				array('length' => $__length, 'offset' => $__offset),
-				$__order_by);
+				$__order_by ?? array('nearest_event_date', 'first_event_date'));
 		},
 		'dates' => function () use ($__db, $__request,$__fields, $__user, $__offset, $__length) { /*MY EVENTS!*/
 			if (isset($__request['month'])){
@@ -88,7 +89,7 @@ $__modules['events'] = array(
 				$__request,
 				$__fields,
 				array('length' => $__length, 'offset' => $__offset),
-				array());
+				$__order_by ?? array());
 		},
 		'' => function () use ($__db, $__request, $__user, $__fields, $__offset, $__length) {
 			return EventsCollection::filter(
@@ -97,7 +98,7 @@ $__modules['events'] = array(
 				$__request,
 				$__fields,
 				array('length' => $__length, 'offset' => $__offset),
-				array('nearest_event_date', 'first_event_date'));
+				$__order_by ?? array('nearest_event_date', 'first_event_date'));
 		}
 	),
 	'POST' => array(

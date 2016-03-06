@@ -103,81 +103,6 @@ class Event extends AbstractEntity{
 		$this->db = App::DB();
 	}
 
-//	private static function generateNotificationsArray(array $data, PDO $db, $event_id = null) {
-//		$result = array();
-//
-//		if (!isset($data['notification']) || $data['notification']){
-//			return array();
-//		}
-//
-//		if ($event_id != null){
-//			$p_upd_notifications = $db->prepare('SELECT
-//				events_notifications.done,
-//				events_notifications.notification_type_id,
-//				notification_types.type
-//			FROM events_notifications
-//			LEFT JOIN notification_types ON notification_types.id = events_notifications.notification_type_id
-//			WHERE events_notifications.event_id = :event_id');
-//			$p_upd_notifications->execute(array(':event_id' => $event_id));
-//
-//			$r = $p_upd_notifications->fetchAll();
-//
-//			$done = [];
-//			foreach($r as $notification){
-//				if ($notification['done'] == 1 || $notification['done'] == 'true'){
-//					$done[$notification['type']] = $notification;
-//				}
-//			}
-//
-//			$done_count = count($done);
-//
-//			if ($done_count >= self::ORGANIZATION_NOTIFICATIONS_LIMIT){ // can't change, coz all done
-//				return array();
-//			}
-//
-//			foreach($result as $type => $val){ // switch off all not done
-//				if ($val == false && !isset($done[$type])){ //not done and is true
-//					$current[$type] = $val;
-//				}
-//			}
-//
-//			$switched_on = 0;
-//			foreach($result as $type => $val) { // switch on till reach limit
-//				if ($val == true
-//					&& !isset($done[$type])
-//					&& ($done_count + $switched_on) < self::ORGANIZATION_NOTIFICATIONS_LIMIT) {
-//					$current[$type] = $val;
-//					$switched_on++;
-//				}
-//			}
-//		}
-//		$final['notification-now'] = true; // NOW IS DEFAULT FOR ALL
-//
-//		$times = array();
-//		$_offsets = self::getNotificationOffsets($db);
-//		$offsets = array();
-//
-//		foreach($_offsets as $type){
-//			$offsets[$type['type']] = $type['timediff'];
-//		}
-//
-//
-//		foreach($final as $type => $value){ // set times
-//			if ($value == true && !isset($done[$type])){
-//				if ($type == 'notification-now'){
-//					$times[$type] = time() + $offsets[$type];
-//				}else{
-//					$times[$type] = $data['first_date']->getTimestamp() - $offsets[$type];
-//				}
-//			}
-//		}
-//
-//		return array (
-//			'types' => $final,
-//			'times' => $times
-//		);
-//	}
-
 	private static function sortDates(array $dates){
 		function sortFunc($a, $b){
 			$datea = strtotime($a['event_date']. ' ' . $a['start_time']);
@@ -212,9 +137,12 @@ class Event extends AbstractEntity{
 
 		try{
 			if (isset($data['public_at']) && $data['public_at'] != null){
-				$data['public_at'] =  new DateTime($data['public_at']);
+				$data['public_at'] = new DateTime($data['public_at']);
+				if ($data['public_at'] < new DateTime()){
+
+				}
 			}else{
-				$data['public_at'] =  new DateTime();
+				$data['public_at'] = new DateTime();
 			}
 			$data['notification_at'] = clone $data['public_at'];
 			$data['notification_at']->modify('+10 minutes');
@@ -238,6 +166,8 @@ class Event extends AbstractEntity{
 
 
 		$data['dates'] = self::sortDates($data['dates']);
+		$data['latitude'] = is_numeric($data['latitude']) ? (float) $data['latitude'] : null;
+		$data['longitude'] = is_numeric($data['longitude']) ? (float) $data['longitude'] : null;
 //		$data['first_date'] = self::getFirstDate($data);
 		$data['is_free'] = isset($data['is_free']) && strtolower($data['is_free']) == 'true';
 		$data['min_price'] = $data['is_free'] == true && is_numeric($data['min_price']) ? (int) $data['min_price'] : null;
@@ -268,8 +198,8 @@ class Event extends AbstractEntity{
 					'location_object' => json_encode($data['geo'] ?? ''),
 					'creator_id' => intval($data['creator_id']),
 					'organization_id' => $organization->getId(),
-					'latitude' => is_numeric($data['latitude']) ? (float) $data['latitude'] : null,
-					'longitude' => is_numeric($data['longitude']) ? (float) $data['longitude'] : null,
+					'latitude' => $data['latitude'],
+					'longitude' => $data['longitude'],
 					'image_vertical' => $img_vertical_filename,
 					'image_horizontal' => $img_horizontal_filename,
 					'detail_info_url' => $data['detail_info_url'],
@@ -446,7 +376,7 @@ class Event extends AbstractEntity{
 					'length' => $fields[self::DATES_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 					'offset' => $fields[self::DATES_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
 				),
-				Fields::parseOrderBy($fields[self::DATES_FIELD_NAME]['order_by']))->getData();
+				Fields::parseOrderBy($fields[self::DATES_FIELD_NAME]['order_by'] ?? ''))->getData();
 		}
 
 		if (isset($fields[self::FAVORED_USERS_FIELD_NAME])){
@@ -457,7 +387,7 @@ class Event extends AbstractEntity{
 					'length' => $fields[self::FAVORED_USERS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 					'offset' => $fields[self::FAVORED_USERS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
 				),
-				Fields::parseOrderBy($fields[self::DATES_FIELD_NAME]['order_by'])
+				Fields::parseOrderBy($fields[self::DATES_FIELD_NAME]['order_by'] ?? '')
 			)->getData();
 		}
 
@@ -470,7 +400,7 @@ class Event extends AbstractEntity{
 					'length' => $fields[self::TAGS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 					'offset' => $fields[self::TAGS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
 				),
-				Fields::parseOrderBy($fields[self::DATES_FIELD_NAME]['order_by']))->getData();
+				Fields::parseOrderBy($fields[self::DATES_FIELD_NAME]['order_by']) ?? '')->getData();
 		}
 
 		if (isset($fields[self::NOTIFICATIONS_FIELD_NAME])){
@@ -609,7 +539,7 @@ class Event extends AbstractEntity{
 
 		$q_upd_event_mysql .= ' WHERE events.id = :event_id';
 
-		$p_upd_event = $this->db->prepare($q_upd_event_mysql);
+		$p_upd_event_mysql = $this->db->prepare($q_upd_event_mysql);
 		$p_upd_event = $this->db->prepare($q_upd_event);
 		$result = $p_upd_event->execute($query_data);
 
@@ -647,13 +577,10 @@ class Event extends AbstractEntity{
 		return new Result(true, 'Уведомление успешно добавлено', $result);
 	}
 
-	/**
-	 * @return mixed
-	 */
+
 	public function getTitle() {
 		return $this->title;
 	}
-
 
 
 }

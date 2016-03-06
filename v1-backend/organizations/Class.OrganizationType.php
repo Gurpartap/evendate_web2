@@ -31,8 +31,11 @@ class OrganizationType extends AbstractEntity{
 				$user,
 				array('type_id' => $this->id),
 				Fields::parseFields($fields[self::ORGANIZATIONS_FIELD_NAME]['fields'] ?? ''),
-				$fields[self::ORGANIZATIONS_FIELD_NAME]['pagination'] ?? array(),
-				$fields[self::ORGANIZATIONS_FIELD_NAME]['order_by'] ?? array()
+				array(
+					'length' => $fields[self::ORGANIZATIONS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+					'offset' => $fields[self::ORGANIZATIONS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
+				),
+				Fields::parseOrderBy($fields[self::ORGANIZATIONS_FIELD_NAME]['order_by'] ?? '')
 			)->getData();
 		}
 		return new Result(true, '', $result_data);
