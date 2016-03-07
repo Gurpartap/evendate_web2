@@ -152,6 +152,7 @@ try {
 		))
 		->returning(array('uuid'));
 	$p_ins_log = $__db->prepare($q_ins_log->getStatement());
+	$p_ins_log->execute($q_ins_log->getBindValues());
 	$log_res = $p_ins_log->fetch(PDO::FETCH_ASSOC);
 
 	if ($log_res != FALSE){
