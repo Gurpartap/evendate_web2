@@ -1,6 +1,8 @@
 <?php
 
 require_once $BACKEND_FULL_PATH . '/organizations/Class.Organization.php';
+require_once $BACKEND_FULL_PATH . '/tags/Class.Tag.php';
+require_once $BACKEND_FULL_PATH . '/tags/Class.TagsCollection.php';
 
 class Event extends AbstractEntity{
 
@@ -36,6 +38,8 @@ class Event extends AbstractEntity{
 		'organization_id',
 	);
 
+	protected $title;
+
 	protected static $ADDITIONAL_COLS = array(
 		'description',
 		'location',
@@ -43,6 +47,7 @@ class Event extends AbstractEntity{
 		'creator_id',
 		'latitude',
 		'longitude',
+		'link',
 		'image_vertical_small_url',
 		'image_horizontal_small_url',
 		'image_vertical_medium_url',
@@ -53,11 +58,18 @@ class Event extends AbstractEntity{
 		'organization_type_name',
 		'organization_short_name',
 		'organization_logo_large_url',
-		'organization_logo_middle_url',
+		'organization_logo_medium_url',
 		'organization_logo_small_url',
 		'created_at',
 		'updated_at',
 		'favored_users_count',
+
+		'public_at',
+		'registration_required',
+		'registration_till',
+		'is_free',
+		'min_price',
+
 		self::IS_FAVORITE_FIELD_NAME => '(SELECT id IS NOT NULL
 			FROM favorite_events
 			WHERE favorite_events.status = TRUE
@@ -67,8 +79,6 @@ class Event extends AbstractEntity{
 			FROM view_editors
 			WHERE id = :user_id AND organization_id = view_events.organization_id) IS NOT NULL AS can_edit'
 	);
-
-	protected $title;
 	protected $description;
 	protected $location;
 	protected $location_uri;
@@ -100,85 +110,10 @@ class Event extends AbstractEntity{
 		$this->db = App::DB();
 	}
 
-//	private static function generateNotificationsArray(array $data, PDO $db, $event_id = null) {
-//		$result = array();
-//
-//		if (!isset($data['notification']) || $data['notification']){
-//			return array();
-//		}
-//
-//		if ($event_id != null){
-//			$p_upd_notifications = $db->prepare('SELECT
-//				events_notifications.done,
-//				events_notifications.notification_type_id,
-//				notification_types.type
-//			FROM events_notifications
-//			LEFT JOIN notification_types ON notification_types.id = events_notifications.notification_type_id
-//			WHERE events_notifications.event_id = :event_id');
-//			$p_upd_notifications->execute(array(':event_id' => $event_id));
-//
-//			$r = $p_upd_notifications->fetchAll();
-//
-//			$done = [];
-//			foreach($r as $notification){
-//				if ($notification['done'] == 1 || $notification['done'] == 'true'){
-//					$done[$notification['type']] = $notification;
-//				}
-//			}
-//
-//			$done_count = count($done);
-//
-//			if ($done_count >= self::ORGANIZATION_NOTIFICATIONS_LIMIT){ // can't change, coz all done
-//				return array();
-//			}
-//
-//			foreach($result as $type => $val){ // switch off all not done
-//				if ($val == false && !isset($done[$type])){ //not done and is true
-//					$current[$type] = $val;
-//				}
-//			}
-//
-//			$switched_on = 0;
-//			foreach($result as $type => $val) { // switch on till reach limit
-//				if ($val == true
-//					&& !isset($done[$type])
-//					&& ($done_count + $switched_on) < self::ORGANIZATION_NOTIFICATIONS_LIMIT) {
-//					$current[$type] = $val;
-//					$switched_on++;
-//				}
-//			}
-//		}
-//		$final['notification-now'] = true; // NOW IS DEFAULT FOR ALL
-//
-//		$times = array();
-//		$_offsets = self::getNotificationOffsets($db);
-//		$offsets = array();
-//
-//		foreach($_offsets as $type){
-//			$offsets[$type['type']] = $type['timediff'];
-//		}
-//
-//
-//		foreach($final as $type => $value){ // set times
-//			if ($value == true && !isset($done[$type])){
-//				if ($type == 'notification-now'){
-//					$times[$type] = time() + $offsets[$type];
-//				}else{
-//					$times[$type] = $data['first_date']->getTimestamp() - $offsets[$type];
-//				}
-//			}
-//		}
-//
-//		return array (
-//			'types' => $final,
-//			'times' => $times
-//		);
-//	}
-
 	private static function sortDates(array $dates){
 		function sortFunc($a, $b){
-			$datea = strtotime($a);
-			$dateb = strtotime($b);
+			$datea = strtotime($a['event_date']. ' ' . $a['start_time']);
+			$dateb = strtotime($b['event_date']. ' ' . $b['start_time']);
 			if ($datea == $dateb){
 				return 0;
 			}
@@ -196,27 +131,57 @@ class Event extends AbstractEntity{
 	private static function generateQueryData(&$data, PDO $db){
 		$data['title'] = trim($data['title']);
 		$data['description'] = trim($data['description']);
-		$data['detail_info_url'] = trim($data['detail-info-url']);
+		$data['detail_info_url'] = trim($data['detail_info_url']);
 
 		$data['location'] = isset($data['address']) ? trim($data['address']) : null;
 		$data['latitude'] = isset($data['geo']['coordinates']['G']) ? $data['geo']['coordinates']['G'] : null;
 		$data['longitude'] = isset($data['geo']['coordinates']['K']) ? $data['geo']['coordinates']['K'] : null;
 
+		$data['file_names'] = $data['filenames'] ?? $data['file_names'];
+
 		if (!isset($data['tags'])) throw new LogicException('Укажите хотя бы один тег');
 		if (!is_array($data['tags'])) throw new LogicException('Укажите хотя бы один тег');
 
 		try{
-			$data['public_at'] = isset($data['public-at']) && $data['public-at'] != null ? new DateTime($data['public-at']) : null;
+			if (isset($data['public_at']) && $data['public_at'] != null){
+				$data['public_at'] = new DateTime($data['public_at']);
+				if ($data['public_at'] < new DateTime()){
+
+				}
+			}else{
+				$data['public_at'] = new DateTime();
+			}
+			$data['notification_at'] = clone $data['public_at'];
+			$data['notification_at']->modify('+10 minutes');
+			$data['public_at'] = $data['public_at']->format('Y-m-d H:i:s');
 		}catch(Exception $e){
 			$data['public_at'] = null;
+			$data['notification_at'] = (new DateTime())->modify('+10 minutes');
+		}
+
+		$data['registration_required'] = isset($data['registration_required']) && $data['registration_required'] == 'true' ? 'true' : 'false';
+
+		try{
+			if (isset($data['registration_required']) && $data['registration_required'] != null){
+				$data['registration_till'] = isset($data['registration_till']) ? new DateTime($data['registration_till']) : null;
+			}else{
+				$data['registration_till'] =  null;
+			}
+		}catch(Exception $e){
+			$data['registration_till'] =  null;
 		}
 
 
 		$data['dates'] = self::sortDates($data['dates']);
-		$data['first_date'] = self::getFirstDate($data);
-		$data['is-free'] = isset($data['is-free']) && strtolower($data['is-free']) == 'true';
-		$data['min-price'] = $data['is-free'] == true && is_numeric($data['min-price']) ? $data['min-price'] : null;
+		$data['latitude'] = is_numeric($data['latitude']) ? (float) $data['latitude'] : null;
+		$data['longitude'] = is_numeric($data['longitude']) ? (float) $data['longitude'] : null;
+//		$data['first_date'] = self::getFirstDate($data);
+		$data['is_free'] = isset($data['is_free']) && strtolower($data['is_free']) == 'true';
+		$data['min_price'] = $data['is_free'] == true && is_numeric($data['min_price']) ? (int) $data['min_price'] : null;
 
+
+		/*VK posting data*/
+		$data['vk_post'] = $data['is_free'] == true && is_numeric($data['min_price']) ? (int) $data['min_price'] : null;
 	}
 
 	public static function create(PDO $db, Organization $organization, array $data){
@@ -240,21 +205,21 @@ class Event extends AbstractEntity{
 					'title' => $data['title'],
 					'description' => $data['description'],
 					'location' => $data['location'],
-					'location_object' => json_encode($data['geo']),
-					'creator_id' => $data['creator_id'],
+					'location_object' => json_encode($data['geo'] ?? ''),
+					'creator_id' => intval($data['creator_id']),
 					'organization_id' => $organization->getId(),
 					'latitude' => $data['latitude'],
 					'longitude' => $data['longitude'],
 					'image_vertical' => $img_vertical_filename,
 					'image_horizontal' => $img_horizontal_filename,
-					'detail_info_url' => $data['detail-info-url'],
-					'registration_required' => $data['registration-required'],
-					'registration_till' => $data['registration-till'],
-					'public_at' => $data['public-at'],
-					'is_free' => $data['is-free'],
-					'min_price' => $data['min-price'],
-					'status' => $data['public-at'] instanceof DateTime ? false : true,
-				))->returning('id');
+					'detail_info_url' => $data['detail_info_url'],
+					'registration_required' => $data['registration_required'],
+					'registration_till' => $data['registration_till'],
+					'public_at' => $data['public_at'] instanceof DateTime ? $data['public_at']->format('Y-m-d H:i:s') : 'null',
+					'is_free' => $data['is_free'] == 'true' ? 'true' : 'false',
+					'min_price' => $data['min_price'],
+					'status' => $data['public_at'] instanceof DateTime ? 'false' : 'true',
+				))->returning(array('id'));
 
 			$p_ins_event = $db->prepare($q_ins_event->getStatement());
 
@@ -262,17 +227,18 @@ class Event extends AbstractEntity{
 
 			if ($result === FALSE) throw new DBQueryException('CANT_CREATE_EVENT', $db);
 
-			$event_id = $db->lastInsertId();
+			$result = $p_ins_event->fetch(PDO::FETCH_ASSOC);
+			$event_id = $result['id'];
 
 			self::saveDates($data['dates'], $db, $event_id);
 			self::saveEventTags($db, $event_id, $data['tags']);
 			self::saveNotifications($event_id, $data, $db);
 
-			App::saveImage($data['files']['horizontal'],
+			App::saveImage($data['image_horizontal'],
 				self::IMAGES_PATH . self::IMG_SIZE_TYPE_LARGE . '/' . $img_horizontal_filename,
 				14000);
 
-			App::saveImage($data['files']['vertical'],
+			App::saveImage($data['image_vertical'],
 				self::IMAGES_PATH . self::IMG_SIZE_TYPE_LARGE . '/' . $img_vertical_filename,
 				14000);
 
@@ -290,8 +256,7 @@ class Event extends AbstractEntity{
 		$p_upd->execute(array(':event_id' => $event_id));
 
 		$q_ins_tags = 'INSERT INTO events_tags(event_id, tag_id, status)
-			VALUES(:event_id, :tag_id, TRUE)
-			ON CONFLICT (event_id, tag_id) DO UPDATE SET status = TRUE';
+			VALUES(:event_id, :tag_id, TRUE)';
 		$p_ins_tags = $db->prepare($q_ins_tags);
 
 		$inserted_count = 0;
@@ -321,7 +286,7 @@ class Event extends AbstractEntity{
 		$p_ins_dates = $db->prepare($q_ins_dates);
 		foreach($dates as $date){
 			$p_ins_dates->execute(array(
-				':event_date' => $date,
+				':event_date' => $date['event_date'],
 				':event_id' => $event_id,
 				':start_time' => $date['start_time'],
 				':end_time' => $date['end_time']
@@ -334,23 +299,40 @@ class Event extends AbstractEntity{
 	private static function saveNotifications($event_id, array $data, PDO $db) {
 
 		$notifications = NotificationsCollection::filter($db, App::getCurrentUser(),
-			array('event' => EventsCollection::one($db, App::getCurrentUser(), $event_id)),
-			array('notification_type', 'done'));
+			array('event' => EventsCollection::one($db, App::getCurrentUser(), $event_id, array())),
+			array('notification_type', 'done'))->getData();
 
-		foreach($notifications as $notification){
-			if ($notification->getType() == Notification::NOTIFICATION_TYPE_NOW
-				&& $notification->getNotificationTime() < time()
-				&& $notification->getDone() == false){
 
-				$now = new DateTime();
-				$now->modify('+10 minutes');
-				$notification->setNotificationTime($now);
+		if (count($notifications) > 0){
+			foreach($notifications as $notification){
+				if ($notification['notification_type'] == Notification::NOTIFICATION_TYPE_NOW
+					&& $notification->getNotificationTime() < time()
+					&& $notification->getDone() == false){
+
+					$notification->setNotificationTime($data['notification_at']);
+				}
 			}
+		}else{
+			$q_ins_notification = App::queryFactory()->newInsert();
+
+			$q_ins_notification
+				->into('events_notifications')
+				->cols(array(
+					'event_id' => $event_id,
+					'notification_type_id' => Notification::NOTIFICATION_TYPE_NOW_ID,
+					'notification_time' => $data['notification_at']->format('Y-m-d H:i:s'),
+					'status' => 'true',
+					'done' => 'false'
+				));
+
+			$p_ins_notification = $db->prepare($q_ins_notification->getStatement());
+			$p_ins_notification->execute($q_ins_notification->getBindValues());
 		}
+
 
 	}
 
-	public function getDates(User $user, array $fields, array $pagination, $order_by){
+	public function getDates(User $user = null, array $fields, array $pagination, $order_by){
 		return EventsDatesCollection::filter($this->db,
 			$user,
 			array('event' => $this),
@@ -369,7 +351,7 @@ class Event extends AbstractEntity{
 		return $this->tags;
 	}
 
-	public function getOrganization() {
+	public function getOrganization() : Organization{
 		if ($this->organization instanceof Organization == false){
 			$this->organization = OrganizationsCollection::filter(
 				$this->db,
@@ -393,7 +375,7 @@ class Event extends AbstractEntity{
 		);
 	}
 
-	public function getParams(User $user, array $fields = null) : Result{
+	public function getParams(User $user = null, array $fields = null) : Result{
 
 		$result_data = parent::getParams($user, $fields)->getData();
 
@@ -404,7 +386,7 @@ class Event extends AbstractEntity{
 					'length' => $fields[self::DATES_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 					'offset' => $fields[self::DATES_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
 				),
-				$fields[self::DATES_FIELD_NAME]['order_by'] ?? array())->getData();
+				Fields::parseOrderBy($fields[self::DATES_FIELD_NAME]['order_by'] ?? ''))->getData();
 		}
 
 		if (isset($fields[self::FAVORED_USERS_FIELD_NAME])){
@@ -415,7 +397,7 @@ class Event extends AbstractEntity{
 					'length' => $fields[self::FAVORED_USERS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 					'offset' => $fields[self::FAVORED_USERS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
 				),
-				$fields[self::FAVORED_USERS_FIELD_NAME]['order_by'] ?? array()
+				Fields::parseOrderBy($fields[self::DATES_FIELD_NAME]['order_by'] ?? '')
 			)->getData();
 		}
 
@@ -428,7 +410,7 @@ class Event extends AbstractEntity{
 					'length' => $fields[self::TAGS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 					'offset' => $fields[self::TAGS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
 				),
-				$fields[self::TAGS_FIELD_NAME]['order_by'] ?? array())->getData();
+				Fields::parseOrderBy($fields[self::DATES_FIELD_NAME]['order_by']) ?? '')->getData();
 		}
 
 		if (isset($fields[self::NOTIFICATIONS_FIELD_NAME])){
@@ -470,7 +452,30 @@ class Event extends AbstractEntity{
 	}
 
 	public function update(array $data, Organization $organization, Editor $editor) {
-		$q_upd_event = 'UPDATE events SET
+
+		$q_upd_event = App::queryFactory()->newUpdate();
+
+		$q_upd_event
+			->table('events')
+			->cols(array(
+				'title' => $data['title'],
+				'description' => $data['description'],
+				'location' => $data['location'],
+				'location_object' => json_encode($data['geo'] ?? ''),
+				'creator_id' => intval($data['creator_id']),
+				'organization_id' => $organization->getId(),
+				'latitude' => is_numeric($data['latitude']) ? (float) $data['latitude'] : null,
+				'longitude' => is_numeric($data['longitude']) ? (float) $data['longitude'] : null,
+				'detail_info_url' => $data['detail_info_url'],
+				'registration_required' => $data['registration_required'],
+				'registration_till' => $data['registration_till'],
+				'public_at' => $data['public_at'] instanceof DateTime ? $data['public_at']->format('Y-m-d H:i:s') : 'null',
+				'is_free' => $data['is_free'] == 'true' ? 'true' : 'false',
+				'min_price' => $data['min_price'],
+				'status' => $data['public_at'] instanceof DateTime ? 'false' : 'true',
+			));
+
+		$q_upd_event_mysql = 'UPDATE events SET
 				title = :title,
 				description = :description,
 				location = :location,
@@ -486,8 +491,6 @@ class Event extends AbstractEntity{
 				end_time = :end_time
 				';
 
-
-
 		self::generateQueryData($data, $this->db);
 
 		if (isset($data['file_names'])){
@@ -497,11 +500,13 @@ class Event extends AbstractEntity{
 			);
 		}
 
+
+
 		$query_data = array(
 			':title' => $data['title'],
 			':description' => $data['description'],
 			':location' => $data['location'],
-			':location_object' => json_encode($data['geo']),
+			':location_object' => json_encode($data['geo'] ?? ''),
 			':location_uri' => 'content://maps.google.com/lat=' . $data['latitude'] .'&long='.$data['longitude'],
 			':first_event_date' => $data['date-start'],
 			':last_event_date' => $data['date-end'],
@@ -522,8 +527,11 @@ class Event extends AbstractEntity{
 		{
 			$img_horizontal_filename = md5(App::generateRandomString() . '-horizontal') .  '.' . $data['image_extensions']['horizontal'];
 			$query_data[':image_horizontal'] = $img_horizontal_filename;
-			$q_upd_event .= ' image_horizontal = :image_horizontal,';
-			self::saveEventImage($data['files']['horizontal'], $img_horizontal_filename);
+			$q_upd_event_mysql .= ' image_horizontal = :image_horizontal,';
+			App::saveImage($data['files']['horizontal'], $img_horizontal_filename, 16000);
+			$q_upd_event->cols(array(
+				'image_horizontal' => $img_horizontal_filename
+			));
 		}
 
 		if (isset($data['image_extensions'])
@@ -532,12 +540,16 @@ class Event extends AbstractEntity{
 		{
 			$img_vertical_filename = md5(App::generateRandomString() . '-vertical') .  '.' . $data['image_extensions']['vertical'];
 			$query_data[':image_vertical'] = $img_vertical_filename;
-			$q_upd_event .= ' image_vertical = :image_vertical,';
-			self::saveEventImage($data['files']['vertical'], $img_vertical_filename);
+			$q_upd_event_mysql .= ' image_vertical = :image_vertical,';
+			App::saveImage($data['files']['vertical'], $img_vertical_filename, 16000);
+			$q_upd_event->cols(array(
+				'image_vertical' => $img_vertical_filename
+			));
 		}
 
-		$q_upd_event .= ' status = 1 WHERE events.id = :event_id';
+		$q_upd_event_mysql .= ' WHERE events.id = :event_id';
 
+		$p_upd_event_mysql = $this->db->prepare($q_upd_event_mysql);
 		$p_upd_event = $this->db->prepare($q_upd_event);
 		$result = $p_upd_event->execute($query_data);
 
@@ -574,4 +586,11 @@ class Event extends AbstractEntity{
 		$result = $p_ins->fetch(PDO::FETCH_ASSOC);
 		return new Result(true, 'Уведомление успешно добавлено', $result);
 	}
+
+
+	public function getTitle() {
+		return $this->title;
+	}
+
+
 }

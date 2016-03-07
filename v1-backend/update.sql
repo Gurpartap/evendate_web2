@@ -1,6 +1,8 @@
 ALTER TABLE public.users ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE public.tokens ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE public.subscriptions ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE public.events_notifications ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE public.notifications ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE public.users ADD gender BOOLEAN DEFAULT NULL  NULL;
 ALTER TABLE public.users ALTER COLUMN gender TYPE VARCHAR(50) USING gender :: VARCHAR(50);
 ALTER TABLE public.users ALTER COLUMN gender SET DEFAULT NULL;
@@ -73,6 +75,18 @@ SET new_status = (CASE status
                   END);
 ALTER TABLE public.favorite_events DROP status;
 ALTER TABLE public.favorite_events RENAME COLUMN new_status TO status;
+
+/*Notifications received*/
+ALTER TABLE public.notifications ADD new_received BOOLEAN DEFAULT FALSE NOT NULL;
+UPDATE public.notifications
+SET new_received = (CASE received
+                    WHEN 1
+                      THEN TRUE
+                    WHEN 0
+                      THEN FALSE
+                    END);
+ALTER TABLE public.notifications DROP received;
+ALTER TABLE public.notifications RENAME COLUMN new_received TO received;
 
 /*Event_Tags*/
 ALTER TABLE public.events_tags ADD new_status BOOLEAN DEFAULT TRUE NOT NULL;
@@ -154,7 +168,7 @@ CREATE VIEW view_organizations AS
   SELECT DISTINCT
     organizations.id :: INT,
     organizations.description,
-    organizations.id :: INT                 AS oid,
+    organizations.id :: INT                                                AS oid,
     organizations.images_domain || organizations.background_medium_img_url AS background_medium_img_url,
     organizations.images_domain || organizations.background_small_img_url  AS background_small_img_url,
     organizations.images_domain || organizations.img_medium_url            AS img_medium_url,
@@ -164,18 +178,18 @@ CREATE VIEW view_organizations AS
     organizations.type_id :: INT,
     organizations.images_domain || organizations.img_url                   AS img_url,
     organizations.images_domain || organizations.background_img_url        AS background_img_url,
-    TRUE                                    AS status,
+    TRUE                                                                   AS status,
     organizations.short_name,
-    organization_types.name                 AS type_name,
+    organization_types.name                                                AS type_name,
     organizations.default_address,
-    organization_types."order" :: INT       AS organization_type_order,
-    organization_types."id" :: INT          AS organization_type_id,
+    organization_types."order" :: INT                                      AS organization_type_order,
+    organization_types."id" :: INT                                         AS organization_type_id,
     DATE_PART(
         'epoch',
-        organizations.updated_at) :: INT    AS updated_at,
+        organizations.updated_at) :: INT                                   AS updated_at,
     DATE_PART(
         'epoch',
-        organizations.created_at) :: INT    AS created_at,
+        organizations.created_at) :: INT                                   AS created_at,
     (
       SELECT COUNT(
                  id) :: INT AS subscribed_count
@@ -189,7 +203,7 @@ CREATE VIEW view_organizations AS
         subscriptions.organization_id
         =
         organizations.id
-    )                                       AS subscribed_count
+    )                                                                      AS subscribed_count
   FROM organizations
     INNER JOIN organization_types ON organization_types.id = organizations.type_id AND organizations.status = TRUE
   WHERE organizations.status = TRUE;
@@ -284,6 +298,7 @@ CREATE VIEW view_friends AS SELECT
                                     view_vk_friends.friend_id  AS friend_id
                                   FROM view_vk_friends;
 
+DROP VIEW view_events CASCADE;
 
 CREATE VIEW view_events AS
   SELECT DISTINCT
@@ -297,25 +312,31 @@ CREATE VIEW view_events AS
     events.latitude :: REAL,
     events.longitude :: REAL,
     events.location,
+    events.min_price,
+    events.public_at,
+    events.registration_required,
+    events.registration_till,
+    events.is_free,
     events.organization_id :: INT,
+    'http://evendate.ru/event.php?id=' || events.id                           AS link,
     TRUE                                                                      AS status,
-    events.images_domain || 'event_images/large/' || events.image_vertical AS image_vertical_url,
+    events.images_domain || 'event_images/large/' || events.image_vertical    AS image_vertical_url,
     events.images_domain || 'event_images/large/' || events.image_horizontal  AS image_horizontal_url,
 
-    events.images_domain || 'event_images/large/' || events.image_vertical AS image_vertical_large_url,
+    events.images_domain || 'event_images/large/' || events.image_vertical    AS image_vertical_large_url,
     events.images_domain || 'event_images/large/' || events.image_horizontal  AS image_horizontal_large_url,
 
-    events.images_domain || 'event_images/medium/' || events.image_vertical AS image_horizontal_medium_url,
-    events.images_domain || 'event_images/medium/' || events.image_horizontal  AS image_vertical_medium_url,
+    events.images_domain || 'event_images/medium/' || events.image_vertical   AS image_horizontal_medium_url,
+    events.images_domain || 'event_images/medium/' || events.image_horizontal AS image_vertical_medium_url,
 
-    events.images_domain || 'event_images/small/' || events.image_vertical AS image_vertical_small_url,
+    events.images_domain || 'event_images/small/' || events.image_vertical    AS image_vertical_small_url,
     events.images_domain || 'event_images/small/' || events.image_horizontal  AS image_horizontal_small_url,
-    view_organizations.img_medium_url AS organization_logo_medium_url,
-    view_organizations.img_url AS organization_logo_large_url,
-    view_organizations.img_small_url  AS organization_logo_small_url,
-    view_organizations.name                                                        AS organization_name,
+    view_organizations.img_medium_url                                         AS organization_logo_medium_url,
+    view_organizations.img_url                                                AS organization_logo_large_url,
+    view_organizations.img_small_url                                          AS organization_logo_small_url,
+    view_organizations.name                                                   AS organization_name,
     organization_types.name                                                   AS organization_type_name,
-    view_organizations.short_name                                                  AS organization_short_name,
+    view_organizations.short_name                                             AS organization_short_name,
     (SELECT DATE_PART('epoch', MIN(events_dates.event_date)) :: INT
      FROM events_dates
      WHERE event_id = events.id AND events_dates.event_date > NOW() AND events_dates.status =
@@ -444,7 +465,7 @@ CREATE VIEW view_actions AS SELECT
                               stat_event_types.entity,
                               stat_event_types.type_code,
                               tokens.user_id,
-                              NULL                                              AS organization_id,
+                              NULL                                                   AS organization_id,
                               DATE_PART('epoch', MAX(stat_events.created_at)) :: INT AS created_at
                             FROM stat_events
                               INNER JOIN stat_event_types ON stat_event_types.id = stat_events.stat_type_id
@@ -453,20 +474,21 @@ CREATE VIEW view_actions AS SELECT
                             WHERE
                               view_events.status = TRUE
                               AND (stat_event_types.type_code = 'fave'
-                              OR stat_event_types.type_code = 'unfave')
-                            GROUP BY stat_events.event_id, tokens.user_id, stat_events.stat_type_id, stat_event_types.name,
+                                   OR stat_event_types.type_code = 'unfave')
+                            GROUP BY stat_events.event_id, tokens.user_id, stat_events.stat_type_id,
+                              stat_event_types.name,
                               stat_event_types.entity,
                               stat_event_types.type_code
                             UNION
 
                             SELECT
                               stat_organizations.stat_type_id,
-                              NULL                                                     AS event_id,
+                              NULL                                                          AS event_id,
                               stat_event_types.name,
                               stat_event_types.entity,
                               stat_event_types.type_code,
                               tokens.user_id,
-                              stat_organizations.organization_id                       AS organization_id,
+                              stat_organizations.organization_id                            AS organization_id,
                               DATE_PART('epoch', MAX(stat_organizations.created_at)) :: INT AS created_at
                             FROM stat_organizations
                               INNER JOIN stat_event_types ON stat_event_types.id = stat_organizations.stat_type_id
@@ -474,19 +496,20 @@ CREATE VIEW view_actions AS SELECT
                               INNER JOIN view_organizations
                                 ON view_organizations.id = stat_organizations.organization_id
                             WHERE (stat_event_types.type_code = 'subscribe'
-                                       OR stat_event_types.type_code = 'unsubscribe')
-                            GROUP BY stat_organizations.organization_id, tokens.user_id, stat_organizations.stat_type_id, stat_event_types.name,
+                                   OR stat_event_types.type_code = 'unsubscribe')
+                            GROUP BY stat_organizations.organization_id, tokens.user_id,
+                              stat_organizations.stat_type_id, stat_event_types.name,
                               stat_event_types.entity,
                               stat_event_types.type_code;
 
 
-
 CREATE VIEW view_organization_types AS
-  SELECT DISTINCT organization_types.id:: INT,
+  SELECT DISTINCT
+    organization_types.id :: INT,
     organization_types.name,
-     DATE_PART('epoch', organization_types.created_at):: INT AS created_at,
-     DATE_PART('epoch', organization_types.updated_at):: INT AS updated_at,
-    organization_types."order" :: INT AS order_position
+    DATE_PART('epoch', organization_types.created_at) :: INT AS created_at,
+    DATE_PART('epoch', organization_types.updated_at) :: INT AS updated_at,
+    organization_types."order" :: INT                        AS order_position
   FROM organization_types
     INNER JOIN organizations ON organization_types.id = organizations.type_id
   WHERE organizations.status = TRUE;
@@ -494,7 +517,7 @@ CREATE VIEW view_organization_types AS
 ALTER TABLE subscriptions ADD CONSTRAINT user_id_organization_id UNIQUE (organization_id, user_id);
 
 
-/*uSers_organizations*/
+/*Users_organizations*/
 ALTER TABLE public.users_organizations ADD new_status BOOLEAN DEFAULT TRUE NOT NULL;
 UPDATE public.users_organizations
 SET new_status = (CASE status
@@ -507,37 +530,41 @@ ALTER TABLE public.users_organizations DROP status;
 ALTER TABLE public.users_organizations RENAME COLUMN new_status TO status;
 
 CREATE VIEW view_editors AS
-  SELECT users.*, users_organizations.organization_id, users_organizations.by_default
+  SELECT
+    users.*,
+    users_organizations.organization_id,
+    users_organizations.by_default
   FROM users
-  INNER JOIN users_organizations ON users.id = users_organizations.user_id
+    INNER JOIN users_organizations ON users.id = users_organizations.user_id
   WHERE users_organizations.status = TRUE;
 
 
-CREATE VIEW view_stat_events AS SELECT
-                                  stat_events.*, tokens.user_id,
-  events.organization_id
-                                FROM stat_events
-                                  INNER JOIN tokens ON stat_events.token_id = tokens.id
-  INNER JOIN events ON stat_events.event_id = events.id
-  WHERE events.status = true;
+CREATE VIEW view_stat_events AS
+  SELECT
+    stat_events.*,
+    tokens.user_id,
+    events.organization_id
+  FROM stat_events
+    INNER JOIN tokens ON stat_events.token_id = tokens.id
+    INNER JOIN events ON stat_events.event_id = events.id
+  WHERE events.status = TRUE;
 
 
 ALTER TABLE public.users ADD avatar_url_max TEXT DEFAULT NULL NULL;
 
 
-CREATE TABLE users_roles(
-  id                SERIAL PRIMARY KEY NOT NULL,
-  name VARCHAR(50)          NOT NULL,
-  description TEXT NULL DEFAULT NULL,
-  created_at        TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP,
-  updated_at        TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE users_roles (
+  id          SERIAL PRIMARY KEY NOT NULL,
+  name        VARCHAR(50)        NOT NULL,
+  description TEXT               NULL DEFAULT NULL,
+  created_at  TIMESTAMP               DEFAULT CURRENT_TIMESTAMP,
+  updated_at  TIMESTAMP               DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO users_roles(name, description)
-    VALUES('admin', 'Администратор и владелец организации');
+INSERT INTO users_roles (name, description)
+VALUES ('admin', 'Администратор и владелец организации');
 
 ALTER TABLE public.users_organizations ADD role_id TEXT DEFAULT 1 NOT NULL;
-
 
 ALTER TABLE public.events ADD registration_required BOOLEAN DEFAULT FALSE NOT NULL;
 ALTER TABLE public.events ADD registration_till TIMESTAMP DEFAULT NULL NULL;
@@ -546,12 +573,48 @@ ALTER TABLE public.events ADD is_free BOOLEAN DEFAULT TRUE NOT NULL;
 ALTER TABLE public.events ADD min_price INT DEFAULT NULL NULL;
 
 
-
 ALTER TABLE public.log_requests ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE public.log_requests ADD headers JSON DEFAULT NULL NULL;
 ALTER TABLE public.log_requests ADD body_json JSON DEFAULT NULL NULL;
 ALTER TABLE public.log_requests ADD response_http_status INT DEFAULT 200 NOT NULL;
 ALTER TABLE public.log_requests ADD response_error_name VARCHAR(255) DEFAULT NULL NULL;
-ALTER TABLE public.log_requests ADD   uuid              TEXT UNIQUE        NOT NULL DEFAULT uuid_generate_v4();
+ALTER TABLE public.log_requests ADD uuid TEXT UNIQUE        NOT NULL DEFAULT uuid_generate_v4();
 
 
+DROP VIEW view_user_event_ids;
+CREATE VIEW view_user_event_ids AS
+
+  SELECT DISTINCT * FROM (SELECT
+    events.id as event_id,
+    subscriptions.user_id
+  FROM events
+    INNER JOIN subscriptions ON subscriptions.organization_id = events.organization_id
+    LEFT JOIN hidden_events ON events.id = hidden_events.event_id
+
+  WHERE
+    (subscriptions.status = TRUE)
+    AND
+    (hidden_events.status = FALSE OR hidden_events.event_id IS NULL)
+  UNION
+  (SELECT
+     user_id,
+     event_id
+   FROM favorite_events
+   WHERE favorite_events.status = TRUE
+  )) as q;
+
+CREATE TABLE public.vk_posts
+(
+  id                SERIAL PRIMARY KEY NOT NULL,
+  creator_id           INT                NOT NULL,
+  event_id          INT                NOT NULL,
+  created_at        TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP,
+  updated_at        TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP,
+  notification_time TIMESTAMP          NOT NULL,
+  status            BOOLEAN                     DEFAULT TRUE,
+  done              BOOLEAN                     DEFAULT FALSE,
+  sent_time         TIMESTAMP                   DEFAULT NULL,
+  uuid              TEXT UNIQUE        NOT NULL DEFAULT uuid_generate_v4(),
+  CONSTRAINT users_notifications_events_id_fk FOREIGN KEY (event_id) REFERENCES events (id),
+  CONSTRAINT users_notifications_users_id_fk FOREIGN KEY (creator_id) REFERENCES users (id)
+);

@@ -60,7 +60,7 @@ class Friend extends AbstractEntity{
 		return $subscriptions;
 	}
 
-	public function getParams(User $user, array $fields = null) : Result{
+	public function getParams(User $user = null, array $fields = null) : Result{
 		$result_data = parent::getParams($user, $fields)->getData();
 
 
@@ -72,7 +72,7 @@ class Friend extends AbstractEntity{
 						'length' => $fields[self::SUBSCRIPTIONS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 						'offset' => $fields[self::SUBSCRIPTIONS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET,
 					),
-					$fields[self::SUBSCRIPTIONS_FIELD_NAME]['order_by'] ?? array()
+					Fields::parseOrderBy($fields[self::SUBSCRIPTIONS_FIELD_NAME]['order_by'] ?? '')
 				)->getData();
 		}
 

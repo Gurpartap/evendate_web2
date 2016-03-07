@@ -39,7 +39,7 @@
 		<!-- END panel-->
 		<div class="p-lg text-center">
 			<span>&copy;</span>
-			<span>2015</span>
+			<span>2016</span>
 			<span>-</span>
 			<span>Evendate</span>
 		</div>

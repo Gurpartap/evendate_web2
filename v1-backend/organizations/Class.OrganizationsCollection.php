@@ -81,7 +81,7 @@ class OrganizationsCollection {
 						$fields[] = Organization::IS_SUBSCRIBED_FIELD_NAME;
 					}
 					$select->where('(SELECT
-						id IS NOT NULL = ' . (boolval($value) ? ' TRUE' : 'FALSE' ) . '
+						id IS NOT NULL = ' . (strtolower(trim($value))== 'true' ? ' TRUE' : 'FALSE' ) . '
 						FROM subscriptions
 						WHERE organization_id = "view_organizations"."id"
 							AND "subscriptions"."status" = TRUE

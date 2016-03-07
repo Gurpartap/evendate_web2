@@ -3,7 +3,7 @@
 abstract class AbstractCollection{
 
 	public abstract static function filter(PDO $db,
-	                                       User $user,
+	                                       User $user = null,
 	                                       array $filters = null,
 	                                       array $fields = null,
 	                                       array $pagination = null,

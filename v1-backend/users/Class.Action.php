@@ -38,7 +38,7 @@ class Action extends AbstractEntity{
 		Statistics::ENTITY_EVENT, Statistics::ENTITY_ORGANIZATION
 	);
 
-	public function getParams(User $user, array $fields = null) : Result {
+	public function getParams(User $user = null, array $fields = null) : Result {
 		$result_data = parent::getParams($user, $fields)->getData();
 
 		if (isset($fields[self::EVENT_FIELD_NAME]) && $this->entity == self::EVENT_FIELD_NAME){

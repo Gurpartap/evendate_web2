@@ -33,7 +33,7 @@ class App {
 	public static $SCHEMA;
 	public static $DB_DSN;
 	public static $DB_PORT;
-	public static $__ORDER_BY;
+	public static $SETTINGS;
 
 	public static $QUERY_FACTORY;
 
@@ -48,6 +48,7 @@ class App {
 	public static $__PAGE;
 	public static $__LENGTH;
 	public static $__OFFSET;
+	public static $__ORDER_BY;
 
 	private static $__USER;
 	private static $__DB;
@@ -82,6 +83,7 @@ class App {
 		self::$DOMAIN = self::$obj->domain;
 		self::$NODE_DOMAIN = self::$obj->node_domain;
 		self::$SCHEMA = self::$obj->schema;
+		self::$SETTINGS = self::$obj;
 
 		self::$DB_DSN = 'pgsql:host=' . self::$DB_SERVER . ';dbname=' . self::$DB_NAME . ';port=' . self::$DB_PORT;
 	}
@@ -110,7 +112,7 @@ class App {
 		self::$__HEADERS = getallheaders();
 
 		self::$__FIELDS = Fields::parseFields(self::$__REQUEST['fields'] ??  '');
-		self::$__ORDER_BY = Fields::parseOrderByFields(self::$__REQUEST['order_by'] ??  '', (bool) (self::$__REQUEST['desc'] ?? false));
+		self::$__ORDER_BY = isset(self::$__REQUEST['order_by']) ? Fields::parseOrderBy(self::$__REQUEST['order_by']) : null;
 
 		self::$__PAGE = (isset($_REQUEST['page'])) ? (int)$_REQUEST['page'] : 0;
 		self::$__LENGTH = (isset($_REQUEST['length'])) ? (int)$_REQUEST['length'] : self::DEFAULT_LENGTH;

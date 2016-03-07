@@ -5,7 +5,7 @@ require_once 'Class.Event.php';
 class EventsCollection extends AbstractCollection{
 
 	public static function filter(PDO $db,
-	                              User $user,
+	                              User $user = null,
 	                              array $filters = null,
 	                              array $fields = null,
 	                              array $pagination = null,
@@ -27,7 +27,6 @@ class EventsCollection extends AbstractCollection{
 
 		$_fields = Fields::mergeFields(Event::getAdditionalCols(), $fields, Event::getDefaultCols());
 
-		$q_get_events->cols($_fields);
 
 		$statement_array = array();
 		if (isset($fields[Event::IS_FAVORITE_FIELD_NAME]) || isset($fields[Event::CAN_EDIT_FIELD_NAME])){
@@ -84,6 +83,11 @@ class EventsCollection extends AbstractCollection{
 					break;
 				}
 				case 'id': {
+					foreach(Event::getAdditionalCols() as $key => $val) {
+						if (is_numeric($key)) {
+							$_fields[] = $val;
+						}
+					}
 					$q_get_events->where('id = :event_id');
 					$statement_array[':event_id'] = $value;
 					$is_one_event = true;
@@ -142,25 +146,25 @@ class EventsCollection extends AbstractCollection{
 					break;
 				}
 				case 'title':{
-					$value = trim($value);
+					$value = strtolower(trim($value));
 					if (empty($value)) break;
-					if (isset($filters['strict']) && boolval($filters['strict']) == true){
+					if (isset($filters['strict']) && $filters['strict'] == 'true'){
 						$q_get_events->where('LOWER(title) = LOWER(:title)');
 						$statement_array[':title'] = $value;
 					}else{
 						$q_get_events->where('LOWER(title) LIKE LOWER(:title)');
-						$statement_array[':title'] = '%'. $value . '%';
+						$statement_array[':title'] = $value . '%';
 					}
 					break;
 				}
 				case 'description':{
-					$value = trim($value);
-					if (isset($filters['strict']) && boolval($filters['strict']) == true){
+					$value = strtolower(trim($value));
+					if (isset($filters['strict']) && $filters['strict'] == 'true'){
 						$q_get_events->where('LOWER(description) = LOWER(:description)');
 						$statement_array[':description'] = $value;
 					}else{
 						$q_get_events->where('LOWER(description) LIKE LOWER(:description)');
-						$statement_array[':description'] = '%'. $value . '%';
+						$statement_array[':description'] = $value . '%';
 					}
 					break;
 				}
@@ -194,6 +198,9 @@ class EventsCollection extends AbstractCollection{
 			}
 		}
 
+
+
+		$q_get_events->cols($_fields);
 		$q_get_events->orderBy($order_by);
 		$p_get_events = $db->prepare($q_get_events->getStatement());
 		$result = $p_get_events->execute($statement_array);
@@ -210,7 +217,7 @@ class EventsCollection extends AbstractCollection{
 	}
 
 	public static function one(PDO $db,
-	                           User $user,
+	                           User $user = null,
 	                           int $id,
 	                           array $fields = null) : Event{
 

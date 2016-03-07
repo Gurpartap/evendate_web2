@@ -3,7 +3,7 @@
 class UsersCollection extends AbstractCollection{
 
 	public static function filter(PDO $db,
-	                              User $user,
+	                              User $user = null,
 	                              array $filters = null,
 	                              array $fields = null,
 	                              array $pagination = null,
@@ -36,7 +36,11 @@ class UsersCollection extends AbstractCollection{
 
 		$q_get_users->cols($_fields);
 
-		$statement_array = array(':user_id' => $user->getId());
+		if ($user instanceof User){
+			$statement_array = array(':user_id' => $user->getId());
+		}else{
+			$statement_array = array(':user_id' => NULL);
+		}
 		$is_one_user = false;
 
 		foreach($filters as $name => $value){
