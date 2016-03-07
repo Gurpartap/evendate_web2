@@ -33,7 +33,7 @@ class App {
 	public static $SCHEMA;
 	public static $DB_DSN;
 	public static $DB_PORT;
-	public static $__ORDER_BY;
+	public static $SETTINGS;
 
 	public static $QUERY_FACTORY;
 
@@ -48,6 +48,7 @@ class App {
 	public static $__PAGE;
 	public static $__LENGTH;
 	public static $__OFFSET;
+	public static $__ORDER_BY;
 
 	private static $__USER;
 	private static $__DB;
@@ -82,6 +83,7 @@ class App {
 		self::$DOMAIN = self::$obj->domain;
 		self::$NODE_DOMAIN = self::$obj->node_domain;
 		self::$SCHEMA = self::$obj->schema;
+		self::$SETTINGS = self::$obj;
 
 		self::$DB_DSN = 'pgsql:host=' . self::$DB_SERVER . ';dbname=' . self::$DB_NAME . ';port=' . self::$DB_PORT;
 	}
