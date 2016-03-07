@@ -63,6 +63,13 @@ class Event extends AbstractEntity{
 		'created_at',
 		'updated_at',
 		'favored_users_count',
+
+		'public_at',
+		'registration_required',
+		'registration_till',
+		'is_free',
+		'min_price',
+
 		self::IS_FAVORITE_FIELD_NAME => '(SELECT id IS NOT NULL
 			FROM favorite_events
 			WHERE favorite_events.status = TRUE
@@ -172,6 +179,9 @@ class Event extends AbstractEntity{
 		$data['is_free'] = isset($data['is_free']) && strtolower($data['is_free']) == 'true';
 		$data['min_price'] = $data['is_free'] == true && is_numeric($data['min_price']) ? (int) $data['min_price'] : null;
 
+
+		/*VK posting data*/
+		$data['vk_post'] = $data['is_free'] == true && is_numeric($data['min_price']) ? (int) $data['min_price'] : null;
 	}
 
 	public static function create(PDO $db, Organization $organization, array $data){

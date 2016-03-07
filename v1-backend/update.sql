@@ -597,3 +597,19 @@ CREATE VIEW view_user_event_ids AS
    FROM favorite_events
    WHERE favorite_events.status = TRUE
   )) as q;
+
+CREATE TABLE public.vk_posts
+(
+  id                SERIAL PRIMARY KEY NOT NULL,
+  creator_id           INT                NOT NULL,
+  event_id          INT                NOT NULL,
+  created_at        TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP,
+  updated_at        TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP,
+  notification_time TIMESTAMP          NOT NULL,
+  status            BOOLEAN                     DEFAULT TRUE,
+  done              BOOLEAN                     DEFAULT FALSE,
+  sent_time         TIMESTAMP                   DEFAULT NULL,
+  uuid              TEXT UNIQUE        NOT NULL DEFAULT uuid_generate_v4(),
+  CONSTRAINT users_notifications_events_id_fk FOREIGN KEY (event_id) REFERENCES events (id),
+  CONSTRAINT users_notifications_users_id_fk FOREIGN KEY (creator_id) REFERENCES users (id)
+);
