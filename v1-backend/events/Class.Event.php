@@ -215,7 +215,7 @@ class Event extends AbstractEntity{
 					'detail_info_url' => $data['detail_info_url'],
 					'registration_required' => $data['registration_required'],
 					'registration_till' => $data['registration_till'],
-					'public_at' => $data['public_at'] instanceof DateTime ? $data['public_at']->format('Y-m-d H:i:s') : 'null',
+					'public_at' => $data['public_at'] instanceof DateTime ? $data['public_at']->format('Y-m-d H:i:s') : null,
 					'is_free' => $data['is_free'] == 'true' ? 'true' : 'false',
 					'min_price' => $data['min_price'],
 					'status' => $data['public_at'] instanceof DateTime ? 'false' : 'true',
@@ -409,8 +409,8 @@ class Event extends AbstractEntity{
 				array(
 					'length' => $fields[self::TAGS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 					'offset' => $fields[self::TAGS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
-				),
-				Fields::parseOrderBy($fields[self::DATES_FIELD_NAME]['order_by']) ?? '')->getData();
+				)/*,
+				Fields::parseOrderBy($fields[self::DATES_FIELD_NAME]['order_by']) ?? ''*/)->getData();
 		}
 
 		if (isset($fields[self::NOTIFICATIONS_FIELD_NAME])){

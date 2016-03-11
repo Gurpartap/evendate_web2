@@ -15,7 +15,7 @@
 	<div class="page shifted">
 		<form class="form-horizontal" id="edit-event-form">
 
-			<h3>Новое мероприятие</h3>
+			<h3>{header_text}</h3>
 			<input id="edit_event_event_id" type="hidden" name="event_id" value="{id}">
 
 			<div class="EditEventOrganizations -hidden">
@@ -129,7 +129,7 @@
 			<div class="form_group -parts_2_3 RegistrationTill">
 				<div class="form_unit -inline -status_disabled">
 					<label class="form_label">Дата</label>
-					<div class="form_select -v_centering DatePicker" data-min_date="{current_date}"><label>Дата</label><input name="registration_till_date" type="hidden" disabled required></div>
+					<div class="form_select -v_centering DatePicker" data-min_date="{current_date}"><label>{registration_till_data_label}</label><input name="registration_till_date" value="{registration_till_data}" type="hidden" disabled required></div>
 				</div>
 				<div class="form_unit -status_disabled">
 					<div class="form_group -parts_e_2">
@@ -138,11 +138,11 @@
 							<div class="form_unit -status_disabled">
 								<div class="form_group -time_input TimeInput">
 									<div class="form_unit -status_disabled">
-										<input class="form_input" name="registration_till_time_hours" disabled required>
+										<input class="form_input" name="registration_till_time_hours" value="{registration_till_time_hours}" disabled required>
 									</div>
 									<span class="divider">:</span>
 									<div class="form_unit -status_disabled">
-										<input class="form_input" name="registration_till_time_minutes" disabled required>
+										<input class="form_input" name="registration_till_time_minutes" value="{registration_till_time_minutes}" disabled required>
 									</div>
 								</div>
 							</div>
@@ -209,8 +209,8 @@
 					<div class="img_holder">
 						<img class="edit_event_img_preview_hor EditEventImgPreview" data-aspect_ratio="16/9" src="{image_horizontal_url}">
 						<img src="app/img/edit_event/edit_event_img_placeholder_hor.png">
-						<input class="DataUrl" type="hidden" name="image_horizontal">
-						<input class="FileName" type="hidden" name="filename_horizontal">
+						<input class="DataUrl" type="hidden" name="image_horizontal" value="{image_horizontal_base64}">
+						<input class="FileName" type="hidden" name="filename_horizontal" value="{image_horizontal_filename}">
 					</div>
 				</div>
 			</div>
@@ -249,8 +249,8 @@
 					<div class="img_holder">
 						<img class="edit_event_img_preview_vert EditEventImgPreview" data-aspect_ratio="7/10" src="{image_vertical_url}">
 						<img src="app/img/edit_event/edit_event_img_placeholder_vert.png">
-						<input class="DataUrl" type="hidden" name="image_vertical">
-						<input class="FileName" type="hidden" name="filename_vertical">
+						<input class="DataUrl" type="hidden" name="image_vertical" value="{image_vertical_base64}">
+						<input class="FileName" type="hidden" name="filename_vertical" value="{image_vertical_filename}">
 					</div>
 				</div>
 			</div>
@@ -301,7 +301,7 @@
 
 					<div class="form_unit -inline">
 						<label class="form_label">Дата</label>
-						<div class="form_select -v_centering DatePicker" data-min_date="{current_date}"><label>Дата</label><input type="hidden" name="public_at_date" disabled required></div>
+						<div class="form_select -v_centering DatePicker" data-min_date="{current_date}"><label>{public_at_data_label}</label><input type="hidden" name="public_at_date" value="{public_at_data}" disabled required></div>
 					</div>
 
 					<div class="form_unit -inline">
@@ -309,11 +309,11 @@
 						<div class="form_unit">
 							<div class="form_group -time_input TimeInput">
 								<div class="form_unit">
-									<input class="form_input" name="public_at_time_hours" disabled required>
+									<input class="form_input" name="public_at_time_hours" value="{public_at_time_hours}" disabled required>
 								</div>
 								<span class="divider">:</span>
 								<div class="form_unit">
-									<input class="form_input" name="public_at_time_minutes" disabled required>
+									<input class="form_input" name="public_at_time_minutes" value="{public_at_time_minutes}" disabled required>
 								</div>
 							</div>
 						</div>
@@ -626,7 +626,7 @@
         <div class="event-tags">{tags_block}</div>
         <div class="event-buttons">
           <button class="btn btn-pink-empty add-to-favorites {favorite_btn_class}" data-event-id="{id}">{favorite_btn_text}</button>
-          <button class="btn btn-default-empty {can_edit_hidden}" data-page="edit_event" data-event-id="{id}">Редактировать</button>
+          <button class="btn btn-default-empty {can_edit_hidden}" data-page="edit_event" data-event-id="{id}" data-title="Редактировать мероприятие {title}">Редактировать</button>
         </div>
         <button class="event-more btn btn-blue more-info-btn"><span class="fa fa-chevron-up"></span></button>
         <div class="event-description">
