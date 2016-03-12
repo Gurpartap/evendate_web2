@@ -89,7 +89,8 @@ $__modules['events'] = array(
 				$__request,
 				$__fields,
 				array('length' => $__length, 'offset' => $__offset),
-				$__order_by ?? array());
+				$__order_by ?? array()
+			);
 		},
 		'' => function () use ($__db, $__request, $__user, $__fields, $__offset, $__length) {
 			return EventsCollection::filter(

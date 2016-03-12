@@ -49,19 +49,40 @@ class EventsDatesCollection extends AbstractCollection{
 					 break;
 				 }
 				 case 'since': {
-					 if ($value instanceof DateTime){
-						 $q_get_dates
-							 ->where("DATE(event_date) >= :since_date");
-						 $statement_array[':since_date'] = $value->format('Y-m-d');
+					 if ($value instanceof DateTime == false){
+						 $date_parts = explode(' ', $value);
+						 $value = new DateTime($value);
+						 $with_time = count($date_parts) > 1 && Fields::checkIsTime($date_parts[1]);
+					 }else{
+						 $with_time = true;
 					 }
+
+					 if ($with_time){
+						 $column_type = '::TIMESTAMP';
+					 }else{
+						 $column_type = '::DATE';
+					 }
+					 $statement_array[':since_date'] = $value->format($with_time ? 'Y-m-d H:i:s' : 'Y-m-d');
+					 $q_get_dates->where(':since_date' . $column_type . ' <= CONCAT(to_timestamp(event_date)::DATE, \' \', start_time)'.$column_type);
 					 break;
 				 }
 				 case 'till': {
-					 if ($value instanceof DateTime){
-						 $q_get_dates
-							 ->where("DATE(event_date) <= :till_date");
-						 $statement_array[':till_date'] = $value->format('Y-m-d');
+					 if ($value instanceof DateTime == false){
+						 $date_parts = explode(' ', $value);
+						 $value = new DateTime($value);
+						 $with_time = count($date_parts) > 1 && Fields::checkIsTime($date_parts[1]);
+					 }else{
+						 $with_time = true;
 					 }
+
+					 if ($with_time){
+						 $column_type = '::TIMESTAMP';
+					 }else{
+						 $column_type = '::DATE';
+					 }
+					 $statement_array[':till_date'] = $value->format($with_time ? 'Y-m-d H:i:s' : 'Y-m-d');
+					 $q_get_dates->where(':till_date' . $column_type . ' <= CONCAT(to_timestamp(event_date)::DATE, \' \', end_time)'.$column_type);
+					 break;
 					 break;
 				 }
 				 case 'event': {

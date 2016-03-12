@@ -147,11 +147,11 @@ class EventsCollection extends AbstractCollection{
 						$column_type = '::DATE';
 					}
 					$statement_array[':since_date'] = $value->format($with_time ? 'Y-m-d H:i:s' : 'Y-m-d');
-					$q_get_events->where(':since_date' . $column_type . ' > (SELECT CONCAT(event_date, \' \', start_time)'. $column_type . '
+					$q_get_events->where(':since_date' . $column_type . ' <= (SELECT CONCAT(event_date, \' \', start_time)'. $column_type . '
 						FROM events_dates
 						WHERE event_id = view_events.id
 						AND status = TRUE
-						ORDER BY date_with_start_time DESC LIMIT 1 ) ');
+						ORDER BY date_with_start_time LIMIT 1 ) ');
 					break;
 				}
 				case 'till': {
@@ -168,8 +168,8 @@ class EventsCollection extends AbstractCollection{
 					}else{
 						$column_type = '::DATE';
 					}
-					$statement_array[':since_date'] = $value->format($with_time ? 'Y-m-d H:i:s' : 'Y-m-d');
-					$q_get_events->where(':since_date' . $column_type . ' > (SELECT CONCAT(event_date, \' \', end_time)'. $column_type . '
+					$statement_array[':till_date'] = $value->format($with_time ? 'Y-m-d H:i:s' : 'Y-m-d');
+					$q_get_events->where(':till_date' . $column_type . ' >= (SELECT CONCAT(event_date, \' \', end_time)'. $column_type . '
 						FROM events_dates
 						WHERE event_id = view_events.id
 						AND status = TRUE
