@@ -14,6 +14,7 @@ var server = require('http'),
 	ImagesResize = require('./image_resizer.js'),
 	pg = require('pg'),
 	sql = require('sql'),
+	crypto = require('crypto'),
 	__rooms = {};
 
 
@@ -58,7 +59,11 @@ var URLs = {
 			real_config.VK.SECURE_KEY +
 			'&redirect_uri=http://' + real_config.domain + '/vkOauthDone.php?mobile=',
 			'GET_FRIENDS_LIST': 'https://api.vk.com/method/friends.get',
-			'GET_USER_INFO': 'https://api.vk.com/method/users.get'
+			'GET_USER_INFO': 'https://api.vk.com/method/users.get',
+			'GET_GROUPS_LIST': 'https://api.vk.com/method/groups.get',
+			'GET_GROUPS_PART': '/method/groups.get',
+			'POST_TO_WALL': 'http://api.vk.com/method/wall.post',
+			'POST_TO_WALL_PART': '/method/wall.post'
 		},
 		"GOOGLE": {
 			'GET_ACCESS_TOKEN': 'https://www.googleapis.com/oauth2/v1/tokeninfo',
@@ -469,6 +474,32 @@ pg.connect(pg_conn_string, function(err, client, done) {
 		});
 	}
 
+	function getVkGroups(user_data, filter, cb){
+		var request_data = [
+			'access_token=' + user_data.access_token,
+			'extended=1',
+			'fields=can_post,is_admin,admin_level,type',
+			'filter=' + (filter == 'can_post' ? 'admin, editor, moder': '')
+		],
+			sig = crypto.createHash('md5').update(URLs.VK.GET_GROUPS_PART + '?' + request_data.join('&') + user_data.secret).digest("hex"),
+			url = URLs.VK.GET_GROUPS_LIST + '?' + request_data.join('&') + '&sig=' + sig,
+			req_params = {
+				url: url,
+				json: true,
+				headers: {
+					'Accept-Language': 'ru,en-us'
+				}
+			};
+
+
+		request(req_params, function(e, i, res){
+			if (handleError(e)) return;
+			if (cb){
+				cb(res);
+			}
+		});
+	}
+
 	try {
 		new CronJob('*/1 * * * *', function() {
 			logger.info('Resizing start', 'START... ' + new Date().toString());
@@ -693,9 +724,9 @@ pg.connect(pg_conn_string, function(err, client, done) {
 							});
 						};
 
-						q_ins_sign_in = q_ins_sign_in.toQuery();
 
-						client.query(q_ins_sign_in, function(sign_in_err, sign_in_result) {
+						client.query(q_ins_sign_in.returning('id').toQuery(), function(sign_in_err, sign_in_result) {
+							console.log(sign_in_result);
 							if (handleError(sign_in_err)) return;
 
 							var q_ins_friends = '',
@@ -1013,6 +1044,44 @@ pg.connect(pg_conn_string, function(err, client, done) {
 				if (err) logger.error(err);
 			})
 		});
+
+		socket.on('vk.getGroupsToPost', function(user_id){
+			var q_get_user_data = vk_sign_in
+				.select(vk_sign_in.id, vk_sign_in.secret, vk_sign_in.access_token)
+				.from(vk_sign_in)
+				.where(
+					vk_sign_in.user_id.equals(user_id)
+				).toQuery();
+			client.query(q_get_user_data, function(err, result){
+				if (handleError(err)) return;
+				socket.vk_user = result.rows[0];
+				getVkGroups(result.rows[0], 'can_post', function(data){
+					socket.emit('log', data);
+				})
+			})
+		});
+
+		socket.on('vk.postToWall', function(gid){
+			//var q_get_user_data = vk_sign_in
+			//	.select(vk_sign_in.id, vk_sign_in.secret, vk_sign_in.access_token)
+			//	.from(vk_sign_in)
+			//	.where(
+			//		vk_sign_in.user_id.equals(user_id)
+			//	).toQuery();
+			var request_data = [
+				'access_token=' + socket.vk_user.access_token,
+				'owner_id=-' + gid,
+				'from_group=1',
+				'message=can_post,is_admin,admin_level,type',
+			],
+				sig = 'sig=' + crypto
+						.createHash('md5')
+						.update(URLs.VK.POST_TO_WALL_PART + '?' + request_data.join('&') + socket.vk_user.secret).digest("hex");
+			request_data.push(sig)
+			console.log(URLs.VK.POST_TO_WALL + '?' + request_data.join('&'));
+		});
+
+
 	});
 
 	io.listen(8080);

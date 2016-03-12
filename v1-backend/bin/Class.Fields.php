@@ -92,4 +92,10 @@ class Fields{
 		}
 		return $result;
 	}
+
+	public static function checkIsTime($value){
+		$pattern1 = '/^(0?\d|1\d|2[0-3]):[0-5]\d:[0-5]\d$/';
+		$pattern2 = '/^(0?\d|1[0-2]):[0-5]\d\s(am|pm)$/i';
+		return preg_match($pattern1, $value) || preg_match($pattern2, $value);
+	}
 }

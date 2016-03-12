@@ -39,7 +39,21 @@ class EventsCollection extends AbstractCollection{
 			switch($name){
 				case 'date': {
 					if ($value instanceof DateTime == false){
+						$date_parts = explode(' ', $value);
 						$value = new DateTime($value);
+						$with_time = count($date_parts) > 1 && Fields::checkIsTime($date_parts[1]);
+						if ($with_time){
+							$statement_array[':time_part'] = $value->format('H:i:s');
+						}
+					}else{
+						$with_time = true;
+						$statement_array[':time_part'] = $value->format('H:i:s');
+					}
+
+					if ($with_time){
+						$query_part = ' AND :time_part BETWEEN start_time AND end_time)';
+					}else{
+						$query_part = ')';
 					}
 					$q_get_events->where(':date IN
 						(SELECT
@@ -48,10 +62,9 @@ class EventsCollection extends AbstractCollection{
 							WHERE
 							view_events.id = events_dates.event_id
 							AND
-							status = TRUE
-							AND :time_part::TIME BETWEEN start_time AND end_time)');
+							status = TRUE ' . $query_part
+					);
 					$statement_array[':date'] = $value->format('Y-m-d');
-					$statement_array[':time_part'] = $value->format('H:i:s');
 					break;
 				}
 				case 'my': {
@@ -120,29 +133,47 @@ class EventsCollection extends AbstractCollection{
 					break;
 				}
 				case 'since': {
-					if ($value instanceof DateTime){
-						$value = $value->getTimestamp();
-					}elseif($value == null){
-						break;
+					if ($value instanceof DateTime == false){
+						$date_parts = explode(' ', $value);
+						$value = new DateTime($value);
+						$with_time = count($date_parts) > 1 && Fields::checkIsTime($date_parts[1]);
 					}else{
-						$dt = new DateTime($value);
-						$value = $dt->getTimestamp();
+						$with_time = true;
 					}
-					$q_get_events->where('first_event_date >= :since_date');
-					$statement_array[':since_date'] = $value;
+
+					if ($with_time){
+						$column_type = '::TIMESTAMP';
+					}else{
+						$column_type = '::DATE';
+					}
+					$statement_array[':since_date'] = $value->format($with_time ? 'Y-m-d H:i:s' : 'Y-m-d');
+					$q_get_events->where(':since_date' . $column_type . ' > (SELECT CONCAT(event_date, \' \', start_time)'. $column_type . '
+						FROM events_dates
+						WHERE event_id = view_events.id
+						AND status = TRUE
+						ORDER BY date_with_start_time DESC LIMIT 1 ) ');
 					break;
 				}
 				case 'till': {
-					if ($value instanceof DateTime){
-						$value = $value->getTimestamp();
-					}elseif($value == null){
-						break;
+					if ($value instanceof DateTime == false){
+						$date_parts = explode(' ', $value);
+						$value = new DateTime($value);
+						$with_time = count($date_parts) > 1 && Fields::checkIsTime($date_parts[1]);
 					}else{
-						$dt = new DateTime($value);
-						$value = $dt->getTimestamp();
+						$with_time = true;
 					}
-					$q_get_events->where('last_event_date <= :till_date');
-					$statement_array[':till_date'] = $value;
+
+					if ($with_time){
+						$column_type = '::TIMESTAMP';
+					}else{
+						$column_type = '::DATE';
+					}
+					$statement_array[':since_date'] = $value->format($with_time ? 'Y-m-d H:i:s' : 'Y-m-d');
+					$q_get_events->where(':since_date' . $column_type . ' > (SELECT CONCAT(event_date, \' \', end_time)'. $column_type . '
+						FROM events_dates
+						WHERE event_id = view_events.id
+						AND status = TRUE
+						ORDER BY date_with_start_time DESC LIMIT 1 ) ');
 					break;
 				}
 				case 'title':{
