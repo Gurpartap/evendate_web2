@@ -908,7 +908,6 @@ socket.on('auth', function(data){
               }
             }
           }
-
           window.close();
         }
       }else{
