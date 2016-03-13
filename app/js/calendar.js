@@ -375,6 +375,7 @@ function MyTimeline($view, $content_block){
 				url: '/api/events/my?page=' + page_number,
 				success: function(res){
 					printEventsInTimeline($view, res);
+					bindOnClick();
 				}
 			});
 		};
@@ -816,7 +817,7 @@ function OneDay($view, $content_block){
 }
 
 function EditEvent($view, $content_block){
-	var event_id = window.current_state_data.eventId;
+	var event_id = History.getState().data.eventId;
 
 	function initEditEventPage($view){
 
@@ -974,8 +975,8 @@ function EditEvent($view, $content_block){
 			}
 
 			$view.find('#edit_event_different_time').on('change', function(){
-				var $table_wrapper = $view.find('.event_selected_days_wrapper'),
-					$table_content = $view.find('.event_selected_days_content');
+				var $table_wrapper = $view.find('#edit_event_selected_days_wrapper'),
+					$table_content = $table_wrapper.children();
 				if($(this).prop('checked')){
 					buildTable(MainCalendar.selected_days);
 					$table_wrapper.height($table_content.height()).one('transitionend', function(){
@@ -1118,7 +1119,7 @@ function EditEvent($view, $content_block){
 			dropdownCssClass: "form_select2_drop"
 		});
 
-		$view.find('.EditEventDefaultAddress').off('click').on('click', function(){
+		$view.find('.EditEventDefaultAddress').off('click.defaultAddress').on('click.defaultAddress', function(){
 			var $this = $(this);
 			$this.closest('.form_group').find('input').val($this.data('default_address'))
 		});
@@ -1158,7 +1159,25 @@ function EditEvent($view, $content_block){
 
 		});
 
-		$view.find('#edit_event_submit').off('click').on('click', function(){
+		$view.find('#edit_event_to_public_vk').on('change', function(){
+			var $table_wrapper = $view.find('#edit_event_vk_publication'),
+				$table_content = $table_wrapper.children();
+			if($(this).prop('checked')){
+				$table_wrapper.height($table_content.height());
+			} else {
+				$table_wrapper.height(0);
+			}
+			$table_wrapper.toggleStatus('disabled');
+
+			$view.find('.DeleteImg').off('click.DeleteImg').on('click.DeleteImg', function(){
+				$(this).closest('.EditEventImgLoadWrap').find('input').val('').end().find('img').attr('src', '');
+			})
+
+		});
+
+		//$view.find('#edit_event_vk_groups').select2();
+
+		$view.find('#edit_event_submit').off('click.submit').on('click.submit', function(){
 
 			function formValidation($form, for_edit){
 				var is_valid = true;
@@ -1170,11 +1189,7 @@ function EditEvent($view, $content_block){
 							var scroll_top = Math.ceil($this.offset().top - 150);
 							$('body').stop().animate({scrollTop: scroll_top}, 1000, 'swing');
 						}
-						if(!$this.closest('form_unit').hasClass('-status_error')){
-							$this.toggleStatus('error').off('input.error change.error').one('input.error change.error', function(){
-								$this.toggleStatus('error');
-							})
-						}
+						handleErrorField($this);
 						is_valid = false;
 					}
 				});
@@ -1243,10 +1258,10 @@ function EditEvent($view, $content_block){
 						})
 					});
 				}
-/*
 				$.ajax({
 					url: url,
 					data: JSON.stringify(data),
+					contentType: 'application/json',
 					method: method,
 					success: function(res){
 						if(res.status){
@@ -1261,11 +1276,14 @@ function EditEvent($view, $content_block){
 								});
 							}
 						} else {
-							showNotifier({text: res.text, status: false})
+							if(res.text){
+								showNotifier({text: res.text, status: false});
+							} else {
+								showNotifier({text: 'Упс. Что-то пошло не так. Скорее всего у нас ведутся какие-то работы.', status: false});
+							}
 						}
 					}
-				});*/
-				console.log(data);
+				});
 			}
 
 		});
@@ -1278,13 +1296,24 @@ function EditEvent($view, $content_block){
 	}
 
 
-	function selectDates($view, dates_raw){
+	function selectDates($view, raw_dates){
 		var	MainCalendar = $view.find('.EventDatesCalendar').data('calendar'),
+			$table_rows = $view.find('.SelectedDaysRows'),
 			dates = [];
-		dates_raw.forEach(function(date){
-			dates.push(moment(date).format('YYYY-MM-DD'));
+		raw_dates.forEach(function(date){
+			date.event_date = moment.unix(date.event_date).format('YYYY-MM-DD');
+			dates.push(date.event_date);
 		});
 		MainCalendar.selectDays(dates);
+		raw_dates.forEach(function(date){
+			var $day_row = $table_rows.find('.TableDay_'+date.event_date),
+				start_time = date.start_time.split(':'),
+				end_time = date.end_time.split(':');
+			$day_row.find('.StartHours').val(start_time[0]);
+			$day_row.find('.StartMinutes').val(start_time[1]);
+			$day_row.find('.EndHours').val(end_time[0]);
+			$day_row.find('.EndMinutes').val(end_time[1]);
+		});
 	}
 
 	function selectTags($view, tags){
@@ -1375,40 +1404,111 @@ function EditEvent($view, $content_block){
 
 	}
 
+	window.scrollTo(0, 0);
 	if(typeof event_id === 'undefined'){
 		$view.find('.page_wrapper').html(tmpl('edit-event-page', {
 			event_id: event_id,
+			header_text: 'Новое мероприятие',
 			current_date: moment().format(__C.DATE_FORMAT)
 		}));
 		initEditEventPage($view);
 	} else {
-
 
 		var url = 'api/v1/events/'+event_id;
 		$.ajax({
 			url: url,
 			method: 'GET',
 			data: {
-				fields: 'location,description,tags,dates,detail_info_url,min_price'
+				fields: 'location,description,tags,detail_info_url,public_at,registration_required,registration_till,is_free,min_price,dates{length:0,fields:"start_time,end_time"}'
 			},
 			success: function(res){
-				console.log(res);
 				if(res.status){
+					var additional_fields = {
+						public_at_data_label: 'Дата',
+						registration_till_data_label: 'Дата',
+						current_date: moment().format(__C.DATE_FORMAT)
+					};
 					if(Array.isArray(res.data)){
 						res.data = res.data[0];
 					}
-					$.extend(true, res.data, {
-						current_date: moment().format(__C.DATE_FORMAT)
-					});
+					if(res.data.public_at !== null){
+						var m_public_at = moment(res.data.public_at);
+						additional_fields.public_at_data = m_public_at.format('YYYY-MM-DD');
+						additional_fields.public_at_data_label = m_public_at.format('DD.MM.YYYY');
+						additional_fields.public_at_time_hours = m_public_at.format('HH');
+						additional_fields.public_at_time_minutes = m_public_at.format('mm');
+					}
+					if(res.data.registration_required){
+						var m_registration_till = moment(res.data.registration_till);
+						additional_fields.registration_till_data = m_registration_till.format('YYYY-MM-DD');
+						additional_fields.registration_till_data_label = m_registration_till.format('DD.MM.YYYY');
+						additional_fields.registration_till_time_hours = m_registration_till.format('HH');
+						additional_fields.registration_till_time_minutes = m_registration_till.format('mm');
+					}
+					if(res.data.image_vertical_url){
+						additional_fields.image_vertical_filename = res.data.image_vertical_url.split('/').reverse()[0];
+					}
+					if(res.data.image_horizontal_url){
+						additional_fields.image_horizontal_filename = res.data.image_horizontal_url.split('/').reverse()[0];
+					}
+					if(res.data.vk_image_src){
+						additional_fields.vk_image_src = res.data.vk_image_src;
+					} else {
+						additional_fields.vk_image_src = res.data.image_horizontal_url;
+					}
+					additional_fields.header_text = 'Редактирование мероприятия';
+					$.extend(true, res.data, additional_fields);
 					$view.find('.page_wrapper').html(tmpl('edit-event-page', res.data));
+
 					initEditEventPage($view);
+
+					$view.find('#edit_event_different_time').prop('checked', true).trigger('change');
 					selectDates($view, res.data.dates);
 					selectTags($view, res.data.tags);
+					if(res.data.image_vertical_url && res.data.image_horizontal_url){
+						initRecrop($view);
+					}
 
-					initRecrop($view);
+					if(res.data.image_vertical_url){
+						toDataUrl(res.data.image_vertical_url, function(base64_string){
+							$view.find('[name="image_vertical"]').val(base64_string);
+						});
+					}
+					if(res.data.image_horizontal_url){
+						toDataUrl(res.data.image_horizontal_url, function(base64_string){
+							$view.find('[name="image_horizontal"]').val(base64_string);
+						});
+					}
+
+					if(res.data.vk_image_src){
+						toDataUrl(res.data.vk_image_src, function(base64_string){
+							$view.find('[name="vk_image_src"]').val(base64_string);
+						});
+					}
+					else if(res.data.image_horizontal_url){
+						toDataUrl(res.data.image_horizontal_url, function(base64_string){
+							$view.find('[name="vk_image_src"]').val(base64_string);
+						});
+					}
+
+
+					if(!res.data.is_free){
+						$view.find('#edit_event_free').prop('checked', false).trigger('change');
+						$view.find('#edit_event_min_price').val(res.data.min_price);
+					}
+					if(res.data.registration_required){
+						$view.find('#edit_event_registration_required').prop('checked', true).trigger('change');
+					}
+					if(res.data.public_at !== null){
+						$view.find('#edit_event_delayed_publication').prop('checked', true).trigger('change');
+					}
 
 				} else {
-					showNotifier({text: res.text, status: false})
+					if(res.text){
+						showNotifier({text: res.text, status: false});
+					} else {
+						showNotifier({text: 'Упс. Что-то пошло не так. Скорее всего у нас ведутся какие-то работы.', status: false});
+					}
 				}
 			}
 		});
@@ -1491,20 +1591,19 @@ function setDaysWithEvents(){
 }
 
 function bindOnClick(){
-	$('[data-page], a[data-controller]').off('click.pageRender').on('click.pageRender', function(){
+	$('[data-page], a[data-controller]').not('.-Handled_Controller').off('click.pageRender').on('click.pageRender', function(){
 		var $this = $(this),
 			page_name = $this.data('page'),
 			controller_name = $this.data('controller');
 		if ($this.hasClass(__C.CLASSES.DISABLED)) return true;
-		window.current_state_data = $this.data();
 		if (page_name != undefined){
-			History.pushState({page: page_name}, $this.data('title') ? $this.data('title'): $this.text(), page_name);
+			History.pushState($this.data(), $this.data('title') ? $this.data('title'): $this.text(), page_name);
 		}else{
 			if (window[controller_name] != undefined && window[controller_name] instanceof Function){
 				window[controller_name]();
 			}
 		}
-	});
+	}).addClass('-Handled_Controller');
 }
 
 $(document)
@@ -1530,7 +1629,6 @@ $(document)
 				return window.location.pathname.replace('/', '');
 			}
 		};
-		window.current_state_data = {};
 
 		//Отрисовака календаря
 		(function(){

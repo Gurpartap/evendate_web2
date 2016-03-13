@@ -12,9 +12,13 @@ $.fn.extend({
 				if(status === 'disabled'){
 					var $form_elements = $this.find('input, select, textarea');
 					if($this.hasClass('-status_disabled')){
-						$form_elements.each(function(){$(this).removeAttr('disabled');});
+						$form_elements.each(function(){
+							$(this).removeAttr('disabled');
+						});
 					} else {
-						$form_elements.each(function(){$(this).attr('disabled', true);});
+						$form_elements.each(function(){
+							$(this).attr('disabled', true)
+						});
 					}
 				}
 				$this.toggleClass('-status_'+status);
@@ -115,7 +119,7 @@ $.fn.extend({
 							else if(value != "on")
 								output[name] = value;
 							else
-								output[name] = el.checked ? 1 : 0;
+								output[name] = el.checked ? true : false;
 							break;
 						}
 					}
@@ -125,6 +129,32 @@ $.fn.extend({
 		}
 	}
 });
+
+function handleErrorField($unit){
+	if(!$unit instanceof jQuery){
+		handleErrorField($($unit));
+	} else if(!$unit.is('.form_unit')) {
+		handleErrorField($unit.closest('.form_unit'));
+	} else {
+		if(!$unit.closest('form_unit').hasClass('-status_error')){
+			var $input = $unit.find('input, select, textarea');
+			$unit
+				.toggleStatus('error')
+				.off('input.clear_error change.clear_error')
+				.one('input.clear_error change.clear_error', function(){
+					$unit.off('input.clear_error change.clear_error').toggleStatus('error');
+					$input.off('blur.clear_error');
+				});
+			$input
+				.off('blur.clear_error')
+				.one('blur.clear_error', function(){
+					if($(this).val() !== ""){
+						$unit.trigger('input.clear_error');
+					}
+				});
+		}
+	}
+}
 
 function bindDatePickers($parent){
 	$parent.find('.DatePicker').not('.-Handled_DatePicker').each(function(i, elem){
@@ -240,10 +270,25 @@ function initTimeInput(time_field){
 	$hours.inputmask('Regex', {regex: "([01]?[0-9]|2[0-3])"}).on('keyup', function(){
 		if($hours.val() > 2 || $hours.val() == "00"){
 			$minutes.focus();
+			$hours.trigger('blur');
 		}
 	}).on('blur', onBlur);
 	$minutes.inputmask('Regex', {regex: "[0-5][0-9]"}).on('blur', onBlur);
 	$time_field.addClass('-Handled_TimeInput');
+}
+
+function toDataUrl(url, callback){
+	var xhr = new XMLHttpRequest();
+	xhr.responseType = 'blob';
+	xhr.onload = function() {
+		var reader  = new FileReader();
+		reader.onloadend = function () {
+			callback(reader.result);
+		};
+		reader.readAsDataURL(xhr.response);
+	};
+	xhr.open('GET', url);
+	xhr.send();
 }
 
 function showModal(name){
