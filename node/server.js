@@ -162,7 +162,7 @@ var URLs = {
 		]
 	}),
 	events = sql.define({
-		name: 'facebook_sign_in',
+		name: 'events',
 		columns: [
 			'id',
 			'creator_id',
@@ -379,6 +379,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 						events.image_horizontal.in(diff)
 					).toQuery();
 
+
 			client.query(q_get_images, function(err, result) {
 				if (err) {
 					logger.error(err);
@@ -449,7 +450,6 @@ pg.connect(pg_conn_string, function(err, client, done) {
 				logger.error(err);
 				return;
 			}
-
 			result.rows.forEach(function(image) {
 				var img_path = '../' + real_config.images.user_images + '/default/' + image.id + '.jpg',
 					blurred_path = '../' + real_config.images.user_images + '/blurred/' + image.id + '.jpg';
@@ -717,7 +717,6 @@ pg.connect(pg_conn_string, function(err, client, done) {
 							});
 
 							client.query(q_ins_token, function(err, res) {
-								console.log(res);
 								if (err) return handleError(err, 'CANT_INSERT_TOKEN');
 								socket.emit('auth', {
 									email: data.access_data.email,
@@ -730,7 +729,6 @@ pg.connect(pg_conn_string, function(err, client, done) {
 
 
 						client.query(q_ins_sign_in.returning('id').toQuery(), function(sign_in_err, sign_in_result) {
-							console.log(sign_in_result);
 							if (handleError(sign_in_err)) return;
 
 							var q_ins_friends = '',
@@ -1060,7 +1058,6 @@ pg.connect(pg_conn_string, function(err, client, done) {
 				if (handleError(err)) return;
 				socket.vk_user = result.rows[0];
 				getVkGroups(result.rows[0], 'can_post', function(data) {
-					console.log(data);
 					socket.emit('vk.getGroupsToPostDone', data);
 				})
 			})
