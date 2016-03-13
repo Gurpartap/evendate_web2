@@ -341,12 +341,12 @@ function initCrop(source, $endpoint_img, options){
 		$destroy_button.off('click');
 	});
 
-	$crop_button.off('click').one('click', function(){
+	$crop_button.off('click.Crop').one('click.Crop', function(){
 		$endpoint_img.attr('src', $img.cropper('getCroppedCanvas').toDataURL()).data('crop_data', $img.cropper('getData'));
 		$endpoint_img.trigger('crop-done');
 		closeModal();
 	});
-	$destroy_button.off('click').one('click', closeModal);
+	$destroy_button.off('click.DestroyCrop').one('click.DestroyCrop', closeModal);
 }
 
 function showNotification(text, time, status){

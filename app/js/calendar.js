@@ -1007,31 +1007,18 @@ function EditEvent($view, $content_block){
 		function handleImgUpload($context, source, filename){
 			var $parent = $context.closest('.EditEventImgLoadWrap'),
 				$preview = $parent.find('.EditEventImgPreview'),
-				$crop_again_button = $parent.find('.CropAgain'),
 				$file_name_text = $parent.find('.FileNameText'),
 				$file_name = $parent.find('.FileName'),
 				$data_url = $parent.find('.DataUrl');
 
 			$preview.data('source_img', source).attr('src', source);
-			$data_url.val(source);
+			$data_url.val(source).trigger('change');
 			$file_name_text.html('Загружен файл:<br>'+filename);
 			$file_name.val(filename);
 			initCrop(source, $preview, {
 				'aspectRatio': eval($preview.data('aspect_ratio'))
 			});
-			$preview.off('crop-done').on('crop-done', function(){
-				var $this = $(this),
-					$crop_data = $this.data('crop_data');
-
-				$data_url.val($preview.attr('src'));
-				$crop_again_button.removeClass('-hidden').off('click').on('click', function(){
-					initCrop($preview.data('source_img'), $preview, {
-						'data': $crop_data,
-						'aspectRatio': eval($preview.data('aspect_ratio'))
-					});
-				});
-
-			})
+			bindRecrop($parent);
 		}
 
 		$.ajax({
@@ -1124,15 +1111,15 @@ function EditEvent($view, $content_block){
 			$this.closest('.form_group').find('input').val($this.data('default_address'))
 		});
 
-		$view.find('#edit_event_delayed_publication').off('change').on('change', function(){
+		$view.find('#edit_event_delayed_publication').off('change.DelayedPublication').on('change.DelayedPublication', function(){
 			$view.find('.DelayedPublication').toggleStatus('disabled');
 		});
 
-		$view.find('#edit_event_registration_required').off('change').on('change', function(){
+		$view.find('#edit_event_registration_required').off('change.RequireRegistration').on('change.RequireRegistration', function(){
 			$view.find('.RegistrationTill').toggleStatus('disabled');
 		});
 
-		$view.find('#edit_event_free').off('change').on('change', function(){
+		$view.find('#edit_event_free').off('change.FreeEvent').on('change.FreeEvent', function(){
 			$view.find('.MinPrice').toggleStatus('disabled');
 		});
 
@@ -1141,7 +1128,7 @@ function EditEvent($view, $content_block){
 			handleImgUpload(window.current_load_button, result.data, url.split('/').reverse()[0]);
 		});
 
-		$view.find('.LoadImg').off('change').on('change', function(e){
+		$view.find('.LoadImg').off('change.LoadImg').on('change.LoadImg', function(e){
 			var $this = $(e.target),
 				files = e.target.files;
 
@@ -1159,7 +1146,7 @@ function EditEvent($view, $content_block){
 
 		});
 
-		$view.find('#edit_event_to_public_vk').on('change', function(){
+		$view.find('#edit_event_to_public_vk').off('change.PublicVK').on('change.PublicVK', function(){
 			var $table_wrapper = $view.find('#edit_event_vk_publication'),
 				$table_content = $table_wrapper.children();
 			if($(this).prop('checked')){
@@ -1169,15 +1156,20 @@ function EditEvent($view, $content_block){
 			}
 			$table_wrapper.toggleStatus('disabled');
 
-			$view.find('.DeleteImg').off('click.DeleteImg').on('click.DeleteImg', function(){
+			$table_content.find('.DeleteImg').off('click.DeleteImg').on('click.DeleteImg', function(){
 				$(this).closest('.EditEventImgLoadWrap').find('input').val('').end().find('img').attr('src', '');
+				toggleVkImg();
 			})
 
 		});
 
-		//$view.find('#edit_event_vk_groups').select2();
+		socket.on('vk.getGroupsToPostDone', function(response){
+			console.log(response);
+			// если группы > 1 то сделать активным селект
+			//$view.find('#edit_event_vk_groups').select2();
+		});
 
-		$view.find('#edit_event_submit').off('click.submit').on('click.submit', function(){
+		$view.find('#edit_event_submit').off('click.Submit').on('click.Submit', function(){
 
 			function formValidation($form, for_edit){
 				var is_valid = true;
@@ -1258,6 +1250,24 @@ function EditEvent($view, $content_block){
 						})
 					});
 				}
+
+				if(data.to_post_vk){
+					socket.emit('vk.getDataToPost', {
+						guid: data.vk_group,
+						message: data.vk_post,
+						image: {
+							base64: data.vk_image_src,
+							filename : data.vk_image_filename
+						}
+					});
+				}
+
+				socket.on('vk.getDataToPostDone', function(data){
+					console.log(data);
+					VK.Api.call("wall.post", data, function(r){
+						console.log(r);
+					});
+				});
 				$.ajax({
 					url: url,
 					data: JSON.stringify(data),
@@ -1295,6 +1305,22 @@ function EditEvent($view, $content_block){
 		 });*/
 	}
 
+
+	function toggleVkImg(){
+		var $wrap = $view.find('#edit_event_vk_publication').find('.EditEventImgLoadWrap'),
+			$left_block = $wrap.children().eq(0),
+			$right_block = $wrap.children().eq(1);
+
+		if(!$left_block.hasClass('-hidden')){
+			$right_block.find('.LoadImg').off('change.ToggleVkImg').one('change.ToggleVkImg', toggleVkImg);
+			$right_block.find('.Text').text('Добавить картинку');
+		} else {
+			$right_block.find('.LoadImg').off('change.ToggleVkImg');
+			$right_block.find('.Text').text('Загрузить еще');
+		}
+		$left_block.toggleClass('-hidden');
+		$right_block.toggleClass('-h_centering');
+	}
 
 	function selectDates($view, raw_dates){
 		var	MainCalendar = $view.find('.EventDatesCalendar').data('calendar'),
@@ -1370,48 +1396,75 @@ function EditEvent($view, $content_block){
 			.select2('data', selected_tags);
 	}
 
-	function initRecrop($view){
+	function bindRecrop($context){
+		var $parent = $context.closest('.EditEventImgLoadWrap'),
+			$preview = $parent.find('.EditEventImgPreview'),
+			$crop_again_button = $parent.find('.CropAgain'),
+			$data_url = $parent.find('.DataUrl');
 
-		var $crop_again_buttons = $view.find('.CropAgain');
+		$preview.off('crop-done').on('crop-done', function(){
+			var $this = $(this),
+				$crop_data = $this.data('crop_data');
 
-		$crop_again_buttons.each(function(){
-			var $button = $(this),
-				$parent = $button.closest('.EditEventImgLoadWrap'),
-				$preview = $parent.find('.EditEventImgPreview'),
-				$data_url = $parent.find('.DataUrl');
-
-			$button.removeClass('-hidden').off('click').on('click', function(){
-				initCrop($preview.attr('src'), $preview, {
+			$data_url.val($preview.attr('src')).trigger('change');
+			$crop_again_button.removeClass('-hidden').off('click.CropAgain').on('click.CropAgain', function(){
+				initCrop($preview.data('source_img'), $preview, {
+					'data': $crop_data,
 					'aspectRatio': eval($preview.data('aspect_ratio'))
 				});
 			});
 
+		})
+	}
 
-			$preview.off('crop-done').on('crop-done', function(){
-				var $this = $(this),
-					$crop_data = $this.data('crop_data');
+	function initRecrop(i, elem){
+		var $button = $(elem),
+			$preview = $button.closest('.EditEventImgLoadWrap').find('.EditEventImgPreview');
 
-				$data_url.val($preview.attr('src'));
-				$button.removeClass('-hidden').off('click').on('click', function(){
-					initCrop($preview.data('source_img'), $preview, {
-						'data': $crop_data,
-						'aspectRatio': eval($preview.data('aspect_ratio'))
-					});
-				});
-
-			})
+		$button.removeClass('-hidden').off('click.CropAgain').on('click.CropAgain', function(){
+			initCrop($preview.data('source_img'), $preview, {
+				'aspectRatio': eval($preview.data('aspect_ratio'))
+			});
 		});
 
+		bindRecrop($button);
+	}
+
+	function initVkDataCopying(){
+		var $vk_wrapper = $view.find('#edit_event_vk_publication');
+		$vk_wrapper.find('.CropAgain').each(initRecrop);
+		$view.find('#edit_event_image_horizontal_src').on('change.CopyToVkImg', function(){
+			var $wrap = $(this).closest('.EditEventImgLoadWrap'),
+				$vk_wrap = $view.find('#edit_event_vk_publication'),
+				src = $(this).val();
+
+			if(!$view.find('.edit_event_vk_right_block').hasClass('-h_centering')){
+				toggleVkImg();
+			}
+			$vk_wrap.find('#edit_event_vk_image_src').val(src);
+			$vk_wrap.find('.EditEventImgPreview').attr('src', src).data('source_img', $wrap.find('.EditEventImgPreview').data('source_img'));
+			$vk_wrap.find('#edit_event_vk_image_filename').val($view.find('#edit_event_image_horizontal_filename').val());
+			$vk_wrap.find('.CropAgain').data($wrap.find('.CropAgain').data());
+
+		});
+		$vk_wrapper.find('.FileLoadButton, .CropAgain, .DeleteImg').on('click.OffCopying', function(){
+			$view.find('#edit_event_image_horizontal_src').off('change.CopyToVkImg');
+		});
 	}
 
 	window.scrollTo(0, 0);
+	var additional_fields = {
+		event_id: event_id,
+		header_text: 'Новое мероприятие',
+		public_at_data_label: 'Дата',
+		registration_till_data_label: 'Дата',
+		current_date: moment().format(__C.DATE_FORMAT)
+	};
 	if(typeof event_id === 'undefined'){
-		$view.find('.page_wrapper').html(tmpl('edit-event-page', {
-			event_id: event_id,
-			header_text: 'Новое мероприятие',
-			current_date: moment().format(__C.DATE_FORMAT)
-		}));
+		$view.find('.page_wrapper').html(tmpl('edit-event-page', additional_fields));
 		initEditEventPage($view);
+		toggleVkImg();
+		initVkDataCopying();
 	} else {
 
 		var url = 'api/v1/events/'+event_id;
@@ -1423,11 +1476,6 @@ function EditEvent($view, $content_block){
 			},
 			success: function(res){
 				if(res.status){
-					var additional_fields = {
-						public_at_data_label: 'Дата',
-						registration_till_data_label: 'Дата',
-						current_date: moment().format(__C.DATE_FORMAT)
-					};
 					if(Array.isArray(res.data)){
 						res.data = res.data[0];
 					}
@@ -1451,9 +1499,7 @@ function EditEvent($view, $content_block){
 					if(res.data.image_horizontal_url){
 						additional_fields.image_horizontal_filename = res.data.image_horizontal_url.split('/').reverse()[0];
 					}
-					if(res.data.vk_image_src){
-						additional_fields.vk_image_src = res.data.vk_image_src;
-					} else {
+					if(!res.data.vk_image_src){
 						additional_fields.vk_image_src = res.data.image_horizontal_url;
 					}
 					additional_fields.header_text = 'Редактирование мероприятия';
@@ -1466,29 +1512,32 @@ function EditEvent($view, $content_block){
 					selectDates($view, res.data.dates);
 					selectTags($view, res.data.tags);
 					if(res.data.image_vertical_url && res.data.image_horizontal_url){
-						initRecrop($view);
+						$view.find('.CropAgain').each(initRecrop);
 					}
 
 					if(res.data.image_vertical_url){
 						toDataUrl(res.data.image_vertical_url, function(base64_string){
-							$view.find('[name="image_vertical"]').val(base64_string);
+							$view.find('#edit_event_image_vertical_src').val(base64_string);
 						});
 					}
 					if(res.data.image_horizontal_url){
 						toDataUrl(res.data.image_horizontal_url, function(base64_string){
-							$view.find('[name="image_horizontal"]').val(base64_string);
+							$view.find('#edit_event_image_horizontal_src').val(base64_string);
 						});
 					}
 
 					if(res.data.vk_image_src){
 						toDataUrl(res.data.vk_image_src, function(base64_string){
-							$view.find('[name="vk_image_src"]').val(base64_string);
+							$view.find('#edit_event_vk_image_src').val(base64_string);
 						});
 					}
 					else if(res.data.image_horizontal_url){
 						toDataUrl(res.data.image_horizontal_url, function(base64_string){
-							$view.find('[name="vk_image_src"]').val(base64_string);
+							$view.find('#edit_event_vk_image_src').val(base64_string);
 						});
+					}
+					else {
+						toggleVkImg();
 					}
 
 
@@ -1513,6 +1562,18 @@ function EditEvent($view, $content_block){
 			}
 		});
 	}
+	$.ajax({
+		url: 'api/v1/users/me',
+		method: 'GET',
+		success: function(res){
+			if(Array.isArray(res.data)){
+				socket.emit('vk.getGroupsToPost', res.data[0].id);
+			} else {
+				socket.emit('vk.getGroupsToPost', res.data.id);
+			}
+		}
+	});
+
 
 }
 
