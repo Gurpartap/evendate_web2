@@ -18,7 +18,7 @@
     "pg-native": "^1.10.0",
     "pushwoosh-client": "^1.1.0",
     "request": "^2.67.0",
-    "restler": "^3.2.2",
+    "restler": "^3.4.0",
     "socket.io": "^1.1.0",
     "sql": "^0.67.0",
     "winston": "^0.7.3"

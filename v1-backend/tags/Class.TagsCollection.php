@@ -39,7 +39,7 @@ class TagsCollection extends AbstractCollection{
 					break;
 				}
 				case 'name': {
-					if (isset($filters['strict']) && $filters['strict'] == true){
+					if (isset($filters['strict']) && $filters['strict'] == 'true'){
 						$q_get_tags->where('LOWER(name) = LOWER(:name)');
 						$statements[':name'] = $value;
 					}else{
@@ -62,6 +62,7 @@ class TagsCollection extends AbstractCollection{
 		$tags = $p_get_tags->fetchAll(PDO::FETCH_CLASS, 'Tag');
 		if (count($tags) == 0 && $is_one_tag) throw new LogicException('CANT_FIND_TAG');
 		$result_events = array();
+		if ($is_one_tag) return $tags[0];
 		foreach($tags as $tag){
 			$result_events[] = $tag->getParams($user, $fields)->getData();
 		}
@@ -75,20 +76,38 @@ class TagsCollection extends AbstractCollection{
 	}
 
 	public static function create(PDO $db, string $name) : Tag{
+		global $__mysql_db;
 		$name = preg_replace('/\s+/', ' ', self::mb_ucfirst($name));
-		$tags = TagsCollection::filter($db, App::getCurrentUser(), array('strict' => true, 'name' => $name))->getData();
+
+		$tags = TagsCollection::filter($db,
+			App::getCurrentUser(),
+			array('strict' => true, 'name' => $name),
+			array(),
+			array(),
+			array())->getData();
 		if (count($tags) == 0){
 			$q_ins_tag = 'INSERT INTO tags(name, status)
 			VALUES(:name, TRUE) RETURNING id';
 			$p_ins_tag = $db->prepare($q_ins_tag);
 
+			$q_ins_tag_mysql = 'INSERT INTO tags(id, name, status, created_at)
+			VALUES(:id, :name, 1, NOW()) ON DUPLICATE KEY UPDATE id = :id';
+			$p_ins_tag_mysql = $__mysql_db->prepare($q_ins_tag_mysql);
+
 			$p_ins_tag->execute(array(
 				':name' => $name
 			));
-			$tag_id = $db->lastInsertId();
+
+			$result = $p_ins_tag->fetch(PDO::FETCH_ASSOC);
+
+			$p_ins_tag_mysql->execute(array(
+				':id' => $result['id'],
+				':name' => $name
+			));
+			$tag_id = $result['id'];
 		}else{
 			$tag_id = intval($tags[0]['id']);
 		}
-		return self::one($db, App::getCurrentUser(), $tag_id);
+		return self::one($db, App::getCurrentUser(), $tag_id, array());
 	}
 }
