@@ -566,7 +566,7 @@ CREATE TABLE users_roles (
 INSERT INTO users_roles (name, description)
 VALUES ('admin', 'Администратор и владелец организации');
 
-ALTER TABLE public.users_organizations ADD role_id TEXT DEFAULT 1 NOT NULL;
+ALTER TABLE public.users_organizations ADD role_id INT DEFAULT 1 NOT NULL;
 
 ALTER TABLE public.events ADD registration_required BOOLEAN DEFAULT FALSE NOT NULL;
 ALTER TABLE public.events ADD registration_till TIMESTAMP DEFAULT NULL NULL;

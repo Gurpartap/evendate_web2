@@ -108,6 +108,11 @@ try {
 	$_internal_code = AuthorizationException::ERROR_CODE;
 	$_error_name = $authe->getMessage();
 	$_function_called = true;
+}catch(PrivilegesException $pe){
+	$_http_code = PrivilegesException::HTTP_CODE;
+	$_internal_code = PrivilegesException::ERROR_CODE;
+	$_error_name = $pe->getMessage();
+	$_function_called = true;
 }catch(AbstractException $ae){
 	$_http_code = $ae->getHttpCode();
 	$_internal_code = $ae->getInternalCode();
