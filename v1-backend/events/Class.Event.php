@@ -614,7 +614,9 @@ class Event extends AbstractEntity{
 
 			if (isset($data['image_extensions'])
 				&& isset($data['image_extensions']['horizontal'])
-				&& $data['image_extensions']['horizontal'] != null)
+				&& $data['image_extensions']['horizontal'] != null
+				&& !empty($data['image_extensions']['horizontal'])
+			)
 			{
 				$img_horizontal_filename = md5(App::generateRandomString() . '-horizontal') .  '.' . $data['image_extensions']['horizontal'];
 				$query_data[':image_horizontal'] = $img_horizontal_filename;
@@ -629,7 +631,8 @@ class Event extends AbstractEntity{
 
 			if (isset($data['image_extensions'])
 				&& isset($data['image_extensions']['vertical'])
-				&& $data['image_extensions']['vertical'] != null)
+				&& $data['image_extensions']['vertical'] != null
+				&& !empty($data['image_extensions']['vertical']))
 			{
 				$img_vertical_filename = md5(App::generateRandomString() . '-vertical') .  '.' . $data['image_extensions']['vertical'];
 				$query_data[':image_vertical'] = $img_vertical_filename;
