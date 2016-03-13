@@ -2,6 +2,7 @@ var server = require('http'),
 	io = require('socket.io')(server),
 	winston = require('winston'),
 	mysql = require('mysql'),
+	rest = require('restler'),
 	fs = require("fs"),
 	request = require('request'),
 	moment = require("moment"),
@@ -63,7 +64,9 @@ var URLs = {
 			'GET_GROUPS_LIST': 'https://api.vk.com/method/groups.get',
 			'GET_GROUPS_PART': '/method/groups.get',
 			'POST_TO_WALL': 'http://api.vk.com/method/wall.post',
-			'POST_TO_WALL_PART': '/method/wall.post'
+			'POST_TO_WALL_PART': '/method/wall.post',
+			'GET_WALL_PHOTO_UPLOAD_SERVER': 'https://api.vk.com/method/photos.getWallUploadServer',
+			'SAVE_WALL_PHOTO_UPLOAD': 'https://api.vk.com/method/photos.saveWallPhoto'
 		},
 		"GOOGLE": {
 			'GET_ACCESS_TOKEN': 'https://www.googleapis.com/oauth2/v1/tokeninfo',
@@ -474,13 +477,13 @@ pg.connect(pg_conn_string, function(err, client, done) {
 		});
 	}
 
-	function getVkGroups(user_data, filter, cb){
+	function getVkGroups(user_data, filter, cb) {
 		var request_data = [
-			'access_token=' + user_data.access_token,
-			'extended=1',
-			'fields=can_post,is_admin,admin_level,type',
-			'filter=' + (filter == 'can_post' ? 'admin, editor, moder': '')
-		],
+				'access_token=' + user_data.access_token,
+				'extended=1',
+				'fields=can_post,is_admin,admin_level,type',
+				'filter=' + (filter == 'can_post' ? 'admin, editor, moder' : '')
+			],
 			sig = crypto.createHash('md5').update(URLs.VK.GET_GROUPS_PART + '?' + request_data.join('&') + user_data.secret).digest("hex"),
 			url = URLs.VK.GET_GROUPS_LIST + '?' + request_data.join('&') + '&sig=' + sig,
 			req_params = {
@@ -492,9 +495,9 @@ pg.connect(pg_conn_string, function(err, client, done) {
 			};
 
 
-		request(req_params, function(e, i, res){
+		request(req_params, function(e, i, res) {
 			if (handleError(e)) return;
-			if (cb){
+			if (cb) {
 				cb(res);
 			}
 		});
@@ -547,6 +550,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 					}
 					return result;
 				}
+
 				if (data.user_info.hasOwnProperty('sex')) {
 					if (data.user_info.sex == 2) {
 						data.user_info.gender = 'male';
@@ -575,11 +579,11 @@ pg.connect(pg_conn_string, function(err, client, done) {
 						gender: data.user_info.gender
 					};
 
-				if (UIDs.vk_uid != null){
+				if (UIDs.vk_uid != null) {
 					user_to_ins['vk_uid'] = UIDs.vk_uid;
-				}else if (UIDs.facebook_uid != null){
+				} else if (UIDs.facebook_uid != null) {
 					user_to_ins['facebook_uid'] = UIDs.facebook_uid;
-				}else if (UIDs.google_uid != null){
+				} else if (UIDs.google_uid != null) {
 					user_to_ins['google_uid'] = UIDs.google_uid;
 				}
 
@@ -611,7 +615,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 
 					client.query(q_user, function(user_err, ins_result) {
 
-						if(is_new_user){
+						if (is_new_user) {
 							q_user_mysql = 'INSERT INTO users (id, first_name, last_name, email, token, avatar_url, vk_uid, facebook_uid, google_uid) ' +
 								' VALUES (' + connection.escape(ins_result.rows[0].id) + ',' +
 								' ' + connection.escape(data.user_info.first_name) + ',' +
@@ -662,12 +666,12 @@ pg.connect(pg_conn_string, function(err, client, done) {
 							}
 							case 'google':
 							{
-									var google_data = {
-										access_token: data.oauth_data.access_token,
-										expires_in: data.oauth_data.expires_in,
-										etag: data.user_info.etag,
-										cover_photo_url: data.user_info.hasOwnProperty('cover') && data.user_info.cover.hasOwnProperty('coverPhoto') ? data.user_info.cover.coverPhoto.url : null,
-									};
+								var google_data = {
+									access_token: data.oauth_data.access_token,
+									expires_in: data.oauth_data.expires_in,
+									etag: data.user_info.etag,
+									cover_photo_url: data.user_info.hasOwnProperty('cover') && data.user_info.cover.hasOwnProperty('coverPhoto') ? data.user_info.cover.coverPhoto.url : null,
+								};
 								if (user.google_uid != null) {
 									q_ins_sign_in = google_sign_in.update(google_data).where(google_sign_in.user_id.equals(user.id));
 								} else {
@@ -1045,40 +1049,92 @@ pg.connect(pg_conn_string, function(err, client, done) {
 			})
 		});
 
-		socket.on('vk.getGroupsToPost', function(user_id){
+		socket.on('vk.getGroupsToPost', function(user_id) {
 			var q_get_user_data = vk_sign_in
 				.select(vk_sign_in.id, vk_sign_in.secret, vk_sign_in.access_token)
 				.from(vk_sign_in)
 				.where(
 					vk_sign_in.user_id.equals(user_id)
 				).toQuery();
-			client.query(q_get_user_data, function(err, result){
+			client.query(q_get_user_data, function(err, result) {
 				if (handleError(err)) return;
 				socket.vk_user = result.rows[0];
-				getVkGroups(result.rows[0], 'can_post', function(data){
-					socket.emit('log', data);
+				getVkGroups(result.rows[0], 'can_post', function(data) {
+					console.log(data);
+					socket.emit('vk.getGroupsToPostDone', data);
 				})
 			})
 		});
 
-		socket.on('vk.postToWall', function(gid){
-			//var q_get_user_data = vk_sign_in
-			//	.select(vk_sign_in.id, vk_sign_in.secret, vk_sign_in.access_token)
-			//	.from(vk_sign_in)
-			//	.where(
-			//		vk_sign_in.user_id.equals(user_id)
-			//	).toQuery();
+		socket.on('vk.getDataToPost', function(data) {
+
 			var request_data = [
-				'access_token=' + socket.vk_user.access_token,
-				'owner_id=-' + gid,
-				'from_group=1',
-				'message=can_post,is_admin,admin_level,type',
-			],
-				sig = 'sig=' + crypto
-						.createHash('md5')
-						.update(URLs.VK.POST_TO_WALL_PART + '?' + request_data.join('&') + socket.vk_user.secret).digest("hex");
-			request_data.push(sig)
-			console.log(URLs.VK.POST_TO_WALL + '?' + request_data.join('&'));
+					'access_token=' + socket.vk_user.access_token,
+					'group_id=' + data.group_id
+				],
+				image_path = __dirname + '/../event_images/vk/',
+				url = URLs.VK.GET_WALL_PHOTO_UPLOAD_SERVER + '?' + request_data.join('&'),
+				filename_parts = data.image.filename.split('.'),
+				extension = filename_parts[filename_parts.length - 1],
+				filename = data.group_id + '__' + Utils.makeId(20) + '.' + extension,
+				base64 = data.image.base64.split(',')[1];
+
+			fs.writeFile(image_path + filename, base64, 'base64', function(err) {
+				if (handleError(err)) return;
+
+				request({
+					url: url,
+					json: true,
+					headers: {
+						'Accept-Language': 'ru,en-us'
+					}
+				}, function(upload_server_err, upload_server_i, upload_server_res) {
+					if (handleError(upload_server_err)) return;
+
+					fs.stat(image_path + filename, function(err, stats) {
+						rest.post(upload_server_res.response.upload_url, {
+							multipart: true,
+							data: {
+								"file1": rest.file(image_path + filename, null, stats.size, null, 'image/' + extension)
+							}
+						}).on("complete", function(upload_data) {
+							upload_data = JSON.parse(upload_data);
+							request_data.push('server=' + upload_data['server']);
+							request_data.push('hash=' + upload_data['hash']);
+							request_data.push('photo=' + upload_data['photo']);
+							request_data.push('access_token=' + socket.vk_user.access_token);
+							request_data.push('group_id=' + data.group_id);
+
+							rest
+								.get(URLs.VK.SAVE_WALL_PHOTO_UPLOAD + '?' + request_data.join('&'))
+								.on('complete', function(res_data){
+									if (res_data.response.length == 0){
+										socket.emit('vk.getDataToPostDone', {'error': 'CANT_LOAD_IMAGE'});
+										return;
+									}
+									socket.emit('log', {
+										error: null,
+										data: {
+											owner_id: '-' + data.group_id,
+											from_group: 1,
+											message: data.message,
+											attachments: [res_data.response[0].id, data.link ? data.link : ''].join(',')
+										}});
+									socket.emit('vk.getDataToPostDone', {
+										error: null,
+										data: {
+											owner_id: '-' + data.group_id,
+											from_group: 1,
+											message: data.message,
+											attachments: [res_data.response[0].id, data.link ? data.link : ''].join(',')
+										}});
+								});
+						});
+					});
+				});
+			});
+
+
 		});
 
 
