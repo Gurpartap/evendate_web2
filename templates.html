@@ -209,8 +209,8 @@
 					<div class="img_holder">
 						<img class="edit_event_img_preview_hor EditEventImgPreview" data-aspect_ratio="16/9" src="{image_horizontal_url}">
 						<img src="app/img/edit_event/edit_event_img_placeholder_hor.png">
-						<input class="DataUrl" type="hidden" name="image_horizontal" value="{image_horizontal_base64}">
-						<input class="FileName" type="hidden" name="filename_horizontal" value="{image_horizontal_filename}">
+						<input id="edit_event_image_horizontal_src" class="DataUrl" type="hidden" name="image_horizontal" value="{image_horizontal_base64}">
+						<input id="edit_event_image_horizontal_filename" class="FileName" type="hidden" name="filename_horizontal" value="{image_horizontal_filename}">
 					</div>
 				</div>
 			</div>
@@ -249,7 +249,7 @@
 					<div class="img_holder">
 						<img class="edit_event_img_preview_vert EditEventImgPreview" data-aspect_ratio="7/10" src="{image_vertical_url}">
 						<img src="app/img/edit_event/edit_event_img_placeholder_vert.png">
-						<input class="DataUrl" type="hidden" name="image_vertical" value="{image_vertical_base64}">
+						<input id="edit_event_image_vertical_src" class="DataUrl" type="hidden" name="image_vertical" value="{image_vertical_base64}">
 						<input class="FileName" type="hidden" name="filename_vertical" value="{image_vertical_filename}">
 					</div>
 				</div>
@@ -324,7 +324,7 @@
 
 
 			<div class="form_unit">
-				<input id="edit_event_to_public_vk" class="form_checkbox" type="checkbox" tabindex="-1">
+				<input id="edit_event_to_public_vk" class="form_checkbox" type="checkbox" name="to_post_vk" tabindex="-1">
 				<label class="form_label" for="edit_event_to_public_vk"><span>Опубликовать Вконтакте</span></label>
 			</div>
 			<div id="edit_event_vk_publication" class="collapsing_wrapper">
@@ -337,22 +337,22 @@
 					</div>
 					<h4 class="form_label"><label for="edit_event_description">Пост</label></h4>
 					<div class="form_unit -status_disabled">
-						<textarea id="edit_event_vk_post" class="form_textarea LimitSize" data-maxlength="500" name="vk_post" placeholder="" required disabled></textarea>
+						<textarea id="edit_event_vk_post" class="form_textarea" name="vk_post" placeholder="" required disabled></textarea>
 					</div>
 					<div class="form_group EditEventImgLoadWrap -parts_2_3">
 						<div class="form_unit -status_disabled">
 							<div class="edit_event_vk_img">
-								<input class="DataUrl" type="hidden" name="vk_image_src" value="{vk_image_base64}" disabled>
-								<input class="FileName" type="hidden" name="vk_image_filename" value="{vk_image_filename}" disabled>
+								<input id="edit_event_vk_image_src" class="DataUrl" type="hidden" name="vk_image_src" value="{vk_image_base64}" disabled>
+								<input id="edit_event_vk_image_filename" class="FileName" type="hidden" name="vk_image_filename" value="{vk_image_filename}" disabled>
 								<div class="edit_event_vk_img_preview"><img class="EditEventImgPreview" data-aspect_ratio="16/9" src="{vk_image_src}"></div>
 								<footer class="edit_event_vk_img_footer form_group -parts_e_2">
-									<div class="form_unit -status_disabled"><span id="edit_event_vk_img_delete" class="action DeleteImg -color_error">Удалить</span></div>
-									<div class="form_unit -status_disabled" align="right"><span id="edit_event_vk_img_crop" class="action CropAgain -color_primary">Кадрировать</span></div>
+									<div class="form_unit -status_disabled"><button class="action DeleteImg -color_error" type="button">Удалить</button></div>
+									<div class="form_unit -status_disabled" align="right"><button class="action CropAgain -color_primary" type="button">Кадрировать</button></div>
 								</footer>
 							</div>
 						</div>
-						<div class="edit_event_vk_right_block form_unit -status_disabled -centering">
-							<button class="button -color_neutral FileLoadButton RippleEffect" type="button"><input class="LoadImg -hidden" type="file">Загрузить еще</button>
+						<div class="edit_event_vk_right_block form_unit -status_disabled -v_centering -h_centering">
+							<button class="button -color_neutral FileLoadButton RippleEffect" type="button"><input class="LoadImg -hidden" type="file"><span class="Text">Загрузить еще</span></button>
 						</div>
 					</div>
 				</div>
