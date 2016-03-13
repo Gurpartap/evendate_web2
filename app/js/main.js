@@ -96,7 +96,7 @@ $.fn.extend({
 						output[name] = typeof(output[name]) == "undefined" ? [] : output[name];
 						output[name].push(value ? value.replace(xb, "\r\n") : value)
 					} else {
-						output[name] = value ? value.replace(xb, "\r\n") : value;
+						output[name] = value || value === 0 ? value.replace(xb, "\r\n") : null;
 					}
 				});
 				elements.filter(function() {

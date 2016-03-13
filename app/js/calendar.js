@@ -1204,13 +1204,37 @@ function EditEvent($view, $content_block){
 			}
 
 			var $form = $view.find("#edit-event-form"),
-				data = $form.serializeForm(),
-				tags = data.tags.split(','),
-				url = 'api/v1/events/'+data.event_id,
-				method = data.event_id ? 'PUT' : 'POST',
-				valid_form = formValidation($form, !!(data.event_id));
+				data = {
+					event_id: null,
+					title: null,
+					image_vertical: null,
+					image_horizontal: null,
+					organization_id: null,
+					location: null,
+					description: null,
+					detail_info_url: null,
+					different_time: null,
+					dates: null,
+					tags: null,
+					registration_required: null,
+					registration_till: null,
+					is_free: null,
+					min_price: null,
+					delayed_publication: null,
+					public_at: null,
+					filenames: {
+						vertical: null,
+						horizontal: null
+					}
+				},
+				form_data = $form.serializeForm(),
+				tags = form_data.tags.split(','),
+				url = 'api/v1/events/'+form_data.event_id,
+				method = form_data.event_id ? 'PUT' : 'POST',
+				valid_form = formValidation($form, !!(form_data.event_id));
 
 			if(valid_form){
+				$.extend(true, data, form_data);
 
 				data.tags = (tags.length === 1 && tags[0] === "") ? [] : tags;
 				data.filenames = {
@@ -1298,11 +1322,6 @@ function EditEvent($view, $content_block){
 
 		});
 
-
-		/*
-		 $('#default-address-btn').on('click', function(){
-		 $address_input.val($organizations.find('option:selected').data('default-address'));
-		 });*/
 	}
 
 
@@ -1517,23 +1536,23 @@ function EditEvent($view, $content_block){
 
 					if(res.data.image_vertical_url){
 						toDataUrl(res.data.image_vertical_url, function(base64_string){
-							$view.find('#edit_event_image_vertical_src').val(base64_string);
+							$view.find('#edit_event_image_vertical_src').val(base64_string ? base64_string : null);
 						});
 					}
 					if(res.data.image_horizontal_url){
 						toDataUrl(res.data.image_horizontal_url, function(base64_string){
-							$view.find('#edit_event_image_horizontal_src').val(base64_string);
+							$view.find('#edit_event_image_horizontal_src').val(base64_string ? base64_string : null);
 						});
 					}
 
 					if(res.data.vk_image_src){
 						toDataUrl(res.data.vk_image_src, function(base64_string){
-							$view.find('#edit_event_vk_image_src').val(base64_string);
+							$view.find('#edit_event_vk_image_src').val(base64_string ? base64_string : null);
 						});
 					}
 					else if(res.data.image_horizontal_url){
 						toDataUrl(res.data.image_horizontal_url, function(base64_string){
-							$view.find('#edit_event_vk_image_src').val(base64_string);
+							$view.find('#edit_event_vk_image_src').val(base64_string ? base64_string : null);
 						});
 					}
 					else {
