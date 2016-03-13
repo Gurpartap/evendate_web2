@@ -337,7 +337,7 @@ Calendar.prototype.deselectDays = function(days){ // 2012-12-21
 			this_month = self.current_month.format('YYYY.MM'),
 			this_weekday_pos;
 
-		self.selected_days.splice(self.selected_days.indexOf($this_day.data('date')), 1);
+		self.selected_days.splice(self.selected_days.indexOf(day), 1);
 		self.selected_days.sort();
 
 		if(self.selected_months.indexOf(this_month) !== -1){
