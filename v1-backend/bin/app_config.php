@@ -189,4 +189,17 @@ class App {
 		}
 		return $randomString;
 	}
+
+	public static function createMysqlDB(){
+		global $__mysql_db;
+		$driver_options = array(
+			PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+		);
+		$mysql_opts = App::$SETTINGS->mysql_db;
+		$__mysql_db = new PDO('mysql:host=' . $mysql_opts->host . ';dbname=' . $mysql_opts->database . ';charset=utf8;port=' . $mysql_opts->port, $mysql_opts->user, $mysql_opts->password, $driver_options);
+
+
+
+	}
 }

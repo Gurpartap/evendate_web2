@@ -111,6 +111,12 @@ class Event extends AbstractEntity{
 	}
 
 	private static function sortDates(array $dates){
+
+		foreach($dates as $date){
+			if (strtotime($date['start_time']) > strtotime($date['end_time']))
+				throw new LogicException('Время начала не может быть больше времени окончания события');
+		}
+
 		function sortFunc($a, $b){
 			$datea = strtotime($a['event_date']. ' ' . $a['start_time']);
 			$dateb = strtotime($b['event_date']. ' ' . $b['start_time']);
@@ -124,16 +130,24 @@ class Event extends AbstractEntity{
 		return $dates;
 	}
 
-	private static function getFirstDate(array $data){
-		return new DateTime($data['dates'][0] . ' ' . $data['dates'][0]['start_time']);
-	}
+	private static function generateQueryData(&$data){
 
-	private static function generateQueryData(&$data, PDO $db){
+		function sortByStartTime($a, $b){
+			$a = strtotime($a['start_time']);
+			$b = strtotime($b['start_time']);
+			return $a - $b;
+		}
+		function sortByEndTime($a, $b){
+			$a = strtotime($a['end_time']);
+			$b = strtotime($b['end_time']);
+			return $a - $b;
+		}
+
 		$data['title'] = trim($data['title']);
 		$data['description'] = trim($data['description']);
 		$data['detail_info_url'] = trim($data['detail_info_url']);
 
-		$data['location'] = isset($data['address']) ? trim($data['address']) : null;
+		$data['location'] = isset($data['address']) ? trim($data['address']) : $data['location'];
 		$data['latitude'] = isset($data['geo']['coordinates']['G']) ? $data['geo']['coordinates']['G'] : null;
 		$data['longitude'] = isset($data['geo']['coordinates']['K']) ? $data['geo']['coordinates']['K'] : null;
 
@@ -159,7 +173,10 @@ class Event extends AbstractEntity{
 			$data['notification_at'] = (new DateTime())->modify('+10 minutes');
 		}
 
-		$data['registration_required'] = isset($data['registration_required']) && $data['registration_required'] == 'true' ? 'true' : 'false';
+		$data['registration_required'] = isset($data['registration_required'])
+			&& (strtolower($data['registration_required']) == 'true'
+				|| strtolower($data['registration_required']) == '1')
+					? 'true' : 'false';
 
 		try{
 			if (isset($data['registration_required']) && $data['registration_required'] != null){
@@ -171,13 +188,24 @@ class Event extends AbstractEntity{
 			$data['registration_till'] =  null;
 		}
 
+		$sorted_by_start_time = $data['dates'];
+		$sorted_by_end_time = $data['dates'];
+
+		usort($sorted_by_start_time, 'sortByStartTime');
+		usort($sorted_by_end_time, 'sortByEndTime');
 
 		$data['dates'] = self::sortDates($data['dates']);
+		$data['begin_time'] = DateTime::createFromFormat('H:i', $sorted_by_start_time[0]['start_time']);
+		$data['end_time'] = DateTime::createFromFormat('H:i', $sorted_by_end_time[count($sorted_by_end_time) - 1]['end_time']);
+
+		$data['begin_time'] = $data['begin_time']->format('H:i:s');
+		$data['end_time'] = $data['end_time']->format('H:i:s');
+
 		$data['latitude'] = is_numeric($data['latitude']) ? (float) $data['latitude'] : null;
 		$data['longitude'] = is_numeric($data['longitude']) ? (float) $data['longitude'] : null;
-//		$data['first_date'] = self::getFirstDate($data);
+
 		$data['is_free'] = isset($data['is_free']) && strtolower($data['is_free']) == 'true';
-		$data['min_price'] = $data['is_free'] == true && is_numeric($data['min_price']) ? (int) $data['min_price'] : null;
+		$data['min_price'] = $data['is_free'] == false && is_numeric($data['min_price']) ? (int) $data['min_price'] : null;
 
 
 		/*VK posting data*/
@@ -186,9 +214,12 @@ class Event extends AbstractEntity{
 
 	public static function create(PDO $db, Organization $organization, array $data){
 
+		App::createMysqlDB();
 		try{
-			$db->beginTransaction();
 
+			global $__mysql_db;
+			$__mysql_db->beginTransaction();
+			$db->beginTransaction();
 			if (!isset($data['dates']) || count($data['dates']) == 0)
 				throw new InvalidArgumentException('Укажите, пожалуйста, даты','');
 
@@ -214,8 +245,8 @@ class Event extends AbstractEntity{
 					'image_horizontal' => $img_horizontal_filename,
 					'detail_info_url' => $data['detail_info_url'],
 					'registration_required' => $data['registration_required'],
-					'registration_till' => $data['registration_till'],
-					'public_at' => $data['public_at'] instanceof DateTime ? $data['public_at']->format('Y-m-d H:i:s') : 'null',
+					'registration_till' => $data['registration_till'] instanceof DateTime ? $data['registration_till']->format('Y-m-d H:i:s') : null,
+					'public_at' => $data['public_at'] instanceof DateTime ? $data['public_at']->format('Y-m-d H:i:s') : null,
 					'is_free' => $data['is_free'] == 'true' ? 'true' : 'false',
 					'min_price' => $data['min_price'],
 					'status' => $data['public_at'] instanceof DateTime ? 'false' : 'true',
@@ -230,6 +261,35 @@ class Event extends AbstractEntity{
 			$result = $p_ins_event->fetch(PDO::FETCH_ASSOC);
 			$event_id = $result['id'];
 
+			$q_ins_event_mysql = 'INSERT INTO events(
+				id, creator_id, organization_id, title, description, location, location_uri, event_start_date, event_type_id,
+				notifications_schema_json, created_at, event_end_date, image_vertical, detail_info_url, begin_time,
+				end_time, image_horizontal, location_object, status)
+				VALUES(
+				:id, :creator_id, :organization_id, :title, :description, :location,
+				NULL, NULL, 1, NULL, NOW(), NULL, :image_vertical,
+				:detail_info_url, :begin_time, :end_time, :image_horizontal, NULL, :status)';
+
+			$p_ins_mysql = $__mysql_db->prepare($q_ins_event_mysql);
+
+			$result_mysql = $p_ins_mysql->execute(array(
+				':id' => $event_id,
+				':creator_id' => $data['creator_id'],
+				':organization_id' => $organization->getId(),
+				':title' => $data['title'],
+				':description' => $data['description'],
+				':location' => $data['location'],
+				':image_vertical' => $img_vertical_filename,
+				':image_horizontal' => $img_horizontal_filename,
+				':detail_info_url' => $data['detail_info_url'],
+				':begin_time' => $data['begin_time'],
+				':end_time' => $data['end_time'],
+				':status' => $data['public_at'] instanceof DateTime ? '0' : '1'
+			));
+
+			if ($result_mysql === FALSE) throw new DBQueryException('CANT_CREATE_EVENT_MYSQL', $db);
+
+
 			self::saveDates($data['dates'], $db, $event_id);
 			self::saveEventTags($db, $event_id, $data['tags']);
 			self::saveNotifications($event_id, $data, $db);
@@ -243,21 +303,31 @@ class Event extends AbstractEntity{
 				14000);
 
 			$db->commit();
+			$__mysql_db->commit();
 			return new Result(true, 'Событие успешно создано', array('event_id' => $event_id));
 		}catch(Exception $e){
 			$db->rollBack();
+			$__mysql_db->rollBack();
 			throw $e;
 		}
 	}
 
-
 	private static function saveEventTags(PDO $db, $event_id, array $tags) {
+		global $__mysql_db;
+
 		$p_upd = $db->prepare('UPDATE events_tags SET status = FALSE WHERE event_id = :event_id');
 		$p_upd->execute(array(':event_id' => $event_id));
 
+		$p_upd_mysql = $__mysql_db->prepare('UPDATE events_tags SET status = 0 WHERE event_id = :event_id');
+		$p_upd_mysql->execute(array(':event_id' => $event_id));
+
 		$q_ins_tags = 'INSERT INTO events_tags(event_id, tag_id, status)
-			VALUES(:event_id, :tag_id, TRUE)';
+			VALUES(:event_id, :tag_id, TRUE) RETURNING id';
 		$p_ins_tags = $db->prepare($q_ins_tags);
+
+		$q_ins_tags_mysql = 'INSERT INTO events_tags(id, event_id, tag_id, status)
+			VALUES(:id, :event_id, :tag_id, 1)';
+		$p_ins_tags_mysql = $__mysql_db->prepare($q_ins_tags_mysql);
 
 		$inserted_count = 0;
 
@@ -273,17 +343,33 @@ class Event extends AbstractEntity{
 				':event_id' => $event_id,
 				':tag_id' => $tag_id
 			));
+
+			$result = $p_ins_tags->fetch(PDO::FETCH_ASSOC);
+
+			$p_ins_tags_mysql->execute(array(
+				':id' => $result['id'],
+				':event_id' => $event_id,
+				':tag_id' => $tag_id
+			));
 			$inserted_count++;
 		}
 	}
 
 	private static function saveDates($dates, PDO $db, $event_id) {
+		global $__mysql_db;
 		$p_set_inactive = $db->prepare('UPDATE events_dates SET status = FALSE WHERE event_id = :event_id');
 		$p_set_inactive->execute(array(':event_id' => $event_id));
 
+		$p_set_inactive_mysql = $__mysql_db->prepare('UPDATE events_dates SET status = 0 WHERE event_id = :event_id');
+		$p_set_inactive_mysql->execute(array(':event_id' => $event_id));
+
 		$q_ins_dates = 'INSERT INTO events_dates(event_date, status, event_id, start_time, end_time)
-			VALUES(:event_date, TRUE, :event_id, :start_time, :end_time)';
+			VALUES(:event_date, TRUE, :event_id, :start_time, :end_time) RETURNING id';
 		$p_ins_dates = $db->prepare($q_ins_dates);
+
+		$q_ins_dates_mysql = 'INSERT INTO events_dates(id, event_date, status, event_id, created_at)
+			VALUES(:id, :event_date, 1, :event_id, NOW())';
+		$p_ins_dates_mysql = $__mysql_db->prepare($q_ins_dates_mysql);
 		foreach($dates as $date){
 			$p_ins_dates->execute(array(
 				':event_date' => $date['event_date'],
@@ -291,9 +377,16 @@ class Event extends AbstractEntity{
 				':start_time' => $date['start_time'],
 				':end_time' => $date['end_time']
 			));
+
+			$result = $p_ins_dates->fetch(PDO::FETCH_ASSOC);
+
+			$p_ins_dates_mysql->execute(array(
+				':event_date' => $date['event_date'],
+				':id' => $result['id'],
+				':event_id' => $event_id
+			));
 		}
 	}
-
 
 	//TODO: Припилить платные аккаунты и их типы уведомлений
 	private static function saveNotifications($event_id, array $data, PDO $db) {
@@ -453,115 +546,131 @@ class Event extends AbstractEntity{
 
 	public function update(array $data, Organization $organization, Editor $editor) {
 
-		$q_upd_event = App::queryFactory()->newUpdate();
+		try{
+			$q_upd_event = App::queryFactory()->newUpdate();
 
-		$q_upd_event
-			->table('events')
-			->cols(array(
-				'title' => $data['title'],
-				'description' => $data['description'],
-				'location' => $data['location'],
-				'location_object' => json_encode($data['geo'] ?? ''),
-				'creator_id' => intval($data['creator_id']),
-				'organization_id' => $organization->getId(),
-				'latitude' => is_numeric($data['latitude']) ? (float) $data['latitude'] : null,
-				'longitude' => is_numeric($data['longitude']) ? (float) $data['longitude'] : null,
-				'detail_info_url' => $data['detail_info_url'],
-				'registration_required' => $data['registration_required'],
-				'registration_till' => $data['registration_till'],
-				'public_at' => $data['public_at'] instanceof DateTime ? $data['public_at']->format('Y-m-d H:i:s') : 'null',
-				'is_free' => $data['is_free'] == 'true' ? 'true' : 'false',
-				'min_price' => $data['min_price'],
-				'status' => $data['public_at'] instanceof DateTime ? 'false' : 'true',
-			));
+			App::createMysqlDB();
+			global $__mysql_db;
 
-		$q_upd_event_mysql = 'UPDATE events SET
+			self::generateQueryData($data, $this->db);
+
+			$data['creator_id'] = $editor->getId();
+
+			$__mysql_db->beginTransaction();
+			$this->db->beginTransaction();
+
+			$q_upd_event
+				->table('events')
+				->cols(array(
+					'title' => $data['title'],
+					'description' => $data['description'],
+					'location' => $data['location'],
+					'location_object' => json_encode($data['geo'] ?? ''),
+					'creator_id' => intval($data['creator_id']),
+					'organization_id' => $organization->getId(),
+					'latitude' => $data['latitude'],
+					'longitude' => $data['longitude'],
+					'detail_info_url' => $data['detail_info_url'],
+					'registration_required' => $data['registration_required'],
+					'registration_till' => $data['registration_till'] instanceof DateTime ? $data['registration_till']->format('Y-m-d H:i:s') : null,
+					'public_at' => $data['public_at'] instanceof DateTime ? $data['public_at']->format('Y-m-d H:i:s') : null,
+					'is_free' => $data['is_free'] == 'true' ? 'true' : 'false',
+					'min_price' => $data['min_price'],
+					'status' => $data['public_at'] instanceof DateTime ? 'false' : 'true',
+				));
+
+			$q_upd_event_mysql = 'UPDATE events SET
 				title = :title,
 				description = :description,
 				location = :location,
-				location_object = :location_object,
-				location_uri = :location_uri,
-				notifications_schema_json = :notifications_schema_json,
 				creator_id = :creator_id,
 				organization_id = :organization_id,
-				latitude = :latitude,
-				longitude = :longitude,
 				detail_info_url = :detail_info_url,
 				begin_time = :begin_time,
-				end_time = :end_time
+				end_time = :end_time,
 				';
 
-		self::generateQueryData($data, $this->db);
 
-		if (isset($data['file_names'])){
-			$data['image_extensions'] = array(
-				'vertical' => App::getImageExtension($data['file_names']['vertical']),
-				'horizontal' => App::getImageExtension($data['file_names']['horizontal'])
+			if (isset($data['file_names'])){
+				$data['image_extensions'] = array(
+					'vertical' => App::getImageExtension($data['file_names']['vertical']),
+					'horizontal' => App::getImageExtension($data['file_names']['horizontal'])
+				);
+			}
+
+
+
+			$query_data = array(
+				':title' => $data['title'],
+				':description' => $data['description'],
+				':location' => $data['location'],
+				':creator_id' => $editor->getId(),
+				':organization_id' => $organization->getId(),
+				':detail_info_url' => $data['detail_info_url'],
+				':begin_time' => $data['begin_time'],
+				':end_time' => $data['end_time'],
+				':event_id' => $this->getId()
 			);
+
+			if (isset($data['image_extensions'])
+				&& isset($data['image_extensions']['horizontal'])
+				&& $data['image_extensions']['horizontal'] != null)
+			{
+				$img_horizontal_filename = md5(App::generateRandomString() . '-horizontal') .  '.' . $data['image_extensions']['horizontal'];
+				$query_data[':image_horizontal'] = $img_horizontal_filename;
+				$q_upd_event_mysql .= ' image_horizontal = :image_horizontal,';
+				App::saveImage($data['image_horizontal'],
+					self::IMAGES_PATH . self::IMG_SIZE_TYPE_LARGE . '/' . $img_horizontal_filename,
+					14000);
+				$q_upd_event->cols(array(
+					'image_horizontal' => $img_horizontal_filename
+				));
+			}
+
+			if (isset($data['image_extensions'])
+				&& isset($data['image_extensions']['vertical'])
+				&& $data['image_extensions']['vertical'] != null)
+			{
+				$img_vertical_filename = md5(App::generateRandomString() . '-vertical') .  '.' . $data['image_extensions']['vertical'];
+				$query_data[':image_vertical'] = $img_vertical_filename;
+				$q_upd_event_mysql .= ' image_vertical = :image_vertical,';
+
+				App::saveImage($data['image_vertical'],
+					self::IMAGES_PATH . self::IMG_SIZE_TYPE_LARGE . '/' . $img_vertical_filename,
+					14000);
+				$q_upd_event->cols(array(
+					'image_vertical' => $img_vertical_filename
+				));
+			}
+
+			$q_upd_event_mysql .= ' updated_at = NOW() WHERE events.id = :event_id';
+
+			$p_upd_event_mysql = $__mysql_db->prepare($q_upd_event_mysql);
+			$p_upd_event = $this->db->prepare($q_upd_event->getStatement());
+
+
+			$result = $p_upd_event_mysql->execute($query_data);
+			$p_upd_event->execute($q_upd_event->getBindValues());
+
+
+			if ($result === FALSE) throw new DBQueryException(implode(';', $this->db->errorInfo()), $this->db);
+
+			self::saveEventTags($this->db, $this->getId(), $data['tags']);
+			if (isset($data['dates']) && count($data['dates']) > 0){
+				self::saveDates($data['dates'], $this->db, $this->getId());
+			}
+
+
+			self::saveNotifications($this->getId(), $data, $this->db);
+
+
+			$__mysql_db->commit();
+			$this->db->commit();
+		}catch(Exception $e){
+			$__mysql_db->rollback();
+			$this->db->rollback();
 		}
 
-
-
-		$query_data = array(
-			':title' => $data['title'],
-			':description' => $data['description'],
-			':location' => $data['location'],
-			':location_object' => json_encode($data['geo'] ?? ''),
-			':location_uri' => 'content://maps.google.com/lat=' . $data['latitude'] .'&long='.$data['longitude'],
-			':first_event_date' => $data['date-start'],
-			':last_event_date' => $data['date-end'],
-			':notifications_schema_json' => json_encode($data['notifications']['types']),
-			':creator_id' => $editor->getId(),
-			':organization_id' => $organization->getId(),
-			':latitude' => $data['latitude'],
-			':longitude' => $data['longitude'],
-			':detail_info_url' => $data['detail_info_url'],
-			':begin_time' => $data['formatted_begin_time'],
-			':end_time' => $data['formatted_end_time'],
-			':event_id' => $this->getId()
-		);
-
-		if (isset($data['image_extensions'])
-			&& isset($data['image_extensions']['horizontal'])
-			&& $data['image_extensions']['horizontal'] != null)
-		{
-			$img_horizontal_filename = md5(App::generateRandomString() . '-horizontal') .  '.' . $data['image_extensions']['horizontal'];
-			$query_data[':image_horizontal'] = $img_horizontal_filename;
-			$q_upd_event_mysql .= ' image_horizontal = :image_horizontal,';
-			App::saveImage($data['files']['horizontal'], $img_horizontal_filename, 16000);
-			$q_upd_event->cols(array(
-				'image_horizontal' => $img_horizontal_filename
-			));
-		}
-
-		if (isset($data['image_extensions'])
-			&& isset($data['image_extensions']['vertical'])
-			&& $data['image_extensions']['vertical'] != null)
-		{
-			$img_vertical_filename = md5(App::generateRandomString() . '-vertical') .  '.' . $data['image_extensions']['vertical'];
-			$query_data[':image_vertical'] = $img_vertical_filename;
-			$q_upd_event_mysql .= ' image_vertical = :image_vertical,';
-			App::saveImage($data['files']['vertical'], $img_vertical_filename, 16000);
-			$q_upd_event->cols(array(
-				'image_vertical' => $img_vertical_filename
-			));
-		}
-
-		$q_upd_event_mysql .= ' WHERE events.id = :event_id';
-
-		$p_upd_event_mysql = $this->db->prepare($q_upd_event_mysql);
-		$p_upd_event = $this->db->prepare($q_upd_event);
-		$result = $p_upd_event->execute($query_data);
-
-		if ($result === FALSE) throw new DBQueryException(implode(';', $this->db->errorInfo()), $this->db);
-		self::saveEventTags($this->db, $this->getId(), $data['tags']);
-
-		if (isset($data['dates']) && count($data['dates']) > 0){
-			self::saveDates($data['dates'], $this->db, $this->getId());
-		}
-
-
-		self::saveNotifications($this->getId(), $data, $this->db);
 		return new Result(true, 'Событие успешно сохранено!', array('event_id' => $this->getId()));
 	}
 
@@ -585,11 +694,6 @@ class Event extends AbstractEntity{
 		if ($result === FALSE) throw new DBQueryException('', $this->db);
 		$result = $p_ins->fetch(PDO::FETCH_ASSOC);
 		return new Result(true, 'Уведомление успешно добавлено', $result);
-	}
-
-
-	public function getTitle() {
-		return $this->title;
 	}
 
 

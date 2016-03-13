@@ -3,6 +3,7 @@ ALTER TABLE public.tokens ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE public.subscriptions ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE public.events_notifications ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE public.notifications ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE public.tags ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
 ALTER TABLE public.users ADD gender BOOLEAN DEFAULT NULL  NULL;
 ALTER TABLE public.users ALTER COLUMN gender TYPE VARCHAR(50) USING gender :: VARCHAR(50);
 ALTER TABLE public.users ALTER COLUMN gender SET DEFAULT NULL;
@@ -361,6 +362,7 @@ CREATE VIEW view_events AS
   WHERE view_organizations.status = TRUE
         AND events.status = TRUE;
 
+DROP VIEW view_tags;
 
 CREATE VIEW view_tags AS
   SELECT
@@ -371,7 +373,7 @@ CREATE VIEW view_tags AS
     DATE_PART('epoch', tags.updated_at) :: INT AS updated_at
 
   FROM tags
-    INNER JOIN events_tags ON events_tags.tag_id = tags.id AND events_tags.status = TRUE
+    LEFT JOIN events_tags ON events_tags.tag_id = tags.id AND events_tags.status = TRUE
   GROUP BY tags.id, events_tags.tag_id;
 
 CREATE VIEW view_dates AS
@@ -602,6 +604,8 @@ CREATE VIEW view_user_event_ids AS
    FROM favorite_events
    WHERE favorite_events.status = TRUE
   )) as q;
+
+DROP TABLE vk_posts;
 
 CREATE TABLE public.vk_posts
 (

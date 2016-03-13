@@ -1243,7 +1243,6 @@ function EditEvent($view, $content_block){
 						})
 					});
 				}
-/*
 				$.ajax({
 					url: url,
 					data: JSON.stringify(data),
@@ -1253,21 +1252,20 @@ function EditEvent($view, $content_block){
 							if(res.data.event_id){
 								$view.find('#edit_event_event_id').val(res.data.event_id);
 								$('body').stop().animate({scrollTop:0}, 1000, 'swing', function() {
-									showNotification('Мероприятие успешно добавлено', 3000);
+									showNotification('Событие успешно добавлено', 3000);
 								});
 							} else {
 								$('body').stop().animate({scrollTop:0}, 1000, 'swing', function() {
-									showNotification('Мероприятие успешно обновлено', 3000);
+									showNotification('Событие успешно обновлено', 3000);
 								});
 							}
 						} else {
 							showNotifier({text: res.text, status: false})
 						}
 					}
-				});*/
+				});
 				console.log(data);
 			}
-
 		});
 
 

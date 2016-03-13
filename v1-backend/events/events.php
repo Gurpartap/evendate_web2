@@ -141,11 +141,11 @@ $__modules['events'] = array(
 			return $notification->update($__db, $__request);
 		},
 		'{/(id:[0-9]+)}' => function ($id) use ($__db, $__request, $__user) {
-			$event = EventsCollection::one($__db, $__user, intval($id));
+			$event = EventsCollection::one($__db, $__user, intval($id), array());
 
 			if (!isset($__request['payload'])) throw new BadMethodCallException('Bad Request');
 			if (isset($__request['payload']['organization_id'])){
-				$organization = new Organization($__request['payload']['organization_id'], $__db);
+				$organization = OrganizationsCollection::one($__db, $__user, intval($__request['payload']['organization_id']), array());
 			}else{
 				$organization = $__user->getEditorInstance()->getDefaultOrganization();
 			}
