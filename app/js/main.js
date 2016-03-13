@@ -12,9 +12,13 @@ $.fn.extend({
 				if(status === 'disabled'){
 					var $form_elements = $this.find('input, select, textarea');
 					if($this.hasClass('-status_disabled')){
-						$form_elements.each(function(){$(this).removeAttr('disabled');});
+						$form_elements.each(function(){
+							$(this).removeAttr('disabled');
+						});
 					} else {
-						$form_elements.each(function(){$(this).attr('disabled', true);});
+						$form_elements.each(function(){
+							$(this).attr('disabled', true)
+						});
 					}
 				}
 				$this.toggleClass('-status_'+status);

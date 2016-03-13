@@ -73,8 +73,8 @@
 				</div>
 			</div>
 
-			<div class="event_selected_days_wrapper">
-				<div class="event_selected_days_content">
+			<div id="edit_event_selected_days_wrapper" class="collapsing_wrapper">
+				<div class="collapsing_content">
 					<table class="event_selected_days_table">
 						<colgroup>
 							<col width="7%">
@@ -289,7 +289,7 @@
 				</div>
 			</div>-->
 
-			<h4 class="form_label"></h4>
+			<h4 class="form_label"><label for="event_tags">Публикация</label></h4>
 			<div class="form_group -parts_e_2">
 
 				<div class="form_unit">
@@ -320,6 +320,44 @@
 					</div>
 
 				</div>
+			</div>
+
+
+			<div class="form_unit">
+				<input id="edit_event_to_public_vk" class="form_checkbox" type="checkbox" tabindex="-1">
+				<label class="form_label" for="edit_event_to_public_vk"><span>Опубликовать Вконтакте</span></label>
+			</div>
+			<div id="edit_event_vk_publication" class="collapsing_wrapper">
+				<div class="collapsing_content">
+					<div class="EditEventVkGroup -hidden">
+						<h4 class="form_label"><label for="edit_event_vk_groups">Сообщество</label></h4>
+						<div class="form_unit -status_disabled">
+							<select id="edit_event_vk_groups" class="form_select2 ToSelect2" name="vk_group" disabled></select>
+						</div>
+					</div>
+					<h4 class="form_label"><label for="edit_event_description">Пост</label></h4>
+					<div class="form_unit -status_disabled">
+						<textarea id="edit_event_vk_post" class="form_textarea LimitSize" data-maxlength="500" name="vk_post" placeholder="" required disabled></textarea>
+					</div>
+					<div class="form_group EditEventImgLoadWrap -parts_2_3">
+						<div class="form_unit -status_disabled">
+							<div class="edit_event_vk_img">
+								<input class="DataUrl" type="hidden" name="vk_image_src" value="{vk_image_base64}" disabled>
+								<input class="FileName" type="hidden" name="vk_image_filename" value="{vk_image_filename}" disabled>
+								<div class="edit_event_vk_img_preview"><img class="EditEventImgPreview" data-aspect_ratio="16/9" src="{vk_image_src}"></div>
+								<footer class="edit_event_vk_img_footer form_group -parts_e_2">
+									<div class="form_unit -status_disabled"><span id="edit_event_vk_img_delete" class="action DeleteImg -color_error">Удалить</span></div>
+									<div class="form_unit -status_disabled" align="right"><span id="edit_event_vk_img_crop" class="action CropAgain -color_primary">Кадрировать</span></div>
+								</footer>
+							</div>
+						</div>
+						<div class="edit_event_vk_right_block form_unit -status_disabled -centering">
+							<button class="button -color_neutral FileLoadButton RippleEffect" type="button"><input class="LoadImg -hidden" type="file">Загрузить еще</button>
+						</div>
+					</div>
+				</div>
+
+
 			</div>
 
 			<div class="form_unit -h_centering">

@@ -975,8 +975,8 @@ function EditEvent($view, $content_block){
 			}
 
 			$view.find('#edit_event_different_time').on('change', function(){
-				var $table_wrapper = $view.find('.event_selected_days_wrapper'),
-					$table_content = $view.find('.event_selected_days_content');
+				var $table_wrapper = $view.find('#edit_event_selected_days_wrapper'),
+					$table_content = $table_wrapper.children();
 				if($(this).prop('checked')){
 					buildTable(MainCalendar.selected_days);
 					$table_wrapper.height($table_content.height()).one('transitionend', function(){
@@ -1119,7 +1119,7 @@ function EditEvent($view, $content_block){
 			dropdownCssClass: "form_select2_drop"
 		});
 
-		$view.find('.EditEventDefaultAddress').off('click').on('click', function(){
+		$view.find('.EditEventDefaultAddress').off('click.defaultAddress').on('click.defaultAddress', function(){
 			var $this = $(this);
 			$this.closest('.form_group').find('input').val($this.data('default_address'))
 		});
@@ -1159,7 +1159,25 @@ function EditEvent($view, $content_block){
 
 		});
 
-		$view.find('#edit_event_submit').off('click').on('click', function(){
+		$view.find('#edit_event_to_public_vk').on('change', function(){
+			var $table_wrapper = $view.find('#edit_event_vk_publication'),
+				$table_content = $table_wrapper.children();
+			if($(this).prop('checked')){
+				$table_wrapper.height($table_content.height());
+			} else {
+				$table_wrapper.height(0);
+			}
+			$table_wrapper.toggleStatus('disabled');
+
+			$view.find('.DeleteImg').off('click.DeleteImg').on('click.DeleteImg', function(){
+				$(this).closest('.EditEventImgLoadWrap').find('input').val('').end().find('img').attr('src', '');
+			})
+
+		});
+
+		//$view.find('#edit_event_vk_groups').select2();
+
+		$view.find('#edit_event_submit').off('click.submit').on('click.submit', function(){
 
 			function formValidation($form, for_edit){
 				var is_valid = true;
@@ -1433,6 +1451,11 @@ function EditEvent($view, $content_block){
 					if(res.data.image_horizontal_url){
 						additional_fields.image_horizontal_filename = res.data.image_horizontal_url.split('/').reverse()[0];
 					}
+					if(res.data.vk_image_src){
+						additional_fields.vk_image_src = res.data.vk_image_src;
+					} else {
+						additional_fields.vk_image_src = res.data.image_horizontal_url;
+					}
 					additional_fields.header_text = 'Редактирование мероприятия';
 					$.extend(true, res.data, additional_fields);
 					$view.find('.page_wrapper').html(tmpl('edit-event-page', res.data));
@@ -1454,6 +1477,17 @@ function EditEvent($view, $content_block){
 					if(res.data.image_horizontal_url){
 						toDataUrl(res.data.image_horizontal_url, function(base64_string){
 							$view.find('[name="image_horizontal"]').val(base64_string);
+						});
+					}
+
+					if(res.data.vk_image_src){
+						toDataUrl(res.data.vk_image_src, function(base64_string){
+							$view.find('[name="vk_image_src"]').val(base64_string);
+						});
+					}
+					else if(res.data.image_horizontal_url){
+						toDataUrl(res.data.image_horizontal_url, function(base64_string){
+							$view.find('[name="vk_image_src"]').val(base64_string);
 						});
 					}
 
