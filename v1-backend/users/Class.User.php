@@ -12,6 +12,10 @@ class User extends AbstractUser{
 	protected $is_editor;
 	protected $token_id;
 
+	protected $google_uid;
+	protected $facebook_uid;
+	protected $vk_uid;
+
 
 	protected $show_to_friends;
 	protected $notify_in_browser;
@@ -66,6 +70,10 @@ class User extends AbstractUser{
 		$this->avatar_url = $row['avatar_url'];
 		$this->is_editor = $row['is_editor'];
 		$this->token_id = $row['token_id'];
+
+		$this->vk_uid = $row['vk_uid'];
+		$this->facebook_uid = $row['facebook_uid'];
+		$this->google_uid = $row['google_uid'];
 
 		$this->show_to_friends = $row['show_to_friends'];
 		$this->notify_in_browser = $row['notify_in_browser'];
@@ -179,13 +187,27 @@ class User extends AbstractUser{
 	}
 
 	public function getMainInfo(){
+
+		$account_types = array();
+
+		if ($this->vk_uid != null){
+			$account_types[] = 'vk';
+		}
+		if ($this->google_uid != null){
+			$account_types[] = 'google';
+		}
+		if ($this->facebook_uid != null){
+			$account_types[] = 'facebook';
+		}
+
 		return new Result(true, '', array(
 			'first_name' => $this->getFirstName(),
 			'last_name' => $this->getLastName(),
 			'id' => $this->getId(),
 			'avatar_url' => $this->getAvatarUrl(),
 			'middle_name' => $this->getMiddleName(),
-			'is_editor' => $this->isEditor()
+			'is_editor' => $this->isEditor(),
+			'accounts' => $account_types
 		));
 	}
 
