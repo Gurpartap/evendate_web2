@@ -577,7 +577,9 @@ class Event extends AbstractEntity{
 					'is_free' => $data['is_free'] == 'true' ? 'true' : 'false',
 					'min_price' => $data['min_price'],
 					'status' => $data['public_at'] instanceof DateTime ? 'false' : 'true',
-				));
+				))
+				->where('id = ?', $this->getId());
+
 
 			$q_upd_event_mysql = 'UPDATE events SET
 				title = :title,
@@ -674,6 +676,7 @@ class Event extends AbstractEntity{
 		}catch(Exception $e){
 			$__mysql_db->rollback();
 			$this->db->rollback();
+			throw $e;
 		}
 
 		return new Result(true, 'Событие успешно сохранено!', array('event_id' => $this->getId()));
