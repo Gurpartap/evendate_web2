@@ -503,7 +503,7 @@ class Event extends AbstractEntity{
 					'length' => $fields[self::TAGS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 					'offset' => $fields[self::TAGS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
 				),
-				Fields::parseOrderBy($fields[self::DATES_FIELD_NAME]['order_by']) ?? '')->getData();
+				Fields::parseOrderBy($fields[self::DATES_FIELD_NAME]['order_by'] ?? ''))->getData();
 		}
 
 		if (isset($fields[self::NOTIFICATIONS_FIELD_NAME])){
