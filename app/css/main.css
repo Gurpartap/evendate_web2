@@ -1,4 +1,5 @@
 :root {
+	--color_vk: #6497bb;
 	--color_primary: #5379b8;
 	--color_secondary: #ff5f9e;
 	--color_secondary_alt: #f9306e;
@@ -412,9 +413,9 @@ input, select, textarea, button {font-family: inherit}
 	background-color: transparent;
 }
 
-.form_radio + .form_label:hover:before,
 .form_radio:checked + .form_label:before,
-.form_checkbox + .form_label:hover:before {border: 2px solid}
+.form_radio:not(:disabled) + .form_label:hover:before,
+.form_checkbox:not(:disabled) + .form_label:hover:before {border: 2px solid}
 
 .form_unit > .form_checkbox:checked + .form_label:before {border: 0}
 
@@ -424,9 +425,9 @@ input, select, textarea, button {font-family: inherit}
 
 .form_unit > .form_radio:checked + .form_label:after,
 .form_unit > .form_checkbox:checked + .form_label:before {background-color: #ff5f9e}
-.form_unit > .form_radio + .form_label:hover:before,
 .form_unit > .form_radio:checked + .form_label:before,
-.form_unit > .form_checkbox + .form_label:hover:before {border-color: #ff5f9e}
+.form_unit:not(.-status_disabled) > .form_radio:not(:disabled) + .form_label:hover:before,
+.form_unit:not(.-status_disabled) > .form_checkbox:not(:disabled) + .form_label:hover:before {border-color: #ff5f9e}
 
 /* /Form Radio & Checkbox */
 /* Form -inline */
@@ -745,6 +746,21 @@ input, select, textarea, button {font-family: inherit}
 	cursor: default;
 }
 
+.form_input.-status_disabled,
+.form_textarea.-status_disabled,
+.form_select.-status_disabled,
+.form_select2.-status_disabled,
+.form_radio.-status_disabled,
+.form_checkbox.-status_disabled,
+.form_unit.-status_disabled {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: -moz-none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
 /* /Form -status */
 
 
@@ -802,7 +818,6 @@ input, select, textarea, button {font-family: inherit}
 	transition: box-shadow .5s ease;
 }
 .button:not(:empty) {padding: 0 .8rem}
-.button[class*="-color_"]:not(:disabled):not(.-color_default):hover {box-shadow: 0 1px 6px #b3b3b3}
 
 .button:disabled,
 .button.-status_disabled {
@@ -817,27 +832,25 @@ a.button:hover {text-decoration: none}
 
 .button.-color_default {color: #5379b8}
 
+.button.-color_vk,
 .button.-color_primary,
 .button.-color_secondary {color: #fff}
+.button.-color_secondary_alt {color: #f9306e}
+.button.-color_neutral {color: #5379b8}
 
 .button.-color_default {background-color: transparent}
-.button.-color_default:not(:disabled):hover,
-.button:not([class*="-color_"]):not(:disabled):hover {background-color: #f1f1f1}
 
-
+.button.-color_vk {background-color: #6497bb}
 .button.-color_primary {background-color: #5379b8}
-
 .button.-color_secondary {background-color: #ff5f9e}
-.button.-color_secondary_alt {
-	color: #f9306e;
-	background-color: #ffdeeb;
-}
+.button.-color_secondary_alt {background-color: #ffdeeb}
+.button.-color_neutral {background-color: #fff}
 
-.button.-color_neutral {
-	color: #5379b8;
-	background-color: #fff;
-	box-shadow: 0 1px 2px #b3b3b3, 0 0 3px #ccc;
-}
+.button.-color_neutral {box-shadow: 0 1px 2px #b3b3b3, 0 0 3px #ccc}
+
+.button:not(:disabled).-color_default:hover,
+.button:not(:disabled):not([class*="-color_"]):hover {background-color: #f1f1f1}
+.button:not(:disabled)[class*="-color_"]:not(.-color_default):hover {box-shadow: 0 1px 6px #b3b3b3}
 
 /* TODO: Ripple on checkboxes and radios */
 

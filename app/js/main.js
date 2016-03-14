@@ -25,8 +25,10 @@ $.fn.extend({
 			});
 		} else if($this.is('input, textarea, select')){
 			$this.closest('.form_unit').toggleStatus(statuses);
-		}	else {
+		}	else if($this.length) {
 			$this.find('.form_unit').toggleStatus(statuses);
+		}	else {
+			throw Error('Argument not found');
 		}
 
 		return this;
@@ -184,10 +186,23 @@ function bindTabs($parent){
 }
 
 function bindSelect2($parent){
-	$parent.find('.ToSelect2').not('.-Handled_ToSelect2').select2({
+	$parent.find('.ToSelect2').not('.-Handled_ToSelect2').each(function(i, el){
+		initSelect2($(el));
+	});
+}
+
+function initSelect2($element, options){
+	var opt = {
 		containerCssClass: 'form_select2',
 		dropdownCssClass: 'form_select2_drop'
-	}).addClass('-Handled_ToSelect2');
+	};
+	if($element.hasClass('-Handled_ToSelect2')){
+		$element.select2('destroy');
+	}
+	if(options){
+		$.extend(true, opt, options);
+	}
+	$element.select2(opt).addClass('-Handled_ToSelect2')
 }
 
 

@@ -329,7 +329,7 @@
 			</div>
 			<div id="edit_event_vk_publication" class="collapsing_wrapper">
 				<div class="collapsing_content">
-					<div class="EditEventVkGroup -hidden">
+					<div class="EditEventVkGroup">
 						<h4 class="form_label"><label for="edit_event_vk_groups">Сообщество</label></h4>
 						<div class="form_unit -status_disabled">
 							<select id="edit_event_vk_groups" class="form_select2 ToSelect2" name="vk_group" disabled></select>
@@ -351,9 +351,12 @@
 								</footer>
 							</div>
 						</div>
-						<div class="edit_event_vk_right_block form_unit -status_disabled -v_centering -h_centering">
+						<div class="edit_event_vk_right_block form_unit -status_disabled -v_centering">
 							<button class="button -color_neutral FileLoadButton RippleEffect" type="button"><input class="LoadImg -hidden" type="file"><span class="Text">Загрузить еще</span></button>
 						</div>
+					</div>
+					<div class="form_unit" align="right">
+						<button class="button -color_vk RippleEffect" type="button"><span class="Text">Подтвердить публикацию</span></button>
 					</div>
 				</div>
 
@@ -617,7 +620,7 @@
       <div class="row">
         <div class="col-xs-7 day-name">{day_name}, {day_number}</div>
         <div class="col-xs-5">
-          <span class="pull-right panel-events-count">Мероприятий
+          <span class="pull-right panel-events-count">Событий
             <span class="label label-blue events-count">{events_count}</span>
           </span>
         </div>
@@ -916,8 +919,14 @@
   <option value="{id}">{name}</option>
 </script>
 
+<!--OLD-->
 <script type="javascript/template" id="tmpl-organization-option">
   <option value="{id}" data-image-url="{img_url}" data-default-address="{default_address}"> {name}</option>
+</script>
+
+<!--NEW-->
+<script type="javascript/template" id="tmpl-option">
+	<option value="{val}" {data}>{display_name}</option>
 </script>
 
 <script type="javascript/template" id="tmpl-organization-item">

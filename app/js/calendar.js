@@ -1034,7 +1034,11 @@ function EditEvent($view, $content_block){
 					$default_address_button = $view.find('.EditEventDefaultAddress');
 
 				res.data.forEach(function(organization){
-					organizations_options = organizations_options.add(tmpl('organization-option', organization));
+					organizations_options = organizations_options.add(tmpl('option', {
+						val: organization.id,
+						data: "data-image-url='"+organization.img_url+"' data-default-address='"+organization.default_address+"'",
+						display_name: organization.name
+					}));
 				});
 
 				$wrapper.find('select').append(organizations_options).select2({
@@ -1163,12 +1167,6 @@ function EditEvent($view, $content_block){
 
 		});
 
-		socket.on('vk.getGroupsToPostDone', function(response){
-			console.log(response);
-			// если группы > 1 то сделать активным селект
-			//$view.find('#edit_event_vk_groups').select2();
-		});
-
 		$view.find('#edit_event_submit').off('click.Submit').on('click.Submit', function(){
 
 			function formValidation($form, for_edit){
@@ -1193,7 +1191,7 @@ function EditEvent($view, $content_block){
 							if(is_valid){
 								var scroll_top = Math.ceil($this.closest('.EditEventImgLoadWrap').offset().top - 150);
 								$('body').stop().animate({scrollTop: scroll_top}, 1000, 'swing', function(){
-									showNotifier({text: 'Пожалуйста, добавьте к мероприятию обложку', status: false})
+									showNotifier({text: 'Пожалуйста, добавьте к событию обложку', status: false})
 								});
 							}
 							is_valid = false;
@@ -1229,7 +1227,7 @@ function EditEvent($view, $content_block){
 				},
 				form_data = $form.serializeForm(),
 				tags = form_data.tags.split(','),
-				url = 'api/v1/events/'+form_data.event_id,
+				url = form_data.event_id ? 'api/v1/events/'+form_data.event_id : 'api/v1/events/',
 				method = form_data.event_id ? 'PUT' : 'POST',
 				valid_form = formValidation($form, !!(form_data.event_id));
 
@@ -1287,10 +1285,13 @@ function EditEvent($view, $content_block){
 				}
 
 				socket.on('vk.getDataToPostDone', function(data){
-					console.log(data);
-					VK.Api.call("wall.post", data, function(r){
-						console.log(r);
+					VK.addCallback('onWallPostSave', function(){
+						showNotifier({text: 'Событие успешно опубликовано в группу Вконтакте', status: true});
 					});
+					VK.addCallback('onWallPostCancel', function(){
+						showNotifier({text: 'Событие не опубликовано', status: false});
+					});
+					VK.Api.call("wall.post", data);
 				});
 				$.ajax({
 					url: url,
@@ -1299,14 +1300,14 @@ function EditEvent($view, $content_block){
 					method: method,
 					success: function(res){
 						if(res.status){
-							if(res.data.event_id){
+							if(!res.data.event_id){
 								$view.find('#edit_event_event_id').val(res.data.event_id);
 								$('body').stop().animate({scrollTop:0}, 1000, 'swing', function() {
-									showNotification('Мероприятие успешно добавлено', 3000);
+									showNotification('Событие успешно добавлено', 3000);
 								});
 							} else {
 								$('body').stop().animate({scrollTop:0}, 1000, 'swing', function() {
-									showNotification('Мероприятие успешно обновлено', 3000);
+									showNotification('Событие успешно обновлено', 3000);
 								});
 							}
 						} else {
@@ -1324,6 +1325,23 @@ function EditEvent($view, $content_block){
 
 	}
 
+
+	socket.on('vk.getGroupsToPostDone', function(response){
+		var $wrap = $view.find('.EditEventVkGroup'),
+			$groups = $wrap.find('#edit_event_vk_groups');/*
+		if(response[0] > 1){
+			$wrap.removeClass('-hidden');
+		}*/
+		response.response.splice(0,1);
+		response.response.forEach(function(option){
+			$groups.append(tmpl('option', {
+				val: option.gid,
+				display_name: option.name,
+				data: "data-img='"+option.photo+"'"
+			}));
+		});
+		initSelect2($groups);
+	});
 
 	function toggleVkImg(){
 		var $wrap = $view.find('#edit_event_vk_publication').find('.EditEventImgLoadWrap'),
@@ -1471,10 +1489,76 @@ function EditEvent($view, $content_block){
 		});
 	}
 
+	function formatVKPost(){
+		var $post = $view.find('#edit_event_vk_post'),
+			$title = $view.find('#edit_event_title'),
+			$calendar = $view.find('.EventDatesCalendar').data('calendar'),
+			$place = $view.find('#edit_event_placepicker'),
+			$description = $view.find('#edit_event_description'),
+			$is_free = $view.find('#edit_event_free'),
+			$min_price = $view.find('#edit_event_min_price'),
+			$is_required = $view.find('#edit_event_registration_required'),
+			$registration_till = $view.find('.RegistrationTill'),
+			$tags = $view.find('.EventTags'),
+			tags = [],
+			$link = $view.find('#edit_event_url'),
+			post_text = '';
+
+		post_text += $title.val() + '\n\n';
+		if($calendar.selected_days.length > 1){
+			post_text += 'Дата начала: ' + moment($calendar.selected_days[0]).format('D MMMM YYYY');
+		} else {
+			var $main_time_inputs = $view.find('.MainTime ').find('.input');
+			post_text += 'Начало: ' + moment($calendar.selected_days[0]).format('D MMMM YYYY') + ' в ' + $main_time_inputs.eq(1).val() + ':' + $main_time_inputs.eq(2).val() + '\n';
+		}
+		if($is_required.prop('checked')){
+			var $inputs = $registration_till.find('input');
+			post_text += ' (регистрация заканчивается: ' + moment($inputs.eq(0).val()).format('DD MMMM YYYY') + ' ' + $inputs.eq(1).val() + ':' + $inputs.eq(2).val() + ')\n';
+		} else {
+			post_text += '\n';
+		}
+		post_text += $place.val() + '\n\n';
+		post_text += $description.val() + '\n\n';
+
+		if(!$is_free.prop('checked')){
+			post_text += 'Цена от ' + $min_price.val() + '\n\n';
+		} else {
+			post_text += '\n\n';
+		}
+
+		$tags.find('.select2-search-choice').each(function(i,tag){
+			tags.push('#' + $(tag).text().trim());
+		});
+		post_text += tags.join(' ') + '\n\n';
+
+		if($link.val()){
+			post_text += $link.val()
+		} else {
+			post_text += 'http://evendate.ru/event.php?id='+event_id;
+		}
+
+		$post.val(post_text);
+	}
+
+	function initVkPostConstructor(){
+		$view.find(
+			'#edit_event_title,' +
+			'#edit_event_placepicker,' +
+			'#edit_event_description,' +
+			'#edit_event_free,' +
+			'#edit_event_min_price,' +
+			'#edit_event_registration_required,' +
+			'.RegistrationTill input' +
+			'#edit_event_url' +
+			'.EventTags'
+		).on('change.FormatVkPost', formatVKPost);
+		$view.find('.EventDatesCalendar').data('calendar').$calendar.on('days-changed.FormatVkPost', formatVKPost);
+	}
+
 	window.scrollTo(0, 0);
 	var additional_fields = {
 		event_id: event_id,
-		header_text: 'Новое мероприятие',
+		header_text: 'Новое событие',
 		public_at_data_label: 'Дата',
 		registration_till_data_label: 'Дата',
 		current_date: moment().format(__C.DATE_FORMAT)
@@ -1482,6 +1566,7 @@ function EditEvent($view, $content_block){
 	if(typeof event_id === 'undefined'){
 		$view.find('.page_wrapper').html(tmpl('edit-event-page', additional_fields));
 		initEditEventPage($view);
+		checkVkPublicationAbility();
 		toggleVkImg();
 		initVkDataCopying();
 	} else {
@@ -1521,11 +1606,12 @@ function EditEvent($view, $content_block){
 					if(!res.data.vk_image_src){
 						additional_fields.vk_image_src = res.data.image_horizontal_url;
 					}
-					additional_fields.header_text = 'Редактирование мероприятия';
+					additional_fields.header_text = 'Редактирование события';
 					$.extend(true, res.data, additional_fields);
 					$view.find('.page_wrapper').html(tmpl('edit-event-page', res.data));
 
 					initEditEventPage($view);
+					checkVkPublicationAbility();
 
 					$view.find('#edit_event_different_time').prop('checked', true).trigger('change');
 					selectDates($view, res.data.dates);
@@ -1571,6 +1657,8 @@ function EditEvent($view, $content_block){
 						$view.find('#edit_event_delayed_publication').prop('checked', true).trigger('change');
 					}
 
+					formatVKPost();
+
 				} else {
 					if(res.text){
 						showNotifier({text: res.text, status: false});
@@ -1581,17 +1669,23 @@ function EditEvent($view, $content_block){
 			}
 		});
 	}
-	$.ajax({
-		url: 'api/v1/users/me',
-		method: 'GET',
-		success: function(res){
-			if(Array.isArray(res.data)){
-				socket.emit('vk.getGroupsToPost', res.data[0].id);
-			} else {
-				socket.emit('vk.getGroupsToPost', res.data.id);
+	function checkVkPublicationAbility(){
+		$.ajax({
+			url: 'api/v1/users/me',
+			method: 'GET',
+			success: function(res){
+				if(Array.isArray(res.data)){
+					res.data = res.data[0];
+				}
+				if(res.data.accounts.indexOf("vk") !== -1){
+					socket.emit('vk.getGroupsToPost', res.data.id);
+					initVkPostConstructor();
+				} else {
+					//$('#edit_event_to_public_vk').toggleStatus('disabled');
+				}
 			}
-		}
-	});
+		});
+	}
 
 
 }
