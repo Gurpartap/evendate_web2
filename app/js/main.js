@@ -10,7 +10,8 @@ $.fn.extend({
 		if($this.is('.form_unit')){
 			statuses.split(' ').forEach(function(status){
 				if(status === 'disabled'){
-					var $form_elements = $this.find('input, select, textarea');
+					var $form_elements = $this.find('input, select, textarea, button');
+					debugger;
 					if($this.hasClass('-status_disabled')){
 						$form_elements.each(function(){
 							$(this).removeAttr('disabled');
@@ -23,7 +24,7 @@ $.fn.extend({
 				}
 				$this.toggleClass('-status_'+status);
 			});
-		} else if($this.is('input, textarea, select')){
+		} else if($this.is('input, textarea, select, button')){
 			$this.closest('.form_unit').toggleStatus(statuses);
 		}	else if($this.length) {
 			$this.find('.form_unit').toggleStatus(statuses);
