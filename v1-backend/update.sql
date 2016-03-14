@@ -399,10 +399,12 @@ CREATE VIEW view_dates AS
 
 ALTER TABLE public.tokens ADD device_name TEXT DEFAULT NULL NULL;
 
+
+ALTER TABLE public.tokens ADD uuid TEXT UNIQUE        NOT NULL DEFAULT uuid_generate_v4();
 CREATE VIEW view_devices AS
   SELECT
     tokens.id,
-    "uuid",
+    tokens.uuid,
     tokens.token_type,
     tokens.user_id,
     tokens.expires_on,
@@ -634,3 +636,5 @@ CREATE TABLE public.vk_posts
   CONSTRAINT users_notifications_events_id_fk FOREIGN KEY (event_id) REFERENCES events (id),
   CONSTRAINT users_notifications_users_id_fk FOREIGN KEY (creator_id) REFERENCES users (id)
 );
+
+ALTER TABLE public.tokens ADD refresh_token TEXT DEFAULT NULL NULL;
