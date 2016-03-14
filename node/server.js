@@ -161,6 +161,18 @@ var URLs = {
 			'updated_at'
 		]
 	}),
+	organizations = sql.define({
+		name: 'organizations',
+		columns: [
+			'id',
+			'img_url',
+			'background_img_url',
+			'background_medium_img_url',
+			'background_small_img_url',
+			'img_medium_url',
+			'img_small_url'
+		]
+	}),
 	events = sql.define({
 		name: 'events',
 		columns: [
@@ -340,21 +352,41 @@ pg.connect(pg_conn_string, function(err, client, done) {
 	function resizeImages() {
 
 		var IMAGES_PATH = '../' + real_config.images.events_path + '/',
+			ORGANIZATIONS_IMAGES_PATH = '../' + real_config.images.organizations_images + '/',
 			LARGE_IMAGES = 'large',
 			MEDIUM_IMAGES = 'medium',
 			SMALL_IMAGES = 'small',
 			VERTICAL_IMAGES = 'vertical',
 			HORIZONTAL_IMAGES = 'horizontal',
-			SQUARE_IMAGES = 'square';
+			SQUARE_IMAGES = 'square',
+			BACKGROUND_IMAGES = 'backgrounds',
+			LOGO_IMAGES = 'logos',
+			q_get_changed_images = organizations
+				.select(organizations.id, organizations.background_img_url, organizations.img_url)
+				.from(organizations)
+				.where(
+					organizations.background_img_url.notEquals(organizations.background_medium_img_url)
+				)
+				.or(
+					organizations.background_img_url.notEquals(organizations.background_small_img_url)
+				)
+				.or(
+					organizations.img_url.notEquals(organizations.img_medium_url)
+				)
+				.or(
+					organizations.img_url.notEquals(organizations.img_small_url)
+				).toQuery();
 
 		fs.readdir(IMAGES_PATH + LARGE_IMAGES, function(err, files) {
 			if (err) {
 				handleError(err);
 				return;
 			}
-			getNotInFolder(files, MEDIUM_IMAGES, resizeImages);
-			getNotInFolder(files, SMALL_IMAGES, resizeImages);
-			getNotInFolder(files, SQUARE_IMAGES, function(size, diff) {
+
+
+			getNotInFolder(IMAGES_PATH, files, MEDIUM_IMAGES, resizeImages);
+			getNotInFolder(IMAGES_PATH, files, SMALL_IMAGES, resizeImages);
+			getNotInFolder(IMAGES_PATH, files, SQUARE_IMAGES, function(size, diff) {
 				diff = diff.splice(0, 100);
 				diff.forEach(function(filename) {
 					cropper.cropToSquare({
@@ -364,6 +396,85 @@ pg.connect(pg_conn_string, function(err, client, done) {
 				})
 			});
 		});
+
+		client.query(q_get_changed_images, function(err, result) {
+			result.rows.forEach(function(obj) {
+
+				var logo_img_path = ORGANIZATIONS_IMAGES_PATH + LOGO_IMAGES + '/' + LARGE_IMAGES + '/' + obj.img_url,
+					background_img_path = ORGANIZATIONS_IMAGES_PATH + BACKGROUND_IMAGES + '/' + LARGE_IMAGES + '/' + obj.background_img_url
+
+				fs.stat(background_img_path, function(err, stats) {
+					if (handleError(err)) return;
+					if (stats.isFile() == false){
+						handleError({
+							name: 'NOT_A_FILE',
+							path: background_img_path
+						});
+						return;
+					}
+					cropper.resizeFile({
+						source: background_img_path,
+						destination: ORGANIZATIONS_IMAGES_PATH + BACKGROUND_IMAGES + '/' + MEDIUM_IMAGES + '/' + obj.background_img_url,
+						type: 'organization',
+						orientation: BACKGROUND_IMAGES,
+						size: MEDIUM_IMAGES
+					});
+
+					cropper.resizeFile({
+						source: background_img_path,
+						destination: ORGANIZATIONS_IMAGES_PATH + BACKGROUND_IMAGES + '/' + SMALL_IMAGES + '/' + obj.background_img_url,
+						type: 'organization',
+						orientation: BACKGROUND_IMAGES,
+						size: SMALL_IMAGES
+					});
+
+
+
+					var q_upd_organization = organizations.update({
+						background_medium_img_url: obj.background_img_url,
+						background_small_img_url: obj.background_img_url
+					}).where(organizations.id.equals(obj.id)).toQuery();
+
+					client.query(q_upd_organization, handleError);
+				});
+
+				fs.stat(logo_img_path, function(err, stats) {
+					if (handleError(err)) return;
+					if (stats.isFile() == false){
+						handleError({
+							name: 'NOT_A_FILE',
+							path: logo_img_path
+						});
+						return;
+					}
+					cropper.resizeFile({
+						source: logo_img_path,
+						destination: ORGANIZATIONS_IMAGES_PATH + BACKGROUND_IMAGES + '/' + MEDIUM_IMAGES + '/' + obj.background_img_url,
+						type: 'organization',
+						orientation: LOGO_IMAGES,
+						size: MEDIUM_IMAGES
+					});
+
+					cropper.resizeFile({
+						source: logo_img_path,
+						destination: ORGANIZATIONS_IMAGES_PATH + BACKGROUND_IMAGES + '/' + SMALL_IMAGES + '/' + obj.background_img_url,
+						type: 'organization',
+						orientation: LOGO_IMAGES,
+						size: SMALL_IMAGES
+					});
+
+
+
+					var q_upd_organization = organizations.update({
+						img_medium_url: obj.img_url,
+						img_small_url: obj.img_url
+					}).where(organizations.id.equals(obj.id)).toQuery();
+
+					client.query(q_upd_organization, handleError);
+				});
+			})
+		});
+
 
 		function resizeImages(size, diff) {
 			if (diff.length == 0) return;
@@ -412,8 +523,8 @@ pg.connect(pg_conn_string, function(err, client, done) {
 			});
 		}
 
-		function getNotInFolder(large_files, size, cb) {
-			fs.readdir(IMAGES_PATH + size, function(err, files) {
+		function getNotInFolder(path, large_files, size, cb) {
+			fs.readdir(path + size, function(err, files) {
 				if (err) {
 					logger.error(err);
 					return;
@@ -1104,8 +1215,8 @@ pg.connect(pg_conn_string, function(err, client, done) {
 
 							rest
 								.get(URLs.VK.SAVE_WALL_PHOTO_UPLOAD + '?' + request_data.join('&'))
-								.on('complete', function(res_data){
-									if (res_data.response.length == 0){
+								.on('complete', function(res_data) {
+									if (res_data.response.length == 0) {
 										socket.emit('vk.getDataToPostDone', {'error': 'CANT_LOAD_IMAGE'});
 										return;
 									}
@@ -1116,7 +1227,8 @@ pg.connect(pg_conn_string, function(err, client, done) {
 											from_group: 1,
 											message: data.message,
 											attachments: [res_data.response[0].id, data.link ? data.link : ''].join(',')
-										}});
+										}
+									});
 									socket.emit('vk.getDataToPostDone', {
 										error: null,
 										data: {
@@ -1124,7 +1236,8 @@ pg.connect(pg_conn_string, function(err, client, done) {
 											from_group: 1,
 											message: data.message,
 											attachments: [res_data.response[0].id, data.link ? data.link : ''].join(',')
-										}});
+										}
+									});
 								});
 						});
 					});

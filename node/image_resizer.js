@@ -19,17 +19,35 @@ const IMG_WIDTHS = {
 		'vertical': 400,
 		'horizontal': 400
 	}
-};
+},
+	ORGANIZATIONS_WIDTHS = {
+		'small': {
+			'backgrounds': 480,
+			'logos': 100
+		},
+		'medium': {
+			'backgrounds': 854,
+			'logos': 250
+		},
+		'large': {
+			'backgrounds': 1366,
+			'logos': 500
+		}
+	};
 
 function ImagesResize(settings) {
 	this.settings = settings;
 }
 
 ImagesResize.prototype.resizeFile = function(settings){
+	var widths = IMG_WIDTHS;
+	if (settings.type == 'organization'){
+		widths = ORGANIZATIONS_WIDTHS;
+	}
 	easyimage.resize({
 		src: settings.source,
 		dst: settings.destination,
-		width: IMG_WIDTHS[settings.size][settings.orientation]
+		width: widths[settings.size][settings.orientation]
 	})
 };
 
