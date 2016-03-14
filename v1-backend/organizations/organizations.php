@@ -47,6 +47,17 @@ $__modules['organizations'] = array(
 			);
 		}
 	),
+	'PUT' => array(
+		'{(id:[0-9]+)}' => function ($organization_id) use ($__db, $__request, $__user, $__fields){
+			$organization = OrganizationsCollection::one(
+				$__db,
+				$__user,
+				intval($organization_id),
+				$__fields
+			);
+			return $organization->update($__user, $__request['payload']);
+		},
+	),
 	'POST' => array(
 		'{(id:[0-9]+)/subscriptions}' => function ($organization_id) use ($__db, $__request, $__user, $__fields){
 			$organization = OrganizationsCollection::one(

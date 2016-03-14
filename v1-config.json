@@ -57,7 +57,8 @@
     },
     "images": {
       "events_path": "event_images",
-      "user_images": "user_images"
+      "user_images": "user_images",
+      "organizations_images": "organizations_images"
     },
     "domain": "evendate.ru",
     "node_domain": "evendate.ru",
@@ -128,7 +129,8 @@
     },
     "images": {
       "events_path": "event_images",
-      "user_images": "user_images"
+      "user_images": "user_images",
+      "organizations_images": "organizations_images"
     },
     "mongodb":{
       "host": "localhost",
@@ -205,7 +207,8 @@
     },
     "images": {
       "events_path": "event_images",
-      "user_images": "user_images"
+      "user_images": "user_images",
+      "organizations_images": "organizations_images"
     },
     "mongodb":{
       "host": "localhost",

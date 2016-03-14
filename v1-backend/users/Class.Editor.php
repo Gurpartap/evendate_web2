@@ -45,7 +45,7 @@
 			}
 		}
 
-		public function isAdmin(User $user) : boolean {
+		public function isAdmin(Organization $organization) : bool {
 			$q_get = App::queryFactory()->newSelect();
 			$q_get
 				->cols(array('id'))
@@ -53,17 +53,17 @@
 				->join('INNER', 'users_roles', 'users_roles.id = users_organizations.role_id')
 				->where('user_id = :user_id')
 				->where('users_organizations.organization_id = :organization_id')
-				->where('users_roles.name = "admin"');
+				->where('users_roles.name = \'admin\'');
 
 			$p_get_data = $this->db->prepare($q_get->getStatement());
 
 			$result = $p_get_data->execute(array(
-				':user_id' => $user->getId(),
-				':organization_id' => $this->id
+				':user_id' => $this->getId(),
+				':organization_id' => $organization->getId()
 			));
 
-			if ($result == FALSE) throw new DBQueryException('',$this->db);
-			return $p_get_data->rowCount() > 1;
+			if ($result == FALSE) throw new DBQueryException('CANT_GET_USERS_ORGANIZATIONS',$this->db);
+			return $p_get_data->rowCount() > 0;
 		}
 
 		public function getDefaultOrganization() : Organization {

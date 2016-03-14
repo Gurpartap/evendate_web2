@@ -162,6 +162,14 @@ SET new_done = (CASE done
 ALTER TABLE public.events_notifications DROP done;
 ALTER TABLE public.events_notifications RENAME COLUMN new_done TO done;
 
+UPDATE organizations SET
+  img_url = REPLACE(img_url,'organizations_images/logos/large/',''),
+  img_medium_url = REPLACE(img_medium_url,'organizations_images/logos/medium/',''),
+  img_small_url = REPLACE(img_small_url,'organizations_images/logos/small/',''),
+  background_img_url = REPLACE(background_img_url,'organizations_images/backgrounds/large/',''),
+  background_medium_img_url = REPLACE(background_medium_img_url,'organizations_images/backgrounds/medium/',''),
+  background_small_img_url = REPLACE(background_small_img_url,'organizations_images/backgrounds/small/','');
+
 DROP VIEW view_organizations CASCADE;
 
 /*VIEW*/
@@ -170,15 +178,15 @@ CREATE VIEW view_organizations AS
     organizations.id :: INT,
     organizations.description,
     organizations.id :: INT                                                AS oid,
-    organizations.images_domain || organizations.background_medium_img_url AS background_medium_img_url,
-    organizations.images_domain || organizations.background_small_img_url  AS background_small_img_url,
-    organizations.images_domain || organizations.img_medium_url            AS img_medium_url,
-    organizations.images_domain || organizations.img_small_url             AS img_small_url,
+    organizations.images_domain || 'organizations_images/backgrounds/medium/' || organizations.background_medium_img_url AS background_medium_img_url,
+    organizations.images_domain || 'organizations_images/backgrounds/small/' || organizations.background_small_img_url  AS background_small_img_url,
+    organizations.images_domain || 'organizations_images/logos/medium/' || organizations.img_medium_url            AS img_medium_url,
+    organizations.images_domain || 'organizations_images/logos/small/' || organizations.img_small_url             AS img_small_url,
     organizations.site_url,
     organizations.name,
     organizations.type_id :: INT,
-    organizations.images_domain || organizations.img_url                   AS img_url,
-    organizations.images_domain || organizations.background_img_url        AS background_img_url,
+    organizations.images_domain || 'organizations_images/logos/large/' || organizations.img_url                   AS img_url,
+    organizations.images_domain || 'organizations_images/backgrounds/large/' || organizations.background_img_url        AS background_img_url,
     TRUE                                                                   AS status,
     organizations.short_name,
     organization_types.name                                                AS type_name,
@@ -391,10 +399,12 @@ CREATE VIEW view_dates AS
 
 ALTER TABLE public.tokens ADD device_name TEXT DEFAULT NULL NULL;
 
+
+ALTER TABLE public.tokens ADD uuid TEXT UNIQUE        NOT NULL DEFAULT uuid_generate_v4();
 CREATE VIEW view_devices AS
   SELECT
     tokens.id,
-    "uuid",
+    tokens.uuid,
     tokens.token_type,
     tokens.user_id,
     tokens.expires_on,
@@ -566,7 +576,11 @@ CREATE TABLE users_roles (
 INSERT INTO users_roles (name, description)
 VALUES ('admin', 'Администратор и владелец организации');
 
-ALTER TABLE public.users_organizations ADD role_id TEXT DEFAULT 1 NOT NULL;
+INSERT INTO users_roles (name, description)
+VALUES ('moderator', 'Модератор (редактор контента)');
+
+ALTER TABLE public.users_organizations DROP role_id;
+ALTER TABLE public.users_organizations ADD role_id INT DEFAULT 1 NOT NULL;
 
 ALTER TABLE public.events ADD registration_required BOOLEAN DEFAULT FALSE NOT NULL;
 ALTER TABLE public.events ADD registration_till TIMESTAMP DEFAULT NULL NULL;
@@ -611,14 +625,14 @@ CREATE TABLE public.vk_posts
 (
   id                SERIAL PRIMARY KEY NOT NULL,
   creator_id           INT                NOT NULL,
-  event_id          INT                NOT NULL,
+  event_id          INT               NULL DEFAULT NULL,
+  image_path TIMESTAMP          NOT NULL,
+  message TEXT,
+  group_id              VARCHAR(50) NOT NULL,
   created_at        TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP,
   updated_at        TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP,
-  notification_time TIMESTAMP          NOT NULL,
-  status            BOOLEAN                     DEFAULT TRUE,
-  done              BOOLEAN                     DEFAULT FALSE,
-  sent_time         TIMESTAMP                   DEFAULT NULL,
-  uuid              TEXT UNIQUE        NOT NULL DEFAULT uuid_generate_v4(),
   CONSTRAINT users_notifications_events_id_fk FOREIGN KEY (event_id) REFERENCES events (id),
   CONSTRAINT users_notifications_users_id_fk FOREIGN KEY (creator_id) REFERENCES users (id)
 );
+
+ALTER TABLE public.tokens ADD refresh_token TEXT DEFAULT NULL NULL;

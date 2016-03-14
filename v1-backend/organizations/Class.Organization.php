@@ -13,6 +13,10 @@ class Organization extends AbstractEntity{
 	const SUBSCRIPTION_ID_FIELD_NAME = 'subscription_id';
 	const IS_SUBSCRIBED_FIELD_NAME = 'is_subscribed';
 	const NEW_EVENTS_COUNT_FIELD_NAME = 'new_events_count';
+	const IMAGES_PATH = 'organizations_images/';
+	const IMAGE_SIZE_LARGE = '/large/';
+	const IMAGE_TYPE_BACKGROUND = '/backgrounds/';
+	const IMAGE_TYPE_LOGO = '/logos/';
 
 	protected $description;
 	protected $background_medium_img_url;
@@ -319,11 +323,12 @@ class Organization extends AbstractEntity{
 		return $result;
 	}
 
-
 	public function update(User $user, array $data){
+
 		if ($user->getEditorInstance()->isAdmin($this) == false) throw new PrivilegesException('NOT_ADMIN', $this->db);
 		$q_upd_organization = App::queryFactory()->newUpdate();
 
+		$q_upd_organization->table('organizations');
 
 		if (isset($data['name'])){
 			if (mb_strlen($data['name']) <= 3) throw new InvalidArgumentException('Слишком короткое название. Должно быть не менее 3 символов.');
@@ -335,7 +340,7 @@ class Organization extends AbstractEntity{
 
 		if (isset($data['short_name'])){
 			if (mb_strlen($data['short_name']) <= 3) throw new InvalidArgumentException('Слишком короткое сокращение. Должно быть не менее 3 символов.');
-			if (mb_strlen($data['short_name']) > 10) throw new InvalidArgumentException('Слишком длинное сокращение. Должно быть не более 10 символов.');
+			if (mb_strlen($data['short_name']) > 15) throw new InvalidArgumentException('Слишком длинное сокращение. Должно быть не более 15 символов.');
 			$q_upd_organization->cols(array('short_name' => trim($data['short_name'])));
 		}
 
@@ -381,10 +386,30 @@ class Organization extends AbstractEntity{
 			);
 		}
 
-		if (isset($data['background']) && !empty($data['background'])
-			&& isset($data['background_filename']) && !empty($data['background_filename'])
+		if (isset($data['background'])
+			&& !empty($data['background'])
+			&& $data['background'] != null
+			&& $data['background_filename'] != null
+			&& isset($data['background_filename'])
+			&& !empty($data['background_filename'])
 		){
-			$filename = md5();
+			$background_filename = md5(App::generateRandomString() . '-background') .  '.' . App::getImageExtension($data['background_filename']);
+			$background_path = self::IMAGES_PATH . self::IMAGE_TYPE_BACKGROUND . $background_filename;
+			$q_upd_organization->cols(array('background_img_url' => $background_path));
+			App::saveImage($data['background'], $background_path, 14000);
+		}
+
+		if (isset($data['logo'])
+			&& !empty($data['logo'])
+			&& $data['logo'] != null
+			&& $data['logo_filename'] != null
+			&& isset($data['logo_filename'])
+			&& !empty($data['logo_filename'])
+		){
+			$logo_filename = md5(App::generateRandomString() . '-logo') .  '.' . App::getImageExtension($data['logo_filename']);
+			$logo_path = self::IMAGES_PATH . self::IMAGE_TYPE_LOGO . $logo_filename;
+			$q_upd_organization->cols(array('img_url' => $logo_path));
+			App::saveImage($data['logo'], $logo_path, 14000);
 		}
 
 		$q_upd_organization
@@ -394,8 +419,8 @@ class Organization extends AbstractEntity{
 
 		$result = $p_upd_organization->execute($q_upd_organization->getBindValues());
 
-		if ($result == FALSE) throw new DBQueryException('CANT_UPDATE_ORGANIZATION', $this->db);
-
+		if ($result === FALSE) throw new DBQueryException('CANT_UPDATE_ORGANIZATION', $this->db);
+		return new Result(true, '', array('organization_id' => $this->getId()));
 	}
 
 }
