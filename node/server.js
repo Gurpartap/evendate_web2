@@ -104,6 +104,17 @@ var URLs = {
 			'avatar_url_max'
 		]
 	}),
+	vk_posts = sql.define({
+		name: 'vk_posts',
+		columns: [
+			'id',
+			'creator_id',
+			'event_id',
+			'image_path',
+			'message',
+			'group_id'
+		]
+	}),
 	vk_sign_in = sql.define({
 		name: 'vk_sign_in',
 		columns: [
@@ -1167,6 +1178,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 				).toQuery();
 			client.query(q_get_user_data, function(err, result) {
 				if (handleError(err)) return;
+				result.rows[0].user_id =  user_id;
 				socket.vk_user = result.rows[0];
 				getVkGroups(result.rows[0], 'can_post', function(data) {
 					socket.emit('vk.getGroupsToPostDone', data);
@@ -1186,7 +1198,6 @@ pg.connect(pg_conn_string, function(err, client, done) {
 				extension = filename_parts[filename_parts.length - 1],
 				filename = data.group_id + '__' + Utils.makeId(20) + '.' + extension,
 				base64 = data.image.base64.split(',')[1];
-
 			fs.writeFile(image_path + filename, base64, 'base64', function(err) {
 				if (handleError(err)) return;
 
@@ -1220,34 +1231,45 @@ pg.connect(pg_conn_string, function(err, client, done) {
 										socket.emit('vk.getDataToPostDone', {'error': 'CANT_LOAD_IMAGE'});
 										return;
 									}
-									socket.emit('log', {
-										error: null,
-										data: {
-											owner_id: '-' + data.group_id,
-											from_group: 1,
-											message: data.message,
-											attachments: [res_data.response[0].id, data.link ? data.link : ''].join(',')
+
+									var q_ins_vk_post = vk_posts.insert({
+										creator_id: socket.vk_user.user_id,
+										image_path: filename,
+										message: data.message,
+										group_id: data.group_id
+									}).returning('id').toQuery();
+
+									client.query(q_ins_vk_post, function(err, ins_result){
+
+										if (handleError(err)){
+											socket.emit('vk.getDataToPostDone', {
+												error: err
+											});
+											return;
 										}
-									});
-									socket.emit('vk.getDataToPostDone', {
-										error: null,
-										data: {
-											owner_id: '-' + data.group_id,
-											from_group: 1,
-											message: data.message,
-											attachments: [res_data.response[0].id, data.link ? data.link : ''].join(',')
-										}
-									});
+
+										socket.emit('vk.getDataToPostDone', {
+											error: null,
+											data: {
+												owner_id: '-' + data.group_id,
+												from_group: 1,
+												message: data.message,
+												guid: ins_result.rows[0].id,
+												attachments: [res_data.response[0].id, data.link ? data.link : ''].join(',')
+											}
+										});
+									})
 								});
 						});
 					});
 				});
 			});
-
-
 		});
 
 
+		socket.on('vk.savePostToVk', function(data) {
+
+		});
 	});
 
 	io.listen(8080);
