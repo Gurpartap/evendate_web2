@@ -11,7 +11,7 @@
 
 $__modules['events'] = array(
 	'GET' => array(
-		'{{/(id:[0-9]+)}/notifications}' => function ($id) use ($__db, $__request, $__user, $__fields) {
+		'{{/(id:[0-9]+)}/notifications}' => function ($id) use ($__db, $__order_by, $__request, $__user, $__fields) {
 			$event = EventsCollection::one(
 				$__db,
 				$__user,
@@ -84,7 +84,6 @@ $__modules['events'] = array(
 				);
 			}
 
-			print_r($__order_by);
 			return EventsDatesCollection::filter(
 				$__db,
 				$__user,
@@ -94,7 +93,7 @@ $__modules['events'] = array(
 				$__order_by ?? array()
 			);
 		},
-		'' => function () use ($__db, $__request, $__user, $__fields, $__offset, $__length) {
+		'' => function () use ($__db, $__request, $__user, $__order_by, $__fields, $__offset, $__length) {
 			return EventsCollection::filter(
 				$__db,
 				$__user,

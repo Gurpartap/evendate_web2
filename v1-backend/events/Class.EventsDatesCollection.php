@@ -48,6 +48,13 @@ class EventsDatesCollection extends AbstractCollection{
 					 }
 					 break;
 				 }
+				 case 'future': {
+					 if (mb_strtolower(trim($value)) == 'true'){
+						 $q_get_dates
+							 ->where("event_date > DATE_PART('epoch', NOW())");
+					 }
+					 break;
+				 }
 				 case 'since': {
 					 if ($value instanceof DateTime == false){
 						 $date_parts = explode(' ', $value);
@@ -81,8 +88,7 @@ class EventsDatesCollection extends AbstractCollection{
 						 $column_type = '::DATE';
 					 }
 					 $statement_array[':till_date'] = $value->format($with_time ? 'Y-m-d H:i:s' : 'Y-m-d');
-					 $q_get_dates->where(':till_date' . $column_type . ' <= CONCAT(to_timestamp(event_date)::DATE, \' \', end_time)'.$column_type);
-					 break;
+					 $q_get_dates->where(':till_date' . $column_type . ' >= CONCAT(to_timestamp(event_date)::DATE, \' \', end_time)'.$column_type);
 					 break;
 				 }
 				 case 'event': {
@@ -137,7 +143,6 @@ class EventsDatesCollection extends AbstractCollection{
 		$q_get_dates
 			->cols($cols)
 			->orderBy($order_by);
-		echo $q_get_dates->getStatement();
 		$p_get_events = $db->prepare($q_get_dates->getStatement());
 		$result = $p_get_events->execute($statement_array);
 		if ($result === FALSE) throw new DBQueryException(implode(';', $db->errorInfo()), $db);
