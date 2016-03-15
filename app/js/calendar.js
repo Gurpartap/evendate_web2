@@ -92,12 +92,12 @@ function bindEventHandlers(){
 		window.open($block.data('share')[_type], 'SHARE_WINDOW',
 			'status=1,toolbar=0,menubar=0&height=300,width=500');
 	});
-
+	/*
 	$view.find('.btn-edit').on('click', function(){
 		var $this = $(this),
 			event_id = $this.data('event-id');
 		showEditEventModal(event_id);
-	});
+	});*/
 
 	$view.find('.event-hide-button').on('click', function(){
 		var $panel_block = $(this).parents('.tl-panel-block'),
@@ -1296,7 +1296,7 @@ function EditEvent($view, $content_block){
 
 				if($submit_button.data('guid')){
 					VK.Api.call("wall.post", $submit_button.data(), function(){});
-					data.guid = $submit_button.data('guid');
+					data.vk_post_id = $submit_button.data('guid');
 				}
 
 				$.ajax({
@@ -1483,12 +1483,12 @@ function EditEvent($view, $content_block){
 		$view.find('#edit_event_image_horizontal_src').on('change.CopyToVkImg', function(){
 			var $wrap = $(this).closest('.EditEventImgLoadWrap'),
 				$vk_wrap = $view.find('#edit_event_vk_publication'),
-				src = $(this).val();
+				src = $(this).data('source');
 
 			if(!$view.find('.edit_event_vk_right_block').hasClass('-h_centering')){
 				toggleVkImg();
 			}
-			$vk_wrap.find('#edit_event_vk_image_src').val(src);
+			$vk_wrap.find('#edit_event_vk_image_src').val('data.source').data('source', src);
 			$vk_wrap.find('.EditEventImgPreview').attr('src', src).data('source_img', $wrap.find('.EditEventImgPreview').data('source_img'));
 			$vk_wrap.find('#edit_event_vk_image_filename').val($view.find('#edit_event_image_horizontal_filename').val());
 			$vk_wrap.find('.CropAgain').data($wrap.find('.CropAgain').data());
@@ -1624,9 +1624,12 @@ function EditEvent($view, $content_block){
 					}
 					if(res.data.image_horizontal_url){
 						additional_fields.image_horizontal_filename = res.data.image_horizontal_url.split('/').reverse()[0];
+						additional_fields.vk_image_url = res.data.image_horizontal_url;
+						additional_fields.vk_image_filename = additional_fields.image_horizontal_filename;
 					}
-					if(!res.data.vk_image_src){
-						additional_fields.vk_image_src = res.data.image_horizontal_url;
+					if(res.data.vk_image_url){
+						additional_fields.vk_image_url = res.data.vk_image_url;
+						additional_fields.vk_image_filename = res.data.vk_image_url.split('/').reverse()[0];
 					}
 					additional_fields.header_text = 'Редактирование события';
 					$.extend(true, res.data, additional_fields);
@@ -1652,14 +1655,8 @@ function EditEvent($view, $content_block){
 							$view.find('#edit_event_image_horizontal_src').val(base64_string ? base64_string : null);
 						});
 					}
-
-					if(res.data.vk_image_src){
-						toDataUrl(res.data.vk_image_src, function(base64_string){
-							$view.find('#edit_event_vk_image_src').val(base64_string ? base64_string : null);
-						});
-					}
-					else if(res.data.image_horizontal_url){
-						toDataUrl(res.data.image_horizontal_url, function(base64_string){
+					if(additional_fields.vk_image_url){
+						toDataUrl(additional_fields.vk_image_url, function(base64_string){
 							$view.find('#edit_event_vk_image_src').val(base64_string ? base64_string : null);
 						});
 					}
