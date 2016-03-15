@@ -344,7 +344,7 @@
 							<div class="edit_event_vk_img">
 								<input id="edit_event_vk_image_src" class="DataUrl" type="hidden" name="vk_image_src" value="{vk_image_base64}" disabled>
 								<input id="edit_event_vk_image_filename" class="FileName" type="hidden" name="vk_image_filename" value="{vk_image_filename}" disabled>
-								<div class="edit_event_vk_img_preview"><img class="EditEventImgPreview" data-aspect_ratio="16/9" src="{vk_image_src}"></div>
+								<div class="edit_event_vk_img_preview"><img class="EditEventImgPreview" data-aspect_ratio="16/9" src="{vk_image_url}"></div>
 								<footer class="edit_event_vk_img_footer form_group -parts_e_2">
 									<div class="form_unit -status_disabled"><button class="action DeleteImg -color_error" type="button">Удалить</button></div>
 									<div class="form_unit -status_disabled" align="right"><button class="action CropAgain -color_primary" type="button">Кадрировать</button></div>
@@ -1061,7 +1061,7 @@
   <div class="middle-col">
     <div class="event-title">
       <a href="event.php?id={id}" target="_blank">{title}</a>
-      <a href="#"  data-event-id="{id}" class="btn btn-edit {can_edit_hidden}"><i class="icon-pencil"></i></a>
+      <button data-event-id="{id}" data-page="edit_event" data-title="{title}" class="btn btn-default-empty btn-edit {can_edit_hidden}" type="button"><i class="icon-pencil"></i></button>
     </div>
     <button type="button" class="close" aria-label="Закрыть"><span aria-hidden="true">×</span></button>
 

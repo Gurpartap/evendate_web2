@@ -1111,10 +1111,10 @@ function showOrganizationalModal(organization_id){
                                 window.open(_link, 'SHARE_WINDOW',
                                     'status=1,toolbar=0,menubar=0&height=300,width=500');
                             });
-
                             $event_alone.find('.btn-edit').on('click', function(){
-                              showEditEventModal(_event.id);
+                              $('#organization-modal').modal('hide');
                             });
+	                          bindOnClick();
                             $event_alone.find('.close').on('click', function(){
                                 $event_alone.animate({
                                     left: 0,
