@@ -1242,7 +1242,7 @@ function EditEvent($view, $content_block){
 					}
 				},
 				form_data = $form.serializeForm(),
-				tags = form_data.tags.split(','),
+				tags = form_data.tags ? form_data.tags.split(',') : null,
 				url = form_data.event_id ? 'api/v1/events/'+form_data.event_id : 'api/v1/events/',
 				method = form_data.event_id ? 'PUT' : 'POST',
 				valid_form = formValidation($form, !!(form_data.event_id));
@@ -1250,7 +1250,7 @@ function EditEvent($view, $content_block){
 			if(valid_form){
 				$.extend(true, data, form_data);
 
-				data.tags = (tags.length === 1 && tags[0] === "") ? [] : tags;
+				data.tags = tags;
 				data.filenames = {
 					vertical: data.filename_vertical,
 					horizontal: data.filename_horizontal
@@ -1504,32 +1504,41 @@ function EditEvent($view, $content_block){
 			$link = $view.find('#edit_event_url'),
 			post_text = '';
 
-		post_text += $title.val() + '\n\n';
-		if($calendar.selected_days.length > 1){
-			post_text += 'Дата начала: ' + moment($calendar.selected_days[0]).format('D MMMM YYYY');
-		} else {
-			var $main_time_inputs = $view.find('.MainTime ').find('.input');
-			post_text += 'Начало: ' + moment($calendar.selected_days[0]).format('D MMMM YYYY') + ' в ' + $main_time_inputs.eq(1).val() + ':' + $main_time_inputs.eq(2).val() + '\n';
+		post_text +=$title.val() ? $title.val() + '\n\n' : '';
+
+		if($calendar.selected_days){
+			post_text += ($calendar.selected_days.length > 1) ? 'Дата начала: ' : 'Начало: ';
+			post_text += moment($calendar.selected_days[0]).format('D MMMM YYYY');
+			if($calendar.selected_days.length == 1){
+				var $main_time_inputs = $view.find('.MainTime').find('input');
+				post_text += $main_time_inputs.eq(0).val() ? ' в ' + parseInt($main_time_inputs.eq(0).val()) : '';
+				post_text += $main_time_inputs.eq(1).val() ? ':' + parseInt($main_time_inputs.eq(1).val()) : '';
+			}
 		}
 		if($is_required.prop('checked')){
 			var $inputs = $registration_till.find('input');
-			post_text += ' (регистрация заканчивается: ' + moment($inputs.eq(0).val()).format('D MMMM YYYY') + ' ' + $inputs.eq(1).val() + ':' + $inputs.eq(2).val() + ')\n';
+			if($inputs.eq(0).val()){
+				post_text += ' (регистрация заканчивается: ' + moment($inputs.eq(0).val()).format('D MMMM YYYY');
+				post_text += $inputs.eq(1).val() ? ' в ' + parseInt($inputs.eq(1).val()) : '';
+				post_text += $inputs.eq(2).val() ? ':' + parseInt($inputs.eq(2).val()) : '';
+				post_text += ')\n';
+			} else {
+				post_text += '\n';
+			}
 		} else {
 			post_text += '\n';
 		}
-		post_text += $place.val() + '\n\n';
-		post_text += $description.val() + '\n\n';
+		post_text += $place.val() ? $place.val() + '\n\n' : '';
+		post_text += $description.val() ? $description.val() + '\n\n' : '';
 
 		if(!$is_free.prop('checked')){
-			post_text += 'Цена от ' + $min_price.val() + '\n\n';
-		} else {
-			post_text += '\n\n';
+			post_text += $min_price.val() ? 'Цена от ' + $min_price.val() + '\n\n' : '';
 		}
 
 		$tags.find('.select2-search-choice').each(function(i,tag){
 			tags.push('#' + $(tag).text().trim());
 		});
-		post_text += tags.join(' ') + '\n\n';
+		post_text += tags ? tags.join(' ') + '\n\n' : '';
 
 		if($link.val()){
 			post_text += $link.val()
@@ -1541,18 +1550,20 @@ function EditEvent($view, $content_block){
 	}
 
 	function initVkPostConstructor(){
-		$view.find(
-			'#edit_event_title,' +
-			'#edit_event_placepicker,' +
-			'#edit_event_description,' +
-			'#edit_event_free,' +
-			'#edit_event_min_price,' +
-			'#edit_event_registration_required,' +
-			'.RegistrationTill input' +
-			'#edit_event_url' +
-			'.EventTags'
-		).on('change.FormatVkPost', formatVKPost);
-		debugger;
+		$view
+			.find(
+				'#edit_event_title,' +
+				'#edit_event_placepicker,' +
+				'#edit_event_description,' +
+				'#edit_event_free,' +
+				'#edit_event_min_price,' +
+				'#edit_event_registration_required,' +
+				'#edit_event_url,' +
+				'.EventTags'
+			)
+			.add('.RegistrationTill input')
+			.add('.MainTime input')
+			.on('change.FormatVkPost', formatVKPost);
 		$view.find('.EventDatesCalendar').data('calendar').$calendar.on('days-changed.FormatVkPost', formatVKPost);
 	}
 
@@ -1677,10 +1688,9 @@ function EditEvent($view, $content_block){
 			success: function(res){
 				if(Array.isArray(res.data)){
 					res.data = res.data[0];
-				}
+				}/*
 				if(res.data.accounts.indexOf("vk") !== -1){
-					socket.emit('vk.getGroupsToPost', res.data.id);
-					initVkPostConstructor();
+					socket.emit('vk.getGroupsToPost', res.data.id;
 					$view.find('#edit_event_vk_publication_button').off('click.vkPublicationConfirm').on('click.vkPublicationConfirm', function(){
 						var data = $view.find('#edit-event-form').serializeForm();
 						$view.find('#edit_event_submit').toggleStatus('disabled');
@@ -1697,7 +1707,8 @@ function EditEvent($view, $content_block){
 					})
 				} else {
 					$('#edit_event_to_public_vk').toggleStatus('disabled');
-				}
+				}*/
+				initVkPostConstructor();
 			}
 		});
 	}
