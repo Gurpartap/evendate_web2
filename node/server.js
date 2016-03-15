@@ -632,9 +632,9 @@ pg.connect(pg_conn_string, function(err, client, done) {
 
 
 		request(req_params, function(e, i, res) {
-			if (handleError(e, '')) return;
+			handleError(e);
 			if (cb) {
-				cb(res);
+				cb(e, res);
 			}
 		});
 	}
@@ -1192,8 +1192,11 @@ pg.connect(pg_conn_string, function(err, client, done) {
 				if (handleError(err, EMIT_NAMES.VK_INTEGRATION.GROUPS_TO_POST)) return;
 				result.rows[0].user_id =  user_id;
 				socket.vk_user = result.rows[0];
-				getVkGroups(result.rows[0], 'can_post', function(data) {
-					socket.emit(EMIT_NAMES.VK_INTEGRATION.GROUPS_TO_POST_DONE, data);
+				getVkGroups(result.rows[0], 'can_post', function(err, data) {
+					socket.emit(EMIT_NAMES.VK_INTEGRATION.GROUPS_TO_POST_DONE, {
+						error: err,
+						data: data
+					});
 				});
 			})
 		});

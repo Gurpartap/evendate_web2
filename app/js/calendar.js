@@ -1144,7 +1144,7 @@ function EditEvent($view, $content_block){
 				$view.find('#edit_event_vk_publication').height(0);
 				$view.find('#edit_event_to_public_vk').toggleStatus('disabled');
 
-				showNotifier({text: 'Пост в группе вконтакте будет опубликован при публикации', status: true});
+				showNotifier({text: 'Пост в группе вконтакте будет размещен при публикации', status: true});
 			}
 		});
 

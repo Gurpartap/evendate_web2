@@ -137,6 +137,7 @@ class EventsDatesCollection extends AbstractCollection{
 		$q_get_dates
 			->cols($cols)
 			->orderBy($order_by);
+		echo $q_get_dates->getStatement();
 		$p_get_events = $db->prepare($q_get_dates->getStatement());
 		$result = $p_get_events->execute($statement_array);
 		if ($result === FALSE) throw new DBQueryException(implode(';', $db->errorInfo()), $db);

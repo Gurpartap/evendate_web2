@@ -597,11 +597,13 @@ ALTER TABLE public.log_requests ADD response_error_name VARCHAR(255) DEFAULT NUL
 ALTER TABLE public.log_requests ADD uuid TEXT UNIQUE        NOT NULL DEFAULT uuid_generate_v4();
 
 
-DROP VIEW view_user_event_ids;
-CREATE VIEW view_user_event_ids AS
+DROP VIEW view_events_from_feed;
+DROP VIEW view_favorite_events;
+DROP VIEW view_hidden_events;
 
-  SELECT DISTINCT * FROM (SELECT
-    events.id as event_id,
+CREATE VIEW view_events_from_feed AS
+  SELECT
+    events.id AS event_id,
     subscriptions.user_id
   FROM events
     INNER JOIN subscriptions ON subscriptions.organization_id = events.organization_id
@@ -610,14 +612,47 @@ CREATE VIEW view_user_event_ids AS
   WHERE
     (subscriptions.status = TRUE)
     AND
-    (hidden_events.status = FALSE OR hidden_events.event_id IS NULL)
-  UNION
-  (SELECT
-     user_id,
-     event_id
-   FROM favorite_events
-   WHERE favorite_events.status = TRUE
-  )) as q;
+    (hidden_events.status = FALSE OR hidden_events.event_id IS NULL);
+
+CREATE VIEW view_favorite_events AS
+  SELECT
+    favorite_events.event_id,
+    favorite_events.user_id
+  FROM favorite_events
+  WHERE
+    (favorite_events.status = TRUE);
+
+CREATE VIEW view_hidden_events AS
+  SELECT
+    hidden_events.event_id,
+    hidden_events.user_id
+  FROM hidden_events
+  WHERE
+    (hidden_events.status = TRUE);
+
+DROP VIEW view_user_event_ids;
+
+CREATE VIEW view_user_event_ids AS
+  SELECT DISTINCT *
+  FROM
+    (SELECT
+       event_id,
+       user_id
+     FROM view_events_from_feed
+     UNION
+     SELECT
+       event_id,
+       user_id
+     FROM view_favorite_events
+    ) AS q
+  WHERE q.event_id NOT IN (
+    SELECT event_id
+    FROM view_hidden_events
+    WHERE view_hidden_events.event_id = q.event_id AND view_hidden_events.user_id = q.user_id
+  );
+
+
+
 
 DROP TABLE vk_posts;
 
