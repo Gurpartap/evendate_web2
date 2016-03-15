@@ -69,6 +69,7 @@ class Event extends AbstractEntity{
 		'registration_till',
 		'is_free',
 		'min_price',
+		'vk_image_url',
 
 		self::IS_FAVORITE_FIELD_NAME => '(SELECT id IS NOT NULL
 			FROM favorite_events
@@ -152,6 +153,7 @@ class Event extends AbstractEntity{
 		$data['longitude'] = isset($data['geo']['coordinates']['K']) ? $data['geo']['coordinates']['K'] : null;
 
 		$data['file_names'] = $data['filenames'] ?? $data['file_names'];
+		$data['vk_post_id'] = $data['vk_post_id'] ?? null;
 
 		if (!isset($data['tags'])) throw new LogicException('Укажите хотя бы один тег');
 		if (!is_array($data['tags'])) throw new LogicException('Укажите хотя бы один тег');
@@ -293,6 +295,7 @@ class Event extends AbstractEntity{
 			self::saveDates($data['dates'], $db, $event_id);
 			self::saveEventTags($db, $event_id, $data['tags']);
 			self::saveNotifications($event_id, $data, $db);
+			self::updateVkPostInformation($db, $event_id, $data);
 
 			App::saveImage($data['image_horizontal'],
 				self::IMAGES_PATH . self::IMG_SIZE_TYPE_LARGE . '/' . $img_horizontal_filename,
@@ -310,6 +313,19 @@ class Event extends AbstractEntity{
 			$__mysql_db->rollBack();
 			throw $e;
 		}
+	}
+
+	private static function updateVkPostInformation(PDO $db, $event_id, array $data){
+		if ($data['vk_post_id'] == null) return;
+		$q_upd_vk_post = App::queryFactory()->newUpdate();
+		$q_upd_vk_post
+			->table('vk_posts')
+			->cols(array(
+				'event_id' => $event_id
+			))
+			->where('id = ?', $data['vk_post_id']);
+		$p_upd_post = $db->prepare($q_upd_vk_post->getStatement());
+		$result = $p_upd_post->execute($q_upd_vk_post->getBindValues());
 	}
 
 	private static function saveEventTags(PDO $db, $event_id, array $tags) {
@@ -669,7 +685,7 @@ class Event extends AbstractEntity{
 
 
 			self::saveNotifications($this->getId(), $data, $this->db);
-
+			self::updateVkPostInformation($this->db, $this->getId(), $data);
 
 			$__mysql_db->commit();
 			$this->db->commit();
