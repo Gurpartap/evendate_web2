@@ -1504,32 +1504,41 @@ function EditEvent($view, $content_block){
 			$link = $view.find('#edit_event_url'),
 			post_text = '';
 
-		post_text += $title.val() + '\n\n';
-		if($calendar.selected_days.length > 1){
-			post_text += 'Дата начала: ' + moment($calendar.selected_days[0]).format('D MMMM YYYY');
-		} else {
-			var $main_time_inputs = $view.find('.MainTime ').find('input');
-			post_text += 'Начало: ' + moment($calendar.selected_days[0]).format('D MMMM YYYY') + ' в ' + $main_time_inputs.eq(0).val() + ':' + $main_time_inputs.eq(1).val();
+		post_text +=$title.val() ? $title.val() + '\n\n' : '';
+
+		if($calendar.selected_days){
+			post_text += ($calendar.selected_days.length > 1) ? 'Дата начала: ' : 'Начало: ';
+			post_text += moment($calendar.selected_days[0]).format('D MMMM YYYY');
+			if($calendar.selected_days.length == 1){
+				var $main_time_inputs = $view.find('.MainTime').find('input');
+				post_text += $main_time_inputs.eq(0).val() ? ' в ' + parseInt($main_time_inputs.eq(0).val()) : '';
+				post_text += $main_time_inputs.eq(1).val() ? ':' + parseInt($main_time_inputs.eq(1).val()) : '';
+			}
 		}
 		if($is_required.prop('checked')){
 			var $inputs = $registration_till.find('input');
-			post_text += ' (регистрация заканчивается: ' + moment($inputs.eq(0).val()).format('D MMMM YYYY') + ' ' + $inputs.eq(1).val() + ':' + $inputs.eq(2).val() + ')\n';
+			if($inputs.eq(0).val()){
+				post_text += ' (регистрация заканчивается: ' + moment($inputs.eq(0).val()).format('D MMMM YYYY');
+				post_text += $inputs.eq(1).val() ? ' в ' + parseInt($inputs.eq(1).val()) : '';
+				post_text += $inputs.eq(2).val() ? ':' + parseInt($inputs.eq(2).val()) : '';
+				post_text += ')\n';
+			} else {
+				post_text += '\n';
+			}
 		} else {
 			post_text += '\n';
 		}
-		post_text += $place.val() + '\n\n';
-		post_text += $description.val() + '\n\n';
+		post_text += $place.val() ? $place.val() + '\n\n' : '';
+		post_text += $description.val() ? $description.val() + '\n\n' : '';
 
 		if(!$is_free.prop('checked')){
-			post_text += 'Цена от ' + $min_price.val() + '\n\n';
-		} else {
-			post_text += '\n\n';
+			post_text += $min_price.val() ? 'Цена от ' + $min_price.val() + '\n\n' : '';
 		}
 
 		$tags.find('.select2-search-choice').each(function(i,tag){
 			tags.push('#' + $(tag).text().trim());
 		});
-		post_text += tags.join(' ') + '\n\n';
+		post_text += tags ? tags.join(' ') + '\n\n' : '';
 
 		if($link.val()){
 			post_text += $link.val()
