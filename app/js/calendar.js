@@ -1242,7 +1242,7 @@ function EditEvent($view, $content_block){
 					}
 				},
 				form_data = $form.serializeForm(),
-				tags = form_data.tags.split(','),
+				tags = form_data.tags ? form_data.tags.split(',') : null,
 				url = form_data.event_id ? 'api/v1/events/'+form_data.event_id : 'api/v1/events/',
 				method = form_data.event_id ? 'PUT' : 'POST',
 				valid_form = formValidation($form, !!(form_data.event_id));
@@ -1250,7 +1250,7 @@ function EditEvent($view, $content_block){
 			if(valid_form){
 				$.extend(true, data, form_data);
 
-				data.tags = (tags.length === 1 && tags[0] === "") ? [] : tags;
+				data.tags = tags;
 				data.filenames = {
 					vertical: data.filename_vertical,
 					horizontal: data.filename_horizontal
