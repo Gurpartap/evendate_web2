@@ -1127,24 +1127,25 @@ function EditEvent($view, $content_block){
 			$view.find('.MinPrice').toggleStatus('disabled');
 		});
 
-		socket.on('image.getFromURLDone', function(result){
-			var url = window.current_load_button.data('url');
-			handleImgUpload(window.current_load_button, result.data, url.split('/').reverse()[0]);
+		socket.on('image.getFromURLDone', function(response){
+			if(response.error){
+				showNotifier({text: response.error, status: false});
+			} else {
+				var url = window.current_load_button.data('url');
+				handleImgUpload(window.current_load_button, response.data, url.split('/').reverse()[0]);
+			}
 		});
 
-		socket.on('vk.getDataToPostDone', function(data){
-			$view.find('#edit_event_submit').data(data).toggleStatus('disabled');
-			$view.find('#edit_event_vk_publication').height(0);
-			$view.find('#edit_event_to_public_vk').toggleStatus('disabled');
+		socket.on('vk.getDataToPostDone', function(response){
+			if(response.error){
+				showNotifier({text: response.error, status: false});
+			} else {
+				$view.find('#edit_event_submit').data(response.data).toggleStatus('disabled');
+				$view.find('#edit_event_vk_publication').height(0);
+				$view.find('#edit_event_to_public_vk').toggleStatus('disabled');
 
-			showNotifier({text: 'Пост в группе вконтакте будет опубликован при публикации', status: true});
-
-			VK.addCallback('onWallPostSave', function(){
-				showNotifier({text: 'Событие успешно опубликовано в группу Вконтакте', status: true});
-			});
-			VK.addCallback('onWallPostCancel', function(){
-				showNotifier({text: 'Событие не опубликовано', status: false});
-			});
+				showNotifier({text: 'Пост в группе вконтакте будет опубликован при публикации', status: true});
+			}
 		});
 
 		$view.find('.LoadImg').off('change.LoadImg').on('change.LoadImg', function(e){
@@ -1329,18 +1330,24 @@ function EditEvent($view, $content_block){
 
 
 	socket.on('vk.getGroupsToPostDone', function(response){
-		var $wrap = $view.find('.EditEventVkGroup'),
-			$groups = $wrap.find('#edit_event_vk_groups');
+		if(response.error){
+			showNotifier({text: response.error, status: false});
+		} else {
 
-		response.response.splice(0,1);
-		response.response.forEach(function(option){
-			$groups.append(tmpl('option', {
-				val: option.gid,
-				display_name: option.name,
-				data: "data-img='"+option.photo+"'"
-			}));
-		});
-		initSelect2($groups);
+			var data = response.data,
+				$wrap = $view.find('.EditEventVkGroup'),
+				$groups = $wrap.find('#edit_event_vk_groups');
+
+			data.splice(0,1);
+			data.forEach(function(option){
+				$groups.append(tmpl('option', {
+					val: option.gid,
+					display_name: option.name,
+					data: "data-img='"+option.photo+"'"
+				}));
+			});
+			initSelect2($groups);
+		}
 	});
 
 	function toggleVkImg(){
@@ -1688,9 +1695,10 @@ function EditEvent($view, $content_block){
 			success: function(res){
 				if(Array.isArray(res.data)){
 					res.data = res.data[0];
-				}/*
+					initVkPostConstructor();
+				}
 				if(res.data.accounts.indexOf("vk") !== -1){
-					socket.emit('vk.getGroupsToPost', res.data.id;
+					socket.emit('vk.getGroupsToPost', res.data.id);
 					$view.find('#edit_event_vk_publication_button').off('click.vkPublicationConfirm').on('click.vkPublicationConfirm', function(){
 						var data = $view.find('#edit-event-form').serializeForm();
 						$view.find('#edit_event_submit').toggleStatus('disabled');
@@ -1707,8 +1715,7 @@ function EditEvent($view, $content_block){
 					})
 				} else {
 					$('#edit_event_to_public_vk').toggleStatus('disabled');
-				}*/
-				initVkPostConstructor();
+				}
 			}
 		});
 	}

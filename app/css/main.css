@@ -1431,9 +1431,7 @@ html.-open_modal {overflow: hidden}
 	margin-right: 20px;
 }
 
-.event_datepicker_calendar .calendar_wrapper {
-	padding: 0 10px;
-}
+.event_datepicker_calendar .calendar_wrapper {padding-right: 20px}
 .event_datepicker_calendar .calendar_wrapper:after {
 	content: '';
 	position: absolute;
