@@ -1012,9 +1012,9 @@ function EditEvent($view, $content_block){
 				$data_url = $parent.find('.DataUrl');
 
 			$preview.data('source_img', source).attr('src', source);
-			$data_url.val(source).trigger('change');
 			$file_name_text.html('Загружен файл:<br>'+filename);
 			$file_name.val(filename);
+			$data_url.val('data.source').data('source', source).trigger('change');
 			initCrop(source, $preview, {
 				'aspectRatio': eval($preview.data('aspect_ratio'))
 			});
@@ -1138,8 +1138,11 @@ function EditEvent($view, $content_block){
 
 		socket.on('vk.getDataToPostDone', function(response){
 			if(response.error){
+				$view.find('#edit_event_submit').toggleStatus('disabled');
+				$view.find('#edit_event_vk_publication').toggleStatus('disabled');
 				showNotifier({text: response.error, status: false});
 			} else {
+				$view.find('#edit_event_vk_publication').toggleStatus('disabled');
 				$view.find('#edit_event_submit').data(response.data).toggleStatus('disabled');
 				$view.find('#edit_event_vk_publication').height(0);
 				$view.find('#edit_event_to_public_vk').toggleStatus('disabled');
@@ -1158,7 +1161,7 @@ function EditEvent($view, $content_block){
 				if (!f.type.match('image.*'))	continue;
 				reader.onload = (function(the_file) {
 					return function(e) {
-						handleImgUpload($this, e.target.result, the_file.name);
+						handleImgUpload($this, e.target.result, the_file['name']);
 					};
 				})(f);
 				reader.readAsDataURL(f);
@@ -1292,7 +1295,7 @@ function EditEvent($view, $content_block){
 
 
 				if($submit_button.data('guid')){
-					VK.Api.call("wall.post", $submit_button.data());
+					VK.Api.call("wall.post", $submit_button.data(), function(){});
 					data.guid = $submit_button.data('guid');
 				}
 
@@ -1303,7 +1306,7 @@ function EditEvent($view, $content_block){
 					method: method,
 					success: function(res){
 						if(res.status){
-							if(!res.data.event_id){
+							if(data.event_id){
 								$view.find('#edit_event_event_id').val(res.data.event_id);
 								$('body').stop().animate({scrollTop:0}, 1000, 'swing', function() {
 									showNotification('Событие успешно добавлено', 3000);
@@ -1450,7 +1453,7 @@ function EditEvent($view, $content_block){
 			var $this = $(this),
 				$crop_data = $this.data('crop_data');
 
-			$data_url.val($preview.attr('src')).trigger('change');
+			$data_url.val('data.source').data('source', $preview.attr('src')).trigger('change');
 			$crop_again_button.removeClass('-hidden').off('click.CropAgain').on('click.CropAgain', function(){
 				initCrop($preview.data('source_img'), $preview, {
 					'data': $crop_data,
@@ -1702,6 +1705,7 @@ function EditEvent($view, $content_block){
 					$view.find('#edit_event_vk_publication_button').off('click.vkPublicationConfirm').on('click.vkPublicationConfirm', function(){
 						var data = $view.find('#edit-event-form').serializeForm();
 						$view.find('#edit_event_submit').toggleStatus('disabled');
+						$view.find('#edit_event_vk_publication').toggleStatus('disabled');
 
 						socket.emit('vk.getDataToPost', {
 							guid: data.vk_group,
