@@ -122,7 +122,7 @@ class EventsDatesCollection extends AbstractCollection{
 					 if (mb_strtolower(trim($value)) == 'true'){
 						 if ($user instanceof User){
 							 $q_get_dates
-								 ->where('event_id IN (
+								 ->where('view_dates.event_id IN (
 								    SELECT event_id FROM view_user_event_ids WHERE user_id = :user_id
 								 )');
 							 $statement_array[':user_id'] = $user->getId();

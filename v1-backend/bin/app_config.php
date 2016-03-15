@@ -1,10 +1,5 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Инал
- * Date: 18.10.2014
- * Time: 23:09
- */
+
 
 use Aura\SqlQuery\QueryFactory;
 
@@ -18,7 +13,6 @@ require_once "{$BACKEND_FULL_PATH}/exceptions/InvalidFileException.php";
 require_once "{$BACKEND_FULL_PATH}/exceptions/NoMethodException.php";
 require_once "{$BACKEND_FULL_PATH}/exceptions/PrivilegesException.php";
 require_once "{$BACKEND_FULL_PATH}/exceptions/AuthorizationException.php";
-
 
 
 class App {
@@ -92,7 +86,7 @@ class App {
 		return self::$obj->$name;
 	}
 
-	public static function queryFactory() : QueryFactory{
+	public static function queryFactory() : QueryFactory {
 		return self::$QUERY_FACTORY;
 	}
 
@@ -150,12 +144,12 @@ class App {
 		return self::$__DB;
 	}
 
-	static public function saveImage(&$file, $filename, $size){
+	static public function saveImage(&$file, $filename, $size) {
 		$start_memory = memory_get_usage();
 		$tmp = unserialize(serialize($file));
 		$img_size = memory_get_usage() - $start_memory;
 
-		if ($img_size / 1024 > $size){
+		if ($img_size / 1024 > $size) {
 			throw new InvalidArgumentException('Файл слишком большого размера. Максимальный размер - ' . $size . ' кбайт');
 		}
 		$file = explode(',', $file);
@@ -164,17 +158,20 @@ class App {
 		if ($file) {
 			global $ROOT_PATH;
 			$result = file_put_contents($ROOT_PATH . $filename, base64_decode($file));
-			if (!$result) throw new RuntimeException('FILE_SAVING_ERROR');
+			if (!$result)
+				throw new RuntimeException('FILE_SAVING_ERROR');
 			return $result;
-		}else{
+		}
+		else {
 			throw new InvalidArgumentException('IMAGE_FILE_NOT_FOUND');
 		}
 	}
 
-	static public function getImageExtension($file_name){
-		if (!isset($file_name) || $file_name == ''){
+	static public function getImageExtension($file_name) {
+		if (!isset($file_name) || $file_name == '') {
 			return '';
-		}else{
+		}
+		else {
 			$file_name_parts = explode('.', $file_name);
 			return end($file_name_parts);
 		}
@@ -190,16 +187,10 @@ class App {
 		return $randomString;
 	}
 
-	public static function createMysqlDB(){
+	public static function createMysqlDB() {
 		global $__mysql_db;
-		$driver_options = array(
-			PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-			PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-		);
+		$driver_options = array(PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION);
 		$mysql_opts = App::$SETTINGS->mysql_db;
 		$__mysql_db = new PDO('mysql:host=' . $mysql_opts->host . ';dbname=' . $mysql_opts->database . ';charset=utf8;port=' . $mysql_opts->port, $mysql_opts->user, $mysql_opts->password, $driver_options);
-
-
-
 	}
 }

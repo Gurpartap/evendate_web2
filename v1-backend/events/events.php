@@ -63,7 +63,7 @@ $__modules['events'] = array(
 				array('length' => $__length, 'offset' => $__offset),
 				$__order_by ?? array('nearest_event_date', 'first_event_date'));
 		},
-		'dates' => function () use ($__db, $__request,$__fields, $__user, $__offset, $__length) { /*MY EVENTS!*/
+		'dates' => function () use ($__db, $__request,$__fields, $__user, $__order_by, $__offset, $__length) { /*MY EVENTS!*/
 			if (isset($__request['month'])){
 				$__request['month'] = new DateTime($__request['month']);
 			}
@@ -83,6 +83,8 @@ $__modules['events'] = array(
 					array()
 				);
 			}
+
+			print_r($__order_by);
 			return EventsDatesCollection::filter(
 				$__db,
 				$__user,
