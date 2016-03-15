@@ -11,7 +11,6 @@ $.fn.extend({
 			statuses.split(' ').forEach(function(status){
 				if(status === 'disabled'){
 					var $form_elements = $this.find('input, select, textarea, button');
-					debugger;
 					if($this.hasClass('-status_disabled')){
 						$form_elements.each(function(){
 							$(this).removeAttr('disabled');

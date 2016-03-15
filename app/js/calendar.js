@@ -1508,8 +1508,8 @@ function EditEvent($view, $content_block){
 		if($calendar.selected_days.length > 1){
 			post_text += 'Дата начала: ' + moment($calendar.selected_days[0]).format('D MMMM YYYY');
 		} else {
-			var $main_time_inputs = $view.find('.MainTime ').find('.input');
-			post_text += 'Начало: ' + moment($calendar.selected_days[0]).format('D MMMM YYYY') + ' в ' + $main_time_inputs.eq(1).val() + ':' + $main_time_inputs.eq(2).val() + '\n';
+			var $main_time_inputs = $view.find('.MainTime ').find('input');
+			post_text += 'Начало: ' + moment($calendar.selected_days[0]).format('D MMMM YYYY') + ' в ' + $main_time_inputs.eq(0).val() + ':' + $main_time_inputs.eq(1).val();
 		}
 		if($is_required.prop('checked')){
 			var $inputs = $registration_till.find('input');
@@ -1541,18 +1541,20 @@ function EditEvent($view, $content_block){
 	}
 
 	function initVkPostConstructor(){
-		$view.find(
-			'#edit_event_title,' +
-			'#edit_event_placepicker,' +
-			'#edit_event_description,' +
-			'#edit_event_free,' +
-			'#edit_event_min_price,' +
-			'#edit_event_registration_required,' +
-			'.RegistrationTill input' +
-			'#edit_event_url' +
-			'.EventTags'
-		).on('change.FormatVkPost', formatVKPost);
-		debugger;
+		$view
+			.find(
+				'#edit_event_title,' +
+				'#edit_event_placepicker,' +
+				'#edit_event_description,' +
+				'#edit_event_free,' +
+				'#edit_event_min_price,' +
+				'#edit_event_registration_required,' +
+				'#edit_event_url,' +
+				'.EventTags'
+			)
+			.add('.RegistrationTill input')
+			.add('.MainTime input')
+			.on('change.FormatVkPost', formatVKPost);
 		$view.find('.EventDatesCalendar').data('calendar').$calendar.on('days-changed.FormatVkPost', formatVKPost);
 	}
 
@@ -1677,10 +1679,9 @@ function EditEvent($view, $content_block){
 			success: function(res){
 				if(Array.isArray(res.data)){
 					res.data = res.data[0];
-				}
+				}/*
 				if(res.data.accounts.indexOf("vk") !== -1){
-					socket.emit('vk.getGroupsToPost', res.data.id);
-					initVkPostConstructor();
+					socket.emit('vk.getGroupsToPost', res.data.id;
 					$view.find('#edit_event_vk_publication_button').off('click.vkPublicationConfirm').on('click.vkPublicationConfirm', function(){
 						var data = $view.find('#edit-event-form').serializeForm();
 						$view.find('#edit_event_submit').toggleStatus('disabled');
@@ -1697,7 +1698,8 @@ function EditEvent($view, $content_block){
 					})
 				} else {
 					$('#edit_event_to_public_vk').toggleStatus('disabled');
-				}
+				}*/
+				initVkPostConstructor();
 			}
 		});
 	}
