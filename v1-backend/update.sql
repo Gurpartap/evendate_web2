@@ -340,6 +340,7 @@ CREATE VIEW view_events AS
 
     events.images_domain || 'event_images/small/' || events.image_vertical    AS image_vertical_small_url,
     events.images_domain || 'event_images/small/' || events.image_horizontal  AS image_horizontal_small_url,
+    events.images_domain || 'event_images/vk/' || vk_posts.image_path  AS vk_image_url,
     view_organizations.img_medium_url                                         AS organization_logo_medium_url,
     view_organizations.img_url                                                AS organization_logo_large_url,
     view_organizations.img_small_url                                          AS organization_logo_small_url,
@@ -365,6 +366,7 @@ CREATE VIEW view_events AS
   FROM events
     INNER JOIN view_organizations ON view_organizations.id = events.organization_id
     INNER JOIN organization_types ON organization_types.id = view_organizations.type_id
+    LEFT JOIN vk_posts ON events.id = vk_posts.event_id
   --LEFT JOIN events_tags ON events.id = events_tags.event_id
   --LEFT JOIN tags ON tags.id = events_tags.tag_id
   WHERE view_organizations.status = TRUE
