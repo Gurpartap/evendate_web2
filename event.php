@@ -27,8 +27,8 @@ error_reporting(E_ALL);
 		$user = null;
 		$hide_auth_btn = '';
 	}
-	$event = EventsCollection::one($__db, $user, $event_id, array('favored'))
-		->getParams($user, Fields::parseFields('organization_logo_large_url,organization_logo_medium_url,organization_logo_small_url,organization_name,organization_id,detail_info_url,dates,favored,location,address,description,tags,link'))->getData();
+	$event_instance = EventsCollection::one($__db, $user, $event_id, array('favored'));
+	$event = $event_instance->getParams($user, Fields::parseFields('organization_logo_large_url,organization_logo_medium_url,organization_logo_small_url,organization_name,organization_id,detail_info_url,dates,favored,location,address,description,tags,link'))->getData();
 
 
 	$trans = array(
@@ -175,7 +175,7 @@ error_reporting(E_ALL);
 						</div>
 						<div class="event-buttons">
 							<?php
-								if ($user != null && $user->hasFavoriteEvent($event)->getData()){
+								if ($user != null && $user instanceof User && $user->hasFavoriteEvent($event_instance)->getData()){
 									$btn_text = 'Убрать из избранного';
 									$btn_class = 'no-borders';
 								}else{
