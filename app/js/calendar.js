@@ -1334,7 +1334,7 @@ function EditEvent($view, $content_block){
 			showNotifier({text: response.error, status: false});
 		} else {
 
-			var data = response.data,
+			var data = response.data.response,
 				$wrap = $view.find('.EditEventVkGroup'),
 				$groups = $wrap.find('#edit_event_vk_groups');
 
