@@ -55,7 +55,7 @@ $.fn.extend({
 			});
 
 		switch(output_type){
-			case "array": {
+			case 'array': {
 				/* Работает так же как и serializeArray, с некоторыми модификациями */
 				return elements.filter(function() {
 					var a = this.type;
@@ -84,20 +84,32 @@ $.fn.extend({
 					}
 				}).get();
 			}
-			case "object":
+			case 'object':
 			default: {
 				var output = {};
 				elements.filter(function() {
 					var a = this.type;
-					return this.name && !$(this).is(":disabled") && zb.test(this.nodeName) && !yb.test(a) && !T.test(a)
+					return this.name && !$(this).is(':disabled') && zb.test(this.nodeName) && !yb.test(a) && !T.test(a)
 				}).each(function(i,el){
-					var name = el.name,
-						value = $(el).val();
+					var $element = $(el),
+						name = el.name,
+						value = $element.val();
 
 					if(elements.filter("[name='"+name+"']").length > 1 && value != ""){
 						output[name] = typeof(output[name]) == "undefined" ? [] : output[name];
 						output[name].push(value ? value.replace(xb, "\r\n") : value)
-					} else {
+					}
+					else if($element.attr('type') === 'hidden' && value.indexOf('data.') === 0){
+						var data_names = value.split('.'),
+							data = $element.data(data_names[1]),
+							n = 2;
+						while(data_names[n]){
+							data = data[data_names[n]];
+							n++;
+						}
+						output[name] = data;
+					}
+					else {
 						output[name] = value || value === 0 ? value.replace(xb, "\r\n") : null;
 					}
 				});
@@ -109,11 +121,11 @@ $.fn.extend({
 						value = el.value;
 
 					switch(el.type){
-						case "radio":{
+						case 'radio':{
 							output[name] = value;
 							break;
 						}
-						case "checkbox":{
+						case 'checkbox':{
 							if(elements.filter("[name='"+name+"']").length > 1 && value != "on"){
 								output[name] = typeof(output[name]) == "undefined" ? [] : output[name];
 								output[name].push(value)
