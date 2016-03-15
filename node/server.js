@@ -421,7 +421,9 @@ pg.connect(pg_conn_string, function(err, client, done) {
 			});
 		});
 
+
 		client.query(q_get_changed_images, function(err, result) {
+			if (config_index == 'local') return;
 			if (handleError(err)) return;
 			result.rows.forEach(function(obj) {
 
