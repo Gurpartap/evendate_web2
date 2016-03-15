@@ -75,12 +75,22 @@ var URLs = {
 		},
 		"FACEBOOK": {
 			'GET_ACCESS_TOKEN': 'https://graph.facebook.com/v2.3/oauth/access_token?'
-			+ 'client_id=' + real_config.facebook.app_id
-			+ '&client_secret=' + real_config.facebook.app_secret
-			+ '&redirect_uri=http://' + real_config.domain + '/fbOauthDone.php?mobile=',
+				+ 'client_id=' + real_config.facebook.app_id
+				+ '&client_secret=' + real_config.facebook.app_secret
+				+ '&redirect_uri=http://' + real_config.domain + '/fbOauthDone.php?mobile=',
 			'GET_USER_INFO': 'https://graph.facebook.com/me',
 			'GET_FRIENDS_LIST': "https://graph.facebook.com/me/friends"
 		}
+	},
+	EMIT_NAMES = {
+		AUTH: {},
+		VK_INTEGRATION: {
+			GROUPS_TO_POST: 'vk.getGroupsToPost',
+			GROUPS_TO_POST_DONE: 'vk.getGroupsToPostDone',
+			DATA_TO_POST: 'vk.getDataToPost',
+			DATA_TO_POST_DONE: 'vk.getDataToPostDone'
+		},
+		UTILS: {}
 	},
 	users = sql.define({
 		name: 'users',
@@ -224,12 +234,15 @@ sql.setDialect('postgres');
 
 pg.connect(pg_conn_string, function(err, client, done) {
 
-	var handleError = function(err) {
+	var handleError = function(err, emit_name) {
 		if (!err || err == null) return false;
 
 		logger.info(err);
 		if (client) {
 			done(client);
+		}
+		if (emit_name){
+			socket.emit(emit_name, {error: err});
 		}
 		return true;
 	};
@@ -409,6 +422,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 		});
 
 		client.query(q_get_changed_images, function(err, result) {
+			if (handleError(err)) return;
 			result.rows.forEach(function(obj) {
 
 				var logo_img_path = ORGANIZATIONS_IMAGES_PATH + LOGO_IMAGES + '/' + LARGE_IMAGES + '/' + obj.img_url,
@@ -618,7 +632,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 
 
 		request(req_params, function(e, i, res) {
-			if (handleError(e)) return;
+			if (handleError(e, '')) return;
 			if (cb) {
 				cb(res);
 			}
@@ -838,8 +852,8 @@ pg.connect(pg_conn_string, function(err, client, done) {
 								handleError(err);
 							});
 
-							client.query(q_ins_token, function(err, res) {
-								if (err) return handleError(err, 'CANT_INSERT_TOKEN');
+							client.query(q_ins_token, function(err) {
+								if (err) return (err, 'CANT_INSERT_TOKEN');
 								socket.emit('auth', {
 									email: data.access_data.email,
 									token: user_token,
@@ -1152,10 +1166,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 
 		socket.on('image.getFromURL', function(url) {
 			Utils.downloadImageFromUrl(request, url, function(error, data) {
-				if (error) {
-					handleError(error);
-					return;
-				}
+				if (handleError(error)) return;
 				socket.emit('image.getFromURLDone', {error: error, data: data});
 			});
 		});
@@ -1169,37 +1180,39 @@ pg.connect(pg_conn_string, function(err, client, done) {
 			})
 		});
 
-		socket.on('vk.getGroupsToPost', function(user_id) {
+		socket.on(EMIT_NAMES.VK_INTEGRATION.GROUPS_TO_POST, function(user_id) {
 			var q_get_user_data = vk_sign_in
 				.select(vk_sign_in.id, vk_sign_in.secret, vk_sign_in.access_token)
 				.from(vk_sign_in)
 				.where(
 					vk_sign_in.user_id.equals(user_id)
 				).toQuery();
+
 			client.query(q_get_user_data, function(err, result) {
-				if (handleError(err)) return;
+				if (handleError(err, EMIT_NAMES.VK_INTEGRATION.GROUPS_TO_POST)) return;
 				result.rows[0].user_id =  user_id;
 				socket.vk_user = result.rows[0];
 				getVkGroups(result.rows[0], 'can_post', function(data) {
-					socket.emit('vk.getGroupsToPostDone', data);
-				})
+					socket.emit(EMIT_NAMES.VK_INTEGRATION.GROUPS_TO_POST_DONE, data);
+				});
 			})
 		});
 
-		socket.on('vk.getDataToPost', function(data) {
 
+		/**/
+		socket.on(EMIT_NAMES.VK_INTEGRATION.DATA_TO_POST, function(data) {
 			var request_data = [
 					'access_token=' + socket.vk_user.access_token,
-					'group_id=' + data.group_id
+					'group_id=' + data.guid
 				],
 				image_path = __dirname + '/../event_images/vk/',
 				url = URLs.VK.GET_WALL_PHOTO_UPLOAD_SERVER + '?' + request_data.join('&'),
 				filename_parts = data.image.filename.split('.'),
 				extension = filename_parts[filename_parts.length - 1],
-				filename = data.group_id + '__' + Utils.makeId(20) + '.' + extension,
+				filename = data.guid + '__' + Utils.makeId(20) + '.' + extension,
 				base64 = data.image.base64.split(',')[1];
 			fs.writeFile(image_path + filename, base64, 'base64', function(err) {
-				if (handleError(err)) return;
+				if (handleError(err, EMIT_NAMES.VK_INTEGRATION.DATA_TO_POST)) return;
 
 				request({
 					url: url,
@@ -1208,7 +1221,9 @@ pg.connect(pg_conn_string, function(err, client, done) {
 						'Accept-Language': 'ru,en-us'
 					}
 				}, function(upload_server_err, upload_server_i, upload_server_res) {
-					if (handleError(upload_server_err)) return;
+					if (handleError(upload_server_err, EMIT_NAMES.VK_INTEGRATION.DATA_TO_POST_DONE)) return;
+
+					console.log(upload_server_res);
 
 					fs.stat(image_path + filename, function(err, stats) {
 						rest.post(upload_server_res.response.upload_url, {
@@ -1217,41 +1232,50 @@ pg.connect(pg_conn_string, function(err, client, done) {
 								"file1": rest.file(image_path + filename, null, stats.size, null, 'image/' + extension)
 							}
 						}).on("complete", function(upload_data) {
+
 							upload_data = JSON.parse(upload_data);
 							request_data.push('server=' + upload_data['server']);
 							request_data.push('hash=' + upload_data['hash']);
 							request_data.push('photo=' + upload_data['photo']);
 							request_data.push('access_token=' + socket.vk_user.access_token);
-							request_data.push('group_id=' + data.group_id);
+							request_data.push('group_id=' + data.guid);
 
 							rest
 								.get(URLs.VK.SAVE_WALL_PHOTO_UPLOAD + '?' + request_data.join('&'))
 								.on('complete', function(res_data) {
 									if (res_data.response.length == 0) {
-										socket.emit('vk.getDataToPostDone', {'error': 'CANT_LOAD_IMAGE'});
+										handleError({name: 'CANT_SAVE_WALL_PHOTO'}, EMIT_NAMES.VK_INTEGRATION.DATA_TO_POST_DONE);
 										return;
 									}
 
-									var q_ins_vk_post = vk_posts.insert({
-										creator_id: socket.vk_user.user_id,
-										image_path: filename,
-										message: data.message,
-										group_id: data.group_id
-									}).returning('id').toQuery();
+									var user_id = socket.vk_user.user_id,
+										q_ins_vk_post = vk_posts.insert({
+											creator_id: user_id,
+											image_path: filename,
+											message: data.message,
+											group_id: data.guid
+										}).returning('id').toQuery();
+
+									console.log(q_ins_vk_post.text);
 
 									client.query(q_ins_vk_post, function(err, ins_result){
+										if (handleError(err, EMIT_NAMES.VK_INTEGRATION.DATA_TO_POST_DONE)) return;
 
-										if (handleError(err)){
-											socket.emit('vk.getDataToPostDone', {
-												error: err
-											});
-											return;
-										}
-
-										socket.emit('vk.getDataToPostDone', {
+										console.log({
 											error: null,
 											data: {
-												owner_id: '-' + data.group_id,
+												owner_id: '-' + data.guid,
+												from_group: 1,
+												message: data.message,
+												guid: ins_result.rows[0].id,
+												attachments: [res_data.response[0].id, data.link ? data.link : ''].join(',')
+											}
+										});
+
+										socket.emit(EMIT_NAMES.VK_INTEGRATION.DATA_TO_POST_DONE, {
+											error: null,
+											data: {
+												owner_id: '-' + data.guid,
 												from_group: 1,
 												message: data.message,
 												guid: ins_result.rows[0].id,
@@ -1264,11 +1288,6 @@ pg.connect(pg_conn_string, function(err, client, done) {
 					});
 				});
 			});
-		});
-
-
-		socket.on('vk.savePostToVk', function(data) {
-
 		});
 	});
 

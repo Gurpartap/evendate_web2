@@ -626,7 +626,7 @@ CREATE TABLE public.vk_posts
   id                SERIAL PRIMARY KEY NOT NULL,
   creator_id           INT                NOT NULL,
   event_id          INT               NULL DEFAULT NULL,
-  image_path TIMESTAMP          NOT NULL,
+  image_path TEXT NULL,
   message TEXT,
   group_id              VARCHAR(50) NOT NULL,
   created_at        TIMESTAMP                   DEFAULT CURRENT_TIMESTAMP,
