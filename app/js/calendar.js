@@ -1092,7 +1092,7 @@ function EditEvent($view, $content_block){
 				dataType: 'JSON',
 				data: function (term, page) {
 					return {
-						q: term // search term
+						name: term // search term
 					};
 				},
 				results: function(data) {
@@ -1522,7 +1522,7 @@ function EditEvent($view, $content_block){
 			if($calendar.selected_days.length == 1){
 				var $main_time_inputs = $view.find('.MainTime').find('input');
 				post_text += $main_time_inputs.eq(0).val() ? ' в ' + parseInt($main_time_inputs.eq(0).val()) : '';
-				post_text += $main_time_inputs.eq(1).val() ? ':' + parseInt($main_time_inputs.eq(1).val()) : '';
+				post_text += $main_time_inputs.eq(1).val() ? ':' + $main_time_inputs.eq(1).val() : '';
 			}
 		}
 		if($is_required.prop('checked')){
@@ -1530,7 +1530,7 @@ function EditEvent($view, $content_block){
 			if($inputs.eq(0).val()){
 				post_text += ' (регистрация заканчивается: ' + moment($inputs.eq(0).val()).format('D MMMM YYYY');
 				post_text += $inputs.eq(1).val() ? ' в ' + parseInt($inputs.eq(1).val()) : '';
-				post_text += $inputs.eq(2).val() ? ':' + parseInt($inputs.eq(2).val()) : '';
+				post_text += $inputs.eq(2).val() ? ':' + $inputs.eq(2).val() : '';
 				post_text += ')\n';
 			} else {
 				post_text += '\n';

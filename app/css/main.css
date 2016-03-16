@@ -823,6 +823,7 @@ input, select, textarea, button {font-family: inherit}
 .button.-status_disabled {
 	cursor: default;
 	background-color: #ccc;
+	box-shadow: none;
 }
 
 a.button {line-height: 2rem}
@@ -1328,6 +1329,17 @@ html.-open_modal {overflow: hidden}
 	opacity: 1;
 	z-index: 100;
 }
+
+
+.alert-danger,
+.alert-success {
+	border: 0;
+	color: #fff;
+	box-shadow: 0 2px 15px hsla(0,0%,0%,.1);
+}
+
+.alert-success {background-color: #5379b8}
+.alert-danger {background-color: #ff7272}
 
 #notification {padding: 5px}
 @media only screen and (min-width: 767px){
