@@ -1381,11 +1381,13 @@ function EditEvent($view, $content_block){
 		raw_dates.forEach(function(date){
 			var $day_row = $table_rows.find('.TableDay_'+date.event_date),
 				start_time = date.start_time.split(':'),
-				end_time = date.end_time.split(':');
+				end_time = date.end_time ? date.end_time.split(':') : [];
 			$day_row.find('.StartHours').val(start_time[0]);
 			$day_row.find('.StartMinutes').val(start_time[1]);
-			$day_row.find('.EndHours').val(end_time[0]);
-			$day_row.find('.EndMinutes').val(end_time[1]);
+			if(end_time.length){
+				$day_row.find('.EndHours').val(end_time[0]);
+				$day_row.find('.EndMinutes').val(end_time[1]);
+			}
 		});
 	}
 
@@ -1393,54 +1395,12 @@ function EditEvent($view, $content_block){
 		var	selected_tags = [];
 		tags.forEach(function(tag){
 			selected_tags.push({
-				id: tag.id,
+				id: parseInt(tag.id),
 				text: tag.name
 			});
 		});
 
-		$view.find('#event_tags')
-			.select2('destroy')
-			.select2({
-				tags: true,
-				width: '100%',
-				placeholder: "Выберите до 5 тегов",
-				maximumSelectionLength: 5,
-				maximumSelectionSize: 5,
-				tokenSeparators: [',', ';'],
-				multiple: true,
-				createSearchChoice: function(term, data) {
-					if ($(data).filter(function() {
-							return this.text.localeCompare(term) === 0;
-						}).length === 0) {
-						return {
-							id: term,
-							text: term
-						};
-					}
-				},
-				ajax: {
-					url: '/api/v1/tags/',
-					dataType: 'JSON',
-					data: function (term, page) {
-						return {
-							q: term // search term
-						};
-					},
-					results: function(data) {
-						var _data = [];
-						data.data.forEach(function(value){
-							value.text = value.name;
-							_data.push(value);
-						});
-						return {
-							results: _data
-						}
-					}
-				},
-				containerCssClass: "form_select2",
-				dropdownCssClass: "form_select2_drop"
-			})
-			.select2('data', selected_tags);
+		$view.find('#event_tags').select2('data', selected_tags);
 	}
 
 	function bindRecrop($context){
