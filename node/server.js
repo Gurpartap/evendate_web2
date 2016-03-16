@@ -982,6 +982,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 					}
 				}
 				request(req_params, function(e, i, res) {
+					console.log(e, i, res);
 					if (handleError(e)) return;
 
 					if (callback instanceof Function) {
@@ -1069,6 +1070,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 					if (handleError(e)) return;
 					if (res.audience != real_config.google.web.client_id) {
 						handleError({emit: 'TOKEN_CANT_BE_VERIFIED'});
+						return;
 					} else {
 						if (callback instanceof Function) {
 							callback(res);
