@@ -219,5 +219,83 @@
     "domain": "dev.evendate.org",
     "node_domain": "dev.evendate.org",
     "schema": "http://"
+  },
+  "prod":{
+    "google": {
+      "web": {
+        "client_id": "403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv.apps.googleusercontent.com",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://accounts.google.com/o/oauth2/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_email": "403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv@developer.gserviceaccount.com",
+        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv%40developer.gserviceaccount.com",
+        "client_secret": "5rK7ElK7fA7G1tylhkzsnE4Q",
+        "redirect_uri": ""
+      },
+      "maps_api_v3":{
+        "key": "AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg"
+      }
+    },
+    "mysql_db": {
+      "host": "evendate.ru",
+      "user": "root",
+      "password": "Trwnp7LUCwW7mp4J",
+      "database": "evendate",
+      "port": 3306
+    },
+    "db": {
+      "host": "localhost",
+      "user": "postgres",
+      "password": "fwhr96GTxYW9sn",
+      "database": "evendate",
+      "port": 5432
+    },
+    "VK": {
+      "APP_ID": 5339561,
+      "SECURE_KEY": "fovLqElJduTAJVgabLfv",
+      "redirect_uri": ""
+    },
+    "facebook":{
+      "app_id": "1692270867652630",
+      "app_secret": "0ecd87ecde79a4ab4e4feb8c2718e845",
+      "redirect_uri": ""
+    },
+    "smtp":{
+      "user": "feedback@evendate.ru",
+      "password": "Aues300694$$$",
+      "host": "smtp.yandex.ru",
+      "port": 25
+    },
+    "APN":{
+      "gateway": "gateway.push.apple.com",
+      "port": 2195,
+      "enhanced": true,
+      "production": false,
+      "cacheLength": 5,
+      "cert": "pushcert.pem",
+      "key": "pushkey.pem",
+      "passphrase": "maryashka2004",
+      "pushwoosh": {
+        "app_code": "3874F-0C5E5",
+        "app_token": "gFVeR6D4frF2VImMkCSQbLgG5vkWCIm5Eetyt3mEgsR8qw3DICcfEX7T1ShRpMYxqaXoxqsZyOVpaBd6kpnw"
+      }
+    },
+    "GCM": {
+      "api_key": "AIzaSyCUJjlz2FJ8RZTKLiiVpUNP4xA_NJaa3Co"
+    },
+    "images": {
+      "events_path": "event_images",
+      "user_images": "user_images",
+      "organizations_images": "organizations_images"
+    },
+    "mongodb":{
+      "host": "localhost",
+      "user": "",
+      "password": "",
+      "port": 27017
+    },
+    "domain": "evendate.ru",
+    "node_domain": "evendate.ru",
+    "schema": "http://"
   }
 }

@@ -251,7 +251,8 @@ pg.connect(pg_conn_string, function(err, client, done) {
 
 	function sendNotifications() {
 
-		if (config_index == 'test' || config_index == 'local') return;
+		if (config_index == 'test' || config_index == 'local')
+			return;
 
 		var q_get_events_notifications = 'SELECT DISTINCT ' +
 				' events_notifications.*, events.organization_id,' +
@@ -293,12 +294,9 @@ pg.connect(pg_conn_string, function(err, client, done) {
 			q_data = null;
 
 		client.query(q_get_events_notifications, function(err, rows) {
-			if (err) {
-				logger.error(err);
-				return;
-			}
+			if (handleError(err)) {return;}
 
-			rows.forEach(function(event_notification) {
+			rows.rows.forEach(function(event_notification) {
 
 				if (event_notification['notification_type_name'] != 'notification-now') {
 					event_notification['notification_suffix'] = Utils.lowerCaseFirstLetter(event_notification['notification_suffix']);
