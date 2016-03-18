@@ -234,12 +234,16 @@ sql.setDialect('postgres');
 
 pg.connect(pg_conn_string, function(err, client, done) {
 
-	var handleError = function(err, emit_name) {
+	var handleError = function(err, emit_name, callback) {
 		if (!err || err == null) return false;
 
 		logger.info(err);
 		if (client) {
 			done(client);
+		}
+		if (callback instanceof Function){
+			callback(err);
+			return true;
 		}
 		if (emit_name){
 			socket.emit(emit_name, {error: err});
@@ -642,7 +646,6 @@ pg.connect(pg_conn_string, function(err, client, done) {
 
 	try {
 		new CronJob('*/1 * * * *', function() {
-			logger.info('Resizing start', 'START... ' + new Date().toString());
 			resizeImages();
 			blurImages();
 		}, null, true);
@@ -931,9 +934,8 @@ pg.connect(pg_conn_string, function(err, client, done) {
 
 
 				request(req_params, function(e, i, res) {
-					if (handleError(e)) return;
 					if (callback instanceof Function) {
-						callback(res);
+						callback(e, res);
 					}
 				});
 			},
@@ -982,11 +984,20 @@ pg.connect(pg_conn_string, function(err, client, done) {
 					}
 				}
 				request(req_params, function(e, i, res) {
-					console.log(e, i, res);
+					if (res.hasOwnProperty('response') == false){
+						if (e instanceof Object){
+							e.text = 'THERE_IS_NO_RESPONSE';
+						}else{
+							e = {
+								text: 'THERE_IS_NO_RESPONSE'
+							}
+						}
+					}
+
 					if (handleError(e)) return;
 
 					if (callback instanceof Function) {
-						callback(res);
+						callback(e, res);
 					}
 				});
 			},
@@ -1034,9 +1045,8 @@ pg.connect(pg_conn_string, function(err, client, done) {
 					}
 				}
 				request(req_params, function(e, i, res) {
-					if (handleError(e)) return;
 					if (callback instanceof Function) {
-						callback(res);
+						callback(e, res);
 					}
 				});
 			},
@@ -1047,8 +1057,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 					case 'vk':
 					{
 						if (callback instanceof Function) {
-							logger.info(data.type + 'VALIDATE_ACCESS_TOKEN', data);
-							callback(data);
+							callback(null, data);
 							return;
 						}
 						break;
@@ -1067,58 +1076,97 @@ pg.connect(pg_conn_string, function(err, client, done) {
 				}
 
 				request(req_params, function(e, i, res) {
-					if (handleError(e)) return;
 					if (res.audience != real_config.google.web.client_id) {
-						handleError({emit: 'TOKEN_CANT_BE_VERIFIED'});
-						return;
-					} else {
-						if (callback instanceof Function) {
-							callback(res);
-						}
+						e = {emit: 'TOKEN_CANT_BE_VERIFIED'};
 					}
-				})
+					if (callback instanceof Function) {
+						callback(e, res);
+					}
+				});
+			},
+			afterAccessToken = function(oauth_data, access_data, retry_count){
+				validateAccessToken(access_data, function(validate_error) {
+					if (handleError(validate_error)){
+						setTimeout(function(){
+							authTry(oauth_data, retry_count, access_data);
+						}, 1000 * retry_count);
+						return;
+					}
+					getUsersInfo(access_data, function(user_info_error, user_info) {
+
+						if (handleError(user_info_error)){
+							setTimeout(function(){
+								authTry(oauth_data, retry_count, access_data);
+							}, 1000 * retry_count);
+							return;
+						}
+
+						if (oauth_data.type == 'vk') {
+							user_info = user_info.response[0];
+						}
+						user_info.type = oauth_data.type;
+						user_info.access_token = access_data.access_token;
+
+						getFriendsList(user_info, function(friends_error, friends_data) {
+							if (handleError(friends_error)){
+								setTimeout(function(){
+									authTry(oauth_data, retry_count, access_data);
+								}, 1000 * retry_count);
+								return;
+							}
+							if (oauth_data.type == 'vk') {
+								friends_data = friends_data.response;
+								if (access_data.email == null) {
+									socket.emit('vk.needEmail');
+									return;
+								}
+							} else if (oauth_data.type == 'google') {
+								friends_data = friends_data.items;
+							} else if (oauth_data.type == 'facebook') {
+								friends_data = friends_data.data;
+								user_info.photo_100 = user_info.hasOwnProperty('picture') ? user_info.picture.data.url : '';
+							}
+							saveDataInDB(Utils.composeFullInfoObject({
+								oauth_data: oauth_data,
+								access_data: access_data,
+								user_info: user_info,
+								friends_data: friends_data,
+								type: access_data.type
+							}));
+						});
+					});
+				});
+			},
+			authTry = function(oauth_data, retry_count, access_data){
+				socket.retry_count++;
+				var timeout = 1000;
+				logger.info('Auth try: ' + socket.retry_count);
+				if (socket.retry_count > 10){
+					socket.emit('error.retry');
+				}else if (socket.retry_count > 3){
+					if (access_data){
+						afterAccessToken(oauth_data, access_data, socket.retry_count);
+					}else{
+						socket.emit('error.retry');
+					}
+				}else{
+					getAccessToken(oauth_data, function(err, access_data) {
+						if (handleError(err)){
+							setTimeout(function(){
+								authTry(oauth_data, socket.retry_count);
+							}, timeout * socket.retry_count);
+							return;
+						}
+						access_data.type = oauth_data.type;
+						afterAccessToken(oauth_data, access_data, socket.retry_count);
+					})
+				}
 			};
 
 		socket.on('auth.oauthDone', function(oauth_data) {
+			socket.retry_count = 0;
 			try {
-				getAccessToken(oauth_data, function(access_data) {
-					access_data.type = oauth_data.type;
-
-					validateAccessToken(access_data, function() {
-						getUsersInfo(access_data, function(user_info) {
-
-							if (oauth_data.type == 'vk') {
-								logger.info('VK_USER_INFO_HAS_RESPONSE', user_info.hasOwnProperty('response'));
-								logger.info('VK_USER_INFO_RESPONSE', user_info);
-								user_info = user_info.response[0];
-							}
-							user_info.type = oauth_data.type;
-							user_info.access_token = access_data.access_token;
-
-							getFriendsList(user_info, function(friends_data) {
-								if (oauth_data.type == 'vk') {
-									friends_data = friends_data.response;
-									if (access_data.email == null) {
-										socket.emit('vk.needEmail');
-										return;
-									}
-								} else if (oauth_data.type == 'google') {
-									friends_data = friends_data.items;
-								} else if (oauth_data.type == 'facebook') {
-									friends_data = friends_data.data;
-									user_info.photo_100 = user_info.hasOwnProperty('picture') ? user_info.picture.data.url : '';
-								}
-								saveDataInDB(Utils.composeFullInfoObject({
-									oauth_data: oauth_data,
-									access_data: access_data,
-									user_info: user_info,
-									friends_data: friends_data,
-									type: access_data.type
-								}));
-							});
-						});
-					});
-				})
+				authTry(oauth_data, 0);
 			} catch(e) {
 				socket.emit('error.retry');
 			}
