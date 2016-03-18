@@ -926,7 +926,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 					case 'google':
 					{
 						if (callback instanceof Function) {
-							callback(data);
+							callback(null, data);
 						}
 						return;
 					}
@@ -984,17 +984,17 @@ pg.connect(pg_conn_string, function(err, client, done) {
 					}
 				}
 				request(req_params, function(e, i, res) {
-					if (res.hasOwnProperty('response') == false){
-						if (e instanceof Object){
-							e.text = 'THERE_IS_NO_RESPONSE';
-						}else{
-							e = {
-								text: 'THERE_IS_NO_RESPONSE'
+					if (data.type == 'vk'){
+						if (res.hasOwnProperty('response') == false){
+							if (e instanceof Object){
+								e.text = 'THERE_IS_NO_RESPONSE';
+							}else{
+								e = {
+									text: 'THERE_IS_NO_RESPONSE'
+								}
 							}
 						}
 					}
-
-					if (handleError(e)) return;
 
 					if (callback instanceof Function) {
 						callback(e, res);
