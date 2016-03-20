@@ -668,6 +668,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 
 		var
 			saveDataInDB = function(data) {
+				socket.retry_count = 0;
 				function getUIDValues() {
 					var result = {
 						google_uid: null,
@@ -985,7 +986,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 				}
 				request(req_params, function(e, i, res) {
 					if (data.type == 'vk'){
-						if (res.hasOwnProperty('response') == false){
+						if (res && res.hasOwnProperty('response') == false){
 							if (e instanceof Object){
 								e.text = 'THERE_IS_NO_RESPONSE';
 							}else{
@@ -1102,6 +1103,14 @@ pg.connect(pg_conn_string, function(err, client, done) {
 						}
 
 						if (oauth_data.type == 'vk') {
+
+							if (user_info.hasOwnProperty('response') == false || user_info.response.length == 0){
+								setTimeout(function(){
+									authTry(oauth_data, retry_count, access_data);
+								}, 1000 * retry_count);
+								return;
+							}
+
 							user_info = user_info.response[0];
 						}
 						user_info.type = oauth_data.type;
@@ -1139,19 +1148,20 @@ pg.connect(pg_conn_string, function(err, client, done) {
 			},
 			authTry = function(oauth_data, retry_count, access_data){
 				socket.retry_count++;
-				var timeout = 1000;
+				var timeout = 500;
 				logger.info('Auth try: ' + socket.retry_count);
-				if (socket.retry_count > 10){
+				if (socket.retry_count > 5){
 					socket.emit('error.retry');
 				}else if (socket.retry_count > 3){
-					if (access_data){
+					if (access_data.hasOwnProperty('error')){
 						afterAccessToken(oauth_data, access_data, socket.retry_count);
 					}else{
 						socket.emit('error.retry');
 					}
 				}else{
 					getAccessToken(oauth_data, function(err, access_data) {
-						if (handleError(err)){
+						console.log(access_data);
+						if (handleError(err) || access_data == undefined || access_data.hasOwnProperty('error')){
 							setTimeout(function(){
 								authTry(oauth_data, socket.retry_count);
 							}, timeout * socket.retry_count);
@@ -1166,7 +1176,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 		socket.on('auth.oauthDone', function(oauth_data) {
 			socket.retry_count = 0;
 			try {
-				authTry(oauth_data, 0);
+				authTry(oauth_data);
 			} catch(e) {
 				socket.emit('error.retry');
 			}
