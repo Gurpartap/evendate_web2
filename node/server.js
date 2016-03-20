@@ -18,6 +18,10 @@ var server = require('http'),
 	crypto = require('crypto'),
 	__rooms = {};
 
+process.on('uncaughtException', function (err) {
+	logger.info('Caught exception: ' + err);
+});
+
 
 var config_index = process.env.ENV ? process.env.ENV : 'dev',
 	real_config = config[config_index],
@@ -401,7 +405,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 				)
 				.or(
 					organizations.img_url.notEquals(organizations.img_small_url)
-				).toQuery();
+				).limit(3).toQuery();
 
 		fs.readdir(IMAGES_PATH + LARGE_IMAGES, function(err, files) {
 			if (err) {
@@ -583,7 +587,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 				users.blurred_image_url.isNotNull().or(users.blurred_image_url.notEquals(users.avatar_url))
 			)
 			.and(users.avatar_url.isNotNull())
-			.limit(30)
+			.limit(5)
 			.toQuery();
 
 		client.query(q_get_user_images, function(err, result) {
@@ -606,7 +610,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 						var q_upd_user = users
 							.update({
 								blurred_image_url: users.avatar_url
-							}).where(users.id.equals(image.id));
+							}).where(users.id.equals(image.id)).toQuery();
 						client.query(q_upd_user, function(err) {
 							if (err) {
 								handleError(err);
@@ -636,12 +640,17 @@ pg.connect(pg_conn_string, function(err, client, done) {
 			};
 
 
-		request(req_params, function(e, i, res) {
-			handleError(e);
-			if (cb) {
-				cb(e, res);
-			}
-		});
+		try{
+			request(req_params, function(e, i, res) {
+				handleError(e);
+				if (cb) {
+					cb(e, res);
+				}
+			}).on('error', cb);
+		}catch(e){
+			cb(e);
+		}
+
 	}
 
 	try {
@@ -858,7 +867,9 @@ pg.connect(pg_conn_string, function(err, client, done) {
 							});
 
 							client.query(q_ins_token, function(err) {
-								if (err) return (err, 'CANT_INSERT_TOKEN');
+								if (handleError(err, 'CANT_INSERT_TOKEN')){
+									socket.emit('error.retry');
+								}
 								socket.emit('auth', {
 									email: data.access_data.email,
 									token: user_token,
@@ -870,7 +881,11 @@ pg.connect(pg_conn_string, function(err, client, done) {
 
 
 						client.query(q_ins_sign_in.returning('id').toQuery(), function(sign_in_err, sign_in_result) {
-							if (handleError(sign_in_err)) return;
+							if (handleError(sign_in_err)){
+								logger.info(q_ins_sign_in.returning('id').toQuery().text);
+								socket.emit('error.retry');
+								return;
+							}
 
 							var q_ins_friends = '',
 								uid_key_name;
@@ -934,11 +949,16 @@ pg.connect(pg_conn_string, function(err, client, done) {
 				}
 
 
-				request(req_params, function(e, i, res) {
-					if (callback instanceof Function) {
-						callback(e, res);
-					}
-				});
+				try{
+					request(req_params, function(e, i, res) {
+						if (callback instanceof Function) {
+							callback(e, res);
+						}
+					}).on('error', callback);
+				}catch(e){
+					callback(e, null);
+				}
+
 			},
 			getUsersInfo = function(data, callback) {
 				var req_params;
@@ -984,23 +1004,27 @@ pg.connect(pg_conn_string, function(err, client, done) {
 						break;
 					}
 				}
-				request(req_params, function(e, i, res) {
-					if (data.type == 'vk'){
-						if (res && res.hasOwnProperty('response') == false){
-							if (e instanceof Object){
-								e.text = 'THERE_IS_NO_RESPONSE';
-							}else{
-								e = {
-									text: 'THERE_IS_NO_RESPONSE'
+				try{
+					request(req_params, function(e, i, res) {
+						if (data.type == 'vk'){
+							if (res && res.hasOwnProperty('response') == false){
+								if (e instanceof Object){
+									e.text = 'THERE_IS_NO_RESPONSE';
+								}else{
+									e = {
+										text: 'THERE_IS_NO_RESPONSE'
+									}
 								}
 							}
 						}
-					}
 
-					if (callback instanceof Function) {
-						callback(e, res);
-					}
-				});
+						if (callback instanceof Function) {
+							callback(e, res);
+						}
+					}).on('error', callback);
+				}catch(e){
+					callback(e);
+				}
 			},
 			getFriendsList = function(data, callback) {
 				var FRIENDS_COUNT = 50000,
@@ -1045,11 +1069,15 @@ pg.connect(pg_conn_string, function(err, client, done) {
 						break;
 					}
 				}
-				request(req_params, function(e, i, res) {
-					if (callback instanceof Function) {
-						callback(e, res);
-					}
-				});
+				try{
+					request(req_params, function(e, i, res) {
+						if (callback instanceof Function) {
+							callback(e, res);
+						}
+					}).on('error', callback);
+				}catch(e){
+					callback(e, null);
+				}
 			},
 			validateAccessToken = function(data, callback) {
 				var req_params;
@@ -1076,14 +1104,18 @@ pg.connect(pg_conn_string, function(err, client, done) {
 					}
 				}
 
-				request(req_params, function(e, i, res) {
-					if (res.audience != real_config.google.web.client_id) {
-						e = {emit: 'TOKEN_CANT_BE_VERIFIED'};
-					}
-					if (callback instanceof Function) {
-						callback(e, res);
-					}
-				});
+				try{
+					request(req_params, function(e, i, res) {
+						if (res.audience != real_config.google.web.client_id) {
+							e = {emit: 'TOKEN_CANT_BE_VERIFIED'};
+						}
+						if (callback instanceof Function) {
+							callback(e, res);
+						}
+					}).on('error', callback);
+				}catch(e){
+					callback(e);
+				}
 			},
 			afterAccessToken = function(oauth_data, access_data, retry_count){
 				validateAccessToken(access_data, function(validate_error) {
@@ -1153,6 +1185,10 @@ pg.connect(pg_conn_string, function(err, client, done) {
 				if (socket.retry_count > 5){
 					socket.emit('error.retry');
 				}else if (socket.retry_count > 3){
+					if (access_data == undefined){
+						socket.emit('error.retry');
+						return;
+					}
 					if (access_data.hasOwnProperty('error')){
 						afterAccessToken(oauth_data, access_data, socket.retry_count);
 					}else{
