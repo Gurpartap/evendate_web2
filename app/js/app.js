@@ -957,8 +957,9 @@ function showOrganizationalModal(organization_id){
   if (window.organization_is_loading) return;
   window.organization_is_loading = true;
     $.ajax({
-        url: 'api/organizations/' + organization_id + '?with_events=true',
+        url: 'api/v1/organizations/' + organization_id + '?fields=events{fields: "detail_info_url,is_favorite,can_edit,location,favored_users_count,organization_name,organization_logo_small_url,dates,description,favored,tags",filters:"future=true"},subscribed,site_url,subscribed_count',
         success: function(res){
+            res.data = res.data[0];
             var $events = $('<div>'),
                 $friends = tmpl('subscribed-users-row', {
                     subscribed_count: res.data.subscribed_count,
@@ -971,8 +972,8 @@ function showOrganizationalModal(organization_id){
           res.data.friends = $('<div>');
           res.data.all_friends = tmpl('liked-dropdown-wrapper', {event_id: res.data.id});
 
-          if (res.data.subscribed_friends != undefined){
-            res.data.subscribed_friends.forEach(function(user, index){
+          if (res.data.subscribed != undefined){
+            res.data.subscribed.forEach(function(user, index){
               res.data.all_friends.append(tmpl('liked-dropdown-item', user));
               if (index > 4) return;
               var $friend = tmpl('subscribed-friend', user);
@@ -1067,12 +1068,15 @@ function showOrganizationalModal(organization_id){
                     $this.addClass(__C.CLASSES.ACTIVE);
 
                     $.ajax({
-                        url: '/api/events/' + $this.data('event-id'),
+                        url: '/api/v1/events/' + $this.data('event-id'),
+                        data: {
+                            fields: 'location,latitude,longitude,organization_name,organization_type_name,organization_short_name,organization_logo_large_url,favored_users_count,description,detail_info_url,is_favorite,link,registration_required,registration_till,is_free,min_price,dates{fields:"start_time,end_time"},tags,favored{fields:"is_friend,type,link"}'
+                        },
                         success: function(res){
 
-                            var _event = generateEventAttributes(res.data);
+                            var _event = generateEventAttributes(res.data[0]);
                             if (_event.one_day){_event.dates = $('<span>' + _event.day_name.capitalize() + '<br>' + _event.dates + '</span>')}
-                            _event.style = _event.dates_range.length > 4 ? 'font-size: 14px;' : '';
+                            _event.style = _event.dates.length > 4 ? 'font-size: 14px;' : '';
                             var $event_content = tmpl('event-modal-content', _event),
                                 $event_alone = $modal.find('.event-alone');
 
@@ -1150,7 +1154,7 @@ function showSettingsModal(){
     $modal.remove();
 
     $.ajax({
-        url: '/api/users/settings',
+        url: '/api/v1/users/settings',
         type: 'GET',
         success: function(res){
             $modal = tmpl('settings-modal', res.data);
@@ -1188,7 +1192,7 @@ function showSettingsModal(){
 
                     Pace.ignore(function(){
                         $.ajax({
-                            url: '/api/users/settings',
+                            url: '/api/v1/users/settings',
                             type: 'PUT',
                             data: _data
                         });
@@ -1205,11 +1209,8 @@ function toggleFavorite($btn, $view, refresh){
         _event_id = $btn.data('event-id'),
         _date = $btn.parents('.tl-panel-block').data(__C.DATA_NAMES.DATE),
         params = {
-            url: '/api/events/favorites/',
-            type: 'POST',
-            data: {
-                event_id: _event_id
-            }
+            url: '/api/v1/events/' + _event_id + '/favorites/',
+            type: 'POST'
         };
 
     $btn.toggleClass(__C.CLASSES.NO_BORDERS);
@@ -1219,7 +1220,7 @@ function toggleFavorite($btn, $view, refresh){
     var new_count;
     if (!$btn.hasClass(__C.CLASSES.NO_BORDERS)){
         params.type = 'DELETE';
-        params.url = '/api/events/favorites/' + $btn.data('event-id');
+        params.url = '/api/v1/events/' + $btn.data('event-id') + '/favorites/';
         new_count = parseInt($liked_count.text()) - 1;
         $liked_count.text(new_count);
     }else{
@@ -1294,6 +1295,24 @@ $(document).ready(function(){
             ENTITIES: {
               EVENT: 'event',
               ORGANIZATION: 'organization'
+            },
+            URL_FIELDS: {
+                EVENTS: {
+                    fields: [
+                        'detail_info_url',
+                        'is_favorite',
+                        'can_edit',
+                        'location',
+                        'favored_users_count',
+                        'organization_name',
+                        'organization_logo_small_url',
+                        'description',
+                        'favored',
+                        'tags',
+                        'dates{"fields": "event_date,start_time,end_time", "order_by": "event_date"}'
+                    ].join(','),
+                    length: 20
+                }
             }
         };
     window.__stats = [];
@@ -1311,7 +1330,7 @@ $(document).ready(function(){
         var batch = window.__stats;
         window.__stats = [];
       $.ajax({
-        url: '/api/statistics/batch',
+        url: '/api/v1/statistics/batch',
         data: JSON.stringify(batch),
         type: 'POST',
         contentType: 'application/json; charset=utf-8',

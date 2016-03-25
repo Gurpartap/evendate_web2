@@ -98,4 +98,16 @@ class Fields{
 		$pattern2 = '/^(0?\d|1[0-2]):[0-5]\d\s(am|pm)$/i';
 		return preg_match($pattern1, $value) || preg_match($pattern2, $value);
 	}
+
+	public static function parseFilters($value) : array{
+		$result = array();
+		$filters = explode(',', $value);
+		foreach ($filters as $filter){
+			$val = explode('=', $filter);
+			if (count($val) == 2){
+				$result[trim($val[0])] = trim($val[1]);
+			}
+		}
+		return $result;
+	}
 }

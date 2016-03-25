@@ -28,6 +28,8 @@ try {
 	require_once "{$BACKEND_FULL_PATH}/users/Class.Friend.php";
 	require_once "{$BACKEND_FULL_PATH}/statistics/Class.Statistics.php";
 	require_once "{$BACKEND_FULL_PATH}/events/Class.EventsCollection.php";
+	require_once "{$BACKEND_FULL_PATH}/events/Class.EventDate.php";
+	require_once "{$BACKEND_FULL_PATH}/events/Class.EventsDatesCollection.php";
 	require_once "{$BACKEND_FULL_PATH}/users/Class.UsersCollection.php";
 
 

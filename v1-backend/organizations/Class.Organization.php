@@ -254,14 +254,20 @@ class Organization extends AbstractEntity{
 				$this->db,
 				$user,
 				Fields::parseFields($users_pagination['fields'] ?? ''),
+				Fields::parseFilters($users_pagination['filters'] ?? ''),
 				Fields::parseOrderBy($users_pagination['order_by'] ?? ''),
-				$users_pagination);
+				$users_pagination['pagination'] ??
+				array(
+					'length' => $users_pagination['length'] ?? App::DEFAULT_LENGTH,
+					'offset' => $users_pagination['offset'] ?? App::DEFAULT_OFFSET
+				));
 		}
 
 		$events_field = $fields[Organization::EVENTS_FIELD_NAME] ?? null;
 		if (is_array($events_field)){
 			$result_data[Organization::EVENTS_FIELD_NAME] = $this->getEvents(
 				Fields::parseFields($events_field['fields'] ?? ''),
+				Fields::parseFilters($events_field['filters'] ?? ''),
 				Fields::parseOrderBy($events_field['order_by'] ?? ''),
 				array(
 					'length' => $events_field['length'] ?? App::DEFAULT_LENGTH,
@@ -273,11 +279,12 @@ class Organization extends AbstractEntity{
 		return new Result(true, '', $result_data);
 	}
 
-	private function getSubscribed(PDO $db, User $user, array $fields = null, array $order_by = null, array $pagination = null) {
+	private function getSubscribed(PDO $db, User $user, array $fields = null, array $filters, array $order_by = null, array $pagination = null) {
+		$filters['organization'] = $this;
 		return UsersCollection::filter(
 			$db,
 			$user,
-			array('organization' => $this),
+			$filters,
 			$fields,
 			$pagination,
 			array('last_name', 'first_name')
@@ -285,11 +292,12 @@ class Organization extends AbstractEntity{
 
 	}
 
-	private function getEvents(array $fields = null, array $oder_by = null, array $pagination = null) {
+	private function getEvents(array $fields = null, array $filters, array $oder_by = null, array $pagination = null) {
+		$filters['organization'] = $this;
 		return EventsCollection::filter(
 			$this->db,
 			App::getCurrentUser(),
-			array('organization' => $this),
+			$filters,
 			$fields,
 			$pagination,
 			array('id')

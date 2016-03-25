@@ -112,7 +112,7 @@ function bindEventHandlers(){
 			.animate({height: 100}, 300, "easeInBack");
 
 		$.ajax({
-			url: '/api/events/' + event.id + '/status?hidden=1',
+			url: '/api/v1/events/' + event.id + '/status?hidden=1',
 			type: 'PUT'
 		});
 	});
@@ -139,7 +139,7 @@ function bindEventHandlers(){
 			$panel_block.css({overflow: 'visible'});
 		});
 		$.ajax({
-			url: '/api/events/' + event.id + '/status?hidden=0',
+			url: '/api/v1/events/' + event_id + '/status?hidden=0',
 			type: 'PUT'
 		});
 
@@ -148,66 +148,53 @@ function bindEventHandlers(){
 
 function generateEventAttributes(event){
 
-	var st_date = event.event_start_date == null ? moment(event.dates_range[0]) :moment(event.event_start_date),
-		end_date = moment(event.event_end_date);
+	var dates = [],
+		is_dates_range = true;
+	event.dates.forEach(function(event_day, index){
+		var _date = moment.unix(event_day.event_date);
+		dates.push({
+			start_date: moment(_date.format(__C.DATE_FORMAT) + ' ' + event_day.start_time),
+			end_date: moment(_date.format(__C.DATE_FORMAT) + ' ' + event_day.end_time)
+		});
+		if (index > 0){
+			is_dates_range = is_dates_range && (_date.add(-1, 'day').format(__C.DATE_FORMAT) == dates[index - 1].start_date.format(__C.DATE_FORMAT));
+		}
+	});
 
-	event.date =  event.event_start_date != null
-		? moment(event.event_start_date).format(__C.DATE_FORMAT)
-		: moment(event.dates_range[0]).format(__C.DATE_FORMAT);
+	event.moment_dates = dates;
+	event.liked_users_count = event.favored_users_count;
 	event.tags_text = getTagsString(event.tags);
 
-	event.begin_time = moment(event.begin_time, 'HH:mm:ss').format('HH:mm');
-
-	if (event.end_time == null){
-		event.time = event.begin_time;
-	}else{
-		event.end_time = moment(event.end_time, 'HH:mm:ss').format('HH:mm');
-		if (event.begin_time == '00:00' && event.end_time == '00:00'){
-			event.time = ' Весь день';
-		}else{
-			event.time = event.begin_time + ' - ' + event.end_time;
-		}
-	}
-
+	event.begin_time = dates[0].start_date.format('HH:mm');
 	event.tags_block = $('<div>');
 
 	event.tags.forEach(function(tag){
 		event.tags_block.append(tmpl('event-tag', tag));
 	});
 
-
-
-	event.begin_time_for_timeline = event.begin_time == '00:00' && event.end_time == '00:00' ? '': event.begin_time;
-	if (event.event_start_date == null || event.event_end_date == null){
-		event.one_day = event.dates_range.length == 1;
-		event.dates = st_date.format('DD MMMM') ;
-		event.short_dates = [];
-		event.dates = [];
-		var date_format = event.dates_range.length == 1 ? 'DD MMMM' : 'DD/MM';
-		event.dates_range.forEach(function(val){
-			event.dates.push(moment(val).format(date_format));
-			event.short_dates.push(moment(val).format('DD/MM'));
-		});
+	event.one_day = event.dates.length == 1;
+	event.short_dates = [];
+	event.dates = [];
+	var date_format = event.dates.length == 1 ? 'DD MMMM' : 'DD/MM';
+	event.moment_dates.forEach(function(val){
+		event.dates.push(val.start_date.format(date_format) + ' ' + val.start_date.format('HH:mm') + ' - ' + val.end_date.format('HH:mm'));
+		event.short_dates.push(val.start_date.format('DD/MM'));
+	});
+	if (is_dates_range){
+		if (event.dates.length > 1){
+			event.dates = '' + event.moment_dates[0].start_date.format('DD/MM') + ' - ' + event.moment_dates[event.moment_dates.length - 1].start_date.format('DD/MM');
+			event.dates += "\n" + ' c ' + event.moment_dates[0].start_date.format('HH:mm') + ' по ' + event.moment_dates[0].end_date.format('HH:mm');
+			event.short_dates = event.dates;
+		}else{
+			event.dates = event.moment_dates[0].start_date.format('DD/MM');
+			event.dates += "\n" + ' c ' + event.moment_dates[0].start_date.format('HH:mm') + ' по ' + event.moment_dates[0].end_date.format('HH:mm');
+			event.short_dates = event.dates;
+		}
+	}else{
 		event.dates = event.dates.join(', ') ;
 		event.short_dates = event.short_dates.join(', ') ;
-		event.day_name = st_date.format('dddd');
-	}else{
-		event.dates = end_date.format('DD MMMM') ;
-		event.short_dates = end_date.format('DD/MM') ;
-		event.day_name = end_date.format('dddd');
-		if (end_date.format(__C.DATE_FORMAT) != st_date.format(__C.DATE_FORMAT)){
-			event.one_day = false;
-			if (end_date.format('MM') == st_date.format('MM')){
-				event.dates = st_date.format('DD') + ' - ' + end_date.format('DD MMMM');
-			}else{
-				event.dates = st_date.format('DD MMMM') + ' - ' + end_date.format('DD MMMM')
-			}
-			event.short_dates = st_date.format('DD/MM') + ' - ' + end_date.format('DD/MM')
-		}else{
-			event.one_day = true;
-		}
 	}
-
+	event.day_name = dates[0].start_date.format('dddd');
 
 
 	var _a = document.createElement('a'),
@@ -222,20 +209,21 @@ function generateEventAttributes(event){
 	event.friends = $('<div>').addClass("liked-users");
 	event.all_friends = tmpl('liked-dropdown-wrapper', {event_id: event.id});
 
-	var short_firends_count = 0;
-	if (event.favorite_friends != undefined){
-		event.favorite_friends.forEach(function(user){
-			if (short_firends_count++ < 5){
+	var short_friends_count = 0;
+	if (event.favored != undefined){
+		event.favored.forEach(function(user){
+			if (short_friends_count++ < 5){
 				event.friends.append(tmpl('liked-user', user));
 			}
 			event.all_friends.append(tmpl('liked-dropdown-item', user))
 		})
 	}
 
+	event.organization_img_url = event.organization_logo_small_url;
 	event.favorite_btn_class = event.is_favorite ? __C.CLASSES.NO_BORDERS : '';
 	event.favorite_btn_text = event.is_favorite ? __C.TEXTS.REMOVE_FAVORITE : __C.TEXTS.ADD_FAVORITE;
 	event.timeline_favorite_class = event.is_favorite ? __C.CLASSES.ACTIVE : '';
-	event.favored_text = getUnitsText(event.liked_users_count, __C.TEXTS.FAVORED);
+	event.favored_text = getUnitsText(event.favored_users_count, __C.TEXTS.FAVORED);
 	return event;
 }
 
@@ -253,12 +241,11 @@ function toggleSubscriptionState(state, entity_id, callback){
 		},
 
 		options = (state == false) ? {
-			url: 'api/subscriptions/' + entity_id,
+			url: 'api/v1/organizations/' + entity_id + '/subscriptions',
 			type: 'DELETE',
 			success: cb
 		} : {
-			url: 'api/subscriptions/',
-			data: {organization_id: entity_id},
+			url: 'api/v1/organizations/' + entity_id + '/subscriptions',
 			type: 'POST',
 			success: cb
 		};
@@ -346,11 +333,9 @@ function printEventsInTimeline($view, res, filter_date){
 	});
 
 	if (res.data.length == 0 || res.data.length < __pages_length) {
-		//$view.find('.main-row').addClass(__C.CLASSES.HIDDEN);
 		$view.find('.load-more-btn').addClass(__C.CLASSES.HIDDEN);
 		$view.find('.sad-eve').removeClass(__C.CLASSES.HIDDEN);
 	} else {
-		//$view.find('.main-row').removeClass(__C.CLASSES.HIDDEN);
 		$view.find('.load-more-btn')
 			.removeClass(__C.CLASSES.HIDDEN)
 			.find('.btn').removeClass(__C.CLASSES.DISABLED);
@@ -369,10 +354,13 @@ function MyTimeline($view, $content_block){
 	$view.find('.tl-outer-wrap').addClass(__C.CLASSES.HIDDEN);
 	var $load_btn = $view.find('.load-more-btn').addClass(__C.CLASSES.HIDDEN).data('page-number', 0),
 		getEvents = function(){
-			var page_number = $load_btn.data('page-number');
+			var page_number = $load_btn.data('page-number'),
+				data = __C.URL_FIELDS.EVENTS;
+			data['offset'] = 20 * page_number;
 			$load_btn.data('page-number', page_number + 1);
 			$.ajax({
-				url: '/api/events/my?page=' + page_number,
+				url: '/api/v1/events/my',
+				data: data,
 				success: function(res){
 					printEventsInTimeline($view, res);
 					bindOnClick();
@@ -389,7 +377,7 @@ function MyTimeline($view, $content_block){
 function OrganizationsList($view, $content_block){
 	if (__STATES.getCurrentState() == 'organizations' && organizations_loaded) return;
 	$.ajax({
-		url: 'api/organizations/?with_subscriptions=true&without_friends=true',
+		url: 'api/v1/organizations?fields=is_subscribed,subscribed_count',
 		success: function(res){
 			organizations_loaded = true;
 			var _organizations_by_types = {},
@@ -484,10 +472,14 @@ function FavoredEvents($view, $content_block){
 	$view.find('.tl-outer-wrap').addClass(__C.CLASSES.HIDDEN);
 	var $load_btn = $view.find('.load-more-btn').addClass(__C.CLASSES.HIDDEN).data('page-number', 0),
 		getEvents = function(){
-			var page_number = $load_btn.data('page-number');
+			var page_number = $load_btn.data('page-number'),
+				data = __C.URL_FIELDS.EVENTS;
+			data['offset'] = (10 * page_number);
+			data['future'] = 'true';
 			$load_btn.data('page-number', page_number + 1);
 			$.ajax({
-				url: '/api/events/favorites?page=' + page_number,
+				url: '/api/v1/events/favorites',
+				data: data,
 				success: function(res){
 					printEventsInTimeline($view, res);
 				}
@@ -507,7 +499,7 @@ function Search($view, $content_block){
 		$('.search-input').val(_search.q);
 	}
 	$.ajax({
-		url: '/api/search/',
+		url: '/api/v1/search/',
 		data: _search,
 		success: function(res){
 			var $events_wrapper = $view.find('.search-events').empty(),
@@ -585,7 +577,7 @@ function OneFriend($view, $content_block){
 			$content.find('.friend-events-block').remove();
 		}
 		$.ajax({
-			url: 'api/users/friends?friends=true&actions=true&length=20&friend_id=' + friend_id + '&page=' + page_number++,
+			url: 'api/v1/users/' + friend_id + '/actions?fields=entity,created_at,user,type_code,event{fields:"organization_logo_small_url,image_square_vertical_url,organization_short_name"},organization{fields:"subscribed_count,img_medium_url"}&&order_by=-created_at&length=20&offset=' + (20 * page_number++),
 			success: function(res){
 				var hide_btn = false;
 				if ((res.data.length == 0 && page_number != 1) || (res.data.length < 20 && res.data.length > 0)){
@@ -598,7 +590,7 @@ function OneFriend($view, $content_block){
 				}
 				var cards_by_users = {};
 				res.data.forEach(function(stat){
-					var date = moment(stat.created_at),
+					var date = moment.unix(stat.created_at),
 						ent = stat[stat.entity],
 						key = [stat.entity, stat.stat_type_id, stat.user.id, date.format('DD.MM')].join('-');
 					if (cards_by_users.hasOwnProperty(key) == false){
@@ -638,22 +630,17 @@ function OneFriend($view, $content_block){
 	}
 
 	$.ajax({
-		url: '/api/users/friends/',
-		data: {
-			subscriptions: true,
-			friend_id: friend_id,
-			with_friend_info: true
-		},
+		url: '/api/v1/users/' + friend_id + '?fields=subscriptions',
 		success: function(res){
-			$content.append(tmpl('friends-page-header', res.data.user));
+			$content.append(tmpl('friends-page-header', res.data[0]));
 			$content.find('.friend-user-link').on('click', function(){
-				window.open(res.data.user.link, '_blank');
+				window.open(res.data[0].link, '_blank');
 			});
 
-			if (res.data.subscriptions.length == 0){
+			if (res.data[0].subscriptions.length == 0){
 				tmpl('no-subscriptions', {}, $content.find('.one-friend-subscriptions'));
 			}else{
-				tmpl('friends-subscription', res.data.subscriptions, $content.find('.one-friend-subscriptions'))
+				tmpl('friends-subscription', res.data[0].subscriptions, $content.find('.one-friend-subscriptions'))
 			}
 
 
@@ -686,7 +673,7 @@ function OneFriend($view, $content_block){
 
 function getFriendsList($friends_right_list, cb){
 	$.ajax({
-		url: '/api/users/friends?page=0&length=500',
+		url: '/api/v1/users/friends?page=0&length=500',
 		success: function(res){
 			if (res.data.length == 0){
 				$('.no-friends-block').removeClass(__C.CLASSES.HIDDEN);
@@ -740,11 +727,11 @@ function Friends($view, $content_block){
 			$view.find('.friend-events-block').remove();
 		}
 		$.ajax({
-			url: 'api/users/feed?length=20&page=' + page_number++,
+			url: 'api/v1/users/feed?fields=entity,created_at,user,type_code,event{fields:"organization_logo_small_url,image_square_vertical_url,organization_short_name"},organization{fields:"subscribed_count,img_medium_url"}&&order_by=-created_at&length=20&offset=' + (20 * page_number++),
 			success: function(res){
 				var cards_by_users = {};
 				res.data.forEach(function(stat){
-					var date = moment(stat.created_at),
+					var date = moment.unix(stat.created_at),
 						ent = stat[stat.entity],
 						key = [stat.entity, stat.stat_type_id, stat.user.id, date.format('DD.MM')].join('-');
 					if (cards_by_users.hasOwnProperty(key) == false){
@@ -761,7 +748,6 @@ function Friends($view, $content_block){
 							entities: []
 						};
 					}
-
 					cards_by_users[key].entities.push(ent);
 				});
 
@@ -796,13 +782,13 @@ function Friends($view, $content_block){
 
 function OneDay($view, $content_block){
 	$view.find('.panel-default,.tl-block').remove();
-	var date = __STATES.getCurrentState();
+	var date = __STATES.getCurrentState(),
+		data = __C.URL_FIELDS.EVENTS;
+	data['date'] = date;
+	data['length'] = 100;
 	$.ajax({
-		url: 'api/events/my',
-		data: {
-			date: date,
-			length: 100
-		},
+		url: 'api/v1/events/my',
+		data: data,
 		type: 'GET',
 		dataType: 'JSON',
 		success: function(res){
@@ -1710,7 +1696,7 @@ function printSubscribedOrganizations(organization){
 		}
 	}else{
 		$.ajax({
-			'url': 'api/subscriptions/my',
+			'url': 'api/v1/organizations/subscriptions',
 			success: function(res){
 				res.data.forEach(function(organization){
 					if (organization.is_subscribed && $list.find('.organization-' + organization.id).length == 0){
@@ -1729,28 +1715,26 @@ function printSubscribedOrganizations(organization){
 
 function setDaysWithEvents(){
 	$.ajax({
-		url: '/api/events/my',
+		url: '/api/v1/events/dates?my=true',
 		data: {
-			since_date: _selected_month.startOf('month').format(__C.DATE_FORMAT),
-			till_date: _selected_month.endOf('month').format(__C.DATE_FORMAT),
-			type: 'short',
-			page: 0,
-			length: 500
+			since: _selected_month.startOf('month').format(__C.DATE_FORMAT),
+			till: _selected_month.endOf('month').format(__C.DATE_FORMAT),
+			offset: 0,
+			length: 500,
+			my: 'true',
+			unique: 'true'
 		},
 		success: function(res){
 			$('.td-day').removeClass('click-able has-favorites').addClass(__C.CLASSES.DISABLED);
-			var _now = moment();
-			res.data.forEach(function(event){
-				event.dates_range.forEach(function(event_date){
-					var m_date = moment(event_date),
-						_event_date = m_date.format(__C.DATE_FORMAT),
-						add_has_favorites = event.is_favorite && _now < m_date ? 'has-favorites' : '';
-					$('.td-day[data-date="' + _event_date + '"]')
-						.addClass('click-able')
-						.addClass(add_has_favorites)
-						.removeClass(__C.CLASSES.DISABLED);
-					__STATES[event_date] = OneDay;
-				})
+			res.data.forEach(function(day){
+				var m_date = moment.unix(day.event_date),
+					_event_date = m_date.format(__C.DATE_FORMAT),
+					add_has_favorites = day.favorites_count > 0 ? 'has-favorites' : '';
+				$('.td-day[data-date="' + _event_date + '"]')
+					.addClass('click-able')
+					.addClass(add_has_favorites)
+					.removeClass(__C.CLASSES.DISABLED);
+				__STATES[_event_date] = OneDay;
 			});
 
 			bindOnClick();

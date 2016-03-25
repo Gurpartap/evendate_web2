@@ -123,7 +123,7 @@ $__modules['events'] = array(
 	),
 	'PUT' => array(
 		'{(id:[0-9]+)/status}' => function($id) use ($__request, $__db, $__user){
-			$event = new Event($id, $__db);
+			$event = EventsCollection::one($__db, $__user, $id, array());
 			if (!isset($__request['hidden'])) throw new BadMethodCallException('Bad Request');
 			if ($__request['hidden'] == 1){
 				return $event->hide($__user);
