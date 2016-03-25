@@ -17,6 +17,10 @@ CREATE VIEW view_events AS
     events.registration_required,
     events.registration_till,
     events.is_free,
+    ((SELECT SUM(1) FROM (SELECT DISTINCT events_dates.start_time, events_dates.end_time
+             FROM events_dates
+     WHERE event_id = events.id AND status = TRUE) as sb) > 0):: BOOL
+                                                                              AS is_same_time,
     events.organization_id :: INT,
     'http://evendate.ru/event.php?id=' || events.id                           AS link,
     TRUE                                                                      AS status,
@@ -25,15 +29,15 @@ CREATE VIEW view_events AS
     events.images_domain || 'event_images/large/' || events.image_vertical    AS image_vertical_large_url,
     events.images_domain || 'event_images/large/' || events.image_horizontal  AS image_horizontal_large_url,
 
-    events.images_domain || 'event_images/square/' || events.image_vertical    AS image_square_vertical_url,
-    events.images_domain || 'event_images/square/' || events.image_horizontal    AS image_square_horizontal_url,
+    events.images_domain || 'event_images/square/' || events.image_vertical   AS image_square_vertical_url,
+    events.images_domain || 'event_images/square/' || events.image_horizontal AS image_square_horizontal_url,
 
     events.images_domain || 'event_images/medium/' || events.image_vertical   AS image_horizontal_medium_url,
     events.images_domain || 'event_images/medium/' || events.image_horizontal AS image_vertical_medium_url,
 
     events.images_domain || 'event_images/small/' || events.image_vertical    AS image_vertical_small_url,
     events.images_domain || 'event_images/small/' || events.image_horizontal  AS image_horizontal_small_url,
-    events.images_domain || 'event_images/vk/' || vk_posts.image_path  AS vk_image_url,
+    events.images_domain || 'event_images/vk/' || vk_posts.image_path         AS vk_image_url,
     view_organizations.img_medium_url                                         AS organization_logo_medium_url,
     view_organizations.img_url                                                AS organization_logo_large_url,
     view_organizations.img_small_url                                          AS organization_logo_small_url,
@@ -64,7 +68,6 @@ CREATE VIEW view_events AS
   --LEFT JOIN tags ON tags.id = events_tags.tag_id
   WHERE view_organizations.status = TRUE
         AND events.status = TRUE;
-
 
 
 CREATE VIEW view_actions AS SELECT

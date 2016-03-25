@@ -149,16 +149,13 @@ function bindEventHandlers(){
 function generateEventAttributes(event){
 
 	var dates = [],
-		is_dates_range = true;
+		is_dates_range = event.is_same_time;
 	event.dates.forEach(function(event_day, index){
 		var _date = moment.unix(event_day.event_date);
 		dates.push({
 			start_date: moment(_date.format(__C.DATE_FORMAT) + ' ' + event_day.start_time),
 			end_date: moment(_date.format(__C.DATE_FORMAT) + ' ' + event_day.end_time)
 		});
-		if (index > 0){
-			is_dates_range = is_dates_range && (_date.add(-1, 'day').format(__C.DATE_FORMAT) == dates[index - 1].start_date.format(__C.DATE_FORMAT));
-		}
 	});
 
 	event.moment_dates = dates;
@@ -356,7 +353,7 @@ function MyTimeline($view, $content_block){
 		getEvents = function(){
 			var page_number = $load_btn.data('page-number'),
 				data = __C.URL_FIELDS.EVENTS;
-			data['offset'] = 20 * page_number;
+			data['offset'] = 10 * page_number;
 			$load_btn.data('page-number', page_number + 1);
 			$.ajax({
 				url: '/api/v1/events/my',
@@ -577,10 +574,10 @@ function OneFriend($view, $content_block){
 			$content.find('.friend-events-block').remove();
 		}
 		$.ajax({
-			url: 'api/v1/users/' + friend_id + '/actions?fields=entity,created_at,user,type_code,event{fields:"organization_logo_small_url,image_square_vertical_url,organization_short_name"},organization{fields:"subscribed_count,img_medium_url"}&&order_by=-created_at&length=20&offset=' + (20 * page_number++),
+			url: 'api/v1/users/' + friend_id + '/actions?fields=entity,created_at,user,type_code,event{fields:"organization_logo_small_url,image_square_vertical_url,organization_short_name"},organization{fields:"subscribed_count,img_medium_url"}&&order_by=-created_at&length=10&offset=' + (10 * page_number++),
 			success: function(res){
 				var hide_btn = false;
-				if ((res.data.length == 0 && page_number != 1) || (res.data.length < 20 && res.data.length > 0)){
+				if ((res.data.length == 0 && page_number != 1) || (res.data.length < 10 && res.data.length > 0)){
 					$load_btn.addClass(__C.CLASSES.HIDDEN);
 					hide_btn = true;
 				}else if (res.data.length == 0 && page_number == 1){
@@ -727,7 +724,7 @@ function Friends($view, $content_block){
 			$view.find('.friend-events-block').remove();
 		}
 		$.ajax({
-			url: 'api/v1/users/feed?fields=entity,created_at,user,type_code,event{fields:"organization_logo_small_url,image_square_vertical_url,organization_short_name"},organization{fields:"subscribed_count,img_medium_url"}&&order_by=-created_at&length=20&offset=' + (20 * page_number++),
+			url: 'api/v1/users/feed?fields=entity,created_at,user,type_code,event{fields:"organization_logo_small_url,image_square_vertical_url,organization_short_name"},organization{fields:"subscribed_count,img_medium_url"}&&order_by=-created_at&length=10&offset=' + (10 * page_number++),
 			success: function(res){
 				var cards_by_users = {};
 				res.data.forEach(function(stat){
