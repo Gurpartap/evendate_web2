@@ -54,6 +54,8 @@ class Event extends AbstractEntity{
 		'image_horizontal_medium_url',
 		'image_vertical_large_url',
 		'image_horizontal_large_url',
+		'image_square_vertical_url',
+		'image_square_horizontal_url',
 		'organization_name',
 		'organization_type_name',
 		'organization_short_name',
@@ -441,7 +443,8 @@ class Event extends AbstractEntity{
 
 	}
 
-	public function getDates(User $user = null, array $fields, array $pagination, $order_by){
+	public function getDates(User $user = null, array $fields, array $filters, array $pagination, $order_by){
+		$filters['event'] = $this;
 		return EventsDatesCollection::filter($this->db,
 			$user,
 			array('event' => $this),
@@ -490,7 +493,8 @@ class Event extends AbstractEntity{
 
 		if (isset($fields[self::DATES_FIELD_NAME])){
 			$result_data[self::DATES_FIELD_NAME] = $this->getDates($user,
-				Fields::parseFields($fields[self::DATES_FIELD_NAME]['fields'] ?? ''),
+				Fields::parseFields($fields[self::DATES_FIELD_NAME]['fields'] ?? 'start_time,end_time'),
+				Fields::parseFilters($fields[self::DATES_FIELD_NAME]['filters'] ?? ''),
 				array(
 					'length' => $fields[self::DATES_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 					'offset' => $fields[self::DATES_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
@@ -506,7 +510,7 @@ class Event extends AbstractEntity{
 					'length' => $fields[self::FAVORED_USERS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 					'offset' => $fields[self::FAVORED_USERS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
 				),
-				Fields::parseOrderBy($fields[self::DATES_FIELD_NAME]['order_by'] ?? '')
+				Fields::parseOrderBy($fields[self::FAVORED_USERS_FIELD_NAME]['order_by'] ?? '')
 			)->getData();
 		}
 
@@ -519,7 +523,7 @@ class Event extends AbstractEntity{
 					'length' => $fields[self::TAGS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 					'offset' => $fields[self::TAGS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
 				),
-				Fields::parseOrderBy($fields[self::DATES_FIELD_NAME]['order_by'] ?? ''))->getData();
+				Fields::parseOrderBy($fields[self::TAGS_FIELD_NAME]['order_by'] ?? ''))->getData();
 		}
 
 		if (isset($fields[self::NOTIFICATIONS_FIELD_NAME])){
@@ -533,7 +537,7 @@ class Event extends AbstractEntity{
 	public function hide(User $user){
 		$q_ins_hidden = 'INSERT INTO hidden_events(event_id, user_id, status)
 			VALUES(:event_id, :user_id, TRUE)
-			ON CONFLICT(event_id, user_id) DO UPDATE status = TRUE';
+			ON CONFLICT(event_id, user_id) DO UPDATE SET status = TRUE';
 		$p_ins_hidden = $this->db->prepare($q_ins_hidden);
 		$result = $p_ins_hidden->execute(array(
 			':event_id' => $this->getId(),

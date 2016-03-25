@@ -16,16 +16,6 @@ $__modules['organizations'] = array(
 				$__fields)->getParams($__user, $__fields)->getData();
 			return new Result(true, '', array($result));
 		},
-		'' => function () use ($__db, $__request, $__user, $__pagination, $__fields, $__order_by){
-			return OrganizationsCollection::filter(
-				$__db,
-				$__user,
-				$__request,
-				$__fields,
-				$__pagination,
-				$__order_by ?? array('organization_type_order', 'organization_type_id')
-			);
-		},
 		'subscriptions' => function () use ($__db, $__pagination, $__request, $__user, $__fields, $__order_by){
 			return OrganizationsCollection::filter(
 				$__db,
@@ -44,6 +34,16 @@ $__modules['organizations'] = array(
 				$__fields,
 				$__pagination,
 				$__order_by ?? array('order_position', 'id')
+			);
+		},
+		'' => function () use ($__db, $__request, $__user, $__pagination, $__fields, $__order_by){
+			return OrganizationsCollection::filter(
+				$__db,
+				$__user,
+				$__request,
+				$__fields,
+				$__pagination,
+				$__order_by ?? array('organization_type_order', 'organization_type_id')
 			);
 		}
 	),

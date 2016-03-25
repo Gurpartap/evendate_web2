@@ -33,7 +33,6 @@ $__modules['users'] = array(
 			);
 		},
 		'{/(id:[0-9]+)/actions}' => function ($id) use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
-
 			return ActionsCollection::filter(
 				$__db,
 				$__user,
@@ -45,7 +44,8 @@ $__modules['users'] = array(
 				))),
 				$__fields,
 				$__pagination,
-				$__order_by ?? array());
+				$__order_by
+			);
 		},
 		'{/(id:[0-9]+)}' => function ($id) use ($__user, $__fields, $__db) {
 			$data = UsersCollection::one(

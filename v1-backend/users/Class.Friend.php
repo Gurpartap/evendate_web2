@@ -49,16 +49,6 @@ class Friend extends AbstractEntity{
 		return $subscriptions;
 	}
 
-	public function getActions(){
-		$subscriptions = OrganizationsCollection::filter(
-			$this->db,
-			$this->user,
-			array(
-				'friend' => $this
-			), '', ' LIMIT 10');
-
-		return $subscriptions;
-	}
 
 	public function getParams(User $user = null, array $fields = null) : Result{
 		$result_data = parent::getParams($user, $fields)->getData();
@@ -77,7 +67,18 @@ class Friend extends AbstractEntity{
 		}
 
 		if (isset($fields[self::ACTIONS_FIELD_NAME])){
-			$result_data[self::ACTIONS_FIELD_NAME] = $this->getActions()->getData();
+			$result_data[self::ACTIONS_FIELD_NAME] = OrganizationsCollection::filter(
+				App::DB(),
+				App::getCurrentUser(),
+				array(
+					'friend' => $this
+				),
+				Fields::parseFields($fields[self::ACTIONS_FIELD_NAME]['fields'] ?? ''),
+				array(
+					'length' => $fields[self::ACTIONS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+					'offset' => $fields[self::ACTIONS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET,
+				),
+				Fields::parseOrderBy($fields[self::ACTIONS_FIELD_NAME]['order_by'] ?? ''))->getData();
 		}
 
 		return new Result(true, '', $result_data);
