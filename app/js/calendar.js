@@ -480,6 +480,56 @@ function OrganizationsList($view, $content_block){
 	setDaysWithEvents();
 }
 
+function Organization($view, $content_block){
+	//after ajax of feed
+	bindTabs($view);
+	bindRippleEffect($view);
+	bindAddAvatar($view);
+	trimAvatarsCollection($view);
+
+	$view.find('.Subscribe').each(function(){
+		var $this = $(this),
+			labels = {
+				subscribe: 'Добавить в избранное',
+				unsubscribe: 'Отписаться',
+				subscribed: 'В избранном'
+			},
+			icons = {
+				subscribe: 'fa-plus',
+				unsubscribe: 'fa-times',
+				subscribed: 'fa-check'
+			};
+
+		function bindEvents($this){
+			$this.on('mouseenter.hoverSubscribed', function(){
+				$this.addClass(icons.unsubscribe).removeClass(icons.subscribed);
+				$this.children('.Text').text(labels.unsubscribe);
+			}).on('mouseleave.hoverSubscribed', function(){
+				$this.addClass(icons.subscribed).removeClass(icons.unsubscribe);
+				$this.children('.Text').text(labels.subscribed);
+			})
+		}
+
+		if($this.hasClass('-Subscribed')){
+			bindEvents($this);
+		}
+
+		$this.on('click.changeState', function(){
+			if($this.hasClass('-Subscribed')){
+				$this.children('.Text').text(labels.subscribe);
+				$this.removeClass('-Subscribed -color_secondary '+icons.unsubscribe+' '+icons.subscribed).addClass('-color_neutral_alt '+icons.subscribe).off('mouseenter.hoverSubscribed').off('mouseleave.hoverSubscribed');
+			} else {
+				$this.children('.Text').text(labels.unsubscribe);
+				$this.addClass('-Subscribed -color_secondary '+icons.unsubscribe).removeClass('-color_neutral_alt '+icons.subscribe+' '+icons.subscribed);
+				bindEvents($this);
+			}
+		})
+	});
+
+	$view.find('.scrollbar-outer').scrollbar({disableBodyScroll: true});
+
+}
+
 function FavoredEvents($view, $content_block){
 	$view.find('.tl-outer-wrap').addClass(__C.CLASSES.HIDDEN);
 	var $load_btn = $view.find('.load-more-btn').addClass(__C.CLASSES.HIDDEN).data('page-number', 0),
@@ -1783,6 +1833,7 @@ $(document)
 		window.__STATES = {
 			timeline: MyTimeline,
 			organizations: OrganizationsList,
+			organization: Organization,
 			favorites: FavoredEvents,
 			search: Search,
 			friends: Friends,
