@@ -50,6 +50,8 @@
 	<link href="vendor/select2v3/select2.css" rel="stylesheet" />
 	<link href="vendor/select2v3/select2-bootstrap.css" rel="stylesheet" />
 	<!--<link href="vendor/select2/css/select2.css" rel="stylesheet" />-->
+	<!-- SCROLLBAR -->
+	<link href="vendor/jquery.scrollbar/jquery.scrollbar.css" rel="stylesheet" />
 
 	<link rel="stylesheet" href="app/css/main.css">
 </head>
@@ -278,9 +280,116 @@
 					</div>
 						<!-- END row-->
 
+					<!-- START row-->
+					<div class="organization-app hidden screen-view" data-controller="Organization">
+						<div class="page_viewport">
+							<div class="page_wrapper">
+								<div class="page organization_info_page">
+									<header class="organization_header">
+										<div class="img_holder">
+											<img src="http://evendate.ru/organizations_images/backgrounds/large/1-large.jpg">
+										</div>
+										<div class="organization_header_backdrop"></div>
+										<div class="organization_header_bottom">
+											<div class="avatar_block organization_title_block">
+												<div class="avatar -size_small organization_avatar"><img src="http://evendate.ru/organizations_images/logos/large/1.png"></div>
+												<span class="avatar_name organization_title" title="Государственный Университет Управления">Государственный Университет Управления</span>
+											</div>
+											<button class="button -low -color_secondary fa_icon fa-plus organization_header_button OrganizationSubscribe RippleEffect" type="button"><span>Подписаться</span></button>
+										</div>
+									</header>
+									<div class="organization_description_block">
+										<p class="organization_description">Государственный университет на протяжении 95 лет уверенно держит позиции лидера управленческого образования в России. В ГУУ обучаются более 15 тысяч студентов.</p>
+										<div class="form_group -parts_1_3">
+											<div class="form_unit">
+												<a class="button -color_marginal RippleEffect fa_icon fa-external-link" href="http://guu.ru/" target="_blank">Подробнее</a>
+											</div>
+											<div class="form_unit">
+												<small class="-color_marginal">Адрес организатора:</small>
+												<p>Берсеневсякая набережная 5 ст, 1</p>
+											</div>
+										</div>
+									</div>
+									<div class="organization_feed Tabs">
+										<div class="tabs_header -color_secondary">
+											<span class="tab Tab -active">Будущие</span>
+											<span class="tab Tab">Прошедшие</span>
+										</div>
+										<div class="tab_bodies_wrap TabsBodyWrapper">
+											<div class="tab_body TabsBody -active">
+												<div class="organization_feed_container" data-container-date="Сегодня">
+													<div class="organization_feed_block">
+														<div class="organization_feed_block_img img_holder">
+															<img src="http://evendate.ru/event_images/large/292bf27e82cf6031c99f707cad7a9d49.jpg">
+														</div>
+														<div class="organization_feed_block_info">
+															<header class="organization_feed_block_title">
+																<span>Speed Italiano. Найди учителя мечты</span>
+															</header>
+															<div class="organization_feed_block_service">
+																<p><small>14:30 - 15:30</small></p>
+																<div class="form_group -parts_e_2 AddAvatarWrapper">
+																	<div class="form_unit">
+																		<button class="button -color_neutral_alt -low -rounded fa_icon fa-plus Subscribe AddAvatar RippleEffect"><span class="Text">Добавить в избранное</span></button>
+																	</div>
+																	<div class="form_unit">
+																		<div class="avatars_collection AvatarsCollection -subscribable">
+																			<div class="avatar -rounded -size_small" style="background-image: url(https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=30)"></div>
+																			<div class="avatar -rounded -size_small" style="background-image: url(https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=30)"></div>
+																			<div class="avatar -rounded -size_small" style="background-image: url(https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=30)"></div>
+																			<div class="avatar -rounded -size_small" style="background-image: url(https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=30)"></div>
+																			<div class="avatar -rounded -size_small" style="background-image: url(https://lh6.googleusercontent.com/-Ia_P6R1HShc/AAAAAAAAAAI/AAAAAAAACFE/Z-DGVm98CCg/photo.jpg?sz=30)"></div>
+																		</div>
+																		<span class="counter -color_marginal">+24</span>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="tab_body TabsBody"></div>
+										</div>
+									</div>
+								</div>
+								<div class="page organization_subscribers_page -fixed">
+									<header class="organization_subscribers_header">
+										<span class="organization_subscribers_header_text">Подписчики</span>
+										<span class="counter -color_secondary">263</span>
+									</header>
+									<div class="organization_subscribers_wrapper scrollbar-outer">
+										<span class="organization_subscribers_divider">Друзья</span><?php
+										for($i=0;$i<=5;$i++){ ?>
+											<div class="subscriber">
+												<div class="avatar_block">
+													<div class="avatar -size_50x50 -rounded">
+														<img src="https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=50">
+													</div>
+													<span class="avatar_name">Константин Красильников</span>
+												</div>
+											</div><?php
+										}?>
+										<span class="organization_subscribers_divider">Все подписчики</span><?php
+										for($i=0;$i<=15;$i++){ ?>
+											<div class="subscriber">
+												<div class="avatar_block">
+													<div class="avatar -size_50x50 -rounded">
+														<img src="https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=50">
+													</div>
+													<span class="avatar_name">Константин Красильников</span>
+												</div>
+											</div><?php
+										}?>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+						<!-- END row-->
+
 					<div class="example-app hidden screen-view" data-controller="Example">
 						<div class="page_wrapper">
-							<div class="page -shifted">
+							<div class="page">
 								<h1>h1 - Main title</h1>
 								<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam dapibus felis nec condimentum condimentum.</p>
 								<h2>h2 - Subtitle</h2>
@@ -458,6 +567,8 @@
 <script src="vendor/select2v3/select2_locale_ru.js"></script>
 <!-- HISTORY API -->
 <script src="vendor/history/jquery.history.js"></script>
+<!-- SCROLLBAR -->
+<script src="vendor/jquery.scrollbar/jquery.scrollbar.min.js"></script>
 <!-- NOTIFICATIONS API -->
 <script src="vendor/notify/notify.js"></script>
 <!-- JQUERY APPEAR-->

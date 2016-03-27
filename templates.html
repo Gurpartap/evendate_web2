@@ -1,18 +1,8 @@
-
-<!-- OLD CALENDAR -->
-<script type="javascript/template" id="tmpl-calendar-line">
-  <tr class="calendar-days-line"></tr>
-</script>
-
-<script type="javascript/template" id="tmpl-calendar-day">
-  <td class="td-day day-{day_number} {today} disabled" data-date="{date}" data-page="{date}" data-title="{date_text}">
-    <div class="content -centering"><span class="day-number">{number}</span></div>
-  </td>
-</script>
+<!-- NEW TEMPLATES -->
 
 <script type="javascript/template" id="tmpl-edit-event-page">
 
-	<div class="page shifted">
+	<div class="page edit_event_page">
 		<form class="form-horizontal" id="edit-event-form">
 
 			<h3>{header_text}</h3>
@@ -372,7 +362,6 @@
 
 </script>
 
-<!-- NEW CALENDAR -->
 <script type="javascript/template" id="tmpl-calendar">
 	<div class="{wrapper_class} -unselectable">
 		<div class="{header_class}">
@@ -459,6 +448,22 @@
 		<div class="DatePickerCalendar"></div>
 		<button class="button -color_primary SubmitDatePicker" type="button">Готово</button>
 	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-option">
+	<option value="{val}" {data}>{display_name}</option>
+</script>
+
+
+<!-- OLD CALENDAR -->
+<script type="javascript/template" id="tmpl-calendar-line">
+  <tr class="calendar-days-line"></tr>
+</script>
+
+<script type="javascript/template" id="tmpl-calendar-day">
+  <td class="td-day day-{day_number} {today} disabled" data-date="{date}" data-page="{date}" data-title="{date_text}">
+    <div class="content -centering"><span class="day-number">{number}</span></div>
+  </td>
 </script>
 
 <script type="javascript/template" id="tmpl-organizations-item">
@@ -922,11 +927,6 @@
 <!--OLD-->
 <script type="javascript/template" id="tmpl-organization-option">
   <option value="{id}" data-image-url="{img_url}" data-default-address="{default_address}"> {name}</option>
-</script>
-
-<!--NEW-->
-<script type="javascript/template" id="tmpl-option">
-	<option value="{val}" {data}>{display_name}</option>
 </script>
 
 <script type="javascript/template" id="tmpl-organization-item">
