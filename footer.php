@@ -16,7 +16,7 @@
 </noscript><!-- /Yandex.Metrika counter -->
 
 
-<script src="//vk.com/js/api/openapi.js" type="text/javascript"></script>
+<script src="vendor/vk_openapi/openapi.js" type="text/javascript"></script>
 
 <script>
 	$(document).ready(function() {
