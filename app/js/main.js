@@ -171,33 +171,45 @@ function handleErrorField($unit){
 }
 
 function bindDatePickers($parent){
+	$parent = $parent ? $parent : $('body');
 	$parent.find('.DatePicker').not('.-Handled_DatePicker').each(function(i, elem){
 		(new DatePicker(elem, $(elem).data())).init();
 	}).addClass('-Handled_DatePicker');
 }
 
 function bindTimeInput($parent){
+	$parent = $parent ? $parent : $('body');
 	$parent.find('.TimeInput').not('.-Handled_TimeInput').each(function(i, elem){
 		initTimeInput(elem);
 	}).addClass('-Handled_TimeInput');
 }
 
 function bindTabs($parent){
+	$parent = $parent ? $parent : $('body');
 	$parent.find('.Tabs').not('.-Handled_Tabs').each(function(i, elem){
 		var $this = $(elem),
+			$wrapper = $this.find('.TabsBodyWrapper'),
 			$tabs = $this.find('.Tab'),
 			$bodies = $this.find('.TabsBody');
+
+		if(!$tabs.filter('.-active').length){
+			$tabs.eq(0).addClass('-active');
+		}
+		$bodies.removeClass('-active').eq($tabs.index($tabs.filter('.-active'))).addClass('-active');
+		$wrapper.height($bodies.filter('.-active').height());
 
 		$tabs.on('click', function(){
 			$tabs.removeClass('-active');
 			$bodies.removeClass('-active');
 			$(this).addClass('-active');
 			$bodies.eq($tabs.index(this)).addClass('-active');
+			$wrapper.height($bodies.filter('.-active').height());
 		})
 	}).addClass('-Handled_Tabs');
 }
 
 function bindSelect2($parent){
+	$parent = $parent ? $parent : $('body');
 	$parent.find('.ToSelect2').not('.-Handled_ToSelect2').each(function(i, el){
 		initSelect2($(el));
 	});
@@ -217,9 +229,9 @@ function initSelect2($element, options){
 	$element.select2(opt).addClass('-Handled_ToSelect2')
 }
 
-
-function bindRippleEffect(){
-	$('.RippleEffect').not('-Handled_RippleEffect').on('click', function(e){
+function bindRippleEffect($parent){
+	$parent = $parent ? $parent : $('body');
+	$parent.find('.RippleEffect').not('-Handled_RippleEffect').on('click', function(e){
 		var $this = $(this), $ripple, size, x, y;
 
 		if($this.children('.ripple').length == 0)
@@ -243,6 +255,23 @@ function bindRippleEffect(){
 				$ripple.removeClass('animate');
 			});
 	}).addClass('-Handled_RippleEffect');
+}
+
+function bindAddAvatar($parent){
+	$parent = $parent ? $parent : $('body');
+	$parent.find('.AddAvatar').not('-Handled_AddAvatar').on('click', function(){
+		$(this).closest('.AddAvatarWrapper').find('.AvatarsCollection').toggleClass('-subscribed');
+	}).addClass('-Handled_AddAvatar');
+}
+
+function trimAvatarsCollection($parent){
+	$parent = $parent ? $parent : $('body');
+	$parent.find('.AvatarsCollection').each(function(){
+		var $collection = $(this),
+			$avatars = $collection.find('.avatar'),
+			amount = $avatars.length;
+		$collection.width(($avatars.width()*(amount-1)) - (6*(amount-2)));
+	});
 }
 
 function bindFileLoadButton(){
