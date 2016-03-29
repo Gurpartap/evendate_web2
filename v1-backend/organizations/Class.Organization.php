@@ -287,7 +287,7 @@ class Organization extends AbstractEntity{
 			$filters,
 			$fields,
 			$pagination,
-			array('last_name', 'first_name')
+			$order_by ?? array('last_name', 'first_name')
 		)->getData();
 
 	}

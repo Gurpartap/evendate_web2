@@ -22,9 +22,9 @@
       "database": "evendate",
       "port": 3306
     },
-    "VK":{
-      "APP_ID": 5339561,
-      "SECURE_KEY": "fovLqElJduTAJVgabLfv",
+    "VK": {
+      "APP_ID": 5029623,
+      "SECURE_KEY": "gCfYONn6zlmdQZzu8Z6G",
       "redirect_uri": ""
     },
     "facebook":{
@@ -95,8 +95,8 @@
       "port": 5432
     },
     "VK": {
-      "APP_ID": 5339561,
-      "SECURE_KEY": "fovLqElJduTAJVgabLfv",
+      "APP_ID": 5029623,
+      "SECURE_KEY": "gCfYONn6zlmdQZzu8Z6G",
       "redirect_uri": ""
     },
     "facebook":{
@@ -173,8 +173,8 @@
       "port": 5432
     },
     "VK": {
-      "APP_ID": 5339561,
-      "SECURE_KEY": "fovLqElJduTAJVgabLfv",
+      "APP_ID": 5029623,
+      "SECURE_KEY": "gCfYONn6zlmdQZzu8Z6G",
       "redirect_uri": ""
     },
     "facebook":{
@@ -251,8 +251,8 @@
       "port": 5432
     },
     "VK": {
-      "APP_ID": 5339561,
-      "SECURE_KEY": "fovLqElJduTAJVgabLfv",
+      "APP_ID": 5029623,
+      "SECURE_KEY": "gCfYONn6zlmdQZzu8Z6G",
       "redirect_uri": ""
     },
     "facebook":{

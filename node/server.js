@@ -1179,6 +1179,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 				});
 			},
 			authTry = function(oauth_data, retry_count, access_data){
+				console.log(oauth_data);
 				socket.retry_count++;
 				var timeout = 500;
 				logger.info('Auth try: ' + socket.retry_count);
@@ -1211,6 +1212,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 
 		socket.on('auth.oauthDone', function(oauth_data) {
 			socket.retry_count = 0;
+			console.log('auth.oauthDone',oauth_data)
 			try {
 				authTry(oauth_data);
 			} catch(e) {

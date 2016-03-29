@@ -11,6 +11,7 @@ class User extends AbstractUser{
 	protected $avatar_url;
 	protected $is_editor;
 	protected $token_id;
+	protected $blurred_image_url;
 
 	protected $google_uid;
 	protected $facebook_uid;
@@ -70,6 +71,7 @@ class User extends AbstractUser{
 		$this->avatar_url = $row['avatar_url'];
 		$this->is_editor = $row['is_editor'];
 		$this->token_id = $row['token_id'];
+		$this->blurred_image_url = $row['blurred_image_url'];
 
 		$this->vk_uid = $row['vk_uid'];
 		$this->facebook_uid = $row['facebook_uid'];
@@ -205,6 +207,7 @@ class User extends AbstractUser{
 			'last_name' => $this->getLastName(),
 			'id' => $this->getId(),
 			'avatar_url' => $this->getAvatarUrl(),
+			'blurred_image_url' => $this->blurred_image_url,
 			'middle_name' => $this->getMiddleName(),
 			'is_editor' => $this->isEditor(),
 			'accounts' => $account_types
