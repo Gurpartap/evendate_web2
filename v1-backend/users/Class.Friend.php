@@ -5,6 +5,7 @@ require_once $BACKEND_FULL_PATH .'/organizations/Class.Organization.php';
 
 class Friend extends AbstractEntity{
 
+	const RANDOM_FIELD_NAME = 'random';
 	protected static $DEFAULT_COLS = array(
 		'id',
 		'first_name',
@@ -18,6 +19,9 @@ class Friend extends AbstractEntity{
 		'type',
 		'is_friend' => 'view_friends.user_id IS NOT NULL AS is_friend',
 		'blurred_image_url',
+		self::RANDOM_FIELD_NAME => '(SELECT DATE_PART(\'epoch\', users.created_at) / (random() * 9 + 1)
+			FROM users AS u
+			WHERE u.id = users.id) AS random',
 	);
 
 	protected $first_name;

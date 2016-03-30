@@ -2,6 +2,7 @@
 
 class Device extends AbstractEntity{
 
+	const RANDOM_FIELD_NAME = 'random';
 	protected static $DEFAULT_COLS = array(
 		'device_token',
 		'client_type',
@@ -12,7 +13,10 @@ class Device extends AbstractEntity{
 		'device_name',
 		'created_at',
 		'updated_at',
-		'expires_on'
+		'expires_on',
+		self::RANDOM_FIELD_NAME => '(SELECT created_at / (random() * 9 + 1)
+			FROM view_devices AS vd
+			WHERE vd.id = view_devices.id) AS random',
 	);
 
 	protected $id;

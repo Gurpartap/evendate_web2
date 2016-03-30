@@ -12,6 +12,7 @@ class Action extends AbstractEntity{
 	const EVENT_FIELD_NAME = Statistics::ENTITY_EVENT;
 	const ORGANIZATION_FIELD_NAME = Statistics::ENTITY_ORGANIZATION;
 	const USER_FIELD_NAME = 'user';
+	const RANDOM_FIELD_NAME = 'random';
 
 	protected static $DEFAULT_COLS = array(
 		'stat_type_id',
@@ -24,7 +25,10 @@ class Action extends AbstractEntity{
 	protected static $ADDITIONAL_COLS = array(
 		'name',
 		'type_code',
-		'created_at'
+		'created_at',
+		self::RANDOM_FIELD_NAME => '(SELECT created_at / (random() * 9 + 1)
+			FROM view_actions AS va
+			WHERE va.id = view_actions.id) AS random',
 	);
 
 	protected static $ALLOWED_ACTION_TYPE_CODES = array(

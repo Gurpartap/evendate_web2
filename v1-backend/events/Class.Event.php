@@ -25,6 +25,7 @@ class Event extends AbstractEntity{
 	const FAVORED_USERS_FIELD_NAME = 'favored';
 	const NOTIFICATIONS_FIELD_NAME = 'notifications';
 	const CAN_EDIT_FIELD_NAME = 'can_edit';
+	const RANDOM_FIELD_NAME = 'random';
 
 
 	protected static $DEFAULT_COLS = array(
@@ -79,6 +80,9 @@ class Event extends AbstractEntity{
 			WHERE favorite_events.status = TRUE
 			AND favorite_events.user_id = :user_id
 			AND favorite_events.event_id = view_events.id) IS NOT NULL AS is_favorite',
+		self::RANDOM_FIELD_NAME => '(SELECT created_at / (random() * 9 + 1)
+			FROM view_events AS ve
+			WHERE ve.id = view_events.id) AS random',
 		self::CAN_EDIT_FIELD_NAME => '(SELECT id IS NOT NULL
 			FROM view_editors
 			WHERE id = :user_id AND organization_id = view_events.organization_id) IS NOT NULL AS can_edit'

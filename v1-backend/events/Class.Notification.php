@@ -12,6 +12,9 @@ class Notification extends AbstractEntity{
 	protected $done;
 	protected $sent_time;
 	protected $notification_type;
+
+	const RANDOM_FIELD_NAME = 'random';
+
 	protected static $DEFAULT_COLS = array(
 		'uuid',
 		'event_id',
@@ -24,6 +27,9 @@ class Notification extends AbstractEntity{
 		'done',
 		'sent_time',
 		'notification_type',
+		self::RANDOM_FIELD_NAME => '(SELECT created_at / (random() * 9 + 1)
+			FROM view_notifications AS vn
+			WHERE vn.id = view_notifications.id) AS random',
 	);
 
 	const NOTIFICATION_TYPE_NOW = 'notification-now';

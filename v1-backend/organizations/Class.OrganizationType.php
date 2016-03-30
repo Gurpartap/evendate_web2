@@ -8,6 +8,7 @@ class OrganizationType extends AbstractEntity{
 	protected $updated_at;
 	protected $order_position;
 
+	const RANDOM_FIELD_NAME = 'random';
 	const ORGANIZATIONS_FIELD_NAME = 'organizations';
 
 	protected static $DEFAULT_COLS = array(
@@ -18,7 +19,10 @@ class OrganizationType extends AbstractEntity{
 
 	protected static $ADDITIONAL_COLS = array(
 		'created_at',
-		'updated_at'
+		'updated_at',
+		self::RANDOM_FIELD_NAME => '(SELECT created_at / (random() * 9 + 1)
+			FROM view_organization_types AS vot
+			WHERE vot.id = view_organization_types.id) AS random',
 	);
 
 	public function getParams(User $user = null, array $fields = null) : Result {

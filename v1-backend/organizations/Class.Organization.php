@@ -17,6 +17,7 @@ class Organization extends AbstractEntity{
 	const IMAGE_SIZE_LARGE = '/large/';
 	const IMAGE_TYPE_BACKGROUND = '/backgrounds/';
 	const IMAGE_TYPE_LOGO = '/logos/';
+	const RANDOM_FIELD_NAME = 'random';
 
 	protected $description;
 	protected $background_medium_img_url;
@@ -63,6 +64,9 @@ class Organization extends AbstractEntity{
 		'created_at',
 		'updated_at',
 		'background_small_img_url',
+		self::RANDOM_FIELD_NAME => '(SELECT created_at / (random() * 9 + 1)
+			FROM view_organizations AS vo
+			WHERE vo.id = view_organizations.id) AS random',
 		self::IS_SUBSCRIBED_FIELD_NAME => '(SELECT
 				id IS NOT NULL AS is_subscribed
 				FROM subscriptions
