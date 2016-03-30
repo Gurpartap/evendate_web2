@@ -4,8 +4,9 @@
 
 	$_function_called = false;
 //	if (isset($_SERVER['ENV']) && ($_SERVER['ENV'] != 'dev' && $_SERVER['ENV'] != 'test')){
-		ini_set("display_errors", 1);
-		error_reporting(E_ALL);
+	ini_set("display_errors", 1);
+	error_reporting(E_ALL);
+
 //	}
 	require_once '../../v1-backend/bin/env_variables.php';
 
@@ -171,6 +172,8 @@ try {
 	}
 
 	if (($_SERVER['ENV'] == 'local' || $_SERVER['ENV'] == 'dev' || $_SERVER['ENV'] == 'test') && isset($e)){
+		print_r($e);
+	}elseif(isset($__request['show_debug'])){
 		print_r($e);
 	}
 
