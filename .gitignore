@@ -99,3 +99,6 @@ $RECYCLE.BIN/
 *.lnk
 
 
+user_images/*
+event_images/*
+organizations_images/*

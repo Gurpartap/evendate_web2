@@ -292,7 +292,7 @@ class Organization extends AbstractEntity{
 
 	}
 
-	private function getEvents(array $fields = null, array $filters, array $oder_by = null, array $pagination = null) {
+	private function getEvents(array $fields = null, array $filters, array $order_by = null, array $pagination = null) {
 		$filters['organization'] = $this;
 		return EventsCollection::filter(
 			$this->db,
@@ -300,16 +300,14 @@ class Organization extends AbstractEntity{
 			$filters,
 			$fields,
 			$pagination,
-			array('id')
+			$order_by ?? array('id')
 		)->getData();
 	}
 
 	private function isSubscribed(User $user) {
 		$q_get_subscribed = App::queryFactory()->newSelect();
 		$q_get_subscribed
-			->cols(array(
-				'id::INT'
-			))
+			->cols(array('id::INT'))
 			->from('subscriptions')
 			->where('subscriptions.user_id = :user_id')
 			->where('subscriptions.organization_id = :organization_id')
