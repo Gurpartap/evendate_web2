@@ -136,6 +136,17 @@ class Event extends AbstractEntity{
 
 	private static function generateQueryData(&$data){
 
+
+		if (isset($data['description'])){
+			if (mb_strlen($data['description']) <= 50) throw new InvalidArgumentException('Слишком короткое описание. Должно быть не менее 50 символов.');
+			if (mb_strlen($data['description']) > 500) throw new InvalidArgumentException('Слишком длинное описание. Должно быть не более 500 символов.');
+		}
+
+		if (isset($data['title'])){
+			if (mb_strlen($data['title']) <= 5) throw new InvalidArgumentException('Слишком короткое название. Должно быть не менее 5 символов.');
+			if (mb_strlen($data['title']) > 500) throw new InvalidArgumentException('Слишком длинное название. Должно быть не более 150 символов.');
+		}
+
 		function sortByStartTime($a, $b){
 			$a = strtotime($a['start_time']);
 			$b = strtotime($b['start_time']);
@@ -211,7 +222,6 @@ class Event extends AbstractEntity{
 
 		$data['is_free'] = isset($data['is_free']) && strtolower($data['is_free']) == 'true';
 		$data['min_price'] = $data['is_free'] == false && is_numeric($data['min_price']) ? (int) $data['min_price'] : null;
-
 
 		/*VK posting data*/
 		$data['vk_post'] = $data['is_free'] == true && is_numeric($data['min_price']) ? (int) $data['min_price'] : null;
