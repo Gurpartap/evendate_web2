@@ -4,8 +4,8 @@
 
 	$_function_called = false;
 //	if (isset($_SERVER['ENV']) && ($_SERVER['ENV'] != 'dev' && $_SERVER['ENV'] != 'test')){
-		ini_set("display_errors", 1);
-		error_reporting(E_ALL);
+	ini_set("display_errors", 1);
+	error_reporting(E_ALL);
 //	}
 	require_once '../../v1-backend/bin/env_variables.php';
 
@@ -18,7 +18,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS'){
 
 
 try {
-
 
 	require_once "{$BACKEND_FULL_PATH}/bin/Class.Result.php";
 	require_once "{$BACKEND_FULL_PATH}/bin/db.php";
@@ -104,31 +103,43 @@ try {
 	$_internal_code = BadArgumentException::ERROR_CODE;
 	$_error_name = $iae->getMessage();
 	$_function_called = true;
+	$_exception = $iae;
 }catch(BadMethodCallException $bmce){
 	$_http_code = BadArgumentException::HTTP_CODE;
 	$_internal_code = BadArgumentException::ERROR_CODE;
 	$_error_name = $bmce->getMessage();
 	$_function_called = true;
+	$_exception = $bmce;
 }catch(AuthorizationException $authe){
 	$_http_code = AuthorizationException::HTTP_CODE;
 	$_internal_code = AuthorizationException::ERROR_CODE;
 	$_error_name = $authe->getMessage();
 	$_function_called = true;
+	$_exception = $authe;
 }catch(PrivilegesException $pe){
 	$_http_code = PrivilegesException::HTTP_CODE;
 	$_internal_code = PrivilegesException::ERROR_CODE;
 	$_error_name = $pe->getMessage();
 	$_function_called = true;
+	$_exception = $pe;
+}catch(DBQueryException $dbe){
+	$_http_code = DBQueryException::HTTP_CODE;
+	$_internal_code = DBQueryException::ERROR_CODE;
+	$_error_name = $dbe->getMessage();
+	$_function_called = true;
+	$_exception = $dbe;
 }catch(AbstractException $ae){
 	$_http_code = $ae->getHttpCode();
 	$_internal_code = $ae->getInternalCode();
 	$_error_name = $ae->getMessage();
 	$_function_called = true;
+	$_exception = $ae;
 }catch(Exception $e){
 	$_http_code = AbstractException::HTTP_CODE;
 	$_internal_code = AbstractException::ERROR_CODE;
 	$_error_name = $e->getMessage();
 	$_function_called = true;
+	$_exception = $e;
 }finally{
 	if (!isset($_result) || $_result instanceof Result == false){
 		if (!$_function_called){
@@ -171,7 +182,9 @@ try {
 	}
 
 	if (($_SERVER['ENV'] == 'local' || $_SERVER['ENV'] == 'dev' || $_SERVER['ENV'] == 'test') && isset($e)){
-		print_r($e);
+		print_r($_exception);
+	}elseif(isset($__request['show_debug']) && isset($_exception)){
+		print_r($_exception);
 	}
 
 	echo $_result;
