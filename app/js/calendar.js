@@ -465,6 +465,161 @@ function OrganizationsList($view, $content_block){
 	setDaysWithEvents();
 }
 
+function Organization($view, $content_block){
+	//after ajax of feed
+	function initOrganizationPage(){
+		bindTabs($view);
+		bindRippleEffect($view);
+		bindAddAvatar($view);
+		trimAvatarsCollection($view);
+
+		function SubscribeButton($btn, options){
+			var self = this;
+			this.$btn = $btn;
+			this.labels = {
+				subscribe: 'Подписаться',
+				unsubscribe: 'Отписаться',
+				subscribed: 'Подписан'
+			};
+			this.icons = {
+				subscribe: 'fa-plus',
+				unsubscribe: 'fa-times',
+				subscribed: 'fa-check'
+			};
+			this.colors = {
+				subscribe: '-color_neutral_alt',
+				unsubscribe: '-color_secondary',
+				subscribed: '-color_secondary'
+			};
+
+			if(typeof options != 'undefined'){
+				this.labels = typeof options.labels != 'undefined' ? $.extend(this.labels, options.labels) : this.labels;
+				this.icons = typeof options.icons != 'undefined' ? $.extend(this.icons, options.icons) : this.icons;
+				this.colors = typeof options.colors != 'undefined' ? $.extend(this.colors, options.colors) : this.colors;
+			}
+
+			this.$btn.bindHoverEvents = function(){
+				self.$btn
+					.off('mouseenter.hoverSubscribed mouseleave.hoverSubscribed')
+					.on('mouseenter.hoverSubscribed', function(){
+						self.$btn.addClass(self.icons.unsubscribe).removeClass(self.icons.subscribed);
+						self.$btn.children('.Text').text(self.labels.unsubscribe);
+					})
+					.on('mouseleave.hoverSubscribed', function(){
+						self.$btn.addClass(self.icons.subscribed).removeClass(self.icons.unsubscribe);
+						self.$btn.children('.Text').text(self.labels.subscribed);
+					});
+				return self.$btn;
+			};
+
+			if(this.$btn.hasClass('-Subscribed')){
+				this.$btn.bindHoverEvents();
+			}
+
+			if(!this.$btn.children('span').length){
+				this.$btn.wrapInner('<span class="Text">');
+			}
+
+			this.$btn.on('click.changeState', function(){
+				if(self.$btn.hasClass('-Subscribed')){
+					self.$btn
+						.removeClass(['-Subscribed', self.colors.unsubscribe, self.colors.subscribed, self.icons.unsubscribe, self.icons.subscribed].join(' '))
+						.addClass([self.colors.subscribe, self.icons.subscribe].join(' '))
+						.off('mouseenter.hoverSubscribed mouseleave.hoverSubscribed')
+						.children('.Text').text(self.labels.subscribe);
+				} else {
+					self.$btn
+						.removeClass([self.colors.subscribe, self.colors.subscribed, self.icons.subscribe, self.icons.subscribed].join(' '))
+						.addClass(['-Subscribed', self.colors.unsubscribe, self.icons.unsubscribe].join(' '))
+						.bindHoverEvents()
+						.children('.Text').text(self.labels.unsubscribe);
+				}
+			})
+		}
+
+		new SubscribeButton($('.OrganizationSubscribe'), {
+			colors: {
+				subscribe: '-color_secondary',
+				unsubscribe: '-color_secondary',
+				subscribed: '-color_secondary'
+			}
+		});
+
+		$view.find('.Subscribe').each(function(){
+			new SubscribeButton($(this), {
+				labels: {
+					subscribe: 'Добавить в избранное',
+					subscribed: 'В избранном'
+				},
+				colors: {
+					subscribe: '-color_neutral_alt',
+					unsubscribe: '-color_secondary',
+					subscribed: '-color_secondary'
+				}
+			});
+		});
+
+
+		$view.find('.scrollbar-outer').scrollbar({disableBodyScroll: true});
+	}
+
+	var url = 'api/v1/organizations/1';
+	$.ajax({
+		url: url,
+		method: 'GET',
+		data: {
+			fields: 'events{fields:"image_horizontal_small_url,favored_users_count,is_favorite"},img_small_url,description,site_url,is_subscribed,default_address,subscribed_count,subscribed{fields:"is_friend",order_by:"is_friend",length:10}'
+		},
+		success: function(res){
+			ajaxHandler(res, function(data){
+				var dates = [],
+					m_today = moment(),
+					$containers = $(),
+					$wrapper = $view.find('.FutureEvents'),
+					$friends = $();
+
+				data = data[0];
+				data.events.forEach(function(event){
+
+					dates.push(moment.unix(event.last_event_date).format('YYYY-MM-DD'));
+					dates = $.unique(dates).sort();
+
+					/*
+					event.dates.forEach(function(date){
+					 dates.push(moment.unix(date.event_date))
+					});*/
+				});
+
+				dates.forEach(function(date){
+					var m_date = moment(date),
+						display_date = m_date.format('D MMMM');
+					if(m_date.diff(m_today, 'days') === 0){
+						display_date = 'Сегодня';
+					} else if(m_date.diff(m_today, 'days') === 1) {
+						display_date = 'Завтра';
+					}
+					$containers = $containers.add(tmpl('organization-feed-container', {date: display_date}));
+				});
+
+				$view.find('.page_wrapper').append(tmpl('organization-info-page', $.extend({
+					subscribe_button_classes: data.is_subscribed ? ['fa-check', '-Subscribed'].join(' ') : ['fa-plus'].join(' '),
+					subscribe_button_text: data.is_subscribed ? 'Подписан' : 'Подписаться',
+					future_events: $containers
+				}, data)));
+
+				initOrganizationPage();
+
+				$view.find('.page_wrapper').append(tmpl('organization-subscribers-page', {
+					subscribers_count: data.subscribed_count,
+					friends: $friends
+				}));
+
+			}, ajaxErrorHandler);
+		}
+	});
+
+}
+
 function FavoredEvents($view, $content_block){
 	$view.find('.tl-outer-wrap').addClass(__C.CLASSES.HIDDEN);
 	var $load_btn = $view.find('.load-more-btn').addClass(__C.CLASSES.HIDDEN).data('page-number', 0),
@@ -1755,15 +1910,46 @@ function bindOnClick(){
 	}).addClass('-Handled_Controller');
 }
 
+
+
+function ajaxHandler(result, success, error){
+	error = typeof error !== 'undefined' ? error : function(){
+		console.log(result);
+		showNotifier({text: 'Упс, что-то пошло не так', status: false});
+	};
+	success = typeof success !== 'function' ? function(){} : success;
+	try {
+		if(result.status){
+			success(result.data);
+		} else {
+			error();
+		}
+	} catch(e){
+		error(e);
+	}
+}
+
+function ajaxErrorHandler(){
+	var args = Array.prototype.slice.call(arguments);
+	console.group('ajax error');
+	args.forEach(function(arg){
+		console.log(arg);
+	});
+	console.groupEnd();
+	showNotifier({text: 'Упс, что-то пошло не так', status: false});
+}
+
 $(document)
 	.ajaxStart(function(){
 		Pace.restart()
 	})
+	.ajaxError(ajaxErrorHandler)
 	.ready(function(){
 
 		window.__STATES = {
 			timeline: MyTimeline,
 			organizations: OrganizationsList,
+			organization: Organization,
 			favorites: FavoredEvents,
 			search: Search,
 			friends: Friends,

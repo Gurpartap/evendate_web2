@@ -1,18 +1,8 @@
-
-<!-- OLD CALENDAR -->
-<script type="javascript/template" id="tmpl-calendar-line">
-  <tr class="calendar-days-line"></tr>
-</script>
-
-<script type="javascript/template" id="tmpl-calendar-day">
-  <td class="td-day day-{day_number} {today} disabled" data-date="{date}" data-page="{date}" data-title="{date_text}">
-    <div class="content -centering"><span class="day-number">{number}</span></div>
-  </td>
-</script>
+<!-- NEW TEMPLATES -->
 
 <script type="javascript/template" id="tmpl-edit-event-page">
 
-	<div class="page shifted">
+	<div class="page edit_event_page">
 		<form class="form-horizontal" id="edit-event-form">
 
 			<h3>{header_text}</h3>
@@ -372,7 +362,6 @@
 
 </script>
 
-<!-- NEW CALENDAR -->
 <script type="javascript/template" id="tmpl-calendar">
 	<div class="{wrapper_class} -unselectable">
 		<div class="{header_class}">
@@ -459,6 +448,131 @@
 		<div class="DatePickerCalendar"></div>
 		<button class="button -color_primary SubmitDatePicker" type="button">Готово</button>
 	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-option">
+	<option value="{val}" {data}>{display_name}</option>
+</script>
+
+<script type="javascript/template" id="tmpl-organization-info-page">
+	<div class="page organization_info_page">
+		<header class="organization_header">
+			<div class="img_holder">
+				<img src="{background_img_url}">
+			</div>
+			<div class="organization_header_backdrop"></div>
+			<div class="organization_header_bottom">
+				<div class="avatar_block organization_title_block">
+					<div class="avatar -size_small organization_avatar"><img src="{img_small_url}"></div>
+					<span class="avatar_name organization_title" title="{name}">{name}</span>
+				</div>
+				<div class="organization_header_button">
+					<button class=" button -low -fill -color_secondary fa_icon {subscribe_button_classes} OrganizationSubscribe RippleEffect" type="button"><span class="Text">{subscribe_button_text}</span></button>
+				</div>
+			</div>
+		</header>
+		<div class="organization_description_block">
+			<p class="organization_description">{description}</p>
+			<div class="form_group -parts_1_3">
+				<div class="form_unit">
+					<a class="button -color_marginal RippleEffect fa_icon fa-external-link" href="{site_url}" target="_blank">Подробнее</a>
+				</div>
+				<div class="form_unit">
+					<small class="-color_marginal">Адрес организатора:</small>
+					<p>{default_address}</p>
+				</div>
+			</div>
+		</div>
+		<div class="organization_feed Tabs">
+			<div class="tabs_header -color_secondary">
+				<span class="tab Tab -active">Будущие</span>
+				<span class="tab Tab">Прошедшие</span>
+			</div>
+			<div class="tab_bodies_wrap TabsBodyWrapper">
+				<div class="tab_body TabsBody -active">
+					{future_events}
+				</div>
+				<div class="tab_body TabsBody">
+					{passed_events}
+				</div>
+			</div>
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-organization-feed-container">
+	<div class="organization_feed_container" data-container-date="{date}">
+		{events}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-organization-feed-block">
+	<div class="organization_feed_block">
+		<div class="organization_feed_block_img img_holder">
+			<img src="{image_horizontal_small_url}">
+		</div>
+		<div class="organization_feed_block_info">
+			<header class="organization_feed_block_title">
+				<span data-page="event" data-event-id="{id}">{title}</span>
+			</header>
+			<div class="organization_feed_block_service">
+				<p><small>14:30 - 15:30</small></p>
+				<div class="form_group -parts_e_2 AddAvatarWrapper">
+					<div class="form_unit">
+						<button class="button -color_neutral_alt -low -rounded fa_icon fa-plus Subscribe -AddFavourite AddAvatar RippleEffect" data-event-id="{id}"><span class="Text">Добавить в избранное</span></button>
+					</div>
+					<div class="form_unit">
+						<div class="avatars_collection AvatarsCollection -subscribable">
+							<div class="avatar -rounded -size_small" style="background-image: url(https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=30)"></div>
+							<div class="avatar -rounded -size_small" style="background-image: url(https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=30)"></div>
+							<div class="avatar -rounded -size_small" style="background-image: url(https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=30)"></div>
+							<div class="avatar -rounded -size_small" style="background-image: url(https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=30)"></div>
+							<div class="avatar -rounded -size_small" style="background-image: url(https://lh6.googleusercontent.com/-Ia_P6R1HShc/AAAAAAAAAAI/AAAAAAAACFE/Z-DGVm98CCg/photo.jpg?sz=30)"></div>
+						</div>
+						<span class="counter -color_marginal">+{favored_users_count}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-organization-subscribers-page">
+	<div class="page organization_subscribers_page -fixed">
+		<header class="organization_subscribers_header">
+			<span class="organization_subscribers_header_text">Подписчики</span>
+			<span class="counter -color_secondary">{subscribers_count}</span>
+		</header>
+		<div class="organization_subscribers_wrapper scrollbar-outer">
+			<span class="organization_subscribers_divider {friends_are_hidden}">Друзья</span>
+			{friends}
+			<span class="organization_subscribers_divider">Все подписчики</span>
+			{subscribers}
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-subscriber">
+	<div class="subscriber">
+		<div class="avatar_block">
+			<div class="avatar -size_50x50 -rounded">
+				<img src="{avatar_url}">
+			</div>
+			<span class="avatar_name">{name}</span>
+		</div>
+	</div>
+</script>
+
+
+<!-- OLD CALENDAR -->
+<script type="javascript/template" id="tmpl-calendar-line">
+  <tr class="calendar-days-line"></tr>
+</script>
+
+<script type="javascript/template" id="tmpl-calendar-day">
+  <td class="td-day day-{day_number} {today} disabled" data-date="{date}" data-page="{date}" data-title="{date_text}">
+    <div class="content -centering"><span class="day-number">{number}</span></div>
+  </td>
 </script>
 
 <script type="javascript/template" id="tmpl-organizations-item">
@@ -922,11 +1036,6 @@
 <!--OLD-->
 <script type="javascript/template" id="tmpl-organization-option">
   <option value="{id}" data-image-url="{img_url}" data-default-address="{default_address}"> {name}</option>
-</script>
-
-<!--NEW-->
-<script type="javascript/template" id="tmpl-option">
-	<option value="{val}" {data}>{display_name}</option>
 </script>
 
 <script type="javascript/template" id="tmpl-organization-item">
