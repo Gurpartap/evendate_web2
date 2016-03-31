@@ -284,7 +284,7 @@
 					<div class="organization-app hidden screen-view" data-controller="Organization">
 						<div class="page_viewport">
 							<div class="page_wrapper">
-								<div class="page organization_info_page">
+								<div class="page organization_info_page -hidden">
 									<header class="organization_header">
 										<div class="img_holder">
 											<img src="http://evendate.ru/organizations_images/backgrounds/large/1-large.jpg">
@@ -316,43 +316,46 @@
 											<span class="tab Tab">Прошедшие</span>
 										</div>
 										<div class="tab_bodies_wrap TabsBodyWrapper">
-											<div class="tab_body TabsBody -active">
-												<div class="organization_feed_container" data-container-date="Сегодня">
-													<div class="organization_feed_block">
-														<div class="organization_feed_block_img img_holder">
-															<img src="http://evendate.ru/event_images/large/292bf27e82cf6031c99f707cad7a9d49.jpg">
-														</div>
-														<div class="organization_feed_block_info">
-															<header class="organization_feed_block_title">
-																<span>Speed Italiano. Найди учителя мечты</span>
-															</header>
-															<div class="organization_feed_block_service">
-																<p><small>14:30 - 15:30</small></p>
-																<div class="form_group -parts_e_2 AddAvatarWrapper">
-																	<div class="form_unit">
-																		<button class="button -color_neutral_alt -low -rounded fa_icon fa-plus Subscribe AddAvatar RippleEffect"><span class="Text">Добавить в избранное</span></button>
-																	</div>
-																	<div class="form_unit">
-																		<div class="avatars_collection AvatarsCollection -subscribable">
-																			<div class="avatar -rounded -size_small" style="background-image: url(https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=30)"></div>
-																			<div class="avatar -rounded -size_small" style="background-image: url(https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=30)"></div>
-																			<div class="avatar -rounded -size_small" style="background-image: url(https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=30)"></div>
-																			<div class="avatar -rounded -size_small" style="background-image: url(https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=30)"></div>
-																			<div class="avatar -rounded -size_small" style="background-image: url(https://lh6.googleusercontent.com/-Ia_P6R1HShc/AAAAAAAAAAI/AAAAAAAACFE/Z-DGVm98CCg/photo.jpg?sz=30)"></div>
+											<div class="tab_body TabsBody FutureEvents -active">
+												<div class="organization_feed_container" data-container-date="Сегодня"><?php
+													for($i=0;$i<=10;$i++){ ?>
+														<div class="organization_feed_block">
+															<div class="organization_feed_block_img img_holder SwitchPage" data-page="event" data-event-id="{id}">
+																<img src="http://evendate.ru/event_images/large/292bf27e82cf6031c99f707cad7a9d49.jpg">
+															</div>
+															<div class="organization_feed_block_info">
+																<header class="organization_feed_block_title">
+																	<span class="SwitchPage" data-page="event" data-event-id="{id}">Speed Italiano. Найди учителя мечты</span>
+																</header>
+																<div class="organization_feed_block_service">
+																	<p><small>14:30 - 15:30</small></p>
+																	<div class="form_group -parts_e_2 AddAvatarWrapper">
+																		<div class="form_unit">
+																			<button class="button -color_neutral_alt -low -fill -rounded fa_icon fa-plus Subscribe AddAvatar RippleEffect"><span class="Text">Добавить в избранное</span></button>
 																		</div>
-																		<span class="counter -color_marginal">+24</span>
+																		<div class="form_unit">
+																			<div class="avatars_collection AvatarsCollection -subscribable">
+																				<div class="avatar -rounded -size_small" style="background-image: url(https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=30)"></div>
+																				<div class="avatar -rounded -size_small" style="background-image: url(https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=30)"></div>
+																				<div class="avatar -rounded -size_small" style="background-image: url(https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=30)"></div>
+																				<div class="avatar -rounded -size_small" style="background-image: url(https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=30)"></div>
+																				<div class="avatar -rounded -size_small" style="background-image: url(https://lh6.googleusercontent.com/-Ia_P6R1HShc/AAAAAAAAAAI/AAAAAAAACFE/Z-DGVm98CCg/photo.jpg?sz=30)"></div>
+																			</div>
+																			<span class="counter -color_marginal">+24</span>
+																		</div>
 																	</div>
 																</div>
 															</div>
-														</div>
-													</div>
+														</div><?php
+													}
+													?>
 												</div>
 											</div>
-											<div class="tab_body TabsBody"></div>
+											<div class="tab_body TabsBody PastEvents"></div>
 										</div>
 									</div>
 								</div>
-								<div class="page organization_subscribers_page -fixed">
+								<div class="page organization_subscribers_page -fixed -hidden">
 									<header class="organization_subscribers_header">
 										<span class="organization_subscribers_header_text">Подписчики</span>
 										<span class="counter -color_secondary">263</span>

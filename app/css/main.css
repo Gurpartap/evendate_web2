@@ -1478,6 +1478,8 @@ html.-open_modal {overflow: hidden}
 	text-align: center;
 }
 
+.counter:not(:only-child) {margin: 0 .5em}
+
 .counter.-color_vk {background-color: #6497bb}
 .counter.-color_primary {background-color: #5379b8}
 .counter.-color_secondary {background-color: #ff5f9e}
@@ -1758,8 +1760,8 @@ html.-open_modal {overflow: hidden}
 	border-radius: 4px;
 	overflow: hidden;
 }
-
-.organization_header {max-height: 338px}
+/*
+.organization_header {max-height: 338px}*/
 
 .organization_header_backdrop {
 	position: absolute;
@@ -1798,6 +1800,8 @@ html.-open_modal {overflow: hidden}
 	bottom: 0;
 	right: 0;
 	margin: auto 24px;
+	height: 1.88rem;
+	width: 130px;
 }
 
 .organization_description_block {padding: 24px 24px 12px}
@@ -1838,7 +1842,10 @@ html.-open_modal {overflow: hidden}
 	font-size: 1rem;
 }
 
-.organization_feed_block_img {width: 220px}
+.organization_feed_block_img {
+	width: 220px;
+	cursor: pointer;
+}
 
 .organization_feed_block_info {
 	width: -webkit-calc(100% - 220px);
@@ -1855,6 +1862,8 @@ html.-open_modal {overflow: hidden}
 	line-height: 1.2;
 	overflow: hidden;
 }
+.organization_feed_block_title > span {cursor: pointer}
+.organization_feed_block_title > span:hover {color: #6b88c7}
 
 .organization_feed_block_service {height: 55px}
 
@@ -1865,6 +1874,7 @@ html.-open_modal {overflow: hidden}
 	vertical-align: top;
 	width: 300px;
 	margin: 36px 0 0 60px;
+	border-radius: 4px;
 }
 
 .organization_subscribers_page.-fixed {
