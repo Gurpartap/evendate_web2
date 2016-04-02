@@ -17,7 +17,7 @@ class OrganizationsCollection {
 		$_friend = null;
 		$return_one = isset($filters['id']);
 		$cols = Fields::mergeFields(Organization::getAdditionalCols(), $fields, Organization::getDefaultCols());
-		$select = APP::queryFactory()->newSelect();
+		$select = App::queryFactory()->newSelect();
 
 		if (isset($filters[Organization::IS_SUBSCRIBED_FIELD_NAME])){
 			$cols[] = Organization::getAdditionalCols()[Organization::IS_SUBSCRIBED_FIELD_NAME];
@@ -35,17 +35,17 @@ class OrganizationsCollection {
 		foreach ($filters as $name => $value){
 			switch ($name) {
 				case 'name': {
-					$select->orWhere('view_organizations.name LIKE :name');
+					$select->orWhere('LOWER(view_organizations.name) LIKE LOWER(:name)');
 					$statement_array[':name'] = $value . '%';
 					break;
 				}
 				case 'description': {
-					$select->orWhere('view_organizations.description LIKE :description');
+					$select->orWhere('LOWER(view_organizations.description) LIKE LOWER(:description)');
 					$statement_array[':description'] = $value . '%';
 					break;
 				}
 				case 'short_name': {
-					$select->orWhere('view_organizations.short_name LIKE :short_name');
+					$select->orWhere('LOWER(view_organizations.short_name) LIKE LOWER(:short_name)');
 					$statement_array[':short_name'] = $value . '%';
 					break;
 				}

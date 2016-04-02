@@ -74,11 +74,11 @@
 			foreach ($events as $event){
 				switch($event['entity_type']){
 					case self::ENTITY_EVENT: {
-						self::Event(new Event($event['entity_id'], $db), $user, $db, $event['event_type']);
+						self::Event(EventsCollection::one($db, $user, $event['entity_id'], array()), $user, $db, $event['event_type']);
 						break;
 					}
 					case self::ENTITY_ORGANIZATION: {
-						self::Organization(new Organization($event['entity_id'], $db), $user, $db, $event['event_type']);
+						self::Organization(OrganizationsCollection::one($db, $user, $event['entity_id'], array()), $user, $db, $event['event_type']);
 						break;
 					}
 				}

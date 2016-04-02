@@ -4,10 +4,10 @@ require_once $BACKEND_FULL_PATH . '/search/Class.Search.php';
 
 $__modules['search'] = array(
 	'GET' => array(
-		'' => function () use ($__db, $__request, $__user) {
+		'' => function () use ($__db, $__request, $__user, $__fields) {
 			if (isset($__request['q'])){
 				$gs = new GlobalSearch($__request['q'], $__db);
-				return $gs->find($__user);
+				return $gs->find($__user, $__fields);
 			}
 		}
 	)

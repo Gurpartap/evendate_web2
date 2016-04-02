@@ -32,8 +32,8 @@ CREATE VIEW view_events AS
     events.images_domain || 'event_images/square/' || events.image_vertical   AS image_square_vertical_url,
     events.images_domain || 'event_images/square/' || events.image_horizontal AS image_square_horizontal_url,
 
-    events.images_domain || 'event_images/medium/' || events.image_vertical   AS image_horizontal_medium_url,
-    events.images_domain || 'event_images/medium/' || events.image_horizontal AS image_vertical_medium_url,
+    events.images_domain || 'event_images/medium/' || events.image_horizontal   AS image_horizontal_medium_url,
+    events.images_domain || 'event_images/medium/' || events.image_vertical AS image_vertical_medium_url,
 
     events.images_domain || 'event_images/small/' || events.image_vertical    AS image_vertical_small_url,
     events.images_domain || 'event_images/small/' || events.image_horizontal  AS image_horizontal_small_url,

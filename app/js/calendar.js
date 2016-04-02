@@ -180,11 +180,11 @@ function generateEventAttributes(event){
 	if (is_dates_range){
 		if (event.dates.length > 1){
 			event.dates = '' + event.moment_dates[0].start_date.format('DD/MM') + ' - ' + event.moment_dates[event.moment_dates.length - 1].start_date.format('DD/MM');
-			event.dates += "\n" + ' c ' + event.moment_dates[0].start_date.format('HH:mm') + ' по ' + event.moment_dates[0].end_date.format('HH:mm');
+			event.dates += "\n" + ' c ' + event.moment_dates[0].start_date.format('HH:mm') + ' до ' + event.moment_dates[0].end_date.format('HH:mm');
 			event.short_dates = event.dates;
 		}else{
 			event.dates = event.moment_dates[0].start_date.format('DD/MM');
-			event.dates += "\n" + ' c ' + event.moment_dates[0].start_date.format('HH:mm') + ' по ' + event.moment_dates[0].end_date.format('HH:mm');
+			event.dates += "\n" + ' c ' + event.moment_dates[0].start_date.format('HH:mm') + ' до ' + event.moment_dates[0].end_date.format('HH:mm');
 			event.short_dates = event.dates;
 		}
 	}else{
@@ -278,7 +278,7 @@ function printEventsInTimeline($view, res, filter_date){
 		//	m_date = moment(value.first_event_date);
 		//}
 		else{
-			m_date = moment(value.nearest_event_date);
+			m_date = moment.unix(value.nearest_event_date);
 		}
 
 		//console.log(m_date);
@@ -354,6 +354,7 @@ function MyTimeline($view, $content_block){
 			var page_number = $load_btn.data('page-number'),
 				data = __C.URL_FIELDS.EVENTS;
 			data['offset'] = 10 * page_number;
+			data['future'] = true;
 			$load_btn.data('page-number', page_number + 1);
 			$.ajax({
 				url: '/api/v1/events/my',
@@ -495,6 +496,7 @@ function Search($view, $content_block){
 	if (_search.hasOwnProperty('q')){
 		$('.search-input').val(_search.q);
 	}
+	_search['fields'] = 'events{fields:"detail_info_url,is_favorite,nearest_event_date,can_edit,location,favored_users_count,organization_name,organization_logo_small_url,description,favored,is_same_time,tags,dates",filters:"future=true"},organizations{fields:"subscribed_count"}';
 	$.ajax({
 		url: '/api/v1/search/',
 		data: _search,
@@ -1541,7 +1543,7 @@ function EditEvent($view, $content_block){
 			url: url,
 			method: 'GET',
 			data: {
-				fields: 'location,description,tags,detail_info_url,public_at,registration_required,registration_till,is_free,min_price,dates{length:0,fields:"start_time,end_time"}'
+				fields: 'location,description,tags,nearest_event_date,detail_info_url,public_at,registration_required,registration_till,is_free,min_price,dates{length:0,fields:"start_time,end_time"}'
 			},
 			success: function(res){
 				if(res.status){

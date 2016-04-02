@@ -1,9 +1,6 @@
 <?php
 
-require_once $ROOT_PATH . 'backend/organizations/Class.OrganizationsCollection.php';
-require_once $ROOT_PATH . 'backend/events/Class.EventsCollection.php';
-
-class GlobalSearch{
+class GlobalSearch {
 
 
 	private $query;
@@ -13,6 +10,9 @@ class GlobalSearch{
 	private $initial_query;
 
 	private $DATE_CONSTANTS;
+
+	const ORGANIZATIONS_FIELD_NAME = 'organizations';
+	const EVENTS_FIELD_NAME = 'events';
 
 	/**
 	 * GlobalSearch constructor.
@@ -38,94 +38,86 @@ class GlobalSearch{
 		$next_month_end = new DateTime('last day of next month');
 
 
-		$this->DATE_CONSTANTS  = array(
-			'(сегодн.*?(\s|$))' => array(
-				'since_date' => new DateTime(),
-				'till_date' => new DateTime(),
-			),
-			'((на|в).*?завтр.*?(\s|$))' => array(
-				'since_date' => new DateTime('tomorrow'),
-				'till_date' => new DateTime('tomorrow'),
-			),
-			'((на|в).*?послезавтр.*?(\s|$))' => array(
-				'since_date' => new DateTime('tomorrow + 1day'),
-				'till_date' => new DateTime('tomorrow + 1day'),
-			),
-			'((на|в).*?эт.*? нед.*?(\s|$))' => array(
-				'since_date' => $start_week,
-				'till_date' => $end_week,
-			),
-			'((на|в).*?след.*? нед.*?(\s|$))' => array(
-				'since_date' => $next_week_start,
-				'till_date' => $next_week_end,
-			),
-			'((на|в).*?эт.*? мес.*?(\s|$))' => array(
-				'since_date' => $curr_month_start,
-				'till_date' => $curr_month_end,
-			),
-			'((на|в).*?след.*? мес.*?(\s|$))' => array(
-				'since_date' => $next_month_start,
-				'till_date' => $next_month_end,
-			)
-		);
+		$this->DATE_CONSTANTS = array('(сегодн.*?(\s|$))' => array('since_date' => new DateTime(), 'till_date' => new DateTime(),), '((на|в).*?завтр.*?(\s|$))' => array('since_date' => new DateTime('tomorrow'), 'till_date' => new DateTime('tomorrow'),), '((на|в).*?послезавтр.*?(\s|$))' => array('since_date' => new DateTime('tomorrow + 1day'), 'till_date' => new DateTime('tomorrow + 1day'),), '((на|в).*?эт.*? нед.*?(\s|$))' => array('since_date' => $start_week, 'till_date' => $end_week,), '((на|в).*?след.*? нед.*?(\s|$))' => array('since_date' => $next_week_start, 'till_date' => $next_week_end,), '((на|в).*?эт.*? мес.*?(\s|$))' => array('since_date' => $curr_month_start, 'till_date' => $curr_month_end,), '((на|в).*?след.*? мес.*?(\s|$))' => array('since_date' => $next_month_start, 'till_date' => $next_month_end,));
 		$this->all_dates = $this->parseDates();
 	}
 
-	private function parseTags(){
+	private function parseTags() {
 		$pattern = '/(^|\s)(\#[а-яА-Яa-zA-ZЁё0-9]+)/u';
 		preg_match_all($pattern, $this->query, $tags);
 		$this->query = preg_replace($pattern, '', $this->query);
-		if (count($tags) > 0){
+		if (count($tags) > 0) {
 			return $tags[0];
-		}else{
+		}
+		else {
 			return $tags;
 		}
 
 	}
 
-	private function parseDates($type = null){
-		if ($this->dates == null){
-			$this->dates = array(
-				'since_date' => null,
-				'till_date' => null
-			);
-			foreach($this->DATE_CONSTANTS as $constant => $value){
-				if (preg_match('/.*?' . $constant . '/', $this->query, $match) > 0){
+	private function parseDates($type = null) {
+		if ($this->dates == null) {
+			$this->dates = array('since_date' => null, 'till_date' => null);
+			foreach ($this->DATE_CONSTANTS as $constant => $value) {
+				if (preg_match('/.*?' . $constant . '/', $this->query, $match) > 0) {
 					$this->dates = $value;
-					if (count($match) > 1){
+					if (count($match) > 1) {
 						$this->query = str_replace($match[1], '', $this->query);
 					}
 				}
 			}
 		}
 
-		if ($type == 'since_date'){
+		if ($type == 'since_date') {
 			return $this->dates['since_date'];
-		}elseif($type == 'till_date'){
+		}
+		elseif ($type == 'till_date') {
 			return $this->dates['till_date'];
-		}elseif($type == null){
+		}
+		elseif ($type == null) {
 			return $this->dates;
-		}else{
+		}
+		else {
 			return array();
 		}
 	}
 
-	public function find(User $user){
+	public function find(User $user, array $fields) {
 
-		return new Result(true, '', array(
-			'organizations' => OrganizationsCollection::filter($this->db, $user, array(
-				'name' => $this->query,
-				'description' => $this->query,
-				'short_name' => $this->query
-			), ' GROUP BY organizations.id ORDER BY subscribed_count LIMIT 50')->getData(),
-			'events' => EventsCollection::filter($this->db, $user, array(
-				'title' => $this->query,
-				'since_date' => $this->parseDates('since_date'),
-				'till_date' => $this->parseDates('till_date'),
-				'tags' => $this->tags
-			), ' ORDER BY events.first_event_date LIMIT 50')->getData(),
-			'query' => $this->initial_query
-		));
+		$result_data = array();
+
+		if (isset($fields[self::ORGANIZATIONS_FIELD_NAME])) {
+			$result_data[self::ORGANIZATIONS_FIELD_NAME] = OrganizationsCollection::filter($this->db,
+				$user,
+				array(
+					'name' => $this->query,
+					'description' => $this->query,
+					'short_name' => $this->query
+				),
+				Fields::parseFields($fields[self::ORGANIZATIONS_FIELD_NAME]['fields'] ?? ''),
+				array(
+					'length' => $fields[self::ORGANIZATIONS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+					'offset' => $fields[self::ORGANIZATIONS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
+				),
+				Fields::parseOrderBy($fields[self::ORGANIZATIONS_FIELD_NAME]['order_by'] ?? '')
+			)->getData();
+		}
+		if (isset($fields[self::EVENTS_FIELD_NAME])) {
+			$filters = Fields::parseFilters($fields[self::EVENTS_FIELD_NAME]['filters'] ?? '');
+			$filters['title'] = $this->query;
+			$filters['tags'] = $this->tags;
+			$result_data[self::EVENTS_FIELD_NAME] = EventsCollection::filter($this->db,
+				$user,
+				$filters,
+				Fields::parseFields($fields[self::EVENTS_FIELD_NAME]['fields'] ?? ''),
+				array(
+					'length' => $fields[self::EVENTS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+					'offset' => $fields[self::EVENTS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
+				),
+				Fields::parseOrderBy($fields[self::EVENTS_FIELD_NAME]['order_by'] ?? '')
+			)->getData();
+		}
+		return new Result(true, '', $result_data);
 	}
 
 }

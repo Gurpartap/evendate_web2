@@ -669,7 +669,7 @@ function showOrganizationalModal(organization_id) {
 	if (window.organization_is_loading) return;
 	window.organization_is_loading = true;
 	$.ajax({
-		url: 'api/v1/organizations/' + organization_id + '?fields=events{fields: "detail_info_url,is_favorite,can_edit,location,is_same_time,favored_users_count,organization_name,organization_logo_small_url,dates,description,favored,tags",filters:"future=true"},subscribed,site_url,subscribed_count',
+		url: 'api/v1/organizations/' + organization_id + '?fields=events{fields: "detail_info_url,is_favorite,can_edit,location,is_same_time,favored_users_count,organization_name,organization_logo_small_url,dates,description,favored,tags,nearest_event_date",filters:"future=true",order_by:"nearest_event_date"},subscribed{fields:"is_friend,random", order_by:"-is_friend,random"},site_url,subscribed_count',
 		success: function(res) {
 			res.data = res.data[0];
 			var $events = $('<div>'),
@@ -784,7 +784,7 @@ function showOrganizationalModal(organization_id) {
 					$.ajax({
 						url: '/api/v1/events/' + $this.data('event-id'),
 						data: {
-							fields: 'location,is_same_time,latitude,longitude,organization_name,organization_type_name,organization_short_name,organization_logo_large_url,favored_users_count,description,detail_info_url,is_favorite,link,registration_required,registration_till,is_free,min_price,dates{fields:"start_time,end_time"},tags,favored{fields:"is_friend,type,link"}'
+							fields: 'location,is_same_time,latitude,longitude,organization_name,organization_type_name,organization_short_name,organization_logo_large_url,favored_users_count,description,detail_info_url,is_favorite,link,registration_required,registration_till,is_free,min_price,dates{fields:"start_time,end_time",order_by:"event_date,start_time"},tags,favored{fields:"is_friend,type,link"}'
 						},
 						success: function(res) {
 
@@ -1021,6 +1021,7 @@ $(document).ready(function() {
 				fields: [
 					'detail_info_url',
 					'is_favorite',
+					'nearest_event_date',
 					'can_edit',
 					'location',
 					'favored_users_count',
@@ -1030,7 +1031,7 @@ $(document).ready(function() {
 					'favored',
 					'is_same_time',
 					'tags',
-					'dates{"fields": "event_date,start_time,end_time", "order_by": "event_date"}'
+					'dates{"fields": "event_date,start_time,end_time", "order_by": "event_date,start_time"}'
 				].join(','),
 				length: 10
 			}

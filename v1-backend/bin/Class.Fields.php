@@ -86,8 +86,11 @@ class Fields{
 			if (substr($field, 0, 1) == '-'){
 				$field = ltrim($field, '-');
 				$result[] = $field . ' DESC';
+			}elseif (substr($field, 0, 1) == '+'){
+				$field = ltrim($field, '+');
+				$result[] = $field . ' ASC';
 			}else{
-				$result[] = $field;
+				$result[] = $field . ' ASC';
 			}
 		}
 		return $result;

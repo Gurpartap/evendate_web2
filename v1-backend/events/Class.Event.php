@@ -514,7 +514,7 @@ class Event extends AbstractEntity{
 					'length' => $fields[self::DATES_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 					'offset' => $fields[self::DATES_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
 				),
-				Fields::parseOrderBy($fields[self::DATES_FIELD_NAME]['order_by'] ?? ''))->getData();
+				Fields::parseOrderBy($fields[self::DATES_FIELD_NAME]['order_by'] ?? 'event_date'))->getData();
 		}
 
 		if (isset($fields[self::FAVORED_USERS_FIELD_NAME])){
