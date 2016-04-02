@@ -6,6 +6,7 @@
 //	if (isset($_SERVER['ENV']) && ($_SERVER['ENV'] != 'dev' && $_SERVER['ENV'] != 'test')){
 	ini_set("display_errors", 1);
 	error_reporting(E_ALL);
+
 //	}
 	require_once '../../v1-backend/bin/env_variables.php';
 
