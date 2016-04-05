@@ -467,7 +467,7 @@
 					<span class="avatar_name organization_title" title="{name}">{name}</span>
 				</div>
 				<div class="organization_header_button">
-					<button class=" button -low -fill -color_secondary fa_icon {subscribe_button_classes} OrganizationSubscribe RippleEffect" type="button"><span class="Text">{subscribe_button_text}</span></button>
+					<button class=" button -low -fill -color_secondary fa_icon {subscribe_button_classes} OrganizationSubscribe RippleEffect" data-organization-id="{id}" type="button"><span class="Text">{subscribe_button_text}</span></button>
 				</div>
 			</div>
 		</header>
@@ -478,7 +478,7 @@
 					<a class="button -color_marginal RippleEffect fa_icon fa-external-link" href="{site_url}" target="_blank">Подробнее</a>
 				</div>
 				<div class="form_unit">
-					<small class="-color_marginal">Адрес организатора:</small>
+					<small class="-color_marginal {has_address}">Адрес организатора:</small>
 					<p>{default_address}</p>
 				</div>
 			</div>
@@ -489,12 +489,8 @@
 				<span class="tab Tab">Прошедшие</span>
 			</div>
 			<div class="tab_bodies_wrap TabsBodyWrapper">
-				<div class="tab_body TabsBody -active">
-					{future_events}
-				</div>
-				<div class="tab_body TabsBody">
-					{passed_events}
-				</div>
+				<div class="tab_body TabsBody FutureEvents -active"></div>
+				<div class="tab_body TabsBody PastEvents"></div>
 			</div>
 		</div>
 	</div>
@@ -506,35 +502,40 @@
 	</div>
 </script>
 
-<script type="javascript/template" id="tmpl-organization-feed-block">
-	<div class="organization_feed_block">
-		<div class="organization_feed_block_img img_holder">
-			<img src="{image_horizontal_small_url}">
-		</div>
+
+<script type="javascript/template" id="tmpl-organization-feed-divider">
+	<hr title="{formatted_date}" data-raw_date="{date}">
+</script>
+
+<script type="javascript/template" id="tmpl-organization-feed-event">
+	<div class="organization_feed_block" data-event_date="{date}">
+		<a class="organization_feed_block_img img_holder -odd" href="/event.php?id={id}" target="_blank">
+			<img src="{image_horizontal_medium_url}">
+		</a>
 		<div class="organization_feed_block_info">
 			<header class="organization_feed_block_title">
-				<span data-page="event" data-event-id="{id}">{title}</span>
+				<a class="-odd" href="/event.php?id={id}" target="_blank">{title}</a>
 			</header>
 			<div class="organization_feed_block_service">
-				<p><small>14:30 - 15:30</small></p>
+				<p><small>{time}</small></p>
 				<div class="form_group -parts_e_2 AddAvatarWrapper">
 					<div class="form_unit">
-						<button class="button -color_neutral_alt -low -rounded fa_icon fa-plus Subscribe -AddFavourite AddAvatar RippleEffect" data-event-id="{id}"><span class="Text">Добавить в избранное</span></button>
+						<button class="button -low -fill -rounded fa_icon {subscribe_button_classes} Subscribe EventSubscribe -AddFavourite AddAvatar RippleEffect" data-event-id="{id}"><span class="Text">{subscribe_button_text}</span></button>
 					</div>
 					<div class="form_unit">
-						<div class="avatars_collection AvatarsCollection -subscribable">
-							<div class="avatar -rounded -size_small" style="background-image: url(https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=30)"></div>
-							<div class="avatar -rounded -size_small" style="background-image: url(https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=30)"></div>
-							<div class="avatar -rounded -size_small" style="background-image: url(https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=30)"></div>
-							<div class="avatar -rounded -size_small" style="background-image: url(https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=30)"></div>
-							<div class="avatar -rounded -size_small" style="background-image: url(https://lh6.googleusercontent.com/-Ia_P6R1HShc/AAAAAAAAAAI/AAAAAAAACFE/Z-DGVm98CCg/photo.jpg?sz=30)"></div>
+						<div class="avatars_collection AvatarsCollection -subscribable {avatars_collection_classes} -rounded -bordered -size_small" data-max_subscribers="4">
+							{subscribers}
 						</div>
-						<span class="counter -color_marginal">+{favored_users_count}</span>
+						<span class="counter -size_30x30 -bordered -color_marginal -castable {favored_users_show}">+<span class="FavoredCount">{favored_users_count}</span></span>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-organization-feed-event-subscriber">
+	<div class="avatar" style="background-image: url({avatar_url})"></div>
 </script>
 
 <script type="javascript/template" id="tmpl-organization-subscribers-page">
@@ -543,17 +544,18 @@
 			<span class="organization_subscribers_header_text">Подписчики</span>
 			<span class="counter -color_secondary">{subscribers_count}</span>
 		</header>
-		<div class="organization_subscribers_wrapper scrollbar-outer">
-			<span class="organization_subscribers_divider {friends_are_hidden}">Друзья</span>
-			{friends}
-			<span class="organization_subscribers_divider">Все подписчики</span>
+		<div class="organization_subscribers_wrapper scrollbar-outer SubscribersScroll">
 			{subscribers}
 		</div>
 	</div>
 </script>
 
+<script type="javascript/template" id="tmpl-subscriber-divider">
+	<span class="organization_subscribers_divider">{label}</span>
+</script>
+
 <script type="javascript/template" id="tmpl-subscriber">
-	<div class="subscriber">
+	<div class="subscriber" data-is_friend="{is_friend}" data-page="friend-{id}" data-friend-id="{id}" data-name="{name}">
 		<div class="avatar_block">
 			<div class="avatar -size_50x50 -rounded">
 				<img src="{avatar_url}">
@@ -746,7 +748,7 @@
 <script type="javascript/template" id="tmpl-event-item">
   <div class="tl-panel-block closed event-{id}-{date}" data-event-id="{id}" data-date="{date}">
     <div class="tl-event-wrapper">
-      <div class="organization-in-event" data-organization-id="{organization_id}">
+      <div class="organization-in-event" data-page="organization" data-organization-id="{organization_id}">
         <div class="organization-img-wrapper blue">
           <img src="{organization_img_url}" title="{organization_name}">
         </div>

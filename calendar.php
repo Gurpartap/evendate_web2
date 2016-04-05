@@ -571,7 +571,7 @@
 <!-- HISTORY API -->
 <script src="vendor/history/jquery.history.js"></script>
 <!-- SCROLLBAR -->
-<script src="vendor/jquery.scrollbar/jquery.scrollbar.min.js"></script>
+<script src="vendor/jquery.scrollbar/jquery.scrollbar.js"></script>
 <!-- NOTIFICATIONS API -->
 <script src="vendor/notify/notify.js"></script>
 <!-- JQUERY APPEAR-->

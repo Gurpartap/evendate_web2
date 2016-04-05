@@ -178,7 +178,7 @@
 					"max-height": ""
 				});
 
-				c.on('scroll' + namespace, function (event) {
+				c.on('scroll.onScroll', function (event) {
 					if ($.isFunction(o.onScroll)) {
 						o.onScroll.call(S, {
 							"maxScroll": s.y.maxScrollOffset,
@@ -192,6 +192,9 @@
 							"visible": s.x.visible
 						});
 					}
+				});
+
+				c.on('scroll' + namespace, function (event) {
 					s.x.isVisible && s.x.scroll.bar.css('left', c.scrollLeft() * s.x.kx + 'px');
 					s.y.isVisible && s.y.scroll.bar.css('top', c.scrollTop() * s.y.kx + 'px');
 				});

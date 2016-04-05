@@ -144,6 +144,70 @@ $.fn.extend({
 	}
 });
 
+function SubscribeButton($btn, options){
+	var self = this;
+	this.$btn = $btn;
+	this.labels = {
+		subscribe: 'Подписаться',
+		unsubscribe: 'Отписаться',
+		subscribed: 'Подписан'
+	};
+	this.icons = {
+		subscribe: 'fa-plus',
+		unsubscribe: 'fa-times',
+		subscribed: 'fa-check'
+	};
+	this.colors = {
+		subscribe: '-color_neutral_alt',
+		unsubscribe: '-color_secondary',
+		subscribed: '-color_secondary'
+	};
+
+	if(typeof options != 'undefined'){
+		this.labels = typeof options.labels != 'undefined' ? $.extend(this.labels, options.labels) : this.labels;
+		this.icons = typeof options.icons != 'undefined' ? $.extend(this.icons, options.icons) : this.icons;
+		this.colors = typeof options.colors != 'undefined' ? $.extend(this.colors, options.colors) : this.colors;
+	}
+
+	this.$btn.bindHoverEvents = function(){
+		self.$btn
+			.off('mouseenter.hoverSubscribed mouseleave.hoverSubscribed')
+			.on('mouseenter.hoverSubscribed', function(){
+				self.$btn.addClass(self.icons.unsubscribe).removeClass(self.icons.subscribed);
+				self.$btn.children('.Text').text(self.labels.unsubscribe);
+			})
+			.on('mouseleave.hoverSubscribed', function(){
+				self.$btn.addClass(self.icons.subscribed).removeClass(self.icons.unsubscribe);
+				self.$btn.children('.Text').text(self.labels.subscribed);
+			});
+		return self.$btn;
+	};
+
+	if(this.$btn.hasClass('-Subscribed')){
+		this.$btn.bindHoverEvents();
+	}
+
+	if(!this.$btn.children('span').length){
+		this.$btn.wrapInner('<span class="Text">');
+	}
+
+	this.$btn.on('click.changeState', function(){
+		if(self.$btn.hasClass('-Subscribed')){
+			self.$btn
+				.removeClass(['-Subscribed', self.colors.unsubscribe, self.colors.subscribed, self.icons.unsubscribe, self.icons.subscribed].join(' '))
+				.addClass([self.colors.subscribe, self.icons.subscribe].join(' '))
+				.off('mouseenter.hoverSubscribed mouseleave.hoverSubscribed')
+				.children('.Text').text(self.labels.subscribe);
+		} else {
+			self.$btn
+				.removeClass([self.colors.subscribe, self.colors.subscribed, self.icons.subscribe, self.icons.subscribed].join(' '))
+				.addClass(['-Subscribed', self.colors.unsubscribe, self.icons.unsubscribe].join(' '))
+				.bindHoverEvents()
+				.children('.Text').text(self.labels.unsubscribe);
+		}
+	})
+}
+
 function handleErrorField($unit){
 	if(!$unit instanceof jQuery){
 		handleErrorField($($unit));
@@ -204,6 +268,7 @@ function bindTabs($parent){
 			$(this).addClass('-active');
 			$bodies.eq($tabs.index(this)).addClass('-active');
 			$wrapper.height($bodies.filter('.-active').height());
+			$this.trigger('change.tabs');
 		})
 	}).addClass('-Handled_Tabs');
 }
@@ -231,7 +296,7 @@ function initSelect2($element, options){
 
 function bindRippleEffect($parent){
 	$parent = $parent ? $parent : $('body');
-	$parent.find('.RippleEffect').not('-Handled_RippleEffect').on('click', function(e){
+	$parent.find('.RippleEffect').not('.-Handled_RippleEffect').on('click', function(e){
 		var $this = $(this), $ripple, size, x, y;
 
 		if($this.children('.ripple').length == 0)
@@ -257,10 +322,49 @@ function bindRippleEffect($parent){
 	}).addClass('-Handled_RippleEffect');
 }
 
+function buildAvatarCollection(subscribers, count){
+	var $subscribers = $();
+	$subscribers = $subscribers.add(tmpl('organization-feed-event-subscriber', __USER));
+	subscribers.forEach(function(subscriber){
+		if(subscriber.id != __USER.id && $subscribers.length <= count){
+			$subscribers = $subscribers.add(tmpl('organization-feed-event-subscriber', subscriber));
+		}
+	});
+	return $subscribers;
+}
+
 function bindAddAvatar($parent){
 	$parent = $parent ? $parent : $('body');
-	$parent.find('.AddAvatar').not('-Handled_AddAvatar').on('click', function(){
-		$(this).closest('.AddAvatarWrapper').find('.AvatarsCollection').toggleClass('-subscribed');
+	$parent.find('.AddAvatar').not('.-Handled_AddAvatar').on('click', function(){
+		var $wrapper = $(this).closest('.AddAvatarWrapper'),
+			$collection = $wrapper.find('.AvatarsCollection'),
+			$favored_count = $wrapper.find('.FavoredCount'),
+			$avatars = $collection.find('.avatar'),
+			amount = $avatars.length;
+
+		if($collection.data('max_subscribers') >= amount){
+			if($collection.hasClass('-subscribed')){
+				$collection.removeClass('-subscribed');
+				$collection.width(amount == 1 ? 0 : ($avatars.outerWidth()*(amount-1)) - (6*(amount-2)));
+			} else {
+				$collection.addClass('-subscribed');
+				$collection.width(($avatars.outerWidth()*amount) - (6*(amount-1)));
+			}
+		} else {
+			if($favored_count.length){
+				var current_count = parseInt($favored_count.text());
+				if($collection.hasClass('-subscribed')){
+					$favored_count.text(current_count-1);
+					if(current_count-1 <= 0){
+						$favored_count.parent().addClass('-cast');
+					}
+				} else {
+					$favored_count.text(current_count+1);
+					$favored_count.parent().removeClass('-cast');
+				}
+			}
+			$collection.toggleClass('-shift -subscribed');
+		}
 	}).addClass('-Handled_AddAvatar');
 }
 
@@ -270,12 +374,25 @@ function trimAvatarsCollection($parent){
 		var $collection = $(this),
 			$avatars = $collection.find('.avatar'),
 			amount = $avatars.length;
-		$collection.width(($avatars.width()*(amount-1)) - (6*(amount-2)));
+		if($collection.hasClass('-subscribed') && !$collection.hasClass('-shift')){
+			$collection.width(amount == 1 ? 0 : ($avatars.outerWidth()*amount) - (6*(amount-1)));
+		} else {
+			$collection.width(amount == 1 ? 0 : ($avatars.outerWidth()*(amount-1)) - (6*(amount-2)));
+		}
+	});
+}
+
+function placeAvatarDefault($parent){
+	var $avatars = $parent.find('.avatar');
+	$avatars.each(function(){
+		$(this).children('img').one('error', function(){
+			this.src = '/app/img/logo_500.png';
+		})
 	});
 }
 
 function bindFileLoadButton(){
-	$('.FileLoadButton').not('-Handled_FileLoadButton').click(function(e){
+	$('.FileLoadButton').not('.-Handled_FileLoadButton').click(function(e){
 		var $this = $(this);
 		$this.children('input').get(0).click();
 	}).addClass('-Handled_FileLoadButton');
@@ -346,6 +463,8 @@ function toDataUrl(url, callback){
 	xhr.open('GET', url);
 	xhr.send();
 }
+
+
 
 function showModal(name){
 	var $modal = $('.'+name.capitalize()+'Modal');

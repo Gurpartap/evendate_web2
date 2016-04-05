@@ -28,6 +28,11 @@ body {
 	background-color: #f5f7fa;
 }
 
+a.-odd,
+a.-odd:hover {color: inherit}
+a.-odd:hover,
+a.-odd:focus {text-decoration: none}
+
 
 .-centering,
 .-h_centering {text-align: center}
@@ -86,6 +91,16 @@ body {
 
 img[src=''],
 img:not([src]) {display: none}
+
+hr[title]:before {
+	content: attr(title);
+	position: absolute;
+	left: 0;
+	top: -.5em;
+	padding: 0 12px;
+	font-weight: 500;
+	background-color: #fff;
+}
 
 .img_holder > img {
 	max-width: 100%;
@@ -1361,6 +1376,7 @@ html.-open_modal {overflow: hidden}
 	vertical-align: middle;
 	width: 70px;
 	height: 70px;
+	background-size: contain;
 }
 .avatar > img {
 	max-width: 100%;
@@ -1383,6 +1399,9 @@ html.-open_modal {overflow: hidden}
 	height: 50px;
 }
 
+/* /Avatar */
+/* Avatars Collection */
+
 .avatars_collection {
 	display: inline-block;
 	vertical-align: middle;
@@ -1390,10 +1409,85 @@ html.-open_modal {overflow: hidden}
 }
 .avatars_collection > .avatar + .avatar {margin-left: -6px}
 
+.avatars_collection.-rounded > .avatar {
+	border-radius: 50%;
+	overflow: hidden;
+}
+.avatars_collection.-bordered > .avatar {border: 2px solid #fff}
+
+.avatars_collection.-size_small > .avatar,
+.avatars_collection.-size_30x30 > .avatar {
+	width: 30px;
+	height: 30px;
+}
+.avatars_collection.-size_50x50 > .avatar {
+	width: 50px;
+	height: 50px;
+}
+.avatars_collection.-bordered > .avatar {border: 2px solid #fff}
+
 .avatars_collection.-subscribable {
 	width: 0;
 	overflow: hidden;
 	white-space: nowrap;
+	border-radius: 50px;
+	-webkit-transition: width .5s ease;
+	-moz-transition: width .5s ease;
+	-o-transition: width .5s ease;
+	transition: width .5s ease;
+
+	-webkit-transform: translate3d(0, 0, 0);
+	-moz-transform: translate3d(0, 0, 0);
+	-ms-transform: translate3d(0, 0, 0);
+	-o-transform: translate3d(0, 0, 0);
+	transform: translate3d(0, 0, 0);
+}
+
+.avatars_collection.-subscribable > .avatar:last-child {
+	-webkit-transition: opacity .5s ease, left .5s ease;
+	-moz-transition: opacity .5s ease, left .5s ease;
+	-o-transition: opacity .5s ease, left .5s ease;
+	transition: opacity .5s ease, left .5s ease;
+}
+
+.avatars_collection.-subscribable > .avatar:first-child {
+	-webkit-transition: opacity .5s ease, margin-left .5s ease, left .5s ease;
+	-moz-transition: opacity .5s ease, margin-left .5s ease, left .5s ease;
+	-o-transition: opacity .5s ease, margin-left .5s ease, left .5s ease;
+	transition: opacity .5s ease, margin-left .5s ease, left .5s ease;
+}
+.avatars_collection.-subscribable > .avatar:last-child,
+.avatars_collection.-subscribable > .avatar:first-child {
+	left: 0;
+	opacity: 0;
+}
+
+.avatars_collection.-subscribable:not(.-shift) > .avatar:last-child,
+.avatars_collection.-subscribable.-subscribed > .avatar:first-child {opacity: 1}
+
+
+.avatars_collection.-subscribable:not(.-subscribed) > .avatar:first-child {left: -6px}
+.avatars_collection.-subscribable.-shift > .avatar:last-child {left: 6px}
+.avatars_collection.-subscribable.-size_small > .avatar:first-child,
+.avatars_collection.-subscribable.-size_30x30 > .avatar:first-child {margin-left: -24px}
+.avatars_collection.-subscribable.-size_50x50 > .avatar:first-child {margin-left: -44px}
+
+.avatars_collection.-subscribable.-subscribed > .avatar:first-child {
+	margin-left: 0;
+	left: 0;
+}
+
+
+/*
+
+.avatars_collection.-subscribable {
+	width: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	-webkit-transition: width .5s ease;
+	-moz-transition: width .5s ease;
+	-o-transition: width .5s ease;
+	transition: width .5s ease;
 }
 
 .avatars_collection.-subscribable > .avatar:last-child,
@@ -1401,21 +1495,19 @@ html.-open_modal {overflow: hidden}
 	left: 0;
 	-webkit-transition: margin-left .5s ease, left .5s ease;
 	-moz-transition: margin-left .5s ease, left .5s ease;
-	-ms-transition: margin-left .5s ease, left .5s ease;
 	-o-transition: margin-left .5s ease, left .5s ease;
 	transition: margin-left .5s ease, left .5s ease;
 }
 
-.avatars_collection.-subscribable.-subscribed > .avatar:first-child {
-	margin-left: -24px;
-	left: -6px;
-}
-.avatars_collection.-subscribable:not(.-subscribed) > .avatar:last-child {
-	left: 6px;
-}
+.avatars_collection.-subscribable.-shift > .avatar:first-child {left: -6px}
+.avatars_collection.-subscribable:not(.-subscribed) > .avatar:last-child {left: 6px}
 
+.avatars_collection.-size_small.-subscribable.-shift > .avatar:first-child,
+.avatars_collection.-size_30x30.-subscribable.-shift > .avatar:first-child {margin-left: -24px}
+.avatars_collection.-size_50x50.-subscribable.-shift > .avatar:first-child {margin-left: -44px}
+*/
 
-/* /Avatar */
+/* /Avatars Collection */
 /* Avatar Block */
 
 .avatar_block {
@@ -1478,6 +1570,14 @@ html.-open_modal {overflow: hidden}
 	text-align: center;
 }
 
+.counter.-size_30x30 {
+	font-weight: 400;
+	padding: 9px;
+}
+
+.counter.-bordered {border: 2px solid #fff}
+.counter.-size_30x30.-bordered {padding: 7px}
+
 .counter:not(:only-child) {margin: 0 .5em}
 
 .counter.-color_vk {background-color: #6497bb}
@@ -1488,6 +1588,30 @@ html.-open_modal {overflow: hidden}
 .counter.-color_marginal {background-color: #e0e0e0}
 
 .counter.-color_marginal {color: #4a4a4a}
+
+.counter.-castable {
+	opacity: 1;
+
+	-webkit-transform: translate(0);
+	-moz-transform: translate(0);
+	-ms-transform: translate(0);
+	-o-transform: translate(0);
+	transform: translate(0);
+
+	-webkit-transition: transform .5s ease, opacity .5s ease;
+	-moz-transition: transform .5s ease, opacity .5s ease;
+	-o-transition: transform .5s ease, opacity .5s ease;
+	transition: transform .5s ease, opacity .5s ease;
+}
+
+.counter.-cast {
+	opacity: 0;
+	-webkit-transform: translate(-30px);
+	-moz-transform: translate(-30px);
+	-ms-transform: translate(-30px);
+	-o-transform: translate(-30px);
+	transform: translate(-30px);
+}
 
 /* /Counter */
 /* Page */
@@ -1819,6 +1943,8 @@ html.-open_modal {overflow: hidden}
 }
 .organization_feed_container + .organization_feed_container {margin-top: 2em}
 
+.organization_feed_text {padding: 12px 24px}
+
 .organization_feed_container:before {
 	content: attr(data-container-date);
 	position: absolute;
@@ -1830,7 +1956,7 @@ html.-open_modal {overflow: hidden}
 }
 
 .organization_feed_block {
-	height: 148px;
+	height: 178px;
 	padding: 12px;
 	font-size: 0;
 }
@@ -1862,8 +1988,8 @@ html.-open_modal {overflow: hidden}
 	line-height: 1.2;
 	overflow: hidden;
 }
-.organization_feed_block_title > span {cursor: pointer}
-.organization_feed_block_title > span:hover {color: #6b88c7}
+.organization_feed_block_title > a {cursor: pointer}
+.organization_feed_block_title > a:hover {color: #6b88c7}
 
 .organization_feed_block_service {height: 55px}
 
