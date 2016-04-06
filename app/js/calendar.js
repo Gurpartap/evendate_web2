@@ -1475,148 +1475,7 @@ function EditEvent($view, $content_block){
 
 		});
 
-		$view.find('#edit_event_submit').off('click.Submit').on('click.Submit', function(){
-			var $submit_button = $(this);
-
-			function formValidation($form, for_edit){
-				var is_valid = true;
-
-				$form.find(':required').not(':disabled').each(function(){
-					var $this = $(this);
-					if($this.val() === ""){
-						if(is_valid){
-							var scroll_top = Math.ceil($this.offset().top - 150);
-							$('body').stop().animate({scrollTop: scroll_top}, 1000, 'swing');
-						}
-						handleErrorField($this);
-						is_valid = false;
-					}
-				});
-
-				if(!for_edit){
-					$form.find('.DataUrl').each(function(){
-						var $this = $(this);
-						if($this.val() === ""){
-							if(is_valid){
-								var scroll_top = Math.ceil($this.closest('.EditEventImgLoadWrap').offset().top - 150);
-								$('body').stop().animate({scrollTop: scroll_top}, 1000, 'swing', function(){
-									showNotifier({text: 'Пожалуйста, добавьте к событию обложку', status: false})
-								});
-							}
-							is_valid = false;
-						}
-					});
-				}
-				return is_valid;
-			}
-
-			var $form = $view.find("#edit-event-form"),
-				data = {
-					event_id: null,
-					title: null,
-					image_vertical: null,
-					image_horizontal: null,
-					organization_id: null,
-					location: null,
-					description: null,
-					detail_info_url: null,
-					different_time: null,
-					dates: null,
-					tags: null,
-					registration_required: null,
-					registration_till: null,
-					is_free: null,
-					min_price: null,
-					delayed_publication: null,
-					public_at: null,
-					filenames: {
-						vertical: null,
-						horizontal: null
-					}
-				},
-				form_data = $form.serializeForm(),
-				tags = form_data.tags ? form_data.tags.split(',') : null,
-				url = form_data.event_id ? '/api/v1/events/'+form_data.event_id : '/api/v1/events/',
-				method = form_data.event_id ? 'PUT' : 'POST',
-				valid_form = formValidation($form, !!(form_data.event_id));
-
-			if(valid_form){
-				$.extend(true, data, form_data);
-
-				data.tags = tags;
-				data.filenames = {
-					vertical: data.filename_vertical,
-					horizontal: data.filename_horizontal
-				};
-				if(data.registration_required){
-					data.registration_till = ""+data.registration_till_date+'T'+data.registration_till_time_hours+':'+data.registration_till_time_minutes+':00'
-				}
-				if(data.delayed_publication){
-					data.public_at = ""+data.public_at_date+'T'+data.public_at_time_hours+':'+data.public_at_time_minutes+':00'
-				}
-
-				data.dates = [];
-				if(data.different_time){
-					var	selected_days_rows = $('.SelectedDaysRows').children();
-
-					selected_days_rows.each(function(){
-						var $this = $(this);
-						data.dates.push({
-							event_date: $this.find('.DatePicker').data('selected_day'),
-							start_time: $this.find('.StartHours').val() + ':' + $this.find('.StartMinutes').val(),
-							end_time: $this.find('.EndHours').val() + ':' + $this.find('.EndMinutes').val()
-						});
-					});
-				} else {
-					var	MainCalendar = $('.EventDatesCalendar').data('calendar'),
-						$main_time = $('.MainTime'),
-						start_time = $main_time.find('.StartHours').val() + ':' + $main_time.find('.StartMinutes').val(),
-						end_time = $main_time.find('.EndHours').val() + ':' + $main_time.find('.EndMinutes').val();
-
-					MainCalendar.selected_days.forEach(function(day){
-						data.dates.push({
-							event_date: day,
-							start_time: start_time,
-							end_time: end_time
-						})
-					});
-				}
-
-
-				if($submit_button.data('guid')){
-					VK.Api.call("wall.post", $submit_button.data(), function(){});
-					data.vk_post_id = $submit_button.data('guid');
-				}
-
-				$.ajax({
-					url: url,
-					data: JSON.stringify(data),
-					contentType: 'application/json',
-					method: method,
-					success: function(res){
-						if(res.status){
-							if(data.event_id){
-								$view.find('#edit_event_event_id').val(res.data.event_id);
-								$('body').stop().animate({scrollTop:0}, 1000, 'swing', function() {
-									showNotification('Событие успешно добавлено', 3000);
-								});
-							} else {
-								$('body').stop().animate({scrollTop:0}, 1000, 'swing', function() {
-									showNotification('Событие успешно обновлено', 3000);
-								});
-							}
-						} else {
-							if(res.text){
-								showNotifier({text: res.text, status: false});
-							} else {
-								showNotifier({text: 'Упс. Что-то пошло не так. Скорее всего у нас ведутся какие-то работы.', status: false});
-							}
-						}
-					}
-				});
-			}
-
-		});
+		$view.find('#edit_event_submit').off('click.Submit').on('click.Submit', submitEditEvent);
 
 	}
 
@@ -1971,6 +1830,149 @@ function EditEvent($view, $content_block){
 	}
 
 
+	function submitEditEvent(){
+		var $submit_button = $(this);
+
+		function formValidation($form, for_edit){
+			var is_valid = true;
+
+			$form.find(':required').not(':disabled').each(function(){
+				var $this = $(this);
+				if($this.val() === ""){
+					if(is_valid){
+						var scroll_top = Math.ceil($this.offset().top - 150);
+						$('body').stop().animate({scrollTop: scroll_top}, 1000, 'swing');
+					}
+					handleErrorField($this);
+					is_valid = false;
+				}
+			});
+
+			if(!for_edit){
+				$form.find('.DataUrl').each(function(){
+					var $this = $(this);
+					if($this.val() === ""){
+						if(is_valid){
+							var scroll_top = Math.ceil($this.closest('.EditEventImgLoadWrap').offset().top - 150);
+							$('body').stop().animate({scrollTop: scroll_top}, 1000, 'swing', function(){
+								showNotifier({text: 'Пожалуйста, добавьте к событию обложку', status: false})
+							});
+						}
+						is_valid = false;
+					}
+				});
+			}
+			return is_valid;
+		}
+
+		var $form = $view.find("#edit-event-form"),
+			data = {
+				event_id: null,
+				title: null,
+				image_vertical: null,
+				image_horizontal: null,
+				organization_id: null,
+				location: null,
+				description: null,
+				detail_info_url: null,
+				different_time: null,
+				dates: null,
+				tags: null,
+				registration_required: null,
+				registration_till: null,
+				is_free: null,
+				min_price: null,
+				delayed_publication: null,
+				public_at: null,
+				filenames: {
+					vertical: null,
+					horizontal: null
+				}
+			},
+			form_data = $form.serializeForm(),
+			tags = form_data.tags ? form_data.tags.split(',') : null,
+			url = form_data.event_id ? '/api/v1/events/'+form_data.event_id : '/api/v1/events/',
+			method = form_data.event_id ? 'PUT' : 'POST',
+			valid_form = formValidation($form, !!(form_data.event_id));
+
+		if(valid_form){
+			$.extend(true, data, form_data);
+
+			data.tags = tags;
+			data.filenames = {
+				vertical: data.filename_vertical,
+				horizontal: data.filename_horizontal
+			};
+			if(data.registration_required){
+				data.registration_till = ""+data.registration_till_date+'T'+data.registration_till_time_hours+':'+data.registration_till_time_minutes+':00'
+			}
+			if(data.delayed_publication){
+				data.public_at = ""+data.public_at_date+'T'+data.public_at_time_hours+':'+data.public_at_time_minutes+':00'
+			}
+
+			data.dates = [];
+			if(data.different_time){
+				var	selected_days_rows = $('.SelectedDaysRows').children();
+
+				selected_days_rows.each(function(){
+					var $this = $(this);
+					data.dates.push({
+						event_date: $this.find('.DatePicker').data('selected_day'),
+						start_time: $this.find('.StartHours').val() + ':' + $this.find('.StartMinutes').val(),
+						end_time: $this.find('.EndHours').val() + ':' + $this.find('.EndMinutes').val()
+					});
+				});
+			} else {
+				var	MainCalendar = $('.EventDatesCalendar').data('calendar'),
+					$main_time = $('.MainTime'),
+					start_time = $main_time.find('.StartHours').val() + ':' + $main_time.find('.StartMinutes').val(),
+					end_time = $main_time.find('.EndHours').val() + ':' + $main_time.find('.EndMinutes').val();
+
+				MainCalendar.selected_days.forEach(function(day){
+					data.dates.push({
+						event_date: day,
+						start_time: start_time,
+						end_time: end_time
+					})
+				});
+			}
+
+
+			if($submit_button.data('guid')){
+				VK.Api.call("wall.post", $submit_button.data(), function(){});
+				data.vk_post_id = $submit_button.data('guid');
+			}
+
+			$.ajax({
+				url: url,
+				data: JSON.stringify(data),
+				contentType: 'application/json',
+				method: method,
+				success: function(res){
+					ajaxHandler(res, function(res_data){
+						if(data.event_id){
+							$('body').stop().animate({scrollTop:0}, 1000, 'swing', function() {
+								showNotification('Событие успешно обновлено', 3000);
+							});
+						} else {
+							$view.find('#edit_event_event_id').val(res_data.event_id);
+							$('body').stop().animate({scrollTop:0}, 1000, 'swing', function() {
+								showNotification('Событие успешно добавлено', 3000);
+							});
+						}
+					}, function(res){
+						if(res.text){
+							showNotifier({text: res.text, status: false});
+						} else {
+							ajaxErrorHandler(res);
+						}
+					});
+				}
+			});
+		}
+
+	}
+
 }
 
 function Example($view, $content_block){
@@ -2074,21 +2076,25 @@ function ajaxHandler(result, success, error){
 		if(result.status){
 			success(result.data, result.text);
 		} else {
-			error();
+			error(result);
 		}
 	} catch(e){
 		error(e);
 	}
 }
 
-function ajaxErrorHandler(){
+function ajaxErrorHandler(event, jqxhr, settings, thrownError){
 	var args = Array.prototype.slice.call(arguments);
 	console.group('ajax error');
 	args.forEach(function(arg){
 		console.log(arg);
 	});
 	console.groupEnd();
-	showNotifier({text: 'Упс, что-то пошло не так', status: false});
+	if(jqxhr && jqxhr.responseJSON && jqxhr.responseJSON.text){
+		showNotifier({text: jqxhr.responseJSON.text, status: false});
+	} else {
+		showNotifier({text: 'Упс, что-то пошло не так', status: false});
+	}
 }
 
 $(document)
