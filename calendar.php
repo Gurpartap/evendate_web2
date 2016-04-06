@@ -23,37 +23,37 @@
 	<link href='https://fonts.googleapis.com/css?family=Didact+Gothic&subset=latin,cyrillic,cyrillic-ext' rel='stylesheet' type='text/css'>
 	<link href='https://fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,500,500italic&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
 	<!-- FONT AWESOME-->
-	<link rel="stylesheet" href="vendor/fontawesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="/vendor/fontawesome/css/font-awesome.min.css">
 	<!-- SIMPLE LINE ICONS-->
-	<link rel="stylesheet" href="vendor/simple-line-icons/css/simple-line-icons.css">
+	<link rel="stylesheet" href="/vendor/simple-line-icons/css/simple-line-icons.css">
 	<!-- ANIMATE.CSS-->
-	<link rel="stylesheet" href="vendor/animate.css/animate.min.css">
+	<link rel="stylesheet" href="/vendor/animate.css/animate.min.css">
 	<!-- =============== PAGE VENDOR STYLES ===============-->
 	<!-- TAGS INPUT-->
-	<link rel="stylesheet" href="vendor/bootstrap-tagsinput/dist/bootstrap-tagsinput.css">
+	<link rel="stylesheet" href="/vendor/bootstrap-tagsinput/dist/bootstrap-tagsinput.css">
 	<!-- FULLCALENDAR-->
-	<link rel="stylesheet" href="vendor/fullcalendar/dist/fullcalendar.css">
+	<link rel="stylesheet" href="/vendor/fullcalendar/dist/fullcalendar.css">
 	<!-- =============== CROPPER STYLES ===============-->
-	<link rel="stylesheet" href="vendor/cropper/css/cropper.css">
+	<link rel="stylesheet" href="/vendor/cropper/css/cropper.css">
 	<!-- =============== BOOTSTRAP STYLES ===============-->
-	<link rel="stylesheet" href="app/css/bootstrap.css" id="bscss">
+	<link rel="stylesheet" href="/app/css/bootstrap.css" id="bscss">
 	<!-- Loaders.css-->
 	<link rel="stylesheet" href="/vendor/loaders.css/loaders.css">
 	<!-- =============== APP STYLES ===============-->
-	<link rel="stylesheet" href="app/css/app.css" id="maincss">
-	<link rel="stylesheet" href="app/css/friends.css"">
+	<link rel="stylesheet" href="/app/css/app.css" id="maincss">
+	<link rel="stylesheet" href="/app/css/friends.css"">
 	<!-- DATERANGEPICKER-->
-	<link rel="stylesheet" href="vendor/daterangepicker/daterangepicker.css">
+	<link rel="stylesheet" href="/vendor/daterangepicker/daterangepicker.css">
 	<!-- Pace -->
-	<link rel="stylesheet" href="vendor/pace/pace.css">
+	<link rel="stylesheet" href="/vendor/pace/pace.css">
 	<!-- SELECT2 -->
-	<link href="vendor/select2v3/select2.css" rel="stylesheet" />
-	<link href="vendor/select2v3/select2-bootstrap.css" rel="stylesheet" />
-	<!--<link href="vendor/select2/css/select2.css" rel="stylesheet" />-->
+	<link href="/vendor/select2v3/select2.css" rel="stylesheet" />
+	<link href="/vendor/select2v3/select2-bootstrap.css" rel="stylesheet" />
+	<!--<link href="/vendor/select2/css/select2.css" rel="stylesheet" />-->
 	<!-- SCROLLBAR -->
-	<link href="vendor/jquery.scrollbar/jquery.scrollbar.css" rel="stylesheet" />
+	<link href="/vendor/jquery.scrollbar/jquery.scrollbar.css" rel="stylesheet" />
 
-	<link rel="stylesheet" href="app/css/main.css">
+	<link rel="stylesheet" href="/app/css/main.css">
 </head>
 
 <body>
@@ -63,7 +63,7 @@
         <div class="aside-inner">
             <nav data-sidebar-anyclick-close="" class="sidebar">
                 <div class="brand-name">
-                    <div class="logo"><a title="Перейти к моей ленте" href="/timeline"><img src="app/img/logo_500.png"> Evendate</a></div>
+                    <div class="logo"><a title="Перейти к моей ленте" href="/timeline"><img src="/app/img/logo_500.png"> Evendate</a></div>
                 </div>
                 <!-- END user info-->
                 <ul class="nav">
@@ -539,53 +539,53 @@
 
 <!-- =============== VENDOR SCRIPTS ===============-->
 <!-- MODERNIZR-->
-<script src="vendor/modernizr/modernizr.js"></script>
+<script src="/vendor/modernizr/modernizr.js"></script>
 <!-- JQUERY-->
-<script src="vendor/jquery/dist/jquery.js"></script>
+<script src="/vendor/jquery/dist/jquery.js"></script>
 <!-- BOOTSTRAP-->
-<script src="vendor/bootstrap/dist/js/bootstrap.js"></script>
+<script src="/vendor/bootstrap/dist/js/bootstrap.js"></script>
 <!-- JQUERY EASING-->
-<script src="vendor/jquery.easing/js/jquery.easing.js"></script>
+<script src="/vendor/jquery.easing/js/jquery.easing.js"></script>
 <!-- ANIMO-->
-<script src="vendor/animo.js/animo.js"></script>
+<script src="/vendor/animo.js/animo.js"></script>
 <!-- SLIMSCROLL-->
-<script src="vendor/slimScroll/jquery.slimscroll.min.js"></script>
+<script src="/vendor/slimScroll/jquery.slimscroll.min.js"></script>
 <!-- IMG CROPPER-->
-<script src="vendor/cropper/js/cropper.js"></script>
+<script src="/vendor/cropper/js/cropper.js"></script>
 <!-- TAGS INPUT-->
-<script src="vendor/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js"></script>
+<script src="/vendor/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js"></script>
 <!-- MOMENT JS-->
-<script src="vendor/moment/min/moment-with-locales.min.js"></script>
+<script src="/vendor/moment/min/moment-with-locales.min.js"></script>
 <!-- DATERANGEINPUTS-->
-<script src="vendor/daterangepicker/daterangepicker.js"></script>
+<script src="/vendor/daterangepicker/daterangepicker.js"></script>
 <!-- INPUTMASKS -->
-<script src="vendor/jquery.inputmask/dist/jquery.inputmask.bundle.min.js"></script>
+<script src="/vendor/jquery.inputmask/dist/jquery.inputmask.bundle.min.js"></script>
 <!-- Google MAPS -->
 <script src="https://maps.googleapis.com/maps/api/js?sensor=true&libraries=places"></script>
-<script src="vendor/placepicker/jquery.placepicker.min.js"></script>
+<script src="/vendor/placepicker/jquery.placepicker.min.js"></script>
 <!-- PACE -->
-<script src="vendor/pace/pace.min.js"></script>
+<script src="/vendor/pace/pace.min.js"></script>
 <!-- SELECT2 -->
-<script src="vendor/select2v3/select2.min.js"></script>
-<script src="vendor/select2v3/select2_locale_ru.js"></script>
+<script src="/vendor/select2v3/select2.min.js"></script>
+<script src="/vendor/select2v3/select2_locale_ru.js"></script>
 <!-- HISTORY API -->
-<script src="vendor/history/jquery.history.js"></script>
+<script src="/vendor/history/jquery.history.js"></script>
 <!-- SCROLLBAR -->
-<script src="vendor/jquery.scrollbar/jquery.scrollbar.js"></script>
+<script src="/vendor/jquery.scrollbar/jquery.scrollbar.js"></script>
 <!-- NOTIFICATIONS API -->
-<script src="vendor/notify/notify.js"></script>
+<script src="/vendor/notify/notify.js"></script>
 <!-- JQUERY APPEAR-->
-<script src="vendor/appear/jquery.appear.js"></script>
+<script src="/vendor/appear/jquery.appear.js"></script>
 
 
 <!-- =============== APP SCRIPTS ===============-->
 <script src="<?=App::$SCHEMA.App::$NODE_DOMAIN?>:8080/socket.io/socket.io.js" type="text/javascript"></script>
-<script src="app/js/app.js"></script>
-<script src="app/js/calendar.js"></script>
-<script src="app/js/add.js"></script>
-<script src="app/js/Class.Calendar.js"></script>
-<script src="app/js/Class.DatePicker.js"></script>
-<script src="app/js/main.js"></script>
+<script src="/app/js/app.js"></script>
+<script src="/app/js/calendar.js"></script>
+<script src="/app/js/add.js"></script>
+<script src="/app/js/Class.Calendar.js"></script>
+<script src="/app/js/Class.DatePicker.js"></script>
+<script src="/app/js/main.js"></script>
 
 
 <?php

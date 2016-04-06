@@ -158,7 +158,7 @@ function SubscribeButton($btn, options){
 		subscribed: 'fa-check'
 	};
 	this.colors = {
-		subscribe: '-color_neutral_alt',
+		subscribe: '-color_neutral_secondary',
 		unsubscribe: '-color_secondary',
 		subscribed: '-color_secondary'
 	};
@@ -173,11 +173,11 @@ function SubscribeButton($btn, options){
 		self.$btn
 			.off('mouseenter.hoverSubscribed mouseleave.hoverSubscribed')
 			.on('mouseenter.hoverSubscribed', function(){
-				self.$btn.addClass(self.icons.unsubscribe).removeClass(self.icons.subscribed);
+				self.$btn.removeClass([self.icons.subscribed, self.colors.subscribed].join(' ')).addClass([self.icons.unsubscribe, self.colors.unsubscribe].join(' '));
 				self.$btn.children('.Text').text(self.labels.unsubscribe);
 			})
 			.on('mouseleave.hoverSubscribed', function(){
-				self.$btn.addClass(self.icons.subscribed).removeClass(self.icons.unsubscribe);
+				self.$btn.removeClass([self.icons.unsubscribe, self.colors.unsubscribe].join(' ')).addClass([self.icons.subscribed, self.colors.subscribed].join(' '));
 				self.$btn.children('.Text').text(self.labels.subscribed);
 			});
 		return self.$btn;

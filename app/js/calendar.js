@@ -238,11 +238,11 @@ function toggleSubscriptionState(state, entity_id, callback){
 		},
 
 		options = (state == false) ? {
-			url: 'api/v1/organizations/' + entity_id + '/subscriptions',
+			url: '/api/v1/organizations/' + entity_id + '/subscriptions',
 			type: 'DELETE',
 			success: cb
 		} : {
-			url: 'api/v1/organizations/' + entity_id + '/subscriptions',
+			url: '/api/v1/organizations/' + entity_id + '/subscriptions',
 			type: 'POST',
 			success: cb
 		};
@@ -374,7 +374,7 @@ function MyTimeline($view, $content_block){
 function OrganizationsList($view, $content_block){
 	if (__STATES.getCurrentState() == 'organizations' && organizations_loaded) return;
 	$.ajax({
-		url: 'api/v1/organizations?fields=is_subscribed,subscribed_count',
+		url: '/api/v1/organizations?fields=is_subscribed,subscribed_count',
 		success: function(res){
 			organizations_loaded = true;
 			var _organizations_by_types = {},
@@ -415,10 +415,12 @@ function OrganizationsList($view, $content_block){
 						}
 						organization.subscribed_count_text = getUnitsText(organization.subscribed_count, __C.TEXTS.SUBSCRIBERS);
 						var $organization = tmpl('new-organization-item', organization).data('organization', organization);
+						/*
 						$organization.find('.organization-img, .heading>span').on('click', function(){
 							showOrganizationalModal(organization.id)
-						});
+						});*/
 						$organizations.append($organization);
+						bindOnClick();
 					});
 
 					$organizations.find('.subscribe-btn').on('click', function(){
@@ -467,8 +469,8 @@ function OrganizationsList($view, $content_block){
 
 function Organization($view, $content_block){
 
-	var organization_id = 1,
-		url = 'api/v1/organizations/'+organization_id;
+	var organization_id = __STATES.getCurrentState().split('/')[1],
+		url = '/api/v1/organizations/'+organization_id;
 
 	function bindEventsEvents($parent){
 		bindRippleEffect($parent);
@@ -477,7 +479,7 @@ function Organization($view, $content_block){
 
 		$parent.find('.EventSubscribe').not('.-Handled_EventSubscribe').on('click.eventSubscribe', function(){
 			var $this = $(this),
-				url = 'api/v1/events/'+$this.data('event-id')+'/favorites',
+				url = '/api/v1/events/'+$this.data('event-id')+'/favorites',
 				method = $this.hasClass('-Subscribed') ? 'DELETE' : 'POST';
 
 			$.ajax({
@@ -485,7 +487,6 @@ function Organization($view, $content_block){
 				method: method,
 				success: function(res){
 					ajaxHandler(res, function(data, text){
-						showNotifier({text: text, status: true});
 					}, ajaxErrorHandler)
 				}
 			});
@@ -499,7 +500,7 @@ function Organization($view, $content_block){
 					subscribed: 'В избранном'
 				},
 				colors: {
-					subscribe: '-color_neutral_alt',
+					subscribe: '-color_neutral_secondary',
 					unsubscribe: '-color_secondary',
 					subscribed: '-color_secondary'
 				}
@@ -515,7 +516,7 @@ function Organization($view, $content_block){
 
 		$parent.find('.OrganizationSubscribe').on('click.organizationSubscribe', function(){
 			var $this = $(this),
-				url = 'api/v1/organizations/'+$this.data('organization-id')+'/subscriptions',
+				url = '/api/v1/organizations/'+$this.data('organization-id')+'/subscriptions',
 				method = $this.hasClass('-Subscribed') ? 'DELETE' : 'POST';
 
 			$.ajax({
@@ -523,7 +524,6 @@ function Organization($view, $content_block){
 				method: method,
 				success: function(res){
 					ajaxHandler(res, function(data, text){
-						showNotifier({text: text, status: true});
 					}, ajaxErrorHandler)
 				}
 			});
@@ -533,8 +533,8 @@ function Organization($view, $content_block){
 		new SubscribeButton($('.OrganizationSubscribe'), {
 			colors: {
 				subscribe: '-color_secondary',
-				unsubscribe: '-color_secondary',
-				subscribed: '-color_secondary'
+				unsubscribe: '-color_neutral',
+				subscribed: '-color_neutral'
 			}
 		});
 		bindEventsEvents($parent);
@@ -644,14 +644,14 @@ function Organization($view, $content_block){
 				}
 			}
 			$events = $events.add(tmpl('organization-feed-event', $.extend({}, event, {
-				subscribe_button_classes: event.is_favorite ? ['fa-check', '-color_secondary', '-Subscribed'].join(' ') : ['fa-plus', '-color_neutral_alt'].join(' '),
+				subscribe_button_classes: event.is_favorite ? ['fa-check', '-color_secondary', '-Subscribed'].join(' ') : ['fa-plus', '-color_neutral_secondary'].join(' '),
 				subscribe_button_text: event.is_favorite ? 'В избранном' : 'Добавить в избранное',
 				date: m_event_date.format(__C.DATE_FORMAT),
 				subscribers: $subscribers,
 				avatars_collection_classes: avatars_collection_classes.join(' '),
 				favored_users_show: favored_users_count ? '' : '-cast',
 				favored_users_count: favored_users_count,
-				time: times.join('<br>')
+				time: times.join('; ')
 			})));
 		});
 
@@ -659,17 +659,17 @@ function Organization($view, $content_block){
 	}
 
 	function uploadEvents($wrapper, is_future, onSuccess){
-		var offset = $wrapper.data('next_offset') ? $wrapper.data('next_offset') : 10,
+		var offset = $wrapper.data('next_offset') ? $wrapper.data('next_offset') : 0,
 			data = {
 				length: 10,
 				offset: offset,
 				organization_id: organization_id,
-				fields: 'image_horizontal_medium_url,favored_users_count,is_favorite,favored{length:5},dates',
-				order_by: is_future ? '-nearest_event_date' : 'nearest_event_date',
+				fields: 'image_horizontal_medium_url,image_vertical_medium_url,favored_users_count,is_favorite,favored{length:5},dates',
+				order_by: is_future ? '-nearest_event_date' : '-last_event_date',
 				future: is_future ? 'true' : 'false'
 			};
 		$.ajax({
-			url: 'api/v1/events/',
+			url: '/api/v1/events/',
 			method: 'GET',
 			data: data,
 			success: function(res){
@@ -730,7 +730,7 @@ function Organization($view, $content_block){
 				data = data[0];
 
 				$page_wrapper.append(tmpl('organization-info-page', $.extend({
-					subscribe_button_classes: data.is_subscribed ? ['fa-check', '-Subscribed'].join(' ') : ['fa-plus'].join(' '),
+					subscribe_button_classes: data.is_subscribed ? ['fa-check', '-color_neutral', '-Subscribed'].join(' ') : ['fa-plus', '-color_secondary'].join(' '),
 					subscribe_button_text: data.is_subscribed ? 'Подписан' : 'Подписаться',
 					has_address: data.default_address ? '' : '-hidden'
 				}, data)));
@@ -819,9 +819,10 @@ function Search($view, $content_block){
 				organization.subscribed_count_text = getUnitsText(organization.subscribed_count, __C.TEXTS.SUBSCRIBERS);
 				var $organization = tmpl('organization-search-item', organization);
 				$organizations_wrapper.append($organization);
+				bindOnClick();/*
 				$organization.on('click', function(){
 					showOrganizationalModal(organization.id);
-				})
+				})*/
 			});
 
 			if (res.data.events.length == 0){
@@ -860,6 +861,7 @@ function bindFeedEvents($view){
 			History.pushState({page: 'friend-' + $this.data('friend-id')}, $this.text(), 'friend-' + $this.data('friend-id'));
 		}
 	});
+	bindOnClick();
 }
 
 
@@ -876,7 +878,7 @@ function OneFriend($view, $content_block){
 			$content.find('.friend-events-block').remove();
 		}
 		$.ajax({
-			url: 'api/v1/users/' + friend_id + '/actions?fields=entity,created_at,user,type_code,event{fields:"organization_logo_small_url,image_square_vertical_url,organization_short_name"},organization{fields:"subscribed_count,img_medium_url"}&&order_by=-created_at&length=10&offset=' + (10 * page_number++),
+			url: '/api/v1/users/' + friend_id + '/actions?fields=entity,created_at,user,type_code,event{fields:"organization_logo_small_url,image_square_vertical_url,organization_short_name"},organization{fields:"subscribed_count,img_medium_url"}&&order_by=-created_at&length=10&offset=' + (10 * page_number++),
 			success: function(res){
 				var hide_btn = false;
 				if ((res.data.length == 0 && page_number != 1) || (res.data.length < 10 && res.data.length > 0)){
@@ -1026,7 +1028,7 @@ function Friends($view, $content_block){
 			$view.find('.friend-events-block').remove();
 		}
 		$.ajax({
-			url: 'api/v1/users/feed?fields=entity,created_at,user,type_code,event{fields:"organization_logo_small_url,image_square_vertical_url,organization_short_name"},organization{fields:"subscribed_count,img_medium_url"}&&order_by=-created_at&length=10&offset=' + (10 * page_number++),
+			url: '/api/v1/users/feed?fields=entity,created_at,user,type_code,event{fields:"organization_logo_small_url,image_square_vertical_url,organization_short_name"},organization{fields:"subscribed_count,img_medium_url"}&&order_by=-created_at&length=10&offset=' + (10 * page_number++),
 			success: function(res){
 				var cards_by_users = {};
 				res.data.forEach(function(stat){
@@ -1086,7 +1088,7 @@ function OneDay($view, $content_block){
 	data['date'] = date;
 	data['length'] = 100;
 	$.ajax({
-		url: 'api/v1/events/my',
+		url: '/api/v1/events/my',
 		data: data,
 		type: 'GET',
 		dataType: 'JSON',
@@ -1307,7 +1309,7 @@ function EditEvent($view, $content_block){
 		}
 
 		$.ajax({
-			url: 'api/v1/organizations',
+			url: '/api/v1/organizations',
 			method: 'GET',
 			data: {
 				privileges: 'can_add',
@@ -1532,7 +1534,7 @@ function EditEvent($view, $content_block){
 				},
 				form_data = $form.serializeForm(),
 				tags = form_data.tags ? form_data.tags.split(',') : null,
-				url = form_data.event_id ? 'api/v1/events/'+form_data.event_id : 'api/v1/events/',
+				url = form_data.event_id ? '/api/v1/events/'+form_data.event_id : '/api/v1/events/',
 				method = form_data.event_id ? 'PUT' : 'POST',
 				valid_form = formValidation($form, !!(form_data.event_id));
 
@@ -1838,7 +1840,7 @@ function EditEvent($view, $content_block){
 		initVkDataCopying();
 	} else {
 
-		var url = 'api/v1/events/'+event_id;
+		var url = '/api/v1/events/'+event_id;
 		$.ajax({
 			url: url,
 			method: 'GET',
@@ -1935,7 +1937,7 @@ function EditEvent($view, $content_block){
 	}
 	function checkVkPublicationAbility(){
 		$.ajax({
-			url: 'api/v1/users/me',
+			url: '/api/v1/users/me',
 			method: 'GET',
 			success: function(res){
 				if(Array.isArray(res.data)){
@@ -1988,28 +1990,29 @@ function printSubscribedOrganizations(organization){
 		if ($list.find('.organization-' + organization.id).length == 0){
 			tmpl('organizations-item', organization)
 				.addClass('fadeInLeftBig')
-				.prependTo($list)
+				.prependTo($list)/*
 				.on('click', function(){
 					showOrganizationalModal($(this).data('organization-id'));
-				});
+				})*/;
 		}
 	}else{
 		$.ajax({
-			'url': 'api/v1/organizations/subscriptions',
+			'url': '/api/v1/organizations/subscriptions',
 			success: function(res){
 				res.data.forEach(function(organization){
 					if (organization.is_subscribed && $list.find('.organization-' + organization.id).length == 0){
 						tmpl('organizations-item', organization)
 							.addClass('fadeInLeftBig')
-							.prependTo($list)
+							.prependTo($list)/*
 							.on('click', function(){
 								showOrganizationalModal($(this).data('organization-id'));
-							});
+							})*/;
 					}
 				});
 			}
 		});
 	}
+	bindOnClick();
 }
 
 function setDaysWithEvents(){
@@ -2048,8 +2051,8 @@ function bindOnClick(){
 			controller_name = $this.data('controller');
 		if ($this.hasClass(__C.CLASSES.DISABLED)) return true;
 		if (page_name != undefined){
-			History.pushState($this.data(), $this.data('title') ? $this.data('title'): $this.text(), page_name);
-		}else{
+			History.pushState($this.data(), $this.data('title') ? $this.data('title'): $this.text(), '/'+page_name);
+		} else {
 			if (window[controller_name] != undefined && window[controller_name] instanceof Function){
 				window[controller_name]();
 			}
@@ -2261,7 +2264,8 @@ $(document)
 
 		function renderState(){
 			var state = History.getState(),
-				page = __STATES.getCurrentState();
+				page_split = __STATES.getCurrentState().split('/'),
+				page = page_split[0];
 
 			if(state.hash.indexOf('friend-') !== -1){
 				var $friends_app = $('.friends-app');

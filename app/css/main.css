@@ -859,10 +859,10 @@ input, select, textarea, button {font-family: inherit}
 	text-transform: uppercase;
 	overflow: hidden;
 	cursor: pointer;
-	-webkit-transition: box-shadow .5s ease;
-	-moz-transition: box-shadow .5s ease;
-	-o-transition: box-shadow .5s ease;
-	transition: box-shadow .5s ease;
+	-webkit-transition: box-shadow .5s ease, background-color .5s ease, color .5s ease;
+	-moz-transition: box-shadow .5s ease, background-color .5s ease, color .5s ease;
+	-o-transition: box-shadow .5s ease, background-color .5s ease, color .5s ease;
+	transition: box-shadow .5s ease, background-color .5s ease, color .5s ease;
 
 	-webkit-transform: translate3d(0, 0, 0);
 	-moz-transform: translate3d(0, 0, 0);
@@ -897,9 +897,10 @@ a.button:hover {text-decoration: none}
 .button.-color_primary,
 .button.-color_secondary {color: #fff}
 .button.-color_secondary_alt {color: #f9306e}
-.button.-color_neutral {color: #5379b8}
-.button.-color_neutral_alt {color: #ff5f9e}
-.button.-color_marginal {color: #4a4a4a}
+.button.-color_marginal,
+.button.-color_neutral {color: #4a4a4a}
+.button.-color_neutral_primary {color: #5379b8}
+.button.-color_neutral_secondary {color: #ff5f9e}
 
 .button.-color_default {background-color: transparent}
 
@@ -908,11 +909,13 @@ a.button:hover {text-decoration: none}
 .button.-color_secondary {background-color: #ff5f9e}
 .button.-color_secondary_alt {background-color: #ffdeeb}
 .button.-color_neutral,
-.button.-color_neutral_alt {background-color: #fff}
+.button.-color_neutral_primary,
+.button.-color_neutral_secondary {background-color: #fff}
 .button.-color_marginal {background-color: #e0e0e0}
 
 .button.-color_neutral,
-.button.-color_neutral_alt {box-shadow: 0 1px 2px #b3b3b3, 0 0 3px #ccc}
+.button.-color_neutral_primary,
+.button.-color_neutral_secondary {box-shadow: 0 1px 2px #b3b3b3, 0 0 3px #ccc}
 
 .button:not(:disabled).-color_default:hover,
 .button:not(:disabled):not([class*="-color_"]):hover {background-color: #f1f1f1}
@@ -934,7 +937,7 @@ a.button:hover {text-decoration: none}
 }
 .button.-color_default > .ripple,
 .button.-color_neutral > .ripple,
-.button.-color_neutral_alt > .ripple,
+.button.-color_neutral_secondary > .ripple,
 .button:not([class*="-color_"]) > .ripple {background-color: #c1cde9}
 .ripple.animate {animation: ripple 0.65s linear;}
 @keyframes ripple {
@@ -1394,9 +1397,18 @@ html.-open_modal {overflow: hidden}
 	width: 30px;
 	height: 30px;
 }
+.avatar.-size_40x40 {
+	width: 40px;
+	height: 40px;
+}
 .avatar.-size_50x50 {
 	width: 50px;
 	height: 50px;
+}
+
+.avatar.-size_40x40.-bordered {
+	border: 1px solid #fff;
+	box-shadow: 0 1px 4px 0 #bdbdbd;
 }
 
 /* /Avatar */
@@ -1419,6 +1431,10 @@ html.-open_modal {overflow: hidden}
 .avatars_collection.-size_30x30 > .avatar {
 	width: 30px;
 	height: 30px;
+}
+.avatars_collection.-size_40x40 > .avatar {
+	width: 40px;
+	height: 40px;
 }
 .avatars_collection.-size_50x50 > .avatar {
 	width: 50px;
@@ -1470,6 +1486,7 @@ html.-open_modal {overflow: hidden}
 .avatars_collection.-subscribable.-shift > .avatar:last-child {left: 6px}
 .avatars_collection.-subscribable.-size_small > .avatar:first-child,
 .avatars_collection.-subscribable.-size_30x30 > .avatar:first-child {margin-left: -24px}
+.avatars_collection.-subscribable.-size_40x40 > .avatar:first-child {margin-left: -34px}
 .avatars_collection.-subscribable.-size_50x50 > .avatar:first-child {margin-left: -44px}
 
 .avatars_collection.-subscribable.-subscribed > .avatar:first-child {
@@ -1517,20 +1534,24 @@ html.-open_modal {overflow: hidden}
 .avatar_block > .avatar + .avatar_name {
 	display: inline-block;
 	vertical-align: middle;
-	width: -webkit-calc(100% - 70px - .5em);
-	width: calc(100% - 70px - .5em);
-	margin-left: .5em;
+	width: -webkit-calc(100% - 70px - 1.1em);
+	width: calc(100% - 70px - 1.1em);
+	margin-left: 1.1em;
 	font-size: 1rem;
 }
 
 .avatar_block > .avatar.-size_small + .avatar_name,
 .avatar_block > .avatar.-size_30x30 + .avatar_name {
-	width: -webkit-calc(100% - 30px - .5em);
-	width: calc(100% - 30px - .5em);
+	width: -webkit-calc(100% - 30px - 1.1em);
+	width: calc(100% - 30px - 1.1em);
+}
+.avatar_block > .avatar.-size_40x40 + .avatar_name {
+	width: -webkit-calc(100% - 40px - 1.1em);
+	width: calc(100% - 40px - 1.1em);
 }
 .avatar_block > .avatar.-size_50x50 + .avatar_name {
-	width: -webkit-calc(100% - 50px - .5em);
-	width: calc(100% - 50px - .5em);
+	width: -webkit-calc(100% - 50px - 1.1em);
+	width: calc(100% - 50px - 1.1em);
 }
 
 
@@ -1538,7 +1559,7 @@ html.-open_modal {overflow: hidden}
 /* Subscriber */
 
 .subscriber {
-	padding: 3px 18px;
+	padding: 6px 18px;
 	cursor: pointer;
 }
 
@@ -1931,10 +1952,7 @@ html.-open_modal {overflow: hidden}
 .organization_description_block {padding: 24px 24px 12px}
 .organization_description {margin-bottom: 1em}
 
-.organization_feed > .tabs_header {
-	padding: 0 24px;
-	font-size: .8em;
-}
+.organization_feed > .tabs_header {padding: 0 24px}
 
 .organization_feed_container {
 	margin-top: .5em;
@@ -1990,6 +2008,8 @@ html.-open_modal {overflow: hidden}
 }
 .organization_feed_block_title > a {cursor: pointer}
 .organization_feed_block_title > a:hover {color: #6b88c7}
+
+.organization_address {margin-top: .2rem}
 
 .organization_feed_block_service {height: 55px}
 
