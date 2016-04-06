@@ -233,11 +233,8 @@ class Event extends AbstractEntity{
 
 	public static function create(PDO $db, Organization $organization, array $data){
 
-		App::createMysqlDB();
 		try{
 
-			global $__mysql_db;
-			$__mysql_db->beginTransaction();
 			$db->beginTransaction();
 			if (!isset($data['dates']) || count($data['dates']) == 0)
 				throw new InvalidArgumentException('Укажите, пожалуйста, даты','');
@@ -280,34 +277,6 @@ class Event extends AbstractEntity{
 			$result = $p_ins_event->fetch(PDO::FETCH_ASSOC);
 			$event_id = $result['id'];
 
-			$q_ins_event_mysql = 'INSERT INTO events(
-				id, creator_id, organization_id, title, description, location, location_uri, event_start_date, event_type_id,
-				notifications_schema_json, created_at, event_end_date, image_vertical, detail_info_url, begin_time,
-				end_time, image_horizontal, location_object, status)
-				VALUES(
-				:id, :creator_id, :organization_id, :title, :description, :location,
-				NULL, NULL, 1, NULL, NOW(), NULL, :image_vertical,
-				:detail_info_url, :begin_time, :end_time, :image_horizontal, NULL, :status)';
-
-			$p_ins_mysql = $__mysql_db->prepare($q_ins_event_mysql);
-
-			$result_mysql = $p_ins_mysql->execute(array(
-				':id' => $event_id,
-				':creator_id' => $data['creator_id'],
-				':organization_id' => $organization->getId(),
-				':title' => $data['title'],
-				':description' => $data['description'],
-				':location' => $data['location'],
-				':image_vertical' => $img_vertical_filename,
-				':image_horizontal' => $img_horizontal_filename,
-				':detail_info_url' => $data['detail_info_url'],
-				':begin_time' => $data['begin_time'],
-				':end_time' => $data['end_time'],
-				':status' => $data['public_at'] instanceof DateTime ? '0' : '1'
-			));
-
-			if ($result_mysql === FALSE) throw new DBQueryException('CANT_CREATE_EVENT_MYSQL', $db);
-
 
 			self::saveDates($data['dates'], $db, $event_id);
 			self::saveEventTags($db, $event_id, $data['tags']);
@@ -323,11 +292,9 @@ class Event extends AbstractEntity{
 				14000);
 
 			$db->commit();
-			$__mysql_db->commit();
 			return new Result(true, 'Событие успешно создано', array('event_id' => $event_id));
 		}catch(Exception $e){
 			$db->rollBack();
-			$__mysql_db->rollBack();
 			throw $e;
 		}
 	}
@@ -346,21 +313,13 @@ class Event extends AbstractEntity{
 	}
 
 	private static function saveEventTags(PDO $db, $event_id, array $tags) {
-		global $__mysql_db;
 
 		$p_upd = $db->prepare('UPDATE events_tags SET status = FALSE WHERE event_id = :event_id');
 		$p_upd->execute(array(':event_id' => $event_id));
 
-		$p_upd_mysql = $__mysql_db->prepare('UPDATE events_tags SET status = 0 WHERE event_id = :event_id');
-		$p_upd_mysql->execute(array(':event_id' => $event_id));
-
 		$q_ins_tags = 'INSERT INTO events_tags(event_id, tag_id, status)
 			VALUES(:event_id, :tag_id, TRUE) RETURNING id';
 		$p_ins_tags = $db->prepare($q_ins_tags);
-
-		$q_ins_tags_mysql = 'INSERT INTO events_tags(id, event_id, tag_id, status)
-			VALUES(:id, :event_id, :tag_id, 1)';
-		$p_ins_tags_mysql = $__mysql_db->prepare($q_ins_tags_mysql);
 
 		$inserted_count = 0;
 
@@ -379,30 +338,18 @@ class Event extends AbstractEntity{
 
 			$result = $p_ins_tags->fetch(PDO::FETCH_ASSOC);
 
-			$p_ins_tags_mysql->execute(array(
-				':id' => $result['id'],
-				':event_id' => $event_id,
-				':tag_id' => $tag_id
-			));
 			$inserted_count++;
 		}
 	}
 
 	private static function saveDates($dates, PDO $db, $event_id) {
-		global $__mysql_db;
 		$p_set_inactive = $db->prepare('UPDATE events_dates SET status = FALSE WHERE event_id = :event_id');
 		$p_set_inactive->execute(array(':event_id' => $event_id));
-
-		$p_set_inactive_mysql = $__mysql_db->prepare('UPDATE events_dates SET status = 0 WHERE event_id = :event_id');
-		$p_set_inactive_mysql->execute(array(':event_id' => $event_id));
 
 		$q_ins_dates = 'INSERT INTO events_dates(event_date, status, event_id, start_time, end_time)
 			VALUES(:event_date, TRUE, :event_id, :start_time, :end_time) RETURNING id';
 		$p_ins_dates = $db->prepare($q_ins_dates);
 
-		$q_ins_dates_mysql = 'INSERT INTO events_dates(id, event_date, status, event_id, created_at)
-			VALUES(:id, :event_date, 1, :event_id, NOW())';
-		$p_ins_dates_mysql = $__mysql_db->prepare($q_ins_dates_mysql);
 		foreach($dates as $date){
 			$p_ins_dates->execute(array(
 				':event_date' => $date['event_date'],
@@ -412,12 +359,6 @@ class Event extends AbstractEntity{
 			));
 
 			$result = $p_ins_dates->fetch(PDO::FETCH_ASSOC);
-
-			$p_ins_dates_mysql->execute(array(
-				':event_date' => $date['event_date'],
-				':id' => $result['id'],
-				':event_id' => $event_id
-			));
 		}
 	}
 
@@ -511,7 +452,7 @@ class Event extends AbstractEntity{
 				Fields::parseFields($fields[self::DATES_FIELD_NAME]['fields'] ?? 'start_time,end_time'),
 				Fields::parseFilters($fields[self::DATES_FIELD_NAME]['filters'] ?? ''),
 				array(
-					'length' => $fields[self::DATES_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+					'length' => $fields[self::DATES_FIELD_NAME]['length'] ?? 1000,
 					'offset' => $fields[self::DATES_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
 				),
 				Fields::parseOrderBy($fields[self::DATES_FIELD_NAME]['order_by'] ?? 'event_date'))->getData();
@@ -584,14 +525,10 @@ class Event extends AbstractEntity{
 		try{
 			$q_upd_event = App::queryFactory()->newUpdate();
 
-			App::createMysqlDB();
-			global $__mysql_db;
-
 			self::generateQueryData($data, $this->db);
 
 			$data['creator_id'] = $editor->getId();
 
-			$__mysql_db->beginTransaction();
 			$this->db->beginTransaction();
 
 			$q_upd_event
@@ -615,17 +552,6 @@ class Event extends AbstractEntity{
 				))
 				->where('id = ?', $this->getId());
 
-
-			$q_upd_event_mysql = 'UPDATE events SET
-				title = :title,
-				description = :description,
-				location = :location,
-				creator_id = :creator_id,
-				organization_id = :organization_id,
-				detail_info_url = :detail_info_url,
-				begin_time = :begin_time,
-				end_time = :end_time,
-				';
 
 
 			if (isset($data['file_names'])){
@@ -658,7 +584,6 @@ class Event extends AbstractEntity{
 			{
 				$img_horizontal_filename = md5(App::generateRandomString() . '-horizontal') .  '.' . $data['image_extensions']['horizontal'];
 				$query_data[':image_horizontal'] = $img_horizontal_filename;
-				$q_upd_event_mysql .= ' image_horizontal = :image_horizontal,';
 				App::saveImage($data['image_horizontal'],
 					self::IMAGES_PATH . self::IMG_SIZE_TYPE_LARGE . '/' . $img_horizontal_filename,
 					14000);
@@ -675,7 +600,6 @@ class Event extends AbstractEntity{
 			{
 				$img_vertical_filename = md5(App::generateRandomString() . '-vertical') .  '.' . $data['image_extensions']['vertical'];
 				$query_data[':image_vertical'] = $img_vertical_filename;
-				$q_upd_event_mysql .= ' image_vertical = :image_vertical,';
 
 				App::saveImage($data['image_vertical'],
 					self::IMAGES_PATH . self::IMG_SIZE_TYPE_LARGE . '/' . $img_vertical_filename,
@@ -685,14 +609,9 @@ class Event extends AbstractEntity{
 				));
 			}
 
-			$q_upd_event_mysql .= ' updated_at = NOW() WHERE events.id = :event_id';
-
-			$p_upd_event_mysql = $__mysql_db->prepare($q_upd_event_mysql);
 			$p_upd_event = $this->db->prepare($q_upd_event->getStatement());
 
-
-			$result = $p_upd_event_mysql->execute($query_data);
-			$p_upd_event->execute($q_upd_event->getBindValues());
+			$result =$p_upd_event->execute($q_upd_event->getBindValues());
 
 
 			if ($result === FALSE) throw new DBQueryException(implode(';', $this->db->errorInfo()), $this->db);
@@ -706,10 +625,8 @@ class Event extends AbstractEntity{
 			self::saveNotifications($this->getId(), $data, $this->db);
 			self::updateVkPostInformation($this->db, $this->getId(), $data);
 
-			$__mysql_db->commit();
 			$this->db->commit();
 		}catch(Exception $e){
-			$__mysql_db->rollback();
 			$this->db->rollback();
 			throw $e;
 		}

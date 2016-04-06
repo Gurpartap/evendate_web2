@@ -69,7 +69,7 @@ $__modules['users'] = array(
 		'{me/settings}' => function () use ($__request, $__user, $__db) {
 			return $__user->updateSettings($__request);
 		},
-		'{me/status}' => function () use ($__request, $__user, $__db) {
+		'{me/devices}' => function () use ($__request, $__user, $__db) {
 			$token = $__user->updateDeviceToken($__request['device_token'], $__request['client_type']);
 			$info = $__user->getMainInfo()->getData();
 			$info = array_merge($info, $token->getData());

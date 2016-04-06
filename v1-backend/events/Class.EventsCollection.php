@@ -251,7 +251,6 @@ class EventsCollection extends AbstractCollection{
 	                           User $user = null,
 	                           int $id,
 	                           array $fields = null) : Event{
-
 		$event = self::filter($db, $user, array('id' => $id), $fields);
 		return $event;
 	}

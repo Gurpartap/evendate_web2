@@ -25,7 +25,6 @@ process.on('uncaughtException', function (err) {
 
 var config_index = process.env.ENV ? process.env.ENV : 'dev',
 	real_config = config[config_index],
-	connection = mysql.createPool(real_config.mysql_db),
 	pg_conn_string = [
 		'postgres://',
 		real_config.db.user,
@@ -257,6 +256,10 @@ pg.connect(pg_conn_string, function(err, client, done) {
 
 	if (handleError(err)) return;
 
+	function sendUserNotifications(){
+		
+	}
+	
 	function sendNotifications() {
 
 		if (config_index == 'test' || config_index == 'local')
@@ -657,6 +660,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 		new CronJob('*/1 * * * *', function() {
 			resizeImages();
 			blurImages();
+			sendUserNotifications();
 		}, null, true);
 	} catch(ex) {
 		logger.error("CRON ERROR", "cron pattern not valid");
@@ -751,36 +755,9 @@ pg.connect(pg_conn_string, function(err, client, done) {
 					} else {
 						user = result.rows[0];
 						q_user = users.update(user_to_ins).where(users.id.equals(user.id)).returning('id').toQuery();
-						q_user_mysql = 'UPDATE users SET' +
-							' first_name = ' + connection.escape(data.user_info.first_name) + ',' +
-							' last_name = ' + connection.escape(data.user_info.last_name) + ',' +
-							' email = ' + connection.escape(data.access_data.email) + ',' +
-							' token = ' + connection.escape(user_token) + ',' +
-							' avatar_url = ' + connection.escape(data.user_info.photo_100) +
-							(UIDs.vk_uid != null ? ', vk_uid = ' + connection.escape(UIDs.vk_uid) : '') +
-							(UIDs.facebook_uid != null ? ', facebook_uid = ' + connection.escape(UIDs.facebook_uid) : '') +
-							(UIDs.google_uid != null ? ', google_uid = ' + connection.escape(UIDs.google_uid) : '') +
-							' WHERE id =' + connection.escape(user.id);
 					}
 
 					client.query(q_user, function(user_err, ins_result) {
-
-						if (is_new_user) {
-							q_user_mysql = 'INSERT INTO users (id, first_name, last_name, email, token, avatar_url, vk_uid, facebook_uid, google_uid) ' +
-								' VALUES (' + connection.escape(ins_result.rows[0].id) + ',' +
-								' ' + connection.escape(data.user_info.first_name) + ',' +
-								' ' + connection.escape(data.user_info.last_name) + ',' +
-								' ' + connection.escape(data.access_data.email) + ',' +
-								' ' + connection.escape(user_token) + ',' +
-								' ' + connection.escape(data.user_info.photo_100) + ', ' +
-								' ' + connection.escape(UIDs.vk_uid) + ', ' +
-								' ' + connection.escape(UIDs.facebook_uid) + ', ' +
-								' ' + connection.escape(UIDs.google_uid) + ')';
-						}
-
-						connection.query(q_user_mysql, function(err) {
-							handleError(err);
-						});
 
 						if (handleError(user_err)) return;
 
@@ -855,16 +832,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 									user_id: user.id,
 									token_type: token_type,
 									expires_on: token_time
-								}).returning('id').toQuery(),
-								q_ins_token_mysql = 'INSERT INTO tokens(token, user_id, token_type, expires_on) VALUES(' +
-									connection.escape(user_token) + ', ' +
-									connection.escape(user.id) + ', ' +
-									connection.escape(token_type) + ', ' +
-									connection.escape(token_time) + ')';
-
-							connection.query(q_ins_token_mysql, function(err) {
-								handleError(err);
-							});
+								}).returning('id').toQuery();
 
 							client.query(q_ins_token, function(err) {
 								if (handleError(err, 'CANT_INSERT_TOKEN')){
@@ -1299,7 +1267,6 @@ pg.connect(pg_conn_string, function(err, client, done) {
 				});
 			})
 		});
-
 
 		/**/
 		socket.on(EMIT_NAMES.VK_INTEGRATION.DATA_TO_POST, function(data) {

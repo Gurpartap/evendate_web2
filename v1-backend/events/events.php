@@ -27,7 +27,7 @@ $__modules['events'] = array(
 				$__user,
 				intval($id),
 				$__fields);
-			Statistics::Event($event, App::getCurrentUser(), App::DB(), Statistics::EVENT_VIEW);
+			Statistics::Event($event, App::getCurrentUser(), App::DB(), Statistics::EVENT_VIEW_DETAIL);
 			return new Result(true, '', array($event->getParams($__user, $__fields)->getData()));
 		},
 		'my' => function () use ($__db, $__request, $__user, $__offset, $__length, $__fields, $__order_by) { /*MY EVENTS!*/
