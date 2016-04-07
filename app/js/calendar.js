@@ -1722,7 +1722,7 @@ function EditEvent($view, $content_block){
 			url: url,
 			method: 'GET',
 			data: {
-				fields: 'location,description,tags,nearest_event_date,detail_info_url,public_at,registration_required,registration_till,is_free,min_price,dates{length:0,fields:"start_time,end_time"}'
+				fields: 'location,description,tags,nearest_event_date,detail_info_url,public_at,registration_required,registration_till,is_free,min_price,is_same_time,dates{length:0,fields:"start_time,end_time"}'
 			},
 			success: function(res){
 				ajaxHandler(res, function(data){
@@ -1763,7 +1763,19 @@ function EditEvent($view, $content_block){
 					initOrganization(data.organization_id);
 					checkVkPublicationAbility();
 
-					$view.find('#edit_event_different_time').prop('checked', true).trigger('change');
+					if(data.is_same_time){
+						var $day_row = $view.find('.MainTime'),
+							start_time = data.dates[0].start_time.split(':'),
+							end_time = data.dates[0].end_time ? data.dates[0].end_time.split(':') : [];
+						$day_row.find('.StartHours').val(start_time[0]);
+						$day_row.find('.StartMinutes').val(start_time[1]);
+						if(end_time.length){
+							$day_row.find('.EndHours').val(end_time[0]);
+							$day_row.find('.EndMinutes').val(end_time[1]);
+						}
+					} else {
+						$view.find('#edit_event_different_time').prop('checked', true).trigger('change');
+					}
 					selectDates($view, data.dates);
 					selectTags($view, data.tags);
 					if(data.image_vertical_url && data.image_horizontal_url){
