@@ -1310,40 +1310,6 @@ function EditEvent($view, $content_block){
 			bindRecrop($parent);
 		}
 
-		$.ajax({
-			url: '/api/v1/organizations',
-			method: 'GET',
-			data: {
-				privileges: 'can_add',
-				fields: 'default_address'
-			},
-			success: function(res){
-				var $wrapper = $('.EditEventOrganizations'),
-					organizations_options = $(),
-					$default_address_button = $view.find('.EditEventDefaultAddress');
-
-				res.data.forEach(function(organization){
-					organizations_options = organizations_options.add(tmpl('option', {
-						val: organization.id,
-						data: "data-image-url='"+organization.img_url+"' data-default-address='"+organization.default_address+"'",
-						display_name: organization.name
-					}));
-				});
-
-				$wrapper.find('select').append(organizations_options).select2({
-					containerCssClass: 'form_select2',
-					dropdownCssClass: 'form_select2_drop'
-				}).on('change', function(){
-					$default_address_button.data('default_address', $(this).children(":selected").data('default-address'));
-				});
-				if(organizations_options.length > 1){
-					$wrapper.removeClass('-hidden');
-				} else {
-					$wrapper.addClass('-hidden');
-				}
-				$default_address_button.data('default_address', res.data[0].default_address)
-			}
-		});
 
 		bindDatePickers($view);
 		bindTimeInput($view);
@@ -1500,6 +1466,55 @@ function EditEvent($view, $content_block){
 			initSelect2($groups);
 		}
 	});
+
+	function initOrganization(selected_id){
+		$.ajax({
+			url: '/api/v1/organizations',
+			method: 'GET',
+			data: {
+				privileges: 'can_add',
+				fields: 'default_address'
+			},
+			success: function(res){
+				ajaxHandler(res, function(data){
+					var $wrapper = $('.EditEventOrganizations'),
+						organizations_options = $(),
+						$default_address_button = $view.find('.EditEventDefaultAddress'),
+						$select = $wrapper.find('#edit_event_organization'),
+						selected_address;
+
+					data.forEach(function(organization){
+						if(organization.id == selected_id){
+							selected_address = organization.default_address;
+						}
+						organizations_options = organizations_options.add(tmpl('option', {
+							val: organization.id,
+							data: "data-image-url='"+organization.img_url+"' data-default-address='"+organization.default_address+"'",
+							display_name: organization.name
+						}));
+					});
+
+					$select.append(organizations_options).select2({
+						containerCssClass: 'form_select2',
+						dropdownCssClass: 'form_select2_drop'
+					}).on('change', function(){
+						$default_address_button.data('default_address', $(this).children(":selected").data('default-address'));
+					});
+					if(selected_id){
+						$select.select2('val', selected_id);
+						$default_address_button.data('default_address', selected_address);
+					} else {
+						$default_address_button.data('default_address', data[0].default_address);
+					}
+					if(organizations_options.length > 1){
+						$wrapper.removeClass('-hidden');
+					} else {
+						$wrapper.addClass('-hidden');
+					}
+				}, ajaxErrorHandler)
+			}
+		});
+	}
 
 	function toggleVkImg(){
 		var $wrap = $view.find('#edit_event_vk_publication').find('.EditEventImgLoadWrap'),
@@ -1696,6 +1711,7 @@ function EditEvent($view, $content_block){
 	if(typeof event_id === 'undefined'){
 		$view.find('.page_wrapper').html(tmpl('edit-event-page', additional_fields));
 		initEditEventPage($view);
+		initOrganization();
 		checkVkPublicationAbility();
 		toggleVkImg();
 		initVkDataCopying();
@@ -1709,57 +1725,58 @@ function EditEvent($view, $content_block){
 				fields: 'location,description,tags,nearest_event_date,detail_info_url,public_at,registration_required,registration_till,is_free,min_price,dates{length:0,fields:"start_time,end_time"}'
 			},
 			success: function(res){
-				if(res.status){
-					if(Array.isArray(res.data)){
-						res.data = res.data[0];
+				ajaxHandler(res, function(data){
+					if(Array.isArray(data)){
+						data = data[0];
 					}
-					if(res.data.public_at !== null){
-						var m_public_at = moment(res.data.public_at);
+					if(data.public_at !== null){
+						var m_public_at = moment(data.public_at);
 						additional_fields.public_at_data = m_public_at.format('YYYY-MM-DD');
 						additional_fields.public_at_data_label = m_public_at.format('DD.MM.YYYY');
 						additional_fields.public_at_time_hours = m_public_at.format('HH');
 						additional_fields.public_at_time_minutes = m_public_at.format('mm');
 					}
-					if(res.data.registration_required){
-						var m_registration_till = moment(res.data.registration_till);
+					if(data.registration_required){
+						var m_registration_till = moment(data.registration_till);
 						additional_fields.registration_till_data = m_registration_till.format('YYYY-MM-DD');
 						additional_fields.registration_till_data_label = m_registration_till.format('DD.MM.YYYY');
 						additional_fields.registration_till_time_hours = m_registration_till.format('HH');
 						additional_fields.registration_till_time_minutes = m_registration_till.format('mm');
 					}
-					if(res.data.image_vertical_url){
-						additional_fields.image_vertical_filename = res.data.image_vertical_url.split('/').reverse()[0];
+					if(data.image_vertical_url){
+						additional_fields.image_vertical_filename = data.image_vertical_url.split('/').reverse()[0];
 					}
-					if(res.data.image_horizontal_url){
-						additional_fields.image_horizontal_filename = res.data.image_horizontal_url.split('/').reverse()[0];
-						additional_fields.vk_image_url = res.data.image_horizontal_url;
+					if(data.image_horizontal_url){
+						additional_fields.image_horizontal_filename = data.image_horizontal_url.split('/').reverse()[0];
+						additional_fields.vk_image_url = data.image_horizontal_url;
 						additional_fields.vk_image_filename = additional_fields.image_horizontal_filename;
 					}
-					if(res.data.vk_image_url){
-						additional_fields.vk_image_url = res.data.vk_image_url;
-						additional_fields.vk_image_filename = res.data.vk_image_url.split('/').reverse()[0];
+					if(data.vk_image_url){
+						additional_fields.vk_image_url = data.vk_image_url;
+						additional_fields.vk_image_filename = data.vk_image_url.split('/').reverse()[0];
 					}
 					additional_fields.header_text = 'Редактирование события';
-					$.extend(true, res.data, additional_fields);
-					$view.find('.page_wrapper').html(tmpl('edit-event-page', res.data));
+					$.extend(true, data, additional_fields);
+					$view.find('.page_wrapper').html(tmpl('edit-event-page', data));
 
 					initEditEventPage($view);
+					initOrganization(data.organization_id);
 					checkVkPublicationAbility();
 
 					$view.find('#edit_event_different_time').prop('checked', true).trigger('change');
-					selectDates($view, res.data.dates);
-					selectTags($view, res.data.tags);
-					if(res.data.image_vertical_url && res.data.image_horizontal_url){
+					selectDates($view, data.dates);
+					selectTags($view, data.tags);
+					if(data.image_vertical_url && data.image_horizontal_url){
 						$view.find('.CropAgain').each(initRecrop);
 					}
 
-					if(res.data.image_vertical_url){
-						toDataUrl(res.data.image_vertical_url, function(base64_string){
+					if(data.image_vertical_url){
+						toDataUrl(data.image_vertical_url, function(base64_string){
 							$view.find('#edit_event_image_vertical_src').val(base64_string ? base64_string : null);
 						});
 					}
-					if(res.data.image_horizontal_url){
-						toDataUrl(res.data.image_horizontal_url, function(base64_string){
+					if(data.image_horizontal_url){
+						toDataUrl(data.image_horizontal_url, function(base64_string){
 							$view.find('#edit_event_image_horizontal_src').val(base64_string ? base64_string : null);
 						});
 					}
@@ -1773,26 +1790,20 @@ function EditEvent($view, $content_block){
 					}
 
 
-					if(!res.data.is_free){
+					if(!data.is_free){
 						$view.find('#edit_event_free').prop('checked', false).trigger('change');
-						$view.find('#edit_event_min_price').val(res.data.min_price);
+						$view.find('#edit_event_min_price').val(data.min_price);
 					}
-					if(res.data.registration_required){
+					if(data.registration_required){
 						$view.find('#edit_event_registration_required').prop('checked', true).trigger('change');
 					}
-					if(res.data.public_at !== null){
+					if(data.public_at !== null){
 						$view.find('#edit_event_delayed_publication').prop('checked', true).trigger('change');
 					}
 
 					formatVKPost();
 
-				} else {
-					if(res.text){
-						showNotifier({text: res.text, status: false});
-					} else {
-						showNotifier({text: 'Упс. Что-то пошло не так. Скорее всего у нас ведутся какие-то работы.', status: false});
-					}
-				}
+				}, ajaxErrorHandler);
 			}
 		});
 	}
@@ -2092,6 +2103,8 @@ function ajaxErrorHandler(event, jqxhr, settings, thrownError){
 	console.groupEnd();
 	if(jqxhr && jqxhr.responseJSON && jqxhr.responseJSON.text){
 		showNotifier({text: jqxhr.responseJSON.text, status: false});
+	} else if(event.text) {
+		showNotifier({text: event.text, status: false});
 	} else {
 		showNotifier({text: 'Упс, что-то пошло не так', status: false});
 	}
