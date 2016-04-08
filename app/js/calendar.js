@@ -513,7 +513,7 @@ function Organization($view, $content_block){
 
 	function initOrganizationPage($parent){
 		bindTabs($parent);
-		placeAvatarDefault($parent);
+		//placeAvatarDefault($parent.find('.organization_info_page'));
 
 		$parent.find('.OrganizationSubscribe').on('click.organizationSubscribe', function(){
 			var $this = $(this),
@@ -566,6 +566,7 @@ function Organization($view, $content_block){
 				name: [subscriber.first_name, subscriber.last_name].join(' ')
 			}));
 		});
+		//placeAvatarDefault($subscribers);
 
 		return $subscribers;
 	}
@@ -582,7 +583,6 @@ function Organization($view, $content_block){
 				ajaxHandler(res, function(data){
 					if(data[0].subscribed.length){
 						var $subscribers = buildSubscribers(data[0].subscribed, false, $wrapper);
-						placeAvatarDefault($subscribers);
 						$wrapper.append($subscribers);
 						$wrapper.data('next_offset', offset+10);
 					} else {
@@ -665,10 +665,14 @@ function Organization($view, $content_block){
 				length: 10,
 				offset: offset,
 				organization_id: organization_id,
-				fields: 'image_horizontal_medium_url,image_vertical_medium_url,favored_users_count,is_favorite,favored{length:5},dates',
-				order_by: is_future ? '-nearest_event_date' : '-last_event_date',
-				future: is_future ? 'true' : 'false'
+				fields: 'image_horizontal_medium_url,favored_users_count,is_favorite,favored{length:5},dates',
+				order_by: is_future ? 'nearest_event_date' : '-last_event_date'
 			};
+		if(is_future){
+			data.future = 'true'
+		} else {
+			data.till = moment().format(__C.DATE_FORMAT);
+		}
 		$.ajax({
 			url: '/api/v1/events/',
 			method: 'GET',
@@ -2074,7 +2078,7 @@ function ajaxHandler(result, success, error){
 		if(result.status){
 			success(result.data, result.text);
 		} else {
-			error();
+			error(result);
 		}
 	} catch(e){
 		error(e);
