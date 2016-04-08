@@ -517,7 +517,9 @@
 					</div>
         </div>
     </section>
+
 	<div class="modal_wrapper">
+		<div class="modal_destroyer"></div>
 		<div class="modal_unit CropperModal">
 			<header class="modal_header">
 				<h4>Кадрирование</h4>
