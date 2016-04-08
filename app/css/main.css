@@ -1380,7 +1380,7 @@ html.-open_modal {overflow: hidden}
 	width: 70px;
 	height: 70px;
 	background-size: contain;
-}
+}/*
 
 .avatar:before {
 	position: absolute;
@@ -1400,7 +1400,7 @@ html.-open_modal {overflow: hidden}
 .avatar.-size_40x40:before,
 .avatars_collection.-size_40x40 > .avatar:before {background-image: url(/app/img/logo_40.png)}
 .avatar.-size_50x50:before,
-.avatars_collection.-size_50x50 > .avatar:before {background-image: url(/app/img/logo_50.png)}
+.avatars_collection.-size_50x50 > .avatar:before {background-image: url(/app/img/logo_50.png)}*/
 
 .avatar > img {
 	max-width: 100%;
