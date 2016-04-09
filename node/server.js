@@ -91,7 +91,11 @@ var URLs = {
 			GROUPS_TO_POST: 'vk.getGroupsToPost',
 			GROUPS_TO_POST_DONE: 'vk.getGroupsToPostDone',
 			DATA_TO_POST: 'vk.getDataToPost',
-			DATA_TO_POST_DONE: 'vk.getDataToPostDone'
+			DATA_TO_POST_DONE: 'vk.getDataToPostDone',
+			POST_IT: 'vk.post'
+		},
+		NOTIFICATIONS: {
+			SEND: 'notifications.send'
 		},
 		UTILS: {}
 	},
@@ -197,6 +201,146 @@ var URLs = {
 			'img_small_url'
 		]
 	}),
+	notifications = sql.define({
+		name: 'notifications',
+		columns: [
+			'id',
+			'event_notification_id',
+			'token_id',
+			'description',
+			'created_at',
+			'updated_at',
+			'click_time',
+			'received'
+		]
+	}),
+	view_notifications = sql.define({
+		name: 'view_notifications',
+		columns: [
+			'uuid',
+			'user_id',
+			'event_id',
+			'notification_time',
+			'status',
+			'notification_type_id',
+			'notification_type',
+			'done',
+			'sent_time',
+			'created_at',
+			'updated_at'
+		]
+	}),
+	view_auto_notifications = sql.define({
+		name: 'view_auto_notifications',
+		columns: [
+			'id',
+			'event_id',
+			'notification_type_id',
+			'notification_time',
+			'created_at',
+			'updated_at',
+			'status',
+			'done',
+			'new_status',
+			'new_done',
+			'organization_id',
+			'title',
+			'short_name',
+			'notification_suffix',
+			'image_square_vertical_url',
+			'image_square_horizontal_url',
+			'notification_type_name',
+			'notification_type_text'
+		]
+	}),
+	subscriptions = sql.define({
+		name: 'subscriptions',
+		columns: [
+			'id',
+			'user_id',
+			'organization_id',
+			'status'
+		]
+	}),
+	events_notifications = sql.define({
+		name: 'events_notifications',
+		columns: [
+			'id',
+			'event_id',
+			'notification_type_id',
+			'notification_time',
+			'created_at',
+			'updated_at',
+			'status',
+			'done'
+		]
+	}),
+	view_auto_notifications_devices = sql.define({
+		name: 'subscriptions',
+		columns: [
+			'id',
+			'token',
+			'user_id',
+			'created_at',
+			'updated_at',
+			'token_type',
+			'expires_on',
+			'device_token',
+			'client_type',
+			'device_name',
+			'refresh_token',
+			'organization_id',
+			'uuid',
+			'notify_in_browser'
+		]
+	}),
+	view_events = sql.define({
+		name: 'view_events',
+		columns: [
+			'id',
+			'title',
+			'creator_id',
+			'description',
+			'detail_info_url',
+			'begin_time',
+			'end_time',
+			'latitude',
+			'longitude',
+			'location',
+			'min_price',
+			'public_at',
+			'registration_required',
+			'registration_till',
+			'is_free',
+			'is_same_time',
+			'organization_id',
+			'link',
+			'status',
+			'image_vertical_url',
+			'image_horizontal_url',
+			'image_vertical_large_url',
+			'image_horizontal_large_url',
+			'image_square_vertical_url',
+			'image_square_horizontal_url',
+			'image_horizontal_medium_url',
+			'image_vertical_medium_url',
+			'image_vertical_small_url',
+			'image_horizontal_small_url',
+			'vk_image_url',
+			'organization_logo_medium_url',
+			'organization_logo_large_url',
+			'organization_logo_small_url',
+			'organization_name',
+			'organization_type_name',
+			'organization_short_name',
+			'nearest_event_date',
+			'first_event_date',
+			'last_event_date',
+			'created_at',
+			'updated_at',
+			'favored_users_count'
+		]
+	}),
 	events = sql.define({
 		name: 'events',
 		columns: [
@@ -262,74 +406,69 @@ pg.connect(pg_conn_string, function(err, client, done) {
 	
 	function sendNotifications() {
 
-		if (config_index == 'test' || config_index == 'local')
-			return;
+		// if (config_index == 'test' || config_index == 'local')
+		// 	return;
 
-		var q_get_events_notifications = 'SELECT DISTINCT ' +
-				' events_notifications.*, events.organization_id,' +
-				' events.title, organizations.short_name, organizations.notification_suffix, ' +
-				' events.image_vertical, ' +
-				' events.image_horizontal, ' +
-				' events.organization_id, ' +
-				' events.id as event_id, ' +
-				' notification_types.type as notification_type_name,' +
-				' notification_types.text as notification_type_text' +
-				' FROM events_notifications' +
-				' INNER JOIN events ON events_notifications.event_id = events.id' +
-				' INNER JOIN notification_types ON notification_types.id = events_notifications.notification_type_id' +
-				' INNER JOIN organizations ON organizations.id = events.organization_id' +
-				' WHERE ' +
-				' notification_time <= NOW() ' +
-				' AND done = FALSE' +
-				' AND events.status = TRUE',
-
-			q_get_to_send_devices = 'SELECT DISTINCT tokens.*, users.notify_in_browser ' +
-				' FROM tokens' +
-				' INNER JOIN subscriptions ON subscriptions.user_id = tokens.user_id' +
-				' INNER JOIN organizations ON organizations.id = subscriptions.organization_id' +
-				' INNER JOIN users ON users.id = tokens.user_id' +
-				' WHERE tokens.expires_on >= DATE_PART("epoch",NOW()) ::INT' +
-				' AND organizations.id = $1' +
-				' AND subscriptions.status = TRUE' +
-				' ORDER BY tokens.id DESC',
-			q_to_send_not_now_notification = 'SELECT DISTINCT tokens.*, users.notify_in_browser ' +
-				' FROM tokens' +
-				' INNER JOIN users ON users.id = tokens.user_id' +
-				' INNER JOIN favorite_events ON favorite_events.user_id = users.id' +
-				' WHERE tokens.expires_on >= >= DATE_PART("epoch",NOW()) ::INT' +
-				' AND favorite_events.event_id = $1' +
-				' AND favorite_events.status = 1' +
-				' ORDER BY tokens.id DESC',
-			q_ins_notification = 'INSERT INTO notifications(click_time, received, token_id, event_notification_id)' +
-				' VALUES(NULL, FALSE, $1, $2)',
-			q_data = null;
+		var q_get_events_notifications =
+			view_auto_notifications
+				.select(
+					view_auto_notifications.id,
+					view_auto_notifications.event_id,
+					view_auto_notifications.notification_type_id,
+					view_auto_notifications.notification_time,
+					view_auto_notifications.status,
+					view_auto_notifications.done,
+					view_auto_notifications.organization_id,
+					view_auto_notifications.title,
+					view_auto_notifications.short_name,
+					view_auto_notifications.notification_suffix,
+					view_auto_notifications.image_square_vertical_url,
+					view_auto_notifications.image_square_horizontal_url,
+					view_auto_notifications.notification_type_name,
+					view_auto_notifications.notification_type_text
+				)
+				.from(view_auto_notifications).limit(5).toQuery(),
+			ins_values = {
+				click_time: null,
+				received: false,
+				event_notification_id: null,
+				token_id: null
+			};
 
 		client.query(q_get_events_notifications, function(err, rows) {
-			if (handleError(err)) {return;}
+			if (handleError(err))return;
 
 			rows.rows.forEach(function(event_notification) {
 
-				if (event_notification['notification_type_name'] != 'notification-now') {
-					event_notification['notification_suffix'] = Utils.lowerCaseFirstLetter(event_notification['notification_suffix']);
-					q_get_to_send_devices = q_to_send_not_now_notification;
-					q_data = [event_notification.event_id];
-				} else {
-					q_data = [event_notification.organization_id];
-				}
+				var
+					q_get_to_send_devices = view_auto_notifications_devices.select(
+						view_auto_notifications_devices.id,
+						view_auto_notifications_devices.token,
+						view_auto_notifications_devices.user_id,
+						view_auto_notifications_devices.created_at,
+						view_auto_notifications_devices.updated_at,
+						view_auto_notifications_devices.token_type,
+						view_auto_notifications_devices.expires_on,
+						view_auto_notifications_devices.device_token,
+						view_auto_notifications_devices.client_type,
+						view_auto_notifications_devices.device_name,
+						view_auto_notifications_devices.refresh_token,
+						view_auto_notifications_devices.uuid,
+						view_auto_notifications_devices.notify_in_browser
+					).where(view_auto_notifications_devices.organization_id.equals(event_notification.organization_id))
+						.toQuery(),
+					q_upd_events_notifications = events_notifications
+						.update({
+							done: true
+						})
+						.where(events_notifications.id.equals(event_notification.id)).toQuery();
 
-				client.query('UPDATE events_notifications SET done = TRUE WHERE id = $1', [event_notification.id], function(err) {
-					if (err) {
-						logger.error(err);
-					}
-				});
-				client.query(q_get_to_send_devices, q_data, function(errors, devices) {
-					if (errors) {
-						logger.error(errors);
-						return;
-					}
+
+				client.query(q_get_to_send_devices, function(errors, devices) {
+					if (handleError(errors))return;
+
 					devices.forEach(function(device) {
 
-						if (err)logger.error(err);
 						var notification_id = 0,
 							_text = Utils.replaceTags(event_notification.notification_type_text, event_notification);
 						var data = {
@@ -343,7 +482,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 									title: event_notification.title,
 									event_id: event_notification.event_id,
 									body: _text,
-									icon: real_config.schema + real_config.domain + '/event_images/square/' + event_notification.image_vertical,
+									icon: event_notification,
 									organization_logo: real_config.schema + real_config.domain + '/organizations_images/small/' + event_notification.organization_id + '.png'
 								}
 							},
@@ -377,6 +516,9 @@ pg.connect(pg_conn_string, function(err, client, done) {
 							handleError(err);
 						});
 					});
+				});
+				client.query(q_upd_events_notifications, function(err) {
+					handleError(err);
 				});
 			});
 		});
@@ -635,24 +777,21 @@ pg.connect(pg_conn_string, function(err, client, done) {
 			sig = crypto.createHash('md5').update(URLs.VK.GET_GROUPS_PART + '?' + request_data.join('&') + user_data.secret).digest("hex"),
 			url = URLs.VK.GET_GROUPS_LIST + '?' + request_data.join('&') + '&sig=' + sig,
 			req_params = {
-				url: url,
 				json: true,
 				headers: {
 					'Accept-Language': 'ru,en-us'
 				}
 			};
 
-
-		try{
-			request(req_params, function(e, i, res) {
-				handleError(e);
-				if (cb) {
-					cb(e, res);
+		rest.get(url, req_params)
+			.on('complete', function(result) {
+				if (result instanceof Error) {
+					handleError(result);
+					this.retry(3000); // try again after 5 sec
+				} else {
+					cb(result);
 				}
-			}).on('error', cb);
-		}catch(e){
-			cb(e);
-		}
+			});
 
 	}
 
@@ -917,15 +1056,15 @@ pg.connect(pg_conn_string, function(err, client, done) {
 				}
 
 
-				try{
-					request(req_params, function(e, i, res) {
-						if (callback instanceof Function) {
-							callback(e, res);
+				rest.get(req_params.url, req_params)
+					.on('complete', function(result) {
+						if (result instanceof Error) {
+							handleError(result);
+							this.retry(3000); // try again after 5 sec
+						} else {
+							callback(null, result);
 						}
-					}).on('error', callback);
-				}catch(e){
-					callback(e, null);
-				}
+					});
 
 			},
 			getUsersInfo = function(data, callback) {
@@ -936,7 +1075,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 					{
 						req_params = {
 							url: URLs[data.type.toUpperCase()].GET_USER_INFO,
-							qs: {
+							query: {
 								user_ids: data.user_id,
 								fields: 'photo_50, sex, photo_100, photo_max, photo_max_orig, universities, education, activities, occupation, interests, music, movies, tv, books, games, about',
 								name_case: 'nom'
@@ -963,7 +1102,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 					{
 						req_params = {
 							url: URLs[data.type.toUpperCase()].GET_USER_INFO,
-							qs: {
+							query: {
 								access_token: data.access_token,
 								fields: 'first_name,last_name,email,middle_name,picture,gender,about,education,books,events,movies,groups'
 							},
@@ -972,27 +1111,34 @@ pg.connect(pg_conn_string, function(err, client, done) {
 						break;
 					}
 				}
-				try{
-					request(req_params, function(e, i, res) {
-						if (data.type == 'vk'){
-							if (res && res.hasOwnProperty('response') == false){
-								if (e instanceof Object){
-									e.text = 'THERE_IS_NO_RESPONSE';
-								}else{
-									e = {
-										text: 'THERE_IS_NO_RESPONSE'
+
+					rest.get(req_params.url, req_params)
+						.on('complete', function(result) {
+							if (result instanceof Error) {
+								handleError(result);
+								this.retry(3000); // try again after 5 sec
+							} else {
+								var e;
+								if (data.type == 'vk'){
+									if (result && result.hasOwnProperty('response') == false){
+										if (e instanceof Object){
+											e.text = 'THERE_IS_NO_RESPONSE';
+										}else{
+											e = {
+												text: 'THERE_IS_NO_RESPONSE'
+											}
+										}
+									}else{
+										e.text = 'THERE_IS_NO_RESPONSE';
 									}
 								}
-							}
-						}
 
-						if (callback instanceof Function) {
-							callback(e, res);
-						}
-					}).on('error', callback);
-				}catch(e){
-					callback(e);
-				}
+								if (callback instanceof Function) {
+									callback(e, result);
+								}
+							}
+
+						});
 			},
 			getFriendsList = function(data, callback) {
 				var FRIENDS_COUNT = 50000,
@@ -1005,7 +1151,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 						req_params = {
 							url: URLs[data.type.toUpperCase()].GET_FRIENDS_LIST,
 							json: true,
-							qs: {
+							query: {
 								order: 'hints',
 								user_id: data.uid,
 								fields: 'city, domain',
@@ -1030,7 +1176,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 						req_params = {
 							url: URLs[data.type.toUpperCase()].GET_FRIENDS_LIST,
 							json: true,
-							qs: {
+							query: {
 								'access_token': data.access_token
 							}
 						};
@@ -1064,7 +1210,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 						req_params = {
 							json: true,
 							url: URLs.GOOGLE.GET_ACCESS_TOKEN,
-							qs: {
+							query: {
 								access_token: data.access_token
 							}
 						};
@@ -1180,7 +1326,7 @@ pg.connect(pg_conn_string, function(err, client, done) {
 
 		socket.on('auth.oauthDone', function(oauth_data) {
 			socket.retry_count = 0;
-			console.log('auth.oauthDone',oauth_data)
+			console.log('auth.oauthDone',oauth_data);
 			try {
 				authTry(oauth_data);
 			} catch(e) {
@@ -1236,6 +1382,10 @@ pg.connect(pg_conn_string, function(err, client, done) {
 				if (handleError(error)) return;
 				socket.emit('image.getFromURLDone', {error: error, data: data});
 			});
+		});
+
+		socket.on(EMIT_NAMES.NOTIFICATIONS.SEND, function(){
+			sendNotifications();
 		});
 
 		socket.on('notification.received', function(data) {

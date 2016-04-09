@@ -574,7 +574,7 @@ window.socket = io.connect(':8080');
 
 socket.on('connect', function() {
 	$.ajax({
-		url: 'api/v1/me/status',
+		url: 'api/v1/me/devices',
 		type: 'PUT',
 		data: {
 			device_token: socket.id,

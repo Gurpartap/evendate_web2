@@ -672,4 +672,30 @@ CREATE TABLE public.vk_posts
   CONSTRAINT users_notifications_users_id_fk FOREIGN KEY (creator_id) REFERENCES users (id)
 );
 
-ALTER TABLE public.tokens ADD refresh_token TEXT DEFAULT NULL NULL;
+CREATE VIEW view_dates AS
+  SELECT DISTINCT
+    events_dates.id,
+    events_dates.event_id,
+    DATE_PART('epoch', events_dates.event_date) :: INT AS event_date,
+    events_dates.start_time,
+    events_dates.end_time,
+    organization_id,
+    DATE_PART('epoch', events_dates.created_at) :: INT AS created_at,
+    DATE_PART('epoch', events_dates.updated_at) :: INT AS updated_at
+  FROM events_dates
+    INNER JOIN events ON events_dates.event_id = events.id AND events_dates.status = TRUE;
+
+
+SELECT * FROM view_dates WHERE event_id = 393;
+
+SELECT DISTINCT
+  events_dates.id,
+  events_dates.event_id,
+  DATE_PART('epoch', events_dates.event_date) :: INT AS event_date,
+  events_dates.start_time,
+  events_dates.end_time,
+  organization_id,
+  DATE_PART('epoch', events_dates.created_at) :: INT AS created_at,
+  DATE_PART('epoch', events_dates.updated_at) :: INT AS updated_at
+FROM events_dates
+  INNER JOIN events ON events_dates.event_id = events.id AND events_dates.status = TRUE AND event_id=393;
