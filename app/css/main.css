@@ -1380,7 +1380,28 @@ html.-open_modal {overflow: hidden}
 	width: 70px;
 	height: 70px;
 	background-size: contain;
+}/*
+
+.avatar:before {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	content: "";
+	display: block;
+	background-size: contain;
+	z-index: -1;
 }
+.avatar.-size_small:before,
+.avatar.-size_30x30:before,
+.avatars_collection.-size_small > .avatar:before,
+.avatars_collection.-size_30x30 > .avatar:before {background-image: url(/app/img/logo_30.png)}
+.avatar.-size_40x40:before,
+.avatars_collection.-size_40x40 > .avatar:before {background-image: url(/app/img/logo_40.png)}
+.avatar.-size_50x50:before,
+.avatars_collection.-size_50x50 > .avatar:before {background-image: url(/app/img/logo_50.png)}*/
+
 .avatar > img {
 	max-width: 100%;
 	max-height: 100%;
@@ -1974,7 +1995,7 @@ html.-open_modal {overflow: hidden}
 }
 
 .organization_feed_block {
-	height: 178px;
+	height: 148px;
 	padding: 12px;
 	font-size: 0;
 }
@@ -1988,7 +2009,11 @@ html.-open_modal {overflow: hidden}
 
 .organization_feed_block_img {
 	width: 220px;
+	height: 100%;
 	cursor: pointer;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: 50%;
 }
 
 .organization_feed_block_info {

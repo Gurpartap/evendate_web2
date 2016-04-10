@@ -509,9 +509,7 @@
 
 <script type="javascript/template" id="tmpl-organization-feed-event">
 	<div class="organization_feed_block" data-event_date="{date}">
-		<a class="organization_feed_block_img img_holder -odd" href="/event.php?id={id}" target="_blank">
-			<img src="{image_horizontal_medium_url}">
-		</a>
+		<a class="organization_feed_block_img img_holder -odd" href="/event.php?id={id}" target="_blank" style="background-image: url({image_horizontal_medium_url})"></a>
 		<div class="organization_feed_block_info">
 			<header class="organization_feed_block_title">
 				<a class="-odd" href="/event.php?id={id}" target="_blank">{title}</a>
@@ -558,7 +556,7 @@
 	<div class="subscriber" data-is_friend="{is_friend}" data-page="friend-{id}" data-friend-id="{id}" data-name="{name}">
 		<div class="avatar_block">
 			<div class="avatar -size_40x40 -rounded -bordered">
-				<img src="{avatar_url}">
+				<img src="{avatar_url}" onerror="this.onerror=null;this.src='/app/img/logo_40.png'">
 			</div>
 			<span class="avatar_name">{name}</span>
 		</div>
