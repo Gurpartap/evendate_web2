@@ -2114,17 +2114,6 @@ $(document)
 			}
 		};
 
-
-		$.ajax({
-			url: '/api/v1/users/me',
-			method: 'GET',
-			success: function(res){
-				ajaxHandler(res, function(data){
-					window.__USER = data[0];
-				}, ajaxErrorHandler);
-			}
-		});
-
 		//Отрисовака календаря
 		(function(){
 			var current_month = moment(),
@@ -2295,7 +2284,6 @@ $(document)
 		History.Adapter.bind(window, 'statechange', renderState);
 
 
-		bindOnClick();
 		$('.log-out-icon').on('click', function(){
 			window.location.href = 'index.php?logout=true';
 		});
@@ -2305,9 +2293,6 @@ $(document)
 					History.pushState({page: 'search'}, 'Поиск: ' + this.value, 'search?q=' + encodeURIComponent(this.value));
 				}
 			});
-		printSubscribedOrganizations();
-		setDaysWithEvents();
-		renderState();
 
 		$('.show-organizations-btn').on('click', function(){
 			History.pushState({page: 'organizations'}, 'Каталог организаций', 'organizations');
@@ -2316,19 +2301,34 @@ $(document)
 			History.pushState({page: 'timeline'}, 'Моя лента', 'timeline');
 		});
 
-		var $list = $('.organizations-list');
-		if (window.innerHeight > 800){
-			$list.slimscroll({height: window.innerHeight - $list.offset().top});
-		}else{
-			var $sidebar;
-			if(($sidebar = $('#Sidebar')).length){
-				$sidebar.slimscroll({
-					height: window.innerHeight
-				})
-			} else {
-				$('.sidebar').slimscroll({
-					height: window.innerHeight
-				})
+
+		$.ajax({
+			url: '/api/v1/users/me',
+			method: 'GET',
+			success: function(res){
+				ajaxHandler(res, function(data){
+					window.__USER = data[0];
+					bindOnClick();
+					printSubscribedOrganizations();
+					setDaysWithEvents();
+					renderState();
+
+					var $list = $('.organizations-list');
+					if (window.innerHeight > 800){
+						$list.slimscroll({height: window.innerHeight - $list.offset().top});
+					}else{
+						var $sidebar;
+						if(($sidebar = $('#Sidebar')).length){
+							$sidebar.slimscroll({
+								height: window.innerHeight
+							})
+						} else {
+							$('.sidebar').slimscroll({
+								height: window.innerHeight
+							})
+						}
+					}
+				}, ajaxErrorHandler);
 			}
-		}
+		});
 	});
