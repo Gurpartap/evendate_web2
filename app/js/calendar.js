@@ -1440,21 +1440,25 @@ function EditEvent($view, $content_block){
 		} else {
 			var data = response.data.response,
 				$groups = $view.find('#edit_event_vk_groups');
-
-			data.splice(0,1);
-			data.forEach(function(option){
-				$groups.append(tmpl('option', {
-					val: option.gid,
-					display_name: option.name,
-					data: "data-img='"+option.photo+"'"
-				}));
-			});
-			initSelect2($groups);
+			if(data.length || data[0]){
+				data.splice(0,1);
+				data.forEach(function(option){
+					$groups.append(tmpl('option', {
+						val: option.gid,
+						display_name: option.name,
+						data: "data-img='"+option.photo+"'"
+					}));
+				});
+				initSelect2($groups);
+			} else {
+				$view.find('#edit_event_to_public_vk').toggleStatus('disabled').prop('checked', false).trigger('change');
+			}
 		}
 	});
 
 	socket.on('vk.post.error', function(response){
 		console.log(response);
+		showNotifier({text: 'Не удалось опубликовать событие в группе vk. Пожалуйста, попробуйте еще раз.', status: false});
 	});
 
 	function initOrganization(selected_id){
@@ -1870,6 +1874,7 @@ function EditEvent($view, $content_block){
 			},
 			success: function(res){
 				ajaxHandler(res, function(data){
+					data = Array.isArray(data) ? data[0] : data;
 					additional_fields.header_text = 'Редактирование события';
 					if(data.public_at !== null){
 						var m_public_at = moment(data.public_at);
