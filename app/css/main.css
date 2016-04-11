@@ -1244,6 +1244,12 @@ html.-open_modal {overflow: hidden}
 	z-index: 1050;
 }
 
+.modal_destroyer {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+}
 
 .modal_unit {
 	display: none;
