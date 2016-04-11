@@ -14,7 +14,6 @@ var feedBackOptions = {
 
 var apnConnection,
 	feedback,
-
 	DEVICE_TYPES = {
 		IOS: 'ios',
 		ANDROID: 'android'

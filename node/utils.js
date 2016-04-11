@@ -2,6 +2,8 @@
  * Created by ���� on 25.12.2015.
  */
 
+var mime = require('mime-types');
+
 module.exports = {
 	replaceTags: function (text, object){
 		for (var key in object){
@@ -70,10 +72,12 @@ module.exports = {
 		}
 	},
 	downloadImageFromUrl: function(request, url, callback){
+		var _this = this;
 		request({url: url, encoding: null}, function (error, response, body) {
 			if (!error && response.statusCode == 200) {
-				data = "data:" + response.headers["content-type"] + ";base64," + new Buffer(body).toString('base64');
-				callback(null, data)
+				var data = "data:" + response.headers["content-type"] + ";base64," + new Buffer(body).toString('base64'),
+					filename = _this.makeId() + '.' + mime.extension(response.headers["content-type"]);
+				callback(null, data, filename);
 			}else{
 				callback(error);
 			}

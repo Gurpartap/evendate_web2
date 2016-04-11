@@ -1,6 +1,6 @@
 {
-  "dev":{
-    "google":{
+  "dev": {
+    "google": {
       "web": {
         "client_id": "403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv.apps.googleusercontent.com",
         "auth_uri": "https://accounts.google.com/o/oauth2/auth",
@@ -11,7 +11,7 @@
         "client_secret": "5rK7ElK7fA7G1tylhkzsnE4Q",
         "redirect_uri": ""
       },
-      "maps_api_v3":{
+      "maps_api_v3": {
         "key": "AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg"
       }
     },
@@ -27,18 +27,18 @@
       "SECURE_KEY": "gCfYONn6zlmdQZzu8Z6G",
       "redirect_uri": ""
     },
-    "facebook":{
+    "facebook": {
       "app_id": "1692270867652630",
       "app_secret": "0ecd87ecde79a4ab4e4feb8c2718e845",
       "redirect_uri": ""
     },
-    "smtp":{
+    "smtp": {
       "user": "feedback@evendate.ru",
       "password": "Aues300694$$$",
       "host": "smtp.yandex.ru",
       "port": 25
     },
-    "APN":{
+    "APN": {
       "gateway": "gateway.push.apple.com",
       "port": 2195,
       "enhanced": true,
@@ -64,7 +64,7 @@
     "node_domain": "evendate.ru",
     "schema": "http://"
   },
-  "test":{
+  "test": {
     "google": {
       "web": {
         "client_id": "403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv.apps.googleusercontent.com",
@@ -76,7 +76,7 @@
         "client_secret": "5rK7ElK7fA7G1tylhkzsnE4Q",
         "redirect_uri": ""
       },
-      "maps_api_v3":{
+      "maps_api_v3": {
         "key": "AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg"
       }
     },
@@ -99,18 +99,18 @@
       "SECURE_KEY": "gCfYONn6zlmdQZzu8Z6G",
       "redirect_uri": ""
     },
-    "facebook":{
+    "facebook": {
       "app_id": "1692270867652630",
       "app_secret": "0ecd87ecde79a4ab4e4feb8c2718e845",
       "redirect_uri": ""
     },
-    "smtp":{
+    "smtp": {
       "user": "feedback@evendate.ru",
       "password": "Aues300694$$$",
       "host": "smtp.yandex.ru",
       "port": 25
     },
-    "APN":{
+    "APN": {
       "gateway": "gateway.push.apple.com",
       "port": 2195,
       "enhanced": true,
@@ -132,7 +132,7 @@
       "user_images": "user_images",
       "organizations_images": "organizations_images"
     },
-    "mongodb":{
+    "mongodb": {
       "host": "localhost",
       "user": "admin",
       "password": "",
@@ -142,7 +142,7 @@
     "node_domain": "test.evendate.ru",
     "schema": "http://"
   },
-  "local":{
+  "local": {
     "google": {
       "web": {
         "client_id": "403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv.apps.googleusercontent.com",
@@ -154,7 +154,7 @@
         "client_secret": "5rK7ElK7fA7G1tylhkzsnE4Q",
         "redirect_uri": ""
       },
-      "maps_api_v3":{
+      "maps_api_v3": {
         "key": "AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg"
       }
     },
@@ -177,18 +177,18 @@
       "SECURE_KEY": "gCfYONn6zlmdQZzu8Z6G",
       "redirect_uri": ""
     },
-    "facebook":{
+    "facebook": {
       "app_id": "1692270867652630",
       "app_secret": "0ecd87ecde79a4ab4e4feb8c2718e845",
       "redirect_uri": ""
     },
-    "smtp":{
+    "smtp": {
       "user": "feedback@evendate.ru",
       "password": "Aues300694$$$",
       "host": "smtp.yandex.ru",
       "port": 25
     },
-    "APN":{
+    "APN": {
       "gateway": "gateway.push.apple.com",
       "port": 2195,
       "enhanced": true,
@@ -210,17 +210,21 @@
       "user_images": "user_images",
       "organizations_images": "organizations_images"
     },
-    "mongodb":{
+    "mongodb": {
       "host": "localhost",
       "user": "",
       "password": "",
       "port": 27017
     },
+    "one_signal": {
+      "app_id": "7471a586-01f3-4eef-b989-c809700a8658",
+      "rest_key": "Mjk5OGFiYzYtMDViOS00ZmMzLTkzNmMtMWVkMWJlNDllMTk0"
+    },
     "domain": "dev.evendate.org",
     "node_domain": "dev.evendate.org",
     "schema": "http://"
   },
-  "prod":{
+  "prod": {
     "google": {
       "web": {
         "client_id": "403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv.apps.googleusercontent.com",
@@ -232,7 +236,7 @@
         "client_secret": "5rK7ElK7fA7G1tylhkzsnE4Q",
         "redirect_uri": ""
       },
-      "maps_api_v3":{
+      "maps_api_v3": {
         "key": "AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg"
       }
     },
@@ -255,18 +259,18 @@
       "SECURE_KEY": "gCfYONn6zlmdQZzu8Z6G",
       "redirect_uri": ""
     },
-    "facebook":{
+    "facebook": {
       "app_id": "1692270867652630",
       "app_secret": "0ecd87ecde79a4ab4e4feb8c2718e845",
       "redirect_uri": ""
     },
-    "smtp":{
+    "smtp": {
       "user": "feedback@evendate.ru",
       "password": "Aues300694$$$",
       "host": "smtp.yandex.ru",
       "port": 25
     },
-    "APN":{
+    "APN": {
       "gateway": "gateway.push.apple.com",
       "port": 2195,
       "enhanced": true,
@@ -288,7 +292,7 @@
       "user_images": "user_images",
       "organizations_images": "organizations_images"
     },
-    "mongodb":{
+    "mongodb": {
       "host": "localhost",
       "user": "",
       "password": "",
