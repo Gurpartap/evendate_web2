@@ -473,12 +473,11 @@ function showModal(name){
 		$('.modal_unit').removeClass('-active');
 		$('html').addClass('-open_modal');
 		$modal.addClass('-active').parent().addClass('-active');
-		$('.modal_wrapper').off('mousedown').on('mousedown', function(e){
-			if(!$(e.target).closest($modal).length){
-				closeModal();
-			}
+		$('.modal_destroyer').height($modal.height()).off('mousedown.CloseModal').on('mousedown.CloseModal', function(){
+			$(this).off('mousedown.CloseModal');
+			closeModal();
 		});
-		$modal.find('.CloseModal').off('click').on('click', closeModal);
+		$modal.find('.CloseModal').off('click.CloseModal').on('click.CloseModal', closeModal);
 	} else {
 		throw Error('Модального окна '+name+' нет');
 	}
