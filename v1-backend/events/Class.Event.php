@@ -237,7 +237,7 @@ class Event extends AbstractEntity{
 
 			$db->beginTransaction();
 			if (!isset($data['dates']) || count($data['dates']) == 0)
-				throw new InvalidArgumentException('Укажите, пожалуйста, даты','');
+				throw new InvalidArgumentException('Укажите, пожалуйста, даты','Укажите, пожалуйста, даты');
 
 			$q_ins_event = App::queryFactory()->newInsert();
 			$random_string = App::generateRandomString();
@@ -388,8 +388,8 @@ class Event extends AbstractEntity{
 					'event_id' => $event_id,
 					'notification_type_id' => Notification::NOTIFICATION_TYPE_NOW_ID,
 					'notification_time' => $data['notification_at']->format('Y-m-d H:i:s'),
-					'status' => TRUE,
-					'done' => FALSE
+					'status' => 'TRUE',
+					'done' => 'FALSE'
 				));
 
 			$p_ins_notification = $db->prepare($q_ins_notification->getStatement());

@@ -72,10 +72,11 @@ module.exports = {
 		}
 	},
 	downloadImageFromUrl: function(request, url, callback){
+		var _this = this;
 		request({url: url, encoding: null}, function (error, response, body) {
 			if (!error && response.statusCode == 200) {
 				var data = "data:" + response.headers["content-type"] + ";base64," + new Buffer(body).toString('base64'),
-					filename = this.makeId() + '.' + mime.extension(response.headers["content-type"]);
+					filename = _this.makeId() + '.' + mime.extension(response.headers["content-type"]);
 				callback(null, data, filename);
 			}else{
 				callback(error);

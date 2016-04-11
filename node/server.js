@@ -66,7 +66,7 @@ var URLs = {
             'GET_USER_INFO': 'https://api.vk.com/method/users.get',
             'GET_GROUPS_LIST': 'https://api.vk.com/method/groups.get',
             'GET_GROUPS_PART': '/method/groups.get',
-            'POST_TO_WALL': 'http://api.vk.com/method/wall.post',
+            'POST_TO_WALL': 'https://api.vk.com/method/wall.post',
             'POST_TO_WALL_PART': '/method/wall.post',
             'GET_WALL_PHOTO_UPLOAD_SERVER': 'https://api.vk.com/method/photos.getWallUploadServer',
             'SAVE_WALL_PHOTO_UPLOAD': 'https://api.vk.com/method/photos.saveWallPhoto'
@@ -376,6 +376,7 @@ var URLs = {
         ]
     });
 
+/* STATIC ENTITIES DESCRIPTION END */
 sql.setDialect('postgres');
 
 pg.connect(pg_conn_string, function (err, client, done) {
@@ -404,9 +405,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
     }
 
     function sendNotifications() {
-
-        // if (config_index == 'test' || config_index == 'local')
-        // 	return;
 
         var q_get_events_notifications =
                 view_auto_notifications
@@ -491,7 +489,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
 
                         if (device.client_type == 'browser') {
-                            if (device.notify_in_browser === 0) return;
+                            if (!device.notify_in_browser) return;
                             if (__rooms.hasOwnProperty(device.token) && __rooms[device.token].length > 0) {
                                 var connections = __rooms[device.token];
                                 connections.forEach(function (socket_id) {
@@ -510,6 +508,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             }
 
                         }
+
+                        var sent_notification;
 
                         client.query(q_ins_notification, [device.id, event_notification.id], function (err, result) {
                             handleError(err);
@@ -764,34 +764,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
         });
     }
 
-    function getVkGroups(user_data, filter, cb) {
-        var request_data = [
-                'access_token=' + user_data.access_token,
-                'extended=1',
-                'fields=can_post,is_admin,admin_level,type',
-                'filter=' + (filter == 'can_post' ? 'admin, editor, moder' : '')
-            ],
-            sig = crypto.createHash('md5').update(URLs.VK.GET_GROUPS_PART + '?' + request_data.join('&') + user_data.secret).digest("hex"),
-            url = URLs.VK.GET_GROUPS_LIST + '?' + request_data.join('&') + '&sig=' + sig,
-            req_params = {
-                json: true,
-                headers: {
-                    'Accept-Language': 'ru,en-us'
-                }
-            };
-
-        rest.get(url, req_params)
-            .on('complete', function (result) {
-                if (result instanceof Error) {
-                    handleError(result);
-                    this.retry(3000); // try again after 5 sec
-                } else {
-                    cb(result);
-                }
-            });
-
-    }
-
     try {
         new CronJob('*/1 * * * *', function () {
             resizeImages();
@@ -815,7 +787,41 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
     io.on('connection', function (socket) {
 
-        var
+        var getVkGroups = function (user_data, filter) {
+                var request_data = [
+                        'access_token=' + user_data.access_token,
+                        'extended=1',
+                        'fields=can_post,is_admin,admin_level,type',
+                        'filter=' + (filter == 'can_post' ? 'admin, editor, moder' : '')
+                    ],
+                    sig = crypto.createHash('md5').update(URLs.VK.GET_GROUPS_PART + '?' + request_data.join('&') + user_data.secret).digest("hex"),
+                    url = URLs.VK.GET_GROUPS_LIST + '?' + request_data.join('&') + '&sig=' + sig,
+                    req_params = {
+                        json: true,
+                        headers: {
+                            'Accept-Language': 'ru,en-us'
+                        }
+                    };
+
+                console.log(url);
+
+                rest.get(url, req_params)
+                    .on('complete', function (result) {
+                        if (result instanceof Error) {
+                            handleError(result);
+                            socket.emit(EMIT_NAMES.VK_INTEGRATION.GROUPS_TO_POST_DONE, {
+                                error: 'Произошла ошибка, мы не смогли получить список групп vk.com.',
+                                data: data
+                            });
+                        } else {
+                            socket.emit(EMIT_NAMES.VK_INTEGRATION.GROUPS_TO_POST_DONE, {
+                                error: null,
+                                data: result
+                            });
+                        }
+                    });
+
+            },
             saveDataInDB = function (data) {
                 socket.retry_count = 0;
                 function getUIDValues() {
@@ -882,7 +888,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     if (handleError(err)) return;
 
                     var q_user,
-                        q_user_mysql,
                         is_new_user = result.rows.length == 0,
                         user;
 
@@ -1401,12 +1406,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 if (handleError(err, EMIT_NAMES.VK_INTEGRATION.GROUPS_TO_POST)) return;
                 result.rows[0].user_id = user_id;
                 socket.vk_user = result.rows[0];
-                getVkGroups(result.rows[0], 'can_post', function (err, data) {
-                    socket.emit(EMIT_NAMES.VK_INTEGRATION.GROUPS_TO_POST_DONE, {
-                        error: err,
-                        data: data
-                    });
-                });
+                getVkGroups(result.rows[0], 'can_post');
             })
         });
 
@@ -1423,7 +1423,10 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 filename = data.guid + '__' + Utils.makeId(20) + '.' + extension,
                 base64 = data.image.base64.split(',')[1];
             fs.writeFile(image_path + filename, base64, 'base64', function (err) {
-                if (handleError(err, EMIT_NAMES.VK_INTEGRATION.DATA_TO_POST)) return;
+
+
+                console.log(image_path, filename);
+                if (handleError(err, EMIT_NAMES.VK_INTEGRATION.POST_ERROR)) return;
 
                 rest.get(url, {
                         json: true,
@@ -1432,9 +1435,9 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         }
                     })
                     .on('complete', function (result) {
+
                         if (result instanceof Error) {
-                            if (handleError(result, EMIT_NAMES.VK_INTEGRATION.POST_ERROR)) return;
-                            this.retry(3000); // try again after 5 sec
+                            handleError(result, EMIT_NAMES.VK_INTEGRATION.POST_ERROR);
                         } else {
                             fs.stat(image_path + filename, function (err, stats) {
                                 rest
@@ -1446,65 +1449,68 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                     })
                                     .on("complete", function (upload_data) {
 
-                                        if (upload_data instanceof Error) {
-                                            if (handleError(result, EMIT_NAMES.VK_INTEGRATION.POST_ERROR)) return;
-                                            this.retry(3000); // try again after 5 sec
-                                        } else {
-
-                                            upload_data = JSON.parse(upload_data);
-                                            request_data.push('server=' + upload_data['server']);
-                                            request_data.push('hash=' + upload_data['hash']);
-                                            request_data.push('photo=' + upload_data['photo']);
-                                            request_data.push('access_token=' + socket.vk_user.access_token);
-                                            request_data.push('group_id=' + data.guid);
-
-                                            rest
-                                                .get(URLs.VK.SAVE_WALL_PHOTO_UPLOAD + '?' + request_data.join('&'))
-                                                .on('complete', function (res_data) {
+                                        setTimeout(function () {
 
 
-                                                    if (upload_data instanceof Error) {
-                                                        if (handleError(result, EMIT_NAMES.VK_INTEGRATION.POST_ERROR)) return;
-                                                        this.retry(3000); // try again after 5 sec
-                                                    } else {
-                                                        if (res_data.response.length == 0) {
-                                                            handleError({name: 'CANT_SAVE_WALL_PHOTO'}, EMIT_NAMES.VK_INTEGRATION.POST_ERROR);
-                                                            return;
+                                            if (upload_data instanceof Error) {
+                                                handleError(result, EMIT_NAMES.VK_INTEGRATION.POST_ERROR);
+                                            } else {
+
+                                                upload_data = JSON.parse(upload_data);
+                                                request_data.push('server=' + upload_data['server']);
+                                                request_data.push('hash=' + upload_data['hash']);
+                                                request_data.push('photo=' + upload_data['photo']);
+                                                request_data.push('access_token=' + socket.vk_user.access_token);
+                                                request_data.push('group_id=' + data.guid);
+
+                                                rest
+                                                    .get(URLs.VK.SAVE_WALL_PHOTO_UPLOAD + '?' + request_data.join('&'))
+                                                    .on('complete', function (res_data) {
+
+                                                        console.log(res_data);
+
+                                                        if (res_data instanceof Error) {
+                                                            handleError(res_data, EMIT_NAMES.VK_INTEGRATION.POST_ERROR);
+                                                        } else {
+                                                            if (res_data.response.length == 0) {
+                                                                handleError({name: 'CANT_SAVE_WALL_PHOTO'}, EMIT_NAMES.VK_INTEGRATION.POST_ERROR);
+                                                                return;
+                                                            }
+
+                                                            var user_id = socket.vk_user.user_id,
+                                                                q_ins_vk_post = vk_posts.insert({
+                                                                    creator_id: user_id,
+                                                                    image_path: filename,
+                                                                    message: data.message,
+                                                                    event_id: data.event_id,
+                                                                    group_id: data.guid
+                                                                }).returning('id').toQuery();
+                                                            client.query(q_ins_vk_post, function (err) {
+                                                                if (handleError(err, EMIT_NAMES.VK_INTEGRATION.POST_ERROR)) return;
+
+                                                                rest
+                                                                    .post(URLs.VK.POST_TO_WALL, {
+                                                                        data: {
+                                                                            owner_id: '-' + data.guid,
+                                                                            from_group: 1,
+                                                                            message: data.message,
+                                                                            access_token: socket.vk_user.access_token,
+                                                                            guid: data.event_id,
+                                                                            attachments: [res_data.response[0].id, data.link ? data.link : ''].join(',')
+                                                                        }
+                                                                    })
+                                                                    .on('complete', function (res) {
+                                                                        console.log(res);
+                                                                        if (res instanceof Error) {
+                                                                            handleError(result, EMIT_NAMES.VK_INTEGRATION.POST_ERROR);
+                                                                        }
+                                                                    });
+                                                            })
                                                         }
 
-                                                        var user_id = socket.vk_user.user_id,
-                                                            q_ins_vk_post = vk_posts.insert({
-                                                                creator_id: user_id,
-                                                                image_path: filename,
-                                                                message: data.message,
-                                                                event_id: data.event_id,
-                                                                group_id: data.guid
-                                                            }).returning('id').toQuery();
-                                                        client.query(q_ins_vk_post, function (err) {
-                                                            if (handleError(err, EMIT_NAMES.VK_INTEGRATION.POST_ERROR)) return;
-
-                                                            rest
-                                                                .post(URLs.VK.POST_TO_WALL, {
-                                                                    multipart: true,
-                                                                    data: {
-                                                                        owner_id: '-' + data.guid,
-                                                                        from_group: 1,
-                                                                        message: data.message,
-                                                                        guid: data.event_id,
-                                                                        attachments: [res_data.response[0].id, data.link ? data.link : ''].join(',')
-                                                                    }
-                                                                })
-                                                                .on('complete', function (res) {
-                                                                    if (res instanceof Error) {
-                                                                        if (handleError(result, EMIT_NAMES.VK_INTEGRATION.POST_ERROR)) return;
-                                                                        this.retry(3000); // try again after 5 sec
-                                                                    }
-                                                                });
-                                                        })
-                                                    }
-
-                                                });
-                                        }
+                                                    });
+                                            }
+                                        }, 1500);
                                     });
                             });
                         }
