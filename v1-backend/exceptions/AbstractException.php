@@ -10,7 +10,7 @@ abstract class AbstractException extends \Exception{
 
 	public function __construct($message, PDO $db, $user_m = ''){
 		parent::__construct($message);
-		$this->user_message = $user_m;
+		$this->user_message = $user_m == '' ? $message : $user_m;
 		$this->db = $db;
 	}
 
