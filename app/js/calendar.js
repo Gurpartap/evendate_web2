@@ -2290,12 +2290,12 @@ $(document)
 
 
 		$('.log-out-icon').on('click', function(){
-			window.location.href = 'index.php?logout=true';
+			window.location.href = '/index.php?logout=true';
 		});
 		$('.search-input')
 			.on('keypress', function(e){
 				if (e.which == 13){
-					History.pushState({page: 'search'}, 'Поиск: ' + this.value, 'search?q=' + encodeURIComponent(this.value));
+					History.pushState({page: 'search'}, 'Поиск: ' + this.value, '/search?q=' + encodeURIComponent(this.value));
 				}
 			});
 
