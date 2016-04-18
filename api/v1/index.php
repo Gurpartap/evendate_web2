@@ -171,7 +171,11 @@ try {
 			'response_status' => null,
 			'headers' => json_encode($__headers ?? array()),
 			'response_http_status' => $_http_code,
-			'time' => $request_time->format('Y-m-d H:i:s')
+			'time' => $request_time->format('Y-m-d H:i:s'),
+			'exception_text' => $_exception ? $_exception->getMessage() : null,
+			'exception_trace' => $_exception ? $_exception->getTraceAsString() : null,
+			'exception_file' => $_exception ? $_exception->getFile() : null,
+			'exception_line' => $_exception ? $_exception->getLine() : null,
 		))
 		->returning(array('uuid'));
 	$p_ins_log = $__db->prepare($q_ins_log->getStatement());

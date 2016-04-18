@@ -2,7 +2,9 @@
  * Created by ���� on 25.12.2015.
  */
 
-var mime = require('mime-types');
+var mime = require('mime-types'),
+	request = require('request'),
+	fs = require('fs');
 
 module.exports = {
 	replaceTags: function (text, object){
@@ -53,33 +55,39 @@ module.exports = {
 	},
 	composeFullInfoObject: function (data){
 		switch (data.type){
+			case 'facebook':
 			case 'vk': {
 				return data;
 			}
 			case 'google': {
-				data.access_data.access_token = data.oauth_data.access_token;
-				data.access_data.secret = '';
-				data.access_data.email = data.user_info.emails[0].value;
 				data.user_info.first_name = data.user_info.name.givenName;
 				data.user_info.last_name = data.user_info.name.familyName;
 				data.user_info.photo_100 = data.user_info.image.url;
 				return data;
 			}
-			case 'facebook': {
-				data.access_data.email = data.user_info.email;
-				return data;
-			}
 		}
 	},
-	downloadImageFromUrl: function(request, url, callback){
+	downloadImageFromUrl: function(url, callback, save_path){
 		var _this = this;
 		request({url: url, encoding: null}, function (error, response, body) {
-			if (!error && response.statusCode == 200) {
-				var data = "data:" + response.headers["content-type"] + ";base64," + new Buffer(body).toString('base64'),
-					filename = _this.makeId() + '.' + mime.extension(response.headers["content-type"]);
-				callback(null, data, filename);
+            if (error){
+                callback(error, null, null);
+                return;
+            }
+            if (response.statusCode != 200){
+                callback('Удаленный сервер вернул ошибку: ' + response.statusCode, null, null);
+                return;
+            }
+			var filename = _this.makeId() + '.' + mime.extension(response.headers["content-type"]);
+			
+			if (save_path){
+				request(url).pipe(fs.createWriteStream(save_path + filename)).on('close', function(){
+					callback(null, null, filename);
+				});
 			}else{
-				callback(error);
+				var data = "data:" + response.headers["content-type"] + ";base64," + new Buffer(body).toString('base64');
+
+				callback(null, data, filename);
 			}
 		});
 	}

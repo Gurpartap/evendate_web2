@@ -27,14 +27,14 @@
 
 		var _oauth_urls = {
 			mobile: {
-				vk: 'https://oauth.vk.com/authorize?client_id=<?=App::$SETTINGS->VK->APP_ID?>&scope=groups,friends,email,wall,offline,pages,photos,groups&redirect_uri=http://<?=App::$DOMAIN?>/vkOauthDone.php?mobile=true&response_type=code',
+				vk: 'https://oauth.vk.com/authorize?client_id=<?=App::$SETTINGS->VK->APP_ID?>&scope=groups,friends,email,wall,offline,pages,photos,groups&redirect_uri=http://<?=App::$DOMAIN?>/vkOauthDone.php?mobile=true&response_type=token',
 				google: 'https://accounts.google.com/o/oauth2/auth?scope=email profile https://www.googleapis.com/auth/plus.login &redirect_uri=http://<?=App::$DOMAIN?>/googleOauthDone.php?mobile=true&response_type=token&client_id=403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv.apps.googleusercontent.com',
-				facebook: 'https://www.facebook.com/dialog/oauth?client_id=1692270867652630&response_type=code&scope=public_profile,email,user_friends&display=popup&redirect_uri=http://<?=App::$DOMAIN?>/fbOauthDone.php?mobile=true'
+				facebook: 'https://www.facebook.com/dialog/oauth?client_id=1692270867652630&response_type=token&scope=public_profile,email,user_friends&display=popup&redirect_uri=http://<?=App::$DOMAIN?>/fbOauthDone.php?mobile=true'
 			},
 			popup: {
-				vk: 'https://oauth.vk.com/authorize?client_id=<?=App::$SETTINGS->VK->APP_ID?>&scope=groups,friends,email,wall,offline,pages,photos,groups&redirect_uri=http://<?=App::$DOMAIN?>/vkOauthDone.php?mobile=false&response_type=code',
+				vk: 'https://oauth.vk.com/authorize?client_id=<?=App::$SETTINGS->VK->APP_ID?>&scope=groups,friends,email,wall,offline,pages,photos,groups&redirect_uri=http://<?=App::$DOMAIN?>/vkOauthDone.php?mobile=false&response_type=token',
 				google: 'https://accounts.google.com/o/oauth2/auth?scope=email profile https://www.googleapis.com/auth/plus.login &redirect_uri=http://<?=App::$DOMAIN?>/googleOauthDone.php?mobile=false&response_type=token&client_id=403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv.apps.googleusercontent.com',
-				facebook: 'https://www.facebook.com/dialog/oauth?client_id=1692270867652630&response_type=code&scope=public_profile,email,user_friends&display=popup&redirect_uri=http://<?=App::$DOMAIN?>/fbOauthDone.php?mobile=false'
+				facebook: 'https://www.facebook.com/dialog/oauth?client_id=1692270867652630&response_type=token&scope=public_profile,email,user_friends&display=popup&redirect_uri=http://<?=App::$DOMAIN?>/fbOauthDone.php?mobile=false'
 			}
 		};
 

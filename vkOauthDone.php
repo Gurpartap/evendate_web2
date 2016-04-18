@@ -74,7 +74,8 @@ require_once 'v1-backend/bin/db.php';
 
 <script>
 	window.resizeTo(530, 400);
-	var data = searchToObject();
+	var mobile_data = searchToObject(),
+		data = $.extend(mobile_data, hashToObject(), true);
 	data.type = 'vk';
 	socket.emit('auth.oauthDone', data);
 	socket.on('vk.needEmail', function(){

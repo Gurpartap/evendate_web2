@@ -69,7 +69,7 @@
 		<div id="login-field">
 			<h2>Войти через</h2>
 			<a class="social vk vk-auth-btn" href="#">ВКонтакте</a>
-			<a class="social google google-plus-btn" href="#">Google+</a>
+			<a class="social google google-plus-btn" href="#">Google</a>
 			<a class="social facebook facebook-btn" href="#">Facebook</a>
 		</div>
 	</div>

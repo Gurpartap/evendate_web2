@@ -154,4 +154,39 @@ CREATE VIEW view_auto_notifications_devices AS
     INNER JOIN organizations ON organizations.id = subscriptions.organization_id
     INNER JOIN users ON users.id = tokens.user_id
 AND subscriptions.status = TRUE
-ORDER BY tokens.id DESC
+ORDER BY tokens.id DESC;
+
+
+DROP INDEX public.public_users_email1_idx CASCADE;
+DROP INDEX public.public_users_vk_uid2_idx CASCADE;
+DROP INDEX public.public_users_google_uid4_idx CASCADE;
+DROP INDEX public.public_users_facebook_uid3_idx CASCADE;
+
+
+ALTER TABLE public.events ADD image_vertical_resized TEXT DEFAULT NULL NULL;
+ALTER TABLE public.events ADD image_horizontal_resized TEXT DEFAULT NULL NULL;
+
+ALTER TABLE public.users ADD local_avatar_filename TEXT DEFAULT NULL NULL;
+
+ALTER TABLE public.log_requests ADD exception_text TEXT DEFAULT NULL NULL;
+ALTER TABLE public.log_requests ADD exception_trace TEXT DEFAULT NULL NULL;
+ALTER TABLE public.log_requests ADD exception_file TEXT DEFAULT NULL NULL;
+ALTER TABLE public.log_requests ADD exception_line TEXT DEFAULT NULL NULL;
+
+CREATE VIEW view_users AS SELECT
+  users.id,
+  users.avatar_url,
+  users.email,
+  users.vk_uid,
+  users.facebook_uid,
+  users.google_uid,
+  users.first_name,
+  users.last_name,
+  users.middle_name,
+  users.gender,
+  users.token,
+  users.show_to_friends,
+  users.blurred_image_url,
+  users.local_avatar_filename
+  FROM users
+;
