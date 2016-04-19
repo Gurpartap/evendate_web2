@@ -37,6 +37,7 @@ class Event extends AbstractEntity{
 		'image_vertical_url',
 		'image_horizontal_url',
 		'organization_id',
+		'canceled',
 	);
 
 	protected $title;
@@ -136,6 +137,10 @@ class Event extends AbstractEntity{
 
 		usort($dates, "sortFunc");
 		return $dates;
+	}
+
+	public function setCanceled(){
+
 	}
 
 	private static function generateQueryData(&$data){
