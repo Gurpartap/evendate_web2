@@ -43,10 +43,10 @@ var config_index = process.env.ENV ? process.env.ENV : 'dev',
             new (winston.transports.Console)(),
             new winston.transports.File({filename: __dirname + '/exceptions.log', json: false})
         ],
-        exitOnError: false
+        exitOnError: true
     }),
 // notifications_factory = new NotificationsManager(real_config),
-    cropper = new ImagesResize({}),
+    cropper = new ImagesResize({logger: logger}),
     transporter = nodemailer.createTransport(smtpTransport({
         host: real_config.smtp.host,
         port: real_config.smtp.port,
@@ -106,24 +106,6 @@ sql.setDialect('postgres');
 
 pg.connect(pg_conn_string, function (err, client, done) {
 
-    var handleError = function (err, emit_name, callback) {
-        if (!err || err == null) return false;
-
-        logger.info(err);
-        if (client) {
-            done(client);
-        }
-        if (callback instanceof Function) {
-            callback(err);
-            return true;
-        }
-        if (emit_name) {
-            socket.emit(emit_name, {error: err});
-        }
-        return true;
-    };
-
-    if (handleError(err)) return;
 
     try {
         new CronJob('*/1 * * * *', function () {
@@ -137,23 +119,43 @@ pg.connect(pg_conn_string, function (err, client, done) {
             });
         }, null, true);
     } catch (ex) {
-        handleError(ex);
+        logger.error(ex);
     }
 
     try {
         if (config_index == 'prod') {
             new CronJob('*/5 * * * *', function () {
                 logger.info('Notifications start', 'START...' + new Date().toString());
-                sendNotifications();
+                // sendNotifications();
             }, null, true);
         }
     } catch (ex) {
-        handleError(ex);
+        logger.error(ex);
     }
 
     io.on('connection', function (socket) {
 
-        var getVkGroups = function (user_data, filter) {
+        socket.on('error', function (err) {
+            logger.error(err);
+        });
+
+        var handleError = function (err, emit_name, callback) {
+                if (!err || err == null) return false;
+
+                logger.error(err);
+                if (client) {
+                    done(client); 
+                }
+                if (callback instanceof Function) {
+                    callback(err);
+                    return true;
+                }
+                if (emit_name) {
+                    socket.emit(emit_name, {error: err});
+                }
+                return true;
+            },
+            getVkGroups = function (user_data, filter) {
                 var request_data = [
                         'access_token=' + user_data.access_token,
                         'extended=1',
@@ -168,8 +170,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             'Accept-Language': 'ru,en-us'
                         }
                     };
-
-                console.log(url);
 
                 rest.get(url, req_params)
                     .on('complete', function (result) {
@@ -189,7 +189,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
             },
             saveDataInDB = function (data) {
-
                 socket.retry_count = 0;
                 function getUIDValues() {
                     var result = {
@@ -230,11 +229,11 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     q_get_user =
                         users
                             .select(users.id, users.vk_uid, users.facebook_uid, users.google_uid)
-                                .where(users.email.equals(data.oauth_data.email))
-                                .or(users.vk_uid.isNotNull().and(users.vk_uid.equals(UIDs.vk_uid)))
-                                .or(users.facebook_uid.isNotNull().and(users.facebook_uid.equals(UIDs.facebook_uid)))
-                                .or(users.google_uid.isNotNull().and(users.google_uid.equals(UIDs.google_uid)))
-                                .toQuery(),
+                            .where(users.email.equals(data.oauth_data.email))
+                            .or(users.vk_uid.isNotNull().and(users.vk_uid.equals(UIDs.vk_uid)))
+                            .or(users.facebook_uid.isNotNull().and(users.facebook_uid.equals(UIDs.facebook_uid)))
+                            .or(users.google_uid.isNotNull().and(users.google_uid.equals(UIDs.google_uid)))
+                            .toQuery(),
                     user_to_ins = {
                         first_name: data.user_info.first_name,
                         last_name: data.user_info.last_name,
@@ -363,7 +362,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
                         client.query(q_ins_sign_in.returning('id').toQuery(), function (sign_in_err) {
                             if (handleError(sign_in_err)) {
-                                logger.info(q_ins_sign_in.returning('id').toQuery().text);
+                                logger.info(q_ins_sign_in.toQuery().text);
                                 socket.emit('error.retry');
                                 return;
                             }
@@ -477,6 +476,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     });
             },
             authTry = function (oauth_data) {
+
                 if (socket.retry_count > 5) {
                     socket.emit('error.retry');
                 } else {
@@ -531,7 +531,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
             getFriendsList = function (data, callback) {
                 var FRIENDS_COUNT = 50000,
                     req_params;
-
 
                 switch (data.type) {
                     case 'vk':
@@ -642,7 +641,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
         });
 
         socket.on(EMIT_NAMES.NOTIFICATIONS.SEND, function () {
-            sendNotifications();
+            // sendNotifications();
         });
 
         socket.on('notification.received', function (data) {
@@ -655,7 +654,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
         });
 
         socket.on(EMIT_NAMES.VK_INTEGRATION.GROUPS_TO_POST, function (user_id) {
-            var q_get_user_data = vk_sign_in
+            var vk_sign_in = Entities.vk_sign_in,
+                q_get_user_data = vk_sign_in
                 .select(vk_sign_in.id, vk_sign_in.secret, vk_sign_in.access_token)
                 .from(vk_sign_in)
                 .where(
@@ -667,7 +667,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 result.rows[0].user_id = user_id;
                 socket.vk_user = result.rows[0];
                 getVkGroups(result.rows[0], 'can_post');
-            })
+            });
         });
 
         /**/
