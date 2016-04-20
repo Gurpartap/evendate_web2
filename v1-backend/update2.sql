@@ -14,6 +14,7 @@ CREATE VIEW view_events AS
     events.location,
     events.min_price,
     events.public_at,
+    events.disabled,
     vk_posts.group_id AS vk_group_id,
     vk_posts.image_path AS vk_image_path,
     vk_posts.message AS vk_message,
@@ -190,3 +191,5 @@ CREATE VIEW view_users AS SELECT
   users.local_avatar_filename
   FROM users
 ;
+
+ALTER TABLE events ADD COLUMN "disabled" BOOLEAN DEFAULT FALSE NOT NULL;

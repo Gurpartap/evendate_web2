@@ -37,6 +37,7 @@ class Event extends AbstractEntity{
 		'image_vertical_url',
 		'image_horizontal_url',
 		'organization_id',
+		'canceled',
 	);
 
 	protected $title;
@@ -136,6 +137,20 @@ class Event extends AbstractEntity{
 
 		usort($dates, "sortFunc");
 		return $dates;
+	}
+
+	public function setCanceled(bool $value, User $user){
+        $q_upd_event = App::queryFactory()->newUpdate();
+        $q_upd_event
+            ->table('events')
+            ->cols(array(
+                'canceled' => $value
+            ))
+            ->where('id = ?', $this->getId());
+        $p_upd = $this->db->prepare($q_upd_event->getStatement());
+        $result = $p_upd->execute($q_upd_event->getBindValues());
+        if ($result === FALSE) throw new DBQueryException('CANT_UPDATE_EVENT', $this->db);
+        return new Result(true, 'Данные успешно обновлены');
 	}
 
 	private static function generateQueryData(&$data){

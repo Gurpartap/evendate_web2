@@ -76,7 +76,6 @@ class TagsCollection extends AbstractCollection{
 	}
 
 	public static function create(PDO $db, string $name) : Tag{
-		global $__mysql_db;
 		$name = preg_replace('/\s+/', ' ', self::mb_ucfirst($name));
 
 		$tags = TagsCollection::filter($db,
@@ -90,20 +89,11 @@ class TagsCollection extends AbstractCollection{
 			VALUES(:name, TRUE) RETURNING id';
 			$p_ins_tag = $db->prepare($q_ins_tag);
 
-			$q_ins_tag_mysql = 'INSERT INTO tags(id, name, status, created_at)
-			VALUES(:id, :name, 1, NOW()) ON DUPLICATE KEY UPDATE id = :id';
-			$p_ins_tag_mysql = $__mysql_db->prepare($q_ins_tag_mysql);
-
 			$p_ins_tag->execute(array(
 				':name' => $name
 			));
 
 			$result = $p_ins_tag->fetch(PDO::FETCH_ASSOC);
-
-			$p_ins_tag_mysql->execute(array(
-				':id' => $result['id'],
-				':name' => $name
-			));
 			$tag_id = $result['id'];
 		}else{
 			$tag_id = intval($tags[0]['id']);
