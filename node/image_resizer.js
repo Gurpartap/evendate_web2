@@ -2,6 +2,7 @@ var easyimage = require('easyimage'),
     gm = require('gm').subClass({imageMagick: true}),
     fs = require('fs'),
     Utils = require('./utils'),
+    path = require('path'),
     Entities = require('./entities');
 
 const IMG_WIDTHS = {
@@ -231,13 +232,17 @@ ImagesResize.prototype.resizeNew = function (config) {
         client.query(organizations.update(data).where(organizations.id.equals(organization_id)).toQuery());
     };
 
+    console.log(q_get_changed_organization_images.text);
+
     client.query(q_get_changed_organization_images, function (err, result) {
 
         if (err) return _logger.error(err);
         result.rows.forEach(function (obj) {
-            var logo_img_path = ORGANIZATIONS_IMAGES_PATH + LOGO_IMAGES + '/' + LARGE_IMAGES + '/' + obj.img_url,
-                background_img_path = ORGANIZATIONS_IMAGES_PATH + BACKGROUND_IMAGES + '/' + LARGE_IMAGES + '/' + obj.background_img_url;
+            var logo_img_path = path.join(__dirname, ORGANIZATIONS_IMAGES_PATH + LOGO_IMAGES + '/' + LARGE_IMAGES + '/' + obj.img_url),
+                background_img_path = path.join(__dirname, ORGANIZATIONS_IMAGES_PATH + BACKGROUND_IMAGES + '/' + LARGE_IMAGES + '/' + obj.background_img_url);
 
+            console.log(logo_img_path);
+            console.log(background_img_path);
 
             // resize background
             try {

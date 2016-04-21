@@ -101,7 +101,6 @@ var
         UTILS: {}
     };
 
-/* STATIC ENTITIES DESCRIPTION END */
 sql.setDialect('postgres');
 
 pg.connect(pg_conn_string, function (err, client, done) {
@@ -109,6 +108,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
     try {
         new CronJob('*/1 * * * *', function () {
+            console.log('START RESIZING');
             cropper.resizeNew({
                 images: real_config.images,
                 client: client
@@ -347,8 +347,9 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 }).returning('id').toQuery();
 
                             client.query(q_ins_token, function (err) {
-                                if (handleError(err, 'CANT_INSERT_TOKEN')) {
+                                if (handleError(err)) {
                                     socket.emit('error.retry');
+                                    return;
                                 }
                                 socket.emit('auth', {
                                     email: data.oauth_data.email,
@@ -362,7 +363,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
                         client.query(q_ins_sign_in.returning('id').toQuery(), function (sign_in_err) {
                             if (handleError(sign_in_err)) {
-                                logger.info(q_ins_sign_in.toQuery().text);
                                 socket.emit('error.retry');
                                 return;
                             }
@@ -455,6 +455,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     .on('complete', function (result) {
                         if (result instanceof Error) {
                             handleError(result);
+                            callback(result, null);
                         } else {
                             var e = {};
                             if (data.type == 'vk') {
@@ -476,7 +477,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     });
             },
             authTry = function (oauth_data) {
-
                 if (socket.retry_count > 5) {
                     socket.emit('error.retry');
                 } else {
@@ -485,7 +485,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         if (handleError(user_info_error)) {
                             setTimeout(function () {
                                 authTry(oauth_data);
-                            }, 1000 * socket.retry_count);
+                            }, 2000 * socket.retry_count);
                             return;
                         }
 
@@ -493,7 +493,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             if (user_info.hasOwnProperty('response') == false || user_info.response.length == 0) {
                                 setTimeout(function () {
                                     authTry(oauth_data);
-                                }, 1000 * socket.retry_count);
+                                }, 2000 * socket.retry_count);
                                 return;
                             }
                             user_info = user_info.response[0];
@@ -506,7 +506,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             if (handleError(friends_error)) {
                                 setTimeout(function () {
                                     authTry(oauth_data);
-                                }, 1000 * retry_count);
+                                }, 2000 * retry_count);
                                 return;
                             }
                             if (oauth_data.type == 'vk') {
@@ -574,7 +574,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     .on('complete', function (result) {
                         if (result instanceof Error) {
                             handleError(result);
-                            this.retry(3000); // try again after 5 sec
+                            callback(result, null);
                         } else {
                             callback(null, result);
                         }
