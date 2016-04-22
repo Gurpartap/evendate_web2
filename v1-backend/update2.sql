@@ -1,3 +1,5 @@
+ALTER TABLE events ADD COLUMN "canceled" BOOLEAN DEFAULT FALSE NOT NULL;
+
 DROP VIEW view_events CASCADE;
 
 CREATE VIEW view_events AS
@@ -15,6 +17,7 @@ CREATE VIEW view_events AS
     events.min_price,
     events.public_at,
     events.disabled,
+    events.canceled,
     vk_posts.group_id AS vk_group_id,
     vk_posts.image_path AS vk_image_path,
     vk_posts.message AS vk_message,
@@ -157,8 +160,8 @@ CREATE VIEW view_auto_notifications_devices AS
 AND subscriptions.status = TRUE
 ORDER BY tokens.id DESC;
 
-
 DROP INDEX public.public_users_email1_idx CASCADE;
+DROP INDEX public.public_users_email0_idx CASCADE;
 DROP INDEX public.public_users_vk_uid2_idx CASCADE;
 DROP INDEX public.public_users_google_uid4_idx CASCADE;
 DROP INDEX public.public_users_facebook_uid3_idx CASCADE;
@@ -173,6 +176,10 @@ ALTER TABLE public.log_requests ADD exception_text TEXT DEFAULT NULL NULL;
 ALTER TABLE public.log_requests ADD exception_trace TEXT DEFAULT NULL NULL;
 ALTER TABLE public.log_requests ADD exception_file TEXT DEFAULT NULL NULL;
 ALTER TABLE public.log_requests ADD exception_line TEXT DEFAULT NULL NULL;
+
+DROP VIEW view_users;
+
+ALTER TABLE public.organizations ADD email TEXT DEFAULT NULL  NULL;
 
 CREATE VIEW view_users AS SELECT
   users.id,
@@ -192,4 +199,9 @@ CREATE VIEW view_users AS SELECT
   FROM users
 ;
 
-ALTER TABLE events ADD COLUMN "disabled" BOOLEAN DEFAULT FALSE NOT NULL;
+INSERT INTO public.notification_types (id, type, timediff, text) VALUES (7, 'notification-event-changed-dates', -1, 'У вашего избранного события {title} изменились даты ');
+INSERT INTO public.notification_types (id, type, timediff, text) VALUES (8, 'notification-event-changed-location', -1, 'У вашего избранного события {title} изменилось место проведения');
+INSERT INTO public.notification_types (id, type, timediff, text) VALUES (9, 'notification-event-changed-registration', -1, 'У вашего избранного события {title} изменилась информация про регистрацию');
+INSERT INTO public.notification_types (id, type, timediff, text) VALUES (10, 'notification-event-changed-price', -1, 'У вашего избранного события {title} изменилась информация про цену');
+INSERT INTO public.notification_types (id, type, timediff, text) VALUES (11, 'notification-event-registration-ending', -1, 'Остался последний день для регистрации на {title}');
+INSERT INTO public.notification_types (id, type, timediff, text) VALUES (12, 'notification-event-canceled', -1, 'Событие {title} отменено организатором');

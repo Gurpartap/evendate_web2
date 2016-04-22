@@ -108,7 +108,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
     try {
         new CronJob('*/1 * * * *', function () {
-            console.log('START RESIZING');
             cropper.resizeNew({
                 images: real_config.images,
                 client: client
@@ -267,7 +266,14 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
                     client.query(q_user, function (user_err, ins_result) {
 
-                        if (handleError(user_err)) return;
+                        if (handleError(user_err)){
+                            if (data.oauth_data.hasOwnProperty('email') == false ||
+                                !data.oauth_data.email){
+                                socket.emit('vk.needEmail');
+                                return;
+                            }
+                            return;
+                        }
 
                         if (is_new_user) {
                             user = {
@@ -482,6 +488,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 } else {
                     socket.retry_count++;
                     getUsersInfo(oauth_data, function (user_info_error, user_info) {
+
                         if (handleError(user_info_error)) {
                             setTimeout(function () {
                                 authTry(oauth_data);
@@ -503,6 +510,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         oauth_data.email = oauth_data.email ? oauth_data.email : user_info.email;
 
                         getFriendsList(user_info, function (friends_error, friends_data) {
+
                             if (handleError(friends_error)) {
                                 setTimeout(function () {
                                     authTry(oauth_data);
@@ -645,7 +653,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
         });
 
         socket.on('notification.received', function (data) {
-            connection.query('UPDATE notifications ' +
+            client.query('UPDATE notifications ' +
                 ' SET received = 1, ' +
                 ' click_time = ' + (data.click_time ? connection.escape(data.click_time) : null) +
                 ' WHERE id = ' + connection.escape(data.notification_id), function (err) {

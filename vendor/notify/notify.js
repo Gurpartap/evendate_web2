@@ -4,176 +4,193 @@
  * License: MIT license
  */
 
-const N = window.Notification;
+(function(global, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD environment
+        define(function() {
+            return factory(global, global.document);
+        });
+    } else if (typeof module !== 'undefined' && module.exports) {
+        // CommonJS environment
+        module.exports = factory(global, global.document);
+    } else {
+        // Browser environment
+        global.Notify = factory(global, global.document);
+    }
+} (typeof window !== 'undefined' ? window : this, function (w, d) {
 
-function isFunction(item) {
-    return typeof item === 'function';
-}
+    'use strict';
 
-function Notify(title, options = {}) {
-
-    if (typeof title !== 'string') {
-        throw new Error('Notify(): first arg (title) must be a string.');
+    function isFunction (item) {
+        return typeof item === 'function';
     }
 
-    if (typeof options !== 'object') {
-        throw new Error('Notify(): second arg (options) must be an object.');
-    }
+    function Notify(title, options) {
 
-    const {
-        // Notify options
-        notifyShow = null,
-        notifyClose = null,
-        notifyClick = null,
-        notifyError = null,
-        closeOnClick = false,
-        timeout = null,
-        // Notification API options
-        ...rest
-    } = options;
+        if (typeof title !== 'string') {
+            throw new Error('Notify(): first arg (title) must be a string.');
+        }
 
-    this.title = title;
-    this.options = rest;
-    this.permission = null;
-    this.closeOnClick = closeOnClick;
-    this.timeout = timeout;
+        this.title = title;
 
-    //callback when notification is displayed
-    if (isFunction(notifyShow)) {
-        this.onShowCallback = notifyShow;
-    }
+        this.options = {
+            icon: '',
+            body: '',
+            tag: '',
+            lang: 'en',
+            notifyShow: null,
+            notifyClose: null,
+            notifyClick: null,
+            notifyError: null,
+            timeout: null
+        };
 
-    //callback when notification is closed
-    if (isFunction(notifyClose)) {
-        this.onCloseCallback = notifyClose;
-    }
+        this.permission = null;
 
-    //callback when notification is clicked
-    if (isFunction(notifyClick)) {
-        this.onClickCallback = notifyClick;
-    }
+        if (!Notify.isSupported) {
+            return;
+        }
 
-    //callback when notification throws error
-    if (isFunction(notifyError)) {
-        this.onErrorCallback = notifyError;
-    }
-}
+        //User defined options for notification content
+        if (typeof options === 'object') {
 
-// returns true if the browser supports Web Notifications
-// https://developers.google.com/web/updates/2015/05/Notifying-you-of-notificiation-changes
-// @param {perm} for test purposes only
-Notify.isSupported = function(perm) {
-    if (!N || !N.requestPermission) {
-        return false;
-    }
+            for (var i in options) {
+                if (options.hasOwnProperty(i)) {
+                    this.options[i] = options[i];
+                }
+            }
 
-    if (perm === 'granted' || N.permission === 'granted') {
-        throw new Error('You must only call this before calling Notification.requestPermission(), otherwise this feature detect would trigger an actual notification!');
-    }
+            //callback when notification is displayed
+            if (isFunction(this.options.notifyShow)) {
+                this.onShowCallback = this.options.notifyShow;
+            }
 
-    try {
-        new N('');
-    } catch (e) {
-        if (e.name === 'TypeError') {
-            return false;
+            //callback when notification is closed
+            if (isFunction(this.options.notifyClose)) {
+                this.onCloseCallback = this.options.notifyClose;
+            }
+
+            //callback when notification is clicked
+            if (isFunction(this.options.notifyClick)) {
+                this.onClickCallback = this.options.notifyClick;
+            }
+
+            //callback when notification throws error
+            if (isFunction(this.options.notifyError)) {
+                this.onErrorCallback = this.options.notifyError;
+            }
         }
     }
-    return true;
-};
 
-// true if the permission is not granted
-Notify.needsPermission = (N && N.permission && N.permission === 'granted') ? false : true;
+    // true if the browser supports HTML5 Notification
+    Notify.isSupported = 'Notification' in w;
 
-// asks the user for permission to display notifications.  Then calls the callback functions is supplied.
-Notify.requestPermission = function(onPermissionGrantedCallback, onPermissionDeniedCallback) {
-    N.requestPermission(function(perm) {
-        switch (perm) {
-        case 'granted':
-            Notify.needsPermission = false;
-            if (isFunction(onPermissionGrantedCallback)) {
-                onPermissionGrantedCallback();
-            }
-            break;
-        case 'denied':
-            Notify.needsPermission = true;
-            if (isFunction(onPermissionDeniedCallback)) {
-                onPermissionDeniedCallback();
-            }
-            break;
+    // true if the permission is not granted
+    Notify.needsPermission = !(Notify.isSupported && Notification.permission === 'granted');
+
+    // returns current permission level ('granted', 'default', 'denied' or null)
+    Notify.permissionLevel = (Notify.isSupported ? Notification.permission : null);
+
+    // asks the user for permission to display notifications.  Then calls the callback functions is supplied.
+    Notify.requestPermission = function (onPermissionGrantedCallback, onPermissionDeniedCallback) {
+        if (!Notify.isSupported) {
+            return;
         }
-    });
-};
+        w.Notification.requestPermission(function (perm) {
+            switch (perm) {
+                case 'granted':
+                    Notify.needsPermission = false;
+                    if (isFunction(onPermissionGrantedCallback)) {
+                        onPermissionGrantedCallback();
+                    }
+                    break;
+                case 'denied':
+                    if (isFunction(onPermissionDeniedCallback)) {
+                        onPermissionDeniedCallback();
+                    }
+                    break;
+            }
+        });
+    };
 
 
-Notify.prototype.show = function() {
-    this.myNotify = new N(this.title, this.options);
+    Notify.prototype.show = function () {
 
-    if (!this.options.requireInteraction && this.timeout && !isNaN(this.timeout)) {
-        setTimeout(this.close.bind(this), this.timeout * 1000);
-    }
+        if (!Notify.isSupported) {
+            return;
+        }
 
-    this.myNotify.addEventListener('show', this, false);
-    this.myNotify.addEventListener('error', this, false);
-    this.myNotify.addEventListener('close', this, false);
-    this.myNotify.addEventListener('click', this, false);
-};
+        this.myNotify = new Notification(this.title, {
+            'body': this.options.body,
+            'tag' : this.options.tag,
+            'icon' : this.options.icon,
+            'lang' : this.options.lang
+        });
 
-Notify.prototype.onShowNotification = function(e) {
-    if (this.onShowCallback) {
-        this.onShowCallback(e);
-    }
-};
+        if (this.options.timeout && !isNaN(this.options.timeout)) {
+            setTimeout(this.close.bind(this), this.options.timeout * 1000);
+        }
 
-Notify.prototype.onCloseNotification = function(e) {
-    if (this.onCloseCallback) {
-        this.onCloseCallback(e);
-    }
-    this.destroy();
-};
+        this.myNotify.addEventListener('show', this, false);
+        this.myNotify.addEventListener('error', this, false);
+        this.myNotify.addEventListener('close', this, false);
+        this.myNotify.addEventListener('click', this, false);
+    };
 
-Notify.prototype.onClickNotification = function(e) {
-    if (this.onClickCallback) {
-        this.onClickCallback(e);
-    }
+    Notify.prototype.onShowNotification = function (e) {
+        if (this.onShowCallback) {
+            this.onShowCallback(e);
+        }
+    };
 
-    if (this.closeOnClick) {
-        this.close();
-    }
-};
+    Notify.prototype.onCloseNotification = function (e) {
+        if (this.onCloseCallback) {
+            this.onCloseCallback(e);
+        }
+        this.destroy();
+    };
 
-Notify.prototype.onErrorNotification = function(e) {
-    if (this.onErrorCallback) {
-        this.onErrorCallback(e);
-    }
-    this.destroy();
-};
+    Notify.prototype.onClickNotification = function (e) {
+        if (this.onClickCallback) {
+            this.onClickCallback(e);
+        }
+    };
 
-Notify.prototype.destroy = function() {
-    this.myNotify.removeEventListener('show', this, false);
-    this.myNotify.removeEventListener('error', this, false);
-    this.myNotify.removeEventListener('close', this, false);
-    this.myNotify.removeEventListener('click', this, false);
-};
+    Notify.prototype.onErrorNotification = function (e) {
+        if (this.onErrorCallback) {
+            this.onErrorCallback(e);
+        }
+        this.destroy();
+    };
 
-Notify.prototype.close = function() {
-    this.myNotify.close();
-};
+    Notify.prototype.destroy = function () {
+        this.myNotify.removeEventListener('show', this, false);
+        this.myNotify.removeEventListener('error', this, false);
+        this.myNotify.removeEventListener('close', this, false);
+        this.myNotify.removeEventListener('click', this, false);
+    };
 
-Notify.prototype.handleEvent = function(e) {
-    switch (e.type) {
-    case 'show':
-        this.onShowNotification(e);
-        break;
-    case 'close':
-        this.onCloseNotification(e);
-        break;
-    case 'click':
-        this.onClickNotification(e);
-        break;
-    case 'error':
-        this.onErrorNotification(e);
-        break;
-    }
-};
+    Notify.prototype.close = function () {
+        this.myNotify.close();
+    };
 
-export default Notify;
+    Notify.prototype.handleEvent = function (e) {
+        switch (e.type) {
+            case 'show':
+                this.onShowNotification(e);
+                break;
+            case 'close':
+                this.onCloseNotification(e);
+                break;
+            case 'click':
+                this.onClickNotification(e);
+                break;
+            case 'error':
+                this.onErrorNotification(e);
+                break;
+        }
+    };
+
+    return Notify;
+
+}));

@@ -11,6 +11,7 @@ class Result{
 	const XML_RESPONSE_ROOT = 'response';
 
 	protected $uuid;
+	protected $exception;
 	private $status;
 	private $text;
 	private $data;
@@ -78,6 +79,9 @@ class Result{
 			if ($this->uuid != null){
 				$arr['request_id'] = $this->uuid;
 			}
+			if ($this->exception != null){
+				$arr['exception'] = $this->exception;
+			}
 		}
 		$res = json_encode($arr);
 		return $res;
@@ -105,6 +109,10 @@ class Result{
 
 	public function setRequestUUID(string $uuid){
 		$this->uuid = $uuid;
+	}
+
+	public function setException(Exception $e){
+		$this->exception = $e;
 	}
 
 	//Only data without any additional status information

@@ -50,8 +50,7 @@ class User extends AbstractUser{
 				FROM users
 				INNER JOIN tokens ON tokens.user_id = users.id
 				WHERE
-					tokens.token = :token
-				AND tokens.expires_on > DATE_PART('epoch', CURRENT_TIMESTAMP)::int");
+					tokens.token = :token");
 			$stm = array(':token' => $token);
 		}
 
@@ -83,6 +82,10 @@ class User extends AbstractUser{
 
 	public function getId() {
 		return $this->id;
+	}
+
+	public function getToken(){
+		return $this->token;
 	}
 
 	protected function getDB() : PDO {

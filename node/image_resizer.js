@@ -73,11 +73,8 @@ ImagesResize.prototype.cropToSquare = function (settings) {
                 rescrop_settings.height = 400 * 16 / 9;
             }
             easyimage.rescrop(rescrop_settings).then(
-                function (image) {
-                },
-                function (err) {
-                    logger.error(err);
-                }
+                function (image) {},
+                function (err) {logger.error(err);}
             );
         },
         function (err) {
@@ -159,10 +156,10 @@ ImagesResize.prototype.resizeNew = function (config) {
                 .from(events)
                 .where(
                     events.image_vertical.notEquals(events.image_vertical_resized)
-                )
-                .or(
-                    events.image_horizontal.notEquals(events.image_horizontal_resized)
-                )
+                        .or(events.image_horizontal.notEquals(events.image_horizontal_resized))
+                        .or(events.image_horizontal_resized.isNull())
+                        .or(events.image_vertical_resized.isNull())
+                ).limit(100)
                 .toQuery(),
 
         q_get_changed_organization_images =
@@ -171,23 +168,18 @@ ImagesResize.prototype.resizeNew = function (config) {
                 .from(organizations)
                 .where(
                     organizations.background_img_url.notEquals(organizations.background_medium_img_url)
-                )
-                .or(
-                    organizations.background_img_url.notEquals(organizations.background_small_img_url)
-                )
-                .or(
-                    organizations.img_url.notEquals(organizations.img_medium_url)
-                )
-                .or(
-                    organizations.img_url.notEquals(organizations.img_small_url)
+                        .or(organizations.background_img_url.notEquals(organizations.background_small_img_url))
+                        .or(organizations.img_url.notEquals(organizations.img_medium_url))
+                        .or(organizations.img_url.notEquals(organizations.img_small_url))
                 ).toQuery();
 
     //Resizing event images
+    console.log(q_get_changed_event_images.text);
+
     client.query(q_get_changed_event_images, function (err, result) {
         var images = [];
         if (err) return _logger.error(err);
         result.rows.forEach(function (event) {
-
             //Make array of all images (with info about orientation)
             images.push({
                 orientation: VERTICAL_IMAGES,
@@ -207,19 +199,26 @@ ImagesResize.prototype.resizeNew = function (config) {
         });
 
         images.forEach(function (image) {
+            var large_image = path.join(__dirname, IMAGES_PATH + LARGE_IMAGES + '/' + image.filename),
+                square_image = path.join(__dirname, IMAGES_PATH + SQUARE_IMAGES + '/' + image.filename),
+                medium_image = path.join(__dirname, IMAGES_PATH + MEDIUM_IMAGES + '/' + image.filename),
+                small_image = path.join(__dirname, IMAGES_PATH + SMALL_IMAGES + '/' + image.filename);
+
+            console.log(large_image, square_image, medium_image, small_image);
+
             _this.cropToSquare({
-                source: IMAGES_PATH + LARGE_IMAGES + '/' + image.filename,
-                destination: IMAGES_PATH + SQUARE_IMAGES + '/' + image.filename
+                source: large_image,
+                destination: square_image
             });
             _this.resizeFile({
-                source: IMAGES_PATH + LARGE_IMAGES + '/' + value,
-                destination: IMAGES_PATH + MEDIUM_IMAGES + '/' + value,
+                source: large_image,
+                destination: medium_image,
                 orientation: image.orientation,
                 size: MEDIUM_IMAGES
             });
             _this.resizeFile({
-                source: IMAGES_PATH + LARGE_IMAGES + '/' + value,
-                destination: IMAGES_PATH + SMALL_IMAGES + '/' + value,
+                source: large_image,
+                destination: small_image,
                 orientation: image.orientation,
                 size: SMALL_IMAGES
             });
@@ -232,7 +231,6 @@ ImagesResize.prototype.resizeNew = function (config) {
         client.query(organizations.update(data).where(organizations.id.equals(organization_id)).toQuery());
     };
 
-    console.log(q_get_changed_organization_images.text);
 
     client.query(q_get_changed_organization_images, function (err, result) {
 
@@ -240,9 +238,6 @@ ImagesResize.prototype.resizeNew = function (config) {
         result.rows.forEach(function (obj) {
             var logo_img_path = path.join(__dirname, ORGANIZATIONS_IMAGES_PATH + LOGO_IMAGES + '/' + LARGE_IMAGES + '/' + obj.img_url),
                 background_img_path = path.join(__dirname, ORGANIZATIONS_IMAGES_PATH + BACKGROUND_IMAGES + '/' + LARGE_IMAGES + '/' + obj.background_img_url);
-
-            console.log(logo_img_path);
-            console.log(background_img_path);
 
             // resize background
             try {

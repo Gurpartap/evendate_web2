@@ -141,6 +141,8 @@ class Event extends AbstractEntity{
 
 	public function setCanceled(bool $value, User $user){
         $q_upd_event = App::queryFactory()->newUpdate();
+		if ($user->getEditorInstance()->isEditor($this->getOrganization()) == false) throw new PrivilegesException('', $this->db);
+
         $q_upd_event
             ->table('events')
             ->cols(array(
@@ -436,10 +438,11 @@ class Event extends AbstractEntity{
 
 	public function getOrganization() : Organization{
 		if ($this->organization instanceof Organization == false){
-			$this->organization = OrganizationsCollection::filter(
+			$this->organization = OrganizationsCollection::one(
 				$this->db,
 				App::getCurrentUser(),
-				array('id' => $this->organization_id)
+				$this->organization_id,
+				array()
 			);
 		}
 		return $this->organization;
