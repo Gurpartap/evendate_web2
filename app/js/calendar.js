@@ -541,7 +541,7 @@ function Organization($view, $content_block){
 		bindEventsEvents($parent);
 
 		$parent.find('.Tabs').on('change.tabs', function(){
-			$(window).off('scroll.uploadEvents');
+			$(window).off('scroll.uploadFutureEvents scroll.uploadPastEvents');
 			bindUploadEventsOnScroll($(this).find('.TabsBody.-active'));
 		});
 	}
@@ -588,6 +588,7 @@ function Organization($view, $content_block){
 					} else {
 						$wrapper.off('scroll.onScroll');
 					}
+					bindOnClick();
 				}, ajaxErrorHandler)
 			}
 		});
@@ -609,15 +610,16 @@ function Organization($view, $content_block){
 				avatars_collection_classes = [],
 				favored_users_count = ($subscribers.length <= 4) ? 0 : event.favored_users_count - 4;
 			if(last_date != m_event_date.format(__C.DATE_FORMAT)){
-				var display_date;
+				var display_date,
+					diff = m_event_date.diff(m_today, 'days', true);
 
-				switch(m_event_date.diff(m_today, 'days')){
-					case 0:
-						display_date = 'Сегодня'; break;
-					case 1:
-						display_date = 'Завтра'; break;
-					case -1:
+				switch(true){
+					case (-2 < diff <= -1):
 						display_date = 'Вчера'; break;
+					case (-1 < diff <= 0):
+						display_date = 'Сегодня'; break;
+					case (0 < diff <= 1):
+						display_date = 'Завтра'; break;
 					default:
 						display_date = m_event_date.format('D MMMM');
 				}
@@ -685,9 +687,10 @@ function Organization($view, $content_block){
 						$wrapper.append($events);
 						$wrapper.data('next_offset', offset+10);
 					} else {
+						var scroll_event = is_future ? 'scroll.uploadFutureEvents' : 'scroll.uploadPastEvents';
 						$wrapper.append('<p class="organization_feed_text">Больше событий нет :(</p>');
 						$wrapper.data('disable_upload', true);
-						$(window).off('scroll.uploadEvents');
+						$(window).off(scroll_event);
 					}
 					if(typeof onSuccess == 'function'){
 						onSuccess($events);
@@ -703,11 +706,12 @@ function Organization($view, $content_block){
 	function bindUploadEventsOnScroll($wrapper){
 		var $window = $(window),
 			$document = $(document),
-			is_future = $wrapper.hasClass('FutureEvents');
+			is_future = $wrapper.hasClass('FutureEvents'),
+			scroll_event = is_future ? 'scroll.uploadFutureEvents' : 'scroll.uploadPastEvents';
 
 		$window.data('block_scroll', false);
 		if(!$wrapper.data('disable_upload')){
-			$window.on('scroll.uploadEvents', function(){
+			$window.on(scroll_event, function(){
 				if($window.height() + $window.scrollTop() + 200 >= $document.height() && !$window.data('block_scroll')){
 					$window.data('block_scroll', true);
 					uploadEvents($wrapper, is_future, function($events){
