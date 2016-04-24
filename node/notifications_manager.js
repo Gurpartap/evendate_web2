@@ -65,18 +65,18 @@ NotificationsManager.prototype.create = function (notification, device) {
         };
     } else if (device.client_type == DEVICE_TYPES.ANDROID) {
         note.send = function (callback) {
-            // note['data.message'] = note.body;
-            // note['data.event_id'] = note.payload.event_id;
-            // note['data.organization_logo'] = note.payload.organization_logo;
-            // note['data.organization_id'] = note.payload.organization_id;
-            // note.registration_id = device;
-            // gcm.send(note, function (err, messageId) {
-            //     if (err) {
-            //         callback(err, null);
-            //     } else {
-            //         callback(null, messageId);
-            //     }
-            // });
+            note['data.message'] = note.body;
+            note['data.event_id'] = note.payload.event_id;
+            note['data.organization_logo'] = note.payload.organization_logo;
+            note['data.organization_id'] = note.payload.organization_id;
+            note.registration_id = device;
+            gcm.send(note, function (err, messageId) {
+                if (err) {
+                    callback(err, null);
+                } else {
+                    callback(null, messageId);
+                }
+            });
         };
     } else {
         note.send = function (callback) {
