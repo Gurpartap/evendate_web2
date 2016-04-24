@@ -105,6 +105,10 @@ class App {
 
 		self::$__HEADERS = getallheaders();
 
+		foreach(self::$__HEADERS as $key => $header){
+			self::$__HEADERS[strtolower($key)] = $header;
+		}
+
 		self::$__FIELDS = Fields::parseFields(self::$__REQUEST['fields'] ??  '');
 		self::$__ORDER_BY = isset(self::$__REQUEST['order_by']) ? Fields::parseOrderBy(self::$__REQUEST['order_by']) : null;
 
@@ -121,7 +125,7 @@ class App {
 	static function getCurrentUser() : User {
 		if (self::$__USER instanceof User)
 			return self::$__USER;
-		$token = isset(self::$__HEADERS['Authorization']) ? self::$__HEADERS['Authorization'] : null;
+		$token = isset(self::$__HEADERS['authorization']) ? self::$__HEADERS['authorization'] : null;
 		self::$__USER = new User(self::$__DB, $token);
 		return self::$__USER;
 	}

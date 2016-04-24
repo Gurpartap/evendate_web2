@@ -111,8 +111,8 @@ module.exports = {
             'img_small_url'
         ]
     }),
-    notifications: sql.define({
-        name: 'notifications',
+    stat_notifications: sql.define({
+        name: 'stat_notifications',
         columns: [
             'id',
             'event_notification_id',
@@ -121,7 +121,22 @@ module.exports = {
             'created_at',
             'updated_at',
             'click_time',
+            'message_id',
             'received'
+        ]
+    }),
+    stat_users_notifications: sql.define({
+        name: 'stat_users_notifications',
+        columns: [
+            'id',
+            'user_notification_id',
+            'token_id',
+            'description',
+            'created_at',
+            'updated_at',
+            'click_time',
+            'received',
+            'message_id'
         ]
     }),
     view_notifications: sql.define({
@@ -138,6 +153,65 @@ module.exports = {
             'sent_time',
             'created_at',
             'updated_at'
+        ]
+    }),
+    view_users_notifications_devices: sql.define({
+        name: 'view_users_notifications_devices',
+        columns: [
+            'id',
+            'token',
+            'user_id',
+            'created_at',
+            'updated_at',
+            'token_type',
+            'expires_on',
+            'device_token',
+            'client_type',
+            'device_name',
+            'refresh_token',
+            'uuid',
+            'user_notification_id',
+            'notify_in_browser'
+        ]
+    }),
+    users_notifications: sql.define({
+        name: 'users_notifications',
+        columns: [
+            'id',
+            'user_id',
+            'event_id',
+            'notification_type_id',
+            'created_at',
+            'updated_at',
+            'notification_time',
+            'status',
+            'done',
+            'sent_time',
+            'uuid'
+        ]
+    }),
+    view_users_notifications: sql.define({
+        name: 'view_users_notifications',
+        columns: [
+            'id',
+            'user_id',
+            'event_id',
+            'created_at',
+            'updated_at',
+            'notification_time',
+            'status',
+            'done',
+            'sent_time',
+            'uuid',
+            'notification_type_id',
+            'organization_id',
+            'title',
+            'short_name',
+            'notification_suffix',
+            'image_square_vertical_url',
+            'image_square_horizontal_url',
+            'notification_type_name',
+            'notification_type_text'
         ]
     }),
     view_auto_notifications: sql.define({
@@ -163,6 +237,25 @@ module.exports = {
             'notification_type_text'
         ]
     }),
+    view_auto_favored_devices: sql.define({
+        name: 'view_auto_favored_devices',
+        columns: [
+            'id',
+            'token',
+            'user_id',
+            'created_at',
+            'updated_at',
+            'token_type',
+            'expires_on',
+            'device_token',
+            'client_type',
+            'device_name',
+            'refresh_token',
+            'uuid',
+            'event_id',
+            'notify_in_browser'
+        ]
+    }),
     subscriptions: sql.define({
         name: 'subscriptions',
         columns: [
@@ -186,7 +279,7 @@ module.exports = {
         ]
     }),
     view_auto_notifications_devices: sql.define({
-        name: 'subscriptions',
+        name: 'view_auto_notifications_devices',
         columns: [
             'id',
             'token',

@@ -1,3 +1,9 @@
+ALTER TABLE events ADD COLUMN "canceled" BOOLEAN DEFAULT FALSE NOT NULL;
+
+
+ALTER TABLE public.notifications ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE notifications ADD COLUMN "message_id" TEXT DEFAULT NULL;
+
 DROP VIEW view_events CASCADE;
 
 CREATE VIEW view_events AS
@@ -15,11 +21,12 @@ CREATE VIEW view_events AS
     events.min_price,
     events.public_at,
     events.disabled,
-    vk_posts.group_id AS vk_group_id,
-    vk_posts.image_path AS vk_image_path,
-    vk_posts.message AS vk_message,
+    events.canceled,
+    vk_posts.group_id                                                                AS vk_group_id,
+    vk_posts.image_path                                                              AS vk_image_path,
+    vk_posts.message                                                                 AS vk_message,
     events.registration_required,
-    DATE_PART('epoch', events.registration_till) :: INT AS registration_till,
+    DATE_PART('epoch', events.registration_till) :: INT                              AS registration_till,
     events.is_free,
     ((SELECT SUM(1)
       FROM (SELECT DISTINCT
@@ -148,17 +155,46 @@ CREATE VIEW view_auto_notifications AS
 DROP VIEW view_auto_notifications_devices;
 
 CREATE VIEW view_auto_notifications_devices AS
-  SELECT DISTINCT tokens.*, users.notify_in_browser,
+  SELECT DISTINCT
+    tokens.*,
+    users.notify_in_browser,
     organizations.id AS organization_id
   FROM tokens
     INNER JOIN subscriptions ON subscriptions.user_id = tokens.user_id
     INNER JOIN organizations ON organizations.id = subscriptions.organization_id
     INNER JOIN users ON users.id = tokens.user_id
-AND subscriptions.status = TRUE
-ORDER BY tokens.id DESC;
+                        AND subscriptions.status = TRUE
+  ORDER BY tokens.id DESC;
 
+DROP VIEW view_auto_favored_devices;
+
+CREATE VIEW view_auto_favored_devices AS
+  SELECT DISTINCT
+    tokens.*,
+    favorite_events.event_id,
+    users.notify_in_browser
+  FROM tokens
+    INNER JOIN favorite_events ON favorite_events.user_id = tokens.user_id
+    INNER JOIN users ON users.id = tokens.user_id
+                        AND favorite_events.status = TRUE
+  ORDER BY tokens.id DESC;
+
+
+DROP VIEW view_users_notifications_devices;
+
+CREATE VIEW view_users_notifications_devices AS
+  SELECT DISTINCT
+    tokens.*,
+    users_notifications.id AS user_notification_id,
+    users.notify_in_browser
+  FROM tokens
+    INNER JOIN users_notifications ON users_notifications.user_id = tokens.user_id
+    INNER JOIN users ON users.id = tokens.user_id
+                        AND users_notifications.status = TRUE
+  ORDER BY tokens.id DESC;
 
 DROP INDEX public.public_users_email1_idx CASCADE;
+DROP INDEX public.public_users_email0_idx CASCADE;
 DROP INDEX public.public_users_vk_uid2_idx CASCADE;
 DROP INDEX public.public_users_google_uid4_idx CASCADE;
 DROP INDEX public.public_users_facebook_uid3_idx CASCADE;
@@ -174,22 +210,99 @@ ALTER TABLE public.log_requests ADD exception_trace TEXT DEFAULT NULL NULL;
 ALTER TABLE public.log_requests ADD exception_file TEXT DEFAULT NULL NULL;
 ALTER TABLE public.log_requests ADD exception_line TEXT DEFAULT NULL NULL;
 
-CREATE VIEW view_users AS SELECT
-  users.id,
-  users.avatar_url,
-  users.email,
-  users.vk_uid,
-  users.facebook_uid,
-  users.google_uid,
-  users.first_name,
-  users.last_name,
-  users.middle_name,
-  users.gender,
-  users.token,
-  users.show_to_friends,
-  users.blurred_image_url,
-  users.local_avatar_filename
-  FROM users
-;
+DROP VIEW view_users;
 
-ALTER TABLE events ADD COLUMN "disabled" BOOLEAN DEFAULT FALSE NOT NULL;
+ALTER TABLE public.organizations ADD email TEXT DEFAULT NULL  NULL;
+
+CREATE VIEW view_users AS
+  SELECT
+    users.id,
+    users.avatar_url,
+    users.email,
+    users.vk_uid,
+    users.facebook_uid,
+    users.google_uid,
+    users.first_name,
+    users.last_name,
+    users.middle_name,
+    users.gender,
+    users.token,
+    users.show_to_friends,
+    users.blurred_image_url,
+    users.local_avatar_filename
+  FROM users;
+
+INSERT INTO public.notification_types (id, type, timediff, text)
+VALUES (7, 'notification-event-changed-dates', -1, 'У вашего избранного события {title} изменились даты ');
+INSERT INTO public.notification_types (id, type, timediff, text) VALUES
+  (8, 'notification-event-changed-location', -1, 'У вашего избранного события {title} изменилось место проведения');
+INSERT INTO public.notification_types (id, type, timediff, text) VALUES
+  (9, 'notification-event-changed-registration', -1,
+   'У вашего избранного события {title} изменилась информация про регистрацию');
+INSERT INTO public.notification_types (id, type, timediff, text) VALUES
+  (10, 'notification-event-changed-price', -1, 'У вашего избранного события {title} изменилась информация про цену');
+INSERT INTO public.notification_types (id, type, timediff, text)
+VALUES (11, 'notification-event-registration-ending', -1, 'Остался последний день для регистрации на {title}');
+
+INSERT INTO public.notification_types (id, type, timediff, text)
+VALUES (12, 'notification-event-canceled', -1, 'Событие {title} отменено организатором');
+
+INSERT INTO public.notification_types (id, type, timediff, text)
+VALUES (13, 'users-notification', -1, '{title}');
+
+
+DROP VIEW view_notifications;
+
+CREATE VIEW view_notifications AS
+  SELECT
+    users_notifications.uuid,
+    users_notifications.user_id,
+    users_notifications.id as user_notification_id,
+    NULL                                                             AS events_notification_id,
+    users_notifications.event_id,
+    DATE_PART('epoch', users_notifications.notification_time) :: INT AS notification_time,
+    users_notifications.status,
+    nt1.id                                                           AS notification_type_id,
+    'users-notification'                                             AS notification_type,
+    users_notifications.done,
+    DATE_PART('epoch', users_notifications.sent_time) :: INT         AS sent_time,
+    users_notifications.created_at,
+    users_notifications.updated_at
+  FROM users_notifications
+    INNER JOIN notification_types nt1 ON nt1.type = 'users-notification'
+  UNION
+  SELECT
+    NULL                                                              AS uuid,
+    NULL                                                              AS user_id,
+    NULL                                                              AS user_notification_id,
+    events_notifications.id                                           AS events_notification_id,
+    events_notifications.event_id,
+    DATE_PART('epoch', events_notifications.notification_time) :: INT AS notification_time,
+    events_notifications.status,
+    events_notifications.notification_type_id,
+    nt2.type                                                          AS notification_type,
+    events_notifications.done,
+    NULL                                                              AS sent_time,
+    events_notifications.created_at,
+    events_notifications.updated_at
+  FROM events_notifications
+    INNER JOIN notification_types nt2 ON events_notifications.notification_type_id = nt2.id;
+
+ALTER TABLE notifications RENAME TO stat_notifications;
+
+ALTER TABLE users_notifications ADD COLUMN notification_type_id INT DEFAULT 13 NOT NULL;
+ALTER TABLE users_notifications ADD FOREIGN KEY (notification_type_id) REFERENCES notification_types (id);
+
+CREATE TABLE stat_users_notifications (
+  id                   SERIAL PRIMARY KEY NOT NULL,
+  user_notification_id INT                NOT NULL,
+  token_id             INT                NOT NULL,
+  description          TEXT      DEFAULT NULL,
+  created_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  click_time           TIMESTAMP DEFAULT NULL,
+  received             BOOLEAN   DEFAULT FALSE,
+  message_id           TEXT      DEFAULT NULL,
+  FOREIGN KEY (user_notification_id) REFERENCES users_notifications (id),
+  FOREIGN KEY (token_id) REFERENCES tokens (id)
+);

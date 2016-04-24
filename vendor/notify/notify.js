@@ -176,18 +176,18 @@
 
     Notify.prototype.handleEvent = function (e) {
         switch (e.type) {
-        case 'show':
-            this.onShowNotification(e);
-            break;
-        case 'close':
-            this.onCloseNotification(e);
-            break;
-        case 'click':
-            this.onClickNotification(e);
-            break;
-        case 'error':
-            this.onErrorNotification(e);
-            break;
+            case 'show':
+                this.onShowNotification(e);
+                break;
+            case 'close':
+                this.onCloseNotification(e);
+                break;
+            case 'click':
+                this.onClickNotification(e);
+                break;
+            case 'error':
+                this.onErrorNotification(e);
+                break;
         }
     };
 

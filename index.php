@@ -92,7 +92,6 @@ require 'footer.php';
 <!-- NOTIFICATIONS API -->
 <script src="vendor/notify/notify.js"></script>
 
-
 <script>
 	$('.vk-auth-btn,.google-plus-btn,.facebook-btn').on('click', function(){
 		if (Notify.needsPermission) {

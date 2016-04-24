@@ -187,9 +187,9 @@ try {
 	}
 
 	if (($_SERVER['ENV'] == 'local' || $_SERVER['ENV'] == 'dev' || $_SERVER['ENV'] == 'test') && isset($e)){
-		print_r($_exception);
+		$_result->setException($_exception);
 	}elseif(isset($__request['show_debug']) && isset($_exception)){
-		print_r($_exception);
+		$_result->setException($_exception);
 	}
 
 	echo $_result;

@@ -4,6 +4,16 @@
 
 	class Editor extends User{
 
+
+		/**
+		 * Editor constructor.
+		 * @param PDO $db
+		 * @param null $token
+		 */
+		public function __construct(PDO $db, $token = null){
+			parent::__construct($db, App::getCurrentUser()->getToken());
+		}
+
 		protected function addNewEvent(array $data){
 			$data['filenames'] = $data['filenames'] ?? $data['file_names'];
 			if (isset($data['organization_id'])){

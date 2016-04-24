@@ -688,6 +688,9 @@ CREATE VIEW view_dates AS
 
 SELECT * FROM view_dates WHERE event_id = 393;
 
+DROP INDEX public.public_events_notifications_event_id0_idx RESTRICT;
+CREATE INDEX public_events_notifications_event_id0_idx ON public.events_notifications (event_id, notification_type_id);
+
 SELECT DISTINCT
   events_dates.id,
   events_dates.event_id,
@@ -699,3 +702,6 @@ SELECT DISTINCT
   DATE_PART('epoch', events_dates.updated_at) :: INT AS updated_at
 FROM events_dates
   INNER JOIN events ON events_dates.event_id = events.id AND events_dates.status = TRUE AND event_id=393;
+
+
+SELECT * FROM log_requests ORDER BY id DESC LIMIT 10;

@@ -1,0 +1,16 @@
+{
+  "name": "evendate-tests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "frisby": "^0.8.5",
+    "jasmine": "^2.4.1",
+    "jasmine-node": "^1.14.5"
+  }
+}

@@ -33,7 +33,22 @@ class Notification extends AbstractEntity{
 	);
 
 	const NOTIFICATION_TYPE_NOW = 'notification-now';
+	const NOTIFICATION_TYPE_CANCELED = 'notification-event-canceled';
+	const NOTIFICATION_TYPE_CHANGED_DATES = 'notification-event-changed-dates';
+	const NOTIFICATION_TYPE_CHANGED_LOCATION = 'notification-event-changed-location';
+	const NOTIFICATION_TYPE_CHANGED_PRICE = 'notification-event-changed-price';
+	const NOTIFICATION_TYPE_CHANGED_REGISTRATION = 'notification-event-changed-registration';
 	const NOTIFICATION_TYPE_NOW_ID = 1;
+
+	const USERS_NOTIFICATION_ID = 13;
+
+	const NOTIFICATION_CHANGED_TYPES = array(
+		self::NOTIFICATION_TYPE_CANCELED,
+		self::NOTIFICATION_TYPE_CHANGED_DATES,
+		self::NOTIFICATION_TYPE_CHANGED_LOCATION,
+		self::NOTIFICATION_TYPE_CHANGED_REGISTRATION,
+		self::NOTIFICATION_TYPE_CHANGED_PRICE,
+	);
 
 	const NOTIFICATION_TYPES = array(
 		self::NOTIFICATION_TYPE_NOW,
@@ -41,7 +56,13 @@ class Notification extends AbstractEntity{
 		'notification-before-three-days',
 		'notification-before-week',
 		'notification-before-day',
-		'notification-custom'
+		'notification-custom',
+		self::NOTIFICATION_TYPE_CANCELED,
+		self::NOTIFICATION_TYPE_CHANGED_DATES,
+		self::NOTIFICATION_TYPE_CHANGED_LOCATION,
+		self::NOTIFICATION_TYPE_CHANGED_REGISTRATION,
+		self::NOTIFICATION_TYPE_CHANGED_PRICE,
+		'notification-event-registration-ending'
 	);
 
 
@@ -83,8 +104,6 @@ class Notification extends AbstractEntity{
 
 		return new Result(true, 'Уведомление успешно удалено');
 	}
-
-
 
 	public function getNotificationTime() {
 		return $this->notification_time;
