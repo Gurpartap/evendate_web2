@@ -16,14 +16,8 @@
 </noscript><!-- /Yandex.Metrika counter -->
 
 
-<script src="/vendor/vk_openapi/openapi.js" type="text/javascript"></script>
-
 <script>
 	$(document).ready(function() {
-
-		VK.init({
-			apiId: <?=App::$SETTINGS->VK->APP_ID?>
-		});
 
 		var _oauth_urls = {
 			mobile: {

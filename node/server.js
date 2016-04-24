@@ -13,8 +13,9 @@ var server = require('http'),
     nodemailer = require('nodemailer'),
     CronJob = require('cron').CronJob,
     ImagesResize = require('./image_resizer'),
+    Notifications = require('./notifications'),
     Entities = require('./entities'),
-    pg = require('pg'),
+    pg = require('pg').native,
     sql = require('sql'),
     crypto = require('crypto'),
     __rooms = {};
@@ -37,15 +38,14 @@ var config_index = process.env.ENV ? process.env.ENV : 'dev',
     logger = new (winston.Logger)({
         transports: [
             new (winston.transports.Console)(),
-            new winston.transports.File({filename: __dirname + '/debug.log', json: false})
+            new winston.transports.File({filename: __dirname + '/debug.log', json: true})
         ],
         exceptionHandlers: [
             new (winston.transports.Console)(),
-            new winston.transports.File({filename: __dirname + '/exceptions.log', json: false})
+            new winston.transports.File({filename: __dirname + '/exceptions.log', json: true})
         ],
         exitOnError: true
     }),
-// notifications_factory = new NotificationsManager(real_config),
     cropper = new ImagesResize({logger: logger}),
     transporter = nodemailer.createTransport(smtpTransport({
         host: real_config.smtp.host,
@@ -116,18 +116,12 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 images: real_config.images,
                 client: client
             });
-        }, null, true);
-    } catch (ex) {
-        logger.error(ex);
-    }
 
-    try {
-        if (config_index == 'prod') {
-            new CronJob('*/5 * * * *', function () {
-                logger.info('Notifications start', 'START...' + new Date().toString());
-                // sendNotifications();
-            }, null, true);
-        }
+            var notifications = new Notifications(real_config, client, logger);
+            notifications.sendAutoNotifications();
+            notifications.sendUsersNotifications();
+
+        }, null, true);
     } catch (ex) {
         logger.error(ex);
     }
@@ -143,7 +137,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
                 logger.error(err);
                 if (client) {
-                    done(client); 
+                    done(client);
                 }
                 if (callback instanceof Function) {
                     callback(err);
@@ -266,9 +260,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
                     client.query(q_user, function (user_err, ins_result) {
 
-                        if (handleError(user_err)){
-                            if (data.oauth_data.hasOwnProperty('email') == false ||
-                                !data.oauth_data.email){
+                        if (handleError(user_err)) {
+                            if (data.oauth_data.hasOwnProperty('email') == false || !data.oauth_data.email) {
                                 socket.emit('vk.needEmail');
                                 return;
                             }
@@ -315,7 +308,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                     access_token: data.oauth_data.access_token,
                                     expires_in: data.oauth_data.expires_in,
                                     etag: data.user_info.etag,
-                                    cover_photo_url: data.user_info.hasOwnProperty('cover') && data.user_info.cover.hasOwnProperty('coverPhoto') ? data.user_info.cover.coverPhoto.url : null,
+                                    cover_photo_url: data.user_info.cover && data.user_info.cover.coverPhoto ? data.user_info.cover.coverPhoto.url : null
                                 };
                                 if (user.google_uid != null) {
                                     q_ins_sign_in = google_sign_in.update(google_data).where(google_sign_in.user_id.equals(user.id));
@@ -649,26 +642,19 @@ pg.connect(pg_conn_string, function (err, client, done) {
         });
 
         socket.on(EMIT_NAMES.NOTIFICATIONS.SEND, function () {
-            // sendNotifications();
-        });
-
-        socket.on('notification.received', function (data) {
-            client.query('UPDATE notifications ' +
-                ' SET received = 1, ' +
-                ' click_time = ' + (data.click_time ? connection.escape(data.click_time) : null) +
-                ' WHERE id = ' + connection.escape(data.notification_id), function (err) {
-                if (err) logger.error(err);
-            })
+            var notifications = new Notifications(real_config, client, logger);
+            notifications.sendAutoNotifications();
+            notifications.sendUsersNotifications();
         });
 
         socket.on(EMIT_NAMES.VK_INTEGRATION.GROUPS_TO_POST, function (user_id) {
             var vk_sign_in = Entities.vk_sign_in,
                 q_get_user_data = vk_sign_in
-                .select(vk_sign_in.id, vk_sign_in.secret, vk_sign_in.access_token)
-                .from(vk_sign_in)
-                .where(
-                    vk_sign_in.user_id.equals(user_id)
-                ).toQuery();
+                    .select(vk_sign_in.id, vk_sign_in.secret, vk_sign_in.access_token)
+                    .from(vk_sign_in)
+                    .where(
+                        vk_sign_in.user_id.equals(user_id)
+                    ).toQuery();
 
             client.query(q_get_user_data, function (err, result) {
                 if (handleError(err, EMIT_NAMES.VK_INTEGRATION.GROUPS_TO_POST)) return;

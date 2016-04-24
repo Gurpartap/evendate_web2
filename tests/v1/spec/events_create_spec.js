@@ -30,7 +30,7 @@ events.forEach(function (value) {
                 console.log(json);
             })
             .after(function(err, res, body){
-                console.log(body);
+                console.log(err);
             })
             .toss();
     }

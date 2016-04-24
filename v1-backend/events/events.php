@@ -125,16 +125,17 @@ $__modules['events'] = array(
         '{(id:[0-9]+)/status}' => function ($id) use ($__request, $__db, $__user) {
             $event = EventsCollection::one($__db, $__user, $id, array());
             if (isset($__request['hidden'])) {
-                if ($__request['hidden'] == 1) {
-                    return $event->hide($__user);
+                if ($__request['hidden'] == 'true') {
+                    $result = $event->hide($__user);
                 } else {
-                    return $event->show($__user);
+                    $result = $event->show($__user);
                 }
             }
             if (isset($__request['canceled'])) {
-                return $event->setCanceled($__request['canceled'] == '1', $__user);
+                $result = $event->setCanceled($__request['canceled'] == 'true', $__user);
             }
             if (!isset($__request['canceled']) && !isset($__request['hidden'])) throw new BadMethodCallException('Bad Request');
+            return $result;
         },
         '{/(id:[0-9]+)/notifications/(uuid:\w+-\w+-\w+-\w+-\w+)}' => function ($id, $notification_uuid) use ($__request, $__fields, $__db, $__user) {
 

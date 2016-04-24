@@ -46,6 +46,11 @@ class NotificationsCollection extends AbstractCollection{
 					$statement_array[':uuid'] = $value;
 					$is_one_notification = true;
 					$filtered = true;
+					break;
+				}
+				case 'id': {
+					
+					break;
 				}
 			}
 		}

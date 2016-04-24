@@ -174,8 +174,6 @@ ImagesResize.prototype.resizeNew = function (config) {
                 ).toQuery();
 
     //Resizing event images
-    console.log(q_get_changed_event_images.text);
-
     client.query(q_get_changed_event_images, function (err, result) {
         var images = [];
         if (err) return _logger.error(err);
@@ -204,7 +202,6 @@ ImagesResize.prototype.resizeNew = function (config) {
                 medium_image = path.join(__dirname, IMAGES_PATH + MEDIUM_IMAGES + '/' + image.filename),
                 small_image = path.join(__dirname, IMAGES_PATH + SMALL_IMAGES + '/' + image.filename);
 
-            console.log(large_image, square_image, medium_image, small_image);
 
             _this.cropToSquare({
                 source: large_image,

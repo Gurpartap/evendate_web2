@@ -154,6 +154,10 @@
         "client_secret": "5rK7ElK7fA7G1tylhkzsnE4Q",
         "redirect_uri": ""
       },
+      "web_gcm": {
+        "number": "403640417782",
+        "api_key": "AIzaSyCnKxHHK0NfkniNh5rSk6RctpIb7tUmC5U"
+      },
       "maps_api_v3": {
         "key": "AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg"
       }
@@ -166,7 +170,7 @@
       "port": 3306
     },
     "db": {
-      "host": "192.168.33.22",
+      "host": "localhost",
       "user": "postgres",
       "password": "APASSWORD",
       "database": "evendate",
