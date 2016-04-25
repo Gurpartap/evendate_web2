@@ -311,13 +311,13 @@ class Event extends AbstractEntity
 
             self::saveDates($data['dates'], $db, $event_id);
             self::saveEventTags($db, $event_id, $data['tags']);
-            self::saveNotifications(array(
+            self::saveNotifications(array(array(
                 'event_id' => $event_id,
                 'notification_type_id' => Notification::NOTIFICATION_TYPE_NOW_ID,
                 'notification_time' => $data['notification_at']->format('Y-m-d H:i:s'),
                 'status' => 'TRUE',
                 'done' => 'FALSE'
-            ), $db);
+            )), $db);
 
             self::updateVkPostInformation($db, $event_id, $data);
 
