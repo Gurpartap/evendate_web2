@@ -732,7 +732,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                                             }
 
                                                             var user_id = socket.vk_user.user_id,
-                                                                q_ins_vk_post = vk_posts.insert({
+                                                                q_ins_vk_post = Entities.vk_posts.insert({
                                                                     creator_id: user_id,
                                                                     image_path: filename,
                                                                     message: data.message,
