@@ -372,6 +372,39 @@ function MyTimeline($view, $content_block){
 	setDaysWithEvents();
 }
 
+function OneEvent($view, $content_block){
+
+	function initEventPage($parent){
+		bindAddAvatar($parent);
+		trimAvatarsCollection($parent);
+		bindRippleEffect($parent);
+		bindDropdown($parent);
+		bindCallModal($parent);
+		bindOpenMedia($parent);
+		bindCollapsing($parent);
+
+		$parent.find('.Subscribe').not('.-Handled_Subscribe').each(function(){
+			new SubscribeButton($(this), {
+				labels: {
+					subscribe: 'Добавить в избранное',
+					subscribed: 'В избранном'
+				},
+				colors: {
+					subscribe: '-color_neutral_secondary',
+					unsubscribe: '-color_secondary',
+					subscribed: '-color_secondary'
+				},
+				icons: {
+					subscribe: 'fa-star-o',
+					subscribed: 'fa-star'
+				}
+			});
+		}).addClass('-Handled_Subscribe');
+	}
+	initEventPage($view);
+
+}
+
 function OrganizationsList($view, $content_block){
 	if (__STATES.getCurrentState() == 'organizations' && organizations_loaded) return;
 	$.ajax({
@@ -873,7 +906,6 @@ function bindFeedEvents($view){
 	});
 	bindOnClick();
 }
-
 
 function OneFriend($view, $content_block){
 	var friend_id = __STATES.getCurrentState().split('-')[1],
@@ -2105,6 +2137,7 @@ $(document)
 	.ready(function(){
 
 		window.__STATES = {
+			event: OneEvent,
 			timeline: MyTimeline,
 			organizations: OrganizationsList,
 			organization: Organization,

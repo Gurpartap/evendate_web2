@@ -1,6 +1,7 @@
 String.prototype.capitalize = function() {
 	return this.charAt(0).toUpperCase() + this.slice(1);
 };
+String.prototype.contains = function(it) {return this.indexOf(it) != -1;};
 
 
 $.fn.extend({
@@ -296,13 +297,13 @@ function initSelect2($element, options){
 
 function bindRippleEffect($parent){
 	$parent = $parent ? $parent : $('body');
-	$parent.find('.RippleEffect').not('.-Handled_RippleEffect').on('click', function(e){
+	$parent.find('.RippleEffect').not('.-Handled_RippleEffect').on('click.RippleEffect', function(e){
 		var $this = $(this), $ripple, size, x, y;
 
-		if($this.children('.ripple').length == 0)
-			$this.prepend("<span class='ripple'></span>");
+		if($this.children('.Ripple').length == 0)
+			$this.prepend("<span class='ripple Ripple'></span>");
 
-		$ripple = $this.children('.ripple');
+		$ripple = $this.children('.Ripple');
 		$ripple.removeClass('animate');
 
 		if(!$ripple.height() && !$ripple.width()) {
@@ -320,6 +321,70 @@ function bindRippleEffect($parent){
 				$ripple.removeClass('animate');
 			});
 	}).addClass('-Handled_RippleEffect');
+}
+
+function bindDropdown($parent){
+	$parent = $parent ? $parent : $('body');
+	$parent.find('.DropdownButton').not('.-Handled_DropdownButton').each(function(){
+		var $button = $(this),
+			data = $button.data(),
+			$dropbox = $('.DropdownBox').filter('[data-dropdown_id="'+data.dropdown+'"]');
+
+		$dropbox.data($.extend({}, $dropbox.data(), data));
+		$dropbox.closeDropbox = function(){
+			$('body').off('mousedown.CloseDropdown');
+			$(document).off('keyup.CloseDropdown');
+			$dropbox.removeClass('-show');
+		};
+
+		if(data.hasOwnProperty('ddWidth')){
+			if(data.ddWidth == 'self'){
+				$dropbox.width($button.outerWidth());
+			} else if((isFinite(data.ddWidth)) || (data.ddWidth.search(/^[1-9]\d*%$|^0%$/) === 0)){
+				$dropbox.width(data.ddWidth);
+			}
+		}
+		if(data.hasOwnProperty('ddPosX') || data.hasOwnProperty('ddPosY')){
+			var button_pos = $button.position();
+			if(data.hasOwnProperty('ddPosX')){
+				var xPos;
+				if(data.ddPosX == 'self.center'){
+					xPos = (button_pos.left + $button.outerWidth() / 2) - $dropbox.outerWidth() / 2;
+				} else if(data.ddPosX == 'center'){
+					xPos = $dropbox.parent().outerWidth() / 2 - $dropbox.outerWidth() / 2;
+				} else if(isFinite(data.ddPosX)){
+					xPos = data.ddPosX;
+				}
+				$dropbox.css('left', xPos);
+			}
+			if(data.hasOwnProperty('ddPosY')){
+				var yPos;
+				if(data.ddPosY == 'self.center'){
+					yPos = (button_pos.top + $button.outerHeight() / 2) - $dropbox.outerHeight() / 2;
+				} else if(data.ddPosY == 'center'){
+					yPos = $dropbox.parent().outerHeight() / 2 - $dropbox.outerHeight() / 2;
+				} else if(isFinite(data.ddPosY)){
+					yPos = (button_pos.top + $button.outerHeight()) + data.ddPosY;
+				}
+				$dropbox.css('top', yPos);
+			}
+		}
+		$dropbox.find('.CloseDropdown').on('click.CloseDropdown', $dropbox.closeDropbox);
+		$button.on('click.Dropdown', function(){
+			$dropbox.addClass('-show');
+			$('body').on('mousedown.CloseDropdown', function(e) {
+				if(!$(e.target).closest('.DropdownBox').length){
+					$dropbox.closeDropbox();
+				}
+			});
+			$(document).on('keyup.CloseDropdown', function(e){
+				if(e.keyCode == 27){
+					$dropbox.closeDropbox();
+				}
+			});
+		});
+
+	}).addClass('-Handled_DropdownButton')
 }
 
 function buildAvatarCollection(subscribers, count){
@@ -383,6 +448,7 @@ function trimAvatarsCollection($parent){
 }
 
 function placeAvatarDefault($parent){
+	$parent = $parent ? $parent : $('body');
 	var $avatars = $parent.find('.avatar');
 	$avatars.each(function(){
 		$(this).children('img').one('error', function(){
@@ -464,29 +530,126 @@ function toDataUrl(url, callback){
 	xhr.send();
 }
 
-
+function bindCallModal($parent){
+	$parent = $parent ? $parent : $('body');
+	$parent.find('.CallModal').each(function() {
+		var $this = $(this);
+		$this.on('click', function(){
+			showModal($this.data('callModal'));
+		});
+	});
+}
 
 function showModal(name){
-	var $modal = $('.'+name.capitalize()+'Modal');
+	var $modal = $('.'+name.capitalize()+'Modal'),
+		$modal_wrapper = $modal.parent(),
+		$html = $('html'),
+		destroyer_height = ($modal.height() > $html.height()) ? $modal.height() : $html.height();
 
 	if($modal.length > 0){
 		$('.modal_unit').removeClass('-active');
-		$('html').addClass('-open_modal');
-		$modal.addClass('-active').parent().addClass('-active');
-		$('.modal_destroyer').height($modal.height()).off('mousedown.CloseModal').on('mousedown.CloseModal', function(){
+		$html.addClass('-open_modal');
+		$modal.addClass('-active');
+		$modal_wrapper.addClass('-active');
+		$('.modal_destroyer').height(destroyer_height).off('mousedown.CloseModal').on('mousedown.CloseModal', function(){
 			$(this).off('mousedown.CloseModal');
 			closeModal();
 		});
 		$modal.find('.CloseModal').off('click.CloseModal').on('click.CloseModal', closeModal);
+		if(name.capitalize() != 'Media') {
+			$modal_wrapper.removeClass('-blackened');
+		}
 	} else {
 		throw Error('Модального окна '+name+' нет');
 	}
-
 }
 
 function closeModal(){
 	$('html').removeClass('-open_modal');
 	$('.modal_unit').removeClass('-active').parent().removeClass('-active').trigger('modal-close');
+}
+
+function openMedia(url, type){
+	type = type == undefined ? 'image' : type;
+	var $modal = $('.MediaModal'),
+		$window = $(window),
+		window_max_w = $window.width() * 0.8,
+		window_max_h = $window.height() * 0.8,
+		$media, real_w, real_h, w, h;
+	$modal.parent().addClass('-blackened');
+	showModal('media');
+	switch(type){
+		default:
+		case 'image': {
+			$media = $('<img>').attr('src', url);
+			$modal.find('.modal_content').html($media);
+			real_w = $media.width();
+			real_h = $media.height();
+
+			if((real_w > window_max_w) || (real_h > window_max_h)){
+				w = (real_w > real_h) ? window_max_w : window_max_h * real_w / real_h;
+				h = (real_w > real_h) ? window_max_w * real_h / real_w : window_max_h;
+			} else {
+				w = real_w;
+				h = real_h;
+			}
+			$modal.width(w);
+			$modal.height(h);
+			$media.wrap($('<div>').addClass('img_holder'));
+		}
+	}
+}
+
+function bindCollapsing($parent){
+	$parent = $parent ? $parent : $('body');
+	$parent.find('.CollapsingButton').each(function(){
+		var $button = $(this),
+			$wrapper = $button.siblings('.CollapsingWrapper'),
+			$content = $wrapper.children(),
+			default_height = $wrapper.data('defaultHeight') ? $wrapper.data('defaultHeight') : 0;
+		function toggleCollapsing(){
+			if($wrapper.hasClass('-opened')){
+				$wrapper.height(default_height);
+				$wrapper.on('click.toggleCollapsing', toggleCollapsing);
+			} else {
+				$wrapper.height($content.outerHeight());
+				$wrapper.off('click.toggleCollapsing');
+			}
+			$wrapper.toggleClass('-opened');
+		}
+		if(!$wrapper.hasClass('-opened')){
+			$wrapper.on('click.toggleCollapsing', toggleCollapsing);
+		}
+		$button.on('click.toggleCollapsing', toggleCollapsing);
+	})
+}
+
+function bindOpenMedia($parent){
+	$parent = $parent ? $parent : $('body');
+	$parent.find('.OpenMedia').each(function() {
+		var $this = $(this),
+			type = $this.data('mediaType'),
+			url = $this.data('mediaUrl');
+		if(!url){
+			if($this.is('img')){
+				url = $this.attr('url');
+				type = type ? type : 'image';
+			} else if($this.is('video')) {
+				//url = $this.attr('url');
+				type = type ? type : 'video';
+			} else {
+				var str = $this.css('background-image');
+				if(str !== 'none'){
+					url = str.slice(str.indexOf('"')+1, str.indexOf('"', str.indexOf('"') + 1));
+				}
+				type = type ? type : 'image';
+			}
+		}
+
+		$this.on('click', function(){
+			openMedia(url, type);
+		});
+	});
 }
 
 function initCrop(source, $endpoint_img, options){

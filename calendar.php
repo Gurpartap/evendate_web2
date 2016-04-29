@@ -19,9 +19,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<title>Evendate</title>
 	<!-- =============== VENDOR STYLES ===============-->
-	<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,800italic,800,700italic,700,600italic,600,400italic,300italic,300' rel='stylesheet' type='text/css'>
-	<link href='https://fonts.googleapis.com/css?family=Didact+Gothic&subset=latin,cyrillic,cyrillic-ext' rel='stylesheet' type='text/css'>
-	<link href='https://fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,500,500italic&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+	<link href='https://fonts.googleapis.com/css?family=Roboto:300,300italic,400,400italic,500,500italic,700,700italic&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
 	<!-- FONT AWESOME-->
 	<link rel="stylesheet" href="/vendor/fontawesome/css/font-awesome.min.css">
 	<!-- SIMPLE LINE ICONS-->
@@ -122,7 +120,7 @@
         <!-- END Sidebar (left)-->
     </aside>
     <!-- Main section-->
-    <section>
+    <section id="main_section">
         <!-- Page content-->
         <div class="content-wrapper">
             <div class="head-row col-xs-10 header blurheader">
@@ -281,110 +279,194 @@
 						<!-- END row-->
 
 					<!-- START row-->
+					<div class="event-app hidden screen-view" data-controller="OneEvent">
+						<div class="page_viewport">
+							<div class="page_wrapper">
+								<div class="page event_page">
+									<div class="event_main_content">
+										<header class="event_header">
+											<div class="event_image OpenMedia" style="background-image: url('http://evendate.ru/event_images/large/5adba4e48891a5b3708e2b8e671338a6.jpg')"></div>
+											<div class="event_image_bottom">
+												<div class="form_group -parts_e_2 AddAvatarWrapper">
+													<div class="form_unit">
+														<div class="avatars_collection -subscribable -rounded -bordered -size_small AvatarsCollection CallModal" data-max_subscribers="6" data-call-modal="friends">
+															<div class="avatar" style="background-image: url(https://scontent.xx.fbcdn.net/hprofile-xfp1/v/t1.0-1/p50x50/10527538_829342687084874_4807662659139049876_n.jpg?oh=0fc62d2cf84572c091d28f93ddbd7a1e&amp;oe=5779783B)"></div>
+															<div class="avatar" style="background-image: url(http://cs624628.vk.me/v624628000/511e2/CVlNSwgIUZc.jpg)"></div>
+															<div class="avatar" style="background-image: url(http://cs629530.vk.me/v629530388/3d59e/z2b38WOLbvo.jpg)"></div>
+															<div class="avatar" style="background-image: url(http://cs624628.vk.me/v624628000/511e2/CVlNSwgIUZc.jpg)"></div>
+															<div class="avatar" style="background-image: url(http://cs629530.vk.me/v629530388/3d59e/z2b38WOLbvo.jpg)"></div>
+															<div class="avatar" style="background-image: url(http://cs629530.vk.me/v629530388/3d59e/z2b38WOLbvo.jpg)"></div>
+															<div class="avatar" style="background-image: url(http://cs629530.vk.me/v629530388/3d59e/z2b38WOLbvo.jpg)"></div>
+														</div>
+														<span class="counter -size_30x30 -bordered -color_marginal -castable -cast">+<span class="FavoredCount">0</span></span>
+													</div>
+													<div class="form_unit" align="right">
+														<button class="button event_favourite_button -low -rounded fa_icon fa-star-o -color_neutral_secondary Subscribe EventSubscribe -AddFavourite AddAvatar RippleEffect" data-event-id="3342" style="width: 170px">
+															<span class="Text">Добавить в избранное</span>
+														</button>
+														<button class="button -empty -low -rounded fa_icon fa-bell-o -color_neutral RippleEffect DropdownButton" data-dropdown="edit_notification" data-dd-width="190" data-dd-pos-x="self.center" data-dd-pos-y="6" type="button"></button>
+														<div class="dropdown_box DropdownBox" data-dropdown_id="edit_notification">
+															<header class="dropdown_header">Настройка напоминания</header>
+															<form class="dropdown_box_wrapper">
+																<div class="form_unit">
+																	<input id="event_notify_1" class="form_checkbox ToggleNotification" type="checkbox" name="notification_time" value="notification-before-three-hours" tabindex="-1">
+																	<label class="form_label" for="event_notify_1"><span>За 3 часа</span></label>
+																</div>
+																<div class="form_unit">
+																	<input id="event_notify_2" class="form_checkbox ToggleNotification" type="checkbox" name="notification_time" value="notification-before-day" tabindex="-1">
+																	<label class="form_label" for="event_notify_2"><span>За день</span></label>
+																</div>
+																<div class="form_unit">
+																	<input id="event_notify_3" class="form_checkbox ToggleNotification" type="checkbox" name="notification_time" value="notification-before-three-days" tabindex="-1">
+																	<label class="form_label" for="event_notify_3"><span>За 3 дня</span></label>
+																</div>
+																<div class="form_unit">
+																	<input id="event_notify_4" class="form_checkbox ToggleNotification" type="checkbox" name="notification_time" value="notification-before-week" tabindex="-1">
+																	<label class="form_label" for="event_notify_4"><span>За неделю</span></label>
+																</div>
+															</form>
+														</div>
+													</div>
+												</div>
+											</div>
+										</header>
+										<div class="event_content">
+											<h3 class="event_title" title="Автор парижского Центра Помпиду и ГЭС-2: почему Москве повезло">Автор парижского Центра Помпиду и ГЭС-2: почему Москве повезло</h3>
+											<div class="event_description">
+												ГЭС-2 — мёртвый участок между Болотной площадью и «Красным Октябрём» со сваленным за забором строительным мусором. К 2019 году здесь должен появиться новый московский арт-центр. Он мог бы стать очередным, если бы за переосмысление территории не взялась мировая звезда архитектуры, автор парижского Центра Помпиду Ренцо Пьяно. На месте одной из старейших столичных гидроэлектростанций, которая поставляла электричество для московских трамваев, появится лес. Пока непонятно, как он уместится на террито
+											</div>
+											<div class="event_map CallModal" data-call-modal="map" style="background-image: url('http://maps.googleapis.com/maps/api/staticmap?markers=%D0%91%D0%B5%D1%80%D1%81%D0%B5%D0%BD%D0%B5%D0%B2%D1%81%D0%BA%D0%B0%D1%8F%20%D0%BD%D0%B0%D0%B1%D0%B5%D1%80%D0%B5%D0%B6%D0%BD%D0%B0%D1%8F%205%2C%20%D1%81%D1%82%201&zoom=15&size=640x640&scale=2&format=png&maptype=roadmap&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg')"></div>
+										</div>
+									</div>
+									<div class="event_additional_content">
+										<button class="button -color_neutral -fill RippleEffect DropdownButton" data-dropdown="redact_event" data-dd-width="self" type="button">Редактирование события</button>
+										<div class="dropdown_box DropdownBox" data-dropdown_id="redact_event">
+											<div class="dropdown_list"><button class="dropdown_button -fill -color_error RippleEffect CloseDropdown DropdownButton" data-dropdown="cancel_event" data-dd-width="self" type="button">Отменить событие</button></div>
+											<div class="dropdown_list"><button class="dropdown_button -fill -color_neutral RippleEffect CloseDropdown" data-page="edit_event" data-event-id="" type="button">Редактировать</button></div>
+										</div>
+										<div class="dropdown_box DropdownBox" data-dropdown_id="cancel_event">
+											<div class="dropdown_box_wrapper">
+												<p>Вы уверены, что хотите отменить событие?</p>
+											</div>
+											<footer class="dropdown_box_footer">
+												<span class="action -color_neutral CloseDropdown">Отмена</span>
+												<span class="action -color_error CloseDropdown">Да</span>
+											</footer>
+										</div>
+										<p class="event_additional_info -transform_uppercase">Регистрация до <span>10 февраля</span></p>
+										<p class="event_additional_info">14 500 рублей</p>
+										<div class="event_additional_field">
+											<label class="event_additional_field_label">Организатор</label>
+											<div class="avatar_block -size_small" data-page="">
+												<div class="avatar"><img src="http://evendate.ru/organizations_images/logos/small/1.png"></div>
+												<span class="avatar_name">Институт STRELKA</span>
+											</div>
+										</div>
+										<div class="event_additional_field">
+											<div class="collapsing_wrapper CollapsingWrapper -fading" data-default-height="80" style="height: 80px;">
+												<div class="collapsing_content CollapsingContent">
+													<div class="event_additional_field_split">
+														<div class="event_additional_field"><label class="event_additional_field_label">Дата</label></div>
+														<div class="event_additional_field"><label class="event_additional_field_label">Время</label></div>
+													</div>
+													<div class="event_additional_field_split">
+														<div class="event_additional_field"><p>12 февраля</p></div>
+														<div class="event_additional_field"><p>15:30 - 18:00</p></div>
+													</div>
+													<div class="event_additional_field_split">
+														<div class="event_additional_field"><p>13 февраля</p></div>
+														<div class="event_additional_field"><p>15:30 - 18:00</p></div>
+													</div>
+													<div class="event_additional_field_split">
+														<div class="event_additional_field"><p>14 февраля</p></div>
+														<div class="event_additional_field"><p>15:30 - 18:00</p></div>
+													</div>
+													<div class="event_additional_field_split">
+														<div class="event_additional_field"><p>15 февраля</p></div>
+														<div class="event_additional_field"><p>15:30 - 18:00</p></div>
+													</div>
+													<div class="event_additional_field_split">
+														<div class="event_additional_field"><p>16 февраля</p></div>
+														<div class="event_additional_field"><p>15:30 - 18:00</p></div>
+													</div>
+													<div class="event_additional_field_split">
+														<div class="event_additional_field"><p>17 февраля</p></div>
+														<div class="event_additional_field"><p>15:30 - 18:00</p></div>
+													</div>
+												</div>
+											</div>
+											<button class="collapsing_button CollapsingButton fa_icon fa-chevron-down -empty"></button>
+										</div>
+										<div class="event_additional_field">
+											<div class="event_additional_field_split">
+												<div class="event_additional_field"><label class="event_additional_field_label">Дата</label></div>
+												<div class="event_additional_field"><label class="event_additional_field_label">Время</label></div>
+											</div>
+											<div class="event_additional_field_split">
+												<div class="event_additional_field"><p>12 февраля</p></div>
+												<div class="event_additional_field"><p>15:30 - 18:00</p></div>
+											</div>
+											<div class="event_additional_field_split">
+												<div class="event_additional_field"><p>13 февраля</p></div>
+												<div class="event_additional_field"><p>15:30 - 18:00</p></div>
+											</div>
+											<div class="event_additional_field_split">
+												<div class="event_additional_field"><p>14 февраля</p></div>
+												<div class="event_additional_field"><p>15:30 - 18:00</p></div>
+											</div>
+											<div class="event_additional_field_split">
+												<div class="event_additional_field"><p>15 февраля</p></div>
+												<div class="event_additional_field"><p>15:30 - 18:00</p></div>
+											</div>
+											<div class="event_additional_field_split">
+												<div class="event_additional_field"><p>16 февраля</p></div>
+												<div class="event_additional_field"><p>15:30 - 18:00</p></div>
+											</div>
+											<div class="event_additional_field_split">
+												<div class="event_additional_field"><p>17 февраля</p></div>
+												<div class="event_additional_field"><p>15:30 - 18:00</p></div>
+											</div>
+										</div>
+										<div class="event_additional_field">
+											<label class="event_additional_field_label">Место</label>
+											<p>Берсеневская набережная 5, ст 1</p>
+										</div>
+										<div class="event_additional_field">
+											<label class="event_additional_field_label">Теги</label>
+											<p>выставка, леция, урбанистика</p>
+										</div>
+										<div class="event_additional_field">
+											<label class="event_additional_field_label">Подробнее</label>
+											<a href="http://vk.com/mister_guu">vk.com/mister_guu&emsp;<i class="fa_icon fa-external-link"></i></a>
+										</div>
+										<div class="share_block">
+											<label class="share_title -color_primary -transform_uppercase">Поделиться</label>
+											<div class="share_icons -size_small">
+												<span class="share_icon vk"></span>
+												<span class="share_icon facebook"></span>
+												<span class="share_icon google"></span>
+											</div>
+										</div>
+									</div>
+									<div class="event_canceled_cap -unselectable -centering -hidden"><span>Организатор отменил событие</span></div>
+								</div>
+								<div class="event_vulcan">
+									<header class="event_vulcan_header">Похожие мероприятия</header>
+									<div class="event_card">
+										<div class="event_card_img" style="background-image: url('http://evendate.ru/event_images/large/9186309e48810497909643a38f6c40ce.jpeg')"></div>
+										<div class="event_card_description">
+											<span>Спекулятивный дизайн и стратегическое планирование</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- START row-->
 					<div class="organization-app hidden screen-view" data-controller="Organization">
 						<div class="page_viewport">
 							<div class="page_wrapper">
-								<div class="page organization_info_page -hidden">
-									<header class="organization_header">
-										<div class="img_holder">
-											<img src="http://evendate.ru/organizations_images/backgrounds/large/1-large.jpg">
-										</div>
-										<div class="organization_header_backdrop"></div>
-										<div class="organization_header_bottom">
-											<div class="avatar_block organization_title_block">
-												<div class="avatar -size_small organization_avatar"><img src="http://evendate.ru/organizations_images/logos/large/1.png"></div>
-												<span class="avatar_name organization_title" title="Государственный Университет Управления">Государственный Университет Управления</span>
-											</div>
-											<button class="button -low -color_secondary fa_icon fa-plus organization_header_button OrganizationSubscribe RippleEffect" type="button"><span>Подписаться</span></button>
-										</div>
-									</header>
-									<div class="organization_description_block">
-										<p class="organization_description">Государственный университет на протяжении 95 лет уверенно держит позиции лидера управленческого образования в России. В ГУУ обучаются более 15 тысяч студентов.</p>
-										<div class="form_group -parts_1_3">
-											<div class="form_unit">
-												<a class="button -color_marginal RippleEffect fa_icon fa-external-link" href="http://guu.ru/" target="_blank">Подробнее</a>
-											</div>
-											<div class="form_unit">
-												<small class="-color_marginal">Адрес организатора:</small>
-												<p>Берсеневсякая набережная 5 ст, 1</p>
-											</div>
-										</div>
-									</div>
-									<div class="organization_feed Tabs">
-										<div class="tabs_header -color_secondary">
-											<span class="tab Tab -active">Будущие</span>
-											<span class="tab Tab">Прошедшие</span>
-										</div>
-										<div class="tab_bodies_wrap TabsBodyWrapper">
-											<div class="tab_body TabsBody FutureEvents -active">
-												<div class="organization_feed_container" data-container-date="Сегодня"><?php
-													for($i=0;$i<=10;$i++){ ?>
-														<div class="organization_feed_block">
-															<div class="organization_feed_block_img img_holder SwitchPage" data-page="event" data-event-id="{id}">
-																<img src="http://evendate.ru/event_images/large/292bf27e82cf6031c99f707cad7a9d49.jpg">
-															</div>
-															<div class="organization_feed_block_info">
-																<header class="organization_feed_block_title">
-																	<span class="SwitchPage" data-page="event" data-event-id="{id}">Speed Italiano. Найди учителя мечты</span>
-																</header>
-																<div class="organization_feed_block_service">
-																	<p><small>14:30 - 15:30</small></p>
-																	<div class="form_group -parts_e_2 AddAvatarWrapper">
-																		<div class="form_unit">
-																			<button class="button -color_neutral_alt -low -fill -rounded fa_icon fa-plus Subscribe AddAvatar RippleEffect"><span class="Text">Добавить в избранное</span></button>
-																		</div>
-																		<div class="form_unit">
-																			<div class="avatars_collection AvatarsCollection -subscribable">
-																				<div class="avatar -rounded -size_small" style="background-image: url(https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=30)"></div>
-																				<div class="avatar -rounded -size_small" style="background-image: url(https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=30)"></div>
-																				<div class="avatar -rounded -size_small" style="background-image: url(https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=30)"></div>
-																				<div class="avatar -rounded -size_small" style="background-image: url(https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=30)"></div>
-																				<div class="avatar -rounded -size_small" style="background-image: url(https://lh6.googleusercontent.com/-Ia_P6R1HShc/AAAAAAAAAAI/AAAAAAAACFE/Z-DGVm98CCg/photo.jpg?sz=30)"></div>
-																			</div>
-																			<span class="counter -color_marginal">+24</span>
-																		</div>
-																	</div>
-																</div>
-															</div>
-														</div><?php
-													}
-													?>
-												</div>
-											</div>
-											<div class="tab_body TabsBody PastEvents"></div>
-										</div>
-									</div>
-								</div>
-								<div class="page organization_subscribers_page -fixed -hidden">
-									<header class="organization_subscribers_header">
-										<span class="organization_subscribers_header_text">Подписчики</span>
-										<span class="counter -color_secondary">263</span>
-									</header>
-									<div class="organization_subscribers_wrapper scrollbar-outer">
-										<span class="organization_subscribers_divider">Друзья</span><?php
-										for($i=0;$i<=5;$i++){ ?>
-											<div class="subscriber">
-												<div class="avatar_block">
-													<div class="avatar -size_50x50 -rounded">
-														<img src="https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=50">
-													</div>
-													<span class="avatar_name">Константин Красильников</span>
-												</div>
-											</div><?php
-										}?>
-										<span class="organization_subscribers_divider">Все подписчики</span><?php
-										for($i=0;$i<=15;$i++){ ?>
-											<div class="subscriber">
-												<div class="avatar_block">
-													<div class="avatar -size_50x50 -rounded">
-														<img src="https://lh5.googleusercontent.com/-I6ofLT51Y6Y/AAAAAAAAAAI/AAAAAAAAEMg/GmuolI5nn70/photo.jpg?sz=50">
-													</div>
-													<span class="avatar_name">Константин Красильников</span>
-												</div>
-											</div><?php
-										}?>
-									</div>
-								</div>
 							</div>
 						</div>
 					</div>
@@ -520,10 +602,11 @@
 
 	<div class="modal_wrapper">
 		<div class="modal_destroyer"></div>
+
 		<div class="modal_unit CropperModal">
 			<header class="modal_header">
 				<h4>Кадрирование</h4>
-				<button class="button -modal_destroyer fa_icon fa-times -color_default CloseModal RippleEffect"></button>
+				<button class="button -empty -modal_destroyer -color_default CloseModal RippleEffect">&times;</button>
 			</header>
 			<div class="modal_content">
 				<div class="Cropper">
@@ -535,6 +618,49 @@
 				<button class="button -color_default DestroyCropButton RippleEffect">Отмена</button>
 			</footer>
 		</div>
+
+		<div class="modal_unit MapModal">
+			<header class="modal_header">
+				<h4>Место проведения события</h4>
+				<button class="button -empty -modal_destroyer -color_default CloseModal RippleEffect">&times;</button>
+			</header>
+			<div class="modal_content -no_padding">
+				<iframe width="100%" height="600" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/place?q=%D0%91%D0%B5%D1%80%D1%81%D0%B5%D0%BD%D0%B5%D0%B2%D1%81%D0%BA%D0%B0%D1%8F%20%D0%BD%D0%B0%D0%B1%D0%B5%D1%80%D0%B5%D0%B6%D0%BD%D0%B0%D1%8F%205%2C%20%D1%81%D1%82%201&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg" allowfullscreen></iframe>
+			</div>
+		</div>
+
+		<div class="modal_unit MediaModal">
+			<header class="modal_header">
+				<button class="button -empty -modal_destroyer -color_default CloseModal RippleEffect">&times;</button>
+			</header>
+			<div class="modal_content -no_padding">
+				<img src="http://evendate.ru/event_images/large/5adba4e48891a5b3708e2b8e671338a6.jpg">
+			</div>
+		</div>
+
+		<div class="modal_unit FriendsModal">
+			<header class="modal_header">
+				<h4>Добавили в избранное</h4>
+				<button class="button -empty -modal_destroyer -color_default CloseModal RippleEffect">&times;</button>
+			</header>
+			<div class="modal_content">
+				<p class="modal_divider">Друзья</p>
+				<div class="friend" data-page="friend-">
+					<div class="avatar -size_70x70 -rounded" style="background-image: url('http://cs629530.vk.me/v629530388/3d59e/z2b38WOLbvo.jpg')"></div>
+					<p class="friend_title">Анюта Андрианова</p>
+				</div>
+				<div class="friend" data-page="friend-">
+					<div class="avatar -size_70x70 -rounded" style="background-image: url('http://cs629530.vk.me/v629530388/3d59e/z2b38WOLbvo.jpg')"></div>
+					<p class="friend_title">Ярослав Попсуй-Шапко</p>
+				</div>
+				<div class="friend" data-page="friend-">
+					<div class="avatar -size_70x70 -rounded" style="background-image: url('http://cs629530.vk.me/v629530388/3d59e/z2b38WOLbvo.jpg')"></div>
+					<p class="friend_title">Анюта Андрианова</p>
+				</div>
+				<p class="modal_divider">Все</p>
+			</div>
+		</div>
+
 	</div>
 </div>
 <!-- Button trigger modal -->
@@ -582,12 +708,12 @@
 
 <!-- =============== APP SCRIPTS ===============-->
 <script src="<?=App::$SCHEMA.App::$NODE_DOMAIN?>:8080/socket.io/socket.io.js" type="text/javascript"></script>
-<script src="/app/js/app.js"></script>
-<script src="/app/js/calendar.js"></script>
-<script src="/app/js/add.js"></script>
-<script src="/app/js/Class.Calendar.js"></script>
-<script src="/app/js/Class.DatePicker.js"></script>
-<script src="/app/js/main.js"></script>
+<script type="text/javascript" src="/app/js/app.js" charset="utf-8"></script>
+<script type="text/javascript" src="/app/js/Class.Calendar.js" charset="utf-8"></script>
+<script type="text/javascript" src="/app/js/Class.DatePicker.js" charset="utf-8"></script>
+<script type="text/javascript" src="/app/js/main.js" charset="utf-8"></script>
+<script type="text/javascript" src="/app/js/calendar.js" charset="utf-8"></script>
+<script type="text/javascript" src="/app/js/add.js" charset="utf-8"></script>
 
 
 <?php
