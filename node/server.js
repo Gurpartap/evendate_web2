@@ -117,9 +117,11 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 client: client
             });
 
-            var notifications = new Notifications(real_config, client, logger);
-            notifications.sendAutoNotifications();
-            notifications.sendUsersNotifications();
+            if (config_index == 'prod'){
+                var notifications = new Notifications(real_config, client, logger);
+                notifications.sendAutoNotifications();
+                notifications.sendUsersNotifications();
+            }
 
         }, null, true);
     } catch (ex) {
@@ -136,9 +138,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 if (!err || err == null) return false;
 
                 logger.error(err);
-                if (client) {
-                    done(client);
-                }
+                
                 if (callback instanceof Function) {
                     callback(err);
                     return true;

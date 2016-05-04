@@ -288,6 +288,7 @@ class Event extends AbstractEntity
                     'organization_id' => $organization->getId(),
                     'latitude' => $data['latitude'],
                     'longitude' => $data['longitude'],
+                    'images_domain' => 'http://dn' . rand(1, 4) .'.evendate.ru/',
                     'image_vertical' => $img_vertical_filename,
                     'image_horizontal' => $img_horizontal_filename,
                     'detail_info_url' => $data['detail_info_url'],
@@ -336,7 +337,6 @@ class Event extends AbstractEntity
             throw $e;
         }
     }
-
     private static function updateVkPostInformation(PDO $db, $event_id, array $data)
     {
         if ($data['vk_post_id'] == null) return;

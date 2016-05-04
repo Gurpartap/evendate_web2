@@ -43,7 +43,7 @@ class TagsCollection extends AbstractCollection{
 						$q_get_tags->where('LOWER(name) = LOWER(:name)');
 						$statements[':name'] = $value;
 					}else{
-						$q_get_tags->where('LOWER(name) LIKE LOWER(:name)');
+						$q_get_tags->where('LOWER(name) ILIKE LOWER(:name)');
 						$statements[':name'] = $value . '%';
 					}
 					break;
@@ -57,6 +57,7 @@ class TagsCollection extends AbstractCollection{
 				}
 			}
 		}
+
 		$p_get_tags = $db->prepare($q_get_tags->getStatement());
 		$p_get_tags->execute($statements);
 		$tags = $p_get_tags->fetchAll(PDO::FETCH_CLASS, 'Tag');

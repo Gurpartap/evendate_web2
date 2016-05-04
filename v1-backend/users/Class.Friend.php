@@ -13,15 +13,17 @@ class Friend extends AbstractEntity{
 		'middle_name',
 		'gender',
 		'avatar_url',
+		'blurred_img_url'
 	);
 
 	protected static $ADDITIONAL_COLS = array(
 		'type',
 		'is_friend' => 'view_friends.user_id IS NOT NULL AS is_friend',
-		'blurred_image_url',
-		self::RANDOM_FIELD_NAME => '(SELECT DATE_PART(\'epoch\', users.created_at) / (random() * 9 + 1)
+		'blurred_img_url',
+		'uid',
+		self::RANDOM_FIELD_NAME => '(SELECT DATE_PART(\'epoch\', u.created_at) / (random() * 9 + 1)
 			FROM users AS u
-			WHERE u.id = users.id) AS random',
+			WHERE u.id = view_users.id) AS random',
 	);
 
 	protected $first_name;
