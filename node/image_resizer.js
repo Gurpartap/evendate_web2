@@ -105,7 +105,8 @@ ImagesResize.prototype.blurNew = function (settings) {
                 )
                 .and(users.avatar_url.isNotNull())
                 .and(users.avatar_url.notEquals(''))
-                .limit(10)
+                .order("DATE_PART('epoch', users.created_at) / (random() * 9 + 1)")
+                .limit(100)
                 .toQuery();
 
     client.query(q_get_user_images, function (err, result) {

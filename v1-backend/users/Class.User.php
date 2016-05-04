@@ -230,10 +230,12 @@ class User extends AbstractUser{
 		));
 	}
 
-	public function updateDeviceToken($device_token, $client_type){
+	public function updateDeviceToken($device_token, $client_type, $device_model = null, $device_os_version = null){
 		$q_upd_device_token = 'UPDATE tokens SET
 			device_token = :device_token,
-			client_type = :client_type
+			client_type = :client_type,
+			model = :model,
+			os_version = :os_version
 			WHERE user_id = :user_id
 			AND tokens.token = :token';
 		$p_upd = $this->db->prepare($q_upd_device_token);
@@ -241,6 +243,8 @@ class User extends AbstractUser{
 			':device_token' => $device_token,
 			':user_id' => $this->getId(),
 			':token' => $this->token,
+			':model' => $device_model,
+			':os_version' => $device_os_version,
 			':client_type' => $client_type
 		));
 

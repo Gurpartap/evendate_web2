@@ -117,9 +117,11 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 client: client
             });
 
-            var notifications = new Notifications(real_config, client, logger);
-            notifications.sendAutoNotifications();
-            notifications.sendUsersNotifications();
+            if (config_index == 'prod'){
+                var notifications = new Notifications(real_config, client, logger);
+                notifications.sendAutoNotifications();
+                notifications.sendUsersNotifications();
+            }
 
         }, null, true);
     } catch (ex) {
@@ -136,9 +138,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 if (!err || err == null) return false;
 
                 logger.error(err);
-                if (client) {
-                    done(client);
-                }
+                
                 if (callback instanceof Function) {
                     callback(err);
                     return true;
@@ -732,7 +732,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                                             }
 
                                                             var user_id = socket.vk_user.user_id,
-                                                                q_ins_vk_post = vk_posts.insert({
+                                                                q_ins_vk_post = Entities.vk_posts.insert({
                                                                     creator_id: user_id,
                                                                     image_path: filename,
                                                                     message: data.message,

@@ -33,26 +33,33 @@ $__modules['users'] = array(
 			);
 		},
 		'{/(id:[0-9]+)/actions}' => function ($id) use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
+			$friend = UsersCollection::one(
+				$__db,
+				$__user,
+				intval($id),
+				array()
+			);
+			Statistics::Friend($friend, $__user, $__db, Statistics::FRIEND_VIEW_ACTIONS);
+
 			return ActionsCollection::filter(
 				$__db,
 				$__user,
-				array_merge($__request, array('friend' => UsersCollection::one(
-					$__db,
-					$__user,
-					intval($id),
-					array()
-				))),
-				$__fields,
-				$__pagination,
-				$__order_by
+				array_merge($__request, array('friend' => $friend)),
+				$__fields ?? array(),
+				$__pagination ?? array(),
+				$__order_by ?? array()
 			);
 		},
 		'{/(id:[0-9]+)}' => function ($id) use ($__user, $__fields, $__db) {
-			$data = UsersCollection::one(
+			$friend = UsersCollection::one(
 				$__db,
 				$__user,
 				$id,
-				array())->getParams($__user, $__fields)->getData();
+				$__fields);
+
+			Statistics::Friend($friend, $__user, $__db, Statistics::FRIEND_VIEW_SUBSCRIPTIONS);
+
+			$data = $friend->getParams($__user, $__fields)->getData();
 
 			return new Result(true, '', array($data));
 		},
@@ -70,7 +77,7 @@ $__modules['users'] = array(
 			return $__user->updateSettings($__request);
 		},
 		'{me/devices}' => function () use ($__request, $__user, $__db) {
-			$token = $__user->updateDeviceToken($__request['device_token'], $__request['client_type']);
+			$token = $__user->updateDeviceToken($__request['device_token'], $__request['client_type'], $__request['model'], $__request['os_version']);
 			$info = $__user->getMainInfo()->getData();
 			$info = array_merge($info, $token->getData());
 			return new Result(true, '', $info);

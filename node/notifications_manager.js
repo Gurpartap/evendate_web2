@@ -1,6 +1,6 @@
 var apn = require('apn'),
     rest = require('restler'),
-    one_signal, gcm,
+    gcm,
     Utils = require('./utils'),
     GCM = require('gcm').GCM;
 
@@ -65,15 +65,19 @@ NotificationsManager.prototype.create = function (notification, device) {
         };
     } else if (device.client_type == DEVICE_TYPES.ANDROID) {
         note.send = function (callback) {
-            note['data.message'] = note.body;
-            note['data.event_id'] = note.payload.event_id;
-            note['data.organization_logo'] = note.payload.organization_logo;
-            note['data.organization_id'] = note.payload.organization_id;
-            note.registration_id = device;
-            gcm.send(note, function (err, messageId) {
+            var send_data = {};
+            send_data['data.message'] = note.body;
+            send_data['data.event_id'] = note.payload.event_id;
+            send_data['data.image_url'] = note.payload.organization_logo;
+            send_data['data.organization_id'] = note.payload.organization_id;
+            // send_data['data.to'] = '';
+            send_data.registration_id = device.device_token;
+            console.log(device, send_data);
+            gcm.send(send_data, function (err, messageId) {
                 if (err) {
                     callback(err, null);
                 } else {
+                    console.log(messageId);
                     callback(null, messageId);
                 }
             });
@@ -85,6 +89,6 @@ NotificationsManager.prototype.create = function (notification, device) {
     }
 
     return note;
-}
+};
 
 module.exports = NotificationsManager;
