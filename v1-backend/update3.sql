@@ -37,7 +37,7 @@ CREATE VIEW view_users AS
 
 CREATE TABLE stat_users
 (
-  id BIGINT PRIMARY KEY NOT NULL,
+  id                   SERIAL PRIMARY KEY NOT NULL,
   user_id BIGINT NOT NULL,
   token_id BIGINT,
   stat_type_id BIGINT NOT NULL,
