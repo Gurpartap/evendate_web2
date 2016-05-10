@@ -6,6 +6,10 @@
 		const ENTITY_ORGANIZATION = 'organization';
 		const ENTITY_FRIEND = 'friend';
 
+		const ENTITY_EVENTS = 'events';
+		const ENTITY_ORGANIZATIONS = 'organizations';
+		const ENTITY_FRIENDS = 'friends';
+
 
 		const ORGANIZATION_SUBSCRIBE = 'subscribe';
 		const ORGANIZATION_VIEW = 'view';
@@ -96,15 +100,21 @@
 		public static function StoreBatch(array $events, User $user = null, PDO $db){
 			foreach ($events as $event){
 				switch($event['entity_type']){
-					case self::ENTITY_EVENT: {
+					case self::ENTITY_EVENT:
+					case self::ENTITY_EVENTS:
+					{
 						self::Event(EventsCollection::one($db, $user, $event['entity_id'], array()), $user, $db, $event['event_type']);
 						break;
 					}
-					case self::ENTITY_ORGANIZATION: {
+					case self::ENTITY_ORGANIZATION:
+					case self::ENTITY_ORGANIZATIONS:
+					{
 						self::Organization(OrganizationsCollection::one($db, $user, $event['entity_id'], array()), $user, $db, $event['event_type']);
 						break;
 					}
-					case self::ENTITY_FRIEND: {
+					case self::ENTITY_FRIEND:
+					case self::ENTITY_FRIENDS:
+					{
 						self::Friend(UsersCollection::one($db, $user, $event['entity_id'], array()), $user, $db, $event['event_type']);
 						break;
 					}
