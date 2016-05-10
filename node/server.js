@@ -108,16 +108,15 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
     try {
         new CronJob('*/1 * * * *', function () {
-            cropper.resizeNew({
-                images: real_config.images,
-                client: client
-            });
-            cropper.blurNew({
-                images: real_config.images,
-                client: client
-            });
-
             if (config_index == 'prod'){
+                cropper.resizeNew({
+                    images: real_config.images,
+                    client: client
+                });
+                cropper.blurNew({
+                    images: real_config.images,
+                    client: client
+                });
                 var notifications = new Notifications(real_config, client, logger);
                 notifications.sendAutoNotifications();
                 notifications.sendUsersNotifications();
@@ -642,9 +641,11 @@ pg.connect(pg_conn_string, function (err, client, done) {
         });
 
         socket.on(EMIT_NAMES.NOTIFICATIONS.SEND, function () {
-            var notifications = new Notifications(real_config, client, logger);
-            notifications.sendAutoNotifications();
-            notifications.sendUsersNotifications();
+            if (config_index == 'local'){
+                var notifications = new Notifications(real_config, client, logger);
+                notifications.sendAutoNotifications();
+                notifications.sendUsersNotifications();
+            }
         });
 
         socket.on(EMIT_NAMES.VK_INTEGRATION.GROUPS_TO_POST, function (user_id) {

@@ -73,13 +73,15 @@ require_once 'v1-backend/bin/db.php';
 <script src="app/js/app.js"></script>
 
 <script>
-	window.resizeTo(530, 400);
-	var mobile_data = searchToObject(),
-		data = $.extend(mobile_data, hashToObject(), true);
-	data.type = 'vk';
-	socket.emit('auth.oauthDone', data);
-	socket.on('vk.needEmail', function(){
-		$('.panel').toggleClass('hidden');
+	$(document).ready(function(){
+		console.log('log is here');
+		window.resizeTo(530, 400);
+		var mobile_data = searchToObject(),
+			data = $.extend(mobile_data, hashToObject(), true);
+		data.type = 'vk';
+		socket.emit('auth.oauthDone', data);
+		socket.on('vk.needEmail', function(){
+			$('.panel').toggleClass('hidden');
+		});
 	});
-
 </script>
