@@ -326,7 +326,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 if (user.facebook_uid != null) {
                                     q_ins_sign_in = facebook_sign_in.update(facebook_data).where(facebook_sign_in.user_id.equals(user.id));
                                 } else {
-                                    q_ins_sign_in = facebook_sign_in.insert(google_data);
+                                    q_ins_sign_in = facebook_sign_in.insert(facebook_data);
                                 }
                                 break;
                             }
