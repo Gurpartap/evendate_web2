@@ -13,7 +13,8 @@ var ONLY_FOR_FAVORED = [
     'notification-event-changed-location',
     'notification-event-changed-registration',
     'notification-event-changed-price',
-    'notification-event-registration-ending'
+    'notification-event-registration-ending',
+    'notification-one-day-registration-close'
 ];
 
 class Notifications {
