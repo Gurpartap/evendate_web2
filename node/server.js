@@ -68,7 +68,7 @@ var
             'GET_USER_INFO': 'https://api.vk.com/method/users.get',
             'GET_GROUPS_LIST': 'https://api.vk.com/method/groups.get',
             'GET_GROUPS_PART': '/method/groups.get',
-            'POST_TO_WALL': 'http://api.vk.com/method/wall.post',
+            'POST_TO_WALL': 'https://api.vk.com/method/wall.post',
             'POST_TO_WALL_PART': '/method/wall.post',
             'GET_WALL_PHOTO_UPLOAD_SERVER': 'https://api.vk.com/method/photos.getWallUploadServer',
             'SAVE_WALL_PHOTO_UPLOAD': 'https://api.vk.com/method/photos.saveWallPhoto'
@@ -721,8 +721,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                                 rest
                                                     .get(URLs.VK.SAVE_WALL_PHOTO_UPLOAD + '?' + request_data.join('&'))
                                                     .on('complete', function (res_data) {
-
-                                                        console.log(res_data);
 
                                                         if (res_data instanceof Error) {
                                                             handleError(res_data, EMIT_NAMES.VK_INTEGRATION.POST_ERROR);
