@@ -335,7 +335,7 @@
 											<div class="event_description">
 												ГЭС-2 — мёртвый участок между Болотной площадью и «Красным Октябрём» со сваленным за забором строительным мусором. К 2019 году здесь должен появиться новый московский арт-центр. Он мог бы стать очередным, если бы за переосмысление территории не взялась мировая звезда архитектуры, автор парижского Центра Помпиду Ренцо Пьяно. На месте одной из старейших столичных гидроэлектростанций, которая поставляла электричество для московских трамваев, появится лес. Пока непонятно, как он уместится на террито
 											</div>
-											<div class="event_map CallModal" data-call-modal="map" style="background-image: url('http://maps.googleapis.com/maps/api/staticmap?markers=%D0%91%D0%B5%D1%80%D1%81%D0%B5%D0%BD%D0%B5%D0%B2%D1%81%D0%BA%D0%B0%D1%8F%20%D0%BD%D0%B0%D0%B1%D0%B5%D1%80%D0%B5%D0%B6%D0%BD%D0%B0%D1%8F%205%2C%20%D1%81%D1%82%201&zoom=15&size=640x640&scale=2&format=png&maptype=roadmap&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg')"></div>
+											<div class="event_map CallModal" data-call-modal="map" style="background-image: url('http://maps.googleapis.com/maps/api/staticmap?markers=%D0%91%D0%B5%D1%80%D1%81%D0%B5%D0%BD%D0%B5%D0%B2%D1%81%D0%BA%D0%B0%D1%8F%20%D0%BD%D0%B0%D0%B1%D0%B5%D1%80%D0%B5%D0%B6%D0%BD%D0%B0%D1%8F%205%2C%20%D1%81%D1%82%201&zoom=15&size=640x640&scale=2&format=png&maptype=roadmap&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg')" data-map_location="%D0%91%D0%B5%D1%80%D1%81%D0%B5%D0%BD%D0%B5%D0%B2%D1%81%D0%BA%D0%B0%D1%8F%20%D0%BD%D0%B0%D0%B1%D0%B5%D1%80%D0%B5%D0%B6%D0%BD%D0%B0%D1%8F%205%2C%20%D1%81%D1%82%201"></div>
 										</div>
 									</div>
 									<div class="event_additional_content">
@@ -398,34 +398,12 @@
 											<button class="collapsing_button CollapsingButton fa_icon fa-chevron-down -empty"></button>
 										</div>
 										<div class="event_additional_field">
-											<div class="event_additional_field_split">
-												<div class="event_additional_field"><label class="event_additional_field_label">Дата</label></div>
-												<div class="event_additional_field"><label class="event_additional_field_label">Время</label></div>
-											</div>
-											<div class="event_additional_field_split">
-												<div class="event_additional_field"><p>12 февраля</p></div>
-												<div class="event_additional_field"><p>15:30 - 18:00</p></div>
-											</div>
-											<div class="event_additional_field_split">
-												<div class="event_additional_field"><p>13 февраля</p></div>
-												<div class="event_additional_field"><p>15:30 - 18:00</p></div>
-											</div>
-											<div class="event_additional_field_split">
-												<div class="event_additional_field"><p>14 февраля</p></div>
-												<div class="event_additional_field"><p>15:30 - 18:00</p></div>
-											</div>
-											<div class="event_additional_field_split">
-												<div class="event_additional_field"><p>15 февраля</p></div>
-												<div class="event_additional_field"><p>15:30 - 18:00</p></div>
-											</div>
-											<div class="event_additional_field_split">
-												<div class="event_additional_field"><p>16 февраля</p></div>
-												<div class="event_additional_field"><p>15:30 - 18:00</p></div>
-											</div>
-											<div class="event_additional_field_split">
-												<div class="event_additional_field"><p>17 февраля</p></div>
-												<div class="event_additional_field"><p>15:30 - 18:00</p></div>
-											</div>
+											<label class="event_additional_field_label">Дата</label>
+											<p>1-10 февраля, 5-23 марта</p>
+										</div>
+										<div class="event_additional_field">
+											<label class="event_additional_field_label">Время</label>
+											<p>18:40</p>
 										</div>
 										<div class="event_additional_field">
 											<label class="event_additional_field_label">Место</label>

@@ -2,6 +2,24 @@ String.prototype.capitalize = function() {
 	return this.charAt(0).toUpperCase() + this.slice(1);
 };
 String.prototype.contains = function(it) {return this.indexOf(it) != -1;};
+Object.props = function(obj){
+	var props = [];
+	Object.keys(obj).forEach(function(prop){
+		if(typeof obj[prop] !== 'function'){
+			props.push(prop);
+		}
+	});
+	return props;
+};
+Object.methods = function(obj){
+	var methods = [];
+	Object.keys(obj).forEach(function(prop){
+		if(typeof obj[prop] === 'function'){
+			methods.push(prop);
+		}
+	});
+	return methods;
+};
 
 
 $.fn.extend({
@@ -389,10 +407,10 @@ function bindDropdown($parent){
 
 function buildAvatarCollection(subscribers, count){
 	var $subscribers = $();
-	$subscribers = $subscribers.add(tmpl('organization-feed-event-subscriber', __USER));
+	$subscribers = $subscribers.add(tmpl('subscriber-avatar', __USER));
 	subscribers.forEach(function(subscriber){
 		if(subscriber.id != __USER.id && $subscribers.length <= count){
-			$subscribers = $subscribers.add(tmpl('organization-feed-event-subscriber', subscriber));
+			$subscribers = $subscribers.add(tmpl('subscriber-avatar', subscriber));
 		}
 	});
 	return $subscribers;
@@ -650,6 +668,46 @@ function bindOpenMedia($parent){
 			openMedia(url, type);
 		});
 	});
+}
+
+function buildRadioOrCheckbox(type, props){
+	if(type == 'checkbox' || type == 'radio'){
+		props.type = type;
+		props.classes = props.classes ? (typeof props.classes == 'string') ? props.classes.split(' ') : props.classes : [];
+		if(props.classes.indexOf('form_checkbox') == -1 && props.classes.indexOf('form_radio') == -1){
+			props.classes.unshift('form_'+type);
+		}
+		props.classes.toString = function(){return this.join(' ')};
+
+		if(Array.isArray(props.dataset)){
+			props.dataset.toString = function(){return this.join(' ')};
+		}
+		else if(props.dataset != undefined && typeof props.dataset != 'string'){
+			props.dataset.toString = function(){
+				var dataset = [], obj = this;
+				Object.props(obj).forEach(function(prop){
+					dataset.push(((prop.indexOf('data-') != 0) ? 'data-'+prop : prop) + '="' + obj[prop] + '"');
+				});
+				return dataset.join(' ');
+			};
+		}
+
+		if(Array.isArray(props.attributes)){
+			props.attributes.toString = function(){return this.join(' ')};
+		}
+		else if(props.attributes != undefined && typeof props.attributes != 'string'){
+			props.attributes.toString = function(){
+				var attributes = [], obj = this;
+				Object.props(obj).forEach(function(prop){
+					attributes.push(prop+'="'+obj[prop]+'"');
+				});
+				return attributes.join(' ');
+			};
+		}
+		return tmpl('radio-checkbox', props);
+	} else {
+		throw Error('Принимаемый аргумент type может быть либо radio либо checkbox, придурок')
+	}
 }
 
 function initCrop(source, $endpoint_img, options){
