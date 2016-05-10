@@ -439,7 +439,7 @@ function OrganizationsList($view, $content_block){
 
 						if (to_delete_state){
 							$btn.find('span').text('Подписаться');
-							toggleSubscriptionState(false, sub_id, function(){});
+							toggleSubscriptionState(false, org_id, function(){});
 							$btn.removeClass(__C.CLASSES.DISABLED);
 							hideOrganizationItem(org_id);
 							return false;
