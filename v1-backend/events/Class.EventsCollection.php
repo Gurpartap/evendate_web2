@@ -220,8 +220,82 @@ class EventsCollection extends AbstractCollection{
 						if (count($q_part) > 0){
 							$q_get_events->where('(' . implode(' OR ', $q_part) . ')');
 						}
-						break;
 					}
+					break;
+				}
+				case 'recommendations': {
+
+					// has tags in favorites
+					// count of favored friends
+					// does not have tags with hidden events
+					// date since creation
+					// date till end
+					// date till registration end
+
+					$has_tags_in_favorites = '(SELECT COUNT(id)
+                            FROM subscriptions
+                            INNER JOIN view_friends ON view_friends.friend_id = subscriptions.user_id
+                            WHERE organization_id = view_organizations.id
+                            AND subscriptions.status = TRUE
+                            AND view_friends.user_id = :user_id)::INT';
+
+					$count_of_favored_friends = '(SELECT COUNT(id) / 5
+						        FROM view_events
+						        WHERE view_events.organization_id = view_organizations.id)::INT';
+
+					$does_not_have_tags_with_hidden = '(SELECT COUNT(id) * 2
+						        FROM view_events
+						        WHERE view_events.organization_id = view_organizations.id
+						        AND view_events.created_at > DATE_PART(\'epoch\', (NOW() - interval \'7 days\'))
+						    )::INT';
+
+					$rating_subscribed_in_social_network = '(SELECT COUNT(id) * 50
+						        FROM view_organizations vo
+						        WHERE vo.id = view_organizations.id
+						        AND vo.vk_url_path IN 
+						            (SELECT vk_groups.screen_name 
+						                FROM vk_groups
+						                INNER JOIN vk_users_subscriptions ON vk_users_subscriptions.vk_group_id=vk_groups.id
+						                WHERE vk_users_subscriptions.user_id = :user_id)
+						    )::INT';
+
+					$cols[] =
+						'('
+						. $rating_subscribed_friends . '
+                            + 
+                            ' . $rating_active_events_count . '
+                            + 
+                            ' . $rating_subscribed_in_social_network . '
+						    +
+						    ' . $rating_last_events_count . '
+						    ) AS ' . Organization::RATING_OVERALL;
+
+
+					$cols[] = $rating_subscribed_friends . ' AS ' . Organization::RATING_SUBSCRIBED_FRIENDS;
+					$cols[] = $rating_active_events_count . ' AS ' . Organization::RATING_ACTIVE_EVENTS;
+					$cols[] = $rating_last_events_count . ' AS ' . Organization::RATING_LAST_EVENTS_COUNT;
+					$cols[] = $rating_subscribed_in_social_network . ' AS ' . Organization::RATING_SUBSCRIBED_IN_SOCIAL_NETWORK;
+
+					$fields[] = Organization::RATING_OVERALL;
+					$fields[] = Organization::RATING_SUBSCRIBED_FRIENDS;
+					$fields[] = Organization::RATING_ACTIVE_EVENTS;
+					$fields[] = Organization::RATING_LAST_EVENTS_COUNT;
+					$fields[] = Organization::RATING_SUBSCRIBED_IN_SOCIAL_NETWORK;
+
+
+
+					$statement_array[':user_id'] = $user->getId();
+
+
+					$q_get_events->where('id NOT IN (SELECT
+						event_id
+						FROM stat_events
+						INNER JOIN tokens ON tokens.id = stat_events.token_id 
+						WHERE tokens.user_id = :user_id)');
+
+					$order_by = array('rating DESC');
+					$statement_array[':user_id'] = $user->getId();
+					break;
 				}
 			}
 		}

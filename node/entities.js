@@ -42,6 +42,17 @@ module.exports = {
             'group_id'
         ]
     }),
+    vk_groups: sql.define({
+        name: 'vk_groups',
+        columns: [
+            'id',
+            'gid',
+            'name',
+            'screen_name',
+            'description',
+            'photo'
+        ]
+    }),
     vk_sign_in: sql.define({
         name: 'vk_sign_in',
         columns: [

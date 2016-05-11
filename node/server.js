@@ -365,6 +365,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 return;
                             }
 
+
+                            /* INSERTING FRIENDS LIST*/
                             var q_ins_friends = '',
                                 uid_key_name;
 
@@ -397,6 +399,43 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                         name: query_name,
                                         values: [user.id, value[uid_key_name]]
                                     }, handleError);
+                                });
+                            }
+
+                            /* INSERTING GROUPS LIST*/
+                            var q_ins_group, q_ins_membership;
+
+                            switch (data.type) {
+                                case 'vk':
+                                {
+                                    q_ins_group = "INSERT INTO vk_groups (gid, name, screen_name, description, photo) " +
+                                        "   VALUES ($1, $2, $3, $4, $5) ON CONFLICT (gid) DO UPDATE SET name = $2, screen_name = $3, description = $4, photo = $5 RETURNING id";
+                                    q_ins_membership = 'INSERT INTO vk_users_subscriptions(user_id, vk_group_id) VALUES($1, $2) ON CONFLICT DO NOTHING';
+                                    break;
+                                }
+                                case 'facebook':
+                                {
+                                    break;
+                                }
+                            }
+
+                            if (data.groups_data) {
+                                query_name = data.type + '_q_ins_groups';
+                                data.groups_data.forEach(function (value) {
+                                    if (value.hasOwnProperty('gid') == false) return true;
+                                    client.query({
+                                        text: q_ins_group,
+                                        name: query_name,
+                                        values: [value.gid, value.name, value.screen_name, value.description, value.photo]
+                                    }, function(err, result){
+                                        if (handleError(err)) return;
+                                        if (result.rows.length != 1) return;
+                                        client.query({
+                                            text: q_ins_membership,
+                                            name: 'insert_membership',
+                                            values: [user.id, result.rows[0].id]
+                                        }, handleError);
+                                    });
                                 });
                             }
                             insertToken();
@@ -518,15 +557,80 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 friends_data = friends_data.data;
                                 user_info.photo_100 = user_info.hasOwnProperty('picture') ? user_info.picture.data.url : '';
                             }
-                            saveDataInDB(Utils.composeFullInfoObject({
-                                oauth_data: oauth_data,
-                                user_info: user_info,
-                                friends_data: friends_data,
-                                type: oauth_data.type
-                            }));
+
+                            getGroupsList(user_info, function(groups_error, groups_data){
+
+                                if (handleError(friends_error)) {
+                                    setTimeout(function () {
+                                        authTry(oauth_data);
+                                    }, 2000 * retry_count);
+                                    return;
+                                }
+
+                                if (oauth_data.type == 'vk') {
+                                    groups_data = groups_data.response;
+                                } else if (oauth_data.type == 'facebook') {
+                                    groups_data = groups_data.data;
+                                }
+
+                                saveDataInDB(Utils.composeFullInfoObject({
+                                    oauth_data: oauth_data,
+                                    user_info: user_info,
+                                    friends_data: friends_data,
+                                    groups_data: groups_data,
+                                    type: oauth_data.type
+                                }));
+                            });
                         });
                     });
                 }
+            },
+            getGroupsList = function (data, callback) {
+                var GROUPS_COUNT = 1000,
+                    req_params;
+
+                switch (data.type) {
+                    case 'vk':
+                    {
+                        req_params = {
+                            url: URLs[data.type.toUpperCase()].GET_GROUPS_LIST,
+                            json: true,
+                            query: {
+                                user_id: data.uid,
+                                extended: 1,
+                                fields: 'description, links',
+                                count: GROUPS_COUNT,
+                                access_token: data.access_token
+                            }
+                        };
+                        break;
+                    }
+                    case 'google':
+                    {
+                        callback(null, null);
+                        return;
+                    }
+                    case 'facebook':
+                    {
+                        req_params = {
+                            url: URLs[data.type.toUpperCase()].GET_GROUPS_LIST,
+                            json: true,
+                            query: {
+                                'access_token': data.access_token
+                            }
+                        };
+                        break;
+                    }
+                }
+                rest.get(req_params.url, req_params)
+                    .on('complete', function (result) {
+                        if (result instanceof Error) {
+                            handleError(result);
+                            callback(result, null);
+                        } else {
+                            callback(null, result);
+                        }
+                    });
             },
             getFriendsList = function (data, callback) {
                 var FRIENDS_COUNT = 50000,
