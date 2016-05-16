@@ -32,7 +32,7 @@
 	<!-- FULLCALENDAR-->
 	<link rel="stylesheet" href="/vendor/fullcalendar/dist/fullcalendar.css">
 	<!-- =============== CROPPER STYLES ===============-->
-	<link rel="stylesheet" href="/vendor/cropper/css/cropper.css">
+	<link rel="stylesheet" href="/vendor/cropper/css/cropper.min.css">
 	<!-- =============== BOOTSTRAP STYLES ===============-->
 	<link rel="stylesheet" href="/app/css/bootstrap.css" id="bscss">
 	<!-- Loaders.css-->
@@ -598,7 +598,7 @@
 <!-- SLIMSCROLL-->
 <script src="/vendor/slimScroll/jquery.slimscroll.min.js"></script>
 <!-- IMG CROPPER-->
-<script src="/vendor/cropper/js/cropper.js"></script>
+<script src="/vendor/cropper/js/cropper.min.js"></script>
 <!-- TAGS INPUT-->
 <script src="/vendor/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js"></script>
 <!-- MOMENT JS-->
