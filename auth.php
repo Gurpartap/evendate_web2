@@ -1,13 +1,25 @@
 <?php
 
+
+require_once 'v1-backend/bin/db.php';
+require_once 'v1-backend/bin/Class.Result.php';
+
+if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'get_urls'){
+	if (isset($_REQUEST['mobile']) && $_REQUEST['mobile'] == 'true'){
+		$type = 'mobile';
+	}else{
+		$type = 'popup';
+	}
+	echo App::getAuthURLs($type);
+	exit();
+}
+
 try{
 	if (!isset($_REQUEST['email']) || trim($_REQUEST['email']) == '' ||
 		!isset($_REQUEST['token']) || trim($_REQUEST['token']) == ''){
 		throw new InvalidArgumentException('Пользователь с указанными данными не существует');
 	}
 
-	require_once 'v1-backend/bin/db.php';
-	require_once 'v1-backend/bin/Class.Result.php';
 
 	$q_get_user = 'SELECT users.id as user_id, users.token, users.email
 				FROM users

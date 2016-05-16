@@ -108,18 +108,19 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
     try {
         new CronJob('*/1 * * * *', function () {
-            cropper.resizeNew({
-                images: real_config.images,
-                client: client
-            });
-            cropper.blurNew({
-                images: real_config.images,
-                client: client
-            });
-
-            var notifications = new Notifications(real_config, client, logger);
-            notifications.sendAutoNotifications();
-            notifications.sendUsersNotifications();
+            if (config_index == 'prod'){
+                cropper.resizeNew({
+                    images: real_config.images,
+                    client: client
+                });
+                cropper.blurNew({
+                    images: real_config.images,
+                    client: client
+                });
+                var notifications = new Notifications(real_config, client, logger);
+                notifications.sendAutoNotifications();
+                notifications.sendUsersNotifications();
+            }
 
         }, null, true);
     } catch (ex) {
@@ -136,9 +137,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 if (!err || err == null) return false;
 
                 logger.error(err);
-                if (client) {
-                    done(client);
-                }
+                
                 if (callback instanceof Function) {
                     callback(err);
                     return true;
@@ -327,7 +326,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 if (user.facebook_uid != null) {
                                     q_ins_sign_in = facebook_sign_in.update(facebook_data).where(facebook_sign_in.user_id.equals(user.id));
                                 } else {
-                                    q_ins_sign_in = facebook_sign_in.insert(google_data);
+                                    q_ins_sign_in = facebook_sign_in.insert(facebook_data);
                                 }
                                 break;
                             }
@@ -642,9 +641,11 @@ pg.connect(pg_conn_string, function (err, client, done) {
         });
 
         socket.on(EMIT_NAMES.NOTIFICATIONS.SEND, function () {
-            var notifications = new Notifications(real_config, client, logger);
-            notifications.sendAutoNotifications();
-            notifications.sendUsersNotifications();
+            if (config_index == 'local'){
+                var notifications = new Notifications(real_config, client, logger);
+                notifications.sendAutoNotifications();
+                notifications.sendUsersNotifications();
+            }
         });
 
         socket.on(EMIT_NAMES.VK_INTEGRATION.GROUPS_TO_POST, function (user_id) {
@@ -732,7 +733,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                                             }
 
                                                             var user_id = socket.vk_user.user_id,
-                                                                q_ins_vk_post = vk_posts.insert({
+                                                                q_ins_vk_post = Entities.vk_posts.insert({
                                                                     creator_id: user_id,
                                                                     image_path: filename,
                                                                     message: data.message,

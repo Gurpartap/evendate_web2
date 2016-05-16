@@ -171,38 +171,36 @@ class Notifications {
     }
 
     sendAutoNotifications() {
+        console.log('sendAutoNotifications');
         var _this = this,
-            view_auto_notifications = Entities.view_auto_notifications,
             events_notifications = Entities.events_notifications,
-            stat_notifications = Entities.stat_notifications,
-            q_get_events_notifications =
-                view_auto_notifications
-                    .select(
-                        view_auto_notifications.id,
-                        view_auto_notifications.event_id,
-                        view_auto_notifications.notification_type_id,
-                        view_auto_notifications.notification_time,
-                        view_auto_notifications.status,
-                        view_auto_notifications.done,
-                        view_auto_notifications.organization_id,
-                        view_auto_notifications.title,
-                        view_auto_notifications.short_name,
-                        view_auto_notifications.notification_suffix,
-                        view_auto_notifications.image_square_vertical_url,
-                        view_auto_notifications.image_square_horizontal_url,
-                        view_auto_notifications.notification_type_name,
-                        view_auto_notifications.notification_type_text
-                    )
-                    .from(view_auto_notifications).limit(5).toQuery();
+            stat_notifications = Entities.stat_notifications;
 
-        _this.settings.client.query(q_get_events_notifications, function (err, result) {
+        _this.settings.client.query('SELECT DISTINCT' +
+            ' events_notifications.*,' +
+            ' view_events.organization_id,' +
+            ' view_events.title,' +
+            ' organizations.short_name,' +
+            ' organizations.notification_suffix,' +
+            ' view_events.image_square_vertical_url,' +
+            ' view_events.image_square_horizontal_url,' +
+            ' organizations.images_domain || \'organizations_images/logos/medium/\' || organizations.img_medium_url AS img_medium_url,' +
+            ' notification_types.type AS notification_type_name,' +
+            ' notification_types.text AS notification_type_text' +
+            ' FROM events_notifications' +
+            ' INNER JOIN view_events ON events_notifications.event_id = view_events.id' +
+            ' INNER JOIN notification_types ON notification_types.id = events_notifications.notification_type_id ' +
+            ' INNER JOIN organizations ON organizations.id = view_events.organization_id' +
+            ' WHERE notification_time <= NOW() AND done = FALSE LIMIT 5', function (err, result) {
 
             if (err){
                 console.log('HERE IS ERROR');
                 _this.logger.error(err);
             }
+            console.log(err, result);
 
             result.rows.forEach(function (notification) {
+                console.log(notification);
                 var data = {};
 
                 if (ONLY_FOR_FAVORED.indexOf(notification.notification_type_name) === -1) {

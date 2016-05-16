@@ -437,7 +437,7 @@ function OrganizationsList($view, $content_block){
 
 						if (to_delete_state){
 							$btn.find('span').text('Подписаться');
-							toggleSubscriptionState(false, sub_id, function(){});
+							toggleSubscriptionState(false, org_id, function(){});
 							$btn.removeClass(__C.CLASSES.DISABLED);
 							hideOrganizationItem(org_id);
 							return false;
@@ -612,11 +612,11 @@ function Organization($view, $content_block){
 					diff = m_event_date.diff(m_today, 'days', true);
 
 				switch(true){
-					case (-2 < diff <= -1):
+					case (-2 < diff && diff <= -1):
 						display_date = 'Вчера'; break;
-					case (-1 < diff <= 0):
+					case (-1 < diff && diff <= 0):
 						display_date = 'Сегодня'; break;
-					case (0 < diff <= 1):
+					case (0 < diff && diff <= 1):
 						display_date = 'Завтра'; break;
 					default:
 						display_date = m_event_date.format('D MMMM');

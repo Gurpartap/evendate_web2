@@ -20,7 +20,6 @@ CREATE VIEW view_events AS
     events.location,
     events.min_price,
     events.public_at,
-    events.disabled,
     events.canceled,
     vk_posts.group_id                                                                AS vk_group_id,
     vk_posts.image_path                                                              AS vk_image_path,

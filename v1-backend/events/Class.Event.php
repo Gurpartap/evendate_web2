@@ -288,6 +288,7 @@ class Event extends AbstractEntity
                     'organization_id' => $organization->getId(),
                     'latitude' => $data['latitude'],
                     'longitude' => $data['longitude'],
+                    'images_domain' => 'http://dn' . rand(1, 4) .'.evendate.ru/',
                     'image_vertical' => $img_vertical_filename,
                     'image_horizontal' => $img_horizontal_filename,
                     'detail_info_url' => $data['detail_info_url'],
@@ -311,13 +312,13 @@ class Event extends AbstractEntity
 
             self::saveDates($data['dates'], $db, $event_id);
             self::saveEventTags($db, $event_id, $data['tags']);
-            self::saveNotifications(array(
+            self::saveNotifications(array(array(
                 'event_id' => $event_id,
                 'notification_type_id' => Notification::NOTIFICATION_TYPE_NOW_ID,
                 'notification_time' => $data['notification_at']->format('Y-m-d H:i:s'),
                 'status' => 'TRUE',
                 'done' => 'FALSE'
-            ), $db);
+            )), $db);
 
             self::updateVkPostInformation($db, $event_id, $data);
 
@@ -336,7 +337,6 @@ class Event extends AbstractEntity
             throw $e;
         }
     }
-
     private static function updateVkPostInformation(PDO $db, $event_id, array $data)
     {
         if ($data['vk_post_id'] == null) return;

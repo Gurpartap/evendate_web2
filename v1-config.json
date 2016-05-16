@@ -60,6 +60,10 @@
       "user_images": "user_images",
       "organizations_images": "organizations_images"
     },
+    "one_signal": {
+      "app_id": "7471a586-01f3-4eef-b989-c809700a8658",
+      "rest_key": "Mjk5OGFiYzYtMDViOS00ZmMzLTkzNmMtMWVkMWJlNDllMTk0"
+    },
     "domain": "evendate.ru",
     "node_domain": "evendate.ru",
     "schema": "http://"
@@ -131,6 +135,10 @@
       "events_path": "event_images",
       "user_images": "user_images",
       "organizations_images": "organizations_images"
+    },
+    "one_signal": {
+      "app_id": "7471a586-01f3-4eef-b989-c809700a8658",
+      "rest_key": "Mjk5OGFiYzYtMDViOS00ZmMzLTkzNmMtMWVkMWJlNDllMTk0"
     },
     "mongodb": {
       "host": "localhost",
@@ -299,6 +307,10 @@
       "events_path": "event_images",
       "user_images": "user_images",
       "organizations_images": "organizations_images"
+    },
+    "one_signal": {
+      "app_id": "7471a586-01f3-4eef-b989-c809700a8658",
+      "rest_key": "Mjk5OGFiYzYtMDViOS00ZmMzLTkzNmMtMWVkMWJlNDllMTk0"
     },
     "mongodb": {
       "host": "localhost",
