@@ -1023,15 +1023,16 @@ a.button:hover {text-decoration: none}
 /*/Button*/
 /*Friend*/
 
-.friend {
+.user_tombstone {
 	display: inline-block;
 	vertical-align: top;
 	width: 150px;
 	padding: 0 6px;
+	margin-bottom: 24px;
 	text-align: center;
 }
 
-.friend_title {
+.user_tombstone_title {
 	margin-top: 12px;
 	font-weight: 400;
 	font-size: .88em;
@@ -1475,6 +1476,8 @@ html.-noscroll {
 	text-align: right;
 	border-top: 1px solid #eee;
 }
+
+.modal_footer > .button + .button {margin-left: .5em}
 
 
 /* /Modal */

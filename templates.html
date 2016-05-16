@@ -11,6 +11,13 @@
 	<button class="button {classes}" {dataset} type="button"><span class="Text">{title}</span></button>
 </script>
 
+<script type="javascript/template" id="tmpl-user-tombstone">
+	<div class="user_tombstone" data-is_friend="{is_friend}" data-page="friend-{id}" data-friend-id="{id}" data-name="{full_name}">
+		<div class="avatar -size_{size} -rounded" style="background-image: url('{avatar_url}')"></div>
+		<p class="user_tombstone_title">{full_name}</p>
+	</div>
+</script>
+
 <script type="javascript/template" id="tmpl-edit-event-page">
 
 	<div class="page edit_event_page">
@@ -175,7 +182,7 @@
 			</div>
 
 			<h4 class="form_label"><label>Обложка для мероприятия</label></h4>
-			<div class="form_group -parts_e_2 EditEventImgLoadWrap">
+			<div class="form_group -parts_e_2 EditEventImgLoadWrap ImgLoadWrap">
 				<div class="form_unit -centering">
 					<div class="wrapper">
 						<h4 class="form_label"><label>Горизонтальная</label></h4>
@@ -202,20 +209,22 @@
 						</div>
 						<p class="FileNameText"></p>
 						<div class="form_unit">
-							<button class="button -color_secondary_alt RippleEffect CropAgain -hidden" type="button">Кадрировать</button>
+							<button class="button -color_secondary_alt RippleEffect CallModal -hidden" type="button" data-modal_type="cropper" data-source_img="{image_horizontal_url}" data-aspect_ratio="16/9">
+								<span class="Text">Кадрировать</span>
+							</button>
 						</div>
 					</div>
 				</div>
 				<div class="form_unit">
 					<div class="img_holder">
-						<img class="edit_event_img_preview_hor EditEventImgPreview" data-aspect_ratio="16/9" src="{image_horizontal_url}">
+						<img class="edit_event_img_preview_hor EditEventImgPreview ImgPreview" src="{image_horizontal_url}">
 						<img src="app/img/edit_event/edit_event_img_placeholder_hor.png">
 						<input id="edit_event_image_horizontal_src" class="DataUrl" type="hidden" name="image_horizontal" value="{image_horizontal_base64}">
 						<input id="edit_event_image_horizontal_filename" class="FileName" type="hidden" name="filename_horizontal" value="{image_horizontal_filename}">
 					</div>
 				</div>
 			</div>
-			<div class="form_group -parts_e_2 EditEventImgLoadWrap">
+			<div class="form_group -parts_e_2 EditEventImgLoadWrap ImgLoadWrap">
 				<div class="form_unit -centering">
 					<div class="wrapper">
 						<h4 class="form_label"><label>Вертикальная</label></h4>
@@ -242,13 +251,15 @@
 						</div>
 						<p class="FileNameText"></p>
 						<div class="form_unit">
-							<button class="button -color_secondary_alt RippleEffect CropAgain -hidden" type="button">Кадрировать</button>
+							<button class="button -color_secondary_alt RippleEffect CallModal -hidden" type="button" data-modal_type="cropper" data-source_img="{image_vertical_url}" data-aspect_ratio="7/10">
+								<span class="Text">Кадрировать</span>
+							</button>
 						</div>
 					</div>
 				</div>
 				<div class="form_unit">
 					<div class="img_holder">
-						<img class="edit_event_img_preview_vert EditEventImgPreview" data-aspect_ratio="7/10" src="{image_vertical_url}">
+						<img class="edit_event_img_preview_vert EditEventImgPreview ImgPreview" src="{image_vertical_url}">
 						<img src="app/img/edit_event/edit_event_img_placeholder_vert.png">
 						<input id="edit_event_image_vertical_src" class="DataUrl" type="hidden" name="image_vertical" value="{image_vertical_base64}">
 						<input class="FileName" type="hidden" name="filename_vertical" value="{image_vertical_filename}">
@@ -340,15 +351,19 @@
 					<div class="form_unit -status_disabled">
 						<textarea id="edit_event_vk_post" class="form_textarea" name="vk_post" placeholder="" disabled style="height: 10em"></textarea>
 					</div>
-					<div class="form_group EditEventImgLoadWrap -parts_2_3">
+					<div class="form_group EditEventImgLoadWrap ImgLoadWrap -parts_2_3">
 						<div class="form_unit -status_disabled">
 							<div class="edit_event_vk_img">
 								<input id="edit_event_vk_image_src" class="DataUrl" type="hidden" name="vk_image_src" value="{vk_image_base64}" disabled>
 								<input id="edit_event_vk_image_filename" class="FileName" type="hidden" name="vk_image_filename" value="{vk_image_filename}" disabled>
-								<div class="edit_event_vk_img_preview"><img class="EditEventImgPreview" data-aspect_ratio="16/9" src="{vk_image_url}"></div>
+								<div class="edit_event_vk_img_preview"><img class="EditEventImgPreview ImgPreview" src="{vk_image_url}"></div>
 								<footer class="edit_event_vk_img_footer form_group -parts_e_2">
 									<div class="form_unit -status_disabled"><button class="action DeleteImg -color_error" type="button">Удалить</button></div>
-									<div class="form_unit -status_disabled" align="right"><button class="action CropAgain -color_primary" type="button">Кадрировать</button></div>
+									<div class="form_unit -status_disabled" align="right">
+										<button class="action CallModal -color_primary" type="button" data-modal_type="cropper" data-source_img="{vk_image_url}" data-aspect_ratio="16/9">
+											<span class="Text">Кадрировать</span>
+										</button>
+									</div>
 								</footer>
 							</div>
 						</div>
@@ -578,7 +593,7 @@
 				<div class="event_image_bottom">
 					<div class="form_group -parts_e_2 AddAvatarWrapper">
 						<div class="form_unit">
-							<div class="avatars_collection -subscribable -rounded -bordered -size_small {avatars_collection_classes} AvatarsCollection CallModal" data-max_subscribers="6" data-call-modal="friends">
+							<div class="avatars_collection -subscribable -rounded -bordered -size_small {avatars_collection_classes} AvatarsCollection CallModal" data-max_subscribers="6" data-modal_type="favors" data-modal_entity_type="event" data-modal_entity_id="{id}" data-modal_title="Добавили в избранное">
 								{subscribers}
 							</div>
 							<span class="counter -size_30x30 -bordered -color_marginal -castable {favored_users_show}">+<span class="FavoredCount">{favored_users_count}</span></span>
@@ -601,7 +616,7 @@
 			<div class="event_content">
 				<h3 class="event_title" title="{title}">{title}</h3>
 				<div class="event_description">{description}</div>
-				<div class="event_map CallModal" data-call-modal="map" style="background-image: url('http://maps.googleapis.com/maps/api/staticmap?markers={location}&zoom=15&size=640x640&scale=2&format=png&maptype=roadmap&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg')"></div>
+				<div class="event_map CallModal" data-modal_type="map" style="background-image: url('http://maps.googleapis.com/maps/api/staticmap?markers={location}&zoom=15&size=640x640&scale=2&format=png&maptype=roadmap&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg')" data-modal_map_location="{location}"></div>
 			</div>
 		</div>
 		<div class="event_additional_content">
@@ -704,6 +719,49 @@
 			<span>{title}</span>
 		</div>
 	</div>
+</script>
+
+
+
+
+
+<script type="javascript/template" id="tmpl-modal">
+	<div class="modal_unit {modal_type}">
+		<header class="modal_header">
+			{modal_title}
+			<button class="button -empty -modal_destroyer -color_default CloseModal RippleEffect">&times;</button>
+		</header>
+		<div class="modal_content {modal_content_classes}">
+			{modal_content}
+		</div>
+		{modal_footer}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-modal-title">
+	<h4>{title}</h4>
+</script>
+
+<script type="javascript/template" id="tmpl-modal-footer">
+	<footer class="modal_footer">
+		{footer_buttons}
+	</footer>
+</script>
+
+<script type="javascript/template" id="tmpl-modal-cropper-content">
+	<img class="Cropper" src="{image_src}">
+</script>
+
+<script type="javascript/template" id="tmpl-modal-image-media-content">
+	<img src="{src}">
+</script>
+
+<script type="javascript/template" id="tmpl-modal-map-content">
+	<iframe width="100%" height="600" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/place?q={location}&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg" allowfullscreen></iframe>
+</script>
+
+<script type="javascript/template" id="tmpl-modal-favored-divider">
+	<p class="modal_divider">{label}</p>
 </script>
 
 

@@ -54,10 +54,6 @@ function bindEventHandlers(){
 	$view.find('.add-to-favorites').on('click', function(){
 		toggleFavorite($(this), $view)
 	});
-/*
-	$view.find('.organization-in-event').on('click', function(){
-		showOrganizationalModal($(this).data('organization-id'));
-	});*/
 
 	$view.find('.likes-block').on('click', function(){
 		var $this = $(this),
@@ -92,12 +88,6 @@ function bindEventHandlers(){
 		window.open($block.data('share')[_type], 'SHARE_WINDOW',
 			'status=1,toolbar=0,menubar=0&height=300,width=500');
 	});
-	/*
-	$view.find('.btn-edit').on('click', function(){
-		var $this = $(this),
-			event_id = $this.data('event-id');
-		showEditEventModal(event_id);
-	});*/
 
 	$view.find('.event-hide-button').on('click', function(){
 		var $panel_block = $(this).parents('.tl-panel-block'),
@@ -253,35 +243,14 @@ function printEventsInTimeline($view, res, filter_date){
 	var $tl_outer_wrap = $view.find('.tl-outer-wrap'),
 		$blocks_wrapper = $view.find('.blocks-outer-wrap');
 
-	function compare(a,b) {
-		if (a.dates_range.length < b.dates_range.length)
-			return -1;
-		if (a.dates_range.length > b.dates_range.length)
-			return 1;
-		return 0;
-	}
-
-	//res.data.sort(compare);
-
 	res.data.forEach(function(value) {
 		var m_date;
 		if (filter_date != null){
 			m_date = moment(filter_date, __C.DATE_FORMAT);
 		}
-		//else if (value.first_event_date == null){
-		//	m_date = moment(value.dates_range[0]);
-		//} else if (moment(value.first_event_date).unix() < moment().unix() && filter_date == null){
-		//	m_date = moment();
-		//}else if (moment(value.first_event_date).unix() < moment().unix() && filter_date != null){
-		//	m_date = moment(filter_date, __C.DATE_FORMAT);
-		//}else{
-		//	m_date = moment(value.first_event_date);
-		//}
 		else{
 			m_date = moment.unix(value.nearest_event_date);
 		}
-
-		//console.log(m_date);
 
 		var day_date = m_date.format(__C.DATE_FORMAT);
 		var $day_wrapper = $blocks_wrapper.find('.events-' + day_date),
@@ -379,8 +348,7 @@ function OneEvent($view, $content_block){
 		trimAvatarsCollection($parent);
 		bindRippleEffect($parent);
 		bindDropdown($parent);
-		bindCallModal($parent);
-		bindOpenMedia($parent);
+		Modal.bindCallModal($parent);
 		bindCollapsing($parent);
 
 		$parent.find('.Subscribe').not('.-Handled_Subscribe').each(function(){
@@ -449,10 +417,7 @@ function OrganizationsList($view, $content_block){
 						}
 						organization.subscribed_count_text = getUnitsText(organization.subscribed_count, __C.TEXTS.SUBSCRIBERS);
 						var $organization = tmpl('new-organization-item', organization).data('organization', organization);
-						/*
-						$organization.find('.organization-img, .heading>span').on('click', function(){
-							showOrganizationalModal(organization.id)
-						});*/
+
 						$organizations.append($organization);
 						bindOnClick();
 					});
@@ -862,10 +827,7 @@ function Search($view, $content_block){
 				organization.subscribed_count_text = getUnitsText(organization.subscribed_count, __C.TEXTS.SUBSCRIBERS);
 				var $organization = tmpl('organization-search-item', organization);
 				$organizations_wrapper.append($organization);
-				bindOnClick();/*
-				$organization.on('click', function(){
-					showOrganizationalModal(organization.id);
-				})*/
+				bindOnClick();
 			});
 
 			if (res.data.events.length == 0){
@@ -1179,16 +1141,20 @@ function EditEvent($view, $content_block){
 				$preview = $parent.find('.EditEventImgPreview'),
 				$file_name_text = $parent.find('.FileNameText'),
 				$file_name = $parent.find('.FileName'),
-				$data_url = $parent.find('.DataUrl');
+				$data_url = $parent.find('.DataUrl'),
+				$button = $parent.find('.CallModal');
 
-			$preview.data('source_img', source).attr('src', source);
+			$preview.attr('src', source);
 			$file_name_text.html('Загружен файл:<br>'+filename);
 			$file_name.val(filename);
-			$data_url.val('data.source').data('source', source).trigger('change');
-			initCrop(source, $preview, {
-				'aspectRatio': eval($preview.data('aspect_ratio'))
-			});
-			bindRecrop($parent);
+			$button
+				.data('source_img', source)
+				.on('crop', function(event, cropped_src, crop_data){
+					$preview.attr('src', cropped_src);
+					$button.data('crop_data', crop_data);
+					$data_url.val('data.source').data('source', $preview.attr('src')).trigger('change');
+				})
+				.trigger('click.CallModal');
 		}
 
 		function initEditEventMainCalendar($view){
@@ -1425,7 +1391,6 @@ function EditEvent($view, $content_block){
 			if(response.error){
 				showNotifier({text: response.error, status: false});
 			} else {
-				//var url = window.current_load_button.data('url');
 				handleImgUpload(window.current_load_button, response.data, response.filename);
 			}
 		});
@@ -1596,58 +1561,34 @@ function EditEvent($view, $content_block){
 		$view.find('#event_tags').select2('data', selected_tags);
 	}
 
-	function bindRecrop($context){
-		var $parent = $context.closest('.EditEventImgLoadWrap'),
-			$preview = $parent.find('.EditEventImgPreview'),
-			$crop_again_button = $parent.find('.CropAgain'),
-			$data_url = $parent.find('.DataUrl');
-
-		$preview.off('crop-done').on('crop-done', function(){
-			var $this = $(this),
-				$crop_data = $this.data('crop_data');
-
-			$data_url.val('data.source').data('source', $preview.attr('src')).trigger('change');
-			$crop_again_button.removeClass('-hidden').off('click.CropAgain').on('click.CropAgain', function(){
-				initCrop($preview.data('source_img'), $preview, {
-					'data': $crop_data,
-					'aspectRatio': eval($preview.data('aspect_ratio'))
-				});
-			});
-
-		})
-	}
-
-	function initRecrop(i, elem){
-		var $button = $(elem),
-			$preview = $button.closest('.EditEventImgLoadWrap').find('.EditEventImgPreview');
-
-		$button.removeClass('-hidden').off('click.CropAgain').on('click.CropAgain', function(){
-			initCrop($preview.data('source_img'), $preview, {
-				'aspectRatio': eval($preview.data('aspect_ratio'))
-			});
-		});
-
-		bindRecrop($button);
-	}
-
 	function initVkImgCopying(){
 		var $vk_wrapper = $view.find('#edit_event_vk_publication');
-		$vk_wrapper.find('.CropAgain').each(initRecrop);
 		$view.find('#edit_event_image_horizontal_src').on('change.CopyToVkImg', function(){
 			var $wrap = $(this).closest('.EditEventImgLoadWrap'),
 				$vk_wrap = $view.find('#edit_event_vk_publication'),
+				$vk_preview = $vk_wrap.find('.EditEventImgPreview'),
+				$vk_button = $vk_wrap.find('.CallModal'),
+				$vk_$data_url = $vk_wrap.find('#edit_event_vk_image_src'),
+				$button_orig = $wrap.find('.CallModal'),
 				src = $(this).data('source');
 
 			if(!$view.find('.edit_event_vk_right_block').hasClass('-h_centering')){
 				toggleVkImg();
 			}
-			$vk_wrap.find('#edit_event_vk_image_src').val('data.source').data('source', src);
-			$vk_wrap.find('.EditEventImgPreview').attr('src', src).data('source_img', $wrap.find('.EditEventImgPreview').data('source_img'));
+			$vk_$data_url.val('data.source').data('source', src);
+			$vk_preview.attr('src', src);
 			$vk_wrap.find('#edit_event_vk_image_filename').val($view.find('#edit_event_image_horizontal_filename').val());
-			$vk_wrap.find('.CropAgain').data($wrap.find('.CropAgain').data());
+			$vk_button
+				.data('crop_data', $button_orig.data('crop_data'))
+				.data('source_img', $button_orig.data('source_img'))
+				.on('crop', function(event, cropped_src, crop_data){
+					$vk_preview.attr('src', cropped_src);
+					$vk_button.data('crop_data', crop_data);
+					$vk_$data_url.data('source', $vk_preview.attr('src')).trigger('change');
+				});
 
 		});
-		$vk_wrapper.find('.FileLoadButton, .CropAgain, .DeleteImg').on('click.OffCopying', function(){
+		$vk_wrapper.find('.FileLoadButton, .CallModal, .DeleteImg').on('click.OffCopying', function(){
 			$view.find('#edit_event_image_horizontal_src').off('change.CopyToVkImg');
 		});
 	}
@@ -1896,6 +1837,7 @@ function EditEvent($view, $content_block){
 	if(typeof event_id === 'undefined'){
 		$view.find('.page_wrapper').html(tmpl('edit-event-page', additional_fields));
 		initEditEventPage($view);
+		Modal.bindCallModal($view);
 		initOrganization();
 		checkVkPublicationAbility();
 		toggleVkImg();
@@ -1962,8 +1904,17 @@ function EditEvent($view, $content_block){
 					selectDates($view, data.dates);
 					selectTags($view, data.tags);
 					if(data.image_vertical_url && data.image_horizontal_url){
-						$view.find('.CropAgain').each(initRecrop);
+						$view.find('.CallModal').removeClass('-hidden').on('crop', function(event, cropped_src, crop_data){
+							var $button = $(this),
+								$parent = $button.closest('.EditEventImgLoadWrap'),
+								$preview = $parent.find('.EditEventImgPreview'),
+								$data_url = $parent.find('.DataUrl');
+							$data_url.val('data.source').data('source', $preview.attr('src')).trigger('change');
+							$preview.attr('src', cropped_src);
+							$button.data('crop_data', crop_data);
+						});
 					}
+					Modal.bindCallModal($view);
 
 					if(data.image_vertical_url){
 						toDataUrl(data.image_vertical_url, function(base64_string){
@@ -2024,10 +1975,7 @@ function printSubscribedOrganizations(organization){
 		if ($list.find('.organization-' + organization.id).length == 0){
 			tmpl('organizations-item', organization)
 				.addClass('fadeInLeftBig')
-				.prependTo($list)/*
-				.on('click', function(){
-					showOrganizationalModal($(this).data('organization-id'));
-				})*/;
+				.prependTo($list);
 		}
 	}else{
 		$.ajax({
@@ -2037,10 +1985,7 @@ function printSubscribedOrganizations(organization){
 					if (organization.is_subscribed && $list.find('.organization-' + organization.id).length == 0){
 						tmpl('organizations-item', organization)
 							.addClass('fadeInLeftBig')
-							.prependTo($list)/*
-							.on('click', function(){
-								showOrganizationalModal($(this).data('organization-id'));
-							})*/;
+							.prependTo($list);
 					}
 				});
 			}

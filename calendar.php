@@ -285,11 +285,11 @@
 								<div class="page event_page">
 									<div class="event_main_content">
 										<header class="event_header">
-											<div class="event_image OpenMedia" style="background-image: url('http://evendate.ru/event_images/large/5adba4e48891a5b3708e2b8e671338a6.jpg')"></div>
+											<div class="event_image CallModal" style="background-image: url('http://evendate.ru/event_images/large/5adba4e48891a5b3708e2b8e671338a6.jpg')" data-modal_type="media"></div>
 											<div class="event_image_bottom">
 												<div class="form_group -parts_e_2 AddAvatarWrapper">
 													<div class="form_unit">
-														<div class="avatars_collection -subscribable -rounded -bordered -size_small AvatarsCollection CallModal" data-max_subscribers="6" data-call-modal="friends">
+														<div class="avatars_collection -subscribable -rounded -bordered -size_small AvatarsCollection CallModal" data-max_subscribers="6" data-modal_type="favors" data-modal_entity_type="event" data-modal_entity_id="1210" data-modal_title="Добавили в избранное">
 															<div class="avatar" style="background-image: url(https://scontent.xx.fbcdn.net/hprofile-xfp1/v/t1.0-1/p50x50/10527538_829342687084874_4807662659139049876_n.jpg?oh=0fc62d2cf84572c091d28f93ddbd7a1e&amp;oe=5779783B)"></div>
 															<div class="avatar" style="background-image: url(http://cs624628.vk.me/v624628000/511e2/CVlNSwgIUZc.jpg)"></div>
 															<div class="avatar" style="background-image: url(http://cs629530.vk.me/v629530388/3d59e/z2b38WOLbvo.jpg)"></div>
@@ -335,7 +335,7 @@
 											<div class="event_description">
 												ГЭС-2 — мёртвый участок между Болотной площадью и «Красным Октябрём» со сваленным за забором строительным мусором. К 2019 году здесь должен появиться новый московский арт-центр. Он мог бы стать очередным, если бы за переосмысление территории не взялась мировая звезда архитектуры, автор парижского Центра Помпиду Ренцо Пьяно. На месте одной из старейших столичных гидроэлектростанций, которая поставляла электричество для московских трамваев, появится лес. Пока непонятно, как он уместится на террито
 											</div>
-											<div class="event_map CallModal" data-call-modal="map" style="background-image: url('http://maps.googleapis.com/maps/api/staticmap?markers=%D0%91%D0%B5%D1%80%D1%81%D0%B5%D0%BD%D0%B5%D0%B2%D1%81%D0%BA%D0%B0%D1%8F%20%D0%BD%D0%B0%D0%B1%D0%B5%D1%80%D0%B5%D0%B6%D0%BD%D0%B0%D1%8F%205%2C%20%D1%81%D1%82%201&zoom=15&size=640x640&scale=2&format=png&maptype=roadmap&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg')" data-map_location="%D0%91%D0%B5%D1%80%D1%81%D0%B5%D0%BD%D0%B5%D0%B2%D1%81%D0%BA%D0%B0%D1%8F%20%D0%BD%D0%B0%D0%B1%D0%B5%D1%80%D0%B5%D0%B6%D0%BD%D0%B0%D1%8F%205%2C%20%D1%81%D1%82%201"></div>
+											<div class="event_map CallModal" data-modal_type="map" style="background-image: url('http://maps.googleapis.com/maps/api/staticmap?markers=%D0%91%D0%B5%D1%80%D1%81%D0%B5%D0%BD%D0%B5%D0%B2%D1%81%D0%BA%D0%B0%D1%8F%20%D0%BD%D0%B0%D0%B1%D0%B5%D1%80%D0%B5%D0%B6%D0%BD%D0%B0%D1%8F%205%2C%20%D1%81%D1%82%201&zoom=15&size=640x640&scale=2&format=png&maptype=roadmap&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg')" data-modal_map_location="%D0%91%D0%B5%D1%80%D1%81%D0%B5%D0%BD%D0%B5%D0%B2%D1%81%D0%BA%D0%B0%D1%8F%20%D0%BD%D0%B0%D0%B1%D0%B5%D1%80%D0%B5%D0%B6%D0%BD%D0%B0%D1%8F%205%2C%20%D1%81%D1%82%201"></div>
 										</div>
 									</div>
 									<div class="event_additional_content">
@@ -580,65 +580,6 @@
 
 	<div class="modal_wrapper">
 		<div class="modal_destroyer"></div>
-
-		<div class="modal_unit CropperModal">
-			<header class="modal_header">
-				<h4>Кадрирование</h4>
-				<button class="button -empty -modal_destroyer -color_default CloseModal RippleEffect">&times;</button>
-			</header>
-			<div class="modal_content">
-				<div class="Cropper">
-					<img>
-				</div>
-			</div>
-			<footer class="modal_footer">
-				<button class="button -color_primary CropButton RippleEffect">Кадрировать</button>
-				<button class="button -color_default DestroyCropButton RippleEffect">Отмена</button>
-			</footer>
-		</div>
-
-		<div class="modal_unit MapModal">
-			<header class="modal_header">
-				<h4>Место проведения события</h4>
-				<button class="button -empty -modal_destroyer -color_default CloseModal RippleEffect">&times;</button>
-			</header>
-			<div class="modal_content -no_padding">
-				<iframe width="100%" height="600" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/place?q=%D0%91%D0%B5%D1%80%D1%81%D0%B5%D0%BD%D0%B5%D0%B2%D1%81%D0%BA%D0%B0%D1%8F%20%D0%BD%D0%B0%D0%B1%D0%B5%D1%80%D0%B5%D0%B6%D0%BD%D0%B0%D1%8F%205%2C%20%D1%81%D1%82%201&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg" allowfullscreen></iframe>
-			</div>
-		</div>
-
-		<div class="modal_unit MediaModal">
-			<header class="modal_header">
-				<button class="button -empty -modal_destroyer -color_default CloseModal RippleEffect">&times;</button>
-			</header>
-			<div class="modal_content -no_padding">
-				<img src="http://evendate.ru/event_images/large/5adba4e48891a5b3708e2b8e671338a6.jpg">
-			</div>
-		</div>
-
-		<div class="modal_unit FriendsModal">
-			<header class="modal_header">
-				<h4>Добавили в избранное</h4>
-				<button class="button -empty -modal_destroyer -color_default CloseModal RippleEffect">&times;</button>
-			</header>
-			<div class="modal_content">
-				<p class="modal_divider">Друзья</p>
-				<div class="friend" data-page="friend-">
-					<div class="avatar -size_70x70 -rounded" style="background-image: url('http://cs629530.vk.me/v629530388/3d59e/z2b38WOLbvo.jpg')"></div>
-					<p class="friend_title">Анюта Андрианова</p>
-				</div>
-				<div class="friend" data-page="friend-">
-					<div class="avatar -size_70x70 -rounded" style="background-image: url('http://cs629530.vk.me/v629530388/3d59e/z2b38WOLbvo.jpg')"></div>
-					<p class="friend_title">Ярослав Попсуй-Шапко</p>
-				</div>
-				<div class="friend" data-page="friend-">
-					<div class="avatar -size_70x70 -rounded" style="background-image: url('http://cs629530.vk.me/v629530388/3d59e/z2b38WOLbvo.jpg')"></div>
-					<p class="friend_title">Анюта Андрианова</p>
-				</div>
-				<p class="modal_divider">Все</p>
-			</div>
-		</div>
-
 	</div>
 </div>
 <!-- Button trigger modal -->
@@ -689,6 +630,7 @@
 <script type="text/javascript" src="/app/js/app.js" charset="utf-8"></script>
 <script type="text/javascript" src="/app/js/Class.Calendar.js" charset="utf-8"></script>
 <script type="text/javascript" src="/app/js/Class.DatePicker.js" charset="utf-8"></script>
+<script type="text/javascript" src="/app/js/Class.Modal.js" charset="utf-8"></script>
 <script type="text/javascript" src="/app/js/main.js" charset="utf-8"></script>
 <script type="text/javascript" src="/app/js/calendar.js" charset="utf-8"></script>
 <script type="text/javascript" src="/app/js/add.js" charset="utf-8"></script>
