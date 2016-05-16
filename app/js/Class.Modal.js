@@ -198,14 +198,9 @@ function CropperModal(image_src, cropper_options){
 		this.destroy_crop_button = this.modal.find('.DestroyCropButton');
 		cropper_options = typeof cropper_options == 'object' ? cropper_options : {};
 		this.options = $.extend({
+			viewMode: 1,
 			zoomable: false,
-			zoomOnWheel: false/*
-			 minCanvasWidth: 500,
-			 minCanvasHeight: 500,
-			 minCropBoxWidth: 500,
-			 minCropBoxHeight: 500,
-			 minContainerWidth: 500,
-			 minContainerHeight: 500*/
+			zoomOnWheel: false
 		}, cropper_options);
 		Modal.pushModal(this);
 	} else {
@@ -218,7 +213,9 @@ CropperModal.extend(Modal);
 CropperModal.prototype.show = function(){
 	var self = this;
 
-	self.cropper.attr('src', self.image_src).cropper(self.options);
+	self.cropper.on('load', function(){
+		self.cropper.cropper(self.options)
+	}).attr('src', self.image_src);
 
 	self.__superCall('show');
 
