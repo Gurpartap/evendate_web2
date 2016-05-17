@@ -29,6 +29,18 @@ class Event extends AbstractEntity
     const RANDOM_FIELD_NAME = 'random';
 
 
+    const RATING_OVERALL = 'rating';
+    const RATING_FAVORED_FRIENDS = 'rating_favored_friends';
+    const RATING_TAGS_IN_FAVORITES = 'rating_tags_in_favorites';
+    const RATING_TAGS_IN_HIDDEN = 'rating_tags_in_hidden';
+    const RATING_SUBSCRIBED_IN_SOCIAL_NETWORK = 'rating_subscribed_in_social_network';
+    const RATING_RECENT_CREATED = 'rating_recent_created';
+    const RATING_ACTIVE_DAYS = 'rating_active_days';
+
+
+    const RATING_DATE_CREATION_LIMIT = 259200; // three days in seconds
+
+
     protected static $DEFAULT_COLS = array(
         'id',
         'title',
