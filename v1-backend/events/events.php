@@ -18,8 +18,7 @@ $__modules['events'] = array(
                 intval($id),
                 $__fields);
 
-            return new Result(true, '', array($event->getNotifications(
-                $__user, $__fields)->getData()));
+            return $event->getNotifications($__user, $__fields);
         },
         '{{/(id:[0-9]+)}}' => function ($id) use ($__db, $__request, $__user, $__fields) {
             $event = EventsCollection::one(

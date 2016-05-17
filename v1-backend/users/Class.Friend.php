@@ -6,6 +6,8 @@ require_once $BACKEND_FULL_PATH .'/organizations/Class.Organization.php';
 class Friend extends AbstractEntity{
 
 	const RANDOM_FIELD_NAME = 'random';
+	const LINK_FIELD_NAME = 'link';
+
 	protected static $DEFAULT_COLS = array(
 		'id',
 		'first_name',
@@ -23,7 +25,16 @@ class Friend extends AbstractEntity{
 		'uid',
 		self::RANDOM_FIELD_NAME => '(SELECT DATE_PART(\'epoch\', u.created_at) / (random() * 9 + 1)
 			FROM users AS u
-			WHERE u.id = view_users.id) AS random',
+			WHERE u.id = view_users.id) AS ' . self::RANDOM_FIELD_NAME,
+		self::LINK_FIELD_NAME => '(SELECT 
+			CASE 
+				WHEN u.vk_uid IS NOT NULL THEN \'https://vk.com/id\' || u.vk_uid
+				WHEN u.facebook_uid IS NOT NULL THEN \'https://facebook.com/\' || u.facebook_uid
+				WHEN u.google_uid IS NOT NULL THEN \'https://plus.google.com/\' || u.google_uid
+				ELSE NULL
+			END
+			FROM users AS u
+			WHERE u.id = view_users.id) AS ' . self::LINK_FIELD_NAME,
 	);
 
 	protected $first_name;
