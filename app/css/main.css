@@ -73,6 +73,8 @@ a.-odd:focus {text-decoration: none}
 .tab,
 .action,
 .button,
+.form_radio + .form_label,
+.form_checkbox + .form_label,
 .-unselectable {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
@@ -2394,7 +2396,7 @@ html.-noscroll {
 	margin-bottom: .5em;
 	font-weight: 500;
 }
-.event_additional_content > .event_additional_field:first-child > .event_additional_field_label {margin-top: 0}
+.event_additional_content > .event_additional_field:first-child {margin-top: 0}
 
 .event_additional_info {
 	font-size: .88rem;

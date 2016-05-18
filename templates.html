@@ -1,7 +1,7 @@
 <!-- NEW TEMPLATES -->
 
 <script type="javascript/template" id="tmpl-radio-checkbox">
-	<div class="form_unit">
+	<div class="{unit_classes}">
 		<input id="{id}" class="{classes}" type="{type}" name="{name}" {attributes} {dataset} tabindex="-1">
 		<label class="form_label" for="{id}"><span>{label}</span></label>
 	</div>
@@ -589,7 +589,7 @@
 	<div class="page event_page">
 		<div class="event_main_content">
 			<header class="event_header">
-				<div class="event_image OpenMedia" style="background-image: url('{image_horizontal_large_url}')"></div>
+				<div class="event_image CallModal" data-modal_type="media" style="background-image: url('{image_horizontal_large_url}')"></div>
 				<div class="event_image_bottom">
 					<div class="form_group -parts_e_2 AddAvatarWrapper">
 						<div class="form_unit">
@@ -625,7 +625,7 @@
 			{event_price_information}
 			<div class="event_additional_field">
 				<label class="event_additional_field_label">Организатор</label>
-				<div class="avatar_block -size_small" data-page="orgainzation/{organization_id}">
+				<div class="avatar_block -size_small" data-page="organization/{organization_id}" data-organization-id="{organization_id}">
 					<div class="avatar"><img src="{organization_logo_small_url}"></div>
 					<span class="avatar_name">{organization_short_name}</span>
 				</div>
@@ -633,7 +633,7 @@
 			{event_additional_fields}
 			<div class="event_additional_field">
 				<label class="event_additional_field_label">Подробнее</label>
-				<a href="{detail_info_url}">{detail_info_url}&emsp;<i class="fa_icon fa-external-link"></i></a>
+				<a href="{detail_info_url}" target="_blank">{detail_info_url}&emsp;<i class="fa_icon fa-external-link"></i></a>
 			</div>
 			<div class="share_block">
 				<label class="share_title -color_primary -transform_uppercase">Поделиться</label>
@@ -644,7 +644,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="event_canceled_cap -unselectable -centering -hidden"><span>Организатор отменил событие</span></div>
+		<div class="event_canceled_cap -unselectable -centering {canceled}"><span>Организатор отменил событие</span></div>
 	</div>
 </script>
 
@@ -673,7 +673,7 @@
 	<p class="event_additional_info">от {min_price} руб.</p>
 </script>
 
-<script type="javascript/template" id="tmpl-event-date-not-same-time">
+<script type="javascript/template" id="tmpl-event-date-time">
 	<div class="event_additional_field">
 		<div class="collapsing_wrapper CollapsingWrapper -fading" data-default-height="80" style="height: 80px;">
 			<div class="collapsing_content CollapsingContent">
@@ -681,20 +681,17 @@
 					<div class="event_additional_field"><label class="event_additional_field_label">Дата</label></div>
 					<div class="event_additional_field"><label class="event_additional_field_label">Время</label></div>
 				</div>
-				<div class="event_additional_field_split">
-					<div class="event_additional_field"><p>12 февраля</p></div>
-					<div class="event_additional_field"><p>15:30 - 18:00</p></div>
-				</div>
+				{date_times}
 			</div>
 		</div>
 		<button class="collapsing_button CollapsingButton fa_icon fa-chevron-down -empty"></button>
 	</div>
 </script>
 
-<script type="javascript/template" id="tmpl-event-date-time">
+<script type="javascript/template" id="tmpl-event-date-time-row">
 	<div class="event_additional_field_split">
-		<div class="event_additional_field"><p>12 февраля</p></div>
-		<div class="event_additional_field"><p>15:30 - 18:00</p></div>
+		<div class="event_additional_field"><p>{date}</p></div>
+		<div class="event_additional_field"><p>{start_time} - {end_time}</p></div>
 	</div>
 </script>
 

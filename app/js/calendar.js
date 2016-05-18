@@ -342,6 +342,8 @@ function MyTimeline($view, $content_block){
 }
 
 function OneEvent($view, $content_block){
+	var $wrapper = $view.find('.page_wrapper'),
+		event_id = 3287;
 
 	function initEventPage($parent){
 		bindAddAvatar($parent);
@@ -350,6 +352,7 @@ function OneEvent($view, $content_block){
 		bindDropdown($parent);
 		Modal.bindCallModal($parent);
 		bindCollapsing($parent);
+		bindOnClick();
 
 		$parent.find('.Subscribe').not('.-Handled_Subscribe').each(function(){
 			new SubscribeButton($(this), {
@@ -369,7 +372,129 @@ function OneEvent($view, $content_block){
 			});
 		}).addClass('-Handled_Subscribe');
 	}
-	initEventPage($view);
+
+	function buildNotifications(raw_notifications, event_id){
+		var all_notifications = {
+				'notification-now': 'За 15 минут',
+				'notification-before-three-hours': 'За 3 часа',
+				'notification-before-day': 'За день',
+				'notification-before-three-days': 'За 3 дня',
+				'notification-before-week': 'За неделю'
+			},
+			$notifications = $(),
+			current_notifications = {},
+			i = 0;
+		for(var notif in raw_notifications){
+			if(raw_notifications.hasOwnProperty(notif)){
+				current_notifications[raw_notifications[notif].notification_type] = raw_notifications[notif];
+			}
+		}
+
+		for(var notification in all_notifications){
+			if(all_notifications.hasOwnProperty(notification)){
+				var data = {
+					id: 'event_notify_'+(++i),
+					classes: ['ToggleNotification'],
+					name: 'notification_time',
+					label: all_notifications[notification],
+					attributes: {
+						value: notification
+					},
+					dataset: {
+						event_id: event_id
+					}
+				};
+
+				if(current_notifications[notification]){
+					$.extend(true, data, {
+						unit_classes: current_notifications[notification].done ? ['-status_disabled'] : [],
+						attributes: {
+							checked: true
+						}
+					});
+					if(current_notifications[notification].done){
+						data.attributes.disabled = true;
+					}
+					if(current_notifications[notification].uuid){
+						data.dataset.uuid = current_notifications[notification].uuid;
+					}
+				}
+				$notifications = $notifications.add(buildRadioOrCheckbox('checkbox', data))
+			}
+		}
+		return $notifications;
+	}
+
+	$wrapper.empty();
+
+	$.ajax({
+		url: 'api/v1/events/'+event_id+'?fields=image_horizontal_large_url,favored{fields:"is_friend",order_by:"-is_friend",length:10},favored_users_count,is_favorite,notifications{fields:"notification_type,done"},description,location,can_edit,registration_required,registration_till,is_free,min_price,organization_logo_small_url,organization_short_name,is_same_time,dates{fields:"start_time,end_time"},tags,detail_info_url,canceled',
+		method: 'GET',
+		success: function(res){
+			ajaxHandler(res, function(data, text){
+				data = data[0];
+				var $subscribers = buildAvatarCollection(data.favored, 6),
+					avatars_collection_classes = [],
+					favored_users_count = ($subscribers.length <= 6) ? 0 : data.favored_users_count - 6;
+
+				if(data.is_favorite){
+					avatars_collection_classes.push('-subscribed');
+					if($subscribers.length > 4){
+						avatars_collection_classes.push('-shift');
+					}
+				}
+
+				data.subscribe_button_classes = data.is_favorite ? ['fa-check', '-color_secondary', '-Subscribed'].join(' ') : ['fa-plus', '-color_neutral_secondary'].join(' ');
+				data.subscribe_button_text = data.is_favorite ? 'В избранном' : 'Добавить в избранное';
+				data.subscribers = $subscribers;
+				data.avatars_collection_classes = avatars_collection_classes.join(' ');
+				data.favored_users_show = favored_users_count ? '' : '-cast';
+				data.favored_users_count = favored_users_count;
+				data.notifications = buildNotifications(data.notifications, event_id);
+
+				data.event_edit_functions = data.can_edit ? tmpl('event-edit-functions', data) : '';
+				data.event_registration_information = data.registration_required ? tmpl('event-registration-info', data) : '';
+				data.event_price_information = data.is_free ? '' : tmpl('event-price-info', {min_price: data.min_price ? data.min_price : '0'});
+				data.canceled = data.canceled ? '' : '-hidden';
+
+				data.event_additional_fields = $();
+				if(data.is_same_time){
+					data.event_additional_fields = data.event_additional_fields.add(tmpl('event-additional-info', {
+						key: 'Дата',
+						value: moment.unix(data.dates[0].event_date).format('LL')
+					}));
+					data.event_additional_fields = data.event_additional_fields.add(tmpl('event-additional-info', {
+						key: 'Время',
+						value: (data.dates[0].start_time == '00:00:00' && data.dates[0].end_time == '00:00:00') ? 'Весь день' : data.dates[0].start_time.split(':').slice(0,2).join(':') + ' - ' + data.dates[0].end_time.split(':').slice(0,2).join(':')
+					}));
+				} else {
+					var date_times = $();
+					data.dates.forEach(function(date){
+						date_times = date_times.add(tmpl('event-date-time-row', {
+							date: moment.unix(date.event_date).format('D MMMM'),
+							start_time: date.start_time.split(':').slice(0,2).join(':'),
+							end_time: date.end_time.split(':').slice(0,2).join(':')
+						}));
+					});
+					data.event_additional_fields = data.event_additional_fields.add(tmpl('event-date-time', {date_times: date_times}));
+				}
+				data.event_additional_fields = data.event_additional_fields = data.event_additional_fields.add(tmpl('event-additional-info', {
+					key: 'Место',
+					value: data.location
+				}));
+				data.event_additional_fields = data.event_additional_fields = data.event_additional_fields.add(tmpl('event-additional-info', {
+					key: 'Теги',
+					value: data.tags.map(function(tag){
+						return tag.name.toLowerCase();
+					}).join(', ')
+				}));
+
+
+				$wrapper.append(tmpl('event-page', data));
+				initEventPage($view);
+			}, ajaxErrorHandler)
+		}
+	});
 
 }
 

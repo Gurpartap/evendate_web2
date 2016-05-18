@@ -227,6 +227,49 @@ function SubscribeButton($btn, options){
 	})
 }
 
+function buildRadioOrCheckbox(type, props){
+	if(type == 'checkbox' || type == 'radio'){
+		props.type = type;
+		props.classes = props.classes ? (typeof props.classes == 'string') ? props.classes.split(' ') : props.classes : [];
+		props.unit_classes = props.unit_classes ? (typeof props.unit_classes == 'string') ? props.unit_classes.split(' ') : props.unit_classes : [];
+		if(props.classes.indexOf('form_checkbox') == -1 && props.classes.indexOf('form_radio') == -1){
+			props.classes.unshift('form_'+type);
+		}
+		props.classes.toString = function(){return this.join(' ')};
+		props.unit_classes.toString = function(){return this.join(' ')};
+		props.unit_classes.unshift('form_unit');
+
+		if(Array.isArray(props.dataset)){
+			props.dataset.toString = function(){return this.join(' ')};
+		}
+		else if(props.dataset != undefined && typeof props.dataset != 'string'){
+			props.dataset.toString = function(){
+				var dataset = [], obj = this;
+				Object.props(obj).forEach(function(prop){
+					dataset.push(((prop.indexOf('data-') != 0) ? 'data-'+prop : prop) + '="' + obj[prop] + '"');
+				});
+				return dataset.join(' ');
+			};
+		}
+
+		if(Array.isArray(props.attributes)){
+			props.attributes.toString = function(){return this.join(' ')};
+		}
+		else if(props.attributes != undefined && typeof props.attributes != 'string'){
+			props.attributes.toString = function(){
+				var attributes = [], obj = this;
+				Object.props(obj).forEach(function(prop){
+					attributes.push(prop+'="'+obj[prop]+'"');
+				});
+				return attributes.join(' ');
+			};
+		}
+		return tmpl('radio-checkbox', props);
+	} else {
+		throw Error('Принимаемый аргумент type может быть либо radio либо checkbox, придурок')
+	}
+}
+
 function handleErrorField($unit){
 	if(!$unit instanceof jQuery){
 		handleErrorField($($unit));
@@ -571,7 +614,6 @@ function bindCollapsing($parent){
 		$button.on('click.toggleCollapsing', toggleCollapsing);
 	})
 }
-
 
 function showNotification(text, time, status){
 	var $notification = $('#notification');
