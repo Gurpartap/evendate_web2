@@ -1077,7 +1077,7 @@ $(document).ready(function() {
 				}
 			});
 		}
-	}, 15000);
+	}, 5000);
 });
 
 function isNotDesktop() {

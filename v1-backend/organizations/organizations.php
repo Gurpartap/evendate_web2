@@ -26,6 +26,16 @@ $__modules['organizations'] = array(
 				$__order_by ?? array('organization_type_order', 'organization_type_id')
 			);
 		},
+		'recommendations' => function () use ($__db, $__pagination, $__request, $__user, $__fields, $__order_by){
+			return OrganizationsCollection::filter(
+				$__db,
+				$__user,
+				array_merge($__request, array('recommendations' => true)),
+				$__fields,
+				$__pagination,
+				$__order_by ?? array(Organization::RATING_OVERALL)
+			);
+		},
 		'types' => function () use ($__db, $__request, $__request, $__pagination, $__user, $__fields, $__order_by){
 			return OrganizationTypesCollection::filter(
 				$__db,

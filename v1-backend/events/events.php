@@ -18,8 +18,7 @@ $__modules['events'] = array(
                 intval($id),
                 $__fields);
 
-            return new Result(true, '', array($event->getNotifications(
-                $__user, $__fields)->getData()));
+            return $event->getNotifications($__user, $__fields);
         },
         '{{/(id:[0-9]+)}}' => function ($id) use ($__db, $__request, $__user, $__fields) {
             $event = EventsCollection::one(
@@ -62,6 +61,15 @@ $__modules['events'] = array(
                 $__fields,
                 array('length' => $__length, 'offset' => $__offset),
                 $__order_by ?? array('nearest_event_date', 'first_event_date'));
+        },
+        'recommendations' => function () use ($__db, $__request, $__fields, $__user, $__order_by, $__pagination) { /*MY EVENTS!*/
+            return EventsCollection::filter(
+                $__db,
+                $__user,
+                array_merge($__request, array('recommendations' => true, 'future' => true)),
+                $__fields,
+                $__pagination,
+                $__order_by ?? array(Event::RATING_OVERALL));
         },
         'dates' => function () use ($__db, $__request, $__fields, $__user, $__order_by, $__offset, $__length) { /*MY EVENTS!*/
             if (isset($__request['month'])) {

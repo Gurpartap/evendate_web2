@@ -18,6 +18,13 @@ class Organization extends AbstractEntity
     const IMAGE_TYPE_LOGO = '/logos/';
     const RANDOM_FIELD_NAME = 'random';
 
+    
+    const RATING_OVERALL = 'rating';
+    const RATING_SUBSCRIBED_FRIENDS = 'rating_subscribed_friends';
+    const RATING_ACTIVE_EVENTS = 'rating_active_events_count';
+    const RATING_LAST_EVENTS_COUNT = 'rating_last_events_count';
+    const RATING_SUBSCRIBED_IN_SOCIAL_NETWORK = 'rating_subscribed_in_social_network';
+    
     protected $description;
     protected $background_medium_img_url;
     protected $background_small_img_url;

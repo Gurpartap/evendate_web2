@@ -1023,6 +1023,7 @@ function bindFeedEvents($view){
 			showOrganizationalModal($this.data('organization-id'));
 		}else if ($this.data('event-id')){
 			window.open('/event.php?id=' + $this.data('event-id'), '_blank');
+			storeStat($this.data('event-id'), 'friend', 'view_event_from_user');
 		}else if ($this.data('friend-id')){
 			History.pushState({page: 'friend-' + $this.data('friend-id')}, $this.text(), 'friend-' + $this.data('friend-id'));
 		}
