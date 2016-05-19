@@ -441,13 +441,14 @@ function OneEvent($view, $content_block){
 				};
 
 				if(current_notifications[notification]){
+					var is_disabled = current_notifications[notification].done || !current_notifications[notification].uuid;
 					$.extend(true, data, {
-						unit_classes: current_notifications[notification].done ? ['-status_disabled'] : [],
+						unit_classes: is_disabled ? ['-status_disabled'] : [],
 						attributes: {
 							checked: true
 						}
 					});
-					if(current_notifications[notification].done){
+					if(is_disabled){
 						data.attributes.disabled = true;
 					}
 					if(current_notifications[notification].uuid){
