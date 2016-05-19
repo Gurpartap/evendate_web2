@@ -2024,7 +2024,7 @@ function EditEvent($view, $content_block){
 						additional_fields.public_at_time_minutes = m_public_at.format('mm');
 					}
 					if(data.registration_required){
-						var m_registration_till = moment(data.registration_till);
+						var m_registration_till = moment.unix(data.registration_till);
 						additional_fields.registration_till_data = m_registration_till.format('YYYY-MM-DD');
 						additional_fields.registration_till_data_label = m_registration_till.format('DD.MM.YYYY');
 						additional_fields.registration_till_time_hours = m_registration_till.format('HH');

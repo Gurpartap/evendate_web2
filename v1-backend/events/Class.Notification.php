@@ -46,6 +46,7 @@ class Notification extends AbstractEntity{
 	const NOTIFICATION_TYPE_BEFORE_THREE_DAYS = 'notification-before-three-days';
 	const NOTIFICATION_TYPE_BEFORE_WEEK = 'notification-before-week';
 	const NOTIFICATION_TYPE_BEFORE_QUARTER_OF_HOUR = 'notification-before-quarter-of-hour';
+	const NOTIFICATION_TYPE_CUSTOM = 'notification-custom';
 
 	const NOTIFICATION_TYPE_NOW_ID = 1;
 
@@ -73,7 +74,7 @@ class Notification extends AbstractEntity{
 		self::NOTIFICATION_TYPE_BEFORE_THREE_DAYS,
 		self::NOTIFICATION_TYPE_BEFORE_WEEK,
 		self::NOTIFICATION_TYPE_BEFORE_DAY,
-		'notification-custom',
+		self::NOTIFICATION_TYPE_CUSTOM,
 		self::NOTIFICATION_TYPE_CANCELED,
 		self::NOTIFICATION_TYPE_CHANGED_DATES,
 		self::NOTIFICATION_TYPE_CHANGED_LOCATION,
