@@ -38,6 +38,7 @@ class Notification extends AbstractEntity{
 	const NOTIFICATION_TYPE_CHANGED_LOCATION = 'notification-event-changed-location';
 	const NOTIFICATION_TYPE_CHANGED_PRICE = 'notification-event-changed-price';
 	const NOTIFICATION_TYPE_CHANGED_REGISTRATION = 'notification-event-changed-registration';
+	const NOTIFICATION_TYPE_ONE_DAY_REGISTRATION_CLOSE = 'notification-one-day-registration-close';
 
 
 	const NOTIFICATION_TYPE_BEFORE_THREE_HOURS = 'notification-before-three-hours';

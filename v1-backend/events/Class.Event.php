@@ -29,6 +29,18 @@ class Event extends AbstractEntity
     const RANDOM_FIELD_NAME = 'random';
 
 
+    const RATING_OVERALL = 'rating';
+    const RATING_FAVORED_FRIENDS = 'rating_favored_friends';
+    const RATING_TAGS_IN_FAVORITES = 'rating_tags_in_favorites';
+    const RATING_TAGS_IN_HIDDEN = 'rating_tags_in_hidden';
+    const RATING_SUBSCRIBED_IN_SOCIAL_NETWORK = 'rating_subscribed_in_social_network';
+    const RATING_RECENT_CREATED = 'rating_recent_created';
+    const RATING_ACTIVE_DAYS = 'rating_active_days';
+
+
+    const RATING_DATE_CREATION_LIMIT = 259200; // three days in seconds
+
+
     protected static $DEFAULT_COLS = array(
         'id',
         'title',
@@ -319,6 +331,20 @@ class Event extends AbstractEntity
                 'done' => 'FALSE'
             )), $db);
 
+            if (isset($data['registration_till'])
+                && $data['registration_required'] == true
+            ) {
+
+                $registration_date = clone $data['registration_till'];
+                self::saveNotifications(array(array(
+                    'event_id' => $event_id,
+                    'notification_type_id' => self::getNotificationTypeId(Notification::NOTIFICATION_TYPE_ONE_DAY_REGISTRATION_CLOSE, $db),
+                    'notification_time' => $registration_date->sub(new DateInterval('P1D'))->format('Y-m-d H:i:s'),
+                    'status' => 'TRUE',
+                    'done' => 'FALSE'
+                )), $db);
+            }
+
             self::updateVkPostInformation($db, $event_id, $data);
 
             App::saveImage($data['image_horizontal'],
@@ -402,7 +428,7 @@ class Event extends AbstractEntity
         }
     }
 
-    private function getNotificationTypeId($name) : int
+    private static function getNotificationTypeId($name, PDO $db) : int
     {
         $q_get_type_id = App::queryFactory()->newSelect();
         $q_get_type_id
@@ -411,7 +437,7 @@ class Event extends AbstractEntity
             ->where(
                 'type = ?', $name
             );
-        $p_get_type_id = $this->db->prepare($q_get_type_id->getStatement());
+        $p_get_type_id = $db->prepare($q_get_type_id->getStatement());
         $p_get_type_id->execute($q_get_type_id->getBindValues());
 
         if ($p_get_type_id->rowCount() != 1) throw new LogicException('CANT_FIND_TYPE');
@@ -472,7 +498,7 @@ class Event extends AbstractEntity
             && !in_array(Notification::NOTIFICATION_TYPE_CHANGED_DATES, $existing_notification_types)) {
             $notifications_to_add[] = array(
                 'event_id' => $this->id,
-                'notification_type_id' => $this->getNotificationTypeId(Notification::NOTIFICATION_TYPE_CHANGED_DATES),
+                'notification_type_id' => self::getNotificationTypeId(Notification::NOTIFICATION_TYPE_CHANGED_DATES, $this->db),
                 'notification_time' => $data['notification_at']->format('Y-m-d H:i:s'),
                 'status' => 'TRUE',
                 'done' => 'FALSE'
@@ -495,7 +521,7 @@ class Event extends AbstractEntity
 
                 $notifications_to_add[] = array(
                     'event_id' => $this->id,
-                    'notification_type_id' => $this->getNotificationTypeId(Notification::NOTIFICATION_TYPE_CHANGED_DATES),
+                    'notification_type_id' => self::getNotificationTypeId(Notification::NOTIFICATION_TYPE_CHANGED_DATES, $this->db),
                     'notification_time' => $data['notification_at']->format('Y-m-d H:i:s'),
                     'status' => 'TRUE',
                     'done' => 'FALSE'
@@ -507,7 +533,7 @@ class Event extends AbstractEntity
             && !in_array(Notification::NOTIFICATION_TYPE_CHANGED_LOCATION, $existing_notification_types)) {
             $notifications_to_add[] = array(
                 'event_id' => $this->id,
-                'notification_type_id' => $this->getNotificationTypeId(Notification::NOTIFICATION_TYPE_CHANGED_LOCATION),
+                'notification_type_id' => self::getNotificationTypeId(Notification::NOTIFICATION_TYPE_CHANGED_LOCATION, $this->db),
                 'notification_time' => $data['notification_at']->format('Y-m-d H:i:s'),
                 'status' => 'TRUE',
                 'done' => 'FALSE'
@@ -518,12 +544,12 @@ class Event extends AbstractEntity
             && !in_array(Notification::NOTIFICATION_TYPE_CANCELED, $existing_notification_types)) {
             $notifications_to_add[] = array(
                 'event_id' => $this->id,
-                'notification_type_id' => $this->getNotificationTypeId(Notification::NOTIFICATION_TYPE_CANCELED),
+                'notification_type_id' => self::getNotificationTypeId(Notification::NOTIFICATION_TYPE_CANCELED, $this->db),
                 'notification_time' => DateTime::createFromFormat('U', strtotime("+15 minutes"))->format('Y-m-d H:i:s'),
                 'status' => 'TRUE',
                 'done' => 'FALSE'
             );
-        }else if (
+        }elseif (
             isset($data['canceled']) &&
             $data['canceled'] == false &&
             in_array(Notification::NOTIFICATION_TYPE_CANCELED, $existing_notification_types)){
@@ -543,6 +569,7 @@ class Event extends AbstractEntity
             $p_upd_notification->execute($q_upd_notification->getBindValues());
 
         }
+        
         if (isset($data['registration_till']) &&
             ($data['registration_till'] != $this->registration_till
             || $data['registration_required'] != $this->registration_required)
@@ -550,12 +577,43 @@ class Event extends AbstractEntity
         ) {
             $notifications_to_add[] = array(
                 'event_id' => $this->id,
-                'notification_type_id' => $this->getNotificationTypeId(Notification::NOTIFICATION_TYPE_CHANGED_REGISTRATION),
+                'notification_type_id' => self::getNotificationTypeId(Notification::NOTIFICATION_TYPE_CHANGED_REGISTRATION, $this->db),
                 'notification_time' => $data['notification_at']->format('Y-m-d H:i:s'),
                 'status' => 'TRUE',
                 'done' => 'FALSE'
             );
         }
+
+        if (isset($data['registration_till'])
+            && $data['registration_required'] == true
+            && !in_array(Notification::NOTIFICATION_TYPE_CHANGED_REGISTRATION, $existing_notification_types)
+        ) {
+
+            $registration_date = clone $data['registration_till'];
+            $notifications_to_add[] = array(
+                'event_id' => $this->id,
+                'notification_type_id' => self::getNotificationTypeId(Notification::NOTIFICATION_TYPE_CHANGED_REGISTRATION, $this->db),
+                'notification_time' => $registration_date->sub(new DateInterval('P1D'))->format('Y-m-d H:i:s'),
+                'status' => 'TRUE',
+                'done' => 'FALSE'
+            );
+        }elseif ($data['registration_till']
+            && $data['registration_required'] == true
+            && in_array(Notification::NOTIFICATION_TYPE_CHANGED_REGISTRATION, $existing_notification_types)){
+            $q_upd_notification = App::queryFactory()
+                ->newUpdate()
+                ->table('events_notifications')
+                ->cols(array(
+                    'done' => 'TRUE',
+                    'status' => 'FALSE',
+                ))->where(
+                    'id = ?', array_search(Notification::NOTIFICATION_TYPE_ONE_DAY_REGISTRATION_CLOSE, $existing_notification_types)
+                );
+            $p_upd_notification = $this->db->prepare($q_upd_notification->getStatement());
+            $p_upd_notification->execute($q_upd_notification->getBindValues());
+        }
+        
+        
         if (isset($data['is_free']) &&
             ($data['is_free'] != $this->is_free
             || $data['min_price'] != $this->min_price)
@@ -563,7 +621,7 @@ class Event extends AbstractEntity
         ) {
             $notifications_to_add[] = array(
                 'event_id' => $this->id,
-                'notification_type_id' => $this->getNotificationTypeId(Notification::NOTIFICATION_TYPE_CHANGED_PRICE),
+                'notification_type_id' => self::getNotificationTypeId(Notification::NOTIFICATION_TYPE_CHANGED_PRICE, $this->db),
                 'notification_time' => $data['notification_at']->format('Y-m-d H:i:s'),
                 'status' => 'TRUE',
                 'done' => 'FALSE'
