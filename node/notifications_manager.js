@@ -70,34 +70,34 @@ NotificationsManager.prototype.create = function (notification, device) {
         };
     } else if (device.client_type == DEVICE_TYPES.ANDROID) {
         note.send = function (callback) {
-            // var type;
-            // if (note.payload.event_id){
-            //     type = 'events';
-            // }else if (note.payload.organization_id){
-            //     type = 'organizations';
-            // }else if (note.payload.user_id){
-            //     type = 'users';
-            // }
-            // var send_data = {
-            //     'data.message': note.body,
-            //     'data.event_id': note.payload.event_id,
-            //     'data.image_url': note.payload.organization_logo,
-            //     'data.organization_id': note.payload.organization_id,
-            //     'data.type': type,
-            //     registration_id: device.device_token
-            // };
-            // // send_data['data.to'] = '';
-            //
-            // send_data.registration_id = device.device_token;
-            // console.log(device, send_data);
-            // gcm.send(send_data, function (err, messageId) {
-            //     if (err) {
-            //         callback(err, null);
-            //     } else {
-            //         console.log(messageId);
-            //         callback(null, messageId);
-            //     }
-            // });
+            var type;
+            if (note.payload.event_id){
+                type = 'events';
+            }else if (note.payload.organization_id){
+                type = 'organizations';
+            }else if (note.payload.user_id){
+                type = 'users';
+            }
+            var send_data = {
+                'data.message': note.body,
+                'data.event_id': note.payload.event_id,
+                'data.image_url': note.payload.organization_logo,
+                'data.organization_id': note.payload.organization_id,
+                'data.type': type,
+                registration_id: device.device_token
+            };
+            // send_data['data.to'] = '';
+
+            send_data.registration_id = device.device_token;
+            console.log(device, send_data);
+            gcm.send(send_data, function (err, messageId) {
+                if (err) {
+                    callback(err, null);
+                } else {
+                    console.log(messageId);
+                    callback(null, messageId);
+                }
+            });
         };
     } else {
         note.send = function (callback) {
