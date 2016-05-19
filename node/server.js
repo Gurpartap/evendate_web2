@@ -108,7 +108,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
     try {
         new CronJob('*/1 * * * *', function () {
-            if (config_index == 'prod'){
+            if (config_index == 'prod') {
                 cropper.resizeNew({
                     images: real_config.images,
                     client: client
@@ -137,7 +137,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 if (!err || err == null) return false;
 
                 logger.error(err);
-                
+
                 if (callback instanceof Function) {
                     callback(err);
                     return true;
@@ -427,7 +427,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                         text: q_ins_group,
                                         name: query_name,
                                         values: [value.gid, value.name, value.screen_name, value.description, value.photo]
-                                    }, function(err, result){
+                                    }, function (err, result) {
                                         if (handleError(err)) return;
                                         if (result.rows.length != 1) return;
                                         client.query({
@@ -558,7 +558,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 user_info.photo_100 = user_info.hasOwnProperty('picture') ? user_info.picture.data.url : '';
                             }
 
-                            getGroupsList(user_info, function(groups_error, groups_data){
+                            getGroupsList(user_info, function (groups_error, groups_data) {
 
                                 if (handleError(friends_error)) {
                                     setTimeout(function () {
@@ -694,6 +694,39 @@ pg.connect(pg_conn_string, function (err, client, done) {
             }
         });
 
+        socket.on('recommendations.get', function (user) {
+            console.log(user);
+
+            var q_get_user_token = Entities.users.select(Entities.users.token)
+                .from(Entities.users)
+                .where(
+                    Entities.users.id.equals(user.user_id)
+                ).toQuery();
+
+            console.log(q_get_user_token);
+            console.log(q_get_user_token.text);
+
+
+            client.query(q_get_user_token, function(err, result){
+                
+                console.log(q_get_user_token.text);
+                console.log(result);
+                if (err) return handleError(err, 'recommendations.error');
+                if (result.rows.length != 1) return handleError({'error': 'USER_NOT_FOUND'}, 'recommendations.error');
+
+                rest.get('http://localhost/api/v1/events/recommendations', {
+                    json: true,
+                    headers: {
+                        'Authorization': result.rows[0].token
+                    }
+                })
+                    .on('complete', function (result) {
+                        console.log(result);
+                    });
+            });
+        });
+
+
         socket.on('feedback', function (data) {
             logger.info(data);
             var html = '';
@@ -745,7 +778,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
         });
 
         socket.on(EMIT_NAMES.NOTIFICATIONS.SEND, function () {
-            if (config_index == 'local'){
+            if (config_index == 'local') {
                 var notifications = new Notifications(real_config, client, logger);
                 notifications.sendAutoNotifications();
                 notifications.sendUsersNotifications();
@@ -788,11 +821,11 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 if (handleError(err, EMIT_NAMES.VK_INTEGRATION.POST_ERROR)) return;
 
                 rest.get(url, {
-                        json: true,
-                        headers: {
-                            'Accept-Language': 'ru,en-us'
-                        }
-                    })
+                    json: true,
+                    headers: {
+                        'Accept-Language': 'ru,en-us'
+                    }
+                })
                     .on('complete', function (result) {
 
                         if (result instanceof Error) {
