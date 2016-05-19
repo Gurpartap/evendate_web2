@@ -352,6 +352,7 @@ function OneEvent($view, $content_block){
 		bindDropdown($parent);
 		Modal.bindCallModal($parent);
 		bindCollapsing($parent);
+		initNotifications($parent);
 		bindOnClick();
 
 		$parent.find('.Subscribe').not('.-Handled_Subscribe').each(function(){
@@ -371,6 +372,40 @@ function OneEvent($view, $content_block){
 				}
 			});
 		}).addClass('-Handled_Subscribe');
+	}
+
+	function initNotifications($parent){
+		$parent = $parent ? $parent : $('body');
+		$parent.find('.ToggleNotification').each(function(){
+			var $this = $(this),
+				url, method;
+
+			$this.on('change', function(){
+				$this.prop('disabled', true);
+				if($this.prop('checked')){
+					url = '/api/v1/events/'+$this.data('event_id')+'/notifications';
+					method = 'POST';
+				} else {
+					url = '/api/v1/events/'+$this.data('event_id')+'/notifications/'+$this.data('uuid');
+					method = 'DELETE';
+				}
+				$.ajax({
+					url: url,
+					method: method,
+					data: {notification_type: $this.val()},
+					success: function(res){
+						ajaxHandler(res, function(data, text){
+							if(data.uuid){
+								$this.data('uuid', data.uuid);
+							} else {
+								$this.data('uuid', undefined);
+							}
+							$this.prop('disabled', false);
+						}, ajaxErrorHandler)
+					}
+				});
+			})
+		});
 	}
 
 	function buildNotifications(raw_notifications, event_id){
