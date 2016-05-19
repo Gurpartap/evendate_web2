@@ -219,3 +219,42 @@ CREATE VIEW view_auto_notifications AS
     INNER JOIN notification_types ON notification_types.id = events_notifications.notification_type_id
     INNER JOIN organizations ON organizations.id = view_events.organization_id
   WHERE notification_time <= NOW() AND done = FALSE;
+
+
+
+DROP VIEW view_notifications;
+
+CREATE VIEW view_notifications AS
+  SELECT
+    users_notifications.uuid,
+    users_notifications.user_id,
+    users_notifications.id as user_notification_id,
+    NULL                                                             AS events_notification_id,
+    users_notifications.event_id,
+    DATE_PART('epoch', users_notifications.notification_time) :: INT AS notification_time,
+    users_notifications.status,
+    nt1.id                                                           AS notification_type_id,
+    nt1.type                                             AS notification_type,
+    users_notifications.done,
+    DATE_PART('epoch', users_notifications.sent_time) :: INT         AS sent_time,
+    users_notifications.created_at,
+    users_notifications.updated_at
+  FROM users_notifications
+    INNER JOIN notification_types nt1 ON nt1.id = users_notifications.notification_type_id
+  UNION
+  SELECT
+    NULL                                                              AS uuid,
+    NULL                                                              AS user_id,
+    NULL                                                              AS user_notification_id,
+    events_notifications.id                                           AS events_notification_id,
+    events_notifications.event_id,
+    DATE_PART('epoch', events_notifications.notification_time) :: INT AS notification_time,
+    events_notifications.status,
+    events_notifications.notification_type_id,
+    nt2.type                                                          AS notification_type,
+    events_notifications.done,
+    NULL                                                              AS sent_time,
+    events_notifications.created_at,
+    events_notifications.updated_at
+  FROM events_notifications
+    INNER JOIN notification_types nt2 ON events_notifications.notification_type_id = nt2.id;

@@ -904,10 +904,13 @@ class Event extends AbstractEntity
                 $event_date = DateTime::createFromFormat('U', $first_event_date['event_date']);
                 $first_event_date = DateTime::createFromFormat('Y-m-d H:i:s', $event_date->format('Y-m-d') . ' ' . $first_event_date['start_time']);
                 $time = DateTime::createFromFormat('U', $first_event_date->getTimestamp() - $this->getNotificationTypeOffset($notification['notification_type']));
+                $notification_type_id = $this->getNotificationTypeId($notification['notification_type'], $this->db);
             }else throw new InvalidArgumentException('CANT_FIND_NOTIFICATION_TYPE');
         }elseif (isset($notification['notification_time'])){
             $time = new DateTime($notification['notification_time']);
+            $notification_type_id = $this->getNotificationTypeId(Notification::NOTIFICATION_TYPE_CUSTOM, $this->db);
         }else throw new InvalidArgumentException('BAD_NOTIFICATION_TIME');
+        
         if ($time <= new DateTime()) throw new InvalidArgumentException('BAD_NOTIFICATION_TIME');
         $q_ins_notification = App::queryFactory()->newInsert();
         $q_ins_notification
@@ -916,6 +919,7 @@ class Event extends AbstractEntity
                 'user_id' => $user->getId(),
                 'event_id' => $this->getId(),
                 'notification_time' => $time->format('Y-m-d H:i:s'),
+                'notification_type_id' => $notification_type_id,
                 'status' => 'true',
                 'done' => 'false',
                 'sent_time' => null
