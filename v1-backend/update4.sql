@@ -69,3 +69,7 @@ CREATE OR REPLACE VIEW view_organizations AS
     FROM organizations
         INNER JOIN organization_types ON organization_types.id = organizations.type_id AND organizations.status = TRUE
     WHERE organizations.status = TRUE;
+
+
+INSERT INTO notification_types(id, type, timediff, text)
+    VALUES (15, 'notification-before-quarter-of-hour', 900, 'До начала события {title} осталось 15 минут');
