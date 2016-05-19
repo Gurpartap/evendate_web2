@@ -570,8 +570,11 @@ class Event extends AbstractEntity
 
         }
         
-        if (isset($data['registration_till']) &&
-            ($data['registration_till'] != $this->registration_till
+        if (isset($data['registration_till'])
+            &&
+            $data['registration_till'] != null
+            &&
+            ($data['registration_till']->getTimestamp() != $this->registration_till
             || $data['registration_required'] != $this->registration_required)
             && !in_array(Notification::NOTIFICATION_TYPE_CHANGED_REGISTRATION, $existing_notification_types)
         ) {
