@@ -2421,7 +2421,7 @@ html.-noscroll {
 	font-weight: 300;
 	color: #4a4a4a;
 	background-color: hsla(0,0%,100%,.9);
-	z-index: 5;
+	z-index: 10;
 }
 
 .event_vulcan {

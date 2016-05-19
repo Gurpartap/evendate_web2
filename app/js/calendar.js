@@ -372,6 +372,32 @@ function OneEvent($view, $content_block){
 				}
 			});
 		}).addClass('-Handled_Subscribe');
+
+		$parent.find('.CancelEvent').on('click.CancelEvent', function(){
+			$.ajax({
+				url: '/api/v1/events/'+event_id+'/status',
+				method: 'PUT',
+				data: {canceled: true},
+				success: function(res){
+					ajaxHandler(res, function(data, text){
+						$parent.find('.event_canceled_cap').removeClass('-hidden');
+					}, ajaxErrorHandler)
+				}
+			});
+		});
+
+		$parent.find('.CancelCancellation').on('click.CancelCancellation', function(){
+			$.ajax({
+				url: '/api/v1/events/'+event_id+'/status',
+				method: 'PUT',
+				data: {canceled: false},
+				success: function(res){
+					ajaxHandler(res, function(data, text){
+						$parent.find('.event_canceled_cap').addClass('-hidden');
+					}, ajaxErrorHandler)
+				}
+			});
+		});
 	}
 
 	function initNotifications($parent){
@@ -524,6 +550,10 @@ function OneEvent($view, $content_block){
 						return tag.name.toLowerCase();
 					}).join(', ')
 				}));
+				data.cancel_cancellation = data.can_edit ? tmpl('button', {
+					classes: '-color_primary RippleEffect CancelCancellation',
+					title: 'Вернуть событие'
+				}) : '';
 
 
 				$wrapper.append(tmpl('event-page', data));
