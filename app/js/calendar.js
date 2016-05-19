@@ -343,7 +343,7 @@ function MyTimeline($view, $content_block){
 
 function OneEvent($view, $content_block){
 	var $wrapper = $view.find('.page_wrapper'),
-		event_id = 3287;
+		event_id = __STATES.getCurrentState().split('/')[1];
 
 	function initEventPage($parent){
 		bindAddAvatar($parent);
@@ -463,7 +463,7 @@ function OneEvent($view, $content_block){
 	$wrapper.empty();
 
 	$.ajax({
-		url: 'api/v1/events/'+event_id+'?fields=image_horizontal_large_url,favored{fields:"is_friend",order_by:"-is_friend",length:10},favored_users_count,is_favorite,notifications{fields:"notification_type,done"},description,location,can_edit,registration_required,registration_till,is_free,min_price,organization_logo_small_url,organization_short_name,is_same_time,dates{fields:"start_time,end_time"},tags,detail_info_url,canceled',
+		url: '/api/v1/events/'+event_id+'?fields=image_horizontal_large_url,favored{fields:"is_friend",order_by:"-is_friend",length:10},favored_users_count,is_favorite,notifications{fields:"notification_type,done"},description,location,can_edit,registration_required,registration_till,is_free,min_price,organization_logo_small_url,organization_short_name,is_same_time,dates{fields:"start_time,end_time"},tags,detail_info_url,canceled',
 		method: 'GET',
 		success: function(res){
 			ajaxHandler(res, function(data, text){
@@ -948,6 +948,7 @@ function FavoredEvents($view, $content_block){
 				data: data,
 				success: function(res){
 					printEventsInTimeline($view, res);
+					bindOnClick();
 				}
 			});
 		};
