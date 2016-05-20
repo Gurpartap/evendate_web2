@@ -2217,18 +2217,32 @@ function setDaysWithEvents(){
 }
 
 function bindOnClick(){
-	$('[data-page], a[data-controller]').not('.-Handled_Controller').off('click.pageRender').on('click.pageRender', function(){
-		var $this = $(this),
-			page_name = $this.data('page'),
-			controller_name = $this.data('controller');
-		if ($this.hasClass(__C.CLASSES.DISABLED)) return true;
-		if (page_name != undefined){
-			History.pushState($this.data(), $this.data('title') ? $this.data('title'): $this.text(), '/'+page_name);
-		} else {
-			if (window[controller_name] != undefined && window[controller_name] instanceof Function){
-				window[controller_name]();
-			}
+	$('[data-page], a[data-controller]').not('.-Handled_Controller').on('mousedown.pageRender', function(e){
+		if(e.which == 2){
+			e.preventDefault();
 		}
+		$(this).off('mouseup.pageRender').one('mouseup.pageRender', function(e){
+			var $this = $(this),
+				page_name = $this.data('page'),
+				controller_name = $this.data('controller');
+			switch(e.which){
+				case 1: {
+					if ($this.hasClass(__C.CLASSES.DISABLED)) return true;
+					if (page_name != undefined){
+						History.pushState($this.data(), $this.data('title') ? $this.data('title'): $this.text(), '/'+page_name);
+					} else {
+						if (window[controller_name] != undefined && window[controller_name] instanceof Function){
+							window[controller_name]();
+						}
+					}
+					break;
+				}
+				case 2: {
+					e.preventDefault();
+					window.open('/'+page_name);
+				}
+			}
+		});
 	}).addClass('-Handled_Controller');
 }
 
