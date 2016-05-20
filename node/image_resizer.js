@@ -47,6 +47,13 @@ ImagesResize.prototype.resizeFile = function (settings) {
     if (settings.type == 'organization') {
         widths = ORGANIZATIONS_WIDTHS;
     }
+
+    console.log({
+        src: settings.source,
+        dst: settings.destination,
+        width: widths[settings.size][settings.orientation]
+    });
+
     easyimage.resize({
         src: settings.source,
         dst: settings.destination,
@@ -73,8 +80,11 @@ ImagesResize.prototype.cropToSquare = function (settings) {
                 rescrop_settings.height = 400 * 16 / 9;
             }
             easyimage.rescrop(rescrop_settings).then(
-                function (image) {},
-                function (err) {logger.error(err);}
+                function (image) {
+                },
+                function (err) {
+                    logger.error(err);
+                }
             );
         },
         function (err) {
@@ -250,9 +260,10 @@ ImagesResize.prototype.resizeNew = function (config) {
                     if (stats.isFile() == false) return setNullNoImage(obj.id, {
                         background_img_url: null
                     });
+
                     _this.resizeFile({
                         source: background_img_path,
-                        destination: ORGANIZATIONS_IMAGES_PATH + BACKGROUND_IMAGES + '/' + MEDIUM_IMAGES + '/' + obj.background_img_url,
+                        destination: path.join(__dirname, ORGANIZATIONS_IMAGES_PATH + BACKGROUND_IMAGES + '/' + MEDIUM_IMAGES + '/' + obj.background_img_url),
                         type: 'organization',
                         orientation: BACKGROUND_IMAGES,
                         size: MEDIUM_IMAGES
@@ -260,7 +271,7 @@ ImagesResize.prototype.resizeNew = function (config) {
 
                     _this.resizeFile({
                         source: background_img_path,
-                        destination: ORGANIZATIONS_IMAGES_PATH + BACKGROUND_IMAGES + '/' + SMALL_IMAGES + '/' + obj.background_img_url,
+                        destination: path.join(__dirname, ORGANIZATIONS_IMAGES_PATH + BACKGROUND_IMAGES + '/' + SMALL_IMAGES + '/' + obj.background_img_url),
                         type: 'organization',
                         orientation: BACKGROUND_IMAGES,
                         size: SMALL_IMAGES
@@ -291,7 +302,7 @@ ImagesResize.prototype.resizeNew = function (config) {
                     });
                     _this.resizeFile({
                         source: logo_img_path,
-                        destination: ORGANIZATIONS_IMAGES_PATH + BACKGROUND_IMAGES + '/' + MEDIUM_IMAGES + '/' + obj.background_img_url,
+                        destination: path.join(__dirname, ORGANIZATIONS_IMAGES_PATH + LOGO_IMAGES + '/' + MEDIUM_IMAGES + '/' + obj.background_img_url),
                         type: 'organization',
                         orientation: LOGO_IMAGES,
                         size: MEDIUM_IMAGES
@@ -299,7 +310,7 @@ ImagesResize.prototype.resizeNew = function (config) {
 
                     _this.resizeFile({
                         source: logo_img_path,
-                        destination: ORGANIZATIONS_IMAGES_PATH + BACKGROUND_IMAGES + '/' + SMALL_IMAGES + '/' + obj.background_img_url,
+                        destination: path.join(__dirname, ORGANIZATIONS_IMAGES_PATH + LOGO_IMAGES + '/' + SMALL_IMAGES + '/' + obj.background_img_url),
                         type: 'organization',
                         orientation: LOGO_IMAGES,
                         size: SMALL_IMAGES

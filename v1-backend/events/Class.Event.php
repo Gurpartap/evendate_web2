@@ -600,7 +600,7 @@ class Event extends AbstractEntity
                 'status' => 'TRUE',
                 'done' => 'FALSE'
             );
-        }elseif ($data['registration_till']
+        }elseif (isset($data['registration_till'])
             && $data['registration_required'] == true
             && in_array(Notification::NOTIFICATION_TYPE_CHANGED_REGISTRATION, $existing_notification_types)){
             $q_upd_notification = App::queryFactory()

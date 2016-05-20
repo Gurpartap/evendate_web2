@@ -612,14 +612,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     }
                     case 'facebook':
                     {
-                        req_params = {
-                            url: URLs[data.type.toUpperCase()].GET_GROUPS_LIST,
-                            json: true,
-                            query: {
-                                'access_token': data.access_token
-                            }
-                        };
-                        break;
+                        callback(null, null);
+                        return;
                     }
                 }
                 rest.get(req_params.url, req_params)

@@ -233,7 +233,7 @@
       "rest_key": "Mjk5OGFiYzYtMDViOS00ZmMzLTkzNmMtMWVkMWJlNDllMTk0"
     },
     "domain": "dev.evendate.org",
-    "node_domain": "dev.evendate.org",
+    "node_domain": "localhost",
     "test": {
       "domain": "localhost",
       "token": "EAAYDHIPuIBYBAPmwIZAk3INqbI1GhyRX8YAMjlirVpYjiIC3KKS09DwzcOtYwlqcC5iEpYwlUdHczjtKoqgpXjfpFloWcYuHBbf6u8sCSH4DEK2AnfDicVghW5eKidZB3BMpvBfUxCQPZACp7KXbZAq5TPg6VT9QGmkPOAdthQZDZDundefinedicFo7r3WzgpHnvBs35DOpBKjSlotpAN5"
