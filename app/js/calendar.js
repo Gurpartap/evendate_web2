@@ -1322,7 +1322,8 @@ function OneDay($view, $content_block){
 }
 
 function EditEvent($view, $content_block){
-	var event_id = History.getState().data.eventId;
+	var $wrapper = $view.find('.page_wrapper'),
+		event_id = History.getState().data.eventId;
 
 	function initEditEventPage($view){
 
@@ -2002,7 +2003,7 @@ function EditEvent($view, $content_block){
 				contentType: 'application/json',
 				method: method,
 				success: function(res){
-					ajaxHandler(res, function(res_data){
+					ajaxHandler(res, function(res_data){/*
 						if(data.event_id){
 							$('body').stop().animate({scrollTop:0}, 1000, 'swing', function() {
 								showNotification('Событие успешно обновлено', 3000);
@@ -2012,7 +2013,7 @@ function EditEvent($view, $content_block){
 							$('body').stop().animate({scrollTop:0}, 1000, 'swing', function() {
 								showNotification('Событие успешно добавлено', 3000);
 							});
-						}
+						}*/
 
 						if($view.find('#edit_event_to_public_vk').prop('checked')){
 							socket.emit('vk.post', {
@@ -2026,6 +2027,7 @@ function EditEvent($view, $content_block){
 								link: data.detail_info_url
 							});
 						}
+						window.location = '/event/'+res_data.event_id;
 
 					}, function(res){
 						if(res.text){
@@ -2040,7 +2042,7 @@ function EditEvent($view, $content_block){
 
 	}
 
-	window.scrollTo(0, 0);
+	$wrapper.empty();
 	var additional_fields = {
 		event_id: event_id,
 		header_text: 'Новое событие',
@@ -2049,7 +2051,7 @@ function EditEvent($view, $content_block){
 		current_date: moment().format(__C.DATE_FORMAT)
 	};
 	if(typeof event_id === 'undefined'){
-		$view.find('.page_wrapper').html(tmpl('edit-event-page', additional_fields));
+		$wrapper.html(tmpl('edit-event-page', additional_fields));
 		initEditEventPage($view);
 		Modal.bindCallModal($view);
 		initOrganization();
@@ -2096,7 +2098,7 @@ function EditEvent($view, $content_block){
 					}
 
 					$.extend(true, data, additional_fields);
-					$view.find('.page_wrapper').html(tmpl('edit-event-page', data));
+					$wrapper.html(tmpl('edit-event-page', data));
 
 					initEditEventPage($view);
 					initOrganization(data.organization_id);
