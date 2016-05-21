@@ -8665,6 +8665,7 @@ span.organization-modal-header-text{
   text-align: left ;
   padding-top: 15px;
   white-space: pre-line !important;
+	clear: both;
 }
 .event-alone .tags{
   text-align: left ;

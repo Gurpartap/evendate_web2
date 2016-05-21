@@ -511,7 +511,7 @@ function trimAvatarsCollection($parent){
 			$avatars = $collection.find('.avatar'),
 			amount = $avatars.length;
 		if($collection.hasClass('-subscribed') && !$collection.hasClass('-shift')){
-			$collection.width(amount == 1 ? 0 : ($avatars.outerWidth()*amount) - (6*(amount-1)));
+			$collection.width(amount == 1 ? ($avatars.outerWidth()*amount) : ($avatars.outerWidth()*amount) - (6*(amount-1)));
 		} else {
 			$collection.width(amount == 1 ? 0 : ($avatars.outerWidth()*(amount-1)) - (6*(amount-2)));
 		}

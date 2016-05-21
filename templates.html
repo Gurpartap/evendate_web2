@@ -1,5 +1,7 @@
 <!-- NEW TEMPLATES -->
 
+<!-- COMMONS -->
+
 <script type="javascript/template" id="tmpl-radio-checkbox">
 	<div class="{unit_classes}">
 		<input id="{id}" class="{classes}" type="{type}" name="{name}" {attributes} {dataset} tabindex="-1">
@@ -17,6 +19,43 @@
 		<p class="user_tombstone_title">{full_name}</p>
 	</div>
 </script>
+
+<script type="javascript/template" id="tmpl-option">
+	<option value="{val}" {data}>{display_name}</option>
+</script>
+
+<script type="javascript/template" id="tmpl-subscriber-divider">
+	<span class="organization_subscribers_divider">{label}</span>
+</script>
+
+<script type="javascript/template" id="tmpl-subscriber">
+	<div class="subscriber Controller" data-is_friend="{is_friend}" data-page="friend-{id}" data-friend-id="{id}" data-name="{name}">
+		<div class="avatar_block">
+			<div class="avatar -size_40x40 -rounded -bordered">
+				<img src="{avatar_url}" onerror="this.onerror=null;this.src='/app/img/logo_40.png'">
+			</div>
+			<span class="avatar_name">{name}</span>
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-subscriber-avatar">
+	<div class="avatar" style="background-image: url({avatar_url})"></div>
+</script>
+
+<script type="javascript/template" id="tmpl-vk-share-button">
+	<button class="ShareButton share_icon {classes}" data-title="VK" data-href="http://vk.com/share.php?url=http://evendate.ru/event/{id}?title={title}&description={description}&image={image_horizontal_url}&noparse=false"></button>
+</script>
+
+<script type="javascript/template" id="tmpl-facebook-share-button">
+	<button class="ShareButton share_icon {classes}" data-title="Facebook" data-href="http://www.facebook.com/dialog/share?app_id=1692270867652630&display=popup&title={title}&quote={description}&href=http://evendate.ru/event/{id}&redirect_uri=http://evendate.ru/event/{id}image[0][url]={image_horizontal_large_url}&image[0][user_generated]=true"></button>
+</script>
+
+<script type="javascript/template" id="tmpl-twitter-share-button">
+	<button class="ShareButton share_icon twitter {classes}" data-title="Twitter" data-href="https://twitter.com/share?url=http://evendate.ru/event/{id}?text={title}&via=evendate.ru&hashtags=#evendate"></button>
+</script>
+
+<!-- Edit Event Page -->
 
 <script type="javascript/template" id="tmpl-edit-event-page">
 
@@ -473,9 +512,7 @@
 	</div>
 </script>
 
-<script type="javascript/template" id="tmpl-option">
-	<option value="{val}" {data}>{display_name}</option>
-</script>
+<!-- Organization Page -->
 
 <script type="javascript/template" id="tmpl-organization-info-page">
 	<div class="page organization_info_page">
@@ -531,7 +568,7 @@
 
 <script type="javascript/template" id="tmpl-organization-feed-event">
 	<div class="organization_feed_block" data-event_date="{date}">
-		<a class="organization_feed_block_img img_holder -odd" href="/event.php?id={id}" target="_blank" style="background-image: url({image_horizontal_medium_url})"></a>
+		<div class="organization_feed_block_img img_holder Controller" data-page="event/{id}" data-event-id="{id}" data-title="{title}" style="background-image: url({image_horizontal_medium_url})"></div>
 		<div class="organization_feed_block_info">
 			<header class="organization_feed_block_title">
 				<span class="Controller" data-page="event/{id}" data-event-id="{id}" data-title="{title}">{title}</span>
@@ -554,10 +591,6 @@
 	</div>
 </script>
 
-<script type="javascript/template" id="tmpl-subscriber-avatar">
-	<div class="avatar" style="background-image: url({avatar_url})"></div>
-</script>
-
 <script type="javascript/template" id="tmpl-organization-subscribers-page">
 	<div class="page organization_subscribers_page -fixed">
 		<header class="organization_subscribers_header">
@@ -570,20 +603,7 @@
 	</div>
 </script>
 
-<script type="javascript/template" id="tmpl-subscriber-divider">
-	<span class="organization_subscribers_divider">{label}</span>
-</script>
-
-<script type="javascript/template" id="tmpl-subscriber">
-	<div class="subscriber Controller" data-is_friend="{is_friend}" data-page="friend-{id}" data-friend-id="{id}" data-name="{name}">
-		<div class="avatar_block">
-			<div class="avatar -size_40x40 -rounded -bordered">
-				<img src="{avatar_url}" onerror="this.onerror=null;this.src='/app/img/logo_40.png'">
-			</div>
-			<span class="avatar_name">{name}</span>
-		</div>
-	</div>
-</script>
+<!-- Event Page -->
 
 <script type="javascript/template" id="tmpl-event-page">
 	<div class="page event_page">
@@ -717,6 +737,8 @@
 
 
 
+
+<!-- Modals -->
 
 <script type="javascript/template" id="tmpl-modal">
 	<div class="modal_unit {modal_type}">
@@ -954,13 +976,13 @@
         </div>
         <div class="event-attributes">
           <p class="tl-event-attribute"><i class="fa fa-clock-o"></i> {dates}, {time}</p>
-          <p class="tl-event-attribute"><i class="fa fa-map-marker"></i> {location}</p>
+          <p class="tl-event-attribute"><i class="fa fa-map-marker"></i> {location}</p><!--
           <p class="social-links">
             <i class="fa fa-vk" data-share-type="vk"></i>
             <i class="fa fa-facebook-f" data-share-type="facebook"></i>
             <i class="fa fa-google-plus hidden" data-share-type="google-plus"></i>
             <i class="fa fa-twitter" data-share-type="twitter"></i>
-          </p>
+          </p>-->
         </div>
       </div>
       <div class="tl-event-right">
@@ -1219,18 +1241,6 @@
   <a href="https://twitter.com/share?url=http://evendate.ru/event/{id}?text={title}&via=evendate.ru&hashtags=#evendate"></a>
 </script>
 
-<script type="javascript/template" id="tmpl-vk-share-button">
-	<button class="ShareButton share_icon {classes}" data-title="VK" data-href="http://vk.com/share.php?url=http://evendate.ru/event/{id}?title={title}&description={description}&image={image_horizontal_url}&noparse=false"></button>
-</script>
-
-<script type="javascript/template" id="tmpl-facebook-share-button">
-	<button class="ShareButton share_icon {classes}" data-title="Facebook" data-href="http://www.facebook.com/dialog/share?app_id=1692270867652630&display=popup&title={title}&quote={description}&href=http://evendate.ru/event/{id}&redirect_uri=http://evendate.ru/event/{id}image[0][url]={image_horizontal_large_url}&image[0][user_generated]=true"></button>
-</script>
-
-<script type="javascript/template" id="tmpl-twitter-share-button">
-	<button class="ShareButton share_icon twitter {classes}" data-title="Twitter" data-href="https://twitter.com/share?url=http://evendate.ru/event/{id}?text={title}&via=evendate.ru&hashtags=#evendate"></button>
-</script>
-
 <script type="javascript/template" id="tmpl-tag-option">
   <option value="{id}">{name}</option>
 </script>
@@ -1312,13 +1322,13 @@
       </div>
       <div class="col-xs-3 text-center">
         <img src="{image_vertical_url}" class="event-image img-rounded">
-        <div class="col-xs-12 text-center social-links-wrapper">
+        <div class="col-xs-12 text-center social-links-wrapper"><!--
             <span class="social-links">
               <i class="fa fa-vk" data-share-type="vk"></i>
               <i class="fa fa-facebook-f" data-share-type="facebook"></i>
               <i class="fa fa-google-plus hidden" data-share-type="google-plus"></i>
               <i class="fa fa-twitter" data-share-type="twitter"></i>
-            </span>
+            </span>-->
         </div>
       </div>
       <div class="row col-xs-12 event-bottom-block">
@@ -1386,7 +1396,7 @@
         {favorite_btn_text}
       </button>
     </div>
-    <div class="event-bottom-block row">
+    <div class="event-bottom-block row"><!--
       <div class="col-xs-10 pull-right">
         <span class="share-text">Поделиться</span>
              <span class="social-links">
@@ -1394,7 +1404,7 @@
               <i class="fa fa-facebook-f" data-share-type="facebook"></i>
               <i class="fa fa-twitter" data-share-type="twitter"></i>
             </span>
-      </div>
+      </div>-->
     </div>
   </div>
 </script>

@@ -435,13 +435,30 @@ function OneEvent($view, $content_block){
 		});
 	}
 
-	function buildNotifications(raw_notifications, event_id){
-		var all_notifications = {
-				'notification-now': 'За 15 минут',
-				'notification-before-three-hours': 'За 3 часа',
-				'notification-before-day': 'За день',
-				'notification-before-three-days': 'За 3 дня',
-				'notification-before-week': 'За неделю'
+	function buildNotifications(raw_notifications, event_id, last_date){
+		var m_today = moment(),
+			m_last_date = moment.unix(last_date),
+			all_notifications = {
+				'notification-now': {
+					label: 'За 15 минут',
+					moment: m_last_date.subtract(15, 'minutes').unix()
+				},
+				'notification-before-three-hours':  {
+					label: 'За 3 часа',
+					moment: m_last_date.subtract(3, 'hours').unix()
+				},
+				'notification-before-day': {
+					label: 'За день',
+					moment: m_last_date.subtract(1, 'days').unix()
+				},
+				'notification-before-three-days': {
+					label: 'За 3 дня',
+					moment: m_last_date.subtract(3, 'days').unix()
+				},
+				'notification-before-week': {
+					label: 'За неделю',
+					moment: m_last_date.subtract(1, 'week').unix()
+				}
 			},
 			$notifications = $(),
 			current_notifications = {},
@@ -453,34 +470,32 @@ function OneEvent($view, $content_block){
 		}
 
 		for(var notification in all_notifications){
+
 			if(all_notifications.hasOwnProperty(notification)){
-				var data = {
-					id: 'event_notify_'+(++i),
-					classes: ['ToggleNotification'],
-					name: 'notification_time',
-					label: all_notifications[notification],
-					attributes: {
-						value: notification
-					},
-					dataset: {
-						event_id: event_id
-					}
-				};
+				var is_disabled = moment.unix(all_notifications[notification].moment).isBefore(m_today),
+					data = {
+						id: 'event_notify_'+(++i),
+						classes: ['ToggleNotification'],
+						name: 'notification_time',
+						label: all_notifications[notification].label,
+						attributes: {
+							value: notification
+						},
+						dataset: {
+							event_id: event_id
+						}
+					};
 
 				if(current_notifications[notification]){
-					var is_disabled = current_notifications[notification].done || !current_notifications[notification].uuid;
-					$.extend(true, data, {
-						unit_classes: is_disabled ? ['-status_disabled'] : [],
-						attributes: {
-							checked: true
-						}
-					});
-					if(is_disabled){
-						data.attributes.disabled = true;
-					}
+					is_disabled = is_disabled || current_notifications[notification].done || !current_notifications[notification].uuid;
 					if(current_notifications[notification].uuid){
 						data.dataset.uuid = current_notifications[notification].uuid;
 					}
+					data.attributes.checked = true;
+				}
+				if(is_disabled){
+					data.unit_classes = ['-status_disabled'];
+					data.attributes.disabled = true;
 				}
 				$notifications = $notifications.add(buildRadioOrCheckbox('checkbox', data))
 			}
@@ -513,10 +528,10 @@ function OneEvent($view, $content_block){
 				data.avatars_collection_classes = avatars_collection_classes.join(' ');
 				data.favored_users_show = favored_users_count ? '' : '-cast';
 				data.favored_users_count = favored_users_count;
-				data.notifications = buildNotifications(data.notifications, event_id);
+				data.notifications = buildNotifications(data.notifications, event_id, data.last_event_date);
 
 				data.event_edit_functions = data.can_edit ? tmpl('event-edit-functions', data) : '';
-				data.event_registration_information = data.registration_required ? tmpl('event-registration-info', data) : '';
+				data.event_registration_information = data.registration_required ? tmpl('event-registration-info', {registration_till: moment.unix(data.registration_till).format('D MMMM')}) : '';
 				data.event_price_information = data.is_free ? '' : tmpl('event-price-info', {min_price: data.min_price ? data.min_price : '0'});
 				data.canceled = data.canceled ? '' : '-hidden';
 
@@ -1002,7 +1017,7 @@ function Search($view, $content_block){
 	if (_search.hasOwnProperty('q')){
 		$('.search-input').val(_search.q);
 	}
-	_search['fields'] = 'events{fields:"detail_info_url,is_favorite,nearest_event_date,can_edit,location,favored_users_count,organization_name,organization_logo_small_url,description,favored,is_same_time,tags,dates",filters:"future=true"},organizations{fields:"subscribed_count"}';
+	_search['fields'] = 'events{fields:"detail_info_url,is_favorite,nearest_event_date,can_edit,location,favored_users_count,organization_name,organization_short_name,organization_logo_small_url,description,favored,is_same_time,tags,dates",filters:"future=true"},organizations{fields:"subscribed_count"}';
 	$.ajax({
 		url: '/api/v1/search/',
 		data: _search,
