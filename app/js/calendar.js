@@ -356,6 +356,22 @@ function OneEvent($view, $content_block){
 		initNotifications($parent);
 		bindOnClick();
 
+		$parent.find('.EventSubscribe').not('.-Handled_EventSubscribe').on('click.eventSubscribe', function(){
+			var $this = $(this),
+				url = '/api/v1/events/'+$this.data('event-id')+'/favorites',
+				method = $this.hasClass('-Subscribed') ? 'DELETE' : 'POST';
+
+			$.ajax({
+				url: url,
+				method: method,
+				success: function(res){
+					ajaxHandler(res, function(data, text){
+					}, ajaxErrorHandler)
+				}
+			});
+
+		}).addClass('-Handled_EventSubscribe');
+
 		$parent.find('.Subscribe').not('.-Handled_Subscribe').each(function(){
 			new SubscribeButton($(this), {
 				labels: {
@@ -503,6 +519,71 @@ function OneEvent($view, $content_block){
 		return $notifications;
 	}
 
+	function formatDates(dates){
+		var prev_day,
+			range = [],
+			dates_obj = {},
+			output = [],
+			genitive_month_names = [
+				'января',
+				'февраля',
+				'марта',
+				'апреля',
+				'мая',
+				'июня',
+				'июля',
+				'августа',
+				'сентября',
+				'октября',
+				'ноября',
+				'декабря'
+			];
+
+		if(dates.length == 1){
+			return [moment.unix(dates[0].event_date).format('LL')];
+		}
+
+		dates.forEach(function(date, i){
+			var this_day = moment.unix(date.event_date);
+			if(!dates_obj.hasOwnProperty(this_day.year())){
+				dates_obj[this_day.year()] = {};
+			}
+			if(!dates_obj[this_day.year()].hasOwnProperty(this_day.month())){
+				dates_obj[this_day.year()][this_day.month()] = [];
+			}
+
+			if(!prev_day){
+				range = [this_day.format('D')];
+			} else {
+				if(this_day.month() == prev_day.month() && prev_day.diff(this_day, 'days') == -1){
+					range.push(this_day.format('D'));
+				} else {
+					dates_obj[prev_day.year()][prev_day.month()].push(range.length == 1 ? range.shift() : range.shift()+'-'+range.pop());
+					range = [this_day.format('D')];
+				}
+			}
+
+			if(i === dates.length - 1){
+				dates_obj[this_day.year()][this_day.month()].push(range.length == 1 ? range.shift() : range.shift()+'-'+range.pop());
+			} else {
+				prev_day = this_day;
+			}
+		});
+
+		for(var year in dates_obj){
+			if(dates_obj.hasOwnProperty(year)){
+				for(var month in dates_obj[year]){
+					if(dates_obj[year].hasOwnProperty(month)){
+						output.push(dates_obj[year][month].join(', ')+' '+genitive_month_names[month]+' '+year+' г.');
+					}
+				}
+			}
+		}
+
+
+		return output;
+	}
+
 	$wrapper.empty();
 
 	$.ajax({
@@ -539,7 +620,7 @@ function OneEvent($view, $content_block){
 				if(data.is_same_time){
 					data.event_additional_fields = data.event_additional_fields.add(tmpl('event-additional-info', {
 						key: 'Дата',
-						value: moment.unix(data.dates[0].event_date).format('LL')
+						value: $(formatDates(data.dates).map(function(elem){return $('<span>').addClass('event_date').text(elem);})).map(function(){return this.toArray();})
 					}));
 					data.event_additional_fields = data.event_additional_fields.add(tmpl('event-additional-info', {
 						key: 'Время',
@@ -566,6 +647,9 @@ function OneEvent($view, $content_block){
 						return tag.name.toLowerCase();
 					}).join(', ')
 				}));
+				if(data.detail_info_url){
+					data.event_additional_fields = data.event_additional_fields = data.event_additional_fields.add(tmpl('event-detail-link', {detail_info_url: data.detail_info_url}));
+				}
 /*
 				data.share_block = $();
 				data.share_block = data.share_block.add(tmpl('vk-share-button', data));
