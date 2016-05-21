@@ -761,7 +761,7 @@ function Organization($view, $content_block){
 			last_is_fiends = false;
 
 		if(typeof $scrollbar != 'undefined'){
-			last_is_fiends = $scrollbar.find('.subscriber').eq(-1).data('is_friend') == 'true';
+			last_is_fiends = $scrollbar.find('.subscriber').eq(-1).data('is_friend') == true;
 		}
 
 		subscribers.forEach(function(subscriber, i){
