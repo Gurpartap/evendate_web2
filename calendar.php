@@ -32,7 +32,7 @@
 	<!-- FULLCALENDAR-->
 	<link rel="stylesheet" href="/vendor/fullcalendar/dist/fullcalendar.css">
 	<!-- =============== CROPPER STYLES ===============-->
-	<link rel="stylesheet" href="/vendor/cropper/css/cropper.css">
+	<link rel="stylesheet" href="/vendor/cropper/css/cropper.min.css">
 	<!-- =============== BOOTSTRAP STYLES ===============-->
 	<link rel="stylesheet" href="/app/css/bootstrap.css" id="bscss">
 	<!-- Loaders.css-->
@@ -282,183 +282,6 @@
 					<div class="event-app hidden screen-view" data-controller="OneEvent">
 						<div class="page_viewport">
 							<div class="page_wrapper">
-								<div class="page event_page">
-									<div class="event_main_content">
-										<header class="event_header">
-											<div class="event_image OpenMedia" style="background-image: url('http://evendate.ru/event_images/large/5adba4e48891a5b3708e2b8e671338a6.jpg')"></div>
-											<div class="event_image_bottom">
-												<div class="form_group -parts_e_2 AddAvatarWrapper">
-													<div class="form_unit">
-														<div class="avatars_collection -subscribable -rounded -bordered -size_small AvatarsCollection CallModal" data-max_subscribers="6" data-call-modal="friends">
-															<div class="avatar" style="background-image: url(https://scontent.xx.fbcdn.net/hprofile-xfp1/v/t1.0-1/p50x50/10527538_829342687084874_4807662659139049876_n.jpg?oh=0fc62d2cf84572c091d28f93ddbd7a1e&amp;oe=5779783B)"></div>
-															<div class="avatar" style="background-image: url(http://cs624628.vk.me/v624628000/511e2/CVlNSwgIUZc.jpg)"></div>
-															<div class="avatar" style="background-image: url(http://cs629530.vk.me/v629530388/3d59e/z2b38WOLbvo.jpg)"></div>
-															<div class="avatar" style="background-image: url(http://cs624628.vk.me/v624628000/511e2/CVlNSwgIUZc.jpg)"></div>
-															<div class="avatar" style="background-image: url(http://cs629530.vk.me/v629530388/3d59e/z2b38WOLbvo.jpg)"></div>
-															<div class="avatar" style="background-image: url(http://cs629530.vk.me/v629530388/3d59e/z2b38WOLbvo.jpg)"></div>
-															<div class="avatar" style="background-image: url(http://cs629530.vk.me/v629530388/3d59e/z2b38WOLbvo.jpg)"></div>
-														</div>
-														<span class="counter -size_30x30 -bordered -color_marginal -castable -cast">+<span class="FavoredCount">0</span></span>
-													</div>
-													<div class="form_unit" align="right">
-														<button class="button event_favourite_button -low -rounded fa_icon fa-star-o -color_neutral_secondary Subscribe EventSubscribe -AddFavourite AddAvatar RippleEffect" data-event-id="3342" style="width: 170px">
-															<span class="Text">Добавить в избранное</span>
-														</button>
-														<button class="button -empty -low -rounded fa_icon fa-bell-o -color_neutral RippleEffect DropdownButton" data-dropdown="edit_notification" data-dd-width="190" data-dd-pos-x="self.center" data-dd-pos-y="6" type="button"></button>
-														<div class="dropdown_box DropdownBox" data-dropdown_id="edit_notification">
-															<header class="dropdown_header">Настройка напоминания</header>
-															<form class="dropdown_box_wrapper">
-																<div class="form_unit">
-																	<input id="event_notify_1" class="form_checkbox ToggleNotification" type="checkbox" name="notification_time" value="notification-before-three-hours" tabindex="-1">
-																	<label class="form_label" for="event_notify_1"><span>За 3 часа</span></label>
-																</div>
-																<div class="form_unit">
-																	<input id="event_notify_2" class="form_checkbox ToggleNotification" type="checkbox" name="notification_time" value="notification-before-day" tabindex="-1">
-																	<label class="form_label" for="event_notify_2"><span>За день</span></label>
-																</div>
-																<div class="form_unit">
-																	<input id="event_notify_3" class="form_checkbox ToggleNotification" type="checkbox" name="notification_time" value="notification-before-three-days" tabindex="-1">
-																	<label class="form_label" for="event_notify_3"><span>За 3 дня</span></label>
-																</div>
-																<div class="form_unit">
-																	<input id="event_notify_4" class="form_checkbox ToggleNotification" type="checkbox" name="notification_time" value="notification-before-week" tabindex="-1">
-																	<label class="form_label" for="event_notify_4"><span>За неделю</span></label>
-																</div>
-															</form>
-														</div>
-													</div>
-												</div>
-											</div>
-										</header>
-										<div class="event_content">
-											<h3 class="event_title" title="Автор парижского Центра Помпиду и ГЭС-2: почему Москве повезло">Автор парижского Центра Помпиду и ГЭС-2: почему Москве повезло</h3>
-											<div class="event_description">
-												ГЭС-2 — мёртвый участок между Болотной площадью и «Красным Октябрём» со сваленным за забором строительным мусором. К 2019 году здесь должен появиться новый московский арт-центр. Он мог бы стать очередным, если бы за переосмысление территории не взялась мировая звезда архитектуры, автор парижского Центра Помпиду Ренцо Пьяно. На месте одной из старейших столичных гидроэлектростанций, которая поставляла электричество для московских трамваев, появится лес. Пока непонятно, как он уместится на террито
-											</div>
-											<div class="event_map CallModal" data-call-modal="map" style="background-image: url('http://maps.googleapis.com/maps/api/staticmap?markers=%D0%91%D0%B5%D1%80%D1%81%D0%B5%D0%BD%D0%B5%D0%B2%D1%81%D0%BA%D0%B0%D1%8F%20%D0%BD%D0%B0%D0%B1%D0%B5%D1%80%D0%B5%D0%B6%D0%BD%D0%B0%D1%8F%205%2C%20%D1%81%D1%82%201&zoom=15&size=640x640&scale=2&format=png&maptype=roadmap&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg')"></div>
-										</div>
-									</div>
-									<div class="event_additional_content">
-										<button class="button -color_neutral -fill RippleEffect DropdownButton" data-dropdown="redact_event" data-dd-width="self" type="button">Редактирование события</button>
-										<div class="dropdown_box DropdownBox" data-dropdown_id="redact_event">
-											<div class="dropdown_list"><button class="dropdown_button -fill -color_error RippleEffect CloseDropdown DropdownButton" data-dropdown="cancel_event" data-dd-width="self" type="button">Отменить событие</button></div>
-											<div class="dropdown_list"><button class="dropdown_button -fill -color_neutral RippleEffect CloseDropdown" data-page="edit_event" data-event-id="" type="button">Редактировать</button></div>
-										</div>
-										<div class="dropdown_box DropdownBox" data-dropdown_id="cancel_event">
-											<div class="dropdown_box_wrapper">
-												<p>Вы уверены, что хотите отменить событие?</p>
-											</div>
-											<footer class="dropdown_box_footer">
-												<span class="action -color_neutral CloseDropdown">Отмена</span>
-												<span class="action -color_error CloseDropdown">Да</span>
-											</footer>
-										</div>
-										<p class="event_additional_info -transform_uppercase">Регистрация до <span>10 февраля</span></p>
-										<p class="event_additional_info">14 500 рублей</p>
-										<div class="event_additional_field">
-											<label class="event_additional_field_label">Организатор</label>
-											<div class="avatar_block -size_small" data-page="">
-												<div class="avatar"><img src="http://evendate.ru/organizations_images/logos/small/1.png"></div>
-												<span class="avatar_name">Институт STRELKA</span>
-											</div>
-										</div>
-										<div class="event_additional_field">
-											<div class="collapsing_wrapper CollapsingWrapper -fading" data-default-height="80" style="height: 80px;">
-												<div class="collapsing_content CollapsingContent">
-													<div class="event_additional_field_split">
-														<div class="event_additional_field"><label class="event_additional_field_label">Дата</label></div>
-														<div class="event_additional_field"><label class="event_additional_field_label">Время</label></div>
-													</div>
-													<div class="event_additional_field_split">
-														<div class="event_additional_field"><p>12 февраля</p></div>
-														<div class="event_additional_field"><p>15:30 - 18:00</p></div>
-													</div>
-													<div class="event_additional_field_split">
-														<div class="event_additional_field"><p>13 февраля</p></div>
-														<div class="event_additional_field"><p>15:30 - 18:00</p></div>
-													</div>
-													<div class="event_additional_field_split">
-														<div class="event_additional_field"><p>14 февраля</p></div>
-														<div class="event_additional_field"><p>15:30 - 18:00</p></div>
-													</div>
-													<div class="event_additional_field_split">
-														<div class="event_additional_field"><p>15 февраля</p></div>
-														<div class="event_additional_field"><p>15:30 - 18:00</p></div>
-													</div>
-													<div class="event_additional_field_split">
-														<div class="event_additional_field"><p>16 февраля</p></div>
-														<div class="event_additional_field"><p>15:30 - 18:00</p></div>
-													</div>
-													<div class="event_additional_field_split">
-														<div class="event_additional_field"><p>17 февраля</p></div>
-														<div class="event_additional_field"><p>15:30 - 18:00</p></div>
-													</div>
-												</div>
-											</div>
-											<button class="collapsing_button CollapsingButton fa_icon fa-chevron-down -empty"></button>
-										</div>
-										<div class="event_additional_field">
-											<div class="event_additional_field_split">
-												<div class="event_additional_field"><label class="event_additional_field_label">Дата</label></div>
-												<div class="event_additional_field"><label class="event_additional_field_label">Время</label></div>
-											</div>
-											<div class="event_additional_field_split">
-												<div class="event_additional_field"><p>12 февраля</p></div>
-												<div class="event_additional_field"><p>15:30 - 18:00</p></div>
-											</div>
-											<div class="event_additional_field_split">
-												<div class="event_additional_field"><p>13 февраля</p></div>
-												<div class="event_additional_field"><p>15:30 - 18:00</p></div>
-											</div>
-											<div class="event_additional_field_split">
-												<div class="event_additional_field"><p>14 февраля</p></div>
-												<div class="event_additional_field"><p>15:30 - 18:00</p></div>
-											</div>
-											<div class="event_additional_field_split">
-												<div class="event_additional_field"><p>15 февраля</p></div>
-												<div class="event_additional_field"><p>15:30 - 18:00</p></div>
-											</div>
-											<div class="event_additional_field_split">
-												<div class="event_additional_field"><p>16 февраля</p></div>
-												<div class="event_additional_field"><p>15:30 - 18:00</p></div>
-											</div>
-											<div class="event_additional_field_split">
-												<div class="event_additional_field"><p>17 февраля</p></div>
-												<div class="event_additional_field"><p>15:30 - 18:00</p></div>
-											</div>
-										</div>
-										<div class="event_additional_field">
-											<label class="event_additional_field_label">Место</label>
-											<p>Берсеневская набережная 5, ст 1</p>
-										</div>
-										<div class="event_additional_field">
-											<label class="event_additional_field_label">Теги</label>
-											<p>выставка, леция, урбанистика</p>
-										</div>
-										<div class="event_additional_field">
-											<label class="event_additional_field_label">Подробнее</label>
-											<a href="http://vk.com/mister_guu">vk.com/mister_guu&emsp;<i class="fa_icon fa-external-link"></i></a>
-										</div>
-										<div class="share_block">
-											<label class="share_title -color_primary -transform_uppercase">Поделиться</label>
-											<div class="share_icons -size_small">
-												<span class="share_icon vk"></span>
-												<span class="share_icon facebook"></span>
-												<span class="share_icon google"></span>
-											</div>
-										</div>
-									</div>
-									<div class="event_canceled_cap -unselectable -centering -hidden"><span>Организатор отменил событие</span></div>
-								</div>
-								<div class="event_vulcan">
-									<header class="event_vulcan_header">Похожие мероприятия</header>
-									<div class="event_card">
-										<div class="event_card_img" style="background-image: url('http://evendate.ru/event_images/large/9186309e48810497909643a38f6c40ce.jpeg')"></div>
-										<div class="event_card_description">
-											<span>Спекулятивный дизайн и стратегическое планирование</span>
-										</div>
-									</div>
-								</div>
 							</div>
 						</div>
 					</div>
@@ -602,65 +425,6 @@
 
 	<div class="modal_wrapper">
 		<div class="modal_destroyer"></div>
-
-		<div class="modal_unit CropperModal">
-			<header class="modal_header">
-				<h4>Кадрирование</h4>
-				<button class="button -empty -modal_destroyer -color_default CloseModal RippleEffect">&times;</button>
-			</header>
-			<div class="modal_content">
-				<div class="Cropper">
-					<img>
-				</div>
-			</div>
-			<footer class="modal_footer">
-				<button class="button -color_primary CropButton RippleEffect">Кадрировать</button>
-				<button class="button -color_default DestroyCropButton RippleEffect">Отмена</button>
-			</footer>
-		</div>
-
-		<div class="modal_unit MapModal">
-			<header class="modal_header">
-				<h4>Место проведения события</h4>
-				<button class="button -empty -modal_destroyer -color_default CloseModal RippleEffect">&times;</button>
-			</header>
-			<div class="modal_content -no_padding">
-				<iframe width="100%" height="600" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/place?q=%D0%91%D0%B5%D1%80%D1%81%D0%B5%D0%BD%D0%B5%D0%B2%D1%81%D0%BA%D0%B0%D1%8F%20%D0%BD%D0%B0%D0%B1%D0%B5%D1%80%D0%B5%D0%B6%D0%BD%D0%B0%D1%8F%205%2C%20%D1%81%D1%82%201&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg" allowfullscreen></iframe>
-			</div>
-		</div>
-
-		<div class="modal_unit MediaModal">
-			<header class="modal_header">
-				<button class="button -empty -modal_destroyer -color_default CloseModal RippleEffect">&times;</button>
-			</header>
-			<div class="modal_content -no_padding">
-				<img src="http://evendate.ru/event_images/large/5adba4e48891a5b3708e2b8e671338a6.jpg">
-			</div>
-		</div>
-
-		<div class="modal_unit FriendsModal">
-			<header class="modal_header">
-				<h4>Добавили в избранное</h4>
-				<button class="button -empty -modal_destroyer -color_default CloseModal RippleEffect">&times;</button>
-			</header>
-			<div class="modal_content">
-				<p class="modal_divider">Друзья</p>
-				<div class="friend" data-page="friend-">
-					<div class="avatar -size_70x70 -rounded" style="background-image: url('http://cs629530.vk.me/v629530388/3d59e/z2b38WOLbvo.jpg')"></div>
-					<p class="friend_title">Анюта Андрианова</p>
-				</div>
-				<div class="friend" data-page="friend-">
-					<div class="avatar -size_70x70 -rounded" style="background-image: url('http://cs629530.vk.me/v629530388/3d59e/z2b38WOLbvo.jpg')"></div>
-					<p class="friend_title">Ярослав Попсуй-Шапко</p>
-				</div>
-				<div class="friend" data-page="friend-">
-					<div class="avatar -size_70x70 -rounded" style="background-image: url('http://cs629530.vk.me/v629530388/3d59e/z2b38WOLbvo.jpg')"></div>
-					<p class="friend_title">Анюта Андрианова</p>
-				</div>
-				<p class="modal_divider">Все</p>
-			</div>
-		</div>
-
 	</div>
 </div>
 <!-- Button trigger modal -->
@@ -679,7 +443,7 @@
 <!-- SLIMSCROLL-->
 <script src="/vendor/slimScroll/jquery.slimscroll.min.js"></script>
 <!-- IMG CROPPER-->
-<script src="/vendor/cropper/js/cropper.js"></script>
+<script src="/vendor/cropper/js/cropper.min.js"></script>
 <!-- TAGS INPUT-->
 <script src="/vendor/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js"></script>
 <!-- MOMENT JS-->
@@ -711,6 +475,7 @@
 <script type="text/javascript" src="/app/js/app.js" charset="utf-8"></script>
 <script type="text/javascript" src="/app/js/Class.Calendar.js" charset="utf-8"></script>
 <script type="text/javascript" src="/app/js/Class.DatePicker.js" charset="utf-8"></script>
+<script type="text/javascript" src="/app/js/Class.Modal.js" charset="utf-8"></script>
 <script type="text/javascript" src="/app/js/main.js" charset="utf-8"></script>
 <script type="text/javascript" src="/app/js/calendar.js" charset="utf-8"></script>
 <script type="text/javascript" src="/app/js/add.js" charset="utf-8"></script>

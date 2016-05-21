@@ -73,6 +73,8 @@ a.-odd:focus {text-decoration: none}
 .tab,
 .action,
 .button,
+.form_radio + .form_label,
+.form_checkbox + .form_label,
 .-unselectable {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
@@ -1023,15 +1025,16 @@ a.button:hover {text-decoration: none}
 /*/Button*/
 /*Friend*/
 
-.friend {
+.user_tombstone {
 	display: inline-block;
 	vertical-align: top;
 	width: 150px;
 	padding: 0 6px;
+	margin-bottom: 24px;
 	text-align: center;
 }
 
-.friend_title {
+.user_tombstone_title {
 	margin-top: 12px;
 	font-weight: 400;
 	font-size: .88em;
@@ -1475,6 +1478,8 @@ html.-noscroll {
 	text-align: right;
 	border-top: 1px solid #eee;
 }
+
+.modal_footer > .button + .button {margin-left: .5em}
 
 
 /* /Modal */
@@ -2362,6 +2367,7 @@ html.-noscroll {
 
 .event_map {
 	height: 300px;
+	margin-top: 3em;
 	background-size: 100% auto;
 	background-position: 50%;
 	cursor: pointer;
@@ -2386,12 +2392,20 @@ html.-noscroll {
 	margin: 0;
 }
 
+.event_additional_field a {
+	display: block;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 .event_additional_field_label {
 	display: block;
 	margin-bottom: .5em;
 	font-weight: 500;
+	color: #6b88c7;
 }
-.event_additional_content > .event_additional_field:first-child > .event_additional_field_label {margin-top: 0}
+.event_additional_content > .event_additional_field:first-child {margin-top: 0}
 
 .event_additional_info {
 	font-size: .88rem;
@@ -2416,8 +2430,10 @@ html.-noscroll {
 	font-weight: 300;
 	color: #4a4a4a;
 	background-color: hsla(0,0%,100%,.9);
-	z-index: 5;
+	z-index: 10;
 }
+
+.event_canceled_cap p {margin-bottom: 12px}
 
 .event_vulcan {
 	display: inline-block;

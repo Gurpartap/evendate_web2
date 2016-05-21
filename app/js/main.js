@@ -2,6 +2,24 @@ String.prototype.capitalize = function() {
 	return this.charAt(0).toUpperCase() + this.slice(1);
 };
 String.prototype.contains = function(it) {return this.indexOf(it) != -1;};
+Object.props = function(obj){
+	var props = [];
+	Object.keys(obj).forEach(function(prop){
+		if(typeof obj[prop] !== 'function'){
+			props.push(prop);
+		}
+	});
+	return props;
+};
+Object.methods = function(obj){
+	var methods = [];
+	Object.keys(obj).forEach(function(prop){
+		if(typeof obj[prop] === 'function'){
+			methods.push(prop);
+		}
+	});
+	return methods;
+};
 
 
 $.fn.extend({
@@ -209,6 +227,49 @@ function SubscribeButton($btn, options){
 	})
 }
 
+function buildRadioOrCheckbox(type, props){
+	if(type == 'checkbox' || type == 'radio'){
+		props.type = type;
+		props.classes = props.classes ? (typeof props.classes == 'string') ? props.classes.split(' ') : props.classes : [];
+		props.unit_classes = props.unit_classes ? (typeof props.unit_classes == 'string') ? props.unit_classes.split(' ') : props.unit_classes : [];
+		if(props.classes.indexOf('form_checkbox') == -1 && props.classes.indexOf('form_radio') == -1){
+			props.classes.unshift('form_'+type);
+		}
+		props.classes.toString = function(){return this.join(' ')};
+		props.unit_classes.toString = function(){return this.join(' ')};
+		props.unit_classes.unshift('form_unit');
+
+		if(Array.isArray(props.dataset)){
+			props.dataset.toString = function(){return this.join(' ')};
+		}
+		else if(props.dataset != undefined && typeof props.dataset != 'string'){
+			props.dataset.toString = function(){
+				var dataset = [], obj = this;
+				Object.props(obj).forEach(function(prop){
+					dataset.push(((prop.indexOf('data-') != 0) ? 'data-'+prop : prop) + '="' + obj[prop] + '"');
+				});
+				return dataset.join(' ');
+			};
+		}
+
+		if(Array.isArray(props.attributes)){
+			props.attributes.toString = function(){return this.join(' ')};
+		}
+		else if(props.attributes != undefined && typeof props.attributes != 'string'){
+			props.attributes.toString = function(){
+				var attributes = [], obj = this;
+				Object.props(obj).forEach(function(prop){
+					attributes.push(prop+'="'+obj[prop]+'"');
+				});
+				return attributes.join(' ');
+			};
+		}
+		return tmpl('radio-checkbox', props);
+	} else {
+		throw Error('Принимаемый аргумент type может быть либо radio либо checkbox, придурок')
+	}
+}
+
 function handleErrorField($unit){
 	if(!$unit instanceof jQuery){
 		handleErrorField($($unit));
@@ -272,6 +333,16 @@ function bindTabs($parent){
 			$this.trigger('change.tabs');
 		})
 	}).addClass('-Handled_Tabs');
+}
+
+function bindShareButtons($parent){
+	$parent = $parent ? $parent : $('body');
+	$parent.find('.ShareButton').not('.-Handled_ShareButton').each(function(i, elem){
+		var $this = $(elem);
+		$this.on('click', function(){
+			window.open($this.data('href'), $this.data('title'), 'width=600,height=440,resizable=yes,scrollbars=no,status=no');
+		});
+	}).addClass('-Handled_ShareButton');
 }
 
 function bindSelect2($parent){
@@ -389,10 +460,10 @@ function bindDropdown($parent){
 
 function buildAvatarCollection(subscribers, count){
 	var $subscribers = $();
-	$subscribers = $subscribers.add(tmpl('organization-feed-event-subscriber', __USER));
+	$subscribers = $subscribers.add(tmpl('subscriber-avatar', __USER));
 	subscribers.forEach(function(subscriber){
 		if(subscriber.id != __USER.id && $subscribers.length <= count){
-			$subscribers = $subscribers.add(tmpl('organization-feed-event-subscriber', subscriber));
+			$subscribers = $subscribers.add(tmpl('subscriber-avatar', subscriber));
 		}
 	});
 	return $subscribers;
@@ -440,7 +511,7 @@ function trimAvatarsCollection($parent){
 			$avatars = $collection.find('.avatar'),
 			amount = $avatars.length;
 		if($collection.hasClass('-subscribed') && !$collection.hasClass('-shift')){
-			$collection.width(amount == 1 ? 0 : ($avatars.outerWidth()*amount) - (6*(amount-1)));
+			$collection.width(amount == 1 ? ($avatars.outerWidth()*amount) : ($avatars.outerWidth()*amount) - (6*(amount-1)));
 		} else {
 			$collection.width(amount == 1 ? 0 : ($avatars.outerWidth()*(amount-1)) - (6*(amount-2)));
 		}
@@ -530,76 +601,6 @@ function toDataUrl(url, callback){
 	xhr.send();
 }
 
-function bindCallModal($parent){
-	$parent = $parent ? $parent : $('body');
-	$parent.find('.CallModal').each(function() {
-		var $this = $(this);
-		$this.on('click', function(){
-			showModal($this.data('callModal'));
-		});
-	});
-}
-
-function showModal(name){
-	var $modal = $('.'+name.capitalize()+'Modal'),
-		$modal_wrapper = $modal.parent(),
-		$html = $('html'),
-		destroyer_height = ($modal.height() > $html.height()) ? $modal.height() : $html.height();
-
-	if($modal.length > 0){
-		$('.modal_unit').removeClass('-active');
-		$html.addClass('-open_modal');
-		$modal.addClass('-active');
-		$modal_wrapper.addClass('-active');
-		$('.modal_destroyer').height(destroyer_height).off('mousedown.CloseModal').on('mousedown.CloseModal', function(){
-			$(this).off('mousedown.CloseModal');
-			closeModal();
-		});
-		$modal.find('.CloseModal').off('click.CloseModal').on('click.CloseModal', closeModal);
-		if(name.capitalize() != 'Media') {
-			$modal_wrapper.removeClass('-blackened');
-		}
-	} else {
-		throw Error('Модального окна '+name+' нет');
-	}
-}
-
-function closeModal(){
-	$('html').removeClass('-open_modal');
-	$('.modal_unit').removeClass('-active').parent().removeClass('-active').trigger('modal-close');
-}
-
-function openMedia(url, type){
-	type = type == undefined ? 'image' : type;
-	var $modal = $('.MediaModal'),
-		$window = $(window),
-		window_max_w = $window.width() * 0.8,
-		window_max_h = $window.height() * 0.8,
-		$media, real_w, real_h, w, h;
-	$modal.parent().addClass('-blackened');
-	showModal('media');
-	switch(type){
-		default:
-		case 'image': {
-			$media = $('<img>').attr('src', url);
-			$modal.find('.modal_content').html($media);
-			real_w = $media.width();
-			real_h = $media.height();
-
-			if((real_w > window_max_w) || (real_h > window_max_h)){
-				w = (real_w > real_h) ? window_max_w : window_max_h * real_w / real_h;
-				h = (real_w > real_h) ? window_max_w * real_h / real_w : window_max_h;
-			} else {
-				w = real_w;
-				h = real_h;
-			}
-			$modal.width(w);
-			$modal.height(h);
-			$media.wrap($('<div>').addClass('img_holder'));
-		}
-	}
-}
-
 function bindCollapsing($parent){
 	$parent = $parent ? $parent : $('body');
 	$parent.find('.CollapsingButton').each(function(){
@@ -622,68 +623,6 @@ function bindCollapsing($parent){
 		}
 		$button.on('click.toggleCollapsing', toggleCollapsing);
 	})
-}
-
-function bindOpenMedia($parent){
-	$parent = $parent ? $parent : $('body');
-	$parent.find('.OpenMedia').each(function() {
-		var $this = $(this),
-			type = $this.data('mediaType'),
-			url = $this.data('mediaUrl');
-		if(!url){
-			if($this.is('img')){
-				url = $this.attr('url');
-				type = type ? type : 'image';
-			} else if($this.is('video')) {
-				//url = $this.attr('url');
-				type = type ? type : 'video';
-			} else {
-				var str = $this.css('background-image');
-				if(str !== 'none'){
-					url = str.slice(str.indexOf('"')+1, str.indexOf('"', str.indexOf('"') + 1));
-				}
-				type = type ? type : 'image';
-			}
-		}
-
-		$this.on('click', function(){
-			openMedia(url, type);
-		});
-	});
-}
-
-function initCrop(source, $endpoint_img, options){
-	var $img = $('.Cropper').children('img'),
-		$crop_button = $('.CropButton'),
-		$destroy_button = $('.DestroyCropButton'),
-		opt = {
-			zoomable: false,
-			zoomOnWheel: false/*
-			minCanvasWidth: 500,
-			minCanvasHeight: 500,
-			minCropBoxWidth: 500,
-			minCropBoxHeight: 500,
-			minContainerWidth: 500,
-			minContainerHeight: 500*/
-		};
-	options = typeof options == 'object' ? options : {};
-	$.extend(opt, options);
-
-	$img.cropper('destroy').attr('src', source).cropper(opt);
-	showModal('cropper');
-
-	$img.closest('.CropperModal').on('modal-close', function(){
-		$img.cropper('destroy');
-		$crop_button.off('click');
-		$destroy_button.off('click');
-	});
-
-	$crop_button.off('click.Crop').one('click.Crop', function(){
-		$endpoint_img.attr('src', $img.cropper('getCroppedCanvas').toDataURL()).data('crop_data', $img.cropper('getData'));
-		$endpoint_img.trigger('crop-done');
-		closeModal();
-	});
-	$destroy_button.off('click.DestroyCrop').one('click.DestroyCrop', closeModal);
 }
 
 function showNotification(text, time, status){

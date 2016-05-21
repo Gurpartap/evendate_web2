@@ -54,10 +54,6 @@ function bindEventHandlers(){
 	$view.find('.add-to-favorites').on('click', function(){
 		toggleFavorite($(this), $view)
 	});
-/*
-	$view.find('.organization-in-event').on('click', function(){
-		showOrganizationalModal($(this).data('organization-id'));
-	});*/
 
 	$view.find('.likes-block').on('click', function(){
 		var $this = $(this),
@@ -92,12 +88,6 @@ function bindEventHandlers(){
 		window.open($block.data('share')[_type], 'SHARE_WINDOW',
 			'status=1,toolbar=0,menubar=0&height=300,width=500');
 	});
-	/*
-	$view.find('.btn-edit').on('click', function(){
-		var $this = $(this),
-			event_id = $this.data('event-id');
-		showEditEventModal(event_id);
-	});*/
 
 	$view.find('.event-hide-button').on('click', function(){
 		var $panel_block = $(this).parents('.tl-panel-block'),
@@ -253,35 +243,14 @@ function printEventsInTimeline($view, res, filter_date){
 	var $tl_outer_wrap = $view.find('.tl-outer-wrap'),
 		$blocks_wrapper = $view.find('.blocks-outer-wrap');
 
-	function compare(a,b) {
-		if (a.dates_range.length < b.dates_range.length)
-			return -1;
-		if (a.dates_range.length > b.dates_range.length)
-			return 1;
-		return 0;
-	}
-
-	//res.data.sort(compare);
-
 	res.data.forEach(function(value) {
 		var m_date;
 		if (filter_date != null){
 			m_date = moment(filter_date, __C.DATE_FORMAT);
 		}
-		//else if (value.first_event_date == null){
-		//	m_date = moment(value.dates_range[0]);
-		//} else if (moment(value.first_event_date).unix() < moment().unix() && filter_date == null){
-		//	m_date = moment();
-		//}else if (moment(value.first_event_date).unix() < moment().unix() && filter_date != null){
-		//	m_date = moment(filter_date, __C.DATE_FORMAT);
-		//}else{
-		//	m_date = moment(value.first_event_date);
-		//}
 		else{
 			m_date = moment.unix(value.nearest_event_date);
 		}
-
-		//console.log(m_date);
 
 		var day_date = m_date.format(__C.DATE_FORMAT);
 		var $day_wrapper = $blocks_wrapper.find('.events-' + day_date),
@@ -373,15 +342,19 @@ function MyTimeline($view, $content_block){
 }
 
 function OneEvent($view, $content_block){
+	var $wrapper = $view.find('.page_wrapper'),
+		event_id = __STATES.getCurrentState().split('/')[1];
 
 	function initEventPage($parent){
 		bindAddAvatar($parent);
 		trimAvatarsCollection($parent);
 		bindRippleEffect($parent);
 		bindDropdown($parent);
-		bindCallModal($parent);
-		bindOpenMedia($parent);
+		//bindShareButtons($parent);
+		Modal.bindCallModal($parent);
 		bindCollapsing($parent);
+		initNotifications($parent);
+		bindOnClick();
 
 		$parent.find('.Subscribe').not('.-Handled_Subscribe').each(function(){
 			new SubscribeButton($(this), {
@@ -400,8 +373,215 @@ function OneEvent($view, $content_block){
 				}
 			});
 		}).addClass('-Handled_Subscribe');
+
+		$parent.find('.CancelEvent').on('click.CancelEvent', function(){
+			$.ajax({
+				url: '/api/v1/events/'+event_id+'/status',
+				method: 'PUT',
+				data: {canceled: true},
+				success: function(res){
+					ajaxHandler(res, function(data, text){
+						$parent.find('.event_canceled_cap').removeClass('-hidden');
+					}, ajaxErrorHandler)
+				}
+			});
+		});
+
+		$parent.find('.CancelCancellation').on('click.CancelCancellation', function(){
+			$.ajax({
+				url: '/api/v1/events/'+event_id+'/status',
+				method: 'PUT',
+				data: {canceled: false},
+				success: function(res){
+					ajaxHandler(res, function(data, text){
+						$parent.find('.event_canceled_cap').addClass('-hidden');
+					}, ajaxErrorHandler)
+				}
+			});
+		});
 	}
-	initEventPage($view);
+
+	function initNotifications($parent){
+		$parent = $parent ? $parent : $('body');
+		$parent.find('.ToggleNotification').each(function(){
+			var $this = $(this),
+				url, method;
+
+			$this.on('change', function(){
+				$this.prop('disabled', true);
+				if($this.prop('checked')){
+					url = '/api/v1/events/'+$this.data('event_id')+'/notifications';
+					method = 'POST';
+				} else {
+					url = '/api/v1/events/'+$this.data('event_id')+'/notifications/'+$this.data('uuid');
+					method = 'DELETE';
+				}
+				$.ajax({
+					url: url,
+					method: method,
+					data: {notification_type: $this.val()},
+					success: function(res){
+						ajaxHandler(res, function(data, text){
+							if(data.uuid){
+								$this.data('uuid', data.uuid);
+							} else {
+								$this.data('uuid', undefined);
+							}
+							$this.prop('disabled', false);
+						}, ajaxErrorHandler)
+					}
+				});
+			})
+		});
+	}
+
+	function buildNotifications(raw_notifications, event_id, last_date){
+		var m_today = moment(),
+			m_last_date = moment.unix(last_date),
+			all_notifications = {
+				'notification-now': {
+					label: 'За 15 минут',
+					moment: m_last_date.subtract(15, 'minutes').unix()
+				},
+				'notification-before-three-hours':  {
+					label: 'За 3 часа',
+					moment: m_last_date.subtract(3, 'hours').unix()
+				},
+				'notification-before-day': {
+					label: 'За день',
+					moment: m_last_date.subtract(1, 'days').unix()
+				},
+				'notification-before-three-days': {
+					label: 'За 3 дня',
+					moment: m_last_date.subtract(3, 'days').unix()
+				},
+				'notification-before-week': {
+					label: 'За неделю',
+					moment: m_last_date.subtract(1, 'week').unix()
+				}
+			},
+			$notifications = $(),
+			current_notifications = {},
+			i = 0;
+		for(var notif in raw_notifications){
+			if(raw_notifications.hasOwnProperty(notif)){
+				current_notifications[raw_notifications[notif].notification_type] = raw_notifications[notif];
+			}
+		}
+
+		for(var notification in all_notifications){
+
+			if(all_notifications.hasOwnProperty(notification)){
+				var is_disabled = moment.unix(all_notifications[notification].moment).isBefore(m_today),
+					data = {
+						id: 'event_notify_'+(++i),
+						classes: ['ToggleNotification'],
+						name: 'notification_time',
+						label: all_notifications[notification].label,
+						attributes: {
+							value: notification
+						},
+						dataset: {
+							event_id: event_id
+						}
+					};
+
+				if(current_notifications[notification]){
+					is_disabled = is_disabled || current_notifications[notification].done || !current_notifications[notification].uuid;
+					if(current_notifications[notification].uuid){
+						data.dataset.uuid = current_notifications[notification].uuid;
+					}
+					data.attributes.checked = true;
+				}
+				if(is_disabled){
+					data.unit_classes = ['-status_disabled'];
+					data.attributes.disabled = true;
+				}
+				$notifications = $notifications.add(buildRadioOrCheckbox('checkbox', data))
+			}
+		}
+		return $notifications;
+	}
+
+	$wrapper.empty();
+
+	$.ajax({
+		url: '/api/v1/events/'+event_id+'?fields=image_horizontal_large_url,favored{fields:"is_friend",order_by:"-is_friend",length:10},favored_users_count,is_favorite,notifications{fields:"notification_type,done"},description,location,can_edit,registration_required,registration_till,is_free,min_price,organization_logo_small_url,organization_short_name,is_same_time,dates{fields:"start_time,end_time"},tags,detail_info_url,canceled',
+		method: 'GET',
+		success: function(res){
+			ajaxHandler(res, function(data, text){
+				data = data[0];
+				var $subscribers = buildAvatarCollection(data.favored, 6),
+					avatars_collection_classes = [],
+					favored_users_count = ($subscribers.length <= 6) ? 0 : data.favored_users_count - 6;
+
+				if(data.is_favorite){
+					avatars_collection_classes.push('-subscribed');
+					if($subscribers.length > 4){
+						avatars_collection_classes.push('-shift');
+					}
+				}
+
+				data.subscribe_button_classes = data.is_favorite ? ['fa-check', '-color_secondary', '-Subscribed'].join(' ') : ['fa-plus', '-color_neutral_secondary'].join(' ');
+				data.subscribe_button_text = data.is_favorite ? 'В избранном' : 'Добавить в избранное';
+				data.subscribers = $subscribers;
+				data.avatars_collection_classes = avatars_collection_classes.join(' ');
+				data.favored_users_show = favored_users_count ? '' : '-cast';
+				data.favored_users_count = favored_users_count;
+				data.notifications = buildNotifications(data.notifications, event_id, data.last_event_date);
+
+				data.event_edit_functions = data.can_edit ? tmpl('event-edit-functions', data) : '';
+				data.event_registration_information = data.registration_required ? tmpl('event-registration-info', {registration_till: moment.unix(data.registration_till).format('D MMMM')}) : '';
+				data.event_price_information = data.is_free ? '' : tmpl('event-price-info', {min_price: data.min_price ? data.min_price : '0'});
+				data.canceled = data.canceled ? '' : '-hidden';
+
+				data.event_additional_fields = $();
+				if(data.is_same_time){
+					data.event_additional_fields = data.event_additional_fields.add(tmpl('event-additional-info', {
+						key: 'Дата',
+						value: moment.unix(data.dates[0].event_date).format('LL')
+					}));
+					data.event_additional_fields = data.event_additional_fields.add(tmpl('event-additional-info', {
+						key: 'Время',
+						value: (data.dates[0].start_time == '00:00:00' && data.dates[0].end_time == '00:00:00') ? 'Весь день' : data.dates[0].start_time.split(':').slice(0,2).join(':') + ' - ' + data.dates[0].end_time.split(':').slice(0,2).join(':')
+					}));
+				} else {
+					var date_times = $();
+					data.dates.forEach(function(date){
+						date_times = date_times.add(tmpl('event-date-time-row', {
+							date: moment.unix(date.event_date).format('D MMMM'),
+							start_time: date.start_time.split(':').slice(0,2).join(':'),
+							end_time: date.end_time.split(':').slice(0,2).join(':')
+						}));
+					});
+					data.event_additional_fields = data.event_additional_fields.add(tmpl('event-date-time', {date_times: date_times}));
+				}
+				data.event_additional_fields = data.event_additional_fields = data.event_additional_fields.add(tmpl('event-additional-info', {
+					key: 'Место',
+					value: data.location
+				}));
+				data.event_additional_fields = data.event_additional_fields = data.event_additional_fields.add(tmpl('event-additional-info', {
+					key: 'Теги',
+					value: data.tags.map(function(tag){
+						return tag.name.toLowerCase();
+					}).join(', ')
+				}));
+/*
+				data.share_block = $();
+				data.share_block = data.share_block.add(tmpl('vk-share-button', data));
+				data.share_block = data.share_block.add(tmpl('facebook-share-button', data));
+				data.share_block = data.share_block.add(tmpl('twitter-share-button', data));*/
+				data.cancel_cancellation = data.can_edit ? tmpl('button', {
+					classes: '-color_primary RippleEffect CancelCancellation',
+					title: 'Вернуть событие'
+				}) : '';
+
+
+				$wrapper.append(tmpl('event-page', data));
+				initEventPage($view);
+			}, ajaxErrorHandler)
+		}
+	});
 
 }
 
@@ -449,10 +629,7 @@ function OrganizationsList($view, $content_block){
 						}
 						organization.subscribed_count_text = getUnitsText(organization.subscribed_count, __C.TEXTS.SUBSCRIBERS);
 						var $organization = tmpl('new-organization-item', organization).data('organization', organization);
-						/*
-						$organization.find('.organization-img, .heading>span').on('click', function(){
-							showOrganizationalModal(organization.id)
-						});*/
+
 						$organizations.append($organization);
 						bindOnClick();
 					});
@@ -823,6 +1000,7 @@ function FavoredEvents($view, $content_block){
 				data: data,
 				success: function(res){
 					printEventsInTimeline($view, res);
+					bindOnClick();
 				}
 			});
 		};
@@ -839,7 +1017,7 @@ function Search($view, $content_block){
 	if (_search.hasOwnProperty('q')){
 		$('.search-input').val(_search.q);
 	}
-	_search['fields'] = 'events{fields:"detail_info_url,is_favorite,nearest_event_date,can_edit,location,favored_users_count,organization_name,organization_logo_small_url,description,favored,is_same_time,tags,dates",filters:"future=true"},organizations{fields:"subscribed_count"}';
+	_search['fields'] = 'events{fields:"detail_info_url,is_favorite,nearest_event_date,can_edit,location,favored_users_count,organization_name,organization_short_name,organization_logo_small_url,description,favored,is_same_time,tags,dates",filters:"future=true"},organizations{fields:"subscribed_count"}';
 	$.ajax({
 		url: '/api/v1/search/',
 		data: _search,
@@ -862,10 +1040,7 @@ function Search($view, $content_block){
 				organization.subscribed_count_text = getUnitsText(organization.subscribed_count, __C.TEXTS.SUBSCRIBERS);
 				var $organization = tmpl('organization-search-item', organization);
 				$organizations_wrapper.append($organization);
-				bindOnClick();/*
-				$organization.on('click', function(){
-					showOrganizationalModal(organization.id);
-				})*/
+				bindOnClick();
 			});
 
 			if (res.data.events.length == 0){
@@ -1180,16 +1355,20 @@ function EditEvent($view, $content_block){
 				$preview = $parent.find('.EditEventImgPreview'),
 				$file_name_text = $parent.find('.FileNameText'),
 				$file_name = $parent.find('.FileName'),
-				$data_url = $parent.find('.DataUrl');
+				$data_url = $parent.find('.DataUrl'),
+				$button = $parent.find('.CallModal');
 
-			$preview.data('source_img', source).attr('src', source);
+			$preview.attr('src', source);
 			$file_name_text.html('Загружен файл:<br>'+filename);
 			$file_name.val(filename);
-			$data_url.val('data.source').data('source', source).trigger('change');
-			initCrop(source, $preview, {
-				'aspectRatio': eval($preview.data('aspect_ratio'))
-			});
-			bindRecrop($parent);
+			$button
+				.data('source_img', source)
+				.on('crop', function(event, cropped_src, crop_data){
+					$preview.attr('src', cropped_src);
+					$button.data('crop_data', crop_data);
+					$data_url.val('data.source').data('source', $preview.attr('src')).trigger('change');
+				})
+				.trigger('click.CallModal');
 		}
 
 		function initEditEventMainCalendar($view){
@@ -1426,7 +1605,6 @@ function EditEvent($view, $content_block){
 			if(response.error){
 				showNotifier({text: response.error, status: false});
 			} else {
-				//var url = window.current_load_button.data('url');
 				handleImgUpload(window.current_load_button, response.data, response.filename);
 			}
 		});
@@ -1597,58 +1775,34 @@ function EditEvent($view, $content_block){
 		$view.find('#event_tags').select2('data', selected_tags);
 	}
 
-	function bindRecrop($context){
-		var $parent = $context.closest('.EditEventImgLoadWrap'),
-			$preview = $parent.find('.EditEventImgPreview'),
-			$crop_again_button = $parent.find('.CropAgain'),
-			$data_url = $parent.find('.DataUrl');
-
-		$preview.off('crop-done').on('crop-done', function(){
-			var $this = $(this),
-				$crop_data = $this.data('crop_data');
-
-			$data_url.val('data.source').data('source', $preview.attr('src')).trigger('change');
-			$crop_again_button.removeClass('-hidden').off('click.CropAgain').on('click.CropAgain', function(){
-				initCrop($preview.data('source_img'), $preview, {
-					'data': $crop_data,
-					'aspectRatio': eval($preview.data('aspect_ratio'))
-				});
-			});
-
-		})
-	}
-
-	function initRecrop(i, elem){
-		var $button = $(elem),
-			$preview = $button.closest('.EditEventImgLoadWrap').find('.EditEventImgPreview');
-
-		$button.removeClass('-hidden').off('click.CropAgain').on('click.CropAgain', function(){
-			initCrop($preview.data('source_img'), $preview, {
-				'aspectRatio': eval($preview.data('aspect_ratio'))
-			});
-		});
-
-		bindRecrop($button);
-	}
-
 	function initVkImgCopying(){
 		var $vk_wrapper = $view.find('#edit_event_vk_publication');
-		$vk_wrapper.find('.CropAgain').each(initRecrop);
 		$view.find('#edit_event_image_horizontal_src').on('change.CopyToVkImg', function(){
 			var $wrap = $(this).closest('.EditEventImgLoadWrap'),
 				$vk_wrap = $view.find('#edit_event_vk_publication'),
+				$vk_preview = $vk_wrap.find('.EditEventImgPreview'),
+				$vk_button = $vk_wrap.find('.CallModal'),
+				$vk_$data_url = $vk_wrap.find('#edit_event_vk_image_src'),
+				$button_orig = $wrap.find('.CallModal'),
 				src = $(this).data('source');
 
 			if(!$view.find('.edit_event_vk_right_block').hasClass('-h_centering')){
 				toggleVkImg();
 			}
-			$vk_wrap.find('#edit_event_vk_image_src').val('data.source').data('source', src);
-			$vk_wrap.find('.EditEventImgPreview').attr('src', src).data('source_img', $wrap.find('.EditEventImgPreview').data('source_img'));
+			$vk_$data_url.val('data.source').data('source', src);
+			$vk_preview.attr('src', src);
 			$vk_wrap.find('#edit_event_vk_image_filename').val($view.find('#edit_event_image_horizontal_filename').val());
-			$vk_wrap.find('.CropAgain').data($wrap.find('.CropAgain').data());
+			$vk_button
+				.data('crop_data', $button_orig.data('crop_data'))
+				.data('source_img', $button_orig.data('source_img'))
+				.on('crop', function(event, cropped_src, crop_data){
+					$vk_preview.attr('src', cropped_src);
+					$vk_button.data('crop_data', crop_data);
+					$vk_$data_url.data('source', $vk_preview.attr('src')).trigger('change');
+				});
 
 		});
-		$vk_wrapper.find('.FileLoadButton, .CropAgain, .DeleteImg').on('click.OffCopying', function(){
+		$vk_wrapper.find('.FileLoadButton, .CallModal, .DeleteImg').on('click.OffCopying', function(){
 			$view.find('#edit_event_image_horizontal_src').off('change.CopyToVkImg');
 		});
 	}
@@ -1897,6 +2051,7 @@ function EditEvent($view, $content_block){
 	if(typeof event_id === 'undefined'){
 		$view.find('.page_wrapper').html(tmpl('edit-event-page', additional_fields));
 		initEditEventPage($view);
+		Modal.bindCallModal($view);
 		initOrganization();
 		checkVkPublicationAbility();
 		toggleVkImg();
@@ -1963,8 +2118,17 @@ function EditEvent($view, $content_block){
 					selectDates($view, data.dates);
 					selectTags($view, data.tags);
 					if(data.image_vertical_url && data.image_horizontal_url){
-						$view.find('.CropAgain').each(initRecrop);
+						$view.find('.CallModal').removeClass('-hidden').on('crop', function(event, cropped_src, crop_data){
+							var $button = $(this),
+								$parent = $button.closest('.EditEventImgLoadWrap'),
+								$preview = $parent.find('.EditEventImgPreview'),
+								$data_url = $parent.find('.DataUrl');
+							$data_url.val('data.source').data('source', $preview.attr('src')).trigger('change');
+							$preview.attr('src', cropped_src);
+							$button.data('crop_data', crop_data);
+						});
 					}
+					Modal.bindCallModal($view);
 
 					if(data.image_vertical_url){
 						toDataUrl(data.image_vertical_url, function(base64_string){
@@ -2025,10 +2189,7 @@ function printSubscribedOrganizations(organization){
 		if ($list.find('.organization-' + organization.id).length == 0){
 			tmpl('organizations-item', organization)
 				.addClass('fadeInLeftBig')
-				.prependTo($list)/*
-				.on('click', function(){
-					showOrganizationalModal($(this).data('organization-id'));
-				})*/;
+				.prependTo($list);
 		}
 	}else{
 		$.ajax({
@@ -2038,10 +2199,7 @@ function printSubscribedOrganizations(organization){
 					if (organization.is_subscribed && $list.find('.organization-' + organization.id).length == 0){
 						tmpl('organizations-item', organization)
 							.addClass('fadeInLeftBig')
-							.prependTo($list)/*
-							.on('click', function(){
-								showOrganizationalModal($(this).data('organization-id'));
-							})*/;
+							.prependTo($list);
 					}
 				});
 			}
@@ -2080,18 +2238,32 @@ function setDaysWithEvents(){
 }
 
 function bindOnClick(){
-	$('[data-page], a[data-controller]').not('.-Handled_Controller').off('click.pageRender').on('click.pageRender', function(){
-		var $this = $(this),
-			page_name = $this.data('page'),
-			controller_name = $this.data('controller');
-		if ($this.hasClass(__C.CLASSES.DISABLED)) return true;
-		if (page_name != undefined){
-			History.pushState($this.data(), $this.data('title') ? $this.data('title'): $this.text(), '/'+page_name);
-		} else {
-			if (window[controller_name] != undefined && window[controller_name] instanceof Function){
-				window[controller_name]();
-			}
+	$('[data-page], a[data-controller]').not('.-Handled_Controller').on('mousedown.pageRender', function(e){
+		if(e.which == 2){
+			e.preventDefault();
 		}
+		$(this).off('mouseup.pageRender').one('mouseup.pageRender', function(e){
+			var $this = $(this),
+				page_name = $this.data('page'),
+				controller_name = $this.data('controller');
+			switch(e.which){
+				case 1: {
+					if ($this.hasClass(__C.CLASSES.DISABLED)) return true;
+					if (page_name != undefined){
+						History.pushState($this.data(), $this.data('title') ? $this.data('title'): $this.text(), '/'+page_name);
+					} else {
+						if (window[controller_name] != undefined && window[controller_name] instanceof Function){
+							window[controller_name]();
+						}
+					}
+					break;
+				}
+				case 2: {
+					e.preventDefault();
+					window.open('/'+page_name);
+				}
+			}
+		});
 	}).addClass('-Handled_Controller');
 }
 
