@@ -631,6 +631,9 @@ function OneEvent($view, $content_block){
 						return tag.name.toLowerCase();
 					}).join(', ')
 				}));
+				if(data.detail_info_url){
+					data.event_additional_fields = data.event_additional_fields = data.event_additional_fields.add(tmpl('event-detail-link', {detail_info_url: data.detail_info_url}));
+				}
 /*
 				data.share_block = $();
 				data.share_block = data.share_block.add(tmpl('vk-share-button', data));

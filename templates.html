@@ -650,11 +650,7 @@
 					<span class="avatar_name">{organization_short_name}</span>
 				</div>
 			</div>
-			{event_additional_fields}
-			<div class="event_additional_field">
-				<label class="event_additional_field_label">Подробнее</label>
-				<a class="fa_icon fa-external-link" href="{detail_info_url}" target="_blank">{detail_info_url}</a>
-			</div><!--
+			{event_additional_fields}<!--
 			<div class="share_block">
 				<label class="share_title -color_primary -transform_uppercase">Поделиться</label>
 				<div class="share_icons -size_small">{share_block}</div>
@@ -715,6 +711,13 @@
 	<div class="event_additional_field">
 		<label class="event_additional_field_label">{key}</label>
 		<p>{value}</p>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-event-detail-link">
+	<div class="event_additional_field">
+		<label class="event_additional_field_label">Подробнее</label>
+		<a class="fa_icon fa-external-link" href="{detail_info_url}" target="_blank">{detail_info_url}</a>
 	</div>
 </script>
 
