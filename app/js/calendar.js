@@ -1322,7 +1322,8 @@ function OneDay($view, $content_block){
 }
 
 function EditEvent($view, $content_block){
-	var event_id = History.getState().data.eventId;
+	var $wrapper = $view.find('.page_wrapper'),
+		event_id = History.getState().data.eventId;
 
 	function initEditEventPage($view){
 
@@ -1374,9 +1375,13 @@ function EditEvent($view, $content_block){
 		function initEditEventMainCalendar($view){
 			//TODO: Refactor this!! Make it more readable
 
-			var MainCalendar = new Calendar('.EventDatesCalendar', {weekday_selection: true, month_selection: true}),
-				$selected_days_text = $view.find('.EventSelectedDaysText'),
+			var $selected_days_text = $view.find('.EventSelectedDaysText'),
 				$selected_days_table_rows = $view.find('.SelectedDaysRows'),
+				MainCalendar = new Calendar('.EventDatesCalendar', {
+					weekday_selection: true,
+					month_selection: true,
+					min_date: moment().format(__C.DATE_FORMAT)
+				}),
 				dates = {},
 				genitive_month_names = {
 					'январь': 'января',
@@ -1517,7 +1522,7 @@ function EditEvent($view, $content_block){
 						'height': $table_content.height(),
 						'overflow': 'hidden'
 					}).height(0);
-					$fucking_table.empty();
+					$fucking_table.remove();
 					MainCalendar.$calendar.off('days-changed.buildTable');
 				}
 				$view.find('.MainTime').toggleStatus('disabled');
@@ -1599,6 +1604,15 @@ function EditEvent($view, $content_block){
 
 		$view.find('#edit_event_free').off('change.FreeEvent').on('change.FreeEvent', function(){
 			$view.find('.MinPrice').toggleStatus('disabled');
+		});
+
+		$view.find('.MinPrice').find('input').inputmask({
+			'alias': 'numeric',
+			'autoGroup': false,
+			'digits': 2,
+			'digitsOptional': true,
+			'placeholder': '0',
+			'rightAlign': false
 		});
 
 		socket.on('image.getFromURLDone', function(response){
@@ -1892,16 +1906,30 @@ function EditEvent($view, $content_block){
 
 	function submitEditEvent(){
 		function formValidation($form, for_edit){
-			var is_valid = true;
+			var is_valid = true,
+				$times = $form.find('#edit_event_different_time').prop('checked') ? $form.find('[class^="TableDay_"]') : $form.find('.MainTime');
 
 			$form.find(':required').not(':disabled').each(function(){
-				var $this = $(this);
-				if($this.val() === ""){
+				var $this = $(this),
+					max_length = $this.data('maxlength');
+				if($this.val() === "" || (max_length && $this.val().length > max_length)){
 					if(is_valid){
-						var scroll_top = Math.ceil($this.offset().top - 150);
-						$('body').stop().animate({scrollTop: scroll_top}, 1000, 'swing');
+						$('body').stop().animate({scrollTop: Math.ceil($this.offset().top - 150)}, 1000, 'swing');
 					}
 					handleErrorField($this);
+					is_valid = false;
+				}
+			});
+
+			$times.each(function(){
+				var $row = $(this),
+					start = $row.find('.StartHours').val()+$row.find('.StartMinutes').val(),
+					end = $row.find('.EndHours').val()+$row.find('.EndMinutes').val();
+				if(start > end){
+					if(is_valid){
+						$('body').stop().animate({scrollTop: Math.ceil($row.offset().top - 150)}, 1000, 'swing');
+					}
+					showNotifier({text: 'Начальное время не может быть меньше конечного', status: false});
 					is_valid = false;
 				}
 			});
@@ -1911,8 +1939,7 @@ function EditEvent($view, $content_block){
 					var $this = $(this);
 					if($this.val() === ""){
 						if(is_valid){
-							var scroll_top = Math.ceil($this.closest('.EditEventImgLoadWrap').offset().top - 150);
-							$('body').stop().animate({scrollTop: scroll_top}, 1000, 'swing', function(){
+							$('body').stop().animate({scrollTop: Math.ceil($this.closest('.EditEventImgLoadWrap').offset().top - 150)}, 1000, 'swing', function(){
 								showNotifier({text: 'Пожалуйста, добавьте к событию обложку', status: false})
 							});
 						}
@@ -2002,7 +2029,7 @@ function EditEvent($view, $content_block){
 				contentType: 'application/json',
 				method: method,
 				success: function(res){
-					ajaxHandler(res, function(res_data){
+					ajaxHandler(res, function(res_data){/*
 						if(data.event_id){
 							$('body').stop().animate({scrollTop:0}, 1000, 'swing', function() {
 								showNotification('Событие успешно обновлено', 3000);
@@ -2012,7 +2039,7 @@ function EditEvent($view, $content_block){
 							$('body').stop().animate({scrollTop:0}, 1000, 'swing', function() {
 								showNotification('Событие успешно добавлено', 3000);
 							});
-						}
+						}*/
 
 						if($view.find('#edit_event_to_public_vk').prop('checked')){
 							socket.emit('vk.post', {
@@ -2026,6 +2053,7 @@ function EditEvent($view, $content_block){
 								link: data.detail_info_url
 							});
 						}
+						window.location = '/event/'+res_data.event_id;
 
 					}, function(res){
 						if(res.text){
@@ -2040,16 +2068,17 @@ function EditEvent($view, $content_block){
 
 	}
 
-	window.scrollTo(0, 0);
+	$wrapper.empty();
 	var additional_fields = {
 		event_id: event_id,
 		header_text: 'Новое событие',
 		public_at_data_label: 'Дата',
 		registration_till_data_label: 'Дата',
-		current_date: moment().format(__C.DATE_FORMAT)
+		current_date: moment().format(__C.DATE_FORMAT),
+		tomorrow_date: moment().add(1, 'd').format(__C.DATE_FORMAT)
 	};
 	if(typeof event_id === 'undefined'){
-		$view.find('.page_wrapper').html(tmpl('edit-event-page', additional_fields));
+		$wrapper.html(tmpl('edit-event-page', additional_fields));
 		initEditEventPage($view);
 		Modal.bindCallModal($view);
 		initOrganization();
@@ -2096,7 +2125,7 @@ function EditEvent($view, $content_block){
 					}
 
 					$.extend(true, data, additional_fields);
-					$view.find('.page_wrapper').html(tmpl('edit-event-page', data));
+					$wrapper.html(tmpl('edit-event-page', data));
 
 					initEditEventPage($view);
 					initOrganization(data.organization_id);
