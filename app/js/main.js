@@ -335,6 +335,16 @@ function bindTabs($parent){
 	}).addClass('-Handled_Tabs');
 }
 
+function bindShareButtons($parent){
+	$parent = $parent ? $parent : $('body');
+	$parent.find('.ShareButton').not('.-Handled_ShareButton').each(function(i, elem){
+		var $this = $(elem);
+		$this.on('click', function(){
+			window.open($this.data('href'), $this.data('title'), 'width=600,height=440,resizable=yes,scrollbars=no,status=no');
+		});
+	}).addClass('-Handled_ShareButton');
+}
+
 function bindSelect2($parent){
 	$parent = $parent ? $parent : $('body');
 	$parent.find('.ToSelect2').not('.-Handled_ToSelect2').each(function(i, el){

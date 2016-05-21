@@ -2391,6 +2391,13 @@ html.-noscroll {
 	margin: 0;
 }
 
+.event_additional_field a {
+	display: block;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 .event_additional_field_label {
 	display: block;
 	margin-bottom: .5em;

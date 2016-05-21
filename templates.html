@@ -633,16 +633,12 @@
 			{event_additional_fields}
 			<div class="event_additional_field">
 				<label class="event_additional_field_label">Подробнее</label>
-				<a href="{detail_info_url}" target="_blank">{detail_info_url}&emsp;<i class="fa_icon fa-external-link"></i></a>
-			</div>
+				<a class="fa_icon fa-external-link" href="{detail_info_url}" target="_blank">{detail_info_url}</a>
+			</div><!--
 			<div class="share_block">
 				<label class="share_title -color_primary -transform_uppercase">Поделиться</label>
-				<div class="share_icons -size_small">
-					<span class="share_icon vk"></span>
-					<span class="share_icon facebook"></span>
-					<span class="share_icon google"></span>
-				</div>
-			</div>
+				<div class="share_icons -size_small">{share_block}</div>
+			</div>-->
 		</div>
 		<div class="event_canceled_cap -unselectable -centering {canceled}"><div><p>Организатор отменил событие</p>{cancel_cancellation}</div></div>
 	</div>
@@ -1212,19 +1208,27 @@
 </script>
 
 <script type="javascript/template" id="tmpl-vk-share-link">
-  <a href="http://vk.com/share.php?url=http://evendate.ru/event.php?id={id}&title={title}&description={description}&image={image_horizontal_url}&noparse=false"></a>
+  <a href="http://vk.com/share.php?url=http://evendate.ru/event/{id}?title={title}&description={description}&image={image_horizontal_url}&noparse=false"></a>
 </script>
 
 <script type="javascript/template" id="tmpl-facebook-share-link">
-  <a href="http://www.facebook.com/sharer.php?s=100&p[title]={title}&p[summary]={description}&p[url]=http://evendate.ru/event.php?id={id}&p[images][0]={image_horizontal_url}"></a>
+  <a href="http://www.facebook.com/sharer.php?s=100&p[title]={title}&p[summary]={description}&p[url]=http://evendate.ru/event/{id}?p[images][0]={image_horizontal_url}"></a>
 </script>
 
 <script type="javascript/template" id="tmpl-twitter-share-link">
-  <a href="https://twitter.com/share?url=http://evendate.ru/event.php?id={id}&text={title}&via=evendate.ru&hashtags={hashtags} #evendate"></a>
+  <a href="https://twitter.com/share?url=http://evendate.ru/event/{id}?text={title}&via=evendate.ru&hashtags=#evendate"></a>
 </script>
 
-<script type="javascript/template" id="tmpl-google-plus-share-link">
-  <a href="https://twitter.com/share?url=http://evendate.ru/event.php?id={id}&text={title}&via=evendate.ru&hashtags={hashtags}"></a>
+<script type="javascript/template" id="tmpl-vk-share-button">
+	<button class="ShareButton share_icon {classes}" data-title="VK" data-href="http://vk.com/share.php?url=http://evendate.ru/event/{id}?title={title}&description={description}&image={image_horizontal_url}&noparse=false"></button>
+</script>
+
+<script type="javascript/template" id="tmpl-facebook-share-button">
+	<button class="ShareButton share_icon {classes}" data-title="Facebook" data-href="http://www.facebook.com/dialog/share?app_id=1692270867652630&display=popup&title={title}&quote={description}&href=http://evendate.ru/event/{id}&redirect_uri=http://evendate.ru/event/{id}image[0][url]={image_horizontal_large_url}&image[0][user_generated]=true"></button>
+</script>
+
+<script type="javascript/template" id="tmpl-twitter-share-button">
+	<button class="ShareButton share_icon twitter {classes}" data-title="Twitter" data-href="https://twitter.com/share?url=http://evendate.ru/event/{id}?text={title}&via=evendate.ru&hashtags=#evendate"></button>
 </script>
 
 <script type="javascript/template" id="tmpl-tag-option">

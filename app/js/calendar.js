@@ -350,6 +350,7 @@ function OneEvent($view, $content_block){
 		trimAvatarsCollection($parent);
 		bindRippleEffect($parent);
 		bindDropdown($parent);
+		//bindShareButtons($parent);
 		Modal.bindCallModal($parent);
 		bindCollapsing($parent);
 		initNotifications($parent);
@@ -550,6 +551,11 @@ function OneEvent($view, $content_block){
 						return tag.name.toLowerCase();
 					}).join(', ')
 				}));
+/*
+				data.share_block = $();
+				data.share_block = data.share_block.add(tmpl('vk-share-button', data));
+				data.share_block = data.share_block.add(tmpl('facebook-share-button', data));
+				data.share_block = data.share_block.add(tmpl('twitter-share-button', data));*/
 				data.cancel_cancellation = data.can_edit ? tmpl('button', {
 					classes: '-color_primary RippleEffect CancelCancellation',
 					title: 'Вернуть событие'
