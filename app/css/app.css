@@ -9103,6 +9103,7 @@ span.organization-modal-header-text{
 }
 
 .new-organization .content{
+	display: inline-block;
   padding-top: 10px;
 }
 
