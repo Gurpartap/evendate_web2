@@ -28,16 +28,12 @@ $.fn.extend({
 
 		if($this.is('.form_unit')){
 			statuses.split(' ').forEach(function(status){
+				var $form_elements = $this.find('input, select, textarea, button');
 				if(status === 'disabled'){
-					var $form_elements = $this.find('input, select, textarea, button');
 					if($this.hasClass('-status_disabled')){
-						$form_elements.each(function(){
-							$(this).removeAttr('disabled');
-						});
+						$form_elements.removeAttr('disabled');
 					} else {
-						$form_elements.each(function(){
-							$(this).attr('disabled', true)
-						});
+						$form_elements.attr('disabled', true);
 					}
 				}
 				$this.toggleClass('-status_'+status);
@@ -536,9 +532,7 @@ function bindFileLoadButton(){
 }
 
 function limitInputSize(){
-	var $elements = $('.LimitSize').not('.-Handled_LimitSize');
-
-	$elements.each(function(i, e) {
+	$('.LimitSize').not('.-Handled_LimitSize').each(function(i, e) {
 		var $this = $(e),
 			$form_unit = $this.closest('.form_unit'),
 			max = $this.data('maxlength'),
@@ -558,8 +552,7 @@ function limitInputSize(){
 			}
 			$prompt.text($this.val().length+'/'+max);
 		})
-	});
-	$elements.addClass('-Handled_LimitSize');
+	}).addClass('-Handled_LimitSize');
 }
 
 function initTimeInput(time_field){
