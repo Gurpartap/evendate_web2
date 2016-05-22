@@ -83,12 +83,12 @@ require_once('landing/header.php'); ?>
 <br><br>
 Заполните форму, и наша команда обязательно свяжется с Вами!</span></div>
 			</div>
-			<div class="form_support">
-				<div class="field_container"><input type="text" placeholder="ВАШЕ ИМЯ" class="form_style status-error"></div>
-				<div class="field_container"><input type="text" placeholder="E-MAIL" class="form_style status-error"></div>
-				<div class="field_container field_container_question"><textarea name="description" placeholder="СООБЩЕНИЕ" required="" class="form_style form_style_message status-error"></textarea></div>
-				<div class="button_fon_img_users_container_form"><button class="button_fon_img_users"><span class="text_button_users_top">ОТПРАВИТЬ</span></button></div>
-			</div>
+			<form class="form_support">
+				<div class="field_container"><input name="full_name" type="text" placeholder="ВАШЕ ИМЯ" required class="form_style"></div>
+				<div class="field_container"><input name="email" type="email" placeholder="E-MAIL" required class="form_style"></div>
+				<div class="field_container field_container_question"><textarea name="message" placeholder="СООБЩЕНИЕ" required class="form_style form_style_message"></textarea></div>
+				<div class="button_fon_img_users_container_form"><button id="send_form" class="button_fon_img_users" type="button"><span class="text_button_users_top">ОТПРАВИТЬ</span></button></div>
+			</form>
 		</div>
 		</div>
 
