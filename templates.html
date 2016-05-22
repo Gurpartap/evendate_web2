@@ -1,5 +1,62 @@
 <!-- NEW TEMPLATES -->
 
+<!-- COMMONS -->
+
+<script type="javascript/template" id="tmpl-radio-checkbox">
+	<div class="{unit_classes}">
+		<input id="{id}" class="{classes}" type="{type}" name="{name}" {attributes} {dataset} tabindex="-1">
+		<label class="form_label" for="{id}"><span>{label}</span></label>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-button">
+	<button class="button {classes}" {dataset} type="button"><span class="Text">{title}</span></button>
+</script>
+
+<script type="javascript/template" id="tmpl-user-tombstone">
+	<div class="user_tombstone Controller" data-is_friend="{is_friend}" data-page="friend-{id}" data-friend-id="{id}" data-title="{full_name}" data-name="{full_name}">
+		<div class="avatar -size_{size} -rounded" style="background-image: url('{avatar_url}')"></div>
+		<p class="user_tombstone_title">{full_name}</p>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-option">
+	<option value="{val}" {data}>{display_name}</option>
+</script>
+
+<script type="javascript/template" id="tmpl-subscriber-divider">
+	<span class="organization_subscribers_divider">{label}</span>
+</script>
+
+<script type="javascript/template" id="tmpl-subscriber">
+	<div class="subscriber Controller" data-is_friend="{is_friend}" data-page="friend-{id}" data-friend-id="{id}" data-name="{name}">
+		<div class="avatar_block">
+			<div class="avatar -size_40x40 -rounded -bordered">
+				<img src="{avatar_url}" onerror="this.onerror=null;this.src='/app/img/logo_40.png'">
+			</div>
+			<span class="avatar_name">{name}</span>
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-subscriber-avatar">
+	<div class="avatar" style="background-image: url({avatar_url})" title="{last_name} {first_name}"></div>
+</script>
+
+<script type="javascript/template" id="tmpl-vk-share-button">
+	<button class="ShareButton share_icon {classes}" data-title="VK" data-href="http://vk.com/share.php?url=http://evendate.ru/event/{id}?title={title}&description={description}&image={image_horizontal_url}&noparse=false"></button>
+</script>
+
+<script type="javascript/template" id="tmpl-facebook-share-button">
+	<button class="ShareButton share_icon {classes}" data-title="Facebook" data-href="http://www.facebook.com/dialog/share?app_id=1692270867652630&display=popup&title={title}&quote={description}&href=http://evendate.ru/event/{id}&redirect_uri=http://evendate.ru/event/{id}image[0][url]={image_horizontal_large_url}&image[0][user_generated]=true"></button>
+</script>
+
+<script type="javascript/template" id="tmpl-twitter-share-button">
+	<button class="ShareButton share_icon twitter {classes}" data-title="Twitter" data-href="https://twitter.com/share?url=http://evendate.ru/event/{id}?text={title}&via=evendate.ru&hashtags=#evendate"></button>
+</script>
+
+<!-- Edit Event Page -->
+
 <script type="javascript/template" id="tmpl-edit-event-page">
 
 	<div class="page edit_event_page">
@@ -95,14 +152,11 @@
 			<h4 class="form_label"><label for="edit_event_placepicker">Место проведения</label></h4>
 			<div class="form_group -parts_3_1">
 				<div class="form_unit">
-					<input class="form_input Placepicker" id="edit_event_placepicker" data-map-container-id="edit_event_map" name="location" value="{location}" required>
+					<input id="edit_event_placepicker" class="form_input Placepicker" name="location" value="{location}" required>
 				</div>
 				<div class="form_unit">
 					<button class="button -color_primary -fill RippleEffect EditEventDefaultAddress" type="button" tabindex="-1">По умолчанию</button>
 				</div>
-			</div>
-			<div id="edit_event_map" class="collapse">
-				<div class="placepicker-map thumbnail"></div>
 			</div>
 
 			<h4 class="form_label"><label for="edit_event_description">Описание</label></h4>
@@ -119,7 +173,7 @@
 			<div class="form_group -parts_2_3 RegistrationTill">
 				<div class="form_unit -inline -status_disabled">
 					<label class="form_label">Дата</label>
-					<div class="form_select -v_centering DatePicker" data-min_date="{current_date}"><label>{registration_till_data_label}</label><input name="registration_till_date" value="{registration_till_data}" type="hidden" disabled required></div>
+					<div class="form_select -v_centering DatePicker" data-min_date="{tomorrow_date}"><label>{registration_till_data_label}</label><input name="registration_till_date" value="{registration_till_data}" type="hidden" disabled required></div>
 				</div>
 				<div class="form_unit -status_disabled">
 					<div class="form_group -parts_e_2">
@@ -164,7 +218,7 @@
 			</div>
 
 			<h4 class="form_label"><label>Обложка для мероприятия</label></h4>
-			<div class="form_group -parts_e_2 EditEventImgLoadWrap">
+			<div class="form_group -parts_e_2 EditEventImgLoadWrap ImgLoadWrap">
 				<div class="form_unit -centering">
 					<div class="wrapper">
 						<h4 class="form_label"><label>Горизонтальная</label></h4>
@@ -191,20 +245,22 @@
 						</div>
 						<p class="FileNameText"></p>
 						<div class="form_unit">
-							<button class="button -color_secondary_alt RippleEffect CropAgain -hidden" type="button">Кадрировать</button>
+							<button class="button -color_secondary_alt RippleEffect CallModal -hidden" type="button" data-modal_type="cropper" data-source_img="{image_horizontal_url}" data-aspect_ratio="16/9">
+								<span class="Text">Кадрировать</span>
+							</button>
 						</div>
 					</div>
 				</div>
 				<div class="form_unit">
 					<div class="img_holder">
-						<img class="edit_event_img_preview_hor EditEventImgPreview" data-aspect_ratio="16/9" src="{image_horizontal_url}">
+						<img class="edit_event_img_preview_hor EditEventImgPreview ImgPreview" src="{image_horizontal_url}">
 						<img src="app/img/edit_event/edit_event_img_placeholder_hor.png">
 						<input id="edit_event_image_horizontal_src" class="DataUrl" type="hidden" name="image_horizontal" value="{image_horizontal_base64}">
 						<input id="edit_event_image_horizontal_filename" class="FileName" type="hidden" name="filename_horizontal" value="{image_horizontal_filename}">
 					</div>
 				</div>
 			</div>
-			<div class="form_group -parts_e_2 EditEventImgLoadWrap">
+			<div class="form_group -parts_e_2 EditEventImgLoadWrap ImgLoadWrap">
 				<div class="form_unit -centering">
 					<div class="wrapper">
 						<h4 class="form_label"><label>Вертикальная</label></h4>
@@ -231,13 +287,15 @@
 						</div>
 						<p class="FileNameText"></p>
 						<div class="form_unit">
-							<button class="button -color_secondary_alt RippleEffect CropAgain -hidden" type="button">Кадрировать</button>
+							<button class="button -color_secondary_alt RippleEffect CallModal -hidden" type="button" data-modal_type="cropper" data-source_img="{image_vertical_url}" data-aspect_ratio="7/10">
+								<span class="Text">Кадрировать</span>
+							</button>
 						</div>
 					</div>
 				</div>
 				<div class="form_unit">
 					<div class="img_holder">
-						<img class="edit_event_img_preview_vert EditEventImgPreview" data-aspect_ratio="7/10" src="{image_vertical_url}">
+						<img class="edit_event_img_preview_vert EditEventImgPreview ImgPreview" src="{image_vertical_url}">
 						<img src="app/img/edit_event/edit_event_img_placeholder_vert.png">
 						<input id="edit_event_image_vertical_src" class="DataUrl" type="hidden" name="image_vertical" value="{image_vertical_base64}">
 						<input class="FileName" type="hidden" name="filename_vertical" value="{image_vertical_filename}">
@@ -329,15 +387,19 @@
 					<div class="form_unit -status_disabled">
 						<textarea id="edit_event_vk_post" class="form_textarea" name="vk_post" placeholder="" disabled style="height: 10em"></textarea>
 					</div>
-					<div class="form_group EditEventImgLoadWrap -parts_2_3">
+					<div class="form_group EditEventImgLoadWrap ImgLoadWrap -parts_2_3">
 						<div class="form_unit -status_disabled">
 							<div class="edit_event_vk_img">
 								<input id="edit_event_vk_image_src" class="DataUrl" type="hidden" name="vk_image_src" value="{vk_image_base64}" disabled>
 								<input id="edit_event_vk_image_filename" class="FileName" type="hidden" name="vk_image_filename" value="{vk_image_filename}" disabled>
-								<div class="edit_event_vk_img_preview"><img class="EditEventImgPreview" data-aspect_ratio="16/9" src="{vk_image_url}"></div>
+								<div class="edit_event_vk_img_preview"><img class="EditEventImgPreview ImgPreview" src="{vk_image_url}"></div>
 								<footer class="edit_event_vk_img_footer form_group -parts_e_2">
 									<div class="form_unit -status_disabled"><button class="action DeleteImg -color_error" type="button">Удалить</button></div>
-									<div class="form_unit -status_disabled" align="right"><button class="action CropAgain -color_primary" type="button">Кадрировать</button></div>
+									<div class="form_unit -status_disabled" align="right">
+										<button class="action CallModal -color_primary" type="button" data-modal_type="cropper" data-source_img="{vk_image_url}" data-aspect_ratio="16/9">
+											<span class="Text">Кадрировать</span>
+										</button>
+									</div>
 								</footer>
 							</div>
 						</div>
@@ -447,9 +509,7 @@
 	</div>
 </script>
 
-<script type="javascript/template" id="tmpl-option">
-	<option value="{val}" {data}>{display_name}</option>
-</script>
+<!-- Organization Page -->
 
 <script type="javascript/template" id="tmpl-organization-info-page">
 	<div class="page organization_info_page">
@@ -499,17 +559,16 @@
 	</div>
 </script>
 
-
 <script type="javascript/template" id="tmpl-organization-feed-divider">
 	<hr title="{formatted_date}" data-raw_date="{date}">
 </script>
 
 <script type="javascript/template" id="tmpl-organization-feed-event">
 	<div class="organization_feed_block" data-event_date="{date}">
-		<a class="organization_feed_block_img img_holder -odd" href="/event.php?id={id}" target="_blank" style="background-image: url({image_horizontal_medium_url})"></a>
+		<div class="organization_feed_block_img img_holder Controller" data-page="event/{id}" data-event-id="{id}" data-title="{title}" style="background-image: url({image_horizontal_medium_url})"></div>
 		<div class="organization_feed_block_info">
 			<header class="organization_feed_block_title">
-				<a class="-odd" href="/event.php?id={id}" target="_blank">{title}</a>
+				<span class="Controller" data-page="event/{id}" data-event-id="{id}" data-title="{title}">{title}</span>
 			</header>
 			<div class="organization_feed_block_service">
 				<p><small>{time}</small></p>
@@ -529,10 +588,6 @@
 	</div>
 </script>
 
-<script type="javascript/template" id="tmpl-organization-feed-event-subscriber">
-	<div class="avatar" style="background-image: url({avatar_url})"></div>
-</script>
-
 <script type="javascript/template" id="tmpl-organization-subscribers-page">
 	<div class="page organization_subscribers_page -fixed">
 		<header class="organization_subscribers_header">
@@ -545,19 +600,183 @@
 	</div>
 </script>
 
-<script type="javascript/template" id="tmpl-subscriber-divider">
-	<span class="organization_subscribers_divider">{label}</span>
+<!-- Event Page -->
+
+<script type="javascript/template" id="tmpl-event-page">
+	<div class="page event_page">
+		<div class="event_main_content">
+			<header class="event_header">
+				<div class="event_image CallModal" data-modal_type="media" style="background-image: url('{image_horizontal_large_url}')"></div>
+				<div class="event_image_bottom">
+					<div class="form_group -parts_e_2 AddAvatarWrapper">
+						<div class="form_unit">
+							<div class="avatars_collection -subscribable -rounded -bordered -size_small {avatars_collection_classes} AvatarsCollection CallModal" data-max_subscribers="6" data-modal_type="favors" data-modal_entity_type="event" data-modal_entity_id="{id}" data-modal_title="Добавили в избранное">
+								{subscribers}
+							</div>
+							<span class="counter -size_30x30 -bordered -color_marginal -castable {favored_users_show}">+<span class="FavoredCount">{favored_users_count}</span></span>
+						</div>
+						<div class="form_unit" align="right">
+							<button class="button event_favourite_button -low -rounded fa_icon {subscribe_button_classes} Subscribe EventSubscribe -AddFavourite AddAvatar RippleEffect" data-event-id="{id}">
+								<span class="Text">{subscribe_button_text}</span>
+							</button>
+							<button class="button -empty -low -rounded fa_icon fa-bell-o -color_neutral RippleEffect DropdownButton" data-dropdown="edit_notification" data-dd-width="190" data-dd-pos-x="self.center" data-dd-pos-y="6" type="button"></button>
+							<div class="dropdown_box DropdownBox" data-dropdown_id="edit_notification">
+								<header class="dropdown_header">Настройка напоминания</header>
+								<form class="dropdown_box_wrapper">
+									{notifications}
+								</form>
+							</div>
+						</div>
+					</div>
+				</div>
+			</header>
+			<div class="event_content">
+				<h3 class="event_title" title="{title}">{title}</h3>
+				<div class="event_description">{description}</div>
+				<div class="event_map CallModal" data-modal_type="map" style="background-image: url('http://maps.googleapis.com/maps/api/staticmap?markers={location}&zoom=15&size=640x640&scale=2&format=png&maptype=roadmap&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg')" data-modal_map_location="{location}"></div>
+			</div>
+		</div>
+		<div class="event_additional_content">
+			{event_edit_functions}
+			{event_registration_information}
+			{event_price_information}
+			<div class="event_additional_field">
+				<label class="event_additional_field_label">Организатор</label>
+				<div class="avatar_block -size_small Controller" data-page="organization/{organization_id}" data-organization-id="{organization_id}" data-title="{organization_short_name}">
+					<div class="avatar"><img src="{organization_logo_small_url}"></div>
+					<span class="avatar_name">{organization_short_name}</span>
+				</div>
+			</div>
+			{event_additional_fields}<!--
+			<div class="share_block">
+				<label class="share_title -color_primary -transform_uppercase">Поделиться</label>
+				<div class="share_icons -size_small">{share_block}</div>
+			</div>-->
+		</div>
+		<div class="event_canceled_cap -unselectable -centering {canceled}"><div><p>Организатор отменил событие</p>{cancel_cancellation}</div></div>
+	</div>
 </script>
 
-<script type="javascript/template" id="tmpl-subscriber">
-	<div class="subscriber" data-is_friend="{is_friend}" data-page="friend-{id}" data-friend-id="{id}" data-name="{name}">
-		<div class="avatar_block">
-			<div class="avatar -size_40x40 -rounded -bordered">
-				<img src="{avatar_url}" onerror="this.onerror=null;this.src='/app/img/logo_40.png'">
+<script type="javascript/template" id="tmpl-event-edit-functions">
+	<button class="button -color_neutral -fill RippleEffect DropdownButton" data-dropdown="redact_event" data-dd-width="self" type="button">Редактирование события</button>
+	<div class="dropdown_box DropdownBox" data-dropdown_id="redact_event">
+		<div class="dropdown_list"><button class="dropdown_button -fill -color_error RippleEffect CloseDropdown DropdownButton" data-dropdown="cancel_event" data-dd-width="self" type="button">Отменить событие</button></div>
+		<div class="dropdown_list"><button class="dropdown_button -fill -color_neutral RippleEffect CloseDropdown Controller" data-page="edit_event" data-event-id="{id}" type="button">Редактировать</button></div>
+	</div>
+	<div class="dropdown_box DropdownBox" data-dropdown_id="cancel_event">
+		<div class="dropdown_box_wrapper">
+			<p>Вы уверены, что хотите отменить событие?</p>
+		</div>
+		<footer class="dropdown_box_footer">
+			<span class="action -color_neutral CloseDropdown">Отмена</span>
+			<span class="action -color_error CloseDropdown CancelEvent">Да</span>
+		</footer>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-event-registration-info">
+	<p class="event_additional_info -transform_uppercase">Регистрация до {registration_till}</p>
+</script>
+
+<script type="javascript/template" id="tmpl-event-price-info">
+	<p class="event_additional_info">от {min_price} руб.</p>
+</script>
+
+<script type="javascript/template" id="tmpl-event-date-time">
+	<div class="event_additional_field">
+		<div class="collapsing_wrapper CollapsingWrapper -fading" data-default-height="80" style="height: 80px;">
+			<div class="collapsing_content CollapsingContent">
+				<div class="event_additional_field_split">
+					<div class="event_additional_field"><label class="event_additional_field_label">Дата</label></div>
+					<div class="event_additional_field"><label class="event_additional_field_label">Время</label></div>
+				</div>
+				{date_times}
 			</div>
-			<span class="avatar_name">{name}</span>
+		</div>
+		<button class="collapsing_button CollapsingButton fa_icon fa-chevron-down -empty"></button>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-event-date-time-row">
+	<div class="event_additional_field_split">
+		<div class="event_additional_field"><p>{date}</p></div>
+		<div class="event_additional_field"><p>{start_time} - {end_time}</p></div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-event-additional-info">
+	<div class="event_additional_field">
+		<label class="event_additional_field_label">{key}</label>
+		<p>{value}</p>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-event-detail-link">
+	<div class="event_additional_field">
+		<label class="event_additional_field_label">Подробнее</label>
+		<a class="fa_icon fa-external-link" href="{detail_info_url}" target="_blank">{detail_info_url}</a>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-event-vulcan">
+	<div class="event_vulcan">
+		<header class="event_vulcan_header">Похожие мероприятия</header>
+		{event_cards}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-event-card">
+	<div class="event_card">
+		<div class="event_card_img" style="background-image: url('{image_horizontal_small_url}')"></div>
+		<div class="event_card_description">
+			<span>{title}</span>
 		</div>
 	</div>
+</script>
+
+
+
+
+
+<!-- Modals -->
+
+<script type="javascript/template" id="tmpl-modal">
+	<div class="modal_unit {modal_type}">
+		<header class="modal_header">
+			{modal_title}
+			<button class="button -empty -modal_destroyer -color_default CloseModal RippleEffect">&times;</button>
+		</header>
+		<div class="modal_content {modal_content_classes}">
+			{modal_content}
+		</div>
+		{modal_footer}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-modal-title">
+	<h4>{title}</h4>
+</script>
+
+<script type="javascript/template" id="tmpl-modal-footer">
+	<footer class="modal_footer">
+		{footer_buttons}
+	</footer>
+</script>
+
+<script type="javascript/template" id="tmpl-modal-cropper-content">
+	<img class="Cropper" src="{image_src}">
+</script>
+
+<script type="javascript/template" id="tmpl-modal-image-media-content">
+	<img src="{src}">
+</script>
+
+<script type="javascript/template" id="tmpl-modal-map-content">
+	<iframe width="100%" height="600" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/place?q={location}&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg" allowfullscreen></iframe>
+</script>
+
+<script type="javascript/template" id="tmpl-modal-favored-divider">
+	<p class="modal_divider">{label}</p>
 </script>
 
 
@@ -567,13 +786,13 @@
 </script>
 
 <script type="javascript/template" id="tmpl-calendar-day">
-  <td class="td-day day-{day_number} {today} disabled" data-date="{date}" data-page="{date}" data-title="{date_text}">
+  <td class="td-day day-{day_number} {today} disabled Controller" data-date="{date}" data-page="{date}" data-title="{date_text}">
     <div class="content -centering"><span class="day-number">{number}</span></div>
   </td>
 </script>
 
 <script type="javascript/template" id="tmpl-organizations-item">
-  <div class="row organizations-item animated organization-{id}" title="{name}" data-page="organization/{id}" data-organization-id="{id}">
+  <div class="row organizations-item animated organization-{id} Controller" title="{name}" data-page="organization/{id}" data-organization-id="{id}" data-title="{name}">
     <div class="organizations-item-wrapper">
       <div class="organization-img-wrapper">
         <img src="{img_url}" title="{name}">
@@ -743,7 +962,7 @@
 <script type="javascript/template" id="tmpl-event-item">
   <div class="tl-panel-block closed event-{id}-{date}" data-event-id="{id}" data-date="{date}">
     <div class="tl-event-wrapper">
-      <div class="organization-in-event" data-page="organization/{organization_id}" data-organization-id="{organization_id}">
+      <div class="organization-in-event Controller" data-page="organization/{organization_id}" data-organization-id="{organization_id}" data-title="{organization_name}">
         <div class="organization-img-wrapper blue">
           <img src="{organization_img_url}" title="{organization_name}">
         </div>
@@ -757,17 +976,17 @@
         </div>
         <div class="event-attributes">
           <p class="tl-event-attribute"><i class="fa fa-clock-o"></i> {dates}, {time}</p>
-          <p class="tl-event-attribute"><i class="fa fa-map-marker"></i> {location}</p>
+          <p class="tl-event-attribute"><i class="fa fa-map-marker"></i> {location}</p><!--
           <p class="social-links">
             <i class="fa fa-vk" data-share-type="vk"></i>
             <i class="fa fa-facebook-f" data-share-type="facebook"></i>
             <i class="fa fa-google-plus hidden" data-share-type="google-plus"></i>
             <i class="fa fa-twitter" data-share-type="twitter"></i>
-          </p>
+          </p>-->
         </div>
       </div>
       <div class="tl-event-right">
-        <h2 class="event-title"><a href="event.php?id={id}" title="{title}" target="_blank">{title}</a></h2>
+        <h2 class="event-title"><span class="Controller" title="{title}" data-page="event/{id}" data-event-id="{id}" data-title="{title}">{title}</span></h2>
         <div class="liked-users-wrap">
           {friends}
           <div class="liked-users-count">
@@ -778,7 +997,7 @@
         <div class="event-tags">{tags_block}</div>
         <div class="event-buttons">
           <button class="btn btn-pink-empty add-to-favorites {favorite_btn_class}" data-event-id="{id}">{favorite_btn_text}</button>
-          <button class="btn btn-default-empty {can_edit_hidden}" data-page="edit_event" data-event-id="{id}" data-title="Редактировать мероприятие {title}">Редактировать</button>
+          <button class="btn btn-default-empty {can_edit_hidden} Controller" data-page="edit_event" data-event-id="{id}" data-title="Редактировать мероприятие {title}">Редактировать</button>
         </div>
         <button class="event-more btn btn-blue more-info-btn"><span class="fa fa-chevron-up"></span></button>
         <div class="event-description">
@@ -1011,19 +1230,15 @@
 </script>
 
 <script type="javascript/template" id="tmpl-vk-share-link">
-  <a href="http://vk.com/share.php?url=http://evendate.ru/event.php?id={id}&title={title}&description={description}&image={image_horizontal_url}&noparse=false"></a>
+  <a href="http://vk.com/share.php?url=http://evendate.ru/event/{id}?title={title}&description={description}&image={image_horizontal_url}&noparse=false"></a>
 </script>
 
 <script type="javascript/template" id="tmpl-facebook-share-link">
-  <a href="http://www.facebook.com/sharer.php?s=100&p[title]={title}&p[summary]={description}&p[url]=http://evendate.ru/event.php?id={id}&p[images][0]={image_horizontal_url}"></a>
+  <a href="http://www.facebook.com/sharer.php?s=100&p[title]={title}&p[summary]={description}&p[url]=http://evendate.ru/event/{id}?p[images][0]={image_horizontal_url}"></a>
 </script>
 
 <script type="javascript/template" id="tmpl-twitter-share-link">
-  <a href="https://twitter.com/share?url=http://evendate.ru/event.php?id={id}&text={title}&via=evendate.ru&hashtags={hashtags} #evendate"></a>
-</script>
-
-<script type="javascript/template" id="tmpl-google-plus-share-link">
-  <a href="https://twitter.com/share?url=http://evendate.ru/event.php?id={id}&text={title}&via=evendate.ru&hashtags={hashtags}"></a>
+  <a href="https://twitter.com/share?url=http://evendate.ru/event/{id}?text={title}&via=evendate.ru&hashtags=#evendate"></a>
 </script>
 
 <script type="javascript/template" id="tmpl-tag-option">
@@ -1038,7 +1253,7 @@
 <script type="javascript/template" id="tmpl-organization-item">
   <div class="col-md-2">
     <div>
-      <img src="{img_url}" title="{name}" class="organization-img" data-page="organization/{id}" data-organization-id="{id}">
+      <img src="{img_url}" title="{name}" class="organization-img Controller" data-page="organization/{id}" data-organization-id="{id}" data-title="{short_name}">
     </div>
     <div>
       <button type="button" class="btn btn-xs btn-{btn_type_class} subscribe-btn subscribe-to-organization" data-organization-id="{id}" data-subscription-id="{subscription_id}">
@@ -1052,7 +1267,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-organization-search-item">
-  <div class="organization-search-item" data-page="organization/{id}" data-organization-id="{id}">
+  <div class="organization-search-item Controller" data-page="organization/{id}" data-organization-id="{id}" data-title="{short_name}">
     <div>
       <img src="{img_url}" title="{name}" class="search-organization-img" data-organization-id="{id}">
     </div>
@@ -1070,7 +1285,7 @@
     <div class="row">
       <div class="col-xs-9">
         <div class="event-title">
-          <a href="event.php?id={id}" target="_blank">{title}</a>
+          <span class="Controller" data-page="event/{id}" data-event-id="{id}" data-title="{title}">{title}</span>
         </div>
         <div class="even-attrs col-xs-6">
           <div class="col-xs-12"><i class="fa fa-clock-o"></i> {dates}, {time}</div>
@@ -1078,7 +1293,7 @@
           <div class="col-xs-12"><i class="fa fa-tags"></i> {tags_text}</div>
         </div>
         <div class="even-attrs col-xs-6">
-          <div class="row col-xs-12 organization-in-event" data-page="organization/{organization_id}" data-organization-id="{organization_id}">
+          <div class="row col-xs-12 organization-in-event Controller" data-page="organization/{organization_id}" data-organization-id="{organization_id}" data-title="{organization_short_name}">
             <div class="organization-img-wrapper blue">
               <img src="{organization_img_url}" title="{organization_name}">
             </div>
@@ -1107,13 +1322,13 @@
       </div>
       <div class="col-xs-3 text-center">
         <img src="{image_vertical_url}" class="event-image img-rounded">
-        <div class="col-xs-12 text-center social-links-wrapper">
+        <div class="col-xs-12 text-center social-links-wrapper"><!--
             <span class="social-links">
               <i class="fa fa-vk" data-share-type="vk"></i>
               <i class="fa fa-facebook-f" data-share-type="facebook"></i>
               <i class="fa fa-google-plus hidden" data-share-type="google-plus"></i>
               <i class="fa fa-twitter" data-share-type="twitter"></i>
-            </span>
+            </span>-->
         </div>
       </div>
       <div class="row col-xs-12 event-bottom-block">
@@ -1167,7 +1382,7 @@
   <div class="middle-col">
     <div class="event-title">
       <a href="event.php?id={id}" target="_blank">{title}</a>
-      <button data-event-id="{id}" data-page="edit_event" data-title="{title}" class="btn btn-default-empty btn-edit {can_edit_hidden}" type="button"><i class="icon-pencil"></i></button>
+      <button class="btn btn-default-empty btn-edit Controller {can_edit_hidden}" data-event-id="{id}" data-page="edit_event" data-title="{title}" type="button"><i class="icon-pencil"></i></button>
     </div>
     <button type="button" class="close" aria-label="Закрыть"><span aria-hidden="true">×</span></button>
 
@@ -1181,7 +1396,7 @@
         {favorite_btn_text}
       </button>
     </div>
-    <div class="event-bottom-block row">
+    <div class="event-bottom-block row"><!--
       <div class="col-xs-10 pull-right">
         <span class="share-text">Поделиться</span>
              <span class="social-links">
@@ -1189,7 +1404,7 @@
               <i class="fa fa-facebook-f" data-share-type="facebook"></i>
               <i class="fa fa-twitter" data-share-type="twitter"></i>
             </span>
-      </div>
+      </div>-->
     </div>
   </div>
 </script>
@@ -1235,10 +1450,10 @@
 
 <script type="javascript/template" id="tmpl-new-organization-item">
   <div class="new-organization col-xs-4 col-md-5 col-lg-5 organization-{id}">
-    <img src="{img_url}" class="organization-img" data-page="organization/{id}" data-organization-id="{id}" title="{name}">
+    <img src="{img_url}" class="organization-img Controller" data-page="organization/{id}" data-organization-id="{id}" data-title="{name}" title="{name}">
     <div class="content">
       <div class="heading">
-        <span data-page="organization/{id}" data-organization-id="{id}">{short_name}</span>
+        <span class="Controller" data-page="organization/{id}" data-organization-id="{id}" data-title="{short_name}">{short_name}</span>
       </div>
       <div class="subscribers-count"> {subscribed_count} {subscribed_count_text}</div>
       <button type="button" class="btn btn-{btn_type_class} btn-sm subscribe-btn subscribe-to-organization" data-organization-id="{id}" data-subscription-id="{subscription_id}">
@@ -1298,7 +1513,7 @@
       <img src="{image_square_vertical_url}" class="feed-clickable" data-event-id="{id}">
       <div class="event-favored-wrapper">
         <div class="event-name feed-clickable" data-event-id="{id}">{title}</div>
-        <div class="organizator-block" data-page="organization/{organization_id}" data-organization-id="{organization_id}">
+        <div class="organizator-block Controller" data-page="organization/{organization_id}" data-organization-id="{organization_id}" data-title="{organization_short_name}">
           <img src="{organization_logo_small_url}">
           <span class="name">{organization_short_name}</span></div></div>
     </div>
@@ -1340,7 +1555,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-friends-subscription">
-  <div class="friend-subscription-block" data-page="organization/{id}" data-organization-id="{id}">
+  <div class="friend-subscription-block Controller" data-page="organization/{id}" data-organization-id="{id}" data-title="{short_name}">
     <img src="{img_url}" class="pull-left friend-organization-logo">
     <div class="friend-subscription-name">{short_name}</div>
   </div>
@@ -1359,11 +1574,11 @@
 <script type="javascript/template" id="tmpl-friends-feed-organization">
   <div class="friend-event subscribed">
     <div>
-      <div class="subscribed-img-wrapper" data-page="organization/{id}" data-organization-id="{id}">
+      <div class="subscribed-img-wrapper Controller" data-page="organization/{id}" data-organization-id="{id}" data-title="{short_name}">
         <img src="{img_medium_url}" style="width: 28px;">
       </div>
       <div class="event-favored-wrapper">
-        <div class="event-name" data-page="organization/{id}" data-organization-id="{id}">{short_name}</div>
+        <div class="event-name Controller" data-page="organization/{id}" data-organization-id="{id}" data-title="{short_name}">{short_name}</div>
         <div>
           <span class="name">{subscribed_count} подписчиков</span></div></div>
     </div>

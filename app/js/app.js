@@ -664,6 +664,21 @@ socket.on('notification', function(data) {
 	}
 });
 
+Function.prototype.extend = function(parent) {
+	var F = function(){};
+	F.prototype = parent.prototype;
+	this.prototype = new F();
+	this.prototype.constructor = this;
+	this.prototype.__super = parent.prototype;
+	this.prototype.__superCall = function(method_name){
+		if(parent.prototype[method_name] && typeof parent.prototype[method_name] == 'function'){
+			return parent.prototype[method_name].call(this, Array.prototype.slice.call(1,arguments));
+		} else {
+			console.error('There is no "'+method_name+'" method in object "'+parent.prototype.constructor.name+'"');
+		}
+	};
+};
+
 
 function showOrganizationalModal(organization_id) {
 	if (window.organization_is_loading) return;
@@ -1062,7 +1077,7 @@ $(document).ready(function() {
 				}
 			});
 		}
-	}, 15000);
+	}, 5000);
 });
 
 function isNotDesktop() {

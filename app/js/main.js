@@ -1,6 +1,25 @@
 String.prototype.capitalize = function() {
 	return this.charAt(0).toUpperCase() + this.slice(1);
 };
+String.prototype.contains = function(it) {return this.indexOf(it) != -1;};
+Object.props = function(obj){
+	var props = [];
+	Object.keys(obj).forEach(function(prop){
+		if(typeof obj[prop] !== 'function'){
+			props.push(prop);
+		}
+	});
+	return props;
+};
+Object.methods = function(obj){
+	var methods = [];
+	Object.keys(obj).forEach(function(prop){
+		if(typeof obj[prop] === 'function'){
+			methods.push(prop);
+		}
+	});
+	return methods;
+};
 
 
 $.fn.extend({
@@ -9,16 +28,12 @@ $.fn.extend({
 
 		if($this.is('.form_unit')){
 			statuses.split(' ').forEach(function(status){
+				var $form_elements = $this.find('input, select, textarea, button');
 				if(status === 'disabled'){
-					var $form_elements = $this.find('input, select, textarea, button');
 					if($this.hasClass('-status_disabled')){
-						$form_elements.each(function(){
-							$(this).removeAttr('disabled');
-						});
+						$form_elements.removeAttr('disabled');
 					} else {
-						$form_elements.each(function(){
-							$(this).attr('disabled', true)
-						});
+						$form_elements.attr('disabled', true);
 					}
 				}
 				$this.toggleClass('-status_'+status);
@@ -208,6 +223,49 @@ function SubscribeButton($btn, options){
 	})
 }
 
+function buildRadioOrCheckbox(type, props){
+	if(type == 'checkbox' || type == 'radio'){
+		props.type = type;
+		props.classes = props.classes ? (typeof props.classes == 'string') ? props.classes.split(' ') : props.classes : [];
+		props.unit_classes = props.unit_classes ? (typeof props.unit_classes == 'string') ? props.unit_classes.split(' ') : props.unit_classes : [];
+		if(props.classes.indexOf('form_checkbox') == -1 && props.classes.indexOf('form_radio') == -1){
+			props.classes.unshift('form_'+type);
+		}
+		props.classes.toString = function(){return this.join(' ')};
+		props.unit_classes.toString = function(){return this.join(' ')};
+		props.unit_classes.unshift('form_unit');
+
+		if(Array.isArray(props.dataset)){
+			props.dataset.toString = function(){return this.join(' ')};
+		}
+		else if(props.dataset != undefined && typeof props.dataset != 'string'){
+			props.dataset.toString = function(){
+				var dataset = [], obj = this;
+				Object.props(obj).forEach(function(prop){
+					dataset.push(((prop.indexOf('data-') != 0) ? 'data-'+prop : prop) + '="' + obj[prop] + '"');
+				});
+				return dataset.join(' ');
+			};
+		}
+
+		if(Array.isArray(props.attributes)){
+			props.attributes.toString = function(){return this.join(' ')};
+		}
+		else if(props.attributes != undefined && typeof props.attributes != 'string'){
+			props.attributes.toString = function(){
+				var attributes = [], obj = this;
+				Object.props(obj).forEach(function(prop){
+					attributes.push(prop+'="'+obj[prop]+'"');
+				});
+				return attributes.join(' ');
+			};
+		}
+		return tmpl('radio-checkbox', props);
+	} else {
+		throw Error('Принимаемый аргумент type может быть либо radio либо checkbox, придурок')
+	}
+}
+
 function handleErrorField($unit){
 	if(!$unit instanceof jQuery){
 		handleErrorField($($unit));
@@ -273,6 +331,16 @@ function bindTabs($parent){
 	}).addClass('-Handled_Tabs');
 }
 
+function bindShareButtons($parent){
+	$parent = $parent ? $parent : $('body');
+	$parent.find('.ShareButton').not('.-Handled_ShareButton').each(function(i, elem){
+		var $this = $(elem);
+		$this.on('click', function(){
+			window.open($this.data('href'), $this.data('title'), 'width=600,height=440,resizable=yes,scrollbars=no,status=no');
+		});
+	}).addClass('-Handled_ShareButton');
+}
+
 function bindSelect2($parent){
 	$parent = $parent ? $parent : $('body');
 	$parent.find('.ToSelect2').not('.-Handled_ToSelect2').each(function(i, el){
@@ -296,13 +364,13 @@ function initSelect2($element, options){
 
 function bindRippleEffect($parent){
 	$parent = $parent ? $parent : $('body');
-	$parent.find('.RippleEffect').not('.-Handled_RippleEffect').on('click', function(e){
+	$parent.find('.RippleEffect').not('.-Handled_RippleEffect').on('click.RippleEffect', function(e){
 		var $this = $(this), $ripple, size, x, y;
 
-		if($this.children('.ripple').length == 0)
-			$this.prepend("<span class='ripple'></span>");
+		if($this.children('.Ripple').length == 0)
+			$this.prepend("<span class='ripple Ripple'></span>");
 
-		$ripple = $this.children('.ripple');
+		$ripple = $this.children('.Ripple');
 		$ripple.removeClass('animate');
 
 		if(!$ripple.height() && !$ripple.width()) {
@@ -322,12 +390,76 @@ function bindRippleEffect($parent){
 	}).addClass('-Handled_RippleEffect');
 }
 
+function bindDropdown($parent){
+	$parent = $parent ? $parent : $('body');
+	$parent.find('.DropdownButton').not('.-Handled_DropdownButton').each(function(){
+		var $button = $(this),
+			data = $button.data(),
+			$dropbox = $('.DropdownBox').filter('[data-dropdown_id="'+data.dropdown+'"]');
+
+		$dropbox.data($.extend({}, $dropbox.data(), data));
+		$dropbox.closeDropbox = function(){
+			$('body').off('mousedown.CloseDropdown');
+			$(document).off('keyup.CloseDropdown');
+			$dropbox.removeClass('-show');
+		};
+
+		if(data.hasOwnProperty('ddWidth')){
+			if(data.ddWidth == 'self'){
+				$dropbox.width($button.outerWidth());
+			} else if((isFinite(data.ddWidth)) || (data.ddWidth.search(/^[1-9]\d*%$|^0%$/) === 0)){
+				$dropbox.width(data.ddWidth);
+			}
+		}
+		if(data.hasOwnProperty('ddPosX') || data.hasOwnProperty('ddPosY')){
+			var button_pos = $button.position();
+			if(data.hasOwnProperty('ddPosX')){
+				var xPos;
+				if(data.ddPosX == 'self.center'){
+					xPos = (button_pos.left + $button.outerWidth() / 2) - $dropbox.outerWidth() / 2;
+				} else if(data.ddPosX == 'center'){
+					xPos = $dropbox.parent().outerWidth() / 2 - $dropbox.outerWidth() / 2;
+				} else if(isFinite(data.ddPosX)){
+					xPos = data.ddPosX;
+				}
+				$dropbox.css('left', xPos);
+			}
+			if(data.hasOwnProperty('ddPosY')){
+				var yPos;
+				if(data.ddPosY == 'self.center'){
+					yPos = (button_pos.top + $button.outerHeight() / 2) - $dropbox.outerHeight() / 2;
+				} else if(data.ddPosY == 'center'){
+					yPos = $dropbox.parent().outerHeight() / 2 - $dropbox.outerHeight() / 2;
+				} else if(isFinite(data.ddPosY)){
+					yPos = (button_pos.top + $button.outerHeight()) + data.ddPosY;
+				}
+				$dropbox.css('top', yPos);
+			}
+		}
+		$dropbox.find('.CloseDropdown').on('click.CloseDropdown', $dropbox.closeDropbox);
+		$button.on('click.Dropdown', function(){
+			$dropbox.addClass('-show');
+			$('body').on('mousedown.CloseDropdown', function(e) {
+				if(!$(e.target).closest('.DropdownBox').length){
+					$dropbox.closeDropbox();
+				}
+			});
+			$(document).on('keyup.CloseDropdown', function(e){
+				if(e.keyCode == 27){
+					$dropbox.closeDropbox();
+				}
+			});
+		});
+
+	}).addClass('-Handled_DropdownButton')
+}
+
 function buildAvatarCollection(subscribers, count){
 	var $subscribers = $();
-	$subscribers = $subscribers.add(tmpl('organization-feed-event-subscriber', __USER));
+	$subscribers = $subscribers.add(tmpl('subscriber-avatar', __USER));
 	subscribers.forEach(function(subscriber){
 		if(subscriber.id != __USER.id && $subscribers.length <= count){
-			$subscribers = $subscribers.add(tmpl('organization-feed-event-subscriber', subscriber));
+			$subscribers = $subscribers.add(tmpl('subscriber-avatar', subscriber));
 		}
 	});
 	return $subscribers;
@@ -375,7 +507,7 @@ function trimAvatarsCollection($parent){
 			$avatars = $collection.find('.avatar'),
 			amount = $avatars.length;
 		if($collection.hasClass('-subscribed') && !$collection.hasClass('-shift')){
-			$collection.width(amount == 1 ? 0 : ($avatars.outerWidth()*amount) - (6*(amount-1)));
+			$collection.width(amount == 1 ? ($avatars.outerWidth()*amount) : ($avatars.outerWidth()*amount) - (6*(amount-1)));
 		} else {
 			$collection.width(amount == 1 ? 0 : ($avatars.outerWidth()*(amount-1)) - (6*(amount-2)));
 		}
@@ -383,6 +515,7 @@ function trimAvatarsCollection($parent){
 }
 
 function placeAvatarDefault($parent){
+	$parent = $parent ? $parent : $('body');
 	var $avatars = $parent.find('.avatar');
 	$avatars.each(function(){
 		$(this).children('img').one('error', function(){
@@ -399,9 +532,7 @@ function bindFileLoadButton(){
 }
 
 function limitInputSize(){
-	var $elements = $('.LimitSize').not('.-Handled_LimitSize');
-
-	$elements.each(function(i, e) {
+	$('.LimitSize').not('.-Handled_LimitSize').each(function(i, e) {
 		var $this = $(e),
 			$form_unit = $this.closest('.form_unit'),
 			max = $this.data('maxlength'),
@@ -421,8 +552,7 @@ function limitInputSize(){
 			}
 			$prompt.text($this.val().length+'/'+max);
 		})
-	});
-	$elements.addClass('-Handled_LimitSize');
+	}).addClass('-Handled_LimitSize');
 }
 
 function initTimeInput(time_field){
@@ -464,63 +594,28 @@ function toDataUrl(url, callback){
 	xhr.send();
 }
 
-
-
-function showModal(name){
-	var $modal = $('.'+name.capitalize()+'Modal');
-
-	if($modal.length > 0){
-		$('.modal_unit').removeClass('-active');
-		$('html').addClass('-open_modal');
-		$modal.addClass('-active').parent().addClass('-active');
-		$('.modal_destroyer').height($modal.height()).off('mousedown.CloseModal').on('mousedown.CloseModal', function(){
-			$(this).off('mousedown.CloseModal');
-			closeModal();
-		});
-		$modal.find('.CloseModal').off('click.CloseModal').on('click.CloseModal', closeModal);
-	} else {
-		throw Error('Модального окна '+name+' нет');
-	}
-
-}
-
-function closeModal(){
-	$('html').removeClass('-open_modal');
-	$('.modal_unit').removeClass('-active').parent().removeClass('-active').trigger('modal-close');
-}
-
-function initCrop(source, $endpoint_img, options){
-	var $img = $('.Cropper').children('img'),
-		$crop_button = $('.CropButton'),
-		$destroy_button = $('.DestroyCropButton'),
-		opt = {
-			zoomable: false,
-			zoomOnWheel: false/*
-			minCanvasWidth: 500,
-			minCanvasHeight: 500,
-			minCropBoxWidth: 500,
-			minCropBoxHeight: 500,
-			minContainerWidth: 500,
-			minContainerHeight: 500*/
-		};
-	options = typeof options == 'object' ? options : {};
-	$.extend(opt, options);
-
-	$img.cropper('destroy').attr('src', source).cropper(opt);
-	showModal('cropper');
-
-	$img.closest('.CropperModal').on('modal-close', function(){
-		$img.cropper('destroy');
-		$crop_button.off('click');
-		$destroy_button.off('click');
-	});
-
-	$crop_button.off('click.Crop').one('click.Crop', function(){
-		$endpoint_img.attr('src', $img.cropper('getCroppedCanvas').toDataURL()).data('crop_data', $img.cropper('getData'));
-		$endpoint_img.trigger('crop-done');
-		closeModal();
-	});
-	$destroy_button.off('click.DestroyCrop').one('click.DestroyCrop', closeModal);
+function bindCollapsing($parent){
+	$parent = $parent ? $parent : $('body');
+	$parent.find('.CollapsingButton').each(function(){
+		var $button = $(this),
+			$wrapper = $button.siblings('.CollapsingWrapper'),
+			$content = $wrapper.children(),
+			default_height = $wrapper.data('defaultHeight') ? $wrapper.data('defaultHeight') : 0;
+		function toggleCollapsing(){
+			if($wrapper.hasClass('-opened')){
+				$wrapper.height(default_height);
+				$wrapper.on('click.toggleCollapsing', toggleCollapsing);
+			} else {
+				$wrapper.height($content.outerHeight());
+				$wrapper.off('click.toggleCollapsing');
+			}
+			$wrapper.toggleClass('-opened');
+		}
+		if(!$wrapper.hasClass('-opened')){
+			$wrapper.on('click.toggleCollapsing', toggleCollapsing);
+		}
+		$button.on('click.toggleCollapsing', toggleCollapsing);
+	})
 }
 
 function showNotification(text, time, status){

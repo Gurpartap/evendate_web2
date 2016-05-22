@@ -38,6 +38,16 @@ class Notification extends AbstractEntity{
 	const NOTIFICATION_TYPE_CHANGED_LOCATION = 'notification-event-changed-location';
 	const NOTIFICATION_TYPE_CHANGED_PRICE = 'notification-event-changed-price';
 	const NOTIFICATION_TYPE_CHANGED_REGISTRATION = 'notification-event-changed-registration';
+	const NOTIFICATION_TYPE_ONE_DAY_REGISTRATION_CLOSE = 'notification-one-day-registration-close';
+
+
+	const NOTIFICATION_TYPE_BEFORE_THREE_HOURS = 'notification-before-three-hours';
+	const NOTIFICATION_TYPE_BEFORE_DAY = 'notification-before-day';
+	const NOTIFICATION_TYPE_BEFORE_THREE_DAYS = 'notification-before-three-days';
+	const NOTIFICATION_TYPE_BEFORE_WEEK = 'notification-before-week';
+	const NOTIFICATION_TYPE_BEFORE_QUARTER_OF_HOUR = 'notification-before-quarter-of-hour';
+	const NOTIFICATION_TYPE_CUSTOM = 'notification-custom';
+
 	const NOTIFICATION_TYPE_NOW_ID = 1;
 
 	const USERS_NOTIFICATION_ID = 13;
@@ -50,13 +60,21 @@ class Notification extends AbstractEntity{
 		self::NOTIFICATION_TYPE_CHANGED_PRICE,
 	);
 
+	const NOTIFICATION_PREDEFINED_CUSTOM = array(
+		self::NOTIFICATION_TYPE_BEFORE_THREE_HOURS,
+		self::NOTIFICATION_TYPE_BEFORE_THREE_DAYS,
+		self::NOTIFICATION_TYPE_BEFORE_WEEK,
+		self::NOTIFICATION_TYPE_BEFORE_DAY,
+		self::NOTIFICATION_TYPE_BEFORE_QUARTER_OF_HOUR
+	);
+
 	const NOTIFICATION_TYPES = array(
 		self::NOTIFICATION_TYPE_NOW,
-		'notification-before-three-hours',
-		'notification-before-three-days',
-		'notification-before-week',
-		'notification-before-day',
-		'notification-custom',
+		self::NOTIFICATION_TYPE_BEFORE_THREE_HOURS,
+		self::NOTIFICATION_TYPE_BEFORE_THREE_DAYS,
+		self::NOTIFICATION_TYPE_BEFORE_WEEK,
+		self::NOTIFICATION_TYPE_BEFORE_DAY,
+		self::NOTIFICATION_TYPE_CUSTOM,
 		self::NOTIFICATION_TYPE_CANCELED,
 		self::NOTIFICATION_TYPE_CHANGED_DATES,
 		self::NOTIFICATION_TYPE_CHANGED_LOCATION,

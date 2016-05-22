@@ -80,7 +80,10 @@ class Result{
 				$arr['request_id'] = $this->uuid;
 			}
 			if ($this->exception != null){
-				$arr['exception'] = $this->exception;
+				$arr['exception'] = array(
+					'stack' => $this->exception->getTraceAsString(),
+					'text' => $this->exception
+				);
 			}
 		}
 		$res = json_encode($arr);
