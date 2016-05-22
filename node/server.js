@@ -872,4 +872,5 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
     io.listen(8080);
 
+    console.log('Started');
 });

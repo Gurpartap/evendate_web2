@@ -302,7 +302,7 @@ ImagesResize.prototype.resizeNew = function (config) {
                     });
                     _this.resizeFile({
                         source: logo_img_path,
-                        destination: path.join(__dirname, ORGANIZATIONS_IMAGES_PATH + LOGO_IMAGES + '/' + MEDIUM_IMAGES + '/' + obj.background_img_url),
+                        destination: path.join(__dirname, ORGANIZATIONS_IMAGES_PATH + LOGO_IMAGES + '/' + MEDIUM_IMAGES + '/' + obj.img_url),
                         type: 'organization',
                         orientation: LOGO_IMAGES,
                         size: MEDIUM_IMAGES
@@ -310,7 +310,7 @@ ImagesResize.prototype.resizeNew = function (config) {
 
                     _this.resizeFile({
                         source: logo_img_path,
-                        destination: path.join(__dirname, ORGANIZATIONS_IMAGES_PATH + LOGO_IMAGES + '/' + SMALL_IMAGES + '/' + obj.background_img_url),
+                        destination: path.join(__dirname, ORGANIZATIONS_IMAGES_PATH + LOGO_IMAGES + '/' + SMALL_IMAGES + '/' + obj.img_url),
                         type: 'organization',
                         orientation: LOGO_IMAGES,
                         size: SMALL_IMAGES
