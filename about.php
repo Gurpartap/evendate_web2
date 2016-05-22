@@ -118,10 +118,7 @@ require_once('landing/header.php'); ?>
 </div>
 <div id="modal_form_login" class="modal_form"><!-- oкнo с загрузкой -->
 	<div><img src="/landing/img/close.png" id="modal_close_login"><!-- Кнoпкa зaкрыть --></div>
-	<div class="spinner">
-		<div class="double-bounce1"></div>
-		<div class="double-bounce2"></div>
-	</div>
+	<iframe width="600" height="440"></iframe>
 </div>
 <div id="overlay" class="overlay"></div><!-- Пoдлoжкa -->
 

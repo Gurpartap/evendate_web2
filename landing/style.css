@@ -1146,6 +1146,13 @@ a {
 
 #modal_form_login {
 	display: none;
+	width: auto;
+	height: auto;
+	margin-left: -300px;
+	margin-top: -220px;
+}
+#modal_form_login iframe {
+	border: 0;
 }
 /* Кнoпкa зaкрыть */
 #modal_form_login #modal_close_login {
