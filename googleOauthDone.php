@@ -32,7 +32,10 @@
 		<div class="panel panel-default">
 			<div class="panel-heading">Загрузка данных</div>
 			<div class="panel-body loader-demo">
-				<div class="whirl duo"></div>
+				<div class="spinner" style="display: none;">
+					<div class="double-bounce1"></div>
+					<div class="double-bounce2"></div>
+				</div>
 			</div>
 		</div>
 

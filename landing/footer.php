@@ -36,28 +36,11 @@
 			if (isNotDesktop()) {
 				window.location.href = _oauth_urls.mobile[type];
 			} else {
-				window.open(_oauth_urls.popup[type], type.toUpperCase() + '_AUTH_WINDOW',
-					'status=1,toolbar=0,menubar=0&height=500,width=700');
+				$('#auth-frame').attr('src', _oauth_urls.popup[type]);
 			}
 		}
 
-		$('.vk-auth-btn').on('click', function() {
-			yaCounter32442130.reachGoal('VkAuthStart');
-			openAuthLink('vk');
-		});
-
-		$('.google-plus-btn').on('click', function() {
-			yaCounter32442130.reachGoal('GoogleAuthStart');
-			openAuthLink('google');
-		});
-
-		$('.facebook-btn').on('click', function() {
-			yaCounter32442130.reachGoal('FacebookAuthStart');
-			openAuthLink('facebook');
-		});
 	})
 </script>
 <script type="text/javascript" src="/landing/js/js_file.js"></script>	<!-- подключение js -->
 <script type="text/javascript" src="/landing/js/modals.js"></script>	<!-- подключение js -->
-</body>
-</html>
