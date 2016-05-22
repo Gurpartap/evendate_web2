@@ -77,3 +77,56 @@ $('#join_button').on('click', join_page); // скролл
 
 var o = $(window);
 $(".mask-loading").css("height", o.height());
+
+
+
+
+
+function showNotifier(response){
+	$.notify({
+		'message': response.text,
+		'pos': response.pos ? response.pos : 'top-right',
+		'status': response.status ? 'success' : 'danger'
+	});
+}
+
+function validateEmail(email) {
+	var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+	return re.test(email);
+}
+
+$("#send_form").off('click').on("click", function(){
+	var $form = $(this).parents("form"),
+		$required = $form.find(":required"),
+		is_valid = true;
+
+	$required.each(function(i, el){
+		var $this = $(el);
+		if($this.is("[type='email']") && !validateEmail($this.val())){
+			$this.addClass("status-error").one("input", function(){
+				$(this).removeClass("status-error");
+			});
+			is_valid = false;
+			showNotifier({text: 'Пожалуйста, введите валидный email адрес', status: false});
+		} else if(!$this.val().trim()){
+			$this.addClass("status-error").one("input", function(){
+				$(this).removeClass("status-error");
+			});
+			is_valid = false;
+			showNotifier({text: 'Заполнены не все обязательные поля', status: false});
+		}
+	});
+	if(is_valid){
+		$form.hide();
+
+		var arr = $form.serializeArray(),
+			data = {};
+
+		arr.forEach(function(val){
+			data[val.name] = val.value;
+		});
+
+		socket.emit('feedback', data);
+		$form.after('<p>Спасибо за интерес к нашему сервису.<br>Ожидайте ответ в течение суток</p>');
+	}
+});

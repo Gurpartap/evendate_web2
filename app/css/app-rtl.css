@@ -4987,8 +4987,6 @@ x:-o-prefocus,
 
   100% {
     opacity: 1;
-    -webkit-transform: ;
-    transform: ;
   }
 }
 
@@ -5002,9 +5000,6 @@ x:-o-prefocus,
 
   100% {
     opacity: 1;
-    -webkit-transform: ;
-    -ms-transform: ;
-    transform: ;
   }
 }
 
@@ -5859,7 +5854,7 @@ fieldset[disabled] body .bootstrap-tagsinput {
   opacity: 1;
 }
 
-textareabody .bootstrap-tagsinput {
+.textareabody .bootstrap-tagsinput {
   height: auto;
 }
 

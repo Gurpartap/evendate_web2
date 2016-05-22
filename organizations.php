@@ -56,14 +56,14 @@ require_once('landing/header.php'); ?>
 
 <article id="join_form" class="blank_article_container">
 	<section class="join_org_container"><span class="content_text_header">Присоединяйтесь к организациям, которые уже работают с нами.</span></section>
-	<section class="form_container">
+	<form class="form_container">
 		<div class="text_header_form_container"><span class="user_text_section_header user_text_section_header_bot">Заполните форму, и наша команда обязательно свяжется с Вами!</span></div>
-		<div class="field_container"><input type="text" placeholder="НАЗВАНИЕ ОРГАНИЗАЦИИ" class="form_style status-error"></div>
-		<div class="field_container"><input type="text" placeholder="ВАШЕ ИМЯ" class="form_style status-error"></div>
-		<div class="field_container"><input type="text" placeholder="E-MAIL" class="form_style status-error"></div>
-		<div class="field_container field_container_question"><textarea name="description" placeholder="СООБЩЕНИЕ" required="" class="form_style form_style_message status-error"></textarea></div>
-		<div class="button_fon_img_users_container_form"><button class="button_fon_img_users"><span class="text_button_users_top">ОТПРАВИТЬ</span></button></div>
-	</section>
+		<div class="field_container"><input class="form_style" type="text" name="organization_name" required placeholder="НАЗВАНИЕ ОРГАНИЗАЦИИ"></div>
+		<div class="field_container"><input class="form_style" type="text" name="full_name" required placeholder="ВАШЕ ИМЯ"></div>
+		<div class="field_container"><input class="form_style" type="email" name="email" required placeholder="E-MAIL"></div>
+		<div class="field_container field_container_question"><textarea class="form_style form_style_message" name="message" placeholder="СООБЩЕНИЕ"></textarea></div>
+		<div class="button_fon_img_users_container_form"><button id="send_form" class="button_fon_img_users" type="button"><span class="text_button_users_top">ОТПРАВИТЬ</span></button></div>
+	</form>
 
 	<section>
 		<footer class="bottom_article_and_footer_size">
@@ -90,10 +90,7 @@ require_once('landing/header.php'); ?>
 </div>
 <div id="modal_form_login" class="modal_form"><!-- oкнo с загрузкой -->
 	<div><img src="/landing/img/close.png" id="modal_close_login"><!-- Кнoпкa зaкрыть --></div>
-	<div class="spinner">
-		<div class="double-bounce1"></div>
-		<div class="double-bounce2"></div>
-	</div>
+	<iframe width="600" height="440"></iframe>
 </div>
 <div id="overlay" class="overlay"></div><!-- Пoдлoжкa -->
 

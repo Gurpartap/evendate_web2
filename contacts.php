@@ -35,12 +35,13 @@ require_once('landing/header.php'); ?>
 <br><br>
 Заполните форму, и наша команда обязательно свяжется с Вами!
 </span></div>
-					<div class="form_support">
-					<div class="field_container"><input type="text" placeholder="ВАШЕ ИМЯ" class="form_style status-error"></div>
-					<div class="field_container"><input type="text" placeholder="E-MAIL" class="form_style status-error"></div>
-					<div class="field_container field_container_question"><textarea id="message_field" name="message" placeholder="ВАШ ВОПРОС" required="" class="form_style form_style_message status-error"></textarea></div>
-					<div class="button_fon_img_users_container_form"><button class="button_fon_img_users"><span class="text_button_users_top">ОТПРАВИТЬ</span></button></div>
-					</div></div>
+					<form class="form_support">
+						<div class="field_container"><input name="full_name" type="text" placeholder="ВАШЕ ИМЯ" required class="form_style"></div>
+						<div class="field_container"><input name="email" type="email" placeholder="E-MAIL" required class="form_style"></div>
+						<div class="field_container field_container_question"><textarea name="question" placeholder="СООБЩЕНИЕ" required class="form_style form_style_message"></textarea></div>
+						<div class="button_fon_img_users_container_form"><button id="send_form" class="button_fon_img_users" type="button"><span class="text_button_users_top">ОТПРАВИТЬ</span></button></div>
+					</form>
+				</div>
 		</div>
 		</div>
 
@@ -70,10 +71,7 @@ require_once('landing/header.php'); ?>
 </div>
 <div id="modal_form_login" class="modal_form"><!-- oкнo с загрузкой -->
 	<div><img src="/landing/img/close.png" id="modal_close_login"><!-- Кнoпкa зaкрыть --></div>
-	<div class="spinner">
-		<div class="double-bounce1"></div>
-		<div class="double-bounce2"></div>
-	</div>
+	<iframe width="600" height="440"></iframe>
 </div>
 <div id="overlay" class="overlay"></div><!-- Пoдлoжкa -->
 
