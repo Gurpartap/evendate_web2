@@ -13,8 +13,9 @@ function Calendar($calendar, options){
 			head_tr_class: 'calendar_weekdays_row',
 			th_class: 'calendar_weekday',
 			td_class: 'calendar_day',
-			td_disabled: 'calendar_day_disabled',
-			table_cell_class: 'calendar_cell'
+			td_disabled_class: 'calendar_day_disabled',
+			table_cell_class: 'calendar_cell',
+			today_class: 'today'
 		},
 		selection_type: 'single',
 		multi_selection: false,
@@ -115,9 +116,9 @@ Calendar.prototype.buildTable = function(){
 			'DayOfMonth_'+this.current_month.month()
 		];
 		if((this.options.min_date !== false && !(this_moment.diff(this.options.min_date, 'd') >= 0) ) || (this.options.max_date !== false && !(this_moment.diff(this.options.max_date, 'd') <= 0)))
-			td_classes.push(this.options.classes.td_disabled);
+			td_classes.push(this.options.classes.td_disabled_class);
 		if(this.current_month.format(__C.DATE_FORMAT) == this._today.format(__C.DATE_FORMAT))
-			td_classes.push('today');
+			td_classes.push(this.options.classes.today_class);
 
 		td_days.push(tmpl('calendar-div', {
 			td_classes: td_classes.join(' '),
@@ -143,7 +144,7 @@ Calendar.prototype.buildTable = function(){
 				'not_this_month'
 			];
 			if((this.options.min_date !== false && !(this_moment.diff(this.options.min_date, 'd') >= 0) ) || (this.options.max_date !== false && !(this_moment.diff(this.options.max_date, 'd') <= 0)))
-				td_classes.push(this.options.classes.td_disabled);
+				td_classes.push(this.options.classes.td_disabled_class);
 
 			td_days.unshift(tmpl('calendar-div', {
 				td_classes: td_classes.join(' '),
@@ -171,7 +172,7 @@ Calendar.prototype.buildTable = function(){
 				'not_this_month'
 			];
 			if((this.options.min_date !== false && !(this_moment.diff(this.options.min_date, 'd') >= 0) ) || (this.options.max_date !== false && !(this_moment.diff(this.options.max_date, 'd') <= 0)))
-				td_classes.push(this.options.classes.td_disabled);
+				td_classes.push(this.options.classes.td_disabled_class);
 
 			td_days.push(tmpl('calendar-div', {
 				td_classes: td_classes.join(' '),
@@ -225,7 +226,7 @@ Calendar.prototype.renderTable = function(){
 };
 
 Calendar.prototype.selectToday = function(){
-	this.$calendar.find('.'+this.options.classes.td_class+'.today').addClass(__C.CLASSES.ACTIVE);
+	this.$calendar.find('.'+this.options.classes.td_class+'.'+this.options.classes.today_class).addClass(__C.CLASSES.ACTIVE);
 	return this;
 };
 
@@ -447,7 +448,7 @@ Calendar.prototype.bindMonthArrows = function(){
 
 Calendar.prototype.bindDaySelection = function(){
 	var self = this,
-		$days = self.$calendar.find('.'+this.options.classes.td_class).not('.'+this.options.classes.td_disabled);
+		$days = self.$calendar.find('.'+this.options.classes.td_class).not('.'+this.options.classes.td_disabled_class);
 	$days.on('click', function(){
 		if(self.options.multi_selection === true && $(this).hasClass(__C.CLASSES.ACTIVE)){
 			self.deselectDays($(this).data('date'));
@@ -481,7 +482,7 @@ Calendar.prototype.bindDragSelection = function(){
 
 	function selectDate($target){
 		$target = $target.is('.'+self.options.classes.td_class) ? $target : $target.closest('.'+self.options.classes.td_class);
-		if($target.not('.'+self.options.classes.td_disabled).length){
+		if($target.not('.'+self.options.classes.td_disabled_class).length){
 			if($target.hasClass(__C.CLASSES.ACTIVE)){
 				self.deselectDays($target.data('date'));
 			} else {
@@ -498,7 +499,7 @@ Calendar.prototype.bindDragSelection = function(){
 		.off('mousedown.RangeSelection')
 		.on('mousedown.RangeSelection', function(e){
 			selectDate($(e.target));
-			self.$calendar.find('.'+self.options.classes.td_class).not('.'+self.options.classes.td_disabled).on('mouseenter.DragSelection', function(e){
+			self.$calendar.find('.'+self.options.classes.td_class).not('.'+self.options.classes.td_disabled_class).on('mouseenter.DragSelection', function(e){
 				e.preventDefault();
 				selectDate($(e.target));
 			});
