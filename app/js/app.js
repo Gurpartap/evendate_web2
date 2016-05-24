@@ -599,7 +599,7 @@ socket.on('auth', function(data) {
 				if (data.hasOwnProperty('mobile') && data.mobile == true) {
 					window.location.href = '/mobileAuthDone.php?token=' + data.token + '&email=' + data.email;
 				} else {
-					window.opener.location = 'timeline';
+					window.parent.location = 'timeline';
 					if (yaCounter32442130) {
 						switch(data.type) {
 							case 'vk':
@@ -619,7 +619,6 @@ socket.on('auth', function(data) {
 							}
 						}
 					}
-					window.close();
 				}
 			} else {
 				$('.panel-body.loader-demo').text(res.text);
