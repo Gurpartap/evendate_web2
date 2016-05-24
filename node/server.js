@@ -645,8 +645,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
                                 if (oauth_data.type == 'vk') {
                                     groups_data = groups_data.response;
-                                } else if (oauth_data.type == 'facebook') {
-                                    groups_data = groups_data.data;
                                 }
 
                                 saveDataInDB(Utils.composeFullInfoObject({
