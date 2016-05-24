@@ -730,6 +730,7 @@ a {
 	background: linear-gradient(to right,  #5379b8, #f82969);
 	border-radius: 3px;
 	margin: 20px 0 0;
+	padding: 1px;
 }
 
 
@@ -739,8 +740,8 @@ a {
 
 
 .form_style {
-	width: 888px;
-	margin: 1px;
+	display: block;
+	width: 100%;
 	border: none;
 	font-family: 'Roboto', sans-serif;
 	font-size: 15px;
@@ -754,7 +755,7 @@ a {
 }
 
 .form_style_message {
-	height: 133px;
+	height: 100%;
 	resize: none;
 }
 
@@ -1205,8 +1206,13 @@ a {
 	cursor: pointer;
 }
 
+.modal_img_container {
+	width: 230px;
+	margin: 0 auto;
+}
+
 .modal_img_container+.modal_img_container {
-	margin: 15px 0 0;
+	margin: 15px auto 0;
 }
 
 .modal_top_header_text {
