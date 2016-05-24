@@ -10,6 +10,9 @@
 
 <body>
 
+<script src="/vendor/jquery/dist/jquery.js" type="text/javascript"></script>
+<script src="/app/js/app.js" type="text/javascript"></script>
+
 <?php
 require_once 'footer.php';
 ?>
@@ -24,6 +27,7 @@ require_once 'footer.php';
             }
         }
         window.opener.location.href = link + params.join('&');
+        window.close();
     });
 
 

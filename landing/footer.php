@@ -31,7 +31,7 @@
             ))
             ?>');
 
-        function openAuthLink(type) {
+        window.openAuthLink = function(type) {
             if (isNotDesktop()) {
                 window.location.href = _oauth_urls.mobile[type];
             } else {

@@ -11,11 +11,11 @@ require_once('landing/header.php'); ?>
 	<div class="fon_img_main_page fon_img_mane_mini">
 		<div class="position_in_fon">
 		<div class="fon_text_container">
-			<div><span class="fon_text_top">Попробуй сделать свою жизнь интереснее!</span></div>
+			<div><span class="fon_text_top">Сделай свою жизнь интереснее!</span></div>
 			<div class="fon_text_bottom_container"><span class="fon_text_bottom">Evendate - это сервис для быстрого и удобного поиска интересных мероприятий.</span></div>
 
 		</div><div class="login_container"><div class="login_container_text"><span class="login_text">ВОЙТИ С ПОМОЩЬЮ</span></div>
-		<div><div class="login_img_container"><img src="/landing/img/vk_logo.jpg" id="vk_login" class="img_login"></div><div class="login_img_container"><img src="/landing/img/fb_logo.jpg" id="fb_login" class="img_login"></div><div class="login_img_container"><img src="/landing/img/g+_logo.png" id="g_login" class="img_login"></div></div>
+		<div><div class="login_img_container"><img src="/landing/img/vk_logo.jpg" id="vk_login" class="img_login" data-type="vk"></div><div class="login_img_container"><img src="/landing/img/fb_logo.jpg" id="fb_login" class="img_login" data-type="facebook"></div><div class="login_img_container"><img src="/landing/img/g+_logo.png" id="g_login" class="img_login" data-type="google"></div></div>
 		<div ><button class="login_button"><span class="login_button_text">ВОЙТИ БЕЗ АВТОРИЗАЦИИ</span></button></div>
 	</div>
 	</div>
@@ -23,7 +23,7 @@ require_once('landing/header.php'); ?>
 
 	<article class="fon_article">
 		<section class="section_stay_in_touch">
-			<div><span class="section_stay_in_touch_text_top">Будь в курсе событий!</span></div>
+			<div><span class="section_stay_in_touch_text_top">Будь в курсе событий</span></div>
 			<div class="section_stay_in_touch_text_bottom_container"><span class="section_stay_in_touch_text_bottom">Подпишись на интересующие тебя источники, сформируй уникальную ленту новостей и с легкостью отслеживай события, которые происходят вокруг тебя!</span></div>
 		</section>
 		<section class="section_steps">
@@ -77,9 +77,9 @@ require_once('landing/header.php'); ?>
 		<div class="bot_part_modal"> <!-- Нижняя часть модалки -->
 			<div><span class="modal_bot_header_text">ВОЙДИТЕ ЧЕРЕЗ СОЦИАЛЬНУЮ СЕТЬ</span></div>
 			<div class="bot_part_modal"> <!-- картинки -->
-				<div id="vk_login_in_modal" class="modal_img_container"><img src="/landing/img/VKBig.png" class="modal_img"></div>
-				<div id="fb_login_in_modal" class="modal_img_container"><img src="/landing/img/FBBig.png" class="modal_img"></div>
-				<div id="g_login_in_modal" class="modal_img_container"><img src="/landing/img/G+Big.png" class="modal_img"></div>
+				<div id="vk_login_in_modal" class="modal_img_container"><img src="/landing/img/VKBig.png" class="modal_img" data-type="vk"></div>
+				<div id="fb_login_in_modal" class="modal_img_container"><img src="/landing/img/FBBig.png" class="modal_img" data-type="facebook"></div>
+				<div id="g_login_in_modal" class="modal_img_container"><img src="/landing/img/G+Big.png" class="modal_img" data-type="google"></div>
 			</div> <!-- /картинки -->
 		</div> <!-- /Нижняя часть модалки -->
 	</div>
