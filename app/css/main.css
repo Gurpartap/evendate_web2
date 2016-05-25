@@ -2399,6 +2399,11 @@ html.-noscroll {
 	text-overflow: ellipsis;
 }
 
+.event_date {
+	display: block;
+	margin-bottom: 6px;
+}
+
 .event_additional_field_label {
 	display: block;
 	margin-bottom: .5em;

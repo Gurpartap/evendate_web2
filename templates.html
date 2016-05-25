@@ -40,7 +40,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-subscriber-avatar">
-	<div class="avatar" style="background-image: url({avatar_url})"></div>
+	<div class="avatar" style="background-image: url({avatar_url})" title="{last_name} {first_name}"></div>
 </script>
 
 <script type="javascript/template" id="tmpl-vk-share-button">
@@ -152,14 +152,11 @@
 			<h4 class="form_label"><label for="edit_event_placepicker">Место проведения</label></h4>
 			<div class="form_group -parts_3_1">
 				<div class="form_unit">
-					<input class="form_input Placepicker" id="edit_event_placepicker" data-map-container-id="edit_event_map" name="location" value="{location}" required>
+					<input id="edit_event_placepicker" class="form_input Placepicker" name="location" value="{location}" required>
 				</div>
 				<div class="form_unit">
 					<button class="button -color_primary -fill RippleEffect EditEventDefaultAddress" type="button" tabindex="-1">По умолчанию</button>
 				</div>
-			</div>
-			<div id="edit_event_map" class="collapse">
-				<div class="placepicker-map thumbnail"></div>
 			</div>
 
 			<h4 class="form_label"><label for="edit_event_description">Описание</label></h4>
@@ -176,7 +173,7 @@
 			<div class="form_group -parts_2_3 RegistrationTill">
 				<div class="form_unit -inline -status_disabled">
 					<label class="form_label">Дата</label>
-					<div class="form_select -v_centering DatePicker" data-min_date="{current_date}"><label>{registration_till_data_label}</label><input name="registration_till_date" value="{registration_till_data}" type="hidden" disabled required></div>
+					<div class="form_select -v_centering DatePicker" data-min_date="{tomorrow_date}"><label>{registration_till_data_label}</label><input name="registration_till_date" value="{registration_till_data}" type="hidden" disabled required></div>
 				</div>
 				<div class="form_unit -status_disabled">
 					<div class="form_group -parts_e_2">
@@ -650,11 +647,7 @@
 					<span class="avatar_name">{organization_short_name}</span>
 				</div>
 			</div>
-			{event_additional_fields}
-			<div class="event_additional_field">
-				<label class="event_additional_field_label">Подробнее</label>
-				<a class="fa_icon fa-external-link" href="{detail_info_url}" target="_blank">{detail_info_url}</a>
-			</div><!--
+			{event_additional_fields}<!--
 			<div class="share_block">
 				<label class="share_title -color_primary -transform_uppercase">Поделиться</label>
 				<div class="share_icons -size_small">{share_block}</div>
@@ -715,6 +708,13 @@
 	<div class="event_additional_field">
 		<label class="event_additional_field_label">{key}</label>
 		<p>{value}</p>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-event-detail-link">
+	<div class="event_additional_field">
+		<label class="event_additional_field_label">Подробнее</label>
+		<a class="fa_icon fa-external-link" href="{detail_info_url}" target="_blank">{detail_info_url}</a>
 	</div>
 </script>
 

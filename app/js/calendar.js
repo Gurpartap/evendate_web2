@@ -356,6 +356,22 @@ function OneEvent($view, $content_block){
 		initNotifications($parent);
 		bindOnClick();
 
+		$parent.find('.EventSubscribe').not('.-Handled_EventSubscribe').on('click.eventSubscribe', function(){
+			var $this = $(this),
+				url = '/api/v1/events/'+$this.data('event-id')+'/favorites',
+				method = $this.hasClass('-Subscribed') ? 'DELETE' : 'POST';
+
+			$.ajax({
+				url: url,
+				method: method,
+				success: function(res){
+					ajaxHandler(res, function(data, text){
+					}, ajaxErrorHandler)
+				}
+			});
+
+		}).addClass('-Handled_EventSubscribe');
+
 		$parent.find('.Subscribe').not('.-Handled_Subscribe').each(function(){
 			new SubscribeButton($(this), {
 				labels: {
@@ -503,6 +519,71 @@ function OneEvent($view, $content_block){
 		return $notifications;
 	}
 
+	function formatDates(dates){
+		var prev_day,
+			range = [],
+			dates_obj = {},
+			output = [],
+			genitive_month_names = [
+				'января',
+				'февраля',
+				'марта',
+				'апреля',
+				'мая',
+				'июня',
+				'июля',
+				'августа',
+				'сентября',
+				'октября',
+				'ноября',
+				'декабря'
+			];
+
+		if(dates.length == 1){
+			return [moment.unix(dates[0].event_date).format('LL')];
+		}
+
+		dates.forEach(function(date, i){
+			var this_day = moment.unix(date.event_date);
+			if(!dates_obj.hasOwnProperty(this_day.year())){
+				dates_obj[this_day.year()] = {};
+			}
+			if(!dates_obj[this_day.year()].hasOwnProperty(this_day.month())){
+				dates_obj[this_day.year()][this_day.month()] = [];
+			}
+
+			if(!prev_day){
+				range = [this_day.format('D')];
+			} else {
+				if(this_day.month() == prev_day.month() && prev_day.diff(this_day, 'days') == -1){
+					range.push(this_day.format('D'));
+				} else {
+					dates_obj[prev_day.year()][prev_day.month()].push(range.length == 1 ? range.shift() : range.shift()+'-'+range.pop());
+					range = [this_day.format('D')];
+				}
+			}
+
+			if(i === dates.length - 1){
+				dates_obj[this_day.year()][this_day.month()].push(range.length == 1 ? range.shift() : range.shift()+'-'+range.pop());
+			} else {
+				prev_day = this_day;
+			}
+		});
+
+		for(var year in dates_obj){
+			if(dates_obj.hasOwnProperty(year)){
+				for(var month in dates_obj[year]){
+					if(dates_obj[year].hasOwnProperty(month)){
+						output.push(dates_obj[year][month].join(', ')+' '+genitive_month_names[month]+' '+year+' г.');
+					}
+				}
+			}
+		}
+
+
+		return output;
+	}
+
 	$wrapper.empty();
 
 	$.ajax({
@@ -539,7 +620,7 @@ function OneEvent($view, $content_block){
 				if(data.is_same_time){
 					data.event_additional_fields = data.event_additional_fields.add(tmpl('event-additional-info', {
 						key: 'Дата',
-						value: moment.unix(data.dates[0].event_date).format('LL')
+						value: $(formatDates(data.dates).map(function(elem){return $('<span>').addClass('event_date').text(elem);})).map(function(){return this.toArray();})
 					}));
 					data.event_additional_fields = data.event_additional_fields.add(tmpl('event-additional-info', {
 						key: 'Время',
@@ -566,6 +647,9 @@ function OneEvent($view, $content_block){
 						return tag.name.toLowerCase();
 					}).join(', ')
 				}));
+				if(data.detail_info_url){
+					data.event_additional_fields = data.event_additional_fields = data.event_additional_fields.add(tmpl('event-detail-link', {detail_info_url: data.detail_info_url}));
+				}
 /*
 				data.share_block = $();
 				data.share_block = data.share_block.add(tmpl('vk-share-button', data));
@@ -761,7 +845,7 @@ function Organization($view, $content_block){
 			last_is_fiends = false;
 
 		if(typeof $scrollbar != 'undefined'){
-			last_is_fiends = $scrollbar.find('.subscriber').eq(-1).data('is_friend') == 'true';
+			last_is_fiends = $scrollbar.find('.subscriber').eq(-1).data('is_friend') == true;
 		}
 
 		subscribers.forEach(function(subscriber, i){
@@ -1322,7 +1406,8 @@ function OneDay($view, $content_block){
 }
 
 function EditEvent($view, $content_block){
-	var event_id = History.getState().data.eventId;
+	var $wrapper = $view.find('.page_wrapper'),
+		event_id = History.getState().data.eventId;
 
 	function initEditEventPage($view){
 
@@ -1374,9 +1459,13 @@ function EditEvent($view, $content_block){
 		function initEditEventMainCalendar($view){
 			//TODO: Refactor this!! Make it more readable
 
-			var MainCalendar = new Calendar('.EventDatesCalendar', {weekday_selection: true, month_selection: true}),
-				$selected_days_text = $view.find('.EventSelectedDaysText'),
+			var $selected_days_text = $view.find('.EventSelectedDaysText'),
 				$selected_days_table_rows = $view.find('.SelectedDaysRows'),
+				MainCalendar = new Calendar('.EventDatesCalendar', {
+					weekday_selection: true,
+					month_selection: true,
+					min_date: moment().format(__C.DATE_FORMAT)
+				}),
 				dates = {},
 				genitive_month_names = {
 					'январь': 'января',
@@ -1517,7 +1606,7 @@ function EditEvent($view, $content_block){
 						'height': $table_content.height(),
 						'overflow': 'hidden'
 					}).height(0);
-					$fucking_table.empty();
+					$fucking_table.remove();
 					MainCalendar.$calendar.off('days-changed.buildTable');
 				}
 				$view.find('.MainTime').toggleStatus('disabled');
@@ -1599,6 +1688,15 @@ function EditEvent($view, $content_block){
 
 		$view.find('#edit_event_free').off('change.FreeEvent').on('change.FreeEvent', function(){
 			$view.find('.MinPrice').toggleStatus('disabled');
+		});
+
+		$view.find('.MinPrice').find('input').inputmask({
+			'alias': 'numeric',
+			'autoGroup': false,
+			'digits': 2,
+			'digitsOptional': true,
+			'placeholder': '0',
+			'rightAlign': false
 		});
 
 		socket.on('image.getFromURLDone', function(response){
@@ -1892,16 +1990,30 @@ function EditEvent($view, $content_block){
 
 	function submitEditEvent(){
 		function formValidation($form, for_edit){
-			var is_valid = true;
+			var is_valid = true,
+				$times = $form.find('#edit_event_different_time').prop('checked') ? $form.find('[class^="TableDay_"]') : $form.find('.MainTime');
 
 			$form.find(':required').not(':disabled').each(function(){
-				var $this = $(this);
-				if($this.val() === ""){
+				var $this = $(this),
+					max_length = $this.data('maxlength');
+				if($this.val() === "" || (max_length && $this.val().length > max_length)){
 					if(is_valid){
-						var scroll_top = Math.ceil($this.offset().top - 150);
-						$('body').stop().animate({scrollTop: scroll_top}, 1000, 'swing');
+						$('body').stop().animate({scrollTop: Math.ceil($this.offset().top - 150)}, 1000, 'swing');
 					}
 					handleErrorField($this);
+					is_valid = false;
+				}
+			});
+
+			$times.each(function(){
+				var $row = $(this),
+					start = $row.find('.StartHours').val()+$row.find('.StartMinutes').val(),
+					end = $row.find('.EndHours').val()+$row.find('.EndMinutes').val();
+				if(start > end){
+					if(is_valid){
+						$('body').stop().animate({scrollTop: Math.ceil($row.offset().top - 150)}, 1000, 'swing');
+					}
+					showNotifier({text: 'Начальное время не может быть меньше конечного', status: false});
 					is_valid = false;
 				}
 			});
@@ -1911,8 +2023,7 @@ function EditEvent($view, $content_block){
 					var $this = $(this);
 					if($this.val() === ""){
 						if(is_valid){
-							var scroll_top = Math.ceil($this.closest('.EditEventImgLoadWrap').offset().top - 150);
-							$('body').stop().animate({scrollTop: scroll_top}, 1000, 'swing', function(){
+							$('body').stop().animate({scrollTop: Math.ceil($this.closest('.EditEventImgLoadWrap').offset().top - 150)}, 1000, 'swing', function(){
 								showNotifier({text: 'Пожалуйста, добавьте к событию обложку', status: false})
 							});
 						}
@@ -2002,7 +2113,7 @@ function EditEvent($view, $content_block){
 				contentType: 'application/json',
 				method: method,
 				success: function(res){
-					ajaxHandler(res, function(res_data){
+					ajaxHandler(res, function(res_data){/*
 						if(data.event_id){
 							$('body').stop().animate({scrollTop:0}, 1000, 'swing', function() {
 								showNotification('Событие успешно обновлено', 3000);
@@ -2012,7 +2123,7 @@ function EditEvent($view, $content_block){
 							$('body').stop().animate({scrollTop:0}, 1000, 'swing', function() {
 								showNotification('Событие успешно добавлено', 3000);
 							});
-						}
+						}*/
 
 						if($view.find('#edit_event_to_public_vk').prop('checked')){
 							socket.emit('vk.post', {
@@ -2026,6 +2137,7 @@ function EditEvent($view, $content_block){
 								link: data.detail_info_url
 							});
 						}
+						window.location = '/event/'+res_data.event_id;
 
 					}, function(res){
 						if(res.text){
@@ -2040,16 +2152,17 @@ function EditEvent($view, $content_block){
 
 	}
 
-	window.scrollTo(0, 0);
+	$wrapper.empty();
 	var additional_fields = {
 		event_id: event_id,
 		header_text: 'Новое событие',
 		public_at_data_label: 'Дата',
 		registration_till_data_label: 'Дата',
-		current_date: moment().format(__C.DATE_FORMAT)
+		current_date: moment().format(__C.DATE_FORMAT),
+		tomorrow_date: moment().add(1, 'd').format(__C.DATE_FORMAT)
 	};
 	if(typeof event_id === 'undefined'){
-		$view.find('.page_wrapper').html(tmpl('edit-event-page', additional_fields));
+		$wrapper.html(tmpl('edit-event-page', additional_fields));
 		initEditEventPage($view);
 		Modal.bindCallModal($view);
 		initOrganization();
@@ -2096,7 +2209,7 @@ function EditEvent($view, $content_block){
 					}
 
 					$.extend(true, data, additional_fields);
-					$view.find('.page_wrapper').html(tmpl('edit-event-page', data));
+					$wrapper.html(tmpl('edit-event-page', data));
 
 					initEditEventPage($view);
 					initOrganization(data.organization_id);
