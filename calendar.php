@@ -287,6 +287,68 @@
 					</div>
 
 					<!-- START row-->
+					<div class="feed-app hidden screen-view" data-controller="Feed">
+						<div class="page_viewport">
+							<div class="page_wrapper">
+								<div class="feed_events"><?php
+									for($i=1;$i<10;$i++){ ?>
+										<div class="page feed_event FeedEvent">
+											<aside class="feed_event_img_side Controller" data-page="event/33<?=$i?>" data-event-id="33<?=$i?>" data-title="Форум «Открытые инновации»" style="background-image: url('http://dn3.evendate.ru/event_images/large/165faef0347ea2bc7048a9534dd9dab4.jpg')"></aside>
+											<aside class="feed_event_info_side">
+												<header class="feed_event_header">
+													<div class="avatar_block -size_small Controller" data-page="organization/1" data-organization-id="1" data-title="ГУУ">
+														<div class="avatar"><img src="http://evendate.ru/organizations_images/logos/small/1.png"></div>
+														<span class="avatar_name">ГУУ</span>
+													</div>
+													<h3 class="feed_event_title Controller" data-page="event/33<?=$i?>" data-event-id="33<?=$i?>" data-title="Форум «Открытые инновации»">Форум «Открытые инновации»</h3>
+													<div class="feed_event_buttons">
+														<!--<button class="feed_event_button fa_icon fa-share-alt -empty DropdownButton" type="button" data-dropdown="share_event_33<?/*=$i*/?>" data-dd-pos-x="-100" data-dd-pos-y="5" data-dd-width="130"></button>-->
+														<button class="feed_event_button -empty HideEvent" type="button">×</button>
+														<div class="dropdown_box DropdownBox" data-dropdown_id="share_event_33<?=$i?>"></div>
+													</div>
+												</header>
+												<footer class="feed_event_footer">
+													<p class="feed_event_info">17 февраля, 15:30</p>
+													<p class="feed_event_info">Регистрация не требуется</p>
+													<p class="feed_event_info">Бесплатно</p>
+													<div class="form_group -parts_e_2 AddAvatarWrapper">
+														<div class="form_unit">
+															<div class="avatars_collection AvatarsCollection -subscribable  -rounded -bordered -size_small" data-max_subscribers="4" style="width: 102px;">
+																<div class="avatar" style="background-image: url(http://cs604427.vk.me/v604427744/5648/O8MzStOLkt0.jpg)" title="Харазян Арам"></div>
+																<div class="avatar" style="background-image: url(http://evendate.ru/user_images/default/fwGgaiZkGkMlVrSadWzV8j4rmptXtauF.jpeg)" title="Kharasyan Aram"></div>
+																<div class="avatar" style="background-image: url(http://cs627821.vk.me/v627821836/1f3fa/lIniCTrJlZg.jpg)" title="Лукьянова Анастасия"></div>
+																<div class="avatar" style="background-image: url(http://evendate.ru/user_images/default/7pcKP9M7V0ZiFEwaHxrFDjEiUTizUv1a.jpeg)" title="Алимов Илья"></div>
+																<div class="avatar" style="background-image: url(http://cs624628.vk.me/v624628000/511e2/CVlNSwgIUZc.jpg)" title="Карданов Инал"></div>
+															</div>
+															<span class="counter -size_30x30 -bordered -color_marginal_primary -castable -cast">+<span class="FavoredCount">0</span></span>
+														</div>
+														<div class="form_unit">
+															<button class="button -low -fill -rounded fa_icon fa-star-o -color_neutral_secondary Subscribe EventSubscribe -AddFavourite AddAvatar RippleEffect" data-event-id="3343">
+																<span class="Text">В избранное</span>
+															</button>
+														</div>
+													</div>
+												</footer>
+											</aside>
+										</div>
+										<?php
+									}	?>
+								</div>
+								<div class="event_vulcan">
+									<div class="page feed_calendar FeedCalendar"></div>
+
+									<div class="event_card">
+										<div class="event_card_img" style="background-image: url('http://dn3.evendate.ru/event_images/large/165faef0347ea2bc7048a9534dd9dab4.jpg')"></div>
+										<div class="event_card_description">
+											<span>Форум «Открытые инновации»</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- START row-->
 					<div class="organization-app hidden screen-view" data-controller="Organization">
 						<div class="page_viewport">
 							<div class="page_wrapper">

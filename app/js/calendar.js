@@ -341,6 +341,65 @@ function MyTimeline($view, $content_block){
 	setDaysWithEvents();
 }
 
+function Feed($view, $content_block){
+	function initFeedPage($parent){
+		var MainCalendar = new Calendar($parent.find('.FeedCalendar'), {
+			classes: {
+				wrapper_class: 'feed_calendar_wrapper',
+				table_class: 'feed_calendar_table',
+				thead_class: 'feed_calendar_thead',
+				tbody_class: 'feed_calendar_tbody',
+				th_class: 'feed_calendar_th',
+				td_class: 'feed_calendar_td',
+				td_disabled: 'calendar_day_disabled'
+			}
+		});
+		MainCalendar.init().selectToday();
+		bindAddAvatar($parent);
+		trimAvatarsCollection($parent);
+		bindRippleEffect($parent);
+		bindDropdown($parent);
+
+		$parent.find('.Subscribe').not('.-Handled_Subscribe').each(function(){
+			new SubscribeButton($(this), {
+				labels: {
+					subscribe: 'В избранное',
+					unsubscribe: 'Отписаться',
+					subscribed: 'В избранном'
+				},
+				colors: {
+					subscribe: '-color_neutral_secondary',
+					unsubscribe: '-color_secondary',
+					subscribed: '-color_secondary'
+				},
+				icons: {
+					subscribe: 'fa-star-o',
+					subscribed: 'fa-star'
+				}
+			});
+		}).addClass('-Handled_Subscribe');
+
+		$parent.find('.HideEvent').not('.-Handled_HideEvent').each(function(){
+			var $this = $(this),
+				$event = $this.parents('.FeedEvent');
+
+			$this.on('click', function(){
+				$event.addClass('-cancel');
+				$event.after(tmpl('button', {
+					classes: '-color_neutral ReturnEvent',
+					title: 'Вернуть событие'
+				}));
+				$event.siblings('.ReturnEvent').not('.-Handled_ReturnEvent').on('click', function(){
+					$(this).remove();
+					$event.removeClass('-cancel');
+				}).addClass('-Handled_ReturnEvent');
+			});
+		}).addClass('-Handled_HideEvent');
+
+	}
+	initFeedPage($view);
+}
+
 function OneEvent($view, $content_block){
 	var $wrapper = $view.find('.page_wrapper'),
 		event_id = __STATES.getCurrentState().split('/')[1];
@@ -2424,6 +2483,7 @@ $(document)
 
 		window.__STATES = {
 			event: OneEvent,
+			feed: Feed,
 			timeline: MyTimeline,
 			organizations: OrganizationsList,
 			organization: Organization,
