@@ -26,7 +26,7 @@ require_once 'footer.php';
                 params.push(key + '=' + data[key]);
             }
         }
-        if (data.mobile){
+        if (data.mobile == 'true'){
             window.location.href = link + params.join('&');
         }else{
             window.opener.location.href = link + params.join('&');
