@@ -26,8 +26,12 @@ require_once 'footer.php';
                 params.push(key + '=' + data[key]);
             }
         }
-        window.opener.location.href = link + params.join('&');
-        window.close();
+        if (data.mobile == 'true'){
+            window.location.href = link + params.join('&');
+        }else{
+            window.opener.location.href = link + params.join('&');
+            window.close();
+        }
     });
 
 

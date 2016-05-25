@@ -18,7 +18,47 @@ var server = require('http'),
     pg = require('pg'),
     sql = require('sql'),
     crypto = require('crypto'),
+    mongoose = require('mongoose'),
     __rooms = {};
+
+mongoose.connect('mongodb://localhost/evendata');
+var db = mongoose.connection;
+var user_model;
+db.on('error', console.error.bind(console, 'connection error:'));
+db.once('open', function () {
+    console.log('mongodb is connected');
+    var userSchema = new mongoose.Schema({
+        user_id: Number,
+        gender: String,
+        city: Number,
+        education: {
+            university: Number,
+            university_name: String,
+            faculty: Number,
+            faculty_name: String,
+            graduation: Number
+        },
+        occupation: {
+            style: String,
+            id: Number,
+            name: String
+        },
+        relation: Number,
+        personal: {
+            political: Number,
+            smoking: Number,
+            alcohol: Number
+        },
+        interests: String,
+        movies: String,
+        tv: String,
+        books: String,
+        games: String,
+        about: String
+    });
+    var user = mongoose.model('user', userSchema);
+    user_model = user;
+});
 
 process.on('uncaughtException', function (err) {
     logger.info('Caught exception: ' + err);
@@ -108,20 +148,21 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
     try {
         new CronJob('*/1 * * * *', function () {
-            if (config_index == 'prod'){
-                cropper.resizeNew({
-                    images: real_config.images,
-                    client: client
-                });
-                cropper.blurNew({
-                    images: real_config.images,
-                    client: client
-                });
+            cropper.resizeNew({
+                images: real_config.images,
+                client: client
+            });
+            cropper.blurNew({
+                images: real_config.images,
+                client: client
+            });
+
+            if (config_index == 'prod') {
                 var notifications = new Notifications(real_config, client, logger);
                 notifications.sendAutoNotifications();
                 notifications.sendUsersNotifications();
-            }
 
+            }
         }, null, true);
     } catch (ex) {
         logger.error(ex);
@@ -332,6 +373,41 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             }
 
                         }
+                        user_model.findOneAndUpdate(
+                            {'user_id': user.id},
+                            {
+                                user_id: user.id,
+                                gender: data.user_info.gender,
+                                city: data.user_info.city,
+                                education: {
+                                    university: data.user_info.university,
+                                    university_name: data.user_info.university_name,
+                                    faculty: data.user_info.faculty,
+                                    faculty_name: data.user_info.faculty_name,
+                                    graduation: data.user_info.graduation
+                                },
+                                occupation: {
+                                    style: data.user_info.occupation && data.user_info.occupation.type ? data.user_info.occupation.type : null,
+                                    id: data.user_info.occupation && data.user_info.occupation.type ? data.user_info.occupation.id : null,
+                                    name: data.user_info.occupation && data.user_info.occupation.type ? data.user_info.occupation.name : null
+                                },
+                                relation: data.user_info.relation,
+                                personal: {
+                                    political: data.user_info.personal.political,
+                                    smoking: data.user_info.personal.smoking,
+                                    alcohol: data.user_info.personal.alcohol
+                                },
+                                interests: data.user_info.interests,
+                                movies: data.user_info.movies,
+                                tv: data.user_info.tv,
+                                books: data.user_info.books,
+                                games: data.user_info.games,
+                                about: data.user_info.about
+                            },
+                            {upsert: true},
+                            function (err) {
+                                if (err) return handleError(err);
+                            });
 
 
                         var insertToken = function () {
@@ -453,7 +529,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             url: URLs[data.type.toUpperCase()].GET_USER_INFO,
                             query: {
                                 user_ids: data.user_id,
-                                fields: 'photo_50, sex, photo_100, photo_max, photo_max_orig, universities, education, activities, occupation, interests, music, movies, tv, books, games, about',
+                                fields: 'photo_50, sex, city, photo_100, photo_max, photo_max_orig, education, activities, occupation, relation, personal, interests, music, movies, tv, books, games, about',
                                 name_case: 'nom'
                             },
                             json: true,
@@ -870,4 +946,5 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
     io.listen(8080);
 
+    console.log('Started');
 });
