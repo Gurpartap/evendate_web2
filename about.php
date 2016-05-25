@@ -21,9 +21,7 @@ require_once('landing/header.php'); ?>
 		<div id="wrapper_about_us_1" class="wrapper_contacts_about_us">
 		<div>
 			<div>
-				<div class="about_us_content_text_container"><span class="who_use_text">Около года назад мы решили объединить все мероприятия Москвы в одном простом и удобном сервисе, где в соответствии с личными интересами можно подписаться на организаторов, добавлять их мероприятия себе в календарь, получать напоминания,
-				чтобы ничего не пропустить, а также видеть какие мероприятия посещают друзья.</span></div><div class="about_us_content_text_container"><span class="who_use_text">Итогом нашей работы стал сервис, представленный в виде веб-сайта, iOS- и Android-приложений.
-			Теперь есть возможность быть в курсе всех интересных вам событий - в родном городе, в любимой организации, в альма-матер, в любом другом месте.</span></div></div>
+				<div class="about_us_content_text_container"><span class="who_use_text">Год назад мы взялись за объединение мероприятий Москвы в одном сервисе, где по личными интересам можно подписаться на организаторов, добавлять мероприятия себе в календарь, получать напоминания, чтобы ничего не пропустить, и видеть какие мероприятия посещают друзья.</span></div><div class="about_us_content_text_container"><span class="who_use_text">Итогом работы стал сервис, представленный в виде веб-сайта, iOS- и Android-приложений. Теперь ты в курсе интересных событий – в родном городе, в любимой организации, в альма-матер, в любом другом месте.</span></div></div>
 		</div>
 		<!-- мы в соц сетях -->
 		<div class="all_network_container">
@@ -34,8 +32,7 @@ require_once('landing/header.php'); ?>
 		<!-- /мы в соц сетях -->
 		</div><div id="wrapper_about_us_2" class="wrapper_contacts_about_us">
 			<div class="team_all_photo_container">
-			<div><span class="who_use_text">Мы используем Evendate ежедневно, им пользуются наши друзья и друзья друзей. Мы будем рады видеть вас в числе наших пользователей.
-								 Верим, что вы полюбите Evendate - он упростит вам жизнь. Скачивайте и пробуйте!</span></div>
+			<div><span class="who_use_text">Мы используем Evendate ежедневно, им пользуются наши друзья и друзья друзей. Мы будем рады видеть тебя в числе пользователей. Верим, что полюбишь Evendate – он упростит вам жизнь. Скачивайте и пробуйте!Знакомьтесь с командой, которая это создает</span></div>
 			<div class="team_text_container"><span class="who_use_text">Знакомьтесь с командой, которая это все создает</span></div>
 
 			<div class="photos_container">
@@ -77,11 +74,8 @@ require_once('landing/header.php'); ?>
 			</div>
 			</div><div id="wrapper_about_us_3" class="wrapper_contacts_about_us">
 			<div class="team_all_photo_container">
-				<div><span class="who_use_text">Наши разработчики ежедневно дорабатывают продукт, чтобы сделать сервис интереснее.
-Если вы хотите приобщиться к нашей миссии и сделать Evendate чуточку лучше,
-то мы предлагаем воспользоваться нашим Beta REST API.
-<br><br>
-Заполните форму, и наша команда обязательно свяжется с Вами!</span></div>
+				<div><span class="who_use_text">Мы ежедневно дорабатываем продукт, чтобы сделать сервис лучше. Приобщись к нашей миссии и сделай Evendate еще круче – предлагаем воспользоваться REST API.<br><br>
+Заполните форму, и мы свяжемся с вами.</span></div>
 			</div>
 			<form class="form_support">
 				<div class="field_container"><input name="full_name" type="text" placeholder="ВАШЕ ИМЯ" required class="form_style"></div>
@@ -110,9 +104,9 @@ require_once('landing/header.php'); ?>
 	<div class="bot_part_modal"> <!-- Нижняя часть модалки -->
 		<div><span class="modal_bot_header_text">ВОЙДИТЕ ЧЕРЕЗ СОЦИАЛЬНУЮ СЕТЬ</span></div>
 		<div class="bot_part_modal"> <!-- картинки -->
-			<div id="vk_login_in_modal" class="modal_img_container"><img src="/landing/img/VKBig.png" class="modal_img"></div>
-			<div id="fb_login_in_modal" class="modal_img_container"><img src="/landing/img/FBBig.png" class="modal_img"></div>
-			<div id="g_login_in_modal" class="modal_img_container"><img src="/landing/img/G+Big.png" class="modal_img"></div>
+			<div id="vk_login_in_modal" class="modal_img_container"><img src="/landing/img/VKBig.png" class="modal_img" data-type="vk"></div>
+			<div id="fb_login_in_modal" class="modal_img_container"><img src="/landing/img/FBBig.png" class="modal_img" data-type="facebook"></div>
+			<div id="g_login_in_modal" class="modal_img_container"><img src="/landing/img/G+Big.png" class="modal_img" data-type="google"></div>
 		</div> <!-- /картинки -->
 	</div> <!-- /Нижняя часть модалки -->
 </div>
