@@ -61,20 +61,6 @@ module.exports = {
         return text;
     },
     composeFullInfoObject: function (data) {
-        switch (data.type) {
-            case 'facebook':
-            case 'vk':
-            {
-                return data;
-            }
-            case 'google':
-            {
-                data.user_info.first_name = data.user_info.name.givenName;
-                data.user_info.last_name = data.user_info.name.familyName;
-                data.user_info.photo_100 = data.user_info.image.url;
-                return data;
-            }
-        }
         data.user_info = setNullToUndefined(data.user_info, 'university');
         data.user_info = setNullToUndefined(data.user_info, 'university_name');
         data.user_info = setNullToUndefined(data.user_info, 'faculty');
@@ -87,6 +73,7 @@ module.exports = {
         data.user_info = setNullToUndefined(data.user_info, 'books');
         data.user_info = setNullToUndefined(data.user_info, 'games');
         data.user_info = setNullToUndefined(data.user_info, 'about');
+        data.user_info = setNullToUndefined(data.user_info, 'city');
 
         if (data.user_info.hasOwnProperty('occupation') == false){
             data.user_info.occupation = {};
@@ -102,6 +89,21 @@ module.exports = {
         data.user_info.personal = setNullToUndefined(data.user_info.personal, 'smoking');
         data.user_info.personal = setNullToUndefined(data.user_info.personal, 'alcohol');
 
+        
+        switch (data.type) {
+            case 'facebook':
+            case 'vk':
+            {
+                return data;
+            }
+            case 'google':
+            {
+                data.user_info.first_name = data.user_info.name.givenName;
+                data.user_info.last_name = data.user_info.name.familyName;
+                data.user_info.photo_100 = data.user_info.image.url;
+                return data;
+            }
+        }
     },
     downloadImageFromUrl: function (url, callback, save_path) {
         var _this = this;

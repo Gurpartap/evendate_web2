@@ -387,9 +387,9 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                     graduation: data.user_info.graduation
                                 },
                                 occupation: {
-                                    style: data.user_info.occupation.type,
-                                    id: data.user_info.occupation.id,
-                                    name: data.user_info.occupation.name
+                                    style: data.user_info.occupation && data.user_info.occupation.type ? data.user_info.occupation.type : null,
+                                    id: data.user_info.occupation && data.user_info.occupation.type ? data.user_info.occupation.id : null,
+                                    name: data.user_info.occupation && data.user_info.occupation.type ? data.user_info.occupation.name : null
                                 },
                                 relation: data.user_info.relation,
                                 personal: {
