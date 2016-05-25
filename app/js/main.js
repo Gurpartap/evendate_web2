@@ -402,6 +402,7 @@ function bindDropdown($parent){
 			$('body').off('mousedown.CloseDropdown');
 			$(document).off('keyup.CloseDropdown');
 			$dropbox.removeClass('-show');
+			$button.addClass('-dropdown_active');
 		};
 
 		if(data.hasOwnProperty('ddWidth')){
@@ -439,6 +440,7 @@ function bindDropdown($parent){
 		$dropbox.find('.CloseDropdown').on('click.CloseDropdown', $dropbox.closeDropbox);
 		$button.on('click.Dropdown', function(){
 			$dropbox.addClass('-show');
+			$button.addClass('-dropdown_active');
 			$('body').on('mousedown.CloseDropdown', function(e) {
 				if(!$(e.target).closest('.DropdownBox').length){
 					$dropbox.closeDropbox();
