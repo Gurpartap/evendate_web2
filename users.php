@@ -32,7 +32,7 @@ require_once('landing/header.php'); ?>
 
 
 		<div class="steps_user_container">
-			<div class="step_user_container"><img src="/landing/img/subscribe253X225.png" class="step_user_img"></div><div class="user_step_content_container">
+			<div class="step_user_container"><img src="/landing/img/subscribe253x225.png" class="step_user_img"></div><div class="user_step_content_container">
 			<div><span class="step_text">ПОДПИСЫВАЙСЯ</span></div>
 			<div class="step_user_text_bot_container"><span class="step_user_text">НАХОДИ СВОИ ЛЮБИМЫЕ МЕСТА И ПОДПИСЫВАЙСЯ НА ОРГАНИЗАТОРОВ</span></div>
 		</div>
@@ -86,7 +86,7 @@ require_once('landing/header.php'); ?>
 		<footer>
 			<div class="line_blue_and_pink"></div>
 			<div class="footer_text_left">
-				<div class="footer_text_container"><a href="contacts.php#contacts" class="footer_text">КОНТАКТЫ</a></div><div class="footer_text_container"><a href="about.php#organizers" class="footer_text" id="org_footer">РАЗРАБОТЧИКАМ</a></div><div class="footer_text_container"><a href="contacts.html#support" class="footer_text">ПОДДЕРЖКА</a></div>
+				<div class="footer_text_container"><a href="contacts.php#contacts" class="footer_text">КОНТАКТЫ</a></div><div class="footer_text_container"><a href="about.php#organizers" class="footer_text" id="org_footer">РАЗРАБОТЧИКАМ</a></div><div class="footer_text_container"><a href="contacts.php#support" class="footer_text">ПОДДЕРЖКА</a></div>
 			</div><div class="footer_text_container footer_text_container_sign"><span class="footer_text_sign">Evendate © 2016</span></div>
 		</footer>
 		</section>
@@ -99,9 +99,9 @@ require_once('landing/header.php'); ?>
 	<div class="bot_part_modal"> <!-- Нижняя часть модалки -->
 		<div><span class="modal_bot_header_text">ВОЙДИТЕ ЧЕРЕЗ СОЦИАЛЬНУЮ СЕТЬ</span></div>
 		<div class="bot_part_modal"> <!-- картинки -->
-			<div id="vk_login_in_modal" class="modal_img_container"><img src="/landing/img/VKBig.png" class="modal_img"></div>
-			<div id="fb_login_in_modal" class="modal_img_container"><img src="/landing/img/FBBig.png" class="modal_img"></div>
-			<div id="g_login_in_modal" class="modal_img_container"><img src="/landing/img/G+Big.png" class="modal_img"></div>
+			<div id="vk_login_in_modal" class="modal_img_container"><img src="/landing/img/VKBig.png" class="modal_img" data-type="vk"></div>
+			<div id="fb_login_in_modal" class="modal_img_container"><img src="/landing/img/FBBig.png" class="modal_img" data-type="facebook"></div>
+			<div id="g_login_in_modal" class="modal_img_container"><img src="/landing/img/G+Big.png" class="modal_img" data-type="google"></div>
 		</div> <!-- /картинки -->
 	</div> <!-- /Нижняя часть модалки -->
 </div>
