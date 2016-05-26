@@ -3,7 +3,7 @@ $title = 'Пользователям';
 require_once('landing/header.php'); ?>
 <body>
 <header class="header_evendate"><div class="logo"><a title="Перейти на главную" href="index.php"><img src="/landing/img/logo_500.png" class="logo_size"><div class="logo_text_style_container"><span class="logo_text_style">Evendate</span></div></a></div><div class="menu_all_item_container">
-	<div class="menu_item_container"><a href="index.php" class="menu_item_text">ГЛАВНАЯ</a></div><div class="menu_item_container"><span class="menu_item_text menu_item_container_active">ПОЛЬЗОВАТЕЛИ</span><div class="header_menu_line"></div></div><div class="menu_item_container "><a href="organizations.php" class="menu_item_text">ОРГАНИЗАТОРАМ</a></div><div class="menu_item_container "><a href="about.php#about" class="menu_item_text">О НАС</a></div>
+	<div class="menu_item_container"><a href="index.php" class="menu_item_text">ГЛАВНАЯ</a></div><div class="menu_item_container"><span class="menu_item_text menu_item_container_active">ПОЛЬЗОВАТЕЛЯМ</span><div class="header_menu_line"></div></div><div class="menu_item_container "><a href="organizations.php" class="menu_item_text">ОРГАНИЗАТОРАМ</a></div><div class="menu_item_container "><a href="about.php#about" class="menu_item_text">О НАС</a></div>
 </div><div class="header_button_container"><button id="go" class="header_button" type="button"><span class="header_button_text">ВОЙТИ</span></button></div></header>
 
 <div class="position_main_part">
@@ -32,7 +32,7 @@ require_once('landing/header.php'); ?>
 
 
 		<div class="steps_user_container">
-			<div class="step_user_container"><img src="/landing/img/4444.png" class="step_user_img"></div><div class="user_step_content_container">
+			<div class="step_user_container"><img src="/landing/img/subscribe253X225.png" class="step_user_img"></div><div class="user_step_content_container">
 			<div><span class="step_text">ПОДПИСЫВАЙСЯ</span></div>
 			<div class="step_user_text_bot_container"><span class="step_user_text">НАХОДИ СВОИ ЛЮБИМЫЕ МЕСТА И ПОДПИСЫВАЙСЯ НА ОРГАНИЗАТОРОВ</span></div>
 		</div>
@@ -43,12 +43,12 @@ require_once('landing/header.php'); ?>
 			<div class="user_step_content_container user_step_content_container_2">
 			<div><span class="step_text">ДОБАВЛЯЙ В ИЗБРАННОЕ</span></div>
 			<div class="step_user_text_bot_container"><span class="step_user_text">ДОБАВЛЯЙ В ИЗБРАННОЕ МЕРОПРИЯТИЯ И НИКОГДА НЕ ПРОПУСКАЙ ИХ</span></div>
-		</div><div class="step_user_container"><img src="/landing/img/5555.png" class="step_user_img"></div>
+		</div><div class="step_user_container"><img src="/landing/img/Liked253x225.png" class="step_user_img"></div>
 		</div>
 		<div class="line_blue_and_pink"></div>
 
 		<div class="steps_user_container">
-			<div class="step_user_container"><img src="/landing/img/6666.png" class="step_user_img"></div><div class="user_step_content_container">
+			<div class="step_user_container"><img src="/landing/img/notification253x225.png" class="step_user_img"></div><div class="user_step_content_container">
 			<div><span class="step_text">ПОЛУЧАЙ УВЕДОМЛЕНИЯ</span></div>
 			<div class="step_user_text_bot_container"><span class="step_user_text">ПОЛУЧАЙ УВЕДОМЛЕНИЯ ОБ ИЗБРАНЫХ СОБЫТИЯХ </span></div>
 		</div>
@@ -59,12 +59,12 @@ require_once('landing/header.php'); ?>
 			<div class="user_step_content_container user_step_content_container_2">
 			<div><span class="step_text">СЛЕДИ ЗА ДРУЗЬЯМИ</span></div>
 			<div class="step_user_text_bot_container"><span class="step_user_text">ОТСЛЕЖИВАЙ ИНТЕРЕСНЫЕ ДРУЗЬЯМ МЕРОПРИЯТИЯ</span></div>
-		</div><div class="step_user_container"><img src="/landing/img/7777.png" class="step_user_img"></div>
+		</div><div class="step_user_container"><img src="/landing/img/follow.png" class="step_user_img"></div>
 		</div>
 		<div class="line_blue_and_pink"></div>
 
 		<div class="steps_user_container">
-			<div class="step_user_container"><img src="/landing/img/8888.png" class="step_user_img"></div><div class="user_step_content_container">
+			<div class="step_user_container"><img src="/landing/img/recommendations.png" class="step_user_img"></div><div class="user_step_content_container">
 				<div><span class="step_text">ПОЛУЧАЙ РЕКОМЕНДАЦИИ</span></div>
 				<div class="step_user_text_bot_container"><span class="step_user_text">ПОЛУЧАЙ РЕКОМЕНДАЦИИ НА ОСНОВЕ СВОИХ ИНТЕРЕСОВ  </span></div>
 			</div>

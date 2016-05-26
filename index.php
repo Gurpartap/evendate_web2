@@ -3,7 +3,7 @@ $title = 'Evendate';
 require_once('landing/header.php'); ?>
 <body>
 	<header class="header_evendate"><div class="logo"><a title="Перейти на главную" href="index.php"><img src="/landing/img/logo_500.png" class="logo_size"><div class="logo_text_style_container"><span class="logo_text_style">Evendate</span></div></a></div><div class="menu_all_item_container">
-		<div class="menu_item_container"><span class="menu_item_text menu_item_container_active">ГЛАВНАЯ</span><div class="header_menu_line"></div></div><div class="menu_item_container "><a href="users.php" class="menu_item_text">ПОЛЬЗОВАТЕЛИ</a></div><div class="menu_item_container "><a href="organizations.php" class="menu_item_text">ОРГАНИЗАТОРАМ</a></div><div class="menu_item_container "><a href="about.php#about" class="menu_item_text">О НАС</a></div>
+		<div class="menu_item_container"><span class="menu_item_text menu_item_container_active">ГЛАВНАЯ</span><div class="header_menu_line"></div></div><div class="menu_item_container "><a href="users.php" class="menu_item_text">ПОЛЬЗОВАТЕЛЯМ</a></div><div class="menu_item_container "><a href="organizations.php" class="menu_item_text">ОРГАНИЗАТОРАМ</a></div><div class="menu_item_container "><a href="about.php#about" class="menu_item_text">О НАС</a></div>
 	</div><div class="header_button_container"><button id="go" class="header_button" type="button"><span class="header_button_text">ВОЙТИ</span></button></div></header>
 
 
@@ -27,7 +27,7 @@ require_once('landing/header.php'); ?>
 			<div class="section_stay_in_touch_text_bottom_container"><span class="section_stay_in_touch_text_bottom">Подпишись на интересующие тебя источники, сформируй уникальную ленту новостей и с легкостью отслеживай события, которые происходят вокруг тебя!</span></div>
 		</section>
 		<section class="section_steps">
-			<div class="step_container"><div><img src="/landing/img/1111.png" class="step_img"></div><div class="step_text_container"><span class="step_text">ПОДПИСЫВАЙСЯ НА ОРГАНИЗАТОРОВ</span></div></div><div class="step_container step_container_center"><div><img src="/landing/img/2222.png" class="step_img"></div><div class="step_text_container"><span class="step_text">ДОБАВЛЯЙ СОБЫТИЯ В ИЗБРАННОЕ</span></div></div><div class="step_container"><div><img src="/landing/img/3333.png" class="step_img"></div><div class="step_text_container"><span class="step_text">ПОЛУЧАЙ УВЕДОМЛЕНИЯ</span></div></div>
+			<div class="step_container"><div><img src="/landing/img/subscribe.png" class="step_img"></div><div class="step_text_container"><span class="step_text">ПОДПИСЫВАЙСЯ НА ОРГАНИЗАТОРОВ</span></div></div><div class="step_container step_container_center"><div><img src="/landing/img/Liked.png" class="step_img"></div><div class="step_text_container"><span class="step_text">ДОБАВЛЯЙ СОБЫТИЯ В ИЗБРАННОЕ</span></div></div><div class="step_container"><div><img src="/landing/img/notice.png" class="step_img"></div><div class="step_text_container"><span class="step_text">ПОЛУЧАЙ УВЕДОМЛЕНИЯ</span></div></div>
 		</section>
 	</article>
 

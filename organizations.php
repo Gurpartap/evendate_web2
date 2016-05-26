@@ -3,7 +3,7 @@ $title = 'Организаторам';
 require_once('landing/header.php'); ?>
 <body>
 <header class="header_evendate"><div class="logo"><a title="Перейти на главную" href="index.php"><img src="/landing/img/logo_500.png" class="logo_size"><div class="logo_text_style_container"><span class="logo_text_style">Evendate</span></div></a></div><div class="menu_all_item_container">
-	<div class="menu_item_container"><a href="index.php" class="menu_item_text">ГЛАВНАЯ</a></div><div class="menu_item_container"><a href="users.php" class="menu_item_text">ПОЛЬЗОВАТЕЛИ</a></div><div class="menu_item_container "><span class="menu_item_text menu_item_container_active">ОРГАНИЗАТОРАМ</span><div class="header_menu_line"></div></div><div class="menu_item_container "><a href="about.php#about" class="menu_item_text">О НАС</a></div>
+	<div class="menu_item_container"><a href="index.php" class="menu_item_text">ГЛАВНАЯ</a></div><div class="menu_item_container"><a href="users.php" class="menu_item_text">ПОЛЬЗОВАТЕЛЯМ</a></div><div class="menu_item_container "><span class="menu_item_text menu_item_container_active">ОРГАНИЗАТОРАМ</span><div class="header_menu_line"></div></div><div class="menu_item_container "><a href="about.php#about" class="menu_item_text">О НАС</a></div>
 </div><div class="header_button_container"><button id="go" class="header_button" type="button"><span class="header_button_text">ВОЙТИ</span></button></div></header>
 
 <div class="position_main_part">
@@ -29,7 +29,7 @@ require_once('landing/header.php'); ?>
 	<section class="fon_users_section">
 
 		<div class="steps_user_container">
-			<div class="step_user_container"><img src="/landing/img/9999.png" class="step_user_img"></div><div class="user_step_content_container">
+			<div class="step_user_container"><img src="/landing/img/platform.png" class="step_user_img"></div><div class="user_step_content_container">
 			<div><span class="step_text">ПЛОЩАДКА ДЛЯ СОБЫТИЙ</span></div>
 			<div class="step_user_text_bot_container"><span class="step_user_text">EVENDATE ПОЗВОЛЯЕТ БЫСТРО И УДОБНО ДОБАВЛЯТЬ СОБЫТИЯ. НАШ СЕРВИС ПРЕДОСТАВЛЯЕТ ВОЗМОЖНОСТЬ ИСПОЛЬЗОВАНИЯ КРОССПОСТИНГА.</span></div>
 		</div>
@@ -41,12 +41,12 @@ require_once('landing/header.php'); ?>
 				<div><span class="step_text">АУДИТОРИЯ</span></div>
 				<div class="step_user_text_bot_container"><span class="step_user_text">EVENDATE - САМЫЙ ПРОСТОЙ СПОСОБ ПРИВЛЕЧЬ И УДЕРЖАТЬ НУЖНУЮ АУДИТОРИЮ.
 НАШИМ ПРИЛОЖЕНИЕМ ПОЛЬЗУЮТСЯ ТЫСЯЧИ СТУДЕТНОВ МОСКВЫ.</span></div>
-			</div><div class="step_user_container_2"><img src="/landing/img/1010.png" class="step_user_img"></div>
+			</div><div class="step_user_container_2"><img src="/landing/img/audience.png" class="step_user_img"></div>
 		</div>
 		<div class="line_blue_and_pink"></div>
 
 		<div class="steps_user_container">
-			<div class="step_user_container"><img src="/landing/img/1212.png" class="step_user_img"></div><div class="user_step_content_container">
+			<div class="step_user_container"><img src="/landing/img/statistics.png" class="step_user_img"></div><div class="user_step_content_container">
 			<div><span class="step_text">СТАТИСТИКА И АНАЛИТИКА</span></div>
 			<div class="step_user_text_bot_container"><span class="step_user_text">ВОЗМОЖНОСТИ EVENDATE ОБШИРНЫ - ВЫ, КАК ОРГАНИЗАТОР, ВСЕГДА СМОЖЕТЕ ПОЛУЧИТЬ СТАТИСТИКУ ПРОВЕДЕННЫХ СОБЫТИЙ И АНАЛИЗИРОВАТЬ ПОЛУЧЕННЫЕ ДАННЫЕ. </span></div>
 		</div>
