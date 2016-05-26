@@ -6,6 +6,13 @@ var mime = require('mime-types'),
     request = require('request'),
     fs = require('fs');
 
+function setNullToUndefined(obj, key){
+    if (obj.hasOwnProperty(key) == false){
+        obj[key] = null;
+    }
+    return obj;
+}
+
 module.exports = {
     replaceTags: function (text, object) {
         for (var key in object) {
@@ -54,6 +61,35 @@ module.exports = {
         return text;
     },
     composeFullInfoObject: function (data) {
+        data.user_info = setNullToUndefined(data.user_info, 'university');
+        data.user_info = setNullToUndefined(data.user_info, 'university_name');
+        data.user_info = setNullToUndefined(data.user_info, 'faculty');
+        data.user_info = setNullToUndefined(data.user_info, 'faculty_name');
+        data.user_info = setNullToUndefined(data.user_info, 'graduation');
+        data.user_info = setNullToUndefined(data.user_info, 'relation');
+        data.user_info = setNullToUndefined(data.user_info, 'interests');
+        data.user_info = setNullToUndefined(data.user_info, 'movies');
+        data.user_info = setNullToUndefined(data.user_info, 'tv');
+        data.user_info = setNullToUndefined(data.user_info, 'books');
+        data.user_info = setNullToUndefined(data.user_info, 'games');
+        data.user_info = setNullToUndefined(data.user_info, 'about');
+        data.user_info = setNullToUndefined(data.user_info, 'city');
+
+        if (data.user_info.hasOwnProperty('occupation') == false){
+            data.user_info.occupation = {};
+        }
+        data.user_info.occupation = setNullToUndefined(data.user_info.occupation, 'type');
+        data.user_info.occupation = setNullToUndefined(data.user_info.occupation, 'id');
+        data.user_info.occupation = setNullToUndefined(data.user_info.occupation, 'name');
+
+        if (data.user_info.hasOwnProperty('personal') == false){
+            data.user_info.personal = {};
+        }
+        data.user_info.personal = setNullToUndefined(data.user_info.personal, 'political');
+        data.user_info.personal = setNullToUndefined(data.user_info.personal, 'smoking');
+        data.user_info.personal = setNullToUndefined(data.user_info.personal, 'alcohol');
+
+        
         switch (data.type) {
             case 'facebook':
             case 'vk':

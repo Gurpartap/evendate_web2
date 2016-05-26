@@ -31,23 +31,12 @@ $(document).ready(function() {
 });
 
 function modalOpenLogin(event) {
-    debugger; //catch bugs
     openAuthLink($(event.target).data('type'));
-    event.preventDefault();
-    $('#modal_form').css('display', 'none');
-    $('#modal_form_login')
-        .css('display', 'block')
-        .animate({opacity: 1, top: '50%'}, 200);
-    openAuthLink($(event.target).data('type'));
+    event.preventDefault(); // выключaем стaндaртную рoль элементa (хз, что это)
 }
 
 function modalOpenLoginOutButton(event){
-	$('#overlay.overlay').fadeIn(400, // show overlay
-		function(){
-			$('#modal_form_login')
-				.css('display', 'block') // show modal window
-				.animate({opacity: 1, top: '50%'}, 200); // change opacity 1
-		});
+    openAuthLink($(event.target).data('type'));
 }
 
 function modalCloseLogin(){ // catch click in X or overlay
