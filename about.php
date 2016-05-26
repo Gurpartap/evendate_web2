@@ -4,7 +4,7 @@ require_once('landing/header.php'); ?>
 <body>
 <header class="header_evendate"><div class="logo"><a title="Перейти на главную" href="index.php"><img src="/landing/img/logo_500.png" class="logo_size"><div class="logo_text_style_container"><span class="logo_text_style">Evendate</span></div></a></div><div class="menu_all_item_container">
 	<div class="menu_item_container"><a href="index.php" class="menu_item_text">ГЛАВНАЯ</a></div><div class="menu_item_container"><a href="users.php" class="menu_item_text">ПОЛЬЗОВАТЕЛИ</a></div><div class="menu_item_container "><a href="organizations.php" class="menu_item_text">ОРГАНИЗАТОРАМ</a></div><div class="menu_item_container "><span class="menu_item_text menu_item_container_active">О НАС</span><div class="header_menu_line"></div></div>
-</div><div class="header_button_container"><button id="go" class="header_button"><span class="header_button_text">ВОЙТИ</span></button></div></header>
+</div><div class="header_button_container"><button id="go" class="header_button" type="button"><span class="header_button_text">ВОЙТИ</span></button></div></header>
 
 <div class="position_main_part">
 <div class="fon_img_users"></div> <!-- Картинка -->

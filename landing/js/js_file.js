@@ -1,4 +1,4 @@
-function support_slider() {
+function supportSlider() {
 	$('#contacts_and_sup_slider').addClass('contacts_container_support').height($('#wrapper_support').height());
 	$('#support_page').addClass('about_us_text_header_active');
 	$('#support_footer').addClass('footer_text_active');
@@ -16,18 +16,18 @@ function contacts_slider() {
 	location.hash = '#contacts';
 }
 
-$('#support_page').on('click', support_slider);
-$('#support_footer').on('click', support_slider);
+$('#support_page').on('click', supportSlider);
+$('#support_footer').on('click', supportSlider);
 $('#contacts_page').on('click', contacts_slider);
 $('#contacts_footer').on('click', contacts_slider);
 if(location.hash == '#support'){
-	support_slider();
+	supportSlider();
 }
 if(location.hash == '#contacts'){
 	contacts_slider();
 }
 
-function team_slider () {
+function teamSlider () {
 	$('#team_page').addClass('about_us_text_header_active');
 	$('#about_evendate').removeClass('about_us_text_header_active');
 	$('#organizers_page').removeClass('about_us_text_header_active');
@@ -37,7 +37,7 @@ function team_slider () {
 
 }
 
-function organizers_slider () {
+function organizersSlider () {
 	$('#organizers_page').addClass('about_us_text_header_active');
 	$('#organizers_footer').addClass('about_us_text_header_active');
 	$('#about_evendate').removeClass('about_us_text_header_active');
@@ -46,7 +46,7 @@ function organizers_slider () {
 	location.hash = '#organizers';
 }
 
-function about_evendate_slider () {
+function aboutEvendateSlider () {
 	$('#about_evendate').addClass('about_us_text_header_active');
 	$('#team_page').removeClass('about_us_text_header_active');
 	$('#organizers_page').removeClass('about_us_text_header_active');
@@ -54,25 +54,25 @@ function about_evendate_slider () {
 	location.hash = '#about';
 }
 
-$('#team_page').on('click', team_slider);
-$('#organizers_page').on('click', organizers_slider);
-$('#organizers_footer').on('click', organizers_slider);
-$('#about_evendate').on('click', about_evendate_slider);
+$('#team_page').on('click', teamSlider);
+$('#organizers_page').on('click', organizersSlider);
+$('#organizers_footer').on('click', organizersSlider);
+$('#about_evendate').on('click', aboutEvendateSlider);
 if(location.hash == '#organizers'){
-	organizers_slider();
+	organizersSlider();
 }
 if(location.hash == '#about'){
-	about_evendate_slider();
+	aboutEvendateSlider();
 }
 if(location.hash == '#team'){
-	team_slider();
+	teamSlider();
 }
 
-function join_page () {
+function joinPage () {
 	$('body').animate({scrollTop: $('#join_form').position().top}, '600', 'swing');
 }
 
-$('#join_button').on('click', join_page); // скролл
+$('#join_button').on('click', joinPage); // scrolling
 
 
 var o = $(window);

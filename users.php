@@ -4,7 +4,7 @@ require_once('landing/header.php'); ?>
 <body>
 <header class="header_evendate"><div class="logo"><a title="Перейти на главную" href="index.php"><img src="/landing/img/logo_500.png" class="logo_size"><div class="logo_text_style_container"><span class="logo_text_style">Evendate</span></div></a></div><div class="menu_all_item_container">
 	<div class="menu_item_container"><a href="index.php" class="menu_item_text">ГЛАВНАЯ</a></div><div class="menu_item_container"><span class="menu_item_text menu_item_container_active">ПОЛЬЗОВАТЕЛИ</span><div class="header_menu_line"></div></div><div class="menu_item_container "><a href="organizations.php" class="menu_item_text">ОРГАНИЗАТОРАМ</a></div><div class="menu_item_container "><a href="about.php#about" class="menu_item_text">О НАС</a></div>
-</div><div class="header_button_container"><button id="go" class="header_button"><span class="header_button_text">ВОЙТИ</span></button></div></header>
+</div><div class="header_button_container"><button id="go" class="header_button" type="button"><span class="header_button_text">ВОЙТИ</span></button></div></header>
 
 <div class="position_main_part">
 <div class="fon_img_main_page users_mini">
@@ -14,7 +14,7 @@ require_once('landing/header.php'); ?>
 			<div class="fon_text_bottom_container"><span class="fon_text_bottom">Используя Evendate, ты сможешь собрать все любимые места в собственную персонализированную ленту</span></div>
 		</div>
 		<div class="button_users">
-			<div class="button_fon_img_users_container"><button id="gogo" class="button_fon_img_users"><span class="text_button_users_top">ВОЙТИ</span></button></div>
+			<div class="button_fon_img_users_container"><button id="gogo" class="button_fon_img_users" type="button"><span class="text_button_users_top">ВОЙТИ</span></button></div>
 			<div class="button_fon_img_users_container"><button class="button_fon_img_users button_fon_img_users_bot"><span class="text_button_users_bottom">ВОЙТИ БЕЗ АВТОРИЗАЦИИ</span></button></div>
 		</div>
 	</div>
