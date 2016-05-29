@@ -42,6 +42,32 @@ module.exports = {
             'group_id'
         ]
     }),
+    users_interests: sql.define({
+        name: 'users_interests',
+        columns: [
+            'id',
+            'user_id',
+            'city',
+            'education_university',
+            'education_university_name',
+            'education_faculty',
+            'education_faculty_name',
+            'education_graduation',
+            'occupation_id',
+            'occupation_name',
+            'relation',
+            'personal_political',
+            'personal_smoking',
+            'personal_alcohol',
+            'interests',
+            'movies',
+            'tv',
+            'books',
+            'games',
+            'network_type',
+            'about'
+        ]
+    }),
     vk_groups: sql.define({
         name: 'vk_groups',
         columns: [

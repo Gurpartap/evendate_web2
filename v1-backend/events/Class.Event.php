@@ -24,6 +24,8 @@ class Event extends AbstractEntity
     const TAGS_FIELD_NAME = 'tags';
     const DATES_FIELD_NAME = 'dates';
     const FAVORED_USERS_FIELD_NAME = 'favored';
+    const FAVORED_FRIENDS_COUNT_FIELD_NAME = 'favored_friends_count';
+    const ACTUALITY_FIELD_NAME = 'actuality';
     const NOTIFICATIONS_FIELD_NAME = 'notifications';
     const CAN_EDIT_FIELD_NAME = 'can_edit';
     const RANDOM_FIELD_NAME = 'random';
@@ -99,7 +101,27 @@ class Event extends AbstractEntity
 			WHERE ve.id = view_events.id) AS random',
         self::CAN_EDIT_FIELD_NAME => '(SELECT id IS NOT NULL
 			FROM view_editors
-			WHERE id = :user_id AND organization_id = view_events.organization_id) IS NOT NULL AS can_edit'
+			WHERE id = :user_id AND organization_id = view_events.organization_id) IS NOT NULL AS can_edit',
+        self::FAVORED_FRIENDS_COUNT_FIELD_NAME => '(SELECT COUNT(id) :: INT AS favored_friends_count
+            FROM favorite_events
+                WHERE status = TRUE 
+                    AND event_id = view_events.id 
+                    AND favorite_events.user_id IN (SELECT friend_id FROM view_friends WHERE user_id = :user_id)) AS ' . self::FAVORED_FRIENDS_COUNT_FIELD_NAME,
+        self::ACTUALITY_FIELD_NAME => '(SELECT 1 / (CASE
+                                              WHEN (ve.registration_required = TRUE AND ve.registration_till < DATE_PART(\'epoch\', NOW()))
+                                              THEN 1000
+                                              ELSE (SELECT
+                                              CASE WHEN COUNT(id)::INT = 0 THEN 1000 ELSE COUNT(id)::INT END
+                                              FROM events_dates
+                                              WHERE
+                                              events_dates.event_id = ve.id
+                                              AND event_date > NOW()
+                                              AND event_date < (NOW() + INTERVAL \'10 days\')
+                                              AND status = TRUE
+                                              )
+                                              END)::REAL * 10
+                                            FROM view_events AS ve
+                                            WHERE ve.id = view_events.id)::REAL AS ' . self::ACTUALITY_FIELD_NAME
     );
     protected $description;
     protected $location;

@@ -18,47 +18,7 @@ var server = require('http'),
     pg = require('pg'),
     sql = require('sql'),
     crypto = require('crypto'),
-    mongoose = require('mongoose'),
     __rooms = {};
-
-mongoose.connect('mongodb://localhost/evendata');
-var db = mongoose.connection;
-var user_model;
-db.on('error', console.error.bind(console, 'connection error:'));
-db.once('open', function () {
-    console.log('mongodb is connected');
-    var userSchema = new mongoose.Schema({
-        user_id: Number,
-        gender: String,
-        city: Number,
-        education: {
-            university: Number,
-            university_name: String,
-            faculty: Number,
-            faculty_name: String,
-            graduation: Number
-        },
-        occupation: {
-            style: String,
-            id: Number,
-            name: String
-        },
-        relation: Number,
-        personal: {
-            political: Number,
-            smoking: Number,
-            alcohol: Number
-        },
-        interests: String,
-        movies: String,
-        tv: String,
-        books: String,
-        games: String,
-        about: String
-    });
-    var user = mongoose.model('user', userSchema);
-    user_model = user;
-});
 
 process.on('uncaughtException', function (err) {
     logger.info('Caught exception: ' + err);
@@ -328,6 +288,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             {
                                 var vk_data = {
                                     uid: data.user_info.user_id,
+                                    user_id: user.id,
                                     access_token: data.oauth_data.access_token,
                                     expires_in: data.oauth_data.expires_in,
                                     secret: null,
@@ -345,6 +306,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             case 'google':
                             {
                                 var google_data = {
+                                    user_id: user.id,
                                     access_token: data.oauth_data.access_token,
                                     expires_in: data.oauth_data.expires_in,
                                     etag: data.user_info.etag,
@@ -360,6 +322,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             case 'facebook':
                             {
                                 var facebook_data = {
+                                    user_id: user.id,
                                     uid: data.user_info.id,
                                     access_token: data.oauth_data.access_token,
                                     expires_in: data.oauth_data.expires_in
@@ -373,43 +336,54 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             }
 
                         }
-                        user_model.findOneAndUpdate(
-                            {'user_id': user.id},
-                            {
-                                user_id: user.id,
-                                gender: data.user_info.gender,
-                                city: data.user_info.city,
-                                education: {
-                                    university: data.user_info.university,
-                                    university_name: data.user_info.university_name,
-                                    faculty: data.user_info.faculty,
-                                    faculty_name: data.user_info.faculty_name,
-                                    graduation: data.user_info.graduation
-                                },
-                                occupation: {
-                                    style: data.user_info.occupation && data.user_info.occupation.type ? data.user_info.occupation.type : null,
-                                    id: data.user_info.occupation && data.user_info.occupation.type ? data.user_info.occupation.id : null,
-                                    name: data.user_info.occupation && data.user_info.occupation.type ? data.user_info.occupation.name : null
-                                },
-                                relation: data.user_info.relation,
-                                personal: {
-                                    political: data.user_info.personal.political,
-                                    smoking: data.user_info.personal.smoking,
-                                    alcohol: data.user_info.personal.alcohol
-                                },
-                                interests: data.user_info.interests,
-                                movies: data.user_info.movies,
-                                tv: data.user_info.tv,
-                                books: data.user_info.books,
-                                games: data.user_info.games,
-                                about: data.user_info.about
-                            },
-                            {upsert: true},
-                            function (err) {
-                                if (err) return handleError(err);
+
+                        var q_ins_interests = Entities.users_interests.insert({
+                            user_id: user.id,
+                            city: data.user_info.city,
+                            education_university: data.user_info.university,
+                            education_university_name: data.user_info.university_name,
+                            education_faculty: data.user_info.faculty,
+                            education_faculty_name: data.user_info.faculty_name,
+                            education_graduation: data.user_info.graduation,
+                            occupation_id: data.user_info.occupation.id,
+                            occupation_name: data.user_info.occupation.name,
+                            relation: data.user_info.relation,
+                            personal_political: data.user_info.personal.political,
+                            personal_smoking: data.user_info.personal.smoking,
+                            personal_alcohol: data.user_info.personal.alcohol,
+                            interests: data.user_info.interests,
+                            movies: data.user_info.movies,
+                            tv: data.user_info.tv,
+                            books: data.user_info.books,
+                            games: data.user_info.games,
+                            about: data.user_info.about,
+                            network_type: data.type
+                        }).toQuery();
+
+                        client.query(q_ins_interests.text + ' ON CONFLICT (user_id, network_type) DO UPDATE SET ' +
+                            ' city = $2, ' +
+                            ' education_university = $3, ' +
+                            ' education_university_name = $4, ' +
+                            ' education_faculty = $5, ' +
+                            ' education_faculty_name = $6, ' +
+                            ' education_graduation = $7, ' +
+                            ' occupation_id = $8, ' +
+                            ' occupation_name = $9, ' +
+                            ' relation = $10, ' +
+                            ' personal_political = $11, ' +
+                            ' personal_smoking = $12, ' +
+                            ' personal_alcohol = $13, ' +
+                            ' interests = $14, ' +
+                            ' movies = $15, ' +
+                            ' tv = $16, ' +
+                            ' books = $17, ' +
+                            ' games = $18, ' +
+                            ' about = $19'
+                        , q_ins_interests.values, function(err, result){
+                                if (handleError(err)) return;
+                                console.log(result);
                             });
-
-
+                        
                         var insertToken = function () {
                             var token_type = (data.oauth_data.hasOwnProperty('mobile') && data.oauth_data.mobile == 'true') ? 'mobile' : 'bearer',
                                 token_time = token_type == 'mobile' ? moment().add(1, 'months').unix() : moment().add(10, 'days').unix(),
@@ -527,6 +501,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     {
                         req_params = {
                             url: URLs[data.type.toUpperCase()].GET_USER_INFO,
+                            timeout: 5000,
                             query: {
                                 user_ids: data.user_id,
                                 fields: 'photo_50, sex, city, photo_100, photo_max, photo_max_orig, education, activities, occupation, relation, personal, interests, music, movies, tv, books, games, about',
@@ -543,6 +518,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     {
                         req_params = {
                             url: URLs[data.type.toUpperCase()].GET_USER_INFO,
+                            timeout: 5000,
                             json: true,
                             headers: {
                                 'Authorization': 'Bearer ' + data.access_token
@@ -554,6 +530,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     {
                         req_params = {
                             url: URLs[data.type.toUpperCase()].GET_USER_INFO,
+                            timeout: 5000,
                             query: {
                                 access_token: data.access_token,
                                 fields: 'first_name,last_name,email,middle_name,picture,gender,about,education,books,events,movies,groups'
@@ -564,8 +541,10 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     }
                 }
 
+                console.log('getting users info', req_params);
                 rest.get(req_params.url, req_params)
                     .on('complete', function (result) {
+                        console.log('getting users info - DONE');
                         if (result instanceof Error) {
                             handleError(result);
                             callback(result, null);
@@ -593,13 +572,16 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 if (socket.retry_count > 5) {
                     socket.emit('error.retry');
                 } else {
+                    console.log(socket.retry_count);
                     socket.retry_count++;
                     getUsersInfo(oauth_data, function (user_info_error, user_info) {
+
+                        console.log(user_info);
 
                         if (handleError(user_info_error)) {
                             setTimeout(function () {
                                 authTry(oauth_data);
-                            }, 2000 * socket.retry_count);
+                            }, 500 * socket.retry_count);
                             return;
                         }
 
@@ -607,7 +589,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             if (user_info.hasOwnProperty('response') == false || user_info.response.length == 0) {
                                 setTimeout(function () {
                                     authTry(oauth_data);
-                                }, 2000 * socket.retry_count);
+                                }, 500 * socket.retry_count);
                                 return;
                             }
                             user_info = user_info.response[0];
@@ -615,13 +597,14 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         user_info.type = oauth_data.type;
                         user_info.access_token = oauth_data.access_token;
                         oauth_data.email = oauth_data.email ? oauth_data.email : user_info.email;
-
+                        console.log('getting friends list start');
                         getFriendsList(user_info, function (friends_error, friends_data) {
 
+                            console.log('getting list done');
                             if (handleError(friends_error)) {
                                 setTimeout(function () {
                                     authTry(oauth_data);
-                                }, 2000 * retry_count);
+                                }, 500 * retry_count);
                                 return;
                             }
                             if (oauth_data.type == 'vk') {
@@ -633,18 +616,23 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 friends_data = friends_data.data;
                                 user_info.photo_100 = user_info.hasOwnProperty('picture') ? user_info.picture.data.url : '';
                             }
-
+                            console.log(friends_data);
                             getGroupsList(user_info, function(groups_error, groups_data){
 
+                                console.log('groups_data', groups_data);
                                 if (handleError(friends_error)) {
                                     setTimeout(function () {
                                         authTry(oauth_data);
-                                    }, 2000 * retry_count);
+                                    }, 500 * retry_count);
                                     return;
                                 }
 
                                 if (oauth_data.type == 'vk') {
-                                    groups_data = groups_data.response;
+                                    if (groups_data.hasOwnProperty('response')){
+                                        groups_data = groups_data.response;
+                                    }else{
+                                        groups_data = null;
+                                    }
                                 }
 
                                 saveDataInDB(Utils.composeFullInfoObject({
@@ -669,6 +657,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         req_params = {
                             url: URLs[data.type.toUpperCase()].GET_GROUPS_LIST,
                             json: true,
+                            timeout: 5000,
                             query: {
                                 user_id: data.uid,
                                 extended: 1,
@@ -690,8 +679,10 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         return;
                     }
                 }
+                console.log('getting groups list', req_params);
                 rest.get(req_params.url, req_params)
                     .on('complete', function (result) {
+                        console.log('getting groups list - done');
                         if (result instanceof Error) {
                             handleError(result);
                             callback(result, null);
@@ -709,6 +700,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     {
                         req_params = {
                             url: URLs[data.type.toUpperCase()].GET_FRIENDS_LIST,
+                            timeout: 5000,
                             json: true,
                             query: {
                                 order: 'hints',
@@ -723,6 +715,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     {
                         req_params = {
                             url: URLs[data.type.toUpperCase()].GET_FRIENDS_LIST,
+                            timeout: 5000,
                             json: true,
                             headers: {
                                 'Authorization': 'Bearer ' + data.access_token
@@ -734,6 +727,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     {
                         req_params = {
                             url: URLs[data.type.toUpperCase()].GET_FRIENDS_LIST,
+                            timeout: 5000,
                             json: true,
                             query: {
                                 'access_token': data.access_token
@@ -754,10 +748,13 @@ pg.connect(pg_conn_string, function (err, client, done) {
             };
 
         socket.on('auth.oauthDone', function (oauth_data) {
+            console.log(oauth_data);
             socket.retry_count = 0;
             try {
+                console.log('trying');
                 authTry(oauth_data);
             } catch (e) {
+                handleError(e);
                 socket.emit('error.retry');
             }
         });
@@ -776,12 +773,13 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 greetingTimeout: 50000,
                 socketTimeout: 50000,
                 from: 'feedback@evendate.ru',
-                to: 'kardinal3094@gmail.com',
+                to: 'support@evendate.com',
                 subject: 'Обратная связь!',
                 html: html
             }, function (err, info) {
                 if (err) {
-                    logger.info('EMAIL SEND ERROR', err);
+                    handleError('EMAIL SEND ERROR', err);
+                    handleError(html);
                 }
                 logger.info('EMAIL_INFO', info);
             });

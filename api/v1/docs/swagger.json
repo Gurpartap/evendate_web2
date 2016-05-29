@@ -137,6 +137,107 @@
         }
       }
     },
+    "/organizations/recommendations": {
+      "get": {
+        "tags": [
+          "Organization"
+        ],
+        "summary": "Get list of organizations",
+        "description": "",
+        "operationId": "getOrganizationsRecommendations",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "short_name",
+            "in": "query",
+            "description": "Short name pattern of organizations to search. Behavior depends on `strict` parameter",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Name pattern of organizations to search. Behavior depends on `strict` parameter",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "privileges",
+            "in": "query",
+            "description": "Can get list of organizations with any privileges",
+            "required": false,
+            "type": "string",
+            "enum": ["can_add", "can_edit", "can_modify"]
+          },
+          {
+            "name": "description",
+            "in": "query",
+            "description": "Description pattern of organizations to search. Behavior depends on `strict` parameter",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "type_id",
+            "in": "query",
+            "description": "ID of organization type.",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "strict",
+            "in": "query",
+            "description": "Changes `name`, `short_name` and `description` search patterns to strict (without %)",
+            "required": false,
+            "type": "string",
+            "enum": ["true", "false"]
+          },
+          {
+            "name": "length",
+            "in": "query",
+            "description": "Items count",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Items count",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "description": "Order column name",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Additional fields and sub-entities",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Organization"
+              }
+            }
+          }
+        }
+      }
+    },
     "/organizations/{Id}": {
       "get": {
         "tags": [
@@ -546,6 +647,162 @@
           },
           {
             "in": "query",
+            "name": "canceled_shown",
+            "description": "show/hide canceled events",
+            "required": false,
+            "type": "string",
+            "enum":["true", "false"]
+          },
+          {
+            "in": "query",
+            "name": "since",
+            "description": "events since date",
+            "required": false,
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "in": "query",
+            "name": "changed_since",
+            "description": "events changed or added since date",
+            "required": false,
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "in": "query",
+            "name": "tags",
+            "description": "Events with this tags",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "since",
+            "description": "events till date",
+            "required": false,
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "in": "query",
+            "name": "title",
+            "description": "events title pattern. Behavior depends on `strict` parameter",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "strict",
+            "description": "Changes `title` and `description` search patterns to strict (without %)",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ]
+          },
+          {
+            "name": "organization_id",
+            "in": "query",
+            "description": "Returns all events for one organization",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+		  },
+		  {
+            "name": "length",
+            "in": "query",
+            "description": "Items count",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Items count",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "description": "Order column name",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Additional fields and sub-entities",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Event"
+              }
+
+            }
+          }
+        }
+      }
+    },
+    "/events/recommendations": {
+      "get": {
+        "tags": [
+          "Event"
+        ],
+        "summary": "Get events list",
+        "description": "",
+        "operationId": "getEventsRecommendations",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "date",
+            "description": "events in one day",
+            "required": false,
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "in": "query",
+            "name": "query",
+            "description": "search query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "future",
+            "description": "all future events",
+            "required": false,
+            "type": "string",
+            "enum":["true", "false"]
+          },
+          {
+            "in": "query",
+            "name": "canceled_shown",
+            "description": "show/hide canceled events",
+            "required": false,
+            "type": "string",
+            "enum":["true", "false"]
+          },
+          {
+            "in": "query",
             "name": "since",
             "description": "events since date",
             "required": false,
@@ -668,6 +925,14 @@
             "required": false,
             "type": "string",
             "format": "date"
+          },
+          {
+            "in": "query",
+            "name": "canceled_shown",
+            "description": "show/hide canceled events",
+            "required": false,
+            "type": "string",
+            "enum":["true", "false"]
           },
           {
             "in": "query",
@@ -903,6 +1168,14 @@
             "required": false,
             "type": "string",
             "format": "date"
+          },
+          {
+            "in": "query",
+            "name": "canceled_shown",
+            "description": "show/hide canceled events",
+            "required": false,
+            "type": "string",
+            "enum":["true", "false"]
           },
           {
             "in": "query",
@@ -2192,6 +2465,14 @@
         },
 		"[min_price]": {
           "type": "int32"
+        },
+        "[favored_friends_count]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[actuality]": {
+          "type": "integer",
+          "format": "int64"
         }
       }
     },
