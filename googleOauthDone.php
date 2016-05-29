@@ -1,8 +1,7 @@
 <html>
 <body>
-<script src="app/js/app.js"></script>
 <script>
-    redirectToNewAuth()
+    window.location.href = '/oAuthDone.php' + window.location.search + window.location.hash;
 </script>
 </body>
 </html>
