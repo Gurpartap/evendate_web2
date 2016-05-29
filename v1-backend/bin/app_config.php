@@ -203,7 +203,7 @@ class App {
 
 		return new Result(true, '', array(
 			'vk' => 'https://oauth.vk.com/authorize?client_id='. self::$SETTINGS->VK->APP_ID . '&scope=groups,friends,email,wall,offline,pages,photos,groups&redirect_uri=http://'. self::$DOMAIN . '/redirectOauth.php?mobile=' . $is_mobile . '%26type=vk&response_type=token',
-			'google' => 'https://accounts.google.com/o/oauth2/auth?scope=email profile https://www.googleapis.com/auth/plus.login &redirect_uri=http://'. self::$DOMAIN . '/redirectOauth.php?mobile=' . $is_mobile . '%26type=google&response_type=token&client_id=' . self::$SETTINGS->google->web->client_id,
+			'google' => 'https://accounts.google.com/o/oauth2/auth?scope=email%20profile%20https://www.googleapis.com/auth/plus.login&redirect_uri=http://'. self::$DOMAIN . '/redirectOauth.php?mobile=' . $is_mobile . '%26type=google&response_type=token&client_id=' . self::$SETTINGS->google->web->client_id,
 			'facebook' => 'https://www.facebook.com/dialog/oauth?client_id=' . self::$SETTINGS->facebook->app_id . '&response_type=token&scope=public_profile,email,user_friends&display=popup&redirect_uri=http://'. self::$DOMAIN . '/redirectOauth.php?mobile=' . $is_mobile . '%26type=facebook'
 		));
 	}

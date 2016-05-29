@@ -1086,3 +1086,7 @@ function isNotDesktop() {
 	})(navigator.userAgent || navigator.vendor || window.opera);
 	return check;
 }
+
+function redirectToNewAuth(){
+	window.location.href = '/oAuthDone.php' + window.location.search + window.location.hash;
+}
