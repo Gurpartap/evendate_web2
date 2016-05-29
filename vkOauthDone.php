@@ -1,7 +1,7 @@
 <html>
 <body>
 <script>
-    window.location.href = '/redirectOauth.php' + window.location.search + window.location.hash;
+    window.location.href = '/redirectOauth.php?type=vk&' + window.location.search.substring(1) + window.location.hash;
 </script>
 </body>
 </html>
