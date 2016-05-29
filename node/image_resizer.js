@@ -121,26 +121,34 @@ ImagesResize.prototype.blurNew = function (settings) {
 
     client.query(q_get_user_images, function (err, result) {
         if (err) return _logger.error(err);
-        result.rows.forEach(function (image) {
-            var img_path = settings.images.user_images + '/default/',
-                blurred_path = settings.images.user_images + '/blurred/';
-            Utils.downloadImageFromUrl(image.avatar_url, function (err, data, filename) {
-                if (err) return _logger.error(err);
-                _this.blurImage({
-                    src: '../' + img_path + filename,
-                    dest: '../' + blurred_path + filename
-                }, function (err) {
-                    if (err) return _logger.error(err);
-                    var q_upd_user = users
-                        .update({
-                            local_avatar_filename: filename,
-                            blurred_image_url: image.avatar_url
-                        }).where(users.id.equals(image.id)).toQuery();
-                    client.query(q_upd_user, function (err) {
+        result.rows.forEach(function (image, index) {
+            setTimeout(function(){
+                var img_path = settings.images.user_images + '/default/',
+                    blurred_path = settings.images.user_images + '/blurred/';
+                Utils.downloadImageFromUrl(image.avatar_url, function (err, data, filename) {
+                    if (err) {
+                        var set_img_null = users.update({avatar_url: null}).where(users.id.equals(image.id)).toQuery();
+                        client.query(set_img_null, function (err) {
+                            if (err) return _logger.error(err);
+                        });
+                        return _logger.error(err);
+                    }
+                    _this.blurImage({
+                        src: '../' + img_path + filename,
+                        dest: '../' + blurred_path + filename
+                    }, function (err) {
                         if (err) return _logger.error(err);
-                    })
-                });
-            }, '../' + img_path);
+                        var q_upd_user = users
+                            .update({
+                                local_avatar_filename: filename,
+                                blurred_image_url: image.avatar_url
+                            }).where(users.id.equals(image.id)).toQuery();
+                        client.query(q_upd_user, function (err) {
+                            if (err) return _logger.error(err);
+                        })
+                    });
+                }, '../' + img_path);
+            }, index * 1000);
         });
     });
 };

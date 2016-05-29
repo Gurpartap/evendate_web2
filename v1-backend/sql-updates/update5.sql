@@ -1,0 +1,25 @@
+CREATE TABLE users_interests(
+  id          SERIAL PRIMARY KEY NOT NULL,
+  user_id INT REFERENCES users(id) NOT NULL,
+  city INT,
+  education_university INT,
+  education_university_name TEXT,
+  education_faculty INT,
+  education_faculty_name TEXT,
+  education_graduation INT,
+  occupation_id INT,
+  occupation_name TEXT,
+  relation INT,
+  personal_political INT,
+  personal_smoking INT,
+  personal_alcohol INT,
+  interests TEXT,
+  movies TEXT,
+  tv TEXT,
+  books TEXT,
+  games TEXT,
+  about TEXT,
+  network_type VARCHAR(10),
+  UNIQUE (user_id, network_type)
+);
+

@@ -36,6 +36,7 @@ class EventsCollection extends AbstractCollection
         }
 
         $is_one_event = false;
+        $canceled_condition = 'canceled = FALSE';
 
         foreach ($filters as $name => $value) {
             switch ($name) {
@@ -112,6 +113,12 @@ class EventsCollection extends AbstractCollection
                     if ($value instanceof Organization) {
                         $q_get_events->where('organization_id = :organization_id');
                         $statement_array[':organization_id'] = $value->getId();
+                    }
+                    break;
+                }
+                case 'canceled_shown': {
+                    if ($value == 'true') {
+                        $canceled_condition = '';
                     }
                     break;
                 }
@@ -277,21 +284,7 @@ class EventsCollection extends AbstractCollection
                         FROM view_events AS ve
                         WHERE ve.id = view_events.id)';
 
-                    $actual_dates_count = '(SELECT 1 / (CASE
-                                              WHEN (ve.registration_required = TRUE AND ve.registration_till < DATE_PART(\'epoch\', NOW()))
-                                              THEN 1000
-                                              ELSE (SELECT
-                                              CASE WHEN COUNT(id)::INT = 0 THEN 1000 ELSE COUNT(id)::INT END
-                                              FROM events_dates
-                                              WHERE
-                                              events_dates.event_id = ve.id
-                                              AND event_date > NOW()
-                                              AND event_date < (NOW() + INTERVAL \'10 days\')
-                                              AND status = TRUE
-                                              )
-                                              END)::REAL * 10
-                                            FROM view_events AS ve
-                                            WHERE ve.id = view_events.id)::REAL';
+                    $actual_dates_count = Event::getAdditionalCols()[Event::ACTUALITY_FIELD_NAME];
 
 
                     $_fields[] =
@@ -303,7 +296,7 @@ class EventsCollection extends AbstractCollection
                             + 
                             ' . $create_date . '
                             + 
-                            ' . $actual_dates_count . '
+                            (' . $actual_dates_count . ')
 						 ) AS ' . Event::RATING_OVERALL;
 
 
@@ -338,7 +331,11 @@ class EventsCollection extends AbstractCollection
             }
         }
 
+        if (array_key_exists(Event::FAVORED_FRIENDS_COUNT_FIELD_NAME, $fields)){
+            $statement_array[':user_id'] = $user->getId();
+        }
 
+        $q_get_events->where($canceled_condition);
         $q_get_events->cols($_fields);
         $q_get_events->orderBy($order_by);
         $p_get_events = $db->prepare($q_get_events->getStatement());
