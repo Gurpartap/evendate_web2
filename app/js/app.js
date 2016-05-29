@@ -596,6 +596,7 @@ socket.on('auth', function(data) {
 		data: data,
 		success: function(res) {
 			if (res.status) {
+				debugger;
 				if (data.hasOwnProperty('mobile') && data.mobile == true) {
 					window.location.href = '/mobileAuthDone.php?token=' + data.token + '&email=' + data.email;
 				} else {
