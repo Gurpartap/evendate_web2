@@ -345,6 +345,7 @@ function Feed($view, $content_block){
 	var $window = $(window),
 		$wrapper = $view.find('.page_wrapper'),
 		feed_state = History.getState().data.feed_state,
+		feed_date = History.getState().data.date,
 		current_offset = 0,
 		ajax_url,
 		ajax_data = {
@@ -388,7 +389,7 @@ function Feed($view, $content_block){
 		default: {
 			feed_state = 'day';
 			ajax_url = '/api/v1/events/favorites';
-			ajax_data.date = History.getState().data.date;
+			ajax_data.date = feed_date;
 			break;
 		}
 	}
@@ -474,10 +475,22 @@ function Feed($view, $content_block){
 				tbody_class: 'feed_calendar_tbody',
 				th_class: 'feed_calendar_th',
 				td_class: 'feed_calendar_td',
-				td_disabled: 'calendar_day_disabled'
+				td_disabled: 'calendar_day_disabled',
+				td_additional_classes: ['Controller']
+			},
+			additional_dataset: {
+				page: 'feed'
 			}
 		});
-		MainCalendar.init().selectToday();
+		MainCalendar.init();
+		if(feed_date){
+			MainCalendar.setMonth(feed_date.split('-')[1]).selectDays(feed_date);
+		} else {
+			MainCalendar.selectToday();
+		}
+		MainCalendar.$calendar.on('month-changed', function(){
+			bindOnClick();
+		});
 		bindEventsEvents($parent);
 	}
 
