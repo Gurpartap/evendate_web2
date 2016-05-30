@@ -13,10 +13,12 @@ function Calendar($calendar, options){
 			head_tr_class: 'calendar_weekdays_row',
 			th_class: 'calendar_weekday',
 			td_class: 'calendar_day',
+			td_additional_classes: [],
 			td_disabled_class: 'calendar_day_disabled',
 			table_cell_class: 'calendar_cell',
 			today_class: 'today'
 		},
+		additional_dataset: {},
 		selection_type: 'single',
 		multi_selection: false,
 		weekday_selection: false,
@@ -74,9 +76,11 @@ Calendar.prototype.setMonth = function(next){
 			this.current_month = moment(); break;
 		}
 		default: {
-			this.current_month = this.current_month.add(next, 'months');
+			this.current_month = this.current_month.month(next-1);
 		}
 	}
+	this.renderTable();
+	this.$calendar.trigger('month-changed');
 	return this;
 };
 
@@ -102,7 +106,13 @@ Calendar.prototype.buildTable = function(){
 		td_days = [],
 		td_classes = [],
 		this_day,
-		this_moment;
+		this_moment,
+		dataset = [];
+	for(var name in this.options.additional_dataset){
+		if(this.options.additional_dataset.hasOwnProperty(name)){
+			dataset.push('data-'+name+'='+this.options.additional_dataset[name]);
+		}
+	}
 	for(var day = 1; day <= days_count; day++){
 		this.current_month.date(day);
 		this_day = this.current_month.format(__C.DATE_FORMAT);
@@ -114,7 +124,7 @@ Calendar.prototype.buildTable = function(){
 			'Day_'+this_day,
 			'DayOfWeek_'+this.current_month.day(),
 			'DayOfMonth_'+this.current_month.month()
-		];
+		].concat(this.options.classes.td_additional_classes);
 		if((this.options.min_date !== false && !(this_moment.diff(this.options.min_date, 'd') >= 0) ) || (this.options.max_date !== false && !(this_moment.diff(this.options.max_date, 'd') <= 0)))
 			td_classes.push(this.options.classes.td_disabled_class);
 		if(this.current_month.format(__C.DATE_FORMAT) == this._today.format(__C.DATE_FORMAT))
@@ -125,7 +135,8 @@ Calendar.prototype.buildTable = function(){
 			number: this.current_month.date(),
 			day_number: this.current_month.day(),
 			date: this.current_month.format(__C.DATE_FORMAT),
-			date_text: this.current_month.format('DD MMMM YYYY')
+			date_text: this.current_month.format('DD MMMM YYYY'),
+			dataset: dataset.join(' ')
 		}));
 	}
 	var curr_month_clone = moment(this.current_month._d);
@@ -142,7 +153,7 @@ Calendar.prototype.buildTable = function(){
 				'DayOfWeek_'+curr_month_clone.day(),
 				'DayOfMonth_'+curr_month_clone.month(),
 				'not_this_month'
-			];
+			].concat(this.options.classes.td_additional_classes);
 			if((this.options.min_date !== false && !(this_moment.diff(this.options.min_date, 'd') >= 0) ) || (this.options.max_date !== false && !(this_moment.diff(this.options.max_date, 'd') <= 0)))
 				td_classes.push(this.options.classes.td_disabled_class);
 
@@ -151,7 +162,8 @@ Calendar.prototype.buildTable = function(){
 				number: curr_month_clone.date(),
 				day_number: curr_month_clone.day(),
 				date: curr_month_clone.format(__C.DATE_FORMAT),
-				date_text: curr_month_clone.format('DD MMMM YYYY')
+				date_text: curr_month_clone.format('DD MMMM YYYY'),
+				dataset: dataset.join(' ')
 			}));
 			curr_month_clone.add(-1, 'days');
 		} while(curr_month_clone.day() != 0);
@@ -170,7 +182,7 @@ Calendar.prototype.buildTable = function(){
 				'DayOfWeek_'+curr_month_clone.day(),
 				'DayOfMonth_'+curr_month_clone.month(),
 				'not_this_month'
-			];
+			].concat(this.options.classes.td_additional_classes);
 			if((this.options.min_date !== false && !(this_moment.diff(this.options.min_date, 'd') >= 0) ) || (this.options.max_date !== false && !(this_moment.diff(this.options.max_date, 'd') <= 0)))
 				td_classes.push(this.options.classes.td_disabled_class);
 
@@ -179,7 +191,8 @@ Calendar.prototype.buildTable = function(){
 				number: curr_month_clone.date(),
 				day_number: curr_month_clone.day(),
 				date: curr_month_clone.format(__C.DATE_FORMAT),
-				date_text: curr_month_clone.format('DD MMMM YYYY')
+				date_text: curr_month_clone.format('DD MMMM YYYY'),
+				dataset: dataset.join(' ')
 			}));
 		} while(curr_month_clone.day() != 0);
 	}
@@ -434,14 +447,10 @@ Calendar.prototype.selectMonth = function(month){ // 0..11
 Calendar.prototype.bindMonthArrows = function(){
 	var self = this;
 	this.$calendar.find('.NextMonth').on('click', function(){
-		self
-			.setMonth('next')
-			.renderTable();
+		self.setMonth('next');
 	});
 	this.$calendar.find('.PrevMonth').on('click', function(){
-		self
-			.setMonth('prev')
-			.renderTable();
+		self.setMonth('prev');
 	});
 	return this;
 };
