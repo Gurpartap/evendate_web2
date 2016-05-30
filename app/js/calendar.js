@@ -356,6 +356,7 @@ function Feed($view, $content_block){
 			'organization_name',
 			'organization_short_name',
 			'organization_logo_small_url',
+			'dates',
 			'favored_users_count',
 			'is_favorite',
 			'favored{fields:"is_friend",order_by:"-is_friend",length:10}',
@@ -374,6 +375,7 @@ function Feed($view, $content_block){
 		}
 		case 'timeline': {
 			ajax_url = '/api/v1/events/my';
+			//ajax_data.future = false;
 			break;
 		}
 		case 'friends': {
@@ -390,6 +392,7 @@ function Feed($view, $content_block){
 			feed_state = 'day';
 			ajax_url = '/api/v1/events/favorites';
 			ajax_data.date = feed_date;
+			ajax_data.future = false;
 			break;
 		}
 	}
@@ -523,14 +526,20 @@ function Feed($view, $content_block){
 						event.favored_users_show = favored_users_count ? '' : '-cast';
 						event.favored_users_count = favored_users_count;
 
-						event.feed_event_infos = tmpl('feed-event-info', {text: moment.unix(event.nearest_event_date).format('D MMMM, HH:mm')});
+						if(event.nearest_event_date){
+							event.feed_event_infos = tmpl('feed-event-info', {text: moment.unix(event.nearest_event_date).format('D MMMM, HH:mm')});
+						} else {
+							var time = event.dates[0].start_time.split(':');
+							time.pop();
+							event.feed_event_infos = tmpl('feed-event-info', {text: moment.unix(event.dates[0].event_date).format('D MMMM')+', '+time.join(':')});
+						}
 						if(event.registration_required){
 							event.feed_event_infos = event.feed_event_infos.add(tmpl('feed-event-info', {text: 'Регистрация до '+moment.unix(event.registration_till).format('D MMMM, HH:mm')}));
 						}
 						if(event.is_free){
 							event.feed_event_infos = event.feed_event_infos.add(tmpl('feed-event-info', {text: 'Бесплатно'}));
 						} else {
-							event.feed_event_infos = event.feed_event_infos.add(tmpl('feed-event-info', {text: 'Цена от '+event.min_price}));
+							event.feed_event_infos = event.feed_event_infos.add(tmpl('feed-event-info', {text: 'Цена от '+(event.min_price ? event.min_price : 0) +' руб.'}));
 						}
 
 						$events = $events.add(tmpl('feed-event', event))
@@ -550,13 +559,17 @@ function Feed($view, $content_block){
 		initFeedPage($wrapper);
 
 		$window.data('block_scroll', false);
-		if(!$wrapper.data('disable_upload')){
+		if($events.length){
 			$window.on('scroll.upload'+feed_state.capitalize()+'Events', function(){
 				if($window.height() + $window.scrollTop() + 200 >= $(document).height() && !$window.data('block_scroll')){
 					$window.data('block_scroll', true);
 					uploadMoreEvents(10, current_offset+=10, function($events){
-						$wrapper.find('.FeedEvents').append($events);
-						bindEventsEvents($events);
+						if($events.length){
+							$wrapper.find('.FeedEvents').append($events);
+							bindEventsEvents($events);
+						} else {
+							$window.off('scroll.upload'+feed_state.capitalize()+'Events');
+						}
 						$window.data('block_scroll', false);
 					});
 				}
@@ -2810,6 +2823,8 @@ $(document)
 				page_split = __STATES.getCurrentState().split('/'),
 				page = page_split[0];
 
+			$(window).off('scroll');
+			$(window).data('disable_upload', false);
 			if(state.hash.indexOf('friend-') !== -1){
 				var $friends_app = $('.friends-app');
 				$('.screen-view').addClass(__C.CLASSES.HIDDEN);
@@ -2833,7 +2848,11 @@ $(document)
 				$('.search-input').val('');
 			}
 			$('[data-page]').removeClass(__C.CLASSES.ACTIVE);
-			$('[data-page="' + page + '"]').addClass(__C.CLASSES.ACTIVE);
+			if(page == 'feed'){
+				$('[data-feed_state="' + state.data.feed_state + '"]').addClass(__C.CLASSES.ACTIVE);
+			} else {
+				$('[data-page="' + page + '"]').addClass(__C.CLASSES.ACTIVE);
+			}
 		}
 
 		History.Adapter.bind(window, 'statechange', renderState);

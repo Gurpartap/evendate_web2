@@ -61,49 +61,23 @@
         <div class="aside-inner">
             <nav data-sidebar-anyclick-close="" class="sidebar">
                 <div class="brand-name">
-                    <div class="logo"><a title="Перейти к моей ленте" href="/timeline"><img src="/app/img/logo_500.png"> Evendate</a></div>
+                    <div class="logo"><a title="Перейти к моей ленте" data-page="feed" data-feed_state="timeline" data-title="Лента событий по времени"><img src="/app/img/logo_500.png"> Evendate</a></div>
                 </div>
                 <!-- END user info-->
                 <ul class="nav">
-                    <div class="panel side-calendar-panel">
-                        <div class="panel-body">
-                            <button type="button" class="btn btn-xs btn-black-blue pressed prev-button">
-                                <span class="icon-arrow-left"></span>
-                            </button>
-                            <span id="month-name"></span>
-                            <button type="button" class="btn btn-xs btn-black-blue pressed next-button">
-                                <span class="icon-arrow-right"></span>
-                            </button>
-                            <table class="sidebar-calendar-table" id="calendar-table">
-                                <thead>
-                                <tr>
-                                    <th>Пн</th>
-                                    <th>Вт</th>
-                                    <th>Ср</th>
-                                    <th>Чт</th>
-                                    <th>Пт</th>
-                                    <th>Сб</th>
-                                    <th>Вс</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn" data-page="timeline">
+                    <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn" data-page="feed" data-feed_state="timeline" data-title="Лента событий по времени">
                         <i class="icon-home"></i> <span>Моя лента</span>
                     </a>
-                    <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn <?=$edit_event_btn_hidden?>" data-page="edit_event">
+                    <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn <?=$edit_event_btn_hidden?>" data-page="edit_event" data-title="Создать событие">
                         <i class="icon-note"></i> <span>Создать событие</span>
                     </a>
-                    <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn" data-page="favorites">
+                    <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn" data-page="feed" data-feed_state="favored" data-title="Избранные события">
                         <i class="icon-pin"></i> <span>Избранное</span>
                     </a>
-                    <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn" data-page="organizations">
+                    <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn" data-page="organizations" data-title="Организации">
                         <i class="icon-list"></i> <span>Организаторы</span>
                     </a>
-                    <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn" data-page="friends">
+                    <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn" data-page="friends" data-title="Друзья">
                         <i class="icon-people"></i> <span>Мои друзья</span>
                     </a>
                     <a type="button" class="btn btn-black-blue btn-sm btn-menu mb-compose-button menu-btn" data-controller="showSettingsModal">
