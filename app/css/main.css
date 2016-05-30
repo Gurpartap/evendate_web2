@@ -2454,8 +2454,7 @@ html.-noscroll {
 	position: fixed;
 	display: inline-block;
 	vertical-align: top;
-	/*width: 20%;*/
-	width: 12.5%;
+	width: 240px;
 	margin: 24px 0 0 2%;
 }
 
@@ -2500,6 +2499,8 @@ html.-noscroll {
 	display: inline-block;
 	vertical-align: top;
 	min-width: 745px;
+	max-width: 900px;
+	width: 65%;
 	text-align: center;
 }
 
@@ -2557,6 +2558,8 @@ html.-noscroll {
 	font-weight: 700;
 	color: #4a4a4a;
 	text-align: left;
+	text-overflow: ellipsis;
+	overflow: hidden;
 }
 
 .feed_event_buttons {
