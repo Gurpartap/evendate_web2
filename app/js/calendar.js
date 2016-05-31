@@ -544,7 +544,7 @@ function Feed($view, $content_block){
 
 						$events = $events.add(tmpl('feed-event', event))
 					});
-					if(success && typeof success == 'funciton'){
+					if(success && typeof success == 'function'){
 						success($events);
 					}
 				}, ajaxErrorHandler)

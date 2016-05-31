@@ -600,7 +600,7 @@ socket.on('auth', function(data) {
 				if (data.hasOwnProperty('mobile') && data.mobile == true) {
 					window.location.href = '/mobileAuthDone.php?token=' + data.token + '&email=' + data.email;
 				} else {
-					window.parent.location = 'timeline';
+					window.parent.location = 'feed';
 					if (yaCounter32442130) {
 						switch(data.type) {
 							case 'vk':
