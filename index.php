@@ -9,7 +9,7 @@ try{
 	if (isset($_GET['logout']) && $_GET['logout'] == true){
 		$user->logout();
 	}else{
-		header('Location: /timeline');
+		header('Location: /feed');
 		die();
 	}
 }catch(Exception $e){

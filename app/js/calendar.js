@@ -367,15 +367,8 @@ function Feed($view, $content_block){
 		];
 
 	switch(feed_state){
-		case '':
-		case 'actual': {
-			feed_state = 'actual';
-			ajax_url = '/api/v1/events/my';
-			break;
-		}
 		case 'timeline': {
 			ajax_url = '/api/v1/events/my';
-			//ajax_data.future = false;
 			break;
 		}
 		case 'friends': {
@@ -389,10 +382,17 @@ function Feed($view, $content_block){
 			break;
 		}
 		default: {
-			feed_state = 'day';
-			ajax_url = '/api/v1/events/favorites';
-			ajax_data.date = feed_date;
-			ajax_data.future = false;
+			if(feed_date){
+				feed_state = 'day';
+				ajax_url = '/api/v1/events/my';
+				ajax_data.date = feed_date;
+				ajax_data.future = false;
+				break;
+			}
+		}
+		case 'actual': {
+			feed_state = 'actual';
+			ajax_url = '/api/v1/events/my';
 			break;
 		}
 	}
@@ -544,7 +544,9 @@ function Feed($view, $content_block){
 
 						$events = $events.add(tmpl('feed-event', event))
 					});
-					success($events);
+					if(success && typeof success == 'funciton'){
+						success($events);
+					}
 				}, ajaxErrorHandler)
 			}
 		});
