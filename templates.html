@@ -55,6 +55,58 @@
 	<button class="ShareButton share_icon twitter {classes}" data-title="Twitter" data-href="https://twitter.com/share?url=http://evendate.ru/event/{id}?text={title}&via=evendate.ru&hashtags=#evendate"></button>
 </script>
 
+<script type="javascript/template" id="tmpl-event-card">
+	<div class="event_card">
+		<div class="event_card_img" style="background-image: url('{image_horizontal_small_url}')"></div>
+		<div class="event_card_description">
+			<span>{title}</span>
+		</div>
+	</div>
+</script>
+
+<!-- Calendar -->
+
+<script type="javascript/template" id="tmpl-calendar">
+	<div class="{wrapper_class} -unselectable">
+		<div class="{header_class}">
+			<button class="PrevMonth {prev_btn_class} fa_icon fa-chevron-left" type="button"></button>
+			<span class="MonthName {month_name_class}"></span>
+			<button class="NextMonth {next_btn_class} fa_icon fa-chevron-right" type="button"></button>
+		</div>
+		<table class="CalendarTable {table_class}">
+			<colgroup>
+				<col valign="middle">
+				<col valign="middle">
+				<col valign="middle">
+				<col valign="middle">
+				<col valign="middle">
+				<col valign="middle">
+				<col valign="middle">
+			</colgroup>
+			<thead class="{thead_class}">
+				<tr class="{head_tr_class}">
+					<th class="{table_cell_class} {th_class} Week_1" data-weekday="1"><span>Пн</span></th>
+					<th class="{table_cell_class} {th_class} Week_2" data-weekday="2"><span>Вт</span></th>
+					<th class="{table_cell_class} {th_class} Week_3" data-weekday="3"><span>Ср</span></th>
+					<th class="{table_cell_class} {th_class} Week_4" data-weekday="4"><span>Чт</span></th>
+					<th class="{table_cell_class} {th_class} Week_5" data-weekday="5"><span>Пт</span></th>
+					<th class="{table_cell_class} {th_class} Week_6" data-weekday="6"><span>Сб</span></th>
+					<th class="{table_cell_class} {th_class} Week_0" data-weekday="0"><span>Вс</span></th>
+				</tr>
+			</thead>
+			<tbody class="CalendarTableBody {tbody_class}"></tbody>
+		</table>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-calendar-row">
+	<tr class="{tr_class}"></tr>
+</script>
+
+<script type="javascript/template" id="tmpl-calendar-div">
+	<td class="{td_classes}" data-weekday="{day_number}" data-date="{date}" data-title="{date_text}" {dataset}><span>{number}</span></td>
+</script>
+
 <!-- Edit Event Page -->
 
 <script type="javascript/template" id="tmpl-edit-event-page">
@@ -421,47 +473,6 @@
 
 </script>
 
-<script type="javascript/template" id="tmpl-calendar">
-	<div class="{wrapper_class} -unselectable">
-		<div class="{header_class}">
-			<button class="PrevMonth {prev_btn_class} fa_icon fa-chevron-left" type="button"></button>
-			<span class="MonthName {month_name_class}"></span>
-			<button class="NextMonth {next_btn_class} fa_icon fa-chevron-right" type="button"></button>
-		</div>
-		<table class="CalendarTable {table_class}">
-			<colgroup>
-				<col valign="middle">
-				<col valign="middle">
-				<col valign="middle">
-				<col valign="middle">
-				<col valign="middle">
-				<col valign="middle">
-				<col valign="middle">
-			</colgroup>
-			<thead class="{thead_class}">
-				<tr class="{head_tr_class}">
-					<th class="{table_cell_class} {th_class} Week_1" data-weekday="1"><span>Пн</span></th>
-					<th class="{table_cell_class} {th_class} Week_2" data-weekday="2"><span>Вт</span></th>
-					<th class="{table_cell_class} {th_class} Week_3" data-weekday="3"><span>Ср</span></th>
-					<th class="{table_cell_class} {th_class} Week_4" data-weekday="4"><span>Чт</span></th>
-					<th class="{table_cell_class} {th_class} Week_5" data-weekday="5"><span>Пт</span></th>
-					<th class="{table_cell_class} {th_class} Week_6" data-weekday="6"><span>Сб</span></th>
-					<th class="{table_cell_class} {th_class} Week_0" data-weekday="0"><span>Вс</span></th>
-				</tr>
-			</thead>
-			<tbody class="CalendarTableBody {tbody_class}"></tbody>
-		</table>
-	</div>
-</script>
-
-<script type="javascript/template" id="tmpl-calendar-row">
-	<tr class="{tr_class}"></tr>
-</script>
-
-<script type="javascript/template" id="tmpl-calendar-div">
-	<td class="{td_classes}" data-weekday="{day_number}" data-date="{date}" data-title="{date_text}"><span>{number}</span></td>
-</script>
-
 <script type="javascript/template" id="tmpl-selected-table-day">
 	<tr class="TableDay_{date}" data-date="{date}">
 		<td><button class="remove_date RemoveRow" type="button">&times;</button></td>
@@ -725,15 +736,58 @@
 	</div>
 </script>
 
-<script type="javascript/template" id="tmpl-event-card">
-	<div class="event_card">
-		<div class="event_card_img" style="background-image: url('{image_horizontal_small_url}')"></div>
-		<div class="event_card_description">
-			<span>{title}</span>
-		</div>
+<!-- Feed Page -->
+
+<script type="javascript/template" id="tmpl-feed-event-wrapper">
+	<div class="feed_events FeedEvents">{feed_events}</div>
+</script>
+
+<script type="javascript/template" id="tmpl-feed-event">
+	<div class="page feed_event FeedEvent">
+		<aside class="feed_event_img_side Controller" data-page="event/{id}" data-event-id="{id}" data-title="{title}" style="background-image: url('{image_horizontal_large_url}')"></aside>
+		<aside class="feed_event_info_side">
+			<header class="feed_event_header">
+				<div class="avatar_block -size_small Controller" data-page="organization/{organization_id}" data-organization-id="{organization_id}" data-title="{organization_name}">
+					<div class="avatar"><img src="{organization_logo_small_url}"></div>
+					<span class="avatar_name">{organization_short_name}</span>
+				</div>
+				<h3 class="feed_event_title Controller" data-page="event/{id}" data-event-id="{id}" data-title="{title}">{title}</h3>
+				<div class="feed_event_buttons">
+					<!--<button class="feed_event_button fa_icon fa-share-alt -empty DropdownButton" type="button" data-dropdown="share_event_{id}" data-dd-pos-x="-100" data-dd-pos-y="5" data-dd-width="130"></button>-->
+					<button class="feed_event_button -empty HideEvent" type="button" data-event-id="{id}">×</button>
+					<div class="dropdown_box DropdownBox" data-dropdown_id="share_event_{id}"></div>
+				</div>
+			</header>
+			<footer class="feed_event_footer">
+				{feed_event_infos}
+				<div class="form_group -parts_e_2 AddAvatarWrapper">
+					<div class="form_unit">
+						<div class="avatars_collection -subscribable -rounded -bordered -size_small {avatars_collection_classes} AvatarsCollection CallModal" data-max_subscribers="4" data-modal_type="favors" data-modal_entity_type="event" data-modal_entity_id="{id}" data-modal_title="Добавили в избранное">
+							{subscribers}
+						</div>
+						<span class="counter -size_30x30 -bordered -color_marginal_primary -castable {favored_users_show}">+<span class="FavoredCount">{favored_users_count}</span></span>
+					</div>
+					<div class="form_unit">
+						<button class="button -low -fill -rounded fa_icon {subscribe_button_classes} Subscribe EventSubscribe -AddFavourite AddAvatar RippleEffect" data-event-id="{id}">
+							<span class="Text">{subscribe_button_text}</span>
+						</button>
+					</div>
+				</div>
+			</footer>
+		</aside>
 	</div>
 </script>
 
+<script type="javascript/template" id="tmpl-feed-event-info">
+	<p class="feed_event_info">{text}</p>
+</script>
+
+<script type="javascript/template" id="tmpl-feed-event-vulcan">
+	<div class="event_vulcan">
+		<div class="page feed_calendar FeedCalendar"></div>
+		{event_cards}
+	</div>
+</script>
 
 
 

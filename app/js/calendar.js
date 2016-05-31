@@ -341,6 +341,245 @@ function MyTimeline($view, $content_block){
 	setDaysWithEvents();
 }
 
+function Feed($view, $content_block){
+	var $window = $(window),
+		$wrapper = $view.find('.page_wrapper'),
+		feed_state = History.getState().data.feed_state,
+		feed_date = History.getState().data.date,
+		current_offset = 0,
+		ajax_url,
+		ajax_data = {
+			future: true
+		},
+		fields = [
+			'image_horizontal_large_url',
+			'organization_name',
+			'organization_short_name',
+			'organization_logo_small_url',
+			'dates',
+			'favored_users_count',
+			'is_favorite',
+			'favored{fields:"is_friend",order_by:"-is_friend",length:10}',
+			'registration_required',
+			'registration_till',
+			'is_free',
+			'min_price'
+		];
+
+	switch(feed_state){
+		case '':
+		case 'actual': {
+			feed_state = 'actual';
+			ajax_url = '/api/v1/events/my';
+			break;
+		}
+		case 'timeline': {
+			ajax_url = '/api/v1/events/my';
+			//ajax_data.future = false;
+			break;
+		}
+		case 'friends': {
+			ajax_url = '/api/v1/events/my';
+			ajax_data.order_by = '-favored_friends_count';
+			fields.push('favored_friends_count');
+			break;
+		}
+		case 'favored': {
+			ajax_url = '/api/v1/events/favorites';
+			break;
+		}
+		default: {
+			feed_state = 'day';
+			ajax_url = '/api/v1/events/favorites';
+			ajax_data.date = feed_date;
+			ajax_data.future = false;
+			break;
+		}
+	}
+
+	ajax_data.fields = fields.join(',');
+
+	function bindEventsEvents($parent){
+		bindAddAvatar($parent);
+		trimAvatarsCollection($parent);
+		bindRippleEffect($parent);
+		bindDropdown($parent);
+		Modal.bindCallModal($parent);
+		bindOnClick();
+
+		$parent.find('.Subscribe').not('.-Handled_Subscribe').each(function(){
+			new SubscribeButton($(this), {
+				labels: {
+					subscribe: 'В избранное',
+					unsubscribe: 'Отписаться',
+					subscribed: 'В избранном'
+				},
+				colors: {
+					subscribe: '-color_neutral_secondary',
+					unsubscribe: '-color_secondary',
+					subscribed: '-color_secondary'
+				},
+				icons: {
+					subscribe: 'fa-star-o',
+					subscribed: 'fa-star'
+				}
+			});
+		}).addClass('-Handled_Subscribe');
+
+		$parent.find('.HideEvent').not('.-Handled_HideEvent').each(function(){
+			var $this = $(this),
+				$event = $this.parents('.FeedEvent'),
+				event_id = $this.data("event-id");
+
+			$this.on('click', function(){
+				$event.addClass('-cancel');
+				$.ajax({
+					url: '/api/v1/events/'+event_id+'/status',
+					data: {
+						hidden: true
+					},
+					method: 'PUT',
+					success: function(res){
+						ajaxHandler(res, function(data, text){
+							$event.after(tmpl('button', {
+								classes: '-color_neutral ReturnEvent',
+								title: 'Вернуть событие',
+								dataset: 'data-event-id="'+event_id+'"'
+							}));
+							$event.siblings('.ReturnEvent').not('.-Handled_ReturnEvent').on('click', function(){
+								var $remove_button = $(this);
+								$.ajax({
+									url: '/api/v1/events/'+event_id+'/status',
+									data: {
+										hidden: false
+									},
+									method: 'PUT',
+									success: function(res){
+										ajaxHandler(res, function(data, text){
+											$remove_button.remove();
+											$event.removeClass('-cancel');
+										}, ajaxErrorHandler)
+									}
+								});
+							}).addClass('-Handled_ReturnEvent');
+						}, ajaxErrorHandler)
+					}
+				});
+			});
+		}).addClass('-Handled_HideEvent');
+	}
+
+	function initFeedPage($parent){
+		var MainCalendar = new Calendar($parent.find('.FeedCalendar'), {
+			classes: {
+				wrapper_class: 'feed_calendar_wrapper',
+				table_class: 'feed_calendar_table',
+				thead_class: 'feed_calendar_thead',
+				tbody_class: 'feed_calendar_tbody',
+				th_class: 'feed_calendar_th',
+				td_class: 'feed_calendar_td',
+				td_disabled: 'calendar_day_disabled',
+				td_additional_classes: ['Controller']
+			},
+			additional_dataset: {
+				page: 'feed'
+			}
+		});
+		MainCalendar.init();
+		if(feed_date){
+			MainCalendar.setMonth(feed_date.split('-')[1]).selectDays(feed_date);
+		} else {
+			MainCalendar.selectToday();
+		}
+		MainCalendar.$calendar.on('month-changed', function(){
+			bindOnClick();
+		});
+		bindEventsEvents($parent);
+	}
+
+	function uploadMoreEvents(length, offset, success){
+		var $events = $();
+		ajax_data.length = length;
+		ajax_data.offset = offset;
+		$.ajax({
+			url: ajax_url,
+			data: ajax_data,
+			method: 'GET',
+			success: function(res){
+				ajaxHandler(res, function(data, text){
+					data.forEach(function(event){
+						var $subscribers = buildAvatarCollection(event.favored, 4),
+							avatars_collection_classes = [],
+							favored_users_count = ($subscribers.length <= 4) ? 0 : event.favored_users_count - 4;
+
+						if(event.is_favorite){
+							avatars_collection_classes.push('-subscribed');
+							if($subscribers.length > 4){
+								avatars_collection_classes.push('-shift');
+							}
+						}
+
+						event.subscribe_button_classes = event.is_favorite ? ['fa-star', '-color_secondary', '-Subscribed'].join(' ') : ['fa-star-o', '-color_neutral_secondary'].join(' ');
+						event.subscribe_button_text = event.is_favorite ? 'В избранном' : 'В избранное';
+						event.subscribers = $subscribers;
+						event.avatars_collection_classes = avatars_collection_classes.join(' ');
+						event.favored_users_show = favored_users_count ? '' : '-cast';
+						event.favored_users_count = favored_users_count;
+
+						if(event.nearest_event_date){
+							event.feed_event_infos = tmpl('feed-event-info', {text: moment.unix(event.nearest_event_date).format('D MMMM, HH:mm')});
+						} else {
+							var time = event.dates[0].start_time.split(':');
+							time.pop();
+							event.feed_event_infos = tmpl('feed-event-info', {text: moment.unix(event.dates[0].event_date).format('D MMMM')+', '+time.join(':')});
+						}
+						if(event.registration_required){
+							event.feed_event_infos = event.feed_event_infos.add(tmpl('feed-event-info', {text: 'Регистрация до '+moment.unix(event.registration_till).format('D MMMM, HH:mm')}));
+						}
+						if(event.is_free){
+							event.feed_event_infos = event.feed_event_infos.add(tmpl('feed-event-info', {text: 'Бесплатно'}));
+						} else {
+							event.feed_event_infos = event.feed_event_infos.add(tmpl('feed-event-info', {text: 'Цена от '+(event.min_price ? event.min_price : 0) +' руб.'}));
+						}
+
+						$events = $events.add(tmpl('feed-event', event))
+					});
+					success($events);
+				}, ajaxErrorHandler)
+			}
+		});
+	}
+
+	$wrapper.empty();
+
+	$window.off('scroll');
+	uploadMoreEvents(10, current_offset, function($events){
+		$wrapper.append(tmpl('feed-event-wrapper', {feed_events: $events}));
+		$wrapper.append(tmpl('feed-event-vulcan', {event_cards: ''}));
+		initFeedPage($wrapper);
+
+		$window.data('block_scroll', false);
+		if($events.length){
+			$window.on('scroll.upload'+feed_state.capitalize()+'Events', function(){
+				if($window.height() + $window.scrollTop() + 200 >= $(document).height() && !$window.data('block_scroll')){
+					$window.data('block_scroll', true);
+					uploadMoreEvents(10, current_offset+=10, function($events){
+						if($events.length){
+							$wrapper.find('.FeedEvents').append($events);
+							bindEventsEvents($events);
+						} else {
+							$window.off('scroll.upload'+feed_state.capitalize()+'Events');
+						}
+						$window.data('block_scroll', false);
+					});
+				}
+			});
+		}
+
+	});
+	initFeedPage($view);
+}
+
 function OneEvent($view, $content_block){
 	var $wrapper = $view.find('.page_wrapper'),
 		event_id = __STATES.getCurrentState().split('/')[1];
@@ -2424,6 +2663,7 @@ $(document)
 
 		window.__STATES = {
 			event: OneEvent,
+			feed: Feed,
 			timeline: MyTimeline,
 			organizations: OrganizationsList,
 			organization: Organization,
@@ -2583,6 +2823,8 @@ $(document)
 				page_split = __STATES.getCurrentState().split('/'),
 				page = page_split[0];
 
+			$(window).off('scroll');
+			$(window).data('disable_upload', false);
 			if(state.hash.indexOf('friend-') !== -1){
 				var $friends_app = $('.friends-app');
 				$('.screen-view').addClass(__C.CLASSES.HIDDEN);
@@ -2606,7 +2848,11 @@ $(document)
 				$('.search-input').val('');
 			}
 			$('[data-page]').removeClass(__C.CLASSES.ACTIVE);
-			$('[data-page="' + page + '"]').addClass(__C.CLASSES.ACTIVE);
+			if(page == 'feed'){
+				$('[data-feed_state="' + state.data.feed_state + '"]').addClass(__C.CLASSES.ACTIVE);
+			} else {
+				$('[data-page="' + page + '"]').addClass(__C.CLASSES.ACTIVE);
+			}
 		}
 
 		History.Adapter.bind(window, 'statechange', renderState);
