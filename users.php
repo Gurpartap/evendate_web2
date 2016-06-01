@@ -7,11 +7,12 @@ require_once('landing/header.php'); ?>
 </div><div class="header_button_container"><button id="go" class="header_button" type="button"><span class="header_button_text">ВОЙТИ</span></button></div></header>
 
 <div class="position_main_part">
-<div class="fon_img_main_page users_mini">
+<div style="background-image: url(landing/img/Users.jpg);" class="fon_img_main_page">
 	<div class="position_in_fon">
 		<div class="fon_text_container fon_text_container_users">
-			<div><span class="fon_text_top">Наполни жизнь событиями!</span></div>
-			<div class="fon_text_bottom_container"><span class="fon_text_bottom">Используя Evendate, ты сможешь собрать все любимые места в собственную персонализированную ленту</span></div>
+			<div><span class="fon_text_top">Сделай жизнь проще</span></div>
+			<div class="fon_text_bottom_container"><span class="fon_text_bottom">Собери любимые места вместе, отмечай интересные события
+и получай уведомления, чтобы ничего не пропустить</span></div>
 		</div>
 		<div class="button_users">
 			<div class="button_fon_img_users_container"><button id="gogo" class="button_fon_img_users" type="button"><span class="text_button_users_top">ВОЙТИ</span></button></div>
@@ -33,40 +34,40 @@ require_once('landing/header.php'); ?>
 
 		<div class="steps_user_container">
 			<div class="step_user_container"><img src="/landing/img/subscribe253x225.png" class="step_user_img"></div><div class="user_step_content_container">
-			<div><span class="step_text">ПОДПИСЫВАЙСЯ</span></div>
-			<div class="step_user_text_bot_container"><span class="step_user_text">НАХОДИ СВОИ ЛЮБИМЫЕ МЕСТА И ПОДПИСЫВАЙСЯ НА ОРГАНИЗАТОРОВ</span></div>
+			<div><span class="step_text">Подписывайся</span></div>
+			<div class="step_user_text_bot_container"><span class="step_user_text">Выбери интересных организаторов и подпишись на их события</span></div>
 		</div>
 		</div>
 		<div class="line_blue_and_pink"></div>
 
 		<div class="steps_user_container">
 			<div class="user_step_content_container user_step_content_container_2">
-			<div><span class="step_text">ДОБАВЛЯЙ В ИЗБРАННОЕ</span></div>
-			<div class="step_user_text_bot_container"><span class="step_user_text">ДОБАВЛЯЙ В ИЗБРАННОЕ МЕРОПРИЯТИЯ И НИКОГДА НЕ ПРОПУСКАЙ ИХ</span></div>
+			<div><span class="step_text">Добавляй в избранное</span></div>
+			<div class="step_user_text_bot_container"><span class="step_user_text"> Добавь мероприятия в избранное, чтобы ничего не забыть</span></div>
 		</div><div class="step_user_container"><img src="/landing/img/Liked253x225.png" class="step_user_img"></div>
 		</div>
 		<div class="line_blue_and_pink"></div>
 
 		<div class="steps_user_container">
 			<div class="step_user_container"><img src="/landing/img/notification253x225.png" class="step_user_img"></div><div class="user_step_content_container">
-			<div><span class="step_text">ПОЛУЧАЙ УВЕДОМЛЕНИЯ</span></div>
-			<div class="step_user_text_bot_container"><span class="step_user_text">ПОЛУЧАЙ УВЕДОМЛЕНИЯ ОБ ИЗБРАНЫХ СОБЫТИЯХ </span></div>
+			<div><span class="step_text">Получай уведомления</span></div>
+			<div class="step_user_text_bot_container"><span class="step_user_text">Получай уведомления о новых событиях</span></div>
 		</div>
 		</div>
 		<div class="line_blue_and_pink"></div>
 
 		<div class="steps_user_container">
 			<div class="user_step_content_container user_step_content_container_2">
-			<div><span class="step_text">СЛЕДИ ЗА ДРУЗЬЯМИ</span></div>
-			<div class="step_user_text_bot_container"><span class="step_user_text">ОТСЛЕЖИВАЙ ИНТЕРЕСНЫЕ ДРУЗЬЯМ МЕРОПРИЯТИЯ</span></div>
+			<div><span class="step_text">Следи за друзьями</span></div>
+			<div class="step_user_text_bot_container"><span class="step_user_text">Узнай, куда собираются сходить друзья из социальных сетей</span></div>
 		</div><div class="step_user_container"><img src="/landing/img/follow.png" class="step_user_img"></div>
 		</div>
 		<div class="line_blue_and_pink"></div>
 
 		<div class="steps_user_container">
 			<div class="step_user_container"><img src="/landing/img/recommendations.png" class="step_user_img"></div><div class="user_step_content_container">
-				<div><span class="step_text">ПОЛУЧАЙ РЕКОМЕНДАЦИИ</span></div>
-				<div class="step_user_text_bot_container"><span class="step_user_text">ПОЛУЧАЙ РЕКОМЕНДАЦИИ НА ОСНОВЕ СВОИХ ИНТЕРЕСОВ  </span></div>
+				<div><span class="step_text">Получай рекомендации</span></div>
+				<div class="step_user_text_bot_container"><span class="step_user_text">Получай рекомендации на основе своих интересов</span></div>
 			</div>
 		</div>
 	</section>
@@ -74,8 +75,7 @@ require_once('landing/header.php'); ?>
 
 <article class="bottom_article_and_footer_size">
 	<section class="join_text_container">
-	<div class="join_text_container_inside"><span class="content_text_header">Присоединяйся прямо сейчас!
-С Evendate твоя жизнь станет интереснее!</span></div><div class="phones_img_container_users">
+	<div class="join_text_container_inside"><span class="content_text_header">Скачай приложение и будь в курсе актуальных событий</span></div><div class="phones_img_container_users">
 	 <!-- Картинки телефонов -->
 			<div class="phone_img_container"><div class="phones_otstup"><img src="/landing/img/iphone.jpg" class="phone_users_size"></div><a href="https://itunes.apple.com/us/app/evendate/id1044975200?l=ru&ls=1&mt=8" class="download_user_container"><img src="/landing/img/app_store.png" class="download_img"></a></div><div class="phone_img_container"><div class="phones_otstup"><img src="/landing/img/android.jpg" class="phone_users_size"></div><a href="https://play.google.com/store/apps/details?id=ru.evendate.android" class="download_user_container"><img src="/landing/img/google_play.png" class="download_img"></a></div>
 	 <!-- /Картинки телефонов -->

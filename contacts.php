@@ -7,7 +7,7 @@ require_once('landing/header.php'); ?>
 </div><div class="header_button_container"><button id="go" class="header_button" type="button"><span class="header_button_text">ВОЙТИ</span></button></div></header>
 
 <div class="position_main_part">
-<div class="fon_img_main_page con_mini"></div>
+<div style="background-image: url(landing/img/Support.jpg);" class="fon_img_main_page"></div>
 
 <article class="article_fon_about_us">
 	<section class="section_about_us_size">

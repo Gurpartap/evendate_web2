@@ -7,7 +7,7 @@ require_once('landing/header.php'); ?>
 </div><div class="header_button_container"><button id="go" class="header_button" type="button"><span class="header_button_text">ВОЙТИ</span></button></div></header>
 
 <div class="position_main_part">
-<div class="fon_img_users"></div> <!-- Картинка -->
+<div style="background-image: url(landing/img/About.jpg);" class="fon_img_users"></div> <!-- Картинка -->
 
 <article class="article_fon_about_us"> <!-- Серый фон -->
 	<section class="section_about_us_size"> <!-- 1008px -->
@@ -21,9 +21,8 @@ require_once('landing/header.php'); ?>
 		<div id="wrapper_about_us_1" class="wrapper_contacts_about_us">
 		<div>
 			<div>
-				<div class="about_us_content_text_container"><span class="who_use_text">Около года назад мы решили объединить все мероприятия Москвы в одном простом и удобном сервисе, где в соответствии с личными интересами можно подписаться на организаторов, добавлять их мероприятия себе в календарь, получать напоминания,
-				чтобы ничего не пропустить, а также видеть какие мероприятия посещают друзья.</span></div><div class="about_us_content_text_container"><span class="who_use_text">Итогом нашей работы стал сервис, представленный в виде веб-сайта, iOS- и Android-приложений.
-			Теперь есть возможность быть в курсе всех интересных вам событий - в родном городе, в любимой организации, в альма-матер, в любом другом месте.</span></div></div>
+				<div class="about_us_content_text_container"><span class="who_use_text">Год назад мы взялись за объединение мероприятий Москвы в одном сервисе, где по личными интересам можно подписаться на организаторов, добавлять мероприятия себе в календарь,
+				получать напоминания, чтобы ничего не пропустить, и видеть какие мероприятия посещают друзья.</span></div><div class="about_us_content_text_container"><span class="who_use_text">Итогом работы стал сервис, представленный в виде веб-сайта, iOS- и Android-приложений. Теперь ты в курсе интересных событий – в родном городе, в любимой организации, в альма-матер, в любом другом месте.</span></div></div>
 		</div>
 		<!-- мы в соц сетях -->
 		<div class="all_network_container">
@@ -34,54 +33,51 @@ require_once('landing/header.php'); ?>
 		<!-- /мы в соц сетях -->
 		</div><div id="wrapper_about_us_2" class="wrapper_contacts_about_us">
 			<div class="team_all_photo_container">
-			<div><span class="who_use_text">Мы используем Evendate ежедневно, им пользуются наши друзья и друзья друзей. Мы будем рады видеть вас в числе наших пользователей.
-								 Верим, что вы полюбите Evendate - он упростит вам жизнь. Скачивайте и пробуйте!</span></div>
+			<div><span class="who_use_text">Мы используем Evendate ежедневно, им пользуются наши друзья и друзья друзей. Мы будем рады видеть тебя в числе пользователей. Верим, что полюбишь Evendate – он упростит вам жизнь. Скачивайте и пробуйте!</span></div>
 			<div class="team_text_container"><span class="who_use_text">Знакомьтесь с командой, которая это все создает</span></div>
 
 			<div class="photos_container">
-				<div class="team_photo_container" style="background-image: url(/landing/img/team_1.jpg); background-size: 158px;"><div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Инал Карданов</span><div><span class="team_name_text">Lead Backend Delevoper</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team_2.jpg); background-size: 158px;">
-				<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Арам Харазян</span><div><span class="team_name_text">Lead Frontend Developer</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team_3.jpg); background-size: 158px;">
-				<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Дмитрий Гордеев</span><div><span class="team_name_text">Lead Android Delevoper</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team_4.jpg); background-size: 158px;">
-				<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Денис Оздемир</span><div><span class="team_name_text">Lead Product Designer</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team_5.jpg); background-size: 158px;">
-				<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Амир Абдуллаев</span><div><span class="team_name_text">Investor & Public Relations</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team_6.jpg); background-size: 158px;">
+				<div class="team_photo_container" style="background-image: url(/landing/img/team/Inal.jpg); background-size: 158px;"><div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Инал Карданов</span><div><span class="team_name_text">Lead Backend Delevoper</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team/Aram.jpg); background-size: 158px;">
+				<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Арам Харазян</span><div><span class="team_name_text">Lead Frontend Developer</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team/Dima.jpg); background-size: 158px;">
+				<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Дмитрий Гордеев</span><div><span class="team_name_text">Lead Android Delevoper</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team/Denis.jpg); background-size: 158px;">
+				<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Денис Оздемир</span><div><span class="team_name_text">Lead Product Designer</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team/Amir.jpg); background-size: 158px;">
+				<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Амир Абдуллаев</span><div><span class="team_name_text">Investor & Public Relations</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team/Sasha_A.jpg); background-size: 158px;">
 				<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Александр Сапронов</span><div><span class="team_name_text">Designer</span></div></div></div></div>
 			</div>
 
 			<div class="photos_container">
-				<div class="team_photo_container" style="background-image: url(/landing/img/team_8.jpg); background-size: 158px;">
-				<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Регина Лукьянова</span><div><span class="team_name_text">UX/UI</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team_9.jpg); background-size: 158px;">
-				<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Елена Власова </span><div><span class="team_name_text">UX/UI</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team_10.jpg); background-size: 158px;">
-				<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Анна Андрианова</span><div><span class="team_name_text">Frontend Developer</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team_11.jpg); background-size: 158px;">
-				<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Елена Каминская</span><div><span class="team_name_text">Analyst</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team_7.jpg); background-size: 158px;"><div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Ольга Санникова</span><div><span class="team_name_text">Sales manager</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team_12.jpg); background-size: 158px;">
+				<div class="team_photo_container" style="background-image: url(/landing/img/team/Rita.jpg); background-size: 158px;">
+				<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Регина Лукьянова</span><div><span class="team_name_text">UX/UI</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team/Elena_V.JPG); background-size: 158px;">
+				<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Елена Власова </span><div><span class="team_name_text">UX/UI</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team/Ann_A.jpg); background-size: 158px;">
+				<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Анна Андрианова</span><div><span class="team_name_text">Frontend Developer</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team/Elena_K.jpg); background-size: 158px;">
+				<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Елена Каминская</span><div><span class="team_name_text">Analyst</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team/Olya.jpg); background-size: 158px;"><div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Ольга Санникова</span><div><span class="team_name_text">Sales manager</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team/Sasha_S.jpg); background-size: 158px;">
 				<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Александра Серкова</span><div><span class="team_name_text">Sales manager</span></div></div></div></div>
 			</div>
 
 			<div class="photos_container">
-					<div class="team_photo_container" style="background-image: url(/landing/img/team_13.jpg); background-size: 158px;"><div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Савр Манджиев</span><div><span class="team_name_text">Backend Delevoper</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team_15.jpg); background-size: 158px;">
-				<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Анна Литвинова</span><div><span class="team_name_text">Node.js Developer</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team_20.jpg); background-size: 158px;">
-				<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Али Абдулмаджидов</span><div><span class="team_name_text">Android developer</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team_21.jpg); background-size: 158px;">
-				<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Айта Манджиев</span><div><span class="team_name_text">Android developer</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team_14.jpg); background-size: 158px;">
-					<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Кристина Личинина</span><div><span class="team_name_text">Junior Developer</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team_16.jpg); background-size: 158px;">
-					<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Катя Мысливцева</span><div><span class="team_name_text">Junior Developer</span></div></div></div></div>
+					<div class="team_photo_container" style="background-image: url(/landing/img/team/Savr.jpg); background-size: 158px;"><div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Савр Манджиев</span><div><span class="team_name_text">Backend Delevoper</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team/Ann_L.jpg); background-size: 158px;">
+				<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Анна Литвинова</span><div><span class="team_name_text">Node.js Developer</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team/Ali.jpg); background-size: 158px;">
+				<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Али Абдулмаджидов</span><div><span class="team_name_text">Android developer</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team/Aita.jpg); background-size: 158px;">
+				<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Айта Манджиев</span><div><span class="team_name_text">Android developer</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team/Kristina.jpg); background-size: 158px;">
+					<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Кристина Личинина</span><div><span class="team_name_text">Junior Developer</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team/Kati.jpg); background-size: 158px;">
+					<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Екатерина Мысливцева</span><div><span class="team_name_text">Junior Developer</span></div></div></div></div>
 			</div>
 
 				<div class="photos_container">
-					<div class="team_photo_container" style="background-image: url(/landing/img/team_22.jpg); background-size: 158px;">
-						<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Ерлан Тансыкбаев</span><div><span class="team_name_text">Sales manager</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team_17.jpg); background-size: 158px;">
-						<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Анастасия Лукьянова</span><div><span class="team_name_text">Content manager</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team_18.jpg); background-size: 158px;">
+					<div class="team_photo_container" style="background-image: url(/landing/img/team/Erlan.jpg); background-size: 158px;">
+						<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Ерлан Тансыкбаев</span><div><span class="team_name_text">Sales manager</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team/Stasya.jpg); background-size: 158px;">
+						<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Анастасия Лукьянова</span><div><span class="team_name_text">Content manager</span></div></div></div></div><div class="team_photo_container" style="background-image: url(/landing/img/team/Darina.jpg); background-size: 158px;">
 					<div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Дарина Кириенко</span><div><span class="team_name_text">Content manager</span></div></div></div></div>
-					<div class="team_photo_container" style="background-image: url(/landing/img/team_19.jpg); background-size: 158px;"><div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Татьяна Иванова</span><div><span class="team_name_text">Content manager</span></div></div></div></div>
+					<div class="team_photo_container" style="background-image: url(/landing/img/team/Tanya.jpg); background-size: 158px;"><div class="team_name_fon"><div class="team_name_container"><span class="team_first_name_text">Татьяна Иванова</span><div><span class="team_name_text">Content manager</span></div></div></div></div>
 					<div class="team_photo_container" style="background-image: none; background-size: 158px;"><div class="team_name_fon" style="display: none"><div class="team_name_container"><span class="team_first_name_text">Татьяна Иванова</span><div><span class="team_name_text">Content manager</span></div></div></div></div>
 					<div class="team_photo_container" style="background-image: none; background-size: 158px;"><div class="team_name_fon" style="display: none"><div class="team_name_container"><span class="team_first_name_text">Татьяна Иванова</span><div><span class="team_name_text">Content manager</span></div></div></div></div>
 				</div>
 			</div>
 			</div><div id="wrapper_about_us_3" class="wrapper_contacts_about_us">
 			<div class="team_all_photo_container">
-				<div><span class="who_use_text">Наши разработчики ежедневно дорабатывают продукт, чтобы сделать сервис интереснее.
-Если вы хотите приобщиться к нашей миссии и сделать Evendate чуточку лучше,
-то мы предлагаем воспользоваться нашим Beta REST API.
+				<div><span class="who_use_text">Наши разработчики ежедневно дорабатывают продукт, чтобы сделать сервис лучше. Приобщитесь к нашей миссии и сделайте Evendate еще круче – предлагаем воспользоваться Beta REST API.
 <br><br>
-Заполните форму, и наша команда обязательно свяжется с Вами!</span></div>
+Заполните форму, и мы свяжемся с вами</span></div>
 			</div>
 			<form class="form_support">
 				<div class="field_container"><input name="full_name" type="text" placeholder="ВАШЕ ИМЯ" required class="form_style"></div>
