@@ -121,8 +121,10 @@ a {
 	background-size: cover;
 	height: 521px;
 	background-position-y: center;
+	background-position-x: center;
 }
 
+/*
 .con_mini {
 	background-image: url(img/contacts.png);
 }
@@ -138,6 +140,7 @@ a {
 .fon_img_mane_mini {
 	background-image: url(img/main_mini.png);
 }
+*/
 
 .fon_text_container {
 	display: inline-block;
@@ -792,7 +795,7 @@ a {
 }
 
 .fon_img_about_evendate {
-	background: url("img/about_evendate.jpg");
+	background: url("img/about.jpg");
 	background-size: 100%;
 	padding: 438px 0 0;
 }
@@ -1313,7 +1316,7 @@ a {
 	}
 
 	.fon_img_users {
-		background-image: url(img/users.jpg);
+		background-image: url(img/Usss.jpg);
 	}
 	/* /Users */
 	/* Organizers */
@@ -1368,10 +1371,10 @@ a {
 		margin: 0 0 0 224px;
 	}
 
-	/*.step_container {
-		display: block;
-		width: auto;
+	.step_container {
+		height: 290px;
 	}
+	/*
 	.step_container_center {
 		border-top: solid 1px #979797;
 		border-bottom: solid 1px #979797;
@@ -1541,11 +1544,11 @@ a {
 	}
 
 	.con_mini {
-		background-image: url(img/contacts.jpg);
+		background-image: url(img/Support.jpg);
 	}
 
 	.fon_img_users {
-		background-image: url(img/Usss.png);
+		background-image: url(img/Usss.jpg);
 	}
 
 	.team_photo_container {
