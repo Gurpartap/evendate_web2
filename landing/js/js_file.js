@@ -42,7 +42,7 @@ function organizersSlider () {
 	$('#organizers_footer').addClass('about_us_text_header_active');
 	$('#about_evendate').removeClass('about_us_text_header_active');
 	$('#team_page').removeClass('about_us_text_header_active');
-	$('#about_us_content_container').addClass('about_us_organizers_slider').removeClass('about_us_page').height($('#wrapper_about_us_3').height());
+	$('#about_us_content_container').removeClass('contacts_container_support').addClass('about_us_organizers_slider').removeClass('about_us_page').height($('#wrapper_about_us_3').height());
 	location.hash = '#organizers';
 }
 

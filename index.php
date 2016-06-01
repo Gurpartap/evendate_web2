@@ -30,11 +30,11 @@ require_once('landing/header.php');
 
 
 	<div class="position_main_part">
-	<div class="fon_img_main_page fon_img_mane_mini">
+	<div style="background-image: url(landing/img/Main.jpg);" class="fon_img_main_page">
 		<div class="position_in_fon">
 		<div class="fon_text_container">
-			<div><span class="fon_text_top">Попробуй сделать свою жизнь интереснее!</span></div>
-			<div class="fon_text_bottom_container"><span class="fon_text_bottom">Evendate - это сервис для быстрого и удобного поиска интересных мероприятий.</span></div>
+			<div><span class="fon_text_top">Наполни жизнь событиями </span></div>
+			<div class="fon_text_bottom_container"><span class="fon_text_bottom">Собери интересные тебе места и не пропусти важные события</span></div>
 
 		</div><div class="login_container"><div class="login_container_text"><span class="login_text">ВОЙТИ С ПОМОЩЬЮ</span></div>
 		<div><div class="login_img_container"><img src="/landing/img/vk_logo.jpg" id="vk_login" class="img_login" data-type="vk"></div><div class="login_img_container"><img src="/landing/img/fb_logo.jpg" id="fb_login" class="img_login" data-type="facebook"></div><div class="login_img_container"><img src="/landing/img/g+_logo.png" id="g_login" class="img_login" data-type="google"></div></div>
@@ -49,7 +49,7 @@ require_once('landing/header.php');
 			<div class="section_stay_in_touch_text_bottom_container"><span class="section_stay_in_touch_text_bottom">Подпишись на интересующие тебя источники, сформируй уникальную ленту новостей и с легкостью отслеживай события, которые происходят вокруг тебя!</span></div>
 		</section>
 		<section class="section_steps">
-			<div class="step_container"><div><img src="/landing/img/subscribe.png" class="step_img"></div><div class="step_text_container"><span class="step_text">ПОДПИСЫВАЙСЯ НА ОРГАНИЗАТОРОВ</span></div></div><div class="step_container step_container_center"><div><img src="/landing/img/Liked.png" class="step_img"></div><div class="step_text_container"><span class="step_text">ДОБАВЛЯЙ СОБЫТИЯ В ИЗБРАННОЕ</span></div></div><div class="step_container"><div><img src="/landing/img/notice.png" class="step_img"></div><div class="step_text_container"><span class="step_text">ПОЛУЧАЙ УВЕДОМЛЕНИЯ</span></div></div>
+			<div class="step_container"><div><img src="/landing/img/subscribe.png" class="step_img"></div><div class="step_text_container"><div><span class="step_text">Подпишись на организаторов</span></div><div class="otstup"><span class="step_user_text">Из подписок формируется лента событий</span></div></div></div><div class="step_container step_container_center"><div><img src="/landing/img/Liked.png" class="step_img"></div><div class="step_text_container"><div><span class="step_text">Добавляй события в избранное</span></div></div><div class="otstup"><span class="step_user_text">Отмеченные события отображаются в календаре вашего телефона</span></div></div><div class="step_container"><div><img src="/landing/img/notice.png" class="step_img"></div><div class="step_text_container"><div><span class="step_text">Получай уведомления</span></div><div class="otstup"><span class="step_user_text">Организатор добавил событие - узнаешь об этом</span></div></div></div>
 		</section>
 	</article>
 
@@ -58,11 +58,10 @@ require_once('landing/header.php');
 			<div><span class="content_text_header">Кто использует Evendate?</span></div>
 			<div class="line_blue_and_pink content_text_header_container"></div>
 			<div>
-				<div class="who_use_container"><div><a href="users.php" class="who_use_head_blue for_users_hover">ПОЛЬЗОВАТЕЛИ<img src="/landing/img/BlueArrow.png" class="arrow_img"></a></div>
-				<div class="who_use_text_container"><span class="who_use_text">Все мероприятия Москвы в одном простом и удобном сервисе.  Используя Evendate, ты
-				сможешь собрать все любимые места в собственную персонализированную ленту.</span></div></div><div class="who_use_container"><div><a href="organizations.php" class="who_use_head_pink who_use_head_blue for_org_hover">ОРГАНИЗАТОРЫ<img src="/landing/img/PinkArrow.png" class="arrow_img"></a></div>
-				<div class="who_use_text_container"><span class="who_use_text">Evendate - самый простой способ привлечь и удержать нужную аудиторию. Мы предлагаем не только потенциальных клиентов, но и
-				возможность получения статистики проведенных событий.</span></div></div>
+				<div class="who_use_container"><div><a href="users.php" class="who_use_head_blue for_users_hover">Пользователи<img src="/landing/img/BlueArrow.png" class="arrow_img"></a></div>
+				<div class="who_use_text_container"><span class="who_use_text">Собери при помощи Evendate любимые места вместе, отмечай интересные события
+и получай уведомления, чтобы ничего не пропустить.</span></div></div><div class="who_use_container"><div><a href="organizations.php" class="who_use_head_pink who_use_head_blue for_org_hover">Организаторы<img src="/landing/img/PinkArrow.png" class="arrow_img"></a></div>
+				<div class="who_use_text_container"><span class="who_use_text">Привлекайте и удерживайте целевую аудиторию. Размещайте события, находите потенциальных клиентов, общайтесь с участниками,  получайте аналитику по проведенным мероприятиям.</span></div></div>
 			</div>
 			<div class="line_blue_and_pink"></div>
 		</section>
@@ -70,27 +69,25 @@ require_once('landing/header.php');
 		<section class="bottom_part_content">
 			<div class="phones_img_container"><img src="/landing/img/phones.jpg" class="phones_img_style"></div><div class="bottom_content_container">
 			<div class="content_text_header_container_phones"><span class="content_text_header">Все события Москвы в твоём телефоне</span></div>
-		<div class="bottom_content_text_container"><span class="who_use_text">Используй мобильное приложение Evendate, чтобы не пропустить то, что тебе интересно.
-Афиша выставок, музеев, кинотеатров, концертов, мастер-классов всегда под рукой.</span></div>
+		<div class="bottom_content_text_container"><span class="who_use_text">Используй мобильное приложение Evendate, чтобы не пропустить то, что тебе интересно. Афиша выставок, музеев, кинотеатров, концертов, мастер-классов в твоем кармане.</span></div>
 		<div><a href="https://itunes.apple.com/us/app/evendate/id1044975200?l=ru&ls=1&mt=8" class="download_container"><img src="/landing/img/app_store.png" class="download_img"></a><a href="https://play.google.com/store/apps/details?id=ru.evendate.android" class="download_container"><img src="/landing/img/google_play.png" class="download_img"></a></div></div>
 		</section>
 	</article>
 
-	<article class="bottom_article_and_footer">
-		<div class="bottom_article_and_footer_size">
-		<section class="who_us_container">
-			<div><span class="content_text_header">Кто мы</span></div>
-			<div class="who_us_text_container"><span class="who_us_text">Мы команда из Государственного Университета Управления, которая решила объединить все мероприятия Москвы в одном удобном сервисе.
-					 Пользуясь нашим приложением, вы всегда будете в курсе интересных событий и никогда их не пропустите.</span></div>
-		</section>
-		<footer>
-			<div class="line_blue_and_pink"></div>
-			<div class="footer_text_left">
-				<div class="footer_text_container"><a href="contacts.php#contacts" class="footer_text">КОНТАКТЫ</a></div><div class="footer_text_container"><a href="about.php#organizers" class="footer_text" id="org_footer">РАЗРАБОТЧИКАМ</a></div><div class="footer_text_container"><a href="contacts.php#support" class="footer_text">ПОДДЕРЖКА</a></div>
-			</div><div class="footer_text_container footer_text_container_sign"><span class="footer_text_sign">Evendate © 2016</span></div>
-		</footer>
+
+		<article>
+			<div class="bottom_article_and_footer_size">
+
+				<footer>
+					<div class="line_blue_and_pink"></div>
+					<div class="footer_text_left">
+						<div class="footer_text_container"><a href="contacts.php#contacts" class="footer_text">КОНТАКТЫ</a></div><div class="footer_text_container"><a href="about.php#organizers" class="footer_text" id="org_footer">РАЗРАБОТЧИКАМ</a></div><div class="footer_text_container"><a href="contacts.php#support" class="footer_text">ПОДДЕРЖКА</a></div>
+					</div><div class="footer_text_container footer_text_container_sign"><span class="footer_text_sign">Evendate © 2016</span></div>
+				</footer>
 			</div>
-	</article>
+		</article>
+
+
 
 	<div id="modal_form" class="modal_form"><!-- Сaмo oкнo -->
 		<div class="top_part_modal"> <!-- Верхняя часть модалки -->

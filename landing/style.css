@@ -128,15 +128,15 @@ a {
 }
 
 .org_mini {
-	background-image: url(img/organizers.png);
+	background-image: url(img/org_mini.png);
 }
 
 .users_mini {
-	background-image: url(img/users.png);
+	background-image: url(img/users_mini.png);
 }
 
 .fon_img_mane_mini {
-	background-image: url(img/main_page.png);
+	background-image: url(img/main_mini.png);
 }
 
 .fon_text_container {
@@ -234,6 +234,7 @@ a {
 	text-align: center;
 	margin: auto;
 	padding: 20px 0 2px 0;
+	display: none;
 }
 
 .section_stay_in_touch_text_top {
@@ -267,6 +268,7 @@ a {
 	vertical-align: top;
 	width: calc(100% - 2/3*100% - 8px);
 	padding: 36px 0;
+	height: 245px;
 }
 
 .step_container_center {
@@ -279,13 +281,17 @@ a {
 	height: 175px;
 }
 
+.otstup {
+	padding: 15px 0 0;
+}
+
 .step_text_container {
 	margin: 25px 0 0 0;
 }
 
 .step_text {
 	font-family: 'Roboto', sans-serif;
-	font-size: 16px;
+	font-size: 18px;
 	color: rgba(74, 74, 74, 1.0);
 }
 /* /Будь в курсе событий! */
@@ -502,7 +508,7 @@ a {
 /* Users page */
 /* Картинка */
 .fon_img_users {
-	background-image: url(img/about_evendate.jpg);
+	background-image: url(img/about.jpg);
 	background-size: cover;
 	height: 521px;
 	background-position-x: center;
@@ -642,7 +648,7 @@ a {
 .step_user_text {
 	font-family: 'Roboto', sans-serif;
 	font-weight: lighter;
-	font-size: 15px;
+	font-size: 16px;
 	color: rgba(74, 74, 74, 1.0);
 }
 
@@ -686,14 +692,15 @@ a {
 /* Organizers */
 
 .fon_img_organizers {
-	background: url(img/organizers.png) no-repeat;
+	background: url(img/organizers.jpg) no-repeat;
 	background-size: 100%;
 }
 
 .fon_users_text_container_org {
 	text-align: center;
 	margin: auto;
-	padding: 128px 0;	width: 600px;
+	padding: 103px 0;
+	width: 712px;
 }
 
 .button_fon_img_users_container_org {
@@ -969,27 +976,7 @@ a {
 	color: #e2e2e2;
 }
 
-/* сами фоточки */
-.photo_1 {
-	background-image: url("img/team_1.jpg");
-}
 
-.photo_2 {
-	background: url(img/team_2.jpg);
-}
-
-.photo_3 {
-	background: url(img/team_3.jpg);
-}
-
-.photo_4 {
-	background: url(img/team_4.jpg);
-}
-
-.photo_enot {
-	background: url(img/team_enot.jpg);
-}
-/* /сами фоточки */
 /* /о нас (фоточки) */
 
 
@@ -997,7 +984,7 @@ a {
 
 /* Contacts */
 .fon_img_contacts {
-	background: url("img/About_Developers.jpg");
+	background: url("img/support.jpg");
 	background-size: 100%;
 	padding: 438px 0 0;
 }
@@ -1326,7 +1313,7 @@ a {
 	}
 
 	.fon_img_users {
-		background-image: url(img/about_evendate2.jpg);
+		background-image: url(img/users.jpg);
 	}
 	/* /Users */
 	/* Organizers */
@@ -1476,9 +1463,7 @@ a {
 		width: 600px;
 	}
 
-	.form_style {
-		width: 587px;
-	}
+
 
 	.section_about_us_size {
 		width: 700px;
@@ -1544,19 +1529,19 @@ a {
 	}
 
 	.fon_img_mane_mini {
-		background-image: url(img/Main_mini.png);
+		background-image: url(img/Main.jpg);
 	}
 
 	.users_mini {
-		background-image: url("img/Users_mini.png");
+		background-image: url("img/Users.jpg");
 	}
 
 	.org_mini {
-		background-image: url(img/Org_mini.png);
+		background-image: url(img/Organizers.jpg);
 	}
 
 	.con_mini {
-		background-image: url(img/Con_mini.png);
+		background-image: url(img/contacts.jpg);
 	}
 
 	.fon_img_users {
