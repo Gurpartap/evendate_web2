@@ -56,6 +56,11 @@ class OrganizationsCollection
                     $statement_array[':type_id'] = $value;
                     break;
                 }
+                case 'q': {
+                    $select->where('fts @@ to_tsquery(:search_stm)');
+                    $statement_array[':search_stm'] = App::prepareSearchStatement($value);
+                    break;
+                }
                 case 'privileges': {
                     if ($value == 'can_add') {
                         $select

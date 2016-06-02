@@ -207,4 +207,9 @@ class App {
 			'facebook' => 'https://www.facebook.com/dialog/oauth?client_id=' . self::$SETTINGS->facebook->app_id . '&response_type=token&scope=public_profile,email,user_friends&display=popup&redirect_uri=http://'. self::$DOMAIN . '/redirectOauth.php?mobile=' . $is_mobile . '%26type=facebook'
 		));
 	}
+
+	public static function prepareSearchStatement($value){
+		$values = preg_split("/([a-zA-Zа-яА-Я]+)/", $value);
+		return implode('&', $values) . ':abd';
+	}
 }
