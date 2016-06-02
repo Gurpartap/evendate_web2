@@ -597,22 +597,6 @@ function OneEvent($view, $content_block){
 		initNotifications($parent);
 		bindOnClick();
 
-		$parent.find('.EventSubscribe').not('.-Handled_EventSubscribe').on('click.eventSubscribe', function(){
-			var $this = $(this),
-				url = '/api/v1/events/'+$this.data('event-id')+'/favorites',
-				method = $this.hasClass('-Subscribed') ? 'DELETE' : 'POST';
-
-			$.ajax({
-				url: url,
-				method: method,
-				success: function(res){
-					ajaxHandler(res, function(data, text){
-					}, ajaxErrorHandler)
-				}
-			});
-
-		}).addClass('-Handled_EventSubscribe');
-
 		$parent.find('.Subscribe').not('.-Handled_Subscribe').each(function(){
 			new SubscribeButton($(this), {
 				labels: {
@@ -1013,22 +997,6 @@ function Organization($view, $content_block){
 		bindAddAvatar($parent);
 		trimAvatarsCollection($parent);
 
-		$parent.find('.EventSubscribe').not('.-Handled_EventSubscribe').on('click.eventSubscribe', function(){
-			var $this = $(this),
-				url = '/api/v1/events/'+$this.data('event-id')+'/favorites',
-				method = $this.hasClass('-Subscribed') ? 'DELETE' : 'POST';
-
-			$.ajax({
-				url: url,
-				method: method,
-				success: function(res){
-					ajaxHandler(res, function(data, text){
-					}, ajaxErrorHandler)
-				}
-			});
-
-		}).addClass('-Handled_EventSubscribe');
-
 		$parent.find('.Subscribe').not('.-Handled_Subscribe').each(function(){
 			new SubscribeButton($(this), {
 				labels: {
@@ -1049,22 +1017,6 @@ function Organization($view, $content_block){
 	function initOrganizationPage($parent){
 		bindTabs($parent);
 		//placeAvatarDefault($parent.find('.organization_info_page'));
-
-		$parent.find('.OrganizationSubscribe').on('click.organizationSubscribe', function(){
-			var $this = $(this),
-				url = '/api/v1/organizations/'+$this.data('organization-id')+'/subscriptions',
-				method = $this.hasClass('-Subscribed') ? 'DELETE' : 'POST';
-
-			$.ajax({
-				url: url,
-				method: method,
-				success: function(res){
-					ajaxHandler(res, function(data, text){
-					}, ajaxErrorHandler)
-				}
-			});
-
-		});
 
 		new SubscribeButton($('.OrganizationSubscribe'), {
 			colors: {
