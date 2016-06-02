@@ -209,7 +209,7 @@ class App {
 	}
 
 	public static function prepareSearchStatement($value){
-		$values = preg_split("/([a-zA-Zа-яА-Я]+)/", $value);
+		$values = preg_split('/\P{L}+/u', $value);
 		return implode('&', $values) . ':abd';
 	}
 }
