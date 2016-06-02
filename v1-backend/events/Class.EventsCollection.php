@@ -218,6 +218,11 @@ class EventsCollection extends AbstractCollection
                     $statement_array[':changed_since'] = $value;
                     break;
                 }
+                case 'q': {
+                    $q_get_events->where('fts @@ to_tsquery(:search_stm)');
+                    $statement_array[':search_stm'] = App::prepareSearchStatement($value);
+                    break;
+                }
                 case 'tags': {
                     if (is_array($value)) {
                         $q_part = array();
@@ -331,7 +336,7 @@ class EventsCollection extends AbstractCollection
             }
         }
 
-        if (array_key_exists(Event::FAVORED_FRIENDS_COUNT_FIELD_NAME, $fields)){
+        if (array_key_exists(Event::FAVORED_FRIENDS_COUNT_FIELD_NAME, $fields)) {
             $statement_array[':user_id'] = $user->getId();
         }
 
