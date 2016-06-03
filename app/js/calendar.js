@@ -570,12 +570,21 @@ function Feed($view, $content_block){
 							$wrapper.find('.FeedEvents').append($events);
 							bindEventsEvents($events);
 						} else {
+							$wrapper.find('.FeedEvents').append(tmpl('feed-no-event', {
+								image_url: '/app/img/sad_eve.png',
+								text: 'Как насчет того, чтобы подписаться на организации?'
+							}));
 							$window.off('scroll.upload'+feed_state.capitalize()+'Events');
 						}
 						$window.data('block_scroll', false);
 					});
 				}
 			});
+		} else {
+			$wrapper.find('.FeedEvents').append(tmpl('feed-no-event', {
+				image_url: '/app/img/sad_eve.png',
+				text: 'Как насчет того, чтобы подписаться на организации?'
+			}));
 		}
 
 	});
