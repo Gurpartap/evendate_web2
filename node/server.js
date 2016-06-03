@@ -108,16 +108,15 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
     try {
         new CronJob('*/1 * * * *', function () {
-            cropper.resizeNew({
-                images: real_config.images,
-                client: client
-            });
-            cropper.blurNew({
-                images: real_config.images,
-                client: client
-            });
-
             if (config_index == 'prod') {
+                cropper.resizeNew({
+                    images: real_config.images,
+                    client: client
+                });
+                cropper.blurNew({
+                    images: real_config.images,
+                    client: client
+                });
                 var notifications = new Notifications(real_config, client, logger);
                 notifications.sendAutoNotifications();
                 notifications.sendUsersNotifications();
@@ -138,7 +137,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 if (!err || err == null) return false;
 
                 logger.error(err);
-                
+
                 if (callback instanceof Function) {
                     callback(err);
                     return true;
@@ -477,7 +476,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                         text: q_ins_group,
                                         name: query_name,
                                         values: [value.gid, value.name, value.screen_name, value.description, value.photo]
-                                    }, function(err, result){
+                                    }, function (err, result) {
                                         if (handleError(err)) return;
                                         if (result.rows.length != 1) return;
                                         client.query({
@@ -616,8 +615,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 friends_data = friends_data.data;
                                 user_info.photo_100 = user_info.hasOwnProperty('picture') ? user_info.picture.data.url : '';
                             }
-                            console.log(friends_data);
-                            getGroupsList(user_info, function(groups_error, groups_data){
+
+                            getGroupsList(user_info, function (groups_error, groups_data) {
 
                                 console.log('groups_data', groups_data);
                                 if (handleError(friends_error)) {
@@ -759,6 +758,32 @@ pg.connect(pg_conn_string, function (err, client, done) {
             }
         });
 
+        socket.on('recommendations.get', function (user, query) {
+            var q_get_user_token = Entities.users.select(Entities.users.token)
+                .from(Entities.users)
+                .where(
+                    Entities.users.id.equals(user.id)
+                ).toQuery();
+            client.query(q_get_user_token, function(err, result){
+                if (err) return handleError(err, 'recommendations.error');
+                if (result.rows.length != 1) return handleError({'error': 'USER_NOT_FOUND', details: err}, 'recommendations.error');
+
+                rest.get('http://localhost/api/v1/events/recommendations' + '?fields=' + encodeURI(query.join(',')), {
+                    json: true,
+                    headers: {
+                        'Authorization': result.rows[0].token
+                    }
+                })
+                    .on('complete', function (result) {
+                        result.data.forEach(function(event, index){
+                            result.data[index].rating_interests = 0;
+                        });
+                        socket.emit('log', result);
+                    });
+            });
+        });
+
+
         socket.on('feedback', function (data) {
             logger.info(data);
             var html = '';
@@ -811,7 +836,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
         });
 
         socket.on(EMIT_NAMES.NOTIFICATIONS.SEND, function () {
-            if (config_index == 'local'){
+            if (config_index == 'local') {
                 var notifications = new Notifications(real_config, client, logger);
                 notifications.sendAutoNotifications();
                 notifications.sendUsersNotifications();
@@ -854,11 +879,11 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 if (handleError(err, EMIT_NAMES.VK_INTEGRATION.POST_ERROR)) return;
 
                 rest.get(url, {
-                        json: true,
-                        headers: {
-                            'Accept-Language': 'ru,en-us'
-                        }
-                    })
+                    json: true,
+                    headers: {
+                        'Accept-Language': 'ru,en-us'
+                    }
+                })
                     .on('complete', function (result) {
 
                         if (result instanceof Error) {
