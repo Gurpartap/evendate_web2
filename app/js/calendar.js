@@ -570,12 +570,21 @@ function Feed($view, $content_block){
 							$wrapper.find('.FeedEvents').append($events);
 							bindEventsEvents($events);
 						} else {
+							$wrapper.find('.FeedEvents').append(tmpl('feed-no-event', {
+								image_url: '/app/img/sad_eve.png',
+								text: 'Как насчет того, чтобы подписаться на организации?'
+							}));
 							$window.off('scroll.upload'+feed_state.capitalize()+'Events');
 						}
 						$window.data('block_scroll', false);
 					});
 				}
 			});
+		} else {
+			$wrapper.find('.FeedEvents').append(tmpl('feed-no-event', {
+				image_url: '/app/img/sad_eve.png',
+				text: 'Как насчет того, чтобы подписаться на организации?'
+			}));
 		}
 
 	});
@@ -596,22 +605,6 @@ function OneEvent($view, $content_block){
 		bindCollapsing($parent);
 		initNotifications($parent);
 		bindOnClick();
-
-		$parent.find('.EventSubscribe').not('.-Handled_EventSubscribe').on('click.eventSubscribe', function(){
-			var $this = $(this),
-				url = '/api/v1/events/'+$this.data('event-id')+'/favorites',
-				method = $this.hasClass('-Subscribed') ? 'DELETE' : 'POST';
-
-			$.ajax({
-				url: url,
-				method: method,
-				success: function(res){
-					ajaxHandler(res, function(data, text){
-					}, ajaxErrorHandler)
-				}
-			});
-
-		}).addClass('-Handled_EventSubscribe');
 
 		$parent.find('.Subscribe').not('.-Handled_Subscribe').each(function(){
 			new SubscribeButton($(this), {
@@ -1013,22 +1006,6 @@ function Organization($view, $content_block){
 		bindAddAvatar($parent);
 		trimAvatarsCollection($parent);
 
-		$parent.find('.EventSubscribe').not('.-Handled_EventSubscribe').on('click.eventSubscribe', function(){
-			var $this = $(this),
-				url = '/api/v1/events/'+$this.data('event-id')+'/favorites',
-				method = $this.hasClass('-Subscribed') ? 'DELETE' : 'POST';
-
-			$.ajax({
-				url: url,
-				method: method,
-				success: function(res){
-					ajaxHandler(res, function(data, text){
-					}, ajaxErrorHandler)
-				}
-			});
-
-		}).addClass('-Handled_EventSubscribe');
-
 		$parent.find('.Subscribe').not('.-Handled_Subscribe').each(function(){
 			new SubscribeButton($(this), {
 				labels: {
@@ -1049,22 +1026,6 @@ function Organization($view, $content_block){
 	function initOrganizationPage($parent){
 		bindTabs($parent);
 		//placeAvatarDefault($parent.find('.organization_info_page'));
-
-		$parent.find('.OrganizationSubscribe').on('click.organizationSubscribe', function(){
-			var $this = $(this),
-				url = '/api/v1/organizations/'+$this.data('organization-id')+'/subscriptions',
-				method = $this.hasClass('-Subscribed') ? 'DELETE' : 'POST';
-
-			$.ajax({
-				url: url,
-				method: method,
-				success: function(res){
-					ajaxHandler(res, function(data, text){
-					}, ajaxErrorHandler)
-				}
-			});
-
-		});
 
 		new SubscribeButton($('.OrganizationSubscribe'), {
 			colors: {

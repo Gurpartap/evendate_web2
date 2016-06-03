@@ -2591,6 +2591,11 @@ html.-noscroll {
 
 .feed_event_button + .feed_event_button {margin-left: 1em}
 
+.feed_no_event {
+	width: 100%;
+	height: 200px;
+	margin: 24px 0;
+}
 
 
 .feed_calendar {margin-bottom: 24px}

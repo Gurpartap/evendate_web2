@@ -206,20 +206,34 @@ function SubscribeButton($btn, options){
 		this.$btn.wrapInner('<span class="Text">');
 	}
 
-	this.$btn.on('click.changeState', function(){
+	this.$btn.on('click.subscribe', function(){
+		var method,
+			url = self.$btn.data('organization-id') ? '/api/v1/organizations/'+self.$btn.data('organization-id')+'/subscriptions' : '/api/v1/events/'+self.$btn.data('event-id')+'/favorites';
 		if(self.$btn.hasClass('-Subscribed')){
+			method = 'DELETE';
 			self.$btn
 				.removeClass(['-Subscribed', self.colors.unsubscribe, self.colors.subscribed, self.icons.unsubscribe, self.icons.subscribed].join(' '))
 				.addClass([self.colors.subscribe, self.icons.subscribe].join(' '))
 				.off('mouseenter.hoverSubscribed mouseleave.hoverSubscribed')
 				.children('.Text').text(self.labels.subscribe);
 		} else {
+			method = 'POST';
 			self.$btn
 				.removeClass([self.colors.subscribe, self.colors.subscribed, self.icons.subscribe, self.icons.subscribed].join(' '))
 				.addClass(['-Subscribed', self.colors.unsubscribe, self.icons.unsubscribe].join(' '))
 				.bindHoverEvents()
 				.children('.Text').text(self.labels.unsubscribe);
 		}
+
+		$.ajax({
+			url: url,
+			method: method,
+			success: function(res){
+				ajaxHandler(res, function(data, text){
+				}, ajaxErrorHandler)
+			}
+		});
+
 	})
 }
 
