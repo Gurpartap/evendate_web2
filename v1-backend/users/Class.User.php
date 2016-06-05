@@ -122,7 +122,28 @@ class User extends AbstractUser
         $p_get = $this->db->prepare($q_get_interests->getStatement());
         $result = $p_get->execute($q_get_interests->getBindValues());
         if ($result === FALSE) throw new DBQueryException('CANT_GET_INTERESTS', $this->db);
-        return new Result(true, '', $p_get->fetch());
+
+
+        $q_get_subscribed_groups = App::queryFactory()->newSelect()
+            ->from('vk_groups')
+            ->cols(array('CONCAT_WS(\' \',name, description) AS text'))
+            ->join('inner', 'vk_users_subscriptions', 'vk_groups.id=vk_users_subscriptions.vk_group_id')
+            ->where('vk_users_subscriptions.user_id = ?', $this->id);
+
+        $p_get_groups = $this->db->prepare($q_get_subscribed_groups->getStatement());
+        $result = $p_get_groups->execute($q_get_subscribed_groups->getBindValues());
+        if ($result === FALSE) throw new DBQueryException('CANT_GET_INTERESTS', $this->db);
+        $groups = $p_get_groups->fetchAll();
+        $groups_text = array();
+        foreach ($groups as $group){
+            $groups_text[] = $group['text'];
+        }
+
+
+        $result = $p_get->fetch();
+        $result['groups'] = implode(' ', $groups_text);
+
+        return new Result(true, '', $result);
 
     }
 

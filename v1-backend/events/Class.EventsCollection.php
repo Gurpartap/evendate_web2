@@ -346,7 +346,6 @@ class EventsCollection extends AbstractCollection
 
 
                     $statement_array[':user_id'] = $user->getId();
-                    echo App::prepareSearchStatement($interests_text, '|');
                     $statement_array[':fts_query'] = App::prepareSearchStatement($interests_text, '|');
 
 
