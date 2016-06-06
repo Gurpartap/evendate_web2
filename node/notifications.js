@@ -198,10 +198,8 @@ class Notifications {
                 console.log('HERE IS ERROR');
                 _this.logger.error(err);
             }
-            console.log(err, result);
 
             result.rows.forEach(function (notification) {
-                console.log(notification);
                 var data = {};
 
                 if (ONLY_FOR_FAVORED.indexOf(notification.notification_type_name) === -1) {
