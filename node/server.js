@@ -469,6 +469,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 }
                             }
 
+                            insertToken();
                             if (data.groups_data) {
                                 query_name = data.type + '_q_ins_groups';
                                 data.groups_data.forEach(function (value) {
@@ -488,7 +489,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                     });
                                 });
                             }
-                            insertToken();
                         });
                     });
                 });

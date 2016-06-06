@@ -210,12 +210,13 @@ class App {
 
 	public static function prepareSearchStatement($value, $glue = '&'){
 		$values = preg_split('/\P{L}+/u', $value);
-		$prep_values = array();
+		$prep_values = array('evendate');
 		foreach($values as $value){
 			if ($value != ''){
 				$prep_values[] = $value;
 			}
 		}
+		echo implode($glue, $prep_values) . ':abd';
 		return implode($glue, $prep_values) . ':abd';
 	}
 }

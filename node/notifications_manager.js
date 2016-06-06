@@ -63,7 +63,6 @@ NotificationsManager.prototype.create = function (notification, device) {
                     if (res instanceof Error) {
                         callback(res, null);
                     } else {
-                        console.log(res);
                         callback(null, res.id);
                     }
                 });
@@ -86,15 +85,14 @@ NotificationsManager.prototype.create = function (notification, device) {
                 'data.type': type,
                 registration_id: device.device_token
             };
+
             // send_data['data.to'] = '';
 
             send_data.registration_id = device.device_token;
-            console.log(device, send_data);
             gcm.send(send_data, function (err, messageId) {
                 if (err) {
                     callback(err, null);
                 } else {
-                    console.log(messageId);
                     callback(null, messageId);
                 }
             });
