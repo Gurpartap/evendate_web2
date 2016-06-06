@@ -216,7 +216,6 @@ class App {
 				$prep_values[] = $value;
 			}
 		}
-		echo implode($glue, $prep_values) . ':abd';
 		return implode($glue, $prep_values) . ':abd';
 	}
 }
