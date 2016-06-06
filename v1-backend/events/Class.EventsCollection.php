@@ -239,13 +239,17 @@ class EventsCollection extends AbstractCollection
                 }
                 case 'recommendations': {
 
+                    $interests = $user->getInterests()->getData();
+                    $interests_text = implode(' ', $interests);
+                    
                     // has tags in favorites
                     // count of favored friends
                     // has tags with hidden events
                     // date since creation => 36
 
                     // dates till end => 10
-                    // date till registration end =>
+                    // date till registration end
+                    // full_text_search_similarity
 
                     $has_tags_in_favorites = 'COALESCE((SELECT SUM(t_favored_by_user.favored_with_tag_count)::INT FROM
                         (SELECT
@@ -287,9 +291,27 @@ class EventsCollection extends AbstractCollection
                         THEN 0
                         ELSE (' . Event::RATING_DATE_CREATION_LIMIT . '::INT - (DATE_PART(\'epoch\', NOW()) - ve.created_at))::INT / 7200 END
                         FROM view_events AS ve
-                        WHERE ve.id = view_events.id)';
+                        WHERE ve.id = view_events.id)::INT';
 
-                    $actual_dates_count = Event::getAdditionalCols()[Event::ACTUALITY_FIELD_NAME];
+                    $rating_text_similarity = '(SELECT ts_rank_cd(\'{1.0, 0.7, 0.5, 0.3}\', ve.fts, query)::REAL AS rank
+                      FROM view_events as ve, to_tsquery(:fts_query) as query
+                      WHERE ve.id = view_events.id)::REAL';
+
+                    $actual_dates_count = '(SELECT 1 / (CASE
+                                              WHEN (ve.registration_required = TRUE AND ve.registration_till < DATE_PART(\'epoch\', NOW()))
+                                              THEN 1000
+                                              ELSE (SELECT
+                                              CASE WHEN COUNT(id)::INT = 0 THEN 1000 ELSE COUNT(id)::INT END
+                                              FROM events_dates
+                                              WHERE
+                                              events_dates.event_id = ve.id
+                                              AND event_date > NOW()
+                                              AND event_date < (NOW() + INTERVAL \'10 days\')
+                                              AND status = TRUE
+                                              )
+                                              END)::REAL * 10
+                                            FROM view_events AS ve
+                                            WHERE ve.id = view_events.id)::INT';
 
 
                     $_fields[] =
@@ -301,25 +323,30 @@ class EventsCollection extends AbstractCollection
                             + 
                             ' . $create_date . '
                             + 
-                            (' . $actual_dates_count . ')
-						 ) AS ' . Event::RATING_OVERALL;
+                            ' . $rating_text_similarity . '
+                            + 
+                            ' . $actual_dates_count . '
+						 )::INT AS ' . Event::RATING_OVERALL;
 
 
                     $_fields[] = $has_tags_in_favorites . ' AS ' . Event::RATING_TAGS_IN_FAVORITES;
                     $_fields[] = $favored_friends_count . ' AS ' . Event::RATING_FAVORED_FRIENDS;
                     $_fields[] = $has_tags_in_hidden . ' AS ' . Event::RATING_TAGS_IN_HIDDEN;
                     $_fields[] = $create_date . ' AS ' . Event::RATING_RECENT_CREATED;
-                    $_fields[] = $actual_dates_count . ' AS ' . Event::RATING_ACTIVE_DAYS;
+                    $_fields[] = $actual_dates_count. ' AS ' . Event::RATING_ACTIVE_DAYS;
+                    $_fields[] = $rating_text_similarity . ' AS ' . Event::RATING_TEXT_SIMILARITY;
 
                     $fields[] = Event::RATING_TAGS_IN_FAVORITES;
                     $fields[] = Event::RATING_FAVORED_FRIENDS;
                     $fields[] = Event::RATING_TAGS_IN_HIDDEN;
                     $fields[] = Event::RATING_RECENT_CREATED;
                     $fields[] = Event::RATING_ACTIVE_DAYS;
+                    $fields[] = Event::RATING_TEXT_SIMILARITY;
                     $fields[] = Event::RATING_OVERALL;
 
 
                     $statement_array[':user_id'] = $user->getId();
+                    $statement_array[':fts_query'] = App::prepareSearchStatement($interests_text, '|');
 
 
                     $q_get_events->where('id NOT IN (SELECT
@@ -343,6 +370,7 @@ class EventsCollection extends AbstractCollection
         $q_get_events->where($canceled_condition);
         $q_get_events->cols($_fields);
         $q_get_events->orderBy($order_by);
+//        echo $q_get_events->getStatement();
         $p_get_events = $db->prepare($q_get_events->getStatement());
         $result = $p_get_events->execute($statement_array);
         if ($result === FALSE) throw new DBQueryException(implode(';', $db->errorInfo()), $db);

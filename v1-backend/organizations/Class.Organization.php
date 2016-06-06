@@ -24,6 +24,7 @@ class Organization extends AbstractEntity
     const RATING_ACTIVE_EVENTS = 'rating_active_events_count';
     const RATING_LAST_EVENTS_COUNT = 'rating_last_events_count';
     const RATING_SUBSCRIBED_IN_SOCIAL_NETWORK = 'rating_subscribed_in_social_network';
+    const RATING_TEXT_SIMILARITY = 'rating_texts_similarity';
     
     protected $description;
     protected $background_medium_img_url;

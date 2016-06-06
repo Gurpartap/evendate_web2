@@ -208,8 +208,14 @@ class App {
 		));
 	}
 
-	public static function prepareSearchStatement($value){
+	public static function prepareSearchStatement($value, $glue = '&'){
 		$values = preg_split('/\P{L}+/u', $value);
-		return implode('&', $values) . ':abd';
+		$prep_values = array();
+		foreach($values as $value){
+			if ($value != ''){
+				$prep_values[] = $value;
+			}
+		}
+		return implode($glue, $prep_values) . ':abd';
 	}
 }
