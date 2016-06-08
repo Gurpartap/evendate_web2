@@ -14,7 +14,7 @@ function Calendar($calendar, options){
 			th_class: 'calendar_weekday',
 			td_class: 'calendar_day',
 			td_additional_classes: [],
-			td_disabled_class: 'calendar_day_disabled',
+			td_disabled_class: '-calendar_day_disabled',
 			table_cell_class: 'calendar_cell',
 			today_class: 'today'
 		},
@@ -85,8 +85,8 @@ Calendar.prototype.setMonth = function(next){
 };
 
 Calendar.prototype.destroyTable = function(){
-	this.$calendar.find('.'+this.options.classes.th_class).removeClass(__C.CLASSES.ACTIVE).off('click');
-	this.$calendar.find('.MonthName').removeClass(__C.CLASSES.ACTIVE).off('click');
+	this.$calendar.find('.'+this.options.classes.th_class).removeClass(__C.CLASSES.NEW_ACTIVE).off('click');
+	this.$calendar.find('.MonthName').removeClass(__C.CLASSES.NEW_ACTIVE).off('click');
 	this.$calendar.find('.CalendarTableBody').remove();
 	return this;
 };
@@ -239,7 +239,7 @@ Calendar.prototype.renderTable = function(){
 };
 
 Calendar.prototype.selectToday = function(){
-	this.$calendar.find('.'+this.options.classes.td_class+'.'+this.options.classes.today_class).addClass(__C.CLASSES.ACTIVE);
+	this.$calendar.find('.'+this.options.classes.td_class+'.'+this.options.classes.today_class).addClass(__C.CLASSES.NEW_ACTIVE);
 	return this;
 };
 
@@ -299,7 +299,7 @@ Calendar.prototype.selectDays = function(days){
 				self.selected_days.sort();
 			}
 		}	else {
-			self.$calendar.find('.'+self.options.classes.td_class+'.'+__C.CLASSES.ACTIVE).removeClass(__C.CLASSES.ACTIVE);
+			self.$calendar.find('.'+self.options.classes.td_class+'.'+__C.CLASSES.NEW_ACTIVE).removeClass(__C.CLASSES.NEW_ACTIVE);
 			self.selected_days = [day];
 		}
 
@@ -307,7 +307,7 @@ Calendar.prototype.selectDays = function(days){
 		//self.now_selected_day = $this_day.data('date');
 		//this.formatDays();
 
-		self.$calendar.find('.Day_'+day).addClass(__C.CLASSES.ACTIVE);
+		self.$calendar.find('.Day_'+day).addClass(__C.CLASSES.NEW_ACTIVE);
 	}
 
 
@@ -355,7 +355,7 @@ Calendar.prototype.deselectDays = function(days){ // 2012-12-21
 		self.selected_days.sort();
 
 		if(self.selected_months.indexOf(this_month) !== -1){
-			$this_month_name.removeClass(__C.CLASSES.ACTIVE);
+			$this_month_name.removeClass(__C.CLASSES.NEW_ACTIVE);
 			self.selected_months.splice(self.selected_months.indexOf(this_month), 1);
 		}
 
@@ -363,12 +363,12 @@ Calendar.prototype.deselectDays = function(days){ // 2012-12-21
 			if(typeof self.selected_weeks[this_year][this_month_num] !== 'undefined'){
 				this_weekday_pos = self.selected_weeks[this_year][this_month_num].indexOf($this_day.data('weekday'));
 				if(this_weekday_pos !== -1){
-					$this_weekday.removeClass(__C.CLASSES.ACTIVE);
+					$this_weekday.removeClass(__C.CLASSES.NEW_ACTIVE);
 					self.selected_weeks[this_year][this_month_num].splice(this_weekday_pos, 1);
 				}
 			}
 		}
-		self.$calendar.find('.Day_'+day).removeClass(__C.CLASSES.ACTIVE);
+		self.$calendar.find('.Day_'+day).removeClass(__C.CLASSES.NEW_ACTIVE);
 	}
 
 	if(this.options.multi_selection === true){
@@ -409,11 +409,11 @@ Calendar.prototype.selectWeek = function(week){ // 0..6
 	this_weekday_pos = self.selected_weeks[this_year][this_month].indexOf(week);
 
 	if(this_weekday_pos === -1){
-		$this_weekday.addClass(__C.CLASSES.ACTIVE);
+		$this_weekday.addClass(__C.CLASSES.NEW_ACTIVE);
 		self.selectDays(days);
 		self.selected_weeks[this_year][this_month].push(week)
 	} else {
-		$this_weekday.removeClass(__C.CLASSES.ACTIVE);
+		$this_weekday.removeClass(__C.CLASSES.NEW_ACTIVE);
 		self.deselectDays(days);
 		self.selected_weeks[this_year][this_month].splice(this_weekday_pos, 1);
 	}
@@ -433,11 +433,11 @@ Calendar.prototype.selectMonth = function(month){ // 0..11
 	});
 
 	if(this_month_pos === -1){
-		$this_month_name.addClass(__C.CLASSES.ACTIVE);
+		$this_month_name.addClass(__C.CLASSES.NEW_ACTIVE);
 		self.selectDays(days);
 		self.selected_months.push(this_month);
 	} else {
-		$this_month_name.removeClass(__C.CLASSES.ACTIVE);
+		$this_month_name.removeClass(__C.CLASSES.NEW_ACTIVE);
 		self.deselectDays(days);
 		self.selected_months.splice(this_month_pos, 1);
 	}
@@ -459,7 +459,7 @@ Calendar.prototype.bindDaySelection = function(){
 	var self = this,
 		$days = self.$calendar.find('.'+this.options.classes.td_class).not('.'+this.options.classes.td_disabled_class);
 	$days.on('click', function(){
-		if(self.options.multi_selection === true && $(this).hasClass(__C.CLASSES.ACTIVE)){
+		if(self.options.multi_selection === true && $(this).hasClass(__C.CLASSES.NEW_ACTIVE)){
 			self.deselectDays($(this).data('date'));
 		} else {
 			self.selectDays($(this).data('date'));
@@ -492,7 +492,7 @@ Calendar.prototype.bindDragSelection = function(){
 	function selectDate($target){
 		$target = $target.is('.'+self.options.classes.td_class) ? $target : $target.closest('.'+self.options.classes.td_class);
 		if($target.not('.'+self.options.classes.td_disabled_class).length){
-			if($target.hasClass(__C.CLASSES.ACTIVE)){
+			if($target.hasClass(__C.CLASSES.NEW_ACTIVE)){
 				self.deselectDays($target.data('date'));
 			} else {
 				self.selectDays($target.data('date'));
@@ -524,16 +524,16 @@ Calendar.prototype.activateSelectedDays = function(){
 		this_month_num = self.current_month.format('MM');
 
 	self.selected_days.forEach(function(day){
-		self.$calendar.find('.Day_'+day).addClass(__C.CLASSES.ACTIVE)
+		self.$calendar.find('.Day_'+day).addClass(__C.CLASSES.NEW_ACTIVE)
 	});
 
 	if(self.selected_months.indexOf(this_year + '.' + this_month_num) !== -1){
-		self.$calendar.find('.MonthName').addClass(__C.CLASSES.ACTIVE);
+		self.$calendar.find('.MonthName').addClass(__C.CLASSES.NEW_ACTIVE);
 	}
 	if(typeof self.selected_weeks[this_year] !== 'undefined'){
 		if(typeof self.selected_weeks[this_year][this_month_num] !== 'undefined'){
 			self.selected_weeks[this_year][this_month_num].forEach(function(weekday) {
-				self.$calendar.find('.Week_'+weekday).addClass(__C.CLASSES.ACTIVE);
+				self.$calendar.find('.Week_'+weekday).addClass(__C.CLASSES.NEW_ACTIVE);
 			});
 		}
 	}
