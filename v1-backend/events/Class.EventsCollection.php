@@ -356,6 +356,13 @@ class EventsCollection extends AbstractCollection
 						WHERE tokens.user_id = :user_id)');
 
 
+
+                    $q_get_events->where('id NOT IN (SELECT
+						hidden_events.event_id
+						FROM hidden_events
+						WHERE hidden_events.user_id = :user_id)');
+
+
                     $order_by = array('rating DESC');
                     $statement_array[':user_id'] = $user->getId();
                     break;
