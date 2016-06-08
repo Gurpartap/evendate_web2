@@ -43,6 +43,28 @@
 	<div class="avatar" style="background-image: url({avatar_url})" title="{last_name} {first_name}"></div>
 </script>
 
+<script type="javascript/template" id="tmpl-organization-block">
+	<div class="organization_item {block_classes} Controller" data-page="organization/{id}" data-organization_id="{id}" data-title="{short_name}" {dataset}>
+		<div class="avatar_block">
+			<div class="avatar {avatar_classes}">
+				<img src="{img_url}" onerror="this.onerror=null;this.src='/app/img/logo_40.png'">
+			</div>
+			<span class="avatar_name">{short_name}</span>
+		</div>
+		<span class="counter organization_counter OrganizationCounter {counter_classes}">{new_events_count}</span>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-tabs-header">
+	<header class="tabs_header -color_{color}">
+		{tabs}
+	</header>
+</script>
+
+<script type="javascript/template" id="tmpl-tab">
+	<span class="tab Tab {classes}" {dataset}>{label}</span>
+</script>
+
 <script type="javascript/template" id="tmpl-vk-share-button">
 	<button class="ShareButton share_icon {classes}" data-title="VK" data-href="http://vk.com/share.php?url=http://evendate.ru/event/{id}?title={title}&description={description}&image={image_horizontal_url}&noparse=false"></button>
 </script>
@@ -543,7 +565,7 @@
 			<p class="organization_description">{description}</p>
 			<div class="form_group -parts_1_3">
 				<div class="form_unit">
-					<a class="button -color_marginal RippleEffect fa_icon fa-external-link" href="{site_url}" target="_blank">Подробнее</a>
+					<a class="button -color_marginal fa_icon fa-external-link RippleEffect ExternalPage" href="{site_url}" target="_blank">Подробнее</a>
 				</div>
 				<div class="form_unit">
 					<small class="-color_marginal {has_address}">Адрес организатора:</small>
@@ -644,7 +666,7 @@
 			<div class="event_content">
 				<h3 class="event_title" title="{title}">{title}</h3>
 				<div class="event_description">{description}</div>
-				<div class="event_map CallModal" data-modal_type="map" style="background-image: url('http://maps.googleapis.com/maps/api/staticmap?markers={location}&zoom=15&size=640x640&scale=2&format=png&maptype=roadmap&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg')" data-modal_map_location="{location}"></div>
+				<div class="event_map CallModal EventMap" data-modal_type="map" style="background-image: url('http://maps.googleapis.com/maps/api/staticmap?markers={location_sanitized}&zoom=15&size=640x640&scale=2&format=png&maptype=roadmap&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg')" data-modal_map_location="{location_sanitized}"></div>
 			</div>
 		</div>
 		<div class="event_additional_content">
@@ -672,7 +694,7 @@
 	<button class="button -color_neutral -fill RippleEffect DropdownButton" data-dropdown="redact_event" data-dd-width="self" type="button">Редактирование события</button>
 	<div class="dropdown_box DropdownBox" data-dropdown_id="redact_event">
 		<div class="dropdown_list"><button class="dropdown_button -fill -color_error RippleEffect CloseDropdown DropdownButton" data-dropdown="cancel_event" data-dd-width="self" type="button">Отменить событие</button></div>
-		<div class="dropdown_list"><button class="dropdown_button -fill -color_neutral RippleEffect CloseDropdown Controller" data-page="edit_event" data-event-id="{id}" type="button">Редактировать</button></div>
+		<div class="dropdown_list"><button class="dropdown_button -fill -color_neutral RippleEffect CloseDropdown Controller" data-page="edit_event" data-title="Редактировать событие" data-event-id="{id}" type="button">Редактировать</button></div>
 	</div>
 	<div class="dropdown_box DropdownBox" data-dropdown_id="cancel_event">
 		<div class="dropdown_box_wrapper">
@@ -725,7 +747,7 @@
 <script type="javascript/template" id="tmpl-event-detail-link">
 	<div class="event_additional_field">
 		<label class="event_additional_field_label">Подробнее</label>
-		<a class="fa_icon fa-external-link" href="{detail_info_url}" target="_blank">{detail_info_url}</a>
+		<a class="fa_icon fa-external-link ExternalLink" href="{detail_info_url}" target="_blank">{detail_info_url}</a>
 	</div>
 </script>
 

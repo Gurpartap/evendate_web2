@@ -126,10 +126,10 @@ Modal.prototype.show = function(){
 	var self = this;
 
 	Modal.modal_wrapper.append(this.modal);
-	$('.modal_unit').removeClass('-active');
+	$('.modal_unit').removeClass(__C.CLASSES.NEW_ACTIVE);
 	$('html').addClass('-open_modal');
-	self.modal.addClass('-active');
-	Modal.modal_wrapper.addClass('-active');
+	self.modal.addClass(__C.CLASSES.NEW_ACTIVE);
+	Modal.modal_wrapper.addClass(__C.CLASSES.NEW_ACTIVE);
 	Modal.modal_destroyer.off('click.CloseModal').on('click.CloseModal', function(){
 		$(this).off('click.CloseModal');
 		self.hide();
@@ -148,11 +148,11 @@ Modal.prototype.show = function(){
 };
 
 Modal.prototype.hide = function(){
-	if(this.modal.hasClass('-active')){
+	if(this.modal.hasClass(__C.CLASSES.NEW_ACTIVE)){
 		$('html').removeClass('-open_modal');
-		Modal.modal_wrapper.removeClass('-active');
+		Modal.modal_wrapper.removeClass(__C.CLASSES.NEW_ACTIVE);
 	}
-	this.modal.removeClass('-active');
+	this.modal.removeClass(__C.CLASSES.NEW_ACTIVE);
 	this.modal.trigger('modal.close');
 };
 
@@ -423,7 +423,7 @@ FavoredModal.prototype.uploadFavored = function(callback){
 					if(callback)
 						callback();
 					self.adjustDestroyer();
-					bindOnClick();
+					bindControllers(self.modal);
 					self.modal.find('.user_tombstone').on('click.hideModal', function(){
 						self.hide();
 					});
