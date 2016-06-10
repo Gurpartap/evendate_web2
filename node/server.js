@@ -181,6 +181,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
             },
             saveDataInDB = function (data) {
+                var subscriptions_count = 0;
                 socket.retry_count = 0;
                 function getUIDValues() {
                     var result = {
@@ -220,7 +221,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     user_token = data.oauth_data.access_token + data.oauth_data.secret + Utils.makeId(),
                     q_get_user =
                         users
-                            .select(users.id, users.vk_uid, users.facebook_uid, users.google_uid)
+                            .select(users.id, users.vk_uid, users.facebook_uid, users.google_uid,
+                            '(SELECT COUNT(id) FROM subscriptions WHERE subscriptions.user_id = users.id AND subscriptions.status = TRUE) AS subscriptions_count')
                             .where(users.email.equals(data.oauth_data.email))
                             .or(users.vk_uid.isNotNull().and(users.vk_uid.equals(UIDs.vk_uid)))
                             .or(users.facebook_uid.isNotNull().and(users.facebook_uid.equals(UIDs.facebook_uid)))
@@ -254,6 +256,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         q_user = users.insert(user_to_ins).returning('id').toQuery();
                     } else {
                         user = result.rows[0];
+                        subscriptions_count = user.subscriptions_count;
                         q_user = users.update(user_to_ins).where(users.id.equals(user.id)).returning('id').toQuery();
                     }
 
@@ -402,7 +405,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                     email: data.oauth_data.email,
                                     token: user_token,
                                     mobile: token_type == 'mobile',
-                                    type: data.type
+                                    type: data.type,
+                                    subscriptions_count: subscriptions_count
                                 });
                             });
                         };
