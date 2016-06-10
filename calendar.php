@@ -172,7 +172,7 @@
 </div>
 
 <aside id="main_sidebar" class="-unselectable">
-	<div class="logo_block Controller" data-page="feed" data-feed_state="timeline" data-title="Мероприятия">
+	<div class="logo_block Controller" data-page="feed" data-feed_state="timeline" data-title="События">
 		<span class="logo">Evendate</span>
 	</div>
 
@@ -180,7 +180,7 @@
 		<nav class="sidebar_navigation SidebarNav">
 			<div class="sidebar_navigation_item -hidden SidebarNavItem"><span>Аналитика мероприятий</span></div>
 			<div class="sidebar_navigation_item <?=$edit_event_btn_hidden?> SidebarNavItem" data-page="edit_event" data-title="Создать событие"><span>Создать событие</span></div>
-			<div class="sidebar_navigation_item SidebarNavItem" data-page="feed" data-feed_state="actual" data-title="Мероприятия"><span>Мероприятия</span><span class="counter sidebar_navigation_counter -color_marginal -hidden SidebarNavFeedCounter">50</span></div>
+			<div class="sidebar_navigation_item SidebarNavItem" data-page="feed" data-feed_state="actual" data-title="События"><span>События</span><span class="counter sidebar_navigation_counter -color_marginal -hidden SidebarNavFeedCounter">50</span></div>
 			<div class="sidebar_navigation_item SidebarNavItem" data-page="friends" data-title="Друзья"><span>Друзья</span><span class="counter sidebar_navigation_counter -color_marginal -hidden SidebarNavFriendsCounter"></span></div>
 			<div class="sidebar_navigation_item SidebarNavItem" data-page="organizations" data-title="Организации"><span>Каталог организаторов</span></div>
 		</nav>
