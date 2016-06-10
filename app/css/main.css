@@ -1283,9 +1283,10 @@ a.button:hover {text-decoration: none}
 	padding: 8px 1px;
 	margin-right: 1em;
 	font-size: .9em;
-	font-weight: 500;
+	font-weight: 400;
 	text-transform: uppercase;
 	border-bottom: 2px solid transparent;
+	opacity: .8;
 	cursor: pointer;
 
 	-webkit-transition: color .5s ease, border-color .5s ease;
@@ -1295,7 +1296,12 @@ a.button:hover {text-decoration: none}
 	transition: color .5s ease, border-color .5s ease;
 }
 
-.tab.-active {border-color: inherit}
+.tab:hover {opacity: 1}
+
+.tab.-active {
+	border-color: inherit;
+	opacity: 1;
+}
 
 .-color_primary .tab.-active,
 .tab.-color_primary.-active {
@@ -2166,7 +2172,7 @@ html.-noscroll {
 .sidebar_navigation_item {
 	padding: 8px 48px 8px 12px;
 	font-size: 0.88em;
-	font-weight: 500;
+	font-weight: 400;
 	color: #878787;
 	letter-spacing: .14px;
 }
