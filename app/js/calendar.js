@@ -2130,8 +2130,8 @@ function Onboarding($view, $content_block){
 	var $wrapper = $view.find(".page_wrapper"),
 		scroll_rec = 0;
 
-	function organisationSubscriptions() {
-		$wrapper.find(".recommendations_item_onboarding_inside").on('click', function(){
+	function organisationSubscriptions($parent) {
+		$parent.find(".OnboardingOrgItem").not('.-Handled_OnboardingOrgItem').on('click', function(){
 			var $this = $(this);
 			$.ajax({
 				url: '/api/v1/organizations/'+$this.data("organization_id")+'/subscriptions',
@@ -2141,8 +2141,9 @@ function Onboarding($view, $content_block){
 				}
 			});
 			$this.toggleClass(__C.CLASSES.NEW_ACTIVE);
-		});
+		}).addClass('-Handled_OnboardingOrgItem');
 	}
+
 	$wrapper.empty();
 	$.ajax({
 		url: '/api/v1/organizations/recommendations',
@@ -2153,11 +2154,7 @@ function Onboarding($view, $content_block){
 		},
 		success: function(res){
 			ajaxHandler(res, function(data){
-
-
 				$wrapper.append(tmpl("onboarding-main", {recommendation_items: tmpl("onboarding-recommendation", data)}));
-
-
 				$wrapper.find(".RecommendationsScrollbar").scrollbar({
 					onScroll: function(y, x){
 						console.log(y.scroll == y.maxScroll);
@@ -2171,22 +2168,20 @@ function Onboarding($view, $content_block){
 								},
 								success: function(res){
 									ajaxHandler(res, function(data){
-
-
 										$wrapper.find(".RecommendationsWrapper").eq(1).append(tmpl("onboarding-recommendation", data));
-
-										organisationSubscriptions();
-
-
+										organisationSubscriptions($wrapper);
 									}, ajaxErrorHandler)
 								}
 							});
 						}
 					}
 				});
-				organisationSubscriptions();
+				organisationSubscriptions($wrapper);
 				bindRippleEffect($wrapper);
 				bindControllers($wrapper);
+				$wrapper.find('.Controller').on('click', function(){
+					renderSidebarOrganizations(null, bindControllers);
+				});
 			}, ajaxErrorHandler)
 		}
 	});
