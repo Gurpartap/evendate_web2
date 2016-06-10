@@ -2530,6 +2530,73 @@ function Example($view, $content_block){
 
 }
 
+function Onboarding($view, $content_block){
+	/* onboarding */
+	var $wrapper = $view.find(".page_wrapper"),
+		scroll_rec = 0;
+
+	function organisationSubscriptions() {
+		$view.find(".recommendations_item_onboarding_inside").on('click', function(){
+			var $this = $(this);
+			$this.toggleClass('-active');
+			$.ajax({
+				url: '/api/v1/organizations/'+$this.data("organization_id")+'/subscriptions',
+				method: 'POST',
+				success: function(res){
+					ajaxHandler(res, function(data){}, ajaxErrorHandler)
+				}
+			});
+		});
+	}
+	$wrapper.empty();
+	$.ajax({
+		url: '/api/v1/organizations/recommendations',
+		method: 'GET',
+		data: {
+			length: 10,
+			offset: 0
+		},
+		success: function(res){
+			ajaxHandler(res, function(data){
+
+
+				$wrapper.append(tmpl("onboarding-main", {recommendation_items: tmpl("onboarding-recommendation", data)}));
+
+
+				$view.find(".RecommendationsScrollbar").scrollbar({
+					onScroll: function(y, x){
+						console.log(y.scroll == y.maxScroll);
+						if(y.scroll == y.maxScroll){
+							$.ajax({
+								url: '/api/v1/organizations/recommendations',
+								method: 'GET',
+								data: {
+									length: 10,
+									offset: scroll_rec+=10
+								},
+								success: function(res){
+									ajaxHandler(res, function(data){
+
+
+										$wrapper.find(".RecommendationsWrapper").eq(1).append(tmpl("onboarding-recommendation", data));
+
+										organisationSubscriptions();
+
+
+									}, ajaxErrorHandler)
+								}
+							});
+						}
+					}
+				});
+				organisationSubscriptions();
+				bindRippleEffect($view);
+				bindOnClick();
+			}, ajaxErrorHandler)
+		}
+	});
+}
+
 function hideOrganizationItem(org_id){
 	var $organization_item = $('.animated.organization-' + org_id).addClass('fadeOutLeftBig');
 	setTimeout(function(){
@@ -2674,6 +2741,7 @@ $(document)
 			friends: Friends,
 			edit_event: EditEvent,
 			example: Example,
+			onboarding: Onboarding,
 			refreshState: function(){
 				var page = this.getCurrentState(),
 					$view = $('.screen-view:not(.hidden)');

@@ -261,6 +261,15 @@
 					</div>
 
 					<!-- START row-->
+					<div class="onboarding-app hidden screen-view" data-controller="Onboarding">
+						<div class="page_viewport">
+							<div class="page_wrapper">
+							
+							</div>
+						</div> 
+					</div>
+
+					<!-- START row-->
 					<div class="feed-app hidden screen-view" data-controller="Feed">
 						<div class="page_viewport">
 							<div class="page_wrapper">
