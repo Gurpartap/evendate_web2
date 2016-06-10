@@ -2123,16 +2123,16 @@ function Onboarding($view, $content_block){
 		scroll_rec = 0;
 
 	function organisationSubscriptions() {
-		$view.find(".recommendations_item_onboarding_inside").on('click', function(){
+		$wrapper.find(".recommendations_item_onboarding_inside").on('click', function(){
 			var $this = $(this);
-			$this.toggleClass('-active');
 			$.ajax({
 				url: '/api/v1/organizations/'+$this.data("organization_id")+'/subscriptions',
-				method: 'POST',
+				method: $this.hasClass(__C.CLASSES.NEW_ACTIVE) ? 'DELETE' : 'POST',
 				success: function(res){
 					ajaxHandler(res, function(data){}, ajaxErrorHandler)
 				}
 			});
+			$this.toggleClass(__C.CLASSES.NEW_ACTIVE);
 		});
 	}
 	$wrapper.empty();
@@ -2150,7 +2150,7 @@ function Onboarding($view, $content_block){
 				$wrapper.append(tmpl("onboarding-main", {recommendation_items: tmpl("onboarding-recommendation", data)}));
 
 
-				$view.find(".RecommendationsScrollbar").scrollbar({
+				$wrapper.find(".RecommendationsScrollbar").scrollbar({
 					onScroll: function(y, x){
 						console.log(y.scroll == y.maxScroll);
 						if(y.scroll == y.maxScroll){
@@ -2177,8 +2177,8 @@ function Onboarding($view, $content_block){
 					}
 				});
 				organisationSubscriptions();
-				bindRippleEffect($view);
-				bindOnClick();
+				bindRippleEffect($wrapper);
+				bindControllers($wrapper);
 			}, ajaxErrorHandler)
 		}
 	});
