@@ -11,6 +11,7 @@ var organizations_loaded = false,
 		feed: Feed,
 		organizations: OrganizationsList,
 		organization: Organization,
+		onboarding: Onboarding,
 		search: Search,
 		friends: Friends,
 		edit_event: EditEvent,
@@ -2115,6 +2116,74 @@ function EditEvent($view, $content_block){
 	}
 
 }
+
+function Onboarding($view, $content_block){
+	/* onboarding */
+	var $wrapper = $view.find(".page_wrapper"),
+		scroll_rec = 0;
+
+	function organisationSubscriptions() {
+		$wrapper.find(".recommendations_item_onboarding_inside").on('click', function(){
+			var $this = $(this);
+			$.ajax({
+				url: '/api/v1/organizations/'+$this.data("organization_id")+'/subscriptions',
+				method: $this.hasClass(__C.CLASSES.NEW_ACTIVE) ? 'DELETE' : 'POST',
+				success: function(res){
+					ajaxHandler(res, function(data){}, ajaxErrorHandler)
+				}
+			});
+			$this.toggleClass(__C.CLASSES.NEW_ACTIVE);
+		});
+	}
+	$wrapper.empty();
+	$.ajax({
+		url: '/api/v1/organizations/recommendations',
+		method: 'GET',
+		data: {
+			length: 10,
+			offset: 0
+		},
+		success: function(res){
+			ajaxHandler(res, function(data){
+
+
+				$wrapper.append(tmpl("onboarding-main", {recommendation_items: tmpl("onboarding-recommendation", data)}));
+
+
+				$wrapper.find(".RecommendationsScrollbar").scrollbar({
+					onScroll: function(y, x){
+						console.log(y.scroll == y.maxScroll);
+						if(y.scroll == y.maxScroll){
+							$.ajax({
+								url: '/api/v1/organizations/recommendations',
+								method: 'GET',
+								data: {
+									length: 10,
+									offset: scroll_rec+=10
+								},
+								success: function(res){
+									ajaxHandler(res, function(data){
+
+
+										$wrapper.find(".RecommendationsWrapper").eq(1).append(tmpl("onboarding-recommendation", data));
+
+										organisationSubscriptions();
+
+
+									}, ajaxErrorHandler)
+								}
+							});
+						}
+					}
+				});
+				organisationSubscriptions();
+				bindRippleEffect($wrapper);
+				bindControllers($wrapper);
+			}, ajaxErrorHandler)
+		}
+	});
+}
+
 
 
 

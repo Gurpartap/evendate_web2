@@ -973,10 +973,12 @@ a.button:hover {text-decoration: none}
 .button.-color_vk,
 .button.-color_primary,
 .button.-color_secondary {color: #fff}
+.button.-color_primary_alt {color: #5379b8}
 .button.-color_secondary_alt {color: #f9306e}
 .button.-color_marginal,
 .button.-color_neutral {color: #4a4a4a}
 .button.-color_neutral_primary {color: #5379b8}
+.button.-color_neutral_alt {color: #b1b1b1}
 .button.-color_neutral_secondary {color: #ff5f9e}
 
 .button.-color_default {background-color: transparent}
@@ -984,6 +986,7 @@ a.button:hover {text-decoration: none}
 .button.-color_vk {background-color: #6497bb}
 .button.-color_primary {background-color: #5379b8}
 .button.-color_secondary {background-color: #ff5f9e}
+.button.-color_primary_alt {background-color: rgba(83,121,184,0.24)}
 .button.-color_secondary_alt {background-color: #ffdeeb}
 .button.-color_neutral,
 .button.-color_neutral_primary,
@@ -1021,6 +1024,7 @@ a.button:hover {text-decoration: none}
 .button.-color_neutral_secondary > .ripple,
 .button:not([class*="-color_"]) > .ripple,
 .dropdown_button > .ripple {background-color: #c1cde9}
+.button.-color_neutral_alt > .ripple {background-color: rgba(83,121,184,0.24)}
 
 /*/Button*/
 /*Friend*/
@@ -1900,6 +1904,189 @@ html.-noscroll {
 	width: 300px;
 }
 .page + .side_page {margin-left: 60px}
+
+/* Onboarding */
+.onboarding-app .page_viewport {
+	height: 100%;
+}
+
+.onboarding-app .page_wrapper {
+	background: #5379b8;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	text-align: center;
+	z-index: 200;
+}
+
+.onboarding-app .page_wrapper:before {
+	content: "";
+	height: 100%;
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.page_onboarding {
+	width: 360px;
+	height: 526px;
+	background: #fafafa;
+	display: inline-block;
+	vertical-align: middle;
+}
+
+/* header */
+.text_onboarding_container {
+	text-align: center;
+	padding: 12px;
+}
+
+.text_onboarding_container+.text_onboarding_container {
+	padding: 0 12px 12px;
+}
+
+.header_text_onboarding {
+	font-family: "Roboto", sans-serif;
+	font-size:24px;
+	font-weight: 500;
+	color:#4a4a4a;
+	line-height:32px;
+}
+
+.text_onboarding {
+	font-family: "Roboto", sans-serif;
+	font-size:14px;
+	color:#4a4a4a;
+	line-height:20px;
+}
+
+.line_onboarding {
+	border:1px solid #d7d7d7;
+	height:1px;
+}
+/* /header */
+/* recommendations */
+.recommendations_item_onboarding_inside {
+	padding: 0 12px 0 12px;
+	margin: 15px 0 0 0;
+	text-align: left;
+}
+
+.recommendations_item_onboarding_inside+.recommendations_item_onboarding_inside {
+	margin: 6px 0 0 0;
+}
+
+.recommendations_item_onboarding_inside:hover {
+	cursor: pointer;
+	background: #d7d7d7;
+}
+
+
+.img_container_recommendation_onboarding {
+	display: inline-block;
+	padding: 8px 32px 8px 0;
+}
+
+.img_recommendation_onboarding {
+	border-radius: 50%;
+	height: 40px;
+}
+
+.text_container_recommendation_onboarding {
+	display: inline-block;
+	vertical-align: top;
+	padding-top: 20px;
+	margin: 0 36px 0 0;
+	width: 184px;
+}
+
+.check_box_img_container_onboarding {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.check_box_img_onboarding {
+	height: 32px;
+	width: 32px;
+	border-radius: 50%;
+	background:rgba(83,121,184,0.24);
+	border: none;
+}
+
+.plus_onboarding {
+	font-weight: 300;
+}
+/* /recommendations */
+
+/* bot_part */
+
+.bot_part_onboarding_page>.button+.button {
+	margin-left: 32px;
+	margin-right: 10px;
+}
+
+.bot_part_onboarding_page {
+	box-shadow:0 0 4px 0 rgba(0,0,0,0.12), 0 4px 4px 0 rgba(0,0,0,0.24);
+	height: 50px;
+	width: 100%;
+	margin-top: 5px;
+	padding: 8px;
+	text-align: right;
+}
+
+.button_onboarding_container {
+	border-radius:2px;
+	border: none;
+	height: 30px;
+	display: inline-block;
+	cursor: pointer;
+	background: #fafafa;
+	margin: 12px 42px 0 143px;
+}
+
+.button_onboarding_container+.button_onboarding_container {
+	background:rgba(83,121,184,0.24);
+	border-radius:2px;
+	width:71px;
+	margin: 12px 0 0 0;
+}
+
+.text_button_onboarding_skip {
+	font-family: "Roboto", sans-serif;
+	font-size:14px;
+	color:#b1b1b1;
+	line-height:20px;
+	text-align:left;
+}
+
+.text_button_onboarding_next {
+	font-family: "Roboto", sans-serif;
+	font-size:14px;
+	color:#5379b8;
+	line-height:19px;
+}
+
+/* /bot_part */
+
+
+.recommendation_scroll {
+	height: 380px;
+}
+
+.recommendations_item_onboarding_inside.-active {
+
+}
+
+.recommendations_item_onboarding_inside.-active .check_box_img_onboarding {
+	background: #F8569A;
+	color: #fff;
+}
+.recommendations_item_onboarding_inside.-active .fa-plus:before {
+	content: "\f00c";
+}
+
+/* /Onboarding */
 
 @media (min-width: 768px) and (max-width: 992px) {
 	.page_wrapper {

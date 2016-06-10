@@ -168,6 +168,16 @@
 			<div class="page_wrapper"></div>
 		</div>
 		<!-- END row-->
+
+		<!-- START row-->
+		<div class="onboarding-app hidden screen-view" data-controller="Onboarding">
+			<div class="page_viewport">
+				<div class="page_wrapper">
+
+				</div>
+			</div>
+		</div>
+		
 	</div>
 </div>
 
