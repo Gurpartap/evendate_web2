@@ -207,4 +207,15 @@ class App {
 			'facebook' => 'https://www.facebook.com/dialog/oauth?client_id=' . self::$SETTINGS->facebook->app_id . '&response_type=token&scope=public_profile,email,user_friends&display=popup&redirect_uri=http://'. self::$DOMAIN . '/redirectOauth.php?mobile=' . $is_mobile . '%26type=facebook'
 		));
 	}
+
+	public static function prepareSearchStatement($value, $glue = '&'){
+		$values = preg_split('/\P{L}+/u', $value);
+		$prep_values = array('evendate');
+		foreach($values as $value){
+			if ($value != ''){
+				$prep_values[] = $value;
+			}
+		}
+		return implode($glue, $prep_values) . ':abd';
+	}
 }

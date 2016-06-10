@@ -56,6 +56,11 @@ class OrganizationsCollection
                     $statement_array[':type_id'] = $value;
                     break;
                 }
+                case 'q': {
+                    $select->where('fts @@ to_tsquery(:search_stm)');
+                    $statement_array[':search_stm'] = App::prepareSearchStatement($value);
+                    break;
+                }
                 case 'privileges': {
                     if ($value == 'can_add') {
                         $select
@@ -105,10 +110,14 @@ class OrganizationsCollection
                 }
                 case 'recommendations': {
 
+                    $interests = $user->getInterests()->getData();
+                    $interests_text = implode(' ', $interests);
+
                     // subscribed friends count
                     // active events count / 5
                     // added last week events count * 2
                     // does subscribe to organization = 50
+                    // texts similarity
 
                     $rating_subscribed_friends = '(SELECT COUNT(id)
                             FROM subscriptions
@@ -136,6 +145,10 @@ class OrganizationsCollection
 						                INNER JOIN vk_users_subscriptions ON vk_users_subscriptions.vk_group_id=vk_groups.id
 						                WHERE vk_users_subscriptions.user_id = :user_id)
 						    )::INT';
+
+                    $rating_text_similarity = '(SELECT ts_rank_cd(\'{1.0, 0.7, 0.5, 0.3}\', vo.fts, query)::REAL AS rank
+                      FROM view_organizations as vo, to_tsquery(:fts_query) as query
+                      WHERE vo.id = view_organizations.id)::REAL';
                     
                     $cols[] =
                         '('
@@ -145,7 +158,11 @@ class OrganizationsCollection
                             + 
                             ' . $rating_subscribed_in_social_network . '
 						    +
+                            + 
+                            ' . $rating_text_similarity . '
+						    +
 						    ' . $rating_last_events_count . '
+						    
 						    ) AS ' . Organization::RATING_OVERALL;
                     
                     
@@ -153,12 +170,14 @@ class OrganizationsCollection
                     $cols[] = $rating_active_events_count . ' AS ' . Organization::RATING_ACTIVE_EVENTS;
                     $cols[] = $rating_last_events_count . ' AS ' . Organization::RATING_LAST_EVENTS_COUNT;
                     $cols[] = $rating_subscribed_in_social_network . ' AS ' . Organization::RATING_SUBSCRIBED_IN_SOCIAL_NETWORK;
+                    $cols[] = $rating_text_similarity . ' AS ' . Organization::RATING_TEXT_SIMILARITY;
 
                     $fields[] = Organization::RATING_OVERALL;
                     $fields[] = Organization::RATING_SUBSCRIBED_FRIENDS;
                     $fields[] = Organization::RATING_ACTIVE_EVENTS;
                     $fields[] = Organization::RATING_LAST_EVENTS_COUNT;
                     $fields[] = Organization::RATING_SUBSCRIBED_IN_SOCIAL_NETWORK;
+                    $fields[] = Organization::RATING_TEXT_SIMILARITY;
 
                     $select->where('(SELECT
 						id
@@ -168,8 +187,8 @@ class OrganizationsCollection
 							AND user_id = :user_id) IS NULL');
 
                     $statement_array[':user_id'] = $user->getId();
+                    $statement_array[':fts_query'] = App::prepareSearchStatement($interests_text, '|');
                     $order_by = array('rating DESC');
-                    $statement_array[':user_id'] = $user->getId();
                     break;
                 }
             }
