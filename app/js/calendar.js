@@ -235,7 +235,8 @@ function Feed($view, $content_block){
 					data.forEach(function(event){
 						var $subscribers = buildAvatarCollection(event.favored, 4),
 							avatars_collection_classes = [],
-							favored_users_count = ($subscribers.length <= 4) ? 0 : event.favored_users_count - 4;
+							favored_users_count = ($subscribers.length <= 4) ? 0 : event.favored_users_count - 4,
+							$event;
 
 						if(event.is_favorite){
 							avatars_collection_classes.push('-subscribed');
@@ -267,7 +268,12 @@ function Feed($view, $content_block){
 							event.feed_event_infos = event.feed_event_infos.add(tmpl('feed-event-info', {text: 'Цена от '+(event.min_price ? event.min_price : 0) +' руб.'}));
 						}
 
-						$events = $events.add(tmpl('feed-event', event))
+						$event = tmpl('feed-event', event);
+						$event.appear(function() {
+							storeStat(event.id, __C.STATS.EVENT_ENTITY, __C.STATS.EVENT_VIEW);
+						}, {accY: 100});
+
+						$events = $events.add($event);
 					});
 					if(success && typeof success == 'function'){
 						success($events);
