@@ -1995,6 +1995,7 @@ html.-noscroll {
 #main_header.-with_tabs > #main_header_bottom {height: 36px}
 
 #main_header_bottom > .page_wrapper {height: 100%}
+#main_header_bottom .tab {color: #fff}
 #main_header_bottom .tabs_header {
 	position: absolute;
 	bottom: 0;

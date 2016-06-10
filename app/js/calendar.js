@@ -72,7 +72,7 @@ function Feed($view, $content_block){
 				label: 'Избранные',
 				dataset: {
 					page: 'feed',
-					feed_state: 'favores',
+					feed_state: 'favored',
 					title: 'Избранные'
 				},
 				classes: ['Controller']
