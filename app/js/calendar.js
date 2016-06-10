@@ -29,6 +29,7 @@ function Feed($view, $content_block){
 	var $window = $(window),
 		$wrapper = $view.find('.page_wrapper'),
 		feed_state = History.getState().data.feed_state,
+		feed_state_id = $wrapper.data('feed_state_id') ? $wrapper.data('feed_state_id') : 0,
 		feed_date = History.getState().data.date,
 		current_offset = 0,
 		ajax_url,
@@ -282,41 +283,42 @@ function Feed($view, $content_block){
 			}
 		});
 	}
-
-	$wrapper.empty();
+	$wrapper.empty().data('feed_state_id', ++feed_state_id);
 
 	$window.off('scroll');
 	renderHeaderTabs(header_tabs);
 	uploadMoreEvents(10, current_offset, function($events){
-		$wrapper.append(tmpl('feed-event-wrapper', {feed_events: $events}));
-		$wrapper.append(tmpl('feed-event-vulcan', {event_cards: ''}));
-		initFeedPage($wrapper);
+		if($wrapper.data('feed_state_id') == feed_state_id){
+			$wrapper.append(tmpl('feed-event-wrapper', {feed_events: $events}));
+			$wrapper.append(tmpl('feed-event-vulcan', {event_cards: ''}));
+			initFeedPage($wrapper);
 
-		$window.data('block_scroll', false);
-		if($events.length){
-			$window.on('scroll.upload'+feed_state.capitalize()+'Events', function(){
-				if($window.height() + $window.scrollTop() + 200 >= $(document).height() && !$window.data('block_scroll')){
-					$window.data('block_scroll', true);
-					uploadMoreEvents(10, current_offset+=10, function($events){
-						if($events.length){
-							$wrapper.find('.FeedEvents').append($events);
-							bindEventsEvents($events);
-						} else {
-							$wrapper.find('.FeedEvents').append(tmpl('feed-no-event', {
-								image_url: '/app/img/sad_eve.png',
-								text: 'Как насчет того, чтобы подписаться на организации?'
-							}));
-							$window.off('scroll.upload'+feed_state.capitalize()+'Events');
-						}
-						$window.data('block_scroll', false);
-					});
-				}
-			});
-		} else {
-			$wrapper.find('.FeedEvents').append(tmpl('feed-no-event', {
-				image_url: '/app/img/sad_eve.png',
-				text: 'Как насчет того, чтобы подписаться на организации?'
-			}));
+			$window.data('block_scroll', false);
+			if($events.length){
+				$window.on('scroll.upload'+feed_state.capitalize()+'Events', function(){
+					if($window.height() + $window.scrollTop() + 200 >= $(document).height() && !$window.data('block_scroll')){
+						$window.data('block_scroll', true);
+						uploadMoreEvents(10, current_offset+=10, function($events){
+							if($events.length){
+								$wrapper.find('.FeedEvents').append($events);
+								bindEventsEvents($events);
+							} else {
+								$wrapper.find('.FeedEvents').append(tmpl('feed-no-event', {
+									image_url: '/app/img/sad_eve.png',
+									text: 'Как насчет того, чтобы подписаться на организации?'
+								}));
+								$window.off('scroll.upload'+feed_state.capitalize()+'Events');
+							}
+							$window.data('block_scroll', false);
+						});
+					}
+				});
+			} else {
+				$wrapper.find('.FeedEvents').append(tmpl('feed-no-event', {
+					image_url: '/app/img/sad_eve.png',
+					text: 'Как насчет того, чтобы подписаться на организации?'
+				}));
+			}
 		}
 
 	});
