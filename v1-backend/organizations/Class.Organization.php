@@ -17,15 +17,19 @@ class Organization extends AbstractEntity
     const IMAGE_TYPE_BACKGROUND = '/backgrounds/';
     const IMAGE_TYPE_LOGO = '/logos/';
     const RANDOM_FIELD_NAME = 'random';
+    const DEFAULT_LOGO_FILENAME = 'logo.png';
+    const DEFAULT_BACKGROUND_FILENAME = 'background.jpg';
 
-    
+
     const RATING_OVERALL = 'rating';
     const RATING_SUBSCRIBED_FRIENDS = 'rating_subscribed_friends';
     const RATING_ACTIVE_EVENTS = 'rating_active_events_count';
     const RATING_LAST_EVENTS_COUNT = 'rating_last_events_count';
     const RATING_SUBSCRIBED_IN_SOCIAL_NETWORK = 'rating_subscribed_in_social_network';
     const RATING_TEXT_SIMILARITY = 'rating_texts_similarity';
-    
+    const ORGANIZATION_STATE_ON_MODERATION = 0;
+    const ORGANIZATION_STATE_SHOWN = 1;
+
     protected $description;
     protected $background_medium_img_url;
     protected $background_small_img_url;
@@ -374,27 +378,18 @@ class Organization extends AbstractEntity
         return $result;
     }
 
-    public function update(User $user, array $data)
+    private static function checkData(&$data)
     {
+        if (!isset($data['name'])) throw new InvalidArgumentException('Название организации обязательно.');
+        if (mb_strlen($data['name']) < 3) throw new InvalidArgumentException('Слишком короткое название. Должно быть не менее 3 символов.');
+        if (mb_strlen($data['name']) > 150) throw new InvalidArgumentException('Слишком длинное название. Должно быть не более 150 символов.');
+        $data['name'] = trim($data['name']);
 
-        if ($user->getEditorInstance()->isAdmin($this) == false) throw new PrivilegesException('NOT_ADMIN', $this->db);
-        $q_upd_organization = App::queryFactory()->newUpdate();
 
-        $q_upd_organization->table('organizations');
-
-        if (isset($data['name'])) {
-            if (mb_strlen($data['name']) <= 3) throw new InvalidArgumentException('Слишком короткое название. Должно быть не менее 3 символов.');
-            if (mb_strlen($data['name']) > 150) throw new InvalidArgumentException('Слишком длинное название. Должно быть не более 150 символов.');
-            $q_upd_organization->cols(
-                array('name' => trim($data['name']))
-            );
-        }
-
-        if (isset($data['short_name'])) {
-            if (mb_strlen($data['short_name']) <= 3) throw new InvalidArgumentException('Слишком короткое сокращение. Должно быть не менее 3 символов.');
-            if (mb_strlen($data['short_name']) > 15) throw new InvalidArgumentException('Слишком длинное сокращение. Должно быть не более 15 символов.');
-            $q_upd_organization->cols(array('short_name' => trim($data['short_name'])));
-        }
+        if (!isset($data['short_name'])) throw new InvalidArgumentException('Краткое название организации обязательно.');
+        if (mb_strlen($data['short_name']) < 3) throw new InvalidArgumentException('Слишком короткое сокращение. Должно быть не менее 3 символов.');
+        if (mb_strlen($data['short_name']) > 15) throw new InvalidArgumentException('Слишком длинное сокращение. Должно быть не более 15 символов.');
+        $data['short_name'] = trim($data['short_name']);
 
         if (isset($data['site_url'])) {
             if (filter_var($data['site_url'], FILTER_VALIDATE_URL) === FALSE) {
@@ -402,40 +397,67 @@ class Organization extends AbstractEntity
             } else {
                 $data['site_url'] = trim($data['site_url']);
             }
-            $q_upd_organization->cols(array('site_url' => $data['site_url']));
+        } else {
+            $data['site_url'] = null;
+        }
+
+        if (isset($data['email'])) {
+            if (filter_var($data['email'], FILTER_VALIDATE_EMAIL) === FALSE) {
+                $data['email'] = null;
+            } else {
+                $data['email'] = trim($data['email']);
+            }
+        } else {
+            $data['email'] = null;
         }
 
 
-        if (isset($data['description'])) {
-            if (mb_strlen($data['description']) <= 50) throw new InvalidArgumentException('Слишком короткое описание. Должно быть не менее 50 символов.');
-            if (mb_strlen($data['description']) > 250) throw new InvalidArgumentException('Слишком длинное описание. Должно быть не более 250 символов.');
-            $q_upd_organization->cols(
-                array('description' => trim($data['description']))
-            );
-        }
+        if (!isset($data['description'])) throw new InvalidArgumentException('Описание название организации обязательно.');
+        if (mb_strlen($data['description']) <= 50) throw new InvalidArgumentException('Слишком короткое описание. Должно быть не менее 50 символов.');
+        if (mb_strlen($data['description']) > 250) throw new InvalidArgumentException('Слишком длинное описание. Должно быть не более 250 символов.');
+        $data['description'] = trim($data['description']);
 
         if (isset($data['default_address'])) {
-            $q_upd_organization->cols(
-                array('default_address' => trim($data['default_address']))
-            );
+            $data['default_address'] = trim($data['default_address']);
+        } else {
+            $data['default_address'] = null;
         }
 
-        if (isset($data['notification_suffix'])) {
-            $q_upd_organization->cols(
-                array('notification_suffix' => trim($data['notification_suffix']))
-            );
-        }
 
         if (isset($data['vk_url_path'])) {
-            $q_upd_organization->cols(
-                array('vk_url_path' => trim($data['vk_url_path']))
-            );
+            $data['vk_url'] = trim($data['vk_url']);
+            $data['vk_url_path'] = trim($data['vk_url_path']);
+        } else {
+            $data['vk_url'] = null;
+            $data['vk_url_path'] = null;
         }
 
-        if (isset($data['facebook_url_path'])) {
-            $q_upd_organization->cols(
-                array('facebook_url_path' => trim($data['facebook_url_path']))
-            );
+        if (isset($data['facebook_url'])) {
+            $data['facebook_url'] = trim($data['facebook_url']);
+            $data['facebook_url'] = preg_replace("#\\/$#", '', $data['facebook_url']);
+
+            $data['facebook_url_path'] = null;
+            preg_match(
+                '#'
+                . '(?:https?://)?'
+                . '(?:www.)?'
+                . '(?:facebook.com/)?'
+                . '(?:(?:\w)*\#!/)?'
+                . '(?:groups/)?'
+                . '(?:[?\p{L}\-_]*/)?'
+                . '(?:[?\w\-_]*/)?'
+                . '(?:group.php\?id=(?=\d.*))?'
+                . '([\d\-]*)?'
+                . '(?:\?.*)?'
+                . '#u',
+                $data['facebook_url'],
+                $data['facebook_url_path']);
+            if(count($data['facebook_url_path']) > 0){
+                $data['facebook_url_path'] = $data['facebook_url_path'][0];
+            }
+        } else {
+            $data['facebook_url'] = null;
+            $data['facebook_url_path'] = null;
         }
 
         if (isset($data['background'])
@@ -447,8 +469,10 @@ class Organization extends AbstractEntity
         ) {
             $background_filename = md5(App::generateRandomString() . '-background') . '.' . App::getImageExtension($data['background_filename']);
             $background_path = self::IMAGES_PATH . self::IMAGE_TYPE_BACKGROUND . $background_filename;
-            $q_upd_organization->cols(array('background_img_url' => $background_path));
             App::saveImage($data['background'], $background_path, 14000);
+            $data['$background_path'] = $background_path;
+        }else{
+            $data['background_img_url'] = self::IMAGES_PATH . self::IMAGE_TYPE_LOGO . self::DEFAULT_BACKGROUND_FILENAME;
         }
 
         if (isset($data['logo'])
@@ -460,19 +484,93 @@ class Organization extends AbstractEntity
         ) {
             $logo_filename = md5(App::generateRandomString() . '-logo') . '.' . App::getImageExtension($data['logo_filename']);
             $logo_path = self::IMAGES_PATH . self::IMAGE_TYPE_LOGO . $logo_filename;
-            $q_upd_organization->cols(array('img_url' => $logo_path));
             App::saveImage($data['logo'], $logo_path, 14000);
+            $data['img_url'] = $logo_path;
+        }else{
+            $data['img_url'] = self::IMAGES_PATH . self::IMAGE_TYPE_LOGO . self::DEFAULT_LOGO_FILENAME;
         }
+    }
+
+    public function update(User $user, array $data)
+    {
+
+        if ($user->getEditorInstance()->isAdmin($this) == false) throw new PrivilegesException('NOT_ADMIN', $this->db);
+        $q_upd_organization = App::queryFactory()->newUpdate();
+
+        $q_upd_organization->table('organizations');
+
+        self::checkData($data);
+
+        $q_upd_organization->cols(array(
+                'name' => $data['name'],
+                'short_name' => $data['short_name'],
+                'type_id' => $data['type_id'],
+                'site_url' => $data['site_url'],
+                'description' => $data['description'],
+                'default_address' => $data['default_address'],
+                'vk_url' => $data['vk_url'],
+                'vk_url_path' => $data['vk_url_path'],
+                'facebook_url_path' => $data['facebook_url_path'],
+                'facebook_url' => $data['facebook_url'],
+                'background_img_url' => $data['background_img_url'],
+                'img_url' => $data['img_url'],
+                'email' => $data['email']
+            )
+        );
 
         $q_upd_organization
             ->where('id = ?', $this->id);
 
         $p_upd_organization = $this->db->prepare($q_upd_organization->getStatement());
 
+
         $result = $p_upd_organization->execute($q_upd_organization->getBindValues());
 
         if ($result === FALSE) throw new DBQueryException('CANT_UPDATE_ORGANIZATION', $this->db);
         return new Result(true, '', array('organization_id' => $this->getId()));
+    }
+
+
+    public static function create($data, User $user, PDO $db)
+    {
+        $q_ins_organization = App::queryFactory()->newInsert();
+
+        $q_ins_organization->into('organizations');
+
+        self::checkData($data);
+
+        $q_ins_organization->cols(array(
+                'name' => $data['name'],
+                'short_name' => $data['short_name'],
+                'type_id' => $data['type_id'],
+                'site_url' => $data['site_url'],
+                'description' => $data['description'],
+                'default_address' => $data['default_address'],
+                'vk_url' => $data['vk_url'],
+                'vk_url_path' => $data['vk_url_path'],
+                'facebook_url_path' => $data['facebook_url_path'],
+                'facebook_url' => $data['facebook_url'],
+                'background_img_url' => $data['background_img_url'],
+                'img_url' => $data['img_url'],
+                'creator_id' => $user->getId(),
+                'email' => $data['email'],
+                'state_id' => self::ORGANIZATION_STATE_ON_MODERATION
+            )
+        );
+
+        $q_ins_organization
+            ->returning(array('id'));
+
+        $p_ins_organization = $db->prepare($q_ins_organization->getStatement());
+//        print_r($q_ins_organization->getBindValues());
+
+        $result = $p_ins_organization->execute($q_ins_organization->getBindValues());
+
+
+
+        if ($result === FALSE) throw new DBQueryException('CANT_CREATE_ORGANIZATION', $db);
+        $result = $p_ins_organization->fetch(PDO::FETCH_ASSOC);
+        return new Result(true, '', array('organization_id' => $result['id']));
     }
 
 }

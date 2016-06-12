@@ -93,10 +93,10 @@ BEGIN
         OLD.default_address <> NEW.default_address)
     THEN
       NEW.fts =
-      setweight(coalesce(to_tsvector('ru', name), ''), 'A') || ' ' ||
-      setweight(coalesce(to_tsvector('ru', short_name), ''), 'B') || ' ' ||
-      setweight(coalesce(to_tsvector('ru', description), ''), 'B') || ' ' ||
-      setweight(coalesce(to_tsvector('ru', default_address), ''), 'D');
+      setweight(coalesce(to_tsvector('ru', NEW.name), ''), 'A') || ' ' ||
+      setweight(coalesce(to_tsvector('ru', NEW.short_name), ''), 'B') || ' ' ||
+      setweight(coalesce(to_tsvector('ru', NEW.description), ''), 'B') || ' ' ||
+      setweight(coalesce(to_tsvector('ru', NEW.default_address), ''), 'D');
       RETURN NEW;
     ELSE
       RETURN NEW;
@@ -104,10 +104,10 @@ BEGIN
   ELSIF (TG_OP = 'INSERT')
     THEN
       NEW.fts =
-      setweight(coalesce(to_tsvector('ru', name), ''), 'A') || ' ' ||
-      setweight(coalesce(to_tsvector('ru', short_name), ''), 'B') || ' ' ||
-      setweight(coalesce(to_tsvector('ru', description), ''), 'B') || ' ' ||
-      setweight(coalesce(to_tsvector('ru', default_address), ''), 'D');
+      setweight(coalesce(to_tsvector('ru', NEW.name), ''), 'A') || ' ' ||
+      setweight(coalesce(to_tsvector('ru', NEW.short_name), ''), 'B') || ' ' ||
+      setweight(coalesce(to_tsvector('ru', NEW.description), ''), 'B') || ' ' ||
+      setweight(coalesce(to_tsvector('ru', NEW.default_address), ''), 'D');
       RETURN NEW;
   END IF;
   RETURN NULL;

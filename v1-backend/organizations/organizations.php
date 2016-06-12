@@ -66,7 +66,7 @@ $__modules['organizations'] = array(
 				$__fields
 			);
 			return $organization->update($__user, $__request['payload']);
-		},
+		}
 	),
 	'POST' => array(
 		'{(id:[0-9]+)/subscriptions}' => function ($organization_id) use ($__db, $__request, $__user, $__fields){
@@ -77,6 +77,13 @@ $__modules['organizations'] = array(
 				$__fields
 			);
 			return $organization->addSubscription($__user);
+		},
+		'' => function () use ($__db, $__request, $__user, $__fields){
+			return $organization = Organization::create(
+				$__request['payload'],
+				$__user,
+				$__db
+			);
 		},
 	),
 	'DELETE' => array(

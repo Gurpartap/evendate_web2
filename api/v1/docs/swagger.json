@@ -135,6 +135,39 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "Organization"
+        ],
+        "summary": "Create new organizations",
+        "description": "",
+        "operationId": "addOrganization",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "new organization data",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NewOrganization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        }
       }
     },
     "/organizations/recommendations": {
@@ -2547,6 +2580,50 @@
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "NewOrganization": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "short_name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "site_url": {
+          "type": "string"
+        },
+        "default_address": {
+          "type": "string"
+        },
+        "vk_url": {
+          "type": "string"
+        },
+        "facebook_url": {
+          "type": "string"
+        },
+        "type_id": {
+          "type": "string",
+          "enum": [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
+        },
+        "background": {
+          "type": "string",
+          "format": "byte"
+        },
+        "logo": {
+          "type": "string",
+          "format": "byte"
+        },
+        "detail_info_url": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
         }
       }
     },
