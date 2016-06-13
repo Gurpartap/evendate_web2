@@ -181,6 +181,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
             },
             saveDataInDB = function (data) {
+                console.log(data);
                 var subscriptions_count = 0;
                 socket.retry_count = 0;
                 function getUIDValues() {
@@ -289,7 +290,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             case 'vk':
                             {
                                 var vk_data = {
-                                    uid: data.user_info.user_id,
+                                    uid: UIDs.vk_uid,
                                     user_id: user.id,
                                     access_token: data.oauth_data.access_token,
                                     expires_in: data.oauth_data.expires_in,
@@ -303,12 +304,14 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 } else {
                                     q_ins_sign_in = vk_sign_in.insert(vk_data);
                                 }
+                                console.log(vk_data);
                                 break;
                             }
                             case 'google':
                             {
                                 var google_data = {
                                     user_id: user.id,
+                                    google_id: user.id,
                                     access_token: data.oauth_data.access_token,
                                     expires_in: data.oauth_data.expires_in,
                                     etag: data.user_info.etag,
@@ -319,13 +322,14 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 } else {
                                     q_ins_sign_in = google_sign_in.insert(google_data);
                                 }
+                                console.log(google_data);
                                 break;
                             }
                             case 'facebook':
                             {
                                 var facebook_data = {
                                     user_id: user.id,
-                                    uid: data.user_info.id,
+                                    uid: UIDs.facebook_uid,
                                     access_token: data.oauth_data.access_token,
                                     expires_in: data.oauth_data.expires_in
                                 };
@@ -334,6 +338,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 } else {
                                     q_ins_sign_in = facebook_sign_in.insert(facebook_data);
                                 }
+                                console.log(facebook_data);
                                 break;
                             }
 
@@ -362,30 +367,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             network_type: data.type
                         }).toQuery();
 
-                        client.query(q_ins_interests.text + ' ON CONFLICT (user_id, network_type) DO UPDATE SET ' +
-                            ' city = $2, ' +
-                            ' education_university = $3, ' +
-                            ' education_university_name = $4, ' +
-                            ' education_faculty = $5, ' +
-                            ' education_faculty_name = $6, ' +
-                            ' education_graduation = $7, ' +
-                            ' occupation_id = $8, ' +
-                            ' occupation_name = $9, ' +
-                            ' relation = $10, ' +
-                            ' personal_political = $11, ' +
-                            ' personal_smoking = $12, ' +
-                            ' personal_alcohol = $13, ' +
-                            ' interests = $14, ' +
-                            ' movies = $15, ' +
-                            ' tv = $16, ' +
-                            ' books = $17, ' +
-                            ' games = $18, ' +
-                            ' about = $19'
-                        , q_ins_interests.values, function(err, result){
-                                if (handleError(err)) return;
-                                console.log(result);
-                            });
-                        
                         var insertToken = function () {
                             var token_type = (data.oauth_data.hasOwnProperty('mobile') && data.oauth_data.mobile == 'true') ? 'mobile' : 'bearer',
                                 token_time = token_type == 'mobile' ? moment().add(1, 'months').unix() : moment().add(10, 'days').unix(),
@@ -398,7 +379,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
                             client.query(q_ins_token, function (err) {
                                 if (handleError(err)) {
-                                    socket.emit('error.retry');
+                                    authTry(data.oauth_data);
                                     return;
                                 }
                                 socket.emit('auth', {
@@ -492,6 +473,29 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                     });
                                 });
                             }
+
+                            client.query(q_ins_interests.text + ' ON CONFLICT (user_id, network_type) DO UPDATE SET ' +
+                                ' city = $2, ' +
+                                ' education_university = $3, ' +
+                                ' education_university_name = $4, ' +
+                                ' education_faculty = $5, ' +
+                                ' education_faculty_name = $6, ' +
+                                ' education_graduation = $7, ' +
+                                ' occupation_id = $8, ' +
+                                ' occupation_name = $9, ' +
+                                ' relation = $10, ' +
+                                ' personal_political = $11, ' +
+                                ' personal_smoking = $12, ' +
+                                ' personal_alcohol = $13, ' +
+                                ' interests = $14, ' +
+                                ' movies = $15, ' +
+                                ' tv = $16, ' +
+                                ' books = $17, ' +
+                                ' games = $18, ' +
+                                ' about = $19'
+                                , q_ins_interests.values, function(err, result){
+                                    if (handleError(err)) return;
+                                });
                         });
                     });
                 });
@@ -579,7 +583,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     socket.retry_count++;
                     getUsersInfo(oauth_data, function (user_info_error, user_info) {
 
-                        console.log(user_info);
 
                         if (handleError(user_info_error)) {
                             setTimeout(function () {
@@ -622,7 +625,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
                             getGroupsList(user_info, function (groups_error, groups_data) {
 
-                                console.log('groups_data', groups_data);
                                 if (handleError(friends_error)) {
                                     setTimeout(function () {
                                         authTry(oauth_data);
@@ -751,7 +753,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
             };
 
         socket.on('auth.oauthDone', function (oauth_data) {
-            console.log(oauth_data);
             socket.retry_count = 0;
             try {
                 console.log('trying');
@@ -879,7 +880,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
             fs.writeFile(image_path + filename, base64, 'base64', function (err) {
 
 
-                console.log(image_path, filename);
                 if (handleError(err, EMIT_NAMES.VK_INTEGRATION.POST_ERROR)) return;
 
                 rest.get(url, {

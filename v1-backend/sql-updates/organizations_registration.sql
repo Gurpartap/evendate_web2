@@ -1,10 +1,11 @@
 ALTER TABLE organizations ADD COLUMN vk_url VARCHAR(255);
 ALTER TABLE organizations ADD COLUMN facebook_url VARCHAR(255);
-ALTER TABLE organizations ADD COLUMN state_id INT REFERENCES organizations_states(id);
+ALTER TABLE organizations ADD COLUMN state_id INT REFERENCES organizations_states(id) DEFAULT 1;
 ALTER TABLE organizations ADD COLUMN creator_id INT REFERENCES users(id);
 ALTER TABLE organizations ADD COLUMN email VARCHAR(255);
 
 ALTER TABLE organizations ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE users_organizations ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
 
 ALTER TABLE organizations ALTER COLUMN background_medium_img_url DROP NOT NULL;
 ALTER TABLE organizations ALTER COLUMN background_small_img_url DROP NOT NULL;
@@ -103,3 +104,5 @@ CREATE OR REPLACE VIEW view_organizations AS
     INNER JOIN organization_types ON organization_types.id = organizations.type_id AND organizations.status = TRUE
   WHERE organizations.status = TRUE
   AND organizations.state_id = 1;
+
+

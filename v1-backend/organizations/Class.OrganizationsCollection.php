@@ -219,7 +219,10 @@ class OrganizationsCollection
 
         $organizations = $p_search->fetchAll(PDO::FETCH_CLASS, 'Organization');
 
-        if ($return_one) return $organizations[0];
+        if ($return_one){
+            if (count($organizations) < 1) throw new LogicException('CANT_FIND_ORGANIZATION');
+            return $organizations[0];
+        }
 
 
         $result_array = array();

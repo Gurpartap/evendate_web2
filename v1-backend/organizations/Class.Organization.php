@@ -452,7 +452,7 @@ class Organization extends AbstractEntity
                 . '#u',
                 $data['facebook_url'],
                 $data['facebook_url_path']);
-            if(count($data['facebook_url_path']) > 0){
+            if (count($data['facebook_url_path']) > 0) {
                 $data['facebook_url_path'] = $data['facebook_url_path'][0];
             }
         } else {
@@ -471,7 +471,7 @@ class Organization extends AbstractEntity
             $background_path = self::IMAGES_PATH . self::IMAGE_TYPE_BACKGROUND . $background_filename;
             App::saveImage($data['background'], $background_path, 14000);
             $data['$background_path'] = $background_path;
-        }else{
+        } else {
             $data['background_img_url'] = self::IMAGES_PATH . self::IMAGE_TYPE_LOGO . self::DEFAULT_BACKGROUND_FILENAME;
         }
 
@@ -486,7 +486,7 @@ class Organization extends AbstractEntity
             $logo_path = self::IMAGES_PATH . self::IMAGE_TYPE_LOGO . $logo_filename;
             App::saveImage($data['logo'], $logo_path, 14000);
             $data['img_url'] = $logo_path;
-        }else{
+        } else {
             $data['img_url'] = self::IMAGES_PATH . self::IMAGE_TYPE_LOGO . self::DEFAULT_LOGO_FILENAME;
         }
     }
@@ -530,6 +530,71 @@ class Organization extends AbstractEntity
         return new Result(true, '', array('organization_id' => $this->getId()));
     }
 
+    public function addStaff(User $user, Friend $friend, $role)
+    {
+        if (!$user->isAdmin($this)) throw new PrivilegesException(null, $this->db);
+        $q_ins_staff = App::queryFactory()
+            ->newInsert()
+            ->into('users_organizations')
+            ->cols(array(
+                'user_id' => $friend->getId(),
+                'organization_id' => $this->getId(),
+                'status' => true,
+                'role_id' => Roles::getId($role),
+            ));
+        $ins_data = $q_ins_staff->getBindValues();
+        $p_ins_staff = $this->db->prepare($q_ins_staff->getStatement() . ' ON CONFLICT (user_id, organization_id) DO UPDATE SET status = TRUE, role_id = :role_id');
+        $ins_data[':role_id'] = Roles::getId($role);
+        $result = $p_ins_staff->execute($ins_data);
+
+        if ($result === FALSE) throw new DBQueryException('CANT_ADD_STAFF', $this->db);
+        return new Result(true, '');
+    }
+
+    public function deleteStaff(User $user, Friend $friend, $role)
+    {
+
+        if (!$user->isAdmin($this)) throw new PrivilegesException(null, $this->db);
+
+        if ($role == Roles::ROLE_ADMIN) {
+            $q_get_admins = App::queryFactory()
+                ->newSelect()
+                ->from('users_organizations')
+                ->cols(array(
+                    '1 AS role_admin_id',
+                    '(SELECT COUNT(user_id) 
+                        FROM users_organizations ua 
+                        WHERE ua.status = TRUE 
+                            AND ua.organization_id = users_organizations.organization_id
+                            AND ua.role_id = ' . Roles::getId(Roles::ROLE_ADMIN) .') AS admins_count'
+                ))
+                ->where('users_organizations.status = TRUE')
+                ->where('users_organizations.organization_id = ?', $this->getId());
+
+            $p_get_admins = $this->db->prepare($q_get_admins->getStatement());
+            $result = $p_get_admins->execute($q_get_admins->getBindValues());
+            if ($result === FALSE) throw new DBQueryException('CANT_GET_ADMINS', $this->db);
+
+            $admins = $p_get_admins->fetch();
+            if ($admins['admins_count'] == 1) throw new LogicException('Невозможно удалить единственного администратора');
+        }
+        $q_upd_staff = App::queryFactory()
+            ->newUpdate()
+            ->table('users_organizations')
+            ->cols(array(
+                'status' => 'false'
+            ))
+        ->where('user_id = ?', $friend->getId())
+        ->where('organization_id = ?', $this->getId())
+        ->where('role_id = ?', Roles::getId($role));
+
+        $p_get_admins = $this->db->prepare($q_upd_staff->getStatement());
+        $result = $p_get_admins->execute($q_upd_staff->getBindValues());
+
+        if ($result === FALSE) throw new DBQueryException('CANT_DELETE_STAFF', $this->db);
+        return new Result(true, '');
+    }
+
 
     public static function create($data, User $user, PDO $db)
     {
@@ -565,7 +630,6 @@ class Organization extends AbstractEntity
 //        print_r($q_ins_organization->getBindValues());
 
         $result = $p_ins_organization->execute($q_ins_organization->getBindValues());
-
 
 
         if ($result === FALSE) throw new DBQueryException('CANT_CREATE_ORGANIZATION', $db);
