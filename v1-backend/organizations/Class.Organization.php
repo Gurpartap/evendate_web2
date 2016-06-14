@@ -12,6 +12,8 @@ class Organization extends AbstractEntity
     const SUBSCRIPTION_ID_FIELD_NAME = 'subscription_id';
     const IS_SUBSCRIBED_FIELD_NAME = 'is_subscribed';
     const NEW_EVENTS_COUNT_FIELD_NAME = 'new_events_count';
+    const STAFF_FIELD_NAME = 'staff';
+
     const IMAGES_PATH = 'organizations_images/';
     const IMAGE_SIZE_LARGE = '/large/';
     const IMAGE_TYPE_BACKGROUND = '/backgrounds/';
@@ -307,6 +309,23 @@ class Organization extends AbstractEntity
                     'length' => $users_pagination['length'] ?? App::DEFAULT_LENGTH,
                     'offset' => $users_pagination['offset'] ?? App::DEFAULT_OFFSET
                 ));
+        }
+
+        if (isset($fields[Organization::STAFF_FIELD_NAME])) {
+            $staff_pagination = $fields[Organization::STAFF_FIELD_NAME];
+            $result_data[Organization::STAFF_FIELD_NAME] =
+                UsersCollection::filter(
+                    $this->db,
+                    $user,
+                    array('staff' => $this),
+                    Fields::parseFields($staff_pagination['fields'] ?? ''),
+                    $staff_pagination['pagination'] ??
+                    array(
+                        'length' => $staff_pagination['length'] ?? App::DEFAULT_LENGTH,
+                        'offset' => $staff_pagination['offset'] ?? App::DEFAULT_OFFSET
+                    ),
+                    Fields::parseOrderBy($staff_pagination['order_by'] ?? '')
+                )->getData();
         }
 
         $events_field = $fields[Organization::EVENTS_FIELD_NAME] ?? null;

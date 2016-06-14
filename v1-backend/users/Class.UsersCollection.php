@@ -67,6 +67,7 @@ class UsersCollection extends AbstractCollection
                 }
                 case 'staff': {
                     if ($value instanceof Organization) {
+                        if (!$user->isAdmin($value)) throw new PrivilegesException('', $db);
                         $q_get_users
                             ->join('INNER', 'users_organizations', 'users_organizations.user_id = view_users.id')
                             ->join('INNER', 'users_roles', 'users_roles.id = users_organizations.role_id')
