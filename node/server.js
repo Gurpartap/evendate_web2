@@ -788,7 +788,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
             });
         });
 
-
         socket.on('feedback', function (data) {
             logger.info(data);
             var html = '';
@@ -865,7 +864,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
             });
         });
 
-        /**/
         socket.on(EMIT_NAMES.VK_INTEGRATION.POST_IT, function (data) {
             var request_data = [
                     'access_token=' + socket.vk_user.access_token,

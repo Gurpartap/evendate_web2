@@ -2,6 +2,24 @@
 
 	class Statistics{
 
+
+		const SCALE_MINUTE = 'minute';
+		const SCALE_HOUR = 'hour';
+		const SCALE_DAY = 'day';
+		const SCALE_WEEK = 'week';
+		const SCALE_MONTH = 'month';
+		const SCALE_YEAR = 'year';
+		
+
+		const SCALES = array(
+			self::SCALE_MINUTE,
+			self::SCALE_HOUR,
+			self::SCALE_DAY,
+			self::SCALE_WEEK,
+			self::SCALE_MONTH,
+			self::SCALE_YEAR,
+		);
+
 		const ENTITY_EVENT = 'event';
 		const ENTITY_ORGANIZATION = 'organization';
 		const ENTITY_FRIEND = 'friend';
@@ -30,6 +48,10 @@
 		const FRIEND_VIEW_ACTIONS = 'view_actions';
 		const FRIEND_VIEW_EVENT_FROM_USER = 'view_event_from_user';
 
+		
+		const FIELD_DYNAMICS = 'dynamics';
+		const FIELD_CONVERSION = 'conversion';
+		const FIELD_AUDIENCE = 'audience';
 
 		public static function getTypeId($entity_type, $type_name, PDO $db){
 			$q_get = 'SELECT id::int FROM stat_event_types
@@ -41,7 +63,7 @@
 				':type_code' => $type_name
 			));
 			if ($res === FALSE) throw new DBQueryException('', $db);
-			if ($p_get->rowCount() != 1) throw new InvalidArgumentException('', $db);
+			if ($p_get->rowCount() < 1) throw new InvalidArgumentException('', $db);
 			return $p_get->fetchColumn(0);
 		}
 
@@ -97,7 +119,7 @@
 			));
 		}
 
-		public static function StoreBatch(array $events, User $user = null, PDO $db){
+		public static function storeBatch(array $events, User $user = null, PDO $db){
 			foreach ($events as $event){
 				switch($event['entity_type']){
 					case self::ENTITY_EVENT:
