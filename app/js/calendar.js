@@ -146,9 +146,9 @@ function Feed($view, $content_block){
 					subscribed: 'В избранном'
 				},
 				colors: {
-					subscribe: '-color_neutral_secondary',
-					unsubscribe: '-color_secondary',
-					subscribed: '-color_secondary'
+					subscribe: '-color_neutral_accent',
+					unsubscribe: '-color_accent',
+					subscribed: '-color_accent'
 				},
 				icons: {
 					subscribe: 'fa-star-o',
@@ -247,7 +247,7 @@ function Feed($view, $content_block){
 							}
 						}
 
-						event.subscribe_button_classes = event.is_favorite ? ['fa-star', '-color_secondary', '-Subscribed'].join(' ') : ['fa-star-o', '-color_neutral_secondary'].join(' ');
+						event.subscribe_button_classes = event.is_favorite ? ['fa-star', '-color_accent', '-Subscribed'].join(' ') : ['fa-star-o', '-color_neutral_accent'].join(' ');
 						event.subscribe_button_text = event.is_favorite ? 'В избранном' : 'В избранное';
 						event.subscribers = $subscribers;
 						event.avatars_collection_classes = avatars_collection_classes.join(' ');
@@ -348,9 +348,9 @@ function OneEvent($view, $content_block){
 					subscribed: 'В избранном'
 				},
 				colors: {
-					subscribe: '-color_neutral_secondary',
-					unsubscribe: '-color_secondary',
-					subscribed: '-color_secondary'
+					subscribe: '-color_neutral_accent',
+					unsubscribe: '-color_accent',
+					subscribed: '-color_accent'
 				},
 				icons: {
 					subscribe: 'fa-star-o',
@@ -580,7 +580,7 @@ function OneEvent($view, $content_block){
 					}
 				}
 
-				data.subscribe_button_classes = data.is_favorite ? ['fa-check', '-color_secondary', '-Subscribed'].join(' ') : ['fa-plus', '-color_neutral_secondary'].join(' ');
+				data.subscribe_button_classes = data.is_favorite ? ['fa-check', '-color_accent', '-Subscribed'].join(' ') : ['fa-plus', '-color_neutral_accent'].join(' ');
 				data.subscribe_button_text = data.is_favorite ? 'В избранном' : 'Добавить в избранное';
 				data.subscribers = $subscribers;
 				data.avatars_collection_classes = avatars_collection_classes.join(' ');
@@ -755,9 +755,9 @@ function Organization($view, $content_block){
 					subscribed: 'В избранном'
 				},
 				colors: {
-					subscribe: '-color_neutral_secondary',
-					unsubscribe: '-color_secondary',
-					subscribed: '-color_secondary'
+					subscribe: '-color_neutral_accent',
+					unsubscribe: '-color_accent',
+					subscribed: '-color_accent'
 				}
 			});
 		}).addClass('-Handled_Subscribe');
@@ -771,7 +771,7 @@ function Organization($view, $content_block){
 
 		new SubscribeButton($('.OrganizationSubscribe'), {
 			colors: {
-				subscribe: '-color_secondary',
+				subscribe: '-color_accent',
 				unsubscribe: '-color_neutral',
 				subscribed: '-color_neutral'
 			}
@@ -890,7 +890,7 @@ function Organization($view, $content_block){
 				}
 			}
 			$event = tmpl('organization-feed-event', $.extend({}, event, {
-				subscribe_button_classes: event.is_favorite ? ['fa-check', '-color_secondary', '-Subscribed'].join(' ') : ['fa-plus', '-color_neutral_secondary'].join(' '),
+				subscribe_button_classes: event.is_favorite ? ['fa-check', '-color_accent', '-Subscribed'].join(' ') : ['fa-plus', '-color_neutral_accent'].join(' '),
 				subscribe_button_text: event.is_favorite ? 'В избранном' : 'Добавить в избранное',
 				date: m_event_date.format(__C.DATE_FORMAT),
 				subscribers: $subscribers,
@@ -987,7 +987,7 @@ function Organization($view, $content_block){
 				data = data[0];
 
 				$page_wrapper.append(tmpl('organization-info-page', $.extend({
-					subscribe_button_classes: data.is_subscribed ? ['fa-check', '-color_neutral', '-Subscribed'].join(' ') : ['fa-plus', '-color_secondary'].join(' '),
+					subscribe_button_classes: data.is_subscribed ? ['fa-check', '-color_neutral', '-Subscribed'].join(' ') : ['fa-plus', '-color_accent'].join(' '),
 					subscribe_button_text: data.is_subscribed ? 'Подписан' : 'Подписаться',
 					has_address: data.default_address ? '' : '-hidden'
 				}, data)));
