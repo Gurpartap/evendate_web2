@@ -8,6 +8,16 @@ require_once $BACKEND_FULL_PATH . '/events/Class.EventsCollection.php';
 
 $__modules['organizations'] = array(
 	'GET' => array(
+		'{(id:[0-9]+)/staff}' => function ($id) use ($__db, $__pagination, $__request, $__user, $__fields, $__order_by){
+			return UsersCollection::filter(
+				$__db,
+				$__user,
+				array_merge($__request, array('staff' => OrganizationsCollection::one($__db, $__user, $id, array()))),
+				$__fields,
+				$__pagination,
+				$__order_by ?? array('id')
+			);
+		},
 		'{{/(id:[0-9]+)}}' => function($id) use ($__db, $__request, $__user, $__fields){
 			$result = $organization = OrganizationsCollection::one(
 				$__db,
@@ -66,9 +76,16 @@ $__modules['organizations'] = array(
 				$__fields
 			);
 			return $organization->update($__user, $__request['payload']);
-		},
+		}
 	),
 	'POST' => array(
+        '{(id:[0-9]+)/staff}' => function ($id) use ($__db, $__pagination, $__request, $__user, $__fields, $__order_by){
+            if (!isset($__request['user_id'])) throw new InvalidArgumentException('Укажите ID пользовател');
+            if (!isset($__request['role'])) throw new InvalidArgumentException('Укажите роль пользователя');
+            return OrganizationsCollection::one($__db, $__user, $id, array())->addStaff(
+                $__user, UsersCollection::one($__db, $__user, $__request['user_id'], array()), $__request['role']
+            );
+        },
 		'{(id:[0-9]+)/subscriptions}' => function ($organization_id) use ($__db, $__request, $__user, $__fields){
 			$organization = OrganizationsCollection::one(
 				$__db,
@@ -78,6 +95,13 @@ $__modules['organizations'] = array(
 			);
 			return $organization->addSubscription($__user);
 		},
+		'' => function () use ($__db, $__request, $__user, $__fields){
+			return $organization = Organization::create(
+				$__request['payload'],
+				$__user,
+				$__db
+			);
+		},
 	),
 	'DELETE' => array(
 		'{(id:[0-9]+)/subscriptions}' => function ($id) use ($__db, $__request, $__user){
@@ -85,5 +109,12 @@ $__modules['organizations'] = array(
 			$result = $organization->deleteSubscription($__user);
 			return $result;
 		},
+        '{(id:[0-9]+)/staff}' => function ($id) use ($__db, $__pagination, $__request, $__user, $__fields, $__order_by){
+            if (!isset($__request['user_id'])) throw new InvalidArgumentException('Укажите ID пользовател');
+            if (!isset($__request['role'])) throw new InvalidArgumentException('Укажите роль пользователя');
+            return OrganizationsCollection::one($__db, $__user, $id, array())->deleteStaff(
+                $__user, UsersCollection::one($__db, $__user, $__request['user_id'], array()), $__request['role']
+            );
+        }
 	)
 );

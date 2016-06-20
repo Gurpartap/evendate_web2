@@ -36,8 +36,6 @@ class UsersCollection extends AbstractCollection
 
         $_fields = Fields::mergeFields(Friend::getAdditionalCols(), $fields, $default_cols);
 
-        $q_get_users->cols($_fields);
-
         if ($user instanceof User) {
             $statement_array = array(':user_id' => $user->getId());
         } else {
@@ -67,6 +65,20 @@ class UsersCollection extends AbstractCollection
                     }
                     break;
                 }
+                case 'staff': {
+                    if ($value instanceof Organization) {
+                        if (!$user->isAdmin($value)) throw new PrivilegesException('', $db);
+                        $q_get_users
+                            ->join('INNER', 'users_organizations', 'users_organizations.user_id = view_users.id')
+                            ->join('INNER', 'users_roles', 'users_roles.id = users_organizations.role_id')
+                            ->where('users_organizations.organization_id = :organization_id')
+                            ->where('users_organizations.status = TRUE');
+                        $statement_array[':organization_id'] = $value->getId();
+                        $_fields[] = 'users_roles.name AS role';
+                        $fields[] = 'role';
+                    }
+                    break;
+                }
                 case 'id': {
                     $q_get_users->where('id = :id');
                     $statement_array[':id'] = $value;
@@ -84,6 +96,8 @@ class UsersCollection extends AbstractCollection
             }
         }
 
+
+        $q_get_users->cols($_fields);
 
         $q_get_users->orderBy($order_by);
         $p_get_events = $db->prepare($q_get_users->getStatement());

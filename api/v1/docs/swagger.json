@@ -68,7 +68,11 @@
             "description": "Can get list of organizations with any privileges",
             "required": false,
             "type": "string",
-            "enum": ["can_add", "can_edit", "can_modify"]
+            "enum": [
+              "can_add",
+              "can_edit",
+              "can_modify"
+            ]
           },
           {
             "name": "description",
@@ -91,7 +95,10 @@
             "description": "Changes `name`, `short_name` and `description` search patterns to strict (without %)",
             "required": false,
             "type": "string",
-            "enum": ["true", "false"]
+            "enum": [
+              "true",
+              "false"
+            ]
           },
           {
             "name": "length",
@@ -135,6 +142,39 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": [
+          "Organization"
+        ],
+        "summary": "Create new organizations",
+        "description": "",
+        "operationId": "addOrganization",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "new organization data",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NewOrganization"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        }
       }
     },
     "/organizations/recommendations": {
@@ -169,7 +209,11 @@
             "description": "Can get list of organizations with any privileges",
             "required": false,
             "type": "string",
-            "enum": ["can_add", "can_edit", "can_modify"]
+            "enum": [
+              "can_add",
+              "can_edit",
+              "can_modify"
+            ]
           },
           {
             "name": "description",
@@ -192,7 +236,10 @@
             "description": "Changes `name`, `short_name` and `description` search patterns to strict (without %)",
             "required": false,
             "type": "string",
-            "enum": ["true", "false"]
+            "enum": [
+              "true",
+              "false"
+            ]
           },
           {
             "name": "length",
@@ -269,18 +316,18 @@
         "responses": {
           "200": {
             "description": "successful operation",
-            "schema":  {
+            "schema": {
               "type": "array",
               "items": {
                 "$ref": "#/definitions/Organization"
               }
-			}
+            }
           },
           "400": {
             "description": "Invalid ID supplied"
           }
         }
-	  }
+      }
     },
     "/organizations/subscriptions": {
       "get": {
@@ -338,7 +385,6 @@
         }
       }
     },
-
     "/organizations/types": {
       "get": {
         "tags": [
@@ -410,6 +456,175 @@
         }
       }
     },
+    "/organizations/{Id}/staff": {
+      "get": {
+        "tags": [
+          "Organization"
+        ],
+        "summary": "Get list of admins and moderators",
+        "description": "",
+        "operationId": "getStaff",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "Id",
+            "description": "ID of organization",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "length",
+            "in": "query",
+            "description": "Items count",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Items count",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "description": "Order column name",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Additional fields. HAVE ADDITIONAL FIELD role",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "BadArgumentException"
+          },
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ApiResponse"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Organization"
+        ],
+        "summary": "Add new staff to organization",
+        "description": "",
+        "operationId": "addStaff",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "Id",
+            "description": "ID of organization user wants to subscribe",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "user_id",
+            "description": "ID of user we want to add",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "role",
+            "description": "Name of role",
+            "required": true,
+            "type": "string",
+            "enum": ["admin", "moderator"]
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "BadArgumentException"
+          },
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ApiResponse"
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Organization"
+        ],
+        "summary": "Remove staff from organization",
+        "description": "",
+        "operationId": "deleteStaff",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "Id",
+            "description": "ID of organization user wants to subscribe",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "user_id",
+            "description": "ID of user we want to add",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "in": "query",
+            "name": "role",
+            "description": "Name of role",
+            "required": true,
+            "type": "string",
+            "enum": ["admin", "moderator"]
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "BadArgumentException"
+          },
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ApiResponse"
+              }
+            }
+          }
+        }
+      }
+    },
     "/organizations/{Id}/subscriptions": {
       "post": {
         "tags": [
@@ -434,6 +649,15 @@
         "responses": {
           "400": {
             "description": "BadArgumentException"
+          },
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ApiResponse"
+              }
+            }
           }
         }
       },
@@ -467,11 +691,19 @@
         "responses": {
           "400": {
             "description": "BadArgumentException"
+          },
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ApiResponse"
+              }
+            }
           }
         }
       }
     },
-
     "/tags/": {
       "get": {
         "tags": [
@@ -535,7 +767,7 @@
             "schema": {
               "type": "array",
               "items": {
-              "$ref": "#/definitions/Tag"
+                "$ref": "#/definitions/Tag"
               }
             }
           }
@@ -569,14 +801,13 @@
             "schema": {
               "type": "array",
               "items": {
-              "$ref": "#/definitions/Tag"
+                "$ref": "#/definitions/Tag"
               }
             }
           }
         }
       }
     },
-
     "/events/": {
       "post": {
         "tags": [
@@ -643,7 +874,10 @@
             "description": "all future events",
             "required": false,
             "type": "string",
-            "enum":["true", "false"]
+            "enum": [
+              "true",
+              "false"
+            ]
           },
           {
             "in": "query",
@@ -651,7 +885,10 @@
             "description": "show/hide canceled events",
             "required": false,
             "type": "string",
-            "enum":["true", "false"]
+            "enum": [
+              "true",
+              "false"
+            ]
           },
           {
             "in": "query",
@@ -712,8 +949,8 @@
             "required": false,
             "type": "integer",
             "format": "int64"
-		  },
-		  {
+          },
+          {
             "name": "length",
             "in": "query",
             "description": "Items count",
@@ -752,7 +989,6 @@
               "items": {
                 "$ref": "#/definitions/Event"
               }
-
             }
           }
         }
@@ -791,7 +1027,10 @@
             "description": "all future events",
             "required": false,
             "type": "string",
-            "enum":["true", "false"]
+            "enum": [
+              "true",
+              "false"
+            ]
           },
           {
             "in": "query",
@@ -799,7 +1038,10 @@
             "description": "show/hide canceled events",
             "required": false,
             "type": "string",
-            "enum":["true", "false"]
+            "enum": [
+              "true",
+              "false"
+            ]
           },
           {
             "in": "query",
@@ -860,8 +1102,8 @@
             "required": false,
             "type": "integer",
             "format": "int64"
-		  },
-		  {
+          },
+          {
             "name": "length",
             "in": "query",
             "description": "Items count",
@@ -900,7 +1142,6 @@
               "items": {
                 "$ref": "#/definitions/Event"
               }
-
             }
           }
         }
@@ -932,7 +1173,10 @@
             "description": "show/hide canceled events",
             "required": false,
             "type": "string",
-            "enum":["true", "false"]
+            "enum": [
+              "true",
+              "false"
+            ]
           },
           {
             "in": "query",
@@ -1030,7 +1274,7 @@
             "description": "successful operation",
             "schema": {
               "type": "array",
-              "items":{
+              "items": {
                 "$ref": "#/definitions/Event"
               }
             }
@@ -1087,7 +1331,10 @@
             "description": "[WARN!] Changes behavior. If equals TRUE dates can contain two additional fields: `events_count` and `favorites_count` otherwise can't. Main use case: filter by month and set to true to get all days in month with events and favorites.",
             "required": false,
             "type": "string",
-            "enum": ["true", "false"]
+            "enum": [
+              "true",
+              "false"
+            ]
           },
           {
             "name": "my",
@@ -1095,7 +1342,10 @@
             "description": "Returns only dates for my events",
             "required": false,
             "type": "string",
-            "enum": ["true", "false"]
+            "enum": [
+              "true",
+              "false"
+            ]
           },
           {
             "name": "organization_id",
@@ -1144,7 +1394,7 @@
               "items": {
                 "$ref": "#/definitions/ApiResponse"
               }
-			}
+            }
           }
         }
       }
@@ -1175,7 +1425,10 @@
             "description": "show/hide canceled events",
             "required": false,
             "type": "string",
-            "enum":["true", "false"]
+            "enum": [
+              "true",
+              "false"
+            ]
           },
           {
             "in": "query",
@@ -1389,7 +1642,8 @@
             "required": true,
             "type": "string",
             "enum": [
-              "true", "false"
+              "true",
+              "false"
             ]
           },
           {
@@ -1399,7 +1653,8 @@
             "required": true,
             "type": "string",
             "enum": [
-              "true", "false"
+              "true",
+              "false"
             ]
           },
           {
@@ -1507,8 +1762,13 @@
             "description": "Predefined type for new notification",
             "required": false,
             "type": "string",
-            "enum": ["notification-before-three-hours", "notification-before-day", "notification-before-three-days",
-              "notification-before-week", "notification-before-quarter-of-hour"]
+            "enum": [
+              "notification-before-three-hours",
+              "notification-before-day",
+              "notification-before-three-days",
+              "notification-before-week",
+              "notification-before-quarter-of-hour"
+            ]
           },
           {
             "name": "Id",
@@ -1671,7 +1931,6 @@
         }
       }
     },
-
     "/users/feed": {
       "get": {
         "tags": [
@@ -1719,11 +1978,11 @@
           "200": {
             "description": "successful operation",
             "schema": {
-			  "type": "array",
-			  "items": {
-			    "$ref": "#/definitions/User"
-			  }
-			}
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/User"
+              }
+            }
           }
         }
       }
@@ -1779,7 +2038,7 @@
               "items": {
                 "$ref": "#/definitions/User"
               }
-			}
+            }
           }
         }
       }
@@ -1816,11 +2075,11 @@
           "200": {
             "description": "successful operation",
             "schema": {
-			  "type": "array",
-			  "items": {
-			    "$ref": "#/definitions/User"
-			  }
-			}
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/User"
+              }
+            }
           }
         }
       }
@@ -1868,7 +2127,7 @@
               "items": {
                 "$ref": "#/definitions/Action"
               }
-			}
+            }
           }
         }
       }
@@ -1935,7 +2194,11 @@
             "description": "Type of client token is assigned",
             "required": true,
             "type": "string",
-            "enum": ["browser", "ios", "android"]
+            "enum": [
+              "browser",
+              "ios",
+              "android"
+            ]
           },
           {
             "name": "device_name",
@@ -2018,7 +2281,10 @@
             "description": "If true enables notifications in browser",
             "required": true,
             "type": "string",
-            "enum": ["true", "false"]
+            "enum": [
+              "true",
+              "false"
+            ]
           },
           {
             "in": "query",
@@ -2026,7 +2292,10 @@
             "description": "If true enables friends to see subscriptions and actions in their feed",
             "required": true,
             "type": "string",
-            "enum": ["true", "false"]
+            "enum": [
+              "true",
+              "false"
+            ]
           }
         ],
         "responses": {
@@ -2040,8 +2309,6 @@
       }
     }
   },
-
-
   "definitions": {
     "Organization": {
       "type": "object",
@@ -2233,7 +2500,7 @@
         "[notification_type]": {
           "type": "string"
         },
-		"[done]": {
+        "[done]": {
           "type": "boolean"
         },
         "[created_at]": {
@@ -2361,22 +2628,22 @@
           "type": "number",
           "format": "float"
         },
-		"[image_vertical_small_url]": {
+        "[image_vertical_small_url]": {
           "type": "string"
         },
-		"[image_horizontal_small_url]": {
+        "[image_horizontal_small_url]": {
           "type": "string"
         },
-		"[image_vertical_medium_url]": {
+        "[image_vertical_medium_url]": {
           "type": "string"
         },
-		"[image_horizontal_medium_url]": {
+        "[image_horizontal_medium_url]": {
           "type": "string"
         },
-		"[image_vertical_large_url]": {
+        "[image_vertical_large_url]": {
           "type": "string"
         },
-		"[image_horizontal_large_url]": {
+        "[image_horizontal_large_url]": {
           "type": "string"
         },
         "[organization_name]": {
@@ -2448,22 +2715,22 @@
         "[can_edit]": {
           "type": "boolean"
         },
-		"[link]": {
+        "[link]": {
           "type": "string"
         },
-		"[public_at]": {
+        "[public_at]": {
           "type": "string"
         },
-		"[registration_required]": {
+        "[registration_required]": {
           "type": "boolean"
         },
-		"[registration_till]": {
+        "[registration_till]": {
           "type": "string"
         },
-		"[is_free]": {
+        "[is_free]": {
           "type": "boolean"
         },
-		"[min_price]": {
+        "[min_price]": {
           "type": "int32"
         },
         "[favored_friends_count]": {
@@ -2536,7 +2803,7 @@
               "start_time": {
                 "type": "string"
               },
-              "end_time":{
+              "end_time": {
                 "type": "string"
               }
             }
@@ -2550,57 +2817,129 @@
         }
       }
     },
+    "NewOrganization": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "short_name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "site_url": {
+          "type": "string"
+        },
+        "default_address": {
+          "type": "string"
+        },
+        "vk_url": {
+          "type": "string"
+        },
+        "facebook_url": {
+          "type": "string"
+        },
+        "type_id": {
+          "type": "string",
+          "enum": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19
+          ]
+        },
+        "background": {
+          "type": "string",
+          "format": "byte"
+        },
+        "logo": {
+          "type": "string",
+          "format": "byte"
+        },
+        "detail_info_url": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      }
+    },
     "Action": {
       "type": "object",
       "properties": {
-		  "stat_type_id": {
-			"type": "integer",
-			"format": "int64"
-		  },
-		  "event_id": {
-			"type": "integer",
-			"format": "int64"
-		  },
-		  "organization_id": {
-			"type": "integer",
-			"format": "int64"
-		  },
-		  "user_id": {
-			"type": "integer",
-			"format": "int64"
-		  },
-		  "entity": {
-			"type": "integer",
-			"format": "int64"
-		  },
-		  "[type_code]": {
-			"type": "string",
-			"enum": ["subscribe", "fave", "unsubscribe", "unfave", "share_vk", "share_fb", "share_tw"]
-		  },
-		  "[created_at]": {
-			"type": "integer",
-			"format": "int64"
-		  },
-		  "[user]": {
-			"type": "object",
-			"schema": {
-			  "$ref": "#/definitions/User"
-			}
-		  },
-		  "[event]": {
-			"type": "object",
-			"schema": {
-			  "$ref": "#/definitions/Event"
-			}
-		  },
-		  "[organization]": {
-			"type": "object",
-			"schema": {
-			  "$ref": "#/definitions/Organization"
-			}
-		  }
-	  }
-	},
+        "stat_type_id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "event_id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "organization_id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "user_id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "entity": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[type_code]": {
+          "type": "string",
+          "enum": [
+            "subscribe",
+            "fave",
+            "unsubscribe",
+            "unfave",
+            "share_vk",
+            "share_fb",
+            "share_tw"
+          ]
+        },
+        "[created_at]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[user]": {
+          "type": "object",
+          "schema": {
+            "$ref": "#/definitions/User"
+          }
+        },
+        "[event]": {
+          "type": "object",
+          "schema": {
+            "$ref": "#/definitions/Event"
+          }
+        },
+        "[organization]": {
+          "type": "object",
+          "schema": {
+            "$ref": "#/definitions/Organization"
+          }
+        }
+      }
+    },
     "Device": {
       "type": "object",
       "properties": {

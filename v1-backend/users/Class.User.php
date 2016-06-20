@@ -1,5 +1,7 @@
 <?php
 
+require_once $BACKEND_FULL_PATH . '/users/Class.Role.php';
+
 class User extends AbstractUser
 {
 
@@ -145,6 +147,28 @@ class User extends AbstractUser
 
         return new Result(true, '', $result);
 
+    }
+
+    public function isAdmin(Organization $organization) : bool
+    {
+        $q_get_is_admin = App::queryFactory()
+            ->newSelect()
+            ->from('users_organizations')
+            ->cols(array('user_id'))
+            ->join('inner', 'users_roles', 'users_organizations.role_id = users_roles.id')
+            ->where('organization_id = ?', $organization->getId())
+            ->where('users_organizations.user_id = ?', $this->getId())
+            ->where('status = TRUE')
+            ->where('users_roles.name = ?', Roles::ROLE_ADMIN);
+        $p_get = $this->db->prepare($q_get_is_admin->getStatement());
+        $result = $p_get->execute($q_get_is_admin->getBindValues());
+        if ($result === FALSE) throw new DBQueryException('CANT_GET_ADMIN_STATUS', $this->db);
+        return $p_get->rowCount() > 0;
+
+    }
+
+    public static function getRoleId($ole){
+        
     }
 
     protected function getDB() : PDO

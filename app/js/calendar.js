@@ -328,7 +328,7 @@ function Feed($view, $content_block){
 
 function OneEvent($view, $content_block){
 	var $wrapper = $view.find('.page_wrapper'),
-		event_id = History.getState().data.page.split('/')[1];
+		event_id = (History.getState().data.page ? History.getState().data.page : window.location.pathname).split('/').reverse()[0];
 
 	function initEventPage($parent){
 		bindAddAvatar($parent);
@@ -740,7 +740,7 @@ function OrganizationsList($view, $content_block){
 }
 
 function Organization($view, $content_block){
-	var organization_id = History.getState().data.page.split('/')[1],
+	var organization_id = (History.getState().data.page ? History.getState().data.page : window.location.pathname).split('/').reverse()[0],
 		url = '/api/v1/organizations/'+organization_id;
 
 	function bindEventsEvents($parent){
