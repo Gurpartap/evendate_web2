@@ -193,9 +193,9 @@ function SubscribeButton($btn, options){
 		subscribed: 'fa-check'
 	};
 	this.colors = {
-		subscribe: '-color_neutral_secondary',
-		unsubscribe: '-color_secondary',
-		subscribed: '-color_secondary'
+		subscribe: '-color_neutral_accent',
+		unsubscribe: '-color_accent',
+		subscribed: '-color_accent'
 	};
 
 	if(typeof options != 'undefined'){
@@ -685,17 +685,6 @@ function toDataUrl(url, callback){
 	};
 	xhr.open('GET', url);
 	xhr.send();
-}
-
-function showNotification(text, time, status){
-	var $notification = $('#notification');
-	$('#notification_text').text(text);
-	$notification.addClass('-show');
-	if(time !== 'infinite') {
-		setTimeout(function(){
-			$notification.removeClass('-show');
-		}, time);
-	}
 }
 
 function showNotifier(response){
