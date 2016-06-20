@@ -9104,14 +9104,18 @@ span.organization-modal-header-text{
 
 .new-organization .content{
 	display: inline-block;
+	vertical-align: top;
+	width: 55%;
   padding-top: 10px;
 }
 
 .new-organization img{
-  max-height: 100%;
-  float: left;
-  margin-right: 15px;
-  cursor: pointer;
+	display: inline-block;
+	vertical-align: top;
+	max-width: 37%;
+	max-height: 100%;
+	margin-right: 15px;
+	cursor: pointer;
 }
 
 .new-organization .heading span{
