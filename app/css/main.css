@@ -129,7 +129,10 @@ hr[title]:before {
 }
 
 [data-page] {cursor: pointer}
-[data-page]:hover {color: #6b88c7}
+[data-page]:hover {
+	color: #f82969;
+	color: var(--color_accent);
+}
 
 /* Collapsing wrapper */
 
@@ -2114,14 +2117,14 @@ html.-noscroll {
 		width: 500px;
 	}
 }
-@media (min-width: 993px) and (max-width: 1200px) {
+@media (min-width: 993px) and (max-width: 1249px) {
 	.page_wrapper {
 		width: 700px;
 	}
 }
-@media (min-width: 1201px) and (max-width: 1600px) {
+@media (min-width: 1250px) and (max-width: 1600px) {
 	.page_wrapper {
-		width: 900px;
+		width: 1012px;
 	}
 }
 @media (min-width: 1601px) {
