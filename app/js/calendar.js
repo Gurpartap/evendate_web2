@@ -14,19 +14,36 @@ var organizations_loaded = false,
 		onboarding: Onboarding,
 		search: Search,
 		friends: Friends,
+		friend: OneFriend,
 		edit_event: EditEvent,
-		refreshState: function(){
-			var page = this.getCurrentState(),
-				$view = $('.screen-view:not(.hidden)');
-			this[page]($view, $view.find('[data-controller]'));
-		},
 		getCurrentState: function(){
 			return window.location.pathname.split('/')[1];
+		},
+		get entityId(){
+			var page = this.getCurrentState();
+			switch(page){
+				case 'event':
+				case 'friend':
+				case 'organization': {
+					return window.location.pathname.split('/')[2];
+				}
+				case 'edit_event': {
+					return History.getState().data.eventId;
+				}
+				case 'statistics': {
+					break;
+				}
+				default: {
+					console.log('Using method in unexpected place');
+					return undefined;
+				}
+			}
+
 		}
 	};
 
 /* PAGE CONTROLLERS */
-function Feed($view, $content_block){
+function Feed($view){
 	var $window = $(window),
 		$wrapper = $view.find('.page_wrapper'),
 		feed_state = History.getState().data.feed_state,
@@ -326,9 +343,9 @@ function Feed($view, $content_block){
 	initFeedPage($view);
 }
 
-function OneEvent($view, $content_block){
+function OneEvent($view){
 	var $wrapper = $view.find('.page_wrapper'),
-		event_id = History.getState().data.page.split('/')[1];
+		event_id = __STATES.entityId;
 
 	function initEventPage($parent){
 		bindAddAvatar($parent);
@@ -647,7 +664,7 @@ function OneEvent($view, $content_block){
 
 }
 
-function OrganizationsList($view, $content_block){
+function OrganizationsList($view){
 	if (__STATES.getCurrentState() == 'organizations' && organizations_loaded) return;
 	$.ajax({
 		url: '/api/v1/organizations?fields=is_subscribed,subscribed_count',
@@ -739,8 +756,8 @@ function OrganizationsList($view, $content_block){
 	});
 }
 
-function Organization($view, $content_block){
-	var organization_id = History.getState().data.page.split('/')[1],
+function Organization($view){
+	var organization_id = __STATES.entityId,
 		url = '/api/v1/organizations/'+organization_id;
 
 	function bindEventsEvents($parent){
@@ -1024,7 +1041,7 @@ function Organization($view, $content_block){
 
 }
 
-function Search($view, $content_block){
+function Search($view){
 	$view.find('.tl-outer-wrap').addClass(__C.CLASSES.HIDDEN);
 	var _search = searchToObject();
 	if (_search.hasOwnProperty('q')){
@@ -1080,10 +1097,14 @@ function Search($view, $content_block){
 	});
 }
 
-function OneFriend($view, $content_block){
-	var friend_id = __STATES.getCurrentState().split('-')[1],
+function OneFriend($view){
+	var friend_id = __STATES.entityId,
 		$content = $view.find('.one-friend-main-content'),
 		page_number = 0;
+
+	getFriendsList($view.find('.friends-right-bar'), function(){
+		$('.friend-item.friend-' + friend_id).addClass(__C.CLASSES.ACTIVE).siblings().removeClass(__C.CLASSES.ACTIVE);
+	});
 	$view.find('.friends-main-content').addClass(__C.CLASSES.HIDDEN);
 	$content.removeClass(__C.CLASSES.HIDDEN).empty();
 
@@ -1140,7 +1161,13 @@ function OneFriend($view, $content_block){
 					$load_btn.removeClass(__C.CLASSES.HIDDEN).find('.btn').removeClass(__C.CLASSES.DISABLED);
 				}
 				$load_btn.off('click').on('click', getFriendFeed);
-				bindFeedEvents($view);
+				$view.find('.EventController').each(function(){
+					var $this = $(this);
+					$this.on('click.storeStats', function(){
+						//storeStat($this.data('event-id'), 'friend', 'view_event_from_user');
+					});
+				});
+				bindControllers($view);
 			}
 		});
 	}
@@ -1187,7 +1214,7 @@ function OneFriend($view, $content_block){
 	calculateMargins($view);
 }
 
-function Friends($view, $content_block){
+function Friends($view){
 	var page_number = 0;
 	function getFeed(){
 		if (page_number == 0){
@@ -1229,7 +1256,7 @@ function Friends($view, $content_block){
 				});
 				$load_btn.removeClass(__C.CLASSES.HIDDEN).find('.btn').removeClass(__C.CLASSES.DISABLED);
 				calculateMargins($view);
-				bindFeedEvents($view);
+				bindControllers($view);
 			}
 		});
 	}
@@ -1247,9 +1274,9 @@ function Friends($view, $content_block){
 	getFeed();
 }
 
-function EditEvent($view, $content_block){
+function EditEvent($view){
 	var $wrapper = $view.find('.page_wrapper'),
-		event_id = History.getState().data.eventId;
+		event_id = __STATES.entityId;
 
 	function initEditEventPage($view){
 
@@ -2125,7 +2152,7 @@ function EditEvent($view, $content_block){
 
 }
 
-function Onboarding($view, $content_block){
+function Onboarding($view){
 	/* onboarding */
 	var $wrapper = $view.find(".page_wrapper"),
 		scroll_rec = 0;
@@ -2233,28 +2260,33 @@ $(document)
 		function renderState(){
 			var state = History.getState(),
 				page_split = __STATES.getCurrentState().split('/'),
-				page = page_split[0];
+				page = page_split[0],
+				controller;
 
+			switch(typeof __STATES[page]){
+				case 'function': {
+					controller = __STATES[page];
+					break;
+				}
+				case 'object': {
+					controller = __STATES[page].default;
+					break;
+				}
+				default:
+				case 'undefined': {
+					console.error('PAGE RENDERING ERROR');
+				}
+			}
 			$(window).off('scroll');
 			$(window).data('disable_upload', false);
 
 			$('#page_title').text(state.title);
 			$('#main_header').removeClass('-with_tabs');
-			if(state.hash.indexOf('friend-') !== -1){
-				var $friends_app = $('.friends-app');
-				$('.screen-view').addClass(__C.CLASSES.HIDDEN);
-				$friends_app.removeClass(__C.CLASSES.HIDDEN).addClass(__C.CLASSES.ACTIVE);
-				getFriendsList($friends_app.find('.friends-right-bar'), function(){
-					$('.friend-item.' + state.data.page).addClass(__C.CLASSES.ACTIVE).siblings().removeClass(__C.CLASSES.ACTIVE);
-				});
-				OneFriend($friends_app);
-			}
-			else if(__STATES.hasOwnProperty(page)) {
-				var $content_block = $('[data-controller="'  + __STATES[page].name + '"]'),
-					$view = $content_block.closest('.screen-view');
-				$('.screen-view').not($view).addClass(__C.CLASSES.HIDDEN);
-				$view.removeClass(__C.CLASSES.HIDDEN);
-				__STATES[page]($view, $content_block);
+			if(__STATES.hasOwnProperty(page)) {
+				var $view = page == 'friend' ? $('.friends-app') : $('[data-controller="'  + controller.name + '"]');
+				$('.PageView').not($view).addClass(__C.CLASSES.NEW_HIDDEN);
+				$view.removeClass(__C.CLASSES.NEW_HIDDEN);
+				controller($view);
 			}
 			else{
 				console.error('PAGE RENDERING ERROR');
