@@ -193,9 +193,9 @@ function SubscribeButton($btn, options){
 		subscribed: 'fa-check'
 	};
 	this.colors = {
-		subscribe: '-color_neutral_secondary',
-		unsubscribe: '-color_secondary',
-		subscribed: '-color_secondary'
+		subscribe: '-color_neutral_accent',
+		unsubscribe: '-color_accent',
+		subscribed: '-color_accent'
 	};
 
 	if(typeof options != 'undefined'){
@@ -687,17 +687,6 @@ function toDataUrl(url, callback){
 	xhr.send();
 }
 
-function showNotification(text, time, status){
-	var $notification = $('#notification');
-	$('#notification_text').text(text);
-	$notification.addClass('-show');
-	if(time !== 'infinite') {
-		setTimeout(function(){
-			$notification.removeClass('-show');
-		}, time);
-	}
-}
-
 function showNotifier(response){
 	$.notify({
 		'message': response.text,
@@ -751,7 +740,7 @@ function renderSidebarOrganizations(organization, afterRenderCallback){
 
 	function prependOrganization(org){
 		if ($list.find('.organization_item[data-organization_id="' + org.id + '"]').length == 0){
-			var counter_classes = org.new_events_count ? ['-color_marginal'] : ['-color_marginal', '-hidden'],
+			var counter_classes = org.new_events_count ? [] : ['-hidden'],
 				org_block = buildOrganizationBlock(org, {
 					block_classes: ['animated'],
 					avatar_classes: ['-size_30x30', '-rounded'],
@@ -888,21 +877,6 @@ function showSettingsModal() {
 	});
 }
 
-function bindFeedEvents($view){
-	$view.find('.feed-clickable').off('click').on('click', function(){
-		var $this = $(this);
-		if ($this.data('organization-id')){
-			showOrganizationalModal($this.data('organization-id'));
-		}else if ($this.data('event-id')){
-			window.open('/event.php?id=' + $this.data('event-id'), '_blank');
-			storeStat($this.data('event-id'), 'friend', 'view_event_from_user');
-		}else if ($this.data('friend-id')){
-			History.pushState({page: 'friend-' + $this.data('friend-id')}, $this.text(), 'friend-' + $this.data('friend-id'));
-		}
-	});
-	bindControllers($view);
-}
-
 function getFriendsList($friends_right_list, cb){
 	$.ajax({
 		url: '/api/v1/users/friends?page=0&length=500',
@@ -915,16 +889,8 @@ function getFriendsList($friends_right_list, cb){
 			$friends_right_list.find('.friends-list').empty();
 			$friends_right_list.removeClass(__C.CLASSES.HIDDEN);
 			tmpl('friend-item', res.data, $friends_right_list.find('.friends-list'));
-			res.data.forEach(function(friend){
-				__STATES['friend-' + friend.id] = OneFriend;
-			});
 			$friends_right_list.find('.friends-count').text(res.data.length);
-			$friends_right_list.find('.friend-item').off('click').on('click', function(){
-				var $this = $(this);
-				$this.siblings().removeClass(__C.CLASSES.ACTIVE);
-				$this.addClass(__C.CLASSES.ACTIVE);
-				History.pushState({page: 'friend-' + $this.data('friend-id')}, $this.data('name'), 'friend-' + $this.data('friend-id'));
-			});
+			bindControllers($friends_right_list);
 			if ($friends_right_list.height() > window.innerHeight - 200){
 				$friends_right_list.find('.friends-list').slimscroll({
 					height: window.innerHeight - 200,
@@ -959,20 +925,12 @@ function calculateMargins($view){
  * @param callback
  */
 function toggleSubscriptionState(state, entity_id, callback){
-	var cb = function(res){
-			if (__STATES.getCurrentState() == 'timeline'){
-				__STATES.refreshState();
-			}
-		},
-
-		options = (state == false) ? {
+	var options = (state == false) ? {
 			url: '/api/v1/organizations/' + entity_id + '/subscriptions',
-			type: 'DELETE',
-			success: cb
+			type: 'DELETE'
 		} : {
 			url: '/api/v1/organizations/' + entity_id + '/subscriptions',
-			type: 'POST',
-			success: cb
+			type: 'POST'
 		};
 	$.ajax(options);
 }
