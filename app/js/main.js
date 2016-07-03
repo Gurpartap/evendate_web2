@@ -824,7 +824,7 @@ function showSettingsModal() {
 	$modal.remove();
 
 	$.ajax({
-		url: '/api/v1/users/settings',
+		url: '/api/v1/users/me/settings',
 		type: 'GET',
 		success: function(res) {
 			$modal = tmpl('settings-modal', res.data);
@@ -866,7 +866,7 @@ function showSettingsModal() {
 
 					Pace.ignore(function() {
 						$.ajax({
-							url: '/api/v1/users/settings',
+							url: '/api/v1/users/me/settings',
 							type: 'PUT',
 							data: _data
 						});
