@@ -14,7 +14,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-user-tombstone">
-	<div class="user_tombstone Controller" data-is_friend="{is_friend}" data-page="friend-{id}" data-friend-id="{id}" data-title="{full_name}" data-name="{full_name}">
+	<div class="user_tombstone Controller" data-is_friend="{is_friend}" data-page="friend/{id}" data-friend-id="{id}" data-title="{full_name}" data-name="{full_name}">
 		<div class="avatar -size_{size} -rounded" style="background-image: url('{avatar_url}')"></div>
 		<p class="user_tombstone_title">{full_name}</p>
 	</div>
@@ -25,11 +25,11 @@
 </script>
 
 <script type="javascript/template" id="tmpl-subscriber-divider">
-	<span class="organization_subscribers_divider">{label}</span>
+	<p class="organization_subscribers_divider -color_accent">{label}</p>
 </script>
 
 <script type="javascript/template" id="tmpl-subscriber">
-	<div class="subscriber Controller" data-is_friend="{is_friend}" data-page="friend-{id}" data-friend-id="{id}" data-name="{name}">
+	<div class="subscriber Controller" data-is_friend="{is_friend}" data-page="friend/{id}" data-friend-id="{id}" data-name="{name}">
 		<div class="avatar_block">
 			<div class="avatar -size_40x40 -rounded -bordered">
 				<img src="{avatar_url}" onerror="this.onerror=null;this.src='/app/img/logo_40.png'">
@@ -297,7 +297,7 @@
 					<div class="wrapper">
 						<h4 class="form_label"><label>Горизонтальная</label></h4>
 						<div class="Tabs">
-							<header class="tabs_header -color_primary">
+							<header class="tabs_header -color_accent">
 								<span class="tab Tab -active">По ссылке</span>
 								<span class="tab Tab">С компьютера</span>
 							</header>
@@ -339,7 +339,7 @@
 					<div class="wrapper">
 						<h4 class="form_label"><label>Вертикальная</label></h4>
 						<div class="Tabs">
-							<header class="tabs_header -color_primary">
+							<header class="tabs_header -color_accent">
 								<span class="tab Tab -active">По ссылке</span>
 								<span class="tab Tab">С компьютера</span>
 							</header>
@@ -586,12 +586,6 @@
 	</div>
 </script>
 
-<script type="javascript/template" id="tmpl-organization-feed-container">
-	<div class="organization_feed_container" data-container-date="{date}">
-		{events}
-	</div>
-</script>
-
 <script type="javascript/template" id="tmpl-organization-feed-divider">
 	<hr title="{formatted_date}" data-raw_date="{date}">
 </script>
@@ -693,7 +687,7 @@
 <script type="javascript/template" id="tmpl-event-edit-functions">
 	<button class="button -color_neutral -fill RippleEffect DropdownButton" data-dropdown="redact_event" data-dd-width="self" type="button">Редактирование события</button>
 	<div class="dropdown_box DropdownBox" data-dropdown_id="redact_event">
-		<div class="dropdown_list"><button class="dropdown_button -fill -color_error RippleEffect CloseDropdown DropdownButton" data-dropdown="cancel_event" data-dd-width="self" type="button">Отменить событие</button></div>
+		<div class="dropdown_list"><button class="dropdown_button -fill -color_accent RippleEffect CloseDropdown DropdownButton" data-dropdown="cancel_event" data-dd-width="self" type="button">Отменить событие</button></div>
 		<div class="dropdown_list"><button class="dropdown_button -fill -color_neutral RippleEffect CloseDropdown Controller" data-page="edit_event" data-title="Редактировать событие" data-event-id="{id}" type="button">Редактировать</button></div>
 	</div>
 	<div class="dropdown_box DropdownBox" data-dropdown_id="cancel_event">
@@ -708,11 +702,11 @@
 </script>
 
 <script type="javascript/template" id="tmpl-event-registration-info">
-	<p class="event_additional_info -transform_uppercase">Регистрация до {registration_till}</p>
+	<p class="event_additional_info -color_accent -transform_uppercase">Регистрация до {registration_till}</p>
 </script>
 
 <script type="javascript/template" id="tmpl-event-price-info">
-	<p class="event_additional_info">от {min_price} руб.</p>
+	<p class="event_additional_info -color_accent">от {min_price} руб.</p>
 </script>
 
 <script type="javascript/template" id="tmpl-event-date-time">
@@ -854,7 +848,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-modal-map-content">
-	<iframe width="100%" height="600" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/place?q={location}&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg" allowfullscreen></iframe>
+	<iframe width="100%" height="600" frameborder="0" style="display:block;border:0" src="https://www.google.com/maps/embed/v1/place?q={location}&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg" allowfullscreen></iframe>
 </script>
 
 <script type="javascript/template" id="tmpl-modal-favored-divider">
@@ -884,14 +878,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-onboarding-recommendation">
-	<div class="recommendations_item_onboarding_inside OnboardingOrgItem" data-organization_id="{id}">
-		<div class="img_container_recommendation_onboarding">
-			<img src="{img_url}" class="img_recommendation_onboarding"></div>
-		<div class="text_container_recommendation_onboarding"><span>{short_name}</span></div>
-		<div class="check_box_img_container_onboarding">
-			<button class="check_box_img_onboarding" type="button"><i class="fa fa-plus plus_onboarding" aria-hidden="true"></i></button>
-		</div>
-	</div>
+	organization_item
 </script>
 
 <!-- OLD CALENDAR -->
@@ -1583,7 +1570,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-friend-item">
-  <div class="friend-item friend-{id}" data-friend-id="{id}" data-name="{last_name} {first_name}">
+  <div class="friend-item friend-{id}" data-page="friend/{id}" data-friend-id="{id}" data-name="{last_name} {first_name}">
     <div class="friend-avatar">
       <img src="{avatar_url}">
     </div>
@@ -1611,7 +1598,7 @@
       <div class="friend-avatar">
         <img src="{avatar_url}">
         <span class="events-date">{date}</span>
-        <span class="friend-name feed-clickable" data-friend-id="{friend_id}">{last_name} {first_name}</span>
+        <span class="friend-name" data-page="friend/{id}" data-friend-id="{friend_id}" data-title="{last_name} {first_name}">{last_name} {first_name}</span>
         <div class="event-type-name">{action_name}</div>
       </div>
     </div>
@@ -1624,9 +1611,9 @@
 <script type="javascript/template" id="tmpl-friends-feed-event">
   <div class="friend-event favored">
     <div>
-      <img src="{image_square_vertical_url}" class="feed-clickable" data-event-id="{id}">
+      <img src="{image_square_vertical_url}" class="EventController Controller" data-page="event/{id}" data-event-id="{id}" data-title="{title}">
       <div class="event-favored-wrapper">
-        <div class="event-name feed-clickable" data-event-id="{id}">{title}</div>
+        <div class="event-name EventController Controller" data-page="event/{id}" data-event-id="{id}" data-title="{title}">{title}</div>
         <div class="organizator-block Controller" data-page="organization/{organization_id}" data-organization-id="{organization_id}" data-title="{organization_short_name}">
           <img src="{organization_logo_small_url}">
           <span class="name">{organization_short_name}</span></div></div>
