@@ -6,5 +6,4 @@
 	<link href="/landing/style.css" rel="stylesheet">
 	<link href="/landing/notify.css" rel="stylesheet">
 	<link href='https://fonts.googleapis.com/css?family=Roboto:400,300' rel='stylesheet' type='text/css'>	<!-- шрифт Roboto -->
-	<!-- <link href='https://fonts.googleapis.com/css?family=Iceland' rel='stylesheet' type='text/css'>	шрифт НЕ Roboto (для лого) -->
 </head>

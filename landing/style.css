@@ -1,3 +1,21 @@
+:root {
+	--color_primary: #3e4d66;
+	--color_primary_80: #657184;
+	--color_primary_50: #9fa6b3;
+	--color_primary_30: #c5c9d1;
+	--color_secondary: #5379b8;
+	--color_accent: #f82969;
+	--color_accent_alt: #ff5f9e;
+	--color_franklin: #28be84;
+	--color_franklin_alt: #23d792;
+
+	--color_text: #4a4a4a;
+
+	--color_background: #f6f6f6;
+	--color_background_lighter: #f9f9fa;
+	--color_page: #fff;
+}
+
 body {
 	font-family: 'Roboto', sans-serif;
 	margin: 0;
@@ -5,6 +23,25 @@ body {
 
 a {
 	text-decoration: none;
+}
+
+.-centering,
+.-h_centering {text-align: center}
+.-centering,
+.-h_centering > img {margin: 0 auto}
+
+.-centering:before,
+.-v_centering:before {
+	content: '';
+	display: inline-block;
+	height: 100%;
+	vertical-align: middle;
+}
+
+.-centering > *,
+.-v_centering > * {
+	display: inline-block !important;
+	vertical-align: middle !important;
 }
 
 /* Main page */
@@ -18,36 +55,34 @@ a {
 }
 
 .header_evendate {
-	background-color: #5379b8;
+	background-color: #3e4d66;
+	background-color: var(--color_primary);
 	box-shadow: 0 1px 14px 0 rgba(0, 0, 0, 0.2);
 	position: fixed;
 	width: 100%;
+	height: 60px;
 	z-index: 3;
+}
+
+.logo_link {
+	position: relative;
+	margin-left: 10px;
 }
 
 .logo {
 	display: inline-block;
+	height: 100%;
 	width: calc(1/2*(100% - 1008px));
-	margin: 10px 0 0 10px;
 	cursor: pointer;
 }
 
-.logo_size {
-	width: 35px;
-	height: 35px;
-}
-
-.logo_text_style_container {
-	padding: 5px 0 0 5px;
-	display: inline-block;
-	vertical-align: top;
-}
-
-.logo_text_style {
-	font-family: 'Roboto', sans-serif;
-	font-weight: 500;
-	color: #fff;
-	font-size: 25px;
+.float_logo {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	opacity: 0;
 }
 
 .menu_all_item_container {
@@ -308,7 +343,7 @@ a {
 
 .line_blue_and_pink {
 	height: 1px;
-	background: linear-gradient(to right, #5379b8, #f82969);
+	background: linear-gradient(to right, #3e4d66, #f82969);
 }
 
 .content_text_header_container {
@@ -351,7 +386,7 @@ a {
 .who_use_head_blue {
 	font-family: 'Roboto', sans-serif;
 	font-size: 20px;
-	color: #5379b8;
+	color: #3e4d66;
 	display: inline-block;
 	border-bottom: 1px solid #fff;
 }
@@ -361,7 +396,7 @@ a {
 }
 
 .for_users_hover:hover {
-	border-bottom: 1px solid #5379b8;
+	border-bottom: 1px solid #3e4d66;
 }
 
 .for_org_hover:hover {
@@ -737,7 +772,7 @@ a {
 }
 
 .field_container {
-	background: linear-gradient(to right,  #5379b8, #f82969);
+	background: linear-gradient(to right,  #3e4d66, #f82969);
 	border-radius: 3px;
 	margin: 20px 0 0;
 	padding: 1px;
@@ -1314,10 +1349,6 @@ a {
 		display: block;
 		padding: 0 0 53px 368px;
 	}
-
-	.fon_img_users {
-		background-image: url(img/Usss.jpg);
-	}
 	/* /Users */
 	/* Organizers */
 
@@ -1545,10 +1576,6 @@ a {
 
 	.con_mini {
 		background-image: url(img/Support.jpg);
-	}
-
-	.fon_img_users {
-		background-image: url(img/Usss.jpg);
 	}
 
 	.team_photo_container {
