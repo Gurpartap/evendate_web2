@@ -73,7 +73,28 @@ require_once('landing/header.php');
 			<div class="section_stay_in_touch_text_bottom_container"><span class="section_stay_in_touch_text_bottom">Подпишись на интересующие тебя источники, сформируй уникальную ленту новостей и с легкостью отслеживай события, которые происходят вокруг тебя!</span></div>
 		</section>
 		<section class="section_steps">
-			<div class="step_container"><div><img src="/landing/img/subscribe.png" class="step_img"></div><div class="step_text_container"><div><span class="step_text">Подпишись на организаторов</span></div><div class="otstup"><span class="step_user_text">Из подписок формируется лента событий</span></div></div></div><div class="step_container step_container_center"><div><img src="/landing/img/Liked.png" class="step_img"></div><div class="step_text_container"><div><span class="step_text">Добавляй события в избранное</span></div></div><div class="otstup"><span class="step_user_text">Отмеченные события отображаются в календаре вашего телефона</span></div></div><div class="step_container"><div><img src="/landing/img/notice.png" class="step_img"></div><div class="step_text_container"><div><span class="step_text">Получай уведомления</span></div><div class="otstup"><span class="step_user_text">Организатор добавил событие - узнаешь об этом</span></div></div></div>
+			<div class="step_container">
+				<div><img src="/landing/img/pics/phone.png" height="175px" class="step_img"></div>
+				<div class="step_text_container">
+					<div><span class="step_text">Подпишись на организаторов</span></div>
+					<div class="otstup"><span class="step_user_text">Из подписок формируется лента событий</span></div>
+				</div>
+			</div><!--
+			--><div class="step_container step_container_center">
+				<div><img src="/landing/img/pics/calendar.png" height="175px" class="step_img"></div>
+				<div class="step_text_container">
+					<div><span class="step_text">Добавляй события в избранное</span></div>
+				</div>
+				<div class="otstup">
+					<span class="step_user_text">Отмеченные события отображаются в календаре вашего телефона</span></div>
+			</div><!--
+			--><div class="step_container">
+				<div><img src="/landing/img/pics/bell.png" height="175px" class="step_img"></div>
+				<div class="step_text_container">
+					<div><span class="step_text">Получай уведомления</span></div>
+					<div class="otstup"><span class="step_user_text">Организатор добавил событие - узнаешь об этом</span></div>
+				</div>
+			</div>
 		</section>
 	</article>
 
