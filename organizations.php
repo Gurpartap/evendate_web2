@@ -49,7 +49,7 @@ require_once('landing/header.php'); ?>
 	<section class="fon_users_section">
 
 		<div class="steps_user_container">
-			<div class="step_user_container"><img src="/landing/img/platform.png" class="step_user_img"></div><div class="user_step_content_container">
+			<div class="step_user_container"><img src="/landing/img/pics/place.png" height="225px" class="step_user_img"></div><div class="user_step_content_container">
 			<div><span class="step_text">Площадка для событий</span></div>
 			<div class="step_user_text_bot_container"><span class="step_user_text">Публикуйте события, отправляйте уведомления, привлекайте участников. Новость о мероприятии автоматически размещается в сообществах в социальных сетях. </span></div>
 		</div>
@@ -60,12 +60,12 @@ require_once('landing/header.php'); ?>
 			<div class="user_step_content_container user_step_content_container_2">
 				<div><span class="step_text">Активная аудитория</span></div>
 				<div class="step_user_text_bot_container"><span class="step_user_text">Сервисом пользуются тысячи студентов и предпринимателей Москвы. Создайте сообщество и привлекайте участников на мероприятия.</span></div>
-			</div><div class="step_user_container_2"><img src="/landing/img/audience.png" class="step_user_img"></div>
+			</div><div class="step_user_container_2"><img src="/landing/img/pics/user.png" height="225px" class="step_user_img"></div>
 		</div>
 		<div class="line_blue_and_pink"></div>
 
 		<div class="steps_user_container">
-			<div class="step_user_container"><img src="/landing/img/statistics.png" class="step_user_img"></div><div class="user_step_content_container">
+			<div class="step_user_container"><img src="/landing/img/pics/analytics.png" height="225px" class="step_user_img"></div><div class="user_step_content_container">
 			<div><span class="step_text">Статистика и аналитика</span></div>
 			<div class="step_user_text_bot_container"><span class="step_user_text">Узнайте о своей аудитории больше. Давайте то, что интересно и чего ожидают. Планируйте деятельность на основе реальных данных по мероприятиям в вашей сфере – собираем и анализируем информацию, чтобы помочь вам стать лучше.</span></div>
 		</div>

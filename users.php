@@ -53,7 +53,7 @@ require_once('landing/header.php'); ?>
 
 
 		<div class="steps_user_container">
-			<div class="step_user_container"><img src="/landing/img/subscribe253x225.png" class="step_user_img"></div><div class="user_step_content_container">
+			<div class="step_user_container"><img src="/landing/img/pics/phone.png" height="225px" class="step_user_img"></div><div class="user_step_content_container">
 			<div><span class="step_text">Подписывайся</span></div>
 			<div class="step_user_text_bot_container"><span class="step_user_text">Выбери интересных организаторов и подпишись на их события</span></div>
 		</div>
@@ -64,12 +64,12 @@ require_once('landing/header.php'); ?>
 			<div class="user_step_content_container user_step_content_container_2">
 			<div><span class="step_text">Добавляй в избранное</span></div>
 			<div class="step_user_text_bot_container"><span class="step_user_text"> Добавь мероприятия в избранное, чтобы ничего не забыть</span></div>
-		</div><div class="step_user_container"><img src="/landing/img/Liked253x225.png" class="step_user_img"></div>
+		</div><div class="step_user_container"><img src="/landing/img/pics/calendar.png" height="225px" class="step_user_img"></div>
 		</div>
 		<div class="line_blue_and_pink"></div>
 
 		<div class="steps_user_container">
-			<div class="step_user_container"><img src="/landing/img/notification253x225.png" class="step_user_img"></div><div class="user_step_content_container">
+			<div class="step_user_container"><img src="/landing/img/pics/bell.png" height="225px" class="step_user_img"></div><div class="user_step_content_container">
 			<div><span class="step_text">Получай уведомления</span></div>
 			<div class="step_user_text_bot_container"><span class="step_user_text">Получай уведомления о новых событиях</span></div>
 		</div>
@@ -80,12 +80,12 @@ require_once('landing/header.php'); ?>
 			<div class="user_step_content_container user_step_content_container_2">
 			<div><span class="step_text">Следи за друзьями</span></div>
 			<div class="step_user_text_bot_container"><span class="step_user_text">Узнай, куда собираются сходить друзья из социальных сетей</span></div>
-		</div><div class="step_user_container"><img src="/landing/img/follow.png" class="step_user_img"></div>
+		</div><div class="step_user_container"><img src="/landing/img/pics/binoculars.png" height="225px" class="step_user_img"></div>
 		</div>
 		<div class="line_blue_and_pink"></div>
 
 		<div class="steps_user_container">
-			<div class="step_user_container"><img src="/landing/img/recommendations.png" class="step_user_img"></div><div class="user_step_content_container">
+			<div class="step_user_container"><img src="/landing/img/pics/heart.png" height="225px" class="step_user_img"></div><div class="user_step_content_container">
 				<div><span class="step_text">Получай рекомендации</span></div>
 				<div class="step_user_text_bot_container"><span class="step_user_text">Получай рекомендации на основе своих интересов</span></div>
 			</div>
