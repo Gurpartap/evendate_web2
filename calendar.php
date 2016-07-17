@@ -19,7 +19,7 @@ try {
     $user = new User($__db);
     $edit_event_btn_hidden = $user->isEditor() ? '' : '-hidden';
     $profile_is_editor = $user->isEditor() ? '' : '';
-    if ($_REQUEST['q'] != 'onboarding' && !isset($_COOKIE['onboarding'])){
+    if ($_REQUEST['q'] != 'onboarding' && !isset($_REQUEST['skip_onboading'])){
         $subscriptions = OrganizationsCollection::filter(
             $__db,
             $user,
@@ -31,9 +31,9 @@ try {
         if (count($subscriptions) == 0) {
             header('Location: /onboarding');
         };
-    }else if ($_REQUEST['q'] == 'onboarding' && isset($_COOKIE['onboarding'])){
-        header('Location: /feed');
-    }else if ($_REQUEST['q'] == 'onboarding' && !isset($_COOKIE['onboarding'])){
+    }else if ($_REQUEST['q'] == 'onboarding' && isset($_COOKIE['skip_onboading'])){
+        header('Location: /feed?skip_onboading');
+    }else if ($_REQUEST['q'] == 'onboarding' && !isset($_COOKIE['skip_onboading'])){
         setcookie('onboarding', true, strtotime("+7 days"));
     }
 } catch (Exception $e) {
