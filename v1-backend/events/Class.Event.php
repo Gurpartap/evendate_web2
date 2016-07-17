@@ -28,9 +28,10 @@ class Event extends AbstractEntity
     const ACTUALITY_FIELD_NAME = 'actuality';
     const NOTIFICATIONS_FIELD_NAME = 'notifications';
     const CAN_EDIT_FIELD_NAME = 'can_edit';
+    const STATISTICS_FIELD_NAME = 'statistics';
+
+
     const RANDOM_FIELD_NAME = 'random';
-
-
     const RATING_OVERALL = 'rating';
     const RATING_FAVORED_FRIENDS = 'rating_favored_friends';
     const RATING_TAGS_IN_FAVORITES = 'rating_tags_in_favorites';
@@ -38,10 +39,10 @@ class Event extends AbstractEntity
     const RATING_SUBSCRIBED_IN_SOCIAL_NETWORK = 'rating_subscribed_in_social_network';
     const RATING_RECENT_CREATED = 'rating_recent_created';
     const RATING_ACTIVE_DAYS = 'rating_active_days';
+
+
     const RATING_TEXT_SIMILARITY = 'rating_texts_similarity';
-
-
-    const RATING_DATE_CREATION_LIMIT = 259200; // three days in seconds
+    const RATING_DATE_CREATION_LIMIT = 259200;
 
 
     protected static $DEFAULT_COLS = array(
@@ -91,6 +92,7 @@ class Event extends AbstractEntity
         'is_free',
         'min_price',
         'vk_image_url',
+        self::STATISTICS_FIELD_NAME,
 
         self::IS_FAVORITE_FIELD_NAME => '(SELECT id IS NOT NULL
 			FROM favorite_events
@@ -124,6 +126,7 @@ class Event extends AbstractEntity
                                             FROM view_events AS ve
                                             WHERE ve.id = view_events.id)::REAL AS ' . self::ACTUALITY_FIELD_NAME
     );
+
     protected $description;
     protected $location;
     protected $location_uri;
@@ -957,6 +960,11 @@ class Event extends AbstractEntity
         $result = $p_ins->fetch(PDO::FETCH_ASSOC);
         $result['notification_time'] = $time->getTimestamp();
         return new Result(true, 'Уведомление успешно добавлено', $result);
+    }
+
+    public function getOrganizationId()
+    {
+        return $this->organization_id;
     }
 
 

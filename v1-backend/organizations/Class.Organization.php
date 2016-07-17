@@ -142,6 +142,8 @@ class Organization extends AbstractEntity
         return $this->organization_type_id;
     }
 
+    
+    
     /**
      * @return mixed
      */

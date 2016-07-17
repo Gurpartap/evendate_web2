@@ -559,7 +559,10 @@
             "description": "Name of role",
             "required": true,
             "type": "string",
-            "enum": ["admin", "moderator"]
+            "enum": [
+              "admin",
+              "moderator"
+            ]
           }
         ],
         "responses": {
@@ -610,7 +613,10 @@
             "description": "Name of role",
             "required": true,
             "type": "string",
-            "enum": ["admin", "moderator"]
+            "enum": [
+              "admin",
+              "moderator"
+            ]
           }
         ],
         "responses": {
@@ -876,6 +882,17 @@
             "in": "query",
             "name": "future",
             "description": "all future events",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ]
+          },
+          {
+            "in": "query",
+            "name": "statistics",
+            "description": "add statistics fields",
             "required": false,
             "type": "string",
             "enum": [
@@ -2313,64 +2330,66 @@
       }
     },
     "/statistics/organizations/{Id}": {
-    "get": {
-      "tags": [
-        "Statistics"
-      ],
-      "summary": "Get stats about organization",
-      "description": "",
-      "operationId": "getOrganizationStats",
-      "produces": [
-        "application/json"
-      ],
-      "parameters": [
-        {
-          "name": "Id",
-          "in": "path",
-          "description": "",
-          "required": true,
-          "type": "string"
-        },
-        {
-          "name": "scale",
-          "in": "query",
-          "description": "",
-          "required": true,
-          "type": "string",
-          "enum": ["minute", "hour", "day", "week", "month", "year"]
-        },
-        {
-          "name": "since",
-          "in": "query",
-          "description": "DateTime since",
-          "required": true,
-          "type": "date-time"
-        },
-        {
-          "name": "till",
-          "in": "query",
-          "description": "DateTime till",
-          "required": true,
-          "type": "date-time"
-        },
-        {
-          "name": "fields",
-          "in": "query",
-          "description": "Allowed fields: [dynamics, view, subscribe, unsubscribe, conversion, audience]. For each field can be used till, since, scale",
-          "required": true,
-          "type": "string"
-        }
-      ],
-      "responses": {
-        "200": {
-          "description": "successful operation",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Device"
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "Get stats about organization",
+        "description": "",
+        "operationId": "getOrganizationStats",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "scale",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "minute", "hour", "day", "week", "month", "year", "overall"
+            ]
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "description": "DateTime since",
+            "required": true,
+            "type": "date-time"
+          },
+          {
+            "name": "till",
+            "in": "query",
+            "description": "DateTime till",
+            "required": true,
+            "type": "date-time"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Allowed fields: [dynamics, view, subscribe, unsubscribe, conversion, audience, events]. For each field can be used till, since, scale",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/Device"
+            }
           }
         }
       }
-    }
     }
   },
   "definitions": {

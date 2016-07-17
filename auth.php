@@ -15,7 +15,7 @@ if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'get_urls'){
 }
 
 try{
-	if (!isset($_REQUEST['email']) || trim($_REQUEST['email']) == '' ||
+	if (!isset($_REQUEST['user_id']) || trim($_REQUEST['user_id']) == '' ||
 		!isset($_REQUEST['token']) || trim($_REQUEST['token']) == ''){
 		throw new InvalidArgumentException('Пользователь с указанными данными не существует');
 	}
@@ -23,11 +23,11 @@ try{
 
 	$q_get_user = 'SELECT users.id as user_id, users.token, users.email
 				FROM users
-				WHERE users.email = :email
+				WHERE users.id = :user_id
 					AND users.token = :token';
 	$p_get_user = $__db->prepare($q_get_user);
 	$p_get_user->execute(array(
-		':email' => $_REQUEST['email'],
+		':user_id' => $_REQUEST['user_id'],
 		':token' => $_REQUEST['token']
 	));
 

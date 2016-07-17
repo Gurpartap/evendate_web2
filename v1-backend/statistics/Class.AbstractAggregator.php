@@ -36,6 +36,9 @@ class AbstractAggregator
             case Statistics::SCALE_YEAR: {
                 return new DateInterval('P1Y');
             }
+            case Statistics::SCALE_OVERALL: {
+                return new DateInterval('P100Y');
+            }
         }
     }
 
