@@ -141,15 +141,75 @@ try {
     </header>
     <div id="main_section">
 
-        <!-- START row-->
-        <div class="organizations-app app_view hidden screen-view" data-controller="OrganizationsList">
-            <div class="new-organizations-categories">
-                <div class="new-categories-title">Категории</div>
-                <div class="new-organizations-categories-wrapper"></div>
-            </div>
-            <div class="new-organizations-list"></div>
-        </div>
-        <!-- END row-->
+		<!-- START row-->
+		<div class="organizations-app app_view hidden screen-view" data-controller="OrganizationsList">
+			<div class="page_wrapper">
+				<div class="sidebar_all">
+					<div class="sidebar">
+						<div class="header_sidebar"><div class="text_header_container"><span class="text_header_catalog">Рубрики</span></div><div class="text_header_container"><span class="text_header_catalog_2">ВСЕ</span></div></div>
+						<div class="scrollbar-outer CatalogScrollbar">
+						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
+						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
+						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
+						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
+						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
+						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
+						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
+						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
+						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
+						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
+						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
+						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
+						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
+						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
+						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
+						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
+						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
+						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">&&&&&&</span></div>
+						</div>
+					</div>
+					<button class="RippleEffect Controller sidebar_button" type="button"><span class="text_sidebar_button">Предложить организатора</span></button>
+				</div>
+				<div class="catalog_organisations_list">
+					<div class="catalog_organisations_item">
+						<div class="catalog_img_container"><img src="app/img/logo_120.png" class="catalog_img_size"></div><div class="catalog_organisation_content">
+							<div class="text_catalog_item_header"><span class="text_catalog_item_content_header">Академия Яндекса Академия Яндекса</span></div>
+							<div><span class="text_catalog_item_content">412 подписчика</span></div>
+							<button type="button" class="button -color_neutral_secondary"><span>ПОДПИСАТЬСЯ</span></button>
+						</div>
+					</div>
+					<div class="catalog_organisations_item">
+						<div class="catalog_img_container"><img src="app/img/logo_120.png" class="catalog_img_size"></div><div class="catalog_organisation_content">
+							<div class="text_catalog_item_header"><span class="text_catalog_item_content_header">Академия Яндекса</span></div>
+							<div><span class="text_catalog_item_content">412 подписчика</span></div>
+							<button type="button" class="button -color_primary_alt"><span>ПОДПИСАТЬСЯ</span></button>
+						</div>
+					</div>
+					<div class="catalog_organisations_item">
+						<div class="catalog_img_container"><img src="app/img/logo_120.png" class="catalog_img_size"></div><div class="catalog_organisation_content">
+							<div class="text_catalog_item_header"><span class="text_catalog_item_content_header">Академия Яндекса</span></div>
+							<div><span class="text_catalog_item_content">412 подписчика</span></div>
+							<button type="button" class="button -color_primary_alt"><span>ПОДПИСАТЬСЯ</span></button>
+						</div>
+					</div>
+					<div class="catalog_organisations_item">
+						<div class="catalog_img_container"><img src="app/img/logo_120.png" class="catalog_img_size"></div><div class="catalog_organisation_content">
+							<div class="text_catalog_item_header"><span class="text_catalog_item_content_header">Академия Яндекса</span></div>
+							<div><span class="text_catalog_item_content">412 подписчика</span></div>
+							<button type="button" class="button -color_primary_alt"><span>ПОДПИСАТЬСЯ</span></button>
+						</div>
+					</div>
+					<div class="catalog_organisations_item">
+						<div class="catalog_img_container"><img src="app/img/logo_120.png" class="catalog_img_size"></div><div class="catalog_organisation_content">
+							<div class="text_catalog_item_header"><span class="text_catalog_item_content_header">Академия Яндекса</span></div>
+							<div><span class="text_catalog_item_content">412 подписчика</span></div>
+							<button type="button" class="button -color_primary_alt"><span>ПОДПИСАТЬСЯ</span></button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- END row-->
 
         <!-- START row-->
         <div class="friends-app app_view hidden screen-view" data-controller="Friends">

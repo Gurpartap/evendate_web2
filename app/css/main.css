@@ -124,6 +124,150 @@ hr[title]:before {
 	visibility: hidden;
 }
 
+/* Catalog */
+.organizations-app {
+	padding-top: 50px;
+}
+
+.organizations-app>.page_wrapper>.sidebar_all {
+	display: inline-block;
+}
+
+.organizations-app>.page_wrapper>.sidebar_all>.sidebar {
+	background: #fff;
+	box-shadow: 0 0 10px 0 rgba(0,0,0,0.15);
+	border-radius: 2px;
+	width: 252px;
+	height:568px;
+	margin: 0 0 12px 0;
+}
+
+.organizations-app>.page_wrapper>.sidebar_all>.sidebar_button {
+	background: #ffffff;
+	box-shadow: 0 1px 4px 0 rgba(0,0,0,0.19);
+	border-radius: 2px;
+	width: 252px;
+	height: 30px;
+	border: 0;
+}
+
+.organizations-app>.page_wrapper>.sidebar_all>.sidebar_button>.text_sidebar_button {
+	font-family: 'Roboto', sans-serif;
+	font-size:13px;
+	color: #ff5f9e;
+}
+
+.organizations-app>.page_wrapper>.sidebar_all>.sidebar>.header_sidebar {
+ box-shadow: 0 1px 0 0 rgba(0,0,0,0.09);
+}
+
+.organizations-app>.page_wrapper>.sidebar_all>.sidebar>.header_sidebar>.text_header_container {
+	display: inline-block;
+	width: 189px;
+	margin: 10px 0 10px 12px;
+}
+
+.organizations-app>.page_wrapper>.sidebar_all>.sidebar>.header_sidebar>.text_header_container+.text_header_container {
+	width: 23px;
+	margin: 17px 0 10px 0;
+}
+
+.organizations-app>.page_wrapper>.sidebar_all>.sidebar>.header_sidebar>.text_header_container+.text_header_container:hover {
+	cursor: pointer;
+	background: #ececec;
+}
+
+.text_header_catalog {
+	 font-family: 'Roboto', sans-serif;
+	 font-size:14px;
+	 color: #5379b8;
+ }
+
+.text_header_catalog_2 {
+	font-family: 'Roboto', sans-serif;
+	font-size:12px;
+	color: #ff5f9e;
+}
+
+.text_sidebar_item_catalog {
+	font-family: 'Roboto', sans-serif;
+	font-weight: 500;
+	font-size:13px;
+	color:#5e5c5c;
+}
+
+.sidebar_item_catalog {
+	margin: 12px 0 6px 0;
+	padding: 8px 0 8px 12px;
+}
+
+.sidebar_item_catalog+.sidebar_item_catalog {
+	margin: 0 0 6px 0;
+}
+
+.sidebar_item_catalog:hover {
+	cursor: pointer;
+	background:#ececec;
+}
+
+.catalog_img_size {
+	width: 96px;
+	height: 96px;
+	cursor: pointer;
+}
+
+.catalog_img_container {
+	display: inline-block;
+}
+
+.catalog_organisations_list {
+	display: inline-block;
+	margin-left: 48px;
+	vertical-align: top;
+	margin-top: -18px;
+	width: calc(100% - 305px);
+}
+
+.catalog_organisations_item {
+	background: #fff;
+	width: 365px;
+	box-shadow: 0 0 10px 0 rgba(0,0,0,0.15);
+	border-radius: 2px;
+	padding: 12px;
+	margin: 18px 30px 0 0;
+	display: inline-block;
+}
+
+.catalog_organisation_content {
+	display: inline-block;
+	vertical-align: top;
+	margin: 8px 0 0 12px;
+	width: calc(100% - 120px);
+}
+
+.text_catalog_item_header {
+	height: 35px;
+	overflow: hidden;
+}
+
+.text_catalog_item_content {
+	font-family: 'Roboto', sans-serif;
+	font-size:14px;
+	font-weight: lighter;
+	color: #a29c9c;
+}
+
+.text_catalog_item_content_header {
+	display: block;
+	font-family: 'Roboto', sans-serif;
+	font-size: 13px;
+	line-height: 1.5;
+	font-weight: bold;
+	color: #5e5c5c;
+}
+/* /Catalog */
+
+
 /* Collapsing wrapper */
 
 .collapsing_wrapper {
