@@ -863,26 +863,21 @@ function Organization($view){
 
 		events.forEach(function(event){
 			var m_event_date = is_future ? moment.unix(event.nearest_event_date) : moment.unix(event.last_event_date),
-				m_today = moment(),
 				$subscribers = buildAvatarCollection(event.favored, 4),
 				times = [],
 				avatars_collection_classes = [],
 				favored_users_count = ($subscribers.length <= 4) ? 0 : event.favored_users_count - 4,
 				$event;
 			if(last_date != m_event_date.format(__C.DATE_FORMAT)){
-				var display_date,
-					diff = m_event_date.diff(m_today, 'days', true);
-
-				switch(true){
-					case (-2 < diff && diff <= -1):
-						display_date = 'Вчера'; break;
-					case (-1 < diff && diff <= 0):
-						display_date = 'Сегодня'; break;
-					case (0 < diff && diff <= 1):
-						display_date = 'Завтра'; break;
-					default:
-						display_date = m_event_date.format('D MMMM');
-				}
+				var display_date = m_event_date.calendar(null, {
+					sameDay: '[Сегодня]',
+					nextDay: '[Завтра]',
+					lastDay: '[Вчера]',
+					nextWeek: 'dddd',
+					lastWeek: 'D MMMM',
+					sameElse: 'D MMMM'
+				}).capitalize();
+				
 				$events = $events.add(tmpl('organization-feed-divider', {
 					formatted_date: display_date,
 					date: m_event_date.format(__C.DATE_FORMAT)
