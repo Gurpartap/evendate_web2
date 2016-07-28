@@ -20,6 +20,34 @@ Object.methods = function(obj){
 	});
 	return methods;
 };
+Array.newFrom = function(original) {
+	var new_array = original.slice(0), arg, i;
+	if(arguments.length > 1){
+		for (i = 1; i < arguments.length; i++) {
+			arg = arguments[i];
+			switch(typeof arg){
+				case 'number':
+				case 'string':
+				case 'boolean': {
+					$.merge(new_array, [arg]);
+					break;
+				}
+				case 'object': {
+					if(!Array.isArray(arg)){
+						$.merge(new_array, Object.keys(arg).map(function(key) {return arg[key]}));
+					} else {
+						$.merge(new_array, arg);
+					}
+					break;
+				}
+				default: {
+					console.error('')
+				}
+			}
+		}
+	}
+	return new_array;
+};
 
 function arrayToSpaceSeparatedString(){return this.join(' ')}
 
@@ -697,36 +725,6 @@ function showNotifier(response){
 
 
 
-
-function setDaysWithEvents(calendar){
-	var $calendar = calendar.$calendar,
-		m_selected_month = moment(calendar.selected_days[0]);
-	$.ajax({
-		url: '/api/v1/events/dates',
-		data: {
-			since: m_selected_month.startOf('month').format(__C.DATE_FORMAT),
-			till: m_selected_month.endOf('month').format(__C.DATE_FORMAT),
-			offset: 0,
-			length: 500,
-			my: true,
-			unique: true
-		},
-		success: function(res){
-			$calendar.find('.feed_calendar_td').removeClass('Controller has_favorites').addClass(__C.CLASSES.NEW_DISABLED);
-			res.data.forEach(function(day){
-				$('.Day_' + moment.unix(day.event_date).format(__C.DATE_FORMAT))
-					.data('page', 'feed')
-					.addClass('Controller')
-					.addClass(day.favorites_count > 0 ? 'has_favorites' : '')
-					.removeClass(__C.CLASSES.NEW_DISABLED);
-			});
-
-			bindControllers($calendar);
-		}
-	});
-}
-
-
 function hideSidebarOrganization(org_id){
 	var $organization_item = $('#main_sidebar').find('.organization_item[data-organization_id="' + org_id + '"]').removeClass('-show');
 	setTimeout(function(){
@@ -801,6 +799,13 @@ function renderSidebarOrganizations(organization, afterRenderCallback){
 function renderHeaderTabs(tabs){
 	var $wrapper = $('#main_header_bottom').find('.HeaderTabsWrapper'),
 		$tabs = $();
+	if(!Array.isArray(tabs) && typeof tabs == 'object'){
+		var buf = [];
+		$.each(tabs, function(){
+			buf.push(this);
+		});
+		tabs = buf;
+	}
 	tabs.forEach(function(tab){
 		if(tab.dataset)
 			tab.dataset.toString = (Array.isArray(tab.dataset)) ? arrayToSpaceSeparatedString : objectToHtmlDataSet;

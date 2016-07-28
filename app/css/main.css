@@ -1703,9 +1703,9 @@ html.-noscroll {
 .calendar_weekday {text-align: inherit} /*FUB*/
 .-weekday_selection .calendar_weekday {cursor: pointer}
 
-.calendar_day:not(.-calendar_day_disabled) {cursor: pointer}
+.calendar_day:not(.-disabled) {cursor: pointer}
 .calendar_day.not_this_month,
-.calendar_day.-calendar_day_disabled {opacity: .5}
+.calendar_day.-disabled {opacity: .5}
 
 /* /Calendar */
 /* DatePicker */

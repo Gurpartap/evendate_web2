@@ -14,7 +14,7 @@ function Calendar($calendar, options){
 			th_class: 'calendar_weekday',
 			td_class: 'calendar_day',
 			td_additional_classes: [],
-			td_disabled_class: '-calendar_day_disabled',
+			td_disabled_class: '-disabled',
 			table_cell_class: 'calendar_cell',
 			today_class: 'today'
 		},
@@ -457,8 +457,10 @@ Calendar.prototype.bindMonthArrows = function(){
 
 Calendar.prototype.bindDaySelection = function(){
 	var self = this,
-		$days = self.$calendar.find('.'+this.options.classes.td_class).not('.'+this.options.classes.td_disabled_class);
-	$days.on('click', function(){
+		$days_in_month = self.$calendar.find('.'+this.options.classes.td_class),
+		$active_days = $days_in_month.not('.'+this.options.classes.td_disabled_class);
+	$days_in_month.off('click.bindDaySelection');
+	$active_days.on('click.bindDaySelection', function(){
 		if(self.options.multi_selection === true && $(this).hasClass(__C.CLASSES.NEW_ACTIVE)){
 			self.deselectDays($(this).data('date'));
 		} else {

@@ -16,6 +16,9 @@ var organizations_loaded = false,
 		friends: Friends,
 		friend: OneFriend,
 		edit_event: EditEvent,
+		statistics: StatisticsOverview,
+		organization_statistics: StatisticsOrganization,
+		event_statistics: StatisticsEvent,
 		getCurrentState: function(){
 			return window.location.pathname.split('/')[1];
 		},
@@ -46,14 +49,11 @@ var organizations_loaded = false,
 function Feed($view){
 	var $window = $(window),
 		$wrapper = $view.find('.page_wrapper'),
-		feed_state = History.getState().data.feed_state,
-		feed_state_id = $wrapper.data('feed_state_id') ? $wrapper.data('feed_state_id') : 0,
+		tab_state = History.getState().data.tab_state,
+		tab_state_id = $wrapper.data('tab_state_id') ? $wrapper.data('tab_state_id') : 0,
 		feed_date = History.getState().data.date,
 		current_offset = 0,
-		ajax_url,
-		ajax_data = {
-			future: true
-		},
+		ajax_url = '/api/v1/events/',
 		fields = [
 			'image_horizontal_large_url',
 			'organization_name',
@@ -68,84 +68,83 @@ function Feed($view){
 			'is_free',
 			'min_price'
 		],
-		header_tabs = [
-			{
+		sub_states = {
+			'actual': {
 				label: 'Актуальные',
-				dataset: {
-					page: 'feed',
-					feed_state: 'actual',
-					title: 'Мероприятия'
+				ajax_url: ajax_url + 'my',
+				ajax_data: {
+					fields: Array.newFrom(fields, 'actuality'),
+					future: true,
+					order_by: '-actuality'
 				},
-				classes: ['Controller']
+				hidden: false
 			},
-			{
+			'timeline': {
 				label: 'По времени',
-				dataset: {
-					page: 'feed',
-					feed_state: 'timeline',
-					title: 'Мероприятия'
+				ajax_url: ajax_url + 'my',
+				ajax_data: {
+					fields: fields,
+					future: true
 				},
-				classes: ['Controller']
+				hidden: false
 			},
-			{
+			'favored': {
 				label: 'Избранные',
-				dataset: {
-					page: 'feed',
-					feed_state: 'favored',
-					title: 'Избранные'
+				ajax_url: ajax_url + 'favorites',
+				ajax_data: {
+					fields: fields,
+					future: true
 				},
-				classes: ['Controller']
+				hidden: false
 			},
-			{
+			'recommendations': {
 				label: 'Рекомендованные',
-				dataset: {
-					page: 'feed',
-					feed_state: 'recommendations',
-					title: 'Рекомендованные'
+				ajax_url: ajax_url + 'recommendations',
+				ajax_data: {
+					fields: fields,
+					future: true,
+					order_by: '-rating'
 				},
-				classes: ['Controller']
+				hidden: false
+			},
+			'friends': {
+				label: 'Друзья',
+				ajax_url: ajax_url + 'my',
+				ajax_data: {
+					fields: Array.newFrom(fields, 'favored_friends_count'),
+					future: true,
+					order_by: '-favored_friends_count'
+				},
+				hidden: true
+			},
+			'day': {
+				ajax_url: ajax_url + 'my',
+				ajax_data: {
+					fields: fields,
+					future: false,
+					date: feed_date
+				},
+				hidden: true
 			}
-		];
+		};
 
-	switch(feed_state){
-		case 'timeline': {
-			ajax_url = '/api/v1/events/my';
-			break;
-		}
-		case 'friends': {
-			ajax_url = '/api/v1/events/my';
-			ajax_data.order_by = '-favored_friends_count';
-			fields.push('favored_friends_count');
-			break;
-		}
-		case 'favored': {
-			ajax_url = '/api/v1/events/favorites';
-			break;
-		}
-		case 'recommendations': {
-			ajax_url = '/api/v1/events/recommendations';
-			ajax_data.order_by = '-rating';
-			break;
-		}
-		default: {
-			if(feed_date){
-				feed_state = 'day';
-				ajax_url = '/api/v1/events/my';
-				ajax_data.date = feed_date;
-				ajax_data.future = false;
-				break;
+	function renderFeedHeaderTabs(sub_states){
+		var header_tabs = [];
+		$.each(sub_states, function(sub_state, options){
+			if(!options.hidden){
+				header_tabs.push({
+					label: options.label,
+					dataset: {
+						page: 'feed',
+						tab_state: sub_state,
+						title: options.label
+					},
+					classes: ['Controller']
+				});
 			}
-		}
-		case 'actual': {
-			feed_state = 'actual';
-			ajax_url = '/api/v1/events/my';
-			ajax_data.order_by = '-actuality';
-			fields.push('actuality');
-			break;
-		}
+		});
+		renderHeaderTabs(header_tabs);
 	}
-
-	ajax_data.fields = fields.join(',');
 
 	function bindEventsEvents($parent){
 		bindAddAvatar($parent);
@@ -217,7 +216,7 @@ function Feed($view){
 		}).addClass('-Handled_HideEvent');
 	}
 
-	function initFeedPage($parent){
+	function initFeedCalendar($parent){
 		var MainCalendar = new Calendar($parent.find('.FeedCalendar'), {
 			classes: {
 				wrapper_class: 'feed_calendar_wrapper',
@@ -229,6 +228,34 @@ function Feed($view){
 				td_disabled: '-disabled'
 			}
 		});
+		
+		function setDaysWithEvents(calendar){
+			calendar.$calendar.find('.feed_calendar_td').removeClass('Controller has_favorites').addClass(__C.CLASSES.NEW_DISABLED);
+			$.ajax({
+				url: '/api/v1/events/dates',
+				data: {
+					since: calendar.current_month.startOf('month').format(__C.DATE_FORMAT),
+					till: calendar.current_month.endOf('month').format(__C.DATE_FORMAT),
+					offset: 0,
+					length: 500,
+					my: true,
+					unique: true
+				},
+				success: function(res){
+					res.data.forEach(function(day){
+						$('.Day_' + moment.unix(day.event_date).format(__C.DATE_FORMAT))
+							.data('page', 'feed')
+							.addClass('Controller')
+							.addClass(day.favorites_count > 0 ? 'has_favorites' : '')
+							.removeClass(__C.CLASSES.NEW_DISABLED);
+					});
+					calendar.bindDaySelection();
+					
+					bindControllers(calendar.$calendar);
+				}
+			});
+		}
+		
 		MainCalendar.init();
 		if(feed_date){
 			MainCalendar.setMonth(feed_date.split('-')[1]).selectDays(feed_date);
@@ -238,15 +265,16 @@ function Feed($view){
 			bindControllers(MainCalendar.$calendar);
 			setDaysWithEvents(MainCalendar);
 		});
-		bindEventsEvents($parent);
 	}
 
-	function uploadMoreEvents(length, offset, success){
-		var $events = $();
+	function uploadMoreEvents(sub_state, length, offset, success){
+		var $events = $(),
+			ajax_data = sub_state.ajax_data;
 		ajax_data.length = length;
 		ajax_data.offset = offset;
+		ajax_data.fields = ajax_data.fields.join(',');
 		$.ajax({
-			url: ajax_url,
+			url: sub_state.ajax_url,
 			data: ajax_data,
 			method: 'GET',
 			success: function(res){
@@ -301,22 +329,31 @@ function Feed($view){
 			}
 		});
 	}
-	$wrapper.empty().data('feed_state_id', ++feed_state_id);
 
+	if(!tab_state){
+		if(feed_date){
+			tab_state = 'day'
+		} else {
+			tab_state = 'actual'
+		}
+	}
+
+	$wrapper.empty().data('tab_state_id', ++tab_state_id);
+	$wrapper.append(tmpl('feed-event-wrapper', {}));
+	initFeedCalendar($wrapper);
 	$window.off('scroll');
-	renderHeaderTabs(header_tabs);
-	uploadMoreEvents(10, current_offset, function($events){
-		if($wrapper.data('feed_state_id') == feed_state_id){
-			$wrapper.append(tmpl('feed-event-wrapper', {feed_events: $events}));
-			$wrapper.append(tmpl('feed-event-vulcan', {event_cards: ''}));
-			initFeedPage($wrapper);
+	renderFeedHeaderTabs(sub_states);
+
+	uploadMoreEvents(sub_states[tab_state], 10, current_offset, function($events){
+		if($wrapper.data('tab_state_id') == tab_state_id){
 
 			$window.data('block_scroll', false);
 			if($events.length){
-				$window.on('scroll.upload'+feed_state.capitalize()+'Events', function(){
+				$wrapper.find('.FeedEvents').append($events);
+				$window.on('scroll.upload'+tab_state.capitalize()+'Events', function(){
 					if($window.height() + $window.scrollTop() + 200 >= $(document).height() && !$window.data('block_scroll')){
 						$window.data('block_scroll', true);
-						uploadMoreEvents(10, current_offset+=10, function($events){
+						uploadMoreEvents(sub_states[tab_state], 10, current_offset+=10, function($events){
 							if($events.length){
 								$wrapper.find('.FeedEvents').append($events);
 								bindEventsEvents($events);
@@ -325,7 +362,7 @@ function Feed($view){
 									image_url: '/app/img/sad_eve.png',
 									text: 'Как насчет того, чтобы подписаться на организации?'
 								}));
-								$window.off('scroll.upload'+feed_state.capitalize()+'Events');
+								$window.off('scroll.upload'+tab_state.capitalize()+'Events');
 							}
 							$window.data('block_scroll', false);
 						});
@@ -340,7 +377,7 @@ function Feed($view){
 		}
 
 	});
-	initFeedPage($view);
+	bindEventsEvents($wrapper);
 }
 
 function OneEvent($view){
@@ -2214,6 +2251,17 @@ function Onboarding($view){
 	});
 }
 
+function StatisticsOverview($view) {
+
+}
+
+function StatisticsOrganization($view) {
+
+}
+
+function StatisticsEvent($view) {
+
+}
 
 
 
@@ -2261,43 +2309,58 @@ $(document)
 			var state = History.getState(),
 				page_split = __STATES.getCurrentState().split('/'),
 				page = page_split[0],
+				$view,
 				controller;
 
+			$(window).off('scroll');
+			$(window).data('disable_upload', false);
 			switch(typeof __STATES[page]){
 				case 'function': {
 					controller = __STATES[page];
 					break;
 				}
-				case 'object': {
-					controller = __STATES[page].default;
-					break;
-				}
 				default:
 				case 'undefined': {
+					//TODO: 404 page
 					console.error('PAGE RENDERING ERROR');
+					return false;
 				}
 			}
-			$(window).off('scroll');
-			$(window).data('disable_upload', false);
+			$view = $('[data-controller="'  + controller.name + '"]');
+			switch(page){
+				case 'friend': {
+					$view = $('.friends-app');
+					$('[data-page="' + page + '"]').addClass(__C.CLASSES.NEW_ACTIVE);
+					break;
+				}
+				case 'search': {
+
+					break;
+				}
+				case 'feed':
+				case 'organization_statistics':
+				case 'event_statistics': {
+					$('.SidebarNavItem[data-page="' + page + '"]').addClass(__C.CLASSES.NEW_ACTIVE);
+					$('[data-tab_state="' + state.data.tab_state + '"]').addClass(__C.CLASSES.NEW_ACTIVE);
+					break;
+				}
+				default: {
+					$('#search_bar_input').val('');
+					$('[data-page="' + page + '"]').addClass(__C.CLASSES.NEW_ACTIVE);
+				}
+			}
 
 			$('#page_title').text(state.title);
 			$('#main_header').removeClass('-with_tabs');
-			if(__STATES.hasOwnProperty(page)) {
-				var $view = page == 'friend' ? $('.friends-app') : $('[data-controller="'  + controller.name + '"]');
-				$('.PageView').not($view).addClass(__C.CLASSES.NEW_HIDDEN);
-				$view.removeClass(__C.CLASSES.NEW_HIDDEN);
-				controller($view);
-			}
-			else{
-				console.error('PAGE RENDERING ERROR');
-			}
-			if (page != 'search'){
-				$('#search_bar_input').val('');
-			}
+
+			$('.PageView').not($view).addClass(__C.CLASSES.NEW_HIDDEN);
+			$view.removeClass(__C.CLASSES.NEW_HIDDEN);
+			controller($view);
+
 			$('[data-page]').removeClass(__C.CLASSES.NEW_ACTIVE);
 			if(page == 'feed'){
 				$('.SidebarNavItem[data-page="' + page + '"]').addClass(__C.CLASSES.NEW_ACTIVE);
-				$('[data-feed_state="' + state.data.feed_state + '"]').addClass(__C.CLASSES.NEW_ACTIVE);
+				$('[data-tab_state="' + state.data.tab_state + '"]').addClass(__C.CLASSES.NEW_ACTIVE);
 			} else {
 				$('[data-page="' + page + '"]').addClass(__C.CLASSES.NEW_ACTIVE);
 			}

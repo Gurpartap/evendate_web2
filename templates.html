@@ -755,7 +755,11 @@
 <!-- Feed Page -->
 
 <script type="javascript/template" id="tmpl-feed-event-wrapper">
-	<div class="feed_events FeedEvents">{feed_events}</div>
+	<div class="feed_events FeedEvents"></div>
+	<div class="event_vulcan">
+		<div class="page feed_calendar FeedCalendar"></div>
+		<div class="FeedVulcanEvents"></div>
+	</div>
 </script>
 
 <script type="javascript/template" id="tmpl-feed-event">
@@ -796,13 +800,6 @@
 
 <script type="javascript/template" id="tmpl-feed-event-info">
 	<p class="feed_event_info">{text}</p>
-</script>
-
-<script type="javascript/template" id="tmpl-feed-event-vulcan">
-	<div class="event_vulcan">
-		<div class="page feed_calendar FeedCalendar"></div>
-		{event_cards}
-	</div>
 </script>
 
 <script type="javascript/template" id="tmpl-feed-no-event">
@@ -872,7 +869,7 @@
 
 		<div class="bot_part_onboarding_page">
 			<button class="button -color_neutral_alt RippleEffect Controller" type="button" data-page="organizations" data-title="Каталог организаторов"><span>Пропустить</span></button>
-			<button class="button -color_neutral_accent RippleEffect Controller" type="button" data-page="feed" data-feed_state="timeline" data-title="События"><span>Далее</span></button>
+			<button class="button -color_neutral_accent RippleEffect Controller" type="button" data-page="feed" data-tab_state="timeline" data-title="События"><span>Далее</span></button>
 		</div>
 	</div>
 </script>
