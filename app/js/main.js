@@ -20,6 +20,34 @@ Object.methods = function(obj){
 	});
 	return methods;
 };
+Array.newFrom = function(original) {
+	var new_array = original.slice(0), arg, i;
+	if(arguments.length > 1){
+		for (i = 1; i < arguments.length; i++) {
+			arg = arguments[i];
+			switch(typeof arg){
+				case 'number':
+				case 'string':
+				case 'boolean': {
+					$.merge(new_array, [arg]);
+					break;
+				}
+				case 'object': {
+					if(!Array.isArray(arg)){
+						$.merge(new_array, Object.keys(arg).map(function(key) {return arg[key]}));
+					} else {
+						$.merge(new_array, arg);
+					}
+					break;
+				}
+				default: {
+					console.error('')
+				}
+			}
+		}
+	}
+	return new_array;
+};
 
 function arrayToSpaceSeparatedString(){return this.join(' ')}
 
@@ -193,9 +221,9 @@ function SubscribeButton($btn, options){
 		subscribed: 'fa-check'
 	};
 	this.colors = {
-		subscribe: '-color_neutral_secondary',
-		unsubscribe: '-color_secondary',
-		subscribed: '-color_secondary'
+		subscribe: '-color_neutral_accent',
+		unsubscribe: '-color_accent',
+		subscribed: '-color_accent'
 	};
 
 	if(typeof options != 'undefined'){
@@ -627,12 +655,16 @@ function limitInputSize(){
 		}
 		$this.on('input', function(){
 			var length = $this.val().length;
+			if($this.is('textarea')){
+				var crlfs = $this.val().match(/\n/g);
+				length = crlfs ? length + crlfs.length : length;
+			}
 			if(length > max){
 				$form_unit.addClass('-status_error');
 			} else if($form_unit.hasClass('-status_error')) {
 				$form_unit.removeClass('-status_error');
 			}
-			$prompt.text($this.val().length+'/'+max);
+			$prompt.text(length+'/'+max);
 		})
 	}).addClass('-Handled_LimitSize');
 }
@@ -687,17 +719,6 @@ function toDataUrl(url, callback){
 	xhr.send();
 }
 
-function showNotification(text, time, status){
-	var $notification = $('#notification');
-	$('#notification_text').text(text);
-	$notification.addClass('-show');
-	if(time !== 'infinite') {
-		setTimeout(function(){
-			$notification.removeClass('-show');
-		}, time);
-	}
-}
-
 function showNotifier(response){
 	$.notify({
 		'message': response.text,
@@ -706,36 +727,6 @@ function showNotifier(response){
 	});
 }
 
-
-
-
-function setDaysWithEvents(calendar){
-	var $calendar = calendar.$calendar,
-		m_selected_month = moment(calendar.selected_days[0]);
-	$.ajax({
-		url: '/api/v1/events/dates',
-		data: {
-			since: m_selected_month.startOf('month').format(__C.DATE_FORMAT),
-			till: m_selected_month.endOf('month').format(__C.DATE_FORMAT),
-			offset: 0,
-			length: 500,
-			my: true,
-			unique: true
-		},
-		success: function(res){
-			$calendar.find('.feed_calendar_td').removeClass('Controller has_favorites').addClass(__C.CLASSES.NEW_DISABLED);
-			res.data.forEach(function(day){
-				$('.Day_' + moment.unix(day.event_date).format(__C.DATE_FORMAT))
-					.data('page', 'feed')
-					.addClass('Controller')
-					.addClass(day.favorites_count > 0 ? 'has_favorites' : '')
-					.removeClass(__C.CLASSES.NEW_DISABLED);
-			});
-
-			bindControllers($calendar);
-		}
-	});
-}
 
 
 function hideSidebarOrganization(org_id){
@@ -751,7 +742,7 @@ function renderSidebarOrganizations(organization, afterRenderCallback){
 
 	function prependOrganization(org){
 		if ($list.find('.organization_item[data-organization_id="' + org.id + '"]').length == 0){
-			var counter_classes = org.new_events_count ? ['-color_marginal'] : ['-color_marginal', '-hidden'],
+			var counter_classes = org.new_events_count ? [] : ['-hidden'],
 				org_block = buildOrganizationBlock(org, {
 					block_classes: ['animated'],
 					avatar_classes: ['-size_30x30', '-rounded'],
@@ -812,6 +803,13 @@ function renderSidebarOrganizations(organization, afterRenderCallback){
 function renderHeaderTabs(tabs){
 	var $wrapper = $('#main_header_bottom').find('.HeaderTabsWrapper'),
 		$tabs = $();
+	if(!Array.isArray(tabs) && typeof tabs == 'object'){
+		var buf = [];
+		$.each(tabs, function(){
+			buf.push(this);
+		});
+		tabs = buf;
+	}
 	tabs.forEach(function(tab){
 		if(tab.dataset)
 			tab.dataset.toString = (Array.isArray(tab.dataset)) ? arrayToSpaceSeparatedString : objectToHtmlDataSet;
@@ -888,21 +886,6 @@ function showSettingsModal() {
 	});
 }
 
-function bindFeedEvents($view){
-	$view.find('.feed-clickable').off('click').on('click', function(){
-		var $this = $(this);
-		if ($this.data('organization-id')){
-			showOrganizationalModal($this.data('organization-id'));
-		}else if ($this.data('event-id')){
-			window.open('/event.php?id=' + $this.data('event-id'), '_blank');
-			storeStat($this.data('event-id'), 'friend', 'view_event_from_user');
-		}else if ($this.data('friend-id')){
-			History.pushState({page: 'friend-' + $this.data('friend-id')}, $this.text(), 'friend-' + $this.data('friend-id'));
-		}
-	});
-	bindControllers($view);
-}
-
 function getFriendsList($friends_right_list, cb){
 	$.ajax({
 		url: '/api/v1/users/friends?page=0&length=500',
@@ -915,16 +898,8 @@ function getFriendsList($friends_right_list, cb){
 			$friends_right_list.find('.friends-list').empty();
 			$friends_right_list.removeClass(__C.CLASSES.HIDDEN);
 			tmpl('friend-item', res.data, $friends_right_list.find('.friends-list'));
-			res.data.forEach(function(friend){
-				__STATES['friend-' + friend.id] = OneFriend;
-			});
 			$friends_right_list.find('.friends-count').text(res.data.length);
-			$friends_right_list.find('.friend-item').off('click').on('click', function(){
-				var $this = $(this);
-				$this.siblings().removeClass(__C.CLASSES.ACTIVE);
-				$this.addClass(__C.CLASSES.ACTIVE);
-				History.pushState({page: 'friend-' + $this.data('friend-id')}, $this.data('name'), 'friend-' + $this.data('friend-id'));
-			});
+			bindControllers($friends_right_list);
 			if ($friends_right_list.height() > window.innerHeight - 200){
 				$friends_right_list.find('.friends-list').slimscroll({
 					height: window.innerHeight - 200,
@@ -959,20 +934,12 @@ function calculateMargins($view){
  * @param callback
  */
 function toggleSubscriptionState(state, entity_id, callback){
-	var cb = function(res){
-			if (__STATES.getCurrentState() == 'timeline'){
-				__STATES.refreshState();
-			}
-		},
-
-		options = (state == false) ? {
+	var options = (state == false) ? {
 			url: '/api/v1/organizations/' + entity_id + '/subscriptions',
-			type: 'DELETE',
-			success: cb
+			type: 'DELETE'
 		} : {
 			url: '/api/v1/organizations/' + entity_id + '/subscriptions',
-			type: 'POST',
-			success: cb
+			type: 'POST'
 		};
 	$.ajax(options);
 }

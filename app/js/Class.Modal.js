@@ -316,6 +316,7 @@ function MapModal(location, title){
 
 		this.modal = tmpl('modal', {
 			modal_type: 'MapModal',
+			modal_content_classes: '-no_padding',
 			modal_title: tmpl('modal-title', {title: this.title}),
 			modal_content: this.content
 		});

@@ -14,7 +14,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-user-tombstone">
-	<div class="user_tombstone Controller" data-is_friend="{is_friend}" data-page="friend-{id}" data-friend-id="{id}" data-title="{full_name}" data-name="{full_name}">
+	<div class="user_tombstone Controller" data-is_friend="{is_friend}" data-page="friend/{id}" data-friend-id="{id}" data-title="{full_name}" data-name="{full_name}">
 		<div class="avatar -size_{size} -rounded" style="background-image: url('{avatar_url}')"></div>
 		<p class="user_tombstone_title">{full_name}</p>
 	</div>
@@ -25,11 +25,11 @@
 </script>
 
 <script type="javascript/template" id="tmpl-subscriber-divider">
-	<span class="organization_subscribers_divider">{label}</span>
+	<p class="organization_subscribers_divider -color_accent">{label}</p>
 </script>
 
 <script type="javascript/template" id="tmpl-subscriber">
-	<div class="subscriber Controller" data-is_friend="{is_friend}" data-page="friend-{id}" data-friend-id="{id}" data-name="{name}">
+	<div class="subscriber Controller" data-is_friend="{is_friend}" data-page="friend/{id}" data-friend-id="{id}" data-name="{name}">
 		<div class="avatar_block">
 			<div class="avatar -size_40x40 -rounded -bordered">
 				<img src="{avatar_url}" onerror="this.onerror=null;this.src='/app/img/logo_40.png'">
@@ -297,7 +297,7 @@
 					<div class="wrapper">
 						<h4 class="form_label"><label>Горизонтальная</label></h4>
 						<div class="Tabs">
-							<header class="tabs_header -color_primary">
+							<header class="tabs_header -color_accent">
 								<span class="tab Tab -active">По ссылке</span>
 								<span class="tab Tab">С компьютера</span>
 							</header>
@@ -307,19 +307,19 @@
 										<input id="edit_event_load_by_url_hor" class="form_input" type="text" autocomplete="off" placeholder="Ссылка на изображение">
 									</div>
 									<div class="form_unit">
-										<button class="button -color_secondary RippleEffect LoadByURLButton" type="button" tabindex="-1" data-load_input="edit_event_load_by_url_hor">Загрузить</button>
+										<button class="button -color_accent RippleEffect LoadByURLButton" type="button" tabindex="-1" data-load_input="edit_event_load_by_url_hor">Загрузить</button>
 									</div>
 								</div>
 								<div class="tab_body TabsBody">
 									<div class="form_unit">
-										<button class="button -color_secondary RippleEffect FileLoadButton" type="button"><input class="LoadImg -hidden" type="file">Выбрать</button>
+										<button class="button -color_accent RippleEffect FileLoadButton" type="button"><input class="LoadImg -hidden" type="file">Выбрать</button>
 									</div>
 								</div>
 							</div>
 						</div>
 						<p class="FileNameText"></p>
 						<div class="form_unit">
-							<button class="button -color_secondary_alt RippleEffect CallModal -hidden" type="button" data-modal_type="cropper" data-source_img="{image_horizontal_url}" data-aspect_ratio="16/9">
+							<button class="button -color_accent_alt RippleEffect CallModal -hidden" type="button" data-modal_type="cropper" data-source_img="{image_horizontal_url}" data-aspect_ratio="16/9">
 								<span class="Text">Кадрировать</span>
 							</button>
 						</div>
@@ -339,7 +339,7 @@
 					<div class="wrapper">
 						<h4 class="form_label"><label>Вертикальная</label></h4>
 						<div class="Tabs">
-							<header class="tabs_header -color_primary">
+							<header class="tabs_header -color_accent">
 								<span class="tab Tab -active">По ссылке</span>
 								<span class="tab Tab">С компьютера</span>
 							</header>
@@ -349,19 +349,19 @@
 										<input id="edit_event_load_by_url_vert" class="form_input" type="text" autocomplete="off" placeholder="Ссылка на изображение">
 									</div>
 									<div class="form_unit">
-										<button class="button -color_secondary RippleEffect LoadByURLButton" type="button" tabindex="-1" data-load_input="edit_event_load_by_url_vert">Загрузить</button>
+										<button class="button -color_accent RippleEffect LoadByURLButton" type="button" tabindex="-1" data-load_input="edit_event_load_by_url_vert">Загрузить</button>
 									</div>
 								</div>
 								<div class="tab_body TabsBody">
 									<div class="form_unit">
-										<button class="button -color_secondary RippleEffect FileLoadButton" type="button"><input class="LoadImg -hidden" type="file">Выбрать</button>
+										<button class="button -color_accent RippleEffect FileLoadButton" type="button"><input class="LoadImg -hidden" type="file">Выбрать</button>
 									</div>
 								</div>
 							</div>
 						</div>
 						<p class="FileNameText"></p>
 						<div class="form_unit">
-							<button class="button -color_secondary_alt RippleEffect CallModal -hidden" type="button" data-modal_type="cropper" data-source_img="{image_vertical_url}" data-aspect_ratio="7/10">
+							<button class="button -color_accent_alt RippleEffect CallModal -hidden" type="button" data-modal_type="cropper" data-source_img="{image_vertical_url}" data-aspect_ratio="7/10">
 								<span class="Text">Кадрировать</span>
 							</button>
 						</div>
@@ -487,7 +487,7 @@
 			</div>
 
 			<div class="form_unit -h_centering">
-				<button id="edit_event_submit" class="button RippleEffect -color_secondary" type="button">Опубликовать</button>
+				<button id="edit_event_submit" class="button RippleEffect -color_accent" type="button">Опубликовать</button>
 			</div>
 
 		</form>
@@ -574,7 +574,7 @@
 			</div>
 		</div>
 		<div class="organization_feed Tabs">
-			<div class="tabs_header -color_secondary">
+			<div class="tabs_header -color_accent">
 				<span class="tab Tab -active">Будущие</span>
 				<span class="tab Tab">Прошедшие</span>
 			</div>
@@ -583,12 +583,6 @@
 				<div class="tab_body TabsBody PastEvents"></div>
 			</div>
 		</div>
-	</div>
-</script>
-
-<script type="javascript/template" id="tmpl-organization-feed-container">
-	<div class="organization_feed_container" data-container-date="{date}">
-		{events}
 	</div>
 </script>
 
@@ -625,7 +619,7 @@
 	<div class="page organization_subscribers_page -fixed">
 		<header class="organization_subscribers_header">
 			<span class="organization_subscribers_header_text">Подписчики</span>
-			<span class="counter -color_secondary">{subscribers_count}</span>
+			<span class="counter -color_accent">{subscribers_count}</span>
 		</header>
 		<div class="organization_subscribers_wrapper scrollbar-outer SubscribersScroll">
 			{subscribers}
@@ -649,10 +643,10 @@
 							<span class="counter -size_30x30 -bordered -color_marginal -castable {favored_users_show}">+<span class="FavoredCount">{favored_users_count}</span></span>
 						</div>
 						<div class="form_unit" align="right">
+							<button class="button -empty -low -rounded fa_icon fa-bell-o -color_neutral RippleEffect DropdownButton" data-dropdown="edit_notification" data-dd-width="190" data-dd-pos-x="self.center" data-dd-pos-y="6" type="button"></button>
 							<button class="button event_favourite_button -low -rounded fa_icon {subscribe_button_classes} Subscribe EventSubscribe -AddFavourite AddAvatar RippleEffect" data-event-id="{id}">
 								<span class="Text">{subscribe_button_text}</span>
 							</button>
-							<button class="button -empty -low -rounded fa_icon fa-bell-o -color_neutral RippleEffect DropdownButton" data-dropdown="edit_notification" data-dd-width="190" data-dd-pos-x="self.center" data-dd-pos-y="6" type="button"></button>
 							<div class="dropdown_box DropdownBox" data-dropdown_id="edit_notification">
 								<header class="dropdown_header">Настройка напоминания</header>
 								<form class="dropdown_box_wrapper">
@@ -693,7 +687,7 @@
 <script type="javascript/template" id="tmpl-event-edit-functions">
 	<button class="button -color_neutral -fill RippleEffect DropdownButton" data-dropdown="redact_event" data-dd-width="self" type="button">Редактирование события</button>
 	<div class="dropdown_box DropdownBox" data-dropdown_id="redact_event">
-		<div class="dropdown_list"><button class="dropdown_button -fill -color_error RippleEffect CloseDropdown DropdownButton" data-dropdown="cancel_event" data-dd-width="self" type="button">Отменить событие</button></div>
+		<div class="dropdown_list"><button class="dropdown_button -fill -color_accent RippleEffect CloseDropdown DropdownButton" data-dropdown="cancel_event" data-dd-width="self" type="button">Отменить событие</button></div>
 		<div class="dropdown_list"><button class="dropdown_button -fill -color_neutral RippleEffect CloseDropdown Controller" data-page="edit_event" data-title="Редактировать событие" data-event-id="{id}" type="button">Редактировать</button></div>
 	</div>
 	<div class="dropdown_box DropdownBox" data-dropdown_id="cancel_event">
@@ -708,11 +702,11 @@
 </script>
 
 <script type="javascript/template" id="tmpl-event-registration-info">
-	<p class="event_additional_info -transform_uppercase">Регистрация до {registration_till}</p>
+	<p class="event_additional_info -color_accent -transform_uppercase">Регистрация до {registration_till}</p>
 </script>
 
 <script type="javascript/template" id="tmpl-event-price-info">
-	<p class="event_additional_info">от {min_price} руб.</p>
+	<p class="event_additional_info -color_accent">от {min_price} руб.</p>
 </script>
 
 <script type="javascript/template" id="tmpl-event-date-time">
@@ -761,7 +755,11 @@
 <!-- Feed Page -->
 
 <script type="javascript/template" id="tmpl-feed-event-wrapper">
-	<div class="feed_events FeedEvents">{feed_events}</div>
+	<div class="feed_events FeedEvents"></div>
+	<div class="event_vulcan">
+		<div class="page feed_calendar FeedCalendar"></div>
+		<div class="FeedVulcanEvents"></div>
+	</div>
 </script>
 
 <script type="javascript/template" id="tmpl-feed-event">
@@ -802,13 +800,6 @@
 
 <script type="javascript/template" id="tmpl-feed-event-info">
 	<p class="feed_event_info">{text}</p>
-</script>
-
-<script type="javascript/template" id="tmpl-feed-event-vulcan">
-	<div class="event_vulcan">
-		<div class="page feed_calendar FeedCalendar"></div>
-		{event_cards}
-	</div>
 </script>
 
 <script type="javascript/template" id="tmpl-feed-no-event">
@@ -854,7 +845,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-modal-map-content">
-	<iframe width="100%" height="600" frameborder="0" style="border:0" src="https://www.google.com/maps/embed/v1/place?q={location}&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg" allowfullscreen></iframe>
+	<iframe width="100%" height="600" frameborder="0" style="display:block;border:0" src="https://www.google.com/maps/embed/v1/place?q={location}&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg" allowfullscreen></iframe>
 </script>
 
 <script type="javascript/template" id="tmpl-modal-favored-divider">
@@ -865,7 +856,7 @@
 <!-- Onboarding  -->
 
 <script type="javascript/template" id="tmpl-onboarding-main">
-	<div class="page_onboarding">
+	<div class="page page_onboarding">
 
 		<div>
 			<div class="text_onboarding_container"><span class="header_text_onboarding">Вам понравится</span></div>
@@ -877,8 +868,8 @@
 		</div>
 
 		<div class="bot_part_onboarding_page">
-			<button class="button -color_neutral_alt RippleEffect Controller" type="button" data-page="organizations" data-title="Каталог организаторов"><span>ПРОПУСТИТЬ</span></button>
-			<button class="button -color_primary_alt RippleEffect Controller" type="button" data-page="feed" data-feed_state="timeline" data-title="Лента"><span>ДАЛЕЕ</span></button>
+			<button class="button -color_neutral_alt RippleEffect Controller" type="button" data-page="organizations" data-title="Каталог организаторов"><span>Пропустить</span></button>
+			<button class="button -color_neutral_accent RippleEffect Controller" type="button" data-page="feed" data-tab_state="timeline" data-title="События"><span>Далее</span></button>
 		</div>
 	</div>
 </script>
@@ -1583,7 +1574,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-friend-item">
-  <div class="friend-item friend-{id}" data-friend-id="{id}" data-name="{last_name} {first_name}">
+  <div class="friend-item friend-{id}" data-page="friend/{id}" data-friend-id="{id}" data-name="{last_name} {first_name}">
     <div class="friend-avatar">
       <img src="{avatar_url}">
     </div>
@@ -1611,7 +1602,7 @@
       <div class="friend-avatar">
         <img src="{avatar_url}">
         <span class="events-date">{date}</span>
-        <span class="friend-name feed-clickable" data-friend-id="{friend_id}">{last_name} {first_name}</span>
+        <span class="friend-name" data-page="friend/{id}" data-friend-id="{friend_id}" data-title="{last_name} {first_name}">{last_name} {first_name}</span>
         <div class="event-type-name">{action_name}</div>
       </div>
     </div>
@@ -1624,9 +1615,9 @@
 <script type="javascript/template" id="tmpl-friends-feed-event">
   <div class="friend-event favored">
     <div>
-      <img src="{image_square_vertical_url}" class="feed-clickable" data-event-id="{id}">
+      <img src="{image_square_vertical_url}" class="EventController Controller" data-page="event/{id}" data-event-id="{id}" data-title="{title}">
       <div class="event-favored-wrapper">
-        <div class="event-name feed-clickable" data-event-id="{id}">{title}</div>
+        <div class="event-name EventController Controller" data-page="event/{id}" data-event-id="{id}" data-title="{title}">{title}</div>
         <div class="organizator-block Controller" data-page="organization/{organization_id}" data-organization-id="{organization_id}" data-title="{organization_short_name}">
           <img src="{organization_logo_small_url}">
           <span class="name">{organization_short_name}</span></div></div>
