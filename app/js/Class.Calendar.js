@@ -94,7 +94,7 @@ Calendar.prototype.destroyTable = function(){
 Calendar.prototype.setMonthName = function(){
 	this.$calendar.find('.MonthName')
 		.data('month', this.current_month.month())
-		.text(this.current_month.lang('ru').format("MMMM YYYY").capitalize());
+		.text(this.current_month.format("MMMM YYYY").capitalize());
 	return this;
 };
 

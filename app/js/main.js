@@ -655,12 +655,16 @@ function limitInputSize(){
 		}
 		$this.on('input', function(){
 			var length = $this.val().length;
+			if($this.is('textarea')){
+				var crlfs = $this.val().match(/\n/g);
+				length = crlfs ? length + crlfs.length : length;
+			}
 			if(length > max){
 				$form_unit.addClass('-status_error');
 			} else if($form_unit.hasClass('-status_error')) {
 				$form_unit.removeClass('-status_error');
 			}
-			$prompt.text($this.val().length+'/'+max);
+			$prompt.text(length+'/'+max);
 		})
 	}).addClass('-Handled_LimitSize');
 }

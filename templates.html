@@ -875,7 +875,14 @@
 </script>
 
 <script type="javascript/template" id="tmpl-onboarding-recommendation">
-	organization_item
+	<div class="recommendations_item_onboarding_inside OnboardingOrgItem" data-organization_id="{id}">
+		<div class="img_container_recommendation_onboarding">
+			<img src="{img_url}" class="img_recommendation_onboarding"></div>
+		<div class="text_container_recommendation_onboarding"><span>{short_name}</span></div>
+		<div class="check_box_img_container_onboarding">
+			<button class="check_box_img_onboarding" type="button"><i class="fa fa-plus plus_onboarding" aria-hidden="true"></i></button>
+		</div>
+	</div>
 </script>
 
 <!-- OLD CALENDAR -->
