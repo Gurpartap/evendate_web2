@@ -2512,6 +2512,8 @@ html.-noscroll {
 
 .sidebar_wrapper {padding: 12px}
 
+.sidebar_organizations_wrapper {overflow-y: auto}
+
 .sidebar_navigation.-items_3 ~ .sidebar_organizations_wrapper,
 .sidebar_navigation:not([class*='-items_']) + .sidebar_organizations_wrapper {
 	height: -webkit-calc(100% - 114px);
@@ -2629,7 +2631,10 @@ html.-noscroll {
 /* /header */
 /* recommendations */
 
-.recommendation_scroll {height: 380px}
+.recommendation_scroll {
+	height: 380px;
+	overflow-y: scroll;
+}
 
 .recommendations_item_onboarding_inside {
 	padding: 0 12px 0 12px;
@@ -2660,7 +2665,7 @@ html.-noscroll {
 	vertical-align: top;
 	padding-top: 20px;
 	margin: 0 36px 0 0;
-	width: 184px;
+	width: 180px;
 }
 
 .check_box_img_container_onboarding {
@@ -2945,6 +2950,7 @@ html.-noscroll {
 .organization_subscribers_wrapper {
 	height: -webkit-calc(100% - 45px);
 	height: calc(100% - 45px);
+	overflow-y: auto;
 }
 
 .organization_subscribers_divider {
