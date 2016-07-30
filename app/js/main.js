@@ -206,48 +206,113 @@ $.fn.extend({
 });
 
 function SubscribeButton($btn, options){
-	var self = this;
+	var self = this,
+		default_values = {
+			labels: {
+				subscribe: 'Подписаться',
+				unsubscribe: 'Отписаться',
+				subscribed: 'Подписан'
+			},
+			colors: {
+				subscribe: '-color_neutral_accent',
+				unsubscribe: '-color_accent',
+				subscribed: '-color_accent'
+			},
+			icons: {
+				subscribe: 'fa-plus',
+				unsubscribe: 'fa-times',
+				subscribed: 'fa-check'
+			}
+		},
+		classes = {
+			subscribed_state: '-Subscribed'
+		};
+	options = options ? options : {};
 	this.$btn = $btn;
+	this.is_subscribed = this.$btn.hasClass(classes.subscribed_state);
 	this.is_organization = self.$btn.data('organization-id') ? true : false;
 	this.id = this.is_organization ? self.$btn.data('organization-id') : self.$btn.data('event-id');
-	this.labels = {
-		subscribe: 'Подписаться',
-		unsubscribe: 'Отписаться',
-		subscribed: 'Подписан'
-	};
-	this.icons = {
-		subscribe: 'fa-plus',
-		unsubscribe: 'fa-times',
-		subscribed: 'fa-check'
-	};
-	this.colors = {
-		subscribe: '-color_neutral_accent',
-		unsubscribe: '-color_accent',
-		subscribed: '-color_accent'
-	};
+	
+	$.each(default_values, function(type, default_values) {
+		if(type == 'labels'){
+			self[type] = typeof options[type] == 'undefined' ? default_values : $.extend({}, default_values, options[type]);
+			return;
+		}
+		options[type] = typeof options[type] != 'undefined' ? options[type] : {};
+		if(typeof options[type] == 'object' && options[type] !== null){
+			$.each(default_values, function(state, default_value) {
+				var add_class = options[type][state] ? options[type][state] : default_value;
+				classes[state] = classes[state] ? classes[state].concat(' ', add_class) : add_class;
+			});
+		}
+	});
+	this.classes = classes;
 
-	if(typeof options != 'undefined'){
-		this.labels = typeof options.labels != 'undefined' ? $.extend(this.labels, options.labels) : this.labels;
-		this.icons = typeof options.icons != 'undefined' ? $.extend(this.icons, options.icons) : this.icons;
-		this.colors = typeof options.colors != 'undefined' ? $.extend(this.colors, options.colors) : this.colors;
-	}
-
-	this.$btn.bindHoverEvents = function(){
+	this.bindHoverEvents = function(){
+		var self = this;
 		self.$btn
 			.off('mouseenter.hoverSubscribed mouseleave.hoverSubscribed')
 			.on('mouseenter.hoverSubscribed', function(){
-				self.$btn.removeClass([self.icons.subscribed, self.colors.subscribed].join(' ')).addClass([self.icons.unsubscribe, self.colors.unsubscribe].join(' '));
+				self.$btn.removeClass(self.classes.subscribed).addClass(self.classes.unsubscribe);
 				self.$btn.children('.Text').text(self.labels.unsubscribe);
 			})
 			.on('mouseleave.hoverSubscribed', function(){
-				self.$btn.removeClass([self.icons.unsubscribe, self.colors.unsubscribe].join(' ')).addClass([self.icons.subscribed, self.colors.subscribed].join(' '));
+				self.$btn.removeClass(self.classes.unsubscribe).addClass(self.classes.subscribed);
 				self.$btn.children('.Text').text(self.labels.subscribed);
 			});
 		return self.$btn;
 	};
 
-	if(this.$btn.hasClass('-Subscribed')){
-		this.$btn.bindHoverEvents();
+	this.subscribe = function(){
+		var self = this;
+		if(this.is_subscribed){
+			console.warn('You already subscribed');
+		} else {
+			subscribeAction(true, self.is_organization, self.id, function(){
+				self.$btn
+					.removeClass([self.classes.subscribe, self.classes.subscribed].join(' '))
+					.addClass(['-Subscribed', self.classes.unsubscribe].join(' '))
+					.children('.Text').text(self.labels.unsubscribe);
+				self.bindHoverEvents();
+				self.is_subscribed = true;
+			});
+		}
+	};
+
+	this.unsubscribe = function(){
+		var self = this;
+		if(this.is_subscribed){
+			subscribeAction(false, this.is_organization, this.id, function(){
+				self.$btn
+					.removeClass([classes.subscribed_state, self.classes.unsubscribe, self.classes.subscribed].join(' '))
+					.addClass(self.classes.subscribe)
+					.off('mouseenter.hoverSubscribed mouseleave.hoverSubscribed')
+					.children('.Text').text(self.labels.subscribe);
+				self.is_subscribed = false;
+			});
+		} else {
+			console.warn('You are not subscribed');
+		}
+	};
+	
+	function subscribeAction(to_subscribe, is_org, id, callback){
+		to_subscribe = typeof to_subscribe == 'boolean' ? to_subscribe : true;
+		$.ajax({
+			url: is_org ? '/api/v1/organizations/'+id+'/subscriptions' : '/api/v1/events/'+id+'/favorites',
+			method: to_subscribe ? 'POST' : 'DELETE',
+			success: function(res){
+				ajaxHandler(res, function(){
+					callback();
+					if(is_org){
+						to_subscribe ? renderSidebarOrganizations(id, bindControllers) : hideSidebarOrganization(id);
+					}
+				}, ajaxErrorHandler)
+			}
+		});
+	}
+
+	if(this.is_subscribed){
+		this.bindHoverEvents();
 	}
 
 	if(!this.$btn.children('span').length){
@@ -255,36 +320,11 @@ function SubscribeButton($btn, options){
 	}
 
 	this.$btn.on('click.subscribe', function(){
-		var method,
-			url = self.is_organization ? '/api/v1/organizations/'+self.id+'/subscriptions' : '/api/v1/events/'+self.id+'/favorites';
-		if(self.$btn.hasClass('-Subscribed')){
-			method = 'DELETE';
-			self.$btn
-				.removeClass(['-Subscribed', self.colors.unsubscribe, self.colors.subscribed, self.icons.unsubscribe, self.icons.subscribed].join(' '))
-				.addClass([self.colors.subscribe, self.icons.subscribe].join(' '))
-				.off('mouseenter.hoverSubscribed mouseleave.hoverSubscribed')
-				.children('.Text').text(self.labels.subscribe);
+		if(self.is_subscribed){
+			self.unsubscribe();
 		} else {
-			method = 'POST';
-			self.$btn
-				.removeClass([self.colors.subscribe, self.colors.subscribed, self.icons.subscribe, self.icons.subscribed].join(' '))
-				.addClass(['-Subscribed', self.colors.unsubscribe, self.icons.unsubscribe].join(' '))
-				.bindHoverEvents()
-				.children('.Text').text(self.labels.unsubscribe);
+			self.subscribe();
 		}
-
-		$.ajax({
-			url: url,
-			method: method,
-			success: function(res){
-				ajaxHandler(res, function(data, text){
-					if(self.is_organization){
-						method == 'POST' ? renderSidebarOrganizations(self.id, bindControllers) : hideSidebarOrganization(self.id);
-					}
-				}, ajaxErrorHandler)
-			}
-		});
-
 	})
 }
 
@@ -338,6 +378,12 @@ function buildOrganizationBlock(organization, additional_fields){
 }
 
 
+function bindSubscribeButton($parent, options){
+	$parent = $parent ? $parent : $('body');
+	$parent.find('.Subscribe').not('.-Handled_Subscribe').each(function(){
+		new SubscribeButton($(this), options);
+	}).addClass('-Handled_Subscribe');
+}
 
 function bindDatePickers($parent){
 	$parent = $parent ? $parent : $('body');
