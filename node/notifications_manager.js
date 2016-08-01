@@ -55,6 +55,8 @@ NotificationsManager.prototype.create = function (notification, device) {
                         en: note.alert,
                         ru: note.alert
                     },
+                    ios_badgeType: 'Increase',
+                    ios_badgeCount: 1,
                     isIos: true,
                     include_player_ids: [device.device_token],
                     data: note.payload
