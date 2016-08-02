@@ -64,8 +64,8 @@ function Calendar($calendar, options){
 	}
 }
 
-Calendar.prototype.setMonth = function(next){
-	switch(next){
+Calendar.prototype.setMonth = function(month, year){
+	switch(month){
 		case 'prev':{
 			this.current_month = this.current_month.add(-1, 'months'); break;
 		}
@@ -76,7 +76,7 @@ Calendar.prototype.setMonth = function(next){
 			this.current_month = moment(); break;
 		}
 		default: {
-			this.current_month = this.current_month.month(next-1);
+			this.current_month = year ? this.current_month.set({'year': year, 'month': month-1}) : this.current_month.month(month-1);
 		}
 	}
 	this.renderTable();

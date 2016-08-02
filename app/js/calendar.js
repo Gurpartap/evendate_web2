@@ -4,9 +4,7 @@
 
 "use strict";
 
-var organizations_loaded = false,
-	organizations_refreshing_count = 0,
-	__STATES = {
+var __STATES = {
 		event: OneEvent,
 		feed: Feed,
 		organizations: OrganizationsList,
@@ -154,25 +152,17 @@ function Feed($view){
 		bindDropdown($parent);
 		Modal.bindCallModal($parent);
 		bindControllers($parent);
-		
-		$parent.find('.Subscribe').not('.-Handled_Subscribe').each(function(){
-			new SubscribeButton($(this), {
-				labels: {
-					subscribe: 'В избранное',
-					unsubscribe: 'Отписаться',
-					subscribed: 'В избранном'
-				},
-				colors: {
-					subscribe: '-color_neutral_accent',
-					unsubscribe: '-color_accent',
-					subscribed: '-color_accent'
-				},
-				icons: {
-					subscribe: 'fa-star-o',
-					subscribed: 'fa-star'
-				}
-			});
-		}).addClass('-Handled_Subscribe');
+		bindSubscribeButton($parent, {
+			labels: {
+				subscribe: 'В избранное',
+				unsubscribe: 'Отписаться',
+				subscribed: 'В избранном'
+			},
+			icons: {
+				subscribe: 'fa-star-o',
+				subscribed: 'fa-star'
+			}
+		});
 		
 		$parent.find('.HideEvent').not('.-Handled_HideEvent').each(function(){
 			var $this = $(this),
@@ -218,7 +208,8 @@ function Feed($view){
 	}
 	
 	function initFeedCalendar($parent){
-		var MainCalendar = new Calendar($parent.find('.FeedCalendar'), {
+		var state_date = state_data.date,
+			MainCalendar = new Calendar($parent.find('.FeedCalendar'), {
 			classes: {
 				wrapper_class: 'feed_calendar_wrapper',
 				table_class: 'feed_calendar_table',
@@ -258,8 +249,8 @@ function Feed($view){
 		}
 		
 		MainCalendar.init();
-		if(state_data.date){
-			MainCalendar.setMonth(state_data.date.split('-')[1]).selectDays(state_data.date);
+		if(state_date){
+			MainCalendar.setMonth(state_date.split('-')[1], state_date.split('-')[0]).selectDays(state_date);
 		}
 		setDaysWithEvents(MainCalendar);
 		MainCalendar.$calendar.on('month-changed', function(){
@@ -337,16 +328,15 @@ function Feed($view){
 		} else {
 			state_data.tab_state = 'actual'
 		}
+		state_data._index = History.getCurrentIndex();
+		state_data.reload = false;
+		History.replaceState(state_data, sub_states[state_data.tab_state].label);
 	}
-	state.title = sub_states[state_data.tab_state].label;
-	History.replaceState(state_data, state.title, '/feed');
-	
 	$wrapper.empty().data('tab_state_id', ++tab_state_id);
 	$wrapper.append(tmpl('feed-event-wrapper', {}));
+	renderFeedHeaderTabs(sub_states, state_data.tab_state);
 	initFeedCalendar($wrapper);
 	$window.off('scroll');
-	renderFeedHeaderTabs(sub_states, state_data.tab_state);
-	
 	uploadMoreEvents(sub_states[state_data.tab_state], 10, current_offset, function($events){
 		if($wrapper.data('tab_state_id') == tab_state_id){
 			
@@ -396,24 +386,16 @@ function OneEvent($view){
 		bindCollapsing($parent);
 		initNotifications($parent);
 		bindControllers($parent);
-		
-		$parent.find('.Subscribe').not('.-Handled_Subscribe').each(function(){
-			new SubscribeButton($(this), {
-				labels: {
-					subscribe: 'Добавить в избранное',
-					subscribed: 'В избранном'
-				},
-				colors: {
-					subscribe: '-color_neutral_accent',
-					unsubscribe: '-color_accent',
-					subscribed: '-color_accent'
-				},
-				icons: {
-					subscribe: 'fa-star-o',
-					subscribed: 'fa-star'
-				}
-			});
-		}).addClass('-Handled_Subscribe');
+		bindSubscribeButton($parent, {
+			labels: {
+				subscribe: 'Добавить в избранное',
+				subscribed: 'В избранном'
+			},
+			icons: {
+				subscribe: 'fa-star-o',
+				subscribed: 'fa-star'
+			}
+		});
 		
 		$parent.find('.CancelEvent').on('click.CancelEvent', function(){
 			$.ajax({
@@ -704,95 +686,164 @@ function OneEvent($view){
 }
 
 function OrganizationsList($view){
-	if (__STATES.getCurrentState() == 'organizations' && organizations_loaded) return;
-	$.ajax({
-		url: '/api/v1/organizations?fields=is_subscribed,subscribed_count',
-		success: function(res){
-			organizations_loaded = true;
-			var _organizations_by_types = {},
-				$categories = $view.find('.new-organizations-categories-wrapper'),
-				$organizations = $view.find('.new-organizations-list');
-			res.data.forEach(function(organization){
-				var _key = '_' + organization.type_id;
-				if (!_organizations_by_types.hasOwnProperty(_key)){
-					_organizations_by_types[_key] = {type_name: organization.type_name, organizations: {}, count: 0, type_order: parseInt(organization.organization_type_order), type_id: organization.type_id};
-				}
-				_organizations_by_types[_key].organizations['_' + organization.id] = organization;
-				_organizations_by_types[_key].count++;
-			});
-			
-			var sorted_keys = Object.keys(_organizations_by_types).sort(function(a,b){
-				return _organizations_by_types[a].type_order - _organizations_by_types[b].type_order;
-			});
-			
-			$categories.empty();
-			
-			sorted_keys.forEach(function(key){
-				var type = _organizations_by_types[key],
-					$category = tmpl('new-organizations-category', type);
-				
-				$category.data('organizations', type.organizations).on('click', function(){
-					var $this = $(this);
-					$this.siblings().removeClass('active');
-					$this.addClass('active');
-					History.pushState({page: 'organizations?type=' + type.type_id}, type.type_name, 'organizations?type=' + type.type_id);
-					$organizations.empty();
-					$.each(type.organizations, function(_id, organization){
-						if(organization.is_subscribed){
-							organization.btn_type_class = 'empty';
-							organization.btn_text = 'Отписаться';
-						}else{
-							organization.btn_type_class = 'pink';
-							organization.btn_text = 'Подписаться';
-						}
-						organization.subscribed_count_text = getUnitsText(organization.subscribed_count, __C.TEXTS.SUBSCRIBERS);
-						var $organization = tmpl('new-organization-item', organization).data('organization', organization);
-						
-						$organizations.append($organization);
-						bindControllers($organizations);
+	var $wrapper = $view.find('.page_wrapper'),
+		all_categories = [],
+		all_organizations = [],
+		organizations_by_categories = [];
+	
+	function bindOrganizationsEvents($parent) {
+		bindRippleEffect($parent);
+		bindSubscribeButton($parent, {
+			colors: {
+				subscribe: '-color_marginal_accent'
+			},
+			icons: null
+		});
+		bindControllers($parent);
+	}
+	
+	function uploadOrganizations(success) {
+		all_categories = [];
+		all_organizations = [];
+		organizations_by_categories = [];
+		
+		$.ajax({
+			url: '/api/v1/organizations/types',
+			method: 'GET',
+			data: {
+				fields: 'organizations{fields: "img_small_url,is_subscribed,subscribed_count", order_by: "-subscribed_count"}',
+				order_by: 'order_position'
+			},
+			success: function(res){
+				var categories = [];
+				ajaxHandler(res, function(data, text){
+					data.forEach(function(category) {
+						all_organizations = all_organizations.concat(category.organizations);
+					});
+					all_organizations.sort(function(a, b) {
+						return b.subscribed_count - a.subscribed_count
 					});
 					
-					$organizations.find('.subscribe-btn').on('click', function(){
-						organizations_refreshing_count++;
-						var $btn = $(this),
-							to_delete_state = $btn.hasClass('btn-empty'),
-							sub_id = $btn.data('subscription-id'),
-							org_id = $btn.data('organization-id');
-						if ($btn.hasClass(__C.CLASSES.DISABLED)) return;
+					data.forEach(function(cat){
+						if(typeof all_categories[cat.id] == 'undefined'){
+							all_categories[cat.id] = {
+								is_parent_type: true,
+								type_id: cat.id,
+								type_name: cat.name,
+								order_position: cat.order_position,
+								new_events_count: 0
+							};
+						}
+						all_categories[cat.id].new_events_count += cat.new_events_count;
 						
-						type.organizations['_' + org_id].is_subscribed = !to_delete_state;
-						
-						$btn.
-						toggleClass('btn-empty btn-pink disabled');
-						
-						if (to_delete_state){
-							$btn.find('span').text('Подписаться');
-							toggleSubscriptionState(false, org_id, function(){});
-							$btn.removeClass(__C.CLASSES.DISABLED);
-							hideSidebarOrganization(org_id);
-							return false;
-						}else{
-							$btn.find('span').text('Отписаться');
-							toggleSubscriptionState(true, org_id, function(res){
-								$btn.data('subscription-id', res.data.subscription_id);
-								return false;
-							});
-							
-							$btn.removeClass(__C.CLASSES.DISABLED);
-							renderSidebarOrganizations([$btn.parents('.new-organization').data('organization')], bindControllers);
+						if(typeof organizations_by_categories[cat.id] == 'undefined'){
+							organizations_by_categories[cat.id] = cat.organizations;
 						}
 					});
-				});
-				$categories.append($category);
+					categories = Array.newFrom(all_categories);
+					categories.clean();
+					categories.sort(function(a, b) {
+						return a.order_position - b.order_position
+					});
+					$.each(categories, function(i, cat){
+						if(cat.is_parent_type){
+							cat.aside_classes = ['counter'];
+							if(cat.new_events_count){
+								cat.new_events_count = '+' + cat.new_events_count;
+							} else {
+								cat.aside_classes.push(__C.CLASSES.NEW_HIDDEN);
+							}
+						} else {
+							cat.new_events_count = '';
+							cat.aside_classes = ['fa_icon', 'fa-angle-down', '-empty'];
+						}
+						cat.aside_classes = cat.aside_classes.join(' ');
+					});
+					success(organizations_by_categories, categories, all_organizations);
+				}, ajaxErrorHandler)
+			}
+		});
+	}
+	
+	function initOrganizationsPage($parent) {
+		var $categories = $parent.find('.Category');
+		
+		bindOrganizationsEvents($parent);
+		$parent.find('.OrganizationsCategoriesScroll').scrollbar({disableBodyScroll: true});
+		$parent.find('.ShowAllOrganizations').on('click.showAllOrganizations', function(){
+			$categories.removeClass(__C.CLASSES.NEW_ACTIVE).siblings('.SubcategoryWrap').height(0);
+			
+			uploadOrganizations(function(organizations_by_categories, categories, all_organizations) {
+				$parent.empty().append(tmpl('organizations-wrapper', {
+					organization_categories: tmpl('organization-category', categories),
+					organization_units: buildOrganisationUnits(all_organizations)
+				}));
+				initOrganizationsPage($parent);
 			});
-			$view.find('.new-organizations-categories-wrapper').slimscroll({
-				height: window.innerHeight - $('.new-organizations-categories-wrapper').offset().top - 50
-			});
-			var selected_type = searchToObject().type ? searchToObject().type : 1;
-			$view.find('.new-category.type-' + selected_type).click();
-			bindControllers($view);
+		});
+		$categories.on('click.selectCategory', function(){
+			var $this = $(this),
+				$wrap = $this.next('.SubcategoryWrap'),
+				is_parent_category = !!$wrap.length,
+				is_this_active = $this.hasClass(__C.CLASSES.NEW_ACTIVE),
+				type_id = $this.data('type-id');
+			$this.parent().find('.Category').not($this).removeClass(__C.CLASSES.NEW_ACTIVE).filter('.SubcategoryWrap').height(0);
+			if(is_parent_category){
+				$wrap.height(is_this_active ? 0 : $wrap.children().outerHeight());
+				$this.toggleClass(__C.CLASSES.NEW_ACTIVE);
+			} else {
+				if(is_this_active){
+					uploadOrganizations(function(organizations_by_categories, categories) {
+						$parent.empty().append(tmpl('organizations-wrapper', {
+							organization_categories: tmpl('organization-category', categories),
+							organization_units: buildOrganisationUnits(organizations_by_categories[type_id])
+						}));
+						selectCategory(all_categories[type_id]);
+						initOrganizationsPage($parent);
+					});
+				} else {
+					selectCategory(all_categories[type_id]);
+					bindOrganizationsEvents($parent.find('.OrganizationsWrapper').html(buildOrganisationUnits(organizations_by_categories[type_id])));
+				}
+			}
+		});
+	}
+	
+	function buildOrganisationUnits(data){
+		data.forEach(function(org){
+			org.subscribe_button_text = org.is_subscribed ? 'Подписан' : 'Подписаться';
+			org.subscribe_button_classes = org.is_subscribed ? '-color_accent -Subscribed' : '-color_marginal_accent';
+			org.subscribed_text = org.subscribed_count + getUnitsText(org.subscribed_count, __C.TEXTS.SUBSCRIBERS);
+		});
+		return tmpl('organization-unit', data);
+	}
+	
+	function selectCategory(category){
+		var state_data = History.getState().data;
+		
+		state_data.title = category.type_name ? category.type_name : state_data.title;
+		state_data.type_id = category.type_id ? category.type_id : state_data.type_id;
+		state_data._index = History.getCurrentIndex();
+		state_data.reload = false;
+		$wrapper.find('.Category').filter('[data-type-id="'+state_data.type_id+'"]').addClass(__C.CLASSES.NEW_ACTIVE);
+		History.replaceState(state_data, category.type_name);
+		changeMainTitle(state_data.title);
+	}
+	
+	$wrapper.empty();
+	uploadOrganizations(function(organizations_by_categories, categories, all_organizations) {
+		var type_id = History.getState().data.type_id,
+			organizations = type_id ? organizations_by_categories[type_id] : all_organizations;
+		$wrapper.append(tmpl('organizations-wrapper', {
+			organization_categories: tmpl('organization-category', categories),
+			organization_units: buildOrganisationUnits(organizations)
+		}));
+		if(type_id){
+			selectCategory(type_id);
 		}
+		initOrganizationsPage($wrapper);
 	});
+	
 }
 
 function Organization($view){
@@ -803,29 +854,18 @@ function Organization($view){
 		bindRippleEffect($parent);
 		bindAddAvatar($parent);
 		trimAvatarsCollection($parent);
-		
-		$parent.find('.Subscribe').not('.-Handled_Subscribe').each(function(){
-			new SubscribeButton($(this), {
-				labels: {
-					subscribe: 'Добавить в избранное',
-					subscribed: 'В избранном'
-				},
-				colors: {
-					subscribe: '-color_neutral_accent',
-					unsubscribe: '-color_accent',
-					subscribed: '-color_accent'
-				}
-			});
-		}).addClass('-Handled_Subscribe');
-		
+		bindSubscribeButton($parent, {
+			labels: {
+				subscribe: 'Добавить в избранное',
+				subscribed: 'В избранном'
+			}
+		});
 		bindControllers($parent);
 	}
 	
 	function initOrganizationPage($parent){
 		bindTabs($parent);
-		//placeAvatarDefault($parent.find('.organization_info_page'));
-		
-		new SubscribeButton($('.OrganizationSubscribe'), {
+		bindSubscribeButton($parent.find('.OrganizationSubscribeButtonWrap'), {
 			colors: {
 				subscribe: '-color_accent',
 				unsubscribe: '-color_neutral',
@@ -1238,7 +1278,7 @@ function OneFriend($view){
 			});
 			
 			$view.find('.back-to-friends-list').on('click', function(){
-				History.pushState({page: 'friends'}, 'Мои друзья', 'friends');
+				History.pushState({_index: History.getCurrentIndex(), page: 'friends'}, 'Мои друзья', 'friends');
 			});
 			getFriendFeed();
 		}
@@ -2302,48 +2342,6 @@ $(document)
 	.ajaxError(ajaxErrorHandler)
 	.ready(function(){
 		
-		function renderState(){
-			var page_split = __STATES.getCurrentState().split('/'),
-				page = page_split[0],
-				$sidebar_nav_items = $('.SidebarNavItem'),
-				$tabs = $('.HeaderTabsWrapper').find('.Tab'),
-				$views = $('.PageView'),
-				$view,
-				state,
-				controller;
-			
-			$(window).off('scroll');
-			$(window).data('disable_upload', false);
-			$('#main_header').removeClass('-with_tabs');
-			switch(typeof __STATES[page]){
-				case 'function': {
-					controller = __STATES[page];
-					break;
-				}
-				default:
-				case 'undefined': {
-					//TODO: 404 page
-					console.error('PAGE RENDERING ERROR');
-					return false;
-				}
-			}
-			$view = page == 'friend' ? $('.friends-app') : $views.filter('[data-controller="'  + controller.name + '"]');
-			
-			$views.not($view).addClass(__C.CLASSES.NEW_HIDDEN);
-			controller($view);
-			$view.removeClass(__C.CLASSES.NEW_HIDDEN);
-			
-			state = History.getState();
-			$('#page_title').text(state.title);
-			if(page != 'search')
-				$('#search_bar_input').val('');
-			
-			$sidebar_nav_items.not('[data-page="' + page + '"]').removeClass(__C.CLASSES.NEW_ACTIVE)
-				.end().filter('[data-page="' + page + '"]').addClass(__C.CLASSES.NEW_ACTIVE);
-			$tabs.not('[data-tab_state="' + state.data.tab_state + '"]').removeClass(__C.CLASSES.NEW_ACTIVE)
-				.end().filter('[data-tab_state="' + state.data.tab_state + '"]').addClass(__C.CLASSES.NEW_ACTIVE);
-		}
-		
 		function initSidebar(){
 			var $sidebar = $('#main_sidebar'),
 				$sidebar_nav = $sidebar.find('.SidebarNav'),
@@ -2363,7 +2361,7 @@ $(document)
 			
 			$main_header.find('#search_bar_input').on('keypress', function(e){
 				if (e.which == 13){
-					History.pushState({page: 'search'}, 'Поиск: ' + this.value, '/search?q=' + encodeURIComponent(this.value));
+					History.pushState({_index: History.getCurrentIndex(), page: 'search'}, 'Поиск: ' + this.value, '/search?q=' + encodeURIComponent(this.value));
 				}
 			});
 			

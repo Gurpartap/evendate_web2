@@ -48,6 +48,15 @@ Array.newFrom = function(original) {
 	}
 	return new_array;
 };
+Array.prototype.clean = function(deleteValue) {
+	for (var i = 0; i < this.length; i++) {
+		if (this[i] == deleteValue) {
+			this.splice(i, 1);
+			i--;
+		}
+	}
+	return this;
+};
 
 function arrayToSpaceSeparatedString(){return this.join(' ')}
 
@@ -615,7 +624,7 @@ function bindControllers($parent){
 				case 1: {
 					if ($this.hasClass(__C.CLASSES.DISABLED)) return true;
 					if (page_name != undefined){
-						History.pushState($this.data(), $this.data('title') ? $this.data('title'): $this.text(), '/'+page_name);
+						History.pushState($.extend({}, $this.data(), {_index: History.getCurrentIndex()}), $this.data('title') ? $this.data('title'): $this.text(), '/'+page_name);
 					} else {
 						if (window[controller_name] != undefined && window[controller_name] instanceof Function){
 							window[controller_name]();
@@ -775,6 +784,49 @@ function showNotifier(response){
 
 
 
+function renderState(){
+	var page_split = __STATES.getCurrentState().split('/'),
+		page = page_split[0],
+		$sidebar_nav_items = $('.SidebarNavItem'),
+		$tabs = $('.HeaderTabsWrapper').find('.Tab'),
+		$views = $('.PageView'),
+		state = History.getState(),
+		$view,
+		controller;
+	
+	if(!(state.data.reload === false && state.data._index+1 == History.getCurrentIndex())){
+		$(window).off('scroll');
+		$(window).data('disable_upload', false);
+		$('#main_header').removeClass('-with_tabs');
+		switch(typeof __STATES[page]){
+			case 'function': {
+				controller = __STATES[page];
+				break;
+			}
+			default:
+			case 'undefined': {
+				//TODO: 404 page
+				console.error('PAGE RENDERING ERROR');
+				return false;
+			}
+		}
+		$view = page == 'friend' ? $('.friends-app') : $views.filter('[data-controller="'  + controller.name + '"]');
+		
+		$views.not($view).addClass(__C.CLASSES.NEW_HIDDEN);
+		controller($view);
+		$view.removeClass(__C.CLASSES.NEW_HIDDEN);
+	}
+	
+	changeMainTitle(state.title);
+	if(page != 'search')
+		$('#search_bar_input').val('');
+	
+	$sidebar_nav_items.not('[data-page="' + page + '"]').removeClass(__C.CLASSES.NEW_ACTIVE)
+		.end().filter('[data-page="' + page + '"]').addClass(__C.CLASSES.NEW_ACTIVE);
+	$tabs.not('[data-tab_state="' + state.data.tab_state + '"]').removeClass(__C.CLASSES.NEW_ACTIVE)
+		.end().filter('[data-tab_state="' + state.data.tab_state + '"]').addClass(__C.CLASSES.NEW_ACTIVE);
+}
+
 function hideSidebarOrganization(org_id){
 	var $organization_item = $('#main_sidebar').find('.organization_item[data-organization_id="' + org_id + '"]').removeClass('-show');
 	setTimeout(function(){
@@ -869,6 +921,10 @@ function renderHeaderTabs(tabs){
 	}));
 	bindControllers($wrapper);
 	$('#main_header').addClass('-with_tabs');
+}
+
+function changeMainTitle(new_title){
+	$('#page_title').text(new_title);
 }
 
 

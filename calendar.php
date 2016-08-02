@@ -194,50 +194,7 @@ $user_full_name = $user->getLastName().' '.$user->getFirstName(); ?>
 
 		<!-- START row-->
 		<div class="organizations-app app_view -hidden PageView" data-controller="OrganizationsList">
-			<div class="page_wrapper">
-				<aside class="organizations_aside">
-					<div class="page organizations_categories">
-						<header class="organizations_categories_header">
-							<span class="organizations_categories_title">Рубрики</span>
-							<span class="action -color_accent">Все</span>
-						</header>
-						<div class="organizations_categories_container scrollbar-outer OrganizationsCategoriesScroll">
-							<div class="organizations_category Category">
-								<span class="organizations_category_title">Парки</span>
-								<span class="organizations_category_aside counter">+245</span>
-							</div>
-							<div class="organizations_category Category">
-								<span class="organizations_category_title">Парки</span>
-								<span class="organizations_category_aside fa_icon fa-angle-down -empty"></span>
-							</div>
-							<div class="collapsing_wrapper SubcategoryWrap">
-								<div class="organizations_subcategories_container collapsing_content">
-									<div class="organizations_category Category">
-										<span class="organizations_category_title">Парки</span>
-										<span class="organizations_category_aside counter">+245</span>
-									</div>
-								</div>
-							</div>
-							<div class="organizations_category Category">
-								<span class="organizations_category_title">Парки</span>
-								<span class="organizations_category_aside counter">+245</span>
-							</div>
-						</div>
-					</div>
-					<button class="button -low -fill -color_neutral_accent RippleEffect" type="button">Предложить организатора</button>
-				</aside>
-
-				<div class="organizations_wrapper">
-					<div class="page organization_unit">
-						<div class="organization_unit_avatar img_holder Controller" data-page="organization/1" data-organization-id="1" style="background-image: url('http://evendate.ru/organizations_images/logos/large/77.png')"></div>
-						<div class="organization_unit_content">
-							<h5 class="organization_unit_title Controller" data-page="organization/1" data-organization-id="1">ГУУ</h5>
-							<span class="organization_unit_subscribers">245 подписчика</span>
-							<button class="button -low -color_marginal_accent RippleEffect" type="button">Подписаться</button>
-						</div>
-					</div>
-				</div>
-			</div>
+			<div class="page_wrapper"></div>
 		</div>
 		<!-- END row-->
 
