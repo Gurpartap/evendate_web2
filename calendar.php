@@ -137,76 +137,6 @@ $user_full_name = $user->getLastName().' '.$user->getFirstName(); ?>
 	<div id="main_section">
 
 		<!-- START row-->
-		<div class="organizations-app app_view -hidden PageView" data-controller="OrganizationsList">
-			<div class="page_wrapper">
-				<div class="sidebar_all">
-					<div class="sidebar">
-						<div class="header_sidebar"><div class="text_header_container"><span class="text_header_catalog">Рубрики</span></div><div class="text_header_container"><span class="text_header_catalog_2">ВСЕ</span></div></div>
-						<div class="scrollbar-outer CatalogScrollbar">
-						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
-						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
-						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
-						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
-						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
-						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
-						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
-						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
-						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
-						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
-						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
-						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
-						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
-						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
-						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
-						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
-						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">Университеты</span></div>
-						<div class="sidebar_item_catalog"><span class="text_sidebar_item_catalog">&&&&&&</span></div>
-						</div>
-					</div>
-					<button class="RippleEffect Controller sidebar_button" type="button"><span class="text_sidebar_button">Предложить организатора</span></button>
-				</div>
-				<div class="catalog_organisations_list">
-					<div class="catalog_organisations_item">
-						<div class="catalog_img_container"><img src="app/img/logo_120.png" class="catalog_img_size"></div><div class="catalog_organisation_content">
-							<div class="text_catalog_item_header"><span class="text_catalog_item_content_header">Академия Яндекса Академия Яндекса</span></div>
-							<div><span class="text_catalog_item_content">412 подписчика</span></div>
-							<button type="button" class="button -color_neutral_secondary"><span>ПОДПИСАТЬСЯ</span></button>
-						</div>
-					</div>
-					<div class="catalog_organisations_item">
-						<div class="catalog_img_container"><img src="app/img/logo_120.png" class="catalog_img_size"></div><div class="catalog_organisation_content">
-							<div class="text_catalog_item_header"><span class="text_catalog_item_content_header">Академия Яндекса</span></div>
-							<div><span class="text_catalog_item_content">412 подписчика</span></div>
-							<button type="button" class="button -color_primary_alt"><span>ПОДПИСАТЬСЯ</span></button>
-						</div>
-					</div>
-					<div class="catalog_organisations_item">
-						<div class="catalog_img_container"><img src="app/img/logo_120.png" class="catalog_img_size"></div><div class="catalog_organisation_content">
-							<div class="text_catalog_item_header"><span class="text_catalog_item_content_header">Академия Яндекса</span></div>
-							<div><span class="text_catalog_item_content">412 подписчика</span></div>
-							<button type="button" class="button -color_primary_alt"><span>ПОДПИСАТЬСЯ</span></button>
-						</div>
-					</div>
-					<div class="catalog_organisations_item">
-						<div class="catalog_img_container"><img src="app/img/logo_120.png" class="catalog_img_size"></div><div class="catalog_organisation_content">
-							<div class="text_catalog_item_header"><span class="text_catalog_item_content_header">Академия Яндекса</span></div>
-							<div><span class="text_catalog_item_content">412 подписчика</span></div>
-							<button type="button" class="button -color_primary_alt"><span>ПОДПИСАТЬСЯ</span></button>
-						</div>
-					</div>
-					<div class="catalog_organisations_item">
-						<div class="catalog_img_container"><img src="app/img/logo_120.png" class="catalog_img_size"></div><div class="catalog_organisation_content">
-							<div class="text_catalog_item_header"><span class="text_catalog_item_content_header">Академия Яндекса</span></div>
-							<div><span class="text_catalog_item_content">412 подписчика</span></div>
-							<button type="button" class="button -color_primary_alt"><span>ПОДПИСАТЬСЯ</span></button>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<!-- END row-->
-
-		<!-- START row-->
 		<div class="friends-app app_view -hidden PageView" data-controller="Friends">
 			<div class="col-md-12" data-controller="Friends" style="padding-top: 100px;">
 
@@ -261,6 +191,55 @@ $user_full_name = $user->getLastName().' '.$user->getFirstName(); ?>
 		<div class="feed-app app_view -hidden PageView" data-controller="Feed">
 			<div class="page_wrapper"></div>
 		</div>
+
+		<!-- START row-->
+		<div class="organizations-app app_view -hidden PageView" data-controller="OrganizationsList">
+			<div class="page_wrapper">
+				<aside class="organizations_aside">
+					<div class="page organizations_categories">
+						<header class="organizations_categories_header">
+							<span class="organizations_categories_title">Рубрики</span>
+							<span class="action -color_accent">Все</span>
+						</header>
+						<div class="organizations_categories_container scrollbar-outer OrganizationsCategoriesScroll">
+							<div class="organizations_category Category">
+								<span class="organizations_category_title">Парки</span>
+								<span class="organizations_category_aside counter">+245</span>
+							</div>
+							<div class="organizations_category Category">
+								<span class="organizations_category_title">Парки</span>
+								<span class="organizations_category_aside fa_icon fa-angle-down -empty"></span>
+							</div>
+							<div class="collapsing_wrapper SubcategoryWrap">
+								<div class="organizations_subcategories_container collapsing_content">
+									<div class="organizations_category Category">
+										<span class="organizations_category_title">Парки</span>
+										<span class="organizations_category_aside counter">+245</span>
+									</div>
+								</div>
+							</div>
+							<div class="organizations_category Category">
+								<span class="organizations_category_title">Парки</span>
+								<span class="organizations_category_aside counter">+245</span>
+							</div>
+						</div>
+					</div>
+					<button class="button -low -fill -color_neutral_accent RippleEffect" type="button">Предложить организатора</button>
+				</aside>
+
+				<div class="organizations_wrapper">
+					<div class="page organization_unit">
+						<div class="organization_unit_avatar img_holder Controller" data-page="organization/1" data-organization-id="1" style="background-image: url('http://evendate.ru/organizations_images/logos/large/77.png')"></div>
+						<div class="organization_unit_content">
+							<h5 class="organization_unit_title Controller" data-page="organization/1" data-organization-id="1">ГУУ</h5>
+							<span class="organization_unit_subscribers">245 подписчика</span>
+							<button class="button -low -color_marginal_accent RippleEffect" type="button">Подписаться</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- END row-->
 
 		<!-- START row-->
 		<div class="organization-app app_view -hidden PageView" data-controller="Organization">
