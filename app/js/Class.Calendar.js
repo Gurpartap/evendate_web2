@@ -14,7 +14,7 @@ function Calendar($calendar, options){
 			th_class: 'calendar_weekday',
 			td_class: 'calendar_day',
 			td_additional_classes: [],
-			td_disabled_class: '-calendar_day_disabled',
+			td_disabled_class: '-disabled',
 			table_cell_class: 'calendar_cell',
 			today_class: 'today'
 		},
@@ -64,8 +64,8 @@ function Calendar($calendar, options){
 	}
 }
 
-Calendar.prototype.setMonth = function(next){
-	switch(next){
+Calendar.prototype.setMonth = function(month, year){
+	switch(month){
 		case 'prev':{
 			this.current_month = this.current_month.add(-1, 'months'); break;
 		}
@@ -76,7 +76,7 @@ Calendar.prototype.setMonth = function(next){
 			this.current_month = moment(); break;
 		}
 		default: {
-			this.current_month = this.current_month.month(next-1);
+			this.current_month = year ? this.current_month.set({'year': year, 'month': month-1}) : this.current_month.month(month-1);
 		}
 	}
 	this.renderTable();
@@ -94,7 +94,7 @@ Calendar.prototype.destroyTable = function(){
 Calendar.prototype.setMonthName = function(){
 	this.$calendar.find('.MonthName')
 		.data('month', this.current_month.month())
-		.text(this.current_month.lang('ru').format("MMMM YYYY").capitalize());
+		.text(this.current_month.format("MMMM YYYY").capitalize());
 	return this;
 };
 
@@ -457,8 +457,10 @@ Calendar.prototype.bindMonthArrows = function(){
 
 Calendar.prototype.bindDaySelection = function(){
 	var self = this,
-		$days = self.$calendar.find('.'+this.options.classes.td_class).not('.'+this.options.classes.td_disabled_class);
-	$days.on('click', function(){
+		$days_in_month = self.$calendar.find('.'+this.options.classes.td_class),
+		$active_days = $days_in_month.not('.'+this.options.classes.td_disabled_class);
+	$days_in_month.off('click.bindDaySelection');
+	$active_days.on('click.bindDaySelection', function(){
 		if(self.options.multi_selection === true && $(this).hasClass(__C.CLASSES.NEW_ACTIVE)){
 			self.deselectDays($(this).data('date'));
 		} else {

@@ -1703,9 +1703,9 @@ html.-noscroll {
 .calendar_weekday {text-align: inherit} /*FUB*/
 .-weekday_selection .calendar_weekday {cursor: pointer}
 
-.calendar_day:not(.-calendar_day_disabled) {cursor: pointer}
+.calendar_day:not(.-disabled) {cursor: pointer}
 .calendar_day.not_this_month,
-.calendar_day.-calendar_day_disabled {opacity: .5}
+.calendar_day.-disabled {opacity: .5}
 
 /* /Calendar */
 /* DatePicker */
@@ -1741,6 +1741,11 @@ html.-noscroll {
 .avatar.-rounded {
 	border-radius: 50%;
 	overflow: hidden;
+	-webkit-transform: translate3d(0,0,0);
+	-moz-transform: translate3d(0,0,0);
+	-ms-transform: translate3d(0,0,0);
+	-o-transform: translate3d(0,0,0);
+	transform: translate3d(0,0,0);
 }
 .avatar.-bordered {border: 2px solid #fff}
 .avatar.-shadowed {box-shadow: 0 1px 4px rgba(0,0,0,0.16)}
@@ -2368,6 +2373,8 @@ html.-noscroll {
 
 .sidebar_wrapper {padding: 12px}
 
+.sidebar_organizations_wrapper {overflow-y: auto}
+
 .sidebar_navigation.-items_3 ~ .sidebar_organizations_wrapper,
 .sidebar_navigation:not([class*='-items_']) + .sidebar_organizations_wrapper {
 	height: -webkit-calc(100% - 114px);
@@ -2485,7 +2492,10 @@ html.-noscroll {
 /* /header */
 /* recommendations */
 
-.recommendation_scroll {height: 380px}
+.recommendation_scroll {
+	height: 380px;
+	overflow-y: scroll;
+}
 
 .recommendations_item_onboarding_inside {
 	padding: 0 12px 0 12px;
@@ -2516,7 +2526,7 @@ html.-noscroll {
 	vertical-align: top;
 	padding-top: 20px;
 	margin: 0 36px 0 0;
-	width: 184px;
+	width: 180px;
 }
 
 .check_box_img_container_onboarding {
@@ -2669,6 +2679,147 @@ html.-noscroll {
 
 .edit_event_vk_right_block {height: 200px}
 
+
+/* ORGANIZATIONS */
+
+.organizations-app > .page_wrapper {
+	padding: 40px 0;
+}
+
+.organizations_aside {
+	position: fixed;
+	width: 250px;
+	height: -webkit-calc(100% - 120px);
+	height: calc(100% - 120px);
+}
+
+.organizations_categories {
+	margin-bottom: 12px;
+	height: -webkit-calc(100% - 40px);
+	height: calc(100% - 40px);
+}
+
+.organizations_categories_header {
+	display: flex;
+	justify-content: space-between;
+	padding: 12px;
+	font-size: 12px;
+	border-bottom: 1px solid #e8e8e8;
+}
+
+.organizations_categories_title {
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.organizations_categories_container,
+.organizations_subcategories_container {padding: 6px 0}
+
+.organizations_categories_container {
+	height: -webkit-calc(100% - 40px);
+	height: calc(100% - 40px);
+}
+
+.organizations_category {
+	padding: 8px 65px 8px 12px;
+	cursor: pointer;
+}
+
+.organizations_category:hover {
+	background-color: #f6f6f6;
+	background-color: var(--color_background);
+}
+
+.organizations_category.-active {
+	color: #fff;
+	background-color: #f82969;
+	background-color: var(--color_accent);
+}
+
+.organizations_subcategories_container > .organizations_category {padding-left: 30px}
+.organizations_category_title {font-size: .79em}
+
+.organizations_category_aside {
+	position: absolute;
+	top: 0;
+	right: 0;
+}
+.organizations_category_aside.fa_icon {
+	margin: 6px 16px;
+	font-size: 1.2em;
+	-webkit-transform: rotateZ(0deg);
+	-moz-transform: rotateZ(0deg);
+	-ms-transform: rotateZ(0deg);
+	-o-transform: rotateZ(0deg);
+	transform: rotateZ(0deg);
+	-webkit-transition: transform .3s ease;
+	-moz-transition: transform .3s ease;
+	-o-transition: transform .3s ease;
+	transition: transform .3s ease;
+}
+.organizations_category.-active > .fa_icon {
+	-webkit-transform: rotateZ(180deg);
+	-moz-transform: rotateZ(180deg);
+	-ms-transform: rotateZ(180deg);
+	-o-transform: rotateZ(180deg);
+	transform: rotateZ(180deg);
+}
+
+.organizations_category_aside.counter {margin: 4px 12px}
+.organizations_category.-active > .counter {display: none}
+
+.organizations_wrapper {
+	display: block;
+	margin-left: 300px;
+	font-size: 0;
+}
+
+.organization_unit {
+	display: inline-block;
+	vertical-align: top;
+	width: -webkit-calc((100% - 30px) / 2);
+	width: calc((100% - 30px) / 2);
+	margin-bottom: 18px;
+	padding: 12px;
+	font-size: 0;
+}
+
+.organization_unit:nth-child(even) {margin-left: 30px}
+
+.organization_unit_avatar,
+.organization_unit_content {
+	display: inline-block;
+	vertical-align: top;
+}
+
+.organization_unit_avatar {
+	width: 95px;
+	height: 95px;
+	background-size: contain;
+}
+
+.organization_unit_content {
+	width: -webkit-calc(100% - 107px);
+	width: calc(100% - 107px);
+	margin-left: 12px;
+	font-size: 1rem;
+}
+
+.organization_unit_title {
+	display: block;
+	height: 2em;
+	margin: 9px 0 6px;
+	overflow: hidden;
+}
+
+.organization_unit_subscribers {
+	display: block;
+	margin: 6px 0;
+	font-size: 0.88em;
+	color: #9fa6b3;
+	color: var(--color_primary_50);
+}
+
 /* ORGANIZATION */
 
 .organization_info_page {
@@ -2801,6 +2952,7 @@ html.-noscroll {
 .organization_subscribers_wrapper {
 	height: -webkit-calc(100% - 45px);
 	height: calc(100% - 45px);
+	overflow-y: auto;
 }
 
 .organization_subscribers_divider {

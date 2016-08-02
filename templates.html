@@ -544,6 +544,47 @@
 
 <!-- Organization Page -->
 
+<script type="javascript/template" id="tmpl-organizations-wrapper">
+	<aside class="organizations_aside">
+		<div class="page organizations_categories">
+			<header class="organizations_categories_header">
+				<span class="organizations_categories_title -unselectable">Рубрики</span>
+				<span class="action -color_accent ShowAllOrganizations">Все</span>
+			</header>
+			<div class="organizations_categories_container scrollbar-outer OrganizationsCategoriesScroll">{organization_categories}</div>
+		</div>
+		<!--<button class="button -low -fill -color_neutral_accent RippleEffect" type="button">Предложить организатора</button>-->
+	</aside>
+
+	<div class="organizations_wrapper OrganizationsWrapper">{organization_units}</div>
+</script>
+
+<script type="javascript/template" id="tmpl-organization-unit">
+	<div class="page organization_unit">
+		<div class="organization_unit_avatar img_holder Controller" data-page="organization/{id}" data-organization-id="{id}" style="background-image: url('{img_small_url}')"></div>
+		<div class="organization_unit_content">
+			<h5 class="organization_unit_title Controller" data-page="organization/{id}" data-organization-id="{id}">{short_name}</h5>
+			<span class="organization_unit_subscribers">{subscribed_text}</span>
+			<button class="button -low {subscribe_button_classes} Subscribe RippleEffect" type="button" data-organization-id="{id}">{subscribe_button_text}</button>
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-organization-category">
+	<div class="organizations_category Category" data-type-id="{type_id}">
+		<span class="organizations_category_title">{type_name}</span>
+		<span class="organizations_category_aside {aside_classes}">{new_events_count}</span>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-organization-subcategories-wrapper">
+	<div class="collapsing_wrapper SubcategoryWrap">
+		<div class="organizations_subcategories_container collapsing_content">{organization_subcategories}</div>
+	</div>
+</script>
+
+<!-- Organization Page -->
+
 <script type="javascript/template" id="tmpl-organization-info-page">
 	<div class="page organization_info_page">
 		<header class="organization_header">
@@ -556,8 +597,8 @@
 					<div class="avatar -size_small organization_avatar"><img src="{img_small_url}"></div>
 					<span class="avatar_name organization_title" title="{name}">{name}</span>
 				</div>
-				<div class="organization_header_button">
-					<button class=" button -low -fill fa_icon {subscribe_button_classes} OrganizationSubscribe RippleEffect" data-organization-id="{id}" type="button"><span class="Text">{subscribe_button_text}</span></button>
+				<div class="organization_header_button OrganizationSubscribeButtonWrap">
+					<button class=" button -low -fill fa_icon {subscribe_button_classes} Subscribe RippleEffect" data-organization-id="{id}" type="button"><span class="Text">{subscribe_button_text}</span></button>
 				</div>
 			</div>
 		</header>
@@ -755,7 +796,11 @@
 <!-- Feed Page -->
 
 <script type="javascript/template" id="tmpl-feed-event-wrapper">
-	<div class="feed_events FeedEvents">{feed_events}</div>
+	<div class="feed_events FeedEvents"></div>
+	<div class="event_vulcan">
+		<div class="page feed_calendar FeedCalendar"></div>
+		<div class="FeedVulcanEvents"></div>
+	</div>
 </script>
 
 <script type="javascript/template" id="tmpl-feed-event">
@@ -796,13 +841,6 @@
 
 <script type="javascript/template" id="tmpl-feed-event-info">
 	<p class="feed_event_info">{text}</p>
-</script>
-
-<script type="javascript/template" id="tmpl-feed-event-vulcan">
-	<div class="event_vulcan">
-		<div class="page feed_calendar FeedCalendar"></div>
-		{event_cards}
-	</div>
 </script>
 
 <script type="javascript/template" id="tmpl-feed-no-event">
@@ -872,7 +910,7 @@
 
 		<div class="bot_part_onboarding_page">
 			<button class="button -color_neutral_alt RippleEffect Controller" type="button" data-page="organizations" data-title="Каталог организаторов"><span>Пропустить</span></button>
-			<button class="button -color_neutral_accent RippleEffect Controller" type="button" data-page="feed" data-feed_state="timeline" data-title="События"><span>Далее</span></button>
+			<button class="button -color_neutral_accent RippleEffect Controller" type="button" data-page="feed" data-tab_state="timeline" data-title="События"><span>Далее</span></button>
 		</div>
 	</div>
 </script>
