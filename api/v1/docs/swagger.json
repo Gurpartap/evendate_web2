@@ -2381,6 +2381,9 @@
         "[is_subscribed]": {
           "type": "boolean"
         },
+        "[is_new]": {
+          "type": "boolean"
+        },
         "[subscription_id]": {
           "type": "integer",
           "format": "int32"

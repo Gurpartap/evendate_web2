@@ -191,6 +191,5 @@ try {
 	}elseif(isset($__request['show_debug']) && isset($_exception)){
 		$_result->setException($_exception);
 	}
-
 	echo $_result;
 }
