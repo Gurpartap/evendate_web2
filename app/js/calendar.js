@@ -1283,9 +1283,6 @@ function OneFriend($view){
 			getFriendFeed();
 		}
 	});
-	
-	
-	calculateMargins($view);
 }
 
 function Friends($view){
@@ -1329,7 +1326,6 @@ function Friends($view){
 					$load_btn.before($card);
 				});
 				$load_btn.removeClass(__C.CLASSES.HIDDEN).find('.btn').removeClass(__C.CLASSES.DISABLED);
-				calculateMargins($view);
 				bindControllers($view);
 			}
 		});
