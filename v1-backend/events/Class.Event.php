@@ -43,6 +43,27 @@ class Event extends AbstractEntity
 
     const RATING_DATE_CREATION_LIMIT = 259200; // three days in seconds
 
+    const MY_EVENTS_QUERY_PART = '
+					((organization_id
+						IN (SELECT organization_id
+							FROM subscriptions
+							WHERE
+							subscriptions.user_id = :user_id
+							AND subscriptions.status = TRUE)
+					)
+					OR
+					(view_events.id
+						IN (SELECT event_id
+							FROM favorite_events
+							WHERE favorite_events.status = TRUE
+							AND favorite_events.user_id = :user_id)
+					))
+					AND
+					(view_events.id
+						NOT IN (SELECT event_id
+						FROM hidden_events
+						WHERE hidden_events.status = TRUE
+						AND hidden_events.user_id = :user_id))';
 
     protected static $DEFAULT_COLS = array(
         'id',
@@ -322,7 +343,7 @@ class Event extends AbstractEntity
                     'organization_id' => $organization->getId(),
                     'latitude' => $data['latitude'],
                     'longitude' => $data['longitude'],
-                    'images_domain' => 'http://dn' . rand(1, 4) .'.evendate.ru/',
+                    'images_domain' => 'http://dn' . rand(1, 4) . '.evendate.ru/',
                     'image_vertical' => $img_vertical_filename,
                     'image_horizontal' => $img_horizontal_filename,
                     'detail_info_url' => $data['detail_info_url'],
@@ -385,6 +406,7 @@ class Event extends AbstractEntity
             throw $e;
         }
     }
+
     private static function updateVkPostInformation(PDO $db, $event_id, array $data)
     {
         if ($data['vk_post_id'] == null) return;
@@ -510,15 +532,16 @@ class Event extends AbstractEntity
 
         $existing_notification_types = array();
 
-        foreach($notifications as $note){
+        foreach ($notifications as $note) {
             $existing_notification_types[$note['events_notification_id']] = $note['notification_type'];
         }
 
         $notifications_to_add = array();
-        $current_dates = $this->getDates(App::getCurrentUser(), array('start_time', 'id', 'end_time'), array(),array('length' => 10000),array())->getData();
+        $current_dates = $this->getDates(App::getCurrentUser(), array('start_time', 'id', 'end_time'), array(), array('length' => 10000), array())->getData();
 
         if (isset($data['dates']) && count($data['dates']) != count($current_dates)
-            && !in_array(Notification::NOTIFICATION_TYPE_CHANGED_DATES, $existing_notification_types)) {
+            && !in_array(Notification::NOTIFICATION_TYPE_CHANGED_DATES, $existing_notification_types)
+        ) {
             $notifications_to_add[] = array(
                 'event_id' => $this->id,
                 'notification_type_id' => self::getNotificationTypeId(Notification::NOTIFICATION_TYPE_CHANGED_DATES, $this->db),
@@ -526,21 +549,22 @@ class Event extends AbstractEntity
                 'status' => 'TRUE',
                 'done' => 'FALSE'
             );
-        }else if (isset($data['dates'])){
+        } else if (isset($data['dates'])) {
             $inline_dates = array(
                 'current' => array(),
                 'updated' => array()
             );
 
-            foreach($current_dates as $date){
+            foreach ($current_dates as $date) {
                 $inline_dates['current'][] = DateTime::createFromFormat('U', $date['event_date'])->format('Y-m-d') . $date['start_time'];
             }
-            foreach($data['dates'] as $date){
+            foreach ($data['dates'] as $date) {
                 $inline_dates['updated'][] = $date['event_date'] . DateTime::createFromFormat('U', strtotime($date['start_time']))->format('H:i:s');
             }
             $not_same = array_intersect($inline_dates['current'], $inline_dates['updated']);
             if (count($inline_dates['current']) != count($not_same)
-                && !in_array(Notification::NOTIFICATION_TYPE_CHANGED_DATES, $existing_notification_types)){
+                && !in_array(Notification::NOTIFICATION_TYPE_CHANGED_DATES, $existing_notification_types)
+            ) {
 
                 $notifications_to_add[] = array(
                     'event_id' => $this->id,
@@ -553,7 +577,8 @@ class Event extends AbstractEntity
         }
         if (isset($data['location']) &&
             $data['location'] != $this->location
-            && !in_array(Notification::NOTIFICATION_TYPE_CHANGED_LOCATION, $existing_notification_types)) {
+            && !in_array(Notification::NOTIFICATION_TYPE_CHANGED_LOCATION, $existing_notification_types)
+        ) {
             $notifications_to_add[] = array(
                 'event_id' => $this->id,
                 'notification_type_id' => self::getNotificationTypeId(Notification::NOTIFICATION_TYPE_CHANGED_LOCATION, $this->db),
@@ -564,7 +589,8 @@ class Event extends AbstractEntity
         }
         if (isset($data['canceled']) &&
             $data['canceled'] == true
-            && !in_array(Notification::NOTIFICATION_TYPE_CANCELED, $existing_notification_types)) {
+            && !in_array(Notification::NOTIFICATION_TYPE_CANCELED, $existing_notification_types)
+        ) {
             $notifications_to_add[] = array(
                 'event_id' => $this->id,
                 'notification_type_id' => self::getNotificationTypeId(Notification::NOTIFICATION_TYPE_CANCELED, $this->db),
@@ -572,10 +598,11 @@ class Event extends AbstractEntity
                 'status' => 'TRUE',
                 'done' => 'FALSE'
             );
-        }elseif (
+        } elseif (
             isset($data['canceled']) &&
             $data['canceled'] == false &&
-            in_array(Notification::NOTIFICATION_TYPE_CANCELED, $existing_notification_types)){
+            in_array(Notification::NOTIFICATION_TYPE_CANCELED, $existing_notification_types)
+        ) {
 
             //cancel notification about event EVENT CANCELLATION
 
@@ -592,13 +619,13 @@ class Event extends AbstractEntity
             $p_upd_notification->execute($q_upd_notification->getBindValues());
 
         }
-        
+
         if (isset($data['registration_till'])
             &&
             $data['registration_till'] != null
             &&
             ($data['registration_till']->getTimestamp() != $this->registration_till
-            || $data['registration_required'] != $this->registration_required)
+                || $data['registration_required'] != $this->registration_required)
             && !in_array(Notification::NOTIFICATION_TYPE_CHANGED_REGISTRATION, $existing_notification_types)
         ) {
             $notifications_to_add[] = array(
@@ -623,9 +650,10 @@ class Event extends AbstractEntity
                 'status' => 'TRUE',
                 'done' => 'FALSE'
             );
-        }elseif (isset($data['registration_till'])
+        } elseif (isset($data['registration_till'])
             && $data['registration_required'] == true
-            && in_array(Notification::NOTIFICATION_TYPE_CHANGED_REGISTRATION, $existing_notification_types)){
+            && in_array(Notification::NOTIFICATION_TYPE_CHANGED_REGISTRATION, $existing_notification_types)
+        ) {
             $q_upd_notification = App::queryFactory()
                 ->newUpdate()
                 ->table('events_notifications')
@@ -638,11 +666,11 @@ class Event extends AbstractEntity
             $p_upd_notification = $this->db->prepare($q_upd_notification->getStatement());
             $p_upd_notification->execute($q_upd_notification->getBindValues());
         }
-        
-        
+
+
         if (isset($data['is_free']) &&
             ($data['is_free'] != $this->is_free
-            || $data['min_price'] != $this->min_price)
+                || $data['min_price'] != $this->min_price)
             && !in_array(Notification::NOTIFICATION_TYPE_CHANGED_PRICE, $existing_notification_types)
         ) {
             $notifications_to_add[] = array(
@@ -916,8 +944,8 @@ class Event extends AbstractEntity
 
     public function addNotification(User $user, array $notification)
     {
-        if (isset($notification['notification_type']) && $notification['notification_type'] != null){
-            if (in_array($notification['notification_type'], Notification::NOTIFICATION_PREDEFINED_CUSTOM)){
+        if (isset($notification['notification_type']) && $notification['notification_type'] != null) {
+            if (in_array($notification['notification_type'], Notification::NOTIFICATION_PREDEFINED_CUSTOM)) {
 
                 $first_event_date = EventsDatesCollection::filter($this->db,
                     $user,
@@ -931,12 +959,12 @@ class Event extends AbstractEntity
                 $first_event_date = DateTime::createFromFormat('Y-m-d H:i:s', $event_date->format('Y-m-d') . ' ' . $first_event_date['start_time']);
                 $time = DateTime::createFromFormat('U', $first_event_date->getTimestamp() - $this->getNotificationTypeOffset($notification['notification_type']));
                 $notification_type_id = $this->getNotificationTypeId($notification['notification_type'], $this->db);
-            }else throw new InvalidArgumentException('CANT_FIND_NOTIFICATION_TYPE');
-        }elseif (isset($notification['notification_time'])){
+            } else throw new InvalidArgumentException('CANT_FIND_NOTIFICATION_TYPE');
+        } elseif (isset($notification['notification_time'])) {
             $time = new DateTime($notification['notification_time']);
             $notification_type_id = $this->getNotificationTypeId(Notification::NOTIFICATION_TYPE_CUSTOM, $this->db);
-        }else throw new InvalidArgumentException('BAD_NOTIFICATION_TIME');
-        
+        } else throw new InvalidArgumentException('BAD_NOTIFICATION_TIME');
+
         if ($time <= new DateTime()) throw new InvalidArgumentException('BAD_NOTIFICATION_TIME');
         $q_ins_notification = App::queryFactory()->newInsert();
         $q_ins_notification
@@ -959,5 +987,36 @@ class Event extends AbstractEntity
         return new Result(true, 'Уведомление успешно добавлено', $result);
     }
 
+    public function isInUserFeed(User $user) : Result
+    {
+        $q_get_in_feed = App::queryFactory()->newSelect();
+        $q_get_in_feed->from('view_events')
+            ->cols(array('id'))
+            ->where(self::MY_EVENTS_QUERY_PART)
+            ->where('id = :event_id');
 
+        $p_get_event = $this->db->prepare($q_get_in_feed->getStatement());
+        $result = $p_get_event->execute(array(
+            ':event_id' => $this->getId(),
+            ':user_id' => $user->getId()
+        ));
+        if ($result === FALSE) throw new DBQueryException('', $this->db);
+        return new Result(true, '', array('is_in_feed' => $p_get_event->rowCount() > 0));
+    }
+
+    public function isSeenByUser(User $user) : Result
+    {
+        $q_get_is_seen = App::queryFactory()->newSelect();
+        $q_get_is_seen->from('stat_events')
+            ->join('INNER', 'tokens', 'stat_events.token_id = tokens.id')
+            ->where('event_id = :event_id')
+            ->where('user_id = :user_id');
+
+        $p_get_event = $this->db->prepare($q_get_is_seen->getStatement());
+        $p_get_event->execute(array(
+            ':event_id' => $this->getId(),
+            ':user_id' => $user->getId()
+        ));
+        return new Result(true, '', array('is_seen' => $p_get_event->rowCount() > 0));
+    }
 }

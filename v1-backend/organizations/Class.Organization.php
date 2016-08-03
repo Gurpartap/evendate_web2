@@ -371,7 +371,7 @@ class Organization extends AbstractEntity
         )->getData();
     }
 
-    private function isSubscribed(User $user)
+    public function isSubscribed(User $user)
     {
         $q_get_subscribed = App::queryFactory()->newSelect();
         $q_get_subscribed

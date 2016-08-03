@@ -74,27 +74,7 @@ class EventsCollection extends AbstractCollection
                     if ($value instanceof User == false) {
                         $value = $user;
                     }
-                    $q_get_events->where('
-					((organization_id
-						IN (SELECT organization_id
-							FROM subscriptions
-							WHERE
-							subscriptions.user_id = :user_id
-							AND subscriptions.status = TRUE)
-					)
-					OR
-					(view_events.id
-						IN (SELECT event_id
-							FROM favorite_events
-							WHERE favorite_events.status = TRUE
-							AND favorite_events.user_id = :user_id)
-					))
-					AND
-					(view_events.id
-						NOT IN (SELECT event_id
-						FROM hidden_events
-						WHERE hidden_events.status = TRUE
-						AND hidden_events.user_id = :user_id))');
+                    $q_get_events->where(Event::MY_EVENTS_QUERY_PART);
                     $statement_array[':user_id'] = $value->getId();
                     break;
                 }
