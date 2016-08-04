@@ -301,7 +301,7 @@ $user_full_name = $user->getLastName().' '.$user->getFirstName(); ?>
 
 
 <!-- =============== APP SCRIPTS ===============-->
-<script src="<?= App::$SCHEMA . App::$NODE_DOMAIN ?>:8080/socket.io/socket.io.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js" type="text/javascript"></script>
 <script type="text/javascript" src="/app/js/app.js" charset="utf-8"></script>
 <script type="text/javascript" src="/app/js/Class.Calendar.js" charset="utf-8"></script>
 <script type="text/javascript" src="/app/js/Class.DatePicker.js" charset="utf-8"></script>
