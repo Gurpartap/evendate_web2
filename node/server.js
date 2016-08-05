@@ -59,12 +59,10 @@ var config_index = process.env.ENV ? process.env.ENV : 'dev',
         }
     }));
 var
-    privateKey,
-    certificate,
     server,
     server2,
-    io,
-    io2,
+    io = null,
+    io2 = null,
     URLs = {
         "VK": {
             'GET_ACCESS_TOKEN': 'https://oauth.vk.com/access_token?client_id=' +
@@ -112,7 +110,6 @@ var
 try {
     fs.accessSync(real_config.https.key_path, fs.F_OK);
     fs.accessSync(real_config.https.cert_path, fs.F_OK);
-    console.log('FILES EXISTS');
     server = https.createServer({
         key: fs.readFileSync(real_config.https.key_path, 'utf8'),
         cert: fs.readFileSync(real_config.https.cert_path, 'utf8')
@@ -123,7 +120,6 @@ try {
     io = require("socket.io").listen(server);
     io2 = require("socket.io").listen(server2);
 } catch (e) {
-    console.log(e);
     server = http.createServer().listen(8080);
     io = require("socket.io").listen(server);
     io2 = null;
@@ -155,8 +151,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
         logger.error(ex);
     }
 
-    var ioHandlers =
-        function (socket) {
+    var ioHandlers = function (socket) {
 
             socket.on('error', function (err) {
                 logger.error(err);
@@ -959,8 +954,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
     io.on('connection', ioHandlers);
 
-    if (io2){
-        io.on('connection', ioHandlers);
+    if (io2 != null){
+        io2.on('connection', ioHandlers);
     }
 
 });
