@@ -1,6 +1,7 @@
 "use strict";
 
 var
+    http = require('http'),
     https = require('https'),
     winston = require('winston'),
     app = require("express"),
@@ -973,8 +974,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
             });
         });
     });
-
-    io.listen(8080);
 
     console.log('Started');
 });
