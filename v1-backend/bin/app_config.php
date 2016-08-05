@@ -200,7 +200,7 @@ class App {
 
 	public static function getAuthURLs(string $type){
 		$is_mobile = $type == 'mobile' ? 'true' : 'false';
-        $scheme = $is_mobile ? 'http://' : 'https://';
+        $scheme = $type == 'mobile' ? 'http://' : 'https://';
 
 		return new Result(true, '', array(
 			'vk' => 'https://oauth.vk.com/authorize?client_id='. self::$SETTINGS->VK->APP_ID . '&scope=groups,friends,email,wall,offline,pages,photos,groups&redirect_uri='. $scheme . self::$DOMAIN . '/redirectOauth.php?mobile=' . $is_mobile . '%26type=vk&response_type=token',
