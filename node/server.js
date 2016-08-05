@@ -1,8 +1,9 @@
 "use strict";
 
-var server = require('http'),
-    io = require('socket.io')(server),
+var
+    https = require('https'),
     winston = require('winston'),
+    app = require("express"),
     mysql = require('mysql'),
     rest = require('restler'),
     fs = require("fs"),
@@ -57,6 +58,9 @@ var config_index = process.env.ENV ? process.env.ENV : 'dev',
         }
     }));
 var
+    privateKey,
+    certificate,
+    server,
     URLs = {
         "VK": {
             'GET_ACCESS_TOKEN': 'https://oauth.vk.com/access_token?client_id=' +
@@ -100,6 +104,21 @@ var
         },
         UTILS: {}
     };
+
+try {
+    fs.accessSync(real_config.https.key_path, fs.F_OK);
+    fs.accessSync(real_config.https.cert_path, fs.F_OK);
+
+    server = https.createServer({
+        key: readFileSync(real_config.certificate.key_path),
+        cert: readFileSync(real_config.certificate.cert_path)
+    }, app).listen(8080);
+
+} catch (e) {
+    server = http.createServer().listen(8080);
+}
+
+var io = require("socket.io").listen(server);
 
 sql.setDialect('postgres');
 
@@ -191,15 +210,13 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         vk_uid: null
                     };
                     switch (data.type) {
-                        case 'vk':
-                        {
+                        case 'vk': {
                             result.vk_uid = data.oauth_data.user_id;
                             break;
                         }
 
                         case 'google':
-                        case 'facebook':
-                        {
+                        case 'facebook': {
                             result[data.type + '_uid'] = data.user_info.id;
                             break;
                         }
@@ -223,7 +240,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     q_get_user =
                         users
                             .select(users.id, users.vk_uid, users.facebook_uid, users.google_uid,
-                            '(SELECT COUNT(id) FROM subscriptions WHERE subscriptions.user_id = users.id AND subscriptions.status = TRUE) AS subscriptions_count')
+                                '(SELECT COUNT(id) FROM subscriptions WHERE subscriptions.user_id = users.id AND subscriptions.status = TRUE) AS subscriptions_count')
                             .where(users.email.equals(data.oauth_data.email))
                             .or(users.vk_uid.isNotNull().and(users.vk_uid.equals(UIDs.vk_uid)))
                             .or(users.facebook_uid.isNotNull().and(users.facebook_uid.equals(UIDs.facebook_uid)))
@@ -287,8 +304,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             facebook_sign_in = Entities.facebook_sign_in;
 
                         switch (data.type) {
-                            case 'vk':
-                            {
+                            case 'vk': {
                                 var vk_data = {
                                     uid: UIDs.vk_uid,
                                     user_id: user.id,
@@ -307,8 +323,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 console.log(vk_data);
                                 break;
                             }
-                            case 'google':
-                            {
+                            case 'google': {
                                 var google_data = {
                                     user_id: user.id,
                                     google_id: user.id,
@@ -325,8 +340,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 console.log(google_data);
                                 break;
                             }
-                            case 'facebook':
-                            {
+                            case 'facebook': {
                                 var facebook_data = {
                                     user_id: user.id,
                                     uid: UIDs.facebook_uid,
@@ -405,20 +419,17 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 uid_key_name;
 
                             switch (data.type) {
-                                case 'vk':
-                                {
+                                case 'vk': {
                                     q_ins_friends = "INSERT INTO vk_friends (user_id, friend_uid) VALUES ($1, $2) ON CONFLICT DO NOTHING";
                                     uid_key_name = 'uid';
                                     break;
                                 }
-                                case 'google':
-                                {
+                                case 'google': {
                                     q_ins_friends = "INSERT INTO google_friends (user_id, friend_uid) VALUES ($1, $2) ON CONFLICT DO NOTHING";
                                     uid_key_name = 'id';
                                     break;
                                 }
-                                case 'facebook':
-                                {
+                                case 'facebook': {
                                     q_ins_friends = "INSERT INTO facebook_friends (user_id, friend_uid) VALUES ($1, $2) ON CONFLICT DO NOTHING";
                                     uid_key_name = 'id';
                                     break;
@@ -440,15 +451,13 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             var q_ins_group, q_ins_membership;
 
                             switch (data.type) {
-                                case 'vk':
-                                {
+                                case 'vk': {
                                     q_ins_group = "INSERT INTO vk_groups (gid, name, screen_name, description, photo) " +
                                         "   VALUES ($1, $2, $3, $4, $5) ON CONFLICT (gid) DO UPDATE SET name = $2, screen_name = $3, description = $4, photo = $5 RETURNING id";
                                     q_ins_membership = 'INSERT INTO vk_users_subscriptions(user_id, vk_group_id) VALUES($1, $2) ON CONFLICT DO NOTHING';
                                     break;
                                 }
-                                case 'facebook':
-                                {
+                                case 'facebook': {
                                     break;
                                 }
                             }
@@ -493,7 +502,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 ' books = $17, ' +
                                 ' games = $18, ' +
                                 ' about = $19'
-                                , q_ins_interests.values, function(err, result){
+                                , q_ins_interests.values, function (err, result) {
                                     if (handleError(err)) return;
                                 });
                         });
@@ -504,8 +513,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 var req_params;
 
                 switch (data.type) {
-                    case 'vk':
-                    {
+                    case 'vk': {
                         req_params = {
                             url: URLs[data.type.toUpperCase()].GET_USER_INFO,
                             timeout: 5000,
@@ -521,8 +529,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         };
                         break;
                     }
-                    case 'google':
-                    {
+                    case 'google': {
                         req_params = {
                             url: URLs[data.type.toUpperCase()].GET_USER_INFO,
                             timeout: 5000,
@@ -533,8 +540,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         };
                         break;
                     }
-                    case 'facebook':
-                    {
+                    case 'facebook': {
                         req_params = {
                             url: URLs[data.type.toUpperCase()].GET_USER_INFO,
                             timeout: 5000,
@@ -633,9 +639,9 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 }
 
                                 if (oauth_data.type == 'vk') {
-                                    if (groups_data.hasOwnProperty('response')){
+                                    if (groups_data.hasOwnProperty('response')) {
                                         groups_data = groups_data.response;
-                                    }else{
+                                    } else {
                                         groups_data = null;
                                     }
                                 }
@@ -657,8 +663,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     req_params;
 
                 switch (data.type) {
-                    case 'vk':
-                    {
+                    case 'vk': {
                         req_params = {
                             url: URLs[data.type.toUpperCase()].GET_GROUPS_LIST,
                             json: true,
@@ -673,13 +678,11 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         };
                         break;
                     }
-                    case 'google':
-                    {
+                    case 'google': {
                         callback(null, null);
                         return;
                     }
-                    case 'facebook':
-                    {
+                    case 'facebook': {
                         callback(null, null);
                         return;
                     }
@@ -701,8 +704,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     req_params;
 
                 switch (data.type) {
-                    case 'vk':
-                    {
+                    case 'vk': {
                         req_params = {
                             url: URLs[data.type.toUpperCase()].GET_FRIENDS_LIST,
                             timeout: 5000,
@@ -716,8 +718,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         };
                         break;
                     }
-                    case 'google':
-                    {
+                    case 'google': {
                         req_params = {
                             url: URLs[data.type.toUpperCase()].GET_FRIENDS_LIST,
                             timeout: 5000,
@@ -728,8 +729,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         };
                         break;
                     }
-                    case 'facebook':
-                    {
+                    case 'facebook': {
                         req_params = {
                             url: URLs[data.type.toUpperCase()].GET_FRIENDS_LIST,
                             timeout: 5000,
@@ -769,9 +769,12 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 .where(
                     Entities.users.id.equals(user.id)
                 ).toQuery();
-            client.query(q_get_user_token, function(err, result){
+            client.query(q_get_user_token, function (err, result) {
                 if (err) return handleError(err, 'recommendations.error');
-                if (result.rows.length != 1) return handleError({'error': 'USER_NOT_FOUND', details: err}, 'recommendations.error');
+                if (result.rows.length != 1) return handleError({
+                    'error': 'USER_NOT_FOUND',
+                    details: err
+                }, 'recommendations.error');
 
                 rest.get('http://localhost/api/v1/events/recommendations' + '?fields=' + encodeURI(query.join(',')), {
                     json: true,
@@ -780,7 +783,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     }
                 })
                     .on('complete', function (result) {
-                        result.data.forEach(function(event, index){
+                        result.data.forEach(function (event, index) {
                             result.data[index].rating_interests = 0;
                         });
                         socket.emit('log', result);
