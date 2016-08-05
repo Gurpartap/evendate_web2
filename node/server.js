@@ -109,13 +109,15 @@ var
 try {
     fs.accessSync(real_config.https.key_path, fs.F_OK);
     fs.accessSync(real_config.https.cert_path, fs.F_OK);
-
+    console.log('FILES EXISTS');
     server = https.createServer({
-        key: readFileSync(real_config.certificate.key_path),
-        cert: readFileSync(real_config.certificate.cert_path)
+        key: fs.readFileSync(real_config.https.key_path, 'utf8'),
+        cert: fs.readFileSync(real_config.https.cert_path, 'utf8')
     }, app).listen(8080);
+    console.log('FILES EXISTS2');
 
 } catch (e) {
+    console.log(e);
     server = http.createServer().listen(8080);
 }
 
@@ -399,6 +401,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 }
                                 socket.emit('auth', {
                                     email: data.oauth_data.email,
+                                    user_id: user.id,
                                     token: user_token,
                                     mobile: token_type == 'mobile',
                                     type: data.type,
@@ -406,7 +409,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 });
                             });
                         };
-
 
                         client.query(q_ins_sign_in.returning('id').toQuery(), function (sign_in_err) {
                             if (handleError(sign_in_err)) {
@@ -764,35 +766,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
             }
         });
 
-        socket.on('recommendations.get', function (user, query) {
-            var q_get_user_token = Entities.users.select(Entities.users.token)
-                .from(Entities.users)
-                .where(
-                    Entities.users.id.equals(user.id)
-                ).toQuery();
-            client.query(q_get_user_token, function (err, result) {
-                if (err) return handleError(err, 'recommendations.error');
-                if (result.rows.length != 1) return handleError({
-                    'error': 'USER_NOT_FOUND',
-                    details: err
-                }, 'recommendations.error');
-
-                rest.get('http://localhost/api/v1/events/recommendations' + '?fields=' + encodeURI(query.join(',')), {
-                    json: true,
-                    headers: {
-                        'Authorization': result.rows[0].token
-                    }
-                })
-                    .on('complete', function (result) {
-                        result.data.forEach(function (event, index) {
-                            result.data[index].rating_interests = 0;
-                        });
-                        socket.emit('log', result);
-                    });
-            });
-        });
-
-
         socket.on('feedback', function (data) {
             logger.info(data);
             var html = '';
@@ -973,7 +946,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     });
             });
         });
+
+        console.log('Started');
     });
 
-    console.log('Started');
 });
