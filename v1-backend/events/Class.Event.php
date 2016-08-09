@@ -244,14 +244,15 @@ class Event extends AbstractEntity
             if (isset($data['public_at']) && $data['public_at'] != null) {
                 $data['public_at'] = new DateTime($data['public_at']);
                 if ($data['public_at'] < new DateTime()) {
-
+                    throw new LogicException('Дата отложенной публикации не может быть меньше текущей даты');
                 }
             } else {
                 $data['public_at'] = new DateTime();
             }
             $data['notification_at'] = clone $data['public_at'];
             $data['notification_at']->modify('+10 minutes');
-            $data['public_at'] = $data['public_at']->format('Y-m-d H:i:s');
+        }catch(LogicException $le){
+            throw $le;
         } catch (Exception $e) {
             $data['public_at'] = null;
             $data['notification_at'] = (new DateTime())->modify('+10 minutes');
@@ -293,6 +294,7 @@ class Event extends AbstractEntity
 
         /*VK posting data*/
         $data['vk_post'] = $data['is_free'] == true && is_numeric($data['min_price']) ? (int)$data['min_price'] : null;
+
     }
 
     public static function create(PDO $db, Organization $organization, array $data)
