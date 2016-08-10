@@ -15,10 +15,9 @@ class EventsCollection extends AbstractCollection
 
         $q_get_events = App::queryFactory()->newSelect();
 
-        $from_table = 'view_events';
-
         $q_get_events
-            ->distinct();
+            ->distinct()
+            ->from('view_events');
 
         if (isset($pagination['offset'])) {
             $q_get_events->offset($pagination['offset']);
@@ -117,34 +116,9 @@ class EventsCollection extends AbstractCollection
                     }
                     break;
                 }
-                case 'canceled_shown':
-                case 'canceled': {
+                case 'canceled_shown': {
                     if ($value == 'true') {
                         $canceled_condition = '';
-                    }
-                    break;
-                }
-                case 'is_delayed': {
-                    if ($value == 'true') {
-                        if ($user->isEditor()){
-                            $from_table = 'view_all_events';
-                            $q_get_events
-                                ->where('is_delayed = TRUE')
-                                ->where('organization_id IN (SELECT organization_id FROM users_organizations WHERE user_id = :user_id AND status = true)');
-                            $statement_array[':user_id'] = $user->getId();
-                        }
-                    }
-                    break;
-                }
-                case 'is_canceled': {
-                    if ($value == 'true') {
-                        if ($user->isEditor()){
-                            $from_table = 'view_all_events';
-                            $q_get_events
-                                ->where('canceled = TRUE')
-                                ->where('organization_id IN (SELECT organization_id FROM users_organizations WHERE user_id = :user_id AND status = true)');
-                            $statement_array[':user_id'] = $user->getId();
-                        }
                     }
                     break;
                 }
@@ -400,11 +374,9 @@ class EventsCollection extends AbstractCollection
             $statement_array[':user_id'] = $user->getId();
         }
 
-        $q_get_events
-            ->from($from_table)
-            ->cols($_fields)
-            ->where($canceled_condition)
-            ->orderBy($order_by);
+        $q_get_events->where($canceled_condition);
+        $q_get_events->cols($_fields);
+        $q_get_events->orderBy($order_by);
 //        echo $q_get_events->getStatement();
         $p_get_events = $db->prepare($q_get_events->getStatement());
         $result = $p_get_events->execute($statement_array);
