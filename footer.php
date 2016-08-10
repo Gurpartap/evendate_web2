@@ -39,19 +39,22 @@
 			}
 		}
 
-		$('.vk-auth-btn').on('click', function() {
+		$('.vk-auth-btn').on('click', function(e) {
 			yaCounter32442130.reachGoal('VkAuthStart');
 			openAuthLink('vk');
+			e.preventDefault();
 		});
 
-		$('.google-plus-btn').on('click', function() {
+		$('.google-plus-btn').on('click', function(e) {
 			yaCounter32442130.reachGoal('GoogleAuthStart');
 			openAuthLink('google');
+			e.preventDefault();
 		});
 
-		$('.facebook-btn').on('click', function() {
+		$('.facebook-btn').on('click', function(e) {
 			yaCounter32442130.reachGoal('FacebookAuthStart');
 			openAuthLink('facebook');
+			e.preventDefault();
 		});
 	})
 </script>
