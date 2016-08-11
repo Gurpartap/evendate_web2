@@ -21,7 +21,6 @@ try {
     }
 }
 $title = 'Evendate';
-require_once('landing/header.php');
 ?>
 <!doctype html>
 <html class="no-js">
@@ -107,6 +106,12 @@ require_once('landing/header.php');
     <div class="fade-gradient"></div>
 
     <div class="overlay-sections">
+        <section class="about-section overlay-section">
+            <form>
+                <input>
+                <input>
+            </form>
+        </section>
         <section class="faq-section overlay-section">
             <div class="fade-in">
                 <div class="fluid-width constrain-large text-center">
@@ -122,7 +127,6 @@ require_once('landing/header.php');
                     </a>
                 </div>
             </div>
-
         </section>
     </div>
 
@@ -167,10 +171,8 @@ require_once('landing/header.php');
                 </div>
 
                 <div class="footer-nav-links float-right">
-                    <a data-ga-label="ContactUs" class="footer-nav-link js-ga-track" target="_blank"
-                       href="mailto:hello@yourprimer.com">+7 (495) 641-6105</a>
-                    <a data-ga-label="Terms" class="footer-nav-link js-ga-track" target="_blank"
-                       href="https://www.google.com/intl/en/policies/terms/">Обратная связь</a>
+                    <a class="footer-nav-link feedback-link" target="_blank"
+                       href="#">Обратная связь</a>
                 </div>
             </div>
         </div>
@@ -190,10 +192,13 @@ require_once('landing/header.php');
         </a>
         <div class="header-nav-links">
             <a class="header-nav-link hover-color organizations-link js-ga-track fader-link about-link about-header-link"
-               data-ga-label="About" data-overlay-target="about-section" href="about.html">Организаторам</a>
+               data-ga-label="About" data-overlay-target="about-section" href="#">Организаторам</a>
             <a class="header-nav-link faq-link hover-color js-ga-track fader-link faq-link faq-header-link"
                data-ga-label="FAQ"
-               data-overlay-target="faq-section" href="faq.html">Войти</a>
+               data-overlay-target="faq-section" href="#">Войти</a>
+
+            <a class="header-nav-link hover-color js-ga-track fader-link about-link about-header-link hidden"
+               data-overlay-target="about-section" href="#"></a>
         </div>
         <a class="menu" href="index.html">Menu</a>
     </header>
@@ -215,37 +220,14 @@ require_once('landing/header.php');
                             wherever and whenever you have 5 minutes free.</p>
                         <div class="slide-cta">
                             <span>Войти через: </span>
-                            <a class="slide-cta-button hover-fill js-ga-track" target="_blank"
-                               href="https://play.google.com/store/apps/details?id=ru.evendate.android"
-                               data-ga-label="Android">
-                                <svg width="30px" height="30px" version="1.1" id="Layer_1"
-                                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                     x="0px" y="0px" viewBox="-3.5 -3.5 55 55" enable-background="new -3.5 -3.5 55 55"
-                                     xml:space="preserve">
-                      <path fill="#FFFFFF" d="M12,36c0,1.1,0.9,2,2,2h2v7c0,1.7,1.3,3,3,3s3-1.3,3-3v-7h4v7c0,1.7,1.3,3,3,3s3-1.3,3-3v-7h2c1.1,0,2-0.9,2-2V16H12V36z
-                         M7,16c-1.7,0-3,1.3-3,3v14c0,1.7,1.3,3,3,3s3-1.3,3-3V19C10,17.3,8.7,16,7,16z M41,16c-1.7,0-3,1.3-3,3v14c0,1.7,1.3,3,3,3
-                        s3-1.3,3-3V19C44,17.3,42.7,16,41,16z M31.1,4.3l2.6-2.6c0.4-0.4,0.4-1,0-1.4s-1-0.4-1.4,0l-3,2.9C27.7,2.5,25.9,2,24,2
-                        c-1.9,0-3.7,0.5-5.3,1.3l-3-3c-0.4-0.4-1-0.4-1.4,0s-0.4,1,0,1.4l2.6,2.6C13.9,6.5,12,10,12,14h24C36,10,34,6.5,31.1,4.3z M20,10h-2
-                        V8h2V10z M30,10h-2V8h2V10z"/>
-                    </svg>
+                            <a class="slide-cta-button hover-fill vk-auth-btn auth-small-btn social-btn vk-btn" href="#">
+                                <i class="fa fa-vk"></i>
                             </a>
-
-                            <a class="slide-cta-button hover-fill js-ga-track" target="_blank"
-                               href="https://itunes.apple.com/us/app/evendate/id1044975200?mt=8"
-                               data-ga-label="iOS">
-                                <svg width="30px" height="30px" version="1.1" id="Layer_1"
-                                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                     x="0px" y="0px" viewBox="-3.5 -3.5 55 55" enable-background="new -3.5 -3.5 55 55"
-                                     xml:space="preserve">
-                      <g>
-                          <g id="svg_1">
-                              <path fill="#FFFFFF" d="M36.8,24.9c0.1,7.1,6.2,9.4,6.3,9.5c-0.1,0.2-1,3.4-3.2,6.7c-1.9,2.8-4,5.7-7.2,5.7c-3.1,0.1-4.1-1.9-7.7-1.9
-                            c-3.6,0-4.7,1.8-7.7,1.9c-3.1,0.1-5.4-3.1-7.4-5.9c-4-5.8-7.1-16.4-3-23.6c2-3.6,5.7-5.8,9.7-5.9c3-0.1,5.9,2,7.7,2
-                            c1.8,0,5.3-2.5,9-2.1c1.5,0.1,5.8,0.6,8.6,4.6C41.6,16.1,36.7,18.9,36.8,24.9 M30.9,7.5c1.6-2,2.7-4.7,2.4-7.5
-                            c-2.4,0.1-5.2,1.6-6.9,3.5c-1.5,1.8-2.8,4.6-2.5,7.2C26.6,11,29.2,9.4,30.9,7.5"/>
-                          </g>
-                      </g>
-                    </svg>
+                            <a class="slide-cta-button hover-fill facebook-btn auth-small-btn social-btn fb-btn" href="#">
+                                <i class="fa fa-facebook"></i>
+                            </a>
+                            <a class="slide-cta-button hover-fill google-plus-btn auth-small-btn social-btn google-lus-btn" href="#">
+                                <i class="fa fa-google"></i>
                             </a>
                         </div>
                     </div>
@@ -256,39 +238,17 @@ require_once('landing/header.php');
                         <p>We’re constantly adding more lessons. So whether you need to brush up on the basics or
                             explore advanced subjects, Primer can teach it all to you in a no-nonsense, no-jargon
                             way.</p>
-                        <div class="slide-cta">
+                        <div class="slide-cta js-animate-this">
                             <span>Войти через: </span>
-                            <a class="slide-cta-button hover-fill js-ga-track" data-ga-label="Android" target="_blank"
-                               href="https://play.google.com/store/apps/details?id=ru.evendate.android">
-                                <svg width="30px" height="30px" version="1.1" id="Layer_1"
-                                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                     x="0px" y="0px" viewBox="-3.5 -3.5 55 55" enable-background="new -3.5 -3.5 55 55"
-                                     xml:space="preserve">
-                      <path fill="#FFFFFF" d="M12,36c0,1.1,0.9,2,2,2h2v7c0,1.7,1.3,3,3,3s3-1.3,3-3v-7h4v7c0,1.7,1.3,3,3,3s3-1.3,3-3v-7h2c1.1,0,2-0.9,2-2V16H12V36z
-                         M7,16c-1.7,0-3,1.3-3,3v14c0,1.7,1.3,3,3,3s3-1.3,3-3V19C10,17.3,8.7,16,7,16z M41,16c-1.7,0-3,1.3-3,3v14c0,1.7,1.3,3,3,3
-                        s3-1.3,3-3V19C44,17.3,42.7,16,41,16z M31.1,4.3l2.6-2.6c0.4-0.4,0.4-1,0-1.4s-1-0.4-1.4,0l-3,2.9C27.7,2.5,25.9,2,24,2
-                        c-1.9,0-3.7,0.5-5.3,1.3l-3-3c-0.4-0.4-1-0.4-1.4,0s-0.4,1,0,1.4l2.6,2.6C13.9,6.5,12,10,12,14h24C36,10,34,6.5,31.1,4.3z M20,10h-2
-                        V8h2V10z M30,10h-2V8h2V10z"/>
-                    </svg>
+                            <a class="slide-cta-button hover-fill vk-auth-btn auth-small-btn social-btn vk-btn" href="#">
+                                <i class="fa fa-vk"></i>
                             </a>
-
-                            <a class="slide-cta-button hover-fill js-ga-track" data-ga-label="iOS" target="_blank"
-                               href="https://itunes.apple.com/app/apple-store/id918628107?pt=9008&ct=9-8-2015-website&mt=8">
-                                <svg width="30px" height="30px" version="1.1" id="Layer_1"
-                                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                     x="0px" y="0px" viewBox="-3.5 -3.5 55 55" enable-background="new -3.5 -3.5 55 55"
-                                     xml:space="preserve">
-                      <g>
-                          <g id="svg_1">
-                              <path fill="#FFFFFF" d="M36.8,24.9c0.1,7.1,6.2,9.4,6.3,9.5c-0.1,0.2-1,3.4-3.2,6.7c-1.9,2.8-4,5.7-7.2,5.7c-3.1,0.1-4.1-1.9-7.7-1.9
-                            c-3.6,0-4.7,1.8-7.7,1.9c-3.1,0.1-5.4-3.1-7.4-5.9c-4-5.8-7.1-16.4-3-23.6c2-3.6,5.7-5.8,9.7-5.9c3-0.1,5.9,2,7.7,2
-                            c1.8,0,5.3-2.5,9-2.1c1.5,0.1,5.8,0.6,8.6,4.6C41.6,16.1,36.7,18.9,36.8,24.9 M30.9,7.5c1.6-2,2.7-4.7,2.4-7.5
-                            c-2.4,0.1-5.2,1.6-6.9,3.5c-1.5,1.8-2.8,4.6-2.5,7.2C26.6,11,29.2,9.4,30.9,7.5"/>
-                          </g>
-                      </g>
-                    </svg>
+                            <a class="slide-cta-button hover-fill facebook-btn auth-small-btn social-btn fb-btn" href="#">
+                                <i class="fa fa-facebook"></i>
                             </a>
-
+                            <a class="slide-cta-button hover-fill google-plus-btn auth-small-btn social-btn google-lus-btn" href="#">
+                                <i class="fa fa-google"></i>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -298,41 +258,19 @@ require_once('landing/header.php');
                         personalized next steps that are automatically saved for you.</p>
                     <div class="slide-cta js-animate-this">
                         <span>Войти через: </span>
-                        <a class="slide-cta-button hover-fill js-ga-track" data-ga-label="Android" target="_blank"
-                           href="https://play.google.com/store/apps/details?id=com.google.android.apps.primer&referrer=utm_source%3Dwebsite%26utm_medium%3Dreferral%26utm_content%3Dbutton%26utm_campaign%3D2015-9-8-website">
-                            <svg width="30px" height="30px" version="1.1" id="Layer_1"
-                                 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
-                                 y="0px" viewBox="-3.5 -3.5 55 55" enable-background="new -3.5 -3.5 55 55"
-                                 xml:space="preserve">
-                    <path fill="#FFFFFF" d="M12,36c0,1.1,0.9,2,2,2h2v7c0,1.7,1.3,3,3,3s3-1.3,3-3v-7h4v7c0,1.7,1.3,3,3,3s3-1.3,3-3v-7h2c1.1,0,2-0.9,2-2V16H12V36z
-                       M7,16c-1.7,0-3,1.3-3,3v14c0,1.7,1.3,3,3,3s3-1.3,3-3V19C10,17.3,8.7,16,7,16z M41,16c-1.7,0-3,1.3-3,3v14c0,1.7,1.3,3,3,3
-                      s3-1.3,3-3V19C44,17.3,42.7,16,41,16z M31.1,4.3l2.6-2.6c0.4-0.4,0.4-1,0-1.4s-1-0.4-1.4,0l-3,2.9C27.7,2.5,25.9,2,24,2
-                      c-1.9,0-3.7,0.5-5.3,1.3l-3-3c-0.4-0.4-1-0.4-1.4,0s-0.4,1,0,1.4l2.6,2.6C13.9,6.5,12,10,12,14h24C36,10,34,6.5,31.1,4.3z M20,10h-2
-                      V8h2V10z M30,10h-2V8h2V10z"/>
-                  </svg>
+                        <a class="slide-cta-button hover-fill vk-auth-btn auth-small-btn social-btn vk-btn" href="#">
+                            <i class="fa fa-vk"></i>
                         </a>
-
-                        <a class="slide-cta-button hover-fill js-ga-track" data-ga-label="iOS" target="_blank"
-                           href="https://itunes.apple.com/app/apple-store/id918628107?pt=9008&ct=9-8-2015-website&mt=8">
-                            <svg width="30px" height="30px" version="1.1" id="Layer_1"
-                                 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px"
-                                 y="0px" viewBox="-3.5 -3.5 55 55" enable-background="new -3.5 -3.5 55 55"
-                                 xml:space="preserve">
-                    <g>
-                        <g id="svg_1">
-                            <path fill="#FFFFFF" d="M36.8,24.9c0.1,7.1,6.2,9.4,6.3,9.5c-0.1,0.2-1,3.4-3.2,6.7c-1.9,2.8-4,5.7-7.2,5.7c-3.1,0.1-4.1-1.9-7.7-1.9
-                          c-3.6,0-4.7,1.8-7.7,1.9c-3.1,0.1-5.4-3.1-7.4-5.9c-4-5.8-7.1-16.4-3-23.6c2-3.6,5.7-5.8,9.7-5.9c3-0.1,5.9,2,7.7,2
-                          c1.8,0,5.3-2.5,9-2.1c1.5,0.1,5.8,0.6,8.6,4.6C41.6,16.1,36.7,18.9,36.8,24.9 M30.9,7.5c1.6-2,2.7-4.7,2.4-7.5
-                          c-2.4,0.1-5.2,1.6-6.9,3.5c-1.5,1.8-2.8,4.6-2.5,7.2C26.6,11,29.2,9.4,30.9,7.5"/>
-                        </g>
-                    </g>
-                  </svg>
+                        <a class="slide-cta-button hover-fill facebook-btn auth-small-btn social-btn fb-btn" href="#">
+                            <i class="fa fa-facebook"></i>
                         </a>
-
+                        <a class="slide-cta-button hover-fill google-plus-btn auth-small-btn social-btn google-lus-btn" href="#">
+                            <i class="fa fa-google"></i>
+                        </a>
                     </div>
                 </div>
                 <div class="text-slide text-slide-3 container-centered" data-slide="3">
-                    <h2 class="js-animate-this">Выберите то, что интересно Вам</h2>
+                    <h1 class="js-animate-this">Выберите то, что интересно Вам</h1>
                     <div class="js-animate-this">
                         <div class="row">
                             <div class="col-md-3 interests-block">
@@ -410,13 +348,7 @@ require_once('landing/header.php');
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-12 text-center">
-                                <a href="#" class="auth-with-interests">Войти</a>
-                            </div>
-                        </div>
                     </div>
-
                 </div>
             </div>
             <div class="device-frame">
@@ -447,7 +379,7 @@ require_once('landing/header.php');
             <img width="500" class="layer-object notebook initial-state init-image"
                  src="app/assets/img/objects/notebook.png"/>
             <img width="1660" class="section-bg section-bg-one initial-state init-image"
-                 src="app/assets/img/shapes/pattern1.png"/>
+                 src="app/assets/img/shapes/shapes1.png"/>
         </div>
 
     </section>
@@ -477,7 +409,6 @@ require_once('landing/header.php');
             <img width="1982" class="section-bg section-bg-three js-load-async"
                  data-image-src="app/assets/img/shapes/shapes2.png"/>
         </div>
-
     </section>
     <section class="scroll-section scroll-section-four" data-from-time="" data-to-time="" data-reverse-from-time="4.06"
              data-reverse-to-time="5.23">
@@ -512,46 +443,42 @@ require_once('landing/header.php');
            class="footer-social-link hover-fill js-ga-track">
             <i class="fa fa-twitter"></i>
         </a>
-        <a target="_blank" href="http://instagram.com/evendate"
+        <a target="_blank" href="http://instagram.com/evendate.ru"
            class="footer-social-link hover-fill js-ga-track">
             <i class="fa fa-instagram"></i>
         </a>
     </div>
 
     <div class="footer-nav-links float-right">
-        <a data-ga-label="ContactUs" class="footer-nav-link js-ga-track" target="_blank"
-           href="mailto:hello@yourprimer.com">+7 (495) 641-6105</a>
-        <a data-ga-label="Terms" class="footer-nav-link js-ga-track" target="_blank"
-           href="https://www.google.com/intl/en/policies/terms/">Обратная связь</a>
+        <a class="footer-nav-link feedback-link" target="_blank"
+           href="#">Обратная связь</a>
     </div>
 </footer>
 
 <footer class="global-footer footer">
     <div class="fluid-width mobile-full-width">
-
         <div class="float-right footer-social-links">
-            <a data-ga-label="G+" target="_blank" href="https://new.vk.com/evendate"
-               class="footer-social-link hover-fill js-ga-track">
+            <a target="_blank" href="https://new.vk.com/evendate"
+               class="footer-social-link">
                 <i class="fa fa-vk"></i>
             </a>
-            <a data-ga-label="Twitter" target="_blank" href="https://twitter.com/evendate"
-               class="footer-social-link hover-fill js-ga-track">
+            <a target="_blank" href="https://twitter.com/evendate"
+               class="footer-social-link">
                 <i class="fa fa-twitter"></i>
             </a>
             <a target="_blank" href="http://instagram.com/evendate"
-               class="footer-social-link hover-fill js-ga-track">
+               class="footer-social-link">
                 <i class="fa fa-instagram"></i>
             </a>
         </div>
 
         <div class="footer-nav-links float-right">
-            <a data-ga-label="ContactUs" class="footer-nav-link js-ga-track"
-               href="#">+7 (495) 641-6105</a>
-            <a data-ga-label="Terms" class="footer-nav-link js-ga-track" target="_blank"
-               href="https://www.google.com/intl/en/policies/terms/">Обратная связь</a>
+            <a class="footer-nav-link feedback-link" target="_blank"
+               href="#">Обратная связь</a>
         </div>
     </div>
 </footer>
+
 
 <?php
 require_once('landing/footer.php');
