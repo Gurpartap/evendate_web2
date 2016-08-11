@@ -2782,7 +2782,6 @@ a.social-btn {
     padding-bottom: 10px;
     text-decoration: none;
     color: #fff;
-    /* background-color: #000; */
     margin-left: 7px;
     font-size: 22px;
     border-radius: 6px;
@@ -2814,7 +2813,28 @@ a.social-btn.google-lus-btn {
     color: #ffffff;
 }
 
-.auth-with-interests:hover{
+.auth-with-interests:hover {
     background: #ffffff;
     color: #586971;
+}
+
+a.auth-small-btn.social-btn {
+    color: #fff;
+    font-size: 25px;
+    margin-right: 4px;
+    border-radius: 5px;
+    padding-left: 7px;
+    padding-right: 0;
+    padding-top: 4px;
+    padding-bottom: 0;
+}
+
+a.facebook-btn.auth-small-btn.social-btn {
+    padding-left: 12px;
+    padding-top: 5px;
+}
+
+a.auth-small-btn.social-btn.google-lus-btn {
+    padding-left: 9px;
+    padding-top: 5px;
 }
