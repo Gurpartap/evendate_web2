@@ -107,24 +107,51 @@ $title = 'Evendate';
 
     <div class="overlay-sections">
         <section class="about-section overlay-section">
-            <form>
-                <input>
-                <input>
-            </form>
+            <div class="fade-in">
+                <div class="fluid-width constrain-large">
+                    <h3 class="page-title text-center">Возникли вопросы?</h3>
+                    <p class="page-body text-center">Заполните форму и наша команда обязательно свяжется с Вами!</p>
+                    <form>
+                        <div class="form-group">
+                            <label for="feedback-name">Ваше имя</label>
+                            <input class="form-control" type="text" name="name" autocomplete="off"
+                                   id="feedback-name"
+                                   placeholder="Ваше имя" required="required">
+                        </div>
+                        <div class="form-group">
+                            <label for="feedback-email">Ваш email</label>
+                            <input class="form-control" type="email" name="email" autocomplete="off"
+                                   id="feedback-email"
+                                   placeholder="E-mail" required="required">
+                        </div>
+                        <div class="form-group">
+                            <label for="feedback-message">Ваше сообщение</label>
+                            <textarea class="form-control" name="message"
+                                      id="feedback-message"
+                                      autocomplete="off">Ваше сообщение</textarea>
+                        </div>
+                        <p class="page-body text-center">
+                            <a class="auth-with-interests" href="#" id="send-feedback">Отправить</a>
+                        </p>
+                    </form>
+                </div>
+            </div>
         </section>
         <section class="faq-section overlay-section">
             <div class="fade-in">
                 <div class="fluid-width constrain-large text-center">
                     <h2 class="page-title">Войдите через социальную сеть:</h2>
-                    <a href="#" class="social-btn vk-btn vk-auth-btn">
-                        <i class="fa fa-vk"></i> ВКонтакте
-                    </a>
-                    <a href="#" class="social-btn fb-btn facebook-btn">
-                        <i class="fa fa-facebook"></i> Facebook
-                    </a>
-                    <a href="#" class="social-btn google-lus-btn google-plus-btn">
-                        <i class="fa fa-google"></i> Google
-                    </a>
+                    <div class="">
+                        <a href="#" class="social-btn vk-btn vk-auth-btn">
+                            <i class="fa fa-vk"></i> ВКонтакте
+                        </a>
+                        <a href="#" class="social-btn fb-btn facebook-btn">
+                            <i class="fa fa-facebook"></i> Facebook
+                        </a>
+                        <a href="#" class="social-btn google-lus-btn google-plus-btn">
+                            <i class="fa fa-google"></i> Google
+                        </a>
+                    </div>
                 </div>
             </div>
         </section>
@@ -191,10 +218,9 @@ $title = 'Evendate';
 
         </a>
         <div class="header-nav-links">
-            <a class="header-nav-link hover-color organizations-link js-ga-track fader-link about-link about-header-link"
-               data-ga-label="About" data-overlay-target="about-section" href="#">Организаторам</a>
-            <a class="header-nav-link faq-link hover-color js-ga-track fader-link faq-link faq-header-link"
-               data-ga-label="FAQ"
+            <a class="header-nav-link hover-color organizations-link fader-link"
+               data-overlay-target="about-section" href="#">Организаторам</a>
+            <a class="header-nav-link faq-link hover-color fader-link faq-link faq-header-link"
                data-overlay-target="faq-section" href="#">Войти</a>
 
             <a class="header-nav-link hover-color js-ga-track fader-link about-link about-header-link hidden"
@@ -203,8 +229,8 @@ $title = 'Evendate';
         <a class="menu" href="index.html">Menu</a>
     </header>
     <nav class="mobile-nav">
-        <a class="mobile-nav-link js-ga-track about-link" data-ga-label="About" href="about.html">Организаторам</a>
-        <a class="mobile-nav-link js-ga-track faq-link" data-ga-label="FAQ" href="faq.html">Войти</a>
+        <a class="mobile-nav-link" data-ga-label="About" href="about.html">Организаторам</a>
+        <a class="mobile-nav-link faq-link" data-ga-label="FAQ" href="faq.html">Войти</a>
     </nav>
 </div>
 
@@ -220,13 +246,16 @@ $title = 'Evendate';
                             wherever and whenever you have 5 minutes free.</p>
                         <div class="slide-cta">
                             <span>Войти через: </span>
-                            <a class="slide-cta-button hover-fill vk-auth-btn auth-small-btn social-btn vk-btn" href="#">
+                            <a class="slide-cta-button hover-fill vk-auth-btn auth-small-btn social-btn vk-btn"
+                               href="#">
                                 <i class="fa fa-vk"></i>
                             </a>
-                            <a class="slide-cta-button hover-fill facebook-btn auth-small-btn social-btn fb-btn" href="#">
+                            <a class="slide-cta-button hover-fill facebook-btn auth-small-btn social-btn fb-btn"
+                               href="#">
                                 <i class="fa fa-facebook"></i>
                             </a>
-                            <a class="slide-cta-button hover-fill google-plus-btn auth-small-btn social-btn google-lus-btn" href="#">
+                            <a class="slide-cta-button hover-fill google-plus-btn auth-small-btn social-btn google-lus-btn"
+                               href="#">
                                 <i class="fa fa-google"></i>
                             </a>
                         </div>
@@ -240,13 +269,16 @@ $title = 'Evendate';
                             way.</p>
                         <div class="slide-cta js-animate-this">
                             <span>Войти через: </span>
-                            <a class="slide-cta-button hover-fill vk-auth-btn auth-small-btn social-btn vk-btn" href="#">
+                            <a class="slide-cta-button hover-fill vk-auth-btn auth-small-btn social-btn vk-btn"
+                               href="#">
                                 <i class="fa fa-vk"></i>
                             </a>
-                            <a class="slide-cta-button hover-fill facebook-btn auth-small-btn social-btn fb-btn" href="#">
+                            <a class="slide-cta-button hover-fill facebook-btn auth-small-btn social-btn fb-btn"
+                               href="#">
                                 <i class="fa fa-facebook"></i>
                             </a>
-                            <a class="slide-cta-button hover-fill google-plus-btn auth-small-btn social-btn google-lus-btn" href="#">
+                            <a class="slide-cta-button hover-fill google-plus-btn auth-small-btn social-btn google-lus-btn"
+                               href="#">
                                 <i class="fa fa-google"></i>
                             </a>
                         </div>
@@ -264,91 +296,138 @@ $title = 'Evendate';
                         <a class="slide-cta-button hover-fill facebook-btn auth-small-btn social-btn fb-btn" href="#">
                             <i class="fa fa-facebook"></i>
                         </a>
-                        <a class="slide-cta-button hover-fill google-plus-btn auth-small-btn social-btn google-lus-btn" href="#">
+                        <a class="slide-cta-button hover-fill google-plus-btn auth-small-btn social-btn google-lus-btn"
+                           href="#">
                             <i class="fa fa-google"></i>
                         </a>
                     </div>
                 </div>
-                <div class="text-slide text-slide-3 container-centered" data-slide="3">
-                    <h1 class="js-animate-this">Выберите то, что интересно Вам</h1>
-                    <div class="js-animate-this">
-                        <div class="row">
-                            <div class="col-md-3 interests-block">
-                                <img src="app/assets/img/objects/step-4/education.png">
-                                <span>Образование</span>
-                                <div class="selected-overlay">
-                                    <div class="selected-overlay-icon-wrapper">
-                                        <i class="fa fa-check" aria-hidden="true"></i>
+            </div>
+            <div class="text-slide text-slide-3 container-centered" data-slide="3">
+                <h1 class="js-animate-this choose-ineterests-text hidden-sm hidden-xs">Выберите то, что интересно Вам</h1>
+                <div class="js-animate-this hidden-sm hidden-xs">
+                    <div class="row col-md-12">
+                        <div class="col-md-3">
+                            <div class="interests-block">
+                                <div class="interest-img-wrapper"><img src="app/assets/img/objects/step-4/education.png">
+                                    <div class="selected-overlay">
+                                        <div class="selected-overlay-icon-wrapper">
+                                            <i class="fa fa-check" aria-hidden="true"></i>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-3 interests-block">
-                                <img src="app/assets/img/objects/step-4/art.png">
-                                <span>Искусство</span>
-                                <div class="selected-overlay">
-                                    <div class="selected-overlay-icon-wrapper">
-                                        <i class="fa fa-check" aria-hidden="true"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3 interests-block">
-                                <img src="app/assets/img/objects/step-4/sport.png">
-                                <span>Спорт</span>
-                                <div class="selected-overlay">
-                                    <div class="selected-overlay-icon-wrapper">
-                                        <i class="fa fa-check" aria-hidden="true"></i>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3 interests-block">
-                                <img src="app/assets/img/objects/step-4/IT.png">
-                                <span>IT</span>
-                                <div class="selected-overlay">
-                                    <div class="selected-overlay-icon-wrapper">
-                                        <i class="fa fa-check" aria-hidden="true"></i>
-                                    </div>
-                                </div>
+                                <div class="interest-name">Образование</div>
                             </div>
                         </div>
-                        <div class="row">
-                            <div class="col-md-3 interests-block">
-                                <img src="app/assets/img/objects/step-4/design.png">
-                                <span>Дизайн</span>
-                                <div class="selected-overlay">
-                                    <div class="selected-overlay-icon-wrapper">
-                                        <i class="fa fa-check" aria-hidden="true"></i>
+                        <div class="col-md-3">
+                            <div class="interests-block">
+                                <div class="interest-img-wrapper"><img src="app/assets/img/objects/step-4/art.png">
+                                    <div class="selected-overlay">
+                                        <div class="selected-overlay-icon-wrapper">
+                                            <i class="fa fa-check" aria-hidden="true"></i>
+                                        </div>
                                     </div>
                                 </div>
+                                <div class="interest-name">Искусство</div>
                             </div>
-                            <div class="col-md-3 interests-block">
-                                <img src="app/assets/img/objects/step-4/business.png">
-                                <span>Стартапы и бизнес</span>
-                                <div class="selected-overlay">
-                                    <div class="selected-overlay-icon-wrapper">
-                                        <i class="fa fa-check" aria-hidden="true"></i>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="interests-block">
+                                <div class="interest-img-wrapper"><img src="app/assets/img/objects/step-4/sport.png">
+                                    <div class="selected-overlay">
+                                        <div class="selected-overlay-icon-wrapper">
+                                            <i class="fa fa-check" aria-hidden="true"></i>
+                                        </div>
                                     </div>
                                 </div>
+                                <div class="interest-name">Спорт</div>
                             </div>
-                            <div class="col-md-3 interests-block">
-                                <img src="app/assets/img/objects/step-4/bars.png">
-                                <span>Клубы и бары</span>
-                                <div class="selected-overlay">
-                                    <div class="selected-overlay-icon-wrapper">
-                                        <i class="fa fa-check" aria-hidden="true"></i>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="interests-block">
+                                <div class="interest-img-wrapper"><img src="app/assets/img/objects/step-4/IT.png">
+                                    <div class="selected-overlay">
+                                        <div class="selected-overlay-icon-wrapper">
+                                            <i class="fa fa-check" aria-hidden="true"></i>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-3 interests-block">
-                                <img src="app/assets/img/objects/step-4/fun.png">
-                                <span>Развлечения</span>
-                                <div class="selected-overlay">
-                                    <div class="selected-overlay-icon-wrapper">
-                                        <i class="fa fa-check" aria-hidden="true"></i>
-                                    </div>
-                                </div>
+                                <div class="interest-name">IT</div>
                             </div>
                         </div>
                     </div>
+                    <div class="row col-md-12">
+                        <div class="col-md-3">
+
+                            <div class="interests-block">
+                                <div class="interest-img-wrapper"><img src="app/assets/img/objects/step-4/design.png">
+                                    <div class="selected-overlay">
+                                        <div class="selected-overlay-icon-wrapper">
+                                            <i class="fa fa-check" aria-hidden="true"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="interest-name">Дизайн</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="interests-block">
+                                <div class="interest-img-wrapper"><img src="app/assets/img/objects/step-4/business.png">
+                                    <div class="selected-overlay">
+                                        <div class="selected-overlay-icon-wrapper">
+                                            <i class="fa fa-check" aria-hidden="true"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="interest-name">Стартапы и бизнес</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="interests-block">
+                                <div class="interest-img-wrapper"><img src="app/assets/img/objects/step-4/bars.png">
+                                    <div class="selected-overlay">
+                                        <div class="selected-overlay-icon-wrapper">
+                                            <i class="fa fa-check" aria-hidden="true"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="interest-name">Клубы и бары</div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="interests-block">
+                                <div class="interest-img-wrapper"><img src="app/assets/img/objects/step-4/fun.png">
+                                    <div class="selected-overlay">
+                                        <div class="selected-overlay-icon-wrapper">
+                                            <i class="fa fa-check" aria-hidden="true"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="interest-name">Развлечения</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row col-md-12 text-center">
+                        <a class="auth-with-interests" href="#">Войти</a>
+                    </div>
+                </div>
+
+                <h2 class="js-animate-this hidden-md hidden-lg"><br/>Learn by doing.</h2>
+                <p class="js-animate-this hidden-md hidden-lg">Put your new knowledge to use right away. Each lesson ends with
+                    personalized next steps that are automatically saved for you.</p>
+                <div class="slide-cta js-animate-this hidden-md hidden-lg">
+                    <span>Войти через: </span>
+                    <a class="slide-cta-button hover-fill vk-auth-btn auth-small-btn social-btn vk-btn" href="#">
+                        <i class="fa fa-vk"></i>
+                    </a>
+                    <a class="slide-cta-button hover-fill facebook-btn auth-small-btn social-btn fb-btn" href="#">
+                        <i class="fa fa-facebook"></i>
+                    </a>
+                    <a class="slide-cta-button hover-fill google-plus-btn auth-small-btn social-btn google-lus-btn"
+                       href="#">
+                        <i class="fa fa-google"></i>
+                    </a>
                 </div>
             </div>
             <div class="device-frame">
@@ -480,10 +559,13 @@ $title = 'Evendate';
 </footer>
 
 
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="assets/components/jquery.js"><\/script>');</script>
+<script src="<?= App::$SCHEMA . App::$NODE_DOMAIN ?>:8080/socket.io/socket.io.js" type="text/javascript"></script>
+<script src="app/js/app.js"></script>
 <?php
-require_once('landing/footer.php');
+require_once('footer.php');
 ?>
-
 <script src="app/assets/js/scripts.min.js"></script>
 </body>
 </html>
