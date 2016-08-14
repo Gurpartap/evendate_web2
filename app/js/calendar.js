@@ -264,7 +264,7 @@ function Feed($view){
 			ajax_data = sub_state.ajax_data;
 		ajax_data.length = length;
 		ajax_data.offset = offset;
-		ajax_data.fields = ajax_data.fields.join(',');
+		ajax_data.fields = Array.isArray(ajax_data.fields) ? ajax_data.fields.join(',') : ajax_data.fields;
 		$.ajax({
 			url: sub_state.ajax_url,
 			data: ajax_data,
@@ -1283,9 +1283,6 @@ function OneFriend($view){
 			getFriendFeed();
 		}
 	});
-	
-	
-	calculateMargins($view);
 }
 
 function Friends($view){
@@ -1329,7 +1326,6 @@ function Friends($view){
 					$load_btn.before($card);
 				});
 				$load_btn.removeClass(__C.CLASSES.HIDDEN).find('.btn').removeClass(__C.CLASSES.DISABLED);
-				calculateMargins($view);
 				bindControllers($view);
 			}
 		});

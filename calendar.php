@@ -138,7 +138,7 @@ $user_full_name = $user->getLastName().' '.$user->getFirstName(); ?>
 
 		<!-- START row-->
 		<div class="friends-app app_view -hidden PageView" data-controller="Friends">
-			<div class="col-md-12" data-controller="Friends" style="padding-top: 100px;">
+			<div class="page_wrapper" style="padding-top: 100px;">
 
 				<div class="no-friends-block hidden">
 					<div class="no-friends-text">Ваших друзей пока нет в Evendate</div>
@@ -150,6 +150,13 @@ $user_full_name = $user->getLastName().' '.$user->getFirstName(); ?>
 							<a class="fa fa-twitter" target="_blank" href="https://twitter.com/share?url=http://evendate.ru/event.php?id={id}&text=Я пользуюсь Evendate, чтобы не пропустить интересные события в своих любимых местах.&via=evendate.ru&hashtags=#events #Москва #evendate" data-share-type="twitter"></a>
 						</p></div>
 				</div>
+				<div class="friends-main-content hidden">
+
+					<div class="load-more-btn hidden" data-page-number="0">
+						<button class="btn btn-lg disabled btn-pink-empty"> Загрузить еще...</button>
+					</div>
+				</div>
+				<div class="one-friend-profile one-friend-main-content"></div>
 
 				<div class="friends-right-bar hidden">
 					<div class="friends-bar-header">
@@ -158,13 +165,6 @@ $user_full_name = $user->getLastName().' '.$user->getFirstName(); ?>
 					<div class="friends-list">
 					</div>
 				</div>
-				<div class="friends-main-content hidden">
-
-					<div class="load-more-btn hidden" data-page-number="0">
-						<button class="btn btn-lg disabled btn-pink-empty"> Загрузить еще...</button>
-					</div>
-				</div>
-				<div class="one-friend-profile one-friend-main-content"></div>
 			</div>
 		</div>
 		<!-- END row-->
@@ -306,7 +306,7 @@ $user_full_name = $user->getLastName().' '.$user->getFirstName(); ?>
 
 
 <!-- =============== APP SCRIPTS ===============-->
-<script src="<?= App::$SCHEMA . App::$NODE_DOMAIN ?>:8080/socket.io/socket.io.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js" type="text/javascript"></script>
 <script type="text/javascript" src="/app/js/app.js" charset="utf-8"></script>
 <script type="text/javascript" src="/app/js/Class.Calendar.js" charset="utf-8"></script>
 <script type="text/javascript" src="/app/js/Class.DatePicker.js" charset="utf-8"></script>

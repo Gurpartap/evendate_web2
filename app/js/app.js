@@ -574,7 +574,8 @@ function showOnboarding(){
 	window.parent.location = 'onboarding';
 }
 
-window.socket = io.connect(':8080');
+window.socket = io.connect(window.location.protocol== 'https:' ? ':8443' : ':8080', {secure: window.location.protocol == 'https:'});
+
 
 socket.on('connect', function() {
 	$.ajax({
@@ -591,6 +592,7 @@ socket.on('connect', function() {
 		}
 	});
 });
+
 
 socket.on('auth', function(data) {
 	console.log(data);

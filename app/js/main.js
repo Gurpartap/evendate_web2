@@ -1012,39 +1012,6 @@ function getFriendsList($friends_right_list, cb){
 	});
 }
 
-function calculateMargins($view){
-	var $main_content = $view.find('.friends-main-content'),
-		$friends_right_list = $view.find('.friends-right-bar'),
-		$user_content = $view.find('.one-friend-main-content'),
-		view_width = $view.width(),
-		content_width = $main_content.width() == 0 ? $user_content.width() : $main_content.width(),
-		friends_right_list_width = $friends_right_list.width(),
-		DISTANCE_BETWEEN = 150,
-		_margin = (view_width - content_width - friends_right_list_width - DISTANCE_BETWEEN) / 2;
-
-	$main_content.css('margin-left', _margin + 'px');
-	$friends_right_list.css('margin-left', _margin + content_width + DISTANCE_BETWEEN + 'px');
-	$user_content.css('margin-left', _margin + 'px');
-}
-
-/**
- * Нажатие на кнопку подписаться/отписаться
- * @param state
- * @param entity_id ID подписки или ID организации в зависимости от типа совершаемого события
- * @param callback
- */
-function toggleSubscriptionState(state, entity_id, callback){
-	var options = (state == false) ? {
-			url: '/api/v1/organizations/' + entity_id + '/subscriptions',
-			type: 'DELETE'
-		} : {
-			url: '/api/v1/organizations/' + entity_id + '/subscriptions',
-			type: 'POST'
-		};
-	$.ajax(options);
-}
-
-
 function getTagsString(tags){
 	var _tags = [];
 	if (tags instanceof Array == false) return null;

@@ -41,7 +41,7 @@
         }
     });
 </script>
-<script src="<?= App::$SCHEMA . App::$NODE_DOMAIN ?>:8080/socket.io/socket.io.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js" type="text/javascript"></script>
 <script src="/app/js/app.js"></script>
 <script type="text/javascript" src="/landing/js/js_file.js"></script>    <!-- подключение js -->
 <script type="text/javascript" src="/landing/js/modals.js"></script>    <!-- подключение js -->
