@@ -620,7 +620,6 @@ class Organization extends AbstractEntity
         return new Result(true, '');
     }
 
-
     public static function create($data, User $user, PDO $db)
     {
         $q_ins_organization = App::queryFactory()->newInsert();

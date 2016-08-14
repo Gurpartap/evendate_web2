@@ -1731,3 +1731,153 @@
   </div>
 </script>
 
+
+
+
+<!-- Add organization Page -->
+
+<script type="javascript/template" id="tmpl-add-organization-page">
+
+	<div class="page edit_event_page">
+		<form class="form-horizontal" id="add-organization-form">
+
+			<h3>{header_text}</h3>
+			<input id="add_organization_event_id" type="hidden" name="event_id" value="{id}">
+
+			<h4 class="form_label"><label for="add_organization_title">Полное название</label></h4>
+			<div class="form_unit">
+				<input id="add_organization_title" class="form_input LimitSize" type="text" name="name" value="{name}" autocomplete="off" placeholder="Название организации" data-maxlength="150" required>
+			</div>
+
+			<h4 class="form_label"><label for="add_organization_short_name">Сокращенное название</label></h4>
+			<div class="form_unit">
+				<input id="add_organization_short_name" class="form_input LimitSize" type="text" name="short_name" value="{short_name}" autocomplete="off" placeholder="Сокращенное навание организации" data-maxlength="15" required>
+			</div>
+
+			<div class="EditEventOrganizations -hidden">
+				<h4 class="form_label"><label for="add_organization_type">Категория</label></h4>
+				<div class="form_unit">
+					<select id="add_organization_type" name="organization_type_id"></select>
+				</div>
+			</div>
+
+
+			<h4 class="form_label"><label for="add_organization_site_url">Официальный сайт</label></h4>
+			<div class="form_unit">
+				<input id="add_organization_site_url" class="form_input" type="text" name="site_url" value="{site_url}" autocomplete="off" placeholder="Адрес сайта">
+			</div>
+
+			<h4 class="form_label"><label for="add_organization_address">Адрес</label></h4>
+			<div class="form_unit">
+				<input id="add_organization_address" class="form_input" type="text" name="default_address" value="{default_address}" autocomplete="off" placeholder="Фактический адрес">
+			</div>
+
+			<h4 class="form_label"><label for="add_organization_description">Описание</label></h4>
+			<div class="form_unit">
+				<textarea id="add_organization_description" class="form_textarea LimitSize" data-maxlength="250" name="description" placeholder="Не более 250 символов" required>{description}</textarea>
+			</div>
+
+			<h4 class="form_label"><label for="add_organization_facebook_url">Группа в Facebook</label></h4>
+			<div class="form_unit">
+				<input id="add_organization_facebook_url" class="form_input" type="text" name="facebook_url" value="{facebook_url}" autocomplete="off" placeholder="Ссылка на официальную группу в Facebook">
+			</div>
+
+			<h4 class="form_label"><label for="add_organization_vk_url">Группа во ВКонтакте</label></h4>
+			<div class="form_unit">
+				<input id="add_organization_vk_url" class="form_input" type="text" name="vk_url" value="{vk_url}" autocomplete="off" placeholder="Ссылка на официальную группу во ВКонтакте">
+			</div>
+
+			<h4 class="form_label"><label>Изображения</label></h4>
+			<div class="form_group -parts_e_2 EditEventImgLoadWrap ImgLoadWrap">
+				<div class="form_unit -centering">
+					<div class="wrapper">
+						<h4 class="form_label"><label>Логотип</label></h4>
+						<div class="Tabs">
+							<header class="tabs_header -color_accent">
+								<span class="tab Tab -active">По ссылке</span>
+								<span class="tab Tab">С компьютера</span>
+							</header>
+							<div class="tab_bodies_wrap TabsBodyWrapper">
+								<div class="tab_body TabsBody -active">
+									<div class="form_unit">
+										<input id="add_organization_load_by_url_hor" class="form_input" type="text" autocomplete="off" placeholder="Ссылка на изображение">
+									</div>
+									<div class="form_unit">
+										<button class="button -color_accent RippleEffect LoadByURLButton" type="button" tabindex="-1" data-load_input="add_organization_load_by_url_hor">Загрузить</button>
+									</div>
+								</div>
+								<div class="tab_body TabsBody">
+									<div class="form_unit">
+										<button class="button -color_accent RippleEffect FileLoadButton" type="button"><input class="LoadImg -hidden" type="file">Выбрать</button>
+									</div>
+								</div>
+							</div>
+						</div>
+						<p class="FileNameText"></p>
+						<div class="form_unit">
+							<button class="button -color_accent_alt RippleEffect CallModal -hidden" type="button" data-modal_type="cropper" data-source_img="{image_horizontal_url}" data-aspect_ratio="16/9">
+								<span class="Text">Кадрировать</span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="form_unit">
+					<div class="img_holder">
+						<img class="add_organization_img_preview_hor EditEventImgPreview ImgPreview" src="{image_horizontal_url}">
+						<img src="app/img/edit_event/add_organization_img_placeholder_hor.png">
+						<input id="add_organization_image_horizontal_src" class="DataUrl" type="hidden" name="image_horizontal" value="{image_horizontal_base64}">
+						<input id="add_organization_image_horizontal_filename" class="FileName" type="hidden" name="filename_horizontal" value="{image_horizontal_filename}">
+					</div>
+				</div>
+			</div>
+			<div class="form_group -parts_e_2 EditEventImgLoadWrap ImgLoadWrap">
+				<div class="form_unit -centering">
+					<div class="wrapper">
+						<h4 class="form_label"><label>Фоновое изображение</label></h4>
+						<div class="Tabs">
+							<header class="tabs_header -color_accent">
+								<span class="tab Tab -active">По ссылке</span>
+								<span class="tab Tab">С компьютера</span>
+							</header>
+							<div class="tab_bodies_wrap TabsBodyWrapper">
+								<div class="tab_body TabsBody -active">
+									<div class="form_unit">
+										<input id="add_organization_load_by_url_vert" class="form_input" type="text" autocomplete="off" placeholder="Ссылка на изображение">
+									</div>
+									<div class="form_unit">
+										<button class="button -color_accent RippleEffect LoadByURLButton" type="button" tabindex="-1" data-load_input="add_organization_load_by_url_vert">Загрузить</button>
+									</div>
+								</div>
+								<div class="tab_body TabsBody">
+									<div class="form_unit">
+										<button class="button -color_accent RippleEffect FileLoadButton" type="button"><input class="LoadImg -hidden" type="file">Выбрать</button>
+									</div>
+								</div>
+							</div>
+						</div>
+						<p class="FileNameText"></p>
+						<div class="form_unit">
+							<button class="button -color_accent_alt RippleEffect CallModal -hidden" type="button" data-modal_type="cropper" data-source_img="{image_vertical_url}" data-aspect_ratio="7/10">
+								<span class="Text">Кадрировать</span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="form_unit">
+					<div class="img_holder">
+						<img class="add_organization_img_preview_vert EditEventImgPreview ImgPreview" src="{image_vertical_url}">
+						<img src="app/img/edit_event/add_organization_img_placeholder_vert.png">
+						<input id="add_organization_image_vertical_src" class="DataUrl" type="hidden" name="image_vertical" value="{image_vertical_base64}">
+						<input class="FileName" type="hidden" name="filename_vertical" value="{image_vertical_filename}">
+					</div>
+				</div>
+			</div>
+
+			<div class="form_unit -h_centering">
+				<button id="add_organization_submit" class="button RippleEffect -color_accent" type="button">Создать</button>
+			</div>
+
+		</form>
+	</div>
+
+</script>

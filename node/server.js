@@ -813,7 +813,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 greetingTimeout: 50000,
                 socketTimeout: 50000,
                 from: 'feedback@evendate.ru',
-                to: 'support@evendate.com',
+                to: 'support@evendate.ru',
                 subject: 'Обратная связь!',
                 html: html
             }, function (err, info) {

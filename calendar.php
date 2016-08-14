@@ -215,6 +215,11 @@ $user_full_name = $user->getLastName().' '.$user->getFirstName(); ?>
 			<div class="page_wrapper"></div>
 		</div>
 
+		<!-- START row-->
+		<div class="add-organization-app app_view -hidden PageView" data-controller="AddOrganization">
+			<div class="page_wrapper"></div>
+		</div>
+
 	</div>
 </div>
 
@@ -308,6 +313,7 @@ $user_full_name = $user->getLastName().' '.$user->getFirstName(); ?>
 <script type="text/javascript" src="/app/js/Class.Modal.js" charset="utf-8"></script>
 <script type="text/javascript" src="/app/js/main.js" charset="utf-8"></script>
 <script type="text/javascript" src="/app/js/calendar.js" charset="utf-8"></script>
+<script type="text/javascript" src="/app/js/add_organization.js" charset="utf-8"></script>
 
 
 <?php
