@@ -129,16 +129,6 @@ sql.setDialect('postgres');
 
 pg.connect(pg_conn_string, function (err, client, done) {
 
-    var publicDelayedEvents = function(){
-        var q_upd_events = 'UPDATE events SET status = TRUE, updated_at = NOW(), public_at = null ' +
-            ' WHERE canceled = FALSE ' +
-            ' AND status = FALSE' +
-            ' AND public_at < NOW()';
-        client.query(q_upd_events, [], function(err){
-            console.log('DELAYED updated');
-            if (err) logger.error(err);
-        })
-    };
 
     try {
         new CronJob('*/1 * * * *', function () {
@@ -154,8 +144,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 var notifications = new Notifications(real_config, client, logger);
                 notifications.sendAutoNotifications();
                 notifications.sendUsersNotifications();
+
             }
-            publicDelayedEvents();
         }, null, true);
     } catch (ex) {
         logger.error(ex);

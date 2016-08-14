@@ -870,28 +870,6 @@
           },
           {
             "in": "query",
-            "name": "is_delayed",
-            "description": "show delayed for admins",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "true",
-              "false"
-            ]
-          },
-          {
-            "in": "query",
-            "name": "is_canceled",
-            "description": "show canceled for admins",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "true",
-              "false"
-            ]
-          },
-          {
-            "in": "query",
             "name": "future",
             "description": "all future events",
             "required": false,
@@ -2320,26 +2298,6 @@
             ]
           }
         ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "schema": {
-              "$ref": "#/definitions/ApiResponse"
-            }
-          }
-        }
-      },
-      "get": {
-        "tags": [
-          "User"
-        ],
-        "summary": "Get user settings for web version",
-        "description": "",
-        "operationId": "updateUserSettings",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [],
         "responses": {
           "200": {
             "description": "successful operation",
