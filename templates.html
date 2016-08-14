@@ -1742,7 +1742,15 @@
 		<form class="form-horizontal" id="add-organization-form">
 
 			<h3>{header_text}</h3>
-			<input id="add_organization_event_id" type="hidden" name="event_id" value="{id}">
+			<input id="add_organization_organization_id" type="hidden" name="organization_id" value="{id}">
+
+
+			<div class="EditEventOrganizations -hidden">
+				<h4 class="form_label"><label for="add_organization_type">Категория</label></h4>
+				<div class="form_unit">
+					<select id="add_organization_type" name="organization_type_id"></select>
+				</div>
+			</div>
 
 			<h4 class="form_label"><label for="add_organization_title">Полное название</label></h4>
 			<div class="form_unit">
@@ -1754,13 +1762,10 @@
 				<input id="add_organization_short_name" class="form_input LimitSize" type="text" name="short_name" value="{short_name}" autocomplete="off" placeholder="Сокращенное навание организации" data-maxlength="15" required>
 			</div>
 
-			<div class="EditEventOrganizations -hidden">
-				<h4 class="form_label"><label for="add_organization_type">Категория</label></h4>
-				<div class="form_unit">
-					<select id="add_organization_type" name="organization_type_id"></select>
-				</div>
+			<h4 class="form_label"><label for="add_organization_email">Email</label></h4>
+			<div class="form_unit">
+				<input id="add_organization_email" class="form_input" type="text" name="email" value="{email}" autocomplete="off" placeholder="Email для связи">
 			</div>
-
 
 			<h4 class="form_label"><label for="add_organization_site_url">Официальный сайт</label></h4>
 			<div class="form_unit">

@@ -829,6 +829,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 });
             });
 
+
             socket.on(EMIT_NAMES.NOTIFICATIONS.SEND, function () {
                 if (config_index == 'local') {
                     var notifications = new Notifications(real_config, client, logger);
