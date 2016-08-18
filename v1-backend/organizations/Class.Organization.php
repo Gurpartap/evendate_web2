@@ -480,7 +480,7 @@ class Organization extends AbstractEntity
             && !empty($data['background_filename'])
         ) {
             $background_filename = md5(App::generateRandomString() . '-background') . '.' . App::getImageExtension($data['background_filename']);
-            App::saveImage($data['background'], $background_filename, 14000);
+            App::saveImage(self::IMAGES_PATH . self::IMAGE_TYPE_BACKGROUND . $data['background'], $background_filename, 14000);
             $data['background_img_url'] = $background_filename;
         } else throw new InvalidArgumentException('Фоновое изображение обязательно');
 
@@ -492,7 +492,7 @@ class Organization extends AbstractEntity
             && !empty($data['logo_filename'])
         ) {
             $logo_filename = md5(App::generateRandomString() . '-logo') . '.' . App::getImageExtension($data['logo_filename']);
-            App::saveImage($data['logo'], $logo_filename, 14000);
+            App::saveImage(self::IMAGES_PATH . self::IMAGE_TYPE_LOGO . $data['logo'], $logo_filename, 14000);
             $data['img_url'] = $logo_filename;
         } else throw new InvalidArgumentException('Логотип обязателен');
     }
