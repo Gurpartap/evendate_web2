@@ -359,6 +359,17 @@ function buildRadioOrCheckbox(type, props){
 	}
 }
 
+function buildButton(props){
+	props.classes = props.classes ? (typeof props.classes == 'string') ? props.classes.split(' ') : props.classes : [];
+	props.classes.toString = arrayToSpaceSeparatedString;
+	if(props.dataset)
+		props.dataset.toString = (Array.isArray(props.dataset)) ? arrayToSpaceSeparatedString : objectToHtmlDataSet;
+	if(props.attributes)
+		props.attributes.toString = (Array.isArray(props.attributes)) ? arrayToSpaceSeparatedString : objectToHtmlAttributes;
+	
+	return tmpl('button', props);
+}
+
 function buildAvatarCollection(subscribers, count){
 	var $subscribers = $();
 	$subscribers = $subscribers.add(tmpl('subscriber-avatar', __USER));

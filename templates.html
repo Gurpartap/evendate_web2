@@ -10,7 +10,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-button">
-	<button class="button {classes}" {dataset} type="button"><span class="Text">{title}</span></button>
+	<button class="button {classes}" {dataset} type="button" {attributes}><span class="Text">{title}</span></button>
 </script>
 
 <script type="javascript/template" id="tmpl-user-tombstone">
@@ -565,7 +565,7 @@
 		<div class="organization_unit_content">
 			<h5 class="organization_unit_title Controller" data-page="organization/{id}" data-organization-id="{id}">{short_name}</h5>
 			<span class="organization_unit_subscribers">{subscribed_text}</span>
-			<button class="button fa_icon fa-pencil -empty -low -color_marginal_primary {redact_hidden} RippleEffect" type="button" data-page=""></button>
+			{redact_org_button}
 			<button class="button -low {subscribe_button_classes} Subscribe RippleEffect" type="button" data-organization-id="{id}">{subscribe_button_text}</button>
 		</div>
 	</div>

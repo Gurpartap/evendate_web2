@@ -31,6 +31,9 @@ var __STATES = {
 				case 'edit_event': {
 					return History.getState().data.eventId;
 				}
+				case 'add_organization': {
+					return History.getState().data.organizationId;
+				}
 				case 'statistics': {
 					break;
 				}
@@ -711,7 +714,7 @@ function OrganizationsList($view){
 			url: '/api/v1/organizations/types',
 			method: 'GET',
 			data: {
-				fields: 'organizations{fields: "img_small_url,is_subscribed,subscribed_count", order_by: "-subscribed_count"}',
+				fields: 'organizations{fields: "img_small_url,is_subscribed,subscribed_count,privileges", order_by: "-subscribed_count"}',
 				order_by: 'order_position'
 			},
 			success: function(res){
@@ -814,6 +817,17 @@ function OrganizationsList($view){
 			org.subscribe_button_text = org.is_subscribed ? 'Подписан' : 'Подписаться';
 			org.subscribe_button_classes = org.is_subscribed ? '-color_accent -Subscribed' : '-color_marginal_accent';
 			org.subscribed_text = org.subscribed_count + getUnitsText(org.subscribed_count, __C.TEXTS.SUBSCRIBERS);
+			org.privileges.forEach(function(privilege) {
+				if(privilege.role_id == 1 || privilege.name == 'admin'){
+					org.redact_org_button = buildButton({
+						classes: ['-low','-color_marginal_primary','fa_icon','fa-pencil','-empty','RippleEffect'],
+						dataset: {
+							'page': 'add_organization',
+							'organization-id': org.id
+						}
+					})
+				}
+			});
 		});
 		return tmpl('organization-unit', data);
 	}
