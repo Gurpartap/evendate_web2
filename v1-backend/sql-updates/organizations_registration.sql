@@ -3,8 +3,6 @@ ALTER TABLE organizations
 ALTER TABLE organizations
   ADD COLUMN facebook_url VARCHAR(255);
 ALTER TABLE organizations
-  ADD COLUMN state_id INT REFERENCES organizations_states (id) DEFAULT 1;
-ALTER TABLE organizations
   ADD COLUMN creator_id INT REFERENCES users (id);
 ALTER TABLE organizations
   ADD COLUMN email VARCHAR(255);
@@ -24,6 +22,10 @@ CREATE TABLE organizations_states (
   state       VARCHAR(255),
   description TEXT
 );
+
+
+ALTER TABLE organizations
+  ADD COLUMN state_id INT REFERENCES organizations_states (id) DEFAULT 1;
 
 INSERT INTO organizations_states (id, state, description)
 VALUES (0, 'on-moderation', ''), (1, 'active', '');
