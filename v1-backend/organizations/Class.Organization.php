@@ -14,6 +14,7 @@ class Organization extends AbstractEntity
     const NEW_EVENTS_COUNT_FIELD_NAME = 'new_events_count';
     const STAFF_FIELD_NAME = 'staff';
     const IS_NEW_FIELD_NAME = 'is_new';
+    const PRIVILEGES_FIELD_NAME = 'privileges';
 
     const IMAGES_PATH = 'organizations_images/';
     const IMAGE_SIZE_LARGE = '/large/';
@@ -347,6 +348,11 @@ class Organization extends AbstractEntity
             );
         }
 
+        if (isset($fields[Organization::PRIVILEGES_FIELD_NAME])) {
+            $result_data[Organization::PRIVILEGES_FIELD_NAME] =
+                Roles::getUsersPrivilegesInOrganization($user, $this, $this->db)->getData();
+        }
+
         return new Result(true, '', $result_data);
     }
 
@@ -451,7 +457,8 @@ class Organization extends AbstractEntity
 
         if (isset($data['vk_url_path'])) {
             $data['vk_url'] = trim($data['vk_url']);
-            $data['vk_url_path'] = trim($data['vk_url_path']);
+
+            $data['vk_url_path'] = parse_url($data['vk_url'], PHP_URL_PATH);
         } else {
             $data['vk_url'] = null;
             $data['vk_url_path'] = null;
@@ -459,27 +466,7 @@ class Organization extends AbstractEntity
 
         if (isset($data['facebook_url'])) {
             $data['facebook_url'] = trim($data['facebook_url']);
-            $data['facebook_url'] = preg_replace("#\\/$#", '', $data['facebook_url']);
-
-            $data['facebook_url_path'] = null;
-            preg_match(
-                '#'
-                . '(?:https?://)?'
-                . '(?:www.)?'
-                . '(?:facebook.com/)?'
-                . '(?:(?:\w)*\#!/)?'
-                . '(?:groups/)?'
-                . '(?:[?\p{L}\-_]*/)?'
-                . '(?:[?\w\-_]*/)?'
-                . '(?:group.php\?id=(?=\d.*))?'
-                . '([\d\-]*)?'
-                . '(?:\?.*)?'
-                . '#u',
-                $data['facebook_url'],
-                $data['facebook_url_path']);
-            if (count($data['facebook_url_path']) > 0) {
-                $data['facebook_url_path'] = $data['facebook_url_path'][0];
-            }
+            $data['facebook_url'] = parse_url($data['facebook_url'], PHP_URL_PATH);
         } else {
             $data['facebook_url'] = null;
             $data['facebook_url_path'] = null;
@@ -493,12 +480,9 @@ class Organization extends AbstractEntity
             && !empty($data['background_filename'])
         ) {
             $background_filename = md5(App::generateRandomString() . '-background') . '.' . App::getImageExtension($data['background_filename']);
-            $background_path = self::IMAGES_PATH . self::IMAGE_TYPE_BACKGROUND . $background_filename;
-            App::saveImage($data['background'], $background_path, 14000);
-            $data['$background_path'] = $background_path;
-        } else {
-            $data['background_img_url'] = self::IMAGES_PATH . self::IMAGE_TYPE_LOGO . self::DEFAULT_BACKGROUND_FILENAME;
-        }
+            App::saveImage($data['background'], $background_filename, 14000);
+            $data['background_img_url'] = $background_filename;
+        } else throw new InvalidArgumentException('Фоновое изображение обязательно');
 
         if (isset($data['logo'])
             && !empty($data['logo'])
@@ -508,12 +492,9 @@ class Organization extends AbstractEntity
             && !empty($data['logo_filename'])
         ) {
             $logo_filename = md5(App::generateRandomString() . '-logo') . '.' . App::getImageExtension($data['logo_filename']);
-            $logo_path = self::IMAGES_PATH . self::IMAGE_TYPE_LOGO . $logo_filename;
-            App::saveImage($data['logo'], $logo_path, 14000);
-            $data['img_url'] = $logo_path;
-        } else {
-            $data['img_url'] = self::IMAGES_PATH . self::IMAGE_TYPE_LOGO . self::DEFAULT_LOGO_FILENAME;
-        }
+            App::saveImage($data['logo'], $logo_filename, 14000);
+            $data['img_url'] = $logo_filename;
+        } else throw new InvalidArgumentException('Логотип обязателен');
     }
 
     public function update(User $user, array $data)
@@ -620,6 +601,25 @@ class Organization extends AbstractEntity
         return new Result(true, '');
     }
 
+    private static function addOwner(User $user, int $organization_id, PDO $db)
+    {
+        $q_ins_owner = App::queryFactory()->newInsert();
+
+        $q_ins_owner
+            ->into('users_organizations')
+            ->cols(array(
+                'user_id' => $user->getId(),
+                'organization_id' => $organization_id,
+                'by_default' => 0,
+                'status' => 'TRUE',
+                'role_id' => Roles::ROLE_ADMIN_ID,
+            ));
+
+        $p_ins_owner = $db->prepare($q_ins_owner->getStatement());
+        $result = $p_ins_owner->execute($q_ins_owner->getBindValues());
+        if ($result === FALSE) throw new DBQueryException('CANT_CREATE_ORGANIZATION', $db);
+    }
+
     public static function create($data, User $user, PDO $db)
     {
         $q_ins_organization = App::queryFactory()->newInsert();
@@ -651,13 +651,13 @@ class Organization extends AbstractEntity
             ->returning(array('id'));
 
         $p_ins_organization = $db->prepare($q_ins_organization->getStatement());
-//        print_r($q_ins_organization->getBindValues());
 
         $result = $p_ins_organization->execute($q_ins_organization->getBindValues());
 
 
         if ($result === FALSE) throw new DBQueryException('CANT_CREATE_ORGANIZATION', $db);
         $result = $p_ins_organization->fetch(PDO::FETCH_ASSOC);
+        self::addOwner($user, $result['id'], $db);
         return new Result(true, '', array('organization_id' => $result['id']));
     }
 
