@@ -39,8 +39,7 @@
                     'status=1,toolbar=0,menubar=0&height=440,width=600');
             }
         }
-
-    })
+    });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js" type="text/javascript"></script>
 <script src="/app/js/app.js"></script>

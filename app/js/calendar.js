@@ -2296,8 +2296,6 @@ function StatisticsEvent($view) {
 	
 }
 
-
-
 function ajaxHandler(result, success, error){
 	error = typeof error !== 'undefined' ? error : function(){
 		console.log(result);

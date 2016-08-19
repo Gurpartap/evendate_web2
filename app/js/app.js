@@ -606,7 +606,9 @@ socket.on('auth', function(data) {
 				if (data.hasOwnProperty('mobile') && data.mobile == true) {
 					window.location.href = '/mobileAuthDone.php?token=' + data.token + '&email=' + data.email;
 				} else {
-					if (data.subscriptions_count == 0){
+					if (window.localStorage.getItem('open_add_organization') != true){
+						window.parent.location = 'add_organization';
+					}else if (data.subscriptions_count == 0){
 						showOnboarding();
 					}else{
 						window.parent.location =  'feed';

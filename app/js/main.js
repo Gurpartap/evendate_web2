@@ -782,8 +782,6 @@ function showNotifier(response){
 	});
 }
 
-
-
 function renderState(){
 	var page_split = __STATES.getCurrentState().split('/'),
 		page = page_split[0],
