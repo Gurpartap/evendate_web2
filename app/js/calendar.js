@@ -31,7 +31,7 @@ var __STATES = {
 				case 'edit_event': {
 					return History.getState().data.eventId;
 				}
-				case 'add_organization': {
+				case 'edit_organization': {
 					return History.getState().data.organizationId;
 				}
 				case 'statistics': {
@@ -822,7 +822,7 @@ function OrganizationsList($view){
 					org.redact_org_button = buildButton({
 						classes: ['-low','-color_marginal_primary','fa_icon','fa-pencil','-empty','RippleEffect'],
 						dataset: {
-							'page': 'add_organization',
+							'page': 'edit_organization',
 							'organization-id': org.id
 						}
 					})
@@ -1081,7 +1081,7 @@ function Organization($view){
 		url: url,
 		method: 'GET',
 		data: {
-			fields: 'img_small_url,description,site_url,is_subscribed,default_address,subscribed_count,subscribed{fields:"is_friend",order_by:"-is_friend,first_name",length:10}'
+			fields: 'img_small_url,description,site_url,is_subscribed,default_address,subscribed_count,privileges,subscribed{fields:"is_friend",order_by:"-is_friend,first_name",length:10}'
 		},
 		success: function(res){
 			ajaxHandler(res, function(data){
@@ -1091,6 +1091,18 @@ function Organization($view){
 				
 				data = data[0];
 				
+				data.privileges.forEach(function(privilege) {
+					if(privilege.role_id == 1 || privilege.name == 'admin'){
+						data.redact_org_button = buildButton({
+							title: 'Редактировать',
+							classes: ['-fill','-color_neutral','fa_icon','fa-pencil','RippleEffect'],
+							dataset: {
+								'page': 'edit_organization',
+								'organization-id': data.id
+							}
+						})
+					}
+				});
 				$page_wrapper.append(tmpl('organization-info-page', $.extend({
 					subscribe_button_classes: data.is_subscribed ? ['fa-check', '-color_neutral', '-Subscribed'].join(' ') : ['fa-plus', '-color_accent'].join(' '),
 					subscribe_button_text: data.is_subscribed ? 'Подписан' : 'Подписаться',
