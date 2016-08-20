@@ -281,7 +281,7 @@ error_reporting(E_ALL);
 
 
 <!-- =============== APP SCRIPTS ===============-->
-<script src="<?=App::$SCHEMA.App::$NODE_DOMAIN?>:8080/socket.io/socket.io.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js" type="text/javascript"></script>
 <script src="app/js/app.js"></script>
 </body>
 

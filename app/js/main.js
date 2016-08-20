@@ -20,6 +20,43 @@ Object.methods = function(obj){
 	});
 	return methods;
 };
+Array.newFrom = function(original) {
+	var new_array = original.slice(0), arg, i;
+	if(arguments.length > 1){
+		for (i = 1; i < arguments.length; i++) {
+			arg = arguments[i];
+			switch(typeof arg){
+				case 'number':
+				case 'string':
+				case 'boolean': {
+					$.merge(new_array, [arg]);
+					break;
+				}
+				case 'object': {
+					if(!Array.isArray(arg)){
+						$.merge(new_array, Object.keys(arg).map(function(key) {return arg[key]}));
+					} else {
+						$.merge(new_array, arg);
+					}
+					break;
+				}
+				default: {
+					console.error('')
+				}
+			}
+		}
+	}
+	return new_array;
+};
+Array.prototype.clean = function(deleteValue) {
+	for (var i = 0; i < this.length; i++) {
+		if (this[i] == deleteValue) {
+			this.splice(i, 1);
+			i--;
+		}
+	}
+	return this;
+};
 
 function arrayToSpaceSeparatedString(){return this.join(' ')}
 
@@ -178,48 +215,113 @@ $.fn.extend({
 });
 
 function SubscribeButton($btn, options){
-	var self = this;
+	var self = this,
+		default_values = {
+			labels: {
+				subscribe: 'Подписаться',
+				unsubscribe: 'Отписаться',
+				subscribed: 'Подписан'
+			},
+			colors: {
+				subscribe: '-color_neutral_accent',
+				unsubscribe: '-color_accent',
+				subscribed: '-color_accent'
+			},
+			icons: {
+				subscribe: 'fa-plus',
+				unsubscribe: 'fa-times',
+				subscribed: 'fa-check'
+			}
+		},
+		classes = {
+			subscribed_state: '-Subscribed'
+		};
+	options = options ? options : {};
 	this.$btn = $btn;
+	this.is_subscribed = this.$btn.hasClass(classes.subscribed_state);
 	this.is_organization = self.$btn.data('organization-id') ? true : false;
 	this.id = this.is_organization ? self.$btn.data('organization-id') : self.$btn.data('event-id');
-	this.labels = {
-		subscribe: 'Подписаться',
-		unsubscribe: 'Отписаться',
-		subscribed: 'Подписан'
-	};
-	this.icons = {
-		subscribe: 'fa-plus',
-		unsubscribe: 'fa-times',
-		subscribed: 'fa-check'
-	};
-	this.colors = {
-		subscribe: '-color_neutral_accent',
-		unsubscribe: '-color_accent',
-		subscribed: '-color_accent'
-	};
+	
+	$.each(default_values, function(type, default_values) {
+		if(type == 'labels'){
+			self[type] = typeof options[type] == 'undefined' ? default_values : $.extend({}, default_values, options[type]);
+			return;
+		}
+		options[type] = typeof options[type] != 'undefined' ? options[type] : {};
+		if(typeof options[type] == 'object' && options[type] !== null){
+			$.each(default_values, function(state, default_value) {
+				var add_class = options[type][state] ? options[type][state] : default_value;
+				classes[state] = classes[state] ? classes[state].concat(' ', add_class) : add_class;
+			});
+		}
+	});
+	this.classes = classes;
 
-	if(typeof options != 'undefined'){
-		this.labels = typeof options.labels != 'undefined' ? $.extend(this.labels, options.labels) : this.labels;
-		this.icons = typeof options.icons != 'undefined' ? $.extend(this.icons, options.icons) : this.icons;
-		this.colors = typeof options.colors != 'undefined' ? $.extend(this.colors, options.colors) : this.colors;
-	}
-
-	this.$btn.bindHoverEvents = function(){
+	this.bindHoverEvents = function(){
+		var self = this;
 		self.$btn
 			.off('mouseenter.hoverSubscribed mouseleave.hoverSubscribed')
 			.on('mouseenter.hoverSubscribed', function(){
-				self.$btn.removeClass([self.icons.subscribed, self.colors.subscribed].join(' ')).addClass([self.icons.unsubscribe, self.colors.unsubscribe].join(' '));
+				self.$btn.removeClass(self.classes.subscribed).addClass(self.classes.unsubscribe);
 				self.$btn.children('.Text').text(self.labels.unsubscribe);
 			})
 			.on('mouseleave.hoverSubscribed', function(){
-				self.$btn.removeClass([self.icons.unsubscribe, self.colors.unsubscribe].join(' ')).addClass([self.icons.subscribed, self.colors.subscribed].join(' '));
+				self.$btn.removeClass(self.classes.unsubscribe).addClass(self.classes.subscribed);
 				self.$btn.children('.Text').text(self.labels.subscribed);
 			});
 		return self.$btn;
 	};
 
-	if(this.$btn.hasClass('-Subscribed')){
-		this.$btn.bindHoverEvents();
+	this.subscribe = function(){
+		var self = this;
+		if(this.is_subscribed){
+			console.warn('You already subscribed');
+		} else {
+			subscribeAction(true, self.is_organization, self.id, function(){
+				self.$btn
+					.removeClass([self.classes.subscribe, self.classes.subscribed].join(' '))
+					.addClass(['-Subscribed', self.classes.unsubscribe].join(' '))
+					.children('.Text').text(self.labels.unsubscribe);
+				self.bindHoverEvents();
+				self.is_subscribed = true;
+			});
+		}
+	};
+
+	this.unsubscribe = function(){
+		var self = this;
+		if(this.is_subscribed){
+			subscribeAction(false, this.is_organization, this.id, function(){
+				self.$btn
+					.removeClass([classes.subscribed_state, self.classes.unsubscribe, self.classes.subscribed].join(' '))
+					.addClass(self.classes.subscribe)
+					.off('mouseenter.hoverSubscribed mouseleave.hoverSubscribed')
+					.children('.Text').text(self.labels.subscribe);
+				self.is_subscribed = false;
+			});
+		} else {
+			console.warn('You are not subscribed');
+		}
+	};
+	
+	function subscribeAction(to_subscribe, is_org, id, callback){
+		to_subscribe = typeof to_subscribe == 'boolean' ? to_subscribe : true;
+		$.ajax({
+			url: is_org ? '/api/v1/organizations/'+id+'/subscriptions' : '/api/v1/events/'+id+'/favorites',
+			method: to_subscribe ? 'POST' : 'DELETE',
+			success: function(res){
+				ajaxHandler(res, function(){
+					callback();
+					if(is_org){
+						to_subscribe ? renderSidebarOrganizations(id, bindControllers) : hideSidebarOrganization(id);
+					}
+				}, ajaxErrorHandler)
+			}
+		});
+	}
+
+	if(this.is_subscribed){
+		this.bindHoverEvents();
 	}
 
 	if(!this.$btn.children('span').length){
@@ -227,36 +329,11 @@ function SubscribeButton($btn, options){
 	}
 
 	this.$btn.on('click.subscribe', function(){
-		var method,
-			url = self.is_organization ? '/api/v1/organizations/'+self.id+'/subscriptions' : '/api/v1/events/'+self.id+'/favorites';
-		if(self.$btn.hasClass('-Subscribed')){
-			method = 'DELETE';
-			self.$btn
-				.removeClass(['-Subscribed', self.colors.unsubscribe, self.colors.subscribed, self.icons.unsubscribe, self.icons.subscribed].join(' '))
-				.addClass([self.colors.subscribe, self.icons.subscribe].join(' '))
-				.off('mouseenter.hoverSubscribed mouseleave.hoverSubscribed')
-				.children('.Text').text(self.labels.subscribe);
+		if(self.is_subscribed){
+			self.unsubscribe();
 		} else {
-			method = 'POST';
-			self.$btn
-				.removeClass([self.colors.subscribe, self.colors.subscribed, self.icons.subscribe, self.icons.subscribed].join(' '))
-				.addClass(['-Subscribed', self.colors.unsubscribe, self.icons.unsubscribe].join(' '))
-				.bindHoverEvents()
-				.children('.Text').text(self.labels.unsubscribe);
+			self.subscribe();
 		}
-
-		$.ajax({
-			url: url,
-			method: method,
-			success: function(res){
-				ajaxHandler(res, function(data, text){
-					if(self.is_organization){
-						method == 'POST' ? renderSidebarOrganizations(self.id, bindControllers) : hideSidebarOrganization(self.id);
-					}
-				}, ajaxErrorHandler)
-			}
-		});
-
 	})
 }
 
@@ -310,6 +387,12 @@ function buildOrganizationBlock(organization, additional_fields){
 }
 
 
+function bindSubscribeButton($parent, options){
+	$parent = $parent ? $parent : $('body');
+	$parent.find('.Subscribe').not('.-Handled_Subscribe').each(function(){
+		new SubscribeButton($(this), options);
+	}).addClass('-Handled_Subscribe');
+}
 
 function bindDatePickers($parent){
 	$parent = $parent ? $parent : $('body');
@@ -541,7 +624,7 @@ function bindControllers($parent){
 				case 1: {
 					if ($this.hasClass(__C.CLASSES.DISABLED)) return true;
 					if (page_name != undefined){
-						History.pushState($this.data(), $this.data('title') ? $this.data('title'): $this.text(), '/'+page_name);
+						History.pushState($.extend({}, $this.data(), {_index: History.getCurrentIndex()}), $this.data('title') ? $this.data('title'): $this.text(), '/'+page_name);
 					} else {
 						if (window[controller_name] != undefined && window[controller_name] instanceof Function){
 							window[controller_name]();
@@ -627,12 +710,16 @@ function limitInputSize(){
 		}
 		$this.on('input', function(){
 			var length = $this.val().length;
+			if($this.is('textarea')){
+				var crlfs = $this.val().match(/\n/g);
+				length = crlfs ? length + crlfs.length : length;
+			}
 			if(length > max){
 				$form_unit.addClass('-status_error');
 			} else if($form_unit.hasClass('-status_error')) {
 				$form_unit.removeClass('-status_error');
 			}
-			$prompt.text($this.val().length+'/'+max);
+			$prompt.text(length+'/'+max);
 		})
 	}).addClass('-Handled_LimitSize');
 }
@@ -695,37 +782,48 @@ function showNotifier(response){
 	});
 }
 
-
-
-
-function setDaysWithEvents(calendar){
-	var $calendar = calendar.$calendar,
-		m_selected_month = moment(calendar.selected_days[0]);
-	$.ajax({
-		url: '/api/v1/events/dates',
-		data: {
-			since: m_selected_month.startOf('month').format(__C.DATE_FORMAT),
-			till: m_selected_month.endOf('month').format(__C.DATE_FORMAT),
-			offset: 0,
-			length: 500,
-			my: true,
-			unique: true
-		},
-		success: function(res){
-			$calendar.find('.feed_calendar_td').removeClass('Controller has_favorites').addClass(__C.CLASSES.NEW_DISABLED);
-			res.data.forEach(function(day){
-				$('.Day_' + moment.unix(day.event_date).format(__C.DATE_FORMAT))
-					.data('page', 'feed')
-					.addClass('Controller')
-					.addClass(day.favorites_count > 0 ? 'has_favorites' : '')
-					.removeClass(__C.CLASSES.NEW_DISABLED);
-			});
-
-			bindControllers($calendar);
+function renderState(){
+	var page_split = __STATES.getCurrentState().split('/'),
+		page = page_split[0],
+		$sidebar_nav_items = $('.SidebarNavItem'),
+		$tabs = $('.HeaderTabsWrapper').find('.Tab'),
+		$views = $('.PageView'),
+		state = History.getState(),
+		$view,
+		controller;
+	
+	if(!(state.data.reload === false && state.data._index+1 == History.getCurrentIndex())){
+		$(window).off('scroll');
+		$(window).data('disable_upload', false);
+		$('#main_header').removeClass('-with_tabs');
+		switch(typeof __STATES[page]){
+			case 'function': {
+				controller = __STATES[page];
+				break;
+			}
+			default:
+			case 'undefined': {
+				//TODO: 404 page
+				console.error('PAGE RENDERING ERROR');
+				return false;
+			}
 		}
-	});
+		$view = page == 'friend' ? $('.friends-app') : $views.filter('[data-controller="'  + controller.name + '"]');
+		
+		$views.not($view).addClass(__C.CLASSES.NEW_HIDDEN);
+		controller($view);
+		$view.removeClass(__C.CLASSES.NEW_HIDDEN);
+	}
+	
+	changeMainTitle(state.title);
+	if(page != 'search')
+		$('#search_bar_input').val('');
+	
+	$sidebar_nav_items.not('[data-page="' + page + '"]').removeClass(__C.CLASSES.NEW_ACTIVE)
+		.end().filter('[data-page="' + page + '"]').addClass(__C.CLASSES.NEW_ACTIVE);
+	$tabs.not('[data-tab_state="' + state.data.tab_state + '"]').removeClass(__C.CLASSES.NEW_ACTIVE)
+		.end().filter('[data-tab_state="' + state.data.tab_state + '"]').addClass(__C.CLASSES.NEW_ACTIVE);
 }
-
 
 function hideSidebarOrganization(org_id){
 	var $organization_item = $('#main_sidebar').find('.organization_item[data-organization_id="' + org_id + '"]').removeClass('-show');
@@ -801,6 +899,13 @@ function renderSidebarOrganizations(organization, afterRenderCallback){
 function renderHeaderTabs(tabs){
 	var $wrapper = $('#main_header_bottom').find('.HeaderTabsWrapper'),
 		$tabs = $();
+	if(!Array.isArray(tabs) && typeof tabs == 'object'){
+		var buf = [];
+		$.each(tabs, function(){
+			buf.push(this);
+		});
+		tabs = buf;
+	}
 	tabs.forEach(function(tab){
 		if(tab.dataset)
 			tab.dataset.toString = (Array.isArray(tab.dataset)) ? arrayToSpaceSeparatedString : objectToHtmlDataSet;
@@ -814,6 +919,10 @@ function renderHeaderTabs(tabs){
 	}));
 	bindControllers($wrapper);
 	$('#main_header').addClass('-with_tabs');
+}
+
+function changeMainTitle(new_title){
+	$('#page_title').text(new_title);
 }
 
 
@@ -902,39 +1011,6 @@ function getFriendsList($friends_right_list, cb){
 		}
 	});
 }
-
-function calculateMargins($view){
-	var $main_content = $view.find('.friends-main-content'),
-		$friends_right_list = $view.find('.friends-right-bar'),
-		$user_content = $view.find('.one-friend-main-content'),
-		view_width = $view.width(),
-		content_width = $main_content.width() == 0 ? $user_content.width() : $main_content.width(),
-		friends_right_list_width = $friends_right_list.width(),
-		DISTANCE_BETWEEN = 150,
-		_margin = (view_width - content_width - friends_right_list_width - DISTANCE_BETWEEN) / 2;
-
-	$main_content.css('margin-left', _margin + 'px');
-	$friends_right_list.css('margin-left', _margin + content_width + DISTANCE_BETWEEN + 'px');
-	$user_content.css('margin-left', _margin + 'px');
-}
-
-/**
- * Нажатие на кнопку подписаться/отписаться
- * @param state
- * @param entity_id ID подписки или ID организации в зависимости от типа совершаемого события
- * @param callback
- */
-function toggleSubscriptionState(state, entity_id, callback){
-	var options = (state == false) ? {
-			url: '/api/v1/organizations/' + entity_id + '/subscriptions',
-			type: 'DELETE'
-		} : {
-			url: '/api/v1/organizations/' + entity_id + '/subscriptions',
-			type: 'POST'
-		};
-	$.ajax(options);
-}
-
 
 function getTagsString(tags){
 	var _tags = [];

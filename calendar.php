@@ -81,6 +81,24 @@ $user_full_name = $user->getLastName().' '.$user->getFirstName(); ?>
 	<link href="/vendor/jquery.scrollbar/jquery.scrollbar.css" rel="stylesheet">
 
 	<link rel="stylesheet" href="/app/css/main.css">
+
+	<link rel="apple-touch-icon" sizes="57x57" href="/app/img/favicon/apple-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="/app/img/favicon/apple-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="/app/img/favicon/apple-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="/app/img/favicon/apple-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="/app/img/favicon/apple-icon-114x114.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="/app/img/favicon/apple-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="/app/img/favicon/apple-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="/app/img/favicon/apple-icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="/app/img/favicon/apple-icon-180x180.png">
+	<link rel="icon" type="image/png" sizes="192x192"  href="/app/img/favicon/android-icon-192x192.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/app/img/favicon/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="96x96" href="/app/img/favicon/favicon-96x96.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/app/img/favicon/favicon-16x16.png">
+	<link rel="manifest" href="/app/img/favicon/manifest.json">
+	<meta name="msapplication-TileColor" content="#ffffff">
+	<meta name="msapplication-TileImage" content="/app/img/favicon/ms-icon-144x144.png">
+	<meta name="theme-color" content="#ffffff">
 </head>
 
 <body>
@@ -119,18 +137,8 @@ $user_full_name = $user->getLastName().' '.$user->getFirstName(); ?>
 	<div id="main_section">
 
 		<!-- START row-->
-		<div class="organizations-app app_view -hidden PageView" data-controller="OrganizationsList">
-			<div class="new-organizations-categories">
-				<div class="new-categories-title">Категории</div>
-				<div class="new-organizations-categories-wrapper"></div>
-			</div>
-			<div class="new-organizations-list"></div>
-		</div>
-		<!-- END row-->
-
-		<!-- START row-->
 		<div class="friends-app app_view -hidden PageView" data-controller="Friends">
-			<div class="col-md-12" data-controller="Friends" style="padding-top: 100px;">
+			<div class="page_wrapper" style="padding-top: 100px;">
 
 				<div class="no-friends-block hidden">
 					<div class="no-friends-text">Ваших друзей пока нет в Evendate</div>
@@ -142,6 +150,13 @@ $user_full_name = $user->getLastName().' '.$user->getFirstName(); ?>
 							<a class="fa fa-twitter" target="_blank" href="https://twitter.com/share?url=http://evendate.ru/event.php?id={id}&text=Я пользуюсь Evendate, чтобы не пропустить интересные события в своих любимых местах.&via=evendate.ru&hashtags=#events #Москва #evendate" data-share-type="twitter"></a>
 						</p></div>
 				</div>
+				<div class="friends-main-content hidden">
+
+					<div class="load-more-btn hidden" data-page-number="0">
+						<button class="btn btn-lg disabled btn-pink-empty"> Загрузить еще...</button>
+					</div>
+				</div>
+				<div class="one-friend-profile one-friend-main-content"></div>
 
 				<div class="friends-right-bar hidden">
 					<div class="friends-bar-header">
@@ -150,13 +165,6 @@ $user_full_name = $user->getLastName().' '.$user->getFirstName(); ?>
 					<div class="friends-list">
 					</div>
 				</div>
-				<div class="friends-main-content hidden">
-
-					<div class="load-more-btn hidden" data-page-number="0">
-						<button class="btn btn-lg disabled btn-pink-empty"> Загрузить еще...</button>
-					</div>
-				</div>
-				<div class="one-friend-profile one-friend-main-content"></div>
 			</div>
 		</div>
 		<!-- END row-->
@@ -185,6 +193,12 @@ $user_full_name = $user->getLastName().' '.$user->getFirstName(); ?>
 		</div>
 
 		<!-- START row-->
+		<div class="organizations-app app_view -hidden PageView" data-controller="OrganizationsList">
+			<div class="page_wrapper"></div>
+		</div>
+		<!-- END row-->
+
+		<!-- START row-->
 		<div class="organization-app app_view -hidden PageView" data-controller="Organization">
 			<div class="page_wrapper"></div>
 		</div>
@@ -201,11 +215,16 @@ $user_full_name = $user->getLastName().' '.$user->getFirstName(); ?>
 			<div class="page_wrapper"></div>
 		</div>
 
+		<!-- START row-->
+		<div class="add-organization-app app_view -hidden PageView" data-controller="AddOrganization">
+			<div class="page_wrapper"></div>
+		</div>
+
 	</div>
 </div>
 
 <aside id="main_sidebar" class="-unselectable">
-	<div class="brand_block Controller" data-page="feed" data-feed_state="timeline" data-title="События">
+	<div class="brand_block Controller" data-page="feed" data-tab_state="timeline" data-title="События">
 		<svg width="135px" height="24.70001px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 135 24.70001">
 			<path id="evendate_logo_text" transform="translate(-2.375 -0.69998)" fill="#9fa6b3" d="M18.675,16.4c0-5.3-3-8.5-8.1-8.5a8.42015,8.42015,0,0,0-8.2,8.7,8.38058,8.38058,0,0,0,8.5,8.8,7.55515,7.55515,0,0,0,7.5-5.2l-3.7-1.2a3.57051,3.57051,0,0,1-3.7,2.5,3.98288,3.98288,0,0,1-4.1-3.7h11.7A13.80487,13.80487,0,0,0,18.675,16.4Zm-11.8-1.6a3.55717,3.55717,0,0,1,3.7-3.2,3.363,3.363,0,0,1,3.7,3.2h-7.4Zm24.3-6.3-3.9,11-4.1-11h-4.9l6.7,16.4h4.4l6.5-16.4h-4.7Zm20.6,7.9c0-5.3-3-8.5-8.1-8.5a8.25038,8.25038,0,0,0-8.1,8.6,8.38058,8.38058,0,0,0,8.5,8.8,7.55522,7.55522,0,0,0,7.5-5.2l-3.8-1.1a3.57051,3.57051,0,0,1-3.7,2.5,3.98293,3.98293,0,0,1-4.1-3.7h11.7A13.79661,13.79661,0,0,0,51.775,16.4Zm-11.7-1.6a3.55712,3.55712,0,0,1,3.7-3.2,3.36289,3.36289,0,0,1,3.7,3.2h-7.4ZM62.975,8a5.385,5.385,0,0,0-4.7,2.5v-2h-4.3V24.9h4.4V15.4c0-1.9,1.1-3.4,3.1-3.4,2.1,0,3,1.4,3,3.3v9.6h4.4V14.5C68.875,10.9,66.975,8,62.975,8Zm24.8,13.9V0.7h-4.4v9.4c-0.5-.9-1.8-2-4.6-2-4.6,0-7.9,3.8-7.9,8.6,0,5,3.3,8.6,8,8.6a5.101,5.101,0,0,0,4.6-2.3,7.75394,7.75394,0,0,0,.2,1.9h4.2A26.28237,26.28237,0,0,1,87.775,21.9Zm-8.3-.6c-2.4,0-4.1-1.8-4.1-4.7s1.8-4.6,4.1-4.6,4,1.6,4,4.6S81.675,21.3,79.475,21.3Zm25.2,1V14.2c0-3.3-1.9-6.2-7.1-6.2-4.4,0-6.8,2.8-7,5.4l3.9,0.8a2.92541,2.92541,0,0,1,3.1-2.7c1.9,0,2.8,1,2.8,2.1a1.19858,1.19858,0,0,1-1.2,1.2l-4,.6c-2.8.4-5,2-5,5,0,2.6,2.1,4.9,5.6,4.9a5.40058,5.40058,0,0,0,4.8-2.4,12.30577,12.30577,0,0,0,.2,2h4.1A18.36784,18.36784,0,0,1,104.675,22.3Zm-4.3-4.2c0,3-1.8,3.9-3.6,3.9a1.89565,1.89565,0,0,1-2.1-1.9,2.094,2.094,0,0,1,2-2.1l3.7-.6v0.7Zm16.3-5.8V8.5h-3.3V3.6h-4.1V5.9a2.33883,2.33883,0,0,1-2.5,2.6h-0.8v3.9h3V20c0,3.2,2,5.1,5.2,5.1a5.9567,5.9567,0,0,0,2.5-.4V21a4.92317,4.92317,0,0,1-1.4.1,1.61828,1.61828,0,0,1-1.9-1.9V12.3h3.3Zm17.2,4.1a10.91279,10.91279,0,0,0-.47-3.3h-0.03a5.49026,5.49026,0,0,1-5.47-4.98,9.60458,9.60458,0,0,0-2.13-.22,8.25043,8.25043,0,0,0-8.1,8.6,8.38058,8.38058,0,0,0,8.5,8.8,7.55517,7.55517,0,0,0,7.5-5.2l-3.8-1.1a3.57051,3.57051,0,0,1-3.7,2.5,3.98284,3.98284,0,0,1-4.1-3.7h11.7A13.80487,13.80487,0,0,0,133.875,16.4Zm-11.7-1.6a3.55721,3.55721,0,0,1,3.7-3.2,3.363,3.363,0,0,1,3.7,3.2h-7.4Z"></path>
 			<circle id="evendate_logo_dot" cx="131" cy="6.90002" r="4" fill="#f82969"></circle>
@@ -219,7 +238,7 @@ $user_full_name = $user->getLastName().' '.$user->getFirstName(); ?>
 			<div class="sidebar_navigation_item <?= $edit_event_btn_hidden ?> SidebarNavItem Controller" data-page="edit_event" data-title="Создать событие">
 				<span>Создать событие</span>
 			</div>
-			<div class="sidebar_navigation_item SidebarNavItem Controller" data-page="feed" data-feed_state="actual" data-title="События">
+			<div class="sidebar_navigation_item SidebarNavItem Controller" data-page="feed" data-tab_state="actual" data-title="События">
 				<span>События</span>
 				<span class="counter sidebar_navigation_counter -hidden SidebarNavFeedCounter">50</span>
 			</div>
@@ -287,13 +306,14 @@ $user_full_name = $user->getLastName().' '.$user->getFirstName(); ?>
 
 
 <!-- =============== APP SCRIPTS ===============-->
-<script src="<?= App::$SCHEMA . App::$NODE_DOMAIN ?>:8080/socket.io/socket.io.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js" type="text/javascript"></script>
 <script type="text/javascript" src="/app/js/app.js" charset="utf-8"></script>
 <script type="text/javascript" src="/app/js/Class.Calendar.js" charset="utf-8"></script>
 <script type="text/javascript" src="/app/js/Class.DatePicker.js" charset="utf-8"></script>
 <script type="text/javascript" src="/app/js/Class.Modal.js" charset="utf-8"></script>
 <script type="text/javascript" src="/app/js/main.js" charset="utf-8"></script>
 <script type="text/javascript" src="/app/js/calendar.js" charset="utf-8"></script>
+<script type="text/javascript" src="/app/js/add_organization.js" charset="utf-8"></script>
 
 
 <?php

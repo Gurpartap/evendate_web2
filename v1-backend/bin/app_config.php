@@ -29,6 +29,7 @@ class App {
 	public static $DB_DSN;
 	public static $DB_PORT;
 	public static $SETTINGS;
+	public static $ENV;
 
 	public static $QUERY_FACTORY;
 
@@ -58,6 +59,7 @@ class App {
 	 * */
 	static function init() {
 		$_SERVER['ENV'] = isset($_SERVER['ENV']) ? $_SERVER['ENV'] : 'local';
+        App::$ENV = $_SERVER['ENV'];
 		$filename = 'v1-config.json';
 		$counter = 0;
 		if (file_exists($filename) == false) {
@@ -202,11 +204,12 @@ class App {
 
 	public static function getAuthURLs(string $type){
 		$is_mobile = $type == 'mobile' ? 'true' : 'false';
+        $scheme = $type == 'mobile' || App::$ENV != 'prod' ? 'http://' : 'https://';
 
 		return new Result(true, '', array(
-			'vk' => 'https://oauth.vk.com/authorize?client_id='. self::$SETTINGS->VK->APP_ID . '&scope=groups,friends,email,wall,offline,pages,photos,groups&redirect_uri=http://'. self::$DOMAIN . '/redirectOauth.php?mobile=' . $is_mobile . '%26type=vk&response_type=token',
-			'google' => 'https://accounts.google.com/o/oauth2/auth?scope=email%20profile%20https://www.googleapis.com/auth/plus.login&redirect_uri=http://'. self::$DOMAIN . '/redirectOauth.php?mobile=' . $is_mobile . '%26type=google&response_type=token&client_id=' . self::$SETTINGS->google->web->client_id,
-			'facebook' => 'https://www.facebook.com/dialog/oauth?client_id=' . self::$SETTINGS->facebook->app_id . '&response_type=token&scope=public_profile,email,user_friends&display=popup&redirect_uri=http://'. self::$DOMAIN . '/redirectOauth.php?mobile=' . $is_mobile . '%26type=facebook'
+			'vk' => 'https://oauth.vk.com/authorize?client_id='. self::$SETTINGS->VK->APP_ID . '&scope=groups,friends,email,wall,offline,pages,photos,groups&redirect_uri='. $scheme . self::$DOMAIN . '/redirectOauth.php?mobile=' . $is_mobile . '%26type=vk&response_type=token',
+			'google' => 'https://accounts.google.com/o/oauth2/auth?scope=email%20profile%20https://www.googleapis.com/auth/plus.login&redirect_uri=' . $scheme . self::$DOMAIN . '/redirectOauth.php?mobile=' . $is_mobile . '%26type=google&response_type=token&client_id=' . self::$SETTINGS->google->web->client_id,
+			'facebook' => 'https://www.facebook.com/dialog/oauth?client_id=' . self::$SETTINGS->facebook->app_id . '&response_type=token&scope=public_profile,email,user_friends&display=popup&redirect_uri='. $scheme . self::$DOMAIN . '/redirectOauth.php?mobile=' . $is_mobile . '%26type=facebook'
 		));
 	}
 

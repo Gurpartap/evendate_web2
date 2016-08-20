@@ -13,6 +13,7 @@ class Organization extends AbstractEntity
     const IS_SUBSCRIBED_FIELD_NAME = 'is_subscribed';
     const NEW_EVENTS_COUNT_FIELD_NAME = 'new_events_count';
     const STAFF_FIELD_NAME = 'staff';
+    const IS_NEW_FIELD_NAME = 'is_new';
 
     const IMAGES_PATH = 'organizations_images/';
     const IMAGE_SIZE_LARGE = '/large/';
@@ -86,6 +87,11 @@ class Organization extends AbstractEntity
 				WHERE organization_id = view_organizations.id
 					AND subscriptions.status = TRUE
 					AND user_id = :user_id) IS NOT NULL AS ' . self::IS_SUBSCRIBED_FIELD_NAME,
+        self::IS_NEW_FIELD_NAME => '(SELECT 
+				id IS NOT NULL AS is_new
+				FROM view_organizations vo
+				WHERE vo.created_at > DATE_PART(\'epoch\', NOW() - INTERVAL \'7 DAY\') 
+				AND vo.id = view_organizations.id) IS NOT NULL AS ' . self::IS_NEW_FIELD_NAME,
         self::NEW_EVENTS_COUNT_FIELD_NAME => '(
 		SELECT
 			COUNT(view_events.id)
@@ -585,7 +591,7 @@ class Organization extends AbstractEntity
                         FROM users_organizations ua 
                         WHERE ua.status = TRUE 
                             AND ua.organization_id = users_organizations.organization_id
-                            AND ua.role_id = ' . Roles::getId(Roles::ROLE_ADMIN) .') AS admins_count'
+                            AND ua.role_id = ' . Roles::getId(Roles::ROLE_ADMIN) . ') AS admins_count'
                 ))
                 ->where('users_organizations.status = TRUE')
                 ->where('users_organizations.organization_id = ?', $this->getId());
@@ -603,9 +609,9 @@ class Organization extends AbstractEntity
             ->cols(array(
                 'status' => 'false'
             ))
-        ->where('user_id = ?', $friend->getId())
-        ->where('organization_id = ?', $this->getId())
-        ->where('role_id = ?', Roles::getId($role));
+            ->where('user_id = ?', $friend->getId())
+            ->where('organization_id = ?', $this->getId())
+            ->where('role_id = ?', Roles::getId($role));
 
         $p_get_admins = $this->db->prepare($q_upd_staff->getStatement());
         $result = $p_get_admins->execute($q_upd_staff->getBindValues());
@@ -613,7 +619,6 @@ class Organization extends AbstractEntity
         if ($result === FALSE) throw new DBQueryException('CANT_DELETE_STAFF', $this->db);
         return new Result(true, '');
     }
-
 
     public static function create($data, User $user, PDO $db)
     {

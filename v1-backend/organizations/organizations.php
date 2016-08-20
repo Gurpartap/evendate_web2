@@ -95,7 +95,13 @@ $__modules['organizations'] = array(
 			);
 			return $organization->addSubscription($__user);
 		},
-		'' => function () use ($__db, $__request, $__user, $__fields){
+		'preregister' => function () use ($__db, $__request, $__user, $__fields){
+			return $organization = Organization::create(
+				$__request['payload'],
+				$__user,
+				$__db
+			);
+		},'' => function () use ($__db, $__request, $__user, $__fields){
 			return $organization = Organization::create(
 				$__request['payload'],
 				$__user,

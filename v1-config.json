@@ -318,6 +318,10 @@
       "password": "",
       "port": 27017
     },
+    "https":{
+      "key_path": "/etc/letsencrypt/live/evendate.ru/privkey.pem",
+      "cert_path": "/etc/letsencrypt/live/evendate.ru/cert.pem"
+    },
     "domain": "evendate.ru",
     "node_domain": "evendate.ru",
     "node_path": "/var/www/html/evendate_web2/node",
