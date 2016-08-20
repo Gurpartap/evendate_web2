@@ -5,11 +5,11 @@ body.organization-page {
 .organization-page .content-text {
     color: #ffffff;
     float: left;
-    width: 380px;
+    width: 390px;
     margin-right: 20px;
     position: relative;
     z-index: 10;
-    top: -59px;
+    top: -130px;
 }
 
 .organization-page .scroll-section-one {
@@ -75,17 +75,14 @@ body.organization-page {
 }
 
 .register-organization input::-webkit-input-placeholder {
-
     color: #f4f4f4 !important;
 }
 
 .register-organization input:-ms-input-placeholder {
-
     color: #f4f4f4 !important;
 }
 
 .register-organization input::-moz-placeholder {
-
     color: #f4f4f4 !important;
 }
 
@@ -93,15 +90,31 @@ body.organization-page {
     color: #f4f4f4 !important;
 }
 
+.organization-page .scroll-section .layer-object.spoon {
+    top: 300px;
+    left: 0;
+}
+
+.organization-page .scroll-section .layer-object.coffee {
+    top: 150px;
+    right: 50px;
+}
+
+.organization-page .scroll-section .layer-object.pencils {
+    top: 524px;
+    left: -106px;
+}
+
 @media only screen and (max-width: 768px) {
 
     .header {
         background: #3cb079;
     }
+
     .organization-page .fixed-content .device-frame .image-slides {
         width: 344px;
         height: 227px;
-        top: 392px;
+        top: 335px;
     }
 
     .fixed-content .device-frame .image-slide {
@@ -126,15 +139,15 @@ body.organization-page {
     .organization-page .fixed-content .device {
         width: 460px;
         left: calc((100% - 460px) / 2);
-        top: 77px;
+        top: 20px;
         right: 0;
         float: left;
     }
 
     .organization-page .content-text {
-         float: none;
-         width: 100%;
-         top: 0;
+        float: none;
+        width: 100%;
+        top: 0;
     }
 }
 
@@ -152,6 +165,11 @@ body.organization-page {
         left: calc(75px + 34%);
         height: 292px;
         width: 451px;
+        top: 46px;
+    }
+
+    .organization-page .fixed-content .device-frame .image-slide {
+        width: 100%;
     }
 }
 
@@ -160,10 +178,10 @@ body.organization-page {
         display: block;
         position: absolute;
         top: 44px;
-        left: calc(87px + 51%);
+        left: calc(95px + 30%);
         right: 0;
-        width: 526px;
-        height: 341px;
+        width: 611px;
+        height: 396px;
         z-index: 10;
         overflow: hidden;
     }
@@ -177,7 +195,7 @@ body.organization-page {
     }
 
     .organization-page .fixed-content .device {
-        width: 700px;
-        left: 51%;
+        width: 800px;
+        left: 30%;
     }
 }

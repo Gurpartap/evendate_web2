@@ -31,6 +31,12 @@ var __STATES = {
 				case 'edit_event': {
 					return History.getState().data.eventId;
 				}
+				case 'add_organization': {
+					break;
+				}
+				case 'edit_organization': {
+					return History.getState().data.organizationId;
+				}
 				case 'statistics': {
 					break;
 				}
@@ -711,7 +717,7 @@ function OrganizationsList($view){
 			url: '/api/v1/organizations/types',
 			method: 'GET',
 			data: {
-				fields: 'organizations{fields: "img_small_url,is_subscribed,subscribed_count", order_by: "-subscribed_count"}',
+				fields: 'organizations{fields: "img_small_url,is_subscribed,subscribed_count,privileges", order_by: "-subscribed_count"}',
 				order_by: 'order_position'
 			},
 			success: function(res){
@@ -814,6 +820,17 @@ function OrganizationsList($view){
 			org.subscribe_button_text = org.is_subscribed ? 'Подписан' : 'Подписаться';
 			org.subscribe_button_classes = org.is_subscribed ? '-color_accent -Subscribed' : '-color_marginal_accent';
 			org.subscribed_text = org.subscribed_count + getUnitsText(org.subscribed_count, __C.TEXTS.SUBSCRIBERS);
+			org.privileges.forEach(function(privilege) {
+				if(privilege.role_id == 1 || privilege.name == 'admin'){
+					org.redact_org_button = buildButton({
+						classes: ['-low','-color_marginal_primary','fa_icon','fa-pencil','-empty','RippleEffect'],
+						dataset: {
+							'page': 'edit_organization',
+							'organization-id': org.id
+						}
+					})
+				}
+			});
 		});
 		return tmpl('organization-unit', data);
 	}
@@ -1067,7 +1084,7 @@ function Organization($view){
 		url: url,
 		method: 'GET',
 		data: {
-			fields: 'img_small_url,description,site_url,is_subscribed,default_address,subscribed_count,subscribed{fields:"is_friend",order_by:"-is_friend,first_name",length:10}'
+			fields: 'img_small_url,description,site_url,is_subscribed,default_address,subscribed_count,privileges,subscribed{fields:"is_friend",order_by:"-is_friend,first_name",length:10}'
 		},
 		success: function(res){
 			ajaxHandler(res, function(data){
@@ -1077,6 +1094,18 @@ function Organization($view){
 				
 				data = data[0];
 				
+				data.privileges.forEach(function(privilege) {
+					if(privilege.role_id == 1 || privilege.name == 'admin'){
+						data.redact_org_button = buildButton({
+							title: 'Редактировать',
+							classes: ['-fill','-color_neutral','fa_icon','fa-pencil','RippleEffect'],
+							dataset: {
+								'page': 'edit_organization',
+								'organization-id': data.id
+							}
+						})
+					}
+				});
 				$page_wrapper.append(tmpl('organization-info-page', $.extend({
 					subscribe_button_classes: data.is_subscribed ? ['fa-check', '-color_neutral', '-Subscribed'].join(' ') : ['fa-plus', '-color_accent'].join(' '),
 					subscribe_button_text: data.is_subscribed ? 'Подписан' : 'Подписаться',

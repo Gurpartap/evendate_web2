@@ -570,10 +570,6 @@ function hashToObject() {
 	return obj;
 }
 
-function showOnboarding(){
-	window.parent.location = 'onboarding';
-}
-
 window.socket = io.connect(window.location.protocol== 'https:' ? ':8443' : ':8080', {secure: window.location.protocol == 'https:'});
 
 
@@ -601,36 +597,37 @@ socket.on('auth', function(data) {
 		type: 'POST',
 		data: data,
 		success: function(res) {
+
+			if (yaCounter32442130) {
+				switch(data.type) {
+					case 'vk':
+					{
+						yaCounter32442130.reachGoal('VkAuthDone');
+						break;
+					}
+					case 'facebook':
+					{
+						yaCounter32442130.reachGoal('FacebookAuthDone');
+						break;
+					}
+					case 'google':
+					{
+						yaCounter32442130.reachGoal('GoogleAuthDone');
+						break;
+					}
+				}
+			}
+
 			if (res.status) {
-				debugger;
 				if (data.hasOwnProperty('mobile') && data.mobile == true) {
 					window.location.href = '/mobileAuthDone.php?token=' + data.token + '&email=' + data.email;
 				} else {
-					if (window.localStorage.getItem('open_add_organization') != true){
+					if (window.localStorage.getItem('open_add_organization') == 'true'){
 						window.parent.location = 'add_organization';
 					}else if (data.subscriptions_count == 0){
-						showOnboarding();
+						window.parent.location = 'onboarding';
 					}else{
 						window.parent.location =  'feed';
-					}
-					if (yaCounter32442130) {
-						switch(data.type) {
-							case 'vk':
-							{
-								yaCounter32442130.reachGoal('VkAuthDone');
-								break;
-							}
-							case 'facebook':
-							{
-								yaCounter32442130.reachGoal('FacebookAuthDone');
-								break;
-							}
-							case 'google':
-							{
-								yaCounter32442130.reachGoal('GoogleAuthDone');
-								break;
-							}
-						}
 					}
 				}
 			} else {

@@ -140,7 +140,8 @@ $title = 'Evendate';
         <section class="faq-section overlay-section">
             <div class="fade-in">
                 <div class="fluid-width constrain-large text-center">
-                    <h2 class="page-title with-register hidden">Чтобы продолжить регистрацию, войдите через социальную сеть:</h2>
+                    <h2 class="page-title with-register hidden">Чтобы продолжить регистрацию, войдите через социальную
+                        сеть:</h2>
                     <h2 class="page-title no-register">Войдите через социальную сеть:</h2>
                     <div class="">
                         <a href="#" class="social-btn vk-btn vk-auth-btn">
@@ -213,51 +214,63 @@ $title = 'Evendate';
 
             <div class="content-text">
                 <div class="text-slide active" data-slide="0">
-                    <h2 class="js-animate-this">Привлекайте <br>аудиторию</h2>
+                    <h2 class="js-animate-this">Увеличивайте количество<br>посетителей</h2>
                     <div class="js-animate-this">
-                        <p>Добавьте свою организацию за 2 минуты и начните использовать Evendate - лучший инструмент для коммуникации
-                            со своей аудиторией.</p>
+                        <p>Социальные сети не ориентированы на афишу, поэтому большая часть событий остается
+                            незамеченной в ленте новостей, а рассылки отправляются в спам.</p>
+                        <p>Evendate даёт возможность каждому организатору бесплатно публиковать события и привлекать новых
+                            подписчиков. После публикации все подписчики получат уведомление и
+                            гарантированно ничего не пропустят.</p>
                     </div>
                 </div>
                 <div class="text-slide" data-slide="1">
-                    <h2 class="js-animate-this">Уведомляйте всех,<br> кому интересно</h2>
+                    <h2 class="js-animate-this">Анализируйте отдачу</h2>
                     <div class="js-animate-this">
-                        <p>Каждый подписчик будет получать уведомления о Ваших событиях, будет в курсе всего, что Вы делаете.
-                            Вы сможете не терять клиентов и повторно их привлекать.</p>
+                        <p>В личном кабинете организатора отображается детальная аналитика активности аудитории.
+                            Evendate покажет вам точки роста количества посетителей и их вовлеченность, позволяя
+                            совершать повторную продажу.</p>
+                        <p>Вы можете анализировать не только общую страницу, но и отдельное событие, сравнивая их
+                            популярность с другими.</p>
                     </div>
                 </div>
                 <div class="text-slide" data-slide="2">
-                    <h2 class="js-animate-this"><br/>Анализируйте<br> отдачу</h2>
-                    <p class="js-animate-this">Контролируйте поведение Ваших пользователей, их интересы и заинтересованность.
-                    Evendate покажет Вам точки роста аудитории и их вовлеченности.</p>
+                    <h2 class="js-animate-this">Будьте ближе<br>к своей аудитории</h2>
+                    <div class="js-animate-this">
+                        <p>Получайте реальные данные о интересах вашей аудитории, основанные на их
+                            соц сетях и активности внутри платформы.
+                        </p>
+                        <p>Это позволит улучшить качество контента и рекламировать события только для тех, кому они
+                            действительно интересны, а полученную информацию выгружать в CRM или Excel.</p>
+                    </div>
                 </div>
             </div>
             <div class="text-slide text-slide-3 container-centered" data-slide="3">
-                <h1 class="js-animate-this choose-ineterests-text hidden-sm hidden-xs">У Вас есть события? <br>Добавьте свою организацияю за 2 минуты.</h1>
-                <div class="js-animate-this hidden-sm hidden-xs">
+                <h1 class="js-animate-this choose-interests-text">У Вас есть события? <br>Добавьте свою организацияю за
+                    2 минуты.</h1>
+                <div class="js-animate-this">
                     <div class="col-md-2"></div>
                     <form class="col-md-8 register-organization">
                         <div class="form-group">
                             <label for="organization-name">Название организатора</label>
-                            <input type="email" class="form-control" id="organization-name" placeholder="Название">
+                            <input type="text" name="name" class="form-control" id="organization-name"
+                                   placeholder="Название">
                         </div>
                         <div class="form-group">
                             <label for="organization-email">Email адрес</label>
-                            <input type="email" class="form-control" id="organization-email" placeholder="Email">
+                            <input type="email" name="email" class="form-control" id="organization-email"
+                                   placeholder="Email">
                         </div>
                         <div class="form-group">
                             <label for="organization-link">Ссылка на сайт или группу в соц. сетях</label>
-                            <input type="text" class="form-control" id="organization-link" placeholder="http://...">
+                            <input type="text" name="site_url" class="form-control" id="organization-link"
+                                   placeholder="http://...">
                         </div>
                         <input name="type" type="hidden" value="attempt-to-register">
+                        <div class="row col-md-12 text-center">
+                            <a class="continue-organization-registration" href="#">Продолжить</a>
+                        </div>
                     </form>
-                    <div class="row col-md-12 text-center">
-                        <a class="continue-organization-registration" href="#">Продолжить</a>
-                    </div>
                 </div>
-
-                <h2 class="js-animate-this hidden-md hidden-lg">У Вас есть события? <br>Добавьте свою организацияю за 2 минуты.</h2>
-
             </div>
             <div class="device-frame">
                 <div class="image-slides">
@@ -309,10 +322,6 @@ $title = 'Evendate';
     <section class="scroll-section scroll-section-four" data-from-time="" data-to-time="" data-reverse-from-time="4.06"
              data-reverse-to-time="5.23">
         <div class="scroll-section-content">
-            <img width="512" class="layer-object candy js-load-async"
-                 data-image-src="app/assets/img/objects/Polaroid-Snap.png"/>
-            <img width="515" class="layer-object passport js-load-async"
-                 data-image-src="app/assets/img/objects/leash.png"/>
         </div>
 
     </section>
