@@ -2366,6 +2366,15 @@
         "[site_url]": {
           "type": "string"
         },
+        "[facebook_url]": {
+          "type": "string"
+        },
+        "[vk_url]": {
+          "type": "string"
+        },
+        "[default_address]": {
+          "type": "string"
+        },
         "[subscribed_count]": {
           "type": "integer",
           "format": "int32"
@@ -2391,6 +2400,9 @@
         "[new_events_count]": {
           "type": "integer",
           "format": "int32"
+        },
+        "[email]": {
+          "type": "string"
         },
         "[events]": {
           "type": "array",
