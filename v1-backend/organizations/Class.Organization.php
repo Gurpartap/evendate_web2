@@ -70,6 +70,7 @@ class Organization extends AbstractEntity
     );
     protected static $ADDITIONAL_COLS = array(
         'description',
+        'email',
         'background_medium_img_url',
         'img_medium_url',
         'img_small_url',
@@ -79,6 +80,8 @@ class Organization extends AbstractEntity
         'created_at',
         'updated_at',
         'background_small_img_url',
+        'facebook_url',
+        'vk_url',
         self::RANDOM_FIELD_NAME => '(SELECT created_at / (random() * 9 + 1)
 			FROM view_organizations AS vo
 			WHERE vo.id = view_organizations.id) AS random',
@@ -455,10 +458,9 @@ class Organization extends AbstractEntity
         }
 
 
-        if (isset($data['vk_url_path'])) {
+        if (isset($data['vk_url'])) {
             $data['vk_url'] = trim($data['vk_url']);
-
-            $data['vk_url_path'] = parse_url($data['vk_url'], PHP_URL_PATH);
+            $data['vk_url_path'] = preg_replace('/\//', '', parse_url($data['vk_url'], PHP_URL_PATH));
         } else {
             $data['vk_url'] = null;
             $data['vk_url_path'] = null;
@@ -466,7 +468,7 @@ class Organization extends AbstractEntity
 
         if (isset($data['facebook_url'])) {
             $data['facebook_url'] = trim($data['facebook_url']);
-            $data['facebook_url'] = parse_url($data['facebook_url'], PHP_URL_PATH);
+            $data['facebook_url_path'] = preg_replace('/\//', '', parse_url($data['facebook_url'], PHP_URL_PATH));
         } else {
             $data['facebook_url'] = null;
             $data['facebook_url_path'] = null;
@@ -480,7 +482,7 @@ class Organization extends AbstractEntity
             && !empty($data['background_filename'])
         ) {
             $background_filename = md5(App::generateRandomString() . '-background') . '.' . App::getImageExtension($data['background_filename']);
-            App::saveImage(self::IMAGES_PATH . self::IMAGE_TYPE_BACKGROUND . $data['background'], $background_filename, 14000);
+            App::saveImage($data['background'], self::IMAGES_PATH . self::IMAGE_TYPE_BACKGROUND . self::IMAGE_SIZE_LARGE  . $background_filename, 14000);
             $data['background_img_url'] = $background_filename;
         } else throw new InvalidArgumentException('Фоновое изображение обязательно');
 
@@ -492,7 +494,7 @@ class Organization extends AbstractEntity
             && !empty($data['logo_filename'])
         ) {
             $logo_filename = md5(App::generateRandomString() . '-logo') . '.' . App::getImageExtension($data['logo_filename']);
-            App::saveImage(self::IMAGES_PATH . self::IMAGE_TYPE_LOGO . $data['logo'], $logo_filename, 14000);
+            App::saveImage($data['logo'], self::IMAGES_PATH . self::IMAGE_TYPE_LOGO . self::IMAGE_SIZE_LARGE . $logo_filename, 14000);
             $data['img_url'] = $logo_filename;
         } else throw new InvalidArgumentException('Логотип обязателен');
     }
@@ -643,7 +645,7 @@ class Organization extends AbstractEntity
                 'img_url' => $data['img_url'],
                 'creator_id' => $user->getId(),
                 'email' => $data['email'],
-                'state_id' => self::ORGANIZATION_STATE_ON_MODERATION
+                'state_id' => self::ORGANIZATION_STATE_SHOWN
             )
         );
 

@@ -1750,7 +1750,7 @@
 			<div class="EditEventOrganizations -hidden">
 				<h4 class="form_label"><label for="add_organization_type">Категория</label></h4>
 				<div class="form_unit">
-					<select id="add_organization_type" name="organization_type_id"></select>
+					<select id="add_organization_type" name="type_id"></select>
 				</div>
 			</div>
 
@@ -1799,6 +1799,8 @@
 				<div class="form_unit -centering">
 					<div class="wrapper">
 						<h4 class="form_label"><label>Логотип</label></h4>
+						<h5 class="form_label"><label>минимальный размер 500x500 </label></h5>
+						<h5 class="form_label"><label>рекомендуемый формат: png с прозрачным фоном</label></h5>
 						<div class="Tabs">
 							<header class="tabs_header -color_accent">
 								<span class="tab Tab -active">По ссылке</span>
@@ -1822,7 +1824,7 @@
 						</div>
 						<p class="FileNameText"></p>
 						<div class="form_unit">
-							<button class="button -color_accent_alt RippleEffect CallModal -hidden" type="button" data-modal_type="cropper" data-source_img="{image_horizontal_url}" data-aspect_ratio="16/9">
+							<button class="button -color_accent_alt RippleEffect CallModal -hidden" type="button" data-modal_type="cropper" data-source_img="{img_url}" data-aspect_ratio="1/1">
 								<span class="Text">Кадрировать</span>
 							</button>
 						</div>
@@ -1830,10 +1832,10 @@
 				</div>
 				<div class="form_unit">
 					<div class="img_holder">
-						<img class="add_organization_img_preview_hor EditEventImgPreview ImgPreview" src="{image_horizontal_url}">
-						<img src="app/img/edit_event/add_organization_img_placeholder_hor.png">
-						<input id="add_organization_image_horizontal_src" class="DataUrl" type="hidden" name="image_horizontal" value="{image_horizontal_base64}">
-						<input id="add_organization_image_horizontal_filename" class="FileName" type="hidden" name="filename_horizontal" value="{image_horizontal_filename}">
+						<img class="add_organization_img_preview_logo EditEventImgPreview ImgPreview" src="{img_url}">
+						<img src="app/img/add_organization/preview.png">
+						<input id="add_organization_img_src" class="DataUrl" type="hidden" name="logo" value="{img_base64}">
+						<input id="add_organization_img_filename" class="FileName" type="hidden" name="logo_filename" value="{logo_filename}">
 					</div>
 				</div>
 			</div>
@@ -1841,6 +1843,8 @@
 				<div class="form_unit -centering">
 					<div class="wrapper">
 						<h4 class="form_label"><label>Фоновое изображение</label></h4>
+						<h5 class="form_label"><label>минимальный размер 1366x768 </label></h5>
+						<h5 class="form_label"><label>рекомендуемый формат: jpeg/jpg</label></h5>
 						<div class="Tabs">
 							<header class="tabs_header -color_accent">
 								<span class="tab Tab -active">По ссылке</span>
@@ -1864,7 +1868,7 @@
 						</div>
 						<p class="FileNameText"></p>
 						<div class="form_unit">
-							<button class="button -color_accent_alt RippleEffect CallModal -hidden" type="button" data-modal_type="cropper" data-source_img="{image_vertical_url}" data-aspect_ratio="7/10">
+							<button class="button -color_accent_alt RippleEffect CallModal -hidden" type="button" data-modal_type="cropper" data-source_img="{background_img_url}" data-aspect_ratio="16/9">
 								<span class="Text">Кадрировать</span>
 							</button>
 						</div>
@@ -1872,19 +1876,20 @@
 				</div>
 				<div class="form_unit">
 					<div class="img_holder">
-						<img class="add_organization_img_preview_vert EditEventImgPreview ImgPreview" src="{image_vertical_url}">
-						<img src="app/img/edit_event/add_organization_img_placeholder_vert.png">
-						<input id="add_organization_image_vertical_src" class="DataUrl" type="hidden" name="image_vertical" value="{image_vertical_base64}">
-						<input class="FileName" type="hidden" name="filename_vertical" value="{image_vertical_filename}">
+						<img class="add_organization_img_preview_background EditEventImgPreview ImgPreview" src="{background_img_url}">
+						<img src="app/img/add_organization/preview.png">
+						<input id="add_organization_background_src" class="DataUrl" type="hidden" name="background" value="{background_base64}">
+						<input class="FileName" type="hidden" name="background_filename" value="{background_filename}">
 					</div>
 				</div>
 			</div>
 
 			<div class="form_unit -h_centering">
-				<button id="add_organization_submit" class="button RippleEffect -color_accent" type="button">Создать</button>
+				<button id="add_organization_submit" class="button RippleEffect -color_accent" type="button">Сохранить</button>
 			</div>
-
 		</form>
-	</div>
+        <div class="alert">
 
+        </div>
+	</div>
 </script>

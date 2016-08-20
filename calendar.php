@@ -81,6 +81,7 @@ $user_full_name = $user->getLastName().' '.$user->getFirstName(); ?>
 	<link href="/vendor/jquery.scrollbar/jquery.scrollbar.css" rel="stylesheet">
 
 	<link rel="stylesheet" href="/app/css/main.css">
+	<link rel="stylesheet" href="/app/css/add_organization.css">
 
 	<link rel="apple-touch-icon" sizes="57x57" href="/app/img/favicon/apple-icon-57x57.png">
 	<link rel="apple-touch-icon" sizes="60x60" href="/app/img/favicon/apple-icon-60x60.png">

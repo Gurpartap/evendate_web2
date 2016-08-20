@@ -1,8 +1,9 @@
 __STATES['add_organization'] = AddOrganization;
+__STATES['edit_organization'] = AddOrganization;
 
 function AddOrganization($view) {
     var $wrapper = $view.find('.page_wrapper'),
-        event_id = __STATES.entityId;
+        organization_id = __STATES.entityId;
 
     function initEditEventPage($view) {
 
@@ -59,32 +60,6 @@ function AddOrganization($view) {
         bindFileLoadButton();
         bindLoadByURLButton();
 
-        $view.find('.EditEventDefaultAddress').off('click.defaultAddress').on('click.defaultAddress', function () {
-            var $this = $(this);
-            $this.closest('.form_group').find('input').val($this.data('default_address'))
-        });
-
-        $view.find('#edit_event_delayed_publication').off('change.DelayedPublication').on('change.DelayedPublication', function () {
-            $view.find('.DelayedPublication').toggleStatus('disabled');
-        });
-
-        $view.find('#edit_event_registration_required').off('change.RequireRegistration').on('change.RequireRegistration', function () {
-            $view.find('.RegistrationTill').toggleStatus('disabled');
-        });
-
-        $view.find('#edit_event_free').off('change.FreeEvent').on('change.FreeEvent', function () {
-            $view.find('.MinPrice').toggleStatus('disabled');
-        });
-
-        $view.find('.MinPrice').find('input').inputmask({
-            'alias': 'numeric',
-            'autoGroup': false,
-            'digits': 2,
-            'digitsOptional': true,
-            'placeholder': '0',
-            'rightAlign': false
-        });
-
         socket.on('image.getFromURLDone', function (response) {
             if (response.error) {
                 showNotifier({text: response.error, status: false});
@@ -111,24 +86,7 @@ function AddOrganization($view) {
 
         });
 
-        $view.find('#edit_event_to_public_vk').off('change.PublicVK').on('change.PublicVK', function () {
-            var $vk_post_wrapper = $view.find('#edit_event_vk_publication'),
-                $vk_post_content = $vk_post_wrapper.children();
-            if ($(this).prop('checked')) {
-                $vk_post_wrapper.height($vk_post_content.height());
-            } else {
-                $vk_post_wrapper.height(0);
-            }
-            $vk_post_wrapper.toggleStatus('disabled');
-
-            $vk_post_content.find('.DeleteImg').off('click.DeleteImg').on('click.DeleteImg', function () {
-                $(this).closest('.EditEventImgLoadWrap').find('input').val('').end().find('img').attr('src', '');
-                toggleVkImg();
-            })
-
-        });
-
-        $view.find('#edit_event_submit').off('click.Submit').on('click.Submit', submitEditEvent);
+        $view.find('#add_organization_submit').off('click.Submit').on('click.Submit', submitEditOrganization);
 
     }
 
@@ -166,7 +124,7 @@ function AddOrganization($view) {
         });
     }
 
-    function submitEditEvent() {
+    function submitEditOrganization() {
         function formValidation($form, for_edit) {
             var is_valid = true,
                 $times = $form.find('#edit_event_different_time').prop('checked') ? $form.find('[class^="TableDay_"]') : $form.find('.MainTime');
@@ -202,7 +160,7 @@ function AddOrganization($view) {
                     if ($this.val() === "") {
                         if (is_valid) {
                             $('body').stop().animate({scrollTop: Math.ceil($this.closest('.EditEventImgLoadWrap').offset().top - 150)}, 1000, 'swing', function () {
-                                showNotifier({text: 'Пожалуйста, добавьте к событию обложку', status: false})
+                                showNotifier({text: 'Пожалуйста, добавьте обложку организации', status: false})
                             });
                         }
                         is_valid = false;
@@ -212,133 +170,142 @@ function AddOrganization($view) {
             return is_valid;
         }
 
-        var $form = $view.find("#edit-event-form"),
+        var $form = $view.find("#add-organization-form"),
             data = {
-                event_id: null,
-                title: null,
-                image_vertical: null,
-                image_horizontal: null,
                 organization_id: null,
+                name: null,
+                short_name: null,
+                type_id: null,
+                background_filename: null,
+                logo_filename: null,
+                default_address: null,
                 location: null,
                 description: null,
-                detail_info_url: null,
-                different_time: null,
-                dates: null,
-                tags: null,
-                registration_required: null,
-                registration_till: null,
-                is_free: null,
-                min_price: null,
-                delayed_publication: null,
-                public_at: null,
+                site_url: null,
+                vk_url: null,
+                facebook_url: null,
+                email: null,
                 filenames: {
-                    vertical: null,
-                    horizontal: null
+                    background: null,
+                    logo: null
                 }
             },
             form_data = $form.serializeForm(),
-            tags = form_data.tags ? form_data.tags.split(',') : null,
-            url = form_data.event_id ? '/api/v1/events/' + form_data.event_id : '/api/v1/events/',
-            method = form_data.event_id ? 'PUT' : 'POST',
-            valid_form = formValidation($form, !!(form_data.event_id));
+            url = form_data.organization_id ? '/api/v1/organizations/' + form_data.organization_id : '/api/v1/organizations/',
+            method = form_data.organization_id ? 'PUT' : 'POST',
+            valid_form = formValidation($form, !!(form_data.organization_id));
 
         if (valid_form) {
             $.extend(true, data, form_data);
 
-            data.tags = tags;
             data.filenames = {
-                vertical: data.filename_vertical,
-                horizontal: data.filename_horizontal
+                background: data.background_filename,
+                logo: data.logo_filename
             };
-            if (data.registration_required) {
-                data.registration_till = "" + data.registration_till_date + 'T' + data.registration_till_time_hours + ':' + data.registration_till_time_minutes + ':00'
-            }
-            if (data.delayed_publication) {
-                data.public_at = "" + data.public_at_date + 'T' + data.public_at_time_hours + ':' + data.public_at_time_minutes + ':00'
-            }
 
-            data.dates = [];
-            if (data.different_time) {
-                var selected_days_rows = $('.SelectedDaysRows').children();
-
-                selected_days_rows.each(function () {
-                    var $this = $(this);
-                    data.dates.push({
-                        event_date: $this.find('.DatePicker').data('selected_day'),
-                        start_time: $this.find('.StartHours').val() + ':' + $this.find('.StartMinutes').val(),
-                        end_time: $this.find('.EndHours').val() + ':' + $this.find('.EndMinutes').val()
-                    });
-                });
-            } else {
-                var MainCalendar = $('.EventDatesCalendar').data('calendar'),
-                    $main_time = $('.MainTime'),
-                    start_time = $main_time.find('.StartHours').val() + ':' + $main_time.find('.StartMinutes').val(),
-                    end_time = $main_time.find('.EndHours').val() + ':' + $main_time.find('.EndMinutes').val();
-
-                MainCalendar.selected_days.forEach(function (day) {
-                    data.dates.push({
-                        event_date: day,
-                        start_time: start_time,
-                        end_time: end_time
-                    })
-                });
-            }
-
-
-            $.ajax({
-                url: url,
-                data: JSON.stringify(data),
-                contentType: 'application/json',
-                method: method,
-                success: function (res) {
-                    ajaxHandler(res, function (res_data) {/*
-                     if(data.event_id){
-                     $('body').stop().animate({scrollTop:0}, 1000, 'swing', function() {
-                     showNotification('Событие успешно обновлено', 3000);
-                     });
-                     } else {
-                     $view.find('#edit_event_event_id').val(res_data.event_id);
-                     $('body').stop().animate({scrollTop:0}, 1000, 'swing', function() {
-                     showNotification('Событие успешно добавлено', 3000);
-                     });
-                     }*/
-
-                        if ($view.find('#edit_event_to_public_vk').prop('checked')) {
-                            socket.emit('vk.post', {
-                                guid: data.vk_group,
-                                event_id: data.event_id ? data.event_id : res_data.event_id,
-                                message: data.vk_post,
-                                image: {
-                                    base64: data.vk_image_src,
-                                    filename: data.vk_image_filename
-                                },
-                                link: data.detail_info_url
+                $.ajax({
+                    url: url,
+                    data: JSON.stringify(data),
+                    contentType: 'application/json',
+                    method: method,
+                    success: function (res) {
+                        socket.emit('utils.updateImages');
+                        ajaxHandler(res, function (res_data) {
+                            socket.on('utils.updateImagesDone', function(){
+                                window.location.href = '/organization/' + res_data.organization_id;
                             });
-                        }
-                        window.location = '/event/' + res_data.event_id;
 
-                    }, function (res) {
-                        if (res.text) {
-                            showNotifier({text: res.text, status: false});
-                        } else {
-                            ajaxErrorHandler(res);
-                        }
-                    });
-                }
-            });
+
+                        }, function (res) {
+                            if (res.text) {
+                                showNotifier({text: res.text, status: false});
+                            } else {
+                                ajaxErrorHandler(res);
+                            }
+                        });
+                    }
+                });
+
+
         }
 
     }
 
-    $wrapper.empty();
-    var local_storage = JSON.parse(window.localStorage.getItem('organization_info')),
-        additional_fields = $.extend({
-            header_text: 'Новый организатор'
-        }, local_storage, true);
 
+    $wrapper.empty();
+    var local_storage;
+    try {
+        local_storage = JSON.parse(window.localStorage.getItem('organization_info'));
+    } catch (e) {
+        local_storage = {}
+    }
+
+    var additional_fields = $.extend({
+        header_text: 'Новый организатор'
+    }, local_storage, true);
+
+    window.localStorage.removeItem('open_add_organization');
+    window.localStorage.removeItem('organization_info');
 
     $wrapper.html(tmpl('add-organization-page', additional_fields));
-    initEditEventPage($view);
-    Modal.bindCallModal($view);
-    initOrganizationTypes();
+
+    if (typeof organization_id === 'undefined') {
+        $wrapper.html(tmpl('add-organization-page', additional_fields));
+        initEditEventPage($view);
+        Modal.bindCallModal($view);
+        initOrganizationTypes();
+    } else {
+        var url = '/api/v1/organizations/' + organization_id;
+        $.ajax({
+            url: url,
+            method: 'GET',
+            data: {
+                fields: 'description,site_url,default_address,vk_url,facebook_url,email'
+            },
+            success: function (res) {
+                ajaxHandler(res, function (data) {
+                    data = Array.isArray(data) ? data[0] : data;
+                    additional_fields.header_text = 'Редактирование организации';
+
+                    if (data.background_img_url) {
+                        additional_fields.background_filename = data.background_img_url.split('/').reverse()[0];
+                    }
+                    if (data.img_url) {
+                        additional_fields.logo_filename = data.img_url.split('/').reverse()[0];
+                    }
+
+                    $.extend(true, additional_fields, data);
+                    $wrapper.html(tmpl('add-organization-page', additional_fields));
+
+                    initEditEventPage($view);
+                    initOrganizationTypes(data.organization_type_id);
+
+                    if (data.background_img_url && data.img_url) {
+                        $view.find('.CallModal').removeClass('-hidden').on('crop', function (event, cropped_src, crop_data) {
+                            var $button = $(this),
+                                $parent = $button.closest('.EditEventImgLoadWrap'),
+                                $preview = $parent.find('.EditEventImgPreview'),
+                                $data_url = $parent.find('.DataUrl');
+                            $data_url.val('data.source').data('source', $preview.attr('src')).trigger('change');
+                            $preview.attr('src', cropped_src);
+                            $button.data('crop_data', crop_data);
+                        });
+                    }
+                    Modal.bindCallModal($view);
+
+                    if (data.img_url) {
+                        toDataUrl(data.img_url, function (base64_string) {
+                            $view.find('#add_organization_img_src').val(base64_string ? base64_string : null);
+                        });
+                    }
+                    if (data.background_img_url) {
+                        toDataUrl(data.background_img_url, function (base64_string) {
+                            $view.find('#add_organization_background_src').val(base64_string ? base64_string : null);
+                        });
+                    }
+
+                }, ajaxErrorHandler);
+            }
+        });
+    }
 }

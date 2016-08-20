@@ -110,7 +110,10 @@ CREATE OR REPLACE VIEW view_organizations AS
 
     organizations.vk_url_path,
     organizations.facebook_url_path,
-    organizations.fts
+    organizations.fts,
+    organizations.facebook_url,
+    organizations.vk_url,
+    organizations.email
   FROM organizations
     INNER JOIN organization_types ON organization_types.id = organizations.type_id AND organizations.status = TRUE
   WHERE organizations.status = TRUE

@@ -31,6 +31,9 @@ var __STATES = {
 				case 'edit_event': {
 					return History.getState().data.eventId;
 				}
+				case 'add_organization': {
+					break;
+				}
 				case 'edit_organization': {
 					return History.getState().data.organizationId;
 				}
