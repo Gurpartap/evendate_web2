@@ -33,9 +33,9 @@ $title = 'Evendate';
     <meta name="twitter:card" content="app">
     <meta name="twitter:site" content="@evendate">
     <meta name="twitter:description"
-          content="Primer is a fast, easy way to learn new digital marketing skills. You can brush up on the basics or explore advanced topics, and you’ll get personalized next steps with each lesson.">
-    <meta name="twitter:app:country" content="US">
-    <meta name="twitter:app:name:iphone" content="Primer">
+          content="Evendate даёт возможность каждому организатору бесплатно публиковать события и привлекать новых подписчиков. После публикации все подписчики получат уведомление и гарантированно ничего не пропустят.">
+    <meta name="twitter:app:country" content="RU">
+    <meta name="twitter:app:name:iphone" content="Evendate">
     <meta name="twitter:app:id:iphone" content="1044975200">
     <meta name="twitter:app:name:ipad" content="Evendate">
     <meta name="twitter:app:name:googleplay" content="Evendate">
@@ -44,7 +44,7 @@ $title = 'Evendate';
     <meta property="og:title" content="Evendate | Будь в курсе событий">
     <meta property="og:url" content="https://evendate.ru">
     <meta property="og:description"
-          content="Primer is a fast, easy way to learn new digital marketing skills. You can take lessons in advertising, content, measurement, and strategy wherever and whenever you have 5 minutes free.">
+          content="Evendate даёт возможность каждому организатору бесплатно публиковать события и привлекать новых подписчиков. После публикации все подписчики получат уведомление и гарантированно ничего не пропустят.">
     <meta property="og:type" content="website">
     <meta property="og:image" content="https://evendate.ru/app/img/brand_2560x1600.jpg"/>
 
@@ -59,7 +59,7 @@ $title = 'Evendate';
 
 <div class="ref-message">
     <div class="fluid-width">
-        <a class="close-ref" href="index.html">
+        <a class="close-ref" href="#">
             <svg fill="#222222" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
                 <path
                     d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
