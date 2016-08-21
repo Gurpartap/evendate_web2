@@ -105,14 +105,14 @@ class Organization extends AbstractEntity
 				AND
 				view_events.last_event_date > DATE_PART(\'epoch\', NOW()) :: INT
 				AND view_events.created_at > 
-					(SELECT DATE_PART(\'epoch\', stat_organizations.created_at)::INT
+					COALESCE((SELECT DATE_PART(\'epoch\', stat_organizations.created_at)::INT
 					    FROM stat_organizations
 					    INNER JOIN stat_event_types ON stat_organizations.stat_type_id = stat_event_types.id
 					    INNER JOIN tokens ON stat_organizations.token_id = tokens.id
 					    WHERE type_code=\'view\'
 					    AND organization_id = view_organizations.id
 					    AND tokens.user_id = :user_id
-					    ORDER BY stat_organizations.created_at DESC LIMIT 1)
+					    ORDER BY stat_organizations.id DESC LIMIT 1),0)
 				AND
 				id NOT IN
 					(SELECT event_id
@@ -180,8 +180,6 @@ class Organization extends AbstractEntity
         if ($result === FALSE)
             throw new DBQueryException('SUBSCRIPTION_QUERY_ERROR', $this->db);
 
-        Statistics::Organization($this, $user, $this->db, Statistics::ORGANIZATION_SUBSCRIBE);
-
         return new Result(true, 'Подписка успешно оформлена');
     }
 
@@ -194,7 +192,6 @@ class Organization extends AbstractEntity
 			RETURNING id::INT';
         $p_upd_sub = $this->db->prepare($q_upd_sub);
         $p_upd_sub->execute(array(':organization_id' => $this->getId(), ':user_id' => $user->getId()));
-        Statistics::Organization($this, $user, $this->db, Statistics::ORGANIZATION_UNSUBSCRIBE);
         return new Result(true, 'Подписка успешно отменена');
     }
 
@@ -386,7 +383,7 @@ class Organization extends AbstractEntity
         )->getData();
     }
 
-    private function isSubscribed(User $user)
+    public function isSubscribed(User $user)
     {
         $q_get_subscribed = App::queryFactory()->newSelect();
         $q_get_subscribed
@@ -482,7 +479,7 @@ class Organization extends AbstractEntity
             && !empty($data['background_filename'])
         ) {
             $background_filename = md5(App::generateRandomString() . '-background') . '.' . App::getImageExtension($data['background_filename']);
-            App::saveImage($data['background'], self::IMAGES_PATH . self::IMAGE_TYPE_BACKGROUND . self::IMAGE_SIZE_LARGE  . $background_filename, 14000);
+            App::saveImage($data['background'], self::IMAGES_PATH . self::IMAGE_TYPE_BACKGROUND . self::IMAGE_SIZE_LARGE . $background_filename, 14000);
             $data['background_img_url'] = $background_filename;
         } else throw new InvalidArgumentException('Фоновое изображение обязательно');
 

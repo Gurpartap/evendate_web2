@@ -18,6 +18,7 @@ require_once "{$BACKEND_FULL_PATH}/exceptions/AuthorizationException.php";
 class App {
 
 	private static $obj;
+	public static $ENV;
 	public static $DB_SERVER;
 	public static $DB_USER;
 	public static $DB_PASSWORD;
@@ -28,7 +29,6 @@ class App {
 	public static $DB_DSN;
 	public static $DB_PORT;
 	public static $SETTINGS;
-	public static $ENV;
 
 	public static $QUERY_FACTORY;
 
@@ -80,6 +80,7 @@ class App {
 		self::$NODE_DOMAIN = self::$obj->node_domain;
 		self::$SCHEMA = self::$obj->schema;
 		self::$SETTINGS = self::$obj;
+		self::$ENV = $_SERVER['ENV'];
 
 		self::$DB_DSN = 'pgsql:host=' . self::$DB_SERVER . ';dbname=' . self::$DB_NAME . ';port=' . self::$DB_PORT;
 	}
