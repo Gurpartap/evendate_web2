@@ -145,8 +145,9 @@ pg.connect(pg_conn_string, function (err, client, done) {
             '           WHERE ' +
             '               is_canceled = FALSE ' +
             '               AND is_delayed = TRUE ' +
-            '               AND public_at < NOW()) ';
+            '               AND public_at < date_part(\'epoch\', NOW())) ';
         client.query(q_upd_events, [], function (err) {
+            if (err) logger.error(q_upd_events);
             if (err) logger.error(err);
         });
     }
