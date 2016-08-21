@@ -5,6 +5,22 @@ require_once 'Class.Event.php';
 class EventsCollection extends AbstractCollection
 {
 
+    const VIEW_ALL_EVENTS = 'view_all_events';
+    const VIEW_ALL_EVENTS_WITH_ALIAS = 'view_all_events AS view_events';
+
+
+    private static function getIsEditor(Organization $organization = null, User $user)
+    {
+        if ($organization != null) {
+            $params = $organization->getParams($user, array('privileges' => true))->getData();
+
+            return (isset($params['privileges'])
+                && is_array($params['privileges'])
+                && count($params['privileges']) > 0
+            );
+        }
+    }
+
     public static function filter(PDO $db,
                                   User $user = null,
                                   array $filters = null,
@@ -15,9 +31,10 @@ class EventsCollection extends AbstractCollection
 
         $q_get_events = App::queryFactory()->newSelect();
 
+        $from_view = 'view_events';
+
         $q_get_events
-            ->distinct()
-            ->from('view_events');
+            ->distinct();
 
         if (isset($pagination['offset'])) {
             $q_get_events->offset($pagination['offset']);
@@ -37,6 +54,30 @@ class EventsCollection extends AbstractCollection
 
         $is_one_event = false;
         $canceled_condition = 'canceled = FALSE';
+
+        $_organization = null;
+        if (array_key_exists('organization', $filters)) {
+            if ($filters['organization'] instanceof Organization) {
+                $_organization = OrganizationsCollection::one($db, $user, $filters['organization']->getId(), array('privileges'));
+            }
+        } elseif (array_key_exists('organization_id', $filters)) {
+            $_organization = OrganizationsCollection::one($db, $user, $filters['organization_id'], array('privileges'));
+        } elseif (array_key_exists('id', $filters)) {
+            $q_get_organization_id = App::queryFactory()
+                ->newSelect()
+                ->cols(array('organization_id'))
+                ->from('view_all_events')
+                ->where('id = ?', $filters['id']);
+            $p_get_organization_id = $db->prepare($q_get_organization_id->getStatement());
+            $result = $p_get_organization_id->execute($q_get_organization_id->getBindValues());
+            if ($result !== FALSE) {
+                if ($p_get_organization_id->rowCount() == 1) {
+                    $_organization = OrganizationsCollection::one($db, $user, $p_get_organization_id->fetchColumn(0), array('privileges'));
+                }
+            }
+        }
+
+        $is_editor = self::getIsEditor($_organization, $user);
 
         foreach ($filters as $name => $value) {
             switch ($name) {
@@ -87,6 +128,9 @@ class EventsCollection extends AbstractCollection
                     $q_get_events->where('id = :event_id');
                     $statement_array[':event_id'] = $value;
                     $is_one_event = true;
+                    if ($is_editor) {
+                        $from_view = self::VIEW_ALL_EVENTS_WITH_ALIAS;
+                    }
                     break;
                 }
                 case 'organization': {
@@ -103,10 +147,18 @@ class EventsCollection extends AbstractCollection
                     break;
                 }
                 case 'organization_id': {
-                    $organization = OrganizationsCollection::one($db, $user, intval($value), array());
-                    if ($organization instanceof Organization) {
+                    if ($_organization instanceof Organization) {
                         $q_get_events->where('organization_id = :organization_id');
-                        $statement_array[':organization_id'] = $organization->getId();
+                        $statement_array[':organization_id'] = $_organization->getId();
+                    }
+                    break;
+                }
+                case 'is_canceled':
+                case 'is_delayed': {
+                    if ($is_editor) {
+                        $from_view = self::VIEW_ALL_EVENTS_WITH_ALIAS;
+                        $q_get_events->where($name . ' = :' . $name);
+                        $statement_array[':' . $name] = boolval($value);
                     }
                     break;
                 }
@@ -221,7 +273,7 @@ class EventsCollection extends AbstractCollection
 
                     $interests = $user->getInterests()->getData();
                     $interests_text = implode(' ', $interests);
-                    
+
                     // has tags in favorites
                     // count of favored friends
                     // has tags with hidden events
@@ -313,7 +365,7 @@ class EventsCollection extends AbstractCollection
                     $_fields[] = $favored_friends_count . ' AS ' . Event::RATING_FAVORED_FRIENDS;
                     $_fields[] = $has_tags_in_hidden . ' AS ' . Event::RATING_TAGS_IN_HIDDEN;
                     $_fields[] = $create_date . ' AS ' . Event::RATING_RECENT_CREATED;
-                    $_fields[] = $actual_dates_count. ' AS ' . Event::RATING_ACTIVE_DAYS;
+                    $_fields[] = $actual_dates_count . ' AS ' . Event::RATING_ACTIVE_DAYS;
                     $_fields[] = $rating_text_similarity . ' AS ' . Event::RATING_TEXT_SIMILARITY;
 
                     $fields[] = Event::RATING_TAGS_IN_FAVORITES;
@@ -336,7 +388,6 @@ class EventsCollection extends AbstractCollection
 						WHERE tokens.user_id = :user_id)');
 
 
-
                     $q_get_events->where('id NOT IN (SELECT
 						hidden_events.event_id
 						FROM hidden_events
@@ -354,10 +405,16 @@ class EventsCollection extends AbstractCollection
             $statement_array[':user_id'] = $user->getId();
         }
 
-        $q_get_events->where($canceled_condition);
-        $q_get_events->cols($_fields);
-        $q_get_events->orderBy($order_by);
+        $q_get_events
+            ->from($from_view)
+            ->cols($_fields)
+            ->orderBy($order_by);
+        if ($from_view != self::VIEW_ALL_EVENTS_WITH_ALIAS){
+            $q_get_events->where($canceled_condition);
+        }
+
 //        echo $q_get_events->getStatement();
+
         $p_get_events = $db->prepare($q_get_events->getStatement());
         $result = $p_get_events->execute($statement_array);
         if ($result === FALSE) throw new DBQueryException(implode(';', $db->errorInfo()), $db);

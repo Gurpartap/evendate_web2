@@ -28,7 +28,7 @@ process.on('uncaughtException', function (err) {
 });
 
 
-var config_index = process.env.ENV ? process.env.ENV : 'dev',
+var config_index = process.env.ENV ? process.env.ENV : 'local',
     real_config = config[config_index],
     pg_conn_string = [
         'postgres://',
@@ -133,6 +133,24 @@ sql.setDialect('postgres');
 
 pg.connect(pg_conn_string, function (err, client, done) {
 
+    function publicDelayedEvents() {
+        var q_upd_events = 'UPDATE events ' +
+            ' SET ' +
+            '   status = TRUE, ' +
+            '   updated_at = NOW(),' +
+            '   public_at = NULL ' +
+            '   WHERE id IN ' +
+            '       (SELECT id ' +
+            '           FROM view_all_events ' +
+            '           WHERE ' +
+            '               is_canceled = FALSE ' +
+            '               AND is_delayed = TRUE ' +
+            '               AND public_at < NOW()) ';
+        client.query(q_upd_events, [], function (err) {
+            if (err) logger.error(err);
+        });
+    }
+
     try {
         new CronJob('*/1 * * * *', function () {
             if (config_index == 'prod' || args.indexOf('--resize-images') !== -1) {
@@ -146,6 +164,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 notifications.sendAutoNotifications();
                 notifications.sendUsersNotifications();
             }
+            publicDelayedEvents();
         }, null, true);
     } catch (ex) {
         logger.error(ex);
