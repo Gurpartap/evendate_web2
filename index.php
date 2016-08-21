@@ -12,7 +12,8 @@ try {
         header('Location: /feed');
         die();
     }
-} catch (Exception $e) {}
+} catch (Exception $e) {
+}
 $title = 'Evendate';
 ?>
 <!doctype html>
@@ -210,11 +211,10 @@ $title = 'Evendate';
 
             <div class="content-text">
                 <div class="text-slide active" data-slide="0">
-                    <h2 class="js-animate-this">Находи<br> интересные места</h2>
+                    <h2 class="js-animate-this">Не упусти<br>самое важное</h2>
                     <div class="js-animate-this">
-                        <p>Evendate - простой и быстрый способ не пропускать события. Ты можешь выбирать из сотен
-                            организаторов разных событий и
-                            подписаться на всех, которые тебе интересны.</p>
+                        <p>Evendate объединяет людей разных интересов, позволяя каждому выбрать свои любимые места,
+                            подписаться на них и получать уведомления о новых событиях. </p>
                         <div class="slide-cta hidden-sm hidden-xs">
                             <span>Войти через: </span>
                             <a class="slide-cta-button hover-fill vk-auth-btn auth-small-btn social-btn vk-btn"
@@ -230,45 +230,14 @@ $title = 'Evendate';
                                 <i class="fa fa-google"></i>
                             </a>
                         </div>
-                        <div class="slide-cta hidden-md hidden-lg">
-                            <span>Скачать приложение: </span>
-                            <a class="slide-cta-button hover-fill js-ga-track" target="_blank"
-                               href="https://play.google.com/store/apps/details?id=ru.evendate.android">
-                                <svg width="30px" height="30px" version="1.1" id="Layer_1"
-                                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                     x="0px" y="0px" viewBox="-3.5 -3.5 55 55" enable-background="new -3.5 -3.5 55 55"
-                                     xml:space="preserve">
-                      <path fill="#FFFFFF" d="M12,36c0,1.1,0.9,2,2,2h2v7c0,1.7,1.3,3,3,3s3-1.3,3-3v-7h4v7c0,1.7,1.3,3,3,3s3-1.3,3-3v-7h2c1.1,0,2-0.9,2-2V16H12V36z
-                         M7,16c-1.7,0-3,1.3-3,3v14c0,1.7,1.3,3,3,3s3-1.3,3-3V19C10,17.3,8.7,16,7,16z M41,16c-1.7,0-3,1.3-3,3v14c0,1.7,1.3,3,3,3
-                        s3-1.3,3-3V19C44,17.3,42.7,16,41,16z M31.1,4.3l2.6-2.6c0.4-0.4,0.4-1,0-1.4s-1-0.4-1.4,0l-3,2.9C27.7,2.5,25.9,2,24,2
-                        c-1.9,0-3.7,0.5-5.3,1.3l-3-3c-0.4-0.4-1-0.4-1.4,0s-0.4,1,0,1.4l2.6,2.6C13.9,6.5,12,10,12,14h24C36,10,34,6.5,31.1,4.3z M20,10h-2
-                        V8h2V10z M30,10h-2V8h2V10z"></path>
-                    </svg>
-                            </a>
-                            <a class="slide-cta-button hover-fill js-ga-track" target="_blank"
-                               href="http://itunes.apple.com/us/app/evendate/id1044975200?mt=8">
-                                <svg width="30px" height="30px" version="1.1" id="Layer_1"
-                                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                     x="0px" y="0px" viewBox="-3.5 -3.5 55 55" enable-background="new -3.5 -3.5 55 55"
-                                     xml:space="preserve">
-                      <g>
-                          <g id="svg_1">
-                              <path fill="#FFFFFF" d="M36.8,24.9c0.1,7.1,6.2,9.4,6.3,9.5c-0.1,0.2-1,3.4-3.2,6.7c-1.9,2.8-4,5.7-7.2,5.7c-3.1,0.1-4.1-1.9-7.7-1.9
-                            c-3.6,0-4.7,1.8-7.7,1.9c-3.1,0.1-5.4-3.1-7.4-5.9c-4-5.8-7.1-16.4-3-23.6c2-3.6,5.7-5.8,9.7-5.9c3-0.1,5.9,2,7.7,2
-                            c1.8,0,5.3-2.5,9-2.1c1.5,0.1,5.8,0.6,8.6,4.6C41.6,16.1,36.7,18.9,36.8,24.9 M30.9,7.5c1.6-2,2.7-4.7,2.4-7.5
-                            c-2.4,0.1-5.2,1.6-6.9,3.5c-1.5,1.8-2.8,4.6-2.5,7.2C26.6,11,29.2,9.4,30.9,7.5"></path>
-                          </g>
-                      </g>
-                    </svg>
-                            </a>
-                        </div>
                     </div>
                 </div>
                 <div class="text-slide" data-slide="1">
-                    <h2 class="js-animate-this">Будь в курсе<br>всех событий</h2>
+                    <h2 class="js-animate-this">Получай только то,<br>что любишь</h2>
                     <div class="js-animate-this">
-                        <p>Персонализированная лента твоих событий и уведомления о новых помогут тебе не пропускать
-                            ничего важного! Evendate также поможет найти интересные события с помощью рекомендаций.</p>
+                        <p>Образование, Искусство, Спорт, Бизнес, Клубы и Бары
+                            Лента будет состоять только из тех событий, которые тебе интересны, а система рекомендаций
+                            всегда посоветует что-нибудь новое. </p>
                         <div class="slide-cta js-animate-this hidden-sm hidden-xs">
                             <span>Войти через: </span>
                             <a class="slide-cta-button hover-fill vk-auth-btn auth-small-btn social-btn vk-btn"
@@ -284,43 +253,12 @@ $title = 'Evendate';
                                 <i class="fa fa-google"></i>
                             </a>
                         </div>
-                        <div class="slide-cta hidden-md hidden-lg">
-                            <span>Скачать приложение: </span>
-                            <a class="slide-cta-button hover-fill js-ga-track" target="_blank"
-                               href="https://play.google.com/store/apps/details?id=ru.evendate.android">
-                                <svg width="30px" height="30px" version="1.1" id="Layer_1"
-                                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                     x="0px" y="0px" viewBox="-3.5 -3.5 55 55" enable-background="new -3.5 -3.5 55 55"
-                                     xml:space="preserve">
-                      <path fill="#FFFFFF" d="M12,36c0,1.1,0.9,2,2,2h2v7c0,1.7,1.3,3,3,3s3-1.3,3-3v-7h4v7c0,1.7,1.3,3,3,3s3-1.3,3-3v-7h2c1.1,0,2-0.9,2-2V16H12V36z
-                         M7,16c-1.7,0-3,1.3-3,3v14c0,1.7,1.3,3,3,3s3-1.3,3-3V19C10,17.3,8.7,16,7,16z M41,16c-1.7,0-3,1.3-3,3v14c0,1.7,1.3,3,3,3
-                        s3-1.3,3-3V19C44,17.3,42.7,16,41,16z M31.1,4.3l2.6-2.6c0.4-0.4,0.4-1,0-1.4s-1-0.4-1.4,0l-3,2.9C27.7,2.5,25.9,2,24,2
-                        c-1.9,0-3.7,0.5-5.3,1.3l-3-3c-0.4-0.4-1-0.4-1.4,0s-0.4,1,0,1.4l2.6,2.6C13.9,6.5,12,10,12,14h24C36,10,34,6.5,31.1,4.3z M20,10h-2
-                        V8h2V10z M30,10h-2V8h2V10z"></path>
-                    </svg>
-                            </a>
-                            <a class="slide-cta-button hover-fill js-ga-track" target="_blank"
-                               href="http://itunes.apple.com/us/app/evendate/id1044975200?mt=8">
-                                <svg width="30px" height="30px" version="1.1" id="Layer_1"
-                                     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                     x="0px" y="0px" viewBox="-3.5 -3.5 55 55" enable-background="new -3.5 -3.5 55 55"
-                                     xml:space="preserve">
-                      <g>
-                          <g id="svg_1">
-                              <path fill="#FFFFFF" d="M36.8,24.9c0.1,7.1,6.2,9.4,6.3,9.5c-0.1,0.2-1,3.4-3.2,6.7c-1.9,2.8-4,5.7-7.2,5.7c-3.1,0.1-4.1-1.9-7.7-1.9
-                            c-3.6,0-4.7,1.8-7.7,1.9c-3.1,0.1-5.4-3.1-7.4-5.9c-4-5.8-7.1-16.4-3-23.6c2-3.6,5.7-5.8,9.7-5.9c3-0.1,5.9,2,7.7,2
-                            c1.8,0,5.3-2.5,9-2.1c1.5,0.1,5.8,0.6,8.6,4.6C41.6,16.1,36.7,18.9,36.8,24.9 M30.9,7.5c1.6-2,2.7-4.7,2.4-7.5
-                            c-2.4,0.1-5.2,1.6-6.9,3.5c-1.5,1.8-2.8,4.6-2.5,7.2C26.6,11,29.2,9.4,30.9,7.5"></path>
-                          </g>
-                      </g>
-                    </svg>
-                            </a>
-                        </div>
                     </div>
                 </div>
                 <div class="text-slide" data-slide="2">
-                    <h2 class="js-animate-this">Следи за тем,<br/> что интересно твоим друзьям</h2>
-                    <p class="js-animate-this">Смотри куда собираются пойти твои друзья с помощью ленты активности. Ходите на события вместе.</p>
+                    <h2 class="js-animate-this">Узнай куда пойдут<br/>твои друзья</h2>
+                    <p class="js-animate-this">Лента активности поможет узнать какие нравятся места и куда собираются
+                        пойти друзья из социальных сетей. Открывайте новое и ходите на события вместе.</p>
                     <div class="slide-cta js-animate-this hidden-sm hidden-xs">
                         <span>Войти через: </span>
                         <a class="slide-cta-button hover-fill vk-auth-btn auth-small-btn social-btn vk-btn" href="#">
