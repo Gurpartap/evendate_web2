@@ -14,7 +14,7 @@ CREATE OR REPLACE VIEW view_all_events AS
     events.longitude :: REAL,
     events.location,
     events.min_price,
-    events.public_at,
+    DATE_PART('epoch', events.public_at) :: INT                                AS public_at,
     (events.status = FALSE AND events.public_at IS NOT
                                NULL)                                                   AS is_delayed,
     events.status,
@@ -150,10 +150,3 @@ CREATE VIEW view_auto_notifications AS
     INNER JOIN notification_types ON notification_types.id = events_notifications.notification_type_id
     INNER JOIN organizations ON organizations.id = view_events.organization_id
   WHERE notification_time <= NOW() AND done = FALSE;
-
-
-UPDATE events
-SET status = TRUE, updated_at = NOW(), public_at = NULL
-WHERE id IN (SELECT id
-             FROM view_all_events
-             WHERE is_canceled = FALSE AND is_delayed = TRUE AND public_at < NOW())
