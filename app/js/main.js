@@ -318,6 +318,9 @@ function SubscribeButton($btn, options){
 				}, ajaxErrorHandler)
 			}
 		});
+		if (window.askToSubscribe instanceof Function){
+			window.askToSubscribe();
+		}
 	}
 
 	if(this.is_subscribed){
@@ -333,6 +336,9 @@ function SubscribeButton($btn, options){
 			self.unsubscribe();
 		} else {
 			self.subscribe();
+		}
+		if (window.askToSubscribe instanceof Function){
+			window.askToSubscribe();
 		}
 	})
 }
@@ -1089,6 +1095,10 @@ function bindEventHandlers(){
 			$liked_count.text(new_count);
 		}
 		$liked_count_text.text(getUnitsText(new_count, __C.TEXTS.FAVORED));
+
+		if (window.askToSubscribe instanceof Function){
+			window.askToSubscribe();
+		}
 	});
 
 	$view.find('.likes-block').on('click', function(){

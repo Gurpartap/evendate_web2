@@ -1,0 +1,7 @@
+{
+  "name": "Evendate",
+  "short_name": "Evendate",
+  "start_url": "/",
+  "display": "standalone",
+  "gcm_sender_id": "403640417782"
+}
