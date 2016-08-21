@@ -118,7 +118,7 @@ $__modules['organizations'] = array(
         '{(id:[0-9]+)/subscriptions}' => function ($id) use ($__db, $__request, $__user) {
             $organization = OrganizationsCollection::one($__db, $__user, intval($id), array());
             $result = $organization->deleteSubscription($__user);
-            Statistics::Organization($this, $__user, $__db, Statistics::ORGANIZATION_UNSUBSCRIBE);
+            Statistics::Organization($organization, $__user, $__db, Statistics::ORGANIZATION_UNSUBSCRIBE);
             return $result;
         },
         '{(id:[0-9]+)/staff}' => function ($id) use ($__db, $__pagination, $__request, $__user, $__fields, $__order_by) {
