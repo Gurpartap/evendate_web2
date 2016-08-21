@@ -892,6 +892,28 @@
           },
           {
             "in": "query",
+            "name": "is_delayed",
+            "description": "get ONLY delayed events.[WARNING] works only with organization_id",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ]
+          },
+          {
+            "in": "query",
+            "name": "is_canceled",
+            "description": "get ONLY canceled events.[WARNING] works only with organization_id",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ]
+          },
+          {
+            "in": "query",
             "name": "since",
             "description": "events since date",
             "required": false,

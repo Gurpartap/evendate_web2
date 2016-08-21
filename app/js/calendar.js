@@ -1016,19 +1016,24 @@ function Organization($view){
 		return $events;
 	}
 	
-	function uploadEvents($wrapper, is_future, onSuccess){
+	function uploadEvents($wrapper, type, onSuccess){
 		var offset = $wrapper.data('next_offset') ? $wrapper.data('next_offset') : 0,
 			data = {
 				length: 10,
 				offset: offset,
 				organization_id: organization_id,
 				fields: 'image_horizontal_medium_url,favored_users_count,is_favorite,favored{length:5},dates',
-				order_by: is_future ? 'nearest_event_date' : '-last_event_date'
+				order_by: type == 'future' ? 'nearest_event_date' : '-last_event_date'
 			};
-		if(is_future){
+		if(type == 'future'){
 			data.future = 'true'
-		} else {
+		} else if (type == 'past') {
 			data.till = moment().format(__C.DATE_FORMAT);
+		}else if (type == 'delayed'){
+			data.is_delayed = true;
+			data.is_canceled = false;
+		}else if (type == 'canceled'){
+			data.is_canceled = true;
 		}
 		$.ajax({
 			url: '/api/v1/events/',
@@ -1038,11 +1043,11 @@ function Organization($view){
 				ajaxHandler(res, function(data){
 					var $events = $();
 					if(data.length){
-						$events = buildEvents(data, is_future, $wrapper);
+						$events = buildEvents(data, type, $wrapper);
 						$wrapper.append($events);
 						$wrapper.data('next_offset', offset+10);
 					} else {
-						var scroll_event = is_future ? 'scroll.uploadFutureEvents' : 'scroll.uploadPastEvents';
+						var scroll_event = 'scroll.uploadEvents' + type;
 						$wrapper.append('<p class="organization_feed_text">Больше событий нет :(</p>');
 						$wrapper.data('disable_upload', true);
 						$(window).off(scroll_event);
@@ -1061,15 +1066,15 @@ function Organization($view){
 	function bindUploadEventsOnScroll($wrapper){
 		var $window = $(window),
 			$document = $(document),
-			is_future = $wrapper.hasClass('FutureEvents'),
-			scroll_event = is_future ? 'scroll.uploadFutureEvents' : 'scroll.uploadPastEvents';
+			type = $wrapper.data('type'),
+			scroll_event = 'scroll.uploadEvents' . type;
 		
 		$window.data('block_scroll', false);
 		if(!$wrapper.data('disable_upload')){
 			$window.on(scroll_event, function(){
 				if($window.height() + $window.scrollTop() + 200 >= $document.height() && !$window.data('block_scroll')){
 					$window.data('block_scroll', true);
-					uploadEvents($wrapper, is_future, function($events){
+					uploadEvents($wrapper, type, function($events){
 						bindEventsEvents($events);
 						$window.data('block_scroll', false);
 					});
@@ -1084,13 +1089,16 @@ function Organization($view){
 		url: url,
 		method: 'GET',
 		data: {
-			fields: 'img_small_url,description,site_url,is_subscribed,default_address,subscribed_count,privileges,subscribed{fields:"is_friend",order_by:"-is_friend,first_name",length:10}'
+			fields: 'img_small_url,description,site_url,is_subscribed,privileges,default_address,subscribed_count,privileges,subscribed{fields:"is_friend",order_by:"-is_friend,first_name",length:10}'
 		},
 		success: function(res){
 			ajaxHandler(res, function(data){
 				var $page_wrapper = $view.find('.page_wrapper'),
 					$past_events_wrapper,
-					$future_events_wrapper;
+					$future_events_wrapper,
+					$delayed_events_wrapper,
+					$canceled_events_wrapper,
+					is_editor = false;
 				
 				data = data[0];
 				
@@ -1106,6 +1114,12 @@ function Organization($view){
 						})
 					}
 				});
+				if (data.privileges && data.privileges.length > 0){
+					data.hidden_for_users = '';
+					is_editor = true;
+				}else{
+					data.hidden_for_users = '-hidden';
+				}
 				$page_wrapper.append(tmpl('organization-info-page', $.extend({
 					subscribe_button_classes: data.is_subscribed ? ['fa-check', '-color_neutral', '-Subscribed'].join(' ') : ['fa-plus', '-color_accent'].join(' '),
 					subscribe_button_text: data.is_subscribed ? 'Подписан' : 'Подписаться',
@@ -1114,10 +1128,20 @@ function Organization($view){
 				
 				$past_events_wrapper = $view.find('.PastEvents');
 				$future_events_wrapper = $view.find('.FutureEvents');
-				
-				uploadEvents($future_events_wrapper, true, function($events){
-					uploadEvents($past_events_wrapper, false, function($events){
-						initOrganizationPage($view);
+				$delayed_events_wrapper = $view.find('.DelayedEvents');
+				$canceled_events_wrapper = $view.find('.CanceledEvents');
+
+				uploadEvents($future_events_wrapper, 'future', function($events){
+					uploadEvents($past_events_wrapper, 'past', function($events){
+						if (is_editor){
+							uploadEvents($delayed_events_wrapper, 'delayed', function($events){
+								uploadEvents($canceled_events_wrapper, 'canceled', function($events){
+									initOrganizationPage($view);
+								});
+							});
+						}else{
+							initOrganizationPage($view);
+						}
 					});
 					bindUploadEventsOnScroll($future_events_wrapper);
 				});

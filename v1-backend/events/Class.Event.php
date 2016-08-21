@@ -258,21 +258,19 @@ class Event extends AbstractEntity
         $data['file_names'] = $data['filenames'] ?? $data['file_names'];
         $data['vk_post_id'] = $data['vk_post_id'] ?? null;
 
-        if (!isset($data['tags'])) throw new LogicException('Укажите хотя бы один тег');
-        if (!is_array($data['tags'])) throw new LogicException('Укажите хотя бы один тег');
+        if (!isset($data['tags']) || !is_array($data['tags'])) throw new LogicException('Укажите хотя бы один тег');
 
         try {
             if (isset($data['public_at']) && $data['public_at'] != null) {
                 $data['public_at'] = new DateTime($data['public_at']);
                 if ($data['public_at'] < new DateTime()) {
-
+                    throw new InvalidArgumentException('Время отложенной публикации не может быть меньше текущего времени.');
                 }
             } else {
                 $data['public_at'] = new DateTime();
             }
             $data['notification_at'] = clone $data['public_at'];
             $data['notification_at']->modify('+10 minutes');
-            $data['public_at'] = $data['public_at']->format('Y-m-d H:i:s');
         } catch (Exception $e) {
             $data['public_at'] = null;
             $data['notification_at'] = (new DateTime())->modify('+10 minutes');

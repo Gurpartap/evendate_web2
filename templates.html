@@ -620,10 +620,14 @@
 			<div class="tabs_header -color_accent">
 				<span class="tab Tab -active">Будущие</span>
 				<span class="tab Tab">Прошедшие</span>
+				<span class="tab Tab {hidden_for_users}">Отложенные</span>
+				<span class="tab Tab {hidden_for_users}">Отмененные</span>
 			</div>
 			<div class="tab_bodies_wrap TabsBodyWrapper">
-				<div class="tab_body TabsBody FutureEvents -active"></div>
-				<div class="tab_body TabsBody PastEvents"></div>
+				<div class="tab_body TabsBody FutureEvents -active" data-type="future"></div>
+				<div class="tab_body TabsBody PastEvents" data-type="past"></div>
+				<div class="tab_body TabsBody DelayedEvents" data-type="delayed"></div>
+				<div class="tab_body TabsBody CanceledEvents" data-type="canceled"></div>
 			</div>
 		</div>
 	</div>
