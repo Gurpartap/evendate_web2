@@ -13,7 +13,7 @@ var
     ONE_SIGNAL_URL = 'https://onesignal.com/api/v1/notifications';
 
 
-var config_index = process.env.ENV ? process.env.ENV : 'dev',
+var config_index = process.env.ENV ? process.env.ENV : 'prod',
     real_config = config[config_index],
     logger = new (winston.Logger)({
         transports: [
@@ -47,14 +47,14 @@ var config_index = process.env.ENV ? process.env.ENV : 'dev',
         ' AND subscriptions.user_id = $1' +
         ' AND subscriptions.status = TRUE' +
         ' WHERE view_events.last_event_date > DATE_PART(\'epoch\', NOW()) :: INT' +
-        ' AND view_events.created_at > (SELECT DATE_PART(\'epoch\', stat_organizations.created_at) :: INT' +
+        ' AND view_events.created_at > (SELECT COALESCE(DATE_PART(\'epoch\', stat_organizations.created_at), 0) :: INT' +
         ' FROM stat_organizations' +
         ' INNER JOIN stat_event_types' +
         ' ON stat_organizations.stat_type_id = stat_event_types.id' +
         ' INNER JOIN tokens ON stat_organizations.token_id = tokens.id' +
         ' WHERE type_code = \'view\' AND organization_id = subscriptions.organization_id AND' +
         ' tokens.user_id = $1' +
-        ' ORDER BY stat_organizations.created_at DESC' +
+        ' ORDER BY stat_organizations.id DESC' +
         ' LIMIT 1)' +
         ' AND view_events.id NOT IN (SELECT event_id' +
         ' FROM view_stat_events' +
@@ -64,10 +64,11 @@ pg.connect(pg_conn_string, function (err, client) {
     var user_id = args[0];
     client.query(q_get_ios_devices, [user_id], function (err, devices) {
         if (err) {
-            logger.log(err)
+            logger.log(err);
             process.exit(0);
         }
         if (devices.rows.length == 0) {
+            logger.log('NO_DEVICES');
             process.exit(0);
         }
         var device_tokens = [];
@@ -85,7 +86,7 @@ pg.connect(pg_conn_string, function (err, client) {
                     app_id: real_config.one_signal.app_id,
                     content_available: true,
                     ios_badgeType: 'SetTo',
-                    ios_badgeCount: 10 /*counter.rows[0].users_unseen_count*/,
+                    ios_badgeCount: counter.rows[0].users_unseen_count,
                     isIos: true,
                     include_player_ids: device_tokens,
                     data: {}
@@ -95,7 +96,7 @@ pg.connect(pg_conn_string, function (err, client) {
                         logger.log(res, null);
                         process.exit(0);
                     } else {
-                        console.log(res, null);
+                        logger.log(res, null);
                         process.exit(1);
                     }
                 });

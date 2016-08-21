@@ -1007,10 +1007,13 @@ class Event extends AbstractEntity
     public function isSeenByUser(User $user) : Result
     {
         $q_get_is_seen = App::queryFactory()->newSelect();
-        $q_get_is_seen->from('stat_events')
+        $q_get_is_seen
+            ->from('stat_events')
+            ->cols(array('stat_events.id'))
             ->join('INNER', 'tokens', 'stat_events.token_id = tokens.id')
             ->where('event_id = :event_id')
-            ->where('user_id = :user_id');
+            ->where('user_id = :user_id')
+            ->limit(1);
 
         $p_get_event = $this->db->prepare($q_get_is_seen->getStatement());
         $p_get_event->execute(array(

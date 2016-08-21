@@ -29,7 +29,6 @@ class App {
 	public static $DB_DSN;
 	public static $DB_PORT;
 	public static $SETTINGS;
-	public static $ENV;
 
 	public static $QUERY_FACTORY;
 

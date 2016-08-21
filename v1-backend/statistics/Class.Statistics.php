@@ -47,11 +47,12 @@ class Statistics
         return $p_get->fetchColumn(0);
     }
 
-    private static function updateIOsBadges(PDO $db, User $user, $type, Event $event, Organization $organization = null)
+    private static function updateIOsBadges(PDO $db, User $user, $type, Event $event = null, Organization $organization = null)
     {
-        if (App::$ENV != 'prod') return;
+//        if (App::$ENV != 'prod') return;
+        $exec_command = 'cd ' . App::getVar('node_path') . ' && ENV=' . App::$ENV . ' node update_ios_badges.js ' . $user->getId() . ' > /dev/null 2>/dev/null &';
         if (isset($event)) {
-            exec('cd ' . App::getVar('node_path') . ' && node update_ios_badges.js ' . $user->getId());
+            exec($exec_command);
         } else if (isset($organization)) {
             if ($type == self::ORGANIZATION_VIEW) {
                 try {
@@ -61,7 +62,7 @@ class Statistics
                     $subscribed = false;
                 }
                 if ($subscribed) {
-                    exec('cd ' . App::getVar('node_path') . ' && node update_ios_badges.js ' . $user->getId());
+                    exec($exec_command);
                 }
             }
         }
@@ -78,9 +79,10 @@ class Statistics
 
         if ($no_update_badges == null
             && $event->isSeenByUser($user)->getData()['is_seen'] == false
-            && $event->isInUserFeed($user)->getData()['is_in_feed']){
+            && $event->isInUserFeed($user)->getData()['is_in_feed']
+        ) {
             $no_update_badges = false;
-        }else{
+        } else {
             $no_update_badges = true;
         }
 
@@ -93,7 +95,7 @@ class Statistics
             ':token_id' => $user ? $user->getTokenId() : null,
             ':stat_type_id' => $type_id
         ));
-        if ($no_update_badges == false) {
+        if ($no_update_badges !== true) {
             self::updateIOsBadges($db, $user, $type, $event);
         }
     }
@@ -115,7 +117,7 @@ class Statistics
             ':stat_type_id' => $type_id
         ));
 
-        if ($no_update_badges == false) {
+        if ($no_update_badges !== true) {
             self::updateIOsBadges($db, $user, $type, null, $organization);
         }
     }
@@ -143,12 +145,14 @@ class Statistics
     {
         $organization_events = 0;
         $organization = null;
+        $event_instance = null;
         foreach ($events as $event) {
             switch ($event['entity_type']) {
                 case self::ENTITY_EVENT:
                 case self::ENTITY_EVENTS: {
-                    $event = EventsCollection::one($db, $user, $event['entity_id'], array());
-                    self::Event($event, $user, $db, $event['event_type']);
+                    $event_instance = EventsCollection::one($db, $user, $event['entity_id'], array());
+                    self::Event($event_instance, $user, $db, $event['event_type'], true);
+                    $organization_events++;
                     break;
                 }
                 case self::ENTITY_ORGANIZATION:
@@ -168,7 +172,7 @@ class Statistics
             }
         }
         if ($organization_events > 0) {
-            self::updateIOsBadges($db, $user, self::ORGANIZATION_VIEW,null, $organization);
+            self::updateIOsBadges($db, $user, self::ORGANIZATION_VIEW, $event_instance, $organization);
         }
         return new Result(true, '');
     }
