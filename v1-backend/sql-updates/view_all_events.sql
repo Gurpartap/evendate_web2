@@ -1,5 +1,4 @@
 DROP VIEW view_events CASCADE;
-DROP VIEW view_all_events CASCADE;
 
 CREATE OR REPLACE VIEW view_all_events AS
   SELECT DISTINCT
