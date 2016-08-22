@@ -221,6 +221,56 @@ class Event extends AbstractEntity
         return new Result(true, 'Данные успешно обновлены');
     }
 
+    private static function getAvailableNotificationTime(PDO $db, DateTime $dt, $organization_id) : DateTime
+    {
+        $dt_clone = clone $dt;
+        $q_get_notifications = App::queryFactory()
+            ->newSelect()
+            ->cols(array(
+                'COUNT(events_notifications.id) AS notifications_count',
+                'events_notifications.notification_time::DATE AS available_date'
+            ))
+            ->from('events_notifications')
+            ->join('inner', 'events', 'events.id=events_notifications.event_id')
+            ->where('organization_id = ?', $organization_id)
+            ->where('events_notifications.status = TRUE')
+            ->where('events_notifications.notification_time::DATE >= NOW()::DATE')
+            ->where('events_notifications.notification_type_id = ?', Notification::NOTIFICATION_TYPE_NOW_ID)
+            ->groupBy(array('events_notifications.notification_time::DATE'))
+            ->orderBy(array('available_date'));
+
+        $p_get_notifications = $db->prepare($q_get_notifications->getStatement());
+        $result = $p_get_notifications->execute($q_get_notifications->getBindValues());
+        if ($result === FALSE) return $dt_clone;
+        if ($p_get_notifications->rowCount() == 0) return $dt_clone;
+        $rows = $p_get_notifications->fetchAll();
+
+
+        $dt_without_time = clone $dt_clone;
+        $dt_without_time->setTime(0, 0, 0);
+
+        foreach ($rows as $index => $row){
+            $_date_time = DateTime::createFromFormat('Y-m-d H:i:s', $row['available_date'] . ' 00:00:00');
+
+            if ($dt_without_time < $_date_time && $index == 0) return $dt_clone;
+            if ($row['notifications_count'] < 2){
+                return $dt_clone->setDate(
+                    intval($_date_time->format('Y')),
+                    intval($_date_time->format('m')),
+                    intval($_date_time->format('d'))
+                );
+            }
+        }
+        if (isset($_date_time) && $_date_time instanceof DateTime){
+            $_date_time->add(new DateInterval('P1D'));
+            return $dt_clone->setDate(
+                intval($_date_time->format('Y')),
+                intval($_date_time->format('m')),
+                intval($_date_time->format('d'))
+            );
+        }else return $dt_clone;
+    }
+
     private static function generateQueryData(&$data)
     {
         if (isset($data['description'])) {
@@ -321,7 +371,7 @@ class Event extends AbstractEntity
 
             $db->beginTransaction();
             if (!isset($data['dates']) || count($data['dates']) == 0)
-                throw new InvalidArgumentException('Укажите, пожалуйста, даты', 'Укажите, пожалуйста, даты');
+                throw new InvalidArgumentException('Укажите, пожалуйста, даты');
 
             $q_ins_event = App::queryFactory()->newInsert();
             $random_string = App::generateRandomString();
@@ -365,10 +415,21 @@ class Event extends AbstractEntity
 
             self::saveDates($data['dates'], $db, $event_id);
             self::saveEventTags($db, $event_id, $data['tags']);
+
+            $notification_date = self::getAvailableNotificationTime($db, $data['notification_at'], $organization->getId());
+
+            //dates are already sorted
+            $first_date_string = $data['dates'][0]['event_date']. ' ' . $data['dates'][0]['start_time'];
+
+            //if available notification time > first event date, we should sent notification NOW
+            if ($notification_date > (DateTime::createFromFormat('Y-m-d H:i', $first_date_string))){
+                $notification_date = $data['notification_at'];
+            }
+
             self::saveNotifications(array(array(
                 'event_id' => $event_id,
                 'notification_type_id' => Notification::NOTIFICATION_TYPE_NOW_ID,
-                'notification_time' => $data['notification_at']->format('Y-m-d H:i:s'),
+                'notification_time' => $notification_date->format('Y-m-d H:i:s'),
                 'status' => 'TRUE',
                 'done' => 'FALSE'
             )), $db);
@@ -467,7 +528,7 @@ class Event extends AbstractEntity
                 ':end_time' => $date['end_time']
             ));
 
-            $result = $p_ins_dates->fetch(PDO::FETCH_ASSOC);
+            $p_ins_dates->fetch(PDO::FETCH_ASSOC);
         }
     }
 
