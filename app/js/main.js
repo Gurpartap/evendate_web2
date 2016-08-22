@@ -318,6 +318,9 @@ function SubscribeButton($btn, options){
 				}, ajaxErrorHandler)
 			}
 		});
+		if (window.askToSubscribe instanceof Function){
+			window.askToSubscribe();
+		}
 	}
 
 	if(this.is_subscribed){
@@ -333,6 +336,9 @@ function SubscribeButton($btn, options){
 			self.unsubscribe();
 		} else {
 			self.subscribe();
+		}
+		if (window.askToSubscribe instanceof Function){
+			window.askToSubscribe();
 		}
 	})
 }
@@ -357,6 +363,17 @@ function buildRadioOrCheckbox(type, props){
 	} else {
 		throw Error('Принимаемый аргумент type может быть либо "radio" либо "checkbox", придурок')
 	}
+}
+
+function buildButton(props){
+	props.classes = props.classes ? (typeof props.classes == 'string') ? props.classes.split(' ') : props.classes : [];
+	props.classes.toString = arrayToSpaceSeparatedString;
+	if(props.dataset)
+		props.dataset.toString = (Array.isArray(props.dataset)) ? arrayToSpaceSeparatedString : objectToHtmlDataSet;
+	if(props.attributes)
+		props.attributes.toString = (Array.isArray(props.attributes)) ? arrayToSpaceSeparatedString : objectToHtmlAttributes;
+	
+	return tmpl('button', props);
 }
 
 function buildAvatarCollection(subscribers, count){
@@ -1078,6 +1095,10 @@ function bindEventHandlers(){
 			$liked_count.text(new_count);
 		}
 		$liked_count_text.text(getUnitsText(new_count, __C.TEXTS.FAVORED));
+
+		if (window.askToSubscribe instanceof Function){
+			window.askToSubscribe();
+		}
 	});
 
 	$view.find('.likes-block').on('click', function(){

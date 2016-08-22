@@ -1,73 +1,4 @@
 {
-  "dev": {
-    "google": {
-      "web": {
-        "client_id": "403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv.apps.googleusercontent.com",
-        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-        "token_uri": "https://accounts.google.com/o/oauth2/token",
-        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-        "client_email": "403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv@developer.gserviceaccount.com",
-        "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/403640417782-lfkpm73j5gqqnq4d3d97vkgfjcoebucv%40developer.gserviceaccount.com",
-        "client_secret": "5rK7ElK7fA7G1tylhkzsnE4Q",
-        "redirect_uri": ""
-      },
-      "maps_api_v3": {
-        "key": "AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg"
-      }
-    },
-    "db": {
-      "host": "localhost",
-      "user": "root",
-      "password": "Trwnp7LUCwW7mp4J",
-      "database": "evendate",
-      "port": 3306
-    },
-    "VK": {
-      "APP_ID": 5029623,
-      "SECURE_KEY": "gCfYONn6zlmdQZzu8Z6G",
-      "redirect_uri": ""
-    },
-    "facebook": {
-      "app_id": "1692270867652630",
-      "app_secret": "0ecd87ecde79a4ab4e4feb8c2718e845",
-      "redirect_uri": ""
-    },
-    "smtp": {
-      "user": "feedback@evendate.ru",
-      "password": "Aues300694$$$",
-      "host": "smtp.yandex.ru",
-      "port": 25
-    },
-    "APN": {
-      "gateway": "gateway.push.apple.com",
-      "port": 2195,
-      "enhanced": true,
-      "production": false,
-      "cacheLength": 5,
-      "cert": "pushcert.pem",
-      "key": "pushkey.pem",
-      "passphrase": "maryashka2004",
-      "pushwoosh": {
-        "app_code": "3874F-0C5E5",
-        "app_token": "gFVeR6D4frF2VImMkCSQbLgG5vkWCIm5Eetyt3mEgsR8qw3DICcfEX7T1ShRpMYxqaXoxqsZyOVpaBd6kpnw"
-      }
-    },
-    "GCM": {
-      "api_key": "AIzaSyCUJjlz2FJ8RZTKLiiVpUNP4xA_NJaa3Co"
-    },
-    "images": {
-      "events_path": "event_images",
-      "user_images": "user_images",
-      "organizations_images": "organizations_images"
-    },
-    "one_signal": {
-      "app_id": "7471a586-01f3-4eef-b989-c809700a8658",
-      "rest_key": "Mjk5OGFiYzYtMDViOS00ZmMzLTkzNmMtMWVkMWJlNDllMTk0"
-    },
-    "domain": "evendate.ru",
-    "node_domain": "evendate.ru",
-    "schema": "http://"
-  },
   "test": {
     "google": {
       "web": {
@@ -83,13 +14,6 @@
       "maps_api_v3": {
         "key": "AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg"
       }
-    },
-    "mysql_db": {
-      "host": "localhost",
-      "user": "root",
-      "password": "Trwnp7LUCwW7mp4J",
-      "database": "evendate",
-      "port": 3306
     },
     "db": {
       "host": "localhost",
@@ -114,20 +38,6 @@
       "host": "smtp.yandex.ru",
       "port": 25
     },
-    "APN": {
-      "gateway": "gateway.push.apple.com",
-      "port": 2195,
-      "enhanced": true,
-      "production": false,
-      "cacheLength": 5,
-      "cert": "pushcert.pem",
-      "key": "pushkey.pem",
-      "passphrase": "maryashka2004",
-      "pushwoosh": {
-        "app_code": "3874F-0C5E5",
-        "app_token": "gFVeR6D4frF2VImMkCSQbLgG5vkWCIm5Eetyt3mEgsR8qw3DICcfEX7T1ShRpMYxqaXoxqsZyOVpaBd6kpnw"
-      }
-    },
     "GCM": {
       "api_key": "AIzaSyCUJjlz2FJ8RZTKLiiVpUNP4xA_NJaa3Co"
     },
@@ -148,6 +58,7 @@
     },
     "domain": "test.evendate.ru",
     "node_domain": "test.evendate.ru",
+    "node_path": "/var/www/html/evendate_web2/node",
     "schema": "http://"
   },
   "local": {
@@ -170,13 +81,6 @@
         "key": "AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg"
       }
     },
-    "mysql_db": {
-      "host": "localhost",
-      "user": "root",
-      "password": "Trwnp7LUCwW7mp4J",
-      "database": "evendate",
-      "port": 3306
-    },
     "db": {
       "host": "localhost",
       "user": "postgres",
@@ -199,20 +103,6 @@
       "password": "Aues300694$$$",
       "host": "smtp.yandex.ru",
       "port": 25
-    },
-    "APN": {
-      "gateway": "gateway.push.apple.com",
-      "port": 2195,
-      "enhanced": true,
-      "production": false,
-      "cacheLength": 5,
-      "cert": "pushcert.pem",
-      "key": "pushkey.pem",
-      "passphrase": "maryashka2004",
-      "pushwoosh": {
-        "app_code": "3874F-0C5E5",
-        "app_token": "gFVeR6D4frF2VImMkCSQbLgG5vkWCIm5Eetyt3mEgsR8qw3DICcfEX7T1ShRpMYxqaXoxqsZyOVpaBd6kpnw"
-      }
     },
     "GCM": {
       "api_key": "AIzaSyCUJjlz2FJ8RZTKLiiVpUNP4xA_NJaa3Co"
@@ -238,7 +128,8 @@
       "domain": "localhost",
       "token": "EAAYDHIPuIBYBAPmwIZAk3INqbI1GhyRX8YAMjlirVpYjiIC3KKS09DwzcOtYwlqcC5iEpYwlUdHczjtKoqgpXjfpFloWcYuHBbf6u8sCSH4DEK2AnfDicVghW5eKidZB3BMpvBfUxCQPZACp7KXbZAq5TPg6VT9QGmkPOAdthQZDZDundefinedicFo7r3WzgpHnvBs35DOpBKjSlotpAN5"
     },
-    "schema": "http://"
+    "schema": "http://",
+    "node_path": "/var/www/html/evendate/node"
   },
   "prod": {
     "google": {
@@ -255,13 +146,6 @@
       "maps_api_v3": {
         "key": "AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg"
       }
-    },
-    "mysql_db": {
-      "host": "evendate.ru",
-      "user": "root",
-      "password": "Trwnp7LUCwW7mp4J",
-      "database": "evendate",
-      "port": 3306
     },
     "db": {
       "host": "localhost",
@@ -285,20 +169,6 @@
       "password": "Aues300694$$$",
       "host": "smtp.yandex.ru",
       "port": 25
-    },
-    "APN": {
-      "gateway": "gateway.push.apple.com",
-      "port": 2195,
-      "enhanced": true,
-      "production": false,
-      "cacheLength": 5,
-      "cert": "pushcert.pem",
-      "key": "pushkey.pem",
-      "passphrase": "maryashka2004",
-      "pushwoosh": {
-        "app_code": "3874F-0C5E5",
-        "app_token": "gFVeR6D4frF2VImMkCSQbLgG5vkWCIm5Eetyt3mEgsR8qw3DICcfEX7T1ShRpMYxqaXoxqsZyOVpaBd6kpnw"
-      }
     },
     "GCM": {
       "api_key": "AIzaSyCUJjlz2FJ8RZTKLiiVpUNP4xA_NJaa3Co"
@@ -324,6 +194,7 @@
     },
     "domain": "evendate.ru",
     "node_domain": "evendate.ru",
+    "node_path": "/var/www/html/evendate_web2/node",
     "schema": "http://"
   }
 }

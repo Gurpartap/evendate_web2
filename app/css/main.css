@@ -2869,6 +2869,8 @@ html.-noscroll {
 	color: var(--color_primary_50);
 }
 
+.organization_unit_content > .button:not(.-hidden) + .button {margin-left: 6px}
+
 /* ORGANIZATION */
 
 .organization_info_page {

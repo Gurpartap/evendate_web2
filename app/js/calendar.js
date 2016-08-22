@@ -31,6 +31,12 @@ var __STATES = {
 				case 'edit_event': {
 					return History.getState().data.eventId;
 				}
+				case 'add_organization': {
+					break;
+				}
+				case 'edit_organization': {
+					return History.getState().data.organizationId;
+				}
 				case 'statistics': {
 					break;
 				}
@@ -39,7 +45,7 @@ var __STATES = {
 					return undefined;
 				}
 			}
-			
+
 		}
 	};
 
@@ -126,7 +132,7 @@ function Feed($view){
 				hidden: true
 			}
 		};
-	
+
 	function renderFeedHeaderTabs(sub_states, active_state){
 		var header_tabs = [];
 		$.each(sub_states, function(sub_state, options){
@@ -144,7 +150,7 @@ function Feed($view){
 		});
 		renderHeaderTabs(header_tabs);
 	}
-	
+
 	function bindEventsEvents($parent){
 		bindAddAvatar($parent);
 		trimAvatarsCollection($parent);
@@ -163,12 +169,12 @@ function Feed($view){
 				subscribed: 'fa-star'
 			}
 		});
-		
+
 		$parent.find('.HideEvent').not('.-Handled_HideEvent').each(function(){
 			var $this = $(this),
 				$event = $this.parents('.FeedEvent'),
 				event_id = $this.data("event-id");
-			
+
 			$this.on('click', function(){
 				$event.addClass('-cancel');
 				$.ajax({
@@ -206,7 +212,7 @@ function Feed($view){
 			});
 		}).addClass('-Handled_HideEvent');
 	}
-	
+
 	function initFeedCalendar($parent){
 		var state_date = state_data.date,
 			MainCalendar = new Calendar($parent.find('.FeedCalendar'), {
@@ -220,7 +226,7 @@ function Feed($view){
 				td_disabled: '-disabled'
 			}
 		});
-		
+
 		function setDaysWithEvents(calendar){
 			calendar.$calendar.find('.feed_calendar_td').removeClass('Controller has_favorites').addClass(__C.CLASSES.NEW_DISABLED);
 			$.ajax({
@@ -242,12 +248,12 @@ function Feed($view){
 							.removeClass(__C.CLASSES.NEW_DISABLED);
 					});
 					calendar.bindDaySelection();
-					
+
 					bindControllers(calendar.$calendar);
 				}
 			});
 		}
-		
+
 		MainCalendar.init();
 		if(state_date){
 			MainCalendar.setMonth(state_date.split('-')[1], state_date.split('-')[0]).selectDays(state_date);
@@ -258,7 +264,7 @@ function Feed($view){
 			setDaysWithEvents(MainCalendar);
 		});
 	}
-	
+
 	function uploadMoreEvents(sub_state, length, offset, success){
 		var $events = $(),
 			ajax_data = sub_state.ajax_data;
@@ -276,21 +282,21 @@ function Feed($view){
 							avatars_collection_classes = [],
 							favored_users_count = ($subscribers.length <= 4) ? 0 : event.favored_users_count - 4,
 							$event;
-						
+
 						if(event.is_favorite){
 							avatars_collection_classes.push('-subscribed');
 							if($subscribers.length > 4){
 								avatars_collection_classes.push('-shift');
 							}
 						}
-						
+
 						event.subscribe_button_classes = event.is_favorite ? ['fa-star', '-color_accent', '-Subscribed'].join(' ') : ['fa-star-o', '-color_neutral_accent'].join(' ');
 						event.subscribe_button_text = event.is_favorite ? 'В избранном' : 'В избранное';
 						event.subscribers = $subscribers;
 						event.avatars_collection_classes = avatars_collection_classes.join(' ');
 						event.favored_users_show = favored_users_count ? '' : '-cast';
 						event.favored_users_count = favored_users_count;
-						
+
 						if(event.nearest_event_date){
 							event.feed_event_infos = tmpl('feed-event-info', {text: moment.unix(event.nearest_event_date).format('D MMMM, HH:mm')});
 						} else {
@@ -306,12 +312,12 @@ function Feed($view){
 						} else {
 							event.feed_event_infos = event.feed_event_infos.add(tmpl('feed-event-info', {text: 'Цена от '+(event.min_price ? event.min_price : 0) +' руб.'}));
 						}
-						
+
 						$event = tmpl('feed-event', event);
 						$event.appear(function() {
 							storeStat(event.id, __C.STATS.EVENT_ENTITY, __C.STATS.EVENT_VIEW);
 						}, {accY: 100});
-						
+
 						$events = $events.add($event);
 					});
 					if(success && typeof success == 'function'){
@@ -321,7 +327,7 @@ function Feed($view){
 			}
 		});
 	}
-	
+
 	if(!state_data.tab_state){
 		if(state_data.date){
 			state_data.tab_state = 'day'
@@ -339,7 +345,7 @@ function Feed($view){
 	$window.off('scroll');
 	uploadMoreEvents(sub_states[state_data.tab_state], 10, current_offset, function($events){
 		if($wrapper.data('tab_state_id') == tab_state_id){
-			
+
 			$window.data('block_scroll', false);
 			if($events.length){
 				$wrapper.find('.FeedEvents').append($events);
@@ -375,7 +381,7 @@ function Feed($view){
 function OneEvent($view){
 	var $wrapper = $view.find('.page_wrapper'),
 		event_id = __STATES.entityId;
-	
+
 	function initEventPage($parent){
 		bindAddAvatar($parent);
 		trimAvatarsCollection($parent);
@@ -396,7 +402,7 @@ function OneEvent($view){
 				subscribed: 'fa-star'
 			}
 		});
-		
+
 		$parent.find('.CancelEvent').on('click.CancelEvent', function(){
 			$.ajax({
 				url: '/api/v1/events/'+event_id+'/status',
@@ -409,7 +415,7 @@ function OneEvent($view){
 				}
 			});
 		});
-		
+
 		$parent.find('.CancelCancellation').on('click.CancelCancellation', function(){
 			$.ajax({
 				url: '/api/v1/events/'+event_id+'/status',
@@ -422,22 +428,22 @@ function OneEvent($view){
 				}
 			});
 		});
-		
+
 		$parent.find('.ExternalLink').on('click.sendStat', function(){
 			storeStat(event_id, __C.STATS.EVENT_ENTITY, __C.STATS.EVENT_OPEN_SITE);
 		});
-		
+
 		$parent.find('.EventMap').on('click.sendStat', function(){
 			storeStat(event_id, __C.STATS.EVENT_ENTITY, __C.STATS.EVENT_OPEN_MAP);
 		});
 	}
-	
+
 	function initNotifications($parent){
 		$parent = $parent ? $parent : $('body');
 		$parent.find('.ToggleNotification').each(function(){
 			var $this = $(this),
 				url, method;
-			
+
 			$this.on('change', function(){
 				$this.prop('disabled', true);
 				if($this.prop('checked')){
@@ -465,7 +471,7 @@ function OneEvent($view){
 			})
 		});
 	}
-	
+
 	function buildNotifications(raw_notifications, event_id, last_date){
 		var m_today = moment(),
 			m_last_date = moment.unix(last_date),
@@ -499,9 +505,9 @@ function OneEvent($view){
 				current_notifications[raw_notifications[notif].notification_type] = raw_notifications[notif];
 			}
 		}
-		
+
 		for(var notification in all_notifications){
-			
+
 			if(all_notifications.hasOwnProperty(notification)){
 				var is_disabled = moment.unix(all_notifications[notification].moment).isBefore(m_today),
 					data = {
@@ -516,7 +522,7 @@ function OneEvent($view){
 							event_id: event_id
 						}
 					};
-				
+
 				if(current_notifications[notification]){
 					is_disabled = is_disabled || current_notifications[notification].done || !current_notifications[notification].uuid;
 					if(current_notifications[notification].uuid){
@@ -533,7 +539,7 @@ function OneEvent($view){
 		}
 		return $notifications;
 	}
-	
+
 	function formatDates(dates){
 		var prev_day,
 			range = [],
@@ -553,11 +559,11 @@ function OneEvent($view){
 				'ноября',
 				'декабря'
 			];
-		
+
 		if(dates.length == 1){
 			return [moment.unix(dates[0].event_date).format('LL')];
 		}
-		
+
 		dates.forEach(function(date, i){
 			var this_day = moment.unix(date.event_date);
 			if(!dates_obj.hasOwnProperty(this_day.year())){
@@ -566,7 +572,7 @@ function OneEvent($view){
 			if(!dates_obj[this_day.year()].hasOwnProperty(this_day.month())){
 				dates_obj[this_day.year()][this_day.month()] = [];
 			}
-			
+
 			if(!prev_day){
 				range = [this_day.format('D')];
 			} else {
@@ -577,14 +583,14 @@ function OneEvent($view){
 					range = [this_day.format('D')];
 				}
 			}
-			
+
 			if(i === dates.length - 1){
 				dates_obj[this_day.year()][this_day.month()].push(range.length == 1 ? range.shift() : range.shift()+'-'+range.pop());
 			} else {
 				prev_day = this_day;
 			}
 		});
-		
+
 		for(var year in dates_obj){
 			if(dates_obj.hasOwnProperty(year)){
 				for(var month in dates_obj[year]){
@@ -594,13 +600,13 @@ function OneEvent($view){
 				}
 			}
 		}
-		
-		
+
+
 		return output;
 	}
-	
+
 	$wrapper.empty();
-	
+
 	$.ajax({
 		url: '/api/v1/events/'+event_id+'?fields=image_horizontal_large_url,favored{fields:"is_friend",order_by:"-is_friend",length:10},favored_users_count,is_favorite,notifications{fields:"notification_type,done"},description,location,can_edit,registration_required,registration_till,is_free,min_price,organization_logo_small_url,organization_short_name,is_same_time,dates{fields:"start_time,end_time"},tags,detail_info_url,canceled',
 		method: 'GET',
@@ -610,14 +616,14 @@ function OneEvent($view){
 				var $subscribers = buildAvatarCollection(data.favored, 6),
 					avatars_collection_classes = [],
 					favored_users_count = ($subscribers.length <= 6) ? 0 : data.favored_users_count - 6;
-				
+
 				if(data.is_favorite){
 					avatars_collection_classes.push('-subscribed');
 					if($subscribers.length > 4){
 						avatars_collection_classes.push('-shift');
 					}
 				}
-				
+
 				data.subscribe_button_classes = data.is_favorite ? ['fa-check', '-color_accent', '-Subscribed'].join(' ') : ['fa-plus', '-color_neutral_accent'].join(' ');
 				data.subscribe_button_text = data.is_favorite ? 'В избранном' : 'Добавить в избранное';
 				data.subscribers = $subscribers;
@@ -626,12 +632,12 @@ function OneEvent($view){
 				data.favored_users_count = favored_users_count;
 				data.notifications = buildNotifications(data.notifications, event_id, data.last_event_date);
 				data.location_sanitized = encodeURI(data.location);
-				
+
 				data.event_edit_functions = data.can_edit ? tmpl('event-edit-functions', data) : '';
 				data.event_registration_information = data.registration_required ? tmpl('event-registration-info', {registration_till: moment.unix(data.registration_till).format('D MMMM')}) : '';
 				data.event_price_information = data.is_free ? '' : tmpl('event-price-info', {min_price: data.min_price ? data.min_price : '0'});
 				data.canceled = data.canceled ? '' : '-hidden';
-				
+
 				data.event_additional_fields = $();
 				if(data.is_same_time){
 					data.event_additional_fields = data.event_additional_fields.add(tmpl('event-additional-info', {
@@ -675,14 +681,14 @@ function OneEvent($view){
 					classes: '-color_primary RippleEffect CancelCancellation',
 					title: 'Вернуть событие'
 				}) : '';
-				
-				
+
+
 				$wrapper.append(tmpl('event-page', data));
 				initEventPage($view);
 			}, ajaxErrorHandler)
 		}
 	});
-	
+
 }
 
 function OrganizationsList($view){
@@ -690,7 +696,7 @@ function OrganizationsList($view){
 		all_categories = [],
 		all_organizations = [],
 		organizations_by_categories = [];
-	
+
 	function bindOrganizationsEvents($parent) {
 		bindRippleEffect($parent);
 		bindSubscribeButton($parent, {
@@ -701,17 +707,17 @@ function OrganizationsList($view){
 		});
 		bindControllers($parent);
 	}
-	
+
 	function uploadOrganizations(success) {
 		all_categories = [];
 		all_organizations = [];
 		organizations_by_categories = [];
-		
+
 		$.ajax({
 			url: '/api/v1/organizations/types',
 			method: 'GET',
 			data: {
-				fields: 'organizations{fields: "img_small_url,is_subscribed,subscribed_count", order_by: "-subscribed_count"}',
+				fields: 'organizations{fields: "img_small_url,is_subscribed,subscribed_count,privileges", order_by: "-subscribed_count"}',
 				order_by: 'order_position'
 			},
 			success: function(res){
@@ -723,7 +729,7 @@ function OrganizationsList($view){
 					all_organizations.sort(function(a, b) {
 						return b.subscribed_count - a.subscribed_count
 					});
-					
+
 					data.forEach(function(cat){
 						if(typeof all_categories[cat.id] == 'undefined'){
 							all_categories[cat.id] = {
@@ -735,7 +741,7 @@ function OrganizationsList($view){
 							};
 						}
 						all_categories[cat.id].new_events_count += cat.new_events_count;
-						
+
 						if(typeof organizations_by_categories[cat.id] == 'undefined'){
 							organizations_by_categories[cat.id] = cat.organizations;
 						}
@@ -764,15 +770,15 @@ function OrganizationsList($view){
 			}
 		});
 	}
-	
+
 	function initOrganizationsPage($parent) {
 		var $categories = $parent.find('.Category');
-		
+
 		bindOrganizationsEvents($parent);
 		$parent.find('.OrganizationsCategoriesScroll').scrollbar({disableBodyScroll: true});
 		$parent.find('.ShowAllOrganizations').on('click.showAllOrganizations', function(){
 			$categories.removeClass(__C.CLASSES.NEW_ACTIVE).siblings('.SubcategoryWrap').height(0);
-			
+
 			uploadOrganizations(function(organizations_by_categories, categories, all_organizations) {
 				$parent.empty().append(tmpl('organizations-wrapper', {
 					organization_categories: tmpl('organization-category', categories),
@@ -808,19 +814,30 @@ function OrganizationsList($view){
 			}
 		});
 	}
-	
+
 	function buildOrganisationUnits(data){
 		data.forEach(function(org){
 			org.subscribe_button_text = org.is_subscribed ? 'Подписан' : 'Подписаться';
 			org.subscribe_button_classes = org.is_subscribed ? '-color_accent -Subscribed' : '-color_marginal_accent';
 			org.subscribed_text = org.subscribed_count + getUnitsText(org.subscribed_count, __C.TEXTS.SUBSCRIBERS);
+			org.privileges.forEach(function(privilege) {
+				if(privilege.role_id == 1 || privilege.name == 'admin'){
+					org.redact_org_button = buildButton({
+						classes: ['-low','-color_marginal_primary','fa_icon','fa-pencil','-empty','RippleEffect'],
+						dataset: {
+							'page': 'edit_organization',
+							'organization-id': org.id
+						}
+					})
+				}
+			});
 		});
 		return tmpl('organization-unit', data);
 	}
-	
+
 	function selectCategory(category){
 		var state_data = History.getState().data;
-		
+
 		state_data.title = category.type_name ? category.type_name : state_data.title;
 		state_data.type_id = category.type_id ? category.type_id : state_data.type_id;
 		state_data._index = History.getCurrentIndex();
@@ -829,7 +846,7 @@ function OrganizationsList($view){
 		History.replaceState(state_data, category.type_name);
 		changeMainTitle(state_data.title);
 	}
-	
+
 	$wrapper.empty();
 	uploadOrganizations(function(organizations_by_categories, categories, all_organizations) {
 		var type_id = History.getState().data.type_id,
@@ -843,13 +860,13 @@ function OrganizationsList($view){
 		}
 		initOrganizationsPage($wrapper);
 	});
-	
+
 }
 
 function Organization($view){
 	var organization_id = __STATES.entityId,
 		url = '/api/v1/organizations/'+organization_id;
-	
+
 	function bindEventsEvents($parent){
 		bindRippleEffect($parent);
 		bindAddAvatar($parent);
@@ -862,7 +879,7 @@ function Organization($view){
 		});
 		bindControllers($parent);
 	}
-	
+
 	function initOrganizationPage($parent){
 		bindTabs($parent);
 		bindSubscribeButton($parent.find('.OrganizationSubscribeButtonWrap'), {
@@ -873,25 +890,25 @@ function Organization($view){
 			}
 		});
 		bindEventsEvents($parent);
-		
+
 		$parent.find('.Tabs').on('change.tabs', function(){
 			$(window).off('scroll.uploadFutureEvents scroll.uploadPastEvents');
 			bindUploadEventsOnScroll($(this).find('.TabsBody.-active'));
 		});
-		
+
 		$parent.find('.ExternalPage').on('click.sendStat', function(){
 			storeStat(organization_id, __C.STATS.ORGANIZATION_ENTITY, __C.STATS.ORGANIZATION_OPEN_SITE);
 		});
 	}
-	
+
 	function buildSubscribers(subscribers, is_first, $scrollbar){
 		var $subscribers = $(),
 			last_is_fiends = false;
-		
+
 		if(typeof $scrollbar != 'undefined'){
 			last_is_fiends = $scrollbar.find('.subscriber').eq(-1).data('is_friend') == true;
 		}
-		
+
 		subscribers.forEach(function(subscriber, i){
 			if((is_first && !i) || last_is_fiends != subscriber.is_friend){
 				$subscribers = $subscribers.add(tmpl('subscriber-divider', {label: subscriber.is_friend ? 'Друзья' : 'Все подписчики'}));
@@ -905,10 +922,10 @@ function Organization($view){
 			}));
 		});
 		//placeAvatarDefault($subscribers);
-		
+
 		return $subscribers;
 	}
-	
+
 	function uploadMoreSubscribers($wrapper){
 		var offset = $wrapper.data('next_offset');
 		$.ajax({
@@ -931,17 +948,36 @@ function Organization($view){
 			}
 		});
 	}
-	
-	function buildEvents(events, is_future, $wrapper){
+
+	function buildEvents(events, type, $wrapper){
 		var $events = $(),
-			last_date = false;
-		
+			last_date = false,
+            sort_date_type = 'nearest_event_date';
+
 		if(typeof $wrapper != 'undefined'){
 			last_date = $wrapper.find('.subscriber').eq(-1).data('date');
 		}
-		
+		switch(type){
+            case 'future': {
+                sort_date_type = 'nearest_event_date';
+                break;
+            }
+            case 'past': {
+                sort_date_type = 'last_event_date';
+                break;
+            }
+            case 'delayed': {
+                sort_date_type = 'public_at';
+                break;
+            }
+            case 'canceled': {
+                sort_date_type = 'updated_at';
+                break;
+            }
+        }
+
 		events.forEach(function(event){
-			var m_event_date = is_future ? moment.unix(event.nearest_event_date) : moment.unix(event.last_event_date),
+			var m_event_date = moment.unix(event[sort_date_type]),
 				$subscribers = buildAvatarCollection(event.favored, 4),
 				times = [],
 				avatars_collection_classes = [],
@@ -956,7 +992,7 @@ function Organization($view){
 					lastWeek: 'D MMMM',
 					sameElse: 'D MMMM'
 				}).capitalize();
-				
+
 				$events = $events.add(tmpl('organization-feed-divider', {
 					formatted_date: display_date,
 					date: m_event_date.format(__C.DATE_FORMAT)
@@ -995,24 +1031,35 @@ function Organization($view){
 			}, {accY: 100});
 			$events = $events.add($event);
 		});
-		
+
 		return $events;
 	}
-	
-	function uploadEvents($wrapper, is_future, onSuccess){
-		var offset = $wrapper.data('next_offset') ? $wrapper.data('next_offset') : 0,
-			data = {
-				length: 10,
-				offset: offset,
-				organization_id: organization_id,
-				fields: 'image_horizontal_medium_url,favored_users_count,is_favorite,favored{length:5},dates',
-				order_by: is_future ? 'nearest_event_date' : '-last_event_date'
-			};
-		if(is_future){
-			data.future = 'true'
-		} else {
-			data.till = moment().format(__C.DATE_FORMAT);
-		}
+
+	function uploadEvents($wrapper, type, onSuccess){
+	    var data = {},
+            offset = $wrapper.data('next_offset') ? $wrapper.data('next_offset') : 0,
+            setts = {
+                length: 10,
+                offset: offset,
+                organization_id: organization_id,
+                fields: 'image_horizontal_medium_url,favored_users_count,is_favorite,favored{length:5},dates,updated_at,public_at'
+            };
+
+        if(type == 'future'){
+            data.future = 'true';
+            data.order_by = 'nearest_event_date';
+        } else if (type == 'past') {
+            data.till = moment().format(__C.DATE_FORMAT);
+            data.order_by = '-last_event_date';
+        }else if (type == 'delayed'){
+            data.is_delayed = true;
+            data.is_canceled = false;
+            data.order_by = 'public_at';
+        }else if (type == 'canceled'){
+            data.is_canceled = true;
+            data.order_by = '-updated_at';
+        }
+		$.extend(data, setts);
 		$.ajax({
 			url: '/api/v1/events/',
 			method: 'GET',
@@ -1021,11 +1068,11 @@ function Organization($view){
 				ajaxHandler(res, function(data){
 					var $events = $();
 					if(data.length){
-						$events = buildEvents(data, is_future, $wrapper);
+						$events = buildEvents(data, type, $wrapper);
 						$wrapper.append($events);
 						$wrapper.data('next_offset', offset+10);
 					} else {
-						var scroll_event = is_future ? 'scroll.uploadFutureEvents' : 'scroll.uploadPastEvents';
+						var scroll_event = 'scroll.uploadEvents' + type;
 						$wrapper.append('<p class="organization_feed_text">Больше событий нет :(</p>');
 						$wrapper.data('disable_upload', true);
 						$(window).off(scroll_event);
@@ -1040,19 +1087,19 @@ function Organization($view){
 			}
 		});
 	}
-	
+
 	function bindUploadEventsOnScroll($wrapper){
 		var $window = $(window),
 			$document = $(document),
-			is_future = $wrapper.hasClass('FutureEvents'),
-			scroll_event = is_future ? 'scroll.uploadFutureEvents' : 'scroll.uploadPastEvents';
-		
+			type = $wrapper.data('type'),
+			scroll_event = 'scroll.uploadEvents' . type;
+
 		$window.data('block_scroll', false);
 		if(!$wrapper.data('disable_upload')){
 			$window.on(scroll_event, function(){
 				if($window.height() + $window.scrollTop() + 200 >= $document.height() && !$window.data('block_scroll')){
 					$window.data('block_scroll', true);
-					uploadEvents($wrapper, is_future, function($events){
+					uploadEvents($wrapper, type, function($events){
 						bindEventsEvents($events);
 						$window.data('block_scroll', false);
 					});
@@ -1060,44 +1107,75 @@ function Organization($view){
 			});
 		}
 	}
-	
+
 	$view.find('.page_wrapper').empty();
 	$('.SidebarOrganizationsList').find('[data-organization_id="'+organization_id+'"]').find('.OrganizationCounter').addClass('-hidden');
 	$.ajax({
 		url: url,
 		method: 'GET',
 		data: {
-			fields: 'img_small_url,description,site_url,is_subscribed,default_address,subscribed_count,subscribed{fields:"is_friend",order_by:"-is_friend,first_name",length:10}'
+			fields: 'img_small_url,description,site_url,is_subscribed,privileges,default_address,subscribed_count,privileges,subscribed{fields:"is_friend",order_by:"-is_friend,first_name",length:10}'
 		},
 		success: function(res){
 			ajaxHandler(res, function(data){
 				var $page_wrapper = $view.find('.page_wrapper'),
 					$past_events_wrapper,
-					$future_events_wrapper;
-				
+					$future_events_wrapper,
+					$delayed_events_wrapper,
+					$canceled_events_wrapper,
+					is_editor = false;
+
 				data = data[0];
-				
+
+				data.privileges.forEach(function(privilege) {
+					if(privilege.role_id == 1 || privilege.name == 'admin'){
+						data.redact_org_button = buildButton({
+							title: 'Редактировать',
+							classes: ['-fill','-color_neutral','fa_icon','fa-pencil','RippleEffect'],
+							dataset: {
+								'page': 'edit_organization',
+								'organization-id': data.id
+							}
+						})
+					}
+				});
+				if (data.privileges && data.privileges.length > 0){
+					data.hidden_for_users = '';
+					is_editor = true;
+				}else{
+					data.hidden_for_users = '-hidden';
+				}
 				$page_wrapper.append(tmpl('organization-info-page', $.extend({
 					subscribe_button_classes: data.is_subscribed ? ['fa-check', '-color_neutral', '-Subscribed'].join(' ') : ['fa-plus', '-color_accent'].join(' '),
 					subscribe_button_text: data.is_subscribed ? 'Подписан' : 'Подписаться',
 					has_address: data.default_address ? '' : '-hidden'
 				}, data)));
-				
+
 				$past_events_wrapper = $view.find('.PastEvents');
 				$future_events_wrapper = $view.find('.FutureEvents');
-				
-				uploadEvents($future_events_wrapper, true, function($events){
-					uploadEvents($past_events_wrapper, false, function($events){
-						initOrganizationPage($view);
+				$delayed_events_wrapper = $view.find('.DelayedEvents');
+				$canceled_events_wrapper = $view.find('.CanceledEvents');
+
+				uploadEvents($future_events_wrapper, 'future', function($events){
+					uploadEvents($past_events_wrapper, 'past', function($events){
+						if (is_editor){
+							uploadEvents($delayed_events_wrapper, 'delayed', function($events){
+								uploadEvents($canceled_events_wrapper, 'canceled', function($events){
+									initOrganizationPage($view);
+								});
+							});
+						}else{
+							initOrganizationPage($view);
+						}
 					});
 					bindUploadEventsOnScroll($future_events_wrapper);
 				});
-				
+
 				$page_wrapper.append(tmpl('organization-subscribers-page', {
 					subscribers_count: data.subscribed_count,
 					subscribers: buildSubscribers(data.subscribed, true)
 				}));
-				
+
 				var $subscribers_scroll = $view.find('.SubscribersScroll');
 				$subscribers_scroll.data('next_offset', 10);
 				$subscribers_scroll.scrollbar({
@@ -1108,11 +1186,11 @@ function Organization($view){
 						}
 					}
 				});
-				
+
 			}, ajaxErrorHandler);
 		}
 	});
-	
+
 }
 
 function Search($view){
@@ -1128,10 +1206,10 @@ function Search($view){
 		success: function(res){
 			var $events_wrapper = $view.find('.search-events').empty(),
 				$organizations_wrapper = $view.find('.search-organizations').empty();
-			
+
 			res.data.events.forEach(function(event){
 				var $event = tmpl('search-event-item', generateEventAttributes(event));
-				
+
 				$event.data('share', {
 					'vk': tmpl('vk-share-link', event).attr('href'),
 					'facebook': tmpl('facebook-share-link', event).attr('href'),
@@ -1139,23 +1217,23 @@ function Search($view){
 				});
 				$events_wrapper.append($event);
 			});
-			
+
 			res.data.organizations.forEach(function(organization){
 				organization.subscribed_count_text = getUnitsText(organization.subscribed_count, __C.TEXTS.SUBSCRIBERS);
 				var $organization = tmpl('organization-search-item', organization);
 				$organizations_wrapper.append($organization);
 				bindControllers($organizations_wrapper);
 			});
-			
+
 			if (res.data.events.length == 0){
 				$events_wrapper.append(tmpl('search-no-events', {}));
 			}
 			if (res.data.organizations == 0){
 				$organizations_wrapper.append(tmpl('search-no-organizations', {}));
 			}
-			
+
 			bindEventHandlers();
-			
+
 			$organizations_wrapper.slimscroll({
 				height: window.innerHeight - $('.header').height()
 			});
@@ -1175,13 +1253,13 @@ function OneFriend($view){
 	var friend_id = __STATES.entityId,
 		$content = $view.find('.one-friend-main-content'),
 		page_number = 0;
-	
+
 	getFriendsList($view.find('.friends-right-bar'), function(){
 		$('.friend-item.friend-' + friend_id).addClass(__C.CLASSES.ACTIVE).siblings().removeClass(__C.CLASSES.ACTIVE);
 	});
 	$view.find('.friends-main-content').addClass(__C.CLASSES.HIDDEN);
 	$content.removeClass(__C.CLASSES.HIDDEN).empty();
-	
+
 	function getFriendFeed(){
 		var $load_btn = $content.find('.load-more-btn');
 		if (page_number == 0){
@@ -1218,14 +1296,14 @@ function OneFriend($view){
 							entities: []
 						};
 					}
-					
+
 					cards_by_users[key].entities.push(ent);
 				});
-				
+
 				$.each(cards_by_users, function(key, value){
 					var $card = tmpl('friends-feed-card-short', value),
 						item_tmpl_name = value.entity == __C.ENTITIES.EVENT ? 'friends-feed-event' : 'friends-feed-organization';
-					
+
 					value.entities.forEach(function(ent){
 						$card.append(tmpl(item_tmpl_name, ent));
 					});
@@ -1245,7 +1323,7 @@ function OneFriend($view){
 			}
 		});
 	}
-	
+
 	$.ajax({
 		url: '/api/v1/users/' + friend_id + '?fields=subscriptions',
 		success: function(res){
@@ -1253,14 +1331,14 @@ function OneFriend($view){
 			$content.find('.friend-user-link').on('click', function(){
 				window.open(res.data[0].link, '_blank');
 			});
-			
+
 			if (res.data[0].subscriptions.length == 0){
 				tmpl('no-subscriptions', {}, $content.find('.one-friend-subscriptions'));
 			}else{
 				tmpl('friends-subscription', res.data[0].subscriptions, $content.find('.one-friend-subscriptions'))
 			}
-			
-			
+
+
 			$content.find('.friend-subscription-block').each(function(index){
 				var $this = $(this);
 				setTimeout(function(){
@@ -1276,7 +1354,7 @@ function OneFriend($view){
 					.siblings()
 					.addClass(__C.CLASSES.HIDDEN);
 			});
-			
+
 			$view.find('.back-to-friends-list').on('click', function(){
 				History.pushState({_index: History.getCurrentIndex(), page: 'friends'}, 'Мои друзья', 'friends');
 			});
@@ -1315,11 +1393,11 @@ function Friends($view){
 					}
 					cards_by_users[key].entities.push(ent);
 				});
-				
+
 				$.each(cards_by_users, function(key, value){
 					var $card = tmpl('friends-feed-card', value),
 						item_tmpl_name = value.entity == __C.ENTITIES.EVENT ? 'friends-feed-event' : 'friends-feed-organization';
-					
+
 					value.entities.forEach(function(ent){
 						$card.append(tmpl(item_tmpl_name, ent));
 					});
@@ -1330,15 +1408,15 @@ function Friends($view){
 			}
 		});
 	}
-	
-	
-	
+
+
+
 	var $main_content = $view.find('.friends-main-content').removeClass(__C.CLASSES.HIDDEN),
 		$friends_right_list = $view.find('.friends-right-bar'),
 		$load_btn = $view.find('.load-more-btn').addClass(__C.CLASSES.HIDDEN),
 		$user_content = $view.find('.one-friend-main-content').addClass(__C.CLASSES.HIDDEN);
-	
-	
+
+
 	getFriendsList($friends_right_list, function(res){});
 	$load_btn.find('.btn').on('click', getFeed);
 	getFeed();
@@ -1347,9 +1425,9 @@ function Friends($view){
 function EditEvent($view){
 	var $wrapper = $view.find('.page_wrapper'),
 		event_id = __STATES.entityId;
-	
+
 	function initEditEventPage($view){
-		
+
 		function bindLoadByURLButton(){
 			$('.LoadByURLButton').not('-Handled_LoadByURLButton').on('click', function(){
 				var $this = $(this),
@@ -1373,7 +1451,7 @@ function EditEvent($view){
 				Pace.restart();
 			}).addClass('-Handled_LoadByURLButton');
 		}
-		
+
 		function handleImgUpload($context, source, filename){
 			var $parent = $context.closest('.EditEventImgLoadWrap'),
 				$preview = $parent.find('.EditEventImgPreview'),
@@ -1381,7 +1459,7 @@ function EditEvent($view){
 				$file_name = $parent.find('.FileName'),
 				$data_url = $parent.find('.DataUrl'),
 				$button = $parent.find('.CallModal');
-			
+
 			$preview.attr('src', source);
 			$file_name_text.html('Загружен файл:<br>'+filename);
 			$file_name.val(filename);
@@ -1394,10 +1472,10 @@ function EditEvent($view){
 				})
 				.trigger('click.CallModal');
 		}
-		
+
 		function initEditEventMainCalendar($view){
 			//TODO: Refactor this!! Make it more readable
-			
+
 			var $selected_days_text = $view.find('.EventSelectedDaysText'),
 				$selected_days_table_rows = $view.find('.SelectedDaysRows'),
 				MainCalendar = new Calendar('.EventDatesCalendar', {
@@ -1423,9 +1501,9 @@ function EditEvent($view){
 				$fucking_table = $();
 			MainCalendar.init();
 			MainCalendar.$calendar.on('days-changed.displayFormattedText', displayFormattedText);
-			
-			
-			
+
+
+
 			function bindRemoveRow($parent){
 				$parent.find('.RemoveRow').not('.-Handled_RemoveRow').each(function(i, elem){
 					$(elem).on('click', function(){
@@ -1433,12 +1511,12 @@ function EditEvent($view){
 					}).addClass('-Handled_RemoveRow');
 				});
 			}
-			
+
 			function displayFormattedText(){
 				dates = {};
 				MainCalendar.selected_days.forEach(function(date, i, days){
 					var _date = moment(date);
-					
+
 					if(typeof dates[_date.month()] === 'undefined'){
 						dates[_date.month()] = {};
 						dates[_date.month()].selected_days = [];
@@ -1446,7 +1524,7 @@ function EditEvent($view){
 					}
 					dates[_date.month()].selected_days.push(_date.date());
 				});
-				
+
 				$selected_days_text.empty().removeClass('hidden');
 				if(Object.keys(dates).length){
 					$.each(dates, function(i, elem){
@@ -1456,19 +1534,19 @@ function EditEvent($view){
 					$selected_days_text.html('<p>Даты не выбраны</p>');
 				}
 			}
-			
+
 			function doTheFuckingSort($rows, $parent){
 				$rows.sort(function(a,b){
 					var an = $(a).data('date'),
 						bn = $(b).data('date');
-					
+
 					if(an > bn) return 1;
 					else if(an < bn) return -1;
 					else return 0;
 				});
 				$rows.detach().appendTo($parent);
 			}
-			
+
 			function buildTable(selected_days){
 				//TODO: BUG. On multiple selection (month or weekday) duplicates appearing in table.
 				//TODO: Bind time on building table
@@ -1490,7 +1568,7 @@ function EditEvent($view){
 				bindDatePickers($output);
 				bindTimeInput($output);
 				bindRemoveRow($output);
-				
+
 				$fucking_table = $fucking_table.add($output);
 				$output.find('.DatePicker').each(function(){
 					var DP = $(this).data('datepicker');
@@ -1501,7 +1579,7 @@ function EditEvent($view){
 				});
 				doTheFuckingSort($fucking_table, $selected_days_table_rows);
 			}
-			
+
 			function BuildSelectedDaysTable(){
 				if(MainCalendar.last_action === 'select'){
 					buildTable(MainCalendar.last_selected_days);
@@ -1520,14 +1598,14 @@ function EditEvent($view){
 						$fucking_table = $fucking_table.not('.TableDay_'+MainCalendar.last_selected_days);
 					}
 				}
-				
+
 				doTheFuckingSort($fucking_table, $selected_days_table_rows);
-				
+
 				//TODO: Do not forget to rename 'fucking' names
 				//TODO: Please, don't forget to rename 'fucking' names
-				
+
 			}
-			
+
 			$view.find('#edit_event_different_time').on('change', function(){
 				var $table_wrapper = $view.find('#edit_event_selected_days_wrapper'),
 					$table_content = $table_wrapper.children();
@@ -1550,14 +1628,14 @@ function EditEvent($view){
 				}
 				$view.find('.MainTime').toggleStatus('disabled');
 			});
-			
+
 			var AddRowDatePicker = $view.find('.AddDayToTable').data('datepicker');
 			AddRowDatePicker.$datepicker.on('date-picked', function(){
 				MainCalendar.selectDays(AddRowDatePicker.selected_day);
 			});
-			
+
 		}
-		
+
 		bindDatePickers($view);
 		bindTimeInput($view);
 		bindSelect2($view);
@@ -1567,10 +1645,10 @@ function EditEvent($view){
 		bindFileLoadButton();
 		bindLoadByURLButton();
 		initEditEventMainCalendar($view);
-		
+
 		//TODO: perepilit' placepicker
 		$view.find(".Placepicker").placepicker();
-		
+
 		$view.find('.EventTags').select2({
 			tags: true,
 			width: '100%',
@@ -1611,24 +1689,24 @@ function EditEvent($view){
 			containerCssClass: "form_select2",
 			dropdownCssClass: "form_select2_drop"
 		});
-		
+
 		$view.find('.EditEventDefaultAddress').off('click.defaultAddress').on('click.defaultAddress', function(){
 			var $this = $(this);
 			$this.closest('.form_group').find('input').val($this.data('default_address'))
 		});
-		
+
 		$view.find('#edit_event_delayed_publication').off('change.DelayedPublication').on('change.DelayedPublication', function(){
 			$view.find('.DelayedPublication').toggleStatus('disabled');
 		});
-		
+
 		$view.find('#edit_event_registration_required').off('change.RequireRegistration').on('change.RequireRegistration', function(){
 			$view.find('.RegistrationTill').toggleStatus('disabled');
 		});
-		
+
 		$view.find('#edit_event_free').off('change.FreeEvent').on('change.FreeEvent', function(){
 			$view.find('.MinPrice').toggleStatus('disabled');
 		});
-		
+
 		$view.find('.MinPrice').find('input').inputmask({
 			'alias': 'numeric',
 			'autoGroup': false,
@@ -1637,7 +1715,7 @@ function EditEvent($view){
 			'placeholder': '0',
 			'rightAlign': false
 		});
-		
+
 		socket.on('image.getFromURLDone', function(response){
 			if(response.error){
 				showNotifier({text: response.error, status: false});
@@ -1645,11 +1723,11 @@ function EditEvent($view){
 				handleImgUpload(window.current_load_button, response.data, response.filename);
 			}
 		});
-		
+
 		$view.find('.LoadImg').off('change.LoadImg').on('change.LoadImg', function(e){
 			var $this = $(e.target),
 				files = e.target.files;
-			
+
 			if (files.length == 0) return false;
 			for(var i = 0, f; f = files[i]; i++) {
 				var reader = new FileReader();
@@ -1661,9 +1739,9 @@ function EditEvent($view){
 				})(f);
 				reader.readAsDataURL(f);
 			}
-			
+
 		});
-		
+
 		$view.find('#edit_event_to_public_vk').off('change.PublicVK').on('change.PublicVK', function(){
 			var $vk_post_wrapper = $view.find('#edit_event_vk_publication'),
 				$vk_post_content = $vk_post_wrapper.children();
@@ -1673,19 +1751,19 @@ function EditEvent($view){
 				$vk_post_wrapper.height(0);
 			}
 			$vk_post_wrapper.toggleStatus('disabled');
-			
+
 			$vk_post_content.find('.DeleteImg').off('click.DeleteImg').on('click.DeleteImg', function(){
 				$(this).closest('.EditEventImgLoadWrap').find('input').val('').end().find('img').attr('src', '');
 				toggleVkImg();
 			})
-			
+
 		});
-		
+
 		$view.find('#edit_event_submit').off('click.Submit').on('click.Submit', submitEditEvent);
-		
+
 	}
-	
-	
+
+
 	socket.on('vk.getGroupsToPostDone', function(response){
 		if(response.error){
 			showNotifier({text: response.error, status: false});
@@ -1707,12 +1785,12 @@ function EditEvent($view){
 			}
 		}
 	});
-	
+
 	socket.on('vk.post.error', function(response){
 		console.log(response);
 		showNotifier({text: 'Не удалось опубликовать событие в группе vk. Пожалуйста, попробуйте еще раз.', status: false});
 	});
-	
+
 	function initOrganization(selected_id){
 		$.ajax({
 			url: '/api/v1/organizations',
@@ -1728,7 +1806,7 @@ function EditEvent($view){
 						$default_address_button = $view.find('.EditEventDefaultAddress'),
 						$select = $wrapper.find('#edit_event_organization'),
 						selected_address;
-					
+
 					data.forEach(function(organization){
 						if(organization.id == selected_id){
 							selected_address = organization.default_address;
@@ -1739,7 +1817,7 @@ function EditEvent($view){
 							display_name: organization.name
 						}));
 					});
-					
+
 					$select.append(organizations_options).select2({
 						containerCssClass: 'form_select2',
 						dropdownCssClass: 'form_select2_drop'
@@ -1761,12 +1839,12 @@ function EditEvent($view){
 			}
 		});
 	}
-	
+
 	function toggleVkImg(){
 		var $wrap = $view.find('#edit_event_vk_publication').find('.EditEventImgLoadWrap'),
 			$left_block = $wrap.children().eq(0),
 			$right_block = $wrap.children().eq(1);
-		
+
 		if(!$left_block.hasClass('-hidden')){
 			$right_block.find('.LoadImg').off('change.ToggleVkImg').one('change.ToggleVkImg', toggleVkImg);
 			$right_block.find('.Text').text('Добавить картинку');
@@ -1777,7 +1855,7 @@ function EditEvent($view){
 		$left_block.toggleClass('-hidden');
 		$right_block.toggleClass('-h_centering');
 	}
-	
+
 	function selectDates($view, raw_dates){
 		var	MainCalendar = $view.find('.EventDatesCalendar').data('calendar'),
 			$table_rows = $view.find('.SelectedDaysRows'),
@@ -1799,7 +1877,7 @@ function EditEvent($view){
 			}
 		});
 	}
-	
+
 	function selectTags($view, tags){
 		var	selected_tags = [];
 		tags.forEach(function(tag){
@@ -1808,10 +1886,10 @@ function EditEvent($view){
 				text: tag.name
 			});
 		});
-		
+
 		$view.find('#event_tags').select2('data', selected_tags);
 	}
-	
+
 	function initVkImgCopying(){
 		var $vk_wrapper = $view.find('#edit_event_vk_publication');
 		$view.find('#edit_event_image_horizontal_src').on('change.CopyToVkImg', function(){
@@ -1822,7 +1900,7 @@ function EditEvent($view){
 				$vk_$data_url = $vk_wrap.find('#edit_event_vk_image_src'),
 				$button_orig = $wrap.find('.CallModal'),
 				src = $(this).data('source');
-			
+
 			if(!$view.find('.edit_event_vk_right_block').hasClass('-h_centering')){
 				toggleVkImg();
 			}
@@ -1837,13 +1915,13 @@ function EditEvent($view){
 					$vk_button.data('crop_data', crop_data);
 					$vk_$data_url.data('source', $vk_preview.attr('src')).trigger('change');
 				});
-			
+
 		});
 		$vk_wrapper.find('.FileLoadButton, .CallModal, .DeleteImg').on('click.OffCopying', function(){
 			$view.find('#edit_event_image_horizontal_src').off('change.CopyToVkImg');
 		});
 	}
-	
+
 	function formatVKPost(){
 		var $post = $view.find('#edit_event_vk_post'),
 			$title = $view.find('#edit_event_title'),
@@ -1858,9 +1936,9 @@ function EditEvent($view){
 			tags = [],
 			$link = $view.find('#edit_event_url'),
 			post_text = '';
-		
+
 		post_text +=$title.val() ? $title.val() + '\n\n' : '';
-		
+
 		if($calendar.selected_days){
 			post_text += ($calendar.selected_days.length > 1) ? 'Дата начала: ' : 'Начало: ';
 			post_text += moment($calendar.selected_days[0]).format('D MMMM YYYY');
@@ -1885,25 +1963,25 @@ function EditEvent($view){
 		}
 		post_text += $place.val() ? $place.val() + '\n\n' : '';
 		post_text += $description.val() ? $description.val() + '\n\n' : '';
-		
+
 		if(!$is_free.prop('checked')){
 			post_text += $min_price.val() ? 'Цена от ' + $min_price.val() + '\n\n' : '';
 		}
-		
+
 		$tags.find('.select2-search-choice').each(function(i,tag){
 			tags.push('#' + $(tag).text().trim());
 		});
 		post_text += tags ? tags.join(' ') + '\n\n' : '';
-		
+
 		if($link.val()){
 			post_text += $link.val()
 		} else if(event_id) {
 			post_text += 'http://evendate.ru/event.php?id='+event_id;
 		}
-		
+
 		$post.val(post_text);
 	}
-	
+
 	function checkVkPublicationAbility(){
 		if(__USER.accounts.indexOf("vk") !== -1){
 			socket.emit('vk.getGroupsToPost', __USER.id);
@@ -1926,12 +2004,12 @@ function EditEvent($view){
 			$view.find('#edit_event_to_public_vk').toggleStatus('disabled');
 		}
 	}
-	
+
 	function submitEditEvent(){
 		function formValidation($form, for_edit){
 			var is_valid = true,
 				$times = $form.find('#edit_event_different_time').prop('checked') ? $form.find('[class^="TableDay_"]') : $form.find('.MainTime');
-			
+
 			$form.find(':required').not(':disabled').each(function(){
 				var $this = $(this),
 					max_length = $this.data('maxlength');
@@ -1943,7 +2021,7 @@ function EditEvent($view){
 					is_valid = false;
 				}
 			});
-			
+
 			$times.each(function(){
 				var $row = $(this),
 					start = $row.find('.StartHours').val()+$row.find('.StartMinutes').val(),
@@ -1956,7 +2034,7 @@ function EditEvent($view){
 					is_valid = false;
 				}
 			});
-			
+
 			if(!for_edit){
 				$form.find('.DataUrl').each(function(){
 					var $this = $(this);
@@ -1972,7 +2050,7 @@ function EditEvent($view){
 			}
 			return is_valid;
 		}
-		
+
 		var $form = $view.find("#edit-event-form"),
 			data = {
 				event_id: null,
@@ -2002,10 +2080,10 @@ function EditEvent($view){
 			url = form_data.event_id ? '/api/v1/events/'+form_data.event_id : '/api/v1/events/',
 			method = form_data.event_id ? 'PUT' : 'POST',
 			valid_form = formValidation($form, !!(form_data.event_id));
-		
+
 		if(valid_form){
 			$.extend(true, data, form_data);
-			
+
 			data.tags = tags;
 			data.filenames = {
 				vertical: data.filename_vertical,
@@ -2017,11 +2095,11 @@ function EditEvent($view){
 			if(data.delayed_publication){
 				data.public_at = ""+data.public_at_date+'T'+data.public_at_time_hours+':'+data.public_at_time_minutes+':00'
 			}
-			
+
 			data.dates = [];
 			if(data.different_time){
 				var	selected_days_rows = $('.SelectedDaysRows').children();
-				
+
 				selected_days_rows.each(function(){
 					var $this = $(this);
 					data.dates.push({
@@ -2035,7 +2113,7 @@ function EditEvent($view){
 					$main_time = $('.MainTime'),
 					start_time = $main_time.find('.StartHours').val() + ':' + $main_time.find('.StartMinutes').val(),
 					end_time = $main_time.find('.EndHours').val() + ':' + $main_time.find('.EndMinutes').val();
-				
+
 				MainCalendar.selected_days.forEach(function(day){
 					data.dates.push({
 						event_date: day,
@@ -2044,8 +2122,8 @@ function EditEvent($view){
 					})
 				});
 			}
-			
-			
+
+
 			$.ajax({
 				url: url,
 				data: JSON.stringify(data),
@@ -2063,7 +2141,7 @@ function EditEvent($view){
 					 showNotification('Событие успешно добавлено', 3000);
 					 });
 					 }*/
-						
+
 						if($view.find('#edit_event_to_public_vk').prop('checked')){
 							socket.emit('vk.post', {
 								guid: data.vk_group,
@@ -2077,7 +2155,7 @@ function EditEvent($view){
 							});
 						}
 						window.location = '/event/'+res_data.event_id;
-						
+
 					}, function(res){
 						if(res.text){
 							showNotifier({text: res.text, status: false});
@@ -2088,9 +2166,9 @@ function EditEvent($view){
 				}
 			});
 		}
-		
+
 	}
-	
+
 	$wrapper.empty();
 	var additional_fields = {
 		event_id: event_id,
@@ -2146,14 +2224,14 @@ function EditEvent($view){
 						additional_fields.vk_image_url = data.vk_image_url;
 						additional_fields.vk_image_filename = data.vk_image_url.split('/').reverse()[0];
 					}
-					
+
 					$.extend(true, data, additional_fields);
 					$wrapper.html(tmpl('edit-event-page', data));
-					
+
 					initEditEventPage($view);
 					initOrganization(data.organization_id);
 					checkVkPublicationAbility();
-					
+
 					if(data.is_same_time){
 						var $day_row = $view.find('.MainTime'),
 							start_time = data.dates[0].start_time.split(':'),
@@ -2181,7 +2259,7 @@ function EditEvent($view){
 						});
 					}
 					Modal.bindCallModal($view);
-					
+
 					if(data.image_vertical_url){
 						toDataUrl(data.image_vertical_url, function(base64_string){
 							$view.find('#edit_event_image_vertical_src').val(base64_string ? base64_string : null);
@@ -2200,8 +2278,8 @@ function EditEvent($view){
 					else {
 						toggleVkImg();
 					}
-					
-					
+
+
 					if(!data.is_free){
 						$view.find('#edit_event_free').prop('checked', false).trigger('change');
 						$view.find('#edit_event_min_price').val(data.min_price);
@@ -2212,21 +2290,21 @@ function EditEvent($view){
 					if(data.public_at !== null){
 						$view.find('#edit_event_delayed_publication').prop('checked', true).trigger('change');
 					}
-					
+
 					formatVKPost();
-					
+
 				}, ajaxErrorHandler);
 			}
 		});
 	}
-	
+
 }
 
 function Onboarding($view){
 	/* onboarding */
 	var $wrapper = $view.find(".page_wrapper"),
 		scroll_rec = 0;
-	
+
 	function organisationSubscriptions($parent) {
 		$parent.find(".OnboardingOrgItem").not('.-Handled_OnboardingOrgItem').on('click', function(){
 			var $this = $(this);
@@ -2240,7 +2318,7 @@ function Onboarding($view){
 			$this.toggleClass(__C.CLASSES.NEW_ACTIVE);
 		}).addClass('-Handled_OnboardingOrgItem');
 	}
-	
+
 	$wrapper.empty();
 	$.ajax({
 		url: '/api/v1/organizations/recommendations',
@@ -2285,15 +2363,15 @@ function Onboarding($view){
 }
 
 function StatisticsOverview($view) {
-	
+
 }
 
 function StatisticsOrganization($view) {
-	
+
 }
 
 function StatisticsEvent($view) {
-	
+
 }
 
 function ajaxHandler(result, success, error){
@@ -2335,14 +2413,14 @@ $(document)
 	})
 	.ajaxError(ajaxErrorHandler)
 	.ready(function(){
-		
+
 		function initSidebar(){
 			var $sidebar = $('#main_sidebar'),
 				$sidebar_nav = $sidebar.find('.SidebarNav'),
 				$sidebar_nav_items = $sidebar_nav.find('.SidebarNavItem');
-			
+
 			$sidebar_nav.addClass('-items_'+$sidebar_nav_items.not('.-hidden').length);
-			
+
 			renderSidebarOrganizations(null, function($list){
 				((window.innerHeight > 800) ? $('.SidebarOrganizationsScroll') : $('.SidebarScroll')).scrollbar({
 					disableBodyScroll: true
@@ -2352,13 +2430,13 @@ $(document)
 		}
 		function initTopBar(){
 			var $main_header = $('#main_header');
-			
+
 			$main_header.find('#search_bar_input').on('keypress', function(e){
 				if (e.which == 13){
 					History.pushState({_index: History.getCurrentIndex(), page: 'search'}, 'Поиск: ' + this.value, '/search?q=' + encodeURIComponent(this.value));
 				}
 			});
-			
+
 			$main_header.find('#user_bar').on('click.openUserBar', function(){
 				var $this = $(this),
 					$document = $(document);
@@ -2382,9 +2460,9 @@ $(document)
 			bindRippleEffect($main_header);
 			bindControllers($main_header);
 		}
-		
+
 		History.Adapter.bind(window, 'statechange', renderState);
-		
+
 		initSidebar();
 		initTopBar();
 		$.ajax({
