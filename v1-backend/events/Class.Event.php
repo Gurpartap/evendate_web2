@@ -223,6 +223,7 @@ class Event extends AbstractEntity
 
     private static function getAvailableNotificationTime(PDO $db, DateTime $dt, $organization_id) : DateTime
     {
+        $dt_clone = clone $dt;
         $q_get_notifications = App::queryFactory()
             ->newSelect()
             ->cols(array(
@@ -237,22 +238,23 @@ class Event extends AbstractEntity
             ->where('events_notifications.notification_type_id = ?', Notification::NOTIFICATION_TYPE_NOW_ID)
             ->groupBy(array('events_notifications.notification_time::DATE'))
             ->orderBy(array('available_date'));
+
         $p_get_notifications = $db->prepare($q_get_notifications->getStatement());
         $result = $p_get_notifications->execute($q_get_notifications->getBindValues());
-        if ($result === FALSE) return $dt;
-        if ($p_get_notifications->rowCount() == 0) return $dt;
+        if ($result === FALSE) return $dt_clone;
+        if ($p_get_notifications->rowCount() == 0) return $dt_clone;
         $rows = $p_get_notifications->fetchAll();
 
 
-        $dt_without_time = clone $dt;
-        $dt_without_time->setTime(0,0,0);
+        $dt_without_time = clone $dt_clone;
+        $dt_without_time->setTime(0, 0, 0);
 
         foreach ($rows as $index => $row){
             $_date_time = DateTime::createFromFormat('Y-m-d H:i:s', $row['available_date'] . ' 00:00:00');
 
-            if ($dt_without_time < $_date_time && $index == 0) return $dt;
+            if ($dt_without_time < $_date_time && $index == 0) return $dt_clone;
             if ($row['notifications_count'] < 2){
-                return $dt->setDate(
+                return $dt_clone->setDate(
                     intval($_date_time->format('Y')),
                     intval($_date_time->format('m')),
                     intval($_date_time->format('d'))
@@ -261,12 +263,12 @@ class Event extends AbstractEntity
         }
         if (isset($_date_time) && $_date_time instanceof DateTime){
             $_date_time->add(new DateInterval('P1D'));
-            return $dt->setDate(
+            return $dt_clone->setDate(
                 intval($_date_time->format('Y')),
                 intval($_date_time->format('m')),
                 intval($_date_time->format('d'))
             );
-        }else return $dt;
+        }else return $dt_clone;
     }
 
     private static function generateQueryData(&$data)
@@ -416,6 +418,14 @@ class Event extends AbstractEntity
 
             $notification_date = self::getAvailableNotificationTime($db, $data['notification_at'], $organization->getId());
 
+            //dates are already sorted
+            $first_date_string = $data['dates'][0]['event_date']. ' ' . $data['dates'][0]['start_time'];
+
+            //if available notification time > first event date, we should sent notification NOW
+            if ($notification_date > (DateTime::createFromFormat('Y-m-d H:i', $first_date_string))){
+                $notification_date = $data['notification_at'];
+            }
+
             self::saveNotifications(array(array(
                 'event_id' => $event_id,
                 'notification_type_id' => Notification::NOTIFICATION_TYPE_NOW_ID,
@@ -518,7 +528,7 @@ class Event extends AbstractEntity
                 ':end_time' => $date['end_time']
             ));
 
-            $result = $p_ins_dates->fetch(PDO::FETCH_ASSOC);
+            $p_ins_dates->fetch(PDO::FETCH_ASSOC);
         }
     }
 
