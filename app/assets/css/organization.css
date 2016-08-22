@@ -1,3 +1,6 @@
+.is-mobile body.organization-page {
+    background: #3cb079;
+}
 body.organization-page {
     background: #3cb079;
 }
@@ -68,6 +71,9 @@ body.organization-page {
     color: #fff;
 }
 
+.is-mobile .register-organization input {
+    background: #ffffff;
+}
 .register-organization input {
     background-color: #3892cb;
     border: 1px solid #ffffff;
@@ -112,9 +118,9 @@ body.organization-page {
     }
 
     .organization-page .fixed-content .device-frame .image-slides {
-        width: 344px;
-        height: 227px;
-        top: 335px;
+        width: 237px;
+        height: 149px;
+        top: 275px;
     }
 
     .fixed-content .device-frame .image-slide {
@@ -137,9 +143,9 @@ body.organization-page {
     }
 
     .organization-page .fixed-content .device {
-        width: 460px;
-        left: calc((100% - 460px) / 2);
-        top: 20px;
+        width: 315px;
+        left: calc((100% - 315px) / 2);
+        top: -33px;
         right: 0;
         float: left;
     }
@@ -198,4 +204,17 @@ body.organization-page {
         width: 800px;
         left: 30%;
     }
+}
+
+.is-mobile .global-footer.footer {
+    display: none;
+}
+.is-mobile .mobile-organizations.header-nav-link{
+    display: block;
+}
+.is-mobile .home-page .footer.fluid-width.mobile-full-width{
+    display: block;
+}
+.is-mobile .continue-organization-registration{
+    background-color: #3892cb;
 }

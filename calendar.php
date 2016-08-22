@@ -100,7 +100,6 @@ $user_full_name = $user->getLastName() . ' ' . $user->getFirstName(); ?>
     <link rel="icon" type="image/png" sizes="16x16" href="/app/img/favicon/favicon-16x16.png">
 
     <link rel="manifest" href="/manifest.json">
-    <link rel="manifest" href="/app/img/favicon/manifest.json">
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="msapplication-TileImage" content="/app/img/favicon/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">

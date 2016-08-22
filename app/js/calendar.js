@@ -826,7 +826,8 @@ function OrganizationsList($view){
 						classes: ['-low','-color_marginal_primary','fa_icon','fa-pencil','-empty','RippleEffect'],
 						dataset: {
 							'page': 'edit_organization',
-							'organization-id': org.id
+							'organization-id': org.id,
+							'title': 'Редактирование организации'
 						}
 					})
 				}
@@ -971,7 +972,7 @@ function Organization($view){
                 break;
             }
             case 'canceled': {
-                sort_date_type = 'updated_at';
+                sort_date_type = 'first_event_date';
                 break;
             }
         }
@@ -1134,7 +1135,8 @@ function Organization($view){
 							classes: ['-fill','-color_neutral','fa_icon','fa-pencil','RippleEffect'],
 							dataset: {
 								'page': 'edit_organization',
-								'organization-id': data.id
+								'organization-id': data.id,
+								'title': 'Редактирование организации'
 							}
 						})
 					}
