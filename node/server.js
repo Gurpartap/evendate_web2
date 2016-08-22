@@ -788,6 +788,31 @@ pg.connect(pg_conn_string, function (err, client, done) {
             }
         });
 
+        socket.on('recommendations.get', function (user, query) {
+            var q_get_user_token = Entities.users.select(Entities.users.token)
+                .from(Entities.users)
+                .where(
+                    Entities.users.id.equals(user.id)
+                ).toQuery();
+            client.query(q_get_user_token, function(err, result){
+                if (err) return handleError(err, 'recommendations.error');
+                if (result.rows.length != 1) return handleError({'error': 'USER_NOT_FOUND', details: err}, 'recommendations.error');
+
+                rest.get('http://localhost/api/v1/events/recommendations' + '?fields=' + encodeURI(query.join(',')), {
+                    json: true,
+                    headers: {
+                        'Authorization': result.rows[0].token
+                    }
+                })
+                    .on('complete', function (result) {
+                        result.data.forEach(function(event, index){
+                            result.data[index].rating_interests = 0;
+                        });
+                        socket.emit('log', result);
+                    });
+            });
+        });
+
         socket.on('feedback', function (data) {
             logger.info(data);
             var html = '';
@@ -865,7 +890,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
             });
         });
 
-        /**/
         socket.on(EMIT_NAMES.VK_INTEGRATION.POST_IT, function (data) {
             var request_data = [
                     'access_token=' + socket.vk_user.access_token,

@@ -3,9 +3,27 @@
 class Statistics
 {
 
-    const ENTITY_EVENT = 'event';
-    const ENTITY_ORGANIZATION = 'organization';
-    const ENTITY_FRIEND = 'friend';
+
+		const SCALE_MINUTE = 'minute';
+		const SCALE_HOUR = 'hour';
+		const SCALE_DAY = 'day';
+		const SCALE_WEEK = 'week';
+		const SCALE_MONTH = 'month';
+		const SCALE_YEAR = 'year';
+
+
+		const SCALES = array(
+			self::SCALE_MINUTE,
+			self::SCALE_HOUR,
+			self::SCALE_DAY,
+			self::SCALE_WEEK,
+			self::SCALE_MONTH,
+			self::SCALE_YEAR,
+		);
+
+		const ENTITY_EVENT = 'event';
+		const ENTITY_ORGANIZATION = 'organization';
+		const ENTITY_FRIEND = 'friend';
 
     const ENTITY_EVENTS = 'events';
     const ENTITY_ORGANIZATIONS = 'organizations';
@@ -32,20 +50,24 @@ class Statistics
     const FRIEND_VIEW_EVENT_FROM_USER = 'view_event_from_user';
 
 
+		const FIELD_DYNAMICS = 'dynamics';
+		const FIELD_CONVERSION = 'conversion';
+		const FIELD_AUDIENCE = 'audience';
+
     public static function getTypeId($entity_type, $type_name, PDO $db)
     {
         $q_get = 'SELECT id::INT FROM stat_event_types
 				WHERE type_code = :type_code
 				AND entity = :entity';
-        $p_get = $db->prepare($q_get);
-        $res = $p_get->execute(array(
-            ':entity' => $entity_type,
-            ':type_code' => $type_name
-        ));
-        if ($res === FALSE) throw new DBQueryException('', $db);
-        if ($p_get->rowCount() != 1) throw new InvalidArgumentException('', $db);
-        return $p_get->fetchColumn(0);
-    }
+			$p_get = $db->prepare($q_get);
+			$res = $p_get->execute(array(
+				':entity' => $entity_type,
+				':type_code' => $type_name
+			));
+			if ($res === FALSE) throw new DBQueryException('', $db);
+			if ($p_get->rowCount() < 1) throw new InvalidArgumentException('', $db);
+			return $p_get->fetchColumn(0);
+		}
 
     private static function updateIOsBadges(PDO $db, User $user, $type, Event $event = null, Organization $organization = null)
     {
