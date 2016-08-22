@@ -306,12 +306,12 @@ $title = 'Evendate';
                     </div>
                 </div>
             </div>
-            <div class="text-slide text-slide-3 container-centered" data-slide="3">
+            <div class="text-slide text-slide-3 container-centered text-slide-decorator" data-slide="3">
+                <h2 class="js-animate-this hidden-md hidden-lg">Скачай приложения<br/>прямо сейчас</h2>
                 <h1 class="js-animate-this choose-interests-text">
                     <span class="hidden-sm hidden-xs">Выбери то, что интересно</span>
-                    <span class="hidden-md hidden-lg">Начни использовать прямо сейчас</span>
                 </h1>
-                <div class="js-animate-this hidden-sm hidden-xs">
+                <div class="js-animate-this hidden-sm hidden-xs is-mobile-hidden">
                     <div class="row col-md-12">
                         <div class="col-md-3">
                             <div class="interests-block">
