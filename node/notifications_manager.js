@@ -6,6 +6,7 @@ var apn = require('apn'),
 
 var DEVICE_TYPES = {
         IOS: 'ios',
+        BROWSER: 'browser',
         ANDROID: 'android'
     },
     ONE_SIGNAL_URL = {
@@ -55,7 +56,37 @@ NotificationsManager.prototype.create = function (notification, device) {
                         en: note.alert,
                         ru: note.alert
                     },
+                    ios_badgeType: 'Increase',
+                    ios_badgeCount: 1,
                     isIos: true,
+                    include_player_ids: [device.device_token],
+                    data: note.payload
+                })
+                .on('complete', function (res) {
+                    if (res instanceof Error) {
+                        callback(res, null);
+                    } else {
+                        callback(null, res.id);
+                    }
+                });
+        };
+    }else if (device.client_type == DEVICE_TYPES.BROWSER) {
+        if (note.payload.event_id) {
+            note.payload.type = 'events';
+        } else if (note.payload.organization_id) {
+            note.payload.type = 'organizations';
+        } else if (note.payload.user_id) {
+            note.payload.type = 'users';
+        }
+        note.send = function (callback) {
+            rest
+                .postJson(ONE_SIGNAL_URL.CREATE, {
+                    app_id: _this.settings.one_signal.app_id,
+                    contents: {
+                        en: note.alert,
+                        ru: note.alert
+                    },
+                    isChromeWeb: true,
                     include_player_ids: [device.device_token],
                     data: note.payload
                 })

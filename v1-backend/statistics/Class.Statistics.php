@@ -75,6 +75,58 @@ class Statistics
         return $p_get->fetchColumn(0);
     }
 
+    private static function updateIOsBadges(PDO $db, User $user, $type, Event $event = null, Organization $organization = null)
+    {
+//        if (App::$ENV != 'prod') return;
+        $exec_command = 'cd ' . App::getVar('node_path') . ' && ENV=' . App::$ENV . ' node update_ios_badges.js ' . $user->getId() . ' > /dev/null 2>/dev/null &';
+        if (isset($event)) {
+            exec($exec_command);
+        } else if (isset($organization)) {
+            if ($type == self::ORGANIZATION_VIEW) {
+                try {
+                    $subscribed = $organization->isSubscribed($user);
+                    $subscribed = $subscribed['is_subscribed'];
+                } catch (Exception $e) {
+                    $subscribed = false;
+                }
+                if ($subscribed) {
+                    exec($exec_command);
+                }
+            }
+        }
+
+    }
+
+    public static function Event(Event $event, User $user = null, PDO $db, $type, $no_update_badges = null)
+    {
+        try {
+            $type_id = self::getTypeId(self::ENTITY_EVENT, $type, $db);
+        } catch (Exception $e) {
+            return FALSE;
+        }
+
+        if ($no_update_badges == null
+            && $event->isSeenByUser($user)->getData()['is_seen'] == false
+            && $event->isInUserFeed($user)->getData()['is_in_feed']
+        ) {
+            $no_update_badges = false;
+        } else {
+            $no_update_badges = true;
+        }
+
+        $q_ins_event = 'INSERT INTO stat_events(event_id, token_id, stat_type_id, created_at)
+				VALUES (:event_id, :token_id, :stat_type_id, NOW())';
+
+        $p_ins = $db->prepare($q_ins_event);
+        $p_ins->execute(array(
+            ':event_id' => $event->getId(),
+            ':token_id' => $user ? $user->getTokenId() : null,
+            ':stat_type_id' => $type_id
+        ));
+        if ($no_update_badges !== true) {
+            self::updateIOsBadges($db, $user, $type, $event);
+        }
+    }
     public static function Event(Event $event, User $user = null, PDO $db, $type)
     {
         try {
@@ -95,13 +147,14 @@ class Statistics
         $p_ins->execute($q_ins_event->getBindValues());
     }
 
-    public static function Organization(Organization $organization, User $user = null, PDO $db, $type)
+    public static function Organization(Organization $organization, User $user = null, PDO $db, $type, $no_update_badges = false)
     {
         try {
             $type_id = self::getTypeId(self::ENTITY_ORGANIZATION, $type, $db);
         } catch (Exception $e) {
-            return;
+            return FALSE;
         }
+
         $q_ins_event = App::queryFactory()
             ->newInsert()
             ->into('stat_organizations')
@@ -113,6 +166,10 @@ class Statistics
 
         $p_ins = $db->prepare($q_ins_event->getStatement());
         $p_ins->execute($q_ins_event->getBindValues());
+
+        if ($no_update_badges !== true) {
+            self::updateIOsBadges($db, $user, $type, null, $organization);
+        }
     }
 
     public static function Friend(Friend $friend, User $user = null, PDO $db, $type)
@@ -136,18 +193,27 @@ class Statistics
         $p_ins->execute($q_ins_event->getBindValues());
     }
 
-    public static function storeBatch(array $events, User $user = null, PDO $db)
+    public static function StoreBatch(array $events, User $user = null, PDO $db)
     {
+        $organization_events = 0;
+        $organization = null;
+        $event_instance = null;
         foreach ($events as $event) {
             switch ($event['entity_type']) {
                 case self::ENTITY_EVENT:
                 case self::ENTITY_EVENTS: {
-                    self::Event(EventsCollection::one($db, $user, $event['entity_id'], array()), $user, $db, $event['event_type']);
+                    $event_instance = EventsCollection::one($db, $user, $event['entity_id'], array());
+                    self::Event($event_instance, $user, $db, $event['event_type'], true);
+                    $organization_events++;
                     break;
                 }
                 case self::ENTITY_ORGANIZATION:
                 case self::ENTITY_ORGANIZATIONS: {
-                    self::Organization(OrganizationsCollection::one($db, $user, $event['entity_id'], array()), $user, $db, $event['event_type']);
+                    $organization = OrganizationsCollection::one($db, $user, $event['entity_id'], array());
+                    self::Organization($organization, $user, $db, $event['event_type'], true);
+                    if ($event['event_type'] == self::ORGANIZATION_VIEW) {
+                        $organization_events++;
+                    }
                     break;
                 }
                 case self::ENTITY_FRIEND:
@@ -156,6 +222,9 @@ class Statistics
                     break;
                 }
             }
+        }
+        if ($organization_events > 0) {
+            self::updateIOsBadges($db, $user, self::ORGANIZATION_VIEW, $event_instance, $organization);
         }
         return new Result(true, '');
     }

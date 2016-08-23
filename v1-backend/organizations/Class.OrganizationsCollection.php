@@ -238,14 +238,7 @@ class OrganizationsCollection
                                int $id,
                                array $fields = null) : Organization
     {
-
         $organization = self::filter($db, $user, array('id' => $id), $fields);
-        Statistics::Organization(
-            $organization,
-            $user,
-            $db,
-            Statistics::ORGANIZATION_VIEW
-        );
         return $organization;
     }
 }

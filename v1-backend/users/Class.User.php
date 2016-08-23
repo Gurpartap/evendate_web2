@@ -245,7 +245,7 @@ class User extends AbstractUser
             ':event_id' => $event->getId()
         ));
         if ($result === FALSE) throw new DBQueryException('CANT_MAKE_FAVORITE', $this->db);
-        Statistics::Event($event, $this, $this->db, Statistics::EVENT_FAVE);
+
         return new Result(true, 'Событие успешно добавлено в избранное');
     }
 
@@ -260,7 +260,6 @@ class User extends AbstractUser
             ':event_id' => $event->getId()
         ));
         if ($result === FALSE) throw new DBQueryException('CANT_DELETE_FAVORITE', $this->db);
-        Statistics::Event($event, $this, $this->db, Statistics::EVENT_UNFAVE);
         return new Result(true, 'Событие успешно удалено из избранных');
     }
 

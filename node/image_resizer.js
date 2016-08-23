@@ -2,6 +2,7 @@ var easyimage = require('easyimage'),
     gm = require('gm').subClass({imageMagick: true}),
     fs = require('fs'),
     Utils = require('./utils'),
+    async = require('async'),
     path = require('path'),
     Entities = require('./entities');
 
@@ -48,12 +49,6 @@ ImagesResize.prototype.resizeFile = function (settings) {
         widths = ORGANIZATIONS_WIDTHS;
     }
 
-    console.log({
-        src: settings.source,
-        dst: settings.destination,
-        width: widths[settings.size][settings.orientation]
-    });
-
     easyimage.resize({
         src: settings.source,
         dst: settings.destination,
@@ -93,67 +88,7 @@ ImagesResize.prototype.cropToSquare = function (settings) {
     );
 };
 
-ImagesResize.prototype.blurImage = function (settings, cb) {
-    gm(settings.src)
-        .resize(500, 500)
-        .contrast(-6)
-        .blur(30, 20)
-        .write(settings.dest, cb);
-};
-
-ImagesResize.prototype.blurNew = function (settings) {
-    var _this = this,
-        _logger = _this.settings.logger,
-        users = Entities.users,
-        client = settings.client,
-        q_get_user_images =
-            users
-                .select(users.id, users.avatar_url)
-                .from(users)
-                .where(
-                    users.blurred_image_url.isNull().or(users.blurred_image_url.notEquals(users.avatar_url))
-                )
-                .and(users.avatar_url.isNotNull())
-                .and(users.avatar_url.notEquals(''))
-                .order("DATE_PART('epoch', users.created_at) / (random() * 9 + 1)")
-                .limit(100)
-                .toQuery();
-
-    client.query(q_get_user_images, function (err, result) {
-        if (err) return _logger.error(err);
-        result.rows.forEach(function (image, index) {
-            setTimeout(function(){
-                var img_path = settings.images.user_images + '/default/',
-                    blurred_path = settings.images.user_images + '/blurred/';
-                Utils.downloadImageFromUrl(image.avatar_url, function (err, data, filename) {
-                    if (err) {
-                        var set_img_null = users.update({avatar_url: null}).where(users.id.equals(image.id)).toQuery();
-                        client.query(set_img_null, function (err) {
-                            if (err) return _logger.error(err);
-                        });
-                        return _logger.error(err);
-                    }
-                    _this.blurImage({
-                        src: '../' + img_path + filename,
-                        dest: '../' + blurred_path + filename
-                    }, function (err) {
-                        if (err) return _logger.error(err);
-                        var q_upd_user = users
-                            .update({
-                                local_avatar_filename: filename,
-                                blurred_image_url: image.avatar_url
-                            }).where(users.id.equals(image.id)).toQuery();
-                        client.query(q_upd_user, function (err) {
-                            if (err) return _logger.error(err);
-                        })
-                    });
-                }, '../' + img_path);
-            }, index * 1000);
-        });
-    });
-};
-
-ImagesResize.prototype.resizeNew = function (config) {
+ImagesResize.prototype.resizeNew = function (config, callback) {
     var _this = this,
         _logger = _this.settings.logger,
         IMAGES_PATH = '../' + config.images.events_path + '/',
@@ -178,7 +113,7 @@ ImagesResize.prototype.resizeNew = function (config) {
                         .or(events.image_horizontal.notEquals(events.image_horizontal_resized))
                         .or(events.image_horizontal_resized.isNull())
                         .or(events.image_vertical_resized.isNull())
-                ).limit(100)
+                )
                 .toQuery(),
 
         q_get_changed_organization_images =
@@ -190,6 +125,10 @@ ImagesResize.prototype.resizeNew = function (config) {
                         .or(organizations.background_img_url.notEquals(organizations.background_small_img_url))
                         .or(organizations.img_url.notEquals(organizations.img_medium_url))
                         .or(organizations.img_url.notEquals(organizations.img_small_url))
+                        .or(organizations.background_medium_img_url.isNull())
+                        .or(organizations.background_small_img_url.isNull())
+                        .or(organizations.img_medium_url.isNull())
+                        .or(organizations.img_small_url.isNull())
                 ).toQuery();
 
     //Resizing event images
@@ -214,7 +153,6 @@ ImagesResize.prototype.resizeNew = function (config) {
             }).where(events.id.equals(event.id)).toQuery();
             client.query(q_upd_event);
         });
-
         images.forEach(function (image) {
             var large_image = path.join(__dirname, IMAGES_PATH + LARGE_IMAGES + '/' + image.filename),
                 square_image = path.join(__dirname, IMAGES_PATH + SQUARE_IMAGES + '/' + image.filename),
@@ -239,8 +177,6 @@ ImagesResize.prototype.resizeNew = function (config) {
                 size: SMALL_IMAGES
             });
         })
-
-
     });
 
     var setNullNoImage = function (organization_id, data) {
@@ -248,94 +184,127 @@ ImagesResize.prototype.resizeNew = function (config) {
     };
 
 
+    //Resizing organization images
+    console.log(q_get_changed_organization_images.text);
     client.query(q_get_changed_organization_images, function (err, result) {
+
+        var queue = [];
 
         if (err) return _logger.error(err);
         result.rows.forEach(function (obj) {
+
+
             var logo_img_path = path.join(__dirname, ORGANIZATIONS_IMAGES_PATH + LOGO_IMAGES + '/' + LARGE_IMAGES + '/' + obj.img_url),
                 background_img_path = path.join(__dirname, ORGANIZATIONS_IMAGES_PATH + BACKGROUND_IMAGES + '/' + LARGE_IMAGES + '/' + obj.background_img_url);
 
-            // resize background
-            try {
-                fs.stat(background_img_path, function (err, stats) {
-                    if (err) {
-                        setNullNoImage(obj.id, {
-                            background_img_url: null
+            queue.push(function (cb) {
+                // resize background
+                try {
+                    fs.stat(background_img_path, function (err, stats) {
+                        if (err) {
+                            setNullNoImage(obj.id, {
+                                background_img_url: null
+                            });
+                            _logger.error(err);
+                            cb(null, null);
+                            return;
+                        }
+                        if (stats.isFile() == false){
+                            setNullNoImage(obj.id, {
+                                background_img_url: null
+                            });
+                            cb(null, null);
+                            return;
+                        }
+                        _this.resizeFile({
+                            source: background_img_path,
+                            destination: path.join(__dirname, ORGANIZATIONS_IMAGES_PATH + BACKGROUND_IMAGES + '/' + MEDIUM_IMAGES + '/' + obj.background_img_url),
+                            type: 'organization',
+                            orientation: BACKGROUND_IMAGES,
+                            size: MEDIUM_IMAGES
                         });
-                        _logger.error(err);
-                        return;
-                    }
-                    if (stats.isFile() == false) return setNullNoImage(obj.id, {
-                        background_img_url: null
+
+                        _this.resizeFile({
+                            source: background_img_path,
+                            destination: path.join(__dirname, ORGANIZATIONS_IMAGES_PATH + BACKGROUND_IMAGES + '/' + SMALL_IMAGES + '/' + obj.background_img_url),
+                            type: 'organization',
+                            orientation: BACKGROUND_IMAGES,
+                            size: SMALL_IMAGES
+                        });
+
+
+                        var q_upd_organization = organizations.update({
+                            background_medium_img_url: obj.background_img_url,
+                            background_small_img_url: obj.background_img_url
+                        }).where(organizations.id.equals(obj.id)).toQuery();
+
+                        client.query(q_upd_organization, function (err) {
+                            if (err) _logger.error(err);
+                            cb(null, null);
+                        });
                     });
+                } catch (e) {
+                    cb(null, null);
+                }
+            });
 
-                    _this.resizeFile({
-                        source: background_img_path,
-                        destination: path.join(__dirname, ORGANIZATIONS_IMAGES_PATH + BACKGROUND_IMAGES + '/' + MEDIUM_IMAGES + '/' + obj.background_img_url),
-                        type: 'organization',
-                        orientation: BACKGROUND_IMAGES,
-                        size: MEDIUM_IMAGES
-                    });
-
-                    _this.resizeFile({
-                        source: background_img_path,
-                        destination: path.join(__dirname, ORGANIZATIONS_IMAGES_PATH + BACKGROUND_IMAGES + '/' + SMALL_IMAGES + '/' + obj.background_img_url),
-                        type: 'organization',
-                        orientation: BACKGROUND_IMAGES,
-                        size: SMALL_IMAGES
-                    });
-
-
-                    var q_upd_organization = organizations.update({
-                        background_medium_img_url: obj.background_img_url,
-                        background_small_img_url: obj.background_img_url
-                    }).where(organizations.id.equals(obj.id)).toQuery();
-
-                    client.query(q_upd_organization, function (err) {
-                        if (err) return;
-                    });
-                });
-
+            queue.push(function (cb) {
                 // resize logos
-                fs.stat(logo_img_path, function (err, stats) {
-                    if (err) {
-                        setNullNoImage(obj.id, {
-                            img_url: null
+
+                try {
+                    fs.stat(logo_img_path, function (err, stats) {
+                        if (err) {
+                            setNullNoImage(obj.id, {
+                                img_url: null
+                            });
+                            _logger.error(err);
+                            cb(null, null);
+                            return;
+                        }
+                        if (stats.isFile() == false) {
+                            setNullNoImage(obj.id, {
+                                img_url: null
+                            });
+                            cb(null, null);
+                            return;
+                        }
+                        _this.resizeFile({
+                            source: logo_img_path,
+                            destination: path.join(__dirname, ORGANIZATIONS_IMAGES_PATH + LOGO_IMAGES + '/' + MEDIUM_IMAGES + '/' + obj.img_url),
+                            type: 'organization',
+                            orientation: LOGO_IMAGES,
+                            size: MEDIUM_IMAGES
                         });
-                        _logger.error(err);
-                        return;
-                    }
-                    if (stats.isFile() == false)  return setNullNoImage(obj.id, {
-                        img_url: null
-                    });
-                    _this.resizeFile({
-                        source: logo_img_path,
-                        destination: path.join(__dirname, ORGANIZATIONS_IMAGES_PATH + LOGO_IMAGES + '/' + MEDIUM_IMAGES + '/' + obj.img_url),
-                        type: 'organization',
-                        orientation: LOGO_IMAGES,
-                        size: MEDIUM_IMAGES
+
+                        _this.resizeFile({
+                            source: logo_img_path,
+                            destination: path.join(__dirname, ORGANIZATIONS_IMAGES_PATH + LOGO_IMAGES + '/' + SMALL_IMAGES + '/' + obj.img_url),
+                            type: 'organization',
+                            orientation: LOGO_IMAGES,
+                            size: SMALL_IMAGES
+                        });
+
+                        var q_upd_organization = organizations.update({
+                            img_medium_url: obj.img_url,
+                            img_small_url: obj.img_url
+                        }).where(organizations.id.equals(obj.id)).toQuery();
+
+                        client.query(q_upd_organization, function (err) {
+                            if (err) _logger.error(err);
+                            cb(null, null);
+                        });
                     });
 
-                    _this.resizeFile({
-                        source: logo_img_path,
-                        destination: path.join(__dirname, ORGANIZATIONS_IMAGES_PATH + LOGO_IMAGES + '/' + SMALL_IMAGES + '/' + obj.img_url),
-                        type: 'organization',
-                        orientation: LOGO_IMAGES,
-                        size: SMALL_IMAGES
-                    });
+                } catch (e) {
+                    cb(null, null);
+                }
+            });
+        });
 
-                    var q_upd_organization = organizations.update({
-                        img_medium_url: obj.img_url,
-                        img_small_url: obj.img_url
-                    }).where(organizations.id.equals(obj.id)).toQuery();
-
-                    client.query(q_upd_organization, function (err) {
-                        if (err) _logger.error(err);
-                    });
-                });
-            } catch (e) {
+        async.parallelLimit(queue, 10, function(){
+            if (callback){
+                callback();
             }
-
         });
     })
 };

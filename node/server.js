@@ -1,8 +1,10 @@
 "use strict";
 
-var server = require('http'),
-    io = require('socket.io')(server),
+var
+    http = require('http'),
+    https = require('https'),
     winston = require('winston'),
+    app = require("express"),
     mysql = require('mysql'),
     rest = require('restler'),
     fs = require("fs"),
@@ -17,6 +19,7 @@ var server = require('http'),
     Entities = require('./entities'),
     pg = require('pg'),
     sql = require('sql'),
+    args = process.argv.slice(2),
     crypto = require('crypto'),
     __rooms = {};
 
@@ -25,7 +28,7 @@ process.on('uncaughtException', function (err) {
 });
 
 
-var config_index = process.env.ENV ? process.env.ENV : 'dev',
+var config_index = process.env.ENV ? process.env.ENV : 'local',
     real_config = config[config_index],
     pg_conn_string = [
         'postgres://',
@@ -57,6 +60,10 @@ var config_index = process.env.ENV ? process.env.ENV : 'dev',
         }
     }));
 var
+    server,
+    server2,
+    io = null,
+    io2 = null,
     URLs = {
         "VK": {
             'GET_ACCESS_TOKEN': 'https://oauth.vk.com/access_token?client_id=' +
@@ -99,8 +106,29 @@ var
             SEND: 'notifications.send',
             UPDATE_STATS: 'notifications.update_stats',
         },
-        UTILS: {}
+        UTILS: {
+            UPDATE_IMAGES: 'utils.updateImages',
+            UPDATE_IMAGES_DONE: 'utils.updateImagesDone'
+        }
     };
+
+try {
+    fs.accessSync(real_config.https.key_path, fs.F_OK);
+    fs.accessSync(real_config.https.cert_path, fs.F_OK);
+    server = https.createServer({
+        key: fs.readFileSync(real_config.https.key_path, 'utf8'),
+        cert: fs.readFileSync(real_config.https.cert_path, 'utf8')
+    }, app).listen(8443);
+
+    server2 = http.createServer().listen(8080);
+
+    io = require("socket.io").listen(server);
+    io2 = require("socket.io").listen(server2);
+} catch (e) {
+    server = http.createServer().listen(8080);
+    io = require("socket.io").listen(server);
+    io2 = null;
+}
 
 sql.setDialect('postgres');
 
@@ -181,27 +209,44 @@ pg.connect(pg_conn_string, function (err, client, done) {
             });
         });
     };
+    function publicDelayedEvents() {
+        var q_upd_events = 'UPDATE events ' +
+            ' SET ' +
+            '   status = TRUE, ' +
+            '   updated_at = NOW(),' +
+            '   public_at = NULL ' +
+            '   WHERE id IN ' +
+            '       (SELECT id ' +
+            '           FROM view_all_events ' +
+            '           WHERE ' +
+            '               is_canceled = FALSE ' +
+            '               AND is_delayed = TRUE ' +
+            '               AND public_at < date_part(\'epoch\', NOW())) ';
+        client.query(q_upd_events, [], function (err) {
+            if (err) logger.error(q_upd_events);
+            if (err) logger.error(err);
+        });
+    }
 
     try {
         new CronJob('*/1 * * * *', function () {
-            if (config_index == 'prod') {
+            if (config_index == 'prod' || args.indexOf('--resize-images') !== -1) {
                 cropper.resizeNew({
                     images: real_config.images,
                     client: client
                 });
-                cropper.blurNew({
-                    images: real_config.images,
-                    client: client
-                });
+            }
+            if (config_index == 'prod') {
                 var notifications = new Notifications(real_config, client, logger);
                 notifications.sendAutoNotifications();
                 notifications.sendUsersNotifications();
-
             }
+            publicDelayedEvents();
         }, null, true);
     } catch (ex) {
         logger.error(ex);
     }
+
 
     try {
         new CronJob('0,15,30,45 * * * *', function () {
@@ -219,7 +264,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
         logger.error(ex);
     }
 
-    io.on('connection', function (socket) {
+    var ioHandlers = function (socket) {
 
         socket.on('error', function (err) {
             logger.error(err);
@@ -283,15 +328,13 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         vk_uid: null
                     };
                     switch (data.type) {
-                        case 'vk':
-                        {
+                        case 'vk': {
                             result.vk_uid = data.oauth_data.user_id;
                             break;
                         }
 
                         case 'google':
-                        case 'facebook':
-                        {
+                        case 'facebook': {
                             result[data.type + '_uid'] = data.user_info.id;
                             break;
                         }
@@ -314,11 +357,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     user_token = data.oauth_data.access_token + data.oauth_data.secret + Utils.makeId(),
                     q_get_user =
                         users
-                            .select(
-                                users.id,
-                                users.vk_uid,
-                                users.facebook_uid,
-                                users.google_uid,
+                            .select(users.id, users.vk_uid, users.facebook_uid, users.google_uid,
                                 '(SELECT COUNT(id) FROM subscriptions WHERE subscriptions.user_id = users.id AND subscriptions.status = TRUE) AS subscriptions_count')
                             .where(users.email.equals(data.oauth_data.email))
                             .or(users.vk_uid.isNotNull().and(users.vk_uid.equals(UIDs.vk_uid)))
@@ -384,8 +423,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             facebook_sign_in = Entities.facebook_sign_in;
 
                         switch (data.type) {
-                            case 'vk':
-                            {
+                            case 'vk': {
                                 var vk_data = {
                                     uid: UIDs.vk_uid,
                                     user_id: user.id,
@@ -404,8 +442,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 console.log(vk_data);
                                 break;
                             }
-                            case 'google':
-                            {
+                            case 'google': {
                                 var google_data = {
                                     user_id: user.id,
                                     google_id: user.id,
@@ -422,8 +459,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 console.log(google_data);
                                 break;
                             }
-                            case 'facebook':
-                            {
+                            case 'facebook': {
                                 var facebook_data = {
                                     user_id: user.id,
                                     uid: UIDs.facebook_uid,
@@ -481,8 +517,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 }
 
                                 socket.emit('auth', {
-                                    user_id: user.id,
                                     email: data.oauth_data.email,
+                                    user_id: user.id,
                                     token: user_token,
                                     mobile: token_type == 'mobile',
                                     type: data.type,
@@ -490,7 +526,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 });
                             });
                         };
-
 
                         client.query(q_ins_sign_in.returning('id').toQuery(), function (sign_in_err) {
                             if (handleError(sign_in_err)) {
@@ -504,20 +539,17 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 uid_key_name;
 
                             switch (data.type) {
-                                case 'vk':
-                                {
+                                case 'vk': {
                                     q_ins_friends = "INSERT INTO vk_friends (user_id, friend_uid) VALUES ($1, $2) ON CONFLICT DO NOTHING";
                                     uid_key_name = 'uid';
                                     break;
                                 }
-                                case 'google':
-                                {
+                                case 'google': {
                                     q_ins_friends = "INSERT INTO google_friends (user_id, friend_uid) VALUES ($1, $2) ON CONFLICT DO NOTHING";
                                     uid_key_name = 'id';
                                     break;
                                 }
-                                case 'facebook':
-                                {
+                                case 'facebook': {
                                     q_ins_friends = "INSERT INTO facebook_friends (user_id, friend_uid) VALUES ($1, $2) ON CONFLICT DO NOTHING";
                                     uid_key_name = 'id';
                                     break;
@@ -539,15 +571,13 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             var q_ins_group, q_ins_membership;
 
                             switch (data.type) {
-                                case 'vk':
-                                {
+                                case 'vk': {
                                     q_ins_group = "INSERT INTO vk_groups (gid, name, screen_name, description, photo) " +
                                         "   VALUES ($1, $2, $3, $4, $5) ON CONFLICT (gid) DO UPDATE SET name = $2, screen_name = $3, description = $4, photo = $5 RETURNING id";
                                     q_ins_membership = 'INSERT INTO vk_users_subscriptions(user_id, vk_group_id) VALUES($1, $2) ON CONFLICT DO NOTHING';
                                     break;
                                 }
-                                case 'facebook':
-                                {
+                                case 'facebook': {
                                     break;
                                 }
                             }
@@ -603,8 +633,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 var req_params;
 
                 switch (data.type) {
-                    case 'vk':
-                    {
+                    case 'vk': {
                         req_params = {
                             url: URLs[data.type.toUpperCase()].GET_USER_INFO,
                             timeout: 5000,
@@ -620,8 +649,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         };
                         break;
                     }
-                    case 'google':
-                    {
+                    case 'google': {
                         req_params = {
                             url: URLs[data.type.toUpperCase()].GET_USER_INFO,
                             timeout: 5000,
@@ -632,8 +660,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         };
                         break;
                     }
-                    case 'facebook':
-                    {
+                    case 'facebook': {
                         req_params = {
                             url: URLs[data.type.toUpperCase()].GET_USER_INFO,
                             timeout: 5000,
@@ -756,8 +783,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     req_params;
 
                 switch (data.type) {
-                    case 'vk':
-                    {
+                    case 'vk': {
                         req_params = {
                             url: URLs[data.type.toUpperCase()].GET_GROUPS_LIST,
                             json: true,
@@ -772,13 +798,11 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         };
                         break;
                     }
-                    case 'google':
-                    {
+                    case 'google': {
                         callback(null, null);
                         return;
                     }
-                    case 'facebook':
-                    {
+                    case 'facebook': {
                         callback(null, null);
                         return;
                     }
@@ -800,8 +824,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     req_params;
 
                 switch (data.type) {
-                    case 'vk':
-                    {
+                    case 'vk': {
                         req_params = {
                             url: URLs[data.type.toUpperCase()].GET_FRIENDS_LIST,
                             timeout: 5000,
@@ -815,8 +838,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         };
                         break;
                     }
-                    case 'google':
-                    {
+                    case 'google': {
                         req_params = {
                             url: URLs[data.type.toUpperCase()].GET_FRIENDS_LIST,
                             timeout: 5000,
@@ -827,8 +849,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         };
                         break;
                     }
-                    case 'facebook':
-                    {
+                    case 'facebook': {
                         req_params = {
                             url: URLs[data.type.toUpperCase()].GET_FRIENDS_LIST,
                             timeout: 5000,
@@ -862,34 +883,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
             }
         });
 
-        socket.on('recommendations.get', function (user, query) {
-            var q_get_user_token = Entities.users.select(Entities.users.token)
-                .from(Entities.users)
-                .where(
-                    Entities.users.id.equals(user.id)
-                ).toQuery();
-            client.query(q_get_user_token, function (err, result) {
-                if (err) return handleError(err, 'recommendations.error');
-                if (result.rows.length != 1) return handleError({
-                    'error': 'USER_NOT_FOUND',
-                    details: err
-                }, 'recommendations.error');
-
-                rest.get('http://localhost/api/v1/events/recommendations' + '?fields=' + encodeURI(query.join(',')), {
-                    json: true,
-                    headers: {
-                        'Authorization': result.rows[0].token
-                    }
-                })
-                    .on('complete', function (result) {
-                        result.data.forEach(function (event, index) {
-                            result.data[index].rating_interests = 0;
-                        });
-                        socket.emit('log', result);
-                    });
-            });
-        });
-
         socket.on('feedback', function (data) {
             logger.info(data);
             var html = '';
@@ -904,7 +897,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 greetingTimeout: 50000,
                 socketTimeout: 50000,
                 from: 'feedback@evendate.ru',
-                to: 'support@evendate.com',
+                to: 'support@evendate.ru',
                 subject: 'Обратная связь!',
                 html: html
             }, function (err, info) {
@@ -940,6 +933,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 socket.emit('image.getFromURLDone', {error: error, data: data, filename: filename});
             });
         });
+
 
         socket.on(EMIT_NAMES.NOTIFICATIONS.SEND, function () {
             if (config_index == 'local') {
@@ -1076,9 +1070,24 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     });
             });
         });
-    });
 
-    io.listen(8080);
+        socket.on(EMIT_NAMES.UTILS.UPDATE_IMAGES, function () {
+            cropper.resizeNew({
+                images: real_config.images,
+                client: client
+            }, function () {
+                socket.emit(EMIT_NAMES.UTILS.UPDATE_IMAGES_DONE);
+            });
+        })
+
+    };
+
+    io.on('connection', ioHandlers);
+
+    if (io2 != null) {
+        io2.on('connection', ioHandlers);
+    }
 
     console.log('Started');
+
 });

@@ -13,6 +13,8 @@ class Organization extends AbstractEntity
     const IS_SUBSCRIBED_FIELD_NAME = 'is_subscribed';
     const NEW_EVENTS_COUNT_FIELD_NAME = 'new_events_count';
     const STAFF_FIELD_NAME = 'staff';
+    const IS_NEW_FIELD_NAME = 'is_new';
+    const PRIVILEGES_FIELD_NAME = 'privileges';
 
     const IMAGES_PATH = 'organizations_images/';
     const IMAGE_SIZE_LARGE = '/large/';
@@ -68,6 +70,7 @@ class Organization extends AbstractEntity
     );
     protected static $ADDITIONAL_COLS = array(
         'description',
+        'email',
         'background_medium_img_url',
         'img_medium_url',
         'img_small_url',
@@ -77,6 +80,8 @@ class Organization extends AbstractEntity
         'created_at',
         'updated_at',
         'background_small_img_url',
+        'facebook_url',
+        'vk_url',
         self::RANDOM_FIELD_NAME => '(SELECT created_at / (random() * 9 + 1)
 			FROM view_organizations AS vo
 			WHERE vo.id = view_organizations.id) AS random',
@@ -86,6 +91,11 @@ class Organization extends AbstractEntity
 				WHERE organization_id = view_organizations.id
 					AND subscriptions.status = TRUE
 					AND user_id = :user_id) IS NOT NULL AS ' . self::IS_SUBSCRIBED_FIELD_NAME,
+        self::IS_NEW_FIELD_NAME => '(SELECT 
+				id IS NOT NULL AS is_new
+				FROM view_organizations vo
+				WHERE vo.created_at > DATE_PART(\'epoch\', NOW() - INTERVAL \'7 DAY\') 
+				AND vo.id = view_organizations.id) IS NOT NULL AS ' . self::IS_NEW_FIELD_NAME,
         self::NEW_EVENTS_COUNT_FIELD_NAME => '(
 		SELECT
 			COUNT(view_events.id)
@@ -95,14 +105,14 @@ class Organization extends AbstractEntity
 				AND
 				view_events.last_event_date > DATE_PART(\'epoch\', NOW()) :: INT
 				AND view_events.created_at > 
-					(SELECT DATE_PART(\'epoch\', stat_organizations.created_at)::INT
+					COALESCE((SELECT DATE_PART(\'epoch\', stat_organizations.created_at)::INT
 					    FROM stat_organizations
 					    INNER JOIN stat_event_types ON stat_organizations.stat_type_id = stat_event_types.id
 					    INNER JOIN tokens ON stat_organizations.token_id = tokens.id
 					    WHERE type_code=\'view\'
 					    AND organization_id = view_organizations.id
 					    AND tokens.user_id = :user_id
-					    ORDER BY stat_organizations.created_at DESC LIMIT 1)
+					    ORDER BY stat_organizations.id DESC LIMIT 1),0)
 				AND
 				id NOT IN
 					(SELECT event_id
@@ -172,8 +182,6 @@ class Organization extends AbstractEntity
         if ($result === FALSE)
             throw new DBQueryException('SUBSCRIPTION_QUERY_ERROR', $this->db);
 
-        Statistics::Organization($this, $user, $this->db, Statistics::ORGANIZATION_SUBSCRIBE);
-
         return new Result(true, 'Подписка успешно оформлена');
     }
 
@@ -186,7 +194,6 @@ class Organization extends AbstractEntity
 			RETURNING id::INT';
         $p_upd_sub = $this->db->prepare($q_upd_sub);
         $p_upd_sub->execute(array(':organization_id' => $this->getId(), ':user_id' => $user->getId()));
-        Statistics::Organization($this, $user, $this->db, Statistics::ORGANIZATION_UNSUBSCRIBE);
         return new Result(true, 'Подписка успешно отменена');
     }
 
@@ -343,6 +350,11 @@ class Organization extends AbstractEntity
             );
         }
 
+        if (isset($fields[Organization::PRIVILEGES_FIELD_NAME])) {
+            $result_data[Organization::PRIVILEGES_FIELD_NAME] =
+                Roles::getUsersPrivilegesInOrganization($user, $this, $this->db)->getData();
+        }
+
         return new Result(true, '', $result_data);
     }
 
@@ -373,7 +385,7 @@ class Organization extends AbstractEntity
         )->getData();
     }
 
-    private function isSubscribed(User $user)
+    public function isSubscribed(User $user)
     {
         $q_get_subscribed = App::queryFactory()->newSelect();
         $q_get_subscribed
@@ -445,9 +457,9 @@ class Organization extends AbstractEntity
         }
 
 
-        if (isset($data['vk_url_path'])) {
+        if (isset($data['vk_url'])) {
             $data['vk_url'] = trim($data['vk_url']);
-            $data['vk_url_path'] = trim($data['vk_url_path']);
+            $data['vk_url_path'] = preg_replace('/\//', '', parse_url($data['vk_url'], PHP_URL_PATH));
         } else {
             $data['vk_url'] = null;
             $data['vk_url_path'] = null;
@@ -455,27 +467,7 @@ class Organization extends AbstractEntity
 
         if (isset($data['facebook_url'])) {
             $data['facebook_url'] = trim($data['facebook_url']);
-            $data['facebook_url'] = preg_replace("#\\/$#", '', $data['facebook_url']);
-
-            $data['facebook_url_path'] = null;
-            preg_match(
-                '#'
-                . '(?:https?://)?'
-                . '(?:www.)?'
-                . '(?:facebook.com/)?'
-                . '(?:(?:\w)*\#!/)?'
-                . '(?:groups/)?'
-                . '(?:[?\p{L}\-_]*/)?'
-                . '(?:[?\w\-_]*/)?'
-                . '(?:group.php\?id=(?=\d.*))?'
-                . '([\d\-]*)?'
-                . '(?:\?.*)?'
-                . '#u',
-                $data['facebook_url'],
-                $data['facebook_url_path']);
-            if (count($data['facebook_url_path']) > 0) {
-                $data['facebook_url_path'] = $data['facebook_url_path'][0];
-            }
+            $data['facebook_url_path'] = preg_replace('/\//', '', parse_url($data['facebook_url'], PHP_URL_PATH));
         } else {
             $data['facebook_url'] = null;
             $data['facebook_url_path'] = null;
@@ -489,12 +481,9 @@ class Organization extends AbstractEntity
             && !empty($data['background_filename'])
         ) {
             $background_filename = md5(App::generateRandomString() . '-background') . '.' . App::getImageExtension($data['background_filename']);
-            $background_path = self::IMAGES_PATH . self::IMAGE_TYPE_BACKGROUND . $background_filename;
-            App::saveImage($data['background'], $background_path, 14000);
-            $data['$background_path'] = $background_path;
-        } else {
-            $data['background_img_url'] = self::IMAGES_PATH . self::IMAGE_TYPE_LOGO . self::DEFAULT_BACKGROUND_FILENAME;
-        }
+            App::saveImage($data['background'], self::IMAGES_PATH . self::IMAGE_TYPE_BACKGROUND . self::IMAGE_SIZE_LARGE . $background_filename, 14000);
+            $data['background_img_url'] = $background_filename;
+        } else throw new InvalidArgumentException('Фоновое изображение обязательно');
 
         if (isset($data['logo'])
             && !empty($data['logo'])
@@ -504,12 +493,9 @@ class Organization extends AbstractEntity
             && !empty($data['logo_filename'])
         ) {
             $logo_filename = md5(App::generateRandomString() . '-logo') . '.' . App::getImageExtension($data['logo_filename']);
-            $logo_path = self::IMAGES_PATH . self::IMAGE_TYPE_LOGO . $logo_filename;
-            App::saveImage($data['logo'], $logo_path, 14000);
-            $data['img_url'] = $logo_path;
-        } else {
-            $data['img_url'] = self::IMAGES_PATH . self::IMAGE_TYPE_LOGO . self::DEFAULT_LOGO_FILENAME;
-        }
+            App::saveImage($data['logo'], self::IMAGES_PATH . self::IMAGE_TYPE_LOGO . self::IMAGE_SIZE_LARGE . $logo_filename, 14000);
+            $data['img_url'] = $logo_filename;
+        } else throw new InvalidArgumentException('Логотип обязателен');
     }
 
     public function update(User $user, array $data)
@@ -587,7 +573,7 @@ class Organization extends AbstractEntity
                         FROM users_organizations ua 
                         WHERE ua.status = TRUE 
                             AND ua.organization_id = users_organizations.organization_id
-                            AND ua.role_id = ' . Roles::getId(Roles::ROLE_ADMIN) .') AS admins_count'
+                            AND ua.role_id = ' . Roles::getId(Roles::ROLE_ADMIN) . ') AS admins_count'
                 ))
                 ->where('users_organizations.status = TRUE')
                 ->where('users_organizations.organization_id = ?', $this->getId());
@@ -605,9 +591,9 @@ class Organization extends AbstractEntity
             ->cols(array(
                 'status' => 'false'
             ))
-        ->where('user_id = ?', $friend->getId())
-        ->where('organization_id = ?', $this->getId())
-        ->where('role_id = ?', Roles::getId($role));
+            ->where('user_id = ?', $friend->getId())
+            ->where('organization_id = ?', $this->getId())
+            ->where('role_id = ?', Roles::getId($role));
 
         $p_get_admins = $this->db->prepare($q_upd_staff->getStatement());
         $result = $p_get_admins->execute($q_upd_staff->getBindValues());
@@ -616,6 +602,24 @@ class Organization extends AbstractEntity
         return new Result(true, '');
     }
 
+    private static function addOwner(User $user, int $organization_id, PDO $db)
+    {
+        $q_ins_owner = App::queryFactory()->newInsert();
+
+        $q_ins_owner
+            ->into('users_organizations')
+            ->cols(array(
+                'user_id' => $user->getId(),
+                'organization_id' => $organization_id,
+                'by_default' => 0,
+                'status' => 'TRUE',
+                'role_id' => Roles::ROLE_ADMIN_ID,
+            ));
+
+        $p_ins_owner = $db->prepare($q_ins_owner->getStatement());
+        $result = $p_ins_owner->execute($q_ins_owner->getBindValues());
+        if ($result === FALSE) throw new DBQueryException('CANT_CREATE_ORGANIZATION', $db);
+    }
 
     public static function create($data, User $user, PDO $db)
     {
@@ -640,7 +644,7 @@ class Organization extends AbstractEntity
                 'img_url' => $data['img_url'],
                 'creator_id' => $user->getId(),
                 'email' => $data['email'],
-                'state_id' => self::ORGANIZATION_STATE_ON_MODERATION
+                'state_id' => self::ORGANIZATION_STATE_SHOWN
             )
         );
 
@@ -648,13 +652,13 @@ class Organization extends AbstractEntity
             ->returning(array('id'));
 
         $p_ins_organization = $db->prepare($q_ins_organization->getStatement());
-//        print_r($q_ins_organization->getBindValues());
 
         $result = $p_ins_organization->execute($q_ins_organization->getBindValues());
 
 
         if ($result === FALSE) throw new DBQueryException('CANT_CREATE_ORGANIZATION', $db);
         $result = $p_ins_organization->fetch(PDO::FETCH_ASSOC);
+        self::addOwner($user, $result['id'], $db);
         return new Result(true, '', array('organization_id' => $result['id']));
     }
 

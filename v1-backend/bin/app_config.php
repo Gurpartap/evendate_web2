@@ -18,17 +18,18 @@ require_once "{$BACKEND_FULL_PATH}/exceptions/AuthorizationException.php";
 class App
 {
 
-    private static $obj;
-    public static $DB_SERVER;
-    public static $DB_USER;
-    public static $DB_PASSWORD;
-    public static $DB_NAME;
-    public static $DOMAIN;
-    public static $NODE_DOMAIN;
-    public static $SCHEMA;
-    public static $DB_DSN;
-    public static $DB_PORT;
-    public static $SETTINGS;
+	private static $obj;
+	public static $ENV;
+	public static $DB_SERVER;
+	public static $DB_USER;
+	public static $DB_PASSWORD;
+	public static $DB_NAME;
+	public static $DOMAIN;
+	public static $NODE_DOMAIN;
+	public static $SCHEMA;
+	public static $DB_DSN;
+	public static $DB_PORT;
+	public static $SETTINGS;
 
     public static $QUERY_FACTORY;
 
@@ -70,16 +71,17 @@ class App
         $config_json = file_get_contents($filename);
         self::$obj = json_decode($config_json, false);
 
-        self::$obj = self::$obj->{$_SERVER['ENV']};
-        self::$DB_NAME = self::$obj->db->database;
-        self::$DB_SERVER = self::$obj->db->host;
-        self::$DB_USER = self::$obj->db->user;
-        self::$DB_PASSWORD = self::$obj->db->password;
-        self::$DB_PORT = self::$obj->db->port;
-        self::$DOMAIN = self::$obj->domain;
-        self::$NODE_DOMAIN = self::$obj->node_domain;
-        self::$SCHEMA = self::$obj->schema;
-        self::$SETTINGS = self::$obj;
+		self::$obj = self::$obj->{$_SERVER['ENV']};
+		self::$DB_NAME = self::$obj->db->database;
+		self::$DB_SERVER = self::$obj->db->host;
+		self::$DB_USER = self::$obj->db->user;
+		self::$DB_PASSWORD = self::$obj->db->password;
+		self::$DB_PORT = self::$obj->db->port;
+		self::$DOMAIN = self::$obj->domain;
+		self::$NODE_DOMAIN = self::$obj->node_domain;
+		self::$SCHEMA = self::$obj->schema;
+		self::$SETTINGS = self::$obj;
+		self::$ENV = $_SERVER['ENV'];
 
         self::$DB_DSN = 'pgsql:host=' . self::$DB_SERVER . ';dbname=' . self::$DB_NAME . ';port=' . self::$DB_PORT;
     }
@@ -200,16 +202,23 @@ class App
         return $randomString;
     }
 
-    public static function getAuthURLs(string $type)
-    {
-        $is_mobile = $type == 'mobile' ? 'true' : 'false';
+	public static function createMysqlDB() {
+		global $__mysql_db;
+		$driver_options = array(PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION);
+		$mysql_opts = App::$SETTINGS->mysql_db;
+		$__mysql_db = new PDO('mysql:host=' . $mysql_opts->host . ';dbname=' . $mysql_opts->database . ';charset=utf8;port=' . $mysql_opts->port, $mysql_opts->user, $mysql_opts->password, $driver_options);
+	}
 
-        return new Result(true, '', array(
-            'vk' => 'https://oauth.vk.com/authorize?client_id=' . self::$SETTINGS->VK->APP_ID . '&scope=groups,friends,email,wall,offline,pages,photos,groups&redirect_uri=http://' . self::$DOMAIN . '/redirectOauth.php?mobile=' . $is_mobile . '%26type=vk&response_type=token',
-            'google' => 'https://accounts.google.com/o/oauth2/auth?scope=email%20profile%20https://www.googleapis.com/auth/plus.login&redirect_uri=http://' . self::$DOMAIN . '/redirectOauth.php?mobile=' . $is_mobile . '%26type=google&response_type=token&client_id=' . self::$SETTINGS->google->web->client_id,
-            'facebook' => 'https://www.facebook.com/dialog/oauth?client_id=' . self::$SETTINGS->facebook->app_id . '&response_type=token&scope=public_profile,email,user_friends&display=popup&redirect_uri=http://' . self::$DOMAIN . '/redirectOauth.php?mobile=' . $is_mobile . '%26type=facebook'
-        ));
-    }
+	public static function getAuthURLs(string $type){
+		$is_mobile = $type == 'mobile' ? 'true' : 'false';
+        $scheme = $type == 'mobile' || App::$ENV != 'prod' ? 'http://' : 'https://';
+
+		return new Result(true, '', array(
+			'vk' => 'https://oauth.vk.com/authorize?client_id='. self::$SETTINGS->VK->APP_ID . '&scope=groups,friends,email,wall,offline,pages,photos,groups&redirect_uri='. $scheme . self::$DOMAIN . '/redirectOauth.php?mobile=' . $is_mobile . '%26type=vk&response_type=token',
+			'google' => 'https://accounts.google.com/o/oauth2/auth?scope=email%20profile%20https://www.googleapis.com/auth/plus.login&redirect_uri=' . $scheme . self::$DOMAIN . '/redirectOauth.php?mobile=' . $is_mobile . '%26type=google&response_type=token&client_id=' . self::$SETTINGS->google->web->client_id,
+			'facebook' => 'https://www.facebook.com/dialog/oauth?client_id=' . self::$SETTINGS->facebook->app_id . '&response_type=token&scope=public_profile,email,user_friends&display=popup&redirect_uri='. $scheme . self::$DOMAIN . '/redirectOauth.php?mobile=' . $is_mobile . '%26type=facebook'
+		));
+	}
 
     public static function prepareSearchStatement($value, $glue = '&')
     {
@@ -225,6 +234,6 @@ class App
 
     public static function prepareStatisticsData()
     {
-        
+
     }
 }

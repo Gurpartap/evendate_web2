@@ -123,6 +123,7 @@ $__modules['events'] = array(
         },
         '{{/(id:[0-9]+)}/favorites}' => function ($id) use ($__db, $__request, $__user, $__fields) {
             $event = EventsCollection::one($__db, $__user, intval($id), array());
+            Statistics::Event($event, $__user, $__db, Statistics::EVENT_FAVE);
             return $__user->addFavoriteEvent($event);
         },
         '' => function () use ($__db, $__request, $__user) {
@@ -179,6 +180,7 @@ $__modules['events'] = array(
         },
         '{/(id:[0-9]+)/favorites}' => function ($id) use ($__db, $__request, $__user) {
             $event = EventsCollection::one($__db, $__user, intval($id), array());
+            Statistics::Event($event, $__user, $__db, Statistics::EVENT_UNFAVE);
             return $__user->deleteFavoriteEvent($event);
         }
     )

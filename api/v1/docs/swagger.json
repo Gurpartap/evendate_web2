@@ -913,6 +913,28 @@
           },
           {
             "in": "query",
+            "name": "is_delayed",
+            "description": "get ONLY delayed events.[WARNING] works only with organization_id",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ]
+          },
+          {
+            "in": "query",
+            "name": "is_canceled",
+            "description": "get ONLY canceled events.[WARNING] works only with organization_id",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ]
+          },
+          {
+            "in": "query",
             "name": "since",
             "description": "events since date",
             "required": false,
@@ -2449,6 +2471,15 @@
         "[site_url]": {
           "type": "string"
         },
+        "[facebook_url]": {
+          "type": "string"
+        },
+        "[vk_url]": {
+          "type": "string"
+        },
+        "[default_address]": {
+          "type": "string"
+        },
         "[subscribed_count]": {
           "type": "integer",
           "format": "int32"
@@ -2464,6 +2495,9 @@
         "[is_subscribed]": {
           "type": "boolean"
         },
+        "[is_new]": {
+          "type": "boolean"
+        },
         "[subscription_id]": {
           "type": "integer",
           "format": "int32"
@@ -2471,6 +2505,9 @@
         "[new_events_count]": {
           "type": "integer",
           "format": "int32"
+        },
+        "[email]": {
+          "type": "string"
         },
         "[events]": {
           "type": "array",
