@@ -804,10 +804,20 @@ $(document).ready(function () {
                 }
             });
         });
+
+        OneSignal.push(["registerForPushNotifications"]);
         event.preventDefault();
     }
 
-    var OneSignal = OneSignal || [];
+    var OneSignal = window.OneSignal || [];
+
+    OneSignal.push(["init", {
+        appId: "7471a586-01f3-4eef-b989-c809700a8658",
+        autoRegister: false,
+        notifyButton: {
+            enable: false /* Set to false to hide */
+        }
+    }]);
 
     OneSignal.push(function () {
         // If we're on an unsupported browser, do nothing

@@ -104,7 +104,7 @@ $user_full_name = $user->getLastName() . ' ' . $user->getFirstName(); ?>
     <meta name="msapplication-TileImage" content="/app/img/favicon/ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
     <!--    Push notifications in browser    -->
-    <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async></script>
+    <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js"></script>
 </head>
 
 <body>
