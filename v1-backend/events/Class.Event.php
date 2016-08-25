@@ -280,7 +280,7 @@ class Event extends AbstractEntity
 
         if (isset($data['title'])) {
             if (mb_strlen($data['title']) <= 5) throw new InvalidArgumentException('Слишком короткое название. Должно быть не менее 5 символов.');
-            if (mb_strlen($data['title']) > 500) throw new InvalidArgumentException('Слишком длинное название. Должно быть не более 150 символов.');
+            if (mb_strlen($data['title']) > 150) throw new InvalidArgumentException('Слишком длинное название. Должно быть не более 150 символов.');
         }
 
         function sortByStartTime($a, $b)
