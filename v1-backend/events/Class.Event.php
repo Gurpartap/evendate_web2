@@ -316,11 +316,12 @@ class Event extends AbstractEntity
                 if ($data['public_at'] < new DateTime()) {
                     throw new InvalidArgumentException('Время отложенной публикации не может быть меньше текущего времени.');
                 }
+                $data['notification_at'] = clone $data['public_at'];
+                $data['notification_at']->modify('+10 minutes');
             } else {
-                $data['public_at'] = new DateTime();
+                $data['public_at'] = null;
+                $data['notification_at'] = (new DateTime())->modify('+10 minutes');
             }
-            $data['notification_at'] = clone $data['public_at'];
-            $data['notification_at']->modify('+10 minutes');
         } catch (Exception $e) {
             $data['public_at'] = null;
             $data['notification_at'] = (new DateTime())->modify('+10 minutes');
