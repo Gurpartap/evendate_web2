@@ -125,6 +125,7 @@ hr[title]:before {
 }
 
 .img_holder > img {
+	display: block;
 	max-width: 100%;
 	max-height: 100%;
 }
@@ -166,11 +167,11 @@ hr[title]:before {
 	left: 0;
 	right: 0;
 	height: 100%;
-	background-image: -webkit-linear-gradient(top, transparent, #fff);
-	background-image: -moz-linear-gradient(top, transparent, #fff);
-	background-image: -ms-linear-gradient(top, transparent, #fff);
-	background-image: -o-linear-gradient(top, transparent, #fff);
-	background-image: linear-gradient(to bottom, transparent, #fff);
+	background-image: -webkit-linear-gradient(top, hsla(0,0%,100%,0), #fff);
+	background-image: -moz-linear-gradient(top, hsla(0,0%,100%,0), #fff);
+	background-image: -ms-linear-gradient(top, hsla(0,0%,100%,0), #fff);
+	background-image: -o-linear-gradient(top, hsla(0,0%,100%,0), #fff);
+	background-image: linear-gradient(to bottom, hsla(0,0%,100%,0), #fff);
 	-webkit-transition: height .3s ease;
 	-moz-transition: height .3s ease;
 	-o-transition: height .3s ease;
@@ -2839,11 +2840,11 @@ html.-noscroll {
 	left: 0;
 	right: 0;
 	bottom: 0;
-	background-image: -webkit-linear-gradient(top, transparent 0%, #fff 95%);
-	background-image: -moz-linear-gradient(top, transparent 0%, #fff 95%);
-	background-image: -ms-linear-gradient(top, transparent 0%, #fff 95%);
-	background-image: -o-linear-gradient(top, transparent 0%, #fff 95%);
-	background-image: linear-gradient(to bottom, transparent 0%, #fff 95%);
+	background-image: -webkit-linear-gradient(top, hsla(0,0%,100%,0) 0%, #fff 95%);
+	background-image: -moz-linear-gradient(top, hsla(0,0%,100%,0) 0%, #fff 95%);
+	background-image: -ms-linear-gradient(top, hsla(0,0%,100%,0) 0%, #fff 95%);
+	background-image: -o-linear-gradient(top, hsla(0,0%,100%,0) 0%, #fff 95%);
+	background-image: linear-gradient(to bottom, hsla(0,0%,100%,0) 0%, #fff 95%);
 }
 
 .organization_header_bottom {
