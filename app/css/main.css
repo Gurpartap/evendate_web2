@@ -3206,11 +3206,12 @@ html.-noscroll {
 .feed_event_header > .avatar_block {display: inline-block}
 
 .feed_event_title {
+	height: 3.3em;
 	margin: 0.7em 0 0;
 	font-size: 18px;
+	line-height: 1.1;
 	font-weight: 700;
 	text-align: left;
-	text-overflow: ellipsis;
 	overflow: hidden;
 }
 
