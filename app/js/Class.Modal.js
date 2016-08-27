@@ -72,7 +72,11 @@ Modal.bindCallModal = function($parent){
 							} else {
 								var str = $this.css('background-image');
 								if(str !== 'none'){
-									url = str.slice(str.indexOf('"')+1, str.indexOf('"', str.indexOf('"') + 1));
+									if(str.indexOf('"') != -1){
+										url = str.slice(str.indexOf('"')+1, str.indexOf('"', str.indexOf('"') + 1));
+									} else {
+										url = str.slice(str.indexOf('(')+1, str.indexOf(')'));
+									}
 								}
 								type = type ? type : 'image';
 							}

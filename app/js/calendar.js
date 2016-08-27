@@ -1978,7 +1978,7 @@ function EditEvent($view){
 		if($link.val()){
 			post_text += $link.val()
 		} else if(event_id) {
-			post_text += 'http://evendate.ru/event.php?id='+event_id;
+			post_text += 'https://evendate.ru/event/'+event_id;
 		}
 
 		$post.val(post_text);
