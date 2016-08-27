@@ -503,11 +503,8 @@ input, select, textarea, button {font-family: inherit}
 .form_select2.form_input.select2-container-multi > .select2-choices > .select2-search-choice {
 	padding: 4px 6px 4px 19px;
 	margin: 0 5px 0 0;
-	border-color: #c5c9d1;
-	border-color: var(--color_primary_30);
 	border: 0;
-	color: #4a4a4a;
-	color: var(--color_text);
+	color: #fff;
 }
 
 .form_select2.form_input.select2-container-multi > .select2-choices > li {
@@ -521,8 +518,7 @@ input, select, textarea, button {font-family: inherit}
 	top: 0;
 	bottom: 0;
 	margin: auto;
-	color: #4a4a4a;
-	color: var(--color_text);
+	color: #fff;
 }
 
 /* /Form Select2 */
