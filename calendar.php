@@ -226,7 +226,7 @@ $user_full_name = $user->getLastName() . ' ' . $user->getFirstName(); ?>
         <!-- END row-->
 
         <!-- START row-->
-        <div class="onboarding-app -hidden PageView" data-controller="Onboarding">
+        <div class="onboarding-app app_view -hidden PageView" data-controller="Onboarding">
             <div class="page_wrapper"></div>
         </div>
         <!-- END row-->

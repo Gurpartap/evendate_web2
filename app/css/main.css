@@ -9,6 +9,8 @@
 	--color_franklin: #28be84;
 	--color_franklin_alt: #23d792;
 
+	--color_error: #ff6b00;
+
 	--color_text: #4a4a4a;
 
 	--color_background: #f6f6f6;
@@ -82,6 +84,7 @@ a.-odd:focus {text-decoration: none}
 .-cf:after {clear: both}
 
 .tab,
+.stamp,
 .action,
 .button,
 .form_radio + .form_label,
@@ -112,7 +115,7 @@ a.-odd:focus {text-decoration: none}
 }
 
 img[src=''],
-img:not([src]) {display: none}
+img:not([src]) {display: none !important;}
 
 hr[title]:before {
 	content: attr(title);
@@ -125,6 +128,7 @@ hr[title]:before {
 }
 
 .img_holder > img {
+	display: block;
 	max-width: 100%;
 	max-height: 100%;
 }
@@ -166,11 +170,11 @@ hr[title]:before {
 	left: 0;
 	right: 0;
 	height: 100%;
-	background-image: -webkit-linear-gradient(top, transparent, #fff);
-	background-image: -moz-linear-gradient(top, transparent, #fff);
-	background-image: -ms-linear-gradient(top, transparent, #fff);
-	background-image: -o-linear-gradient(top, transparent, #fff);
-	background-image: linear-gradient(to bottom, transparent, #fff);
+	background-image: -webkit-linear-gradient(top, hsla(0,0%,100%,0), #fff);
+	background-image: -moz-linear-gradient(top, hsla(0,0%,100%,0), #fff);
+	background-image: -ms-linear-gradient(top, hsla(0,0%,100%,0), #fff);
+	background-image: -o-linear-gradient(top, hsla(0,0%,100%,0), #fff);
+	background-image: linear-gradient(to bottom, hsla(0,0%,100%,0), #fff);
 	-webkit-transition: height .3s ease;
 	-moz-transition: height .3s ease;
 	-o-transition: height .3s ease;
@@ -499,11 +503,8 @@ input, select, textarea, button {font-family: inherit}
 .form_select2.form_input.select2-container-multi > .select2-choices > .select2-search-choice {
 	padding: 4px 6px 4px 19px;
 	margin: 0 5px 0 0;
-	border-color: #c5c9d1;
-	border-color: var(--color_primary_30);
 	border: 0;
-	color: #4a4a4a;
-	color: var(--color_text);
+	color: #fff;
 }
 
 .form_select2.form_input.select2-container-multi > .select2-choices > li {
@@ -517,8 +518,7 @@ input, select, textarea, button {font-family: inherit}
 	top: 0;
 	bottom: 0;
 	margin: auto;
-	color: #4a4a4a;
-	color: var(--color_text);
+	color: #fff;
 }
 
 /* /Form Select2 */
@@ -895,19 +895,18 @@ input, select, textarea, button {font-family: inherit}
 /* /Form group */
 /* Form -status */
 
-.form_unit.-status_error {color: #f82969; color: var(--color_accent);}
+.form_unit.-status_error,
 .form_unit.-status_error > .form_input:-moz-placeholder,
 .form_unit.-status_error > .form_textarea:-moz-placeholder,
 .form_unit.-status_error > .form_input::-webkit-input-placeholder,
-.form_unit.-status_error > .form_textarea::-webkit-input-placeholder {color: #ff5f9e; color: var(--color_accent_alt);}
+.form_unit.-status_error > .form_textarea::-webkit-input-placeholder {color: #ff6b00; color: var(--color_error);}
 
 .form_unit.-status_error > .form_input,
 .form_unit.-status_error > .form_select,
 .form_unit.-status_error > .form_textarea  {
-	border-color: #f82969;
-	border-color: var(--color_accent);
-	box-shadow: 0 0 3px #ff5f9e;
-	box-shadow: 0 0 3px var(--color_accent_alt);
+	border-color: #ff6b00;
+	border-color: var(--color_error);
+	box-shadow: 0 0 3px rgba(255, 53, 0, 0.6);
 }
 
 
@@ -1527,7 +1526,7 @@ a.button:hover {text-decoration: none}
 /* /Notification */
 /* Modal */
 
-html.-open_modal {overflow: hidden}
+body.-open_modal {overflow: hidden}
 html.-noscroll {
 	position: fixed;
 	overflow-y: scroll;
@@ -1538,9 +1537,9 @@ html.-noscroll {
 	position: fixed;
 	top: 0;
 	left: 0;
+	display: block;
 	width: 100%;
 	height: 100%;
-	display: none;
 	overflow: auto;
 	outline: 0;
 	-webkit-overflow-scrolling: touch;
@@ -1556,7 +1555,7 @@ html.-noscroll {
 }
 
 .modal_unit {
-	display: none;
+	display: block;
 	width: 800px;
 	margin: 100px auto;
 	background-color: #fff;
@@ -1569,8 +1568,26 @@ html.-noscroll {
 	background-color: transparent;
 	box-shadow: none;
 }
-.modal_unit.-active,
-.modal_wrapper.-active {display: block}
+
+.modal_wrapper,
+.modal_unit {
+	-webkit-transition: opacity .3s ease, visibility .3s ease;
+	-moz-transition: opacity .3s ease, visibility .3s ease;
+	-o-transition: opacity .3s ease, visibility .3s ease;
+	transition: opacity .3s ease, visibility .3s ease;
+}
+
+.modal_wrapper,
+.modal_unit.-faded {
+	opacity: 0;
+	visibility: hidden;
+}
+
+.modal_unit,
+body.-open_modal > .modal_wrapper {
+	opacity: 1;
+	visibility: visible;
+}
 
 .modal_header {
 	padding: 10px 25px;
@@ -1700,7 +1717,6 @@ html.-noscroll {
 	background-color: #657184;
 	background-color: var(--color_primary_80);
 }
-.calendar_weekday {text-align: inherit} /*FUB*/
 .-weekday_selection .calendar_weekday {cursor: pointer}
 
 .calendar_day:not(.-disabled) {cursor: pointer}
@@ -2042,6 +2058,54 @@ html.-noscroll {
 }
 
 /* /Counter */
+/* Stamp */
+
+.stamp {
+	display: inline-block;
+	vertical-align: middle;
+	padding: 4px 12px;
+	font-size: 12px;
+	font-weight: 500;
+	text-transform: uppercase;
+	border-radius: 50px;
+	-webkit-transition: color .4s ease, background-color .4s ease;
+	-moz-transition: color .4s ease, background-color .4s ease;
+	-ms-transition: color .4s ease, background-color .4s ease;
+	-o-transition: color .4s ease, background-color .4s ease;
+	transition: color .4s ease, background-color .4s ease;
+}
+
+.stamp.-color_primary,
+.stamp.-color_accent,
+.stamp.-color_accent_alt,
+.-state_statistics .stamp.-color_accent,
+.-state_statistics .stamp.-color_accent_alt {color: #fff}
+
+.stamp.-color_primary {background-color: #3e4d66; background-color: var(--color_primary);}
+.stamp.-color_accent {background-color: #f82969; background-color: var(--color_accent);}
+.stamp.-color_accent_alt {background-color: #ff5f9e; background-color: var(--color_accent_alt);}
+.-state_statistics .stamp.-color_accent {background-color: #28be84; background-color: var(--color_franklin);}
+.-state_statistics .stamp.-color_accent_alt {background-color: #23d792; background-color: var(--color_franklin_alt);}
+
+
+.stamp.-color_marginal,
+.stamp.-color_neutral {color: #657184; color: var(--color_primary_80);}
+.stamp.-color_neutral_primary,
+.stamp.-color_marginal_primary {color: #3e4d66; color: var(--color_primary);}
+.stamp.-color_neutral_accent,
+.stamp.-color_marginal_accent {color: #f82969; color: var(--color_accent);}
+.-state_statistics .stamp.-color_neutral_accent,
+.-state_statistics .stamp.-color_marginal_accent {color: #28be84; color: var(--color_franklin);}
+
+.stamp.-color_neutral,
+.stamp.-color_neutral_primary,
+.stamp.-color_neutral_accent {background-color: #fff}
+
+.stamp.-color_marginal,
+.stamp.-color_marginal_primary,
+.stamp.-color_marginal_accent {background-color: #e0e0e0}
+
+/* /Stamp */
 /* Page */
 
 .page_wrapper {
@@ -2090,11 +2154,6 @@ html.-noscroll {
 /* FUCK YOU BOOTSTRAP */
 
 .wrapper > section {z-index: auto}
-.blurheader {
-	opacity: 1;
-	z-index: 100;
-}
-
 
 .alert-danger,
 .alert-success {
@@ -2247,7 +2306,7 @@ html.-noscroll {
 	padding: 6px;
 	margin-left: 24px;
 	white-space: normal;
-	border-radius: 2px;
+	border-radius: 21px;
 	cursor: pointer;
 }
 
@@ -2291,7 +2350,20 @@ html.-noscroll {
 #main_section {padding-top: 54px}
 #main_header.-with_tabs + #main_section {padding-top: 90px}
 
-.app_view {height: 100%}
+.app_view {
+	height: 100%;
+	opacity: 1;
+	visibility: visible;
+	-webkit-transition: opacity .5s ease, visibility .5s ease;
+	-moz-transition: opacity .5s ease, visibility .5s ease;
+	-o-transition: opacity .5s ease, visibility .5s ease;
+	transition: opacity .5s ease, visibility .5s ease;
+}
+
+.app_view.-faded {
+	opacity: 0;
+	visibility: hidden;
+}
 
 
 #main_sidebar {
@@ -2839,11 +2911,11 @@ html.-noscroll {
 	left: 0;
 	right: 0;
 	bottom: 0;
-	background-image: -webkit-linear-gradient(top, transparent 0%, #fff 95%);
-	background-image: -moz-linear-gradient(top, transparent 0%, #fff 95%);
-	background-image: -ms-linear-gradient(top, transparent 0%, #fff 95%);
-	background-image: -o-linear-gradient(top, transparent 0%, #fff 95%);
-	background-image: linear-gradient(to bottom, transparent 0%, #fff 95%);
+	background-image: -webkit-linear-gradient(top, hsla(0,0%,100%,0) 0%, #fff 95%);
+	background-image: -moz-linear-gradient(top, hsla(0,0%,100%,0) 0%, #fff 95%);
+	background-image: -ms-linear-gradient(top, hsla(0,0%,100%,0) 0%, #fff 95%);
+	background-image: -o-linear-gradient(top, hsla(0,0%,100%,0) 0%, #fff 95%);
+	background-image: linear-gradient(to bottom, hsla(0,0%,100%,0) 0%, #fff 95%);
 }
 
 .organization_header_bottom {
@@ -3206,11 +3278,12 @@ html.-noscroll {
 .feed_event_header > .avatar_block {display: inline-block}
 
 .feed_event_title {
+	height: 3.3em;
 	margin: 0.7em 0 0;
 	font-size: 18px;
+	line-height: 1.1;
 	font-weight: 700;
 	text-align: left;
-	text-overflow: ellipsis;
 	overflow: hidden;
 }
 
