@@ -829,20 +829,17 @@ function renderState(){
 		if(!$cur_view.is($new_view))
 			$('#main_header').removeClass('-with_tabs');
 		
+		$('body').find('[data-page], .Controller').removeClass('-Handled_Controller').off('mousedown.pageRender');
 		$cur_view.addClass('-faded');
 		setTimeout(function(){
 			$cur_view.addClass(__C.CLASSES.NEW_HIDDEN);
 			$new_view.addClass('-faded').removeClass(__C.CLASSES.NEW_HIDDEN);
 			controller($new_view);
+			bindControllers();
 			setTimeout(function(){
 				$new_view.removeClass('-faded');
 			}, 300);
 		}, 500);
-		//$views.not($view).addClass(__C.CLASSES.HIDDEN).addClass('-fade_out');
-		/*
-		$views.not($view).removeClass('-fade_in -hidden').addClass('-fade_out');
-		controller($view);
-		$view.removeClass('-fade_out').addClass('-fade_in');*/
 	}
 	
 	changeMainTitle(state.title);

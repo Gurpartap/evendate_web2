@@ -152,7 +152,7 @@ $user_full_name = $user->getLastName() . ' ' . $user->getFirstName(); ?>
     <div id="main_section">
 
         <!-- START row-->
-        <div class="friends-app app_view -fade_out PageView" data-controller="Friends">
+        <div class="friends-app app_view -hidden PageView" data-controller="Friends">
             <div class="page_wrapper" style="padding-top: 100px;">
 
                 <div class="no-friends-block hidden">
@@ -191,53 +191,53 @@ $user_full_name = $user->getLastName() . ' ' . $user->getFirstName(); ?>
         <!-- END row-->
 
         <!-- START row-->
-        <div class="search-app app_view -fade_out PageView" data-controller="Search">
+        <div class="search-app app_view -hidden PageView" data-controller="Search">
             <div class="search-organizations"></div>
             <div class="search-events"></div>
         </div>
         <!-- END row-->
 
         <!-- START row-->
-        <div class="edit_event-app app_view -fade_out PageView" data-controller="EditEvent">
+        <div class="edit_event-app app_view -hidden PageView" data-controller="EditEvent">
             <div class="page_wrapper"></div>
         </div>
         <!-- END row-->
 
         <!-- START row-->
-        <div class="event-app app_view -fade_out PageView" data-controller="OneEvent">
+        <div class="event-app app_view -hidden PageView" data-controller="OneEvent">
             <div class="page_wrapper"></div>
         </div>
 
         <!-- START row-->
-        <div class="feed-app app_view -fade_out PageView" data-controller="Feed">
+        <div class="feed-app app_view -hidden PageView" data-controller="Feed">
             <div class="page_wrapper"></div>
         </div>
 
         <!-- START row-->
-        <div class="organizations-app app_view -fade_out PageView" data-controller="OrganizationsList">
-            <div class="page_wrapper"></div>
-        </div>
-        <!-- END row-->
-
-        <!-- START row-->
-        <div class="organization-app app_view -fade_out PageView" data-controller="Organization">
+        <div class="organizations-app app_view -hidden PageView" data-controller="OrganizationsList">
             <div class="page_wrapper"></div>
         </div>
         <!-- END row-->
 
         <!-- START row-->
-        <div class="onboarding-app app_view -fade_out PageView" data-controller="Onboarding">
+        <div class="organization-app app_view -hidden PageView" data-controller="Organization">
             <div class="page_wrapper"></div>
         </div>
         <!-- END row-->
 
         <!-- START row-->
-        <div class="statistics-app app_view -fade_out PageView" data-controller="Statistics">
+        <div class="onboarding-app app_view -hidden PageView" data-controller="Onboarding">
+            <div class="page_wrapper"></div>
+        </div>
+        <!-- END row-->
+
+        <!-- START row-->
+        <div class="statistics-app app_view -hidden PageView" data-controller="Statistics">
             <div class="page_wrapper"></div>
         </div>
 
         <!-- START row-->
-        <div class="add-organization-app app_view -fade_out PageView" data-controller="AddOrganization">
+        <div class="add-organization-app app_view -hidden PageView" data-controller="AddOrganization">
             <div class="page_wrapper"></div>
         </div>
 
