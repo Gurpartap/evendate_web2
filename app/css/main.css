@@ -1702,7 +1702,6 @@ html.-noscroll {
 	background-color: #657184;
 	background-color: var(--color_primary_80);
 }
-.calendar_weekday {text-align: inherit} /*FUB*/
 .-weekday_selection .calendar_weekday {cursor: pointer}
 
 .calendar_day:not(.-disabled) {cursor: pointer}
@@ -2140,11 +2139,6 @@ html.-noscroll {
 /* FUCK YOU BOOTSTRAP */
 
 .wrapper > section {z-index: auto}
-.blurheader {
-	opacity: 1;
-	z-index: 100;
-}
-
 
 .alert-danger,
 .alert-success {
