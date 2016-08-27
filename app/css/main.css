@@ -113,7 +113,7 @@ a.-odd:focus {text-decoration: none}
 }
 
 img[src=''],
-img:not([src]) {display: none}
+img:not([src]) {display: none !important;}
 
 hr[title]:before {
 	content: attr(title);
@@ -2341,7 +2341,20 @@ html.-noscroll {
 #main_section {padding-top: 54px}
 #main_header.-with_tabs + #main_section {padding-top: 90px}
 
-.app_view {height: 100%}
+.app_view {
+	height: 100%;
+	opacity: 1;
+	visibility: visible;
+	-webkit-transition: opacity .5s ease, visibility .5s ease;
+	-moz-transition: opacity .5s ease, visibility .5s ease;
+	-o-transition: opacity .5s ease, visibility .5s ease;
+	transition: opacity .5s ease, visibility .5s ease;
+}
+
+.app_view.-faded {
+	opacity: 0;
+	visibility: hidden;
+}
 
 
 #main_sidebar {
