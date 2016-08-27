@@ -9,6 +9,8 @@
 	--color_franklin: #28be84;
 	--color_franklin_alt: #23d792;
 
+	--color_error: #ff6b00;
+
 	--color_text: #4a4a4a;
 
 	--color_background: #f6f6f6;
@@ -897,19 +899,18 @@ input, select, textarea, button {font-family: inherit}
 /* /Form group */
 /* Form -status */
 
-.form_unit.-status_error {color: #f82969; color: var(--color_accent);}
+.form_unit.-status_error,
 .form_unit.-status_error > .form_input:-moz-placeholder,
 .form_unit.-status_error > .form_textarea:-moz-placeholder,
 .form_unit.-status_error > .form_input::-webkit-input-placeholder,
-.form_unit.-status_error > .form_textarea::-webkit-input-placeholder {color: #ff5f9e; color: var(--color_accent_alt);}
+.form_unit.-status_error > .form_textarea::-webkit-input-placeholder {color: #ff6b00; color: var(--color_error);}
 
 .form_unit.-status_error > .form_input,
 .form_unit.-status_error > .form_select,
 .form_unit.-status_error > .form_textarea  {
-	border-color: #f82969;
-	border-color: var(--color_accent);
-	box-shadow: 0 0 3px #ff5f9e;
-	box-shadow: 0 0 3px var(--color_accent_alt);
+	border-color: #ff6b00;
+	border-color: var(--color_error);
+	box-shadow: 0 0 3px rgba(255, 53, 0, 0.6);
 }
 
 
