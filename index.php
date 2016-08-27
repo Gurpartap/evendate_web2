@@ -306,12 +306,12 @@ $title = 'Evendate';
                     </div>
                 </div>
             </div>
-            <div class="text-slide text-slide-3 container-centered" data-slide="3">
+            <div class="text-slide text-slide-3 container-centered text-slide-decorator" data-slide="3">
+                <h2 class="js-animate-this hidden-md hidden-lg">Скачай приложения<br/>прямо сейчас</h2>
                 <h1 class="js-animate-this choose-interests-text">
                     <span class="hidden-sm hidden-xs">Выбери то, что интересно</span>
-                    <span class="hidden-md hidden-lg">Начни использовать прямо сейчас</span>
                 </h1>
-                <div class="js-animate-this hidden-sm hidden-xs">
+                <div class="js-animate-this hidden-sm hidden-xs is-mobile-hidden">
                     <div class="row col-md-12">
                         <div class="col-md-3">
                             <div class="interests-block">
@@ -551,7 +551,7 @@ $title = 'Evendate';
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
 <script>window.jQuery || document.write('<script src="assets/components/jquery.js"><\/script>');</script>
-<script src="<?= App::$SCHEMA . App::$NODE_DOMAIN ?>:8080/socket.io/socket.io.js" type="text/javascript"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js" type="text/javascript"></script>
 <script src="app/js/app.js"></script>
 <?php
 require_once('footer.php');

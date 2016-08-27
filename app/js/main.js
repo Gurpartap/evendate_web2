@@ -805,14 +805,14 @@ function renderState(){
 		$sidebar_nav_items = $('.SidebarNavItem'),
 		$tabs = $('.HeaderTabsWrapper').find('.Tab'),
 		$views = $('.PageView'),
+		$cur_view = $views.not('.'+__C.CLASSES.NEW_HIDDEN),
 		state = History.getState(),
-		$view,
+		$new_view,
 		controller;
 	
 	if(!(state.data.reload === false && state.data._index+1 == History.getCurrentIndex())){
 		$(window).off('scroll');
 		$(window).data('disable_upload', false);
-		$('#main_header').removeClass('-with_tabs');
 		switch(typeof __STATES[page]){
 			case 'function': {
 				controller = __STATES[page];
@@ -825,11 +825,21 @@ function renderState(){
 				return false;
 			}
 		}
-		$view = page == 'friend' ? $('.friends-app') : $views.filter('[data-controller="'  + controller.name + '"]');
+		$new_view = page == 'friend' ? $('.friends-app') : $views.filter('[data-controller="'  + controller.name + '"]');
+		if(!$cur_view.is($new_view))
+			$('#main_header').removeClass('-with_tabs');
 		
-		$views.not($view).addClass(__C.CLASSES.NEW_HIDDEN);
-		controller($view);
-		$view.removeClass(__C.CLASSES.NEW_HIDDEN);
+		$('body').find('[data-page], .Controller').removeClass('-Handled_Controller').off('mousedown.pageRender');
+		$cur_view.addClass('-faded');
+		setTimeout(function(){
+			$cur_view.addClass(__C.CLASSES.NEW_HIDDEN);
+			$new_view.addClass('-faded').removeClass(__C.CLASSES.NEW_HIDDEN);
+			controller($new_view);
+			bindControllers();
+			setTimeout(function(){
+				$new_view.removeClass('-faded');
+			}, 300);
+		}, 500);
 	}
 	
 	changeMainTitle(state.title);

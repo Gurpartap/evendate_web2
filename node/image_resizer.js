@@ -125,6 +125,10 @@ ImagesResize.prototype.resizeNew = function (config, callback) {
                         .or(organizations.background_img_url.notEquals(organizations.background_small_img_url))
                         .or(organizations.img_url.notEquals(organizations.img_medium_url))
                         .or(organizations.img_url.notEquals(organizations.img_small_url))
+                        .or(organizations.background_medium_img_url.isNull())
+                        .or(organizations.background_small_img_url.isNull())
+                        .or(organizations.img_medium_url.isNull())
+                        .or(organizations.img_small_url.isNull())
                 ).toQuery();
 
     //Resizing event images
@@ -181,6 +185,7 @@ ImagesResize.prototype.resizeNew = function (config, callback) {
 
 
     //Resizing organization images
+    console.log(q_get_changed_organization_images.text);
     client.query(q_get_changed_organization_images, function (err, result) {
 
         var queue = [];

@@ -11,6 +11,7 @@ function Modal(title, content){
 }
 Modal.last_id = 0;
 Modal.modals = {};
+Modal.active_modal = undefined;
 Modal.modal_destroyer = $('.modal_destroyer');
 Modal.modal_wrapper = $('.modal_wrapper');
 
@@ -22,6 +23,13 @@ Modal.pushModal = function(modal){
 		Modal.modals[keys[0]].destroy();
 	}
 	Modal.modal_wrapper.append(modal.modal);
+};
+
+Modal.hide = function(){
+	if(Modal.active_modal !== undefined){
+		Modal.active_modal.hide();
+	}
+	$('body').removeClass('-open_modal');
 };
 
 Modal.bindCallModal = function($parent){
@@ -64,7 +72,11 @@ Modal.bindCallModal = function($parent){
 							} else {
 								var str = $this.css('background-image');
 								if(str !== 'none'){
-									url = str.slice(str.indexOf('"')+1, str.indexOf('"', str.indexOf('"') + 1));
+									if(str.indexOf('"') != -1){
+										url = str.slice(str.indexOf('"')+1, str.indexOf('"', str.indexOf('"') + 1));
+									} else {
+										url = str.slice(str.indexOf('(')+1, str.indexOf(')'));
+									}
 								}
 								type = type ? type : 'image';
 							}
@@ -126,34 +138,43 @@ Modal.prototype.show = function(){
 	var self = this;
 
 	Modal.modal_wrapper.append(this.modal);
-	$('.modal_unit').removeClass(__C.CLASSES.NEW_ACTIVE);
-	$('html').addClass('-open_modal');
-	self.modal.addClass(__C.CLASSES.NEW_ACTIVE);
-	Modal.modal_wrapper.addClass(__C.CLASSES.NEW_ACTIVE);
+	$('body').addClass('-open_modal');
+	
+	if(Modal.active_modal !== undefined){
+		Modal.active_modal.hide();
+	}
+	Modal.active_modal = this;
+	
+	self.modal.addClass('-faded').removeClass(__C.CLASSES.NEW_HIDDEN);
+	self.adjustDestroyer();
+	self.modal.trigger('modal.show');
+	setTimeout(function(){
+		self.modal.removeClass('-faded');
+	}, 300);
+	
 	Modal.modal_destroyer.off('click.CloseModal').on('click.CloseModal', function(){
 		$(this).off('click.CloseModal');
-		self.hide();
+		Modal.hide();
 	});
 	self.modal.find('.CloseModal').off('click.CloseModal').on('click.CloseModal', function(){
-		self.hide();
+		Modal.hide();
 	});
 	$(document).on('keyup.CloseModal', function(event) {
 		if(event.keyCode == 27){
 			$(this).off('keyup.CloseModal');
-			self.hide();
+			Modal.hide();
 		}
 	});
-	self.adjustDestroyer();
-	self.modal.trigger('modal.show');
 };
 
 Modal.prototype.hide = function(){
-	if(this.modal.hasClass(__C.CLASSES.NEW_ACTIVE)){
-		$('html').removeClass('-open_modal');
-		Modal.modal_wrapper.removeClass(__C.CLASSES.NEW_ACTIVE);
-	}
-	this.modal.removeClass(__C.CLASSES.NEW_ACTIVE);
-	this.modal.trigger('modal.close');
+	var self = this;
+	Modal.active_modal = undefined;
+	self.modal.addClass('-faded');
+	setTimeout(function(){
+		self.modal.addClass(__C.CLASSES.NEW_HIDDEN);
+		self.modal.trigger('modal.close');
+	}, 300);
 };
 
 Modal.prototype.destroy = function(){
@@ -227,10 +248,10 @@ CropperModal.prototype.show = function(){
 
 	self.crop_button.off('click.Crop').on('click.Crop', function(){
 		self.crop();
-		self.hide();
+		Modal.hide();
 	});
 	self.destroy_crop_button.off('click.DestroyCrop').on('click.DestroyCrop', function(){
-		self.hide();
+		Modal.hide();
 	});
 };
 
@@ -275,35 +296,30 @@ MediaModal.prototype.show = function(){
 	var self = this,
 		$window = $(window),
 		window_max_w = $window.width() * 0.8,
-		window_max_h = $window.height() * 0.8,
-		$media, real_w, real_h, w, h;
-	self.__superCall('show');
-	switch(this.format){
-		default:
-		case 'image': {
-			function onLoad(){
-				real_w = $media.width();
-				real_h = $media.height();
-
-				if((real_w > window_max_w) || (real_h > window_max_h)){
-					w = (real_w > real_h) ? window_max_w : window_max_h * real_w / real_h;
-					h = (real_w > real_h) ? window_max_w * real_h / real_w : window_max_h;
-				} else {
-					w = real_w;
-					h = real_h;
+		$media, real_w, real_h;
+	
+	self.modal.on('modal.show', function() {
+		switch(this.format){
+			default:
+			case 'image': {
+				function onLoad(){
+					real_w = $media.width();
+					real_h = $media.height();
+					
+					self.modal.width((real_w > window_max_w) ? window_max_w : real_w);
+					self.modal.height((real_w > window_max_w) ? (window_max_w * real_h / real_w) : real_h);
+					$media.wrap($('<div>').addClass('img_holder'));
 				}
-				self.modal.width(w);
-				self.modal.height(h);
-				$media.wrap($('<div>').addClass('img_holder'));
-			}
-			$media = self.modal.find('img');
-			if($media.width()){
-				onLoad();
-			} else {
-				$media.on('load', onLoad)
+				$media = self.modal.find('img');
+				if($media.width()){
+					onLoad();
+				} else {
+					$media.on('load', onLoad)
+				}
 			}
 		}
-	}
+	});
+	self.__superCall('show');
 };
 
 
@@ -404,6 +420,7 @@ FavoredModal.prototype.show = function(){
 FavoredModal.prototype.hide = function(){
 	Modal.modal_wrapper.data('block_scroll', false).off('scroll.uploadFavored');
 	this.__superCall('hide');
+	Modal.hide();
 };
 
 FavoredModal.prototype.uploadFavored = function(callback){

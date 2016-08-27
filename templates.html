@@ -148,7 +148,7 @@
 
 			<h4 class="form_label"><label for="edit_event_title">Название</label></h4>
 			<div class="form_unit">
-				<input id="edit_event_title" class="form_input LimitSize" type="text" name="title" value="{title}" autocomplete="off" placeholder="Название мероприятия" data-maxlength="60" required>
+				<input id="edit_event_title" class="form_input LimitSize" type="text" name="title" value="{title}" autocomplete="off" placeholder="Название мероприятия" data-maxlength="150" required>
 			</div>
 
 			<h4 class="form_label">Дата</h4>
@@ -707,7 +707,7 @@
 			<div class="event_content">
 				<h3 class="event_title" title="{title}">{title}</h3>
 				<div class="event_description">{description}</div>
-				<div class="event_map CallModal EventMap" data-modal_type="map" style="background-image: url('http://maps.googleapis.com/maps/api/staticmap?markers={location_sanitized}&zoom=15&size=640x640&scale=2&format=png&maptype=roadmap&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg')" data-modal_map_location="{location_sanitized}"></div>
+				<div class="event_map CallModal EventMap" data-modal_type="map" style="background-image: url('https://maps.googleapis.com/maps/api/staticmap?markers={location_sanitized}&zoom=15&size=640x640&scale=2&format=png&maptype=roadmap&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg')" data-modal_map_location="{location_sanitized}"></div>
 			</div>
 		</div>
 		<div class="event_additional_content">
@@ -861,7 +861,7 @@
 <!-- Modals -->
 
 <script type="javascript/template" id="tmpl-modal">
-	<div class="modal_unit {modal_type}">
+	<div class="modal_unit {modal_type} -hidden -faded">
 		<header class="modal_header">
 			{modal_title}
 			<button class="button -empty -modal_destroyer -color_default CloseModal RippleEffect">&times;</button>

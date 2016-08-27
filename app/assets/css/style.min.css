@@ -1193,7 +1193,7 @@ h6 {
 @media only screen and (max-width: 1140px) {
     .content-text h2 {
         font-size: 36px;
-        line-height: 42px;
+        line-height: 36px;
     }
 }
 
@@ -1919,7 +1919,7 @@ h6 {
 }
 
 .is-mobile .home-page {
-    background: #4fd0ea;
+    background: #3a4962;
 }
 
 .is-mobile .prod-video {
@@ -2197,7 +2197,6 @@ h6 {
     .mobile-organizations.header-nav-link.organizations-link {
         display: block;
     }
-    .slide-cta.
 }
 
 .faq-section .page-title,
@@ -2904,4 +2903,15 @@ a.auth-small-btn.social-btn.google-lus-btn {
 
 .mobile-organizations.header-nav-link {
     display: none;
+}
+
+.is-mobile .is-mobile-hidden {
+    display: none !important;
+}
+
+.text-slide-decorator:not(.text-slide-3) h2{
+    font-size: 42px;
+    line-height: 46px;
+    color: #ffffff;
+    margin-bottom: 25px;
 }
