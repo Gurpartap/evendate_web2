@@ -76,6 +76,71 @@ function objectToHtmlDataSet(){
 	return dataset.join(' ');
 }
 
+function formatDates(dates){
+	var prev_day,
+		range = [],
+		dates_obj = {},
+		output = [],
+		genitive_month_names = [
+			'января',
+			'февраля',
+			'марта',
+			'апреля',
+			'мая',
+			'июня',
+			'июля',
+			'августа',
+			'сентября',
+			'октября',
+			'ноября',
+			'декабря'
+		];
+	
+	if(dates.length == 1){
+		return [moment.unix(dates[0].event_date).format('LL')];
+	}
+	
+	dates.forEach(function(date, i){
+		var this_day = moment.unix(date.event_date);
+		if(!dates_obj.hasOwnProperty(this_day.year())){
+			dates_obj[this_day.year()] = {};
+		}
+		if(!dates_obj[this_day.year()].hasOwnProperty(this_day.month())){
+			dates_obj[this_day.year()][this_day.month()] = [];
+		}
+		
+		if(!prev_day){
+			range = [this_day.format('D')];
+		} else {
+			if(this_day.month() == prev_day.month() && prev_day.diff(this_day, 'days') == -1){
+				range.push(this_day.format('D'));
+			} else {
+				dates_obj[prev_day.year()][prev_day.month()].push(range.length == 1 ? range.shift() : range.shift()+'-'+range.pop());
+				range = [this_day.format('D')];
+			}
+		}
+		
+		if(i === dates.length - 1){
+			dates_obj[this_day.year()][this_day.month()].push(range.length == 1 ? range.shift() : range.shift()+'-'+range.pop());
+		} else {
+			prev_day = this_day;
+		}
+	});
+	
+	for(var year in dates_obj){
+		if(dates_obj.hasOwnProperty(year)){
+			for(var month in dates_obj[year]){
+				if(dates_obj[year].hasOwnProperty(month)){
+					output.push(dates_obj[year][month].join(', ')+' '+genitive_month_names[month]+' '+year+' г.');
+				}
+			}
+		}
+	}
+	
+	
+	return output;
+}
+
 
 $.fn.extend({
 	toggleStatus: function(statuses) {
@@ -1037,235 +1102,4 @@ function getFriendsList($friends_right_list, cb){
 			if (cb) cb(res);
 		}
 	});
-}
-
-function getTagsString(tags){
-	var _tags = [];
-	if (tags instanceof Array == false) return null;
-	tags.forEach(function(tag){
-		_tags.push(tag.name);
-	});
-	return _tags.join(', ');
-}
-
-function bindEventHandlers(){
-
-	var $view = $('.screen-view:not(.hidden)');
-	$view.find('.tl-part:not(.tl-header)').each(function(){
-		var $this = $(this);
-		$this.height($view.find('.event-' + $this.data('event-id') + '-' + $this.data(__C.DATA_NAMES.DATE)).outerHeight());
-	});
-
-	$view.find('.more-info-btn').off('click').on('click', function(){
-		var $panel_block = $(this).parents('.tl-panel-block'),
-			$panel_wrapper = $panel_block.find('.tl-event-wrapper'),
-			event_id = $panel_block.data('event-id');
-
-		if($panel_block.hasClass('closed')){
-			$panel_block.removeClass('closed');
-			$panel_block.animate({height: $panel_wrapper.height() + 30}, 500, "easeOutBack", function(){
-				$panel_block.addClass('opened');
-				after();
-			});
-		} else {
-			$panel_block.removeClass('opened').addClass('closed').animate({height: $panel_wrapper.height() + 30}, 500, "easeInBack", after);
-		}
-		function after(){
-			$view.find('.timeline-' + $panel_block.data('event-id') + '-' + $panel_block.data(__C.DATA_NAMES.DATE))
-				.animate({height: $panel_block.outerHeight()}, 500);
-
-			storeStat(event_id, __C.STATS.EVENT_ENTITY, __C.STATS.EVENT_VIEW_DETAIL);
-		}
-	});
-
-	$view.find('.add-to-favorites').on('click', function(){
-		var $btn = $(this);
-
-		var $liked_count = $btn.parents('.tl-panel-block').find('.liked-users-count-number'),
-			$liked_count_text = $btn.parents('.tl-panel-block').find('.liked-users-count-text'),
-			_event_id = $btn.data('event-id'),
-			_date = $btn.parents('.tl-panel-block').data(__C.DATA_NAMES.DATE),
-			params = {
-				url: '/api/v1/events/' + _event_id + '/favorites/',
-				type: 'POST'
-			};
-
-		$btn.toggleClass(__C.CLASSES.NO_BORDERS);
-		$btn.text($btn.hasClass(__C.CLASSES.NO_BORDERS) ? __C.TEXTS.REMOVE_FAVORITE : __C.TEXTS.ADD_FAVORITE);
-		$view.find('.timeline-' + _event_id + '-' + _date).toggleClass(__C.CLASSES.ACTIVE);
-
-		var new_count;
-		if (!$btn.hasClass(__C.CLASSES.NO_BORDERS)) {
-			params.type = 'DELETE';
-			params.url = '/api/v1/events/' + $btn.data('event-id') + '/favorites/';
-			new_count = parseInt($liked_count.text()) - 1;
-			$liked_count.text(new_count);
-		} else {
-			new_count = parseInt($liked_count.text()) + 1;
-			$liked_count.text(new_count);
-		}
-		$liked_count_text.text(getUnitsText(new_count, __C.TEXTS.FAVORED));
-
-		if (window.askToSubscribe instanceof Function){
-			window.askToSubscribe();
-		}
-	});
-
-	$view.find('.likes-block').on('click', function(){
-		var $this = $(this),
-			$event = $this.parents('.tl-panel-block'),
-			$all_friends = $('.friends-event-' + $event.data('event-id'));
-
-		if ($all_friends.hasClass('open')){
-			$all_friends
-				.removeClass('open')
-				.addClass('hidden')
-				.remove();
-		}else{
-			$all_friends.remove();
-			$all_friends = $event.data('friends');
-			if ($all_friends.find('li').length == 0) return;
-
-			$all_friends
-				.removeClass('hidden')
-				.addClass('open')
-				.css({
-					top: $this.offset().top + $this.height() + 'px',
-					left: $this.find('.user-img-wrapper:first').offset().left - $this.width() + 'px'
-				})
-				.prependTo($event.parent().addClass('open'));
-		}
-	});
-
-	$view.find('.social-links i').on('click', function(){
-		var $this = $(this),
-			$block = $this.parents('.tl-panel-block'),
-			_type = $this.data('share-type');
-		window.open($block.data('share')[_type], 'SHARE_WINDOW',
-			'status=1,toolbar=0,menubar=0&height=300,width=500');
-	});
-
-	$view.find('.event-hide-button').on('click', function(){
-		var $panel_block = $(this).parents('.tl-panel-block'),
-			event = {id: $panel_block.data('event-id'), date: $panel_block.data(__C.DATA_NAMES.DATE)},
-			$placeholder = tmpl('removed-event-placeholder', event);
-
-		$panel_block.css({overflow: 'hidden'}).animate({height: 100, opacity: 0}, 300, "easeInBack", function(){
-			$panel_block.hide().after($placeholder);
-			$placeholder.find('.btn-cancel-remove').one('click', undoRemoveEvent);
-		});
-		$view.find('.timeline-' + $panel_block.data('event-id') + '-' + $panel_block.data(__C.DATA_NAMES.DATE))
-			.animate({height: 100}, 300, "easeInBack");
-
-		$.ajax({
-			url: '/api/v1/events/' + event.id + '/status?hidden=1',
-			type: 'PUT'
-		});
-	});
-
-	$view.find('.external-link').on('click', function(){
-		var $panel_block = $(this).parents('.tl-panel-block'),
-			event_id = $panel_block.data('event-id');
-		storeStat(event_id, __C.STATS.EVENT_ENTITY, __C.STATS.EVENT_OPEN_SITE);
-	});
-
-	function undoRemoveEvent(e){
-		var $this = $(e.target),
-			$placeholder = $this.parents('.tl-panel-block-placeholder'),
-			event_id = $placeholder.data('event-id'),
-			event_date = $placeholder.data('date'),
-			$panel_block = $view.find('.event-' + event_id + '-' + event_date),
-			$panel_wrapper = $panel_block.find('.tl-event-wrapper'),
-			$tl_block = $view.find('.timeline-' + event_id + '-' + event_date);
-
-		$placeholder.remove();
-		$panel_block.show();
-		$tl_block.animate({height: $panel_wrapper.height() + 30}, 300, "easeOutBack");
-		$panel_block.animate({height: $panel_wrapper.height() + 30, opacity: 1}, 300, "easeOutBack", function(){
-			$panel_block.css({overflow: 'visible'});
-		});
-		$.ajax({
-			url: '/api/v1/events/' + event_id + '/status?hidden=0',
-			type: 'PUT'
-		});
-
-	}
-}
-
-function generateEventAttributes(event){
-
-	var dates = [],
-		is_dates_range = event.is_same_time;
-	event.dates.forEach(function(event_day, index){
-		var _date = moment.unix(event_day.event_date);
-		dates.push({
-			start_date: moment(_date.format(__C.DATE_FORMAT) + ' ' + event_day.start_time),
-			end_date: moment(_date.format(__C.DATE_FORMAT) + ' ' + event_day.end_time)
-		});
-	});
-
-	event.moment_dates = dates;
-	event.liked_users_count = event.favored_users_count;
-	event.tags_text = getTagsString(event.tags);
-
-	event.begin_time = dates[0].start_date.format('HH:mm');
-	event.tags_block = $('<div>');
-
-	event.tags.forEach(function(tag){
-		event.tags_block.append(tmpl('event-tag', tag));
-	});
-
-	event.one_day = event.dates.length == 1;
-	event.short_dates = [];
-	event.dates = [];
-	var date_format = event.dates.length == 1 ? 'DD MMMM' : 'DD/MM';
-	event.moment_dates.forEach(function(val){
-		event.dates.push(val.start_date.format(date_format) + ' ' + val.start_date.format('HH:mm') + ' - ' + val.end_date.format('HH:mm'));
-		event.short_dates.push(val.start_date.format('DD/MM'));
-	});
-	if (is_dates_range){
-		if (event.dates.length > 1){
-			event.dates = '' + event.moment_dates[0].start_date.format('DD/MM') + ' - ' + event.moment_dates[event.moment_dates.length - 1].start_date.format('DD/MM');
-			event.dates += "\n" + ' c ' + event.moment_dates[0].start_date.format('HH:mm') + ' до ' + event.moment_dates[0].end_date.format('HH:mm');
-			event.short_dates = event.dates;
-		}else{
-			event.dates = event.moment_dates[0].start_date.format('DD/MM');
-			event.dates += "\n" + ' c ' + event.moment_dates[0].start_date.format('HH:mm') + ' до ' + event.moment_dates[0].end_date.format('HH:mm');
-			event.short_dates = event.dates;
-		}
-	}else{
-		event.dates = event.dates.join(', ') ;
-		event.short_dates = event.short_dates.join(', ') ;
-	}
-	event.day_name = dates[0].start_date.format('dddd');
-
-
-	var _a = document.createElement('a'),
-		_url = event.detail_info_url;
-
-	_a.href = event.detail_info_url;
-
-
-	event.detail_info_url = _url;
-	event.can_edit_hidden = event.can_edit != 1 ? 'hidden':'';
-
-	event.friends = $('<div>').addClass("liked-users");
-	event.all_friends = tmpl('liked-dropdown-wrapper', {event_id: event.id});
-
-	var short_friends_count = 0;
-	if (event.favored != undefined){
-		event.favored.forEach(function(user){
-			if (short_friends_count++ < 5){
-				event.friends.append(tmpl('liked-user', user));
-			}
-			event.all_friends.append(tmpl('liked-dropdown-item', user))
-		})
-	}
-
-	event.organization_img_url = event.organization_logo_small_url;
-	event.favorite_btn_class = event.is_favorite ? __C.CLASSES.NO_BORDERS : '';
-	event.favorite_btn_text = event.is_favorite ? __C.TEXTS.REMOVE_FAVORITE : __C.TEXTS.ADD_FAVORITE;
-	event.timeline_favorite_class = event.is_favorite ? __C.CLASSES.ACTIVE : '';
-	event.favored_text = getUnitsText(event.favored_users_count, __C.TEXTS.FAVORED);
-	return event;
 }

@@ -192,8 +192,7 @@ $user_full_name = $user->getLastName() . ' ' . $user->getFirstName(); ?>
 
         <!-- START row-->
         <div class="search-app app_view -hidden PageView" data-controller="Search">
-            <div class="search-organizations"></div>
-            <div class="search-events"></div>
+						<div class="page_wrapper"></div>
         </div>
         <!-- END row-->
 
