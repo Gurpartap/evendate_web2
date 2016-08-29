@@ -866,7 +866,19 @@ function OrganizationsList($view){
 
 function Organization($view){
 	var organization_id = __STATES.entityId,
-		url = '/api/v1/organizations/'+organization_id;
+		url = '/api/v1/organizations/'+organization_id,
+		EVENT_TYPES = {
+			FUTURE: 'future',
+			PAST: 'past',
+			DELAYED: 'delayed',
+			CANCELED: 'canceled'
+		},
+		SCROLL_EVENTS = {
+			future: 'scroll.uploadFutureEvents',
+			past: 'scroll.uploadPastEvents',
+			delayed: 'scroll.uploadDelayedEvents',
+			canceled: 'scroll.uploadCanceledEvents'
+		};
 
 	function bindEventsEvents($parent){
 		bindRippleEffect($parent);
@@ -893,7 +905,7 @@ function Organization($view){
 		bindEventsEvents($parent);
 
 		$parent.find('.Tabs').on('change.tabs', function(){
-			$(window).off('scroll.uploadFutureEvents scroll.uploadPastEvents');
+			$(window).off(Object.values(SCROLL_EVENTS).join(' '));
 			bindUploadEventsOnScroll($(this).find('.TabsBody.-active'));
 		});
 
@@ -953,29 +965,25 @@ function Organization($view){
 	function buildEvents(events, type, $wrapper){
 		var $events = $(),
 			last_date = false,
-            sort_date_type = 'nearest_event_date';
+			sort_date_type = 'nearest_event_date';
 
 		if(typeof $wrapper != 'undefined'){
 			last_date = $wrapper.find('.subscriber').eq(-1).data('date');
 		}
 		switch(type){
-            case 'future': {
-                sort_date_type = 'nearest_event_date';
-                break;
-            }
-            case 'past': {
-                sort_date_type = 'last_event_date';
-                break;
-            }
-            case 'delayed': {
-                sort_date_type = 'public_at';
-                break;
-            }
-            case 'canceled': {
-                sort_date_type = 'first_event_date';
-                break;
-            }
-        }
+			case EVENT_TYPES.FUTURE: {
+				sort_date_type = 'nearest_event_date'; break;
+			}
+			case EVENT_TYPES.PAST: {
+				sort_date_type = 'last_event_date'; break;
+			}
+			case EVENT_TYPES.DELAYED: {
+				sort_date_type = 'public_at'; break;
+			}
+			case EVENT_TYPES.CANCELED: {
+				sort_date_type = 'first_event_date'; break;
+			}
+		}
 
 		events.forEach(function(event){
 			var m_event_date = moment.unix(event[sort_date_type]),
@@ -1037,29 +1045,47 @@ function Organization($view){
 	}
 
 	function uploadEvents($wrapper, type, onSuccess){
-	    var data = {},
-            offset = $wrapper.data('next_offset') ? $wrapper.data('next_offset') : 0,
-            setts = {
-                length: 10,
-                offset: offset,
-                organization_id: organization_id,
-                fields: 'image_horizontal_medium_url,favored_users_count,is_favorite,favored{length:5},dates,updated_at,public_at'
-            };
-
-        if(type == 'future'){
-            data.future = 'true';
-            data.order_by = 'nearest_event_date';
-        } else if (type == 'past') {
-            data.till = moment().format(__C.DATE_FORMAT);
-            data.order_by = '-last_event_date';
-        }else if (type == 'delayed'){
-            data.is_delayed = true;
-            data.is_canceled = false;
-            data.order_by = 'public_at';
-        }else if (type == 'canceled'){
-            data.is_canceled = true;
-            data.order_by = '-updated_at';
-        }
+		var data = {},
+			offset = $wrapper.data('next_offset') ? $wrapper.data('next_offset') : 0,
+			setts = {
+				length: 10,
+				offset: offset,
+				organization_id: organization_id,
+				fields: [
+					'image_horizontal_medium_url',
+					'favored_users_count',
+					'is_favorite',
+					'favored{length:5}',
+					'dates',
+					'updated_at',
+					'public_at'
+				].join(',')
+			};
+		
+		switch(type){
+			case EVENT_TYPES.FUTURE: {
+				data.future = 'true';
+				data.order_by = 'nearest_event_date';
+				break;
+			}
+			case EVENT_TYPES.PAST: {
+				data.till = moment().format(__C.DATE_FORMAT);
+				data.order_by = '-last_event_date';
+				break;
+			}
+			case EVENT_TYPES.DELAYED: {
+				data.is_delayed = true;
+				data.is_canceled = false;
+				data.order_by = 'public_at';
+				break;
+			}
+			case EVENT_TYPES.CANCELED: {
+				data.is_canceled = true;
+				data.order_by = '-updated_at';
+				break;
+			}
+		}
+		
 		$.extend(data, setts);
 		$.ajax({
 			url: '/api/v1/events/',
@@ -1073,10 +1099,9 @@ function Organization($view){
 						$wrapper.append($events);
 						$wrapper.data('next_offset', offset+10);
 					} else {
-						var scroll_event = 'scroll.uploadEvents' + type;
 						$wrapper.append('<p class="organization_feed_text">Больше событий нет :(</p>');
 						$wrapper.data('disable_upload', true);
-						$(window).off(scroll_event);
+						$(window).off(SCROLL_EVENTS[type]);
 					}
 					if(typeof onSuccess == 'function'){
 						onSuccess($events);
@@ -1093,7 +1118,7 @@ function Organization($view){
 		var $window = $(window),
 			$document = $(document),
 			type = $wrapper.data('type'),
-			scroll_event = 'scroll.uploadEvents' . type;
+			scroll_event = SCROLL_EVENTS[type];
 
 		$window.data('block_scroll', false);
 		if(!$wrapper.data('disable_upload')){
@@ -1158,11 +1183,11 @@ function Organization($view){
 				$delayed_events_wrapper = $view.find('.DelayedEvents');
 				$canceled_events_wrapper = $view.find('.CanceledEvents');
 
-				uploadEvents($future_events_wrapper, 'future', function($events){
-					uploadEvents($past_events_wrapper, 'past', function($events){
+				uploadEvents($future_events_wrapper, EVENT_TYPES.FUTURE, function($events){
+					uploadEvents($past_events_wrapper, EVENT_TYPES.PAST, function($events){
 						if (is_editor){
-							uploadEvents($delayed_events_wrapper, 'delayed', function($events){
-								uploadEvents($canceled_events_wrapper, 'canceled', function($events){
+							uploadEvents($delayed_events_wrapper, EVENT_TYPES.DELAYED, function($events){
+								uploadEvents($canceled_events_wrapper, EVENT_TYPES.CANCELED, function($events){
 									initOrganizationPage($view);
 								});
 							});
