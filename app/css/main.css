@@ -1571,10 +1571,10 @@ html.-noscroll {
 
 .modal_wrapper,
 .modal_unit {
-	-webkit-transition: opacity .3s ease, visibility .3s ease;
-	-moz-transition: opacity .3s ease, visibility .3s ease;
-	-o-transition: opacity .3s ease, visibility .3s ease;
-	transition: opacity .3s ease, visibility .3s ease;
+	-webkit-transition: opacity .2s ease, visibility .2s ease;
+	-moz-transition: opacity .2s ease, visibility .2s ease;
+	-o-transition: opacity .2s ease, visibility .2s ease;
+	transition: opacity .2s ease, visibility .2s ease;
 }
 
 .modal_wrapper,
@@ -2354,10 +2354,10 @@ body.-open_modal > .modal_wrapper {
 	height: 100%;
 	opacity: 1;
 	visibility: visible;
-	-webkit-transition: opacity .5s ease, visibility .5s ease;
-	-moz-transition: opacity .5s ease, visibility .5s ease;
-	-o-transition: opacity .5s ease, visibility .5s ease;
-	transition: opacity .5s ease, visibility .5s ease;
+	-webkit-transition: opacity .4s ease, visibility .4s ease;
+	-moz-transition: opacity .4s ease, visibility .4s ease;
+	-o-transition: opacity .4s ease, visibility .4s ease;
+	transition: opacity .4s ease, visibility .4s ease;
 }
 
 .app_view.-faded {

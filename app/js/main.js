@@ -838,8 +838,8 @@ function renderState(){
 			bindControllers();
 			setTimeout(function(){
 				$new_view.removeClass('-faded');
-			}, 300);
-		}, 500);
+			}, 200);
+		}, 200);
 	}
 	
 	changeMainTitle(state.title);

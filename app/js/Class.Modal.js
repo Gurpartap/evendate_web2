@@ -150,7 +150,7 @@ Modal.prototype.show = function(){
 	self.modal.trigger('modal.show');
 	setTimeout(function(){
 		self.modal.removeClass('-faded');
-	}, 300);
+	}, 200);
 	
 	Modal.modal_destroyer.off('click.CloseModal').on('click.CloseModal', function(){
 		$(this).off('click.CloseModal');
@@ -174,7 +174,7 @@ Modal.prototype.hide = function(){
 	setTimeout(function(){
 		self.modal.addClass(__C.CLASSES.NEW_HIDDEN);
 		self.modal.trigger('modal.close');
-	}, 300);
+	}, 200);
 };
 
 Modal.prototype.destroy = function(){
