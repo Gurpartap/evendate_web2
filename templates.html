@@ -651,7 +651,7 @@
 						<button class="button -low -fill -rounded fa_icon {subscribe_button_classes} Subscribe EventSubscribe -AddFavourite AddAvatar RippleEffect" data-event-id="{id}"><span class="Text">{subscribe_button_text}</span></button>
 					</div>
 					<div class="form_unit">
-						<div class="avatars_collection AvatarsCollection -subscribable {avatars_collection_classes} -rounded -bordered -size_small" data-max_subscribers="4">
+						<div class="avatars_collection -subscribable {avatars_collection_classes} -rounded -bordered -size_small AvatarsCollection CallModal" data-max_subscribers="4" data-modal_type="favors" data-modal_entity_type="event" data-modal_entity_id="{id}" data-modal_title="Добавили в избранное">
 							{subscribers}
 						</div>
 						<span class="counter -size_30x30 -bordered -color_marginal -castable {favored_users_show}">+<span class="FavoredCount">{favored_users_count}</span></span>

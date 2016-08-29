@@ -890,6 +890,7 @@ function Organization($view){
 				subscribed: 'В избранном'
 			}
 		});
+		Modal.bindCallModal($parent);
 		bindControllers($parent);
 	}
 

@@ -2994,6 +2994,8 @@ body.-open_modal > .modal_wrapper {
 
 .organization_feed_block_service {height: 55px}
 
+.organization_feed_block_service .avatars_collection {cursor: pointer}
+
 
 
 .organization_subscribers_page {

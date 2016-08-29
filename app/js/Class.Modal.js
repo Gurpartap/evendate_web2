@@ -34,7 +34,7 @@ Modal.hide = function(){
 
 Modal.bindCallModal = function($parent){
 	$parent = $parent ? $parent : $('body');
-	$parent.find('.CallModal').each(function() {
+	$parent.find('.CallModal').not('.-Handled_CallModal').each(function() {
 		var $this = $(this),
 			title = $this.data('modal_title'),
 			modal,
@@ -131,7 +131,7 @@ Modal.bindCallModal = function($parent){
 				modal.show();
 			}
 		});
-	});
+	}).addClass('-Handled_CallModal');
 };
 
 Modal.prototype.show = function(){
