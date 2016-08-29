@@ -59,7 +59,6 @@ function Feed($view){
 		current_offset = 0,
 		ajax_url = '/api/v1/events/',
 		fields = [
-			'image_horizontal_large_url',
 			'organization_name',
 			'organization_short_name',
 			'organization_logo_small_url',
@@ -540,71 +539,6 @@ function OneEvent($view){
 		return $notifications;
 	}
 
-	function formatDates(dates){
-		var prev_day,
-			range = [],
-			dates_obj = {},
-			output = [],
-			genitive_month_names = [
-				'января',
-				'февраля',
-				'марта',
-				'апреля',
-				'мая',
-				'июня',
-				'июля',
-				'августа',
-				'сентября',
-				'октября',
-				'ноября',
-				'декабря'
-			];
-
-		if(dates.length == 1){
-			return [moment.unix(dates[0].event_date).format('LL')];
-		}
-
-		dates.forEach(function(date, i){
-			var this_day = moment.unix(date.event_date);
-			if(!dates_obj.hasOwnProperty(this_day.year())){
-				dates_obj[this_day.year()] = {};
-			}
-			if(!dates_obj[this_day.year()].hasOwnProperty(this_day.month())){
-				dates_obj[this_day.year()][this_day.month()] = [];
-			}
-
-			if(!prev_day){
-				range = [this_day.format('D')];
-			} else {
-				if(this_day.month() == prev_day.month() && prev_day.diff(this_day, 'days') == -1){
-					range.push(this_day.format('D'));
-				} else {
-					dates_obj[prev_day.year()][prev_day.month()].push(range.length == 1 ? range.shift() : range.shift()+'-'+range.pop());
-					range = [this_day.format('D')];
-				}
-			}
-
-			if(i === dates.length - 1){
-				dates_obj[this_day.year()][this_day.month()].push(range.length == 1 ? range.shift() : range.shift()+'-'+range.pop());
-			} else {
-				prev_day = this_day;
-			}
-		});
-
-		for(var year in dates_obj){
-			if(dates_obj.hasOwnProperty(year)){
-				for(var month in dates_obj[year]){
-					if(dates_obj[year].hasOwnProperty(month)){
-						output.push(dates_obj[year][month].join(', ')+' '+genitive_month_names[month]+' '+year+' г.');
-					}
-				}
-			}
-		}
-
-
-		return output;
-	}
-
 	$wrapper.empty();
 
 	$.ajax({
@@ -866,7 +800,19 @@ function OrganizationsList($view){
 
 function Organization($view){
 	var organization_id = __STATES.entityId,
-		url = '/api/v1/organizations/'+organization_id;
+		url = '/api/v1/organizations/'+organization_id,
+		EVENT_TYPES = {
+			FUTURE: 'future',
+			PAST: 'past',
+			DELAYED: 'delayed',
+			CANCELED: 'canceled'
+		},
+		SCROLL_EVENTS = {
+			future: 'scroll.uploadFutureEvents',
+			past: 'scroll.uploadPastEvents',
+			delayed: 'scroll.uploadDelayedEvents',
+			canceled: 'scroll.uploadCanceledEvents'
+		};
 
 	function bindEventsEvents($parent){
 		bindRippleEffect($parent);
@@ -878,6 +824,7 @@ function Organization($view){
 				subscribed: 'В избранном'
 			}
 		});
+		Modal.bindCallModal($parent);
 		bindControllers($parent);
 	}
 
@@ -893,7 +840,7 @@ function Organization($view){
 		bindEventsEvents($parent);
 
 		$parent.find('.Tabs').on('change.tabs', function(){
-			$(window).off('scroll.uploadFutureEvents scroll.uploadPastEvents');
+			$(window).off(Object.values(SCROLL_EVENTS).join(' '));
 			bindUploadEventsOnScroll($(this).find('.TabsBody.-active'));
 		});
 
@@ -953,29 +900,25 @@ function Organization($view){
 	function buildEvents(events, type, $wrapper){
 		var $events = $(),
 			last_date = false,
-            sort_date_type = 'nearest_event_date';
+			sort_date_type = 'nearest_event_date';
 
 		if(typeof $wrapper != 'undefined'){
 			last_date = $wrapper.find('.subscriber').eq(-1).data('date');
 		}
 		switch(type){
-            case 'future': {
-                sort_date_type = 'nearest_event_date';
-                break;
-            }
-            case 'past': {
-                sort_date_type = 'last_event_date';
-                break;
-            }
-            case 'delayed': {
-                sort_date_type = 'public_at';
-                break;
-            }
-            case 'canceled': {
-                sort_date_type = 'first_event_date';
-                break;
-            }
-        }
+			case EVENT_TYPES.FUTURE: {
+				sort_date_type = 'nearest_event_date'; break;
+			}
+			case EVENT_TYPES.PAST: {
+				sort_date_type = 'last_event_date'; break;
+			}
+			case EVENT_TYPES.DELAYED: {
+				sort_date_type = 'public_at'; break;
+			}
+			case EVENT_TYPES.CANCELED: {
+				sort_date_type = 'first_event_date'; break;
+			}
+		}
 
 		events.forEach(function(event){
 			var m_event_date = moment.unix(event[sort_date_type]),
@@ -1037,29 +980,47 @@ function Organization($view){
 	}
 
 	function uploadEvents($wrapper, type, onSuccess){
-	    var data = {},
-            offset = $wrapper.data('next_offset') ? $wrapper.data('next_offset') : 0,
-            setts = {
-                length: 10,
-                offset: offset,
-                organization_id: organization_id,
-                fields: 'image_horizontal_medium_url,favored_users_count,is_favorite,favored{length:5},dates,updated_at,public_at'
-            };
-
-        if(type == 'future'){
-            data.future = 'true';
-            data.order_by = 'nearest_event_date';
-        } else if (type == 'past') {
-            data.till = moment().format(__C.DATE_FORMAT);
-            data.order_by = '-last_event_date';
-        }else if (type == 'delayed'){
-            data.is_delayed = true;
-            data.is_canceled = false;
-            data.order_by = 'public_at';
-        }else if (type == 'canceled'){
-            data.is_canceled = true;
-            data.order_by = '-updated_at';
-        }
+		var data = {},
+			offset = $wrapper.data('next_offset') ? $wrapper.data('next_offset') : 0,
+			setts = {
+				length: 10,
+				offset: offset,
+				organization_id: organization_id,
+				fields: [
+					'image_horizontal_medium_url',
+					'favored_users_count',
+					'is_favorite',
+					'favored{length:5}',
+					'dates',
+					'updated_at',
+					'public_at'
+				].join(',')
+			};
+		
+		switch(type){
+			case EVENT_TYPES.FUTURE: {
+				data.future = 'true';
+				data.order_by = 'nearest_event_date';
+				break;
+			}
+			case EVENT_TYPES.PAST: {
+				data.till = moment().format(__C.DATE_FORMAT);
+				data.order_by = '-last_event_date';
+				break;
+			}
+			case EVENT_TYPES.DELAYED: {
+				data.is_delayed = true;
+				data.is_canceled = false;
+				data.order_by = 'public_at';
+				break;
+			}
+			case EVENT_TYPES.CANCELED: {
+				data.is_canceled = true;
+				data.order_by = '-updated_at';
+				break;
+			}
+		}
+		
 		$.extend(data, setts);
 		$.ajax({
 			url: '/api/v1/events/',
@@ -1073,10 +1034,9 @@ function Organization($view){
 						$wrapper.append($events);
 						$wrapper.data('next_offset', offset+10);
 					} else {
-						var scroll_event = 'scroll.uploadEvents' + type;
 						$wrapper.append('<p class="organization_feed_text">Больше событий нет :(</p>');
 						$wrapper.data('disable_upload', true);
-						$(window).off(scroll_event);
+						$(window).off(SCROLL_EVENTS[type]);
 					}
 					if(typeof onSuccess == 'function'){
 						onSuccess($events);
@@ -1093,7 +1053,7 @@ function Organization($view){
 		var $window = $(window),
 			$document = $(document),
 			type = $wrapper.data('type'),
-			scroll_event = 'scroll.uploadEvents' . type;
+			scroll_event = SCROLL_EVENTS[type];
 
 		$window.data('block_scroll', false);
 		if(!$wrapper.data('disable_upload')){
@@ -1158,11 +1118,11 @@ function Organization($view){
 				$delayed_events_wrapper = $view.find('.DelayedEvents');
 				$canceled_events_wrapper = $view.find('.CanceledEvents');
 
-				uploadEvents($future_events_wrapper, 'future', function($events){
-					uploadEvents($past_events_wrapper, 'past', function($events){
+				uploadEvents($future_events_wrapper, EVENT_TYPES.FUTURE, function($events){
+					uploadEvents($past_events_wrapper, EVENT_TYPES.PAST, function($events){
 						if (is_editor){
-							uploadEvents($delayed_events_wrapper, 'delayed', function($events){
-								uploadEvents($canceled_events_wrapper, 'canceled', function($events){
+							uploadEvents($delayed_events_wrapper, EVENT_TYPES.DELAYED, function($events){
+								uploadEvents($canceled_events_wrapper, EVENT_TYPES.CANCELED, function($events){
 									initOrganizationPage($view);
 								});
 							});
@@ -1196,58 +1156,116 @@ function Organization($view){
 }
 
 function Search($view){
-	$view.find('.tl-outer-wrap').addClass(__C.CLASSES.HIDDEN);
-	var _search = searchToObject();
+	var $wrapper = $view.find('.page_wrapper'),
+		ajax_url = '/api/v1/search/',
+		_search = searchToObject();
+	
 	if (_search.hasOwnProperty('q')){
 		$('#search_bar_input').val(_search.q);
 	}
-	_search['fields'] = 'events{fields:"detail_info_url,is_favorite,nearest_event_date,can_edit,location,favored_users_count,organization_name,organization_short_name,organization_logo_small_url,description,favored,is_same_time,tags,dates",filters:"future=true"},organizations{fields:"subscribed_count"}';
-	$.ajax({
-		url: '/api/v1/search/',
-		data: _search,
-		success: function(res){
-			var $events_wrapper = $view.find('.search-events').empty(),
-				$organizations_wrapper = $view.find('.search-organizations').empty();
-
-			res.data.events.forEach(function(event){
-				var $event = tmpl('search-event-item', generateEventAttributes(event));
-
-				$event.data('share', {
-					'vk': tmpl('vk-share-link', event).attr('href'),
-					'facebook': tmpl('facebook-share-link', event).attr('href'),
-					'twitter': tmpl('twitter-share-link', event).attr('href')
-				});
-				$events_wrapper.append($event);
-			});
-
-			res.data.organizations.forEach(function(organization){
-				organization.subscribed_count_text = getUnitsText(organization.subscribed_count, __C.TEXTS.SUBSCRIBERS);
-				var $organization = tmpl('organization-search-item', organization);
-				$organizations_wrapper.append($organization);
-				bindControllers($organizations_wrapper);
-			});
-
-			if (res.data.events.length == 0){
-				$events_wrapper.append(tmpl('search-no-events', {}));
+	_search['fields'] = 'events{fields:"image_horizontal_medium_url,detail_info_url,is_favorite,nearest_event_date,can_edit,location,favored_users_count,organization_name,organization_short_name,organization_logo_small_url,description,favored,is_same_time,tags,dates",filters:"future=true"},organizations{fields:"subscribed_count"}';
+	
+	function uploadMoreEvents(ajax_data, ajax_url, success){
+		var $events = $(),
+			$organizations = $();
+		ajax_data.fields = Array.isArray(ajax_data.fields) ? ajax_data.fields.join(',') : ajax_data.fields;
+		$.ajax({
+			url: ajax_url,
+			data: ajax_data,
+			method: 'GET',
+			success: function(res){
+				ajaxHandler(res, function(data, text){
+					data.events.forEach(function(event){
+						var $subscribers = buildAvatarCollection(event.favored, 4),
+							avatars_collection_classes = [],
+							favored_users_count = ($subscribers.length <= 4) ? 0 : event.favored_users_count - 4;
+						
+						if(event.is_favorite){
+							avatars_collection_classes.push('-subscribed');
+							if($subscribers.length > 4){
+								avatars_collection_classes.push('-shift');
+							}
+						}
+						
+						event.subscribe_button_classes = event.is_favorite ? ['fa-star', '-color_accent', '-Subscribed'].join(' ') : ['fa-star-o', '-color_neutral_accent'].join(' ');
+						event.subscribe_button_text = event.is_favorite ? 'В избранном' : 'В избранное';
+						event.subscribers = $subscribers;
+						event.avatars_collection_classes = avatars_collection_classes.join(' ');
+						event.favored_users_show = favored_users_count ? '' : '-cast';
+						event.favored_users_count = favored_users_count;
+						
+						if(event.nearest_event_date){
+							event.feed_event_infos = tmpl('feed-event-info', {text: moment.unix(event.nearest_event_date).format('D MMMM, HH:mm')});
+						} else {
+							var time = event.dates[0].start_time.split(':');
+							time.pop();
+							event.feed_event_infos = tmpl('feed-event-info', {text: moment.unix(event.dates[0].event_date).format('D MMMM')+', '+time.join(':')});
+						}
+						if(event.registration_required){
+							event.feed_event_infos = event.feed_event_infos.add(tmpl('feed-event-info', {text: 'Регистрация до '+moment.unix(event.registration_till).format('D MMMM, HH:mm')}));
+						}
+						if(event.is_free){
+							event.feed_event_infos = event.feed_event_infos.add(tmpl('feed-event-info', {text: 'Бесплатно'}));
+						} else {
+							event.feed_event_infos = event.feed_event_infos.add(tmpl('feed-event-info', {text: 'Цена от '+(event.min_price ? event.min_price : 0) +' руб.'}));
+						}
+						
+						
+						$events = $events.add(tmpl('feed-event', event));
+					});
+					
+					data.organizations.forEach(function(organization){
+						organization.subscribed_count_text = getUnitsText(organization.subscribed_count, __C.TEXTS.SUBSCRIBERS);
+						$organizations = $organizations.add(tmpl('organization-search-item', organization));
+					});
+					
+					if(success && typeof success == 'function'){
+						success($events, $organizations);
+					}
+				}, ajaxErrorHandler)
 			}
-			if (res.data.organizations == 0){
-				$organizations_wrapper.append(tmpl('search-no-organizations', {}));
+		});
+	}
+	
+	function bindEventsEvents($parent){
+		bindAddAvatar($parent);
+		trimAvatarsCollection($parent);
+		bindRippleEffect($parent);
+		Modal.bindCallModal($parent);
+		bindControllers($parent);
+		bindSubscribeButton($parent, {
+			labels: {
+				subscribe: 'В избранное',
+				unsubscribe: 'Отписаться',
+				subscribed: 'В избранном'
+			},
+			icons: {
+				subscribe: 'fa-star-o',
+				subscribed: 'fa-star'
 			}
-
-			bindEventHandlers();
-
-			$organizations_wrapper.slimscroll({
-				height: window.innerHeight - $('.header').height()
-			});
-			$organizations_wrapper
-				.css({
-					width: '350px'
-				})
-				.parent().css({
-				position: 'fixed',
-				width: '350px'
-			});
+		});
+		
+		$parent.find('.HideEvent').addClass(__C.CLASSES.NEW_HIDDEN);
+	}
+	
+	$wrapper.empty();
+	uploadMoreEvents(_search, ajax_url, function($events, $organizations){
+		
+		if ($events.length == 0){
+			$events = tmpl('search-no-events', {});
 		}
+		if ($organizations.length == 0){
+			$organizations = tmpl('search-no-organizations', {});
+		}
+		
+		$wrapper.append(tmpl('search-page', {
+			organizations: $organizations,
+			events: $events
+		}));
+		$wrapper.find('.search-organizations-wrapper').scrollbar({
+			disableBodyScroll: true
+		});
+		bindEventsEvents($wrapper);
 	});
 }
 
