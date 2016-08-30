@@ -1129,9 +1129,13 @@ a.button:hover {text-decoration: none}
 .button.-color_neutral > .ripple,
 .button.-color_marginal > .ripple,
 .button.-color_neutral_primary > .ripple,
-.button.-color_marginal_primary > .ripple,
+.button.-color_marginal_primary > .ripple {background-color: #c5c9d1; background-color: var(--color_primary_30)}
+
 .button.-color_neutral_accent > .ripple,
-.button.-color_marginal_accent > .ripple {background-color: #c5c9d1; background-color: var(--color_primary_30)}
+.button.-color_marginal_accent > .ripple {background-color: #ff5f9e; background-color: var(--color_accent_alt)}
+
+.-state_statistics .button.-color_neutral_accent > .ripple,
+.-state_statistics .button.-color_marginal_accent > .ripple {background-color: #23d792; background-color: var(--color_franklin_alt)}
 
 /*/Button*/
 /*Friend*/
@@ -3314,7 +3318,7 @@ body.-open_modal > .modal_wrapper {
 .feed_event_header > .avatar_block {display: inline-block}
 
 .feed_event_title {
-	height: 3.3em;
+	max-height: 3.3em;
 	margin: 0.7em 0 0;
 	font-size: 18px;
 	line-height: 1.1;
