@@ -285,7 +285,7 @@ class Event extends AbstractEntity
 
         if (isset($data['title'])) {
             if (mb_strlen($data['title']) <= 5) throw new InvalidArgumentException('Слишком короткое название. Должно быть не менее 5 символов.');
-            if (mb_strlen($data['title']) > 500) throw new InvalidArgumentException('Слишком длинное название. Должно быть не более 150 символов.');
+            if (mb_strlen($data['title']) > 150) throw new InvalidArgumentException('Слишком длинное название. Должно быть не более 150 символов.');
         }
 
         function sortByStartTime($a, $b)
@@ -321,11 +321,12 @@ class Event extends AbstractEntity
                 if ($data['public_at'] < new DateTime()) {
                     throw new InvalidArgumentException('Время отложенной публикации не может быть меньше текущего времени.');
                 }
+                $data['notification_at'] = clone $data['public_at'];
+                $data['notification_at']->modify('+10 minutes');
             } else {
-                $data['public_at'] = new DateTime();
+                $data['public_at'] = null;
+                $data['notification_at'] = (new DateTime())->modify('+10 minutes');
             }
-            $data['notification_at'] = clone $data['public_at'];
-            $data['notification_at']->modify('+10 minutes');
         } catch (Exception $e) {
             $data['public_at'] = null;
             $data['notification_at'] = (new DateTime())->modify('+10 minutes');
