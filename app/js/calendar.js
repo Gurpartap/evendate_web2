@@ -159,13 +159,14 @@ function Feed($view){
 		bindControllers($parent);
 		bindSubscribeButton($parent, {
 			labels: {
-				subscribe: 'В избранное',
-				unsubscribe: 'Отписаться',
-				subscribed: 'В избранном'
+				subscribe: 'Добавить в избранное',
+				subscribed: 'Избранное событие',
+				unsubscribe: 'Удалить из избранного'
 			},
 			icons: {
 				subscribe: 'fa-star-o',
-				subscribed: 'fa-star'
+				subscribed: 'fa-star',
+				unsubscribe: 'fa-times'
 			}
 		});
 
@@ -290,7 +291,7 @@ function Feed($view){
 						}
 
 						event.subscribe_button_classes = event.is_favorite ? ['fa-star', '-color_accent', '-Subscribed'].join(' ') : ['fa-star-o', '-color_neutral_accent'].join(' ');
-						event.subscribe_button_text = event.is_favorite ? 'В избранном' : 'В избранное';
+						event.subscribe_button_text = event.is_favorite ? 'Избранное событие' : 'Добавить в избранное';
 						event.subscribers = $subscribers;
 						event.avatars_collection_classes = avatars_collection_classes.join(' ');
 						event.favored_users_show = favored_users_count ? '' : '-cast';
@@ -326,6 +327,22 @@ function Feed($view){
 			}
 		});
 	}
+	
+	function addNoEventsBlock($wrapper){
+		var $no_events_block = tmpl('feed-no-event', {
+			text: 'Как насчет того, чтобы подписаться на организации?',
+			button: buildButton({
+				title: 'Перейти к каталогу',
+				classes: ['-color_neutral_accent', 'RippleEffect', 'Controller'],
+				dataset: {
+					page: 'organizations',
+					title: 'Организации'
+				}
+			})
+		}, $wrapper);
+		bindControllers($no_events_block);
+		bindRippleEffect($no_events_block);
+	}
 
 	if(!state_data.tab_state){
 		if(state_data.date){
@@ -356,10 +373,7 @@ function Feed($view){
 								$wrapper.find('.FeedEvents').append($events);
 								bindEventsEvents($events);
 							} else {
-								$wrapper.find('.FeedEvents').append(tmpl('feed-no-event', {
-									image_url: '/app/img/sad_eve.png',
-									text: 'Как насчет того, чтобы подписаться на организации?'
-								}));
+								addNoEventsBlock($wrapper.find('.FeedEvents'));
 								$window.off('scroll.upload'+state_data.tab_state.capitalize()+'Events');
 							}
 							$window.data('block_scroll', false);
@@ -367,10 +381,7 @@ function Feed($view){
 					}
 				});
 			} else {
-				$wrapper.find('.FeedEvents').append(tmpl('feed-no-event', {
-					image_url: '/app/img/sad_eve.png',
-					text: 'Как насчет того, чтобы подписаться на организации?'
-				}));
+				addNoEventsBlock($wrapper.find('.FeedEvents'));
 			}
 			bindEventsEvents($wrapper);
 		}
@@ -394,11 +405,13 @@ function OneEvent($view){
 		bindSubscribeButton($parent, {
 			labels: {
 				subscribe: 'Добавить в избранное',
-				subscribed: 'В избранном'
+				subscribed: 'Избранное событие',
+				unsubscribe: 'Удалить из избранного'
 			},
 			icons: {
 				subscribe: 'fa-star-o',
-				subscribed: 'fa-star'
+				subscribed: 'fa-star',
+				unsubscribe: 'fa-times'
 			}
 		});
 
@@ -558,8 +571,8 @@ function OneEvent($view){
 					}
 				}
 
-				data.subscribe_button_classes = data.is_favorite ? ['fa-check', '-color_accent', '-Subscribed'].join(' ') : ['fa-plus', '-color_neutral_accent'].join(' ');
-				data.subscribe_button_text = data.is_favorite ? 'В избранном' : 'Добавить в избранное';
+				data.subscribe_button_classes = data.is_favorite ? ['fa-star', '-color_accent', '-Subscribed'].join(' ') : ['fa-star-o', '-color_neutral_accent'].join(' ');
+				data.subscribe_button_text = data.is_favorite ? 'Избранное событие' : 'Добавить в избранное';
 				data.subscribers = $subscribers;
 				data.avatars_collection_classes = avatars_collection_classes.join(' ');
 				data.favored_users_show = favored_users_count ? '' : '-cast';
@@ -1188,7 +1201,7 @@ function Search($view){
 						}
 						
 						event.subscribe_button_classes = event.is_favorite ? ['fa-star', '-color_accent', '-Subscribed'].join(' ') : ['fa-star-o', '-color_neutral_accent'].join(' ');
-						event.subscribe_button_text = event.is_favorite ? 'В избранном' : 'В избранное';
+						event.subscribe_button_text = event.is_favorite ? 'Избранное событие' : 'Добавить в избранное';
 						event.subscribers = $subscribers;
 						event.avatars_collection_classes = avatars_collection_classes.join(' ');
 						event.favored_users_show = favored_users_count ? '' : '-cast';
@@ -1235,13 +1248,14 @@ function Search($view){
 		bindControllers($parent);
 		bindSubscribeButton($parent, {
 			labels: {
-				subscribe: 'В избранное',
-				unsubscribe: 'Отписаться',
-				subscribed: 'В избранном'
+				subscribe: 'Добавить в избранное',
+				subscribed: 'Избранное событие',
+				unsubscribe: 'Удалить из избранного'
 			},
 			icons: {
 				subscribe: 'fa-star-o',
-				subscribed: 'fa-star'
+				subscribed: 'fa-star',
+				unsubscribe: 'fa-times'
 			}
 		});
 		
