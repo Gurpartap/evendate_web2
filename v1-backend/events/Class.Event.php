@@ -280,7 +280,7 @@ class Event extends AbstractEntity
     {
         if (isset($data['description'])) {
             if (mb_strlen($data['description']) <= 50) throw new InvalidArgumentException('Слишком короткое описание. Должно быть не менее 50 символов.');
-            if (mb_strlen($data['description']) > 500) throw new InvalidArgumentException('Слишком длинное описание. Должно быть не более 500 символов.');
+            if (mb_strlen($data['description']) > 1000) throw new InvalidArgumentException('Слишком длинное описание. Должно быть не более 1000 символов.');
         }
 
         if (isset($data['title'])) {
@@ -372,9 +372,7 @@ class Event extends AbstractEntity
 
     public static function create(PDO $db, Organization $organization, array $data)
     {
-
         try {
-
             $db->beginTransaction();
             if (!isset($data['dates']) || count($data['dates']) == 0)
                 throw new InvalidArgumentException('Укажите, пожалуйста, даты');
@@ -382,7 +380,7 @@ class Event extends AbstractEntity
             $q_ins_event = App::queryFactory()->newInsert();
             $random_string = App::generateRandomString();
             $img_horizontal_filename = md5($random_string . '-horizontal') . '.' . $data['image_extensions']['horizontal'];
-            $img_vertical_filename = md5($random_string . '-vertical') . '.' . $data['image_extensions']['vertical'];
+            $img_vertical_filename = 'default.jpeg';
 
             self::generateQueryData($data);
 
@@ -460,9 +458,9 @@ class Event extends AbstractEntity
                 self::IMAGES_PATH . self::IMG_SIZE_TYPE_LARGE . '/' . $img_horizontal_filename,
                 14000);
 
-            App::saveImage($data['image_vertical'],
-                self::IMAGES_PATH . self::IMG_SIZE_TYPE_LARGE . '/' . $img_vertical_filename,
-                14000);
+//            App::saveImage($data['image_vertical'],
+//                self::IMAGES_PATH . self::IMG_SIZE_TYPE_LARGE . '/' . $img_vertical_filename,
+//                14000);
 
             $db->commit();
             return new Result(true, 'Событие успешно создано', array('event_id' => $event_id));
@@ -965,22 +963,22 @@ class Event extends AbstractEntity
                 ));
             }
 
-            if (isset($data['image_extensions'])
-                && isset($data['image_extensions']['vertical'])
-                && $data['image_extensions']['vertical'] != null
-                && !empty($data['image_extensions']['vertical'])
-                && $data['image_vertical'] != null
-            ) {
-                $img_vertical_filename = md5(App::generateRandomString() . '-vertical') . '.' . $data['image_extensions']['vertical'];
-                $query_data[':image_vertical'] = $img_vertical_filename;
-
-                App::saveImage($data['image_vertical'],
-                    self::IMAGES_PATH . self::IMG_SIZE_TYPE_LARGE . '/' . $img_vertical_filename,
-                    14000);
-                $q_upd_event->cols(array(
-                    'image_vertical' => $img_vertical_filename
-                ));
-            }
+//            if (isset($data['image_extensions'])
+//                && isset($data['image_extensions']['vertical'])
+//                && $data['image_extensions']['vertical'] != null
+//                && !empty($data['image_extensions']['vertical'])
+//                && $data['image_vertical'] != null
+//            ) {
+//                $img_vertical_filename = md5(App::generateRandomString() . '-vertical') . '.' . $data['image_extensions']['vertical'];
+//                $query_data[':image_vertical'] = $img_vertical_filename;
+//
+//                App::saveImage($data['image_vertical'],
+//                    self::IMAGES_PATH . self::IMG_SIZE_TYPE_LARGE . '/' . $img_vertical_filename,
+//                    14000);
+//                $q_upd_event->cols(array(
+//                    'image_vertical' => $img_vertical_filename
+//                ));
+//            }
 
             $p_upd_event = $this->db->prepare($q_upd_event->getStatement());
 
