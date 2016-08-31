@@ -506,7 +506,10 @@ function tmpl(template_type, items, addTo, direction) {
  * Query search part to object
  * */
 if (window['moment'] != undefined) {
-    moment.locale(navigator.language);
+	moment.locale(navigator.language);
+	moment.updateLocale('ru', {
+		monthsShort : ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"]
+	})
 }
 
 /**
@@ -687,6 +690,11 @@ $(document).ready(function () {
                 GEN: ' подписчика',
                 PLU: ' подписчиков'
             },
+            PEOPLE: {
+                NOM: ' человек',
+                GEN: ' человека',
+                PLU: ' человек'
+            },
             FAVORED: {
                 NOM: ' участник',
                 GEN: ' участника',
@@ -709,7 +717,24 @@ $(document).ready(function () {
             HIDDEN: 'hidden',
             NEW_HIDDEN: '-hidden'
         },
+	      ROLES: {
+		      USER: 'user',
+		      MODERATOR: 'moderator',
+		      ADMIN: 'admin'
+	      },
         DATE_FORMAT: 'YYYY-MM-DD',
+	      COLORS: {
+	      	PRIMARY: '#2e3b50',
+		      MUTED: '#3e4d66',
+		      MUTED_80: '#657184',
+		      MUTED_50: '#9fa6b3',
+		      MUTED_30: '#c5c9d1',
+		      TEXT: '#4a4a4a',
+		      ACCENT: '#f82969',
+		      ACCENT_ALT: '#ff5f9e',
+		      FRANKLIN: '#28be84',
+		      FRANKLIN_ALT: '#23d792'
+	      },
         IMAGES_PATH: '/events_images',
         STATS: {
             EVENT_VIEW: 'view',

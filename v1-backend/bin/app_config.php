@@ -54,22 +54,22 @@ class App
     const DEFAULT_LENGTH = 100;
     const DEFAULT_OFFSET = 0;
 
-    /*
-     * init config options for deploy and visioning
-     * */
-    static function init()
-    {
-        $_SERVER['ENV'] = isset($_SERVER['ENV']) ? $_SERVER['ENV'] : 'local';
-        $filename = 'v1-config.json';
-        $counter = 0;
-        if (file_exists($filename) == false) {
-            do {
-                $filename = '../' . $filename;
-                $counter++;
-            } while (file_exists($filename) == false && $counter < 5);
-        }
-        $config_json = file_get_contents($filename);
-        self::$obj = json_decode($config_json, false);
+	/*
+	 * init config options for deploy and visioning
+	 * */
+	static function init() {
+		$_SERVER['ENV'] = isset($_SERVER['ENV']) ? $_SERVER['ENV'] : 'local';
+        App::$ENV = $_SERVER['ENV'];
+		$filename = 'v1-config.json';
+		$counter = 0;
+		if (file_exists($filename) == false) {
+			do {
+				$filename = '../' . $filename;
+				$counter++;
+			} while (file_exists($filename) == false && $counter < 5);
+		}
+		$config_json = file_get_contents($filename);
+		self::$obj = json_decode($config_json, false);
 
 		self::$obj = self::$obj->{$_SERVER['ENV']};
 		self::$DB_NAME = self::$obj->db->database;
@@ -202,12 +202,13 @@ class App
         return $randomString;
     }
 
-	public static function createMysqlDB() {
-		global $__mysql_db;
-		$driver_options = array(PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION);
-		$mysql_opts = App::$SETTINGS->mysql_db;
-		$__mysql_db = new PDO('mysql:host=' . $mysql_opts->host . ';dbname=' . $mysql_opts->database . ';charset=utf8;port=' . $mysql_opts->port, $mysql_opts->user, $mysql_opts->password, $driver_options);
-	}
+    public static function createMysqlDB()
+    {
+        global $__mysql_db;
+        $driver_options = array(PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION);
+        $mysql_opts = App::$SETTINGS->mysql_db;
+        $__mysql_db = new PDO('mysql:host=' . $mysql_opts->host . ';dbname=' . $mysql_opts->database . ';charset=utf8;port=' . $mysql_opts->port, $mysql_opts->user, $mysql_opts->password, $driver_options);
+    }
 
 	public static function getAuthURLs(string $type){
 		$is_mobile = $type == 'mobile' ? 'true' : 'false';

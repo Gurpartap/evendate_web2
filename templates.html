@@ -29,13 +29,15 @@
 </script>
 
 <script type="javascript/template" id="tmpl-subscriber">
-	<div class="subscriber Controller" data-is_friend="{is_friend}" data-page="friend/{id}" data-friend-id="{id}" data-name="{name}">
-		<div class="avatar_block">
-			<div class="avatar -size_40x40 -rounded -bordered">
-				<img src="{avatar_url}" onerror="this.onerror=null;this.src='/app/img/logo_40.png'">
-			</div>
-			<span class="avatar_name">{name}</span>
+	<div class="subscriber Controller" data-is_friend="{is_friend}" data-page="friend/{id}" data-friend-id="{id}" data-title="{name}">{avatar_block}</div>
+</script>
+
+<script type="javascript/template" id="tmpl-avatar-block">
+	<div class="avatar_block {block_classes}" {dataset}>
+		<div class="avatar {avatar_classes}">
+			<img src="{avatar_url}" onerror="this.onerror=null;this.src='/app/img/logo_40.png'">
 		</div>
+		<span class="avatar_name">{name}</span>
 	</div>
 </script>
 
@@ -247,7 +249,7 @@
 			<div class="form_group -parts_2_3 RegistrationTill">
 				<div class="form_unit -inline -status_disabled">
 					<label class="form_label">Дата</label>
-					<div class="form_select -v_centering DatePicker" data-min_date="{tomorrow_date}"><label>{registration_till_data_label}</label><input name="registration_till_date" value="{registration_till_data}" type="hidden" disabled required></div>
+					<div class="form_select -valign_center DatePicker" data-min_date="{tomorrow_date}"><label>{registration_till_data_label}</label><input name="registration_till_date" value="{registration_till_data}" type="hidden" disabled required></div>
 				</div>
 				<div class="form_unit -status_disabled">
 					<div class="form_group -parts_e_2">
@@ -423,7 +425,7 @@
 
 					<div class="form_unit -inline">
 						<label class="form_label">Дата</label>
-						<div class="form_select -v_centering DatePicker" data-min_date="{current_date}"><label>{public_at_data_label}</label><input type="hidden" name="public_at_date" value="{public_at_data}" disabled required></div>
+						<div class="form_select -valign_center DatePicker" data-min_date="{current_date}"><label>{public_at_data_label}</label><input type="hidden" name="public_at_date" value="{public_at_data}" disabled required></div>
 					</div>
 
 					<div class="form_unit -inline">
@@ -477,7 +479,7 @@
 								</footer>
 							</div>
 						</div>
-						<div class="edit_event_vk_right_block form_unit -status_disabled -v_centering -h_centering">
+						<div class="edit_event_vk_right_block form_unit -status_disabled -centering">
 							<button class="button -color_neutral_primary FileLoadButton RippleEffect" type="button"><input class="LoadImg -hidden" type="file"><span class="Text">Изменить</span></button>
 						</div>
 					</div>
@@ -486,7 +488,7 @@
 
 			</div>
 
-			<div class="form_unit -h_centering">
+			<div class="form_unit -align_center">
 				<button id="edit_event_submit" class="button RippleEffect -color_accent" type="button">Опубликовать</button>
 			</div>
 
@@ -566,7 +568,7 @@
 			<h5 class="organization_unit_title Controller" data-page="organization/{id}" data-organization-id="{id}">{short_name}</h5>
 			<span class="organization_unit_subscribers">{subscribed_text}</span>
 			{redact_org_button}
-			<button class="button -low {subscribe_button_classes} Subscribe RippleEffect" type="button" data-organization-id="{id}">{subscribe_button_text}</button>
+			<button class="button -size_low {subscribe_button_classes} Subscribe RippleEffect" type="button" data-organization-id="{id}">{subscribe_button_text}</button>
 		</div>
 	</div>
 </script>
@@ -599,7 +601,7 @@
 					<span class="avatar_name organization_title" title="{name}">{name}</span>
 				</div>
 				<div class="organization_header_button OrganizationSubscribeButtonWrap">
-					<button class=" button -low -fill fa_icon {subscribe_button_classes} Subscribe RippleEffect" data-organization-id="{id}" type="button"><span class="Text">{subscribe_button_text}</span></button>
+					<button class=" button -size_low -fill fa_icon {subscribe_button_classes} Subscribe RippleEffect" data-organization-id="{id}" type="button"><span class="Text">{subscribe_button_text}</span></button>
 				</div>
 			</div>
 		</header>
@@ -648,7 +650,7 @@
 				<p><small>{time}</small></p>
 				<div class="form_group -parts_e_2 AddAvatarWrapper">
 					<div class="form_unit">
-						<button class="button -low -fill -rounded fa_icon {subscribe_button_classes} Subscribe EventSubscribe -AddFavourite AddAvatar RippleEffect" data-event-id="{id}"><span class="Text">{subscribe_button_text}</span></button>
+						<button class="button -size_low -fill -rounded fa_icon {subscribe_button_classes} Subscribe EventSubscribe -AddFavourite AddAvatar RippleEffect" data-event-id="{id}"><span class="Text">{subscribe_button_text}</span></button>
 					</div>
 					<div class="form_unit">
 						<div class="avatars_collection -subscribable {avatars_collection_classes} -rounded -bordered -size_small AvatarsCollection CallModal" data-max_subscribers="4" data-modal_type="favors" data-modal_entity_type="event" data-modal_entity_id="{id}" data-modal_title="Добавили в избранное">
@@ -690,8 +692,8 @@
 							<span class="counter -size_30x30 -bordered -color_marginal -castable {favored_users_show}">+<span class="FavoredCount">{favored_users_count}</span></span>
 						</div>
 						<div class="form_unit" align="right">
-							<button class="button -empty -low -rounded fa_icon fa-bell-o -color_neutral RippleEffect DropdownButton" data-dropdown="edit_notification" data-dd-width="190" data-dd-pos-x="self.center" data-dd-pos-y="6" type="button"></button>
-							<button class="button event_favourite_button -low -rounded fa_icon {subscribe_button_classes} Subscribe EventSubscribe -AddFavourite AddAvatar RippleEffect" data-event-id="{id}">
+							<button class="button -empty -size_low -rounded fa_icon fa-bell-o -color_neutral RippleEffect DropdownButton" data-dropdown="edit_notification" data-dd-width="190" data-dd-pos-x="self.center" data-dd-pos-y="6" type="button"></button>
+							<button class="button event_favourite_button -size_low -rounded fa_icon {subscribe_button_classes} Subscribe EventSubscribe -AddFavourite AddAvatar RippleEffect" data-event-id="{id}">
 								<span class="Text">{subscribe_button_text}</span>
 							</button>
 							<div class="dropdown_box DropdownBox" data-dropdown_id="edit_notification">
@@ -835,7 +837,7 @@
 						<span class="counter -size_30x30 -bordered -color_marginal_primary -castable {favored_users_show}">+<span class="FavoredCount">{favored_users_count}</span></span>
 					</div>
 					<div class="form_unit">
-						<button class="button -low -fill -rounded fa_icon {subscribe_button_classes} Subscribe EventSubscribe -AddFavourite AddAvatar RippleEffect" data-event-id="{id}">
+						<button class="button -size_low -fill -rounded fa_icon {subscribe_button_classes} Subscribe EventSubscribe -AddFavourite AddAvatar RippleEffect" data-event-id="{id}">
 							<span class="Text">{subscribe_button_text}</span>
 						</button>
 					</div>
@@ -850,8 +852,88 @@
 </script>
 
 <script type="javascript/template" id="tmpl-feed-no-event">
-	<div class="feed_no_event img_holder">
-		<img src="{image_url}" title="{text}">
+	<div class="feed_no_event -centering">
+		<div>
+			<p class="feed_no_event_text">{text}</p>
+			{button}
+		</div>
+	</div>
+</script>
+
+<!-- Organization Statistics -->
+<!-- Organization Statistics Overview -->
+
+<script type="javascript/template" id="tmpl-orgstat-overview">
+	<div class="page orgstat_overview">
+		<aside class="orgstat_overview_sidebar">
+			<header class="orgstat_overview_sidebar_header">
+				<span class="orgstat_overview_sidebar_title">Об организаторе</span>
+				<span class="stamp -color_accent">Starter</span>
+			</header>
+			<div class="orgstat_overview_sidebar_wrapper -align_center">
+				<div class="user_tombstone">
+					<div class="avatar -size_70x70 -rounded -bordered -shadowed" style="background-image: url('{img_medium_url}')"></div>
+					<p class="user_tombstone_title">{short_name}</p>
+				</div>
+				<p class="orgstat_overview_sidebar_title">{name}</p>
+				<p class="orgstat_overview_sidebar_description">{description}</p>
+				<p class="orgstat_overview_sidebar_location">{default_address}</p>
+				<button class="button -color_neutral -size_low fa_icon fa-pencil RippleEffect" type="button"><span class="Text">Редактировать</span></button>
+			</div>
+			<div class="orgstat_overview_sidebar_wrapper -align_center">
+				<button class="button -color_telegram -size_low fa_icon fa-send RippleEffect" type="button"><span class="Text">Создать Telegram бота</span></button>
+			</div>
+			<div class="orgstat_overview_sidebar_wrapper">
+				<p class="orgstat_overview_sidebar_title">Администраторы</p>
+				{administrators}
+				<p class="orgstat_overview_sidebar_title">Модераторы</p>
+				{moderators}
+			</div>
+			<div class="orgstat_overview_sidebar_wrapper">
+				<p class="orgstat_overview_sidebar_title">Предстоящие события</p>
+				{event_blocks}
+			</div>
+			<div class="orgstat_overview_sidebar_wrapper">
+				<p class="orgstat_overview_sidebar_title">Аудитория</p>
+				<div class="GenderPieChart"></div>
+				<div class="DevicePieChart"></div>
+			</div>
+		</aside>
+		<div class="orgstat_overview_content OrgstatOverviewContent"></div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-orgstat-event-block">
+	<div class="orgstat_event_block">
+		<aside class="orgstat_event_block_date">
+			<span>{day}</span><br>
+			<span>{month}</span>
+		</aside>
+		<div class="orgstat_event_block_body">
+			<p class="orgstat_event_block_name">{title}</p>
+			{badges}
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-orgstat-event-block-badge">
+	<span class="orgstat_event_block_badge">{title}</span>
+</script>
+
+<script type="javascript/template" id="tmpl-orgstat-overview-content">
+	<header class="orgstat_overview_header Scoreboards">{scoreboards}</header>
+	<div class="orgstat_overview_charts">
+		<div class="SubscribersAreaChart"></div>
+		<div class="ViewsAreaChart"></div>
+		<div class="ConversionsAreaChart"></div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-orgstat-scoreboard">
+	<div class="orgstat_overview_scoreboard {type}">
+		<span class="scoreboard_number ScoreboardNumber">{number}</span>
+		<p class="scoreboard_dynamic"><label class="scoreboard_dynamic_icon fa_icon {icon_classes}"></label><span class="ScoreboardDynamic">{dynamic_by_week}</span><span> за неделю</span></p>
+		<span class="scoreboard_title">{title}</span>
 	</div>
 </script>
 
@@ -1293,7 +1375,7 @@
 				</div>
 			</div>
 
-			<div class="form_unit -h_centering">
+			<div class="form_unit -align_center">
 				<button id="add_organization_submit" class="button RippleEffect -color_accent" type="button">Сохранить</button>
 			</div>
 		</form>
