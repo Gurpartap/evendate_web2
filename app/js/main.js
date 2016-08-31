@@ -58,6 +58,82 @@ Array.prototype.clean = function(deleteValue) {
 	return this;
 };
 
+(function($) {
+	function handleStep(tween) {
+		var target = $(tween.elem),
+			defaults = {
+				separator: ' ',
+				group_length: 3,
+				suffix: '',
+				prefix: ''
+			},
+			options, floored_number, separated_number;
+		if ( tween.elem.nodeType && tween.elem.parentNode ) {
+			options = $.extend(true, {}, defaults, target.data());
+			floored_number = Math.floor(tween.now);
+			separated_number = floored_number.toString();
+			
+			function extractNumberParts(separated_number, group_length) {
+				var numbers = separated_number.split('').reverse(),
+					number_parts = [],
+					current_number_part,
+					current_index,
+					q;
+				
+				for(var i = 0, l = Math.ceil(separated_number.length / group_length); i < l; i++) {
+					current_number_part = '';
+					for(q = 0; q < group_length; q++) {
+						current_index = i * group_length + q;
+						if (current_index === separated_number.length) {
+							break;
+						}
+						
+						current_number_part = current_number_part + numbers[current_index];
+					}
+					number_parts.push(current_number_part);
+				}
+				
+				return number_parts;
+			}
+			
+			function removePrecendingZeros(number_parts) {
+				var last_index = number_parts.length - 1,
+					last = number_parts[last_index].split('').reverse().join('');
+				
+				number_parts[last_index] = parseInt(last, 10).toString().split('').reverse().join('');
+				return number_parts;
+			}
+			
+			if (separated_number.length > options.group_length) {
+				var number_parts = extractNumberParts(separated_number, options.group_length);
+				separated_number = removePrecendingZeros(number_parts).join(options.separator);
+				separated_number = separated_number.split('').reverse().join('');
+			}
+			target.prop('number', tween.now).text(options.prefix + separated_number + options.suffix);
+		}
+	}
+	
+	if (!$.Tween || !$.Tween.propHooks) {
+		$.fx.step.number = handleStep;
+	} else {
+		$.Tween.propHooks.number = {
+			set: handleStep
+		};
+	}
+	
+	$.fn.animateNumber = function(options) {
+		var args = [options];
+		
+		for(var i = 1, l = arguments.length; i < l; i++) {
+			args.push(arguments[i]);
+		}
+		this.data(options);
+		
+		return this.animate.apply(this, args);
+	}
+	
+}(jQuery));
+
 function arrayToSpaceSeparatedString(){return this.join(' ')}
 
 function objectToHtmlAttributes(){
@@ -441,6 +517,35 @@ function buildButton(props){
 	return tmpl('button', props);
 }
 
+function buildAvatarBlocks(props){
+	if(Array.isArray(props)){
+		props.forEach(normalize);
+	} else {
+		normalize(props);
+	}
+	
+	function normalize(props_unit) {
+		props_unit.avatar_classes = props_unit.avatar_classes ? (typeof props_unit.avatar_classes == 'string') ? props_unit.avatar_classes.split(' ') : props_unit.avatar_classes : [];
+		props_unit.block_classes = props_unit.block_classes ? (typeof props_unit.block_classes == 'string') ? props_unit.block_classes.split(' ') : props_unit.block_classes : [];
+		if(props_unit.is_link){
+			props_unit.dataset = $.extend({
+				'title': props_unit.name,
+				'page': 'friend/'+props_unit.id,
+				'friend-id': props_unit.id
+			}, props_unit.dataset);
+			props_unit.block_classes.push('Controller');
+		}
+		if(props_unit.avatar_classes)
+			props_unit.avatar_classes.toString = arrayToSpaceSeparatedString;
+		if(props_unit.block_classes)
+			props_unit.block_classes.toString = arrayToSpaceSeparatedString;
+		if(props_unit.dataset)
+			props_unit.dataset.toString = (Array.isArray(props_unit.dataset)) ? arrayToSpaceSeparatedString : objectToHtmlDataSet;
+	}
+	
+	return tmpl('avatar-block', props);
+}
+
 function buildAvatarCollection(subscribers, count){
 	var $subscribers = $();
 	$subscribers = $subscribers.add(tmpl('subscriber-avatar', __USER));
@@ -505,12 +610,14 @@ function bindTabs($parent){
 		$wrapper.height($bodies.filter('.-active').height());
 
 		$tabs.on('click', function(){
-			$tabs.removeClass(__C.CLASSES.NEW_ACTIVE);
-			$bodies.removeClass(__C.CLASSES.NEW_ACTIVE);
-			$(this).addClass(__C.CLASSES.NEW_ACTIVE);
-			$bodies.eq($tabs.index(this)).addClass(__C.CLASSES.NEW_ACTIVE);
-			$wrapper.height($bodies.filter('.-active').height());
-			$this.trigger('change.tabs');
+			if(!$(this).hasClass(__C.CLASSES.NEW_ACTIVE)){
+				$tabs.removeClass(__C.CLASSES.NEW_ACTIVE);
+				$bodies.removeClass(__C.CLASSES.NEW_ACTIVE);
+				$(this).addClass(__C.CLASSES.NEW_ACTIVE);
+				$bodies.eq($tabs.index(this)).addClass(__C.CLASSES.NEW_ACTIVE);
+				$wrapper.height($bodies.filter('.-active').height());
+				$this.trigger('change.tabs');
+			}
 		})
 	}).addClass('-Handled_Tabs');
 }
@@ -702,11 +809,11 @@ function bindControllers($parent){
 			var $this = $(this),
 				page_name = $this.data('page'),
 				controller_name = $this.data('controller');
+			if ($this.hasClass(__C.CLASSES.DISABLED)) return true;
 			switch(e.which){
 				case 1: {
-					if ($this.hasClass(__C.CLASSES.DISABLED)) return true;
 					if (page_name != undefined){
-						History.pushState($.extend({}, $this.data(), {_index: History.getCurrentIndex()}), $this.data('title') ? $this.data('title'): $this.text(), '/'+page_name);
+						changeState(page_name, $this.data('title') ? $this.data('title'): $this.text(), $this.data());
 					} else {
 						if (window[controller_name] != undefined && window[controller_name] instanceof Function){
 							window[controller_name]();
@@ -721,6 +828,17 @@ function bindControllers($parent){
 			}
 		});
 	}).addClass('-Handled_Controller');
+}
+
+function changeState(page_name, title, data){
+	title = title ? title : '';
+	data = data ? data : {};
+	if (page_name){
+		page_name = page_name.indexOf('/') == 0 ? page_name : '/'+page_name;
+		History.pushState($.extend({}, data, {_index: History.getCurrentIndex()}), title, '/'+page_name);
+	} else {
+		console.error('Need to pass page name');
+	}
 }
 
 
@@ -878,6 +996,7 @@ function renderState(){
 	if(!(state.data.reload === false && state.data._index+1 == History.getCurrentIndex())){
 		$(window).off('scroll');
 		$(window).data('disable_upload', false);
+		$('body').removeClass('-state_statistics');
 		switch(typeof __STATES[page]){
 			case 'function': {
 				controller = __STATES[page];
@@ -989,8 +1108,7 @@ function renderSidebarOrganizations(organization, afterRenderCallback){
 }
 
 function renderHeaderTabs(tabs){
-	var $wrapper = $('#main_header_bottom').find('.HeaderTabsWrapper'),
-		$tabs = $();
+	var $wrapper = $('#main_header_bottom').find('.HeaderTabsWrapper');
 	if(!Array.isArray(tabs) && typeof tabs == 'object'){
 		var buf = [];
 		$.each(tabs, function(){
@@ -1003,18 +1121,52 @@ function renderHeaderTabs(tabs){
 			tab.dataset.toString = (Array.isArray(tab.dataset)) ? arrayToSpaceSeparatedString : objectToHtmlDataSet;
 		if(tab.classes)
 			tab.classes.toString = arrayToSpaceSeparatedString;
-		$tabs = $tabs.add(tmpl('tab', tab))
 	});
 	$wrapper.html(tmpl('tabs-header', {
 		color: 'default',
-		tabs: $tabs
+		tabs: tmpl('tab', tabs)
 	}));
+	bindTabs($wrapper);
+	$wrapper.find('.Tabs').on('change.tabs', function() {
+		var $this = $(this),
+			page_name = $this.data('page');
+		changeState(page_name, $this.data('title') ? $this.data('title'): $this.text(), $this.data());
+	});
 	bindControllers($wrapper);
 	$('#main_header').addClass('-with_tabs');
 }
 
 function changeMainTitle(new_title){
-	$('#page_title').text(new_title);
+	var $page_title = $('#page_title');
+	$page_title.empty();
+	switch(true){
+		case (typeof new_title == 'string'): {
+			new_title = new_title.split(' > ');
+		}
+		case (Array.isArray(new_title)): {
+			new_title.forEach(function(title_chunk, i) {
+				if(i)
+					$page_title.append('<span class="fa_icon fa-angle-right -empty"></span>');
+				$page_title.append('<span>'+title_chunk+'</span>');
+			});
+			break;
+		}
+		case (new_title instanceof jQuery): {
+			$page_title.append(new_title);
+			break;
+		}
+	}
+}
+
+function recognizeRole(privileges){
+	var role = __C.ROLES.USER;
+	privileges.forEach(function(privilege) {
+		if(privilege.role_id == 1 || privilege.name == __C.ROLES.ADMIN)
+			role = __C.ROLES.ADMIN;
+		if((privilege.role_id == 2 || privilege.name == __C.ROLES.MODERATOR) && role !== __C.ROLES.ADMIN)
+			role = __C.ROLES.MODERATOR;
+	});
+	return role;
 }
 
 
