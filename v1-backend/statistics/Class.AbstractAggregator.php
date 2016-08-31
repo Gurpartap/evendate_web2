@@ -31,7 +31,7 @@ class AbstractAggregator
                 return new DateInterval('P1W');
             }
             case Statistics::SCALE_MONTH: {
-                return new DateInterval('P1MM');
+                return new DateInterval('P1M');
             }
             case Statistics::SCALE_YEAR: {
                 return new DateInterval('P1Y');
