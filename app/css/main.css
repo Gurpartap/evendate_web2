@@ -3548,13 +3548,13 @@ body.-open_modal > .modal_wrapper {
 
 .orgstat_event_block {
 	display: flex;
-	align-items: flex-start;
 	margin: 24px 0;
 	font-size: 14px;
 }
 
 .orgstat_event_block_date {
 	width: 60px;
+	flex-shrink: 0;
 	font-size: 14px;
 	font-weight: 700;
 	color: #9fa6b3;
@@ -3572,8 +3572,6 @@ body.-open_modal > .modal_wrapper {
 	background-color: #9fa6b3;
 	background-color: var(--color_primary_50);
 }
-
-.highcharts-container > svg > text {display: none} /* FUCKING HACK*/
 
 .orgstat_overview_header {
 	display: flex;

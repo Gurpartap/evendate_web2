@@ -2440,8 +2440,24 @@ function StatisticsOrganization($view) {
 						'conversion'
 					].join(',')
 				})
-			].join(',');
-		
+			].join(','),
+			highchart_defaults = {
+				chart: {
+					backgroundColor: null,
+					plotBorderWidth: null,
+					plotShadow: false,
+					style: {
+						fontFamily: 'inherit',
+						fontSize: 'inherit'
+					}
+				},
+				title: {
+					text: false
+				},
+				credits: {
+					enabled: false
+				}
+			};
 		
 		function getStatistics(org_id, scale, since, till, fields, success){
 			$.ajax({
@@ -2542,6 +2558,253 @@ function StatisticsOrganization($view) {
 			});
 		}
 		
+		function buildPieChart($container, data) {
+			var pie_chart_options = {
+				chart: {
+					type: 'pie',
+					height: 200,
+					style: {
+						fontFamily: 'inherit',
+						fontSize: 'inherit'
+					}
+				},
+				tooltip: {
+					pointFormat: '<b>{point.percentage:.1f}%</b>'
+				},
+				plotOptions: {
+					pie: {
+						center: [45, '50%'],
+						allowPointSelect: true,
+						cursor: 'pointer',
+						size: 120,
+						dataLabels: {
+							distance: -35,
+							defer: false,
+							formatter: function () {
+								return this.percentage > 15 ? Math.round(this.percentage)+'%' : null;
+							},
+							style: {"color": "#fff", "fontSize": "20px", "fontWeight": "300", "textShadow": "none" },
+							y: -6
+						},
+						showInLegend: true
+					}
+				},
+				legend: {
+					align: 'right',
+					verticalAlign: 'top',
+					layout: 'vertical',
+					width: 100,
+					symbolHeight: 0,
+					symbolWidth: 0,
+					itemMarginBottom: 5,
+					labelFormatter: function() {
+						return '<span style="color: '+this.color+'">'+this.name+'</span>'
+					},
+					itemStyle: { cursor: 'pointer', fontSize: '14px', fontWeight: '500' },
+					y: 12
+				}
+			};
+			
+			function pieChartSeriesNormalize(raw_data) {
+				var default_colors = [__C.COLORS.FRANKLIN,__C.COLORS.ACCENT,__C.COLORS.MUTED,__C.COLORS.MUTED_80,__C.COLORS.MUTED_50,__C.COLORS.MUTED_30],
+					STD_NAMES = {
+						"browser": "Браузер",
+						"android": "Аndroid",
+						"ios": "iOS",
+						"female": "Женщины",
+						"male": "Мужчины",
+						"other": "Остальные",
+						null: "Не указано"
+					};
+				return [{
+					colorByPoint: true,
+					data: raw_data.map(function(line, i) {
+						return {
+							name: line.name ? STD_NAMES[line.name] : STD_NAMES[line.gender],
+							color: default_colors[i],
+							y: line.count
+						}
+					})
+				}];
+			}
+			
+			$container.highcharts($.extend(true, {}, highchart_defaults, pie_chart_options, {series: pieChartSeriesNormalize(data)}));
+		}
+		
+		function buildAreaCharts($container, data){
+			var area_chart_default_options = $.extend(true, {}, highchart_defaults, {
+				chart: {
+					type: 'areaspline'
+				},
+				title: {
+					align: 'left',
+					margin: 20
+				},
+				xAxis: {
+					type: 'datetime',
+					showEmpty: false
+				},
+				yAxis: {
+					title: {
+						text: false
+					}
+				},
+				legend: {
+					enabled: true,
+					align: 'left',
+					itemStyle: { color: __C.COLORS.TEXT, cursor: 'pointer', fontSize: '14px', fontWeight: '500', y: 0 },
+					itemMarginBottom: 5,
+					symbolHeight: 18,
+					symbolWidth: 18,
+					symbolRadius: 9,
+					itemDistance: 42
+				},
+				plotOptions: {
+					areaspline: {
+						fillOpacity: 0.5,
+						tooltip: {
+							headerFormat: '<b>{point.key}</b><br/>',
+							xDateFormat: '%d.%m.%Y'
+						},
+						marker: {
+							enabled: false,
+							symbol: 'circle',
+							radius: 2,
+							states: {
+								hover: {
+									enabled: true
+								}
+							}
+						},
+						pointStart: Date.UTC(2010, 0, 1),
+						pointIntervalUnit: 'year'
+					}
+				},
+				scrollbar: {enabled: false},
+				rangeSelector: {
+					buttonTheme: {
+						width: null,
+						height: 22,
+						fill: 'none',
+						stroke: 'none',
+						r: 14,
+						style: {
+							color: __C.COLORS.MUTED_80,
+							fontSize: '13px',
+							fontWeight: '400',
+							textTransform: 'uppercase',
+							dominantBaseline: 'middle'
+						},
+						states: {
+							hover: {
+								fill: __C.COLORS.MUTED_50,
+								style: {
+									color: '#fff'
+								}
+							},
+							select: {
+								fill: __C.COLORS.MUTED_80,
+								style: {
+									color: '#fff',
+									fontWeight: '400'
+								}
+							}
+						}
+					},
+					buttons: [{
+						type: 'day',
+						count: 7,
+						text: "\xa0\xa0\xa0Неделя\xa0\xa0\xa0"
+					}, {
+						type: 'month',
+						count: 1,
+						text: "\xa0\xa0\xa0Месяц\xa0\xa0\xa0"
+					}, {
+						type: 'year',
+						count: 1,
+						text: "\xa0\xa0\xa0Год\xa0\xa0\xa0"
+					}, {
+						type: 'all',
+						text: "\xa0\xa0\xa0Все\xa0время\xa0\xa0\xa0"
+					}],
+					allButtonsEnabled: true,
+					selected: 3,
+					labelStyle: {
+						display: 'none'
+					},
+					inputEnabled: false
+				}
+			});
+			
+			function areaChartSeriesNormalize(raw_data) {
+				var line_colors = [__C.COLORS.FRANKLIN,__C.COLORS.MUTED_80],
+					fill_colors = ['rgba(35, 215, 146, 0.09)','rgba(101, 101, 101, 0.6)'],
+					fill_colors2 = ['rgba(35, 215, 146, 0.18)','rgba(101, 101, 101, 0.6)'],
+					STD_NAMES = {
+						'view': 'Просмотры страницы организации',
+						'conversion': 'Конверсия',
+						'subscribe': 'Подписалось',
+						'unsubscribe': 'Отписалось'
+					},
+					output = [],
+					i = 0;
+				
+				$.each(raw_data, function(key, data){
+					output.push({
+						name: STD_NAMES[key],
+						color: line_colors[i],
+						fillColor: {
+							linearGradient: {x1: 0, x2: 0, y1: 0, y2: 1},
+							stops: [
+								[0, fill_colors2[i]],
+								[1, fill_colors[i++]]
+							]
+						},
+						data: data.reverse().map(function(line, i) {
+							return [moment.unix(line.since).valueOf(), line.value];
+						})
+					});
+				});
+				
+				return output;
+			}
+			
+			if(data.subscribe && data.unsubscribe){
+				$container.find('.SubscribersAreaChart').highcharts('StockChart', $.extend(true, {}, area_chart_default_options, {
+					title: {text: 'Подписчики'},
+					tooltip: {shared: true},
+					navigator: {enabled: false},
+					series: areaChartSeriesNormalize({subscribe: data.subscribe, unsubscribe: data.unsubscribe})
+				}));
+			}
+			
+			if(data.view){
+				$container.find('.ViewsAreaChart').highcharts('StockChart', $.extend(true, {}, area_chart_default_options, {
+					title: {text: 'Просмотры организатора'},
+					navigator: {
+						maskInside: false,
+						maskFill: 'rgba(255, 255, 255, 0.66)',
+						handles: {
+							backgroundColor: '#9fa7b6',
+							borderColor: '#fff'
+						}
+					},
+					series: areaChartSeriesNormalize({view: data.view})
+				}));
+			}
+			
+			if(data.conversion){
+				$container.find('.ConversionsAreaChart').highcharts('StockChart', $.extend(true, {}, area_chart_default_options, {
+					title: {text: 'Конверсия просмотров/подписок'},
+					tooltip: {valueSuffix: ' %'},
+					navigator: {enabled: false},
+					series: areaChartSeriesNormalize({conversion: data.conversion})
+				}));
+			}
+			
+			console.log(data);
+		}
+		
 		$wrapper.empty();
 		getOrganizationData(org_id, org_fields, function(org_data) {
 			var role;
@@ -2592,198 +2855,32 @@ function StatisticsOrganization($view) {
 			$wrapper.append(tmpl('orgstat-overview', org_data));
 			
 			getStatistics(org_id, 'year', moment().subtract(6, 'd').format(), moment().format(), stat_fields, function(stat_data){
+				var charts_data = JSON.parse(window.sessionStorage.getItem('statistics'));
+				charts_data = charts_data ? charts_data : {until: moment().unix()};
 				
-				function initPieChart($container, data) {
-					var pie_chart_options = {
-						chart: {
-							backgroundColor: null,
-							plotBorderWidth: null,
-							plotShadow: false,
-							type: 'pie',
-							height: 200,
-							style: {
-								fontFamily: 'inherit',
-								fontSize: 'inherit'
-							}
-						},
-						title: {
-							text: false
-						},
-						tooltip: {
-							pointFormat: '<b>{point.percentage:.1f}%</b>'
-						},
-						plotOptions: {
-							pie: {
-								center: [45, '50%'],
-								allowPointSelect: true,
-								cursor: 'pointer',
-								size: 120,
-								dataLabels: {
-									distance: -35,
-									defer: false,
-									formatter: function () {
-										return this.percentage > 15 ? Math.round(this.percentage)+'%' : null;
-									},
-									style: {"color": "#fff", "fontSize": "20px", "fontWeight": "300", "textShadow": "none" },
-									y: -6
-								},
-								showInLegend: true
-							}
-						},
-						legend: {
-							align: 'right',
-							verticalAlign: 'top',
-							layout: 'vertical',
-							width: 100,
-							itemStyle: { "color": "#333333", "cursor": "pointer", "fontSize": "14px", "fontWeight": "500" },
-							y: 12
-						}
-					};
-					
-					function pieChartDataGenerator(raw_data) {
-						var default_colors = [__C.COLORS.FRANKLIN,__C.COLORS.ACCENT,__C.COLORS.MUTED,__C.COLORS.MUTED_80,__C.COLORS.MUTED_50,__C.COLORS.MUTED_30],
-							STD_NAMES = {
-								"browser": "Браузер",
-								"android": "Аndroid",
-								"ios": "iOS",
-								"female": "Женщины",
-								"male": "Мужчины",
-								"other": "Остальные",
-								null: "Не указано"
-							},
-							output = {
-								colorByPoint: true,
-								data: raw_data.map(function(line, i) {
-									return {
-										name: line.name ? STD_NAMES[line.name] : STD_NAMES[line.gender],
-										color: default_colors[i],
-										y: line.count
-									}
-								})
-							};
-						return {series: [output]};
-					}
-					
-					$container.highcharts($.extend(true, {}, pie_chart_options, pieChartDataGenerator(data)));
-				}
-				
-				initPieChart($wrapper.find('.GenderPieChart'), stat_data.audience.gender);
-				initPieChart($wrapper.find('.DevicePieChart'), stat_data.audience.devices);
+				buildPieChart($wrapper.find('.GenderPieChart'), stat_data.audience.gender);
+				buildPieChart($wrapper.find('.DevicePieChart'), stat_data.audience.devices);
 				
 				$wrapper.find('.OrgstatOverviewContent').append(tmpl('orgstat-overview-content', {}));
 				
 				updateScoreboards($wrapper.find('.Scoreboards'), stat_data, stat_data.dynamics);
 				
-				getStatistics(org_id, 'week', moment().subtract(11, 'months').format(), moment().format(), 'view,subscribe,unsubscribe,conversion,notification', function(stat_data){
-					
-					var area_chart_default_options = {
-						chart: {
-							type: 'areaspline'
-						},
-						title: {text: false},
-						xAxis: {
-							type: 'datetime',
-							showEmpty: false
-						},
-						yAxis: {
-							title: {text: false}
-						},
-						plotOptions: {
-							areaspline: {
-								stacking: 'normal',
-								pointStart: Date.UTC(2010, 0, 1),
-								pointIntervalUnit: 'year',
-								tooltip: {
-									headerFormat: '<b>{point.key}</b><br/>',
-									xDateFormat: '%d %m %Y'
-								},
-								marker: {
-									enabled: false,
-									symbol: 'circle',
-									radius: 2,
-									states: {
-										hover: {
-											enabled: true
-										}
-									}
-								}
-							}
-						}
-					},
-						area_stock_chart_default_options = {
-							title: {
-								text: 'chart.type is set to \'areaspline\''
-							},
-							chart: {
-								type: 'areaspline'
-							},
-							
-							rangeSelector: {
-								selected: 1
-							}
-						};
-					
-					function areaChartSeriesNormalize(raw_data) {
-						var line_colors = [__C.COLORS.FRANKLIN,__C.COLORS.ACCENT],
-							fill_colors = [__C.COLORS.FRANKLIN_ALT,__C.COLORS.ACCENT_ALT],
-							STD_NAMES = {
-								'view': 'Просмотры страницы организации',
-								'conversion': 'Конверсия',
-								'subscribe': 'Подписалось',
-								'unsubscribe': 'Отписалось'
-							},
-							output = [],
-							i = 0;
-						
-						$.each(raw_data, function(key, data){
-							output.push({
-								name: STD_NAMES[key],
-								fillColor: fill_colors[i],
-								lineColor: line_colors[i++],
-								data: data.reverse().map(function(line, i) {
-									return [moment.unix(line.since).valueOf(), line.value];
-								})
-							});
-						});
-						
-						return output;
-					}
-					
-					$wrapper.find('.SubscribersAreaChart').highcharts($.extend(true, {}, area_chart_default_options, {
-						title: {
-							text: 'Подписчики'
-						},
-						tooltip: {
-							shared: true
-						},
-						series: areaChartSeriesNormalize({subscribe: stat_data.subscribe, unsubscribe: stat_data.unsubscribe})
-					}));
-					
-					$wrapper.find('.ViewsAreaChart').highcharts('StockChart', $.extend(true, {}, area_stock_chart_default_options, {
-						series: areaChartSeriesNormalize({view: stat_data.view})
-					}));
-					
-					$wrapper.find('.ConversionsAreaChart').highcharts($.extend(true, {}, area_chart_default_options, {
-						title: {
-							text: 'Конверсия просмотров/подписок'
-						},
-						tooltip: {
-							valueSuffix: ' %'
-						},
-						series: areaChartSeriesNormalize({conversion: stat_data.conversion})
-					}));
-					
-					console.log(stat_data);
-				});
-				
-				
-				
+				if(moment.unix(charts_data.until).isSameOrBefore(moment())){
+					getStatistics(org_id, 'day', moment().subtract(18, 'months').format(), moment().format(), 'view,subscribe,unsubscribe,conversion,notification', function(stat_data) {
+						stat_data.until = moment().add(15, 'm').unix();
+						window.sessionStorage.setItem('statistics', JSON.stringify(stat_data));
+						buildAreaCharts($wrapper, stat_data);
+					});
+				} else {
+					buildAreaCharts($wrapper, charts_data);
+				}
 				
 				console.log(stat_data);
-				console.log(org_data);
 			});
+			
 			bindRippleEffect($wrapper);
 			bindControllers($wrapper);
+			console.log(org_data);
 		});
 	}
 	
