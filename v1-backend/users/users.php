@@ -67,10 +67,13 @@ $__modules['users'] = array(
 			return DevicesCollection::filter($__db, $__user, $__request, $__fields,
 				$__pagination, $__order_by ?? array());
 		},
+        '{me/settings}' => function () use ($__user) {
+            return $__user->getSettings();
+        },
 		'{me}' => function () use ($__user) {
 			$data = $__user->getMainInfo()->getData();
 			return new Result(true, '', array($data));
-		}
+		},
 	),
 	'PUT' => array(
 		'{me/settings}' => function () use ($__request, $__user, $__db) {
