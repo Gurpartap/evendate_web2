@@ -67,6 +67,13 @@
 	<span class="tab Tab {classes}" {dataset}>{label}</span>
 </script>
 
+<script type="javascript/template" id="tmpl-loader">
+	<div class="loader">
+		<div class="loader_dot"></div>
+		<div class="loader_dot"></div>
+	</div>
+</script>
+
 <script type="javascript/template" id="tmpl-vk-share-button">
 	<button class="ShareButton share_icon {classes}" data-title="VK" data-href="http://vk.com/share.php?url=http://evendate.ru/event/{id}?title={title}&description={description}&image={image_horizontal_url}&noparse=false"></button>
 </script>
@@ -922,10 +929,10 @@
 
 <script type="javascript/template" id="tmpl-orgstat-overview-content">
 	<header class="orgstat_overview_header Scoreboards">{scoreboards}</header>
-	<div class="orgstat_overview_charts">
-		<div class="SubscribersAreaChart"></div>
-		<div class="ViewsAreaChart"></div>
-		<div class="ConversionsAreaChart"></div>
+	<div class="orgstat_overview_charts OrgstatOverviewCharts">
+		<div class="orgstat_overview_chart SubscribersAreaChart"></div>
+		<div class="orgstat_overview_chart ViewsAreaChart"></div>
+		<div class="orgstat_overview_chart ConversionsAreaChart"></div>
 	</div>
 </script>
 

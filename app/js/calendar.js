@@ -2451,6 +2451,7 @@ function StatisticsOrganization($view) {
 						fontSize: 'inherit'
 					}
 				},
+				colors: [__C.COLORS.FRANKLIN,__C.COLORS.ACCENT,__C.COLORS.MUTED,__C.COLORS.MUTED_80,__C.COLORS.MUTED_50,__C.COLORS.MUTED_30],
 				title: {
 					text: false
 				},
@@ -2606,7 +2607,7 @@ function StatisticsOrganization($view) {
 			};
 			
 			function pieChartSeriesNormalize(raw_data) {
-				var default_colors = [__C.COLORS.FRANKLIN,__C.COLORS.ACCENT,__C.COLORS.MUTED,__C.COLORS.MUTED_80,__C.COLORS.MUTED_50,__C.COLORS.MUTED_30],
+				var
 					STD_NAMES = {
 						"browser": "Браузер",
 						"android": "Аndroid",
@@ -2617,11 +2618,9 @@ function StatisticsOrganization($view) {
 						null: "Не указано"
 					};
 				return [{
-					colorByPoint: true,
 					data: raw_data.map(function(line, i) {
 						return {
 							name: line.name ? STD_NAMES[line.name] : STD_NAMES[line.gender],
-							color: default_colors[i],
 							y: line.count
 						}
 					})
@@ -2634,17 +2633,26 @@ function StatisticsOrganization($view) {
 		function buildAreaCharts($container, data){
 			var area_chart_default_options = $.extend(true, {}, highchart_defaults, {
 				chart: {
-					type: 'areaspline'
+					type: 'areaspline',
+					plotBackgroundColor: '#fcfcfc',
+					plotBorderColor: '#ebebeb',
+					plotBorderWidth: 1
 				},
 				title: {
 					align: 'left',
 					margin: 20
 				},
 				xAxis: {
+					gridLineWidth: 1,
+					gridLineDashStyle: 'dash',
 					type: 'datetime',
 					showEmpty: false
 				},
 				yAxis: {
+					floor: 0,
+					min: 0,
+					gridLineDashStyle: 'dash',
+					opposite: false,
 					title: {
 						text: false
 					}
@@ -2657,14 +2665,25 @@ function StatisticsOrganization($view) {
 					symbolHeight: 18,
 					symbolWidth: 18,
 					symbolRadius: 9,
-					itemDistance: 42
+					itemDistance: 42,
+					x: 30
 				},
 				plotOptions: {
 					areaspline: {
 						fillOpacity: 0.5,
 						tooltip: {
 							headerFormat: '<b>{point.key}</b><br/>',
-							xDateFormat: '%d.%m.%Y'
+							xDateFormat: '%d.%m.%Y',
+							dateTimeLabelFormats: {
+								millisecond: "%A, %b %e, %H:%M:%S.%L",
+								second: "%A, %b %e, %H:%M:%S",
+								minute: "%A, %b %e, %H:%M",
+								hour: "%A, %b %e, %H:%M",
+								day: "%A, %b %e, %Y",
+								week: "Week from %A, %b %e, %Y",
+								month: "%B %Y",
+								year: "%Y"
+							}
 						},
 						marker: {
 							enabled: false,
@@ -2681,6 +2700,16 @@ function StatisticsOrganization($view) {
 					}
 				},
 				scrollbar: {enabled: false},
+				navigator: {
+					outlineColor: '#ebebeb',
+					outlineWidth: 1,
+					maskInside: false,
+					maskFill: 'rgba(255, 255, 255, 0.66)',
+					handles: {
+						backgroundColor: '#9fa7b6',
+						borderColor: '#fff'
+					}
+				},
 				rangeSelector: {
 					buttonTheme: {
 						width: null,
@@ -2712,6 +2741,10 @@ function StatisticsOrganization($view) {
 						}
 					},
 					buttons: [{
+						type: 'day',
+						count: 1,
+						text: "\xa0\xa0\xa0День\xa0\xa0\xa0"
+					}, {
 						type: 'day',
 						count: 7,
 						text: "\xa0\xa0\xa0Неделя\xa0\xa0\xa0"
@@ -2773,7 +2806,6 @@ function StatisticsOrganization($view) {
 				$container.find('.SubscribersAreaChart').highcharts('StockChart', $.extend(true, {}, area_chart_default_options, {
 					title: {text: 'Подписчики'},
 					tooltip: {shared: true},
-					navigator: {enabled: false},
 					series: areaChartSeriesNormalize({subscribe: data.subscribe, unsubscribe: data.unsubscribe})
 				}));
 			}
@@ -2781,14 +2813,6 @@ function StatisticsOrganization($view) {
 			if(data.view){
 				$container.find('.ViewsAreaChart').highcharts('StockChart', $.extend(true, {}, area_chart_default_options, {
 					title: {text: 'Просмотры организатора'},
-					navigator: {
-						maskInside: false,
-						maskFill: 'rgba(255, 255, 255, 0.66)',
-						handles: {
-							backgroundColor: '#9fa7b6',
-							borderColor: '#fff'
-						}
-					},
 					series: areaChartSeriesNormalize({view: data.view})
 				}));
 			}
@@ -2797,7 +2821,6 @@ function StatisticsOrganization($view) {
 				$container.find('.ConversionsAreaChart').highcharts('StockChart', $.extend(true, {}, area_chart_default_options, {
 					title: {text: 'Конверсия просмотров/подписок'},
 					tooltip: {valueSuffix: ' %'},
-					navigator: {enabled: false},
 					series: areaChartSeriesNormalize({conversion: data.conversion})
 				}));
 			}
@@ -2855,9 +2878,6 @@ function StatisticsOrganization($view) {
 			$wrapper.append(tmpl('orgstat-overview', org_data));
 			
 			getStatistics(org_id, 'year', moment().subtract(6, 'd').format(), moment().format(), stat_fields, function(stat_data){
-				var charts_data = JSON.parse(window.sessionStorage.getItem('statistics'));
-				charts_data = charts_data ? charts_data : {until: moment().unix()};
-				
 				buildPieChart($wrapper.find('.GenderPieChart'), stat_data.audience.gender);
 				buildPieChart($wrapper.find('.DevicePieChart'), stat_data.audience.devices);
 				
@@ -2865,14 +2885,16 @@ function StatisticsOrganization($view) {
 				
 				updateScoreboards($wrapper.find('.Scoreboards'), stat_data, stat_data.dynamics);
 				
-				if(moment.unix(charts_data.until).isSameOrBefore(moment())){
+				if(moment.unix(window.sessionStorage.getItem('statistics_chart_data_until')).isSameOrBefore(moment())){
+					var $loader = tmpl('loader', {}, $wrapper.find('.OrgstatOverviewCharts'));
 					getStatistics(org_id, 'day', moment().subtract(18, 'months').format(), moment().format(), 'view,subscribe,unsubscribe,conversion,notification', function(stat_data) {
-						stat_data.until = moment().add(15, 'm').unix();
-						window.sessionStorage.setItem('statistics', JSON.stringify(stat_data));
+						window.sessionStorage.setItem('statistics_chart_data', JSON.stringify(stat_data));
+						window.sessionStorage.setItem('statistics_chart_data_until', moment().add(15, 'm').unix());
+						$loader.remove();
 						buildAreaCharts($wrapper, stat_data);
 					});
 				} else {
-					buildAreaCharts($wrapper, charts_data);
+					buildAreaCharts($wrapper, JSON.parse(window.sessionStorage.getItem('statistics_chart_data')));
 				}
 				
 				console.log(stat_data);
