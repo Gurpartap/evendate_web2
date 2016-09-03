@@ -985,6 +985,7 @@ function showNotifier(response){
 function renderState(){
 	var page_split = __STATES.getCurrentState().split('/'),
 		page = page_split[0],
+		$body = $('body'),
 		$sidebar_nav_items = $('.SidebarNavItem'),
 		$tabs = $('.HeaderTabsWrapper').find('.Tab'),
 		$views = $('.PageView'),
@@ -994,9 +995,8 @@ function renderState(){
 		controller;
 	
 	if(!(state.data.reload === false && state.data._index+1 == History.getCurrentIndex())){
-		$(window).off('scroll');
-		$(window).data('disable_upload', false);
-		$('body').removeClass('-state_statistics');
+		$(window).off('scroll').data('disable_upload', false);
+		$body.removeClass('-state_statistics');
 		switch(typeof __STATES[page]){
 			case 'function': {
 				controller = __STATES[page];
@@ -1009,11 +1009,11 @@ function renderState(){
 				return false;
 			}
 		}
-		$new_view = page == 'friend' ? $('.friends-app') : $views.filter('[data-controller="'  + controller.name + '"]');
+		$new_view = page == 'friend' ? $('.friends-app') : $views.filter('.'+controller.name+'View');
 		if(!$cur_view.is($new_view))
 			$('#main_header').removeClass('-with_tabs');
 		
-		$('body').find('[data-page], .Controller').removeClass('-Handled_Controller').off('mousedown.pageRender');
+		$body.find('[data-page], .Controller').removeClass('-Handled_Controller').off('mousedown.pageRender');
 		$cur_view.addClass('-faded');
 		setTimeout(function(){
 			$cur_view.addClass(__C.CLASSES.NEW_HIDDEN);
@@ -1026,7 +1026,7 @@ function renderState(){
 		}, 200);
 	}
 	
-	changeMainTitle(state.title);
+	changeTitle(state.title);
 	if(page != 'search')
 		$('#search_bar_input').val('');
 	
@@ -1136,26 +1136,36 @@ function renderHeaderTabs(tabs){
 	$('#main_header').addClass('-with_tabs');
 }
 
-function changeMainTitle(new_title){
-	var $page_title = $('#page_title');
-	$page_title.empty();
+function changeTitle(new_title){
+	var $new_title = $(),
+		title_str;
 	switch(true){
 		case (typeof new_title == 'string'): {
+			title_str = new_title;
 			new_title = new_title.split(' > ');
 		}
 		case (Array.isArray(new_title)): {
 			new_title.forEach(function(title_chunk, i) {
 				if(i)
-					$page_title.append('<span class="fa_icon fa-angle-right -empty"></span>');
-				$page_title.append('<span>'+title_chunk+'</span>');
+					$new_title = $new_title.add('<span class="fa_icon fa-angle-right -empty"></span>');
+				$new_title = $new_title.add('<span>'+title_chunk+'</span>');
 			});
+			if(!title_str){
+				title_str = new_title.join(' > ');
+			}
 			break;
 		}
 		case (new_title instanceof jQuery): {
-			$page_title.append(new_title);
+			$new_title = new_title;
+			new_title.each(function() {
+				if(this.text())
+					title_str += this.text() + ' ';
+			});
 			break;
 		}
 	}
+	$('#page_title').html($new_title);
+	$('title').text(title_str ? 'Evendate. '+title_str : 'Evendate');
 }
 
 function recognizeRole(privileges){

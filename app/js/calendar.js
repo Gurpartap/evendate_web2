@@ -14,9 +14,9 @@ var __STATES = {
 		friends: Friends,
 		friend: OneFriend,
 		edit_event: EditEvent,
-		statistics: StatisticsOverview,
-		organization_statistics: StatisticsOrganization,
-		event_statistics: StatisticsEvent,
+		statistics: Statistics,
+		organization_statistics: Statistics,
+		event_statistics: Statistics,
 		getCurrentState: function(){
 			return window.location.pathname.split('/')[1];
 		},
@@ -792,7 +792,7 @@ function OrganizationsList($view){
 		state_data.reload = false;
 		$wrapper.find('.Category').filter('[data-type-id="'+state_data.type_id+'"]').addClass(__C.CLASSES.NEW_ACTIVE);
 		History.replaceState(state_data, category.type_name);
-		changeMainTitle(state_data.title);
+		changeTitle(state_data.title);
 	}
 
 	$wrapper.empty();
@@ -1109,7 +1109,7 @@ function Organization($view){
 				role = recognizeRole(data.privileges);
 				if(role == __C.ROLES.ADMIN){
 					data.redact_org_button = buildButton({
-						title: 'Редактировать',
+						title: 'Изменить',
 						classes: ['-fill','-color_neutral','fa_icon','fa-pencil','RippleEffect'],
 						dataset: {
 							'page': 'edit_organization',
@@ -2399,558 +2399,573 @@ function Onboarding($view){
 	});
 }
 
-function StatisticsOverview($view) {
-
-}
-
-function StatisticsOrganization($view) {
-	var current_state = window.location.pathname.split('/')[2],
-		sub_states = {
-			overview: Overview,
-			events: Events,
-			auditory: Auditory,
-			promotion: Promotion,
-			settings: Settings,
-			support: Support
+function Statistics($view) {
+	var current_state = window.location.pathname.split('/')[1],
+		statistics_states = {
+			statistics: StatisticsOverview,
+			organization_statistics: StatisticsOrganization,
+			event_statistics: StatisticsEvent
 		},
 		$wrapper = $view.find('.page_wrapper');
 	
-	function Overview($wrapper) {
-		var org_id = 1,
-			org_fields = [
-				'description',
-				'img_medium_url',
-				'default_address',
-				'staff',
-				'privileges',
-				'events{length:3,future:true,is_canceled:true,is_delayed:true,fields:"public_at"}'
-			],
-			stat_fields = [
-				'subscribe',
-				'view',
-				'fave',
-				'conversion',
-				'audience',
-				'dynamics'+JSON.stringify({
-					scale: 'week',
-					fields: [
-						'subscribe',
-						'view',
-						'fave',
-						'conversion'
-					].join(',')
-				})
-			].join(','),
-			highchart_defaults = {
-				chart: {
-					backgroundColor: null,
-					plotBorderWidth: null,
-					plotShadow: false,
-					style: {
-						fontFamily: 'inherit',
-						fontSize: 'inherit'
-					}
-				},
-				colors: [__C.COLORS.FRANKLIN,__C.COLORS.ACCENT,__C.COLORS.MUTED,__C.COLORS.MUTED_80,__C.COLORS.MUTED_50,__C.COLORS.MUTED_30],
-				title: {
-					text: false
-				},
-				credits: {
-					enabled: false
-				}
-			};
+	function StatisticsOverview($view) {
 		
-		function getStatistics(org_id, scale, since, till, fields, success){
-			$.ajax({
-				url: '/api/v1/statistics/organizations/'+org_id,
-				data: {
-					scale: scale,
-					since: since,
-					till: till,
-					fields: fields
-				},
-				method: 'GET',
-				success: function(res){
-					ajaxHandler(res, function(data, text){
-						if(success && typeof success == 'function'){
-							success(data);
-						}
-					}, ajaxErrorHandler)
-				}
-			});
-		}
-		
-		function getOrganizationData(org_id, fields, success){
-			$.ajax({
-				url: '/api/v1/organizations/'+org_id,
-				data: {
-					fields: Array.isArray(fields) ? fields.join(',') : fields
-				},
-				method: 'GET',
-				success: function(res){
-					ajaxHandler(res, function(data, text){
-						if(success && typeof success == 'function'){
-							success(data);
-						}
-					}, ajaxErrorHandler)
-				}
-			});
-		}
-		
-		function getSpecificStaff(role, staff){
-			var specific_staff = [];
-			staff.forEach(function(man){
-				if(man.role == role){
-					specific_staff.push({
-						id: man.id,
-						avatar_url: man.avatar_url,
-						name: man.first_name + ' ' + man.last_name,
-						is_link: true,
-						avatar_classes: ['-size_40x40','-rounded']
-					})
-				}
-			});
-			return specific_staff;
-		}
-		
-		function updateScoreboards($wrapper, numbers, dynamics) {
-			var order = ['subscribe', 'fave', 'view', 'conversion'],
-				fields = {
-					'subscribe': 'Подписчиков организатора',
-					'fave': 'Добавлений в избранное',
-					'view': 'Просмотров организатора',
-					'conversion': 'Конверсия откытий/подписки'
-				};
-			
-			order.forEach(function(field){
-				var measure = field == 'conversion' ? '%' : '',
-					$scoreboard = $wrapper.find('.Scoreboard'+field.capitalize());
-				
-				if(!$scoreboard.length){
-					$scoreboard = tmpl('orgstat-scoreboard', {
-						type: 'Scoreboard'+field.capitalize(),
-						title: fields[field],
-						number: 0 + measure,
-						dynamic_by_week: 0 + measure
-					}, $wrapper)
-				}
-				
-				if(numbers[field]){
-					$scoreboard.find('.ScoreboardNumber').animateNumber({
-						number: Math.round(numbers[field][0].value),
-						suffix: measure
-					}, 2000, 'easeOutSine');
-				}
-				
-				if(dynamics[field]){
-					var dynamic = dynamics[field][0].value;
-					$scoreboard
-						.find('.ScoreboardDynamic')
-						.animateNumber({
-							number: Math.round(dynamic),
-							prefix: dynamic == 0 ? '' : (dynamic > 0 ? '+' : '-'),
-							suffix: measure
-						}, 2000, 'easeOutSine')
-						.siblings('label')
-						.removeClass('fa-caret-up -color_franklin fa-caret-down -color_bubblegum')
-						.addClass(dynamic == 0 ? '' : (dynamic > 0 ? 'fa-caret-up -color_franklin' : 'fa-caret-down -color_bubblegum'));
-				}
-				
-			});
-		}
-		
-		function buildPieChart($container, data) {
-			var pie_chart_options = {
-				chart: {
-					type: 'pie',
-					height: 200,
-					style: {
-						fontFamily: 'inherit',
-						fontSize: 'inherit'
-					}
-				},
-				tooltip: {
-					pointFormat: '<b>{point.percentage:.1f}%</b>'
-				},
-				plotOptions: {
-					pie: {
-						center: [45, '50%'],
-						allowPointSelect: true,
-						cursor: 'pointer',
-						size: 120,
-						dataLabels: {
-							distance: -35,
-							defer: false,
-							formatter: function () {
-								return this.percentage > 15 ? Math.round(this.percentage)+'%' : null;
-							},
-							style: {"color": "#fff", "fontSize": "20px", "fontWeight": "300", "textShadow": "none" },
-							y: -6
-						},
-						showInLegend: true
-					}
-				},
-				legend: {
-					align: 'right',
-					verticalAlign: 'top',
-					layout: 'vertical',
-					width: 100,
-					symbolHeight: 0,
-					symbolWidth: 0,
-					itemMarginBottom: 5,
-					labelFormatter: function() {
-						return '<span style="color: '+this.color+'">'+this.name+'</span>'
-					},
-					itemStyle: { cursor: 'pointer', fontSize: '14px', fontWeight: '500' },
-					y: 12
-				}
-			};
-			
-			function pieChartSeriesNormalize(raw_data) {
-				var
-					STD_NAMES = {
-						"browser": "Браузер",
-						"android": "Аndroid",
-						"ios": "iOS",
-						"female": "Женщины",
-						"male": "Мужчины",
-						"other": "Остальные",
-						null: "Не указано"
-					};
-				return [{
-					data: raw_data.map(function(line, i) {
-						return {
-							name: line.name ? STD_NAMES[line.name] : STD_NAMES[line.gender],
-							y: line.count
-						}
-					})
-				}];
-			}
-			
-			$container.highcharts($.extend(true, {}, highchart_defaults, pie_chart_options, {series: pieChartSeriesNormalize(data)}));
-		}
-		
-		function buildAreaCharts($container, data){
-			var area_chart_default_options = $.extend(true, {}, highchart_defaults, {
-				chart: {
-					type: 'areaspline',
-					plotBackgroundColor: '#fcfcfc',
-					plotBorderColor: '#ebebeb',
-					plotBorderWidth: 1
-				},
-				title: {
-					align: 'left',
-					margin: 20
-				},
-				legend: {
-					enabled: true,
-					align: 'left',
-					itemStyle: { color: __C.COLORS.TEXT, cursor: 'pointer', fontSize: '14px', fontWeight: '500', y: 0 },
-					itemMarginTop: 24,
-					itemMarginBottom: 5,
-					symbolHeight: 18,
-					symbolWidth: 18,
-					symbolRadius: 9,
-					itemDistance: 42,
-					x: 30
-				},
-				plotOptions: {
-					series: {
-						states: {
-							hover: {
-								enabled: true,
-								lineWidth: 2
-							}
-						}
-					},
-					areaspline: {
-						fillOpacity: 0.5,
-						marker: {
-							enabled: false,
-							symbol: 'circle',
-							radius: 2,
-							states: {
-								hover: {
-									enabled: true
-								}
-							}
-						}
-					}
-				},
-				tooltip: {
-					headerFormat: '<b>{point.key}</b><br/>',
-					valueDecimals: 0,
-					xDateFormat: '%e %b %Y, %H:%M'
-				},
-				scrollbar: {enabled: false},
-				navigator: {
-					outlineColor: '#ebebeb',
-					outlineWidth: 1,
-					maskInside: false,
-					maskFill: 'rgba(245, 245, 245, 0.66)',
-					handles: {
-						backgroundColor: '#9fa7b6',
-						borderColor: '#fff'
-					},
-					xAxis: {
-						gridLineWidth: 0,
-						labels: {
-							align: 'left',
-							reserveSpace: true,
-							style: {
-								color: '#888'
-							},
-							x: 0,
-							y: null
-						}
-					}
-				},
-				rangeSelector: {
-					buttonTheme: {
-						width: null,
-						height: 22,
-						fill: 'none',
-						stroke: 'none',
-						r: 14,
-						style: {
-							color: __C.COLORS.MUTED_80,
-							fontSize: '13px',
-							fontWeight: '400',
-							textTransform: 'uppercase',
-							dominantBaseline: 'middle'
-						},
-						states: {
-							hover: {
-								fill: __C.COLORS.MUTED_50,
-								style: {
-									color: '#fff'
-								}
-							},
-							select: {
-								fill: __C.COLORS.MUTED_80,
-								style: {
-									color: '#fff',
-									fontWeight: '400'
-								}
-							}
-						}
-					},
-					buttons: [{
-						type: 'day',
-						count: 1,
-						text: "\xa0\xa0\xa0День\xa0\xa0\xa0"
-					}, {
-						type: 'day',
-						count: 7,
-						text: "\xa0\xa0\xa0Неделя\xa0\xa0\xa0"
-					}, {
-						type: 'month',
-						count: 1,
-						text: "\xa0\xa0\xa0Месяц\xa0\xa0\xa0"
-					}, {
-						type: 'year',
-						count: 1,
-						text: "\xa0\xa0\xa0Год\xa0\xa0\xa0"
-					}, {
-						type: 'all',
-						text: "\xa0\xa0\xa0Все\xa0время\xa0\xa0\xa0"
-					}],
-					allButtonsEnabled: true,
-					selected: 3,
-					labelStyle: {
-						display: 'none'
-					},
-					inputEnabled: false
-				},
-				xAxis: {
-					gridLineWidth: 1,
-					gridLineDashStyle: 'dash',
-					type: 'datetime',
-					showEmpty: false,
-					tickPosition: 'inside',
-					dateTimeLabelFormats: {
-						minute: '%H:%M',
-						hour: '%H:%M',
-						day: '%e %b',
-						week: '%e %b',
-						month: '%b %y',
-						year: '%Y'
-					}
-				},
-				yAxis: {
-					floor: 0,
-					min: 0,
-					gridLineDashStyle: 'dash',
-					opposite: false,
-					title: {
-						text: false
-					}
-				}
-			});
-			
-			function areaChartSeriesNormalize(raw_data) {
-				var line_colors = [__C.COLORS.FRANKLIN,__C.COLORS.MUTED_80],
-					fill_colors = ['rgba(35, 215, 146, 0.09)','rgba(101, 101, 101, 0.6)'],
-					fill_colors2 = ['rgba(35, 215, 146, 0.18)','rgba(101, 101, 101, 0.6)'],
-					STD_NAMES = {
-						'view': 'Просмотры страницы организации',
-						'conversion': 'Конверсия',
-						'subscribe': 'Подписалось',
-						'unsubscribe': 'Отписалось'
-					},
-					output = [],
-					i = 0;
-				
-				$.each(raw_data, function(key, data){
-					output.push({
-						name: STD_NAMES[key],
-						color: line_colors[i],
-						fillColor: {
-							linearGradient: {x1: 0, x2: 0, y1: 0, y2: 1},
-							stops: [
-								[0, fill_colors2[i]],
-								[1, fill_colors[i++]]
-							]
-						},
-						data: data.reverse().map(function(line, i) {
-							return [moment.unix(line.since).valueOf(), line.value];
-						})
-					});
-				});
-				
-				return output;
-			}
-			
-			if(data.subscribe && data.unsubscribe){
-				$container.find('.SubscribersAreaChart').highcharts('StockChart', $.extend(true, {}, area_chart_default_options, {
-					title: {text: 'Подписчики'},
-					tooltip: {shared: true},
-					series: areaChartSeriesNormalize({subscribe: data.subscribe, unsubscribe: data.unsubscribe})
-				}));
-			}
-			
-			if(data.view){
-				$container.find('.ViewsAreaChart').highcharts('StockChart', $.extend(true, {}, area_chart_default_options, {
-					title: {text: 'Просмотры организатора'},
-					series: areaChartSeriesNormalize({view: data.view})
-				}));
-			}
-			
-			if(data.conversion){
-				$container.find('.ConversionsAreaChart').highcharts('StockChart', $.extend(true, {}, area_chart_default_options, {
-					title: {text: 'Конверсия просмотров/подписок'},
-					tooltip: {valueSuffix: ' %'},
-					yAxis: {
-						max: 100,
-						labels: {
-							format: '{value}%'
-						}
-					},
-					series: areaChartSeriesNormalize({conversion: data.conversion})
-				}));
-			}
-			
-			console.log(data);
-		}
-		
-		$wrapper.empty();
-		getOrganizationData(org_id, org_fields, function(org_data) {
-			var role;
-			org_data = org_data[0];
-			
-			changeMainTitle(['Организации', org_data.short_name]);
-			
-			role = recognizeRole(org_data.privileges);
-			
-			org_data.administrators = getSpecificStaff('admin', org_data.staff);
-			org_data.moderators = getSpecificStaff('moderator', org_data.staff);
-			switch(role){
-				case __C.ROLES.ADMIN: {
-					org_data.administrators.push({
-						avatar_url: '/app/img/add_user.png',
-						name: 'Добавить администратора',
-						block_classes: ['-add_new','-color_marginal','AddAdmin'],
-						avatar_classes: ['-size_40x40','-rounded']
-					});
-				}
-				case __C.ROLES.MODERATOR: {
-					org_data.moderators.push({
-						avatar_url: '/app/img/add_user.png',
-						name: 'Добавить модератора',
-						block_classes: ['-add_new','-color_marginal','AddModerator'],
-						avatar_classes: ['-size_40x40','-rounded']
-					});
-					break;
-				}
-			}
-			org_data.administrators = buildAvatarBlocks(org_data.administrators);
-			org_data.moderators = buildAvatarBlocks(org_data.moderators);
-			org_data.event_blocks = org_data.events.map(function(event) {
-				var event_block = {
-					title: event.title,
-					day: moment.unix(event.first_event_date).format("D"),
-					month: moment.unix(event.first_event_date).format("MMM"),
-					badges: []
-				};
-				if(event.canceled)
-					event_block.badges.push('Отменено');
-				if(event.public_at && moment.unix(event.public_at).isBefore())
-					event_block.badges.push('Не опубликовано');
-				return event_block;
-			});
-			org_data.event_blocks = tmpl('orgstat-event-block', org_data.event_blocks);
-			
-			$wrapper.append(tmpl('orgstat-overview', org_data));
-			
-			getStatistics(org_id, 'year', moment().subtract(6, 'd').format(), moment().format(), stat_fields, function(stat_data){
-				buildPieChart($wrapper.find('.GenderPieChart'), stat_data.audience.gender);
-				buildPieChart($wrapper.find('.DevicePieChart'), stat_data.audience.devices);
-				
-				$wrapper.find('.OrgstatOverviewContent').append(tmpl('orgstat-overview-content', {}));
-				
-				updateScoreboards($wrapper.find('.Scoreboards'), stat_data, stat_data.dynamics);
-				
-				if(moment.unix(window.sessionStorage.getItem('statistics_chart_data_until')).isSameOrBefore(moment())){
-					var $loader = tmpl('loader', {}, $wrapper.find('.OrgstatOverviewCharts'));
-					getStatistics(org_id, 'day', moment().subtract(18, 'months').format(), moment().format(), 'view,subscribe,unsubscribe,conversion,notification', function(stat_data) {
-						window.sessionStorage.setItem('statistics_chart_data', JSON.stringify(stat_data));
-						window.sessionStorage.setItem('statistics_chart_data_until', moment().add(15, 'm').unix());
-						$loader.remove();
-						buildAreaCharts($wrapper, stat_data);
-					});
-				} else {
-					buildAreaCharts($wrapper, JSON.parse(window.sessionStorage.getItem('statistics_chart_data')));
-				}
-				
-				console.log(stat_data);
-			});
-			
-			bindRippleEffect($wrapper);
-			bindControllers($wrapper);
-			console.log(org_data);
-		});
 	}
 	
-	function Events($wrapper) {}
+	function StatisticsOrganization($wrapper) {
+		var current_state = window.location.pathname.split('/')[2],
+			sub_states = {
+				overview: Overview,
+				events: Events,
+				auditory: Auditory,
+				promotion: Promotion,
+				settings: Settings,
+				support: Support
+			};
+		
+		function Overview($wrapper) {
+			var org_id = 1,
+				org_fields = [
+					'description',
+					'img_medium_url',
+					'default_address',
+					'staff',
+					'privileges',
+					'events{length:3,future:true,is_canceled:true,is_delayed:true,fields:"public_at"}'
+				],
+				stat_fields = [
+					'subscribe',
+					'view',
+					'fave',
+					'conversion',
+					'audience',
+					'dynamics'+JSON.stringify({
+						scale: 'week',
+						fields: [
+							'subscribe',
+							'view',
+							'fave',
+							'conversion'
+						].join(',')
+					})
+				].join(','),
+				highchart_defaults = {
+					chart: {
+						backgroundColor: null,
+						plotBorderWidth: null,
+						plotShadow: false,
+						style: {
+							fontFamily: 'inherit',
+							fontSize: 'inherit'
+						}
+					},
+					colors: [__C.COLORS.FRANKLIN,__C.COLORS.ACCENT,__C.COLORS.MUTED,__C.COLORS.MUTED_80,__C.COLORS.MUTED_50,__C.COLORS.MUTED_30],
+					title: {
+						text: false
+					},
+					credits: {
+						enabled: false
+					}
+				};
+			
+			function getStatistics(org_id, scale, since, till, fields, success){
+				$.ajax({
+					url: '/api/v1/statistics/organizations/'+org_id,
+					data: {
+						scale: scale,
+						since: since,
+						till: till,
+						fields: fields
+					},
+					method: 'GET',
+					success: function(res){
+						ajaxHandler(res, function(data, text){
+							if(success && typeof success == 'function'){
+								success(data);
+							}
+						}, ajaxErrorHandler)
+					}
+				});
+			}
+			
+			function getOrganizationData(org_id, fields, success){
+				$.ajax({
+					url: '/api/v1/organizations/'+org_id,
+					data: {
+						fields: Array.isArray(fields) ? fields.join(',') : fields
+					},
+					method: 'GET',
+					success: function(res){
+						ajaxHandler(res, function(data, text){
+							if(success && typeof success == 'function'){
+								success(data);
+							}
+						}, ajaxErrorHandler)
+					}
+				});
+			}
+			
+			function getSpecificStaff(role, staff){
+				var specific_staff = [];
+				staff.forEach(function(man){
+					if(man.role == role){
+						specific_staff.push({
+							id: man.id,
+							avatar_url: man.avatar_url,
+							name: man.first_name + ' ' + man.last_name,
+							is_link: true,
+							avatar_classes: ['-size_40x40','-rounded']
+						})
+					}
+				});
+				return specific_staff;
+			}
+			
+			function updateScoreboards($wrapper, numbers, dynamics) {
+				var order = ['subscribe', 'fave', 'view', 'conversion'],
+					fields = {
+						'subscribe': 'Подписчиков организатора',
+						'fave': 'Добавлений в избранное',
+						'view': 'Просмотров организатора',
+						'conversion': 'Конверсия откытий/подписки'
+					};
+				
+				order.forEach(function(field){
+					var measure = field == 'conversion' ? '%' : '',
+						$scoreboard = $wrapper.find('.Scoreboard'+field.capitalize());
+					
+					if(!$scoreboard.length){
+						$scoreboard = tmpl('orgstat-scoreboard', {
+							type: 'Scoreboard'+field.capitalize(),
+							title: fields[field],
+							number: 0 + measure,
+							dynamic_by_week: 0 + measure
+						}, $wrapper)
+					}
+					
+					if(numbers[field]){
+						$scoreboard.find('.ScoreboardNumber').animateNumber({
+							number: Math.round(numbers[field][0].value),
+							suffix: measure
+						}, 2000, 'easeOutSine');
+					}
+					
+					if(dynamics[field]){
+						var dynamic = dynamics[field][0].value;
+						$scoreboard
+							.find('.ScoreboardDynamic')
+							.animateNumber({
+								number: Math.round(dynamic),
+								prefix: dynamic == 0 ? '' : (dynamic > 0 ? '+' : '-'),
+								suffix: measure
+							}, 2000, 'easeOutSine')
+							.siblings('label')
+							.removeClass('fa-caret-up -color_franklin fa-caret-down -color_bubblegum')
+							.addClass(dynamic == 0 ? '' : (dynamic > 0 ? 'fa-caret-up -color_franklin' : 'fa-caret-down -color_bubblegum'));
+					}
+					
+				});
+			}
+			
+			function buildPieChart($container, data) {
+				var pie_chart_options = {
+					chart: {
+						type: 'pie',
+						height: 200,
+						style: {
+							fontFamily: 'inherit',
+							fontSize: 'inherit'
+						}
+					},
+					tooltip: {
+						pointFormat: '<b>{point.percentage:.1f}%</b>'
+					},
+					plotOptions: {
+						pie: {
+							center: [45, '50%'],
+							allowPointSelect: true,
+							cursor: 'pointer',
+							size: 120,
+							dataLabels: {
+								distance: -35,
+								defer: false,
+								formatter: function () {
+									return this.percentage > 15 ? Math.round(this.percentage)+'%' : null;
+								},
+								style: {"color": "#fff", "fontSize": "20px", "fontWeight": "300", "textShadow": "none" },
+								y: -6
+							},
+							showInLegend: true
+						}
+					},
+					legend: {
+						align: 'right',
+						verticalAlign: 'top',
+						layout: 'vertical',
+						width: 100,
+						symbolHeight: 0,
+						symbolWidth: 0,
+						itemMarginBottom: 5,
+						labelFormatter: function() {
+							return '<span style="color: '+this.color+'">'+this.name+'</span>'
+						},
+						itemStyle: { cursor: 'pointer', fontSize: '14px', fontWeight: '500' },
+						y: 12
+					}
+				};
+				
+				function pieChartSeriesNormalize(raw_data) {
+					var
+						STD_NAMES = {
+							"browser": "Браузер",
+							"android": "Аndroid",
+							"ios": "iOS",
+							"female": "Женщины",
+							"male": "Мужчины",
+							"other": "Остальные",
+							null: "Не указано"
+						};
+					return [{
+						data: raw_data.map(function(line, i) {
+							return {
+								name: line.name ? STD_NAMES[line.name] : STD_NAMES[line.gender],
+								y: line.count
+							}
+						})
+					}];
+				}
+				
+				$container.highcharts($.extend(true, {}, highchart_defaults, pie_chart_options, {series: pieChartSeriesNormalize(data)}));
+			}
+			
+			function buildAreaCharts($container, data){
+				var area_chart_default_options = $.extend(true, {}, highchart_defaults, {
+					chart: {
+						type: 'areaspline',
+						plotBackgroundColor: '#fcfcfc',
+						plotBorderColor: '#ebebeb',
+						plotBorderWidth: 1
+					},
+					title: {
+						align: 'left',
+						margin: 20
+					},
+					legend: {
+						enabled: true,
+						align: 'left',
+						itemStyle: { color: __C.COLORS.TEXT, cursor: 'pointer', fontSize: '14px', fontWeight: '500', y: 0 },
+						itemMarginTop: 24,
+						itemMarginBottom: 5,
+						symbolHeight: 18,
+						symbolWidth: 18,
+						symbolRadius: 9,
+						itemDistance: 42,
+						x: 30
+					},
+					plotOptions: {
+						series: {
+							states: {
+								hover: {
+									enabled: true,
+									lineWidth: 2
+								}
+							}
+						},
+						areaspline: {
+							fillOpacity: 0.5,
+							marker: {
+								enabled: false,
+								symbol: 'circle',
+								radius: 2,
+								states: {
+									hover: {
+										enabled: true
+									}
+								}
+							}
+						}
+					},
+					tooltip: {
+						headerFormat: '<b>{point.key}</b><br/>',
+						valueDecimals: 0,
+						xDateFormat: '%e %b %Y, %H:%M'
+					},
+					scrollbar: {enabled: false},
+					navigator: {
+						outlineColor: '#ebebeb',
+						outlineWidth: 1,
+						maskInside: false,
+						maskFill: 'rgba(245, 245, 245, 0.66)',
+						handles: {
+							backgroundColor: '#9fa7b6',
+							borderColor: '#fff'
+						},
+						xAxis: {
+							gridLineWidth: 0,
+							labels: {
+								align: 'left',
+								reserveSpace: true,
+								style: {
+									color: '#888'
+								},
+								x: 0,
+								y: null
+							}
+						}
+					},
+					rangeSelector: {
+						buttonTheme: {
+							width: null,
+							height: 22,
+							fill: 'none',
+							stroke: 'none',
+							r: 14,
+							style: {
+								color: __C.COLORS.MUTED_80,
+								fontSize: '13px',
+								fontWeight: '400',
+								textTransform: 'uppercase',
+								dominantBaseline: 'middle'
+							},
+							states: {
+								hover: {
+									fill: __C.COLORS.MUTED_50,
+									style: {
+										color: '#fff'
+									}
+								},
+								select: {
+									fill: __C.COLORS.MUTED_80,
+									style: {
+										color: '#fff',
+										fontWeight: '400'
+									}
+								}
+							}
+						},
+						buttons: [{
+							type: 'day',
+							count: 1,
+							text: "\xa0\xa0\xa0День\xa0\xa0\xa0"
+						}, {
+							type: 'day',
+							count: 7,
+							text: "\xa0\xa0\xa0Неделя\xa0\xa0\xa0"
+						}, {
+							type: 'month',
+							count: 1,
+							text: "\xa0\xa0\xa0Месяц\xa0\xa0\xa0"
+						}, {
+							type: 'year',
+							count: 1,
+							text: "\xa0\xa0\xa0Год\xa0\xa0\xa0"
+						}, {
+							type: 'all',
+							text: "\xa0\xa0\xa0Все\xa0время\xa0\xa0\xa0"
+						}],
+						allButtonsEnabled: true,
+						selected: 3,
+						labelStyle: {
+							display: 'none'
+						},
+						inputEnabled: false
+					},
+					xAxis: {
+						gridLineWidth: 1,
+						gridLineDashStyle: 'dash',
+						type: 'datetime',
+						showEmpty: false,
+						tickPosition: 'inside',
+						dateTimeLabelFormats: {
+							minute: '%H:%M',
+							hour: '%H:%M',
+							day: '%e %b',
+							week: '%e %b',
+							month: '%b %y',
+							year: '%Y'
+						}
+					},
+					yAxis: {
+						floor: 0,
+						min: 0,
+						gridLineDashStyle: 'dash',
+						opposite: false,
+						title: {
+							text: false
+						}
+					}
+				});
+				
+				function areaChartSeriesNormalize(raw_data) {
+					var line_colors = [__C.COLORS.FRANKLIN,__C.COLORS.MUTED_80],
+						fill_colors = ['rgba(35, 215, 146, 0.09)','rgba(101, 101, 101, 0.6)'],
+						fill_colors2 = ['rgba(35, 215, 146, 0.18)','rgba(101, 101, 101, 0.6)'],
+						STD_NAMES = {
+							'view': 'Просмотры страницы организации',
+							'conversion': 'Конверсия',
+							'subscribe': 'Подписалось',
+							'unsubscribe': 'Отписалось'
+						},
+						output = [],
+						i = 0;
+					
+					$.each(raw_data, function(key, data){
+						output.push({
+							name: STD_NAMES[key],
+							color: line_colors[i],
+							fillColor: {
+								linearGradient: {x1: 0, x2: 0, y1: 0, y2: 1},
+								stops: [
+									[0, fill_colors2[i]],
+									[1, fill_colors[i++]]
+								]
+							},
+							data: data.reverse().map(function(line, i) {
+								return [moment.unix(line.since).valueOf(), line.value];
+							})
+						});
+					});
+					
+					return output;
+				}
+				
+				if(data.subscribe && data.unsubscribe){
+					$container.find('.SubscribersAreaChart').highcharts('StockChart', $.extend(true, {}, area_chart_default_options, {
+						title: {text: 'Подписчики'},
+						tooltip: {shared: true},
+						series: areaChartSeriesNormalize({subscribe: data.subscribe, unsubscribe: data.unsubscribe})
+					}));
+				}
+				
+				if(data.view){
+					$container.find('.ViewsAreaChart').highcharts('StockChart', $.extend(true, {}, area_chart_default_options, {
+						title: {text: 'Просмотры организатора'},
+						series: areaChartSeriesNormalize({view: data.view})
+					}));
+				}
+				
+				if(data.conversion){
+					$container.find('.ConversionsAreaChart').highcharts('StockChart', $.extend(true, {}, area_chart_default_options, {
+						title: {text: 'Конверсия просмотров/подписок'},
+						tooltip: {valueSuffix: ' %'},
+						yAxis: {
+							max: 100,
+							labels: {
+								format: '{value}%'
+							}
+						},
+						series: areaChartSeriesNormalize({conversion: data.conversion})
+					}));
+				}
+				
+				console.log(data);
+			}
+			
+			$wrapper.empty();
+			getOrganizationData(org_id, org_fields, function(org_data) {
+				var role;
+				org_data = org_data[0];
+				
+				changeTitle(['Организации', org_data.short_name]);
+				
+				role = recognizeRole(org_data.privileges);
+				
+				org_data.administrators = getSpecificStaff('admin', org_data.staff);
+				org_data.moderators = getSpecificStaff('moderator', org_data.staff);
+				switch(role){
+					case __C.ROLES.ADMIN: {
+						org_data.administrators.push({
+							avatar_url: '/app/img/add_user.png',
+							name: 'Добавить администратора',
+							block_classes: ['-add_new','-color_marginal','AddAdmin'],
+							avatar_classes: ['-size_40x40','-rounded']
+						});
+					}
+					case __C.ROLES.MODERATOR: {
+						org_data.moderators.push({
+							avatar_url: '/app/img/add_user.png',
+							name: 'Добавить модератора',
+							block_classes: ['-add_new','-color_marginal','AddModerator'],
+							avatar_classes: ['-size_40x40','-rounded']
+						});
+						break;
+					}
+				}
+				org_data.administrators = buildAvatarBlocks(org_data.administrators);
+				org_data.moderators = buildAvatarBlocks(org_data.moderators);
+				org_data.event_blocks = org_data.events.map(function(event) {
+					var event_block = {
+						title: event.title,
+						day: moment.unix(event.first_event_date).format("D"),
+						month: moment.unix(event.first_event_date).format("MMM"),
+						badges: []
+					};
+					if(event.canceled)
+						event_block.badges.push('Отменено');
+					if(event.public_at && moment.unix(event.public_at).isBefore())
+						event_block.badges.push('Не опубликовано');
+					return event_block;
+				});
+				org_data.event_blocks = tmpl('orgstat-event-block', org_data.event_blocks);
+				
+				$wrapper.append(tmpl('orgstat-overview', org_data));
+				
+				getStatistics(org_id, 'year', moment().subtract(6, 'd').format(), moment().format(), stat_fields, function(stat_data){
+					buildPieChart($wrapper.find('.GenderPieChart'), stat_data.audience.gender);
+					buildPieChart($wrapper.find('.DevicePieChart'), stat_data.audience.devices);
+					
+					$wrapper.find('.OrgstatOverviewContent').append(tmpl('orgstat-overview-content', {}));
+					
+					updateScoreboards($wrapper.find('.Scoreboards'), stat_data, stat_data.dynamics);
+					
+					if(moment.unix(window.sessionStorage.getItem('statistics_chart_data_until')).isSameOrBefore(moment())){
+						var $loader = tmpl('loader', {}, $wrapper.find('.OrgstatOverviewCharts'));
+						getStatistics(org_id, 'day', moment().subtract(18, 'months').format(), moment().format(), 'view,subscribe,unsubscribe,conversion,notification', function(stat_data) {
+							window.sessionStorage.setItem('statistics_chart_data', JSON.stringify(stat_data));
+							window.sessionStorage.setItem('statistics_chart_data_until', moment().add(15, 'm').unix());
+							$loader.remove();
+							buildAreaCharts($wrapper, stat_data);
+						});
+					} else {
+						buildAreaCharts($wrapper, JSON.parse(window.sessionStorage.getItem('statistics_chart_data')));
+					}
+					
+					console.log(stat_data);
+				});
+				
+				bindRippleEffect($wrapper);
+				bindControllers($wrapper);
+				console.log(org_data);
+			});
+		}
+		
+		function Events($wrapper) {}
+		
+		function Auditory($wrapper) {}
+		
+		function Promotion($wrapper) {}
+		
+		function Settings($wrapper) {}
+		
+		function Support($wrapper) {}
+		
+		if(!current_state)
+			current_state = 'overview';
+		
+		sub_states[current_state]($wrapper);
+		
+	}
 	
-	function Auditory($wrapper) {}
-	
-	function Promotion($wrapper) {}
-	
-	function Settings($wrapper) {}
-	
-	function Support($wrapper) {}
+	function StatisticsEvent($view) {
+		
+	}
 	
 	if(!current_state)
-		current_state = 'overview';
+		current_state = 'statistics';
 	
-	sub_states[current_state]($wrapper);
+	statistics_states[current_state]($wrapper);
 	$('body').addClass('-state_statistics');
 	
-}
-
-function StatisticsEvent($view) {
-
 }
 
 function ajaxHandler(result, success, error){
