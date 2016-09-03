@@ -1,3 +1,107 @@
+__C = {
+	TEXTS: {
+		REMOVE_FAVORITE: 'Удалить из избранного',
+		ADD_FAVORITE: 'В избранное',
+		SUBSCRIBERS: {
+			NOM: ' подписчик',
+			GEN: ' подписчика',
+			PLU: ' подписчиков'
+		},
+		PEOPLE: {
+			NOM: ' человек',
+			GEN: ' человека',
+			PLU: ' человек'
+		},
+		FAVORED: {
+			NOM: ' участник',
+			GEN: ' участника',
+			PLU: ' участников'
+		},
+		ADD_SUBSCRIPTION: 'Подписаться',
+		REMOVE_SUBSCRIPTION: 'Отписаться'
+	},
+	DATA_NAMES: {
+		DATE: 'date'
+	},
+	CLASSES: {
+		ACTIVE: 'active',
+		NEW_ACTIVE: '-active',
+		NO_BORDERS: 'no-borders',
+		SUBSCRIBE_ADD: 'btn-pink-empty',
+		SUBSCRIBE_DELETE: 'btn-pink',
+		DISABLED: 'disabled',
+		NEW_DISABLED: '-disabled',
+		HIDDEN: 'hidden',
+		NEW_HIDDEN: '-hidden'
+	},
+	ROLES: {
+		USER: 'user',
+		MODERATOR: 'moderator',
+		ADMIN: 'admin'
+	},
+	DATE_FORMAT: 'YYYY-MM-DD',
+	COLORS: {
+		PRIMARY: '#2e3b50',
+		MUTED: '#3e4d66',
+		MUTED_80: '#657184',
+		MUTED_50: '#9fa6b3',
+		MUTED_30: '#c5c9d1',
+		TEXT: '#4a4a4a',
+		ACCENT: '#f82969',
+		ACCENT_ALT: '#ff5f9e',
+		FRANKLIN: '#28be84',
+		FRANKLIN_ALT: '#23d792'
+	},
+	IMAGES_PATH: '/events_images',
+	STATS: {
+		EVENT_VIEW: 'view',
+		EVENT_VIEW_DETAIL: 'view_detail',
+		EVENT_OPEN_SITE: 'open_site',
+		EVENT_OPEN_MAP: 'open_map',
+		ORGANIZATION_OPEN_SITE: 'open_site',
+		EVENT_ENTITY: 'event',
+		ORGANIZATION_ENTITY: 'organization'
+	},
+	ACTION_NAMES: {
+		fave: ['добавил(а) в избранное'],
+		unfave: ['удалил(а) из избранного'],
+		subscribe: ['добавил(а) подписки'],
+		unsubscribe: ['удалил(а) подписки']
+	},
+	ENTITIES: {
+		EVENT: 'event',
+		ORGANIZATION: 'organization'
+	},
+	URL_FIELDS: {
+		EVENTS: {
+			fields: [
+				'detail_info_url',
+				'is_favorite',
+				'nearest_event_date',
+				'can_edit',
+				'location',
+				'favored_users_count',
+				'organization_name',
+				'organization_logo_small_url',
+				'description',
+				'favored',
+				'is_same_time',
+				'tags',
+				'dates{"fields": "event_date,start_time,end_time", "order_by": "event_date,start_time"}'
+			].join(','),
+			length: 10
+		}
+	}
+};
+__LOCALES = {
+	DATE: {
+		DATE_FORMAT: 'DD MM YYYY',
+		MONTH_SHORT_NAMES: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
+		MONTH_NAMES: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
+	}
+};
+
+
 (function (window, document, $, undefined) {
 
     if (typeof $ === 'undefined') {
@@ -502,14 +606,19 @@ function tmpl(template_type, items, addTo, direction) {
     return result;
 }
 
-/**===========================================================
- * Query search part to object
- * */
 if (window['moment'] != undefined) {
 	moment.locale(navigator.language);
 	moment.updateLocale('ru', {
-		monthsShort : ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"]
+		monthsShort : __LOCALES.DATE.MONTH_SHORT_NAMES
 	})
+}
+
+if (window['Highcharts'] != undefined) {
+	Highcharts.setOptions({
+		lang: {
+			shortMonths: __LOCALES.DATE.MONTH_SHORT_NAMES
+		}
+	});
 }
 
 /**
@@ -680,101 +789,6 @@ $(document).ready(function () {
         search_is_active: false,
         search_query: null,
         search_xhr: null
-    };
-    window.__C = {
-        TEXTS: {
-            REMOVE_FAVORITE: 'Удалить из избранного',
-            ADD_FAVORITE: 'В избранное',
-            SUBSCRIBERS: {
-                NOM: ' подписчик',
-                GEN: ' подписчика',
-                PLU: ' подписчиков'
-            },
-            PEOPLE: {
-                NOM: ' человек',
-                GEN: ' человека',
-                PLU: ' человек'
-            },
-            FAVORED: {
-                NOM: ' участник',
-                GEN: ' участника',
-                PLU: ' участников'
-            },
-            ADD_SUBSCRIPTION: 'Подписаться',
-            REMOVE_SUBSCRIPTION: 'Отписаться'
-        },
-        DATA_NAMES: {
-            DATE: 'date'
-        },
-        CLASSES: {
-            ACTIVE: 'active',
-            NEW_ACTIVE: '-active',
-            NO_BORDERS: 'no-borders',
-            SUBSCRIBE_ADD: 'btn-pink-empty',
-            SUBSCRIBE_DELETE: 'btn-pink',
-            DISABLED: 'disabled',
-            NEW_DISABLED: '-disabled',
-            HIDDEN: 'hidden',
-            NEW_HIDDEN: '-hidden'
-        },
-	      ROLES: {
-		      USER: 'user',
-		      MODERATOR: 'moderator',
-		      ADMIN: 'admin'
-	      },
-        DATE_FORMAT: 'YYYY-MM-DD',
-	      COLORS: {
-	      	PRIMARY: '#2e3b50',
-		      MUTED: '#3e4d66',
-		      MUTED_80: '#657184',
-		      MUTED_50: '#9fa6b3',
-		      MUTED_30: '#c5c9d1',
-		      TEXT: '#4a4a4a',
-		      ACCENT: '#f82969',
-		      ACCENT_ALT: '#ff5f9e',
-		      FRANKLIN: '#28be84',
-		      FRANKLIN_ALT: '#23d792'
-	      },
-        IMAGES_PATH: '/events_images',
-        STATS: {
-            EVENT_VIEW: 'view',
-            EVENT_VIEW_DETAIL: 'view_detail',
-            EVENT_OPEN_SITE: 'open_site',
-            EVENT_OPEN_MAP: 'open_map',
-            ORGANIZATION_OPEN_SITE: 'open_site',
-            EVENT_ENTITY: 'event',
-            ORGANIZATION_ENTITY: 'organization'
-        },
-        ACTION_NAMES: {
-            fave: ['добавил(а) в избранное'],
-            unfave: ['удалил(а) из избранного'],
-            subscribe: ['добавил(а) подписки'],
-            unsubscribe: ['удалил(а) подписки']
-        },
-        ENTITIES: {
-            EVENT: 'event',
-            ORGANIZATION: 'organization'
-        },
-        URL_FIELDS: {
-            EVENTS: {
-                fields: [
-                    'detail_info_url',
-                    'is_favorite',
-                    'nearest_event_date',
-                    'can_edit',
-                    'location',
-                    'favored_users_count',
-                    'organization_name',
-                    'organization_logo_small_url',
-                    'description',
-                    'favored',
-                    'is_same_time',
-                    'tags',
-                    'dates{"fields": "event_date,start_time,end_time", "order_by": "event_date,start_time"}'
-                ].join(','),
-                length: 10
-            }
-        }
     };
     window.__stats = [];
     window.askToSubscribe = null;

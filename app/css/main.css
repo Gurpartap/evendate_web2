@@ -3674,4 +3674,7 @@ body.-open_modal > .modal_wrapper {
 
 .orgstat_overview_charts {padding: 48px 24px}
 
-.orgstat_overview_chart {margin-bottom: 60px}
+.orgstat_overview_chart {
+	height: 460px;
+	margin-bottom: 60px;
+}

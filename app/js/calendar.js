@@ -2642,25 +2642,11 @@ function StatisticsOrganization($view) {
 					align: 'left',
 					margin: 20
 				},
-				xAxis: {
-					gridLineWidth: 1,
-					gridLineDashStyle: 'dash',
-					type: 'datetime',
-					showEmpty: false
-				},
-				yAxis: {
-					floor: 0,
-					min: 0,
-					gridLineDashStyle: 'dash',
-					opposite: false,
-					title: {
-						text: false
-					}
-				},
 				legend: {
 					enabled: true,
 					align: 'left',
 					itemStyle: { color: __C.COLORS.TEXT, cursor: 'pointer', fontSize: '14px', fontWeight: '500', y: 0 },
+					itemMarginTop: 24,
 					itemMarginBottom: 5,
 					symbolHeight: 18,
 					symbolWidth: 18,
@@ -2669,22 +2655,16 @@ function StatisticsOrganization($view) {
 					x: 30
 				},
 				plotOptions: {
+					series: {
+						states: {
+							hover: {
+								enabled: true,
+								lineWidth: 2
+							}
+						}
+					},
 					areaspline: {
 						fillOpacity: 0.5,
-						tooltip: {
-							headerFormat: '<b>{point.key}</b><br/>',
-							xDateFormat: '%d.%m.%Y',
-							dateTimeLabelFormats: {
-								millisecond: "%A, %b %e, %H:%M:%S.%L",
-								second: "%A, %b %e, %H:%M:%S",
-								minute: "%A, %b %e, %H:%M",
-								hour: "%A, %b %e, %H:%M",
-								day: "%A, %b %e, %Y",
-								week: "Week from %A, %b %e, %Y",
-								month: "%B %Y",
-								year: "%Y"
-							}
-						},
 						marker: {
 							enabled: false,
 							symbol: 'circle',
@@ -2694,20 +2674,35 @@ function StatisticsOrganization($view) {
 									enabled: true
 								}
 							}
-						},
-						pointStart: Date.UTC(2010, 0, 1),
-						pointIntervalUnit: 'year'
+						}
 					}
+				},
+				tooltip: {
+					headerFormat: '<b>{point.key}</b><br/>',
+					valueDecimals: 0,
+					xDateFormat: '%e %b %Y, %H:%M'
 				},
 				scrollbar: {enabled: false},
 				navigator: {
 					outlineColor: '#ebebeb',
 					outlineWidth: 1,
 					maskInside: false,
-					maskFill: 'rgba(255, 255, 255, 0.66)',
+					maskFill: 'rgba(245, 245, 245, 0.66)',
 					handles: {
 						backgroundColor: '#9fa7b6',
 						borderColor: '#fff'
+					},
+					xAxis: {
+						gridLineWidth: 0,
+						labels: {
+							align: 'left',
+							reserveSpace: true,
+							style: {
+								color: '#888'
+							},
+							x: 0,
+							y: null
+						}
 					}
 				},
 				rangeSelector: {
@@ -2766,6 +2761,30 @@ function StatisticsOrganization($view) {
 						display: 'none'
 					},
 					inputEnabled: false
+				},
+				xAxis: {
+					gridLineWidth: 1,
+					gridLineDashStyle: 'dash',
+					type: 'datetime',
+					showEmpty: false,
+					tickPosition: 'inside',
+					dateTimeLabelFormats: {
+						minute: '%H:%M',
+						hour: '%H:%M',
+						day: '%e %b',
+						week: '%e %b',
+						month: '%b %y',
+						year: '%Y'
+					}
+				},
+				yAxis: {
+					floor: 0,
+					min: 0,
+					gridLineDashStyle: 'dash',
+					opposite: false,
+					title: {
+						text: false
+					}
 				}
 			});
 			
@@ -2821,6 +2840,12 @@ function StatisticsOrganization($view) {
 				$container.find('.ConversionsAreaChart').highcharts('StockChart', $.extend(true, {}, area_chart_default_options, {
 					title: {text: 'Конверсия просмотров/подписок'},
 					tooltip: {valueSuffix: ' %'},
+					yAxis: {
+						max: 100,
+						labels: {
+							format: '{value}%'
+						}
+					},
 					series: areaChartSeriesNormalize({conversion: data.conversion})
 				}));
 			}
