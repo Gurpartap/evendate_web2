@@ -115,8 +115,6 @@ class Event extends AbstractEntity
         'is_free',
         'min_price',
         'vk_image_url',
-        self::STATISTICS_FIELD_NAME,
-
         self::IS_FAVORITE_FIELD_NAME => '(SELECT id IS NOT NULL
 			FROM favorite_events
 			WHERE favorite_events.status = TRUE
@@ -799,17 +797,17 @@ class Event extends AbstractEntity
         return $this->organization;
     }
 
-    public function getNotifications(User $user, array $fields = null) : Result
+    public function getNotifications(User $user, array $fields = null, $length = null, $offset = null, $order_by = null) : Result
     {
         return NotificationsCollection::filter($this->db,
             $user,
             array('event' => $this),
             $fields,
             array(
-                'length' => $fields[self::NOTIFICATIONS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
-                'offset' => $fields[self::NOTIFICATIONS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
+                'length' => $length ?? $fields[self::NOTIFICATIONS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+                'offset' => $offset ?? $fields[self::NOTIFICATIONS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
             ),
-            $fields[self::NOTIFICATIONS_FIELD_NAME]['order_by'] ?? array()
+            $order_by ?? $fields[self::NOTIFICATIONS_FIELD_NAME]['order_by'] ?? array()
         );
     }
 
@@ -855,6 +853,11 @@ class Event extends AbstractEntity
 
         if (isset($fields[self::NOTIFICATIONS_FIELD_NAME])) {
             $result_data[self::NOTIFICATIONS_FIELD_NAME] = $this->getNotifications($user,
+                Fields::parseFields($fields[self::NOTIFICATIONS_FIELD_NAME]['fields'] ?? ''))->getData();
+        }
+
+        if (isset($fields[self::STATISTICS_FIELD_NAME])) {
+            $result_data[self::STATISTICS_FIELD_NAME] = $this->getStatistics($user,
                 Fields::parseFields($fields[self::NOTIFICATIONS_FIELD_NAME]['fields'] ?? ''))->getData();
         }
 
