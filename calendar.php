@@ -253,7 +253,7 @@ $user_full_name = $user->getLastName() . ' ' . $user->getFirstName(); ?>
 
     <div class="sidebar_main_wrapper scrollbar-outer SidebarScroll">
         <nav class="sidebar_navigation SidebarNav">
-            <div class="sidebar_navigation_item -hidden SidebarNavItem Controller" data-page="statistics/overview"
+            <div class="sidebar_navigation_item <?= $edit_event_btn_hidden ?> SidebarNavItem Controller" data-page="statistics"
                  data-title="Статистика"><span>Статистика</span></div>
             <div class="sidebar_navigation_item <?= $edit_event_btn_hidden ?> SidebarNavItem Controller"
                  data-page="edit_event" data-title="Создать событие">

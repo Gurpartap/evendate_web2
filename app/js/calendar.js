@@ -29,16 +29,16 @@ var __STATES = {
 					return window.location.pathname.split('/')[2];
 				}
 				case 'edit_event': {
-					return History.getState().data.eventId;
+					return History.getState().data.eventId ? History.getState().data.eventId : History.getState().data.event_id;
 				}
 				case 'add_organization': {
 					break;
 				}
 				case 'edit_organization': {
-					return History.getState().data.organizationId;
+					return History.getState().data.organizationId ? History.getState().data.organizationId : History.getState().data.organization_id;
 				}
-				case 'statistics': {
-					break;
+				case 'organization_statistics': {
+					return window.location.pathname.split('/')[2];
 				}
 				default: {
 					console.log('Using method in unexpected place');
@@ -278,7 +278,7 @@ function Feed($view){
 			success: function(res){
 				ajaxHandler(res, function(data, text){
 					data.forEach(function(event){
-						var $subscribers = buildAvatarCollection(event.favored, 4),
+						var $subscribers = buildAvatars(event.favored, 4),
 							avatars_collection_classes = [],
 							favored_users_count = ($subscribers.length <= 4) ? 0 : event.favored_users_count - 4,
 							$event;
@@ -560,7 +560,7 @@ function OneEvent($view){
 		success: function(res){
 			ajaxHandler(res, function(data, text){
 				data = data[0];
-				var $subscribers = buildAvatarCollection(data.favored, 6),
+				var $subscribers = buildAvatars(data.favored, 6),
 					avatars_collection_classes = [],
 					favored_users_count = ($subscribers.length <= 6) ? 0 : data.favored_users_count - 6;
 
@@ -940,7 +940,7 @@ function Organization($view){
 
 		events.forEach(function(event){
 			var m_event_date = moment.unix(event[sort_date_type]),
-				$subscribers = buildAvatarCollection(event.favored, 4),
+				$subscribers = buildAvatars(event.favored, 4),
 				times = [],
 				avatars_collection_classes = [],
 				favored_users_count = ($subscribers.length <= 4) ? 0 : event.favored_users_count - 4,
@@ -1192,7 +1192,7 @@ function Search($view){
 			success: function(res){
 				ajaxHandler(res, function(data, text){
 					data.events.forEach(function(event){
-						var $subscribers = buildAvatarCollection(event.favored, 4),
+						var $subscribers = buildAvatars(event.favored, 4),
 							avatars_collection_classes = [],
 							favored_users_count = ($subscribers.length <= 4) ? 0 : event.favored_users_count - 4;
 						
@@ -1461,7 +1461,8 @@ function Friends($view){
 
 function EditEvent($view){
 	var $wrapper = $view.find('.page_wrapper'),
-		event_id = __STATES.entityId;
+		event_id = __STATES.entityId,
+		org_id = History.getState().data.organization_id;
 
 	function initEditEventPage($view){
 
@@ -2219,7 +2220,7 @@ function EditEvent($view){
 		$wrapper.html(tmpl('edit-event-page', additional_fields));
 		initEditEventPage($view);
 		Modal.bindCallModal($view);
-		initOrganization();
+		initOrganization(org_id);
 		checkVkPublicationAbility();
 		toggleVkImg();
 		initVkImgCopying();
@@ -2408,12 +2409,119 @@ function Statistics($view) {
 		},
 		$wrapper = $view.find('.page_wrapper');
 	
-	function StatisticsOverview($view) {
+	function StatisticsOverview($wrapper) {
+		
+		function getMyOrganizations(privilege, fields, success){
+			$.ajax({
+				url: '/api/v1/organizations/',
+				data: {
+					privileges: privilege,
+					fields: fields ? Array.isArray(fields) ? fields.join(',') : fields : [
+						'img_medium_url',
+						'subscribed_count',
+						'staff',
+						'privileges'/*,
+						 'events{length:500,future:true,is_delayed:true}'*/
+					].join(',')
+				},
+				method: 'GET',
+				success: function(res){
+					ajaxHandler(res, function(data, text){
+						var staffs_additional_fields = {
+							is_link: true,
+							avatar_classes: ['-size_100x100','-rounded']
+						};
+						data.forEach(function(org) {
+							var admins = getSpecificStaff('admin', org.staff, staffs_additional_fields),
+								moderators = getSpecificStaff('moderator', org.staff, staffs_additional_fields),
+								avatars_max_count = 2,
+								staffs_fields = {
+									classes: ['-size_30x30', '-rounded', 'CallModal'],
+									dataset: {
+										modal_type: 'editors',
+										modal_organization_id: org.id
+									}
+								};
+							
+							org.administrators = buildAvatarCollection(admins, avatars_max_count, $.extend(true, {}, staffs_fields, {dataset: {modal_title: 'Администраторы'}}));
+							org.moderators = buildAvatarCollection(moderators, avatars_max_count, $.extend(true, {}, staffs_fields, {dataset: {modal_title: 'Модераторы'}}));
+							
+							org.administrators_plus_count = admins.length - avatars_max_count;
+							org.administrators_plus_count_hidden = org.administrators_plus_count <= 0 ? '-cast' : '';
+							
+							org.moderators_plus_count = moderators.length - avatars_max_count;
+							org.moderators_plus_count_hidden = org.moderators_plus_count <= 0 ? '-cast' : '';
+							
+							/*
+							org.future_events = org.future_events_count + getUnitsText(org.future_events_count, {
+									NOM: ' предстоящее событие',
+									GEN: ' предстоящих события',
+									PLU: ' предстоящих событий'
+								});*/
+							
+							org.subscribers = org.subscribed_count + getUnitsText(org.subscribed_count, __C.TEXTS.SUBSCRIBERS);
+							
+							org.buttons = $();
+							if(privilege == 'can_add'){
+								org.buttons = org.buttons.add(buildButton({
+									title: 'Редактировать',
+									classes: ['fa_icon', 'fa-pencil', '-color_neutral', 'RippleEffect'],
+									dataset: {
+										page: 'edit_organization',
+										title: 'Редактировать организацию',
+										organization_id: org.id
+									}
+								}));
+							}
+							org.buttons = org.buttons.add(buildButton({
+								title: 'Создать событие',
+								classes: ['fa_icon', 'fa-plus', '-color_accent', 'RippleEffect'],
+								dataset: {
+									page: 'edit_event',
+									title: 'Создать событие',
+									organization_id: org.id
+								}
+							}));
+							
+						});
+						if(success && typeof success == 'function'){
+							success(data);
+						}
+					}, ajaxErrorHandler)
+				}
+			});
+		}
+		
+		$wrapper.html(tmpl('statistics-overview-activity', {}));
+		
+		getMyOrganizations('can_add', false, function(data) {
+			if(data.length){
+				var $organizations = tmpl('statistics-overview-organizations', {
+					heading: 'Администратор',
+					organizations: tmpl('statistics-overview-organization', data)
+				}, $wrapper);
+				trimAvatarsCollection($organizations);
+				bindControllers($organizations);
+				Modal.bindCallModal($organizations);
+				bindRippleEffect($organizations);
+			}
+			
+			/*
+			getMyOrganizations({privileges: 'can_add'}, false, function(data) {
+				if(data.length){
+					$wrapper.append(tmpl('statistics-overview', {
+						heading: 'Модаератор',
+						organizations: tmpl('statistics-overview-organization', data)
+					}));
+				}
+			});*/
+		})
+		
 		
 	}
 	
 	function StatisticsOrganization($wrapper) {
-		var current_state = window.location.pathname.split('/')[2],
+		var current_state = window.location.pathname.split('/')[3],
 			sub_states = {
 				overview: Overview,
 				events: Events,
@@ -2424,7 +2532,7 @@ function Statistics($view) {
 			};
 		
 		function Overview($wrapper) {
-			var org_id = 1,
+			var org_id = __STATES.entityId,
 				org_fields = [
 					'description',
 					'img_medium_url',
@@ -2503,22 +2611,6 @@ function Statistics($view) {
 						}, ajaxErrorHandler)
 					}
 				});
-			}
-			
-			function getSpecificStaff(role, staff){
-				var specific_staff = [];
-				staff.forEach(function(man){
-					if(man.role == role){
-						specific_staff.push({
-							id: man.id,
-							avatar_url: man.avatar_url,
-							name: man.first_name + ' ' + man.last_name,
-							is_link: true,
-							avatar_classes: ['-size_40x40','-rounded']
-						})
-					}
-				});
-				return specific_staff;
 			}
 			
 			function updateScoreboards($wrapper, numbers, dynamics) {
@@ -2857,21 +2949,23 @@ function Statistics($view) {
 						series: areaChartSeriesNormalize({conversion: data.conversion})
 					}));
 				}
-				
-				console.log(data);
 			}
 			
 			$wrapper.empty();
 			getOrganizationData(org_id, org_fields, function(org_data) {
-				var role;
+				var role,
+					staffs_additional_fields = {
+						is_link: true,
+						avatar_classes: ['-size_40x40','-rounded']
+					};
 				org_data = org_data[0];
 				
 				changeTitle(['Организации', org_data.short_name]);
 				
 				role = recognizeRole(org_data.privileges);
 				
-				org_data.administrators = getSpecificStaff('admin', org_data.staff);
-				org_data.moderators = getSpecificStaff('moderator', org_data.staff);
+				org_data.administrators = getSpecificStaff('admin', org_data.staff, staffs_additional_fields);
+				org_data.moderators = getSpecificStaff('moderator', org_data.staff, staffs_additional_fields);
 				switch(role){
 					case __C.ROLES.ADMIN: {
 						org_data.administrators.push({
@@ -2911,6 +3005,8 @@ function Statistics($view) {
 				$wrapper.append(tmpl('orgstat-overview', org_data));
 				
 				getStatistics(org_id, 'year', moment().subtract(6, 'd').format(), moment().format(), stat_fields, function(stat_data){
+					var storage_data_name = 'stat_org_'+org_id+'_data',
+						storage_until_name = 'stat_org_'+org_id+'_until';
 					buildPieChart($wrapper.find('.GenderPieChart'), stat_data.audience.gender);
 					buildPieChart($wrapper.find('.DevicePieChart'), stat_data.audience.devices);
 					
@@ -2918,24 +3014,21 @@ function Statistics($view) {
 					
 					updateScoreboards($wrapper.find('.Scoreboards'), stat_data, stat_data.dynamics);
 					
-					if(moment.unix(window.sessionStorage.getItem('statistics_chart_data_until')).isSameOrBefore(moment())){
-						var $loader = tmpl('loader', {}, $wrapper.find('.OrgstatOverviewCharts'));
+					if(moment.unix(window.sessionStorage.getItem(storage_until_name)).isSameOrBefore(moment())){
+						var $loaders = tmpl('loader', {}, $wrapper.find('.SubscribersAreaChart, .ViewsAreaChart, .ConversionsAreaChart'));
 						getStatistics(org_id, 'day', moment().subtract(18, 'months').format(), moment().format(), 'view,subscribe,unsubscribe,conversion,notification', function(stat_data) {
-							window.sessionStorage.setItem('statistics_chart_data', JSON.stringify(stat_data));
-							window.sessionStorage.setItem('statistics_chart_data_until', moment().add(15, 'm').unix());
-							$loader.remove();
+							window.sessionStorage.setItem(storage_data_name, JSON.stringify(stat_data));
+							window.sessionStorage.setItem(storage_until_name, moment().add(15, 'm').unix());
+							$loaders.remove();
 							buildAreaCharts($wrapper, stat_data);
 						});
 					} else {
-						buildAreaCharts($wrapper, JSON.parse(window.sessionStorage.getItem('statistics_chart_data')));
+						buildAreaCharts($wrapper, JSON.parse(window.sessionStorage.getItem(storage_data_name)));
 					}
-					
-					console.log(stat_data);
 				});
 				
 				bindRippleEffect($wrapper);
 				bindControllers($wrapper);
-				console.log(org_data);
 			});
 		}
 		
@@ -2956,15 +3049,15 @@ function Statistics($view) {
 		
 	}
 	
-	function StatisticsEvent($view) {
+	function StatisticsEvent($wrapper) {
 		
 	}
 	
 	if(!current_state)
 		current_state = 'statistics';
 	
-	statistics_states[current_state]($wrapper);
 	$('body').addClass('-state_statistics');
+	statistics_states[current_state]($wrapper);
 	
 }
 

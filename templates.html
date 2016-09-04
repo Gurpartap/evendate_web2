@@ -14,9 +14,9 @@
 </script>
 
 <script type="javascript/template" id="tmpl-user-tombstone">
-	<div class="user_tombstone Controller" data-is_friend="{is_friend}" data-page="friend/{id}" data-friend-id="{id}" data-title="{full_name}" data-name="{full_name}">
-		<div class="avatar -size_{size} -rounded" style="background-image: url('{avatar_url}')"></div>
-		<p class="user_tombstone_title">{full_name}</p>
+	<div class="user_tombstone {tombstone_classes}" {dataset}>
+		<div class="avatar -size_{size} -rounded {avatar_classes}" style="background-image: url('{avatar_url}')"></div>
+		<p class="user_tombstone_title">{name}</p>
 	</div>
 </script>
 
@@ -41,6 +41,12 @@
 	</div>
 </script>
 
+<script type="javascript/template" id="tmpl-avatars-collection">
+	<div class="avatars_collection AvatarsCollection {classes}" data-max_amount="{max_amount}" {dataset} style="width: 0">
+		{avatars}
+	</div>
+</script>
+
 <script type="javascript/template" id="tmpl-subscriber-avatar">
 	<div class="avatar" style="background-image: url({avatar_url})" title="{last_name} {first_name}"></div>
 </script>
@@ -49,7 +55,7 @@
 	<div class="organization_item {block_classes} Controller" data-page="organization/{id}" data-organization_id="{id}" data-title="{short_name}" {dataset}>
 		<div class="avatar_block">
 			<div class="avatar {avatar_classes}">
-				<img src="{img_url}" onerror="this.onerror=null;this.src='/app/img/logo_40.png'">
+				<img src="{img_small_url}" onerror="this.onerror=null;this.src='/app/img/logo_40.png'">
 			</div>
 			<span class="avatar_name">{short_name}</span>
 		</div>
@@ -660,7 +666,7 @@
 						<button class="button -size_low -fill -rounded fa_icon {subscribe_button_classes} Subscribe EventSubscribe -AddFavourite AddAvatar RippleEffect" data-event-id="{id}"><span class="Text">{subscribe_button_text}</span></button>
 					</div>
 					<div class="form_unit">
-						<div class="avatars_collection -subscribable {avatars_collection_classes} -rounded -bordered -size_small AvatarsCollection CallModal" data-max_subscribers="4" data-modal_type="favors" data-modal_entity_type="event" data-modal_entity_id="{id}" data-modal_title="Добавили в избранное">
+						<div class="avatars_collection -trimmed {avatars_collection_classes} -rounded -bordered -size_small AvatarsCollection CallModal" data-max_amount="4" data-modal_type="favors" data-modal_entity_type="event" data-modal_entity_id="{id}" data-modal_title="Добавили в избранное">
 							{subscribers}
 						</div>
 						<span class="counter -size_30x30 -bordered -color_marginal -castable {favored_users_show}">+<span class="FavoredCount">{favored_users_count}</span></span>
@@ -693,7 +699,7 @@
 				<div class="event_image_bottom">
 					<div class="form_group -parts_e_2 AddAvatarWrapper">
 						<div class="form_unit">
-							<div class="avatars_collection -subscribable -rounded -bordered -size_small {avatars_collection_classes} AvatarsCollection CallModal" data-max_subscribers="6" data-modal_type="favors" data-modal_entity_type="event" data-modal_entity_id="{id}" data-modal_title="Добавили в избранное">
+							<div class="avatars_collection -trimmed -rounded -bordered -size_small {avatars_collection_classes} AvatarsCollection CallModal" data-max_amount="6" data-modal_type="favors" data-modal_entity_type="event" data-modal_entity_id="{id}" data-modal_title="Добавили в избранное">
 								{subscribers}
 							</div>
 							<span class="counter -size_30x30 -bordered -color_marginal -castable {favored_users_show}">+<span class="FavoredCount">{favored_users_count}</span></span>
@@ -838,7 +844,7 @@
 				{feed_event_infos}
 				<div class="form_group -parts_e_2 AddAvatarWrapper">
 					<div class="form_unit">
-						<div class="avatars_collection -subscribable -rounded -bordered -size_small {avatars_collection_classes} AvatarsCollection CallModal" data-max_subscribers="4" data-modal_type="favors" data-modal_entity_type="event" data-modal_entity_id="{id}" data-modal_title="Добавили в избранное">
+						<div class="avatars_collection -trimmed -rounded -bordered -size_small {avatars_collection_classes} AvatarsCollection CallModal" data-max_amount="4" data-modal_type="favors" data-modal_entity_type="event" data-modal_entity_id="{id}" data-modal_title="Добавили в избранное">
 							{subscribers}
 						</div>
 						<span class="counter -size_30x30 -bordered -color_marginal_primary -castable {favored_users_show}">+<span class="FavoredCount">{favored_users_count}</span></span>
@@ -863,6 +869,42 @@
 		<div>
 			<p class="feed_no_event_text">{text}</p>
 			{button}
+		</div>
+	</div>
+</script>
+
+<!-- STATISTICS -->
+<!-- Statistics Overview -->
+
+<script type="javascript/template" id="tmpl-statistics-overview-activity">
+	<!--<div class="page statistics_overview_activity"></div>-->
+</script>
+
+<script type="javascript/template" id="tmpl-statistics-overview-organizations">
+	<div class="statistics_overview_wrapper">
+		<h3 class="statistics_overview_heading">{heading}</h3>
+		{organizations}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-statistics-overview-organization">
+	<div class="page organization_card">
+		<aside class="organization_card_side">
+			<div class="avatar -size_100x100 -rounded Controller" data-page="organization_statistics/{id}" data-title="Организации > {short_name}">
+				<img src="{img_medium_url}" onerror="this.onerror=null;this.src='/app/img/logo_40.png'">
+			</div>
+		</aside>
+		<div class="organization_card_content">
+			<span class="organization_card_title Controller" data-page="organization_statistics/{id}" data-title="Организации > {short_name}" data-organization-id="{id}">{short_name}</span>
+			<div class="organization_card_info">
+				<span class="organization_card_field">{future_events}</span>
+				<span class="organization_card_field">{subscribers}</span>
+			</div>
+			<div class="organization_card_bottom">
+				<div class="organization_card_avatars">{administrators}<span class="counter -size_30x30 -color_marginal_primary {administrators_plus_count_hidden}">+<span class="FavoredCount">{administrators_plus_count}</span></span></div>
+				<div class="organization_card_avatars">{moderators}<span class="counter -size_30x30 -color_marginal_primary {moderators_plus_count_hidden}">+<span class="FavoredCount">{moderators_plus_count}</span></span></div>
+				<div class="organization_card_buttons">{buttons}</div>
+			</div>
 		</div>
 	</div>
 </script>
@@ -929,7 +971,7 @@
 
 <script type="javascript/template" id="tmpl-orgstat-overview-content">
 	<header class="orgstat_overview_header Scoreboards">{scoreboards}</header>
-	<div class="orgstat_overview_charts OrgstatOverviewCharts">
+	<div class="orgstat_overview_charts">
 		<div class="orgstat_overview_chart SubscribersAreaChart"></div>
 		<div class="orgstat_overview_chart ViewsAreaChart"></div>
 		<div class="orgstat_overview_chart ConversionsAreaChart"></div>
@@ -984,7 +1026,7 @@
 	<iframe width="100%" height="600" frameborder="0" style="display:block;border:0" src="https://www.google.com/maps/embed/v1/place?q={location}&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg" allowfullscreen></iframe>
 </script>
 
-<script type="javascript/template" id="tmpl-modal-favored-divider">
+<script type="javascript/template" id="tmpl-modal-users-divider">
 	<p class="modal_divider">{label}</p>
 </script>
 
@@ -1022,17 +1064,6 @@
 </script>
 
 <!-- OLD -->
-<script type="javascript/template" id="tmpl-organizations-item">
-  <div class="row organizations-item animated organization-{id} Controller" title="{name}" data-page="organization/{id}" data-organization-id="{id}" data-title="{name}">
-    <div class="organizations-item-wrapper">
-      <div class="organization-img-wrapper">
-        <img src="{img_url}" title="{name}">
-      </div>
-      <div class="organization-item-name">{short_name}</div>
-    </div>
-  </div>
-</script>
-
 <script type="javascript/template" id="tmpl-settings-modal">
   <div class="modal fade settings-modal" id="settings-modal" tabindex="-1" role="dialog"
        aria-labelledby="organization-label">
