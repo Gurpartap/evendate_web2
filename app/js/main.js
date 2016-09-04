@@ -121,17 +121,6 @@ Array.prototype.clean = function(deleteValue) {
 		};
 	}
 	
-	$.fn.animateNumber = function(options) {
-		var args = [options];
-		
-		for(var i = 1, l = arguments.length; i < l; i++) {
-			args.push(arguments[i]);
-		}
-		this.data(options);
-		
-		return this.animate.apply(this, args);
-	}
-	
 }(jQuery));
 
 function arrayToSpaceSeparatedString(){return this.join(' ')}
@@ -352,6 +341,17 @@ $.fn.extend({
 				return output;
 			}
 		}
+	},
+	
+	animateNumber: function(options) {
+		var args = [options];
+		
+		for(var i = 1, l = arguments.length; i < l; i++) {
+			args.push(arguments[i]);
+		}
+		this.data(options);
+		
+		return this.animate.apply(this, args);
 	}
 });
 
@@ -517,6 +517,42 @@ function buildButton(props){
 	return tmpl('button', props);
 }
 
+function buildUserTombstones(users, props){
+	function normalize(user) {
+		props.avatar_classes = props.avatar_classes ? (typeof props.avatar_classes == 'string') ? props.avatar_classes.split(' ') : props.avatar_classes : [];
+		props.tombstone_classes = props.tombstone_classes ? (typeof props.tombstone_classes == 'string') ? props.tombstone_classes.split(' ') : props.tombstone_classes : [];
+		
+		$.extend(true, user, {
+			dataset: {},
+			name: [user.first_name, user.last_name].join(' '),
+			size: '70x70'
+		}, props);
+		
+		if(props.is_link){
+			$.extend(true, user.dataset, {
+				page: 'friend/'+user.id,
+				'friend-id': user.id,
+				title: user.name,
+				name: user.name
+			});
+			user.tombstone_classes.push('Controller');
+		}
+		
+		user.avatar_classes.toString = arrayToSpaceSeparatedString;
+		user.tombstone_classes.toString = arrayToSpaceSeparatedString;
+		if(user.dataset)
+			user.dataset.toString = (Array.isArray(user.dataset)) ? arrayToSpaceSeparatedString : objectToHtmlDataSet;
+	}
+	
+	if(Array.isArray(users)){
+		users.forEach(normalize);
+	} else {
+		normalize(users);
+	}
+	
+	return tmpl('user-tombstone', users);
+}
+
 function buildAvatarBlocks(props){
 	if(Array.isArray(props)){
 		props.forEach(normalize);
@@ -546,7 +582,7 @@ function buildAvatarBlocks(props){
 	return tmpl('avatar-block', props);
 }
 
-function buildAvatarCollection(subscribers, count){
+function buildAvatars(subscribers, count){
 	var $subscribers = $();
 	$subscribers = $subscribers.add(tmpl('subscriber-avatar', __USER));
 	subscribers.forEach(function(subscriber){
@@ -555,6 +591,21 @@ function buildAvatarCollection(subscribers, count){
 		}
 	});
 	return $subscribers;
+}
+
+function buildAvatarCollection(users, max_count, props){
+	props.classes = props.classes ? (typeof props.classes == 'string') ? props.classes.split(' ') : props.classes : [];
+	props.classes.toString = arrayToSpaceSeparatedString;
+	if(props.dataset)
+		props.dataset.toString = (Array.isArray(props.dataset)) ? arrayToSpaceSeparatedString : objectToHtmlDataSet;
+	
+	props.avatars = tmpl('subscriber-avatar', __USER);
+	users.forEach(function(user){
+		if(user.id != __USER.id && props.avatars.length <= max_count){
+			props.avatars = props.avatars.add(tmpl('subscriber-avatar', user));
+		}
+	});
+	return tmpl('avatars-collection', props);
 }
 
 function buildOrganizationBlock(organization, additional_fields){
@@ -742,7 +793,7 @@ function bindAddAvatar($parent){
 			$avatars = $collection.find('.avatar'),
 			amount = $avatars.length;
 
-		if($collection.data('max_subscribers') >= amount){
+		if($collection.data('max_amount') >= amount){
 			if($collection.hasClass('-subscribed')){
 				$collection.removeClass('-subscribed');
 				$collection.width(amount == 1 ? 0 : ($avatars.outerWidth()*(amount-1)) - (6*(amount-2)));
@@ -893,6 +944,7 @@ function trimAvatarsCollection($parent){
 		} else {
 			$collection.width(amount == 1 ? 0 : ($avatars.outerWidth()*(amount-1)) - (6*(amount-2)));
 		}
+		$collection.addClass('-trimmed');
 	});
 }
 
@@ -994,9 +1046,10 @@ function renderState(){
 		$new_view,
 		controller;
 	
+	changeTitle(state.title);
+	
 	if(!(state.data.reload === false && state.data._index+1 == History.getCurrentIndex())){
 		$(window).off('scroll').data('disable_upload', false);
-		$body.removeClass('-state_statistics');
 		switch(typeof __STATES[page]){
 			case 'function': {
 				controller = __STATES[page];
@@ -1010,8 +1063,10 @@ function renderState(){
 			}
 		}
 		$new_view = page == 'friend' ? $('.friends-app') : $views.filter('.'+controller.name+'View');
-		if(!$cur_view.is($new_view))
+		if(!$cur_view.is($new_view)){
 			$('#main_header').removeClass('-with_tabs');
+			$body.removeClass('-state_statistics');
+		}
 		
 		$body.find('[data-page], .Controller').removeClass('-Handled_Controller').off('mousedown.pageRender');
 		$cur_view.addClass('-faded');
@@ -1025,8 +1080,6 @@ function renderState(){
 			}, 200);
 		}, 200);
 	}
-	
-	changeTitle(state.title);
 	if(page != 'search')
 		$('#search_bar_input').val('');
 	
@@ -1077,7 +1130,7 @@ function renderSidebarOrganizations(organization, afterRenderCallback){
 		else if(typeof organization == 'number'){
 			$.ajax({
 				url: '/api/v1/organizations/'+organization,
-				data: {fields: 'new_events_count'},
+				data: {fields: 'new_events_count,img_small_url'},
 				success: function(res){
 					res.data.forEach(function(organization){
 						prependOrganization(organization);
@@ -1095,7 +1148,7 @@ function renderSidebarOrganizations(organization, afterRenderCallback){
 	}else{
 		$.ajax({
 			url: '/api/v1/organizations/subscriptions',
-			data: {fields: 'new_events_count'},
+			data: {fields: 'new_events_count,img_small_url'},
 			success: function(res){
 				res.data.forEach(function(organization){
 					prependOrganization(organization);
@@ -1177,6 +1230,17 @@ function recognizeRole(privileges){
 			role = __C.ROLES.MODERATOR;
 	});
 	return role;
+}
+
+function getSpecificStaff(role, staff, additional_fields){
+	var specific_staff = [];
+	staff.forEach(function(man){
+		if(man.role == role){
+			man.name = man.first_name + ' ' + man.last_name;
+			specific_staff.push($.extend(true, {}, man, additional_fields))
+		}
+	});
+	return specific_staff;
 }
 
 
