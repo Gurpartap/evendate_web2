@@ -48,15 +48,15 @@ Modal.bindCallModal = function($parent){
 			} else {
 				switch(modal_type){
 					case 'favors': {
-						var entity_type = $this.data('modal_entity_type'),
-							entity_id = $this.data('modal_entity_id');
-
-						modal = new FavoredModal(entity_type, entity_id, title);
+						modal = new FavoredModal($this.data('modal_entity_type'), $this.data('modal_entity_id'), title);
+						break;
+					}
+					case 'editors': {
+						modal = new EditorsModal($this.data('modal_organization_id'), title, $this.data('modal_specific_role'));
 						break;
 					}
 					case 'map': {
-						var location = $this.data('modal_map_location');
-						modal = new MapModal(location, title);
+						modal = new MapModal($this.data('modal_map_location'), title);
 						break;
 					}
 					case 'media': {
@@ -120,9 +120,7 @@ Modal.bindCallModal = function($parent){
 						break;
 					}
 					default: {
-						var content = $this.data('modal_content');
-
-						modal = new Modal(title, content);
+						modal = new Modal(title, $this.data('modal_content'));
 						break;
 					}
 				}
@@ -135,8 +133,12 @@ Modal.bindCallModal = function($parent){
 };
 
 Modal.prototype.show = function(){
-	var self = this;
+	this.appear();
+};
 
+Modal.prototype.appear = function(){
+	var self = this;
+	
 	Modal.modal_wrapper.append(this.modal);
 	$('body').addClass('-open_modal');
 	
@@ -168,6 +170,10 @@ Modal.prototype.show = function(){
 };
 
 Modal.prototype.hide = function(){
+	this.disappear();
+};
+
+Modal.prototype.disappear = function(){
 	var self = this;
 	Modal.active_modal = undefined;
 	self.modal.addClass('-faded');
@@ -345,6 +351,57 @@ MapModal.extend(Modal);
 
 
 
+function AbstractUsersModal(){
+	this.title = '';
+	this.content = $();
+	this.id = 0;
+	this.disable_upload = false;
+	this.ajax_url = {toString: function() {}};
+	this.is_first = true;
+	
+	if (this.constructor === AbstractUsersModal) {
+		throw new Error("Can't instantiate abstract class!");
+	}
+}
+AbstractUsersModal.extend(Modal);
+
+AbstractUsersModal.prototype.show = function(){
+	var self = this;
+	
+	Modal.modal_wrapper.data('block_scroll', false);
+	Modal.modal_wrapper.on('scroll.uploadUsers', function(){
+		if(!self.disable_upload){
+			if(Modal.modal_wrapper.height() + Modal.modal_wrapper.scrollTop() >= self.modal.height()){
+				if(!Modal.modal_wrapper.data('block_scroll')){
+					Modal.modal_wrapper.data('block_scroll', true);
+					self.uploadUsers(function(){
+						Modal.modal_wrapper.data('block_scroll', false);
+						self.adjustDestroyer();
+					});
+				}
+			}
+		}
+	});
+	if(!self.content.length){
+		self.uploadUsers(function(){
+			self.appear();
+		});
+	} else {
+		self.appear();
+	}
+};
+
+AbstractUsersModal.prototype.hide = function(){
+	Modal.modal_wrapper.data('block_scroll', false).off('scroll.uploadUsers');
+	this.disappear();
+	Modal.hide();
+};
+
+AbstractUsersModal.prototype.uploadUsers = function(callback){};
+AbstractUsersModal.prototype.appendUsers = function(users, $wrapper){};
+
+
+
 function FavoredModal(entity_type, entity_id, title){
 	if(entity_type || entity_id){
 		this.title = title ? title : 'Добавили в избранное';
@@ -354,10 +411,10 @@ function FavoredModal(entity_type, entity_id, title){
 		this.disable_upload = false;
 		this.ajax_url = {
 			id: this.entity_id,
-			favored_length: 30,
+			length: 30,
 			offset_number: 0,
 			toString: function(){
-				return '/api/v1/'+this.type+'/'+this.id+'?fields='+this.field+'{fields:"is_friend",order_by:"-is_friend,first_name",length:'+this.favored_length+',offset:'+this.offset_number+'}'
+				return '/api/v1/'+this.type+'/'+this.id+'?fields='+this.field+'{fields:"is_friend",order_by:"-is_friend,first_name",length:'+this.length+',offset:'+this.offset_number+'}'
 			}
 		};
 		this.is_first = true;
@@ -389,41 +446,9 @@ function FavoredModal(entity_type, entity_id, title){
 		throw Error('To open favored modal you need to pass entity_type (organization or event) and entity_id');
 	}
 }
-FavoredModal.extend(Modal);
+FavoredModal.extend(AbstractUsersModal);
 
-FavoredModal.prototype.show = function(){
-	var self = this;
-
-	Modal.modal_wrapper.data('block_scroll', false);
-	Modal.modal_wrapper.on('scroll.uploadFavored', function(){
-		if(!self.disable_upload){
-			if(Modal.modal_wrapper.height() + Modal.modal_wrapper.scrollTop() >= self.modal.height()){
-				if(!Modal.modal_wrapper.data('block_scroll')){
-					Modal.modal_wrapper.data('block_scroll', true);
-					self.uploadFavored(function(){
-						Modal.modal_wrapper.data('block_scroll', false);
-						self.adjustDestroyer();
-					});
-				}
-			}
-		}
-	});
-	if(!self.content.length){
-		self.uploadFavored(function(){
-			self.__superCall('show');
-		});
-	} else {
-		self.__superCall('show');
-	}
-};
-
-FavoredModal.prototype.hide = function(){
-	Modal.modal_wrapper.data('block_scroll', false).off('scroll.uploadFavored');
-	this.__superCall('hide');
-	Modal.hide();
-};
-
-FavoredModal.prototype.uploadFavored = function(callback){
+FavoredModal.prototype.uploadUsers = function(callback){
 	var self = this;
 	$.ajax({
 		url: this.ajax_url,
@@ -432,17 +457,17 @@ FavoredModal.prototype.uploadFavored = function(callback){
 			ajaxHandler(res, function(data){
 				if(data[0][self.ajax_url.field].length){
 					var $wrapper = self.modal.find('.FavoredModalContent'),
-						$new_favors = self.buildFavored(data[0][self.ajax_url.field], $wrapper);
+						$new_favors = self.appendUsers(data[0][self.ajax_url.field], $wrapper);
 					self.content = self.content.add($new_favors);
 					$wrapper.append($new_favors);
 					self.is_first = false;
-					self.ajax_url.offset_number = self.ajax_url.offset_number + self.ajax_url.favored_length;
-					self.ajax_url.favored_length = 10;
+					self.ajax_url.offset_number = self.ajax_url.offset_number + self.ajax_url.length;
+					self.ajax_url.length = 10;
 					if(callback)
 						callback();
 					self.adjustDestroyer();
 					bindControllers(self.modal);
-					self.modal.find('.user_tombstone').on('click.hideModal', function(){
+					self.modal.find('.UserTombstone').on('click.hideModal', function(){
 						self.hide();
 					});
 				} else {
@@ -453,28 +478,115 @@ FavoredModal.prototype.uploadFavored = function(callback){
 	});
 };
 
-FavoredModal.prototype.buildFavored = function(favors, $wrapper){
-	var $favors = $(),
+FavoredModal.prototype.appendUsers = function(users, $wrapper){
+	var $users = $(),
 		last_is_fiends = false,
 		self = this;
 
 	if(typeof $wrapper != 'undefined'){
-		last_is_fiends = $wrapper.find('.user_tombstone').eq(-1).data('is_friend') == 'true';
+		last_is_fiends = $wrapper.find('.UserTombstone').eq(-1).data('is_friend') == 'true';
 	}
 
-	favors.forEach(function(favored, i){
-		if((self.is_first && !i) || last_is_fiends != favored.is_friend){
-			$favors = $favors.add(tmpl('modal-favored-divider', {label: favored.is_friend ? 'Друзья' : 'Все'}));
-			last_is_fiends = favored.is_friend;
+	users.forEach(function(user, i){
+		if((self.is_first && !i) || last_is_fiends != user.is_friend){
+			$users = $users.add(tmpl('modal-users-divider', {label: user.is_friend ? 'Друзья' : 'Все'}));
+			last_is_fiends = user.is_friend;
 		}
-		$favors = $favors.add(tmpl('user-tombstone', {
-			id: favored.id,
-			is_friend: favored.is_friend,
-			avatar_url: favored.avatar_url,
-			size: '70x70',
-			full_name: [favored.first_name, favored.last_name].join(' ')
+		
+		$users = $users.add(buildUserTombstones(user, {
+			tombstone_classes: ['UserTombstone'],
+			is_link: true,
+			dataset: {is_friend: user.is_friend}
 		}));
 	});
+	$wrapper.append($users);
+	return $users;
+};
 
-	return $favors;
+
+
+function EditorsModal(organization_id, title, specific_role){
+	this.title = title ? title : 'Редакторы';
+	this.content = $();
+	this.specific_role = specific_role ? specific_role : false;
+	this.id = organization_id;
+	this.disable_upload = false;
+	this.ajax_url = {
+		id: this.id,
+		length: 30,
+		offset_number: 0,
+		toString: function(){
+			return '/api/v1/organizations/'+this.id+'/staff/?order_by="first_name"&length='+this.length+'&offset='+this.offset_number+''
+		}
+	};
+	this.is_first = true;
+	
+	this.modal = tmpl('modal', {
+		modal_type: 'EditorsModal',
+		modal_content_classes: 'EditorsModalContent',
+		modal_title: tmpl('modal-title', {title: this.title}),
+		modal_content: this.content
+	});
+	
+	Modal.pushModal(this);
+}
+EditorsModal.extend(AbstractUsersModal);
+
+EditorsModal.prototype.uploadUsers = function(callback){
+	var self = this;
+	$.ajax({
+		url: this.ajax_url,
+		method: 'GET',
+		success: function(res){
+			ajaxHandler(res, function(data){
+				/*getSpecificStaff(self.specific_role, data);*/
+				if(data.length){
+					var $wrapper = self.modal.find('.EditorsModalContent');
+					
+					self.content = self.appendUsers(data, $wrapper);
+					self.is_first = false;
+					self.ajax_url.offset_number = self.ajax_url.offset_number + self.ajax_url.length;
+					self.ajax_url.length = 10;
+					if(callback)
+						callback();
+					self.adjustDestroyer();
+					bindControllers(self.modal);
+					self.modal.find('.UserTombstone').on('click.hideModal', function(){
+						self.hide();
+					});
+				} else {
+					self.disable_upload = true;
+				}
+			},ajaxErrorHandler);
+		}
+	});
+};
+
+EditorsModal.prototype.appendUsers = function(users, $wrapper){
+	var $users = $(),
+		last_role = false,
+		labels = {
+			admin: 'Администраторы',
+			moderator: 'Модераторы'
+		},
+		self = this;
+	
+	if(typeof $wrapper != 'undefined'){
+		last_role = $wrapper.find('.UserTombstone').last().data('role');
+	}
+	
+	users.forEach(function(user, i){
+		if((self.is_first && !i) || last_role != user.role){
+			$users = $users.add(tmpl('modal-users-divider', {label: labels[user.role]}));
+			last_role = user.role;
+		}
+		
+		$users = $users.add(buildUserTombstones(user, {
+			tombstone_classes: ['UserTombstone'],
+			is_link: true,
+			dataset: {role: user.role}
+		}));
+	});
+	$wrapper.append($users);
+	return $users;
 };
