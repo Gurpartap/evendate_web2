@@ -2351,6 +2351,68 @@
         }
       }
     },
+    "/statistics/events/{Id}": {
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "Get stats about event",
+        "description": "",
+        "operationId": "getEventStats",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "scale",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "minute", "hour", "day", "week", "month", "year", "overall"
+            ]
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "description": "Unix timestamp since",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "till",
+            "in": "query",
+            "description": "Unix timestamp till",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Allowed fields: [dynamics, view, subscribe, unsubscribe, conversion, audience, events]. For each field can be used till, since, scale",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/Device"
+            }
+          }
+        }
+      }
+    },
     "/statistics/organizations/{Id}": {
       "get": {
         "tags": [
@@ -2383,16 +2445,16 @@
           {
             "name": "since",
             "in": "query",
-            "description": "DateTime since",
+            "description": "Unix timestamp since",
             "required": true,
-            "type": "date-time"
+            "type": "integer"
           },
           {
             "name": "till",
             "in": "query",
-            "description": "DateTime till",
-            "required": true,
-            "type": "date-time"
+            "description": "Unix timestamp till",
+            "required": false,
+            "type": "integer"
           },
           {
             "name": "fields",
@@ -2503,6 +2565,10 @@
           "format": "int32"
         },
         "[new_events_count]": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "[actual_events_count]": {
           "type": "integer",
           "format": "int32"
         },

@@ -12,6 +12,7 @@ class Organization extends AbstractEntity
     const SUBSCRIPTION_ID_FIELD_NAME = 'subscription_id';
     const IS_SUBSCRIBED_FIELD_NAME = 'is_subscribed';
     const NEW_EVENTS_COUNT_FIELD_NAME = 'new_events_count';
+    const ACTUAL_EVENTS_COUNT_FIELD_NAME = 'actual_events_count';
     const STAFF_FIELD_NAME = 'staff';
     const IS_NEW_FIELD_NAME = 'is_new';
     const PRIVILEGES_FIELD_NAME = 'privileges';
@@ -120,7 +121,16 @@ class Organization extends AbstractEntity
 					WHERE
 						user_id = :user_id
 					)
-				) :: INT AS ' . self::NEW_EVENTS_COUNT_FIELD_NAME
+				) :: INT AS ' . self::NEW_EVENTS_COUNT_FIELD_NAME,
+        self::ACTUAL_EVENTS_COUNT_FIELD_NAME => '(
+		SELECT
+			COUNT(view_events.id)
+			FROM view_events
+			WHERE
+				organization_id = view_organizations.id
+				AND
+				view_events.last_event_date > DATE_PART(\'epoch\', NOW()) :: INT
+				) :: INT AS ' . self::ACTUAL_EVENTS_COUNT_FIELD_NAME
     );
 
     public function __construct()
