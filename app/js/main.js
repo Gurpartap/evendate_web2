@@ -1,7 +1,12 @@
 String.prototype.capitalize = function() {
 	return this.charAt(0).toUpperCase() + this.slice(1);
 };
-String.prototype.contains = function(it) {return this.indexOf(it) != -1;};
+String.prototype.contains = function(it) {return this.search(it) !== -1;};
+String.prototype.format = function(fields){
+	return this.replace(/\{(\w+)\}/gm, function(m,n){
+		return fields[n] ? fields[n] : m;
+	});
+};
 Object.props = function(obj){
 	var props = [];
 	Object.keys(obj).forEach(function(prop){
@@ -141,12 +146,22 @@ function objectToHtmlDataSet(){
 	return dataset.join(' ');
 }
 
-function formatDates(dates){
-	var prev_day,
-		range = [],
+function formatDates(dates, format, is_same_time){
+	var cur_moment,
+		prev_moment,
+		cur_year,
+		cur_month,
+		cur_time,
+		prev_time,
+		is_with_time = false,
+		cur_range_of_days = [],
+		last_index = dates.length - 1,
 		dates_obj = {},
-		output = [],
-		genitive_month_names = [
+		output = [];
+		
+	
+	function formatString(formatting, days, time, month, year) {
+		var genitive_month_names = [
 			'января',
 			'февраля',
 			'марта',
@@ -159,47 +174,169 @@ function formatDates(dates){
 			'октября',
 			'ноября',
 			'декабря'
-		];
-	
-	if(dates.length == 1){
-		return [moment.unix(dates[0].event_date).format('LL')];
+		],
+			format_options = {
+				d: days,
+				D: days,
+				t: time,
+				T: time,
+				M: month + 1,
+				MM: month + 1 > 9 ? month + 1 : "0"+(month + 1),
+				MMM: __LOCALES.DATE.MONTH_SHORT_NAMES[month].toLocaleLowerCase(),
+				MMMM: __LOCALES.DATE.MONTH_NAMES[month].toLocaleLowerCase(),
+				MMMMs: genitive_month_names[month],
+				Y: year,
+				YY: year.substr(2,2),
+				YYYY: year
+			},
+			output;
+		
+		if(typeof formatting == 'string'){
+			output = formatting.format(format_options).capitalize();
+		} else if(Array.isArray(formatting)) {
+			output = formatting.map(function(str) {
+				return str.format(format_options).capitalize();
+			});
+		} else if(formatting instanceof jQuery) {
+			output = $();
+			formatting.each(function(key, elem) {
+				var $elem = $(elem).clone();
+				$elem.text(elem.innerText.format(format_options).capitalize());
+				output = output.add($elem);
+			});
+		} else {
+			output = {};
+			$.each(formatting, function(key, str) {
+				output[key] = str.format(format_options).capitalize();
+			});
+		}
+		
+		return output;
 	}
 	
-	dates.forEach(function(date, i){
-		var this_day = moment.unix(date.event_date);
-		if(!dates_obj.hasOwnProperty(this_day.year())){
-			dates_obj[this_day.year()] = {};
+	if(!format) {
+		format = {
+			date: '{D} {MMMMs} {YYYY}',
+			time: '{T}'
 		}
-		if(!dates_obj[this_day.year()].hasOwnProperty(this_day.month())){
-			dates_obj[this_day.year()][this_day.month()] = [];
-		}
-		
-		if(!prev_day){
-			range = [this_day.format('D')];
-		} else {
-			if(this_day.month() == prev_day.month() && prev_day.diff(this_day, 'days') == -1){
-				range.push(this_day.format('D'));
-			} else {
-				dates_obj[prev_day.year()][prev_day.month()].push(range.length == 1 ? range.shift() : range.shift()+'-'+range.pop());
-				range = [this_day.format('D')];
-			}
-		}
-		
-		if(i === dates.length - 1){
-			dates_obj[this_day.year()][this_day.month()].push(range.length == 1 ? range.shift() : range.shift()+'-'+range.pop());
-		} else {
-			prev_day = this_day;
-		}
-	});
+	}
 	
-	for(var year in dates_obj){
-		if(dates_obj.hasOwnProperty(year)){
-			for(var month in dates_obj[year]){
-				if(dates_obj[year].hasOwnProperty(month)){
-					output.push(dates_obj[year][month].join(', ')+' '+genitive_month_names[month]+' '+year+' г.');
-				}
-			}
+	if(typeof format == 'string'){
+		is_with_time = format.contains((/\{T\}|\{t\}/)) && dates[0]['start_time'] !== undefined;
+	} else {
+		is_with_time = dates[0]['start_time'] !== undefined;
+		$.each(format, function() {
+			is_with_time = is_with_time || this.contains((/\{T\}|\{t\}/));
+		})
+	}
+	
+	if(is_same_time){
+		if(is_with_time){
+			cur_time = dates[0].end_time ?
+				[moment(dates[0].start_time, 'HH:mm:ss').format('HH:mm'), moment(dates[0].end_time, 'HH:mm:ss').format('HH:mm')].join('-') :
+				moment(dates[0].end_time, 'HH:mm:ss').format('HH:mm');
 		}
+		
+		dates.forEach(function(date, i) {
+			cur_moment = moment.unix(date.event_date);
+			cur_year = cur_moment.year();
+			cur_month = cur_moment.month();
+			if(!dates_obj[cur_year])  dates_obj[cur_year] = {};
+			if(!dates_obj[cur_year][cur_month])  dates_obj[cur_year][cur_month] = [];
+			
+			if(prev_moment){
+				if(cur_month !== prev_moment.month() || prev_moment.diff(cur_moment, 'days') !== -1){
+					dates_obj[prev_moment.year()][prev_moment.month()].push(cur_range_of_days.join('-'));
+					cur_range_of_days[0] = cur_moment.format('D');
+				} else {
+					cur_range_of_days[1] = cur_moment.format('D');
+				}
+			} else {
+				cur_range_of_days[0] = cur_moment.format('D');
+			}
+			
+			if(i === last_index){
+				dates_obj[cur_year][cur_month].push(cur_range_of_days.join('-'));
+			} else {
+				prev_moment = cur_moment;
+			}
+		});
+		
+		
+		$.each(dates_obj, function(year, months){
+			$.each(months, function(month, days){
+				output.push(formatString(format, days.join(', '), is_with_time ? cur_time : '', month, year));
+			})
+		});
+		
+	} else {
+		dates.forEach(function(date, i) {
+			cur_moment = moment.unix(date.event_date);
+			cur_year = cur_moment.year();
+			cur_month = cur_moment.month();
+			cur_time = date.end_time ?
+				[moment(date.start_time, 'HH:mm:ss').format('HH:mm'), moment(date.end_time, 'HH:mm:ss').format('HH:mm')].join('-') :
+				moment(date.end_time, 'HH:mm:ss').format('HH:mm');
+			if(!dates_obj[cur_year])  dates_obj[cur_year] = {};
+			if(!dates_obj[cur_year][cur_month])  dates_obj[cur_year][cur_month] = [];
+			
+			if(prev_moment){
+				if(cur_month !== prev_moment.month() || prev_moment.diff(cur_moment, 'days') !== -1 || prev_time !== cur_time){
+					dates_obj[prev_moment.year()][prev_moment.month()].push({
+						date: cur_range_of_days.join('-'),
+						time: prev_time
+					});
+					cur_range_of_days[0] = cur_moment.format('D');
+				} else {
+					cur_range_of_days[1] = cur_moment.format('D');
+				}
+			} else {
+				cur_range_of_days[0] = cur_moment.format('D');
+			}
+			
+			if(i === last_index){
+				dates_obj[cur_year][cur_month].push({
+					date: cur_range_of_days.join('-'),
+					time: prev_time
+				});
+			} else {
+				prev_moment = cur_moment;
+				prev_time = cur_time;
+			}
+		});
+		
+		
+		$.each(dates_obj, function(year, months){
+			$.each(months, function(month, days){
+				var formatted_days = [],
+					range = [],
+					prev_time;
+				$.each(days, function(i, day) {
+					if(prev_time){
+						if(day.time != prev_time){
+							formatted_days.push({date: range.join(', '), time: prev_time});
+							range = [day.date];
+						} else {
+							range.push(day.date);
+						}
+					} else {
+						range = [day.date];
+					}
+					
+					if(i === days.length - 1){
+						formatted_days.push({date: range.join(', '), time: prev_time ? prev_time : day.time});
+					} else {
+						prev_time = day.time;
+					}
+				});
+				
+				$.each(formatted_days, function(i, day) {
+					output.push(formatString(format, day.date, is_with_time ? day.time : '', month, year));
+				});
+			})
+		});
+			
+		
 	}
 	
 	

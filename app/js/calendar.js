@@ -37,6 +37,9 @@ var __STATES = {
 				case 'edit_organization': {
 					return History.getState().data.organizationId ? History.getState().data.organizationId : History.getState().data.organization_id;
 				}
+				case 'event_statistics': {
+					return window.location.pathname.split('/')[2];
+				}
 				case 'organization_statistics': {
 					return window.location.pathname.split('/')[2];
 				}
@@ -589,7 +592,12 @@ function OneEvent($view){
 				if(data.is_same_time){
 					data.event_additional_fields = data.event_additional_fields.add(tmpl('event-additional-info', {
 						key: 'Дата',
-						value: $(formatDates(data.dates).map(function(elem){return $('<span>').addClass('event_date').text(elem);})).map(function(){return this.toArray();})
+						value: $(formatDates(data.dates, '{D} {MMMMs} {YYYY}', data.is_same_time)
+							.map(function(elem){
+								return $('<span>').addClass('event_date').text(elem);
+							})).map(function(){
+								return this.toArray();
+							})
 					}));
 					data.event_additional_fields = data.event_additional_fields.add(tmpl('event-additional-info', {
 						key: 'Время',
@@ -2529,7 +2537,226 @@ function Statistics($view) {
 				promotion: Promotion,
 				settings: Settings,
 				support: Support
-			};
+			},
+			highchart_defaults = {
+				chart: {
+					backgroundColor: null,
+					plotBorderWidth: null,
+					plotShadow: false,
+					style: {
+						fontFamily: 'inherit',
+						fontSize: 'inherit'
+					}
+				},
+				colors: [__C.COLORS.FRANKLIN,__C.COLORS.ACCENT,__C.COLORS.MUTED,__C.COLORS.MUTED_80,__C.COLORS.MUTED_50,__C.COLORS.MUTED_30],
+				title: {
+					text: false
+				},
+				credits: {
+					enabled: false
+				}
+			},
+			pie_chart_options = {
+				chart: {
+					type: 'pie',
+					height: 200,
+					style: {
+						fontFamily: 'inherit',
+						fontSize: 'inherit'
+					}
+				},
+				tooltip: {
+					pointFormat: '<b>{point.percentage:.1f}%</b>'
+				},
+				plotOptions: {
+					pie: {
+						center: [45, '50%'],
+						allowPointSelect: true,
+						cursor: 'pointer',
+						size: 120,
+						dataLabels: {
+							distance: -35,
+							defer: false,
+							formatter: function () {
+								return this.percentage > 15 ? Math.round(this.percentage)+'%' : null;
+							},
+							style: {"color": "#fff", "fontSize": "20px", "fontWeight": "300", "textShadow": "none" },
+							y: -6
+						},
+						showInLegend: true
+					}
+				},
+				legend: {
+					align: 'right',
+					verticalAlign: 'top',
+					layout: 'vertical',
+					width: 100,
+					symbolHeight: 0,
+					symbolWidth: 0,
+					itemMarginBottom: 5,
+					labelFormatter: function() {
+						return '<span style="color: '+this.color+'">'+this.name+'</span>'
+					},
+					itemStyle: { cursor: 'pointer', fontSize: '14px', fontWeight: '500' },
+					y: 12
+				}
+			},
+			area_chart_default_options = $.extend(true, {}, highchart_defaults, {
+				chart: {
+					type: 'areaspline',
+					plotBackgroundColor: '#fcfcfc',
+					plotBorderColor: '#ebebeb',
+					plotBorderWidth: 1
+				},
+				title: {
+					align: 'left',
+					margin: 20
+				},
+				legend: {
+					enabled: true,
+					align: 'left',
+					itemStyle: { color: __C.COLORS.TEXT, cursor: 'pointer', fontSize: '14px', fontWeight: '500', y: 0 },
+					itemMarginTop: 24,
+					itemMarginBottom: 5,
+					symbolHeight: 18,
+					symbolWidth: 18,
+					symbolRadius: 9,
+					itemDistance: 42,
+					x: 30
+				},
+				plotOptions: {
+					series: {
+						states: {
+							hover: {
+								enabled: true,
+								lineWidth: 2
+							}
+						}
+					},
+					areaspline: {
+						fillOpacity: 0.5,
+						marker: {
+							enabled: false,
+							symbol: 'circle',
+							radius: 2,
+							states: {
+								hover: {
+									enabled: true
+								}
+							}
+						}
+					}
+				},
+				tooltip: {
+					headerFormat: '<b>{point.key}</b><br/>',
+					valueDecimals: 0,
+					xDateFormat: '%e %b %Y, %H:%M'
+				},
+				scrollbar: {enabled: false},
+				navigator: {
+					outlineColor: '#ebebeb',
+					outlineWidth: 1,
+					maskInside: false,
+					maskFill: 'rgba(245, 245, 245, 0.66)',
+					handles: {
+						backgroundColor: '#9fa7b6',
+						borderColor: '#fff'
+					},
+					xAxis: {
+						gridLineWidth: 0,
+						labels: {
+							align: 'left',
+							reserveSpace: true,
+							style: {
+								color: '#888'
+							},
+							x: 0,
+							y: null
+						}
+					}
+				},
+				rangeSelector: {
+					buttonTheme: {
+						width: null,
+						height: 22,
+						fill: 'none',
+						stroke: 'none',
+						r: 14,
+						style: {
+							color: __C.COLORS.MUTED_80,
+							fontSize: '13px',
+							fontWeight: '400',
+							textTransform: 'uppercase',
+							dominantBaseline: 'middle'
+						},
+						states: {
+							hover: {
+								fill: __C.COLORS.MUTED_50,
+								style: {
+									color: '#fff'
+								}
+							},
+							select: {
+								fill: __C.COLORS.MUTED_80,
+								style: {
+									color: '#fff',
+									fontWeight: '400'
+								}
+							}
+						}
+					},
+					buttons: [{
+						type: 'day',
+						count: 1,
+						text: "\xa0\xa0\xa0День\xa0\xa0\xa0"
+					}, {
+						type: 'day',
+						count: 7,
+						text: "\xa0\xa0\xa0Неделя\xa0\xa0\xa0"
+					}, {
+						type: 'month',
+						count: 1,
+						text: "\xa0\xa0\xa0Месяц\xa0\xa0\xa0"
+					}, {
+						type: 'year',
+						count: 1,
+						text: "\xa0\xa0\xa0Год\xa0\xa0\xa0"
+					}, {
+						type: 'all',
+						text: "\xa0\xa0\xa0Все\xa0время\xa0\xa0\xa0"
+					}],
+					allButtonsEnabled: true,
+					selected: 3,
+					labelStyle: {
+						display: 'none'
+					},
+					inputEnabled: false
+				},
+				xAxis: {
+					gridLineWidth: 1,
+					gridLineDashStyle: 'dash',
+					type: 'datetime',
+					showEmpty: false,
+					tickPosition: 'inside',
+					dateTimeLabelFormats: {
+						minute: '%H:%M',
+						hour: '%H:%M',
+						day: '%e %b',
+						week: '%e %b',
+						month: '%b %y',
+						year: '%Y'
+					}
+				},
+				yAxis: {
+					floor: 0,
+					min: 0,
+					gridLineDashStyle: 'dash',
+					opposite: false,
+					title: {
+						text: false
+					}
+				}
+			});
 		
 		function Overview($wrapper) {
 			var org_id = __STATES.entityId,
@@ -2556,25 +2783,7 @@ function Statistics($view) {
 							'conversion'
 						].join(',')
 					})
-				].join(','),
-				highchart_defaults = {
-					chart: {
-						backgroundColor: null,
-						plotBorderWidth: null,
-						plotShadow: false,
-						style: {
-							fontFamily: 'inherit',
-							fontSize: 'inherit'
-						}
-					},
-					colors: [__C.COLORS.FRANKLIN,__C.COLORS.ACCENT,__C.COLORS.MUTED,__C.COLORS.MUTED_80,__C.COLORS.MUTED_50,__C.COLORS.MUTED_30],
-					title: {
-						text: false
-					},
-					credits: {
-						enabled: false
-					}
-				};
+				].join(',');
 			
 			function getStatistics(org_id, scale, since, till, fields, success){
 				$.ajax({
@@ -2660,51 +2869,6 @@ function Statistics($view) {
 			}
 			
 			function buildPieChart($container, data) {
-				var pie_chart_options = {
-					chart: {
-						type: 'pie',
-						height: 200,
-						style: {
-							fontFamily: 'inherit',
-							fontSize: 'inherit'
-						}
-					},
-					tooltip: {
-						pointFormat: '<b>{point.percentage:.1f}%</b>'
-					},
-					plotOptions: {
-						pie: {
-							center: [45, '50%'],
-							allowPointSelect: true,
-							cursor: 'pointer',
-							size: 120,
-							dataLabels: {
-								distance: -35,
-								defer: false,
-								formatter: function () {
-									return this.percentage > 15 ? Math.round(this.percentage)+'%' : null;
-								},
-								style: {"color": "#fff", "fontSize": "20px", "fontWeight": "300", "textShadow": "none" },
-								y: -6
-							},
-							showInLegend: true
-						}
-					},
-					legend: {
-						align: 'right',
-						verticalAlign: 'top',
-						layout: 'vertical',
-						width: 100,
-						symbolHeight: 0,
-						symbolWidth: 0,
-						itemMarginBottom: 5,
-						labelFormatter: function() {
-							return '<span style="color: '+this.color+'">'+this.name+'</span>'
-						},
-						itemStyle: { cursor: 'pointer', fontSize: '14px', fontWeight: '500' },
-						y: 12
-					}
-				};
 				
 				function pieChartSeriesNormalize(raw_data) {
 					var
@@ -2731,162 +2895,6 @@ function Statistics($view) {
 			}
 			
 			function buildAreaCharts($container, data){
-				var area_chart_default_options = $.extend(true, {}, highchart_defaults, {
-					chart: {
-						type: 'areaspline',
-						plotBackgroundColor: '#fcfcfc',
-						plotBorderColor: '#ebebeb',
-						plotBorderWidth: 1
-					},
-					title: {
-						align: 'left',
-						margin: 20
-					},
-					legend: {
-						enabled: true,
-						align: 'left',
-						itemStyle: { color: __C.COLORS.TEXT, cursor: 'pointer', fontSize: '14px', fontWeight: '500', y: 0 },
-						itemMarginTop: 24,
-						itemMarginBottom: 5,
-						symbolHeight: 18,
-						symbolWidth: 18,
-						symbolRadius: 9,
-						itemDistance: 42,
-						x: 30
-					},
-					plotOptions: {
-						series: {
-							states: {
-								hover: {
-									enabled: true,
-									lineWidth: 2
-								}
-							}
-						},
-						areaspline: {
-							fillOpacity: 0.5,
-							marker: {
-								enabled: false,
-								symbol: 'circle',
-								radius: 2,
-								states: {
-									hover: {
-										enabled: true
-									}
-								}
-							}
-						}
-					},
-					tooltip: {
-						headerFormat: '<b>{point.key}</b><br/>',
-						valueDecimals: 0,
-						xDateFormat: '%e %b %Y, %H:%M'
-					},
-					scrollbar: {enabled: false},
-					navigator: {
-						outlineColor: '#ebebeb',
-						outlineWidth: 1,
-						maskInside: false,
-						maskFill: 'rgba(245, 245, 245, 0.66)',
-						handles: {
-							backgroundColor: '#9fa7b6',
-							borderColor: '#fff'
-						},
-						xAxis: {
-							gridLineWidth: 0,
-							labels: {
-								align: 'left',
-								reserveSpace: true,
-								style: {
-									color: '#888'
-								},
-								x: 0,
-								y: null
-							}
-						}
-					},
-					rangeSelector: {
-						buttonTheme: {
-							width: null,
-							height: 22,
-							fill: 'none',
-							stroke: 'none',
-							r: 14,
-							style: {
-								color: __C.COLORS.MUTED_80,
-								fontSize: '13px',
-								fontWeight: '400',
-								textTransform: 'uppercase',
-								dominantBaseline: 'middle'
-							},
-							states: {
-								hover: {
-									fill: __C.COLORS.MUTED_50,
-									style: {
-										color: '#fff'
-									}
-								},
-								select: {
-									fill: __C.COLORS.MUTED_80,
-									style: {
-										color: '#fff',
-										fontWeight: '400'
-									}
-								}
-							}
-						},
-						buttons: [{
-							type: 'day',
-							count: 1,
-							text: "\xa0\xa0\xa0День\xa0\xa0\xa0"
-						}, {
-							type: 'day',
-							count: 7,
-							text: "\xa0\xa0\xa0Неделя\xa0\xa0\xa0"
-						}, {
-							type: 'month',
-							count: 1,
-							text: "\xa0\xa0\xa0Месяц\xa0\xa0\xa0"
-						}, {
-							type: 'year',
-							count: 1,
-							text: "\xa0\xa0\xa0Год\xa0\xa0\xa0"
-						}, {
-							type: 'all',
-							text: "\xa0\xa0\xa0Все\xa0время\xa0\xa0\xa0"
-						}],
-						allButtonsEnabled: true,
-						selected: 3,
-						labelStyle: {
-							display: 'none'
-						},
-						inputEnabled: false
-					},
-					xAxis: {
-						gridLineWidth: 1,
-						gridLineDashStyle: 'dash',
-						type: 'datetime',
-						showEmpty: false,
-						tickPosition: 'inside',
-						dateTimeLabelFormats: {
-							minute: '%H:%M',
-							hour: '%H:%M',
-							day: '%e %b',
-							week: '%e %b',
-							month: '%b %y',
-							year: '%Y'
-						}
-					},
-					yAxis: {
-						floor: 0,
-						min: 0,
-						gridLineDashStyle: 'dash',
-						opposite: false,
-						title: {
-							text: false
-						}
-					}
-				});
 				
 				function areaChartSeriesNormalize(raw_data) {
 					var line_colors = [__C.COLORS.FRANKLIN,__C.COLORS.MUTED_80],
@@ -3050,7 +3058,100 @@ function Statistics($view) {
 	}
 	
 	function StatisticsEvent($wrapper) {
+		var current_state = window.location.pathname.split('/')[3],
+			sub_states = {
+				overview: Overview,
+				auditory: Auditory,
+				edit: Edit,
+				promotion: Promotion
+			};
 		
+		function Overview($wrapper) {
+			var event_id = __STATES.entityId,
+				event_fields = [
+					'image_horizontal_medium_url',
+					'organization_short_name',
+					'favored_users_count',
+					'is_same_time',
+					'dates'
+				];
+			
+			function getEventData(event_id, fields, success){
+				$.ajax({
+					url: '/api/v1/events/'+event_id,
+					data: {
+						fields: Array.isArray(fields) ? fields.join(',') : fields
+					},
+					method: 'GET',
+					success: function(res){
+						ajaxHandler(res, function(data, text){
+							if(success && typeof success == 'function'){
+								success(data[0]);
+							}
+						}, ajaxErrorHandler)
+					}
+				});
+			}
+			
+			function updateScoreboards($wrapper, numbers, dynamics) {
+				var order = ['fave', 'view'],
+					fields = {
+						'fave': 'Добавлений в избранное',
+						'view': 'Просмотров события'
+					};
+				
+				order.forEach(function(field){
+					var measure = field == 'conversion' ? '%' : '',
+						$scoreboard = $wrapper.find('.Scoreboard'+field.capitalize());
+					
+					if(!$scoreboard.length){
+						$scoreboard = tmpl('eventstat-scoreboard', {
+							type: 'Scoreboard'+field.capitalize(),
+							title: fields[field],
+							number: 0 + measure
+						}, $wrapper)
+					}
+					
+					if(numbers[field]){
+						$scoreboard.find('.ScoreboardNumber').animateNumber({
+							number: Math.round(numbers[field]),
+							suffix: measure
+						}, 2000, 'easeOutSine');
+					}
+					
+				});
+			}
+			
+			$wrapper.empty();
+			getEventData(event_id, event_fields, function(event_data) {
+				if(event_data.is_same_time){
+					event_data.dates_block = tmpl('eventstat-overview-datetime', formatDates(event_data.dates, {date: '{D} {MMMMs}', time: '{T}'}, event_data.is_same_time))
+				} else {
+					event_data.dates_block = {};
+				}
+				
+				$wrapper.html(tmpl('eventstat-overview', event_data));
+				
+				updateScoreboards($wrapper, {
+					fave: event_data.favored_users_count
+				});
+				
+				
+			});
+			
+		}
+		
+		function Auditory($wrapper) {}
+		
+		function Edit($wrapper) {}
+		
+		function Promotion($wrapper) {}
+		
+		
+		if(!current_state)
+			current_state = 'overview';
+		
+		sub_states[current_state]($wrapper);
 	}
 	
 	if(!current_state)

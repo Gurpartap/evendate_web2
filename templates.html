@@ -917,7 +917,7 @@
 		<aside class="orgstat_overview_sidebar">
 			<header class="orgstat_overview_sidebar_header">
 				<span class="orgstat_overview_sidebar_title">Об организаторе</span>
-				<span class="stamp -color_accent">Starter</span>
+				<!--<span class="stamp -color_accent">Starter</span>-->
 			</header>
 			<div class="orgstat_overview_sidebar_wrapper -align_center">
 				<div class="user_tombstone">
@@ -982,6 +982,50 @@
 	<div class="orgstat_overview_scoreboard {type}">
 		<span class="scoreboard_number ScoreboardNumber">{number}</span>
 		<p class="scoreboard_dynamic"><label class="scoreboard_dynamic_icon fa_icon {icon_classes}"></label><span class="ScoreboardDynamic">{dynamic_by_week}</span><span> за неделю</span></p>
+		<span class="scoreboard_title">{title}</span>
+	</div>
+</script>
+
+<!-- Event Statistics -->
+<!-- Event Statistics Overview -->
+
+<script type="javascript/template" id="tmpl-eventstat-overview">
+	<div class="page eventstat_overview">
+		<header class="eventstat_overview_header">
+			<div class="eventstat_overview_header_block img_holder">
+				<img src="{image_horizontal_medium_url}">
+			</div>
+			<div class="eventstat_overview_header_block eventstat_overview_info">
+				<span class="eventstat_overview_event_title">{title}</span>
+				<div class="eventstat_overview_dates">
+					{dates_block}
+				</div>
+				<div class="eventstat_overview_buttons">
+					<button class="button -size_low -color_neutral RippleEffect Controller" type="button" data-page="event/{id}" data-title="{title}">Перейти на страницу</button>
+				</div>
+			</div>
+			<div class="eventstat_overview_header_block">
+				<div class="eventstat_overview_scoreboards Scoreboards">{scoreboards}</div>
+				<span class="action -color_accent fa_icon fa-plus-circle">Добавить к сравнению</span>
+			</div>
+		</header>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-eventstat-overview-datetime">
+	<div class="eventstat_overview_datetime">
+		<div class="eventstat_overview_date"><span>{date}</span></div>
+		<div class="eventstat_overview_time"><span>{time}</span></div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-eventstat-overview-different-time-date">
+
+</script>
+
+<script type="javascript/template" id="tmpl-eventstat-scoreboard">
+	<div class="eventstat_overview_scoreboard {type}">
+		<span class="scoreboard_number ScoreboardNumber">{number}</span>
 		<span class="scoreboard_title">{title}</span>
 	</div>
 </script>
