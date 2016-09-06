@@ -197,6 +197,7 @@ class EventsCollection extends AbstractCollection
                         $fields[] = Statistics::EVENT_USERS_NOTIFICATIONS_SENT;
 
                         $q_get_events->where('organization_id IN (SELECT organization_id FROM users_organizations ua WHERE ua.user_id = :user_id AND ua.role_id = :role_id)');
+                        $q_get_events->where('organization_id IN (SELECT organization_id FROM users_organizations ua WHERE ua.user_id = :user_id AND ua.role_id = :role_id)');
                         $statement_array[':user_id'] = $user->getId();
                         $statement_array[':role_id'] = Roles::getId(Roles::ROLE_ADMIN);
                         $statement_array[':since'] = '2014-01-01 00:00:00';
@@ -216,7 +217,7 @@ class EventsCollection extends AbstractCollection
                     if ($is_editor) {
                         $from_view = self::VIEW_ALL_EVENTS_WITH_ALIAS;
                         $q_get_events->where($name . ' = :' . $name);
-                        $statement_array[':' . $name] = boolval($value);
+                        $statement_array[':' . $name] = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
                     }
                     break;
                 }
@@ -471,7 +472,6 @@ class EventsCollection extends AbstractCollection
             $q_get_events->where($canceled_condition);
         }
 
-//        echo $q_get_events->getStatement();
 
         $p_get_events = $db->prepare($q_get_events->getStatement());
         $result = $p_get_events->execute($statement_array);
