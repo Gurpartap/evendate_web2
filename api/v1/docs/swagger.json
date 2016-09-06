@@ -67,16 +67,11 @@
             "type": "string"
           },
           {
-            "name": "privileges",
+            "name": "roles",
             "in": "query",
-            "description": "Can get list of organizations with any privileges",
+            "description": "Can get list of organizations with any roles",
             "required": false,
-            "type": "string",
-            "enum": [
-              "can_add",
-              "can_edit",
-              "can_modify"
-            ]
+            "type": "string"
           },
           {
             "name": "description",
@@ -208,16 +203,11 @@
             "type": "string"
           },
           {
-            "name": "privileges",
+            "name": "roles",
             "in": "query",
-            "description": "Can get list of organizations with any privileges",
+            "description": "Can get list of organizations with any roles",
             "required": false,
-            "type": "string",
-            "enum": [
-              "can_add",
-              "can_edit",
-              "can_modify"
-            ]
+            "type": "string"
           },
           {
             "name": "description",
