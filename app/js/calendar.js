@@ -2359,7 +2359,8 @@ function Onboarding($view){
 		method: 'GET',
 		data: {
 			length: 10,
-			offset: 0
+			offset: 0,
+			fields: 'img_small_url'
 		},
 		success: function(res){
 			ajaxHandler(res, function(data){
