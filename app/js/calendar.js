@@ -770,7 +770,7 @@ function OrganizationsList($view){
 			org.privileges.forEach(function(privilege) {
 				if(privilege.role_id == 1 || privilege.name == 'admin'){
 					org.redact_org_button = buildButton({
-						classes: ['-low','-color_marginal_primary','fa_icon','fa-pencil','-empty','RippleEffect'],
+						classes: ['-size_low','-color_marginal_primary','fa_icon','fa-pencil','-empty','RippleEffect'],
 						dataset: {
 							'page': 'edit_organization',
 							'organization-id': org.id,
@@ -875,11 +875,16 @@ function Organization($view){
 				$subscribers = $subscribers.add(tmpl('subscriber-divider', {label: subscriber.is_friend ? 'Друзья' : 'Все подписчики'}));
 				last_is_fiends = subscriber.is_friend;
 			}
+			
 			$subscribers = $subscribers.add(tmpl('subscriber', {
+				avatar_block: buildAvatarBlocks({
+					avatar_classes: ['-size_40x40','-rounded','-bordered'],
+					name: [subscriber.first_name, subscriber.last_name].join(' '),
+					avatar_url: subscriber.avatar_url
+				}),
 				id: subscriber.id,
-				is_friend: subscriber.is_friend,
-				avatar_url: subscriber.avatar_url,
-				name: [subscriber.first_name, subscriber.last_name].join(' ')
+				name: [subscriber.first_name, subscriber.last_name].join(' '),
+				is_friend: subscriber.is_friend
 			}));
 		});
 		//placeAvatarDefault($subscribers);
@@ -1097,26 +1102,24 @@ function Organization($view){
 					$future_events_wrapper,
 					$delayed_events_wrapper,
 					$canceled_events_wrapper,
-					is_editor = false;
+					role;
 
 				data = data[0];
-
-				data.privileges.forEach(function(privilege) {
-					if(privilege.role_id == 1 || privilege.name == 'admin'){
-						data.redact_org_button = buildButton({
-							title: 'Редактировать',
-							classes: ['-fill','-color_neutral','fa_icon','fa-pencil','RippleEffect'],
-							dataset: {
-								'page': 'edit_organization',
-								'organization-id': data.id,
-								'title': 'Редактирование организации'
-							}
-						})
-					}
-				});
-				if (data.privileges && data.privileges.length > 0){
+				
+				role = recognizeRole(data.privileges);
+				if(role == __C.ROLES.ADMIN){
+					data.redact_org_button = buildButton({
+						title: 'Редактировать',
+						classes: ['-fill','-color_neutral','fa_icon','fa-pencil','RippleEffect'],
+						dataset: {
+							'page': 'edit_organization',
+							'organization-id': data.id,
+							'title': 'Редактирование организации'
+						}
+					})
+				}
+				if (role != __C.ROLES.USER){
 					data.hidden_for_users = '';
-					is_editor = true;
 				}else{
 					data.hidden_for_users = '-hidden';
 				}
@@ -1133,7 +1136,7 @@ function Organization($view){
 
 				uploadEvents($future_events_wrapper, EVENT_TYPES.FUTURE, function($events){
 					uploadEvents($past_events_wrapper, EVENT_TYPES.PAST, function($events){
-						if (is_editor){
+						if (role != __C.ROLES.USER){
 							uploadEvents($delayed_events_wrapper, EVENT_TYPES.DELAYED, function($events){
 								uploadEvents($canceled_events_wrapper, EVENT_TYPES.CANCELED, function($events){
 									initOrganizationPage($view);
@@ -1887,7 +1890,7 @@ function EditEvent($view){
 			$right_block.find('.Text').text('Изменить');
 		}
 		$left_block.toggleClass('-hidden');
-		$right_block.toggleClass('-h_centering');
+		$right_block.toggleClass('-align_center');
 	}
 
 	function selectDates($view, raw_dates){
@@ -1935,7 +1938,7 @@ function EditEvent($view){
 				$button_orig = $wrap.find('.CallModal'),
 				src = $(this).data('source');
 
-			if(!$view.find('.edit_event_vk_right_block').hasClass('-h_centering')){
+			if(!$view.find('.edit_event_vk_right_block').hasClass('-align_center')){
 				toggleVkImg();
 			}
 			$vk_$data_url.val('data.source').data('source', src);
@@ -2401,7 +2404,405 @@ function StatisticsOverview($view) {
 }
 
 function StatisticsOrganization($view) {
-
+	var current_state = window.location.pathname.split('/')[2],
+		sub_states = {
+			overview: Overview,
+			events: Events,
+			auditory: Auditory,
+			promotion: Promotion,
+			settings: Settings,
+			support: Support
+		},
+		$wrapper = $view.find('.page_wrapper');
+	
+	function Overview($wrapper) {
+		var org_id = 1,
+			org_fields = [
+				'description',
+				'img_medium_url',
+				'default_address',
+				'staff',
+				'privileges',
+				'events{length:3,future:true,is_canceled:true,is_delayed:true,fields:"public_at"}'
+			],
+			stat_fields = [
+				'subscribe',
+				'view',
+				'fave',
+				'conversion',
+				'audience',
+				'dynamics'+JSON.stringify({
+					scale: 'week',
+					fields: [
+						'subscribe',
+						'view',
+						'fave',
+						'conversion'
+					].join(',')
+				})
+			].join(',');
+		
+		
+		function getStatistics(org_id, scale, since, till, fields, success){
+			$.ajax({
+				url: '/api/v1/statistics/organizations/'+org_id,
+				data: {
+					scale: scale,
+					since: since,
+					till: till,
+					fields: fields
+				},
+				method: 'GET',
+				success: function(res){
+					ajaxHandler(res, function(data, text){
+						if(success && typeof success == 'function'){
+							success(data);
+						}
+					}, ajaxErrorHandler)
+				}
+			});
+		}
+		
+		function getOrganizationData(org_id, fields, success){
+			$.ajax({
+				url: '/api/v1/organizations/'+org_id,
+				data: {
+					fields: Array.isArray(fields) ? fields.join(',') : fields
+				},
+				method: 'GET',
+				success: function(res){
+					ajaxHandler(res, function(data, text){
+						if(success && typeof success == 'function'){
+							success(data);
+						}
+					}, ajaxErrorHandler)
+				}
+			});
+		}
+		
+		function getSpecificStaff(role, staff){
+			var specific_staff = [];
+			staff.forEach(function(man){
+				if(man.role == role){
+					specific_staff.push({
+						id: man.id,
+						avatar_url: man.avatar_url,
+						name: man.first_name + ' ' + man.last_name,
+						is_link: true,
+						avatar_classes: ['-size_40x40','-rounded']
+					})
+				}
+			});
+			return specific_staff;
+		}
+		
+		function updateScoreboards($wrapper, numbers, dynamics) {
+			var order = ['subscribe', 'fave', 'view', 'conversion'],
+				fields = {
+					'subscribe': 'Подписчиков организатора',
+					'fave': 'Добавлений в избранное',
+					'view': 'Просмотров организатора',
+					'conversion': 'Конверсия откытий/подписки'
+				};
+			
+			order.forEach(function(field){
+				var measure = field == 'conversion' ? '%' : '',
+					$scoreboard = $wrapper.find('.Scoreboard'+field.capitalize());
+				
+				if(!$scoreboard.length){
+					$scoreboard = tmpl('orgstat-scoreboard', {
+						type: 'Scoreboard'+field.capitalize(),
+						title: fields[field],
+						number: 0 + measure,
+						dynamic_by_week: 0 + measure
+					}, $wrapper)
+				}
+				
+				if(numbers[field]){
+					$scoreboard.find('.ScoreboardNumber').animateNumber({
+						number: Math.round(numbers[field][0].value),
+						suffix: measure
+					}, 2000, 'easeOutSine');
+				}
+				
+				if(dynamics[field]){
+					var dynamic = dynamics[field][0].value;
+					$scoreboard
+						.find('.ScoreboardDynamic')
+						.animateNumber({
+							number: Math.round(dynamic),
+							prefix: dynamic == 0 ? '' : (dynamic > 0 ? '+' : '-'),
+							suffix: measure
+						}, 2000, 'easeOutSine')
+						.siblings('label')
+						.removeClass('fa-caret-up -color_franklin fa-caret-down -color_bubblegum')
+						.addClass(dynamic == 0 ? '' : (dynamic > 0 ? 'fa-caret-up -color_franklin' : 'fa-caret-down -color_bubblegum'));
+				}
+				
+			});
+		}
+		
+		$wrapper.empty();
+		getOrganizationData(org_id, org_fields, function(org_data) {
+			var role;
+			org_data = org_data[0];
+			
+			changeMainTitle(['Организации', org_data.short_name]);
+			
+			role = recognizeRole(org_data.privileges);
+			
+			org_data.administrators = getSpecificStaff('admin', org_data.staff);
+			org_data.moderators = getSpecificStaff('moderator', org_data.staff);
+			switch(role){
+				case __C.ROLES.ADMIN: {
+					org_data.administrators.push({
+						avatar_url: '/app/img/add_user.png',
+						name: 'Добавить администратора',
+						block_classes: ['-add_new','-color_marginal','AddAdmin'],
+						avatar_classes: ['-size_40x40','-rounded']
+					});
+				}
+				case __C.ROLES.MODERATOR: {
+					org_data.moderators.push({
+						avatar_url: '/app/img/add_user.png',
+						name: 'Добавить модератора',
+						block_classes: ['-add_new','-color_marginal','AddModerator'],
+						avatar_classes: ['-size_40x40','-rounded']
+					});
+					break;
+				}
+			}
+			org_data.administrators = buildAvatarBlocks(org_data.administrators);
+			org_data.moderators = buildAvatarBlocks(org_data.moderators);
+			org_data.event_blocks = org_data.events.map(function(event) {
+				var event_block = {
+					title: event.title,
+					day: moment.unix(event.first_event_date).format("D"),
+					month: moment.unix(event.first_event_date).format("MMM"),
+					badges: []
+				};
+				if(event.canceled)
+					event_block.badges.push('Отменено');
+				if(event.public_at && moment.unix(event.public_at).isBefore())
+					event_block.badges.push('Не опубликовано');
+				return event_block;
+			});
+			org_data.event_blocks = tmpl('orgstat-event-block', org_data.event_blocks);
+			
+			$wrapper.append(tmpl('orgstat-overview', org_data));
+			
+			getStatistics(org_id, 'year', moment().subtract(6, 'd').format(), moment().format(), stat_fields, function(stat_data){
+				
+				function initPieChart($container, data) {
+					var pie_chart_options = {
+						chart: {
+							backgroundColor: null,
+							plotBorderWidth: null,
+							plotShadow: false,
+							type: 'pie',
+							height: 200,
+							style: {
+								fontFamily: 'inherit',
+								fontSize: 'inherit'
+							}
+						},
+						title: {
+							text: false
+						},
+						tooltip: {
+							pointFormat: '<b>{point.percentage:.1f}%</b>'
+						},
+						plotOptions: {
+							pie: {
+								center: [45, '50%'],
+								allowPointSelect: true,
+								cursor: 'pointer',
+								size: 120,
+								dataLabels: {
+									distance: -35,
+									defer: false,
+									formatter: function () {
+										return this.percentage > 15 ? Math.round(this.percentage)+'%' : null;
+									},
+									style: {"color": "#fff", "fontSize": "20px", "fontWeight": "300", "textShadow": "none" },
+									y: -6
+								},
+								showInLegend: true
+							}
+						},
+						legend: {
+							align: 'right',
+							verticalAlign: 'top',
+							layout: 'vertical',
+							width: 100,
+							itemStyle: { "color": "#333333", "cursor": "pointer", "fontSize": "14px", "fontWeight": "500" },
+							y: 12
+						}
+					};
+					
+					function pieChartDataGenerator(raw_data) {
+						var default_colors = [__C.COLORS.FRANKLIN,__C.COLORS.ACCENT,__C.COLORS.MUTED,__C.COLORS.MUTED_80,__C.COLORS.MUTED_50,__C.COLORS.MUTED_30],
+							STD_NAMES = {
+								"browser": "Браузер",
+								"android": "Аndroid",
+								"ios": "iOS",
+								"female": "Женщины",
+								"male": "Мужчины",
+								"other": "Остальные",
+								null: "Не указано"
+							},
+							output = {
+								colorByPoint: true,
+								data: raw_data.map(function(line, i) {
+									return {
+										name: line.name ? STD_NAMES[line.name] : STD_NAMES[line.gender],
+										color: default_colors[i],
+										y: line.count
+									}
+								})
+							};
+						return {series: [output]};
+					}
+					
+					$container.highcharts($.extend(true, {}, pie_chart_options, pieChartDataGenerator(data)));
+				}
+				
+				initPieChart($wrapper.find('.GenderPieChart'), stat_data.audience.gender);
+				initPieChart($wrapper.find('.DevicePieChart'), stat_data.audience.devices);
+				
+				$wrapper.find('.OrgstatOverviewContent').append(tmpl('orgstat-overview-content', {}));
+				
+				updateScoreboards($wrapper.find('.Scoreboards'), stat_data, stat_data.dynamics);
+				
+				getStatistics(org_id, 'week', moment().subtract(11, 'months').format(), moment().format(), 'view,subscribe,unsubscribe,conversion,notification', function(stat_data){
+					
+					var area_chart_default_options = {
+						chart: {
+							type: 'areaspline'
+						},
+						title: {text: false},
+						xAxis: {
+							type: 'datetime',
+							showEmpty: false
+						},
+						yAxis: {
+							title: {text: false}
+						},
+						plotOptions: {
+							areaspline: {
+								stacking: 'normal',
+								pointStart: Date.UTC(2010, 0, 1),
+								pointIntervalUnit: 'year',
+								tooltip: {
+									headerFormat: '<b>{point.key}</b><br/>',
+									xDateFormat: '%d %m %Y'
+								},
+								marker: {
+									enabled: false,
+									symbol: 'circle',
+									radius: 2,
+									states: {
+										hover: {
+											enabled: true
+										}
+									}
+								}
+							}
+						}
+					},
+						area_stock_chart_default_options = {
+							title: {
+								text: 'chart.type is set to \'areaspline\''
+							},
+							chart: {
+								type: 'areaspline'
+							},
+							
+							rangeSelector: {
+								selected: 1
+							}
+						};
+					
+					function areaChartSeriesNormalize(raw_data) {
+						var line_colors = [__C.COLORS.FRANKLIN,__C.COLORS.ACCENT],
+							fill_colors = [__C.COLORS.FRANKLIN_ALT,__C.COLORS.ACCENT_ALT],
+							STD_NAMES = {
+								'view': 'Просмотры страницы организации',
+								'conversion': 'Конверсия',
+								'subscribe': 'Подписалось',
+								'unsubscribe': 'Отписалось'
+							},
+							output = [],
+							i = 0;
+						
+						$.each(raw_data, function(key, data){
+							output.push({
+								name: STD_NAMES[key],
+								fillColor: fill_colors[i],
+								lineColor: line_colors[i++],
+								data: data.reverse().map(function(line, i) {
+									return [moment.unix(line.since).valueOf(), line.value];
+								})
+							});
+						});
+						
+						return output;
+					}
+					
+					$wrapper.find('.SubscribersAreaChart').highcharts($.extend(true, {}, area_chart_default_options, {
+						title: {
+							text: 'Подписчики'
+						},
+						tooltip: {
+							shared: true
+						},
+						series: areaChartSeriesNormalize({subscribe: stat_data.subscribe, unsubscribe: stat_data.unsubscribe})
+					}));
+					
+					$wrapper.find('.ViewsAreaChart').highcharts('StockChart', $.extend(true, {}, area_stock_chart_default_options, {
+						series: areaChartSeriesNormalize({view: stat_data.view})
+					}));
+					
+					$wrapper.find('.ConversionsAreaChart').highcharts($.extend(true, {}, area_chart_default_options, {
+						title: {
+							text: 'Конверсия просмотров/подписок'
+						},
+						tooltip: {
+							valueSuffix: ' %'
+						},
+						series: areaChartSeriesNormalize({conversion: stat_data.conversion})
+					}));
+					
+					console.log(stat_data);
+				});
+				
+				
+				
+				
+				console.log(stat_data);
+				console.log(org_data);
+			});
+			bindRippleEffect($wrapper);
+			bindControllers($wrapper);
+		});
+	}
+	
+	function Events($wrapper) {}
+	
+	function Auditory($wrapper) {}
+	
+	function Promotion($wrapper) {}
+	
+	function Settings($wrapper) {}
+	
+	function Support($wrapper) {}
+	
+	if(!current_state)
+		current_state = 'overview';
+	
+	sub_states[current_state]($wrapper);
+	$('body').addClass('-state_statistics');
+	
 }
 
 function StatisticsEvent($view) {

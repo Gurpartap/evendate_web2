@@ -103,7 +103,8 @@ var
             POST_ERROR: 'vk.post.error'
         },
         NOTIFICATIONS: {
-            SEND: 'notifications.send'
+            SEND: 'notifications.send',
+            UPDATE_STATS: 'notifications.update_stats',
         },
         UTILS: {
             UPDATE_IMAGES: 'utils.updateImages',
@@ -133,6 +134,81 @@ sql.setDialect('postgres');
 
 pg.connect(pg_conn_string, function (err, client, done) {
 
+    var updateEventsStats = function (full_refresh) {
+
+        var q_get_events = Entities.view_events.select(
+            Entities.view_events.id
+        ).from(
+            Entities.view_events
+        );
+        if (full_refresh) {
+            q_get_events = q_get_events
+                .where(Entities.view_events.nearest_event_date.isNotNull())
+        }
+        q_get_events = q_get_events
+            .order([Entities.view_events.id.descending])
+            .toQuery();
+
+        var q_get_count = 'SELECT COUNT(view_stat_notifications.event_id) as count, ' +
+                ' stat_notifications_aggregated.event_id AS aggregated_event_id' +
+                ' FROM view_stat_notifications ' +
+                ' LEFT JOIN stat_notifications_aggregated ON stat_notifications_aggregated.event_id = view_stat_notifications.event_id' +
+                ' WHERE view_stat_notifications.event_id = $1' +
+                ' GROUP BY view_stat_notifications.event_id, stat_notifications_aggregated.event_id' +
+                ' ORDER BY aggregated_event_id DESC',
+
+            q_get_stats = 'SELECT COUNT(id) as value, event_id, stat_type_id ' +
+                ' FROM stats_events ' +
+                ' WHERE event_id = $1' +
+                ' GROUP BY event_id, stat_type_id',
+            q_ins_upd_stats = 'INSERT INTO stat_events_aggregated(value, event_id, stat_type_id, updated_at) ' +
+                ' VALUES($1, $2, $3, NOW())' +
+                ' ON CONFLICT (event_id, stat_type_id) DO UPDATE SET value = $1, updated_at = NOW()',
+
+            q_upd_notifications_count = 'UPDATE stat_notifications_aggregated SET updated_at = NOW(), count = $2 WHERE event_id = $1',
+            q_ins_notifications_count = 'INSERT INTO stat_notifications_aggregated (event_id, count)' +
+                ' VALUES ($1, $2)';
+
+        client.query(q_get_events, function (err, events) {
+            if (err) return logger.error(err);
+            events.rows.forEach(function (event) {
+                client.query({
+                    text: q_get_count,
+                    name: 'get_values',
+                    values: [event.id]
+                }, function (err, result) {
+                    if (err) return logger.error(err);
+                    var _query, _data, _count;
+                    if (result.rows.length == 0) {
+                        _count = 0;
+                        _query = q_ins_notifications_count;
+                    } else {
+                        _count = result.rows[0].count;
+                        if (result.rows[0].aggregated_event_id != null) {
+                            _query = q_upd_notifications_count;
+                        } else {
+                            _query = q_ins_notifications_count;
+                        }
+                    }
+
+                    _data = [event.id, _count];
+
+                    client.query(q_get_stats, [event.id], function (error, result) {
+                        if (handleError(error)) return error;
+                        result.rows.forEach(function (value) {
+                            client.query(q_ins_upd_stats, [value.value, event.id, value.stat_type_id], function (err) {
+                                if (handleError(err)) return err;
+                            });
+                        });
+                    });
+
+                    client.query(_query, _data, function (error, _r) {
+                        if (err) return logger.error(error);
+                    });
+                });
+            });
+        });
+    };
     function publicDelayedEvents() {
         var q_upd_events = 'UPDATE events ' +
             ' SET ' +
@@ -166,6 +242,23 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 notifications.sendUsersNotifications();
             }
             publicDelayedEvents();
+        }, null, true);
+    } catch (ex) {
+        logger.error(ex);
+    }
+
+
+    try {
+        new CronJob('0,15,30,45 * * * *', function () {
+            updateEventsStats();
+        }, null, true);
+    } catch (ex) {
+        logger.error(ex);
+    }
+
+    try {
+        new CronJob('0 3 * * *', function () {
+            updateEventsStats(true);
         }, null, true);
     } catch (ex) {
         logger.error(ex);
@@ -302,6 +395,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         subscriptions_count = user.subscriptions_count;
                         q_user = users.update(user_to_ins).where(users.id.equals(user.id)).returning('id').toQuery();
                     }
+                    console.log('GETTING USER: ', is_new_user, result);
 
                     client.query(q_user, function (user_err, ins_result) {
 
@@ -421,6 +515,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                     authTry(data.oauth_data);
                                     return;
                                 }
+
                                 socket.emit('auth', {
                                     email: data.oauth_data.email,
                                     user_id: user.id,
@@ -848,6 +943,13 @@ pg.connect(pg_conn_string, function (err, client, done) {
             }
         });
 
+        socket.on(EMIT_NAMES.NOTIFICATIONS.UPDATE_STATS, function () {
+            if (config_index == 'local') {
+                console.log('strted');
+                updateEventsStats();
+            }
+        });
+
         socket.on(EMIT_NAMES.VK_INTEGRATION.GROUPS_TO_POST, function (user_id) {
             var vk_sign_in = Entities.vk_sign_in,
                 q_get_user_data = vk_sign_in
@@ -865,7 +967,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
             });
         });
 
-        /**/
         socket.on(EMIT_NAMES.VK_INTEGRATION.POST_IT, function (data) {
             var request_data = [
                     'access_token=' + socket.vk_user.access_token,

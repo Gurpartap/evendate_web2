@@ -3,6 +3,26 @@
 class Statistics
 {
 
+
+    const SCALE_MINUTE = 'minute';
+    const SCALE_HOUR = 'hour';
+    const SCALE_DAY = 'day';
+    const SCALE_WEEK = 'week';
+    const SCALE_MONTH = 'month';
+    const SCALE_YEAR = 'year';
+    const SCALE_OVERALL = 'overall';
+
+
+    const SCALES = array(
+        self::SCALE_MINUTE,
+        self::SCALE_HOUR,
+        self::SCALE_DAY,
+        self::SCALE_WEEK,
+        self::SCALE_MONTH,
+        self::SCALE_YEAR,
+        self::SCALE_OVERALL
+    );
+
     const ENTITY_EVENT = 'event';
     const ENTITY_ORGANIZATION = 'organization';
     const ENTITY_FRIEND = 'friend';
@@ -22,6 +42,10 @@ class Statistics
     const EVENT_FAVE = 'fave';
     const EVENT_VIEW_DETAIL = 'view_detail';
     const EVENT_OPEN_SITE = 'open_site';
+    const EVENT_NOTIFICATIONS_SENT = 'notifications_sent';
+    const EVENT_AUTO_NOTIFICATIONS_SENT = 'auto_notifications_sent';
+    const EVENT_USERS_NOTIFICATIONS_SENT = 'users_notifications_sent';
+    const EVENT_USERS_NOTIFICATIONS = 'users_notifications';
 
     const SHARE_FACEBOOK = 'share_fb';
     const SHARE_VK = 'share_vk';
@@ -31,19 +55,23 @@ class Statistics
     const FRIEND_VIEW_ACTIONS = 'view_actions';
     const FRIEND_VIEW_EVENT_FROM_USER = 'view_event_from_user';
 
+    const FIELD_DYNAMICS = 'dynamics';
+    const FIELD_CONVERSION = 'conversion';
+    const FIELD_AUDIENCE = 'audience';
 
     public static function getTypeId($entity_type, $type_name, PDO $db)
     {
-        $q_get = 'SELECT id::INT FROM stat_event_types
-				WHERE type_code = :type_code
-				AND entity = :entity';
-        $p_get = $db->prepare($q_get);
-        $res = $p_get->execute(array(
-            ':entity' => $entity_type,
-            ':type_code' => $type_name
-        ));
+        $q_get = App::queryFactory()
+            ->newSelect()
+            ->from('stat_event_types')
+            ->cols(array('id'))
+            ->where('type_code = ?', $type_name)
+            ->where('entity = ?', $entity_type);
+
+        $p_get = $db->prepare($q_get->getStatement());
+        $res = $p_get->execute($q_get->getBindValues());
         if ($res === FALSE) throw new DBQueryException('', $db);
-        if ($p_get->rowCount() != 1) throw new InvalidArgumentException('', $db);
+        if ($p_get->rowCount() < 1) throw new InvalidArgumentException('', $db);
         return $p_get->fetchColumn(0);
     }
 
@@ -99,6 +127,25 @@ class Statistics
             self::updateIOsBadges($db, $user, $type, $event);
         }
     }
+    public static function Event(Event $event, User $user = null, PDO $db, $type)
+    {
+        try {
+            $type_id = self::getTypeId(self::ENTITY_EVENT, $type, $db);
+        } catch (Exception $e) {
+            return;
+        }
+        $q_ins_event = App::queryFactory()
+            ->newInsert()
+            ->into('stat_events')
+            ->cols(array(
+                'event_id' => $event->getId(),
+                'token_id' => $user ? $user->getTokenId() : null,
+                'stat_type_id' => $type_id
+            ));
+
+        $p_ins = $db->prepare($q_ins_event->getStatement());
+        $p_ins->execute($q_ins_event->getBindValues());
+    }
 
     public static function Organization(Organization $organization, User $user = null, PDO $db, $type, $no_update_badges = false)
     {
@@ -107,15 +154,18 @@ class Statistics
         } catch (Exception $e) {
             return FALSE;
         }
-        $q_ins_event = 'INSERT INTO stat_organizations(organization_id, token_id, stat_type_id, created_at)
-				VALUES (:organization_id, :token_id, :stat_type_id, NOW())';
 
-        $p_ins = $db->prepare($q_ins_event);
-        $p_ins->execute(array(
-            ':organization_id' => $organization->getId(),
-            ':token_id' => $user ? $user->getTokenId() : null,
-            ':stat_type_id' => $type_id
-        ));
+        $q_ins_event = App::queryFactory()
+            ->newInsert()
+            ->into('stat_organizations')
+            ->cols(array(
+                'organization_id' => $organization->getId(),
+                'token_id' => $user ? $user->getTokenId() : null,
+                'stat_type_id' => $type_id
+            ));
+
+        $p_ins = $db->prepare($q_ins_event->getStatement());
+        $p_ins->execute($q_ins_event->getBindValues());
 
         if ($no_update_badges !== true) {
             self::updateIOsBadges($db, $user, $type, null, $organization);
@@ -124,21 +174,23 @@ class Statistics
 
     public static function Friend(Friend $friend, User $user = null, PDO $db, $type)
     {
-        if ($friend->getId() == $user->getId()) return FALSE;
+        if ($friend->getId() == $user->getId()) return;
         try {
             $type_id = self::getTypeId(self::ENTITY_FRIEND, $type, $db);
         } catch (Exception $e) {
-            return FALSE;
+            return;
         }
-        $q_ins_event = 'INSERT INTO stat_users(user_id, token_id, stat_type_id, created_at)
-				VALUES (:user_id, :token_id, :stat_type_id, NOW())';
+        $q_ins_event = App::queryFactory()
+            ->newInsert()
+            ->into('stat_users')
+            ->cols(array(
+                'user_id' => $friend->getId(),
+                'token_id' => $user ? $user->getTokenId() : null,
+                'stat_type_id' => $type_id
+            ));
 
-        $p_ins = $db->prepare($q_ins_event);
-        $p_ins->execute(array(
-            ':user_id' => $friend->getId(),
-            ':token_id' => $user ? $user->getTokenId() : null,
-            ':stat_type_id' => $type_id
-        ));
+        $p_ins = $db->prepare($q_ins_event->getStatement());
+        $p_ins->execute($q_ins_event->getBindValues());
     }
 
     public static function StoreBatch(array $events, User $user = null, PDO $db)
