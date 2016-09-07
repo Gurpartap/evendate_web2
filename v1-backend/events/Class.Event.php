@@ -282,7 +282,7 @@ class Event extends AbstractEntity
         }
 
         if (isset($data['title'])) {
-            if (mb_strlen($data['title']) <= 5) throw new InvalidArgumentException('Слишком короткое название. Должно быть не менее 5 символов.');
+            if (mb_strlen($data['title']) < 3) throw new InvalidArgumentException('Слишком короткое название. Должно быть не менее 3 символов.');
             if (mb_strlen($data['title']) > 150) throw new InvalidArgumentException('Слишком длинное название. Должно быть не более 150 символов.');
         }
 
@@ -1012,7 +1012,6 @@ class Event extends AbstractEntity
     {
         if (isset($notification['notification_type']) && $notification['notification_type'] != null) {
             if (in_array($notification['notification_type'], Notification::NOTIFICATION_PREDEFINED_CUSTOM)) {
-
                 $first_event_date = EventsDatesCollection::filter($this->db,
                     $user,
                     array('event' => $this, 'future' => 'true'),
