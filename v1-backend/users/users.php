@@ -9,8 +9,16 @@ require_once $BACKEND_FULL_PATH . '/users/Class.OrganizationAction.php';
 
 $__modules['users'] = array(
 	'GET' => array(
-		'settings' => function () use ($__user) {
-			return $__user->getSettings();
+		'settings' => function () use ($__user, $__request) {
+		    if (isset($__request['as_array']) && filter_var($__request['as_array'], FILTER_VALIDATE_BOOLEAN)){
+		        $settings = $__user->getSettings();
+		        return new Result(true,
+                    'Данные успешно получены',
+                    array($settings->getData())
+                    );
+            }else{
+                return $__user->getSettings();
+            }
 		},
 		'feed' => function () use ($__user, $__db, $__order_by, $__fields, $__pagination) {
 			return ActionsCollection::filter(
@@ -67,8 +75,16 @@ $__modules['users'] = array(
 			return DevicesCollection::filter($__db, $__user, $__request, $__fields,
 				$__pagination, $__order_by ?? array());
 		},
-        '{me/settings}' => function () use ($__user) {
-            return $__user->getSettings();
+        '{me/settings}' => function () use ($__user, $__request) {
+            if (isset($__request['as_array']) && filter_var($__request['as_array'], FILTER_VALIDATE_BOOLEAN)){
+                $settings = $__user->getSettings();
+                return new Result(true,
+                    'Данные успешно получены',
+                    array($settings->getData())
+                );
+            }else{
+                return $__user->getSettings();
+            }
         },
 		'{me}' => function () use ($__user) {
 			$data = $__user->getMainInfo()->getData();
@@ -76,6 +92,9 @@ $__modules['users'] = array(
 		},
 	),
 	'PUT' => array(
+		'{settings}' => function () use ($__request, $__user, $__db) {
+			return $__user->updateSettings($__request);
+		},
 		'{me/settings}' => function () use ($__request, $__user, $__db) {
 			return $__user->updateSettings($__request);
 		},

@@ -80,8 +80,8 @@ class User extends AbstractUser
         $this->facebook_uid = $row['facebook_uid'];
         $this->google_uid = $row['google_uid'];
 
-        $this->show_to_friends = $row['show_to_friends'];
-        $this->notify_in_browser = $row['notify_in_browser'];
+        $this->show_to_friends = $row['show_to_friends'] == 1;
+        $this->notify_in_browser = $row['notify_in_browser'] == 1;
     }
 
     public function getId()
