@@ -61,13 +61,30 @@ class OrganizationsCollection
                     $statement_array[':search_stm'] = App::prepareSearchStatement($value);
                     break;
                 }
-                case 'privileges': {
-                    if ($value == 'can_add') {
-                        $select
-                            ->join('INNER', 'users_organizations', 'users_organizations.organization_id = view_organizations.id AND users_organizations.status = TRUE')
-                            ->where('users_organizations.user_id = :user_id');
-                        $statement_array[':user_id'] = $user->getId();
+                case 'roles': {
+                    $values = explode(',', $value);
+                    $in_ids = [];
+                    foreach ($values as $curr_value){
+                        if (in_array($curr_value, Roles::ROLES) == false) throw new InvalidArgumentException('CANT_FIND_ROLE: ' . $curr_value);
+                        $in_ids[] = Roles::getId($curr_value);
                     }
+                    if (count($in_ids) == 0) break;
+
+                    $roles_str = [];
+                    foreach ($in_ids as $index => $role_id){
+                        $key = ':role_id_' . $index;
+                        $roles_str[] = $key;
+                        $statement_array[$key] = $role_id;
+                    }
+
+
+                    $select
+                        ->join('INNER', 'users_organizations', 'users_organizations.organization_id = view_organizations.id AND users_organizations.status = TRUE')
+                        ->where('users_organizations.user_id = :user_id')
+                        ->where('users_organizations.role_id IN (' . implode(',', $roles_str) . ')');
+
+
+                    $statement_array[':user_id'] = $user->getId();
                     break;
                 }
                 case 'id': {

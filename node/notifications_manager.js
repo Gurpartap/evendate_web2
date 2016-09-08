@@ -86,6 +86,7 @@ NotificationsManager.prototype.create = function (notification, device) {
                         en: note.alert,
                         ru: note.alert
                     },
+                    url: 'https://evendate.ru/event/' + note.payload.event_id,
                     isChromeWeb: true,
                     include_player_ids: [device.device_token],
                     data: note.payload

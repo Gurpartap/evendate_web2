@@ -103,7 +103,8 @@ var
             POST_ERROR: 'vk.post.error'
         },
         NOTIFICATIONS: {
-            SEND: 'notifications.send'
+            SEND: 'notifications.send',
+            UPDATE_STATS: 'notifications.update_stats',
         },
         UTILS: {
             UPDATE_IMAGES: 'utils.updateImages',
@@ -132,6 +133,27 @@ try {
 sql.setDialect('postgres');
 
 pg.connect(pg_conn_string, function (err, client, done) {
+
+    var updateEventsStats = function () {
+        var q_upd_stats = 'INSERT INTO stat_notifications_aggregated(event_id, notifications_count, updated_at)' +
+            ' SELECT' +
+            ' id as event_id,' +
+            '     (SELECT COUNT(*)' +
+            ' FROM stat_notifications' +
+            ' INNER JOIN events_notifications ON stat_notifications.event_notification_id = events_notifications.id' +
+            ' WHERE events_notifications.event_id = events.id) AS notifications_count,' +
+            ' NOW() as updated_at' +
+            ' FROM events' +
+            ' ON CONFLICT (event_id) DO UPDATE SET  updated_at = NOW(),' +
+            '     notifications_count = (SELECT COUNT(*)' +
+            ' FROM stat_notifications' +
+            ' INNER JOIN events_notifications ON stat_notifications.event_notification_id = events_notifications.id' +
+            ' WHERE events_notifications.event_id = stat_notifications_aggregated.event_id);';
+
+        client.query(q_upd_stats, [], function (err) {
+            if (err) return logger.error(err);
+        });
+    };
 
     function publicDelayedEvents() {
         var q_upd_events = 'UPDATE events ' +
@@ -166,6 +188,14 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 notifications.sendUsersNotifications();
             }
             publicDelayedEvents();
+        }, null, true);
+    } catch (ex) {
+        logger.error(ex);
+    }
+
+    try {
+        new CronJob('*/3 * * * *', function () {
+            updateEventsStats();
         }, null, true);
     } catch (ex) {
         logger.error(ex);
@@ -302,6 +332,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         subscriptions_count = user.subscriptions_count;
                         q_user = users.update(user_to_ins).where(users.id.equals(user.id)).returning('id').toQuery();
                     }
+                    console.log('GETTING USER: ', is_new_user, result);
 
                     client.query(q_user, function (user_err, ins_result) {
 
@@ -421,6 +452,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                     authTry(data.oauth_data);
                                     return;
                                 }
+
                                 socket.emit('auth', {
                                     email: data.oauth_data.email,
                                     user_id: user.id,
@@ -788,31 +820,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
             }
         });
 
-        socket.on('recommendations.get', function (user, query) {
-            var q_get_user_token = Entities.users.select(Entities.users.token)
-                .from(Entities.users)
-                .where(
-                    Entities.users.id.equals(user.id)
-                ).toQuery();
-            client.query(q_get_user_token, function(err, result){
-                if (err) return handleError(err, 'recommendations.error');
-                if (result.rows.length != 1) return handleError({'error': 'USER_NOT_FOUND', details: err}, 'recommendations.error');
-
-                rest.get('http://localhost/api/v1/events/recommendations' + '?fields=' + encodeURI(query.join(',')), {
-                    json: true,
-                    headers: {
-                        'Authorization': result.rows[0].token
-                    }
-                })
-                    .on('complete', function (result) {
-                        result.data.forEach(function(event, index){
-                            result.data[index].rating_interests = 0;
-                        });
-                        socket.emit('log', result);
-                    });
-            });
-        });
-
         socket.on('feedback', function (data) {
             logger.info(data);
             var html = '';
@@ -870,6 +877,13 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 var notifications = new Notifications(real_config, client, logger);
                 notifications.sendAutoNotifications();
                 notifications.sendUsersNotifications();
+            }
+        });
+
+        socket.on(EMIT_NAMES.NOTIFICATIONS.UPDATE_STATS, function () {
+            if (config_index == 'local') {
+                console.log('strted');
+                updateEventsStats();
             }
         });
 

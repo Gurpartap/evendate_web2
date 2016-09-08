@@ -175,7 +175,7 @@ try {
 			'exception_text' => isset($_exception) ? $_exception->getMessage() : null,
 			'exception_trace' => isset($_exception) ? $_exception->getTraceAsString() : null,
 			'exception_file' => isset($_exception) ? $_exception->getFile() : null,
-			'exception_line' => isset($_exception) ? $_exception->getLine() : null,
+			'exception_line' => isset($_exception) ? $_exception->getLine() : null
 		))
 		->returning(array('uuid'));
 	$p_ins_log = $__db->prepare($q_ins_log->getStatement());

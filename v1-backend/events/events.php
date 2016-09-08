@@ -11,14 +11,14 @@ require_once $BACKEND_FULL_PATH . '/events/Class.NotificationsCollection.php';
 
 $__modules['events'] = array(
     'GET' => array(
-        '{{/(id:[0-9]+)}/notifications}' => function ($id) use ($__db, $__order_by, $__request, $__user, $__fields) {
+        '{{/(id:[0-9]+)}/notifications}' => function ($id) use ($__db, $__order_by, $__request, $__offset, $__length, $__user, $__fields) {
             $event = EventsCollection::one(
                 $__db,
                 $__user,
                 intval($id),
                 $__fields);
 
-            return $event->getNotifications($__user, $__fields);
+            return $event->getNotifications($__user, $__fields, $__length, $__offset, $__order_by);
         },
         '{{/(id:[0-9]+)}}' => function ($id) use ($__db, $__request, $__user, $__fields) {
             $event = EventsCollection::one(

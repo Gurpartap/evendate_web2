@@ -403,7 +403,6 @@ module.exports = {
             'detail_info_url',
             'begin_time',
             'end_time',
-            'events_pkey',
             'image_horizontal',
             'location_object',
             'dates_range',
