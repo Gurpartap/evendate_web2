@@ -932,7 +932,7 @@ class Event extends AbstractEntity
 
             if (isset($data['file_names'])) {
                 $data['image_extensions'] = array(
-                    'vertical' => App::getImageExtension($data['file_names']['vertical']),
+                    /*'vertical' => App::getImageExtension($data['file_names']['vertical']),*/
                     'horizontal' => App::getImageExtension($data['file_names']['horizontal'])
                 );
             }

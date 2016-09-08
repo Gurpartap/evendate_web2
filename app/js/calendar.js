@@ -2092,7 +2092,6 @@ function EditEvent($view){
 			data = {
 				event_id: null,
 				title: null,
-				image_vertical: null,
 				image_horizontal: null,
 				organization_id: null,
 				location: null,
@@ -2108,7 +2107,6 @@ function EditEvent($view){
 				delayed_publication: null,
 				public_at: null,
 				filenames: {
-					vertical: null,
 					horizontal: null
 				}
 			},
@@ -2123,7 +2121,6 @@ function EditEvent($view){
 
 			data.tags = tags;
 			data.filenames = {
-				vertical: data.filename_vertical,
 				horizontal: data.filename_horizontal
 			};
 			if(data.registration_required){
@@ -2216,6 +2213,7 @@ function EditEvent($view){
 		tomorrow_date: moment().add(1, 'd').format(__C.DATE_FORMAT)
 	};
 	if(typeof event_id === 'undefined'){
+		additional_fields.button_text = 'Опубликовать';
 		$wrapper.html(tmpl('edit-event-page', additional_fields));
 		initEditEventPage($view);
 		Modal.bindCallModal($view);
@@ -2235,6 +2233,7 @@ function EditEvent($view){
 				ajaxHandler(res, function(data){
 					data = Array.isArray(data) ? data[0] : data;
 					additional_fields.header_text = 'Редактирование события';
+					additional_fields.button_text = 'Сохранить';
 					if(data.public_at !== null){
 						var m_public_at = moment(data.public_at);
 						additional_fields.public_at_data = m_public_at.format('YYYY-MM-DD');
@@ -2248,9 +2247,6 @@ function EditEvent($view){
 						additional_fields.registration_till_data_label = m_registration_till.format('DD.MM.YYYY');
 						additional_fields.registration_till_time_hours = m_registration_till.format('HH');
 						additional_fields.registration_till_time_minutes = m_registration_till.format('mm');
-					}
-					if(data.image_vertical_url){
-						additional_fields.image_vertical_filename = data.image_vertical_url.split('/').reverse()[0];
 					}
 					if(data.image_horizontal_url){
 						additional_fields.image_horizontal_filename = data.image_horizontal_url.split('/').reverse()[0];
@@ -2284,7 +2280,12 @@ function EditEvent($view){
 					}
 					selectDates($view, data.dates);
 					selectTags($view, data.tags);
-					if(data.image_vertical_url && data.image_horizontal_url){
+					Modal.bindCallModal($view);
+
+					if(data.image_horizontal_url){
+						toDataUrl(data.image_horizontal_url, function(base64_string){
+							$view.find('#edit_event_image_horizontal_src').val(base64_string ? base64_string : null);
+						});
 						$view.find('.CallModal').removeClass('-hidden').on('crop', function(event, cropped_src, crop_data){
 							var $button = $(this),
 								$parent = $button.closest('.EditEventImgLoadWrap'),
@@ -2293,18 +2294,6 @@ function EditEvent($view){
 							$data_url.val('data.source').data('source', $preview.attr('src')).trigger('change');
 							$preview.attr('src', cropped_src);
 							$button.data('crop_data', crop_data);
-						});
-					}
-					Modal.bindCallModal($view);
-
-					if(data.image_vertical_url){
-						toDataUrl(data.image_vertical_url, function(base64_string){
-							$view.find('#edit_event_image_vertical_src').val(base64_string ? base64_string : null);
-						});
-					}
-					if(data.image_horizontal_url){
-						toDataUrl(data.image_horizontal_url, function(base64_string){
-							$view.find('#edit_event_image_horizontal_src').val(base64_string ? base64_string : null);
 						});
 					}
 					if(additional_fields.vk_image_url){
