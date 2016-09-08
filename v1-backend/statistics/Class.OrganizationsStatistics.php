@@ -12,51 +12,7 @@ class OrganizationsStatistics extends AbstractAggregator
 
     private $db;
     private $organization;
-    /**
-     * OrganizationsStatistics constructor.
-     */
 
-    const SQL_GET_VIEWS = 'SELECT COUNT(stat_organizations.id) AS value
-      FROM stat_organizations
-      INNER JOIN stat_event_types ON stat_organizations.stat_type_id = stat_event_types.id
-      WHERE organization_id = :organization_id
-      AND stat_event_types.entity = :entity
-      AND stat_event_types.type_code = :type_code
-      AND DATE_PART(\'epoch\', stat_organizations.created_at)::INT BETWEEN :since AND :till';
-
-    const SQL_GET_FAVORED = 'SELECT COUNT(stat_events.id) AS value
-      FROM stat_events
-      INNER JOIN stat_event_types ON stat_events.stat_type_id = stat_event_types.id
-      INNER JOIN view_events ON view_events.id = stat_events.event_id
-      WHERE view_events.organization_id = :organization_id
-      AND stat_event_types.entity = :entity
-      AND stat_event_types.name = :type_code
-      AND DATE_PART(\'epoch\', stat_events.created_at)::INT BETWEEN :since AND :till';
-
-    const SQL_GET_AUDIENCE_DEVICES = '
-        SELECT CASE 
-          WHEN client_type = \'android\' THEN \'android\'
-          WHEN client_type = \'ios\' THEN \'ios\'
-          ELSE \'browser\'
-           END AS name,
-         COUNT(tokens.id) AS count 
-        FROM tokens 
-        INNER JOIN subscriptions ON subscriptions.user_id = tokens.user_id 
-        WHERE subscriptions.status = TRUE
-        AND subscriptions.organization_id = :organization_id
-        GROUP BY client_type
-    ';
-
-    const SQL_GET_AUDIENCE_GENDER = '
-        SELECT gender, COUNT(users.id) AS count 
-        FROM users 
-        INNER JOIN subscriptions ON subscriptions.user_id = users.id 
-        WHERE subscriptions.status = TRUE
-        AND subscriptions.organization_id = :organization_id
-        GROUP BY gender
-    ';
-
-    const SQL_GET_SUBSCRIBED = self::SQL_GET_VIEWS;
 
     public function __construct(PDO $db, Organization $organization, User $user)
     {
@@ -84,11 +40,14 @@ class OrganizationsStatistics extends AbstractAggregator
                 $query = self::SQL_GET_FAVORED;
                 break;
             }
+            case Statistics::EVENT_NOTIFICATIONS_SENT: {
+                $query = self::SQL_GET_NOTIFICATIONS;
+                break;
+            }
         }
-        $p_get_views = $this->db->prepare($query);
 
         return self::iterate(
-            $p_get_views,
+            $query,
             array(
                 ':organization_id' => $this->organization->getId(),
                 ':entity' => Statistics::ENTITY_ORGANIZATION,
@@ -110,16 +69,16 @@ class OrganizationsStatistics extends AbstractAggregator
                     $result[Statistics::FIELD_DYNAMICS] = $this->getDynamics(
                         Fields::parseFields($value['fields'] ?? ''),
                         $value['scale'] ?? $scale,
-                        $value['since'] ?? $since,
-                        $value['till'] ?? $till
+                        isset($value['since']) ? DateTime::createFromFormat('U', $value['since']) : $since,
+                        isset($value['till']) ? DateTime::createFromFormat('U', $value['till']) : $till
                     )->getData();
                     break;
                 }
                 case Statistics::FIELD_CONVERSION: {
                     $result[Statistics::FIELD_CONVERSION] = $this->getConversion(
                         $value['scale'] ?? $scale,
-                        $value['since'] ?? $since,
-                        $value['till'] ?? $till
+                        isset($value['since']) ? DateTime::createFromFormat('U', $value['since']) : $since,
+                        isset($value['till']) ? DateTime::createFromFormat('U', $value['till']) : $till
                     )->getData();
                     break;
                 }
@@ -135,8 +94,8 @@ class OrganizationsStatistics extends AbstractAggregator
                     $result[$key] = $this->getValue(
                         $key,
                         $value['scale'] ?? $scale,
-                        $value['since'] ?? $since,
-                        $value['till'] ?? $till
+                        isset($value['since']) ? DateTime::createFromFormat('U', $value['since']) : $since,
+                        isset($value['till']) ? DateTime::createFromFormat('U', $value['till']) : $till
                     )->getData();
                     break;
                 }
@@ -160,16 +119,10 @@ class OrganizationsStatistics extends AbstractAggregator
 
         foreach ($fields as $key => $param) {
             switch ($key) {
+                case Statistics::ORGANIZATION_VIEW:
+                case Statistics::EVENT_FAVE:
                 case Statistics::ORGANIZATION_SUBSCRIBE: {
-                    $result[Statistics::ORGANIZATION_SUBSCRIBE] = $this->getValue($key, $scale, $since, $till)->getData();
-                    break;
-                }
-                case Statistics::ORGANIZATION_VIEW: {
-                    $result[Statistics::ORGANIZATION_VIEW] = $this->getValue($key, $scale, $since, $till)->getData();
-                    break;
-                }
-                case Statistics::EVENT_FAVE: {
-                    $result[Statistics::EVENT_FAVE] = $this->getValue($key, $scale, $since, $till)->getData();
+                    $result[$key] = $this->getValue($key, $scale, $since, $till)->getData();
                     break;
                 }
                 case Statistics::FIELD_CONVERSION: {
@@ -229,14 +182,14 @@ class OrganizationsStatistics extends AbstractAggregator
         $res_devices = array();
         $keys = array();
 
-        foreach($devices as $type){
-            if (isset($keys[$type['name']])){
+        foreach ($devices as $type) {
+            if (isset($keys[$type['name']])) {
                 $keys[$type['name']] += $type['count'];
-            }else{
+            } else {
                 $keys[$type['name']] = $type['count'];
             }
         }
-        foreach($keys as $name => $count){
+        foreach ($keys as $name => $count) {
             $res_devices[] = array('name' => $name, 'count' => $count);
         }
 
