@@ -47,6 +47,7 @@ class Notification extends AbstractEntity{
 	const NOTIFICATION_TYPE_BEFORE_WEEK = 'notification-before-week';
 	const NOTIFICATION_TYPE_BEFORE_QUARTER_OF_HOUR = 'notification-before-quarter-of-hour';
 	const NOTIFICATION_TYPE_CUSTOM = 'notification-custom';
+	const NOTIFICATION_TYPE_USERS = 'users-notification';
 
 	const NOTIFICATION_TYPE_NOW_ID = 1;
 

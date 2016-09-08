@@ -28,9 +28,10 @@ class Event extends AbstractEntity
     const ACTUALITY_FIELD_NAME = 'actuality';
     const NOTIFICATIONS_FIELD_NAME = 'notifications';
     const CAN_EDIT_FIELD_NAME = 'can_edit';
+    const STATISTICS_FIELD_NAME = 'statistics';
+
+
     const RANDOM_FIELD_NAME = 'random';
-
-
     const RATING_OVERALL = 'rating';
     const RATING_FAVORED_FRIENDS = 'rating_favored_friends';
     const RATING_TAGS_IN_FAVORITES = 'rating_tags_in_favorites';
@@ -38,6 +39,8 @@ class Event extends AbstractEntity
     const RATING_SUBSCRIBED_IN_SOCIAL_NETWORK = 'rating_subscribed_in_social_network';
     const RATING_RECENT_CREATED = 'rating_recent_created';
     const RATING_ACTIVE_DAYS = 'rating_active_days';
+
+
     const RATING_TEXT_SIMILARITY = 'rating_texts_similarity';
 
 
@@ -112,7 +115,6 @@ class Event extends AbstractEntity
         'is_free',
         'min_price',
         'vk_image_url',
-
         self::IS_FAVORITE_FIELD_NAME => '(SELECT id IS NOT NULL
 			FROM favorite_events
 			WHERE favorite_events.status = TRUE
@@ -145,6 +147,7 @@ class Event extends AbstractEntity
                                             FROM view_events AS ve
                                             WHERE ve.id = view_events.id)::REAL AS ' . self::ACTUALITY_FIELD_NAME
     );
+
     protected $description;
     protected $location;
     protected $location_uri;
@@ -275,11 +278,11 @@ class Event extends AbstractEntity
     {
         if (isset($data['description'])) {
             if (mb_strlen($data['description']) <= 50) throw new InvalidArgumentException('Слишком короткое описание. Должно быть не менее 50 символов.');
-            if (mb_strlen($data['description']) > 500) throw new InvalidArgumentException('Слишком длинное описание. Должно быть не более 500 символов.');
+            if (mb_strlen($data['description']) > 1000) throw new InvalidArgumentException('Слишком длинное описание. Должно быть не более 1000 символов.');
         }
 
         if (isset($data['title'])) {
-            if (mb_strlen($data['title']) <= 5) throw new InvalidArgumentException('Слишком короткое название. Должно быть не менее 5 символов.');
+            if (mb_strlen($data['title']) < 3) throw new InvalidArgumentException('Слишком короткое название. Должно быть не менее 3 символов.');
             if (mb_strlen($data['title']) > 150) throw new InvalidArgumentException('Слишком длинное название. Должно быть не более 150 символов.');
         }
 
@@ -367,9 +370,7 @@ class Event extends AbstractEntity
 
     public static function create(PDO $db, Organization $organization, array $data)
     {
-
         try {
-
             $db->beginTransaction();
             if (!isset($data['dates']) || count($data['dates']) == 0)
                 throw new InvalidArgumentException('Укажите, пожалуйста, даты');
@@ -377,7 +378,7 @@ class Event extends AbstractEntity
             $q_ins_event = App::queryFactory()->newInsert();
             $random_string = App::generateRandomString();
             $img_horizontal_filename = md5($random_string . '-horizontal') . '.' . $data['image_extensions']['horizontal'];
-            $img_vertical_filename = md5($random_string . '-vertical') . '.' . $data['image_extensions']['vertical'];
+            $img_vertical_filename = 'default.jpeg';
 
             self::generateQueryData($data);
 
@@ -455,9 +456,9 @@ class Event extends AbstractEntity
                 self::IMAGES_PATH . self::IMG_SIZE_TYPE_LARGE . '/' . $img_horizontal_filename,
                 14000);
 
-            App::saveImage($data['image_vertical'],
-                self::IMAGES_PATH . self::IMG_SIZE_TYPE_LARGE . '/' . $img_vertical_filename,
-                14000);
+//            App::saveImage($data['image_vertical'],
+//                self::IMAGES_PATH . self::IMG_SIZE_TYPE_LARGE . '/' . $img_vertical_filename,
+//                14000);
 
             $db->commit();
             return new Result(true, 'Событие успешно создано', array('event_id' => $event_id));
@@ -796,17 +797,17 @@ class Event extends AbstractEntity
         return $this->organization;
     }
 
-    public function getNotifications(User $user, array $fields = null) : Result
+    public function getNotifications(User $user, array $fields = null, $length = null, $offset = null, $order_by = null) : Result
     {
         return NotificationsCollection::filter($this->db,
             $user,
             array('event' => $this),
             $fields,
             array(
-                'length' => $fields[self::NOTIFICATIONS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
-                'offset' => $fields[self::NOTIFICATIONS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
+                'length' => $length ?? $fields[self::NOTIFICATIONS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+                'offset' => $offset ?? $fields[self::NOTIFICATIONS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
             ),
-            $fields[self::NOTIFICATIONS_FIELD_NAME]['order_by'] ?? array()
+            $order_by ?? $fields[self::NOTIFICATIONS_FIELD_NAME]['order_by'] ?? array()
         );
     }
 
@@ -852,6 +853,11 @@ class Event extends AbstractEntity
 
         if (isset($fields[self::NOTIFICATIONS_FIELD_NAME])) {
             $result_data[self::NOTIFICATIONS_FIELD_NAME] = $this->getNotifications($user,
+                Fields::parseFields($fields[self::NOTIFICATIONS_FIELD_NAME]['fields'] ?? ''))->getData();
+        }
+
+        if (isset($fields[self::STATISTICS_FIELD_NAME])) {
+            $result_data[self::STATISTICS_FIELD_NAME] = $this->getStatistics($user,
                 Fields::parseFields($fields[self::NOTIFICATIONS_FIELD_NAME]['fields'] ?? ''))->getData();
         }
 
@@ -960,22 +966,22 @@ class Event extends AbstractEntity
                 ));
             }
 
-            if (isset($data['image_extensions'])
-                && isset($data['image_extensions']['vertical'])
-                && $data['image_extensions']['vertical'] != null
-                && !empty($data['image_extensions']['vertical'])
-                && $data['image_vertical'] != null
-            ) {
-                $img_vertical_filename = md5(App::generateRandomString() . '-vertical') . '.' . $data['image_extensions']['vertical'];
-                $query_data[':image_vertical'] = $img_vertical_filename;
-
-                App::saveImage($data['image_vertical'],
-                    self::IMAGES_PATH . self::IMG_SIZE_TYPE_LARGE . '/' . $img_vertical_filename,
-                    14000);
-                $q_upd_event->cols(array(
-                    'image_vertical' => $img_vertical_filename
-                ));
-            }
+//            if (isset($data['image_extensions'])
+//                && isset($data['image_extensions']['vertical'])
+//                && $data['image_extensions']['vertical'] != null
+//                && !empty($data['image_extensions']['vertical'])
+//                && $data['image_vertical'] != null
+//            ) {
+//                $img_vertical_filename = md5(App::generateRandomString() . '-vertical') . '.' . $data['image_extensions']['vertical'];
+//                $query_data[':image_vertical'] = $img_vertical_filename;
+//
+//                App::saveImage($data['image_vertical'],
+//                    self::IMAGES_PATH . self::IMG_SIZE_TYPE_LARGE . '/' . $img_vertical_filename,
+//                    14000);
+//                $q_upd_event->cols(array(
+//                    'image_vertical' => $img_vertical_filename
+//                ));
+//            }
 
             $p_upd_event = $this->db->prepare($q_upd_event->getStatement());
 
@@ -1006,7 +1012,6 @@ class Event extends AbstractEntity
     {
         if (isset($notification['notification_type']) && $notification['notification_type'] != null) {
             if (in_array($notification['notification_type'], Notification::NOTIFICATION_PREDEFINED_CUSTOM)) {
-
                 $first_event_date = EventsDatesCollection::filter($this->db,
                     $user,
                     array('event' => $this, 'future' => 'true'),

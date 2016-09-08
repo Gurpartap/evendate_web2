@@ -1,6 +1,6 @@
 <?php
 
-require_once $BACKEND_FULL_PATH . '/users/Class.Role.php';
+require_once $BACKEND_FULL_PATH . '/users/Class.Roles.php';
 
 class User extends AbstractUser
 {
@@ -80,8 +80,8 @@ class User extends AbstractUser
         $this->facebook_uid = $row['facebook_uid'];
         $this->google_uid = $row['google_uid'];
 
-        $this->show_to_friends = $row['show_to_friends'];
-        $this->notify_in_browser = $row['notify_in_browser'];
+        $this->show_to_friends = $row['show_to_friends'] == 1;
+        $this->notify_in_browser = $row['notify_in_browser'] == 1;
     }
 
     public function getId()
@@ -164,8 +164,27 @@ class User extends AbstractUser
         $result = $p_get->execute($q_get_is_admin->getBindValues());
         if ($result === FALSE) throw new DBQueryException('CANT_GET_ADMIN_STATUS', $this->db);
         return $p_get->rowCount() > 0;
-
     }
+    
+    
+    public function isEventAdmin(Event $event) : bool
+    {
+        $q_get_is_admin = App::queryFactory()
+            ->newSelect()
+            ->from('users_organizations')
+            ->cols(array('user_id'))
+            ->join('inner', 'users_roles', 'users_organizations.role_id = users_roles.id')
+            ->where('organization_id = ?', $event->getOrganizationId())
+            ->where('users_organizations.user_id = ?', $this->getId())
+            ->where('status = TRUE')
+            ->where('users_roles.name = ?', Roles::ROLE_ADMIN);
+        $p_get = $this->db->prepare($q_get_is_admin->getStatement());
+        $result = $p_get->execute($q_get_is_admin->getBindValues());
+        if ($result === FALSE) throw new DBQueryException('CANT_GET_ADMIN_STATUS', $this->db);
+        return $p_get->rowCount() > 0;
+    }
+    
+    
 
     public static function getRoleId($ole){
         
