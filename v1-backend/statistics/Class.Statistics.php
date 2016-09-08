@@ -127,25 +127,6 @@ class Statistics
             self::updateIOsBadges($db, $user, $type, $event);
         }
     }
-    public static function Event(Event $event, User $user = null, PDO $db, $type)
-    {
-        try {
-            $type_id = self::getTypeId(self::ENTITY_EVENT, $type, $db);
-        } catch (Exception $e) {
-            return;
-        }
-        $q_ins_event = App::queryFactory()
-            ->newInsert()
-            ->into('stat_events')
-            ->cols(array(
-                'event_id' => $event->getId(),
-                'token_id' => $user ? $user->getTokenId() : null,
-                'stat_type_id' => $type_id
-            ));
-
-        $p_ins = $db->prepare($q_ins_event->getStatement());
-        $p_ins->execute($q_ins_event->getBindValues());
-    }
 
     public static function Organization(Organization $organization, User $user = null, PDO $db, $type, $no_update_badges = false)
     {
