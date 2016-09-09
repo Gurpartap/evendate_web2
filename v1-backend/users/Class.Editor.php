@@ -29,7 +29,7 @@
 
 			return Event::create($this->getDB(), $organization, array_merge($data, array(
 				'image_extensions' => array(
-					'vertical' => App::getImageExtension($data['filenames']['vertical']),
+					'vertical' => 'jpg',
 					'horizontal' => App::getImageExtension($data['filenames']['horizontal'])
 				),
 				'creator_id' => $this->getId()
