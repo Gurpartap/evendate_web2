@@ -224,11 +224,14 @@ class App
     public static function prepareSearchStatement($value, $glue = '&')
     {
         $values = preg_split('/\P{L}+/u', $value);
-        $prep_values = array('evendate');
+        $prep_values = array();
         foreach ($values as $value) {
             if ($value != '') {
                 $prep_values[] = $value;
             }
+        }
+        if (count($prep_values) == 0){
+            $prep_values = array('evendate');
         }
         return implode($glue, $prep_values) . ':abd';
     }
