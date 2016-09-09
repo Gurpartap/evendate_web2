@@ -2348,8 +2348,6 @@ body.-open_modal > .modal_wrapper {
 	cursor: pointer;
 }
 
-#user_bar:hover {background-color: rgba(255,255,255,0.15)}
-
 #user_bar .avatar.-bordered {border-width: 1px}
 
 .user_bar_forhead {
