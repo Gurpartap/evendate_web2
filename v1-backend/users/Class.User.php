@@ -183,8 +183,6 @@ class User extends AbstractUser
         if ($result === FALSE) throw new DBQueryException('CANT_GET_ADMIN_STATUS', $this->db);
         return $p_get->rowCount() > 0;
     }
-    
-    
 
     public static function getRoleId($ole){
         
