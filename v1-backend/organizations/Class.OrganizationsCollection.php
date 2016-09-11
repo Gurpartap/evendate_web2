@@ -76,11 +76,10 @@ class OrganizationsCollection
                         $roles_str[] = $key;
                         $statement_array[$key] = $role_id;
                     }
-
-
                     $select
                         ->join('INNER', 'users_organizations', 'users_organizations.organization_id = view_organizations.id AND users_organizations.status = TRUE')
                         ->where('users_organizations.user_id = :user_id')
+                        ->where('users_organizations.status = TRUE')
                         ->where('users_organizations.role_id IN (' . implode(',', $roles_str) . ')');
 
 

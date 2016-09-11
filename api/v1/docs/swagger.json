@@ -942,7 +942,7 @@
           {
             "in": "query",
             "name": "tags",
-            "description": "Events with this tags",
+            "description": "Events with this tags. Supports searching by tag1*tag2 (logic AND) or tag1|tag2(logic OR)",
             "required": false,
             "type": "array",
             "items": {
@@ -1095,7 +1095,7 @@
           {
             "in": "query",
             "name": "tags",
-            "description": "Events with this tags",
+            "description": "Events with this tags. Supports searching by tag1*tag2 (logic AND) or tag1|tag2(logic OR)",
             "required": false,
             "type": "array",
             "items": {
@@ -1238,7 +1238,7 @@
           {
             "in": "query",
             "name": "tags",
-            "description": "Events with this tags",
+            "description": "Events with this tags. Supports searching by tag1*tag2 (logic AND) or tag1|tag2(logic OR)",
             "required": false,
             "type": "array",
             "items": {
@@ -1490,7 +1490,7 @@
           {
             "in": "query",
             "name": "tags",
-            "description": "Events with this tags",
+            "description": "Events with this tags. Supports searching by tag1*tag2 (logic AND) or tag1|tag2(logic OR)",
             "required": false,
             "type": "array",
             "items": {

@@ -12,7 +12,9 @@ $__modules['organizations'] = array(
             return UsersCollection::filter(
                 $__db,
                 $__user,
-                array_merge($__request, array('staff' => OrganizationsCollection::one($__db, $__user, $id, array()))),
+                array_merge($__request,
+                    array('staff' => OrganizationsCollection::one($__db, $__user, $id, array()))
+                ),
                 $__fields,
                 $__pagination,
                 $__order_by ?? array('id')
