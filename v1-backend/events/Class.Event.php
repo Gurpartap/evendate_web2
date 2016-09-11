@@ -21,6 +21,7 @@ class Event extends AbstractEntity
     const TAGS_LIMIT = 5;
     const ORGANIZATION_NOTIFICATIONS_LIMIT = 2;
     const IS_FAVORITE_FIELD_NAME = 'is_favorite';
+    const IS_NEW_FIELD_NAME = 'is_new';
     const TAGS_FIELD_NAME = 'tags';
     const DATES_FIELD_NAME = 'dates';
     const FAVORED_USERS_FIELD_NAME = 'favored';
@@ -119,13 +120,40 @@ class Event extends AbstractEntity
 			FROM favorite_events
 			WHERE favorite_events.status = TRUE
 			AND favorite_events.user_id = :user_id
-			AND favorite_events.event_id = view_events.id) IS NOT NULL AS is_favorite',
+			AND favorite_events.event_id = view_events.id) IS NOT NULL AS ' . self::IS_FAVORITE_FIELD_NAME,
         self::RANDOM_FIELD_NAME => '(SELECT created_at / (random() * 9 + 1)
 			FROM view_events AS ve
-			WHERE ve.id = view_events.id) AS random',
+			WHERE ve.id = view_events.id) AS ' . self::RANDOM_FIELD_NAME,
         self::CAN_EDIT_FIELD_NAME => '(SELECT id IS NOT NULL
 			FROM view_editors
-			WHERE id = :user_id AND organization_id = view_events.organization_id) IS NOT NULL AS can_edit',
+			WHERE id = :user_id AND organization_id = view_events.organization_id) IS NOT NULL AS ' . self::CAN_EDIT_FIELD_NAME,
+        self::IS_NEW_FIELD_NAME => '(
+		SELECT
+			COUNT(ve.id)
+			FROM view_events ve
+			WHERE
+				ve.id = view_events.id
+				AND
+				ve.last_event_date > DATE_PART(\'epoch\', NOW()) :: INT
+				AND ve.created_at > 
+					COALESCE((SELECT DATE_PART(\'epoch\', stat_organizations.created_at)::INT
+					    FROM stat_organizations
+					    INNER JOIN stat_event_types ON stat_organizations.stat_type_id = stat_event_types.id
+					    INNER JOIN tokens ON stat_organizations.token_id = tokens.id
+					    WHERE type_code=\'view\'
+					    AND organization_id = view_events.organization_id
+					    AND tokens.user_id = :user_id
+					    AND ve.id = view_events.id
+					    ORDER BY stat_organizations.id DESC LIMIT 1),0)
+				AND
+				id NOT IN
+					(SELECT event_id
+						FROM view_stat_events
+					WHERE
+						user_id = :user_id
+						AND event_id = view_events.id
+					)
+				) :: INT > 0 AS ' . self::IS_NEW_FIELD_NAME,
         self::FAVORED_FRIENDS_COUNT_FIELD_NAME => '(SELECT COUNT(id) :: INT AS favored_friends_count
             FROM favorite_events
                 WHERE status = TRUE 
