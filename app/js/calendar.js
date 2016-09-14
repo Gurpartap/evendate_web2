@@ -483,30 +483,29 @@ function OneEvent($view){
 			})
 		});
 	}
-
-	function buildNotifications(raw_notifications, event_id, last_date){
+	
+	function buildNotifications(raw_notifications, event_id, first_date){
 		var m_today = moment(),
-			m_last_date = moment.unix(last_date),
 			all_notifications = {
-				'notification-now': {
+				'notification-before-quarter-of-hour': {
 					label: 'За 15 минут',
-					moment: m_last_date.subtract(15, 'minutes').unix()
+					moment: moment.unix(first_date).subtract(15, 'minutes').unix()
 				},
 				'notification-before-three-hours':  {
 					label: 'За 3 часа',
-					moment: m_last_date.subtract(3, 'hours').unix()
+					moment: moment.unix(first_date).subtract(3, 'hours').unix()
 				},
 				'notification-before-day': {
 					label: 'За день',
-					moment: m_last_date.subtract(1, 'days').unix()
+					moment: moment.unix(first_date).subtract(1, 'days').unix()
 				},
 				'notification-before-three-days': {
 					label: 'За 3 дня',
-					moment: m_last_date.subtract(3, 'days').unix()
+					moment: moment.unix(first_date).subtract(3, 'days').unix()
 				},
 				'notification-before-week': {
 					label: 'За неделю',
-					moment: m_last_date.subtract(1, 'week').unix()
+					moment: moment.unix(first_date).subtract(1, 'week').unix()
 				}
 			},
 			$notifications = $(),
