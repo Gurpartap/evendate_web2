@@ -1138,13 +1138,12 @@ function Organization($view){
 						if (role != __C.ROLES.USER){
 							uploadEvents($delayed_events_wrapper, EVENT_TYPES.DELAYED, function($events){
 								uploadEvents($canceled_events_wrapper, EVENT_TYPES.CANCELED, function($events){
-									initOrganizationPage($view);
+									bindEventsEvents($view);
 								});
 							});
-						}else{
-							initOrganizationPage($view);
 						}
 					});
+					initOrganizationPage($view);
 					bindUploadEventsOnScroll($future_events_wrapper);
 				});
 
