@@ -2194,6 +2194,9 @@ function EditEvent($view){
 							ajaxErrorHandler(res);
 						}
 					});
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					$view.removeClass('-faded');
 				}
 			});
 		}
@@ -2814,19 +2817,29 @@ function ajaxHandler(result, success, error){
 }
 
 function ajaxErrorHandler(event, jqxhr, settings, thrownError){
-	var args = Array.prototype.slice.call(arguments);
-	console.group('ajax error');
-	args.forEach(function(arg){
-		console.log(arg);
+	var args = Array.prototype.slice.call(arguments),
+		fields = ['event', 'jqxhr', 'settings', 'thrownError'];
+	window.debug = {};
+	args.forEach(function(arg, i){
+		window.debug[fields[i]] = arg;
 	});
-	console.groupEnd();
+	console.groupCollapsed('AJAX error');
+	if(thrownError)
+		console.log('Thrown error:', thrownError);
+	if(event && event.type)
+		console.log('Error type:', event.type);
+	if(event && event.text)
+		console.log('Description:', event.text);
 	if(jqxhr && jqxhr.responseJSON && jqxhr.responseJSON.text){
+		console.log('Response:', jqxhr.responseJSON.text);
 		showNotifier({text: jqxhr.responseJSON.text, status: false});
-	} else if(event.text) {
-		showNotifier({text: event.text, status: false});
-	} else {
-		showNotifier({text: 'Упс, что-то пошло не так', status: false});
 	}
+	if(settings){
+		console.log('URL:', settings.url);
+		console.log('Method:', settings.type);
+	}
+	console.error('Error stacktrace:');
+	console.groupEnd();
 }
 
 $(document)
