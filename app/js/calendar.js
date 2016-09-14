@@ -2154,8 +2154,8 @@ function EditEvent($view){
 					})
 				});
 			}
-
-
+			
+			$view.addClass('-faded');
 			$.ajax({
 				url: url,
 				data: JSON.stringify(data),
@@ -2173,7 +2173,6 @@ function EditEvent($view){
 					 showNotification('Событие успешно добавлено', 3000);
 					 });
 					 }*/
-
 						if($view.find('#edit_event_to_public_vk').prop('checked')){
 							socket.emit('vk.post', {
 								guid: data.vk_group,
@@ -2186,9 +2185,9 @@ function EditEvent($view){
 								link: data.detail_info_url
 							});
 						}
-						window.location = '/event/'+res_data.event_id;
-
+						changeState('/event/'+res_data.event_id, data.title, {event_id: res_data.event_id});
 					}, function(res){
+						$view.removeClass('-faded');
 						if(res.text){
 							showNotifier({text: res.text, status: false});
 						} else {
