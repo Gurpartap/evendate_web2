@@ -37,6 +37,7 @@ body {
 	line-height: 1;
 	color: #4a4a4a;
 	color: var(--color_text);
+	word-wrap: break-word;
 	background-color: #f6f6f6;
 	background-color: var(--color_background);
 }
