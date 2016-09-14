@@ -1014,6 +1014,7 @@ input, select, textarea, button {font-family: inherit}
 	text-transform: uppercase;
 	overflow: hidden;
 	cursor: pointer;
+	word-wrap: normal;
 	-webkit-transition: box-shadow .5s ease, background-color .5s ease, color .5s ease;
 	-moz-transition: box-shadow .5s ease, background-color .5s ease, color .5s ease;
 	-o-transition: box-shadow .5s ease, background-color .5s ease, color .5s ease;
