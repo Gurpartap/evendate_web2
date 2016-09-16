@@ -64,11 +64,11 @@ Modal.bindCallModal = function($parent){
 							url = $this.data('modal_media_url');
 						if(!url){
 							if($this.is('img')){
-								url = $this.attr('url');
-								type = type ? type : 'image';
+								url = $this.attr('src');
+								type = 'image';
 							} else if($this.is('video')) {
 								//url = $this.attr('url');
-								type = type ? type : 'video';
+								type = 'video';
 							} else {
 								var str = $this.css('background-image');
 								if(str !== 'none'){
@@ -77,8 +77,8 @@ Modal.bindCallModal = function($parent){
 									} else {
 										url = str.slice(str.indexOf('(')+1, str.indexOf(')'));
 									}
+									type = 'image';
 								}
-								type = type ? type : 'image';
 							}
 						}
 						modal = new MediaModal(url, type);
@@ -309,6 +309,7 @@ MediaModal.prototype.show = function(){
 					self.modal.width((real_w > window_max_w) ? window_max_w : real_w);
 					self.modal.height((real_w > window_max_w) ? (window_max_w * real_h / real_w) : real_h);
 					$media.wrap($('<div>').addClass('img_holder'));
+					self.adjustDestroyer();
 				}
 				$media = self.modal.find('img');
 				if($media.width()){

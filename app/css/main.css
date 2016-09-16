@@ -2992,29 +2992,10 @@ body.-open_modal > .modal_wrapper {
 	overflow: hidden;
 }
 
-.organization_header_backdrop {
-	position: absolute;
-	top: 60px;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background-image: -webkit-linear-gradient(top, hsla(0,0%,100%,0) 0%, #fff 95%);
-	background-image: -moz-linear-gradient(top, hsla(0,0%,100%,0) 0%, #fff 95%);
-	background-image: -ms-linear-gradient(top, hsla(0,0%,100%,0) 0%, #fff 95%);
-	background-image: -o-linear-gradient(top, hsla(0,0%,100%,0) 0%, #fff 95%);
-	background-image: linear-gradient(to bottom, hsla(0,0%,100%,0) 0%, #fff 95%);
-}
-
-.organization_header_bottom {
-	position: absolute;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	padding: 14px 24px;
-}
-
-.organization_title_block {
-	padding-right: 150px;
+.organization_header {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 1em;
 }
 
 .avatar_block > .avatar + .avatar_name.organization_title {
@@ -3023,17 +3004,16 @@ body.-open_modal > .modal_wrapper {
 }
 
 .organization_header_button {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	right: 0;
-	margin: auto 24px;
 	height: 1.88rem;
-	width: 130px;
+	flex: 0 0 130px;
+	margin-left: 1em;
 }
 
 .organization_description_block {padding: 24px 24px 12px}
 .organization_description {margin-bottom: 1em}
+
+.organization_metas {display: flex}
+.organization_meta + .organization_meta {margin-left: 1.5em}
 
 .organization_feed > .tabs_header {padding: 0 24px}
 

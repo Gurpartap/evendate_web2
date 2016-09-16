@@ -850,6 +850,7 @@ function Organization($view){
 			}
 		});
 		bindEventsEvents($parent);
+		Modal.bindCallModal($parent);
 
 		$parent.find('.Tabs').on('change.tabs', function(){
 			$(window).off(Object.values(SCROLL_EVENTS).join(' '));
@@ -1117,11 +1118,7 @@ function Organization($view){
 						}
 					})
 				}
-				if (role != __C.ROLES.USER){
-					data.hidden_for_users = '';
-				}else{
-					data.hidden_for_users = '-hidden';
-				}
+				data.hidden_for_users = (role != __C.ROLES.USER) ? '' : '-hidden';
 				$page_wrapper.append(tmpl('organization-info-page', $.extend({
 					subscribe_button_classes: data.is_subscribed ? ['fa-check', '-color_neutral', '-Subscribed'].join(' ') : ['fa-plus', '-color_accent'].join(' '),
 					subscribe_button_text: data.is_subscribed ? 'Подписан' : 'Подписаться',
@@ -1141,6 +1138,8 @@ function Organization($view){
 									bindEventsEvents($view);
 								});
 							});
+						} else {
+							bindEventsEvents($view);
 						}
 					});
 					initOrganizationPage($view);
