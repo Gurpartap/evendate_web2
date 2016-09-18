@@ -9,6 +9,16 @@ require_once $BACKEND_FULL_PATH . '/users/Class.OrganizationAction.php';
 
 $__modules['users'] = array(
 	'GET' => array(
+        '' => function () use ($__user, $__request, $__fields, $__pagination, $__order_by, $__db) {
+            return UsersCollection::filter(
+                $__db,
+                $__user,
+                $__request,
+                $__fields,
+                $__pagination,
+                $__order_by ?? array()
+            );
+        },
 		'settings' => function () use ($__user, $__request) {
 		    if (isset($__request['as_array']) && filter_var($__request['as_array'], FILTER_VALIDATE_BOOLEAN)){
 		        $settings = $__user->getSettings();

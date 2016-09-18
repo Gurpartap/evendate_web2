@@ -759,6 +759,22 @@
             "description": "Additional fields and sub-entities",
             "required": false,
             "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "used_since",
+            "description": "Tags used since date",
+            "required": false,
+            "type": "string",
+            "format": "date"
+          },
+          {
+            "in": "query",
+            "name": "used_till",
+            "description": "Tags used till date",
+            "required": false,
+            "type": "string",
+            "format": "date"
           }
         ],
         "responses": {
@@ -1964,6 +1980,83 @@
         }
       }
     },
+    "/users": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Search users by name",
+        "description": "",
+        "operationId": "getFriendsFeed",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "first_name",
+            "in": "query",
+            "description": "Searching by first name",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "last_name",
+            "in": "query",
+            "description": "Searching by first name",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "description": "Searching by full name",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "length",
+            "in": "query",
+            "description": "Items count",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Items count",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "description": "Order column name",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Additional fields and sub-entities",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/User"
+              }
+            }
+          }
+        }
+      }
+    },
     "/users/feed": {
       "get": {
         "tags": [
@@ -2367,7 +2460,13 @@
             "required": true,
             "type": "string",
             "enum": [
-              "minute", "hour", "day", "week", "month", "year", "overall"
+              "minute",
+              "hour",
+              "day",
+              "week",
+              "month",
+              "year",
+              "overall"
             ]
           },
           {
@@ -2429,7 +2528,13 @@
             "required": true,
             "type": "string",
             "enum": [
-              "minute", "hour", "day", "week", "month", "year", "overall"
+              "minute",
+              "hour",
+              "day",
+              "week",
+              "month",
+              "year",
+              "overall"
             ]
           },
           {
