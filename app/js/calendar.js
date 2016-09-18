@@ -1390,7 +1390,7 @@ function OneFriend($view){
 			});
 
 			$view.find('.back-to-friends-list').on('click', function(){
-				History.pushState({_index: History.getCurrentIndex(), page: 'friends'}, 'Мои друзья', 'friends');
+				History.pushState({_index: History.getCurrentIndex(), page: 'friends'}, 'Мои друзья', '/friends');
 			});
 			getFriendFeed();
 		}
