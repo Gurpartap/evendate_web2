@@ -507,6 +507,7 @@ function tmpl(template_type, items, addTo, direction) {
  * */
 if (window['moment'] != undefined) {
 	moment.locale(navigator.language);
+	moment.tz.setDefault('Europe/Moscow');
 	moment.updateLocale('ru', {
 		monthsShort : ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"]
 	})
