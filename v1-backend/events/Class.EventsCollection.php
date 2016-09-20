@@ -50,7 +50,7 @@ class EventsCollection extends AbstractCollection
         $statement_array = array();
         if (isset($fields[Event::IS_FAVORITE_FIELD_NAME])
             || isset($fields[Event::CAN_EDIT_FIELD_NAME])
-            || isset($fields[Event::IS_NEW_FIELD_NAME])) {
+            || isset($fields[Event::IS_SEEN_FIELD_NAME])) {
             $statement_array[':user_id'] = $user->getId();
         }
 
