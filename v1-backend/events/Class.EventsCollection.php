@@ -48,7 +48,9 @@ class EventsCollection extends AbstractCollection
 
 
         $statement_array = array();
-        if (isset($fields[Event::IS_FAVORITE_FIELD_NAME]) || isset($fields[Event::CAN_EDIT_FIELD_NAME])) {
+        if (isset($fields[Event::IS_FAVORITE_FIELD_NAME])
+            || isset($fields[Event::CAN_EDIT_FIELD_NAME])
+            || isset($fields[Event::IS_NEW_FIELD_NAME])) {
             $statement_array[':user_id'] = $user->getId();
         }
 
@@ -146,6 +148,65 @@ class EventsCollection extends AbstractCollection
                     }
                     break;
                 }
+                case 'statistics': {
+                    if ($value == 'true') {
+                        global $BACKEND_FULL_PATH;
+                        require_once $BACKEND_FULL_PATH . '/users/Class.Roles.php';
+                        require_once $BACKEND_FULL_PATH . '/statistics/Class.EventsStatistics.php';
+
+                        $_fields[] = '(' . EventsStatistics::getValueSQLWithNamedParams(Statistics::EVENT_VIEW)
+                                . ') AS ' . Statistics::EVENT_VIEW;
+                        $statement_array[':type_code_' . Statistics::EVENT_VIEW] = Statistics::EVENT_VIEW;
+
+                        $_fields[] = '(' . EventsStatistics::getValueSQLWithNamedParams(Statistics::EVENT_FAVE)
+                                . ') AS ' . Statistics::EVENT_FAVE;
+                        $statement_array[':type_code_' . Statistics::EVENT_FAVE] = Statistics::EVENT_FAVE;
+
+
+                        $_fields[] = '(' . EventsStatistics::getValueSQLWithNamedParams(Statistics::EVENT_VIEW_DETAIL)
+                                . ') AS ' . Statistics::EVENT_VIEW_DETAIL;
+                        $statement_array[':type_code_' . Statistics::EVENT_VIEW_DETAIL] = Statistics::EVENT_VIEW_DETAIL;
+
+
+                        $_fields[] = '(' . EventsStatistics::getValueSQLWithNamedParams(Statistics::EVENT_OPEN_SITE)
+                                . ') AS ' . Statistics::EVENT_OPEN_SITE;
+                        $statement_array[':type_code_' . Statistics::EVENT_OPEN_SITE] = Statistics::EVENT_OPEN_SITE;
+
+
+                        $_fields[] = '(' . EventsStatistics::getValueSQLWithNamedParams(Statistics::EVENT_UNFAVE)
+                                . ') AS ' . Statistics::EVENT_UNFAVE;
+                        $statement_array[':type_code_' . Statistics::EVENT_UNFAVE] = Statistics::EVENT_UNFAVE;
+
+
+                        /*Notifications*/
+
+                        $_fields[] = '(' . EventsStatistics::SQL_GET_NOTIFICATIONS_SENT
+                                . ' AND event_id = view_events.id AND type != :users_notification) AS ' . Statistics::EVENT_AUTO_NOTIFICATIONS_SENT;
+                        $_fields[] = '(' . EventsStatistics::SQL_GET_NOTIFICATIONS_SENT
+                                . ' AND event_id = view_events.id AND type = :users_notification) ' . Statistics::EVENT_USERS_NOTIFICATIONS_SENT;
+                        $statement_array[':users_notification'] = Notification::NOTIFICATION_TYPE_USERS;
+                        $_fields[] = '(' . EventsStatistics::SQL_GET_USERS_NOTIFICATIONS
+                                . ' AND event_id = view_events.id) AS ' . Statistics::EVENT_USERS_NOTIFICATIONS;
+
+                        $fields[] = Statistics::EVENT_VIEW;
+                        $fields[] = Statistics::EVENT_FAVE;
+                        $fields[] = Statistics::EVENT_VIEW_DETAIL;
+                        $fields[] = Statistics::EVENT_OPEN_SITE;
+                        $fields[] = Statistics::EVENT_UNFAVE;
+
+                        $fields[] = Statistics::EVENT_NOTIFICATIONS_SENT;
+                        $fields[] = Statistics::EVENT_AUTO_NOTIFICATIONS_SENT;
+                        $fields[] = Statistics::EVENT_USERS_NOTIFICATIONS_SENT;
+
+                        $q_get_events->where('organization_id IN (SELECT organization_id FROM users_organizations ua WHERE ua.user_id = :user_id AND ua.role_id = :role_id)');
+                        $q_get_events->where('organization_id IN (SELECT organization_id FROM users_organizations ua WHERE ua.user_id = :user_id AND ua.role_id = :role_id)');
+                        $statement_array[':user_id'] = $user->getId();
+                        $statement_array[':role_id'] = Roles::getId(Roles::ROLE_ADMIN);
+                        $statement_array[':since'] = '2014-01-01 00:00:00';
+                        $statement_array[':till'] = (new DateTime())->format('Y-m-d H:i:s');
+                    }
+                    break;
+                }
                 case 'organization_id': {
                     if ($_organization instanceof Organization) {
                         $q_get_events->where('organization_id = :organization_id');
@@ -158,7 +219,7 @@ class EventsCollection extends AbstractCollection
                     if ($is_editor) {
                         $from_view = self::VIEW_ALL_EVENTS_WITH_ALIAS;
                         $q_get_events->where($name . ' = :' . $name);
-                        $statement_array[':' . $name] = boolval($value);
+                        $statement_array[':' . $name] = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
                     }
                     break;
                 }
@@ -256,16 +317,29 @@ class EventsCollection extends AbstractCollection
                     break;
                 }
                 case 'tags': {
-                    if (is_array($value)) {
-                        $q_part = array();
-                        foreach ($value as $key => $tag) {
-                            $tag = str_replace('#', '', $tag);
-                            $q_part[] = '(:tag_' . $key . ' = tags.name )';
-                            $statement_array[':tag_' . $key] = trim($tag);
+                    if (strpos($value, '*') != FALSE){
+                        $value = explode('*', $value);
+                        if (count($value) == 0) throw new InvalidArgumentException('TAGS_SHOULD_NOT_BE_EMPTY');
+                        $tags_tmpl = [];
+                        foreach ($value as $index => $tag){
+                            $key = ':tag_' . $index;
+                            $tags_tmpl[] = $key;
+                            $statement_array[$key] = mb_strtolower($tag);
                         }
-                        if (count($q_part) > 0) {
-                            $q_get_events->where('(' . implode(' OR ', $q_part) . ')');
+                        $q_get_events->where('(SELECT COUNT(tags.id) FROM tags INNER JOIN events_tags ON events_tags.tag_id = tags.id WHERE events_tags.status=true AND event_id = view_events.id AND LOWER(name) IN ('. implode(',', $tags_tmpl) .')) = ' . count($value));
+                    }elseif(strpos($value, '|') != FALSE){
+                        $value = explode('|', $value);
+                        if (count($value) == 0) throw new InvalidArgumentException('TAGS_SHOULD_NOT_BE_EMPTY');
+                        $tags_tmpl = [];
+                        foreach ($value as $index => $tag){
+                            $key = ':tag_' . $index;
+                            $tags_tmpl[] = $key;
+                            $statement_array[$key] = mb_strtolower($tag);
                         }
+                        $q_get_events->where('(SELECT COUNT(tags.id) FROM tags INNER JOIN events_tags ON events_tags.tag_id = tags.id WHERE events_tags.status=true AND event_id = view_events.id AND LOWER(name) IN ('. implode(',', $tags_tmpl) .')) > 0');
+                    }else{
+                        $q_get_events->where('(SELECT COUNT(tags.id) FROM tags INNER JOIN events_tags ON events_tags.tag_id = tags.id WHERE events_tags.status=true AND event_id = view_events.id AND LOWER(name) = :tag_0) > 0');
+                        $statement_array[':tag_0'] = mb_strtolower($value);
                     }
                     break;
                 }
@@ -413,7 +487,6 @@ class EventsCollection extends AbstractCollection
             $q_get_events->where($canceled_condition);
         }
 
-//        echo $q_get_events->getStatement();
 
         $p_get_events = $db->prepare($q_get_events->getStatement());
         $result = $p_get_events->execute($statement_array);

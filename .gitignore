@@ -99,6 +99,8 @@ $RECYCLE.BIN/
 *.lnk
 
 
-user_images/*
-event_images/*
-organizations_images/*
+user_images/blurred/*
+user_images/default/*
+
+event_images/*/*
+organizations_images/*/*

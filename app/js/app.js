@@ -608,6 +608,7 @@ function tmpl(template_type, items, addTo, direction) {
 
 if (window['moment'] != undefined) {
 	moment.locale(navigator.language);
+	moment.tz.setDefault('Europe/Moscow');
 	moment.updateLocale('ru', {
 		monthsShort : __LOCALES.DATE.MONTH_SHORT_NAMES
 	})

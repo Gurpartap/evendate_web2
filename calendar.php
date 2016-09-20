@@ -306,6 +306,7 @@ $user_full_name = $user->getLastName() . ' ' . $user->getFirstName(); ?>
 <script src="/vendor/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js"></script>
 <!-- MOMENT JS-->
 <script src="/vendor/moment/min/moment-with-locales.min.js"></script>
+<script src="/vendor/moment/min/moment-timezone-with-data-2010-2020.min.js"></script>
 <!-- DATERANGEINPUTS-->
 <script src="/vendor/daterangepicker/daterangepicker.js"></script>
 <!-- INPUTMASKS -->

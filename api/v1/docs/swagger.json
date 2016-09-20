@@ -67,16 +67,11 @@
             "type": "string"
           },
           {
-            "name": "privileges",
+            "name": "roles",
             "in": "query",
-            "description": "Can get list of organizations with any privileges",
+            "description": "Can get list of organizations with any roles",
             "required": false,
-            "type": "string",
-            "enum": [
-              "can_add",
-              "can_edit",
-              "can_modify"
-            ]
+            "type": "string"
           },
           {
             "name": "description",
@@ -208,16 +203,11 @@
             "type": "string"
           },
           {
-            "name": "privileges",
+            "name": "roles",
             "in": "query",
-            "description": "Can get list of organizations with any privileges",
+            "description": "Can get list of organizations with any roles",
             "required": false,
-            "type": "string",
-            "enum": [
-              "can_add",
-              "can_edit",
-              "can_modify"
-            ]
+            "type": "string"
           },
           {
             "name": "description",
@@ -559,7 +549,10 @@
             "description": "Name of role",
             "required": true,
             "type": "string",
-            "enum": ["admin", "moderator"]
+            "enum": [
+              "admin",
+              "moderator"
+            ]
           }
         ],
         "responses": {
@@ -610,7 +603,10 @@
             "description": "Name of role",
             "required": true,
             "type": "string",
-            "enum": ["admin", "moderator"]
+            "enum": [
+              "admin",
+              "moderator"
+            ]
           }
         ],
         "responses": {
@@ -885,6 +881,17 @@
           },
           {
             "in": "query",
+            "name": "statistics",
+            "description": "add statistics fields",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ]
+          },
+          {
+            "in": "query",
             "name": "canceled_shown",
             "description": "show/hide canceled events",
             "required": false,
@@ -935,7 +942,7 @@
           {
             "in": "query",
             "name": "tags",
-            "description": "Events with this tags",
+            "description": "Events with this tags. Supports searching by tag1*tag2 (logic AND) or tag1|tag2(logic OR)",
             "required": false,
             "type": "array",
             "items": {
@@ -1088,7 +1095,7 @@
           {
             "in": "query",
             "name": "tags",
-            "description": "Events with this tags",
+            "description": "Events with this tags. Supports searching by tag1*tag2 (logic AND) or tag1|tag2(logic OR)",
             "required": false,
             "type": "array",
             "items": {
@@ -1231,7 +1238,7 @@
           {
             "in": "query",
             "name": "tags",
-            "description": "Events with this tags",
+            "description": "Events with this tags. Supports searching by tag1*tag2 (logic AND) or tag1|tag2(logic OR)",
             "required": false,
             "type": "array",
             "items": {
@@ -1483,7 +1490,7 @@
           {
             "in": "query",
             "name": "tags",
-            "description": "Events with this tags",
+            "description": "Events with this tags. Supports searching by tag1*tag2 (logic AND) or tag1|tag2(logic OR)",
             "required": false,
             "type": "array",
             "items": {
@@ -2334,65 +2341,129 @@
         }
       }
     },
-    "/statistics/organizations/{Id}": {
-    "get": {
-      "tags": [
-        "Statistics"
-      ],
-      "summary": "Get stats about organization",
-      "description": "",
-      "operationId": "getOrganizationStats",
-      "produces": [
-        "application/json"
-      ],
-      "parameters": [
-        {
-          "name": "Id",
-          "in": "path",
-          "description": "",
-          "required": true,
-          "type": "string"
-        },
-        {
-          "name": "scale",
-          "in": "query",
-          "description": "",
-          "required": true,
-          "type": "string",
-          "enum": ["minute", "hour", "day", "week", "month", "year"]
-        },
-        {
-          "name": "since",
-          "in": "query",
-          "description": "DateTime since",
-          "required": true,
-          "type": "date-time"
-        },
-        {
-          "name": "till",
-          "in": "query",
-          "description": "DateTime till",
-          "required": true,
-          "type": "date-time"
-        },
-        {
-          "name": "fields",
-          "in": "query",
-          "description": "Allowed fields: [dynamics, view, subscribe, unsubscribe, conversion, audience]. For each field can be used till, since, scale",
-          "required": true,
-          "type": "string"
-        }
-      ],
-      "responses": {
-        "200": {
-          "description": "successful operation",
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Device"
+    "/statistics/events/{Id}": {
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "Get stats about event",
+        "description": "",
+        "operationId": "getEventStats",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "scale",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "minute", "hour", "day", "week", "month", "year", "overall"
+            ]
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "description": "Unix timestamp since",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "till",
+            "in": "query",
+            "description": "Unix timestamp till",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Allowed fields: [dynamics, view, subscribe, unsubscribe, conversion, audience, events]. For each field can be used till, since, scale",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/Device"
+            }
           }
         }
       }
-    }
+    },
+    "/statistics/organizations/{Id}": {
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "Get stats about organization",
+        "description": "",
+        "operationId": "getOrganizationStats",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "scale",
+            "in": "query",
+            "description": "",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "minute", "hour", "day", "week", "month", "year", "overall"
+            ]
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "description": "Unix timestamp since",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "till",
+            "in": "query",
+            "description": "Unix timestamp till",
+            "required": false,
+            "type": "integer"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Allowed fields: [dynamics, view, subscribe, unsubscribe, conversion, audience, events]. For each field can be used till, since, scale",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/Device"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -2484,6 +2555,10 @@
           "format": "int32"
         },
         "[new_events_count]": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "[actual_events_count]": {
           "type": "integer",
           "format": "int32"
         },

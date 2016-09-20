@@ -37,6 +37,7 @@ body {
 	line-height: 1;
 	color: #4a4a4a;
 	color: var(--color_text);
+	word-wrap: break-word;
 	background-color: #f6f6f6;
 	background-color: var(--color_background);
 }
@@ -1014,6 +1015,7 @@ input, select, textarea, button {font-family: inherit}
 	text-transform: uppercase;
 	overflow: hidden;
 	cursor: pointer;
+	word-wrap: normal;
 	-webkit-transition: box-shadow .5s ease, background-color .5s ease, color .5s ease;
 	-moz-transition: box-shadow .5s ease, background-color .5s ease, color .5s ease;
 	-o-transition: box-shadow .5s ease, background-color .5s ease, color .5s ease;
@@ -2413,8 +2415,6 @@ body.-open_modal > .modal_wrapper {
 	cursor: pointer;
 }
 
-#user_bar:hover {background-color: rgba(255,255,255,0.15)}
-
 #user_bar .avatar.-bordered {border-width: 1px}
 
 .user_bar_forhead {
@@ -3057,29 +3057,10 @@ body.-open_modal > .modal_wrapper {
 	overflow: hidden;
 }
 
-.organization_header_backdrop {
-	position: absolute;
-	top: 60px;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	background-image: -webkit-linear-gradient(top, hsla(0,0%,100%,0) 0%, #fff 95%);
-	background-image: -moz-linear-gradient(top, hsla(0,0%,100%,0) 0%, #fff 95%);
-	background-image: -ms-linear-gradient(top, hsla(0,0%,100%,0) 0%, #fff 95%);
-	background-image: -o-linear-gradient(top, hsla(0,0%,100%,0) 0%, #fff 95%);
-	background-image: linear-gradient(to bottom, hsla(0,0%,100%,0) 0%, #fff 95%);
-}
-
-.organization_header_bottom {
-	position: absolute;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	padding: 14px 24px;
-}
-
-.organization_title_block {
-	padding-right: 150px;
+.organization_header {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 1em;
 }
 
 .avatar_block > .avatar + .avatar_name.organization_title {
@@ -3088,17 +3069,16 @@ body.-open_modal > .modal_wrapper {
 }
 
 .organization_header_button {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	right: 0;
-	margin: auto 24px;
 	height: 1.88rem;
-	width: 130px;
+	flex: 0 0 130px;
+	margin-left: 1em;
 }
 
 .organization_description_block {padding: 24px 24px 12px}
 .organization_description {margin-bottom: 1em}
+
+.organization_metas {display: flex}
+.organization_meta + .organization_meta {margin-left: 1.5em}
 
 .organization_feed > .tabs_header {padding: 0 24px}
 

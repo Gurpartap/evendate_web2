@@ -76,6 +76,26 @@ class UsersCollection extends AbstractCollection
                         $statement_array[':organization_id'] = $value->getId();
                         $_fields[] = 'users_roles.name AS role';
                         $fields[] = 'role';
+
+                        if (isset($filters['roles'])){
+                            $roles = $filters['roles'];
+                            $values = explode(',', $roles);
+                            $in_ids = [];
+                            foreach ($values as $curr_value) {
+                                if (in_array($curr_value, Roles::ROLES) == false) throw new InvalidArgumentException('CANT_FIND_ROLE: ' . $curr_value);
+                                $in_ids[] = Roles::getId($curr_value);
+                            }
+                            if (count($in_ids) == 0) break;
+
+                            $roles_str = [];
+                            foreach ($in_ids as $index => $role_id) {
+                                $key = ':role_id_' . $index;
+                                $roles_str[] = $key;
+                                $statement_array[$key] = $role_id;
+                            }
+                            $q_get_users->where('users_organizations.role_id IN (' . implode(',', $roles_str) . ')');
+                        }
+
                     }
                     break;
                 }

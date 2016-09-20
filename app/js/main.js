@@ -25,6 +25,15 @@ Object.methods = function(obj){
 	});
 	return methods;
 };
+Object.values = typeof Object.values == 'function' ? Object.values : function(obj) {
+	var vals = [];
+	for (var key in obj) {
+		if (obj.hasOwnProperty(key) && obj.propertyIsEnumerable(key)) {
+			vals.push(obj[key]);
+		}
+	}
+	return vals;
+};
 Array.newFrom = function(original) {
 	var new_array = original.slice(0), arg, i;
 	if(arguments.length > 1){

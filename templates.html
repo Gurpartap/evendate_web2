@@ -250,7 +250,7 @@
 
 			<h4 class="form_label"><label for="edit_event_description">Описание</label></h4>
 			<div class="form_unit">
-				<textarea id="edit_event_description" class="form_textarea LimitSize" data-maxlength="500" name="description" placeholder="Не более 500 символов" required>{description}</textarea>
+				<textarea id="edit_event_description" class="form_textarea LimitSize" data-maxlength="1000" name="description" placeholder="Не более 1000 символов" required>{description}</textarea>
 			</div>
 
 			<h4 class="form_label">Регистрация</h4>
@@ -310,7 +310,7 @@
 			<div class="form_group -parts_e_2 EditEventImgLoadWrap ImgLoadWrap">
 				<div class="form_unit -centering">
 					<div class="wrapper">
-						<h4 class="form_label"><label>Горизонтальная</label></h4>
+						<h4 class="form_label"><label>Выберите способ загрузки:</label></h4>
 						<div class="Tabs">
 							<header class="tabs_header -color_accent">
 								<span class="tab Tab -active">По ссылке</span>
@@ -346,48 +346,6 @@
 						<img src="app/img/edit_event/edit_event_img_placeholder_hor.png">
 						<input id="edit_event_image_horizontal_src" class="DataUrl" type="hidden" name="image_horizontal" value="{image_horizontal_base64}">
 						<input id="edit_event_image_horizontal_filename" class="FileName" type="hidden" name="filename_horizontal" value="{image_horizontal_filename}">
-					</div>
-				</div>
-			</div>
-			<div class="form_group -parts_e_2 EditEventImgLoadWrap ImgLoadWrap">
-				<div class="form_unit -centering">
-					<div class="wrapper">
-						<h4 class="form_label"><label>Вертикальная</label></h4>
-						<div class="Tabs">
-							<header class="tabs_header -color_accent">
-								<span class="tab Tab -active">По ссылке</span>
-								<span class="tab Tab">С компьютера</span>
-							</header>
-							<div class="tab_bodies_wrap TabsBodyWrapper">
-								<div class="tab_body TabsBody -active">
-									<div class="form_unit">
-										<input id="edit_event_load_by_url_vert" class="form_input" type="text" autocomplete="off" placeholder="Ссылка на изображение">
-									</div>
-									<div class="form_unit">
-										<button class="button -color_accent RippleEffect LoadByURLButton" type="button" tabindex="-1" data-load_input="edit_event_load_by_url_vert">Загрузить</button>
-									</div>
-								</div>
-								<div class="tab_body TabsBody">
-									<div class="form_unit">
-										<button class="button -color_accent RippleEffect FileLoadButton" type="button"><input class="LoadImg -hidden" type="file">Выбрать</button>
-									</div>
-								</div>
-							</div>
-						</div>
-						<p class="FileNameText"></p>
-						<div class="form_unit">
-							<button class="button -color_accent_alt RippleEffect CallModal -hidden" type="button" data-modal_type="cropper" data-source_img="{image_vertical_url}" data-aspect_ratio="7/10">
-								<span class="Text">Кадрировать</span>
-							</button>
-						</div>
-					</div>
-				</div>
-				<div class="form_unit">
-					<div class="img_holder">
-						<img class="edit_event_img_preview_vert EditEventImgPreview ImgPreview" src="{image_vertical_url}">
-						<img src="app/img/edit_event/edit_event_img_placeholder_vert.png">
-						<input id="edit_event_image_vertical_src" class="DataUrl" type="hidden" name="image_vertical" value="{image_vertical_base64}">
-						<input class="FileName" type="hidden" name="filename_vertical" value="{image_vertical_filename}">
 					</div>
 				</div>
 			</div>
@@ -502,7 +460,7 @@
 			</div>
 
 			<div class="form_unit -align_center">
-				<button id="edit_event_submit" class="button RippleEffect -color_accent" type="button">Опубликовать</button>
+				<button id="edit_event_submit" class="button RippleEffect -color_accent" type="button">{button_text}</button>
 			</div>
 
 		</form>
@@ -603,12 +561,11 @@
 
 <script type="javascript/template" id="tmpl-organization-info-page">
 	<div class="page organization_info_page">
-		<header class="organization_header">
-			<div class="img_holder">
-				<img src="{background_img_url}">
-			</div>
-			<div class="organization_header_backdrop"></div>
-			<div class="organization_header_bottom">
+		<div class="img_holder">
+			<img class="CallModal" src="{background_img_url}" data-modal_type="media">
+		</div>
+		<div class="organization_description_block">
+			<header class="organization_header">
 				<div class="avatar_block organization_title_block">
 					<div class="avatar -size_small organization_avatar"><img src="{img_small_url}"></div>
 					<span class="avatar_name organization_title" title="{name}">{name}</span>
@@ -616,19 +573,17 @@
 				<div class="organization_header_button OrganizationSubscribeButtonWrap">
 					<button class=" button -size_low -fill fa_icon {subscribe_button_classes} Subscribe RippleEffect" data-organization-id="{id}" type="button"><span class="Text">{subscribe_button_text}</span></button>
 				</div>
-			</div>
-		</header>
-		<div class="organization_description_block">
+			</header>
 			<p class="organization_description">{description}</p>
-			<div class="form_group -parts_1_2_1">
-				<div class="form_unit">
+			<div class="organization_metas">
+				<div class="organization_meta">
 					<a class="button -color_marginal fa_icon fa-external-link RippleEffect ExternalPage" href="{site_url}" target="_blank">Подробнее</a>
 				</div>
-				<div class="form_unit">
+				<div class="organization_meta">
 					<small class="-color_marginal {has_address}">Адрес организатора:</small>
 					<p class="organization_address">{default_address}</p>
 				</div>
-				<div class="form_unit">{redact_org_button}</div>
+				<div class="organization_meta">{redact_org_button}</div>
 			</div>
 		</div>
 		<div class="organization_feed Tabs">
@@ -1099,7 +1054,7 @@
 <script type="javascript/template" id="tmpl-onboarding-recommendation">
 	<div class="recommendations_item_onboarding_inside OnboardingOrgItem" data-organization_id="{id}">
 		<div class="img_container_recommendation_onboarding">
-			<img src="{img_url}" class="img_recommendation_onboarding"></div>
+			<img src="{img_small_url}" class="img_recommendation_onboarding"></div>
 		<div class="text_container_recommendation_onboarding"><span>{short_name}</span></div>
 		<div class="check_box_img_container_onboarding">
 			<button class="check_box_img_onboarding" type="button"><i class="fa fa-plus plus_onboarding" aria-hidden="true"></i></button>

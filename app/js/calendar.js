@@ -486,30 +486,29 @@ function OneEvent($view){
 			})
 		});
 	}
-
-	function buildNotifications(raw_notifications, event_id, last_date){
+	
+	function buildNotifications(raw_notifications, event_id, first_date){
 		var m_today = moment(),
-			m_last_date = moment.unix(last_date),
 			all_notifications = {
-				'notification-now': {
+				'notification-before-quarter-of-hour': {
 					label: 'За 15 минут',
-					moment: m_last_date.subtract(15, 'minutes').unix()
+					moment: moment.unix(first_date).subtract(15, 'minutes').unix()
 				},
 				'notification-before-three-hours':  {
 					label: 'За 3 часа',
-					moment: m_last_date.subtract(3, 'hours').unix()
+					moment: moment.unix(first_date).subtract(3, 'hours').unix()
 				},
 				'notification-before-day': {
 					label: 'За день',
-					moment: m_last_date.subtract(1, 'days').unix()
+					moment: moment.unix(first_date).subtract(1, 'days').unix()
 				},
 				'notification-before-three-days': {
 					label: 'За 3 дня',
-					moment: m_last_date.subtract(3, 'days').unix()
+					moment: moment.unix(first_date).subtract(3, 'days').unix()
 				},
 				'notification-before-week': {
 					label: 'За неделю',
-					moment: m_last_date.subtract(1, 'week').unix()
+					moment: moment.unix(first_date).subtract(1, 'week').unix()
 				}
 			},
 			$notifications = $(),
@@ -859,6 +858,7 @@ function Organization($view){
 			}
 		});
 		bindEventsEvents($parent);
+		Modal.bindCallModal($parent);
 
 		$parent.find('.Tabs').on('change.tabs', function(){
 			$(window).off(Object.values(SCROLL_EVENTS).join(' '));
@@ -1126,11 +1126,7 @@ function Organization($view){
 						}
 					})
 				}
-				if (role != __C.ROLES.USER){
-					data.hidden_for_users = '';
-				}else{
-					data.hidden_for_users = '-hidden';
-				}
+				data.hidden_for_users = (role != __C.ROLES.USER) ? '' : '-hidden';
 				$page_wrapper.append(tmpl('organization-info-page', $.extend({
 					subscribe_button_classes: data.is_subscribed ? ['fa-check', '-color_neutral', '-Subscribed'].join(' ') : ['fa-plus', '-color_accent'].join(' '),
 					subscribe_button_text: data.is_subscribed ? 'Подписан' : 'Подписаться',
@@ -1147,13 +1143,14 @@ function Organization($view){
 						if (role != __C.ROLES.USER){
 							uploadEvents($delayed_events_wrapper, EVENT_TYPES.DELAYED, function($events){
 								uploadEvents($canceled_events_wrapper, EVENT_TYPES.CANCELED, function($events){
-									initOrganizationPage($view);
+									bindEventsEvents($view);
 								});
 							});
-						}else{
-							initOrganizationPage($view);
+						} else {
+							bindEventsEvents($view);
 						}
 					});
+					initOrganizationPage($view);
 					bindUploadEventsOnScroll($future_events_wrapper);
 				});
 
@@ -1401,7 +1398,7 @@ function OneFriend($view){
 			});
 
 			$view.find('.back-to-friends-list').on('click', function(){
-				History.pushState({_index: History.getCurrentIndex(), page: 'friends'}, 'Мои друзья', 'friends');
+				History.pushState({_index: History.getCurrentIndex(), page: 'friends'}, 'Мои друзья', '/friends');
 			});
 			getFriendFeed();
 		}
@@ -2101,7 +2098,6 @@ function EditEvent($view){
 			data = {
 				event_id: null,
 				title: null,
-				image_vertical: null,
 				image_horizontal: null,
 				organization_id: null,
 				location: null,
@@ -2117,7 +2113,6 @@ function EditEvent($view){
 				delayed_publication: null,
 				public_at: null,
 				filenames: {
-					vertical: null,
 					horizontal: null
 				}
 			},
@@ -2132,7 +2127,6 @@ function EditEvent($view){
 
 			data.tags = tags;
 			data.filenames = {
-				vertical: data.filename_vertical,
 				horizontal: data.filename_horizontal
 			};
 			if(data.registration_required){
@@ -2168,8 +2162,8 @@ function EditEvent($view){
 					})
 				});
 			}
-
-
+			
+			$view.addClass('-faded');
 			$.ajax({
 				url: url,
 				data: JSON.stringify(data),
@@ -2187,7 +2181,6 @@ function EditEvent($view){
 					 showNotification('Событие успешно добавлено', 3000);
 					 });
 					 }*/
-
 						if($view.find('#edit_event_to_public_vk').prop('checked')){
 							socket.emit('vk.post', {
 								guid: data.vk_group,
@@ -2200,15 +2193,18 @@ function EditEvent($view){
 								link: data.detail_info_url
 							});
 						}
-						window.location = '/event/'+res_data.event_id;
-
+						changeState('/event/'+res_data.event_id, data.title, {event_id: res_data.event_id});
 					}, function(res){
+						$view.removeClass('-faded');
 						if(res.text){
 							showNotifier({text: res.text, status: false});
 						} else {
 							ajaxErrorHandler(res);
 						}
 					});
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					$view.removeClass('-faded');
 				}
 			});
 		}
@@ -2225,6 +2221,7 @@ function EditEvent($view){
 		tomorrow_date: moment().add(1, 'd').format(__C.DATE_FORMAT)
 	};
 	if(typeof event_id === 'undefined'){
+		additional_fields.button_text = 'Опубликовать';
 		$wrapper.html(tmpl('edit-event-page', additional_fields));
 		initEditEventPage($view);
 		Modal.bindCallModal($view);
@@ -2244,6 +2241,7 @@ function EditEvent($view){
 				ajaxHandler(res, function(data){
 					data = Array.isArray(data) ? data[0] : data;
 					additional_fields.header_text = 'Редактирование события';
+					additional_fields.button_text = 'Сохранить';
 					if(data.public_at !== null){
 						var m_public_at = moment(data.public_at);
 						additional_fields.public_at_data = m_public_at.format('YYYY-MM-DD');
@@ -2257,9 +2255,6 @@ function EditEvent($view){
 						additional_fields.registration_till_data_label = m_registration_till.format('DD.MM.YYYY');
 						additional_fields.registration_till_time_hours = m_registration_till.format('HH');
 						additional_fields.registration_till_time_minutes = m_registration_till.format('mm');
-					}
-					if(data.image_vertical_url){
-						additional_fields.image_vertical_filename = data.image_vertical_url.split('/').reverse()[0];
 					}
 					if(data.image_horizontal_url){
 						additional_fields.image_horizontal_filename = data.image_horizontal_url.split('/').reverse()[0];
@@ -2293,7 +2288,12 @@ function EditEvent($view){
 					}
 					selectDates($view, data.dates);
 					selectTags($view, data.tags);
-					if(data.image_vertical_url && data.image_horizontal_url){
+					Modal.bindCallModal($view);
+
+					if(data.image_horizontal_url){
+						toDataUrl(data.image_horizontal_url, function(base64_string){
+							$view.find('#edit_event_image_horizontal_src').val(base64_string ? base64_string : null);
+						});
 						$view.find('.CallModal').removeClass('-hidden').on('crop', function(event, cropped_src, crop_data){
 							var $button = $(this),
 								$parent = $button.closest('.EditEventImgLoadWrap'),
@@ -2302,18 +2302,6 @@ function EditEvent($view){
 							$data_url.val('data.source').data('source', $preview.attr('src')).trigger('change');
 							$preview.attr('src', cropped_src);
 							$button.data('crop_data', crop_data);
-						});
-					}
-					Modal.bindCallModal($view);
-
-					if(data.image_vertical_url){
-						toDataUrl(data.image_vertical_url, function(base64_string){
-							$view.find('#edit_event_image_vertical_src').val(base64_string ? base64_string : null);
-						});
-					}
-					if(data.image_horizontal_url){
-						toDataUrl(data.image_horizontal_url, function(base64_string){
-							$view.find('#edit_event_image_horizontal_src').val(base64_string ? base64_string : null);
 						});
 					}
 					if(additional_fields.vk_image_url){
@@ -2371,7 +2359,8 @@ function Onboarding($view){
 		method: 'GET',
 		data: {
 			length: 10,
-			offset: 0
+			offset: 0,
+			fields: 'img_small_url'
 		},
 		success: function(res){
 			ajaxHandler(res, function(data){
@@ -3180,19 +3169,29 @@ function ajaxHandler(result, success, error){
 }
 
 function ajaxErrorHandler(event, jqxhr, settings, thrownError){
-	var args = Array.prototype.slice.call(arguments);
-	console.group('ajax error');
-	args.forEach(function(arg){
-		console.log(arg);
+	var args = Array.prototype.slice.call(arguments),
+		fields = ['event', 'jqxhr', 'settings', 'thrownError'];
+	window.debug = {};
+	args.forEach(function(arg, i){
+		window.debug[fields[i]] = arg;
 	});
-	console.groupEnd();
+	console.groupCollapsed('AJAX error');
+	if(thrownError)
+		console.log('Thrown error:', thrownError);
+	if(event && event.type)
+		console.log('Error type:', event.type);
+	if(event && event.text)
+		console.log('Description:', event.text);
 	if(jqxhr && jqxhr.responseJSON && jqxhr.responseJSON.text){
+		console.log('Response:', jqxhr.responseJSON.text);
 		showNotifier({text: jqxhr.responseJSON.text, status: false});
-	} else if(event.text) {
-		showNotifier({text: event.text, status: false});
-	} else {
-		showNotifier({text: 'Упс, что-то пошло не так', status: false});
 	}
+	if(settings){
+		console.log('URL:', settings.url);
+		console.log('Method:', settings.type);
+	}
+	console.error('Error stacktrace:');
+	console.groupEnd();
 }
 
 $(document)
