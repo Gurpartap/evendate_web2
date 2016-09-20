@@ -21,7 +21,7 @@ class Event extends AbstractEntity
     const TAGS_LIMIT = 5;
     const ORGANIZATION_NOTIFICATIONS_LIMIT = 2;
     const IS_FAVORITE_FIELD_NAME = 'is_favorite';
-    const IS_NEW_FIELD_NAME = 'is_new';
+    const IS_SEEN_FIELD_NAME = 'is_seen';
     const TAGS_FIELD_NAME = 'tags';
     const DATES_FIELD_NAME = 'dates';
     const FAVORED_USERS_FIELD_NAME = 'favored';
@@ -127,7 +127,7 @@ class Event extends AbstractEntity
         self::CAN_EDIT_FIELD_NAME => '(SELECT id IS NOT NULL
 			FROM view_editors
 			WHERE id = :user_id AND organization_id = view_events.organization_id) IS NOT NULL AS ' . self::CAN_EDIT_FIELD_NAME,
-        self::IS_NEW_FIELD_NAME => '(
+        self::IS_SEEN_FIELD_NAME => '(
 		SELECT
 			COUNT(ve.id)
 			FROM view_events ve
@@ -153,7 +153,7 @@ class Event extends AbstractEntity
 						user_id = :user_id
 						AND event_id = view_events.id
 					)
-				) :: INT > 0 AS ' . self::IS_NEW_FIELD_NAME,
+				) :: INT > 0 AS ' . self::IS_SEEN_FIELD_NAME,
         self::FAVORED_FRIENDS_COUNT_FIELD_NAME => '(SELECT COUNT(id) :: INT AS favored_friends_count
             FROM favorite_events
                 WHERE status = TRUE 
@@ -482,7 +482,7 @@ class Event extends AbstractEntity
 
             App::saveImage($data['image_horizontal'],
                 self::IMAGES_PATH . self::IMG_SIZE_TYPE_LARGE . '/' . $img_horizontal_filename,
-                14000);
+                50000);
 
 //            App::saveImage($data['image_vertical'],
 //                self::IMAGES_PATH . self::IMG_SIZE_TYPE_LARGE . '/' . $img_vertical_filename,
