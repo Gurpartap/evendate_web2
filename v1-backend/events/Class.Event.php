@@ -153,7 +153,7 @@ class Event extends AbstractEntity
 						user_id = :user_id
 						AND event_id = view_events.id
 					)
-				) :: INT > 0 AS ' . self::IS_SEEN_FIELD_NAME,
+				) :: INT = 1 AS ' . self::IS_SEEN_FIELD_NAME,
         self::FAVORED_FRIENDS_COUNT_FIELD_NAME => '(SELECT COUNT(id) :: INT AS favored_friends_count
             FROM favorite_events
                 WHERE status = TRUE 
