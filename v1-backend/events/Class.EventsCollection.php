@@ -276,9 +276,9 @@ class EventsCollection extends AbstractCollection
                     break;
                 }
                 case 'title': {
-                    $value = strtolower(trim($value));
+                    $value = mb_strtolower(trim($value));
                     if (empty($value)) break;
-                    if (isset($filters['strict']) && $filters['strict'] == 'true') {
+                    if (isset($filters['strict']) && filter_var($filters['strict'], FILTER_VALIDATE_BOOLEAN)) {
                         $q_get_events->where('LOWER(title) = LOWER(:title)');
                         $statement_array[':title'] = $value;
                     } else {
@@ -288,7 +288,7 @@ class EventsCollection extends AbstractCollection
                     break;
                 }
                 case 'description': {
-                    $value = strtolower(trim($value));
+                    $value = mb_strtolower(trim($value));
                     if (isset($filters['strict']) && $filters['strict'] == 'true') {
                         $q_get_events->where('LOWER(description) = LOWER(:description)');
                         $statement_array[':description'] = $value;
