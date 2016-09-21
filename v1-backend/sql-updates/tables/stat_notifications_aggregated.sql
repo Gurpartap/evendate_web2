@@ -1,12 +1,3 @@
-ALTER TABLE public.stat_organizations
-  ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
-ALTER TABLE public.stat_events
-  ALTER COLUMN created_at SET DEFAULT CURRENT_TIMESTAMP;
-
-
-CREATE INDEX ON stat_events(event_id);
-CREATE INDEX ON stat_notifications (created_at);
-
 DROP TABLE IF EXISTS stat_notifications_aggregated;
 
 CREATE TABLE stat_notifications_aggregated (

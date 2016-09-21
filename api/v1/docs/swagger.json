@@ -2540,21 +2540,21 @@
           {
             "name": "since",
             "in": "query",
-            "description": "Unix timestamp since",
+            "description": "DateTime since",
             "required": true,
-            "type": "integer"
+            "type": "string"
           },
           {
             "name": "till",
             "in": "query",
-            "description": "Unix timestamp till",
-            "required": false,
-            "type": "integer"
+            "description": "DateTime till",
+            "required": true,
+            "type": "string"
           },
           {
             "name": "fields",
             "in": "query",
-            "description": "Allowed fields: [dynamics, view, subscribe, unsubscribe, conversion, audience, events]. For each field can be used till, since, scale",
+            "description": "Allowed fields: [dynamics, view, subscribe, unsubscribe, conversion, audience, notifications_sent, open_site, fave, unfave]. For each field can be used till, since, scale",
             "required": true,
             "type": "string"
           }
