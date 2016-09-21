@@ -113,6 +113,46 @@ class UsersCollection extends AbstractCollection
                     }
                     break;
                 }
+                case 'first_name': {
+                    $value = mb_strtolower(trim($value));
+                    if (empty($value)) break;
+                    if (isset($filters['strict']) && filter_var($filters['strict'], FILTER_VALIDATE_BOOLEAN) == true) {
+                        $q_get_users->where('LOWER(first_name) = LOWER(:first_name)');
+                        $statement_array[':first_name'] = $value;
+                    } else {
+                        $q_get_users->where('LOWER(first_name) LIKE LOWER(:first_name)');
+                        $statement_array[':first_name'] = $value . '%';
+                    }
+                    break;
+                }
+                case 'last_name': {
+                    $value = mb_strtolower(trim($value));
+                    if (empty($value)) break;
+                    if (isset($filters['strict']) && filter_var($filters['strict'], FILTER_VALIDATE_BOOLEAN) == true) {
+                        $q_get_users->where('LOWER(last_name) = LOWER(:last_name)');
+                        $statement_array[':first_name'] = $value;
+                    } else {
+                        $q_get_users->where('LOWER(last_name) LIKE LOWER(:last_name)');
+                        $statement_array[':last_name'] = $value . '%';
+                    }
+                    break;
+                }
+                case 'name': {
+                    $value = mb_strtolower(trim($value));
+                    if (empty($value)) break;
+                    if (isset($filters['strict']) && filter_var($filters['strict'], FILTER_VALIDATE_BOOLEAN) == true) {
+                        $q_get_users->where('LOWER(CONCAT(last_name, \' \', first_name)) = LOWER(:name) 
+                                OR 
+                                    LOWER(CONCAT(first_name, \' \', last_name)) = LOWER(:name) ');
+                        $statement_array[':name'] = $value;
+                    } else {
+                        $q_get_users->where('LOWER(CONCAT(last_name,\' \', first_name)) LIKE LOWER(:name)
+                            OR 
+                            LOWER(CONCAT(first_name,\' \', last_name)) LIKE LOWER(:name)');
+                        $statement_array[':name'] = $value . '%';
+                    }
+                    break;
+                }
             }
         }
 

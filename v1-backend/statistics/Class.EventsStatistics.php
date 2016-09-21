@@ -17,6 +17,10 @@ class EventsStatistics extends AbstractAggregator
       FROM view_stat_notifications 
       WHERE view_stat_notifications.notification_time BETWEEN :since AND :till';
 
+    const SQL_GET_NOTIFICATIONS_SENT_AGGREGATED = 'SELECT notifications_count
+      FROM stat_notifications_aggregated 
+      WHERE 1 = 1 ';
+
     const SQL_GET_USERS_NOTIFICATIONS = 'SELECT COUNT(users_notifications.id) AS value
       FROM users_notifications
       WHERE users_notifications.created_at BETWEEN :since AND :till';

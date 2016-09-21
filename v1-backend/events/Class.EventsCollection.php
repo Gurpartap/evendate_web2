@@ -50,7 +50,7 @@ class EventsCollection extends AbstractCollection
         $statement_array = array();
         if (isset($fields[Event::IS_FAVORITE_FIELD_NAME])
             || isset($fields[Event::CAN_EDIT_FIELD_NAME])
-            || isset($fields[Event::IS_NEW_FIELD_NAME])) {
+            || isset($fields[Event::IS_SEEN_FIELD_NAME])) {
             $statement_array[':user_id'] = $user->getId();
         }
 
@@ -149,7 +149,7 @@ class EventsCollection extends AbstractCollection
                     break;
                 }
                 case 'statistics': {
-                    if ($value == 'true') {
+                    if (filter_var($value, FILTER_VALIDATE_BOOLEAN)) {
                         global $BACKEND_FULL_PATH;
                         require_once $BACKEND_FULL_PATH . '/users/Class.Roles.php';
                         require_once $BACKEND_FULL_PATH . '/statistics/Class.EventsStatistics.php';
@@ -180,13 +180,8 @@ class EventsCollection extends AbstractCollection
 
                         /*Notifications*/
 
-                        $_fields[] = '(' . EventsStatistics::SQL_GET_NOTIFICATIONS_SENT
-                                . ' AND event_id = view_events.id AND type != :users_notification) AS ' . Statistics::EVENT_AUTO_NOTIFICATIONS_SENT;
-                        $_fields[] = '(' . EventsStatistics::SQL_GET_NOTIFICATIONS_SENT
-                                . ' AND event_id = view_events.id AND type = :users_notification) ' . Statistics::EVENT_USERS_NOTIFICATIONS_SENT;
-                        $statement_array[':users_notification'] = Notification::NOTIFICATION_TYPE_USERS;
-                        $_fields[] = '(' . EventsStatistics::SQL_GET_USERS_NOTIFICATIONS
-                                . ' AND event_id = view_events.id) AS ' . Statistics::EVENT_USERS_NOTIFICATIONS;
+                        $_fields[] = '(' . EventsStatistics::SQL_GET_NOTIFICATIONS_SENT_AGGREGATED
+                                . ' AND event_id = view_events.id) AS ' . Statistics::EVENT_NOTIFICATIONS_SENT;
 
                         $fields[] = Statistics::EVENT_VIEW;
                         $fields[] = Statistics::EVENT_FAVE;
@@ -195,8 +190,6 @@ class EventsCollection extends AbstractCollection
                         $fields[] = Statistics::EVENT_UNFAVE;
 
                         $fields[] = Statistics::EVENT_NOTIFICATIONS_SENT;
-                        $fields[] = Statistics::EVENT_AUTO_NOTIFICATIONS_SENT;
-                        $fields[] = Statistics::EVENT_USERS_NOTIFICATIONS_SENT;
 
                         $q_get_events->where('organization_id IN (SELECT organization_id FROM users_organizations ua WHERE ua.user_id = :user_id AND ua.role_id = :role_id)');
                         $q_get_events->where('organization_id IN (SELECT organization_id FROM users_organizations ua WHERE ua.user_id = :user_id AND ua.role_id = :role_id)');
@@ -276,9 +269,9 @@ class EventsCollection extends AbstractCollection
                     break;
                 }
                 case 'title': {
-                    $value = strtolower(trim($value));
+                    $value = mb_strtolower(trim($value));
                     if (empty($value)) break;
-                    if (isset($filters['strict']) && $filters['strict'] == 'true') {
+                    if (isset($filters['strict']) && filter_var($filters['strict'], FILTER_VALIDATE_BOOLEAN)) {
                         $q_get_events->where('LOWER(title) = LOWER(:title)');
                         $statement_array[':title'] = $value;
                     } else {
@@ -288,7 +281,7 @@ class EventsCollection extends AbstractCollection
                     break;
                 }
                 case 'description': {
-                    $value = strtolower(trim($value));
+                    $value = mb_strtolower(trim($value));
                     if (isset($filters['strict']) && $filters['strict'] == 'true') {
                         $q_get_events->where('LOWER(description) = LOWER(:description)');
                         $statement_array[':description'] = $value;
