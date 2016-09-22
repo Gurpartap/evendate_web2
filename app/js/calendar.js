@@ -2754,7 +2754,7 @@ function Statistics($view) {
 					'default_address',
 					'staff',
 					'privileges',
-					'events{length:3,future:true,is_canceled:true,is_delayed:true,fields:"public_at",order_by:"nearest_event_date"}'
+					'events{length:3,future:true,is_canceled:true,is_delayed:true,fields:"organization_short_name,public_at",order_by:"nearest_event_date"}'
 				],
 				stat_fields = [
 					'subscribe',
@@ -3044,6 +3044,7 @@ function Statistics($view) {
 					var event_block = {
 						id: event.id,
 						title: event.title,
+						organization_short_name: event.organization_short_name,
 						day: moment.unix(event.first_event_date).format("D"),
 						month: moment.unix(event.first_event_date).format("MMM"),
 						badges: []
@@ -3139,7 +3140,7 @@ function Statistics($view) {
 				});
 			}
 			
-			function updateScoreboards($wrapper, numbers, dynamics) {
+			function updateScoreboards($wrapper, numbers) {
 				var order = ['fave', 'view'],
 					fields = {
 						'fave': 'Добавлений в избранное',
@@ -3153,6 +3154,40 @@ function Statistics($view) {
 					if(!$scoreboard.length){
 						$scoreboard = tmpl('eventstat-scoreboard', {
 							type: 'Scoreboard'+field.capitalize(),
+							title: fields[field],
+							number: 0 + measure
+						}, $wrapper)
+					}
+					
+					if(numbers[field]){
+						$scoreboard.find('.ScoreboardNumber').animateNumber({
+							number: Math.round(numbers[field]),
+							suffix: measure
+						}, 2000, 'easeOutSine');
+					}
+					
+				});
+			}
+			
+			function updateBigScoreboards($wrapper, numbers) {
+				var order = ['view', 'opens', 'open_conversion', 'fave', 'fave_conversion', 'spent_time'],
+					fields = {
+						'view': 'Просмотров',
+						'opens': 'Открытий',
+						'open_conversion': 'Конверсия открытий',
+						'fave': 'Добавлений',
+						'fave_conversion': 'Конверсия добавлений',
+						'spent_time': 'Время пребывания'
+					};
+				
+				order.forEach(function(field){
+					var measure = field == 'conversion' ? '%' : '',
+						$scoreboard = $wrapper.find('.Scoreboard'+field.capitalize());
+					
+					if(!$scoreboard.length){
+						$scoreboard = tmpl('eventstat-scoreboard', {
+							type: 'Scoreboard'+field.capitalize(),
+							size: '-size_big',
 							title: fields[field],
 							number: 0 + measure
 						}, $wrapper)
@@ -3182,6 +3217,10 @@ function Statistics($view) {
 					fave: event_data.favored_users_count
 				});
 				
+				updateBigScoreboards($wrapper.find('.EventstatsBigScoreboards'), {});
+				
+				Modal.bindCallModal($wrapper);
+				bindControllers($wrapper);
 				
 			});
 			

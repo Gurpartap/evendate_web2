@@ -9,6 +9,9 @@
 	--color_franklin: #28be84;
 	--color_franklin_alt: #23d792;
 
+	--color_accent: var(--color_bubblegum);;
+	--color_accent_alt: var(--color_bubblegum_alt);;
+
 	--color_error: #ff6b00;
 
 	--color_text: #4a4a4a;
@@ -40,6 +43,10 @@ body {
 	word-wrap: break-word;
 	background-color: #f6f6f6;
 	background-color: var(--color_background);
+}
+.-state_statistics {
+	--color_accent: var(--color_franklin);
+	--color_accent_alt: var(--color_franklin_alt);
 }
 /*
 font-weight: 300            Roboto-Light
@@ -146,13 +153,10 @@ hr[title]:before {
 [data-page] {cursor: pointer}
 [data-page]:not(.button):hover {
 	color: #f82969;
-	color: var(--color_bubblegum);
+	color: var(--color_accent);
 }
 
-.-state_statistics [data-page]:not(.button):hover {
-	color: #28be84;
-	color: var(--color_franklin);
-}
+.-state_statistics [data-page]:not(.button):hover {color: #28be84}
 
 /* Collapsing wrapper */
 
@@ -265,28 +269,28 @@ small.-color_bubblegum,
 label.-color_bubblegum,
 :not(.-state_statistics) p.-color_accent,
 :not(.-state_statistics) small.-color_accent,
-:not(.-state_statistics) label.-color_accent {color: #f82969; color: var(--color_bubblegum);}
+:not(.-state_statistics) label.-color_accent {color: #f82969; color: var(--color_accent);}
 
 p.-color_bubblegum_alt,
 small.-color_bubblegum_alt,
 label.-color_bubblegum_alt,
 :not(.-state_statistics) p.-color_accent_alt,
 :not(.-state_statistics) small.-color_accent_alt,
-:not(.-state_statistics) label.-color_accent_alt {color: #ff5f9e; color: var(--color_bubblegum_alt);}
+:not(.-state_statistics) label.-color_accent_alt {color: #ff5f9e; color: var(--color_accent_alt);}
 
 p.-color_franklin,
 small.-color_franklin,
 label.-color_franklin,
 .-state_statistics p.-color_accent,
 .-state_statistics small.-color_accent,
-.-state_statistics label.-color_accent {color: #28be84; color: var(--color_franklin);}
+.-state_statistics label.-color_accent {color: #28be84}
 
 p.-color_franklin_alt,
 small.-color_franklin_alt,
 label.-color_franklin_alt,
 .-state_statistics p.-color_accent_alt,
 .-state_statistics small.-color_accent_alt,
-.-state_statistics label.-color_accent_alt {color: #23d792; color: var(--color_franklin_alt);}
+.-state_statistics label.-color_accent_alt {color: #23d792}
 
 p.-color_marginal,
 small.-color_marginal,
@@ -625,16 +629,16 @@ input, select, textarea, button {font-family: inherit}
 
 
 .form_unit > .form_radio:checked + .form_label:after,
-.form_unit > .form_checkbox:checked + .form_label:before {background-color: #f82969; background-color: var(--color_bubblegum);}
+.form_unit > .form_checkbox:checked + .form_label:before {background-color: #f82969; background-color: var(--color_accent);}
 .form_unit > .form_radio:checked + .form_label:before,
 .form_unit:not(.-status_disabled) > .form_radio:not(:disabled) + .form_label:hover:before,
-.form_unit:not(.-status_disabled) > .form_checkbox:not(:disabled) + .form_label:hover:before {border-color: #f82969; border-color: var(--color_bubblegum);}
+.form_unit:not(.-status_disabled) > .form_checkbox:not(:disabled) + .form_label:hover:before {border-color: #f82969; border-color: var(--color_accent);}
 
 .-state_statistics .form_unit > .form_radio:checked + .form_label:after,
-.-state_statistics .form_unit > .form_checkbox:checked + .form_label:before {background-color: #28be84; background-color: var(--color_franklin);}
+.-state_statistics .form_unit > .form_checkbox:checked + .form_label:before {background-color: #28be84}
 .-state_statistics .form_unit > .form_radio:checked + .form_label:before,
 .-state_statistics .form_unit:not(.-status_disabled) > .form_radio:not(:disabled) + .form_label:hover:before,
-.-state_statistics .form_unit:not(.-status_disabled) > .form_checkbox:not(:disabled) + .form_label:hover:before {border-color: #28be84; border-color: var(--color_franklin);}
+.-state_statistics .form_unit:not(.-status_disabled) > .form_checkbox:not(:disabled) + .form_label:hover:before {border-color: #28be84}
 
 /* /Form Radio & Checkbox */
 /* Form -inline */
@@ -1063,11 +1067,11 @@ a.button:hover {text-decoration: none}
 
 .button.-color_accent_alt,
 .button.-color_neutral_accent,
-.button.-color_marginal_accent {color: #f82969; color: var(--color_bubblegum);}
+.button.-color_marginal_accent {color: #f82969; color: var(--color_accent);}
 
 .-state_statistics .button.-color_accent_alt,
 .-state_statistics .button.-color_neutral_accent,
-.-state_statistics .button.-color_marginal_accent {color: #28be84; color: var(--color_franklin);}
+.-state_statistics .button.-color_marginal_accent {color: #28be84}
 
 
 
@@ -1075,8 +1079,8 @@ a.button:hover {text-decoration: none}
 .button.-color_neutral_alt {background-color: transparent}
 
 .button.-color_primary {background-color: #3e4d66; background-color: var(--color_primary);}
-.button.-color_accent {background-color: #f82969; background-color: var(--color_bubblegum);}
-.-state_statistics .button.-color_accent {background-color: #28be84; background-color: var(--color_franklin);}
+.button.-color_accent {background-color: #f82969; background-color: var(--color_accent);}
+.-state_statistics .button.-color_accent {background-color: #28be84}
 
 .button.-color_primary_alt {background-color: rgba(83,121,184,0.24)}
 .button.-color_accent_alt {background-color: #ffdeeb}
@@ -1162,7 +1166,7 @@ a.button:hover {text-decoration: none}
 .button.-color_marginal_accent > .ripple {background-color: #ff5f9e; background-color: var(--color_accent_alt)}
 
 .-state_statistics .button.-color_neutral_accent > .ripple,
-.-state_statistics .button.-color_marginal_accent > .ripple {background-color: #23d792; background-color: var(--color_franklin_alt)}
+.-state_statistics .button.-color_marginal_accent > .ripple {background-color: #23d792}
 
 /*/Button*/
 /*Friend*/
@@ -1341,8 +1345,8 @@ a.button:hover {text-decoration: none}
 	opacity: .9;
 }
 .action.-color_primary {color: #3e4d66; color: var(--color_primary);}
-.action.-color_accent {color: #f82969; color: var(--color_bubblegum);}
-.-state_statistics .action.-color_accent {color: #28be84; color: var(--color_franklin);}
+.action.-color_accent {color: #f82969; color: var(--color_accent);}
+.-state_statistics .action.-color_accent {color: #28be84}
 .action.-color_error {color: #ff5f9e; color: var(--color_bubblegum_alt);}
 .action.-color_neutral {color: #9fa6b3; color: var(--color_primary_50);}
 
@@ -1403,8 +1407,8 @@ a.button:hover {text-decoration: none}
 .dropdown_button:hover {opacity: 1}
 
 .dropdown_button.-color_primary {color: #3e4d66; color: var(--color_primary);}
-.dropdown_button.-color_accent {color: #f82969; color: var(--color_bubblegum);}
-.-state_statistics .dropdown_button.-color_accent {color: #28be84; color: var(--color_franklin);}
+.dropdown_button.-color_accent {color: #f82969; color: var(--color_accent);}
+.-state_statistics .dropdown_button.-color_accent {color: #28be84}
 .dropdown_button.-color_error {color: #ff5f9e; color: var(--color_bubblegum_alt);}
 .dropdown_button.-color_neutral {color: #657184; color: var(--color_primary_80);}
 
@@ -1460,17 +1464,15 @@ a.button:hover {text-decoration: none}
 .-color_accent .tab.-active,
 .tab.-color_accent.-active {
 	color: #f82969;
-	color: var(--color_bubblegum);
+	color: var(--color_accent);
 	border-color: #f82969;
-	border-color: var(--color_bubblegum);
+	border-color: var(--color_accent);
 }
 
 .-state_statistics .-color_accent .tab.-active,
 .-state_statistics .tab.-color_accent.-active {
 	color: #28be84;
-	color: var(--color_franklin);
 	border-color: #28be84;
-	border-color: var(--color_franklin);
 }
 
 .-color_default .tab.-active,
@@ -1544,17 +1546,14 @@ a.button:hover {text-decoration: none}
 	height: 100%;
 	border-radius: 50%;
 	background-color: #f82969;
-	background-color: var(--color_bubblegum);
+	background-color: var(--color_accent);
 	opacity: 0.6;
 
 	-webkit-animation: loader-bounce 2.4s infinite ease-in-out;
 	animation: loader-bounce 2.4s infinite ease-in-out;
 }
 
-.-state_statistics .loader_dot {
-	background-color: #28be84;
-	background-color: var(--color_franklin);
-}
+.-state_statistics .loader_dot {background-color: #28be84}
 
 .loader_dot:last-child {
 	-webkit-animation-delay: -1.4s;
@@ -1746,14 +1745,11 @@ body.-open_modal > .modal_wrapper {
 	padding: 0 7px;
 	font-weight: 500;
 	color: #f82969;
-	color: var(--color_bubblegum);
+	color: var(--color_accent);
 	text-align: center;
 }
 
-.-state_statistics .calendar_header {
-	color: #28be84;
-	color: var(--color_franklin);
-}
+.-state_statistics .calendar_header {color: #28be84}
 
 .calendar_prev_btn,
 .calendar_next_btn {
@@ -1994,10 +1990,10 @@ body.-open_modal > .modal_wrapper {
 
 .avatar_block.-color_primary {color: #3e4d66; color: var(--color_primary);}
 .avatar_block.-color_marginal {color: #9fa6b3; color: var(--color_primary_50);}
-.avatar_block.-color_accent {color: #f82969; color: var(--color_bubblegum);}
-.avatar_block.-color_accent_alt {color: #ff5f9e; color: var(--color_bubblegum_alt);}
-.-state_statistics .avatar_block.-color_accent {color: #28be84; color: var(--color_franklin);}
-.-state_statistics .avatar_block.-color_accent_alt {color: #23d792; color: var(--color_franklin_alt);}
+.avatar_block.-color_accent {color: #f82969; color: var(--color_accent);}
+.avatar_block.-color_accent_alt {color: #ff5f9e; color: var(--color_accent_alt);}
+.-state_statistics .avatar_block.-color_accent {color: #28be84}
+.-state_statistics .avatar_block.-color_accent_alt {color: #23d792}
 
 
 /* /Avatar Block */
@@ -2015,14 +2011,11 @@ body.-open_modal > .modal_wrapper {
 
 .subscriber.-active {
 	background-color: #f82969;
-	background-color: var(--color_bubblegum);
+	background-color: var(--color_accent);
 	color: #fff;
 }
 
-.-state_statistics .subscriber.-active {
-	background-color: #28be84;
-	background-color: var(--color_franklin);
-}
+.-state_statistics .subscriber.-active {background-color: #28be84}
 
 /* /Subscriber */
 /* Share Block */
@@ -2108,10 +2101,10 @@ body.-open_modal > .modal_wrapper {
 .counter:not(:only-child) {margin: 0 .5em}
 
 .counter.-color_primary {background-color: #3e4d66; background-color: var(--color_primary);}
-.counter.-color_accent {background-color: #f82969; background-color: var(--color_bubblegum);}
-.counter.-color_accent_alt {background-color: #ff5f9e; background-color: var(--color_bubblegum_alt);}
-.-state_statistics .counter.-color_accent {background-color: #28be84; background-color: var(--color_franklin);}
-.-state_statistics .counter.-color_accent_alt {background-color: #23d792; background-color: var(--color_franklin_alt);}
+.counter.-color_accent {background-color: #f82969; background-color: var(--color_accent);}
+.counter.-color_accent_alt {background-color: #ff5f9e; background-color: var(--color_accent_alt);}
+.-state_statistics .counter.-color_accent {background-color: #28be84}
+.-state_statistics .counter.-color_accent_alt {background-color: #23d792}
 
 .counter.-color_neutral,
 .counter.-color_neutral_primary,
@@ -2129,9 +2122,9 @@ body.-open_modal > .modal_wrapper {
 .counter.-color_neutral_primary,
 .counter.-color_marginal_primary {color: #3e4d66; color: var(--color_primary);}
 .counter.-color_neutral_accent,
-.counter.-color_marginal_accent {color: #f82969; color: var(--color_bubblegum);}
+.counter.-color_marginal_accent {color: #f82969; color: var(--color_accent);}
 .-state_statistics .counter.-color_neutral_accent,
-.-state_statistics .counter.-color_marginal_accent {color: #28be84; color: var(--color_franklin);}
+.-state_statistics .counter.-color_marginal_accent {color: #28be84}
 
 .counter.-castable {
 	opacity: 1;
@@ -2179,15 +2172,13 @@ body.-open_modal > .modal_wrapper {
 
 .stamp.-color_primary,
 .stamp.-color_accent,
-.stamp.-color_accent_alt,
-.-state_statistics .stamp.-color_accent,
-.-state_statistics .stamp.-color_accent_alt {color: #fff}
+.stamp.-color_accent_alt {color: #fff}
 
 .stamp.-color_primary {background-color: #3e4d66; background-color: var(--color_primary);}
-.stamp.-color_accent {background-color: #f82969; background-color: var(--color_bubblegum);}
-.stamp.-color_accent_alt {background-color: #ff5f9e; background-color: var(--color_bubblegum_alt);}
-.-state_statistics .stamp.-color_accent {background-color: #28be84; background-color: var(--color_franklin);}
-.-state_statistics .stamp.-color_accent_alt {background-color: #23d792; background-color: var(--color_franklin_alt);}
+.stamp.-color_accent {background-color: #f82969; background-color: var(--color_accent);}
+.stamp.-color_accent_alt {background-color: #ff5f9e; background-color: var(--color_accent_alt);}
+.-state_statistics .stamp.-color_accent {background-color: #28be84}
+.-state_statistics .stamp.-color_accent_alt {background-color: #23d792}
 
 
 .stamp.-color_marginal,
@@ -2195,9 +2186,9 @@ body.-open_modal > .modal_wrapper {
 .stamp.-color_neutral_primary,
 .stamp.-color_marginal_primary {color: #3e4d66; color: var(--color_primary);}
 .stamp.-color_neutral_accent,
-.stamp.-color_marginal_accent {color: #f82969; color: var(--color_bubblegum);}
+.stamp.-color_marginal_accent {color: #f82969; color: var(--color_accent);}
 .-state_statistics .stamp.-color_neutral_accent,
-.-state_statistics .stamp.-color_marginal_accent {color: #28be84; color: var(--color_franklin);}
+.-state_statistics .stamp.-color_marginal_accent {color: #28be84}
 
 .stamp.-color_neutral,
 .stamp.-color_neutral_primary,
@@ -2542,15 +2533,12 @@ body.-open_modal > .modal_wrapper {
 .sidebar_navigation_item.-active,
 .sidebar_navigation_item.-active > .sidebar_navigation_counter {
 	color: #f82969;
-	color: var(--color_bubblegum);
+	color: var(--color_accent);
 }
 
 .-state_statistics .sidebar_navigation_item:hover,
 .-state_statistics .sidebar_navigation_item.-active,
-.-state_statistics .sidebar_navigation_item.-active > .sidebar_navigation_counter {
-	color: #28be84;
-	color: var(--color_franklin);
-}
+.-state_statistics .sidebar_navigation_item.-active > .sidebar_navigation_counter {color: #28be84}
 
 .sidebar_navigation_item.-active {background-color: #f6f6f6; background-color: var(--color_background);}
 .sidebar_navigation_item.-active > .sidebar_navigation_counter {background-color: transparent}
@@ -3504,19 +3492,16 @@ body.-open_modal > .modal_wrapper {
 	line-height: 24px;
 }
 
-.feed_calendar_td.today > span {color: #f82969; color: var(--color_bubblegum)}
-.-state_statistics .feed_calendar_td.today > span {color: #28be84; color: var(--color_franklin)}
+.feed_calendar_td.today > span {color: #f82969; color: var(--color_accent)}
+.-state_statistics .feed_calendar_td.today > span {color: #28be84}
 .feed_calendar_td.-active {background-color: transparent}
 .feed_calendar_td.-active > span {
 	color: #fff;
 	border-radius: 50%;
 	background-color: #f82969;
-	background-color: var(--color_bubblegum);
+	background-color: var(--color_accent);
 }
-.-state_statistics .feed_calendar_td.-active > span {
-	background-color: #28be84;
-	background-color: var(--color_franklin);
-}
+.-state_statistics .feed_calendar_td.-active > span {background-color: #28be84}
 
 .feed_calendar_td:not(.-disabled) {cursor: pointer}
 .feed_calendar_td.not_this_month,
@@ -3707,7 +3692,7 @@ body.-open_modal > .modal_wrapper {
 .scoreboard_number {
 	display: block;
 	margin-bottom: 6px;
-	font-size: 37px;
+	font-size: 2.3em;
 	font-weight: 700;
 }
 
@@ -3727,7 +3712,7 @@ body.-open_modal > .modal_wrapper {
 }
 
 .scoreboard_title {
-	font-size: 14px;
+	font-size: .88em;
 	font-weight: 500;
 	color: #9fa6b3;
 	color: var(--color_primary_50);
@@ -3748,18 +3733,25 @@ body.-open_modal > .modal_wrapper {
 
 .eventstat_overview_header {
 	display: flex;
+	min-height: 157px;
+	border-bottom: 1px solid #d6d6d6;
 }
 
 .eventstat_overview_header_block.img_holder {
 	flex: 0 0 280px;
+	cursor: pointer;
 }
 
 .eventstat_overview_info {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
 	padding: 12px;
 }
 
 .eventstat_overview_event_title {
-	font-size: 18px;
+	font-size: 1.12em;
 	font-weight: 500;
 	color: #3e4d66;
 	color: var(--color_primary);
@@ -3770,11 +3762,61 @@ body.-open_modal > .modal_wrapper {
 }
 
 .eventstat_overview_date,
-.eventstat_overview_time {flex: 1 50%}
+.eventstat_overview_time {padding: 6px 0}
 .eventstat_overview_date {padding-right: 12px}
 .eventstat_overview_time {padding-left: 12px}
 .eventstat_overview_time {border-left: 1px solid #d6d6d6}
 
+.eventstat_overview_scoreboards_wrapper {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	padding: 12px 8px 24px;
+	border-left: 1px solid #d6d6d6;
+}
+.eventstat_overview_scoreboards_wrapper,
+.eventstat_overview_big_scoreboards {
+	flex: 0 0 340px;
+	text-align: center;
+}
+
 .eventstat_overview_scoreboards {
 	display: flex;
+	justify-content: space-between;
+}
+
+.eventstat_overview_scoreboard {
+	padding: 0 12px;
+}
+
+.eventstat_overview_content {
+	display: flex;
+}
+
+.eventstat_overview_charts {
+	flex: 1;
+}
+
+.eventstat_overview_chart,
+.eventstat_overview_scoreboard.-size_big {
+	height: 460px;
+	margin-bottom: 60px;
+}
+
+.eventstat_overview_scoreboard.-size_big {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.eventstat_overview_scoreboard.-size_big > .scoreboard_number {
+	font-size: 4.2em;
+	font-weight: bold;
+	color: #3e4d66;
+	color: var(--color_primary);
+}
+
+.eventstat_overview_scoreboard.-size_big > .scoreboard_title {
+	font-size: 1.25em;
+	font-weight: 500;
 }

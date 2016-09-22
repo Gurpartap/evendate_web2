@@ -910,7 +910,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-orgstat-event-block">
-	<div class="orgstat_event_block Controller" data-page="/event_statistics/{id}" data-event-id="{id}" data-title="{title}">
+	<div class="orgstat_event_block Controller" data-page="/event_statistics/{id}" data-event-id="{id}" data-title="Орагнизации > {organization_short_name} > {title}">
 		<aside class="orgstat_event_block_date">
 			<span>{day}</span><br>
 			<span>{month}</span>
@@ -950,7 +950,7 @@
 	<div class="page eventstat_overview">
 		<header class="eventstat_overview_header">
 			<div class="eventstat_overview_header_block img_holder">
-				<img src="{image_horizontal_medium_url}">
+				<img src="{image_horizontal_medium_url}" class="CallModal" data-modal_type="media" data-modal_media_type="image" data-modal_media_url="{image_horizontal_url}">
 			</div>
 			<div class="eventstat_overview_header_block eventstat_overview_info">
 				<span class="eventstat_overview_event_title">{title}</span>
@@ -961,11 +961,19 @@
 					<button class="button -size_low -color_neutral RippleEffect Controller" type="button" data-page="event/{id}" data-title="{title}">Перейти на страницу</button>
 				</div>
 			</div>
-			<div class="eventstat_overview_header_block">
+			<div class="eventstat_overview_header_block eventstat_overview_scoreboards_wrapper">
 				<div class="eventstat_overview_scoreboards EventstatsScoreboards">{scoreboards}</div>
-				<span class="action -color_accent fa_icon fa-plus-circle">Добавить к сравнению</span>
+				<span class="action -color_accent fa_icon fa-plus-circle -hidden">Добавить к сравнению</span>
 			</div>
 		</header>
+		<div class="eventstat_overview_content">
+			<div class="eventstat_overview_charts">
+				<div class="eventstat_overview_chart SubscribersAreaChart"></div>
+				<div class="eventstat_overview_chart ViewsAreaChart"></div>
+				<div class="eventstat_overview_chart ConversionsAreaChart"></div>
+			</div>
+			<div class="eventstat_overview_big_scoreboards EventstatsBigScoreboards">{big_scoreboards}</div>
+		</div>
 	</div>
 </script>
 
@@ -981,7 +989,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-eventstat-scoreboard">
-	<div class="eventstat_overview_scoreboard {type}">
+	<div class="eventstat_overview_scoreboard {size} {type}">
 		<span class="scoreboard_number ScoreboardNumber">{number}</span>
 		<span class="scoreboard_title">{title}</span>
 	</div>
