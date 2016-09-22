@@ -564,7 +564,8 @@ function OneEvent($view){
 				data = data[0];
 				var $subscribers = buildAvatars(data.favored, 6),
 					avatars_collection_classes = [],
-					favored_users_count = ($subscribers.length <= 6) ? 0 : data.favored_users_count - 6;
+					favored_users_count = ($subscribers.length <= 6) ? 0 : data.favored_users_count - 6,
+					formatted_dates = formatDates(data.dates, data.is_same_time ? '{D} {MMMMs} {YYYY}' : {date: '{D} {MMMMs}', time: '{T}'}, data.is_same_time);
 
 				if(data.is_favorite){
 					avatars_collection_classes.push('-subscribed');
@@ -588,30 +589,20 @@ function OneEvent($view){
 				data.canceled = data.canceled ? '' : '-hidden';
 
 				data.event_additional_fields = $();
+								
 				if(data.is_same_time){
 					data.event_additional_fields = data.event_additional_fields.add(tmpl('event-additional-info', {
 						key: 'Дата',
-						value: $(formatDates(data.dates, '{D} {MMMMs} {YYYY}', data.is_same_time)
-							.map(function(elem){
-								return $('<span>').addClass('event_date').text(elem);
-							})).map(function(){
-								return this.toArray();
-							})
+						value: $.makeSet(formatted_dates.map(function(date) { return $('<span>').addClass('event_date').text(date)	}))
 					}));
 					data.event_additional_fields = data.event_additional_fields.add(tmpl('event-additional-info', {
 						key: 'Время',
-						value: (data.dates[0].start_time == '00:00:00' && data.dates[0].end_time == '00:00:00') ? 'Весь день' : data.dates[0].start_time.split(':').slice(0,2).join(':') + ' - ' + data.dates[0].end_time.split(':').slice(0,2).join(':')
+						value: displayTimeRange(data.dates[0].start_time, data.dates[0].end_time)
 					}));
 				} else {
-					var date_times = $();
-					data.dates.forEach(function(date){
-						date_times = date_times.add(tmpl('event-date-time-row', {
-							date: moment.unix(date.event_date).format('D MMMM'),
-							start_time: date.start_time.split(':').slice(0,2).join(':'),
-							end_time: date.end_time.split(':').slice(0,2).join(':')
-						}));
-					});
-					data.event_additional_fields = data.event_additional_fields.add(tmpl('event-date-time', {date_times: date_times}));
+					data.event_additional_fields = data.event_additional_fields.add(tmpl('event-date-time', {
+						date_times: tmpl('event-date-time-row', formatted_dates)
+					}));
 				}
 				data.event_additional_fields = data.event_additional_fields = data.event_additional_fields.add(tmpl('event-additional-info', {
 					key: 'Место',
@@ -2404,20 +2395,23 @@ function Statistics($view) {
 			organization_statistics: StatisticsOrganization,
 			event_statistics: StatisticsEvent
 		},
-		$wrapper = $view.find('.page_wrapper');
+		$wrapper = $view.find('.page_wrapper'),
+		roles = [
+			{name: 'admin', title: 'Администратор'},
+			{name: 'moderator', title: 'Модератор'}
+		];
 	
 	function StatisticsOverview($wrapper) {
 		
-		function getMyOrganizations(privilege, fields, success){
+		function getMyOrganizations(role, fields, success){
 			$.ajax({
 				url: '/api/v1/organizations/',
 				data: {
-					privileges: privilege,
+					roles: role,
 					fields: fields ? Array.isArray(fields) ? fields.join(',') : fields : [
 						'img_medium_url',
 						'subscribed_count',
-						'staff',
-						'privileges'/*,
+						'staff'/*,
 						 'events{length:500,future:true,is_delayed:true}'*/
 					].join(',')
 				},
@@ -2429,9 +2423,10 @@ function Statistics($view) {
 							avatar_classes: ['-size_100x100','-rounded']
 						};
 						data.forEach(function(org) {
-							var admins = getSpecificStaff('admin', org.staff, staffs_additional_fields),
-								moderators = getSpecificStaff('moderator', org.staff, staffs_additional_fields),
-								avatars_max_count = 2,
+							var avatars_max_count = 2,
+								org_roles = roles.map(function(role) {
+									return $.extend({}, role, {staff: getSpecificStaff(role.name, org.staff, staffs_additional_fields), plural_name: role.name+'s'})
+								}),
 								staffs_fields = {
 									classes: ['-size_30x30', '-rounded', 'CallModal'],
 									dataset: {
@@ -2440,14 +2435,17 @@ function Statistics($view) {
 									}
 								};
 							
-							org.administrators = buildAvatarCollection(admins, avatars_max_count, $.extend(true, {}, staffs_fields, {dataset: {modal_title: 'Администраторы'}}));
-							org.moderators = buildAvatarCollection(moderators, avatars_max_count, $.extend(true, {}, staffs_fields, {dataset: {modal_title: 'Модераторы'}}));
-							
-							org.administrators_plus_count = admins.length - avatars_max_count;
-							org.administrators_plus_count_hidden = org.administrators_plus_count <= 0 ? '-cast' : '';
-							
-							org.moderators_plus_count = moderators.length - avatars_max_count;
-							org.moderators_plus_count_hidden = org.moderators_plus_count <= 0 ? '-cast' : '';
+							org_roles.forEach(function(role) {
+								org[role.plural_name] = buildAvatarCollection(role.staff, avatars_max_count, $.extend(true, {}, staffs_fields, {
+									dataset: {
+										modal_specific_role: role.name,
+										modal_title: role.title
+									}
+								}));
+								
+								org[role.plural_name+'_plus_count'] = role.staff.length - avatars_max_count;
+								org[role.plural_name+'_plus_count_hidden'] = org[role.plural_name+'_plus_count'] <= 0 ? '-cast' : '';
+							});
 							
 							/*
 							org.future_events = org.future_events_count + getUnitsText(org.future_events_count, {
@@ -2459,7 +2457,7 @@ function Statistics($view) {
 							org.subscribers = org.subscribed_count + getUnitsText(org.subscribed_count, __C.TEXTS.SUBSCRIBERS);
 							
 							org.buttons = $();
-							if(privilege == 'can_add'){
+							if(role == 'admin'){
 								org.buttons = org.buttons.add(buildButton({
 									title: 'Редактировать',
 									classes: ['fa_icon', 'fa-pencil', '-color_neutral', 'RippleEffect'],
@@ -2491,29 +2489,18 @@ function Statistics($view) {
 		
 		$wrapper.html(tmpl('statistics-overview-activity', {}));
 		
-		getMyOrganizations('can_add', false, function(data) {
-			if(data.length){
+		getMyOrganizations('admin', false, function(organizations) {
+			if(organizations.length){
 				var $organizations = tmpl('statistics-overview-organizations', {
-					heading: 'Администратор',
-					organizations: tmpl('statistics-overview-organization', data)
+					heading: '',
+					organizations: tmpl('statistics-overview-organization', organizations)
 				}, $wrapper);
 				trimAvatarsCollection($organizations);
 				bindControllers($organizations);
 				Modal.bindCallModal($organizations);
 				bindRippleEffect($organizations);
 			}
-			
-			/*
-			getMyOrganizations({privileges: 'can_add'}, false, function(data) {
-				if(data.length){
-					$wrapper.append(tmpl('statistics-overview', {
-						heading: 'Модаератор',
-						organizations: tmpl('statistics-overview-organization', data)
-					}));
-				}
-			});*/
 		})
-		
 		
 	}
 	
@@ -3113,15 +3100,15 @@ function Statistics($view) {
 			
 			$wrapper.empty();
 			getEventData(event_id, event_fields, function(event_data) {
-				if(event_data.is_same_time){
-					event_data.dates_block = tmpl('eventstat-overview-datetime', formatDates(event_data.dates, {date: '{D} {MMMMs}', time: '{T}'}, event_data.is_same_time))
-				} else {
-					event_data.dates_block = {};
-				}
+				
+				event_data.dates_block = tmpl('eventstat-overview-datetime', {
+					date: displayDateRange(event_data.first_event_date, event_data.last_event_date),
+					time: event_data.is_same_time ? displayTimeRange(event_data.dates[0].start_time, event_data.dates[0].end_time) : 'Разное время'
+				});
 				
 				$wrapper.html(tmpl('eventstat-overview', event_data));
 				
-				updateScoreboards($wrapper, {
+				updateScoreboards($wrapper.find('.EventstatsScoreboards'), {
 					fave: event_data.favored_users_count
 				});
 				
@@ -3170,28 +3157,46 @@ function ajaxHandler(result, success, error){
 
 function ajaxErrorHandler(event, jqxhr, settings, thrownError){
 	var args = Array.prototype.slice.call(arguments),
+		debug = {},
+		fields;
+	if(args.length == 4){
 		fields = ['event', 'jqxhr', 'settings', 'thrownError'];
-	window.debug = {};
-	args.forEach(function(arg, i){
-		window.debug[fields[i]] = arg;
-	});
+		args.forEach(function(arg, i){
+			debug[fields[i]] = arg;
+		});
+	} else if(args.length == 1) {
+		debug = args[0];
+	} else {
+		args.forEach(function(arg, i){
+			debug[i] = arg;
+		});
+	}
 	console.groupCollapsed('AJAX error');
-	if(thrownError)
-		console.log('Thrown error:', thrownError);
-	if(event && event.type)
-		console.log('Error type:', event.type);
-	if(event && event.text)
-		console.log('Description:', event.text);
-	if(jqxhr && jqxhr.responseJSON && jqxhr.responseJSON.text){
-		console.log('Response:', jqxhr.responseJSON.text);
-		showNotifier({text: jqxhr.responseJSON.text, status: false});
+	if(debug.thrownError)
+		console.log('Thrown error:', debug.thrownError);
+	if(debug.event && debug.event.type)
+		console.log('Error type:', debug.event.type);
+	if(debug.event && debug.event.text)
+		console.log('Description:', debug.event.text);
+	if(debug.jqxhr && debug.jqxhr.responseJSON && debug.jqxhr.responseJSON.text){
+		console.log('Response:', debug.jqxhr.responseJSON.text);
+		showNotifier({text: debug.jqxhr.responseJSON.text, status: false});
 	}
-	if(settings){
-		console.log('URL:', settings.url);
-		console.log('Method:', settings.type);
+	if(debug.settings){
+		console.log('URL:', debug.settings.url);
+		console.log('Method:', debug.settings.type);
 	}
-	console.error('Error stacktrace:');
+	if(debug.stack){
+		console.log('Thrown error:', debug.name);
+		console.log('Description:', debug.message);
+		console.log('Error stacktrace:', debug.stack);
+	} else {
+		console.error('Error stacktrace:');
+	}
 	console.groupEnd();
+	
+	if(!window.debug)	window.debug = [];
+	window.debug.push(debug);
 }
 
 $(document)

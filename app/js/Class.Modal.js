@@ -512,15 +512,18 @@ function EditorsModal(organization_id, title, specific_role){
 	this.specific_role = specific_role ? specific_role : false;
 	this.id = organization_id;
 	this.disable_upload = false;
-	this.ajax_url = {
-		id: this.id,
-		length: 30,
-		offset_number: 0,
-		toString: function(){
-			return '/api/v1/organizations/'+this.id+'/staff/?order_by="first_name"&length='+this.length+'&offset='+this.offset_number+''
-		}
+	this.ajax_url = '/api/v1/organizations/'+this.id+'/staff/';
+	this.ajax_data = {
+		order_by: 'role,first_name',
+		length: this.length,
+		offset: this.offset_number
 	};
 	this.is_first = true;
+	
+	if(specific_role) {
+		this.ajax_data.roles = specific_role;
+	}
+	
 	
 	this.modal = tmpl('modal', {
 		modal_type: 'EditorsModal',
@@ -537,17 +540,17 @@ EditorsModal.prototype.uploadUsers = function(callback){
 	var self = this;
 	$.ajax({
 		url: this.ajax_url,
+		data: this.ajax_data,
 		method: 'GET',
 		success: function(res){
 			ajaxHandler(res, function(data){
-				/*getSpecificStaff(self.specific_role, data);*/
 				if(data.length){
 					var $wrapper = self.modal.find('.EditorsModalContent');
 					
 					self.content = self.appendUsers(data, $wrapper);
 					self.is_first = false;
-					self.ajax_url.offset_number = self.ajax_url.offset_number + self.ajax_url.length;
-					self.ajax_url.length = 10;
+					self.ajax_data.offset = self.ajax_data.offset + self.ajax_data.length;
+					self.ajax_data.length = 10;
 					if(callback)
 						callback();
 					self.adjustDestroyer();

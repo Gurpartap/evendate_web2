@@ -155,6 +155,16 @@ function objectToHtmlDataSet(){
 	return dataset.join(' ');
 }
 
+/**
+ *
+ * @param {Object[]} dates
+ * @param {timestamp} dates[].event_date
+ * @param {string} [dates[].start_time]
+ * @param {string} [dates[].end_time]
+ * @param {(string|Array|jQuery|Object)} format
+ * @param {bool} is_same_time
+ * @returns {Array}
+ */
 function formatDates(dates, format, is_same_time){
 	var cur_moment,
 		prev_moment,
@@ -241,9 +251,7 @@ function formatDates(dates, format, is_same_time){
 	
 	if(is_same_time){
 		if(is_with_time){
-			cur_time = dates[0].end_time ?
-				[moment(dates[0].start_time, 'HH:mm:ss').format('HH:mm'), moment(dates[0].end_time, 'HH:mm:ss').format('HH:mm')].join('-') :
-				moment(dates[0].end_time, 'HH:mm:ss').format('HH:mm');
+			cur_time = dates[0].end_time ? displayTimeRange(dates[0].start_time, dates[0].end_time) : displayTimeRange(dates[0].start_time);
 		}
 		
 		dates.forEach(function(date, i) {
@@ -283,9 +291,7 @@ function formatDates(dates, format, is_same_time){
 			cur_moment = moment.unix(date.event_date);
 			cur_year = cur_moment.year();
 			cur_month = cur_moment.month();
-			cur_time = date.end_time ?
-				[moment(date.start_time, 'HH:mm:ss').format('HH:mm'), moment(date.end_time, 'HH:mm:ss').format('HH:mm')].join('-') :
-				moment(date.end_time, 'HH:mm:ss').format('HH:mm');
+			cur_time = date.end_time ? displayTimeRange(date.start_time, date.end_time) : displayTimeRange(date.start_time);
 			if(!dates_obj[cur_year])  dates_obj[cur_year] = {};
 			if(!dates_obj[cur_year][cur_month])  dates_obj[cur_year][cur_month] = [];
 			
@@ -295,12 +301,12 @@ function formatDates(dates, format, is_same_time){
 						date: cur_range_of_days.join('-'),
 						time: prev_time
 					});
-					cur_range_of_days[0] = cur_moment.format('D');
+					cur_range_of_days = [cur_moment.format('D')];
 				} else {
 					cur_range_of_days[1] = cur_moment.format('D');
 				}
 			} else {
-				cur_range_of_days[0] = cur_moment.format('D');
+				cur_range_of_days = [cur_moment.format('D')];
 			}
 			
 			if(i === last_index){
@@ -313,7 +319,6 @@ function formatDates(dates, format, is_same_time){
 				prev_time = cur_time;
 			}
 		});
-		
 		
 		$.each(dates_obj, function(year, months){
 			$.each(months, function(month, days){
@@ -333,14 +338,14 @@ function formatDates(dates, format, is_same_time){
 					}
 					
 					if(i === days.length - 1){
-						formatted_days.push({date: range.join(', '), time: prev_time ? prev_time : day.time});
+						formatted_days.push({date: range.join(', '), time: day.time});
 					} else {
 						prev_time = day.time;
 					}
 				});
 				
-				$.each(formatted_days, function(i, day) {
-					output.push(formatString(format, day.date, is_with_time ? day.time : '', month, year));
+				$.each(formatted_days, function(i, formatted_day) {
+					output.push(formatString(format, formatted_day.date, is_with_time ? formatted_day.time : '', month, year));
 				});
 			})
 		});
@@ -350,6 +355,58 @@ function formatDates(dates, format, is_same_time){
 	
 	
 	return output;
+}
+
+function trimSeconds(time) {
+	time = time.split(':');
+	if(time.length == 3)
+		time = time.splice(0,2);
+	
+	return time.join(':');
+}
+
+/**
+ *
+ * @param {timestamp} first_date
+ * @param {timestamp} last_date
+ * @returns {string}
+ */
+function displayDateRange(first_date, last_date){
+	var m_first = moment.unix(first_date),
+		m_last = moment.unix(last_date);
+	
+	if(m_first.isSame(m_last, 'year')){
+		if(m_first.isSame(m_last, 'month')){
+			if(m_first.isSame(m_last, 'day')){
+				return m_first.format('D MMM YYYY');
+			} else {
+				return m_first.format('D') + '-' + m_last.format('D MMM YYYY');
+			}
+		} else {
+			return m_first.format('D MMM') + ' - ' + m_last.format('D MMM YYYY');
+		}
+	} else {
+		return m_first.format('MMM YYYY') + ' - ' + m_last.format('MMM YYYY');
+	}
+}
+
+/**
+ *
+ * @param {string} start_time
+ * @param {string} [end_time]
+ * @returns {string}
+ */
+function displayTimeRange(start_time, end_time){
+	
+	if(end_time){
+		if(end_time == start_time && (start_time == '00:00:00' || start_time == '00:00')){
+			return 'Весь день';
+		} else {
+			return trimSeconds(start_time) + ' - ' + trimSeconds(end_time);
+		}
+	} else {
+		return trimSeconds(start_time);
+	}
 }
 
 
@@ -500,6 +557,10 @@ $.fn.extend({
 		return this.animate.apply(this, args);
 	}
 });
+
+jQuery.makeSet = function(array) {
+	return $($.map(array, function(el){return el.get();}));
+};
 
 function SubscribeButton($btn, options){
 	var self = this,

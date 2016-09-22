@@ -744,7 +744,7 @@
 <script type="javascript/template" id="tmpl-event-date-time-row">
 	<div class="event_additional_field_split">
 		<div class="event_additional_field"><p>{date}</p></div>
-		<div class="event_additional_field"><p>{start_time} - {end_time}</p></div>
+		<div class="event_additional_field"><p>{time}</p></div>
 	</div>
 </script>
 
@@ -856,7 +856,7 @@
 				<span class="organization_card_field">{subscribers}</span>
 			</div>
 			<div class="organization_card_bottom">
-				<div class="organization_card_avatars">{administrators}<span class="counter -size_30x30 -color_marginal_primary {administrators_plus_count_hidden}">+<span class="FavoredCount">{administrators_plus_count}</span></span></div>
+				<div class="organization_card_avatars">{admins}<span class="counter -size_30x30 -color_marginal_primary {admins_plus_count_hidden}">+<span class="FavoredCount">{admins_plus_count}</span></span></div>
 				<div class="organization_card_avatars">{moderators}<span class="counter -size_30x30 -color_marginal_primary {moderators_plus_count_hidden}">+<span class="FavoredCount">{moderators_plus_count}</span></span></div>
 				<div class="organization_card_buttons">{buttons}</div>
 			</div>
@@ -960,7 +960,7 @@
 				</div>
 			</div>
 			<div class="eventstat_overview_header_block">
-				<div class="eventstat_overview_scoreboards Scoreboards">{scoreboards}</div>
+				<div class="eventstat_overview_scoreboards EventstatsScoreboards">{scoreboards}</div>
 				<span class="action -color_accent fa_icon fa-plus-circle">Добавить к сравнению</span>
 			</div>
 		</header>
