@@ -2620,6 +2620,18 @@ function Statistics($view) {
 									enabled: true
 								}
 							}
+						},
+						dataGrouping: {
+							dateTimeLabelFormats: {
+								millisecond: ['%b %e, %H:%M:%S.%L', '%b %e, %H:%M:%S.%L', '-%H:%M:%S.%L'],
+								second: ['%b %e, %H:%M:%S', '%b %e, %H:%M:%S', '-%H:%M:%S'],
+								minute: ['%b %e, %H:%M', '%b %e, %H:%M', '-%H:%M'],
+								hour: ['%b %e, %H:%M', '%b %e, %H:%M', '-%H:%M'],
+								day: ['%b %e, %Y', '%b %e', '-%b %e, %Y'],
+								week: ['  %b %e, %Y', '%b %e', '-%b %e, %Y'],
+								month: ['%B %Y', '%B', '-%B %Y'],
+								year: ['%Y', '%Y', '-%Y']
+							}
 						}
 					}
 				},
@@ -2702,7 +2714,7 @@ function Statistics($view) {
 						text: "\xa0\xa0\xa0Все\xa0время\xa0\xa0\xa0"
 					}],
 					allButtonsEnabled: true,
-					selected: 3,
+					selected: 2,
 					labelStyle: {
 						display: 'none'
 					},
@@ -2761,15 +2773,32 @@ function Statistics($view) {
 					})
 				].join(',');
 			
-			function getStatistics(org_id, scale, since, till, fields, success){
+			/**
+			 *
+			 * @param {(string|number)} org_id
+			 * @param {string} scale
+			 * @param {(string|Object)} range
+			 * @param {string} range.since
+			 * @param {string} [range.till]
+			 * @param {string} fields
+			 * @param {success} success
+			 */
+			function getStatistics(org_id, scale, range, fields, success){
+				var data = {
+					scale: scale,
+					fields: fields
+				};
+				if(typeof range == 'string'){
+					data.since = range;
+				} else {
+					data.since = range.since;
+					if(range.till){
+						data.till = range.till;
+					}
+				}
 				$.ajax({
 					url: '/api/v1/statistics/organizations/'+org_id,
-					data: {
-						scale: scale,
-						since: since,
-						till: till,
-						fields: fields
-					},
+					data: data,
 					method: 'GET',
 					success: function(res){
 						ajaxHandler(res, function(data, text){
@@ -2886,20 +2915,57 @@ function Statistics($view) {
 						i = 0;
 					
 					$.each(raw_data, function(key, data){
-						output.push({
-							name: STD_NAMES[key],
-							color: line_colors[i],
-							fillColor: {
-								linearGradient: {x1: 0, x2: 0, y1: 0, y2: 1},
-								stops: [
-									[0, fill_colors2[i]],
-									[1, fill_colors[i++]]
-								]
-							},
-							data: data.reverse().map(function(line, i) {
-								return [moment.unix(line.since).valueOf(), line.value];
-							})
-						});
+						if(key == 'conversion'){
+							output.push({
+								id: 1,
+								name: STD_NAMES[key],
+								tooltip: {valueSuffix: ' %'},
+								fillColor: {
+									linearGradient: {x1: 0, x2: 0, y1: 0, y2: 1},
+									stops: [
+										[0, fill_colors2[i]],
+										[1, fill_colors[i++]]
+									]
+								},
+								data: data.map(function(line, i) {
+									return [moment.unix(line.time_value).valueOf(), line.value];
+								})
+							},{
+								name: STD_NAMES['subscribe'],
+								showInLegend: false,
+								fillOpacity: 0,
+								lineWidth: 0,
+								linkedTo: 1,
+								data: data.map(function(line, i) {
+									return [moment.unix(line.time_value).valueOf(), line['subscribe']];
+								})
+							},{
+								name: STD_NAMES['view'],
+								showInLegend: false,
+								fillOpacity: 0,
+								lineWidth: 0,
+								linkedTo: 1,
+								data: data.map(function(line, i) {
+									return [moment.unix(line.time_value).valueOf(), line['view']];
+								})
+							});
+						} else {
+							output.push({
+								name: STD_NAMES[key],
+								color: line_colors[i],
+								fillColor: {
+									linearGradient: {x1: 0, x2: 0, y1: 0, y2: 1},
+									stops: [
+										[0, fill_colors2[i]],
+										[1, fill_colors[i++]]
+									]
+								},
+								data: data.map(function(line, i) {
+									return [moment.unix(line.time_value).valueOf(), line.value];
+								})
+							});
+						}
+						
 					});
 					
 					return output;
@@ -2923,7 +2989,6 @@ function Statistics($view) {
 				if(data.conversion){
 					$container.find('.ConversionsAreaChart').highcharts('StockChart', $.extend(true, {}, area_chart_default_options, {
 						title: {text: 'Конверсия просмотров/подписок'},
-						tooltip: {valueSuffix: ' %'},
 						yAxis: {
 							max: 100,
 							labels: {
@@ -2988,7 +3053,7 @@ function Statistics($view) {
 				
 				$wrapper.append(tmpl('orgstat-overview', org_data));
 				
-				getStatistics(org_id, 'year', moment().subtract(6, 'd').format(), moment().format(), stat_fields, function(stat_data){
+				getStatistics(org_id, 'year', moment().subtract(6, 'd').format(), stat_fields, function(stat_data){
 					var storage_data_name = 'stat_org_'+org_id+'_data',
 						storage_until_name = 'stat_org_'+org_id+'_until';
 					buildPieChart($wrapper.find('.GenderPieChart'), stat_data.audience.gender);
@@ -3000,7 +3065,7 @@ function Statistics($view) {
 					
 					if(moment.unix(window.sessionStorage.getItem(storage_until_name)).isSameOrBefore(moment())){
 						var $loaders = tmpl('loader', {}, $wrapper.find('.SubscribersAreaChart, .ViewsAreaChart, .ConversionsAreaChart'));
-						getStatistics(org_id, 'day', moment().subtract(18, 'months').format(), moment().format(), 'view,subscribe,unsubscribe,conversion,notification', function(stat_data) {
+						getStatistics(org_id, 'hours', moment().subtract(12, 'months').format(), 'view,subscribe,unsubscribe,conversion,events', function(stat_data) {
 							window.sessionStorage.setItem(storage_data_name, JSON.stringify(stat_data));
 							window.sessionStorage.setItem(storage_until_name, moment().add(15, 'm').unix());
 							$loaders.remove();
