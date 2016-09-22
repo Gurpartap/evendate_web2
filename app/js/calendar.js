@@ -2754,7 +2754,7 @@ function Statistics($view) {
 					'default_address',
 					'staff',
 					'privileges',
-					'events{length:3,future:true,is_canceled:true,is_delayed:true,fields:"public_at"}'
+					'events{length:3,future:true,is_canceled:true,is_delayed:true,fields:"public_at",order_by:"nearest_event_date"}'
 				],
 				stat_fields = [
 					'subscribe',
@@ -3015,7 +3015,7 @@ function Statistics($view) {
 				
 				org_data.administrators = getSpecificStaff('admin', org_data.staff, staffs_additional_fields);
 				org_data.moderators = getSpecificStaff('moderator', org_data.staff, staffs_additional_fields);
-				switch(role){
+				/*switch(role){
 					case __C.ROLES.ADMIN: {
 						org_data.administrators.push({
 							avatar_url: '/app/img/add_user.png',
@@ -3033,11 +3033,16 @@ function Statistics($view) {
 						});
 						break;
 					}
-				}
+				}*/
 				org_data.administrators = buildAvatarBlocks(org_data.administrators);
-				org_data.moderators = buildAvatarBlocks(org_data.moderators);
+				if(org_data.moderators.length){
+					org_data.moderators = buildAvatarBlocks(org_data.moderators);
+				} else {
+					org_data.is_moderators = __C.CLASSES.NEW_HIDDEN;
+				}
 				org_data.event_blocks = org_data.events.map(function(event) {
 					var event_block = {
+						id: event.id,
 						title: event.title,
 						day: moment.unix(event.first_event_date).format("D"),
 						month: moment.unix(event.first_event_date).format("MMM"),
