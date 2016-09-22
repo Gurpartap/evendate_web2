@@ -583,13 +583,16 @@ function OneEvent($view){
 				data.event_registration_information = data.registration_required ? tmpl('event-registration-info', {registration_till: moment.unix(data.registration_till).format('D MMMM')}) : '';
 				data.event_price_information = data.is_free ? '' : tmpl('event-price-info', {min_price: data.min_price ? data.min_price : '0'});
 				data.canceled = data.canceled ? '' : '-hidden';
+				
+				
+				
 
 				data.event_additional_fields = $();
 				if(data.is_same_time){
-					data.event_additional_fields = data.event_additional_fields.add(tmpl('event-additional-info', {
+					/*data.event_additional_fields = data.event_additional_fields.add(tmpl('event-additional-info', {
 						key: 'Дата',
 						value: $(formatDates(data.dates).map(function(elem){return $('<span>').addClass('event_date').text(elem);})).map(function(){return this.toArray();})
-					}));
+					}));*/
 					data.event_additional_fields = data.event_additional_fields.add(tmpl('event-additional-info', {
 						key: 'Время',
 						value: (data.dates[0].start_time == '00:00:00' && data.dates[0].end_time == '00:00:00') ? 'Весь день' : data.dates[0].start_time.split(':').slice(0,2).join(':') + ' - ' + data.dates[0].end_time.split(':').slice(0,2).join(':')
@@ -630,6 +633,25 @@ function OneEvent($view){
 
 
 				$wrapper.append(tmpl('event-page', data));
+				if(data.is_same_time){
+					var m_nearest_date = data.nearest_event_date ? moment.unix(data.nearest_event_date) : moment.unix(data.first_event_date),
+						event_calendar = new Calendar($wrapper.find('.EventCalendar'), {
+							classes: {
+								wrapper_class: 'feed_calendar_wrapper',
+								td_class: 'event_calendar_day'
+							},
+							selection_type: Calendar.SELECTION_TYPES.MULTI,
+							disable_selection: true
+						});
+					event_calendar
+						.init()
+						.setMonth(m_nearest_date.format('M'), m_nearest_date.format('YYYY'))
+						.selectDays(
+							data.dates.map(function(date) {
+								return moment.unix(date.event_date).format(__C.DATE_FORMAT)
+							})
+						);
+				}
 				initEventPage($view);
 			}, ajaxErrorHandler)
 		}
