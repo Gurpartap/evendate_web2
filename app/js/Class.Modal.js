@@ -509,14 +509,13 @@ FavoredModal.prototype.appendUsers = function(users, $wrapper){
 function EditorsModal(organization_id, title, specific_role){
 	this.title = title ? title : 'Редакторы';
 	this.content = $();
-	this.specific_role = specific_role ? specific_role : false;
 	this.id = organization_id;
 	this.disable_upload = false;
 	this.ajax_url = '/api/v1/organizations/'+this.id+'/staff/';
 	this.ajax_data = {
 		order_by: 'role,first_name',
-		length: this.length,
-		offset: this.offset_number
+		length: 30,
+		offset: 0
 	};
 	this.is_first = true;
 	
@@ -546,6 +545,10 @@ EditorsModal.prototype.uploadUsers = function(callback){
 			ajaxHandler(res, function(data){
 				if(data.length){
 					var $wrapper = self.modal.find('.EditorsModalContent');
+					
+					if(data.length < self.ajax_data.length){
+						self.disable_upload = true;
+					}
 					
 					self.content = self.appendUsers(data, $wrapper);
 					self.is_first = false;
