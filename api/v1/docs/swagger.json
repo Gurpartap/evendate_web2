@@ -2486,7 +2486,7 @@
           {
             "name": "fields",
             "in": "query",
-            "description": "Allowed fields: [dynamics, view, fave, unfave, open_site, conversion, view_detail, notifications_sent]. For each field can be used till, since, scale",
+            "description": "Allowed fields: [dynamics, view, fave, unfave, open_site, fave_conversion, open_conversion, view_detail, notifications_sent]. For each field can be used till, since, scale",
             "required": true,
             "type": "string"
           }
