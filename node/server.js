@@ -275,6 +275,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 notifications.sendUsersNotifications();
             }
             publicDelayedEvents();
+            updateEventsGeocodes();
         }, null, true);
     } catch (ex) {
         logger.error(ex);
