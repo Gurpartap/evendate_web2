@@ -280,11 +280,11 @@ class Event extends AbstractEntity
         $dt_without_time = clone $dt_clone;
         $dt_without_time->setTime(0, 0, 0);
 
-        foreach ($rows as $index => $row){
+        foreach ($rows as $index => $row) {
             $_date_time = DateTime::createFromFormat('Y-m-d H:i:s', $row['available_date'] . ' 00:00:00');
 
             if ($dt_without_time < $_date_time && $index == 0) return $dt_clone;
-            if ($row['notifications_count'] < 2){
+            if ($row['notifications_count'] < 2) {
                 return $dt_clone->setDate(
                     intval($_date_time->format('Y')),
                     intval($_date_time->format('m')),
@@ -292,14 +292,14 @@ class Event extends AbstractEntity
                 );
             }
         }
-        if (isset($_date_time) && $_date_time instanceof DateTime){
+        if (isset($_date_time) && $_date_time instanceof DateTime) {
             $_date_time->add(new DateInterval('P1D'));
             return $dt_clone->setDate(
                 intval($_date_time->format('Y')),
                 intval($_date_time->format('m')),
                 intval($_date_time->format('d'))
             );
-        }else return $dt_clone;
+        } else return $dt_clone;
     }
 
     private static function generateQueryData(&$data)
@@ -449,10 +449,10 @@ class Event extends AbstractEntity
             $notification_date = self::getAvailableNotificationTime($db, $data['notification_at'], $organization->getId());
 
             //dates are already sorted
-            $first_date_string = $data['dates'][0]['event_date']. ' ' . $data['dates'][0]['start_time'];
+            $first_date_string = $data['dates'][0]['event_date'] . ' ' . $data['dates'][0]['start_time'];
 
             //if available notification time > first event date, we should sent notification NOW
-            if ($notification_date > (DateTime::createFromFormat('Y-m-d H:i', $first_date_string))){
+            if ($notification_date > (DateTime::createFromFormat('Y-m-d H:i', $first_date_string))) {
                 $notification_date = $data['notification_at'];
             }
 
@@ -947,6 +947,7 @@ class Event extends AbstractEntity
                     'organization_id' => $organization->getId(),
                     'latitude' => $data['latitude'],
                     'longitude' => $data['longitude'],
+                    'location_updates' => 0,
                     'detail_info_url' => $data['detail_info_url'],
                     'registration_required' => $data['registration_required'],
                     'registration_till' => $data['registration_till'] instanceof DateTime ? $data['registration_till']->format('Y-m-d H:i:s') : null,

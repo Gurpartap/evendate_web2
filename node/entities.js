@@ -414,6 +414,7 @@ module.exports = {
             'image_vertical_resized',
             'image_horizontal_resized',
             'public_at',
+            'location_updates',
             'is_free'
         ]
     })
