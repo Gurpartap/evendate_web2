@@ -1000,6 +1000,27 @@
             "format": "int64"
           },
           {
+            "name": "bounds",
+            "in": "query",
+            "description": "Returns all events in rectangle. You have to pass coordinates of two points: left-bottom and top-right separated with comma. Example: 55.7558 37.6173,56.7558 38.6173",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "point",
+            "in": "query",
+            "description": "Returns all events in circle. You have to pass coordinates the center of circle: Example: 55.7558 37.6173. Also requires distance (in km).",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "distance",
+            "in": "query",
+            "description": "Required for searching with point. Distance in km.",
+            "required": false,
+            "type": "float"
+          },
+          {
             "name": "length",
             "in": "query",
             "description": "Items count",

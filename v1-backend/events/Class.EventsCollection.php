@@ -50,7 +50,8 @@ class EventsCollection extends AbstractCollection
         $statement_array = array();
         if (isset($fields[Event::IS_FAVORITE_FIELD_NAME])
             || isset($fields[Event::CAN_EDIT_FIELD_NAME])
-            || isset($fields[Event::IS_SEEN_FIELD_NAME])) {
+            || isset($fields[Event::IS_SEEN_FIELD_NAME])
+        ) {
             $statement_array[':user_id'] = $user->getId();
         }
 
@@ -155,33 +156,33 @@ class EventsCollection extends AbstractCollection
                         require_once $BACKEND_FULL_PATH . '/statistics/Class.EventsStatistics.php';
 
                         $_fields[] = '(' . EventsStatistics::getValueSQLWithNamedParams(Statistics::EVENT_VIEW)
-                                . ') AS ' . Statistics::EVENT_VIEW;
+                            . ') AS ' . Statistics::EVENT_VIEW;
                         $statement_array[':type_code_' . Statistics::EVENT_VIEW] = Statistics::EVENT_VIEW;
 
                         $_fields[] = '(' . EventsStatistics::getValueSQLWithNamedParams(Statistics::EVENT_FAVE)
-                                . ') AS ' . Statistics::EVENT_FAVE;
+                            . ') AS ' . Statistics::EVENT_FAVE;
                         $statement_array[':type_code_' . Statistics::EVENT_FAVE] = Statistics::EVENT_FAVE;
 
 
                         $_fields[] = '(' . EventsStatistics::getValueSQLWithNamedParams(Statistics::EVENT_VIEW_DETAIL)
-                                . ') AS ' . Statistics::EVENT_VIEW_DETAIL;
+                            . ') AS ' . Statistics::EVENT_VIEW_DETAIL;
                         $statement_array[':type_code_' . Statistics::EVENT_VIEW_DETAIL] = Statistics::EVENT_VIEW_DETAIL;
 
 
                         $_fields[] = '(' . EventsStatistics::getValueSQLWithNamedParams(Statistics::EVENT_OPEN_SITE)
-                                . ') AS ' . Statistics::EVENT_OPEN_SITE;
+                            . ') AS ' . Statistics::EVENT_OPEN_SITE;
                         $statement_array[':type_code_' . Statistics::EVENT_OPEN_SITE] = Statistics::EVENT_OPEN_SITE;
 
 
                         $_fields[] = '(' . EventsStatistics::getValueSQLWithNamedParams(Statistics::EVENT_UNFAVE)
-                                . ') AS ' . Statistics::EVENT_UNFAVE;
+                            . ') AS ' . Statistics::EVENT_UNFAVE;
                         $statement_array[':type_code_' . Statistics::EVENT_UNFAVE] = Statistics::EVENT_UNFAVE;
 
 
                         /*Notifications*/
 
                         $_fields[] = '(' . EventsStatistics::SQL_GET_NOTIFICATIONS_SENT_AGGREGATED
-                                . ' AND event_id = view_events.id) AS ' . Statistics::EVENT_NOTIFICATIONS_SENT;
+                            . ' AND event_id = view_events.id) AS ' . Statistics::EVENT_NOTIFICATIONS_SENT;
 
                         $fields[] = Statistics::EVENT_VIEW;
                         $fields[] = Statistics::EVENT_FAVE;
@@ -209,7 +210,7 @@ class EventsCollection extends AbstractCollection
                 }
                 case 'is_canceled':
                 case 'is_delayed': {
-                    if ($is_editor) {
+                    if ($is_editor && filter_var($value, FILTER_VALIDATE_BOOLEAN) == true) {
                         $from_view = self::VIEW_ALL_EVENTS_WITH_ALIAS;
                         $q_get_events->where($name . ' = :' . $name);
                         $statement_array[':' . $name] = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
@@ -217,9 +218,68 @@ class EventsCollection extends AbstractCollection
                     break;
                 }
                 case 'future': {
-                    if ($value == 'true') {
+                    if (filter_var($value, FILTER_VALIDATE_BOOLEAN) == true) {
                         $q_get_events->where("view_events.last_event_date > (SELECT DATE_PART('epoch', TIMESTAMP 'today') :: INT)");
                     }
+                    break;
+                }
+                case 'bounds': {
+                    $points = explode(',', $value);
+
+                    if (count($points) != 2) throw new InvalidArgumentException('EXPECTED_2_BOUND_POINTS');
+                    $bottom_point = explode(' ', trim($points[0]));
+                    $top_point = explode(' ', trim($points[1]));
+
+                    if (count($bottom_point) != 2) throw new InvalidArgumentException('EXPECTED_2_POINT_COORDINATES');
+                    if (count($top_point) != 2) throw new InvalidArgumentException('EXPECTED_2_POINT_COORDINATES');
+
+                    $bottom_point = array(floatval($bottom_point[0]), floatval($bottom_point[1]));
+                    $top_point = array(floatval($top_point[0]), floatval($top_point[1]));
+
+
+                    //first_number (x) is latitude, second(y) is longitude
+                    $_points = array(
+                        'top-left' => array($bottom_point[0], $top_point[1]),
+                        'top-right' => $top_point,
+                        'bottom-left' => $bottom_point,
+                        'bottom-right' => array($top_point[0], $bottom_point[1]),
+                    );
+
+                    $q_get_events
+                        ->where('
+                            (latitude >= :min_x AND latitude <= :max_x)
+                            AND 
+                            (longitude >= :min_y AND longitude <= :max_y)
+                        ');
+                    $statement_array[':min_x'] = $_points['bottom-left'][0];
+                    $statement_array[':max_x'] = $_points['bottom-right'][0];
+                    $statement_array[':min_y'] = $_points['bottom-left'][1];
+                    $statement_array[':max_y'] = $_points['top-right'][1];
+                    break;
+                }
+                case 'point': {
+                    $point = explode(' ', $value);
+
+                    if (count($point) != 2) throw new InvalidArgumentException('EXPECTED_2_POINT_COORDINATES');
+
+                    if (!isset($filters['distance'])) throw new InvalidArgumentException('DISTANCE_IS_REQUIRED');
+                    if (!is_numeric($filters['distance'])) throw new InvalidArgumentException('DISTANCE_IS_REQUIRED');
+
+                    $filters['distance'] = floatval($filters['distance']);
+
+                    $lon0 = $point[1] - $filters['distance']/abs(cos(deg2rad($point[0]))*111.0); # 1 градус широты = 111 км
+                    $lon1 = $point[1] + $filters['distance']/abs(cos(deg2rad($point[0]))*111.0);
+                    $lat0 = $point[0]-($filters['distance']/111.0);
+                    $lat1 = $point[0]+($filters['distance']/111.0);
+
+                    $q_get_events->where('latitude BETWEEN :lat_0 AND :lat_1 
+                        AND longitude BETWEEN :long_0 AND :long_1');
+
+                    $statement_array[':lat_0'] = $lat0;
+                    $statement_array[':lat_1'] = $lat1;
+                    $statement_array[':long_0'] = $lon0;
+                    $statement_array[':long_1'] = $lon1;
+
                     break;
                 }
                 case 'favorites': {
@@ -310,27 +370,27 @@ class EventsCollection extends AbstractCollection
                     break;
                 }
                 case 'tags': {
-                    if (strpos($value, '*') != FALSE){
+                    if (strpos($value, '*') != FALSE) {
                         $value = explode('*', $value);
                         if (count($value) == 0) throw new InvalidArgumentException('TAGS_SHOULD_NOT_BE_EMPTY');
                         $tags_tmpl = [];
-                        foreach ($value as $index => $tag){
+                        foreach ($value as $index => $tag) {
                             $key = ':tag_' . $index;
                             $tags_tmpl[] = $key;
                             $statement_array[$key] = mb_strtolower($tag);
                         }
-                        $q_get_events->where('(SELECT COUNT(tags.id) FROM tags INNER JOIN events_tags ON events_tags.tag_id = tags.id WHERE events_tags.status=true AND event_id = view_events.id AND LOWER(name) IN ('. implode(',', $tags_tmpl) .')) = ' . count($value));
-                    }elseif(strpos($value, '|') != FALSE){
+                        $q_get_events->where('(SELECT COUNT(tags.id) FROM tags INNER JOIN events_tags ON events_tags.tag_id = tags.id WHERE events_tags.status=true AND event_id = view_events.id AND LOWER(name) IN (' . implode(',', $tags_tmpl) . ')) = ' . count($value));
+                    } elseif (strpos($value, '|') != FALSE) {
                         $value = explode('|', $value);
                         if (count($value) == 0) throw new InvalidArgumentException('TAGS_SHOULD_NOT_BE_EMPTY');
                         $tags_tmpl = [];
-                        foreach ($value as $index => $tag){
+                        foreach ($value as $index => $tag) {
                             $key = ':tag_' . $index;
                             $tags_tmpl[] = $key;
                             $statement_array[$key] = mb_strtolower($tag);
                         }
-                        $q_get_events->where('(SELECT COUNT(tags.id) FROM tags INNER JOIN events_tags ON events_tags.tag_id = tags.id WHERE events_tags.status=true AND event_id = view_events.id AND LOWER(name) IN ('. implode(',', $tags_tmpl) .')) > 0');
-                    }else{
+                        $q_get_events->where('(SELECT COUNT(tags.id) FROM tags INNER JOIN events_tags ON events_tags.tag_id = tags.id WHERE events_tags.status=true AND event_id = view_events.id AND LOWER(name) IN (' . implode(',', $tags_tmpl) . ')) > 0');
+                    } else {
                         $q_get_events->where('(SELECT COUNT(tags.id) FROM tags INNER JOIN events_tags ON events_tags.tag_id = tags.id WHERE events_tags.status=true AND event_id = view_events.id AND LOWER(name) = :tag_0) > 0');
                         $statement_array[':tag_0'] = mb_strtolower($value);
                     }
@@ -476,7 +536,7 @@ class EventsCollection extends AbstractCollection
             ->from($from_view)
             ->cols($_fields)
             ->orderBy($order_by);
-        if ($from_view != self::VIEW_ALL_EVENTS_WITH_ALIAS){
+        if ($from_view != self::VIEW_ALL_EVENTS_WITH_ALIAS) {
             $q_get_events->where($canceled_condition);
         }
 
