@@ -21,12 +21,24 @@ class User extends AbstractUser
     protected $vk_uid;
 
 
-    protected $show_to_friends;
-    protected $notify_in_browser;
+    protected $send_notifications_new_organizations;
+    protected $send_notifications_for_friends;
+    protected $send_notifications_for_favored;
+    protected $send_notifications_for_subscriptions;
+    protected $send_notifications;
+    protected $privacy_mode;
 
     private $editor_instance;
     protected $db;
 
+    const SETTINGS = array(
+        'send_notifications' => 'boolean',
+        'send_notifications_for_favored' => 'boolean',
+        'send_notifications_for_subscriptions' => 'boolean',
+        'send_notifications_new_organizations' => 'boolean',
+        'send_notifications_for_friends' => 'boolean',
+        'privacy_mode' => array('public', 'only_friends', 'private')
+    );
 
     public function __construct(PDO $db, $token = null)
     {
@@ -80,8 +92,12 @@ class User extends AbstractUser
         $this->facebook_uid = $row['facebook_uid'];
         $this->google_uid = $row['google_uid'];
 
-        $this->show_to_friends = $row['show_to_friends'] == 1;
-        $this->notify_in_browser = $row['notify_in_browser'] == 1;
+        $this->send_notifications = $row['send_notifications'];
+        $this->send_notifications_for_favored = $row['send_notifications_for_favored'];
+        $this->send_notifications_for_subscriptions = $row['send_notifications_for_subscriptions'];
+        $this->send_notifications_new_organizations = $row['send_notifications_new_organizations'];
+        $this->send_notifications_for_friends = $row['send_notifications_for_friends'];
+        $this->privacy_mode = $row['privacy_mode'];
     }
 
     public function getId()
@@ -165,8 +181,7 @@ class User extends AbstractUser
         if ($result === FALSE) throw new DBQueryException('CANT_GET_ADMIN_STATUS', $this->db);
         return $p_get->rowCount() > 0;
     }
-    
-    
+
     public function isEventAdmin(Event $event) : bool
     {
         $q_get_is_admin = App::queryFactory()
@@ -279,25 +294,32 @@ class User extends AbstractUser
 
     public function updateSettings($__request)
     {
-        if (isset($__request['notify-in-browser'])) {
-            $this->notify_in_browser = $__request['notify-in-browser'] == 'true' ? 1 : 0;
-        }
-        if (isset($__request['show-to-friends'])) {
-            $this->show_to_friends = $__request['show-to-friends'] == 'true' ? 1 : 0;
-        }
-        $q_upd = 'UPDATE users SET
-			show_to_friends = :show_to_friends,
-			notify_in_browser = :notify_in_browser
-			WHERE users.id = :user_id';
-        $p_upd = $this->db->prepare($q_upd);
+        $q_upd = App::queryFactory()
+            ->newUpdate()
+            ->table('users')
+            ->where('id = ?', $this->getId());
 
-        $result = $p_upd->execute(array(
-            ':show_to_friends' => $this->show_to_friends,
-            ':notify_in_browser' => $this->notify_in_browser,
-            ':user_id' => $this->getId()
-        ));
+        $cols = array();
 
-        if ($result === FALSE) throw new DBQueryException('', $this->db);
+        foreach (self::SETTINGS as $key => $data_type){
+            if (isset($__request[$key])) {
+                if ($data_type == 'boolean'){
+                    $this->$key = filter_var($__request[$key], FILTER_VALIDATE_BOOLEAN);
+                    $cols[$key] = filter_var($__request[$key], FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+                }elseif (is_array($data_type)){
+                    if (in_array($__request[$key], $data_type) == false) throw new InvalidArgumentException('UNEXPECTED_VALUES');
+                    $this->$key = $__request[$key];
+                    $cols[$key] = $__request[$key];
+                }
+            }
+        }
+        $cols['show_to_friends'] = '1';
+
+        $q_upd->cols($cols);
+        $p_upd = $this->db->prepare($q_upd->getStatement());
+        $result = $p_upd->execute($q_upd->getBindValues());
+
+        if ($result === FALSE) throw new DBQueryException('CANT_UPDATE_SETTINGS', $this->db);
 
         return new Result(true, '');
     }
@@ -339,8 +361,14 @@ class User extends AbstractUser
     public function getSettings()
     {
         return new Result(true, '', array(
-            'show_to_friends' => $this->show_to_friends,
-            'notify_in_browser' => $this->notify_in_browser,
+            'send_notifications' => $this->send_notifications,
+            'send_notifications_for_favored' => $this->send_notifications_for_favored,
+            'send_notifications_for_subscriptions' => $this->send_notifications_for_subscriptions,
+            'send_notifications_new_organizations' => $this->send_notifications_new_organizations,
+            'send_notifications_for_friends' => $this->send_notifications_for_friends,
+            'privacy_mode' => $this->privacy_mode,
+            'show_to_friends' => $this->privacy_mode != 'private',
+            'notify_in_browser' => $this->send_notifications,
         ));
     }
 
