@@ -1309,6 +1309,20 @@
             ]
           },
           {
+            "name": "bounds",
+            "in": "query",
+            "description": "Returns all events in rectangle. You have to pass coordinates of two points: left-bottom and top-right separated with comma. Example: 55.7558 37.6173,56.7558 38.6173",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "point",
+            "in": "query",
+            "description": "Returns all events in circle. You have to pass coordinates the center of circle: Example: 55.7558 37.6173. Also requires distance (in km).",
+            "required": false,
+            "type": "string"
+          },
+          {
             "name": "length",
             "in": "query",
             "description": "Items count",
@@ -1566,6 +1580,50 @@
               "true",
               "false"
             ]
+          },
+          {
+            "name": "bounds",
+            "in": "query",
+            "description": "Returns all events in rectangle. You have to pass coordinates of two points: left-bottom and top-right separated with comma. Example: 55.7558 37.6173,56.7558 38.6173",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "point",
+            "in": "query",
+            "description": "Returns all events in circle. You have to pass coordinates the center of circle: Example: 55.7558 37.6173. Also requires distance (in km).",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "length",
+            "in": "query",
+            "description": "Items count",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Items count",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "description": "Order column name",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Additional fields and sub-entities",
+            "required": false,
+            "type": "string"
           }
         ],
         "responses": {
@@ -2411,6 +2469,26 @@
       }
     },
     "/users/me/settings": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Get user settings for web version",
+        "description": "",
+        "operationId": "getUserSettings",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        }
+      },
       "put": {
         "tags": [
           "User"
@@ -2424,8 +2502,8 @@
         "parameters": [
           {
             "in": "query",
-            "name": "notify-in-browser",
-            "description": "If true enables notifications in browser",
+            "name": "send_notifications",
+            "description": "If true enables notifications",
             "required": true,
             "type": "string",
             "enum": [
@@ -2435,13 +2513,58 @@
           },
           {
             "in": "query",
-            "name": "show-to-friends",
-            "description": "If true enables friends to see subscriptions and actions in their feed",
+            "name": "send_notifications_for_favored",
+            "description": "If true enables notifications",
             "required": true,
             "type": "string",
             "enum": [
               "true",
               "false"
+            ]
+          },
+          {
+            "in": "query",
+            "name": "send_notifications_for_subscriptions",
+            "description": "If true enables notifications",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ]
+          },
+          {
+            "in": "query",
+            "name": "send_notifications_new_organizations",
+            "description": "If true enables notifications",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ]
+          },
+          {
+            "in": "query",
+            "name": "send_notifications_for_friends",
+            "description": "If true enables notifications",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ]
+          },
+          {
+            "in": "query",
+            "name": "privacy_mode",
+            "description": "If true enables notifications",
+            "required": true,
+            "type": "string",
+            "enum": [
+              "public",
+              "only_friends",
+              "private"
             ]
           }
         ],
