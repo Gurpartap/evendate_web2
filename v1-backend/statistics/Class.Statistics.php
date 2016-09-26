@@ -57,6 +57,8 @@ class Statistics
 
     const FIELD_DYNAMICS = 'dynamics';
     const FIELD_CONVERSION = 'conversion';
+    const FIELD_OPEN_CONVERSION = 'open_conversion';
+    const FIELD_FAVE_CONVERSION = 'fave_conversion';
     const FIELD_AUDIENCE = 'audience';
 
     public static function getTypeId($entity_type, $type_name, PDO $db)
