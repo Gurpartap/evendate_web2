@@ -595,10 +595,6 @@ function OneEvent($view){
 								
 				if(data.is_same_time){
 					data.event_additional_fields = data.event_additional_fields.add(tmpl('event-additional-info', {
-						key: 'Дата',
-						value: $.makeSet(formatted_dates.map(function(date) { return $('<span>').addClass('event_date').text(date)	}))
-					}));
-					data.event_additional_fields = data.event_additional_fields.add(tmpl('event-additional-info', {
 						key: 'Время',
 						value: displayTimeRange(data.dates[0].start_time, data.dates[0].end_time)
 					}));

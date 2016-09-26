@@ -54,8 +54,8 @@ function Calendar($calendar, options){
 			this.prev_selected_day = '';
 			this.formatted_days = {};
 			this.$calendar = $calendar;
-			this.current_month = moment();
-			this._today = moment();
+			this.current_month = moment(new Date());
+			this._today = moment(new Date());
 			break;
 		}
 		default: {
@@ -78,7 +78,7 @@ Calendar.prototype.setMonth = function(month, year){
 			this.current_month = this.current_month.add(1, 'months'); break;
 		}
 		case 'current':{
-			this.current_month = moment(); break;
+			this.current_month = moment(new Date()); break;
 		}
 		default: {
 			this.current_month = year ? this.current_month.set({'year': year, 'month': month-1}) : this.current_month.month(month-1);
@@ -144,7 +144,7 @@ Calendar.prototype.buildTable = function(){
 			dataset: dataset.join(' ')
 		}));
 	}
-	var curr_month_clone = moment(this.current_month._d);
+	var curr_month_clone = this.current_month.clone();
 	if (first_day_in_month != 1){
 		curr_month_clone.add(-1, 'months');
 		curr_month_clone.date(curr_month_clone.daysInMonth());
@@ -175,7 +175,7 @@ Calendar.prototype.buildTable = function(){
 	}
 
 	if (last_day_in_month != 0){
-		curr_month_clone = moment(this.current_month._d);
+		curr_month_clone = this.current_month.clone();
 		do {
 			curr_month_clone.add(1, 'days');
 			this_day = curr_month_clone.format(__C.DATE_FORMAT);
