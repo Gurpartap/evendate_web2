@@ -206,7 +206,6 @@ class Event extends AbstractEntity
 
     private $organization;
 
-
     public function __construct()
     {
         $this->db = App::DB();

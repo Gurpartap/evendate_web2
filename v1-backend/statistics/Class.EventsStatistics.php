@@ -62,7 +62,7 @@ class EventsStatistics extends AbstractAggregator
             case Statistics::EVENT_FAVE:
             case Statistics::EVENT_UNFAVE:
             case Statistics::EVENT_OPEN_SITE: {
-                $query = str_replace('{SCALE}', $scale, self::SQL_GET_DATA);
+                $query = $this->replaceScale(self::SQL_GET_DATA, $scale);
                 $statements = array(
                     ':event_id' => $this->event->getId(),
                     ':entity' => Statistics::ENTITY_EVENT,
@@ -73,7 +73,7 @@ class EventsStatistics extends AbstractAggregator
                 break;
             }
             case Statistics::EVENT_NOTIFICATIONS_SENT: {
-                $query = str_replace('{SCALE}', $scale, self::SQL_GET_NOTIFICATIONS);
+                $query = $this->replaceScale(self::SQL_GET_NOTIFICATIONS, $scale);
                 $statements = array(
                     ':event_id' => $this->event->getId(),
                     ':since' => $since->getTimestamp(),
@@ -107,11 +107,13 @@ class EventsStatistics extends AbstractAggregator
                     )->getData();
                     break;
                 }
-                case Statistics::FIELD_CONVERSION: {
-                    $result[Statistics::FIELD_CONVERSION] = $this->getConversion(
+                case Statistics::FIELD_OPEN_CONVERSION:
+                case Statistics::FIELD_FAVE_CONVERSION: {
+                    $result[$key] = $this->getConversion(
                         $value['scale'] ?? $scale,
                         isset($value['since']) ? DateTime::createFromFormat('U', $value['since']) : $since,
-                        isset($value['till']) ? DateTime::createFromFormat('U', $value['till']) : $till
+                        isset($value['till']) ? DateTime::createFromFormat('U', $value['till']) : $till,
+                        $key
                     )->getData();
                     break;
                 }
@@ -155,8 +157,9 @@ class EventsStatistics extends AbstractAggregator
                     $result[$key] = $this->getValue($key, $scale, $since, $till)->getData();
                     break;
                 }
-                case Statistics::FIELD_CONVERSION: {
-                    $result[Statistics::FIELD_CONVERSION] = $this->getConversion($scale, $since, $till)->getData();
+                case Statistics::FIELD_OPEN_CONVERSION:
+                case Statistics::FIELD_FAVE_CONVERSION: {
+                    $result[$key] = $this->getConversion($scale, $since, $till, $key)->getData();
                     break;
                 }
             }
@@ -164,17 +167,25 @@ class EventsStatistics extends AbstractAggregator
         return new Result(true, '', $result);
     }
 
-    private function getConversion($scale, $since, $till)
+    private function getConversion($scale, $since, $till, $type)
     {
+        if ($type == Statistics::FIELD_FAVE_CONVERSION) {
+            $with = Statistics::EVENT_VIEW;
+            $to = Statistics::EVENT_FAVE;
+        } else {
+            $with = Statistics::EVENT_VIEW;
+            $to = Statistics::EVENT_VIEW_DETAIL;
+        }
+
         $views = $this->getValue(
-            Statistics::EVENT_VIEW,
+            $with,
             $scale,
             $since,
             $till
         )->getData();
 
         $subscribes = $this->getValue(
-            Statistics::EVENT_FAVE,
+            $to,
             $scale,
             $since,
             $till
@@ -192,5 +203,5 @@ class EventsStatistics extends AbstractAggregator
         }
         return new Result(true, '', $result);
     }
-    
+
 }
