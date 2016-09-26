@@ -543,7 +543,13 @@ __LOCALES = {
 
 /**===========================================================
  * Templates for jQuery
- * */
+ *
+ * @param {string} template_type
+ * @param {(object|Array)} items
+ * @param {jQuery} [addTo]
+ * @param {string} [direction="append"]
+ * @returns {jQuery}
+ */
 function tmpl(template_type, items, addTo, direction) {
 
     var htmlEntities = function (str) {

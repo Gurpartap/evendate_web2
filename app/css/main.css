@@ -1577,6 +1577,51 @@ a.button:hover {text-decoration: none}
 }
 
 /* /Loader */
+/* Scoreboard */
+
+.scoreboard_number {
+	display: block;
+	margin-bottom: 6px;
+	font-size: 2.3em;
+	font-weight: 700;
+}
+
+.scoreboard_dynamic {
+	margin: 6px 0 12px;
+	font-size: 14px;
+	font-weight: 400;
+}
+
+.scoreboard_dynamic_icon {
+	display: inline-block;
+	vertical-align: sub;
+	height: 24px;
+	font-size: 24px;
+	line-height: 14px;
+	margin: 0 .1em 0 0;
+}
+
+.scoreboard_title {
+	font-size: .88em;
+	font-weight: 500;
+	color: #9fa6b3;
+	color: var(--color_primary_50);
+}
+
+
+.scoreboard.-size_big > .scoreboard_number {
+	font-size: 4.2em;
+	font-weight: bold;
+	color: #3e4d66;
+	color: var(--color_primary);
+}
+
+.scoreboard.-size_big > .scoreboard_title {
+	font-size: 1.25em;
+	font-weight: 500;
+}
+
+/* /Scoreboard */
 /* Notification */
 
 #notification {
@@ -3681,42 +3726,13 @@ body.-open_modal > .modal_wrapper {
 	border-bottom: 1px solid #d6d6d6;
 }
 
-.orgstat_overview_scoreboard {
+.orgstat_overview_header > .scoreboard {
 	flex: 1 25%;
 	height: 100px;
 	text-align: center;
 }
 
-.orgstat_overview_scoreboard + .orgstat_overview_scoreboard {margin-left: 12px}
-
-.scoreboard_number {
-	display: block;
-	margin-bottom: 6px;
-	font-size: 2.3em;
-	font-weight: 700;
-}
-
-.scoreboard_dynamic {
-	margin: 6px 0 12px;
-	font-size: 14px;
-	font-weight: 400;
-}
-
-.scoreboard_dynamic_icon {
-	display: inline-block;
-	vertical-align: sub;
-	height: 24px;
-	font-size: 24px;
-	line-height: 14px;
-	margin: 0 .1em 0 0;
-}
-
-.scoreboard_title {
-	font-size: .88em;
-	font-weight: 500;
-	color: #9fa6b3;
-	color: var(--color_primary_50);
-}
+.orgstat_overview_header > .scoreboard + .scoreboard {margin-left: 12px}
 
 .orgstat_overview_charts {padding: 48px 24px}
 
@@ -3785,38 +3801,26 @@ body.-open_modal > .modal_wrapper {
 	justify-content: space-between;
 }
 
-.eventstat_overview_scoreboard {
-	padding: 0 12px;
-}
+.eventstat_overview_scoreboards > .scoreboard {padding: 0 12px}
 
 .eventstat_overview_content {
 	display: flex;
+	padding: 36px 0;
 }
 
 .eventstat_overview_charts {
 	flex: 1;
+	padding-left: 36px;
 }
 
 .eventstat_overview_chart,
-.eventstat_overview_scoreboard.-size_big {
+.eventstat_overview_big_scoreboards > .scoreboard.-size_big {
 	height: 460px;
 	margin-bottom: 60px;
 }
 
-.eventstat_overview_scoreboard.-size_big {
+.eventstat_overview_big_scoreboards > .scoreboard.-size_big {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
-}
-
-.eventstat_overview_scoreboard.-size_big > .scoreboard_number {
-	font-size: 4.2em;
-	font-weight: bold;
-	color: #3e4d66;
-	color: var(--color_primary);
-}
-
-.eventstat_overview_scoreboard.-size_big > .scoreboard_title {
-	font-size: 1.25em;
-	font-weight: 500;
 }

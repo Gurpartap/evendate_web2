@@ -248,8 +248,8 @@ class OrganizationsStatistics extends AbstractAggregator
         foreach ($views as $key => $view) {
             $result[] = array(
                 'time_value' => $view['time_value'],
-                'subscribe' => $subscribes[$key]['value'],
-                'view' => $view['value'],
+                'with' => $subscribes[$key]['value'],
+                'to' => $view['value'],
                 'value' => $view['value'] == 0 ? 0 : $subscribes[$key]['value'] / $view['value'] * 100
             );
         }

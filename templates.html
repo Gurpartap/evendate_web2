@@ -101,6 +101,24 @@
 	</div>
 </script>
 
+<script type="javascript/template" id="tmpl-scoreboard">
+	<div class="scoreboard {size} {type}">
+		<span class="scoreboard_number ScoreboardNumber">{number}</span>
+		<span class="scoreboard_title">{title}</span>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-scoreboard-with-dynamics">
+	<div class="scoreboard {size} {type}">
+		<span class="scoreboard_number ScoreboardNumber">{number}</span>
+		<p class="scoreboard_dynamic">
+			<label class="scoreboard_dynamic_icon fa_icon {icon_classes}"></label>
+			<span class="ScoreboardDynamic">{dynamic_by_week}</span><span> за неделю</span>
+		</p>
+		<span class="scoreboard_title">{title}</span>
+	</div>
+</script>
+
 <!-- Calendar -->
 
 <script type="javascript/template" id="tmpl-calendar">
@@ -928,18 +946,10 @@
 
 <script type="javascript/template" id="tmpl-orgstat-overview-content">
 	<header class="orgstat_overview_header Scoreboards">{scoreboards}</header>
-	<div class="orgstat_overview_charts">
-		<div class="orgstat_overview_chart SubscribersAreaChart"></div>
-		<div class="orgstat_overview_chart ViewsAreaChart"></div>
-		<div class="orgstat_overview_chart ConversionsAreaChart"></div>
-	</div>
-</script>
-
-<script type="javascript/template" id="tmpl-orgstat-scoreboard">
-	<div class="orgstat_overview_scoreboard {type}">
-		<span class="scoreboard_number ScoreboardNumber">{number}</span>
-		<p class="scoreboard_dynamic"><label class="scoreboard_dynamic_icon fa_icon {icon_classes}"></label><span class="ScoreboardDynamic">{dynamic_by_week}</span><span> за неделю</span></p>
-		<span class="scoreboard_title">{title}</span>
+	<div class="orgstat_overview_charts OrgStatAreaCharts">
+		<div class="orgstat_overview_chart AreaChart SubscriberAreaChart"></div>
+		<div class="orgstat_overview_chart AreaChart ViewAreaChart"></div>
+		<div class="orgstat_overview_chart AreaChart ConversionAreaChart"></div>
 	</div>
 </script>
 
@@ -967,10 +977,12 @@
 			</div>
 		</header>
 		<div class="eventstat_overview_content">
-			<div class="eventstat_overview_charts">
-				<div class="eventstat_overview_chart SubscribersAreaChart"></div>
-				<div class="eventstat_overview_chart ViewsAreaChart"></div>
-				<div class="eventstat_overview_chart ConversionsAreaChart"></div>
+			<div class="eventstat_overview_charts EventStatAreaCharts">
+				<div class="eventstat_overview_chart AreaChart ViewAreaChart"></div>
+				<div class="eventstat_overview_chart AreaChart OpenSiteAreaChart"></div>
+				<div class="eventstat_overview_chart AreaChart OpenConversionsAreaChart"></div>
+				<div class="eventstat_overview_chart AreaChart FaveAreaChart"></div>
+				<div class="eventstat_overview_chart AreaChart FaveConversionsAreaChart"></div>
 			</div>
 			<div class="eventstat_overview_big_scoreboards EventstatsBigScoreboards">{big_scoreboards}</div>
 		</div>
@@ -983,19 +995,6 @@
 		<div class="eventstat_overview_time"><span>{time}</span></div>
 	</div>
 </script>
-
-<script type="javascript/template" id="tmpl-eventstat-overview-different-time-date">
-
-</script>
-
-<script type="javascript/template" id="tmpl-eventstat-scoreboard">
-	<div class="eventstat_overview_scoreboard {size} {type}">
-		<span class="scoreboard_number ScoreboardNumber">{number}</span>
-		<span class="scoreboard_title">{title}</span>
-	</div>
-</script>
-
-
 
 
 <!-- Modals -->

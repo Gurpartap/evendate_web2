@@ -7,6 +7,9 @@ String.prototype.format = function(fields){
 		return fields[n] ? fields[n] : m;
 	});
 };
+String.prototype.toCamelCase = function(delimiter){
+	return this.split(delimiter ? delimiter : ' ').map(function(part) { return part.capitalize(); }).join('');
+};
 Object.props = function(obj){
 	var props = [];
 	Object.keys(obj).forEach(function(prop){
