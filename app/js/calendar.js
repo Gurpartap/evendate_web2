@@ -14,9 +14,9 @@ var __STATES = {
 		friends: Friends,
 		friend: OneFriend,
 		edit_event: EditEvent,
-		statistics: StatisticsOverview,
-		organization_statistics: StatisticsOrganization,
-		event_statistics: StatisticsEvent,
+		statistics: Statistics,
+		organization_statistics: Statistics,
+		event_statistics: Statistics,
 		getCurrentState: function(){
 			return window.location.pathname.split('/')[1];
 		},
@@ -29,16 +29,19 @@ var __STATES = {
 					return window.location.pathname.split('/')[2];
 				}
 				case 'edit_event': {
-					return History.getState().data.eventId;
+					return History.getState().data.eventId ? History.getState().data.eventId : History.getState().data.event_id;
 				}
 				case 'add_organization': {
 					break;
 				}
 				case 'edit_organization': {
-					return History.getState().data.organizationId;
+					return History.getState().data.organizationId ? History.getState().data.organizationId : History.getState().data.organization_id;
 				}
-				case 'statistics': {
-					break;
+				case 'event_statistics': {
+					return window.location.pathname.split('/')[2];
+				}
+				case 'organization_statistics': {
+					return window.location.pathname.split('/')[2];
 				}
 				default: {
 					console.log('Using method in unexpected place');
@@ -278,7 +281,7 @@ function Feed($view){
 			success: function(res){
 				ajaxHandler(res, function(data, text){
 					data.forEach(function(event){
-						var $subscribers = buildAvatarCollection(event.favored, 4),
+						var $subscribers = buildAvatars(event.favored, 4),
 							avatars_collection_classes = [],
 							favored_users_count = ($subscribers.length <= 4) ? 0 : event.favored_users_count - 4,
 							$event;
@@ -483,30 +486,29 @@ function OneEvent($view){
 			})
 		});
 	}
-
-	function buildNotifications(raw_notifications, event_id, last_date){
+	
+	function buildNotifications(raw_notifications, event_id, first_date){
 		var m_today = moment(),
-			m_last_date = moment.unix(last_date),
 			all_notifications = {
-				'notification-now': {
+				'notification-before-quarter-of-hour': {
 					label: 'За 15 минут',
-					moment: m_last_date.subtract(15, 'minutes').unix()
+					moment: moment.unix(first_date).subtract(15, 'minutes').unix()
 				},
 				'notification-before-three-hours':  {
 					label: 'За 3 часа',
-					moment: m_last_date.subtract(3, 'hours').unix()
+					moment: moment.unix(first_date).subtract(3, 'hours').unix()
 				},
 				'notification-before-day': {
 					label: 'За день',
-					moment: m_last_date.subtract(1, 'days').unix()
+					moment: moment.unix(first_date).subtract(1, 'days').unix()
 				},
 				'notification-before-three-days': {
 					label: 'За 3 дня',
-					moment: m_last_date.subtract(3, 'days').unix()
+					moment: moment.unix(first_date).subtract(3, 'days').unix()
 				},
 				'notification-before-week': {
 					label: 'За неделю',
-					moment: m_last_date.subtract(1, 'week').unix()
+					moment: moment.unix(first_date).subtract(1, 'week').unix()
 				}
 			},
 			$notifications = $(),
@@ -560,9 +562,10 @@ function OneEvent($view){
 		success: function(res){
 			ajaxHandler(res, function(data, text){
 				data = data[0];
-				var $subscribers = buildAvatarCollection(data.favored, 6),
+				var $subscribers = buildAvatars(data.favored, 6),
 					avatars_collection_classes = [],
-					favored_users_count = ($subscribers.length <= 6) ? 0 : data.favored_users_count - 6;
+					favored_users_count = ($subscribers.length <= 6) ? 0 : data.favored_users_count - 6,
+					formatted_dates = formatDates(data.dates, data.is_same_time ? '{D} {MMMMs} {YYYY}' : {date: '{D} {MMMMs}', time: '{T}'}, data.is_same_time);
 
 				if(data.is_favorite){
 					avatars_collection_classes.push('-subscribed');
@@ -584,27 +587,21 @@ function OneEvent($view){
 				data.event_registration_information = data.registration_required ? tmpl('event-registration-info', {registration_till: moment.unix(data.registration_till).format('D MMMM')}) : '';
 				data.event_price_information = data.is_free ? '' : tmpl('event-price-info', {min_price: data.min_price ? data.min_price : '0'});
 				data.canceled = data.canceled ? '' : '-hidden';
+				
+				
+				
 
 				data.event_additional_fields = $();
+								
 				if(data.is_same_time){
 					data.event_additional_fields = data.event_additional_fields.add(tmpl('event-additional-info', {
-						key: 'Дата',
-						value: $(formatDates(data.dates).map(function(elem){return $('<span>').addClass('event_date').text(elem);})).map(function(){return this.toArray();})
-					}));
-					data.event_additional_fields = data.event_additional_fields.add(tmpl('event-additional-info', {
 						key: 'Время',
-						value: (data.dates[0].start_time == '00:00:00' && data.dates[0].end_time == '00:00:00') ? 'Весь день' : data.dates[0].start_time.split(':').slice(0,2).join(':') + ' - ' + data.dates[0].end_time.split(':').slice(0,2).join(':')
+						value: displayTimeRange(data.dates[0].start_time, data.dates[0].end_time)
 					}));
 				} else {
-					var date_times = $();
-					data.dates.forEach(function(date){
-						date_times = date_times.add(tmpl('event-date-time-row', {
-							date: moment.unix(date.event_date).format('D MMMM'),
-							start_time: date.start_time.split(':').slice(0,2).join(':'),
-							end_time: date.end_time.split(':').slice(0,2).join(':')
-						}));
-					});
-					data.event_additional_fields = data.event_additional_fields.add(tmpl('event-date-time', {date_times: date_times}));
+					data.event_additional_fields = data.event_additional_fields.add(tmpl('event-date-time', {
+						date_times: tmpl('event-date-time-row', formatted_dates)
+					}));
 				}
 				data.event_additional_fields = data.event_additional_fields = data.event_additional_fields.add(tmpl('event-additional-info', {
 					key: 'Место',
@@ -631,6 +628,25 @@ function OneEvent($view){
 
 
 				$wrapper.append(tmpl('event-page', data));
+				if(data.is_same_time){
+					var m_nearest_date = data.nearest_event_date ? moment.unix(data.nearest_event_date) : moment.unix(data.first_event_date),
+						event_calendar = new Calendar($wrapper.find('.EventCalendar'), {
+							classes: {
+								wrapper_class: 'feed_calendar_wrapper',
+								td_class: 'event_calendar_day'
+							},
+							selection_type: Calendar.SELECTION_TYPES.MULTI,
+							disable_selection: true
+						});
+					event_calendar
+						.init()
+						.setMonth(m_nearest_date.format('M'), m_nearest_date.format('YYYY'))
+						.selectDays(
+							data.dates.map(function(date) {
+								return moment.unix(date.event_date).format(__C.DATE_FORMAT)
+							})
+						);
+				}
 				initEventPage($view);
 			}, ajaxErrorHandler)
 		}
@@ -792,7 +808,7 @@ function OrganizationsList($view){
 		state_data.reload = false;
 		$wrapper.find('.Category').filter('[data-type-id="'+state_data.type_id+'"]').addClass(__C.CLASSES.NEW_ACTIVE);
 		History.replaceState(state_data, category.type_name);
-		changeMainTitle(state_data.title);
+		changeTitle(state_data.title);
 	}
 
 	$wrapper.empty();
@@ -851,6 +867,7 @@ function Organization($view){
 			}
 		});
 		bindEventsEvents($parent);
+		Modal.bindCallModal($parent);
 
 		$parent.find('.Tabs').on('change.tabs', function(){
 			$(window).off(Object.values(SCROLL_EVENTS).join(' '));
@@ -940,7 +957,7 @@ function Organization($view){
 
 		events.forEach(function(event){
 			var m_event_date = moment.unix(event[sort_date_type]),
-				$subscribers = buildAvatarCollection(event.favored, 4),
+				$subscribers = buildAvatars(event.favored, 4),
 				times = [],
 				avatars_collection_classes = [],
 				favored_users_count = ($subscribers.length <= 4) ? 0 : event.favored_users_count - 4,
@@ -1109,7 +1126,7 @@ function Organization($view){
 				role = recognizeRole(data.privileges);
 				if(role == __C.ROLES.ADMIN){
 					data.redact_org_button = buildButton({
-						title: 'Редактировать',
+						title: 'Изменить',
 						classes: ['-fill','-color_neutral','fa_icon','fa-pencil','RippleEffect'],
 						dataset: {
 							'page': 'edit_organization',
@@ -1118,11 +1135,7 @@ function Organization($view){
 						}
 					})
 				}
-				if (role != __C.ROLES.USER){
-					data.hidden_for_users = '';
-				}else{
-					data.hidden_for_users = '-hidden';
-				}
+				data.hidden_for_users = (role != __C.ROLES.USER) ? '' : '-hidden';
 				$page_wrapper.append(tmpl('organization-info-page', $.extend({
 					subscribe_button_classes: data.is_subscribed ? ['fa-check', '-color_neutral', '-Subscribed'].join(' ') : ['fa-plus', '-color_accent'].join(' '),
 					subscribe_button_text: data.is_subscribed ? 'Подписан' : 'Подписаться',
@@ -1139,13 +1152,14 @@ function Organization($view){
 						if (role != __C.ROLES.USER){
 							uploadEvents($delayed_events_wrapper, EVENT_TYPES.DELAYED, function($events){
 								uploadEvents($canceled_events_wrapper, EVENT_TYPES.CANCELED, function($events){
-									initOrganizationPage($view);
+									bindEventsEvents($view);
 								});
 							});
-						}else{
-							initOrganizationPage($view);
+						} else {
+							bindEventsEvents($view);
 						}
 					});
+					initOrganizationPage($view);
 					bindUploadEventsOnScroll($future_events_wrapper);
 				});
 
@@ -1192,7 +1206,7 @@ function Search($view){
 			success: function(res){
 				ajaxHandler(res, function(data, text){
 					data.events.forEach(function(event){
-						var $subscribers = buildAvatarCollection(event.favored, 4),
+						var $subscribers = buildAvatars(event.favored, 4),
 							avatars_collection_classes = [],
 							favored_users_count = ($subscribers.length <= 4) ? 0 : event.favored_users_count - 4;
 						
@@ -1393,7 +1407,7 @@ function OneFriend($view){
 			});
 
 			$view.find('.back-to-friends-list').on('click', function(){
-				History.pushState({_index: History.getCurrentIndex(), page: 'friends'}, 'Мои друзья', 'friends');
+				History.pushState({_index: History.getCurrentIndex(), page: 'friends'}, 'Мои друзья', '/friends');
 			});
 			getFriendFeed();
 		}
@@ -1461,7 +1475,8 @@ function Friends($view){
 
 function EditEvent($view){
 	var $wrapper = $view.find('.page_wrapper'),
-		event_id = __STATES.entityId;
+		event_id = __STATES.entityId,
+		org_id = History.getState().data.organization_id;
 
 	function initEditEventPage($view){
 
@@ -2092,7 +2107,6 @@ function EditEvent($view){
 			data = {
 				event_id: null,
 				title: null,
-				image_vertical: null,
 				image_horizontal: null,
 				organization_id: null,
 				location: null,
@@ -2108,7 +2122,6 @@ function EditEvent($view){
 				delayed_publication: null,
 				public_at: null,
 				filenames: {
-					vertical: null,
 					horizontal: null
 				}
 			},
@@ -2123,7 +2136,6 @@ function EditEvent($view){
 
 			data.tags = tags;
 			data.filenames = {
-				vertical: data.filename_vertical,
 				horizontal: data.filename_horizontal
 			};
 			if(data.registration_required){
@@ -2159,8 +2171,8 @@ function EditEvent($view){
 					})
 				});
 			}
-
-
+			
+			$view.addClass('-faded');
 			$.ajax({
 				url: url,
 				data: JSON.stringify(data),
@@ -2178,7 +2190,6 @@ function EditEvent($view){
 					 showNotification('Событие успешно добавлено', 3000);
 					 });
 					 }*/
-
 						if($view.find('#edit_event_to_public_vk').prop('checked')){
 							socket.emit('vk.post', {
 								guid: data.vk_group,
@@ -2191,15 +2202,18 @@ function EditEvent($view){
 								link: data.detail_info_url
 							});
 						}
-						window.location = '/event/'+res_data.event_id;
-
+						changeState('/event/'+res_data.event_id, data.title, {event_id: res_data.event_id});
 					}, function(res){
+						$view.removeClass('-faded');
 						if(res.text){
 							showNotifier({text: res.text, status: false});
 						} else {
 							ajaxErrorHandler(res);
 						}
 					});
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					$view.removeClass('-faded');
 				}
 			});
 		}
@@ -2216,10 +2230,11 @@ function EditEvent($view){
 		tomorrow_date: moment().add(1, 'd').format(__C.DATE_FORMAT)
 	};
 	if(typeof event_id === 'undefined'){
+		additional_fields.button_text = 'Опубликовать';
 		$wrapper.html(tmpl('edit-event-page', additional_fields));
 		initEditEventPage($view);
 		Modal.bindCallModal($view);
-		initOrganization();
+		initOrganization(org_id);
 		checkVkPublicationAbility();
 		toggleVkImg();
 		initVkImgCopying();
@@ -2235,6 +2250,7 @@ function EditEvent($view){
 				ajaxHandler(res, function(data){
 					data = Array.isArray(data) ? data[0] : data;
 					additional_fields.header_text = 'Редактирование события';
+					additional_fields.button_text = 'Сохранить';
 					if(data.public_at !== null){
 						var m_public_at = moment(data.public_at);
 						additional_fields.public_at_data = m_public_at.format('YYYY-MM-DD');
@@ -2248,9 +2264,6 @@ function EditEvent($view){
 						additional_fields.registration_till_data_label = m_registration_till.format('DD.MM.YYYY');
 						additional_fields.registration_till_time_hours = m_registration_till.format('HH');
 						additional_fields.registration_till_time_minutes = m_registration_till.format('mm');
-					}
-					if(data.image_vertical_url){
-						additional_fields.image_vertical_filename = data.image_vertical_url.split('/').reverse()[0];
 					}
 					if(data.image_horizontal_url){
 						additional_fields.image_horizontal_filename = data.image_horizontal_url.split('/').reverse()[0];
@@ -2284,7 +2297,12 @@ function EditEvent($view){
 					}
 					selectDates($view, data.dates);
 					selectTags($view, data.tags);
-					if(data.image_vertical_url && data.image_horizontal_url){
+					Modal.bindCallModal($view);
+
+					if(data.image_horizontal_url){
+						toDataUrl(data.image_horizontal_url, function(base64_string){
+							$view.find('#edit_event_image_horizontal_src').val(base64_string ? base64_string : null);
+						});
 						$view.find('.CallModal').removeClass('-hidden').on('crop', function(event, cropped_src, crop_data){
 							var $button = $(this),
 								$parent = $button.closest('.EditEventImgLoadWrap'),
@@ -2293,18 +2311,6 @@ function EditEvent($view){
 							$data_url.val('data.source').data('source', $preview.attr('src')).trigger('change');
 							$preview.attr('src', cropped_src);
 							$button.data('crop_data', crop_data);
-						});
-					}
-					Modal.bindCallModal($view);
-
-					if(data.image_vertical_url){
-						toDataUrl(data.image_vertical_url, function(base64_string){
-							$view.find('#edit_event_image_vertical_src').val(base64_string ? base64_string : null);
-						});
-					}
-					if(data.image_horizontal_url){
-						toDataUrl(data.image_horizontal_url, function(base64_string){
-							$view.find('#edit_event_image_horizontal_src').val(base64_string ? base64_string : null);
 						});
 					}
 					if(additional_fields.vk_image_url){
@@ -2362,7 +2368,8 @@ function Onboarding($view){
 		method: 'GET',
 		data: {
 			length: 10,
-			offset: 0
+			offset: 0,
+			fields: 'img_small_url'
 		},
 		success: function(res){
 			ajaxHandler(res, function(data){
@@ -2399,414 +2406,947 @@ function Onboarding($view){
 	});
 }
 
-function StatisticsOverview($view) {
-
-}
-
-function StatisticsOrganization($view) {
-	var current_state = window.location.pathname.split('/')[2],
-		sub_states = {
-			overview: Overview,
-			events: Events,
-			auditory: Auditory,
-			promotion: Promotion,
-			settings: Settings,
-			support: Support
+function Statistics($view) {
+	var current_state = window.location.pathname.split('/')[1],
+		statistics_states = {
+			statistics: StatisticsOverview,
+			organization_statistics: StatisticsOrganization,
+			event_statistics: StatisticsEvent
 		},
-		$wrapper = $view.find('.page_wrapper');
+		$wrapper = $view.find('.page_wrapper'),
+		roles = [
+			{name: 'admin', title: 'Администратор'},
+			{name: 'moderator', title: 'Модератор'}
+		],
+		SCALES = {
+			MINUTE: 'minute',
+			HOUR: 'hour',
+			DAY: 'day',
+			WEEK: 'week',
+			MONTH: 'month',
+			YEAR: 'year',
+			OVERALL: 'overall'
+		},
+		highchart_defaults = {
+			chart: {
+				backgroundColor: null,
+				plotBorderWidth: null,
+				plotShadow: false,
+				style: {
+					fontFamily: 'inherit',
+					fontSize: 'inherit'
+				}
+			},
+			title: {
+				text: false
+			},
+			credits: {
+				enabled: false
+			}
+		},
+		pie_chart_options = {
+			chart: {
+				type: 'pie',
+				height: 200,
+				style: {
+					fontFamily: 'inherit',
+					fontSize: 'inherit'
+				}
+			},
+			colors: [__C.COLORS.FRANKLIN,__C.COLORS.ACCENT,__C.COLORS.MUTED,__C.COLORS.MUTED_80,__C.COLORS.MUTED_50,__C.COLORS.MUTED_30],
+			tooltip: {
+				pointFormat: '<b>{point.percentage:.1f}%</b>'
+			},
+			plotOptions: {
+				pie: {
+					center: [45, '50%'],
+					allowPointSelect: true,
+					cursor: 'pointer',
+					size: 120,
+					dataLabels: {
+						distance: -35,
+						defer: false,
+						formatter: function () {
+							return this.percentage > 15 ? Math.round(this.percentage)+'%' : null;
+						},
+						style: {"color": "#fff", "fontSize": "20px", "fontWeight": "300", "textShadow": "none" },
+						y: -6
+					},
+					showInLegend: true
+				}
+			},
+			legend: {
+				align: 'right',
+				verticalAlign: 'top',
+				layout: 'vertical',
+				width: 100,
+				symbolHeight: 0,
+				symbolWidth: 0,
+				itemMarginBottom: 5,
+				labelFormatter: function() {
+					return '<span style="color: '+this.color+'">'+this.name+'</span>'
+				},
+				itemStyle: { cursor: 'pointer', fontSize: '14px', fontWeight: '500' },
+				y: 12
+			}
+		},
+		area_chart_default_options = $.extend(true, {}, highchart_defaults, {
+			chart: {
+				type: 'areaspline',
+				plotBackgroundColor: '#fcfcfc',
+				plotBorderColor: '#ebebeb',
+				plotBorderWidth: 1
+			},
+			colors: [__C.COLORS.FRANKLIN,__C.COLORS.MUTED_80,__C.COLORS.ACCENT,__C.COLORS.MUTED,__C.COLORS.MUTED_50,__C.COLORS.MUTED_30],
+			title: {
+				align: 'left',
+				margin: 20
+			},
+			legend: {
+				enabled: true,
+				align: 'left',
+				itemStyle: { color: __C.COLORS.TEXT, cursor: 'pointer', fontSize: '14px', fontWeight: '500', y: 0 },
+				itemMarginTop: 24,
+				itemMarginBottom: 5,
+				symbolHeight: 18,
+				symbolWidth: 18,
+				symbolRadius: 9,
+				itemDistance: 42,
+				x: 30
+			},
+			plotOptions: {
+				series: {
+					states: {
+						hover: {
+							enabled: true,
+							lineWidth: 2
+						}
+					}
+				},
+				areaspline: {
+					fillOpacity: 0.5,
+					marker: {
+						enabled: false,
+						symbol: 'circle',
+						radius: 2,
+						states: {
+							hover: {
+								enabled: true
+							}
+						}
+					},
+					dataGrouping: {
+						dateTimeLabelFormats: {
+							millisecond: ['%b %e, %H:%M:%S.%L', '%b %e, %H:%M:%S.%L', '-%H:%M:%S.%L'],
+							second: ['%b %e, %H:%M:%S', '%b %e, %H:%M:%S', '-%H:%M:%S'],
+							minute: ['%b %e, %H:%M', '%b %e, %H:%M', '-%H:%M'],
+							hour: ['%b %e, %H:%M', '%b %e, %H:%M', '-%H:%M'],
+							day: ['%b %e, %Y', '%b %e', '-%b %e, %Y'],
+							week: ['  %b %e, %Y', '%b %e', '-%b %e, %Y'],
+							month: ['%B %Y', '%B', '-%B %Y'],
+							year: ['%Y', '%Y', '-%Y']
+						}
+					}
+				}
+			},
+			tooltip: {
+				headerFormat: '<b>{point.key}</b><br/>',
+				valueDecimals: 0,
+				xDateFormat: '%e %b %Y, %H:%M'
+			},
+			scrollbar: {enabled: false},
+			navigator: {
+				outlineColor: '#ebebeb',
+				outlineWidth: 1,
+				maskInside: false,
+				maskFill: 'rgba(245, 245, 245, 0.66)',
+				handles: {
+					backgroundColor: '#9fa7b6',
+					borderColor: '#fff'
+				},
+				xAxis: {
+					gridLineWidth: 0,
+					labels: {
+						align: 'left',
+						reserveSpace: true,
+						style: {
+							color: '#888'
+						},
+						x: 0,
+						y: null
+					}
+				}
+			},
+			rangeSelector: {
+				buttonTheme: {
+					width: null,
+					height: 22,
+					fill: 'none',
+					stroke: 'none',
+					r: 14,
+					style: {
+						color: __C.COLORS.MUTED_80,
+						fontSize: '13px',
+						fontWeight: '400',
+						textTransform: 'uppercase',
+						dominantBaseline: 'middle'
+					},
+					states: {
+						hover: {
+							fill: __C.COLORS.MUTED_50,
+							style: {
+								color: '#fff'
+							}
+						},
+						select: {
+							fill: __C.COLORS.MUTED_80,
+							style: {
+								color: '#fff',
+								fontWeight: '400'
+							}
+						}
+					}
+				},
+				buttons: [{
+					type: 'day',
+					count: 1,
+					text: "\xa0\xa0\xa0День\xa0\xa0\xa0"
+				}, {
+					type: 'day',
+					count: 7,
+					text: "\xa0\xa0\xa0Неделя\xa0\xa0\xa0"
+				}, {
+					type: 'month',
+					count: 1,
+					text: "\xa0\xa0\xa0Месяц\xa0\xa0\xa0"
+				}, {
+					type: 'year',
+					count: 1,
+					text: "\xa0\xa0\xa0Год\xa0\xa0\xa0"
+				}, {
+					type: 'all',
+					text: "\xa0\xa0\xa0Все\xa0время\xa0\xa0\xa0"
+				}],
+				allButtonsEnabled: true,
+				selected: 2,
+				labelStyle: {
+					display: 'none'
+				},
+				inputEnabled: false
+			},
+			xAxis: {
+				gridLineWidth: 1,
+				gridLineDashStyle: 'dash',
+				type: 'datetime',
+				showEmpty: false,
+				tickPosition: 'inside',
+				dateTimeLabelFormats: {
+					minute: '%H:%M',
+					hour: '%H:%M',
+					day: '%e %b',
+					week: '%e %b',
+					month: '%b %y',
+					year: '%Y'
+				}
+			},
+			yAxis: {
+				floor: 0,
+				min: 0,
+				gridLineDashStyle: 'dash',
+				opposite: false,
+				title: {
+					text: false
+				}
+			}
+		});
 	
-	function Overview($wrapper) {
-		var org_id = 1,
-			org_fields = [
-				'description',
-				'img_medium_url',
-				'default_address',
-				'staff',
-				'privileges',
-				'events{length:3,future:true,is_canceled:true,is_delayed:true,fields:"public_at"}'
-			],
-			stat_fields = [
-				'subscribe',
-				'view',
-				'fave',
-				'conversion',
-				'audience',
-				'dynamics'+JSON.stringify({
-					scale: 'week',
-					fields: [
-						'subscribe',
-						'view',
-						'fave',
-						'conversion'
-					].join(',')
+	/**
+	 *
+	 * @param {string} entity
+	 * @param {(string|number)} id
+	 * @param {string} scale
+	 * @param {(string|Object)} range
+	 * @param {string} range.since
+	 * @param {string} [range.till]
+	 * @param {string} fields
+	 * @param {success} success
+	 */
+	function getStatistics(entity, id, scale, range, fields, success){
+		var data = {
+			scale: scale,
+			fields: fields
+		};
+		
+		switch(entity){
+			case 'organization':
+			case 'organizations': {
+				entity = 'organizations';
+				break;
+			}
+			default:
+			case 'event':
+			case 'events': {
+				entity = 'events';
+				break;
+			}
+		}
+		
+		switch (typeof range){
+			case 'string': {
+				if(range) data.since = range;
+				break;
+			}
+			case 'object': {
+				if(range.since) data.since = range.since;
+				if(range.till) data.till = range.till;
+				break;
+			}
+			default:
+			case 'boolean': {	break; }
+		}
+		$.ajax({
+			url: '/api/v1/statistics/'+entity+'/'+id,
+			data: data,
+			method: 'GET',
+			success: function(res){
+				ajaxHandler(res, function(data, text){
+					if(success && typeof success == 'function'){
+						success(data);
+					}
+				}, ajaxErrorHandler)
+			}
+		});
+	}
+	
+	/**
+	 *
+	 * @param {object} raw_data
+	 * @returns {object}
+	 */
+	function areaChartSeriesNormalize(raw_data) {
+		var CONVERSATIONS = {
+				open_conversion: {
+					with: 'open_site',
+					to: 'view'
+				},
+				fave_conversion: {
+					with: 'fave',
+					to: 'open_site'
+				},
+				conversion: {
+					with: 'subscribe',
+					to: 'view'
+				}
+			},
+			COMPARISONS = {
+				subscribe_unsubscribe: {
+					subscribe: 'subscribe',
+					unsubscribe: 'unsubscribe'
+				}
+			},
+			STD_NAMES = {
+				'view': 'Просмотры',
+				'conversion': 'Конверсия',
+				'subscribe': 'Подписалось',
+				'unsubscribe': 'Отписалось',
+				'open_site': 'Открытий страницы события из ленту Evendate',
+				'open_conversion': 'Конвресия просмотра события в ленте к открытию страницы события',
+				'fave': 'Кол-во пользователей, которые добавили событие в избранное',
+				'fave_conversion': 'Конверсия открытия страницы события к добавлениям в избранное'
+			},
+			output = {};
+		
+		
+		$.each(raw_data, function(key, data){
+			output[key] = [];
+			if(CONVERSATIONS[key]){
+				output[key].push({
+					id: 1,
+					name: STD_NAMES[key],
+					tooltip: {valueSuffix: ' %'},
+					data: data.map(function(line, i) {
+						return [moment.unix(line.time_value).valueOf(), line.value];
+					})
+				});
+				$.each(CONVERSATIONS[key], function(field_key, field) {
+					output[key].push({
+						name: STD_NAMES[field],
+						showInLegend: false,
+						fillOpacity: 0,
+						color: '',
+						lineWidth: 0,
+						linkedTo: 1,
+						data: data.map(function(line, i) {
+							return [moment.unix(line.time_value).valueOf(), line[field_key]];
+						})
+					});
 				})
-			].join(',');
+			} else if(COMPARISONS[key]) {
+				$.each(COMPARISONS[key], function(field_key, field) {
+					output[key].push({
+						name: STD_NAMES[field],
+						data: data.map(function(line, i) {
+							return [moment.unix(line.time_value).valueOf(), line[field_key]];
+						})
+					});
+				})
+			} else {
+				output[key].push({
+					name: STD_NAMES[key],
+					data: data.map(function(line, i) {
+						return [moment.unix(line.time_value).valueOf(), line.value];
+					})
+				});
+			}
+		});
 		
-		
-		function getStatistics(org_id, scale, since, till, fields, success){
-			$.ajax({
-				url: '/api/v1/statistics/organizations/'+org_id,
-				data: {
-					scale: scale,
-					since: since,
-					till: till,
-					fields: fields
+		return output;
+	}
+	
+	/**
+	 *
+	 * @param {jQuery} $container
+	 * @param {object} data
+	 */
+	function buildAreaCharts($container, data){
+		var normalized_series = areaChartSeriesNormalize(data),
+			FIELDS = {
+				view: {
+					title: 'Просмотры',
+					wrapper_class: 'ViewAreaChart'
 				},
-				method: 'GET',
-				success: function(res){
-					ajaxHandler(res, function(data, text){
-						if(success && typeof success == 'function'){
-							success(data);
-						}
-					}, ajaxErrorHandler)
-				}
-			});
-		}
-		
-		function getOrganizationData(org_id, fields, success){
-			$.ajax({
-				url: '/api/v1/organizations/'+org_id,
-				data: {
-					fields: Array.isArray(fields) ? fields.join(',') : fields
+				open_site: {
+					title: 'Открытий страницы события',
+					wrapper_class: 'OpenSiteAreaChart'
 				},
-				method: 'GET',
-				success: function(res){
-					ajaxHandler(res, function(data, text){
-						if(success && typeof success == 'function'){
-							success(data);
-						}
-					}, ajaxErrorHandler)
+				open_conversion: {
+					title: 'Конверсия просмотров/открытий',
+					wrapper_class: 'OpenConversionsAreaChart'
+				},
+				fave: {
+					title: 'Добавлений в избранное',
+					wrapper_class: 'FaveAreaChart'
+				},
+				fave_conversion: {
+					title: 'Конверсия открытий/добавлений в избранное',
+					wrapper_class: 'FaveConversionsAreaChart'
+				},
+				subscribe_unsubscribe: {
+					title: 'Подписчики',
+					wrapper_class: 'SubscriberAreaChart'
+				},
+				conversion: {
+					title: 'Конверсия просмотров/подписок',
+					wrapper_class: 'ConversionAreaChart'
 				}
-			});
-		}
+			},
+			FILL_COLORS = [
+				['rgba(35, 215, 146, 0.18)', 'rgba(101, 101, 101, 0.6)', 'rgba(101, 101, 101, 0.6)'],
+				['rgba(35, 215, 146, 0.09)', 'rgba(101, 101, 101, 0.6)', 'rgba(101, 101, 101, 0.6)']
+			];
 		
-		function getSpecificStaff(role, staff){
-			var specific_staff = [];
-			staff.forEach(function(man){
-				if(man.role == role){
-					specific_staff.push({
-						id: man.id,
-						avatar_url: man.avatar_url,
-						name: man.first_name + ' ' + man.last_name,
-						is_link: true,
-						avatar_classes: ['-size_40x40','-rounded']
+		$.each(normalized_series, function(key) {
+			var field_data = {
+				title: {text: FIELDS[key].title}
+			};
+			
+			field_data.series = normalized_series[key].map(function(series_unit, i) {
+				if(series_unit.fillOpacity !== 0){
+					return $.extend(true, {}, series_unit, {
+						fillColor: {
+							linearGradient: {x1: 0, x2: 0, y1: 0, y2: 1},
+							stops: FILL_COLORS.map(function(colors_set, j) {
+								return [j, colors_set[i]];
+							})
+						}
 					})
 				}
+				return series_unit;
 			});
-			return specific_staff;
-		}
-		
-		function updateScoreboards($wrapper, numbers, dynamics) {
-			var order = ['subscribe', 'fave', 'view', 'conversion'],
-				fields = {
-					'subscribe': 'Подписчиков организатора',
-					'fave': 'Добавлений в избранное',
-					'view': 'Просмотров организатора',
-					'conversion': 'Конверсия откытий/подписки'
-				};
 			
-			order.forEach(function(field){
-				var measure = field == 'conversion' ? '%' : '',
-					$scoreboard = $wrapper.find('.Scoreboard'+field.capitalize());
-				
-				if(!$scoreboard.length){
-					$scoreboard = tmpl('orgstat-scoreboard', {
-						type: 'Scoreboard'+field.capitalize(),
-						title: fields[field],
-						number: 0 + measure,
-						dynamic_by_week: 0 + measure
-					}, $wrapper)
+			if(key == 'conversion' || key == 'open_conversion' || key == 'fave_conversion') {
+				field_data.yAxis = {
+					max: 100,
+					labels: {
+						format: '{value}%'
+					}
+				};
+			}
+			
+			$container.find('.'+FIELDS[key].wrapper_class).highcharts('StockChart', $.extend(true, {}, area_chart_default_options, field_data));
+		});
+	}
+	
+	/**
+	 *
+	 * @param {jQuery} $wrapper
+	 * @param {object} data
+	 * @param {object} data.numbers
+	 * @param {object} [data.dynamics]
+	 * @param {object} [titles]
+	 * @param {Array} [order]
+	 * @param {string} [size="normal"]
+	 */
+	function updateScoreboards($wrapper, data, titles, order, size) {
+		var with_dynamics = data.dynamics ? true : false;
+		if(!order)
+			order = Object.keys(titles);
+		
+		order.forEach(function(field){
+			var scoreboard_type = 'Scoreboard'+field.toCamelCase('_'),
+				$scoreboard = $wrapper.find('.'+scoreboard_type),
+				measure;
+			
+			switch(field){
+				case 'conversion':
+				case 'open_conversion':
+				case 'fave_conversion': {
+					measure = '%';
+					break;
 				}
-				
-				if(numbers[field]){
-					$scoreboard.find('.ScoreboardNumber').animateNumber({
-						number: Math.round(numbers[field][0].value),
-						suffix: measure
-					}, 2000, 'easeOutSine');
-				}
-				
-				if(dynamics[field]){
-					var dynamic = dynamics[field][0].value;
+			}
+			
+			if(!$scoreboard.length){
+				$scoreboard = tmpl(with_dynamics ? 'scoreboard-with-dynamics' : 'scoreboard', {
+					type: scoreboard_type,
+					title: titles[field],
+					size: size ? '-size_'+size : '-size_normal',
+					number: 0 + measure,
+					dynamic_by_week: 0 + measure
+				}, $wrapper)
+			}
+			
+			if(data.numbers[field] !== undefined){
+				$scoreboard.find('.ScoreboardNumber').animateNumber({
+					number: Math.round(data.numbers[field]),
+					suffix: measure
+				}, 2000, 'easeOutSine');
+			}
+			
+			if(with_dynamics){
+				if(data.dynamics[field] !== undefined){
 					$scoreboard
 						.find('.ScoreboardDynamic')
 						.animateNumber({
-							number: Math.round(dynamic),
-							prefix: dynamic == 0 ? '' : (dynamic > 0 ? '+' : '-'),
+							number: Math.round(data.dynamics[field]),
+							prefix: data.dynamics[field] == 0 ? '' : (data.dynamics[field] > 0 ? '+' : '-'),
 							suffix: measure
 						}, 2000, 'easeOutSine')
 						.siblings('label')
 						.removeClass('fa-caret-up -color_franklin fa-caret-down -color_bubblegum')
-						.addClass(dynamic == 0 ? '' : (dynamic > 0 ? 'fa-caret-up -color_franklin' : 'fa-caret-down -color_bubblegum'));
-				}
-				
-			});
-		}
-		
-		$wrapper.empty();
-		getOrganizationData(org_id, org_fields, function(org_data) {
-			var role;
-			org_data = org_data[0];
-			
-			changeMainTitle(['Организации', org_data.short_name]);
-			
-			role = recognizeRole(org_data.privileges);
-			
-			org_data.administrators = getSpecificStaff('admin', org_data.staff);
-			org_data.moderators = getSpecificStaff('moderator', org_data.staff);
-			switch(role){
-				case __C.ROLES.ADMIN: {
-					org_data.administrators.push({
-						avatar_url: '/app/img/add_user.png',
-						name: 'Добавить администратора',
-						block_classes: ['-add_new','-color_marginal','AddAdmin'],
-						avatar_classes: ['-size_40x40','-rounded']
-					});
-				}
-				case __C.ROLES.MODERATOR: {
-					org_data.moderators.push({
-						avatar_url: '/app/img/add_user.png',
-						name: 'Добавить модератора',
-						block_classes: ['-add_new','-color_marginal','AddModerator'],
-						avatar_classes: ['-size_40x40','-rounded']
-					});
-					break;
+						.addClass(data.dynamics[field] == 0 ? '' : (data.dynamics[field] > 0 ? 'fa-caret-up -color_franklin' : 'fa-caret-down -color_bubblegum'));
 				}
 			}
-			org_data.administrators = buildAvatarBlocks(org_data.administrators);
-			org_data.moderators = buildAvatarBlocks(org_data.moderators);
-			org_data.event_blocks = org_data.events.map(function(event) {
-				var event_block = {
-					title: event.title,
-					day: moment.unix(event.first_event_date).format("D"),
-					month: moment.unix(event.first_event_date).format("MMM"),
-					badges: []
-				};
-				if(event.canceled)
-					event_block.badges.push('Отменено');
-				if(event.public_at && moment.unix(event.public_at).isBefore())
-					event_block.badges.push('Не опубликовано');
-				return event_block;
-			});
-			org_data.event_blocks = tmpl('orgstat-event-block', org_data.event_blocks);
-			
-			$wrapper.append(tmpl('orgstat-overview', org_data));
-			
-			getStatistics(org_id, 'year', moment().subtract(6, 'd').format(), moment().format(), stat_fields, function(stat_data){
-				
-				function initPieChart($container, data) {
-					var pie_chart_options = {
-						chart: {
-							backgroundColor: null,
-							plotBorderWidth: null,
-							plotShadow: false,
-							type: 'pie',
-							height: 200,
-							style: {
-								fontFamily: 'inherit',
-								fontSize: 'inherit'
-							}
-						},
-						title: {
-							text: false
-						},
-						tooltip: {
-							pointFormat: '<b>{point.percentage:.1f}%</b>'
-						},
-						plotOptions: {
-							pie: {
-								center: [45, '50%'],
-								allowPointSelect: true,
-								cursor: 'pointer',
-								size: 120,
-								dataLabels: {
-									distance: -35,
-									defer: false,
-									formatter: function () {
-										return this.percentage > 15 ? Math.round(this.percentage)+'%' : null;
-									},
-									style: {"color": "#fff", "fontSize": "20px", "fontWeight": "300", "textShadow": "none" },
-									y: -6
-								},
-								showInLegend: true
-							}
-						},
-						legend: {
-							align: 'right',
-							verticalAlign: 'top',
-							layout: 'vertical',
-							width: 100,
-							itemStyle: { "color": "#333333", "cursor": "pointer", "fontSize": "14px", "fontWeight": "500" },
-							y: 12
-						}
-					};
-					
-					function pieChartDataGenerator(raw_data) {
-						var default_colors = [__C.COLORS.FRANKLIN,__C.COLORS.ACCENT,__C.COLORS.MUTED,__C.COLORS.MUTED_80,__C.COLORS.MUTED_50,__C.COLORS.MUTED_30],
-							STD_NAMES = {
-								"browser": "Браузер",
-								"android": "Аndroid",
-								"ios": "iOS",
-								"female": "Женщины",
-								"male": "Мужчины",
-								"other": "Остальные",
-								null: "Не указано"
-							},
-							output = {
-								colorByPoint: true,
-								data: raw_data.map(function(line, i) {
-									return {
-										name: line.name ? STD_NAMES[line.name] : STD_NAMES[line.gender],
-										color: default_colors[i],
-										y: line.count
-									}
-								})
-							};
-						return {series: [output]};
-					}
-					
-					$container.highcharts($.extend(true, {}, pie_chart_options, pieChartDataGenerator(data)));
-				}
-				
-				initPieChart($wrapper.find('.GenderPieChart'), stat_data.audience.gender);
-				initPieChart($wrapper.find('.DevicePieChart'), stat_data.audience.devices);
-				
-				$wrapper.find('.OrgstatOverviewContent').append(tmpl('orgstat-overview-content', {}));
-				
-				updateScoreboards($wrapper.find('.Scoreboards'), stat_data, stat_data.dynamics);
-				
-				getStatistics(org_id, 'week', moment().subtract(11, 'months').format(), moment().format(), 'view,subscribe,unsubscribe,conversion,notification', function(stat_data){
-					
-					var area_chart_default_options = {
-						chart: {
-							type: 'areaspline'
-						},
-						title: {text: false},
-						xAxis: {
-							type: 'datetime',
-							showEmpty: false
-						},
-						yAxis: {
-							title: {text: false}
-						},
-						plotOptions: {
-							areaspline: {
-								stacking: 'normal',
-								pointStart: Date.UTC(2010, 0, 1),
-								pointIntervalUnit: 'year',
-								tooltip: {
-									headerFormat: '<b>{point.key}</b><br/>',
-									xDateFormat: '%d %m %Y'
-								},
-								marker: {
-									enabled: false,
-									symbol: 'circle',
-									radius: 2,
-									states: {
-										hover: {
-											enabled: true
-										}
-									}
-								}
-							}
-						}
-					},
-						area_stock_chart_default_options = {
-							title: {
-								text: 'chart.type is set to \'areaspline\''
-							},
-							chart: {
-								type: 'areaspline'
-							},
-							
-							rangeSelector: {
-								selected: 1
-							}
-						};
-					
-					function areaChartSeriesNormalize(raw_data) {
-						var line_colors = [__C.COLORS.FRANKLIN,__C.COLORS.ACCENT],
-							fill_colors = [__C.COLORS.FRANKLIN_ALT,__C.COLORS.ACCENT_ALT],
-							STD_NAMES = {
-								'view': 'Просмотры страницы организации',
-								'conversion': 'Конверсия',
-								'subscribe': 'Подписалось',
-								'unsubscribe': 'Отписалось'
-							},
-							output = [],
-							i = 0;
-						
-						$.each(raw_data, function(key, data){
-							output.push({
-								name: STD_NAMES[key],
-								fillColor: fill_colors[i],
-								lineColor: line_colors[i++],
-								data: data.reverse().map(function(line, i) {
-									return [moment.unix(line.since).valueOf(), line.value];
-								})
-							});
-						});
-						
-						return output;
-					}
-					
-					$wrapper.find('.SubscribersAreaChart').highcharts($.extend(true, {}, area_chart_default_options, {
-						title: {
-							text: 'Подписчики'
-						},
-						tooltip: {
-							shared: true
-						},
-						series: areaChartSeriesNormalize({subscribe: stat_data.subscribe, unsubscribe: stat_data.unsubscribe})
-					}));
-					
-					$wrapper.find('.ViewsAreaChart').highcharts('StockChart', $.extend(true, {}, area_stock_chart_default_options, {
-						series: areaChartSeriesNormalize({view: stat_data.view})
-					}));
-					
-					$wrapper.find('.ConversionsAreaChart').highcharts($.extend(true, {}, area_chart_default_options, {
-						title: {
-							text: 'Конверсия просмотров/подписок'
-						},
-						tooltip: {
-							valueSuffix: ' %'
-						},
-						series: areaChartSeriesNormalize({conversion: stat_data.conversion})
-					}));
-					
-					console.log(stat_data);
-				});
-				
-				
-				
-				
-				console.log(stat_data);
-				console.log(org_data);
-			});
-			bindRippleEffect($wrapper);
-			bindControllers($wrapper);
 		});
 	}
 	
-	function Events($wrapper) {}
 	
-	function Auditory($wrapper) {}
 	
-	function Promotion($wrapper) {}
 	
-	function Settings($wrapper) {}
+	function StatisticsOverview($wrapper) {
+		
+		function getMyOrganizations(role, fields, success){
+			$.ajax({
+				url: '/api/v1/organizations/',
+				data: {
+					roles: role,
+					fields: fields ? Array.isArray(fields) ? fields.join(',') : fields : [
+						'img_medium_url',
+						'subscribed_count',
+						'staff'/*,
+						 'events{length:500,future:true,is_delayed:true}'*/
+					].join(',')
+				},
+				method: 'GET',
+				success: function(res){
+					ajaxHandler(res, function(data, text){
+						var staffs_additional_fields = {
+							is_link: true,
+							avatar_classes: ['-size_100x100','-rounded']
+						};
+						data.forEach(function(org) {
+							var avatars_max_count = 2,
+								org_roles = roles.map(function(role) {
+									return $.extend({}, role, {staff: getSpecificStaff(role.name, org.staff, staffs_additional_fields), plural_name: role.name+'s'})
+								}),
+								staffs_fields = {
+									classes: ['-size_30x30', '-rounded', 'CallModal'],
+									dataset: {
+										modal_type: 'editors',
+										modal_organization_id: org.id
+									}
+								};
+							
+							org_roles.forEach(function(role) {
+								org[role.plural_name] = buildAvatarCollection(role.staff, avatars_max_count, $.extend(true, {}, staffs_fields, {
+									dataset: {
+										modal_specific_role: role.name,
+										modal_title: role.title
+									}
+								}));
+								
+								org[role.plural_name+'_plus_count'] = role.staff.length - avatars_max_count;
+								org[role.plural_name+'_plus_count_hidden'] = org[role.plural_name+'_plus_count'] <= 0 ? '-cast' : '';
+							});
+							
+							/*
+							org.future_events = org.future_events_count + getUnitsText(org.future_events_count, {
+									NOM: ' предстоящее событие',
+									GEN: ' предстоящих события',
+									PLU: ' предстоящих событий'
+								});*/
+							
+							org.subscribers = org.subscribed_count + getUnitsText(org.subscribed_count, __C.TEXTS.SUBSCRIBERS);
+							
+							org.buttons = $();
+							if(role == 'admin'){
+								org.buttons = org.buttons.add(buildButton({
+									title: 'Редактировать',
+									classes: ['fa_icon', 'fa-pencil', '-color_neutral', 'RippleEffect'],
+									dataset: {
+										page: 'edit_organization',
+										title: 'Редактировать организацию',
+										organization_id: org.id
+									}
+								}));
+							}
+							org.buttons = org.buttons.add(buildButton({
+								title: 'Создать событие',
+								classes: ['fa_icon', 'fa-plus', '-color_accent', 'RippleEffect'],
+								dataset: {
+									page: 'edit_event',
+									title: 'Создать событие',
+									organization_id: org.id
+								}
+							}));
+							
+						});
+						if(success && typeof success == 'function'){
+							success(data);
+						}
+					}, ajaxErrorHandler)
+				}
+			});
+		}
+		
+		$wrapper.html(tmpl('statistics-overview-activity', {}));
+		
+		getMyOrganizations('admin', false, function(organizations) {
+			if(organizations.length){
+				var $organizations = tmpl('statistics-overview-organizations', {
+					heading: '',
+					organizations: tmpl('statistics-overview-organization', organizations)
+				}, $wrapper);
+				trimAvatarsCollection($organizations);
+				bindControllers($organizations);
+				Modal.bindCallModal($organizations);
+				bindRippleEffect($organizations);
+			}
+		})
+		
+	}
 	
-	function Support($wrapper) {}
+	function StatisticsOrganization($wrapper) {
+		var current_state = window.location.pathname.split('/')[3],
+			sub_states = {
+				overview: Overview,
+				events: Events,
+				auditory: Auditory,
+				promotion: Promotion,
+				settings: Settings,
+				support: Support
+			};
+		
+		function Overview($wrapper) {
+			var org_id = __STATES.entityId,
+				org_fields = [
+					'description',
+					'img_medium_url',
+					'default_address',
+					'staff',
+					'privileges',
+					'events{length:3,future:true,is_canceled:true,is_delayed:true,fields:"organization_short_name,public_at",order_by:"nearest_event_date"}'
+				],
+				stat_fields = [
+					'subscribe',
+					'view',
+					'fave',
+					'conversion',
+					'audience',
+					'dynamics'+JSON.stringify({
+						scale: 'week',
+						fields: [
+							'subscribe',
+							'view',
+							'fave',
+							'conversion'
+						].join(',')
+					})
+				].join(',');
+			
+			function getOrganizationData(org_id, fields, success){
+				$.ajax({
+					url: '/api/v1/organizations/'+org_id,
+					data: {
+						fields: Array.isArray(fields) ? fields.join(',') : fields
+					},
+					method: 'GET',
+					success: function(res){
+						ajaxHandler(res, function(data, text){
+							if(success && typeof success == 'function'){
+								success(data);
+							}
+						}, ajaxErrorHandler)
+					}
+				});
+			}
+			
+			function buildPieChart($container, data) {
+				
+				function pieChartSeriesNormalize(raw_data) {
+					var
+						STD_NAMES = {
+							"browser": "Браузер",
+							"android": "Аndroid",
+							"ios": "iOS",
+							"female": "Женщины",
+							"male": "Мужчины",
+							"other": "Остальные",
+							null: "Не указано"
+						};
+					return [{
+						data: raw_data.map(function(line, i) {
+							return {
+								name: line.name ? STD_NAMES[line.name] : STD_NAMES[line.gender],
+								y: line.count
+							}
+						})
+					}];
+				}
+				
+				$container.highcharts($.extend(true, {}, highchart_defaults, pie_chart_options, {series: pieChartSeriesNormalize(data)}));
+			}
+			
+			$wrapper.empty();
+			getOrganizationData(org_id, org_fields, function(org_data) {
+				var staffs_additional_fields = {
+						is_link: true,
+						avatar_classes: ['-size_40x40','-rounded']
+					};
+				org_data = org_data[0];
+				
+				changeTitle(['Организации', org_data.short_name]);
+				
+				org_data.administrators = getSpecificStaff('admin', org_data.staff, staffs_additional_fields);
+				org_data.moderators = getSpecificStaff('moderator', org_data.staff, staffs_additional_fields);
+				/*switch(role){
+					case __C.ROLES.ADMIN: {
+						org_data.administrators.push({
+							avatar_url: '/app/img/add_user.png',
+							name: 'Добавить администратора',
+							block_classes: ['-add_new','-color_marginal','AddAdmin'],
+							avatar_classes: ['-size_40x40','-rounded']
+						});
+					}
+					case __C.ROLES.MODERATOR: {
+						org_data.moderators.push({
+							avatar_url: '/app/img/add_user.png',
+							name: 'Добавить модератора',
+							block_classes: ['-add_new','-color_marginal','AddModerator'],
+							avatar_classes: ['-size_40x40','-rounded']
+						});
+						break;
+					}
+				}*/
+				org_data.administrators = buildAvatarBlocks(org_data.administrators);
+				if(org_data.moderators.length){
+					org_data.moderators = buildAvatarBlocks(org_data.moderators);
+				} else {
+					org_data.is_moderators = __C.CLASSES.NEW_HIDDEN;
+				}
+				org_data.event_blocks = org_data.events.map(function(event) {
+					var event_block = {
+						id: event.id,
+						title: event.title,
+						organization_short_name: event.organization_short_name,
+						day: moment.unix(event.first_event_date).format("D"),
+						month: moment.unix(event.first_event_date).format("MMM"),
+						badges: []
+					};
+					if(event.canceled)
+						event_block.badges.push('Отменено');
+					if(event.public_at && moment.unix(event.public_at).isBefore())
+						event_block.badges.push('Не опубликовано');
+					return event_block;
+				});
+				org_data.event_blocks = tmpl('orgstat-event-block', org_data.event_blocks);
+				
+				$wrapper.append(tmpl('orgstat-overview', org_data));
+				
+				getStatistics('organization', org_id, SCALES.OVERALL, false, stat_fields, function(stat_data){
+					var storage_data_name = 'stat_org_'+org_id+'_data',
+						storage_until_name = 'stat_org_'+org_id+'_until',
+						scoreboards_data = {numbers: {}, dynamics: {}};
+					
+					$.each(stat_data.dynamics, function(field, dynamics) {
+						scoreboards_data.dynamics[field] = dynamics[0].value;
+						scoreboards_data.numbers[field] = stat_data[field][0].value;
+					});
+					buildPieChart($wrapper.find('.GenderPieChart'), stat_data.audience.gender);
+					buildPieChart($wrapper.find('.DevicePieChart'), stat_data.audience.devices);
+					
+					$wrapper.find('.OrgstatOverviewContent').append(tmpl('orgstat-overview-content', {}));
+					updateScoreboards($wrapper.find('.Scoreboards'), scoreboards_data, {
+						'subscribe': 'Подписчиков организатора',
+						'fave': 'Добавлений в избранное',
+						'view': 'Просмотров организатора',
+						'conversion': 'Конверсия откытий/подписки'
+					}, ['subscribe', 'fave', 'view', 'conversion']);
+					
+					if(moment.unix(window.sessionStorage.getItem(storage_until_name)).isSameOrBefore(moment())){
+						tmpl('loader', {}, $wrapper.find('.OrgStatAreaCharts').children('.AreaChart'));
+						getStatistics('organization', org_id, SCALES.HOUR, moment().subtract(12, 'months').format(), 'view,subscribe,unsubscribe,conversion', function(stat_data) {
+							var chart_data = {
+								view: stat_data.view,
+								subscribe_unsubscribe: stat_data.subscribe.map(function(el, i) {
+									return {
+										time_value: el.time_value,
+										subscribe: el.value,
+										unsubscribe: stat_data.unsubscribe[i].value
+									}
+								}),
+								conversion: stat_data.conversion
+							};
+							window.sessionStorage.setItem(storage_data_name, JSON.stringify(chart_data));
+							window.sessionStorage.setItem(storage_until_name, moment().add(15, 'm').unix());
+							buildAreaCharts($wrapper, chart_data);
+						});
+					} else {
+						buildAreaCharts($wrapper, JSON.parse(window.sessionStorage.getItem(storage_data_name)));
+					}
+				});
+				
+				bindRippleEffect($wrapper);
+				bindControllers($wrapper);
+			});
+		}
+		
+		function Events($wrapper) {}
+		
+		function Auditory($wrapper) {}
+		
+		function Promotion($wrapper) {}
+		
+		function Settings($wrapper) {}
+		
+		function Support($wrapper) {}
+		
+		if(!current_state)
+			current_state = 'overview';
+		
+		sub_states[current_state]($wrapper);
+		
+	}
+	
+	function StatisticsEvent($wrapper) {
+		var current_state = window.location.pathname.split('/')[3],
+			sub_states = {
+				overview: Overview,
+				auditory: Auditory,
+				edit: Edit,
+				promotion: Promotion
+			};
+		
+		function Overview($wrapper) {
+			var event_id = __STATES.entityId,
+				event_fields = [
+					'image_horizontal_medium_url',
+					'organization_short_name',
+					'favored_users_count',
+					'is_same_time',
+					'dates'
+				];
+			
+			function getEventData(event_id, fields, success){
+				$.ajax({
+					url: '/api/v1/events/'+event_id,
+					data: {
+						fields: Array.isArray(fields) ? fields.join(',') : fields
+					},
+					method: 'GET',
+					success: function(res){
+						ajaxHandler(res, function(data, text){
+							if(success && typeof success == 'function'){
+								success(data[0]);
+							}
+						}, ajaxErrorHandler)
+					}
+				});
+			}
+			
+			
+			$wrapper.empty();
+			getEventData(event_id, event_fields, function(event_data) {
+				changeTitle(['Орагнизации', event_data.organization_short_name, event_data.title]);
+				
+				tmpl('eventstat-overview', $.extend(true, {}, event_data, {
+					dates_block: tmpl('eventstat-overview-datetime', {
+						date: displayDateRange(event_data.first_event_date, event_data.last_event_date),
+						time: event_data.is_same_time ? displayTimeRange(event_data.dates[0].start_time, event_data.dates[0].end_time) : 'Разное время'
+					})
+				}), $wrapper);
+				tmpl('loader', {}, $wrapper.find('.EventStatAreaCharts').children('.AreaChart'));
+				
+				getStatistics('event', event_id, SCALES.OVERALL, false, 'view,fave,open_site,fave_conversion,open_conversion', function(data) {
+					var scoreboards_data = {numbers: {}};
+					$.each(data, function(field, stats) {
+						scoreboards_data.numbers[field] = stats[0].value
+					});
+					updateScoreboards($wrapper.find('.EventstatsScoreboards'), scoreboards_data, {
+						'fave': 'Добавлений в избранное',
+						'view': 'Просмотров события'
+					}, ['fave', 'view']);
+					
+					updateScoreboards($wrapper.find('.EventstatsBigScoreboards'), scoreboards_data, {
+						'view': 'Просмотров',
+						'open_site': 'Открытий',
+						'open_conversion': 'Конверсия открытий',
+						'fave': 'Добавлений',
+						'fave_conversion': 'Конверсия добавлений'
+					}, ['view', 'open_site', 'open_conversion', 'fave', 'fave_conversion'], 'big');
+				});
+				
+				getStatistics('event', event_id, SCALES.HOUR, moment().subtract(12, 'month').format(), 'view,fave,open_site,fave_conversion,open_conversion', function(data) {
+					buildAreaCharts($wrapper, data);
+				});
+				
+				
+				Modal.bindCallModal($wrapper);
+				bindControllers($wrapper);
+				
+			});
+			
+		}
+		
+		function Auditory($wrapper) {}
+		
+		function Edit($wrapper) {}
+		
+		function Promotion($wrapper) {}
+		
+		
+		if(!current_state)
+			current_state = 'overview';
+		
+		sub_states[current_state]($wrapper);
+	}
 	
 	if(!current_state)
-		current_state = 'overview';
+		current_state = 'statistics';
 	
-	sub_states[current_state]($wrapper);
 	$('body').addClass('-state_statistics');
+	statistics_states[current_state]($wrapper);
 	
-}
-
-function StatisticsEvent($view) {
-
 }
 
 function ajaxHandler(result, success, error){
@@ -2827,19 +3367,47 @@ function ajaxHandler(result, success, error){
 }
 
 function ajaxErrorHandler(event, jqxhr, settings, thrownError){
-	var args = Array.prototype.slice.call(arguments);
-	console.group('ajax error');
-	args.forEach(function(arg){
-		console.log(arg);
-	});
-	console.groupEnd();
-	if(jqxhr && jqxhr.responseJSON && jqxhr.responseJSON.text){
-		showNotifier({text: jqxhr.responseJSON.text, status: false});
-	} else if(event.text) {
-		showNotifier({text: event.text, status: false});
+	var args = Array.prototype.slice.call(arguments),
+		debug = {},
+		fields;
+	if(args.length == 4){
+		fields = ['event', 'jqxhr', 'settings', 'thrownError'];
+		args.forEach(function(arg, i){
+			debug[fields[i]] = arg;
+		});
+	} else if(args.length == 1) {
+		debug = args[0];
 	} else {
-		showNotifier({text: 'Упс, что-то пошло не так', status: false});
+		args.forEach(function(arg, i){
+			debug[i] = arg;
+		});
 	}
+	console.groupCollapsed('AJAX error');
+	if(debug.thrownError)
+		console.log('Thrown error:', debug.thrownError);
+	if(debug.event && debug.event.type)
+		console.log('Error type:', debug.event.type);
+	if(debug.event && debug.event.text)
+		console.log('Description:', debug.event.text);
+	if(debug.jqxhr && debug.jqxhr.responseJSON && debug.jqxhr.responseJSON.text){
+		console.log('Response:', debug.jqxhr.responseJSON.text);
+		showNotifier({text: debug.jqxhr.responseJSON.text, status: false});
+	}
+	if(debug.settings){
+		console.log('URL:', debug.settings.url);
+		console.log('Method:', debug.settings.type);
+	}
+	if(debug.stack){
+		console.log('Thrown error:', debug.name);
+		console.log('Description:', debug.message);
+		console.log('Error stacktrace:', debug.stack);
+	} else {
+		console.error('Error stacktrace:');
+	}
+	console.groupEnd();
+	
+	if(!window.debug)	window.debug = [];
+	window.debug.push(debug);
 }
 
 $(document)

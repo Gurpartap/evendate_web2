@@ -1,7 +1,15 @@
 String.prototype.capitalize = function() {
 	return this.charAt(0).toUpperCase() + this.slice(1);
 };
-String.prototype.contains = function(it) {return this.indexOf(it) != -1;};
+String.prototype.contains = function(it) {return this.search(it) !== -1;};
+String.prototype.format = function(fields){
+	return this.replace(/\{(\w+)\}/gm, function(m,n){
+		return fields[n] ? fields[n] : m;
+	});
+};
+String.prototype.toCamelCase = function(delimiter){
+	return this.split(delimiter ? delimiter : ' ').map(function(part) { return part.capitalize(); }).join('');
+};
 Object.props = function(obj){
 	var props = [];
 	Object.keys(obj).forEach(function(prop){
@@ -19,6 +27,15 @@ Object.methods = function(obj){
 		}
 	});
 	return methods;
+};
+Object.values = typeof Object.values == 'function' ? Object.values : function(obj) {
+	var vals = [];
+	for (var key in obj) {
+		if (obj.hasOwnProperty(key) && obj.propertyIsEnumerable(key)) {
+			vals.push(obj[key]);
+		}
+	}
+	return vals;
 };
 Array.newFrom = function(original) {
 	var new_array = original.slice(0), arg, i;
@@ -121,17 +138,6 @@ Array.prototype.clean = function(deleteValue) {
 		};
 	}
 	
-	$.fn.animateNumber = function(options) {
-		var args = [options];
-		
-		for(var i = 1, l = arguments.length; i < l; i++) {
-			args.push(arguments[i]);
-		}
-		this.data(options);
-		
-		return this.animate.apply(this, args);
-	}
-	
 }(jQuery));
 
 function arrayToSpaceSeparatedString(){return this.join(' ')}
@@ -152,12 +158,32 @@ function objectToHtmlDataSet(){
 	return dataset.join(' ');
 }
 
-function formatDates(dates){
-	var prev_day,
-		range = [],
+/**
+ *
+ * @param {Object[]} dates
+ * @param {timestamp} dates[].event_date
+ * @param {string} [dates[].start_time]
+ * @param {string} [dates[].end_time]
+ * @param {(string|Array|jQuery|Object)} format
+ * @param {bool} is_same_time
+ * @returns {Array}
+ */
+function formatDates(dates, format, is_same_time){
+	var cur_moment,
+		prev_moment,
+		cur_year,
+		cur_month,
+		cur_time,
+		prev_time,
+		is_with_time = false,
+		cur_range_of_days = [],
+		last_index = dates.length - 1,
 		dates_obj = {},
-		output = [],
-		genitive_month_names = [
+		output = [];
+		
+	
+	function formatString(formatting, days, time, month, year) {
+		var genitive_month_names = [
 			'января',
 			'февраля',
 			'марта',
@@ -170,51 +196,220 @@ function formatDates(dates){
 			'октября',
 			'ноября',
 			'декабря'
-		];
-	
-	if(dates.length == 1){
-		return [moment.unix(dates[0].event_date).format('LL')];
+		],
+			format_options = {
+				d: days,
+				D: days,
+				t: time,
+				T: time,
+				M: month + 1,
+				MM: month + 1 > 9 ? month + 1 : "0"+(month + 1),
+				MMM: __LOCALES.DATE.MONTH_SHORT_NAMES[month].toLocaleLowerCase(),
+				MMMM: __LOCALES.DATE.MONTH_NAMES[month].toLocaleLowerCase(),
+				MMMMs: genitive_month_names[month],
+				Y: year,
+				YY: year.substr(2,2),
+				YYYY: year
+			},
+			output;
+		
+		if(typeof formatting == 'string'){
+			output = formatting.format(format_options).capitalize();
+		} else if(Array.isArray(formatting)) {
+			output = formatting.map(function(str) {
+				return str.format(format_options).capitalize();
+			});
+		} else if(formatting instanceof jQuery) {
+			output = $();
+			formatting.each(function(key, elem) {
+				var $elem = $(elem).clone();
+				$elem.text(elem.innerText.format(format_options).capitalize());
+				output = output.add($elem);
+			});
+		} else {
+			output = {};
+			$.each(formatting, function(key, str) {
+				output[key] = str.format(format_options).capitalize();
+			});
+		}
+		
+		return output;
 	}
 	
-	dates.forEach(function(date, i){
-		var this_day = moment.unix(date.event_date);
-		if(!dates_obj.hasOwnProperty(this_day.year())){
-			dates_obj[this_day.year()] = {};
+	if(!format) {
+		format = {
+			date: '{D} {MMMMs} {YYYY}',
+			time: '{T}'
 		}
-		if(!dates_obj[this_day.year()].hasOwnProperty(this_day.month())){
-			dates_obj[this_day.year()][this_day.month()] = [];
-		}
-		
-		if(!prev_day){
-			range = [this_day.format('D')];
-		} else {
-			if(this_day.month() == prev_day.month() && prev_day.diff(this_day, 'days') == -1){
-				range.push(this_day.format('D'));
-			} else {
-				dates_obj[prev_day.year()][prev_day.month()].push(range.length == 1 ? range.shift() : range.shift()+'-'+range.pop());
-				range = [this_day.format('D')];
-			}
-		}
-		
-		if(i === dates.length - 1){
-			dates_obj[this_day.year()][this_day.month()].push(range.length == 1 ? range.shift() : range.shift()+'-'+range.pop());
-		} else {
-			prev_day = this_day;
-		}
-	});
+	}
 	
-	for(var year in dates_obj){
-		if(dates_obj.hasOwnProperty(year)){
-			for(var month in dates_obj[year]){
-				if(dates_obj[year].hasOwnProperty(month)){
-					output.push(dates_obj[year][month].join(', ')+' '+genitive_month_names[month]+' '+year+' г.');
-				}
-			}
+	if(typeof format == 'string'){
+		is_with_time = format.contains((/\{T\}|\{t\}/)) && dates[0]['start_time'] !== undefined;
+	} else {
+		is_with_time = dates[0]['start_time'] !== undefined;
+		$.each(format, function() {
+			is_with_time = is_with_time || this.contains((/\{T\}|\{t\}/));
+		})
+	}
+	
+	if(is_same_time){
+		if(is_with_time){
+			cur_time = dates[0].end_time ? displayTimeRange(dates[0].start_time, dates[0].end_time) : displayTimeRange(dates[0].start_time);
 		}
+		
+		dates.forEach(function(date, i) {
+			cur_moment = moment.unix(date.event_date);
+			cur_year = cur_moment.year();
+			cur_month = cur_moment.month();
+			if(!dates_obj[cur_year])  dates_obj[cur_year] = {};
+			if(!dates_obj[cur_year][cur_month])  dates_obj[cur_year][cur_month] = [];
+			
+			if(prev_moment){
+				if(cur_month !== prev_moment.month() || prev_moment.diff(cur_moment, 'days') !== -1){
+					dates_obj[prev_moment.year()][prev_moment.month()].push(cur_range_of_days.join('-'));
+					cur_range_of_days[0] = cur_moment.format('D');
+				} else {
+					cur_range_of_days[1] = cur_moment.format('D');
+				}
+			} else {
+				cur_range_of_days[0] = cur_moment.format('D');
+			}
+			
+			if(i === last_index){
+				dates_obj[cur_year][cur_month].push(cur_range_of_days.join('-'));
+			} else {
+				prev_moment = cur_moment;
+			}
+		});
+		
+		
+		$.each(dates_obj, function(year, months){
+			$.each(months, function(month, days){
+				output.push(formatString(format, days.join(', '), is_with_time ? cur_time : '', month, year));
+			})
+		});
+		
+	} else {
+		dates.forEach(function(date, i) {
+			cur_moment = moment.unix(date.event_date);
+			cur_year = cur_moment.year();
+			cur_month = cur_moment.month();
+			cur_time = date.end_time ? displayTimeRange(date.start_time, date.end_time) : displayTimeRange(date.start_time);
+			if(!dates_obj[cur_year])  dates_obj[cur_year] = {};
+			if(!dates_obj[cur_year][cur_month])  dates_obj[cur_year][cur_month] = [];
+			
+			if(prev_moment){
+				if(cur_month !== prev_moment.month() || prev_moment.diff(cur_moment, 'days') !== -1 || prev_time !== cur_time){
+					dates_obj[prev_moment.year()][prev_moment.month()].push({
+						date: cur_range_of_days.join('-'),
+						time: prev_time
+					});
+					cur_range_of_days = [cur_moment.format('D')];
+				} else {
+					cur_range_of_days[1] = cur_moment.format('D');
+				}
+			} else {
+				cur_range_of_days = [cur_moment.format('D')];
+			}
+			
+			if(i === last_index){
+				dates_obj[cur_year][cur_month].push({
+					date: cur_range_of_days.join('-'),
+					time: prev_time
+				});
+			} else {
+				prev_moment = cur_moment;
+				prev_time = cur_time;
+			}
+		});
+		
+		$.each(dates_obj, function(year, months){
+			$.each(months, function(month, days){
+				var formatted_days = [],
+					range = [],
+					prev_time;
+				$.each(days, function(i, day) {
+					if(prev_time){
+						if(day.time != prev_time){
+							formatted_days.push({date: range.join(', '), time: prev_time});
+							range = [day.date];
+						} else {
+							range.push(day.date);
+						}
+					} else {
+						range = [day.date];
+					}
+					
+					if(i === days.length - 1){
+						formatted_days.push({date: range.join(', '), time: day.time});
+					} else {
+						prev_time = day.time;
+					}
+				});
+				
+				$.each(formatted_days, function(i, formatted_day) {
+					output.push(formatString(format, formatted_day.date, is_with_time ? formatted_day.time : '', month, year));
+				});
+			})
+		});
+			
+		
 	}
 	
 	
 	return output;
+}
+
+function trimSeconds(time) {
+	time = time.split(':');
+	if(time.length == 3)
+		time = time.splice(0,2);
+	
+	return time.join(':');
+}
+
+/**
+ *
+ * @param {timestamp} first_date
+ * @param {timestamp} last_date
+ * @returns {string}
+ */
+function displayDateRange(first_date, last_date){
+	var m_first = moment.unix(first_date),
+		m_last = moment.unix(last_date);
+	
+	if(m_first.isSame(m_last, 'year')){
+		if(m_first.isSame(m_last, 'month')){
+			if(m_first.isSame(m_last, 'day')){
+				return m_first.format('D MMM YYYY');
+			} else {
+				return m_first.format('D') + '-' + m_last.format('D MMM YYYY');
+			}
+		} else {
+			return m_first.format('D MMM') + ' - ' + m_last.format('D MMM YYYY');
+		}
+	} else {
+		return m_first.format('MMM YYYY') + ' - ' + m_last.format('MMM YYYY');
+	}
+}
+
+/**
+ *
+ * @param {string} start_time
+ * @param {string} [end_time]
+ * @returns {string}
+ */
+function displayTimeRange(start_time, end_time){
+	
+	if(end_time){
+		if(end_time == start_time && (start_time == '00:00:00' || start_time == '00:00')){
+			return 'Весь день';
+		} else {
+			return trimSeconds(start_time) + ' - ' + trimSeconds(end_time);
+		}
+	} else {
+		return trimSeconds(start_time);
+	}
 }
 
 
@@ -352,8 +547,23 @@ $.fn.extend({
 				return output;
 			}
 		}
+	},
+	
+	animateNumber: function(options) {
+		var args = [options];
+		
+		for(var i = 1, l = arguments.length; i < l; i++) {
+			args.push(arguments[i]);
+		}
+		this.data(options);
+		
+		return this.animate.apply(this, args);
 	}
 });
+
+jQuery.makeSet = function(array) {
+	return $($.map(array, function(el){return el.get();}));
+};
 
 function SubscribeButton($btn, options){
 	var self = this,
@@ -517,6 +727,42 @@ function buildButton(props){
 	return tmpl('button', props);
 }
 
+function buildUserTombstones(users, props){
+	function normalize(user) {
+		props.avatar_classes = props.avatar_classes ? (typeof props.avatar_classes == 'string') ? props.avatar_classes.split(' ') : props.avatar_classes : [];
+		props.tombstone_classes = props.tombstone_classes ? (typeof props.tombstone_classes == 'string') ? props.tombstone_classes.split(' ') : props.tombstone_classes : [];
+		
+		$.extend(true, user, {
+			dataset: {},
+			name: [user.first_name, user.last_name].join(' '),
+			size: '70x70'
+		}, props);
+		
+		if(props.is_link){
+			$.extend(true, user.dataset, {
+				page: 'friend/'+user.id,
+				'friend-id': user.id,
+				title: user.name,
+				name: user.name
+			});
+			user.tombstone_classes.push('Controller');
+		}
+		
+		user.avatar_classes.toString = arrayToSpaceSeparatedString;
+		user.tombstone_classes.toString = arrayToSpaceSeparatedString;
+		if(user.dataset)
+			user.dataset.toString = (Array.isArray(user.dataset)) ? arrayToSpaceSeparatedString : objectToHtmlDataSet;
+	}
+	
+	if(Array.isArray(users)){
+		users.forEach(normalize);
+	} else {
+		normalize(users);
+	}
+	
+	return tmpl('user-tombstone', users);
+}
+
 function buildAvatarBlocks(props){
 	if(Array.isArray(props)){
 		props.forEach(normalize);
@@ -546,7 +792,7 @@ function buildAvatarBlocks(props){
 	return tmpl('avatar-block', props);
 }
 
-function buildAvatarCollection(subscribers, count){
+function buildAvatars(subscribers, count){
 	var $subscribers = $();
 	$subscribers = $subscribers.add(tmpl('subscriber-avatar', __USER));
 	subscribers.forEach(function(subscriber){
@@ -555,6 +801,21 @@ function buildAvatarCollection(subscribers, count){
 		}
 	});
 	return $subscribers;
+}
+
+function buildAvatarCollection(users, max_count, props){
+	props.classes = props.classes ? (typeof props.classes == 'string') ? props.classes.split(' ') : props.classes : [];
+	props.classes.toString = arrayToSpaceSeparatedString;
+	if(props.dataset)
+		props.dataset.toString = (Array.isArray(props.dataset)) ? arrayToSpaceSeparatedString : objectToHtmlDataSet;
+	
+	props.avatars = tmpl('subscriber-avatar', __USER);
+	users.forEach(function(user){
+		if(user.id != __USER.id && props.avatars.length <= max_count){
+			props.avatars = props.avatars.add(tmpl('subscriber-avatar', user));
+		}
+	});
+	return tmpl('avatars-collection', props);
 }
 
 function buildOrganizationBlock(organization, additional_fields){
@@ -742,7 +1003,7 @@ function bindAddAvatar($parent){
 			$avatars = $collection.find('.avatar'),
 			amount = $avatars.length;
 
-		if($collection.data('max_subscribers') >= amount){
+		if($collection.data('max_amount') >= amount){
 			if($collection.hasClass('-subscribed')){
 				$collection.removeClass('-subscribed');
 				$collection.width(amount == 1 ? 0 : ($avatars.outerWidth()*(amount-1)) - (6*(amount-2)));
@@ -893,6 +1154,7 @@ function trimAvatarsCollection($parent){
 		} else {
 			$collection.width(amount == 1 ? 0 : ($avatars.outerWidth()*(amount-1)) - (6*(amount-2)));
 		}
+		$collection.addClass('-trimmed');
 	});
 }
 
@@ -985,6 +1247,7 @@ function showNotifier(response){
 function renderState(){
 	var page_split = __STATES.getCurrentState().split('/'),
 		page = page_split[0],
+		$body = $('body'),
 		$sidebar_nav_items = $('.SidebarNavItem'),
 		$tabs = $('.HeaderTabsWrapper').find('.Tab'),
 		$views = $('.PageView'),
@@ -993,10 +1256,10 @@ function renderState(){
 		$new_view,
 		controller;
 	
+	changeTitle(state.title);
+	
 	if(!(state.data.reload === false && state.data._index+1 == History.getCurrentIndex())){
-		$(window).off('scroll');
-		$(window).data('disable_upload', false);
-		$('body').removeClass('-state_statistics');
+		$(window).off('scroll').data('disable_upload', false);
 		switch(typeof __STATES[page]){
 			case 'function': {
 				controller = __STATES[page];
@@ -1009,11 +1272,13 @@ function renderState(){
 				return false;
 			}
 		}
-		$new_view = page == 'friend' ? $('.friends-app') : $views.filter('[data-controller="'  + controller.name + '"]');
-		if(!$cur_view.is($new_view))
+		$new_view = page == 'friend' ? $('.friends-app') : $views.filter('.'+controller.name+'View');
+		if(!$cur_view.is($new_view)){
 			$('#main_header').removeClass('-with_tabs');
+			$body.removeClass('-state_statistics');
+		}
 		
-		$('body').find('[data-page], .Controller').removeClass('-Handled_Controller').off('mousedown.pageRender');
+		$body.find('[data-page], .Controller').removeClass('-Handled_Controller').off('mousedown.pageRender');
 		$cur_view.addClass('-faded');
 		setTimeout(function(){
 			$cur_view.addClass(__C.CLASSES.NEW_HIDDEN);
@@ -1025,8 +1290,6 @@ function renderState(){
 			}, 200);
 		}, 200);
 	}
-	
-	changeMainTitle(state.title);
 	if(page != 'search')
 		$('#search_bar_input').val('');
 	
@@ -1077,7 +1340,7 @@ function renderSidebarOrganizations(organization, afterRenderCallback){
 		else if(typeof organization == 'number'){
 			$.ajax({
 				url: '/api/v1/organizations/'+organization,
-				data: {fields: 'new_events_count'},
+				data: {fields: 'new_events_count,img_small_url'},
 				success: function(res){
 					res.data.forEach(function(organization){
 						prependOrganization(organization);
@@ -1095,7 +1358,7 @@ function renderSidebarOrganizations(organization, afterRenderCallback){
 	}else{
 		$.ajax({
 			url: '/api/v1/organizations/subscriptions',
-			data: {fields: 'new_events_count'},
+			data: {fields: 'new_events_count,img_small_url'},
 			success: function(res){
 				res.data.forEach(function(organization){
 					prependOrganization(organization);
@@ -1136,26 +1399,36 @@ function renderHeaderTabs(tabs){
 	$('#main_header').addClass('-with_tabs');
 }
 
-function changeMainTitle(new_title){
-	var $page_title = $('#page_title');
-	$page_title.empty();
+function changeTitle(new_title){
+	var $new_title = $(),
+		title_str;
 	switch(true){
 		case (typeof new_title == 'string'): {
+			title_str = new_title;
 			new_title = new_title.split(' > ');
 		}
 		case (Array.isArray(new_title)): {
 			new_title.forEach(function(title_chunk, i) {
 				if(i)
-					$page_title.append('<span class="fa_icon fa-angle-right -empty"></span>');
-				$page_title.append('<span>'+title_chunk+'</span>');
+					$new_title = $new_title.add('<span class="fa_icon fa-angle-right -empty"></span>');
+				$new_title = $new_title.add('<span>'+title_chunk+'</span>');
 			});
+			if(!title_str){
+				title_str = new_title.join(' > ');
+			}
 			break;
 		}
 		case (new_title instanceof jQuery): {
-			$page_title.append(new_title);
+			$new_title = new_title;
+			new_title.each(function() {
+				if(this.text())
+					title_str += this.text() + ' ';
+			});
 			break;
 		}
 	}
+	$('#page_title').html($new_title);
+	$('title').text(title_str ? 'Evendate. '+title_str : 'Evendate');
 }
 
 function recognizeRole(privileges){
@@ -1167,6 +1440,17 @@ function recognizeRole(privileges){
 			role = __C.ROLES.MODERATOR;
 	});
 	return role;
+}
+
+function getSpecificStaff(role, staff, additional_fields){
+	var specific_staff = [];
+	staff.forEach(function(man){
+		if(man.role == role){
+			man.name = man.first_name + ' ' + man.last_name;
+			specific_staff.push($.extend(true, {}, man, additional_fields))
+		}
+	});
+	return specific_staff;
 }
 
 

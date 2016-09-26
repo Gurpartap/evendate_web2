@@ -150,7 +150,7 @@ $user_full_name = $user->getLastName() . ' ' . $user->getFirstName(); ?>
     <div id="main_section">
 
         <!-- START row-->
-        <div class="friends-app app_view -hidden PageView" data-controller="Friends">
+        <div class="friends-app app_view -hidden PageView FriendsView" data-controller="Friends">
             <div class="page_wrapper" style="padding-top: 100px;">
 
                 <div class="no-friends-block hidden">
@@ -189,112 +189,52 @@ $user_full_name = $user->getLastName() . ' ' . $user->getFirstName(); ?>
         <!-- END row-->
 
         <!-- START row-->
-        <div class="search-app app_view -hidden PageView" data-controller="Search">
+        <div class="search-app app_view -hidden PageView SearchView" data-controller="Search">
 						<div class="page_wrapper"></div>
         </div>
         <!-- END row-->
 
         <!-- START row-->
-        <div class="edit_event-app app_view -hidden PageView" data-controller="EditEvent">
+        <div class="edit_event-app app_view -hidden PageView EditEventView" data-controller="EditEvent">
             <div class="page_wrapper"></div>
         </div>
         <!-- END row-->
 
         <!-- START row-->
-        <div class="event-app app_view -hidden PageView" data-controller="OneEvent">
+        <div class="event-app app_view -hidden PageView OneEventView" data-controller="OneEvent">
             <div class="page_wrapper"></div>
         </div>
 
         <!-- START row-->
-        <div class="feed-app app_view -hidden PageView" data-controller="Feed">
+        <div class="feed-app app_view -hidden PageView FeedView" data-controller="Feed">
             <div class="page_wrapper"></div>
         </div>
 
         <!-- START row-->
-        <div class="organizations-app app_view -hidden PageView" data-controller="OrganizationsList">
-            <div class="page_wrapper"></div>
-        </div>
-        <!-- END row-->
-
-        <!-- START row-->
-        <div class="organization-app app_view -hidden PageView" data-controller="Organization">
+        <div class="organizations-app app_view -hidden PageView OrganizationsListView" data-controller="OrganizationsList">
             <div class="page_wrapper"></div>
         </div>
         <!-- END row-->
 
         <!-- START row-->
-        <div class="onboarding-app app_view -hidden PageView" data-controller="Onboarding">
+        <div class="organization-app app_view -hidden PageView OrganizationView" data-controller="Organization">
+            <div class="page_wrapper"></div>
+        </div>
+        <!-- END row-->
+
+        <!-- START row-->
+        <div class="onboarding-app app_view -hidden PageView OnboardingView" data-controller="Onboarding">
             <div class="page_wrapper"></div>
         </div>
         <!-- END row-->
 
 		<!-- START row-->
-		<div class="statistics-app app_view -hidden PageView" data-controller="StatisticsOrganization">
-			<div class="page_wrapper">
-
-				<div class="page orgstat_overview">
-					<aside class="orgstat_overview_sidebar">
-						<header class="orgstat_overview_sidebar_header">
-							<span class="orgstat_overview_sidebar_title">Об организаторе</span>
-							<span class="stamp -color_accent">Starter</span>
-						</header>
-						<div class="orgstat_overview_sidebar_wrapper orgstat_overview_sidebar_about">
-							<div class="user_tombstone">
-								<div class="avatar -size_ -rounded" style="background-image: url('http://evendate.ru/organizations_images/logos/medium/115.png')"></div>
-								<p class="user_tombstone_title">Агентство esPrezo</p>
-							</div>
-							<p class="orgstat_overview_sidebar_title">Презентационное агентство EsPrezo</p>
-							<p class="orgstat_overview_sidebar_description">esPrezo — главная русскоязычная платформа о презентациях и публичных выступлениях. Мастер-классы, вебинары, тренинги и курсы от презентационных экспертов.</p>
-							<p class="orgstat_overview_sidebar_location">г. Москва, Летниковская ул. 11/10, стр. 12, м. Павелецкая</p>
-							<button class="button -color_neutral fa_icon fa-pencil" type="button"><span class="Text">Редактировать</span></button>
-						</div>
-						<div class="orgstat_overview_sidebar_wrapper orgstat_overview_sidebar_add_telegram">
-							<button class="button fa_icon fa-send" type="button"><span class="Text">Создать Telegram бота</span></button>
-						</div>
-						<div class="orgstat_overview_sidebar_wrapper">
-							<p class="orgstat_overview_sidebar_title">Администраторы</p>
-							<div class="avatar_block Controller" data-page="friend/1164" data-friend-id="1164" data-title="Denis Ozdemir">
-								<div class="avatar -size_40x40 -rounded -bordered">
-									<img src="http://evendate.ru/user_images/default/vhem8LLtlsNqx4ggmabKSKQnyWSMf9VY.png" onerror="this.onerror=null;this.src='/app/img/logo_40.png'">
-								</div>
-								<span class="avatar_name">Denis Ozdemir</span>
-							</div>
-							<div class="avatar_block Controller" data-page="friend/1164" data-friend-id="1164" data-title="Denis Ozdemir">
-								<div class="avatar -size_40x40 -rounded -bordered">
-									<img src="http://evendate.ru/user_images/default/vhem8LLtlsNqx4ggmabKSKQnyWSMf9VY.png" onerror="this.onerror=null;this.src='/app/img/logo_40.png'">
-								</div>
-								<span class="avatar_name">Denis Ozdemir</span>
-							</div>
-							<p class="orgstat_overview_sidebar_title">Модераторы</p>
-							<div class="avatar_block Controller" data-page="friend/1164" data-friend-id="1164" data-title="Denis Ozdemir">
-								<div class="avatar -size_40x40 -rounded -bordered">
-									<img src="http://evendate.ru/user_images/default/vhem8LLtlsNqx4ggmabKSKQnyWSMf9VY.png" onerror="this.onerror=null;this.src='/app/img/logo_40.png'">
-								</div>
-								<span class="avatar_name">Denis Ozdemir</span>
-							</div>
-							<div class="avatar_block Controller" data-page="friend/1164" data-friend-id="1164" data-title="Denis Ozdemir">
-								<div class="avatar -size_40x40 -rounded -bordered">
-									<img src="http://evendate.ru/user_images/default/vhem8LLtlsNqx4ggmabKSKQnyWSMf9VY.png" onerror="this.onerror=null;this.src='/app/img/logo_40.png'">
-								</div>
-								<span class="avatar_name">Denis Ozdemir</span>
-							</div>
-						</div>
-						<div class="orgstat_overview_sidebar_wrapper">
-							<p class="orgstat_overview_sidebar_title">Предстоящие события</p>
-						</div>
-						<div class="orgstat_overview_sidebar_wrapper">
-							<p class="orgstat_overview_sidebar_title">Аудитория</p>
-						</div>
-					</aside><div class="orgstat_overview_content">
-
-					</div>
-				</div>
-
-			</div>
+		<div class="statistics-app app_view -hidden PageView StatisticsView" data-controller="StatisticsOrganization">
+			<div class="page_wrapper"></div>
 		</div>
 
         <!-- START row-->
-        <div class="add-organization-app app_view -hidden PageView" data-controller="AddOrganization">
+        <div class="add-organization-app app_view -hidden PageView AddOrganizationView" data-controller="AddOrganization">
             <div class="page_wrapper"></div>
         </div>
 
@@ -313,7 +253,7 @@ $user_full_name = $user->getLastName() . ' ' . $user->getFirstName(); ?>
 
     <div class="sidebar_main_wrapper scrollbar-outer SidebarScroll">
         <nav class="sidebar_navigation SidebarNav">
-            <div class="sidebar_navigation_item -hidden SidebarNavItem Controller" data-page="statistics/overview"
+            <div class="sidebar_navigation_item <?= $edit_event_btn_hidden ?> SidebarNavItem Controller" data-page="statistics"
                  data-title="Статистика"><span>Статистика</span></div>
             <div class="sidebar_navigation_item <?= $edit_event_btn_hidden ?> SidebarNavItem Controller"
                  data-page="edit_event" data-title="Создать событие">
@@ -366,6 +306,7 @@ $user_full_name = $user->getLastName() . ' ' . $user->getFirstName(); ?>
 <script src="/vendor/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js"></script>
 <!-- MOMENT JS-->
 <script src="/vendor/moment/min/moment-with-locales.min.js"></script>
+<script src="/vendor/moment/min/moment-timezone-with-data-2010-2020.min.js"></script>
 <!-- DATERANGEINPUTS-->
 <script src="/vendor/daterangepicker/daterangepicker.js"></script>
 <!-- INPUTMASKS -->

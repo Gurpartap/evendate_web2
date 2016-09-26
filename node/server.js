@@ -7,6 +7,7 @@ var
     app = require("express"),
     mysql = require('mysql'),
     rest = require('restler'),
+    async = require('async'),
     fs = require("fs"),
     moment = require("moment"),
     config = JSON.parse(fs.readFileSync('../v1-config.json')),
@@ -64,6 +65,20 @@ var
     server2,
     io = null,
     io2 = null,
+    handleError = function (err, emit_name, callback, socket) {
+        if (!err || err == null) return false;
+
+        logger.error(err);
+
+        if (callback instanceof Function) {
+            callback(err);
+            return true;
+        }
+        if (emit_name && socket) {
+            socket.emit(emit_name, {error: err});
+        }
+        return true;
+    },
     URLs = {
         "VK": {
             'GET_ACCESS_TOKEN': 'https://oauth.vk.com/access_token?client_id=' +
@@ -134,7 +149,17 @@ sql.setDialect('postgres');
 
 pg.connect(pg_conn_string, function (err, client, done) {
 
-    var updateEventsStats = function () {
+    var checkNested = function (obj /*, level1, level2, ... levelN*/) {
+        var args = Array.prototype.slice.call(arguments, 1);
+            for (var i = 0; i < args.length; i++) {
+                if (!obj || !obj.hasOwnProperty(args[i])) {
+                    return false;
+                }
+                obj = obj[args[i]];
+            }
+            return true;
+        },
+        updateEventsStats = function () {
         var q_upd_stats = 'INSERT INTO stat_notifications_aggregated(event_id, notifications_count, updated_at)' +
             ' SELECT' +
             ' id as event_id,' +
@@ -174,6 +199,68 @@ pg.connect(pg_conn_string, function (err, client, done) {
         });
     }
 
+    function updateEventsGeocodes(){
+        var q_get_events = 'SELECT id, location, location_updates FROM events ' +
+            '   WHERE (latitude IS NULL ' +
+            '       OR longitude IS NULL ' +
+            '       OR latitude = \'0\'' +
+            '       OR longitude =  \'0\')' +
+            '       AND (location_updates < 5 OR location_updates IS NULL)';
+
+        client.query(q_get_events, function(err, res){
+            if (handleError(err)) return;
+            var queue = [],
+                url = 'https://geocode-maps.yandex.ru/1.x/?';
+            res.rows.forEach(function(event){
+                (function(_event){
+                    queue.push(function(callback){
+                        var _url = url + [
+                                'format=json',
+                                'results=1',
+                                'geocode=' + encodeURIComponent(_event.location)
+                            ].join('&');
+                        rest.get(_url, {
+                            json: true
+                        })
+                            .on('complete', function(rest_res){
+                                if (_event.location_updates == null){
+                                    _event.location_updates = 0;
+                                }
+                                var upd_data = {location_updates: ++_event.location_updates};
+                                if (rest_res instanceof Error == false){
+                                    if (checkNested(rest_res, 'response', 'GeoObjectCollection', 'featureMember')){
+                                        if (rest_res['response']['GeoObjectCollection']['featureMember'].length > 0){
+                                            var feature_member = rest_res['response']['GeoObjectCollection']['featureMember'][0];
+                                            if (checkNested(feature_member, 'GeoObject', 'Point', 'pos')){
+                                                var pos = feature_member['GeoObject']['Point']['pos'].split(' ');
+                                                upd_data.latitude = pos[1];
+                                                upd_data.longitude = pos[0];
+                                            }
+                                        }
+                                    }
+                                }
+                                var q_upd_event = Entities.events
+                                        .update(upd_data)
+                                        .where(Entities.events.id.equals(_event.id))
+                                        .toQuery();
+                                client.query(q_upd_event, function(err){
+                                    handleError(err);
+                                    callback(null);
+                                });
+                            })
+                    })
+                })(event);
+            });
+            async.parallelLimit(queue, 5);
+        });
+
+    }
+
+    console.log(args);
+    if (args.indexOf('--update-geocodes') !== -1){
+        updateEventsGeocodes();
+    }
+
     try {
         new CronJob('*/1 * * * *', function () {
             if (config_index == 'prod' || args.indexOf('--resize-images') !== -1) {
@@ -188,6 +275,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 notifications.sendUsersNotifications();
             }
             publicDelayedEvents();
+            updateEventsGeocodes();
         }, null, true);
     } catch (ex) {
         logger.error(ex);
@@ -207,21 +295,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
             logger.error(err);
         });
 
-        var handleError = function (err, emit_name, callback) {
-                if (!err || err == null) return false;
-
-                logger.error(err);
-
-                if (callback instanceof Function) {
-                    callback(err);
-                    return true;
-                }
-                if (emit_name) {
-                    socket.emit(emit_name, {error: err});
-                }
-                return true;
-            },
-            getVkGroups = function (user_data, filter) {
+        var getVkGroups = function (user_data, filter) {
                 var request_data = [
                         'access_token=' + user_data.access_token,
                         'extended=1',
@@ -897,7 +971,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     ).toQuery();
 
             client.query(q_get_user_data, function (err, result) {
-                if (handleError(err, EMIT_NAMES.VK_INTEGRATION.GROUPS_TO_POST)) return;
+                if (handleError(err, EMIT_NAMES.VK_INTEGRATION.GROUPS_TO_POST, function(){}, socket)) return;
                 result.rows[0].user_id = user_id;
                 socket.vk_user = result.rows[0];
                 getVkGroups(result.rows[0], 'can_post');
@@ -918,7 +992,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
             fs.writeFile(image_path + filename, base64, 'base64', function (err) {
 
 
-                if (handleError(err, EMIT_NAMES.VK_INTEGRATION.POST_ERROR)) return;
+                if (handleError(err, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function(){}, socket)) return;
 
                 rest.get(url, {
                     json: true,
@@ -929,7 +1003,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     .on('complete', function (result) {
 
                         if (result instanceof Error) {
-                            handleError(result, EMIT_NAMES.VK_INTEGRATION.POST_ERROR);
+                            handleError(result, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function(){}, socket);
                         } else {
                             fs.stat(image_path + filename, function (err, stats) {
                                 rest
@@ -945,7 +1019,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
 
                                             if (upload_data instanceof Error) {
-                                                handleError(result, EMIT_NAMES.VK_INTEGRATION.POST_ERROR);
+                                                handleError(result, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function(){}, socket);
                                             } else {
 
                                                 upload_data = JSON.parse(upload_data);
@@ -960,10 +1034,10 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                                     .on('complete', function (res_data) {
 
                                                         if (res_data instanceof Error) {
-                                                            handleError(res_data, EMIT_NAMES.VK_INTEGRATION.POST_ERROR);
+                                                            handleError(res_data, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function(){}, socket);
                                                         } else {
                                                             if (res_data.response.length == 0) {
-                                                                handleError({name: 'CANT_SAVE_WALL_PHOTO'}, EMIT_NAMES.VK_INTEGRATION.POST_ERROR);
+                                                                handleError({name: 'CANT_SAVE_WALL_PHOTO'}, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function(){}, socket);
                                                                 return;
                                                             }
 
@@ -976,7 +1050,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                                                     group_id: data.guid
                                                                 }).returning('id').toQuery();
                                                             client.query(q_ins_vk_post, function (err) {
-                                                                if (handleError(err, EMIT_NAMES.VK_INTEGRATION.POST_ERROR)) return;
+                                                                if (handleError(err, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function(){}, socket)) return;
 
                                                                 rest
                                                                     .post(URLs.VK.POST_TO_WALL, {
@@ -992,7 +1066,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                                                     .on('complete', function (res) {
                                                                         console.log(res);
                                                                         if (res instanceof Error) {
-                                                                            handleError(result, EMIT_NAMES.VK_INTEGRATION.POST_ERROR);
+                                                                            handleError(result, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function(){}, socket);
                                                                         }
                                                                     });
                                                             })
