@@ -36,7 +36,7 @@ class OrganizationsStatistics extends AbstractAggregator
           WHEN client_type = \'ios\' THEN \'ios\'
           ELSE \'browser\'
            END AS name,
-         COUNT(tokens.id) AS count 
+         COUNT(tokens.id)::INT AS count 
         FROM tokens 
         INNER JOIN subscriptions ON subscriptions.user_id = tokens.user_id 
         WHERE subscriptions.status = TRUE
