@@ -1847,7 +1847,9 @@ body.-open_modal > .modal_wrapper {
 
 .calendar_day:not(.-disabled) {cursor: pointer}
 .calendar_day.not_this_month,
-.calendar_day.-disabled {opacity: .5}
+.calendar_day.-disabled,
+.event_calendar_day.not_this_month,
+.event_calendar_day.-disabled {opacity: .5}
 
 /* /Calendar */
 /* DatePicker */
@@ -3284,6 +3286,10 @@ body.-open_modal > .modal_wrapper {
 	border-left: 1px solid #c5c9d1;
 	border-left: 1px solid var(--color_primary_30);
 }
+.event_calendar {
+	height: 265px;
+}
+
 .event_additional_field {
 	font-size: .88rem;
 	margin: 2em 0 .5em;

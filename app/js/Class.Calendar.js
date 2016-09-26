@@ -19,10 +19,10 @@ function Calendar($calendar, options){
 			today_class: 'today'
 		},
 		additional_dataset: {},
-		selection_type: 'single',
-		multi_selection: false,
+		selection_type: Calendar.SELECTION_TYPES.SINGLE,
 		weekday_selection: false,
 		month_selection: false,
+		disable_selection: false,
 		min_date: false,
 		max_date: false,
 		locale: 'ru',
@@ -43,7 +43,7 @@ function Calendar($calendar, options){
 				this.options.max_date = false;
 			}
 			if(this.options.weekday_selection === true || this.options.month_selection === true ) {
-				this.options.multi_selection = true;
+				this.options.selection_type = Calendar.SELECTION_TYPES.MULTI;
 			}
 			this.selected_days = [];
 			this.selected_weeks = {};
@@ -63,6 +63,11 @@ function Calendar($calendar, options){
 		}
 	}
 }
+
+Calendar.SELECTION_TYPES = {
+	SINGLE: 'single',
+	MULTI: 'multi'
+};
 
 Calendar.prototype.setMonth = function(month, year){
 	switch(month){
@@ -222,17 +227,26 @@ Calendar.prototype.renderTable = function(){
 		.buildTable()
 		.activateSelectedDays()
 		.setMonthName();
-
-	if(this.options.multi_selection){
-		this.bindDragSelection();
-	} else {
-		this.bindDaySelection();
-	}
-	if(this.options.weekday_selection === true){
-		this.bindWeekdaySelection();
-	}
-	if(this.options.month_selection === true){
-		this.bindMonthSelection();
+	
+	if(!this.options.disable_selection){
+		switch(this.options.selection_type){
+			case Calendar.SELECTION_TYPES.MULTI: {
+				this.bindDragSelection();
+				break;
+			}
+			case Calendar.SELECTION_TYPES.SINGLE: {
+				this.bindDaySelection();
+				break;
+			}
+			default: {break;}
+		}
+		
+		if(this.options.weekday_selection === true){
+			this.bindWeekdaySelection();
+		}
+		if(this.options.month_selection === true){
+			this.bindMonthSelection();
+		}
 	}
 
 	return this;
@@ -292,15 +306,23 @@ Calendar.prototype.selectDays = function(days){
 	var self = this;
 
 	function select(day){
-		var $this_day = self.$calendar.find('.Day_'+day);
-		if(self.options.multi_selection === true) {
-			if(self.selected_days.indexOf(day) === -1){
-				self.selected_days.push(day);
-				self.selected_days.sort();
+		//var $this_day = self.$calendar.find('.Day_'+day);
+		
+		
+		switch(self.options.selection_type){
+			case Calendar.SELECTION_TYPES.MULTI: {
+				if(self.selected_days.indexOf(day) === -1){
+					self.selected_days.push(day);
+					self.selected_days.sort();
+				}
+				break;
 			}
-		}	else {
-			self.$calendar.find('.'+self.options.classes.td_class+'.'+__C.CLASSES.NEW_ACTIVE).removeClass(__C.CLASSES.NEW_ACTIVE);
-			self.selected_days = [day];
+			default:
+			case Calendar.SELECTION_TYPES.SINGLE: {
+				self.$calendar.find('.'+self.options.classes.td_class+'.'+__C.CLASSES.NEW_ACTIVE).removeClass(__C.CLASSES.NEW_ACTIVE);
+				self.selected_days = [day];
+				break;
+			}
 		}
 
 		//self.prev_selected_day = self.now_selected_day;
@@ -371,7 +393,7 @@ Calendar.prototype.deselectDays = function(days){ // 2012-12-21
 		self.$calendar.find('.Day_'+day).removeClass(__C.CLASSES.NEW_ACTIVE);
 	}
 
-	if(this.options.multi_selection === true){
+	if(this.options.selection_type === Calendar.SELECTION_TYPES.MULTI){
 		if(Array.isArray(days)){
 			days.forEach(function(day){
 				deselect(day);
@@ -461,7 +483,7 @@ Calendar.prototype.bindDaySelection = function(){
 		$active_days = $days_in_month.not('.'+this.options.classes.td_disabled_class);
 	$days_in_month.off('click.bindDaySelection');
 	$active_days.on('click.bindDaySelection', function(){
-		if(self.options.multi_selection === true && $(this).hasClass(__C.CLASSES.NEW_ACTIVE)){
+		if(self.options.selection_type === Calendar.SELECTION_TYPES.MULTI && $(this).hasClass(__C.CLASSES.NEW_ACTIVE)){
 			self.deselectDays($(this).data('date'));
 		} else {
 			self.selectDays($(this).data('date'));
