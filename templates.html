@@ -14,9 +14,9 @@
 </script>
 
 <script type="javascript/template" id="tmpl-user-tombstone">
-	<div class="user_tombstone Controller" data-is_friend="{is_friend}" data-page="friend/{id}" data-friend-id="{id}" data-title="{full_name}" data-name="{full_name}">
-		<div class="avatar -size_{size} -rounded" style="background-image: url('{avatar_url}')"></div>
-		<p class="user_tombstone_title">{full_name}</p>
+	<div class="user_tombstone {tombstone_classes}" {dataset}>
+		<div class="avatar -size_{size} -rounded {avatar_classes}" style="background-image: url('{avatar_url}')"></div>
+		<p class="user_tombstone_title">{name}</p>
 	</div>
 </script>
 
@@ -41,6 +41,12 @@
 	</div>
 </script>
 
+<script type="javascript/template" id="tmpl-avatars-collection">
+	<div class="avatars_collection AvatarsCollection {classes}" data-max_amount="{max_amount}" {dataset} style="width: 0">
+		{avatars}
+	</div>
+</script>
+
 <script type="javascript/template" id="tmpl-subscriber-avatar">
 	<div class="avatar" style="background-image: url({avatar_url})" title="{last_name} {first_name}"></div>
 </script>
@@ -49,7 +55,7 @@
 	<div class="organization_item {block_classes} Controller" data-page="organization/{id}" data-organization_id="{id}" data-title="{short_name}" {dataset}>
 		<div class="avatar_block">
 			<div class="avatar {avatar_classes}">
-				<img src="{img_url}" onerror="this.onerror=null;this.src='/app/img/logo_40.png'">
+				<img src="{img_small_url}" onerror="this.onerror=null;this.src='/app/img/logo_40.png'">
 			</div>
 			<span class="avatar_name">{short_name}</span>
 		</div>
@@ -65,6 +71,13 @@
 
 <script type="javascript/template" id="tmpl-tab">
 	<span class="tab Tab {classes}" {dataset}>{label}</span>
+</script>
+
+<script type="javascript/template" id="tmpl-loader">
+	<div class="loader">
+		<div class="loader_dot"></div>
+		<div class="loader_dot"></div>
+	</div>
 </script>
 
 <script type="javascript/template" id="tmpl-vk-share-button">
@@ -85,6 +98,24 @@
 		<div class="event_card_description">
 			<span>{title}</span>
 		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-scoreboard">
+	<div class="scoreboard {size} {type}">
+		<span class="scoreboard_number ScoreboardNumber">{number}</span>
+		<span class="scoreboard_title">{title}</span>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-scoreboard-with-dynamics">
+	<div class="scoreboard {size} {type}">
+		<span class="scoreboard_number ScoreboardNumber">{number}</span>
+		<p class="scoreboard_dynamic">
+			<label class="scoreboard_dynamic_icon fa_icon {icon_classes}"></label>
+			<span class="ScoreboardDynamic">{dynamic_by_week}</span><span> за неделю</span>
+		</p>
+		<span class="scoreboard_title">{title}</span>
 	</div>
 </script>
 
@@ -548,12 +579,11 @@
 
 <script type="javascript/template" id="tmpl-organization-info-page">
 	<div class="page organization_info_page">
-		<header class="organization_header">
-			<div class="img_holder">
-				<img src="{background_img_url}">
-			</div>
-			<div class="organization_header_backdrop"></div>
-			<div class="organization_header_bottom">
+		<div class="img_holder">
+			<img class="CallModal" src="{background_img_url}" data-modal_type="media">
+		</div>
+		<div class="organization_description_block">
+			<header class="organization_header">
 				<div class="avatar_block organization_title_block">
 					<div class="avatar -size_small organization_avatar"><img src="{img_small_url}"></div>
 					<span class="avatar_name organization_title" title="{name}">{name}</span>
@@ -561,19 +591,17 @@
 				<div class="organization_header_button OrganizationSubscribeButtonWrap">
 					<button class=" button -size_low -fill fa_icon {subscribe_button_classes} Subscribe RippleEffect" data-organization-id="{id}" type="button"><span class="Text">{subscribe_button_text}</span></button>
 				</div>
-			</div>
-		</header>
-		<div class="organization_description_block">
+			</header>
 			<p class="organization_description">{description}</p>
-			<div class="form_group -parts_1_2_1">
-				<div class="form_unit">
+			<div class="organization_metas">
+				<div class="organization_meta">
 					<a class="button -color_marginal fa_icon fa-external-link RippleEffect ExternalPage" href="{site_url}" target="_blank">Подробнее</a>
 				</div>
-				<div class="form_unit">
+				<div class="organization_meta">
 					<small class="-color_marginal {has_address}">Адрес организатора:</small>
 					<p class="organization_address">{default_address}</p>
 				</div>
-				<div class="form_unit">{redact_org_button}</div>
+				<div class="organization_meta">{redact_org_button}</div>
 			</div>
 		</div>
 		<div class="organization_feed Tabs">
@@ -611,7 +639,7 @@
 						<button class="button -size_low -fill -rounded fa_icon {subscribe_button_classes} Subscribe EventSubscribe -AddFavourite AddAvatar RippleEffect" data-event-id="{id}"><span class="Text">{subscribe_button_text}</span></button>
 					</div>
 					<div class="form_unit">
-						<div class="avatars_collection -subscribable {avatars_collection_classes} -rounded -bordered -size_small AvatarsCollection CallModal" data-max_subscribers="4" data-modal_type="favors" data-modal_entity_type="event" data-modal_entity_id="{id}" data-modal_title="Добавили в избранное">
+						<div class="avatars_collection -trimmed {avatars_collection_classes} -rounded -bordered -size_small AvatarsCollection CallModal" data-max_amount="4" data-modal_type="favors" data-modal_entity_type="event" data-modal_entity_id="{id}" data-modal_title="Добавили в избранное">
 							{subscribers}
 						</div>
 						<span class="counter -size_30x30 -bordered -color_marginal -castable {favored_users_show}">+<span class="FavoredCount">{favored_users_count}</span></span>
@@ -644,7 +672,7 @@
 				<div class="event_image_bottom">
 					<div class="form_group -parts_e_2 AddAvatarWrapper">
 						<div class="form_unit">
-							<div class="avatars_collection -subscribable -rounded -bordered -size_small {avatars_collection_classes} AvatarsCollection CallModal" data-max_subscribers="6" data-modal_type="favors" data-modal_entity_type="event" data-modal_entity_id="{id}" data-modal_title="Добавили в избранное">
+							<div class="avatars_collection -trimmed -rounded -bordered -size_small {avatars_collection_classes} AvatarsCollection CallModal" data-max_amount="6" data-modal_type="favors" data-modal_entity_type="event" data-modal_entity_id="{id}" data-modal_title="Добавили в избранное">
 								{subscribers}
 							</div>
 							<span class="counter -size_30x30 -bordered -color_marginal -castable {favored_users_show}">+<span class="FavoredCount">{favored_users_count}</span></span>
@@ -681,6 +709,7 @@
 					<span class="avatar_name">{organization_short_name}</span>
 				</div>
 			</div>
+			<div class="event_calendar EventCalendar"></div>
 			{event_additional_fields}<!--
 			<div class="share_block">
 				<label class="share_title -color_primary -transform_uppercase">Поделиться</label>
@@ -734,7 +763,7 @@
 <script type="javascript/template" id="tmpl-event-date-time-row">
 	<div class="event_additional_field_split">
 		<div class="event_additional_field"><p>{date}</p></div>
-		<div class="event_additional_field"><p>{start_time} - {end_time}</p></div>
+		<div class="event_additional_field"><p>{time}</p></div>
 	</div>
 </script>
 
@@ -789,7 +818,7 @@
 				{feed_event_infos}
 				<div class="form_group -parts_e_2 AddAvatarWrapper">
 					<div class="form_unit">
-						<div class="avatars_collection -subscribable -rounded -bordered -size_small {avatars_collection_classes} AvatarsCollection CallModal" data-max_subscribers="4" data-modal_type="favors" data-modal_entity_type="event" data-modal_entity_id="{id}" data-modal_title="Добавили в избранное">
+						<div class="avatars_collection -trimmed -rounded -bordered -size_small {avatars_collection_classes} AvatarsCollection CallModal" data-max_amount="4" data-modal_type="favors" data-modal_entity_type="event" data-modal_entity_id="{id}" data-modal_title="Добавили в избранное">
 							{subscribers}
 						</div>
 						<span class="counter -size_30x30 -bordered -color_marginal_primary -castable {favored_users_show}">+<span class="FavoredCount">{favored_users_count}</span></span>
@@ -818,6 +847,42 @@
 	</div>
 </script>
 
+<!-- STATISTICS -->
+<!-- Statistics Overview -->
+
+<script type="javascript/template" id="tmpl-statistics-overview-activity">
+	<!--<div class="page statistics_overview_activity"></div>-->
+</script>
+
+<script type="javascript/template" id="tmpl-statistics-overview-organizations">
+	<div class="statistics_overview_wrapper">
+		<h3 class="statistics_overview_heading">{heading}</h3>
+		{organizations}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-statistics-overview-organization">
+	<div class="page organization_card">
+		<aside class="organization_card_side">
+			<div class="avatar -size_100x100 -rounded Controller" data-page="organization_statistics/{id}" data-title="Организации > {short_name}">
+				<img src="{img_medium_url}" onerror="this.onerror=null;this.src='/app/img/logo_40.png'">
+			</div>
+		</aside>
+		<div class="organization_card_content">
+			<span class="organization_card_title Controller" data-page="organization_statistics/{id}" data-title="Организации > {short_name}" data-organization-id="{id}">{short_name}</span>
+			<div class="organization_card_info">
+				<span class="organization_card_field">{future_events}</span>
+				<span class="organization_card_field">{subscribers}</span>
+			</div>
+			<div class="organization_card_bottom">
+				<div class="organization_card_avatars">{admins}<span class="counter -size_30x30 -color_marginal_primary {admins_plus_count_hidden}">+<span class="FavoredCount">{admins_plus_count}</span></span></div>
+				<div class="organization_card_avatars">{moderators}<span class="counter -size_30x30 -color_marginal_primary {moderators_plus_count_hidden}">+<span class="FavoredCount">{moderators_plus_count}</span></span></div>
+				<div class="organization_card_buttons">{buttons}</div>
+			</div>
+		</div>
+	</div>
+</script>
+
 <!-- Organization Statistics -->
 <!-- Organization Statistics Overview -->
 
@@ -826,7 +891,7 @@
 		<aside class="orgstat_overview_sidebar">
 			<header class="orgstat_overview_sidebar_header">
 				<span class="orgstat_overview_sidebar_title">Об организаторе</span>
-				<span class="stamp -color_accent">Starter</span>
+				<!--<span class="stamp -color_accent">Starter</span>-->
 			</header>
 			<div class="orgstat_overview_sidebar_wrapper -align_center">
 				<div class="user_tombstone">
@@ -836,15 +901,17 @@
 				<p class="orgstat_overview_sidebar_title">{name}</p>
 				<p class="orgstat_overview_sidebar_description">{description}</p>
 				<p class="orgstat_overview_sidebar_location">{default_address}</p>
-				<button class="button -color_neutral -size_low fa_icon fa-pencil RippleEffect" type="button"><span class="Text">Редактировать</span></button>
+				<button class="button -color_neutral -size_low fa_icon fa-pencil RippleEffect Controller" type="button" data-page="/edit_organization" data-organization-id="{id}" data-title="Редактирование организации">
+					<span class="Text">Редактировать</span>
+				</button>
 			</div>
-			<div class="orgstat_overview_sidebar_wrapper -align_center">
+			<div class="orgstat_overview_sidebar_wrapper -align_center -hidden">
 				<button class="button -color_telegram -size_low fa_icon fa-send RippleEffect" type="button"><span class="Text">Создать Telegram бота</span></button>
 			</div>
 			<div class="orgstat_overview_sidebar_wrapper">
 				<p class="orgstat_overview_sidebar_title">Администраторы</p>
 				{administrators}
-				<p class="orgstat_overview_sidebar_title">Модераторы</p>
+				<p class="orgstat_overview_sidebar_title {is_moderators}">Модераторы</p>
 				{moderators}
 			</div>
 			<div class="orgstat_overview_sidebar_wrapper">
@@ -862,7 +929,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-orgstat-event-block">
-	<div class="orgstat_event_block">
+	<div class="orgstat_event_block Controller" data-page="/event_statistics/{id}" data-event-id="{id}" data-title="Орагнизации > {organization_short_name} > {title}">
 		<aside class="orgstat_event_block_date">
 			<span>{day}</span><br>
 			<span>{month}</span>
@@ -880,22 +947,55 @@
 
 <script type="javascript/template" id="tmpl-orgstat-overview-content">
 	<header class="orgstat_overview_header Scoreboards">{scoreboards}</header>
-	<div class="orgstat_overview_charts">
-		<div class="SubscribersAreaChart"></div>
-		<div class="ViewsAreaChart"></div>
-		<div class="ConversionsAreaChart"></div>
+	<div class="orgstat_overview_charts OrgStatAreaCharts">
+		<div class="orgstat_overview_chart AreaChart SubscriberAreaChart"></div>
+		<div class="orgstat_overview_chart AreaChart ViewAreaChart"></div>
+		<div class="orgstat_overview_chart AreaChart ConversionAreaChart"></div>
 	</div>
 </script>
 
-<script type="javascript/template" id="tmpl-orgstat-scoreboard">
-	<div class="orgstat_overview_scoreboard {type}">
-		<span class="scoreboard_number ScoreboardNumber">{number}</span>
-		<p class="scoreboard_dynamic"><label class="scoreboard_dynamic_icon fa_icon {icon_classes}"></label><span class="ScoreboardDynamic">{dynamic_by_week}</span><span> за неделю</span></p>
-		<span class="scoreboard_title">{title}</span>
+<!-- Event Statistics -->
+<!-- Event Statistics Overview -->
+
+<script type="javascript/template" id="tmpl-eventstat-overview">
+	<div class="page eventstat_overview">
+		<header class="eventstat_overview_header">
+			<div class="eventstat_overview_header_block img_holder">
+				<img src="{image_horizontal_medium_url}" class="CallModal" data-modal_type="media" data-modal_media_type="image" data-modal_media_url="{image_horizontal_url}">
+			</div>
+			<div class="eventstat_overview_header_block eventstat_overview_info">
+				<span class="eventstat_overview_event_title">{title}</span>
+				<div class="eventstat_overview_dates">
+					{dates_block}
+				</div>
+				<div class="eventstat_overview_buttons">
+					<button class="button -size_low -color_neutral RippleEffect Controller" type="button" data-page="event/{id}" data-title="{title}">Перейти на страницу</button>
+				</div>
+			</div>
+			<div class="eventstat_overview_header_block eventstat_overview_scoreboards_wrapper">
+				<div class="eventstat_overview_scoreboards EventstatsScoreboards">{scoreboards}</div>
+				<span class="action -color_accent fa_icon fa-plus-circle -hidden">Добавить к сравнению</span>
+			</div>
+		</header>
+		<div class="eventstat_overview_content">
+			<div class="eventstat_overview_charts EventStatAreaCharts">
+				<div class="eventstat_overview_chart AreaChart ViewAreaChart"></div>
+				<div class="eventstat_overview_chart AreaChart OpenSiteAreaChart"></div>
+				<div class="eventstat_overview_chart AreaChart OpenConversionsAreaChart"></div>
+				<div class="eventstat_overview_chart AreaChart FaveAreaChart"></div>
+				<div class="eventstat_overview_chart AreaChart FaveConversionsAreaChart"></div>
+			</div>
+			<div class="eventstat_overview_big_scoreboards EventstatsBigScoreboards">{big_scoreboards}</div>
+		</div>
 	</div>
 </script>
 
-
+<script type="javascript/template" id="tmpl-eventstat-overview-datetime">
+	<div class="eventstat_overview_datetime">
+		<div class="eventstat_overview_date"><span>{date}</span></div>
+		<div class="eventstat_overview_time"><span>{time}</span></div>
+	</div>
+</script>
 
 
 <!-- Modals -->
@@ -935,7 +1035,7 @@
 	<iframe width="100%" height="600" frameborder="0" style="display:block;border:0" src="https://www.google.com/maps/embed/v1/place?q={location}&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg" allowfullscreen></iframe>
 </script>
 
-<script type="javascript/template" id="tmpl-modal-favored-divider">
+<script type="javascript/template" id="tmpl-modal-users-divider">
 	<p class="modal_divider">{label}</p>
 </script>
 
@@ -973,17 +1073,6 @@
 </script>
 
 <!-- OLD -->
-<script type="javascript/template" id="tmpl-organizations-item">
-  <div class="row organizations-item animated organization-{id} Controller" title="{name}" data-page="organization/{id}" data-organization-id="{id}" data-title="{name}">
-    <div class="organizations-item-wrapper">
-      <div class="organization-img-wrapper">
-        <img src="{img_url}" title="{name}">
-      </div>
-      <div class="organization-item-name">{short_name}</div>
-    </div>
-  </div>
-</script>
-
 <script type="javascript/template" id="tmpl-settings-modal">
   <div class="modal fade settings-modal" id="settings-modal" tabindex="-1" role="dialog"
        aria-labelledby="organization-label">

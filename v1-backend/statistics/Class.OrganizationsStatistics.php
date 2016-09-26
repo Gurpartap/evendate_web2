@@ -109,7 +109,7 @@ class OrganizationsStatistics extends AbstractAggregator
             case Statistics::ORGANIZATION_VIEW:
             case Statistics::ORGANIZATION_UNSUBSCRIBE:
             case Statistics::ORGANIZATION_SUBSCRIBE: {
-                $query = str_replace('{SCALE}', $scale, self::SQL_GET_DATA);
+                $query = $this->replaceScale(self::SQL_GET_DATA, $scale);
                 $statements = array(
                     ':organization_id' => $this->organization->getId(),
                     ':entity' => Statistics::ENTITY_ORGANIZATION,
@@ -121,7 +121,7 @@ class OrganizationsStatistics extends AbstractAggregator
             }
             case Statistics::EVENT_UNFAVE:
             case Statistics::EVENT_FAVE: {
-                $query = str_replace('{SCALE}', $scale, self::SQL_GET_FAVORED);
+            $query = $this->replaceScale(self::SQL_GET_FAVORED, $scale);
                 $statements = array(
                     ':organization_id' => $this->organization->getId(),
                     ':entity' => Statistics::ENTITY_EVENT,
@@ -132,7 +132,7 @@ class OrganizationsStatistics extends AbstractAggregator
                 break;
             }
             case Statistics::EVENT_NOTIFICATIONS_SENT: {
-                $query = str_replace('{SCALE}', $scale, self::SQL_GET_NOTIFICATIONS);
+                $query = $this->replaceScale(self::SQL_GET_NOTIFICATIONS, $scale);
                 $statements = array(
                     ':organization_id' => $this->organization->getId(),
                     ':since' => $since->getTimestamp(),
@@ -248,8 +248,8 @@ class OrganizationsStatistics extends AbstractAggregator
         foreach ($views as $key => $view) {
             $result[] = array(
                 'time_value' => $view['time_value'],
-                'subscribe' => $subscribes[$key]['value'],
-                'view' => $view['value'],
+                'with' => $subscribes[$key]['value'],
+                'to' => $view['value'],
                 'value' => $view['value'] == 0 ? 0 : $subscribes[$key]['value'] / $view['value'] * 100
             );
         }
