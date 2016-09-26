@@ -11,7 +11,7 @@ class OrganizationsStatistics extends AbstractAggregator
 
     const SQL_GET_DATA = '
       SELECT
-      COUNT(stat_organizations.id) AS value,
+      COUNT(stat_organizations.id)::INT AS value,
       DATE_PART(\'epoch\', ts.time_value)::INT AS time_value
       FROM stat_organizations
         INNER JOIN stat_event_types ON stat_organizations.stat_type_id = stat_event_types.id 
@@ -45,7 +45,7 @@ class OrganizationsStatistics extends AbstractAggregator
     ';
 
     const SQL_GET_AUDIENCE_GENDER = '
-        SELECT gender, COUNT(users.id) AS count 
+        SELECT gender, COUNT(users.id)::INT AS count 
         FROM users 
         INNER JOIN subscriptions ON subscriptions.user_id = users.id 
         WHERE subscriptions.status = TRUE
@@ -55,7 +55,7 @@ class OrganizationsStatistics extends AbstractAggregator
 
 
     const SQL_GET_FAVORED = 'SELECT 
-      COUNT(stat_events.id) AS value,
+      COUNT(stat_events.id)::INT AS value,
       DATE_PART(\'epoch\', ts.time_value)::INT AS time_value
       FROM stat_events
       INNER JOIN stat_event_types ON stat_events.stat_type_id = stat_event_types.id 
@@ -78,7 +78,7 @@ class OrganizationsStatistics extends AbstractAggregator
         LIMIT 10000';
 
     const SQL_GET_NOTIFICATIONS = 'SELECT
-      COUNT(stat_notifications.id) AS value,
+      COUNT(stat_notifications.id)::INT AS value,
       DATE_PART(\'epoch\', ts.time_value)::INT AS time_value
       FROM stat_notifications
         INNER JOIN events_notifications ON stat_notifications.event_notification_id = events_notifications.id 

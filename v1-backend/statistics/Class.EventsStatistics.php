@@ -8,7 +8,7 @@ class EventsStatistics extends AbstractAggregator
 
     const SQL_GET_DATA = '
       SELECT
-      COUNT(stat_events.id) AS value,
+      COUNT(stat_events.id)::INT AS value,
       DATE_PART(\'epoch\', ts.time_value)::INT AS time_value
       FROM stat_events
         INNER JOIN stat_event_types ON stat_events.stat_type_id = stat_event_types.id 
@@ -29,7 +29,7 @@ class EventsStatistics extends AbstractAggregator
         LIMIT 10000';
 
     const SQL_GET_NOTIFICATIONS = 'SELECT
-      COUNT(stat_notifications.id) AS value,
+      COUNT(stat_notifications.id)::INT AS value,
       DATE_PART(\'epoch\', ts.time_value)::INT AS time_value
       FROM stat_notifications
         INNER JOIN events_notifications ON stat_notifications.event_notification_id = events_notifications.id 
