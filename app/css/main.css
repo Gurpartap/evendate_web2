@@ -1368,6 +1368,19 @@ a.button:hover {text-decoration: none}
 }
 
 /* /Action */
+/* Action */
+
+.tag_unit {
+	display: inline-block;
+	vertical-align: middle;
+	padding: 4px 6px;
+	margin: 0 6px 6px 0;
+	border-radius: 2px;
+	background-color: #fff;
+	box-shadow: 0 0 4px 0 hsla(0,0%,0%,.2);
+}
+
+/* /Action */
 /* Dropdown */
 
 .dropdown_box {
@@ -2401,6 +2414,13 @@ body.-open_modal > .modal_wrapper {
 	color: #fff;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	opacity: 1;
+	visibility: visible;
+
+	-webkit-transition: width .3s ease, opacity .3s ease, visibility .3s ease;
+	-moz-transition: width .3s ease, opacity .3s ease, visibility .3s ease;
+	-o-transition: width .3s ease, opacity .3s ease, visibility .3s ease;
+	transition: width .3s ease, opacity .3s ease, visibility .3s ease;
 }
 
 #page_title > span + span {margin-left: 14px}
@@ -2417,10 +2437,26 @@ body.-open_modal > .modal_wrapper {
 	width: calc(100% - 250px);
 	border-radius: 100px;
 	overflow: hidden;
+
+	-webkit-transition: width .3s ease;
+	-moz-transition: width .3s ease;
+	-o-transition: width .3s ease;
+	transition: width .3s ease;
 }
 
 .-state_statistics #search_bar {display: none}
 .-state_statistics #page_title {width: 780px}
+
+
+.-state_search #page_title {
+	width: 0;
+	opacity: 0;
+	visibility: hidden;
+}
+.-state_search #search_bar {
+	width: -webkit-calc(100% - 50px);
+	width: calc(100% - 50px);
+}
 
 #search_bar_input {
 	width: 100%;

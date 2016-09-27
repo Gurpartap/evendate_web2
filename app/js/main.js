@@ -731,6 +731,31 @@ function buildButton(props){
 	return tmpl('button', props);
 }
 
+function buildTags(tags, props){
+	if(props){
+		if(props.classes)
+			props.classes.toString = arrayToSpaceSeparatedString;
+		if(props.attributes)
+			props.attributes.toString = (Array.isArray(props.attributes)) ? arrayToSpaceSeparatedString : objectToHtmlAttributes;
+	}
+	
+	function normalizeTag(tag) {
+		return $.extend(true, {}, {
+			name: tag.name.toLowerCase(),
+			dataset: {
+				page: '/search/'+encodeURIComponent('#'+tag.name.toLowerCase()),
+				toString: objectToHtmlDataSet
+			}
+		}, props);
+	}
+	
+	if(Array.isArray(tags)){
+		return tmpl('tag', tags.map(normalizeTag));
+	} else {
+		return tmpl('tag', normalizeTag(tags));
+	}
+}
+
 function buildUserTombstones(users, props){
 	function normalize(user) {
 		props.avatar_classes = props.avatar_classes ? (typeof props.avatar_classes == 'string') ? props.avatar_classes.split(' ') : props.avatar_classes : [];
@@ -1279,7 +1304,9 @@ function renderState(){
 		$new_view = page == 'friend' ? $('.friends-app') : $views.filter('.'+controller.name+'View');
 		if(!$cur_view.is($new_view)){
 			$('#main_header').removeClass('-with_tabs');
-			$body.removeClass('-state_statistics');
+			$body.removeClass(function (index, css) {
+				return (css.match (/(^|\s)-state_\S+/g) || []).join(' ');
+			});
 		}
 		
 		$body.find('[data-page], .Controller').removeClass('-Handled_Controller').off('mousedown.pageRender');
@@ -1287,6 +1314,7 @@ function renderState(){
 		setTimeout(function(){
 			$cur_view.addClass(__C.CLASSES.NEW_HIDDEN);
 			$new_view.addClass('-faded').removeClass(__C.CLASSES.NEW_HIDDEN);
+			$body.addClass('-state_'+controller.name.toLowerCase());
 			controller($new_view);
 			bindControllers();
 			setTimeout(function(){
