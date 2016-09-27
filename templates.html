@@ -552,8 +552,9 @@
 
 <script type="javascript/template" id="tmpl-organization-unit">
 	<div class="page organization_unit">
-		<div class="organization_unit_avatar img_holder Controller" data-page="organization/{id}" data-organization-id="{id}" style="background-image: url('{img_small_url}')"></div>
+		<div class="organization_unit_background Controller" data-page="organization/{id}" data-organization-id="{id}" style="background-image: url({background_small_img_url})"></div>
 		<div class="organization_unit_content">
+			<div class="organization_unit_avatar avatar -size_55x55 -bordered -rounded Controller" data-page="organization/{id}" data-organization-id="{id}" style="background-image: url('{img_small_url}')"></div>
 			<h5 class="organization_unit_title Controller" data-page="organization/{id}" data-organization-id="{id}">{short_name}</h5>
 			<span class="organization_unit_subscribers">{subscribed_text}</span>
 			{redact_org_button}

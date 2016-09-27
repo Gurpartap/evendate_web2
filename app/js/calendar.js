@@ -680,7 +680,7 @@ function OrganizationsList($view){
 			url: '/api/v1/organizations/types',
 			method: 'GET',
 			data: {
-				fields: 'organizations{fields: "img_small_url,is_subscribed,subscribed_count,privileges", order_by: "-subscribed_count"}',
+				fields: 'organizations{fields: "background_small_img_url,img_small_url,is_subscribed,subscribed_count,privileges", order_by: "-subscribed_count"}',
 				order_by: 'order_position'
 			},
 			success: function(res){

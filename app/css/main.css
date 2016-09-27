@@ -1010,7 +1010,7 @@ input, select, textarea, button {font-family: inherit}
 	min-width: 2.2rem;
 	font-family: inherit;
 	font-size: .81em;
-	font-weight: 400;
+	font-weight: 500;
 	color: inherit;
 	border: 0;
 	border-radius: 2px;
@@ -1087,11 +1087,11 @@ a.button:hover {text-decoration: none}
 
 .button.-color_neutral,
 .button.-color_neutral_primary,
-.button.-color_neutral_accent {background-color: #fff}
+.button.-color_neutral_accent {background-color: #fff; background-color: var(--color_page);}
 
-.button.-color_marginal {background-color: #e0e0e0}
+.button.-color_marginal,
 .button.-color_marginal_primary,
-.button.-color_marginal_accent {background-color: #f9f9fa; background-color: var(--color_background_lighter);}
+.button.-color_marginal_accent {background-color: #fff; background-color: var(--color_page);}
 
 
 
@@ -1110,12 +1110,24 @@ a.button:hover {text-decoration: none}
 
 .button:not(:disabled).-color_default:hover,
 .button:not(:disabled):not([class*="-color_"]):hover {background-color: #f1f1f1}
-.button:not(:disabled)[class*="-color_"]:not(.-color_default):not(.-color_accent_alt):hover {box-shadow: 0 1px 6px #b3b3b3}
+.button:not(:disabled)[class*="-color_"]:hover {box-shadow: 0 1px 6px #b3b3b3}
+
+.button:not(:disabled).-color_default:hover,
+.button:not(:disabled).-color_marginal:hover,
+.button:not(:disabled).-color_accent_alt:hover,
+.button:not(:disabled).-color_marginal_accent:hover,
+.button:not(:disabled).-color_marginal_primary:hover {box-shadow: none}
+
 .button:not(:disabled).-color_accent_alt:hover {box-shadow: 0 1px 6px #e8b7b7}
+
+.button:not(:disabled).-color_marginal:hover,
+.button:not(:disabled).-color_marginal_primary:hover,
+.button:not(:disabled).-color_marginal_accent:hover {background-color: #ebedef}
 
 
 .button:disabled,
 .button.-status_disabled {
+	pointer-events: none;
 	cursor: default;
 	color: #9fa6b3;
 	color: var(--color_primary_50);
@@ -1910,6 +1922,11 @@ body.-open_modal > .modal_wrapper {
 .-size_50x50 > .avatar {
 	width: 50px;
 	height: 50px;
+}
+.avatar.-size_55x55,
+.-size_55x55 > .avatar {
+	width: 55px;
+	height: 55px;
 }
 .avatar.-size_100x100,
 .-size_100x100 > .avatar {
@@ -3034,47 +3051,49 @@ body.-open_modal > .modal_wrapper {
 .organizations_category.-active > .counter {display: none}
 
 .organizations_wrapper {
-	display: block;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-around;
 	margin-left: 300px;
-	font-size: 0;
 }
 
 .organization_unit {
-	display: inline-block;
-	vertical-align: top;
-	width: -webkit-calc((100% - 30px) / 2);
-	width: calc((100% - 30px) / 2);
-	margin-bottom: 18px;
-	padding: 12px;
-	font-size: 0;
+	flex: 0 1 240px;
+	max-width: 240px;
+	margin-bottom: 32px;
 }
 
-.organization_unit:nth-child(even) {margin-left: 30px}
-
-.organization_unit_avatar,
-.organization_unit_content {
-	display: inline-block;
-	vertical-align: top;
+.organization_unit_background {
+	height: 135px;
+	background-size: cover;
+	background-position: center;
 }
+
 
 .organization_unit_avatar {
-	width: 95px;
-	height: 95px;
+	position: absolute;
+	top: -27.5px;
+	left: 0;
+	right: 0;
+	margin: auto;
+	background-color: #fff;
+	box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.15);
 	background-size: contain;
 }
 
 .organization_unit_content {
-	width: -webkit-calc(100% - 107px);
-	width: calc(100% - 107px);
-	margin-left: 12px;
-	font-size: 1rem;
+	padding: 30px 12px 12px;
+	text-align: center;
 }
 
 .organization_unit_title {
 	display: block;
-	height: 2em;
-	margin: 9px 0 6px;
+	font-size: 1em;
+	font-weight: 500;
+	margin: 18px 0 12px;
 	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .organization_unit_subscribers {
