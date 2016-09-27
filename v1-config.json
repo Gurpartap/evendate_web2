@@ -190,7 +190,7 @@
     },
     "https":{
       "key_path": "/etc/letsencrypt/live/evendate.ru/privkey.pem",
-      "cert_path": "/etc/letsencrypt/live/evendate.ru/cert.pem"
+      "cert_path": "/etc/letsencrypt/live/evendate.ru/fullchain.pem"
     },
     "domain": "evendate.ru",
     "node_domain": "evendate.ru",
