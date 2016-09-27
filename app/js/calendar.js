@@ -2749,8 +2749,8 @@ function Statistics($view) {
 				'conversion': 'Конверсия',
 				'subscribe': 'Подписалось',
 				'unsubscribe': 'Отписалось',
-				'open_site': 'Открытий страницы события из ленту Evendate',
-				'open_conversion': 'Конвресия просмотра события в ленте к открытию страницы события',
+				'open_site': 'Открытий страницы события из ленты Evendate',
+				'open_conversion': 'Конверсия просмотра события в ленте к открытию страницы события',
 				'fave': 'Кол-во пользователей, которые добавили событие в избранное',
 				'fave_conversion': 'Конверсия открытия страницы события к добавлениям в избранное'
 			},
@@ -3200,7 +3200,7 @@ function Statistics($view) {
 						'subscribe': 'Подписчиков организатора',
 						'fave': 'Добавлений в избранное',
 						'view': 'Просмотров организатора',
-						'conversion': 'Конверсия откытий/подписки'
+						'conversion': 'Конверсия открытий/подписок'
 					}, ['subscribe', 'fave', 'view', 'conversion']);
 					
 					if(moment.unix(window.sessionStorage.getItem(storage_until_name)).isSameOrBefore(moment())){
@@ -3287,7 +3287,7 @@ function Statistics($view) {
 			
 			$wrapper.empty();
 			getEventData(event_id, event_fields, function(event_data) {
-				changeTitle(['Орагнизации', event_data.organization_short_name, event_data.title]);
+				changeTitle(['Организации', event_data.organization_short_name, event_data.title]);
 				
 				tmpl('eventstat-overview', $.extend(true, {}, event_data, {
 					dates_block: tmpl('eventstat-overview-datetime', {
