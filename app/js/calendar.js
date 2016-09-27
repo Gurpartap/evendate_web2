@@ -3135,7 +3135,10 @@ function Statistics($view) {
 					};
 				org_data = org_data[0];
 				
-				changeTitle(['Организации', org_data.short_name]);
+				changeTitle([{
+					title: 'Организации',
+					page: '/statistics'
+				}, org_data.short_name]);
 				
 				org_data.administrators = getSpecificStaff('admin', org_data.staff, staffs_additional_fields);
 				org_data.moderators = getSpecificStaff('moderator', org_data.staff, staffs_additional_fields);
@@ -3287,7 +3290,13 @@ function Statistics($view) {
 			
 			$wrapper.empty();
 			getEventData(event_id, event_fields, function(event_data) {
-				changeTitle(['Организации', event_data.organization_short_name, event_data.title]);
+				changeTitle([{
+					title: 'Организации',
+					page: '/statistics'
+				}, {
+					title: event_data.organization_short_name,
+					page: '/organization_statistics/'+event_data.organization_id
+				}, event_data.title]);
 				
 				tmpl('eventstat-overview', $.extend(true, {}, event_data, {
 					dates_block: tmpl('eventstat-overview-datetime', {
