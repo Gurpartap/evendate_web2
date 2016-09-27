@@ -2388,6 +2388,12 @@ body.-open_modal > .modal_wrapper {
 
 #page_title > span + span {margin-left: 14px}
 
+#page_title > span[data-page]:hover {
+	color: #ff5f9e;
+	color: var(--color_accent_alt);
+}
+.-state_statistics #page_title > span[data-page]:hover {color: #23d792}
+
 #search_bar {
 	margin: 12px 0;
 	width: -webkit-calc(100% - 250px);

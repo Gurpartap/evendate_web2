@@ -74,6 +74,10 @@ Array.prototype.clean = function(deleteValue) {
 	}
 	return this;
 };
+Math.roundTo = function(num, decimals) {
+	var d = Math.pow(10, decimals ? decimals : 0);
+	return Math.round(num*d)/d;
+};
 
 (function($) {
 	function handleStep(tween) {
@@ -1074,7 +1078,7 @@ function bindControllers($parent){
 			switch(e.which){
 				case 1: {
 					if (page_name != undefined){
-						changeState(page_name, $this.data('title') ? $this.data('title'): $this.text(), $this.data());
+						changeState(page_name, $this.data('title') ? $this.data('title'): '', $this.data());
 					} else {
 						if (window[controller_name] != undefined && window[controller_name] instanceof Function){
 							window[controller_name]();
@@ -1409,9 +1413,16 @@ function changeTitle(new_title){
 		}
 		case (Array.isArray(new_title)): {
 			new_title.forEach(function(title_chunk, i) {
-				if(i)
+				if(i) {
 					$new_title = $new_title.add('<span class="fa_icon fa-angle-right -empty"></span>');
-				$new_title = $new_title.add('<span>'+title_chunk+'</span>');
+				}
+				if(typeof title_chunk == 'object'){
+					title_chunk.toString = (Array.isArray(title_chunk)) ? arrayToSpaceSeparatedString : objectToHtmlDataSet;
+					$new_title = $new_title.add('<span class="Controller" '+title_chunk+'>'+title_chunk.title+'</span>');
+					new_title[i] = title_chunk.title;
+				} else {
+					$new_title = $new_title.add('<span>'+title_chunk+'</span>');
+				}
 			});
 			if(!title_str){
 				title_str = new_title.join(' > ');
@@ -1427,7 +1438,7 @@ function changeTitle(new_title){
 			break;
 		}
 	}
-	$('#page_title').html($new_title);
+	bindControllers($('#page_title').html($new_title));
 	$('title').text(title_str ? 'Evendate. '+title_str : 'Evendate');
 }
 
