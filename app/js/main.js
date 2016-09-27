@@ -74,6 +74,10 @@ Array.prototype.clean = function(deleteValue) {
 	}
 	return this;
 };
+Math.roundTo = function(num, decimals) {
+	var d = Math.pow(10, decimals ? decimals : 0);
+	return Math.round(num*d)/d;
+};
 
 (function($) {
 	function handleStep(tween) {

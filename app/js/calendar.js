@@ -2427,6 +2427,7 @@ function Statistics($view) {
 			YEAR: 'year',
 			OVERALL: 'overall'
 		},
+		EVENDATE_START = moment('15-12-2015', 'DD-MM-YYYY'),
 		highchart_defaults = {
 			chart: {
 				backgroundColor: null,
@@ -2542,7 +2543,7 @@ function Statistics($view) {
 							minute: ['%b %e, %H:%M', '%b %e, %H:%M', '-%H:%M'],
 							hour: ['%b %e, %H:%M', '%b %e, %H:%M', '-%H:%M'],
 							day: ['%b %e, %Y', '%b %e', '-%b %e, %Y'],
-							week: ['  %b %e, %Y', '%b %e', '-%b %e, %Y'],
+							week: ['%b %e, %Y', '%b %e', '-%b %e, %Y'],
 							month: ['%B %Y', '%B', '-%B %Y'],
 							year: ['%Y', '%Y', '-%Y']
 						}
@@ -2551,8 +2552,32 @@ function Statistics($view) {
 			},
 			tooltip: {
 				headerFormat: '<b>{point.key}</b><br/>',
+				positioner: function (labelWidth, labelHeight) {
+					return {
+						x: this.chart.plotLeft,
+						y: this.chart.plotTop
+					};
+				},
+				shadow: false,
+				shape: 'square',
 				valueDecimals: 0,
-				xDateFormat: '%e %b %Y, %H:%M'
+				xDateFormat: '%e %b %Y',
+				formatter: function() {
+					var s = '<b>'+ Highcharts.dateFormat(this.points[0].series.chart.tooltip.options.xDateFormat, this.x) +'</b><br/>',
+						categories = this.points[0].series.processedXData,
+						index = $.inArray(this.x, categories);
+					this.points[0].series.chart.series.forEach(function(series){
+						var value = '';
+						if(series.name != 'Navigator'){
+							value += series.tooltipOptions.valuePrefix ? ' '+series.tooltipOptions.valuePrefix : '';
+							value += Math.roundTo(series.processedYData[index], 2);
+							value += series.tooltipOptions.valueSuffix ? ' '+series.tooltipOptions.valueSuffix : '';
+							s += '<span style="color:'+series.color+'">●</span> '+series.name+': <b>'+value+'</b><br/>'
+						}
+					});
+					return s;
+				},
+				shared: true
 			},
 			scrollbar: {enabled: false},
 			navigator: {
@@ -2609,10 +2634,6 @@ function Statistics($view) {
 				},
 				buttons: [{
 					type: 'day',
-					count: 1,
-					text: "\xa0\xa0\xa0День\xa0\xa0\xa0"
-				}, {
-					type: 'day',
 					count: 7,
 					text: "\xa0\xa0\xa0Неделя\xa0\xa0\xa0"
 				}, {
@@ -2650,6 +2671,7 @@ function Statistics($view) {
 				}
 			},
 			yAxis: {
+				allowDecimals: false,
 				floor: 0,
 				min: 0,
 				gridLineDashStyle: 'dash',
@@ -2772,9 +2794,7 @@ function Statistics($view) {
 					output[key].push({
 						name: STD_NAMES[field],
 						showInLegend: false,
-						fillOpacity: 0,
-						color: '',
-						lineWidth: 0,
+						visible: false,
 						linkedTo: 1,
 						data: data.map(function(line, i) {
 							return [moment.unix(line.time_value).valueOf(), line[field_key]];
@@ -2807,8 +2827,9 @@ function Statistics($view) {
 	 *
 	 * @param {jQuery} $container
 	 * @param {object} data
+	 * @param {object} additional_options
 	 */
-	function buildAreaCharts($container, data){
+	function buildAreaCharts($container, data, additional_options){
 		var normalized_series = areaChartSeriesNormalize(data),
 			FIELDS = {
 				view: {
@@ -2843,7 +2864,8 @@ function Statistics($view) {
 			FILL_COLORS = [
 				['rgba(35, 215, 146, 0.18)', 'rgba(101, 101, 101, 0.6)', 'rgba(101, 101, 101, 0.6)'],
 				['rgba(35, 215, 146, 0.09)', 'rgba(101, 101, 101, 0.6)', 'rgba(101, 101, 101, 0.6)']
-			];
+			],
+			area_chart_options = $.extend(true, {}, area_chart_default_options, additional_options);
 		
 		$.each(normalized_series, function(key) {
 			var field_data = {
@@ -2873,7 +2895,7 @@ function Statistics($view) {
 				};
 			}
 			
-			$container.find('.'+FIELDS[key].wrapper_class).highcharts('StockChart', $.extend(true, {}, area_chart_default_options, field_data));
+			$container.find('.'+FIELDS[key].wrapper_class).highcharts('StockChart', $.extend(true, {}, area_chart_options, field_data));
 		});
 	}
 	
@@ -3187,8 +3209,8 @@ function Statistics($view) {
 				$wrapper.append(tmpl('orgstat-overview', org_data));
 				
 				getStatistics('organization', org_id, SCALES.OVERALL, false, stat_fields, function(stat_data){
-					var storage_data_name = 'stat_org_'+org_id+'_data',
-						storage_until_name = 'stat_org_'+org_id+'_until',
+					var storage_data_name = 'org_stats_'+org_id+'_data',
+						storage_until_name = 'org_stats_'+org_id+'_until',
 						scoreboards_data = {numbers: {}, dynamics: {}};
 					
 					$.each(stat_data.dynamics, function(field, dynamics) {
@@ -3208,7 +3230,7 @@ function Statistics($view) {
 					
 					if(moment.unix(window.sessionStorage.getItem(storage_until_name)).isSameOrBefore(moment())){
 						tmpl('loader', {}, $wrapper.find('.OrgStatAreaCharts').children('.AreaChart'));
-						getStatistics('organization', org_id, SCALES.HOUR, moment().subtract(12, 'months').format(), 'view,subscribe,unsubscribe,conversion', function(stat_data) {
+						getStatistics('organization', org_id, SCALES.DAY, EVENDATE_START.format(), 'view,subscribe,unsubscribe,conversion', function(stat_data) {
 							var chart_data = {
 								view: stat_data.view,
 								subscribe_unsubscribe: stat_data.subscribe.map(function(el, i) {
@@ -3325,8 +3347,12 @@ function Statistics($view) {
 					}, ['view', 'open_site', 'open_conversion', 'fave', 'fave_conversion'], 'big');
 				});
 				
-				getStatistics('event', event_id, SCALES.HOUR, moment().subtract(12, 'month').format(), 'view,fave,open_site,fave_conversion,open_conversion', function(data) {
-					buildAreaCharts($wrapper, data);
+				getStatistics('event', event_id, SCALES.DAY, EVENDATE_START.format(), 'view,fave,open_site,fave_conversion,open_conversion', function(data) {
+					buildAreaCharts($wrapper, data, {
+						rangeSelector: {
+							selected: 1
+						}
+					});
 				});
 				
 				
