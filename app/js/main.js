@@ -1046,7 +1046,7 @@ function bindCollapsing($parent){
 		var $button = $(this),
 			$wrapper = $button.siblings('.CollapsingWrapper'),
 			$content = $wrapper.children(),
-			default_height = $wrapper.data('defaultHeight') ? $wrapper.data('defaultHeight') : 0;
+			default_height = $wrapper.data('defaultHeight') < $content.height() ? $wrapper.data('defaultHeight') : $content.height();
 		function toggleCollapsing(){
 			if($wrapper.hasClass('-opened')){
 				$wrapper.height(default_height);
@@ -1059,6 +1059,9 @@ function bindCollapsing($parent){
 		}
 		if(!$wrapper.hasClass('-opened')){
 			$wrapper.on('click.toggleCollapsing', toggleCollapsing);
+			if($wrapper.height() < default_height){
+				$wrapper.height(default_height);
+			}
 		}
 		$button.on('click.toggleCollapsing', toggleCollapsing);
 	})
