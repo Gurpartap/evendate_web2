@@ -13,6 +13,10 @@
 	<button class="button {classes}" {dataset} type="button" {attributes}><span class="Text">{title}</span></button>
 </script>
 
+<script type="javascript/template" id="tmpl-tag">
+	<span class="tag_unit Controller {classes}" {dataset} {attributes}>{name}</span>
+</script>
+
 <script type="javascript/template" id="tmpl-user-tombstone">
 	<div class="user_tombstone {tombstone_classes}" {dataset}>
 		<div class="avatar -size_{size} -rounded {avatar_classes}" style="background-image: url('{avatar_url}')"></div>
@@ -552,8 +556,9 @@
 
 <script type="javascript/template" id="tmpl-organization-unit">
 	<div class="page organization_unit">
-		<div class="organization_unit_avatar img_holder Controller" data-page="organization/{id}" data-organization-id="{id}" style="background-image: url('{img_small_url}')"></div>
+		<div class="organization_unit_background Controller" data-page="organization/{id}" data-organization-id="{id}" style="background-image: url({background_small_img_url})"></div>
 		<div class="organization_unit_content">
+			<div class="organization_unit_avatar avatar -size_55x55 -bordered -rounded Controller" data-page="organization/{id}" data-organization-id="{id}" style="background-image: url('{img_small_url}')"></div>
 			<h5 class="organization_unit_title Controller" data-page="organization/{id}" data-organization-id="{id}">{short_name}</h5>
 			<span class="organization_unit_subscribers">{subscribed_text}</span>
 			{redact_org_button}
@@ -747,7 +752,7 @@
 
 <script type="javascript/template" id="tmpl-event-date-time">
 	<div class="event_additional_field">
-		<div class="collapsing_wrapper CollapsingWrapper -fading" data-default-height="80" style="height: 80px;">
+		<div class="collapsing_wrapper CollapsingWrapper -fading" data-default-height="80">
 			<div class="collapsing_content CollapsingContent">
 				<div class="event_additional_field_split">
 					<div class="event_additional_field"><label class="event_additional_field_label">Дата</label></div>
@@ -1040,6 +1045,44 @@
 </script>
 
 
+<!-- Search  -->
+
+<script type="javascript/template" id="tmpl-search-page">
+	<div class="search-organizations {no_organizations}">
+		<div class="search-organizations-wrapper scrollbar-outer">
+			<div class="search_organizations_wrapper">{organizations}</div>
+		</div>
+	</div>
+	<div class="search-events">{events}</div>
+</script>
+
+<script type="javascript/template" id="tmpl-organization-search-item">
+	<div class="organization-search-item clearfix Controller" data-page="organization/{id}" data-organization-id="{id}" data-title="{short_name}">
+		<div>
+			<img src="{img_url}" title="{name}" class="search-organization-img" data-organization-id="{id}">
+		</div>
+		<div class="search-organization-text">
+			<span class="organization-short-name">{short_name}</span>
+		</div>
+		<div>
+			<span class="organization-subscribers-count">{subscribed_count}</span> {subscribed_count_text}
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-search-no-events">
+	<div class="no-events text-center">
+		По запросу не найдено событий.
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-search-no-organizations">
+	<div class="no-organizations text-center">
+		По запросу не найдено организаций.
+	</div>
+</script>
+
+
 <!-- Onboarding  -->
 
 <script type="javascript/template" id="tmpl-onboarding-main">
@@ -1121,39 +1164,6 @@
 
 <script type="javascript/template" id="tmpl-twitter-share-link">
   <a href="https://twitter.com/share?url=http://evendate.ru/event/{id}?text={title}&via=evendate.ru&hashtags=#evendate"></a>
-</script>
-
-<script type="javascript/template" id="tmpl-search-page">
-	<div class="search-organizations">
-		<div class="search-organizations-wrapper scrollbar-outer">{organizations}</div>
-	</div>
-	<div class="search-events">{events}</div>
-</script>
-
-<script type="javascript/template" id="tmpl-organization-search-item">
-  <div class="organization-search-item clearfix Controller" data-page="organization/{id}" data-organization-id="{id}" data-title="{short_name}">
-    <div>
-      <img src="{img_url}" title="{name}" class="search-organization-img" data-organization-id="{id}">
-    </div>
-    <div class="search-organization-text">
-      <span class="organization-short-name">{short_name}</span>
-    </div>
-    <div>
-      <span class="organization-subscribers-count">{subscribed_count}</span> {subscribed_count_text}
-    </div>
-  </div>
-</script>
-
-<script type="javascript/template" id="tmpl-search-no-events">
-  <div class="no-events text-center">
-    По запросу не найдено событий.
-  </div>
-</script>
-
-<script type="javascript/template" id="tmpl-search-no-organizations">
-  <div class="no-organizations text-center">
-    По запросу не найдено организаций.
-  </div>
 </script>
 
 <script type="javascript/template" id="tmpl-friend-item">

@@ -319,7 +319,7 @@ function formatDates(dates, format, is_same_time){
 			if(i === last_index){
 				dates_obj[cur_year][cur_month].push({
 					date: cur_range_of_days.join('-'),
-					time: prev_time
+					time: cur_time
 				});
 			} else {
 				prev_moment = cur_moment;
@@ -356,10 +356,7 @@ function formatDates(dates, format, is_same_time){
 				});
 			})
 		});
-			
-		
 	}
-	
 	
 	return output;
 }
@@ -731,6 +728,31 @@ function buildButton(props){
 	return tmpl('button', props);
 }
 
+function buildTags(tags, props){
+	if(props){
+		if(props.classes)
+			props.classes.toString = arrayToSpaceSeparatedString;
+		if(props.attributes)
+			props.attributes.toString = (Array.isArray(props.attributes)) ? arrayToSpaceSeparatedString : objectToHtmlAttributes;
+	}
+	
+	function normalizeTag(tag) {
+		return $.extend(true, {}, {
+			name: tag.name.toLowerCase(),
+			dataset: {
+				page: '/search/'+encodeURIComponent('#'+tag.name.toLowerCase()),
+				toString: objectToHtmlDataSet
+			}
+		}, props);
+	}
+	
+	if(Array.isArray(tags)){
+		return tmpl('tag', tags.map(normalizeTag));
+	} else {
+		return tmpl('tag', normalizeTag(tags));
+	}
+}
+
 function buildUserTombstones(users, props){
 	function normalize(user) {
 		props.avatar_classes = props.avatar_classes ? (typeof props.avatar_classes == 'string') ? props.avatar_classes.split(' ') : props.avatar_classes : [];
@@ -1046,7 +1068,7 @@ function bindCollapsing($parent){
 		var $button = $(this),
 			$wrapper = $button.siblings('.CollapsingWrapper'),
 			$content = $wrapper.children(),
-			default_height = $wrapper.data('defaultHeight') ? $wrapper.data('defaultHeight') : 0;
+			default_height = $wrapper.data('defaultHeight') < $content.height() ? $wrapper.data('defaultHeight') : $content.height();
 		function toggleCollapsing(){
 			if($wrapper.hasClass('-opened')){
 				$wrapper.height(default_height);
@@ -1059,6 +1081,9 @@ function bindCollapsing($parent){
 		}
 		if(!$wrapper.hasClass('-opened')){
 			$wrapper.on('click.toggleCollapsing', toggleCollapsing);
+			if($wrapper.height() < default_height){
+				$wrapper.height(default_height);
+			}
 		}
 		$button.on('click.toggleCollapsing', toggleCollapsing);
 	})
@@ -1279,7 +1304,9 @@ function renderState(){
 		$new_view = page == 'friend' ? $('.friends-app') : $views.filter('.'+controller.name+'View');
 		if(!$cur_view.is($new_view)){
 			$('#main_header').removeClass('-with_tabs');
-			$body.removeClass('-state_statistics');
+			$body.removeClass(function (index, css) {
+				return (css.match (/(^|\s)-state_\S+/g) || []).join(' ');
+			});
 		}
 		
 		$body.find('[data-page], .Controller').removeClass('-Handled_Controller').off('mousedown.pageRender');
@@ -1287,6 +1314,7 @@ function renderState(){
 		setTimeout(function(){
 			$cur_view.addClass(__C.CLASSES.NEW_HIDDEN);
 			$new_view.addClass('-faded').removeClass(__C.CLASSES.NEW_HIDDEN);
+			$body.addClass('-state_'+controller.name.toLowerCase());
 			controller($new_view);
 			bindControllers();
 			setTimeout(function(){
