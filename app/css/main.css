@@ -3347,9 +3347,7 @@ body.-open_modal > .modal_wrapper {
 	border-left: 1px solid #c5c9d1;
 	border-left: 1px solid var(--color_primary_30);
 }
-.event_calendar {
-	height: 265px;
-}
+.event_calendar:not(:empty) {height: 265px}
 
 .event_additional_field {
 	font-size: .88rem;
