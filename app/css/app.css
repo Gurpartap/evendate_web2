@@ -8464,12 +8464,15 @@ fieldset[disabled] .flatdoc-wrapper .button.active {
   color: #ffffff;
 }
 .search-organizations{
-  height: 100%;
+	height: -webkit-calc(100% - 54px);
+	height: calc(100% - 54px);
   border-right: solid 1px #B9BDC3;
   position: fixed;
   width: 240px;
-  padding-top: 30px;
 }
+
+.search-organizations > .search-organizations-wrapper {height: 100%}
+.search_organizations_wrapper {padding: 30px 0}
 
 .search-events .tl-panel-block {
   background-color: #fff;
@@ -8485,6 +8488,8 @@ fieldset[disabled] .flatdoc-wrapper .button.active {
 	margin-left: auto;
 	padding-top: 1px;
 }
+
+.search-organizations.-hidden + .search-events {margin: 0 auto 0 0}
 
 .no-events {padding-top: 50px}
 

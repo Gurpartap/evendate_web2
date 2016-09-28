@@ -1186,7 +1186,7 @@ function Search($view){
 		query = decodeURIComponent(window.location.pathname.split('/')[2]),
 		send_data = {
 			fields: [
-			'events'+JSON.stringify({
+				'events'+JSON.stringify({
 				fields: [
 					'image_horizontal_medium_url',
 					'detail_info_url',
@@ -1205,11 +1205,8 @@ function Search($view){
 					'dates'
 				].join(','),
 				filters: "future=true"
-			}),
-			'organizations'+JSON.stringify({
-				fields: ['subscribed_count'].join(',')
 			})
-		].join(',')
+			]
 		};
 	
 	$('#search_bar_input').val(query);
@@ -1220,9 +1217,11 @@ function Search($view){
 			send_data.tags ? send_data.tags.push(query_var) : send_data.tags = [query_var];
 		} else {
 			send_data.q = query_var;
+			send_data.fields.push('organizations'+JSON.stringify({fields: ['subscribed_count'].join(',')}));
 		}
 	});
 	send_data.tags ? send_data.tags = send_data.tags.join('|') : null;
+	send_data.fields = send_data.fields.join(',');
 	
 	function uploadMoreEvents(ajax_data, ajax_url, success){
 		var $events = $(),
@@ -1273,10 +1272,12 @@ function Search($view){
 						$events = $events.add(tmpl('feed-event', event));
 					});
 					
-					data.organizations.forEach(function(organization){
-						organization.subscribed_count_text = getUnitsText(organization.subscribed_count, __C.TEXTS.SUBSCRIBERS);
-						$organizations = $organizations.add(tmpl('organization-search-item', organization));
-					});
+					if(data.organizations){
+						data.organizations.forEach(function(organization){
+							organization.subscribed_count_text = getUnitsText(organization.subscribed_count, __C.TEXTS.SUBSCRIBERS);
+							$organizations = $organizations.add(tmpl('organization-search-item', organization));
+						});
+					}
 					
 					if(success && typeof success == 'function'){
 						success($events, $organizations);
@@ -1310,18 +1311,20 @@ function Search($view){
 	
 	$wrapper.empty();
 	uploadMoreEvents(send_data, ajax_url, function($events, $organizations){
-		
-		if ($events.length == 0){
-			$events = tmpl('search-no-events', {});
-		}
-		if ($organizations.length == 0){
-			$organizations = tmpl('search-no-organizations', {});
-		}
-		
-		$wrapper.append(tmpl('search-page', {
+		var data = {
 			organizations: $organizations,
 			events: $events
-		}));
+		};
+		
+		if ($events.length == 0){
+			data.events = tmpl('search-no-events', {});
+		}
+		if ($organizations.length == 0){
+			data.no_organizations= __C.CLASSES.NEW_HIDDEN;
+			data.organizations = tmpl('search-no-organizations', {});
+		}
+		
+		$wrapper.append(tmpl('search-page', data));
 		$wrapper.find('.search-organizations-wrapper').scrollbar({
 			disableBodyScroll: true
 		});

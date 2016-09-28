@@ -2417,10 +2417,10 @@ body.-open_modal > .modal_wrapper {
 	opacity: 1;
 	visibility: visible;
 
-	-webkit-transition: width .3s ease, opacity .3s ease, visibility .3s ease;
-	-moz-transition: width .3s ease, opacity .3s ease, visibility .3s ease;
-	-o-transition: width .3s ease, opacity .3s ease, visibility .3s ease;
-	transition: width .3s ease, opacity .3s ease, visibility .3s ease;
+	-webkit-transition: width .4s ease, opacity .4s ease, visibility .4s ease;
+	-moz-transition: width .4s ease, opacity .4s ease, visibility .4s ease;
+	-o-transition: width .4s ease, opacity .4s ease, visibility .4s ease;
+	transition: width .4s ease, opacity .4s ease, visibility .4s ease;
 }
 
 #page_title > span + span {margin-left: 14px}
@@ -2438,10 +2438,10 @@ body.-open_modal > .modal_wrapper {
 	border-radius: 100px;
 	overflow: hidden;
 
-	-webkit-transition: width .3s ease;
-	-moz-transition: width .3s ease;
-	-o-transition: width .3s ease;
-	transition: width .3s ease;
+	-webkit-transition: width .4s ease;
+	-moz-transition: width .4s ease;
+	-o-transition: width .4s ease;
+	transition: width .4s ease;
 }
 
 .-state_statistics #search_bar {display: none}
