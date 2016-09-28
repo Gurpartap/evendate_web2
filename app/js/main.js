@@ -319,7 +319,7 @@ function formatDates(dates, format, is_same_time){
 			if(i === last_index){
 				dates_obj[cur_year][cur_month].push({
 					date: cur_range_of_days.join('-'),
-					time: prev_time
+					time: cur_time
 				});
 			} else {
 				prev_moment = cur_moment;
@@ -356,10 +356,7 @@ function formatDates(dates, format, is_same_time){
 				});
 			})
 		});
-			
-		
 	}
-	
 	
 	return output;
 }
