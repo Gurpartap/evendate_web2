@@ -328,7 +328,7 @@ $user_full_name = $user->getLastName() . ' ' . $user->getFirstName(); ?>
 <!-- JQUERY APPEAR-->
 <script src="/vendor/appear/jquery.appear.js"></script>
 <!-- HIGHCHARTS-->
-<script src="https://code.highcharts.com/stock/highstock.js"></script>
+<script src="https://code.highcharts.com/stock/4.2.2/highstock.js"></script>
 
 <!-- =============== APP SCRIPTS ===============-->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js" type="text/javascript"></script>
