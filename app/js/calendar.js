@@ -2551,7 +2551,6 @@ function Statistics($view) {
 				series: {
 					states: {
 						hover: {
-							enabled: true,
 							lineWidth: 2
 						}
 					}
@@ -2594,21 +2593,6 @@ function Statistics($view) {
 				shape: 'square',
 				valueDecimals: 0,
 				xDateFormat: '%e %b %Y',
-				formatter: function() {
-					var s = '<b>'+ Highcharts.dateFormat(this.points[0].series.chart.tooltip.options.xDateFormat, this.x) +'</b><br/>',
-						categories = this.points[0].series.processedXData,
-						index = $.inArray(this.x, categories);
-					this.points[0].series.chart.series.forEach(function(series){
-						var value = '';
-						if(series.name != 'Navigator'){
-							value += series.tooltipOptions.valuePrefix ? ' '+series.tooltipOptions.valuePrefix : '';
-							value += Math.roundTo(series.processedYData[index], 2);
-							value += series.tooltipOptions.valueSuffix ? ' '+series.tooltipOptions.valueSuffix : '';
-							s += '<span style="color:'+series.color+'">●</span> '+series.name+': <b>'+value+'</b><br/>'
-						}
-					});
-					return s;
-				},
 				shared: true
 			},
 			scrollbar: {enabled: false},
@@ -2808,47 +2792,43 @@ function Statistics($view) {
 				'fave': 'Кол-во пользователей, которые добавили событие в избранное',
 				'fave_conversion': 'Конверсия открытия страницы события к добавлениям в избранное'
 			},
+			HIDDEN_SERIES_OPTIONS = {
+				showInLegend: false,
+				lineWidth: 0,
+				fillOpacity: 0,
+				states: {
+					hover: {
+						enabled: false
+					}
+				}
+			},
 			output = {};
+		
+		function dataNormalize(raw_data, field, value_field_name) {
+			return {
+				name: STD_NAMES[field],
+				data: raw_data.map(function(line, i) {
+					return [moment.unix(line.time_value).valueOf(), line[value_field_name]];
+				})
+			}
+		}
 		
 		
 		$.each(raw_data, function(key, data){
 			output[key] = [];
-			if(CONVERSATIONS[key]){
-				output[key].push({
-					id: 1,
-					name: STD_NAMES[key],
-					tooltip: {valueSuffix: ' %'},
-					data: data.map(function(line, i) {
-						return [moment.unix(line.time_value).valueOf(), line.value];
-					})
-				});
+			if(CONVERSATIONS.hasOwnProperty(key)){
+				output[key].push($.extend(true, { tooltip: {valueSuffix: ' %'} }, dataNormalize(data, key, 'value')));
 				$.each(CONVERSATIONS[key], function(field_key, field) {
-					output[key].push({
-						name: STD_NAMES[field],
-						showInLegend: false,
-						visible: false,
-						linkedTo: 1,
-						data: data.map(function(line, i) {
-							return [moment.unix(line.time_value).valueOf(), line[field_key]];
-						})
-					});
+					output[key].push($.extend(true, {}, HIDDEN_SERIES_OPTIONS, dataNormalize(data, field, field_key)));
 				})
-			} else if(COMPARISONS[key]) {
+			}
+			else if(COMPARISONS.hasOwnProperty(key)) {
 				$.each(COMPARISONS[key], function(field_key, field) {
-					output[key].push({
-						name: STD_NAMES[field],
-						data: data.map(function(line, i) {
-							return [moment.unix(line.time_value).valueOf(), line[field_key]];
-						})
-					});
+					output[key].push(dataNormalize(data, field, field_key));
 				})
-			} else {
-				output[key].push({
-					name: STD_NAMES[key],
-					data: data.map(function(line, i) {
-						return [moment.unix(line.time_value).valueOf(), line.value];
-					})
-				});
+			}
+			else {
+				output[key].push(dataNormalize(data, key, 'value'));
 			}
 		});
 		
@@ -2983,7 +2963,7 @@ function Statistics($view) {
 						.find('.ScoreboardDynamic')
 						.animateNumber({
 							number: Math.round(data.dynamics[field]),
-							prefix: data.dynamics[field] == 0 ? '' : (data.dynamics[field] > 0 ? '+' : '-'),
+							prefix: data.dynamics[field] == 0 ? undefined : (data.dynamics[field] > 0 ? '+' : '-'),
 							suffix: measure
 						}, 2000, 'easeOutSine')
 						.siblings('label')

@@ -3742,6 +3742,7 @@ body.-open_modal > .modal_wrapper {
 .orgstat_overview_sidebar_location {
 	margin: 24px 0;
 	font-size: 13px;
+	line-height: 1.4;
 	font-weight: 400;
 }
 
