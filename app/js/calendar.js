@@ -2963,7 +2963,7 @@ function Statistics($view) {
 						.find('.ScoreboardDynamic')
 						.animateNumber({
 							number: Math.round(data.dynamics[field]),
-							prefix: data.dynamics[field] == 0 ? '' : (data.dynamics[field] > 0 ? '+' : '-'),
+							prefix: data.dynamics[field] == 0 ? undefined : (data.dynamics[field] > 0 ? '+' : '-'),
 							suffix: measure
 						}, 2000, 'easeOutSine')
 						.siblings('label')
