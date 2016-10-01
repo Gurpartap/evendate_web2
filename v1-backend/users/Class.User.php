@@ -27,6 +27,7 @@ class User extends AbstractUser
     protected $send_notifications_for_subscriptions;
     protected $send_notifications;
     protected $privacy_mode;
+    protected $created_at;
 
     private $editor_instance;
     protected $db;
@@ -87,6 +88,7 @@ class User extends AbstractUser
         $this->is_editor = $row['is_editor'];
         $this->token_id = $row['token_id'];
         $this->blurred_image_url = $row['blurred_image_url'];
+        $this->created_at = $row['created_at'];
 
         $this->vk_uid = $row['vk_uid'];
         $this->facebook_uid = $row['facebook_uid'];
@@ -109,6 +111,24 @@ class User extends AbstractUser
     {
         return $this->token;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCreatedAt()
+    {
+        return $this->created_at;
+    }
+
+
 
     public function getInterests()
     {
