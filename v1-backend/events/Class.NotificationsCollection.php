@@ -4,7 +4,7 @@ class NotificationsCollection extends AbstractCollection{
 
 	public static function filter(
 									PDO $db,
-									User $user = null,
+									AbstractUser $user = null,
 									array $filters = null,
 									array $fields = null,
 									array $pagination = null,

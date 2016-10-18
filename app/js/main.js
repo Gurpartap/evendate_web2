@@ -860,7 +860,6 @@ function buildOrganizationBlock(organization, additional_fields){
 	}
 }
 
-
 function bindSubscribeButton($parent, options){
 	$parent = $parent ? $parent : $('body');
 	$parent.find('.Subscribe').not('.-Handled_Subscribe').each(function(){

@@ -34,7 +34,7 @@ CREATE OR REPLACE VIEW view_all_events AS
             WHERE event_id = events.id AND status = TRUE) AS sb) = 1) :: BOOL
                                                                                        AS is_same_time,
     events.organization_id :: INT,
-    'http://evendate.ru/event.php?id=' || events.id                                    AS link,
+    'http://evendate.ru/event/' || events.id                                    AS link,
     events.images_domain || 'event_images/large/' || events.image_vertical             AS image_vertical_url,
     events.images_domain || 'event_images/large/' || events.image_horizontal           AS image_horizontal_url,
     events.images_domain || 'event_images/large/' || events.image_vertical             AS image_vertical_large_url,
@@ -80,72 +80,3 @@ CREATE OR REPLACE VIEW view_all_events AS
     INNER JOIN organization_types ON organization_types.id = view_organizations.type_id
     LEFT JOIN vk_posts ON events.id = vk_posts.event_id
   WHERE view_organizations.status = TRUE;
-
-
-CREATE VIEW view_events AS
-  SELECT *
-  FROM view_all_events
-  WHERE status = TRUE;
-
-
-CREATE VIEW view_actions AS SELECT
-                              stat_events.stat_type_id,
-                              stat_events.event_id,
-                              stat_event_types.name,
-                              stat_event_types.entity,
-                              stat_event_types.type_code,
-                              tokens.user_id,
-                              NULL                                                   AS organization_id,
-                              DATE_PART('epoch', MAX(stat_events.created_at)) :: INT AS created_at
-                            FROM stat_events
-                              INNER JOIN stat_event_types ON stat_event_types.id = stat_events.stat_type_id
-                              INNER JOIN tokens ON tokens.id = stat_events.token_id
-                              INNER JOIN view_events ON view_events.id = stat_events.event_id
-                            WHERE
-                              view_events.status = TRUE
-                              AND (stat_event_types.type_code = 'fave'
-                                   OR stat_event_types.type_code = 'unfave')
-                            GROUP BY stat_events.event_id, tokens.user_id, stat_events.stat_type_id,
-                              stat_event_types.name,
-                              stat_event_types.entity,
-                              stat_event_types.type_code
-                            UNION
-
-                            SELECT
-                              stat_organizations.stat_type_id,
-                              NULL                                                          AS event_id,
-                              stat_event_types.name,
-                              stat_event_types.entity,
-                              stat_event_types.type_code,
-                              tokens.user_id,
-                              stat_organizations.organization_id                            AS organization_id,
-                              DATE_PART('epoch', MAX(stat_organizations.created_at)) :: INT AS created_at
-                            FROM stat_organizations
-                              INNER JOIN stat_event_types ON stat_event_types.id = stat_organizations.stat_type_id
-                              INNER JOIN tokens ON tokens.id = stat_organizations.token_id
-                              INNER JOIN view_organizations
-                                ON view_organizations.id = stat_organizations.organization_id
-                            WHERE (stat_event_types.type_code = 'subscribe'
-                                   OR stat_event_types.type_code = 'unsubscribe')
-                            GROUP BY stat_organizations.organization_id, tokens.user_id,
-                              stat_organizations.stat_type_id, stat_event_types.name,
-                              stat_event_types.entity,
-                              stat_event_types.type_code;
-
-
-CREATE VIEW view_auto_notifications AS
-  SELECT DISTINCT
-    events_notifications.*,
-    view_events.organization_id,
-    view_events.title,
-    organizations.short_name,
-    organizations.notification_suffix,
-    view_events.image_square_vertical_url,
-    view_events.image_square_horizontal_url,
-    notification_types.type AS notification_type_name,
-    notification_types.text AS notification_type_text
-  FROM events_notifications
-    INNER JOIN view_events ON events_notifications.event_id = view_events.id
-    INNER JOIN notification_types ON notification_types.id = events_notifications.notification_type_id
-    INNER JOIN organizations ON organizations.id = view_events.organization_id
-  WHERE notification_time <= NOW() AND done = FALSE;
