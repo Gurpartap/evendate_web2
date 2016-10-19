@@ -4,7 +4,7 @@ class UsersCollection extends AbstractCollection
 {
 
     public static function filter(PDO $db,
-                                  User $user = null,
+                                  AbstractUser $user = null,
                                   array $filters = null,
                                   array $fields = null,
                                   array $pagination = null,
@@ -178,7 +178,7 @@ class UsersCollection extends AbstractCollection
 
     }
 
-    public static function one(PDO $db, User $user, int $id, array $fields = null) : Friend
+    public static function one(PDO $db, AbstractUser $user, int $id, array $fields = null) : Friend
     {
         $friend = parent::one($db, $user, $id, $fields);
         return $friend;

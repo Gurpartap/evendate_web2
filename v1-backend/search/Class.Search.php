@@ -107,7 +107,7 @@ class GlobalSearch
         }
     }
 
-    public function find(User $user, array $fields)
+    public function find(AbstractUser $user, array $fields)
     {
         $result_data = array();
         if (isset($fields[self::ORGANIZATIONS_FIELD_NAME])) {

@@ -789,7 +789,7 @@ class Event extends AbstractEntity
 
     }
 
-    public function getDates(User $user = null, array $fields, array $filters, array $pagination, $order_by)
+    public function getDates(AbstractUser $user = null, array $fields, array $filters, array $pagination, $order_by)
     {
         $filters['event'] = $this;
         return EventsDatesCollection::filter($this->db,
@@ -838,7 +838,7 @@ class Event extends AbstractEntity
         );
     }
 
-    public function getParams(User $user = null, array $fields = null) : Result
+    public function getParams(AbstractUser $user = null, array $fields = null) : Result
     {
 
         $result_data = parent::getParams($user, $fields)->getData();
@@ -879,13 +879,21 @@ class Event extends AbstractEntity
         }
 
         if (isset($fields[self::NOTIFICATIONS_FIELD_NAME])) {
-            $result_data[self::NOTIFICATIONS_FIELD_NAME] = $this->getNotifications($user,
-                Fields::parseFields($fields[self::NOTIFICATIONS_FIELD_NAME]['fields'] ?? ''))->getData();
+        	if ($user instanceof User){
+						$result_data[self::NOTIFICATIONS_FIELD_NAME] = $this->getNotifications($user,
+							Fields::parseFields($fields[self::NOTIFICATIONS_FIELD_NAME]['fields'] ?? ''))->getData();
+					}else{
+						$result_data[self::NOTIFICATIONS_FIELD_NAME] = array();
+					}
         }
 
         if (isset($fields[self::STATISTICS_FIELD_NAME])) {
-            $result_data[self::STATISTICS_FIELD_NAME] = $this->getStatistics($user,
-                Fields::parseFields($fields[self::NOTIFICATIONS_FIELD_NAME]['fields'] ?? ''))->getData();
+        	if ($user instanceof User){
+						$result_data[self::STATISTICS_FIELD_NAME] = $this->getStatistics($user,
+							Fields::parseFields($fields[self::NOTIFICATIONS_FIELD_NAME]['fields'] ?? ''))->getData();
+					}else{
+						$result_data[self::STATISTICS_FIELD_NAME] = null;
+					}
         }
 
         return new Result(true, '', $result_data);

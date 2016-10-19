@@ -4,7 +4,7 @@ class DevicesCollection extends AbstractCollection{
 
 
 	public static function filter(PDO $db,
-	                              User $user = null,
+																AbstractUser $user = null,
 	                              array $filters = null,
 	                              array $fields = null,
 	                              array $pagination = null,
@@ -56,7 +56,7 @@ class DevicesCollection extends AbstractCollection{
 		return new Result(true, '', $result_devices);
 	}
 
-	public static function one(PDO $db, User $user, int $id, array $fields = null) : Device {
+	public static function one(PDO $db, AbstractUser $user, int $id, array $fields = null) : Device {
 		return parent::one($db, $user, $id, $fields);
 
 	}
