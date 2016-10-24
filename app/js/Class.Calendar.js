@@ -564,6 +564,34 @@ Calendar.prototype.activateSelectedDays = function(){
 	return this;
 };
 
+Calendar.prototype.setDaysWithEvents = function(){
+	var calendar = this,
+		ajax_data = {
+			since: calendar.current_month.startOf('month').format(__C.DATE_FORMAT),
+			till: calendar.current_month.endOf('month').format(__C.DATE_FORMAT),
+			length: 500,
+			my: true,
+			unique: true
+		};
+	calendar.$calendar.find('.feed_calendar_td').removeClass('Controller has_favorites').addClass(__C.CLASSES.NEW_DISABLED);
+	DatesCollection.fetchDates(ajax_data, function(data) {
+		data.forEach(function(day){
+			var $tr = calendar.$calendar.find('.Day_' + moment.unix(day.event_date).format(__C.DATE_FORMAT));
+			$tr
+				.html(tmpl('link', {
+					title: $tr.children().text(),
+					classes: $tr.children().get(0).classList,
+					page: '/feed/day/'+$tr.data('date')
+				}))
+				.addClass(day.favorites_count > 0 ? 'has_favorites' : '')
+				.removeClass(__C.CLASSES.NEW_DISABLED);
+		});
+		calendar.bindDaySelection();
+		bindPageLinks(calendar.$calendar);
+	});
+	return this;
+};
+
 Calendar.prototype.init = function(){
 	this.$calendar.empty().append(tmpl('calendar', this.options.classes));
 	if(this.options.weekday_selection){
