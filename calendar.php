@@ -53,24 +53,24 @@ $user_full_name = $user->getLastName() . ' ' . $user->getFirstName(); ?>
 	<!-- =============== VENDOR STYLES ===============-->
 	<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i&subset=cyrillic" rel="stylesheet">
 
-	<link rel="stylesheet" href="/dist/vendor.css?v=fad1918b3193bd5834c1d66922fc422c">
-	<link rel="stylesheet" href="/dist/app.css?v=1cfd95577d2acba771d6e5b94fbd4aca">
+	<link rel="stylesheet" href="/dist/vendor.css?rev=d3d5bfc3e05267870c6f3272b313478e">
+	<link rel="stylesheet" href="/dist/app.css?rev=7d54965573705e09215e75de03b01d01">
 
-	<link rel="apple-touch-icon" sizes="57x57" href="/app/img/favicon/apple-icon-57x57.png?v=51fb783b84df4c1cbe7419df6ea4e9a9">
-	<link rel="apple-touch-icon" sizes="60x60" href="/app/img/favicon/apple-icon-60x60.png?v=52c6a86e2a4d4a5e03e404a712144fd4">
-	<link rel="apple-touch-icon" sizes="72x72" href="/app/img/favicon/apple-icon-72x72.png?v=3dc9454a360611ec316cbc36b1351e87">
-	<link rel="apple-touch-icon" sizes="76x76" href="/app/img/favicon/apple-icon-76x76.png?v=dd25f921984de36a62166ffb38426ccb">
-	<link rel="apple-touch-icon" sizes="114x114" href="/app/img/favicon/apple-icon-114x114.png?v=82daca14e8443867f709ba78c0a5f805">
-	<link rel="apple-touch-icon" sizes="120x120" href="/app/img/favicon/apple-icon-120x120.png?v=673efe0e856f049606e8f15d0d0cddd8">
-	<link rel="apple-touch-icon" sizes="144x144" href="/app/img/favicon/apple-icon-144x144.png?v=d2f6b3f58d103d331de955c6cc368f45">
-	<link rel="apple-touch-icon" sizes="152x152" href="/app/img/favicon/apple-icon-152x152.png?v=f461d30d94d6f68a45cf839b49e70fcd">
-	<link rel="apple-touch-icon" sizes="180x180" href="/app/img/favicon/apple-icon-180x180.png?v=ef0df8ad76b64eb48865e41b68d2cca1">
-	<link rel="icon" type="image/png" sizes="192x192" href="/app/img/favicon/android-icon-192x192.png?v=487ac7cd55c913a3f2c09a7bcb853da5">
-	<link rel="icon" type="image/png" sizes="32x32" href="/app/img/favicon/favicon-32x32.png?v=07302288a2256a3a74fff31c8bc74c2c">
-	<link rel="icon" type="image/png" sizes="96x96" href="/app/img/favicon/favicon-96x96.png?v=698f36fa2b3f5b2931cec4f9e78cf30a">
-	<link rel="icon" type="image/png" sizes="16x16" href="/app/img/favicon/favicon-16x16.png?v=062fdf2f1ecd1ce98f688070194fdfa6">
+	<link rel="apple-touch-icon" sizes="57x57" href="/app/img/favicon/apple-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="/app/img/favicon/apple-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="/app/img/favicon/apple-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="/app/img/favicon/apple-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="/app/img/favicon/apple-icon-114x114.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="/app/img/favicon/apple-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="/app/img/favicon/apple-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="/app/img/favicon/apple-icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="/app/img/favicon/apple-icon-180x180.png">
+	<link rel="icon" type="image/png" sizes="192x192" href="/app/img/favicon/android-icon-192x192.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/app/img/favicon/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="96x96" href="/app/img/favicon/favicon-96x96.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/app/img/favicon/favicon-16x16.png">
 
-	<link rel="manifest" href="/manifest.json?v=e613ac179182330608a6d4b0e6e53764">
+	<link rel="manifest" href="/manifest.json">
 	<meta name="msapplication-TileColor" content="#ffffff">
 	<meta name="msapplication-TileImage" content="/app/img/favicon/ms-icon-144x144.png">
 	<meta name="theme-color" content="#ffffff">
@@ -158,13 +158,11 @@ $user_full_name = $user->getLastName() . ' ' . $user->getFirstName(); ?>
 <!-- =============== VENDOR SCRIPTS ===============-->
 <!-- Google MAPS -->
 <script src="https://maps.googleapis.com/maps/api/js?sensor=true&libraries=places"></script>
-<!-- HIGHCHARTS-->
-<script src="https://code.highcharts.com/stock/4.2.2/highstock.js"></script>
 <!-- SOCKET.IO -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js" type="text/javascript"></script>
 
-<script type="text/javascript" src="/dist/vendor.js?v=b296a14d2a2ce0ff89db2fb7bae23bc1" charset="utf-8"></script>
-<script type="text/javascript" src="/dist/app.js?v=4134160463d17b852aca18e93f9bfa01" charset="utf-8"></script>
+<script type="text/javascript" src="/dist/vendor.js?rev=453680a6e5cafdb7a0ff029e37c556d3" charset="utf-8"></script>
+<script type="text/javascript" src="/dist/app.js?rev=ad4dfe6a0962906622a7e02a651cdc8c" charset="utf-8"></script>
 
 <?php
 require 'templates.html';

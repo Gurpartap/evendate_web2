@@ -61,7 +61,7 @@ StatisticsOrganizationOverviewPage.prototype.buildAreaCharts = function() {
 		}),
 		view: self.graphics_stats.view,
 		conversion: self.graphics_stats.conversion
-	})
+	});
 };
 
 StatisticsOrganizationOverviewPage.prototype.buildPieChart = function($container, data) {

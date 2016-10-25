@@ -18,7 +18,7 @@ gulp.task('js', function() {
 		'../app/src/js/vendor/select2v3/select2_locale_ru.js',
 		'../app/src/js/vendor/**/*.js'
 	])
-		.pipe(sourcemaps.init({largeFile: true, loadMaps: true}))
+		.pipe(sourcemaps.init({largeFile: true}))
 		.pipe(concat('vendor.js'))
 		.pipe(uglify())
 		.pipe(sourcemaps.write('./', {sourceRoot: '/src/js'}))

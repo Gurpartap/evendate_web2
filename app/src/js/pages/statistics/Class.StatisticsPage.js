@@ -96,15 +96,15 @@ StatisticsPage.prototype.areaChartSeriesNormalize = function(raw_data) {
 	}
 	
 	
-	$.each(raw_data, function(key, data) {
+	$.each(raw_data, function(key, data){
 		output[key] = [];
-		if (CONVERSATIONS.hasOwnProperty(key)) {
-			output[key].push($.extend(true, {tooltip: {valueSuffix: ' %'}}, dataNormalize(data, key, 'value')));
+		if(CONVERSATIONS.hasOwnProperty(key)){
+			output[key].push($.extend(true, { tooltip: {valueSuffix: ' %'} }, dataNormalize(data, key, 'value')));
 			$.each(CONVERSATIONS[key], function(field_key, field) {
 				output[key].push($.extend(true, {}, HIDDEN_SERIES_OPTIONS, dataNormalize(data, field, field_key)));
 			})
 		}
-		else if (COMPARISONS.hasOwnProperty(key)) {
+		else if(COMPARISONS.hasOwnProperty(key)) {
 			$.each(COMPARISONS[key], function(field_key, field) {
 				output[key].push(dataNormalize(data, field, field_key));
 			})
