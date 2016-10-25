@@ -1,0 +1,213 @@
+paceOptions = {
+	ajax: false, // disabled
+	document: false, // disabled
+	eventLag: false, // disabled
+	elements: {},
+	search_is_active: false,
+	search_query: null,
+	search_xhr: null
+};
+__stats = [];
+askToSubscribe = null;
+
+$(document)
+	.ajaxStart(function() {
+		Pace.restart()
+	})
+	.ajaxError(function(event, jqxhr, settings, thrownError) {
+		if (!(thrownError && thrownError == 'abort')) {
+			__APP.SERVER.ajaxErrorHandler(event, jqxhr, settings, thrownError);
+		}
+	})
+	.ready(function() {
+		var OneSignal = window.OneSignal || [];
+		
+		function initSidebar() {
+			var $sidebar = $('#main_sidebar'),
+				$sidebar_nav = $sidebar.find('.SidebarNav'),
+				$sidebar_nav_items = $sidebar_nav.find('.SidebarNavItem');
+			
+			$sidebar_nav.addClass('-items_' + $sidebar_nav_items.not('.-hidden').length);
+			__APP.SUBSCRIBED_ORGS.update();
+			$(window).on('subscribe unsubscribe', function() {
+				__APP.SUBSCRIBED_ORGS.update();
+			});
+			((window.innerHeight > 800) ? $('.SidebarOrganizationsScroll') : $('.SidebarScroll')).scrollbar({
+				disableBodyScroll: true
+			});
+		}
+		
+		function initTopBar() {
+			var $main_header = $('#main_header');
+			
+			$main_header.find('#search_bar_input').on('keypress', function(e) {
+				if (e.which == 13) {
+					__APP.changeState('/search/' + encodeURIComponent(this.value));
+				}
+			});
+			
+			$main_header.find('#user_bar').on('click.openUserBar', function() {
+				var $this = $(this),
+					$document = $(document);
+				$this.addClass('-open');
+				$document.on('click.closeUserBar', function(e) {
+					if (!$(e.target).parents('#user_bar').length) {
+						$document.off('click.closeUserBar');
+						$this.removeClass('-open');
+					}
+				})
+			});
+			$main_header.find('.LogoutButton').on('click', __APP.USER.logout);
+			$main_header.find('.OpenSettingsButton').on('click', showSettingsModal);
+			bindRippleEffect($main_header);
+			bindPageLinks($main_header);
+		}
+		
+		OneSignal.push(["init", {
+			appId: "7471a586-01f3-4eef-b989-c809700a8658",
+			autoRegister: false,
+			notifyButton: {
+				enable: false /* Set to false to hide */
+			}
+		}]);
+		OneSignal.push(function () {
+			// If we're on an unsupported browser, do nothing
+			if (!OneSignal.isPushNotificationsSupported()) {
+				return;
+			}
+			OneSignal.isPushNotificationsEnabled(function (isEnabled) {
+				if (isEnabled) {
+					// The user is subscribed to notifications
+					// Don't show anything
+				} else {
+					window.askToSubscribe = function subscribe() {
+						OneSignal.push(function () {
+							OneSignal.on('subscriptionChange', function (isSubscribed) {
+								if (isSubscribed) {
+									// The user is subscribed
+									//   Either the user subscribed for the first time
+									//   Or the user was subscribed -> unsubscribed -> subscribed
+									
+									OneSignal.getUserId(function (userId) {
+										$.ajax({
+											url: 'api/v1/users/me/devices',
+											type: 'PUT',
+											data: {
+												'device_token': userId,
+												'client_type': 'browser',
+												'model': navigator.appVersion ? navigator.appVersion : null,
+												'os_version': navigator.platform ? navigator.platform : null
+											},
+											global: false
+										});
+									});
+								}
+							});
+						});
+						
+						OneSignal.push(["registerForPushNotifications"]);
+						event.preventDefault();
+					};
+				}
+			});
+		});
+		
+		if (window['moment'] != undefined) {
+			moment.locale(navigator.language);
+			moment.tz.setDefault('Europe/Moscow');
+			moment.updateLocale('ru', {
+				monthsShort: __LOCALES.ru_RU.DATE.MONTH_SHORT_NAMES,
+				calendar: {
+					sameDay: '[Сегодня]',
+					nextDay: '[Завтра]',
+					lastDay: '[Вчера]',
+					nextWeek: 'dddd',
+					lastWeek: 'D MMMM',
+					sameElse: 'D MMMM'
+				}
+			})
+		}
+		
+		if (window['Highcharts'] != undefined) {
+			Highcharts.setOptions({
+				lang: {
+					shortMonths: __LOCALES.ru_RU.DATE.MONTH_SHORT_NAMES
+				}
+			});
+		}
+		
+		/**
+		 * Bind only on 'back' action
+		 */
+		History.Adapter.bind(window, 'statechange', function() {
+			if (History.getCurrentIndex() - 1 !== History.getState().data._index) {
+				__APP.reInit();
+			}
+		});
+		
+		__APP.SUBSCRIBED_ORGS = $('.SidebarOrganizationsList');
+		__APP.SUBSCRIBED_ORGS.update = function() {
+			/**
+			 * @this jQuery
+			 */
+			var self = this,
+				timing = 0,
+				current_menu_items = $.map(self.children(), function(el) {
+					return $(el).data('organization_id');
+				}),
+				to_add = __APP.USER.subscriptions.filter(function(item) {
+					return current_menu_items.indexOf(item.id) === -1;
+				}),
+				to_remove = current_menu_items.filter(function(item) {
+					return !(__APP.USER.subscriptions.has(item));
+				});
+			
+			if (to_add.length) {
+				__APP.BUILD.organizationItems(to_add, {
+					block_classes: ['animated'],
+					avatar_classes: ['-size_30x30', '-rounded']
+				})
+					[(self.length ? 'prependTo' : 'appendTo')](self)
+					.each(function(i, org_block) {
+						setTimeout(function() {
+							$(org_block).addClass('-show');
+						}, timing += 100);
+					});
+				
+				bindPageLinks(self);
+			}
+			if (to_remove.length) {
+				to_remove.forEach(function(id) {
+					var $organization_item = self.find('.organization_item[data-organization_id="' + id + '"]').removeClass('-show');
+					setTimeout(function() {
+						$organization_item.remove();
+					}, 500);
+				});
+			}
+		};
+		
+		__APP.USER.fetchUserWithSubscriptions([], undefined, function() {
+			initTopBar();
+			initSidebar();
+			__APP.init();
+			bindPageLinks();
+		});
+		
+		setInterval(function () {
+			if (window.__stats.length != 0) {
+				var batch = window.__stats;
+				window.__stats = [];
+				$.ajax({
+					url: '/api/v1/statistics/batch',
+					data: JSON.stringify(batch),
+					type: 'POST',
+					contentType: 'application/json; charset=utf-8',
+					dataType: 'json',
+					error: function () {
+						window.__stats.concat(batch);
+					}
+				});
+			}
+		}, 5000);
+		
+	});

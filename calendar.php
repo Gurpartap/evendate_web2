@@ -42,42 +42,25 @@ $user_full_name = $user->getLastName() . ' ' . $user->getFirstName(); ?>
 	<title>Evendate</title>
 	<!-- =============== VENDOR STYLES ===============-->
 	<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i&subset=cyrillic" rel="stylesheet">
-	<!-- FONT AWESOME-->
-	<link rel="stylesheet" href="/vendor/fontawesome/css/font-awesome.min.css">
-	<!-- =============== PAGE VENDOR STYLES ===============-->
-	<!-- TAGS INPUT-->
-	<link rel="stylesheet" href="/vendor/bootstrap-tagsinput/dist/bootstrap-tagsinput.css">
-	<!-- =============== CROPPER STYLES ===============-->
-	<link rel="stylesheet" href="/vendor/cropper/css/cropper.min.css">
-	<!-- =============== BOOTSTRAP STYLES ===============-->
-	<link rel="stylesheet" href="/app/css/bootstrap.css" id="bscss">
-	<!-- =============== APP STYLES ===============-->
-	<link rel="stylesheet" href="/app/css/govnokod.css">
-	<!-- Pace -->
-	<link rel="stylesheet" href="/vendor/pace/pace.css">
-	<!-- SELECT2 -->
-	<link href="/vendor/select2v3/select2.css" rel="stylesheet">
-	<link href="/vendor/select2v3/select2-bootstrap.css" rel="stylesheet">
-	<!-- SCROLLBAR -->
-	<link href="/vendor/jquery.scrollbar/jquery.scrollbar.css" rel="stylesheet">
 
-	<link rel="stylesheet" href="/app/css/main.css">
+	<link rel="stylesheet" href="/dist/vendor.css?v=fad1918b3193bd5834c1d66922fc422c">
+	<link rel="stylesheet" href="/dist/app.css?v=1cfd95577d2acba771d6e5b94fbd4aca">
 
-	<link rel="apple-touch-icon" sizes="57x57" href="/app/img/favicon/apple-icon-57x57.png">
-	<link rel="apple-touch-icon" sizes="60x60" href="/app/img/favicon/apple-icon-60x60.png">
-	<link rel="apple-touch-icon" sizes="72x72" href="/app/img/favicon/apple-icon-72x72.png">
-	<link rel="apple-touch-icon" sizes="76x76" href="/app/img/favicon/apple-icon-76x76.png">
-	<link rel="apple-touch-icon" sizes="114x114" href="/app/img/favicon/apple-icon-114x114.png">
-	<link rel="apple-touch-icon" sizes="120x120" href="/app/img/favicon/apple-icon-120x120.png">
-	<link rel="apple-touch-icon" sizes="144x144" href="/app/img/favicon/apple-icon-144x144.png">
-	<link rel="apple-touch-icon" sizes="152x152" href="/app/img/favicon/apple-icon-152x152.png">
-	<link rel="apple-touch-icon" sizes="180x180" href="/app/img/favicon/apple-icon-180x180.png">
-	<link rel="icon" type="image/png" sizes="192x192" href="/app/img/favicon/android-icon-192x192.png">
-	<link rel="icon" type="image/png" sizes="32x32" href="/app/img/favicon/favicon-32x32.png">
-	<link rel="icon" type="image/png" sizes="96x96" href="/app/img/favicon/favicon-96x96.png">
-	<link rel="icon" type="image/png" sizes="16x16" href="/app/img/favicon/favicon-16x16.png">
+	<link rel="apple-touch-icon" sizes="57x57" href="/app/img/favicon/apple-icon-57x57.png?v=51fb783b84df4c1cbe7419df6ea4e9a9">
+	<link rel="apple-touch-icon" sizes="60x60" href="/app/img/favicon/apple-icon-60x60.png?v=52c6a86e2a4d4a5e03e404a712144fd4">
+	<link rel="apple-touch-icon" sizes="72x72" href="/app/img/favicon/apple-icon-72x72.png?v=3dc9454a360611ec316cbc36b1351e87">
+	<link rel="apple-touch-icon" sizes="76x76" href="/app/img/favicon/apple-icon-76x76.png?v=dd25f921984de36a62166ffb38426ccb">
+	<link rel="apple-touch-icon" sizes="114x114" href="/app/img/favicon/apple-icon-114x114.png?v=82daca14e8443867f709ba78c0a5f805">
+	<link rel="apple-touch-icon" sizes="120x120" href="/app/img/favicon/apple-icon-120x120.png?v=673efe0e856f049606e8f15d0d0cddd8">
+	<link rel="apple-touch-icon" sizes="144x144" href="/app/img/favicon/apple-icon-144x144.png?v=d2f6b3f58d103d331de955c6cc368f45">
+	<link rel="apple-touch-icon" sizes="152x152" href="/app/img/favicon/apple-icon-152x152.png?v=f461d30d94d6f68a45cf839b49e70fcd">
+	<link rel="apple-touch-icon" sizes="180x180" href="/app/img/favicon/apple-icon-180x180.png?v=ef0df8ad76b64eb48865e41b68d2cca1">
+	<link rel="icon" type="image/png" sizes="192x192" href="/app/img/favicon/android-icon-192x192.png?v=487ac7cd55c913a3f2c09a7bcb853da5">
+	<link rel="icon" type="image/png" sizes="32x32" href="/app/img/favicon/favicon-32x32.png?v=07302288a2256a3a74fff31c8bc74c2c">
+	<link rel="icon" type="image/png" sizes="96x96" href="/app/img/favicon/favicon-96x96.png?v=698f36fa2b3f5b2931cec4f9e78cf30a">
+	<link rel="icon" type="image/png" sizes="16x16" href="/app/img/favicon/favicon-16x16.png?v=062fdf2f1ecd1ce98f688070194fdfa6">
 
-	<link rel="manifest" href="/manifest.json">
+	<link rel="manifest" href="/manifest.json?v=e613ac179182330608a6d4b0e6e53764">
 	<meta name="msapplication-TileColor" content="#ffffff">
 	<meta name="msapplication-TileImage" content="/app/img/favicon/ms-icon-144x144.png">
 	<meta name="theme-color" content="#ffffff">
@@ -135,7 +118,7 @@ $user_full_name = $user->getLastName() . ' ' . $user->getFirstName(); ?>
 			<path id="evendate_logo_text" transform="translate(-2.375 -0.69998)" fill="#9fa6b3" d="M18.675,16.4c0-5.3-3-8.5-8.1-8.5a8.42015,8.42015,0,0,0-8.2,8.7,8.38058,8.38058,0,0,0,8.5,8.8,7.55515,7.55515,0,0,0,7.5-5.2l-3.7-1.2a3.57051,3.57051,0,0,1-3.7,2.5,3.98288,3.98288,0,0,1-4.1-3.7h11.7A13.80487,13.80487,0,0,0,18.675,16.4Zm-11.8-1.6a3.55717,3.55717,0,0,1,3.7-3.2,3.363,3.363,0,0,1,3.7,3.2h-7.4Zm24.3-6.3-3.9,11-4.1-11h-4.9l6.7,16.4h4.4l6.5-16.4h-4.7Zm20.6,7.9c0-5.3-3-8.5-8.1-8.5a8.25038,8.25038,0,0,0-8.1,8.6,8.38058,8.38058,0,0,0,8.5,8.8,7.55522,7.55522,0,0,0,7.5-5.2l-3.8-1.1a3.57051,3.57051,0,0,1-3.7,2.5,3.98293,3.98293,0,0,1-4.1-3.7h11.7A13.79661,13.79661,0,0,0,51.775,16.4Zm-11.7-1.6a3.55712,3.55712,0,0,1,3.7-3.2,3.36289,3.36289,0,0,1,3.7,3.2h-7.4ZM62.975,8a5.385,5.385,0,0,0-4.7,2.5v-2h-4.3V24.9h4.4V15.4c0-1.9,1.1-3.4,3.1-3.4,2.1,0,3,1.4,3,3.3v9.6h4.4V14.5C68.875,10.9,66.975,8,62.975,8Zm24.8,13.9V0.7h-4.4v9.4c-0.5-.9-1.8-2-4.6-2-4.6,0-7.9,3.8-7.9,8.6,0,5,3.3,8.6,8,8.6a5.101,5.101,0,0,0,4.6-2.3,7.75394,7.75394,0,0,0,.2,1.9h4.2A26.28237,26.28237,0,0,1,87.775,21.9Zm-8.3-.6c-2.4,0-4.1-1.8-4.1-4.7s1.8-4.6,4.1-4.6,4,1.6,4,4.6S81.675,21.3,79.475,21.3Zm25.2,1V14.2c0-3.3-1.9-6.2-7.1-6.2-4.4,0-6.8,2.8-7,5.4l3.9,0.8a2.92541,2.92541,0,0,1,3.1-2.7c1.9,0,2.8,1,2.8,2.1a1.19858,1.19858,0,0,1-1.2,1.2l-4,.6c-2.8.4-5,2-5,5,0,2.6,2.1,4.9,5.6,4.9a5.40058,5.40058,0,0,0,4.8-2.4,12.30577,12.30577,0,0,0,.2,2h4.1A18.36784,18.36784,0,0,1,104.675,22.3Zm-4.3-4.2c0,3-1.8,3.9-3.6,3.9a1.89565,1.89565,0,0,1-2.1-1.9,2.094,2.094,0,0,1,2-2.1l3.7-.6v0.7Zm16.3-5.8V8.5h-3.3V3.6h-4.1V5.9a2.33883,2.33883,0,0,1-2.5,2.6h-0.8v3.9h3V20c0,3.2,2,5.1,5.2,5.1a5.9567,5.9567,0,0,0,2.5-.4V21a4.92317,4.92317,0,0,1-1.4.1,1.61828,1.61828,0,0,1-1.9-1.9V12.3h3.3Zm17.2,4.1a10.91279,10.91279,0,0,0-.47-3.3h-0.03a5.49026,5.49026,0,0,1-5.47-4.98,9.60458,9.60458,0,0,0-2.13-.22,8.25043,8.25043,0,0,0-8.1,8.6,8.38058,8.38058,0,0,0,8.5,8.8,7.55517,7.55517,0,0,0,7.5-5.2l-3.8-1.1a3.57051,3.57051,0,0,1-3.7,2.5,3.98284,3.98284,0,0,1-4.1-3.7h11.7A13.80487,13.80487,0,0,0,133.875,16.4Zm-11.7-1.6a3.55721,3.55721,0,0,1,3.7-3.2,3.363,3.363,0,0,1,3.7,3.2h-7.4Z"></path>
 			<circle id="evendate_logo_dot" cx="131" cy="6.90002" r="4" fill="#f82969"></circle>
 		</svg>
-		<img class="brand" src="/app/img/brand.png">
+		<img class="brand" src="/app/img/brand.png?v=f7ff6c58ee76c1a3a7ed091510e9e288">
 	</a>
 
 	<div class="sidebar_main_wrapper scrollbar-outer SidebarScroll">
@@ -170,48 +153,8 @@ $user_full_name = $user->getLastName() . ' ' . $user->getFirstName(); ?>
 <!-- SOCKET.IO -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js" type="text/javascript"></script>
 
-<!-- JQUERY-->
-<script src="/vendor/jquery/dist/jquery.js"></script>
-<!-- BOOTSTRAP-->
-<script src="/vendor/bootstrap/dist/js/bootstrap.js"></script>
-<!-- JQUERY EASING-->
-<script src="/vendor/jquery.easing/js/jquery.easing.js"></script>
-<!-- SLIMSCROLL-->
-<script src="/vendor/slimScroll/jquery.slimscroll.min.js"></script>
-<!-- IMG CROPPER-->
-<script src="/vendor/cropper/js/cropper.min.js"></script>
-<!-- TAGS INPUT-->
-<script src="/vendor/bootstrap-tagsinput/dist/bootstrap-tagsinput.min.js"></script>
-<!-- MOMENT JS-->
-<script src="/vendor/moment/min/moment-with-locales.min.js"></script>
-<script src="/vendor/moment/min/moment-timezone-with-data-2010-2020.min.js"></script>
-<!-- INPUTMASKS -->
-<script src="/vendor/jquery.inputmask/dist/jquery.inputmask.bundle.min.js"></script>
-<!-- PLACEPICKER -->
-<script src="/vendor/placepicker/jquery.placepicker.min.js"></script>
-<!-- PACE -->
-<script src="/vendor/pace/pace.min.js"></script>
-<!-- SELECT2 -->
-<script src="/vendor/select2v3/select2.min.js"></script>
-<script src="/vendor/select2v3/select2_locale_ru.js"></script>
-<!-- HISTORY API -->
-<script src="/vendor/history/jquery.history.js"></script>
-<!-- SCROLLBAR -->
-<script src="/vendor/jquery.scrollbar/jquery.scrollbar.js"></script>
-<!-- NOTIFICATIONS API -->
-<script src="/vendor/notify/notify.js"></script>
-<!-- JQUERY APPEAR-->
-<script src="/vendor/appear/jquery.appear.js"></script>
-
-<!-- =============== APP SCRIPTS ===============-->
-<script type="text/javascript" src="/app/js/app.js" charset="utf-8"></script>
-<script type="text/javascript" src="/app/js/application.js" charset="utf-8"></script>
-<script type="text/javascript" src="/app/js/Class.Calendar.js" charset="utf-8"></script>
-<script type="text/javascript" src="/app/js/Class.DatePicker.js" charset="utf-8"></script>
-<script type="text/javascript" src="/app/js/Class.Modal.js" charset="utf-8"></script>
-<script type="text/javascript" src="/app/js/main.js" charset="utf-8"></script>
-<script type="text/javascript" src="/app/js/calendar.js" charset="utf-8"></script>
-
+<script type="text/javascript" src="/dist/vendor.js?v=b296a14d2a2ce0ff89db2fb7bae23bc1" charset="utf-8"></script>
+<script type="text/javascript" src="/dist/app.js?v=4134160463d17b852aca18e93f9bfa01" charset="utf-8"></script>
 
 <?php
 require 'templates.html';
