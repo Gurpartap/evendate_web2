@@ -7,9 +7,23 @@ var gulp = require('gulp'),
 	uglify = require('gulp-uglify'),
 	autoprefixer = require('gulp-autoprefixer'),
 	csso = require('gulp-csso'),
-	rev = require('gulp-rev-append-all');
+	rev = require('gulp-rev-append');
 
 gulp.task('js', function() {
+	gulp.src([
+		'../app/src/js/vendor/jquery/jquery.js',
+		'../app/src/js/vendor/moment/moment-with-locales.min.js',
+		'../app/src/js/vendor/moment/moment-timezone-with-data-2010-2020.min.js',
+		'../app/src/js/vendor/select2v3/select2.min.js',
+		'../app/src/js/vendor/select2v3/select2_locale_ru.js',
+		'../app/src/js/vendor/**/*.js'
+	])
+		.pipe(sourcemaps.init({largeFile: true, loadMaps: true}))
+		.pipe(concat('vendor.js'))
+		.pipe(uglify())
+		.pipe(sourcemaps.write('./', {sourceRoot: '/src/js'}))
+		.pipe(gulp.dest('../dist/'));
+	
 	gulp.src([
 		'../app/src/js/lib.js',
 		'../app/src/js/node_connection.js',
@@ -23,25 +37,18 @@ gulp.task('js', function() {
 		.pipe(sourcemaps.init())
 		.pipe(concat('app.js'))
 		.pipe(uglify())
-		.pipe(sourcemaps.write())
-		.pipe(gulp.dest('../dist/'));
-	
-	gulp.src([
-		'../app/src/js/vendor/jquery/jquery.js',
-		'../app/src/js/vendor/moment/moment-with-locales.min.js',
-		'../app/src/js/vendor/moment/moment-timezone-with-data-2010-2020.min.js',
-		'../app/src/js/vendor/select2v3/select2.min.js',
-		'../app/src/js/vendor/select2v3/select2_locale_ru.js',
-		'../app/src/js/vendor/**/*.js'
-	])
-		.pipe(sourcemaps.init({largeFile: true, loadMaps: true}))
-		.pipe(concat('vendor.js'))
-		.pipe(uglify())
-		.pipe(sourcemaps.write())
+		.pipe(sourcemaps.write('./', {sourceRoot: '/src/js'}))
 		.pipe(gulp.dest('../dist/'));
 });
 
 gulp.task('css', function() {
+	gulp.src('../app/src/css/vendor/**/*.css')
+		.pipe(sourcemaps.init({largeFile: true, loadMaps: true}))
+		.pipe(concat('vendor.css'))
+		.pipe(csso())
+		.pipe(sourcemaps.write('./', {sourceRoot: '/src/css'}))
+		.pipe(gulp.dest('../dist/'));
+	
 	gulp.src([
 		'../app/src/css/govnokod.css',
 		'../app/src/css/main.css'
@@ -50,19 +57,12 @@ gulp.task('css', function() {
 		.pipe(concat('app.css'))
 		.pipe(autoprefixer())
 		.pipe(csso())
-		.pipe(sourcemaps.write())
-		.pipe(gulp.dest('../dist/'));
-	
-	gulp.src(['../app/src/css/vendor/**/*.css'])
-		.pipe(sourcemaps.init({largeFile: true, loadMaps: true}))
-		.pipe(concat('vendor.css'))
-		.pipe(csso())
-		.pipe(sourcemaps.write())
+		.pipe(sourcemaps.write('./', {sourceRoot: '/src/css'}))
 		.pipe(gulp.dest('../dist/'));
 });
 
 gulp.task('rev', ['css', 'js'], function() {
-	gulp.src(['../calendar.php'])
+	gulp.src('../calendar.php')
 		.pipe(rev())
 		.pipe(gulp.dest('../'));
 });
