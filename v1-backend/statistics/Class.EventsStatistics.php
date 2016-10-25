@@ -42,6 +42,14 @@ class EventsStatistics extends AbstractAggregator
         LIMIT 10000';
 
 
+		const SQL_GET_NOTIFICATIONS_SENT_AGGREGATED = 'SELECT
+      notifications_count FROM stat_notifications_aggregated WHERE 1 = 1 ';
+
+		const SQL_GET_ONE_PARAM = 'SELECT COUNT(stat_events.id) AS value
+      FROM stat_events
+      INNER JOIN stat_event_types ON stat_events.stat_type_id = stat_event_types.id
+      WHERE stat_events.created_at BETWEEN :since AND :till ';
+
     private $db;
     private $event;
 
@@ -203,5 +211,12 @@ class EventsStatistics extends AbstractAggregator
         }
         return new Result(true, '', $result);
     }
+
+
+	public static function getValueSQLWithNamedParams($type){
+		return self::SQL_GET_ONE_PARAM
+		. ' AND stat_event_types.type_code = :type_code_' . $type
+		. ' AND stat_events.event_id = view_events.id';
+	}
 
 }
