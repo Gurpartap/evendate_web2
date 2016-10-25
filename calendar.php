@@ -12,25 +12,35 @@ require_once "{$BACKEND_FULL_PATH}/bin/Class.AbstractCollection.php";
 require_once "{$BACKEND_FULL_PATH}/users/Class.AbstractUser.php";
 require_once "{$BACKEND_FULL_PATH}/organizations/Class.OrganizationsCollection.php";
 require_once "{$BACKEND_FULL_PATH}/organizations/Class.Organization.php";
+require_once "{$BACKEND_FULL_PATH}/users/Class.NotAuthorizedUser.php";
 require_once "{$BACKEND_FULL_PATH}/users/Class.User.php";
 
 App::buildGlobal($__db);
+
 try {
 	$user = new User($__db);
 	$edit_event_btn_hidden = $user->isEditor() ? '' : '-hidden';
 	$profile_is_editor = $user->isEditor() ? '' : '';
-	if($_REQUEST['q'] != 'onboarding' && !isset($_REQUEST['skip_onboading'])){
-		$subscriptions = OrganizationsCollection::filter($__db, $user, array( 'is_subscribed' => true ), array( 'created_at' ), array(), array())->getData();
-		if(count($subscriptions) == 0){
+	if ($_REQUEST['q'] != 'onboarding' && !isset($_REQUEST['skip_onboading'])) {
+		$subscriptions = OrganizationsCollection::filter(
+			$__db,
+			$user,
+			array('is_subscribed' => true),
+			array('created_at'),
+			array(),
+			array()
+		)->getData();
+		if (count($subscriptions) == 0) {
 			header('Location: /onboarding');
 		};
-	} else if($_REQUEST['q'] == 'onboarding' && isset($_COOKIE['skip_onboading'])){
+	} else if ($_REQUEST['q'] == 'onboarding' && isset($_COOKIE['skip_onboading'])) {
 		header('Location: /feed?skip_onboading');
-	} else if($_REQUEST['q'] == 'onboarding' && !isset($_COOKIE['skip_onboading'])){
+	} else if ($_REQUEST['q'] == 'onboarding' && !isset($_COOKIE['skip_onboading'])) {
 		setcookie('onboarding', true, strtotime("+7 days"));
 	}
-} catch(Exception $e){
-	header('Location: /');
+} catch (Exception $e) {
+	$user = App::getCurrentUser();
+//    header('Location: /');
 }
 $user_full_name = $user->getLastName() . ' ' . $user->getFirstName(); ?>
 <!DOCTYPE html>

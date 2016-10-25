@@ -17,6 +17,7 @@ class Roles
         self::ROLE_MODERATOR => self::ROLE_MODERATOR_ID
     );
 
+		const PRIVILEGES_COLS = array('role_id', 'name');
     public static function getId($role)
     {
         if (!in_array($role, self::ROLES)) throw new InvalidArgumentException('CANT_FIND_ROLE');
@@ -28,7 +29,7 @@ class Roles
         $q_get_privileges = App::queryFactory()
             ->newSelect()
             ->from('view_privileges')
-        ->cols(array('role_id', 'name'))
+        ->cols(self::PRIVILEGES_COLS)
         ->where('user_id = ?', $user->getId())
         ->where('organization_id = ?', $organization->getId());
 

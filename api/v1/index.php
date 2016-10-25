@@ -28,6 +28,7 @@ try {
 	require_once "{$BACKEND_FULL_PATH}/bin/Class.AbstractCollection.php";
 	require_once "{$BACKEND_FULL_PATH}/users/Class.AbstractUser.php";
 	require_once "{$BACKEND_FULL_PATH}/users/Class.User.php";
+	require_once "{$BACKEND_FULL_PATH}/users/Class.NotAuthorizedUser.php";
 	require_once "{$BACKEND_FULL_PATH}/users/Class.Editor.php";
 	require_once "{$BACKEND_FULL_PATH}/users/Class.Friend.php";
 	require_once "{$BACKEND_FULL_PATH}/statistics/Class.Statistics.php";
