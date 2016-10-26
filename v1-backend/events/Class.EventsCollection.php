@@ -549,6 +549,7 @@ class EventsCollection extends AbstractCollection
 
 
 		$p_get_events = $db->prepare($q_get_events->getStatement());
+
 		$result = $p_get_events->execute($statement_array);
 		if ($result === FALSE) throw new DBQueryException(implode(';', $db->errorInfo()), $db);
 
