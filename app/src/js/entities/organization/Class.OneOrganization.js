@@ -25,6 +25,7 @@ function OneOrganization(organization_id, is_loading_continuous) {
 	this.type_name = '';
 	this.site_url = '';
 	this.default_address = '';
+	this.events = new EventsCollection();
 	this.is_subscribed = false;
 	this.subscribed_count = 0;
 	this.subscribed = new UsersCollection();
@@ -126,6 +127,19 @@ OneOrganization.prototype.fetchOrganization = function(fields, success) {
 			success.call(self, self);
 		}
 	});
+};
+/**
+ *
+ * @param {(string|Array)} fields
+ * @param {AJAXData} [events_ajax_data]
+ * @param {AJAXCallback} [success]
+ * @returns {jqXHR}
+ */
+OneOrganization.prototype.fetchOrganizationWithEvents = function(fields, events_ajax_data, success) {
+	var _fields = fields;
+	_fields = _fields instanceof Array ? _fields : _fields.split(',');
+	_fields.push('events'.appendAjaxData(events_ajax_data));
+	return this.fetchOrganization(fields, success);
 };
 /**
  *
