@@ -544,7 +544,7 @@ class EventsCollection extends AbstractCollection
 			->cols($_fields)
 			->orderBy($order_by);
 		if ($from_view != self::VIEW_ALL_EVENTS_WITH_ALIAS) {
-			$q_get_events->where($canceled_condition);
+			$canceled_condition ? $q_get_events->where($canceled_condition) : false;
 		}
 
 
