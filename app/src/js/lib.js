@@ -614,19 +614,31 @@ jQuery.makeSet = function(array) {
 function tmpl(template_type, items, addTo, direction) {
 	items = items ? items : {};
 	
+	var wrapMap = {
+		thead: [ 1, "<table>", "</table>" ],
+		col: [ 2, "<table><colgroup>", "</colgroup></table>" ],
+		tr: [ 2, "<table><tbody>", "</tbody></table>" ],
+		td: [ 3, "<table><tbody><tr>", "</tr></tbody></table>" ],
+		_default: [ 0, "", "" ]
+	};
+	wrapMap.tbody = wrapMap.tfoot = wrapMap.colgroup = wrapMap.caption = wrapMap.thead;
+	wrapMap.th = wrapMap.td;
+	
 	var htmlEntities = function(str) {
 			return String(str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 		},
 		replaceTags = function(html, object) {
 			var jQuery_pairs = {},
-				keys = {};
+				keys = {},
+				wrap = wrapMap[ ( /<([\w:]+)/.exec( html ) || [ "", "" ] )[ 1 ].toLowerCase() ] || wrapMap._default,
+				j = wrap[ 0 ];
 			$.each(object, function(key, value) {
 				if ($.type(value) == 'string') {
 					keys[key] = htmlEntities(value);
 				} else if (value instanceof jQuery) {
 					if (value.length) {
 						jQuery_pairs[key] = value;
-						keys[key] = '<div id="JQ_tmpl_' + key + '"></div>';
+						keys[key] = value.is('tr') ? '<tbody id="JQ_tmpl_' + key + '"></tbody>' : '<div id="JQ_tmpl_' + key + '"></div>';
 					}
 				} else if (value == null) {
 					keys[key] = '';
@@ -635,18 +647,14 @@ function tmpl(template_type, items, addTo, direction) {
 				}
 			});
 			
-			html = $(html ? html.format(keys) : '');
+			html = $(html ? wrap[ 1 ] + html.format(keys) + wrap[ 2 ] : '');
 			$.each(jQuery_pairs, function(key, value) {
-				html = html.map(function(i, el) {
-					var $el = $(el);
-					if (el.id == 'JQ_tmpl_' + key) {
-						return value.toArray();
-					}
-					$el.find('#JQ_tmpl_' + key).append(value);
-					return $el.get(0);
-				});
+				html.find('#JQ_tmpl_' + key).append(value);
 				value.unwrap();
 			});
+			while ( j-- ) {
+				html = html.children();
+			}
 			return html;
 		},
 		
