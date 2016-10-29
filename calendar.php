@@ -2,6 +2,7 @@
 
 ini_set("display_errors", 1);
 error_reporting(E_ALL);
+$DEBUG_MODE = true;
 require_once 'v1-backend/bin/env_variables.php';
 require_once "{$BACKEND_FULL_PATH}/bin/Class.Result.php";
 require_once "{$BACKEND_FULL_PATH}/bin/db.php";
@@ -42,7 +43,11 @@ try {
 	$user = App::getCurrentUser();
 //    header('Location: /');
 }
-$user_full_name = $user->getLastName() . ' ' . $user->getFirstName(); ?>
+$user_full_name = $user->getLastName() . ' ' . $user->getFirstName();
+if(App::$ENV == 'prod'){
+	$DEBUG_MODE = false;
+}
+?>
 <!DOCTYPE html>
 <html lang="ru">
 
@@ -53,8 +58,14 @@ $user_full_name = $user->getLastName() . ' ' . $user->getFirstName(); ?>
 	<!-- =============== VENDOR STYLES ===============-->
 	<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i&subset=cyrillic" rel="stylesheet">
 
-	<link rel="stylesheet" href="/dist/vendor.css?rev=d3d5bfc3e05267870c6f3272b313478e">
-	<link rel="stylesheet" href="/dist/app.css?rev=7d54965573705e09215e75de03b01d01">
+	<?php
+	if($DEBUG_MODE) { ?>
+		<link rel="stylesheet" href="/dist/vendor.css?rev=4a5f26b8943f7df5fdaa6fb7c86b19fc">
+		<link rel="stylesheet" href="/dist/app.css?rev=eb6d45f75e9aa933d43c67850b822f08"><?php
+	} else { ?>
+		<link rel="stylesheet" href="/dist/vendor.min.css?rev=4460c4f9deb1ba4acdfd297e9c414595">
+		<link rel="stylesheet" href="/dist/app.min.css?rev=3be0fe6df6a284c85f41490cf3bbbf9a"><?php
+	}	?>
 
 	<link rel="apple-touch-icon" sizes="57x57" href="/app/img/favicon/apple-icon-57x57.png">
 	<link rel="apple-touch-icon" sizes="60x60" href="/app/img/favicon/apple-icon-60x60.png">
@@ -161,8 +172,14 @@ $user_full_name = $user->getLastName() . ' ' . $user->getFirstName(); ?>
 <!-- SOCKET.IO -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js" type="text/javascript"></script>
 
-<script type="text/javascript" src="/dist/vendor.js?rev=453680a6e5cafdb7a0ff029e37c556d3" charset="utf-8"></script>
-<script type="text/javascript" src="/dist/app.js?rev=ad4dfe6a0962906622a7e02a651cdc8c" charset="utf-8"></script>
+<?php
+if($DEBUG_MODE) { ?>
+	<script type="text/javascript" src="/dist/vendor.js?rev=b7d3430803962b126d7905f8ac176bc6" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=08ebfcf663e8aaded9a1e26f47df952d" charset="utf-8"></script><?php
+} else { ?>
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=a325bc345675aaf507d2e2b6b2f43b81" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=ef31c42556a20091d628455f2a5289cd" charset="utf-8"></script><?php
+}	?>
 
 <?php
 require 'templates.html';
