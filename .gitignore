@@ -104,3 +104,7 @@ user_images/default/*
 
 event_images/*/*
 organizations_images/*/*
+/dist/app.js
+/dist/vendor.js
+/dist/vendor.css
+/dist/app.css

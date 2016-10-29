@@ -12,24 +12,23 @@ function StatisticsOrganizationOverviewPage(org_id) {
 	this.graphics_stats = new OrganizationsStatistics(this.id);
 	this.other_stats = new OrganizationsStatistics(this.id);
 	this.is_loading = true;
-	this.organization.fetchOrganization([
+	this.organization.fetchOrganizationWithEvents([
 		'description',
 		'img_medium_url',
 		'default_address',
 		'staff',
-		'privileges',
-		'events'.appendAjaxData({
-			length: 3,
-			future: true,
-			is_canceled: true,
-			is_delayed: true,
-			fields: [
-				'organization_short_name',
-				'public_at'
-			],
-			order_by: 'nearest_event_date'
-		})
-	], Page.triggerRender);
+		'privileges'
+	], {
+		length: 3,
+		future: true,
+		is_canceled: true,
+		is_delayed: true,
+		fields: [
+			'organization_short_name',
+			'public_at'
+		],
+		order_by: 'nearest_event_date'
+	}, Page.triggerRender);
 }
 StatisticsOrganizationOverviewPage.extend(StatisticsOrganizationPage);
 /**
@@ -154,6 +153,10 @@ StatisticsOrganizationOverviewPage.prototype.render = function() {
 		storage_until_name = 'org_stats_' + this.id + '_until',
 		is_cached_data_actual = moment.unix(window.sessionStorage.getItem(storage_until_name)).isAfter(moment());
 	
+	if (!window.location.pathname.contains('overview')) {
+		__APP.changeState(window.location.pathname+'/overview', true);
+	}
+	this.renderHeaderTabs();
 	__APP.changeTitle([{
 		title: 'Организации',
 		page: '/statistics'

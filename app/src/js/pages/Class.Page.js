@@ -69,7 +69,11 @@ Object.defineProperty(Page, 'PAGES', {
 		},
 		'statistics': {
 			'organization': {
-				'^([0-9]+)': StatisticsOrganizationOverviewPage
+				'^([0-9]+)': {
+					'overview': StatisticsOrganizationOverviewPage,
+					'events': StatisticsOrganizationEventsPage,
+					'': StatisticsOrganizationOverviewPage
+				}
 			},
 			'event': {
 				'^([0-9]+)': StatisticsEventOverviewPage
