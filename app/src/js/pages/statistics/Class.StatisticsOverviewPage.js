@@ -27,12 +27,12 @@ StatisticsOverviewPage.buildMyOrganizationsBlocks = function(organizations) {
 				{
 					name: OneUser.ROLE.ADMIN,
 					title: 'Администраторы',
-					staff: org.staff.getSpecificStaff(OneUser.ROLE.ADMIN, staff_additional_fields),
+					staff: UsersCollection.getSpecificStaff(OneUser.ROLE.ADMIN, org.staff, staff_additional_fields),
 					plural_name: OneUser.ROLE.ADMIN + 's'
 				}, {
 					name: OneUser.ROLE.MODERATOR,
 					title: 'Модераторы',
-					staff: org.staff.getSpecificStaff(OneUser.ROLE.MODERATOR, staff_additional_fields),
+					staff: UsersCollection.getSpecificStaff(OneUser.ROLE.MODERATOR, org.staff, staff_additional_fields),
 					plural_name: OneUser.ROLE.MODERATOR + 's'
 				}
 			],
@@ -85,7 +85,7 @@ StatisticsOverviewPage.prototype.bindUploadOnScroll = function() {
 				$window.off('scroll.uploadOrganizations');
 				PAGE.my_organizations.fetchMyOrganizations('admin', PAGE.my_organizations_fields, 10, '', function(organizations) {
 					if (organizations.length) {
-						PAGE.find('.StatOverviewOrganizations').append(PAGE.bindOrganizationsEvents(StatisticsOverviewPage.buildMyOrganizationsBlocks(organizations)));
+						PAGE.$wrapper.find('.StatOverviewOrganizations').append(PAGE.bindOrganizationsEvents(StatisticsOverviewPage.buildMyOrganizationsBlocks(organizations)));
 						$window.on('scroll.uploadOrganizations', scrollEvent);
 					} else {
 						PAGE.disable_upload = true;
