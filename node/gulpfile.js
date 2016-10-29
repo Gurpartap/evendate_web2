@@ -39,6 +39,7 @@ var gulp = require('gulp'),
 gulp.task('js', function() {
 	return merge(
 		gulp.src(srcs.vendor_js)
+			.pipe(resolveDependencies())
 			.pipe(concat('vendor.js'))
 			.pipe(gulp.dest('../dist/')),
 		

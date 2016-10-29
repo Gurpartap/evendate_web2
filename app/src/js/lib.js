@@ -406,6 +406,19 @@ $.fn.extend({
 		this.data(options);
 		
 		return this.animate.apply(this, args);
+	},
+	/**
+	 * jQuery adapter for Tablesort
+	 * @param {object} [options]
+	 */
+	tablesort: function(options) {
+		if(!options)
+			options = {};
+		if(Tablesort && typeof Tablesort === 'function'){
+			return Tablesort(this.get(0), options);
+		} else {
+			console.error('Tablesort is not defined');
+		}
 	}
 });
 
@@ -619,7 +632,7 @@ function tmpl(template_type, items, addTo, direction) {
 		col: [ 2, "<table><colgroup>", "</colgroup></table>" ],
 		tr: [ 2, "<table><tbody>", "</tbody></table>" ],
 		td: [ 3, "<table><tbody><tr>", "</tr></tbody></table>" ],
-		_default: [ 0, "", "" ]
+		_default: [ 1, "<div>", "</div>" ]
 	};
 	wrapMap.tbody = wrapMap.tfoot = wrapMap.colgroup = wrapMap.caption = wrapMap.thead;
 	wrapMap.th = wrapMap.td;
@@ -650,7 +663,11 @@ function tmpl(template_type, items, addTo, direction) {
 			html = $(html ? wrap[ 1 ] + html.format(keys) + wrap[ 2 ] : '');
 			$.each(jQuery_pairs, function(key, value) {
 				html.find('#JQ_tmpl_' + key).append(value);
-				value.unwrap();
+				if(value.is('tr')){
+					value.parent('tbody').removeAttr('id');
+				} else {
+					value.unwrap();
+				}
 			});
 			while ( j-- ) {
 				html = html.children();
