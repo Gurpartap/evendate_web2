@@ -4189,6 +4189,78 @@ body.-open_modal > .modal_wrapper {
 
 /* STATISTICS */
 
+.statistics_table {
+	width: 100%;
+	table-layout: fixed;
+}
+
+.statistics_table tr {border-bottom: 1px solid #e6e8eb}
+.statistics_table tr:nth-child(even) {background-color: #f9f9fa; background-color: var(--color_background_lighter);}
+
+.statistics_table th {
+	padding: 12px 0;
+	font-size: 0.8125em;
+	font-weight: 500;
+	color: rgba(62, 77, 102, 0.5);
+	text-transform: uppercase;
+}
+
+.statistics_table td {
+	padding: 16px 0;
+	font-size: 1em;
+	font-weight: 500;
+	color: rgba(62, 77, 102, 0.8);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.statistics_table th:first-child,
+.statistics_table td:first-child {padding-left: 24px}
+
+.statistics_table th:last-child,
+.statistics_table td:last-child {padding-right: 24px}
+
+.statistics_table .-text_small {font-size: 0.875em}
+.statistics_table .-text_big {font-size: 1.125em}
+
+.statistics_table .sort-up,
+.statistics_table .sort-down,
+.statistics_table .-highlighted {color: #28be84; color: var(--color_franklin);}
+
+.statistics_table .sort-header {cursor: pointer}
+
+.statistics_table .sort-header:after {
+	content: '';
+	position: absolute;
+	top: -2px;
+	bottom: 0;
+	height: 0;
+	margin: auto 0 auto 5px;
+	border-left: 4px solid transparent;
+	border-right: 4px solid transparent;
+	visibility: hidden;
+}
+.statistics_table .sort-up:after,
+.statistics_table .sort-down:after,
+.statistics_table .sort-down:hover:after,
+.statistics_table .sort-header:hover:after {visibility: visible}
+
+.statistics_table .sort-header:after,
+.statistics_table .sort-header.sort-down:after,
+.statistics_table .sort-header.sort-up[data-sort-order="asc"]:after,
+.statistics_table .sort-header.sort-up[data-sort-order="desc"]:after {
+	border-top: 4px solid;
+	border-bottom: 0 solid;
+}
+
+.statistics_table .sort-header.sort-up:after,
+.statistics_table .sort-header.sort-down[data-sort-order="asc"]:after,
+.statistics_table .sort-header.sort-down[data-sort-order="desc"]:after {
+	border-top: 0 solid;
+	border-bottom: 4px solid;
+}
+
 /* Statistics Overview */
 
 .statistics_overview_activity {
@@ -4373,7 +4445,24 @@ body.-open_modal > .modal_wrapper {
 	margin-bottom: 60px;
 }
 
-/* Organization Statistics Overview */
+/* Organization Statistics Events */
+
+.orgstat_events_page {
+	margin-top: 18px;
+}
+
+.orgstat_events_page_header {
+	border-bottom: 1px solid rgba(62, 77, 101, 0.1);
+}
+
+.orgstat_events_title {
+	margin: 36px 18px 18px;
+	font-size: 1.5em;
+	font-weight: 500;
+	color: rgba(62, 77, 102, 0.8);
+}
+
+/* Event Statistics Overview */
 
 .eventstat_overview {
 	margin: 18px 0;

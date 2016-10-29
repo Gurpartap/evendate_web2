@@ -54,17 +54,10 @@ gulp.task('css', function() {
 	return merge(
 		gulp.src(srcs.vendor_css)
 			.pipe(concat('vendor.css'))
-			.pipe(gulp.dest('../dist/'))
-			.pipe(csso())
-			.pipe(rename({extname: '.min.css'}))
 			.pipe(gulp.dest('../dist/')),
 		
 		gulp.src(srcs.app_css)
 			.pipe(concat('app.css'))
-			.pipe(gulp.dest('../dist/'))
-			.pipe(autoprefixer())
-			.pipe(csso())
-			.pipe(rename({extname: '.min.css'}))
 			.pipe(gulp.dest('../dist/'))
 	);
 });
