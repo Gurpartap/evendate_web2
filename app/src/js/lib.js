@@ -614,6 +614,94 @@ jQuery.makeSet = function(array) {
 	
 }(jQuery, window, document));
 
+/**===========================================================
+ * A complete cookies reader/writer framework with full unicode support.
+ *
+ * Revision #1 - September 4, 2014
+ *
+ * https://developer.mozilla.org/en-US/docs/Web/API/document.cookie
+ * https://developer.mozilla.org/User:fusionchess
+ * https://github.com/madmurphy/cookies.js
+ *
+ * This framework is released under the GNU Public License, version 3 or later.
+ * http://www.gnu.org/licenses/gpl-3.0-standalone.html
+ */
+(function(window){
+	window.cookies = {
+		/**
+		 *
+		 * @param {string} name
+		 * @return {(string|null)}
+		 */
+		getItem: function (name) {
+			if (!name) { return null; }
+			return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(name).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
+		},
+		/**
+		 *
+		 * @param {string} name
+		 * @param {*} value
+		 * @param {(string|number|Date)} [end] - max-age in seconds, Infinity, or the expires date in GMTString format or as Date object
+		 * @param {string} [path]
+		 * @param {string} [domain]
+		 * @param {boolean} [is_secure]
+		 * @return {boolean}
+		 */
+		setItem: function (name, value, end, path, domain, is_secure) {
+			var expires = "";
+			if (!name || /^(?:expires|max\-age|path|domain|secure)$/i.test(name)) { return false; }
+			if (end) {
+				switch (end.constructor) {
+					case Number:
+						expires = end === Infinity ? "; expires=Fri, 31 Dec 9999 23:59:59 GMT" : "; max-age=" + end;
+						break;
+					case String:
+						expires = "; expires=" + end;
+						break;
+					case Date:
+						expires = "; expires=" + end.toUTCString();
+						break;
+				}
+			}
+			document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + (domain ? "; domain=" + domain : "") + (path ? "; path=" + path : "") + (is_secure ? "; secure" : "");
+			return true;
+		},
+		/**
+		 *
+		 * @param {string} name
+		 * @param {string} [path]
+		 * @param {string} [domain]
+		 * @return {boolean}
+		 */
+		removeItem: function (name, path, domain) {
+			if (!this.hasItem(name)) { return false; }
+			document.cookie = encodeURIComponent(name) + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT" + (domain ? "; domain=" + domain : "") + (path ? "; path=" + path : "");
+			return true;
+		},
+		/**
+		 *
+		 * @param {string} name
+		 * @return {boolean}
+		 */
+		hasItem: function (name) {
+			if (!name) { return false; }
+			return (new RegExp("(?:^|;\\s*)" + encodeURIComponent(name).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=")).test(document.cookie);
+		},
+		/**
+		 *
+		 * @return {Array}
+		 */
+		keys: function () {
+			var keys = document.cookie.replace(/((?:^|\s*;)[^\=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, "").split(/\s*(?:\=[^;]*)?;\s*/),
+				length = keys.length;
+			for (var i = 0; i < length; i++) {
+				keys[i] = decodeURIComponent(keys[i]);
+			}
+			return keys;
+		}
+	};
+}(window));
+
 
 /**===========================================================
  * Templates for jQuery
