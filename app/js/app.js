@@ -23,6 +23,143 @@
 
 })(window, document, window.jQuery);
 
+$.fn.extend({
+	toggleStatus: function(statuses) {
+		var $this = this;
+		
+		if ($this.is('.form_unit')) {
+			statuses.split(' ').forEach(function(status) {
+				var $form_elements = $this.find('input, select, textarea, button');
+				if (status === 'disabled') {
+					if ($this.hasClass('-status_disabled')) {
+						$form_elements.removeAttr('disabled');
+					} else {
+						$form_elements.attr('disabled', true);
+					}
+				}
+				$this.toggleClass('-status_' + status);
+			});
+		} else if ($this.is('input, textarea, select, button')) {
+			$this.closest('.form_unit').toggleStatus(statuses);
+		} else if ($this.length) {
+			$this.find('.form_unit').toggleStatus(statuses);
+		} else {
+			throw Error('Argument not found');
+		}
+		
+		return this;
+	},
+	
+	/**
+	 * Сбор данных с формы
+	 * Метод возвращает javaScript объект, состоящий из атрибутов name и value элементов формы.
+	 * Если output_type стоит на array, то возвращается массив из объектов с полями name и value (аналогично с serializeArray).
+	 *
+	 * @method external:"jQuery.fn".serializeForm
+	 *
+	 * @param {string} [output_type=object]
+	 * @returns {Array|Object}
+	 */
+	serializeForm: function(output_type) {
+		var zb = /^(?:input|select|textarea|keygen)/i,
+			yb = /^(?:submit|button|image|reset|file)$/i,
+			T = /^(?:checkbox|radio)$/i,
+			xb = /\r?\n/g,
+			elements = this.map(function() {
+				var a = $.prop(this, "elements");
+				return a ? $.makeArray(a) : this
+			});
+		
+		switch (output_type) {
+			case 'array': {
+				/* Работает так же как и serializeArray, с некоторыми модификациями */
+				return elements.filter(function() {
+					var a = this.type;
+					return this.name
+						&& !$(this).is(":disabled")
+						&& zb.test(this.nodeName)
+						&& !yb.test(a)
+						&& ((this.checked && this.value != "on") || a != "radio")
+						&& ((this.checked && this.value != "on") || this.value == "on" || a != "checkbox")
+				}).map(function(a, b) {
+					var c = $(this).val(),
+						std = "";
+					switch (this.type) {
+						case "radio":
+						case "checkbox": {
+							std = c == "on" ? ( this.checked ? 1 : 0 ) : c;
+							break;
+						}
+						default: {
+							std = c.replace(xb, "\r\n");
+						}
+					}
+					return null == c ? null : {
+						name: b.name,
+						value: std
+					}
+				}).get();
+			}
+			case 'object':
+			default: {
+				var output = {};
+				elements.filter(function() {
+					var a = this.type;
+					return this.name && !$(this).is(':disabled') && zb.test(this.nodeName) && !yb.test(a) && !T.test(a)
+				}).each(function(i, el) {
+					var $element = $(el),
+						name = el.name,
+						value = $element.val();
+					
+					if (elements.filter("[name='" + name + "']").length > 1 && value != "") {
+						output[name] = typeof(output[name]) == "undefined" ? [] : output[name];
+						output[name].push(value ? value.replace(xb, "\r\n") : value)
+					}
+					else if ($element.attr('type') === 'hidden' && value.indexOf('data.') === 0) {
+						var data_names = value.split('.'),
+							data = $element.data(data_names[1]),
+							n = 2;
+						while (data_names[n]) {
+							data = data[data_names[n]];
+							n++;
+						}
+						output[name] = data;
+					}
+					else {
+						output[name] = value || value === 0 ? value.replace(xb, "\r\n") : null;
+					}
+				});
+				elements.filter(function() {
+					var a = this.type;
+					return this.name && !$(this).is(":disabled") && T.test(a) && ((this.checked && this.value != "on") || (this.value == "on" && a == "checkbox"))
+				}).each(function(i, el) {
+					var name = el.name,
+						value = el.value;
+					
+					switch (el.type) {
+						case 'radio': {
+							output[name] = value;
+							break;
+						}
+						case 'checkbox': {
+							if (elements.filter("[name='" + name + "']").length > 1 && value != "on") {
+								output[name] = typeof(output[name]) == "undefined" ? [] : output[name];
+								output[name].push(value)
+							}
+							else if (value != "on")
+								output[name] = value;
+							else
+								output[name] = el.checked ? true : false;
+							break;
+						}
+					}
+				});
+				return output;
+			}
+		}
+	}
+});
+
 jQuery.makeSet = function(array) {
 	return $($.map(array, function(el){return el.get();}));
 };
