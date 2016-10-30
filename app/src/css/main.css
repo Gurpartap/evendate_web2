@@ -2053,6 +2053,11 @@ body.-open_modal > .modal_wrapper {
 	font-size: 1rem;
 }
 
+.avatar_block > .avatar {
+	flex-grow: 0;
+	flex-shrink: 0;
+}
+
 .avatar_block.-size_small > .avatar_name,
 .avatar_block.-size_30x30 > .avatar_name,
 .avatar_block > .avatar.-size_small + .avatar_name,
@@ -2291,6 +2296,7 @@ body.-open_modal > .modal_wrapper {
 	background-color: #fff;
 	background-color: var(--color_page);
 	box-shadow: 0 2px 6px hsla(0,0%,0%,.28);
+	border-radius: 2px;
 }
 
 .side_page {
@@ -3128,6 +3134,7 @@ body.-open_modal > .modal_wrapper {
 	flex: 0 1 240px;
 	max-width: 240px;
 	margin-bottom: 32px;
+	overflow: hidden;
 }
 
 .organization_unit_background {
@@ -3604,8 +3611,8 @@ body.-open_modal > .modal_wrapper {
 .feed_calendar {margin-bottom: 24px}
 
 .feed_calendar_wrapper {
-	min-height: -webkit-calc((24px * 6) + 58px + (12px * 2));
-	min-height: calc((24px * 6) + 58px + (12px * 2));
+	min-height: -webkit-calc((24px * 6) + 60px + (12px * 2));
+	min-height: calc((24px * 6) + 60px + (12px * 2));
 	cursor: default;
 }
 
