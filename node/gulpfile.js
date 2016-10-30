@@ -12,12 +12,8 @@ var gulp = require('gulp'),
 	runSequence = require('run-sequence').use(gulp),
 	srcs = {
 		vendor_js: [
-			'../app/src/js/vendor/jquery/jquery.js',
-			'../app/src/js/vendor/moment/moment-with-locales.min.js',
-			'../app/src/js/vendor/moment/moment-timezone-with-data-2010-2020.min.js',
-			'../app/src/js/vendor/select2v3/select2.js',
-			'../app/src/js/vendor/select2v3/select2_locale_ru.js',
-			'../app/src/js/vendor/**/*.js'
+			'../app/src/vendor/jquery/jquery.js',
+			'../app/src/vendor/**/*.js'
 		],
 		app_js: [
 			'../app/src/js/lib.js',
@@ -29,7 +25,7 @@ var gulp = require('gulp'),
 			'../app/src/js/application.js',
 			'../app/src/js/init.js'
 		],
-		vendor_css: '../app/src/css/vendor/**/*.css',
+		vendor_css: '../app/src/vendor/**/*.css',
 		app_css: [
 			'../app/src/css/govnokod.css',
 			'../app/src/css/main.css'

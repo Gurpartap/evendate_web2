@@ -1,4 +1,7 @@
 /**
+ * @requires select2.js
+ */
+/**
  * Select2 Russian translation.
  *
  * @author  Uriy Efremochkin <efremochkin@uriy.me>

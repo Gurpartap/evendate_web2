@@ -19,7 +19,7 @@ CurrentUser.extend(OneUser);
  * @returns {jqXHR}
  */
 CurrentUser.prototype.logout = function() {
-	return __APP.SERVER.AJAX(__APP.SERVER.AJAX_METHOD.GET, '/index.php', {logout: true}, function() {
+	return __APP.SERVER.ajax(__APP.SERVER.AJAX_METHOD.GET, '/index.php', {logout: true}, function() {
 		window.location = '/';
 	});
 };

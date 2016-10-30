@@ -18,7 +18,7 @@ __APP = {
 		 * @param {function} [error]
 		 * @returns {jqXHR}
 		 */
-		AJAX: function AJAX(ajax_method, ajax_url, ajax_data, success, error) {
+		ajax: function ajax(ajax_method, ajax_url, ajax_data, success, error) {
 			return $.ajax({
 				url: ajax_url,
 				data: ajax_data,
@@ -30,21 +30,38 @@ __APP = {
 		},
 		/**
 		 *
+		 * @param {__APP.SERVER.AJAX_METHOD} ajax_method
+		 * @param {string} ajax_url
+		 * @param {(AJAXData|string)} ajax_data
+		 * @param {AJAXCallback} [success]
+		 * @returns {jqXHR}
+		 */
+		dealAjax: function(ajax_method, ajax_url, ajax_data, success) {
+			var self = this;
+			return __APP.SERVER.ajax(ajax_method, ajax_url, ajax_data, function(res) {
+				__APP.SERVER.ajaxHandler(res, function(data, text) {
+					if (success && typeof success == 'function') {
+						success.call(self, data);
+					}
+				}, __APP.SERVER.ajaxErrorHandler)
+			})
+		},
+		/**
+		 *
 		 * @param {string} ajax_url
 		 * @param {AJAXData} ajax_data
 		 * @param {AJAXCallback} [success]
 		 * @returns {jqXHR}
 		 */
 		getData: function getData(ajax_url, ajax_data, success) {
-			return __APP.SERVER.AJAX(__APP.SERVER.AJAX_METHOD.GET, ajax_url, __APP.SERVER.validateData(ajax_data), function(res) {
-				__APP.SERVER.ajaxHandler(res, function(data, text) {
-					if (success && typeof success == 'function') {
-						if (ajax_data.length != undefined && ajax_data.offset != undefined) {
-							ajax_data.offset += ajax_data.length;
-						}
-						success.call(self, data);
-					}
-				}, __APP.SERVER.ajaxErrorHandler)
+			var self = this;
+			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.GET, ajax_url, __APP.SERVER.validateData(ajax_data), function(data) {
+				if (ajax_data.length != undefined && ajax_data.offset != undefined) {
+					ajax_data.offset += ajax_data.length;
+				}
+				if (success && typeof success == 'function') {
+					success.call(self, data);
+				}
 			});
 		},
 		/**
@@ -55,16 +72,7 @@ __APP = {
 		 * @returns {jqXHR}
 		 */
 		updateData: function updateData(ajax_url, ajax_data, success) {
-			return __APP.SERVER.AJAX(__APP.SERVER.AJAX_METHOD.PUT, ajax_url, ajax_data, function(res) {
-				__APP.SERVER.ajaxHandler(res, function(data, text) {
-					if (success && typeof success == 'function') {
-						if (ajax_data.length != undefined && ajax_data.offset != undefined) {
-							ajax_data.offset += ajax_data.length;
-						}
-						success.call(self, data);
-					}
-				}, __APP.SERVER.ajaxErrorHandler)
-			});
+			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.PUT, ajax_url, ajax_data, success);
 		},
 		/**
 		 *
@@ -74,16 +82,7 @@ __APP = {
 		 * @returns {jqXHR}
 		 */
 		addData: function addData(ajax_url, ajax_data, success) {
-			return __APP.SERVER.AJAX(__APP.SERVER.AJAX_METHOD.POST, ajax_url, ajax_data, function(res) {
-				__APP.SERVER.ajaxHandler(res, function(data, text) {
-					if (success && typeof success == 'function') {
-						if (ajax_data.length != undefined && ajax_data.offset != undefined) {
-							ajax_data.offset += ajax_data.length;
-						}
-						success.call(self, data);
-					}
-				}, __APP.SERVER.ajaxErrorHandler)
-			});
+			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.POST, ajax_url, ajax_data, success);
 		},
 		/**
 		 *
@@ -93,16 +92,7 @@ __APP = {
 		 * @returns {jqXHR}
 		 */
 		deleteData: function deleteData(ajax_url, ajax_data, success) {
-			return __APP.SERVER.AJAX(__APP.SERVER.AJAX_METHOD.DELETE, ajax_url, ajax_data, function(res) {
-				__APP.SERVER.ajaxHandler(res, function(data, text) {
-					if (success && typeof success == 'function') {
-						if (ajax_data.length != undefined && ajax_data.offset != undefined) {
-							ajax_data.offset += ajax_data.length;
-						}
-						success.call(self, data);
-					}
-				}, __APP.SERVER.ajaxErrorHandler)
-			});
+			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.DELETE, ajax_url, ajax_data, success);
 		},
 		/**
 		 *
@@ -255,7 +245,7 @@ __APP = {
 		 * @param {(Array<string>|string)} [props.unit_classes]
 		 * @returns {jQuery}
 		 */
-		radioOrCheckbox: function buildRadioOrCheckbox(type, props) {
+		radioCheckbox: function buildRadioCheckbox(type, props) {
 			if (type == 'checkbox' || type == 'radio') {
 				props = __APP.BUILD.normalizeBuildProps(props, ['unit_classes']);
 				if (props.classes.indexOf('form_checkbox') == -1 && props.classes.indexOf('form_radio') == -1) {
@@ -266,6 +256,22 @@ __APP = {
 			} else {
 				throw Error('Принимаемый аргумент type может быть либо "radio" либо "checkbox", придурок')
 			}
+		},
+		/**
+		 *
+		 * @param {buildProps} props
+		 * @returns {jQuery}
+		 */
+		radio: function buildRadio(props) {
+			return __APP.BUILD.radioCheckbox('radio', props);
+		},
+		/**
+		 *
+		 * @param {buildProps} props
+		 * @returns {jQuery}
+		 */
+		checkbox: function buildCheckbox(props) {
+			return __APP.BUILD.radioCheckbox('checkbox', props);
 		},
 		/**
 		 *
@@ -602,11 +608,11 @@ __APP = {
 	changeTitle: function changeTitle(new_title) {
 		var $new_title = $(),
 			title_str;
+		if(typeof new_title === 'string') {
+			title_str = new_title;
+			new_title = new_title.split(' > ');
+		}
 		switch (true) {
-			case (typeof new_title == 'string'): {
-				title_str = new_title;
-				new_title = new_title.split(' > ');
-			}
 			case (new_title instanceof Array): {
 				new_title.forEach(function(title_chunk, i) {
 					if (i) {

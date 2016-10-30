@@ -104,7 +104,7 @@ OneEventPage.buildNotifications = function(raw_notifications, event_id, last_dat
 				data.unit_classes = ['-status_disabled'];
 				data.attributes.disabled = true;
 			}
-			$notifications = $notifications.add(__APP.BUILD.radioOrCheckbox('checkbox', data))
+			$notifications = $notifications.add(__APP.BUILD.checkbox(data))
 		}
 	}
 	return $notifications;
