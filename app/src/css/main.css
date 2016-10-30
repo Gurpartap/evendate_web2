@@ -1048,7 +1048,7 @@ input, select, textarea, button {font-family: inherit}
 	min-width: 1.88rem;
 }
 .button.-rounded {
-	font-size: 0.68em;
+	font-size: 0.8em;
 	border-radius: 50px;
 }
 

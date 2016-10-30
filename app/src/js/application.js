@@ -457,10 +457,7 @@ __APP = {
 						date: m_event_date.format(__C.DATE_FORMAT)
 					}) : '',
 					add_to_favorite_button: new AddToFavoriteButton(event.id, event.is_favorite, {
-						classes: ['-size_low', '-fill', '-rounded', 'AddToFavorites', 'AddAvatar', 'RippleEffect'],
-						labels: {
-							subscribed: 'В избранном'
-						}
+						classes: ['-size_low', '-fill', '-rounded', 'AddToFavorites', 'AddAvatar', 'RippleEffect']
 					}),
 					subscribers: $subscribers,
 					date: m_event_date.format(__C.DATE_FORMAT),
@@ -742,9 +739,9 @@ __LOCALES = {
 	ru_RU: {
 		TEXTS: {
 			BUTTON: {
-				REMOVE_FAVORITE: 'Удалить из избранного',
-				ADD_FAVORITE: 'Добавить в избранное',
-				FAVORED: 'Избранное событие',
+				REMOVE_FAVORITE: 'Убрать',
+				ADD_FAVORITE: 'В избранное',
+				FAVORED: 'В избранном',
 				ADD_SUBSCRIPTION: 'Подписаться',
 				REMOVE_SUBSCRIPTION: 'Отписаться',
 				SUBSCRIBED: 'Подписан'
