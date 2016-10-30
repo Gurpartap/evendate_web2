@@ -173,10 +173,10 @@ if(App::$ENV == 'prod'){
 <?php
 if($DEBUG_MODE) { ?>
 	<script type="text/javascript" src="/dist/vendor.js?rev=9e532c62fd59aeecd19339efc66c09cf" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=dd4b289623f019bc7aa4b1480dfbf423" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/app.js?rev=c700a879adf4a5fe3d6c39a038a5cfdb" charset="utf-8"></script><?php
 } else { ?>
 	<script type="text/javascript" src="/dist/vendor.min.js?rev=ee15d83ed35c0671a0a4c15ff037058f" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=12668e58e1b6540e2d80f08a436b7220" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/app.min.js?rev=ee973a5d27f9fc2ab0588dda899c0bc0" charset="utf-8"></script><?php
 }	?>
 
 <?php

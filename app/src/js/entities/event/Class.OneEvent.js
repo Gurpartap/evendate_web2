@@ -92,20 +92,22 @@ OneEvent.fetchEvent = function(event_id, fields, success) {
  *
  * @param {OneEventCreateEventData} new_event_data
  * @param {OneEventCreateEventCallback} [success]
+ * @param {function} [error]
  * @returns {jqXHR}
  */
-OneEvent.createEvent = function(new_event_data, success) {
-	return __APP.SERVER.addData('/api/v1/events/', JSON.stringify(new_event_data), true, success);
+OneEvent.createEvent = function(new_event_data, success, error) {
+	return __APP.SERVER.addData('/api/v1/events/', JSON.stringify(new_event_data), true, success, error);
 };
 /**
  *
  * @param {(string|number)} event_id
  * @param {OneEventCreateEventData} data
  * @param {OneEventCreateEventCallback} [success]
+ * @param {function} [error]
  * @returns {jqXHR}
  */
-OneEvent.updateEvent = function(event_id, data, success) {
-	return __APP.SERVER.updateData('/api/v1/events/' + event_id, JSON.stringify(data), success);
+OneEvent.updateEvent = function(event_id, data, success, error) {
+	return __APP.SERVER.updateData('/api/v1/events/' + event_id, JSON.stringify(data), success, error);
 };
 /**
  *
@@ -200,9 +202,10 @@ OneEvent.prototype.fetchEvent = function(fields, success) {
  *
  * @param {OneEventCreateEventData} data
  * @param {OneEventCreateEventCallback} [success]
+ * @param {function} [error]
  * @returns {jqXHR}
  */
-OneEvent.prototype.createEvent = function(data, success) {
+OneEvent.prototype.createEvent = function(data, success, error) {
 	var self = this;
 	return this.constructor.createEvent(data, function(response_data) {
 		self.setData(data);
@@ -210,22 +213,23 @@ OneEvent.prototype.createEvent = function(data, success) {
 		if (success && typeof success == 'function') {
 			success.call(self, data);
 		}
-	});
+	}, error);
 };
 /**
  *
  * @param {OneEventCreateEventData} data
  * @param {OneEventCreateEventCallback} [success]
+ * @param {function} [error]
  * @returns {jqXHR}
  */
-OneEvent.prototype.updateEvent = function(data, success) {
+OneEvent.prototype.updateEvent = function(data, success, error) {
 	var self = this;
 	return this.constructor.updateEvent(self.id, data, function(response_data) {
 		self.setData(data);
 		if (success && typeof success == 'function') {
 			success.call(self, data);
 		}
-	});
+	}, error);
 };
 /**
  *

@@ -196,6 +196,10 @@ RedactEventPage.prototype.init = function() {
 			__APP.changeState('/event/' + PAGE.event.id);
 		}
 		
+		function onError() {
+			PAGE.$wrapper.removeClass('-faded');
+		}
+		
 		$form.find(':required').not(':disabled').each(function() {
 			var $this = $(this),
 				max_length = $this.data('maxlength');
@@ -279,9 +283,9 @@ RedactEventPage.prototype.init = function() {
 			PAGE.$wrapper.addClass('-faded');
 			try {
 				if (is_edit) {
-					PAGE.event.updateEvent(data, afterSubmit);
+					PAGE.event.updateEvent(data, afterSubmit, onError);
 				} else {
-					PAGE.event.createEvent(data, afterSubmit);
+					PAGE.event.createEvent(data, afterSubmit, onError);
 				}
 			} catch (e) {
 				PAGE.$wrapper.removeClass('-faded');

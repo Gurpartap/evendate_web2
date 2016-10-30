@@ -16,9 +16,10 @@ __APP = {
 		 * @param {(AJAXData|string)} ajax_data
 		 * @param {string} [content_type='application/x-www-form-urlencoded; charset=UTF-8']
 		 * @param {AJAXCallback} [success]
+		 * @param {function} [error]
 		 * @returns {jqXHR}
 		 */
-		dealAjax: function(ajax_method, ajax_url, ajax_data, content_type, success) {
+		dealAjax: function(ajax_method, ajax_url, ajax_data, content_type, success, error) {
 			var self = this;
 			return $.ajax({
 				url: ajax_url,
@@ -31,7 +32,8 @@ __APP = {
 							success.call(self, data);
 						}
 					}, __APP.SERVER.ajaxErrorHandler)
-				}
+				},
+				error: error
 			});
 		},
 		/**
@@ -39,9 +41,10 @@ __APP = {
 		 * @param {string} ajax_url
 		 * @param {AJAXData} ajax_data
 		 * @param {AJAXCallback} [success]
+		 * @param {function} [error]
 		 * @returns {jqXHR}
 		 */
-		getData: function getData(ajax_url, ajax_data, success) {
+		getData: function getData(ajax_url, ajax_data, success, error) {
 			var self = this;
 			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.GET, ajax_url, __APP.SERVER.validateData(ajax_data), 'application/json', function(data) {
 				if (ajax_data.length != undefined && ajax_data.offset != undefined) {
@@ -50,17 +53,18 @@ __APP = {
 				if (success && typeof success == 'function') {
 					success.call(self, data);
 				}
-			});
+			}, error);
 		},
 		/**
 		 *
 		 * @param {string} ajax_url
 		 * @param {AJAXData} ajax_data
 		 * @param {AJAXCallback} [success]
+		 * @param {function} [error]
 		 * @returns {jqXHR}
 		 */
-		updateData: function updateData(ajax_url, ajax_data, success) {
-			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.PUT, ajax_url, ajax_data, 'application/json', success);
+		updateData: function updateData(ajax_url, ajax_data, success, error) {
+			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.PUT, ajax_url, ajax_data, 'application/json', success, error);
 		},
 		/**
 		 *
@@ -68,23 +72,25 @@ __APP = {
 		 * @param {AJAXData} ajax_data
 		 * @param {boolean} is_payload
 		 * @param {AJAXCallback} [success]
+		 * @param {function} [error]
 		 * @returns {jqXHR}
 		 */
-		addData: function addData(ajax_url, ajax_data, is_payload, success) {
+		addData: function addData(ajax_url, ajax_data, is_payload, success, error) {
 			if(is_payload){
-				return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.POST, ajax_url, ajax_data, 'application/json', success);
+				return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.POST, ajax_url, ajax_data, 'application/json', success, error);
 			}
-			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.POST, ajax_url, ajax_data, 'application/x-www-form-urlencoded; charset=UTF-8', success);
+			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.POST, ajax_url, ajax_data, 'application/x-www-form-urlencoded; charset=UTF-8', success, error);
 		},
 		/**
 		 *
 		 * @param {string} ajax_url
 		 * @param {AJAXData} ajax_data
 		 * @param {AJAXCallback} [success]
+		 * @param {function} [error]
 		 * @returns {jqXHR}
 		 */
-		deleteData: function deleteData(ajax_url, ajax_data, success) {
-			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.DELETE, ajax_url, ajax_data, 'application/json', success);
+		deleteData: function deleteData(ajax_url, ajax_data, success, error) {
+			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.DELETE, ajax_url, ajax_data, 'application/json', success, error);
 		},
 		/**
 		 *
