@@ -3220,7 +3220,11 @@ body.-open_modal > .modal_wrapper {
 
 .organization_feed > .tabs_header {padding: 0 24px}
 
-.organization_feed_text {padding: 12px 24px}
+.organization_feed_text {
+	border-top: 1px solid #eee;
+	margin-top: 36px;
+	padding: 36px 24px 12px;
+}
 
 .organization_feed_block {
 	height: 148px;
