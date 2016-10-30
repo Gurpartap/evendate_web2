@@ -22,6 +22,9 @@ OnboardingPage.prototype.init = function() {
 	bindRippleEffect(this.$wrapper);
 	bindPageLinks(this.$wrapper);
 	this.$wrapper.find('.Link').on('click', function() {
+		if($(this).is('.SkipOnboarding')){
+			cookies.setItem('skip_onboarding', 1, moment().add(7, 'd')._d);
+		}
 		__APP.SUBSCRIBED_ORGS.update();
 	});
 };

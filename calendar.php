@@ -22,7 +22,7 @@ try {
 	$user = new User($__db);
 	$edit_event_btn_hidden = $user->isEditor() ? '' : '-hidden';
 	$profile_is_editor = $user->isEditor() ? '' : '';
-	if ($_REQUEST['q'] != 'onboarding' && !isset($_REQUEST['skip_onboading'])) {
+	if ($_REQUEST['q'] != 'onboarding' && !isset($_COOKIE['skip_onboarding']) && !isset($_COOKIE['open_add_organization'])) {
 		$subscriptions = OrganizationsCollection::filter(
 			$__db,
 			$user,
@@ -34,10 +34,8 @@ try {
 		if (count($subscriptions) == 0) {
 			header('Location: /onboarding');
 		};
-	} else if ($_REQUEST['q'] == 'onboarding' && isset($_COOKIE['skip_onboading'])) {
-		header('Location: /feed?skip_onboading');
-	} else if ($_REQUEST['q'] == 'onboarding' && !isset($_COOKIE['skip_onboading'])) {
-		setcookie('onboarding', true, strtotime("+7 days"));
+	} else if ($_REQUEST['q'] == 'onboarding' && isset($_COOKIE['skip_onboarding'])) {
+		header('Location: /feed');
 	}
 } catch (Exception $e) {
 	$user = App::getCurrentUser();
@@ -60,10 +58,10 @@ if(App::$ENV == 'prod'){
 
 	<?php
 	if($DEBUG_MODE) { ?>
-		<link rel="stylesheet" href="/dist/vendor.css?rev=1c6bca97ca768078a2c51bcf37f9c587">
+		<link rel="stylesheet" href="/dist/vendor.css?rev=daaf4e9e261f490963cf3bca6da05c0e">
 		<link rel="stylesheet" href="/dist/app.css?rev=9d776f03f24e031f69408e1c23d44116"><?php
 	} else { ?>
-		<link rel="stylesheet" href="/dist/vendor.min.css?rev=3386194a99c991ca4bef728181a1c5a2">
+		<link rel="stylesheet" href="/dist/vendor.min.css?rev=2fa15d2cddc420211671b73eecaccfbb">
 		<link rel="stylesheet" href="/dist/app.min.css?rev=fb60c653bdad889970a6dd304aba082b"><?php
 	}	?>
 
@@ -174,11 +172,11 @@ if(App::$ENV == 'prod'){
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=ad005916ca8d2274c188fa8598a7cfab" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=52d10891870994b29e8408d47a057e93" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=9e532c62fd59aeecd19339efc66c09cf" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=884c2c4bce0579dcd4d3f03cd7e2383b" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=176b01c39ddf30c8970cf558f55e1635" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=6715f716d22f671318dae22caff1331d" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=ee15d83ed35c0671a0a4c15ff037058f" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=ae029993f9c251deddba1f7b580bdb64" charset="utf-8"></script><?php
 }	?>
 
 <?php

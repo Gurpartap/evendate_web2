@@ -238,7 +238,7 @@ EditOrganizationPage.prototype.render = function() {
 	}
 	
 	
-	if (typeof organization_id === 'undefined') {
+	if (!organization_id) {
 		try {
 			local_storage = JSON.parse(window.localStorage.getItem('organization_info'));
 		} catch (e) {
@@ -249,7 +249,7 @@ EditOrganizationPage.prototype.render = function() {
 			header_text: 'Новый организатор'
 		}, local_storage, true);
 		
-		window.localStorage.removeItem('open_add_organization');
+		cookies.removeItem('open_add_organization', '/');
 		window.localStorage.removeItem('organization_info');
 		
 		$wrapper.html(tmpl('add-organization-page', additional_fields));

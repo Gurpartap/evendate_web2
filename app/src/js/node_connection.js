@@ -29,12 +29,12 @@ socket.on('auth', function (data) {
 				if (data.hasOwnProperty('mobile') && data.mobile == true) {
 					window.location.href = '/mobileAuthDone.php?token=' + data.token + '&email=' + data.email;
 				} else {
-					if (window.localStorage.getItem('open_add_organization') == 'true') {
-						window.parent.location = 'organization/add';
+					if (cookies.hasItem('open_add_organization')) {
+						window.parent.location = '/organization/add';
 					} else if (data.subscriptions_count == 0) {
-						window.parent.location = 'onboarding';
+						window.parent.location = '/onboarding';
 					} else {
-						window.parent.location = 'feed';
+						window.parent.location = '/feed';
 					}
 				}
 			} else {
