@@ -2041,16 +2041,14 @@ body.-open_modal > .modal_wrapper {
 /* Avatar Block */
 
 .avatar_block {
-	display: block;
+	display: flex;
+	align-items: center;
 	font-size: 0;
 	font-weight: 500;
 }
 
 .avatar_block > .avatar_name {
 	display: inline-block;
-	vertical-align: middle;
-	width: -webkit-calc(100% - 70px - 1.1em);
-	width: calc(100% - 70px - 1.1em);
 	margin: 0 0 0 1.1em;
 	font-size: 1rem;
 }
@@ -2059,20 +2057,8 @@ body.-open_modal > .modal_wrapper {
 .avatar_block.-size_30x30 > .avatar_name,
 .avatar_block > .avatar.-size_small + .avatar_name,
 .avatar_block > .avatar.-size_30x30 + .avatar_name {
-	width: -webkit-calc(100% - 30px - .5em);
-	width: calc(100% - 30px - .5em);
 	margin: 0 0 0 .5em;
 	font-size: 0.88rem;
-}
-.avatar_block.-size_40x40 > .avatar_name,
-.avatar_block > .avatar.-size_40x40 + .avatar_name {
-	width: -webkit-calc(100% - 40px - 1.1em);
-	width: calc(100% - 40px - 1.1em);
-}
-.avatar_block.-size_50x50 > .avatar_name,
-.avatar_block > .avatar.-size_50x50 + .avatar_name {
-	width: -webkit-calc(100% - 50px - 1.1em);
-	width: calc(100% - 50px - 1.1em);
 }
 
 
@@ -3563,7 +3549,7 @@ body.-open_modal > .modal_wrapper {
 	font-size: 1rem;
 }
 
-.feed_event_header > .avatar_block {display: inline-block}
+.feed_event_header > .avatar_block {display: inline-flex}
 
 .feed_event_title {
 	max-height: 3.3em;
