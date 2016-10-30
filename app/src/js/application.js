@@ -560,7 +560,7 @@ __APP = {
 				if (event.is_free) {
 					feed_event_infos.push({text: 'Бесплатно'});
 				} else {
-					feed_event_infos.push({text: 'Цена от ' + (event.min_price ? event.min_price : 0) + ' руб.'});
+					feed_event_infos.push({text: 'Цена от ' + (event.min_price ? formatCurrency(event.min_price) : 0) + ' руб.'});
 				}
 				
 				return $.extend(true, {

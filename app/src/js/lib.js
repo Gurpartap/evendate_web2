@@ -1083,6 +1083,26 @@ function displayTimeRange(start_time, end_time) {
 		return trimSeconds(start_time);
 	}
 }
+/**
+ *
+ * @param {(string|number)} number
+ * @param {string} [separator=' ']
+ * @param {string} [decimal_separator='.']
+ * @return {string}
+ */
+function formatCurrency(number, separator, decimal_separator) {
+	number = +number || 0;
+	separator = separator || ' ';
+	decimal_separator = decimal_separator || '.';
+	var numbers_decimals = (''+number).split('.')[1],
+		negative = number < 0 ? '-' : '',
+		integer_part = parseInt(Math.abs(number), 10) + '',
+		cast_pos = integer_part.length > 3 ? integer_part.length % 3 : 0;
+	return negative
+		+ (cast_pos ? integer_part.substr(0, cast_pos) + separator : '')
+		+ integer_part.substr(cast_pos).replace(/(\d{3})(?=\d)/g, '$1' + separator)
+		+ (numbers_decimals ? decimal_separator + numbers_decimals : '');
+}
 
 
 function bindLimitInputSize($parent) {

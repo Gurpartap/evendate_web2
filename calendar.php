@@ -172,11 +172,11 @@ if(App::$ENV == 'prod'){
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=51bf783d0cdf63bee52ccf488105b34d" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=d5a018f8448852cfefd3e9dc4e728e97" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=37996b4ea073d67cb811be464b5ad34d" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=5f2aea9cf886dcfbfbcbac28d00a4be8" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=f656e8afad23b6e4da30530dedc7e7e2" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=73d6f81cb38b9251a44a9d63ce11b441" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=6aa9a9fb265e9116f24f63bc8d22cef1" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=a024fff0a23bf55065a9e81a630fbdaa" charset="utf-8"></script><?php
 }	?>
 
 <?php
