@@ -2907,6 +2907,11 @@ body.-open_modal > .modal_wrapper {
 	padding-top: 1px;
 }
 
+.search_organizations.-hidden + .search_events {
+	margin-left: 0;
+	margin-right: auto;
+}
+
 .search_result_block {
 	padding: 24px;
 	font-size: 14px;
