@@ -43,6 +43,7 @@ body {
 	word-wrap: break-word;
 	background-color: #f6f6f6;
 	background-color: var(--color_background);
+	-webkit-font-smoothing: antialiased;
 }
 .-state_statistics {
 	--color_accent: var(--color_franklin);
