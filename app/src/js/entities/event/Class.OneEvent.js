@@ -95,7 +95,7 @@ OneEvent.fetchEvent = function(event_id, fields, success) {
  * @returns {jqXHR}
  */
 OneEvent.createEvent = function(new_event_data, success) {
-	return __APP.SERVER.addData('/api/v1/events/', JSON.stringify(new_event_data), success);
+	return __APP.SERVER.addData('/api/v1/events/', JSON.stringify(new_event_data), true, success);
 };
 /**
  *
@@ -150,7 +150,7 @@ OneEvent.changeEventStatus = function(event_id, status, success) {
  * @returns {jqXHR}
  */
 OneEvent.addFavored = function(event_id, success) {
-	return __APP.SERVER.addData('/api/v1/events/' + event_id + '/favorites', {}, success);
+	return __APP.SERVER.addData('/api/v1/events/' + event_id + '/favorites', {}, false, success);
 };
 /**
  *
@@ -169,7 +169,7 @@ OneEvent.deleteFavored = function(event_id, success) {
  * @returns {jqXHR}
  */
 OneEvent.addEventNotification = function(event_id, notification_type, success) {
-	return __APP.SERVER.addData('/api/v1/events/' + event_id + '/notifications', {notification_type: notification_type}, success);
+	return __APP.SERVER.addData('/api/v1/events/' + event_id + '/notifications', {notification_type: notification_type}, false, success);
 };
 /**
  *
@@ -179,7 +179,7 @@ OneEvent.addEventNotification = function(event_id, notification_type, success) {
  * @returns {jqXHR}
  */
 OneEvent.deleteEventNotification = function(event_id, notification_uuid, success) {
-	return __APP.SERVER.deleteData('/api/v1/events/' + event_id + '/notifications' + notification_uuid, {}, success);
+	return __APP.SERVER.deleteData('/api/v1/events/' + event_id + '/notifications/' + notification_uuid, {}, success);
 };
 /**
  *

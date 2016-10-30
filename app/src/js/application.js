@@ -14,37 +14,25 @@ __APP = {
 		 * @param {__APP.SERVER.AJAX_METHOD} ajax_method
 		 * @param {string} ajax_url
 		 * @param {(AJAXData|string)} ajax_data
+		 * @param {string} [content_type='application/x-www-form-urlencoded; charset=UTF-8']
 		 * @param {AJAXCallback} [success]
-		 * @param {function} [error]
 		 * @returns {jqXHR}
 		 */
-		ajax: function ajax(ajax_method, ajax_url, ajax_data, success, error) {
+		dealAjax: function(ajax_method, ajax_url, ajax_data, content_type, success) {
+			var self = this;
 			return $.ajax({
 				url: ajax_url,
 				data: ajax_data,
 				method: ajax_method,
-				contentType: 'application/json',
-				success: success,
-				error: error
+				contentType: content_type || 'application/x-www-form-urlencoded; charset=UTF-8',
+				success: function(res) {
+					__APP.SERVER.ajaxHandler(res, function(data, text) {
+						if (success && typeof success == 'function') {
+							success.call(self, data);
+						}
+					}, __APP.SERVER.ajaxErrorHandler)
+				}
 			});
-		},
-		/**
-		 *
-		 * @param {__APP.SERVER.AJAX_METHOD} ajax_method
-		 * @param {string} ajax_url
-		 * @param {(AJAXData|string)} ajax_data
-		 * @param {AJAXCallback} [success]
-		 * @returns {jqXHR}
-		 */
-		dealAjax: function(ajax_method, ajax_url, ajax_data, success) {
-			var self = this;
-			return __APP.SERVER.ajax(ajax_method, ajax_url, ajax_data, function(res) {
-				__APP.SERVER.ajaxHandler(res, function(data, text) {
-					if (success && typeof success == 'function') {
-						success.call(self, data);
-					}
-				}, __APP.SERVER.ajaxErrorHandler)
-			})
 		},
 		/**
 		 *
@@ -55,7 +43,7 @@ __APP = {
 		 */
 		getData: function getData(ajax_url, ajax_data, success) {
 			var self = this;
-			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.GET, ajax_url, __APP.SERVER.validateData(ajax_data), function(data) {
+			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.GET, ajax_url, __APP.SERVER.validateData(ajax_data), 'application/json', function(data) {
 				if (ajax_data.length != undefined && ajax_data.offset != undefined) {
 					ajax_data.offset += ajax_data.length;
 				}
@@ -72,17 +60,21 @@ __APP = {
 		 * @returns {jqXHR}
 		 */
 		updateData: function updateData(ajax_url, ajax_data, success) {
-			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.PUT, ajax_url, ajax_data, success);
+			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.PUT, ajax_url, ajax_data, 'application/json', success);
 		},
 		/**
 		 *
 		 * @param {string} ajax_url
 		 * @param {AJAXData} ajax_data
+		 * @param {boolean} is_payload
 		 * @param {AJAXCallback} [success]
 		 * @returns {jqXHR}
 		 */
-		addData: function addData(ajax_url, ajax_data, success) {
-			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.POST, ajax_url, ajax_data, success);
+		addData: function addData(ajax_url, ajax_data, is_payload, success) {
+			if(is_payload){
+				return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.POST, ajax_url, ajax_data, 'application/json', success);
+			}
+			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.POST, ajax_url, ajax_data, 'application/x-www-form-urlencoded; charset=UTF-8', success);
 		},
 		/**
 		 *
@@ -92,7 +84,7 @@ __APP = {
 		 * @returns {jqXHR}
 		 */
 		deleteData: function deleteData(ajax_url, ajax_data, success) {
-			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.DELETE, ajax_url, ajax_data, success);
+			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.DELETE, ajax_url, ajax_data, 'application/json', success);
 		},
 		/**
 		 *
