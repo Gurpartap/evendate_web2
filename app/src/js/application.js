@@ -415,6 +415,13 @@ __APP = {
 		organizationCard: function buildOrganisationCard(organizations) {
 			return tmpl('organization-card', organizations.map(function(org) {
 				return $.extend(true, {}, org, {
+					background_image: org.background_small_img_url || org.background_img_url ? __APP.BUILD.link({
+						page: '/organization/'+org.id,
+						classes: ['organization_unit_background'],
+						attributes: {
+							style: 'background-image: url(\''+(org.background_small_img_url || org.background_img_url)+'\')'
+						}
+					}) : '',
 					subscribe_button: new SubscribeButton(org.id, org.is_subscribed, {
 						colors: {
 							subscribe: '-color_marginal_accent'

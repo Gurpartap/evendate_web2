@@ -59,10 +59,10 @@ if(App::$ENV == 'prod'){
 	<?php
 	if($DEBUG_MODE) { ?>
 		<link rel="stylesheet" href="/dist/vendor.css?rev=daaf4e9e261f490963cf3bca6da05c0e">
-		<link rel="stylesheet" href="/dist/app.css?rev=9d776f03f24e031f69408e1c23d44116"><?php
+		<link rel="stylesheet" href="/dist/app.css?rev=a2e8f1660a3102f03d563cf0b326c48f"><?php
 	} else { ?>
 		<link rel="stylesheet" href="/dist/vendor.min.css?rev=2fa15d2cddc420211671b73eecaccfbb">
-		<link rel="stylesheet" href="/dist/app.min.css?rev=fb60c653bdad889970a6dd304aba082b"><?php
+		<link rel="stylesheet" href="/dist/app.min.css?rev=349efdb93ba710520ccd6d04e268e113"><?php
 	}	?>
 
 	<link rel="apple-touch-icon" sizes="57x57" href="/app/img/favicon/apple-icon-57x57.png">
@@ -172,11 +172,11 @@ if(App::$ENV == 'prod'){
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=9e532c62fd59aeecd19339efc66c09cf" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=884c2c4bce0579dcd4d3f03cd7e2383b" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=c9e55805dea5040dea14aff680ea4d12" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=0e18ef973da1d3dbae92d893d206cea8" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=ee15d83ed35c0671a0a4c15ff037058f" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=ae029993f9c251deddba1f7b580bdb64" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=d85e94696558f06eca1a5aa10ac16aaf" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=e8c0d1dfda37e5eff53e9791363eca61" charset="utf-8"></script><?php
 }	?>
 
 <?php

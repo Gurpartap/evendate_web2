@@ -185,6 +185,7 @@ OrganizationPage.prototype.render = function() {
 	$('.SidebarOrganizationsList').find('[data-organization_id="' + PAGE.organization.id + '"]').find('.OrganizationCounter').addClass('-hidden');
 	
 	PAGE.$wrapper.html(tmpl('organization-wrapper', $.extend(true, {
+		background_image: PAGE.organization.background_img_url ? tmpl('organization-background-image', PAGE.organization) : '',
 		subscribe_button: new SubscribeButton(PAGE.organization.id, PAGE.organization.is_subscribed, {
 			colors: {
 				subscribe: '-color_accent',

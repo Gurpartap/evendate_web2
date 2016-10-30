@@ -3132,6 +3132,7 @@ body.-open_modal > .modal_wrapper {
 .organizations_wrapper {
 	display: flex;
 	flex-wrap: wrap;
+	align-items: flex-end;
 	justify-content: space-around;
 	margin-left: 300px;
 }

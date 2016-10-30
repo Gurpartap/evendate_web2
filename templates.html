@@ -599,7 +599,7 @@
 
 <script type="javascript/template" id="tmpl-organization-card">
 	<div class="page organization_unit">
-		<a href="/organization/{id}" class="organization_unit_background link Link" style="background-image: url({background_small_img_url})"></a>
+		{background_image}
 		<div class="organization_unit_content">
 			<a href="/organization/{id}" class="organization_unit_avatar avatar -size_55x55 -bordered -rounded link Link" style="background-image: url('{img_small_url}')"></a>
 			<a href="/organization/{id}" class="link Link"><h5 class="organization_unit_title">{short_name}</h5></a>
@@ -627,9 +627,7 @@
 
 <script type="javascript/template" id="tmpl-organization-wrapper">
 	<div class="page organization_info_page">
-		<div class="organization_background_image img_holder">
-			<img class="CallModal" src="{background_medium_img_url}" data-modal_type="media" data-modal_media_type="image" data-modal_media_url="{background_img_url}">
-		</div>
+		{background_image}
 		<div class="organization_description_block">
 			<header class="organization_header">
 				<div class="avatar_block organization_title_block">
@@ -673,6 +671,12 @@
 		<div class="organization_subscribers_wrapper scrollbar-outer SubscribersScroll">
 			{subscribed_blocks}
 		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-organization-background-image">
+	<div class="organization_background_image img_holder">
+		<img class="CallModal" src="{background_medium_img_url}" data-modal_type="media" data-modal_media_type="image" data-modal_media_url="{background_img_url}">
 	</div>
 </script>
 
