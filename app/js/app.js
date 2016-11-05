@@ -695,7 +695,7 @@ function hashToObject() {
     return obj;
 }
 
-if (window.location.hostname.indexOf('.test.evendate.ru') != -1){
+if (window.location.hostname.indexOf('.test.evendate.ru') == -1){
     window.socket = io.connect(window.location.protocol == 'https:' ? ':8443' : ':8080', {secure: window.location.protocol == 'https:'});
 }else{
     window.socket = io({path: '/node/socket.io'});
