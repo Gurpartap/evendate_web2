@@ -695,7 +695,12 @@ function hashToObject() {
     return obj;
 }
 
-window.socket = io.connect(window.location.protocol == 'https:' ? ':8443' : ':8080', {secure: window.location.protocol == 'https:'});
+if (window.location.hostname.indexOf('.test.evendate.ru') != -1){
+    window.socket = io.connect(window.location.protocol == 'https:' ? ':8443' : ':8080', {secure: window.location.protocol == 'https:'});
+}else{
+    window.socket = io({path: '/node/socket.io'});
+}
+
 
 socket.on('auth', function (data) {
     console.log(data);
