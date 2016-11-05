@@ -3,9 +3,10 @@ require_once 'v1-backend/bin/db.php';
 require_once 'v1-backend/bin/Class.Result.php';
 require_once 'v1-backend/users/Class.AbstractUser.php';
 require_once 'v1-backend/users/Class.User.php';
+require_once 'v1-backend/users/Class.NotAuthorizedUser.php';
 require_once 'v1-backend/tags/Class.TagsCollection.php';
 try {
-    $user = App::getCurrentUser();
+    $user = new User($__db);
     if (isset($_GET['logout']) && $_GET['logout'] == true) {
         $user->logout();
     } else {
@@ -382,7 +383,6 @@ try {
 <script>window.jQuery || document.write('<script src="assets/components/jquery.js"><\/script>');</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js" type="text/javascript"></script>
 <script src="app/js/app.js"></script>
-<script src="app/js/main.js"></script>
 <?php
 require_once('footer.php');
 ?>
