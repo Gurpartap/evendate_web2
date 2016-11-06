@@ -42,7 +42,7 @@ try {
 //    header('Location: /');
 }
 $user_full_name = $user->getLastName() . ' ' . $user->getFirstName();
-if(App::$ENV == 'prod'){
+if(App::$ENV == 'prod' || App::$ENV == 'test'){
 	$DEBUG_MODE = false;
 }
 ?>
@@ -173,10 +173,10 @@ if(App::$ENV == 'prod'){
 <?php
 if($DEBUG_MODE) { ?>
 	<script type="text/javascript" src="/dist/vendor.js?rev=9e532c62fd59aeecd19339efc66c09cf" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=c700a879adf4a5fe3d6c39a038a5cfdb" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/app.js?rev=32716e968304a9cc3d44f7cd60545495" charset="utf-8"></script><?php
 } else { ?>
 	<script type="text/javascript" src="/dist/vendor.min.js?rev=ee15d83ed35c0671a0a4c15ff037058f" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=ee973a5d27f9fc2ab0588dda899c0bc0" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/app.min.js?rev=20867a36930d8d44ed2b7c1d5e8d7589" charset="utf-8"></script><?php
 }	?>
 
 <?php
