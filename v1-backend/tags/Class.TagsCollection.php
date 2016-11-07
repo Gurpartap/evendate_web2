@@ -7,7 +7,7 @@ class TagsCollection extends AbstractCollection
 {
 
     public static function filter(PDO $db,
-                                  User $user = null,
+																	AbstractUser $user = null,
                                   array $filters = null,
                                   array $fields = null,
                                   array $pagination = null,
@@ -116,7 +116,6 @@ class TagsCollection extends AbstractCollection
         $tags = $p_get_tags->fetchAll(PDO::FETCH_CLASS, 'Tag');
         if (count($tags) == 0 && $is_one_tag) throw new LogicException('CANT_FIND_TAG');
         $result_events = array();
-        if ($is_one_tag) return $tags[0];
         foreach ($tags as $tag) {
             $result_events[] = $tag->getParams($user, $fields)->getData();
         }

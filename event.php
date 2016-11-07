@@ -21,7 +21,7 @@ error_reporting(E_ALL);
 	$event_id = isset($_REQUEST['id']) ? intval($_REQUEST['id']): null;
 
 	try {
-		$user = new User($__db);
+		$user = App::getCurrentUser();
 		$hide_auth_btn = 'hidden';
 	}catch (Exception $e){
 		$user = null;

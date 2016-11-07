@@ -8,7 +8,7 @@ class OrganizationsCollection
 
 
     public static function filter(PDO $db,
-                                  User $user,
+																	AbstractUser $user,
                                   array $filters = null,
                                   array $fields = null,
                                   array $pagination = null,
@@ -250,7 +250,7 @@ class OrganizationsCollection
     }
 
     public static function one(PDO $db,
-                               User $user,
+															 AbstractUser $user,
                                int $id,
                                array $fields = null) : Organization
     {

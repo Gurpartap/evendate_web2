@@ -1,107 +1,3 @@
-__C = {
-	TEXTS: {
-		REMOVE_FAVORITE: 'Удалить из избранного',
-		ADD_FAVORITE: 'В избранное',
-		SUBSCRIBERS: {
-			NOM: ' подписчик',
-			GEN: ' подписчика',
-			PLU: ' подписчиков'
-		},
-		PEOPLE: {
-			NOM: ' человек',
-			GEN: ' человека',
-			PLU: ' человек'
-		},
-		FAVORED: {
-			NOM: ' участник',
-			GEN: ' участника',
-			PLU: ' участников'
-		},
-		ADD_SUBSCRIPTION: 'Подписаться',
-		REMOVE_SUBSCRIPTION: 'Отписаться'
-	},
-	DATA_NAMES: {
-		DATE: 'date'
-	},
-	CLASSES: {
-		ACTIVE: 'active',
-		NEW_ACTIVE: '-active',
-		NO_BORDERS: 'no-borders',
-		SUBSCRIBE_ADD: 'btn-pink-empty',
-		SUBSCRIBE_DELETE: 'btn-pink',
-		DISABLED: 'disabled',
-		NEW_DISABLED: '-disabled',
-		HIDDEN: 'hidden',
-		NEW_HIDDEN: '-hidden'
-	},
-	ROLES: {
-		USER: 'user',
-		MODERATOR: 'moderator',
-		ADMIN: 'admin'
-	},
-	DATE_FORMAT: 'YYYY-MM-DD',
-	COLORS: {
-		PRIMARY: '#2e3b50',
-		MUTED: '#3e4d66',
-		MUTED_80: '#657184',
-		MUTED_50: '#9fa6b3',
-		MUTED_30: '#c5c9d1',
-		TEXT: '#4a4a4a',
-		ACCENT: '#f82969',
-		ACCENT_ALT: '#ff5f9e',
-		FRANKLIN: '#28be84',
-		FRANKLIN_ALT: '#23d792'
-	},
-	IMAGES_PATH: '/events_images',
-	STATS: {
-		EVENT_VIEW: 'view',
-		EVENT_VIEW_DETAIL: 'view_detail',
-		EVENT_OPEN_SITE: 'open_site',
-		EVENT_OPEN_MAP: 'open_map',
-		ORGANIZATION_OPEN_SITE: 'open_site',
-		EVENT_ENTITY: 'event',
-		ORGANIZATION_ENTITY: 'organization'
-	},
-	ACTION_NAMES: {
-		fave: ['добавил(а) в избранное'],
-		unfave: ['удалил(а) из избранного'],
-		subscribe: ['добавил(а) подписки'],
-		unsubscribe: ['удалил(а) подписки']
-	},
-	ENTITIES: {
-		EVENT: 'event',
-		ORGANIZATION: 'organization'
-	},
-	URL_FIELDS: {
-		EVENTS: {
-			fields: [
-				'detail_info_url',
-				'is_favorite',
-				'nearest_event_date',
-				'can_edit',
-				'location',
-				'favored_users_count',
-				'organization_name',
-				'organization_logo_small_url',
-				'description',
-				'favored',
-				'is_same_time',
-				'tags',
-				'dates{"fields": "event_date,start_time,end_time", "order_by": "event_date,start_time"}'
-			].join(','),
-			length: 10
-		}
-	}
-};
-__LOCALES = {
-	DATE: {
-		DATE_FORMAT: 'DD MM YYYY',
-		MONTH_SHORT_NAMES: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
-		MONTH_NAMES: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
-	}
-};
-
-
 (function (window, document, $, undefined) {
 
     if (typeof $ === 'undefined') {
@@ -126,8 +22,147 @@ __LOCALES = {
 
 
 })(window, document, window.jQuery);
-// Custom jQuery
-// -----------------------------------
+
+$.fn.extend({
+	toggleStatus: function(statuses) {
+		var $this = this;
+		
+		if ($this.is('.form_unit')) {
+			statuses.split(' ').forEach(function(status) {
+				var $form_elements = $this.find('input, select, textarea, button');
+				if (status === 'disabled') {
+					if ($this.hasClass('-status_disabled')) {
+						$form_elements.removeAttr('disabled');
+					} else {
+						$form_elements.attr('disabled', true);
+					}
+				}
+				$this.toggleClass('-status_' + status);
+			});
+		} else if ($this.is('input, textarea, select, button')) {
+			$this.closest('.form_unit').toggleStatus(statuses);
+		} else if ($this.length) {
+			$this.find('.form_unit').toggleStatus(statuses);
+		} else {
+			throw Error('Argument not found');
+		}
+		
+		return this;
+	},
+	
+	/**
+	 * Сбор данных с формы
+	 * Метод возвращает javaScript объект, состоящий из атрибутов name и value элементов формы.
+	 * Если output_type стоит на array, то возвращается массив из объектов с полями name и value (аналогично с serializeArray).
+	 *
+	 * @method external:"jQuery.fn".serializeForm
+	 *
+	 * @param {string} [output_type=object]
+	 * @returns {Array|Object}
+	 */
+	serializeForm: function(output_type) {
+		var zb = /^(?:input|select|textarea|keygen)/i,
+			yb = /^(?:submit|button|image|reset|file)$/i,
+			T = /^(?:checkbox|radio)$/i,
+			xb = /\r?\n/g,
+			elements = this.map(function() {
+				var a = $.prop(this, "elements");
+				return a ? $.makeArray(a) : this
+			});
+		
+		switch (output_type) {
+			case 'array': {
+				/* Работает так же как и serializeArray, с некоторыми модификациями */
+				return elements.filter(function() {
+					var a = this.type;
+					return this.name
+						&& !$(this).is(":disabled")
+						&& zb.test(this.nodeName)
+						&& !yb.test(a)
+						&& ((this.checked && this.value != "on") || a != "radio")
+						&& ((this.checked && this.value != "on") || this.value == "on" || a != "checkbox")
+				}).map(function(a, b) {
+					var c = $(this).val(),
+						std = "";
+					switch (this.type) {
+						case "radio":
+						case "checkbox": {
+							std = c == "on" ? ( this.checked ? 1 : 0 ) : c;
+							break;
+						}
+						default: {
+							std = c.replace(xb, "\r\n");
+						}
+					}
+					return null == c ? null : {
+						name: b.name,
+						value: std
+					}
+				}).get();
+			}
+			case 'object':
+			default: {
+				var output = {};
+				elements.filter(function() {
+					var a = this.type;
+					return this.name && !$(this).is(':disabled') && zb.test(this.nodeName) && !yb.test(a) && !T.test(a)
+				}).each(function(i, el) {
+					var $element = $(el),
+						name = el.name,
+						value = $element.val();
+					
+					if (elements.filter("[name='" + name + "']").length > 1 && value != "") {
+						output[name] = typeof(output[name]) == "undefined" ? [] : output[name];
+						output[name].push(value ? value.replace(xb, "\r\n") : value)
+					}
+					else if ($element.attr('type') === 'hidden' && value.indexOf('data.') === 0) {
+						var data_names = value.split('.'),
+							data = $element.data(data_names[1]),
+							n = 2;
+						while (data_names[n]) {
+							data = data[data_names[n]];
+							n++;
+						}
+						output[name] = data;
+					}
+					else {
+						output[name] = value || value === 0 ? value.replace(xb, "\r\n") : null;
+					}
+				});
+				elements.filter(function() {
+					var a = this.type;
+					return this.name && !$(this).is(":disabled") && T.test(a) && ((this.checked && this.value != "on") || (this.value == "on" && a == "checkbox"))
+				}).each(function(i, el) {
+					var name = el.name,
+						value = el.value;
+					
+					switch (el.type) {
+						case 'radio': {
+							output[name] = value;
+							break;
+						}
+						case 'checkbox': {
+							if (elements.filter("[name='" + name + "']").length > 1 && value != "on") {
+								output[name] = typeof(output[name]) == "undefined" ? [] : output[name];
+								output[name].push(value)
+							}
+							else if (value != "on")
+								output[name] = value;
+							else
+								output[name] = el.checked ? true : false;
+							break;
+						}
+					}
+				});
+				return output;
+			}
+		}
+	}
+});
+
+jQuery.makeSet = function(array) {
+	return $($.map(array, function(el){return el.get();}));
+};
 
 /**=========================================================
  * Module: notify.js
@@ -136,7 +171,6 @@ __LOCALES = {
  * [data-toggle="notify"]
  * [data-options="options in json format" ]
  =========================================================*/
-
 (function ($, window, document) {
     'use strict';
 
@@ -186,7 +220,6 @@ __LOCALES = {
  * Adapted version to work with Bootstrap classes
  * More information http://getuikit.com/docs/addons_notify.html
  */
-
 (function ($, window, document) {
 
     var containers = {},
@@ -374,7 +407,6 @@ __LOCALES = {
  * jQuery Utility functions library
  * adapted from the core of UIKit
  =========================================================*/
-
 (function ($, window, doc) {
     'use strict';
 
@@ -540,120 +572,94 @@ __LOCALES = {
 
 }(jQuery, window, document));
 
-
 /**===========================================================
- * Templates for jQuery
+ * A complete cookies reader/writer framework with full unicode support.
  *
- * @param {string} template_type
- * @param {(object|Array)} items
- * @param {jQuery} [addTo]
- * @param {string} [direction="append"]
- * @returns {jQuery}
+ * Revision #1 - September 4, 2014
+ *
+ * https://developer.mozilla.org/en-US/docs/Web/API/document.cookie
+ * https://developer.mozilla.org/User:fusionchess
+ * https://github.com/madmurphy/cookies.js
+ *
+ * This framework is released under the GNU Public License, version 3 or later.
+ * http://www.gnu.org/licenses/gpl-3.0-standalone.html
  */
-function tmpl(template_type, items, addTo, direction) {
-
-    var htmlEntities = function (str) {
-            return String(str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        },
-        replaceTags = function (html, object) {
-            $.each(object, function (key, value) {
-                var key_expr = new RegExp('{' + key + '}', 'gim');
-                if ($.type(value) == 'string') {
-                    value = htmlEntities(value);
-                } else if (value instanceof jQuery) {
-                    var _value = [];
-                    value.each(function () {
-                        "use strict";
-                        _value.push(this.outerHTML);
-                    });
-                    value = _value.join('');
-                } else if (value == null) {
-                    value = '';
-                }
-                html = html ? html.replace(key_expr, value) : '';
-            });
-            var not_handled_keys = new RegExp(/\{.*?\}/gim);
-            html = html ? html.replace(not_handled_keys, '') : '';
-            return html;
-        },
-
-        result = '',
-        html_val = (typeof template_type == 'object') ? template_type.tmpl : $('#tmpl-' + template_type).html(), //Р”РѕР±Р°РІР»СЏСЋ РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ РїРµСЂРµРґР°С‡Сѓ СЃСЂР°Р·Сѓ С‚РµР»Р° С€Р°Р±Р»РѕРЅР°, Р° РЅРµ СЃРµР»РµРєС‚РѕСЂР°
-        comments = new RegExp(/(?:\/\*(?:[\s\S]*?)\*\/)|(?:([\s;])+\/\/(?:.*)$)/gim),
-        spaces = new RegExp('\\s{2,}', 'igm');
-    if (html_val === undefined || items === undefined) {
-        console.group('tmpl_error');
-        console.log('error in ' + template_type);
-        console.log('items', items);
-        console.log('addTo', addTo);
-        console.log('html_val', html_val);
-        console.log('inputs', {template_type: template_type, items: items, addTo: addTo, direction: direction});
-        console.groupEnd();
-    }
-    html_val = html_val ? html_val.replace(comments, '') : '';
-    html_val = html_val ? html_val.replace(spaces, '').trim() : '';
-    if (Array.isArray(items)) {
-        var i, items_length = items.length;
-        for (i = 0; i < items_length; i++) {
-            result += replaceTags(html_val, items[i]);
-        }
-    } else {
-        result = replaceTags(html_val, items);
-    }
-    result = $(result);
-    if (addTo == null || addTo == undefined) {
-        return result;
-    }
-    if (direction == 'prepend') {
-        addTo.prepend(result);
-    } else {
-        addTo.append(result);
-    }
-    return result;
-}
-
-if (window['moment'] != undefined) {
-	moment.locale(navigator.language);
-	moment.tz.setDefault('Europe/Moscow');
-	moment.updateLocale('ru', {
-		monthsShort : __LOCALES.DATE.MONTH_SHORT_NAMES
-	})
-}
-
-if (window['Highcharts'] != undefined) {
-	Highcharts.setOptions({
-		lang: {
-			shortMonths: __LOCALES.DATE.MONTH_SHORT_NAMES
+(function(window){
+	window.cookies = {
+		/**
+		 *
+		 * @param {string} name
+		 * @return {(string|null)}
+		 */
+		getItem: function (name) {
+			if (!name) { return null; }
+			return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(name).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
+		},
+		/**
+		 *
+		 * @param {string} name
+		 * @param {*} value
+		 * @param {(string|number|Date)} [end] - max-age in seconds, Infinity, or the expires date in GMTString format or as Date object
+		 * @param {string} [path]
+		 * @param {string} [domain]
+		 * @param {boolean} [is_secure]
+		 * @return {boolean}
+		 */
+		setItem: function (name, value, end, path, domain, is_secure) {
+			var expires = "";
+			if (!name || /^(?:expires|max\-age|path|domain|secure)$/i.test(name)) { return false; }
+			if (end) {
+				switch (end.constructor) {
+					case Number:
+						expires = end === Infinity ? "; expires=Fri, 31 Dec 9999 23:59:59 GMT" : "; max-age=" + end;
+						break;
+					case String:
+						expires = "; expires=" + end;
+						break;
+					case Date:
+						expires = "; expires=" + end.toUTCString();
+						break;
+				}
+			}
+			document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + (domain ? "; domain=" + domain : "") + (path ? "; path=" + path : "") + (is_secure ? "; secure" : "");
+			return true;
+		},
+		/**
+		 *
+		 * @param {string} name
+		 * @param {string} [path]
+		 * @param {string} [domain]
+		 * @return {boolean}
+		 */
+		removeItem: function (name, path, domain) {
+			if (!this.hasItem(name)) { return false; }
+			document.cookie = encodeURIComponent(name) + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT" + (domain ? "; domain=" + domain : "") + (path ? "; path=" + path : "");
+			return true;
+		},
+		/**
+		 *
+		 * @param {string} name
+		 * @return {boolean}
+		 */
+		hasItem: function (name) {
+			if (!name) { return false; }
+			return (new RegExp("(?:^|;\\s*)" + encodeURIComponent(name).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=")).test(document.cookie);
+		},
+		/**
+		 *
+		 * @return {Array}
+		 */
+		keys: function () {
+			var keys = document.cookie.replace(/((?:^|\s*;)[^\=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, "").split(/\s*(?:\=[^;]*)?;\s*/),
+				length = keys.length;
+			for (var i = 0; i < length; i++) {
+				keys[i] = decodeURIComponent(keys[i]);
+			}
+			return keys;
 		}
-	});
-}
+	};
+}(window));
 
-/**
- * Возвращает единицу измерения с правильным окончанием
- *
- * @param {Number} num      Число
- * @param {Object} cases    Варианты слова {nom: 'час', gen: 'часа', plu: 'часов'}
- * @return {String}
- */
-function getUnitsText(num, cases) {
-    num = Math.abs(num);
-
-    var word = '';
-
-    if (num.toString().indexOf('.') > -1) {
-        word = cases.GEN;
-    } else {
-        word = (
-            num % 10 == 1 && num % 100 != 11
-                ? cases.NOM
-                : num % 10 >= 2 && num % 10 <= 4 && (num % 100 < 10 || num % 100 >= 20)
-                ? cases.GEN
-                : cases.PLU
-        );
-    }
-
-    return word;
-}
 
 function searchToObject() {
     var pairs = window.location.search.substring(1).split("&"),
@@ -720,12 +726,12 @@ socket.on('auth', function (data) {
                 if (data.hasOwnProperty('mobile') && data.mobile == true) {
                     window.location.href = '/mobileAuthDone.php?token=' + data.token + '&email=' + data.email;
                 } else {
-                    if (window.localStorage.getItem('open_add_organization') == 'true') {
-                        window.parent.location = 'add_organization';
+                    if (cookies.hasItem('open_add_organization')) {
+                        window.parent.location = '/organization/add';
                     } else if (data.subscriptions_count == 0) {
-                        window.parent.location = 'onboarding';
+                        window.parent.location = '/onboarding';
                     } else {
-                        window.parent.location = 'feed';
+                        window.parent.location = '/feed';
                     }
                 }
             } else {
@@ -770,22 +776,6 @@ socket.on('notification', function (data) {
         Notify.requestPermission();
     }
 });
-
-Function.prototype.extend = function (parent) {
-    var F = function () {
-    };
-    F.prototype = parent.prototype;
-    this.prototype = new F();
-    this.prototype.constructor = this;
-    this.prototype.__super = parent.prototype;
-    this.prototype.__superCall = function (method_name) {
-        if (parent.prototype[method_name] && typeof parent.prototype[method_name] == 'function') {
-            return parent.prototype[method_name].call(this, Array.prototype.slice.call(1, arguments));
-        } else {
-            console.error('There is no "' + method_name + '" method in object "' + parent.prototype.constructor.name + '"');
-        }
-    };
-};
 
 $(document).ready(function () {
     window.paceOptions = {

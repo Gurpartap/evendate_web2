@@ -28,5 +28,18 @@
     "sql": "^0.67.0",
     "vkapi": "^1.0.0",
     "winston": "^0.7.3"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^3.1.1",
+    "gulp-concat": "^2.6.0",
+    "gulp-csso": "^2.0.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-resolve-dependencies": "^2.2.0",
+    "gulp-rev-append": "^0.1.6",
+    "gulp-uglify": "^2.0.0",
+    "gulp-util": "^3.0.7",
+    "merge-stream": "^1.0.0",
+    "run-sequence": "^1.2.2"
   }
 }
