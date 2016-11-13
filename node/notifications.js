@@ -118,7 +118,7 @@ class Notifications {
             ' uuid IS NOT NULL' +
             ' AND view_notifications.done = FALSE' +
             ' AND view_notifications.status = TRUE' +
-            ' DATE_PART(\'epoch\', view_notifications.notification_time_original::TIMESTAMPTZ) <= DATE_PART(\'epoch\', NOW())::INT', function (err, res) {
+            ' AND DATE_PART(\'epoch\', view_notifications.notification_time_original::TIMESTAMPTZ) <= DATE_PART(\'epoch\', NOW())::INT', function (err, res) {
             if (err) {
                 _this.logger.error(err);
                 return;
