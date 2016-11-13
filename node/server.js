@@ -4,7 +4,8 @@ var
     http = require('http'),
     https = require('https'),
     winston = require('winston'),
-    app = require("express"),
+    express = require("express"),
+    app = express(),
     mysql = require('mysql'),
     rest = require('restler'),
     async = require('async'),
@@ -22,12 +23,28 @@ var
     sql = require('sql'),
     args = process.argv.slice(2),
     crypto = require('crypto'),
-    __rooms = {};
+    bodyParser = require('body-parser'),
+    __rooms = {},
+    logger = new (winston.Logger)({
+        transports: [
+            new (winston.transports.Console)(),
+            new winston.transports.File({filename: __dirname + '/debug.log', json: true})
+        ],
+        exceptionHandlers: [
+            new (winston.transports.Console)(),
+            new winston.transports.File({filename: __dirname + '/exceptions.log', json: true})
+        ],
+        exitOnError: true
+    });
 
 process.on('uncaughtException', function (err) {
     logger.info('Caught exception: ' + err);
 });
 
+app.use(bodyParser.json());       // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+    extended: true
+}));
 
 var config_index = process.env.ENV ? process.env.ENV : 'local',
     real_config = config[config_index],
@@ -39,17 +56,6 @@ var config_index = process.env.ENV ? process.env.ENV : 'local',
         ':', real_config.db.port,
         '/', real_config.db.database
     ].join(''),
-    logger = new (winston.Logger)({
-        transports: [
-            new (winston.transports.Console)(),
-            new winston.transports.File({filename: __dirname + '/debug.log', json: true})
-        ],
-        exceptionHandlers: [
-            new (winston.transports.Console)(),
-            new winston.transports.File({filename: __dirname + '/exceptions.log', json: true})
-        ],
-        exitOnError: true
-    }),
     cropper = new ImagesResize({logger: logger}),
     transporter = nodemailer.createTransport(smtpTransport({
         host: real_config.smtp.host,
@@ -150,7 +156,7 @@ sql.setDialect('postgres');
 pg.connect(pg_conn_string, function (err, client, done) {
 
     var checkNested = function (obj /*, level1, level2, ... levelN*/) {
-        var args = Array.prototype.slice.call(arguments, 1);
+            var args = Array.prototype.slice.call(arguments, 1);
             for (var i = 0; i < args.length; i++) {
                 if (!obj || !obj.hasOwnProperty(args[i])) {
                     return false;
@@ -160,25 +166,25 @@ pg.connect(pg_conn_string, function (err, client, done) {
             return true;
         },
         updateEventsStats = function () {
-        var q_upd_stats = 'INSERT INTO stat_notifications_aggregated(event_id, notifications_count, updated_at)' +
-            ' SELECT' +
-            ' id as event_id,' +
-            '     (SELECT COUNT(*)' +
-            ' FROM stat_notifications' +
-            ' INNER JOIN events_notifications ON stat_notifications.event_notification_id = events_notifications.id' +
-            ' WHERE events_notifications.event_id = events.id) AS notifications_count,' +
-            ' NOW() as updated_at' +
-            ' FROM events' +
-            ' ON CONFLICT (event_id) DO UPDATE SET  updated_at = NOW(),' +
-            '     notifications_count = (SELECT COUNT(*)' +
-            ' FROM stat_notifications' +
-            ' INNER JOIN events_notifications ON stat_notifications.event_notification_id = events_notifications.id' +
-            ' WHERE events_notifications.event_id = stat_notifications_aggregated.event_id);';
+            var q_upd_stats = 'INSERT INTO stat_notifications_aggregated(event_id, notifications_count, updated_at)' +
+                ' SELECT' +
+                ' id as event_id,' +
+                '     (SELECT COUNT(*)' +
+                ' FROM stat_notifications' +
+                ' INNER JOIN events_notifications ON stat_notifications.event_notification_id = events_notifications.id' +
+                ' WHERE events_notifications.event_id = events.id) AS notifications_count,' +
+                ' NOW() as updated_at' +
+                ' FROM events' +
+                ' ON CONFLICT (event_id) DO UPDATE SET  updated_at = NOW(),' +
+                '     notifications_count = (SELECT COUNT(*)' +
+                ' FROM stat_notifications' +
+                ' INNER JOIN events_notifications ON stat_notifications.event_notification_id = events_notifications.id' +
+                ' WHERE events_notifications.event_id = stat_notifications_aggregated.event_id);';
 
-        client.query(q_upd_stats, [], function (err) {
-            if (err) return logger.error(err);
-        });
-    };
+            client.query(q_upd_stats, [], function (err) {
+                if (err) return logger.error(err);
+            });
+        };
 
     function publicDelayedEvents() {
         var q_upd_events = 'UPDATE events ' +
@@ -199,7 +205,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
         });
     }
 
-    function updateEventsGeocodes(){
+    function updateEventsGeocodes() {
         var q_get_events = 'SELECT id, location, location_updates FROM events ' +
             '   WHERE (latitude IS NULL ' +
             '       OR longitude IS NULL ' +
@@ -207,13 +213,13 @@ pg.connect(pg_conn_string, function (err, client, done) {
             '       OR longitude =  \'0\')' +
             '       AND (location_updates < 5 OR location_updates IS NULL)';
 
-        client.query(q_get_events, function(err, res){
+        client.query(q_get_events, function (err, res) {
             if (handleError(err)) return;
             var queue = [],
                 url = 'https://geocode-maps.yandex.ru/1.x/?';
-            res.rows.forEach(function(event){
-                (function(_event){
-                    queue.push(function(callback){
+            res.rows.forEach(function (event) {
+                (function (_event) {
+                    queue.push(function (callback) {
                         var _url = url + [
                                 'format=json',
                                 'results=1',
@@ -222,16 +228,16 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         rest.get(_url, {
                             json: true
                         })
-                            .on('complete', function(rest_res){
-                                if (_event.location_updates == null){
+                            .on('complete', function (rest_res) {
+                                if (_event.location_updates == null) {
                                     _event.location_updates = 0;
                                 }
                                 var upd_data = {location_updates: ++_event.location_updates};
-                                if (rest_res instanceof Error == false){
-                                    if (checkNested(rest_res, 'response', 'GeoObjectCollection', 'featureMember')){
-                                        if (rest_res['response']['GeoObjectCollection']['featureMember'].length > 0){
+                                if (rest_res instanceof Error == false) {
+                                    if (checkNested(rest_res, 'response', 'GeoObjectCollection', 'featureMember')) {
+                                        if (rest_res['response']['GeoObjectCollection']['featureMember'].length > 0) {
                                             var feature_member = rest_res['response']['GeoObjectCollection']['featureMember'][0];
-                                            if (checkNested(feature_member, 'GeoObject', 'Point', 'pos')){
+                                            if (checkNested(feature_member, 'GeoObject', 'Point', 'pos')) {
                                                 var pos = feature_member['GeoObject']['Point']['pos'].split(' ');
                                                 upd_data.latitude = pos[1];
                                                 upd_data.longitude = pos[0];
@@ -240,10 +246,10 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                     }
                                 }
                                 var q_upd_event = Entities.events
-                                        .update(upd_data)
-                                        .where(Entities.events.id.equals(_event.id))
-                                        .toQuery();
-                                client.query(q_upd_event, function(err){
+                                    .update(upd_data)
+                                    .where(Entities.events.id.equals(_event.id))
+                                    .toQuery();
+                                client.query(q_upd_event, function (err) {
                                     handleError(err);
                                     callback(null);
                                 });
@@ -256,8 +262,14 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
     }
 
+    function updateRecommendations(data, callback) {
+        var q_upd_organizations = 'UPDATE ';
+        var q_upd_events = '';
+
+    }
+
     console.log(args);
-    if (args.indexOf('--update-geocodes') !== -1){
+    if (args.indexOf('--update-geocodes') !== -1) {
         updateEventsGeocodes();
     }
 
@@ -276,6 +288,14 @@ pg.connect(pg_conn_string, function (err, client, done) {
             }
             publicDelayedEvents();
             updateEventsGeocodes();
+        }, null, true);
+    } catch (ex) {
+        logger.error(ex);
+    }
+
+    try {
+        new CronJob('*/1 * * * *', function () {
+            updateRecommendations();
         }, null, true);
     } catch (ex) {
         logger.error(ex);
@@ -527,14 +547,44 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                     return;
                                 }
 
-                                socket.emit('auth', {
-                                    email: data.oauth_data.email,
-                                    user_id: user.id,
-                                    token: user_token,
-                                    mobile: token_type == 'mobile',
-                                    type: data.type,
-                                    subscriptions_count: subscriptions_count
+                                //prepare ts_query for user interests
+
+                                var q_upd_interests = 'UPDATE users_interests' +
+                                    ' SET interests_tsquery = subquery.interests_tsquery' +
+                                    ' FROM (SELECT' +
+                                    ' users.id AS user_id,' +
+                                    ' array_to_string(regexp_split_to_array((SELECT string_agg(CONCAT_WS(' +
+                                    ' \' \',' +
+                                    ' city, education_university_name,' +
+                                    ' education_faculty_name, education_graduation,' +
+                                    ' occupation_name, relation, personal_political,' +
+                                    ' personal_smoking, personal_alcohol,' +
+                                    ' interests, movies, tv, books, games, about), \' \')' +
+                                    ' FROM users_interests WHERE users_interests.user_id = ? )' +
+                                    ' ||' +
+                                    ' (SELECT string_agg(vk_groups.description || \' \' || vk_groups.name, \' \')' +
+                                    ' FROM vk_users_subscriptions' +
+                                    ' INNER JOIN vk_groups' +
+                                    ' ON vk_groups.id = vk_users_subscriptions.vk_group_id' +
+                                    ' WHERE user_id = users.id), \'\s+\'), \'|\') AS interests_tsquery' +
+                                    ' FROM users WHERE users_interests.user_id = ? ) AS subquery' +
+                                    ' WHERE users_interests.user_id = ?';
+
+                                client.query(q_upd_interests, [user.id, user.id, user.id], function (err) {
+                                    handleError(err);
+
+                                    updateRecommendations({user_id: user.id});
+
+                                    socket.emit('auth', {
+                                        email: data.oauth_data.email,
+                                        user_id: user.id,
+                                        token: user_token,
+                                        mobile: token_type == 'mobile',
+                                        type: data.type,
+                                        subscriptions_count: subscriptions_count
+                                    });
                                 });
+
                             });
                         };
 
@@ -971,7 +1021,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     ).toQuery();
 
             client.query(q_get_user_data, function (err, result) {
-                if (handleError(err, EMIT_NAMES.VK_INTEGRATION.GROUPS_TO_POST, function(){}, socket)) return;
+                if (handleError(err, EMIT_NAMES.VK_INTEGRATION.GROUPS_TO_POST, function () {
+                    }, socket)) return;
                 result.rows[0].user_id = user_id;
                 socket.vk_user = result.rows[0];
                 getVkGroups(result.rows[0], 'can_post');
@@ -992,7 +1043,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
             fs.writeFile(image_path + filename, base64, 'base64', function (err) {
 
 
-                if (handleError(err, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function(){}, socket)) return;
+                if (handleError(err, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function () {
+                    }, socket)) return;
 
                 rest.get(url, {
                     json: true,
@@ -1003,7 +1055,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     .on('complete', function (result) {
 
                         if (result instanceof Error) {
-                            handleError(result, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function(){}, socket);
+                            handleError(result, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function () {
+                            }, socket);
                         } else {
                             fs.stat(image_path + filename, function (err, stats) {
                                 rest
@@ -1019,7 +1072,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
 
                                             if (upload_data instanceof Error) {
-                                                handleError(result, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function(){}, socket);
+                                                handleError(result, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function () {
+                                                }, socket);
                                             } else {
 
                                                 upload_data = JSON.parse(upload_data);
@@ -1034,10 +1088,12 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                                     .on('complete', function (res_data) {
 
                                                         if (res_data instanceof Error) {
-                                                            handleError(res_data, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function(){}, socket);
+                                                            handleError(res_data, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function () {
+                                                            }, socket);
                                                         } else {
                                                             if (res_data.response.length == 0) {
-                                                                handleError({name: 'CANT_SAVE_WALL_PHOTO'}, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function(){}, socket);
+                                                                handleError({name: 'CANT_SAVE_WALL_PHOTO'}, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function () {
+                                                                }, socket);
                                                                 return;
                                                             }
 
@@ -1050,7 +1106,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                                                     group_id: data.guid
                                                                 }).returning('id').toQuery();
                                                             client.query(q_ins_vk_post, function (err) {
-                                                                if (handleError(err, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function(){}, socket)) return;
+                                                                if (handleError(err, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function () {
+                                                                    }, socket)) return;
 
                                                                 rest
                                                                     .post(URLs.VK.POST_TO_WALL, {
@@ -1066,7 +1123,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                                                     .on('complete', function (res) {
                                                                         console.log(res);
                                                                         if (res instanceof Error) {
-                                                                            handleError(result, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function(){}, socket);
+                                                                            handleError(result, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function () {
+                                                                            }, socket);
                                                                         }
                                                                     });
                                                             })
@@ -1089,7 +1147,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
             }, function () {
                 socket.emit(EMIT_NAMES.UTILS.UPDATE_IMAGES_DONE);
             });
-        })
+        });
 
     };
 
@@ -1099,6 +1157,27 @@ pg.connect(pg_conn_string, function (err, client, done) {
         io2.on('connection', ioHandlers);
     }
 
-    console.log('Started');
+    app.get('/utils/updateImages', function (req, res) {
+        cropper.resizeNew({
+            images: real_config.images,
+            client: client
+        }, function () {
+            res.json({status: true});
+        });
+    });
+
+
+    app.get('/recommendations/events/:id', function (req, res) {
+        console.log('/recommendations/events/:id');
+    });
+
+    app.get('/recommendations/organizations/:id', function (req, res) {
+        console.log('/recommendations/organizations/:id');
+    });
+
+
+    app.listen(8000, function () {
+        console.log('Node listening on port 8000!');
+    });
 
 });

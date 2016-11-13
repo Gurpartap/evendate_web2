@@ -53,6 +53,7 @@ class App
 
 	const DEFAULT_LENGTH = 100;
 	const DEFAULT_OFFSET = 0;
+	const DEFAULT_NODE_LOCATION = 'http://localhost:8000';
 
 	/*
 	 * init config options for deploy and visioning

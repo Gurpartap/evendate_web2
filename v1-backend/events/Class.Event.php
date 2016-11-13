@@ -40,11 +40,7 @@ class Event extends AbstractEntity
     const RATING_SUBSCRIBED_IN_SOCIAL_NETWORK = 'rating_subscribed_in_social_network';
     const RATING_RECENT_CREATED = 'rating_recent_created';
     const RATING_ACTIVE_DAYS = 'rating_active_days';
-
-
     const RATING_TEXT_SIMILARITY = 'rating_texts_similarity';
-
-
     const RATING_DATE_CREATION_LIMIT = 259200; // three days in seconds
 
     const MY_EVENTS_QUERY_PART = '
