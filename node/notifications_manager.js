@@ -20,7 +20,7 @@ function NotificationsManager(settings) {
 }
 
 
-NotificationsManager.prototype.create = function (notification, device) {
+NotificationsManager.prototype.create = function (notification, device, type) {
 
     var _this = this;
     var _text = Utils.replaceTags(notification.notification_type_text, notification);
@@ -29,7 +29,7 @@ NotificationsManager.prototype.create = function (notification, device) {
         body: _text,
         icon: notification.image,
         payload: {
-            type: null,
+            type: type != undefined ? type : null,
             title: notification.title,
             event_id: notification.event_id,
             body: _text,

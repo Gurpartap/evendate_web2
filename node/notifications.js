@@ -146,7 +146,7 @@ class Notifications {
 
                         if (device.device_token == null) return true;
 
-                        var note = _this.notifications_manager.create(notification, device);
+                        var note = _this.notifications_manager.create(notification, device, 'events');
 
                         note.send(function (err, message_id) {
                             if (err) return _this.logger.error(err);
@@ -229,7 +229,7 @@ class Notifications {
 
                         if (device.device_token == null) return true;
 
-                        var note = _this.notifications_manager.create(notification, device);
+                        var note = _this.notifications_manager.create(notification, device, 'events');
 
                         note.send(function (err, message_id) {
                             if (err) return _this.logger.error(err);
