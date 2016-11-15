@@ -586,6 +586,10 @@ __APP = {
 				}, {accY: 100})
 			});
 			
+			if(__APP.USER.id === -1){
+				$events.find('.HideEvent').remove();
+			}
+			
 			return $events;
 		}
 	},

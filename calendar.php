@@ -190,11 +190,11 @@ if(App::$ENV == 'prod' || App::$ENV == 'test'){
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=48a293af430b34bf96a3447aaeede4c4" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=808ab1a51134cbbdf583f9940361c4cf" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=1e1460b65569937bbb96e1c179c0d840" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=26f6e185a4b53e5c9e3e5e517d188a6f" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=f12a9f4a308cbe12b940bc0e18f80e10" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=5a437c45d133985b5e5fc2a5bfec0112" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=86975c32ca0e3724ef3b9b861ce5ef05" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=00e44a2065efa43fae2c56cf4036a5a1" charset="utf-8"></script><?php
 }	?>
 
 <?php

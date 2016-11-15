@@ -128,16 +128,28 @@ FeedPage.prototype.render = function() {
 	var PAGE = this,
 		$window = $(window);
 	
-	__APP.renderHeaderTabs([
-		{title: 'Актуальные', page: '/feed/actual'},
-		{title: 'По времени', page: '/feed/timeline'},
-		{title: 'Избранные', page: '/feed/favored'},
-		{title: 'Рекомендованные', page: '/feed/recommendations'}/*,
-		 {title: 'Друзья', page: '/feed/friends/'},*/
-	]);
-	
 	if (!(__APP.PREVIOUS_PAGE instanceof FeedPage)) {
 		PAGE.initFeedCalendar();
+	}
+	
+	if(__APP.USER.id === -1){
+		__APP.renderHeaderTabs([
+			{title: 'Актуальные', page: '/feed/actual'},
+			{title: 'По времени', page: '/feed/timeline'}
+		]);
+		
+		if(window.location.pathname == '/feed/favored' || window.location.pathname == '/feed/recommendations'){
+			__APP.changeState('/feed/actual', true, true);
+			return null;
+		}
+	} else {
+		__APP.renderHeaderTabs([
+			{title: 'Актуальные', page: '/feed/actual'},
+			{title: 'По времени', page: '/feed/timeline'},
+			{title: 'Избранные', page: '/feed/favored'},
+			{title: 'Рекомендованные', page: '/feed/recommendations'}/*,
+			 {title: 'Друзья', page: '/feed/friends/'},*/
+		]);
 	}
 	if (window.location.pathname == '/feed/' || window.location.pathname == '/feed' || !window.location.pathname.contains('feed')) {
 		__APP.changeState('/feed/actual', true, true);
