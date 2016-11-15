@@ -244,5 +244,9 @@ OneEventPage.prototype.render = function() {
 			);
 	}
 	
+	if(__APP.USER.id === -1){
+		$('.DropdownButton, .DropdownBox').remove();
+	}
+	
 	PAGE.init();
 };
