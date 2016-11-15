@@ -20,8 +20,6 @@ App::buildGlobal($__db);
 
 try {
 	$user = new User($__db);
-	$edit_event_btn_hidden = $user->isEditor() ? '' : '-hidden';
-	$profile_is_editor = $user->isEditor() ? '' : '';
 	if ($_REQUEST['q'] != 'onboarding' && !isset($_COOKIE['skip_onboarding']) && !isset($_COOKIE['open_add_organization'])) {
 		$subscriptions = OrganizationsCollection::filter(
 			$__db,
@@ -41,7 +39,15 @@ try {
 	$user = App::getCurrentUser();
 //    header('Location: /');
 }
-$user_full_name = $user->getLastName() . ' ' . $user->getFirstName();
+
+$is_user_not_auth = $user instanceof NotAuthorizedUser;
+if($is_user_not_auth){
+	$is_user_editor = false;
+	$user_full_name = '';
+} else {
+	$is_user_editor = $user->isEditor();
+	$user_full_name = $user->getLastName() . ' ' . $user->getFirstName();
+}
 if(App::$ENV == 'prod' || App::$ENV == 'test'){
 	$DEBUG_MODE = false;
 }
@@ -59,10 +65,10 @@ if(App::$ENV == 'prod' || App::$ENV == 'test'){
 	<?php
 	if($DEBUG_MODE) { ?>
 		<link rel="stylesheet" href="/dist/vendor.css?rev=1c6bca97ca768078a2c51bcf37f9c587">
-		<link rel="stylesheet" href="/dist/app.css?rev=512a359bcc9ef73a5897293f2ce0a870"><?php
+		<link rel="stylesheet" href="/dist/app.css?rev=7e12fdf198f35c16b14f132f9fc8833b"><?php
 	} else { ?>
-		<link rel="stylesheet" href="/dist/vendor.min.css?rev=3386194a99c991ca4bef728181a1c5a2">
-		<link rel="stylesheet" href="/dist/app.min.css?rev=fb68b9633c5597195cefc8a3a74e0e1b"><?php
+		<link rel="stylesheet" href="/dist/vendor.min.css?rev=fd547647e0674a5a11af5e863bd408c0">
+		<link rel="stylesheet" href="/dist/app.min.css?rev=5ef5716ff460160db0232cb20a274b61"><?php
 	}	?>
 
 	<link rel="apple-touch-icon" sizes="57x57" href="/app/img/favicon/apple-icon-57x57.png">
@@ -99,23 +105,29 @@ if(App::$ENV == 'prod' || App::$ENV == 'test'){
 						<label class="search_block_icon fa_icon fa-search -empty" for="search_bar_input"></label>
 						<button class="search_block_icon adv_search_button fa_icon fa-sliders -empty -hidden" type="button"></button>
 					</div>
-				</div>
-				<div id="user_bar" class="-unselectable">
-					<div class="avatar_block -align_right -size_small">
-						<span class="avatar_name" title="<?=$user_full_name?>"><?=$user_full_name?></span>
-						<div class="avatar -rounded -bordered"><img src="<?=$user->getAvatarUrl()?>"></div>
-					</div>
-					<div class="user_bar_forhead">
+				</div><?php
+				if($is_user_not_auth){ ?>
+					<div id="header_login_block">
+						<button class="button login_button -size_low -color_neutral_accent RippleEffect LoginButton" type="button"><span class="Text">Войти</span></button>
+					</div><?php
+				} else { ?>
+					<div id="user_bar" class="-unselectable">
 						<div class="avatar_block -align_right -size_small">
 							<span class="avatar_name" title="<?=$user_full_name?>"><?=$user_full_name?></span>
 							<div class="avatar -rounded -bordered"><img src="<?=$user->getAvatarUrl()?>"></div>
 						</div>
-						<div class="user_bar_buttons">
-							<button class="button -color_neutral RippleEffect OpenSettingsButton" type="button"><span class="Text fa_icon fa-cog">Настройки</span></button>
-							<button class="button -color_neutral_accent RippleEffect LogoutButton" type="button"><span class="Text">Выйти</span></button>
+						<div class="user_bar_forhead">
+							<div class="avatar_block -align_right -size_small">
+								<span class="avatar_name" title="<?=$user_full_name?>"><?=$user_full_name?></span>
+								<div class="avatar -rounded -bordered"><img src="<?=$user->getAvatarUrl()?>"></div>
+							</div>
+							<div class="user_bar_buttons">
+								<button class="button -color_neutral RippleEffect OpenSettingsButton" type="button"><span class="Text fa_icon fa-cog">Настройки</span></button>
+								<button class="button -color_neutral_accent RippleEffect LogoutButton" type="button"><span class="Text">Выйти</span></button>
+							</div>
 						</div>
-					</div>
-				</div>
+					</div><?php
+				} ?>
 			</div>
 		</div>
 		<div id="main_header_bottom">
@@ -141,19 +153,25 @@ if(App::$ENV == 'prod' || App::$ENV == 'test'){
 	</a>
 
 	<div class="sidebar_main_wrapper scrollbar-outer SidebarScroll">
-		<nav class="sidebar_navigation SidebarNav">
-			<a href="/statistics" class="sidebar_navigation_item <?=$edit_event_btn_hidden?> SidebarNavItem link Link"><span>Статистика</span></a>
-			<a href="/event/add" class="sidebar_navigation_item <?=$edit_event_btn_hidden?> SidebarNavItem link Link"><span>Создать событие</span></a>
-			<a href="/feed" class="sidebar_navigation_item SidebarNavItem link Link"><span>События</span><span class="counter sidebar_navigation_counter -hidden SidebarNavFeedCounter"></span></a>
-			<a href="/friends" class="sidebar_navigation_item SidebarNavItem link Link"><span>Друзья</span><span class="counter sidebar_navigation_counter -hidden SidebarNavFriendsCounter"></span></a>
+		<nav class="sidebar_navigation SidebarNav"><?php
+			if($is_user_editor){ ?>
+				<a href="/statistics" class="sidebar_navigation_item SidebarNavItem link Link"><span>Статистика</span></a>
+				<a href="/event/add" class="sidebar_navigation_item SidebarNavItem link Link"><span>Создать событие</span></a><?php
+			} ?>
+			<a href="/feed" class="sidebar_navigation_item SidebarNavItem link Link"><span>События</span><span class="counter sidebar_navigation_counter -hidden SidebarNavFeedCounter"></span></a><?php
+			if(!$is_user_not_auth){ ?>
+				<a href="/friends" class="sidebar_navigation_item SidebarNavItem link Link"><span>Друзья</span><span class="counter sidebar_navigation_counter -hidden SidebarNavFriendsCounter"></span></a><?php
+			} ?>
 			<a href="/organizations" class="sidebar_navigation_item SidebarNavItem link Link"><span>Каталог организаторов</span></a>
 		</nav>
 		<hr class="sidebar_divider">
-		<div class="sidebar_organizations_wrapper scrollbar-outer SidebarOrganizationsScroll">
-			<div class="sidebar_wrapper">
-				<span class="sidebar_section_heading">Подписки</span>
-				<div class="sidebar_organizations_list SidebarOrganizationsList"></div>
-			</div>
+		<div class="sidebar_organizations_wrapper scrollbar-outer SidebarOrganizationsScroll"><?php
+			if(!$is_user_not_auth){ ?>
+				<div class="sidebar_wrapper">
+					<span class="sidebar_section_heading">Подписки</span>
+					<div class="sidebar_organizations_list SidebarOrganizationsList"></div>
+				</div><?php
+			} ?>
 		</div>
 	</div>
 
@@ -172,11 +190,11 @@ if(App::$ENV == 'prod' || App::$ENV == 'test'){
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=9e532c62fd59aeecd19339efc66c09cf" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=d399a68d63afef1a51857673ca155c14" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=ac7d1bfe2ada7571a2ac0375009085e3" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=6156e36a9fe1e9dc50570f295d421c46" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=ee15d83ed35c0671a0a4c15ff037058f" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=f423f6df0c1914d7d83823c858a0f28f" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=614405a68787acc9ffa7b77dc0abc38b" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=5c600d9af7ed0eb08b952e45e1004a24" charset="utf-8"></script><?php
 }	?>
 
 <?php

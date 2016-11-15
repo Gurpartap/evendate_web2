@@ -2973,7 +2973,8 @@ body.-open_modal > .modal_wrapper {
 
 #user_bar,
 #page_title,
-#search_bar {
+#search_bar,
+#header_login_block {
 	display: inline-block;
 	vertical-align: middle;
 }
@@ -3075,6 +3076,12 @@ body.-open_modal > .modal_wrapper {
 
 #search_bar_input:focus ~ .search_block_icon,
 #search_bar_input:focus::-webkit-input-placeholder {color: #9fa6b3}
+
+#header_login_block {
+	width: 260px;
+	text-align: right;
+}
+.login_button {width: 90px}
 
 #user_bar {
 	width: 240px;
