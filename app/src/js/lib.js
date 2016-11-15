@@ -14,6 +14,10 @@ Function.prototype.extend = function(parent) {
 		}
 	};
 };
+function extending(parent, children){
+	children.prototype = $.extend({}, parent.prototype, children.prototype);
+	return children;
+}
 /**
  * Returns capitalized string
  * @return {string}

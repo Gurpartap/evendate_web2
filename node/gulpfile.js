@@ -21,6 +21,7 @@ var gulp = require('gulp'),
 			'../app/src/js/entities/**/*.js',
 			'../app/src/js/utils/**/*.js',
 			'../app/src/js/modals/**/*.js',
+			'../app/src/js/ui/**/*.js',
 			'../app/src/js/pages/**/*.js',
 			'../app/src/js/application.js',
 			'../app/src/js/init.js'

@@ -1,4 +1,4 @@
-paceOptions = {
+window.paceOptions = {
 	ajax: false, // disabled
 	document: false, // disabled
 	eventLag: false, // disabled
@@ -21,47 +21,6 @@ $(document)
 	})
 	.ready(function() {
 		var OneSignal = window.OneSignal || [];
-		
-		function initSidebar() {
-			var $sidebar = $('#main_sidebar'),
-				$sidebar_nav = $sidebar.find('.SidebarNav'),
-				$sidebar_nav_items = $sidebar_nav.find('.SidebarNavItem');
-			
-			$sidebar_nav.addClass('-items_' + $sidebar_nav_items.not('.-hidden').length);
-			__APP.SUBSCRIBED_ORGS.update();
-			$(window).on('subscribe unsubscribe', function() {
-				__APP.SUBSCRIBED_ORGS.update();
-			});
-			((window.innerHeight > 800) ? $('.SidebarOrganizationsScroll') : $('.SidebarScroll')).scrollbar({
-				disableBodyScroll: true
-			});
-		}
-		
-		function initTopBar() {
-			var $main_header = $('#main_header');
-			
-			$main_header.find('#search_bar_input').on('keypress', function(e) {
-				if (e.which == 13) {
-					__APP.changeState('/search/' + encodeURIComponent(this.value));
-				}
-			});
-			
-			$main_header.find('#user_bar').on('click.openUserBar', function() {
-				var $this = $(this),
-					$document = $(document);
-				$this.addClass('-open');
-				$document.on('click.closeUserBar', function(e) {
-					if (!$(e.target).parents('#user_bar').length) {
-						$document.off('click.closeUserBar');
-						$this.removeClass('-open');
-					}
-				})
-			});
-			$main_header.find('.LogoutButton').on('click', __APP.USER.logout);
-			$main_header.find('.OpenSettingsButton').on('click', showSettingsModal);
-			bindRippleEffect($main_header);
-			bindPageLinks($main_header);
-		}
 		
 		OneSignal.push(["init", {
 			appId: "7471a586-01f3-4eef-b989-c809700a8658",
@@ -145,50 +104,16 @@ $(document)
 			}
 		});
 		
-		__APP.SUBSCRIBED_ORGS = $('.SidebarOrganizationsList');
-		__APP.SUBSCRIBED_ORGS.update = function() {
-			/**
-			 * @this jQuery
-			 */
-			var self = this,
-				timing = 0,
-				current_menu_items = $.map(self.children(), function(el) {
-					return $(el).data('organization_id');
-				}),
-				to_add = __APP.USER.subscriptions.filter(function(item) {
-					return current_menu_items.indexOf(item.id) === -1;
-				}),
-				to_remove = current_menu_items.filter(function(item) {
-					return !(__APP.USER.subscriptions.has(item));
-				});
-			
-			if (to_add.length) {
-				__APP.BUILD.organizationItems(to_add, {
-					block_classes: ['animated'],
-					avatar_classes: ['-size_30x30', '-rounded']
-				})
-					[(self.length ? 'prependTo' : 'appendTo')](self)
-					.each(function(i, org_block) {
-						setTimeout(function() {
-							$(org_block).addClass('-show');
-						}, timing += 100);
-					});
-				
-				bindPageLinks(self);
-			}
-			if (to_remove.length) {
-				to_remove.forEach(function(id) {
-					var $organization_item = self.find('.organization_item[data-organization_id="' + id + '"]').removeClass('-show');
-					setTimeout(function() {
-						$organization_item.remove();
-					}, 500);
-				});
-			}
-		};
-		
 		__APP.USER.fetchUserWithSubscriptions([], undefined, function() {
-			initTopBar();
-			initSidebar();
+			if(this.id === -1){
+				__APP.TOP_BAR = new TopBarNoAuth();
+				__APP.SIDEBAR = new SidebarNoAuth();
+			} else {
+				__APP.TOP_BAR = new TopBar();
+				__APP.SIDEBAR = new Sidebar();
+			}
+			__APP.TOP_BAR.init();
+			__APP.SIDEBAR.init();
 			__APP.init();
 			bindPageLinks();
 		});

@@ -177,6 +177,8 @@ __APP = {
 		}
 	},
 	EVENDATE_BEGIN: '15-12-2015',
+	TOP_BAR: new AbstractTopBar(),
+	SIDEBAR: new AbstractSidebar(),
 	USER: new CurrentUser(),
 	PREVIOUS_PAGE: new Page(),
 	CURRENT_PAGE: new Page(),

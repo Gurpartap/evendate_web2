@@ -25,7 +25,7 @@ OnboardingPage.prototype.init = function() {
 		if($(this).is('.SkipOnboarding')){
 			cookies.setItem('skip_onboarding', 1, moment().add(7, 'd')._d);
 		}
-		__APP.SUBSCRIBED_ORGS.update();
+		__APP.SIDEBAR.updateSubscriptions();
 	});
 };
 
