@@ -431,7 +431,7 @@ __APP = {
 						classes: ['-size_low', 'RippleEffect']
 					}),
 					subscribed_text: org.subscribed_count + getUnitsText(org.subscribed_count, __LOCALES.ru_RU.TEXTS.SUBSCRIBERS),
-					redact_org_button: org.role === OneUser.ROLE.USER ? '' : __APP.BUILD.link({
+					redact_org_button: (org.role === OneUser.ROLE.UNAUTH || org.role === OneUser.ROLE.USER) ? '' : __APP.BUILD.link({
 						classes: ['button', '-size_low', '-color_marginal_primary', 'fa_icon', 'fa-pencil', '-empty', 'RippleEffect'],
 						page: 'organization/' + org.id + '/edit'
 					})

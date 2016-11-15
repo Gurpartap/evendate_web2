@@ -64,10 +64,10 @@ if(App::$ENV == 'prod' || App::$ENV == 'test'){
 
 	<?php
 	if($DEBUG_MODE) { ?>
-		<link rel="stylesheet" href="/dist/vendor.css?rev=1c6bca97ca768078a2c51bcf37f9c587">
+		<link rel="stylesheet" href="/dist/vendor.css?rev=daaf4e9e261f490963cf3bca6da05c0e">
 		<link rel="stylesheet" href="/dist/app.css?rev=7e12fdf198f35c16b14f132f9fc8833b"><?php
 	} else { ?>
-		<link rel="stylesheet" href="/dist/vendor.min.css?rev=3386194a99c991ca4bef728181a1c5a2">
+		<link rel="stylesheet" href="/dist/vendor.min.css?rev=2fa15d2cddc420211671b73eecaccfbb">
 		<link rel="stylesheet" href="/dist/app.min.css?rev=5ef5716ff460160db0232cb20a274b61"><?php
 	}	?>
 
@@ -190,11 +190,11 @@ if(App::$ENV == 'prod' || App::$ENV == 'test'){
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=7555354cdc31d36d013bb8cab7e68cfc" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=a66228078bc326fa0ce4fbfc5118530e" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=9e532c62fd59aeecd19339efc66c09cf" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=71d8fd6eb567478de9fbc4e4a5e15891" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=12d04060c1a5df01ec589e73ad3762a9" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=b14e98332e5650e959e45cd6baac80cc" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=ee15d83ed35c0671a0a4c15ff037058f" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=e44d409effc4085575e23dd2fc24b87a" charset="utf-8"></script><?php
 }	?>
 
 <?php
