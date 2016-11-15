@@ -132,7 +132,6 @@ OrganizationPage.prototype.bindUploadEventsOnScroll = function(type) {
 
 OrganizationPage.prototype.bindFeedEvents = function($parent) {
 	bindRippleEffect($parent);
-	bindAddAvatar($parent);
 	trimAvatarsCollection($parent);
 	Modal.bindCallModal($parent);
 	bindPageLinks($parent);
@@ -186,7 +185,8 @@ OrganizationPage.prototype.render = function() {
 	
 	PAGE.$wrapper.html(tmpl('organization-wrapper', $.extend(true, {
 		background_image: PAGE.organization.background_img_url ? tmpl('organization-background-image', PAGE.organization) : '',
-		subscribe_button: new SubscribeButton(PAGE.organization.id, PAGE.organization.is_subscribed, {
+		subscribe_button: new SubscribeButton(PAGE.organization.id, {
+			is_subscribed: PAGE.organization.is_subscribed,
 			colors: {
 				subscribe: '-color_accent',
 				unsubscribe: '-color_neutral',

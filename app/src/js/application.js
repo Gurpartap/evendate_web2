@@ -422,7 +422,8 @@ __APP = {
 							style: 'background-image: url(\''+(org.background_small_img_url || org.background_img_url)+'\')'
 						}
 					}) : '',
-					subscribe_button: new SubscribeButton(org.id, org.is_subscribed, {
+					subscribe_button: new SubscribeButton(org.id, {
+						is_subscribed: org.is_subscribed,
 						colors: {
 							subscribe: '-color_marginal_accent'
 						},
@@ -456,8 +457,10 @@ __APP = {
 						formatted_date: m_event_date.calendar().capitalize(),
 						date: m_event_date.format(__C.DATE_FORMAT)
 					}) : '',
-					add_to_favorite_button: new AddToFavoriteButton(event.id, event.is_favorite, {
-						classes: ['-size_low', '-fill', '-rounded', 'AddToFavorites', 'AddAvatar', 'RippleEffect']
+					add_to_favorite_button: new AddToFavoriteButton(event.id, {
+						is_add_avatar: true,
+						is_subscribed: event.is_favorite,
+						classes: ['-size_low', '-fill', '-rounded', 'AddToFavorites', 'RippleEffect']
 					}),
 					subscribers: $subscribers,
 					date: m_event_date.format(__C.DATE_FORMAT),
@@ -564,8 +567,10 @@ __APP = {
 				}
 				
 				return $.extend(true, {
-					add_to_favorite_button: new AddToFavoriteButton(event.id, event.is_favorite, {
-						classes: ['-size_low', '-fill', '-rounded', 'AddAvatar', 'RippleEffect']
+					add_to_favorite_button: new AddToFavoriteButton(event.id, {
+						is_add_avatar: true,
+						is_subscribed: event.is_favorite,
+						classes: ['-size_low', '-fill', '-rounded', 'RippleEffect']
 					}),
 					subscribers: $subscribers,
 					avatars_collection_classes: avatars_collection_classes.join(' '),

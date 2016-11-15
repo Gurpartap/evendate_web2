@@ -1344,41 +1344,6 @@ function bindDropdown($parent) {
 	}).addClass('-Handled_DropdownButton')
 }
 
-function bindAddAvatar($parent) {
-	$parent = $parent ? $parent : $('body');
-	$parent.find('.AddAvatar').not('.-Handled_AddAvatar').on('click', function() {
-		var $wrapper = $(this).closest('.AddAvatarWrapper'),
-			$collection = $wrapper.find('.AvatarsCollection'),
-			$favored_count = $wrapper.find('.FavoredCount'),
-			$avatars = $collection.find('.avatar'),
-			amount = $avatars.length;
-		
-		if ($collection.data('max_amount') >= amount) {
-			if ($collection.hasClass('-subscribed')) {
-				$collection.removeClass('-subscribed');
-				$collection.width(amount == 1 ? 0 : ($avatars.outerWidth() * (amount - 1)) - (6 * (amount - 2)));
-			} else {
-				$collection.addClass('-subscribed');
-				$collection.width(($avatars.outerWidth() * amount) - (6 * (amount - 1)));
-			}
-		} else {
-			if ($favored_count.length) {
-				var current_count = parseInt($favored_count.text());
-				if ($collection.hasClass('-subscribed')) {
-					$favored_count.text(current_count - 1);
-					if (current_count - 1 <= 0) {
-						$favored_count.parent().addClass('-cast');
-					}
-				} else {
-					$favored_count.text(current_count + 1);
-					$favored_count.parent().removeClass('-cast');
-				}
-			}
-			$collection.toggleClass('-shift -subscribed');
-		}
-	}).addClass('-Handled_AddAvatar');
-}
-
 function bindFileLoadButton($parent) {
 	$parent = $parent ? $parent : $('body');
 	$parent.find('.FileLoadButton').not('.-Handled_FileLoadButton').click(function(e) {
@@ -1815,108 +1780,6 @@ EntitiesCollection.prototype.remove = function(id) {
  */
 /**
  *
- * @abstract
- * @augments OneEntity
- */
-function OneActivity() {
-	this.stat_type_id = 0;
-	this.event_id = 0;
-	this.event = new OneEvent(this.event_id);
-	this.organization_id = 0;
-	this.organization = new OneOrganization(this.organization_id);
-	this.user_id = 0;
-	this.user = new OneUser(this.user_id);
-	this.entity = '';
-	this.type_code = '';
-	this.created_at = 0;
-}
-OneActivity.extend(OneEntity);
-/**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneActivity.js
- */
-/**
- *
- * @constructor
- * @augments EntitiesCollection
- */
-function ActivitiesCollection() {}
-ActivitiesCollection.extend(EntitiesCollection);
-ActivitiesCollection.prototype.collection_of = OneActivity;
-/**
- *
- * @param {(string|number)} user_id
- * @param {AJAXData} data
- * @param {AJAXCallback} [success]
- * @returns {jqXHR}
- */
-ActivitiesCollection.fetchUserActions = function(user_id, data, success) {
-	return __APP.SERVER.getData('/api/v1/users/' + user_id + '/actions', data, success);
-};
-/**
- *
- * @param {AJAXData} data
- * @param {AJAXCallback} [success]
- * @returns {jqXHR}
- */
-ActivitiesCollection.fetchFriendsActions = function(data, success) {
-	return __APP.SERVER.getData('/api/v1/users/feed', data, success);
-};
-/**
- *
- * @param {(Array|string)} [fields]
- * @param {(number|string)} [length]
- * @param {string} [order_by]
- * @param {AJAXCallback} [success]
- * @returns {jqXHR}
- */
-ActivitiesCollection.prototype.fetchUserActions = function(fields, length, order_by, success) {
-	var self = this,
-		ajax_data = {
-			fields: fields,
-			offset: this.length,
-			length: length
-		};
-	if (order_by) {
-		ajax_data.order_by = order_by;
-	}
-	return this.constructor.fetchUserActions(ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
-/**
- *
- * @param {(Array|string)} [fields]
- * @param {(number|string)} [length]
- * @param {string} [order_by]
- * @param {AJAXCallback} [success]
- * @returns {jqXHR}
- */
-ActivitiesCollection.prototype.fetchFriendsActions = function(fields, length, order_by, success) {
-	var self = this,
-		ajax_data = {
-			fields: fields,
-			offset: this.length,
-			length: length
-		};
-	if (order_by) {
-		ajax_data.order_by = order_by;
-	}
-	return this.constructor.fetchFriendsActions(ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
-/**
- * @requires ../Class.OneEntity.js
- */
-/**
- *
  * @constructor
  * @augments OneEntity
  * @param {(string|number)} [category_id]
@@ -2033,6 +1896,108 @@ CategoriesCollection.prototype.fetchCategoriesWithOrganizations = function(categ
  */
 /**
  *
+ * @abstract
+ * @augments OneEntity
+ */
+function OneActivity() {
+	this.stat_type_id = 0;
+	this.event_id = 0;
+	this.event = new OneEvent(this.event_id);
+	this.organization_id = 0;
+	this.organization = new OneOrganization(this.organization_id);
+	this.user_id = 0;
+	this.user = new OneUser(this.user_id);
+	this.entity = '';
+	this.type_code = '';
+	this.created_at = 0;
+}
+OneActivity.extend(OneEntity);
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.OneActivity.js
+ */
+/**
+ *
+ * @constructor
+ * @augments EntitiesCollection
+ */
+function ActivitiesCollection() {}
+ActivitiesCollection.extend(EntitiesCollection);
+ActivitiesCollection.prototype.collection_of = OneActivity;
+/**
+ *
+ * @param {(string|number)} user_id
+ * @param {AJAXData} data
+ * @param {AJAXCallback} [success]
+ * @returns {jqXHR}
+ */
+ActivitiesCollection.fetchUserActions = function(user_id, data, success) {
+	return __APP.SERVER.getData('/api/v1/users/' + user_id + '/actions', data, success);
+};
+/**
+ *
+ * @param {AJAXData} data
+ * @param {AJAXCallback} [success]
+ * @returns {jqXHR}
+ */
+ActivitiesCollection.fetchFriendsActions = function(data, success) {
+	return __APP.SERVER.getData('/api/v1/users/feed', data, success);
+};
+/**
+ *
+ * @param {(Array|string)} [fields]
+ * @param {(number|string)} [length]
+ * @param {string} [order_by]
+ * @param {AJAXCallback} [success]
+ * @returns {jqXHR}
+ */
+ActivitiesCollection.prototype.fetchUserActions = function(fields, length, order_by, success) {
+	var self = this,
+		ajax_data = {
+			fields: fields,
+			offset: this.length,
+			length: length
+		};
+	if (order_by) {
+		ajax_data.order_by = order_by;
+	}
+	return this.constructor.fetchUserActions(ajax_data, function(data) {
+		self.setData(data);
+		if (success && typeof success == 'function') {
+			success.call(self, data);
+		}
+	});
+};
+/**
+ *
+ * @param {(Array|string)} [fields]
+ * @param {(number|string)} [length]
+ * @param {string} [order_by]
+ * @param {AJAXCallback} [success]
+ * @returns {jqXHR}
+ */
+ActivitiesCollection.prototype.fetchFriendsActions = function(fields, length, order_by, success) {
+	var self = this,
+		ajax_data = {
+			fields: fields,
+			offset: this.length,
+			length: length
+		};
+	if (order_by) {
+		ajax_data.order_by = order_by;
+	}
+	return this.constructor.fetchFriendsActions(ajax_data, function(data) {
+		self.setData(data);
+		if (success && typeof success == 'function') {
+			success.call(self, data);
+		}
+	});
+};
+/**
+ * @requires ../Class.OneEntity.js
+ */
+/**
+ *
  * @constructor
  * @augments OneEntity
  */
@@ -2077,6 +2042,295 @@ DatesCollection.extend(EntitiesCollection);
  */
 DatesCollection.fetchDates = function(ajax_data, success) {
 	return __APP.SERVER.getData('/api/v1/events/dates', ajax_data, success);
+};
+/**
+ * @requires ../Class.OneEntity.js
+ */
+/**
+ * @typedef {object} Privilege
+ * @property {number} role_id
+ * @property {OneUser.ROLE} name
+ */
+/**
+ *
+ * @constructor
+ * @augments OneEntity
+ * @param {(string|number)} [organization_id]
+ * @param {boolean} [is_loading_continuous]
+ */
+function OneOrganization(organization_id, is_loading_continuous) {
+	this.id = organization_id || 0;
+	this.short_name = '';
+	this.description = '';
+	this.img_url = '';
+	this.img_small_url = '';
+	this.background_img_url = '';
+	this.background_medium_img_url = '';
+	this.type_id = 0;
+	this.type_name = '';
+	this.site_url = '';
+	this.default_address = '';
+	this.events = new EventsCollection();
+	this.is_subscribed = false;
+	this.subscribed_count = 0;
+	this.subscribed = new UsersCollection();
+	/**
+	 * @type {Array<Privilege>}
+	 */
+	this.privileges = [];
+	this.role = '';
+	this.staff = new UsersCollection();
+	
+	if (organization_id && is_loading_continuous) {
+		this.loading = true;
+		this.fetchOrganization([], function() {
+			this.loading = false;
+			$(window).trigger('fetch.OneOrganization');
+		});
+	}
+}
+OneOrganization.extend(OneEntity);
+/**
+ *
+ * @param {(string|number)} org_id
+ * @param {(string|Array)} fields
+ * @param {AJAXCallback} [success]
+ * @returns {jqXHR}
+ */
+OneOrganization.fetchOrganization = function(org_id, fields, success) {
+	return __APP.SERVER.getData('/api/v1/organizations/' + org_id, {fields: fields}, success);
+};
+/**
+ * @typedef {AJAXData} OneOrganizationCreateOrganizationData
+ * @property {string} [name]
+ * @property {string} [short_name]
+ * @property {string} [description]
+ * @property {string} [site_url]
+ * @property {string} [default_address]
+ * @property {string} [vk_url]
+ * @property {string} [facebook_url]
+ * @property {string} [type_id]
+ * @property {string} [background]
+ * @property {string} [logo]
+ * @property {string} [detail_info_url]
+ * @property {string} [email]
+ */
+/**
+ * @typedef {function({
+ *   organization_id: number
+ * })} OneOrganizationCreateOrganizationCallback
+ */
+/**
+ *
+ * @param {OneOrganizationCreateOrganizationData} new_organization_data
+ * @param {OneOrganizationCreateOrganizationCallback} [success]
+ * @returns {jqXHR}
+ */
+OneOrganization.createOrganization = function(new_organization_data, success) {
+	return __APP.SERVER.addData('/api/v1/organizations/', JSON.stringify(new_organization_data), true, success);
+};
+/**
+ *
+ * @param {(string|number)} organization_id
+ * @param {OneOrganizationCreateOrganizationData} organization_data
+ * @param {OneOrganizationCreateOrganizationCallback} [success]
+ * @returns {jqXHR}
+ */
+OneOrganization.updateOrganization = function(organization_id, organization_data, success) {
+	return __APP.SERVER.updateData('/api/v1/organizations/' + organization_id, JSON.stringify(organization_data), success);
+};
+/**
+ *
+ * @param {(string|number)} org_id
+ * @param {AJAXCallback} [success]
+ * @returns {jqXHR}
+ */
+OneOrganization.subscribeOrganization = function(org_id, success) {
+	return __APP.SERVER.addData('/api/v1/organizations/' + org_id + '/subscriptions', {}, false, success);
+};
+/**
+ *
+ * @param {(string|number)} org_id
+ * @param {AJAXCallback} [success]
+ * @returns {jqXHR}
+ */
+OneOrganization.unsubscribeOrganization = function(org_id, success) {
+	return __APP.SERVER.deleteData('/api/v1/organizations/' + org_id + '/subscriptions', {}, success);
+};
+/**
+ *
+ * @param {(string|Array)} fields
+ * @param {AJAXCallback} [success]
+ * @returns {jqXHR}
+ */
+OneOrganization.prototype.fetchOrganization = function(fields, success) {
+	var self = this;
+	return this.constructor.fetchOrganization(self.id, fields, function(data) {
+		self.role = data[0].privileges ? OneUser.recognizeRole(data[0].privileges) : '';
+		self.setData(data);
+		if (success && typeof success == 'function') {
+			success.call(self, self);
+		}
+	});
+};
+/**
+ *
+ * @param {(string|Array)} fields
+ * @param {AJAXData} [events_ajax_data]
+ * @param {AJAXCallback} [success]
+ * @returns {jqXHR}
+ */
+OneOrganization.prototype.fetchOrganizationWithEvents = function(fields, events_ajax_data, success) {
+	var _fields = fields;
+	_fields = _fields instanceof Array ? _fields : _fields.split(',');
+	_fields.push('events'.appendAjaxData(events_ajax_data));
+	return this.fetchOrganization(fields, success);
+};
+/**
+ *
+ * @param {OneOrganizationCreateOrganizationData} new_organization_data
+ * @param {OneOrganizationCreateOrganizationCallback} [success]
+ * @returns {jqXHR}
+ */
+OneOrganization.prototype.createOrganization = function(new_organization_data, success) {
+	var self = this;
+	return OneOrganization.createOrganization(new_organization_data, function(response_data) {
+		self.setData(new_organization_data);
+		self.id = response_data.organization_id;
+		if (success && typeof success == 'function') {
+			success.call(self, self);
+		}
+	});
+};
+/**
+ *
+ * @param {OneOrganizationCreateOrganizationData} organization_data
+ * @param {OneOrganizationCreateOrganizationCallback} [success]
+ * @returns {jqXHR}
+ */
+OneOrganization.prototype.updateOrganization = function(organization_data, success) {
+	var self = this;
+	return OneOrganization.updateOrganization(self.id, organization_data, function(response_data) {
+		self.setData(organization_data);
+		if (success && typeof success == 'function') {
+			success.call(self, self);
+		}
+	});
+};
+/**
+ *
+ * @param {AJAXCallback} [success]
+ * @returns {jqXHR}
+ */
+OneOrganization.prototype.subscribe = function(success) {
+	var self = this;
+	return this.constructor.subscribeOrganization(this.id, function(data) {
+		this.is_subscribed = true;
+		this.subscribed_count++;
+		if (success && typeof success == 'function') {
+			success.call(self, data);
+		}
+	});
+};
+/**
+ *
+ * @param {AJAXCallback} [success]
+ * @returns {jqXHR}
+ */
+OneOrganization.prototype.unsubscribe = function(success) {
+	var self = this;
+	return this.constructor.unsubscribeOrganization(this.id, function(data) {
+		this.is_subscribed = false;
+		this.subscribed_count = this.subscribed_count ? this.subscribed_count - 1 : this.subscribed_count;
+		if (success && typeof success == 'function') {
+			success.call(self, data);
+		}
+	});
+};
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.OneOrganization.js
+ */
+/**
+ *
+ * @constructor
+ * @augments EntitiesCollection
+ */
+function OrganizationsCollection() {}
+OrganizationsCollection.extend(EntitiesCollection);
+OrganizationsCollection.prototype.collection_of = OneOrganization;
+/**
+ *
+ * @param {AJAXData} data
+ * @param {AJAXCallback} [success]
+ */
+OrganizationsCollection.fetchSubscribedOrganizations = function(data, success) {
+	return __APP.SERVER.getData('/api/v1/organizations/subscriptions', data, success);
+};
+/**
+ *
+ * @param {(string|Array)} [roles]
+ * @param {AJAXData} [data]
+ * @param {AJAXCallback} [success]
+ */
+OrganizationsCollection.fetchMyOrganizations = function(roles, data, success) {
+	roles = Array.isArray(roles) ? roles.join(',') : roles;
+	return __APP.SERVER.getData('/api/v1/organizations/', $.extend({}, data, {roles: roles}), success);
+};
+/**
+ *
+ * @param {AJAXData} data
+ * @param {AJAXCallback} [success]
+ */
+OrganizationsCollection.fetchRecommendations = function(data, success) {
+	return __APP.SERVER.getData('/api/v1/organizations/recommendations', data, success);
+};
+/**
+ *
+ * @param {(Array|string)} [fields]
+ * @param {(number|string)} [length]
+ * @param {string} [order_by]
+ * @param {AJAXCallback} [success]
+ * @returns {jqXHR}
+ */
+OrganizationsCollection.prototype.fetchSubscribedOrganizations = function(fields, length, order_by, success) {
+	var self = this,
+		ajax_data = {
+			fields: fields,
+			offset: this.length,
+			length: length,
+			order_by: order_by || undefined
+		};
+	return this.constructor.fetchSubscribedOrganizations(ajax_data, function(data) {
+		self.setData(data);
+		if (success && typeof success == 'function') {
+			success.call(self, data);
+		}
+	});
+};
+/**
+ *
+ * @param {(Array<string>|string)} roles
+ * @param {(Array<string>|string)} [fields]
+ * @param {(number|string)} [length]
+ * @param {string} [order_by]
+ * @param {AJAXCallback} [success]
+ * @returns {jqXHR}
+ */
+OrganizationsCollection.prototype.fetchMyOrganizations = function(roles, fields, length, order_by, success) {
+	var self = this,
+		ajax_data = {
+			fields: fields,
+			length: length,
+			offset: this.length,
+			order_by: order_by || undefined
+		};
+	return OrganizationsCollection.fetchMyOrganizations(roles, ajax_data, function(data) {
+		self.setData(data);
+		if (success && typeof success == 'function') {
+			success.call(self, data);
+		}
+	});
 };
 /**
  * @requires ../Class.OneEntity.js
@@ -2844,401 +3098,6 @@ TimelineEventsCollection.fetchEvents = function(data, success) {
 	return EventsCollection.fetchMyEvents(data, success);
 };
 /**
- * @requires ../Class.OneEntity.js
- */
-/**
- * @typedef {object} Privilege
- * @property {number} role_id
- * @property {OneUser.ROLE} name
- */
-/**
- *
- * @constructor
- * @augments OneEntity
- * @param {(string|number)} [organization_id]
- * @param {boolean} [is_loading_continuous]
- */
-function OneOrganization(organization_id, is_loading_continuous) {
-	this.id = organization_id || 0;
-	this.short_name = '';
-	this.description = '';
-	this.img_url = '';
-	this.img_small_url = '';
-	this.background_img_url = '';
-	this.background_medium_img_url = '';
-	this.type_id = 0;
-	this.type_name = '';
-	this.site_url = '';
-	this.default_address = '';
-	this.events = new EventsCollection();
-	this.is_subscribed = false;
-	this.subscribed_count = 0;
-	this.subscribed = new UsersCollection();
-	/**
-	 * @type {Array<Privilege>}
-	 */
-	this.privileges = [];
-	this.role = '';
-	this.staff = new UsersCollection();
-	
-	if (organization_id && is_loading_continuous) {
-		this.loading = true;
-		this.fetchOrganization([], function() {
-			this.loading = false;
-			$(window).trigger('fetch.OneOrganization');
-		});
-	}
-}
-OneOrganization.extend(OneEntity);
-/**
- *
- * @param {(string|number)} org_id
- * @param {(string|Array)} fields
- * @param {AJAXCallback} [success]
- * @returns {jqXHR}
- */
-OneOrganization.fetchOrganization = function(org_id, fields, success) {
-	return __APP.SERVER.getData('/api/v1/organizations/' + org_id, {fields: fields}, success);
-};
-/**
- * @typedef {AJAXData} OneOrganizationCreateOrganizationData
- * @property {string} [name]
- * @property {string} [short_name]
- * @property {string} [description]
- * @property {string} [site_url]
- * @property {string} [default_address]
- * @property {string} [vk_url]
- * @property {string} [facebook_url]
- * @property {string} [type_id]
- * @property {string} [background]
- * @property {string} [logo]
- * @property {string} [detail_info_url]
- * @property {string} [email]
- */
-/**
- * @typedef {function({
- *   organization_id: number
- * })} OneOrganizationCreateOrganizationCallback
- */
-/**
- *
- * @param {OneOrganizationCreateOrganizationData} new_organization_data
- * @param {OneOrganizationCreateOrganizationCallback} [success]
- * @returns {jqXHR}
- */
-OneOrganization.createOrganization = function(new_organization_data, success) {
-	return __APP.SERVER.addData('/api/v1/organizations/', JSON.stringify(new_organization_data), true, success);
-};
-/**
- *
- * @param {(string|number)} organization_id
- * @param {OneOrganizationCreateOrganizationData} organization_data
- * @param {OneOrganizationCreateOrganizationCallback} [success]
- * @returns {jqXHR}
- */
-OneOrganization.updateOrganization = function(organization_id, organization_data, success) {
-	return __APP.SERVER.updateData('/api/v1/organizations/' + organization_id, JSON.stringify(organization_data), success);
-};
-/**
- *
- * @param {(string|number)} org_id
- * @param {AJAXCallback} [success]
- * @returns {jqXHR}
- */
-OneOrganization.subscribeOrganization = function(org_id, success) {
-	return __APP.SERVER.addData('/api/v1/organizations/' + org_id + '/subscriptions', {}, false, success);
-};
-/**
- *
- * @param {(string|number)} org_id
- * @param {AJAXCallback} [success]
- * @returns {jqXHR}
- */
-OneOrganization.unsubscribeOrganization = function(org_id, success) {
-	return __APP.SERVER.deleteData('/api/v1/organizations/' + org_id + '/subscriptions', {}, success);
-};
-/**
- *
- * @param {(string|Array)} fields
- * @param {AJAXCallback} [success]
- * @returns {jqXHR}
- */
-OneOrganization.prototype.fetchOrganization = function(fields, success) {
-	var self = this;
-	return this.constructor.fetchOrganization(self.id, fields, function(data) {
-		self.role = data[0].privileges ? OneUser.recognizeRole(data[0].privileges) : '';
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, self);
-		}
-	});
-};
-/**
- *
- * @param {(string|Array)} fields
- * @param {AJAXData} [events_ajax_data]
- * @param {AJAXCallback} [success]
- * @returns {jqXHR}
- */
-OneOrganization.prototype.fetchOrganizationWithEvents = function(fields, events_ajax_data, success) {
-	var _fields = fields;
-	_fields = _fields instanceof Array ? _fields : _fields.split(',');
-	_fields.push('events'.appendAjaxData(events_ajax_data));
-	return this.fetchOrganization(fields, success);
-};
-/**
- *
- * @param {OneOrganizationCreateOrganizationData} new_organization_data
- * @param {OneOrganizationCreateOrganizationCallback} [success]
- * @returns {jqXHR}
- */
-OneOrganization.prototype.createOrganization = function(new_organization_data, success) {
-	var self = this;
-	return OneOrganization.createOrganization(new_organization_data, function(response_data) {
-		self.setData(new_organization_data);
-		self.id = response_data.organization_id;
-		if (success && typeof success == 'function') {
-			success.call(self, self);
-		}
-	});
-};
-/**
- *
- * @param {OneOrganizationCreateOrganizationData} organization_data
- * @param {OneOrganizationCreateOrganizationCallback} [success]
- * @returns {jqXHR}
- */
-OneOrganization.prototype.updateOrganization = function(organization_data, success) {
-	var self = this;
-	return OneOrganization.updateOrganization(self.id, organization_data, function(response_data) {
-		self.setData(organization_data);
-		if (success && typeof success == 'function') {
-			success.call(self, self);
-		}
-	});
-};
-/**
- *
- * @param {AJAXCallback} [success]
- * @returns {jqXHR}
- */
-OneOrganization.prototype.subscribe = function(success) {
-	var self = this;
-	return this.constructor.subscribeOrganization(this.id, function(data) {
-		this.is_subscribed = true;
-		this.subscribed_count++;
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
-/**
- *
- * @param {AJAXCallback} [success]
- * @returns {jqXHR}
- */
-OneOrganization.prototype.unsubscribe = function(success) {
-	var self = this;
-	return this.constructor.unsubscribeOrganization(this.id, function(data) {
-		this.is_subscribed = false;
-		this.subscribed_count = this.subscribed_count ? this.subscribed_count - 1 : this.subscribed_count;
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
-/**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneOrganization.js
- */
-/**
- *
- * @constructor
- * @augments EntitiesCollection
- */
-function OrganizationsCollection() {}
-OrganizationsCollection.extend(EntitiesCollection);
-OrganizationsCollection.prototype.collection_of = OneOrganization;
-/**
- *
- * @param {AJAXData} data
- * @param {AJAXCallback} [success]
- */
-OrganizationsCollection.fetchSubscribedOrganizations = function(data, success) {
-	return __APP.SERVER.getData('/api/v1/organizations/subscriptions', data, success);
-};
-/**
- *
- * @param {(string|Array)} [roles]
- * @param {AJAXData} [data]
- * @param {AJAXCallback} [success]
- */
-OrganizationsCollection.fetchMyOrganizations = function(roles, data, success) {
-	roles = Array.isArray(roles) ? roles.join(',') : roles;
-	return __APP.SERVER.getData('/api/v1/organizations/', $.extend({}, data, {roles: roles}), success);
-};
-/**
- *
- * @param {AJAXData} data
- * @param {AJAXCallback} [success]
- */
-OrganizationsCollection.fetchRecommendations = function(data, success) {
-	return __APP.SERVER.getData('/api/v1/organizations/recommendations', data, success);
-};
-/**
- *
- * @param {(Array|string)} [fields]
- * @param {(number|string)} [length]
- * @param {string} [order_by]
- * @param {AJAXCallback} [success]
- * @returns {jqXHR}
- */
-OrganizationsCollection.prototype.fetchSubscribedOrganizations = function(fields, length, order_by, success) {
-	var self = this,
-		ajax_data = {
-			fields: fields,
-			offset: this.length,
-			length: length,
-			order_by: order_by || undefined
-		};
-	return this.constructor.fetchSubscribedOrganizations(ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
-/**
- *
- * @param {(Array<string>|string)} roles
- * @param {(Array<string>|string)} [fields]
- * @param {(number|string)} [length]
- * @param {string} [order_by]
- * @param {AJAXCallback} [success]
- * @returns {jqXHR}
- */
-OrganizationsCollection.prototype.fetchMyOrganizations = function(roles, fields, length, order_by, success) {
-	var self = this,
-		ajax_data = {
-			fields: fields,
-			length: length,
-			offset: this.length,
-			order_by: order_by || undefined
-		};
-	return OrganizationsCollection.fetchMyOrganizations(roles, ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
-/**
- * @requires ../Class.OneEntity.js
- */
-/**
- * @typedef {function({
- *   [events]: Array<OneEvent>,
- *   [organizations]: Array<OneOrganization>
- * })} SearchResultsAJAXCallback
- */
-/**
- *
- * @constructor
- * @augments OneEntity
- * @param {string} query_string
- */
-function SearchResults(query_string) {
-	this.query_string = query_string;
-	this.events = new EventsCollection();
-	this.organizations = new OrganizationsCollection();
-}
-SearchResults.extend(OneEntity);
-/**
- *
- * @param {string} query_string
- * @returns {{ [q]: {string}, [tags]: {string} }}
- */
-SearchResults.sanitizeQueryVar = function(query_string) {
-	var data = {};
-	if (query_string.indexOf('#') === 0) {
-		data.tags = query_string.replace('#', '');
-	} else {
-		data.q = query_string;
-	}
-	return data;
-};
-/**
- *
- * @param {string} query_string
- * @param {AJAXData} [ajax_data]
- * @param {SearchResultsAJAXCallback} [success]
- * @returns {jqXHR}
- */
-SearchResults.fetchEventsAndOrganizations = function(query_string, ajax_data, success) {
-	return __APP.SERVER.getData('/api/v1/search/', $.extend({}, SearchResults.sanitizeQueryVar(query_string), ajax_data), success);
-};
-/**
- *
- * @param {AJAXData} [events_ajax_data]
- * @param {function(organizations: Array<OneEvent>)} [success]
- * @returns {jqXHR}
- */
-SearchResults.prototype.fetchEvents = function(events_ajax_data, success) {
-	var self = this,
-		ajax_data = {
-			fields: 'events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length}))
-		};
-	
-	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data.events);
-		}
-	});
-};
-/**
- *
- * @param {AJAXData} [organizations_ajax_data]
- * @param {function(organizations: Array<OneOrganization>)} [success]
- * @returns {jqXHR}
- */
-SearchResults.prototype.fetchOrganizations = function(organizations_ajax_data, success) {
-	var self = this,
-		ajax_data = {
-			fields: 'organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length}))
-		};
-	
-	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data.organizations);
-		}
-	});
-};
-/**
- *
- * @param {AJAXData} [events_ajax_data]
- * @param {AJAXData} [organizations_ajax_data]
- * @param {SearchResultsAJAXCallback} [success]
- * @returns {jqXHR}
- */
-SearchResults.prototype.fetchEventsAndOrganizations = function(events_ajax_data, organizations_ajax_data, success) {
-	var self = this,
-		ajax_data = {fields: []};
-	if (events_ajax_data) {
-		ajax_data.fields.push('events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length})));
-	}
-	if (organizations_ajax_data && !SearchResults.sanitizeQueryVar(self.query_string).tags) {
-		ajax_data.fields.push('organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length})));
-	}
-	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
-/**
  * @typedef {object} StatisticsUnit
  * @property {number} time_value
  * @property {number} value
@@ -3507,6 +3366,112 @@ OrganizationsStatistics.extend(Statistics);
  */
 OrganizationsStatistics.fetchStatistics = function(id, scale, range, statistics_fields, dynamics_ajax_data, success) {
 	return Statistics.fetchStatistics(Statistics.ENTITIES.ORGANIZATION, id, scale, range, statistics_fields, dynamics_ajax_data, success);
+};
+/**
+ * @requires ../Class.OneEntity.js
+ */
+/**
+ * @typedef {function({
+ *   [events]: Array<OneEvent>,
+ *   [organizations]: Array<OneOrganization>
+ * })} SearchResultsAJAXCallback
+ */
+/**
+ *
+ * @constructor
+ * @augments OneEntity
+ * @param {string} query_string
+ */
+function SearchResults(query_string) {
+	this.query_string = query_string;
+	this.events = new EventsCollection();
+	this.organizations = new OrganizationsCollection();
+}
+SearchResults.extend(OneEntity);
+/**
+ *
+ * @param {string} query_string
+ * @returns {{ [q]: {string}, [tags]: {string} }}
+ */
+SearchResults.sanitizeQueryVar = function(query_string) {
+	var data = {};
+	if (query_string.indexOf('#') === 0) {
+		data.tags = query_string.replace('#', '');
+	} else {
+		data.q = query_string;
+	}
+	return data;
+};
+/**
+ *
+ * @param {string} query_string
+ * @param {AJAXData} [ajax_data]
+ * @param {SearchResultsAJAXCallback} [success]
+ * @returns {jqXHR}
+ */
+SearchResults.fetchEventsAndOrganizations = function(query_string, ajax_data, success) {
+	return __APP.SERVER.getData('/api/v1/search/', $.extend({}, SearchResults.sanitizeQueryVar(query_string), ajax_data), success);
+};
+/**
+ *
+ * @param {AJAXData} [events_ajax_data]
+ * @param {function(organizations: Array<OneEvent>)} [success]
+ * @returns {jqXHR}
+ */
+SearchResults.prototype.fetchEvents = function(events_ajax_data, success) {
+	var self = this,
+		ajax_data = {
+			fields: 'events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length}))
+		};
+	
+	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
+		self.setData(data);
+		if (success && typeof success == 'function') {
+			success.call(self, data.events);
+		}
+	});
+};
+/**
+ *
+ * @param {AJAXData} [organizations_ajax_data]
+ * @param {function(organizations: Array<OneOrganization>)} [success]
+ * @returns {jqXHR}
+ */
+SearchResults.prototype.fetchOrganizations = function(organizations_ajax_data, success) {
+	var self = this,
+		ajax_data = {
+			fields: 'organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length}))
+		};
+	
+	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
+		self.setData(data);
+		if (success && typeof success == 'function') {
+			success.call(self, data.organizations);
+		}
+	});
+};
+/**
+ *
+ * @param {AJAXData} [events_ajax_data]
+ * @param {AJAXData} [organizations_ajax_data]
+ * @param {SearchResultsAJAXCallback} [success]
+ * @returns {jqXHR}
+ */
+SearchResults.prototype.fetchEventsAndOrganizations = function(events_ajax_data, organizations_ajax_data, success) {
+	var self = this,
+		ajax_data = {fields: []};
+	if (events_ajax_data) {
+		ajax_data.fields.push('events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length})));
+	}
+	if (organizations_ajax_data && !SearchResults.sanitizeQueryVar(self.query_string).tags) {
+		ajax_data.fields.push('organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length})));
+	}
+	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
+		self.setData(data);
+		if (success && typeof success == 'function') {
+			success.call(self, data);
+		}
+	});
 };
 /**
  * @requires ../Class.OneEntity.js
@@ -4777,10 +4742,9 @@ DatePicker.prototype.destroy = function(){
  * @constructor
  * @augments jQuery
  * @param {(number|string)} id
- * @param {boolean} is_subscribed
  * @param {object} options
  */
-function ActionButton(id, is_subscribed, options) {
+function ActionButton(id, options) {
 	var self = this;
 	this.classes = $.extend(true, {subscribed_state: ''}, this.classes);
 	this.options = $.extend(true, this.options, options);
@@ -4791,7 +4755,8 @@ function ActionButton(id, is_subscribed, options) {
 		self.options.colors ? self.classes[state].push(self.options.colors[state]) : false;
 		self.classes[state] = self.classes[state].join(' ');
 	});
-	this.is_subscribed = is_subscribed;
+	this.is_subscribed = !!options.is_subscribed;
+	this.is_add_avatar = !!options.is_add_avatar;
 	this.id = id;
 	jQuery.fn.init.call(this, __APP.BUILD.button({
 		classes: (
@@ -4811,6 +4776,39 @@ ActionButton.prototype.pushStack = function(elems) {
 	ret.context = this.context;
 	return ret;
 };
+
+
+ActionButton.prototype.addAvatar = function() {
+	var $wrapper = this.closest('.AddAvatarWrapper'),
+		$collection = $wrapper.find('.AvatarsCollection'),
+		$favored_count = $wrapper.find('.FavoredCount'),
+		$avatars = $collection.find('.avatar'),
+		amount = $avatars.length;
+	
+	if ($collection.data('max_amount') >= amount) {
+		if ($collection.hasClass('-subscribed')) {
+			$collection.removeClass('-subscribed');
+			$collection.width(amount == 1 ? 0 : ($avatars.outerWidth() * (amount - 1)) - (6 * (amount - 2)));
+		} else {
+			$collection.addClass('-subscribed');
+			$collection.width(($avatars.outerWidth() * amount) - (6 * (amount - 1)));
+		}
+	} else {
+		if ($favored_count.length) {
+			var current_count = parseInt($favored_count.text());
+			if ($collection.hasClass('-subscribed')) {
+				$favored_count.text(current_count - 1);
+				if (current_count - 1 <= 0) {
+					$favored_count.parent().addClass('-cast');
+				}
+			} else {
+				$favored_count.text(current_count + 1);
+				$favored_count.parent().removeClass('-cast');
+			}
+		}
+		$collection.toggleClass('-shift -subscribed');
+	}
+};
 ActionButton.prototype.bindHoverEffects = function() {
 	var self = this;
 	this
@@ -4824,10 +4822,23 @@ ActionButton.prototype.bindHoverEffects = function() {
 			self.children('.Text').text(self.options.labels.subscribed);
 		});
 };
-/**
- * @interface
- */
-ActionButton.prototype.bindClick = function() {};
+ActionButton.prototype.onClick = function() {};
+ActionButton.prototype.bindClick = function() {
+	var self = this;
+	this.on('click.subscribe', function() {
+		if(__APP.USER.id === -1){
+			// call auth modal
+		} else {
+			self.onClick();
+			if(self.is_add_avatar){
+				self.addAvatar();
+			}
+			if (window.askToSubscribe instanceof Function) {
+				window.askToSubscribe();
+			}
+		}
+	});
+};
 ActionButton.prototype.afterSubscribe = function() {
 	this.removeClass([this.classes.subscribe, this.classes.subscribed].join(' '));
 	this.addClass([this.classes.subscribed_state, this.classes.unsubscribe].join(' '));
@@ -4856,10 +4867,9 @@ ActionButton.prototype.initiate = function() {
  * @constructor
  * @augments ActionButton
  * @param {(number|string)} id
- * @param {boolean} is_subscribed
  * @param {object} options
  */
-function AddToFavoriteButton(id, is_subscribed, options) {
+function AddToFavoriteButton(id, options) {
 	this.classes = {
 		subscribed_state: '-Favored'
 	};
@@ -4880,25 +4890,21 @@ function AddToFavoriteButton(id, is_subscribed, options) {
 			subscribed: 'fa-star'
 		}
 	};
-	ActionButton.apply(this, [id, is_subscribed, options]);
+	ActionButton.apply(this, [id, options]);
 }
 AddToFavoriteButton.extend(ActionButton);
-AddToFavoriteButton.prototype.bindClick = function() {
+AddToFavoriteButton.prototype.onClick = function() {
 	var self = this;
-	this.on('click.subscribe', function() {
-		if (self.is_subscribed) {
-			OneEvent.deleteFavored(self.id, function() {
-				self.afterUnsubscribe();
-			});
-		} else {
-			OneEvent.addFavored(self.id, function() {
-				self.afterSubscribe();
-			});
-		}
-		if (window.askToSubscribe instanceof Function) {
-			window.askToSubscribe();
-		}
-	});
+	
+	if (self.is_subscribed) {
+		OneEvent.deleteFavored(self.id, function() {
+			self.afterUnsubscribe();
+		});
+	} else {
+		OneEvent.addFavored(self.id, function() {
+			self.afterSubscribe();
+		});
+	}
 };
 /**
  * @requires Class.ActionButton.js
@@ -4908,10 +4914,9 @@ AddToFavoriteButton.prototype.bindClick = function() {
  * @constructor
  * @augments ActionButton
  * @param {(number|string)} id
- * @param {boolean} is_subscribed
  * @param {object} options
  */
-function SubscribeButton(id, is_subscribed, options) {
+function SubscribeButton(id, options) {
 	this.classes = {
 		subscribed_state: '-Subscribed'
 	};
@@ -4932,27 +4937,22 @@ function SubscribeButton(id, is_subscribed, options) {
 			subscribed: 'fa-check'
 		}
 	};
-	ActionButton.apply(this, [id, is_subscribed, options]);
+	ActionButton.apply(this, [id, options]);
 }
 SubscribeButton.extend(ActionButton);
-SubscribeButton.prototype.bindClick = function() {
+SubscribeButton.prototype.onClick = function() {
 	var self = this;
-	this.on('click.subscribe', function() {
-		if (self.is_subscribed) {
-			__APP.USER.unsubscribeFromOrganization(self.id, function() {
-				self.afterUnsubscribe();
-				$(window).trigger('unsubscribe', [self.id]);
-			});
-		} else {
-			__APP.USER.subscribeToOrganization(self.id, function() {
-				self.afterSubscribe();
-				$(window).trigger('subscribe', [self.id]);
-			});
-		}
-		if (window.askToSubscribe instanceof Function) {
-			window.askToSubscribe();
-		}
-	});
+	if (self.is_subscribed) {
+		__APP.USER.unsubscribeFromOrganization(self.id, function() {
+			self.afterUnsubscribe();
+			$(window).trigger('unsubscribe', [self.id]);
+		});
+	} else {
+		__APP.USER.subscribeToOrganization(self.id, function() {
+			self.afterSubscribe();
+			$(window).trigger('subscribe', [self.id]);
+		});
+	}
 };
 function Modal(title, content) {
 	this.title = title;
@@ -5558,7 +5558,7 @@ SubscribersModal.prototype.uploadUsers = function(callback) {
 /**
  * @class
  */
-var AbstractSidebar = (function () {
+AbstractSidebar = (function () {
 	function AbstractSidebar() {
 		this.$sidebar = $('#main_sidebar');
 		this.$subscribed_orgs = $('.SidebarOrganizationsList');
@@ -5579,7 +5579,7 @@ var AbstractSidebar = (function () {
  * @class
  * @extends AbstractSidebar
  */
-var Sidebar = extending(AbstractSidebar, (function () {
+Sidebar = extending(AbstractSidebar, (function () {
 	function Sidebar() {
 		AbstractSidebar.call(this);
 	}
@@ -5639,7 +5639,7 @@ var Sidebar = extending(AbstractSidebar, (function () {
  * @class
  * @extends AbstractSidebar
  */
-var SidebarNoAuth = extending(AbstractSidebar, (function () {
+SidebarNoAuth = extending(AbstractSidebar, (function () {
 	function SidebarNoAuth() {
 		AbstractSidebar.call(this);
 	}
@@ -5942,7 +5942,6 @@ function FeedPage() {
 FeedPage.extend(Page);
 
 FeedPage.prototype.bindFeedEvents = function($parent) {
-	bindAddAvatar($parent);
 	trimAvatarsCollection($parent);
 	bindRippleEffect($parent);
 	bindDropdown($parent);
@@ -8073,7 +8072,6 @@ OneEventPage.buildNotifications = function(raw_notifications, event_id, last_dat
 
 OneEventPage.prototype.init = function() {
 	var PAGE = this;
-	bindAddAvatar(PAGE.$wrapper);
 	trimAvatarsCollection(PAGE.$wrapper);
 	bindRippleEffect(PAGE.$wrapper);
 	bindDropdown(PAGE.$wrapper);
@@ -8164,8 +8162,10 @@ OneEventPage.prototype.render = function() {
 	}
 	
 	PAGE.$wrapper.html(tmpl('event-page', $.extend({}, PAGE.event, {
-		add_to_favorite_button: new AddToFavoriteButton(PAGE.event.id, PAGE.event.is_favorite, {
-			classes: ['event_favourite_button', '-size_low', '-rounded', 'AddAvatar', 'RippleEffect']
+		add_to_favorite_button: new AddToFavoriteButton(PAGE.event.id, {
+			is_add_avatar: true,
+			is_subscribed: PAGE.event.is_favorite,
+			classes: ['event_favourite_button', '-size_low', '-rounded', 'RippleEffect']
 		}),
 		subscribers: $subscribers,
 		avatars_collection_classes: avatars_collection_classes.join(' '),
@@ -9058,7 +9058,6 @@ OrganizationPage.prototype.bindUploadEventsOnScroll = function(type) {
 
 OrganizationPage.prototype.bindFeedEvents = function($parent) {
 	bindRippleEffect($parent);
-	bindAddAvatar($parent);
 	trimAvatarsCollection($parent);
 	Modal.bindCallModal($parent);
 	bindPageLinks($parent);
@@ -9112,7 +9111,8 @@ OrganizationPage.prototype.render = function() {
 	
 	PAGE.$wrapper.html(tmpl('organization-wrapper', $.extend(true, {
 		background_image: PAGE.organization.background_img_url ? tmpl('organization-background-image', PAGE.organization) : '',
-		subscribe_button: new SubscribeButton(PAGE.organization.id, PAGE.organization.is_subscribed, {
+		subscribe_button: new SubscribeButton(PAGE.organization.id, {
+			is_subscribed: PAGE.organization.is_subscribed,
 			colors: {
 				subscribe: '-color_accent',
 				unsubscribe: '-color_neutral',
@@ -9237,7 +9237,6 @@ SearchPage.prototype.render = function() {
 	this.$search_bar_input.val(this.search_string);
 	
 	function bindFeedEvents($parent) {
-		bindAddAvatar($parent);
 		trimAvatarsCollection($parent);
 		bindRippleEffect($parent);
 		Modal.bindCallModal($parent);
@@ -9815,7 +9814,8 @@ __APP = {
 							style: 'background-image: url(\''+(org.background_small_img_url || org.background_img_url)+'\')'
 						}
 					}) : '',
-					subscribe_button: new SubscribeButton(org.id, org.is_subscribed, {
+					subscribe_button: new SubscribeButton(org.id, {
+						is_subscribed: org.is_subscribed,
 						colors: {
 							subscribe: '-color_marginal_accent'
 						},
@@ -9849,8 +9849,10 @@ __APP = {
 						formatted_date: m_event_date.calendar().capitalize(),
 						date: m_event_date.format(__C.DATE_FORMAT)
 					}) : '',
-					add_to_favorite_button: new AddToFavoriteButton(event.id, event.is_favorite, {
-						classes: ['-size_low', '-fill', '-rounded', 'AddToFavorites', 'AddAvatar', 'RippleEffect']
+					add_to_favorite_button: new AddToFavoriteButton(event.id, {
+						is_add_avatar: true,
+						is_subscribed: event.is_favorite,
+						classes: ['-size_low', '-fill', '-rounded', 'AddToFavorites', 'RippleEffect']
 					}),
 					subscribers: $subscribers,
 					date: m_event_date.format(__C.DATE_FORMAT),
@@ -9957,8 +9959,10 @@ __APP = {
 				}
 				
 				return $.extend(true, {
-					add_to_favorite_button: new AddToFavoriteButton(event.id, event.is_favorite, {
-						classes: ['-size_low', '-fill', '-rounded', 'AddAvatar', 'RippleEffect']
+					add_to_favorite_button: new AddToFavoriteButton(event.id, {
+						is_add_avatar: true,
+						is_subscribed: event.is_favorite,
+						classes: ['-size_low', '-fill', '-rounded', 'RippleEffect']
 					}),
 					subscribers: $subscribers,
 					avatars_collection_classes: avatars_collection_classes.join(' '),

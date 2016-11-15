@@ -71,7 +71,6 @@ SearchPage.prototype.render = function() {
 	this.$search_bar_input.val(this.search_string);
 	
 	function bindFeedEvents($parent) {
-		bindAddAvatar($parent);
 		trimAvatarsCollection($parent);
 		bindRippleEffect($parent);
 		Modal.bindCallModal($parent);

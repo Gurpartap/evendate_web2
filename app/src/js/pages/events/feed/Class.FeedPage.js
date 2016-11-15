@@ -30,7 +30,6 @@ function FeedPage() {
 FeedPage.extend(Page);
 
 FeedPage.prototype.bindFeedEvents = function($parent) {
-	bindAddAvatar($parent);
 	trimAvatarsCollection($parent);
 	bindRippleEffect($parent);
 	bindDropdown($parent);

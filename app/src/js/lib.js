@@ -1344,41 +1344,6 @@ function bindDropdown($parent) {
 	}).addClass('-Handled_DropdownButton')
 }
 
-function bindAddAvatar($parent) {
-	$parent = $parent ? $parent : $('body');
-	$parent.find('.AddAvatar').not('.-Handled_AddAvatar').on('click', function() {
-		var $wrapper = $(this).closest('.AddAvatarWrapper'),
-			$collection = $wrapper.find('.AvatarsCollection'),
-			$favored_count = $wrapper.find('.FavoredCount'),
-			$avatars = $collection.find('.avatar'),
-			amount = $avatars.length;
-		
-		if ($collection.data('max_amount') >= amount) {
-			if ($collection.hasClass('-subscribed')) {
-				$collection.removeClass('-subscribed');
-				$collection.width(amount == 1 ? 0 : ($avatars.outerWidth() * (amount - 1)) - (6 * (amount - 2)));
-			} else {
-				$collection.addClass('-subscribed');
-				$collection.width(($avatars.outerWidth() * amount) - (6 * (amount - 1)));
-			}
-		} else {
-			if ($favored_count.length) {
-				var current_count = parseInt($favored_count.text());
-				if ($collection.hasClass('-subscribed')) {
-					$favored_count.text(current_count - 1);
-					if (current_count - 1 <= 0) {
-						$favored_count.parent().addClass('-cast');
-					}
-				} else {
-					$favored_count.text(current_count + 1);
-					$favored_count.parent().removeClass('-cast');
-				}
-			}
-			$collection.toggleClass('-shift -subscribed');
-		}
-	}).addClass('-Handled_AddAvatar');
-}
-
 function bindFileLoadButton($parent) {
 	$parent = $parent ? $parent : $('body');
 	$parent.find('.FileLoadButton').not('.-Handled_FileLoadButton').click(function(e) {

@@ -112,7 +112,6 @@ OneEventPage.buildNotifications = function(raw_notifications, event_id, last_dat
 
 OneEventPage.prototype.init = function() {
 	var PAGE = this;
-	bindAddAvatar(PAGE.$wrapper);
 	trimAvatarsCollection(PAGE.$wrapper);
 	bindRippleEffect(PAGE.$wrapper);
 	bindDropdown(PAGE.$wrapper);
@@ -203,8 +202,10 @@ OneEventPage.prototype.render = function() {
 	}
 	
 	PAGE.$wrapper.html(tmpl('event-page', $.extend({}, PAGE.event, {
-		add_to_favorite_button: new AddToFavoriteButton(PAGE.event.id, PAGE.event.is_favorite, {
-			classes: ['event_favourite_button', '-size_low', '-rounded', 'AddAvatar', 'RippleEffect']
+		add_to_favorite_button: new AddToFavoriteButton(PAGE.event.id, {
+			is_add_avatar: true,
+			is_subscribed: PAGE.event.is_favorite,
+			classes: ['event_favourite_button', '-size_low', '-rounded', 'RippleEffect']
 		}),
 		subscribers: $subscribers,
 		avatars_collection_classes: avatars_collection_classes.join(' '),

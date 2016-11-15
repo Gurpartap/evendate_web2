@@ -6,10 +6,9 @@
  * @constructor
  * @augments ActionButton
  * @param {(number|string)} id
- * @param {boolean} is_subscribed
  * @param {object} options
  */
-function SubscribeButton(id, is_subscribed, options) {
+function SubscribeButton(id, options) {
 	this.classes = {
 		subscribed_state: '-Subscribed'
 	};
@@ -30,25 +29,20 @@ function SubscribeButton(id, is_subscribed, options) {
 			subscribed: 'fa-check'
 		}
 	};
-	ActionButton.apply(this, [id, is_subscribed, options]);
+	ActionButton.apply(this, [id, options]);
 }
 SubscribeButton.extend(ActionButton);
-SubscribeButton.prototype.bindClick = function() {
+SubscribeButton.prototype.onClick = function() {
 	var self = this;
-	this.on('click.subscribe', function() {
-		if (self.is_subscribed) {
-			__APP.USER.unsubscribeFromOrganization(self.id, function() {
-				self.afterUnsubscribe();
-				$(window).trigger('unsubscribe', [self.id]);
-			});
-		} else {
-			__APP.USER.subscribeToOrganization(self.id, function() {
-				self.afterSubscribe();
-				$(window).trigger('subscribe', [self.id]);
-			});
-		}
-		if (window.askToSubscribe instanceof Function) {
-			window.askToSubscribe();
-		}
-	});
+	if (self.is_subscribed) {
+		__APP.USER.unsubscribeFromOrganization(self.id, function() {
+			self.afterUnsubscribe();
+			$(window).trigger('unsubscribe', [self.id]);
+		});
+	} else {
+		__APP.USER.subscribeToOrganization(self.id, function() {
+			self.afterSubscribe();
+			$(window).trigger('subscribe', [self.id]);
+		});
+	}
 };
