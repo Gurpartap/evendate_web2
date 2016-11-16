@@ -84,8 +84,10 @@ StatisticsOverviewPage.prototype.bindUploadOnScroll = function() {
 			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.disable_upload) {
 				$window.off('scroll.uploadOrganizations');
 				PAGE.my_organizations.fetchMyOrganizations('admin', PAGE.my_organizations_fields, 10, '', function(organizations) {
+					var $organizations = StatisticsOverviewPage.buildMyOrganizationsBlocks(organizations);
 					if (organizations.length) {
-						PAGE.$wrapper.find('.StatOverviewOrganizations').append(PAGE.bindOrganizationsEvents(StatisticsOverviewPage.buildMyOrganizationsBlocks(organizations)));
+						PAGE.$wrapper.find('.StatOverviewOrganizations').append($organizations);
+						PAGE.bindOrganizationsEvents($organizations);
 						$window.on('scroll.uploadOrganizations', scrollEvent);
 					} else {
 						PAGE.disable_upload = true;

@@ -65,11 +65,13 @@ StatisticsPage.prototype.areaChartSeriesNormalize = function(raw_data) {
 			}
 		},
 		STD_NAMES = {
+			'notifications_sent': 'Отправлено уведомлений',
 			'view': 'Просмотры',
+			'view_detail': 'Открытий страницы события из ленты Evendate',
 			'conversion': 'Конверсия',
 			'subscribe': 'Подписалось',
 			'unsubscribe': 'Отписалось',
-			'open_site': 'Открытий страницы события из ленты Evendate',
+			'open_site': 'Открытий страницы события',
 			'open_conversion': 'Конверсия просмотра события в ленте к открытию страницы события',
 			'fave': 'Кол-во пользователей, которые добавили событие в избранное',
 			'fave_conversion': 'Конверсия открытия страницы события к добавлениям в избранное'
@@ -125,12 +127,20 @@ StatisticsPage.prototype.buildAreaCharts = function(data, additional_options) {
 	var self = this,
 		normalized_series = self.areaChartSeriesNormalize(data),
 		FIELDS = {
+			notifications_sent: {
+				title: 'Отправлено уведомлений пользователям',
+				wrapper_class: 'NotificationsSentAreaChart'
+			},
 			view: {
 				title: 'Просмотры',
 				wrapper_class: 'ViewAreaChart'
 			},
-			open_site: {
+			view_detail: {
 				title: 'Открытий страницы события',
+				wrapper_class: 'ViewDetailAreaChart'
+			},
+			open_site: {
+				title: 'Открытий страницы события из ленты Evendate',
 				wrapper_class: 'OpenSiteAreaChart'
 			},
 			open_conversion: {

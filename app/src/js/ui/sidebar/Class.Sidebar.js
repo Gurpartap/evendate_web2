@@ -35,7 +35,7 @@ Sidebar = extending(AbstractSidebar, (function () {
 		if (to_add.length) {
 			__APP.BUILD.organizationItems(to_add, {
 				block_classes: ['animated'],
-				avatar_classes: ['-size_30x30', '-rounded']
+				avatar_classes: ['-size_30x30']
 			})
 				[($subscribed_orgs.length ? 'prependTo' : 'appendTo')]($subscribed_orgs)
 				.each(function(i, org_block) {

@@ -46,7 +46,7 @@ StatisticsEventOverviewPage.prototype.render = function() {
 	})));
 	this.$wrapper.find('.EventStatAreaCharts').children('.AreaChart').html(tmpl('loader'));
 	
-	this.scoreboards_stats.fetchStatistics(Statistics.SCALES.OVERALL, false, ['view', 'fave', 'open_site', 'fave_conversion', 'open_conversion'], null, function(data) {
+	this.scoreboards_stats.fetchStatistics(Statistics.SCALES.OVERALL, false, ['notifications_sent', 'view', 'fave', 'view_detail', 'fave_conversion', 'open_conversion'], null, function(data) {
 		var scoreboards_data = {numbers: {}};
 		$.each(data, function(field, stats) {
 			scoreboards_data.numbers[field] = stats[0].value
@@ -56,15 +56,16 @@ StatisticsEventOverviewPage.prototype.render = function() {
 			'view': 'Просмотров события'
 		}, ['fave', 'view']);
 		PAGE.updateScoreboards(PAGE.$wrapper.find('.EventstatsBigScoreboards'), scoreboards_data, {
+			'notifications_sent': 'Уведомлений отправлено',
 			'view': 'Просмотров',
-			'open_site': 'Открытий',
+			'view_detail': 'Открытий',
 			'open_conversion': 'Конверсия открытий',
 			'fave': 'Добавлений',
 			'fave_conversion': 'Конверсия добавлений'
-		}, ['view', 'open_site', 'open_conversion', 'fave', 'fave_conversion'], 'big');
+		}, ['notifications_sent', 'view', 'view_detail', 'open_conversion', 'fave', 'fave_conversion'], 'big');
 	});
 	
-	this.graphics_stats.fetchStatistics(Statistics.SCALES.DAY, moment(__APP.EVENDATE_BEGIN, 'DD-MM-YYYY').format(), ['view', 'fave', 'open_site', 'fave_conversion', 'open_conversion'], null, function(data) {
+	this.graphics_stats.fetchStatistics(Statistics.SCALES.DAY, moment(__APP.EVENDATE_BEGIN, 'DD-MM-YYYY').format(), ['notifications_sent', 'view', 'fave', 'view_detail', 'fave_conversion', 'open_conversion'], null, function(data) {
 		PAGE.buildAreaCharts(data, {
 			rangeSelector: {
 				selected: 1
