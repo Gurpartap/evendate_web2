@@ -4436,7 +4436,7 @@ body.-open_modal > .modal_wrapper {
 
 .organization_card_avatars > .avatars_collection {cursor: pointer}
 
-.organization_card_buttons {flex: 1 0 330px}
+.organization_card_buttons {flex: 1 0 350px}
 .organization_card_buttons > .button + .button {margin-left: 12px}
 
 /* Organization Statistics Overview */
