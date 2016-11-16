@@ -116,7 +116,7 @@ OneEventPage.prototype.init = function() {
 	bindRippleEffect(PAGE.$wrapper);
 	bindDropdown(PAGE.$wrapper);
 	//bindShareButtons(PAGE.$wrapper);
-	Modal.bindCallModal(PAGE.$wrapper);
+	__APP.MODALS.bindCallModal(PAGE.$wrapper);
 	bindCollapsing(PAGE.$wrapper);
 	bindPageLinks(PAGE.$wrapper);
 	

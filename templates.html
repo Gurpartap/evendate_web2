@@ -1084,11 +1084,8 @@
 <!-- Modals -->
 
 <script type="javascript/template" id="tmpl-modal">
-	<div class="modal_unit {modal_type} -hidden -faded">
-		<header class="modal_header">
-			{modal_title}
-			<button class="button -empty -modal_destroyer -color_default CloseModal RippleEffect">&times;</button>
-		</header>
+	<div class="modal_unit {modal_type} {modal_classes} -hidden -faded">
+		{modal_header}
 		<div class="modal_content {modal_content_classes}">
 			{modal_content}
 		</div>
@@ -1096,8 +1093,11 @@
 	</div>
 </script>
 
-<script type="javascript/template" id="tmpl-modal-title">
-	<h4>{title}</h4>
+<script type="javascript/template" id="tmpl-modal-header">
+	<header class="modal_header">
+		<h4>{title}</h4>
+		{close_button}
+	</header>
 </script>
 
 <script type="javascript/template" id="tmpl-modal-footer">

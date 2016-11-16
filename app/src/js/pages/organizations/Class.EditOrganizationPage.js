@@ -254,7 +254,7 @@ EditOrganizationPage.prototype.render = function() {
 		
 		$wrapper.html(tmpl('add-organization-page', additional_fields));
 		initEditEventPage($view);
-		Modal.bindCallModal($view);
+		__APP.MODALS.bindCallModal($view);
 		initOrganizationTypes();
 	} else {
 		additional_fields = $.extend(true, {}, this.organization);
@@ -285,7 +285,7 @@ EditOrganizationPage.prototype.render = function() {
 				$button.data('crop_data', crop_data);
 			});
 		}
-		Modal.bindCallModal($view);
+		__APP.MODALS.bindCallModal($view);
 		
 		if (additional_fields.img_url) {
 			toDataUrl(additional_fields.img_url, function(base64_string) {

@@ -133,7 +133,7 @@ OrganizationPage.prototype.bindUploadEventsOnScroll = function(type) {
 OrganizationPage.prototype.bindFeedEvents = function($parent) {
 	bindRippleEffect($parent);
 	trimAvatarsCollection($parent);
-	Modal.bindCallModal($parent);
+	__APP.MODALS.bindCallModal($parent);
 	bindPageLinks($parent);
 };
 
@@ -142,7 +142,7 @@ OrganizationPage.prototype.init = function() {
 		$subscribers_scroll;
 	bindTabs(PAGE.$wrapper);
 	PAGE.bindFeedEvents(PAGE.$wrapper);
-	Modal.bindCallModal(PAGE.$wrapper);
+	__APP.MODALS.bindCallModal(PAGE.$wrapper);
 	
 	PAGE.$wrapper.find('.Tabs').on('change.tabs', function() {
 		var scroll_events = [];

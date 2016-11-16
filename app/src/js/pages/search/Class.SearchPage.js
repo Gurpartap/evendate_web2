@@ -73,7 +73,7 @@ SearchPage.prototype.render = function() {
 	function bindFeedEvents($parent) {
 		trimAvatarsCollection($parent);
 		bindRippleEffect($parent);
-		Modal.bindCallModal($parent);
+		__APP.MODALS.bindCallModal($parent);
 		bindPageLinks($parent);
 		
 		$parent.find('.HideEvent').addClass(__C.CLASSES.NEW_HIDDEN);

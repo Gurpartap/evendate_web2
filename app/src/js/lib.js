@@ -16,6 +16,10 @@ Function.prototype.extend = function(parent) {
 };
 function extending(parent, children){
 	children.prototype = $.extend({}, parent.prototype, children.prototype);
+	children.prototype.constructor = children;
+	Object.defineProperty(children.prototype, '__super', {
+		value: parent
+	});
 	return children;
 }
 /**

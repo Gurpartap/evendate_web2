@@ -72,7 +72,7 @@ StatisticsOverviewPage.buildMyOrganizationsBlocks = function(organizations) {
 StatisticsOverviewPage.prototype.bindOrganizationsEvents = function($parent) {
 	trimAvatarsCollection($parent);
 	bindPageLinks($parent);
-	Modal.bindCallModal($parent);
+	__APP.MODALS.bindCallModal($parent);
 	bindRippleEffect($parent);
 	return $parent;
 };

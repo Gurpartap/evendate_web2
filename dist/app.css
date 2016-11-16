@@ -2272,6 +2272,7 @@ html.-noscroll {
 	height: 100%;
 	overflow: auto;
 	outline: 0;
+	text-align: center;
 	-webkit-overflow-scrolling: touch;
 	background-color: hsla(218,24%,32%,.6);
 	z-index: 1050;
@@ -2292,7 +2293,17 @@ html.-noscroll {
 	background-color: var(--color_page);
 	box-shadow: 0 2px 15px hsla(0,0%,0%,.2);
 	border-radius: 2px;
+	text-align: left;
 }
+
+.modal_unit.-size_wide {width: 80%}
+.modal_unit.-size_narrow {width: 400px}
+.modal_unit.-size_responsive {
+	display: inline-block;
+	width: auto;
+	max-width: 80%;
+}
+.modal_unit.-size_responsive > .modal_content {display: inline-block}
 
 .modal_wrapper.-blackened > .modal_unit {
 	background-color: transparent;

@@ -68,6 +68,6 @@ StatisticsEventOverviewPage.prototype.render = function() {
 		});
 	});
 	
-	Modal.bindCallModal(PAGE.$wrapper);
+	__APP.MODALS.bindCallModal(PAGE.$wrapper);
 	bindPageLinks(PAGE.$wrapper);
 };

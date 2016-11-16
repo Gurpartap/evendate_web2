@@ -1,3 +1,23 @@
+/**
+ *
+ * @namespace __APP
+ * @property {object} SERVER
+ * @property {object} SERVER.AJAX_METHOD
+ * @property {string} EVENDATE_BEGIN
+ * @property {AbstractTopBar} TOP_BAR
+ * @property {AbstractSidebar} SIDEBAR
+ * @property {CurrentUser} USER
+ * @property {Page} PREVIOUS_PAGE
+ * @property {Page} CURRENT_PAGE
+ * @property {jqXHR} CURRENT_JQXHR
+ * @property {object} MODALS
+ * @property {number} MODALS.last_id
+ * @property {Object<number, AbstractModal>} MODALS.collection
+ * @property {AbstractModal} MODALS.active_modal
+ * @property {jQuery} MODALS.modal_destroyer
+ * @property {jQuery} MODALS.modal_wrapper
+ * @property {object} BUILD
+ */
 __APP = {
 	SERVER: {
 		/**
@@ -183,6 +203,140 @@ __APP = {
 	PREVIOUS_PAGE: new Page(),
 	CURRENT_PAGE: new Page(),
 	CURRENT_JQXHR: {},
+	MODALS: {
+		last_id: 0,
+		collection: {},
+		active_modal: undefined,
+		modal_destroyer: $.extend({
+			adjustHeight: function(height) {
+				var html_height = $(window).height(),
+					modal_height = height + 200;
+				this.height((modal_height > html_height) ? modal_height : html_height);
+			}
+		}, $('.modal_destroyer')),
+		modal_wrapper: $('.modal_wrapper'),
+		/**
+		 *
+		 * @param {AbstractModal} modal
+		 */
+		pushModal: function(modal) {
+			modal.id = ++__APP.MODALS.last_id;
+			__APP.MODALS.collection[modal.id] = modal;
+			var keys = Object.keys(__APP.MODALS.collection);
+			if (keys.length > 5) {
+				__APP.MODALS.collection[keys[0]].destroy();
+			}
+		},
+		hideCurrent: function() {
+			if (__APP.MODALS.active_modal !== undefined) {
+				__APP.MODALS.active_modal.__hide();
+				$('body').removeClass('-open_modal');
+			}
+		},
+		bindCallModal: function($parent) {
+			$parent = $parent ? $parent : $('body');
+			$parent.find('.CallModal').not('.-Handled_CallModal').each(function() {
+				var $this = $(this),
+					title = $this.data('modal_title'),
+					modal,
+					modal_id,
+					modal_type = $this.data('modal_type');
+				
+				$this.on('click.CallModal', function() {
+					modal_id = $this.data('modal_id');
+					if (__APP.MODALS.collection.hasOwnProperty(modal_id)) {
+						__APP.MODALS.collection[modal_id].show();
+					} else {
+						switch (modal_type) {
+							case 'favors': {
+								modal = new FavoredModal($this.data('modal_event_id'), title);
+								break;
+							}
+							case 'subscribers': {
+								modal = new SubscribersModal($this.data('modal_organization_id'), title);
+								break;
+							}
+							case 'editors': {
+								modal = new EditorsModal($this.data('modal_organization_id'), title, $this.data('modal_specific_role'));
+								break;
+							}
+							case 'map': {
+								modal = new MapModal($this.data('modal_map_location'), title);
+								break;
+							}
+							case 'media': {
+								var type = $this.data('modal_media_type'),
+									url = $this.data('modal_media_url');
+								if (!url) {
+									if ($this.is('img')) {
+										url = $this.attr('src');
+										type = 'image';
+									} else if ($this.is('video')) {
+										//url = $this.attr('url');
+										type = 'video';
+									} else {
+										var str = $this.css('background-image');
+										if (str !== 'none') {
+											if (str.indexOf('"') != -1) {
+												url = str.slice(str.indexOf('"') + 1, str.indexOf('"', str.indexOf('"') + 1));
+											} else {
+												url = str.slice(str.indexOf('(') + 1, str.indexOf(')'));
+											}
+											type = 'image';
+										}
+									}
+								}
+								modal = new MediaModal(url, type);
+								break;
+							}
+							case 'cropper': {
+								modal = new CropperModal($this.data('source_img'), {
+									'aspectRatio': eval($this.data('aspect_ratio'))
+								});
+								
+								modal.modal.one('modal.close', function() {
+									
+									$this.removeClass('-hidden').off('click.CallModal').on('click.CallModal', function() {
+										modal_id = $this.data('modal_id');
+										if (__APP.MODALS.collection.hasOwnProperty(modal_id)) {
+											if (__APP.MODALS.collection[modal_id].image_src == $this.data('source_img')) {
+												__APP.MODALS.collection[modal_id].show();
+											} else {
+												__APP.MODALS.collection[modal_id].destroy();
+												modal = new CropperModal($this.data('source_img'), {
+													'aspectRatio': eval($this.data('aspect_ratio'))
+												});
+												$this.data('modal_id', modal.id);
+												modal.initer = $this;
+												modal.show();
+											}
+										} else {
+											modal = new CropperModal($this.data('source_img'), {
+												'data': $this.data('crop_data'),
+												'aspectRatio': eval($this.data('aspect_ratio'))
+											});
+											$this.data('modal_id', modal.id);
+											modal.initer = $this;
+											modal.show();
+										}
+									});
+									
+								});
+								break;
+							}
+							default: {
+								modal = new StdModal(title, $this.data('modal_content'));
+								break;
+							}
+						}
+						$this.data('modal_id', modal.id);
+						modal.initer = $this;
+						modal.show();
+					}
+				});
+			}).addClass('-Handled_CallModal');
+		}
+	},
 	BUILD: {
 		/**
 		 * @typedef {object} buildProps
@@ -591,6 +745,56 @@ __APP = {
 			}
 			
 			return $events;
+		},
+		/**
+		 *
+		 * @param {{
+		 *    [type]: string,
+		 *    [content]: string|jQuery,
+		 *    [classes]: Array<string>|string,
+		 *    [content_classes]: Array<string>|string,
+		 *    [width]: number,
+		 *    [header]: jQuery,
+		 *    [title]: string,
+		 *    [footer]: jQuery,
+		 *    [footer_buttons]: jQuery
+		 * }} props
+		 * @return {jQuery}
+		 */
+		modal: function(props) {
+			var $modal;
+			props = __APP.BUILD.normalizeBuildProps(props, ['content_classes']);
+			var vars = {
+				modal_type: props.type,
+				modal_content: props.content,
+				modal_classes: props.classes,
+				modal_content_classes: props.content_classes
+			};
+			if(props.header){
+				vars.modal_header = props.header;
+			} else if(props.title) {
+				vars.modal_header = tmpl('modal-header', {
+					title: props.title,
+					close_button: __APP.BUILD.button({
+						classes: ['-color_default','-empty','-modal_destroyer','CloseModal','RippleEffect'],
+						title: '×'
+					})
+				});
+			} else {
+				vars.header = '';
+			}
+			if(props.footer){
+				vars.modal_footer = props.footer;
+			} else if(props.footer_buttons) {
+				vars.modal_footer = tmpl('modal-footer', {footer_buttons: props.footer_buttons});
+			} else {
+				vars.modal_footer = '';
+			}
+			$modal = tmpl('modal', vars);
+			if(props.width){
+				$modal.width(props.width);
+			}
+			return $modal;
 		}
 	},
 	/**
@@ -700,7 +904,16 @@ __APP = {
 		}
 	}
 };
-
+/**
+ *
+ * @namespace __C
+ * @property CLASSES
+ * @property DATE_FORMAT
+ * @property COLORS
+ * @property STATS
+ * @property ACTION_NAMES
+ * @property ENTITIES
+ */
 __C = {
 	CLASSES: {
 		ACTIVE: 'active',

@@ -33,7 +33,7 @@ FeedPage.prototype.bindFeedEvents = function($parent) {
 	trimAvatarsCollection($parent);
 	bindRippleEffect($parent);
 	bindDropdown($parent);
-	Modal.bindCallModal($parent);
+	__APP.MODALS.bindCallModal($parent);
 	bindPageLinks($parent);
 	
 	$parent.find('.HideEvent').not('.-Handled_HideEvent').each(function() {
