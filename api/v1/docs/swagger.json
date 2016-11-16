@@ -2066,7 +2066,7 @@
         ],
         "summary": "Search users by name",
         "description": "",
-        "operationId": "getFriendsFeed",
+        "operationId": "getUsers",
         "produces": [
           "application/json"
         ],

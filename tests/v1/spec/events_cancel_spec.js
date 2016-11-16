@@ -6,11 +6,11 @@ var
     frisby = require('frisby'),
     fs = require("fs"),
     path = require('path'),
-    env = require(path.join(__dirname, './env.js')).module;
+    env = require(path.join(__dirname, './env.js'));
 
 frisby.globalSetup({
     request: {
-        headers: { 'Authorization': env.test.token }
+        headers: { 'Authorization': env.token }
     }
 });
 
