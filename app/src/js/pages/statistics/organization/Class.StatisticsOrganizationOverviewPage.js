@@ -153,6 +153,11 @@ StatisticsOrganizationOverviewPage.prototype.render = function() {
 		storage_until_name = 'org_stats_' + this.id + '_until',
 		is_cached_data_actual = moment.unix(window.sessionStorage.getItem(storage_until_name)).isAfter(moment());
 	
+	if(__APP.USER.id === -1){
+		__APP.changeState('/feed/actual', true, true);
+		return null;
+	}
+	
 	if (!window.location.pathname.contains('overview')) {
 		__APP.changeState(window.location.pathname+'/overview', true);
 	}

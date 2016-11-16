@@ -72,7 +72,7 @@ StatisticsOverviewPage.buildMyOrganizationsBlocks = function(organizations) {
 StatisticsOverviewPage.prototype.bindOrganizationsEvents = function($parent) {
 	trimAvatarsCollection($parent);
 	bindPageLinks($parent);
-	Modal.bindCallModal($parent);
+	__APP.MODALS.bindCallModal($parent);
 	bindRippleEffect($parent);
 	return $parent;
 };
@@ -84,8 +84,10 @@ StatisticsOverviewPage.prototype.bindUploadOnScroll = function() {
 			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.disable_upload) {
 				$window.off('scroll.uploadOrganizations');
 				PAGE.my_organizations.fetchMyOrganizations('admin', PAGE.my_organizations_fields, 10, '', function(organizations) {
+					var $organizations = StatisticsOverviewPage.buildMyOrganizationsBlocks(organizations);
 					if (organizations.length) {
-						PAGE.$wrapper.find('.StatOverviewOrganizations').append(PAGE.bindOrganizationsEvents(StatisticsOverviewPage.buildMyOrganizationsBlocks(organizations)));
+						PAGE.$wrapper.find('.StatOverviewOrganizations').append($organizations);
+						PAGE.bindOrganizationsEvents($organizations);
 						$window.on('scroll.uploadOrganizations', scrollEvent);
 					} else {
 						PAGE.disable_upload = true;
@@ -105,6 +107,10 @@ StatisticsOverviewPage.prototype.init = function() {
 };
 
 StatisticsOverviewPage.prototype.render = function() {
+	if(__APP.USER.id === -1){
+		__APP.changeState('/feed/actual', true, true);
+		return null;
+	}
 	this.$wrapper.html(tmpl('statistics-overview-wrapper', {
 		organizations: StatisticsOverviewPage.buildMyOrganizationsBlocks(this.my_organizations)
 	}));

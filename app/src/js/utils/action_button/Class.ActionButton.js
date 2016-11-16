@@ -3,10 +3,9 @@
  * @constructor
  * @augments jQuery
  * @param {(number|string)} id
- * @param {boolean} is_subscribed
  * @param {object} options
  */
-function ActionButton(id, is_subscribed, options) {
+function ActionButton(id, options) {
 	var self = this;
 	this.classes = $.extend(true, {subscribed_state: ''}, this.classes);
 	this.options = $.extend(true, this.options, options);
@@ -17,7 +16,8 @@ function ActionButton(id, is_subscribed, options) {
 		self.options.colors ? self.classes[state].push(self.options.colors[state]) : false;
 		self.classes[state] = self.classes[state].join(' ');
 	});
-	this.is_subscribed = is_subscribed;
+	this.is_subscribed = !!options.is_subscribed;
+	this.is_add_avatar = !!options.is_add_avatar;
 	this.id = id;
 	jQuery.fn.init.call(this, __APP.BUILD.button({
 		classes: (
@@ -37,6 +37,39 @@ ActionButton.prototype.pushStack = function(elems) {
 	ret.context = this.context;
 	return ret;
 };
+
+
+ActionButton.prototype.addAvatar = function() {
+	var $wrapper = this.closest('.AddAvatarWrapper'),
+		$collection = $wrapper.find('.AvatarsCollection'),
+		$favored_count = $wrapper.find('.FavoredCount'),
+		$avatars = $collection.find('.avatar'),
+		amount = $avatars.length;
+	
+	if ($collection.data('max_amount') >= amount) {
+		if ($collection.hasClass('-subscribed')) {
+			$collection.removeClass('-subscribed');
+			$collection.width(amount == 1 ? 0 : ($avatars.outerWidth() * (amount - 1)) - (6 * (amount - 2)));
+		} else {
+			$collection.addClass('-subscribed');
+			$collection.width(($avatars.outerWidth() * amount) - (6 * (amount - 1)));
+		}
+	} else {
+		if ($favored_count.length) {
+			var current_count = parseInt($favored_count.text());
+			if ($collection.hasClass('-subscribed')) {
+				$favored_count.text(current_count - 1);
+				if (current_count - 1 <= 0) {
+					$favored_count.parent().addClass('-cast');
+				}
+			} else {
+				$favored_count.text(current_count + 1);
+				$favored_count.parent().removeClass('-cast');
+			}
+		}
+		$collection.toggleClass('-shift -subscribed');
+	}
+};
 ActionButton.prototype.bindHoverEffects = function() {
 	var self = this;
 	this
@@ -50,10 +83,23 @@ ActionButton.prototype.bindHoverEffects = function() {
 			self.children('.Text').text(self.options.labels.subscribed);
 		});
 };
-/**
- * @interface
- */
-ActionButton.prototype.bindClick = function() {};
+ActionButton.prototype.onClick = function() {};
+ActionButton.prototype.bindClick = function() {
+	var self = this;
+	this.on('click.subscribe', function() {
+		if(__APP.USER.id === -1){
+			(new AuthModal()).show();
+		} else {
+			self.onClick();
+			if(self.is_add_avatar){
+				self.addAvatar();
+			}
+			if (window.askToSubscribe instanceof Function) {
+				window.askToSubscribe();
+			}
+		}
+	});
+};
 ActionButton.prototype.afterSubscribe = function() {
 	this.removeClass([this.classes.subscribe, this.classes.subscribed].join(' '));
 	this.addClass([this.classes.subscribed_state, this.classes.unsubscribe].join(' '));

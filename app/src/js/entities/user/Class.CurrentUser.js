@@ -19,8 +19,12 @@ CurrentUser.extend(OneUser);
  * @returns {jqXHR}
  */
 CurrentUser.prototype.logout = function() {
-	return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.GET, '/index.php', {logout: true}, 'application/json', function() {
-		window.location = '/';
+	return $.ajax({
+		url: '/index.php',
+		data: {logout: true},
+		complete: function() {
+			window.location = '/';
+		}
 	});
 };
 /**
