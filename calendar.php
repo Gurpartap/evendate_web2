@@ -64,11 +64,11 @@ if(App::$ENV == 'prod' || App::$ENV == 'test'){
 
 	<?php
 	if($DEBUG_MODE) { ?>
-		<link rel="stylesheet" href="/dist/vendor.css?rev=7eede2e1befdb9713f2f7b6f3eeae2fb">
-		<link rel="stylesheet" href="/dist/app.css?rev=18696fe2c97a8b6d6780119800f02c43"><?php
+		<link rel="stylesheet" href="/dist/vendor.css?rev=5602b9b9f8cddbb4f8133131a270a5ae">
+		<link rel="stylesheet" href="/dist/app.css?rev=625137e8b24f659e96e485888326cfea"><?php
 	} else { ?>
-		<link rel="stylesheet" href="/dist/vendor.min.css?rev=5da68b9a715b18c0a15d5436b2991e02">
-		<link rel="stylesheet" href="/dist/app.min.css?rev=7db2ff77e12d79b271ee1282e3fd103e"><?php
+		<link rel="stylesheet" href="/dist/vendor.min.css?rev=d48eec79ba0dcb66d3491c6bccde5f11">
+		<link rel="stylesheet" href="/dist/app.min.css?rev=d71f7219fe8e59f34f8377e2375f2711"><?php
 	}	?>
 
 	<link rel="apple-touch-icon" sizes="57x57" href="/app/img/favicon/apple-icon-57x57.png">
@@ -190,11 +190,11 @@ if(App::$ENV == 'prod' || App::$ENV == 'test'){
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=319acf45258f32e4efa82ce0c921b81d" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=5d6796c0f286430e1116e2328a5ec1d1" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=5d62249ad946b3ba8b16654408edcd64" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=b288d8c972a95e500e9d055f34e8e94b" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=1e2cc7cb25f5b3d10b6ab69e7fb9ea03" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=49f01b4a6ab1fa319fdcac6c035adfab" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=119c4c625740e81f7305b7eafaf874c2" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=795faed30858931cf0d65450149c37cb" charset="utf-8"></script><?php
 }	?>
 
 <?php

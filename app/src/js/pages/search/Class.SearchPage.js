@@ -14,7 +14,7 @@ function SearchPage(search) {
 	this.$search_bar_input = $('#search_bar_input');
 	this.search_string = decodeURIComponent(search);
 	this.events_ajax_data = {
-		length: 20,
+		length: 10,
 		fields: [
 			'image_horizontal_medium_url',
 			'detail_info_url',
@@ -36,7 +36,7 @@ function SearchPage(search) {
 			'tags',
 			'dates'
 		],
-		filters: "future=true"
+		order_by: 'nearest_event_date,-first_event_date'
 	};
 	this.organizations_ajax_data = {
 		length: 30,
@@ -45,6 +45,7 @@ function SearchPage(search) {
 			'img_small_url'
 		]
 	};
+	this.past_events = false;
 	this.search_results = new SearchResults(this.search_string);
 	this.is_loading = true;
 	this.search_results.fetchEventsAndOrganizations(this.events_ajax_data, this.organizations_ajax_data, Page.triggerRender);
@@ -62,13 +63,31 @@ SearchPage.buildOrganizationItems = function(organizations) {
 		counter_classes: [__C.CLASSES.NEW_HIDDEN]
 	})
 };
+/**
+ *
+ * @param {(OneEvent|Array<OneEvent>|EventsCollection)} events
+ * @returns {jQuery}
+ */
+SearchPage.buildEventCards = function(events) {
+	var $events = $();
+	if (events.length == 0) {
+		$events = tmpl('search-no-events', {});
+	} else {
+		events.forEach(function(event) {
+			if(event.nearest_event_date == undefined && !this.past_events){
+				$events = $events.add(tmpl('divider', {title: 'Прошедшие события'}));
+				this.past_events = true;
+			}
+			$events = $events.add(__APP.BUILD.feedEventCards(event));
+		});
+	}
+	return $events
+};
 
-SearchPage.prototype.render = function() {
+SearchPage.prototype.init = function() {
 	var PAGE = this,
-		data = {},
+		$window = $(window),
 		$organizations_scrollbar;
-	
-	this.$search_bar_input.val(this.search_string);
 	
 	function bindFeedEvents($parent) {
 		trimAvatarsCollection($parent);
@@ -79,18 +98,6 @@ SearchPage.prototype.render = function() {
 		$parent.find('.HideEvent').addClass(__C.CLASSES.NEW_HIDDEN);
 	}
 	
-	if (this.search_results.events.length == 0) {
-		data.events = tmpl('search-no-events', {});
-	} else {
-		data.events = __APP.BUILD.feedEventCards(this.search_results.events);
-	}
-	if (this.search_results.organizations.length == 0) {
-		data.no_organizations = __C.CLASSES.NEW_HIDDEN;
-	} else {
-		data.organizations = SearchPage.buildOrganizationItems(this.search_results.organizations);
-	}
-	
-	this.$wrapper.append(tmpl('search-wrapper', data));
 	$organizations_scrollbar = this.$wrapper.find('.SearchOrganizationsScrollbar').scrollbar({
 		disableBodyScroll: true,
 		onScroll: function(y) {
@@ -106,5 +113,38 @@ SearchPage.prototype.render = function() {
 			}
 		}
 	});
+	$window.off('scroll.upload' + PAGE.constructor.name);
+	$window.on('scroll.upload' + PAGE.constructor.name, function() {
+		if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.block_scroll) {
+			PAGE.block_scroll = true;
+			__APP.CURRENT_JQXHR = PAGE.search_results.fetchEvents(PAGE.events_ajax_data, function(events) {
+				var $events;
+				if(events.length){
+					$events = SearchPage.buildEventCards(events);
+					bindFeedEvents($events);
+					PAGE.$wrapper.find('.SearchEvents').append($events);
+					PAGE.block_scroll = false;
+				} else {
+					$window.off('scroll.upload' + PAGE.constructor.name);
+				}
+			});
+		}
+	});
 	bindFeedEvents(this.$wrapper);
+};
+
+SearchPage.prototype.render = function() {
+	var data = {};
+	
+	this.$search_bar_input.val(this.search_string);
+	
+	data.events = SearchPage.buildEventCards(this.search_results.events);
+	if (this.search_results.organizations.length == 0) {
+		data.no_organizations = __C.CLASSES.NEW_HIDDEN;
+	} else {
+		data.organizations = SearchPage.buildOrganizationItems(this.search_results.organizations);
+	}
+	
+	this.$wrapper.append(tmpl('search-wrapper', data));
+	this.init();
 };

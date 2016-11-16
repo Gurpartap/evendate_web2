@@ -55,6 +55,10 @@
 
 <!-- COMMONS -->
 
+<script type="javascript/template" id="tmpl-divider">
+	<hr title="{title}" {dataset}>
+</script>
+
 <script type="javascript/template" id="tmpl-radio-checkbox">
 	<div class="{unit_classes}">
 		<input id="{id}" class="{classes}" type="{type}" name="{name}" {attributes} {dataset} tabindex="-1">
@@ -684,10 +688,6 @@
 	<p class="organization_feed_text">{text}</p>
 </script>
 
-<script type="javascript/template" id="tmpl-organization-feed-event-divider">
-	<hr title="{formatted_date}" data-raw_date="{date}">
-</script>
-
 <script type="javascript/template" id="tmpl-organization-feed-event">
 	{divider}
 	<div class="organization_feed_block OrganizationFeedEvent" data-event-id="{id}" data-event_date="{date}">
@@ -1147,7 +1147,7 @@
 			<div class="search_organizations_content">{organizations}</div>
 		</div>
 	</div>
-	<div class="feed_event_cards_wrapper search_events">{events}</div>
+	<div class="feed_event_cards_wrapper search_events SearchEvents">{events}</div>
 </script>
 
 <script type="javascript/template" id="tmpl-search-no-events">

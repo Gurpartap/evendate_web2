@@ -612,9 +612,8 @@ __APP = {
 				
 				type.last_date = m_event_date.format(__C.DATE_FORMAT);
 				return $.extend({}, event, {
-					divider: different_day ? tmpl('organization-feed-event-divider', {
-						formatted_date: m_event_date.calendar().capitalize(),
-						date: m_event_date.format(__C.DATE_FORMAT)
+					divider: different_day ? tmpl('divider', {
+						title: m_event_date.calendar().capitalize()
 					}) : '',
 					add_to_favorite_button: new AddToFavoriteButton(event.id, {
 						is_add_avatar: true,
