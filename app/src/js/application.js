@@ -4,6 +4,10 @@
  * @property {object} SERVER
  * @property {object} SERVER.AJAX_METHOD
  * @property {string} EVENDATE_BEGIN
+ * @property {object} AUTH_URLS
+ * @property {string} AUTH_URLS.vk
+ * @property {string} AUTH_URLS.google
+ * @property {string} AUTH_URLS.facebook
  * @property {AbstractTopBar} TOP_BAR
  * @property {AbstractSidebar} SIDEBAR
  * @property {CurrentUser} USER
@@ -197,6 +201,7 @@ __APP = {
 		}
 	},
 	EVENDATE_BEGIN: '15-12-2015',
+	AUTH_URLS: {},
 	TOP_BAR: new AbstractTopBar(),
 	SIDEBAR: new AbstractSidebar(),
 	USER: new CurrentUser(),
@@ -614,7 +619,7 @@ __APP = {
 					add_to_favorite_button: new AddToFavoriteButton(event.id, {
 						is_add_avatar: true,
 						is_subscribed: event.is_favorite,
-						classes: ['-size_low', '-fill', '-rounded', 'AddToFavorites', 'RippleEffect']
+						classes: ['-size_low', '-size_wide', '-rounded', 'AddToFavorites', 'RippleEffect']
 					}),
 					subscribers: $subscribers,
 					date: m_event_date.format(__C.DATE_FORMAT),
@@ -724,7 +729,7 @@ __APP = {
 					add_to_favorite_button: new AddToFavoriteButton(event.id, {
 						is_add_avatar: true,
 						is_subscribed: event.is_favorite,
-						classes: ['-size_low', '-fill', '-rounded', 'RippleEffect']
+						classes: ['-size_low', '-size_wide', '-rounded', 'RippleEffect']
 					}),
 					subscribers: $subscribers,
 					avatars_collection_classes: avatars_collection_classes.join(' '),

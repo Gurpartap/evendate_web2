@@ -5,7 +5,7 @@
  * @class
  * @extends AbstractTopBar
  */
-var TopBar = extending(AbstractTopBar, (function () {
+TopBar = extending(AbstractTopBar, (function () {
 	function TopBar() {
 		AbstractTopBar.call(this);
 	}

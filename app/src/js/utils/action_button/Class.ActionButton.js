@@ -88,7 +88,7 @@ ActionButton.prototype.bindClick = function() {
 	var self = this;
 	this.on('click.subscribe', function() {
 		if(__APP.USER.id === -1){
-			// call auth modal
+			(new AuthModal()).show();
 		} else {
 			self.onClick();
 			if(self.is_add_avatar){

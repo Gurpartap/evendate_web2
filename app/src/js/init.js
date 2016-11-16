@@ -112,9 +112,16 @@ $(document)
 				__APP.TOP_BAR = new TopBar();
 				__APP.SIDEBAR = new Sidebar();
 			}
-			__APP.TOP_BAR.init();
-			__APP.SIDEBAR.init();
-			__APP.init();
+			
+			__APP.SERVER.getData('/auth.php', {
+				action: 'get_urls',
+				mobile: isNotDesktop()
+			}, function(data) {
+				__APP.AUTH_URLS = data;
+				__APP.TOP_BAR.init();
+				__APP.SIDEBAR.init();
+				__APP.init();
+			});
 			bindPageLinks();
 		});
 		

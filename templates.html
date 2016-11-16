@@ -324,7 +324,7 @@
 					<input id="edit_event_placepicker" class="form_input Placepicker" name="location" value="{location}" required>
 				</div>
 				<div class="form_unit">
-					<button class="button -color_primary -fill RippleEffect EditEventDefaultAddress" type="button" tabindex="-1">По умолчанию</button>
+					<button class="button -color_primary -size_wide RippleEffect EditEventDefaultAddress" type="button" tabindex="-1">По умолчанию</button>
 				</div>
 			</div>
 
@@ -769,10 +769,10 @@
 </script>
 
 <script type="javascript/template" id="tmpl-event-edit-functions">
-	<button class="button -color_neutral -fill RippleEffect DropdownButton" data-dropdown="redact_event" data-dd-width="self" type="button">Редактирование события</button>
+	<button class="button -color_neutral -size_wide RippleEffect DropdownButton" data-dropdown="redact_event" data-dd-width="self" type="button">Редактирование события</button>
 	<div class="dropdown_box DropdownBox" data-dropdown_id="redact_event">
-		<div class="dropdown_list"><button class="dropdown_button -fill -color_accent RippleEffect CloseDropdown DropdownButton" data-dropdown="cancel_event" data-dd-width="self" type="button">Отменить событие</button></div>
-		<div class="dropdown_list"><a href="/event/{id}/edit" class="dropdown_button link -fill -color_neutral RippleEffect CloseDropdown Link">Редактировать</a></div>
+		<div class="dropdown_list"><button class="dropdown_button -size_wide -color_accent RippleEffect CloseDropdown DropdownButton" data-dropdown="cancel_event" data-dd-width="self" type="button">Отменить событие</button></div>
+		<div class="dropdown_list"><a href="/event/{id}/edit" class="dropdown_button link -size_wide -color_neutral RippleEffect CloseDropdown Link">Редактировать</a></div>
 	</div>
 	<div class="dropdown_box DropdownBox" data-dropdown_id="cancel_event">
 		<div class="dropdown_box_wrapper">
@@ -1116,6 +1116,22 @@
 
 <script type="javascript/template" id="tmpl-modal-map-content">
 	<iframe width="100%" height="600" frameborder="0" style="display:block;border:0" src="https://www.google.com/maps/embed/v1/place?q={location}&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg" allowfullscreen></iframe>
+</script>
+
+<script type="javascript/template" id="tmpl-modal-auth-content">
+	<h4 class="auth_modal_heading">{heading}</h4>
+	<div class="auth_buttons_wrapper">
+		<a href="#" data-auth_network="vk" class="button -size_wide -rounded -no_uppercase -align_left -color_vk RippleEffect AuthButton">
+			<span class="Text"><i class="fa fa-vk fa-lg"></i><span>Войти через ВКонтакте</span></span>
+		</a>
+		<a href="#" data-auth_network="google" class="button -size_wide -rounded -no_uppercase -align_left -color_google RippleEffect AuthButton">
+			<span class="Text"><i class="fa fa-google-plus fa-lg"></i><span>Войти через Google+</span></span>
+		</a>
+		<a href="#" data-auth_network="facebook" class="button -size_wide -rounded -no_uppercase -align_left -color_facebook RippleEffect AuthButton">
+			<span class="Text"><i class="fa fa-facebook-official fa-lg"></i><span>Войти через Facebook</span></span>
+		</a>
+	</div>
+	<p class="auth_modal_bottom">{bottom}</p>
 </script>
 
 <script type="javascript/template" id="tmpl-modal-users-divider">

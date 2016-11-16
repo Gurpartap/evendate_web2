@@ -1,7 +1,7 @@
 /**
  * @class
  */
-var AbstractTopBar = (function () {
+AbstractTopBar = (function () {
 	function AbstractTopBar() {
 		this.$main_header = $('#main_header');
 	}
