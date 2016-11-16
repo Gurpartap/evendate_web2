@@ -665,6 +665,12 @@ RedactEventPage.prototype.render = function() {
 			tomorrow_date: moment().add(1, 'd').format(__C.DATE_FORMAT)
 		};
 	
+	
+	if(__APP.USER.id === -1){
+		__APP.changeState('/feed/actual', true, true);
+		return null;
+	}
+	
 	function selectDates($view, raw_dates) {
 		var MainCalendar = $view.find('.EventDatesCalendar').data('calendar'),
 			$table_rows = $view.find('.SelectedDaysRows'),

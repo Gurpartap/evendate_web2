@@ -36,6 +36,11 @@ StatisticsOrganizationEventsPage.prototype.render = function() {
 		$past_events_wrapper,
 		past_events_tablesort;
 	
+	if(__APP.USER.id === -1){
+		__APP.changeState('/feed/actual', true, true);
+		return null;
+	}
+	
 	this.renderHeaderTabs();
 	__APP.changeTitle([{
 		title: 'Организации',

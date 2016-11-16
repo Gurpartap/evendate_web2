@@ -45,6 +45,10 @@ OnboardingPage.prototype.render = function() {
 	var PAGE = this,
 		$loader = tmpl('loader', {});
 	
+	if(__APP.USER.id === -1){
+		__APP.changeState('/feed/actual', true, true);
+		return null;
+	}
 	function appendRecommendations(organizations) {
 		$loader.detach();
 		if (organizations.length) {

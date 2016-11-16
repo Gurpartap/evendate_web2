@@ -36,6 +36,11 @@ EditOrganizationPage.prototype.render = function() {
 		additional_fields,
 		local_storage;
 	
+	if(__APP.USER.id === -1){
+		__APP.changeState('/feed/actual', true, true);
+		return null;
+	}
+	
 	function initEditEventPage($view) {
 		
 		function bindLoadByURLButton($view) {

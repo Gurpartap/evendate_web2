@@ -26,6 +26,10 @@ StatisticsEventOverviewPage.extend(StatisticsEventPage);
 StatisticsEventOverviewPage.prototype.render = function() {
 	var PAGE = this;
 	
+	if(__APP.USER.id === -1){
+		__APP.changeState('/feed/actual', true, true);
+		return null;
+	}
 	__APP.changeTitle([{
 		title: 'Организации',
 		page: '/statistics'

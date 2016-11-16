@@ -105,6 +105,10 @@ StatisticsOverviewPage.prototype.init = function() {
 };
 
 StatisticsOverviewPage.prototype.render = function() {
+	if(__APP.USER.id === -1){
+		__APP.changeState('/feed/actual', true, true);
+		return null;
+	}
 	this.$wrapper.html(tmpl('statistics-overview-wrapper', {
 		organizations: StatisticsOverviewPage.buildMyOrganizationsBlocks(this.my_organizations)
 	}));
