@@ -129,7 +129,7 @@ class TagsCollection extends AbstractCollection
         return $fc . mb_substr($str, 1);
     }
 
-    public static function create(PDO $db, string $name) : Tag
+    public static function create(PDO $db, string $name)
     {
         $name = preg_replace('/\s+/', ' ', self::mb_ucfirst($name));
 
