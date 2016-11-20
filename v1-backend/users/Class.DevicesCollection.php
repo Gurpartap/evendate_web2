@@ -47,7 +47,7 @@ class DevicesCollection extends AbstractCollection{
 		if ($result === FALSE) throw new DBQueryException(implode(';', $db->errorInfo()), $db);
 
 		$devices = $p_get_events->fetchAll(PDO::FETCH_CLASS, 'Device');
-		if (count($devices) == 0 && $is_one_device) throw new LogicException('CANT_FIND_EVENT');
+		if (count($devices) == 0 && $is_one_device) throw new LogicException('CANT_FIND_DEVICE');
 		$result_devices = array();
 		if ($is_one_device) return $devices[0];
 		foreach($devices as $device){
