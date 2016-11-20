@@ -130,7 +130,6 @@ $__modules['events'] = array(
 			if ($__user instanceof User){
 				$result = $__user->createEvent($__request['payload']);
 
-				@file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/updateImages');
 			}else throw new PrivilegesException('NOT_AUTHORIZED', $__db);
 			return $result;
 		},
@@ -170,7 +169,9 @@ $__modules['events'] = array(
 			} else {
 				$organization = $__user->getEditorInstance()->getDefaultOrganization();
 			}
-			return $event->update($__request['payload'], $organization, $__user->getEditorInstance());
+			$result = $event->update($__request['payload'], $organization, $__user->getEditorInstance());
+
+			return $result;
 		}
 	),
 	'DELETE' => array(
