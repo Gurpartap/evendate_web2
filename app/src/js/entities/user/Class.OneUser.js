@@ -14,6 +14,10 @@ function OneUser(user_id, is_loading_continuous) {
 	this.first_name = '';
 	this.last_name = '';
 	this.middle_name = '';
+	/**
+	 *
+	 * @type {OneUser.GENDER}
+	 */
 	this.gender = '';
 	this.avatar_url = '';
 	this.type = '';
@@ -59,6 +63,15 @@ OneUser.ROLE = {
 	USER: 'user',
 	MODERATOR: 'moderator',
 	ADMIN: 'admin'
+};
+/**
+ * @const
+ * @enum {string}
+ */
+OneUser.GENDER = {
+	MALE: 'male',
+	FEMALE: 'female',
+	NEUTRAL: 'neutral'
 };
 
 Object.defineProperty(OneUser.prototype, 'subscriptions_fields', {

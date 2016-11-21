@@ -11529,6 +11529,157 @@ if (typeof jQuery === 'undefined') {
 
 !function(a){"use strict";function b(b,c){this.itemsArray=[],this.$element=a(b),this.$element.hide(),this.isSelect="SELECT"===b.tagName,this.multiple=this.isSelect&&b.hasAttribute("multiple"),this.objectItems=c&&c.itemValue,this.placeholderText=b.hasAttribute("placeholder")?this.$element.attr("placeholder"):"",this.inputSize=Math.max(1,this.placeholderText.length),this.$container=a('<div class="bootstrap-tagsinput"></div>'),this.$input=a('<input type="text" placeholder="'+this.placeholderText+'"/>').appendTo(this.$container),this.$element.after(this.$container);var d=(this.inputSize<3?3:this.inputSize)+"em";this.$input.get(0).style.cssText="width: "+d+" !important;",this.build(c)}function c(a,b){if("function"!=typeof a[b]){var c=a[b];a[b]=function(a){return a[c]}}}function d(a,b){if("function"!=typeof a[b]){var c=a[b];a[b]=function(){return c}}}function e(a){return a?i.text(a).html():""}function f(a){var b=0;if(document.selection){a.focus();var c=document.selection.createRange();c.moveStart("character",-a.value.length),b=c.text.length}else(a.selectionStart||"0"==a.selectionStart)&&(b=a.selectionStart);return b}function g(b,c){var d=!1;return a.each(c,function(a,c){if("number"==typeof c&&b.which===c)return d=!0,!1;if(b.which===c.which){var e=!c.hasOwnProperty("altKey")||b.altKey===c.altKey,f=!c.hasOwnProperty("shiftKey")||b.shiftKey===c.shiftKey,g=!c.hasOwnProperty("ctrlKey")||b.ctrlKey===c.ctrlKey;if(e&&f&&g)return d=!0,!1}}),d}var h={tagClass:function(){return"label label-info"},itemValue:function(a){return a?a.toString():a},itemText:function(a){return this.itemValue(a)},freeInput:!0,addOnBlur:!0,maxTags:void 0,maxChars:void 0,confirmKeys:[13,44],onTagExists:function(a,b){b.hide().fadeIn()},trimValue:!1,allowDuplicates:!1};b.prototype={constructor:b,add:function(b,c){var d=this;if(!(d.options.maxTags&&d.itemsArray.length>=d.options.maxTags||b!==!1&&!b)){if("string"==typeof b&&d.options.trimValue&&(b=a.trim(b)),"object"==typeof b&&!d.objectItems)throw"Can't add objects when itemValue option is not set";if(!b.toString().match(/^\s*$/)){if(d.isSelect&&!d.multiple&&d.itemsArray.length>0&&d.remove(d.itemsArray[0]),"string"==typeof b&&"INPUT"===this.$element[0].tagName){var f=b.split(",");if(f.length>1){for(var g=0;g<f.length;g++)this.add(f[g],!0);return void(c||d.pushVal())}}var h=d.options.itemValue(b),i=d.options.itemText(b),j=d.options.tagClass(b),k=a.grep(d.itemsArray,function(a){return d.options.itemValue(a)===h})[0];if(!k||d.options.allowDuplicates){if(!(d.items().toString().length+b.length+1>d.options.maxInputLength)){var l=a.Event("beforeItemAdd",{item:b,cancel:!1});if(d.$element.trigger(l),!l.cancel){d.itemsArray.push(b);var m=a('<span class="tag '+e(j)+'">'+e(i)+'<span data-role="remove"></span></span>');if(m.data("item",b),d.findInputWrapper().before(m),m.after(" "),d.isSelect&&!a('option[value="'+encodeURIComponent(h)+'"]',d.$element)[0]){var n=a("<option selected>"+e(i)+"</option>");n.data("item",b),n.attr("value",h),d.$element.append(n)}c||d.pushVal(),(d.options.maxTags===d.itemsArray.length||d.items().toString().length===d.options.maxInputLength)&&d.$container.addClass("bootstrap-tagsinput-max"),d.$element.trigger(a.Event("itemAdded",{item:b}))}}}else if(d.options.onTagExists){var o=a(".tag",d.$container).filter(function(){return a(this).data("item")===k});d.options.onTagExists(b,o)}}}},remove:function(b,c){var d=this;if(d.objectItems&&(b="object"==typeof b?a.grep(d.itemsArray,function(a){return d.options.itemValue(a)==d.options.itemValue(b)}):a.grep(d.itemsArray,function(a){return d.options.itemValue(a)==b}),b=b[b.length-1]),b){var e=a.Event("beforeItemRemove",{item:b,cancel:!1});if(d.$element.trigger(e),e.cancel)return;a(".tag",d.$container).filter(function(){return a(this).data("item")===b}).remove(),a("option",d.$element).filter(function(){return a(this).data("item")===b}).remove(),-1!==a.inArray(b,d.itemsArray)&&d.itemsArray.splice(a.inArray(b,d.itemsArray),1)}c||d.pushVal(),d.options.maxTags>d.itemsArray.length&&d.$container.removeClass("bootstrap-tagsinput-max"),d.$element.trigger(a.Event("itemRemoved",{item:b}))},removeAll:function(){var b=this;for(a(".tag",b.$container).remove(),a("option",b.$element).remove();b.itemsArray.length>0;)b.itemsArray.pop();b.pushVal()},refresh:function(){var b=this;a(".tag",b.$container).each(function(){var c=a(this),d=c.data("item"),f=b.options.itemValue(d),g=b.options.itemText(d),h=b.options.tagClass(d);if(c.attr("class",null),c.addClass("tag "+e(h)),c.contents().filter(function(){return 3==this.nodeType})[0].nodeValue=e(g),b.isSelect){var i=a("option",b.$element).filter(function(){return a(this).data("item")===d});i.attr("value",f)}})},items:function(){return this.itemsArray},pushVal:function(){var b=this,c=a.map(b.items(),function(a){return b.options.itemValue(a).toString()});b.$element.val(c,!0).trigger("change")},build:function(b){var e=this;if(e.options=a.extend({},h,b),e.objectItems&&(e.options.freeInput=!1),c(e.options,"itemValue"),c(e.options,"itemText"),d(e.options,"tagClass"),e.options.typeahead){var i=e.options.typeahead||{};d(i,"source"),e.$input.typeahead(a.extend({},i,{source:function(b,c){function d(a){for(var b=[],d=0;d<a.length;d++){var g=e.options.itemText(a[d]);f[g]=a[d],b.push(g)}c(b)}this.map={};var f=this.map,g=i.source(b);a.isFunction(g.success)?g.success(d):a.isFunction(g.then)?g.then(d):a.when(g).then(d)},updater:function(a){e.add(this.map[a])},matcher:function(a){return-1!==a.toLowerCase().indexOf(this.query.trim().toLowerCase())},sorter:function(a){return a.sort()},highlighter:function(a){var b=new RegExp("("+this.query+")","gi");return a.replace(b,"<strong>$1</strong>")}}))}if(e.options.typeaheadjs){var j=e.options.typeaheadjs||{};e.$input.typeahead(null,j).on("typeahead:selected",a.proxy(function(a,b){e.add(j.valueKey?b[j.valueKey]:b),e.$input.typeahead("val","")},e))}e.$container.on("click",a.proxy(function(){e.$element.attr("disabled")||e.$input.removeAttr("disabled"),e.$input.focus()},e)),e.options.addOnBlur&&e.options.freeInput&&e.$input.on("focusout",a.proxy(function(){0===a(".typeahead, .twitter-typeahead",e.$container).length&&(e.add(e.$input.val()),e.$input.val(""))},e)),e.$container.on("keydown","input",a.proxy(function(b){var c=a(b.target),d=e.findInputWrapper();if(e.$element.attr("disabled"))return void e.$input.attr("disabled","disabled");switch(b.which){case 8:if(0===f(c[0])){var g=d.prev();g&&e.remove(g.data("item"))}break;case 46:if(0===f(c[0])){var h=d.next();h&&e.remove(h.data("item"))}break;case 37:var i=d.prev();0===c.val().length&&i[0]&&(i.before(d),c.focus());break;case 39:var j=d.next();0===c.val().length&&j[0]&&(j.after(d),c.focus())}{var k=c.val().length;Math.ceil(k/5)}c.attr("size",Math.max(this.inputSize,c.val().length))},e)),e.$container.on("keypress","input",a.proxy(function(b){var c=a(b.target);if(e.$element.attr("disabled"))return void e.$input.attr("disabled","disabled");var d=c.val(),f=e.options.maxChars&&d.length>=e.options.maxChars;e.options.freeInput&&(g(b,e.options.confirmKeys)||f)&&(e.add(f?d.substr(0,e.options.maxChars):d),c.val(""),b.preventDefault());{var h=c.val().length;Math.ceil(h/5)}c.attr("size",Math.max(this.inputSize,c.val().length))},e)),e.$container.on("click","[data-role=remove]",a.proxy(function(b){e.$element.attr("disabled")||e.remove(a(b.target).closest(".tag").data("item"))},e)),e.options.itemValue===h.itemValue&&("INPUT"===e.$element[0].tagName?e.add(e.$element.val()):a("option",e.$element).each(function(){e.add(a(this).attr("value"),!0)}))},destroy:function(){var a=this;a.$container.off("keypress","input"),a.$container.off("click","[role=remove]"),a.$container.remove(),a.$element.removeData("tagsinput"),a.$element.show()},focus:function(){this.$input.focus()},input:function(){return this.$input},findInputWrapper:function(){for(var b=this.$input[0],c=this.$container[0];b&&b.parentNode!==c;)b=b.parentNode;return a(b)}},a.fn.tagsinput=function(c,d){var e=[];return this.each(function(){var f=a(this).data("tagsinput");if(f)if(c||d){if(void 0!==f[c]){var g=f[c](d);void 0!==g&&e.push(g)}}else e.push(f);else f=new b(this,c),a(this).data("tagsinput",f),e.push(f),"SELECT"===this.tagName&&a("option",a(this)).attr("selected","selected"),a(this).val(a(this).val())}),"string"==typeof c?e.length>1?e:e[0]:e},a.fn.tagsinput.Constructor=b;var i=a("<div />");a(function(){a("input[data-role=tagsinput], select[multiple][data-role=tagsinput]").tagsinput()})}(window.jQuery);
 /*
+ * jQuery.appear
+ * https://github.com/bas2k/jquery.appear/
+ * http://code.google.com/p/jquery-appear/
+ * http://bas2k.ru/
+ *
+ * Copyright (c) 2009 Michael Hixson
+ * Copyright (c) 2012-2014 Alexander Brovikov
+ * Licensed under the MIT license (http://www.opensource.org/licenses/mit-license.php)
+ */
+(function($) {
+	$.fn.appear = function(fn, options) {
+
+		var settings = $.extend({
+
+			//arbitrary data to pass to fn
+			data: undefined,
+
+			//call fn only on the first appear?
+			one: true,
+
+			// X & Y accuracy
+			accX: 0,
+			accY: 0
+
+		}, options);
+
+		return this.each(function() {
+
+			var t = $(this);
+
+			//whether the element is currently visible
+			t.appeared = false;
+
+			if (!fn) {
+
+				//trigger the custom event
+				t.trigger('appear', settings.data);
+				return;
+			}
+
+			var w = $(window);
+
+			//fires the appear event when appropriate
+			var check = function() {
+
+				//is the element hidden?
+				if (!t.is(':visible')) {
+
+					//it became hidden
+					t.appeared = false;
+					return;
+				}
+
+				//is the element inside the visible window?
+				var a = w.scrollLeft();
+				var b = w.scrollTop();
+				var o = t.offset();
+				var x = o.left;
+				var y = o.top;
+
+				var ax = settings.accX;
+				var ay = settings.accY;
+				var th = t.height();
+				var wh = w.height();
+				var tw = t.width();
+				var ww = w.width();
+
+				if (y + th + ay >= b &&
+					y <= b + wh + ay &&
+					x + tw + ax >= a &&
+					x <= a + ww + ax) {
+
+					//trigger the custom event
+					if (!t.appeared) t.trigger('appear', settings.data);
+
+				} else {
+
+					//it scrolled out of view
+					t.appeared = false;
+				}
+			};
+
+			//create a modified fn with some additional logic
+			var modifiedFn = function() {
+
+				//mark the element as visible
+				t.appeared = true;
+
+				//is this supposed to happen only once?
+				if (settings.one) {
+
+					//remove the check
+					w.unbind('scroll', check);
+					var i = $.inArray(check, $.fn.appear.checks);
+					if (i >= 0) $.fn.appear.checks.splice(i, 1);
+				}
+
+				//trigger the original fn
+				fn.apply(this, arguments);
+			};
+
+			//bind the modified fn to the element
+			if (settings.one) t.one('appear', settings.data, modifiedFn);
+			else t.bind('appear', settings.data, modifiedFn);
+
+			//check whenever the window scrolls
+			w.scroll(check);
+
+			//check whenever the dom changes
+			$.fn.appear.checks.push(check);
+
+			//check now
+			(check)();
+		});
+	};
+
+	//keep a queue of appearance checks
+	$.extend($.fn.appear, {
+
+		checks: [],
+		timeout: null,
+
+		//process the queue
+		checkAll: function() {
+			var length = $.fn.appear.checks.length;
+			if (length > 0) while (length--) ($.fn.appear.checks[length])();
+		},
+
+		//check the queue asynchronously
+		run: function() {
+			if ($.fn.appear.timeout) clearTimeout($.fn.appear.timeout);
+			$.fn.appear.timeout = setTimeout($.fn.appear.checkAll, 20);
+		}
+	});
+
+	//run checks when these methods are called
+	$.each(['append', 'prepend', 'after', 'before', 'attr',
+		'removeAttr', 'addClass', 'removeClass', 'toggleClass',
+		'remove', 'css', 'show', 'hide'], function(i, n) {
+		var old = $.fn[n];
+		if (old) {
+			$.fn[n] = function() {
+				var r = old.apply(this, arguments);
+				$.fn.appear.run();
+				return r;
+			}
+		}
+	});
+
+})(jQuery);
+/*
  Highstock JS v4.2.2 (2016-02-04)
  
  (c) 2009-2016 Torstein Honsi
@@ -11959,157 +12110,6 @@ Object.prototype.toString.call(c)!=="[object Array]"&&d!=="renderTo"&&typeof c.n
 		c[a]>=this.xAxis.min&&f!==0){this.compareValue=f;break}}};S(ga,"getExtremes",function(a){var b;a.apply(this,[].slice.call(arguments,1));if(this.modifyValue)b=[this.modifyValue(this.dataMin),this.modifyValue(this.dataMax)],this.dataMin=Pa(b),this.dataMax=Ea(b)});F.prototype.setCompare=function(a,b){this.isXAxis||(n(this.series,function(b){b.setCompare(a)}),p(b,!0)&&this.chart.redraw())};Ha.prototype.tooltipFormatter=function(a){a=a.replace("{point.change}",(this.change>0?"+":"")+z.numberFormat(this.change,
 			p(this.series.tooltipOptions.changeDecimals,2)));return jc.apply(this,[a])};S(P.prototype,"render",function(a){if(this.chart.options._stock&&this.xAxis)!this.clipBox&&this.animate?(this.clipBox=C(this.chart.clipBox),this.clipBox.width=this.xAxis.len,this.clipBox.height=this.yAxis.len):this.chart[this.sharedClipKey]&&(Ta(this.chart[this.sharedClipKey]),this.chart[this.sharedClipKey].attr({width:this.xAxis.len,height:this.yAxis.len}));a.call(this)});w(z,{Color:va,Point:Ha,Tick:db,Renderer:$a,SVGElement:Y,
 		SVGRenderer:xa,arrayMin:Pa,arrayMax:Ea,charts:$,dateFormat:la,error:ea,format:Ka,pathAnim:void 0,getOptions:function(){return O},hasBidiBug:$b,isTouchDevice:lb,setOptions:function(a){O=C(!0,O,a);Pb();return O},addEvent:D,removeEvent:R,createElement:ca,discardElement:Xa,css:I,each:n,map:ra,merge:C,splat:ua,stableSort:pb,extendClass:ka,pInt:G,svg:ha,canvas:oa,vml:!ha&&!oa,product:"Highstock",version:"4.2.2"});return z});
-/*
- * jQuery.appear
- * https://github.com/bas2k/jquery.appear/
- * http://code.google.com/p/jquery-appear/
- * http://bas2k.ru/
- *
- * Copyright (c) 2009 Michael Hixson
- * Copyright (c) 2012-2014 Alexander Brovikov
- * Licensed under the MIT license (http://www.opensource.org/licenses/mit-license.php)
- */
-(function($) {
-	$.fn.appear = function(fn, options) {
-
-		var settings = $.extend({
-
-			//arbitrary data to pass to fn
-			data: undefined,
-
-			//call fn only on the first appear?
-			one: true,
-
-			// X & Y accuracy
-			accX: 0,
-			accY: 0
-
-		}, options);
-
-		return this.each(function() {
-
-			var t = $(this);
-
-			//whether the element is currently visible
-			t.appeared = false;
-
-			if (!fn) {
-
-				//trigger the custom event
-				t.trigger('appear', settings.data);
-				return;
-			}
-
-			var w = $(window);
-
-			//fires the appear event when appropriate
-			var check = function() {
-
-				//is the element hidden?
-				if (!t.is(':visible')) {
-
-					//it became hidden
-					t.appeared = false;
-					return;
-				}
-
-				//is the element inside the visible window?
-				var a = w.scrollLeft();
-				var b = w.scrollTop();
-				var o = t.offset();
-				var x = o.left;
-				var y = o.top;
-
-				var ax = settings.accX;
-				var ay = settings.accY;
-				var th = t.height();
-				var wh = w.height();
-				var tw = t.width();
-				var ww = w.width();
-
-				if (y + th + ay >= b &&
-					y <= b + wh + ay &&
-					x + tw + ax >= a &&
-					x <= a + ww + ax) {
-
-					//trigger the custom event
-					if (!t.appeared) t.trigger('appear', settings.data);
-
-				} else {
-
-					//it scrolled out of view
-					t.appeared = false;
-				}
-			};
-
-			//create a modified fn with some additional logic
-			var modifiedFn = function() {
-
-				//mark the element as visible
-				t.appeared = true;
-
-				//is this supposed to happen only once?
-				if (settings.one) {
-
-					//remove the check
-					w.unbind('scroll', check);
-					var i = $.inArray(check, $.fn.appear.checks);
-					if (i >= 0) $.fn.appear.checks.splice(i, 1);
-				}
-
-				//trigger the original fn
-				fn.apply(this, arguments);
-			};
-
-			//bind the modified fn to the element
-			if (settings.one) t.one('appear', settings.data, modifiedFn);
-			else t.bind('appear', settings.data, modifiedFn);
-
-			//check whenever the window scrolls
-			w.scroll(check);
-
-			//check whenever the dom changes
-			$.fn.appear.checks.push(check);
-
-			//check now
-			(check)();
-		});
-	};
-
-	//keep a queue of appearance checks
-	$.extend($.fn.appear, {
-
-		checks: [],
-		timeout: null,
-
-		//process the queue
-		checkAll: function() {
-			var length = $.fn.appear.checks.length;
-			if (length > 0) while (length--) ($.fn.appear.checks[length])();
-		},
-
-		//check the queue asynchronously
-		run: function() {
-			if ($.fn.appear.timeout) clearTimeout($.fn.appear.timeout);
-			$.fn.appear.timeout = setTimeout($.fn.appear.checkAll, 20);
-		}
-	});
-
-	//run checks when these methods are called
-	$.each(['append', 'prepend', 'after', 'before', 'attr',
-		'removeAttr', 'addClass', 'removeClass', 'toggleClass',
-		'remove', 'css', 'show', 'hide'], function(i, n) {
-		var old = $.fn[n];
-		if (old) {
-			$.fn[n] = function() {
-				var r = old.apply(this, arguments);
-				$.fn.appear.run();
-				return r;
-			}
-		}
-	});
-
-})(jQuery);
 /*!
  * Cropper v2.3.4
  * https://github.com/fengyuanchen/cropper

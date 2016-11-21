@@ -845,6 +845,27 @@ function getUnitsText(num, cases) {
 	
 	return word;
 }
+/**
+ * Возвращает текст с правильным родом
+ *
+ * @param {OneUser.GENDER} gender
+ * @param {({
+ *  MAS: {string},
+ *  FEM: {string},
+ *  NEU: {string}
+ * }|string)} cases
+ */
+function getGenderText(gender, cases) {
+	if(typeof cases === 'string'){
+		return cases;
+	}
+	switch (gender) {
+		default:
+		case OneUser.GENDER.MALE: return cases.MAS;
+		case OneUser.GENDER.FEMALE: return cases.FEM;
+		case OneUser.GENDER.NEUTRAL: return cases.NEU;
+	}
+}
 
 
 /**
