@@ -195,6 +195,6 @@
     "domain": "evendate.ru",
     "node_domain": "evendate.ru",
     "node_path": "/var/www/html/evendate_web2/node",
-    "schema": "http://"
+    "schema": "https://"
   }
 }
