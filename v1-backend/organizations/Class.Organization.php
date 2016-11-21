@@ -327,22 +327,18 @@ class Organization extends AbstractEntity
 		$result_data = parent::getParams($user, $fields)->getData();
 
 		if (isset($fields[Organization::SUBSCRIBED_FIELD_NAME])) {
-			if ($user instanceof User) {
-				$users_pagination = $fields[Organization::SUBSCRIBED_FIELD_NAME];
-				$result_data[Organization::SUBSCRIBED_FIELD_NAME] = $this->getSubscribed(
-					$this->db,
-					$user,
-					Fields::parseFields($users_pagination['fields'] ?? ''),
-					Fields::parseFilters($users_pagination['filters'] ?? ''),
-					Fields::parseOrderBy($users_pagination['order_by'] ?? ''),
-					$users_pagination['pagination'] ??
-					array(
-						'length' => $users_pagination['length'] ?? App::DEFAULT_LENGTH,
-						'offset' => $users_pagination['offset'] ?? App::DEFAULT_OFFSET
-					));
-			} else {
-				$result_data[Organization::SUBSCRIBED_FIELD_NAME] = array();
-			}
+			$users_pagination = $fields[Organization::SUBSCRIBED_FIELD_NAME];
+			$result_data[Organization::SUBSCRIBED_FIELD_NAME] = $this->getSubscribed(
+				$this->db,
+				$user,
+				Fields::parseFields($users_pagination['fields'] ?? ''),
+				Fields::parseFilters($users_pagination['filters'] ?? ''),
+				Fields::parseOrderBy($users_pagination['order_by'] ?? ''),
+				$users_pagination['pagination'] ??
+				array(
+					'length' => $users_pagination['length'] ?? App::DEFAULT_LENGTH,
+					'offset' => $users_pagination['offset'] ?? App::DEFAULT_OFFSET
+				));
 		}
 
 		if (isset($fields[Organization::STAFF_FIELD_NAME])) {
@@ -391,7 +387,7 @@ class Organization extends AbstractEntity
 		return new Result(true, '', $result_data);
 	}
 
-	private function getSubscribed(PDO $db, User $user, array $fields = null, array $filters, array $order_by = null, array $pagination = null)
+	private function getSubscribed(PDO $db, AbstractUser $user, array $fields = null, array $filters, array $order_by = null, array $pagination = null)
 	{
 		$filters['organization'] = $this;
 		return UsersCollection::filter(
