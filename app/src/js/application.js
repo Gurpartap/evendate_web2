@@ -1,5 +1,5 @@
 /**
- *
+ * @const
  * @namespace __APP
  * @property {object} SERVER
  * @property {object} SERVER.AJAX_METHOD
@@ -14,6 +14,7 @@
  * @property {Page} PREVIOUS_PAGE
  * @property {Page} CURRENT_PAGE
  * @property {jqXHR} CURRENT_JQXHR
+ * @property {object} ROUTING
  * @property {object} MODALS
  * @property {number} MODALS.last_id
  * @property {Object<number, AbstractModal>} MODALS.collection
@@ -208,6 +209,74 @@ __APP = {
 	PREVIOUS_PAGE: new Page(),
 	CURRENT_PAGE: new Page(),
 	CURRENT_JQXHR: {},
+	ROUTING: {
+		'my': {
+			'profile': MyProfilePage,
+			'': MyProfilePage
+		},
+		'event': {
+			'add_to': {
+				'^([0-9]+)': AddEventPage,
+				'': AddEventPage
+			},
+			'add': AddEventPage,
+			'^([0-9]+)': {
+				'edit': RedactEventPage,
+				'': EventPage
+			},
+			'': FeedPage
+		},
+		'feed': {
+			'actual': ActualEventsPage,
+			'timeline': TimelineEventsPage,
+			'favored': FavoredEventsPage,
+			'recommendations': RecommendedEventsPage,
+			'friends': FriendsEventsPage,
+			'day': {
+				'^([0-9]{4}-[0-9]{2}-[0-9]{2})': DayEventsPage //Very shitty way to detect date
+			},
+			'': FeedPage
+		},
+		'organizations': {
+			'^([0-9]+)': CatalogPage,
+			'': CatalogPage
+		},
+		'organization': {
+			'add': AddOrganizationPage,
+			'^([0-9]+)': {
+				'edit': EditOrganizationPage,
+				'': OrganizationPage
+			},
+			'': CatalogPage
+		},
+		'onboarding': OnboardingPage,
+		'search': {
+			'^([^/]+)': SearchPage
+		},
+		'friends': FriendsPage,
+		'friend': {
+			'^([0-9]+)': OneFriendPage,
+			'': FriendsPage
+		},
+		'user': {
+			'me': MyProfilePage,
+			'^([0-9]+)': UserPage,
+			'': FriendsPage
+		},
+		'statistics': {
+			'organization': {
+				'^([0-9]+)': {
+					'overview': StatisticsOrganizationOverviewPage,
+					'events': StatisticsOrganizationEventsPage,
+					'': StatisticsOrganizationOverviewPage
+				}
+			},
+			'event': {
+				'^([0-9]+)': StatisticsEventOverviewPage
+			},
+			'': StatisticsOverviewPage
+		}
+	},
 	MODALS: {
 		last_id: 0,
 		collection: {},
@@ -995,3 +1064,9 @@ __LOCALES = {
 		}
 	}
 };
+Object.seal(__APP);
+Object.freeze(__APP.SERVER);
+Object.freeze(__APP.ROUTING);
+Object.freeze(__APP.BUILD);
+Object.freeze(__C);
+Object.freeze(__LOCALES);

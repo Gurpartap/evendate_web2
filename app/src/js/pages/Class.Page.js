@@ -21,67 +21,6 @@ function Page() {
 	this.can_render = false;
 	this.with_header_tabs = false;
 }
-Object.defineProperty(Page, 'PAGES', {
-	value: {
-		'event': {
-			'add_to': {
-				'^([0-9]+)': AddEventPage,
-				'': AddEventPage
-			},
-			'add': AddEventPage,
-			'^([0-9]+)': {
-				'edit': RedactEventPage,
-				'': OneEventPage
-			},
-			'': FeedPage
-		},
-		'feed': {
-			'actual': ActualEventsPage,
-			'timeline': TimelineEventsPage,
-			'favored': FavoredEventsPage,
-			'recommendations': RecommendedEventsPage,
-			'friends': FriendsEventsPage,
-			'day': {
-				'^([0-9]{4}-[0-9]{2}-[0-9]{2})': DayEventsPage //Very shitty way to detect date
-			},
-			'': FeedPage
-		},
-		'organizations': {
-			'^([0-9]+)': CatalogPage,
-			'': CatalogPage
-		},
-		'organization': {
-			'add': AddOrganizationPage,
-			'^([0-9]+)': {
-				'edit': EditOrganizationPage,
-				'': OrganizationPage
-			},
-			'': CatalogPage
-		},
-		'onboarding': OnboardingPage,
-		'search': {
-			'^([^/]+)': SearchPage
-		},
-		'friends': FriendsPage,
-		'friend': {
-			'^([0-9]+)': OneFriendPage,
-			'': FriendsPage
-		},
-		'statistics': {
-			'organization': {
-				'^([0-9]+)': {
-					'overview': StatisticsOrganizationOverviewPage,
-					'events': StatisticsOrganizationEventsPage,
-					'': StatisticsOrganizationOverviewPage
-				}
-			},
-			'event': {
-				'^([0-9]+)': StatisticsEventOverviewPage
-			},
-			'': StatisticsOverviewPage
-		}
-	}
-});
 /**
  * Routing
  * @param {string} path
@@ -89,7 +28,7 @@ Object.defineProperty(Page, 'PAGES', {
  */
 Page.routeNewPage = function(path) {
 	var path_split = decodeURIComponent(path).split('/').splice(1),
-		pages_child = Page.PAGES,
+		pages_child = __APP.ROUTING,
 		args = [], i, key, PageClass;
 	
 	for (i = 0; i < path_split.length; i++) {
@@ -186,11 +125,7 @@ Page.prototype.show = function() {
 		}
 	}, 200);
 };
-/**
- * @interface
- */
+
 Page.prototype.render = function() {};
-/**
- * @interface
- */
+
 Page.prototype.destroy = function() {};

@@ -104,7 +104,7 @@ $(document)
 			}
 		});
 		
-		__APP.USER.fetchUserWithSubscriptions([], undefined, function() {
+		__APP.USER.fetchUserWithSubscriptions(['type', 'link'], undefined, function() {
 			if(this.id === -1){
 				__APP.TOP_BAR = new TopBarNoAuth();
 				__APP.SIDEBAR = new SidebarNoAuth();

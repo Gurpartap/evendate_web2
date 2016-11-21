@@ -14,8 +14,14 @@ Function.prototype.extend = function(parent) {
 		}
 	};
 };
+/**
+ * Extending class
+ * @param {Function} parent
+ * @param {Function} children
+ * @return {Function}
+ */
 function extending(parent, children){
-	children.prototype = $.extend({}, parent.prototype, children.prototype);
+	children.prototype = $.extend(Object.create(parent.prototype), children.prototype);
 	children.prototype.constructor = children;
 	Object.defineProperty(children.prototype, '__super', {
 		value: parent

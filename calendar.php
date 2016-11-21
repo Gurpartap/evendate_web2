@@ -67,7 +67,7 @@ if(App::$ENV == 'prod' || App::$ENV == 'test'){
 		<link rel="stylesheet" href="/dist/vendor.css?rev=5602b9b9f8cddbb4f8133131a270a5ae">
 		<link rel="stylesheet" href="/dist/app.css?rev=280a5df13db671ea696259b1c7aab7d3"><?php
 	} else { ?>
-		<link rel="stylesheet" href="/dist/vendor.min.css?rev=d48eec79ba0dcb66d3491c6bccde5f11">
+		<link rel="stylesheet" href="/dist/vendor.min.css?rev=881b7735eebc8e5ff60cb6f5dffc0b87">
 		<link rel="stylesheet" href="/dist/app.min.css?rev=fddb69099d84548395c5a59ac4e3cfb5"><?php
 	}	?>
 
@@ -154,14 +154,14 @@ if(App::$ENV == 'prod' || App::$ENV == 'test'){
 
 	<div class="sidebar_main_wrapper scrollbar-outer SidebarScroll">
 		<nav class="sidebar_navigation SidebarNav"><?php
+			if(!$is_user_not_auth){ ?>
+				<a href="/my/profile" class="sidebar_navigation_item SidebarNavItem link Link"><span>Мой профиль</span></a><?php
+			}
 			if($is_user_editor){ ?>
 				<a href="/statistics" class="sidebar_navigation_item SidebarNavItem link Link"><span>Статистика</span></a>
 				<a href="/event/add" class="sidebar_navigation_item SidebarNavItem link Link"><span>Создать событие</span></a><?php
 			} ?>
-			<a href="/feed" class="sidebar_navigation_item SidebarNavItem link Link"><span>События</span><span class="counter sidebar_navigation_counter -hidden SidebarNavFeedCounter"></span></a><?php
-			if(!$is_user_not_auth){ ?>
-				<a href="/friends" class="sidebar_navigation_item SidebarNavItem link Link"><span>Друзья</span><span class="counter sidebar_navigation_counter -hidden SidebarNavFriendsCounter"></span></a><?php
-			} ?>
+			<a href="/feed" class="sidebar_navigation_item SidebarNavItem link Link"><span>События</span><span class="counter sidebar_navigation_counter -hidden SidebarNavFeedCounter"></span></a>
 			<a href="/organizations" class="sidebar_navigation_item SidebarNavItem link Link"><span>Каталог организаторов</span></a>
 		</nav>
 		<hr class="sidebar_divider">
@@ -190,11 +190,11 @@ if(App::$ENV == 'prod' || App::$ENV == 'test'){
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=96b2fd0613108aa4a7a30b6bed1b6e80" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=34b5bc5126f959ae8d928ac3ba7ea09f" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=9edd7064f93f57195e6666bc01586168" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=2491a125a0a791cd1a607d62a2a9eb42" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=24315c093ecbdcb547cb7254d235baa2" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=e374a44fd2906586969cade11067ad46" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=c750fe19ba9fbe9899aa528bb5be5d59" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=60f4ee5f75873dc0d3deacfce63286d3" charset="utf-8"></script><?php
 }	?>
 
 <?php

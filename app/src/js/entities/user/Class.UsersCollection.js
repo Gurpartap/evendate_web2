@@ -15,7 +15,7 @@
  */
 function UsersCollection() {}
 UsersCollection.extend(EntitiesCollection);
-UsersCollection.prototype.collection_of = OneUser;
+Object.defineProperty(UsersCollection.prototype, 'collection_of', {value: OneUser});
 /**
  * Returns specified staff by role. Mixing additional_fields if needed.
  * @param {OneUser.ROLE} role
@@ -42,15 +42,6 @@ UsersCollection.getSpecificStaff = function(role, staff, additional_fields) {
  */
 UsersCollection.fetchUsers = function(data, success) {
 	return __APP.SERVER.getData('/api/v1/users/', data, success);
-};
-/**
- *
- * @param {UsersCollectionAJAXData} data
- * @param {AJAXCallback} [success]
- * @returns {jqXHR}
- */
-UsersCollection.fetchFriends = function(data, success) {
-	return __APP.SERVER.getData('/api/v1/users/friends/', data, success);
 };
 /**
  *
@@ -128,31 +119,6 @@ UsersCollection.prototype.fetchUsers = function(data, length, success) {
 			length: length
 		});
 	return UsersCollection.fetchUsers(ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
-/**
- *
- * @param {(Array|string)} [fields]
- * @param {(number|string)} [length]
- * @param {string} [order_by]
- * @param {AJAXCallback} [success]
- * @returns {jqXHR}
- */
-UsersCollection.prototype.fetchFriends = function(fields, length, order_by, success) {
-	var self = this,
-		ajax_data = {
-			fields: fields,
-			offset: this.length,
-			length: length
-		};
-	if (order_by) {
-		ajax_data.order_by = order_by;
-	}
-	return UsersCollection.fetchFriends(ajax_data, function(data) {
 		self.setData(data);
 		if (success && typeof success == 'function') {
 			success.call(self, data);

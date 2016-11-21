@@ -11,9 +11,37 @@ function CurrentUser() {
 		return CurrentUser.instance;
 	}
 	OneUser.apply(this, ['me']);
+	this.friends = new UsersCollection();
 	CurrentUser.instance = this;
 }
 CurrentUser.extend(OneUser);
+/**
+ *
+ * @param {AJAXData} [data]
+ * @param {AJAXCallback} [success]
+ * @return {jqXHR}
+ */
+CurrentUser.fetchFriends = function(data, success){
+	return __APP.SERVER.getData('/api/v1/users/friends', data, success);
+};
+/**
+ *
+ * @param {AJAXData} [ajax_data]
+ * @param {AJAXCallback} [success]
+ * @returns {jqXHR}
+ */
+CurrentUser.prototype.fetchFriends = function(ajax_data, success) {
+	var self = this;
+	ajax_data = $.extend(ajax_data, {
+		offset: self.friends.length
+	});
+	return CurrentUser.fetchFriends(ajax_data, function(data) {
+		self.setData({friends: data});
+		if (success && typeof success == 'function') {
+			success.call(self, data);
+		}
+	});
+};
 /**
  *
  * @returns {jqXHR}

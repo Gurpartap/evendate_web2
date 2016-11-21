@@ -9,6 +9,7 @@
  * @param {boolean} [is_loading_continuous]
  */
 function OneUser(user_id, is_loading_continuous) {
+	var self = this;
 	this.id = user_id ? user_id : 0;
 	this.first_name = '';
 	this.last_name = '';
@@ -20,6 +21,11 @@ function OneUser(user_id, is_loading_continuous) {
 	this.is_editor = false;
 	this.blurred_image_url = '';
 	this.link = '';
+	Object.defineProperty(this, 'full_name', {
+		get: function() {
+			return self.first_name + ' ' + self.last_name;
+		}
+	});
 	this.subscriptions = new OrganizationsCollection();
 	/**
 	 * @type {Array<OneUser.ACCOUNTS>}
@@ -56,7 +62,6 @@ OneUser.ROLE = {
 };
 
 Object.defineProperty(OneUser.prototype, 'subscriptions_fields', {
-	enumerable: false,
 	value: ['img_small_url', 'subscribed_count', 'new_events_count', 'actual_events_count']
 });
 /**

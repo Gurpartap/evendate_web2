@@ -7,7 +7,7 @@
  * @augments Page
  * @param {(string|number)} event_id
  */
-function OneEventPage(event_id) {
+function EventPage(event_id) {
 	Page.apply(this);
 	
 	this.fields = [
@@ -35,7 +35,7 @@ function OneEventPage(event_id) {
 	this.event = new OneEvent(event_id);
 	this.event.fetchEvent(this.fields, Page.triggerRender);
 }
-OneEventPage.extend(Page);
+EventPage.extend(Page);
 /**
  *
  * @param {Array} raw_notifications
@@ -43,7 +43,7 @@ OneEventPage.extend(Page);
  * @param {OneEvent.last_event_date} last_date
  * @return {jQuery}
  */
-OneEventPage.buildNotifications = function(raw_notifications, event_id, last_date) {
+EventPage.buildNotifications = function(raw_notifications, event_id, last_date) {
 	var m_today = moment(),
 		all_notifications = {
 			'notification-before-quarter-of-hour': {
@@ -110,7 +110,7 @@ OneEventPage.buildNotifications = function(raw_notifications, event_id, last_dat
 	return $notifications;
 };
 
-OneEventPage.prototype.init = function() {
+EventPage.prototype.init = function() {
 	var PAGE = this;
 	trimAvatarsCollection(PAGE.$wrapper);
 	bindRippleEffect(PAGE.$wrapper);
@@ -160,7 +160,7 @@ OneEventPage.prototype.init = function() {
 	});
 };
 
-OneEventPage.prototype.render = function() {
+EventPage.prototype.render = function() {
 	var PAGE = this,
 		$subscribers = __APP.BUILD.avatars(PAGE.event.favored, 6),
 		avatars_collection_classes = [],
@@ -211,7 +211,7 @@ OneEventPage.prototype.render = function() {
 		avatars_collection_classes: avatars_collection_classes.join(' '),
 		favored_users_show: favored_users_count ? '' : '-cast',
 		favored_users_count: favored_users_count,
-		notifications: OneEventPage.buildNotifications(PAGE.event.notifications, PAGE.event.id, PAGE.event.last_event_date),
+		notifications: EventPage.buildNotifications(PAGE.event.notifications, PAGE.event.id, PAGE.event.last_event_date),
 		location_sanitized: encodeURI(PAGE.event.location),
 		event_edit_functions: PAGE.event.can_edit ? tmpl('event-edit-functions', PAGE.event) : '',
 		event_registration_information: PAGE.event.registration_required ? tmpl('event-registration-info', {registration_till: moment.unix(PAGE.event.registration_till).format('D MMMM')}) : '',

@@ -14,8 +14,14 @@ Function.prototype.extend = function(parent) {
 		}
 	};
 };
+/**
+ * Extending class
+ * @param {Function} parent
+ * @param {Function} children
+ * @return {Function}
+ */
 function extending(parent, children){
-	children.prototype = $.extend({}, parent.prototype, children.prototype);
+	children.prototype = $.extend(Object.create(parent.prototype), children.prototype);
 	children.prototype.constructor = children;
 	Object.defineProperty(children.prototype, '__super', {
 		value: parent
@@ -3501,10 +3507,100 @@ OrganizationsStatistics.fetchStatistics = function(id, scale, range, statistics_
  *
  * @constructor
  * @augments OneEntity
+ * @param {(string|number)} [tag_id]
+ * @param {boolean} [is_loading_continuous]
+ */
+function OneTag(tag_id, is_loading_continuous) {
+	this.id = tag_id ? tag_id : 0;
+	this.name = '';
+	
+	if (tag_id && is_loading_continuous) {
+		this.loading = true;
+		this.fetchTag(function() {
+			this.loading = false;
+			$(window).trigger('fetch.OneTag');
+		});
+	}
+}
+OneTag.extend(OneEntity);
+/**
+ *
+ * @param {(string|number)} tag_id
+ * @param {AJAXCallback} [success]
+ * @returns {jqXHR}
+ */
+OneTag.fetchTag = function(tag_id, success) {
+	return __APP.SERVER.getData('/api/v1/tags/' + tag_id, {}, success);
+};
+/**
+ *
+ * @param {AJAXCallback} [success]
+ * @returns {jqXHR}
+ */
+OneTag.prototype.fetchTag = function(success) {
+	var self = this;
+	return this.constructor.fetchTag(self.id, function(data) {
+		self.setData(data[0]);
+		if (success && typeof success == 'function') {
+			success.call(self, data[0]);
+		}
+	});
+};
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.OneTag.js
+ */
+/**
+ * @typedef {AJAXData} TagsCollectionAJAXData
+ * @property {string} name
+ * @property {(string|number)} event_id
+ * @property {string} used_since
+ * @property {string} used_till
+ */
+/**
+ *
+ * @constructor
+ * @augments EntitiesCollection
+ */
+function TagsCollection() {}
+TagsCollection.extend(EntitiesCollection);
+TagsCollection.prototype.collection_of = OneTag;
+/**
+ *
+ * @param {AJAXData} data
+ * @param {AJAXCallback} [success]
+ * @returns {jqXHR}
+ */
+TagsCollection.fetchTags = function(data, success) {
+	return __APP.SERVER.getData('/api/v1/tags/', data, success);
+};
+/**
+ *
+ * @param {TagsCollectionAJAXData} data
+ * @param {AJAXCallback} [success]
+ * @returns {jqXHR}
+ */
+TagsCollection.prototype.fetchTags = function(data, success) {
+	var self = this;
+	return this.constructor.fetchTags(data, function(data) {
+		self.setData(data);
+		if (success && typeof success == 'function') {
+			success.call(self, data);
+		}
+	});
+};
+/**
+ * @requires ../Class.OneEntity.js
+ */
+/**
+ *
+ * @constructor
+ * @augments OneEntity
  * @param {(string|number)} [user_id]
  * @param {boolean} [is_loading_continuous]
  */
 function OneUser(user_id, is_loading_continuous) {
+	var self = this;
 	this.id = user_id ? user_id : 0;
 	this.first_name = '';
 	this.last_name = '';
@@ -3516,6 +3612,11 @@ function OneUser(user_id, is_loading_continuous) {
 	this.is_editor = false;
 	this.blurred_image_url = '';
 	this.link = '';
+	Object.defineProperty(this, 'full_name', {
+		get: function() {
+			return self.first_name + ' ' + self.last_name;
+		}
+	});
 	this.subscriptions = new OrganizationsCollection();
 	/**
 	 * @type {Array<OneUser.ACCOUNTS>}
@@ -3552,7 +3653,6 @@ OneUser.ROLE = {
 };
 
 Object.defineProperty(OneUser.prototype, 'subscriptions_fields', {
-	enumerable: false,
 	value: ['img_small_url', 'subscribed_count', 'new_events_count', 'actual_events_count']
 });
 /**
@@ -3634,9 +3734,37 @@ function CurrentUser() {
 		return CurrentUser.instance;
 	}
 	OneUser.apply(this, ['me']);
+	this.friends = new UsersCollection();
 	CurrentUser.instance = this;
 }
 CurrentUser.extend(OneUser);
+/**
+ *
+ * @param {AJAXData} [data]
+ * @param {AJAXCallback} [success]
+ * @return {jqXHR}
+ */
+CurrentUser.fetchFriends = function(data, success){
+	return __APP.SERVER.getData('/api/v1/users/friends', data, success);
+};
+/**
+ *
+ * @param {AJAXData} [ajax_data]
+ * @param {AJAXCallback} [success]
+ * @returns {jqXHR}
+ */
+CurrentUser.prototype.fetchFriends = function(ajax_data, success) {
+	var self = this;
+	ajax_data = $.extend(ajax_data, {
+		offset: self.friends.length
+	});
+	return CurrentUser.fetchFriends(ajax_data, function(data) {
+		self.setData({friends: data});
+		if (success && typeof success == 'function') {
+			success.call(self, data);
+		}
+	});
+};
 /**
  *
  * @returns {jqXHR}
@@ -3731,7 +3859,7 @@ CurrentUser.prototype.fetchUserWithSubscriptions = function(fields, subscription
  */
 function UsersCollection() {}
 UsersCollection.extend(EntitiesCollection);
-UsersCollection.prototype.collection_of = OneUser;
+Object.defineProperty(UsersCollection.prototype, 'collection_of', {value: OneUser});
 /**
  * Returns specified staff by role. Mixing additional_fields if needed.
  * @param {OneUser.ROLE} role
@@ -3758,15 +3886,6 @@ UsersCollection.getSpecificStaff = function(role, staff, additional_fields) {
  */
 UsersCollection.fetchUsers = function(data, success) {
 	return __APP.SERVER.getData('/api/v1/users/', data, success);
-};
-/**
- *
- * @param {UsersCollectionAJAXData} data
- * @param {AJAXCallback} [success]
- * @returns {jqXHR}
- */
-UsersCollection.fetchFriends = function(data, success) {
-	return __APP.SERVER.getData('/api/v1/users/friends/', data, success);
 };
 /**
  *
@@ -3852,31 +3971,6 @@ UsersCollection.prototype.fetchUsers = function(data, length, success) {
 };
 /**
  *
- * @param {(Array|string)} [fields]
- * @param {(number|string)} [length]
- * @param {string} [order_by]
- * @param {AJAXCallback} [success]
- * @returns {jqXHR}
- */
-UsersCollection.prototype.fetchFriends = function(fields, length, order_by, success) {
-	var self = this,
-		ajax_data = {
-			fields: fields,
-			offset: this.length,
-			length: length
-		};
-	if (order_by) {
-		ajax_data.order_by = order_by;
-	}
-	return UsersCollection.fetchFriends(ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
-/**
- *
  * @param {(string|number)} event_id
  * @param {(number|string)} length
  * @param {UsersCollectionAJAXData} [data]
@@ -3932,95 +4026,6 @@ UsersCollection.prototype.fetchOrganizationStaff = function(org_id, length, data
 			length: length
 		});
 	return UsersCollection.fetchOrganizationStaff(org_id, ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
-/**
- * @requires ../Class.OneEntity.js
- */
-/**
- *
- * @constructor
- * @augments OneEntity
- * @param {(string|number)} [tag_id]
- * @param {boolean} [is_loading_continuous]
- */
-function OneTag(tag_id, is_loading_continuous) {
-	this.id = tag_id ? tag_id : 0;
-	this.name = '';
-	
-	if (tag_id && is_loading_continuous) {
-		this.loading = true;
-		this.fetchTag(function() {
-			this.loading = false;
-			$(window).trigger('fetch.OneTag');
-		});
-	}
-}
-OneTag.extend(OneEntity);
-/**
- *
- * @param {(string|number)} tag_id
- * @param {AJAXCallback} [success]
- * @returns {jqXHR}
- */
-OneTag.fetchTag = function(tag_id, success) {
-	return __APP.SERVER.getData('/api/v1/tags/' + tag_id, {}, success);
-};
-/**
- *
- * @param {AJAXCallback} [success]
- * @returns {jqXHR}
- */
-OneTag.prototype.fetchTag = function(success) {
-	var self = this;
-	return this.constructor.fetchTag(self.id, function(data) {
-		self.setData(data[0]);
-		if (success && typeof success == 'function') {
-			success.call(self, data[0]);
-		}
-	});
-};
-/**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneTag.js
- */
-/**
- * @typedef {AJAXData} TagsCollectionAJAXData
- * @property {string} name
- * @property {(string|number)} event_id
- * @property {string} used_since
- * @property {string} used_till
- */
-/**
- *
- * @constructor
- * @augments EntitiesCollection
- */
-function TagsCollection() {}
-TagsCollection.extend(EntitiesCollection);
-TagsCollection.prototype.collection_of = OneTag;
-/**
- *
- * @param {AJAXData} data
- * @param {AJAXCallback} [success]
- * @returns {jqXHR}
- */
-TagsCollection.fetchTags = function(data, success) {
-	return __APP.SERVER.getData('/api/v1/tags/', data, success);
-};
-/**
- *
- * @param {TagsCollectionAJAXData} data
- * @param {AJAXCallback} [success]
- * @returns {jqXHR}
- */
-TagsCollection.prototype.fetchTags = function(data, success) {
-	var self = this;
-	return this.constructor.fetchTags(data, function(data) {
 		self.setData(data);
 		if (success && typeof success == 'function') {
 			success.call(self, data);
@@ -5770,67 +5775,6 @@ function Page() {
 	this.can_render = false;
 	this.with_header_tabs = false;
 }
-Object.defineProperty(Page, 'PAGES', {
-	value: {
-		'event': {
-			'add_to': {
-				'^([0-9]+)': AddEventPage,
-				'': AddEventPage
-			},
-			'add': AddEventPage,
-			'^([0-9]+)': {
-				'edit': RedactEventPage,
-				'': OneEventPage
-			},
-			'': FeedPage
-		},
-		'feed': {
-			'actual': ActualEventsPage,
-			'timeline': TimelineEventsPage,
-			'favored': FavoredEventsPage,
-			'recommendations': RecommendedEventsPage,
-			'friends': FriendsEventsPage,
-			'day': {
-				'^([0-9]{4}-[0-9]{2}-[0-9]{2})': DayEventsPage //Very shitty way to detect date
-			},
-			'': FeedPage
-		},
-		'organizations': {
-			'^([0-9]+)': CatalogPage,
-			'': CatalogPage
-		},
-		'organization': {
-			'add': AddOrganizationPage,
-			'^([0-9]+)': {
-				'edit': EditOrganizationPage,
-				'': OrganizationPage
-			},
-			'': CatalogPage
-		},
-		'onboarding': OnboardingPage,
-		'search': {
-			'^([^/]+)': SearchPage
-		},
-		'friends': FriendsPage,
-		'friend': {
-			'^([0-9]+)': OneFriendPage,
-			'': FriendsPage
-		},
-		'statistics': {
-			'organization': {
-				'^([0-9]+)': {
-					'overview': StatisticsOrganizationOverviewPage,
-					'events': StatisticsOrganizationEventsPage,
-					'': StatisticsOrganizationOverviewPage
-				}
-			},
-			'event': {
-				'^([0-9]+)': StatisticsEventOverviewPage
-			},
-			'': StatisticsOverviewPage
-		}
-	}
-});
 /**
  * Routing
  * @param {string} path
@@ -5838,7 +5782,7 @@ Object.defineProperty(Page, 'PAGES', {
  */
 Page.routeNewPage = function(path) {
 	var path_split = decodeURIComponent(path).split('/').splice(1),
-		pages_child = Page.PAGES,
+		pages_child = __APP.ROUTING,
 		args = [], i, key, PageClass;
 	
 	for (i = 0; i < path_split.length; i++) {
@@ -5935,13 +5879,9 @@ Page.prototype.show = function() {
 		}
 	}, 200);
 };
-/**
- * @interface
- */
+
 Page.prototype.render = function() {};
-/**
- * @interface
- */
+
 Page.prototype.destroy = function() {};
 /**
  * @requires ../../Class.Page.js
@@ -7201,82 +7141,6 @@ StatisticsOrganizationSupportPage.prototype.render = function() {};
  *
  * @constructor
  * @augments Page
- */
-function OnboardingPage() {
-	Page.apply(this, arguments);
-	this.ajax_data = {
-		length: 30,
-		offset: 0,
-		fields: 'img_small_url'
-	};
-	this.disable_upload = false;
-	this.block_scroll = true;
-}
-OnboardingPage.extend(Page);
-
-OnboardingPage.prototype.init = function() {
-	bindRippleEffect(this.$wrapper);
-	bindPageLinks(this.$wrapper);
-	this.$wrapper.find('.Link').on('click', function() {
-		if($(this).is('.SkipOnboarding')){
-			cookies.setItem('skip_onboarding', 1, moment().add(7, 'd')._d);
-		}
-		__APP.SIDEBAR.updateSubscriptions();
-	});
-};
-
-OnboardingPage.prototype.bindSubscriptions = function() {
-	this.$wrapper.find(".OnboardingOrgItem").not('.-Handled_OnboardingOrgItem').on('click', function() {
-		var $this = $(this);
-		if ($this.hasClass(__C.CLASSES.NEW_ACTIVE)) {
-			__APP.USER.unsubscribeFromOrganization($this.data("organization_id"));
-		} else {
-			__APP.USER.subscribeToOrganization($this.data("organization_id"));
-		}
-		$this.toggleClass(__C.CLASSES.NEW_ACTIVE);
-	}).addClass('-Handled_OnboardingOrgItem');
-};
-
-OnboardingPage.prototype.render = function() {
-	var PAGE = this,
-		$loader = tmpl('loader', {});
-	
-	if(__APP.USER.id === -1){
-		__APP.changeState('/feed/actual', true, true);
-		return null;
-	}
-	function appendRecommendations(organizations) {
-		$loader.detach();
-		if (organizations.length) {
-			PAGE.$wrapper.find(".RecommendationsWrapper").last().append(tmpl("onboarding-recommendation", organizations));
-			PAGE.bindSubscriptions();
-			PAGE.block_scroll = false;
-		} else {
-			PAGE.disable_upload = true;
-		}
-	}
-	
-	PAGE.$wrapper.html(tmpl("onboarding-main", {}));
-	PAGE.init();
-	PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
-	OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
-	PAGE.$wrapper.find(".RecommendationsScrollbar").scrollbar({
-		onScroll: function(y, x) {
-			if (y.scroll == y.maxScroll && !PAGE.disable_upload && !PAGE.block_scroll) {
-				PAGE.block_scroll = true;
-				PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
-				OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
-			}
-		}
-	});
-};
-/**
- * @requires ../Class.Page.js
- */
-/**
- *
- * @constructor
- * @augments Page
  * @param {(string|number)} [event_id]
  */
 function RedactEventPage(event_id) {
@@ -8122,7 +7986,7 @@ AddEventPage.extend(RedactEventPage);
  * @augments Page
  * @param {(string|number)} event_id
  */
-function OneEventPage(event_id) {
+function EventPage(event_id) {
 	Page.apply(this);
 	
 	this.fields = [
@@ -8150,7 +8014,7 @@ function OneEventPage(event_id) {
 	this.event = new OneEvent(event_id);
 	this.event.fetchEvent(this.fields, Page.triggerRender);
 }
-OneEventPage.extend(Page);
+EventPage.extend(Page);
 /**
  *
  * @param {Array} raw_notifications
@@ -8158,7 +8022,7 @@ OneEventPage.extend(Page);
  * @param {OneEvent.last_event_date} last_date
  * @return {jQuery}
  */
-OneEventPage.buildNotifications = function(raw_notifications, event_id, last_date) {
+EventPage.buildNotifications = function(raw_notifications, event_id, last_date) {
 	var m_today = moment(),
 		all_notifications = {
 			'notification-before-quarter-of-hour': {
@@ -8225,7 +8089,7 @@ OneEventPage.buildNotifications = function(raw_notifications, event_id, last_dat
 	return $notifications;
 };
 
-OneEventPage.prototype.init = function() {
+EventPage.prototype.init = function() {
 	var PAGE = this;
 	trimAvatarsCollection(PAGE.$wrapper);
 	bindRippleEffect(PAGE.$wrapper);
@@ -8275,7 +8139,7 @@ OneEventPage.prototype.init = function() {
 	});
 };
 
-OneEventPage.prototype.render = function() {
+EventPage.prototype.render = function() {
 	var PAGE = this,
 		$subscribers = __APP.BUILD.avatars(PAGE.event.favored, 6),
 		avatars_collection_classes = [],
@@ -8326,7 +8190,7 @@ OneEventPage.prototype.render = function() {
 		avatars_collection_classes: avatars_collection_classes.join(' '),
 		favored_users_show: favored_users_count ? '' : '-cast',
 		favored_users_count: favored_users_count,
-		notifications: OneEventPage.buildNotifications(PAGE.event.notifications, PAGE.event.id, PAGE.event.last_event_date),
+		notifications: EventPage.buildNotifications(PAGE.event.notifications, PAGE.event.id, PAGE.event.last_event_date),
 		location_sanitized: encodeURI(PAGE.event.location),
 		event_edit_functions: PAGE.event.can_edit ? tmpl('event-edit-functions', PAGE.event) : '',
 		event_registration_information: PAGE.event.registration_required ? tmpl('event-registration-info', {registration_till: moment.unix(PAGE.event.registration_till).format('D MMMM')}) : '',
@@ -8577,6 +8441,82 @@ OneFriendPage.prototype.render = function() {
 				});
 			}
 			getFriendFeed();
+		}
+	});
+};
+/**
+ * @requires ../Class.Page.js
+ */
+/**
+ *
+ * @constructor
+ * @augments Page
+ */
+function OnboardingPage() {
+	Page.apply(this, arguments);
+	this.ajax_data = {
+		length: 30,
+		offset: 0,
+		fields: 'img_small_url'
+	};
+	this.disable_upload = false;
+	this.block_scroll = true;
+}
+OnboardingPage.extend(Page);
+
+OnboardingPage.prototype.init = function() {
+	bindRippleEffect(this.$wrapper);
+	bindPageLinks(this.$wrapper);
+	this.$wrapper.find('.Link').on('click', function() {
+		if($(this).is('.SkipOnboarding')){
+			cookies.setItem('skip_onboarding', 1, moment().add(7, 'd')._d);
+		}
+		__APP.SIDEBAR.updateSubscriptions();
+	});
+};
+
+OnboardingPage.prototype.bindSubscriptions = function() {
+	this.$wrapper.find(".OnboardingOrgItem").not('.-Handled_OnboardingOrgItem').on('click', function() {
+		var $this = $(this);
+		if ($this.hasClass(__C.CLASSES.NEW_ACTIVE)) {
+			__APP.USER.unsubscribeFromOrganization($this.data("organization_id"));
+		} else {
+			__APP.USER.subscribeToOrganization($this.data("organization_id"));
+		}
+		$this.toggleClass(__C.CLASSES.NEW_ACTIVE);
+	}).addClass('-Handled_OnboardingOrgItem');
+};
+
+OnboardingPage.prototype.render = function() {
+	var PAGE = this,
+		$loader = tmpl('loader', {});
+	
+	if(__APP.USER.id === -1){
+		__APP.changeState('/feed/actual', true, true);
+		return null;
+	}
+	function appendRecommendations(organizations) {
+		$loader.detach();
+		if (organizations.length) {
+			PAGE.$wrapper.find(".RecommendationsWrapper").last().append(tmpl("onboarding-recommendation", organizations));
+			PAGE.bindSubscriptions();
+			PAGE.block_scroll = false;
+		} else {
+			PAGE.disable_upload = true;
+		}
+	}
+	
+	PAGE.$wrapper.html(tmpl("onboarding-main", {}));
+	PAGE.init();
+	PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
+	OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
+	PAGE.$wrapper.find(".RecommendationsScrollbar").scrollbar({
+		onScroll: function(y, x) {
+			if (y.scroll == y.maxScroll && !PAGE.disable_upload && !PAGE.block_scroll) {
+				PAGE.block_scroll = true;
+				PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
+				OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
+			}
 		}
 	});
 };
@@ -9543,7 +9483,75 @@ StatisticsOverviewPage.prototype.destroy = function() {
 	$(window).off('scroll.uploadOrganizations');
 };
 /**
- *
+ * @requires ../Class.Page.js
+ */
+/**
+ * @class UserPage
+ * @extends Page
+ */
+UserPage = extending(Page, (function() {
+	/**
+	 *
+	 * @param {(number|string)} user_id
+	 * @constructs UserPage
+	 */
+	function UserPage(user_id) {
+		Page.apply(this);
+		this.user_id = user_id;
+		this.user = new OneUser(user_id);
+		
+		if(this.user_id != __APP.USER.id){
+			this.is_loading = true;
+			this.user.fetchUserWithSubscriptions(['type', 'is_friend', 'link'], undefined, Page.triggerRender)
+		} else {
+			Page.triggerRender();
+		}
+	}
+	
+	UserPage.prototype.render = function() {
+		if(this.user_id == __APP.USER.id){
+			__APP.changeState('/my/profile', true, true);
+			return null;
+		}
+		__APP.changeTitle(this.user.full_name)
+	};
+	
+	return UserPage;
+}()));
+/**
+ * @requires Class.UserPage.js
+ */
+/**
+ * @class MyProfilePage
+ * @extends UserPage
+ */
+MyProfilePage = extending(UserPage, (function() {
+	/**
+	 *
+	 * @constructs MyProfilePage
+	 */
+	function MyProfilePage() {
+		UserPage.call(this, 'me');
+		this.page_title = 'Мой профиль';
+		this.user = __APP.USER;
+		
+		if(this.user.friends.length > 0){
+			Page.triggerRender();
+		} else {
+			this.user.fetchFriends({length: 4}, Page.triggerRender);
+		}
+	}
+	
+	MyProfilePage.prototype.render = function() {
+		var self = this;
+		
+		
+	};
+	
+	return MyProfilePage;
+}()));
+/**
+ * @const
  * @namespace __APP
  * @property {object} SERVER
  * @property {object} SERVER.AJAX_METHOD
@@ -9558,6 +9566,7 @@ StatisticsOverviewPage.prototype.destroy = function() {
  * @property {Page} PREVIOUS_PAGE
  * @property {Page} CURRENT_PAGE
  * @property {jqXHR} CURRENT_JQXHR
+ * @property {object} ROUTING
  * @property {object} MODALS
  * @property {number} MODALS.last_id
  * @property {Object<number, AbstractModal>} MODALS.collection
@@ -9752,6 +9761,74 @@ __APP = {
 	PREVIOUS_PAGE: new Page(),
 	CURRENT_PAGE: new Page(),
 	CURRENT_JQXHR: {},
+	ROUTING: {
+		'my': {
+			'profile': MyProfilePage,
+			'': MyProfilePage
+		},
+		'event': {
+			'add_to': {
+				'^([0-9]+)': AddEventPage,
+				'': AddEventPage
+			},
+			'add': AddEventPage,
+			'^([0-9]+)': {
+				'edit': RedactEventPage,
+				'': EventPage
+			},
+			'': FeedPage
+		},
+		'feed': {
+			'actual': ActualEventsPage,
+			'timeline': TimelineEventsPage,
+			'favored': FavoredEventsPage,
+			'recommendations': RecommendedEventsPage,
+			'friends': FriendsEventsPage,
+			'day': {
+				'^([0-9]{4}-[0-9]{2}-[0-9]{2})': DayEventsPage //Very shitty way to detect date
+			},
+			'': FeedPage
+		},
+		'organizations': {
+			'^([0-9]+)': CatalogPage,
+			'': CatalogPage
+		},
+		'organization': {
+			'add': AddOrganizationPage,
+			'^([0-9]+)': {
+				'edit': EditOrganizationPage,
+				'': OrganizationPage
+			},
+			'': CatalogPage
+		},
+		'onboarding': OnboardingPage,
+		'search': {
+			'^([^/]+)': SearchPage
+		},
+		'friends': FriendsPage,
+		'friend': {
+			'^([0-9]+)': OneFriendPage,
+			'': FriendsPage
+		},
+		'user': {
+			'me': MyProfilePage,
+			'^([0-9]+)': UserPage,
+			'': FriendsPage
+		},
+		'statistics': {
+			'organization': {
+				'^([0-9]+)': {
+					'overview': StatisticsOrganizationOverviewPage,
+					'events': StatisticsOrganizationEventsPage,
+					'': StatisticsOrganizationOverviewPage
+				}
+			},
+			'event': {
+				'^([0-9]+)': StatisticsEventOverviewPage
+			},
+			'': StatisticsOverviewPage
+		}
+	},
 	MODALS: {
 		last_id: 0,
 		collection: {},
@@ -10539,6 +10616,12 @@ __LOCALES = {
 		}
 	}
 };
+Object.seal(__APP);
+Object.freeze(__APP.SERVER);
+Object.freeze(__APP.ROUTING);
+Object.freeze(__APP.BUILD);
+Object.freeze(__C);
+Object.freeze(__LOCALES);
 window.paceOptions = {
 	ajax: false, // disabled
 	document: false, // disabled
@@ -10645,7 +10728,7 @@ $(document)
 			}
 		});
 		
-		__APP.USER.fetchUserWithSubscriptions([], undefined, function() {
+		__APP.USER.fetchUserWithSubscriptions(['type', 'link'], undefined, function() {
 			if(this.id === -1){
 				__APP.TOP_BAR = new TopBarNoAuth();
 				__APP.SIDEBAR = new SidebarNoAuth();
