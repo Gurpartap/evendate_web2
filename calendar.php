@@ -108,6 +108,7 @@ $url_parts = explode('/', $url);
 			}
 		}
 		if (isset($data)) {
+			$current_url = App::getVar('schema') . "$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 			echo "
 			<meta name=\"twitter:card\" content=\"summary\" />
 			<meta name=\"twitter:description\" content=\"{$data['description']}\">
@@ -118,6 +119,7 @@ $url_parts = explode('/', $url);
     	<meta name=\"twitter:app:name:googleplay\" content=\"Evendate\">
     	<meta name=\"twitter:app:id:googleplay\" content=\"ru.evendate.android\">
 
+    	<meta property=\"og:url\" content=\"{$current_url}\">
     	<meta property=\"og:title\" content=\"{$data['title']}\">
     	<meta property=\"og:description\" content=\"{$data['description']}\">
     	<meta property=\"og:image\" content=\"{$data['image']}\"/>";
