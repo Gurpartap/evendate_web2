@@ -21,9 +21,16 @@ OneFriendPage.prototype.render = function() {
 		$content = $view.find('.one-friend-main-content'),
 		page_number = 0;
 	
-	getFriendsList($view.find('.friends-right-bar'), function() {
-		$('.friend-item.friend-' + friend_id).addClass(__C.CLASSES.ACTIVE).siblings().removeClass(__C.CLASSES.ACTIVE);
-	});
+	
+	if(__APP.USER.id === -1){
+		$view.find('.friends-right-bar').remove();
+		$view.find('.back-to-friends-list').remove();
+	} else {
+		getFriendsList($view.find('.friends-right-bar'), function() {
+			$('.friend-item.friend-' + friend_id).addClass(__C.CLASSES.ACTIVE).siblings().removeClass(__C.CLASSES.ACTIVE);
+		});
+	}
+	
 	$view.find('.friends-main-content').addClass(__C.CLASSES.HIDDEN);
 	$content.removeClass(__C.CLASSES.HIDDEN).empty();
 	
@@ -117,9 +124,13 @@ OneFriendPage.prototype.render = function() {
 					.addClass(__C.CLASSES.HIDDEN);
 			});
 			
-			$view.find('.back-to-friends-list').on('click', function() {
-				__APP.changeState('/friends');
-			});
+			if(__APP.USER.id === -1){
+				$view.find('.back-to-friends-list').remove();
+			} else {
+				$view.find('.back-to-friends-list').on('click', function() {
+					__APP.changeState('/friends');
+				});
+			}
 			getFriendFeed();
 		}
 	});

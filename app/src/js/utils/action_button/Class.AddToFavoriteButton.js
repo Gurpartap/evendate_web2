@@ -6,10 +6,9 @@
  * @constructor
  * @augments ActionButton
  * @param {(number|string)} id
- * @param {boolean} is_subscribed
  * @param {object} options
  */
-function AddToFavoriteButton(id, is_subscribed, options) {
+function AddToFavoriteButton(id, options) {
 	this.classes = {
 		subscribed_state: '-Favored'
 	};
@@ -30,23 +29,19 @@ function AddToFavoriteButton(id, is_subscribed, options) {
 			subscribed: 'fa-star'
 		}
 	};
-	ActionButton.apply(this, [id, is_subscribed, options]);
+	ActionButton.apply(this, [id, options]);
 }
 AddToFavoriteButton.extend(ActionButton);
-AddToFavoriteButton.prototype.bindClick = function() {
+AddToFavoriteButton.prototype.onClick = function() {
 	var self = this;
-	this.on('click.subscribe', function() {
-		if (self.is_subscribed) {
-			OneEvent.deleteFavored(self.id, function() {
-				self.afterUnsubscribe();
-			});
-		} else {
-			OneEvent.addFavored(self.id, function() {
-				self.afterSubscribe();
-			});
-		}
-		if (window.askToSubscribe instanceof Function) {
-			window.askToSubscribe();
-		}
-	});
+	
+	if (self.is_subscribed) {
+		OneEvent.deleteFavored(self.id, function() {
+			self.afterUnsubscribe();
+		});
+	} else {
+		OneEvent.addFavored(self.id, function() {
+			self.afterSubscribe();
+		});
+	}
 };

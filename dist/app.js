@@ -14,6 +14,14 @@ Function.prototype.extend = function(parent) {
 		}
 	};
 };
+function extending(parent, children){
+	children.prototype = $.extend({}, parent.prototype, children.prototype);
+	children.prototype.constructor = children;
+	Object.defineProperty(children.prototype, '__super', {
+		value: parent
+	});
+	return children;
+}
 /**
  * Returns capitalized string
  * @return {string}
@@ -614,6 +622,94 @@ jQuery.makeSet = function(array) {
 	
 }(jQuery, window, document));
 
+/**===========================================================
+ * A complete cookies reader/writer framework with full unicode support.
+ *
+ * Revision #1 - September 4, 2014
+ *
+ * https://developer.mozilla.org/en-US/docs/Web/API/document.cookie
+ * https://developer.mozilla.org/User:fusionchess
+ * https://github.com/madmurphy/cookies.js
+ *
+ * This framework is released under the GNU Public License, version 3 or later.
+ * http://www.gnu.org/licenses/gpl-3.0-standalone.html
+ */
+(function(window){
+	window.cookies = {
+		/**
+		 *
+		 * @param {string} name
+		 * @return {(string|null)}
+		 */
+		getItem: function (name) {
+			if (!name) { return null; }
+			return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(name).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
+		},
+		/**
+		 *
+		 * @param {string} name
+		 * @param {*} value
+		 * @param {(string|number|Date)} [end] - max-age in seconds, Infinity, or the expires date in GMTString format or as Date object
+		 * @param {string} [path]
+		 * @param {string} [domain]
+		 * @param {boolean} [is_secure]
+		 * @return {boolean}
+		 */
+		setItem: function (name, value, end, path, domain, is_secure) {
+			var expires = "";
+			if (!name || /^(?:expires|max\-age|path|domain|secure)$/i.test(name)) { return false; }
+			if (end) {
+				switch (end.constructor) {
+					case Number:
+						expires = end === Infinity ? "; expires=Fri, 31 Dec 9999 23:59:59 GMT" : "; max-age=" + end;
+						break;
+					case String:
+						expires = "; expires=" + end;
+						break;
+					case Date:
+						expires = "; expires=" + end.toUTCString();
+						break;
+				}
+			}
+			document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + (domain ? "; domain=" + domain : "") + (path ? "; path=" + path : "") + (is_secure ? "; secure" : "");
+			return true;
+		},
+		/**
+		 *
+		 * @param {string} name
+		 * @param {string} [path]
+		 * @param {string} [domain]
+		 * @return {boolean}
+		 */
+		removeItem: function (name, path, domain) {
+			if (!this.hasItem(name)) { return false; }
+			document.cookie = encodeURIComponent(name) + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT" + (domain ? "; domain=" + domain : "") + (path ? "; path=" + path : "");
+			return true;
+		},
+		/**
+		 *
+		 * @param {string} name
+		 * @return {boolean}
+		 */
+		hasItem: function (name) {
+			if (!name) { return false; }
+			return (new RegExp("(?:^|;\\s*)" + encodeURIComponent(name).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=")).test(document.cookie);
+		},
+		/**
+		 *
+		 * @return {Array}
+		 */
+		keys: function () {
+			var keys = document.cookie.replace(/((?:^|\s*;)[^\=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, "").split(/\s*(?:\=[^;]*)?;\s*/),
+				length = keys.length;
+			for (var i = 0; i < length; i++) {
+				keys[i] = decodeURIComponent(keys[i]);
+			}
+			return keys;
+		}
+	};
+}(window));
+
 
 /**===========================================================
  * Templates for jQuery
@@ -995,6 +1091,26 @@ function displayTimeRange(start_time, end_time) {
 		return trimSeconds(start_time);
 	}
 }
+/**
+ *
+ * @param {(string|number)} number
+ * @param {string} [separator=' ']
+ * @param {string} [decimal_separator='.']
+ * @return {string}
+ */
+function formatCurrency(number, separator, decimal_separator) {
+	number = +number || 0;
+	separator = separator || ' ';
+	decimal_separator = decimal_separator || '.';
+	var numbers_decimals = (''+number).split('.')[1],
+		negative = number < 0 ? '-' : '',
+		integer_part = parseInt(Math.abs(number), 10) + '',
+		cast_pos = integer_part.length > 3 ? integer_part.length % 3 : 0;
+	return negative
+		+ (cast_pos ? integer_part.substr(0, cast_pos) + separator : '')
+		+ integer_part.substr(cast_pos).replace(/(\d{3})(?=\d)/g, '$1' + separator)
+		+ (numbers_decimals ? decimal_separator + numbers_decimals : '');
+}
 
 
 function bindLimitInputSize($parent) {
@@ -1232,41 +1348,6 @@ function bindDropdown($parent) {
 	}).addClass('-Handled_DropdownButton')
 }
 
-function bindAddAvatar($parent) {
-	$parent = $parent ? $parent : $('body');
-	$parent.find('.AddAvatar').not('.-Handled_AddAvatar').on('click', function() {
-		var $wrapper = $(this).closest('.AddAvatarWrapper'),
-			$collection = $wrapper.find('.AvatarsCollection'),
-			$favored_count = $wrapper.find('.FavoredCount'),
-			$avatars = $collection.find('.avatar'),
-			amount = $avatars.length;
-		
-		if ($collection.data('max_amount') >= amount) {
-			if ($collection.hasClass('-subscribed')) {
-				$collection.removeClass('-subscribed');
-				$collection.width(amount == 1 ? 0 : ($avatars.outerWidth() * (amount - 1)) - (6 * (amount - 2)));
-			} else {
-				$collection.addClass('-subscribed');
-				$collection.width(($avatars.outerWidth() * amount) - (6 * (amount - 1)));
-			}
-		} else {
-			if ($favored_count.length) {
-				var current_count = parseInt($favored_count.text());
-				if ($collection.hasClass('-subscribed')) {
-					$favored_count.text(current_count - 1);
-					if (current_count - 1 <= 0) {
-						$favored_count.parent().addClass('-cast');
-					}
-				} else {
-					$favored_count.text(current_count + 1);
-					$favored_count.parent().removeClass('-cast');
-				}
-			}
-			$collection.toggleClass('-shift -subscribed');
-		}
-	}).addClass('-Handled_AddAvatar');
-}
-
 function bindFileLoadButton($parent) {
 	$parent = $parent ? $parent : $('body');
 	$parent.find('.FileLoadButton').not('.-Handled_FileLoadButton').click(function(e) {
@@ -1373,6 +1454,14 @@ function showNotifier(response) {
 	});
 }
 
+function isNotDesktop() {
+	var check = false;
+	(function (a) {
+		if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(a) || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0, 4)))check = true
+	})(navigator.userAgent || navigator.vendor || window.opera);
+	return check;
+}
+
 
 /* OLD CODE */
 
@@ -1459,7 +1548,11 @@ function getFriendsList($friends_right_list, cb) {
 		}
 	});
 }
-socket = io.connect(window.location.protocol == 'https:' ? ':8443' : ':8080', {secure: window.location.protocol == 'https:'});
+if (window.location.hostname.indexOf('.test.evendate.ru') == -1){
+	window.socket = io.connect(window.location.protocol == 'https:' ? ':8443' : ':8080', {secure: window.location.protocol == 'https:'});
+}else{
+	window.socket = io({path: '/node/socket.io'});
+}
 
 socket.on('auth', function (data) {
 	console.log(data);
@@ -1490,12 +1583,12 @@ socket.on('auth', function (data) {
 				if (data.hasOwnProperty('mobile') && data.mobile == true) {
 					window.location.href = '/mobileAuthDone.php?token=' + data.token + '&email=' + data.email;
 				} else {
-					if (window.localStorage.getItem('open_add_organization') == 'true') {
-						window.parent.location = 'organization/add';
+					if (cookies.hasItem('open_add_organization')) {
+						window.parent.location = '/organization/add';
 					} else if (data.subscriptions_count == 0) {
-						window.parent.location = 'onboarding';
+						window.parent.location = '/onboarding';
 					} else {
-						window.parent.location = 'feed';
+						window.parent.location = '/feed';
 					}
 				}
 			} else {
@@ -2056,20 +2149,22 @@ OneEvent.fetchEvent = function(event_id, fields, success) {
  *
  * @param {OneEventCreateEventData} new_event_data
  * @param {OneEventCreateEventCallback} [success]
+ * @param {function} [error]
  * @returns {jqXHR}
  */
-OneEvent.createEvent = function(new_event_data, success) {
-	return __APP.SERVER.addData('/api/v1/events/', JSON.stringify(new_event_data), success);
+OneEvent.createEvent = function(new_event_data, success, error) {
+	return __APP.SERVER.addData('/api/v1/events/', JSON.stringify(new_event_data), true, success, error);
 };
 /**
  *
  * @param {(string|number)} event_id
  * @param {OneEventCreateEventData} data
  * @param {OneEventCreateEventCallback} [success]
+ * @param {function} [error]
  * @returns {jqXHR}
  */
-OneEvent.updateEvent = function(event_id, data, success) {
-	return __APP.SERVER.updateData('/api/v1/events/' + event_id, JSON.stringify(data), success);
+OneEvent.updateEvent = function(event_id, data, success, error) {
+	return __APP.SERVER.updateData('/api/v1/events/' + event_id, JSON.stringify(data), success, error);
 };
 /**
  *
@@ -2114,7 +2209,7 @@ OneEvent.changeEventStatus = function(event_id, status, success) {
  * @returns {jqXHR}
  */
 OneEvent.addFavored = function(event_id, success) {
-	return __APP.SERVER.addData('/api/v1/events/' + event_id + '/favorites', {}, success);
+	return __APP.SERVER.addData('/api/v1/events/' + event_id + '/favorites', {}, false, success);
 };
 /**
  *
@@ -2133,7 +2228,7 @@ OneEvent.deleteFavored = function(event_id, success) {
  * @returns {jqXHR}
  */
 OneEvent.addEventNotification = function(event_id, notification_type, success) {
-	return __APP.SERVER.addData('/api/v1/events/' + event_id + '/notifications', {notification_type: notification_type}, success);
+	return __APP.SERVER.addData('/api/v1/events/' + event_id + '/notifications', {notification_type: notification_type}, false, success);
 };
 /**
  *
@@ -2143,7 +2238,7 @@ OneEvent.addEventNotification = function(event_id, notification_type, success) {
  * @returns {jqXHR}
  */
 OneEvent.deleteEventNotification = function(event_id, notification_uuid, success) {
-	return __APP.SERVER.deleteData('/api/v1/events/' + event_id + '/notifications' + notification_uuid, {}, success);
+	return __APP.SERVER.deleteData('/api/v1/events/' + event_id + '/notifications/' + notification_uuid, {}, success);
 };
 /**
  *
@@ -2164,9 +2259,10 @@ OneEvent.prototype.fetchEvent = function(fields, success) {
  *
  * @param {OneEventCreateEventData} data
  * @param {OneEventCreateEventCallback} [success]
+ * @param {function} [error]
  * @returns {jqXHR}
  */
-OneEvent.prototype.createEvent = function(data, success) {
+OneEvent.prototype.createEvent = function(data, success, error) {
 	var self = this;
 	return this.constructor.createEvent(data, function(response_data) {
 		self.setData(data);
@@ -2174,22 +2270,23 @@ OneEvent.prototype.createEvent = function(data, success) {
 		if (success && typeof success == 'function') {
 			success.call(self, data);
 		}
-	});
+	}, error);
 };
 /**
  *
  * @param {OneEventCreateEventData} data
  * @param {OneEventCreateEventCallback} [success]
+ * @param {function} [error]
  * @returns {jqXHR}
  */
-OneEvent.prototype.updateEvent = function(data, success) {
+OneEvent.prototype.updateEvent = function(data, success, error) {
 	var self = this;
 	return this.constructor.updateEvent(self.id, data, function(response_data) {
 		self.setData(data);
 		if (success && typeof success == 'function') {
 			success.call(self, data);
 		}
-	});
+	}, error);
 };
 /**
  *
@@ -2807,7 +2904,7 @@ OneOrganization.fetchOrganization = function(org_id, fields, success) {
  * @returns {jqXHR}
  */
 OneOrganization.createOrganization = function(new_organization_data, success) {
-	return __APP.SERVER.addData('/api/v1/organizations/', JSON.stringify(new_organization_data), success);
+	return __APP.SERVER.addData('/api/v1/organizations/', JSON.stringify(new_organization_data), true, success);
 };
 /**
  *
@@ -2826,7 +2923,7 @@ OneOrganization.updateOrganization = function(organization_id, organization_data
  * @returns {jqXHR}
  */
 OneOrganization.subscribeOrganization = function(org_id, success) {
-	return __APP.SERVER.addData('/api/v1/organizations/' + org_id + '/subscriptions', {}, success);
+	return __APP.SERVER.addData('/api/v1/organizations/' + org_id + '/subscriptions', {}, false, success);
 };
 /**
  *
@@ -2839,6 +2936,16 @@ OneOrganization.unsubscribeOrganization = function(org_id, success) {
 };
 /**
  *
+ * @param {(Array|object)} data
+ * @returns {OneEntity}
+ */
+OneOrganization.prototype.setData = function(data) {
+	OneEntity.prototype.setData.call(this, data);
+	this.role = OneUser.recognizeRole(this.privileges);
+	return this;
+};
+/**
+ *
  * @param {(string|Array)} fields
  * @param {AJAXCallback} [success]
  * @returns {jqXHR}
@@ -2846,7 +2953,6 @@ OneOrganization.unsubscribeOrganization = function(org_id, success) {
 OneOrganization.prototype.fetchOrganization = function(fields, success) {
 	var self = this;
 	return this.constructor.fetchOrganization(self.id, fields, function(data) {
-		self.role = data[0].privileges ? OneUser.recognizeRole(data[0].privileges) : '';
 		self.setData(data);
 		if (success && typeof success == 'function') {
 			success.call(self, self);
@@ -3395,95 +3501,6 @@ OrganizationsStatistics.fetchStatistics = function(id, scale, range, statistics_
  *
  * @constructor
  * @augments OneEntity
- * @param {(string|number)} [tag_id]
- * @param {boolean} [is_loading_continuous]
- */
-function OneTag(tag_id, is_loading_continuous) {
-	this.id = tag_id ? tag_id : 0;
-	this.name = '';
-	
-	if (tag_id && is_loading_continuous) {
-		this.loading = true;
-		this.fetchTag(function() {
-			this.loading = false;
-			$(window).trigger('fetch.OneTag');
-		});
-	}
-}
-OneTag.extend(OneEntity);
-/**
- *
- * @param {(string|number)} tag_id
- * @param {AJAXCallback} [success]
- * @returns {jqXHR}
- */
-OneTag.fetchTag = function(tag_id, success) {
-	return __APP.SERVER.getData('/api/v1/tags/' + tag_id, {}, success);
-};
-/**
- *
- * @param {AJAXCallback} [success]
- * @returns {jqXHR}
- */
-OneTag.prototype.fetchTag = function(success) {
-	var self = this;
-	return this.constructor.fetchTag(self.id, function(data) {
-		self.setData(data[0]);
-		if (success && typeof success == 'function') {
-			success.call(self, data[0]);
-		}
-	});
-};
-/**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneTag.js
- */
-/**
- * @typedef {AJAXData} TagsCollectionAJAXData
- * @property {string} name
- * @property {(string|number)} event_id
- * @property {string} used_since
- * @property {string} used_till
- */
-/**
- *
- * @constructor
- * @augments EntitiesCollection
- */
-function TagsCollection() {}
-TagsCollection.extend(EntitiesCollection);
-TagsCollection.prototype.collection_of = OneTag;
-/**
- *
- * @param {AJAXData} data
- * @param {AJAXCallback} [success]
- * @returns {jqXHR}
- */
-TagsCollection.fetchTags = function(data, success) {
-	return __APP.SERVER.getData('/api/v1/tags/', data, success);
-};
-/**
- *
- * @param {TagsCollectionAJAXData} data
- * @param {AJAXCallback} [success]
- * @returns {jqXHR}
- */
-TagsCollection.prototype.fetchTags = function(data, success) {
-	var self = this;
-	return this.constructor.fetchTags(data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
-/**
- * @requires ../Class.OneEntity.js
- */
-/**
- *
- * @constructor
- * @augments OneEntity
  * @param {(string|number)} [user_id]
  * @param {boolean} [is_loading_continuous]
  */
@@ -3528,6 +3545,7 @@ OneUser.ACCOUNTS = {
  * @enum {string}
  */
 OneUser.ROLE = {
+	UNAUTH: 'unauth',
 	USER: 'user',
 	MODERATOR: 'moderator',
 	ADMIN: 'admin'
@@ -3550,7 +3568,7 @@ OneUser.recognizeRole = function(privileges) {
 		if ((privilege.role_id == 2 || privilege.name == OneUser.ROLE.MODERATOR) && role !== OneUser.ROLE.ADMIN)
 			role = OneUser.ROLE.MODERATOR;
 	});
-	return role;
+	return role ? role : OneUser.ROLE.UNAUTH;
 };
 /**
  *
@@ -3624,8 +3642,12 @@ CurrentUser.extend(OneUser);
  * @returns {jqXHR}
  */
 CurrentUser.prototype.logout = function() {
-	return __APP.SERVER.ajax(__APP.SERVER.AJAX_METHOD.GET, '/index.php', {logout: true}, function() {
-		window.location = '/';
+	return $.ajax({
+		url: '/index.php',
+		data: {logout: true},
+		complete: function() {
+			window.location = '/';
+		}
 	});
 };
 /**
@@ -3910,6 +3932,95 @@ UsersCollection.prototype.fetchOrganizationStaff = function(org_id, length, data
 			length: length
 		});
 	return UsersCollection.fetchOrganizationStaff(org_id, ajax_data, function(data) {
+		self.setData(data);
+		if (success && typeof success == 'function') {
+			success.call(self, data);
+		}
+	});
+};
+/**
+ * @requires ../Class.OneEntity.js
+ */
+/**
+ *
+ * @constructor
+ * @augments OneEntity
+ * @param {(string|number)} [tag_id]
+ * @param {boolean} [is_loading_continuous]
+ */
+function OneTag(tag_id, is_loading_continuous) {
+	this.id = tag_id ? tag_id : 0;
+	this.name = '';
+	
+	if (tag_id && is_loading_continuous) {
+		this.loading = true;
+		this.fetchTag(function() {
+			this.loading = false;
+			$(window).trigger('fetch.OneTag');
+		});
+	}
+}
+OneTag.extend(OneEntity);
+/**
+ *
+ * @param {(string|number)} tag_id
+ * @param {AJAXCallback} [success]
+ * @returns {jqXHR}
+ */
+OneTag.fetchTag = function(tag_id, success) {
+	return __APP.SERVER.getData('/api/v1/tags/' + tag_id, {}, success);
+};
+/**
+ *
+ * @param {AJAXCallback} [success]
+ * @returns {jqXHR}
+ */
+OneTag.prototype.fetchTag = function(success) {
+	var self = this;
+	return this.constructor.fetchTag(self.id, function(data) {
+		self.setData(data[0]);
+		if (success && typeof success == 'function') {
+			success.call(self, data[0]);
+		}
+	});
+};
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.OneTag.js
+ */
+/**
+ * @typedef {AJAXData} TagsCollectionAJAXData
+ * @property {string} name
+ * @property {(string|number)} event_id
+ * @property {string} used_since
+ * @property {string} used_till
+ */
+/**
+ *
+ * @constructor
+ * @augments EntitiesCollection
+ */
+function TagsCollection() {}
+TagsCollection.extend(EntitiesCollection);
+TagsCollection.prototype.collection_of = OneTag;
+/**
+ *
+ * @param {AJAXData} data
+ * @param {AJAXCallback} [success]
+ * @returns {jqXHR}
+ */
+TagsCollection.fetchTags = function(data, success) {
+	return __APP.SERVER.getData('/api/v1/tags/', data, success);
+};
+/**
+ *
+ * @param {TagsCollectionAJAXData} data
+ * @param {AJAXCallback} [success]
+ * @returns {jqXHR}
+ */
+TagsCollection.prototype.fetchTags = function(data, success) {
+	var self = this;
+	return this.constructor.fetchTags(data, function(data) {
 		self.setData(data);
 		if (success && typeof success == 'function') {
 			success.call(self, data);
@@ -4657,10 +4768,9 @@ DatePicker.prototype.destroy = function(){
  * @constructor
  * @augments jQuery
  * @param {(number|string)} id
- * @param {boolean} is_subscribed
  * @param {object} options
  */
-function ActionButton(id, is_subscribed, options) {
+function ActionButton(id, options) {
 	var self = this;
 	this.classes = $.extend(true, {subscribed_state: ''}, this.classes);
 	this.options = $.extend(true, this.options, options);
@@ -4671,7 +4781,8 @@ function ActionButton(id, is_subscribed, options) {
 		self.options.colors ? self.classes[state].push(self.options.colors[state]) : false;
 		self.classes[state] = self.classes[state].join(' ');
 	});
-	this.is_subscribed = is_subscribed;
+	this.is_subscribed = !!options.is_subscribed;
+	this.is_add_avatar = !!options.is_add_avatar;
 	this.id = id;
 	jQuery.fn.init.call(this, __APP.BUILD.button({
 		classes: (
@@ -4691,6 +4802,39 @@ ActionButton.prototype.pushStack = function(elems) {
 	ret.context = this.context;
 	return ret;
 };
+
+
+ActionButton.prototype.addAvatar = function() {
+	var $wrapper = this.closest('.AddAvatarWrapper'),
+		$collection = $wrapper.find('.AvatarsCollection'),
+		$favored_count = $wrapper.find('.FavoredCount'),
+		$avatars = $collection.find('.avatar'),
+		amount = $avatars.length;
+	
+	if ($collection.data('max_amount') >= amount) {
+		if ($collection.hasClass('-subscribed')) {
+			$collection.removeClass('-subscribed');
+			$collection.width(amount == 1 ? 0 : ($avatars.outerWidth() * (amount - 1)) - (6 * (amount - 2)));
+		} else {
+			$collection.addClass('-subscribed');
+			$collection.width(($avatars.outerWidth() * amount) - (6 * (amount - 1)));
+		}
+	} else {
+		if ($favored_count.length) {
+			var current_count = parseInt($favored_count.text());
+			if ($collection.hasClass('-subscribed')) {
+				$favored_count.text(current_count - 1);
+				if (current_count - 1 <= 0) {
+					$favored_count.parent().addClass('-cast');
+				}
+			} else {
+				$favored_count.text(current_count + 1);
+				$favored_count.parent().removeClass('-cast');
+			}
+		}
+		$collection.toggleClass('-shift -subscribed');
+	}
+};
 ActionButton.prototype.bindHoverEffects = function() {
 	var self = this;
 	this
@@ -4704,10 +4848,23 @@ ActionButton.prototype.bindHoverEffects = function() {
 			self.children('.Text').text(self.options.labels.subscribed);
 		});
 };
-/**
- * @interface
- */
-ActionButton.prototype.bindClick = function() {};
+ActionButton.prototype.onClick = function() {};
+ActionButton.prototype.bindClick = function() {
+	var self = this;
+	this.on('click.subscribe', function() {
+		if(__APP.USER.id === -1){
+			(new AuthModal()).show();
+		} else {
+			self.onClick();
+			if(self.is_add_avatar){
+				self.addAvatar();
+			}
+			if (window.askToSubscribe instanceof Function) {
+				window.askToSubscribe();
+			}
+		}
+	});
+};
 ActionButton.prototype.afterSubscribe = function() {
 	this.removeClass([this.classes.subscribe, this.classes.subscribed].join(' '));
 	this.addClass([this.classes.subscribed_state, this.classes.unsubscribe].join(' '));
@@ -4736,10 +4893,9 @@ ActionButton.prototype.initiate = function() {
  * @constructor
  * @augments ActionButton
  * @param {(number|string)} id
- * @param {boolean} is_subscribed
  * @param {object} options
  */
-function AddToFavoriteButton(id, is_subscribed, options) {
+function AddToFavoriteButton(id, options) {
 	this.classes = {
 		subscribed_state: '-Favored'
 	};
@@ -4760,25 +4916,21 @@ function AddToFavoriteButton(id, is_subscribed, options) {
 			subscribed: 'fa-star'
 		}
 	};
-	ActionButton.apply(this, [id, is_subscribed, options]);
+	ActionButton.apply(this, [id, options]);
 }
 AddToFavoriteButton.extend(ActionButton);
-AddToFavoriteButton.prototype.bindClick = function() {
+AddToFavoriteButton.prototype.onClick = function() {
 	var self = this;
-	this.on('click.subscribe', function() {
-		if (self.is_subscribed) {
-			OneEvent.deleteFavored(self.id, function() {
-				self.afterUnsubscribe();
-			});
-		} else {
-			OneEvent.addFavored(self.id, function() {
-				self.afterSubscribe();
-			});
-		}
-		if (window.askToSubscribe instanceof Function) {
-			window.askToSubscribe();
-		}
-	});
+	
+	if (self.is_subscribed) {
+		OneEvent.deleteFavored(self.id, function() {
+			self.afterUnsubscribe();
+		});
+	} else {
+		OneEvent.addFavored(self.id, function() {
+			self.afterSubscribe();
+		});
+	}
 };
 /**
  * @requires Class.ActionButton.js
@@ -4788,10 +4940,9 @@ AddToFavoriteButton.prototype.bindClick = function() {
  * @constructor
  * @augments ActionButton
  * @param {(number|string)} id
- * @param {boolean} is_subscribed
  * @param {object} options
  */
-function SubscribeButton(id, is_subscribed, options) {
+function SubscribeButton(id, options) {
 	this.classes = {
 		subscribed_state: '-Subscribed'
 	};
@@ -4812,629 +4963,790 @@ function SubscribeButton(id, is_subscribed, options) {
 			subscribed: 'fa-check'
 		}
 	};
-	ActionButton.apply(this, [id, is_subscribed, options]);
+	ActionButton.apply(this, [id, options]);
 }
 SubscribeButton.extend(ActionButton);
-SubscribeButton.prototype.bindClick = function() {
+SubscribeButton.prototype.onClick = function() {
 	var self = this;
-	this.on('click.subscribe', function() {
-		if (self.is_subscribed) {
-			__APP.USER.unsubscribeFromOrganization(self.id, function() {
-				self.afterUnsubscribe();
-				$(window).trigger('unsubscribe', [self.id]);
-			});
-		} else {
-			__APP.USER.subscribeToOrganization(self.id, function() {
-				self.afterSubscribe();
-				$(window).trigger('subscribe', [self.id]);
-			});
-		}
-		if (window.askToSubscribe instanceof Function) {
-			window.askToSubscribe();
-		}
-	});
+	if (self.is_subscribed) {
+		__APP.USER.unsubscribeFromOrganization(self.id, function() {
+			self.afterUnsubscribe();
+			$(window).trigger('unsubscribe', [self.id]);
+		});
+	} else {
+		__APP.USER.subscribeToOrganization(self.id, function() {
+			self.afterSubscribe();
+			$(window).trigger('subscribe', [self.id]);
+		});
+	}
 };
-function Modal(title, content) {
-	this.title = title;
-	this.content = content;
-	this.modal = tmpl('modal', {
-		modal_title: this.title ? tmpl('modal-title', {title: this.title}) : '',
-		modal_content: content,
-		modal_footer: tmpl('modal-footer', {
-			footer_buttons: tmpl('button', {
-				classes: '-color_primary CloseModal RippleEffect',
-				title: 'OK'
-			})
-		})
-	});
+/**
+ * @class
+ */
+AbstractModal = (function() {
+	/**
+	 *
+	 * @param {{
+	 *    content: ?(string|jQuery),
+	 *    [title]: string,
+	 *    [type]: string,
+	 *    [classes]: ?(Array<string>|string),
+	 *    [content_classes]: ?(Array<string>|string),
+	 *    [width]: number,
+	 *    [footer]: ?jQuery
+	 * }} props
+	 * @constructor
+	 */
+	function AbstractModal(props) {
+		this.id = 0;
+		this.title = props.title;
+		this.type = props.type ? props.type : 'Std';
+		this.content = props.content;
+		/**
+		 *
+		 * @type {jQuery}
+		 */
+		this.modal = __APP.BUILD.modal(props);
+		__APP.MODALS.pushModal(this);
+	}
 	
-	Modal.pushModal(this);
-}
-Modal.last_id = 0;
-Modal.modals = {};
-Modal.active_modal = undefined;
-Modal.modal_destroyer = $('.modal_destroyer');
-Modal.modal_wrapper = $('.modal_wrapper');
-
-Modal.pushModal = function(modal) {
-	modal.id = ++Modal.last_id;
-	Modal.modals[modal.id] = modal;
-	var keys = Object.keys(Modal.modals);
-	if (keys.length > 5) {
-		Modal.modals[keys[0]].destroy();
-	}
-	Modal.modal_wrapper.append(modal.modal);
-};
-
-Modal.hide = function() {
-	if (Modal.active_modal !== undefined) {
-		Modal.active_modal.hide();
-	}
-	$('body').removeClass('-open_modal');
-};
-
-Modal.bindCallModal = function($parent) {
-	$parent = $parent ? $parent : $('body');
-	$parent.find('.CallModal').not('.-Handled_CallModal').each(function() {
-		var $this = $(this),
-			title = $this.data('modal_title'),
-			modal,
-			modal_id,
-			modal_type = $this.data('modal_type');
+	/**
+	 *
+	 * @final
+	 */
+	AbstractModal.prototype.__show = function() {
+		var self = this;
 		
-		$this.on('click.CallModal', function() {
-			modal_id = $this.data('modal_id');
-			if (Modal.modals.hasOwnProperty(modal_id)) {
-				Modal.modals[modal_id].show();
-			} else {
-				switch (modal_type) {
-					case 'favors': {
-						modal = new FavoredModal($this.data('modal_event_id'), title);
-						break;
-					}
-					case 'subscribers': {
-						modal = new SubscribersModal($this.data('modal_organization_id'), title);
-						break;
-					}
-					case 'editors': {
-						modal = new EditorsModal($this.data('modal_organization_id'), title, $this.data('modal_specific_role'));
-						break;
-					}
-					case 'map': {
-						modal = new MapModal($this.data('modal_map_location'), title);
-						break;
-					}
-					case 'media': {
-						var type = $this.data('modal_media_type'),
-							url = $this.data('modal_media_url');
-						if (!url) {
-							if ($this.is('img')) {
-								url = $this.attr('src');
-								type = 'image';
-							} else if ($this.is('video')) {
-								//url = $this.attr('url');
-								type = 'video';
-							} else {
-								var str = $this.css('background-image');
-								if (str !== 'none') {
-									if (str.indexOf('"') != -1) {
-										url = str.slice(str.indexOf('"') + 1, str.indexOf('"', str.indexOf('"') + 1));
-									} else {
-										url = str.slice(str.indexOf('(') + 1, str.indexOf(')'));
-									}
-									type = 'image';
-								}
-							}
-						}
-						modal = new MediaModal(url, type);
-						break;
-					}
-					case 'cropper': {
-						modal = new CropperModal($this.data('source_img'), {
-							'aspectRatio': eval($this.data('aspect_ratio'))
-						});
-						
-						modal.modal.one('modal.close', function() {
-							
-							$this.removeClass('-hidden').off('click.CallModal').on('click.CallModal', function() {
-								modal_id = $this.data('modal_id');
-								if (Modal.modals.hasOwnProperty(modal_id)) {
-									if (Modal.modals[modal_id].image_src == $this.data('source_img')) {
-										Modal.modals[modal_id].show();
-									} else {
-										Modal.modals[modal_id].destroy();
-										modal = new CropperModal($this.data('source_img'), {
-											'aspectRatio': eval($this.data('aspect_ratio'))
-										});
-										$this.data('modal_id', modal.id);
-										modal.initer = $this;
-										modal.show();
-									}
-								} else {
-									modal = new CropperModal($this.data('source_img'), {
-										'data': $this.data('crop_data'),
-										'aspectRatio': eval($this.data('aspect_ratio'))
-									});
-									$this.data('modal_id', modal.id);
-									modal.initer = $this;
-									modal.show();
-								}
-							});
-							
-						});
-						break;
-					}
-					default: {
-						modal = new Modal(title, $this.data('modal_content'));
-						break;
-					}
-				}
-				$this.data('modal_id', modal.id);
-				modal.initer = $this;
-				modal.show();
+		__APP.MODALS.modal_wrapper.append(this.modal);
+		$('body').addClass('-open_modal');
+		
+		__APP.MODALS.hideCurrent();
+		__APP.MODALS.active_modal = this;
+		
+		this.modal.addClass('-faded').removeClass(__C.CLASSES.NEW_HIDDEN);
+		__APP.MODALS.modal_destroyer.adjustHeight(this.modal.height());
+		this.modal.trigger('modal.show');
+		setTimeout(function() {
+			self.modal.removeClass('-faded');
+		}, 200);
+		
+		__APP.MODALS.modal_destroyer.off('click.CloseModal').on('click.CloseModal', function() {
+			$(this).off('click.CloseModal');
+			__APP.MODALS.hideCurrent();
+		});
+		this.modal.find('.CloseModal').off('click.CloseModal').on('click.CloseModal', function() {
+			__APP.MODALS.hideCurrent();
+		});
+		$(document).off('keyup.CloseModal').on('keyup.CloseModal', function(event) {
+			if (event.keyCode == 27) {
+				$(this).off('keyup.CloseModal');
+				__APP.MODALS.hideCurrent();
 			}
 		});
-	}).addClass('-Handled_CallModal');
-};
-
-Modal.prototype.show = function() {
-	this.appear();
-};
-
-Modal.prototype.appear = function() {
-	var self = this;
-	
-	Modal.modal_wrapper.append(this.modal);
-	$('body').addClass('-open_modal');
-	
-	if (Modal.active_modal !== undefined) {
-		Modal.active_modal.hide();
-	}
-	Modal.active_modal = this;
-	
-	self.modal.addClass('-faded').removeClass(__C.CLASSES.NEW_HIDDEN);
-	self.adjustDestroyer();
-	self.modal.trigger('modal.show');
-	setTimeout(function() {
-		self.modal.removeClass('-faded');
-	}, 200);
-	
-	Modal.modal_destroyer.off('click.CloseModal').on('click.CloseModal', function() {
-		$(this).off('click.CloseModal');
-		Modal.hide();
-	});
-	self.modal.find('.CloseModal').off('click.CloseModal').on('click.CloseModal', function() {
-		Modal.hide();
-	});
-	$(document).on('keyup.CloseModal', function(event) {
-		if (event.keyCode == 27) {
-			$(this).off('keyup.CloseModal');
-			Modal.hide();
-		}
-	});
-};
-
-Modal.prototype.hide = function() {
-	this.disappear();
-};
-
-Modal.prototype.disappear = function() {
-	var self = this;
-	Modal.active_modal = undefined;
-	self.modal.addClass('-faded');
-	setTimeout(function() {
-		self.modal.addClass(__C.CLASSES.NEW_HIDDEN);
-		self.modal.trigger('modal.close');
-	}, 200);
-};
-
-Modal.prototype.destroy = function() {
-	this.hide();
-	Modal.modal_wrapper.trigger('modal.beforeDestroy');
-	this.modal.remove();
-	for (var key in Modal.modals) {
-		if (Modal.modals[key] == this) {
-			delete Modal.modals[key];
-		}
-	}
-	Modal.modal_wrapper.trigger('modal.afterDestroy');
-};
-
-Modal.prototype.adjustDestroyer = function() {
-	var html_height = $('html').height(),
-		modal_height = this.modal.height() + 200;
-	Modal.modal_destroyer.height((modal_height > html_height) ? modal_height : html_height);
-};
-/**
- * @requires Class.Modal.js
- */
-/**
- * @abstract
- * @augments Modal
- * @param {(string|number)} entity_id
- * @param {string} title
- */
-function AbstractUsersModal(entity_id, title) {
-	this.title = title;
-	this.entity_id = entity_id;
-	this.entities_length = 30;
-	this.disable_upload = false;
-	this.users = new UsersCollection();
-	this.is_first = true;
-	
-	this.modal = tmpl('modal', {
-		modal_type: this.constructor.name,
-		modal_content_classes: 'ModalContent',
-		modal_title: tmpl('modal-title', {title: this.title})
-	});
-	this.content = this.modal.find('.ModalContent');
-	
-	if (this.constructor === AbstractUsersModal) {
-		throw new Error("Can't instantiate abstract class!");
-	}
-}
-AbstractUsersModal.extend(Modal);
-
-AbstractUsersModal.prototype.show = function() {
-	var self = this;
-	
-	Modal.modal_wrapper.data('block_scroll', false);
-	Modal.modal_wrapper.on('scroll.uploadUsers', function() {
-		if (!self.disable_upload) {
-			if (Modal.modal_wrapper.height() + Modal.modal_wrapper.scrollTop() >= self.modal.height()) {
-				if (!Modal.modal_wrapper.data('block_scroll')) {
-					Modal.modal_wrapper.data('block_scroll', true);
-					self.uploadUsers(function() {
-						Modal.modal_wrapper.data('block_scroll', false);
-						self.adjustDestroyer();
-					});
-				}
-			}
-		}
-	});
-	if (!this.users.length) {
-		self.uploadUsers(function() {
-			self.appear();
-		});
 		
-	} else {
-		self.appear();
-	}
-};
-
-AbstractUsersModal.prototype.hide = function() {
-	Modal.modal_wrapper.data('block_scroll', false).off('scroll.uploadUsers');
-	this.disappear();
-	Modal.hide();
-};
-
-AbstractUsersModal.prototype.uploadUsers = function(callback) {};
-
-AbstractUsersModal.prototype.buildUsers = function(users, $wrapper) {
-	var $users = $(),
-		last_is_fiends = false,
-		self = this;
-	
-	if (typeof $wrapper != 'undefined') {
-		last_is_fiends = $wrapper.find('.UserTombstone').eq(-1).data('is_friend') == 'true';
-	}
-	
-	users.forEach(function(user, i) {
-		if ((self.is_first && !i) || last_is_fiends != user.is_friend) {
-			$users = $users.add(tmpl('modal-users-divider', {label: user.is_friend ? 'Друзья' : 'Все'}));
-			last_is_fiends = user.is_friend;
-		}
-		
-		$users = $users.add(__APP.BUILD.userTombstones(user, {
-			tombstone_classes: ['UserTombstone'],
-			is_link: true,
-			dataset: {is_friend: user.is_friend}
-		}));
-	});
-	$wrapper.append($users);
-	return $users;
-};
-
-AbstractUsersModal.prototype.afterUpload = function(users) {
-	var self = this,
-		$new_users;
-	if (users.length) {
-		$new_users = this.buildUsers(users, this.content);
-		this.content.append($new_users);
-		this.is_first = false;
-		this.entities_length = 10;
-		this.adjustDestroyer();
-		bindPageLinks(this.modal);
-		$new_users.on('click.hideModal', function() {
-			self.hide();
-		});
-	} else {
-		this.disable_upload = true;
-	}
-};
-/**
- * @requires Class.Modal.js
- */
-function CropperModal(image_src, cropper_options) {
-	if (image_src) {
-		this.image_src = image_src;
-		this.title = 'Кадрирование';
-		this.content = tmpl('modal-cropper-content', {image_src: this.image_src});
-		
-		this.modal = tmpl('modal', {
-			modal_type: 'CropperModal',
-			modal_title: tmpl('modal-title', {title: this.title}),
-			modal_content: this.content,
-			modal_footer: tmpl('modal-footer', {
-				footer_buttons: $()
-					.add(tmpl('button', {classes: '-color_primary CropButton RippleEffect', title: 'Кадрировать'}))
-					.add(tmpl('button', {classes: '-color_default DestroyCropButton RippleEffect', title: 'Отмена'}))
-			})
-		});
-		this.cropper = this.modal.find('.Cropper');
-		this.crop_button = this.modal.find('.CropButton');
-		this.destroy_crop_button = this.modal.find('.DestroyCropButton');
-		cropper_options = typeof cropper_options == 'object' ? cropper_options : {};
-		this.options = $.extend({
-			viewMode: 1,
-			zoomable: false,
-			zoomOnWheel: false
-		}, cropper_options);
-		Modal.pushModal(this);
-	} else {
-		throw Error('To initiate cropper you need to pass image source (image_src)')
-	}
-}
-CropperModal.extend(Modal);
-
-
-CropperModal.prototype.show = function() {
-	var self = this;
-	
-	self.cropper.on('load', function() {
-		self.cropper.cropper(self.options)
-	}).attr('src', self.image_src);
-	
-	self.__superCall('show');
-	
-	self.modal.on('modal.beforeDestroy', function() {
-		self.cropper.cropper('destroy');
-		self.crop_button.off('click.Crop');
-		self.destroy_crop_button.off('click.DestroyCrop');
-	});
-	
-	self.crop_button.off('click.Crop').on('click.Crop', function() {
-		self.crop();
-		Modal.hide();
-	});
-	self.destroy_crop_button.off('click.DestroyCrop').on('click.DestroyCrop', function() {
-		Modal.hide();
-	});
-};
-
-CropperModal.prototype.crop = function() {
-	var self = this;
-	self.initer.trigger('crop', [self.cropper.cropper('getCroppedCanvas').toDataURL(), self.cropper.cropper('getData')]);
-};
-/**
- * @requires Class.AbstractUsersModal.js
- */
-/**
- *
- * @constructor
- * @augments AbstractUsersModal
- * @param {(string|number)} organization_id
- * @param {string} [title='Редаторы']
- * @param {OneUser.ROLE} [specific_role]
- */
-function EditorsModal(organization_id, title, specific_role) {
-	AbstractUsersModal.apply(this, [organization_id, title ? title : 'Редакторы']);
-	this.ajax_data = {
-		order_by: 'role,first_name'
+	};
+	/**
+	 *
+	 * @final
+	 */
+	AbstractModal.prototype.__hide = function() {
+		var self = this;
+		__APP.MODALS.modal_destroyer.off('click.CloseModal');
+		$(document).off('keyup.CloseModal');
+		__APP.MODALS.active_modal = undefined;
+		this.modal.find('.CloseModal').off('click.CloseModal');
+		this.modal.addClass('-faded');
+		setTimeout(function() {
+			self.modal.addClass(__C.CLASSES.NEW_HIDDEN);
+			self.modal.trigger('modal.close');
+		}, 200);
 	};
 	
-	if (specific_role) {
-		this.ajax_data.roles = specific_role;
-	}
+	AbstractModal.prototype.show = function() {
+		this.__show();
+	};
 	
+	AbstractModal.prototype.hide = function() {
+		this.__hide();
+	};
 	
-	Modal.pushModal(this);
-}
-EditorsModal.extend(AbstractUsersModal);
-
-EditorsModal.prototype.uploadUsers = function(callback) {
-	var self = this;
-	
-	this.users.fetchOrganizationStaff(this.entity_id, this.entities_length, this.ajax_data, function(users) {
-		self.afterUpload(users);
-		if (callback && typeof callback == 'function') {
-			callback(users);
-		}
-	});
-};
-
-EditorsModal.prototype.buildUsers = function(users, $wrapper) {
-	var $users = $(),
-		last_role = false,
-		labels = {
-			admin: 'Администраторы',
-			moderator: 'Модераторы'
-		},
-		self = this;
-	
-	if (typeof $wrapper != 'undefined') {
-		last_role = $wrapper.find('.UserTombstone').last().data('role');
-	}
-	
-	users.forEach(function(user, i) {
-		if ((self.is_first && !i) || last_role != user.role) {
-			$users = $users.add(tmpl('modal-users-divider', {label: labels[user.role]}));
-			last_role = user.role;
-		}
-		
-		$users = $users.add(__APP.BUILD.userTombstones(user, {
-			tombstone_classes: ['UserTombstone'],
-			is_link: true,
-			dataset: {role: user.role}
-		}));
-	});
-	$wrapper.append($users);
-	return $users;
-};
-/**
- * @requires Class.AbstractUsersModal.js
- */
-/**
- *
- * @constructor
- * @augments AbstractUsersModal
- * @param {(number|string)} event_id
- * @param {string} [title='Добавили в избранное']
- */
-function FavoredModal(event_id, title) {
-	if (event_id) {
-		AbstractUsersModal.apply(this, [event_id, title ? title : 'Добавили в избранное']);
-		this.ajax_data = {
-			fields: ['is_friend'],
-			order_by: '-is_friend,first_name'
-		};
-		
-		Modal.pushModal(this);
-	} else {
-		throw Error('To open favored modal you need to pass event_id');
-	}
-}
-FavoredModal.extend(AbstractUsersModal);
-
-FavoredModal.prototype.uploadUsers = function(callback) {
-	var self = this;
-	
-	this.users.fetchEventFavorites(this.entity_id, this.entities_length, this.ajax_data, function(users) {
-		self.afterUpload(users);
-		if (callback && typeof callback == 'function') {
-			callback(users);
-		}
-	});
-};
-/**
- * @requires Class.Modal.js
- */
-function MapModal(location, title) {
-	if (location) {
-		this.location = location;
-		this.title = title ? title : 'Место проведения события';
-		this.content = tmpl('modal-map-content', {location: this.location});
-		
-		this.modal = tmpl('modal', {
-			modal_type: 'MapModal',
-			modal_content_classes: '-no_padding',
-			modal_title: tmpl('modal-title', {title: this.title}),
-			modal_content: this.content
-		});
-		Modal.pushModal(this);
-	} else {
-		throw Error('To initiate map you need to pass location (location)')
-	}
-}
-MapModal.extend(Modal);
-/**
- * @requires Class.Modal.js
- */
-function MediaModal(src, format) {
-	if (src) {
-		this.src = src;
-		this.format = format ? format : 'image';
-		this.title = '';
-		if (format == 'image') {
-			this.content = tmpl('modal-image-media-content', {src: this.src});
-		} else {
-			
-		}
-		
-		this.modal = tmpl('modal', {
-			modal_type: 'MediaModal',
-			modal_content_classes: '-no_padding ModalContent',
-			modal_content: this.content
-		});
-		this.modal.on('modal.show', function() {
-			Modal.modal_wrapper.addClass('-blackened');
-		});
-		this.modal.on('modal.close', function() {
-			Modal.modal_wrapper.removeClass('-blackened');
-		});
-		Modal.pushModal(this);
-	} else {
-		throw Error('To open media you need to pass media source (src)')
-	}
-}
-MediaModal.extend(Modal);
-
-MediaModal.prototype.show = function() {
-	var self = this,
-		$window = $(window),
-		window_max_w = $window.width() * 0.8,
-		$media, real_w, real_h;
-	
-	self.modal.on('modal.show', function() {
-		switch (this.format) {
-			default:
-			case 'image': {
-				function onLoad() {
-					real_w = $media.width();
-					real_h = $media.height();
-					
-					self.modal.width((real_w > window_max_w) ? window_max_w : real_w);
-					self.modal.height((real_w > window_max_w) ? (window_max_w * real_h / real_w) : real_h);
-					$media.wrap($('<div>').addClass('img_holder'));
-					self.adjustDestroyer();
-				}
-				
-				$media = self.modal.find('img');
-				if ($media.width()) {
-					onLoad();
-				} else {
-					$media.on('load', onLoad)
-				}
+	AbstractModal.prototype.destroy = function() {
+		this.hide();
+		__APP.MODALS.modal_wrapper.trigger('modal.beforeDestroy');
+		this.modal.remove();
+		for (var key in __APP.MODALS.collection) {
+			if (__APP.MODALS.collection[key] == this) {
+				delete __APP.MODALS.collection[key];
 			}
 		}
-	});
-	self.__superCall('show');
-};
+		__APP.MODALS.modal_wrapper.trigger('modal.afterDestroy');
+	};
+	
+	return AbstractModal;
+}());
+/**
+ * @requires Class.AbstractModal.js
+ */
+/**
+ * @class
+ * @abstract
+ * @extends AbstractModal
+ */
+AbstractUsersModal = extending(AbstractModal, (function() {
+	/**
+	 *
+	 * @param {(string|number)} entity_id
+	 * @param {string} title
+	 * @constructor
+	 */
+	function AbstractUsersModal(entity_id, title) {
+		AbstractModal.call(this, {
+			content: '',
+			title: title,
+			type: this.constructor.name,
+			content_classes: ['ModalContent']
+		});
+		this.entity_id = entity_id;
+		this.entities_length = 30;
+		this.disable_upload = false;
+		this.users = new UsersCollection();
+		this.is_first = true;
+		
+		this.content = this.modal.find('.ModalContent');
+		
+		if (this.constructor === AbstractUsersModal) {
+			throw new Error("Can't instantiate abstract class!");
+		}
+	}
+	
+	AbstractUsersModal.prototype.show = function() {
+		var self = this;
+		
+		__APP.MODALS.modal_wrapper.data('block_scroll', false);
+		__APP.MODALS.modal_wrapper.on('scroll.uploadUsers', function() {
+			if (!self.disable_upload) {
+				if (__APP.MODALS.modal_wrapper.height() + __APP.MODALS.modal_wrapper.scrollTop() >= self.modal.height()) {
+					if (!__APP.MODALS.modal_wrapper.data('block_scroll')) {
+						__APP.MODALS.modal_wrapper.data('block_scroll', true);
+						self.uploadUsers(function() {
+							__APP.MODALS.modal_wrapper.data('block_scroll', false);
+							__APP.MODALS.modal_destroyer.adjustHeight(self.modal.height());
+						});
+					}
+				}
+			}
+		});
+		if (!this.users.length) {
+			self.uploadUsers(function() {
+				AbstractModal.prototype.show.call(self);
+			});
+			
+		} else {
+			AbstractModal.prototype.show.call(self);
+		}
+	};
+	
+	AbstractUsersModal.prototype.hide = function() {
+		__APP.MODALS.modal_wrapper.data('block_scroll', false).off('scroll.uploadUsers');
+		__APP.MODALS.hideCurrent();
+	};
+	
+	AbstractUsersModal.prototype.uploadUsers = function(callback) {};
+	/**
+	 *
+	 * @param {Array} users
+	 * @param {jQuery} $wrapper
+	 * @return {jQuery}
+	 */
+	AbstractUsersModal.prototype.buildUsers = function(users, $wrapper) {
+		var $users = $(),
+			last_is_fiends = false,
+			self = this;
+		
+		if (typeof $wrapper != 'undefined') {
+			last_is_fiends = $wrapper.find('.UserTombstone').eq(-1).data('is_friend') == 'true';
+		}
+		
+		users.forEach(function(user, i) {
+			if ((self.is_first && !i) || last_is_fiends != user.is_friend) {
+				$users = $users.add(tmpl('modal-users-divider', {label: user.is_friend ? 'Друзья' : 'Все'}));
+				last_is_fiends = user.is_friend;
+			}
+			
+			$users = $users.add(__APP.BUILD.userTombstones(user, {
+				tombstone_classes: ['UserTombstone'],
+				is_link: true,
+				dataset: {is_friend: user.is_friend}
+			}));
+		});
+		$wrapper.append($users);
+		return $users;
+	};
+	/**
+	 *
+	 * @param {Array} users
+	 */
+	AbstractUsersModal.prototype.afterUpload = function(users) {
+		var self = this,
+			$new_users;
+		if (users.length) {
+			$new_users = this.buildUsers(users, this.content);
+			this.content.append($new_users);
+			this.is_first = false;
+			this.entities_length = 10;
+			__APP.MODALS.modal_destroyer.adjustHeight(this.modal.height());
+			bindPageLinks(this.modal);
+			$new_users.on('click.hideModal', function() {
+				self.hide();
+			});
+		} else {
+			this.disable_upload = true;
+		}
+	};
+	
+	return AbstractUsersModal;
+}()));
+/**
+ * @requires Class.AbstractModal.js
+ */
+/**
+ * @class
+ * @extends AbstractModal
+ */
+AuthModal = extending(AbstractModal, (function() {
+	
+	function AuthModal() {
+		if (typeof AuthModal.instance === 'object') {
+			return AuthModal.instance;
+		}
+		AbstractModal.call(this, {
+			type: 'AuthModal',
+			content: tmpl('modal-auth-content', {
+				heading: 'Войдите через социальную сеть, чтобы совершить это действие'
+			}),
+			classes: ['-size_tiny'],
+			content_classes: ['-align_center']
+		});
+		
+		this.modal.find('.AuthButton').each(function() {
+			$(this).on('click', function (e) {
+				var network = $(this).data('auth_network');
+				yaCounter32442130.reachGoal(network.toUpperCase() + 'AuthStart');
+				
+				if (isNotDesktop()) {
+					window.location.href = __APP.AUTH_URLS[network];
+				} else {
+					window.open(__APP.AUTH_URLS[network], network.toUpperCase() + '_AUTH_WINDOW', 'status=1,toolbar=0,menubar=0&height=500,width=700');
+				}
+				e.preventDefault();
+			});
+		});
+		
+		bindRippleEffect(this.modal);
+		AuthModal.instance = this;
+	}
+	
+	return AuthModal;
+}()));
+/**
+ * @requires Class.AbstractModal.js
+ */
+/**
+ * @class
+ * @extends AbstractModal
+ */
+CropperModal = extending(AbstractModal, (function() {
+	/**
+	 *
+	 * @param image_src
+	 * @param cropper_options
+	 * @constructor
+	 */
+	function CropperModal(image_src, cropper_options) {
+		if (image_src) {
+			cropper_options = typeof cropper_options == 'object' ? cropper_options : {};
+			AbstractModal.call(this, {
+				content: tmpl('modal-cropper-content', {image_src: this.image_src}),
+				type: 'CropperModal',
+				classes: ['-size_wide'],
+				content_classes: ['-no_padding', 'img_holder'],
+				footer: tmpl('modal-footer', {
+					footer_buttons: $()
+						.add(tmpl('button', {classes: '-color_primary CropButton RippleEffect', title: 'Кадрировать'}))
+						.add(tmpl('button', {classes: '-color_default DestroyCropButton RippleEffect', title: 'Отмена'}))
+				})
+			});
+			this.image_src = image_src;
+			
+			this.cropper = this.modal.find('.Cropper');
+			this.crop_button = this.modal.find('.CropButton');
+			this.destroy_crop_button = this.modal.find('.DestroyCropButton');
+			this.options = $.extend({
+				viewMode: 1,
+				responsive: false,
+				scalable: false,
+				zoomable: false,
+				zoomOnWheel: false
+			}, cropper_options);
+		} else {
+			throw Error('To initiate cropper you need to pass image source (image_src)')
+		}
+	}
+	
+	
+	CropperModal.prototype.show = function() {
+		var self = this;
+		
+		self.cropper.on('load', function() {
+			self.cropper.cropper(self.options);
+		}).attr('src', self.image_src);
+		
+		self.__show();
+		
+		self.modal.on('modal.beforeDestroy', function() {
+			self.cropper.cropper('destroy');
+			self.crop_button.off('click.Crop');
+			self.destroy_crop_button.off('click.DestroyCrop');
+		});
+		
+		self.crop_button.off('click.Crop').on('click.Crop', function() {
+			self.crop();
+			__APP.MODALS.hideCurrent();
+		});
+		self.destroy_crop_button.off('click.DestroyCrop').on('click.DestroyCrop', function() {
+			__APP.MODALS.hideCurrent();
+		});
+	};
+	
+	CropperModal.prototype.crop = function() {
+		var self = this;
+		self.initer.trigger('crop', [self.cropper.cropper('getCroppedCanvas').toDataURL(), self.cropper.cropper('getData')]);
+	};
+	
+	return CropperModal;
+}()));
 /**
  * @requires Class.AbstractUsersModal.js
  */
 /**
- *
- * @constructor
- * @augments AbstractUsersModal
- * @param {(string|number)} organization_id
- * @param {string} [title='Подписались']
+ * @class
+ * @extends AbstractUsersModal
  */
-function SubscribersModal(organization_id, title) {
-	if (organization_id) {
-		AbstractUsersModal.apply(this, [organization_id, title ? title : 'Подписались']);
-		this.entity_id = organization_id;
+EditorsModal = extending(AbstractUsersModal, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @param {(string|number)} organization_id
+	 * @param {string} [title='Редаторы']
+	 * @param {OneUser.ROLE} [specific_role]
+	 */
+	function EditorsModal(organization_id, title, specific_role) {
+		AbstractUsersModal.apply(this, [organization_id, title ? title : 'Редакторы']);
 		this.ajax_data = {
-			fields: ['is_friend'],
-			order_by: '-is_friend,first_name'
+			order_by: 'role,first_name'
 		};
 		
-		Modal.pushModal(this);
-	} else {
-		throw Error('To open favored modal you need to pass organization_id');
-	}
-}
-
-SubscribersModal.prototype.uploadUsers = function(callback) {
-	var self = this;
-	
-	this.users.fetchOrganizationSubscribers(this.entity_id, this.entities_length, this.ajax_data, function(users) {
-		self.afterUpload(users);
-		if (callback && typeof callback == 'function') {
-			callback(users);
+		if (specific_role) {
+			this.ajax_data.roles = specific_role;
 		}
-	});
-};
+	}
+	
+	/**
+	 *
+	 * @param {function({Array})} callback
+	 */
+	EditorsModal.prototype.uploadUsers = function(callback) {
+		var self = this;
+		
+		this.users.fetchOrganizationStaff(this.entity_id, this.entities_length, this.ajax_data, function(users) {
+			self.afterUpload(users);
+			if (callback && typeof callback == 'function') {
+				callback(users);
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {Array} users
+	 * @param {jQuery} $wrapper
+	 * @return {jQuery}
+	 */
+	EditorsModal.prototype.buildUsers = function(users, $wrapper) {
+		var $users = $(),
+			last_role = false,
+			labels = {
+				admin: 'Администраторы',
+				moderator: 'Модераторы'
+			},
+			self = this;
+		
+		if (typeof $wrapper != 'undefined') {
+			last_role = $wrapper.find('.UserTombstone').last().data('role');
+		}
+		
+		users.forEach(function(user, i) {
+			if ((self.is_first && !i) || last_role != user.role) {
+				$users = $users.add(tmpl('modal-users-divider', {label: labels[user.role]}));
+				last_role = user.role;
+			}
+			
+			$users = $users.add(__APP.BUILD.userTombstones(user, {
+				tombstone_classes: ['UserTombstone'],
+				is_link: true,
+				dataset: {role: user.role}
+			}));
+		});
+		$wrapper.append($users);
+		return $users;
+	};
+	
+	return EditorsModal;
+}()));
+
+/**
+ * @requires Class.AbstractUsersModal.js
+ */
+/**
+ * @class
+ * @extends AbstractUsersModal
+ */
+FavoredModal = extending(AbstractUsersModal, (function() {
+	/**
+	 *
+	 * @param {(number|string)} event_id
+	 * @param {string} [title='Добавили в избранное']
+	 * @constructor
+	 */
+	function FavoredModal(event_id, title) {
+		if (event_id) {
+			AbstractUsersModal.apply(this, [event_id, title ? title : 'Добавили в избранное']);
+			this.ajax_data = {
+				fields: ['is_friend'],
+				order_by: '-is_friend,first_name'
+			};
+		} else {
+			throw Error('To open favored modal you need to pass event_id');
+		}
+	}
+	
+	FavoredModal.prototype.uploadUsers = function(callback) {
+		var self = this;
+		
+		this.users.fetchEventFavorites(this.entity_id, this.entities_length, this.ajax_data, function(users) {
+			self.afterUpload(users);
+			if (callback && typeof callback == 'function') {
+				callback(users);
+			}
+		});
+	};
+	
+	return FavoredModal;
+}()));
+
+/**
+ * @requires Class.AbstractModal.js
+ */
+/**
+ * @class
+ * @extends AbstractModal
+ */
+MapModal = extending(AbstractModal, (function() {
+	function MapModal(location, title) {
+		if (location) {
+			AbstractModal.call(this, {
+				content: tmpl('modal-map-content', {location: location}),
+				type: 'MapModal',
+				classes: ['-size_wide'],
+				content_classes: ['-no_padding']
+			});
+			this.location = location;
+		} else {
+			throw Error('To initiate map you need to pass location (location)')
+		}
+	}
+	
+	return MapModal;
+}()));
+/**
+ * @requires Class.AbstractModal.js
+ */
+/**
+ * @class
+ * @extends AbstractModal
+ */
+MediaModal = extending(AbstractModal, (function() {
+	function MediaModal(src, format) {
+		if (src) {
+			if (format == 'image') {
+				this.content = tmpl('modal-image-media-content', {src: src});
+			} else {
+				
+			}
+			AbstractModal.call(this, {
+				content: this.content,
+				type: 'MediaModal',
+				classes: ['-size_responsive'],
+				content_classes: ['img_holder', '-no_padding', 'ModalContent']
+			});
+			this.src = src;
+			this.format = format ? format : 'image';
+			this.modal.on('modal.show', function() {
+				__APP.MODALS.modal_wrapper.addClass('-blackened');
+			});
+			this.modal.on('modal.close', function() {
+				__APP.MODALS.modal_wrapper.removeClass('-blackened');
+			});
+		} else {
+			throw Error('To open media you need to pass media source (src)')
+		}
+	}
+	
+	/**
+	 * @lends MediaModal
+	 */
+	MediaModal.prototype.show = function() {
+		var self = this;
+		self.modal.find('img').on('load', function() {
+			__APP.MODALS.modal_destroyer.adjustHeight(self.modal.height());
+		});
+		self.__show();
+	};
+	
+	return MediaModal;
+}()));
+/**
+ * @requires Class.AbstractModal.js
+ */
+/**
+ * @class
+ * @extends AbstractModal
+ */
+StdModal = extending(AbstractModal, (function() {
+	/**
+	 *
+	 * @param {string} title
+	 * @param {(string|jQuery)} [content]
+	 * @constructor
+	 */
+	function StdModal(title, content) {
+		AbstractModal.call(this, {
+			content: content,
+			title: title,
+			type: '',
+			content_classes: [],
+			footer: __APP.BUILD.button({
+				classes: ['-color_primary','CloseModal','RippleEffect'],
+				title: 'OK'
+			})
+		});
+	}
+	
+	return StdModal;
+}()));
+/**
+ * @requires Class.AbstractUsersModal.js
+ */
+/**
+ * @class
+ * @extends AbstractUsersModal
+ */
+SubscribersModal = extending(AbstractUsersModal, (function() {
+	/**
+	 *
+	 * @param {(string|number)} organization_id
+	 * @param {string} [title='Подписались']
+	 * @constructor
+	 * @augments AbstractUsersModal
+	 */
+	function SubscribersModal(organization_id, title) {
+		if (organization_id) {
+			AbstractUsersModal.apply(this, [organization_id, title ? title : 'Подписались']);
+			this.entity_id = organization_id;
+			this.ajax_data = {
+				fields: ['is_friend'],
+				order_by: '-is_friend,first_name'
+			};
+			
+		} else {
+			throw Error('To open favored modal you need to pass organization_id');
+		}
+	}
+	
+	SubscribersModal.prototype.uploadUsers = function(callback) {
+		var self = this;
+		
+		this.users.fetchOrganizationSubscribers(this.entity_id, this.entities_length, this.ajax_data, function(users) {
+			self.afterUpload(users);
+			if (callback && typeof callback == 'function') {
+				callback(users);
+			}
+		});
+	};
+	
+	return SubscribersModal;
+}()));
+
+/**
+ * @class
+ */
+AbstractSidebar = (function () {
+	function AbstractSidebar() {
+		this.$sidebar = $('#main_sidebar');
+		this.$subscribed_orgs = $('.SidebarOrganizationsList');
+	}
+	AbstractSidebar.prototype.init = function () {
+		this.$sidebar.find('.SidebarNav').addClass('-items_' + this.$sidebar.find('.SidebarNavItem').not('.-hidden').length);
+		((window.innerHeight > 800) ? this.$sidebar.find('.SidebarOrganizationsScroll') : this.$sidebar.find('.SidebarScroll')).scrollbar({
+			disableBodyScroll: true
+		});
+	};
+	AbstractSidebar.prototype.updateSubscriptions = function () {};
+	return AbstractSidebar;
+}());
+/**
+ * @requires Class.AbstractSidebar.js
+ */
+/**
+ * @class
+ * @extends AbstractSidebar
+ */
+Sidebar = extending(AbstractSidebar, (function () {
+	function Sidebar() {
+		AbstractSidebar.call(this);
+	}
+	Sidebar.prototype.init = function () {
+		var self = this;
+		self.updateSubscriptions();
+		$(window).on('subscribe unsubscribe', function() {
+			self.updateSubscriptions();
+		});
+		
+		AbstractSidebar.prototype.init.call(this);
+	};
+	
+	Sidebar.prototype.updateSubscriptions = function() {
+		var $subscribed_orgs = this.$subscribed_orgs,
+			timing = 0,
+			current_menu_items = $.map($subscribed_orgs.children(), function(el) {
+				return $(el).data('organization_id');
+			}),
+			to_add = __APP.USER.subscriptions.filter(function(item) {
+				return current_menu_items.indexOf(item.id) === -1;
+			}),
+			to_remove = current_menu_items.filter(function(item) {
+				return !(__APP.USER.subscriptions.has(item));
+			});
+		
+		if (to_add.length) {
+			__APP.BUILD.organizationItems(to_add, {
+				block_classes: ['animated'],
+				avatar_classes: ['-size_30x30']
+			})
+				[($subscribed_orgs.length ? 'prependTo' : 'appendTo')]($subscribed_orgs)
+				.each(function(i, org_block) {
+					setTimeout(function() {
+						$(org_block).addClass('-show');
+					}, timing += 100);
+				});
+			
+			bindPageLinks($subscribed_orgs);
+		}
+		if (to_remove.length) {
+			to_remove.forEach(function(id) {
+				var $organization_item = $subscribed_orgs.find('.organization_item[data-organization_id="' + id + '"]').removeClass('-show');
+				setTimeout(function() {
+					$organization_item.remove();
+				}, 500);
+			});
+		}
+	};
+	
+	return Sidebar;
+}()));
+/**
+ * @requires Class.AbstractSidebar.js
+ */
+/**
+ * @class
+ * @extends AbstractSidebar
+ */
+SidebarNoAuth = extending(AbstractSidebar, (function () {
+	function SidebarNoAuth() {
+		AbstractSidebar.call(this);
+	}
+	SidebarNoAuth.prototype.init = function () {
+		this.$sidebar.find('.SidebarOrganizationsScroll').addClass(__C.CLASSES.NEW_HIDDEN);
+		AbstractSidebar.prototype.init.call(this);
+	};
+	return SidebarNoAuth;
+}()));
+/**
+ * @class
+ */
+AbstractTopBar = (function () {
+	function AbstractTopBar() {
+		this.$main_header = $('#main_header');
+	}
+	AbstractTopBar.prototype.init = function () {
+		this.$main_header.find('#search_bar_input').on('keypress', function(e) {
+			if (e.which == 13) {
+				__APP.changeState('/search/' + encodeURIComponent(this.value));
+			}
+		});
+		
+		bindRippleEffect(this.$main_header);
+		bindPageLinks(this.$main_header);
+	};
+	return AbstractTopBar;
+}());
+/**
+ * @requires Class.AbstractTopBar.js
+ */
+/**
+ * @class
+ * @extends AbstractTopBar
+ */
+TopBar = extending(AbstractTopBar, (function () {
+	function TopBar() {
+		AbstractTopBar.call(this);
+	}
+	TopBar.prototype.init = function () {
+		this.$main_header.find('#user_bar').on('click.openUserBar', function() {
+			var $this = $(this),
+				$document = $(document);
+			$this.addClass('-open');
+			$document.on('click.closeUserBar', function(e) {
+				if (!$(e.target).parents('#user_bar').length) {
+					$document.off('click.closeUserBar');
+					$this.removeClass('-open');
+				}
+			})
+		});
+		this.$main_header.find('.LogoutButton').on('click', __APP.USER.logout);
+		this.$main_header.find('.OpenSettingsButton').on('click', showSettingsModal);
+		AbstractTopBar.prototype.init.call(this);
+	};
+	return TopBar;
+}()));
+/**
+ * @requires Class.AbstractTopBar.js
+ */
+/**
+ * @class
+ * @extends AbstractTopBar
+ */
+TopBarNoAuth = extending(AbstractTopBar, (function () {
+	function TopBarNoAuth() {
+		AbstractTopBar.call(this);
+	}
+	TopBarNoAuth.prototype.init = function () {
+		this.$main_header.find('.LoginButton').on('click', function() {
+			(new AuthModal()).show();
+		});
+		AbstractTopBar.prototype.init.call(this);
+	};
+	return TopBarNoAuth;
+}()));
 /**
  *
  * @abstract
@@ -5663,11 +5975,10 @@ function FeedPage() {
 FeedPage.extend(Page);
 
 FeedPage.prototype.bindFeedEvents = function($parent) {
-	bindAddAvatar($parent);
 	trimAvatarsCollection($parent);
 	bindRippleEffect($parent);
 	bindDropdown($parent);
-	Modal.bindCallModal($parent);
+	__APP.MODALS.bindCallModal($parent);
 	bindPageLinks($parent);
 	
 	$parent.find('.HideEvent').not('.-Handled_HideEvent').each(function() {
@@ -5762,16 +6073,28 @@ FeedPage.prototype.render = function() {
 	var PAGE = this,
 		$window = $(window);
 	
-	__APP.renderHeaderTabs([
-		{title: 'Актуальные', page: '/feed/actual'},
-		{title: 'По времени', page: '/feed/timeline'},
-		{title: 'Избранные', page: '/feed/favored'},
-		{title: 'Рекомендованные', page: '/feed/recommendations'}/*,
-		 {title: 'Друзья', page: '/feed/friends/'},*/
-	]);
-	
 	if (!(__APP.PREVIOUS_PAGE instanceof FeedPage)) {
 		PAGE.initFeedCalendar();
+	}
+	
+	if(__APP.USER.id === -1){
+		__APP.renderHeaderTabs([
+			{title: 'Актуальные', page: '/feed/actual'},
+			{title: 'По времени', page: '/feed/timeline'}
+		]);
+		
+		if(window.location.pathname == '/feed/favored' || window.location.pathname == '/feed/recommendations'){
+			__APP.changeState('/feed/actual', true, true);
+			return null;
+		}
+	} else {
+		__APP.renderHeaderTabs([
+			{title: 'Актуальные', page: '/feed/actual'},
+			{title: 'По времени', page: '/feed/timeline'},
+			{title: 'Избранные', page: '/feed/favored'},
+			{title: 'Рекомендованные', page: '/feed/recommendations'}/*,
+			 {title: 'Друзья', page: '/feed/friends/'},*/
+		]);
 	}
 	if (window.location.pathname == '/feed/' || window.location.pathname == '/feed' || !window.location.pathname.contains('feed')) {
 		__APP.changeState('/feed/actual', true, true);
@@ -5942,11 +6265,13 @@ StatisticsPage.prototype.areaChartSeriesNormalize = function(raw_data) {
 			}
 		},
 		STD_NAMES = {
+			'notifications_sent': 'Отправлено уведомлений',
 			'view': 'Просмотры',
+			'view_detail': 'Открытий страницы события из ленты Evendate',
 			'conversion': 'Конверсия',
 			'subscribe': 'Подписалось',
 			'unsubscribe': 'Отписалось',
-			'open_site': 'Открытий страницы события из ленты Evendate',
+			'open_site': 'Открытий страницы события',
 			'open_conversion': 'Конверсия просмотра события в ленте к открытию страницы события',
 			'fave': 'Кол-во пользователей, которые добавили событие в избранное',
 			'fave_conversion': 'Конверсия открытия страницы события к добавлениям в избранное'
@@ -6002,12 +6327,20 @@ StatisticsPage.prototype.buildAreaCharts = function(data, additional_options) {
 	var self = this,
 		normalized_series = self.areaChartSeriesNormalize(data),
 		FIELDS = {
+			notifications_sent: {
+				title: 'Отправлено уведомлений пользователям',
+				wrapper_class: 'NotificationsSentAreaChart'
+			},
 			view: {
 				title: 'Просмотры',
 				wrapper_class: 'ViewAreaChart'
 			},
-			open_site: {
+			view_detail: {
 				title: 'Открытий страницы события',
+				wrapper_class: 'ViewDetailAreaChart'
+			},
+			open_site: {
+				title: 'Открытий страницы события из ленты Evendate',
 				wrapper_class: 'OpenSiteAreaChart'
 			},
 			open_conversion: {
@@ -6376,6 +6709,10 @@ StatisticsEventOverviewPage.extend(StatisticsEventPage);
 StatisticsEventOverviewPage.prototype.render = function() {
 	var PAGE = this;
 	
+	if(__APP.USER.id === -1){
+		__APP.changeState('/feed/actual', true, true);
+		return null;
+	}
 	__APP.changeTitle([{
 		title: 'Организации',
 		page: '/statistics'
@@ -6392,7 +6729,7 @@ StatisticsEventOverviewPage.prototype.render = function() {
 	})));
 	this.$wrapper.find('.EventStatAreaCharts').children('.AreaChart').html(tmpl('loader'));
 	
-	this.scoreboards_stats.fetchStatistics(Statistics.SCALES.OVERALL, false, ['view', 'fave', 'open_site', 'fave_conversion', 'open_conversion'], null, function(data) {
+	this.scoreboards_stats.fetchStatistics(Statistics.SCALES.OVERALL, false, ['notifications_sent', 'view', 'fave', 'view_detail', 'fave_conversion', 'open_conversion'], null, function(data) {
 		var scoreboards_data = {numbers: {}};
 		$.each(data, function(field, stats) {
 			scoreboards_data.numbers[field] = stats[0].value
@@ -6402,15 +6739,16 @@ StatisticsEventOverviewPage.prototype.render = function() {
 			'view': 'Просмотров события'
 		}, ['fave', 'view']);
 		PAGE.updateScoreboards(PAGE.$wrapper.find('.EventstatsBigScoreboards'), scoreboards_data, {
+			'notifications_sent': 'Уведомлений отправлено',
 			'view': 'Просмотров',
-			'open_site': 'Открытий',
+			'view_detail': 'Открытий',
 			'open_conversion': 'Конверсия открытий',
 			'fave': 'Добавлений',
 			'fave_conversion': 'Конверсия добавлений'
-		}, ['view', 'open_site', 'open_conversion', 'fave', 'fave_conversion'], 'big');
+		}, ['notifications_sent', 'view', 'view_detail', 'open_conversion', 'fave', 'fave_conversion'], 'big');
 	});
 	
-	this.graphics_stats.fetchStatistics(Statistics.SCALES.DAY, moment(__APP.EVENDATE_BEGIN, 'DD-MM-YYYY').format(), ['view', 'fave', 'open_site', 'fave_conversion', 'open_conversion'], null, function(data) {
+	this.graphics_stats.fetchStatistics(Statistics.SCALES.DAY, moment(__APP.EVENDATE_BEGIN, 'DD-MM-YYYY').format(), ['notifications_sent', 'view', 'fave', 'view_detail', 'fave_conversion', 'open_conversion'], null, function(data) {
 		PAGE.buildAreaCharts(data, {
 			rangeSelector: {
 				selected: 1
@@ -6418,7 +6756,7 @@ StatisticsEventOverviewPage.prototype.render = function() {
 		});
 	});
 	
-	Modal.bindCallModal(PAGE.$wrapper);
+	__APP.MODALS.bindCallModal(PAGE.$wrapper);
 	bindPageLinks(PAGE.$wrapper);
 };
 /**
@@ -6519,7 +6857,7 @@ StatisticsOrganizationEventsPage.buildEventRows = function(events, date_field) {
 		return $.extend({}, event, {
 			date: moment.unix(event[date_field]).format(__LOCALES.ru_RU.DATE.DATE_FORMAT),
 			timestamp: event[date_field],
-			conversion: Math.round(event.open_site * 100 / event.view) + '%'
+			conversion: Math.round(event.view ? event.view_detail * 100 / event.view : 0) + '%'
 		});
 	}));
 	bindPageLinks($events);
@@ -6531,6 +6869,11 @@ StatisticsOrganizationEventsPage.prototype.render = function() {
 		$window = $(window),
 		$past_events_wrapper,
 		past_events_tablesort;
+	
+	if(__APP.USER.id === -1){
+		__APP.changeState('/feed/actual', true, true);
+		return null;
+	}
 	
 	this.renderHeaderTabs();
 	__APP.changeTitle([{
@@ -6552,7 +6895,10 @@ StatisticsOrganizationEventsPage.prototype.render = function() {
 		}
 	});
 	
-	this.past_events.fetchOrganizationsEvents(this.organization.id, {canceled_shown: true}, 30, function() {
+	this.past_events.fetchOrganizationsEvents(this.organization.id, {
+		canceled_shown: true,
+		order_by: '-first_event_date'
+	}, 30, function() {
 		if(this.length){
 			$past_events_wrapper = this_page.$wrapper.find('.OrgStatPastEventsWrapper');
 			$past_events_wrapper.html(tmpl('orgstat-events-wrapper', {
@@ -6734,6 +7080,11 @@ StatisticsOrganizationOverviewPage.prototype.render = function() {
 		storage_until_name = 'org_stats_' + this.id + '_until',
 		is_cached_data_actual = moment.unix(window.sessionStorage.getItem(storage_until_name)).isAfter(moment());
 	
+	if(__APP.USER.id === -1){
+		__APP.changeState('/feed/actual', true, true);
+		return null;
+	}
+	
 	if (!window.location.pathname.contains('overview')) {
 		__APP.changeState(window.location.pathname+'/overview', true);
 	}
@@ -6843,6 +7194,82 @@ function StatisticsOrganizationSupportPage(org_id) {
 StatisticsOrganizationSupportPage.extend(StatisticsOrganizationPage);
 
 StatisticsOrganizationSupportPage.prototype.render = function() {};
+/**
+ * @requires ../Class.Page.js
+ */
+/**
+ *
+ * @constructor
+ * @augments Page
+ */
+function OnboardingPage() {
+	Page.apply(this, arguments);
+	this.ajax_data = {
+		length: 30,
+		offset: 0,
+		fields: 'img_small_url'
+	};
+	this.disable_upload = false;
+	this.block_scroll = true;
+}
+OnboardingPage.extend(Page);
+
+OnboardingPage.prototype.init = function() {
+	bindRippleEffect(this.$wrapper);
+	bindPageLinks(this.$wrapper);
+	this.$wrapper.find('.Link').on('click', function() {
+		if($(this).is('.SkipOnboarding')){
+			cookies.setItem('skip_onboarding', 1, moment().add(7, 'd')._d);
+		}
+		__APP.SIDEBAR.updateSubscriptions();
+	});
+};
+
+OnboardingPage.prototype.bindSubscriptions = function() {
+	this.$wrapper.find(".OnboardingOrgItem").not('.-Handled_OnboardingOrgItem').on('click', function() {
+		var $this = $(this);
+		if ($this.hasClass(__C.CLASSES.NEW_ACTIVE)) {
+			__APP.USER.unsubscribeFromOrganization($this.data("organization_id"));
+		} else {
+			__APP.USER.subscribeToOrganization($this.data("organization_id"));
+		}
+		$this.toggleClass(__C.CLASSES.NEW_ACTIVE);
+	}).addClass('-Handled_OnboardingOrgItem');
+};
+
+OnboardingPage.prototype.render = function() {
+	var PAGE = this,
+		$loader = tmpl('loader', {});
+	
+	if(__APP.USER.id === -1){
+		__APP.changeState('/feed/actual', true, true);
+		return null;
+	}
+	function appendRecommendations(organizations) {
+		$loader.detach();
+		if (organizations.length) {
+			PAGE.$wrapper.find(".RecommendationsWrapper").last().append(tmpl("onboarding-recommendation", organizations));
+			PAGE.bindSubscriptions();
+			PAGE.block_scroll = false;
+		} else {
+			PAGE.disable_upload = true;
+		}
+	}
+	
+	PAGE.$wrapper.html(tmpl("onboarding-main", {}));
+	PAGE.init();
+	PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
+	OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
+	PAGE.$wrapper.find(".RecommendationsScrollbar").scrollbar({
+		onScroll: function(y, x) {
+			if (y.scroll == y.maxScroll && !PAGE.disable_upload && !PAGE.block_scroll) {
+				PAGE.block_scroll = true;
+				PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
+				OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
+			}
+		}
+	});
+};
 /**
  * @requires ../Class.Page.js
  */
@@ -7041,6 +7468,10 @@ RedactEventPage.prototype.init = function() {
 			__APP.changeState('/event/' + PAGE.event.id);
 		}
 		
+		function onError() {
+			PAGE.$wrapper.removeClass('-faded');
+		}
+		
 		$form.find(':required').not(':disabled').each(function() {
 			var $this = $(this),
 				max_length = $this.data('maxlength');
@@ -7124,9 +7555,9 @@ RedactEventPage.prototype.init = function() {
 			PAGE.$wrapper.addClass('-faded');
 			try {
 				if (is_edit) {
-					PAGE.event.updateEvent(data, afterSubmit);
+					PAGE.event.updateEvent(data, afterSubmit, onError);
 				} else {
-					PAGE.event.createEvent(data, afterSubmit);
+					PAGE.event.createEvent(data, afterSubmit, onError);
 				}
 			} catch (e) {
 				PAGE.$wrapper.removeClass('-faded');
@@ -7139,7 +7570,7 @@ RedactEventPage.prototype.init = function() {
 	bindTimeInput(PAGE.$wrapper);
 	bindSelect2(PAGE.$wrapper);
 	bindTabs(PAGE.$wrapper);
-	Modal.bindCallModal(PAGE.$wrapper);
+	__APP.MODALS.bindCallModal(PAGE.$wrapper);
 	bindLimitInputSize(PAGE.$wrapper);
 	bindRippleEffect(PAGE.$wrapper);
 	bindFileLoadButton(PAGE.$wrapper);
@@ -7506,6 +7937,12 @@ RedactEventPage.prototype.render = function() {
 			tomorrow_date: moment().add(1, 'd').format(__C.DATE_FORMAT)
 		};
 	
+	
+	if(__APP.USER.id === -1){
+		__APP.changeState('/feed/actual', true, true);
+		return null;
+	}
+	
 	function selectDates($view, raw_dates) {
 		var MainCalendar = $view.find('.EventDatesCalendar').data('calendar'),
 			$table_rows = $view.find('.SelectedDaysRows'),
@@ -7790,12 +8227,11 @@ OneEventPage.buildNotifications = function(raw_notifications, event_id, last_dat
 
 OneEventPage.prototype.init = function() {
 	var PAGE = this;
-	bindAddAvatar(PAGE.$wrapper);
 	trimAvatarsCollection(PAGE.$wrapper);
 	bindRippleEffect(PAGE.$wrapper);
 	bindDropdown(PAGE.$wrapper);
 	//bindShareButtons(PAGE.$wrapper);
-	Modal.bindCallModal(PAGE.$wrapper);
+	__APP.MODALS.bindCallModal(PAGE.$wrapper);
 	bindCollapsing(PAGE.$wrapper);
 	bindPageLinks(PAGE.$wrapper);
 	
@@ -7881,8 +8317,10 @@ OneEventPage.prototype.render = function() {
 	}
 	
 	PAGE.$wrapper.html(tmpl('event-page', $.extend({}, PAGE.event, {
-		add_to_favorite_button: new AddToFavoriteButton(PAGE.event.id, PAGE.event.is_favorite, {
-			classes: ['event_favourite_button', '-size_low', '-rounded', 'AddAvatar', 'RippleEffect']
+		add_to_favorite_button: new AddToFavoriteButton(PAGE.event.id, {
+			is_add_avatar: true,
+			is_subscribed: PAGE.event.is_favorite,
+			classes: ['event_favourite_button', '-size_low', '-rounded', 'RippleEffect']
 		}),
 		subscribers: $subscribers,
 		avatars_collection_classes: avatars_collection_classes.join(' '),
@@ -7892,7 +8330,7 @@ OneEventPage.prototype.render = function() {
 		location_sanitized: encodeURI(PAGE.event.location),
 		event_edit_functions: PAGE.event.can_edit ? tmpl('event-edit-functions', PAGE.event) : '',
 		event_registration_information: PAGE.event.registration_required ? tmpl('event-registration-info', {registration_till: moment.unix(PAGE.event.registration_till).format('D MMMM')}) : '',
-		event_price_information: PAGE.event.is_free ? '' : tmpl('event-price-info', {min_price: PAGE.event.min_price ? PAGE.event.min_price : '0'}),
+		event_price_information: PAGE.event.is_free ? '' : tmpl('event-price-info', {min_price: PAGE.event.min_price ? formatCurrency(PAGE.event.min_price) : '0'}),
 		canceled: PAGE.event.canceled ? '' : '-hidden',
 		event_additional_fields: $event_additional_fields,
 		cancel_cancellation: PAGE.event.can_edit ? tmpl('button', {
@@ -7919,6 +8357,10 @@ OneEventPage.prototype.render = function() {
 					return moment.unix(date.event_date).format(__C.DATE_FORMAT)
 				})
 			);
+	}
+	
+	if(__APP.USER.id === -1){
+		$('.DropdownButton, .DropdownBox').remove();
 	}
 	
 	PAGE.init();
@@ -7987,16 +8429,19 @@ FriendsPage.prototype.render = function() {
 		});
 	}
 	
-	
-	var $main_content = $view.find('.friends-main-content').removeClass(__C.CLASSES.HIDDEN),
-		$friends_right_list = $view.find('.friends-right-bar'),
-		$load_btn = $view.find('.load-more-btn').addClass(__C.CLASSES.HIDDEN),
-		$user_content = $view.find('.one-friend-main-content').addClass(__C.CLASSES.HIDDEN);
-	
-	
-	getFriendsList($friends_right_list, function(res) {});
-	$load_btn.find('.btn').on('click', getFeed);
-	getFeed();
+	if(__APP.USER.id === -1){
+		__APP.changeState('/feed/');
+	} else {
+		var $main_content = $view.find('.friends-main-content').removeClass(__C.CLASSES.HIDDEN),
+			$friends_right_list = $view.find('.friends-right-bar'),
+			$load_btn = $view.find('.load-more-btn').addClass(__C.CLASSES.HIDDEN),
+			$user_content = $view.find('.one-friend-main-content').addClass(__C.CLASSES.HIDDEN);
+		
+		
+		getFriendsList($friends_right_list, function(res) {});
+		$load_btn.find('.btn').on('click', getFeed);
+		getFeed();
+	}
 };
 /**
  * @requires ../Class.Page.js
@@ -8021,9 +8466,16 @@ OneFriendPage.prototype.render = function() {
 		$content = $view.find('.one-friend-main-content'),
 		page_number = 0;
 	
-	getFriendsList($view.find('.friends-right-bar'), function() {
-		$('.friend-item.friend-' + friend_id).addClass(__C.CLASSES.ACTIVE).siblings().removeClass(__C.CLASSES.ACTIVE);
-	});
+	
+	if(__APP.USER.id === -1){
+		$view.find('.friends-right-bar').remove();
+		$view.find('.back-to-friends-list').remove();
+	} else {
+		getFriendsList($view.find('.friends-right-bar'), function() {
+			$('.friend-item.friend-' + friend_id).addClass(__C.CLASSES.ACTIVE).siblings().removeClass(__C.CLASSES.ACTIVE);
+		});
+	}
+	
 	$view.find('.friends-main-content').addClass(__C.CLASSES.HIDDEN);
 	$content.removeClass(__C.CLASSES.HIDDEN).empty();
 	
@@ -8117,188 +8569,16 @@ OneFriendPage.prototype.render = function() {
 					.addClass(__C.CLASSES.HIDDEN);
 			});
 			
-			$view.find('.back-to-friends-list').on('click', function() {
-				__APP.changeState('/friends');
-			});
+			if(__APP.USER.id === -1){
+				$view.find('.back-to-friends-list').remove();
+			} else {
+				$view.find('.back-to-friends-list').on('click', function() {
+					__APP.changeState('/friends');
+				});
+			}
 			getFriendFeed();
 		}
 	});
-};
-/**
- * @requires ../Class.Page.js
- */
-/**
- *
- * @constructor
- * @augments Page
- */
-function OnboardingPage() {
-	Page.apply(this, arguments);
-	this.ajax_data = {
-		length: 30,
-		offset: 0,
-		fields: 'img_small_url'
-	};
-	this.disable_upload = false;
-	this.block_scroll = true;
-}
-OnboardingPage.extend(Page);
-
-OnboardingPage.prototype.init = function() {
-	bindRippleEffect(this.$wrapper);
-	bindPageLinks(this.$wrapper);
-	this.$wrapper.find('.Link').on('click', function() {
-		__APP.SUBSCRIBED_ORGS.update();
-	});
-};
-
-OnboardingPage.prototype.bindSubscriptions = function() {
-	this.$wrapper.find(".OnboardingOrgItem").not('.-Handled_OnboardingOrgItem').on('click', function() {
-		var $this = $(this);
-		if ($this.hasClass(__C.CLASSES.NEW_ACTIVE)) {
-			__APP.USER.unsubscribeFromOrganization($this.data("organization_id"));
-		} else {
-			__APP.USER.subscribeToOrganization($this.data("organization_id"));
-		}
-		$this.toggleClass(__C.CLASSES.NEW_ACTIVE);
-	}).addClass('-Handled_OnboardingOrgItem');
-};
-
-OnboardingPage.prototype.render = function() {
-	var PAGE = this,
-		$loader = tmpl('loader', {});
-	
-	function appendRecommendations(organizations) {
-		$loader.detach();
-		if (organizations.length) {
-			PAGE.$wrapper.find(".RecommendationsWrapper").last().append(tmpl("onboarding-recommendation", organizations));
-			PAGE.bindSubscriptions();
-			PAGE.block_scroll = false;
-		} else {
-			PAGE.disable_upload = true;
-		}
-	}
-	
-	PAGE.$wrapper.html(tmpl("onboarding-main", {}));
-	PAGE.init();
-	PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
-	OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
-	PAGE.$wrapper.find(".RecommendationsScrollbar").scrollbar({
-		onScroll: function(y, x) {
-			if (y.scroll == y.maxScroll && !PAGE.disable_upload && !PAGE.block_scroll) {
-				PAGE.block_scroll = true;
-				PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
-				OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
-			}
-		}
-	});
-};
-/**
- * @requires ../Class.Page.js
- */
-/**
- *
- * @constructor
- * @augments Page
- * @param {string} search
- */
-function SearchPage(search) {
-	Page.apply(this, arguments);
-	
-	this.page_title = 'Поиск';
-	this.$search_bar_input = $('#search_bar_input');
-	this.search_string = decodeURIComponent(search);
-	this.events_ajax_data = {
-		length: 20,
-		fields: [
-			'image_horizontal_medium_url',
-			'detail_info_url',
-			'is_favorite',
-			'nearest_event_date',
-			'can_edit',
-			'location',
-			'favored_users_count',
-			'organization_name',
-			'organization_short_name',
-			'organization_logo_small_url',
-			'description',
-			'favored',
-			'is_same_time',
-			'tags',
-			'dates'
-		],
-		filters: "future=true"
-	};
-	this.organizations_ajax_data = {
-		length: 30,
-		fields: [
-			'subscribed_count',
-			'img_small_url'
-		]
-	};
-	this.search_results = new SearchResults(this.search_string);
-	this.is_loading = true;
-	this.search_results.fetchEventsAndOrganizations(this.events_ajax_data, this.organizations_ajax_data, Page.triggerRender);
-}
-SearchPage.extend(Page);
-/**
- *
- * @param {(OneOrganization|Array<OneOrganization>|OrganizationsCollection)} organizations
- * @returns {jQuery}
- */
-SearchPage.buildOrganizationItems = function(organizations) {
-	return __APP.BUILD.organizationItems(organizations, {
-		block_classes: ['-show'],
-		avatar_classes: ['-size_50x50', '-rounded'],
-		counter_classes: [__C.CLASSES.NEW_HIDDEN]
-	})
-};
-
-SearchPage.prototype.render = function() {
-	var PAGE = this,
-		data = {},
-		$organizations_scrollbar;
-	
-	this.$search_bar_input.val(this.search_string);
-	
-	function bindFeedEvents($parent) {
-		bindAddAvatar($parent);
-		trimAvatarsCollection($parent);
-		bindRippleEffect($parent);
-		Modal.bindCallModal($parent);
-		bindPageLinks($parent);
-		
-		$parent.find('.HideEvent').addClass(__C.CLASSES.NEW_HIDDEN);
-	}
-	
-	if (this.search_results.events.length == 0) {
-		data.events = tmpl('search-no-events', {});
-	} else {
-		data.events = __APP.BUILD.feedEventCards(this.search_results.events);
-	}
-	if (this.search_results.organizations.length == 0) {
-		data.no_organizations = __C.CLASSES.NEW_HIDDEN;
-	} else {
-		data.organizations = SearchPage.buildOrganizationItems(this.search_results.organizations);
-	}
-	
-	this.$wrapper.append(tmpl('search-wrapper', data));
-	$organizations_scrollbar = this.$wrapper.find('.SearchOrganizationsScrollbar').scrollbar({
-		disableBodyScroll: true,
-		onScroll: function(y) {
-			if (y.scroll == y.maxScroll) {
-				PAGE.search_results.fetchOrganizations(PAGE.organizations_ajax_data, function(organizations) {
-					if (organizations.length) {
-						$organizations_scrollbar.append(SearchPage.buildOrganizationItems(organizations));
-					} else {
-						$organizations_scrollbar.off('scroll.onScroll');
-					}
-					bindPageLinks($organizations_scrollbar);
-				});
-			}
-		}
-	});
-	bindFeedEvents(this.$wrapper);
 };
 /**
  * @requires ../Class.Page.js
@@ -8337,6 +8617,11 @@ EditOrganizationPage.prototype.render = function() {
 		organization_id = this.organization.id,
 		additional_fields,
 		local_storage;
+	
+	if(__APP.USER.id === -1){
+		__APP.changeState('/feed/actual', true, true);
+		return null;
+	}
 	
 	function initEditEventPage($view) {
 		
@@ -8540,7 +8825,7 @@ EditOrganizationPage.prototype.render = function() {
 	}
 	
 	
-	if (typeof organization_id === 'undefined') {
+	if (!organization_id) {
 		try {
 			local_storage = JSON.parse(window.localStorage.getItem('organization_info'));
 		} catch (e) {
@@ -8551,12 +8836,12 @@ EditOrganizationPage.prototype.render = function() {
 			header_text: 'Новый организатор'
 		}, local_storage, true);
 		
-		window.localStorage.removeItem('open_add_organization');
+		cookies.removeItem('open_add_organization', '/');
 		window.localStorage.removeItem('organization_info');
 		
 		$wrapper.html(tmpl('add-organization-page', additional_fields));
 		initEditEventPage($view);
-		Modal.bindCallModal($view);
+		__APP.MODALS.bindCallModal($view);
 		initOrganizationTypes();
 	} else {
 		additional_fields = $.extend(true, {}, this.organization);
@@ -8587,7 +8872,7 @@ EditOrganizationPage.prototype.render = function() {
 				$button.data('crop_data', crop_data);
 			});
 		}
-		Modal.bindCallModal($view);
+		__APP.MODALS.bindCallModal($view);
 		
 		if (additional_fields.img_url) {
 			toDataUrl(additional_fields.img_url, function(base64_string) {
@@ -8879,9 +9164,8 @@ OrganizationPage.prototype.bindUploadEventsOnScroll = function(type) {
 
 OrganizationPage.prototype.bindFeedEvents = function($parent) {
 	bindRippleEffect($parent);
-	bindAddAvatar($parent);
 	trimAvatarsCollection($parent);
-	Modal.bindCallModal($parent);
+	__APP.MODALS.bindCallModal($parent);
 	bindPageLinks($parent);
 };
 
@@ -8890,7 +9174,7 @@ OrganizationPage.prototype.init = function() {
 		$subscribers_scroll;
 	bindTabs(PAGE.$wrapper);
 	PAGE.bindFeedEvents(PAGE.$wrapper);
-	Modal.bindCallModal(PAGE.$wrapper);
+	__APP.MODALS.bindCallModal(PAGE.$wrapper);
 	
 	PAGE.$wrapper.find('.Tabs').on('change.tabs', function() {
 		var scroll_events = [];
@@ -8932,7 +9216,9 @@ OrganizationPage.prototype.render = function() {
 	$('.SidebarOrganizationsList').find('[data-organization_id="' + PAGE.organization.id + '"]').find('.OrganizationCounter').addClass('-hidden');
 	
 	PAGE.$wrapper.html(tmpl('organization-wrapper', $.extend(true, {
-		subscribe_button: new SubscribeButton(PAGE.organization.id, PAGE.organization.is_subscribed, {
+		background_image: PAGE.organization.background_img_url ? tmpl('organization-background-image', PAGE.organization) : '',
+		subscribe_button: new SubscribeButton(PAGE.organization.id, {
+			is_subscribed: PAGE.organization.is_subscribed,
 			colors: {
 				subscribe: '-color_accent',
 				unsubscribe: '-color_neutral',
@@ -8983,6 +9269,156 @@ OrganizationPage.prototype.render = function() {
 			PAGE.$wrapper.trigger('events_load.CanceledEvents');
 		});
 	}
+};
+/**
+ * @requires ../Class.Page.js
+ */
+/**
+ *
+ * @constructor
+ * @augments Page
+ * @param {string} search
+ */
+function SearchPage(search) {
+	Page.apply(this, arguments);
+	
+	this.page_title = 'Поиск';
+	this.$search_bar_input = $('#search_bar_input');
+	this.search_string = decodeURIComponent(search);
+	this.events_ajax_data = {
+		length: 10,
+		fields: [
+			'image_horizontal_medium_url',
+			'detail_info_url',
+			'is_favorite',
+			'nearest_event_date',
+			'can_edit',
+			'location',
+			'registration_required',
+			'registration_till',
+			'is_free',
+			'min_price',
+			'favored_users_count',
+			'organization_name',
+			'organization_short_name',
+			'organization_logo_small_url',
+			'description',
+			'favored',
+			'is_same_time',
+			'tags',
+			'dates'
+		],
+		order_by: 'nearest_event_date,-first_event_date'
+	};
+	this.organizations_ajax_data = {
+		length: 30,
+		fields: [
+			'subscribed_count',
+			'img_small_url'
+		]
+	};
+	this.past_events = false;
+	this.search_results = new SearchResults(this.search_string);
+	this.is_loading = true;
+	this.search_results.fetchEventsAndOrganizations(this.events_ajax_data, this.organizations_ajax_data, Page.triggerRender);
+}
+SearchPage.extend(Page);
+/**
+ *
+ * @param {(OneOrganization|Array<OneOrganization>|OrganizationsCollection)} organizations
+ * @returns {jQuery}
+ */
+SearchPage.buildOrganizationItems = function(organizations) {
+	return __APP.BUILD.organizationItems(organizations, {
+		block_classes: ['-show'],
+		avatar_classes: ['-size_50x50', '-rounded'],
+		counter_classes: [__C.CLASSES.NEW_HIDDEN]
+	})
+};
+/**
+ *
+ * @param {(OneEvent|Array<OneEvent>|EventsCollection)} events
+ * @returns {jQuery}
+ */
+SearchPage.buildEventCards = function(events) {
+	var $events = $();
+	if (events.length == 0) {
+		$events = tmpl('search-no-events', {});
+	} else {
+		events.forEach(function(event) {
+			if(event.nearest_event_date == undefined && !this.past_events){
+				$events = $events.add(tmpl('divider', {title: 'Прошедшие события'}));
+				this.past_events = true;
+			}
+			$events = $events.add(__APP.BUILD.feedEventCards(event));
+		});
+	}
+	return $events
+};
+
+SearchPage.prototype.init = function() {
+	var PAGE = this,
+		$window = $(window),
+		$organizations_scrollbar;
+	
+	function bindFeedEvents($parent) {
+		trimAvatarsCollection($parent);
+		bindRippleEffect($parent);
+		__APP.MODALS.bindCallModal($parent);
+		bindPageLinks($parent);
+		
+		$parent.find('.HideEvent').addClass(__C.CLASSES.NEW_HIDDEN);
+	}
+	
+	$organizations_scrollbar = this.$wrapper.find('.SearchOrganizationsScrollbar').scrollbar({
+		disableBodyScroll: true,
+		onScroll: function(y) {
+			if (y.scroll == y.maxScroll) {
+				PAGE.search_results.fetchOrganizations(PAGE.organizations_ajax_data, function(organizations) {
+					if (organizations.length) {
+						$organizations_scrollbar.append(SearchPage.buildOrganizationItems(organizations));
+					} else {
+						$organizations_scrollbar.off('scroll.onScroll');
+					}
+					bindPageLinks($organizations_scrollbar);
+				});
+			}
+		}
+	});
+	$window.off('scroll.upload' + PAGE.constructor.name);
+	$window.on('scroll.upload' + PAGE.constructor.name, function() {
+		if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.block_scroll) {
+			PAGE.block_scroll = true;
+			__APP.CURRENT_JQXHR = PAGE.search_results.fetchEvents(PAGE.events_ajax_data, function(events) {
+				var $events;
+				if(events.length){
+					$events = SearchPage.buildEventCards(events);
+					bindFeedEvents($events);
+					PAGE.$wrapper.find('.SearchEvents').append($events);
+					PAGE.block_scroll = false;
+				} else {
+					$window.off('scroll.upload' + PAGE.constructor.name);
+				}
+			});
+		}
+	});
+	bindFeedEvents(this.$wrapper);
+};
+
+SearchPage.prototype.render = function() {
+	var data = {};
+	
+	this.$search_bar_input.val(this.search_string);
+	
+	data.events = SearchPage.buildEventCards(this.search_results.events);
+	if (this.search_results.organizations.length == 0) {
+		data.no_organizations = __C.CLASSES.NEW_HIDDEN;
+	} else {
+		data.organizations = SearchPage.buildOrganizationItems(this.search_results.organizations);
+	}
+	
+	this.$wrapper.append(tmpl('search-wrapper', data));
+	this.init();
 };
 /**
  * @requires Class.StatisticsPage.js
@@ -9058,7 +9494,7 @@ StatisticsOverviewPage.buildMyOrganizationsBlocks = function(organizations) {
 StatisticsOverviewPage.prototype.bindOrganizationsEvents = function($parent) {
 	trimAvatarsCollection($parent);
 	bindPageLinks($parent);
-	Modal.bindCallModal($parent);
+	__APP.MODALS.bindCallModal($parent);
 	bindRippleEffect($parent);
 	return $parent;
 };
@@ -9070,8 +9506,10 @@ StatisticsOverviewPage.prototype.bindUploadOnScroll = function() {
 			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.disable_upload) {
 				$window.off('scroll.uploadOrganizations');
 				PAGE.my_organizations.fetchMyOrganizations('admin', PAGE.my_organizations_fields, 10, '', function(organizations) {
+					var $organizations = StatisticsOverviewPage.buildMyOrganizationsBlocks(organizations);
 					if (organizations.length) {
-						PAGE.$wrapper.find('.StatOverviewOrganizations').append(PAGE.bindOrganizationsEvents(StatisticsOverviewPage.buildMyOrganizationsBlocks(organizations)));
+						PAGE.$wrapper.find('.StatOverviewOrganizations').append($organizations);
+						PAGE.bindOrganizationsEvents($organizations);
 						$window.on('scroll.uploadOrganizations', scrollEvent);
 					} else {
 						PAGE.disable_upload = true;
@@ -9091,6 +9529,10 @@ StatisticsOverviewPage.prototype.init = function() {
 };
 
 StatisticsOverviewPage.prototype.render = function() {
+	if(__APP.USER.id === -1){
+		__APP.changeState('/feed/actual', true, true);
+		return null;
+	}
 	this.$wrapper.html(tmpl('statistics-overview-wrapper', {
 		organizations: StatisticsOverviewPage.buildMyOrganizationsBlocks(this.my_organizations)
 	}));
@@ -9100,6 +9542,30 @@ StatisticsOverviewPage.prototype.render = function() {
 StatisticsOverviewPage.prototype.destroy = function() {
 	$(window).off('scroll.uploadOrganizations');
 };
+/**
+ *
+ * @namespace __APP
+ * @property {object} SERVER
+ * @property {object} SERVER.AJAX_METHOD
+ * @property {string} EVENDATE_BEGIN
+ * @property {object} AUTH_URLS
+ * @property {string} AUTH_URLS.vk
+ * @property {string} AUTH_URLS.google
+ * @property {string} AUTH_URLS.facebook
+ * @property {AbstractTopBar} TOP_BAR
+ * @property {AbstractSidebar} SIDEBAR
+ * @property {CurrentUser} USER
+ * @property {Page} PREVIOUS_PAGE
+ * @property {Page} CURRENT_PAGE
+ * @property {jqXHR} CURRENT_JQXHR
+ * @property {object} MODALS
+ * @property {number} MODALS.last_id
+ * @property {Object<number, AbstractModal>} MODALS.collection
+ * @property {AbstractModal} MODALS.active_modal
+ * @property {jQuery} MODALS.modal_destroyer
+ * @property {jQuery} MODALS.modal_wrapper
+ * @property {object} BUILD
+ */
 __APP = {
 	SERVER: {
 		/**
@@ -9116,85 +9582,83 @@ __APP = {
 		 * @param {__APP.SERVER.AJAX_METHOD} ajax_method
 		 * @param {string} ajax_url
 		 * @param {(AJAXData|string)} ajax_data
+		 * @param {string} [content_type='application/x-www-form-urlencoded; charset=UTF-8']
 		 * @param {AJAXCallback} [success]
 		 * @param {function} [error]
 		 * @returns {jqXHR}
 		 */
-		ajax: function ajax(ajax_method, ajax_url, ajax_data, success, error) {
+		dealAjax: function(ajax_method, ajax_url, ajax_data, content_type, success, error) {
+			var self = this;
 			return $.ajax({
 				url: ajax_url,
 				data: ajax_data,
 				method: ajax_method,
-				contentType: 'application/json',
-				success: success,
+				contentType: content_type || 'application/x-www-form-urlencoded; charset=UTF-8',
+				success: function(res) {
+					__APP.SERVER.ajaxHandler(res, function(data, text) {
+						if (success && typeof success == 'function') {
+							success.call(self, data);
+						}
+					}, __APP.SERVER.ajaxErrorHandler)
+				},
 				error: error
 			});
-		},
-		/**
-		 *
-		 * @param {__APP.SERVER.AJAX_METHOD} ajax_method
-		 * @param {string} ajax_url
-		 * @param {(AJAXData|string)} ajax_data
-		 * @param {AJAXCallback} [success]
-		 * @returns {jqXHR}
-		 */
-		dealAjax: function(ajax_method, ajax_url, ajax_data, success) {
-			var self = this;
-			return __APP.SERVER.ajax(ajax_method, ajax_url, ajax_data, function(res) {
-				__APP.SERVER.ajaxHandler(res, function(data, text) {
-					if (success && typeof success == 'function') {
-						success.call(self, data);
-					}
-				}, __APP.SERVER.ajaxErrorHandler)
-			})
 		},
 		/**
 		 *
 		 * @param {string} ajax_url
 		 * @param {AJAXData} ajax_data
 		 * @param {AJAXCallback} [success]
+		 * @param {function} [error]
 		 * @returns {jqXHR}
 		 */
-		getData: function getData(ajax_url, ajax_data, success) {
+		getData: function getData(ajax_url, ajax_data, success, error) {
 			var self = this;
-			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.GET, ajax_url, __APP.SERVER.validateData(ajax_data), function(data) {
+			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.GET, ajax_url, __APP.SERVER.validateData(ajax_data), 'application/json', function(data) {
 				if (ajax_data.length != undefined && ajax_data.offset != undefined) {
 					ajax_data.offset += ajax_data.length;
 				}
 				if (success && typeof success == 'function') {
 					success.call(self, data);
 				}
-			});
+			}, error);
 		},
 		/**
 		 *
 		 * @param {string} ajax_url
 		 * @param {AJAXData} ajax_data
 		 * @param {AJAXCallback} [success]
+		 * @param {function} [error]
 		 * @returns {jqXHR}
 		 */
-		updateData: function updateData(ajax_url, ajax_data, success) {
-			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.PUT, ajax_url, ajax_data, success);
+		updateData: function updateData(ajax_url, ajax_data, success, error) {
+			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.PUT, ajax_url, ajax_data, 'application/json', success, error);
+		},
+		/**
+		 *
+		 * @param {string} ajax_url
+		 * @param {AJAXData} ajax_data
+		 * @param {boolean} is_payload
+		 * @param {AJAXCallback} [success]
+		 * @param {function} [error]
+		 * @returns {jqXHR}
+		 */
+		addData: function addData(ajax_url, ajax_data, is_payload, success, error) {
+			if(is_payload){
+				return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.POST, ajax_url, ajax_data, 'application/json', success, error);
+			}
+			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.POST, ajax_url, ajax_data, 'application/x-www-form-urlencoded; charset=UTF-8', success, error);
 		},
 		/**
 		 *
 		 * @param {string} ajax_url
 		 * @param {AJAXData} ajax_data
 		 * @param {AJAXCallback} [success]
+		 * @param {function} [error]
 		 * @returns {jqXHR}
 		 */
-		addData: function addData(ajax_url, ajax_data, success) {
-			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.POST, ajax_url, ajax_data, success);
-		},
-		/**
-		 *
-		 * @param {string} ajax_url
-		 * @param {AJAXData} ajax_data
-		 * @param {AJAXCallback} [success]
-		 * @returns {jqXHR}
-		 */
-		deleteData: function deleteData(ajax_url, ajax_data, success) {
-			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.DELETE, ajax_url, ajax_data, success);
+		deleteData: function deleteData(ajax_url, ajax_data, success, error) {
+			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.DELETE, ajax_url, ajax_data, 'application/json', success, error);
 		},
 		/**
 		 *
@@ -9281,10 +9745,147 @@ __APP = {
 		}
 	},
 	EVENDATE_BEGIN: '15-12-2015',
+	AUTH_URLS: {},
+	TOP_BAR: new AbstractTopBar(),
+	SIDEBAR: new AbstractSidebar(),
 	USER: new CurrentUser(),
 	PREVIOUS_PAGE: new Page(),
 	CURRENT_PAGE: new Page(),
 	CURRENT_JQXHR: {},
+	MODALS: {
+		last_id: 0,
+		collection: {},
+		active_modal: undefined,
+		modal_destroyer: $.extend({
+			adjustHeight: function(height) {
+				var html_height = $(window).height(),
+					modal_height = height + 200;
+				this.height((modal_height > html_height) ? modal_height : html_height);
+			}
+		}, $('.modal_destroyer')),
+		modal_wrapper: $('.modal_wrapper'),
+		/**
+		 *
+		 * @param {AbstractModal} modal
+		 */
+		pushModal: function(modal) {
+			modal.id = ++__APP.MODALS.last_id;
+			__APP.MODALS.collection[modal.id] = modal;
+			var keys = Object.keys(__APP.MODALS.collection);
+			if (keys.length > 5) {
+				__APP.MODALS.collection[keys[0]].destroy();
+			}
+		},
+		hideCurrent: function() {
+			if (__APP.MODALS.active_modal !== undefined) {
+				__APP.MODALS.active_modal.__hide();
+				$('body').removeClass('-open_modal');
+			}
+		},
+		bindCallModal: function($parent) {
+			$parent = $parent ? $parent : $('body');
+			$parent.find('.CallModal').not('.-Handled_CallModal').each(function() {
+				var $this = $(this),
+					title = $this.data('modal_title'),
+					modal,
+					modal_id,
+					modal_type = $this.data('modal_type');
+				
+				$this.on('click.CallModal', function() {
+					modal_id = $this.data('modal_id');
+					if (__APP.MODALS.collection.hasOwnProperty(modal_id)) {
+						__APP.MODALS.collection[modal_id].show();
+					} else {
+						switch (modal_type) {
+							case 'favors': {
+								modal = new FavoredModal($this.data('modal_event_id'), title);
+								break;
+							}
+							case 'subscribers': {
+								modal = new SubscribersModal($this.data('modal_organization_id'), title);
+								break;
+							}
+							case 'editors': {
+								modal = new EditorsModal($this.data('modal_organization_id'), title, $this.data('modal_specific_role'));
+								break;
+							}
+							case 'map': {
+								modal = new MapModal($this.data('modal_map_location'), title);
+								break;
+							}
+							case 'media': {
+								var type = $this.data('modal_media_type'),
+									url = $this.data('modal_media_url');
+								if (!url) {
+									if ($this.is('img')) {
+										url = $this.attr('src');
+										type = 'image';
+									} else if ($this.is('video')) {
+										//url = $this.attr('url');
+										type = 'video';
+									} else {
+										var str = $this.css('background-image');
+										if (str !== 'none') {
+											if (str.indexOf('"') != -1) {
+												url = str.slice(str.indexOf('"') + 1, str.indexOf('"', str.indexOf('"') + 1));
+											} else {
+												url = str.slice(str.indexOf('(') + 1, str.indexOf(')'));
+											}
+											type = 'image';
+										}
+									}
+								}
+								modal = new MediaModal(url, type);
+								break;
+							}
+							case 'cropper': {
+								modal = new CropperModal($this.data('source_img'), {
+									'aspectRatio': eval($this.data('aspect_ratio'))
+								});
+								
+								modal.modal.one('modal.close', function() {
+									
+									$this.removeClass('-hidden').off('click.CallModal').on('click.CallModal', function() {
+										modal_id = $this.data('modal_id');
+										if (__APP.MODALS.collection.hasOwnProperty(modal_id)) {
+											if (__APP.MODALS.collection[modal_id].image_src == $this.data('source_img')) {
+												__APP.MODALS.collection[modal_id].show();
+											} else {
+												__APP.MODALS.collection[modal_id].destroy();
+												modal = new CropperModal($this.data('source_img'), {
+													'aspectRatio': eval($this.data('aspect_ratio'))
+												});
+												$this.data('modal_id', modal.id);
+												modal.initer = $this;
+												modal.show();
+											}
+										} else {
+											modal = new CropperModal($this.data('source_img'), {
+												'data': $this.data('crop_data'),
+												'aspectRatio': eval($this.data('aspect_ratio'))
+											});
+											$this.data('modal_id', modal.id);
+											modal.initer = $this;
+											modal.show();
+										}
+									});
+									
+								});
+								break;
+							}
+							default: {
+								modal = new StdModal(title, $this.data('modal_content'));
+								break;
+							}
+						}
+						$this.data('modal_id', modal.id);
+						modal.initer = $this;
+						modal.show();
+					}
+				});
+			}).addClass('-Handled_CallModal');
+		}
+	},
 	BUILD: {
 		/**
 		 * @typedef {object} buildProps
@@ -9517,7 +10118,15 @@ __APP = {
 		organizationCard: function buildOrganisationCard(organizations) {
 			return tmpl('organization-card', organizations.map(function(org) {
 				return $.extend(true, {}, org, {
-					subscribe_button: new SubscribeButton(org.id, org.is_subscribed, {
+					background_image: org.background_small_img_url || org.background_img_url ? __APP.BUILD.link({
+						page: '/organization/'+org.id,
+						classes: ['organization_unit_background'],
+						attributes: {
+							style: 'background-image: url(\''+(org.background_small_img_url || org.background_img_url)+'\')'
+						}
+					}) : '',
+					subscribe_button: new SubscribeButton(org.id, {
+						is_subscribed: org.is_subscribed,
 						colors: {
 							subscribe: '-color_marginal_accent'
 						},
@@ -9525,7 +10134,7 @@ __APP = {
 						classes: ['-size_low', 'RippleEffect']
 					}),
 					subscribed_text: org.subscribed_count + getUnitsText(org.subscribed_count, __LOCALES.ru_RU.TEXTS.SUBSCRIBERS),
-					redact_org_button: org.role === OneUser.ROLE.USER ? '' : __APP.BUILD.link({
+					redact_org_button: (org.role === OneUser.ROLE.UNAUTH || org.role === OneUser.ROLE.USER) ? '' : __APP.BUILD.link({
 						classes: ['button', '-size_low', '-color_marginal_primary', 'fa_icon', 'fa-pencil', '-empty', 'RippleEffect'],
 						page: 'organization/' + org.id + '/edit'
 					})
@@ -9547,15 +10156,13 @@ __APP = {
 				
 				type.last_date = m_event_date.format(__C.DATE_FORMAT);
 				return $.extend({}, event, {
-					divider: different_day ? tmpl('organization-feed-event-divider', {
-						formatted_date: m_event_date.calendar().capitalize(),
-						date: m_event_date.format(__C.DATE_FORMAT)
+					divider: different_day ? tmpl('divider', {
+						title: m_event_date.calendar().capitalize()
 					}) : '',
-					add_to_favorite_button: new AddToFavoriteButton(event.id, event.is_favorite, {
-						classes: ['-size_low', '-fill', '-rounded', 'AddToFavorites', 'AddAvatar', 'RippleEffect'],
-						labels: {
-							subscribed: 'В избранном'
-						}
+					add_to_favorite_button: new AddToFavoriteButton(event.id, {
+						is_add_avatar: true,
+						is_subscribed: event.is_favorite,
+						classes: ['-size_low', '-size_wide', '-rounded', 'AddToFavorites', 'RippleEffect']
 					}),
 					subscribers: $subscribers,
 					date: m_event_date.format(__C.DATE_FORMAT),
@@ -9658,12 +10265,14 @@ __APP = {
 				if (event.is_free) {
 					feed_event_infos.push({text: 'Бесплатно'});
 				} else {
-					feed_event_infos.push({text: 'Цена от ' + (event.min_price ? event.min_price : 0) + ' руб.'});
+					feed_event_infos.push({text: 'Цена от ' + (event.min_price ? formatCurrency(event.min_price) : 0) + ' руб.'});
 				}
 				
 				return $.extend(true, {
-					add_to_favorite_button: new AddToFavoriteButton(event.id, event.is_favorite, {
-						classes: ['-size_low', '-fill', '-rounded', 'AddAvatar', 'RippleEffect']
+					add_to_favorite_button: new AddToFavoriteButton(event.id, {
+						is_add_avatar: true,
+						is_subscribed: event.is_favorite,
+						classes: ['-size_low', '-size_wide', '-rounded', 'RippleEffect']
 					}),
 					subscribers: $subscribers,
 					avatars_collection_classes: avatars_collection_classes.join(' '),
@@ -9679,7 +10288,61 @@ __APP = {
 				}, {accY: 100})
 			});
 			
+			if(__APP.USER.id === -1){
+				$events.find('.HideEvent').remove();
+			}
+			
 			return $events;
+		},
+		/**
+		 *
+		 * @param {{
+		 *    [type]: string,
+		 *    [content]: string|jQuery,
+		 *    [classes]: Array<string>|string,
+		 *    [content_classes]: Array<string>|string,
+		 *    [width]: number,
+		 *    [header]: jQuery,
+		 *    [title]: string,
+		 *    [footer]: jQuery,
+		 *    [footer_buttons]: jQuery
+		 * }} props
+		 * @return {jQuery}
+		 */
+		modal: function(props) {
+			var $modal;
+			props = __APP.BUILD.normalizeBuildProps(props, ['content_classes']);
+			var vars = {
+				modal_type: props.type,
+				modal_content: props.content,
+				modal_classes: props.classes,
+				modal_content_classes: props.content_classes
+			};
+			if(props.header){
+				vars.modal_header = props.header;
+			} else if(props.title) {
+				vars.modal_header = tmpl('modal-header', {
+					title: props.title,
+					close_button: __APP.BUILD.button({
+						classes: ['-color_default','-empty','-modal_destroyer','CloseModal','RippleEffect'],
+						title: '×'
+					})
+				});
+			} else {
+				vars.header = '';
+			}
+			if(props.footer){
+				vars.modal_footer = props.footer;
+			} else if(props.footer_buttons) {
+				vars.modal_footer = tmpl('modal-footer', {footer_buttons: props.footer_buttons});
+			} else {
+				vars.modal_footer = '';
+			}
+			$modal = tmpl('modal', vars);
+			if(props.width){
+				$modal.width(props.width);
+			}
+			return $modal;
 		}
 	},
 	/**
@@ -9789,7 +10452,16 @@ __APP = {
 		}
 	}
 };
-
+/**
+ *
+ * @namespace __C
+ * @property CLASSES
+ * @property DATE_FORMAT
+ * @property COLORS
+ * @property STATS
+ * @property ACTION_NAMES
+ * @property ENTITIES
+ */
 __C = {
 	CLASSES: {
 		ACTIVE: 'active',
@@ -9837,9 +10509,9 @@ __LOCALES = {
 	ru_RU: {
 		TEXTS: {
 			BUTTON: {
-				REMOVE_FAVORITE: 'Удалить из избранного',
-				ADD_FAVORITE: 'Добавить в избранное',
-				FAVORED: 'Избранное событие',
+				REMOVE_FAVORITE: 'Убрать',
+				ADD_FAVORITE: 'В избранное',
+				FAVORED: 'В избранном',
 				ADD_SUBSCRIPTION: 'Подписаться',
 				REMOVE_SUBSCRIPTION: 'Отписаться',
 				SUBSCRIBED: 'Подписан'
@@ -9867,7 +10539,7 @@ __LOCALES = {
 		}
 	}
 };
-paceOptions = {
+window.paceOptions = {
 	ajax: false, // disabled
 	document: false, // disabled
 	eventLag: false, // disabled
@@ -9890,47 +10562,6 @@ $(document)
 	})
 	.ready(function() {
 		var OneSignal = window.OneSignal || [];
-		
-		function initSidebar() {
-			var $sidebar = $('#main_sidebar'),
-				$sidebar_nav = $sidebar.find('.SidebarNav'),
-				$sidebar_nav_items = $sidebar_nav.find('.SidebarNavItem');
-			
-			$sidebar_nav.addClass('-items_' + $sidebar_nav_items.not('.-hidden').length);
-			__APP.SUBSCRIBED_ORGS.update();
-			$(window).on('subscribe unsubscribe', function() {
-				__APP.SUBSCRIBED_ORGS.update();
-			});
-			((window.innerHeight > 800) ? $('.SidebarOrganizationsScroll') : $('.SidebarScroll')).scrollbar({
-				disableBodyScroll: true
-			});
-		}
-		
-		function initTopBar() {
-			var $main_header = $('#main_header');
-			
-			$main_header.find('#search_bar_input').on('keypress', function(e) {
-				if (e.which == 13) {
-					__APP.changeState('/search/' + encodeURIComponent(this.value));
-				}
-			});
-			
-			$main_header.find('#user_bar').on('click.openUserBar', function() {
-				var $this = $(this),
-					$document = $(document);
-				$this.addClass('-open');
-				$document.on('click.closeUserBar', function(e) {
-					if (!$(e.target).parents('#user_bar').length) {
-						$document.off('click.closeUserBar');
-						$this.removeClass('-open');
-					}
-				})
-			});
-			$main_header.find('.LogoutButton').on('click', __APP.USER.logout);
-			$main_header.find('.OpenSettingsButton').on('click', showSettingsModal);
-			bindRippleEffect($main_header);
-			bindPageLinks($main_header);
-		}
 		
 		OneSignal.push(["init", {
 			appId: "7471a586-01f3-4eef-b989-c809700a8658",
@@ -10014,51 +10645,24 @@ $(document)
 			}
 		});
 		
-		__APP.SUBSCRIBED_ORGS = $('.SidebarOrganizationsList');
-		__APP.SUBSCRIBED_ORGS.update = function() {
-			/**
-			 * @this jQuery
-			 */
-			var self = this,
-				timing = 0,
-				current_menu_items = $.map(self.children(), function(el) {
-					return $(el).data('organization_id');
-				}),
-				to_add = __APP.USER.subscriptions.filter(function(item) {
-					return current_menu_items.indexOf(item.id) === -1;
-				}),
-				to_remove = current_menu_items.filter(function(item) {
-					return !(__APP.USER.subscriptions.has(item));
-				});
-			
-			if (to_add.length) {
-				__APP.BUILD.organizationItems(to_add, {
-					block_classes: ['animated'],
-					avatar_classes: ['-size_30x30', '-rounded']
-				})
-					[(self.length ? 'prependTo' : 'appendTo')](self)
-					.each(function(i, org_block) {
-						setTimeout(function() {
-							$(org_block).addClass('-show');
-						}, timing += 100);
-					});
-				
-				bindPageLinks(self);
-			}
-			if (to_remove.length) {
-				to_remove.forEach(function(id) {
-					var $organization_item = self.find('.organization_item[data-organization_id="' + id + '"]').removeClass('-show');
-					setTimeout(function() {
-						$organization_item.remove();
-					}, 500);
-				});
-			}
-		};
-		
 		__APP.USER.fetchUserWithSubscriptions([], undefined, function() {
-			initTopBar();
-			initSidebar();
-			__APP.init();
+			if(this.id === -1){
+				__APP.TOP_BAR = new TopBarNoAuth();
+				__APP.SIDEBAR = new SidebarNoAuth();
+			} else {
+				__APP.TOP_BAR = new TopBar();
+				__APP.SIDEBAR = new Sidebar();
+			}
+			
+			__APP.SERVER.getData('/auth.php', {
+				action: 'get_urls',
+				mobile: isNotDesktop()
+			}, function(data) {
+				__APP.AUTH_URLS = data;
+				__APP.TOP_BAR.init();
+				__APP.SIDEBAR.init();
+				__APP.init();
+			});
 			bindPageLinks();
 		});
 		

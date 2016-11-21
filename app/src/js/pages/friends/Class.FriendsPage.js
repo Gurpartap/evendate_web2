@@ -62,14 +62,17 @@ FriendsPage.prototype.render = function() {
 		});
 	}
 	
-	
-	var $main_content = $view.find('.friends-main-content').removeClass(__C.CLASSES.HIDDEN),
-		$friends_right_list = $view.find('.friends-right-bar'),
-		$load_btn = $view.find('.load-more-btn').addClass(__C.CLASSES.HIDDEN),
-		$user_content = $view.find('.one-friend-main-content').addClass(__C.CLASSES.HIDDEN);
-	
-	
-	getFriendsList($friends_right_list, function(res) {});
-	$load_btn.find('.btn').on('click', getFeed);
-	getFeed();
+	if(__APP.USER.id === -1){
+		__APP.changeState('/feed/');
+	} else {
+		var $main_content = $view.find('.friends-main-content').removeClass(__C.CLASSES.HIDDEN),
+			$friends_right_list = $view.find('.friends-right-bar'),
+			$load_btn = $view.find('.load-more-btn').addClass(__C.CLASSES.HIDDEN),
+			$user_content = $view.find('.one-friend-main-content').addClass(__C.CLASSES.HIDDEN);
+		
+		
+		getFriendsList($friends_right_list, function(res) {});
+		$load_btn.find('.btn').on('click', getFeed);
+		getFeed();
+	}
 };

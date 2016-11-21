@@ -114,6 +114,16 @@ OneOrganization.unsubscribeOrganization = function(org_id, success) {
 };
 /**
  *
+ * @param {(Array|object)} data
+ * @returns {OneEntity}
+ */
+OneOrganization.prototype.setData = function(data) {
+	OneEntity.prototype.setData.call(this, data);
+	this.role = OneUser.recognizeRole(this.privileges);
+	return this;
+};
+/**
+ *
  * @param {(string|Array)} fields
  * @param {AJAXCallback} [success]
  * @returns {jqXHR}
@@ -121,7 +131,6 @@ OneOrganization.unsubscribeOrganization = function(org_id, success) {
 OneOrganization.prototype.fetchOrganization = function(fields, success) {
 	var self = this;
 	return this.constructor.fetchOrganization(self.id, fields, function(data) {
-		self.role = data[0].privileges ? OneUser.recognizeRole(data[0].privileges) : '';
 		self.setData(data);
 		if (success && typeof success == 'function') {
 			success.call(self, self);

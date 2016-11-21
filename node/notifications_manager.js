@@ -20,7 +20,7 @@ function NotificationsManager(settings) {
 }
 
 
-NotificationsManager.prototype.create = function (notification, device) {
+NotificationsManager.prototype.create = function (notification, device, type) {
 
     var _this = this;
     var _text = Utils.replaceTags(notification.notification_type_text, notification);
@@ -29,7 +29,7 @@ NotificationsManager.prototype.create = function (notification, device) {
         body: _text,
         icon: notification.image,
         payload: {
-            type: null,
+            type: type != undefined ? type : null,
             title: notification.title,
             event_id: notification.event_id,
             body: _text,
@@ -70,7 +70,7 @@ NotificationsManager.prototype.create = function (notification, device) {
                     }
                 });
         };
-    }else if (device.client_type == DEVICE_TYPES.BROWSER) {
+    } else if (device.client_type == DEVICE_TYPES.BROWSER) {
         if (note.payload.event_id) {
             note.payload.type = 'events';
         } else if (note.payload.organization_id) {
@@ -102,32 +102,55 @@ NotificationsManager.prototype.create = function (notification, device) {
     } else if (device.client_type == DEVICE_TYPES.ANDROID) {
         note.send = function (callback) {
             var type;
-            if (note.payload.event_id){
+            if (note.payload.event_id) {
                 type = 'events';
-            }else if (note.payload.organization_id){
+            } else if (note.payload.organization_id) {
                 type = 'organizations';
-            }else if (note.payload.user_id){
+            } else if (note.payload.user_id) {
                 type = 'users';
             }
-            var send_data = {
-                'data.message': note.body,
-                'data.event_id': note.payload.event_id,
-                'data.image_url': note.payload.organization_logo,
-                'data.organization_id': note.payload.organization_id,
-                'data.type': type,
-                registration_id: device.device_token
-            };
 
-            // send_data['data.to'] = '';
+            if (device.device_token.length == 36 && (device.device_token.match(/-/g) || []).length == 4) { // is UUID
+                rest
+                    .postJson(ONE_SIGNAL_URL.CREATE, {
+                        app_id: _this.settings.one_signal.app_id,
+                        contents: {
+                            en: note.alert,
+                            ru: note.alert
+                        },
+                        url: 'https://evendate.ru/event/' + note.payload.event_id,
+                        isAndroid: true,
+                        include_player_ids: [device.device_token],
+                        data: note.payload
+                    })
+                    .on('complete', function (res) {
+                        if (res instanceof Error) {
+                            callback(res, null);
+                        } else {
+                            callback(null, res.id);
+                        }
+                    });
+            } else {
+                var send_data = {
+                    'data.message': note.body,
+                    'data.event_id': note.payload.event_id,
+                    'data.image_url': note.payload.organization_logo,
+                    'data.organization_id': note.payload.organization_id,
+                    'data.type': type,
+                    registration_id: device.device_token
+                };
 
-            send_data.registration_id = device.device_token;
-            gcm.send(send_data, function (err, messageId) {
-                if (err) {
-                    callback(err, null);
-                } else {
-                    callback(null, messageId);
-                }
-            });
+                // send_data['data.to'] = '';
+
+                send_data.registration_id = device.device_token;
+                gcm.send(send_data, function (err, messageId) {
+                    if (err) {
+                        callback(err, null);
+                    } else {
+                        callback(null, messageId);
+                    }
+                });
+            }
         };
     } else {
         note.send = function (callback) {

@@ -55,6 +55,10 @@
 
 <!-- COMMONS -->
 
+<script type="javascript/template" id="tmpl-divider">
+	<hr title="{title}" {dataset}>
+</script>
+
 <script type="javascript/template" id="tmpl-radio-checkbox">
 	<div class="{unit_classes}">
 		<input id="{id}" class="{classes}" type="{type}" name="{name}" {attributes} {dataset} tabindex="-1">
@@ -324,7 +328,7 @@
 					<input id="edit_event_placepicker" class="form_input Placepicker" name="location" value="{location}" required>
 				</div>
 				<div class="form_unit">
-					<button class="button -color_primary -fill RippleEffect EditEventDefaultAddress" type="button" tabindex="-1">По умолчанию</button>
+					<button class="button -color_primary -size_wide RippleEffect EditEventDefaultAddress" type="button" tabindex="-1">По умолчанию</button>
 				</div>
 			</div>
 
@@ -684,10 +688,6 @@
 	<p class="organization_feed_text">{text}</p>
 </script>
 
-<script type="javascript/template" id="tmpl-organization-feed-event-divider">
-	<hr title="{formatted_date}" data-raw_date="{date}">
-</script>
-
 <script type="javascript/template" id="tmpl-organization-feed-event">
 	{divider}
 	<div class="organization_feed_block OrganizationFeedEvent" data-event-id="{id}" data-event_date="{date}">
@@ -769,10 +769,10 @@
 </script>
 
 <script type="javascript/template" id="tmpl-event-edit-functions">
-	<button class="button -color_neutral -fill RippleEffect DropdownButton" data-dropdown="redact_event" data-dd-width="self" type="button">Редактирование события</button>
+	<button class="button -color_neutral -size_wide RippleEffect DropdownButton" data-dropdown="redact_event" data-dd-width="self" type="button">Редактирование события</button>
 	<div class="dropdown_box DropdownBox" data-dropdown_id="redact_event">
-		<div class="dropdown_list"><button class="dropdown_button -fill -color_accent RippleEffect CloseDropdown DropdownButton" data-dropdown="cancel_event" data-dd-width="self" type="button">Отменить событие</button></div>
-		<div class="dropdown_list"><a href="/event/{id}/edit" class="dropdown_button link -fill -color_neutral RippleEffect CloseDropdown Link">Редактировать</a></div>
+		<div class="dropdown_list"><button class="dropdown_button -size_wide -color_accent RippleEffect CloseDropdown DropdownButton" data-dropdown="cancel_event" data-dd-width="self" type="button">Отменить событие</button></div>
+		<div class="dropdown_list"><a href="/event/{id}/edit" class="dropdown_button link -size_wide -color_neutral RippleEffect CloseDropdown Link">Редактировать</a></div>
 	</div>
 	<div class="dropdown_box DropdownBox" data-dropdown_id="cancel_event">
 		<div class="dropdown_box_wrapper">
@@ -903,7 +903,7 @@
 <script type="javascript/template" id="tmpl-statistics-overview-organization">
 	<div class="page organization_card">
 		<aside class="organization_card_side">
-			<a href="/statistics/organization/{id}" class="avatar -size_100x100 -rounded link Link">
+			<a href="/statistics/organization/{id}" class="avatar -size_100x100 link Link">
 				<img src="{img_medium_url}" onerror="this.onerror=null;this.src='/app/img/logo_40.png'">
 			</a>
 		</aside>
@@ -934,7 +934,7 @@
 			</header>
 			<div class="orgstat_overview_sidebar_wrapper -align_center">
 				<div class="user_tombstone">
-					<div class="avatar -size_70x70 -rounded -bordered -shadowed" style="background-image: url('{img_medium_url}')"></div>
+					<div class="avatar -size_70x70" style="background-image: url('{img_medium_url}')"></div>
 					<p class="user_tombstone_title">{short_name}</p>
 				</div>
 				<p class="orgstat_overview_sidebar_title">{name}</p>
@@ -1007,9 +1007,10 @@
 		<colgroup>
 			<col>
 			<col width="144px">
+			<col width="100px">
+			<col width="100px">
 			<col width="144px">
-			<col width="144px">
-			<col width="144px">
+			<col width="110px">
 			<col width="144px">
 		</colgroup>
 		<thead>
@@ -1020,6 +1021,7 @@
 				<th class="-unselectable" data-sort-order="desc">Открытий</th>
 				<th class="-unselectable" data-sort-order="desc">Доб. в избранное</th>
 				<th class="-unselectable" data-sort-order="desc">Конверсия</th>
+				<th class="-unselectable" data-sort-order="desc">Уведомлений</th>
 			</tr>
 		</thead>
 		{rows}
@@ -1031,9 +1033,10 @@
 		<td><a href="/statistics/event/{id}" class="link Link">{title}</a></td>
 		<td align="center" data-sort="{timestamp}">{date}</td>
 		<td align="center" class="-text_big -highlighted">{view}</td>
-		<td align="center" class="-text_big -highlighted">{open_site}</td>
+		<td align="center" class="-text_big -highlighted">{view_detail}</td>
 		<td align="center" class="-text_big -highlighted">{fave}</td>
 		<td align="center" class="-text_big -highlighted">{conversion}</td>
+		<td align="center" class="-text_big -highlighted">{notifications_sent}</td>
 	</tr>
 </script>
 
@@ -1062,8 +1065,9 @@
 		</header>
 		<div class="eventstat_overview_content">
 			<div class="eventstat_overview_charts EventStatAreaCharts">
+				<div class="eventstat_overview_chart AreaChart NotificationsSentAreaChart"></div>
 				<div class="eventstat_overview_chart AreaChart ViewAreaChart"></div>
-				<div class="eventstat_overview_chart AreaChart OpenSiteAreaChart"></div>
+				<div class="eventstat_overview_chart AreaChart ViewDetailAreaChart"></div>
 				<div class="eventstat_overview_chart AreaChart OpenConversionsAreaChart"></div>
 				<div class="eventstat_overview_chart AreaChart FaveAreaChart"></div>
 				<div class="eventstat_overview_chart AreaChart FaveConversionsAreaChart"></div>
@@ -1084,11 +1088,8 @@
 <!-- Modals -->
 
 <script type="javascript/template" id="tmpl-modal">
-	<div class="modal_unit {modal_type} -hidden -faded">
-		<header class="modal_header">
-			{modal_title}
-			<button class="button -empty -modal_destroyer -color_default CloseModal RippleEffect">&times;</button>
-		</header>
+	<div class="modal_unit {modal_type} {modal_classes} -hidden -faded">
+		{modal_header}
 		<div class="modal_content {modal_content_classes}">
 			{modal_content}
 		</div>
@@ -1096,8 +1097,11 @@
 	</div>
 </script>
 
-<script type="javascript/template" id="tmpl-modal-title">
-	<h4>{title}</h4>
+<script type="javascript/template" id="tmpl-modal-header">
+	<header class="modal_header">
+		<h4>{title}</h4>
+		{close_button}
+	</header>
 </script>
 
 <script type="javascript/template" id="tmpl-modal-footer">
@@ -1118,6 +1122,22 @@
 	<iframe width="100%" height="600" frameborder="0" style="display:block;border:0" src="https://www.google.com/maps/embed/v1/place?q={location}&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg" allowfullscreen></iframe>
 </script>
 
+<script type="javascript/template" id="tmpl-modal-auth-content">
+	<h4 class="auth_modal_heading">{heading}</h4>
+	<div class="auth_buttons_wrapper">
+		<a href="#" data-auth_network="vk" class="button -size_wide -rounded -no_uppercase -align_left -color_vk RippleEffect AuthButton">
+			<span class="Text"><i class="fa fa-vk fa-lg"></i><span>Войти через ВКонтакте</span></span>
+		</a>
+		<a href="#" data-auth_network="google" class="button -size_wide -rounded -no_uppercase -align_left -color_google RippleEffect AuthButton">
+			<span class="Text"><i class="fa fa-google-plus fa-lg"></i><span>Войти через Google+</span></span>
+		</a>
+		<a href="#" data-auth_network="facebook" class="button -size_wide -rounded -no_uppercase -align_left -color_facebook RippleEffect AuthButton">
+			<span class="Text"><i class="fa fa-facebook-official fa-lg"></i><span>Войти через Facebook</span></span>
+		</a>
+	</div>
+	<p class="auth_modal_bottom">{bottom}</p>
+</script>
+
 <script type="javascript/template" id="tmpl-modal-users-divider">
 	<p class="modal_divider">{label}</p>
 </script>
@@ -1131,7 +1151,7 @@
 			<div class="search_organizations_content">{organizations}</div>
 		</div>
 	</div>
-	<div class="feed_event_cards_wrapper search_events">{events}</div>
+	<div class="feed_event_cards_wrapper search_events SearchEvents">{events}</div>
 </script>
 
 <script type="javascript/template" id="tmpl-search-no-events">

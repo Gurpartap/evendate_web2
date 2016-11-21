@@ -25,7 +25,7 @@ OnboardingPage.prototype.init = function() {
 		if($(this).is('.SkipOnboarding')){
 			cookies.setItem('skip_onboarding', 1, moment().add(7, 'd')._d);
 		}
-		__APP.SUBSCRIBED_ORGS.update();
+		__APP.SIDEBAR.updateSubscriptions();
 	});
 };
 
@@ -45,6 +45,10 @@ OnboardingPage.prototype.render = function() {
 	var PAGE = this,
 		$loader = tmpl('loader', {});
 	
+	if(__APP.USER.id === -1){
+		__APP.changeState('/feed/actual', true, true);
+		return null;
+	}
 	function appendRecommendations(organizations) {
 		$loader.detach();
 		if (organizations.length) {

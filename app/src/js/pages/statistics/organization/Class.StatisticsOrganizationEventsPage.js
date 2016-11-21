@@ -23,7 +23,7 @@ StatisticsOrganizationEventsPage.buildEventRows = function(events, date_field) {
 		return $.extend({}, event, {
 			date: moment.unix(event[date_field]).format(__LOCALES.ru_RU.DATE.DATE_FORMAT),
 			timestamp: event[date_field],
-			conversion: Math.round(event.open_site * 100 / event.view) + '%'
+			conversion: Math.round(event.view ? event.view_detail * 100 / event.view : 0) + '%'
 		});
 	}));
 	bindPageLinks($events);
@@ -35,6 +35,11 @@ StatisticsOrganizationEventsPage.prototype.render = function() {
 		$window = $(window),
 		$past_events_wrapper,
 		past_events_tablesort;
+	
+	if(__APP.USER.id === -1){
+		__APP.changeState('/feed/actual', true, true);
+		return null;
+	}
 	
 	this.renderHeaderTabs();
 	__APP.changeTitle([{
@@ -56,7 +61,10 @@ StatisticsOrganizationEventsPage.prototype.render = function() {
 		}
 	});
 	
-	this.past_events.fetchOrganizationsEvents(this.organization.id, {canceled_shown: true}, 30, function() {
+	this.past_events.fetchOrganizationsEvents(this.organization.id, {
+		canceled_shown: true,
+		order_by: '-first_event_date'
+	}, 30, function() {
 		if(this.length){
 			$past_events_wrapper = this_page.$wrapper.find('.OrgStatPastEventsWrapper');
 			$past_events_wrapper.html(tmpl('orgstat-events-wrapper', {

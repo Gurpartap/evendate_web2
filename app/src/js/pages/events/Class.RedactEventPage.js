@@ -298,7 +298,7 @@ RedactEventPage.prototype.init = function() {
 	bindTimeInput(PAGE.$wrapper);
 	bindSelect2(PAGE.$wrapper);
 	bindTabs(PAGE.$wrapper);
-	Modal.bindCallModal(PAGE.$wrapper);
+	__APP.MODALS.bindCallModal(PAGE.$wrapper);
 	bindLimitInputSize(PAGE.$wrapper);
 	bindRippleEffect(PAGE.$wrapper);
 	bindFileLoadButton(PAGE.$wrapper);
@@ -664,6 +664,12 @@ RedactEventPage.prototype.render = function() {
 			current_date: moment().format(__C.DATE_FORMAT),
 			tomorrow_date: moment().add(1, 'd').format(__C.DATE_FORMAT)
 		};
+	
+	
+	if(__APP.USER.id === -1){
+		__APP.changeState('/feed/actual', true, true);
+		return null;
+	}
 	
 	function selectDates($view, raw_dates) {
 		var MainCalendar = $view.find('.EventDatesCalendar').data('calendar'),

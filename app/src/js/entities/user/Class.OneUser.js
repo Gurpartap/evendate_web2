@@ -49,6 +49,7 @@ OneUser.ACCOUNTS = {
  * @enum {string}
  */
 OneUser.ROLE = {
+	UNAUTH: 'unauth',
 	USER: 'user',
 	MODERATOR: 'moderator',
 	ADMIN: 'admin'
@@ -71,7 +72,7 @@ OneUser.recognizeRole = function(privileges) {
 		if ((privilege.role_id == 2 || privilege.name == OneUser.ROLE.MODERATOR) && role !== OneUser.ROLE.ADMIN)
 			role = OneUser.ROLE.MODERATOR;
 	});
-	return role;
+	return role ? role : OneUser.ROLE.UNAUTH;
 };
 /**
  *
