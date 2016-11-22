@@ -77,7 +77,7 @@ function OrganizationPage(organization_id) {
 	this.canceled_events = new CanceledEventsCollection();
 	this.organization = new OneOrganization(organization_id);
 	this.organization.fetchOrganization(this.fields, function(data) {
-		self.is_admin = self.organization.role != OneUser.ROLE.USER;
+		self.is_admin = self.organization.role != OneAbstractUser.ROLE.USER;
 		self.max_events_load = self.is_admin ? 4 : 2;
 		Page.triggerRender();
 	});
@@ -195,7 +195,7 @@ OrganizationPage.prototype.render = function() {
 			classes: ['-size_low', '-fill', 'RippleEffect']
 		}),
 		has_address: PAGE.organization.default_address ? '' : '-hidden',
-		redact_org_button: (PAGE.organization.role == OneUser.ROLE.ADMIN) ? __APP.BUILD.link({
+		redact_org_button: (PAGE.organization.role == OneAbstractUser.ROLE.ADMIN) ? __APP.BUILD.link({
 			title: 'Изменить',
 			classes: ['button', '-fill', '-color_neutral', 'fa_icon', 'fa-pencil', 'RippleEffect'],
 			page: 'organization/' + PAGE.organization.id + '/edit/'

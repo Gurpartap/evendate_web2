@@ -4,7 +4,7 @@
 /**
  * @typedef {object} Privilege
  * @property {number} role_id
- * @property {OneUser.ROLE} name
+ * @property {OneAbstractUser.ROLE} name
  */
 /**
  *
@@ -119,7 +119,7 @@ OneOrganization.unsubscribeOrganization = function(org_id, success) {
  */
 OneOrganization.prototype.setData = function(data) {
 	OneEntity.prototype.setData.call(this, data);
-	this.role = OneUser.recognizeRole(this.privileges);
+	this.role = OneAbstractUser.recognizeRole(this.privileges);
 	return this;
 };
 /**

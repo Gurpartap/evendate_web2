@@ -62,6 +62,26 @@ __APP = {
 			});
 		},
 		/**
+		 * @param {..jqXHR} jqXHRs
+		 * @param {function(..(Array|object))} cb
+		 */
+		multipleAjax: function multipleAjax(){
+			var self = this,
+				cb = arguments[arguments.length - 1],
+				jqXHRs = Array.prototype.splice.call(arguments, 0, arguments.length - 1);
+			
+			$.when.apply($, jqXHRs).done(function() {
+				var datas = Array.prototype.slice.call(arguments).map(function(resolve) {
+					if(resolve[0].status){
+						return resolve[0].data;
+					} else {
+						window.errors_array.push(resolve);
+					}
+				});
+				cb.apply(self, datas);
+			});
+		},
+		/**
 		 *
 		 * @param {string} ajax_url
 		 * @param {AJAXData} ajax_data
@@ -125,11 +145,11 @@ __APP = {
 		validateData: function validateData(ajax_data) {
 			if (ajax_data.fields && Array.isArray(ajax_data.fields)) {
 				if (ajax_data.order_by) {
-					(ajax_data.order_by instanceof Array ? ajax_data.order_by : ajax_data.order_by.split(',')).forEach(function(order_by) {
-						if (ajax_data.fields.indexOf(order_by.trim().replace('-', '')) === -1) {
-							ajax_data.fields.push(order_by.trim().replace('-', ''));
-						}
-					});
+					ajax_data.order_by = ajax_data.order_by instanceof Array ? ajax_data.order_by : ajax_data.order_by.split(',');
+					ajax_data.fields = ajax_data.fields.merge(ajax_data.order_by.map(function(order_by) {
+						return order_by.trim().replace('-', '');
+					}));
+					ajax_data.order_by = ajax_data.order_by.join(',');
 				}
 				if (ajax_data.fields.length) {
 					ajax_data.fields = ajax_data.fields.join(',');
@@ -659,7 +679,7 @@ __APP = {
 						classes: ['-size_low', 'RippleEffect']
 					}),
 					subscribed_text: org.subscribed_count + getUnitsText(org.subscribed_count, __LOCALES.ru_RU.TEXTS.SUBSCRIBERS),
-					redact_org_button: (org.role === OneUser.ROLE.UNAUTH || org.role === OneUser.ROLE.USER) ? '' : __APP.BUILD.link({
+					redact_org_button: (org.role === OneAbstractUser.ROLE.UNAUTH || org.role === OneAbstractUser.ROLE.USER) ? '' : __APP.BUILD.link({
 						classes: ['button', '-size_low', '-color_marginal_primary', 'fa_icon', 'fa-pencil', '-empty', 'RippleEffect'],
 						page: 'organization/' + org.id + '/edit'
 					})

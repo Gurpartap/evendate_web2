@@ -15,13 +15,13 @@
  */
 function UsersCollection() {}
 UsersCollection.extend(EntitiesCollection);
-Object.defineProperty(UsersCollection.prototype, 'collection_of', {value: OneUser});
+Object.defineProperty(UsersCollection.prototype, 'collection_of', {value: OneAbstractUser});
 /**
  * Returns specified staff by role. Mixing additional_fields if needed.
- * @param {OneUser.ROLE} role
- * @param {(Array<OneUser>|UsersCollection)} staff
+ * @param {OneAbstractUser.ROLE} role
+ * @param {(Array<OneAbstractUser>|UsersCollection)} staff
  * @param {object} [additional_fields]
- * @return {(Array<OneUser>|UsersCollection|Array<object>)}
+ * @return {(Array<OneAbstractUser>|UsersCollection|Array<object>)}
  */
 UsersCollection.getSpecificStaff = function(role, staff, additional_fields) {
 	var specific_staff = [];
@@ -89,9 +89,9 @@ UsersCollection.fetchOrganizationStaff = function(org_id, ajax_data, success) {
 };
 /**
  * Returns specified staff by role. Mixing additional_fields if needed.
- * @param {OneUser.ROLE} role
+ * @param {OneAbstractUser.ROLE} role
  * @param {object} [additional_fields]
- * @return {(Array<OneUser>|UsersCollection|Array<object>)}
+ * @return {(Array<OneAbstractUser>|UsersCollection|Array<object>)}
  */
 UsersCollection.prototype.getSpecificStaff = function(role, additional_fields) {
 	var specific_staff = [];
@@ -109,7 +109,7 @@ UsersCollection.prototype.getSpecificStaff = function(role, additional_fields) {
  * @param {UsersCollectionAJAXData} [data]
  * @param {(number|string)} [length]
  * @param {AJAXCallback} [success]
- * @this Array<OneUser>
+ * @this Array<OneAbstractUser>
  * @returns {jqXHR}
  */
 UsersCollection.prototype.fetchUsers = function(data, length, success) {
