@@ -300,15 +300,19 @@ class User extends AbstractUser
 	{
 
 		$account_types = array();
+		$account_links = array();
 
 		if ($this->vk_uid != null) {
 			$account_types[] = 'vk';
+			$account_links['vk'] = 'https://vk.com/id' . $this->vk_uid;
 		}
 		if ($this->google_uid != null) {
 			$account_types[] = 'google';
+			$account_links['google'] = 'https://plus.google.com/u/0/' . $this->google_uid;
 		}
 		if ($this->facebook_uid != null) {
 			$account_types[] = 'facebook';
+			$account_links['facebook'] = 'https://facebook.com/' . $this->facebook_uid;
 		}
 
 		return new Result(true, '', array(
@@ -319,7 +323,8 @@ class User extends AbstractUser
 			'blurred_image_url' => $this->blurred_image_url,
 			'middle_name' => $this->getMiddleName(),
 			'is_editor' => $this->isEditor(),
-			'accounts' => $account_types
+			'accounts' => $account_types,
+			'accounts_links' => $account_links
 		));
 	}
 
