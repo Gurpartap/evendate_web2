@@ -41,19 +41,25 @@
         }
 
         $('.vk-auth-btn').on('click', function (e) {
-            yaCounter32442130.reachGoal('VkAuthStart');
+            if (yaCounter32442130){
+                yaCounter32442130.reachGoal('VkAuthStart');
+            }
             openAuthLink('vk');
             e.preventDefault();
         });
 
         $('.google-plus-btn').on('click', function (e) {
-            yaCounter32442130.reachGoal('GoogleAuthStart');
+            if (yaCounter32442130){
+                yaCounter32442130.reachGoal('GoogleAuthStart');
+            }
             openAuthLink('google');
             e.preventDefault();
         });
 
         $('.facebook-btn').on('click', function (e) {
-            yaCounter32442130.reachGoal('FacebookAuthStart');
+            if (yaCounter32442130){
+                yaCounter32442130.reachGoal('FacebookAuthStart');
+            }
             openAuthLink('facebook');
             e.preventDefault();
         });
@@ -128,7 +134,9 @@ if (isset($user) && $user instanceof User) {
         m.parentNode.insertBefore(a, m)
     })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
 
-    ga('create', 'UA-69300084-3', 'auto');
-    ga('send', 'pageview');
+    if (ga){
+        ga('create', 'UA-69300084-3', 'auto');
+        ga('send', 'pageview');
+    }
 
 </script>
