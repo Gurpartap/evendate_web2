@@ -137,6 +137,8 @@ if (isset($user) && $user instanceof User) {
     if (ga){
         ga('create', 'UA-69300084-3', 'auto');
         ga('send', 'pageview');
+    }else{
+        console.log('No GA');
     }
 
 </script>
