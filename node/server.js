@@ -469,7 +469,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             result_words = [];
                         str_items.forEach(function (word) {
                             word = word.trim();
-                            if (word.length <= 3 && word.toUpperCase() != word) return true; //stop word
+                            if (typeof word == 'string' && word.length <= 3 && word.toUpperCase() != word) return true; //stop word
                             result_words.push(word);
                         });
                         return result_words.join(' ');
@@ -483,7 +483,9 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             'occupation_name', 'interests', 'movies', 'tv', 'books', 'games', 'about'];
                     data.rows.forEach(function (row) {
                         interest_types.forEach(function (type) {
-                            items.push(cleanData(row[type]));
+                            if (typeof row[type] == 'string'){
+                                items.push(cleanData(row[type]));
+                            }
                         });
                     });
 
