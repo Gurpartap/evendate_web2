@@ -40,6 +40,10 @@ EditOrganizationPage.prototype.render = function() {
 		__APP.changeState('/feed/actual', true, true);
 		return null;
 	}
+	if(window.location.pathname.contains('organization/add')){
+		__APP.changeState('/add/organization', true, true);
+		return null;
+	}
 	
 	function initEditEventPage($view) {
 		
