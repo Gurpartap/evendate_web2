@@ -68,6 +68,14 @@ module.exports = {
             'about'
         ]
     }),
+    users_interests_aggregated: sql.define({
+        name: 'users_interests_aggregated',
+        columns: [
+            'user_id',
+            'aggregated_text',
+            'aggregated_tsquery'
+        ]
+    }),
     vk_groups: sql.define({
         name: 'vk_groups',
         columns: [
@@ -77,6 +85,14 @@ module.exports = {
             'screen_name',
             'description',
             'photo'
+        ]
+    }),
+    vk_users_subscriptions: sql.define({
+        name: 'vk_users_subscriptions',
+        columns: [
+            'id',
+            'user_id',
+            'vk_group_id'
         ]
     }),
     vk_sign_in: sql.define({

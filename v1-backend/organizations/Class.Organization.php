@@ -97,6 +97,17 @@ class Organization extends AbstractEntity
 				FROM view_organizations vo
 				WHERE vo.created_at > DATE_PART(\'epoch\', NOW() - INTERVAL \'7 DAY\') 
 				AND vo.id = view_organizations.id) IS NOT NULL AS ' . self::IS_NEW_FIELD_NAME,
+
+		self::RATING_OVERALL => 'COALESCE((SELECT 
+														(COALESCE(rating_subscribed_friends, 0)::INT + 
+														COALESCE(rating_active_events_count, 0)::INT + 
+														COALESCE(rating_last_events_count, 0)::INT + 
+														COALESCE(rating_subscribed_in_social_network, 0)::INT + 
+														COALESCE(rating_texts_similarity, 0)::INT) AS ' . Event::RATING_OVERALL . '														
+														FROM recommendations_organizations
+														WHERE user_id = :user_id 
+														AND organization_id = view_organizations.id
+                        ), 0) AS ' . self::RATING_OVERALL,
 		self::NEW_EVENTS_COUNT_FIELD_NAME => '(
 		SELECT
 			COUNT(view_events.id)
@@ -122,6 +133,7 @@ class Organization extends AbstractEntity
 						user_id = :user_id
 					)
 				) :: INT AS ' . self::NEW_EVENTS_COUNT_FIELD_NAME,
+
 		self::ACTUAL_EVENTS_COUNT_FIELD_NAME => '(
 		SELECT
 			COUNT(view_events.id)
