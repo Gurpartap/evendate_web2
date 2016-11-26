@@ -21,18 +21,18 @@ class EventDate extends AbstractEntity{
 	);
 
 	protected static $ADDITIONAL_COLS = array(
-		'id',
+		'id::INT',
 		'start_time',
 		'end_time',
 		'created_at',
 		'updated_at',
-		'event_id',
+		'event_id::INT',
 		self::RANDOM_FIELD_NAME => '(SELECT created_at / (random() * 9 + 1)
 			FROM view_dates AS vd
 			WHERE vd.id = view_dates.id) AS random',
 		self::EVENTS_COUNT_FIELD_NAME => ' COUNT(event_date) AS ' . self::EVENTS_COUNT_FIELD_NAME,
 		self::FAVORED_COUNT_FIELD_NAME => ' COUNT(favorite_events.id) AS ' . self::FAVORED_COUNT_FIELD_NAME,
-		'organization_id'
+		'organization_id::INT'
 	);
 
 

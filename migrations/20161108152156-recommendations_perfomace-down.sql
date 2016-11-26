@@ -45,3 +45,4 @@ DROP TABLE users_interests_aggregated;
 
 DROP VIEW view_users_organizations;
 DROP VIEW view_users_events;
+DROP VIEW view_actions;
