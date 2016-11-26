@@ -463,6 +463,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             .join(Entities.vk_users_subscriptions).on(Entities.vk_users_subscriptions.vk_group_id.equals(Entities.vk_groups.id))
                     ).where(Entities.vk_users_subscriptions.user_id.equals(user_id)).toQuery(),
                     cleanData = function (str) {
+                        if (typeof str != 'string') return '';
                         str = str.replace(/<[^>]*>/gmi, ''); // remove tags
                         str = str.replace(/[^a-zA-Zа-яА-ЯёЁ\-\s]/gmi, ''); // remove NOT words
                         var str_items = str.split(/\s/gmi),
@@ -494,9 +495,18 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         if (error) handleError({error: error, name: 'q_get_groups'});
 
                         groups_data.rows.forEach(function (row) {
-                            items.push(cleanData(row.name));
-                            items.push(cleanData(row.screen_name));
-                            items.push(cleanData(row.description));
+
+                            if (typeof row[type] == 'string'){
+                                items.push(cleanData(row.name));
+                            }
+
+                            if (typeof row[type] == 'string'){
+                                items.push(cleanData(row.screen_name));
+                            }
+
+                            if (typeof row[type] == 'string'){
+                                items.push(cleanData(row.description));
+                            }
                         });
                         var items_text = items.join(' '),
                             items_text_tsquery = items_text.trim().replace(/\s+/gmi, '|');
