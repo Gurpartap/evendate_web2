@@ -218,7 +218,7 @@ $url_parts = explode('/', $url);
 		<nav class="sidebar_navigation SidebarNav"><?php
 			if ($is_user_editor) { ?>
 				<a href="/statistics" class="sidebar_navigation_item SidebarNavItem link Link"><span>Статистика</span></a>
-				<a href="/event/add"
+				<a href="/add/event"
 					 class="sidebar_navigation_item SidebarNavItem link Link"><span>Создать событие</span></a><?php
 			} ?>
 			<a href="/feed" class="sidebar_navigation_item SidebarNavItem link Link"><span>События</span><span
@@ -256,12 +256,12 @@ $url_parts = explode('/', $url);
 
 <?php
 if ($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=96b2fd0613108aa4a7a30b6bed1b6e80" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=34b5bc5126f959ae8d928ac3ba7ea09f" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=426081a2ac60d601255065438bbe6e1d" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=188b82f574fa5a36d64c39025d95caca" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=24315c093ecbdcb547cb7254d235baa2"
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=82c33d36ccb535919096c712a66f6b47"
 					charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=e374a44fd2906586969cade11067ad46"
+	<script type="text/javascript" src="/dist/app.min.js?rev=47a36d4dc7968e6488a249b74542ab16"
 					charset="utf-8"></script><?php
 } ?>
 

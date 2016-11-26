@@ -23,6 +23,16 @@ function Page() {
 }
 Object.defineProperty(Page, 'PAGES', {
 	value: {
+		'add': {
+			'event': {
+				'to': {
+					'^([0-9]+)': AddEventPage,
+					'': AddEventPage
+				},
+				'': AddEventPage
+			},
+			'organization': AddOrganizationPage
+		},
 		'event': {
 			'add_to': {
 				'^([0-9]+)': AddEventPage,
