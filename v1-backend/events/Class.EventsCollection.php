@@ -289,6 +289,7 @@ class EventsCollection extends AbstractCollection
 				}
 				case 'favorites': {
 					if ($value instanceof NotAuthorizedUser) break;
+					if ($value instanceof AbstractUser == false) break;
 					$q_get_events->where("id IN (SELECT DISTINCT event_id FROM favorite_events WHERE status = TRUE AND user_id = :user_id)");
 					$statement_array[':user_id'] = $user->getId();
 					break;
@@ -405,122 +406,12 @@ class EventsCollection extends AbstractCollection
 				case 'recommendations': {
 
 					if ($value instanceof NotAuthorizedUser) break;
-					$interests = $user->getInterests()->getData();
-					$interests_text = implode(' ', $interests);
 
-					// has tags in favorites
-					// count of favored friends
-					// has tags with hidden events
-					// date since creation => 36
-
-					// dates till end => 10
-					// date till registration end
-					// full_text_search_similarity
-
-					$has_tags_in_favorites = 'COALESCE((SELECT SUM(t_favored_by_user.favored_with_tag_count)::INT FROM
-                        (SELECT
-                            COUNT(events_tags.id)::INT AS favored_with_tag_count
-                            FROM events_tags
-                            WHERE 
-                            events_tags.event_id IN (
-                                SELECT favorite_events.event_id
-                                FROM favorite_events
-                                WHERE status = TRUE
-                                AND favorite_events.user_id = :user_id
-                            )
-                            AND events_tags.event_id = view_events.id
-                            GROUP BY events_tags.tag_id) AS t_favored_by_user)::INT, 0)';
-
-					$favored_friends_count = '(SELECT COUNT(id)
-						        FROM favorite_events
-						        INNER JOIN view_friends ON view_friends.friend_id = favorite_events.user_id 
-						        WHERE view_events.id = favorite_events.event_id
-						        AND view_friends.user_id = :user_id)::INT';
-
-
-					$has_tags_in_hidden = 'COALESCE((SELECT SUM (favored_with_tag_count) FROM
-                        (SELECT
-                            COUNT(events_tags.id)::INT AS favored_with_tag_count
-                            FROM events_tags
-                            WHERE 
-                            events_tags.event_id IN (
-                                SELECT hidden_events.event_id
-                                FROM hidden_events
-                                WHERE status = TRUE
-                                AND hidden_events.user_id = :user_id
-                            )
-                            AND events_tags.event_id = view_events.id
-                            GROUP BY events_tags.tag_id) AS favored_by_user)::INT,0)';
-
-					$create_date = '(SELECT
-                        CASE WHEN DATE_PART(\'epoch\', NOW()) > ve.created_at + ' . Event::RATING_DATE_CREATION_LIMIT . '::INT
-                        THEN 0
-                        ELSE (' . Event::RATING_DATE_CREATION_LIMIT . '::INT - (DATE_PART(\'epoch\', NOW()) - ve.created_at))::INT / 7200 END
-                        FROM view_events AS ve
-                        WHERE ve.id = view_events.id)::INT';
-
-					$rating_text_similarity = '(SELECT ts_rank_cd(\'{1.0, 0.7, 0.5, 0.3}\', ve.fts, query)::REAL AS rank
-                      FROM view_events as ve, to_tsquery(:fts_query) as query
-                      WHERE ve.id = view_events.id)::REAL';
-
-					$actual_dates_count = '(SELECT 1 / (CASE
-                                              WHEN (ve.registration_required = TRUE AND ve.registration_till < DATE_PART(\'epoch\', NOW()))
-                                              THEN 1000
-                                              ELSE (SELECT
-                                              CASE WHEN COUNT(id)::INT = 0 THEN 1000 ELSE COUNT(id)::INT END
-                                              FROM events_dates
-                                              WHERE
-                                              events_dates.event_id = ve.id
-                                              AND event_date > NOW()
-                                              AND event_date < (NOW() + INTERVAL \'10 days\')
-                                              AND status = TRUE
-                                              )
-                                              END)::REAL * 10
-                                            FROM view_events AS ve
-                                            WHERE ve.id = view_events.id)::INT';
-
-
-					$_fields[] =
-						'(' . $has_tags_in_favorites . '
-                            + 
-                            ' . $favored_friends_count . '
-                            + 
-                            ' . $has_tags_in_hidden . '
-                            + 
-                            ' . $create_date . '
-                            + 
-                            ' . $rating_text_similarity . '
-                            + 
-                            ' . $actual_dates_count . '
-						 )::INT AS ' . Event::RATING_OVERALL;
-
-
-					$_fields[] = $has_tags_in_favorites . ' AS ' . Event::RATING_TAGS_IN_FAVORITES;
-					$_fields[] = $favored_friends_count . ' AS ' . Event::RATING_FAVORED_FRIENDS;
-					$_fields[] = $has_tags_in_hidden . ' AS ' . Event::RATING_TAGS_IN_HIDDEN;
-					$_fields[] = $create_date . ' AS ' . Event::RATING_RECENT_CREATED;
-					$_fields[] = $actual_dates_count . ' AS ' . Event::RATING_ACTIVE_DAYS;
-					$_fields[] = $rating_text_similarity . ' AS ' . Event::RATING_TEXT_SIMILARITY;
-
-					$fields[] = Event::RATING_TAGS_IN_FAVORITES;
-					$fields[] = Event::RATING_FAVORED_FRIENDS;
-					$fields[] = Event::RATING_TAGS_IN_HIDDEN;
-					$fields[] = Event::RATING_RECENT_CREATED;
-					$fields[] = Event::RATING_ACTIVE_DAYS;
-					$fields[] = Event::RATING_TEXT_SIMILARITY;
 					$fields[] = Event::RATING_OVERALL;
+					$_fields[] = Event::getAdditionalCols()[Event::RATING_OVERALL];
 
 
 					$statement_array[':user_id'] = $user->getId();
-					$statement_array[':fts_query'] = App::prepareSearchStatement($interests_text, '|');
-
-
-					$q_get_events->where('id NOT IN (SELECT
-						event_id
-						FROM stat_events
-						INNER JOIN tokens ON tokens.id = stat_events.token_id 
-						WHERE tokens.user_id = :user_id)');
-
 
 					$q_get_events->where('id NOT IN (SELECT
 						hidden_events.event_id

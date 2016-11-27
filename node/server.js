@@ -4,7 +4,8 @@ var
     http = require('http'),
     https = require('https'),
     winston = require('winston'),
-    app = require("express"),
+    express = require("express"),
+    app = express(),
     mysql = require('mysql'),
     rest = require('restler'),
     async = require('async'),
@@ -17,17 +18,34 @@ var
     CronJob = require('cron').CronJob,
     ImagesResize = require('./image_resizer'),
     Notifications = require('./notifications'),
+    ConstantsStorage = require('./constants'),
     Entities = require('./entities'),
     pg = require('pg'),
     sql = require('sql'),
     args = process.argv.slice(2),
     crypto = require('crypto'),
-    __rooms = {};
+    bodyParser = require('body-parser'),
+    __rooms = {},
+    logger = new (winston.Logger)({
+        transports: [
+            new (winston.transports.Console)(),
+            new winston.transports.File({filename: __dirname + '/debug.log', json: true})
+        ],
+        exceptionHandlers: [
+            new (winston.transports.Console)(),
+            new winston.transports.File({filename: __dirname + '/exceptions.log', json: true})
+        ],
+        exitOnError: true
+    });
 
 process.on('uncaughtException', function (err) {
     logger.info('Caught exception: ' + err);
 });
 
+app.use(bodyParser.json());       // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+    extended: true
+}));
 
 var config_index = process.env.ENV ? process.env.ENV : 'local',
     real_config = config[config_index],
@@ -39,18 +57,8 @@ var config_index = process.env.ENV ? process.env.ENV : 'local',
         ':', real_config.db.port,
         '/', real_config.db.database
     ].join(''),
-    logger = new (winston.Logger)({
-        transports: [
-            new (winston.transports.Console)(),
-            new winston.transports.File({filename: __dirname + '/debug.log', json: true})
-        ],
-        exceptionHandlers: [
-            new (winston.transports.Console)(),
-            new winston.transports.File({filename: __dirname + '/exceptions.log', json: true})
-        ],
-        exitOnError: true
-    }),
     cropper = new ImagesResize({logger: logger}),
+    CONSTANTS = ConstantsStorage,
     transporter = nodemailer.createTransport(smtpTransport({
         host: real_config.smtp.host,
         port: real_config.smtp.port,
@@ -79,53 +87,7 @@ var
         }
         return true;
     },
-    URLs = {
-        "VK": {
-            'GET_ACCESS_TOKEN': 'https://oauth.vk.com/access_token?client_id=' +
-            real_config.VK.APP_ID +
-            '&client_secret=' +
-            real_config.VK.SECURE_KEY +
-            '&redirect_uri=http://' + real_config.domain + '/vkOauthDone.php?mobile=',
-            'GET_FRIENDS_LIST': 'https://api.vk.com/method/friends.get',
-            'GET_USER_INFO': 'https://api.vk.com/method/users.get',
-            'GET_GROUPS_LIST': 'https://api.vk.com/method/groups.get',
-            'GET_GROUPS_PART': '/method/groups.get',
-            'POST_TO_WALL': 'https://api.vk.com/method/wall.post',
-            'POST_TO_WALL_PART': '/method/wall.post',
-            'GET_WALL_PHOTO_UPLOAD_SERVER': 'https://api.vk.com/method/photos.getWallUploadServer',
-            'SAVE_WALL_PHOTO_UPLOAD': 'https://api.vk.com/method/photos.saveWallPhoto'
-        },
-        "GOOGLE": {
-            'GET_ACCESS_TOKEN': 'https://www.googleapis.com/oauth2/v1/tokeninfo',
-            'GET_USER_INFO': 'https://www.googleapis.com/plus/v1/people/me',
-            'GET_FRIENDS_LIST': "https://www.googleapis.com/plus/v1/people/me/people/visible"
-        },
-        "FACEBOOK": {
-            'GET_ACCESS_TOKEN': 'https://graph.facebook.com/v2.3/oauth/access_token?'
-            + 'client_id=' + real_config.facebook.app_id
-            + '&client_secret=' + real_config.facebook.app_secret
-            + '&redirect_uri=http://' + real_config.domain + '/fbOauthDone.php?mobile=',
-            'GET_USER_INFO': 'https://graph.facebook.com/me',
-            'GET_FRIENDS_LIST': "https://graph.facebook.com/me/friends"
-        }
-    },
-    EMIT_NAMES = {
-        AUTH: {},
-        VK_INTEGRATION: {
-            GROUPS_TO_POST: 'vk.getGroupsToPost',
-            GROUPS_TO_POST_DONE: 'vk.getGroupsToPostDone',
-            POST_IT: 'vk.post',
-            POST_ERROR: 'vk.post.error'
-        },
-        NOTIFICATIONS: {
-            SEND: 'notifications.send',
-            UPDATE_STATS: 'notifications.update_stats',
-        },
-        UTILS: {
-            UPDATE_IMAGES: 'utils.updateImages',
-            UPDATE_IMAGES_DONE: 'utils.updateImagesDone'
-        }
-    };
+    URLs = ConstantsStorage.getUrls(real_config);
 
 try {
     fs.accessSync(real_config.https.key_path, fs.F_OK);
@@ -150,7 +112,7 @@ sql.setDialect('postgres');
 pg.connect(pg_conn_string, function (err, client, done) {
 
     var checkNested = function (obj /*, level1, level2, ... levelN*/) {
-        var args = Array.prototype.slice.call(arguments, 1);
+            var args = Array.prototype.slice.call(arguments, 1);
             for (var i = 0; i < args.length; i++) {
                 if (!obj || !obj.hasOwnProperty(args[i])) {
                     return false;
@@ -160,25 +122,25 @@ pg.connect(pg_conn_string, function (err, client, done) {
             return true;
         },
         updateEventsStats = function () {
-        var q_upd_stats = 'INSERT INTO stat_notifications_aggregated(event_id, notifications_count, updated_at)' +
-            ' SELECT' +
-            ' id as event_id,' +
-            '     (SELECT COUNT(*)' +
-            ' FROM stat_notifications' +
-            ' INNER JOIN events_notifications ON stat_notifications.event_notification_id = events_notifications.id' +
-            ' WHERE events_notifications.event_id = events.id) AS notifications_count,' +
-            ' NOW() as updated_at' +
-            ' FROM events' +
-            ' ON CONFLICT (event_id) DO UPDATE SET  updated_at = NOW(),' +
-            '     notifications_count = (SELECT COUNT(*)' +
-            ' FROM stat_notifications' +
-            ' INNER JOIN events_notifications ON stat_notifications.event_notification_id = events_notifications.id' +
-            ' WHERE events_notifications.event_id = stat_notifications_aggregated.event_id);';
+            var q_upd_stats = 'INSERT INTO stat_notifications_aggregated(event_id, notifications_count, updated_at)' +
+                ' SELECT' +
+                ' id as event_id,' +
+                '     (SELECT COUNT(*)' +
+                ' FROM stat_notifications' +
+                ' INNER JOIN events_notifications ON stat_notifications.event_notification_id = events_notifications.id' +
+                ' WHERE events_notifications.event_id = events.id) AS notifications_count,' +
+                ' NOW() as updated_at' +
+                ' FROM events' +
+                ' ON CONFLICT (event_id) DO UPDATE SET  updated_at = NOW(),' +
+                '     notifications_count = (SELECT COUNT(*)' +
+                ' FROM stat_notifications' +
+                ' INNER JOIN events_notifications ON stat_notifications.event_notification_id = events_notifications.id' +
+                ' WHERE events_notifications.event_id = stat_notifications_aggregated.event_id);';
 
-        client.query(q_upd_stats, [], function (err) {
-            if (err) return logger.error(err);
-        });
-    };
+            client.query(q_upd_stats, [], function (err) {
+                if (err) return logger.error(err);
+            });
+        };
 
     function publicDelayedEvents() {
         var q_upd_events = 'UPDATE events ' +
@@ -199,21 +161,17 @@ pg.connect(pg_conn_string, function (err, client, done) {
         });
     }
 
-    function updateEventsGeocodes(){
+    function updateEventsGeocodes(event_id) {
         var q_get_events = 'SELECT id, location, location_updates FROM events ' +
-            '   WHERE (latitude IS NULL ' +
-            '       OR longitude IS NULL ' +
-            '       OR latitude = \'0\'' +
-            '       OR longitude =  \'0\')' +
-            '       AND (location_updates < 5 OR location_updates IS NULL)';
+            '   WHERE event_id = ?';
 
-        client.query(q_get_events, function(err, res){
+        client.query(q_get_events, [event_id], function (err, res) {
             if (handleError(err)) return;
             var queue = [],
                 url = 'https://geocode-maps.yandex.ru/1.x/?';
-            res.rows.forEach(function(event){
-                (function(_event){
-                    queue.push(function(callback){
+            res.rows.forEach(function (event) {
+                (function (_event) {
+                    queue.push(function (callback) {
                         var _url = url + [
                                 'format=json',
                                 'results=1',
@@ -222,16 +180,16 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         rest.get(_url, {
                             json: true
                         })
-                            .on('complete', function(rest_res){
-                                if (_event.location_updates == null){
+                            .on('complete', function (rest_res) {
+                                if (_event.location_updates == null) {
                                     _event.location_updates = 0;
                                 }
                                 var upd_data = {location_updates: ++_event.location_updates};
-                                if (rest_res instanceof Error == false){
-                                    if (checkNested(rest_res, 'response', 'GeoObjectCollection', 'featureMember')){
-                                        if (rest_res['response']['GeoObjectCollection']['featureMember'].length > 0){
+                                if (rest_res instanceof Error == false) {
+                                    if (checkNested(rest_res, 'response', 'GeoObjectCollection', 'featureMember')) {
+                                        if (rest_res['response']['GeoObjectCollection']['featureMember'].length > 0) {
                                             var feature_member = rest_res['response']['GeoObjectCollection']['featureMember'][0];
-                                            if (checkNested(feature_member, 'GeoObject', 'Point', 'pos')){
+                                            if (checkNested(feature_member, 'GeoObject', 'Point', 'pos')) {
                                                 var pos = feature_member['GeoObject']['Point']['pos'].split(' ');
                                                 upd_data.latitude = pos[1];
                                                 upd_data.longitude = pos[0];
@@ -240,10 +198,10 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                     }
                                 }
                                 var q_upd_event = Entities.events
-                                        .update(upd_data)
-                                        .where(Entities.events.id.equals(_event.id))
-                                        .toQuery();
-                                client.query(q_upd_event, function(err){
+                                    .update(upd_data)
+                                    .where(Entities.events.id.equals(_event.id))
+                                    .toQuery();
+                                client.query(q_upd_event, function (err) {
                                     handleError(err);
                                     callback(null);
                                 });
@@ -256,10 +214,175 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
     }
 
-    console.log(args);
-    if (args.indexOf('--update-geocodes') !== -1){
-        updateEventsGeocodes();
+    function updateRecommendations(data, cb) {
+        if (!data) return cb();
+        var organizations_text = 'COALESCE((SELECT ts_rank_cd(\'{1.0, 0.7, 0.5, 0.3}\', vo.fts, query) :: REAL AS rank' +
+                ' FROM view_organizations AS vo, to_tsquery(' +
+                ' (SELECT' +
+                ' users_interests_aggregated.aggregated_tsquery' +
+                ' FROM users_interests_aggregated' +
+                ' WHERE users_interests_aggregated.user_id =' +
+                ' view_users_organizations.user_id) ' +
+                ' ) AS query' +
+                ' WHERE vo.id = view_users_organizations.organization_id) :: REAL, 0)',
+            events_text = 'COALESCE((SELECT ts_rank_cd(\'{1.0, 0.7, 0.5, 0.3}\', ve.fts, query) :: REAL AS rank' +
+                '     FROM view_events AS ve, to_tsquery(' +
+                '         (SELECT users_interests_aggregated.aggregated_tsquery' +
+                '     FROM users_interests_aggregated' +
+                '     WHERE users_interests_aggregated.user_id =' +
+                '         view_users_events.user_id)' +
+                ' ) AS query' +
+                '     WHERE ve.id = view_users_events.event_id) :: REAL, 0)',
+
+            q_upd_organizations = 'UPDATE recommendations_organizations' +
+                ' SET' +
+                ' rating_subscribed_friends           = (SELECT COUNT(id)' +
+                ' FROM subscriptions' +
+                ' INNER JOIN view_friends ON view_friends.friend_id = subscriptions.user_id' +
+                ' WHERE subscriptions.organization_id = view_users_organizations.organization_id' +
+                ' AND subscriptions.status = TRUE' +
+                ' AND view_friends.user_id = view_users_organizations.user_id) :: INT,' +
+                ' rating_active_events_count          = (SELECT COUNT(id) / 5' +
+                ' FROM view_events' +
+                ' WHERE view_events.organization_id =' +
+                ' view_users_organizations.organization_id) :: INT,' +
+                ' rating_last_events_count            = (SELECT COUNT(id) * 2' +
+                ' FROM view_events' +
+                ' WHERE view_events.organization_id = view_users_organizations.organization_id' +
+                ' AND view_events.created_at >' +
+                ' DATE_PART(\'epoch\', (NOW() - INTERVAL \'7 days\'))) :: INT,' +
+                ' rating_subscribed_in_social_network = (SELECT COUNT(id) * 50' +
+                ' FROM view_organizations vo' +
+                ' WHERE vo.id = view_users_organizations.organization_id' +
+                ' AND vo.vk_url_path IN' +
+                ' (SELECT vk_groups.screen_name' +
+                ' FROM vk_groups' +
+                ' INNER JOIN vk_users_subscriptions' +
+                ' ON vk_users_subscriptions.vk_group_id = vk_groups.id' +
+                ' WHERE' +
+                ' vk_users_subscriptions.user_id =' +
+                ' view_users_organizations.user_id)) :: INT,' +
+                ' rating_texts_similarity             = ' + (data.organizations_update_texts === false ? 'rating_texts_similarity' : organizations_text) + ',' +
+                ' updated_at                          = NOW()' +
+                ' FROM (SELECT *' +
+                ' FROM view_users_organizations' +
+                ' {WHERE_PLACEHOLDER}) AS view_users_organizations' +
+                ' WHERE view_users_organizations.user_id = recommendations_organizations.user_id' +
+                ' AND view_users_organizations.organization_id = recommendations_organizations.organization_id ';
+
+        var q_upd_events = 'UPDATE recommendations_events' +
+                '     SET' +
+                '     rating_favored_friends   = (SELECT COUNT(id)' +
+                '     FROM favorite_events' +
+                '     INNER JOIN view_friends ON view_friends.friend_id = favorite_events.user_id' +
+                '     WHERE view_users_events.event_id = favorite_events.event_id' +
+                '     AND view_friends.user_id = view_users_events.user_id) :: INT,' +
+                '         rating_tags_in_favorites = COALESCE((SELECT SUM(t_favored_by_user.favored_with_tag_count) :: INT' +
+                '     FROM' +
+                '     (SELECT COUNT(events_tags.id) :: INT AS favored_with_tag_count' +
+                '     FROM events_tags' +
+                '     WHERE' +
+                '     events_tags.event_id IN (' +
+                '         SELECT favorite_events.event_id' +
+                '     FROM favorite_events' +
+                '     WHERE status = TRUE' +
+                '     AND favorite_events.user_id = view_users_events.user_id' +
+                ' )' +
+                '     AND events_tags.event_id = view_users_events.event_id' +
+                '     GROUP BY events_tags.tag_id) AS t_favored_by_user) :: INT, 0),' +
+                '     rating_tags_in_hidden    = COALESCE((SELECT SUM(favored_with_tag_count)' +
+                '     FROM' +
+                '     (SELECT COUNT(events_tags.id) :: INT AS favored_with_tag_count' +
+                '     FROM events_tags' +
+                '     WHERE' +
+                '     events_tags.event_id IN (' +
+                '         SELECT hidden_events.event_id' +
+                '     FROM hidden_events' +
+                '     WHERE status = TRUE' +
+                '     AND hidden_events.user_id = view_users_events.user_id' +
+                ' )' +
+                '     AND events_tags.event_id = view_users_events.event_id' +
+                '     GROUP BY events_tags.tag_id) AS favored_by_user) :: INT, 0),' +
+                '     rating_recent_created    = (SELECT CASE WHEN DATE_PART(\'epoch\', NOW()) > ve.created_at + 259200 :: INT' +
+                '     THEN 0' +
+                '     ELSE (259200 :: INT - (DATE_PART(\'epoch\', NOW()) - ve.created_at)) :: INT /' +
+                '     7200 END' +
+                '     FROM view_events AS ve' +
+                '     WHERE ve.id = view_users_events.event_id) :: INT,' +
+                '         rating_active_days       = (SELECT 1 / (CASE' +
+                '     WHEN (ve.registration_required = TRUE AND' +
+                '     ve.registration_till < DATE_PART(\'epoch\', NOW()))' +
+                '     THEN 1000' +
+                '     ELSE (SELECT CASE WHEN COUNT(id) :: INT = 0' +
+                '     THEN 1000' +
+                '     ELSE COUNT(id) :: INT END' +
+                '     FROM events_dates' +
+                '     WHERE' +
+                '     events_dates.event_id = ve.id' +
+                '     AND event_date > NOW()' +
+                '     AND event_date < (NOW() + INTERVAL \'10 days\')' +
+                '     AND status = TRUE' +
+                ' )' +
+                '     END) :: REAL * 10' +
+                '     FROM view_events AS ve' +
+                '     WHERE ve.id = view_users_events.event_id) :: INT,' +
+                '         rating_texts_similarity  = ' + (data.events_update_texts === false ? 'rating_texts_similarity' : events_text) + ',' +
+                '     updated_at               = NOW()' +
+                '     FROM (SELECT view_users_events.*' +
+                '     FROM view_users_events' +
+                '     INNER JOIN view_events ON view_users_events.event_id = view_events.id' +
+                '     WHERE view_events.last_event_date > (SELECT DATE_PART(\'epoch\', TIMESTAMPTZ \'yesterday\') :: INT)' +
+                '     AND view_users_events.user_id = $1) AS view_users_events' +
+                '     WHERE view_users_events.user_id = recommendations_events.user_id' +
+                '     AND view_users_events.event_id = recommendations_events.event_id' +
+                '     AND view_users_events.user_id = $2;',
+            upd_events = false,
+            upd_organizations = false,
+            operations = [], events_args = [], orgs_args = [];
+
+        if (data.user_id) {
+            q_upd_organizations = q_upd_organizations + ' AND view_users_organizations.user_id = $1';
+            q_upd_organizations = q_upd_organizations.replace('{WHERE_PLACEHOLDER}', ' WHERE user_id = $2');
+
+            q_upd_events = q_upd_events + ' AND view_users_events.user_id = $1';
+            q_upd_events = q_upd_organizations.replace('{WHERE_PLACEHOLDER}', ' WHERE user_id = $2');
+
+            upd_events = upd_organizations = true;
+            events_args = [data.user_id, data.user_id];
+            orgs_args = [data.user_id, data.user_id];
+        } else if (data.event_id) {
+            q_upd_events = q_upd_events + ' AND view_users_events.event_id = $1';
+            q_upd_events = q_upd_organizations.replace('{WHERE_PLACEHOLDER}', ' WHERE event_id = $2');
+            upd_events = true;
+            events_args = [data.event_id, data.event_id];
+        } else if (data.organization_id) {
+            q_upd_organizations = q_upd_organizations + ' AND view_users_organizations.organization_id = $1';
+            q_upd_organizations = q_upd_organizations.replace('{WHERE_PLACEHOLDER}', ' WHERE organization_id = $2');
+            upd_organizations = true;
+            events_args = [data.event_id, data.event_id];
+        }
+
+        if (upd_events) {
+            operations.push(function (callback) {
+                client.query(q_upd_events, events_args, function (err, result) {
+                    if (err) handleError({error: err, name: 'q_upd_events'});
+                    callback(null);
+                })
+            });
+        }
+        if (upd_organizations) {
+            operations.push(function (callback) {
+                client.query(q_upd_organizations, orgs_args, function (err, result) {
+                    if (err) handleError({error: err, name: 'q_upd_organizations'});
+                    callback(null);
+                })
+            })
+        }
+        async.parallel(operations, function (err, results) {
+            cb(err, results);
+        });
     }
+
 
     try {
         new CronJob('*/1 * * * *', function () {
@@ -275,7 +398,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 notifications.sendUsersNotifications();
             }
             publicDelayedEvents();
-            updateEventsGeocodes();
         }, null, true);
     } catch (ex) {
         logger.error(ex);
@@ -291,7 +413,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
     var ioHandlers = function (socket) {
 
-        socket.on('error', function (err) {
+        socket.on(CONSTANTS.CONNECTION.ERROR, function (err) {
             logger.error(err);
         });
 
@@ -315,12 +437,12 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     .on('complete', function (result) {
                         if (result instanceof Error) {
                             handleError(result);
-                            socket.emit(EMIT_NAMES.VK_INTEGRATION.GROUPS_TO_POST_DONE, {
+                            socket.emit(CONSTANTS.VK_INTEGRATION.GROUPS_TO_POST_DONE, {
                                 error: 'Произошла ошибка, мы не смогли получить список групп vk.com.',
                                 data: data
                             });
                         } else {
-                            socket.emit(EMIT_NAMES.VK_INTEGRATION.GROUPS_TO_POST_DONE, {
+                            socket.emit(CONSTANTS.VK_INTEGRATION.GROUPS_TO_POST_DONE, {
                                 error: null,
                                 data: result
                             });
@@ -328,8 +450,74 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     });
 
             },
+            updateUsersInterestsAggregated = function (user_id, callback) {
+                var q_get_interests = Entities.users_interests.select(
+                    Entities.users_interests.star()
+                    ).where(Entities.users_interests.user_id.equals(user_id)).toQuery(),
+                    q_get_groups = Entities.vk_groups.select(
+                        Entities.vk_groups.name,
+                        Entities.vk_groups.description,
+                        Entities.vk_groups.screen_name
+                    ).from(
+                        Entities.vk_groups
+                            .join(Entities.vk_users_subscriptions).on(Entities.vk_users_subscriptions.vk_group_id.equals(Entities.vk_groups.id))
+                    ).where(Entities.vk_users_subscriptions.user_id.equals(user_id)).toQuery(),
+                    cleanData = function (str) {
+                        if (typeof str !== 'string') return '';
+                        str = str.replace(/<[^>]*>/gmi, ''); // remove tags
+                        str = str.replace(/[^a-zA-Zа-яА-ЯёЁ\-\s]/gmi, ''); // remove NOT words
+                        var str_items = str.split(/\s/gmi),
+                            result_words = [];
+                        str_items.forEach(function (word) {
+                            word = word.trim();
+                            if (typeof word == 'string' && word.length <= 3 && word.toUpperCase() != word) return true; //stop word
+                            result_words.push(word);
+                        });
+                        return result_words.join(' ');
+                    };
+
+
+                client.query(q_get_interests, function (err, data) {
+                    if (err) handleError({error: err, name: 'q_get_interests'});
+                    var items = [],
+                        interest_types = ['education_university_name', 'education_faculty_name',
+                            'occupation_name', 'interests', 'movies', 'tv', 'books', 'games', 'about'];
+                    data.rows.forEach(function (row) {
+                        interest_types.forEach(function (type) {
+                            if (typeof row[type] == 'string'){
+                                items.push(cleanData(row[type]));
+                            }
+                        });
+                    });
+
+                    client.query(q_get_groups, function (error, groups_data) {
+
+                        if (error) handleError({error: error, name: 'q_get_groups'});
+
+                        groups_data.rows.forEach(function (row) {
+
+                                items.push(cleanData(row.name));
+                                items.push(cleanData(row.screen_name));
+                                items.push(cleanData(row.description));
+                        });
+                        var items_text = items.join(' '),
+                            items_text_tsquery = items_text.trim().replace(/\s+/gmi, '|');
+
+                        var q_ins_interests = 'INSERT INTO ' +
+                            '   users_interests_aggregated (user_id, aggregated_text, aggregated_tsquery, updated_at)' +
+                            ' VALUES($1, $2, $3, NOW())' +
+                            ' ON CONFLICT(user_id) DO UPDATE ' +
+                            ' SET aggregated_text = $4, aggregated_tsquery = $5, updated_at = NOW()';
+
+                        client.query(q_ins_interests, [user_id, items_text, items_text_tsquery, items_text, items_text_tsquery], function (err, data) {
+                            if (err) handleError({error: err, name: 'q_ins_interests'});
+                            if (callback) callback(err);
+                        });
+
+                    });
+                });
+            },
             saveDataInDB = function (data) {
-                console.log(data);
                 var subscriptions_count = 0;
                 socket.retry_count = 0;
                 function getUIDValues() {
@@ -406,17 +594,12 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         subscriptions_count = user.subscriptions_count;
                         q_user = users.update(user_to_ins).where(users.id.equals(user.id)).returning('id').toQuery();
                     }
+
                     console.log('GETTING USER: ', is_new_user, result);
 
                     client.query(q_user, function (user_err, ins_result) {
 
-                        if (handleError(user_err)) {
-                            if (data.oauth_data.hasOwnProperty('email') == false || !data.oauth_data.email) {
-                                socket.emit('vk.needEmail');
-                                return;
-                            }
-                            return;
-                        }
+                        if (err) return handleError({error: user_err, name: 'q_user'});
 
                         if (is_new_user) {
                             user = {
@@ -527,14 +710,24 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                     return;
                                 }
 
-                                socket.emit('auth', {
-                                    email: data.oauth_data.email,
-                                    user_id: user.id,
-                                    token: user_token,
-                                    mobile: token_type == 'mobile',
-                                    type: data.type,
-                                    subscriptions_count: subscriptions_count
+                                updateUsersInterestsAggregated(user.id, function () {
+                                    updateRecommendations({
+                                        user_id: user.id,
+                                        organizations_update_texts: true,
+                                        events_update_texts: false
+                                    }, function () {
+                                        socket.emit('auth', {
+                                            email: data.oauth_data.email,
+                                            user_id: user.id,
+                                            token: user_token,
+                                            mobile: token_type == 'mobile',
+                                            type: data.type,
+                                            subscriptions_count: subscriptions_count
+                                        });
+                                    });
                                 });
+
+
                             });
                         };
 
@@ -707,6 +900,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             } else {
                                 e = null;
                             }
+                            console.log('USERS DATA: ', result);
                             callback(e, result);
                         }
 
@@ -883,7 +1077,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     });
             };
 
-        socket.on('auth.oauthDone', function (oauth_data) {
+        socket.on(CONSTANTS.AUTH.OAUTH_DONE, function (oauth_data) {
             socket.retry_count = 0;
             try {
                 console.log('trying');
@@ -894,8 +1088,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
             }
         });
 
-        socket.on('feedback', function (data) {
-            logger.info(data);
+        socket.on(CONSTANTS.UTILS.FEEDBACK, function (data) {
             var html = '';
             for (var i in data) {
                 if (data.hasOwnProperty(i)) {
@@ -920,7 +1113,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
             });
         });
 
-        socket.on('session.set', function (token) {
+        socket.on(CONSTANTS.AUTH.SESSION_SET, function (token) {
             if (!__rooms.hasOwnProperty(token)) {
                 __rooms[token] = [];
             }
@@ -928,7 +1121,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
             socket.token = token;
         });
 
-        socket.on('disconnect', function () {
+        socket.on(CONSTANTS.CONNECTION.DISCONNECT, function () {
             if (__rooms.hasOwnProperty(socket.token)) {
                 var index = __rooms[socket.token].indexOf(socket.id);
                 __rooms[socket.token].splice(index, 1);
@@ -938,15 +1131,14 @@ pg.connect(pg_conn_string, function (err, client, done) {
             }
         });
 
-        socket.on('image.getFromURL', function (url) {
+        socket.on(CONSTANTS.UTILS.GET_IMAGE_FROM_URL, function (url) {
             Utils.downloadImageFromUrl(url, function (error, data, filename) {
                 if (handleError(error)) return;
                 socket.emit('image.getFromURLDone', {error: error, data: data, filename: filename});
             });
         });
 
-
-        socket.on(EMIT_NAMES.NOTIFICATIONS.SEND, function () {
+        socket.on(CONSTANTS.NOTIFICATIONS.SEND, function () {
             if (config_index == 'local') {
                 var notifications = new Notifications(real_config, client, logger);
                 notifications.sendAutoNotifications();
@@ -954,14 +1146,14 @@ pg.connect(pg_conn_string, function (err, client, done) {
             }
         });
 
-        socket.on(EMIT_NAMES.NOTIFICATIONS.UPDATE_STATS, function () {
+        socket.on(CONSTANTS.NOTIFICATIONS.UPDATE_STATS, function () {
             if (config_index == 'local') {
                 console.log('strted');
                 updateEventsStats();
             }
         });
 
-        socket.on(EMIT_NAMES.VK_INTEGRATION.GROUPS_TO_POST, function (user_id) {
+        socket.on(CONSTANTS.VK_INTEGRATION.GROUPS_TO_POST, function (user_id) {
             var vk_sign_in = Entities.vk_sign_in,
                 q_get_user_data = vk_sign_in
                     .select(vk_sign_in.id, vk_sign_in.secret, vk_sign_in.access_token)
@@ -971,14 +1163,15 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     ).toQuery();
 
             client.query(q_get_user_data, function (err, result) {
-                if (handleError(err, EMIT_NAMES.VK_INTEGRATION.GROUPS_TO_POST, function(){}, socket)) return;
+                if (handleError(err, CONSTANTS.VK_INTEGRATION.GROUPS_TO_POST, function () {
+                    }, socket)) return;
                 result.rows[0].user_id = user_id;
                 socket.vk_user = result.rows[0];
                 getVkGroups(result.rows[0], 'can_post');
             });
         });
 
-        socket.on(EMIT_NAMES.VK_INTEGRATION.POST_IT, function (data) {
+        socket.on(CONSTANTS.VK_INTEGRATION.POST_IT, function (data) {
             var request_data = [
                     'access_token=' + socket.vk_user.access_token,
                     'group_id=' + data.guid
@@ -992,7 +1185,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
             fs.writeFile(image_path + filename, base64, 'base64', function (err) {
 
 
-                if (handleError(err, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function(){}, socket)) return;
+                if (handleError(err, CONSTANTS.VK_INTEGRATION.POST_ERROR, function () {
+                    }, socket)) return;
 
                 rest.get(url, {
                     json: true,
@@ -1003,7 +1197,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     .on('complete', function (result) {
 
                         if (result instanceof Error) {
-                            handleError(result, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function(){}, socket);
+                            handleError(result, CONSTANTS.VK_INTEGRATION.POST_ERROR, function () {
+                            }, socket);
                         } else {
                             fs.stat(image_path + filename, function (err, stats) {
                                 rest
@@ -1019,7 +1214,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
 
                                             if (upload_data instanceof Error) {
-                                                handleError(result, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function(){}, socket);
+                                                handleError(result, CONSTANTS.VK_INTEGRATION.POST_ERROR, function () {
+                                                }, socket);
                                             } else {
 
                                                 upload_data = JSON.parse(upload_data);
@@ -1034,10 +1230,12 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                                     .on('complete', function (res_data) {
 
                                                         if (res_data instanceof Error) {
-                                                            handleError(res_data, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function(){}, socket);
+                                                            handleError(res_data, CONSTANTS.VK_INTEGRATION.POST_ERROR, function () {
+                                                            }, socket);
                                                         } else {
                                                             if (res_data.response.length == 0) {
-                                                                handleError({name: 'CANT_SAVE_WALL_PHOTO'}, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function(){}, socket);
+                                                                handleError({name: 'CANT_SAVE_WALL_PHOTO'}, CONSTANTS.VK_INTEGRATION.POST_ERROR, function () {
+                                                                }, socket);
                                                                 return;
                                                             }
 
@@ -1050,7 +1248,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                                                     group_id: data.guid
                                                                 }).returning('id').toQuery();
                                                             client.query(q_ins_vk_post, function (err) {
-                                                                if (handleError(err, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function(){}, socket)) return;
+                                                                if (handleError(err, CONSTANTS.VK_INTEGRATION.POST_ERROR, function () {
+                                                                    }, socket)) return;
 
                                                                 rest
                                                                     .post(URLs.VK.POST_TO_WALL, {
@@ -1066,7 +1265,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                                                     .on('complete', function (res) {
                                                                         console.log(res);
                                                                         if (res instanceof Error) {
-                                                                            handleError(result, EMIT_NAMES.VK_INTEGRATION.POST_ERROR, function(){}, socket);
+                                                                            handleError(result, CONSTANTS.VK_INTEGRATION.POST_ERROR, function () {
+                                                                            }, socket);
                                                                         }
                                                                     });
                                                             })
@@ -1082,14 +1282,14 @@ pg.connect(pg_conn_string, function (err, client, done) {
             });
         });
 
-        socket.on(EMIT_NAMES.UTILS.UPDATE_IMAGES, function () {
+        socket.on(CONSTANTS.UTILS.UPDATE_IMAGES, function () {
             cropper.resizeNew({
                 images: real_config.images,
                 client: client
             }, function () {
-                socket.emit(EMIT_NAMES.UTILS.UPDATE_IMAGES_DONE);
+                socket.emit(CONSTANTS.UTILS.UPDATE_IMAGES_DONE);
             });
-        })
+        });
 
     };
 
@@ -1099,6 +1299,55 @@ pg.connect(pg_conn_string, function (err, client, done) {
         io2.on('connection', ioHandlers);
     }
 
-    console.log('Started');
+
+    /* All endpoints below are used for calls from PHP*/
+    app.get('/utils/updateImages', function (req, res) {
+        cropper.resizeNew({
+            images: real_config.images,
+            client: client
+        }, function () {
+            res.json({status: true});
+        });
+    });
+
+    app.get('/utils/updateGeocodes', function (req, res) {
+        if (config_index != 'prod') {
+            console.log(req.params);
+        }
+        updateEventsGeocodes(req.params.event_id);
+        res.json({status: true});
+    });
+
+    app.get('/utils/events/:id', function (req, res) {
+        if (config_index != 'prod') {
+            console.log(req.params);
+        }
+        updateEventsGeocodes(req.params.id);
+        cropper.resizeNew({
+            images: real_config.images,
+            client: client
+        }, function () {
+            res.json({status: true});
+        });
+    });
+
+
+    app.get('/recommendations/events/:id', function (req, res) {
+        updateRecommendations({event_id: req.params.id}, logger.info);
+    });
+
+    app.get('/recommendations/organizations/:id', function (req, res) {
+        updateRecommendations({organization_id: req.params.id}, logger.info);
+    });
+
+    app.get('/recommendations/users/:id', function (req, res) {
+        updateRecommendations({user_id: req.params.id}, logger.info);
+        console.log('/recommendations/organizations/:id');
+    });
+
+
+    app.listen(8000, function () {
+        console.log('Node listening on port 8000!');
+    });
 
 });
