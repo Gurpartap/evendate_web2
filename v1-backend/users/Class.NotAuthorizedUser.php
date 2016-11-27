@@ -8,10 +8,8 @@ class NotAuthorizedUser extends AbstractUser {
 		return -1;
 	}
 
-	public function getMainInfo()
+	public function getMainInfo(array $fields)
 	{
-
-		$account_types = array();
 
 		return new Result(true, '', array(
 			'first_name' => $this->getFirstName(),
@@ -21,7 +19,7 @@ class NotAuthorizedUser extends AbstractUser {
 			'blurred_image_url' => $this->blurred_image_url,
 			'middle_name' => $this->getMiddleName(),
 			'is_editor' => false,
-			'accounts' => $account_types
+			'accounts' => array()
 		));
 	}
 

@@ -117,6 +117,6 @@ abstract class AbstractUser{
 		return $this->middle_name;
 	}
 
-	public abstract function getMainInfo();
+	public abstract function getMainInfo(array $fields);
 	public abstract function getTokenId();
 }

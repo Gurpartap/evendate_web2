@@ -1858,9 +1858,11 @@
         "responses": {
           "200": {
             "description": "successful operation",
-            "type": "array",
-            "items": {
-              "$ref": "#/definitions/Notification"
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Notification"
+              }
             }
           }
         }
@@ -2271,7 +2273,7 @@
           {
             "name": "fields",
             "in": "query",
-            "description": "Additional fields and sub-entities",
+            "description": "Additional fields and sub-entities (allowed: type, is_friend, blurred_img_url, uid, random, link, accounts_links, accounts, favored, subscriptions, actions)",
             "required": false,
             "type": "string"
           }
@@ -2348,25 +2350,22 @@
         "produces": [
           "application/json"
         ],
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Additional fields and sub-entities (allowed: type, is_friend, uid, random, link, accounts_links, accounts, favored, subscriptions, actions)",
+            "required": false,
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
             "schema": {
               "type": "string"
             },
-            "headers": {
-              "X-Rate-Limit": {
-                "type": "integer",
-                "format": "int32",
-                "description": "calls per hour allowed by the user"
-              },
-              "X-Expires-After": {
-                "type": "string",
-                "format": "date-time",
-                "description": "date in UTC when token expires"
-              }
-            }
+            "headers": {}
           },
           "400": {
             "description": "Invalid username/password supplied"
@@ -2706,9 +2705,11 @@
         "responses": {
           "200": {
             "description": "successful operation",
-            "type": "array",
-            "items": {
-              "$ref": "#/definitions/Device"
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Device"
+              }
             }
           }
         }
