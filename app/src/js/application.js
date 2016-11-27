@@ -230,6 +230,16 @@ __APP = {
 	CURRENT_PAGE: new Page(),
 	CURRENT_JQXHR: {},
 	ROUTING: {
+		'add': {
+			'event': {
+				'to': {
+					'^([0-9]+)': AddEventPage,
+					'': AddEventPage
+				},
+				'': AddEventPage
+			},
+			'organization': AddOrganizationPage
+		},
 		'my': {
 			'profile': MyProfilePage,
 			'': MyProfilePage

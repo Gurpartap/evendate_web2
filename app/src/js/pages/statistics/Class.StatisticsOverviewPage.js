@@ -63,7 +63,7 @@ StatisticsOverviewPage.buildMyOrganizationsBlocks = function(organizations) {
 			}, {
 				title: 'Создать событие',
 				classes: ['button', 'fa_icon', 'fa-plus', '-color_accent', 'RippleEffect'],
-				page: '/event/add_to/' + org.id
+				page: '/add/event/to/' + org.id
 			})
 		});
 	}));

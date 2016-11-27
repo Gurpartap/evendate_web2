@@ -221,7 +221,7 @@ $url_parts = explode('/', $url);
 			}
 			if ($is_user_editor) { ?>
 				<a href="/statistics" class="sidebar_navigation_item SidebarNavItem link Link"><span>Статистика</span></a>
-				<a href="/event/add" class="sidebar_navigation_item SidebarNavItem link Link"><span>Создать событие</span></a><?php
+				<a href="/add/event" class="sidebar_navigation_item SidebarNavItem link Link"><span>Создать событие</span></a><?php
 			} ?>
 			<a href="/feed" class="sidebar_navigation_item SidebarNavItem link Link"><span>События</span><span class="counter sidebar_navigation_counter -hidden SidebarNavFeedCounter"></span></a>
 			<a href="/organizations" class="sidebar_navigation_item SidebarNavItem link Link"><span>Каталог организаторов</span></a>
