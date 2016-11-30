@@ -670,6 +670,14 @@ RedactEventPage.prototype.render = function() {
 		__APP.changeState('/feed/actual', true, true);
 		return null;
 	}
+	if(window.location.pathname.contains('event/add')){
+		if(this.organization_id){
+			__APP.changeState('/add/event/to/' + this.organization_id, true, true);
+		} else {
+			__APP.changeState('/add/event', true, true);
+		}
+		return null;
+	}
 	
 	function selectDates($view, raw_dates) {
 		var MainCalendar = $view.find('.EventDatesCalendar').data('calendar'),
