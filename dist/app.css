@@ -3971,7 +3971,11 @@ body.-open_modal > .modal_wrapper {
 
 .event_image_bottom .button + .button {margin-left: .88em}
 
-.event_favourite_button {width: 16em}
+.event_favourite_button {
+	width: -webkit-calc(100% - 30px - 1em);
+	width: calc(100% - 30px - 1em);
+	max-width: 170px;
+}
 
 .event_content {padding: 42px 24px 24px}
 
