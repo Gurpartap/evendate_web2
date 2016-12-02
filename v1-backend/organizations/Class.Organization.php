@@ -674,6 +674,7 @@ class Organization extends AbstractEntity
 				'background_img_url' => $data['background_img_url'],
 				'img_url' => $data['img_url'],
 				'creator_id' => $user->getId(),
+				'images_domain' => 'https://dn' . rand(1, 4) . '.evendate.ru/',
 				'email' => $data['email'],
 				'state_id' => self::ORGANIZATION_STATE_SHOWN
 			)
