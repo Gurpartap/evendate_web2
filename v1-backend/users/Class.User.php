@@ -296,36 +296,16 @@ class User extends AbstractUser
 		return $this->token_id;
 	}
 
-	public function getMainInfo()
+	public function getMainInfo(array $fields)
 	{
 
-		$account_types = array();
-		$account_links = array();
+		$data = UsersCollection::one($this->db, $this, $this->getId(), $fields)
+			->getParams($this, $fields)
+			->getData();
 
-		if ($this->vk_uid != null) {
-			$account_types[] = 'vk';
-			$account_links['vk'] = 'https://vk.com/id' . $this->vk_uid;
-		}
-		if ($this->google_uid != null) {
-			$account_types[] = 'google';
-			$account_links['google'] = 'https://plus.google.com/u/0/' . $this->google_uid;
-		}
-		if ($this->facebook_uid != null) {
-			$account_types[] = 'facebook';
-			$account_links['facebook'] = 'https://facebook.com/' . $this->facebook_uid;
-		}
+		$data['is_editor'] = $this->isEditor();
 
-		return new Result(true, '', array(
-			'first_name' => $this->getFirstName(),
-			'last_name' => $this->getLastName(),
-			'id' => intval($this->getId()),
-			'avatar_url' => $this->getAvatarUrl(),
-			'blurred_image_url' => $this->blurred_image_url,
-			'middle_name' => $this->getMiddleName(),
-			'is_editor' => $this->isEditor(),
-			'accounts' => $account_types,
-			'accounts_links' => $account_links
-		));
+		return new Result(true, '', array($data));
 	}
 
 }

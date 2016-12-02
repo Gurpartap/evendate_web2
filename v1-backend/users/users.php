@@ -96,9 +96,8 @@ $__modules['users'] = array(
 				return $__user->getSettings();
 			}
 		},
-		'{me}' => function () use ($__user) {
-			$data = $__user->getMainInfo()->getData();
-			return new Result(true, '', array($data));
+		'{me}' => function () use ($__user, $__fields) {
+			return $__user->getMainInfo($__fields);
 		},
 		'subscriptions' => function () use ($__db, $__pagination, $__request, $__user, $__fields, $__order_by) {
 			return OrganizationsCollection::filter(
