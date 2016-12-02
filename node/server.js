@@ -461,6 +461,10 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     images: real_config.images,
                     client: client
                 });
+                cropper.downloadNew({
+                    client: client,
+                    images: real_config.images
+                });
             }
             if (config_index == 'prod') {
                 var notifications = new Notifications(real_config, client, logger);

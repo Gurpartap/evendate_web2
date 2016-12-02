@@ -1,3 +1,5 @@
+"use strict";
+
 var easyimage = require('easyimage'),
     gm = require('gm').subClass({imageMagick: true}),
     fs = require('fs'),
@@ -42,6 +44,43 @@ const IMG_WIDTHS = {
 function ImagesResize(settings) {
     this.settings = settings;
 }
+
+
+ImagesResize.prototype.downloadNew = function (settings) {
+    let _this = this,
+        _logger = _this.settings.logger,
+        users = Entities.users,
+        client = settings.client,
+        q_get_user_images =
+            users
+                .select(users.id, users.avatar_url)
+                .from(users)
+                .where(
+                    users.local_avatar_filename.isNull()
+                )
+                .and(users.avatar_url.isNotNull())
+                .and(users.avatar_url.notEquals(''))
+                .limit(100)
+                .toQuery();
+
+    client.query(q_get_user_images, function (err, result) {
+        if (err) return _logger.error(err);
+        result.rows.forEach(function (image) {
+            let img_path = settings.images.user_images + '/default/';
+            Utils.downloadImageFromUrl(image.avatar_url, function (err, data, filename) {
+                if (err) return _logger.error(err);
+                let q_upd_user = users
+                    .update({
+                        local_avatar_filename: filename
+                    }).where(users.id.equals(image.id)).toQuery();
+                client.query(q_upd_user, function (err) {
+                    if (err) return _logger.error(err);
+                })
+            }, '../' + img_path);
+        });
+    });
+};
+
 
 ImagesResize.prototype.resizeFile = function (settings) {
     var widths = IMG_WIDTHS;
