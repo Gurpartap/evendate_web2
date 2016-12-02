@@ -70,7 +70,7 @@ CREATE TABLE recommendations_organizations (
 CREATE TABLE recommendations_events (
   id                       SERIAL PRIMARY KEY NOT NULL,
   user_id                  BIGINT             NOT NULL  REFERENCES users (id),
-  event_id                 BIGINT             NOT NULL  REFERENCES organizations (id),
+  event_id                 BIGINT             NOT NULL  REFERENCES events (id),
   rating_favored_friends   REAL,
   rating_tags_in_favorites REAL,
   rating_tags_in_hidden    REAL,
@@ -123,7 +123,7 @@ ON CONFLICT DO NOTHING;
 INSERT INTO recommendations_events (user_id, event_id, rating_favored_friends, rating_tags_in_favorites, rating_tags_in_hidden, rating_recent_created, rating_active_days, rating_texts_similarity, rating, updated_at)
   SELECT
     user_id,
-    organization_id,
+    event_id,
     NULL AS rating_favored_friends,
     NULL AS rating_tags_in_favorites,
     NULL AS rating_tags_in_hidden,
@@ -132,7 +132,7 @@ INSERT INTO recommendations_events (user_id, event_id, rating_favored_friends, r
     NULL AS rating_texts_similarity,
     NULL AS rating,
     NULL AS updated_at
-  FROM view_users_organizations
+  FROM view_users_events
 ON CONFLICT DO NOTHING;
 
 
