@@ -9,13 +9,13 @@ CREATE VIEW view_users AS
     users.local_avatar_filename,
     (CASE
      WHEN users.local_avatar_filename IS NOT NULL
-       THEN 'http://evendate.ru/user_images/default/' || users.local_avatar_filename
+       THEN 'https://evendate.ru/user_images/default/' || users.local_avatar_filename
      ELSE users.avatar_url
      END
     ) AS avatar_url,
     (CASE
      WHEN users.local_avatar_filename IS NOT NULL
-       THEN 'http://evendate.ru/user_images/blurred/' || users.local_avatar_filename
+       THEN 'https://evendate.ru/user_images/blurred/' || users.local_avatar_filename
      ELSE NULL
      END
     ) AS blurred_img_url,
