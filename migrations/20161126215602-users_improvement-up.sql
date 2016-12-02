@@ -1,0 +1,38 @@
+-- CREATE TABLE users_followings (
+--   user_id      INT,
+--   following_id INT,
+--   status       BOOLEAN DEFAULT TRUE,
+--   FOREIGN KEY (user_id) REFERENCES users (id),
+--   FOREIGN KEY (following_id) REFERENCES users (id)
+-- );
+--
+-- DROP VIEW view_friends;
+--
+-- CREATE VIEW view_friends AS (SELECT
+--                               'google'                       AS type,
+--                               view_google_friends.uid        AS uid,
+--                               view_google_friends.user_id    AS user_id,
+--                               view_google_friends.friend_uid AS friend_uid,
+--                               view_google_friends.friend_id  AS friend_id
+--                             FROM view_google_friends
+--                             UNION SELECT
+--                                     'facebook'                       AS type,
+--                                     view_facebook_friends.uid        AS uid,
+--                                     view_facebook_friends.user_id    AS user_id,
+--                                     view_facebook_friends.friend_uid AS friend_uid,
+--                                     view_facebook_friends.friend_id  AS friend_id
+--                                   FROM view_facebook_friends
+--                             UNION SELECT
+--                                     'vk.com'                   AS type,
+--                                     view_vk_friends.uid        AS uid,
+--                                     view_vk_friends.user_id    AS user_id,
+--                                     view_vk_friends.friend_uid AS friend_uid,
+--                                     view_vk_friends.friend_id  AS friend_id
+--                                   FROM view_vk_friends
+--                             UNION SELECT
+--                                     'evendate'   AS type,
+--                                     users_followings.user_id::TEXT           AS uid,
+--                                     users_followings.user_id           AS user_id,
+--                                     users_followings.following_id::TEXT AS friend_uid,
+--                                     users_followings.following_id AS friend_id
+--                                   FROM users_followings WHERE users_followings.status = true);

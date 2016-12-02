@@ -563,6 +563,7 @@ class Organization extends AbstractEntity
 
 		$result = $p_upd_organization->execute($q_upd_organization->getBindValues());
 
+		@file_get_contents(App::DEFAULT_NODE_LOCATION . '/recommendations/organizations/' . $this->id);
 		if ($result === FALSE) throw new DBQueryException('CANT_UPDATE_ORGANIZATION', $this->db);
 		return new Result(true, '', array('organization_id' => $this->getId()));
 	}
@@ -689,6 +690,7 @@ class Organization extends AbstractEntity
 		if ($result === FALSE) throw new DBQueryException('CANT_CREATE_ORGANIZATION', $db);
 		$result = $p_ins_organization->fetch(PDO::FETCH_ASSOC);
 		self::addOwner($user, $result['id'], $db);
+		@file_get_contents(App::DEFAULT_NODE_LOCATION . '/recommendations/organizations/' . $result['id']);
 		return new Result(true, '', array('organization_id' => $result['id']));
 	}
 

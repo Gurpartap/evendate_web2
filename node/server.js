@@ -77,6 +77,7 @@ var
         if (!err || err == null) return false;
 
         logger.error(err);
+        console.trace();
 
         if (callback instanceof Function) {
             callback(err);
@@ -140,6 +141,75 @@ pg.connect(pg_conn_string, function (err, client, done) {
             client.query(q_upd_stats, [], function (err) {
                 if (err) return logger.error(err);
             });
+        },
+        insertRecommendationsAccordance = function (data, callback) {
+            var q_ins_user_upd_event = 'INSERT INTO recommendations_events (user_id, event_id, rating_favored_friends, ' +
+                    ' rating_tags_in_favorites, rating_tags_in_hidden, rating_recent_created, ' +
+                    ' rating_active_days, rating_texts_similarity, rating, updated_at)' +
+                    ' SELECT DISTINCT $1 AS user_id, view_events.id::INT AS event_id, 0 AS rating_favored_friends, ' +
+                    ' 0 AS rating_tags_in_favorites, 0 AS rating_tags_in_hidden, 0 AS rating_recent_created, ' +
+                    ' 0 AS rating_active_days, 0 AS rating_texts_similarity, 0 AS rating, NOW() AS updated_at ' +
+                    ' FROM view_events' +
+                    ' ON CONFLICT (user_id, event_id) DO NOTHING',
+
+                q_upd_user_upd_org = 'INSERT INTO recommendations_organizations (user_id, organization_id, rating_subscribed_friends, ' +
+                    ' rating_active_events_count, rating_last_events_count, rating_subscribed_in_social_network, rating_texts_similarity, ' +
+                    ' rating, updated_at)' +
+                    ' SELECT $1 AS user_id, view_organizations.id::INT AS organization_id, 0 AS  rating_subscribed_friends, ' +
+                    ' 0 AS rating_active_events_count, 0 AS rating_last_events_count, ' +
+                    ' 0 AS rating_subscribed_in_social_network, 0 AS rating_texts_similarity, 0 AS rating, ' +
+                    ' NOW() AS updated_at' +
+                    ' FROM view_organizations' +
+                    ' ON CONFLICT (user_id, organization_id) DO NOTHING',
+
+                q_ins_events = 'INSERT INTO recommendations_events (user_id, event_id, rating_favored_friends, ' +
+                    ' rating_tags_in_favorites, rating_tags_in_hidden, rating_recent_created, ' +
+                    ' rating_active_days, rating_texts_similarity, rating, updated_at)' +
+                    ' SELECT users.id AS user_id, $1 AS event_id, 0 AS rating_favored_friends, ' +
+                    ' 0 AS rating_tags_in_favorites, 0 AS rating_tags_in_hidden, 0 AS rating_recent_created, ' +
+                    ' 0 AS rating_active_days, 0 AS rating_texts_similarity, 0 AS rating, NOW() AS updated_at ' +
+                    ' FROM users' +
+                    ' ON CONFLICT (user_id, event_id) DO NOTHING',
+
+                q_ins_organizations = 'INSERT INTO recommendations_organizations (user_id, organization_id, rating_subscribed_friends, ' +
+                    ' rating_active_events_count, rating_last_events_count, rating_subscribed_in_social_network, rating_texts_similarity, ' +
+                    ' rating, updated_at)' +
+                    ' SELECT users.id AS user_id, $1 AS organization_id, 0 AS  rating_subscribed_friends, ' +
+                    ' 0 AS rating_active_events_count, 0 AS rating_last_events_count, ' +
+                    ' 0 AS rating_subscribed_in_social_network, 0 AS rating_texts_similarity, 0 AS rating, ' +
+                    ' NOW() AS updated_at' +
+                    ' FROM users' +
+                    ' ON CONFLICT (user_id, organization_id) DO NOTHING';
+
+            if (data.user_id) {
+                async.parallel([
+                    function (cb) {
+                        client.query(q_ins_user_upd_event, [data.user_id], function (err) {
+                            if (err) handleError(err);
+                            cb();
+                        });
+                    },
+                    function (cb) {
+                        client.query(q_upd_user_upd_org, [data.user_id], function (err) {
+                            if (err) handleError(err);
+                            cb();
+                        });
+                    },
+                ], callback);
+
+            } else if (data.event_id) {
+                client.query(q_ins_events, [data.event_id], function (err) {
+                    if (err) handleError(err);
+                    callback();
+                });
+            } else if (data.organization_id) {
+                client.query(q_ins_organizations, [data.organization_id], function (err) {
+                    if (err) handleError(err);
+                    callback();
+                });
+            } else {
+                callback();
+            }
         };
 
     function publicDelayedEvents() {
@@ -216,7 +286,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
     function updateRecommendations(data, cb) {
         if (!data) return cb();
-        var organizations_text = 'COALESCE((SELECT ts_rank_cd(\'{1.0, 0.7, 0.5, 0.3}\', vo.fts, query) :: REAL AS rank' +
+        let organizations_text = 'COALESCE((SELECT ts_rank_cd(\'{1.0, 0.7, 0.5, 0.3}\', vo.fts, query) :: REAL AS rank' +
                 ' FROM view_organizations AS vo, to_tsquery(' +
                 ' (SELECT' +
                 ' users_interests_aggregated.aggregated_tsquery' +
@@ -270,7 +340,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 ' WHERE view_users_organizations.user_id = recommendations_organizations.user_id' +
                 ' AND view_users_organizations.organization_id = recommendations_organizations.organization_id ';
 
-        var q_upd_events = 'UPDATE recommendations_events' +
+        let q_upd_events = 'UPDATE recommendations_events' +
                 '     SET' +
                 '     rating_favored_friends   = (SELECT COUNT(id)' +
                 '     FROM favorite_events' +
@@ -484,7 +554,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             'occupation_name', 'interests', 'movies', 'tv', 'books', 'games', 'about'];
                     data.rows.forEach(function (row) {
                         interest_types.forEach(function (type) {
-                            if (typeof row[type] == 'string'){
+                            if (typeof row[type] == 'string') {
                                 items.push(cleanData(row[type]));
                             }
                         });
@@ -496,9 +566,9 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
                         groups_data.rows.forEach(function (row) {
 
-                                items.push(cleanData(row.name));
-                                items.push(cleanData(row.screen_name));
-                                items.push(cleanData(row.description));
+                            items.push(cleanData(row.name));
+                            items.push(cleanData(row.screen_name));
+                            items.push(cleanData(row.description));
                         });
                         var items_text = items.join(' '),
                             items_text_tsquery = items_text.trim().replace(/\s+/gmi, '|');
@@ -711,18 +781,20 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 }
 
                                 updateUsersInterestsAggregated(user.id, function () {
-                                    updateRecommendations({
-                                        user_id: user.id,
-                                        organizations_update_texts: true,
-                                        events_update_texts: false
-                                    }, function () {
-                                        socket.emit('auth', {
-                                            email: data.oauth_data.email,
+                                    insertRecommendationsAccordance({user_id: user.id}, function () {
+                                        updateRecommendations({
                                             user_id: user.id,
-                                            token: user_token,
-                                            mobile: token_type == 'mobile',
-                                            type: data.type,
-                                            subscriptions_count: subscriptions_count
+                                            organizations_update_texts: true,
+                                            events_update_texts: false
+                                        }, function () {
+                                            socket.emit('auth', {
+                                                email: data.oauth_data.email,
+                                                user_id: user.id,
+                                                token: user_token,
+                                                mobile: token_type == 'mobile',
+                                                type: data.type,
+                                                subscriptions_count: subscriptions_count
+                                            });
                                         });
                                     });
                                 });
@@ -984,7 +1056,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 }
             },
             getGroupsList = function (data, callback) {
-                var GROUPS_COUNT = 1000,
+                let GROUPS_COUNT = 1000,
                     req_params;
 
                 switch (data.type) {
@@ -1025,7 +1097,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     });
             },
             getFriendsList = function (data, callback) {
-                var FRIENDS_COUNT = 50000,
+                let FRIENDS_COUNT = 50000,
                     req_params;
 
                 switch (data.type) {
@@ -1089,8 +1161,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
         });
 
         socket.on(CONSTANTS.UTILS.FEEDBACK, function (data) {
-            var html = '';
-            for (var i in data) {
+            let html = '';
+            for (let i in data) {
                 if (data.hasOwnProperty(i)) {
                     html += '<p><strong>' + i + ':</strong> ' + data[i] + '</p>';
                 }
@@ -1154,7 +1226,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
         });
 
         socket.on(CONSTANTS.VK_INTEGRATION.GROUPS_TO_POST, function (user_id) {
-            var vk_sign_in = Entities.vk_sign_in,
+            let vk_sign_in = Entities.vk_sign_in,
                 q_get_user_data = vk_sign_in
                     .select(vk_sign_in.id, vk_sign_in.secret, vk_sign_in.access_token)
                     .from(vk_sign_in)
@@ -1323,6 +1395,9 @@ pg.connect(pg_conn_string, function (err, client, done) {
             console.log(req.params);
         }
         updateEventsGeocodes(req.params.id);
+        insertRecommendationsAccordance({event_id: req.params.id}, function(){
+            updateRecommendations({event_id: req.params.id}, logger.info)
+        });
         cropper.resizeNew({
             images: real_config.images,
             client: client
@@ -1331,20 +1406,24 @@ pg.connect(pg_conn_string, function (err, client, done) {
         });
     });
 
-
     app.get('/recommendations/events/:id', function (req, res) {
-        updateRecommendations({event_id: req.params.id}, logger.info);
+        insertRecommendationsAccordance({event_id: req.params.id}, function(){
+            updateRecommendations({event_id: req.params.id}, logger.info)
+        });
     });
 
     app.get('/recommendations/organizations/:id', function (req, res) {
-        updateRecommendations({organization_id: req.params.id}, logger.info);
+        insertRecommendationsAccordance({organization_id: req.params.id}, function(){
+            updateRecommendations({organization_id: req.params.id}, logger.info);
+        });
+        res.json({status: true});
     });
 
     app.get('/recommendations/users/:id', function (req, res) {
-        updateRecommendations({user_id: req.params.id}, logger.info);
-        console.log('/recommendations/organizations/:id');
+        insertRecommendationsAccordance({organization_id: req.params.id}, function(){
+            updateRecommendations({user_id: req.params.id}, logger.info);
+        });
     });
-
 
     app.listen(8000, function () {
         console.log('Node listening on port 8000!');

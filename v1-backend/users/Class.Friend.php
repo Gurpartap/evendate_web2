@@ -7,6 +7,11 @@ class Friend extends AbstractEntity{
 
 	const RANDOM_FIELD_NAME = 'random';
 	const LINK_FIELD_NAME = 'link';
+	const ACCOUNTS_LINKS_FIELD_NAME = 'accounts_links';
+	const ACCOUNTS_FIELD_NAME = 'accounts';
+	const FAVORED_FIELD_NAME = 'favored';
+	const SUBSCRIPTIONS_FIELD_NAME = 'subscriptions';
+	const ACTIONS_FIELD_NAME = 'actions';
 
 	protected static $DEFAULT_COLS = array(
 		'id',
@@ -15,13 +20,15 @@ class Friend extends AbstractEntity{
 		'middle_name',
 		'gender',
 		'avatar_url',
+		'vk_uid',
+		'facebook_uid',
+		'google_uid',
 		'blurred_img_url'
 	);
 
 	protected static $ADDITIONAL_COLS = array(
 		'type',
 		'is_friend' => 'view_friends.user_id IS NOT NULL AS is_friend',
-		'blurred_img_url',
 		'uid',
 		self::RANDOM_FIELD_NAME => '(SELECT DATE_PART(\'epoch\', u.created_at) / (random() * 9 + 1)
 			FROM users AS u
@@ -46,11 +53,12 @@ class Friend extends AbstractEntity{
 	protected $is_friend;
 	protected $blurred_image_url;
 	protected $link;
+	protected $vk_uid;
+	protected $google_uid;
+	protected $facebook_uid;
 
 	private $user;
 
-	const SUBSCRIPTIONS_FIELD_NAME = 'subscriptions';
-	const ACTIONS_FIELD_NAME = 'actions';
 
 	public function getSubscriptions(array $fields,
 	                                 array $pagination,
@@ -83,6 +91,38 @@ class Friend extends AbstractEntity{
 				)->getData();
 		}
 
+		if (isset($fields[self::ACCOUNTS_LINKS_FIELD_NAME])){
+
+			$account_links = array();
+
+			if ($this->vk_uid != null) {
+				$account_links['vk'] = 'https://vk.com/id' . $this->vk_uid;
+			}
+			if ($this->google_uid != null) {
+				$account_links['google'] = 'https://plus.google.com/u/0/' . $this->google_uid;
+			}
+			if ($this->facebook_uid != null) {
+				$account_links['facebook'] = 'https://facebook.com/' . $this->facebook_uid;
+			}
+			$result_data[self::ACCOUNTS_LINKS_FIELD_NAME] = $account_links;
+		}
+
+		if (isset($fields[self::ACCOUNTS_FIELD_NAME])){
+
+			$account_types = array();
+
+			if ($this->vk_uid != null) {
+				$account_types[] = 'vk';
+			}
+			if ($this->google_uid != null) {
+				$account_types[] = 'google';
+			}
+			if ($this->facebook_uid != null) {
+				$account_types[] = 'facebook';
+			}
+			$result_data[self::ACCOUNTS_FIELD_NAME] = $account_types;
+		}
+
 		if (isset($fields[self::ACTIONS_FIELD_NAME])){
 			$result_data[self::ACTIONS_FIELD_NAME] = OrganizationsCollection::filter(
 				App::DB(),
@@ -96,6 +136,20 @@ class Friend extends AbstractEntity{
 					'offset' => $fields[self::ACTIONS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET,
 				),
 				Fields::parseOrderBy($fields[self::ACTIONS_FIELD_NAME]['order_by'] ?? ''))->getData();
+		}
+		if (isset($fields[self::FAVORED_FIELD_NAME])){
+			$result_data[self::FAVORED_FIELD_NAME] = EventsCollection::filter(
+				App::DB(),
+				App::getCurrentUser(),
+				array(
+					'favorites' => $this
+				),
+				Fields::parseFields($fields[self::FAVORED_FIELD_NAME]['fields'] ?? ''),
+				array(
+					'length' => $fields[self::FAVORED_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+					'offset' => $fields[self::FAVORED_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET,
+				),
+				Fields::parseOrderBy($fields[self::FAVORED_FIELD_NAME]['order_by'] ?? ''))->getData();
 		}
 
 		return new Result(true, '', $result_data);
