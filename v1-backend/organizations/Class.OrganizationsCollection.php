@@ -150,6 +150,13 @@ class OrganizationsCollection
 							AND "subscriptions"."status" = TRUE
 							AND user_id = :user_id) IS NULL');
 
+					$q_get_organizations->where('(SELECT
+						id
+						FROM favorite_events
+						WHERE event_id = "view_events"."id"
+							AND "favorite_events"."status" = TRUE
+							AND user_id = :user_id) IS NULL');
+
 					$statement_array[':user_id'] = $user->getId();
 					$order_by = array('rating DESC');
 					break;
