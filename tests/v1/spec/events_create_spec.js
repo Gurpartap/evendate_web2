@@ -3,17 +3,17 @@ var
     fs = require("fs"),
     path = require('path'),
     events = JSON.parse(fs.readFileSync(path.join(__dirname, './events.json'))),
-    env = require(path.join(__dirname, './env.js')).module;
+    env = require(path.join(__dirname, './env.js'));
 
 frisby.globalSetup({
     request: {
-        headers: { 'Authorization': env.test.token }
+        headers: { 'Authorization': env.token }
     }
 });
 
 events.forEach(function (value) {
     if (value.payload) {
-        
+
         frisby
             .create('Create event')
             .post(env.api_url + 'events', value.payload, {json: true})
