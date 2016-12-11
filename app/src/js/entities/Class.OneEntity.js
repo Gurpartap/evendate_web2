@@ -1,5 +1,6 @@
 /**
  * @requires EntityInterface.js
+ * @requires Class.Fields.js
  */
 /**
  *
