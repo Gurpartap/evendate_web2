@@ -11,7 +11,7 @@ class NotAuthorizedUser extends AbstractUser {
 	public function getMainInfo(array $fields)
 	{
 
-		return new Result(true, '', array(
+		$result_data = array(array(
 			'first_name' => $this->getFirstName(),
 			'last_name' => $this->getLastName(),
 			'id' => $this->getId(),
@@ -21,6 +21,7 @@ class NotAuthorizedUser extends AbstractUser {
 			'is_editor' => false,
 			'accounts' => array()
 		));
+		return new Result(true, '', $result_data);
 	}
 
 	public function getTokenId(){

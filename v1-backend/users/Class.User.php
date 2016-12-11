@@ -305,7 +305,7 @@ class User extends AbstractUser
 
 		$data['is_editor'] = $this->isEditor();
 
-		return new Result(true, '', $data);
+		return new Result(true, '', array($data));
 	}
 
 }

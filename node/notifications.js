@@ -192,7 +192,7 @@ class Notifications {
             ' INNER JOIN view_events ON events_notifications.event_id = view_events.id' +
             ' INNER JOIN notification_types ON notification_types.id = events_notifications.notification_type_id ' +
             ' INNER JOIN organizations ON organizations.id = view_events.organization_id' +
-            ' WHERE notification_time <= NOW() AND done = FALSE LIMIT 5', function (err, result) {
+            ' WHERE notification_time::TIMESTAMPTZ <= NOW() AND done = FALSE LIMIT 5', function (err, result) {
 
             if (err){
                 console.log('HERE IS ERROR');
