@@ -69,10 +69,10 @@ $url_parts = explode('/', $url);
 
 	<?php
 	if ($DEBUG_MODE) { ?>
-		<link rel="stylesheet" href="/dist/vendor.css?rev=aa30f09bd9db74d644e86e933654551d">
+		<link rel="stylesheet" href="/dist/vendor.css?rev=5602b9b9f8cddbb4f8133131a270a5ae">
 		<link rel="stylesheet" href="/dist/app.css?rev=a04c35838096eb488568e3c9c342cbe7"><?php
 	} else { ?>
-		<link rel="stylesheet" href="/dist/vendor.min.css?rev=fdd4ff5b8a7cb545e718662cc5d7e715">
+		<link rel="stylesheet" href="/dist/vendor.min.css?rev=c77bbf10c9422dd93a16960ea8ac57df">
 		<link rel="stylesheet" href="/dist/app.min.css?rev=e4298c5787a95b14c339e2a5c98c97f7"><?php
 	} ?>
 
@@ -216,19 +216,15 @@ $url_parts = explode('/', $url);
 
 	<div class="sidebar_main_wrapper scrollbar-outer SidebarScroll">
 		<nav class="sidebar_navigation SidebarNav"><?php
+			if(!$is_user_not_auth){ ?>
+				<a href="/my/profile" class="sidebar_navigation_item SidebarNavItem link Link"><span>Мой профиль</span></a><?php
+			}
 			if ($is_user_editor) { ?>
 				<a href="/statistics" class="sidebar_navigation_item SidebarNavItem link Link"><span>Статистика</span></a>
-				<a href="/add/event"
-					 class="sidebar_navigation_item SidebarNavItem link Link"><span>Создать событие</span></a><?php
+				<a href="/add/event" class="sidebar_navigation_item SidebarNavItem link Link"><span>Создать событие</span></a><?php
 			} ?>
-			<a href="/feed" class="sidebar_navigation_item SidebarNavItem link Link"><span>События</span><span
-					class="counter sidebar_navigation_counter -hidden SidebarNavFeedCounter"></span></a><?php
-			if (!$is_user_not_auth) { ?>
-				<a href="/friends" class="sidebar_navigation_item SidebarNavItem link Link"><span>Друзья</span><span
-						class="counter sidebar_navigation_counter -hidden SidebarNavFriendsCounter"></span></a><?php
-			} ?>
-			<a href="/organizations"
-				 class="sidebar_navigation_item SidebarNavItem link Link"><span>Каталог организаторов</span></a>
+			<a href="/feed" class="sidebar_navigation_item SidebarNavItem link Link"><span>События</span><span class="counter sidebar_navigation_counter -hidden SidebarNavFeedCounter"></span></a>
+			<a href="/organizations" class="sidebar_navigation_item SidebarNavItem link Link"><span>Каталог организаторов</span></a>
 		</nav>
 		<hr class="sidebar_divider">
 		<div class="sidebar_organizations_wrapper scrollbar-outer SidebarOrganizationsScroll"><?php
@@ -255,15 +251,13 @@ $url_parts = explode('/', $url);
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js" type="text/javascript"></script>
 
 <?php
-if ($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=72219c55ad69625ed38c8c6fd720e78c" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=a0de068063cd065c89ae72da15902ced" charset="utf-8"></script><?php
+if($DEBUG_MODE) { ?>
+	<script type="text/javascript" src="/dist/vendor.js?rev=9edd7064f93f57195e6666bc01586168" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=5b319638d89c0eb7761f4fe065abfcc7" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=e97a00ae6c2103a717f5e41950ea6b51"
-					charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=f6dfcefa7c9c4280686e2c1ab539fb00"
-					charset="utf-8"></script><?php
-} ?>
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=5612f01a7080454048f25092e7699ec1" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=189ba3ecc701daee7f46c47a7aade187" charset="utf-8"></script><?php
+}	?>
 
 <?php
 require 'templates.html';

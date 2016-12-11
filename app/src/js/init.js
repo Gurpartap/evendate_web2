@@ -20,7 +20,9 @@ $(document)
 		}
 	})
 	.ready(function() {
-		var OneSignal = window.OneSignal || [];
+		var OneSignal = window.OneSignal || [],
+			user_jqhxr,
+			auth_urls_jqxhr;
 		
 		OneSignal.push(["init", {
 			appId: "7471a586-01f3-4eef-b989-c809700a8658",
@@ -104,24 +106,32 @@ $(document)
 			}
 		});
 		
-		__APP.USER.fetchUserWithSubscriptions(['type', 'link'], undefined, function() {
-			if(this.id === -1){
+		user_jqhxr = __APP.USER.fetchUser(new Fields('accounts', 'accounts_links', {
+			friends: {
+				fields: ['is_friend'],
+				length: 4
+			},
+			subscriptions: {
+				fields: ['img_small_url', 'subscribed_count', 'new_events_count', 'actual_events_count']
+			}
+		}));
+		auth_urls_jqxhr = __APP.SERVER.getData('/auth.php', {
+			action: 'get_urls',
+			mobile: isNotDesktop()
+		});
+		
+		__APP.SERVER.multipleAjax(user_jqhxr, auth_urls_jqxhr, function(user_data, auth_urls) {
+			__APP.AUTH_URLS = auth_urls;
+			if(__APP.USER.id === -1){
 				__APP.TOP_BAR = new TopBarNoAuth();
 				__APP.SIDEBAR = new SidebarNoAuth();
 			} else {
 				__APP.TOP_BAR = new TopBar();
 				__APP.SIDEBAR = new Sidebar();
 			}
-			
-			__APP.SERVER.getData('/auth.php', {
-				action: 'get_urls',
-				mobile: isNotDesktop()
-			}, function(data) {
-				__APP.AUTH_URLS = data;
-				__APP.TOP_BAR.init();
-				__APP.SIDEBAR.init();
-				__APP.init();
-			});
+			__APP.TOP_BAR.init();
+			__APP.SIDEBAR.init();
+			__APP.init();
 			bindPageLinks();
 		});
 		

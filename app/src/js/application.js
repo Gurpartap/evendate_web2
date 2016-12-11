@@ -46,6 +46,9 @@ __APP = {
 		 */
 		dealAjax: function(ajax_method, ajax_url, ajax_data, content_type, success, error) {
 			var self = this;
+			if(ajax_data.fields instanceof Fields){
+				ajax_data.fields = ajax_data.fields.toString();
+			}
 			return $.ajax({
 				url: ajax_url,
 				data: ajax_data,
@@ -62,20 +65,29 @@ __APP = {
 			});
 		},
 		/**
-		 * @param {..jqXHR} jqXHRs
+		 * @param {...(jqXHR|Deferred)} jqXHRs
 		 * @param {function(..(Array|object))} cb
 		 */
 		multipleAjax: function multipleAjax(){
 			var self = this,
 				cb = arguments[arguments.length - 1],
-				jqXHRs = Array.prototype.splice.call(arguments, 0, arguments.length - 1);
-			
-			$.when.apply($, jqXHRs).done(function() {
-				var datas = Array.prototype.slice.call(arguments).map(function(resolve) {
+				jqXHRs = Array.prototype.splice.call(arguments, 0, arguments.length - 1),
+				resolveData = function(resolve) {
 					if(resolve[0].status){
 						return resolve[0].data;
+					}
+					window.errors_array.push(resolve);
+					return null;
+				};
+			
+			return $.when.apply($, jqXHRs).done(function() {
+				var datas = Array.prototype.slice.call(arguments).map(function(resolve) {
+					if(Array.isArray(resolve[0])){
+						return resolve.map(function(res) {
+							return resolveData(res);
+						});
 					} else {
-						window.errors_array.push(resolve);
+						return resolveData(resolve);
 					}
 				});
 				cb.apply(self, datas);
@@ -143,18 +155,32 @@ __APP = {
 		 * @returns {AJAXData}
 		 */
 		validateData: function validateData(ajax_data) {
-			if (ajax_data.fields && Array.isArray(ajax_data.fields)) {
-				if (ajax_data.order_by) {
-					ajax_data.order_by = ajax_data.order_by instanceof Array ? ajax_data.order_by : ajax_data.order_by.split(',');
-					ajax_data.fields = ajax_data.fields.merge(ajax_data.order_by.map(function(order_by) {
-						return order_by.trim().replace('-', '');
-					}));
-					ajax_data.order_by = ajax_data.order_by.join(',');
-				}
-				if (ajax_data.fields.length) {
-					ajax_data.fields = ajax_data.fields.join(',');
-				} else {
-					ajax_data.fields = undefined;
+			if(ajax_data.fields){
+				if(Array.isArray(ajax_data.fields)){
+					if (ajax_data.order_by) {
+						ajax_data.order_by = ajax_data.order_by instanceof Array ? ajax_data.order_by : ajax_data.order_by.split(',');
+						ajax_data.fields = ajax_data.fields.merge(ajax_data.order_by.map(function(order_by) {
+							return order_by.trim().replace('-', '');
+						}));
+						ajax_data.order_by = ajax_data.order_by.join(',');
+					}
+					if (ajax_data.fields.length) {
+						ajax_data.fields = ajax_data.fields.join(',');
+					} else {
+						ajax_data.fields = undefined;
+					}
+				} else if(ajax_data.fields instanceof Fields){
+					if (ajax_data.order_by) {
+						ajax_data.order_by = ajax_data.order_by instanceof Array ? ajax_data.order_by : ajax_data.order_by.split(',');
+						ajax_data.order_by.forEach(function(field) {
+							ajax_data.fields[field.trim().replace('-', '')] = {};
+						});
+						ajax_data.order_by = ajax_data.order_by.join(',');
+					}
+					if (Object.keys(ajax_data.fields).length === 0) {
+						ajax_data.fields = undefined;
+					}
+					
 				}
 			}
 			return ajax_data;
@@ -1107,17 +1133,7 @@ __LOCALES = {
 					FEM: 'удалила из избранного событие',
 					NEU: 'удалило из избранного событие'
 				},
-				SHARE_VK: {
-					MAS: 'поделился событием',
-					FEM: 'поделилась событием',
-					NEU: 'поделилось событием'
-				},
-				SHARE_FB: {
-					MAS: 'поделился событием',
-					FEM: 'поделилась событием',
-					NEU: 'поделилось событием'
-				},
-				SHARE_TW: {
+				SHARE: {
 					MAS: 'поделился событием',
 					FEM: 'поделилась событием',
 					NEU: 'поделилось событием'

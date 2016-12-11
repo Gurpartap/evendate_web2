@@ -29,6 +29,16 @@ OneAbstractUser = extending(OneEntity, (function() {
 		this.is_editor = false;
 		this.blurred_image_url = '';
 		this.link = '';
+		/**
+		 *
+		 * @type {Array<OneAbstractUser.ACCOUNTS>}
+		 */
+		this.accounts = [];
+		/**
+		 *
+		 * @type {Object<OneAbstractUser.ACCOUNTS, string>}
+		 */
+		this.accounts_links = {};
 		Object.defineProperty(this, 'full_name', {
 			enumerable: true,
 			get: function() {
@@ -36,7 +46,8 @@ OneAbstractUser = extending(OneEntity, (function() {
 			}
 		});
 		this.subscriptions = new OrganizationsCollection();
-		
+		this.favored = new FavoredEventsCollection();
+		this.actions = new AbstractActivitiesCollection();
 	}
 	OneAbstractUser.prototype.subscriptions_fields = ['img_small_url', 'subscribed_count', 'new_events_count', 'actual_events_count'];
 	Object.freeze(OneAbstractUser.prototype.subscriptions_fields);
@@ -65,18 +76,18 @@ OneAbstractUser = extending(OneEntity, (function() {
 	 */
 	OneAbstractUser.ACCOUNTS = {
 		VK: 'vk',
-		FACEBOOK: 'facebook',
-		GOOGLE: 'google'
+		GOOGLE: 'google',
+		FACEBOOK: 'facebook'
 	};
 	/**
 	 *
 	 * @param {(string|number)} user_id
 	 * @param {(Array|string)} [fields]
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqXHR}
+	 * @returns {jqPromise}
 	 */
 	OneAbstractUser.fetchUser = function(user_id, fields, success) {
-		return __APP.SERVER.getData('/api/v1/users/' + user_id, fields || (Array.isArray(fields) && fields.length) ? {fields: fields} : {}, success);
+		return __APP.SERVER.getData('/api/v1/users/' + user_id, {fields: fields}, success);
 	};
 	/**
 	 * Returns highest role in privileges set
@@ -92,6 +103,41 @@ OneAbstractUser = extending(OneEntity, (function() {
 				role = OneAbstractUser.ROLE.MODERATOR;
 		});
 		return role ? role : OneAbstractUser.ROLE.UNAUTH;
+	};
+	/**
+	 *
+	 * @param {(Array|string)} [fields]
+	 * @param {AJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	OneAbstractUser.prototype.fetchUser = function(fields, success) {
+		var self = this;
+		fields = setDefaultValue(fields, []);
+		
+		return OneAbstractUser.fetchUser(self.id, fields, function(data) {
+			data = data instanceof Array ? data[0] : data;
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data);
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {AJAXData} [data]
+	 * @param {AJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	OneAbstractUser.prototype.fetchFavored = function(data, success) {
+		var self = this;
+		data.offset = this.favored.length;
+		return OneAbstractUser.fetchUser(self.id, new Fields({favored: data})).done(function(data) {
+			data = data instanceof Array ? data[0] : data;
+			self.setData({favored: data.favored});
+			if (success && typeof success == 'function') {
+				success.call(self, data.favored);
+			}
+		});
 	};
 	
 	Object.freeze(OneAbstractUser.ROLE);

@@ -25,9 +25,7 @@ AbstractActivitiesCollection = extending(EntitiesCollection, (function() {
 			'created_at',
 			'type_code',
 			'event',
-			'organization'.appendAjaxData({
-				fields: ['img_small_url']
-			})
+			'organization'
 		]);
 		data.order_by = setDefaultValue(data.order_by, '-created_at');
 		data.length = setDefaultValue(data.length, 20);
@@ -51,6 +49,15 @@ AbstractActivitiesCollection = extending(EntitiesCollection, (function() {
 		}
 		return this.length;
 	};
+	/**
+	 *
+	 * @param {(Array|string)} [fields]
+	 * @param {(number|string)} [length]
+	 * @param {string} [order_by]
+	 * @param {AJAXCallback} [success]
+	 * @returns {jqXHR}
+	 */
+	AbstractActivitiesCollection.prototype.fetch = function(fields, length, order_by, success) {};
 	
 	return AbstractActivitiesCollection;
 }()));

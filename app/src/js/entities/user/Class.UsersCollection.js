@@ -15,7 +15,7 @@
  */
 function UsersCollection() {}
 UsersCollection.extend(EntitiesCollection);
-Object.defineProperty(UsersCollection.prototype, 'collection_of', {value: OneAbstractUser});
+Object.defineProperty(UsersCollection.prototype, 'collection_of', {value: OneUser});
 /**
  * Returns specified staff by role. Mixing additional_fields if needed.
  * @param {OneAbstractUser.ROLE} role
