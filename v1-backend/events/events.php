@@ -126,6 +126,18 @@ $__modules['events'] = array(
 			Statistics::Event($event, $__user, $__db, Statistics::EVENT_FAVE);
 			return $__user->addFavoriteEvent($event);
 		},
+		'{{/(id:[0-9]+)}/registration}' => function ($id) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+			$event = EventsCollection::one(
+				$__db,
+				$__user,
+				intval($id),
+				$__fields);
+
+			if (!isset($__request['payload']) || !isset($__request['payload']['registration_fields']))
+				throw new InvalidArgumentException('REGISTRATION_FIELDS_NOT_FOUND');
+
+			return $event->registerUser($__user, $__request['payload']['registration_fields']);
+		},
 		'' => function () use ($__db, $__request, $__user) {
 			if ($__user instanceof User){
 				$result = $__user->createEvent($__request['payload']);
@@ -138,14 +150,14 @@ $__modules['events'] = array(
 		'{(id:[0-9]+)/status}' => function ($id) use ($__request, $__db, $__user) {
 			$event = EventsCollection::one($__db, $__user, $id, array());
 			if (isset($__request['hidden'])) {
-				if ($__request['hidden'] == 'true') {
+				if (filter_var($__request['hidden'], FILTER_VALIDATE_BOOLEAN)) {
 					$result = $event->hide($__user);
 				} else {
 					$result = $event->show($__user);
 				}
 			}
 			if (isset($__request['canceled'])) {
-				$result = $event->setCanceled($__request['canceled'] == 'true', $__user);
+				$result = $event->setCanceled(filter_var($__request['canceled'], FILTER_VALIDATE_BOOLEAN), $__user);
 			}
 			if (!isset($__request['canceled']) && !isset($__request['hidden'])) throw new BadMethodCallException('Bad Request');
 			return $result;
@@ -159,6 +171,20 @@ $__modules['events'] = array(
 				$__fields
 			);
 			return $notification->update($__db, $__request);
+		},
+		'{{/(id:[0-9]+)}/registration}' => function ($id) use ($__db, $__request, $__user) {
+			$event = EventsCollection::one(
+				$__db,
+				$__user,
+				intval($id),
+				array());
+
+			if (filter_var($__request['status'], FILTER_VALIDATE_BOOLEAN) == false){
+				return $event->unregisterUser($__user);
+			}else{
+				throw new BadArgumentException('STATUS_FIELD_CAN_BE_ONLY_FALSE', $__db);
+			}
+
 		},
 		'{/(id:[0-9]+)}' => function ($id) use ($__db, $__request, $__user) {
 			$event = EventsCollection::one($__db, $__user, intval($id), array());

@@ -37,7 +37,7 @@ class ActionsCollection extends AbstractCollection{
 					break;
 				}
 				case 'friend': {
-					if ($value instanceof Friend){
+					if ($value instanceof Friend || $value instanceof AbstractUser){
 						$q_get_actions
 							->where('user_id = :friend_id');
 						$statement_array[':friend_id'] = $value->getId();

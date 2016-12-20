@@ -120,7 +120,7 @@ class OrganizationsCollection
 					break;
 				}
 				case 'friend': {
-					if ($value instanceof Friend) {
+					if ($value instanceof Friend || $value instanceof AbstractUser) {
 						$q_get_organizations->where('(SELECT
 							id IS NOT NULL = TRUE AS is_subscribed
 							FROM subscriptions

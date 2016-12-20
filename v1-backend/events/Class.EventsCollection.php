@@ -213,6 +213,16 @@ class EventsCollection extends AbstractCollection
 					}
 					break;
 				}
+				case 'registration_locally':
+				case 'registered':
+				case 'registration_required': {
+					if (filter_var($value, FILTER_VALIDATE_BOOLEAN) == true) {
+						$from_view = self::VIEW_ALL_EVENTS_WITH_ALIAS;
+						$q_get_events->where($name . ' = :' . $name);
+						$statement_array[':' . $name] = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+					}
+					break;
+				}
 				case 'is_canceled':
 				case 'is_delayed': {
 					if ($is_editor && filter_var($value, FILTER_VALIDATE_BOOLEAN) == true) {
@@ -457,7 +467,7 @@ class EventsCollection extends AbstractCollection
 	public static function one(PDO $db,
 														 AbstractUser $user = null,
 														 int $id,
-														 array $fields = null) : Event
+														 array $fields = null): Event
 	{
 		$event = self::filter($db, $user, array('id' => $id), $fields);
 		return $event;

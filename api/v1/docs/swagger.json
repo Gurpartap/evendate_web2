@@ -2459,9 +2459,11 @@
         "responses": {
           "200": {
             "description": "successful operation",
-            "type": "array",
-            "items": {
-              "$ref": "#/definitions/Device"
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Device"
+              }
             }
           }
         }
@@ -2637,9 +2639,11 @@
         "responses": {
           "200": {
             "description": "successful operation",
-            "type": "array",
-            "items": {
-              "$ref": "#/definitions/Device"
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Device"
+              }
             }
           }
         }
@@ -3156,7 +3160,23 @@
         "[registration_required]": {
           "type": "boolean"
         },
+        "[registration_approvement_required]": {
+          "type": "boolean"
+        },
+        "[registration_limit_count]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[registration_locally]": {
+          "type": "boolean"
+        },
         "[registration_till]": {
+          "type": "string"
+        },
+        "[registration_approved]": {
+          "type": "string"
+        },
+        "[registered]": {
           "type": "string"
         },
         "[is_free]": {

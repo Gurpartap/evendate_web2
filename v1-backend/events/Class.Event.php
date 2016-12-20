@@ -3,6 +3,9 @@
 require_once $BACKEND_FULL_PATH . '/organizations/Class.Organization.php';
 require_once $BACKEND_FULL_PATH . '/tags/Class.Tag.php';
 require_once $BACKEND_FULL_PATH . '/tags/Class.TagsCollection.php';
+require_once $BACKEND_FULL_PATH . '/events/Class.RegistrationForm.php';
+require_once $BACKEND_FULL_PATH . '/events/Class.Registration.php';
+require_once $BACKEND_FULL_PATH . '/events/Class.RegistrationFieldsCollection.php';
 
 class Event extends AbstractEntity
 {
@@ -29,7 +32,16 @@ class Event extends AbstractEntity
 	const ACTUALITY_FIELD_NAME = 'actuality';
 	const NOTIFICATIONS_FIELD_NAME = 'notifications';
 	const CAN_EDIT_FIELD_NAME = 'can_edit';
+
+	/*ONLY FOR ADMINS*/
 	const STATISTICS_FIELD_NAME = 'statistics';
+	const REGISTERED_USERS_FIELD_NAME = 'registered_users';
+	/*ONLY FOR ADMINS*/
+
+	const REGISTRATION_FIELDS_FIELD_NAME = 'registration_fields';
+	const REGISTERED_FIELD_NAME = 'registered';
+	const REGISTRATION_APPROVED_FIELD_NAME = 'registration_approved';
+	const REGISTRATION_UUID_FIELD_NAME = 'registration_uuid';
 
 
 	const RANDOM_FIELD_NAME = 'random';
@@ -51,7 +63,7 @@ class Event extends AbstractEntity
 							subscriptions.user_id = :user_id
 							AND subscriptions.status = TRUE)
 					)
-					OR
+					OR	
 					(view_events.id
 						IN (SELECT event_id
 							FROM favorite_events
@@ -105,24 +117,48 @@ class Event extends AbstractEntity
 		'created_at',
 		'updated_at',
 		'favored_users_count',
-
 		'public_at',
 		'registration_required',
 		'registration_till',
+		'registration_approvement_required',
+		'registration_limit_count',
+		'registration_locally',
 		'is_free',
 		'min_price',
 		'vk_image_url',
+
 		self::IS_FAVORITE_FIELD_NAME => '(SELECT id IS NOT NULL
 			FROM favorite_events
 			WHERE favorite_events.status = TRUE
 			AND favorite_events.user_id = :user_id
 			AND favorite_events.event_id = view_events.id) IS NOT NULL AS ' . self::IS_FAVORITE_FIELD_NAME,
+
+		self::REGISTERED_FIELD_NAME => '(SELECT id IS NOT NULL
+			FROM users_registrations
+			WHERE users_registrations.status = TRUE
+			AND users_registrations.user_id = :user_id
+			AND users_registrations.event_id = view_events.id) IS NOT NULL AS ' . self::REGISTERED_FIELD_NAME,
+
+		self::REGISTRATION_APPROVED_FIELD_NAME => '(SELECT COALESCE(organization_approved, FALSE)
+			FROM users_registrations
+			WHERE users_registrations.status = TRUE
+			AND users_registrations.user_id = :user_id
+			AND users_registrations.event_id = view_events.id) = TRUE AS ' . self::REGISTRATION_APPROVED_FIELD_NAME,
+
+		self::REGISTRATION_UUID_FIELD_NAME => '(SELECT registration_uuid
+			FROM users_registrations
+			WHERE users_registrations.status = TRUE
+			AND users_registrations.user_id = :user_id
+			AND users_registrations.event_id = view_events.id) = TRUE AS ' . self::REGISTRATION_UUID_FIELD_NAME,
+
 		self::RANDOM_FIELD_NAME => '(SELECT created_at / (random() * 9 + 1)
 			FROM view_events AS ve
 			WHERE ve.id = view_events.id) AS ' . self::RANDOM_FIELD_NAME,
+
 		self::CAN_EDIT_FIELD_NAME => '(SELECT id IS NOT NULL
 			FROM view_editors
 			WHERE id = :user_id AND organization_id = view_events.organization_id) IS NOT NULL AS ' . self::CAN_EDIT_FIELD_NAME,
+
 		self::IS_SEEN_FIELD_NAME => '(
 		SELECT
 			COUNT(ve.id)
@@ -150,6 +186,7 @@ class Event extends AbstractEntity
 						AND event_id = view_events.id
 					)
 				) :: INT = 1 AS ' . self::IS_SEEN_FIELD_NAME,
+
 		self::RATING_OVERALL => 'COALESCE((SELECT 
 														(COALESCE(rating_favored_friends, 0)::INT + 
 														COALESCE(rating_tags_in_favorites, 0)::INT - 
@@ -161,11 +198,13 @@ class Event extends AbstractEntity
 														WHERE user_id = :user_id 
 														AND event_id = view_events.id
                         ), 0) AS ' . self::RATING_OVERALL,
+
 		self::FAVORED_FRIENDS_COUNT_FIELD_NAME => '(SELECT COUNT(id) :: INT AS favored_friends_count
             FROM favorite_events
                 WHERE status = TRUE 
                     AND event_id = view_events.id 
                     AND favorite_events.user_id IN (SELECT friend_id FROM view_friends WHERE user_id = :user_id)) AS ' . self::FAVORED_FRIENDS_COUNT_FIELD_NAME,
+
 		self::ACTUALITY_FIELD_NAME => '(SELECT 1 / (CASE
                                               WHEN (ve.registration_required = TRUE AND ve.registration_till < DATE_PART(\'epoch\', NOW()))
                                               THEN 1000
@@ -240,6 +279,13 @@ class Event extends AbstractEntity
 		return $dates;
 	}
 
+	private static function saveRegistrationInfo(PDO $db, $event_id, array $data)
+	{
+		if (isset($data['registration_locally']) && filter_var($data['registration_locally'], FILTER_VALIDATE_BOOLEAN) == true) {
+			RegistrationForm::create($event_id, $data['registration_fields'], $db);
+		}
+	}
+
 	public function setCanceled(bool $value, User $user)
 	{
 		$q_upd_event = App::queryFactory()->newUpdate();
@@ -258,7 +304,7 @@ class Event extends AbstractEntity
 		return new Result(true, 'Данные успешно обновлены');
 	}
 
-	private static function getAvailableNotificationTime(PDO $db, DateTime $dt, $organization_id) : DateTime
+	private static function getAvailableNotificationTime(PDO $db, DateTime $dt, $organization_id): DateTime
 	{
 		$dt_clone = clone $dt;
 		$q_get_notifications = App::queryFactory()
@@ -365,9 +411,31 @@ class Event extends AbstractEntity
 		}
 
 		$data['registration_required'] = isset($data['registration_required'])
-		&& (strtolower($data['registration_required']) == 'true'
-			|| strtolower($data['registration_required']) == '1')
+		&& filter_var($data['registration_required'], FILTER_VALIDATE_BOOLEAN)
 			? 'true' : 'false';
+
+		$data['registration_locally'] = isset($data['registration_locally'])
+		&& filter_var($data['registration_locally'], FILTER_VALIDATE_BOOLEAN)
+			? 'true' : 'false';
+
+		if ($data['registration_locally'] === 'true') {
+			$data['registration_limit_count'] = isset($data['registration_limit_count'])
+			&& is_numeric($data['registration_limit_count'])
+				? filter_var($data['registration_limit_count'], FILTER_VALIDATE_INT) : null;
+
+			$data['registration_approvement_required'] = isset($data['registration_approvement_required'])
+			&& filter_var($data['registration_approvement_required'], FILTER_VALIDATE_BOOLEAN)
+				? 'true' : 'false';
+
+			if (!isset($data['registration_fields'])
+				|| !is_array($data['registration_fields'])
+				|| count($data['registration_fields']) < 1
+			) throw new InvalidArgumentException('BAD_REGISTRATION_FIELDS');
+
+		} else {
+			$data['registration_limit_count'] = null;
+			$data['registration_approvement_required'] = null;
+		}
 
 		try {
 			if (isset($data['registration_required']) && $data['registration_required'] != null) {
@@ -432,6 +500,9 @@ class Event extends AbstractEntity
 					'image_horizontal' => $img_horizontal_filename,
 					'detail_info_url' => $data['detail_info_url'],
 					'registration_required' => $data['registration_required'],
+					'registration_locally' => $data['registration_locally'],
+					'registration_limit_count' => $data['registration_limit_count'],
+					'registration_approvement_required' => $data['registration_approvement_required'],
 					'registration_till' => $data['registration_till'] instanceof DateTime ? $data['registration_till']->format('Y-m-d H:i:s') : null,
 					'public_at' => $data['public_at'] instanceof DateTime ? $data['public_at']->format('Y-m-d H:i:s') : null,
 					'is_free' => $data['is_free'] == 'true' ? 'true' : 'false',
@@ -451,6 +522,7 @@ class Event extends AbstractEntity
 
 			self::saveDates($data['dates'], $db, $event_id);
 			self::saveEventTags($db, $event_id, $data['tags']);
+			self::saveRegistrationInfo($db, $event_id, $data);
 
 			$notification_date = self::getAvailableNotificationTime($db, $data['notification_at'], $organization->getId());
 
@@ -570,7 +642,7 @@ class Event extends AbstractEntity
 		}
 	}
 
-	private static function getNotificationTypeId($name, PDO $db) : int
+	private static function getNotificationTypeId($name, PDO $db): int
 	{
 		$q_get_type_id = App::queryFactory()->newSelect();
 		$q_get_type_id
@@ -588,7 +660,7 @@ class Event extends AbstractEntity
 		return $rows[0]['id'];
 	}
 
-	private function getNotificationTypeOffset($name) : int
+	private function getNotificationTypeOffset($name): int
 	{
 		$q_get_type_id = App::queryFactory()->newSelect();
 		$q_get_type_id
@@ -820,7 +892,7 @@ class Event extends AbstractEntity
 		return $this->tags;
 	}
 
-	public function getOrganization() : Organization
+	public function getOrganization(): Organization
 	{
 		if ($this->organization instanceof Organization == false) {
 			$this->organization = OrganizationsCollection::one(
@@ -833,7 +905,7 @@ class Event extends AbstractEntity
 		return $this->organization;
 	}
 
-	public function getNotifications(User $user, array $fields = null, $length = null, $offset = null, $order_by = null) : Result
+	public function getNotifications(User $user, array $fields = null, $length = null, $offset = null, $order_by = null): Result
 	{
 		return NotificationsCollection::filter($this->db,
 			$user,
@@ -847,7 +919,19 @@ class Event extends AbstractEntity
 		);
 	}
 
-	public function getParams(AbstractUser $user = null, array $fields = null) : Result
+	public function getRegistrationFields(User $user, array $fields = null, $order_by = null): Result
+	{
+		return RegistrationFieldsCollection::filter(
+			$this->db,
+			$user,
+			array('event' => $this),
+			Fields::parseFields($fields[self::REGISTRATION_FIELDS_FIELD_NAME]['fields'] ?? ''),
+			array(),
+			$order_by ?? $fields[self::REGISTRATION_FIELDS_FIELD_NAME]['order_by'] ?? array()
+		);
+	}
+
+	public function getParams(AbstractUser $user = null, array $fields = null): Result
 	{
 
 		$result_data = parent::getParams($user, $fields)->getData();
@@ -896,6 +980,15 @@ class Event extends AbstractEntity
 			}
 		}
 
+		if (isset($fields[self::REGISTRATION_FIELDS_FIELD_NAME])) {
+			if ($user instanceof User) {
+				$result_data[self::REGISTRATION_FIELDS_FIELD_NAME] = $this->getRegistrationFields($user,
+					Fields::parseFields($fields[self::REGISTRATION_FIELDS_FIELD_NAME]['fields'] ?? ''))->getData();
+			} else {
+				$result_data[self::REGISTRATION_FIELDS_FIELD_NAME] = array();
+			}
+		}
+
 		if (isset($fields[self::STATISTICS_FIELD_NAME])) {
 			if ($user instanceof User) {
 				$result_data[self::STATISTICS_FIELD_NAME] = $this->getStatistics($user,
@@ -905,6 +998,23 @@ class Event extends AbstractEntity
 			}
 		}
 
+
+		if (isset($fields[self::REGISTERED_USERS_FIELD_NAME])) {
+			if ($user instanceof User) {
+				$result_data[self::REGISTERED_USERS_FIELD_NAME] = UsersCollection::filter(
+					$this->db,
+					$user,
+					array('registered' => $this),
+					array(
+						'length' => $length ?? $fields[self::REGISTERED_USERS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+						'offset' => $offset ?? $fields[self::REGISTERED_USERS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
+					),
+					$order_by ?? $fields[self::REGISTERED_USERS_FIELD_NAME]['order_by'] ?? array()
+					)->getData();
+			} else {
+				$result_data[self::REGISTERED_USERS_FIELD_NAME] = null;
+			}
+		}
 		return new Result(true, '', $result_data);
 	}
 
@@ -966,6 +1076,9 @@ class Event extends AbstractEntity
 					'location_updates' => 0,
 					'detail_info_url' => $data['detail_info_url'],
 					'registration_required' => $data['registration_required'],
+					'registration_locally' => $data['registration_locally'],
+					'registration_limit_count' => $data['registration_limit_count'],
+					'registration_approvement_required' => $data['registration_approvement_required'],
 					'registration_till' => $data['registration_till'] instanceof DateTime ? $data['registration_till']->format('Y-m-d H:i:s') : null,
 					'public_at' => $data['public_at'] instanceof DateTime ? $data['public_at']->format('Y-m-d H:i:s') : null,
 					'is_free' => $data['is_free'] == 'true' ? 'true' : 'false',
@@ -1011,34 +1124,19 @@ class Event extends AbstractEntity
 				));
 			}
 
-//            if (isset($data['image_extensions'])
-//                && isset($data['image_extensions']['vertical'])
-//                && $data['image_extensions']['vertical'] != null
-//                && !empty($data['image_extensions']['vertical'])
-//                && $data['image_vertical'] != null
-//            ) {
-//                $img_vertical_filename = md5(App::generateRandomString() . '-vertical') . '.' . $data['image_extensions']['vertical'];
-//                $query_data[':image_vertical'] = $img_vertical_filename;
-//
-//                App::saveImage($data['image_vertical'],
-//                    self::IMAGES_PATH . self::IMG_SIZE_TYPE_LARGE . '/' . $img_vertical_filename,
-//                    14000);
-//                $q_upd_event->cols(array(
-//                    'image_vertical' => $img_vertical_filename
-//                ));
-//            }
 
 			$p_upd_event = $this->db->prepare($q_upd_event->getStatement());
-
 			$result = $p_upd_event->execute($q_upd_event->getBindValues());
 
 
 			if ($result === FALSE) throw new DBQueryException(implode(';', $this->db->errorInfo()), $this->db);
 
 			self::saveEventTags($this->db, $this->getId(), $data['tags']);
+
 			if (isset($data['dates']) && count($data['dates']) > 0) {
 				self::saveDates($data['dates'], $this->db, $this->getId());
 			}
+			self::saveRegistrationInfo($this->db, $this->getId(), $data);
 
 
 			self::saveNotifications($this->generateNotifications($data), $this->db);
@@ -1099,7 +1197,7 @@ class Event extends AbstractEntity
 		return new Result(true, 'Уведомление успешно добавлено', $result);
 	}
 
-	public function isInUserFeed(User $user) : Result
+	public function isInUserFeed(User $user): Result
 	{
 		$q_get_in_feed = App::queryFactory()->newSelect();
 		$q_get_in_feed->from('view_events')
@@ -1116,7 +1214,7 @@ class Event extends AbstractEntity
 		return new Result(true, '', array('is_in_feed' => $p_get_event->rowCount() > 0));
 	}
 
-	public function isSeenByUser(User $user) : Result
+	public function isSeenByUser(User $user): Result
 	{
 		$q_get_is_seen = App::queryFactory()->newSelect();
 		$q_get_is_seen
@@ -1133,5 +1231,67 @@ class Event extends AbstractEntity
 			':user_id' => $user->getId()
 		));
 		return new Result(true, '', array('is_seen' => $p_get_event->rowCount() > 0));
+	}
+
+
+	public function registerUser(AbstractUser $user, array $filled_fields)
+	{
+		if ($user instanceof User === false) throw new PrivilegesException('NOT_AUTHORIZED_FOR_REGISTRATION', $this->db);
+
+		$fields = $this->getRegistrationFields($user)->getData();
+		$merged_fields = [];
+		foreach ($fields as $field) {
+			$merged_fields[$field['uuid']] = $field;
+		}
+		foreach ($filled_fields as $filled_field) {
+			if (isset($merged_fields[$filled_field['uuid']])) {
+				$merged_fields[$filled_field['uuid']]['value'] = trim($filled_field['value']);
+			}
+		}
+
+		$errors = array();
+
+		foreach ($merged_fields as $final_field) {
+
+			if ($final_field['required'] == true &&
+				(!isset($final_field['value']) || empty($final_field['value']))
+			) {
+				$final_field['error'] = 'This field is required';
+				$errors[] = $final_field;
+			}
+
+			switch ($final_field['type']) {
+				case 'email': {
+					if ($final_field['required'] == true) {
+						if (filter_var($final_field['value'], FILTER_VALIDATE_EMAIL) == FALSE) {
+							$final_field['error'] = 'This is not valid email.';
+							$errors[] = $final_field;
+						}
+					}
+				}
+			}
+		}
+		if (count($errors) > 0) return new Result(false, 'Возникла ошибка во время регистрации', $errors);
+
+		if (isset($this->registration_approvement_required)) {
+			$approve_required = $this->registration_approvement_required;
+		} else {
+			$q_get_approve_information = App::queryFactory()->newSelect()
+				->cols(array('registration_approvement_required'))
+				->from('events')
+				->where('id = ?', $this->id);
+			$p_get_approve_information = $this->db->prepare($q_get_approve_information->getStatement());
+			$result = $p_get_approve_information->execute($p_get_approve_information->getBindValues());
+			if ($result === FALSE) throw new DBQueryException(implode(';', $this->db->errorInfo()), $this->db);
+
+			$approve_required = $p_get_approve_information->fetchColumn(0);
+		}
+
+		return RegistrationForm::registerUser($user, $this, $merged_fields, $approve_required);
+	}
+
+	public function unregisterUser(AbstractUser $user)
+	{
+		return RegistrationForm::unregisterUser($user, $this);
 	}
 }
