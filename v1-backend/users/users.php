@@ -155,7 +155,7 @@ $__modules['users'] = array(
 				$__pagination,
 				$__order_by)->getData();
 		},
-		'{me/subscriptions}' => function ($id) use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
+		'{me/subscriptions}' => function () use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
 			return OrganizationsCollection::filter(
 				App::DB(),
 				App::getCurrentUser(),
