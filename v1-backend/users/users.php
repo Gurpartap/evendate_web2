@@ -68,6 +68,43 @@ $__modules['users'] = array(
 				$__order_by ?? array()
 			);
 		},
+		'{/(id:[0-9]+)/favorites}' => function ($id) use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
+			$friend = UsersCollection::one(
+				$__db,
+				$__user,
+				intval($id),
+				array()
+			);
+
+			return EventsCollection::filter(
+				App::DB(),
+				App::getCurrentUser(),
+				array(
+					'favorites' => $friend
+				),
+				$__fields,
+				$__pagination,
+				$__order_by)->getData();
+		},
+		'{/(id:[0-9]+)/subscriptions}' => function ($id) use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
+			$friend = UsersCollection::one(
+				$__db,
+				$__user,
+				intval($id),
+				array()
+			);
+
+
+			return OrganizationsCollection::filter(
+				App::DB(),
+				App::getCurrentUser(),
+				array(
+					'friend' => $friend
+				),
+				$__fields,
+				$__pagination,
+				$__order_by);
+		},
 		'{/(id:[0-9]+)}' => function ($id) use ($__user, $__fields, $__db) {
 			$friend = UsersCollection::one(
 				$__db,
@@ -95,6 +132,39 @@ $__modules['users'] = array(
 			} else {
 				return $__user->getSettings();
 			}
+		},
+
+		'{me/actions}' => function () use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
+			return ActionsCollection::filter(
+				$__db,
+				$__user,
+				array_merge($__request, array('friend' => $__user)),
+				$__fields ?? array(),
+				$__pagination ?? array(),
+				$__order_by ?? array()
+			);
+		},
+		'{me/favorites}' => function () use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
+			return EventsCollection::filter(
+				App::DB(),
+				App::getCurrentUser(),
+				array(
+					'favorites' => $__user
+				),
+				$__fields,
+				$__pagination,
+				$__order_by)->getData();
+		},
+		'{me/subscriptions}' => function ($id) use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
+			return OrganizationsCollection::filter(
+				App::DB(),
+				App::getCurrentUser(),
+				array(
+					'friend' => $__user
+				),
+				$__fields,
+				$__pagination,
+				$__order_by);
 		},
 		'{me}' => function () use ($__user, $__fields) {
 			return $__user->getMainInfo($__fields);
