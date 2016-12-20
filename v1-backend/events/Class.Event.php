@@ -1010,7 +1010,7 @@ class Event extends AbstractEntity
 						'offset' => $offset ?? $fields[self::REGISTERED_USERS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
 					),
 					$order_by ?? $fields[self::REGISTERED_USERS_FIELD_NAME]['order_by'] ?? array()
-					)->getData();
+				)->getData();
 			} else {
 				$result_data[self::REGISTERED_USERS_FIELD_NAME] = null;
 			}
@@ -1287,11 +1287,15 @@ class Event extends AbstractEntity
 			$approve_required = $p_get_approve_information->fetchColumn(0);
 		}
 
-		return RegistrationForm::registerUser($user, $this, $merged_fields, $approve_required);
+		$result = RegistrationForm::registerUser($user, $this, $merged_fields, $approve_required);
+		if ($result->getStatus()) {
+			$user->addFavoriteEvent($this);
+		}
+		return $result;
 	}
 
 	public function unregisterUser(AbstractUser $user)
 	{
-		return RegistrationForm::unregisterUser($user, $this);
+		$result = RegistrationForm::unregisterUser($user, $this);
 	}
 }
