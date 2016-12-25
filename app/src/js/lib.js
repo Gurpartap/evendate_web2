@@ -221,6 +221,12 @@ Array.prototype.merge = function(array) {
 	}
 	return arr;
 };
+/**
+ * Checks if array contains some element
+ * @param {*} it
+ * @return {boolean}
+ */
+Array.prototype.contains = function(it) {return this.indexOf(it) !== -1;};
 
 if (![].includes) {
 	Array.prototype.includes = function(searchElement/*, fromIndex*/) {
@@ -1267,7 +1273,7 @@ function trimAvatarsCollection($parent) {
 		var $collection = $(this),
 			$avatars = $collection.find('.avatar'),
 			amount = $avatars.length;
-		if ($collection.hasClass('-subscribed') && !$collection.hasClass('-shift')) {
+		if (($collection.hasClass('-subscribed') || $collection.hasClass('-shifted')) && amount < $collection.data('max_amount')) {
 			$collection.width(amount == 1 ? ($avatars.outerWidth() * amount) : ($avatars.outerWidth() * amount) - (6 * (amount - 1)));
 		} else {
 			$collection.width(amount == 1 ? 0 : ($avatars.outerWidth() * (amount - 1)) - (6 * (amount - 2)));

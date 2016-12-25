@@ -80,7 +80,7 @@
 
 <script type="javascript/template" id="tmpl-user-tombstone">
 	<{html_tag} class="user_tombstone {tombstone_classes}" {attributes} {dataset}>
-		<div class="avatar -size_{size} -rounded {avatar_classes}" style="background-image: url('{avatar_url}')"></div>
+		{avatar}
 		<p class="user_tombstone_title">{name}</p>
 	</{html_tag}>
 </script>
@@ -95,38 +95,55 @@
 
 <script type="javascript/template" id="tmpl-subscriber">
 	{divider}
-	<a href="/friend/{id}" class="subscriber link Link">{avatar_block}</a>
+	{avatar_block}
 </script>
 
 <script type="javascript/template" id="tmpl-avatar-block">
 	<{html_tag} class="avatar_block {block_classes}" {attributes} {dataset}>
-		<div class="avatar {avatar_classes}">
-			<img src="{avatar_url}" onerror="this.onerror=null;this.src='/app/img/logo_40.png'">
-		</div>
+		{avatar}
 		<span class="avatar_name">{name}</span>
 	</{html_tag}>
 </script>
 
 <script type="javascript/template" id="tmpl-avatars-collection">
-	<div class="avatars_collection AvatarsCollection {classes}" data-max_amount="{max_amount}" {dataset} style="width: 0">
-		{avatars}
+	<div class="avatars_collection AvatarsCollection {classes}" {dataset}>{avatars}</div>
+	<span class="counter {counter_classes}">+<span class="FavoredCount">{more_avatars_count}</span></span>
+</script>
+
+<script type="javascript/template" id="tmpl-subscriber-avatar" !deprecated>
+	<div class="avatar" style="background-image: url({avatar_url})" title="{last_name} {first_name}"></div>
+</script>
+
+<script type="javascript/template" id="tmpl-avatar">
+	<div class="avatar {classes}" title="{name}" {dataset} {attributes}>
+		<img src="{avatar_url}" onerror="this.onerror=null;this.src='/app/img/brand_logo.png'">
+		{badge}
 	</div>
 </script>
 
-<script type="javascript/template" id="tmpl-subscriber-avatar">
-	<div class="avatar" style="background-image: url({avatar_url})" title="{last_name} {first_name}"></div>
+<script type="javascript/template" id="tmpl-avatar-badge">
+	<span class="avatar_badge"><i class="fa fa-{icon_class}"></i></span>
 </script>
 
 <script type="javascript/template" id="tmpl-organization-item">
 	<a href="/organization/{id}" class="organization_item {block_classes} link Link" data-organization_id="{id}" {dataset}>
-		<div class="avatar_block">
-			<div class="avatar {avatar_classes}">
-				<img src="{img_small_url}" onerror="this.onerror=null;this.src='/app/img/logo_40.png'">
-			</div>
-			<span class="avatar_name">{short_name}</span>
-		</div>
+		{avatar_block}
 		<span class="counter organization_counter OrganizationCounter {counter_classes}">{new_events_count}</span>
 	</a>
+</script>
+
+<script type="javascript/template" id="tmpl-activity-block">
+	<div class="activity_block -type_{type_code} -entity_{entity}">
+		{creator_avatar}
+		<div class="activity_block_content">
+			<p class="activity_block_top"><a href="{creator_url}" class="activity_block_creator link Link">{creator_name}</a> {additional_info}</p>
+			<p class="activity_block_middle"><a href="{entity_url}" class="link Link">{hero_text}</a></p>
+			<p class="activity_block_bottom">{date}</p>
+		</div>
+		<a class="activity_block_image img_holder link Link" href="{entity_url}">
+			<img src="{img_url}" height="48" onerror="this.onerror=null;this.src='/app/img/brand_logo.png'">
+		</a>
+	</div>
 </script>
 
 <script type="javascript/template" id="tmpl-tabs-header">
@@ -163,6 +180,25 @@
 		<div class="event_card_img" style="background-image: url('{image_horizontal_small_url}')"></div>
 		<div class="event_card_description">
 			<span>{title}</span>
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-event-block">
+	{divider}
+	<div class="organization_feed_block OrganizationFeedEvent" data-event-id="{id}" data-event_date="{date}">
+		<a href="/event/{id}" class="organization_feed_block_img img_holder link Link" style="background-image: url({image_horizontal_medium_url})"></a>
+		<div class="organization_feed_block_info">
+			<header class="organization_feed_block_title">
+				<a href="/event/{id}" class="link Link">{title}</a>
+			</header>
+			<div class="organization_feed_block_service">
+				<p><small>{time}</small></p>
+				<div class="form_group -parts_e_2 AddAvatarWrapper">
+					<div class="form_unit">{add_to_favorite_button}</div>
+					<div class="form_unit">{avatars_collection}</div>
+				</div>
+			</div>
 		</div>
 	</div>
 </script>
@@ -605,7 +641,7 @@
 	<div class="page organization_unit">
 		{background_image}
 		<div class="organization_unit_content">
-			<a href="/organization/{id}" class="organization_unit_avatar avatar -size_55x55 -bordered -rounded link Link" style="background-image: url('{img_small_url}')"></a>
+			{avatar}
 			<a href="/organization/{id}" class="link Link"><h5 class="organization_unit_title">{short_name}</h5></a>
 			<span class="organization_unit_subscribers">{subscribed_text}</span>
 			{redact_org_button}
@@ -634,10 +670,7 @@
 		{background_image}
 		<div class="organization_description_block">
 			<header class="organization_header">
-				<div class="avatar_block organization_title_block">
-					<div class="avatar -size_small organization_avatar"><img src="{img_small_url}"></div>
-					<span class="avatar_name organization_title" title="{name}">{name}</span>
-				</div>
+				{avatar_block}
 				<div class="organization_header_button OrganizationSubscribeButtonWrap">{subscribe_button}</div>
 			</header>
 			<p class="organization_description">{description}</p>
@@ -688,30 +721,6 @@
 	<p class="organization_feed_text">{text}</p>
 </script>
 
-<script type="javascript/template" id="tmpl-organization-feed-event">
-	{divider}
-	<div class="organization_feed_block OrganizationFeedEvent" data-event-id="{id}" data-event_date="{date}">
-		<a href="/event/{id}" class="organization_feed_block_img img_holder link Link" style="background-image: url({image_horizontal_medium_url})"></a>
-		<div class="organization_feed_block_info">
-			<header class="organization_feed_block_title">
-				<a href="/event/{id}" class="link Link">{title}</a>
-			</header>
-			<div class="organization_feed_block_service">
-				<p><small>{time}</small></p>
-				<div class="form_group -parts_e_2 AddAvatarWrapper">
-					<div class="form_unit">{add_to_favorite_button}</div>
-					<div class="form_unit">
-						<div class="avatars_collection -trimmed {avatars_collection_classes} -rounded -bordered -size_small AvatarsCollection CallModal" data-max_amount="4" data-modal_type="favors" data-modal_event_id="{id}" data-modal_title="Добавили в избранное">
-							{subscribers}
-						</div>
-						<span class="counter -size_30x30 -bordered -color_marginal -castable {favored_users_show}">+<span class="FavoredCount">{favored_users_count}</span></span>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</script>
-
 <!-- Event Page -->
 
 <script type="javascript/template" id="tmpl-event-page">
@@ -721,12 +730,7 @@
 				<div class="event_image CallModal" data-modal_type="media" style="background-image: url('{image_horizontal_large_url}')"></div>
 				<div class="event_image_bottom">
 					<div class="form_group -parts_e_2 AddAvatarWrapper">
-						<div class="form_unit">
-							<div class="avatars_collection -trimmed -rounded -bordered -size_small {avatars_collection_classes} AvatarsCollection CallModal" data-max_amount="6" data-modal_type="favors" data-modal_event_id="{id}" data-modal_title="Добавили в избранное">
-								{subscribers}
-							</div>
-							<span class="counter -size_30x30 -bordered -color_marginal -castable {favored_users_show}">+<span class="FavoredCount">{favored_users_count}</span></span>
-						</div>
+						<div class="form_unit">{avatars_collection}</div>
 						<div class="form_unit" align="right">
 							<button class="button -empty -size_low -rounded fa_icon fa-bell-o -color_neutral RippleEffect DropdownButton" data-dropdown="edit_notification" data-dd-width="190" data-dd-pos-x="self.center" data-dd-pos-y="6" type="button"></button>
 							{add_to_favorite_button}
@@ -752,10 +756,7 @@
 			{event_price_information}
 			<div class="event_additional_field">
 				<label class="event_additional_field_label">Организатор</label>
-				<a href="/organization/{organization_id}" class="avatar_block -size_small link Link">
-					<div class="avatar"><img src="{organization_logo_small_url}"></div>
-					<span class="avatar_name">{organization_short_name}</span>
-				</a>
+				{organization_avatar_block}
 			</div>
 			<div class="event_calendar EventCalendar"></div>
 			{event_additional_fields}<!--
@@ -843,10 +844,7 @@
 		<a href="/event/{id}" class="feed_event_img_side link Link" style="background-image: url('{image_horizontal_url}')"></a>
 		<aside class="feed_event_info_side">
 			<header class="feed_event_header">
-				<a href="/organization/{organization_id}" class="avatar_block -size_small link Link">
-					<div class="avatar"><img src="{organization_logo_small_url}"></div>
-					<span class="avatar_name">{organization_short_name}</span>
-				</a>
+				{organization_avatar_block}
 				<a href="/event/{id}" class="link Link"><h3 class="feed_event_title">{title}</h3></a>
 				<div class="feed_event_buttons">
 					<!--<button class="feed_event_button fa_icon fa-share-alt -empty DropdownButton" type="button" data-dropdown="share_event_{id}" data-dd-pos-x="-100" data-dd-pos-y="5" data-dd-width="130"></button>-->
@@ -857,12 +855,7 @@
 			<footer class="feed_event_footer">
 				{feed_event_infos}
 				<div class="form_group -parts_e_2 AddAvatarWrapper">
-					<div class="form_unit">
-						<div class="avatars_collection -trimmed -rounded -bordered -size_small {avatars_collection_classes} AvatarsCollection CallModal" data-max_amount="4" data-modal_type="favors" data-modal_event_id="{id}" data-modal_title="Добавили в избранное">
-							{subscribers}
-						</div>
-						<span class="counter -size_30x30 -bordered -color_marginal_primary -castable {favored_users_show}">+<span class="FavoredCount">{favored_users_count}</span></span>
-					</div>
+					<div class="form_unit">{avatars_collection}</div>
 					<div class="form_unit">{add_to_favorite_button}</div>
 				</div>
 			</footer>
@@ -881,6 +874,54 @@
 			{button}
 		</div>
 	</div>
+</script>
+
+<!-- User Page -->
+
+<script type="javascript/template" id="tmpl-user-page">
+	<div class="user_page_wrapper">
+		<div class="page user_page_sidebar">
+			<header class="user_page_sidebar_header">
+				{tombstone}
+				<div class="user_page_social_links">
+					{links}
+				</div>
+				{subscribe_button}
+			</header>
+			<div class="user_page_sidebar_wrapper">
+				<span class="sidebar_section_heading">Подписан на организаторов</span>
+				{subscribed_orgs}
+				<footer class="user_page_sidebar_footer">
+					{show_all_subscribed_orgs_button}
+				</footer>
+			</div>
+			<div class="user_page_sidebar_wrapper {friends_hidden}">
+				<span class="sidebar_section_heading">Подписан на пользователей</span>
+				{subscribed_users}
+				<footer class="user_page_sidebar_footer">
+					{show_all_subscribed_users_button}
+				</footer>
+			</div>
+		</div>
+		<div class="page user_page_content Tabs">
+			<header class="user_page_content_header tabs_header -color_accent">
+				<span class="tab Tab -active">Активность</span>
+				<span class="tab Tab">Избранные события</span>
+			</header>
+			<div class="tab_bodies_wrap TabsBodyWrapper">
+				<div class="tab_body TabsBody -active" data-tab_body_type="activities">
+					{activity_blocks}
+				</div>
+				<div class="tab_body TabsBody" data-tab_body_type="events">
+					{favored_event_blocks}
+				</div>
+			</div>
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-user-page-social-link">
+	<{html_tag} class="social_link -color_{slug} -valign_center" {attributes}><i class="fa fa-{icon_slug}"></i></{html_tag}>
 </script>
 
 <!-- STATISTICS -->
@@ -904,7 +945,7 @@
 	<div class="page organization_card">
 		<aside class="organization_card_side">
 			<a href="/statistics/organization/{id}" class="avatar -size_100x100 link Link">
-				<img src="{img_medium_url}" onerror="this.onerror=null;this.src='/app/img/logo_40.png'">
+				<img src="{img_medium_url}" onerror="this.onerror=null;this.src='/app/img/brand_logo.png'">
 			</a>
 		</aside>
 		<div class="organization_card_content">
@@ -914,8 +955,8 @@
 				<span class="organization_card_field">{subscribers}</span>
 			</div>
 			<div class="organization_card_bottom">
-				<div class="organization_card_avatars">{admins}<span class="counter -size_30x30 -color_marginal_primary {admins_plus_count_hidden}">+<span class="FavoredCount">{admins_plus_count}</span></span></div>
-				<div class="organization_card_avatars">{moderators}<span class="counter -size_30x30 -color_marginal_primary {moderators_plus_count_hidden}">+<span class="FavoredCount">{moderators_plus_count}</span></span></div>
+				<div class="organization_card_avatars">{admins}</div>
+				<div class="organization_card_avatars -hidden">{moderators}</div>
 				<div class="organization_card_buttons">{buttons}</div>
 			</div>
 		</div>
@@ -932,11 +973,8 @@
 				<span class="orgstat_overview_sidebar_title">Об организаторе</span>
 				<!--<span class="stamp -color_accent">Starter</span>-->
 			</header>
-			<div class="orgstat_overview_sidebar_wrapper -align_center">
-				<div class="user_tombstone">
-					<div class="avatar -size_70x70" style="background-image: url('{img_medium_url}')"></div>
-					<p class="user_tombstone_title">{short_name}</p>
-				</div>
+			<div class="orgstat_overview_sidebar_wrapper orgstat_overview_sidebar_top -align_center">
+				{avatar_block}
 				<p class="orgstat_overview_sidebar_title">{name}</p>
 				<p class="orgstat_overview_sidebar_description">{description}</p>
 				<p class="orgstat_overview_sidebar_location">{default_address}</p>
