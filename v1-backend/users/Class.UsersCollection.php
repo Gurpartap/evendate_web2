@@ -1,5 +1,8 @@
 <?php
 
+require_once 'Class.RegisteredUser.php';
+
+
 class UsersCollection extends AbstractCollection
 {
 
@@ -10,8 +13,6 @@ class UsersCollection extends AbstractCollection
 																array $pagination = null,
 																array $order_by = array('id'))
 	{
-
-
 
 
 		$q_get_users = App::queryFactory()->newSelect();
@@ -148,40 +149,67 @@ class UsersCollection extends AbstractCollection
 					}
 					break;
 				}
-				case 'registered': {
-					$getting_registered = true;
+				case 'registered_users': {
+					$getting_registered_users = true;
 					if ($value instanceof Event == false) throw new InvalidArgumentException('BAD_EVENT');
 					if ($user->isAdmin($value->getOrganization()) == false) throw new PrivilegesException('', $db);
+					$fields['event_id'] = 'event_id';
 					$q_get_users
 						->join('INNER', 'users_registrations', 'users_registrations.user_id = view_users.id')
-						->where('users_registrations.event_id = :event_id')
-						->where('users_registrations.status = TRUE');
+						->where('users_registrations.event_id = :event_id');
 					$statement_array[':event_id'] = $value->getId();
-
+					break;
+				}
+				case 'registered_status': {
+					if (!array_key_exists('registered_users', $filters)) throw new InvalidArgumentException('registered_users filter is required for ' . $name);
+					$_val = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+					$q_get_users
+						->where('users_registrations.status = :registered_status');
+					$statement_array[':registered_status'] = $_val;
+					break;
+				}
+				case 'organization_approved': {
+					if (!array_key_exists('registered_users', $filters)) throw new InvalidArgumentException('registered_users filter is required for ' . $name);
+					$_val = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+					$q_get_users
+						->where('users_registrations.organization_approved = :organization_approved');
+					$statement_array[':organization_approved'] = $_val;
+					break;
+				}
+				case 'registered_checked_out': {
+					if (!array_key_exists('registered_users', $filters)) throw new InvalidArgumentException('registered_users filter is required for ' . $name);
+					$_val = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+					$q_get_users
+						->where('users_registrations.checked_out = :checked_out');
+					$statement_array[':checked_out'] = $_val;
+					break;
 				}
 			}
 		}
 
-		if (isset($getting_registered) && $getting_registered === true){
+		if (isset($getting_registered_users) && $getting_registered_users === true) {
 			$class_name = 'RegisteredUser';
 			$default_cols = RegisteredUser::getDefaultCols();
+			foreach ($default_cols as &$col) {
+				$col = 'view_users.' . $col;
+			}
 			$_fields = Fields::mergeFields(RegisteredUser::getAdditionalCols(), $fields, $default_cols);
-		}else{
+		} else {
 			$default_cols = Friend::getDefaultCols();
+			foreach ($default_cols as &$col) {
+				$col = 'view_users.' . $col;
+			}
 			$_fields = Fields::mergeFields(Friend::getAdditionalCols(), $fields, $default_cols);
 			$class_name = 'Friend';
 		}
 
 
-
-		foreach ($default_cols as &$col) {
-			$col = 'view_users.' . $col;
-		}
-
+//		print_r($_fields);
 		$q_get_users->cols($_fields);
 
 		$q_get_users->orderBy($order_by);
 		$p_get_events = $db->prepare($q_get_users->getStatement());
+//		echo $q_get_users->getStatement();
 		$result = $p_get_events->execute($statement_array);
 		if ($result === FALSE) throw new DBQueryException(implode(';', $db->errorInfo()), $db);
 
@@ -189,7 +217,6 @@ class UsersCollection extends AbstractCollection
 		if (count($users) == 0 && $is_one_user) throw new LogicException('CANT_FIND_USER');
 		$result_users = array();
 		if ($is_one_user) {
-//			echo $q_get_users->getStatement();
 			return $users[0];
 		}
 		foreach ($users as $friend) {

@@ -7,7 +7,7 @@ var
     fs = require("fs"),
     path = require('path'),
     _ = require('lodash'),
-    env = require(path.join(__dirname, './env.js'));
+    env = require(path.join(__dirname, '../env.js'));
 
 frisby.globalSetup({
     request: {

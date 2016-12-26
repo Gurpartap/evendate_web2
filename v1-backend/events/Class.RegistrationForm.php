@@ -81,11 +81,11 @@ class RegistrationForm
 				'user_id' => $user->getId(),
 				'event_id' => $event->getId(),
 				'status' => 'true',
-				'organization_approved' => 'false',
+				'organization_approved' => $approvement_required ? 'false' : 'true',
 			))
 			->onConflictUpdate(array('user_id', 'event_id'), array(
 				'status' => 'true',
-				'organization_approved' => 'false'
+				'organization_approved' => $approvement_required ? 'false' : 'true'
 			))
 			->returning(array('id'));
 
@@ -138,8 +138,30 @@ class RegistrationForm
 		return new Result(true, 'Регистрация успешно отменена');
 	}
 
-	public static function checkoutUser(User $user, Event $event, $uuid){
+	private static function updateBooleanColumn($type, User $user, Event $event, $uuid, $bool_val){
+		if ($user->isEventAdmin($event) == false) throw new PrivilegesException(null, App::DB());
+		$db = App::DB();
+		$q_upd_col = App::queryFactory()->newUpdate()
+			->table('users_registrations')
+			->cols(array(
+				$type => filter_var($bool_val, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false'
+			))
+		->where('uuid = ?', $uuid)
+		->where('status = true')
+		->where('event_id = ?', $event->getId());
+		$p_upd_col = $db->prepare($q_upd_col->getStatement());
+		$result = $p_upd_col->execute($q_upd_col->getBindValues());
+		if ($result === FALSE) throw new DBQueryException('CANT_UPDATE_INFO', $db);
+		if ($p_upd_col->rowCount() != 1) throw new InvalidArgumentException('BAD_REGISTRATION_UUID', $db);
+		return new Result(true, 'Данные успешно обновлены');
+	}
 
+	public static function setCheckOutStatus(User $user, Event $event, $uuid, $bool_val){
+		return self::updateBooleanColumn('checked_out', $user, $event, $uuid, $bool_val);
+	}
+
+	public static function setApproved(User $user, Event $event, $uuid, $bool_val){
+		return self::updateBooleanColumn('organization_approved', $user, $event, $uuid, $bool_val);
 	}
 
 }

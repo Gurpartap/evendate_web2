@@ -126,6 +126,8 @@ class Event extends AbstractEntity
 		'is_free',
 		'min_price',
 		'vk_image_url',
+		'registration_available',
+		'registered_count',
 
 		self::IS_FAVORITE_FIELD_NAME => '(SELECT id IS NOT NULL
 			FROM favorite_events
@@ -133,7 +135,7 @@ class Event extends AbstractEntity
 			AND favorite_events.user_id = :user_id
 			AND favorite_events.event_id = view_events.id) IS NOT NULL AS ' . self::IS_FAVORITE_FIELD_NAME,
 
-		self::REGISTERED_FIELD_NAME => '(SELECT id IS NOT NULL
+		self::REGISTERED_FIELD_NAME => '(SELECT users_registrations.id IS NOT NULL
 			FROM users_registrations
 			WHERE users_registrations.status = TRUE
 			AND users_registrations.user_id = :user_id
@@ -154,6 +156,8 @@ class Event extends AbstractEntity
 		self::RANDOM_FIELD_NAME => '(SELECT created_at / (random() * 9 + 1)
 			FROM view_events AS ve
 			WHERE ve.id = view_events.id) AS ' . self::RANDOM_FIELD_NAME,
+
+
 
 		self::CAN_EDIT_FIELD_NAME => '(SELECT id IS NOT NULL
 			FROM view_editors
@@ -1004,7 +1008,8 @@ class Event extends AbstractEntity
 				$result_data[self::REGISTERED_USERS_FIELD_NAME] = UsersCollection::filter(
 					$this->db,
 					$user,
-					array('registered' => $this),
+					array_merge(Fields::parseFilters($fields[self::REGISTERED_USERS_FIELD_NAME]['filters'] ?? ''), array('registered_users' => $this)),
+					Fields::parseFields($fields[self::REGISTERED_USERS_FIELD_NAME]['fields'] ?? ''),
 					array(
 						'length' => $length ?? $fields[self::REGISTERED_USERS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 						'offset' => $offset ?? $fields[self::REGISTERED_USERS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
@@ -1234,10 +1239,39 @@ class Event extends AbstractEntity
 	}
 
 
+	private function updateRegisteredCount(){
+		$q_upd_event = 'UPDATE events SET registered_count = (SELECT COUNT(id) FROM users_registrations
+     WHERE users_registrations.status = TRUE
+           AND users_registrations.organization_approved = TRUE
+           AND users_registrations.event_id = events.id
+      GROUP BY users_registrations.event_id) WHERE events.id = :event_id';
+
+		$p_upd_event = $this->db->prepare($q_upd_event);
+		$result = $p_upd_event->execute(array(
+			':event_id' => $this->getId()
+		));
+
+		if ($result === FALSE) throw new DBQueryException('', $this->db);
+
+	}
+
+	private function getRegistrationAvailable(){
+		$q_get_available = App::queryFactory()
+			->newSelect()
+			->from('view_events')
+			->cols(array('registration_available'))
+			->where('id = ?', $this->getId());
+		$p_get_available = $this->db->prepare($q_get_available->getStatement());
+		$result = $p_get_available->execute($q_get_available->getBindValues());
+		if ($result === FALSE) throw new DBQueryException(implode(';', $this->db->errorInfo()), $this->db);
+		if ($p_get_available->rowCount() != 1) throw new InvalidArgumentException('BAD_EVENT_ID');
+		return $p_get_available->fetchColumn(0);
+	}
+
 	public function registerUser(AbstractUser $user, array $filled_fields)
 	{
 		if ($user instanceof User === false) throw new PrivilegesException('NOT_AUTHORIZED_FOR_REGISTRATION', $this->db);
-
+		if ($this->getRegistrationAvailable() == false) throw new InvalidArgumentException('REGISTRATION_FINISHED');
 		$fields = $this->getRegistrationFields($user)->getData();
 		$merged_fields = [];
 		foreach ($fields as $field) {
@@ -1290,6 +1324,7 @@ class Event extends AbstractEntity
 		$result = RegistrationForm::registerUser($user, $this, $merged_fields, $approve_required);
 		if ($result->getStatus()) {
 			$user->addFavoriteEvent($this);
+			$this->updateRegisteredCount();
 		}
 		return $result;
 	}
@@ -1297,5 +1332,7 @@ class Event extends AbstractEntity
 	public function unregisterUser(AbstractUser $user)
 	{
 		$result = RegistrationForm::unregisterUser($user, $this);
+		$this->updateRegisteredCount();
+		return $result;
 	}
 }

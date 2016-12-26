@@ -30,7 +30,7 @@
         "6"
       ],
       "registration_required": true,
-      "registration_till": "2016-12-16T18:00:00",
+      "registration_till": "2016-12-29T18:00:00",
       "is_free": true,
       "min_price": null,
       "delayed_publication": false,
@@ -38,7 +38,7 @@
       "filenames": {
         "horizontal": "C0J7HAe2.jpg"
       },
-      "registration_till_date": "2016-12-16",
+      "registration_till_date": "2016-12-29",
       "registration_till_time_hours": "18",
       "registration_till_time_minutes": "00",
       "filename_horizontal": "C0J7HAe2.jpg"
@@ -78,7 +78,7 @@
         "horizontal": "C0J7HAe2.jpg"
       },
       "registration_required": true,
-      "registration_till": "2016-12-16T18:00:00",
+      "registration_till": "2016-12-29T18:00:00",
       "registration_locally": true,
       "registration_limit_count": 100,
       "registration_approvement_required": false,
@@ -104,7 +104,7 @@
           "required": false
         }
       ],
-      "registration_till_date": "2016-12-16",
+      "registration_till_date": "2016-12-29",
       "registration_till_time_hours": "18",
       "registration_till_time_minutes": "00",
       "filename_horizontal": "C0J7HAe2.jpg"

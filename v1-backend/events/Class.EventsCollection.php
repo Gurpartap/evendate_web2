@@ -214,7 +214,15 @@ class EventsCollection extends AbstractCollection
 					break;
 				}
 				case 'registration_locally':
-				case 'registered':
+				case 'registered': {
+					if (filter_var($value, FILTER_VALIDATE_BOOLEAN) == true) {
+						$from_view = self::VIEW_ALL_EVENTS_WITH_ALIAS;
+						$operand = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'IN' : 'NOT IN';
+						$q_get_events->where('id ' . $operand . ' (SELECT event_id FROM users_registrations WHERE user_id = :user_id AND status=true)');
+
+					}
+					break;
+				}
 				case 'registration_required': {
 					if (filter_var($value, FILTER_VALIDATE_BOOLEAN) == true) {
 						$from_view = self::VIEW_ALL_EVENTS_WITH_ALIAS;
@@ -436,7 +444,9 @@ class EventsCollection extends AbstractCollection
 			}
 		}
 
-		if (array_key_exists(Event::FAVORED_FRIENDS_COUNT_FIELD_NAME, $fields)) {
+		if (array_key_exists(Event::FAVORED_FRIENDS_COUNT_FIELD_NAME, $fields) ||
+			 array_key_exists(Event::REGISTERED_FIELD_NAME, $fields)
+		) {
 			$statement_array[':user_id'] = $user->getId();
 		}
 

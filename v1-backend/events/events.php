@@ -20,6 +20,24 @@ $__modules['events'] = array(
 
 			return $event->getNotifications($__user, $__fields, $__length, $__offset, $__order_by);
 		},
+		'{{/(id:[0-9]+)}/registered_users}' => function ($id) use ($__db, $__request, $__user, $__fields, $__pagination, $__order_by) {
+
+			$event = EventsCollection::one(
+				$__db,
+				$__user,
+				intval($id),
+				$__fields);
+
+
+			return UsersCollection::filter(
+				$__db,
+				$__user,
+				array_merge($__request ?? array(), array('registered_users' => $event)),
+				$__fields ?? array(),
+				$__pagination,
+				$__order_by ?? array());
+
+		},
 		'{{/(id:[0-9]+)}}' => function ($id) use ($__db, $__request, $__user, $__fields) {
 			$event = EventsCollection::one(
 				$__db,
@@ -126,7 +144,7 @@ $__modules['events'] = array(
 			Statistics::Event($event, $__user, $__db, Statistics::EVENT_FAVE);
 			return $__user->addFavoriteEvent($event);
 		},
-		'{{/(id:[0-9]+)}/registration}' => function ($id) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+		'{{/(id:[0-9]+)}/registrations}' => function ($id) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
 			$event = EventsCollection::one(
 				$__db,
 				$__user,
@@ -171,6 +189,30 @@ $__modules['events'] = array(
 				$__fields
 			);
 			return $notification->update($__db, $__request);
+		},
+		'{/(id:[0-9]+)/registrations/(uuid:\w+-\w+-\w+-\w+-\w+)}' => function ($id, $registration_uuid) use ($__request, $__fields, $__db, $__user) {
+
+			$updated = false;
+			$event = EventsCollection::one(
+				$__db,
+				$__user,
+				$id,
+				$__fields
+			);
+			if (isset($__request['approved'])){
+				RegistrationForm::setApproved($__user, $event, $registration_uuid, $__request['approved']);
+				$updated = true;
+			}
+			if (isset($__request['checkout'])){
+				RegistrationForm::setCheckOutStatus($__user, $event, $registration_uuid, $__request['checkout']);
+
+				$updated = true;
+			}
+			if ($updated){
+				return new Result(true, 'Данные успешно обновлены');
+			}else{
+				return new Result(false, 'Не указаны поля для обновления');
+			}
 		},
 		'{{/(id:[0-9]+)}/registration}' => function ($id) use ($__db, $__request, $__user) {
 			$event = EventsCollection::one(
