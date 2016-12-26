@@ -13,7 +13,6 @@ function StatisticsOrganizationEventsPage(org_id) {
 	this.block_scroll = false;
 	this.future_events = new EventsWithStatisticsCollection();
 	this.past_events = new EventsWithStatisticsCollection();
-	this.organization.fetchOrganization([], Page.triggerRender);
 }
 StatisticsOrganizationEventsPage.extend(StatisticsOrganizationPage);
 
@@ -28,6 +27,10 @@ StatisticsOrganizationEventsPage.buildEventRows = function(events, date_field) {
 	}));
 	bindPageLinks($events);
 	return $events;
+};
+
+StatisticsOrganizationEventsPage.prototype.fetchData = function() {
+	return this.fetching_data_defer = this.organization.fetchOrganization([]);
 };
 
 StatisticsOrganizationEventsPage.prototype.render = function() {
@@ -77,7 +80,7 @@ StatisticsOrganizationEventsPage.prototype.render = function() {
 				if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !this_page.block_scroll) {
 					this_page.block_scroll = true;
 					
-					__APP.CURRENT_JQXHR = this_page.past_events.fetchOrganizationsEvents(this_page.organization.id, {canceled_shown: true}, 30, function(events) {
+					this_page.past_events.fetchOrganizationsEvents(this_page.organization.id, {canceled_shown: true}, 30, function(events) {
 						this_page.block_scroll = false;
 						if (events.length) {
 							$past_events_wrapper.find('tbody').append(StatisticsOrganizationEventsPage.buildEventRows(events, 'first_event_date'));

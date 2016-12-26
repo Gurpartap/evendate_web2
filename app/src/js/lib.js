@@ -775,6 +775,21 @@ jQuery.makeSet = function(array) {
 	};
 }(window));
 
+var CollectionOfXHRs = extending(Array, (function(){
+	function CollectionOfXHRs(){}
+	
+	CollectionOfXHRs.prototype.abortAll = function() {
+		var cur;
+		while (this.length) {
+			cur = this.pop();
+			if(cur.state() === 'pending'){
+				cur.abort();
+			}
+		}
+	};
+	
+	return CollectionOfXHRs;
+}()));
 
 /**===========================================================
  * Templates for jQuery
@@ -1481,11 +1496,6 @@ function bindPageLinks($parent) {
 			__APP.changeState($this.attr('href'));
 		}
 	}).addClass('-Handled_Link');
-}
-
-function unbindPageLinks($parent) {
-	$parent = $parent ? $parent : $('body');
-	$parent.find('.Link').removeClass('-Handled_Link').off('click.pageRender');
 }
 
 /**

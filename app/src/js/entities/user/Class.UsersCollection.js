@@ -38,7 +38,7 @@ UsersCollection.getSpecificStaff = function(role, staff, additional_fields) {
  *
  * @param {UsersCollectionAJAXData} data
  * @param {AJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 UsersCollection.fetchUsers = function(data, success) {
 	return __APP.SERVER.getData('/api/v1/users/', data, success);
@@ -48,7 +48,7 @@ UsersCollection.fetchUsers = function(data, success) {
  * @param {(string|number)} event_id
  * @param {UsersCollectionAJAXData} ajax_data
  * @param {AJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 UsersCollection.fetchEventFavorites = function(event_id, ajax_data, success) {
 	return __APP.SERVER.getData('/api/v1/events/' + event_id, {fields: 'favored'.appendAjaxData(__APP.SERVER.validateData(ajax_data))}, function(data) {
@@ -65,7 +65,7 @@ UsersCollection.fetchEventFavorites = function(event_id, ajax_data, success) {
  * @param {(string|number)} org_id
  * @param {UsersCollectionAJAXData} ajax_data
  * @param {AJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 UsersCollection.fetchOrganizationSubscribers = function(org_id, ajax_data, success) {
 	return __APP.SERVER.getData('/api/v1/organizations/' + org_id, {fields: 'subscribed'.appendAjaxData(__APP.SERVER.validateData(ajax_data))}, function(data) {
@@ -82,7 +82,7 @@ UsersCollection.fetchOrganizationSubscribers = function(org_id, ajax_data, succe
  * @param {(string|number)} org_id
  * @param {UsersCollectionAJAXData} ajax_data
  * @param {AJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 UsersCollection.fetchOrganizationStaff = function(org_id, ajax_data, success) {
 	return __APP.SERVER.getData('/api/v1/organizations/' + org_id + '/staff/', ajax_data, success);
@@ -110,7 +110,7 @@ UsersCollection.prototype.getSpecificStaff = function(role, additional_fields) {
  * @param {(number|string)} [length]
  * @param {AJAXCallback} [success]
  * @this Array<OneAbstractUser>
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 UsersCollection.prototype.fetchUsers = function(data, length, success) {
 	var self = this,
@@ -131,7 +131,7 @@ UsersCollection.prototype.fetchUsers = function(data, length, success) {
  * @param {(number|string)} length
  * @param {UsersCollectionAJAXData} [data]
  * @param {AJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 UsersCollection.prototype.fetchEventFavorites = function(event_id, length, data, success) {
 	var self = this,
@@ -152,7 +152,7 @@ UsersCollection.prototype.fetchEventFavorites = function(event_id, length, data,
  * @param {(number|string)} length
  * @param {UsersCollectionAJAXData} [data]
  * @param {AJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 UsersCollection.prototype.fetchOrganizationSubscribers = function(org_id, length, data, success) {
 	var self = this,
@@ -173,7 +173,7 @@ UsersCollection.prototype.fetchOrganizationSubscribers = function(org_id, length
  * @param {(number|string)} length
  * @param {UsersCollectionAJAXData} [data]
  * @param {AJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 UsersCollection.prototype.fetchOrganizationStaff = function(org_id, length, data, success) {
 	var self = this,

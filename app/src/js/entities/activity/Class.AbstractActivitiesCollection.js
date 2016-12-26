@@ -55,7 +55,7 @@ AbstractActivitiesCollection = extending(EntitiesCollection, (function() {
 	 * @param {(number|string)} [length]
 	 * @param {string} [order_by]
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqXHR}
+	 * @returns {jqPromise}
 	 */
 	AbstractActivitiesCollection.prototype.fetch = function(fields, length, order_by, success) {};
 	

@@ -37,6 +37,20 @@ OneAbstractActivity = extending(OneEntity, (function() {
 		SHARE_TW: 'share_tw'
 	};
 	Object.freeze(OneAbstractActivity.TYPES);
+	/**
+	 * @const
+	 * @enum {string}
+	 */
+	OneAbstractActivity.TYPES_INDEX = {
+		subscribe: 'SUBSCRIBE',
+		fave: 'FAVE',
+		unsubscribe: 'UNSUBSCRIBE',
+		unfave: 'UNFAVE',
+		share_vk: 'SHARE',
+		share_fb: 'SHARE',
+		share_tw: 'SHARE'
+	};
+	Object.freeze(OneAbstractActivity.TYPES_INDEX);
 
 	
 	return OneAbstractActivity;

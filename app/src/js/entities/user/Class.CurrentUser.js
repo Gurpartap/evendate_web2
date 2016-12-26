@@ -21,7 +21,7 @@ CurrentUser = extending(OneAbstractUser, (function() {
 		 *
 		 * @param {AJAXData} data
 		 * @param {AJAXCallback} [success]
-		 * @returns {jqXHR}
+		 * @returns {jqPromise}
 		 */
 		CurrentUsersActivitiesCollection.fetch = function(data, success) {
 			var self = true;
@@ -39,7 +39,7 @@ CurrentUser = extending(OneAbstractUser, (function() {
 		 * @param {(number|string)} [length]
 		 * @param {string} [order_by]
 		 * @param {AJAXCallback} [success]
-		 * @returns {jqXHR}
+		 * @returns {jqPromise}
 		 */
 		CurrentUsersActivitiesCollection.prototype.fetch = function(fields, length, order_by, success) {
 			var self = this,
@@ -75,7 +75,7 @@ CurrentUser = extending(OneAbstractUser, (function() {
 		 *
 		 * @param {AJAXData} data
 		 * @param {AJAXCallback} [success]
-		 * @returns {jqXHR}
+		 * @returns {jqPromise}
 		 */
 		FriendsActivitiesCollection.fetch = function(data, success) {
 			data = AbstractActivitiesCollection.setDefaultData(data);
@@ -104,7 +104,7 @@ CurrentUser = extending(OneAbstractUser, (function() {
 	 *
 	 * @param {AJAXData} [data]
 	 * @param {AJAXCallback} [success]
-	 * @return {jqXHR}
+	 * @return {jqPromise}
 	 */
 	CurrentUser.fetchFriends = function(data, success){
 		return __APP.SERVER.getData('/api/v1/users/friends', data, success);
@@ -113,7 +113,7 @@ CurrentUser = extending(OneAbstractUser, (function() {
 	 *
 	 * @param {AJAXData} [data]
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqXHR}
+	 * @returns {jqPromise}
 	 */
 	CurrentUser.fetchUserActivity = function(data, success) {
 		return CurrentUsersActivitiesCollection.fetch(data, success);
@@ -149,7 +149,7 @@ CurrentUser = extending(OneAbstractUser, (function() {
 	 *
 	 * @param {AJAXData} [ajax_data]
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqXHR}
+	 * @returns {jqPromise}
 	 */
 	CurrentUser.prototype.fetchFriends = function(ajax_data, success) {
 		var self = this;
@@ -165,7 +165,7 @@ CurrentUser = extending(OneAbstractUser, (function() {
 	};
 	/**
 	 *
-	 * @returns {jqXHR}
+	 * @returns {jqPromise}
 	 */
 	CurrentUser.prototype.logout = function() {
 		return $.ajax({
@@ -180,7 +180,7 @@ CurrentUser = extending(OneAbstractUser, (function() {
 	 *
 	 * @param {(number|string)} [organization_id]
 	 * @param {AJAXCallback} [success]
-	 * @returns {(jqXHR|null)}
+	 * @returns {(jqPromise|null)}
 	 */
 	CurrentUser.prototype.subscribeToOrganization = function(organization_id, success) {
 		var self = this;
@@ -201,7 +201,7 @@ CurrentUser = extending(OneAbstractUser, (function() {
 	 *
 	 * @param {(number|string)} [organization_id]
 	 * @param {AJAXCallback} [success]
-	 * @returns {(jqXHR|null)}
+	 * @returns {(jqPromise|null)}
 	 */
 	CurrentUser.prototype.unsubscribeFromOrganization = function(organization_id, success) {
 		var self = this;

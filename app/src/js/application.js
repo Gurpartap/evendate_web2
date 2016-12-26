@@ -1,8 +1,57 @@
 /**
+ *
+ * @class jqPromise
+ */
+/**
+ * @method
+ * @name jqPromise#then
+ * @param {(Function|Array<Function>)} doneCallbacks
+ * @param {(Function|Array<Function>)} [failCallbacks]
+ * @param {(Function|Array<Function>)} [progressCallbacks]
+ * @returns {jqPromise}
+ */
+/**
+ * @method
+ * @name jqPromise#progress
+ * @param {...(Function|Array<Function>)} progressCallbacks
+ * @returns {Deferred}
+ */
+/**
+ * @method
+ * @name jqPromise#done
+ * @param {...(Function|Array<Function>)} doneCallbacks
+ * @returns {Deferred}
+ */
+/**
+ * @method
+ * @name jqPromise#fail
+ * @param {...(Function|Array<Function>)} failCallbacks
+ * @returns {Deferred}
+ */
+/**
+ * @method
+ * @name jqPromise#always
+ * @param {...(Function|Array<Function>)} alwaysCallbacks
+ * @returns {Deferred}
+ */
+/**
+ * @method
+ * @name jqPromise#promise
+ * @param {Object} [target]
+ * @returns {jqPromise}
+ */
+/**
+ * @method
+ * @name jqPromise#state
+ * @returns {__C.DEFERRED_STATES}
+ */
+
+/**
  * @const
  * @namespace __APP
  * @property {object} SERVER
  * @property {object} SERVER.AJAX_METHOD
+ * @property {CollectionOfXHRs} SERVER.CURRENT_CONNECTIONS
  * @property {string} EVENDATE_BEGIN
  * @property {object} AUTH_URLS
  * @property {string} AUTH_URLS.vk
@@ -13,7 +62,6 @@
  * @property {CurrentUser} USER
  * @property {Page} PREVIOUS_PAGE
  * @property {Page} CURRENT_PAGE
- * @property {jqXHR} CURRENT_JQXHR
  * @property {object} ROUTING
  * @property {object} MODALS
  * @property {number} MODALS.last_id
@@ -34,6 +82,8 @@ __APP = {
 			PUT: 'PUT',
 			DELETE: 'DELETE'
 		},
+		
+		CURRENT_CONNECTIONS: new CollectionOfXHRs(),
 		/**
 		 *
 		 * @param {__APP.SERVER.AJAX_METHOD} ajax_method
@@ -42,56 +92,44 @@ __APP = {
 		 * @param {string} [content_type='application/x-www-form-urlencoded; charset=UTF-8']
 		 * @param {AJAXCallback} [success]
 		 * @param {function} [error]
-		 * @returns {jqXHR}
+		 * @returns {jqPromise}
 		 */
 		dealAjax: function(ajax_method, ajax_url, ajax_data, content_type, success, error) {
-			var self = this;
+			var self = this,
+				jqXHR;
 			if(ajax_data.fields instanceof Fields){
 				ajax_data.fields = ajax_data.fields.toString();
 			}
-			return $.ajax({
+			jqXHR = $.ajax({
 				url: ajax_url,
 				data: ajax_data,
 				method: ajax_method,
-				contentType: content_type || 'application/x-www-form-urlencoded; charset=UTF-8',
-				success: function(res) {
-					__APP.SERVER.ajaxHandler(res, function(data, text) {
-						if (success && typeof success == 'function') {
-							success.call(self, data);
-						}
-					}, __APP.SERVER.ajaxErrorHandler)
-				},
-				error: error
+				contentType: content_type || 'application/x-www-form-urlencoded; charset=UTF-8'
 			});
+			__APP.SERVER.CURRENT_CONNECTIONS.push(jqXHR);
+			return jqXHR.fail(error).then(function(response, status_text, jqXHR) {
+				__APP.SERVER.ajaxHandler(response, function(data, text) {
+					if (success && typeof success == 'function') {
+						success.call(self, data);
+					}
+				}, __APP.SERVER.ajaxErrorHandler);
+				return response.data;
+			}).promise();
 		},
 		/**
-		 * @param {...(jqXHR|Deferred)} jqXHRs
-		 * @param {function(..(Array|object))} cb
+		 * @param {...(jqXHR|Deferred|jqPromise)} Deferreds
+		 * @param {function(..(Array|object))} [cb]
+		 * @return {jqPromise}
 		 */
 		multipleAjax: function multipleAjax(){
-			var self = this,
-				cb = arguments[arguments.length - 1],
-				jqXHRs = Array.prototype.splice.call(arguments, 0, arguments.length - 1),
-				resolveData = function(resolve) {
-					if(resolve[0].status){
-						return resolve[0].data;
-					}
-					window.errors_array.push(resolve);
-					return null;
-				};
-			
-			return $.when.apply($, jqXHRs).done(function() {
-				var datas = Array.prototype.slice.call(arguments).map(function(resolve) {
-					if(Array.isArray(resolve[0])){
-						return resolve.map(function(res) {
-							return resolveData(res);
-						});
-					} else {
-						return resolveData(resolve);
-					}
-				});
-				cb.apply(self, datas);
-			});
+			var with_callback = (arguments[arguments.length - 1] instanceof Function),
+				promises = with_callback ? Array.prototype.splice.call(arguments, 0, arguments.length - 1) : Array.prototype.slice.call(arguments),
+				parallel_promise;
+			parallel_promise = $.when.apply($, promises);
+			if(with_callback) {
+				parallel_promise.done(Array.prototype.shift.call(arguments));
+			}
+			return parallel_promise.promise();
 		},
 		/**
 		 *
@@ -99,7 +137,7 @@ __APP = {
 		 * @param {AJAXData} ajax_data
 		 * @param {AJAXCallback} [success]
 		 * @param {function} [error]
-		 * @returns {jqXHR}
+		 * @returns {jqPromise}
 		 */
 		getData: function getData(ajax_url, ajax_data, success, error) {
 			var self = this;
@@ -118,7 +156,7 @@ __APP = {
 		 * @param {AJAXData} ajax_data
 		 * @param {AJAXCallback} [success]
 		 * @param {function} [error]
-		 * @returns {jqXHR}
+		 * @returns {jqPromise}
 		 */
 		updateData: function updateData(ajax_url, ajax_data, success, error) {
 			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.PUT, ajax_url, ajax_data, 'application/json', success, error);
@@ -130,7 +168,7 @@ __APP = {
 		 * @param {boolean} is_payload
 		 * @param {AJAXCallback} [success]
 		 * @param {function} [error]
-		 * @returns {jqXHR}
+		 * @returns {jqPromise}
 		 */
 		addData: function addData(ajax_url, ajax_data, is_payload, success, error) {
 			if(is_payload){
@@ -144,7 +182,7 @@ __APP = {
 		 * @param {AJAXData} ajax_data
 		 * @param {AJAXCallback} [success]
 		 * @param {function} [error]
-		 * @returns {jqXHR}
+		 * @returns {jqPromise}
 		 */
 		deleteData: function deleteData(ajax_url, ajax_data, success, error) {
 			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.DELETE, ajax_url, ajax_data, 'application/json', success, error);
@@ -254,7 +292,6 @@ __APP = {
 	USER: new CurrentUser(),
 	PREVIOUS_PAGE: new Page(),
 	CURRENT_PAGE: new Page(),
-	CURRENT_JQXHR: {},
 	ROUTING: {
 		'add': {
 			'event': {
@@ -581,8 +618,37 @@ __APP = {
 		},
 		/**
 		 *
+		 * @param {Object<OneAbstractUser.ACCOUNTS, string>} [accounts_links]
+		 * @returns {jQuery}
+		 */
+		socialLinks: function buildSocialLinks(accounts_links) {
+			var props_array = [],
+				ICON_SLUGS = {
+					VK: 'vk',
+					GOOGLE: 'google-plus',
+					FACEBOOK: 'facebook-official'
+				};
+			$.each(OneAbstractUser.ACCOUNTS, function(slug, account) {
+				var props = {
+					slug: account,
+					icon_slug: ICON_SLUGS[slug]
+				};
+				if(accounts_links.hasOwnProperty(account)){
+					props.html_tag = 'a';
+					props.attributes = {
+						href: accounts_links[account]
+					};
+				} else {
+					props.html_tag = 'span';
+				}
+				props_array.push(__APP.BUILD.normalizeBuildProps(props))
+			});
+			return tmpl('user-page-social-link', props_array);
+		},
+		/**
+		 *
 		 * @param users
-		 * @param {buildProps} props
+		 * @param {buildProps} [props]
 		 * @param {(Array<string>|string)} [props.avatar_classes]
 		 * @param {(Array<string>|string)} [props.tombstone_classes]
 		 * @param {boolean} [props.is_link]
@@ -590,60 +656,122 @@ __APP = {
 		 */
 		userTombstones: function buildUserTombstones(users, props) {
 			props = __APP.BUILD.normalizeBuildProps(props, ['avatar_classes', 'tombstone_classes']);
-			function normalize(user) {
+			props.avatar_classes.push('-rounded');
+			props.avatar_classes.push('-size_'+ (props.size ? props.size : '70x70'));
+			if (props.is_link) {
+				props.html_tag = 'a';
+				props.tombstone_classes.push('link Link');
+			} else {
+				props.html_tag = 'div';
+			}
+			
+			return tmpl('user-tombstone', (users instanceof Array ? users : [users]).map(function(user) {
 				if (props.is_link) {
-					props.html_tag = 'a';
-					props.tombstone_classes.push('link Link');
-					props.attributes.href = '/friend/' + user.id;
-				} else {
-					props.html_tag = 'div';
+					props.attributes.href = '/user/' + user.id;
 				}
-				$.extend(true, user, {
-					name: [user.first_name, user.last_name].join(' '),
-					size: '70x70'
+				return $.extend(true, {}, user, {
+					avatar: __APP.BUILD.avatars(user, {
+						classes: props.avatar_classes
+					}),
+					name: user.full_name ? user.full_name : [user.first_name, user.last_name].join(' ')
+				}, props);
+			}));
+		},
+		/**
+		 *
+		 * @param {(OneAbstractUser|UsersCollection|OneOrganization|OrganizationsCollection|Array)} entities
+		 * @param {buildProps} [props]
+		 * @param {boolean} [props.is_link]
+		 * @param {string} [props.entity]
+		 * @param {(Array<string>|string)} [props.avatar_classes]
+		 * @param {(Array<string>|string)} [props.block_classes]
+		 * @returns {jQuery}
+		 */
+		avatarBlocks: function buildAvatarBlocks(entities, props) {
+			props = __APP.BUILD.normalizeBuildProps(props, ['avatar_classes', 'block_classes']);
+			if (props.is_link) {
+				props.html_tag = 'a';
+				props.block_classes.push('link','Link');
+			} else {
+				props.html_tag = 'div';
+			}
+			
+			return tmpl('avatar-block', (entities instanceof Array ? entities : [entities]).map(function(entity) {
+				var name, href;
+				if((props.entity && props.entity === 'organization') || !entity.first_name){
+					name = entity.short_name ? entity.short_name : entity.name;
+					href = '/organization/' + entity.id;
+				} else {
+					name = entity.full_name ? entity.full_name : (entity.first_name + ' ' + entity.last_name);
+					href = '/user/' + entity.id;
+				}
+				return $.extend(true, {
+					avatar: __APP.BUILD.avatars(entity, {
+						classes: props.avatar_classes
+					}),
+					attributes: {
+						href: href
+					},
+					name: name
+				}, props);
+			}));
+		},
+		/**
+		 *
+		 * @param {(OneAbstractUser|UsersCollection|OneOrganization|OrganizationsCollection|Array)} entities
+		 * @param {buildProps} [props]
+		 * @returns {jQuery|undefined}
+		 */
+		avatars: function buildAvatars(entities, props) {
+			var map = function() {},
+				tmp = [],
+				output_entities;
+			if(!entities || (entities instanceof Array && !entities.length))
+				return;
+			props = __APP.BUILD.normalizeBuildProps(props);
+			function userMap(user) {
+				return $.extend(true, {
+					avatar_url: user.avatar_url,
+					name: user.full_name ? user.full_name : (user.first_name + ' ' + user.last_name)
+				}, props);
+			}
+			function orgMap(org) {
+				return $.extend(true, {
+					avatar_url: org.img_small_url ? org.img_small_url : org.img_url,
+					name: org.short_name ? org.short_name : org.name
 				}, props);
 			}
 			
-			if (users instanceof Array) {
-				users.forEach(normalize);
-			} else {
-				normalize(users);
-			}
-			
-			return tmpl('user-tombstone', users);
-		},
-		/**
-		 *
-		 * @param {(buildProps|Array<buildProps>)} props
-		 * @returns {jQuery}
-		 */
-		avatarBlocks: function buildAvatarBlocks(props) {
-			if (Array.isArray(props)) {
-				props.forEach(normalize);
-			} else {
-				normalize(props);
-			}
-			
-			function normalize(props_unit) {
-				props_unit = __APP.BUILD.normalizeBuildProps(props_unit, ['avatar_classes', 'block_classes']);
-				if (props_unit.is_link) {
-					props_unit.html_tag = 'a';
-					props_unit.block_classes.push('link Link');
-					props_unit.attributes.href = '/friend/' + props_unit.id;
-				} else {
-					props_unit.html_tag = 'div';
+			switch (true){
+				case (entities instanceof OneAbstractUser):
+				case (entities instanceof UsersCollection): {
+					map = userMap;
+					break;
+				}
+				case (entities instanceof OneOrganization):
+				case (entities instanceof OrganizationsCollection): {
+					map = orgMap;
+					break;
+				}
+				default: {
+					if(!(entities instanceof Array)){
+						tmp = [entities];
+					}
+					map = tmp[0].avatar_url ? userMap : orgMap;
+					break;
 				}
 			}
+			output_entities = (entities instanceof Array) ? entities : [entities];
 			
-			return tmpl('avatar-block', props);
+			return tmpl('avatar', output_entities.map(map));
 		},
 		/**
-		 *
+		 * @deprecated
 		 * @param {Array} subscribers
 		 * @param {number} count
 		 * @returns {jQuery}
 		 */
-		avatars: function buildAvatars(subscribers, count) {
+		subscribersAvatars: function buildSubscribersAvatars(subscribers, count) {
 			var $subscribers = $();
 			$subscribers = $subscribers.add(tmpl('subscriber-avatar', __APP.USER));
 			subscribers.forEach(function(subscriber) {
@@ -655,21 +783,83 @@ __APP = {
 		},
 		/**
 		 *
-		 * @param {Array} users
+		 * @param {Array} entities
 		 * @param {number} max_count
-		 * @param {buildProps} props
+		 * @param {buildProps} [props]
+		 * @param {boolean} [props.avatar_is_link]
+		 * @param {number} [overall_avatars_count]
 		 * @returns {jQuery}
 		 */
-		avatarCollection: function buildAvatarCollection(users, max_count, props) {
-			var data = __APP.BUILD.normalizeBuildProps(props);
+		avatarCollection: function buildAvatarCollection(entities, max_count, props, overall_avatars_count) {
+			var data = __APP.BUILD.normalizeBuildProps(props, ['counter_classes']),
+				i, count;
 			
-			data.avatars = tmpl('subscriber-avatar', __APP.USER);
-			users.forEach(function(user) {
-				if (user.id != __APP.USER.id && data.avatars.length <= max_count) {
-					data.avatars = data.avatars.add(tmpl('subscriber-avatar', user));
+			data.dataset.max_amount = max_count;
+			data.classes.push('-max_' + max_count);
+			
+			data.avatars = __APP.BUILD.avatars(__APP.USER);
+			for(i = 0, count = 1; count <= max_count; i++){
+				if (!entities[i]) break;
+				if (entities[i].id != __APP.USER.id) {
+					data.avatars = data.avatars.add(__APP.BUILD.avatars(entities[i]));
+					count++;
 				}
-			});
+			}
+			data.more_avatars_count = (count <= max_count) ? 0 : ( (overall_avatars_count ? overall_avatars_count : entities.length) - max_count );
+			if(data.more_avatars_count <= 0){
+				data.counter_classes.push('-cast');
+			}
+			
 			return tmpl('avatars-collection', data);
+		},
+		
+		activity: function buildActivity(activities, props){
+			var ICON_CLASSES = {};
+			
+			ICON_CLASSES[OneAbstractActivity.TYPES.SUBSCRIBE] = 'plus';
+			ICON_CLASSES[OneAbstractActivity.TYPES.FAVE] = 'star';
+			ICON_CLASSES[OneAbstractActivity.TYPES.UNSUBSCRIBE] = ICON_CLASSES[OneAbstractActivity.TYPES.UNFAVE] = 'minus';
+			
+			props = __APP.BUILD.normalizeBuildProps(props, ['avatar_classes']);
+			props.avatar_classes.push('-size_50x50', '-rounded');
+			
+			return tmpl('activity-block', (activities instanceof Array ? activities : [activities]).map(function(activity) {
+				var entity_props = {},
+					locales = __LOCALES.ru_RU.TEXTS.ACTIVITY[OneAbstractActivity.TYPES_INDEX[activity.type_code]];
+				
+				switch (true) {
+					case (activity instanceof OneOrganizationActivity): {
+						entity_props = {
+							entity: 'organization',
+							img_url: activity.organization.img_small_url ? activity.organization.img_small_url : activity.organization.img_url,
+							entity_url: '/organization/'+activity.organization.id,
+							hero_text: activity.organization.short_name
+						};
+						break;
+					}
+					case (activity instanceof OneEventActivity): {
+						entity_props = {
+							entity: 'event',
+							img_url: activity.event.image_horizontal_small_url ? activity.event.image_horizontal_small_url : activity.event.image_horizontal_url,
+							entity_url: '/event/'+activity.event.id,
+							hero_text: activity.event.title
+						};
+						break;
+					}
+				}
+				return $.extend(entity_props, {
+					creator_avatar: __APP.BUILD.avatars(activity.user, {
+						classes: props.avatar_classes,
+						is_link: props.avatar_is_link,
+						badge: tmpl('avatar-badge', {icon_class: ICON_CLASSES[activity.type_code]})
+					}),
+					type_code: activity.type_code,
+					additional_info: getGenderText(activity.user.gender, locales),
+					creator_url: '/user/'+activity.user.id,
+					creator_name: activity.user.full_name ? activity.user.full_name : (activity.user.first_name + ' ' + activity.user.last_name),
+					date: moment.unix(activity.created_at).calendar(null, __LOCALES.ru_RU.DATE.CALENDAR_DATE_TIME)
+				})
+			}));
 		},
 		/**
 		 *
@@ -683,13 +873,14 @@ __APP = {
 				org.counter_classes = org.new_events_count ? [] : [__C.CLASSES.NEW_HIDDEN];
 				return org;
 			});
-			if (additional_fields) {
-				return tmpl('organization-item', orgs.map(function(organization) {
-					return $.extend(true, {}, organization, __APP.BUILD.normalizeBuildProps(additional_fields, ['avatar_classes', 'block_classes', 'counter_classes']));
-				}));
-			} else {
-				return tmpl('organization-item', orgs);
-			}
+			return tmpl('organization-item', orgs.map(function(organization) {
+				return $.extend(true, {
+					avatar_block: __APP.BUILD.avatarBlocks(organization, {
+						entity: 'organization',
+						avatar_classes: ['-size_30x30']
+					})
+				}, organization, __APP.BUILD.normalizeBuildProps(additional_fields, ['avatar_classes', 'block_classes', 'counter_classes']));
+			}));
 		},
 		/**
 		 *
@@ -706,6 +897,9 @@ __APP = {
 							style: 'background-image: url(\''+(org.background_small_img_url || org.background_img_url)+'\')'
 						}
 					}) : '',
+					avatar: __APP.BUILD.avatars(org, {
+						classes: ['organization_unit_avatar','-size_55x55','-bordered','-rounded','-shadowed']
+					}),
 					subscribe_button: new SubscribeButton(org.id, {
 						is_subscribed: org.is_subscribed,
 						colors: {
@@ -728,12 +922,16 @@ __APP = {
 		 * @param {OrganizationPage~EventType} type
 		 * @returns {jQuery}
 		 */
-		organizationFeedEvents: function buildOrganizationFeedEvents(events, type) {
-			return tmpl('organization-feed-event', events.map(function(event) {
-				var m_event_date = moment.unix(event[type.sort_date_type]),
-					$subscribers = __APP.BUILD.avatars(event.favored, 4),
-					favored_users_count = ($subscribers.length <= 4) ? 0 : event.favored_users_count - 4,
-					different_day = type.last_date != m_event_date.format(__C.DATE_FORMAT);
+		eventBlocks: function buildEventBlocks(events, type) {
+			return tmpl('event-block', events.map(function(event) {
+				var sort_date_type = type.sort_date_type ? type.sort_date_type : 'nearest_event_date',
+					m_event_date = moment.unix(event[sort_date_type] ? event[sort_date_type] : event['first_event_date']),
+					different_day = type.last_date != m_event_date.format(__C.DATE_FORMAT),
+					avatars_collection_classes = ['-rounded','-bordered','-size_small','AvatarsCollection','CallModal'];
+				
+				if(event.is_favorite) {
+					avatars_collection_classes.push('-shifted');
+				}
 				
 				type.last_date = m_event_date.format(__C.DATE_FORMAT);
 				return $.extend({}, event, {
@@ -745,11 +943,16 @@ __APP = {
 						is_subscribed: event.is_favorite,
 						classes: ['-size_low', '-size_wide', '-rounded', 'AddToFavorites', 'RippleEffect']
 					}),
-					subscribers: $subscribers,
 					date: m_event_date.format(__C.DATE_FORMAT),
-					avatars_collection_classes: event.is_favorite ? ($subscribers.length > 4) ? '-subscribed -shift' : '-subscribed' : '',
-					favored_users_count: favored_users_count,
-					favored_users_show: favored_users_count ? '' : '-cast',
+					avatars_collection: __APP.BUILD.avatarCollection(event.favored, 4, {
+						dataset: {
+							modal_type: 'favors',
+							modal_event_id: event.id,
+							modal_title: 'Добавили в избранное'
+						},
+						classes: avatars_collection_classes,
+						counter_classes: ['-size_30x30','-bordered','-color_marginal','-castable']
+					}, event.favored_users_count),
 					time: event.dates.reduce(function(times, date) {
 						if (moment.unix(date.event_date).format(__C.DATE_FORMAT) == m_event_date.format(__C.DATE_FORMAT)) {
 							times.push(displayTimeRange(date.start_time, date.end_time));
@@ -805,15 +1008,15 @@ __APP = {
 				var append_divider = (typeof last_is_fiend == 'undefined') || last_is_fiend != subscriber.is_friend;
 				
 				last_is_fiend = subscriber.is_friend;
-				return $.extend({
+				return {
 					divider: append_divider ? tmpl('subscriber-divider', {label: subscriber.is_friend ? 'Друзья' : 'Все подписчики'}) : '',
-					avatar_block: __APP.BUILD.avatarBlocks({
-						avatar_classes: ['-size_40x40', '-rounded', '-bordered'],
-						name: [subscriber.first_name, subscriber.last_name].join(' '),
-						avatar_url: subscriber.avatar_url
-					}),
-					name: [subscriber.first_name, subscriber.last_name].join(' ')
-				}, subscriber);
+					avatar_block: __APP.BUILD.avatarBlocks(subscriber, {
+						is_link: true,
+						entity: 'user',
+						avatar_classes: ['-size_40x40', '-rounded', '-bordered', '-shadowed'],
+						block_classes: ['subscriber']
+					})
+				};
 			}));
 		},
 		/**
@@ -821,20 +1024,20 @@ __APP = {
 		 * @param {(OneEvent|Array<OneEvent>|EventsCollection)} events
 		 * @returns {jQuery}
 		 */
-		feedEventCards: function buildFeedEventCards(events) {
+		eventCards: function buildEventCards(events) {
 			var $events;
 			events = events instanceof Array ? events : [events];
 			$events = tmpl('feed-event', events.map(function(event) {
-				var $subscribers = __APP.BUILD.avatars(event.favored, 4),
-					avatars_collection_classes = [],
-					favored_users_count = ($subscribers.length <= 4) ? 0 : event.favored_users_count - 4,
-					feed_event_infos = [];
+				var avatars_collection_classes = ['-rounded','-bordered','-size_small','AvatarsCollection','CallModal'],
+					feed_event_infos = [],
+					organization = new OneOrganization(event.organization_id);
+				organization.setData({
+					short_name: event.organization_short_name,
+					img_url: event.organization_logo_small_url
+				});
 				
 				if (event.is_favorite) {
-					avatars_collection_classes.push('-subscribed');
-					if ($subscribers.length > 4) {
-						avatars_collection_classes.push('-shift');
-					}
+					avatars_collection_classes.push('-shifted');
 				}
 				feed_event_infos.push({
 					text: displayDateRange(event.dates[0].event_date, event.dates[event.dates.length - 1].event_date)
@@ -850,15 +1053,25 @@ __APP = {
 				}
 				
 				return $.extend(true, {
+					organization_avatar_block: __APP.BUILD.avatarBlocks(organization, {
+						block_classes: ['-size_small'],
+						is_link: true,
+						entity: 'organization'
+					}),
 					add_to_favorite_button: new AddToFavoriteButton(event.id, {
 						is_add_avatar: true,
 						is_subscribed: event.is_favorite,
 						classes: ['-size_low', '-size_wide', '-rounded', 'RippleEffect']
 					}),
-					subscribers: $subscribers,
-					avatars_collection_classes: avatars_collection_classes.join(' '),
-					favored_users_show: favored_users_count ? '' : '-cast',
-					favored_users_count: favored_users_count,
+					avatars_collection: __APP.BUILD.avatarCollection(event.favored, 4, {
+						dataset: {
+							modal_type: 'favors',
+							modal_event_id: event.id,
+							modal_title: 'Добавили в избранное'
+						},
+						classes: avatars_collection_classes,
+						counter_classes: ['-size_30x30','-bordered','-color_marginal_primary','-castable']
+					}, event.favored_users_count),
 					feed_event_infos: tmpl('feed-event-info', feed_event_infos)
 				}, event);
 			}));
@@ -1013,6 +1226,7 @@ __APP = {
 	init: function appInit() {
 		var $sidebar_nav_items = $('.SidebarNavItem');
 		__APP.CURRENT_PAGE = Page.routeNewPage(window.location.pathname);
+		__APP.CURRENT_PAGE.fetchData();
 		__APP.CURRENT_PAGE.show();
 		$sidebar_nav_items.removeClass(__C.CLASSES.NEW_ACTIVE)
 			.filter(function() {
@@ -1022,8 +1236,7 @@ __APP = {
 	reInit: function appReInit() {
 		$(window).off('scroll');
 		
-		unbindPageLinks();
-		
+		__APP.SERVER.CURRENT_CONNECTIONS.abortAll();
 		__APP.PREVIOUS_PAGE = __APP.CURRENT_PAGE;
 		__APP.PREVIOUS_PAGE.destroy();
 		__APP.init();
@@ -1083,8 +1296,18 @@ __C = {
 	ENTITIES: {
 		EVENT: 'event',
 		ORGANIZATION: 'organization'
+	},
+	/**
+	 * @enum {string}
+	 */
+	DEFERRED_STATES: {
+		PENDING: 'pending',
+		RESOLVED: 'resolved',
+		REJECTED: 'rejected'
 	}
 };
+
+__ERRORS = [];
 
 __LOCALES = {
 	ru_RU: {
@@ -1124,8 +1347,8 @@ __LOCALES = {
 					NEU: 'отписалось от организации'
 				},
 				FAVE: {
-					MAS: 'добавила в избранное событие',
-					FEM: 'добавил в избранное событие',
+					MAS: 'добавил в избранное событие',
+					FEM: 'добавила в избранное событие',
 					NEU: 'добавило в избранное событие'
 				},
 				UNFAVE: {
@@ -1143,7 +1366,14 @@ __LOCALES = {
 		DATE: {
 			DATE_FORMAT: 'DD.MM.YYYY',
 			MONTH_SHORT_NAMES: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
-			MONTH_NAMES: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь']
+			MONTH_NAMES: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
+			CALENDAR_DATE_TIME: {
+				sameDay: '[Сегодня в] HH:mm',
+				lastDay: '[Вчера в] HH:mm',
+				nextWeek: 'dddd [в] HH:mm',
+				lastWeek: 'D MMMM [в] HH:mm',
+				sameElse: 'D MMMM [в] HH:mm'
+			}
 		}
 	}
 };

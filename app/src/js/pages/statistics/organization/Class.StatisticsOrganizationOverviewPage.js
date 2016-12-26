@@ -11,8 +11,31 @@ function StatisticsOrganizationOverviewPage(org_id) {
 	StatisticsOrganizationPage.apply(this, arguments);
 	this.graphics_stats = new OrganizationsStatistics(this.id);
 	this.other_stats = new OrganizationsStatistics(this.id);
-	this.is_loading = true;
-	this.organization.fetchOrganizationWithEvents([
+}
+StatisticsOrganizationOverviewPage.extend(StatisticsOrganizationPage);
+/**
+ *
+ * @param {string} title
+ * @param staff
+ * @return {jQuery}
+ */
+StatisticsOrganizationOverviewPage.buildStaffBlock = function(title, staff) {
+	if (staff.length) {
+		return tmpl('orgstat-staff-block', {
+			title: title,
+			avatars: __APP.BUILD.avatarBlocks(staff, {
+				avatar_classes: ['-size_40x40','-rounded'],
+				entity: 'user',
+				is_link: true
+			})
+		});
+	} else {
+		return tmpl('orgstat-staff-block', {hidden: __C.CLASSES.NEW_HIDDEN});
+	}
+};
+
+StatisticsOrganizationOverviewPage.prototype.fetchData = function() {
+	return this.fetching_data_defer = this.organization.fetchOrganizationWithEvents([
 		'description',
 		'img_medium_url',
 		'default_address',
@@ -28,24 +51,7 @@ function StatisticsOrganizationOverviewPage(org_id) {
 			'public_at'
 		],
 		order_by: 'nearest_event_date'
-	}, Page.triggerRender);
-}
-StatisticsOrganizationOverviewPage.extend(StatisticsOrganizationPage);
-/**
- *
- * @param {string} title
- * @param staff
- * @return {jQuery}
- */
-StatisticsOrganizationOverviewPage.buildStaffBlock = function(title, staff) {
-	if (staff.length) {
-		return tmpl('orgstat-staff-block', {
-			title: title,
-			avatars: __APP.BUILD.avatarBlocks(staff)
-		});
-	} else {
-		return tmpl('orgstat-staff-block', {hidden: __C.CLASSES.NEW_HIDDEN});
-	}
+	});
 };
 
 StatisticsOrganizationOverviewPage.prototype.buildAreaCharts = function() {
@@ -168,6 +174,10 @@ StatisticsOrganizationOverviewPage.prototype.render = function() {
 	}, this.organization.short_name]);
 	
 	this.$wrapper.html(tmpl('orgstat-overview', $.extend(true, {}, this.organization, {
+		avatar_block: __APP.BUILD.avatarBlocks(this.organization, {
+			entity: 'organization',
+			block_classes: ['-stack']
+		}),
 		staff_block: StatisticsOrganizationOverviewPage.buildStaffBlock('Администраторы', this.organization.staff.getSpecificStaff(OneAbstractUser.ROLE.ADMIN, staffs_additional_fields))
 			.add(StatisticsOrganizationOverviewPage.buildStaffBlock('Модераторы', this.organization.staff.getSpecificStaff(OneAbstractUser.ROLE.MODERATOR, staffs_additional_fields))),
 		event_blocks: tmpl('orgstat-event-block', this.organization.events.map(function(event) {

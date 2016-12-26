@@ -76,14 +76,14 @@ FeedPage.prototype.addNoEventsBlock = function() {
 /**
  *
  * @param {function(jQuery)} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 FeedPage.prototype.appendEvents = function(success) {
 	var PAGE = this;
 	
 	PAGE.block_scroll = true;
 	return PAGE.events.fetchFeed(this.fields, this.next_events_length, function(events) {
-		var $events = __APP.BUILD.feedEventCards(events);
+		var $events = __APP.BUILD.eventCards(events);
 		PAGE.block_scroll = false;
 		if ($events.length) {
 			PAGE.$wrapper.append($events);
@@ -157,10 +157,10 @@ FeedPage.prototype.render = function() {
 	}
 	
 	$window.off('scroll');
-	__APP.CURRENT_JQXHR = PAGE.appendEvents(function() {
+	PAGE.appendEvents(function() {
 		$window.on('scroll.upload' + PAGE.constructor.name, function() {
 			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.block_scroll) {
-				__APP.CURRENT_JQXHR = PAGE.appendEvents();
+				PAGE.appendEvents();
 			}
 		})
 	});

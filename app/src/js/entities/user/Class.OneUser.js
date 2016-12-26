@@ -25,7 +25,7 @@ OneUser = extending(OneAbstractUser, (function() {
 		 * @param {(string|number)} user_id
 		 * @param {AJAXData} data
 		 * @param {AJAXCallback} [success]
-		 * @returns {jqXHR}
+		 * @returns {jqPromise}
 		 */
 		UsersActivitiesCollection.fetch = function(user_id, data, success) {
 			data = AbstractActivitiesCollection.setDefaultData(data);
@@ -37,7 +37,7 @@ OneUser = extending(OneAbstractUser, (function() {
 		 * @param {(number|string)} [length]
 		 * @param {string} [order_by]
 		 * @param {AJAXCallback} [success]
-		 * @returns {jqXHR}
+		 * @returns {jqPromise}
 		 */
 		UsersActivitiesCollection.prototype.fetch = function(fields, length, order_by, success) {
 			var self = this,
@@ -87,7 +87,7 @@ OneUser = extending(OneAbstractUser, (function() {
 	 * @param {(string|number)} user_id
 	 * @param {(Array|string)} [fields]
 	 * @param {AJAXCallback} [success]
-	 * @returns {jqXHR}
+	 * @returns {jqPromise}
 	 */
 	OneUser.fetchUserActivity = function(user_id, fields, success) {
 		return UsersActivitiesCollection.fetch(user_id, {fields: fields}, success);

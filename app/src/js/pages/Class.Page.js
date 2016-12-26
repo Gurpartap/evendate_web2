@@ -17,9 +17,10 @@ function Page() {
 	 */
 	this.$wrapper = $();
 	this.wrapper_tmpl = 'std';
-	this.is_loading = false;
-	this.can_render = false;
 	this.with_header_tabs = false;
+	
+	this.rendering_defer = $.Deferred();
+	this.fetching_data_defer = $.Deferred();
 }
 /**
  * Routing
@@ -58,44 +59,18 @@ Page.routeNewPage = function(path) {
 	return new (Function.prototype.bind.apply(PageClass, [null].concat(args)))(); // new Page(...args)
 };
 
-Page.triggerRender = function() {
-	$(window).trigger('page_load');
-};
-
 Page.prototype.show = function() {
 	var PAGE = this,
 		$main_header = $('#main_header'),
 		is_other_page = __APP.PREVIOUS_PAGE.wrapper_tmpl !== PAGE.wrapper_tmpl,
 		wrapper_field = is_other_page ? '$view' : '$wrapper',
-		$prev = __APP.PREVIOUS_PAGE[wrapper_field].length ? __APP.PREVIOUS_PAGE[wrapper_field] : is_other_page ? $('.PageView') : $('.PageView').find('.Content'),
-		$window = $(window);
+		$prev = __APP.PREVIOUS_PAGE[wrapper_field].length ? __APP.PREVIOUS_PAGE[wrapper_field] : is_other_page ? $('.PageView') : $('.PageView').find('.Content');
 	
 	if (PAGE.page_title) {
 		__APP.changeTitle(PAGE.page_title);
 	}
 	$prev.addClass('-faded');
 	
-	if (__APP.CURRENT_JQXHR && __APP.CURRENT_JQXHR.status == 1) {
-		__APP.CURRENT_JQXHR.abort();
-	}
-	
-	$window.on('page_render', function() {
-		if (PAGE.can_render && !PAGE.is_loading) {
-			$window.off('page_render');
-			$(window).scrollTop(0);
-			PAGE.render();
-			bindPageLinks();
-			setTimeout(function() {
-				PAGE[wrapper_field].removeClass('-faded');
-			}, 200);
-		}
-	});
-	$window.one('page_load', function() {
-		PAGE.is_loading = false;
-		if (PAGE.can_render) {
-			$window.trigger('page_render');
-		}
-	});
 	setTimeout(function() {
 		$prev.addClass(__C.CLASSES.NEW_HIDDEN);
 		
@@ -119,11 +94,21 @@ Page.prototype.show = function() {
 		PAGE.$wrapper.removeClass(__C.CLASSES.NEW_HIDDEN);
 		PAGE[wrapper_field].addClass('-faded');
 		
-		PAGE.can_render = true;
-		if (!PAGE.is_loading) {
-			$window.trigger('page_render');
-		}
+		PAGE.rendering_defer.resolve();
 	}, 200);
+	
+	$.when(PAGE.rendering_defer, PAGE.fetching_data_defer).done(function pageRender(){
+		$(window).scrollTop(0);
+		PAGE.render();
+		bindPageLinks();
+		setTimeout(function() {
+			PAGE[wrapper_field].removeClass('-faded');
+		}, 200);
+	});
+};
+
+Page.prototype.fetchData = function() {
+	return this.fetching_data_defer.resolve().promise();
 };
 
 Page.prototype.render = function() {};
