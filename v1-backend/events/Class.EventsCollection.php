@@ -445,7 +445,10 @@ class EventsCollection extends AbstractCollection
 		}
 
 		if (array_key_exists(Event::FAVORED_FRIENDS_COUNT_FIELD_NAME, $fields) ||
-			 array_key_exists(Event::REGISTERED_FIELD_NAME, $fields)
+			 array_key_exists(Event::REGISTERED_FIELD_NAME, $fields) ||
+			 array_key_exists(Event::REGISTRATION_UUID_FIELD_NAME, $fields) ||
+			 array_key_exists(Event::REGISTRATION_APPROVED_FIELD_NAME, $fields) ||
+			 array_key_exists(Event::REGISTRATION_QR_FIELD_NAME, $fields)
 		) {
 			$statement_array[':user_id'] = $user->getId();
 		}

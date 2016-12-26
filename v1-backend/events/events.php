@@ -11,6 +11,32 @@ require_once $BACKEND_FULL_PATH . '/events/Class.NotificationsCollection.php';
 
 $__modules['events'] = array(
 	'GET' => array(
+		'{/(id:[0-9]+)/registrations/(uuid:\w+-\w+-\w+-\w+-\w+)/qr}' => function ($event_id, $uuid) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+			$format = 'png';
+			$available_types = ['png', 'svg', 'pdf', 'eps'];
+			$headers = array(
+				'png' => 'image/png',
+				'svg' => 'image/svg+xml',
+				'pdf' => 'application/pdf',
+				'eps' => 'application/postscript',
+			);
+			$size = 10;
+			if (isset($__request['format'])) {
+				if (isset($available_types[$__request['format']])) {
+					$format = $__request['format'];
+
+				}
+			}
+			$mime_type = $headers[$format];
+			if (isset($__request['size'])) {
+				$size = filter_var($__request['size'], FILTER_VALIDATE_INT);
+			}
+
+			header("Content-type: " . $mime_type);
+
+			echo file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/qr/' . $event_id . '/' . $uuid . '?format=' . $format . '&size=' . $size);
+			die();
+		},
 		'{{/(id:[0-9]+)}/notifications}' => function ($id) use ($__db, $__order_by, $__request, $__offset, $__length, $__user, $__fields) {
 			$event = EventsCollection::one(
 				$__db,
@@ -157,10 +183,10 @@ $__modules['events'] = array(
 			return $event->registerUser($__user, $__request['payload']['registration_fields']);
 		},
 		'' => function () use ($__db, $__request, $__user) {
-			if ($__user instanceof User){
+			if ($__user instanceof User) {
 				$result = $__user->createEvent($__request['payload']);
 
-			}else throw new PrivilegesException('NOT_AUTHORIZED', $__db);
+			} else throw new PrivilegesException('NOT_AUTHORIZED', $__db);
 			return $result;
 		},
 	),
@@ -199,31 +225,31 @@ $__modules['events'] = array(
 				$id,
 				$__fields
 			);
-			if (isset($__request['approved'])){
+			if (isset($__request['approved'])) {
 				RegistrationForm::setApproved($__user, $event, $registration_uuid, $__request['approved']);
 				$updated = true;
 			}
-			if (isset($__request['checkout'])){
+			if (isset($__request['checkout'])) {
 				RegistrationForm::setCheckOutStatus($__user, $event, $registration_uuid, $__request['checkout']);
 
 				$updated = true;
 			}
-			if ($updated){
+			if ($updated) {
 				return new Result(true, 'Данные успешно обновлены');
-			}else{
+			} else {
 				return new Result(false, 'Не указаны поля для обновления');
 			}
 		},
-		'{{/(id:[0-9]+)}/registration}' => function ($id) use ($__db, $__request, $__user) {
+		'{{/(id:[0-9]+)}/registrations}' => function ($id) use ($__db, $__request, $__user) {
 			$event = EventsCollection::one(
 				$__db,
 				$__user,
 				intval($id),
 				array());
 
-			if (filter_var($__request['status'], FILTER_VALIDATE_BOOLEAN) == false){
+			if (filter_var($__request['status'], FILTER_VALIDATE_BOOLEAN) == false) {
 				return $event->unregisterUser($__user);
-			}else{
+			} else {
 				throw new BadArgumentException('STATUS_FIELD_CAN_BE_ONLY_FALSE', $__db);
 			}
 

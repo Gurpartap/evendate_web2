@@ -2034,6 +2034,48 @@
         }
       }
     },
+    "/events/{Id}/registrations": {
+      "put": {
+        "tags": [
+          "Event"
+        ],
+        "summary": "Update one registration by registered user",
+        "description": "",
+        "operationId": "updateRegistrationByUser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "description": "Registration status",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ]
+          }
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "Event ID",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        }
+      }
+    },
     "/events/{Id}/registrations/{UUID}": {
       "put": {
         "tags": [

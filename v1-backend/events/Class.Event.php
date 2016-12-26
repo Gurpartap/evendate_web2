@@ -42,6 +42,7 @@ class Event extends AbstractEntity
 	const REGISTERED_FIELD_NAME = 'registered';
 	const REGISTRATION_APPROVED_FIELD_NAME = 'registration_approved';
 	const REGISTRATION_UUID_FIELD_NAME = 'registration_uuid';
+	const REGISTRATION_QR_FIELD_NAME = 'registration_qr';
 
 
 	const RANDOM_FIELD_NAME = 'random';
@@ -141,17 +142,28 @@ class Event extends AbstractEntity
 			AND users_registrations.user_id = :user_id
 			AND users_registrations.event_id = view_events.id) IS NOT NULL AS ' . self::REGISTERED_FIELD_NAME,
 
+
+
+
+
+
 		self::REGISTRATION_APPROVED_FIELD_NAME => '(SELECT COALESCE(organization_approved, FALSE)
 			FROM users_registrations
 			WHERE users_registrations.status = TRUE
 			AND users_registrations.user_id = :user_id
 			AND users_registrations.event_id = view_events.id) = TRUE AS ' . self::REGISTRATION_APPROVED_FIELD_NAME,
 
-		self::REGISTRATION_UUID_FIELD_NAME => '(SELECT registration_uuid
+		self::REGISTRATION_UUID_FIELD_NAME => '(SELECT uuid
 			FROM users_registrations
 			WHERE users_registrations.status = TRUE
 			AND users_registrations.user_id = :user_id
 			AND users_registrations.event_id = view_events.id) = TRUE AS ' . self::REGISTRATION_UUID_FIELD_NAME,
+
+		self::REGISTRATION_QR_FIELD_NAME => '(SELECT \'https://evendate.ru/api/v1/events/\' || view_events.id || \'/registrations/\' || view_users_registrations.uuid || \'/qr?format=png&size=10\'
+			FROM view_users_registrations
+			WHERE view_users_registrations.status = TRUE
+			AND view_users_registrations.user_id = :user_id
+			AND view_users_registrations.event_id = view_events.id) AS ' . self::REGISTRATION_QR_FIELD_NAME,
 
 		self::RANDOM_FIELD_NAME => '(SELECT created_at / (random() * 9 + 1)
 			FROM view_events AS ve

@@ -21,6 +21,7 @@ var
     ConstantsStorage = require('./constants'),
     Entities = require('./entities'),
     pg = require('pg'),
+    qr = require('qr-image'),
     sql = require('sql'),
     args = process.argv.slice(2),
     crypto = require('crypto'),
@@ -1395,7 +1396,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
             console.log(req.params);
         }
         updateEventsGeocodes(req.params.id);
-        insertRecommendationsAccordance({event_id: req.params.id}, function(){
+        insertRecommendationsAccordance({event_id: req.params.id}, function () {
             updateRecommendations({event_id: req.params.id}, logger.info)
         });
         cropper.resizeNew({
@@ -1407,22 +1408,60 @@ pg.connect(pg_conn_string, function (err, client, done) {
     });
 
     app.get('/recommendations/events/:id', function (req, res) {
-        insertRecommendationsAccordance({event_id: req.params.id}, function(){
+        insertRecommendationsAccordance({event_id: req.params.id}, function () {
             updateRecommendations({event_id: req.params.id}, logger.info)
         });
     });
 
     app.get('/recommendations/organizations/:id', function (req, res) {
-        insertRecommendationsAccordance({organization_id: req.params.id}, function(){
+        insertRecommendationsAccordance({organization_id: req.params.id}, function () {
             updateRecommendations({organization_id: req.params.id}, logger.info);
         });
         res.json({status: true});
     });
 
     app.get('/recommendations/users/:id', function (req, res) {
-        insertRecommendationsAccordance({organization_id: req.params.id}, function(){
+        insertRecommendationsAccordance({organization_id: req.params.id}, function () {
             updateRecommendations({user_id: req.params.id}, logger.info);
         });
+    });
+
+
+    app.get('/utils/qr/:event_id/:uuid', function (req, res) {
+        var format = 'png',
+            available_types = ['png', 'svg', 'pdf', 'eps'],
+            headers = {
+                png: 'image/png',
+                svg: 'image/svg+xml',
+                pdf: 'application/pdf',
+                eps: 'application/postscript'
+            },
+            size = 10;
+        if (checkNested(req, 'query', 'format')) {
+            console.log(req.query.format);
+            if (available_types.indexOf(req.query.format) != -1) {
+                format = req.query.format;
+            }
+        }
+        if (checkNested(req, 'query', 'size')) {
+            size = parseInt(req.query.size);
+            size = isNaN(size) ? 10 : size;
+        }
+
+        console.log({
+            uuid: req.params.uuid,
+            event_id: req.params.event_id,
+        });
+
+        var qr_svg = qr.image(JSON.stringify({
+            uuid: req.params.uuid,
+            event_id: req.params.event_id,
+        }), {
+            type: format,
+            size: size
+        });
+        res.setHeader("content-type", headers[format]);
+        qr_svg.pipe(res);
     });
 
     app.listen(8000, function () {
