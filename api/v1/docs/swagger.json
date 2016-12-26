@@ -897,6 +897,17 @@
           },
           {
             "in": "query",
+            "name": "registered",
+            "description": "all events where user registered",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ]
+          },
+          {
+            "in": "query",
             "name": "statistics",
             "description": "add statistics fields",
             "required": false,
@@ -1250,6 +1261,17 @@
           },
           {
             "in": "query",
+            "name": "registered",
+            "description": "all events where user registered",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ]
+          },
+          {
+            "in": "query",
             "name": "future",
             "description": "all future events",
             "required": false,
@@ -1507,6 +1529,17 @@
             "in": "query",
             "name": "canceled_shown",
             "description": "show/hide canceled events",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ]
+          },
+          {
+            "in": "query",
+            "name": "registered",
+            "description": "all events where user registered",
             "required": false,
             "type": "string",
             "enum": [
@@ -2001,6 +2034,108 @@
         }
       }
     },
+    "/events/{Id}/registrations": {
+      "put": {
+        "tags": [
+          "Event"
+        ],
+        "summary": "Update one registration by registered user",
+        "description": "",
+        "operationId": "updateRegistrationByUser",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "description": "Registration status",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ]
+          },
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "Event ID",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        }
+      }
+    },
+    "/events/{Id}/registrations/{UUID}": {
+      "put": {
+        "tags": [
+          "Event"
+        ],
+        "summary": "Update one registration status",
+        "description": "",
+        "operationId": "updateRegistration",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "checkout",
+            "description": "Checkout status",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ]
+          },
+          {
+            "in": "query",
+            "name": "approved",
+            "description": "Approve status",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "true",
+              "false"
+            ]
+          },
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "Event ID",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "UUID",
+            "in": "path",
+            "description": "Notification UUID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        }
+      }
+    },
     "/events/{Id}/favorites": {
       "delete": {
         "tags": [
@@ -2061,6 +2196,37 @@
         }
       }
     },
+    "/events/{Id}/registered_users": {
+      "get": {
+        "tags": [
+          "Event"
+        ],
+        "summary": "Get list of registered users (only for admin)",
+        "description": "",
+        "operationId": "getRegisteredUsers",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "Event ID",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        }
+      }
+    },
     "/users": {
       "get": {
         "tags": [
@@ -2068,7 +2234,7 @@
         ],
         "summary": "Search users by name",
         "description": "",
-        "operationId": "getFriendsFeed",
+        "operationId": "getUsers",
         "produces": [
           "application/json"
         ],
@@ -2339,6 +2505,222 @@
         }
       }
     },
+    "/users/{Id}/favorites": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Returns list of favored events",
+        "description": "",
+        "operationId": "getFriendFavorites",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "Id",
+            "description": "Friends ID",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "description": "Order column name",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Additional fields and sub-entities",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Action"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{Id}/subscriptions": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Returns list of subscriptions events",
+        "description": "",
+        "operationId": "getFriendSubscriptions",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "Id",
+            "description": "Friends ID",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "description": "Order column name",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Additional fields and sub-entities",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Action"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/me/actions": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Returns list of actions for one specified friend",
+        "description": "",
+        "operationId": "getFriendActions",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "order_by",
+            "in": "query",
+            "description": "Order column name",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Additional fields and sub-entities",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Action"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/me/favorites": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Returns list of favored events",
+        "description": "",
+        "operationId": "getFriendFavorites",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "order_by",
+            "in": "query",
+            "description": "Order column name",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Additional fields and sub-entities",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Action"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/me/subscriptions": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "summary": "Returns list of subscriptions events",
+        "description": "",
+        "operationId": "getFriendSubscriptions",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "order_by",
+            "in": "query",
+            "description": "Order column name",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Additional fields and sub-entities",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Action"
+              }
+            }
+          }
+        }
+      }
+    },
     "/users/me": {
       "get": {
         "tags": [
@@ -2459,9 +2841,11 @@
         "responses": {
           "200": {
             "description": "successful operation",
-            "type": "array",
-            "items": {
-              "$ref": "#/definitions/Device"
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Device"
+              }
             }
           }
         }
@@ -2637,9 +3021,11 @@
         "responses": {
           "200": {
             "description": "successful operation",
-            "type": "array",
-            "items": {
-              "$ref": "#/definitions/Device"
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Device"
+              }
             }
           }
         }
@@ -3144,6 +3530,12 @@
             "$ref": "#/definitions/User"
           }
         },
+        "[registered_users]": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/User"
+          }
+        },
         "[can_edit]": {
           "type": "boolean"
         },
@@ -3156,7 +3548,29 @@
         "[registration_required]": {
           "type": "boolean"
         },
+        "[registration_approvement_required]": {
+          "type": "boolean"
+        },
+        "[registration_limit_count]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[registration_locally]": {
+          "type": "boolean"
+        },
         "[registration_till]": {
+          "type": "string"
+        },
+        "[registration_approved]": {
+          "type": "string"
+        },
+        "[registration_available]": {
+          "type": "boolean"
+        },
+        "[registered_count]": {
+          "type": "string"
+        },
+        "[registered]": {
           "type": "string"
         },
         "[is_free]": {

@@ -21,7 +21,7 @@ class EventDate extends AbstractEntity{
 	);
 
 	protected static $ADDITIONAL_COLS = array(
-		'id::INT',
+		'id',
 		'start_time',
 		'end_time',
 		'created_at',

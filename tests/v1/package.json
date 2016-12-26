@@ -11,6 +11,9 @@
   "dependencies": {
     "frisby": "^0.8.5",
     "jasmine": "^2.4.1",
-    "jasmine-node": "^1.14.5"
+    "jasmine-node": "^1.14.5",
+    "lodash": "^4.16.6",
+    "restler": "^3.4.0",
+    "winston": "^2.3.0"
   }
 }
