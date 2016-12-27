@@ -17,6 +17,13 @@ class UsersCollection extends AbstractCollection
 
 		$q_get_users = App::queryFactory()->newSelect();
 
+		$default_cols = Friend::getDefaultCols();
+		foreach ($default_cols as &$col) {
+			$col = 'view_users.' . $col;
+		}
+		$_fields = Fields::mergeFields(Friend::getAdditionalCols(), $fields, $default_cols);
+		$class_name = 'Friend';
+
 
 		$q_get_users
 			->distinct()
@@ -151,6 +158,13 @@ class UsersCollection extends AbstractCollection
 				}
 				case 'registered_users': {
 					$getting_registered_users = true;
+					$class_name = 'RegisteredUser';
+					$default_cols = RegisteredUser::getDefaultCols();
+					foreach ($default_cols as &$col) {
+						$col = 'view_users.' . $col;
+					}
+					$_fields = Fields::mergeFields(RegisteredUser::getAdditionalCols(), $fields, $default_cols);
+
 					if ($value instanceof Event == false) throw new InvalidArgumentException('BAD_EVENT');
 					if ($user->isAdmin($value->getOrganization()) == false) throw new PrivilegesException('', $db);
 					$fields['event_id'] = 'event_id';
@@ -185,22 +199,6 @@ class UsersCollection extends AbstractCollection
 					break;
 				}
 			}
-		}
-
-		if (isset($getting_registered_users) && $getting_registered_users === true) {
-			$class_name = 'RegisteredUser';
-			$default_cols = RegisteredUser::getDefaultCols();
-			foreach ($default_cols as &$col) {
-				$col = 'view_users.' . $col;
-			}
-			$_fields = Fields::mergeFields(RegisteredUser::getAdditionalCols(), $fields, $default_cols);
-		} else {
-			$default_cols = Friend::getDefaultCols();
-			foreach ($default_cols as &$col) {
-				$col = 'view_users.' . $col;
-			}
-			$_fields = Fields::mergeFields(Friend::getAdditionalCols(), $fields, $default_cols);
-			$class_name = 'Friend';
 		}
 
 
