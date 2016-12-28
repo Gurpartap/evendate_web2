@@ -87,7 +87,7 @@ class RegistrationForm
 				'status' => 'true',
 				'organization_approved' => $approvement_required ? 'false' : 'true'
 			))
-			->returning(array('id'));
+			->returning(array('id', 'uuid'));
 
 		$p_ins_reg = $db->prepare($q_ins_reg->getStatement());
 		$result = $p_ins_reg->execute($q_ins_reg->getBindValues());
@@ -95,6 +95,7 @@ class RegistrationForm
 
 		$result = $p_ins_reg->fetch(PDO::FETCH_ASSOC);
 		$user_reg_id = $result['id'];
+		$user_reg_uuid = $result['uuid'];
 
 		/* Form inserted, insert fields */
 		$q_ins_fields = 'INSERT INTO registration_info(user_registration_id, registration_form_field_id, value, created_at) 
@@ -116,7 +117,9 @@ class RegistrationForm
 		}
 
 		$text = $approvement_required ? 'Данные успешно отправлены. Ожидайте подтверждения регистрации от организатора.' : 'Вы успешно зарегистированы на событие.';
-		return new Result(true, $text);
+		return new Result(true, $text, array(
+			'uuid' => $user_reg_uuid
+		));
 	}
 
 	public static function unregisterUser(User $user, Event $event)
@@ -141,10 +144,11 @@ class RegistrationForm
 	private static function updateBooleanColumn($type, User $user, Event $event, $uuid, $bool_val){
 		if ($user->isEventAdmin($event) == false) throw new PrivilegesException(null, App::DB());
 		$db = App::DB();
+		$value = filter_var($bool_val, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
 		$q_upd_col = App::queryFactory()->newUpdate()
 			->table('users_registrations')
 			->cols(array(
-				$type => filter_var($bool_val, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false'
+				$type => $value
 			))
 		->where('uuid = ?', $uuid)
 		->where('status = true')
@@ -153,6 +157,31 @@ class RegistrationForm
 		$result = $p_upd_col->execute($q_upd_col->getBindValues());
 		if ($result === FALSE) throw new DBQueryException('CANT_UPDATE_INFO', $db);
 		if ($p_upd_col->rowCount() != 1) throw new InvalidArgumentException('BAD_REGISTRATION_UUID', $db);
+
+
+		$q_get_user_id = App::queryFactory()
+			->newSelect()
+			->cols(array(
+				'user_id'
+			))
+			->from('users_registrations')
+			->where('event_id = ?', $event->getId())
+			->where('status = true')
+			->where('uuid = ?', $uuid);
+		$p_get_user_id = $db->prepare($q_get_user_id->getStatement());
+		$result = $p_get_user_id->execute($q_get_user_id->getBindValues());
+
+		$user_id = $p_get_user_id->fetchColumn(0);
+
+		$event->addNotification(UsersCollection::one($db, $user, $user_id, array()),
+			array(
+				'notification_type' => $value == 'true' ? Notification::NOTIFICATION_TYPE_REGISTRATION_APPROVED : Notification::NOTIFICATION_TYPE_REGISTRATION_NOT_APPROVED,
+				'notification_time' => (new DateTime())->add(new DateInterval('PT5M'))->format('Y-m-d H:i:s')
+			));
+
+		if ($result === FALSE) throw new DBQueryException('CANT_ADD_NOTIFICATION_FOR_USER', $db);
+		if ($p_upd_col->rowCount() != 1) throw new InvalidArgumentException('BAD_REGISTRATION_UUID', $db);
+
 		return new Result(true, 'Данные успешно обновлены');
 	}
 

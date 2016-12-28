@@ -17,6 +17,14 @@ frisby
     .create('Create event for update')
     .post(env.api_url + 'events', update_event, {json: true})
     .expectStatus(200)
+    .after(function (err, res, body) {
+        if (res.statusCode != 200){
+            console.log(body);
+        }
+        if (err){
+            env.logger.error(err);
+        }
+    })
     .expectJSONTypes({
         request_id: String,
         data: {
@@ -65,6 +73,14 @@ frisby
             .create('Get one event')
             .get(env.api_url + 'events/' + event_id + '?fields=' + field_names.join(','))
             .expectStatus(200)
+            .after(function (err, res, body) {
+                if (res.statusCode != 200){
+                    console.log(body);
+                }
+                if (err){
+                    env.logger.error(err);
+                }
+            })
             .expectJSONTypes({
                 request_id: String,
                 data: function(data){
@@ -75,9 +91,6 @@ frisby
                 },
                 status: Boolean,
                 text: String
-            })
-            .afterJSON(function (result) {
-                console.log('Get', result);
             })
             .toss();
     })

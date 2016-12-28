@@ -83,6 +83,8 @@ class Organization extends AbstractEntity
 		'background_small_img_url',
 		'facebook_url',
 		'vk_url',
+		'private',
+		'brand_color',
 		self::RANDOM_FIELD_NAME => '(SELECT created_at / (random() * 9 + 1)
 			FROM view_organizations AS vo
 			WHERE vo.id = view_organizations.id) AS random',
@@ -322,7 +324,7 @@ class Organization extends AbstractEntity
 		return $this->img_small_url;
 	}
 
-	public function getParams(AbstractUser $user = null, array $fields = null) : Result
+	public function getParams(AbstractUser $user = null, array $fields = null): Result
 	{
 		$result_data = parent::getParams($user, $fields)->getData();
 
@@ -474,6 +476,18 @@ class Organization extends AbstractEntity
 			$data['email'] = null;
 		}
 
+		$data['private'] = isset($data['private']) && filter_var($data['filter'], FILTER_VALIDATE_BOOLEAN) == true ? 'true' : 'false';
+
+		if (isset($data['brand_color'])) {
+			if (preg_match('/^#[a-f0-9]{6}$/i', $data['brand_color'])) //hex color is valid
+			{
+				//color is valid
+			} else {
+				$data['brand_color'] = null;
+			}
+		} else {
+			$data['brand_color'] = null;
+		}
 
 		if (!isset($data['description'])) throw new InvalidArgumentException('Описание название организации обязательно.');
 		if (mb_strlen($data['description']) <= 50) throw new InvalidArgumentException('Слишком короткое описание. Должно быть не менее 50 символов.');
@@ -551,6 +565,8 @@ class Organization extends AbstractEntity
 				'facebook_url' => $data['facebook_url'],
 				'background_img_url' => $data['background_img_url'],
 				'img_url' => $data['img_url'],
+				'private' => $data['private'],
+				'brand_color' => $data['brand_color'],
 				'email' => $data['email']
 			)
 		);
@@ -676,6 +692,8 @@ class Organization extends AbstractEntity
 				'creator_id' => $user->getId(),
 				'images_domain' => 'https://dn' . rand(1, 4) . '.evendate.ru/',
 				'email' => $data['email'],
+				'private' => $data['private'],
+				'brand_color' => $data['brand_color'],
 				'state_id' => self::ORGANIZATION_STATE_SHOWN
 			)
 		);

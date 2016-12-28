@@ -117,6 +117,8 @@ class OrganizationsCollection
 						WHERE organization_id = "view_organizations"."id"
 							AND "subscriptions"."status" = TRUE
 							AND user_id = :user_id) IS NOT NULL');
+
+					$statement_array[':user_id'] = $user->getId();
 					break;
 				}
 				case 'friend': {
@@ -140,9 +142,6 @@ class OrganizationsCollection
 					$cols[] = Organization::getAdditionalCols()[Organization::RATING_OVERALL];
 
 
-					$statement_array[':user_id'] = $user->getId();
-
-
 					$q_get_organizations->where('(SELECT
 						id
 						FROM subscriptions
@@ -150,12 +149,13 @@ class OrganizationsCollection
 							AND "subscriptions"."status" = TRUE
 							AND user_id = :user_id) IS NULL');
 
-					$q_get_organizations->where('(SELECT
-						id
-						FROM favorite_events
-						WHERE event_id = "view_events"."id"
-							AND "favorite_events"."status" = TRUE
-							AND user_id = :user_id) IS NULL');
+					//Wrong query part, may be should be something else
+//					$q_get_organizations->where('(SELECT
+//						id
+//						FROM favorite_events
+//						WHERE event_id = "view_events"."id"
+//							AND "favorite_events"."status" = TRUE
+//							AND user_id = :user_id) IS NULL');
 
 					$statement_array[':user_id'] = $user->getId();
 					$order_by = array('rating DESC');
