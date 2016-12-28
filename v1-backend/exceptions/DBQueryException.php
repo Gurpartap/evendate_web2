@@ -15,8 +15,6 @@ class DBQueryException extends AbstractException{
 			$this->user_message = $user_message;
 		}
 		$description = "FILE:\n {$this->getFile()}\n LINE: \n {$this->getLine()}\n Description: \n {$this->message}.\n Trace: \n {$this->getTraceAsString()}";
-		$prep = $db->prepare('INSERT INTO errors(type, id, description, status) VALUES(:type, :id, :description, :status)');
-		$prep->execute(array(':type' => get_class(), ':id' => '0', ':description' => $description, ':status' => 1));
 		parent::__construct($message, $db, $file, $file_line);
 	}
 }

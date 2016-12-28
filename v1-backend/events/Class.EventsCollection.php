@@ -213,6 +213,24 @@ class EventsCollection extends AbstractCollection
 					}
 					break;
 				}
+				case 'registration_locally':
+				case 'registered': {
+					if (filter_var($value, FILTER_VALIDATE_BOOLEAN) == true) {
+						$from_view = self::VIEW_ALL_EVENTS_WITH_ALIAS;
+						$operand = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'IN' : 'NOT IN';
+						$q_get_events->where('id ' . $operand . ' (SELECT event_id FROM users_registrations WHERE user_id = :user_id AND status=true)');
+
+					}
+					break;
+				}
+				case 'registration_required': {
+					if (filter_var($value, FILTER_VALIDATE_BOOLEAN) == true) {
+						$from_view = self::VIEW_ALL_EVENTS_WITH_ALIAS;
+						$q_get_events->where($name . ' = :' . $name);
+						$statement_array[':' . $name] = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+					}
+					break;
+				}
 				case 'is_canceled':
 				case 'is_delayed': {
 					if ($is_editor && filter_var($value, FILTER_VALIDATE_BOOLEAN) == true) {
@@ -426,7 +444,12 @@ class EventsCollection extends AbstractCollection
 			}
 		}
 
-		if (array_key_exists(Event::FAVORED_FRIENDS_COUNT_FIELD_NAME, $fields)) {
+		if (array_key_exists(Event::FAVORED_FRIENDS_COUNT_FIELD_NAME, $fields) ||
+			 array_key_exists(Event::REGISTERED_FIELD_NAME, $fields) ||
+			 array_key_exists(Event::REGISTRATION_UUID_FIELD_NAME, $fields) ||
+			 array_key_exists(Event::REGISTRATION_APPROVED_FIELD_NAME, $fields) ||
+			 array_key_exists(Event::REGISTRATION_QR_FIELD_NAME, $fields)
+		) {
 			$statement_array[':user_id'] = $user->getId();
 		}
 
@@ -457,7 +480,7 @@ class EventsCollection extends AbstractCollection
 	public static function one(PDO $db,
 														 AbstractUser $user = null,
 														 int $id,
-														 array $fields = null) : Event
+														 array $fields = null): Event
 	{
 		$event = self::filter($db, $user, array('id' => $id), $fields);
 		return $event;

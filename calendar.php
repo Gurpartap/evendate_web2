@@ -77,39 +77,40 @@ $url_parts = explode('/', $url);
 	} ?>
 
 	<?php
-	if (count($url_parts) > 2) {
-		switch ($url_parts[1]) {
-			case 'organization': {
-				$item = OrganizationsCollection::one($__db, $user, $url_parts[2], array('description', 'subscribed_count'));
-				$data = array(
-					'title' => htmlspecialchars('Evendate - ' . $item->getName()),
-					'description' => htmlspecialchars($item->getName() . ' в Evendate это больше ' . $item->getSubscribedCount() . ' подписчиков и самые интересные события! ' . $item->getDescription()),
-					'image' => htmlspecialchars($item->getBackgroundImgUrl())
-				);
-				break;
+	try {
+		if (count($url_parts) > 2) {
+			switch ($url_parts[1]) {
+				case 'organization': {
+					$item = OrganizationsCollection::one($__db, $user, $url_parts[2], array('description', 'subscribed_count'));
+					$data = array(
+						'title' => htmlspecialchars('Evendate - ' . $item->getName()),
+						'description' => htmlspecialchars($item->getName() . ' в Evendate это больше ' . $item->getSubscribedCount() . ' подписчиков и самые интересные события! ' . $item->getDescription()),
+						'image' => htmlspecialchars($item->getBackgroundImgUrl())
+					);
+					break;
+				}
+				case 'event': {
+					$item = EventsCollection::one($__db, $user, $url_parts[2], array('description', 'organization_short_name'));
+					$params = $item->getParams($user, array('title', 'description', 'organization_short_name'))->getData();
+					$data = array(
+						'title' => htmlspecialchars($params['title'] . ' в ' . $params['organization_short_name'] . ' на Evendate'),
+						'description' => htmlspecialchars($params['description']),
+						'image' => htmlspecialchars($params['image_horizontal_url'])
+					);
+					break;
+				}
+				case 'organizations': {
+					$data = array(
+						'title' => htmlspecialchars('Каталог организаторов Evendate'),
+						'description' => htmlspecialchars('Сотни организаций публикуют свои события на Evendate. Не пропускайте ничего важного и интересного вокруг.'),
+						'image' => htmlspecialchars('https://evendate.ru/app/img/brand_2560x1600.jpg')
+					);
+					break;
+				}
 			}
-			case 'event': {
-				$item = EventsCollection::one($__db, $user, $url_parts[2], array('description', 'organization_short_name'));
-				$params = $item->getParams($user, array('title', 'description', 'organization_short_name'))->getData();
-				$data = array(
-					'title' => htmlspecialchars($params['title'] . ' в ' . $params['organization_short_name'] . ' на Evendate'),
-					'description' => htmlspecialchars($params['description']),
-					'image' => htmlspecialchars($params['image_horizontal_url'])
-				);
-				break;
-			}
-			case 'organizations': {
-				$data = array(
-					'title' => htmlspecialchars('Каталог организаторов Evendate'),
-					'description' => htmlspecialchars('Сотни организаций публикуют свои события на Evendate. Не пропускайте ничего важного и интересного вокруг.'),
-					'image' => htmlspecialchars('https://evendate.ru/app/img/brand_2560x1600.jpg')
-				);
-				break;
-			}
-		}
-		if (isset($data)) {
-			$current_url = App::getVar('schema') . "$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-			echo "
+			if (isset($data)) {
+				$current_url = App::getVar('schema') . "$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+				echo "
 			<meta name=\"twitter:card\" content=\"summary\" />
 			<meta name=\"twitter:description\" content=\"{$data['description']}\">
     	<meta name=\"twitter:app:country\" content=\"RU\">
@@ -123,8 +124,12 @@ $url_parts = explode('/', $url);
     	<meta property=\"og:title\" content=\"{$data['title']}\">
     	<meta property=\"og:description\" content=\"{$data['description']}\">
     	<meta property=\"og:image\" content=\"{$data['image']}\"/>";
+			}
 		}
+	} catch (Exception $e) {
+		header('Location: /');
 	}
+
 	?>
 
 	<link rel="apple-touch-icon" sizes="57x57" href="/app/img/favicon/apple-icon-57x57.png">
