@@ -263,8 +263,8 @@ $url_parts = explode('/', $url);
 
 <?php
 if ($DEBUG_MODE) { ?>
-    <script type="text/javascript" src="/dist/vendor.js?rev=d80fc4d30c12613284d259a95b2e97a7" charset="utf-8"></script>
-    <script type="text/javascript" src="/dist/app.js?rev=610b7c44a05eb6adf55ba25824fd956c"
+    <script type="text/javascript" src="/dist/vendor.js?rev=9edd7064f93f57195e6666bc01586168" charset="utf-8"></script>
+    <script type="text/javascript" src="/dist/app.js?rev=c9371b9834b769966cc0ac969b3df7cd"
             charset="utf-8"></script><?php
 } else { ?>
     <script type="text/javascript" src="/dist/vendor.min.js?rev=f1e55230b70bedc1d50f01f4eef3c82d"
