@@ -618,6 +618,15 @@ __APP = {
 		},
 		/**
 		 *
+		 * @param {jQuery} [$wrapper]
+		 * @param {string} [direction]
+		 * @return {jQuery}
+		 */
+		loaderBlock: function buildLoaderBlock($wrapper, direction) {
+			return tmpl('loader-block', {loader: tmpl('loader')}, $wrapper, direction);
+		},
+		/**
+		 *
 		 * @param {Object<OneAbstractUser.ACCOUNTS, string>} [accounts_links]
 		 * @returns {jQuery}
 		 */

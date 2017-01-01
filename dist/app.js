@@ -10042,11 +10042,6 @@ UserPage = extending(Page, (function() {
 			order_by: 'nearest_event_date,-first_event_date',
 			length: 10
 		};
-		this.actions_fetch_data = {
-			fields: ['organization', 'event', 'type_code', 'created_at'],
-			order_by: '-created_at',
-			length: 20
-		};
 	}
 	
 	UserPage.bindEvents = function($parent) {
@@ -10067,8 +10062,7 @@ UserPage = extending(Page, (function() {
 				subscriptions: {
 					fields: ['img_small_url'],
 					length: 4
-				},
-				actions: this.actions_fetch_data
+				}
 			}));
 		}
 		return Page.prototype.fetchData.call(this);
@@ -10076,7 +10070,9 @@ UserPage = extending(Page, (function() {
 	
 	UserPage.prototype.uploadEvents = function() {
 		var self = this,
-			$wrapper = self.$wrapper.find('.TabsBody').filter('[data-tab_body_type="events"]');
+			$wrapper = self.$wrapper.find('.TabsBody').filter('[data-tab_body_type="events"]'),
+			$loader = __APP.BUILD.loaderBlock($wrapper);
+		$wrapper.parent().height($wrapper.height());
 		if(!self.events_data.disable_upload){
 			self.user.fetchFavored(this.favored_fetch_data, function(favored) {
 				var $events;
@@ -10084,21 +10080,23 @@ UserPage = extending(Page, (function() {
 					$events = __APP.BUILD.eventBlocks(favored, self.events_data);
 					$wrapper.append($events);
 					UserPage.bindEvents($events);
-					
-					$wrapper.parent().height($wrapper.height());
 					self.block_scroll = false;
 				} else {
 					self.events_data.disable_upload = true;
 				}
+				$loader.remove();
+				$wrapper.parent().height($wrapper.height());
 			});
 		}
 	};
 	
 	UserPage.prototype.uploadActivities = function() {
 		var self = this,
-			$wrapper = self.$wrapper.find('.TabsBody').filter('[data-tab_body_type="activities"]');
+			$wrapper = self.$wrapper.find('.TabsBody').filter('[data-tab_body_type="activities"]'),
+			$loader = __APP.BUILD.loaderBlock($wrapper);
+		$wrapper.parent().height($wrapper.height());
 		if(!self.actions_disable_upload){
-			self.user.actions.fetch(self.actions_fetch_data.fields, self.actions_fetch_data.length, self.actions_fetch_data.order_by, function(activities) {
+			self.user.actions.fetch(['organization', 'event', 'type_code', 'created_at'], 20, '-created_at', function(activities) {
 				var $activities;
 				if(activities.length){
 					activities.forEach(function(activity) {
@@ -10107,11 +10105,12 @@ UserPage = extending(Page, (function() {
 					$activities = __APP.BUILD.activity(activities);
 					$wrapper.append($activities);
 					UserPage.bindEvents($activities);
-					$wrapper.parent().height($wrapper.height());
 					self.block_scroll = false;
 				} else {
 					self.actions_disable_upload = true;
 				}
+				$loader.remove();
+				$wrapper.parent().height($wrapper.height());
 			});
 		}
 	};
@@ -10186,9 +10185,9 @@ UserPage = extending(Page, (function() {
 				title: 'Показать все'
 			}),
 			friends_hidden: '-hidden',
-			activity_blocks: __APP.BUILD.activity(this.user.actions),
 			favored_event_blocks: __APP.BUILD.eventBlocks(this.user.favored, this.events_data)
 		}));
+		this.uploadActivities();
 		this.init();
 	};
 	
@@ -10213,24 +10212,8 @@ MyProfilePage = extending(UserPage, (function() {
 	}
 	
 	MyProfilePage.prototype.fetchData = function() {
-		var actions_promise,
-			favored_promise;
-		if(!this.user.actions.length){
-			actions_promise = this.user.actions.fetch(this.actions_fetch_data.fields, this.actions_fetch_data.length, this.actions_fetch_data.order_by);
-		}
 		if(!this.user.favored.length){
-			favored_promise = this.user.fetchFavored(this.favored_fetch_data);
-		}
-		
-		if(actions_promise && favored_promise){
-			return this.fetching_data_defer = __APP.SERVER.multipleAjax(actions_promise, favored_promise);
-		} else {
-			if(actions_promise) {
-				return this.fetching_data_defer = actions_promise;
-			}
-			if(favored_promise) {
-				return this.fetching_data_defer = favored_promise;
-			}
+			return this.fetching_data_defer = this.user.fetchFavored(this.favored_fetch_data);
 		}
 		return Page.prototype.fetchData.call(this);
 	};
@@ -10268,9 +10251,9 @@ MyProfilePage = extending(UserPage, (function() {
 				},
 				title: 'Показать все'
 			}),
-			activity_blocks: __APP.BUILD.activity(this.user.actions),
 			favored_event_blocks: __APP.BUILD.eventBlocks(this.user.favored, this.events_data)
 		}));
+		this.uploadActivities();
 		this.init();
 	};
 	
@@ -10893,6 +10876,15 @@ __APP = {
 			} else {
 				return tmpl('tag', normalizeTag(tags));
 			}
+		},
+		/**
+		 *
+		 * @param {jQuery} [$wrapper]
+		 * @param {string} [direction]
+		 * @return {jQuery}
+		 */
+		loaderBlock: function buildLoaderBlock($wrapper, direction) {
+			return tmpl('loader-block', {loader: tmpl('loader')}, $wrapper, direction);
 		},
 		/**
 		 *

@@ -2136,7 +2136,10 @@ a.button:hover {text-decoration: none}
 /* /Tabs */
 /* Loader */
 
-.loader {
+.loader_block {}
+
+.loader,
+.loader_block {
 	width: 100px;
 	height: 100px;
 	margin: auto;

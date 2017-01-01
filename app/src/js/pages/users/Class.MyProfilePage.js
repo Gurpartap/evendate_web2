@@ -17,24 +17,8 @@ MyProfilePage = extending(UserPage, (function() {
 	}
 	
 	MyProfilePage.prototype.fetchData = function() {
-		var actions_promise,
-			favored_promise;
-		if(!this.user.actions.length){
-			actions_promise = this.user.actions.fetch(this.actions_fetch_data.fields, this.actions_fetch_data.length, this.actions_fetch_data.order_by);
-		}
 		if(!this.user.favored.length){
-			favored_promise = this.user.fetchFavored(this.favored_fetch_data);
-		}
-		
-		if(actions_promise && favored_promise){
-			return this.fetching_data_defer = __APP.SERVER.multipleAjax(actions_promise, favored_promise);
-		} else {
-			if(actions_promise) {
-				return this.fetching_data_defer = actions_promise;
-			}
-			if(favored_promise) {
-				return this.fetching_data_defer = favored_promise;
-			}
+			return this.fetching_data_defer = this.user.fetchFavored(this.favored_fetch_data);
 		}
 		return Page.prototype.fetchData.call(this);
 	};
@@ -72,9 +56,9 @@ MyProfilePage = extending(UserPage, (function() {
 				},
 				title: 'Показать все'
 			}),
-			activity_blocks: __APP.BUILD.activity(this.user.actions),
 			favored_event_blocks: __APP.BUILD.eventBlocks(this.user.favored, this.events_data)
 		}));
+		this.uploadActivities();
 		this.init();
 	};
 	
