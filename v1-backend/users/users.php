@@ -82,9 +82,10 @@ $__modules['users'] = array(
 				array(
 					'favorites' => $friend
 				),
-				$__fields,
-				$__pagination,
-				$__order_by)->getData();
+				$__fields ?? array(),
+				$__pagination ?? array(),
+				$__order_by ?? array()
+			);
 		},
 		'{/(id:[0-9]+)/subscriptions}' => function ($id) use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
 			$friend = UsersCollection::one(
@@ -101,9 +102,10 @@ $__modules['users'] = array(
 				array(
 					'friend' => $friend
 				),
-				$__fields,
-				$__pagination,
-				$__order_by);
+				$__fields ?? array(),
+				$__pagination ?? array(),
+				$__order_by ?? array()
+			);
 		},
 		'{/(id:[0-9]+)}' => function ($id) use ($__user, $__fields, $__db) {
 			$friend = UsersCollection::one(
@@ -151,9 +153,10 @@ $__modules['users'] = array(
 				array(
 					'favorites' => $__user
 				),
-				$__fields,
-				$__pagination,
-				$__order_by)->getData();
+				$__fields ?? array(),
+				$__pagination ?? array(),
+				$__order_by ?? array()
+			);
 		},
 		'{me/subscriptions}' => function () use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
 			return OrganizationsCollection::filter(
@@ -162,9 +165,10 @@ $__modules['users'] = array(
 				array(
 					'friend' => $__user
 				),
-				$__fields,
-				$__pagination,
-				$__order_by);
+				$__fields ?? array(),
+				$__pagination ?? array(),
+				$__order_by ?? array()
+			);
 		},
 		'{me}' => function () use ($__user, $__fields) {
 			return $__user->getMainInfo($__fields);
