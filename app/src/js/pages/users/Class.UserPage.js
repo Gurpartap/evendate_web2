@@ -167,7 +167,7 @@ UserPage = extending(Page, (function() {
 				},
 				title: 'Показать все'
 			}),
-			friends_hidden: '-hidden',
+			friends_hidden: __C.CLASSES.NEW_HIDDEN,
 			favored_event_blocks: __APP.BUILD.eventBlocks(this.user.favored, this.events_metadata)
 		}));
 		this.uploadEntities('activities');

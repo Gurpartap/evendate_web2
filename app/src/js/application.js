@@ -645,7 +645,8 @@ __APP = {
 				if(accounts_links.hasOwnProperty(account)){
 					props.html_tag = 'a';
 					props.attributes = {
-						href: accounts_links[account]
+						href: accounts_links[account],
+						target: '_blank'
 					};
 				} else {
 					props.html_tag = 'span';
