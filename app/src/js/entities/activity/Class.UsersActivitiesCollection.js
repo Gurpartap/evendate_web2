@@ -80,11 +80,9 @@ UsersActivitiesCollection = extending(EntitiesCollection, (function() {
 		if (order_by) {
 			ajax_data.order_by = order_by;
 		}
-		return this.constructor.fetch(this.user_id, ajax_data, function(data) {
+		return this.constructor.fetch(this.user_id, ajax_data).then(function(data) {
 			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, (new self.constructor()).setData(data));
-			}
+			return (new self.constructor()).setData(data);
 		});
 	};
 	

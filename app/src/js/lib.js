@@ -1559,6 +1559,15 @@ function isNotDesktop() {
 }
 
 /**
+ * Returning true if scroll passes ending threshold + left argument
+ * @param {int} left
+ * @return {boolean}
+ */
+function isScrollLeft(left) {
+	return ($(window).height() + $(window).scrollTop() + +(left)) >= $(document).height();
+}
+
+/**
  * Setting default value for variable if its is undefined
  * @param {*} variable
  * @param {*} default_value

@@ -1559,6 +1559,15 @@ function isNotDesktop() {
 }
 
 /**
+ * Returning true if scroll passes ending threshold + left argument
+ * @param {int} left
+ * @return {boolean}
+ */
+function isScrollLeft(left) {
+	return ($(window).height() + $(window).scrollTop() + +(left)) >= $(document).height();
+}
+
+/**
  * Setting default value for variable if its is undefined
  * @param {*} variable
  * @param {*} default_value
@@ -2201,11 +2210,9 @@ UsersActivitiesCollection = extending(EntitiesCollection, (function() {
 		if (order_by) {
 			ajax_data.order_by = order_by;
 		}
-		return this.constructor.fetch(this.user_id, ajax_data, function(data) {
+		return this.constructor.fetch(this.user_id, ajax_data).then(function(data) {
 			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, (new self.constructor()).setData(data));
-			}
+			return (new self.constructor()).setData(data);
 		});
 	};
 	
@@ -3147,6 +3154,112 @@ TimelineEventsCollection.fetchEvents = function(data, success) {
  * @requires ../Class.OneEntity.js
  */
 /**
+ * @typedef {function({
+ *   [events]: Array<OneEvent>,
+ *   [organizations]: Array<OneOrganization>
+ * })} SearchResultsAJAXCallback
+ */
+/**
+ *
+ * @constructor
+ * @augments OneEntity
+ * @param {string} query_string
+ */
+function SearchResults(query_string) {
+	this.query_string = query_string;
+	this.events = new EventsCollection();
+	this.organizations = new OrganizationsCollection();
+}
+SearchResults.extend(OneEntity);
+/**
+ *
+ * @param {string} query_string
+ * @returns {{ [q]: {string}, [tags]: {string} }}
+ */
+SearchResults.sanitizeQueryVar = function(query_string) {
+	var data = {};
+	if (query_string.indexOf('#') === 0) {
+		data.tags = query_string.replace('#', '');
+	} else {
+		data.q = query_string;
+	}
+	return data;
+};
+/**
+ *
+ * @param {string} query_string
+ * @param {AJAXData} [ajax_data]
+ * @param {SearchResultsAJAXCallback} [success]
+ * @returns {jqPromise}
+ */
+SearchResults.fetchEventsAndOrganizations = function(query_string, ajax_data, success) {
+	return __APP.SERVER.getData('/api/v1/search/', $.extend({}, SearchResults.sanitizeQueryVar(query_string), ajax_data), success);
+};
+/**
+ *
+ * @param {AJAXData} [events_ajax_data]
+ * @param {function(organizations: Array<OneEvent>)} [success]
+ * @returns {jqPromise}
+ */
+SearchResults.prototype.fetchEvents = function(events_ajax_data, success) {
+	var self = this,
+		ajax_data = {
+			fields: 'events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length}))
+		};
+	
+	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
+		self.setData(data);
+		if (success && typeof success == 'function') {
+			success.call(self, data.events);
+		}
+	});
+};
+/**
+ *
+ * @param {AJAXData} [organizations_ajax_data]
+ * @param {function(organizations: Array<OneOrganization>)} [success]
+ * @returns {jqPromise}
+ */
+SearchResults.prototype.fetchOrganizations = function(organizations_ajax_data, success) {
+	var self = this,
+		ajax_data = {
+			fields: 'organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length}))
+		};
+	
+	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
+		self.setData(data);
+		if (success && typeof success == 'function') {
+			success.call(self, data.organizations);
+		}
+	});
+};
+/**
+ *
+ * @param {AJAXData} [events_ajax_data]
+ * @param {AJAXData} [organizations_ajax_data]
+ * @param {SearchResultsAJAXCallback} [success]
+ * @returns {jqPromise}
+ */
+SearchResults.prototype.fetchEventsAndOrganizations = function(events_ajax_data, organizations_ajax_data, success) {
+	var self = this,
+		ajax_data = {fields: []};
+	if (events_ajax_data) {
+		ajax_data.fields.push('events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length})));
+	}
+	if (organizations_ajax_data && !SearchResults.sanitizeQueryVar(self.query_string).tags) {
+		ajax_data.fields.push('organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length})));
+	}
+	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
+		self.setData(data);
+		if (success && typeof success == 'function') {
+			success.call(self, data);
+		}
+	});
+};
+/**
+ * @requires ../Class.OneEntity.js
+ */
+/**
  * @typedef {object} Privilege
  * @property {number} role_id
  * @property {OneUser.ROLE} name
@@ -3443,201 +3556,6 @@ OrganizationsCollection.prototype.fetchMyOrganizations = function(roles, fields,
 	});
 };
 /**
- * @requires ../Class.OneEntity.js
- */
-/**
- * @typedef {function({
- *   [events]: Array<OneEvent>,
- *   [organizations]: Array<OneOrganization>
- * })} SearchResultsAJAXCallback
- */
-/**
- *
- * @constructor
- * @augments OneEntity
- * @param {string} query_string
- */
-function SearchResults(query_string) {
-	this.query_string = query_string;
-	this.events = new EventsCollection();
-	this.organizations = new OrganizationsCollection();
-}
-SearchResults.extend(OneEntity);
-/**
- *
- * @param {string} query_string
- * @returns {{ [q]: {string}, [tags]: {string} }}
- */
-SearchResults.sanitizeQueryVar = function(query_string) {
-	var data = {};
-	if (query_string.indexOf('#') === 0) {
-		data.tags = query_string.replace('#', '');
-	} else {
-		data.q = query_string;
-	}
-	return data;
-};
-/**
- *
- * @param {string} query_string
- * @param {AJAXData} [ajax_data]
- * @param {SearchResultsAJAXCallback} [success]
- * @returns {jqPromise}
- */
-SearchResults.fetchEventsAndOrganizations = function(query_string, ajax_data, success) {
-	return __APP.SERVER.getData('/api/v1/search/', $.extend({}, SearchResults.sanitizeQueryVar(query_string), ajax_data), success);
-};
-/**
- *
- * @param {AJAXData} [events_ajax_data]
- * @param {function(organizations: Array<OneEvent>)} [success]
- * @returns {jqPromise}
- */
-SearchResults.prototype.fetchEvents = function(events_ajax_data, success) {
-	var self = this,
-		ajax_data = {
-			fields: 'events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length}))
-		};
-	
-	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data.events);
-		}
-	});
-};
-/**
- *
- * @param {AJAXData} [organizations_ajax_data]
- * @param {function(organizations: Array<OneOrganization>)} [success]
- * @returns {jqPromise}
- */
-SearchResults.prototype.fetchOrganizations = function(organizations_ajax_data, success) {
-	var self = this,
-		ajax_data = {
-			fields: 'organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length}))
-		};
-	
-	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data.organizations);
-		}
-	});
-};
-/**
- *
- * @param {AJAXData} [events_ajax_data]
- * @param {AJAXData} [organizations_ajax_data]
- * @param {SearchResultsAJAXCallback} [success]
- * @returns {jqPromise}
- */
-SearchResults.prototype.fetchEventsAndOrganizations = function(events_ajax_data, organizations_ajax_data, success) {
-	var self = this,
-		ajax_data = {fields: []};
-	if (events_ajax_data) {
-		ajax_data.fields.push('events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length})));
-	}
-	if (organizations_ajax_data && !SearchResults.sanitizeQueryVar(self.query_string).tags) {
-		ajax_data.fields.push('organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length})));
-	}
-	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
-/**
- * @requires ../Class.OneEntity.js
- */
-/**
- *
- * @constructor
- * @augments OneEntity
- * @param {(string|number)} [tag_id]
- * @param {boolean} [is_loading_continuous]
- */
-function OneTag(tag_id, is_loading_continuous) {
-	this.id = tag_id ? tag_id : 0;
-	this.name = '';
-	
-	if (tag_id && is_loading_continuous) {
-		this.loading = true;
-		this.fetchTag(function() {
-			this.loading = false;
-			$(window).trigger('fetch.OneTag');
-		});
-	}
-}
-OneTag.extend(OneEntity);
-/**
- *
- * @param {(string|number)} tag_id
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-OneTag.fetchTag = function(tag_id, success) {
-	return __APP.SERVER.getData('/api/v1/tags/' + tag_id, {}, success);
-};
-/**
- *
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-OneTag.prototype.fetchTag = function(success) {
-	var self = this;
-	return this.constructor.fetchTag(self.id, function(data) {
-		self.setData(data[0]);
-		if (success && typeof success == 'function') {
-			success.call(self, data[0]);
-		}
-	});
-};
-/**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneTag.js
- */
-/**
- * @typedef {AJAXData} TagsCollectionAJAXData
- * @property {string} name
- * @property {(string|number)} event_id
- * @property {string} used_since
- * @property {string} used_till
- */
-/**
- *
- * @constructor
- * @augments EntitiesCollection
- */
-function TagsCollection() {}
-TagsCollection.extend(EntitiesCollection);
-TagsCollection.prototype.collection_of = OneTag;
-/**
- *
- * @param {AJAXData} data
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-TagsCollection.fetchTags = function(data, success) {
-	return __APP.SERVER.getData('/api/v1/tags/', data, success);
-};
-/**
- *
- * @param {TagsCollectionAJAXData} data
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-TagsCollection.prototype.fetchTags = function(data, success) {
-	var self = this;
-	return this.constructor.fetchTags(data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
-/**
  * @typedef {object} StatisticsUnit
  * @property {number} time_value
  * @property {number} value
@@ -3906,6 +3824,95 @@ OrganizationsStatistics.extend(Statistics);
  */
 OrganizationsStatistics.fetchStatistics = function(id, scale, range, statistics_fields, dynamics_ajax_data, success) {
 	return Statistics.fetchStatistics(Statistics.ENTITIES.ORGANIZATION, id, scale, range, statistics_fields, dynamics_ajax_data, success);
+};
+/**
+ * @requires ../Class.OneEntity.js
+ */
+/**
+ *
+ * @constructor
+ * @augments OneEntity
+ * @param {(string|number)} [tag_id]
+ * @param {boolean} [is_loading_continuous]
+ */
+function OneTag(tag_id, is_loading_continuous) {
+	this.id = tag_id ? tag_id : 0;
+	this.name = '';
+	
+	if (tag_id && is_loading_continuous) {
+		this.loading = true;
+		this.fetchTag(function() {
+			this.loading = false;
+			$(window).trigger('fetch.OneTag');
+		});
+	}
+}
+OneTag.extend(OneEntity);
+/**
+ *
+ * @param {(string|number)} tag_id
+ * @param {AJAXCallback} [success]
+ * @returns {jqPromise}
+ */
+OneTag.fetchTag = function(tag_id, success) {
+	return __APP.SERVER.getData('/api/v1/tags/' + tag_id, {}, success);
+};
+/**
+ *
+ * @param {AJAXCallback} [success]
+ * @returns {jqPromise}
+ */
+OneTag.prototype.fetchTag = function(success) {
+	var self = this;
+	return this.constructor.fetchTag(self.id, function(data) {
+		self.setData(data[0]);
+		if (success && typeof success == 'function') {
+			success.call(self, data[0]);
+		}
+	});
+};
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.OneTag.js
+ */
+/**
+ * @typedef {AJAXData} TagsCollectionAJAXData
+ * @property {string} name
+ * @property {(string|number)} event_id
+ * @property {string} used_since
+ * @property {string} used_till
+ */
+/**
+ *
+ * @constructor
+ * @augments EntitiesCollection
+ */
+function TagsCollection() {}
+TagsCollection.extend(EntitiesCollection);
+TagsCollection.prototype.collection_of = OneTag;
+/**
+ *
+ * @param {AJAXData} data
+ * @param {AJAXCallback} [success]
+ * @returns {jqPromise}
+ */
+TagsCollection.fetchTags = function(data, success) {
+	return __APP.SERVER.getData('/api/v1/tags/', data, success);
+};
+/**
+ *
+ * @param {TagsCollectionAJAXData} data
+ * @param {AJAXCallback} [success]
+ * @returns {jqPromise}
+ */
+TagsCollection.prototype.fetchTags = function(data, success) {
+	var self = this;
+	return this.constructor.fetchTags(data, function(data) {
+		self.setData(data);
+		if (success && typeof success == 'function') {
+			success.call(self, data);
+		}
+	});
 };
 /**
  * @requires ../Class.OneEntity.js
@@ -8676,6 +8683,82 @@ EventPage.prototype.render = function() {
  * @constructor
  * @augments Page
  */
+function OnboardingPage() {
+	Page.apply(this, arguments);
+	this.ajax_data = {
+		length: 30,
+		offset: 0,
+		fields: 'img_small_url'
+	};
+	this.disable_upload = false;
+	this.block_scroll = true;
+}
+OnboardingPage.extend(Page);
+
+OnboardingPage.prototype.init = function() {
+	bindRippleEffect(this.$wrapper);
+	bindPageLinks(this.$wrapper);
+	this.$wrapper.find('.Link').on('click', function() {
+		if($(this).is('.SkipOnboarding')){
+			cookies.setItem('skip_onboarding', 1, moment().add(7, 'd')._d);
+		}
+		__APP.SIDEBAR.updateSubscriptions();
+	});
+};
+
+OnboardingPage.prototype.bindSubscriptions = function() {
+	this.$wrapper.find(".OnboardingOrgItem").not('.-Handled_OnboardingOrgItem').on('click', function() {
+		var $this = $(this);
+		if ($this.hasClass(__C.CLASSES.NEW_ACTIVE)) {
+			__APP.USER.unsubscribeFromOrganization($this.data("organization_id"));
+		} else {
+			__APP.USER.subscribeToOrganization($this.data("organization_id"));
+		}
+		$this.toggleClass(__C.CLASSES.NEW_ACTIVE);
+	}).addClass('-Handled_OnboardingOrgItem');
+};
+
+OnboardingPage.prototype.render = function() {
+	var PAGE = this,
+		$loader = tmpl('loader', {});
+	
+	if(__APP.USER.id === -1){
+		__APP.changeState('/feed/actual', true, true);
+		return null;
+	}
+	function appendRecommendations(organizations) {
+		$loader.detach();
+		if (organizations.length) {
+			PAGE.$wrapper.find(".RecommendationsWrapper").last().append(tmpl("onboarding-recommendation", organizations));
+			PAGE.bindSubscriptions();
+			PAGE.block_scroll = false;
+		} else {
+			PAGE.disable_upload = true;
+		}
+	}
+	
+	PAGE.$wrapper.html(tmpl("onboarding-main", {}));
+	PAGE.init();
+	PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
+	OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
+	PAGE.$wrapper.find(".RecommendationsScrollbar").scrollbar({
+		onScroll: function(y, x) {
+			if (y.scroll == y.maxScroll && !PAGE.disable_upload && !PAGE.block_scroll) {
+				PAGE.block_scroll = true;
+				PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
+				OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
+			}
+		}
+	});
+};
+/**
+ * @requires ../Class.Page.js
+ */
+/**
+ *
+ * @constructor
+ * @augments Page
+ */
 function FriendsPage() {
 	Page.apply(this);
 	
@@ -8880,82 +8963,6 @@ OneFriendPage.prototype.render = function() {
 				});
 			}
 			getFriendFeed();
-		}
-	});
-};
-/**
- * @requires ../Class.Page.js
- */
-/**
- *
- * @constructor
- * @augments Page
- */
-function OnboardingPage() {
-	Page.apply(this, arguments);
-	this.ajax_data = {
-		length: 30,
-		offset: 0,
-		fields: 'img_small_url'
-	};
-	this.disable_upload = false;
-	this.block_scroll = true;
-}
-OnboardingPage.extend(Page);
-
-OnboardingPage.prototype.init = function() {
-	bindRippleEffect(this.$wrapper);
-	bindPageLinks(this.$wrapper);
-	this.$wrapper.find('.Link').on('click', function() {
-		if($(this).is('.SkipOnboarding')){
-			cookies.setItem('skip_onboarding', 1, moment().add(7, 'd')._d);
-		}
-		__APP.SIDEBAR.updateSubscriptions();
-	});
-};
-
-OnboardingPage.prototype.bindSubscriptions = function() {
-	this.$wrapper.find(".OnboardingOrgItem").not('.-Handled_OnboardingOrgItem').on('click', function() {
-		var $this = $(this);
-		if ($this.hasClass(__C.CLASSES.NEW_ACTIVE)) {
-			__APP.USER.unsubscribeFromOrganization($this.data("organization_id"));
-		} else {
-			__APP.USER.subscribeToOrganization($this.data("organization_id"));
-		}
-		$this.toggleClass(__C.CLASSES.NEW_ACTIVE);
-	}).addClass('-Handled_OnboardingOrgItem');
-};
-
-OnboardingPage.prototype.render = function() {
-	var PAGE = this,
-		$loader = tmpl('loader', {});
-	
-	if(__APP.USER.id === -1){
-		__APP.changeState('/feed/actual', true, true);
-		return null;
-	}
-	function appendRecommendations(organizations) {
-		$loader.detach();
-		if (organizations.length) {
-			PAGE.$wrapper.find(".RecommendationsWrapper").last().append(tmpl("onboarding-recommendation", organizations));
-			PAGE.bindSubscriptions();
-			PAGE.block_scroll = false;
-		} else {
-			PAGE.disable_upload = true;
-		}
-	}
-	
-	PAGE.$wrapper.html(tmpl("onboarding-main", {}));
-	PAGE.init();
-	PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
-	OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
-	PAGE.$wrapper.find(".RecommendationsScrollbar").scrollbar({
-		onScroll: function(y, x) {
-			if (y.scroll == y.maxScroll && !PAGE.disable_upload && !PAGE.block_scroll) {
-				PAGE.block_scroll = true;
-				PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
-				OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
-			}
 		}
 	});
 };
@@ -9819,6 +9826,252 @@ SearchPage.prototype.render = function() {
 	this.init();
 };
 /**
+ * @requires ../Class.Page.js
+ */
+/**
+ * @class UserPage
+ * @extends Page
+ */
+UserPage = extending(Page, (function() {
+	/**
+	 *
+	 * @param {(number|string)} user_id
+	 * @constructs UserPage
+	 */
+	function UserPage(user_id) {
+		Page.apply(this);
+		this.user_id = user_id;
+		this.user = new OneUser(user_id);
+		this.events_metadata = {last_date: ''};
+		
+		this.disable_uploads = {
+			events: false,
+			activities: false
+		};
+		this.favored_fetch_data = {
+			fields: ['image_horizontal_medium_url', 'favored', 'dates'],
+			order_by: 'nearest_event_date,-first_event_date',
+			length: 10
+		};
+	}
+	
+	UserPage.bindEvents = function($parent) {
+		bindRippleEffect($parent);
+		trimAvatarsCollection($parent);
+		__APP.MODALS.bindCallModal($parent);
+		bindPageLinks($parent);
+	};
+	
+	UserPage.prototype.fetchData = function() {
+		if(!(this.user_id == __APP.USER.id || this.user_id === 'me')){
+			return this.fetching_data_defer = this.user.fetchUser(new Fields('type', 'is_friend', 'link', 'accounts', 'accounts_links', {
+				friends: {
+					fields: ['is_friend'],
+					length: 4
+				},
+				favored: this.favored_fetch_data,
+				subscriptions: {
+					fields: ['img_small_url'],
+					length: 4
+				}
+			}));
+		}
+		return Page.prototype.fetchData.call(this);
+	};
+	
+	UserPage.prototype.uploadEntities = function(type) {
+		var self = this,
+			types = {
+				activities: {
+					fetch_method: this.user.actions.fetch,
+					fetch_context: this.user.actions,
+					fetch_arguments: [['organization', 'event', 'type_code', 'created_at'], 20, '-created_at'],
+					extra_function: function(entities) {
+						entities.forEach(function(activity) {
+							activity.user = self.user;
+						});
+					},
+					build_method: __APP.BUILD.activity,
+					build_extra_arguments: []
+				},
+				events: {
+					fetch_method: this.user.fetchFavored,
+					fetch_context: this.user,
+					fetch_arguments: [this.favored_fetch_data],
+					build_method: __APP.BUILD.eventBlocks,
+					build_extra_arguments: [this.events_metadata]
+				}
+			},
+			type_data = types[type],
+			$wrapper = self.$wrapper.find('.TabsBody').filter('[data-tab_body_type="'+type+'"]'),
+			$loader;
+		
+		if(!self.disable_uploads[type] && !self.block_scroll){
+			$loader = __APP.BUILD.loaderBlock($wrapper);
+			self.block_scroll = true;
+			$wrapper.parent().height($wrapper.height());
+			
+			type_data.fetch_method.apply(type_data.fetch_context, type_data.fetch_arguments).done(function(entities) {
+				var $entities;
+				if(entities.length){
+					if(type_data.extra_function && typeof type_data.extra_function === 'function'){
+						type_data.extra_function(entities);
+					}
+					$entities = type_data.build_method.apply(self, [entities].concat(type_data.build_extra_arguments));
+					$wrapper.append($entities);
+					UserPage.bindEvents($entities);
+				} else {
+					self.disable_uploads[type] = true;
+				}
+				self.block_scroll = false;
+				$loader.remove();
+				$wrapper.parent().height($wrapper.height());
+			});
+		}
+	};
+	
+	UserPage.prototype.init = function() {
+		var self = this,
+			$window = $(window),
+			event_names = {
+				activities: 'scroll.uploadActivities',
+				events: 'scroll.uploadEvents'
+			};
+		
+		bindTabs(this.$wrapper);
+		UserPage.bindEvents(this.$wrapper);
+		
+		this.$wrapper.find('.Tabs').on('change.tabs', function() {
+			var $this = $(this),
+				active_type = $this.find('.TabsBody').filter('.'+__C.CLASSES.NEW_ACTIVE).data('tab_body_type');
+			$window.off(Object.values(event_names).join(' '));
+			$window.on(event_names[active_type], function() {
+				if ( isScrollLeft(200) ) {
+					switch (active_type) {
+						case 'activities': {
+							self.uploadEntities('activities');
+							break;
+						}
+						case 'events': {
+							self.uploadEntities('events');
+							break;
+						}
+					}
+				}
+			});
+		});
+		
+		$window.on(event_names.activities, function() {
+			if (isScrollLeft(200)) {
+				self.uploadEntities('activities');
+			}
+		});
+	};
+	
+	UserPage.prototype.render = function() {
+		var self = this;
+		
+		if(this.user_id == __APP.USER.id){
+			__APP.changeState('/my/profile', true, true);
+			return null;
+		}
+		__APP.changeTitle(this.user.full_name);
+		
+		this.user.actions.forEach(function(action) {
+			action.user = self.user;
+		});
+		
+		this.$wrapper.append(tmpl('user-page', {
+			tombstone: __APP.BUILD.userTombstones(this.user, {avatar_classes: ['-bordered', '-shadowed']}),
+			links: __APP.BUILD.socialLinks(this.user.accounts_links),
+			subscribed_orgs: __APP.BUILD.avatarBlocks(this.user.subscriptions.slice(0,4), {
+				avatar_classes: ['-size_30x30'],
+				entity: 'organization',
+				is_link: true
+			}),
+			show_all_subscribed_orgs_button: __APP.BUILD.button({
+				classes: ['-color_neutral_accent','CallModal','RippleEffect'],
+				dataset: {
+					modal_type: ''
+				},
+				title: 'Показать все'
+			}),
+			friends_hidden: '-hidden',
+			favored_event_blocks: __APP.BUILD.eventBlocks(this.user.favored, this.events_metadata)
+		}));
+		this.uploadEntities('activities');
+		this.init();
+	};
+	
+	return UserPage;
+}()));
+/**
+ * @requires Class.UserPage.js
+ */
+/**
+ * @class MyProfilePage
+ * @extends UserPage
+ */
+MyProfilePage = extending(UserPage, (function() {
+	/**
+	 *
+	 * @constructs MyProfilePage
+	 */
+	function MyProfilePage() {
+		UserPage.call(this, __APP.USER.id);
+		this.page_title = 'Мой профиль';
+		this.user = __APP.USER;
+	}
+	
+	MyProfilePage.prototype.fetchData = function() {
+		if(!this.user.favored.length){
+			return this.fetching_data_defer = this.user.fetchFavored(this.favored_fetch_data);
+		}
+		return Page.prototype.fetchData.call(this);
+	};
+	
+	MyProfilePage.prototype.render = function() {
+		__APP.changeTitle('Мой профиль');
+		
+		this.user.actions.forEach(function(action) {
+			action.user = __APP.USER;
+		});
+		this.$wrapper.append(tmpl('user-page', {
+			tombstone: __APP.BUILD.userTombstones(this.user, {avatar_classes: ['-bordered', '-shadowed']}),
+			links: __APP.BUILD.socialLinks(this.user.accounts_links),
+			subscribed_orgs: __APP.BUILD.avatarBlocks(this.user.subscriptions.slice(0,4), {
+				avatar_classes: ['-size_30x30'],
+				entity: 'organization',
+				is_link: true
+			}),
+			show_all_subscribed_orgs_button: __APP.BUILD.button({
+				classes: ['-color_neutral_accent','CallModal','RippleEffect'],
+				dataset: {
+					modal_type: ''
+				},
+				title: 'Показать все'
+			}),
+			subscribed_users: __APP.BUILD.avatarBlocks(this.user.friends.slice(0,4), {
+				avatar_classes: ['-size_30x30', '-rounded'],
+				entity: 'user',
+				is_link: true
+			}),
+			show_all_subscribed_users_button: __APP.BUILD.button({
+				classes: ['-color_neutral_accent','CallModal','RippleEffect'],
+				dataset: {
+					modal_type: 'favors'
+				},
+				title: 'Показать все'
+			}),
+			favored_event_blocks: __APP.BUILD.eventBlocks(this.user.favored, this.events_metadata)
+		}));
+		this.uploadEntities('activities');
+		this.init();
+	};
+	
+	return MyProfilePage;
+}()));
+/**
  * @requires Class.StatisticsPage.js
  */
 /**
@@ -9936,250 +10189,6 @@ StatisticsOverviewPage.prototype.render = function() {
 StatisticsOverviewPage.prototype.destroy = function() {
 	$(window).off('scroll.uploadOrganizations');
 };
-/**
- * @requires ../Class.Page.js
- */
-/**
- * @class UserPage
- * @extends Page
- */
-UserPage = extending(Page, (function() {
-	/**
-	 *
-	 * @param {(number|string)} user_id
-	 * @constructs UserPage
-	 */
-	function UserPage(user_id) {
-		Page.apply(this);
-		this.user_id = user_id;
-		this.user = new OneUser(user_id);
-		this.events_data = {
-			last_date: '',
-			disable_upload: false
-		};
-		this.actions_disable_upload = false;
-		this.favored_fetch_data = {
-			fields: ['image_horizontal_medium_url', 'favored', 'dates'],
-			order_by: 'nearest_event_date,-first_event_date',
-			length: 10
-		};
-	}
-	
-	UserPage.bindEvents = function($parent) {
-		bindRippleEffect($parent);
-		trimAvatarsCollection($parent);
-		__APP.MODALS.bindCallModal($parent);
-		bindPageLinks($parent);
-	};
-	
-	UserPage.prototype.fetchData = function() {
-		if(!(this.user_id == __APP.USER.id || this.user_id === 'me')){
-			return this.fetching_data_defer = this.user.fetchUser(new Fields('type', 'is_friend', 'link', 'accounts', 'accounts_links', {
-				friends: {
-					fields: ['is_friend'],
-					length: 4
-				},
-				favored: this.favored_fetch_data,
-				subscriptions: {
-					fields: ['img_small_url'],
-					length: 4
-				}
-			}));
-		}
-		return Page.prototype.fetchData.call(this);
-	};
-	
-	UserPage.prototype.uploadEvents = function() {
-		var self = this,
-			$wrapper = self.$wrapper.find('.TabsBody').filter('[data-tab_body_type="events"]'),
-			$loader = __APP.BUILD.loaderBlock($wrapper);
-		$wrapper.parent().height($wrapper.height());
-		if(!self.events_data.disable_upload){
-			self.user.fetchFavored(this.favored_fetch_data, function(favored) {
-				var $events;
-				if(favored.length){
-					$events = __APP.BUILD.eventBlocks(favored, self.events_data);
-					$wrapper.append($events);
-					UserPage.bindEvents($events);
-					self.block_scroll = false;
-				} else {
-					self.events_data.disable_upload = true;
-				}
-				$loader.remove();
-				$wrapper.parent().height($wrapper.height());
-			});
-		}
-	};
-	
-	UserPage.prototype.uploadActivities = function() {
-		var self = this,
-			$wrapper = self.$wrapper.find('.TabsBody').filter('[data-tab_body_type="activities"]'),
-			$loader = __APP.BUILD.loaderBlock($wrapper);
-		$wrapper.parent().height($wrapper.height());
-		if(!self.actions_disable_upload){
-			self.user.actions.fetch(['organization', 'event', 'type_code', 'created_at'], 20, '-created_at', function(activities) {
-				var $activities;
-				if(activities.length){
-					activities.forEach(function(activity) {
-						activity.user = self.user;
-					});
-					$activities = __APP.BUILD.activity(activities);
-					$wrapper.append($activities);
-					UserPage.bindEvents($activities);
-					self.block_scroll = false;
-				} else {
-					self.actions_disable_upload = true;
-				}
-				$loader.remove();
-				$wrapper.parent().height($wrapper.height());
-			});
-		}
-	};
-	
-	UserPage.prototype.init = function() {
-		var self = this,
-			$window = $(window),
-			event_names = {
-				activities: 'scroll.uploadActivities',
-				events: 'scroll.uploadEvents'
-			};
-		
-		bindTabs(this.$wrapper);
-		UserPage.bindEvents(this.$wrapper);
-		
-		
-		this.$wrapper.find('.Tabs').on('change.tabs', function() {
-			var $this = $(this),
-				active_type = $this.find('.TabsBody').filter('.'+__C.CLASSES.NEW_ACTIVE).data('tab_body_type');
-			$window.off(Object.values(event_names).join(' '));
-			$window.on(event_names[active_type], function() {
-				if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !self.block_scroll) {
-					self.block_scroll = true;
-					switch (active_type) {
-						case 'activities': {
-							self.uploadActivities();
-							break;
-						}
-						case 'events': {
-							self.uploadEvents();
-							break;
-						}
-					}
-				}
-			});
-		});
-		
-		$window.on(event_names.activities, function() {
-			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !self.block_scroll) {
-				self.block_scroll = true;
-				self.uploadActivities();
-			}
-		});
-	};
-	
-	UserPage.prototype.render = function() {
-		var self = this;
-		
-		if(this.user_id == __APP.USER.id){
-			__APP.changeState('/my/profile', true, true);
-			return null;
-		}
-		__APP.changeTitle(this.user.full_name);
-		
-		this.user.actions.forEach(function(action) {
-			action.user = self.user;
-		});
-		
-		this.$wrapper.append(tmpl('user-page', {
-			tombstone: __APP.BUILD.userTombstones(this.user, {avatar_classes: ['-bordered', '-shadowed']}),
-			links: __APP.BUILD.socialLinks(this.user.accounts_links),
-			subscribed_orgs: __APP.BUILD.avatarBlocks(this.user.subscriptions.slice(0,4), {
-				avatar_classes: ['-size_30x30'],
-				entity: 'organization',
-				is_link: true
-			}),
-			show_all_subscribed_orgs_button: __APP.BUILD.button({
-				classes: ['-color_neutral_accent','CallModal','RippleEffect'],
-				dataset: {
-					modal_type: ''
-				},
-				title: 'Показать все'
-			}),
-			friends_hidden: '-hidden',
-			favored_event_blocks: __APP.BUILD.eventBlocks(this.user.favored, this.events_data)
-		}));
-		this.uploadActivities();
-		this.init();
-	};
-	
-	return UserPage;
-}()));
-/**
- * @requires Class.UserPage.js
- */
-/**
- * @class MyProfilePage
- * @extends UserPage
- */
-MyProfilePage = extending(UserPage, (function() {
-	/**
-	 *
-	 * @constructs MyProfilePage
-	 */
-	function MyProfilePage() {
-		UserPage.call(this, __APP.USER.id);
-		this.page_title = 'Мой профиль';
-		this.user = __APP.USER;
-	}
-	
-	MyProfilePage.prototype.fetchData = function() {
-		if(!this.user.favored.length){
-			return this.fetching_data_defer = this.user.fetchFavored(this.favored_fetch_data);
-		}
-		return Page.prototype.fetchData.call(this);
-	};
-	
-	MyProfilePage.prototype.render = function() {
-		__APP.changeTitle('Мой профиль');
-		
-		this.user.actions.forEach(function(action) {
-			action.user = __APP.USER;
-		});
-		this.$wrapper.append(tmpl('user-page', {
-			tombstone: __APP.BUILD.userTombstones(this.user, {avatar_classes: ['-bordered', '-shadowed']}),
-			links: __APP.BUILD.socialLinks(this.user.accounts_links),
-			subscribed_orgs: __APP.BUILD.avatarBlocks(this.user.subscriptions.slice(0,4), {
-				avatar_classes: ['-size_30x30'],
-				entity: 'organization',
-				is_link: true
-			}),
-			show_all_subscribed_orgs_button: __APP.BUILD.button({
-				classes: ['-color_neutral_accent','CallModal','RippleEffect'],
-				dataset: {
-					modal_type: ''
-				},
-				title: 'Показать все'
-			}),
-			subscribed_users: __APP.BUILD.avatarBlocks(this.user.friends.slice(0,4), {
-				avatar_classes: ['-size_30x30', '-rounded'],
-				entity: 'user',
-				is_link: true
-			}),
-			show_all_subscribed_users_button: __APP.BUILD.button({
-				classes: ['-color_neutral_accent','CallModal','RippleEffect'],
-				dataset: {
-					modal_type: 'favors'
-				},
-				title: 'Показать все'
-			}),
-			favored_event_blocks: __APP.BUILD.eventBlocks(this.user.favored, this.events_data)
-		}));
-		this.uploadActivities();
-		this.init();
-	};
-	
-	return MyProfilePage;
-}()));
 /**
  *
  * @class jqPromise

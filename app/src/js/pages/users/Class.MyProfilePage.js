@@ -56,9 +56,9 @@ MyProfilePage = extending(UserPage, (function() {
 				},
 				title: 'Показать все'
 			}),
-			favored_event_blocks: __APP.BUILD.eventBlocks(this.user.favored, this.events_data)
+			favored_event_blocks: __APP.BUILD.eventBlocks(this.user.favored, this.events_metadata)
 		}));
-		this.uploadActivities();
+		this.uploadEntities('activities');
 		this.init();
 	};
 	
