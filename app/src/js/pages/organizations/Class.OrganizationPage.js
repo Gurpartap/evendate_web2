@@ -104,9 +104,6 @@ OrganizationPage.prototype.appendEvents = function(type, events) {
 		});
 	}
 	$wrapper.append($output);
-	if ($wrapper.hasClass(__C.CLASSES.NEW_ACTIVE)) {
-		$wrapper.parent().height($wrapper.height());
-	}
 	return $output;
 };
 /**

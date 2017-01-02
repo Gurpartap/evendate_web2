@@ -82,7 +82,6 @@ UserPage = extending(Page, (function() {
 		if(!self.disable_uploads[type] && !self.block_scroll){
 			$loader = __APP.BUILD.loaderBlock($wrapper);
 			self.block_scroll = true;
-			$wrapper.parent().height($wrapper.height());
 			
 			type_data.fetch_method.apply(type_data.fetch_context, type_data.fetch_arguments).done(function(entities) {
 				var $entities;
@@ -98,7 +97,6 @@ UserPage = extending(Page, (function() {
 				}
 				self.block_scroll = false;
 				$loader.remove();
-				$wrapper.parent().height($wrapper.height());
 			});
 		}
 	};

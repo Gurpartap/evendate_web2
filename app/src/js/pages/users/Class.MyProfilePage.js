@@ -24,6 +24,7 @@ MyProfilePage = extending(UserPage, (function() {
 	};
 	
 	MyProfilePage.prototype.render = function() {
+		var $activities;
 		__APP.changeTitle('Мой профиль');
 		
 		this.user.actions.forEach(function(action) {
@@ -58,7 +59,13 @@ MyProfilePage = extending(UserPage, (function() {
 			}),
 			favored_event_blocks: __APP.BUILD.eventBlocks(this.user.favored, this.events_metadata)
 		}));
-		this.uploadEntities('activities');
+		if(this.user.actions.length){
+			$activities = __APP.BUILD.activity(this.user.actions);
+			this.$wrapper.find('.TabsBody').filter('[data-tab_body_type="activities"]').append($activities);
+			UserPage.bindEvents($activities);
+		} else {
+			this.uploadEntities('activities');
+		}
 		this.init();
 	};
 	

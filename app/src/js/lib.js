@@ -1317,13 +1317,22 @@ function bindTabs($parent) {
 		var $this = $(elem),
 			$wrapper = $this.find('.TabsBodyWrapper'),
 			$tabs = $this.find('.Tab'),
-			$bodies = $this.find('.TabsBody');
+			$bodies = $this.find('.TabsBody'),
+			mutation_observer = new MutationObserver(function(records) {
+				records.forEach(function(record){
+					var $wrapper = $(record.target);
+					$wrapper.parent().height($wrapper.height());
+				});
+			});
 		
 		if (!$tabs.filter('.-active').length) {
 			$tabs.eq(0).addClass(__C.CLASSES.NEW_ACTIVE);
 		}
 		$bodies.removeClass(__C.CLASSES.NEW_ACTIVE).eq($tabs.index($tabs.filter('.-active'))).addClass(__C.CLASSES.NEW_ACTIVE);
 		$wrapper.height($bodies.filter('.-active').height());
+		$bodies.each(function(i, body) {
+			mutation_observer.observe(body, {childList: true});
+		});
 		
 		$tabs.on('click', function() {
 			if (!$(this).hasClass(__C.CLASSES.NEW_ACTIVE)) {
