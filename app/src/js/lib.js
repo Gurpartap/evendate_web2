@@ -783,7 +783,7 @@ var CollectionOfXHRs = extending(Array, (function(){
 		while (this.length) {
 			cur = this.pop();
 			if(cur.state() === 'pending'){
-				cur.abort();
+				//cur.abort();
 			}
 		}
 	};
