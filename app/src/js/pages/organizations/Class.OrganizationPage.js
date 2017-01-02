@@ -80,7 +80,7 @@ OrganizationPage.extend(Page);
 OrganizationPage.prototype.fetchData = function() {
 	var self = this;
 	return this.fetching_data_defer = this.organization.fetchOrganization(this.fields).done(function(data) {
-		self.is_admin = self.organization.role != OneAbstractUser.ROLE.USER;
+		self.is_admin = self.organization.role != OneUser.ROLE.USER;
 		self.max_events_load = self.is_admin ? 4 : 2;
 	});
 };
@@ -203,7 +203,7 @@ OrganizationPage.prototype.render = function() {
 			classes: ['-size_low', '-fill', 'RippleEffect']
 		}),
 		has_address: organization.default_address ? '' : '-hidden',
-		redact_org_button: (organization.role == OneAbstractUser.ROLE.ADMIN) ? __APP.BUILD.link({
+		redact_org_button: (organization.role == OneUser.ROLE.ADMIN) ? __APP.BUILD.link({
 			title: 'Изменить',
 			classes: ['button', '-fill', '-color_neutral', 'fa_icon', 'fa-pencil', 'RippleEffect'],
 			page: 'organization/' + organization.id + '/edit/'

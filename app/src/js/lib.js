@@ -922,7 +922,7 @@ function getUnitsText(num, cases) {
 /**
  * Возвращает текст с правильным родом
  *
- * @param {OneAbstractUser.GENDER} gender
+ * @param {OneUser.GENDER} gender
  * @param {({
  *  MAS: {string},
  *  FEM: {string},
@@ -935,9 +935,9 @@ function getGenderText(gender, cases) {
 	}
 	switch (gender) {
 		default:
-		case OneAbstractUser.GENDER.MALE: return cases.MAS;
-		case OneAbstractUser.GENDER.FEMALE: return cases.FEM;
-		case OneAbstractUser.GENDER.NEUTRAL: return cases.NEU;
+		case OneUser.GENDER.MALE: return cases.MAS;
+		case OneUser.GENDER.FEMALE: return cases.FEM;
+		case OneUser.GENDER.NEUTRAL: return cases.NEU;
 	}
 }
 

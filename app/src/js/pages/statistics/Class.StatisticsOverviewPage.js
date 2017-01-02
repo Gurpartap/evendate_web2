@@ -23,15 +23,15 @@ StatisticsOverviewPage.buildMyOrganizationsBlocks = function(organizations) {
 			},
 			org_roles = [
 				{
-					name: OneAbstractUser.ROLE.ADMIN,
+					name: OneUser.ROLE.ADMIN,
 					title: 'Администраторы',
-					staff: UsersCollection.getSpecificStaff(OneAbstractUser.ROLE.ADMIN, org.staff, staff_additional_fields),
-					plural_name: OneAbstractUser.ROLE.ADMIN + 's'
+					staff: UsersCollection.getSpecificStaff(OneUser.ROLE.ADMIN, org.staff, staff_additional_fields),
+					plural_name: OneUser.ROLE.ADMIN + 's'
 				}, {
-					name: OneAbstractUser.ROLE.MODERATOR,
+					name: OneUser.ROLE.MODERATOR,
 					title: 'Модераторы',
-					staff: UsersCollection.getSpecificStaff(OneAbstractUser.ROLE.MODERATOR, org.staff, staff_additional_fields),
-					plural_name: OneAbstractUser.ROLE.MODERATOR + 's'
+					staff: UsersCollection.getSpecificStaff(OneUser.ROLE.MODERATOR, org.staff, staff_additional_fields),
+					plural_name: OneUser.ROLE.MODERATOR + 's'
 				}
 			];
 		org_roles.forEach(function(role) {

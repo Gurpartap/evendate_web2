@@ -84,7 +84,7 @@ $__modules['users'] = array(
 				),
 				$__fields ?? array(),
 				$__pagination ?? array(),
-				$__order_by ?? array()
+				$__order_by ?? array('nearest_event_date', 'first_event_date')
 			);
 		},
 		'{/(id:[0-9]+)/subscriptions}' => function ($id) use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
@@ -155,7 +155,7 @@ $__modules['users'] = array(
 				),
 				$__fields ?? array(),
 				$__pagination ?? array(),
-				$__order_by ?? array()
+				$__order_by ?? array('nearest_event_date', 'first_event_date')
 			);
 		},
 		'{me/subscriptions}' => function () use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {

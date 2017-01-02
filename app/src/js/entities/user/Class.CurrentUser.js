@@ -1,71 +1,16 @@
 /**
- * @requires Class.OneAbstractUser.js
- * @requires ../activity/Class.AbstractActivitiesCollection.js
+ * @requires Class.OneUser.js
  */
 /**
  * @class CurrentUser
- * @extends OneAbstractUser
+ * @extends OneUser
  */
-CurrentUser = extending(OneAbstractUser, (function() {
-	/**
-	 * @class CurrentUsersActivitiesCollection
-	 * @extends AbstractActivitiesCollection
-	 */
-	var CurrentUsersActivitiesCollection = extending(AbstractActivitiesCollection, (function() {
-		/**
-		 *
-		 * @constructs CurrentUsersActivitiesCollection
-		 */
-		function CurrentUsersActivitiesCollection() {}
-		/**
-		 *
-		 * @param {AJAXData} data
-		 * @param {AJAXCallback} [success]
-		 * @returns {jqPromise}
-		 */
-		CurrentUsersActivitiesCollection.fetch = function(data, success) {
-			var self = true;
-			data = AbstractActivitiesCollection.setDefaultData(data);
-			return __APP.SERVER.getData('/api/v1/users/me/', {fields: 'actions'.appendAjaxData(data)}, function(user_data) {
-				user_data = user_data instanceof Array ? user_data[0] : user_data;
-				if (success && typeof success == 'function') {
-					success.call(self, user_data.actions);
-				}
-			});
-		};
-		/**
-		 *
-		 * @param {(Array|string)} [fields]
-		 * @param {(number|string)} [length]
-		 * @param {string} [order_by]
-		 * @param {AJAXCallback} [success]
-		 * @returns {jqPromise}
-		 */
-		CurrentUsersActivitiesCollection.prototype.fetch = function(fields, length, order_by, success) {
-			var self = this,
-				ajax_data = {
-					fields: fields,
-					offset: this.length,
-					length: length
-				};
-			if (order_by) {
-				ajax_data.order_by = order_by;
-			}
-			return this.constructor.fetch(ajax_data, function(data) {
-				self.setData(data);
-				if (success && typeof success == 'function') {
-					success.call(self, (new self.constructor()).setData(data));
-				}
-			});
-		};
-		
-		return CurrentUsersActivitiesCollection;
-	}()));
+CurrentUser = extending(OneUser, (function() {
 	/**
 	 * @class FriendsActivitiesCollection
-	 * @extends AbstractActivitiesCollection
+	 * @extends UsersActivitiesCollection
 	 */
-	var FriendsActivitiesCollection = extending(CurrentUsersActivitiesCollection, (function() {
+	var FriendsActivitiesCollection = extending(UsersActivitiesCollection, (function() {
 		/**
 		 *
 		 * @constructs FriendsActivitiesCollection
@@ -78,7 +23,7 @@ CurrentUser = extending(OneAbstractUser, (function() {
 		 * @returns {jqPromise}
 		 */
 		FriendsActivitiesCollection.fetch = function(data, success) {
-			data = AbstractActivitiesCollection.setDefaultData(data);
+			data = UsersActivitiesCollection.setDefaultData(data);
 			data.fields = data.fields.merge(['user']);
 			return __APP.SERVER.getData('/api/v1/users/feed', data, success);
 		};
@@ -88,14 +33,13 @@ CurrentUser = extending(OneAbstractUser, (function() {
 	/**
 	 *
 	 * @constructs - Implements singleton
-	 * @augments OneAbstractUser
+	 * @augments OneUser
 	 */
 	function CurrentUser() {
 		if (typeof CurrentUser.instance === 'object') {
 			return CurrentUser.instance;
 		}
-		OneAbstractUser.apply(this, ['me']);
-		this.actions = new CurrentUsersActivitiesCollection();
+		OneUser.call(this, 'me');
 		this.friends = new UsersCollection();
 		this.friends_activities = new FriendsActivitiesCollection();
 		CurrentUser.instance = this;
@@ -111,22 +55,13 @@ CurrentUser = extending(OneAbstractUser, (function() {
 	};
 	/**
 	 *
-	 * @param {AJAXData} [data]
-	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
-	 */
-	CurrentUser.fetchUserActivity = function(data, success) {
-		return CurrentUsersActivitiesCollection.fetch(data, success);
-	};
-	/**
-	 *
 	 * @param {(Array|string)} [fields]
 	 * @param {AJAXCallback} [success]
 	 * @returns {jqPromise}
 	 */
 	CurrentUser.prototype.fetchUser = function(fields, success) {
 		var self = this,
-			promise = OneAbstractUser.fetchUser('me', fields),
+			promise = OneUser.fetchUser('me', fields),
 			afterAjax = function(data) {
 				data = data instanceof Array ? data[0] : data;
 				self.setData(data);
@@ -143,7 +78,7 @@ CurrentUser = extending(OneAbstractUser, (function() {
 				afterAjax(user_data);
 			}).promise();
 		}
-		return OneAbstractUser.fetchUser('me', fields).done(afterAjax).promise();
+		return promise.done(afterAjax).promise();
 	};
 	/**
 	 *
@@ -157,9 +92,9 @@ CurrentUser = extending(OneAbstractUser, (function() {
 			offset: self.friends.length
 		});
 		return CurrentUser.fetchFriends(ajax_data, function(data) {
-			self.setData({friends: data});
+			self.friends.setData(data);
 			if (success && typeof success == 'function') {
-				success.call(self, data);
+				success.call(self, self.friends.last_pushed);
 			}
 		});
 	};

@@ -178,8 +178,8 @@ StatisticsOrganizationOverviewPage.prototype.render = function() {
 			entity: 'organization',
 			block_classes: ['-stack']
 		}),
-		staff_block: StatisticsOrganizationOverviewPage.buildStaffBlock('Администраторы', this.organization.staff.getSpecificStaff(OneAbstractUser.ROLE.ADMIN, staffs_additional_fields))
-			.add(StatisticsOrganizationOverviewPage.buildStaffBlock('Модераторы', this.organization.staff.getSpecificStaff(OneAbstractUser.ROLE.MODERATOR, staffs_additional_fields))),
+		staff_block: StatisticsOrganizationOverviewPage.buildStaffBlock('Администраторы', this.organization.staff.getSpecificStaff(OneUser.ROLE.ADMIN, staffs_additional_fields))
+			.add(StatisticsOrganizationOverviewPage.buildStaffBlock('Модераторы', this.organization.staff.getSpecificStaff(OneUser.ROLE.MODERATOR, staffs_additional_fields))),
 		event_blocks: tmpl('orgstat-event-block', this.organization.events.map(function(event) {
 			var badges = [];
 			if (event.canceled)

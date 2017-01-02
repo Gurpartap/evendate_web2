@@ -627,7 +627,7 @@ __APP = {
 		},
 		/**
 		 *
-		 * @param {Object<OneAbstractUser.ACCOUNTS, string>} [accounts_links]
+		 * @param {Object<OneUser.ACCOUNTS, string>} [accounts_links]
 		 * @returns {jQuery}
 		 */
 		socialLinks: function buildSocialLinks(accounts_links) {
@@ -637,7 +637,7 @@ __APP = {
 					GOOGLE: 'google-plus',
 					FACEBOOK: 'facebook-official'
 				};
-			$.each(OneAbstractUser.ACCOUNTS, function(slug, account) {
+			$.each(OneUser.ACCOUNTS, function(slug, account) {
 				var props = {
 					slug: account,
 					icon_slug: ICON_SLUGS[slug]
@@ -688,7 +688,7 @@ __APP = {
 		},
 		/**
 		 *
-		 * @param {(OneAbstractUser|UsersCollection|OneOrganization|OrganizationsCollection|Array)} entities
+		 * @param {(OneUser|UsersCollection|OneOrganization|OrganizationsCollection|Array)} entities
 		 * @param {buildProps} [props]
 		 * @param {boolean} [props.is_link]
 		 * @param {string} [props.entity]
@@ -727,7 +727,7 @@ __APP = {
 		},
 		/**
 		 *
-		 * @param {(OneAbstractUser|UsersCollection|OneOrganization|OrganizationsCollection|Array)} entities
+		 * @param {(OneUser|UsersCollection|OneOrganization|OrganizationsCollection|Array)} entities
 		 * @param {buildProps} [props]
 		 * @returns {jQuery|undefined}
 		 */
@@ -752,7 +752,7 @@ __APP = {
 			}
 			
 			switch (true){
-				case (entities instanceof OneAbstractUser):
+				case (entities instanceof OneUser):
 				case (entities instanceof UsersCollection): {
 					map = userMap;
 					break;
@@ -918,7 +918,7 @@ __APP = {
 						classes: ['-size_low', 'RippleEffect']
 					}),
 					subscribed_text: org.subscribed_count + getUnitsText(org.subscribed_count, __LOCALES.ru_RU.TEXTS.SUBSCRIBERS),
-					redact_org_button: (org.role === OneAbstractUser.ROLE.UNAUTH || org.role === OneAbstractUser.ROLE.USER) ? '' : __APP.BUILD.link({
+					redact_org_button: (org.role === OneUser.ROLE.UNAUTH || org.role === OneUser.ROLE.USER) ? '' : __APP.BUILD.link({
 						classes: ['button', '-size_low', '-color_marginal_primary', 'fa_icon', 'fa-pencil', '-empty', 'RippleEffect'],
 						page: 'organization/' + org.id + '/edit'
 					})

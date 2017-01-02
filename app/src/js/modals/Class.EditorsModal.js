@@ -11,7 +11,7 @@ EditorsModal = extending(AbstractUsersModal, (function() {
 	 * @constructor
 	 * @param {(string|number)} organization_id
 	 * @param {string} [title='Редаторы']
-	 * @param {OneAbstractUser.ROLE} [specific_role]
+	 * @param {OneUser.ROLE} [specific_role]
 	 */
 	function EditorsModal(organization_id, title, specific_role) {
 		AbstractUsersModal.apply(this, [organization_id, title ? title : 'Редакторы']);

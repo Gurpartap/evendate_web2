@@ -14,7 +14,7 @@ OneAbstractActivity = extending(OneEntity, (function() {
 	function OneAbstractActivity() {
 		this.stat_type_id = 0;
 		this.user_id = 0;
-		this.user = new OneAbstractUser(this.user_id);
+		this.user = new OneUser(this.user_id);
 		this.entity = '';
 		/**
 		 *

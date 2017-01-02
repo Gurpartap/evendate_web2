@@ -922,7 +922,7 @@ function getUnitsText(num, cases) {
 /**
  * Возвращает текст с правильным родом
  *
- * @param {OneAbstractUser.GENDER} gender
+ * @param {OneUser.GENDER} gender
  * @param {({
  *  MAS: {string},
  *  FEM: {string},
@@ -935,9 +935,9 @@ function getGenderText(gender, cases) {
 	}
 	switch (gender) {
 		default:
-		case OneAbstractUser.GENDER.MALE: return cases.MAS;
-		case OneAbstractUser.GENDER.FEMALE: return cases.FEM;
-		case OneAbstractUser.GENDER.NEUTRAL: return cases.NEU;
+		case OneUser.GENDER.MALE: return cases.MAS;
+		case OneUser.GENDER.FEMALE: return cases.FEM;
+		case OneUser.GENDER.NEUTRAL: return cases.NEU;
 	}
 }
 
@@ -1956,7 +1956,14 @@ OneEntity.prototype.setData = function(data) {
  * @augments Array
  * @implements EntityInterface
  */
-function EntitiesCollection() {}
+function EntitiesCollection() {
+	Object.defineProperty(this, 'last_pushed', {
+		value: [],
+		writable: true,
+		enumerable: false,
+		configurable: false
+	});
+}
 EntitiesCollection.extend(Array);
 EntitiesCollection.prototype.collection_of = OneEntity;
 /**
@@ -1996,9 +2003,10 @@ EntitiesCollection.prototype.has = function(id) {
  * @returns {number}
  */
 EntitiesCollection.prototype.push = function(element) {
+	this.last_pushed = [];
 	for (var i = 0; i < arguments.length; i++) {
 		if (!arguments[i].id || (arguments[i].id && !this.has(arguments[i].id))) {
-			this[this.length++] = arguments[i] instanceof this.collection_of ? arguments[i] : (new this.collection_of()).setData(arguments[i]);
+			this.last_pushed.push(this[this.length++] = arguments[i] instanceof this.collection_of ? arguments[i] : (new this.collection_of()).setData(arguments[i]));
 		}
 	}
 	return this.length;
@@ -2030,7 +2038,7 @@ OneAbstractActivity = extending(OneEntity, (function() {
 	function OneAbstractActivity() {
 		this.stat_type_id = 0;
 		this.user_id = 0;
-		this.user = new OneAbstractUser(this.user_id);
+		this.user = new OneUser(this.user_id);
 		this.entity = '';
 		/**
 		 *
@@ -2117,18 +2125,20 @@ OneOrganizationActivity = extending(OneAbstractActivity, (function() {
  * @requires Class.OneOrganizationActivity.js
  */
 /**
- * @class AbstractActivitiesCollection
+ * @class UsersActivitiesCollection
  * @extends EntitiesCollection
  */
-AbstractActivitiesCollection = extending(EntitiesCollection, (function() {
+UsersActivitiesCollection = extending(EntitiesCollection, (function() {
 	/**
 	 *
-	 * @constructs AbstractActivitiesCollection
+	 * @constructs UsersActivitiesCollection
 	 */
-	function AbstractActivitiesCollection() {}
-	Object.defineProperty(AbstractActivitiesCollection.prototype, 'collection_of', {value: OneAbstractActivity});
+	function UsersActivitiesCollection(user_id) {
+		Object.defineProperty(this, 'user_id', {value: user_id});
+	}
+	Object.defineProperty(UsersActivitiesCollection.prototype, 'collection_of', {value: OneAbstractActivity});
 	
-	AbstractActivitiesCollection.setDefaultData = function(data) {
+	UsersActivitiesCollection.setDefaultData = function(data) {
 		if(typeof data.fields === 'string'){
 			data.fields = data.fields.split(',');
 		} else if (!(data.fields instanceof Array)) {
@@ -2149,7 +2159,7 @@ AbstractActivitiesCollection = extending(EntitiesCollection, (function() {
 	 * @param {...object} element
 	 * @returns {number}
 	 */
-	AbstractActivitiesCollection.prototype.push = function(element) {
+	UsersActivitiesCollection.prototype.push = function(element) {
 		for (var i = 0; i < arguments.length; i++) {
 			if(arguments[i] instanceof this.collection_of){
 				this[this.length] = arguments[i];
@@ -2164,15 +2174,42 @@ AbstractActivitiesCollection = extending(EntitiesCollection, (function() {
 	};
 	/**
 	 *
+	 * @param {(string|number)} user_id
+	 * @param {AJAXData} data
+	 * @param {AJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	UsersActivitiesCollection.fetch = function(user_id, data, success) {
+		data = UsersActivitiesCollection.setDefaultData(data);
+		return __APP.SERVER.getData('/api/v1/users/' + user_id + '/actions', data, success);
+	};
+	/**
+	 *
 	 * @param {(Array|string)} [fields]
 	 * @param {(number|string)} [length]
 	 * @param {string} [order_by]
 	 * @param {AJAXCallback} [success]
 	 * @returns {jqPromise}
 	 */
-	AbstractActivitiesCollection.prototype.fetch = function(fields, length, order_by, success) {};
+	UsersActivitiesCollection.prototype.fetch = function(fields, length, order_by, success) {
+		var self = this,
+			ajax_data = {
+				fields: fields,
+				offset: this.length,
+				length: length
+			};
+		if (order_by) {
+			ajax_data.order_by = order_by;
+		}
+		return this.constructor.fetch(this.user_id, ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, (new self.constructor()).setData(data));
+			}
+		});
+	};
 	
-	return AbstractActivitiesCollection;
+	return UsersActivitiesCollection;
 }()));
 /**
  * @requires ../Class.OneEntity.js
@@ -3112,7 +3149,7 @@ TimelineEventsCollection.fetchEvents = function(data, success) {
 /**
  * @typedef {object} Privilege
  * @property {number} role_id
- * @property {OneAbstractUser.ROLE} name
+ * @property {OneUser.ROLE} name
  */
 /**
  *
@@ -3228,7 +3265,7 @@ OneOrganization.unsubscribeOrganization = function(org_id, success) {
  */
 OneOrganization.prototype.setData = function(data) {
 	OneEntity.prototype.setData.call(this, data);
-	this.role = OneAbstractUser.recognizeRole(this.privileges);
+	this.role = OneUser.recognizeRole(this.privileges);
 	return this;
 };
 /**
@@ -3512,6 +3549,95 @@ SearchResults.prototype.fetchEventsAndOrganizations = function(events_ajax_data,
 	});
 };
 /**
+ * @requires ../Class.OneEntity.js
+ */
+/**
+ *
+ * @constructor
+ * @augments OneEntity
+ * @param {(string|number)} [tag_id]
+ * @param {boolean} [is_loading_continuous]
+ */
+function OneTag(tag_id, is_loading_continuous) {
+	this.id = tag_id ? tag_id : 0;
+	this.name = '';
+	
+	if (tag_id && is_loading_continuous) {
+		this.loading = true;
+		this.fetchTag(function() {
+			this.loading = false;
+			$(window).trigger('fetch.OneTag');
+		});
+	}
+}
+OneTag.extend(OneEntity);
+/**
+ *
+ * @param {(string|number)} tag_id
+ * @param {AJAXCallback} [success]
+ * @returns {jqPromise}
+ */
+OneTag.fetchTag = function(tag_id, success) {
+	return __APP.SERVER.getData('/api/v1/tags/' + tag_id, {}, success);
+};
+/**
+ *
+ * @param {AJAXCallback} [success]
+ * @returns {jqPromise}
+ */
+OneTag.prototype.fetchTag = function(success) {
+	var self = this;
+	return this.constructor.fetchTag(self.id, function(data) {
+		self.setData(data[0]);
+		if (success && typeof success == 'function') {
+			success.call(self, data[0]);
+		}
+	});
+};
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.OneTag.js
+ */
+/**
+ * @typedef {AJAXData} TagsCollectionAJAXData
+ * @property {string} name
+ * @property {(string|number)} event_id
+ * @property {string} used_since
+ * @property {string} used_till
+ */
+/**
+ *
+ * @constructor
+ * @augments EntitiesCollection
+ */
+function TagsCollection() {}
+TagsCollection.extend(EntitiesCollection);
+TagsCollection.prototype.collection_of = OneTag;
+/**
+ *
+ * @param {AJAXData} data
+ * @param {AJAXCallback} [success]
+ * @returns {jqPromise}
+ */
+TagsCollection.fetchTags = function(data, success) {
+	return __APP.SERVER.getData('/api/v1/tags/', data, success);
+};
+/**
+ *
+ * @param {TagsCollectionAJAXData} data
+ * @param {AJAXCallback} [success]
+ * @returns {jqPromise}
+ */
+TagsCollection.prototype.fetchTags = function(data, success) {
+	var self = this;
+	return this.constructor.fetchTags(data, function(data) {
+		self.setData(data);
+		if (success && typeof success == 'function') {
+			success.call(self, data);
+		}
+	});
+};
+/**
  * @typedef {object} StatisticsUnit
  * @property {number} time_value
  * @property {number} value
@@ -3783,107 +3909,19 @@ OrganizationsStatistics.fetchStatistics = function(id, scale, range, statistics_
 };
 /**
  * @requires ../Class.OneEntity.js
+ * @requires ../activity/Class.UsersActivitiesCollection.js
  */
 /**
- *
- * @constructor
- * @augments OneEntity
- * @param {(string|number)} [tag_id]
- * @param {boolean} [is_loading_continuous]
- */
-function OneTag(tag_id, is_loading_continuous) {
-	this.id = tag_id ? tag_id : 0;
-	this.name = '';
-	
-	if (tag_id && is_loading_continuous) {
-		this.loading = true;
-		this.fetchTag(function() {
-			this.loading = false;
-			$(window).trigger('fetch.OneTag');
-		});
-	}
-}
-OneTag.extend(OneEntity);
-/**
- *
- * @param {(string|number)} tag_id
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-OneTag.fetchTag = function(tag_id, success) {
-	return __APP.SERVER.getData('/api/v1/tags/' + tag_id, {}, success);
-};
-/**
- *
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-OneTag.prototype.fetchTag = function(success) {
-	var self = this;
-	return this.constructor.fetchTag(self.id, function(data) {
-		self.setData(data[0]);
-		if (success && typeof success == 'function') {
-			success.call(self, data[0]);
-		}
-	});
-};
-/**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneTag.js
- */
-/**
- * @typedef {AJAXData} TagsCollectionAJAXData
- * @property {string} name
- * @property {(string|number)} event_id
- * @property {string} used_since
- * @property {string} used_till
- */
-/**
- *
- * @constructor
- * @augments EntitiesCollection
- */
-function TagsCollection() {}
-TagsCollection.extend(EntitiesCollection);
-TagsCollection.prototype.collection_of = OneTag;
-/**
- *
- * @param {AJAXData} data
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-TagsCollection.fetchTags = function(data, success) {
-	return __APP.SERVER.getData('/api/v1/tags/', data, success);
-};
-/**
- *
- * @param {TagsCollectionAJAXData} data
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-TagsCollection.prototype.fetchTags = function(data, success) {
-	var self = this;
-	return this.constructor.fetchTags(data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
-/**
- * @requires ../Class.OneEntity.js
- */
-/**
- * @class OneAbstractUser
+ * @class OneUser
  * @extends OneEntity
  */
-OneAbstractUser = extending(OneEntity, (function() {
+OneUser = extending(OneEntity, (function() {
 	/**
 	 *
 	 * @param {(string|number)} [user_id]
-	 * @constructs OneAbstractUser
+	 * @constructs OneUser
 	 */
-	function OneAbstractUser(user_id) {
+	function OneUser(user_id) {
 		var self = this;
 		
 		this.id = setDefaultValue(user_id, 0);
@@ -3892,7 +3930,7 @@ OneAbstractUser = extending(OneEntity, (function() {
 		this.middle_name = '';
 		/**
 		 *
-		 * @type {OneAbstractUser.GENDER}
+		 * @type {OneUser.GENDER}
 		 */
 		this.gender = '';
 		this.avatar_url = '';
@@ -3903,12 +3941,12 @@ OneAbstractUser = extending(OneEntity, (function() {
 		this.link = '';
 		/**
 		 *
-		 * @type {Array<OneAbstractUser.ACCOUNTS>}
+		 * @type {Array<OneUser.ACCOUNTS>}
 		 */
 		this.accounts = [];
 		/**
 		 *
-		 * @type {Object<OneAbstractUser.ACCOUNTS, string>}
+		 * @type {Object<OneUser.ACCOUNTS, string>}
 		 */
 		this.accounts_links = {};
 		Object.defineProperty(this, 'full_name', {
@@ -3919,15 +3957,15 @@ OneAbstractUser = extending(OneEntity, (function() {
 		});
 		this.subscriptions = new OrganizationsCollection();
 		this.favored = new FavoredEventsCollection();
-		this.actions = new AbstractActivitiesCollection();
+		this.actions = new UsersActivitiesCollection(user_id);
 	}
-	OneAbstractUser.prototype.subscriptions_fields = ['img_small_url', 'subscribed_count', 'new_events_count', 'actual_events_count'];
-	Object.freeze(OneAbstractUser.prototype.subscriptions_fields);
+	OneUser.prototype.subscriptions_fields = ['img_small_url', 'subscribed_count', 'new_events_count', 'actual_events_count'];
+	Object.freeze(OneUser.prototype.subscriptions_fields);
 	/**
 	 * @const
 	 * @enum {string}
 	 */
-	OneAbstractUser.ROLE = {
+	OneUser.ROLE = {
 		UNAUTH: 'unauth',
 		USER: 'user',
 		MODERATOR: 'moderator',
@@ -3937,7 +3975,7 @@ OneAbstractUser = extending(OneEntity, (function() {
 	 * @const
 	 * @enum {string}
 	 */
-	OneAbstractUser.GENDER = {
+	OneUser.GENDER = {
 		MALE: 'male',
 		FEMALE: 'female',
 		NEUTRAL: 'neutral'
@@ -3946,7 +3984,7 @@ OneAbstractUser = extending(OneEntity, (function() {
 	 * @const
 	 * @enum {string}
 	 */
-	OneAbstractUser.ACCOUNTS = {
+	OneUser.ACCOUNTS = {
 		VK: 'vk',
 		GOOGLE: 'google',
 		FACEBOOK: 'facebook'
@@ -3958,23 +3996,53 @@ OneAbstractUser = extending(OneEntity, (function() {
 	 * @param {AJAXCallback} [success]
 	 * @returns {jqPromise}
 	 */
-	OneAbstractUser.fetchUser = function(user_id, fields, success) {
+	OneUser.fetchUser = function(user_id, fields, success) {
 		return __APP.SERVER.getData('/api/v1/users/' + user_id, {fields: fields}, success);
+	};
+	/**
+	 *
+	 * @param {(string|number)} user_id
+	 * @param {AJAXData} [data]
+	 * @param {AJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	OneUser.fetchFavored = function(user_id, data, success) {
+		return __APP.SERVER.getData('/api/v1/users/' + user_id + '/favorites', data, success);
+	};
+	/**
+	 *
+	 * @param {(string|number)} user_id
+	 * @param {AJAXData} [data]
+	 * @param {AJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	OneUser.fetchSubscriptions = function(user_id, data, success) {
+		return __APP.SERVER.getData('/api/v1/users/' + user_id + '/subscriptions', data, success);
+	};
+	/**
+	 *
+	 * @param {(string|number)} user_id
+	 * @param {(Array|string)} [fields]
+	 * @param {AJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	OneUser.fetchUserActivity = function(user_id, fields, success) {
+		return UsersActivitiesCollection.fetch(user_id, {fields: fields}, success);
 	};
 	/**
 	 * Returns highest role in privileges set
 	 * @param {Array<Privilege>} privileges
-	 * @returns {OneAbstractUser.ROLE}
+	 * @returns {OneUser.ROLE}
 	 */
-	OneAbstractUser.recognizeRole = function(privileges) {
-		var role = OneAbstractUser.ROLE.USER;
+	OneUser.recognizeRole = function(privileges) {
+		var role = OneUser.ROLE.USER;
 		privileges.forEach(function(privilege) {
-			if (privilege.role_id == 1 || privilege.name == OneAbstractUser.ROLE.ADMIN)
-				role = OneAbstractUser.ROLE.ADMIN;
-			if ((privilege.role_id == 2 || privilege.name == OneAbstractUser.ROLE.MODERATOR) && role !== OneAbstractUser.ROLE.ADMIN)
-				role = OneAbstractUser.ROLE.MODERATOR;
+			if (privilege.role_id == 1 || privilege.name == OneUser.ROLE.ADMIN)
+				role = OneUser.ROLE.ADMIN;
+			if ((privilege.role_id == 2 || privilege.name == OneUser.ROLE.MODERATOR) && role !== OneUser.ROLE.ADMIN)
+				role = OneUser.ROLE.MODERATOR;
 		});
-		return role ? role : OneAbstractUser.ROLE.UNAUTH;
+		return role ? role : OneUser.ROLE.UNAUTH;
 	};
 	/**
 	 *
@@ -3982,11 +4050,11 @@ OneAbstractUser = extending(OneEntity, (function() {
 	 * @param {AJAXCallback} [success]
 	 * @returns {jqPromise}
 	 */
-	OneAbstractUser.prototype.fetchUser = function(fields, success) {
+	OneUser.prototype.fetchUser = function(fields, success) {
 		var self = this;
 		fields = setDefaultValue(fields, []);
 		
-		return OneAbstractUser.fetchUser(self.id, fields, function(data) {
+		return OneUser.fetchUser(self.id, fields, function(data) {
 			data = data instanceof Array ? data[0] : data;
 			self.setData(data);
 			if (success && typeof success == 'function') {
@@ -4000,91 +4068,51 @@ OneAbstractUser = extending(OneEntity, (function() {
 	 * @param {AJAXCallback} [success]
 	 * @returns {jqPromise}
 	 */
-	OneAbstractUser.prototype.fetchFavored = function(data, success) {
+	OneUser.prototype.fetchFavored = function(data, success) {
 		var self = this;
 		data.offset = this.favored.length;
-		return OneAbstractUser.fetchUser(self.id, new Fields({favored: data})).done(function(data) {
-			data = data instanceof Array ? data[0] : data;
-			self.setData({favored: data.favored});
+		return OneUser.fetchFavored(self.id, data).done(function(favored) {
+			self.favored.setData(favored);
 			if (success && typeof success == 'function') {
-				success.call(self, data.favored);
+				success.call(self, self.favored.last_pushed);
 			}
-		});
+		}).promise();
+	};
+	/**
+	 *
+	 * @param {AJAXData} [data]
+	 * @param {AJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	OneUser.prototype.fetchSubscriptions = function(data, success) {
+		var self = this;
+		data.offset = this.favored.length;
+		return OneUser.fetchSubscriptions(self.id, data).done(function(subscriptions) {
+			self.subscriptions.setData(subscriptions);
+			if (success && typeof success == 'function') {
+				success.call(self, self.subscriptions.last_pushed);
+			}
+		}).promise();
 	};
 	
-	Object.freeze(OneAbstractUser.ROLE);
-	Object.freeze(OneAbstractUser.GENDER);
-	Object.freeze(OneAbstractUser.ACCOUNTS);
-	return OneAbstractUser;
+	Object.freeze(OneUser.ROLE);
+	Object.freeze(OneUser.GENDER);
+	Object.freeze(OneUser.ACCOUNTS);
+	return OneUser;
 }()));
 /**
- * @requires Class.OneAbstractUser.js
- * @requires ../activity/Class.AbstractActivitiesCollection.js
+ * @requires Class.OneUser.js
  */
 /**
  * @class CurrentUser
- * @extends OneAbstractUser
+ * @extends OneUser
  */
-CurrentUser = extending(OneAbstractUser, (function() {
-	/**
-	 * @class CurrentUsersActivitiesCollection
-	 * @extends AbstractActivitiesCollection
-	 */
-	var CurrentUsersActivitiesCollection = extending(AbstractActivitiesCollection, (function() {
-		/**
-		 *
-		 * @constructs CurrentUsersActivitiesCollection
-		 */
-		function CurrentUsersActivitiesCollection() {}
-		/**
-		 *
-		 * @param {AJAXData} data
-		 * @param {AJAXCallback} [success]
-		 * @returns {jqPromise}
-		 */
-		CurrentUsersActivitiesCollection.fetch = function(data, success) {
-			var self = true;
-			data = AbstractActivitiesCollection.setDefaultData(data);
-			return __APP.SERVER.getData('/api/v1/users/me/', {fields: 'actions'.appendAjaxData(data)}, function(user_data) {
-				user_data = user_data instanceof Array ? user_data[0] : user_data;
-				if (success && typeof success == 'function') {
-					success.call(self, user_data.actions);
-				}
-			});
-		};
-		/**
-		 *
-		 * @param {(Array|string)} [fields]
-		 * @param {(number|string)} [length]
-		 * @param {string} [order_by]
-		 * @param {AJAXCallback} [success]
-		 * @returns {jqPromise}
-		 */
-		CurrentUsersActivitiesCollection.prototype.fetch = function(fields, length, order_by, success) {
-			var self = this,
-				ajax_data = {
-					fields: fields,
-					offset: this.length,
-					length: length
-				};
-			if (order_by) {
-				ajax_data.order_by = order_by;
-			}
-			return this.constructor.fetch(ajax_data, function(data) {
-				self.setData(data);
-				if (success && typeof success == 'function') {
-					success.call(self, (new self.constructor()).setData(data));
-				}
-			});
-		};
-		
-		return CurrentUsersActivitiesCollection;
-	}()));
+CurrentUser = extending(OneUser, (function() {
 	/**
 	 * @class FriendsActivitiesCollection
-	 * @extends AbstractActivitiesCollection
+	 * @extends UsersActivitiesCollection
 	 */
-	var FriendsActivitiesCollection = extending(CurrentUsersActivitiesCollection, (function() {
+	var FriendsActivitiesCollection = extending(UsersActivitiesCollection, (function() {
 		/**
 		 *
 		 * @constructs FriendsActivitiesCollection
@@ -4097,7 +4125,7 @@ CurrentUser = extending(OneAbstractUser, (function() {
 		 * @returns {jqPromise}
 		 */
 		FriendsActivitiesCollection.fetch = function(data, success) {
-			data = AbstractActivitiesCollection.setDefaultData(data);
+			data = UsersActivitiesCollection.setDefaultData(data);
 			data.fields = data.fields.merge(['user']);
 			return __APP.SERVER.getData('/api/v1/users/feed', data, success);
 		};
@@ -4107,14 +4135,13 @@ CurrentUser = extending(OneAbstractUser, (function() {
 	/**
 	 *
 	 * @constructs - Implements singleton
-	 * @augments OneAbstractUser
+	 * @augments OneUser
 	 */
 	function CurrentUser() {
 		if (typeof CurrentUser.instance === 'object') {
 			return CurrentUser.instance;
 		}
-		OneAbstractUser.apply(this, ['me']);
-		this.actions = new CurrentUsersActivitiesCollection();
+		OneUser.call(this, 'me');
 		this.friends = new UsersCollection();
 		this.friends_activities = new FriendsActivitiesCollection();
 		CurrentUser.instance = this;
@@ -4130,22 +4157,13 @@ CurrentUser = extending(OneAbstractUser, (function() {
 	};
 	/**
 	 *
-	 * @param {AJAXData} [data]
-	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
-	 */
-	CurrentUser.fetchUserActivity = function(data, success) {
-		return CurrentUsersActivitiesCollection.fetch(data, success);
-	};
-	/**
-	 *
 	 * @param {(Array|string)} [fields]
 	 * @param {AJAXCallback} [success]
 	 * @returns {jqPromise}
 	 */
 	CurrentUser.prototype.fetchUser = function(fields, success) {
 		var self = this,
-			promise = OneAbstractUser.fetchUser('me', fields),
+			promise = OneUser.fetchUser('me', fields),
 			afterAjax = function(data) {
 				data = data instanceof Array ? data[0] : data;
 				self.setData(data);
@@ -4162,7 +4180,7 @@ CurrentUser = extending(OneAbstractUser, (function() {
 				afterAjax(user_data);
 			}).promise();
 		}
-		return OneAbstractUser.fetchUser('me', fields).done(afterAjax).promise();
+		return promise.done(afterAjax).promise();
 	};
 	/**
 	 *
@@ -4176,9 +4194,9 @@ CurrentUser = extending(OneAbstractUser, (function() {
 			offset: self.friends.length
 		});
 		return CurrentUser.fetchFriends(ajax_data, function(data) {
-			self.setData({friends: data});
+			self.friends.setData(data);
 			if (success && typeof success == 'function') {
-				success.call(self, data);
+				success.call(self, self.friends.last_pushed);
 			}
 		});
 	};
@@ -4240,103 +4258,6 @@ CurrentUser = extending(OneAbstractUser, (function() {
 	return CurrentUser;
 }()));
 /**
- * @requires Class.OneAbstractUser.js
- * @requires ../activity/Class.AbstractActivitiesCollection.js
- */
-/**
- * @class OneUser
- * @extends OneAbstractUser
- */
-OneUser = extending(OneAbstractUser, (function() {
-	/**
-	 * @class UsersActivitiesCollection
-	 * @extends AbstractActivitiesCollection
-	 */
-	var UsersActivitiesCollection = extending(AbstractActivitiesCollection, (function() {
-		/**
-		 *
-		 * @constructs UsersActivitiesCollection
-		 * @param {(string|number)} [user_id]
-		 */
-		function UsersActivitiesCollection(user_id) {
-			Object.defineProperty(this, 'user_id', {value: user_id});
-		}
-		/**
-		 *
-		 * @param {(string|number)} user_id
-		 * @param {AJAXData} data
-		 * @param {AJAXCallback} [success]
-		 * @returns {jqPromise}
-		 */
-		UsersActivitiesCollection.fetch = function(user_id, data, success) {
-			data = AbstractActivitiesCollection.setDefaultData(data);
-			return __APP.SERVER.getData('/api/v1/users/' + user_id + '/actions', data, success);
-		};
-		/**
-		 *
-		 * @param {(Array|string)} [fields]
-		 * @param {(number|string)} [length]
-		 * @param {string} [order_by]
-		 * @param {AJAXCallback} [success]
-		 * @returns {jqPromise}
-		 */
-		UsersActivitiesCollection.prototype.fetch = function(fields, length, order_by, success) {
-			var self = this,
-				ajax_data = {
-					fields: fields,
-					offset: this.length,
-					length: length
-				};
-			if (order_by) {
-				ajax_data.order_by = order_by;
-			}
-			return this.constructor.fetch(this.user_id, ajax_data, function(data) {
-				self.setData(data);
-				if (success && typeof success == 'function') {
-					success.call(self, (new self.constructor()).setData(data));
-				}
-			});
-		};
-		
-		return UsersActivitiesCollection;
-	}()));
-	/**
-	 *
-	 * @constructs OneUser
-	 * @param {(string|number)} [user_id]
-	 * @param {boolean} [is_loading_continuous]
-	 */
-	function OneUser(user_id, is_loading_continuous) {
-		OneAbstractUser.call(this, user_id);
-		
-		/**
-		 * @type {Array<OneAbstractUser.ACCOUNTS>}
-		 */
-		this.accounts = [];
-		this.actions = new UsersActivitiesCollection(user_id);
-		
-		if (user_id && is_loading_continuous) {
-			this.loading = true;
-			this.fetchUser([], function() {
-				this.loading = false;
-				$(window).trigger('fetch.OneUser');
-			});
-		}
-	}
-	/**
-	 *
-	 * @param {(string|number)} user_id
-	 * @param {(Array|string)} [fields]
-	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
-	 */
-	OneUser.fetchUserActivity = function(user_id, fields, success) {
-		return UsersActivitiesCollection.fetch(user_id, {fields: fields}, success);
-	};
-	
-	return OneUser;
-}()));
-/**
  * @requires ../Class.EntitiesCollection.js
  * @requires Class.OneUser.js
  */
@@ -4356,10 +4277,10 @@ UsersCollection.extend(EntitiesCollection);
 Object.defineProperty(UsersCollection.prototype, 'collection_of', {value: OneUser});
 /**
  * Returns specified staff by role. Mixing additional_fields if needed.
- * @param {OneAbstractUser.ROLE} role
- * @param {(Array<OneAbstractUser>|UsersCollection)} staff
+ * @param {OneUser.ROLE} role
+ * @param {(Array<OneUser>|UsersCollection)} staff
  * @param {object} [additional_fields]
- * @return {(Array<OneAbstractUser>|UsersCollection|Array<object>)}
+ * @return {(Array<OneUser>|UsersCollection|Array<object>)}
  */
 UsersCollection.getSpecificStaff = function(role, staff, additional_fields) {
 	var specific_staff = [];
@@ -4427,9 +4348,9 @@ UsersCollection.fetchOrganizationStaff = function(org_id, ajax_data, success) {
 };
 /**
  * Returns specified staff by role. Mixing additional_fields if needed.
- * @param {OneAbstractUser.ROLE} role
+ * @param {OneUser.ROLE} role
  * @param {object} [additional_fields]
- * @return {(Array<OneAbstractUser>|UsersCollection|Array<object>)}
+ * @return {(Array<OneUser>|UsersCollection|Array<object>)}
  */
 UsersCollection.prototype.getSpecificStaff = function(role, additional_fields) {
 	var specific_staff = [];
@@ -4447,7 +4368,7 @@ UsersCollection.prototype.getSpecificStaff = function(role, additional_fields) {
  * @param {UsersCollectionAJAXData} [data]
  * @param {(number|string)} [length]
  * @param {AJAXCallback} [success]
- * @this Array<OneAbstractUser>
+ * @this Array<OneUser>
  * @returns {jqPromise}
  */
 UsersCollection.prototype.fetchUsers = function(data, length, success) {
@@ -5837,7 +5758,7 @@ EditorsModal = extending(AbstractUsersModal, (function() {
 	 * @constructor
 	 * @param {(string|number)} organization_id
 	 * @param {string} [title='Редаторы']
-	 * @param {OneAbstractUser.ROLE} [specific_role]
+	 * @param {OneUser.ROLE} [specific_role]
 	 */
 	function EditorsModal(organization_id, title, specific_role) {
 		AbstractUsersModal.apply(this, [organization_id, title ? title : 'Редакторы']);
@@ -7531,8 +7452,8 @@ StatisticsOrganizationOverviewPage.prototype.render = function() {
 			entity: 'organization',
 			block_classes: ['-stack']
 		}),
-		staff_block: StatisticsOrganizationOverviewPage.buildStaffBlock('Администраторы', this.organization.staff.getSpecificStaff(OneAbstractUser.ROLE.ADMIN, staffs_additional_fields))
-			.add(StatisticsOrganizationOverviewPage.buildStaffBlock('Модераторы', this.organization.staff.getSpecificStaff(OneAbstractUser.ROLE.MODERATOR, staffs_additional_fields))),
+		staff_block: StatisticsOrganizationOverviewPage.buildStaffBlock('Администраторы', this.organization.staff.getSpecificStaff(OneUser.ROLE.ADMIN, staffs_additional_fields))
+			.add(StatisticsOrganizationOverviewPage.buildStaffBlock('Модераторы', this.organization.staff.getSpecificStaff(OneUser.ROLE.MODERATOR, staffs_additional_fields))),
 		event_blocks: tmpl('orgstat-event-block', this.organization.events.map(function(event) {
 			var badges = [];
 			if (event.canceled)
@@ -9579,7 +9500,7 @@ OrganizationPage.extend(Page);
 OrganizationPage.prototype.fetchData = function() {
 	var self = this;
 	return this.fetching_data_defer = this.organization.fetchOrganization(this.fields).done(function(data) {
-		self.is_admin = self.organization.role != OneAbstractUser.ROLE.USER;
+		self.is_admin = self.organization.role != OneUser.ROLE.USER;
 		self.max_events_load = self.is_admin ? 4 : 2;
 	});
 };
@@ -9702,7 +9623,7 @@ OrganizationPage.prototype.render = function() {
 			classes: ['-size_low', '-fill', 'RippleEffect']
 		}),
 		has_address: organization.default_address ? '' : '-hidden',
-		redact_org_button: (organization.role == OneAbstractUser.ROLE.ADMIN) ? __APP.BUILD.link({
+		redact_org_button: (organization.role == OneUser.ROLE.ADMIN) ? __APP.BUILD.link({
 			title: 'Изменить',
 			classes: ['button', '-fill', '-color_neutral', 'fa_icon', 'fa-pencil', 'RippleEffect'],
 			page: 'organization/' + organization.id + '/edit/'
@@ -9922,15 +9843,15 @@ StatisticsOverviewPage.buildMyOrganizationsBlocks = function(organizations) {
 			},
 			org_roles = [
 				{
-					name: OneAbstractUser.ROLE.ADMIN,
+					name: OneUser.ROLE.ADMIN,
 					title: 'Администраторы',
-					staff: UsersCollection.getSpecificStaff(OneAbstractUser.ROLE.ADMIN, org.staff, staff_additional_fields),
-					plural_name: OneAbstractUser.ROLE.ADMIN + 's'
+					staff: UsersCollection.getSpecificStaff(OneUser.ROLE.ADMIN, org.staff, staff_additional_fields),
+					plural_name: OneUser.ROLE.ADMIN + 's'
 				}, {
-					name: OneAbstractUser.ROLE.MODERATOR,
+					name: OneUser.ROLE.MODERATOR,
 					title: 'Модераторы',
-					staff: UsersCollection.getSpecificStaff(OneAbstractUser.ROLE.MODERATOR, org.staff, staff_additional_fields),
-					plural_name: OneAbstractUser.ROLE.MODERATOR + 's'
+					staff: UsersCollection.getSpecificStaff(OneUser.ROLE.MODERATOR, org.staff, staff_additional_fields),
+					plural_name: OneUser.ROLE.MODERATOR + 's'
 				}
 			];
 		org_roles.forEach(function(role) {
@@ -10888,7 +10809,7 @@ __APP = {
 		},
 		/**
 		 *
-		 * @param {Object<OneAbstractUser.ACCOUNTS, string>} [accounts_links]
+		 * @param {Object<OneUser.ACCOUNTS, string>} [accounts_links]
 		 * @returns {jQuery}
 		 */
 		socialLinks: function buildSocialLinks(accounts_links) {
@@ -10898,7 +10819,7 @@ __APP = {
 					GOOGLE: 'google-plus',
 					FACEBOOK: 'facebook-official'
 				};
-			$.each(OneAbstractUser.ACCOUNTS, function(slug, account) {
+			$.each(OneUser.ACCOUNTS, function(slug, account) {
 				var props = {
 					slug: account,
 					icon_slug: ICON_SLUGS[slug]
@@ -10949,7 +10870,7 @@ __APP = {
 		},
 		/**
 		 *
-		 * @param {(OneAbstractUser|UsersCollection|OneOrganization|OrganizationsCollection|Array)} entities
+		 * @param {(OneUser|UsersCollection|OneOrganization|OrganizationsCollection|Array)} entities
 		 * @param {buildProps} [props]
 		 * @param {boolean} [props.is_link]
 		 * @param {string} [props.entity]
@@ -10988,7 +10909,7 @@ __APP = {
 		},
 		/**
 		 *
-		 * @param {(OneAbstractUser|UsersCollection|OneOrganization|OrganizationsCollection|Array)} entities
+		 * @param {(OneUser|UsersCollection|OneOrganization|OrganizationsCollection|Array)} entities
 		 * @param {buildProps} [props]
 		 * @returns {jQuery|undefined}
 		 */
@@ -11013,7 +10934,7 @@ __APP = {
 			}
 			
 			switch (true){
-				case (entities instanceof OneAbstractUser):
+				case (entities instanceof OneUser):
 				case (entities instanceof UsersCollection): {
 					map = userMap;
 					break;
@@ -11179,7 +11100,7 @@ __APP = {
 						classes: ['-size_low', 'RippleEffect']
 					}),
 					subscribed_text: org.subscribed_count + getUnitsText(org.subscribed_count, __LOCALES.ru_RU.TEXTS.SUBSCRIBERS),
-					redact_org_button: (org.role === OneAbstractUser.ROLE.UNAUTH || org.role === OneAbstractUser.ROLE.USER) ? '' : __APP.BUILD.link({
+					redact_org_button: (org.role === OneUser.ROLE.UNAUTH || org.role === OneUser.ROLE.USER) ? '' : __APP.BUILD.link({
 						classes: ['button', '-size_low', '-color_marginal_primary', 'fa_icon', 'fa-pencil', '-empty', 'RippleEffect'],
 						page: 'organization/' + org.id + '/edit'
 					})
