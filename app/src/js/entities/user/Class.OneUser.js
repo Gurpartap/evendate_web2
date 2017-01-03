@@ -177,7 +177,7 @@ OneUser = extending(OneEntity, (function() {
 	 */
 	OneUser.prototype.fetchSubscriptions = function(data, success) {
 		var self = this;
-		data.offset = this.favored.length;
+		data.offset = this.subscriptions.length;
 		return OneUser.fetchSubscriptions(self.id, data).done(function(subscriptions) {
 			self.subscriptions.setData(subscriptions);
 			if (success && typeof success == 'function') {

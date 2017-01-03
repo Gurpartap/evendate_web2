@@ -45,7 +45,8 @@ UserPage = extending(Page, (function() {
 				favored: this.favored_fetch_data,
 				subscriptions: {
 					fields: ['img_small_url'],
-					length: 4
+					length: 4,
+					order_by: ['organization_type_order', 'organization_type_id']
 				}
 			}));
 		}
@@ -163,7 +164,8 @@ UserPage = extending(Page, (function() {
 			show_all_subscribed_orgs_button: __APP.BUILD.button({
 				classes: ['-color_neutral_accent','CallModal','RippleEffect'],
 				dataset: {
-					modal_type: ''
+					modal_type: 'subscribers_list',
+					modal_entity: this.user
 				},
 				title: 'Показать все'
 			}),

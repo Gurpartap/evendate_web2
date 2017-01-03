@@ -377,7 +377,7 @@ __APP = {
 		modal_destroyer: $.extend({
 			adjustHeight: function(height) {
 				var html_height = $(window).height(),
-					modal_height = height + 200;
+					modal_height = height;
 				this.height((modal_height > html_height) ? modal_height : html_height);
 			}
 		}, $('.modal_destroyer')),
@@ -491,6 +491,14 @@ __APP = {
 								});
 								break;
 							}
+							case 'friends_list': {
+								modal = new FriendsListModal($this.data('modal_entity'));
+								break;
+							}
+							case 'subscribers_list': {
+								modal = new SubscriptionsListModal($this.data('modal_entity'));
+								break;
+							}
 							default: {
 								modal = new StdModal(title, $this.data('modal_content'));
 								break;
@@ -540,13 +548,18 @@ __APP = {
 		},
 		/**
 		 *
-		 * @param {...buildProps} props
+		 * @param {..buildProps} props
 		 * @returns {jQuery}
 		 */
-		button: function buildButton(props) {
-			return tmpl('button', [].map.call(arguments, function(arg) {
+		button: function buildButton(/**props*/) {
+			var props = Array.prototype.slice.call(arguments);
+			return tmpl('button', props.map(function(arg) {
 				return __APP.BUILD.normalizeBuildProps(arg);
-			}));
+			})).each(function(i, button) {
+				if(props[i].dataset) {
+					$(button).data(props[i].dataset);
+				}
+			});
 		},
 		/**
 		 *
@@ -1105,18 +1118,21 @@ __APP = {
 		 *    [content]: string|jQuery,
 		 *    [classes]: Array<string>|string,
 		 *    [content_classes]: Array<string>|string,
-		 *    [width]: number,
+		 *    [width]: (number|string),
+		 *    [height]: (number|string),
 		 *    [header]: jQuery,
 		 *    [title]: string,
 		 *    [footer]: jQuery,
 		 *    [footer_buttons]: jQuery
+		 *    [dataset]: object
+		 *    [attributes]: object
 		 * }} props
 		 * @return {jQuery}
 		 */
 		modal: function(props) {
-			var $modal;
+			var $modal, vars;
 			props = __APP.BUILD.normalizeBuildProps(props, ['content_classes']);
-			var vars = {
+			vars = {
 				modal_type: props.type,
 				modal_content: props.content,
 				modal_classes: props.classes,
@@ -1128,7 +1144,7 @@ __APP = {
 				vars.modal_header = tmpl('modal-header', {
 					title: props.title,
 					close_button: __APP.BUILD.button({
-						classes: ['-color_default','-empty','-modal_destroyer','CloseModal','RippleEffect'],
+						classes: ['-empty','-modal_destroyer','CloseModal','RippleEffect'],
 						title: '×'
 					})
 				});
@@ -1145,6 +1161,9 @@ __APP = {
 			$modal = tmpl('modal', vars);
 			if(props.width){
 				$modal.width(props.width);
+			}
+			if(props.height){
+				$modal.height(props.height);
 			}
 			return $modal;
 		}

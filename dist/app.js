@@ -3163,112 +3163,6 @@ TimelineEventsCollection.fetchEvents = function(data, success) {
  * @requires ../Class.OneEntity.js
  */
 /**
- * @typedef {function({
- *   [events]: Array<OneEvent>,
- *   [organizations]: Array<OneOrganization>
- * })} SearchResultsAJAXCallback
- */
-/**
- *
- * @constructor
- * @augments OneEntity
- * @param {string} query_string
- */
-function SearchResults(query_string) {
-	this.query_string = query_string;
-	this.events = new EventsCollection();
-	this.organizations = new OrganizationsCollection();
-}
-SearchResults.extend(OneEntity);
-/**
- *
- * @param {string} query_string
- * @returns {{ [q]: {string}, [tags]: {string} }}
- */
-SearchResults.sanitizeQueryVar = function(query_string) {
-	var data = {};
-	if (query_string.indexOf('#') === 0) {
-		data.tags = query_string.replace('#', '');
-	} else {
-		data.q = query_string;
-	}
-	return data;
-};
-/**
- *
- * @param {string} query_string
- * @param {AJAXData} [ajax_data]
- * @param {SearchResultsAJAXCallback} [success]
- * @returns {jqPromise}
- */
-SearchResults.fetchEventsAndOrganizations = function(query_string, ajax_data, success) {
-	return __APP.SERVER.getData('/api/v1/search/', $.extend({}, SearchResults.sanitizeQueryVar(query_string), ajax_data), success);
-};
-/**
- *
- * @param {AJAXData} [events_ajax_data]
- * @param {function(organizations: Array<OneEvent>)} [success]
- * @returns {jqPromise}
- */
-SearchResults.prototype.fetchEvents = function(events_ajax_data, success) {
-	var self = this,
-		ajax_data = {
-			fields: 'events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length}))
-		};
-	
-	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data.events);
-		}
-	});
-};
-/**
- *
- * @param {AJAXData} [organizations_ajax_data]
- * @param {function(organizations: Array<OneOrganization>)} [success]
- * @returns {jqPromise}
- */
-SearchResults.prototype.fetchOrganizations = function(organizations_ajax_data, success) {
-	var self = this,
-		ajax_data = {
-			fields: 'organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length}))
-		};
-	
-	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data.organizations);
-		}
-	});
-};
-/**
- *
- * @param {AJAXData} [events_ajax_data]
- * @param {AJAXData} [organizations_ajax_data]
- * @param {SearchResultsAJAXCallback} [success]
- * @returns {jqPromise}
- */
-SearchResults.prototype.fetchEventsAndOrganizations = function(events_ajax_data, organizations_ajax_data, success) {
-	var self = this,
-		ajax_data = {fields: []};
-	if (events_ajax_data) {
-		ajax_data.fields.push('events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length})));
-	}
-	if (organizations_ajax_data && !SearchResults.sanitizeQueryVar(self.query_string).tags) {
-		ajax_data.fields.push('organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length})));
-	}
-	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
-/**
- * @requires ../Class.OneEntity.js
- */
-/**
  * @typedef {object} Privilege
  * @property {number} role_id
  * @property {OneUser.ROLE} name
@@ -3558,6 +3452,112 @@ OrganizationsCollection.prototype.fetchMyOrganizations = function(roles, fields,
 			order_by: order_by || undefined
 		};
 	return OrganizationsCollection.fetchMyOrganizations(roles, ajax_data, function(data) {
+		self.setData(data);
+		if (success && typeof success == 'function') {
+			success.call(self, data);
+		}
+	});
+};
+/**
+ * @requires ../Class.OneEntity.js
+ */
+/**
+ * @typedef {function({
+ *   [events]: Array<OneEvent>,
+ *   [organizations]: Array<OneOrganization>
+ * })} SearchResultsAJAXCallback
+ */
+/**
+ *
+ * @constructor
+ * @augments OneEntity
+ * @param {string} query_string
+ */
+function SearchResults(query_string) {
+	this.query_string = query_string;
+	this.events = new EventsCollection();
+	this.organizations = new OrganizationsCollection();
+}
+SearchResults.extend(OneEntity);
+/**
+ *
+ * @param {string} query_string
+ * @returns {{ [q]: {string}, [tags]: {string} }}
+ */
+SearchResults.sanitizeQueryVar = function(query_string) {
+	var data = {};
+	if (query_string.indexOf('#') === 0) {
+		data.tags = query_string.replace('#', '');
+	} else {
+		data.q = query_string;
+	}
+	return data;
+};
+/**
+ *
+ * @param {string} query_string
+ * @param {AJAXData} [ajax_data]
+ * @param {SearchResultsAJAXCallback} [success]
+ * @returns {jqPromise}
+ */
+SearchResults.fetchEventsAndOrganizations = function(query_string, ajax_data, success) {
+	return __APP.SERVER.getData('/api/v1/search/', $.extend({}, SearchResults.sanitizeQueryVar(query_string), ajax_data), success);
+};
+/**
+ *
+ * @param {AJAXData} [events_ajax_data]
+ * @param {function(organizations: Array<OneEvent>)} [success]
+ * @returns {jqPromise}
+ */
+SearchResults.prototype.fetchEvents = function(events_ajax_data, success) {
+	var self = this,
+		ajax_data = {
+			fields: 'events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length}))
+		};
+	
+	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
+		self.setData(data);
+		if (success && typeof success == 'function') {
+			success.call(self, data.events);
+		}
+	});
+};
+/**
+ *
+ * @param {AJAXData} [organizations_ajax_data]
+ * @param {function(organizations: Array<OneOrganization>)} [success]
+ * @returns {jqPromise}
+ */
+SearchResults.prototype.fetchOrganizations = function(organizations_ajax_data, success) {
+	var self = this,
+		ajax_data = {
+			fields: 'organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length}))
+		};
+	
+	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
+		self.setData(data);
+		if (success && typeof success == 'function') {
+			success.call(self, data.organizations);
+		}
+	});
+};
+/**
+ *
+ * @param {AJAXData} [events_ajax_data]
+ * @param {AJAXData} [organizations_ajax_data]
+ * @param {SearchResultsAJAXCallback} [success]
+ * @returns {jqPromise}
+ */
+SearchResults.prototype.fetchEventsAndOrganizations = function(events_ajax_data, organizations_ajax_data, success) {
+	var self = this,
+		ajax_data = {fields: []};
+	if (events_ajax_data) {
+		ajax_data.fields.push('events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length})));
+	}
+	if (organizations_ajax_data && !SearchResults.sanitizeQueryVar(self.query_string).tags) {
+		ajax_data.fields.push('organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length})));
+	}
+	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
 		self.setData(data);
 		if (success && typeof success == 'function') {
 			success.call(self, data);
@@ -4102,7 +4102,7 @@ OneUser = extending(OneEntity, (function() {
 	 */
 	OneUser.prototype.fetchSubscriptions = function(data, success) {
 		var self = this;
-		data.offset = this.favored.length;
+		data.offset = this.subscriptions.length;
 		return OneUser.fetchSubscriptions(self.id, data).done(function(subscriptions) {
 			self.subscriptions.setData(subscriptions);
 			if (success && typeof success == 'function') {
@@ -5525,6 +5525,389 @@ AbstractModal = (function() {
  */
 /**
  * @class
+ * @extends AbstractModal
+ */
+AuthModal = extending(AbstractModal, (function() {
+	
+	function AuthModal() {
+		if (typeof AuthModal.instance === 'object') {
+			return AuthModal.instance;
+		}
+		AbstractModal.call(this, {
+			type: 'AuthModal',
+			content: tmpl('modal-auth-content', {
+				heading: 'Войдите через социальную сеть, чтобы совершить это действие'
+			}),
+			classes: ['-size_tiny'],
+			content_classes: ['-align_center']
+		});
+		
+		this.modal.find('.AuthButton').each(function() {
+			$(this).on('click', function (e) {
+				var network = $(this).data('auth_network');
+				yaCounter32442130.reachGoal(network.toUpperCase() + 'AuthStart');
+				
+				if (isNotDesktop()) {
+					window.location.href = __APP.AUTH_URLS[network];
+				} else {
+					window.open(__APP.AUTH_URLS[network], network.toUpperCase() + '_AUTH_WINDOW', 'status=1,toolbar=0,menubar=0&height=500,width=700');
+				}
+				e.preventDefault();
+			});
+		});
+		
+		bindRippleEffect(this.modal);
+		AuthModal.instance = this;
+	}
+	
+	return AuthModal;
+}()));
+/**
+ * @requires Class.AbstractModal.js
+ */
+/**
+ * @class
+ * @extends AbstractModal
+ */
+CropperModal = extending(AbstractModal, (function() {
+	/**
+	 *
+	 * @param image_src
+	 * @param cropper_options
+	 * @constructor
+	 */
+	function CropperModal(image_src, cropper_options) {
+		if (image_src) {
+			cropper_options = typeof cropper_options == 'object' ? cropper_options : {};
+			AbstractModal.call(this, {
+				content: tmpl('modal-cropper-content', {image_src: this.image_src}),
+				type: 'CropperModal',
+				classes: ['-size_wide'],
+				content_classes: ['-no_padding', 'img_holder'],
+				footer: tmpl('modal-footer', {
+					footer_buttons: $()
+						.add(tmpl('button', {classes: '-color_primary CropButton RippleEffect', title: 'Кадрировать'}))
+						.add(tmpl('button', {classes: '-color_default DestroyCropButton RippleEffect', title: 'Отмена'}))
+				})
+			});
+			this.image_src = image_src;
+			
+			this.cropper = this.modal.find('.Cropper');
+			this.crop_button = this.modal.find('.CropButton');
+			this.destroy_crop_button = this.modal.find('.DestroyCropButton');
+			this.options = $.extend({
+				viewMode: 1,
+				responsive: false,
+				scalable: false,
+				zoomable: false,
+				zoomOnWheel: false
+			}, cropper_options);
+		} else {
+			throw Error('To initiate cropper you need to pass image source (image_src)')
+		}
+	}
+	
+	
+	CropperModal.prototype.show = function() {
+		var self = this;
+		
+		self.cropper.on('load', function() {
+			self.cropper.cropper(self.options);
+		}).attr('src', self.image_src);
+		
+		self.__show();
+		
+		self.modal.on('modal.beforeDestroy', function() {
+			self.cropper.cropper('destroy');
+			self.crop_button.off('click.Crop');
+			self.destroy_crop_button.off('click.DestroyCrop');
+		});
+		
+		self.crop_button.off('click.Crop').on('click.Crop', function() {
+			self.crop();
+			__APP.MODALS.hideCurrent();
+		});
+		self.destroy_crop_button.off('click.DestroyCrop').on('click.DestroyCrop', function() {
+			__APP.MODALS.hideCurrent();
+		});
+	};
+	
+	CropperModal.prototype.crop = function() {
+		var self = this;
+		self.initer.trigger('crop', [self.cropper.cropper('getCroppedCanvas').toDataURL(), self.cropper.cropper('getData')]);
+	};
+	
+	return CropperModal;
+}()));
+/**
+ * @requires Class.AbstractModal.js
+ */
+/**
+ * @class
+ * @extends AbstractModal
+ */
+MapModal = extending(AbstractModal, (function() {
+	function MapModal(location, title) {
+		if (location) {
+			AbstractModal.call(this, {
+				content: tmpl('modal-map-content', {location: location}),
+				type: 'MapModal',
+				classes: ['-size_wide'],
+				content_classes: ['-no_padding']
+			});
+			this.location = location;
+		} else {
+			throw Error('To initiate map you need to pass location (location)')
+		}
+	}
+	
+	return MapModal;
+}()));
+/**
+ * @requires Class.AbstractModal.js
+ */
+/**
+ * @class
+ * @extends AbstractModal
+ */
+MediaModal = extending(AbstractModal, (function() {
+	function MediaModal(src, format) {
+		if (src) {
+			if (format == 'image') {
+				this.content = tmpl('modal-image-media-content', {src: src});
+			} else {
+				
+			}
+			AbstractModal.call(this, {
+				content: this.content,
+				type: 'MediaModal',
+				classes: ['-size_responsive'],
+				content_classes: ['img_holder', '-no_padding', 'ModalContent']
+			});
+			this.src = src;
+			this.format = format ? format : 'image';
+			this.modal.on('modal.show', function() {
+				__APP.MODALS.modal_wrapper.addClass('-blackened');
+			});
+			this.modal.on('modal.close', function() {
+				__APP.MODALS.modal_wrapper.removeClass('-blackened');
+			});
+		} else {
+			throw Error('To open media you need to pass media source (src)')
+		}
+	}
+	
+	/**
+	 * @lends MediaModal
+	 */
+	MediaModal.prototype.show = function() {
+		var self = this;
+		self.modal.find('img').on('load', function() {
+			__APP.MODALS.modal_destroyer.adjustHeight(self.modal.height());
+		});
+		self.__show();
+	};
+	
+	return MediaModal;
+}()));
+/**
+ * @requires Class.AbstractModal.js
+ */
+/**
+ * @class
+ * @extends AbstractModal
+ */
+StdModal = extending(AbstractModal, (function() {
+	/**
+	 *
+	 * @param {string} title
+	 * @param {(string|jQuery)} [content]
+	 * @constructor
+	 */
+	function StdModal(title, content) {
+		AbstractModal.call(this, {
+			content: content,
+			title: title,
+			type: '',
+			content_classes: [],
+			footer: __APP.BUILD.button({
+				classes: ['-color_primary','CloseModal','RippleEffect'],
+				title: 'OK'
+			})
+		});
+	}
+	
+	return StdModal;
+}()));
+/**
+ * @requires ../Class.AbstractModal.js
+ */
+/**
+ * @class
+ * @extends AbstractModal
+ */
+AbstractListModal = extending(AbstractModal, (function() {
+	
+	function AbstractListModal(entity) {
+		AbstractModal.call(this, {
+			type: this.constructor.name,
+			title: this.title,
+			content: tmpl('modal-list-content'),
+			width: 384,
+			height: 'calc(100% - 140px)',
+			classes: ['-fixed'],
+			content_classes: ['list_modal_content']
+		});
+		this.entity = entity;
+		/**
+		 * @abstract
+		 * @type {EntitiesCollection}
+		 */
+		this.entities = new EntitiesCollection();
+		/**
+		 * @type jQuery
+		 */
+		this.$entities_wrapper = this.modal.find('.ListModalWrapper');
+		this.block_scroll = false;
+	}
+	
+	AbstractListModal.prototype.uploadEntities = function() {};
+	
+	AbstractListModal.prototype.buildEntities = function(entities) {};
+	
+	AbstractListModal.prototype.init = function() {
+		var self = this,
+			$loader;
+		
+		this.$entities_wrapper.scrollbar({
+			disableBodyScroll: true,
+			onScroll: function(y) {
+				if (y.scroll == y.maxScroll) {
+					$loader = __APP.BUILD.loaderBlock(self.$entities_wrapper);
+					self.uploadEntities().done(function(){
+						$loader.remove();
+					});
+				}
+			}
+		});
+	};
+	
+	AbstractListModal.prototype.show = function() {
+		var self = this;
+		if(this.$entities_wrapper.children().length) {
+			this.__show();
+			self.init();
+		} else {
+			this.$entities_wrapper.append(this.buildEntities(this.entities));
+			if (this.entities.length < 5) {
+				this.uploadEntities().done(function() {
+					self.__show();
+					self.init();
+				});
+			}
+		}
+	};
+	
+	return AbstractListModal;
+}()));
+/**
+ * @requires Class.AbstractListModal.js
+ */
+/**
+ * @class
+ * @extends AbstractListModal
+ */
+FriendsListModal = extending(AbstractListModal, (function() {
+	/**
+	 *
+	 * @constructs FriendsListModal
+	 */
+	function FriendsListModal(user) {
+		if (typeof FriendsListModal.instance === 'object') {
+			return FriendsListModal.instance;
+		}
+		this.title = 'Подписки на пользователей';
+		AbstractListModal.call(this, user);
+		this.entities = this.entity.friends;
+		FriendsListModal.instance = this;
+	}
+	
+	FriendsListModal.prototype.uploadEntities = function() {
+		var self = this;
+		if(!this.block_scroll){
+			this.block_scroll = true;
+			return __APP.USER.fetchFriends({length: 20}).done(function(friends) {
+				if(friends.length) {
+					self.block_scroll = false;
+					self.$entities_wrapper.append(self.buildEntities(friends));
+				}
+			});
+		}
+		return $.Deferred().resolve().promise();
+	};
+	
+	FriendsListModal.prototype.buildEntities = function(entities) {
+		var $blocks = __APP.BUILD.avatarBlocks(entities, {
+			is_link: true,
+			entity: 'user',
+			avatar_classes: ['-size_40x40', '-rounded']
+		});
+		bindPageLinks($blocks);
+		return $blocks;
+	};
+	
+	return FriendsListModal;
+}()));
+/**
+ * @requires Class.AbstractListModal.js
+ */
+/**
+ * @class
+ * @extends AbstractListModal
+ */
+SubscriptionsListModal = extending(AbstractListModal, (function() {
+	/**
+	 *
+	 * @constructs SubscriptionsListModal
+	 */
+	function SubscriptionsListModal(user) {
+		AbstractListModal.call(this);
+		this.title = 'Подписки на организации';
+		AbstractListModal.call(this, user);
+		this.entities = this.entity.subscriptions;
+	}
+	
+	SubscriptionsListModal.prototype.uploadEntities = function() {
+		var self = this;
+		if(!this.block_scroll){
+			this.block_scroll = true;
+			return this.entity.fetchSubscriptions({length: 20}).done(function(organizations) {
+				if(organizations.length) {
+					self.block_scroll = false;
+					self.$entities_wrapper.append(self.buildEntities(organizations));
+				}
+			});
+		}
+		return $.Deferred().resolve().promise();
+	};
+	
+	SubscriptionsListModal.prototype.buildEntities = function(entities) {
+		var $blocks = __APP.BUILD.avatarBlocks(entities, {
+			is_link: true,
+			entity: 'organization',
+			avatar_classes: ['-size_40x40', '-rounded']
+		});
+		bindPageLinks($blocks);
+		return $blocks;
+	};
+	
+	return SubscriptionsListModal;
+}()));
+/**
+ * @requires ../Class.AbstractModal.js
+ */
+/**
+ * @class
  * @abstract
  * @extends AbstractModal
  */
@@ -5641,125 +6024,6 @@ AbstractUsersModal = extending(AbstractModal, (function() {
 	};
 	
 	return AbstractUsersModal;
-}()));
-/**
- * @requires Class.AbstractModal.js
- */
-/**
- * @class
- * @extends AbstractModal
- */
-AuthModal = extending(AbstractModal, (function() {
-	
-	function AuthModal() {
-		if (typeof AuthModal.instance === 'object') {
-			return AuthModal.instance;
-		}
-		AbstractModal.call(this, {
-			type: 'AuthModal',
-			content: tmpl('modal-auth-content', {
-				heading: 'Войдите через социальную сеть, чтобы совершить это действие'
-			}),
-			classes: ['-size_tiny'],
-			content_classes: ['-align_center']
-		});
-		
-		this.modal.find('.AuthButton').each(function() {
-			$(this).on('click', function (e) {
-				var network = $(this).data('auth_network');
-				yaCounter32442130.reachGoal(network.toUpperCase() + 'AuthStart');
-				
-				if (isNotDesktop()) {
-					window.location.href = __APP.AUTH_URLS[network];
-				} else {
-					window.open(__APP.AUTH_URLS[network], network.toUpperCase() + '_AUTH_WINDOW', 'status=1,toolbar=0,menubar=0&height=500,width=700');
-				}
-				e.preventDefault();
-			});
-		});
-		
-		bindRippleEffect(this.modal);
-		AuthModal.instance = this;
-	}
-	
-	return AuthModal;
-}()));
-/**
- * @requires Class.AbstractModal.js
- */
-/**
- * @class
- * @extends AbstractModal
- */
-CropperModal = extending(AbstractModal, (function() {
-	/**
-	 *
-	 * @param image_src
-	 * @param cropper_options
-	 * @constructor
-	 */
-	function CropperModal(image_src, cropper_options) {
-		if (image_src) {
-			cropper_options = typeof cropper_options == 'object' ? cropper_options : {};
-			AbstractModal.call(this, {
-				content: tmpl('modal-cropper-content', {image_src: this.image_src}),
-				type: 'CropperModal',
-				classes: ['-size_wide'],
-				content_classes: ['-no_padding', 'img_holder'],
-				footer: tmpl('modal-footer', {
-					footer_buttons: $()
-						.add(tmpl('button', {classes: '-color_primary CropButton RippleEffect', title: 'Кадрировать'}))
-						.add(tmpl('button', {classes: '-color_default DestroyCropButton RippleEffect', title: 'Отмена'}))
-				})
-			});
-			this.image_src = image_src;
-			
-			this.cropper = this.modal.find('.Cropper');
-			this.crop_button = this.modal.find('.CropButton');
-			this.destroy_crop_button = this.modal.find('.DestroyCropButton');
-			this.options = $.extend({
-				viewMode: 1,
-				responsive: false,
-				scalable: false,
-				zoomable: false,
-				zoomOnWheel: false
-			}, cropper_options);
-		} else {
-			throw Error('To initiate cropper you need to pass image source (image_src)')
-		}
-	}
-	
-	
-	CropperModal.prototype.show = function() {
-		var self = this;
-		
-		self.cropper.on('load', function() {
-			self.cropper.cropper(self.options);
-		}).attr('src', self.image_src);
-		
-		self.__show();
-		
-		self.modal.on('modal.beforeDestroy', function() {
-			self.cropper.cropper('destroy');
-			self.crop_button.off('click.Crop');
-			self.destroy_crop_button.off('click.DestroyCrop');
-		});
-		
-		self.crop_button.off('click.Crop').on('click.Crop', function() {
-			self.crop();
-			__APP.MODALS.hideCurrent();
-		});
-		self.destroy_crop_button.off('click.DestroyCrop').on('click.DestroyCrop', function() {
-			__APP.MODALS.hideCurrent();
-		});
-	};
-	
-	CropperModal.prototype.crop = function() {
-		var self = this;
-		self.initer.trigger('crop', [self.cropper.cropper('getCroppedCanvas').toDataURL(), self.cropper.cropper('getData')]);
-	};
-	
-	return CropperModal;
 }()));
 /**
  * @requires Class.AbstractUsersModal.js
@@ -5879,106 +6143,6 @@ FavoredModal = extending(AbstractUsersModal, (function() {
 	return FavoredModal;
 }()));
 
-/**
- * @requires Class.AbstractModal.js
- */
-/**
- * @class
- * @extends AbstractModal
- */
-MapModal = extending(AbstractModal, (function() {
-	function MapModal(location, title) {
-		if (location) {
-			AbstractModal.call(this, {
-				content: tmpl('modal-map-content', {location: location}),
-				type: 'MapModal',
-				classes: ['-size_wide'],
-				content_classes: ['-no_padding']
-			});
-			this.location = location;
-		} else {
-			throw Error('To initiate map you need to pass location (location)')
-		}
-	}
-	
-	return MapModal;
-}()));
-/**
- * @requires Class.AbstractModal.js
- */
-/**
- * @class
- * @extends AbstractModal
- */
-MediaModal = extending(AbstractModal, (function() {
-	function MediaModal(src, format) {
-		if (src) {
-			if (format == 'image') {
-				this.content = tmpl('modal-image-media-content', {src: src});
-			} else {
-				
-			}
-			AbstractModal.call(this, {
-				content: this.content,
-				type: 'MediaModal',
-				classes: ['-size_responsive'],
-				content_classes: ['img_holder', '-no_padding', 'ModalContent']
-			});
-			this.src = src;
-			this.format = format ? format : 'image';
-			this.modal.on('modal.show', function() {
-				__APP.MODALS.modal_wrapper.addClass('-blackened');
-			});
-			this.modal.on('modal.close', function() {
-				__APP.MODALS.modal_wrapper.removeClass('-blackened');
-			});
-		} else {
-			throw Error('To open media you need to pass media source (src)')
-		}
-	}
-	
-	/**
-	 * @lends MediaModal
-	 */
-	MediaModal.prototype.show = function() {
-		var self = this;
-		self.modal.find('img').on('load', function() {
-			__APP.MODALS.modal_destroyer.adjustHeight(self.modal.height());
-		});
-		self.__show();
-	};
-	
-	return MediaModal;
-}()));
-/**
- * @requires Class.AbstractModal.js
- */
-/**
- * @class
- * @extends AbstractModal
- */
-StdModal = extending(AbstractModal, (function() {
-	/**
-	 *
-	 * @param {string} title
-	 * @param {(string|jQuery)} [content]
-	 * @constructor
-	 */
-	function StdModal(title, content) {
-		AbstractModal.call(this, {
-			content: content,
-			title: title,
-			type: '',
-			content_classes: [],
-			footer: __APP.BUILD.button({
-				classes: ['-color_primary','CloseModal','RippleEffect'],
-				title: 'OK'
-			})
-		});
-	}
-	
-	return StdModal;
-}()));
 /**
  * @requires Class.AbstractUsersModal.js
  */
@@ -7574,221 +7738,6 @@ StatisticsOrganizationSupportPage.prototype.render = function() {};
  *
  * @constructor
  * @augments Page
- */
-function FriendsPage() {
-	Page.apply(this);
-	
-	this.wrapper_tmpl = 'friends';
-	this.page_title = 'Друзья';
-}
-FriendsPage.extend(Page);
-
-FriendsPage.prototype.render = function() {
-	var $view = this.$view,
-		page_number = 0;
-	
-	function getFeed() {
-		if (page_number == 0) {
-			$view.find('.friend-events-block').remove();
-		}
-		$.ajax({
-			url: '/api/v1/users/feed?fields=entity,created_at,user,type_code,event{fields:"organization_logo_small_url,image_square_vertical_url,organization_short_name"},organization{fields:"subscribed_count,img_medium_url"}&&order_by=-created_at&length=10&offset=' + (10 * page_number++),
-			success: function(res) {
-				var cards_by_users = {};
-				res.data.forEach(function(stat) {
-					var date = moment.unix(stat.created_at),
-						ent = stat[stat.entity],
-						key = [stat.entity, stat.stat_type_id, stat.user.id, date.format('DD.MM')].join('-');
-					if (cards_by_users.hasOwnProperty(key) == false) {
-						cards_by_users[key] = {
-							user: stat.user,
-							entity: stat.entity,
-							type_code: stat.type_code,
-							date: date.format(__C.DATE_FORMAT) == moment().format(__C.DATE_FORMAT) ? 'Сегодня' : date.format('DD.MM'),
-							action_name: __C.ACTION_NAMES[stat.type_code][0],
-							first_name: stat.user.first_name,
-							friend_id: stat.user.id,
-							avatar_url: stat.user.avatar_url,
-							last_name: stat.user.last_name,
-							entities: []
-						};
-					}
-					cards_by_users[key].entities.push(ent);
-				});
-				
-				$.each(cards_by_users, function(key, value) {
-					var $card = tmpl('friends-feed-card', value),
-						item_tmpl_name = value.entity == __C.ENTITIES.EVENT ? 'friends-feed-event' : 'friends-feed-organization';
-					
-					value.entities.forEach(function(ent) {
-						$card.append(tmpl(item_tmpl_name, ent));
-					});
-					$load_btn.before($card);
-				});
-				$load_btn.removeClass(__C.CLASSES.HIDDEN).find('.btn').removeClass(__C.CLASSES.DISABLED);
-				bindPageLinks($view);
-			}
-		});
-	}
-	
-	if(__APP.USER.id === -1){
-		__APP.changeState('/feed/');
-	} else {
-		var $main_content = $view.find('.friends-main-content').removeClass(__C.CLASSES.HIDDEN),
-			$friends_right_list = $view.find('.friends-right-bar'),
-			$load_btn = $view.find('.load-more-btn').addClass(__C.CLASSES.HIDDEN),
-			$user_content = $view.find('.one-friend-main-content').addClass(__C.CLASSES.HIDDEN);
-		
-		
-		getFriendsList($friends_right_list, function(res) {});
-		$load_btn.find('.btn').on('click', getFeed);
-		getFeed();
-	}
-};
-/**
- * @requires ../Class.Page.js
- */
-/**
- *
- * @constructor
- * @augments Page
- * @param {(string|number)} friend_id
- */
-function OneFriendPage(friend_id) {
-	Page.apply(this);
-	
-	this.wrapper_tmpl = 'friends';
-	this.friend_id = friend_id;
-}
-OneFriendPage.extend(Page);
-
-OneFriendPage.prototype.render = function() {
-	var $view = this.$view,
-		friend_id = this.friend_id,
-		$content = $view.find('.one-friend-main-content'),
-		page_number = 0;
-	
-	
-	if(__APP.USER.id === -1){
-		$view.find('.friends-right-bar').remove();
-		$view.find('.back-to-friends-list').remove();
-	} else {
-		getFriendsList($view.find('.friends-right-bar'), function() {
-			$('.friend-item.friend-' + friend_id).addClass(__C.CLASSES.ACTIVE).siblings().removeClass(__C.CLASSES.ACTIVE);
-		});
-	}
-	
-	$view.find('.friends-main-content').addClass(__C.CLASSES.HIDDEN);
-	$content.removeClass(__C.CLASSES.HIDDEN).empty();
-	
-	function getFriendFeed() {
-		var $load_btn = $content.find('.load-more-btn');
-		if (page_number == 0) {
-			$content.find('.friend-events-block').remove();
-		}
-		$.ajax({
-			url: '/api/v1/users/' + friend_id + '/actions?fields=entity,created_at,user,type_code,event{fields:"organization_logo_small_url,image_square_vertical_url,organization_short_name"},organization{fields:"subscribed_count,img_medium_url"}&&order_by=-created_at&length=10&offset=' + (10 * page_number++),
-			success: function(res) {
-				var hide_btn = false;
-				if ((res.data.length == 0 && page_number != 1) || (res.data.length < 10 && res.data.length > 0)) {
-					$load_btn.addClass(__C.CLASSES.HIDDEN);
-					hide_btn = true;
-				} else if (res.data.length == 0 && page_number == 1) {
-					$load_btn.before(tmpl('no-activity', {}));
-					$load_btn.addClass(__C.CLASSES.HIDDEN);
-					hide_btn = true;
-				}
-				var cards_by_users = {};
-				res.data.forEach(function(stat) {
-					var date = moment.unix(stat.created_at),
-						ent = stat[stat.entity],
-						key = [stat.entity, stat.stat_type_id, stat.user.id, date.format('DD.MM')].join('-');
-					if (cards_by_users.hasOwnProperty(key) == false) {
-						cards_by_users[key] = {
-							user: stat.user,
-							entity: stat.entity,
-							type_code: stat.type_code,
-							date: date.format(__C.DATE_FORMAT) == moment().format(__C.DATE_FORMAT) ? 'Сегодня' : date.format('DD.MM'),
-							action_name: __C.ACTION_NAMES[stat.type_code][0].capitalize(),
-							first_name: stat.user.first_name,
-							avatar_url: stat.user.avatar_url,
-							friend_id: stat.user.id,
-							last_name: stat.user.last_name,
-							entities: []
-						};
-					}
-					
-					cards_by_users[key].entities.push(ent);
-				});
-				
-				$.each(cards_by_users, function(key, value) {
-					var $card = tmpl('friends-feed-card-short', value),
-						item_tmpl_name = value.entity == __C.ENTITIES.EVENT ? 'friends-feed-event' : 'friends-feed-organization';
-					
-					value.entities.forEach(function(ent) {
-						$card.append(tmpl(item_tmpl_name, ent));
-					});
-					$load_btn.before($card);
-				});
-				if (!hide_btn) {
-					$load_btn.removeClass(__C.CLASSES.HIDDEN).find('.btn').removeClass(__C.CLASSES.DISABLED);
-				}
-				$load_btn.off('click').on('click', getFriendFeed);
-				bindPageLinks($view);
-			}
-		});
-	}
-	
-	$.ajax({
-		url: '/api/v1/users/' + friend_id + '?fields=subscriptions',
-		success: function(res) {
-			$content.append(tmpl('friends-page-header', res.data[0]));
-			__APP.changeTitle(res.data[0].first_name + ' ' + res.data[0].last_name);
-			$content.find('.friend-user-link').on('click', function() {
-				window.open(res.data[0].link, '_blank');
-			});
-			
-			if (res.data[0].subscriptions.length == 0) {
-				tmpl('no-subscriptions', {}, $content.find('.one-friend-subscriptions'));
-			} else {
-				tmpl('friends-subscription', res.data[0].subscriptions, $content.find('.one-friend-subscriptions'))
-			}
-			
-			
-			$content.find('.friend-subscription-block').each(function(index) {
-				var $this = $(this);
-				setTimeout(function() {
-					$this.fadeIn(300);
-				}, index * 40 + 500);
-			});
-			$content.find('.user-btn').on('click', function() {
-				var $this = $(this);
-				$this.addClass(__C.CLASSES.ACTIVE);
-				$this.siblings().removeClass(__C.CLASSES.ACTIVE);
-				$content.find('.' + $this.data('tab'))
-					.removeClass(__C.CLASSES.HIDDEN)
-					.siblings()
-					.addClass(__C.CLASSES.HIDDEN);
-			});
-			
-			if(__APP.USER.id === -1){
-				$view.find('.back-to-friends-list').remove();
-			} else {
-				$view.find('.back-to-friends-list').on('click', function() {
-					__APP.changeState('/friends');
-				});
-			}
-			getFriendFeed();
-		}
-	});
-};
-/**
- * @requires ../Class.Page.js
- */
-/**
- *
- * @constructor
- * @augments Page
  * @param {(string|number)} [event_id]
  */
 function RedactEventPage(event_id) {
@@ -8907,6 +8856,221 @@ EventPage.prototype.render = function() {
  * @constructor
  * @augments Page
  */
+function FriendsPage() {
+	Page.apply(this);
+	
+	this.wrapper_tmpl = 'friends';
+	this.page_title = 'Друзья';
+}
+FriendsPage.extend(Page);
+
+FriendsPage.prototype.render = function() {
+	var $view = this.$view,
+		page_number = 0;
+	
+	function getFeed() {
+		if (page_number == 0) {
+			$view.find('.friend-events-block').remove();
+		}
+		$.ajax({
+			url: '/api/v1/users/feed?fields=entity,created_at,user,type_code,event{fields:"organization_logo_small_url,image_square_vertical_url,organization_short_name"},organization{fields:"subscribed_count,img_medium_url"}&&order_by=-created_at&length=10&offset=' + (10 * page_number++),
+			success: function(res) {
+				var cards_by_users = {};
+				res.data.forEach(function(stat) {
+					var date = moment.unix(stat.created_at),
+						ent = stat[stat.entity],
+						key = [stat.entity, stat.stat_type_id, stat.user.id, date.format('DD.MM')].join('-');
+					if (cards_by_users.hasOwnProperty(key) == false) {
+						cards_by_users[key] = {
+							user: stat.user,
+							entity: stat.entity,
+							type_code: stat.type_code,
+							date: date.format(__C.DATE_FORMAT) == moment().format(__C.DATE_FORMAT) ? 'Сегодня' : date.format('DD.MM'),
+							action_name: __C.ACTION_NAMES[stat.type_code][0],
+							first_name: stat.user.first_name,
+							friend_id: stat.user.id,
+							avatar_url: stat.user.avatar_url,
+							last_name: stat.user.last_name,
+							entities: []
+						};
+					}
+					cards_by_users[key].entities.push(ent);
+				});
+				
+				$.each(cards_by_users, function(key, value) {
+					var $card = tmpl('friends-feed-card', value),
+						item_tmpl_name = value.entity == __C.ENTITIES.EVENT ? 'friends-feed-event' : 'friends-feed-organization';
+					
+					value.entities.forEach(function(ent) {
+						$card.append(tmpl(item_tmpl_name, ent));
+					});
+					$load_btn.before($card);
+				});
+				$load_btn.removeClass(__C.CLASSES.HIDDEN).find('.btn').removeClass(__C.CLASSES.DISABLED);
+				bindPageLinks($view);
+			}
+		});
+	}
+	
+	if(__APP.USER.id === -1){
+		__APP.changeState('/feed/');
+	} else {
+		var $main_content = $view.find('.friends-main-content').removeClass(__C.CLASSES.HIDDEN),
+			$friends_right_list = $view.find('.friends-right-bar'),
+			$load_btn = $view.find('.load-more-btn').addClass(__C.CLASSES.HIDDEN),
+			$user_content = $view.find('.one-friend-main-content').addClass(__C.CLASSES.HIDDEN);
+		
+		
+		getFriendsList($friends_right_list, function(res) {});
+		$load_btn.find('.btn').on('click', getFeed);
+		getFeed();
+	}
+};
+/**
+ * @requires ../Class.Page.js
+ */
+/**
+ *
+ * @constructor
+ * @augments Page
+ * @param {(string|number)} friend_id
+ */
+function OneFriendPage(friend_id) {
+	Page.apply(this);
+	
+	this.wrapper_tmpl = 'friends';
+	this.friend_id = friend_id;
+}
+OneFriendPage.extend(Page);
+
+OneFriendPage.prototype.render = function() {
+	var $view = this.$view,
+		friend_id = this.friend_id,
+		$content = $view.find('.one-friend-main-content'),
+		page_number = 0;
+	
+	
+	if(__APP.USER.id === -1){
+		$view.find('.friends-right-bar').remove();
+		$view.find('.back-to-friends-list').remove();
+	} else {
+		getFriendsList($view.find('.friends-right-bar'), function() {
+			$('.friend-item.friend-' + friend_id).addClass(__C.CLASSES.ACTIVE).siblings().removeClass(__C.CLASSES.ACTIVE);
+		});
+	}
+	
+	$view.find('.friends-main-content').addClass(__C.CLASSES.HIDDEN);
+	$content.removeClass(__C.CLASSES.HIDDEN).empty();
+	
+	function getFriendFeed() {
+		var $load_btn = $content.find('.load-more-btn');
+		if (page_number == 0) {
+			$content.find('.friend-events-block').remove();
+		}
+		$.ajax({
+			url: '/api/v1/users/' + friend_id + '/actions?fields=entity,created_at,user,type_code,event{fields:"organization_logo_small_url,image_square_vertical_url,organization_short_name"},organization{fields:"subscribed_count,img_medium_url"}&&order_by=-created_at&length=10&offset=' + (10 * page_number++),
+			success: function(res) {
+				var hide_btn = false;
+				if ((res.data.length == 0 && page_number != 1) || (res.data.length < 10 && res.data.length > 0)) {
+					$load_btn.addClass(__C.CLASSES.HIDDEN);
+					hide_btn = true;
+				} else if (res.data.length == 0 && page_number == 1) {
+					$load_btn.before(tmpl('no-activity', {}));
+					$load_btn.addClass(__C.CLASSES.HIDDEN);
+					hide_btn = true;
+				}
+				var cards_by_users = {};
+				res.data.forEach(function(stat) {
+					var date = moment.unix(stat.created_at),
+						ent = stat[stat.entity],
+						key = [stat.entity, stat.stat_type_id, stat.user.id, date.format('DD.MM')].join('-');
+					if (cards_by_users.hasOwnProperty(key) == false) {
+						cards_by_users[key] = {
+							user: stat.user,
+							entity: stat.entity,
+							type_code: stat.type_code,
+							date: date.format(__C.DATE_FORMAT) == moment().format(__C.DATE_FORMAT) ? 'Сегодня' : date.format('DD.MM'),
+							action_name: __C.ACTION_NAMES[stat.type_code][0].capitalize(),
+							first_name: stat.user.first_name,
+							avatar_url: stat.user.avatar_url,
+							friend_id: stat.user.id,
+							last_name: stat.user.last_name,
+							entities: []
+						};
+					}
+					
+					cards_by_users[key].entities.push(ent);
+				});
+				
+				$.each(cards_by_users, function(key, value) {
+					var $card = tmpl('friends-feed-card-short', value),
+						item_tmpl_name = value.entity == __C.ENTITIES.EVENT ? 'friends-feed-event' : 'friends-feed-organization';
+					
+					value.entities.forEach(function(ent) {
+						$card.append(tmpl(item_tmpl_name, ent));
+					});
+					$load_btn.before($card);
+				});
+				if (!hide_btn) {
+					$load_btn.removeClass(__C.CLASSES.HIDDEN).find('.btn').removeClass(__C.CLASSES.DISABLED);
+				}
+				$load_btn.off('click').on('click', getFriendFeed);
+				bindPageLinks($view);
+			}
+		});
+	}
+	
+	$.ajax({
+		url: '/api/v1/users/' + friend_id + '?fields=subscriptions',
+		success: function(res) {
+			$content.append(tmpl('friends-page-header', res.data[0]));
+			__APP.changeTitle(res.data[0].first_name + ' ' + res.data[0].last_name);
+			$content.find('.friend-user-link').on('click', function() {
+				window.open(res.data[0].link, '_blank');
+			});
+			
+			if (res.data[0].subscriptions.length == 0) {
+				tmpl('no-subscriptions', {}, $content.find('.one-friend-subscriptions'));
+			} else {
+				tmpl('friends-subscription', res.data[0].subscriptions, $content.find('.one-friend-subscriptions'))
+			}
+			
+			
+			$content.find('.friend-subscription-block').each(function(index) {
+				var $this = $(this);
+				setTimeout(function() {
+					$this.fadeIn(300);
+				}, index * 40 + 500);
+			});
+			$content.find('.user-btn').on('click', function() {
+				var $this = $(this);
+				$this.addClass(__C.CLASSES.ACTIVE);
+				$this.siblings().removeClass(__C.CLASSES.ACTIVE);
+				$content.find('.' + $this.data('tab'))
+					.removeClass(__C.CLASSES.HIDDEN)
+					.siblings()
+					.addClass(__C.CLASSES.HIDDEN);
+			});
+			
+			if(__APP.USER.id === -1){
+				$view.find('.back-to-friends-list').remove();
+			} else {
+				$view.find('.back-to-friends-list').on('click', function() {
+					__APP.changeState('/friends');
+				});
+			}
+			getFriendFeed();
+		}
+	});
+};
+/**
+ * @requires ../Class.Page.js
+ */
+/**
+ *
+ * @constructor
+ * @augments Page
+ */
 function OnboardingPage() {
 	Page.apply(this, arguments);
 	this.ajax_data = {
@@ -9832,257 +9996,6 @@ SearchPage.prototype.render = function() {
 	this.init();
 };
 /**
- * @requires ../Class.Page.js
- */
-/**
- * @class UserPage
- * @extends Page
- */
-UserPage = extending(Page, (function() {
-	/**
-	 *
-	 * @param {(number|string)} user_id
-	 * @constructs UserPage
-	 */
-	function UserPage(user_id) {
-		Page.apply(this);
-		this.user_id = user_id;
-		this.user = new OneUser(user_id);
-		this.events_metadata = {last_date: ''};
-		
-		this.disable_uploads = {
-			events: false,
-			activities: false
-		};
-		this.favored_fetch_data = {
-			fields: ['image_horizontal_medium_url', 'favored', 'dates'],
-			order_by: 'nearest_event_date,-first_event_date',
-			length: 10
-		};
-	}
-	
-	UserPage.bindEvents = function($parent) {
-		bindRippleEffect($parent);
-		trimAvatarsCollection($parent);
-		__APP.MODALS.bindCallModal($parent);
-		bindPageLinks($parent);
-	};
-	
-	UserPage.prototype.fetchData = function() {
-		if(!(this.user_id == __APP.USER.id || this.user_id === 'me')){
-			return this.fetching_data_defer = this.user.fetchUser(new Fields('type', 'is_friend', 'link', 'accounts', 'accounts_links', {
-				friends: {
-					fields: ['is_friend'],
-					length: 4
-				},
-				favored: this.favored_fetch_data,
-				subscriptions: {
-					fields: ['img_small_url'],
-					length: 4
-				}
-			}));
-		}
-		return Page.prototype.fetchData.call(this);
-	};
-	
-	UserPage.prototype.uploadEntities = function(type) {
-		var self = this,
-			types = {
-				activities: {
-					fetch_method: this.user.actions.fetch,
-					fetch_context: this.user.actions,
-					fetch_arguments: [['organization', 'event', 'type_code', 'created_at'], 20, '-created_at'],
-					extra_function: function(entities) {
-						entities.forEach(function(activity) {
-							activity.user = self.user;
-						});
-					},
-					build_method: __APP.BUILD.activity,
-					build_extra_arguments: []
-				},
-				events: {
-					fetch_method: this.user.fetchFavored,
-					fetch_context: this.user,
-					fetch_arguments: [this.favored_fetch_data],
-					build_method: __APP.BUILD.eventBlocks,
-					build_extra_arguments: [this.events_metadata]
-				}
-			},
-			type_data = types[type],
-			$wrapper = self.$wrapper.find('.TabsBody').filter('[data-tab_body_type="'+type+'"]'),
-			$loader;
-		
-		if(!self.disable_uploads[type] && !self.block_scroll){
-			$loader = __APP.BUILD.loaderBlock($wrapper);
-			self.block_scroll = true;
-			
-			type_data.fetch_method.apply(type_data.fetch_context, type_data.fetch_arguments).done(function(entities) {
-				var $entities;
-				if(entities.length){
-					if(type_data.extra_function && typeof type_data.extra_function === 'function'){
-						type_data.extra_function(entities);
-					}
-					$entities = type_data.build_method.apply(self, [entities].concat(type_data.build_extra_arguments));
-					$wrapper.append($entities);
-					UserPage.bindEvents($entities);
-				} else {
-					self.disable_uploads[type] = true;
-				}
-				self.block_scroll = false;
-				$loader.remove();
-			});
-		}
-	};
-	
-	UserPage.prototype.init = function() {
-		var self = this,
-			$window = $(window),
-			event_names = {
-				activities: 'scroll.uploadActivities',
-				events: 'scroll.uploadEvents'
-			};
-		
-		bindTabs(this.$wrapper);
-		UserPage.bindEvents(this.$wrapper);
-		
-		this.$wrapper.find('.Tabs').on('change.tabs', function() {
-			var $this = $(this),
-				active_type = $this.find('.TabsBody').filter('.'+__C.CLASSES.NEW_ACTIVE).data('tab_body_type');
-			$window.off(Object.values(event_names).join(' '));
-			$window.on(event_names[active_type], function() {
-				if ( isScrollLeft(200) ) {
-					switch (active_type) {
-						case 'activities': {
-							self.uploadEntities('activities');
-							break;
-						}
-						case 'events': {
-							self.uploadEntities('events');
-							break;
-						}
-					}
-				}
-			});
-		});
-		
-		$window.on(event_names.activities, function() {
-			if (isScrollLeft(200)) {
-				self.uploadEntities('activities');
-			}
-		});
-	};
-	
-	UserPage.prototype.render = function() {
-		var self = this;
-		
-		if(this.user_id == __APP.USER.id){
-			__APP.changeState('/my/profile', true, true);
-			return null;
-		}
-		__APP.changeTitle(this.user.full_name);
-		
-		this.user.actions.forEach(function(action) {
-			action.user = self.user;
-		});
-		
-		this.$wrapper.append(tmpl('user-page', {
-			tombstone: __APP.BUILD.userTombstones(this.user, {avatar_classes: ['-bordered', '-shadowed']}),
-			links: __APP.BUILD.socialLinks(this.user.accounts_links),
-			subscribed_orgs: __APP.BUILD.avatarBlocks(this.user.subscriptions.slice(0,4), {
-				avatar_classes: ['-size_30x30'],
-				entity: 'organization',
-				is_link: true
-			}),
-			show_all_subscribed_orgs_button: __APP.BUILD.button({
-				classes: ['-color_neutral_accent','CallModal','RippleEffect'],
-				dataset: {
-					modal_type: ''
-				},
-				title: 'Показать все'
-			}),
-			friends_hidden: __C.CLASSES.NEW_HIDDEN,
-			favored_event_blocks: __APP.BUILD.eventBlocks(this.user.favored, this.events_metadata)
-		}));
-		this.uploadEntities('activities');
-		this.init();
-	};
-	
-	return UserPage;
-}()));
-/**
- * @requires Class.UserPage.js
- */
-/**
- * @class MyProfilePage
- * @extends UserPage
- */
-MyProfilePage = extending(UserPage, (function() {
-	/**
-	 *
-	 * @constructs MyProfilePage
-	 */
-	function MyProfilePage() {
-		UserPage.call(this, __APP.USER.id);
-		this.page_title = 'Мой профиль';
-		this.user = __APP.USER;
-	}
-	
-	MyProfilePage.prototype.fetchData = function() {
-		if(!this.user.favored.length){
-			return this.fetching_data_defer = this.user.fetchFavored(this.favored_fetch_data);
-		}
-		return Page.prototype.fetchData.call(this);
-	};
-	
-	MyProfilePage.prototype.render = function() {
-		var $activities;
-		__APP.changeTitle('Мой профиль');
-		
-		this.user.actions.forEach(function(action) {
-			action.user = __APP.USER;
-		});
-		this.$wrapper.append(tmpl('user-page', {
-			tombstone: __APP.BUILD.userTombstones(this.user, {avatar_classes: ['-bordered', '-shadowed']}),
-			links: __APP.BUILD.socialLinks(this.user.accounts_links),
-			subscribed_orgs: __APP.BUILD.avatarBlocks(this.user.subscriptions.slice(0,4), {
-				avatar_classes: ['-size_30x30'],
-				entity: 'organization',
-				is_link: true
-			}),
-			show_all_subscribed_orgs_button: __APP.BUILD.button({
-				classes: ['-color_neutral_accent','CallModal','RippleEffect'],
-				dataset: {
-					modal_type: ''
-				},
-				title: 'Показать все'
-			}),
-			subscribed_users: __APP.BUILD.avatarBlocks(this.user.friends.slice(0,4), {
-				avatar_classes: ['-size_30x30', '-rounded'],
-				entity: 'user',
-				is_link: true
-			}),
-			show_all_subscribed_users_button: __APP.BUILD.button({
-				classes: ['-color_neutral_accent','CallModal','RippleEffect'],
-				dataset: {
-					modal_type: 'favors'
-				},
-				title: 'Показать все'
-			}),
-			favored_event_blocks: __APP.BUILD.eventBlocks(this.user.favored, this.events_metadata)
-		}));
-		if(this.user.actions.length){
-			$activities = __APP.BUILD.activity(this.user.actions);
-			this.$wrapper.find('.TabsBody').filter('[data-tab_body_type="activities"]').append($activities);
-			UserPage.bindEvents($activities);
-		} else {
-			this.uploadEntities('activities');
-		}
-		this.init();
-	};
-	
-	return MyProfilePage;
-}()));
-/**
  * @requires Class.StatisticsPage.js
  */
 /**
@@ -10200,6 +10113,261 @@ StatisticsOverviewPage.prototype.render = function() {
 StatisticsOverviewPage.prototype.destroy = function() {
 	$(window).off('scroll.uploadOrganizations');
 };
+/**
+ * @requires ../Class.Page.js
+ */
+/**
+ * @class UserPage
+ * @extends Page
+ */
+UserPage = extending(Page, (function() {
+	/**
+	 *
+	 * @param {(number|string)} user_id
+	 * @constructs UserPage
+	 */
+	function UserPage(user_id) {
+		Page.apply(this);
+		this.user_id = user_id;
+		this.user = new OneUser(user_id);
+		this.events_metadata = {last_date: ''};
+		
+		this.disable_uploads = {
+			events: false,
+			activities: false
+		};
+		this.favored_fetch_data = {
+			fields: ['image_horizontal_medium_url', 'favored', 'dates'],
+			order_by: 'nearest_event_date,-first_event_date',
+			length: 10
+		};
+	}
+	
+	UserPage.bindEvents = function($parent) {
+		bindRippleEffect($parent);
+		trimAvatarsCollection($parent);
+		__APP.MODALS.bindCallModal($parent);
+		bindPageLinks($parent);
+	};
+	
+	UserPage.prototype.fetchData = function() {
+		if(!(this.user_id == __APP.USER.id || this.user_id === 'me')){
+			return this.fetching_data_defer = this.user.fetchUser(new Fields('type', 'is_friend', 'link', 'accounts', 'accounts_links', {
+				friends: {
+					fields: ['is_friend'],
+					length: 4
+				},
+				favored: this.favored_fetch_data,
+				subscriptions: {
+					fields: ['img_small_url'],
+					length: 4,
+					order_by: ['organization_type_order', 'organization_type_id']
+				}
+			}));
+		}
+		return Page.prototype.fetchData.call(this);
+	};
+	
+	UserPage.prototype.uploadEntities = function(type) {
+		var self = this,
+			types = {
+				activities: {
+					fetch_method: this.user.actions.fetch,
+					fetch_context: this.user.actions,
+					fetch_arguments: [['organization', 'event', 'type_code', 'created_at'], 20, '-created_at'],
+					extra_function: function(entities) {
+						entities.forEach(function(activity) {
+							activity.user = self.user;
+						});
+					},
+					build_method: __APP.BUILD.activity,
+					build_extra_arguments: []
+				},
+				events: {
+					fetch_method: this.user.fetchFavored,
+					fetch_context: this.user,
+					fetch_arguments: [this.favored_fetch_data],
+					build_method: __APP.BUILD.eventBlocks,
+					build_extra_arguments: [this.events_metadata]
+				}
+			},
+			type_data = types[type],
+			$wrapper = self.$wrapper.find('.TabsBody').filter('[data-tab_body_type="'+type+'"]'),
+			$loader;
+		
+		if(!self.disable_uploads[type] && !self.block_scroll){
+			$loader = __APP.BUILD.loaderBlock($wrapper);
+			self.block_scroll = true;
+			
+			type_data.fetch_method.apply(type_data.fetch_context, type_data.fetch_arguments).done(function(entities) {
+				var $entities;
+				if(entities.length){
+					if(type_data.extra_function && typeof type_data.extra_function === 'function'){
+						type_data.extra_function(entities);
+					}
+					$entities = type_data.build_method.apply(self, [entities].concat(type_data.build_extra_arguments));
+					$wrapper.append($entities);
+					UserPage.bindEvents($entities);
+				} else {
+					self.disable_uploads[type] = true;
+				}
+				self.block_scroll = false;
+				$loader.remove();
+			});
+		}
+	};
+	
+	UserPage.prototype.init = function() {
+		var self = this,
+			$window = $(window),
+			event_names = {
+				activities: 'scroll.uploadActivities',
+				events: 'scroll.uploadEvents'
+			};
+		
+		bindTabs(this.$wrapper);
+		UserPage.bindEvents(this.$wrapper);
+		
+		this.$wrapper.find('.Tabs').on('change.tabs', function() {
+			var $this = $(this),
+				active_type = $this.find('.TabsBody').filter('.'+__C.CLASSES.NEW_ACTIVE).data('tab_body_type');
+			$window.off(Object.values(event_names).join(' '));
+			$window.on(event_names[active_type], function() {
+				if ( isScrollLeft(200) ) {
+					switch (active_type) {
+						case 'activities': {
+							self.uploadEntities('activities');
+							break;
+						}
+						case 'events': {
+							self.uploadEntities('events');
+							break;
+						}
+					}
+				}
+			});
+		});
+		
+		$window.on(event_names.activities, function() {
+			if (isScrollLeft(200)) {
+				self.uploadEntities('activities');
+			}
+		});
+	};
+	
+	UserPage.prototype.render = function() {
+		var self = this;
+		
+		if(this.user_id == __APP.USER.id){
+			__APP.changeState('/my/profile', true, true);
+			return null;
+		}
+		__APP.changeTitle(this.user.full_name);
+		
+		this.user.actions.forEach(function(action) {
+			action.user = self.user;
+		});
+		
+		this.$wrapper.append(tmpl('user-page', {
+			tombstone: __APP.BUILD.userTombstones(this.user, {avatar_classes: ['-bordered', '-shadowed']}),
+			links: __APP.BUILD.socialLinks(this.user.accounts_links),
+			subscribed_orgs: __APP.BUILD.avatarBlocks(this.user.subscriptions.slice(0,4), {
+				avatar_classes: ['-size_30x30'],
+				entity: 'organization',
+				is_link: true
+			}),
+			show_all_subscribed_orgs_button: __APP.BUILD.button({
+				classes: ['-color_neutral_accent','CallModal','RippleEffect'],
+				dataset: {
+					modal_type: 'subscribers_list',
+					modal_entity: this.user
+				},
+				title: 'Показать все'
+			}),
+			friends_hidden: __C.CLASSES.NEW_HIDDEN,
+			favored_event_blocks: __APP.BUILD.eventBlocks(this.user.favored, this.events_metadata)
+		}));
+		this.uploadEntities('activities');
+		this.init();
+	};
+	
+	return UserPage;
+}()));
+/**
+ * @requires Class.UserPage.js
+ */
+/**
+ * @class MyProfilePage
+ * @extends UserPage
+ */
+MyProfilePage = extending(UserPage, (function() {
+	/**
+	 *
+	 * @constructs MyProfilePage
+	 */
+	function MyProfilePage() {
+		UserPage.call(this, __APP.USER.id);
+		this.page_title = 'Мой профиль';
+		this.user = __APP.USER;
+	}
+	
+	MyProfilePage.prototype.fetchData = function() {
+		if(!this.user.favored.length){
+			return this.fetching_data_defer = this.user.fetchFavored(this.favored_fetch_data);
+		}
+		return Page.prototype.fetchData.call(this);
+	};
+	
+	MyProfilePage.prototype.render = function() {
+		var $activities;
+		__APP.changeTitle('Мой профиль');
+		
+		this.user.actions.forEach(function(action) {
+			action.user = __APP.USER;
+		});
+		this.$wrapper.append(tmpl('user-page', {
+			tombstone: __APP.BUILD.userTombstones(this.user, {avatar_classes: ['-bordered', '-shadowed']}),
+			links: __APP.BUILD.socialLinks(this.user.accounts_links),
+			subscribed_orgs: __APP.BUILD.avatarBlocks(this.user.subscriptions.slice(0,4), {
+				avatar_classes: ['-size_30x30'],
+				entity: 'organization',
+				is_link: true
+			}),
+			show_all_subscribed_orgs_button: __APP.BUILD.button({
+				classes: ['-color_neutral_accent','CallModal','RippleEffect'],
+				dataset: {
+					modal_type: 'subscribers_list',
+					modal_entity: this.user
+				},
+				title: 'Показать все'
+			}),
+			subscribed_users: __APP.BUILD.avatarBlocks(this.user.friends.slice(0,4), {
+				avatar_classes: ['-size_30x30', '-rounded'],
+				entity: 'user',
+				is_link: true
+			}),
+			show_all_subscribed_users_button: __APP.BUILD.button({
+				classes: ['-color_neutral_accent','CallModal','RippleEffect'],
+				dataset: {
+					modal_type: 'friends_list',
+					modal_entity: this.user
+				},
+				title: 'Показать все'
+			}),
+			favored_event_blocks: __APP.BUILD.eventBlocks(this.user.favored, this.events_metadata)
+		}));
+		if(this.user.actions.length){
+			$activities = __APP.BUILD.activity(this.user.actions);
+			this.$wrapper.find('.TabsBody').filter('[data-tab_body_type="activities"]').append($activities);
+			UserPage.bindEvents($activities);
+		} else {
+			this.uploadEntities('activities');
+		}
+		this.init();
+	};
+	
+	return MyProfilePage;
+}()));
 /**
  *
  * @class jqPromise
@@ -10579,7 +10747,7 @@ __APP = {
 		modal_destroyer: $.extend({
 			adjustHeight: function(height) {
 				var html_height = $(window).height(),
-					modal_height = height + 200;
+					modal_height = height;
 				this.height((modal_height > html_height) ? modal_height : html_height);
 			}
 		}, $('.modal_destroyer')),
@@ -10693,6 +10861,14 @@ __APP = {
 								});
 								break;
 							}
+							case 'friends_list': {
+								modal = new FriendsListModal($this.data('modal_entity'));
+								break;
+							}
+							case 'subscribers_list': {
+								modal = new SubscriptionsListModal($this.data('modal_entity'));
+								break;
+							}
 							default: {
 								modal = new StdModal(title, $this.data('modal_content'));
 								break;
@@ -10742,13 +10918,18 @@ __APP = {
 		},
 		/**
 		 *
-		 * @param {...buildProps} props
+		 * @param {..buildProps} props
 		 * @returns {jQuery}
 		 */
-		button: function buildButton(props) {
-			return tmpl('button', [].map.call(arguments, function(arg) {
+		button: function buildButton(/**props*/) {
+			var props = Array.prototype.slice.call(arguments);
+			return tmpl('button', props.map(function(arg) {
 				return __APP.BUILD.normalizeBuildProps(arg);
-			}));
+			})).each(function(i, button) {
+				if(props[i].dataset) {
+					$(button).data(props[i].dataset);
+				}
+			});
 		},
 		/**
 		 *
@@ -11307,18 +11488,21 @@ __APP = {
 		 *    [content]: string|jQuery,
 		 *    [classes]: Array<string>|string,
 		 *    [content_classes]: Array<string>|string,
-		 *    [width]: number,
+		 *    [width]: (number|string),
+		 *    [height]: (number|string),
 		 *    [header]: jQuery,
 		 *    [title]: string,
 		 *    [footer]: jQuery,
 		 *    [footer_buttons]: jQuery
+		 *    [dataset]: object
+		 *    [attributes]: object
 		 * }} props
 		 * @return {jQuery}
 		 */
 		modal: function(props) {
-			var $modal;
+			var $modal, vars;
 			props = __APP.BUILD.normalizeBuildProps(props, ['content_classes']);
-			var vars = {
+			vars = {
 				modal_type: props.type,
 				modal_content: props.content,
 				modal_classes: props.classes,
@@ -11330,7 +11514,7 @@ __APP = {
 				vars.modal_header = tmpl('modal-header', {
 					title: props.title,
 					close_button: __APP.BUILD.button({
-						classes: ['-color_default','-empty','-modal_destroyer','CloseModal','RippleEffect'],
+						classes: ['-empty','-modal_destroyer','CloseModal','RippleEffect'],
 						title: '×'
 					})
 				});
@@ -11347,6 +11531,9 @@ __APP = {
 			$modal = tmpl('modal', vars);
 			if(props.width){
 				$modal.width(props.width);
+			}
+			if(props.height){
+				$modal.height(props.height);
 			}
 			return $modal;
 		}

@@ -41,7 +41,8 @@ MyProfilePage = extending(UserPage, (function() {
 			show_all_subscribed_orgs_button: __APP.BUILD.button({
 				classes: ['-color_neutral_accent','CallModal','RippleEffect'],
 				dataset: {
-					modal_type: ''
+					modal_type: 'subscribers_list',
+					modal_entity: this.user
 				},
 				title: 'Показать все'
 			}),
@@ -53,7 +54,8 @@ MyProfilePage = extending(UserPage, (function() {
 			show_all_subscribed_users_button: __APP.BUILD.button({
 				classes: ['-color_neutral_accent','CallModal','RippleEffect'],
 				dataset: {
-					modal_type: 'favors'
+					modal_type: 'friends_list',
+					modal_entity: this.user
 				},
 				title: 'Показать все'
 			}),
