@@ -789,22 +789,6 @@ __APP = {
 			return tmpl('avatar', output_entities.map(map));
 		},
 		/**
-		 * @deprecated
-		 * @param {Array} subscribers
-		 * @param {number} count
-		 * @returns {jQuery}
-		 */
-		subscribersAvatars: function buildSubscribersAvatars(subscribers, count) {
-			var $subscribers = $();
-			$subscribers = $subscribers.add(tmpl('subscriber-avatar', __APP.USER));
-			subscribers.forEach(function(subscriber) {
-				if (subscriber.id != __APP.USER.id && $subscribers.length <= count) {
-					$subscribers = $subscribers.add(tmpl('subscriber-avatar', subscriber));
-				}
-			});
-			return $subscribers;
-		},
-		/**
 		 *
 		 * @param {Array} entities
 		 * @param {number} max_count
