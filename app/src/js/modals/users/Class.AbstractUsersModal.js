@@ -1,5 +1,5 @@
 /**
- * @requires Class.AbstractModal.js
+ * @requires ../Class.AbstractModal.js
  */
 /**
  * @class

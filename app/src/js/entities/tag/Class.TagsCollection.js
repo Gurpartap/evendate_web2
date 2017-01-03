@@ -21,7 +21,7 @@ TagsCollection.prototype.collection_of = OneTag;
  *
  * @param {AJAXData} data
  * @param {AJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 TagsCollection.fetchTags = function(data, success) {
 	return __APP.SERVER.getData('/api/v1/tags/', data, success);
@@ -30,7 +30,7 @@ TagsCollection.fetchTags = function(data, success) {
  *
  * @param {TagsCollectionAJAXData} data
  * @param {AJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 TagsCollection.prototype.fetchTags = function(data, success) {
 	var self = this;
