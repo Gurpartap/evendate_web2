@@ -1321,7 +1321,9 @@ function bindTabs($parent) {
 			mutation_observer = new MutationObserver(function(records) {
 				records.forEach(function(record){
 					var $wrapper = $(record.target);
-					$wrapper.parent().height($wrapper.height());
+					if($wrapper.hasClass(__C.CLASSES.NEW_ACTIVE)) {
+						$wrapper.parent().height($wrapper.height());
+					}
 				});
 			});
 		
@@ -1329,7 +1331,7 @@ function bindTabs($parent) {
 			$tabs.eq(0).addClass(__C.CLASSES.NEW_ACTIVE);
 		}
 		$bodies.removeClass(__C.CLASSES.NEW_ACTIVE).eq($tabs.index($tabs.filter('.-active'))).addClass(__C.CLASSES.NEW_ACTIVE);
-		$wrapper.height($bodies.filter('.-active').height());
+		$wrapper.height($bodies.filter('.'+__C.CLASSES.NEW_ACTIVE).height());
 		$bodies.each(function(i, body) {
 			mutation_observer.observe(body, {childList: true});
 		});
@@ -1340,7 +1342,7 @@ function bindTabs($parent) {
 				$bodies.removeClass(__C.CLASSES.NEW_ACTIVE);
 				$(this).addClass(__C.CLASSES.NEW_ACTIVE);
 				$bodies.eq($tabs.index(this)).addClass(__C.CLASSES.NEW_ACTIVE);
-				$wrapper.height($bodies.filter('.-active').height());
+				$wrapper.height($bodies.filter('.'+__C.CLASSES.NEW_ACTIVE).height());
 				$this.trigger('change.tabs');
 			}
 		})
