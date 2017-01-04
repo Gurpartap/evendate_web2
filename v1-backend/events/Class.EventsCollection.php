@@ -125,6 +125,7 @@ class EventsCollection extends AbstractCollection
 					}
 					$q_get_events->where(Event::MY_EVENTS_QUERY_PART);
 					$statement_array[':user_id'] = $value->getId();
+					$getting_personal_events = true;
 					break;
 				}
 				case 'id': {
@@ -145,6 +146,7 @@ class EventsCollection extends AbstractCollection
 					if ($value instanceof Organization) {
 						$q_get_events->where('organization_id = :organization_id');
 						$statement_array[':organization_id'] = $value->getId();
+						$getting_personal_events = true;
 					}
 					break;
 				}
@@ -460,6 +462,10 @@ class EventsCollection extends AbstractCollection
 			->orderBy($order_by);
 		if ($from_view != self::VIEW_ALL_EVENTS_WITH_ALIAS) {
 			$canceled_condition ? $q_get_events->where($canceled_condition) : false;
+		}
+		if (!isset($getting_personal_events) || $getting_personal_events == false) {
+			$q_get_events
+				->where('organization_private = false');
 		}
 
 

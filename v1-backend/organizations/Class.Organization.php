@@ -476,7 +476,7 @@ class Organization extends AbstractEntity
 			$data['email'] = null;
 		}
 
-		$data['private'] = isset($data['private']) && filter_var($data['filter'], FILTER_VALIDATE_BOOLEAN) == true ? 'true' : 'false';
+		$data['private'] = isset($data['private']) && filter_var($data['private'], FILTER_VALIDATE_BOOLEAN) == true ? 'true' : 'false';
 
 		if (isset($data['brand_color'])) {
 			if (preg_match('/^#[a-f0-9]{6}$/i', $data['brand_color'])) //hex color is valid

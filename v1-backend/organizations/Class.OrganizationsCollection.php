@@ -161,12 +161,44 @@ class OrganizationsCollection
 					$order_by = array('rating DESC');
 					break;
 				}
+				case 'invite_key': {
+					$getting_private_organization = true;
+				}
 			}
 		}
 
 		$q_get_organizations
 			->cols($cols)
 			->orderBy($order_by);
+
+		if (isset($getting_private_organization) && $getting_private_organization == true) {
+
+		} else {
+			$q_get_organizations->where('private = false')
+				->orWhere('id IN 
+					(SELECT organization_id 
+						FROM organizations_invitations
+						WHERE 
+						(user_id = :user_id OR email = :email)
+						AND status = true
+						)')
+				->orWhere('id IN 
+					(SELECT organization_id 
+						FROM subscriptions
+						WHERE 
+						user_id = :user_id
+						AND status = true
+						)')
+				->orWhere('id IN 
+					(SELECT organization_id 
+						FROM users_organizations
+						WHERE 
+						user_id = :user_id
+						AND status = true
+						)');
+			$statement_array[':user_id'] = $user->getId();
+			$statement_array[':email'] = $user->getEmail();
+		}
 
 		if (isset($pagination['offset'])) {
 			$q_get_organizations->offset($pagination['offset']);
@@ -200,7 +232,7 @@ class OrganizationsCollection
 	public static function one(PDO $db,
 														 AbstractUser $user,
 														 int $id,
-														 array $fields = null) : Organization
+														 array $fields = null): Organization
 	{
 		$organization = self::filter($db,
 			$user,
