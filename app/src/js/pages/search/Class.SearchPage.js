@@ -47,8 +47,6 @@ function SearchPage(search) {
 	};
 	this.past_events = false;
 	this.search_results = new SearchResults(this.search_string);
-	this.is_loading = true;
-	this.search_results.fetchEventsAndOrganizations(this.events_ajax_data, this.organizations_ajax_data, Page.triggerRender);
 }
 SearchPage.extend(Page);
 /**
@@ -78,10 +76,14 @@ SearchPage.buildEventCards = function(events) {
 				$events = $events.add(tmpl('divider', {title: 'Прошедшие события'}));
 				this.past_events = true;
 			}
-			$events = $events.add(__APP.BUILD.feedEventCards(event));
+			$events = $events.add(__APP.BUILD.eventCards(event));
 		});
 	}
 	return $events
+};
+
+SearchPage.prototype.fetchData = function() {
+	return this.fetching_data_defer = this.search_results.fetchEventsAndOrganizations(this.events_ajax_data, this.organizations_ajax_data);
 };
 
 SearchPage.prototype.init = function() {
@@ -117,12 +119,12 @@ SearchPage.prototype.init = function() {
 	$window.on('scroll.upload' + PAGE.constructor.name, function() {
 		if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.block_scroll) {
 			PAGE.block_scroll = true;
-			__APP.CURRENT_JQXHR = PAGE.search_results.fetchEvents(PAGE.events_ajax_data, function(events) {
+			PAGE.search_results.fetchEvents(PAGE.events_ajax_data, function(events) {
 				var $events;
 				if(events.length){
 					$events = SearchPage.buildEventCards(events);
-					bindFeedEvents($events);
 					PAGE.$wrapper.find('.SearchEvents').append($events);
+					bindFeedEvents($events);
 					PAGE.block_scroll = false;
 				} else {
 					$window.off('scroll.upload' + PAGE.constructor.name);

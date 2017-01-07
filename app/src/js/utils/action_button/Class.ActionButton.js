@@ -47,17 +47,17 @@ ActionButton.prototype.addAvatar = function() {
 		amount = $avatars.length;
 	
 	if ($collection.data('max_amount') >= amount) {
-		if ($collection.hasClass('-subscribed')) {
-			$collection.removeClass('-subscribed');
+		if ($collection.hasClass('-shifted')) {
+			$collection.removeClass('-shifted');
 			$collection.width(amount == 1 ? 0 : ($avatars.outerWidth() * (amount - 1)) - (6 * (amount - 2)));
 		} else {
-			$collection.addClass('-subscribed');
+			$collection.addClass('-shifted');
 			$collection.width(($avatars.outerWidth() * amount) - (6 * (amount - 1)));
 		}
 	} else {
 		if ($favored_count.length) {
 			var current_count = parseInt($favored_count.text());
-			if ($collection.hasClass('-subscribed')) {
+			if ($collection.hasClass('-shifted')) {
 				$favored_count.text(current_count - 1);
 				if (current_count - 1 <= 0) {
 					$favored_count.parent().addClass('-cast');
@@ -67,7 +67,7 @@ ActionButton.prototype.addAvatar = function() {
 				$favored_count.parent().removeClass('-cast');
 			}
 		}
-		$collection.toggleClass('-shift -subscribed');
+		$collection.toggleClass('-shift -shifted');
 	}
 };
 ActionButton.prototype.bindHoverEffects = function() {

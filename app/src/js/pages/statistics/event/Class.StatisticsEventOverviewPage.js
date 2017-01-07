@@ -12,16 +12,18 @@ function StatisticsEventOverviewPage(event_id) {
 	
 	this.graphics_stats = new EventStatistics(this.id);
 	this.scoreboards_stats = new EventStatistics(this.id);
-	this.is_loading = true;
-	this.event.fetchEvent([
+}
+StatisticsEventOverviewPage.extend(StatisticsEventPage);
+
+StatisticsEventOverviewPage.prototype.fetchData = function() {
+	return this.fetching_data_defer = this.event.fetchEvent([
 		'image_horizontal_medium_url',
 		'organization_short_name',
 		'favored_users_count',
 		'is_same_time',
 		'dates'
-	], Page.triggerRender);
-}
-StatisticsEventOverviewPage.extend(StatisticsEventPage);
+	]);
+};
 
 StatisticsEventOverviewPage.prototype.render = function() {
 	var PAGE = this;

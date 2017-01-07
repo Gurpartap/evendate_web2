@@ -49,7 +49,7 @@ OrganizationsStatistics.extend(Statistics);
  * @param {string} [dynamics_ajax_data.since]
  * @param {string} [dynamics_ajax_data.till]
  * @param {function} [success]
- * @return {jqXHR}
+ * @return {jqPromise}
  */
 OrganizationsStatistics.fetchStatistics = function(id, scale, range, statistics_fields, dynamics_ajax_data, success) {
 	return Statistics.fetchStatistics(Statistics.ENTITIES.ORGANIZATION, id, scale, range, statistics_fields, dynamics_ajax_data, success);

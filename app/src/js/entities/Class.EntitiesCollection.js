@@ -7,7 +7,14 @@
  * @augments Array
  * @implements EntityInterface
  */
-function EntitiesCollection() {}
+function EntitiesCollection() {
+	Object.defineProperty(this, 'last_pushed', {
+		value: [],
+		writable: true,
+		enumerable: false,
+		configurable: false
+	});
+}
 EntitiesCollection.extend(Array);
 EntitiesCollection.prototype.collection_of = OneEntity;
 /**
@@ -47,9 +54,10 @@ EntitiesCollection.prototype.has = function(id) {
  * @returns {number}
  */
 EntitiesCollection.prototype.push = function(element) {
+	this.last_pushed = [];
 	for (var i = 0; i < arguments.length; i++) {
 		if (!arguments[i].id || (arguments[i].id && !this.has(arguments[i].id))) {
-			this[this.length++] = arguments[i] instanceof this.collection_of ? arguments[i] : (new this.collection_of()).setData(arguments[i]);
+			this.last_pushed.push(this[this.length++] = arguments[i] instanceof this.collection_of ? arguments[i] : (new this.collection_of()).setData(arguments[i]));
 		}
 	}
 	return this.length;

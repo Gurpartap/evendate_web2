@@ -8,7 +8,6 @@
  * @param {(string|number)} [category_id]
  */
 function CatalogPage(category_id) {
-	var self = this;
 	Page.apply(this);
 	
 	this.wrapper_tmpl = 'organizations';
@@ -27,11 +26,16 @@ function CatalogPage(category_id) {
 	
 	this.default_title = 'Организации';
 	
-	this.is_loading = true;
 	this.selected_category_id = category_id;
 	this.categories = new CategoriesCollection();
 	this.all_organizations = new OrganizationsCollection();
-	this.categories.fetchCategoriesWithOrganizations(this.categories_ajax_data, this.organizations_ajax_data, 0, function() {
+	
+}
+CatalogPage.extend(Page);
+
+CatalogPage.prototype.fetchData = function() {
+	var self = this;
+	return this.fetching_data_defer = this.categories.fetchCategoriesWithOrganizations(this.categories_ajax_data, this.organizations_ajax_data, 0).done(function() {
 		self.all_organizations = self.categories
 			.reduce(function(collection, cat) {
 				return collection.setData(cat.organizations);
@@ -39,10 +43,8 @@ function CatalogPage(category_id) {
 			.sort(function(a, b) {
 				return b.subscribed_count - a.subscribed_count;
 			});
-		Page.triggerRender();
 	});
-}
-CatalogPage.extend(Page);
+};
 /**
  *
  * @param {(string|number)} category_id

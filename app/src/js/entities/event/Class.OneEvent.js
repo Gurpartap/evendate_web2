@@ -22,6 +22,7 @@ function OneEvent(event_id, is_loading_continuous) {
 	this.image_vertical_url = '';
 	this.image_horizontal_url = '';
 	this.image_horizontal_large_url = '';
+	this.image_horizontal_small_url = '';
 	this.organization_logo_small_url = '';
 	this.is_free = false;
 	this.min_price = 0;
@@ -62,7 +63,7 @@ OneEvent.STATUS = {
  * @param {(string|number)} event_id
  * @param {(string|Array)} [fields]
  * @param {AJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OneEvent.fetchEvent = function(event_id, fields, success) {
 	return __APP.SERVER.getData('/api/v1/events/' + event_id, fields || (Array.isArray(fields) && fields.length) ? {fields: fields} : {}, success);
@@ -93,7 +94,7 @@ OneEvent.fetchEvent = function(event_id, fields, success) {
  * @param {OneEventCreateEventData} new_event_data
  * @param {OneEventCreateEventCallback} [success]
  * @param {function} [error]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OneEvent.createEvent = function(new_event_data, success, error) {
 	return __APP.SERVER.addData('/api/v1/events/', JSON.stringify(new_event_data), true, success, error);
@@ -104,7 +105,7 @@ OneEvent.createEvent = function(new_event_data, success, error) {
  * @param {OneEventCreateEventData} data
  * @param {OneEventCreateEventCallback} [success]
  * @param {function} [error]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OneEvent.updateEvent = function(event_id, data, success, error) {
 	return __APP.SERVER.updateData('/api/v1/events/' + event_id, JSON.stringify(data), success, error);
@@ -114,7 +115,7 @@ OneEvent.updateEvent = function(event_id, data, success, error) {
  * @param {(string|number)} event_id
  * @param {(OneEvent.STATUS|Array<OneEvent.STATUS>)} status
  * @param {AJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OneEvent.changeEventStatus = function(event_id, status, success) {
 	var data = {};
@@ -149,7 +150,7 @@ OneEvent.changeEventStatus = function(event_id, status, success) {
  *
  * @param {(string|number)} event_id
  * @param {function} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OneEvent.addFavored = function(event_id, success) {
 	return __APP.SERVER.addData('/api/v1/events/' + event_id + '/favorites', {}, false, success);
@@ -158,7 +159,7 @@ OneEvent.addFavored = function(event_id, success) {
  *
  * @param {(string|number)} event_id
  * @param {AJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OneEvent.deleteFavored = function(event_id, success) {
 	return __APP.SERVER.deleteData('/api/v1/events/' + event_id + '/favorites', {}, success);
@@ -168,7 +169,7 @@ OneEvent.deleteFavored = function(event_id, success) {
  * @param {(string|number)} event_id
  * @param {string} notification_type
  * @param {function} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OneEvent.addEventNotification = function(event_id, notification_type, success) {
 	return __APP.SERVER.addData('/api/v1/events/' + event_id + '/notifications', {notification_type: notification_type}, false, success);
@@ -178,7 +179,7 @@ OneEvent.addEventNotification = function(event_id, notification_type, success) {
  * @param {(string|number)} event_id
  * @param {string} notification_uuid
  * @param {AJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OneEvent.deleteEventNotification = function(event_id, notification_uuid, success) {
 	return __APP.SERVER.deleteData('/api/v1/events/' + event_id + '/notifications/' + notification_uuid, {}, success);
@@ -187,7 +188,7 @@ OneEvent.deleteEventNotification = function(event_id, notification_uuid, success
  *
  * @param {(string|Array)} fields
  * @param {AJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OneEvent.prototype.fetchEvent = function(fields, success) {
 	var self = this;
@@ -203,7 +204,7 @@ OneEvent.prototype.fetchEvent = function(fields, success) {
  * @param {OneEventCreateEventData} data
  * @param {OneEventCreateEventCallback} [success]
  * @param {function} [error]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OneEvent.prototype.createEvent = function(data, success, error) {
 	var self = this;
@@ -220,7 +221,7 @@ OneEvent.prototype.createEvent = function(data, success, error) {
  * @param {OneEventCreateEventData} data
  * @param {OneEventCreateEventCallback} [success]
  * @param {function} [error]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OneEvent.prototype.updateEvent = function(data, success, error) {
 	var self = this;
@@ -235,7 +236,7 @@ OneEvent.prototype.updateEvent = function(data, success, error) {
  *
  * @param {(OneEvent.STATUS|Array<OneEvent.STATUS>)} status
  * @param {AJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OneEvent.prototype.changeEventStatus = function(status, success) {
 	var self = this;
@@ -250,7 +251,7 @@ OneEvent.prototype.changeEventStatus = function(status, success) {
  *
  * @param {string} notification_type
  * @param {function} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OneEvent.prototype.addNotification = function(notification_type, success) {
 	return this.constructor.addEventNotification(this.id, notification_type, success);
@@ -259,7 +260,7 @@ OneEvent.prototype.addNotification = function(notification_type, success) {
  *
  * @param {string} notification_uuid
  * @param {AJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OneEvent.prototype.deleteNotification = function(notification_uuid, success) {
 	return this.constructor.deleteEventNotification(this.id, notification_uuid, success);

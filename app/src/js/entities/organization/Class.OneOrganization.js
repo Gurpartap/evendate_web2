@@ -15,6 +15,7 @@
  */
 function OneOrganization(organization_id, is_loading_continuous) {
 	this.id = organization_id || 0;
+	this.name = '';
 	this.short_name = '';
 	this.description = '';
 	this.img_url = '';
@@ -50,7 +51,7 @@ OneOrganization.extend(OneEntity);
  * @param {(string|number)} org_id
  * @param {(string|Array)} fields
  * @param {AJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OneOrganization.fetchOrganization = function(org_id, fields, success) {
 	return __APP.SERVER.getData('/api/v1/organizations/' + org_id, {fields: fields}, success);
@@ -79,7 +80,7 @@ OneOrganization.fetchOrganization = function(org_id, fields, success) {
  *
  * @param {OneOrganizationCreateOrganizationData} new_organization_data
  * @param {OneOrganizationCreateOrganizationCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OneOrganization.createOrganization = function(new_organization_data, success) {
 	return __APP.SERVER.addData('/api/v1/organizations/', JSON.stringify(new_organization_data), true, success);
@@ -89,7 +90,7 @@ OneOrganization.createOrganization = function(new_organization_data, success) {
  * @param {(string|number)} organization_id
  * @param {OneOrganizationCreateOrganizationData} organization_data
  * @param {OneOrganizationCreateOrganizationCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OneOrganization.updateOrganization = function(organization_id, organization_data, success) {
 	return __APP.SERVER.updateData('/api/v1/organizations/' + organization_id, JSON.stringify(organization_data), success);
@@ -98,7 +99,7 @@ OneOrganization.updateOrganization = function(organization_id, organization_data
  *
  * @param {(string|number)} org_id
  * @param {AJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OneOrganization.subscribeOrganization = function(org_id, success) {
 	return __APP.SERVER.addData('/api/v1/organizations/' + org_id + '/subscriptions', {}, false, success);
@@ -107,7 +108,7 @@ OneOrganization.subscribeOrganization = function(org_id, success) {
  *
  * @param {(string|number)} org_id
  * @param {AJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OneOrganization.unsubscribeOrganization = function(org_id, success) {
 	return __APP.SERVER.deleteData('/api/v1/organizations/' + org_id + '/subscriptions', {}, success);
@@ -126,7 +127,7 @@ OneOrganization.prototype.setData = function(data) {
  *
  * @param {(string|Array)} fields
  * @param {AJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OneOrganization.prototype.fetchOrganization = function(fields, success) {
 	var self = this;
@@ -142,7 +143,7 @@ OneOrganization.prototype.fetchOrganization = function(fields, success) {
  * @param {(string|Array)} fields
  * @param {AJAXData} [events_ajax_data]
  * @param {AJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OneOrganization.prototype.fetchOrganizationWithEvents = function(fields, events_ajax_data, success) {
 	var _fields = fields;
@@ -154,7 +155,7 @@ OneOrganization.prototype.fetchOrganizationWithEvents = function(fields, events_
  *
  * @param {OneOrganizationCreateOrganizationData} new_organization_data
  * @param {OneOrganizationCreateOrganizationCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OneOrganization.prototype.createOrganization = function(new_organization_data, success) {
 	var self = this;
@@ -170,7 +171,7 @@ OneOrganization.prototype.createOrganization = function(new_organization_data, s
  *
  * @param {OneOrganizationCreateOrganizationData} organization_data
  * @param {OneOrganizationCreateOrganizationCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OneOrganization.prototype.updateOrganization = function(organization_data, success) {
 	var self = this;
@@ -184,7 +185,7 @@ OneOrganization.prototype.updateOrganization = function(organization_data, succe
 /**
  *
  * @param {AJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OneOrganization.prototype.subscribe = function(success) {
 	var self = this;
@@ -199,7 +200,7 @@ OneOrganization.prototype.subscribe = function(success) {
 /**
  *
  * @param {AJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OneOrganization.prototype.unsubscribe = function(success) {
 	var self = this;

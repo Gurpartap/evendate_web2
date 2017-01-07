@@ -7,7 +7,7 @@
  * @augments Page
  * @param {(string|number)} event_id
  */
-function OneEventPage(event_id) {
+function EventPage(event_id) {
 	Page.apply(this);
 	
 	this.fields = [
@@ -31,11 +31,9 @@ function OneEventPage(event_id) {
 		'detail_info_url',
 		'canceled'
 	];
-	this.is_loading = true;
 	this.event = new OneEvent(event_id);
-	this.event.fetchEvent(this.fields, Page.triggerRender);
 }
-OneEventPage.extend(Page);
+EventPage.extend(Page);
 /**
  *
  * @param {Array} raw_notifications
@@ -43,7 +41,7 @@ OneEventPage.extend(Page);
  * @param {OneEvent.last_event_date} last_date
  * @return {jQuery}
  */
-OneEventPage.buildNotifications = function(raw_notifications, event_id, last_date) {
+EventPage.buildNotifications = function(raw_notifications, event_id, last_date) {
 	var m_today = moment(),
 		all_notifications = {
 			'notification-before-quarter-of-hour': {
@@ -110,7 +108,11 @@ OneEventPage.buildNotifications = function(raw_notifications, event_id, last_dat
 	return $notifications;
 };
 
-OneEventPage.prototype.init = function() {
+EventPage.prototype.fetchData = function() {
+	return this.fetching_data_defer = this.event.fetchEvent(this.fields);
+};
+
+EventPage.prototype.init = function() {
 	var PAGE = this;
 	trimAvatarsCollection(PAGE.$wrapper);
 	bindRippleEffect(PAGE.$wrapper);
@@ -160,19 +162,19 @@ OneEventPage.prototype.init = function() {
 	});
 };
 
-OneEventPage.prototype.render = function() {
+EventPage.prototype.render = function() {
 	var PAGE = this,
-		$subscribers = __APP.BUILD.avatars(PAGE.event.favored, 6),
-		avatars_collection_classes = [],
-		favored_users_count = ($subscribers.length <= 6) ? 0 : PAGE.event.favored_users_count - 6,
-		$event_additional_fields = $();
+		avatars_collection_classes = ['-rounded','-bordered','-size_small','AvatarsCollection','CallModal'],
+		$event_additional_fields = $(),
+		organization = new OneOrganization(PAGE.event.organization_id);
+	organization.setData({
+		short_name: PAGE.event.organization_short_name,
+		img_url: PAGE.event.organization_logo_small_url
+	});
 	
 	__APP.changeTitle(PAGE.event.title);
 	if (PAGE.event.is_favorite) {
 		avatars_collection_classes.push('-subscribed');
-		if ($subscribers.length > 4) {
-			avatars_collection_classes.push('-shift');
-		}
 	}
 	
 	if (PAGE.event.is_same_time) {
@@ -207,16 +209,26 @@ OneEventPage.prototype.render = function() {
 			is_subscribed: PAGE.event.is_favorite,
 			classes: ['event_favourite_button', '-size_low', '-rounded', 'RippleEffect']
 		}),
-		subscribers: $subscribers,
-		avatars_collection_classes: avatars_collection_classes.join(' '),
-		favored_users_show: favored_users_count ? '' : '-cast',
-		favored_users_count: favored_users_count,
-		notifications: OneEventPage.buildNotifications(PAGE.event.notifications, PAGE.event.id, PAGE.event.last_event_date),
+		avatars_collection: __APP.BUILD.avatarCollection(PAGE.event.favored, 6, {
+			dataset: {
+				modal_type: 'favors',
+				modal_event_id: PAGE.event.id,
+				modal_title: 'Добавили в избранное'
+			},
+			classes: avatars_collection_classes,
+			counter_classes: ['-size_30x30','-bordered','-color_marginal','-castable']
+		}, PAGE.event.favored_users_count),
+		notifications: EventPage.buildNotifications(PAGE.event.notifications, PAGE.event.id, PAGE.event.last_event_date),
 		location_sanitized: encodeURI(PAGE.event.location),
 		event_edit_functions: PAGE.event.can_edit ? tmpl('event-edit-functions', PAGE.event) : '',
 		event_registration_information: PAGE.event.registration_required ? tmpl('event-registration-info', {registration_till: moment.unix(PAGE.event.registration_till).format('D MMMM')}) : '',
 		event_price_information: PAGE.event.is_free ? '' : tmpl('event-price-info', {min_price: PAGE.event.min_price ? formatCurrency(PAGE.event.min_price) : '0'}),
 		canceled: PAGE.event.canceled ? '' : '-hidden',
+		organization_avatar_block: __APP.BUILD.avatarBlocks(organization, {
+			block_classes: ['-size_small'],
+			is_link: true,
+			entity: 'organization'
+		}),
 		event_additional_fields: $event_additional_fields,
 		cancel_cancellation: PAGE.event.can_edit ? tmpl('button', {
 			classes: '-color_primary RippleEffect CancelCancellation',

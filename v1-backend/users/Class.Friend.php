@@ -124,7 +124,7 @@ class Friend extends AbstractEntity implements UserInterface {
 		}
 
 		if (isset($fields[self::ACTIONS_FIELD_NAME])){
-			$result_data[self::ACTIONS_FIELD_NAME] = OrganizationsCollection::filter(
+			$result_data[self::ACTIONS_FIELD_NAME] = ActionsCollection::filter(
 				App::DB(),
 				App::getCurrentUser(),
 				array(

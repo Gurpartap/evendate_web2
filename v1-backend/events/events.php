@@ -101,7 +101,7 @@ $__modules['events'] = array(
 			return EventsCollection::filter(
 				$__db,
 				$__user,
-				array_merge($__request, array('favorites' => true)),
+				array_merge($__request, array('favorites' => $__user)),
 				$__fields,
 				array('length' => $__length, 'offset' => $__offset),
 				$__order_by ?? array('nearest_event_date', 'first_event_date'));

@@ -1,5 +1,5 @@
 
-CREATE VIEW view_actions AS SELECT
+CREATE OR REPLACE VIEW view_actions AS SELECT
                               stat_events.stat_type_id,
                               stat_events.event_id,
                               stat_event_types.name,
@@ -14,6 +14,7 @@ CREATE VIEW view_actions AS SELECT
                               INNER JOIN view_events ON view_events.id = stat_events.event_id
                             WHERE
                               view_events.status = TRUE
+                                AND view_events.is_canceled = FALSE
                               AND (stat_event_types.type_code = 'fave'
                                    OR stat_event_types.type_code = 'unfave')
                             GROUP BY stat_events.event_id, tokens.user_id, stat_events.stat_type_id,

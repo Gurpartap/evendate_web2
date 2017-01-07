@@ -10,9 +10,7 @@ function StatisticsOverviewPage() {
 	StatisticsPage.apply(this);
 	this.my_organizations_fields = ['img_medium_url', 'subscribed_count', 'staff'];
 	this.page_title = 'Организации';
-	this.is_loading = true;
 	this.my_organizations = new OrganizationsCollection();
-	this.my_organizations.fetchMyOrganizations('admin', this.my_organizations_fields, 10, '', Page.triggerRender);
 }
 StatisticsOverviewPage.extend(StatisticsPage);
 
@@ -35,24 +33,18 @@ StatisticsOverviewPage.buildMyOrganizationsBlocks = function(organizations) {
 					staff: UsersCollection.getSpecificStaff(OneUser.ROLE.MODERATOR, org.staff, staff_additional_fields),
 					plural_name: OneUser.ROLE.MODERATOR + 's'
 				}
-			],
-			staffs_fields = {
-				classes: ['-size_30x30', '-rounded', 'CallModal'],
+			];
+		org_roles.forEach(function(role) {
+			org[role.plural_name] = __APP.BUILD.avatarCollection(role.staff, avatars_max_count, {
 				dataset: {
 					modal_type: 'editors',
-					modal_organization_id: org.id
-				}
-			};
-		org_roles.forEach(function(role) {
-			org[role.plural_name] = __APP.BUILD.avatarCollection(role.staff, avatars_max_count, $.extend(true, {}, staffs_fields, {
-				dataset: {
 					modal_specific_role: role.name,
-					modal_title: role.title
-				}
-			}));
-			
-			org[role.plural_name + '_plus_count'] = role.staff.length - avatars_max_count;
-			org[role.plural_name + '_plus_count_hidden'] = org[role.plural_name + '_plus_count'] <= 0 ? '-cast' : '';
+					modal_title: role.title,
+					modal_organization_id: org.id
+				},
+				classes: ['-size_30x30', '-rounded', '-shifted', 'CallModal'],
+				counter_classes: ['-size_30x30','-color_marginal_primary']
+			});
 		});
 		return $.extend(true, {}, org, {
 			subscribers: org.subscribed_count + getUnitsText(org.subscribed_count, __LOCALES.ru_RU.TEXTS.SUBSCRIBERS),
@@ -67,6 +59,10 @@ StatisticsOverviewPage.buildMyOrganizationsBlocks = function(organizations) {
 			})
 		});
 	}));
+};
+
+StatisticsOverviewPage.prototype.fetchData = function() {
+	return this.fetching_data_defer = this.my_organizations.fetchMyOrganizations('admin', this.my_organizations_fields, 10, '');
 };
 
 StatisticsOverviewPage.prototype.bindOrganizationsEvents = function($parent) {
