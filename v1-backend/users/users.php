@@ -65,7 +65,7 @@ $__modules['users'] = array(
 				array_merge($__request, array('friend' => $friend)),
 				$__fields ?? array(),
 				$__pagination ?? array(),
-				$__order_by ?? array('id')
+				$__order_by ?? array('created_at DESC')
 			);
 		},
 		'{/(id:[0-9]+)/favorites}' => function ($id) use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
