@@ -47,7 +47,7 @@ $__modules['users'] = array(
 				array('user' => $__user),
 				$__fields,
 				$__pagination,
-				$__order_by ?? array()
+				$__order_by ?? array('id')
 			);
 		},
 		'{/(id:[0-9]+)/actions}' => function ($id) use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
@@ -65,7 +65,46 @@ $__modules['users'] = array(
 				array_merge($__request, array('friend' => $friend)),
 				$__fields ?? array(),
 				$__pagination ?? array(),
-				$__order_by ?? array()
+				$__order_by ?? array('created_at DESC')
+			);
+		},
+		'{/(id:[0-9]+)/favorites}' => function ($id) use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
+			$friend = UsersCollection::one(
+				$__db,
+				$__user,
+				intval($id),
+				array()
+			);
+
+			return EventsCollection::filter(
+				App::DB(),
+				App::getCurrentUser(),
+				array(
+					'favorites' => $friend
+				),
+				$__fields ?? array(),
+				$__pagination ?? array(),
+				$__order_by ?? array('nearest_event_date', 'first_event_date')
+			);
+		},
+		'{/(id:[0-9]+)/subscriptions}' => function ($id) use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
+			$friend = UsersCollection::one(
+				$__db,
+				$__user,
+				intval($id),
+				array()
+			);
+
+
+			return OrganizationsCollection::filter(
+				App::DB(),
+				App::getCurrentUser(),
+				array(
+					'friend' => $friend
+				),
+				$__fields ?? array(),
+				$__pagination ?? array(),
+				$__order_by ?? array('organization_type_order', 'organization_type_id')
 			);
 		},
 		'{/(id:[0-9]+)}' => function ($id) use ($__user, $__fields, $__db) {
@@ -95,6 +134,41 @@ $__modules['users'] = array(
 			} else {
 				return $__user->getSettings();
 			}
+		},
+
+		'{me/actions}' => function () use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
+			return ActionsCollection::filter(
+				$__db,
+				$__user,
+				array_merge($__request, array('friend' => $__user)),
+				$__fields ?? array(),
+				$__pagination ?? array(),
+				$__order_by ?? array('id')
+			);
+		},
+		'{me/favorites}' => function () use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
+			return EventsCollection::filter(
+				App::DB(),
+				App::getCurrentUser(),
+				array(
+					'favorites' => $__user
+				),
+				$__fields ?? array(),
+				$__pagination ?? array(),
+				$__order_by ?? array('nearest_event_date', 'first_event_date')
+			);
+		},
+		'{me/subscriptions}' => function () use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
+			return OrganizationsCollection::filter(
+				App::DB(),
+				App::getCurrentUser(),
+				array(
+					'friend' => $__user
+				),
+				$__fields ?? array(),
+				$__pagination ?? array(),
+				$__order_by ?? array('organization_type_order', 'organization_type_id')
+			);
 		},
 		'{me}' => function () use ($__user, $__fields) {
 			return $__user->getMainInfo($__fields);

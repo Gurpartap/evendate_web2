@@ -14,8 +14,14 @@ Function.prototype.extend = function(parent) {
 		}
 	};
 };
+/**
+ * Extending class
+ * @param {Function} parent
+ * @param {Function} children
+ * @return {Function}
+ */
 function extending(parent, children){
-	children.prototype = $.extend({}, parent.prototype, children.prototype);
+	children.prototype = $.extend(Object.create(parent.prototype), children.prototype);
 	children.prototype.constructor = children;
 	Object.defineProperty(children.prototype, '__super', {
 		value: parent
@@ -193,6 +199,65 @@ Array.prototype.clean = function(delete_value) {
 	}
 	return this;
 };
+/**
+ * Merges arrays without duplicates
+ * @param {...Array} array
+ * @return {Array}
+ */
+Array.prototype.merge = function(array) {
+	var args = Array.prototype.slice.call(arguments),
+		hash = {},
+		arr = [],
+		i = 0,
+		j = 0;
+	args.unshift(this);
+	for (i = 0; i < args.length; i++) {
+		for (j = 0; j < args[i].length; j++) {
+			if (hash[args[i][j]] !== true) {
+				arr[arr.length] = args[i][j];
+				hash[args[i][j]] = true;
+			}
+		}
+	}
+	return arr;
+};
+/**
+ * Checks if array contains some element
+ * @param {*} it
+ * @return {boolean}
+ */
+Array.prototype.contains = function(it) {return this.indexOf(it) !== -1;};
+
+if (![].includes) {
+	Array.prototype.includes = function(searchElement/*, fromIndex*/) {
+		'use strict';
+		var O = Object(this);
+		var len = parseInt(O.length) || 0;
+		if (len === 0) {
+			return false;
+		}
+		var n = parseInt(arguments[1]) || 0;
+		var k;
+		if (n >= 0) {
+			k = n;
+		} else {
+			k = len + n;
+			if (k < 0) {
+				k = 0;
+			}
+		}
+		while (k < len) {
+			var currentElement = O[k];
+			if (searchElement === currentElement ||
+				(searchElement !== searchElement && currentElement !== currentElement)
+			) {
+				return true;
+			}
+			k++;
+		}
+		return false;
+	};
+}
 /**
  * Returns rounded num to specific count of decimals
  * @param {(number|string)} num
@@ -710,6 +775,21 @@ jQuery.makeSet = function(array) {
 	};
 }(window));
 
+var CollectionOfXHRs = extending(Array, (function(){
+	function CollectionOfXHRs(){}
+	
+	CollectionOfXHRs.prototype.abortAll = function() {
+		var cur;
+		while (this.length) {
+			cur = this.pop();
+			if(cur.state() === 'pending'){
+				//cur.abort();
+			}
+		}
+	};
+	
+	return CollectionOfXHRs;
+}()));
 
 /**===========================================================
  * Templates for jQuery
@@ -838,6 +918,27 @@ function getUnitsText(num, cases) {
 	}
 	
 	return word;
+}
+/**
+ * Возвращает текст с правильным родом
+ *
+ * @param {OneUser.GENDER} gender
+ * @param {({
+ *  MAS: {string},
+ *  FEM: {string},
+ *  NEU: {string}
+ * }|string)} cases
+ */
+function getGenderText(gender, cases) {
+	if(typeof cases === 'string'){
+		return cases;
+	}
+	switch (gender) {
+		default:
+		case OneUser.GENDER.MALE: return cases.MAS;
+		case OneUser.GENDER.FEMALE: return cases.FEM;
+		case OneUser.GENDER.NEUTRAL: return cases.NEU;
+	}
 }
 
 
@@ -1187,7 +1288,7 @@ function trimAvatarsCollection($parent) {
 		var $collection = $(this),
 			$avatars = $collection.find('.avatar'),
 			amount = $avatars.length;
-		if ($collection.hasClass('-subscribed') && !$collection.hasClass('-shift')) {
+		if (($collection.hasClass('-subscribed') || $collection.hasClass('-shifted')) && amount < $collection.data('max_amount')) {
 			$collection.width(amount == 1 ? ($avatars.outerWidth() * amount) : ($avatars.outerWidth() * amount) - (6 * (amount - 1)));
 		} else {
 			$collection.width(amount == 1 ? 0 : ($avatars.outerWidth() * (amount - 1)) - (6 * (amount - 2)));
@@ -1216,13 +1317,24 @@ function bindTabs($parent) {
 		var $this = $(elem),
 			$wrapper = $this.find('.TabsBodyWrapper'),
 			$tabs = $this.find('.Tab'),
-			$bodies = $this.find('.TabsBody');
+			$bodies = $this.find('.TabsBody'),
+			mutation_observer = new MutationObserver(function(records) {
+				records.forEach(function(record){
+					var $wrapper = $(record.target);
+					if($wrapper.hasClass(__C.CLASSES.NEW_ACTIVE)) {
+						$wrapper.parent().height($wrapper.height());
+					}
+				});
+			});
 		
 		if (!$tabs.filter('.-active').length) {
 			$tabs.eq(0).addClass(__C.CLASSES.NEW_ACTIVE);
 		}
 		$bodies.removeClass(__C.CLASSES.NEW_ACTIVE).eq($tabs.index($tabs.filter('.-active'))).addClass(__C.CLASSES.NEW_ACTIVE);
-		$wrapper.height($bodies.filter('.-active').height());
+		$wrapper.height($bodies.filter('.'+__C.CLASSES.NEW_ACTIVE).height());
+		$bodies.each(function(i, body) {
+			mutation_observer.observe(body, {childList: true});
+		});
 		
 		$tabs.on('click', function() {
 			if (!$(this).hasClass(__C.CLASSES.NEW_ACTIVE)) {
@@ -1230,7 +1342,7 @@ function bindTabs($parent) {
 				$bodies.removeClass(__C.CLASSES.NEW_ACTIVE);
 				$(this).addClass(__C.CLASSES.NEW_ACTIVE);
 				$bodies.eq($tabs.index(this)).addClass(__C.CLASSES.NEW_ACTIVE);
-				$wrapper.height($bodies.filter('.-active').height());
+				$wrapper.height($bodies.filter('.'+__C.CLASSES.NEW_ACTIVE).height());
 				$this.trigger('change.tabs');
 			}
 		})
@@ -1397,11 +1509,6 @@ function bindPageLinks($parent) {
 	}).addClass('-Handled_Link');
 }
 
-function unbindPageLinks($parent) {
-	$parent = $parent ? $parent : $('body');
-	$parent.find('.Link').removeClass('-Handled_Link').off('click.pageRender');
-}
-
 /**
  * Changes form unit`s state to error
  * @param {jQuery} $unit
@@ -1460,6 +1567,25 @@ function isNotDesktop() {
 		if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(a) || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0, 4)))check = true
 	})(navigator.userAgent || navigator.vendor || window.opera);
 	return check;
+}
+
+/**
+ * Returning true if scroll passes ending threshold + left argument
+ * @param {int} left
+ * @return {boolean}
+ */
+function isScrollLeft(left) {
+	return ($(window).height() + $(window).scrollTop() + +(left)) >= $(document).height();
+}
+
+/**
+ * Setting default value for variable if its is undefined
+ * @param {*} variable
+ * @param {*} default_value
+ * @return {*}
+ */
+function setDefaultValue(variable, default_value) {
+	return variable = typeof variable === 'undefined' ? default_value : variable;
 }
 
 

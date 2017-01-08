@@ -38,7 +38,7 @@ SearchResults.sanitizeQueryVar = function(query_string) {
  * @param {string} query_string
  * @param {AJAXData} [ajax_data]
  * @param {SearchResultsAJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 SearchResults.fetchEventsAndOrganizations = function(query_string, ajax_data, success) {
 	return __APP.SERVER.getData('/api/v1/search/', $.extend({}, SearchResults.sanitizeQueryVar(query_string), ajax_data), success);
@@ -47,7 +47,7 @@ SearchResults.fetchEventsAndOrganizations = function(query_string, ajax_data, su
  *
  * @param {AJAXData} [events_ajax_data]
  * @param {function(organizations: Array<OneEvent>)} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 SearchResults.prototype.fetchEvents = function(events_ajax_data, success) {
 	var self = this,
@@ -66,7 +66,7 @@ SearchResults.prototype.fetchEvents = function(events_ajax_data, success) {
  *
  * @param {AJAXData} [organizations_ajax_data]
  * @param {function(organizations: Array<OneOrganization>)} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 SearchResults.prototype.fetchOrganizations = function(organizations_ajax_data, success) {
 	var self = this,
@@ -86,7 +86,7 @@ SearchResults.prototype.fetchOrganizations = function(organizations_ajax_data, s
  * @param {AJAXData} [events_ajax_data]
  * @param {AJAXData} [organizations_ajax_data]
  * @param {SearchResultsAJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 SearchResults.prototype.fetchEventsAndOrganizations = function(events_ajax_data, organizations_ajax_data, success) {
 	var self = this,

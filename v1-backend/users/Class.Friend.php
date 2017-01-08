@@ -124,7 +124,7 @@ class Friend extends AbstractEntity{
 		}
 
 		if (isset($fields[self::ACTIONS_FIELD_NAME])){
-			$result_data[self::ACTIONS_FIELD_NAME] = OrganizationsCollection::filter(
+			$result_data[self::ACTIONS_FIELD_NAME] = ActionsCollection::filter(
 				App::DB(),
 				App::getCurrentUser(),
 				array(
@@ -137,6 +137,7 @@ class Friend extends AbstractEntity{
 				),
 				Fields::parseOrderBy($fields[self::ACTIONS_FIELD_NAME]['order_by'] ?? ''))->getData();
 		}
+
 		if (isset($fields[self::FAVORED_FIELD_NAME])){
 			$result_data[self::FAVORED_FIELD_NAME] = EventsCollection::filter(
 				App::DB(),

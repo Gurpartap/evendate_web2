@@ -11,6 +11,32 @@ require_once $BACKEND_FULL_PATH . '/events/Class.NotificationsCollection.php';
 
 $__modules['events'] = array(
 	'GET' => array(
+		'{/(id:[0-9]+)/registrations/(uuid:\w+-\w+-\w+-\w+-\w+)/qr}' => function ($event_id, $uuid) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+			$format = 'png';
+			$available_types = ['png', 'svg', 'pdf', 'eps'];
+			$headers = array(
+				'png' => 'image/png',
+				'svg' => 'image/svg+xml',
+				'pdf' => 'application/pdf',
+				'eps' => 'application/postscript',
+			);
+			$size = 10;
+			if (isset($__request['format'])) {
+				if (isset($available_types[$__request['format']])) {
+					$format = $__request['format'];
+
+				}
+			}
+			$mime_type = $headers[$format];
+			if (isset($__request['size'])) {
+				$size = filter_var($__request['size'], FILTER_VALIDATE_INT);
+			}
+
+			header("Content-type: " . $mime_type);
+
+			echo file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/qr/' . $event_id . '/' . $uuid . '?format=' . $format . '&size=' . $size);
+			die();
+		},
 		'{{/(id:[0-9]+)}/notifications}' => function ($id) use ($__db, $__order_by, $__request, $__offset, $__length, $__user, $__fields) {
 			$event = EventsCollection::one(
 				$__db,
@@ -19,6 +45,24 @@ $__modules['events'] = array(
 				$__fields);
 
 			return $event->getNotifications($__user, $__fields, $__length, $__offset, $__order_by);
+		},
+		'{{/(id:[0-9]+)}/registered_users}' => function ($id) use ($__db, $__request, $__user, $__fields, $__pagination, $__order_by) {
+
+			$event = EventsCollection::one(
+				$__db,
+				$__user,
+				intval($id),
+				$__fields);
+
+
+			return UsersCollection::filter(
+				$__db,
+				$__user,
+				array_merge($__request ?? array(), array('registered_users' => $event)),
+				$__fields ?? array(),
+				$__pagination,
+				$__order_by ?? array());
+
 		},
 		'{{/(id:[0-9]+)}}' => function ($id) use ($__db, $__request, $__user, $__fields) {
 			$event = EventsCollection::one(
@@ -57,7 +101,7 @@ $__modules['events'] = array(
 			return EventsCollection::filter(
 				$__db,
 				$__user,
-				array_merge($__request, array('favorites' => true)),
+				array_merge($__request, array('favorites' => $__user)),
 				$__fields,
 				array('length' => $__length, 'offset' => $__offset),
 				$__order_by ?? array('nearest_event_date', 'first_event_date'));
@@ -126,11 +170,23 @@ $__modules['events'] = array(
 			Statistics::Event($event, $__user, $__db, Statistics::EVENT_FAVE);
 			return $__user->addFavoriteEvent($event);
 		},
+		'{{/(id:[0-9]+)}/registrations}' => function ($id) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+			$event = EventsCollection::one(
+				$__db,
+				$__user,
+				intval($id),
+				$__fields);
+
+			if (!isset($__request['payload']) || !isset($__request['payload']['registration_fields']))
+				throw new InvalidArgumentException('REGISTRATION_FIELDS_NOT_FOUND');
+
+			return $event->registerUser($__user, $__request['payload']['registration_fields']);
+		},
 		'' => function () use ($__db, $__request, $__user) {
-			if ($__user instanceof User){
+			if ($__user instanceof User) {
 				$result = $__user->createEvent($__request['payload']);
 
-			}else throw new PrivilegesException('NOT_AUTHORIZED', $__db);
+			} else throw new PrivilegesException('NOT_AUTHORIZED', $__db);
 			return $result;
 		},
 	),
@@ -138,14 +194,14 @@ $__modules['events'] = array(
 		'{(id:[0-9]+)/status}' => function ($id) use ($__request, $__db, $__user) {
 			$event = EventsCollection::one($__db, $__user, $id, array());
 			if (isset($__request['hidden'])) {
-				if ($__request['hidden'] == 'true') {
+				if (filter_var($__request['hidden'], FILTER_VALIDATE_BOOLEAN)) {
 					$result = $event->hide($__user);
 				} else {
 					$result = $event->show($__user);
 				}
 			}
 			if (isset($__request['canceled'])) {
-				$result = $event->setCanceled($__request['canceled'] == 'true', $__user);
+				$result = $event->setCanceled(filter_var($__request['canceled'], FILTER_VALIDATE_BOOLEAN), $__user);
 			}
 			if (!isset($__request['canceled']) && !isset($__request['hidden'])) throw new BadMethodCallException('Bad Request');
 			return $result;
@@ -159,6 +215,44 @@ $__modules['events'] = array(
 				$__fields
 			);
 			return $notification->update($__db, $__request);
+		},
+		'{/(id:[0-9]+)/registrations/(uuid:\w+-\w+-\w+-\w+-\w+)}' => function ($id, $registration_uuid) use ($__request, $__fields, $__db, $__user) {
+
+			$updated = false;
+			$event = EventsCollection::one(
+				$__db,
+				$__user,
+				$id,
+				$__fields
+			);
+			if (isset($__request['approved'])) {
+				RegistrationForm::setApproved($__user, $event, $registration_uuid, $__request['approved']);
+				$updated = true;
+			}
+			if (isset($__request['checkout'])) {
+				RegistrationForm::setCheckOutStatus($__user, $event, $registration_uuid, $__request['checkout']);
+
+				$updated = true;
+			}
+			if ($updated) {
+				return new Result(true, 'Данные успешно обновлены');
+			} else {
+				return new Result(false, 'Не указаны поля для обновления');
+			}
+		},
+		'{{/(id:[0-9]+)}/registrations}' => function ($id) use ($__db, $__request, $__user) {
+			$event = EventsCollection::one(
+				$__db,
+				$__user,
+				intval($id),
+				array());
+
+			if (filter_var($__request['status'], FILTER_VALIDATE_BOOLEAN) == false) {
+				return $event->unregisterUser($__user);
+			} else {
+				throw new BadArgumentException('STATUS_FIELD_CAN_BE_ONLY_FALSE', $__db);
+			}
+
 		},
 		'{/(id:[0-9]+)}' => function ($id) use ($__db, $__request, $__user) {
 			$event = EventsCollection::one($__db, $__user, intval($id), array());

@@ -14,7 +14,7 @@
 			parent::__construct($db, App::getCurrentUser()->getToken());
 		}
 
-		protected function addNewEvent(array $data){
+		public function addNewEvent(array $data){
 			$data['filenames'] = $data['filenames'] ?? $data['file_names'];
 			if (isset($data['organization_id'])){
 				$organization = OrganizationsCollection::one(

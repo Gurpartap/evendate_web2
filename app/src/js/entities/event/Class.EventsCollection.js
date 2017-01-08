@@ -45,7 +45,7 @@ EventsCollection.KIND = {
  *
  * @param {EventsCollectionAJAXData} data
  * @param {EventsCollectionAJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 EventsCollection.fetchEvents = function(data, success) {
 	return __APP.SERVER.getData('/api/v1/events/', data, success);
@@ -54,7 +54,7 @@ EventsCollection.fetchEvents = function(data, success) {
  *
  * @param {EventsCollectionAJAXData} data
  * @param {EventsCollectionAJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 EventsCollection.fetchMyEvents = function(data, success) {
 	return __APP.SERVER.getData('/api/v1/events/my', data, success);
@@ -63,7 +63,7 @@ EventsCollection.fetchMyEvents = function(data, success) {
  *
  * @param {EventsCollectionAJAXData} data
  * @param {EventsCollectionAJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 EventsCollection.fetchFavoredEvents = function(data, success) {
 	return __APP.SERVER.getData('/api/v1/events/favorites', data, success);
@@ -72,7 +72,7 @@ EventsCollection.fetchFavoredEvents = function(data, success) {
  *
  * @param {EventsCollectionAJAXData} data
  * @param {EventsCollectionAJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 EventsCollection.fetchRecommendedEvents = function(data, success) {
 	return __APP.SERVER.getData('/api/v1/events/recommendations', data, success);
@@ -82,7 +82,7 @@ EventsCollection.fetchRecommendedEvents = function(data, success) {
  * @param {(number|string)} organization_id
  * @param {EventsCollectionAJAXData} data
  * @param {EventsCollectionAJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 EventsCollection.fetchOrganizationsEvents = function(organization_id, data, success) {
 	return __APP.SERVER.getData('/api/v1/events/', $.extend({}, data, {organization_id: organization_id}), success);
@@ -93,7 +93,7 @@ EventsCollection.fetchOrganizationsEvents = function(organization_id, data, succ
  * @param {EventsCollectionAJAXData} [data]
  * @param {(number|string)} [length]
  * @param {EventsCollectionAJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 EventsCollection.prototype.fetchEvents = function(kind, data, length, success) {
 	var self = this,
@@ -132,7 +132,7 @@ EventsCollection.prototype.fetchEvents = function(kind, data, length, success) {
  * @param {(Array|string)} [fields]
  * @param {(number|string)} [length]
  * @param {EventsCollectionAJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 EventsCollection.prototype.fetchFeed = function(fields, length, success) {
 	var self = this,
@@ -154,7 +154,7 @@ EventsCollection.prototype.fetchFeed = function(fields, length, success) {
  * @param {EventsCollectionAJAXData} [data]
  * @param {(number|string)} [length]
  * @param {EventsCollectionAJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 EventsCollection.prototype.fetchOrganizationsEvents = function(organization_id, data, length, success) {
 	var self = this,
@@ -175,7 +175,7 @@ EventsCollection.prototype.fetchOrganizationsEvents = function(organization_id, 
  * @param {(Array|string)} [fields]
  * @param {(number|string)} [length]
  * @param {EventsCollectionAJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 EventsCollection.prototype.fetchOrganizationsFeed = function(organization_id, fields, length, success) {
 	var self = this,

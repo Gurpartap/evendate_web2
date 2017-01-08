@@ -21,12 +21,15 @@ function EditOrganizationPage(organization_id) {
 		'facebook_url',
 		'email'
 	];
-	if (organization_id) {
-		this.is_loading = true;
-		this.organization.fetchOrganization(this.fields, Page.triggerRender);
-	}
 }
 EditOrganizationPage.extend(Page);
+
+EditOrganizationPage.prototype.fetchData = function() {
+	if (this.organization.id) {
+		return this.fetching_data_defer = this.organization.fetchOrganization(this.fields);
+	}
+	return Page.prototype.fetchData.call(this);
+};
 
 EditOrganizationPage.prototype.render = function() {
 	var PAGE = this,

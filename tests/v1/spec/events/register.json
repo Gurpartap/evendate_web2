@@ -1,0 +1,8 @@
+{
+  "first_name": "Иван",
+  "last_name": "Иванов",
+  "email": "test@test.com",
+  "middle_name": "Петрович",
+  "phone_number": "+7 968 718 49 39",
+  "custom": "Тут просто текст"
+}

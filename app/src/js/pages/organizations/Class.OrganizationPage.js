@@ -16,8 +16,7 @@ function OrganizationPage(organization_id) {
 	 * @property {string} last_date
 	 * @property {boolean} disable_upload
 	 */
-	var self = this,
-		event_type_default = {
+	var	event_type_default = {
 			last_date: '',
 			disable_upload: false
 		};
@@ -70,19 +69,21 @@ function OrganizationPage(organization_id) {
 	};
 	
 	this.events_load = 0;
-	this.is_loading = true;
 	this.future_events = new FutureEventsCollection();
 	this.past_events = new PastEventsCollection();
 	this.delayed_events = new DelayedEventsCollection();
 	this.canceled_events = new CanceledEventsCollection();
 	this.organization = new OneOrganization(organization_id);
-	this.organization.fetchOrganization(this.fields, function(data) {
-		self.is_admin = self.organization.role != OneUser.ROLE.USER;
-		self.max_events_load = self.is_admin ? 4 : 2;
-		Page.triggerRender();
-	});
 }
 OrganizationPage.extend(Page);
+
+OrganizationPage.prototype.fetchData = function() {
+	var self = this;
+	return this.fetching_data_defer = this.organization.fetchOrganization(this.fields).done(function(data) {
+		self.is_admin = self.organization.role != OneUser.ROLE.USER;
+		self.max_events_load = self.is_admin ? 4 : 2;
+	});
+};
 /**
  *
  * @param {OrganizationPage~EventType} type
@@ -94,7 +95,7 @@ OrganizationPage.prototype.appendEvents = function(type, events) {
 		$output;
 	
 	if (events.length) {
-		$output = __APP.BUILD.organizationFeedEvents(events, type);
+		$output = __APP.BUILD.eventBlocks(events, type);
 	} else {
 		type.disable_upload = true;
 		$(window).off(type.scroll_event);
@@ -103,9 +104,6 @@ OrganizationPage.prototype.appendEvents = function(type, events) {
 		});
 	}
 	$wrapper.append($output);
-	if ($wrapper.hasClass(__C.CLASSES.NEW_ACTIVE)) {
-		$wrapper.parent().height($wrapper.height());
-	}
 	return $output;
 };
 /**
@@ -178,15 +176,22 @@ OrganizationPage.prototype.init = function() {
 };
 
 OrganizationPage.prototype.render = function() {
-	var PAGE = this;
-	
-	__APP.changeTitle(PAGE.organization.short_name);
-	$('.SidebarOrganizationsList').find('[data-organization_id="' + PAGE.organization.id + '"]').find('.OrganizationCounter').addClass('-hidden');
+	var PAGE = this,
+		organization = new OneOrganization(PAGE.organization.id);
+	organization.setData(PAGE.organization);
+	__APP.changeTitle(organization.short_name);
+	organization.short_name = undefined;
+	$('.SidebarOrganizationsList').find('[data-organization_id="' + organization.id + '"]').find('.OrganizationCounter').addClass('-hidden');
 	
 	PAGE.$wrapper.html(tmpl('organization-wrapper', $.extend(true, {
-		background_image: PAGE.organization.background_img_url ? tmpl('organization-background-image', PAGE.organization) : '',
-		subscribe_button: new SubscribeButton(PAGE.organization.id, {
-			is_subscribed: PAGE.organization.is_subscribed,
+		background_image: organization.background_img_url ? tmpl('organization-background-image', organization) : '',
+		avatar_block: __APP.BUILD.avatarBlocks(organization, {
+			block_classes: ['organization_title_block'],
+			avatar_classes: ['-size_small','organization_avatar'],
+			entity: 'organization'
+		}),
+		subscribe_button: new SubscribeButton(organization.id, {
+			is_subscribed: organization.is_subscribed,
 			colors: {
 				subscribe: '-color_accent',
 				unsubscribe: '-color_neutral',
@@ -194,15 +199,15 @@ OrganizationPage.prototype.render = function() {
 			},
 			classes: ['-size_low', '-fill', 'RippleEffect']
 		}),
-		has_address: PAGE.organization.default_address ? '' : '-hidden',
-		redact_org_button: (PAGE.organization.role == OneUser.ROLE.ADMIN) ? __APP.BUILD.link({
+		has_address: organization.default_address ? '' : '-hidden',
+		redact_org_button: (organization.role == OneUser.ROLE.ADMIN) ? __APP.BUILD.link({
 			title: 'Изменить',
 			classes: ['button', '-fill', '-color_neutral', 'fa_icon', 'fa-pencil', 'RippleEffect'],
-			page: 'organization/' + PAGE.organization.id + '/edit/'
+			page: 'organization/' + organization.id + '/edit/'
 		}) : '',
 		hidden_for_users: PAGE.is_admin ? '' : '-hidden',
-		subscribed_blocks: __APP.BUILD.subscribers(PAGE.organization.subscribed)
-	}, PAGE.organization)));
+		subscribed_blocks: __APP.BUILD.subscribers(organization.subscribed)
+	}, organization)));
 	
 	PAGE.$wrapper.on('events_load.FutureEvents events_load.PastEvents events_load.DelayedEvents events_load.CanceledEvents', function(e) {
 		if (e.namespace == 'FutureEvents') {
@@ -216,23 +221,23 @@ OrganizationPage.prototype.render = function() {
 	});
 	
 	
-	PAGE.future_events.fetchOrganizationsFeed(PAGE.organization.id, PAGE.events_fields, 10, function(future_events) {
+	PAGE.future_events.fetchOrganizationsFeed(organization.id, PAGE.events_fields, 10, function(future_events) {
 		PAGE.appendEvents(PAGE.event_types.future, future_events);
 		PAGE.$wrapper.trigger('events_load.FutureEvents');
 	});
 	
-	PAGE.past_events.fetchOrganizationsFeed(PAGE.organization.id, PAGE.events_fields, 10, function(past_events) {
+	PAGE.past_events.fetchOrganizationsFeed(organization.id, PAGE.events_fields, 10, function(past_events) {
 		PAGE.appendEvents(PAGE.event_types.past, past_events);
 		PAGE.$wrapper.trigger('events_load.PastEvents');
 	});
 	
 	if (PAGE.is_admin) {
-		PAGE.delayed_events.fetchOrganizationsFeed(PAGE.organization.id, PAGE.events_fields, 10, function(delayed_events) {
+		PAGE.delayed_events.fetchOrganizationsFeed(organization.id, PAGE.events_fields, 10, function(delayed_events) {
 			PAGE.appendEvents(PAGE.event_types.delayed, delayed_events);
 			PAGE.$wrapper.trigger('events_load.DelayedEvents');
 		});
 		
-		PAGE.canceled_events.fetchOrganizationsFeed(PAGE.organization.id, PAGE.events_fields, 10, function(canceled_events) {
+		PAGE.canceled_events.fetchOrganizationsFeed(organization.id, PAGE.events_fields, 10, function(canceled_events) {
 			PAGE.appendEvents(PAGE.event_types.canceled, canceled_events);
 			PAGE.$wrapper.trigger('events_load.CanceledEvents');
 		});

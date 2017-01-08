@@ -1,12 +1,28 @@
 var
     fs = require('fs'),
     path = require('path'),
-    config = JSON.parse(fs.readFileSync(path.join(__dirname, '../../../v1-config.json')));
+    winston = require('winston'),
+    logger = new (winston.Logger)({
+        transports: [
+            new (winston.transports.Console)(),
+            new winston.transports.File({filename: __dirname + '/tests.log', json: true})
+        ],
+        exceptionHandlers: [
+            new (winston.transports.Console)(),
+            new winston.transports.File({filename: __dirname + '/tests_exceptions.log', json: true})
+        ],
+        exitOnError: true
+    }),
+    config = JSON.parse(fs.readFileSync(path.join(__dirname, '../../../v1-config.json'))),
+    api_docs = JSON.parse(fs.readFileSync(path.join(__dirname, '../../../api/v1/docs/swagger.json')));
 
 
 var config_index = process.env.ENV ? process.env.ENV : 'local',
     real_config = config[config_index];
 
 real_config.api_url = real_config.schema + real_config.test.domain + '/api/v1/';
+real_config.api_docs = api_docs;
+real_config.logger = logger;
+real_config.token = 'ya29.CjaiA_rYHeHwY9qFlNHnmFs9w-2x1x-FWLnXzZA7Mht12IIvA9gsljsCzMXjt5AkBz-naz9PsrsundefinedR1QN4E6v8oSOA0xm2LmEQrxcqd7NYSis';
 
-exports.module = real_config;
+module.exports = real_config;

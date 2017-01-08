@@ -1,5 +1,7 @@
 DROP VIEW view_events CASCADE;
 
+DROP VIEW view_events CASCADE;
+
 CREATE OR REPLACE VIEW view_all_events AS
   SELECT DISTINCT
     events.id :: INT,
@@ -13,7 +15,7 @@ CREATE OR REPLACE VIEW view_all_events AS
     events.longitude :: REAL,
     events.location,
     events.min_price,
-    DATE_PART('epoch', events.public_at::TIMESTAMPTZ) :: INT                                AS public_at,
+    DATE_PART('epoch', events.public_at :: TIMESTAMPTZ) :: INT                         AS public_at,
     (events.status = FALSE AND events.public_at IS NOT
                                NULL)                                                   AS is_delayed,
     events.status,
@@ -23,7 +25,7 @@ CREATE OR REPLACE VIEW view_all_events AS
     vk_posts.image_path                                                                AS vk_image_path,
     vk_posts.message                                                                   AS vk_message,
     events.registration_required,
-    DATE_PART('epoch', events.registration_till::TIMESTAMPTZ) :: INT                                AS registration_till,
+    DATE_PART('epoch', events.registration_till :: TIMESTAMPTZ) :: INT                 AS registration_till,
     events.is_free,
     ((SELECT SUM(counter)
       FROM (SELECT DISTINCT
@@ -34,7 +36,7 @@ CREATE OR REPLACE VIEW view_all_events AS
             WHERE event_id = events.id AND status = TRUE) AS sb) = 1) :: BOOL
                                                                                        AS is_same_time,
     events.organization_id :: INT,
-    'http://evendate.ru/event/' || events.id                                    AS link,
+    'http://evendate.ru/event/' || events.id                                           AS link,
     events.images_domain || 'event_images/large/' || events.image_vertical             AS image_vertical_url,
     events.images_domain || 'event_images/large/' || events.image_horizontal           AS image_horizontal_url,
     events.images_domain || 'event_images/large/' || events.image_vertical             AS image_vertical_large_url,
@@ -55,17 +57,17 @@ CREATE OR REPLACE VIEW view_all_events AS
     view_organizations.name                                                            AS organization_name,
     organization_types.name                                                            AS organization_type_name,
     view_organizations.short_name                                                      AS organization_short_name,
-    (SELECT
-       DATE_PART('epoch', MIN((events_dates.event_date :: DATE || ' ' || events_dates.start_time) :: TIMESTAMPTZ)) :: INT
+    (SELECT DATE_PART('epoch',
+                      MIN((events_dates.event_date :: DATE || ' ' || events_dates.start_time) :: TIMESTAMPTZ)) :: INT
      FROM events_dates
      WHERE event_id = events.id AND events_dates.event_date >= NOW() :: DATE AND events_dates.status =
                                                                                  TRUE) AS nearest_event_date,
-    (SELECT
-       DATE_PART('epoch', MIN((events_dates.event_date :: DATE || ' ' || events_dates.start_time) :: TIMESTAMPTZ)) :: INT
+    (SELECT DATE_PART('epoch',
+                      MIN((events_dates.event_date :: DATE || ' ' || events_dates.start_time) :: TIMESTAMPTZ)) :: INT
      FROM events_dates
      WHERE event_id = events.id AND events_dates.status = TRUE)                        AS first_event_date,
-    (SELECT
-       DATE_PART('epoch', MAX((events_dates.event_date :: DATE || ' ' || events_dates.start_time) :: TIMESTAMPTZ)) :: INT
+    (SELECT DATE_PART('epoch',
+                      MAX((events_dates.event_date :: DATE || ' ' || events_dates.start_time) :: TIMESTAMPTZ)) :: INT
      FROM events_dates
      WHERE event_id = events.id AND events_dates.status = TRUE)                        AS last_event_date,
     DATE_PART('epoch', events.created_at) :: INT                                       AS created_at,
@@ -74,7 +76,10 @@ CREATE OR REPLACE VIEW view_all_events AS
      FROM favorite_events
      WHERE status = TRUE AND event_id =
                              events.id)                                                AS favored_users_count,
-    events.fts
+    events.fts,
+    events.registration_approvement_required,
+    events.registration_limit_count,
+    events.registration_locally
   FROM events
     INNER JOIN view_organizations ON view_organizations.id = events.organization_id
     INNER JOIN organization_types ON organization_types.id = view_organizations.type_id

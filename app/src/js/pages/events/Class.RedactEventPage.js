@@ -10,7 +10,6 @@
 function RedactEventPage(event_id) {
 	Page.apply(this);
 	this.page_title = 'Редактирование события';
-	this.is_loading = false;
 	
 	this.fields = [
 		'image_horizontal_large_url',
@@ -34,10 +33,6 @@ function RedactEventPage(event_id) {
 		'canceled'
 	];
 	this.event = new OneEvent(event_id);
-	if (event_id) {
-		this.is_loading = true;
-		this.event.fetchEvent(this.fields, Page.triggerRender);
-	}
 }
 RedactEventPage.extend(Page);
 
@@ -66,6 +61,13 @@ RedactEventPage.handleImgUpload = function($context, source, filename) {
 			$data_url.val('data.source').data('source', $preview.attr('src')).trigger('change');
 		})
 		.trigger('click.CallModal');
+};
+
+RedactEventPage.prototype.fetchData = function() {
+	if(this.event.id){
+		return this.fetching_data_defer = this.event.fetchEvent(this.fields);
+	}
+	return Page.prototype.fetchData.call(this);
 };
 
 RedactEventPage.prototype.formatVKPost = function() {

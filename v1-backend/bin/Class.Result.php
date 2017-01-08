@@ -6,7 +6,9 @@ require_once $BACKEND_FULL_PATH . '/bin/vendor/Class.Array2xml.php';
  *
  *
  * */
-class Result{
+
+class Result
+{
 
 	const XML_RESPONSE_ROOT = 'response';
 
@@ -25,7 +27,8 @@ class Result{
 
 	/*
 	 * */
-	public function __construct($status, $text = '', $data = array(), $error_code = 0, $format = 'json'){
+	public function __construct($status, $text = '', $data = array(), $error_code = 0, $format = 'json')
+	{
 		$this->setStatus($status);
 		$this->setText($text);
 		$this->setErrorCode($error_code);
@@ -33,53 +36,61 @@ class Result{
 		$this->setFormat($format);
 	}
 
-	public function setFileName($filename){
+	public function setFileName($filename)
+	{
 		$this->filename = $filename;
 	}
 
-	public function setStatus($status){
+	public function setStatus($status)
+	{
 		$this->status = ($status == true || $status == 1) ? true : false;
 	}
 
-	public function setText($text){
-		if (empty($text)){
+	public function setText($text)
+	{
+		if (empty($text)) {
 			$text = $this->status ? 'Данные успешно получены' : 'Извините, произошла ошибка';
 		}
 		$this->text = $text;
 	}
 
-	public function setErrorCode($error_code){
+	public function setErrorCode($error_code)
+	{
 		$this->error_code = $error_code;
 	}
 
-	public function setData($data){
+	public function setData($data)
+	{
 		$this->data = $data;
 	}
 
-	public function getData(){
+	public function getData()
+	{
 		return $this->data;
 	}
 
-	public function addProp($name, $value){
+	public function addProp($name, $value)
+	{
 		$this->data[$name] = $value;
 	}
 
-	public function __toString(){
+	public function __toString()
+	{
 		header("Content-Type: application/json");
 		http_response_code($this->http_code ?? 200);
-		if ($this->getNude()){
+		if ($this->getNude()) {
 			$arr = $this->data;
-		}else{
+		} else {
 			$arr = array(
 				'status' => $this->status,
 				'text' => $this->text,
 				'code' => $this->internal_code,
 				'data' => $this->data
 			);
-			if ($this->uuid != null){
+			if ($this->uuid != null) {
 				$arr['request_id'] = $this->uuid;
 			}
-			if ($this->exception != null){
+			if ($this->exception != null) {
 				$arr['exception'] = array(
 					'stack' => $this->exception->getTraceAsString(),
 					'text' => $this->exception
@@ -90,44 +101,58 @@ class Result{
 		return $res;
 	}
 
-	public function setFormat($format) {
+	public function setFormat($format)
+	{
 		$this->format = $format == 'xml' ? 'xml' : 'json';
 	}
 
-	public function setDownloadable($downloadable) {
+	public function setDownloadable($downloadable)
+	{
 		$this->downloadable = $downloadable;
 	}
 
-	private function getFileName() {
-		if ($this->filename && $this->filename != ''){
+	private function getFileName()
+	{
+		if ($this->filename && $this->filename != '') {
 			return $this->filename;
-		}else{
+		} else {
 			return 'file';
 		}
 	}
 
-	public function setNude($nude_data) {
+	public function setNude($nude_data)
+	{
 		$this->is_nude = $nude_data;
 	}
 
-	public function setRequestUUID(string $uuid){
+	public function setRequestUUID(string $uuid)
+	{
 		$this->uuid = $uuid;
 	}
 
-	public function setException(Exception $e){
+	public function setException(Exception $e)
+	{
 		$this->exception = $e;
 	}
 
 	//Only data without any additional status information
-	private function getNude() {
+	private function getNude()
+	{
 		return $this->is_nude ? $this->is_nude : false;
 	}
 
-	public function setHttpCode(int $code){
+	public function setHttpCode(int $code)
+	{
 		$this->http_code = $code;
 	}
 
-	public function setInternalCode(int $internal_code){
+	public function setInternalCode(int $internal_code)
+	{
 		$this->internal_code = $internal_code;
+	}
+
+	public function getStatus()
+	{
+		return $this->status;
 	}
 }

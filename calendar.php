@@ -69,47 +69,48 @@ $url_parts = explode('/', $url);
 
 	<?php
 	if ($DEBUG_MODE) { ?>
-		<link rel="stylesheet" href="/dist/vendor.css?rev=aa30f09bd9db74d644e86e933654551d">
-		<link rel="stylesheet" href="/dist/app.css?rev=a04c35838096eb488568e3c9c342cbe7"><?php
+		<link rel="stylesheet" href="/dist/vendor.css?rev=40b7971db65b1cafe03cb542e61fb5ae">
+		<link rel="stylesheet" href="/dist/app.css?rev=b533d8579fc77b73281151faf99ef031"><?php
 	} else { ?>
-		<link rel="stylesheet" href="/dist/vendor.min.css?rev=fdd4ff5b8a7cb545e718662cc5d7e715">
-		<link rel="stylesheet" href="/dist/app.min.css?rev=e4298c5787a95b14c339e2a5c98c97f7"><?php
+		<link rel="stylesheet" href="/dist/vendor.min.css?rev=294f8f20367db8d5e6aadde824138e62">
+		<link rel="stylesheet" href="/dist/app.min.css?rev=f70182b8ca20ba06528d18af4455f1b5"><?php
 	} ?>
 
 	<?php
-	if (count($url_parts) > 2) {
-		switch ($url_parts[1]) {
-			case 'organization': {
-				$item = OrganizationsCollection::one($__db, $user, $url_parts[2], array('description', 'subscribed_count'));
-				$data = array(
-					'title' => htmlspecialchars('Evendate - ' . $item->getName()),
-					'description' => htmlspecialchars($item->getName() . ' в Evendate это больше ' . $item->getSubscribedCount() . ' подписчиков и самые интересные события! ' . $item->getDescription()),
-					'image' => htmlspecialchars($item->getBackgroundImgUrl())
-				);
-				break;
+	try {
+		if (count($url_parts) > 2) {
+			switch ($url_parts[1]) {
+				case 'organization': {
+					$item = OrganizationsCollection::one($__db, $user, $url_parts[2], array('description', 'subscribed_count'));
+					$data = array(
+						'title' => htmlspecialchars('Evendate - ' . $item->getName()),
+						'description' => htmlspecialchars($item->getName() . ' в Evendate это больше ' . $item->getSubscribedCount() . ' подписчиков и самые интересные события! ' . $item->getDescription()),
+						'image' => htmlspecialchars($item->getBackgroundImgUrl())
+					);
+					break;
+				}
+				case 'event': {
+					$item = EventsCollection::one($__db, $user, $url_parts[2], array('description', 'organization_short_name'));
+					$params = $item->getParams($user, array('title', 'description', 'organization_short_name'))->getData();
+					$data = array(
+						'title' => htmlspecialchars($params['title'] . ' в ' . $params['organization_short_name'] . ' на Evendate'),
+						'description' => htmlspecialchars($params['description']),
+						'image' => htmlspecialchars($params['image_horizontal_url'])
+					);
+					break;
+				}
+				case 'organizations': {
+					$data = array(
+						'title' => htmlspecialchars('Каталог организаторов Evendate'),
+						'description' => htmlspecialchars('Сотни организаций публикуют свои события на Evendate. Не пропускайте ничего важного и интересного вокруг.'),
+						'image' => htmlspecialchars('https://evendate.ru/app/img/brand_2560x1600.jpg')
+					);
+					break;
+				}
 			}
-			case 'event': {
-				$item = EventsCollection::one($__db, $user, $url_parts[2], array('description', 'organization_short_name'));
-				$params = $item->getParams($user, array('title', 'description', 'organization_short_name'))->getData();
-				$data = array(
-					'title' => htmlspecialchars($params['title'] . ' в ' . $params['organization_short_name'] . ' на Evendate'),
-					'description' => htmlspecialchars($params['description']),
-					'image' => htmlspecialchars($params['image_horizontal_url'])
-				);
-				break;
-			}
-			case 'organizations': {
-				$data = array(
-					'title' => htmlspecialchars('Каталог организаторов Evendate'),
-					'description' => htmlspecialchars('Сотни организаций публикуют свои события на Evendate. Не пропускайте ничего важного и интересного вокруг.'),
-					'image' => htmlspecialchars('https://evendate.ru/app/img/brand_2560x1600.jpg')
-				);
-				break;
-			}
-		}
-		if (isset($data)) {
-			$current_url = App::getVar('schema') . "$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
-			echo "
+			if (isset($data)) {
+				$current_url = App::getVar('schema') . "$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+				echo "
 			<meta name=\"twitter:card\" content=\"summary\" />
 			<meta name=\"twitter:description\" content=\"{$data['description']}\">
     	<meta name=\"twitter:app:country\" content=\"RU\">
@@ -123,8 +124,12 @@ $url_parts = explode('/', $url);
     	<meta property=\"og:title\" content=\"{$data['title']}\">
     	<meta property=\"og:description\" content=\"{$data['description']}\">
     	<meta property=\"og:image\" content=\"{$data['image']}\"/>";
+			}
 		}
+	} catch (Exception $e) {
+		header('Location: /');
 	}
+
 	?>
 
 	<link rel="apple-touch-icon" sizes="57x57" href="/app/img/favicon/apple-icon-57x57.png">
@@ -216,19 +221,15 @@ $url_parts = explode('/', $url);
 
 	<div class="sidebar_main_wrapper scrollbar-outer SidebarScroll">
 		<nav class="sidebar_navigation SidebarNav"><?php
+			if(!$is_user_not_auth){ ?>
+				<a href="/my/profile" class="sidebar_navigation_item SidebarNavItem link Link"><span>Мой профиль</span></a><?php
+			}
 			if ($is_user_editor) { ?>
 				<a href="/statistics" class="sidebar_navigation_item SidebarNavItem link Link"><span>Статистика</span></a>
-				<a href="/add/event"
-					 class="sidebar_navigation_item SidebarNavItem link Link"><span>Создать событие</span></a><?php
+				<a href="/add/event" class="sidebar_navigation_item SidebarNavItem link Link"><span>Создать событие</span></a><?php
 			} ?>
-			<a href="/feed" class="sidebar_navigation_item SidebarNavItem link Link"><span>События</span><span
-					class="counter sidebar_navigation_counter -hidden SidebarNavFeedCounter"></span></a><?php
-			if (!$is_user_not_auth) { ?>
-				<a href="/friends" class="sidebar_navigation_item SidebarNavItem link Link"><span>Друзья</span><span
-						class="counter sidebar_navigation_counter -hidden SidebarNavFriendsCounter"></span></a><?php
-			} ?>
-			<a href="/organizations"
-				 class="sidebar_navigation_item SidebarNavItem link Link"><span>Каталог организаторов</span></a>
+			<a href="/feed" class="sidebar_navigation_item SidebarNavItem link Link"><span>События</span><span class="counter sidebar_navigation_counter -hidden SidebarNavFeedCounter"></span></a>
+			<a href="/organizations" class="sidebar_navigation_item SidebarNavItem link Link"><span>Каталог организаторов</span></a>
 		</nav>
 		<hr class="sidebar_divider">
 		<div class="sidebar_organizations_wrapper scrollbar-outer SidebarOrganizationsScroll"><?php
@@ -255,15 +256,13 @@ $url_parts = explode('/', $url);
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js" type="text/javascript"></script>
 
 <?php
-if ($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=72219c55ad69625ed38c8c6fd720e78c" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=a0de068063cd065c89ae72da15902ced" charset="utf-8"></script><?php
+if($DEBUG_MODE) { ?>
+	<script type="text/javascript" src="/dist/vendor.js?rev=1afde92ec9da9ac16bf41078ddc05616" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=58c8b9e649b9be73a5271dd12722ceec" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=e97a00ae6c2103a717f5e41950ea6b51"
-					charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=f6dfcefa7c9c4280686e2c1ab539fb00"
-					charset="utf-8"></script><?php
-} ?>
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=3767e86f1db748115aafd09ea734b08b" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=b56d4bab9161fda2fe660bcd3197270d" charset="utf-8"></script><?php
+}	?>
 
 <?php
 require 'templates.html';
