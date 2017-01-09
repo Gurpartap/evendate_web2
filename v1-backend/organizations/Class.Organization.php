@@ -83,7 +83,7 @@ class Organization extends AbstractEntity
 		'background_small_img_url',
 		'facebook_url',
 		'vk_url',
-		'private',
+		'is_private',
 		'brand_color',
 		self::RANDOM_FIELD_NAME => '(SELECT created_at / (random() * 9 + 1)
 			FROM view_organizations AS vo
@@ -197,7 +197,7 @@ class Organization extends AbstractEntity
 	{
 		$q_ins_sub = 'INSERT INTO subscriptions(organization_id, user_id, status)
 			VALUES(:organization_id, :user_id, TRUE)
-			ON CONFLICT(organization_id, user_id) DO UPDATE SET status = TRUE RETURNING id::INT;';
+			ON CONFLICT(organization_id, user_id) DO UPDATE SET status = TRUE RETURNING id::INT';
 
 		$p_ins_sub = $this->db->prepare($q_ins_sub);
 		$result = $p_ins_sub->execute(array(':organization_id' => $this->getId(), ':user_id' => $user->getId()));
@@ -476,7 +476,7 @@ class Organization extends AbstractEntity
 			$data['email'] = null;
 		}
 
-		$data['private'] = isset($data['private']) && filter_var($data['private'], FILTER_VALIDATE_BOOLEAN) == true ? 'true' : 'false';
+		$data['is_private'] = isset($data['is_private']) && filter_var($data['is_private'], FILTER_VALIDATE_BOOLEAN) == true ? 'true' : 'false';
 
 		if (isset($data['brand_color'])) {
 			if (preg_match('/^#[a-f0-9]{6}$/i', $data['brand_color'])) //hex color is valid
@@ -565,7 +565,7 @@ class Organization extends AbstractEntity
 				'facebook_url' => $data['facebook_url'],
 				'background_img_url' => $data['background_img_url'],
 				'img_url' => $data['img_url'],
-				'private' => $data['private'],
+				'is_private' => $data['is_private'],
 				'brand_color' => $data['brand_color'],
 				'email' => $data['email']
 			)
@@ -692,7 +692,7 @@ class Organization extends AbstractEntity
 				'creator_id' => $user->getId(),
 				'images_domain' => 'https://dn' . rand(1, 4) . '.evendate.ru/',
 				'email' => $data['email'],
-				'private' => $data['private'],
+				'is_private' => $data['is_private'],
 				'brand_color' => $data['brand_color'],
 				'state_id' => self::ORGANIZATION_STATE_SHOWN
 			)

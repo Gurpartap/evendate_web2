@@ -63,3 +63,6 @@ CREATE OR REPLACE VIEW view_organizations AS
 DROP TABLE organizations_invitations;
 
 DROP TABLE organizations_invitation_links;
+
+DROP VIEW view_invitation_links;
+DROP VIEW view_invited_users;

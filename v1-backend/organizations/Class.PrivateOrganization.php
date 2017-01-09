@@ -104,20 +104,18 @@ class PrivateOrganization extends Organization
 
 	}
 
-	public function getInvitationLinks(User $user, array $fields)
+	public function getInvitationLinks(User $user, array $fields = null, array $order_by = null)
 	{
 		if ($user->isAdmin($this) == false) throw new PrivilegesException('', $this->db);
 
 		$_fields = Fields::mergeFields(array(
-			'organization_id',
 			'creator_id',
-			'uuid',
 			'created_at',
 			'updated_at',
 			'creator_first_name',
 			'creator_last_name',
 			'creator_avatar_url',
-		), $fields, array(
+		), $fields ?? array(), array(
 			'organization_id',
 			'creator_id',
 			'uuid'
@@ -127,10 +125,11 @@ class PrivateOrganization extends Organization
 			->cols($_fields)
 			->from('view_invitation_links')
 			->where('organization_id = ?', $this->getId())
-			->where('status = true');
+			->where('status = true')
+			->orderBy($order_by ?? array());
 		$p_get_links = $this->db->prepare($q_get_links->getStatement());
 		$result = $p_get_links->execute($q_get_links->getBindValues());
-		if ($result === FALSE) throw new DBQueryException('CANT_INSERT_INVITATION', $this->db);
+		if ($result === FALSE) throw new DBQueryException('CANT_GET_INVITATIONS', $this->db);
 		return new Result(true, '', $p_get_links->fetchAll());
 	}
 
@@ -171,7 +170,6 @@ class PrivateOrganization extends Organization
 		$result = $p_get_links->execute($q_get_links->getBindValues());
 		if ($result === FALSE) throw new DBQueryException('CANT_INSERT_INVITATION', $this->db);
 		return new Result(true, '', $p_get_links->fetchAll());
-
 	}
 
 	public function getParams(AbstractUser $user = null, array $fields = null): Result

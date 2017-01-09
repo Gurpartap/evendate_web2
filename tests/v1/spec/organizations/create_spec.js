@@ -7,7 +7,7 @@ var
 
 frisby.globalSetup({
     request: {
-        headers: { 'Authorization': env.token }
+        headers: {'Authorization': env.token}
     }
 });
 
@@ -27,14 +27,17 @@ organizations.forEach(function (value, index) {
                 text: String
             })
             .after(function (err, res, body) {
-                if (res.statusCode != 200){
+                if (res.statusCode != 200) {
                     console.log(body);
                 }
-                if (err){
+
+                if (err) {
                     env.logger.error(err);
                 }
 
-                if (value.payload.private)
+                if (value.payload.private) {
+
+                }
             })
             .toss();
     }

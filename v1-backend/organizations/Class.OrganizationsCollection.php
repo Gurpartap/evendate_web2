@@ -41,6 +41,7 @@ class OrganizationsCollection
 			$statement_array[':user_id'] = $user->getId();
 		}
 
+		$instance_class_name = 'Organization';
 
 		foreach ($filters as $name => $value) {
 			switch ($name) {
@@ -67,6 +68,24 @@ class OrganizationsCollection
 				case 'q': {
 					$q_get_organizations->where('fts @@ to_tsquery(:search_stm)');
 					$statement_array[':search_stm'] = App::prepareSearchStatement($value);
+					break;
+				}
+				case 'invitation_key': {
+					if ($value == null) break;
+					$getting_private_organization = true;
+					$q_get_organizations->where(':invitation_key = (SELECT DISTINCT uuid 
+						FROM view_invitation_links 
+						WHERE view_invitation_links.organization_id=view_organizations.id 
+						AND uuid = :invitation_key)');
+					$statement_array[':invitation_key'] = $value;
+					break;
+				}
+				case 'is_private': {
+					$getting_private_organization = true;
+					$q_get_organizations->where('id IN (SELECT organization_id 
+						FROM view_users_organizations 
+						WHERE user_id = :user_id)');
+					$statement_array[':user_id'] = $user->getId();
 					break;
 				}
 				case 'roles': {
@@ -161,9 +180,6 @@ class OrganizationsCollection
 					$order_by = array('rating DESC');
 					break;
 				}
-				case 'invite_key': {
-					$getting_private_organization = true;
-				}
 			}
 		}
 
@@ -172,9 +188,10 @@ class OrganizationsCollection
 			->orderBy($order_by);
 
 		if (isset($getting_private_organization) && $getting_private_organization == true) {
-
+			$instance_class_name = 'PrivateOrganization';
 		} else {
-			$q_get_organizations->where('private = false')
+			$q_get_organizations
+				->where('is_private = false')
 				->orWhere('id IN 
 					(SELECT organization_id 
 						FROM organizations_invitations
@@ -213,7 +230,7 @@ class OrganizationsCollection
 		$p_search = $db->prepare($q_get_organizations->getStatement());
 		$p_search->execute($statement_array);
 
-		$organizations = $p_search->fetchAll(PDO::FETCH_CLASS, 'Organization');
+		$organizations = $p_search->fetchAll(PDO::FETCH_CLASS, $instance_class_name);
 
 		if ($return_one) {
 			if (count($organizations) < 1) throw new LogicException('CANT_FIND_ORGANIZATION');
@@ -237,6 +254,21 @@ class OrganizationsCollection
 		$organization = self::filter($db,
 			$user,
 			array('id' => $id),
+			$fields
+		);
+		return $organization;
+	}
+
+
+	public static function onePrivate(PDO $db,
+																		AbstractUser $user,
+																		int $id,
+																		string $uuid = null,
+																		array $fields = null): PrivateOrganization
+	{
+		$organization = self::filter($db,
+			$user,
+			array('id' => $id, 'invitation_key' => $uuid, 'is_private' => true),
 			$fields
 		);
 		return $organization;

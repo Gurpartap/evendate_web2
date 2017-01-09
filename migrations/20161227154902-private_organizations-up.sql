@@ -211,7 +211,7 @@ CREATE VIEW view_invitation_links AS
     INNER JOIN view_users ON view_users.id = organizations_invitation_links.creator_id
   WHERE organizations_invitation_links.status = TRUE;
 
-CREATE VIEW view_invited_users
+CREATE OR REPLACE VIEW view_invited_users
 AS
   SELECT DISTINCT
     organizations_invitations.organization_id,
@@ -232,8 +232,15 @@ AS
         'epoch',
         organizations_invitations.updated_at) :: INT                  AS updated_at,
     organizations_invitations.email IS NOT NULL                       AS invited_by_email,
-    organizations_invitations.user_id IS NOT NULL                     AS invited_by_user_id
+    organizations_invitations.user_id IS NOT NULL                     AS invited_by_user_id,
+    organizations_invitations.status
   FROM organizations_invitations
     INNER JOIN view_users AS inviters ON inviters.id = organizations_invitations.creator_id
     LEFT JOIN view_users AS users_by_id ON users_by_id.id = organizations_invitations.user_id
     LEFT JOIN view_users AS users_by_email ON users_by_email.email = organizations_invitations.email;
+
+ALTER TABLE organizations RENAME COLUMN private TO is_private;
+ALTER TABLE view_organizations RENAME COLUMN private TO is_private;
+ALTER TABLE view_events RENAME COLUMN organization_private TO organization_is_private;
+
+ALTER TABLE organizations_invitations ALTER COLUMN email DROP NOT NULL;

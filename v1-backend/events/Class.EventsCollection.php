@@ -465,7 +465,7 @@ class EventsCollection extends AbstractCollection
 		}
 		if (!isset($getting_personal_events) || $getting_personal_events == false) {
 			$q_get_events
-				->where('organization_private = false');
+				->where('organization_is_private = false');
 		}
 
 
