@@ -147,8 +147,8 @@ class OrganizationsCollection extends AbstractCollection
 							FROM subscriptions
 							WHERE organization_id = "view_organizations"."id"
 								AND "subscriptions"."status" = TRUE
-								AND user_id = :user_id) = TRUE');
-						$statement_array[':user_id'] = $value->getId();
+								AND user_id = :friend_id) = TRUE');
+						$statement_array[':friend_id'] = $value->getId();
 					}
 					break;
 				}
@@ -167,14 +167,6 @@ class OrganizationsCollection extends AbstractCollection
 						WHERE organization_id = "view_organizations"."id"
 							AND "subscriptions"."status" = TRUE
 							AND user_id = :user_id) IS NULL');
-
-					//Wrong query part, may be should be something else
-//					$q_get_organizations->where('(SELECT
-//						id
-//						FROM favorite_events
-//						WHERE event_id = "view_events"."id"
-//							AND "favorite_events"."status" = TRUE
-//							AND user_id = :user_id) IS NULL');
 
 					$statement_array[':user_id'] = $user->getId();
 					$order_by = array('rating DESC');
@@ -205,8 +197,15 @@ class OrganizationsCollection extends AbstractCollection
 					(SELECT organization_id FROM users_organizations WHERE user_id = :user_id AND status = true)
 					
 					))');
-			$statement_array[':user_id'] = $user->getId();
-			$statement_array[':email'] = $user->getEmail();
+
+			if (array_key_exists(Organization::IS_SUBSCRIBED_FIELD_NAME, $filters) == false){
+				$statement_array[':user_id'] = $user->getId();
+			}
+			if($user instanceof User){
+				$statement_array[':email'] = $user->getEmail();
+			}else{
+				$statement_array[':email'] = '-';
+			}
 		}
 
 		if (isset($pagination['offset'])) {
@@ -221,6 +220,8 @@ class OrganizationsCollection extends AbstractCollection
 //		echo $q_get_organizations->getStatement();
 		$p_search = $db->prepare($q_get_organizations->getStatement());
 		$p_search->execute($statement_array);
+
+//		print_r($statement_array);
 
 		$organizations = $p_search->fetchAll(PDO::FETCH_CLASS, $instance_class_name);
 
