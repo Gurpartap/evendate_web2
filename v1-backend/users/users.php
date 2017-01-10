@@ -76,10 +76,9 @@ $__modules['users'] = array(
 				array()
 			);
 
-			//don't change App:: calls
 			return EventsCollection::filter(
-				App::DB(),
-				App::getCurrentUser(),
+				$__db,
+				$__user,
 				array(
 					'favorites' => $friend
 				),
@@ -97,10 +96,9 @@ $__modules['users'] = array(
 			);
 
 
-			//don't change App:: calls
 			return OrganizationsCollection::filter(
-				App::DB(),
-				App::getCurrentUser(),
+				$__db,
+				$__user,
 				array(
 					'friend' => $friend
 				),
