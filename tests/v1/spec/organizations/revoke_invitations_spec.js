@@ -51,7 +51,6 @@ frisby
                         }
                     })
                     .afterJSON(json => {
-                        console.log(json.data);
                         json.data.users.forEach(invitation => {
                             frisby
                                 .create('Remove invitation: ' + invitation.uuid)
@@ -74,7 +73,6 @@ frisby
                                 .toss();
                         });
                         json.data.links.forEach(invitation => {
-                            console.log('Remove invitation: ' + invitation.uuid);
                             frisby
                                 .create('Remove invitation: ' + invitation.uuid)
                                 .delete(env.api_url + 'organizations/' + organization.id + '/invitations/links/' + invitation.uuid)

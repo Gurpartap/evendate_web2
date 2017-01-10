@@ -1,6 +1,6 @@
 <?php
 
-class OrganizationsCollection
+class OrganizationsCollection extends AbstractCollection
 {
 
 	private $db;
@@ -8,11 +8,11 @@ class OrganizationsCollection
 
 
 	public static function filter(PDO $db,
-																AbstractUser $user,
+																AbstractUser $user = null,
 																array $filters = null,
 																array $fields = null,
 																array $pagination = null,
-																$order_by = array('organization_type_order', 'organization_type_id'))
+																array $order_by = array('organization_type_order', 'organization_type_id'))
 	{
 
 		$statement_array = array();
@@ -191,28 +191,20 @@ class OrganizationsCollection
 			$instance_class_name = 'PrivateOrganization';
 		} else {
 			$q_get_organizations
-				->where('is_private = false')
-				->orWhere('id IN 
-					(SELECT organization_id 
-						FROM organizations_invitations
-						WHERE 
-						(user_id = :user_id OR email = :email)
-						AND status = true
-						)')
-				->orWhere('id IN 
-					(SELECT organization_id 
-						FROM subscriptions
-						WHERE 
-						user_id = :user_id
-						AND status = true
-						)')
-				->orWhere('id IN 
-					(SELECT organization_id 
-						FROM users_organizations
-						WHERE 
-						user_id = :user_id
-						AND status = true
-						)');
+				->where('(is_private = false OR (
+				
+					id IN 
+						(SELECT organization_id FROM organizations_invitations WHERE 
+						(user_id = :user_id OR email = :email) AND status = true) 						
+					OR	 
+					id IN 
+					(SELECT organization_id FROM subscriptions WHERE user_id = :user_id AND status = true) 
+					
+					OR 
+					id IN 
+					(SELECT organization_id FROM users_organizations WHERE user_id = :user_id AND status = true)
+					
+					))');
 			$statement_array[':user_id'] = $user->getId();
 			$statement_array[':email'] = $user->getEmail();
 		}
@@ -226,7 +218,7 @@ class OrganizationsCollection
 		}
 
 
-//		echo $select->getStatement();
+//		echo $q_get_organizations->getStatement();
 		$p_search = $db->prepare($q_get_organizations->getStatement());
 		$p_search->execute($statement_array);
 
@@ -249,11 +241,12 @@ class OrganizationsCollection
 	public static function one(PDO $db,
 														 AbstractUser $user,
 														 int $id,
-														 array $fields = null): Organization
+														 array $fields = null,
+														 array $filters = null): Organization
 	{
 		$organization = self::filter($db,
 			$user,
-			array('id' => $id),
+			array_merge($filters ?? array(), array('id' => $id)),
 			$fields
 		);
 		return $organization;

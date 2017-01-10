@@ -21,6 +21,58 @@ $__modules['organizations'] = array(
 				$__order_by ?? array('id')
 			);
 		},
+		'{/(id:[0-9]+)/invitations/users/(uuid:\w+-\w+-\w+-\w+-\w+)/qr}' => function ($organization_id, $uuid) use ($__request) {
+			$format = 'png';
+			$available_types = ['png', 'svg', 'pdf', 'eps'];
+			$headers = array(
+				'png' => 'image/png',
+				'svg' => 'image/svg+xml',
+				'pdf' => 'application/pdf',
+				'eps' => 'application/postscript',
+			);
+			$size = 10;
+			if (isset($__request['format'])) {
+				if (isset($available_types[$__request['format']])) {
+					$format = $__request['format'];
+
+				}
+			}
+			$mime_type = $headers[$format];
+			if (isset($__request['size'])) {
+				$size = filter_var($__request['size'], FILTER_VALIDATE_INT);
+			}
+
+			header("Content-type: " . $mime_type);
+
+			echo file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/invitation-qr/' . $organization_id . '/' . $uuid . '?format=' . $format . '&size=' . $size);
+			die();
+		},
+		'{/(id:[0-9]+)/invitations/links/(uuid:\w+-\w+-\w+-\w+-\w+)/qr}' => function ($organization_id, $uuid) use ($__request) {
+			$format = 'png';
+			$available_types = ['png', 'svg', 'pdf', 'eps'];
+			$headers = array(
+				'png' => 'image/png',
+				'svg' => 'image/svg+xml',
+				'pdf' => 'application/pdf',
+				'eps' => 'application/postscript',
+			);
+			$size = 10;
+			if (isset($__request['format'])) {
+				if (isset($available_types[$__request['format']])) {
+					$format = $__request['format'];
+
+				}
+			}
+			$mime_type = $headers[$format];
+			if (isset($__request['size'])) {
+				$size = filter_var($__request['size'], FILTER_VALIDATE_INT);
+			}
+
+			header("Content-type: " . $mime_type);
+
+			echo file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/invitation-qr/' . $organization_id . '/' . $uuid . '?format=' . $format . '&size=' . $size);
+			die();
+		},
 		'{/(id:[0-9]+)/invitations/users}' => function ($organization_id) use ($__db, $__request, $__user, $__fields, $__order_by) {
 			$organization = OrganizationsCollection::onePrivate(
 				$__db,
@@ -55,12 +107,12 @@ $__modules['organizations'] = array(
 			));
 		},
 		'{{/(id:[0-9]+)}}' => function ($id) use ($__db, $__request, $__user, $__fields) {
-
 			$org_instance = OrganizationsCollection::one(
 				$__db,
 				$__user,
 				$id,
-				$__fields);
+				$__fields,
+				$__request ?? array());
 			$result = $organization = $org_instance->getParams($__user, $__fields)->getData();
 
 			Statistics::Organization(

@@ -1468,6 +1468,43 @@ pg.connect(pg_conn_string, function (err, client, done) {
         qr_svg.pipe(res);
     });
 
+    app.get('/utils/invitation-qr/:organization_id/:uuid', function (req, res) {
+        var format = 'png',
+            available_types = ['png', 'svg', 'pdf', 'eps'],
+            headers = {
+                png: 'image/png',
+                svg: 'image/svg+xml',
+                pdf: 'application/pdf',
+                eps: 'application/postscript'
+            },
+            size = 10;
+        if (checkNested(req, 'query', 'format')) {
+            console.log(req.query.format);
+            if (available_types.indexOf(req.query.format) != -1) {
+                format = req.query.format;
+            }
+        }
+        if (checkNested(req, 'query', 'size')) {
+            size = parseInt(req.query.size);
+            size = isNaN(size) ? 10 : size;
+        }
+
+        console.log({
+            uuid: req.params.uuid,
+            organization_id: req.params.organization_id,
+        });
+
+        var qr_svg = qr.image(JSON.stringify({
+            uuid: req.params.uuid,
+            organization_id: req.params.organization_id,
+        }), {
+            type: format,
+            size: size
+        });
+        res.setHeader("content-type", headers[format]);
+        qr_svg.pipe(res);
+    });
+
     app.listen(8000, function () {
         console.log('Node listening on port 8000!');
     });
