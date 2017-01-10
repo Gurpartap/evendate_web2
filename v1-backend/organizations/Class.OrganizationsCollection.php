@@ -147,8 +147,8 @@ class OrganizationsCollection extends AbstractCollection
 							FROM subscriptions
 							WHERE organization_id = "view_organizations"."id"
 								AND "subscriptions"."status" = TRUE
-								AND user_id = :user_id) = TRUE');
-						$statement_array[':user_id'] = $value->getId();
+								AND user_id = :friend_id) = TRUE');
+						$statement_array[':friend_id'] = $value->getId();
 					}
 					break;
 				}
@@ -198,8 +198,10 @@ class OrganizationsCollection extends AbstractCollection
 					
 					))');
 
-			if (array_key_exists('friend', $filters) == false){
+			if (array_key_exists(Organization::IS_SUBSCRIBED_FIELD_NAME, $filters) == false){
 				$statement_array[':user_id'] = $user->getId();
+			}
+			if($user instanceof User){
 				$statement_array[':email'] = $user->getEmail();
 			}else{
 				$statement_array[':email'] = '-';
@@ -218,6 +220,8 @@ class OrganizationsCollection extends AbstractCollection
 //		echo $q_get_organizations->getStatement();
 		$p_search = $db->prepare($q_get_organizations->getStatement());
 		$p_search->execute($statement_array);
+
+//		print_r($statement_array);
 
 		$organizations = $p_search->fetchAll(PDO::FETCH_CLASS, $instance_class_name);
 
