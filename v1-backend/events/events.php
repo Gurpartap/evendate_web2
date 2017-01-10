@@ -247,7 +247,7 @@ $__modules['events'] = array(
 				intval($id),
 				array());
 
-			if (filter_var($__request['status'], FILTER_VALIDATE_BOOLEAN) == false) {
+			if (isset($__request['status']) && filter_var($__request['status'], FILTER_VALIDATE_BOOLEAN) == false) {
 				return $event->unregisterUser($__user);
 			} else {
 				throw new BadArgumentException('STATUS_FIELD_CAN_BE_ONLY_FALSE', $__db);

@@ -27,6 +27,14 @@ frisby
         text: String,
         request_id: String
     })
+    .after(function (err, res, body) {
+        if (res.statusCode != 200){
+            console.log(body);
+        }
+        if (err){
+            env.logger.error(err);
+        }
+    })
     .afterJSON(function (events) {
         events.data.forEach(function (event, index) {
             var send_data = [];
@@ -39,21 +47,27 @@ frisby
             });
             frisby
                 .create('Register for event: ' + index)
-                .post(env.api_url + 'events/' + event.id + '/registration', {registration_fields: send_data}, {json: true})
+                .post(env.api_url + 'events/' + event.id + '/registrations', {registration_fields: send_data}, {json: true})
                 .expectStatus(200)
+                .after(function (err, res, body) {
+                    if (res.statusCode != 200){
+                        console.log(body);
+                    }
+                    if (err){
+                        env.logger.error(err);
+                    }
+                })
                 .expectJSONTypes({
                     request_id: String,
-                    data: Array,
+                    data: Object,
                     status: Boolean,
                     text: String
                 })
                 .afterJSON(function (json) {
-                    env.logger.log(json);
-
                     if (index == 2 || index == 4) {
                         frisby
                             .create('Cancel registration for event: ' + index)
-                            .put(env.api_url + 'events/' + event.id + '/registration?status=false')
+                            .put(env.api_url + 'events/' + event.id + '/registrations?status=false')
                             .expectStatus(200)
                             .expectJSONTypes({
                                 request_id: String,
@@ -61,8 +75,33 @@ frisby
                                 status: Boolean,
                                 text: String
                             })
-                            .afterJSON(function (res) {
-                                console.log(res);
+                            .after(function (err, res, body) {
+                                if (res.statusCode != 200){
+                                    console.log(body);
+                                }
+                                if (err){
+                                    env.logger.error(err);
+                                }
+                            })
+                            .toss()
+                    }else{ // approve registrations
+                        frisby
+                            .create('Approve registration with UUID: ' + json.data.uuid)
+                            .put(env.api_url + 'events/' + event.id + '/registrations/' + json.data.uuid + '?approved=true')
+                            .expectStatus(200)
+                            .expectJSONTypes({
+                                request_id: String,
+                                data: Array,
+                                status: Boolean,
+                                text: String
+                            })
+                            .after(function (err, res, body) {
+                                if (res.statusCode != 200){
+                                    console.log(body);
+                                }
+                                if (err){
+                                    env.logger.error(err);
+                                }
                             })
                             .toss()
                     }

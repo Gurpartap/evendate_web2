@@ -36,6 +36,7 @@ try {
 	require_once "{$BACKEND_FULL_PATH}/events/Class.EventDate.php";
 	require_once "{$BACKEND_FULL_PATH}/events/Class.EventsDatesCollection.php";
 	require_once "{$BACKEND_FULL_PATH}/users/Class.UsersCollection.php";
+	require_once "{$BACKEND_FULL_PATH}/users/Interface.UserInterface.php";
 
 
 

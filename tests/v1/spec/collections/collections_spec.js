@@ -22,12 +22,6 @@ var collections_operation_ids = {
         'getUserSettings']
 };
 
-//
-// function randomIntFromInterval(min, max) {
-//     return Math.floor(Math.random() * (max - min + 1) + min);
-// }
-
-
 _.forEach(env.api_docs.paths, function (path, key) {
     if (path.hasOwnProperty('get')) {
 
@@ -37,20 +31,25 @@ _.forEach(env.api_docs.paths, function (path, key) {
         var unauthorized = collections_operation_ids.unauthorized.indexOf(path.get.operationId) != -1;
 
         frisby.create(path.get.summary)
-            .get(env.api_url + key, {
-                request: {
-                    headers: {'Authorization': env.token}
+            .addHeader('Authorization', env.token)
+            .get(env.api_url + key)
+            .after(function (err, res, body) {
+                if (res.statusCode != 200){
+                    console.log(body);
+                }
+                if (err){
+                    env.logger.error(err);
                 }
             })
             .expectStatus(200)
+            .exceptionHandler(function(e) {
+                env.logger.error(e);
+            })
             .expectJSON({
                 status: Boolean,
                 data: Array,
                 text: String,
                 request_id: String
-            })
-            .afterJSON(function (events) {
-
             })
             .toss();
 
@@ -58,6 +57,17 @@ _.forEach(env.api_docs.paths, function (path, key) {
             frisby.create(path.get.summary)
                 .get(env.api_url + key)
                 .expectStatus(200)
+                .exceptionHandler(function(e) {
+                    env.logger.error(e);
+                })
+                .after(function (err, res, body) {
+                    if (res.statusCode != 200){
+                        console.log(body);
+                    }
+                    if (err){
+                        env.logger.error(err);
+                    }
+                })
                 .expectJSON({
                     status: Boolean,
                     data: Array,

@@ -67,7 +67,6 @@ class RegisteredUser extends Friend
 		return $additional_cols;
 	}
 
-
 	public function getParams(AbstractUser $user = null, array $fields = null): Result
 	{
 		$result_data = parent::getParams($user, $fields)->getData();

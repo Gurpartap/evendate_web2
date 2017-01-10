@@ -26,8 +26,13 @@ events.forEach(function (value, index) {
                 status: Boolean,
                 text: String
             })
-            .afterJSON(function (json) {
-                console.log(json);
+            .after(function (err, res, body) {
+                if (res.statusCode != 200){
+                    console.log(body);
+                }
+                if (err){
+                    env.logger.error(err);
+                }
             })
             .toss();
     }

@@ -1,7 +1,8 @@
 <?php
 
 
-class Notification extends AbstractEntity{
+class Notification extends AbstractEntity
+{
 
 	protected $id;
 	protected $uuid;
@@ -47,6 +48,8 @@ class Notification extends AbstractEntity{
 	const NOTIFICATION_TYPE_BEFORE_WEEK = 'notification-before-week';
 	const NOTIFICATION_TYPE_BEFORE_QUARTER_OF_HOUR = 'notification-before-quarter-of-hour';
 	const NOTIFICATION_TYPE_CUSTOM = 'notification-custom';
+	const NOTIFICATION_TYPE_REGISTRATION_APPROVED = 'notification-registration-approved';
+	const NOTIFICATION_TYPE_REGISTRATION_NOT_APPROVED = 'notification-registration-not-approved';
 	const NOTIFICATION_TYPE_USERS = 'users-notification';
 
 	const NOTIFICATION_TYPE_NOW_ID = 1;
@@ -69,6 +72,11 @@ class Notification extends AbstractEntity{
 		self::NOTIFICATION_TYPE_BEFORE_QUARTER_OF_HOUR
 	);
 
+	const NOTIFICATION_REGISTRATION_TYPES = array(
+		self::NOTIFICATION_TYPE_REGISTRATION_APPROVED,
+		self::NOTIFICATION_TYPE_REGISTRATION_NOT_APPROVED
+	);
+
 	const NOTIFICATION_TYPES = array(
 		self::NOTIFICATION_TYPE_NOW,
 		self::NOTIFICATION_TYPE_BEFORE_THREE_HOURS,
@@ -81,11 +89,14 @@ class Notification extends AbstractEntity{
 		self::NOTIFICATION_TYPE_CHANGED_LOCATION,
 		self::NOTIFICATION_TYPE_CHANGED_REGISTRATION,
 		self::NOTIFICATION_TYPE_CHANGED_PRICE,
+		self::NOTIFICATION_TYPE_REGISTRATION_APPROVED,
+		self::NOTIFICATION_TYPE_REGISTRATION_NOT_APPROVED,
 		'notification-event-registration-ending'
 	);
 
 
-	public function update(PDO $db, array $notification){
+	public function update(PDO $db, array $notification)
+	{
 		if ($this->done == true) throw new LogicException('CANT_UPDATE_SENT_NOTIFICATION');
 		if (!isset($notification['notification_time'])) throw new LogicException('CANT_FIND_NOTIFICATION_TIME');
 
@@ -107,7 +118,8 @@ class Notification extends AbstractEntity{
 		return new Result(true, 'Уведомление успешно обновлено', $result);
 	}
 
-	public function delete(PDO $db){
+	public function delete(PDO $db)
+	{
 		$q_upd = App::queryFactory()->newUpdate();
 
 		$q_upd
@@ -124,12 +136,13 @@ class Notification extends AbstractEntity{
 		return new Result(true, 'Уведомление успешно удалено');
 	}
 
-	public function getNotificationTime() {
+	public function getNotificationTime()
+	{
 		return $this->notification_time;
 	}
 
-
-	public function setNotificationTime(DateTime $dt) {
+	public function setNotificationTime(DateTime $dt)
+	{
 		$q_upd = App::queryFactory()->newUpdate();
 		$q_upd
 			->table('events_notifications')
@@ -142,13 +155,14 @@ class Notification extends AbstractEntity{
 		return $this->notification_time = $dt->getTimestamp();
 	}
 
-	public function getType() {
+	public function getType()
+	{
 		return $this->notification_type;
 	}
 
-	public function getDone() {
+	public function getDone()
+	{
 		return $this->done;
 	}
-
 
 }
