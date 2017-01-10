@@ -3,7 +3,7 @@
 require_once $BACKEND_FULL_PATH .'/organizations/Class.OrganizationsCollection.php';
 require_once $BACKEND_FULL_PATH .'/organizations/Class.Organization.php';
 
-class Friend extends AbstractEntity{
+class Friend extends AbstractEntity implements UserInterface {
 
 	const RANDOM_FIELD_NAME = 'random';
 	const LINK_FIELD_NAME = 'link';

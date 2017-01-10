@@ -3186,6 +3186,12 @@
         "[is_new]": {
           "type": "boolean"
         },
+        "[is_private]": {
+          "type": "boolean"
+        },
+        "[brand_color]": {
+          "type": "string"
+        },
         "[subscription_id]": {
           "type": "integer",
           "format": "int32"

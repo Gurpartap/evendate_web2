@@ -2,7 +2,7 @@ var
     frisby = require('frisby'),
     fs = require("fs"),
     path = require('path'),
-    events = JSON.parse(fs.readFileSync(path.join(__dirname, './events.json'))),
+    organizations = JSON.parse(fs.readFileSync(path.join(__dirname, './organizations.json'))),
     env = require(path.join(__dirname, '../env.js'));
 
 frisby.globalSetup({
@@ -11,12 +11,12 @@ frisby.globalSetup({
     }
 });
 
-var create_event = events[0].payload;
-var update_event = events[1].payload;
+var create_organization = organizations[0].payload;
+var update_organization = organizations[1].payload;
 
 frisby
-    .create('Create event for update')
-    .post(env.api_url + 'events', create_event, {json: true})
+    .create('Create organization for update')
+    .post(env.api_url + 'organizations', create_organization, {json: true})
     .expectStatus(200)
     .after(function (err, res, body) {
         if (res.statusCode != 200){
@@ -29,16 +29,16 @@ frisby
     .expectJSONTypes({
         request_id: String,
         data: {
-            event_id: Number
+            organization_id: Number
         },
         status: Boolean,
         text: String
     })
     .afterJSON(function (json) {
-        var event_id = json.data.event_id;
+        var organization_id = json.data.organization_id;
         frisby
-            .create('Update event')
-            .put(env.api_url + 'events/' + event_id, update_event, {json: true})
+            .create('Update organization')
+            .put(env.api_url + 'organizations/' + organization_id, update_organization, {json: true})
             .expectStatus(200)
             .after(function (err, res, body) {
                 if (res.statusCode != 200){
@@ -51,7 +51,7 @@ frisby
             .expectJSONTypes({
                 request_id: String,
                 data: {
-                    event_id: Number
+                    organization_id: Number
                 },
                 status: Boolean,
                 text: String

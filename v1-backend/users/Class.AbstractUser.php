@@ -1,6 +1,9 @@
 <?php
 
-abstract class AbstractUser{
+require_once $BACKEND_FULL_PATH . '/users/Interface.UserInterface.php';
+
+abstract class AbstractUser implements UserInterface
+{
 
 
 	protected $id;
@@ -118,5 +121,10 @@ abstract class AbstractUser{
 	}
 
 	public abstract function getMainInfo(array $fields);
+
 	public abstract function getTokenId();
+
+	public function getSettings(){
+		return null;
+	}
 }
