@@ -312,7 +312,7 @@ class EventsCollection extends AbstractCollection
 					if ($value instanceof NotAuthorizedUser) break;
 					if ($value instanceof UserInterface == false) break;
 					$q_get_events->where("id IN (SELECT DISTINCT event_id FROM favorite_events WHERE status = TRUE AND user_id = :user_id)");
-					$statement_array[':user_id'] = $user->getId();
+					$statement_array[':user_id'] = $value->getId();
 					break;
 				}
 				case 'since': {
