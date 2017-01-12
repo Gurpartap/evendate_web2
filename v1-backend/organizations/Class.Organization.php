@@ -112,12 +112,12 @@ class Organization extends AbstractEntity
                         ), 0) AS ' . self::RATING_OVERALL,
 		self::NEW_EVENTS_COUNT_FIELD_NAME => '(
 		SELECT
-			COUNT(view_events.id)
+			COUNT(*)
 			FROM view_events
 			WHERE
 				organization_id = view_organizations.id
-				AND
-				view_events.last_event_date > DATE_PART(\'epoch\', NOW()) :: INT
+				AND 
+				view_events.last_event_date_dt < NOW()::TIMESTAMPTZ
 				AND view_events.created_at > 
 					COALESCE((SELECT DATE_PART(\'epoch\', stat_organizations.created_at)::INT
 					    FROM stat_organizations
