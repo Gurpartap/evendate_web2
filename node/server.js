@@ -15,6 +15,7 @@ var
     Utils = require('./utils'),
     smtpTransport = require('nodemailer-smtp-transport'),
     nodemailer = require('nodemailer'),
+    Mailer = require('./mailer.js'),
     CronJob = require('cron').CronJob,
     ImagesResize = require('./image_resizer'),
     Notifications = require('./notifications'),
@@ -1510,3 +1511,16 @@ pg.connect(pg_conn_string, function (err, client, done) {
     });
 
 });
+
+if (args.indexOf('--send-email') !== -1){
+    new Mailer(transporter).constructLetter('organization_registered', {
+        title: 'Добро пожаловать в Evendate!',
+        first_name: 'Инал'
+    }).send('kardinal3094@gmail.com', 'Добро пожаловать в Evendate!', function (err, info) {
+        if (err) {
+            handleError('EMAIL SEND ERROR', err);
+            handleError(html);
+        }
+        logger.info('EMAIL_INFO', info);
+    });
+}
