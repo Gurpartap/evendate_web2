@@ -96,7 +96,6 @@ CREATE OR REPLACE VIEW view_all_events AS
           events.registered_count IS NULL)
      AND (DATE_PART('epoch', NOW()) :: INT < (DATE_PART('epoch', events.registration_till) :: INT) OR
           events.registration_till IS NULL))                                           AS registration_available,
-    view_organizations.is_private                                                         AS organization_private,
     view_organizations.is_private                                                         AS organization_is_private,
     events.first_event_date AS first_event_date_dt,
     events.last_event_date AS last_event_date_dt
