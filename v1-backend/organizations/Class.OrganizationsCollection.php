@@ -21,25 +21,9 @@ class OrganizationsCollection extends AbstractCollection
 		$cols = Fields::mergeFields(Organization::getAdditionalCols(), $fields, Organization::getDefaultCols());
 		$q_get_organizations = App::queryFactory()->newSelect();
 
-		if (isset($filters[Organization::IS_SUBSCRIBED_FIELD_NAME])) {
-			$cols[] = Organization::getAdditionalCols()[Organization::IS_SUBSCRIBED_FIELD_NAME];
-		}
-		if (isset($fields[Organization::NEW_EVENTS_COUNT_FIELD_NAME])) {
-			$cols[] = Organization::getAdditionalCols()[Organization::NEW_EVENTS_COUNT_FIELD_NAME];
-			$statement_array[':user_id'] = $user->getId();
-		}
-
 		$q_get_organizations
 			->distinct()
 			->from('view_organizations');
-
-
-		if (isset($fields[Organization::IS_SUBSCRIBED_FIELD_NAME])
-			|| isset($fields[Organization::SUBSCRIPTION_ID_FIELD_NAME])
-			|| $return_one
-		) {
-			$statement_array[':user_id'] = $user->getId();
-		}
 
 		$instance_class_name = 'Organization';
 
@@ -175,9 +159,19 @@ class OrganizationsCollection extends AbstractCollection
 			}
 		}
 
-		$q_get_organizations
-			->cols($cols)
-			->orderBy($order_by);
+
+		if (isset($filters[Organization::IS_SUBSCRIBED_FIELD_NAME])) {
+			$cols[] = Organization::getAdditionalCols()[Organization::IS_SUBSCRIBED_FIELD_NAME];
+		}
+
+		if (isset($fields[Organization::NEW_EVENTS_COUNT_FIELD_NAME]) ||
+				isset($fields[Organization::IS_SUBSCRIBED_FIELD_NAME])
+				|| isset($fields[Organization::SUBSCRIPTION_ID_FIELD_NAME])
+				|| $return_one
+		) {
+			$statement_array[':user_id'] = $user->getId();
+		}
+
 
 		if (isset($getting_private_organization) && $getting_private_organization == true) {
 			$instance_class_name = 'PrivateOrganization';
@@ -198,15 +192,20 @@ class OrganizationsCollection extends AbstractCollection
 					
 					))');
 
-			if (array_key_exists(Organization::IS_SUBSCRIBED_FIELD_NAME, $filters) == false){
+			if (array_key_exists(Organization::IS_SUBSCRIBED_FIELD_NAME, $filters) == false) {
 				$statement_array[':user_id'] = $user->getId();
 			}
-			if($user instanceof User){
+			if ($user instanceof User) {
 				$statement_array[':email'] = $user->getEmail();
-			}else{
+			} else {
 				$statement_array[':email'] = '-';
 			}
 		}
+
+
+		$q_get_organizations
+			->cols($cols)
+			->orderBy($order_by);
 
 		if (isset($pagination['offset'])) {
 			$q_get_organizations->offset($pagination['offset']);
