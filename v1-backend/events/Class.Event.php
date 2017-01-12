@@ -298,7 +298,22 @@ class Event extends AbstractEntity
 		return $this->organization_id;
 	}
 
+	private static function updateExtremumDates($event_id, PDO $db)
+	{
+		$q_upd_first = 'UPDATE events SET first_event_date = (SELECT MIN((events_dates.event_date :: DATE || \' \' || events_dates.start_time) :: TIMESTAMPTZ)
+     FROM events_dates
+     WHERE event_id = :event_id AND events_dates.status = TRUE) WHERE event_id = :event_id';
 
+		$q_upd_last = 'UPDATE events SET last_event_date = (SELECT MAX((events_dates.event_date :: DATE || \' \' || events_dates.start_time) :: TIMESTAMPTZ)
+     FROM events_dates
+     WHERE event_id = :event_id AND events_dates.status = TRUE) WHERE event_id = :event_id';
+
+		$result = $db->prepare($q_upd_first)->execute(array(':event_id' => $event_id));
+		if ($result === FALSE) throw new DBQueryException('CANT_UPDATE_DATES', $db);
+
+		$result = $db->prepare($q_upd_last)->execute(array(':event_id' => $event_id));
+		if ($result === FALSE) throw new DBQueryException('CANT_UPDATE_DATES', $db);
+	}
 
 	private static function saveRegistrationInfo(PDO $db, $event_id, array $data)
 	{
@@ -661,6 +676,8 @@ class Event extends AbstractEntity
 
 			$p_ins_dates->fetch(PDO::FETCH_ASSOC);
 		}
+
+		self::updateExtremumDates($event_id, $db);
 	}
 
 	private static function getNotificationTypeId($name, PDO $db): int
@@ -1193,8 +1210,7 @@ class Event extends AbstractEntity
 				$first_event_date = DateTime::createFromFormat('Y-m-d H:i:s', $event_date->format('Y-m-d') . ' ' . $first_event_date['start_time']);
 				$time = DateTime::createFromFormat('U', $first_event_date->getTimestamp() - $this->getNotificationTypeOffset($notification['notification_type']));
 				$notification_type_id = $this->getNotificationTypeId($notification['notification_type'], $this->db);
-			}
-			// notifications for registration events
+			} // notifications for registration events
 			elseif (in_array($notification['notification_type'], Notification::NOTIFICATION_REGISTRATION_TYPES)) {
 				$time = new DateTime($notification['notification_time']);
 				$notification_type_id = $this->getNotificationTypeId($notification['notification_type'], $this->db);
@@ -1211,8 +1227,7 @@ class Event extends AbstractEntity
 				$r = $p_upd_notifications->execute($q_upd_notifications->getBindValues());
 				if ($r === FALSE) throw new DBQueryException('CANT_UPDATE_NOTIFICATIONS', $this->db);
 			} else throw new InvalidArgumentException('CANT_FIND_NOTIFICATION_TYPE');
-		}
-		// notifications by exact time
+		} // notifications by exact time
 		elseif (isset($notification['notification_time'])) {
 			$time = new DateTime($notification['notification_time']);
 			$notification_type_id = $this->getNotificationTypeId(Notification::NOTIFICATION_TYPE_CUSTOM, $this->db);
