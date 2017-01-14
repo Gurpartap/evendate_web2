@@ -1,11 +1,6 @@
 <?php
 
-if (App::$ENV == 'prod' || App::$ENV == 'test') {
-	$DEBUG_MODE = false;
-}else{
-	ini_set("display_errors", 1);
-	error_reporting(E_ALL);
-}
+
 require_once 'v1-backend/bin/env_variables.php';
 require_once "{$BACKEND_FULL_PATH}/bin/Class.Result.php";
 require_once "{$BACKEND_FULL_PATH}/bin/db.php";
@@ -21,6 +16,12 @@ require_once "{$BACKEND_FULL_PATH}/events/Class.Event.php";
 require_once "{$BACKEND_FULL_PATH}/users/Class.NotAuthorizedUser.php";
 require_once "{$BACKEND_FULL_PATH}/users/Class.User.php";
 
+if (App::$ENV == 'prod' || App::$ENV == 'test') {
+	$DEBUG_MODE = false;
+}else{
+	ini_set("display_errors", 1);
+	error_reporting(E_ALL);
+}
 App::buildGlobal($__db);
 
 try {
