@@ -1,8 +1,11 @@
 <?php
 
-ini_set("display_errors", 1);
-error_reporting(E_ALL);
-$DEBUG_MODE = true;
+if (App::$ENV == 'prod' || App::$ENV == 'test') {
+	$DEBUG_MODE = false;
+}else{
+	ini_set("display_errors", 1);
+	error_reporting(E_ALL);
+}
 require_once 'v1-backend/bin/env_variables.php';
 require_once "{$BACKEND_FULL_PATH}/bin/Class.Result.php";
 require_once "{$BACKEND_FULL_PATH}/bin/db.php";
