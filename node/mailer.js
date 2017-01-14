@@ -1,6 +1,8 @@
 
 let fs = require('fs');
 let utils = require('./utils');
+let mailData = require('./mail_data.js');
+
 const EMAILS_PATH = '../emails/';
 
 class Mailer {
@@ -33,6 +35,9 @@ class Mailer {
             subject: subject,
             html: this.html
         }, callback);
+    }
+
+    sendScheduled (client){
 
     }
 }

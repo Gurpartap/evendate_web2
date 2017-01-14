@@ -24,144 +24,146 @@
 })(window, document, window.jQuery);
 
 $.fn.extend({
-	toggleStatus: function(statuses) {
-		var $this = this;
-		
-		if ($this.is('.form_unit')) {
-			statuses.split(' ').forEach(function(status) {
-				var $form_elements = $this.find('input, select, textarea, button');
-				if (status === 'disabled') {
-					if ($this.hasClass('-status_disabled')) {
-						$form_elements.removeAttr('disabled');
-					} else {
-						$form_elements.attr('disabled', true);
-					}
-				}
-				$this.toggleClass('-status_' + status);
-			});
-		} else if ($this.is('input, textarea, select, button')) {
-			$this.closest('.form_unit').toggleStatus(statuses);
-		} else if ($this.length) {
-			$this.find('.form_unit').toggleStatus(statuses);
-		} else {
-			throw Error('Argument not found');
-		}
-		
-		return this;
-	},
-	
-	/**
-	 * Сбор данных с формы
-	 * Метод возвращает javaScript объект, состоящий из атрибутов name и value элементов формы.
-	 * Если output_type стоит на array, то возвращается массив из объектов с полями name и value (аналогично с serializeArray).
-	 *
-	 * @method external:"jQuery.fn".serializeForm
-	 *
-	 * @param {string} [output_type=object]
-	 * @returns {Array|Object}
-	 */
-	serializeForm: function(output_type) {
-		var zb = /^(?:input|select|textarea|keygen)/i,
-			yb = /^(?:submit|button|image|reset|file)$/i,
-			T = /^(?:checkbox|radio)$/i,
-			xb = /\r?\n/g,
-			elements = this.map(function() {
-				var a = $.prop(this, "elements");
-				return a ? $.makeArray(a) : this
-			});
-		
-		switch (output_type) {
-			case 'array': {
-				/* Работает так же как и serializeArray, с некоторыми модификациями */
-				return elements.filter(function() {
-					var a = this.type;
-					return this.name
-						&& !$(this).is(":disabled")
-						&& zb.test(this.nodeName)
-						&& !yb.test(a)
-						&& ((this.checked && this.value != "on") || a != "radio")
-						&& ((this.checked && this.value != "on") || this.value == "on" || a != "checkbox")
-				}).map(function(a, b) {
-					var c = $(this).val(),
-						std = "";
-					switch (this.type) {
-						case "radio":
-						case "checkbox": {
-							std = c == "on" ? ( this.checked ? 1 : 0 ) : c;
-							break;
-						}
-						default: {
-							std = c.replace(xb, "\r\n");
-						}
-					}
-					return null == c ? null : {
-						name: b.name,
-						value: std
-					}
-				}).get();
-			}
-			case 'object':
-			default: {
-				var output = {};
-				elements.filter(function() {
-					var a = this.type;
-					return this.name && !$(this).is(':disabled') && zb.test(this.nodeName) && !yb.test(a) && !T.test(a)
-				}).each(function(i, el) {
-					var $element = $(el),
-						name = el.name,
-						value = $element.val();
-					
-					if (elements.filter("[name='" + name + "']").length > 1 && value != "") {
-						output[name] = typeof(output[name]) == "undefined" ? [] : output[name];
-						output[name].push(value ? value.replace(xb, "\r\n") : value)
-					}
-					else if ($element.attr('type') === 'hidden' && value.indexOf('data.') === 0) {
-						var data_names = value.split('.'),
-							data = $element.data(data_names[1]),
-							n = 2;
-						while (data_names[n]) {
-							data = data[data_names[n]];
-							n++;
-						}
-						output[name] = data;
-					}
-					else {
-						output[name] = value || value === 0 ? value.replace(xb, "\r\n") : null;
-					}
-				});
-				elements.filter(function() {
-					var a = this.type;
-					return this.name && !$(this).is(":disabled") && T.test(a) && ((this.checked && this.value != "on") || (this.value == "on" && a == "checkbox"))
-				}).each(function(i, el) {
-					var name = el.name,
-						value = el.value;
-					
-					switch (el.type) {
-						case 'radio': {
-							output[name] = value;
-							break;
-						}
-						case 'checkbox': {
-							if (elements.filter("[name='" + name + "']").length > 1 && value != "on") {
-								output[name] = typeof(output[name]) == "undefined" ? [] : output[name];
-								output[name].push(value)
-							}
-							else if (value != "on")
-								output[name] = value;
-							else
-								output[name] = el.checked ? true : false;
-							break;
-						}
-					}
-				});
-				return output;
-			}
-		}
-	}
+    toggleStatus: function (statuses) {
+        var $this = this;
+
+        if ($this.is('.form_unit')) {
+            statuses.split(' ').forEach(function (status) {
+                var $form_elements = $this.find('input, select, textarea, button');
+                if (status === 'disabled') {
+                    if ($this.hasClass('-status_disabled')) {
+                        $form_elements.removeAttr('disabled');
+                    } else {
+                        $form_elements.attr('disabled', true);
+                    }
+                }
+                $this.toggleClass('-status_' + status);
+            });
+        } else if ($this.is('input, textarea, select, button')) {
+            $this.closest('.form_unit').toggleStatus(statuses);
+        } else if ($this.length) {
+            $this.find('.form_unit').toggleStatus(statuses);
+        } else {
+            throw Error('Argument not found');
+        }
+
+        return this;
+    },
+
+    /**
+     * Сбор данных с формы
+     * Метод возвращает javaScript объект, состоящий из атрибутов name и value элементов формы.
+     * Если output_type стоит на array, то возвращается массив из объектов с полями name и value (аналогично с serializeArray).
+     *
+     * @method external:"jQuery.fn".serializeForm
+     *
+     * @param {string} [output_type=object]
+     * @returns {Array|Object}
+     */
+    serializeForm: function (output_type) {
+        var zb = /^(?:input|select|textarea|keygen)/i,
+            yb = /^(?:submit|button|image|reset|file)$/i,
+            T = /^(?:checkbox|radio)$/i,
+            xb = /\r?\n/g,
+            elements = this.map(function () {
+                var a = $.prop(this, "elements");
+                return a ? $.makeArray(a) : this
+            });
+
+        switch (output_type) {
+            case 'array': {
+                /* Работает так же как и serializeArray, с некоторыми модификациями */
+                return elements.filter(function () {
+                    var a = this.type;
+                    return this.name
+                        && !$(this).is(":disabled")
+                        && zb.test(this.nodeName)
+                        && !yb.test(a)
+                        && ((this.checked && this.value != "on") || a != "radio")
+                        && ((this.checked && this.value != "on") || this.value == "on" || a != "checkbox")
+                }).map(function (a, b) {
+                    var c = $(this).val(),
+                        std = "";
+                    switch (this.type) {
+                        case "radio":
+                        case "checkbox": {
+                            std = c == "on" ? ( this.checked ? 1 : 0 ) : c;
+                            break;
+                        }
+                        default: {
+                            std = c.replace(xb, "\r\n");
+                        }
+                    }
+                    return null == c ? null : {
+                            name: b.name,
+                            value: std
+                        }
+                }).get();
+            }
+            case 'object':
+            default: {
+                var output = {};
+                elements.filter(function () {
+                    var a = this.type;
+                    return this.name && !$(this).is(':disabled') && zb.test(this.nodeName) && !yb.test(a) && !T.test(a)
+                }).each(function (i, el) {
+                    var $element = $(el),
+                        name = el.name,
+                        value = $element.val();
+
+                    if (elements.filter("[name='" + name + "']").length > 1 && value != "") {
+                        output[name] = typeof(output[name]) == "undefined" ? [] : output[name];
+                        output[name].push(value ? value.replace(xb, "\r\n") : value)
+                    }
+                    else if ($element.attr('type') === 'hidden' && value.indexOf('data.') === 0) {
+                        var data_names = value.split('.'),
+                            data = $element.data(data_names[1]),
+                            n = 2;
+                        while (data_names[n]) {
+                            data = data[data_names[n]];
+                            n++;
+                        }
+                        output[name] = data;
+                    }
+                    else {
+                        output[name] = value || value === 0 ? value.replace(xb, "\r\n") : null;
+                    }
+                });
+                elements.filter(function () {
+                    var a = this.type;
+                    return this.name && !$(this).is(":disabled") && T.test(a) && ((this.checked && this.value != "on") || (this.value == "on" && a == "checkbox"))
+                }).each(function (i, el) {
+                    var name = el.name,
+                        value = el.value;
+
+                    switch (el.type) {
+                        case 'radio': {
+                            output[name] = value;
+                            break;
+                        }
+                        case 'checkbox': {
+                            if (elements.filter("[name='" + name + "']").length > 1 && value != "on") {
+                                output[name] = typeof(output[name]) == "undefined" ? [] : output[name];
+                                output[name].push(value)
+                            }
+                            else if (value != "on")
+                                output[name] = value;
+                            else
+                                output[name] = el.checked ? true : false;
+                            break;
+                        }
+                    }
+                });
+                return output;
+            }
+        }
+    }
 });
 
-jQuery.makeSet = function(array) {
-	return $($.map(array, function(el){return el.get();}));
+jQuery.makeSet = function (array) {
+    return $($.map(array, function (el) {
+        return el.get();
+    }));
 };
 
 /**=========================================================
@@ -584,80 +586,88 @@ jQuery.makeSet = function(array) {
  * This framework is released under the GNU Public License, version 3 or later.
  * http://www.gnu.org/licenses/gpl-3.0-standalone.html
  */
-(function(window){
-	window.cookies = {
-		/**
-		 *
-		 * @param {string} name
-		 * @return {(string|null)}
-		 */
-		getItem: function (name) {
-			if (!name) { return null; }
-			return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(name).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
-		},
-		/**
-		 *
-		 * @param {string} name
-		 * @param {*} value
-		 * @param {(string|number|Date)} [end] - max-age in seconds, Infinity, or the expires date in GMTString format or as Date object
-		 * @param {string} [path]
-		 * @param {string} [domain]
-		 * @param {boolean} [is_secure]
-		 * @return {boolean}
-		 */
-		setItem: function (name, value, end, path, domain, is_secure) {
-			var expires = "";
-			if (!name || /^(?:expires|max\-age|path|domain|secure)$/i.test(name)) { return false; }
-			if (end) {
-				switch (end.constructor) {
-					case Number:
-						expires = end === Infinity ? "; expires=Fri, 31 Dec 9999 23:59:59 GMT" : "; max-age=" + end;
-						break;
-					case String:
-						expires = "; expires=" + end;
-						break;
-					case Date:
-						expires = "; expires=" + end.toUTCString();
-						break;
-				}
-			}
-			document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + (domain ? "; domain=" + domain : "") + (path ? "; path=" + path : "") + (is_secure ? "; secure" : "");
-			return true;
-		},
-		/**
-		 *
-		 * @param {string} name
-		 * @param {string} [path]
-		 * @param {string} [domain]
-		 * @return {boolean}
-		 */
-		removeItem: function (name, path, domain) {
-			if (!this.hasItem(name)) { return false; }
-			document.cookie = encodeURIComponent(name) + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT" + (domain ? "; domain=" + domain : "") + (path ? "; path=" + path : "");
-			return true;
-		},
-		/**
-		 *
-		 * @param {string} name
-		 * @return {boolean}
-		 */
-		hasItem: function (name) {
-			if (!name) { return false; }
-			return (new RegExp("(?:^|;\\s*)" + encodeURIComponent(name).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=")).test(document.cookie);
-		},
-		/**
-		 *
-		 * @return {Array}
-		 */
-		keys: function () {
-			var keys = document.cookie.replace(/((?:^|\s*;)[^\=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, "").split(/\s*(?:\=[^;]*)?;\s*/),
-				length = keys.length;
-			for (var i = 0; i < length; i++) {
-				keys[i] = decodeURIComponent(keys[i]);
-			}
-			return keys;
-		}
-	};
+(function (window) {
+    window.cookies = {
+        /**
+         *
+         * @param {string} name
+         * @return {(string|null)}
+         */
+        getItem: function (name) {
+            if (!name) {
+                return null;
+            }
+            return decodeURIComponent(document.cookie.replace(new RegExp("(?:(?:^|.*;)\\s*" + encodeURIComponent(name).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=\\s*([^;]*).*$)|^.*$"), "$1")) || null;
+        },
+        /**
+         *
+         * @param {string} name
+         * @param {*} value
+         * @param {(string|number|Date)} [end] - max-age in seconds, Infinity, or the expires date in GMTString format or as Date object
+         * @param {string} [path]
+         * @param {string} [domain]
+         * @param {boolean} [is_secure]
+         * @return {boolean}
+         */
+        setItem: function (name, value, end, path, domain, is_secure) {
+            var expires = "";
+            if (!name || /^(?:expires|max\-age|path|domain|secure)$/i.test(name)) {
+                return false;
+            }
+            if (end) {
+                switch (end.constructor) {
+                    case Number:
+                        expires = end === Infinity ? "; expires=Fri, 31 Dec 9999 23:59:59 GMT" : "; max-age=" + end;
+                        break;
+                    case String:
+                        expires = "; expires=" + end;
+                        break;
+                    case Date:
+                        expires = "; expires=" + end.toUTCString();
+                        break;
+                }
+            }
+            document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + (domain ? "; domain=" + domain : "") + (path ? "; path=" + path : "") + (is_secure ? "; secure" : "");
+            return true;
+        },
+        /**
+         *
+         * @param {string} name
+         * @param {string} [path]
+         * @param {string} [domain]
+         * @return {boolean}
+         */
+        removeItem: function (name, path, domain) {
+            if (!this.hasItem(name)) {
+                return false;
+            }
+            document.cookie = encodeURIComponent(name) + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT" + (domain ? "; domain=" + domain : "") + (path ? "; path=" + path : "");
+            return true;
+        },
+        /**
+         *
+         * @param {string} name
+         * @return {boolean}
+         */
+        hasItem: function (name) {
+            if (!name) {
+                return false;
+            }
+            return (new RegExp("(?:^|;\\s*)" + encodeURIComponent(name).replace(/[\-\.\+\*]/g, "\\$&") + "\\s*\\=")).test(document.cookie);
+        },
+        /**
+         *
+         * @return {Array}
+         */
+        keys: function () {
+            var keys = document.cookie.replace(/((?:^|\s*;)[^\=]+)(?=;|$)|^\s*|\s*(?:\=[^;]*)?(?:\1|$)/g, "").split(/\s*(?:\=[^;]*)?;\s*/),
+                length = keys.length;
+            for (var i = 0; i < length; i++) {
+                keys[i] = decodeURIComponent(keys[i]);
+            }
+            return keys;
+        }
+    };
 }(window));
 
 
@@ -695,9 +705,9 @@ function hashToObject() {
     return obj;
 }
 
-if (window.location.hostname.indexOf('.test.evendate.ru') == -1){
+if (window.location.hostname.indexOf('.test.evendate.ru') == -1) {
     window.socket = io.connect(window.location.protocol == 'https:' ? ':8443' : ':8080', {secure: window.location.protocol == 'https:'});
-}else{
+} else {
     window.socket = io({path: '/node/socket.io'});
 }
 
@@ -749,6 +759,15 @@ socket.on('auth', function (data) {
 
 socket.on('log', function (data) {
     console.log(data);
+});
+
+socket.on('utils.registrationSaved', function (data) {
+    var _data = $('form.register-organization').serializeForm();
+    _data.uuid = data.uuid;
+    $('.with-register, .no-register').toggleClass('hidden');
+    $('.faq-link').click();
+    cookies.setItem('open_add_organization', 1, Infinity);
+    window.localStorage.setItem('organization_info', JSON.stringify(_data));
 });
 
 socket.on('error.retry', function () {
@@ -879,7 +898,7 @@ $(document).ready(function () {
 function isNotDesktop() {
     var check = false;
     (function (a) {
-        if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(a) || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0, 4)))check = true
+        if (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(a) || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0, 4))) check = true
     })(navigator.userAgent || navigator.vendor || window.opera);
     return check;
 }

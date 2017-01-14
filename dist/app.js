@@ -1794,6 +1794,17 @@ socket.on('vk.post.error', function(response){
 	console.log(response);
 	showNotifier({text: 'Не удалось опубликовать событие в группе vk. Пожалуйста, попробуйте еще раз.', status: false});
 });
+
+socket.on('utils.registrationSaved', function (data) {
+    var _data = $('form.register-organization').serializeForm();
+    _data.uuid = data.uuid;
+    $('.with-register, .no-register').toggleClass('hidden');
+    $('.faq-link').click();
+    cookies.setItem('open_add_organization', 1, Infinity);
+    window.localStorage.setItem('organization_info', JSON.stringify(_data));
+    e.preventDefault();
+});
+
 /**
  * @typedef {object} AJAXData
  * @property {(Array|string|undefined)} [fields]
@@ -9344,7 +9355,8 @@ EditOrganizationPage.prototype.render = function() {
 		}
 		
 		function afterSubmit() {
-			socket.on('utils.updateImagesDone', function() {
+            socket.emit('utils.registrationFinished', additional_fields);
+            socket.on('utils.updateImagesDone', function() {
 				window.location.href = '/organization/' + PAGE.organization.id;
 			});
 			socket.emit('utils.updateImages');

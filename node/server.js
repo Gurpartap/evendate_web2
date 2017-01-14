@@ -1191,6 +1191,57 @@ pg.connect(pg_conn_string, function (err, client, done) {
             });
         });
 
+        socket.on(CONSTANTS.UTILS.REGISTRATION_FINISHED, function (data) {
+            console.log('Reg finished', data);
+
+            let q_upd_registration = Entities.organization_registrations.update({
+                finished: true
+            }).where(Entities.organization_registrations.uuid.equals(data.uuid)).toQuery();
+
+            client.query(q_upd_registration, handleError);
+
+        });
+
+        socket.on(CONSTANTS.UTILS.REGISTRATION_STARTED, function (data) {
+            let html = '';
+            for (let i in data) {
+                if (data.hasOwnProperty(i)) {
+                    html += '<p><strong>' + i + ':</strong> ' + data[i] + '</p>';
+                }
+            }
+            transporter.sendMail({
+                debug: true,
+                connectionTimeout: 50000,
+                greetingTimeout: 50000,
+                socketTimeout: 50000,
+                from: 'feedback@evendate.ru',
+                to: 'support@evendate.ru',
+                subject: 'Обратная связь!',
+                html: html
+            }, function (err, info) {
+                if (err) {
+                    handleError('EMAIL SEND ERROR', err);
+                    handleError(html);
+                }
+                logger.info('EMAIL_INFO', info);
+            });
+
+            let q_ins_registration = Entities.organization_registrations.insert({
+                email: data.email,
+                site_url: data.site_url,
+                name: data.name
+            }).returning('uuid').toQuery();
+
+            client.query(q_ins_registration, function(err, res){
+                if (err) {
+                    handleError('EMAIL SEND ERROR', err);
+                }
+                socket.emit('utils.registrationSaved', {
+                    uuid: res.rows[0].uuid
+                })
+            });
+        });
+
         socket.on(CONSTANTS.AUTH.SESSION_SET, function (token) {
             if (!__rooms.hasOwnProperty(token)) {
                 __rooms[token] = [];
