@@ -302,11 +302,11 @@ class Event extends AbstractEntity
 	{
 		$q_upd_first = 'UPDATE events SET first_event_date = (SELECT MIN((events_dates.event_date :: DATE || \' \' || events_dates.start_time) :: TIMESTAMPTZ)
      FROM events_dates
-     WHERE event_id = :event_id AND events_dates.status = TRUE) WHERE event_id = :event_id';
+     WHERE event_id = :event_id AND events_dates.status = TRUE) WHERE id = :event_id';
 
 		$q_upd_last = 'UPDATE events SET last_event_date = (SELECT MAX((events_dates.event_date :: DATE || \' \' || events_dates.start_time) :: TIMESTAMPTZ)
      FROM events_dates
-     WHERE event_id = :event_id AND events_dates.status = TRUE) WHERE event_id = :event_id';
+     WHERE event_id = :event_id AND events_dates.status = TRUE) WHERE id = :event_id';
 
 		$result = $db->prepare($q_upd_first)->execute(array(':event_id' => $event_id));
 		if ($result === FALSE) throw new DBQueryException('CANT_UPDATE_DATES', $db);
