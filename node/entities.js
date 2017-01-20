@@ -31,6 +31,19 @@ module.exports = {
             'avatar_url_max'
         ]
     }),
+    organization_registrations: sql.define({
+        name: 'organization_registrations',
+        columns: [
+            'id',
+            'email',
+            'site_url',
+            'name',
+            'finished',
+            'created_at',
+            'updated_at',
+            'uuid'
+        ]
+    }),
     vk_posts: sql.define({
         name: 'vk_posts',
         columns: [
