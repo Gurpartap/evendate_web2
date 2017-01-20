@@ -13,7 +13,6 @@
     "gcm": "^1.0.1",
     "gm": "^1.21.1",
     "googlemaps": "^1.11.1",
-    "highcharts-export-server": "^1.0.5",
     "mime-types": "^2.1.10",
     "moment": "2.10.3",
     "mongoose": "^4.3.5",
