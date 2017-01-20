@@ -152,6 +152,24 @@ class Organization extends AbstractEntity
 		$this->db = App::DB();
 	}
 
+	private static function addMailInfo(User $user, $data, $id, PDO $db)
+	{
+		$q_ins_mail = App::queryFactory()->newInsert()
+			->into('emails')
+			->cols(array(
+				'email_type_id' => '1', //hardcoded in SQL also,
+				'recipient' => filter_var($user->getEmail(), FILTER_VALIDATE_EMAIL) === FALSE ? $data['email'] : $user->getEmail(),
+				'data' => json_encode(array(
+					'first_name' => $user->getFirstName(),
+					'last_name' => $user->getLastName(),
+					'organization_short_name' => $data['short_name'],
+					'organization_id' => $id,
+				)),
+				'status' => 'true'
+			));
+		$db->prepare($q_ins_mail->getStatement())->execute($q_ins_mail->getBindValues());
+	}
+
 	/**
 	 * @return mixed
 	 */
@@ -709,6 +727,7 @@ class Organization extends AbstractEntity
 		if ($result === FALSE) throw new DBQueryException('CANT_CREATE_ORGANIZATION', $db);
 		$result = $p_ins_organization->fetch(PDO::FETCH_ASSOC);
 		self::addOwner($user, $result['id'], $db);
+		self::addMailInfo($user, $data, $result['id'], $db);
 		@file_get_contents(App::DEFAULT_NODE_LOCATION . '/recommendations/organizations/' . $result['id']);
 		return new Result(true, '', array('organization_id' => $result['id']));
 	}

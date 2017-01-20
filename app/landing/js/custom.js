@@ -167,7 +167,7 @@ $(document).ready(function() {
               $("input#mc-email").focus().addClass("error");
           }else{
               $(".subscribe.contact-message").html('<i class="fa fa-check"></i> Спасибо! Мы будем держать Вас в курсе').css("color","#29b94f");
-              socket.emit('feedback', {
+              socket.emit('utils.feedback', {
                   type: 'subscribe',
                   email: email
               });
@@ -235,7 +235,7 @@ $(document).ready(function() {
                $(".feebdack.contact-message").stop(true).html('<i class="fa fa-warning"></i> Все поля обязательны.').css("color","#ef4b4b");
                $("textarea#contactmessage").focus().addClass("error");
            } else {
-               socket.emit('feedback', {
+               socket.emit('utils.feedback', {
                    'contactEmail': email,
                    'organization': organizationname,
                    'type': 'organization',
