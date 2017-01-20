@@ -184,7 +184,7 @@ class MailScheduler {
         exporter.initPool();
         let start = MailScheduler.getLastWeekStart().format('YYYY-MM-DD');
         let end = MailScheduler.getLastWeekEnd().format('YYYY-MM-DD');
-        let folder_path = '/email_images/' + start + ' - ' + end + '/';
+        let folder_path = '/email_images/' + start + '---' + end + '/';
         try {
             fs.mkdirSync('..' + folder_path);
         } catch (e) {
