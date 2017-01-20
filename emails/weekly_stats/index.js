@@ -16,6 +16,8 @@ module.exports = {
             data.page_views = data.main_stats.view[data.main_stats.view.length - 1].value;
             data.favored_count = data.main_stats.fave[data.main_stats.view.length - 1].value;
         }
+        if (!data.page_views) data.page_views = 0;
+        if (!data.favored_count) data.favored_count = 0;
         return data;
     }
 };
