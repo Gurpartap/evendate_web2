@@ -206,7 +206,7 @@ class MailScheduler {
             if (err) return handleError(err);
 
             res.rows.forEach(organization => {
-                (() => {
+                ((organization) => {
                     queue.push((callback) => {
                         let data_getters = {
                             graph_data: (callback) => {
@@ -348,7 +348,7 @@ class MailScheduler {
                             });
                         });
                     })
-                })();
+                })(organization);
             });
 
             async.parallelLimit(queue, 1, (err, results) => {
