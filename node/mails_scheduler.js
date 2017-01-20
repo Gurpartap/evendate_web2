@@ -258,6 +258,7 @@ class MailScheduler {
                                             }
                                         })
                                     .on('complete', function (result) {
+                                        console.log(result);
                                         if (result.status != true) {
                                             handleError(result.data);
                                         }
