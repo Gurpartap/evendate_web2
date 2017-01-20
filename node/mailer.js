@@ -1,5 +1,6 @@
 let fs = require('fs');
 let utils = require('./utils');
+let async = require('async');
 
 const EMAILS_PATH = '../emails/';
 
@@ -46,6 +47,7 @@ class Mailer {
 
     sendScheduled(client, handleError) {
         let self = this,
+            queue = [],
             q_get_emails = 'SELECT emails.*, ' +
                 'email_types.type_code, ' +
                 'email_types.name as subject ' +
@@ -64,25 +66,35 @@ class Mailer {
 
             res_emails.rows.forEach(email => {
                 (mail => {
-                    client.query(q_upd_is_sending, [mail.id], function (upd_err) {
-                        if (upd_err) return handleError(upd_err);
+                    queue.push(function (callback) {
+                        client.query(q_upd_is_sending, [mail.id], function (upd_err) {
+                            if (upd_err) {
+                                handleError(upd_err);
+                                callback(null);
+                            }
 
-                        mail.data.subject = utils.replaceTags(mail.subject, mail.data);
-                        self.constructLetter(mail.type_code, mail.data);
-                        self.send('', mail.data.subject, function (err, res) {
-                            console.log(err, res);
-                            let is_sended = err == null;
-                            client.query(q_ins_email_sent_attempt, [mail.id, err == null ? null : JSON.stringify(err), JSON.stringify(res)], function (ins_err) {
-                                if (ins_err) return handleError(ins_err);
-                            });
-                            client.query(q_upd_is_not_sending, [mail.id, parseInt(mail.attempts) + 1, is_sended], function (upd2_err) {
-                                if (upd2_err) return handleError(upd2_err);
+                            mail.data.subject = utils.replaceTags(mail.subject, mail.data);
+                            self.constructLetter(mail.type_code, mail.data);
+                            self.send('', mail.data.subject, function (err, res) {
+                                console.log(err, res);
+                                let is_sended = err == null;
+                                client.query(q_ins_email_sent_attempt, [mail.id, err == null ? null : JSON.stringify(err), JSON.stringify(res)], function (ins_err) {
+                                    if (ins_err) {
+                                        handleError(ins_err);
+                                    }
+                                    callback(null);
+                                });
+                                client.query(q_upd_is_not_sending, [mail.id, parseInt(mail.attempts) + 1, is_sended], function (upd2_err) {
+                                    if (upd2_err) return handleError(upd2_err);
+                                });
                             });
                         });
                     });
 
                 })(email);
             });
+
+            async.series(queue);
         });
     }
 }
