@@ -72,7 +72,7 @@ class Mailer {
 
                     email.data.subject = utils.replaceTags(email.subject, email.data);
                     _mailer.constructLetter(email.type_code, email.data);
-                    _mailer.send(email, email.data.subject, function (err, res) {
+                    _mailer.send(email.email, email.data.subject, function (err, res) {
 
                         let is_sended = err == null;
                         client.query(q_ins_email_sent_attempt, [email.id, err == null ? null : JSON.stringify(err), JSON.stringify(res)], function (ins_err) {
