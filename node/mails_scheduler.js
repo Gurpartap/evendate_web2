@@ -206,11 +206,11 @@ class MailScheduler {
             if (err) return handleError(err);
 
             res.rows.forEach(organization => {
-                ((organization) => {
+                ((org) => {
                     queue.push((callback) => {
                         let data_getters = {
                             graph_data: (callback) => {
-                                _client.query(q_get_weekly_events_view_count, [start, end, organization.id], function (graph_err, graph_result) {
+                                _client.query(q_get_weekly_events_view_count, [start, end, org.id], function (graph_err, graph_result) {
 
                                     if (graph_err) {
                                         handleError(graph_err);
@@ -232,7 +232,7 @@ class MailScheduler {
                                         if (res.data == undefined) return callback(null, null);
 
                                         let base64Data = res.data.replace(/^data:image\/png;base64,/, "");
-                                        let filename = "views-" + organization.id + "-week-" + Utils.makeId(7) + ".png";
+                                        let filename = "views-" + org.id + "-week-" + Utils.makeId(7) + ".png";
                                         exporter.killPool();
                                         fs.writeFile('..' + folder_path + filename, base64Data, 'base64', function (err) {
                                             if (err) {
@@ -248,13 +248,13 @@ class MailScheduler {
 
                             },
                             main_stats: (callback) => {
-                                let url = 'http://localhost/api/v1/statistics/organizations/' + organization.id +
+                                let url = 'http://localhost/api/v1/statistics/organizations/' + org.id +
                                     '?fields=view,fave&scale=week&since=' + start + ' 00:00:01&to=' + end + ' 23:59:59';
                                 restler
                                     .get(url,
                                         {
                                             headers: {
-                                                'Authorization': organization.admin_token
+                                                'Authorization': org.admin_token
                                             }
                                         })
                                     .on('complete', function (result) {
@@ -265,7 +265,7 @@ class MailScheduler {
                                     });
                             },
                             new_subscribers: (callback) => {
-                                _client.query(q_get_new_subscribers, [organization.id, start, end], function (subs_err, subs_result) {
+                                _client.query(q_get_new_subscribers, [org.id, start, end], function (subs_err, subs_result) {
                                     if (subs_err) {
                                         handleError(subs_err);
                                         callback(null, []);
@@ -274,7 +274,7 @@ class MailScheduler {
                                 });
                             },
                             events_added: (callback) => {
-                                _client.query(q_events_added, [organization.id, start, end], function (err, result) {
+                                _client.query(q_events_added, [org.id, start, end], function (err, result) {
                                     if (err) {
                                         handleError(err);
                                         callback(null, 0);
@@ -287,7 +287,7 @@ class MailScheduler {
                                 });
                             },
                             notifications_sent: (callback) => {
-                                _client.query(q_get_weekly_notifications_sent, [organization.id, start, end], function (err, result) {
+                                _client.query(q_get_weekly_notifications_sent, [org.id, start, end], function (err, result) {
                                     if (err) {
                                         handleError(err);
                                         callback(null, []);
@@ -299,7 +299,7 @@ class MailScheduler {
                                     }                                });
                             },
                             emails_to_send: (callback) => {
-                                _client.query(q_get_admins, [organization.id], function (err, result) {
+                                _client.query(q_get_admins, [org.id], function (err, result) {
                                     if (err) {
                                         handleError(err);
                                         callback(err, null);
@@ -317,15 +317,15 @@ class MailScheduler {
                         async.parallelLimit(data_getters, 3, function (err, results) {
 
                             if (results.emails_to_send != null && results.graph_data != null) {
-                                if (results.emails_to_send.indexOf(organization.email) == -1) {
-                                    results.emails_to_send.push(organization.email);
+                                if (results.emails_to_send.indexOf(org.email) == -1) {
+                                    results.emails_to_send.push(org.email);
                                 }
                                 results.emails_to_send.forEach(email => {
                                     if (MailScheduler.validateEmail(email) == false) return true;
                                     insert_data.push(inner_cb => {
                                         _client.query(q_ins_data, [email, JSON.stringify({
-                                            organization_id: organization.id,
-                                            organization_short_name: organization.organization_short_name,
+                                            organization_id: org.id,
+                                            organization_short_name: org.organization_short_name,
                                             new_subscribers_count: results.new_subscribers.length,
                                             subscribed: results.new_subscribers,
                                             events_added: results.events_added,
