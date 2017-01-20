@@ -31,6 +31,7 @@ class Mailer {
     }
 
     send(to, subject, callback) {
+        console.log('Sending', subject);
         this.transporter.sendMail({
             debug: true,
             connectionTimeout: 50000,
