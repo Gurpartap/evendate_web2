@@ -53,7 +53,7 @@ class Mailer {
                 ' WHERE is_sending = FALSE ' +
                 ' AND is_sended = FALSE' +
                 ' AND attempts < 5' +
-                ' ORDER BY created_at DESC' +
+                ' ORDER BY created_at' +
                 ' LIMIT 4',
             q_upd_is_sending = 'UPDATE emails SET is_sending = TRUE WHERE id = $1',
             q_ins_email_sent_attempt = 'INSERT INTO emails_sent(email_id, error, info) VALUES($1, $2, $3)',
@@ -65,12 +65,11 @@ class Mailer {
                 client.query(q_upd_is_sending, [email.id], function (upd_err) {
                     if (upd_err) return handleError(upd_err);
 
-                    let subject = utils.replaceTags(email.subject, email.data);
-                    email.data.subject = subject;
+                    email.data.subject = utils.replaceTags(email.subject, email.data);
                     self.constructLetter(email.type_code, email.data);
-                    self.send('', subject, function (err, res) {
+                    self.send('', email.data.subject, function (err, res) {
                         console.log(err, res);
-                        let is_sended = err != null;
+                        let is_sended = err == null;
                         client.query(q_ins_email_sent_attempt, [email.id, err == null ? null : JSON.stringify(err), JSON.stringify(res)], function (ins_err) {
                             if (ins_err) return handleError(ins_err);
                         });
