@@ -16,6 +16,7 @@ var
     smtpTransport = require('nodemailer-smtp-transport'),
     nodemailer = require('nodemailer'),
     Mailer = require('./mailer.js'),
+    MailScheduler = require('./mails_scheduler'),
     CronJob = require('cron').CronJob,
     ImagesResize = require('./image_resizer'),
     Notifications = require('./notifications'),
@@ -485,6 +486,53 @@ pg.connect(pg_conn_string, function (err, client, done) {
         }, null, true);
     } catch (ex) {
         logger.error(ex);
+    }
+
+
+    /* Emails */
+    try {
+        new CronJob('0 * * * *', function () {
+            let scheduler = new MailScheduler(client, handleError);
+            scheduler.scheduleOrganizationRegistrationFailed();
+        }, null, true);
+    } catch (ex) {
+        logger.error(ex);
+    }
+//every monday at 2:30 am
+    try {
+        new CronJob('30 2 * 1 *', function () {
+            let scheduler = new MailScheduler(client, handleError);
+            scheduler.scheduleWeeklyEmails();
+        }, null, true);
+    } catch (ex) {
+        logger.error(ex);
+    }
+
+    try {
+        new CronJob('*/1 * * * *', function () {
+            let mailer = new Mailer(transporter);
+            if (config_index == 'prod' || args.indexOf('--send-emails-force') !== -1) {
+                mailer.sendScheduled(client, handleError);
+            }
+        }, null, true);
+    } catch (ex) {
+        logger.error(ex);
+    }
+
+
+    if (args.indexOf('--schedule-emails-failed') !== -1) {
+        let scheduler = new MailScheduler(client, handleError);
+        scheduler.scheduleOrganizationRegistrationFailed();
+    }
+
+    if (args.indexOf('--schedule-emails-weekly') !== -1) {
+        let scheduler = new MailScheduler(client, handleError);
+        scheduler.scheduleWeeklyEmails();
+    }
+    if (args.indexOf('--send-emails-force') !== -1) {
+        let mailer = new Mailer(transporter);
+        mailer.sendScheduled(client, handleError);
+
     }
 
     var ioHandlers = function (socket) {
@@ -1232,7 +1280,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 name: data.name
             }).returning('uuid').toQuery();
 
-            client.query(q_ins_registration, function(err, res){
+            client.query(q_ins_registration, function (err, res) {
                 if (err) {
                     handleError('EMAIL SEND ERROR', err);
                 }
@@ -1451,16 +1499,33 @@ pg.connect(pg_conn_string, function (err, client, done) {
         if (config_index != 'prod') {
             console.log(req.params);
         }
-        updateEventsGeocodes(req.params.id);
-        insertRecommendationsAccordance({event_id: req.params.id}, function () {
-            updateRecommendations({event_id: req.params.id}, logger.info)
-        });
-        cropper.resizeNew({
-            images: real_config.images,
-            client: client
-        }, function () {
-            res.json({status: true});
-        });
+        try {
+            updateEventsGeocodes(req.params.id);
+        } catch (e) {
+        }
+
+        try {
+            insertRecommendationsAccordance({event_id: req.params.id}, function () {
+                updateRecommendations({event_id: req.params.id}, logger.info)
+            });
+        } catch (e) {
+        }
+
+        try {
+            cropper.resizeNew({
+                images: real_config.images,
+                client: client
+            }, function () {
+                res.json({status: true});
+            });
+        } catch (e) {
+        }
+
+        try {
+            let scheduler = new MailScheduler(client, handleError);
+            scheduler.scheduleIfFirstEvent(req.params.id);
+        } catch (e) {
+        }
     });
 
     app.get('/recommendations/events/:id', function (req, res) {
@@ -1562,16 +1627,3 @@ pg.connect(pg_conn_string, function (err, client, done) {
     });
 
 });
-
-if (args.indexOf('--send-email') !== -1){
-    new Mailer(transporter).constructLetter('organization_registered', {
-        title: 'Добро пожаловать в Evendate!',
-        first_name: 'Инал'
-    }).send('kardinal3094@gmail.com', 'Добро пожаловать в Evendate!', function (err, info) {
-        if (err) {
-            handleError('EMAIL SEND ERROR', err);
-            handleError(html);
-        }
-        logger.info('EMAIL_INFO', info);
-    });
-}

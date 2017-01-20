@@ -19,10 +19,6 @@ class OrganizationsStatistics extends AbstractAggregator
           AND stat_event_types.type_code = :type_code
           AND stat_organizations.organization_id = :organization_id
         INNER JOIN tokens ON stat_organizations.token_id = tokens.id
-          AND tokens.user_id NOT IN (SELECT user_id
-            FROM users_organizations
-            WHERE users_organizations.organization_id = :organization_id
-            AND users_organizations.status = TRUE)
         RIGHT OUTER JOIN (SELECT *
                     FROM generate_series(to_timestamp(:till), to_timestamp(:since), \'-1 {SCALE}\')) AS ts(time_value)
                     ON stat_organizations.created_at BETWEEN (ts.time_value - INTERVAL \'1 {SCALE}\') AND ts.time_value
