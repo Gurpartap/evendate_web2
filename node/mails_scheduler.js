@@ -248,7 +248,7 @@ class MailScheduler {
 
                             },
                             main_stats: (callback) => {
-                                let url = 'http://localhost/api/v1/statistics/organizations/' + org.id +
+                                let url = 'https://localhost/api/v1/statistics/organizations/' + org.id +
                                     '?fields=view,fave&scale=week&since=' + start + ' 00:00:01&to=' + end + ' 23:59:59';
                                 restler
                                     .get(url,
