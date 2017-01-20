@@ -59,26 +59,29 @@ class Mailer {
             q_upd_is_sending = 'UPDATE emails SET is_sending = TRUE WHERE id = $1',
             q_ins_email_sent_attempt = 'INSERT INTO emails_sent(email_id, error, info) VALUES($1, $2, $3)',
             q_upd_is_not_sending = 'UPDATE emails SET is_sending = FALSE, attempts = $2, is_sended = $3 WHERE id = $1';
-        client.query(q_get_emails, [], function (err, res) {
+        client.query(q_get_emails, [], function (err, res_emails) {
             if (err) return handleError(err);
 
-            res.rows.forEach(email => {
-                client.query(q_upd_is_sending, [email.id], function (upd_err) {
-                    if (upd_err) return handleError(upd_err);
+            res_emails.rows.forEach(email => {
+                (mail => {
+                    client.query(q_upd_is_sending, [mail.id], function (upd_err) {
+                        if (upd_err) return handleError(upd_err);
 
-                    email.data.subject = utils.replaceTags(email.subject, email.data);
-                    self.constructLetter(email.type_code, email.data);
-                    self.send('', email.data.subject, function (err, res) {
-                        console.log(err, res);
-                        let is_sended = err == null;
-                        client.query(q_ins_email_sent_attempt, [email.id, err == null ? null : JSON.stringify(err), JSON.stringify(res)], function (ins_err) {
-                            if (ins_err) return handleError(ins_err);
-                        });
-                        client.query(q_upd_is_not_sending, [email.id, parseInt(email.attempts) + 1, is_sended], function (upd2_err) {
-                            if (upd2_err) return handleError(upd2_err);
+                        mail.data.subject = utils.replaceTags(mail.subject, mail.data);
+                        self.constructLetter(mail.type_code, mail.data);
+                        self.send('', mail.data.subject, function (err, res) {
+                            console.log(err, res);
+                            let is_sended = err == null;
+                            client.query(q_ins_email_sent_attempt, [mail.id, err == null ? null : JSON.stringify(err), JSON.stringify(res)], function (ins_err) {
+                                if (ins_err) return handleError(ins_err);
+                            });
+                            client.query(q_upd_is_not_sending, [mail.id, parseInt(mail.attempts) + 1, is_sended], function (upd2_err) {
+                                if (upd2_err) return handleError(upd2_err);
+                            });
                         });
                     });
-                });
+
+                })(email);
             });
         });
     }
