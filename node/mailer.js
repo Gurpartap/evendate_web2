@@ -32,6 +32,7 @@ class Mailer {
     }
 
     send(to, subject, callback) {
+        console.log(to);
         console.log('Sending', subject);
         this.transporter.sendMail({
             debug: true,
@@ -75,7 +76,7 @@ class Mailer {
 
                             mail.data.subject = utils.replaceTags(mail.subject, mail.data);
                             self.constructLetter(mail.type_code, mail.data);
-                            self.send('', utils.replaceTags(mail.subject, mail.data), function (err, res) {
+                            self.send(mail, utils.replaceTags(mail.subject, mail.data), function (err, res) {
 
                                 let is_sended = err == null;
                                 client.query(q_ins_email_sent_attempt, [mail.id, err == null ? null : JSON.stringify(err), JSON.stringify(res)], function (ins_err) {
