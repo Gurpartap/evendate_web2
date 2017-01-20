@@ -510,7 +510,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
     try {
         new CronJob('*/1 * * * *', function () {
-            let mailer = new Mailer(transporter);
+            let mailer = new Mailer(transporter, logger);
             if (config_index == 'prod' || args.indexOf('--send-emails-force') !== -1) {
                 mailer.sendScheduled(client, handleError);
             }

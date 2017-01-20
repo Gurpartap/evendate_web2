@@ -7,8 +7,9 @@ const EMAILS_PATH = '../emails/';
 class Mailer {
 
 
-    constructor(transporter) {
+    constructor(transporter, logger) {
         this.transporter = transporter;
+        this.logger = logger;
         this.html = fs.readFileSync(EMAILS_PATH + 'main_part.html', {encoding: 'utf8'});
     }
 
@@ -32,14 +33,13 @@ class Mailer {
     }
 
     send(to, subject, callback) {
-        console.log('Sending', subject);
         this.transporter.sendMail({
             debug: true,
             connectionTimeout: 50000,
             greetingTimeout: 50000,
             socketTimeout: 50000,
             from: '"Evendate" <feedback@evendate.ru>',
-            to: 'kardinal3094@gmail.com',
+            to: to,
             subject: subject,
             html: this.html
         }, callback);
@@ -47,7 +47,6 @@ class Mailer {
 
     sendScheduled(client, handleError) {
         let self = this,
-            queue = [],
             q_get_emails = 'SELECT emails.*, ' +
                 'email_types.type_code, ' +
                 'email_types.name as subject ' +
@@ -65,37 +64,29 @@ class Mailer {
             if (err) return handleError(err);
 
             res_emails.rows.forEach(email => {
-                (mail => {
-                    queue.push(function (callback) {
-                        client.query(q_upd_is_sending, [mail.id], function (upd_err) {
-                            if (upd_err) {
-                                handleError(upd_err);
-                                callback(null);
+                let _mailer = new Mailer(self.transporter, self.logger);
+                    client.query(q_upd_is_sending, [email.id], function (upd_err) {
+                    if (upd_err) {
+                        handleError(upd_err);
+                    }
+
+                    email.data.subject = utils.replaceTags(email.subject, email.data);
+                    _mailer.constructLetter(email.type_code, email.data);
+                    _mailer.send(email.email, email.data.subject, function (err, res) {
+
+                        let is_sended = err == null;
+                        client.query(q_ins_email_sent_attempt, [email.id, err == null ? null : JSON.stringify(err), JSON.stringify(res)], function (ins_err) {
+                            if (ins_err) {
+                                handleError(ins_err);
                             }
+                        });
 
-                            mail.data.subject = utils.replaceTags(mail.subject, mail.data);
-                            self.constructLetter(mail.type_code, mail.data);
-                            self.send('', utils.replaceTags(mail.subject, mail.data), function (err, res) {
-
-                                let is_sended = err == null;
-                                client.query(q_ins_email_sent_attempt, [mail.id, err == null ? null : JSON.stringify(err), JSON.stringify(res)], function (ins_err) {
-                                    if (ins_err) {
-                                        handleError(ins_err);
-                                    }
-                                    callback(null);
-                                });
-
-                                client.query(q_upd_is_not_sending, [mail.id, parseInt(mail.attempts) + 1, is_sended], function (upd2_err) {
-                                    if (upd2_err) return handleError(upd2_err);
-                                });
-                            });
+                        client.query(q_upd_is_not_sending, [email.id, parseInt(email.attempts) + 1, is_sended], function (upd2_err) {
+                            if (upd2_err) return handleError(upd2_err);
                         });
                     });
-
-                })(email);
+                });
             });
-
-            async.series(queue);
         });
     }
 }
