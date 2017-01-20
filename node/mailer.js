@@ -75,8 +75,8 @@ class Mailer {
 
                             mail.data.subject = utils.replaceTags(mail.subject, mail.data);
                             self.constructLetter(mail.type_code, mail.data);
-                            self.send('', mail.data.subject, function (err, res) {
-                                console.log(err, res);
+                            self.send('', utils.replaceTags(mail.subject, mail.data), function (err, res) {
+
                                 let is_sended = err == null;
                                 client.query(q_ins_email_sent_attempt, [mail.id, err == null ? null : JSON.stringify(err), JSON.stringify(res)], function (ins_err) {
                                     if (ins_err) {
@@ -84,6 +84,7 @@ class Mailer {
                                     }
                                     callback(null);
                                 });
+
                                 client.query(q_upd_is_not_sending, [mail.id, parseInt(mail.attempts) + 1, is_sended], function (upd2_err) {
                                     if (upd2_err) return handleError(upd2_err);
                                 });
