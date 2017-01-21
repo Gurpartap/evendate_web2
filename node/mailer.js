@@ -23,10 +23,13 @@ class Mailer {
         let header = fs.readFileSync(EMAILS_PATH + name + '/header.html', {encoding: 'utf8'});
         let body = fs.readFileSync(EMAILS_PATH + name + '/body.html', {encoding: 'utf8'});
 
-        this.html = utils.replaceTags(this.html, {
+
+        const _data = Object.assign({}, data, {
             header_part: utils.replaceTags(header, data),
             body_part: utils.replaceTags(body, data)
         });
+
+        this.html = utils.replaceTags(this.html, _data);
 
         this.html = utils.replaceTags(this.html, data);
         return this;
@@ -65,14 +68,17 @@ class Mailer {
 
             res_emails.rows.forEach(email => {
                 let _mailer = new Mailer(self.transporter, self.logger);
-                    client.query(q_upd_is_sending, [email.id], function (upd_err) {
+                client.query(q_upd_is_sending, [email.id], function (upd_err) {
                     if (upd_err) {
                         handleError(upd_err);
                     }
 
+                    email.data.email = email.recipient;
+                    email.data.email_id = email.id;
+                    email.data.email_type_code = email.type_code;
                     email.data.subject = utils.replaceTags(email.subject, email.data);
                     _mailer.constructLetter(email.type_code, email.data);
-                    _mailer.send(email.email, email.data.subject, function (err, res) {
+                    _mailer.send(email.recipient, email.data.subject, function (err, res) {
 
                         let is_sended = err == null;
                         client.query(q_ins_email_sent_attempt, [email.id, err == null ? null : JSON.stringify(err), JSON.stringify(res)], function (ins_err) {
