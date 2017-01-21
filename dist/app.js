@@ -3176,112 +3176,6 @@ TimelineEventsCollection.fetchEvents = function(data, success) {
  * @requires ../Class.OneEntity.js
  */
 /**
- * @typedef {function({
- *   [events]: Array<OneEvent>,
- *   [organizations]: Array<OneOrganization>
- * })} SearchResultsAJAXCallback
- */
-/**
- *
- * @constructor
- * @augments OneEntity
- * @param {string} query_string
- */
-function SearchResults(query_string) {
-	this.query_string = query_string;
-	this.events = new EventsCollection();
-	this.organizations = new OrganizationsCollection();
-}
-SearchResults.extend(OneEntity);
-/**
- *
- * @param {string} query_string
- * @returns {{ [q]: {string}, [tags]: {string} }}
- */
-SearchResults.sanitizeQueryVar = function(query_string) {
-	var data = {};
-	if (query_string.indexOf('#') === 0) {
-		data.tags = query_string.replace('#', '');
-	} else {
-		data.q = query_string;
-	}
-	return data;
-};
-/**
- *
- * @param {string} query_string
- * @param {AJAXData} [ajax_data]
- * @param {SearchResultsAJAXCallback} [success]
- * @returns {jqPromise}
- */
-SearchResults.fetchEventsAndOrganizations = function(query_string, ajax_data, success) {
-	return __APP.SERVER.getData('/api/v1/search/', $.extend({}, SearchResults.sanitizeQueryVar(query_string), ajax_data), success);
-};
-/**
- *
- * @param {AJAXData} [events_ajax_data]
- * @param {function(organizations: Array<OneEvent>)} [success]
- * @returns {jqPromise}
- */
-SearchResults.prototype.fetchEvents = function(events_ajax_data, success) {
-	var self = this,
-		ajax_data = {
-			fields: 'events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length}))
-		};
-	
-	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data.events);
-		}
-	});
-};
-/**
- *
- * @param {AJAXData} [organizations_ajax_data]
- * @param {function(organizations: Array<OneOrganization>)} [success]
- * @returns {jqPromise}
- */
-SearchResults.prototype.fetchOrganizations = function(organizations_ajax_data, success) {
-	var self = this,
-		ajax_data = {
-			fields: 'organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length}))
-		};
-	
-	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data.organizations);
-		}
-	});
-};
-/**
- *
- * @param {AJAXData} [events_ajax_data]
- * @param {AJAXData} [organizations_ajax_data]
- * @param {SearchResultsAJAXCallback} [success]
- * @returns {jqPromise}
- */
-SearchResults.prototype.fetchEventsAndOrganizations = function(events_ajax_data, organizations_ajax_data, success) {
-	var self = this,
-		ajax_data = {fields: []};
-	if (events_ajax_data) {
-		ajax_data.fields.push('events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length})));
-	}
-	if (organizations_ajax_data && !SearchResults.sanitizeQueryVar(self.query_string).tags) {
-		ajax_data.fields.push('organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length})));
-	}
-	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
-/**
- * @requires ../Class.OneEntity.js
- */
-/**
  * @typedef {object} Privilege
  * @property {number} role_id
  * @property {OneUser.ROLE} name
@@ -3571,6 +3465,112 @@ OrganizationsCollection.prototype.fetchMyOrganizations = function(roles, fields,
 			order_by: order_by || undefined
 		};
 	return OrganizationsCollection.fetchMyOrganizations(roles, ajax_data, function(data) {
+		self.setData(data);
+		if (success && typeof success == 'function') {
+			success.call(self, data);
+		}
+	});
+};
+/**
+ * @requires ../Class.OneEntity.js
+ */
+/**
+ * @typedef {function({
+ *   [events]: Array<OneEvent>,
+ *   [organizations]: Array<OneOrganization>
+ * })} SearchResultsAJAXCallback
+ */
+/**
+ *
+ * @constructor
+ * @augments OneEntity
+ * @param {string} query_string
+ */
+function SearchResults(query_string) {
+	this.query_string = query_string;
+	this.events = new EventsCollection();
+	this.organizations = new OrganizationsCollection();
+}
+SearchResults.extend(OneEntity);
+/**
+ *
+ * @param {string} query_string
+ * @returns {{ [q]: {string}, [tags]: {string} }}
+ */
+SearchResults.sanitizeQueryVar = function(query_string) {
+	var data = {};
+	if (query_string.indexOf('#') === 0) {
+		data.tags = query_string.replace('#', '');
+	} else {
+		data.q = query_string;
+	}
+	return data;
+};
+/**
+ *
+ * @param {string} query_string
+ * @param {AJAXData} [ajax_data]
+ * @param {SearchResultsAJAXCallback} [success]
+ * @returns {jqPromise}
+ */
+SearchResults.fetchEventsAndOrganizations = function(query_string, ajax_data, success) {
+	return __APP.SERVER.getData('/api/v1/search/', $.extend({}, SearchResults.sanitizeQueryVar(query_string), ajax_data), success);
+};
+/**
+ *
+ * @param {AJAXData} [events_ajax_data]
+ * @param {function(organizations: Array<OneEvent>)} [success]
+ * @returns {jqPromise}
+ */
+SearchResults.prototype.fetchEvents = function(events_ajax_data, success) {
+	var self = this,
+		ajax_data = {
+			fields: 'events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length}))
+		};
+	
+	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
+		self.setData(data);
+		if (success && typeof success == 'function') {
+			success.call(self, data.events);
+		}
+	});
+};
+/**
+ *
+ * @param {AJAXData} [organizations_ajax_data]
+ * @param {function(organizations: Array<OneOrganization>)} [success]
+ * @returns {jqPromise}
+ */
+SearchResults.prototype.fetchOrganizations = function(organizations_ajax_data, success) {
+	var self = this,
+		ajax_data = {
+			fields: 'organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length}))
+		};
+	
+	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
+		self.setData(data);
+		if (success && typeof success == 'function') {
+			success.call(self, data.organizations);
+		}
+	});
+};
+/**
+ *
+ * @param {AJAXData} [events_ajax_data]
+ * @param {AJAXData} [organizations_ajax_data]
+ * @param {SearchResultsAJAXCallback} [success]
+ * @returns {jqPromise}
+ */
+SearchResults.prototype.fetchEventsAndOrganizations = function(events_ajax_data, organizations_ajax_data, success) {
+	var self = this,
+		ajax_data = {fields: []};
+	if (events_ajax_data) {
+		ajax_data.fields.push('events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length})));
+	}
+	if (organizations_ajax_data && !SearchResults.sanitizeQueryVar(self.query_string).tags) {
+		ajax_data.fields.push('organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length})));
+	}
+	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
 		self.setData(data);
 		if (success && typeof success == 'function') {
 			success.call(self, data);
@@ -6202,73 +6202,6 @@ SubscribersModal = extending(AbstractUsersModal, (function() {
 /**
  * @class
  */
-AbstractTopBar = (function () {
-	function AbstractTopBar() {
-		this.$main_header = $('#main_header');
-	}
-	AbstractTopBar.prototype.init = function () {
-		this.$main_header.find('#search_bar_input').on('keypress', function(e) {
-			if (e.which == 13) {
-				__APP.changeState('/search/' + encodeURIComponent(this.value));
-			}
-		});
-		
-		bindRippleEffect(this.$main_header);
-		bindPageLinks(this.$main_header);
-	};
-	return AbstractTopBar;
-}());
-/**
- * @requires Class.AbstractTopBar.js
- */
-/**
- * @class
- * @extends AbstractTopBar
- */
-TopBar = extending(AbstractTopBar, (function () {
-	function TopBar() {
-		AbstractTopBar.call(this);
-	}
-	TopBar.prototype.init = function () {
-		this.$main_header.find('#user_bar').on('click.openUserBar', function() {
-			var $this = $(this),
-				$document = $(document);
-			$this.addClass('-open');
-			$document.on('click.closeUserBar', function(e) {
-				if (!$(e.target).parents('#user_bar').length) {
-					$document.off('click.closeUserBar');
-					$this.removeClass('-open');
-				}
-			})
-		});
-		this.$main_header.find('.LogoutButton').on('click', __APP.USER.logout);
-		this.$main_header.find('.OpenSettingsButton').on('click', showSettingsModal);
-		AbstractTopBar.prototype.init.call(this);
-	};
-	return TopBar;
-}()));
-/**
- * @requires Class.AbstractTopBar.js
- */
-/**
- * @class
- * @extends AbstractTopBar
- */
-TopBarNoAuth = extending(AbstractTopBar, (function () {
-	function TopBarNoAuth() {
-		AbstractTopBar.call(this);
-	}
-	TopBarNoAuth.prototype.init = function () {
-		this.$main_header.find('.LoginButton').on('click', function() {
-			(new AuthModal()).show();
-		});
-		AbstractTopBar.prototype.init.call(this);
-	};
-	return TopBarNoAuth;
-}()));
-/**
- * @class
- */
 AbstractSidebar = (function () {
 	function AbstractSidebar() {
 		this.$sidebar = $('#main_sidebar');
@@ -6359,6 +6292,73 @@ SidebarNoAuth = extending(AbstractSidebar, (function () {
 		AbstractSidebar.prototype.init.call(this);
 	};
 	return SidebarNoAuth;
+}()));
+/**
+ * @class
+ */
+AbstractTopBar = (function () {
+	function AbstractTopBar() {
+		this.$main_header = $('#main_header');
+	}
+	AbstractTopBar.prototype.init = function () {
+		this.$main_header.find('#search_bar_input').on('keypress', function(e) {
+			if (e.which == 13) {
+				__APP.changeState('/search/' + encodeURIComponent(this.value));
+			}
+		});
+		
+		bindRippleEffect(this.$main_header);
+		bindPageLinks(this.$main_header);
+	};
+	return AbstractTopBar;
+}());
+/**
+ * @requires Class.AbstractTopBar.js
+ */
+/**
+ * @class
+ * @extends AbstractTopBar
+ */
+TopBar = extending(AbstractTopBar, (function () {
+	function TopBar() {
+		AbstractTopBar.call(this);
+	}
+	TopBar.prototype.init = function () {
+		this.$main_header.find('#user_bar').on('click.openUserBar', function() {
+			var $this = $(this),
+				$document = $(document);
+			$this.addClass('-open');
+			$document.on('click.closeUserBar', function(e) {
+				if (!$(e.target).parents('#user_bar').length) {
+					$document.off('click.closeUserBar');
+					$this.removeClass('-open');
+				}
+			})
+		});
+		this.$main_header.find('.LogoutButton').on('click', __APP.USER.logout);
+		this.$main_header.find('.OpenSettingsButton').on('click', showSettingsModal);
+		AbstractTopBar.prototype.init.call(this);
+	};
+	return TopBar;
+}()));
+/**
+ * @requires Class.AbstractTopBar.js
+ */
+/**
+ * @class
+ * @extends AbstractTopBar
+ */
+TopBarNoAuth = extending(AbstractTopBar, (function () {
+	function TopBarNoAuth() {
+		AbstractTopBar.call(this);
+	}
+	TopBarNoAuth.prototype.init = function () {
+		this.$main_header.find('.LoginButton').on('click', function() {
+			(new AuthModal()).show();
+		});
+		AbstractTopBar.prototype.init.call(this);
+	};
+	return TopBarNoAuth;
 }()));
 /**
  *
@@ -7382,6 +7382,14 @@ function StatisticsOrganizationEventsPage(org_id) {
 	StatisticsOrganizationPage.apply(this, arguments);
 	
 	this.block_scroll = false;
+	this.future_events_data = {
+		future: true,
+		canceled_shown: true
+	};
+	this.past_events_data = {
+		canceled_shown: true,
+		order_by: '-first_event_date'
+	};
 	this.future_events = new EventsWithStatisticsCollection();
 	this.past_events = new EventsWithStatisticsCollection();
 }
@@ -7423,10 +7431,7 @@ StatisticsOrganizationEventsPage.prototype.render = function() {
 	
 	this.$wrapper.html(tmpl('orgstat-events-page'));
 	
-	this.future_events.fetchOrganizationsEvents(this.organization.id, {
-		future: true,
-		canceled_shown: true
-	}, 0, function() {
+	this.future_events.fetchOrganizationsEvents(this.organization.id, this.future_events_data, 0, function() {
 		if(this.length){
 			this_page.$wrapper.find('.OrgStatFutureEventsWrapper').html(tmpl('orgstat-events-wrapper', {
 				title: 'Предстоящие события',
@@ -7435,10 +7440,7 @@ StatisticsOrganizationEventsPage.prototype.render = function() {
 		}
 	});
 	
-	this.past_events.fetchOrganizationsEvents(this.organization.id, {
-		canceled_shown: true,
-		order_by: '-first_event_date'
-	}, 30, function() {
+	this.past_events.fetchOrganizationsEvents(this.organization.id, this.past_events_data, 30, function() {
 		if(this.length){
 			$past_events_wrapper = this_page.$wrapper.find('.OrgStatPastEventsWrapper');
 			$past_events_wrapper.html(tmpl('orgstat-events-wrapper', {
@@ -7451,7 +7453,7 @@ StatisticsOrganizationEventsPage.prototype.render = function() {
 				if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !this_page.block_scroll) {
 					this_page.block_scroll = true;
 					
-					this_page.past_events.fetchOrganizationsEvents(this_page.organization.id, {canceled_shown: true}, 30, function(events) {
+					this_page.past_events.fetchOrganizationsEvents(this_page.organization.id, this_page.past_events_data, 30, function(events) {
 						this_page.block_scroll = false;
 						if (events.length) {
 							$past_events_wrapper.find('tbody').append(StatisticsOrganizationEventsPage.buildEventRows(events, 'first_event_date'));
