@@ -19,6 +19,7 @@ require_once "{$BACKEND_FULL_PATH}/users/Class.User.php";
 if (App::$ENV == 'prod' || App::$ENV == 'test') {
 	$DEBUG_MODE = false;
 }else{
+	$DEBUG_MODE = true;
 	ini_set("display_errors", 1);
 	error_reporting(E_ALL);
 }
