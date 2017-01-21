@@ -22,7 +22,7 @@ UserPage = extending(Page, (function() {
 			activities: false
 		};
 		this.favored_fetch_data = {
-			fields: ['image_horizontal_medium_url', 'favored', 'dates'],
+			fields: ['image_horizontal_medium_url', 'favored', 'is_favorite', 'dates'],
 			order_by: 'nearest_event_date,-first_event_date',
 			length: 10
 		};
