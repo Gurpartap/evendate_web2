@@ -3009,6 +3009,23 @@ body.-open_modal > .modal_wrapper {
 .stamp.-color_marginal_accent {background-color: #e0e0e0}
 
 /* /Stamp */
+/* Cap */
+
+.cap {
+	display: flex;
+	height: 5em;
+	justify-content: center;
+	align-items: center;
+}
+
+.cap_message {
+	font-weight: 500;
+	font-size: .875em;
+	color: #9fa6b3;
+	color: var(--color_primary_50);
+}
+
+/* /Cap */
 /* Page */
 
 .page_wrapper {

@@ -609,6 +609,19 @@ __APP = {
 		},
 		/**
 		 *
+		 * @param {string|Element|jQuery} message
+		 * @param {buildProps} [props]
+		 * @return {jQuery}
+		 */
+		cap: function buildTags(message, props) {
+			if(!props)
+				props = {};
+			props = __APP.BUILD.normalizeBuildProps(props);
+			
+			return tmpl('cap', $.extend({message: message}, props));
+		},
+		/**
+		 *
 		 * @param {(OneTag|Array<OneTag>|TagsCollection)} tags
 		 * @param {buildProps} [props]
 		 * @returns {jQuery}

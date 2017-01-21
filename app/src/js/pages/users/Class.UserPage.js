@@ -86,6 +86,8 @@ UserPage = extending(Page, (function() {
 			
 			type_data.fetch_method.apply(type_data.fetch_context, type_data.fetch_arguments).done(function(entities) {
 				var $entities;
+				self.block_scroll = false;
+				$loader.remove();
 				if(entities.length){
 					if(type_data.extra_function && typeof type_data.extra_function === 'function'){
 						type_data.extra_function(entities);
@@ -94,10 +96,11 @@ UserPage = extending(Page, (function() {
 					$wrapper.append($entities);
 					UserPage.bindEvents($entities);
 				} else {
+					if(!$wrapper.children().length){
+						$wrapper.append(__APP.BUILD.cap('Активности нет'));
+					}
 					self.disable_uploads[type] = true;
 				}
-				self.block_scroll = false;
-				$loader.remove();
 			});
 		}
 	};
@@ -141,7 +144,9 @@ UserPage = extending(Page, (function() {
 	};
 	
 	UserPage.prototype.render = function() {
-		var self = this;
+		var self = this,
+			$subscribed_orgs,
+			$favored_events;
 		
 		if(this.user_id == __APP.USER.id){
 			__APP.changeState('/my/profile', true, true);
@@ -153,24 +158,36 @@ UserPage = extending(Page, (function() {
 			action.user = self.user;
 		});
 		
-		this.$wrapper.append(tmpl('user-page', {
-			tombstone: __APP.BUILD.userTombstones(this.user, {avatar_classes: ['-bordered', '-shadowed']}),
-			links: __APP.BUILD.socialLinks(this.user.accounts_links),
-			subscribed_orgs: __APP.BUILD.avatarBlocks(this.user.subscriptions.slice(0,4), {
+		if(this.user.subscriptions.length) {
+			$subscribed_orgs = __APP.BUILD.avatarBlocks(this.user.subscriptions.slice(0,4), {
 				avatar_classes: ['-size_30x30'],
 				entity: 'organization',
 				is_link: true
-			}),
-			show_all_subscribed_orgs_button: __APP.BUILD.button({
+			});
+		} else {
+			$subscribed_orgs = __APP.BUILD.cap('Нет подписок');
+		}
+		
+		if(this.user.favored.length) {
+			$favored_events = __APP.BUILD.eventBlocks(this.user.favored, this.events_metadata);
+		} else {
+			$favored_events = __APP.BUILD.cap('Событий нет');
+		}
+		
+		this.$wrapper.append(tmpl('user-page', {
+			tombstone: __APP.BUILD.userTombstones(this.user, {avatar_classes: ['-bordered', '-shadowed']}),
+			links: __APP.BUILD.socialLinks(this.user.accounts_links),
+			subscribed_orgs: $subscribed_orgs,
+			show_all_subscribed_orgs_button: this.user.subscriptions.length ? __APP.BUILD.button({
 				classes: ['-color_neutral_accent','CallModal','RippleEffect'],
 				dataset: {
 					modal_type: 'subscribers_list',
 					modal_entity: this.user
 				},
 				title: 'Показать все'
-			}),
+			}) : '',
 			friends_hidden: __C.CLASSES.NEW_HIDDEN,
-			favored_event_blocks: __APP.BUILD.eventBlocks(this.user.favored, this.events_metadata)
+			favored_event_blocks: $favored_events
 		}));
 		this.uploadEntities('activities');
 		this.init();
