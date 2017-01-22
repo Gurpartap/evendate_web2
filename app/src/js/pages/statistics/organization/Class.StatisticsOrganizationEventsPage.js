@@ -30,7 +30,7 @@ StatisticsOrganizationEventsPage.buildEventRows = function(events, date_field) {
 		return $.extend({}, event, {
 			date: moment.unix(event[date_field]).format(__LOCALES.ru_RU.DATE.DATE_FORMAT),
 			timestamp: event[date_field],
-			conversion: Math.round(event.view ? event.view_detail * 100 / event.view : 0) + '%'
+			conversion: Math.round(event.view == 0 ? (event.view_detail * 100 / event).view : 0) + '%'
 		});
 	}));
 	bindPageLinks($events);
