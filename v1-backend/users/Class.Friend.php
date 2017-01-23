@@ -3,7 +3,7 @@
 require_once $BACKEND_FULL_PATH .'/organizations/Class.OrganizationsCollection.php';
 require_once $BACKEND_FULL_PATH .'/organizations/Class.Organization.php';
 
-class Friend extends AbstractEntity{
+class Friend extends AbstractEntity implements UserInterface {
 
 	const RANDOM_FIELD_NAME = 'random';
 	const LINK_FIELD_NAME = 'link';
@@ -124,7 +124,7 @@ class Friend extends AbstractEntity{
 		}
 
 		if (isset($fields[self::ACTIONS_FIELD_NAME])){
-			$result_data[self::ACTIONS_FIELD_NAME] = OrganizationsCollection::filter(
+			$result_data[self::ACTIONS_FIELD_NAME] = ActionsCollection::filter(
 				App::DB(),
 				App::getCurrentUser(),
 				array(

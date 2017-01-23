@@ -18,6 +18,14 @@ frisby
     .create('Create event for update')
     .post(env.api_url + 'events', create_event, {json: true})
     .expectStatus(200)
+    .after(function (err, res, body) {
+        if (res.statusCode != 200){
+            console.log(body);
+        }
+        if (err){
+            env.logger.error(err);
+        }
+    })
     .expectJSONTypes({
         request_id: String,
         data: {
@@ -27,12 +35,19 @@ frisby
         text: String
     })
     .afterJSON(function (json) {
-        console.log('Added', json);
         var event_id = json.data.event_id;
         frisby
             .create('Update event')
             .put(env.api_url + 'events/' + event_id, update_event, {json: true})
             .expectStatus(200)
+            .after(function (err, res, body) {
+                if (res.statusCode != 200){
+                    console.log(body);
+                }
+                if (err){
+                    env.logger.error(err);
+                }
+            })
             .expectJSONTypes({
                 request_id: String,
                 data: {
@@ -40,9 +55,6 @@ frisby
                 },
                 status: Boolean,
                 text: String
-            })
-            .afterJSON(function (json) {
-                console.log('Updated', json);
             })
             .toss();
     })

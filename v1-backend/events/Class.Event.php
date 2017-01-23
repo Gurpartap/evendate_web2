@@ -143,10 +143,6 @@ class Event extends AbstractEntity
 			AND users_registrations.event_id = view_events.id) IS NOT NULL AS ' . self::REGISTERED_FIELD_NAME,
 
 
-
-
-
-
 		self::REGISTRATION_APPROVED_FIELD_NAME => '(SELECT COALESCE(organization_approved, FALSE)
 			FROM users_registrations
 			WHERE users_registrations.status = TRUE
@@ -168,7 +164,6 @@ class Event extends AbstractEntity
 		self::RANDOM_FIELD_NAME => '(SELECT created_at / (random() * 9 + 1)
 			FROM view_events AS ve
 			WHERE ve.id = view_events.id) AS ' . self::RANDOM_FIELD_NAME,
-
 
 
 		self::CAN_EDIT_FIELD_NAME => '(SELECT id IS NOT NULL
@@ -293,6 +288,31 @@ class Event extends AbstractEntity
 
 		usort($dates, "sortFunc");
 		return $dates;
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getOrganizationId()
+	{
+		return $this->organization_id;
+	}
+
+	private static function updateExtremumDates($event_id, PDO $db)
+	{
+		$q_upd_first = 'UPDATE events SET first_event_date = (SELECT MIN((events_dates.event_date :: DATE || \' \' || events_dates.start_time) :: TIMESTAMPTZ)
+     FROM events_dates
+     WHERE event_id = :event_id AND events_dates.status = TRUE) WHERE id = :event_id';
+
+		$q_upd_last = 'UPDATE events SET last_event_date = (SELECT MAX((events_dates.event_date :: DATE || \' \' || events_dates.start_time) :: TIMESTAMPTZ)
+     FROM events_dates
+     WHERE event_id = :event_id AND events_dates.status = TRUE) WHERE id = :event_id';
+
+		$result = $db->prepare($q_upd_first)->execute(array(':event_id' => $event_id));
+		if ($result === FALSE) throw new DBQueryException('CANT_UPDATE_DATES', $db);
+
+		$result = $db->prepare($q_upd_last)->execute(array(':event_id' => $event_id));
+		if ($result === FALSE) throw new DBQueryException('CANT_UPDATE_DATES', $db);
 	}
 
 	private static function saveRegistrationInfo(PDO $db, $event_id, array $data)
@@ -511,7 +531,7 @@ class Event extends AbstractEntity
 					'organization_id' => $organization->getId(),
 					'latitude' => $data['latitude'],
 					'longitude' => $data['longitude'],
-					'images_domain' => 'http://dn' . rand(1, 4) . '.evendate.ru/',
+					'images_domain' => 'https://dn' . rand(1, 4) . '.evendate.ru/',
 					'image_vertical' => $img_vertical_filename,
 					'image_horizontal' => $img_horizontal_filename,
 					'detail_info_url' => $data['detail_info_url'],
@@ -656,6 +676,8 @@ class Event extends AbstractEntity
 
 			$p_ins_dates->fetch(PDO::FETCH_ASSOC);
 		}
+
+		self::updateExtremumDates($event_id, $db);
 	}
 
 	private static function getNotificationTypeId($name, PDO $db): int
@@ -1170,9 +1192,11 @@ class Event extends AbstractEntity
 		return new Result(true, 'Событие успешно сохранено!', array('event_id' => $this->getId()));
 	}
 
-	public function addNotification(User $user, array $notification)
+	public function addNotification(UserInterface $user, array $notification)
 	{
+		$q_ins_notification = App::queryFactory()->newInsert();
 		if (isset($notification['notification_type']) && $notification['notification_type'] != null) {
+			//custom predefined notifications
 			if (in_array($notification['notification_type'], Notification::NOTIFICATION_PREDEFINED_CUSTOM)) {
 				$first_event_date = EventsDatesCollection::filter($this->db,
 					$user,
@@ -1186,14 +1210,31 @@ class Event extends AbstractEntity
 				$first_event_date = DateTime::createFromFormat('Y-m-d H:i:s', $event_date->format('Y-m-d') . ' ' . $first_event_date['start_time']);
 				$time = DateTime::createFromFormat('U', $first_event_date->getTimestamp() - $this->getNotificationTypeOffset($notification['notification_type']));
 				$notification_type_id = $this->getNotificationTypeId($notification['notification_type'], $this->db);
+			} // notifications for registration events
+			elseif (in_array($notification['notification_type'], Notification::NOTIFICATION_REGISTRATION_TYPES)) {
+				$time = new DateTime($notification['notification_time']);
+				$notification_type_id = $this->getNotificationTypeId($notification['notification_type'], $this->db);
+				$q_upd_notifications = App::queryFactory()
+					->newUpdate()
+					->table('users_notifications')
+					->cols(array('status' => 'false'))
+					->where('user_id = ? ', $user->getId())
+					->where('event_id = ? ', $this->getId())
+					->where('notification_type_id = ? ', $notification_type_id)
+					->where('status = true')
+					->where('done = false');
+				$p_upd_notifications = $this->db->prepare($q_upd_notifications->getStatement());
+				$r = $p_upd_notifications->execute($q_upd_notifications->getBindValues());
+				if ($r === FALSE) throw new DBQueryException('CANT_UPDATE_NOTIFICATIONS', $this->db);
 			} else throw new InvalidArgumentException('CANT_FIND_NOTIFICATION_TYPE');
-		} elseif (isset($notification['notification_time'])) {
+		} // notifications by exact time
+		elseif (isset($notification['notification_time'])) {
 			$time = new DateTime($notification['notification_time']);
 			$notification_type_id = $this->getNotificationTypeId(Notification::NOTIFICATION_TYPE_CUSTOM, $this->db);
 		} else throw new InvalidArgumentException('BAD_NOTIFICATION_TIME');
 
 		if ($time <= new DateTime()) throw new InvalidArgumentException('BAD_NOTIFICATION_TIME');
-		$q_ins_notification = App::queryFactory()->newInsert();
+
 		$q_ins_notification
 			->into('users_notifications')
 			->cols(array(
@@ -1251,7 +1292,8 @@ class Event extends AbstractEntity
 	}
 
 
-	private function updateRegisteredCount(){
+	private function updateRegisteredCount()
+	{
 		$q_upd_event = 'UPDATE events SET registered_count = (SELECT COUNT(id) FROM users_registrations
      WHERE users_registrations.status = TRUE
            AND users_registrations.organization_approved = TRUE
@@ -1267,7 +1309,8 @@ class Event extends AbstractEntity
 
 	}
 
-	private function getRegistrationAvailable(){
+	private function getRegistrationAvailable()
+	{
 		$q_get_available = App::queryFactory()
 			->newSelect()
 			->from('view_events')
@@ -1347,4 +1390,5 @@ class Event extends AbstractEntity
 		$this->updateRegisteredCount();
 		return $result;
 	}
+
 }

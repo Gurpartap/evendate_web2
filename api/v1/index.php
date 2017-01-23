@@ -3,11 +3,8 @@
 	$request_time = new DateTime();
 
 	$_function_called = false;
-//	if (isset($_SERVER['ENV']) && ($_SERVER['ENV'] != 'dev' && $_SERVER['ENV'] != 'test')){
-	ini_set("display_errors", 1);
-	error_reporting(E_ALL);
 
-//	}
+
 	require_once '../../v1-backend/bin/env_variables.php';
 
 	@session_start();
@@ -36,8 +33,14 @@ try {
 	require_once "{$BACKEND_FULL_PATH}/events/Class.EventDate.php";
 	require_once "{$BACKEND_FULL_PATH}/events/Class.EventsDatesCollection.php";
 	require_once "{$BACKEND_FULL_PATH}/users/Class.UsersCollection.php";
+	require_once "{$BACKEND_FULL_PATH}/users/Interface.UserInterface.php";
 
-
+	if (App::$ENV == 'prod') {
+		$DEBUG_MODE = false;
+	}else{
+		ini_set("display_errors", 1);
+		error_reporting(E_ALL);
+	}
 
 	App::buildGlobal($__db);
 

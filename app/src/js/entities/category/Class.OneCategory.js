@@ -28,7 +28,7 @@ OneCategory.extend(OneEntity);
  * @param {(string|number)} category_id
  * @param {AJAXData} data
  * @param {AJAXCallback} [success]
- * @return {jqXHR}
+ * @return {jqPromise}
  */
 OneCategory.fetchCategory = function(category_id, data, success) {
 	return __APP.SERVER.getData('/api/v1/organizations/types', $.extend({}, data, {id: category_id}), success);
@@ -37,11 +37,11 @@ OneCategory.fetchCategory = function(category_id, data, success) {
  *
  * @param {(Array|string)} fields
  * @param {AJAXCallback} [success]
- * @return {jqXHR}
+ * @return {jqPromise}
  */
 OneCategory.prototype.fetchCategory = function(fields, success) {
 	var self = this;
-	return this.constructor.fetchCategory(self.id, fields, function(data) {
+	return this.constructor.fetchCategory(self.id, {fields: fields}, function(data) {
 		self.setData(data);
 		if (success && typeof success == 'function') {
 			success.call(self, data[0]);

@@ -42,7 +42,7 @@ OrganizationsCollection.fetchRecommendations = function(data, success) {
  * @param {(number|string)} [length]
  * @param {string} [order_by]
  * @param {AJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OrganizationsCollection.prototype.fetchSubscribedOrganizations = function(fields, length, order_by, success) {
 	var self = this,
@@ -66,7 +66,7 @@ OrganizationsCollection.prototype.fetchSubscribedOrganizations = function(fields
  * @param {(number|string)} [length]
  * @param {string} [order_by]
  * @param {AJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 OrganizationsCollection.prototype.fetchMyOrganizations = function(roles, fields, length, order_by, success) {
 	var self = this,

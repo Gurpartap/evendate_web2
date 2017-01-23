@@ -101,7 +101,7 @@ $__modules['events'] = array(
 			return EventsCollection::filter(
 				$__db,
 				$__user,
-				array_merge($__request, array('favorites' => true)),
+				array_merge($__request, array('favorites' => $__user)),
 				$__fields,
 				array('length' => $__length, 'offset' => $__offset),
 				$__order_by ?? array('nearest_event_date', 'first_event_date'));
@@ -247,7 +247,7 @@ $__modules['events'] = array(
 				intval($id),
 				array());
 
-			if (filter_var($__request['status'], FILTER_VALIDATE_BOOLEAN) == false) {
+			if (isset($__request['status']) && filter_var($__request['status'], FILTER_VALIDATE_BOOLEAN) == false) {
 				return $event->unregisterUser($__user);
 			} else {
 				throw new BadArgumentException('STATUS_FIELD_CAN_BE_ONLY_FALSE', $__db);

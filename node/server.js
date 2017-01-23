@@ -15,6 +15,8 @@ var
     Utils = require('./utils'),
     smtpTransport = require('nodemailer-smtp-transport'),
     nodemailer = require('nodemailer'),
+    Mailer = require('./mailer.js'),
+    MailScheduler = require('./mails_scheduler'),
     CronJob = require('cron').CronJob,
     ImagesResize = require('./image_resizer'),
     Notifications = require('./notifications'),
@@ -462,6 +464,10 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     images: real_config.images,
                     client: client
                 });
+                cropper.downloadNew({
+                    client: client,
+                    images: real_config.images
+                });
             }
             if (config_index == 'prod') {
                 var notifications = new Notifications(real_config, client, logger);
@@ -480,6 +486,53 @@ pg.connect(pg_conn_string, function (err, client, done) {
         }, null, true);
     } catch (ex) {
         logger.error(ex);
+    }
+
+
+    /* Emails */
+    try {
+        new CronJob('0 * * * *', function () {
+            let scheduler = new MailScheduler(client, handleError);
+            scheduler.scheduleOrganizationRegistrationFailed();
+        }, null, true);
+    } catch (ex) {
+        logger.error(ex);
+    }
+//every monday at 2:30 am
+    try {
+        new CronJob('30 2 * 1 *', function () {
+            let scheduler = new MailScheduler(client, handleError);
+            scheduler.scheduleWeeklyEmails();
+        }, null, true);
+    } catch (ex) {
+        logger.error(ex);
+    }
+
+    try {
+        new CronJob('*/1 * * * *', function () {
+            let mailer = new Mailer(transporter, logger);
+            if (config_index == 'prod' || args.indexOf('--send-emails-force') !== -1) {
+                mailer.sendScheduled(client, handleError);
+            }
+        }, null, true);
+    } catch (ex) {
+        logger.error(ex);
+    }
+
+
+    if (args.indexOf('--schedule-emails-failed') !== -1) {
+        let scheduler = new MailScheduler(client, handleError);
+        scheduler.scheduleOrganizationRegistrationFailed();
+    }
+
+    if (args.indexOf('--schedule-emails-weekly') !== -1) {
+        let scheduler = new MailScheduler(client, handleError);
+        scheduler.scheduleWeeklyEmails();
+    }
+    if (args.indexOf('--send-emails-force') !== -1) {
+        let mailer = new Mailer(transporter);
+        mailer.sendScheduled(client, handleError);
+
     }
 
     var ioHandlers = function (socket) {
@@ -1186,6 +1239,57 @@ pg.connect(pg_conn_string, function (err, client, done) {
             });
         });
 
+        socket.on(CONSTANTS.UTILS.REGISTRATION_FINISHED, function (data) {
+            console.log('Reg finished', data);
+
+            let q_upd_registration = Entities.organization_registrations.update({
+                finished: true
+            }).where(Entities.organization_registrations.uuid.equals(data.uuid)).toQuery();
+
+            client.query(q_upd_registration, handleError);
+
+        });
+
+        socket.on(CONSTANTS.UTILS.REGISTRATION_STARTED, function (data) {
+            let html = '';
+            for (let i in data) {
+                if (data.hasOwnProperty(i)) {
+                    html += '<p><strong>' + i + ':</strong> ' + data[i] + '</p>';
+                }
+            }
+            transporter.sendMail({
+                debug: true,
+                connectionTimeout: 50000,
+                greetingTimeout: 50000,
+                socketTimeout: 50000,
+                from: 'feedback@evendate.ru',
+                to: 'support@evendate.ru',
+                subject: 'Обратная связь!',
+                html: html
+            }, function (err, info) {
+                if (err) {
+                    handleError('EMAIL SEND ERROR', err);
+                    handleError(html);
+                }
+                logger.info('EMAIL_INFO', info);
+            });
+
+            let q_ins_registration = Entities.organization_registrations.insert({
+                email: data.email,
+                site_url: data.site_url,
+                name: data.name
+            }).returning('uuid').toQuery();
+
+            client.query(q_ins_registration, function (err, res) {
+                if (err) {
+                    handleError('EMAIL SEND ERROR', err);
+                }
+                socket.emit('utils.registrationSaved', {
+                    uuid: res.rows[0].uuid
+                })
+            });
+        });
+
         socket.on(CONSTANTS.AUTH.SESSION_SET, function (token) {
             if (!__rooms.hasOwnProperty(token)) {
                 __rooms[token] = [];
@@ -1395,16 +1499,33 @@ pg.connect(pg_conn_string, function (err, client, done) {
         if (config_index != 'prod') {
             console.log(req.params);
         }
-        updateEventsGeocodes(req.params.id);
-        insertRecommendationsAccordance({event_id: req.params.id}, function () {
-            updateRecommendations({event_id: req.params.id}, logger.info)
-        });
-        cropper.resizeNew({
-            images: real_config.images,
-            client: client
-        }, function () {
-            res.json({status: true});
-        });
+        try {
+            updateEventsGeocodes(req.params.id);
+        } catch (e) {
+        }
+
+        try {
+            insertRecommendationsAccordance({event_id: req.params.id}, function () {
+                updateRecommendations({event_id: req.params.id}, logger.info)
+            });
+        } catch (e) {
+        }
+
+        try {
+            cropper.resizeNew({
+                images: real_config.images,
+                client: client
+            }, function () {
+                res.json({status: true});
+            });
+        } catch (e) {
+        }
+
+        try {
+            let scheduler = new MailScheduler(client, handleError);
+            scheduler.scheduleIfFirstEvent(req.params.id);
+        } catch (e) {
+        }
     });
 
     app.get('/recommendations/events/:id', function (req, res) {
@@ -1456,6 +1577,43 @@ pg.connect(pg_conn_string, function (err, client, done) {
         var qr_svg = qr.image(JSON.stringify({
             uuid: req.params.uuid,
             event_id: req.params.event_id,
+        }), {
+            type: format,
+            size: size
+        });
+        res.setHeader("content-type", headers[format]);
+        qr_svg.pipe(res);
+    });
+
+    app.get('/utils/invitation-qr/:organization_id/:uuid', function (req, res) {
+        var format = 'png',
+            available_types = ['png', 'svg', 'pdf', 'eps'],
+            headers = {
+                png: 'image/png',
+                svg: 'image/svg+xml',
+                pdf: 'application/pdf',
+                eps: 'application/postscript'
+            },
+            size = 10;
+        if (checkNested(req, 'query', 'format')) {
+            console.log(req.query.format);
+            if (available_types.indexOf(req.query.format) != -1) {
+                format = req.query.format;
+            }
+        }
+        if (checkNested(req, 'query', 'size')) {
+            size = parseInt(req.query.size);
+            size = isNaN(size) ? 10 : size;
+        }
+
+        console.log({
+            uuid: req.params.uuid,
+            organization_id: req.params.organization_id,
+        });
+
+        var qr_svg = qr.image(JSON.stringify({
+            uuid: req.params.uuid,
+            organization_id: req.params.organization_id,
         }), {
             type: format,
             size: size

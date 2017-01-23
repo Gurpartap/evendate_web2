@@ -83,6 +83,8 @@ class Organization extends AbstractEntity
 		'background_small_img_url',
 		'facebook_url',
 		'vk_url',
+		'is_private',
+		'brand_color',
 		self::RANDOM_FIELD_NAME => '(SELECT created_at / (random() * 9 + 1)
 			FROM view_organizations AS vo
 			WHERE vo.id = view_organizations.id) AS random',
@@ -110,12 +112,12 @@ class Organization extends AbstractEntity
                         ), 0) AS ' . self::RATING_OVERALL,
 		self::NEW_EVENTS_COUNT_FIELD_NAME => '(
 		SELECT
-			COUNT(view_events.id)
+			COUNT(*)
 			FROM view_events
 			WHERE
 				organization_id = view_organizations.id
-				AND
-				view_events.last_event_date > DATE_PART(\'epoch\', NOW()) :: INT
+				AND 
+				view_events.last_event_date_dt < NOW()::TIMESTAMPTZ
 				AND view_events.created_at > 
 					COALESCE((SELECT DATE_PART(\'epoch\', stat_organizations.created_at)::INT
 					    FROM stat_organizations
@@ -148,6 +150,24 @@ class Organization extends AbstractEntity
 	public function __construct()
 	{
 		$this->db = App::DB();
+	}
+
+	private static function addMailInfo(User $user, $data, $id, PDO $db)
+	{
+		$q_ins_mail = App::queryFactory()->newInsert()
+			->into('emails')
+			->cols(array(
+				'email_type_id' => '1', //hardcoded in SQL also,
+				'recipient' => filter_var($user->getEmail(), FILTER_VALIDATE_EMAIL) === FALSE ? $data['email'] : $user->getEmail(),
+				'data' => json_encode(array(
+					'first_name' => $user->getFirstName(),
+					'last_name' => $user->getLastName(),
+					'organization_short_name' => $data['short_name'],
+					'organization_id' => $id,
+				)),
+				'status' => 'true'
+			));
+		$db->prepare($q_ins_mail->getStatement())->execute($q_ins_mail->getBindValues());
 	}
 
 	/**
@@ -195,7 +215,7 @@ class Organization extends AbstractEntity
 	{
 		$q_ins_sub = 'INSERT INTO subscriptions(organization_id, user_id, status)
 			VALUES(:organization_id, :user_id, TRUE)
-			ON CONFLICT(organization_id, user_id) DO UPDATE SET status = TRUE RETURNING id::INT;';
+			ON CONFLICT(organization_id, user_id) DO UPDATE SET status = TRUE RETURNING id::INT';
 
 		$p_ins_sub = $this->db->prepare($q_ins_sub);
 		$result = $p_ins_sub->execute(array(':organization_id' => $this->getId(), ':user_id' => $user->getId()));
@@ -322,7 +342,7 @@ class Organization extends AbstractEntity
 		return $this->img_small_url;
 	}
 
-	public function getParams(AbstractUser $user = null, array $fields = null) : Result
+	public function getParams(AbstractUser $user = null, array $fields = null): Result
 	{
 		$result_data = parent::getParams($user, $fields)->getData();
 
@@ -474,6 +494,18 @@ class Organization extends AbstractEntity
 			$data['email'] = null;
 		}
 
+		$data['is_private'] = isset($data['is_private']) && filter_var($data['is_private'], FILTER_VALIDATE_BOOLEAN) == true ? 'true' : 'false';
+
+		if (isset($data['brand_color'])) {
+			if (preg_match('/^#[a-f0-9]{6}$/i', $data['brand_color'])) //hex color is valid
+			{
+				//color is valid
+			} else {
+				$data['brand_color'] = null;
+			}
+		} else {
+			$data['brand_color'] = null;
+		}
 
 		if (!isset($data['description'])) throw new InvalidArgumentException('Описание название организации обязательно.');
 		if (mb_strlen($data['description']) <= 50) throw new InvalidArgumentException('Слишком короткое описание. Должно быть не менее 50 символов.');
@@ -551,6 +583,8 @@ class Organization extends AbstractEntity
 				'facebook_url' => $data['facebook_url'],
 				'background_img_url' => $data['background_img_url'],
 				'img_url' => $data['img_url'],
+				'is_private' => $data['is_private'],
+				'brand_color' => $data['brand_color'],
 				'email' => $data['email']
 			)
 		);
@@ -674,7 +708,10 @@ class Organization extends AbstractEntity
 				'background_img_url' => $data['background_img_url'],
 				'img_url' => $data['img_url'],
 				'creator_id' => $user->getId(),
+				'images_domain' => 'https://dn' . rand(1, 4) . '.evendate.ru/',
 				'email' => $data['email'],
+				'is_private' => $data['is_private'],
+				'brand_color' => $data['brand_color'],
 				'state_id' => self::ORGANIZATION_STATE_SHOWN
 			)
 		);
@@ -690,6 +727,7 @@ class Organization extends AbstractEntity
 		if ($result === FALSE) throw new DBQueryException('CANT_CREATE_ORGANIZATION', $db);
 		$result = $p_ins_organization->fetch(PDO::FETCH_ASSOC);
 		self::addOwner($user, $result['id'], $db);
+		self::addMailInfo($user, $data, $result['id'], $db);
 		@file_get_contents(App::DEFAULT_NODE_LOCATION . '/recommendations/organizations/' . $result['id']);
 		return new Result(true, '', array('organization_id' => $result['id']));
 	}

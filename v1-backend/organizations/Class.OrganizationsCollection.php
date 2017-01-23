@@ -1,6 +1,6 @@
 <?php
 
-class OrganizationsCollection
+class OrganizationsCollection extends AbstractCollection
 {
 
 	private $db;
@@ -8,11 +8,11 @@ class OrganizationsCollection
 
 
 	public static function filter(PDO $db,
-																AbstractUser $user,
+																AbstractUser $user = null,
 																array $filters = null,
 																array $fields = null,
 																array $pagination = null,
-																$order_by = array('organization_type_order', 'organization_type_id'))
+																array $order_by = array('organization_type_order', 'organization_type_id'))
 	{
 
 		$statement_array = array();
@@ -21,26 +21,11 @@ class OrganizationsCollection
 		$cols = Fields::mergeFields(Organization::getAdditionalCols(), $fields, Organization::getDefaultCols());
 		$q_get_organizations = App::queryFactory()->newSelect();
 
-		if (isset($filters[Organization::IS_SUBSCRIBED_FIELD_NAME])) {
-			$cols[] = Organization::getAdditionalCols()[Organization::IS_SUBSCRIBED_FIELD_NAME];
-		}
-		if (isset($fields[Organization::NEW_EVENTS_COUNT_FIELD_NAME])) {
-			$cols[] = Organization::getAdditionalCols()[Organization::NEW_EVENTS_COUNT_FIELD_NAME];
-			$statement_array[':user_id'] = $user->getId();
-		}
-
 		$q_get_organizations
 			->distinct()
 			->from('view_organizations');
 
-
-		if (isset($fields[Organization::IS_SUBSCRIBED_FIELD_NAME])
-			|| isset($fields[Organization::SUBSCRIPTION_ID_FIELD_NAME])
-			|| $return_one
-		) {
-			$statement_array[':user_id'] = $user->getId();
-		}
-
+		$instance_class_name = 'Organization';
 
 		foreach ($filters as $name => $value) {
 			switch ($name) {
@@ -67,6 +52,24 @@ class OrganizationsCollection
 				case 'q': {
 					$q_get_organizations->where('fts @@ to_tsquery(:search_stm)');
 					$statement_array[':search_stm'] = App::prepareSearchStatement($value);
+					break;
+				}
+				case 'invitation_key': {
+					if ($value == null) break;
+					$getting_private_organization = true;
+					$q_get_organizations->where(':invitation_key = (SELECT DISTINCT uuid 
+						FROM view_invitation_links 
+						WHERE view_invitation_links.organization_id=view_organizations.id 
+						AND uuid = :invitation_key)');
+					$statement_array[':invitation_key'] = $value;
+					break;
+				}
+				case 'is_private': {
+					$getting_private_organization = true;
+					$q_get_organizations->where('id IN (SELECT organization_id 
+						FROM view_users_organizations 
+						WHERE user_id = :user_id)');
+					$statement_array[':user_id'] = $user->getId();
 					break;
 				}
 				case 'roles': {
@@ -117,6 +120,8 @@ class OrganizationsCollection
 						WHERE organization_id = "view_organizations"."id"
 							AND "subscriptions"."status" = TRUE
 							AND user_id = :user_id) IS NOT NULL');
+
+					$statement_array[':user_id'] = $user->getId();
 					break;
 				}
 				case 'friend': {
@@ -126,8 +131,8 @@ class OrganizationsCollection
 							FROM subscriptions
 							WHERE organization_id = "view_organizations"."id"
 								AND "subscriptions"."status" = TRUE
-								AND user_id = :user_id) = TRUE');
-						$statement_array[':user_id'] = $value->getId();
+								AND user_id = :friend_id) = TRUE');
+						$statement_array[':friend_id'] = $value->getId();
 					}
 					break;
 				}
@@ -140,21 +145,11 @@ class OrganizationsCollection
 					$cols[] = Organization::getAdditionalCols()[Organization::RATING_OVERALL];
 
 
-					$statement_array[':user_id'] = $user->getId();
-
-
 					$q_get_organizations->where('(SELECT
 						id
 						FROM subscriptions
 						WHERE organization_id = "view_organizations"."id"
 							AND "subscriptions"."status" = TRUE
-							AND user_id = :user_id) IS NULL');
-
-					$q_get_organizations->where('(SELECT
-						id
-						FROM favorite_events
-						WHERE event_id = "view_events"."id"
-							AND "favorite_events"."status" = TRUE
 							AND user_id = :user_id) IS NULL');
 
 					$statement_array[':user_id'] = $user->getId();
@@ -163,6 +158,50 @@ class OrganizationsCollection
 				}
 			}
 		}
+
+
+		if (isset($filters[Organization::IS_SUBSCRIBED_FIELD_NAME])) {
+			$cols[] = Organization::getAdditionalCols()[Organization::IS_SUBSCRIBED_FIELD_NAME];
+		}
+
+		if (isset($fields[Organization::NEW_EVENTS_COUNT_FIELD_NAME]) ||
+				isset($fields[Organization::IS_SUBSCRIBED_FIELD_NAME])
+				|| isset($fields[Organization::SUBSCRIPTION_ID_FIELD_NAME])
+				|| $return_one
+		) {
+			$statement_array[':user_id'] = $user->getId();
+		}
+
+
+		if (isset($getting_private_organization) && $getting_private_organization == true) {
+			$instance_class_name = 'PrivateOrganization';
+		} else {
+			$q_get_organizations
+				->where('(is_private = false OR (
+				
+					id IN 
+						(SELECT organization_id FROM organizations_invitations WHERE 
+						(user_id = :user_id OR email = :email) AND status = true) 						
+					OR	 
+					id IN 
+					(SELECT organization_id FROM subscriptions WHERE user_id = :user_id AND status = true) 
+					
+					OR 
+					id IN 
+					(SELECT organization_id FROM users_organizations WHERE user_id = :user_id AND status = true)
+					
+					))');
+
+			if (array_key_exists(Organization::IS_SUBSCRIBED_FIELD_NAME, $filters) == false) {
+				$statement_array[':user_id'] = $user->getId();
+			}
+			if ($user instanceof User) {
+				$statement_array[':email'] = $user->getEmail();
+			} else {
+				$statement_array[':email'] = '-';
+			}
+		}
+
 
 		$q_get_organizations
 			->cols($cols)
@@ -177,11 +216,13 @@ class OrganizationsCollection
 		}
 
 
-//		echo $select->getStatement();
+//		echo $q_get_organizations->getStatement();
 		$p_search = $db->prepare($q_get_organizations->getStatement());
 		$p_search->execute($statement_array);
 
-		$organizations = $p_search->fetchAll(PDO::FETCH_CLASS, 'Organization');
+//		print_r($statement_array);
+
+		$organizations = $p_search->fetchAll(PDO::FETCH_CLASS, $instance_class_name);
 
 		if ($return_one) {
 			if (count($organizations) < 1) throw new LogicException('CANT_FIND_ORGANIZATION');
@@ -200,11 +241,27 @@ class OrganizationsCollection
 	public static function one(PDO $db,
 														 AbstractUser $user,
 														 int $id,
-														 array $fields = null) : Organization
+														 array $fields = null,
+														 array $filters = null): Organization
 	{
 		$organization = self::filter($db,
 			$user,
-			array('id' => $id),
+			array_merge($filters ?? array(), array('id' => $id)),
+			$fields
+		);
+		return $organization;
+	}
+
+
+	public static function onePrivate(PDO $db,
+																		AbstractUser $user,
+																		int $id,
+																		string $uuid = null,
+																		array $fields = null): PrivateOrganization
+	{
+		$organization = self::filter($db,
+			$user,
+			array('id' => $id, 'invitation_key' => $uuid, 'is_private' => true),
 			$fields
 		);
 		return $organization;

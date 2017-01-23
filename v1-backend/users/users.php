@@ -47,7 +47,7 @@ $__modules['users'] = array(
 				array('user' => $__user),
 				$__fields,
 				$__pagination,
-				$__order_by ?? array()
+				$__order_by ?? array('id')
 			);
 		},
 		'{/(id:[0-9]+)/actions}' => function ($id) use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
@@ -65,7 +65,7 @@ $__modules['users'] = array(
 				array_merge($__request, array('friend' => $friend)),
 				$__fields ?? array(),
 				$__pagination ?? array(),
-				$__order_by ?? array()
+				$__order_by ?? array('created_at DESC')
 			);
 		},
 		'{/(id:[0-9]+)/favorites}' => function ($id) use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
@@ -77,14 +77,15 @@ $__modules['users'] = array(
 			);
 
 			return EventsCollection::filter(
-				App::DB(),
-				App::getCurrentUser(),
+				$__db,
+				$__user,
 				array(
 					'favorites' => $friend
 				),
-				$__fields,
-				$__pagination,
-				$__order_by)->getData();
+				$__fields ?? array(),
+				$__pagination ?? array(),
+				$__order_by ?? array('nearest_event_date', 'first_event_date')
+			);
 		},
 		'{/(id:[0-9]+)/subscriptions}' => function ($id) use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
 			$friend = UsersCollection::one(
@@ -96,14 +97,15 @@ $__modules['users'] = array(
 
 
 			return OrganizationsCollection::filter(
-				App::DB(),
-				App::getCurrentUser(),
+				$__db,
+				$__user,
 				array(
 					'friend' => $friend
 				),
-				$__fields,
-				$__pagination,
-				$__order_by);
+				$__fields ?? array(),
+				$__pagination ?? array(),
+				$__order_by ?? array('organization_type_order', 'organization_type_id')
+			);
 		},
 		'{/(id:[0-9]+)}' => function ($id) use ($__user, $__fields, $__db) {
 			$friend = UsersCollection::one(
@@ -141,7 +143,7 @@ $__modules['users'] = array(
 				array_merge($__request, array('friend' => $__user)),
 				$__fields ?? array(),
 				$__pagination ?? array(),
-				$__order_by ?? array()
+				$__order_by ?? array('id')
 			);
 		},
 		'{me/favorites}' => function () use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
@@ -151,9 +153,10 @@ $__modules['users'] = array(
 				array(
 					'favorites' => $__user
 				),
-				$__fields,
-				$__pagination,
-				$__order_by)->getData();
+				$__fields ?? array(),
+				$__pagination ?? array(),
+				$__order_by ?? array('nearest_event_date', 'first_event_date')
+			);
 		},
 		'{me/subscriptions}' => function () use ($__request, $__user, $__fields, $__db, $__pagination, $__order_by) {
 			return OrganizationsCollection::filter(
@@ -162,9 +165,10 @@ $__modules['users'] = array(
 				array(
 					'friend' => $__user
 				),
-				$__fields,
-				$__pagination,
-				$__order_by);
+				$__fields ?? array(),
+				$__pagination ?? array(),
+				$__order_by ?? array('organization_type_order', 'organization_type_id')
+			);
 		},
 		'{me}' => function () use ($__user, $__fields) {
 			return $__user->getMainInfo($__fields);
@@ -187,9 +191,9 @@ $__modules['users'] = array(
 		'{me/settings}' => function () use ($__request, $__user, $__db) {
 			return $__user->updateSettings($__request);
 		},
-		'{me/devices}' => function () use ($__request, $__user, $__db) {
+		'{me/devices}' => function () use ($__request, $__user, $__db, $__fields) {
 			$token = $__user->updateDeviceToken($__request['device_token'], $__request['client_type'], $__request['model'], $__request['os_version']);
-			$info = $__user->getMainInfo()->getData();
+			$info = $__user->getMainInfo($__fields ?? array())->getData();
 			$info = array_merge($info, $token->getData());
 			return new Result(true, '', $info);
 		},

@@ -18,7 +18,7 @@ DayEventsCollection.extend(EventsCollection);
  * @param {string} date
  * @param {EventsCollectionAJAXData} data
  * @param {AJAXCallback} [success]
- * @returns {jqXHR}
+ * @returns {jqPromise}
  */
 DayEventsCollection.fetchEvents = function(date, data, success) {
 	data.future = false;

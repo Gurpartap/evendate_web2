@@ -1,5 +1,6 @@
 /**
  * @requires EntityInterface.js
+ * @requires Class.Fields.js
  */
 /**
  *
@@ -18,7 +19,7 @@ OneEntity.prototype.setData = function(data) {
 		data = data[0];
 	}
 	for (field in data) {
-		if (this[field] instanceof EntitiesCollection) {
+		if (this[field] instanceof EntitiesCollection || this[field] instanceof OneEntity) {
 			this[field].setData(data[field]);
 		} else {
 			this[field] = data[field];

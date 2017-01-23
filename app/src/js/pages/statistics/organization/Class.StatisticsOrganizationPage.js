@@ -13,8 +13,11 @@ function StatisticsOrganizationPage(org_id) {
 	this.id = org_id;
 	this.organization = new OneOrganization(this.id);
 	this.with_header_tabs = true;
-	this.is_loading = true;
-	this.organization.fetchOrganization([
+}
+StatisticsOrganizationPage.extend(StatisticsPage);
+
+StatisticsOrganizationPage.prototype.fetchData = function() {
+	return this.fetching_data_defer = this.organization.fetchOrganization([
 		'description',
 		'img_medium_url',
 		'default_address',
@@ -31,9 +34,8 @@ function StatisticsOrganizationPage(org_id) {
 			],
 			order_by: 'nearest_event_date'
 		})
-	], Page.triggerRender);
-}
-StatisticsOrganizationPage.extend(StatisticsPage);
+	]);
+};
 
 StatisticsOrganizationPage.prototype.renderHeaderTabs = function(){
 	__APP.renderHeaderTabs([

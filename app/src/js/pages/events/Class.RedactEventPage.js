@@ -10,7 +10,6 @@
 function RedactEventPage(event_id) {
 	Page.apply(this);
 	this.page_title = 'Редактирование события';
-	this.is_loading = false;
 	
 	this.fields = [
 		'image_horizontal_large_url',
@@ -34,10 +33,6 @@ function RedactEventPage(event_id) {
 		'canceled'
 	];
 	this.event = new OneEvent(event_id);
-	if (event_id) {
-		this.is_loading = true;
-		this.event.fetchEvent(this.fields, Page.triggerRender);
-	}
 }
 RedactEventPage.extend(Page);
 
@@ -66,6 +61,13 @@ RedactEventPage.handleImgUpload = function($context, source, filename) {
 			$data_url.val('data.source').data('source', $preview.attr('src')).trigger('change');
 		})
 		.trigger('click.CallModal');
+};
+
+RedactEventPage.prototype.fetchData = function() {
+	if(this.event.id){
+		return this.fetching_data_defer = this.event.fetchEvent(this.fields);
+	}
+	return Page.prototype.fetchData.call(this);
 };
 
 RedactEventPage.prototype.formatVKPost = function() {
@@ -755,13 +757,6 @@ RedactEventPage.prototype.render = function() {
 	} else {
 		page_vars.header_text = 'Редактирование события';
 		page_vars.button_text = 'Сохранить';
-		if (PAGE.event.public_at !== null) {
-			var m_public_at = moment(PAGE.event.public_at);
-			page_vars.public_at_data = m_public_at.format('YYYY-MM-DD');
-			page_vars.public_at_data_label = m_public_at.format('DD.MM.YYYY');
-			page_vars.public_at_time_hours = m_public_at.format('HH');
-			page_vars.public_at_time_minutes = m_public_at.format('mm');
-		}
 		if (PAGE.event.registration_required) {
 			var m_registration_till = moment.unix(PAGE.event.registration_till);
 			page_vars.registration_till_data = m_registration_till.format('YYYY-MM-DD');
@@ -780,6 +775,7 @@ RedactEventPage.prototype.render = function() {
 		}
 		
 		page_vars = $.extend(true, {}, PAGE.event, page_vars);
+		console.log(page_vars);
 		PAGE.$wrapper.html(tmpl('edit-event-page', page_vars));
 		PAGE.init();
 		
@@ -828,9 +824,7 @@ RedactEventPage.prototype.render = function() {
 		if (PAGE.event.registration_required) {
 			PAGE.$wrapper.find('#edit_event_registration_required').prop('checked', true).trigger('change');
 		}
-		if (PAGE.event.public_at !== null) {
-			PAGE.$wrapper.find('#edit_event_delayed_publication').prop('checked', true).trigger('change');
-		}
+		PAGE.$wrapper.find('#edit_event_delayed_publication').toggleStatus('disabled');
 		PAGE.formatVKPost();
 	}
 };
