@@ -1226,7 +1226,7 @@ __APP = {
 			}
 		}
 		bindPageLinks($('#page_title').html($new_title));
-		$('title').text(title_str ? 'Evendate. ' + title_str : 'Evendate');
+		$('title').text(title_str ? title_str : 'Evendate');
 	},
 	/**
 	 * Pushes state in History.js`s states stack and renders page or replaces last state
