@@ -226,15 +226,15 @@ $url_parts = explode('/', $url);
 
 	<div class="sidebar_main_wrapper scrollbar-outer SidebarScroll">
 		<nav class="sidebar_navigation SidebarNav"><?php
-			if(!$is_user_not_auth){ ?>
-				<a href="/my/profile" class="sidebar_navigation_item SidebarNavItem link Link"><span>Мой профиль</span></a><?php
-			}
 			if ($is_user_editor) { ?>
 				<a href="/statistics" class="sidebar_navigation_item SidebarNavItem link Link"><span>Статистика</span></a>
 				<a href="/add/event" class="sidebar_navigation_item SidebarNavItem link Link"><span>Создать событие</span></a><?php
 			} ?>
 			<a href="/feed" class="sidebar_navigation_item SidebarNavItem link Link"><span>События</span><span class="counter sidebar_navigation_counter -hidden SidebarNavFeedCounter"></span></a>
-			<a href="/organizations" class="sidebar_navigation_item SidebarNavItem link Link"><span>Каталог организаторов</span></a>
+			<a href="/organizations" class="sidebar_navigation_item SidebarNavItem link Link"><span>Организаторы</span></a><?php
+			if(!$is_user_not_auth){ ?>
+				<a href="/my/profile" class="sidebar_navigation_item SidebarNavItem link Link"><span>Мой профиль</span></a><?php
+			}?>
 		</nav>
 		<hr class="sidebar_divider">
 		<div class="sidebar_organizations_wrapper scrollbar-outer SidebarOrganizationsScroll"><?php
