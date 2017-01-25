@@ -11959,6 +11959,157 @@ Object.prototype.toString.call(c)!=="[object Array]"&&d!=="renderTo"&&typeof c.n
 		c[a]>=this.xAxis.min&&f!==0){this.compareValue=f;break}}};S(ga,"getExtremes",function(a){var b;a.apply(this,[].slice.call(arguments,1));if(this.modifyValue)b=[this.modifyValue(this.dataMin),this.modifyValue(this.dataMax)],this.dataMin=Pa(b),this.dataMax=Ea(b)});F.prototype.setCompare=function(a,b){this.isXAxis||(n(this.series,function(b){b.setCompare(a)}),p(b,!0)&&this.chart.redraw())};Ha.prototype.tooltipFormatter=function(a){a=a.replace("{point.change}",(this.change>0?"+":"")+z.numberFormat(this.change,
 			p(this.series.tooltipOptions.changeDecimals,2)));return jc.apply(this,[a])};S(P.prototype,"render",function(a){if(this.chart.options._stock&&this.xAxis)!this.clipBox&&this.animate?(this.clipBox=C(this.chart.clipBox),this.clipBox.width=this.xAxis.len,this.clipBox.height=this.yAxis.len):this.chart[this.sharedClipKey]&&(Ta(this.chart[this.sharedClipKey]),this.chart[this.sharedClipKey].attr({width:this.xAxis.len,height:this.yAxis.len}));a.call(this)});w(z,{Color:va,Point:Ha,Tick:db,Renderer:$a,SVGElement:Y,
 		SVGRenderer:xa,arrayMin:Pa,arrayMax:Ea,charts:$,dateFormat:la,error:ea,format:Ka,pathAnim:void 0,getOptions:function(){return O},hasBidiBug:$b,isTouchDevice:lb,setOptions:function(a){O=C(!0,O,a);Pb();return O},addEvent:D,removeEvent:R,createElement:ca,discardElement:Xa,css:I,each:n,map:ra,merge:C,splat:ua,stableSort:pb,extendClass:ka,pInt:G,svg:ha,canvas:oa,vml:!ha&&!oa,product:"Highstock",version:"4.2.2"});return z});
+/*
+ * jQuery.appear
+ * https://github.com/bas2k/jquery.appear/
+ * http://code.google.com/p/jquery-appear/
+ * http://bas2k.ru/
+ *
+ * Copyright (c) 2009 Michael Hixson
+ * Copyright (c) 2012-2014 Alexander Brovikov
+ * Licensed under the MIT license (http://www.opensource.org/licenses/mit-license.php)
+ */
+(function($) {
+	$.fn.appear = function(fn, options) {
+
+		var settings = $.extend({
+
+			//arbitrary data to pass to fn
+			data: undefined,
+
+			//call fn only on the first appear?
+			one: true,
+
+			// X & Y accuracy
+			accX: 0,
+			accY: 0
+
+		}, options);
+
+		return this.each(function() {
+
+			var t = $(this);
+
+			//whether the element is currently visible
+			t.appeared = false;
+
+			if (!fn) {
+
+				//trigger the custom event
+				t.trigger('appear', settings.data);
+				return;
+			}
+
+			var w = $(window);
+
+			//fires the appear event when appropriate
+			var check = function() {
+
+				//is the element hidden?
+				if (!t.is(':visible')) {
+
+					//it became hidden
+					t.appeared = false;
+					return;
+				}
+
+				//is the element inside the visible window?
+				var a = w.scrollLeft();
+				var b = w.scrollTop();
+				var o = t.offset();
+				var x = o.left;
+				var y = o.top;
+
+				var ax = settings.accX;
+				var ay = settings.accY;
+				var th = t.height();
+				var wh = w.height();
+				var tw = t.width();
+				var ww = w.width();
+
+				if (y + th + ay >= b &&
+					y <= b + wh + ay &&
+					x + tw + ax >= a &&
+					x <= a + ww + ax) {
+
+					//trigger the custom event
+					if (!t.appeared) t.trigger('appear', settings.data);
+
+				} else {
+
+					//it scrolled out of view
+					t.appeared = false;
+				}
+			};
+
+			//create a modified fn with some additional logic
+			var modifiedFn = function() {
+
+				//mark the element as visible
+				t.appeared = true;
+
+				//is this supposed to happen only once?
+				if (settings.one) {
+
+					//remove the check
+					w.unbind('scroll', check);
+					var i = $.inArray(check, $.fn.appear.checks);
+					if (i >= 0) $.fn.appear.checks.splice(i, 1);
+				}
+
+				//trigger the original fn
+				fn.apply(this, arguments);
+			};
+
+			//bind the modified fn to the element
+			if (settings.one) t.one('appear', settings.data, modifiedFn);
+			else t.bind('appear', settings.data, modifiedFn);
+
+			//check whenever the window scrolls
+			w.scroll(check);
+
+			//check whenever the dom changes
+			$.fn.appear.checks.push(check);
+
+			//check now
+			(check)();
+		});
+	};
+
+	//keep a queue of appearance checks
+	$.extend($.fn.appear, {
+
+		checks: [],
+		timeout: null,
+
+		//process the queue
+		checkAll: function() {
+			var length = $.fn.appear.checks.length;
+			if (length > 0) while (length--) ($.fn.appear.checks[length])();
+		},
+
+		//check the queue asynchronously
+		run: function() {
+			if ($.fn.appear.timeout) clearTimeout($.fn.appear.timeout);
+			$.fn.appear.timeout = setTimeout($.fn.appear.checkAll, 20);
+		}
+	});
+
+	//run checks when these methods are called
+	$.each(['append', 'prepend', 'after', 'before', 'attr',
+		'removeAttr', 'addClass', 'removeClass', 'toggleClass',
+		'remove', 'css', 'show', 'hide'], function(i, n) {
+		var old = $.fn[n];
+		if (old) {
+			$.fn[n] = function() {
+				var r = old.apply(this, arguments);
+				$.fn.appear.run();
+				return r;
+			}
+		}
+	});
+
+})(jQuery);
 /*!
  * Cropper v2.3.4
  * https://github.com/fengyuanchen/cropper
@@ -12174,157 +12325,6 @@ jQuery.extend( jQuery.easing,
  * OF THE POSSIBILITY OF SUCH DAMAGE. 
  *
  */
-/*
- * jQuery.appear
- * https://github.com/bas2k/jquery.appear/
- * http://code.google.com/p/jquery-appear/
- * http://bas2k.ru/
- *
- * Copyright (c) 2009 Michael Hixson
- * Copyright (c) 2012-2014 Alexander Brovikov
- * Licensed under the MIT license (http://www.opensource.org/licenses/mit-license.php)
- */
-(function($) {
-	$.fn.appear = function(fn, options) {
-
-		var settings = $.extend({
-
-			//arbitrary data to pass to fn
-			data: undefined,
-
-			//call fn only on the first appear?
-			one: true,
-
-			// X & Y accuracy
-			accX: 0,
-			accY: 0
-
-		}, options);
-
-		return this.each(function() {
-
-			var t = $(this);
-
-			//whether the element is currently visible
-			t.appeared = false;
-
-			if (!fn) {
-
-				//trigger the custom event
-				t.trigger('appear', settings.data);
-				return;
-			}
-
-			var w = $(window);
-
-			//fires the appear event when appropriate
-			var check = function() {
-
-				//is the element hidden?
-				if (!t.is(':visible')) {
-
-					//it became hidden
-					t.appeared = false;
-					return;
-				}
-
-				//is the element inside the visible window?
-				var a = w.scrollLeft();
-				var b = w.scrollTop();
-				var o = t.offset();
-				var x = o.left;
-				var y = o.top;
-
-				var ax = settings.accX;
-				var ay = settings.accY;
-				var th = t.height();
-				var wh = w.height();
-				var tw = t.width();
-				var ww = w.width();
-
-				if (y + th + ay >= b &&
-					y <= b + wh + ay &&
-					x + tw + ax >= a &&
-					x <= a + ww + ax) {
-
-					//trigger the custom event
-					if (!t.appeared) t.trigger('appear', settings.data);
-
-				} else {
-
-					//it scrolled out of view
-					t.appeared = false;
-				}
-			};
-
-			//create a modified fn with some additional logic
-			var modifiedFn = function() {
-
-				//mark the element as visible
-				t.appeared = true;
-
-				//is this supposed to happen only once?
-				if (settings.one) {
-
-					//remove the check
-					w.unbind('scroll', check);
-					var i = $.inArray(check, $.fn.appear.checks);
-					if (i >= 0) $.fn.appear.checks.splice(i, 1);
-				}
-
-				//trigger the original fn
-				fn.apply(this, arguments);
-			};
-
-			//bind the modified fn to the element
-			if (settings.one) t.one('appear', settings.data, modifiedFn);
-			else t.bind('appear', settings.data, modifiedFn);
-
-			//check whenever the window scrolls
-			w.scroll(check);
-
-			//check whenever the dom changes
-			$.fn.appear.checks.push(check);
-
-			//check now
-			(check)();
-		});
-	};
-
-	//keep a queue of appearance checks
-	$.extend($.fn.appear, {
-
-		checks: [],
-		timeout: null,
-
-		//process the queue
-		checkAll: function() {
-			var length = $.fn.appear.checks.length;
-			if (length > 0) while (length--) ($.fn.appear.checks[length])();
-		},
-
-		//check the queue asynchronously
-		run: function() {
-			if ($.fn.appear.timeout) clearTimeout($.fn.appear.timeout);
-			$.fn.appear.timeout = setTimeout($.fn.appear.checkAll, 20);
-		}
-	});
-
-	//run checks when these methods are called
-	$.each(['append', 'prepend', 'after', 'before', 'attr',
-		'removeAttr', 'addClass', 'removeClass', 'toggleClass',
-		'remove', 'css', 'show', 'hide'], function(i, n) {
-		var old = $.fn[n];
-		if (old) {
-			$.fn[n] = function() {
-				var r = old.apply(this, arguments);
-				$.fn.appear.run();
-				return r;
-			}
-		}
-	});
-
-})(jQuery);
 /*
     json2.js
     2012-10-08
