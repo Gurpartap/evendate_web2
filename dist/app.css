@@ -1115,6 +1115,14 @@ input, select, textarea, button {font-family: inherit}
 	margin: auto;
 	color: #fff;
 }
+.form_select2.form_input.select2-container-multi > .select2-choices > .select2-search-choice > .select2-search-choice-close:before {
+	display: inline-block;
+	font: normal normal normal 14px/1 FontAwesome;
+	text-rendering: auto;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	content: "\f00d";
+}
 
 /* /Form Select2 */
 /* Form Radio & Checkbox */
