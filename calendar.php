@@ -19,6 +19,7 @@ require_once "{$BACKEND_FULL_PATH}/users/Class.User.php";
 if (App::$ENV == 'prod' || App::$ENV == 'test') {
 	$DEBUG_MODE = false;
 }else{
+	$DEBUG_MODE = true;
 	ini_set("display_errors", 1);
 	error_reporting(E_ALL);
 }
@@ -73,11 +74,11 @@ $url_parts = explode('/', $url);
 
 	<?php
 	if ($DEBUG_MODE) { ?>
-		<link rel="stylesheet" href="/dist/vendor.css?rev=53b1be6369d3e2da863169eddb4ebfd7">
-		<link rel="stylesheet" href="/dist/app.css?rev=b533d8579fc77b73281151faf99ef031"><?php
+		<link rel="stylesheet" href="/dist/vendor.css?rev=5602b9b9f8cddbb4f8133131a270a5ae">
+		<link rel="stylesheet" href="/dist/app.css?rev=b94fa44d2e0fcbce480f35ec9e974534"><?php
 	} else { ?>
-		<link rel="stylesheet" href="/dist/vendor.min.css?rev=b721a799630f0cdd841a4b11ca32c21f">
-		<link rel="stylesheet" href="/dist/app.min.css?rev=f70182b8ca20ba06528d18af4455f1b5"><?php
+		<link rel="stylesheet" href="/dist/vendor.min.css?rev=d48eec79ba0dcb66d3491c6bccde5f11">
+		<link rel="stylesheet" href="/dist/app.min.css?rev=19733b3537109a05f112bf15d2819bfe"><?php
 	} ?>
 
 	<?php
@@ -225,15 +226,15 @@ $url_parts = explode('/', $url);
 
 	<div class="sidebar_main_wrapper scrollbar-outer SidebarScroll">
 		<nav class="sidebar_navigation SidebarNav"><?php
-			if(!$is_user_not_auth){ ?>
-				<a href="/my/profile" class="sidebar_navigation_item SidebarNavItem link Link"><span>Мой профиль</span></a><?php
-			}
 			if ($is_user_editor) { ?>
 				<a href="/statistics" class="sidebar_navigation_item SidebarNavItem link Link"><span>Статистика</span></a>
 				<a href="/add/event" class="sidebar_navigation_item SidebarNavItem link Link"><span>Создать событие</span></a><?php
 			} ?>
 			<a href="/feed" class="sidebar_navigation_item SidebarNavItem link Link"><span>События</span><span class="counter sidebar_navigation_counter -hidden SidebarNavFeedCounter"></span></a>
-			<a href="/organizations" class="sidebar_navigation_item SidebarNavItem link Link"><span>Каталог организаторов</span></a>
+			<a href="/organizations" class="sidebar_navigation_item SidebarNavItem link Link"><span>Организаторы</span></a><?php
+			if(!$is_user_not_auth){ ?>
+				<a href="/my/profile" class="sidebar_navigation_item SidebarNavItem link Link"><span>Мой профиль</span></a><?php
+			}?>
 		</nav>
 		<hr class="sidebar_divider">
 		<div class="sidebar_organizations_wrapper scrollbar-outer SidebarOrganizationsScroll"><?php
@@ -261,11 +262,11 @@ $url_parts = explode('/', $url);
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=d8aa36aec51d5992718e08424293dd00" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=c9bce4b110fdb97c6dbbf6347f4803dc" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=9edd7064f93f57195e6666bc01586168" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=433a1fa1707d894e9edddc9b1cd9c6a9" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=cd483ecb56210caa4e06f0acf76a8357" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=8e280997efbdabdccb1e10e73b634e26" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=1e2cc7cb25f5b3d10b6ab69e7fb9ea03" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=541fd78bf2e5ea367e4cd01c5b6e014e" charset="utf-8"></script><?php
 }	?>
 
 <?php

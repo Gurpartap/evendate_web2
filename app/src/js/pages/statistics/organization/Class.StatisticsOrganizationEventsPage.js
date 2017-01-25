@@ -11,6 +11,14 @@ function StatisticsOrganizationEventsPage(org_id) {
 	StatisticsOrganizationPage.apply(this, arguments);
 	
 	this.block_scroll = false;
+	this.future_events_data = {
+		future: true,
+		canceled_shown: true
+	};
+	this.past_events_data = {
+		canceled_shown: true,
+		order_by: '-first_event_date'
+	};
 	this.future_events = new EventsWithStatisticsCollection();
 	this.past_events = new EventsWithStatisticsCollection();
 }
@@ -22,7 +30,7 @@ StatisticsOrganizationEventsPage.buildEventRows = function(events, date_field) {
 		return $.extend({}, event, {
 			date: moment.unix(event[date_field]).format(__LOCALES.ru_RU.DATE.DATE_FORMAT),
 			timestamp: event[date_field],
-			conversion: Math.round(event.view ? event.view_detail * 100 / event.view : 0) + '%'
+			conversion: Math.round(event.view == 0 ? (event.view_detail * 100 / event).view : 0) + '%'
 		});
 	}));
 	bindPageLinks($events);
@@ -52,10 +60,7 @@ StatisticsOrganizationEventsPage.prototype.render = function() {
 	
 	this.$wrapper.html(tmpl('orgstat-events-page'));
 	
-	this.future_events.fetchOrganizationsEvents(this.organization.id, {
-		future: true,
-		canceled_shown: true
-	}, 0, function() {
+	this.future_events.fetchOrganizationsEvents(this.organization.id, this.future_events_data, 0, function() {
 		if(this.length){
 			this_page.$wrapper.find('.OrgStatFutureEventsWrapper').html(tmpl('orgstat-events-wrapper', {
 				title: 'Предстоящие события',
@@ -64,10 +69,7 @@ StatisticsOrganizationEventsPage.prototype.render = function() {
 		}
 	});
 	
-	this.past_events.fetchOrganizationsEvents(this.organization.id, {
-		canceled_shown: true,
-		order_by: '-first_event_date'
-	}, 30, function() {
+	this.past_events.fetchOrganizationsEvents(this.organization.id, this.past_events_data, 30, function() {
 		if(this.length){
 			$past_events_wrapper = this_page.$wrapper.find('.OrgStatPastEventsWrapper');
 			$past_events_wrapper.html(tmpl('orgstat-events-wrapper', {
@@ -80,7 +82,7 @@ StatisticsOrganizationEventsPage.prototype.render = function() {
 				if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !this_page.block_scroll) {
 					this_page.block_scroll = true;
 					
-					this_page.past_events.fetchOrganizationsEvents(this_page.organization.id, {canceled_shown: true}, 30, function(events) {
+					this_page.past_events.fetchOrganizationsEvents(this_page.organization.id, this_page.past_events_data, 30, function(events) {
 						this_page.block_scroll = false;
 						if (events.length) {
 							$past_events_wrapper.find('tbody').append(StatisticsOrganizationEventsPage.buildEventRows(events, 'first_event_date'));

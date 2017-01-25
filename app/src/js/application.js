@@ -609,6 +609,19 @@ __APP = {
 		},
 		/**
 		 *
+		 * @param {string|Element|jQuery} message
+		 * @param {buildProps} [props]
+		 * @return {jQuery}
+		 */
+		cap: function buildTags(message, props) {
+			if(!props)
+				props = {};
+			props = __APP.BUILD.normalizeBuildProps(props);
+			
+			return tmpl('cap', $.extend({message: message}, props));
+		},
+		/**
+		 *
 		 * @param {(OneTag|Array<OneTag>|TagsCollection)} tags
 		 * @param {buildProps} [props]
 		 * @returns {jQuery}
@@ -1213,7 +1226,7 @@ __APP = {
 			}
 		}
 		bindPageLinks($('#page_title').html($new_title));
-		$('title').text(title_str ? 'Evendate. ' + title_str : 'Evendate');
+		$('title').text(title_str ? title_str : 'Evendate');
 	},
 	/**
 	 * Pushes state in History.js`s states stack and renders page or replaces last state
