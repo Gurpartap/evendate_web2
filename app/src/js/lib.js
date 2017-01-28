@@ -498,7 +498,8 @@ $.fn.extend({
 	 * @return {*}
 	 */
 	resolveInstance: function() {
-		return this.data('instance');
+		var instance = this.data('instance');
+		return instance ? instance : this;
 	}
 });
 
@@ -1349,6 +1350,19 @@ function bindTabs($parent) {
 			$tabs = $header_wrapper.children('.Tab');
 		}
 		
+		Object.defineProperties($this, {
+			'currentTabsIndex': {
+				get: function() {
+					return $tabs.index($tabs.filter('.'+__C.CLASSES.NEW_ACTIVE));
+				}
+			},
+			'tabsCount': {
+				get: function() {
+					return $tabs.length;
+				}
+			}
+		});
+		
 		$this.setToTab = function(index) {
 			var $setting_tab = $tabs.eq(index),
 				$setting_body = $bodies.eq(index);
@@ -1362,17 +1376,17 @@ function bindTabs($parent) {
 		};
 		
 		$this.nextTab = function() {
-			$this.setToTab($tabs.index($tabs.filter('.'+__C.CLASSES.NEW_ACTIVE)) + 1);
+			$this.setToTab($this.currentTabsIndex + 1);
 		};
 		
 		$this.prevTab = function() {
-			$this.setToTab($tabs.index($tabs.filter('.'+__C.CLASSES.NEW_ACTIVE)) - 1);
+			$this.setToTab($this.currentTabsIndex - 1);
 		};
 		
 		if (!$tabs.filter('.'+__C.CLASSES.NEW_ACTIVE).length) {
 			$tabs.eq(0).addClass(__C.CLASSES.NEW_ACTIVE);
 		}
-		$bodies.removeClass(__C.CLASSES.NEW_ACTIVE).eq($tabs.index($tabs.filter('.'+__C.CLASSES.NEW_ACTIVE))).addClass(__C.CLASSES.NEW_ACTIVE);
+		$bodies.removeClass(__C.CLASSES.NEW_ACTIVE).eq($this.currentTabsIndex).addClass(__C.CLASSES.NEW_ACTIVE);
 		$bodies_wrapper.height($bodies.filter('.'+__C.CLASSES.NEW_ACTIVE).outerHeight());
 		$bodies.each(function(i, body) {
 			mutation_observer.observe(body, {
@@ -1429,10 +1443,10 @@ function bindRippleEffect($parent) {
 		
 		$ripple
 			.css({top: y + 'px', left: x + 'px'})
-			.addClass('animate')
-			.one('animationend webkitAnimationEnd', function() {
-				$ripple.removeClass('animate');
-			});
+			.addClass('animate');
+		setTimeout(function() {
+			$ripple.removeClass('animate');
+		}, 650);
 	}).addClass('-Handled_RippleEffect');
 }
 

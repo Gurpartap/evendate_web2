@@ -143,7 +143,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-tabs-header">
-	<header class="tabs_header -color_{color}">
+	<header class="tabs_header HeaderTabs -color_{color}">
 		{tabs}
 	</header>
 </script>
@@ -272,280 +272,272 @@
 
 <script type="javascript/template" id="tmpl-edit-event-page">
 
-	<div class="page edit_event_page">
-		<form class="form-horizontal" id="edit-event-form">
+	<div class="edit_event_overlay Tabs EditEventPageTabs" data-tabs_id="edit_event_pages">
+		<div class="edit_event_page_wrapper">
+			<div class="page">
+				<form class="form-horizontal" id="edit-event-form">
+					<input id="edit_event_event_id" type="hidden" name="event_id" value="{id}">
 
-			<h3>{header_text}</h3>
-			<input id="edit_event_event_id" type="hidden" name="event_id" value="{id}">
+					<div class="edit_event_page_tab_bodies tab_bodies_wrap TabsBodyWrapper" data-tabs_id="edit_event_pages">
 
-			<div class="EditEventOrganizations -hidden">
-				<h4 class="form_label"><label for="edit_event_organization">Организация</label></h4>
-				<div class="form_unit">
-					<select id="edit_event_organization" name="organization_id"></select>
-				</div>
-			</div>
 
-			<h4 class="form_label"><label for="edit_event_title">Название</label></h4>
-			<div class="form_unit">
-				<input id="edit_event_title" class="form_input LimitSize" type="text" name="title" value="{title}" autocomplete="off" placeholder="Название мероприятия" data-maxlength="150" required>
-			</div>
+						<div class="tab_body TabsBody -active">
+							<div class="EditEventOrganizations -hidden">
+								<h4 class="form_label"><label for="edit_event_organization">Организация</label></h4>
+								<div class="form_unit">
+									<select id="edit_event_organization" name="organization_id"></select>
+								</div>
+							</div>
 
-			<h4 class="form_label">Дата</h4>
-			<div class="event_datepicker">
-				<div class="EventDatesCalendar event_datepicker_calendar"></div>
-				<div class="event_datepicker_form">
-					<p>Выбраны даты:</p>
-					<div class="selected_days EventSelectedDaysText"><p>Даты не выбраны</p></div>
-					<div class="form_group MainTime -parts_e_2">
-						<div class="form_unit -inline">
-							<label class="form_label">Начало</label>
+							<h4 class="form_label"><label for="edit_event_title">Название</label></h4>
 							<div class="form_unit">
-								<div class="form_group -time_input TimeInput">
-									<div class="form_unit">
-										<input class="form_input StartHours" required>
-									</div>
-									<span class="divider">:</span>
-									<div class="form_unit">
-										<input class="form_input StartMinutes" required>
-									</div>
-								</div>
+								<input id="edit_event_title" class="form_input LimitSize" type="text" name="title" value="{title}" autocomplete="off" placeholder="Название мероприятия" data-maxlength="150" required>
 							</div>
-						</div>
-						<div class="form_unit -inline">
-							<label class="form_label">Конец</label>
+
+							<h4 class="form_label"><label for="edit_event_description">Описание</label></h4>
 							<div class="form_unit">
-								<div class="form_group -time_input TimeInput">
-									<div class="form_unit">
-										<input class="form_input EndHours" required>
+								<textarea id="edit_event_description" class="form_textarea LimitSize" data-maxlength="1000" name="description" placeholder="Не более 1000 символов" required>{description}</textarea>
+							</div>
+
+							<h4 class="form_label">Дата</h4>
+							<div class="event_datepicker">
+								<div class="EventDatesCalendar event_datepicker_calendar"></div>
+								<div class="event_datepicker_form">
+									<p>Выбраны даты:</p>
+									<div class="selected_days EventSelectedDaysText"><p>Даты не выбраны</p></div>
+									<div class="form_group MainTime -parts_e_2">
+										<div class="form_unit -inline">
+											<label class="form_label">Начало</label>
+											<div class="form_unit">
+												<div class="form_group -time_input TimeInput">
+													<div class="form_unit">
+														<input class="form_input StartHours" required>
+													</div>
+													<span class="divider">:</span>
+													<div class="form_unit">
+														<input class="form_input StartMinutes" required>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="form_unit -inline">
+											<label class="form_label">Конец</label>
+											<div class="form_unit">
+												<div class="form_group -time_input TimeInput">
+													<div class="form_unit">
+														<input class="form_input EndHours" required>
+													</div>
+													<span class="divider">:</span>
+													<div class="form_unit">
+														<input class="form_input EndMinutes" required>
+													</div>
+												</div>
+											</div>
+										</div>
 									</div>
-									<span class="divider">:</span>
 									<div class="form_unit">
-										<input class="form_input EndMinutes" required>
+										<input id="edit_event_different_time" class="form_checkbox" type="checkbox" name="different_time" tabindex="-1">
+										<label class="form_label" for="edit_event_different_time"><span>Разное время</span></label>
 									</div>
 								</div>
 							</div>
-						</div>
-					</div>
-					<div class="form_unit">
-						<input id="edit_event_different_time" class="form_checkbox" type="checkbox" name="different_time" tabindex="-1">
-						<label class="form_label" for="edit_event_different_time"><span>Разное время</span></label>
-					</div>
-				</div>
-			</div>
 
-			<div id="edit_event_selected_days_wrapper" class="collapsing_wrapper">
-				<div class="collapsing_content">
-					<table class="event_selected_days_table">
-						<colgroup>
-							<col width="7%">
-							<col width="21%">
-							<col width="10%">
-							<col width="31%">
-							<col width="31%">
-						</colgroup>
-						<thead>
-							<tr>
-								<th></th>
-								<th>День</th>
-								<th></th>
-								<th>Время начала</th>
-								<th>Время конца</th>
-							</tr>
-						</thead>
-						<tbody class="SelectedDaysRows">
-						</tbody>
-					</table>
-					<div style="display: inline-block">
-						<input id="new_date" type="hidden">
-						<button class="button -color_default event_selected_days_add_date AddDayToTable DatePicker RippleEffect" type="button"><span>Добавить день</span></button>
-					</div>
-				</div>
-			</div>
-
-			<h4 class="form_label"><label for="edit_event_placepicker">Место проведения</label></h4>
-			<div class="form_group -parts_3_1">
-				<div class="form_unit">
-					<input id="edit_event_placepicker" class="form_input Placepicker" name="location" value="{location}" required>
-				</div>
-				<div class="form_unit">
-					<button class="button -color_primary -size_wide RippleEffect EditEventDefaultAddress" type="button" tabindex="-1">По умолчанию</button>
-				</div>
-			</div>
-
-			<h4 class="form_label"><label for="edit_event_description">Описание</label></h4>
-			<div class="form_unit">
-				<textarea id="edit_event_description" class="form_textarea LimitSize" data-maxlength="1000" name="description" placeholder="Не более 1000 символов" required>{description}</textarea>
-			</div>
-
-			<h4 class="form_label">Регистрация</h4>
-			<div class="form_unit">
-				<input id="edit_event_registration_required" class="form_checkbox" type="checkbox" name="registration_required">
-				<label class="form_label" for="edit_event_registration_required"><span>Обязательная регистрация</span></label>
-			</div>
-			<p>Крайний срок регистрации до:</p>
-			<div class="form_group -parts_2_3 RegistrationTill">
-				<div class="form_unit -inline -status_disabled">
-					<label class="form_label">Дата</label>
-					<div class="form_select -valign_center DatePicker" data-min_date="{tomorrow_date}"><label>{registration_till_data_label}</label><input name="registration_till_date" value="{registration_till_data}" type="hidden" disabled required></div>
-				</div>
-				<div class="form_unit -status_disabled">
-					<div class="form_group -parts_e_2">
-						<div class="form_unit -inline -status_disabled">
-							<label class="form_label">Время</label>
-							<div class="form_unit -status_disabled">
-								<div class="form_group -time_input TimeInput">
-									<div class="form_unit -status_disabled">
-										<input class="form_input" name="registration_till_time_hours" value="{registration_till_time_hours}" disabled required>
-									</div>
-									<span class="divider">:</span>
-									<div class="form_unit -status_disabled">
-										<input class="form_input" name="registration_till_time_minutes" value="{registration_till_time_minutes}" disabled required>
+							<div id="edit_event_selected_days_wrapper" class="collapsing_wrapper">
+								<div class="collapsing_content">
+									<table class="event_selected_days_table">
+										<colgroup>
+											<col width="7%">
+											<col width="21%">
+											<col width="10%">
+											<col width="31%">
+											<col width="31%">
+										</colgroup>
+										<thead>
+											<tr>
+												<th></th>
+												<th>День</th>
+												<th></th>
+												<th>Время начала</th>
+												<th>Время конца</th>
+											</tr>
+										</thead>
+										<tbody class="SelectedDaysRows">
+										</tbody>
+									</table>
+									<div style="display: inline-block">
+										<input id="new_date" type="hidden">
+										<button class="button -color_default event_selected_days_add_date AddDayToTable DatePicker RippleEffect" type="button"><span>Добавить день</span></button>
 									</div>
 								</div>
 							</div>
-						</div>
-					</div>
-				</div>
-			</div>
 
-			<h4 class="form_label">Цена</h4>
-			<div class="form_group -parts_1_3">
-				<div class="form_unit">
-					<input id="edit_event_free" class="form_checkbox" type="checkbox" checked name="is_free">
-					<label class="form_label" for="edit_event_free"><span>Бесплатно</span></label>
-				</div>
-				<div class="form_unit -inline -status_disabled MinPrice">
-					<label class="form_label" for="edit_event_min_price"><span>Цена от</span></label>
-					<input id="edit_event_min_price" class="form_input" type="text" name="min_price" autocomplete="off" disabled placeholder="Минимальная цена">
-				</div>
-			</div>
-
-			<h4 class="form_label"><label for="edit_event_url">Ссылка на страницу мероприятия</label></h4>
-			<div class="form_unit">
-				<input id="edit_event_url" class="form_input" type="text" name="detail_info_url" value="{detail_info_url}" autocomplete="off" placeholder="Ссылка">
-			</div>
-
-			<h4 class="form_label"><label for="event_tags">Теги</label></h4>
-			<div class="form_unit">
-				<input id="event_tags" class="form_input EventTags" type="text" name="tags" autocomplete="off" required>
-			</div>
-
-			<h4 class="form_label"><label>Обложка для мероприятия</label></h4>
-			<div class="form_group -parts_e_2 EditEventImgLoadWrap ImgLoadWrap">
-				<div class="form_unit -centering">
-					<div class="wrapper">
-						<h4 class="form_label"><label>Выберите способ загрузки:</label></h4>
-						<div class="Tabs">
-							<header class="tabs_header -color_accent">
-								<span class="tab Tab -active">По ссылке</span>
-								<span class="tab Tab">С компьютера</span>
-							</header>
-							<div class="tab_bodies_wrap TabsBodyWrapper">
-								<div class="tab_body TabsBody -active">
-									<div class="form_unit">
-										<input id="edit_event_load_by_url_hor" class="form_input" type="text" autocomplete="off" placeholder="Ссылка на изображение">
-									</div>
-									<div class="form_unit">
-										<button class="button -color_accent RippleEffect LoadByURLButton" type="button" tabindex="-1" data-load_input="edit_event_load_by_url_hor">Загрузить</button>
-									</div>
-								</div>
-								<div class="tab_body TabsBody">
-									<div class="form_unit">
-										<button class="button -color_accent RippleEffect FileLoadButton" type="button"><input class="LoadImg -hidden" type="file" accept="image/*">Выбрать</button>
-									</div>
-								</div>
-							</div>
-						</div>
-						<p class="FileNameText"></p>
-						<div class="form_unit">
-							<button class="button -color_accent_alt RippleEffect CallModal -hidden" type="button" data-modal_type="cropper" data-source_img="{image_horizontal_url}" data-aspect_ratio="16/9">
-								<span class="Text">Кадрировать</span>
-							</button>
-						</div>
-					</div>
-				</div>
-				<div class="form_unit">
-					<div class="img_holder">
-						<img class="edit_event_img_preview_hor EditEventImgPreview ImgPreview" src="{image_horizontal_url}">
-						<img src="/app/img/edit_event/edit_event_img_placeholder_hor.png">
-						<input id="edit_event_image_horizontal_src" class="DataUrl" type="hidden" name="image_horizontal" value="{image_horizontal_base64}">
-						<input id="edit_event_image_horizontal_filename" class="FileName" type="hidden" name="filename_horizontal" value="{image_horizontal_filename}">
-					</div>
-				</div>
-			</div>
-			<!--
-			<h4 class="form_label"><label>Уведомления для пользователей</label></h4>
-			<div class="form_group -parts_1_2_1">
-				<div class="form_unit">
-					<select class="form_select2 ToSelect2" data-minimum-results-for-search="-1">
-						<option selected>Не уведомлять</option>
-						<option>За 3 часа</option>
-						<option>За сутки</option>
-						<option>За 3 дня</option>
-						<option>За неделю</option>
-						<option>Свой вариант</option>
-					</select>
-				</div>
-				<div class="form_unit -offset_1">
-					<div class="form_unit -inline">
-						<label class="form_label">Дата</label>
-						<div class="form_select -v_centering DatePicker"><label>Дата</label><input type="hidden"></div>
-					</div>
-					<div class="form_unit -inline">
-						<label class="form_label">Точное время</label>
-						<div class="form_unit">
-							<div class="form_group -time_input TimeInput">
+							<h4 class="form_label"><label for="edit_event_placepicker">Место проведения</label></h4>
+							<div class="form_group -parts_3_1">
 								<div class="form_unit">
-									<input class="form_input">
+									<input id="edit_event_placepicker" class="form_input Placepicker" name="location" value="{location}" required>
 								</div>
-								<span class="divider">:</span>
 								<div class="form_unit">
-									<input class="form_input">
+									<button class="button -color_primary -size_wide RippleEffect EditEventDefaultAddress" type="button" tabindex="-1">По умолчанию</button>
+								</div>
+							</div>
+
+							<h4 class="form_label"><label for="event_tags">Теги</label></h4>
+							<div class="form_unit">
+								<input id="event_tags" class="form_input EventTags" type="text" name="tags" autocomplete="off" required>
+							</div>
+
+							<h4 class="form_label">Цена</h4>
+							<div class="form_group -parts_1_3">
+								<div class="form_unit">
+									<input id="edit_event_free" class="form_checkbox" type="checkbox" checked name="is_free">
+									<label class="form_label" for="edit_event_free"><span>Бесплатно</span></label>
+								</div>
+								<div class="form_unit -inline -status_disabled MinPrice">
+									<label class="form_label" for="edit_event_min_price"><span>Цена от</span></label>
+									<input id="edit_event_min_price" class="form_input" type="text" name="min_price" autocomplete="off" disabled placeholder="Минимальная цена">
+								</div>
+							</div>
+
+							<h4 class="form_label"><label for="edit_event_url">Ссылка на страницу мероприятия</label></h4>
+							<div class="form_unit">
+								<input id="edit_event_url" class="form_input" type="text" name="detail_info_url" value="{detail_info_url}" autocomplete="off" placeholder="Ссылка">
+							</div>
+
+							<h4 class="form_label"><label>Обложка события</label></h4>
+							<div class="form_group -parts_e_2 EditEventImgLoadWrap ImgLoadWrap">
+								<div class="form_unit -centering">
+									<div class="wrapper">
+										<h4 class="form_label"><label>Выберите способ загрузки:</label></h4>
+										<div class="Tabs">
+											<header class="tabs_header HeaderTabs -color_accent">
+												<span class="tab Tab -active">По ссылке</span>
+												<span class="tab Tab">С компьютера</span>
+											</header>
+											<div class="tab_bodies_wrap TabsBodyWrapper">
+												<div class="tab_body TabsBody -active">
+													<div class="form_unit">
+														<input id="edit_event_load_by_url_hor" class="form_input" type="text" autocomplete="off" placeholder="Ссылка на изображение">
+													</div>
+													<div class="form_unit">
+														<button class="button -color_accent RippleEffect LoadByURLButton" type="button" tabindex="-1" data-load_input="edit_event_load_by_url_hor">Загрузить</button>
+													</div>
+												</div>
+												<div class="tab_body TabsBody">
+													<div class="form_unit">
+														<button class="button -color_accent RippleEffect FileLoadButton" type="button"><input class="LoadImg -hidden" type="file" accept="image/*">Выбрать</button>
+													</div>
+												</div>
+											</div>
+										</div>
+										<p class="FileNameText"></p>
+										<div class="form_unit">
+											<button class="button -color_accent_alt RippleEffect CallModal -hidden" type="button" data-modal_type="cropper" data-source_img="{image_horizontal_url}" data-aspect_ratio="16/9">
+												<span class="Text">Кадрировать</span>
+											</button>
+										</div>
+									</div>
+								</div>
+								<div class="form_unit">
+									<div class="img_holder">
+										<img class="edit_event_img_preview_hor EditEventImgPreview ImgPreview" src="{image_horizontal_url}">
+										<img src="/app/img/edit_event/edit_event_img_placeholder_hor.png">
+										<input id="edit_event_image_horizontal_src" class="DataUrl" type="hidden" name="image_horizontal" value="{image_horizontal_base64}">
+										<input id="edit_event_image_horizontal_filename" class="FileName" type="hidden" name="filename_horizontal" value="{image_horizontal_filename}">
+									</div>
 								</div>
 							</div>
 						</div>
-					</div>
-				</div>
-			</div>-->
 
-			<h4 class="form_label"><label for="event_tags">Публикация</label></h4>
-			<div class="form_group -parts_e_2">
 
-				<div class="form_unit">
-					<input id="edit_event_delayed_publication" class="form_checkbox" type="checkbox" name="delayed_publication">
-					<label class="form_label" for="edit_event_delayed_publication"><span>Отложенная публикация</span></label>
-				</div>
-
-				<div class="form_unit DelayedPublication -status_disabled">
-
-					<div class="form_unit -inline">
-						<label class="form_label">Дата</label>
-						<div class="form_select -valign_center DatePicker" data-min_date="{current_date}"><label>{public_at_data_label}</label><input type="hidden" name="public_at_date" value="{public_at_data}" disabled required></div>
-					</div>
-
-					<div class="form_unit -inline">
-						<label class="form_label">Точное время</label>
-						<div class="form_unit">
-							<div class="form_group -time_input TimeInput">
-								<div class="form_unit">
-									<input class="form_input" name="public_at_time_hours" value="{public_at_time_hours}" disabled required>
+						<div class="tab_body TabsBody">
+							<h4 class="form_label">Регистрация</h4>
+							<div class="form_unit">
+								<input id="edit_event_registration_required" class="form_checkbox" type="checkbox" name="registration_required">
+								<label class="form_label" for="edit_event_registration_required"><span>Обязательная регистрация</span></label>
+							</div>
+							<p>Крайний срок регистрации до:</p>
+							<div class="form_group -parts_2_3 RegistrationTill">
+								<div class="form_unit -inline -status_disabled">
+									<label class="form_label">Дата</label>
+									<div class="form_select -valign_center DatePicker" data-min_date="{tomorrow_date}"><label>{registration_till_data_label}</label><input name="registration_till_date" value="{registration_till_data}" type="hidden" disabled required></div>
 								</div>
-								<span class="divider">:</span>
-								<div class="form_unit">
-									<input class="form_input" name="public_at_time_minutes" value="{public_at_time_minutes}" disabled required>
+								<div class="form_unit -status_disabled">
+									<div class="form_group -parts_e_2">
+										<div class="form_unit -inline -status_disabled">
+											<label class="form_label">Время</label>
+											<div class="form_unit -status_disabled">
+												<div class="form_group -time_input TimeInput">
+													<div class="form_unit -status_disabled">
+														<input class="form_input" name="registration_till_time_hours" value="{registration_till_time_hours}" disabled required>
+													</div>
+													<span class="divider">:</span>
+													<div class="form_unit -status_disabled">
+														<input class="form_input" name="registration_till_time_minutes" value="{registration_till_time_minutes}" disabled required>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
 								</div>
 							</div>
 						</div>
+
+
+						<div class="tab_body TabsBody">
+							<h4 class="form_label"><label for="event_tags">Публикация</label></h4>
+							<div class="form_group -parts_e_2">
+
+								<div class="form_unit">
+									<input id="edit_event_delayed_publication" class="form_checkbox" type="checkbox" name="delayed_publication">
+									<label class="form_label" for="edit_event_delayed_publication"><span>Отложенная публикация</span></label>
+								</div>
+
+								<div class="form_unit DelayedPublication -status_disabled">
+
+									<div class="form_unit -inline">
+										<label class="form_label">Дата</label>
+										<div class="form_select -valign_center DatePicker" data-min_date="{current_date}"><label>{public_at_data_label}</label><input type="hidden" name="public_at_date" value="{public_at_data}" disabled required></div>
+									</div>
+
+									<div class="form_unit -inline">
+										<label class="form_label">Время</label>
+										<div class="form_unit">
+											<div class="form_group -time_input TimeInput">
+												<div class="form_unit">
+													<input class="form_input" name="public_at_time_hours" value="{public_at_time_hours}" disabled required>
+												</div>
+												<span class="divider">:</span>
+												<div class="form_unit">
+													<input class="form_input" name="public_at_time_minutes" value="{public_at_time_minutes}" disabled required>
+												</div>
+											</div>
+										</div>
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+
 					</div>
-
-				</div>
+				</form>
 			</div>
-
-			<div class="form_unit -align_center">
-				<button id="edit_event_submit" class="button RippleEffect -color_accent" type="button">{button_text}</button>
+			<div class="edit_event_buttons -align_right">
+				<button id="edit_event_submit" class="button RippleEffect -color_accent -hidden" type="button"><span class="Text">{button_text}</span></button>
+				<button id="edit_event_next_page" class="button RippleEffect -color_accent" type="button">
+					<span class="Text"><span>Далее</span><span class="fa fa-angle-right"></span></span>
+				</button>
+				<button id="edit_event_prev_page" class="button RippleEffect -color_neutral -hidden" type="button">
+					<span class="Text"><span class="fa fa-angle-left"></span><span>Назад</span></span>
+				</button>
 			</div>
+		</div>
 
-		</form>
+		<div class="page event_edit_navigation HeaderTabs" data-tabs_id="edit_event_pages">
+			<div class="event_edit_navigation_item Tab"><span>1. Описание</span></div>
+			<div class="event_edit_navigation_item Tab"><span>2. Регистрация на событие</span></div>
+			<div class="event_edit_navigation_item Tab"><span>3. Публикация</span></div>
+		</div>
 	</div>
 
 </script>
@@ -648,7 +640,7 @@
 			</div>
 		</div>
 		<div class="organization_feed Tabs">
-			<div class="tabs_header -color_accent">
+			<div class="tabs_header HeaderTabs -color_accent">
 				<span class="tab Tab -active" data-type="future">Будущие</span>
 				<span class="tab Tab" data-type="past">Прошедшие</span>
 				<span class="tab Tab {hidden_for_users}" data-type="delayed">Отложенные</span>
@@ -866,7 +858,7 @@
 			</div>
 		</div>
 		<div class="page user_page_content Tabs">
-			<header class="user_page_content_header tabs_header -color_accent">
+			<header class="user_page_content_header tabs_header HeaderTabs -color_accent">
 				<span class="tab Tab">Активность</span>
 				<span class="tab Tab -active">Избранные события</span>
 			</header>
@@ -1436,7 +1428,7 @@
 						<h5 class="form_label"><label>минимальный размер 500x500 </label></h5>
 						<h5 class="form_label"><label>рекомендуемый формат: png с прозрачным фоном</label></h5>
 						<div class="Tabs">
-							<header class="tabs_header -color_accent">
+							<header class="tabs_header HeaderTabs -color_accent">
 								<span class="tab Tab -active">По ссылке</span>
 								<span class="tab Tab">С компьютера</span>
 							</header>
@@ -1480,7 +1472,7 @@
 						<h5 class="form_label"><label>минимальный размер 1366x768 </label></h5>
 						<h5 class="form_label"><label>рекомендуемый формат: jpeg/jpg</label></h5>
 						<div class="Tabs">
-							<header class="tabs_header -color_accent">
+							<header class="tabs_header HeaderTabs -color_accent">
 								<span class="tab Tab -active">По ссылке</span>
 								<span class="tab Tab">С компьютера</span>
 							</header>

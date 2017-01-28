@@ -71,7 +71,12 @@ RedactEventPage.prototype.fetchData = function() {
 };
 
 RedactEventPage.prototype.init = function() {
-	var PAGE = this;
+	var PAGE = this,
+		$main_tabs = PAGE.$wrapper.find('.EditEventPageTabs'),
+		$buttons = PAGE.$wrapper.find('.edit_event_buttons').children(),
+		$next_page_button = $buttons.filter('#edit_event_next_page'),
+		$prev_page_button = $buttons.filter('#edit_event_prev_page'),
+		$submit_button = $buttons.filter('#edit_event_submit');
 	
 	function submitEditEvent() {
 		var $form = PAGE.$wrapper.find("#edit-event-form"),
@@ -433,6 +438,8 @@ RedactEventPage.prototype.init = function() {
 		});
 	})(PAGE.event.organization_id);
 	
+	$main_tabs = $main_tabs.resolveInstance();
+	
 	//TODO: perepilit' placepicker
 	PAGE.$wrapper.find(".Placepicker").placepicker();
 	
@@ -522,7 +529,30 @@ RedactEventPage.prototype.init = function() {
 		
 	});
 	
-	PAGE.$wrapper.find('#edit_event_submit').off('click.Submit').on('click.Submit', submitEditEvent);
+	$main_tabs.on('change.tabs', function() {
+		if($main_tabs.currentTabsIndex === 0){
+			$prev_page_button.addClass(__C.CLASSES.NEW_HIDDEN);
+		} else {
+			$prev_page_button.removeClass(__C.CLASSES.NEW_HIDDEN);
+		}
+		if ($main_tabs.currentTabsIndex === $main_tabs.tabsCount - 1) {
+			$next_page_button.addClass(__C.CLASSES.NEW_HIDDEN);
+			$submit_button.removeClass(__C.CLASSES.NEW_HIDDEN);
+		} else {
+			$next_page_button.removeClass(__C.CLASSES.NEW_HIDDEN);
+			$submit_button.addClass(__C.CLASSES.NEW_HIDDEN);
+		}
+	});
+	
+	$next_page_button.off('click.nextPage').on('click.nextPage', function() {
+		$main_tabs.nextTab();
+	});
+	
+	$prev_page_button.off('click.nextPage').on('click.prevPage', function() {
+		$main_tabs.prevTab();
+	});
+	
+	$submit_button.off('click.Submit').on('click.Submit', submitEditEvent);
 };
 
 RedactEventPage.prototype.render = function() {
@@ -585,12 +615,10 @@ RedactEventPage.prototype.render = function() {
 	}
 	
 	if (!is_edit) {
-		page_vars.header_text = 'Новое событие';
 		page_vars.button_text = 'Опубликовать';
 		PAGE.$wrapper.html(tmpl('edit-event-page', page_vars));
 		PAGE.init();
 	} else {
-		page_vars.header_text = 'Редактирование события';
 		page_vars.button_text = 'Сохранить';
 		if (PAGE.event.registration_required) {
 			var m_registration_till = moment.unix(PAGE.event.registration_till);
