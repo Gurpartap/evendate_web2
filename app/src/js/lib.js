@@ -492,6 +492,13 @@ $.fn.extend({
 		} else {
 			console.error('Tablesort is not defined');
 		}
+	},
+	/**
+	 * Resolving instance from element
+	 * @return {*}
+	 */
+	resolveInstance: function() {
+		return this.data('instance');
 	}
 });
 
@@ -1315,37 +1322,72 @@ function bindTabs($parent) {
 	$parent = $parent ? $parent : $('body');
 	$parent.find('.Tabs').not('.-Handled_Tabs').each(function(i, elem) {
 		var $this = $(elem),
-			$wrapper = $this.find('.TabsBodyWrapper'),
-			$tabs = $this.find('.Tab'),
-			$bodies = $this.find('.TabsBody'),
+			tabs_id = $this.data('tabs_id'),
 			mutation_observer = new MutationObserver(function(records) {
+				var $wrapper;
 				records.forEach(function(record){
-					var $wrapper = $(record.target);
+					$wrapper = $(record.target).closest('.TabsBody');
 					if($wrapper.hasClass(__C.CLASSES.NEW_ACTIVE)) {
-						$wrapper.parent().height($wrapper.height());
+						$wrapper.parent().height($wrapper.outerHeight());
 					}
 				});
-			});
+			}),
+			$bodies_wrapper,
+			$bodies,
+			$header_wrapper,
+			$tabs;
 		
-		if (!$tabs.filter('.-active').length) {
+		if(tabs_id){
+			$bodies_wrapper = $this.find('.TabsBodyWrapper[data-tabs_id="'+tabs_id+'"]');
+			$bodies = $bodies_wrapper.children('.TabsBody');
+			$header_wrapper = $this.find('.HeaderTabs[data-tabs_id="'+tabs_id+'"]');
+			$tabs = $header_wrapper.children('.Tab');
+		} else {
+			$bodies_wrapper = $this.find('.TabsBodyWrapper:first');
+			$bodies = $bodies_wrapper.children('.TabsBody');
+			$header_wrapper = $this.find('.HeaderTabs:first');
+			$tabs = $header_wrapper.children('.Tab');
+		}
+		
+		$this.setToTab = function(index) {
+			var $setting_tab = $tabs.eq(index),
+				$setting_body = $bodies.eq(index);
+			if ($setting_tab.length && !$setting_tab.hasClass(__C.CLASSES.NEW_ACTIVE)) {
+				$tabs.removeClass(__C.CLASSES.NEW_ACTIVE);
+				$bodies.removeClass(__C.CLASSES.NEW_ACTIVE);
+				$setting_tab.addClass(__C.CLASSES.NEW_ACTIVE);
+				$setting_body.addClass(__C.CLASSES.NEW_ACTIVE);
+				$this.trigger('change.tabs');
+			}
+		};
+		
+		$this.nextTab = function() {
+			$this.setToTab($tabs.index($tabs.filter('.'+__C.CLASSES.NEW_ACTIVE)) + 1);
+		};
+		
+		$this.prevTab = function() {
+			$this.setToTab($tabs.index($tabs.filter('.'+__C.CLASSES.NEW_ACTIVE)) - 1);
+		};
+		
+		if (!$tabs.filter('.'+__C.CLASSES.NEW_ACTIVE).length) {
 			$tabs.eq(0).addClass(__C.CLASSES.NEW_ACTIVE);
 		}
-		$bodies.removeClass(__C.CLASSES.NEW_ACTIVE).eq($tabs.index($tabs.filter('.-active'))).addClass(__C.CLASSES.NEW_ACTIVE);
-		$wrapper.height($bodies.filter('.'+__C.CLASSES.NEW_ACTIVE).height());
+		$bodies.removeClass(__C.CLASSES.NEW_ACTIVE).eq($tabs.index($tabs.filter('.'+__C.CLASSES.NEW_ACTIVE))).addClass(__C.CLASSES.NEW_ACTIVE);
+		$bodies_wrapper.height($bodies.filter('.'+__C.CLASSES.NEW_ACTIVE).outerHeight());
 		$bodies.each(function(i, body) {
-			mutation_observer.observe(body, {childList: true});
+			mutation_observer.observe(body, {
+				childList: true,
+				subtree: true,
+				attributes: true,
+				attributeFilter: ['class']
+			});
 		});
 		
 		$tabs.on('click', function() {
-			if (!$(this).hasClass(__C.CLASSES.NEW_ACTIVE)) {
-				$tabs.removeClass(__C.CLASSES.NEW_ACTIVE);
-				$bodies.removeClass(__C.CLASSES.NEW_ACTIVE);
-				$(this).addClass(__C.CLASSES.NEW_ACTIVE);
-				$bodies.eq($tabs.index(this)).addClass(__C.CLASSES.NEW_ACTIVE);
-				$wrapper.height($bodies.filter('.'+__C.CLASSES.NEW_ACTIVE).height());
-				$this.trigger('change.tabs');
-			}
-		})
+			$this.setToTab($tabs.index(this));
+		});
+		
+		$this.data('instance', $this);
 	}).addClass('-Handled_Tabs');
 }
 
