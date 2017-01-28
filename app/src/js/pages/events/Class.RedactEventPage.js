@@ -70,86 +70,6 @@ RedactEventPage.prototype.fetchData = function() {
 	return Page.prototype.fetchData.call(this);
 };
 
-RedactEventPage.prototype.formatVKPost = function() {
-	var PAGE = this,
-		$post = PAGE.$wrapper.find('#edit_event_vk_post'),
-		$title = PAGE.$wrapper.find('#edit_event_title'),
-		$calendar = PAGE.$wrapper.find('.EventDatesCalendar').data('calendar'),
-		$place = PAGE.$wrapper.find('#edit_event_placepicker'),
-		$description = PAGE.$wrapper.find('#edit_event_description'),
-		$is_free = PAGE.$wrapper.find('#edit_event_free'),
-		$min_price = PAGE.$wrapper.find('#edit_event_min_price'),
-		$is_required = PAGE.$wrapper.find('#edit_event_registration_required'),
-		$registration_till = PAGE.$wrapper.find('.RegistrationTill'),
-		$tags = PAGE.$wrapper.find('.EventTags'),
-		tags = [],
-		$link = PAGE.$wrapper.find('#edit_event_url'),
-		post_text = '';
-	
-	post_text += $title.val() ? $title.val() + '\n\n' : '';
-	
-	if ($calendar.selected_days) {
-		post_text += ($calendar.selected_days.length > 1) ? 'Дата начала: ' : 'Начало: ';
-		post_text += moment($calendar.selected_days[0]).format('D MMMM YYYY');
-		if ($calendar.selected_days.length == 1) {
-			var $main_time_inputs = PAGE.$wrapper.find('.MainTime').find('input');
-			post_text += $main_time_inputs.eq(0).val() ? ' в ' + parseInt($main_time_inputs.eq(0).val()) : '';
-			post_text += $main_time_inputs.eq(1).val() ? ':' + $main_time_inputs.eq(1).val() : '';
-		}
-	}
-	if ($is_required.prop('checked')) {
-		var $inputs = $registration_till.find('input');
-		if ($inputs.eq(0).val()) {
-			post_text += ' (регистрация заканчивается: ' + moment($inputs.eq(0).val()).format('D MMMM YYYY');
-			post_text += $inputs.eq(1).val() ? ' в ' + parseInt($inputs.eq(1).val()) : '';
-			post_text += $inputs.eq(2).val() ? ':' + $inputs.eq(2).val() : '';
-			post_text += ')\n';
-		} else {
-			post_text += '\n';
-		}
-	} else {
-		post_text += '\n';
-	}
-	post_text += $place.val() ? $place.val() + '\n\n' : '';
-	post_text += $description.val() ? $description.val() + '\n\n' : '';
-	
-	if (!$is_free.prop('checked')) {
-		post_text += $min_price.val() ? 'Цена от ' + $min_price.val() + '\n\n' : '';
-	}
-	
-	$tags.find('.select2-search-choice').each(function(i, tag) {
-		tags.push('#' + $(tag).text().trim());
-	});
-	post_text += tags ? tags.join(' ') + '\n\n' : '';
-	
-	if ($link.val()) {
-		post_text += $link.val()
-	} else if (PAGE.event.id) {
-		post_text += 'https://evendate.ru/event/' + PAGE.event.id;
-	}
-	
-	$post.val(post_text);
-};
-
-RedactEventPage.prototype.toggleVkImg = function() {
-	var PAGE = this,
-		$wrap = PAGE.$wrapper.find('#edit_event_vk_publication').find('.EditEventImgLoadWrap'),
-		$left_block = $wrap.children().eq(0),
-		$right_block = $wrap.children().eq(1);
-	
-	if (!$left_block.hasClass('-hidden')) {
-		$right_block.find('.LoadImg').off('change.ToggleVkImg').one('change.ToggleVkImg', function() {
-			PAGE.toggleVkImg();
-		});
-		$right_block.find('.Text').text('Добавить картинку');
-	} else {
-		$right_block.find('.LoadImg').off('change.ToggleVkImg');
-		$right_block.find('.Text').text('Изменить');
-	}
-	$left_block.toggleClass('-hidden');
-	$right_block.toggleClass('-align_center');
-};
-
 RedactEventPage.prototype.init = function() {
 	var PAGE = this;
 	
@@ -183,18 +103,6 @@ RedactEventPage.prototype.init = function() {
 			$times = $form.find('#edit_event_different_time').prop('checked') ? $form.find('[class^="TableDay_"]') : $form.find('.MainTime');
 		
 		function afterSubmit() {
-			if ($form.find('#edit_event_to_public_vk').prop('checked')) {
-				socket.emit('vk.post', {
-					guid: data.vk_group,
-					event_id: PAGE.event.id,
-					message: data.vk_post,
-					image: {
-						base64: data.vk_image_src,
-						filename: data.vk_image_filename
-					},
-					link: data.detail_info_url
-				});
-			}
 			__APP.changeState('/event/' + PAGE.event.id);
 		}
 		
@@ -524,28 +432,6 @@ RedactEventPage.prototype.init = function() {
 			}
 		});
 	})(PAGE.event.organization_id);
-	(function checkVkPublicationAbility() {
-		if (__APP.USER.accounts.indexOf("vk") !== -1) {
-			socket.emit('vk.getGroupsToPost', __APP.USER.id);
-			PAGE.$wrapper
-				.find(
-					'#edit_event_title,' +
-					'#edit_event_placepicker,' +
-					'#edit_event_description,' +
-					'#edit_event_free,' +
-					'#edit_event_min_price,' +
-					'#edit_event_registration_required,' +
-					'#edit_event_url,' +
-					'.EventTags'
-				)
-				.add('.RegistrationTill input')
-				.add('.MainTime input')
-				.on('change.FormatVkPost', function() { PAGE.formatVKPost(); });
-			PAGE.$wrapper.find('.EventDatesCalendar').data('calendar').$calendar.on('days-changed.FormatVkPost', function() { PAGE.formatVKPost(); });
-		} else {
-			PAGE.$wrapper.find('#edit_event_to_public_vk').toggleStatus('disabled');
-		}
-	})();
 	
 	//TODO: perepilit' placepicker
 	PAGE.$wrapper.find(".Placepicker").placepicker();
@@ -636,23 +522,6 @@ RedactEventPage.prototype.init = function() {
 		
 	});
 	
-	PAGE.$wrapper.find('#edit_event_to_public_vk').off('change.PublicVK').on('change.PublicVK', function() {
-		var $vk_post_wrapper = PAGE.$wrapper.find('#edit_event_vk_publication'),
-			$vk_post_content = $vk_post_wrapper.children();
-		if ($(this).prop('checked')) {
-			$vk_post_wrapper.height($vk_post_content.height());
-		} else {
-			$vk_post_wrapper.height(0);
-		}
-		$vk_post_wrapper.toggleStatus('disabled');
-		
-		$vk_post_content.find('.DeleteImg').off('click.DeleteImg').on('click.DeleteImg', function() {
-			$(this).closest('.EditEventImgLoadWrap').find('input').val('').end().find('img').attr('src', '');
-			PAGE.toggleVkImg();
-		})
-		
-	});
-	
 	PAGE.$wrapper.find('#edit_event_submit').off('click.Submit').on('click.Submit', submitEditEvent);
 };
 
@@ -715,45 +584,11 @@ RedactEventPage.prototype.render = function() {
 		$view.find('#event_tags').select2('data', selected_tags);
 	}
 	
-	function initVkImgCopying() {
-		var $vk_wrapper = PAGE.$wrapper.find('#edit_event_vk_publication');
-		PAGE.$wrapper.find('#edit_event_image_horizontal_src').on('change.CopyToVkImg', function() {
-			var $wrap = $(this).closest('.EditEventImgLoadWrap'),
-				$vk_wrap = PAGE.$wrapper.find('#edit_event_vk_publication'),
-				$vk_preview = $vk_wrap.find('.EditEventImgPreview'),
-				$vk_button = $vk_wrap.find('.CallModal'),
-				$vk_$data_url = $vk_wrap.find('#edit_event_vk_image_src'),
-				$button_orig = $wrap.find('.CallModal'),
-				src = $(this).data('source');
-			
-			if (!PAGE.$wrapper.find('.edit_event_vk_right_block').hasClass('-align_center')) {
-				PAGE.toggleVkImg();
-			}
-			$vk_$data_url.val('data.source').data('source', src);
-			$vk_preview.attr('src', src);
-			$vk_wrap.find('#edit_event_vk_image_filename').val(PAGE.$wrapper.find('#edit_event_image_horizontal_filename').val());
-			$vk_button
-				.data('crop_data', $button_orig.data('crop_data'))
-				.data('source_img', $button_orig.data('source_img'))
-				.on('crop', function(event, cropped_src, crop_data) {
-					$vk_preview.attr('src', cropped_src);
-					$vk_button.data('crop_data', crop_data);
-					$vk_$data_url.data('source', $vk_preview.attr('src')).trigger('change');
-				});
-			
-		});
-		$vk_wrapper.find('.FileLoadButton, .CallModal, .DeleteImg').on('click.OffCopying', function() {
-			PAGE.$wrapper.find('#edit_event_image_horizontal_src').off('change.CopyToVkImg');
-		});
-	}
-	
 	if (!is_edit) {
 		page_vars.header_text = 'Новое событие';
 		page_vars.button_text = 'Опубликовать';
 		PAGE.$wrapper.html(tmpl('edit-event-page', page_vars));
 		PAGE.init();
-		PAGE.toggleVkImg();
-		initVkImgCopying();
 	} else {
 		page_vars.header_text = 'Редактирование события';
 		page_vars.button_text = 'Сохранить';
@@ -766,12 +601,6 @@ RedactEventPage.prototype.render = function() {
 		}
 		if (PAGE.event.image_horizontal_url) {
 			page_vars.image_horizontal_filename = PAGE.event.image_horizontal_url.split('/').reverse()[0];
-			page_vars.vk_image_url = PAGE.event.image_horizontal_url;
-			page_vars.vk_image_filename = page_vars.image_horizontal_filename;
-		}
-		if (PAGE.event.vk_image_url) {
-			page_vars.vk_image_url = PAGE.event.vk_image_url;
-			page_vars.vk_image_filename = PAGE.event.vk_image_url.split('/').reverse()[0];
 		}
 		
 		page_vars = $.extend(true, {}, PAGE.event, page_vars);
@@ -809,13 +638,6 @@ RedactEventPage.prototype.render = function() {
 				$button.data('crop_data', crop_data);
 			});
 		}
-		if (page_vars.vk_image_url) {
-			toDataUrl(page_vars.vk_image_url, function(base64_string) {
-				PAGE.$wrapper.find('#edit_event_vk_image_src').val(base64_string ? base64_string : null);
-			});
-		} else {
-			PAGE.toggleVkImg();
-		}
 		
 		if (!PAGE.event.is_free) {
 			PAGE.$wrapper.find('#edit_event_free').prop('checked', false).trigger('change');
@@ -825,6 +647,5 @@ RedactEventPage.prototype.render = function() {
 			PAGE.$wrapper.find('#edit_event_registration_required').prop('checked', true).trigger('change');
 		}
 		PAGE.$wrapper.find('#edit_event_delayed_publication').toggleStatus('disabled');
-		PAGE.formatVKPost();
 	}
 };

@@ -541,48 +541,6 @@
 				</div>
 			</div>
 
-
-			<div class="form_unit">
-				<input id="edit_event_to_public_vk" class="form_checkbox" type="checkbox" name="to_post_vk" tabindex="-1">
-				<label class="form_label" for="edit_event_to_public_vk"><span>Опубликовать Вконтакте</span></label>
-			</div>
-			<div id="edit_event_vk_publication" class="collapsing_wrapper">
-				<div class="collapsing_content">
-					<div class="EditEventVkGroup">
-						<h4 class="form_label"><label for="edit_event_vk_groups">Сообщество</label></h4>
-						<div class="form_unit -status_disabled">
-							<select id="edit_event_vk_groups" class="form_select2 ToSelect2" name="vk_group" disabled></select>
-						</div>
-					</div>
-					<h4 class="form_label"><label for="edit_event_description">Пост</label></h4>
-					<div class="form_unit -status_disabled">
-						<textarea id="edit_event_vk_post" class="form_textarea" name="vk_post" placeholder="" disabled style="height: 10em"></textarea>
-					</div>
-					<div class="form_group EditEventImgLoadWrap ImgLoadWrap -parts_2_3">
-						<div class="form_unit -status_disabled">
-							<div class="edit_event_vk_img">
-								<input id="edit_event_vk_image_src" class="DataUrl" type="hidden" name="vk_image_src" value="{vk_image_base64}" disabled>
-								<input id="edit_event_vk_image_filename" class="FileName" type="hidden" name="vk_image_filename" value="{vk_image_filename}" disabled>
-								<div class="edit_event_vk_img_preview"><img class="EditEventImgPreview ImgPreview" src="{vk_image_url}"></div>
-								<footer class="edit_event_vk_img_footer form_group -parts_e_2">
-									<div class="form_unit -status_disabled"><button class="action DeleteImg -color_error" type="button">Удалить</button></div>
-									<div class="form_unit -status_disabled" align="right">
-										<button class="action CallModal -color_primary" type="button" data-modal_type="cropper" data-source_img="{vk_image_url}" data-aspect_ratio="16/9">
-											<span class="Text">Кадрировать</span>
-										</button>
-									</div>
-								</footer>
-							</div>
-						</div>
-						<div class="edit_event_vk_right_block form_unit -status_disabled -centering">
-							<button class="button -color_neutral_primary FileLoadButton RippleEffect" type="button"><input class="LoadImg -hidden" type="file" accept="image/*"><span class="Text">Изменить</span></button>
-						</div>
-					</div>
-				</div>
-
-
-			</div>
-
 			<div class="form_unit -align_center">
 				<button id="edit_event_submit" class="button RippleEffect -color_accent" type="button">{button_text}</button>
 			</div>
