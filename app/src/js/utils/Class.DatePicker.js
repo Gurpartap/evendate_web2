@@ -20,7 +20,7 @@ function DatePicker($datepicker, options){
 		case ($datepicker instanceof jQuery): {
 			$.extend(true, this.options, options, $datepicker.data());
 			this.$datepicker = $datepicker;
-			this.$datepicker_modal = {};
+			this.$datepicker_modal = tmpl('datepicker', {});
 			this.$input = $datepicker.is('input') ? $datepicker : $datepicker.find('input');
 			this.calendar = {};
 			this.prev_selected_day = (typeof this.options.selected_day !== 'undefined') ? this.options.selected_day : '';
@@ -59,10 +59,15 @@ DatePicker.prototype.bindOpener = function(){
 
 
 DatePicker.prototype.openDialog = function(){
-	var self = this;
-
-	this.$datepicker.after(tmpl('datepicker', {}));
-	this.$datepicker_modal = this.$datepicker.siblings('.date_picker');
+	var self = this,
+		datepicker_position = this.$datepicker.offset();
+	
+	$('body').after(this.$datepicker_modal);
+	this.$datepicker_modal.css({
+		top: datepicker_position.top + this.$datepicker.outerHeight() + 2,
+		left: datepicker_position.left + this.$datepicker.width() - this.$datepicker_modal.width(),
+		maxWidth: this.$datepicker.width()
+	});
 	this.calendar = new Calendar(this.$datepicker_modal.children('.DatePickerCalendar'), {
 		min_date: this.options.min_date,
 		max_date: this.options.max_date
@@ -117,7 +122,7 @@ DatePicker.prototype.checkOnKeyDown = function(e){
 
 DatePicker.prototype.destroy = function(){
 	$(document).off('click.checkOnClick').off('keydown.checkOnKeyDown');
-	this.$datepicker_modal.remove();
+	this.$datepicker_modal.detach();
 	delete this.calendar;
 	this.bindOpener().$datepicker.data('datepicker', '');
 	return this;
