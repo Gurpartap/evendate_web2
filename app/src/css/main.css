@@ -177,15 +177,16 @@ hr[title]:before {
 
 .collapsing_wrapper {
 	height: 0;
+	overflow: hidden;
+}
+
+.collapsing_wrapper.-inset {
 	background-color: #f9f9fa;
 	background-color: var(--color_background_lighter);
 	box-shadow: inset 0 5px 3px -3px #ccc, inset 0 -5px 3px -3px #ccc;
-	overflow: hidden;
-	-webkit-transition: height .3s ease;
-	-moz-transition: height .3s ease;
-	-o-transition: height .3s ease;
-	transition: height .3s ease;
 }
+.collapsing_wrapper.-inset,
+.collapsing_wrapper.-fading {transition: height .3s ease}
 
 .collapsing_wrapper.-fading:after {
 	content: "";
@@ -194,26 +195,14 @@ hr[title]:before {
 	left: 0;
 	right: 0;
 	height: 100%;
-	background-image: -webkit-linear-gradient(top, hsla(0,0%,100%,0), #fff);
-	background-image: -moz-linear-gradient(top, hsla(0,0%,100%,0), #fff);
-	background-image: -ms-linear-gradient(top, hsla(0,0%,100%,0), #fff);
-	background-image: -o-linear-gradient(top, hsla(0,0%,100%,0), #fff);
 	background-image: linear-gradient(to bottom, hsla(0,0%,100%,0), #fff);
-	-webkit-transition: height .3s ease;
-	-moz-transition: height .3s ease;
-	-o-transition: height .3s ease;
 	transition: height .3s ease;
 	cursor: pointer;
 }
 
 .collapsing_wrapper.-fading.-opened:after {height: 0}
 
-.collapsing_wrapper.-fading {
-	background-color: transparent;
-	box-shadow: none;
-}
-
-:not(.-fading) > .collapsing_content {border: 1px solid transparent}
+.collapsing_wrapper.-inset > .collapsing_content {border: 1px solid transparent}
 
 .collapsing_button {
 	width: 100%;
@@ -222,9 +211,6 @@ hr[title]:before {
 	border: 0;
 	background-color: transparent;
 	text-align: center;
-	-webkit-transition: -webkit-transform .3s ease;
-	-moz-transition: -moz-transform .3s ease;
-	-o-transition: -o-transform .3s ease;
 	transition: transform .3s ease;
 }
 .collapsing_button:hover,
@@ -241,77 +227,112 @@ hr[title]:before {
 /* /Collapsing wrapper */
 /* Typography */
 
-h1, h2, h3, h4 {font-weight: 500}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {margin: 1.5em 0 1em}
+
+h1,
+h2,
+h3 {font-weight: bold}
+
+h4,
+h5,
+h6 {font-weight: 500}
+
+h2,
+h3,
+h4,
+h5 {letter-spacing: 0.2px}
 
 h1 {
-	font-size: 2.2rem;
-	margin: 1.5rem 0 .8rem;
+	font-size: 1.75rem;
+	letter-spacing: 0.3px;
 }
 
-h2 {
-	font-size: 1.9rem;
-	margin: 1.8rem 0 .6rem;
+h2 {font-size: 1.5rem}
+h3 {font-size: 1.125rem}
+h4 {font-size: 1.25rem}
+h5 {font-size: 1rem}
+h6 {
+	font-size: 0.875rem;
+	letter-spacing: 0.1px;
 }
 
-h3 {
-	font-size: 1.6rem;
-	margin: 1.4rem 0 .5rem;
-}
-h4 {
-	font-size: 1.1rem;
-	margin: 2.5em 0 .8em;
+p,
+.text {
+	margin-bottom: .4em;
+	font-size: 0.875rem;
+	font-weight: normal;
+	line-height: 1.43;
+	letter-spacing: 0.1px;
 }
 
-p {margin-bottom: .4rem}
+small,
+.text.-mini {
+	font-size: 0.8125rem;
+	line-height: normal;
+}
 
 label {font-weight: inherit}
 
 
 
-p.-color_default,
-p.-color_neutral,
-small.-color_default,
-small.-color_neutral,
-label.-color_default,
-label.-color_neutral {color: #fff; color: var(--color_page);}
+p.-text_color_default,
+p.-text_color_neutral,
+span.-text_color_default,
+span.-text_color_neutral,
+small.-text_color_default,
+small.-text_color_neutral,
+label.-text_color_default,
+label.-text_color_neutral {color: #fff; color: var(--color_page);}
 
-p.-color_primary,
-small.-color_primary,
-label.-color_primary {color: #3e4d66; color: var(--color_primary);}
+p.-text_color_primary,
+span.-text_color_primary,
+small.-text_color_primary,
+label.-text_color_primary {color: #3e4d66; color: var(--color_primary);}
 
-p.-color_bubblegum,
-small.-color_bubblegum,
-label.-color_bubblegum,
-:not(.-state_statistics) p.-color_accent,
-:not(.-state_statistics) small.-color_accent,
-:not(.-state_statistics) label.-color_accent {color: #f82969; color: var(--color_accent);}
+p.-text_color_bubblegum,
+small.-text_color_bubblegum,
+label.-text_color_bubblegum,
+:not(.-state_statistics) p.-text_color_accent,
+:not(.-state_statistics) span.-text_color_accent,
+:not(.-state_statistics) small.-text_color_accent,
+:not(.-state_statistics) label.-text_color_accent {color: #f82969; color: var(--color_accent);}
 
-p.-color_bubblegum_alt,
-small.-color_bubblegum_alt,
-label.-color_bubblegum_alt,
-:not(.-state_statistics) p.-color_accent_alt,
-:not(.-state_statistics) small.-color_accent_alt,
-:not(.-state_statistics) label.-color_accent_alt {color: #ff5f9e; color: var(--color_accent_alt);}
+p.-text_color_bubblegum_alt,
+small.-text_color_bubblegum_alt,
+label.-text_color_bubblegum_alt,
+:not(.-state_statistics) p.-text_color_accent_alt,
+:not(.-state_statistics) span.-text_color_accent_alt,
+:not(.-state_statistics) small.-text_color_accent_alt,
+:not(.-state_statistics) label.-text_color_accent_alt {color: #ff5f9e; color: var(--color_accent_alt);}
 
-p.-color_franklin,
-small.-color_franklin,
-label.-color_franklin,
-.-state_statistics p.-color_accent,
-.-state_statistics small.-color_accent,
-.-state_statistics label.-color_accent {color: #28be84}
+p.-text_color_franklin,
+small.-text_color_franklin,
+label.-text_color_franklin,
+.-state_statistics p.-text_color_accent,
+.-state_statistics span.-text_color_accent,
+.-state_statistics small.-text_color_accent,
+.-state_statistics label.-text_color_accent {color: #28be84}
 
-p.-color_franklin_alt,
-small.-color_franklin_alt,
-label.-color_franklin_alt,
-.-state_statistics p.-color_accent_alt,
-.-state_statistics small.-color_accent_alt,
-.-state_statistics label.-color_accent_alt {color: #23d792}
+p.-text_color_franklin_alt,
+small.-text_color_franklin_alt,
+label.-text_color_franklin_alt,
+.-state_statistics p.-text_color_accent_alt,
+.-state_statistics span.-text_color_accent_alt,
+.-state_statistics small.-text_color_accent_alt,
+.-state_statistics label.-text_color_accent_alt {color: #23d792}
 
-p.-color_marginal,
-small.-color_marginal,
-label.-color_marginal {color: #9fa6b3; color: var(--color_primary_50);}
+p.-text_color_marginal,
+span.-text_color_marginal,
+small.-text_color_marginal,
+label.-text_color_marginal {color: #9fa6b3; color: var(--color_primary_50);}
 
 p.-transform_uppercase,
+span.-transform_uppercase,
 small.-transform_uppercase,
 label.-transform_uppercase {text-transform: uppercase}
 
@@ -323,9 +344,11 @@ input, select, textarea, button {font-family: inherit}
 
 .form {margin: 0 auto}
 
-.form_unit {
-	margin-bottom: .875rem;
-	font-size: 1rem;
+.form_unit {margin-bottom: .875rem}
+
+.form_accent_block {
+	font-size: 1.5em;
+	margin: 1.5em 0;
 }
 
 .form_unit:only-child {margin: 0}
@@ -344,15 +367,19 @@ input, select, textarea, button {font-family: inherit}
 
 .form_label:not(h1):not(h2):not(h3):not(h4):not(h5):not(h6) {
 	margin: 0 0 .5em;
-	font-size: .9rem;
+	font-size: .9em;
 	text-align: left;
 }
 
 .form_label > label {margin-bottom: 0}
 
+.form_text {
+	font-size: 14px;
+	line-height: 20px;
+}
 
 .form_prompt {
-	font-size: .9rem;
+	font-size: .9em;
 	text-align: right;
 	margin: .2em 0 0;
 }
@@ -452,10 +479,10 @@ input, select, textarea, button {font-family: inherit}
 	display: block;
 	width: 100%;
 	border-radius: 2px;
-	font-size: .9rem;
+	font-size: .9em;
 }
 .form_select2 > .select2-choice {
-	height: 2.2rem;
+	height: 2.2em;
 	padding: 0;
 	background-color: #fff;
 	background-color: var(--color_page);
@@ -467,8 +494,8 @@ input, select, textarea, button {font-family: inherit}
 .form_select2.select2-dropdown-open > .select2-choice {border-radius: 3px 3px 0 0}
 
 .form_select2.select2-container > .select2-choice > .select2-chosen {
-	line-height: 2.2rem;
-	padding-left: 0.6rem;
+	line-height: 2.2em;
+	padding-left: 0.6em;
 }
 .form_select2.select2-container.select2-container-disabled > .select2-choice {
 	border-color: #ddd;
@@ -572,7 +599,6 @@ input, select, textarea, button {font-family: inherit}
 .form_radio + .form_label,
 .form_checkbox + .form_label {
 	display: block;
-	font-size: 0;
 	white-space: nowrap;
 	cursor: pointer;
 }
@@ -583,7 +609,7 @@ input, select, textarea, button {font-family: inherit}
 	vertical-align: middle;
 	width: calc(100% - 20px - 10px);
 	margin-left: 10px;
-	font-size: .9rem;
+	font-size: .9em;
 	line-height: 1;
 	text-align: left;
 	white-space: normal;
@@ -664,8 +690,6 @@ input, select, textarea, button {font-family: inherit}
 /* /Form Radio & Checkbox */
 /* Form -inline */
 
-.form_unit.-inline {font-size: 0}
-
 .-inline > .form_label,
 .-inline > .form_unit,
 .-inline > .form_group,
@@ -696,10 +720,7 @@ input, select, textarea, button {font-family: inherit}
 /* /Form -inline */
 /* /Form group */
 
-.form_group {
-	margin-bottom: .875rem;
-	font-size: 0;
-}
+.form_group {margin-bottom: .875em}
 .form_group > .form_unit {
 	display: inline-block;
 	vertical-align: top;
@@ -739,7 +760,7 @@ input, select, textarea, button {font-family: inherit}
 .form_group.-parts_1_3 > .form_unit:nth-child(n+3),
 .form_group.-parts_3_1 > .form_unit:nth-child(n+3),
 .form_group.-parts_2_3 > .form_unit:nth-child(n+3),
-.form_group.-parts_3_2 > .form_unit:nth-child(n+3) {margin-top: .875rem}
+.form_group.-parts_3_2 > .form_unit:nth-child(n+3) {margin-top: .875em}
 
 
 .form_group.-parts_e_2 > .form_unit.-offset_1,
@@ -845,7 +866,7 @@ input, select, textarea, button {font-family: inherit}
 .form_group.-parts_2_2_1 > .form_unit:nth-child(n+4),
 .form_group.-parts_1_1_3 > .form_unit:nth-child(n+4),
 .form_group.-parts_1_3_1 > .form_unit:nth-child(n+4),
-.form_group.-parts_3_1_1 > .form_unit:nth-child(n+4) {margin-top: .875rem}
+.form_group.-parts_3_1_1 > .form_unit:nth-child(n+4) {margin-top: .875em}
 
 
 
@@ -902,7 +923,7 @@ input, select, textarea, button {font-family: inherit}
 .form_group.-parts_1_1_1_2 > .form_unit:nth-child(n+5),
 .form_group.-parts_1_1_2_1 > .form_unit:nth-child(n+5),
 .form_group.-parts_1_2_1_1 > .form_unit:nth-child(n+5),
-.form_group.-parts_2_1_1_1 > .form_unit:nth-child(n+5) {margin-top: .875rem}
+.form_group.-parts_2_1_1_1 > .form_unit:nth-child(n+5) {margin-top: .875em}
 
 
 
@@ -914,12 +935,12 @@ input, select, textarea, button {font-family: inherit}
 .form_group.-parts_e_e_e_e_e > .form_unit:not(:nth-child(5n+1)) {margin-left: 1%}
 
 .form_group.-parts_e_5       > .form_unit:nth-child(n+6),
-.form_group.-parts_e_e_e_e_e > .form_unit:nth-child(n+6) {margin-top: .875rem}
+.form_group.-parts_e_e_e_e_e > .form_unit:nth-child(n+6) {margin-top: .875em}
 
 
 
 .form_group > .form_unit > .form_radio + .form_label,
-.form_group > .form_unit > .form_checkbox + .form_label {margin: 7px 0 }
+.form_group > .form_unit > .form_checkbox + .form_label {margin: 7px 0}
 
 
 .form_group.-time_input > .form_unit {
@@ -931,7 +952,6 @@ input, select, textarea, button {font-family: inherit}
 	display: inline-block;
 	vertical-align: middle;
 	margin: 0.3em;
-	font-size: 1rem;
 }
 
 /* /Form group */
@@ -3209,9 +3229,9 @@ body.-open_modal > .modal_wrapper {
 
 #edit_event_vk_publication,
 #edit_event_selected_days_wrapper {
-	width: -webkit-calc(100% + 60px);
-	width: calc(100% + 60px);
-	margin: 0 -30px;
+	width: -webkit-calc(100% + 72px);
+	width: calc(100% + 72px);
+	margin: 0 -36px;
 }
 #edit_event_vk_publication {margin-bottom: 20px}
 #edit_event_vk_publication > .collapsing_content {padding: 0 30px}
@@ -3997,6 +4017,12 @@ a.social_link.-color_facebook {color: #3b5998}
 }
 
 /* EDIT ORGANIZATION */
+
+.add_organization_page {
+	width: 700px;
+	margin: 40px 0;
+	padding: 15px 30px;
+}
 
 .add_organization_img_preview_background {
 	position: absolute;

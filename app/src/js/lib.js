@@ -92,6 +92,20 @@ Object.props = function(obj) {
 	return props;
 };
 /**
+ * Returns objects` own properties
+ * @param {object} obj
+ * @return {object}
+ */
+Object.getProps = function(obj) {
+	var props = {};
+	$.each(obj, function(key, value) {
+		if (typeof value !== 'function') {
+			props[key] = value;
+		}
+	});
+	return props;
+};
+/**
  * Returns array of objects` own methods
  * @param {object} obj
  * @return {Array}
@@ -354,8 +368,6 @@ $.fn.extend({
 			$this.closest('.form_unit').toggleStatus(statuses);
 		} else if ($this.length) {
 			$this.find('.form_unit').toggleStatus(statuses);
-		} else {
-			throw Error('Argument not found');
 		}
 		
 		return this;
@@ -810,70 +822,74 @@ var CollectionOfXHRs = extending(Array, (function(){
  */
 function tmpl(template_type, items, addTo, direction) {
 	items = items ? items : {};
+	var $tmpl = $('#tmpl-' + template_type),
+		wrapMap = {
+			thead: [ 1, "<table>", "</table>" ],
+			col: [ 2, "<table><colgroup>", "</colgroup></table>" ],
+			tr: [ 2, "<table><tbody>", "</tbody></table>" ],
+			td: [ 3, "<table><tbody><tr>", "</tr></tbody></table>" ],
+			_default: [ 1, "<div>", "</div>" ]
+		},
+		result = $(),
+		html_val;
 	
-	var wrapMap = {
-		thead: [ 1, "<table>", "</table>" ],
-		col: [ 2, "<table><colgroup>", "</colgroup></table>" ],
-		tr: [ 2, "<table><tbody>", "</tbody></table>" ],
-		td: [ 3, "<table><tbody><tr>", "</tr></tbody></table>" ],
-		_default: [ 1, "<div>", "</div>" ]
-	};
 	wrapMap.tbody = wrapMap.tfoot = wrapMap.colgroup = wrapMap.caption = wrapMap.thead;
 	wrapMap.th = wrapMap.td;
 	
-	var htmlEntities = function(str) {
-			return String(str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-		},
-		replaceTags = function(html, object) {
-			var jQuery_pairs = {},
-				keys = {},
-				wrap = wrapMap[ ( /<([\w:]+)/.exec( html ) || [ "", "" ] )[ 1 ].toLowerCase() ] || wrapMap._default,
-				j = wrap[ 0 ];
-			$.each(object, function(key, value) {
-				if ($.type(value) == 'string') {
-					keys[key] = htmlEntities(value);
-				} else if (value instanceof jQuery) {
-					if (value.length) {
-						jQuery_pairs[key] = value;
-						keys[key] = value.is('tr') ? '<tbody id="JQ_tmpl_' + key + '"></tbody>' : '<div id="JQ_tmpl_' + key + '"></div>';
-					}
-				} else if (value == null) {
-					keys[key] = '';
-				} else {
-					keys[key] = value;
-				}
-			});
-			
-			html = $(html ? wrap[ 1 ] + html.format(keys) + wrap[ 2 ] : '');
-			$.each(jQuery_pairs, function(key, value) {
-				html.find('#JQ_tmpl_' + key).append(value);
-				if(value.is('tr')){
-					value.parent('tbody').removeAttr('id');
-				} else {
-					value.unwrap();
-				}
-			});
-			while ( j-- ) {
-				html = html.children();
-			}
-			return html;
-		},
-		
-		result = $(),
-		html_val = $('#tmpl-' + template_type).html()
-			.replace(/(?:\/\*(?:[\s\S]*?)\*\/)|(?:([\s;])+\/\/(?:.*)$)/gim, '')// comments
-			.replace(/\\s{2,}|\t|\n|\r/gim, '')// spaces, tabs, new lines
-			.trim();
-	
-	if (html_val === undefined) {
+	if(!$tmpl.length) {
 		console.group('tmpl_error');
 		console.log('error in ' + template_type);
 		console.log('items', items);
 		console.log('addTo', addTo);
-		console.log('html_val', html_val);
 		console.log('inputs', {template_type: template_type, items: items, addTo: addTo, direction: direction});
 		console.groupEnd();
+		return $();
 	}
+	
+	function htmlEntities(str) {
+		return String(str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+	}
+	
+	function replaceTags(html, object) {
+		var jQuery_pairs = {},
+			keys = {},
+			wrap = wrapMap[ ( /<([\w:]+)/.exec( html ) || [ "", "" ] )[ 1 ].toLowerCase() ] || wrapMap._default,
+			j = wrap[ 0 ];
+		$.each(object, function(key, value) {
+			if ($.type(value) == 'string') {
+				keys[key] = htmlEntities(value);
+			} else if (value instanceof jQuery) {
+				if (value.length) {
+					jQuery_pairs[key] = value;
+					keys[key] = value.is('tr') ? '<tbody id="JQ_tmpl_' + key + '"></tbody>' : '<div id="JQ_tmpl_' + key + '"></div>';
+				}
+			} else if (value == null) {
+				keys[key] = '';
+			} else {
+				keys[key] = value;
+			}
+		});
+		
+		html = $(html ? wrap[ 1 ] + html.format(keys) + wrap[ 2 ] : '');
+		$.each(jQuery_pairs, function(key, value) {
+			html.find('#JQ_tmpl_' + key).append(value);
+			if(value.is('tr')){
+				value.parent('tbody').removeAttr('id');
+			} else {
+				value.unwrap();
+			}
+		});
+		while ( j-- ) {
+			html = html.children();
+		}
+		return html;
+	}
+	
+	html_val = $tmpl.html()
+		.replace(/(?:\/\*(?:[\s\S]*?)\*\/)|(?:([\s;])+\/\/(?:.*)$)/gim, '')// comments
+		.replace(/\\s{2,}|\t|\n|\r/gim, '')// spaces, tabs, new lines
+		.trim();
+	
 	if (Array.isArray(items)) {
 		result = $.makeSet(items.map(function(item) {
 			return replaceTags(html_val, item);
@@ -1325,12 +1341,19 @@ function bindTabs($parent) {
 		var $this = $(elem),
 			tabs_id = $this.data('tabs_id'),
 			mutation_observer = new MutationObserver(function(records) {
-				var $wrapper;
+				var $wrappers,
+					$target;
 				records.forEach(function(record){
-					$wrapper = $(record.target).closest('.TabsBody');
-					if($wrapper.hasClass(__C.CLASSES.NEW_ACTIVE)) {
-						$wrapper.parent().height($wrapper.outerHeight());
-					}
+					$target = $(record.target);
+					$wrappers = $target.parents('.TabsBody');
+					$wrappers = $target.hasClass('TabsBody') ? $wrappers.add($target) : $wrappers;
+					$wrappers.each(function(i, wrapper) {
+						var $wrapper = $(wrapper);
+						if($wrapper.hasClass(__C.CLASSES.NEW_ACTIVE)) {
+							$this.addClass('-in_progress');
+							$wrapper.parent().height($wrapper.outerHeight());
+						}
+					});
 				});
 			}),
 			$bodies_wrapper,
@@ -1388,6 +1411,10 @@ function bindTabs($parent) {
 		}
 		$bodies.removeClass(__C.CLASSES.NEW_ACTIVE).eq($this.currentTabsIndex).addClass(__C.CLASSES.NEW_ACTIVE);
 		$bodies_wrapper.height($bodies.filter('.'+__C.CLASSES.NEW_ACTIVE).outerHeight());
+		$bodies_wrapper.on('transitionend webkitTransitionEnd', function() {
+			$this.removeClass('-in_progress');
+			$this.trigger('progress_end')
+		});
 		$bodies.each(function(i, body) {
 			mutation_observer.observe(body, {
 				childList: true,
@@ -1526,31 +1553,102 @@ function bindFileLoadButton($parent) {
 
 function bindCollapsing($parent) {
 	$parent = $parent ? $parent : $('body');
-	$parent.find('.CollapsingButton').each(function() {
-		var $button = $(this),
-			$wrapper = $button.siblings('.CollapsingWrapper'),
-			$content = $wrapper.children(),
-			default_height = $wrapper.data('defaultHeight') < $content.height() ? $wrapper.data('defaultHeight') : $content.height();
+	$parent.find('.Collapsing').not('.-Handled_Collapsing').each(function() {
+		var $instance = $(this),
+			collapsing_id = $instance.data('collapsing_id'),
+			mutation_observer = new MutationObserver(function(records) {
+				var $contents,
+					$target;
+				records.forEach(function(record){
+					$target = $(record.target);
+					$contents = $target.parents('.CollapsingContent');
+					$contents = $target.hasClass('CollapsingContent') ? $contents.add($target) : $contents;
+					$contents.each(function(i, content) {
+						var $content = $(content),
+							$wrapper = $content.parent();
+						if ($wrapper.hasClass('-opened')) {
+							$wrapper.addClass('-in_progress').height($content.outerHeight());
+						}
+					});
+				});
+			}),
+			default_height,
+			$wrapper,
+			$content,
+			$trigger,
+			trigger_event;
 		
-		function toggleCollapsing() {
-			if ($wrapper.hasClass('-opened')) {
+		if(collapsing_id){
+			$wrapper = $instance.find('.CollapsingWrapper[data-collapsing_id="'+collapsing_id+'"]');
+			$trigger = $instance.find('.CollapsingTrigger[data-collapsing_id="'+collapsing_id+'"]');
+		} else {
+			$wrapper = $instance.find('.CollapsingWrapper:first');
+			$trigger = $instance.find('.CollapsingTrigger:first');
+		}
+		$content = $wrapper.children('.CollapsingContent');
+		trigger_event = $trigger.is(':checkbox') || $trigger.is(':radio') ? 'change' : 'click';
+		
+		if($wrapper.hasClass('-fading')){
+			default_height = $instance.data('defaultHeight') < $content.height() ? $instance.data('defaultHeight') : $content.height();
+			if (!$instance.hasClass(__C.CLASSES.NEW_ACTIVE) && $wrapper.height() < default_height) {
 				$wrapper.height(default_height);
-				$wrapper.on('click.toggleCollapsing', toggleCollapsing);
+			}
+		} else {
+			default_height = $instance.data('defaultHeight') ? $instance.data('defaultHeight') : 0;
+		}
+		
+		function toggleCollapsing(){
+			$wrapper.addClass('-in_progress');
+			if ($instance.hasClass(__C.CLASSES.NEW_ACTIVE)) {
+				$wrapper.height(default_height);
 			} else {
 				$wrapper.height($content.outerHeight());
-				$wrapper.off('click.toggleCollapsing');
 			}
 			$wrapper.toggleClass('-opened');
+			$instance.toggleClass(__C.CLASSES.NEW_ACTIVE);
 		}
 		
-		if (!$wrapper.hasClass('-opened')) {
-			$wrapper.on('click.toggleCollapsing', toggleCollapsing);
-			if ($wrapper.height() < default_height) {
-				$wrapper.height(default_height);
+		function changeProp(){
+			if (trigger_event === 'change') {
+				$trigger.prop('checked', !$trigger.prop('checked'));
 			}
 		}
-		$button.on('click.toggleCollapsing', toggleCollapsing);
-	})
+		
+		$instance.openCollapsing = function() {
+			if(!$instance.hasClass(__C.CLASSES.NEW_ACTIVE)){
+				changeProp();
+				toggleCollapsing();
+			}
+		};
+		
+		$instance.closeCollapsing = function() {
+			if($instance.hasClass(__C.CLASSES.NEW_ACTIVE)){
+				changeProp();
+				toggleCollapsing();
+			}
+		};
+		
+		$trigger.on(trigger_event+'.toggleCollapsing', function() {
+			toggleCollapsing();
+		});
+		
+		$wrapper
+			.on('click', function(){
+				$instance.openCollapsing();
+			})
+			.on('transitionend webkitTransitionEnd', function() {
+				$wrapper.removeClass('-in_progress');
+			});
+		
+		mutation_observer.observe($wrapper.get(0), {
+			childList: true,
+			subtree: true,
+			attributes: true,
+			attributeFilter: ['class']
+		});
+		
+		$instance.data('instance', $instance);
+	}).addClass('Handled_Collapsing');
 }
 
 function bindPageLinks($parent) {
@@ -1567,15 +1665,15 @@ function bindPageLinks($parent) {
 
 /**
  * Changes form unit`s state to error
- * @param {jQuery} $unit
+ * @param {jQuery|Element} $unit
  */
 function handleErrorField($unit) {
 	if (!$unit instanceof jQuery) {
 		handleErrorField($($unit));
-	} else if (!$unit.is('.form_unit')) {
+	} else if (!$unit.is('.form_unit') && $unit.closest('.form_unit').length) {
 		handleErrorField($unit.closest('.form_unit'));
 	} else {
-		if (!$unit.closest('form_unit').hasClass('-status_error')) {
+		if (!$unit.closest('.form_unit').hasClass('-status_error')) {
 			var $input = $unit.find('input, select, textarea');
 			$unit
 				.toggleStatus('error')
@@ -1587,7 +1685,7 @@ function handleErrorField($unit) {
 			$input
 				.off('blur.clear_error')
 				.one('blur.clear_error', function() {
-					if ($(this).val() !== "") {
+					if ($(this).val().trim() !== '') {
 						$unit.trigger('input.clear_error');
 					}
 				});

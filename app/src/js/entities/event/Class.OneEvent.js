@@ -36,6 +36,7 @@ function OneEvent(event_id, is_loading_continuous) {
 	this.favored = new UsersCollection();
 	this.favored_users_count = 0;
 	this.is_favorite = false;
+	this.public_at = null;
 	this.canceled = false;
 	this.loading = false;
 	

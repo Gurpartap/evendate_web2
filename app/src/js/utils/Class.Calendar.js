@@ -1,3 +1,9 @@
+/**
+ *
+ * @param {jQuery} $calendar
+ * @param {object} options
+ * @constructor
+ */
 function Calendar($calendar, options){
 	this.options = {
 		classes: {
@@ -28,45 +34,53 @@ function Calendar($calendar, options){
 		locale: 'ru',
 		labels: {}
 	};
-	switch(true){
-		case ($calendar instanceof Element):
-		case (typeof $calendar == "string"): {
-			$calendar = $($calendar);
-			if($calendar.length === 0)
-				throw new Error("Такого элемента не существует");
-			else if($calendar.length > 1)
-				throw new Error("Элементов с заданным аргументов найдено несколько");
+	
+	if ($calendar instanceof Element || typeof $calendar == "string") {
+		$calendar = $($calendar);
+		if($calendar.length === 0)
+			throw new Error("Такого элемента не существует");
+		else if($calendar.length > 1)
+			throw new Error("Элементов с заданным аргументов найдено несколько");
+	}
+	if ($calendar instanceof jQuery) {
+		$.extend(true, this.options, options, $calendar.data());
+		if(this.options.min_date !== false && this.options.max_date !== false && moment(this.options.max_date).diff(this.options.min_date, 'days') <= 0){
+			this.options.max_date = false;
 		}
-		case ($calendar instanceof jQuery): {
-			$.extend(true, this.options, options, $calendar.data());
-			if(this.options.min_date !== false && this.options.max_date !== false && moment(this.options.max_date).diff(this.options.min_date, 'days') <= 0){
-				this.options.max_date = false;
-			}
-			if(this.options.weekday_selection === true || this.options.month_selection === true ) {
-				this.options.selection_type = Calendar.SELECTION_TYPES.MULTI;
-			}
-			this.selected_days = [];
-			this.selected_weeks = {};
-			this.selected_months = [];
-			this.last_action = '';
-			this.last_selected_days = '';
-			this.now_selected_day = '';
-			this.prev_selected_day = '';
-			this.formatted_days = {};
-			this.$calendar = $calendar;
-			this.current_month = moment(new Date());
-			this._today = moment(new Date());
-			break;
+		if(this.options.weekday_selection === true || this.options.month_selection === true ) {
+			this.options.selection_type = Calendar.SELECTION_TYPES.MULTI;
 		}
-		default: {
-			throw new TypeError("Аргумент должен быть экземпляром jQuery, элементом DOM, либо CSS селектором")
-		}
+		this.selected_days = [];
+		this.selected_weeks = {};
+		this.selected_months = [];
+		this.last_action = '';
+		this.last_selected_days = '';
+		this.now_selected_day = '';
+		this.prev_selected_day = '';
+		this.formatted_days = {};
+		this.$calendar = $calendar;
+		this.current_month = moment(new Date());
+		this._today = moment(new Date());
+	} else {
+		throw new TypeError("Аргумент должен быть экземпляром jQuery, элементом DOM, либо CSS селектором");
 	}
 }
 
 Calendar.SELECTION_TYPES = {
 	SINGLE: 'single',
 	MULTI: 'multi'
+};
+
+Calendar.prototype.flush = function(){
+	this.selected_days = [];
+	this.selected_weeks = {};
+	this.selected_months = [];
+	this.last_action = '';
+	this.last_selected_days = '';
+	this.now_selected_day = '';
+	this.prev_selected_day = '';
+	this.formatted_days = {};
+	this.destroyTable();
 };
 
 Calendar.prototype.setMonth = function(month, year){
@@ -468,10 +482,10 @@ Calendar.prototype.selectMonth = function(month){ // 0..11
 
 Calendar.prototype.bindMonthArrows = function(){
 	var self = this;
-	this.$calendar.find('.NextMonth').on('click', function(){
+	this.$calendar.find('.NextMonth').off('click.NextMonth').on('click.NextMonth', function(){
 		self.setMonth('next');
 	});
-	this.$calendar.find('.PrevMonth').on('click', function(){
+	this.$calendar.find('.PrevMonth').off('click.PrevMonth').on('click.PrevMonth', function(){
 		self.setMonth('prev');
 	});
 	return this;
@@ -601,6 +615,7 @@ Calendar.prototype.init = function(){
 		this.$calendar.addClass('-month_selection');
 	}
 	this.$calendar.data('calendar', this);
+	this.$calendar.data('instance', this);
 	this.$calendar.data('days', this.selected_days);
 	this.$calendar.data('options', this.options);
 	this

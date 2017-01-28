@@ -92,6 +92,20 @@ Object.props = function(obj) {
 	return props;
 };
 /**
+ * Returns objects` own properties
+ * @param {object} obj
+ * @return {object}
+ */
+Object.getProps = function(obj) {
+	var props = {};
+	$.each(obj, function(key, value) {
+		if (typeof value !== 'function') {
+			props[key] = value;
+		}
+	});
+	return props;
+};
+/**
  * Returns array of objects` own methods
  * @param {object} obj
  * @return {Array}
@@ -354,8 +368,6 @@ $.fn.extend({
 			$this.closest('.form_unit').toggleStatus(statuses);
 		} else if ($this.length) {
 			$this.find('.form_unit').toggleStatus(statuses);
-		} else {
-			throw Error('Argument not found');
 		}
 		
 		return this;
@@ -810,70 +822,74 @@ var CollectionOfXHRs = extending(Array, (function(){
  */
 function tmpl(template_type, items, addTo, direction) {
 	items = items ? items : {};
+	var $tmpl = $('#tmpl-' + template_type),
+		wrapMap = {
+			thead: [ 1, "<table>", "</table>" ],
+			col: [ 2, "<table><colgroup>", "</colgroup></table>" ],
+			tr: [ 2, "<table><tbody>", "</tbody></table>" ],
+			td: [ 3, "<table><tbody><tr>", "</tr></tbody></table>" ],
+			_default: [ 1, "<div>", "</div>" ]
+		},
+		result = $(),
+		html_val;
 	
-	var wrapMap = {
-		thead: [ 1, "<table>", "</table>" ],
-		col: [ 2, "<table><colgroup>", "</colgroup></table>" ],
-		tr: [ 2, "<table><tbody>", "</tbody></table>" ],
-		td: [ 3, "<table><tbody><tr>", "</tr></tbody></table>" ],
-		_default: [ 1, "<div>", "</div>" ]
-	};
 	wrapMap.tbody = wrapMap.tfoot = wrapMap.colgroup = wrapMap.caption = wrapMap.thead;
 	wrapMap.th = wrapMap.td;
 	
-	var htmlEntities = function(str) {
-			return String(str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-		},
-		replaceTags = function(html, object) {
-			var jQuery_pairs = {},
-				keys = {},
-				wrap = wrapMap[ ( /<([\w:]+)/.exec( html ) || [ "", "" ] )[ 1 ].toLowerCase() ] || wrapMap._default,
-				j = wrap[ 0 ];
-			$.each(object, function(key, value) {
-				if ($.type(value) == 'string') {
-					keys[key] = htmlEntities(value);
-				} else if (value instanceof jQuery) {
-					if (value.length) {
-						jQuery_pairs[key] = value;
-						keys[key] = value.is('tr') ? '<tbody id="JQ_tmpl_' + key + '"></tbody>' : '<div id="JQ_tmpl_' + key + '"></div>';
-					}
-				} else if (value == null) {
-					keys[key] = '';
-				} else {
-					keys[key] = value;
-				}
-			});
-			
-			html = $(html ? wrap[ 1 ] + html.format(keys) + wrap[ 2 ] : '');
-			$.each(jQuery_pairs, function(key, value) {
-				html.find('#JQ_tmpl_' + key).append(value);
-				if(value.is('tr')){
-					value.parent('tbody').removeAttr('id');
-				} else {
-					value.unwrap();
-				}
-			});
-			while ( j-- ) {
-				html = html.children();
-			}
-			return html;
-		},
-		
-		result = $(),
-		html_val = $('#tmpl-' + template_type).html()
-			.replace(/(?:\/\*(?:[\s\S]*?)\*\/)|(?:([\s;])+\/\/(?:.*)$)/gim, '')// comments
-			.replace(/\\s{2,}|\t|\n|\r/gim, '')// spaces, tabs, new lines
-			.trim();
-	
-	if (html_val === undefined) {
+	if(!$tmpl.length) {
 		console.group('tmpl_error');
 		console.log('error in ' + template_type);
 		console.log('items', items);
 		console.log('addTo', addTo);
-		console.log('html_val', html_val);
 		console.log('inputs', {template_type: template_type, items: items, addTo: addTo, direction: direction});
 		console.groupEnd();
+		return $();
 	}
+	
+	function htmlEntities(str) {
+		return String(str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+	}
+	
+	function replaceTags(html, object) {
+		var jQuery_pairs = {},
+			keys = {},
+			wrap = wrapMap[ ( /<([\w:]+)/.exec( html ) || [ "", "" ] )[ 1 ].toLowerCase() ] || wrapMap._default,
+			j = wrap[ 0 ];
+		$.each(object, function(key, value) {
+			if ($.type(value) == 'string') {
+				keys[key] = htmlEntities(value);
+			} else if (value instanceof jQuery) {
+				if (value.length) {
+					jQuery_pairs[key] = value;
+					keys[key] = value.is('tr') ? '<tbody id="JQ_tmpl_' + key + '"></tbody>' : '<div id="JQ_tmpl_' + key + '"></div>';
+				}
+			} else if (value == null) {
+				keys[key] = '';
+			} else {
+				keys[key] = value;
+			}
+		});
+		
+		html = $(html ? wrap[ 1 ] + html.format(keys) + wrap[ 2 ] : '');
+		$.each(jQuery_pairs, function(key, value) {
+			html.find('#JQ_tmpl_' + key).append(value);
+			if(value.is('tr')){
+				value.parent('tbody').removeAttr('id');
+			} else {
+				value.unwrap();
+			}
+		});
+		while ( j-- ) {
+			html = html.children();
+		}
+		return html;
+	}
+	
+	html_val = $tmpl.html()
+		.replace(/(?:\/\*(?:[\s\S]*?)\*\/)|(?:([\s;])+\/\/(?:.*)$)/gim, '')// comments
+		.replace(/\\s{2,}|\t|\n|\r/gim, '')// spaces, tabs, new lines
+		.trim();
+	
 	if (Array.isArray(items)) {
 		result = $.makeSet(items.map(function(item) {
 			return replaceTags(html_val, item);
@@ -1325,12 +1341,19 @@ function bindTabs($parent) {
 		var $this = $(elem),
 			tabs_id = $this.data('tabs_id'),
 			mutation_observer = new MutationObserver(function(records) {
-				var $wrapper;
+				var $wrappers,
+					$target;
 				records.forEach(function(record){
-					$wrapper = $(record.target).closest('.TabsBody');
-					if($wrapper.hasClass(__C.CLASSES.NEW_ACTIVE)) {
-						$wrapper.parent().height($wrapper.outerHeight());
-					}
+					$target = $(record.target);
+					$wrappers = $target.parents('.TabsBody');
+					$wrappers = $target.hasClass('TabsBody') ? $wrappers.add($target) : $wrappers;
+					$wrappers.each(function(i, wrapper) {
+						var $wrapper = $(wrapper);
+						if($wrapper.hasClass(__C.CLASSES.NEW_ACTIVE)) {
+							$this.addClass('-in_progress');
+							$wrapper.parent().height($wrapper.outerHeight());
+						}
+					});
 				});
 			}),
 			$bodies_wrapper,
@@ -1388,6 +1411,10 @@ function bindTabs($parent) {
 		}
 		$bodies.removeClass(__C.CLASSES.NEW_ACTIVE).eq($this.currentTabsIndex).addClass(__C.CLASSES.NEW_ACTIVE);
 		$bodies_wrapper.height($bodies.filter('.'+__C.CLASSES.NEW_ACTIVE).outerHeight());
+		$bodies_wrapper.on('transitionend webkitTransitionEnd', function() {
+			$this.removeClass('-in_progress');
+			$this.trigger('progress_end')
+		});
 		$bodies.each(function(i, body) {
 			mutation_observer.observe(body, {
 				childList: true,
@@ -1526,31 +1553,102 @@ function bindFileLoadButton($parent) {
 
 function bindCollapsing($parent) {
 	$parent = $parent ? $parent : $('body');
-	$parent.find('.CollapsingButton').each(function() {
-		var $button = $(this),
-			$wrapper = $button.siblings('.CollapsingWrapper'),
-			$content = $wrapper.children(),
-			default_height = $wrapper.data('defaultHeight') < $content.height() ? $wrapper.data('defaultHeight') : $content.height();
+	$parent.find('.Collapsing').not('.-Handled_Collapsing').each(function() {
+		var $instance = $(this),
+			collapsing_id = $instance.data('collapsing_id'),
+			mutation_observer = new MutationObserver(function(records) {
+				var $contents,
+					$target;
+				records.forEach(function(record){
+					$target = $(record.target);
+					$contents = $target.parents('.CollapsingContent');
+					$contents = $target.hasClass('CollapsingContent') ? $contents.add($target) : $contents;
+					$contents.each(function(i, content) {
+						var $content = $(content),
+							$wrapper = $content.parent();
+						if ($wrapper.hasClass('-opened')) {
+							$wrapper.addClass('-in_progress').height($content.outerHeight());
+						}
+					});
+				});
+			}),
+			default_height,
+			$wrapper,
+			$content,
+			$trigger,
+			trigger_event;
 		
-		function toggleCollapsing() {
-			if ($wrapper.hasClass('-opened')) {
+		if(collapsing_id){
+			$wrapper = $instance.find('.CollapsingWrapper[data-collapsing_id="'+collapsing_id+'"]');
+			$trigger = $instance.find('.CollapsingTrigger[data-collapsing_id="'+collapsing_id+'"]');
+		} else {
+			$wrapper = $instance.find('.CollapsingWrapper:first');
+			$trigger = $instance.find('.CollapsingTrigger:first');
+		}
+		$content = $wrapper.children('.CollapsingContent');
+		trigger_event = $trigger.is(':checkbox') || $trigger.is(':radio') ? 'change' : 'click';
+		
+		if($wrapper.hasClass('-fading')){
+			default_height = $instance.data('defaultHeight') < $content.height() ? $instance.data('defaultHeight') : $content.height();
+			if (!$instance.hasClass(__C.CLASSES.NEW_ACTIVE) && $wrapper.height() < default_height) {
 				$wrapper.height(default_height);
-				$wrapper.on('click.toggleCollapsing', toggleCollapsing);
+			}
+		} else {
+			default_height = $instance.data('defaultHeight') ? $instance.data('defaultHeight') : 0;
+		}
+		
+		function toggleCollapsing(){
+			$wrapper.addClass('-in_progress');
+			if ($instance.hasClass(__C.CLASSES.NEW_ACTIVE)) {
+				$wrapper.height(default_height);
 			} else {
 				$wrapper.height($content.outerHeight());
-				$wrapper.off('click.toggleCollapsing');
 			}
 			$wrapper.toggleClass('-opened');
+			$instance.toggleClass(__C.CLASSES.NEW_ACTIVE);
 		}
 		
-		if (!$wrapper.hasClass('-opened')) {
-			$wrapper.on('click.toggleCollapsing', toggleCollapsing);
-			if ($wrapper.height() < default_height) {
-				$wrapper.height(default_height);
+		function changeProp(){
+			if (trigger_event === 'change') {
+				$trigger.prop('checked', !$trigger.prop('checked'));
 			}
 		}
-		$button.on('click.toggleCollapsing', toggleCollapsing);
-	})
+		
+		$instance.openCollapsing = function() {
+			if(!$instance.hasClass(__C.CLASSES.NEW_ACTIVE)){
+				changeProp();
+				toggleCollapsing();
+			}
+		};
+		
+		$instance.closeCollapsing = function() {
+			if($instance.hasClass(__C.CLASSES.NEW_ACTIVE)){
+				changeProp();
+				toggleCollapsing();
+			}
+		};
+		
+		$trigger.on(trigger_event+'.toggleCollapsing', function() {
+			toggleCollapsing();
+		});
+		
+		$wrapper
+			.on('click', function(){
+				$instance.openCollapsing();
+			})
+			.on('transitionend webkitTransitionEnd', function() {
+				$wrapper.removeClass('-in_progress');
+			});
+		
+		mutation_observer.observe($wrapper.get(0), {
+			childList: true,
+			subtree: true,
+			attributes: true,
+			attributeFilter: ['class']
+		});
+		
+		$instance.data('instance', $instance);
+	}).addClass('Handled_Collapsing');
 }
 
 function bindPageLinks($parent) {
@@ -1567,15 +1665,15 @@ function bindPageLinks($parent) {
 
 /**
  * Changes form unit`s state to error
- * @param {jQuery} $unit
+ * @param {jQuery|Element} $unit
  */
 function handleErrorField($unit) {
 	if (!$unit instanceof jQuery) {
 		handleErrorField($($unit));
-	} else if (!$unit.is('.form_unit')) {
+	} else if (!$unit.is('.form_unit') && $unit.closest('.form_unit').length) {
 		handleErrorField($unit.closest('.form_unit'));
 	} else {
-		if (!$unit.closest('form_unit').hasClass('-status_error')) {
+		if (!$unit.closest('.form_unit').hasClass('-status_error')) {
 			var $input = $unit.find('input, select, textarea');
 			$unit
 				.toggleStatus('error')
@@ -1587,7 +1685,7 @@ function handleErrorField($unit) {
 			$input
 				.off('blur.clear_error')
 				.one('blur.clear_error', function() {
-					if ($(this).val() !== "") {
+					if ($(this).val().trim() !== '') {
 						$unit.trigger('input.clear_error');
 					}
 				});
@@ -2500,6 +2598,7 @@ function OneEvent(event_id, is_loading_continuous) {
 	this.favored = new UsersCollection();
 	this.favored_users_count = 0;
 	this.is_favorite = false;
+	this.public_at = null;
 	this.canceled = false;
 	this.loading = false;
 	
@@ -4532,6 +4631,12 @@ UsersCollection.prototype.fetchOrganizationStaff = function(org_id, length, data
 		}
 	});
 };
+/**
+ *
+ * @param {jQuery} $calendar
+ * @param {object} options
+ * @constructor
+ */
 function Calendar($calendar, options){
 	this.options = {
 		classes: {
@@ -4562,45 +4667,53 @@ function Calendar($calendar, options){
 		locale: 'ru',
 		labels: {}
 	};
-	switch(true){
-		case ($calendar instanceof Element):
-		case (typeof $calendar == "string"): {
-			$calendar = $($calendar);
-			if($calendar.length === 0)
-				throw new Error("Такого элемента не существует");
-			else if($calendar.length > 1)
-				throw new Error("Элементов с заданным аргументов найдено несколько");
+	
+	if ($calendar instanceof Element || typeof $calendar == "string") {
+		$calendar = $($calendar);
+		if($calendar.length === 0)
+			throw new Error("Такого элемента не существует");
+		else if($calendar.length > 1)
+			throw new Error("Элементов с заданным аргументов найдено несколько");
+	}
+	if ($calendar instanceof jQuery) {
+		$.extend(true, this.options, options, $calendar.data());
+		if(this.options.min_date !== false && this.options.max_date !== false && moment(this.options.max_date).diff(this.options.min_date, 'days') <= 0){
+			this.options.max_date = false;
 		}
-		case ($calendar instanceof jQuery): {
-			$.extend(true, this.options, options, $calendar.data());
-			if(this.options.min_date !== false && this.options.max_date !== false && moment(this.options.max_date).diff(this.options.min_date, 'days') <= 0){
-				this.options.max_date = false;
-			}
-			if(this.options.weekday_selection === true || this.options.month_selection === true ) {
-				this.options.selection_type = Calendar.SELECTION_TYPES.MULTI;
-			}
-			this.selected_days = [];
-			this.selected_weeks = {};
-			this.selected_months = [];
-			this.last_action = '';
-			this.last_selected_days = '';
-			this.now_selected_day = '';
-			this.prev_selected_day = '';
-			this.formatted_days = {};
-			this.$calendar = $calendar;
-			this.current_month = moment(new Date());
-			this._today = moment(new Date());
-			break;
+		if(this.options.weekday_selection === true || this.options.month_selection === true ) {
+			this.options.selection_type = Calendar.SELECTION_TYPES.MULTI;
 		}
-		default: {
-			throw new TypeError("Аргумент должен быть экземпляром jQuery, элементом DOM, либо CSS селектором")
-		}
+		this.selected_days = [];
+		this.selected_weeks = {};
+		this.selected_months = [];
+		this.last_action = '';
+		this.last_selected_days = '';
+		this.now_selected_day = '';
+		this.prev_selected_day = '';
+		this.formatted_days = {};
+		this.$calendar = $calendar;
+		this.current_month = moment(new Date());
+		this._today = moment(new Date());
+	} else {
+		throw new TypeError("Аргумент должен быть экземпляром jQuery, элементом DOM, либо CSS селектором");
 	}
 }
 
 Calendar.SELECTION_TYPES = {
 	SINGLE: 'single',
 	MULTI: 'multi'
+};
+
+Calendar.prototype.flush = function(){
+	this.selected_days = [];
+	this.selected_weeks = {};
+	this.selected_months = [];
+	this.last_action = '';
+	this.last_selected_days = '';
+	this.now_selected_day = '';
+	this.prev_selected_day = '';
+	this.formatted_days = {};
+	this.destroyTable();
 };
 
 Calendar.prototype.setMonth = function(month, year){
@@ -5002,10 +5115,10 @@ Calendar.prototype.selectMonth = function(month){ // 0..11
 
 Calendar.prototype.bindMonthArrows = function(){
 	var self = this;
-	this.$calendar.find('.NextMonth').on('click', function(){
+	this.$calendar.find('.NextMonth').off('click.NextMonth').on('click.NextMonth', function(){
 		self.setMonth('next');
 	});
-	this.$calendar.find('.PrevMonth').on('click', function(){
+	this.$calendar.find('.PrevMonth').off('click.PrevMonth').on('click.PrevMonth', function(){
 		self.setMonth('prev');
 	});
 	return this;
@@ -5135,6 +5248,7 @@ Calendar.prototype.init = function(){
 		this.$calendar.addClass('-month_selection');
 	}
 	this.$calendar.data('calendar', this);
+	this.$calendar.data('instance', this);
 	this.$calendar.data('days', this.selected_days);
 	this.$calendar.data('options', this.options);
 	this
@@ -5153,38 +5267,54 @@ function DatePicker($datepicker, options){
 		labels: {}
 	};
 
-	switch(true){
-		case ($datepicker instanceof Element):
-		case (typeof $datepicker == 'string'): {
-			$datepicker = $($datepicker);
-			if($datepicker.length === 0)
-				throw new Error('Такого элемента не существует');
-			else if($datepicker.length > 1)
-				throw new Error('Элементов с заданным аргументов найдено несколько');
-		}
-		case ($datepicker instanceof jQuery): {
-			$.extend(true, this.options, options, $datepicker.data());
-			this.$datepicker = $datepicker;
-			this.$datepicker_modal = tmpl('datepicker', {});
-			this.$input = $datepicker.is('input') ? $datepicker : $datepicker.find('input');
-			this.calendar = {};
-			this.prev_selected_day = (typeof this.options.selected_day !== 'undefined') ? this.options.selected_day : '';
-			this.selected_day = (typeof this.options.selected_day !== 'undefined') ? this.options.selected_day : '';
-			this.formated_selected_day = this.selected_day.toString().split('-').reverse().join('.');
-			break;
-		}
-		default: {
-			throw new TypeError('Аргумент должен быть экземпляром jQuery, элементом DOM, либо CSS селектором')
-		}
+	if ($datepicker instanceof Element || typeof $datepicker == 'string') {
+		$datepicker = $($datepicker);
+		if($datepicker.length === 0)
+			throw new Error('Такого элемента не существует');
+		else if($datepicker.length > 1)
+			throw new Error('Элементов с заданным аргументов найдено несколько');
+	}
+	if ($datepicker instanceof jQuery) {
+		$.extend(true, this.options, options, $datepicker.data());
+		this.$datepicker = $datepicker;
+		this.$datepicker_modal = tmpl('datepicker', {});
+		this.$input = $datepicker.is('input') ? $datepicker : $datepicker.find('input');
+		this.calendar = new Calendar(this.$datepicker_modal.children('.DatePickerCalendar'), {
+			min_date: this.options.min_date,
+			max_date: this.options.max_date
+		});
+		this.prev_selected_day = (typeof this.options.selected_day !== 'undefined') ? this.options.selected_day : '';
+		this.selected_day = (typeof this.options.selected_day !== 'undefined') ? this.options.selected_day : '';
+		this.formated_selected_day = this.selected_day.toString().split('-').reverse().join('.');
+	} else {
+		throw new TypeError('Аргумент должен быть экземпляром jQuery, элементом DOM, либо CSS селектором');
 	}
 }
 
 
 DatePicker.prototype.init = function(){
+	var self = this;
 	this
 		.bindOpener()
-		.$datepicker.data('datepicker', this);
+		.$datepicker.data('datepicker', this)
+		.data('instance', this);
 	this.$datepicker.addClass('-unselectable -Handled_DatePicker');
+	
+	this.calendar.init().$calendar.on('days-changed', function(){
+		self.prev_selected_day = self.selected_day;
+		self.selected_day = self.calendar.selected_days.toString();
+		self.formated_selected_day = self.calendar.selected_days.toString().split('-').reverse().join('.');
+		if(!self.$datepicker.is('input')){
+			self.$datepicker.find('label').text(self.formated_selected_day);
+		}
+		self.$input.val(self.selected_day).trigger('change');
+		
+		if(self.options.close_on_pick){
+			self.closeDialog();
+		}
+		self.$datepicker.trigger('date-picked');
+	});
+	
 	return this;
 };
 
@@ -5204,8 +5334,7 @@ DatePicker.prototype.bindOpener = function(){
 
 
 DatePicker.prototype.openDialog = function(){
-	var self = this,
-		datepicker_position = this.$datepicker.offset();
+	var datepicker_position = this.$datepicker.offset();
 	
 	$('body').after(this.$datepicker_modal);
 	this.$datepicker_modal.css({
@@ -5213,25 +5342,7 @@ DatePicker.prototype.openDialog = function(){
 		left: datepicker_position.left + this.$datepicker.width() - this.$datepicker_modal.width(),
 		maxWidth: this.$datepicker.width()
 	});
-	this.calendar = new Calendar(this.$datepicker_modal.children('.DatePickerCalendar'), {
-		min_date: this.options.min_date,
-		max_date: this.options.max_date
-	});
-	this.calendar.init();
-	this.calendar.$calendar.on('days-changed', function(){
-		self.prev_selected_day = self.selected_day;
-		self.selected_day = self.calendar.selected_days.toString();
-		self.formated_selected_day = self.calendar.selected_days.toString().split('-').reverse().join('.');
-		if(!self.$datepicker.is('input')){
-			self.$datepicker.find('label').text(self.formated_selected_day);
-		}
-		self.$input.val(self.selected_day).trigger('change');
-
-		if(self.options.close_on_pick){
-			self.destroy();
-		}
-		self.$datepicker.trigger('date-picked');
-	});
+	this.calendar.renderTable();
 	this.bindCloseDialog();
 	return this;
 };
@@ -5242,34 +5353,34 @@ DatePicker.prototype.bindCloseDialog = function(){
 
 	$(document)
 		.off('click.checkOnClick')
-		.on('click.checkOnClick', function(e){self.checkOnClick(e)})
+		.on('click.checkOnClick', function(e){
+			var $this = $(e.target);
+			if(($this.closest(self.$datepicker_modal).length === 0 && $this.closest(self.$datepicker).length === 0) || $this.closest('.SubmitDatePicker').length){
+				self.closeDialog();
+			}
+		})
 		.off('keydown.checkOnKeyDown')
-		.on('keydown.checkOnKeyDown', function(e){self.checkOnKeyDown(e)});
+		.on('keydown.checkOnKeyDown', function(e){
+			if(e.keyCode === 9 || e.keyCode === 13 || e.keyCode === 27){
+				self.closeDialog();
+			}
+		});
 
-	//TODO: Click on another datepicker doesn't close current
+	//TODO: BUG. Click on another datepicker doesn't close current
 	return this;
 };
 
-DatePicker.prototype.checkOnClick = function(e){
-	var $this = $(e.target);
-	if(($this.closest(this.$datepicker_modal).length === 0 && $this.closest(this.$datepicker).length === 0) || $this.closest('.SubmitDatePicker').length){
-		this.destroy();
-	}
-};
-
-DatePicker.prototype.checkOnKeyDown = function(e){
-	var self = this;
-	if(e.keyCode === 9 || e.keyCode === 13 || e.keyCode === 27){
-		self.destroy();
-	}
+DatePicker.prototype.closeDialog = function() {
+	$(document).off('click.checkOnClick').off('keydown.checkOnKeyDown');
+	this.$datepicker_modal.detach();
+	this.calendar.flush();
+	this.bindOpener();
+	return this;
 };
 
 
 DatePicker.prototype.destroy = function(){
-	$(document).off('click.checkOnClick').off('keydown.checkOnKeyDown');
-	this.$datepicker_modal.detach();
-	delete this.calendar;
-	this.bindOpener().$datepicker.data('datepicker', '');
+	this.closeDialog().$datepicker.data('datepicker', '');
 	return this;
 };
 
@@ -7822,10 +7933,6 @@ function RedactEventPage(event_id) {
 	
 	this.fields = [
 		'image_horizontal_large_url',
-		'favored{fields:"is_friend",order_by:"-is_friend",length:10}',
-		'favored_users_count',
-		'is_favorite',
-		'notifications{fields:"notification_type,done"}',
 		'description',
 		'location',
 		'can_edit',
@@ -7839,6 +7946,7 @@ function RedactEventPage(event_id) {
 		'dates{length:0,fields:"start_time,end_time"}',
 		'tags',
 		'detail_info_url',
+		'public_at',
 		'canceled'
 	];
 	this.event = new OneEvent(event_id);
@@ -7889,6 +7997,14 @@ RedactEventPage.prototype.init = function() {
 	
 	function submitEditEvent() {
 		var $form = PAGE.$wrapper.find("#edit-event-form"),
+			/**
+			 * @type {Calendar} MainCalendar
+			 */
+			MainCalendar = PAGE.$wrapper.find('.EventDatesCalendar').resolveInstance(),
+			$event_tags = $form.find('input.EventTags'),
+			form_data = $form.serializeForm(),
+			is_edit = !!(PAGE.event.id),
+			is_form_valid,
 			data = {
 				event_id: null,
 				title: null,
@@ -7898,7 +8014,7 @@ RedactEventPage.prototype.init = function() {
 				description: null,
 				detail_info_url: null,
 				different_time: null,
-				dates: null,
+				dates: [],
 				tags: null,
 				registration_required: null,
 				registration_till: null,
@@ -7909,12 +8025,80 @@ RedactEventPage.prototype.init = function() {
 				filenames: {
 					horizontal: null
 				}
-			},
-			form_data = $form.serializeForm(),
-			tags = form_data.tags ? form_data.tags.split(',') : null,
-			is_edit = !!(PAGE.event.id),
-			is_form_valid = true,
-			$times = $form.find('#edit_event_different_time').prop('checked') ? $form.find('[class^="TableDay_"]') : $form.find('.MainTime');
+			};
+		
+		is_form_valid = (function validation($form, Calendar) {
+			var is_valid = true,
+				$times = $form.find('#edit_event_different_time').prop('checked') ? $form.find('[class^="TableDay_"]') : $form.find('.MainTime');
+			
+			function failSubmit($element, is_form_valid, error_message){
+				var $cut_tab,
+					$Tabs;
+				if(is_form_valid){
+					$cut_tab = $element.parents('.TabsBody:last');
+					$Tabs = $cut_tab.closest('.Tabs').resolveInstance();
+					$Tabs.setToTab($Tabs.find('.TabsBodyWrapper:first').children().index($cut_tab));
+					$('html').stop().animate({
+							scrollTop: Math.ceil($element.offset().top - 150)
+						}, {
+							duration: 400,
+							easing: 'swing',
+							complete: function() {
+								showNotifier({text: error_message, status: false});
+							}
+						}
+					);
+				}
+				handleErrorField($element);
+				return false;
+			}
+			
+			$form.find(':required').not(':disabled').each(function() {
+				var $this = $(this);
+				
+				if ($this.val().trim() === '') {
+					is_valid = failSubmit($this, is_valid, 'Заполните все обязательные поля');
+				} else if ($this.hasClass('LimitSize') && $this.val().trim().length > $this.data('maxlength')) {
+					is_valid = failSubmit($this, is_valid, 'Количество символов превышает установленное значение');
+				}
+			});
+			
+			if (!Calendar.selected_days.length) {
+				is_valid = failSubmit(Calendar.$calendar, is_valid, 'Выберите даты для события');
+			}
+			
+			$times.each(function() {
+				var $row = $(this),
+					$inputs = $row.find('.StartHours, .StartMinutes, .EndHours, .EndMinutes'),
+					start = $row.find('.StartHours').val().trim() + $row.find('.StartMinutes').val().trim(),
+					end = $row.find('.EndHours').val().trim() + $row.find('.EndMinutes').val().trim();
+				
+				$inputs.each(function() {
+					var $input = $(this);
+					if ($input.val().trim() === '') {
+						is_valid = failSubmit($input, is_valid, 'Заполните время события');
+					}
+				});
+				if (is_valid && start > end) {
+					is_valid = failSubmit($row, is_valid, 'Начальное время не может быть позже конечного');
+				}
+			});
+			
+			if ($event_tags.val().trim() === '') {
+				is_valid = failSubmit($event_tags.siblings('.EventTags'), is_valid, 'Необходимо выбрать хотя бы один тэг');
+			}
+			
+			if (!is_edit) {
+				$form.find('.DataUrl').each(function() {
+					var $this = $(this);
+					if ($this.val().trim() === "") {
+						is_valid = failSubmit($this.closest('.ImgLoadWrap'), is_valid, 'Пожалуйста, добавьте к событию обложку');
+					}
+				});
+			}
+			
+			return is_valid;
+		})($form, MainCalendar);
 		
 		function afterSubmit() {
 			__APP.changeState('/event/' + PAGE.event.id);
@@ -7924,49 +8108,12 @@ RedactEventPage.prototype.init = function() {
 			PAGE.$wrapper.removeClass('-faded');
 		}
 		
-		$form.find(':required').not(':disabled').each(function() {
-			var $this = $(this),
-				max_length = $this.data('maxlength');
-			if ($this.val() === "" || (max_length && $this.val().length > max_length)) {
-				if (is_form_valid) {
-					$('body').stop().animate({scrollTop: Math.ceil($this.offset().top - 150)}, 1000, 'swing');
-				}
-				handleErrorField($this);
-				is_form_valid = false;
-			}
-		});
-		
-		$times.each(function() {
-			var $row = $(this),
-				start = $row.find('.StartHours').val() + $row.find('.StartMinutes').val(),
-				end = $row.find('.EndHours').val() + $row.find('.EndMinutes').val();
-			if (start > end) {
-				if (is_form_valid) {
-					$('body').stop().animate({scrollTop: Math.ceil($row.offset().top - 150)}, 1000, 'swing');
-				}
-				showNotifier({text: 'Начальное время не может быть меньше конечного', status: false});
-				is_form_valid = false;
-			}
-		});
-		
-		if (!is_edit) {
-			$form.find('.DataUrl').each(function() {
-				var $this = $(this);
-				if ($this.val() === "") {
-					if (is_form_valid) {
-						$('body').stop().animate({scrollTop: Math.ceil($this.closest('.EditEventImgLoadWrap').offset().top - 150)}, 1000, 'swing', function() {
-							showNotifier({text: 'Пожалуйста, добавьте к событию обложку', status: false})
-						});
-					}
-					is_form_valid = false;
-				}
-			});
-		}
-		
 		if (is_form_valid) {
 			$.extend(true, data, form_data);
 			
-			data.tags = tags;
+			if(form_data.tags){
+				data.tags = form_data.tags.split(',');
+			}
 			data.filenames = {
 				horizontal: data.filename_horizontal
 			};
@@ -7977,7 +8124,6 @@ RedactEventPage.prototype.init = function() {
 				data.public_at = "" + data.public_at_date + 'T' + data.public_at_time_hours + ':' + data.public_at_time_minutes + ':00'
 			}
 			
-			data.dates = [];
 			if (data.different_time) {
 				var selected_days_rows = $('.SelectedDaysRows').children();
 				
@@ -7990,8 +8136,7 @@ RedactEventPage.prototype.init = function() {
 					});
 				});
 			} else {
-				var MainCalendar = $('.EventDatesCalendar').data('calendar'),
-					$main_time = $('.MainTime'),
+				var $main_time = PAGE.$wrapper.find('.MainTime'),
 					start_time = $main_time.find('.StartHours').val() + ':' + $main_time.find('.StartMinutes').val(),
 					end_time = $main_time.find('.EndHours').val() + ':' + $main_time.find('.EndMinutes').val();
 				
@@ -8058,6 +8203,7 @@ RedactEventPage.prototype.init = function() {
 				month_selection: true,
 				min_date: moment().format(__C.DATE_FORMAT)
 			}),
+			AddRowDatePicker = PAGE.$wrapper.find('.AddDayToTable').data('datepicker'),
 			dates = {},
 			genitive_month_names = {
 				'январь': 'января',
@@ -8075,7 +8221,6 @@ RedactEventPage.prototype.init = function() {
 			},
 			$fucking_table = $();
 		MainCalendar.init();
-		MainCalendar.$calendar.on('days-changed.displayFormattedText', displayFormattedText);
 		
 		function bindRemoveRow($parent) {
 			$parent.find('.RemoveRow').not('.-Handled_RemoveRow').each(function(i, elem) {
@@ -8123,19 +8268,22 @@ RedactEventPage.prototype.init = function() {
 		function buildTable(selected_days) {
 			//TODO: BUG. On multiple selection (month or weekday) duplicates appearing in table.
 			//TODO: Bind time on building table
-			var $output = $();
+			var $output = $(),
+				today = moment().format(__C.DATE_FORMAT);
 			if (Array.isArray(selected_days)) {
 				selected_days.forEach(function(day) {
 					$output = $output.add(tmpl('selected-table-day', {
 						date: day,
-						formatted_date: day.split('-').reverse().join('.')
+						formatted_date: day.split('-').reverse().join('.'),
+						today: today
 					}));
 				});
 			}
 			else {
 				$output = tmpl('selected-table-day', {
 					date: selected_days,
-					formatted_date: selected_days.split('-').reverse().join('.')
+					formatted_date: selected_days.split('-').reverse().join('.'),
+					today: today
 				});
 			}
 			bindDatePickers($output);
@@ -8163,11 +8311,11 @@ RedactEventPage.prototype.init = function() {
 					MainCalendar.last_selected_days.forEach(function(day) {
 						classes.push('.TableDay_' + day);
 					});
-					$fucking_table.detach(classes.join(', '));
+					$fucking_table.remove(classes.join(', '));
 					$fucking_table = $fucking_table.not(classes.join(', '));
 				}
 				else {
-					$fucking_table.detach('.TableDay_' + MainCalendar.last_selected_days);
+					$fucking_table.remove('.TableDay_' + MainCalendar.last_selected_days);
 					$fucking_table = $fucking_table.not('.TableDay_' + MainCalendar.last_selected_days);
 				}
 			}
@@ -8179,30 +8327,16 @@ RedactEventPage.prototype.init = function() {
 			
 		}
 		
+		buildTable(MainCalendar.selected_days);
+		PAGE.$wrapper.find('.SelectedDaysRows').toggleStatus('disabled');
+		
+		MainCalendar.$calendar.on('days-changed.displayFormattedText', displayFormattedText);
+		MainCalendar.$calendar.on('days-changed.buildTable', BuildSelectedDaysTable);
+		
 		PAGE.$wrapper.find('#edit_event_different_time').on('change', function() {
-			var $table_wrapper = PAGE.$wrapper.find('#edit_event_selected_days_wrapper'),
-				$table_content = $table_wrapper.children();
-			if ($(this).prop('checked')) {
-				buildTable(MainCalendar.selected_days);
-				$table_wrapper.height($table_content.height()).one('transitionend', function() {
-					$table_wrapper.css({
-						'height': 'auto',
-						'overflow': 'visible'
-					})
-				});
-				MainCalendar.$calendar.on('days-changed.buildTable', BuildSelectedDaysTable);
-			} else {
-				$table_wrapper.css({
-					'height': $table_content.height(),
-					'overflow': 'hidden'
-				}).height(0);
-				$fucking_table.remove();
-				MainCalendar.$calendar.off('days-changed.buildTable');
-			}
 			PAGE.$wrapper.find('.MainTime').toggleStatus('disabled');
 		});
 		
-		var AddRowDatePicker = PAGE.$wrapper.find('.AddDayToTable').data('datepicker');
 		AddRowDatePicker.$datepicker.on('date-picked', function() {
 			MainCalendar.selectDays(AddRowDatePicker.selected_day);
 		});
@@ -8246,6 +8380,8 @@ RedactEventPage.prototype.init = function() {
 			}
 		});
 	})(PAGE.event.organization_id);
+	
+	bindCollapsing(PAGE.$wrapper);
 	
 	$main_tabs = $main_tabs.resolveInstance();
 	
@@ -8295,7 +8431,7 @@ RedactEventPage.prototype.init = function() {
 	
 	PAGE.$wrapper.find('.EditEventDefaultAddress').off('click.defaultAddress').on('click.defaultAddress', function() {
 		var $this = $(this);
-		$this.closest('.form_group').find('input').val($this.data('default_address'))
+		$this.closest('.form_group').find('input').val($this.data('default_address')).trigger('input');
 	});
 	
 	PAGE.$wrapper.find('#edit_event_delayed_publication').off('change.DelayedPublication').on('change.DelayedPublication', function() {
@@ -8303,7 +8439,7 @@ RedactEventPage.prototype.init = function() {
 	});
 	
 	PAGE.$wrapper.find('#edit_event_registration_required').off('change.RequireRegistration').on('change.RequireRegistration', function() {
-		PAGE.$wrapper.find('.RegistrationTill').toggleStatus('disabled');
+		PAGE.$wrapper.find('.EditEventRegistrationWrap').toggleStatus('disabled');
 	});
 	
 	PAGE.$wrapper.find('#edit_event_free').off('change.FreeEvent').on('change.FreeEvent', function() {
@@ -8367,12 +8503,16 @@ RedactEventPage.prototype.init = function() {
 RedactEventPage.prototype.render = function() {
 	var PAGE = this,
 		is_edit = !!PAGE.event.id,
-		page_vars = {
+		page_vars = $.extend(true, {}, Object.getProps(PAGE.event), {
 			event_id: PAGE.event.id ? PAGE.event.id : undefined,
 			public_at_data_label: 'Дата',
-			registration_till_data_label: 'Дата',
 			current_date: moment().format(__C.DATE_FORMAT),
-			tomorrow_date: moment().add(1, 'd').format(__C.DATE_FORMAT)
+			tomorrow_date: moment().add(1, 'd').format(__C.DATE_FORMAT),
+			button_text: is_edit ? 'Сохранить' : 'Опубликовать'
+		}),
+		registration_props = {
+			registration_till_display_date: 'Дата',
+			tomorrow_date: page_vars.tomorrow_date
 		};
 	
 	
@@ -8389,83 +8529,98 @@ RedactEventPage.prototype.render = function() {
 		return null;
 	}
 	
-	function selectDates($view, raw_dates) {
-		var MainCalendar = $view.find('.EventDatesCalendar').data('calendar'),
-			$table_rows = $view.find('.SelectedDaysRows'),
-			dates = [];
-		raw_dates.forEach(function(date) {
-			date.event_date = moment.unix(date.event_date).format('YYYY-MM-DD');
-			dates.push(date.event_date);
-		});
-		MainCalendar.selectDays(dates);
-		raw_dates.forEach(function(date) {
-			var $day_row = $table_rows.find('.TableDay_' + date.event_date),
-				start_time = date.start_time.split(':'),
-				end_time = date.end_time ? date.end_time.split(':') : [];
-			$day_row.find('.StartHours').val(start_time[0]);
-			$day_row.find('.StartMinutes').val(start_time[1]);
-			if (end_time.length) {
-				$day_row.find('.EndHours').val(end_time[0]);
-				$day_row.find('.EndMinutes').val(end_time[1]);
-			}
+	if (PAGE.event.registration_required) {
+		var m_registration_till = moment.unix(PAGE.event.registration_till);
+		registration_props = $.extend(registration_props, {
+			registration_till_display_date: m_registration_till.format(__LOCALES.ru_RU.DATE.DATE_FORMAT),
+			registration_till_date: m_registration_till.format(__C.DATE_FORMAT),
+			registration_till_time_hours: m_registration_till.format('HH'),
+			registration_till_time_minutes: m_registration_till.format('mm')
 		});
 	}
 	
-	function selectTags($view, tags) {
-		var selected_tags = [];
-		tags.forEach(function(tag) {
-			selected_tags.push({
-				id: parseInt(tag.id),
-				text: tag.name
+	if (PAGE.event.image_horizontal_url) {
+		page_vars.image_horizontal_filename = PAGE.event.image_horizontal_url.split('/').reverse()[0];
+	}
+	
+	if (PAGE.event.public_at != null) {
+		var m_public_at = moment.unix(PAGE.event.public_at);
+		page_vars.public_at_data = m_public_at.format('YYYY-MM-DD');
+		page_vars.public_at_data_label = m_public_at.format('DD.MM.YYYY');
+		page_vars.public_at_time_hours = m_public_at.format('HH');
+		page_vars.public_at_time_minutes = m_public_at.format('mm');
+		page_vars.public_at_checkbox_attribute = 'checked';
+	}
+	console.log(page_vars);
+	
+	PAGE.$wrapper.html(tmpl('edit-event-page', $.extend(page_vars, {
+		date_picker: tmpl('edit-event-datepicker', {
+			today: page_vars.current_date
+		}),
+		cover_picker: tmpl('edit-event-cover-picker', {
+			image_horizontal_url: PAGE.event.image_horizontal_url,
+			image_horizontal_filename: PAGE.event.image_horizontal_filename
+		}),
+		registration: tmpl('edit-event-registration', registration_props)
+	})));
+	
+	PAGE.init();
+	
+	if (is_edit) {
+		(function selectDates($view, raw_dates, is_same_time) {
+			var MainCalendar = $view.find('.EventDatesCalendar').data('calendar'),
+				start_time = raw_dates[0].start_time.split(':'),
+				end_time = raw_dates[0].end_time ? raw_dates[0].end_time.split(':') : [],
+				$table_rows = $view.find('.SelectedDaysRows'),
+				dates = [],
+				$day_row;
+			
+			if (is_same_time) {
+				$day_row = $view.find('.MainTime');
+				$day_row.find('.StartHours').val(start_time[0]);
+				$day_row.find('.StartMinutes').val(start_time[1]);
+				if (end_time.length) {
+					$day_row.find('.EndHours').val(end_time[0]);
+					$day_row.find('.EndMinutes').val(end_time[1]);
+				}
+			} else {
+				PAGE.$wrapper.find('#edit_event_different_time').prop('checked', true).trigger('change');
+			}
+			
+			raw_dates.forEach(function(date) {
+				date.event_date = moment.unix(date.event_date).format('YYYY-MM-DD');
+				dates.push(date.event_date);
 			});
-		});
-		
-		$view.find('#event_tags').select2('data', selected_tags);
-	}
-	
-	if (!is_edit) {
-		page_vars.button_text = 'Опубликовать';
-		PAGE.$wrapper.html(tmpl('edit-event-page', page_vars));
-		PAGE.init();
-	} else {
-		page_vars.button_text = 'Сохранить';
-		if (PAGE.event.registration_required) {
-			var m_registration_till = moment.unix(PAGE.event.registration_till);
-			page_vars.registration_till_data = m_registration_till.format('YYYY-MM-DD');
-			page_vars.registration_till_data_label = m_registration_till.format('DD.MM.YYYY');
-			page_vars.registration_till_time_hours = m_registration_till.format('HH');
-			page_vars.registration_till_time_minutes = m_registration_till.format('mm');
-		}
-		if (PAGE.event.image_horizontal_url) {
-			page_vars.image_horizontal_filename = PAGE.event.image_horizontal_url.split('/').reverse()[0];
-		}
-		
-		page_vars = $.extend(true, {}, PAGE.event, page_vars);
-		console.log(page_vars);
-		PAGE.$wrapper.html(tmpl('edit-event-page', page_vars));
-		PAGE.init();
-		
-		if (PAGE.event.is_same_time) {
-			var $day_row = PAGE.$wrapper.find('.MainTime'),
-				start_time = PAGE.event.dates[0].start_time.split(':'),
-				end_time = PAGE.event.dates[0].end_time ? PAGE.event.dates[0].end_time.split(':') : [];
-			$day_row.find('.StartHours').val(start_time[0]);
-			$day_row.find('.StartMinutes').val(start_time[1]);
-			if (end_time.length) {
-				$day_row.find('.EndHours').val(end_time[0]);
-				$day_row.find('.EndMinutes').val(end_time[1]);
-			}
-		} else {
-			PAGE.$wrapper.find('#edit_event_different_time').prop('checked', true).trigger('change');
-		}
-		selectDates(PAGE.$wrapper, PAGE.event.dates);
-		selectTags(PAGE.$wrapper, PAGE.event.tags);
+			MainCalendar.selectDays(dates);
+			raw_dates.forEach(function(date) {
+				var $day_row = $table_rows.find('.TableDay_' + date.event_date),
+					start_time = date.start_time.split(':'),
+					end_time = date.end_time ? date.end_time.split(':') : [];
+				$day_row.find('.StartHours').val(start_time[0]);
+				$day_row.find('.StartMinutes').val(start_time[1]);
+				if (end_time.length) {
+					$day_row.find('.EndHours').val(end_time[0]);
+					$day_row.find('.EndMinutes').val(end_time[1]);
+				}
+			});
+		})(PAGE.$wrapper, PAGE.event.dates, PAGE.event.is_same_time);
+		(function selectTags($view, tags) {
+			var selected_tags = [];
+			tags.forEach(function(tag) {
+				selected_tags.push({
+					id: parseInt(tag.id),
+					text: tag.name
+				});
+			});
+			
+			$view.find('#event_tags').select2('data', selected_tags);
+		})(PAGE.$wrapper, PAGE.event.tags);
 		
 		if (PAGE.event.image_horizontal_url) {
 			toDataUrl(PAGE.event.image_horizontal_url, function(base64_string) {
 				PAGE.$wrapper.find('#edit_event_image_horizontal_src').val(base64_string ? base64_string : null);
 			});
-			PAGE.$wrapper.find('.CallModal').removeClass('-hidden').on('crop', function(event, cropped_src, crop_data) {
+			PAGE.$wrapper.find('.CallModal').removeClass(__C.CLASSES.NEW_HIDDEN).on('crop', function(event, cropped_src, crop_data) {
 				var $button = $(this),
 					$parent = $button.closest('.EditEventImgLoadWrap'),
 					$preview = $parent.find('.EditEventImgPreview'),
@@ -8483,7 +8638,9 @@ RedactEventPage.prototype.render = function() {
 		if (PAGE.event.registration_required) {
 			PAGE.$wrapper.find('#edit_event_registration_required').prop('checked', true).trigger('change');
 		}
-		PAGE.$wrapper.find('#edit_event_delayed_publication').toggleStatus('disabled');
+		if(page_vars.created_at == null) {
+			PAGE.$wrapper.find('#edit_event_delayed_publication').toggleStatus('disabled');
+		}
 	}
 };
 /**
