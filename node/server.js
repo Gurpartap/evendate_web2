@@ -500,7 +500,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
     }
 //every monday at 2:30 am
     try {
-        new CronJob('30 2 * 1 *', function () {
+        new CronJob('30 2 * * 1', function () {
             let scheduler = new MailScheduler(client, handleError);
             scheduler.scheduleWeeklyEmails();
         }, null, true);
