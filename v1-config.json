@@ -192,6 +192,10 @@
       "key_path": "/etc/letsencrypt/live/evendate.ru/privkey.pem",
       "cert_path": "/etc/letsencrypt/live/evendate.ru/fullchain.pem"
     },
+    "test": {
+      "domain": "evendate.ru",
+      "token": "EAAYDHIPuIBYBAPmwIZAk3INqbI1GhyRX8YAMjlirVpYjiIC3KKS09DwzcOtYwlqcC5iEpYwlUdHczjtKoqgpXjfpFloWcYuHBbf6u8sCSH4DEK2AnfDicVghW5eKidZB3BMpvBfUxCQPZACp7KXbZAq5TPg6VT9QGmkPOAdthQZDZDundefinedicFo7r3WzgpHnvBs35DOpBKjSlotpAN5"
+    },
     "domain": "evendate.ru",
     "node_domain": "evendate.ru",
     "node_path": "/var/www/html/evendate_web2/node",

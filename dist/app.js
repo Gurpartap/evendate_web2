@@ -7382,6 +7382,14 @@ function StatisticsOrganizationEventsPage(org_id) {
 	StatisticsOrganizationPage.apply(this, arguments);
 	
 	this.block_scroll = false;
+	this.future_events_data = {
+		future: true,
+		canceled_shown: true
+	};
+	this.past_events_data = {
+		canceled_shown: true,
+		order_by: '-first_event_date'
+	};
 	this.future_events = new EventsWithStatisticsCollection();
 	this.past_events = new EventsWithStatisticsCollection();
 }
@@ -7393,7 +7401,7 @@ StatisticsOrganizationEventsPage.buildEventRows = function(events, date_field) {
 		return $.extend({}, event, {
 			date: moment.unix(event[date_field]).format(__LOCALES.ru_RU.DATE.DATE_FORMAT),
 			timestamp: event[date_field],
-			conversion: Math.round(event.view ? event.view_detail * 100 / event.view : 0) + '%'
+			conversion: Math.round(event.view == 0 ? (event.view_detail * 100 / event).view : 0) + '%'
 		});
 	}));
 	bindPageLinks($events);
@@ -7423,10 +7431,7 @@ StatisticsOrganizationEventsPage.prototype.render = function() {
 	
 	this.$wrapper.html(tmpl('orgstat-events-page'));
 	
-	this.future_events.fetchOrganizationsEvents(this.organization.id, {
-		future: true,
-		canceled_shown: true
-	}, 0, function() {
+	this.future_events.fetchOrganizationsEvents(this.organization.id, this.future_events_data, 0, function() {
 		if(this.length){
 			this_page.$wrapper.find('.OrgStatFutureEventsWrapper').html(tmpl('orgstat-events-wrapper', {
 				title: 'Предстоящие события',
@@ -7435,10 +7440,7 @@ StatisticsOrganizationEventsPage.prototype.render = function() {
 		}
 	});
 	
-	this.past_events.fetchOrganizationsEvents(this.organization.id, {
-		canceled_shown: true,
-		order_by: '-first_event_date'
-	}, 30, function() {
+	this.past_events.fetchOrganizationsEvents(this.organization.id, this.past_events_data, 30, function() {
 		if(this.length){
 			$past_events_wrapper = this_page.$wrapper.find('.OrgStatPastEventsWrapper');
 			$past_events_wrapper.html(tmpl('orgstat-events-wrapper', {
@@ -7451,7 +7453,7 @@ StatisticsOrganizationEventsPage.prototype.render = function() {
 				if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !this_page.block_scroll) {
 					this_page.block_scroll = true;
 					
-					this_page.past_events.fetchOrganizationsEvents(this_page.organization.id, {canceled_shown: true}, 30, function(events) {
+					this_page.past_events.fetchOrganizationsEvents(this_page.organization.id, this_page.past_events_data, 30, function(events) {
 						this_page.block_scroll = false;
 						if (events.length) {
 							$past_events_wrapper.find('tbody').append(StatisticsOrganizationEventsPage.buildEventRows(events, 'first_event_date'));
@@ -8503,13 +8505,6 @@ RedactEventPage.prototype.render = function() {
 	} else {
 		page_vars.header_text = 'Редактирование события';
 		page_vars.button_text = 'Сохранить';
-		if (PAGE.event.public_at !== null) {
-			var m_public_at = moment(PAGE.event.public_at);
-			page_vars.public_at_data = m_public_at.format('YYYY-MM-DD');
-			page_vars.public_at_data_label = m_public_at.format('DD.MM.YYYY');
-			page_vars.public_at_time_hours = m_public_at.format('HH');
-			page_vars.public_at_time_minutes = m_public_at.format('mm');
-		}
 		if (PAGE.event.registration_required) {
 			var m_registration_till = moment.unix(PAGE.event.registration_till);
 			page_vars.registration_till_data = m_registration_till.format('YYYY-MM-DD');
@@ -8528,6 +8523,7 @@ RedactEventPage.prototype.render = function() {
 		}
 		
 		page_vars = $.extend(true, {}, PAGE.event, page_vars);
+		console.log(page_vars);
 		PAGE.$wrapper.html(tmpl('edit-event-page', page_vars));
 		PAGE.init();
 		
@@ -8576,9 +8572,7 @@ RedactEventPage.prototype.render = function() {
 		if (PAGE.event.registration_required) {
 			PAGE.$wrapper.find('#edit_event_registration_required').prop('checked', true).trigger('change');
 		}
-		if (PAGE.event.public_at !== null) {
-			PAGE.$wrapper.find('#edit_event_delayed_publication').prop('checked', true).trigger('change');
-		}
+		PAGE.$wrapper.find('#edit_event_delayed_publication').toggleStatus('disabled');
 		PAGE.formatVKPost();
 	}
 };
@@ -10151,7 +10145,7 @@ UserPage = extending(Page, (function() {
 			activities: false
 		};
 		this.favored_fetch_data = {
-			fields: ['image_horizontal_medium_url', 'favored', 'dates'],
+			fields: ['image_horizontal_medium_url', 'favored', 'is_favorite', 'dates'],
 			order_by: 'nearest_event_date,-first_event_date',
 			length: 10
 		};
@@ -10215,6 +10209,8 @@ UserPage = extending(Page, (function() {
 			
 			type_data.fetch_method.apply(type_data.fetch_context, type_data.fetch_arguments).done(function(entities) {
 				var $entities;
+				self.block_scroll = false;
+				$loader.remove();
 				if(entities.length){
 					if(type_data.extra_function && typeof type_data.extra_function === 'function'){
 						type_data.extra_function(entities);
@@ -10223,10 +10219,11 @@ UserPage = extending(Page, (function() {
 					$wrapper.append($entities);
 					UserPage.bindEvents($entities);
 				} else {
+					if(!$wrapper.children().length){
+						$wrapper.append(__APP.BUILD.cap('Активности нет'));
+					}
 					self.disable_uploads[type] = true;
 				}
-				self.block_scroll = false;
-				$loader.remove();
 			});
 		}
 	};
@@ -10270,7 +10267,9 @@ UserPage = extending(Page, (function() {
 	};
 	
 	UserPage.prototype.render = function() {
-		var self = this;
+		var self = this,
+			$subscribed_orgs,
+			$favored_events;
 		
 		if(this.user_id == __APP.USER.id){
 			__APP.changeState('/my/profile', true, true);
@@ -10282,24 +10281,36 @@ UserPage = extending(Page, (function() {
 			action.user = self.user;
 		});
 		
-		this.$wrapper.append(tmpl('user-page', {
-			tombstone: __APP.BUILD.userTombstones(this.user, {avatar_classes: ['-bordered', '-shadowed']}),
-			links: __APP.BUILD.socialLinks(this.user.accounts_links),
-			subscribed_orgs: __APP.BUILD.avatarBlocks(this.user.subscriptions.slice(0,4), {
+		if(this.user.subscriptions.length) {
+			$subscribed_orgs = __APP.BUILD.avatarBlocks(this.user.subscriptions.slice(0,4), {
 				avatar_classes: ['-size_30x30'],
 				entity: 'organization',
 				is_link: true
-			}),
-			show_all_subscribed_orgs_button: __APP.BUILD.button({
+			});
+		} else {
+			$subscribed_orgs = __APP.BUILD.cap('Нет подписок');
+		}
+		
+		if(this.user.favored.length) {
+			$favored_events = __APP.BUILD.eventBlocks(this.user.favored, this.events_metadata);
+		} else {
+			$favored_events = __APP.BUILD.cap('Событий нет');
+		}
+		
+		this.$wrapper.append(tmpl('user-page', {
+			tombstone: __APP.BUILD.userTombstones(this.user, {avatar_classes: ['-bordered', '-shadowed']}),
+			links: __APP.BUILD.socialLinks(this.user.accounts_links),
+			subscribed_orgs: $subscribed_orgs,
+			show_all_subscribed_orgs_button: this.user.subscriptions.length ? __APP.BUILD.button({
 				classes: ['-color_neutral_accent','CallModal','RippleEffect'],
 				dataset: {
 					modal_type: 'subscribers_list',
 					modal_entity: this.user
 				},
 				title: 'Показать все'
-			}),
+			}) : '',
 			friends_hidden: __C.CLASSES.NEW_HIDDEN,
-			favored_event_blocks: __APP.BUILD.eventBlocks(this.user.favored, this.events_metadata)
+			favored_event_blocks: $favored_events
 		}));
 		this.uploadEntities('activities');
 		this.init();
@@ -10333,42 +10344,64 @@ MyProfilePage = extending(UserPage, (function() {
 	};
 	
 	MyProfilePage.prototype.render = function() {
-		var $activities;
+		var $activities,
+			$subscribed_orgs,
+			$favored_events,
+			$subscribed_users;
 		__APP.changeTitle('Мой профиль');
 		
 		this.user.actions.forEach(function(action) {
 			action.user = __APP.USER;
 		});
-		this.$wrapper.append(tmpl('user-page', {
-			tombstone: __APP.BUILD.userTombstones(this.user, {avatar_classes: ['-bordered', '-shadowed']}),
-			links: __APP.BUILD.socialLinks(this.user.accounts_links),
-			subscribed_orgs: __APP.BUILD.avatarBlocks(this.user.subscriptions.slice(0,4), {
+		
+		if(this.user.subscriptions.length) {
+			$subscribed_orgs = __APP.BUILD.avatarBlocks(this.user.subscriptions.slice(0,4), {
 				avatar_classes: ['-size_30x30'],
 				entity: 'organization',
 				is_link: true
-			}),
-			show_all_subscribed_orgs_button: __APP.BUILD.button({
+			});
+		} else {
+			$subscribed_orgs = __APP.BUILD.cap('Нет подписок');
+		}
+		
+		if(this.user.friends.length) {
+			$subscribed_users = __APP.BUILD.avatarBlocks(this.user.friends.slice(0,4), {
+				avatar_classes: ['-size_30x30', '-rounded'],
+				entity: 'user',
+				is_link: true
+			});
+		} else {
+			$subscribed_users = __APP.BUILD.cap('Нет друзей');
+		}
+		
+		if(this.user.favored.length) {
+			$favored_events = __APP.BUILD.eventBlocks(this.user.favored, this.events_metadata);
+		} else {
+			$favored_events = __APP.BUILD.cap('Событий нет');
+		}
+		
+		this.$wrapper.append(tmpl('user-page', {
+			tombstone: __APP.BUILD.userTombstones(this.user, {avatar_classes: ['-bordered', '-shadowed']}),
+			links: __APP.BUILD.socialLinks(this.user.accounts_links),
+			subscribed_orgs: $subscribed_orgs,
+			show_all_subscribed_orgs_button: this.user.subscriptions.length ? __APP.BUILD.button({
 				classes: ['-color_neutral_accent','CallModal','RippleEffect'],
 				dataset: {
 					modal_type: 'subscribers_list',
 					modal_entity: this.user
 				},
 				title: 'Показать все'
-			}),
-			subscribed_users: __APP.BUILD.avatarBlocks(this.user.friends.slice(0,4), {
-				avatar_classes: ['-size_30x30', '-rounded'],
-				entity: 'user',
-				is_link: true
-			}),
-			show_all_subscribed_users_button: __APP.BUILD.button({
+			}) : '',
+			subscribed_users: $subscribed_users,
+			show_all_subscribed_users_button: this.user.friends.length ? __APP.BUILD.button({
 				classes: ['-color_neutral_accent','CallModal','RippleEffect'],
 				dataset: {
 					modal_type: 'friends_list',
 					modal_entity: this.user
 				},
 				title: 'Показать все'
-			}),
-			favored_event_blocks: __APP.BUILD.eventBlocks(this.user.favored, this.events_metadata)
+			}) : '',
+			favored_event_blocks: $favored_events
 		}));
 		if(this.user.actions.length){
 			$activities = __APP.BUILD.activity(this.user.actions);
@@ -10993,6 +11026,19 @@ __APP = {
 		},
 		/**
 		 *
+		 * @param {string|Element|jQuery} message
+		 * @param {buildProps} [props]
+		 * @return {jQuery}
+		 */
+		cap: function buildTags(message, props) {
+			if(!props)
+				props = {};
+			props = __APP.BUILD.normalizeBuildProps(props);
+			
+			return tmpl('cap', $.extend({message: message}, props));
+		},
+		/**
+		 *
 		 * @param {(OneTag|Array<OneTag>|TagsCollection)} tags
 		 * @param {buildProps} [props]
 		 * @returns {jQuery}
@@ -11597,7 +11643,7 @@ __APP = {
 			}
 		}
 		bindPageLinks($('#page_title').html($new_title));
-		$('title').text(title_str ? 'Evendate. ' + title_str : 'Evendate');
+		$('title').text(title_str ? title_str : 'Evendate');
 	},
 	/**
 	 * Pushes state in History.js`s states stack and renders page or replaces last state
