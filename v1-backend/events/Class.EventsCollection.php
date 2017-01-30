@@ -76,7 +76,7 @@ class EventsCollection extends AbstractCollection
 			if ($result !== FALSE) {
 				if ($p_get_organization_id->rowCount() == 1) {
 					try{
-						$_organization = OrganizationsCollection::onePrivate($db, $user, $p_get_organization_id->fetchColumn(0), array('privileges'));
+						$_organization = OrganizationsCollection::onePrivate($db, $user, $p_get_organization_id->fetchColumn(0), null, array('privileges'));
 						$getting_personal_events = true;
 					}catch(Exception $e){
 						$_organization = OrganizationsCollection::one($db, $user, $p_get_organization_id->fetchColumn(0), array('privileges'));
