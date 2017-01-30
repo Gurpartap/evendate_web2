@@ -1,6 +1,7 @@
 <?php
 
 require_once 'Class.Event.php';
+require_once "{$BACKEND_FULL_PATH}/organizations/Class.PrivateOrganization.php";
 
 class EventsCollection extends AbstractCollection
 {
@@ -76,6 +77,7 @@ class EventsCollection extends AbstractCollection
 			if ($result !== FALSE) {
 				if ($p_get_organization_id->rowCount() == 1) {
 					try{
+						/*check if can make private instance*/
 						$_organization = OrganizationsCollection::onePrivate($db, $user, $p_get_organization_id->fetchColumn(0), null, array('privileges'));
 						$getting_personal_events = true;
 					}catch(Exception $e){
