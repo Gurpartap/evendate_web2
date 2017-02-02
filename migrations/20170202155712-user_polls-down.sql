@@ -1,0 +1,1 @@
+DROP TABLE stat_external_link_opens;
