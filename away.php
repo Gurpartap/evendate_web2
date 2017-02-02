@@ -1,6 +1,6 @@
 <?php
 
-	require_once '../v1-backend/bin/env_variables.php';
+	require_once './v1-backend/bin/env_variables.php';
 	require_once "{$BACKEND_FULL_PATH}/bin/db.php";
 	require_once "{$BACKEND_FULL_PATH}/bin/Class.RequestsParser.php";
 	require_once "{$BACKEND_FULL_PATH}/bin/Class.Fields.php";
