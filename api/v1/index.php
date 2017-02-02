@@ -72,6 +72,10 @@ try {
 	$__pagination  = array('length' => $__length, 'offset' => $__offset);
 	$__modules = array();
 
+	if (isset($__request['tz']) && $_request_method == 'GET'){
+		App::setSessionTimezone($__request['tz']);
+	}
+
 	require_once "{$BACKEND_FULL_PATH}/{$_class_name}/{$_class_name}.php";
 
 	if (isset($__modules[$_class_name]) && isset($__modules[$_class_name][$_request_method]) && isset($__modules[$_class_name][$_request_method][$_method_name])) {

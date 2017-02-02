@@ -118,7 +118,8 @@ class RegistrationForm
 
 		$text = $approvement_required ? 'Данные успешно отправлены. Ожидайте подтверждения регистрации от организатора.' : 'Вы успешно зарегистированы на событие.';
 		return new Result(true, $text, array(
-			'uuid' => $user_reg_uuid
+			'uuid' => $user_reg_uuid,
+			'registration_approvement_required' => $approvement_required
 		));
 	}
 

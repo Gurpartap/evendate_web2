@@ -93,7 +93,7 @@ class App
 		return self::$obj->$name;
 	}
 
-	public static function queryFactory() : QueryFactory
+	public static function queryFactory(): QueryFactory
 	{
 		return self::$QUERY_FACTORY;
 	}
@@ -131,15 +131,15 @@ class App
 		self::$QUERY_FACTORY = new QueryFactory('pgsql');
 	}
 
-	static function getCurrentUser() : AbstractUser
+	static function getCurrentUser(): AbstractUser
 	{
 		if (self::$__USER instanceof User)
 			return self::$__USER;
 		$token = isset(self::$__HEADERS['authorization']) ? self::$__HEADERS['authorization'] : null;
 
-		try{
+		try {
 			self::$__USER = new User(self::$__DB, $token);
-		}catch (Exception $e){
+		} catch (Exception $e) {
 			self::$__USER = new NotAuthorizedUser();
 		}
 		return self::$__USER;
@@ -160,7 +160,7 @@ class App
 		}
 	}
 
-	static public function DB() : PDO
+	static public function DB(): PDO
 	{
 		return self::$__DB;
 	}
@@ -246,6 +246,15 @@ class App
 
 	public static function prepareStatisticsData()
 	{
+
+	}
+
+	public static function setSessionTimezone($tz)
+	{
+		$tz = trim($tz);
+		if (preg_match('/^[\-\+]\d\d:\d\d$/', $tz)) {
+			self::$__DB->query("SET SESSION TIME ZONE INTERVAL '+08:00' HOUR TO MINUTE;");
+		} else throw new InvalidArgumentException('BAD_TIMEZONE');
 
 	}
 }

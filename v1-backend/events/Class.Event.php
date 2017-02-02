@@ -298,8 +298,6 @@ class Event extends AbstractEntity
 		return $this->organization_id;
 	}
 
-
-
 	private static function saveRegistrationInfo(PDO $db, $event_id, array $data)
 	{
 		if (isset($data['registration_locally']) && filter_var($data['registration_locally'], FILTER_VALIDATE_BOOLEAN) == true) {
