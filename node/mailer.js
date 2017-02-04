@@ -1,6 +1,7 @@
 let fs = require('fs');
 let utils = require('./utils');
 let async = require('async');
+let path = require('path');
 
 const EMAILS_PATH = '../emails/';
 
@@ -15,23 +16,34 @@ class Mailer {
 
     constructLetter(name, data) {
 
+        let process_tags = true;
         if (fs.existsSync(EMAILS_PATH + name + '/index.js')) {
             let dataHandler = require(EMAILS_PATH + name + '/index.js');
             data = dataHandler.process(data);
+            if (dataHandler.replace_main != undefined){
+                this.html = fs.readFileSync(path.resolve(EMAILS_PATH, name, dataHandler.replace_main), {encoding: 'utf8'});
+            }
+            if (dataHandler.process_tags != undefined){
+                process_tags = dataHandler.process_tags;
+            }
         }
 
-        let header = fs.readFileSync(EMAILS_PATH + name + '/header.html', {encoding: 'utf8'});
-        let body = fs.readFileSync(EMAILS_PATH + name + '/body.html', {encoding: 'utf8'});
+        if (process_tags){
+            let header = fs.readFileSync(EMAILS_PATH + name + '/header.html', {encoding: 'utf8'});
+            let body = fs.readFileSync(EMAILS_PATH + name + '/body.html', {encoding: 'utf8'});
 
 
-        const _data = Object.assign({}, data, {
-            header_part: utils.replaceTags(header, data),
-            body_part: utils.replaceTags(body, data)
-        });
+            const _data = Object.assign({}, data, {
+                header_part: utils.replaceTags(header, data),
+                body_part: utils.replaceTags(body, data)
+            });
 
-        this.html = utils.replaceTags(this.html, _data);
+            this.html = utils.replaceTags(this.html, _data);
+            this.html = utils.replaceTags(this.html, data);
 
-        this.html = utils.replaceTags(this.html, data);
+        }
+
+        fs.writeFileSync(EMAILS_PATH + name + '/test.html', this.html);
         return this;
     }
 
