@@ -86,16 +86,16 @@ $url_parts = explode('/', $url);
 		if (count($url_parts) > 2) {
 			switch ($url_parts[1]) {
 				case 'organization': {
-					$item = OrganizationsCollection::one($__db, $user, $url_parts[2], array('description', 'subscribed_count'));
+					$item = OrganizationsCollection::one($__db, $user, intval($url_parts[2]), array('description', 'subscribed_count'));
 					$data = array(
-						'title' => htmlspecialchars('Evendate - ' . $item->getName()),
+						'title' => htmlspecialchars($item->getName()),
 						'description' => htmlspecialchars($item->getName() . ' в Evendate это больше ' . $item->getSubscribedCount() . ' подписчиков и самые интересные события! ' . $item->getDescription()),
 						'image' => htmlspecialchars($item->getBackgroundImgUrl())
 					);
 					break;
 				}
 				case 'event': {
-					$item = EventsCollection::one($__db, $user, $url_parts[2], array('description', 'organization_short_name'));
+					$item = EventsCollection::one($__db, $user, intval($url_parts[2]), array('description', 'organization_short_name'));
 					$params = $item->getParams($user, array('title', 'description', 'organization_short_name'))->getData();
 					$data = array(
 						'title' => htmlspecialchars($params['title'] . ' в ' . $params['organization_short_name'] . ' на Evendate'),
@@ -132,7 +132,7 @@ $url_parts = explode('/', $url);
 			}
 		}
 	} catch (Exception $e) {
-		header('Location: /');
+//		header('Location: /');
 	}
 
 	?>

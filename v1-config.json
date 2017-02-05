@@ -150,7 +150,7 @@
     "db": {
       "host": "localhost",
       "user": "postgres",
-      "password": "fwhr96GTxYW9sn",
+      "password": "VSuJTfwhrTxYW9snZxM7sL84nL696GTb82c32445",
       "database": "evendate",
       "port": 5432
     },
@@ -191,6 +191,10 @@
     "https":{
       "key_path": "/etc/letsencrypt/live/evendate.ru/privkey.pem",
       "cert_path": "/etc/letsencrypt/live/evendate.ru/fullchain.pem"
+    },
+    "test": {
+      "domain": "evendate.ru",
+      "token": "EAAYDHIPuIBYBAPmwIZAk3INqbI1GhyRX8YAMjlirVpYjiIC3KKS09DwzcOtYwlqcC5iEpYwlUdHczjtKoqgpXjfpFloWcYuHBbf6u8sCSH4DEK2AnfDicVghW5eKidZB3BMpvBfUxCQPZACp7KXbZAq5TPg6VT9QGmkPOAdthQZDZDundefinedicFo7r3WzgpHnvBs35DOpBKjSlotpAN5"
     },
     "domain": "evendate.ru",
     "node_domain": "evendate.ru",
