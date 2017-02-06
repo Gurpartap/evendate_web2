@@ -31,8 +31,8 @@
       ],
       "registration_required": true,
       "registration_till": "2016-12-29T18:00:00",
-      "is_free": true,
-      "min_price": null,
+      "is_free": false,
+      "min_price": 500,
       "delayed_publication": false,
       "public_at": null,
       "filenames": {
@@ -71,7 +71,7 @@
         "6"
       ],
       "is_free": true,
-      "min_price": null,
+      "min_price": 50,
       "delayed_publication": false,
       "public_at": null,
       "filenames": {

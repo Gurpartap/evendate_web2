@@ -499,11 +499,16 @@ class Event extends AbstractEntity
 		$data['latitude'] = is_numeric($data['latitude']) ? (float)$data['latitude'] : null;
 		$data['longitude'] = is_numeric($data['longitude']) ? (float)$data['longitude'] : null;
 
-		$data['is_free'] = isset($data['is_free']) && strtolower($data['is_free']) == 'true';
-		$data['min_price'] = $data['is_free'] == false && is_numeric($data['min_price']) ? (int)$data['min_price'] : null;
+		if (!isset($data['is_free'])) {
+			$data['is_free'] = 'true';
+		} else {
+			$data['is_free'] = filter_var($data['is_free'], FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+		}
+
+		$data['min_price'] = $data['is_free'] == 'false' && is_numeric($data['min_price']) ? (int) $data['min_price'] : null;
 
 		/*VK posting data*/
-		$data['vk_post'] = $data['is_free'] == true && is_numeric($data['min_price']) ? (int)$data['min_price'] : null;
+		$data['vk_post'] = $data['is_free'] == true && is_numeric($data['min_price']) ? (int) $data['min_price'] : null;
 	}
 
 	public static function create(PDO $db, Organization $organization, array $data)
@@ -541,7 +546,7 @@ class Event extends AbstractEntity
 					'registration_approvement_required' => $data['registration_approvement_required'],
 					'registration_till' => $data['registration_till'] instanceof DateTime ? $data['registration_till']->format('Y-m-d H:i:s') : null,
 					'public_at' => $data['public_at'] instanceof DateTime ? $data['public_at']->format('Y-m-d H:i:s') : null,
-					'is_free' => $data['is_free'] == 'true' ? 'true' : 'false',
+					'is_free' => $data['is_free'],
 					'min_price' => $data['min_price'],
 					'status' => $data['public_at'] instanceof DateTime ? 'false' : 'true',
 				))->returning(array('id'));
@@ -1120,7 +1125,7 @@ class Event extends AbstractEntity
 					'registration_approvement_required' => $data['registration_approvement_required'],
 					'registration_till' => $data['registration_till'] instanceof DateTime ? $data['registration_till']->format('Y-m-d H:i:s') : null,
 					'public_at' => $data['public_at'] instanceof DateTime ? $data['public_at']->format('Y-m-d H:i:s') : null,
-					'is_free' => $data['is_free'] == 'true' ? 'true' : 'false',
+					'is_free' => $data['is_free'],
 					'min_price' => $data['min_price'],
 					'status' => $data['public_at'] instanceof DateTime ? 'false' : 'true',
 				))
