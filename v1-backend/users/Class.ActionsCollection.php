@@ -3,12 +3,12 @@
 class ActionsCollection extends AbstractCollection{
 
 
-	public static function filter(PDO $db,
+	public static function filter(ExtendedPDO $db,
 																AbstractUser $user = null,
-	                              array $filters = null,
-	                              array $fields = null,
-	                              array $pagination = null,
-	                              array $order_by = array('id')){
+																array $filters = null,
+																array $fields = null,
+																array $pagination = null,
+																array $order_by = array('id')){
 
 		$q_get_actions = App::queryFactory()->newSelect();
 
@@ -61,11 +61,8 @@ class ActionsCollection extends AbstractCollection{
 		$q_get_actions
 			->cols($cols)
 			->orderBy($order_by);
-		$p_get_actions = $db->prepare($q_get_actions->getStatement());
-		$result = $p_get_actions->execute($statement_array);
-		if ($result === FALSE) throw new DBQueryException(implode(';', $db->errorInfo()), $db);
 
-		$actions = $p_get_actions->fetchAll(PDO::FETCH_CLASS, 'Action');
+		$actions = $db->prepareExecute($q_get_actions, '', $statement_array)->fetchAll(PDO::FETCH_CLASS, 'Action');;
 		$result_dates = array();
 		foreach($actions as $action) {
 			$result_dates[] = $action->getParams($user, $fields)->getData();

@@ -8,7 +8,7 @@ abstract class AbstractException extends \Exception{
 	const HTTP_CODE = 500;
 	const ERROR_CODE = 10000;
 
-	public function __construct($message, PDO $db, $user_m = ''){
+	public function __construct($message, ExtendedPDO $db, $user_m = ''){
 		parent::__construct($message);
 		$this->user_message = $user_m == '' ? $message : $user_m;
 		$this->db = $db;

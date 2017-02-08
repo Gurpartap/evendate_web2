@@ -3,12 +3,12 @@
 class NotificationsCollection extends AbstractCollection{
 
 	public static function filter(
-									PDO $db,
-									AbstractUser $user = null,
-									array $filters = null,
-									array $fields = null,
-									array $pagination = null,
-									array $order_by = array('notification_time')) {
+		ExtendedPDO $db,
+		AbstractUser $user = null,
+		array $filters = null,
+		array $fields = null,
+		array $pagination = null,
+		array $order_by = array('notification_time')) {
 
 		$q_get_notifications = App::queryFactory()->newSelect();
 		$_fields = Fields::mergeFields(Notification::getAdditionalCols(), $fields, Notification::getDefaultCols());
@@ -66,12 +66,9 @@ class NotificationsCollection extends AbstractCollection{
 		}
 
 
-		$p_get_notifications = $db->prepare($q_get_notifications->getStatement());
-		$result = $p_get_notifications->execute($statement_array);
 
-		if ($result === FALSE) throw new DBQueryException(implode(';', $db->errorInfo()), $db);
 
-		$notifications = $p_get_notifications->fetchAll(PDO::FETCH_CLASS, 'Notification');
+		$notifications = $db->prepareExecute($q_get_notifications, '', $statement_array)->fetchAll(PDO::FETCH_CLASS, 'Notification');
 		if (count($notifications) == 0 && $is_one_notification) throw new LogicException('CANT_FIND_NOTIFICATION');
 		$result_notifications = array();
 		if ($is_one_notification) return $notifications[0];
@@ -82,7 +79,7 @@ class NotificationsCollection extends AbstractCollection{
 		return new Result(true, '', $result_notifications);
 	}
 
-	public static function oneByUUID(PDO $db, User $user, string $uuid, array $fields = null) : Notification {
+	public static function oneByUUID(ExtendedPDO $db, User $user, string $uuid, array $fields = null) : Notification {
 		return static::filter($db, $user, array('uuid' => $uuid), $fields);
 	}
 

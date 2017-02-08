@@ -22,7 +22,7 @@ class EventsCollection extends AbstractCollection
 		}
 	}
 
-	public static function filter(PDO $db,
+	public static function filter(ExtendedPDO $db,
 																AbstractUser $user = null,
 																array $filters = null,
 																array $fields = null,
@@ -455,7 +455,7 @@ class EventsCollection extends AbstractCollection
 		}
 
 		if (array_key_exists(Event::FAVORED_FRIENDS_COUNT_FIELD_NAME, $fields) ||
-			array_key_exists(Event::REGISTERED_FIELD_NAME, $fields) ||
+			array_key_exists(Event::IS_REGISTERED_FIELD_NAME, $fields) ||
 			array_key_exists(Event::REGISTRATION_UUID_FIELD_NAME, $fields) ||
 			array_key_exists(Event::REGISTRATION_APPROVED_FIELD_NAME, $fields) ||
 			array_key_exists(Event::REGISTRATION_QR_FIELD_NAME, $fields)
@@ -476,12 +476,7 @@ class EventsCollection extends AbstractCollection
 		}
 
 
-		$p_get_events = $db->prepare($q_get_events->getStatement());
-
-		$result = $p_get_events->execute($statement_array);
-		if ($result === FALSE) throw new DBQueryException(implode(';', $db->errorInfo()), $db);
-
-		$events = $p_get_events->fetchAll(PDO::FETCH_CLASS, 'Event');
+		$events = $db->prepareExecute($q_get_events, '', $statement_array)->fetchAll(PDO::FETCH_CLASS, 'Event');
 		if (count($events) == 0 && $is_one_event) throw new LogicException('CANT_FIND_EVENT: ' . $filters['id']);
 		$result_events = array();
 		if ($is_one_event) return $events[0];
@@ -491,7 +486,7 @@ class EventsCollection extends AbstractCollection
 		return new Result(true, '', $result_events);
 	}
 
-	public static function one(PDO $db,
+	public static function one(ExtendedPDO $db,
 														 AbstractUser $user = null,
 														 int $id,
 														 array $fields = null): Event

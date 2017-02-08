@@ -3,7 +3,7 @@
 class DBQueryException extends AbstractException{
 	const ERROR_CODE = 10001;
 	const HTTP_CODE = 500;
-	public function __construct($message, \PDO $db, $user_message = '', $file = '', $file_line = 0){
+	public function __construct($message, ExtendedPDO $db, $user_message = '', $file = '', $file_line = 0){
 		if (is_array($message)){
 			$message = implode(';', $message);
 		}elseif ($message == '' || $message == null){

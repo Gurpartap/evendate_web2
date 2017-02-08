@@ -17,7 +17,7 @@ use Aura\SqlQuery\Common;
  * @package Aura.SqlQuery
  *
  */
-class Insert extends Common\Insert implements Common\ReturningInterface, Common\OnConflictInterface
+class Insert extends Common\Insert implements Common\ReturningInterface, Common\OnConflictInterface, Common\QueryInterface
 {
 	protected $on_conflict;
 

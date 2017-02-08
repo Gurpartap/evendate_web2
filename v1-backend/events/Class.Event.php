@@ -24,6 +24,7 @@ class Event extends AbstractEntity
 	const TAGS_LIMIT = 5;
 	const ORGANIZATION_NOTIFICATIONS_LIMIT = 2;
 	const IS_FAVORITE_FIELD_NAME = 'is_favorite';
+	const TICKETS_FIELD_NAME = 'tickets';
 	const IS_SEEN_FIELD_NAME = 'is_seen';
 	const TAGS_FIELD_NAME = 'tags';
 	const DATES_FIELD_NAME = 'dates';
@@ -39,7 +40,7 @@ class Event extends AbstractEntity
 	/*ONLY FOR ADMINS*/
 
 	const REGISTRATION_FIELDS_FIELD_NAME = 'registration_fields';
-	const REGISTERED_FIELD_NAME = 'registered';
+	const IS_REGISTERED_FIELD_NAME = 'is_registered';
 	const REGISTRATION_APPROVED_FIELD_NAME = 'registration_approved';
 	const REGISTRATION_UUID_FIELD_NAME = 'registration_uuid';
 	const REGISTRATION_QR_FIELD_NAME = 'registration_qr';
@@ -136,11 +137,11 @@ class Event extends AbstractEntity
 			AND favorite_events.user_id = :user_id
 			AND favorite_events.event_id = view_events.id) IS NOT NULL AS ' . self::IS_FAVORITE_FIELD_NAME,
 
-		self::REGISTERED_FIELD_NAME => '(SELECT users_registrations.id IS NOT NULL
+		self::IS_REGISTERED_FIELD_NAME => '(SELECT users_registrations.id IS NOT NULL
 			FROM users_registrations
 			WHERE users_registrations.status = TRUE
 			AND users_registrations.user_id = :user_id
-			AND users_registrations.event_id = view_events.id) IS NOT NULL AS ' . self::REGISTERED_FIELD_NAME,
+			AND users_registrations.event_id = view_events.id) IS NOT NULL AS ' . self::IS_REGISTERED_FIELD_NAME,
 
 
 		self::REGISTRATION_APPROVED_FIELD_NAME => '(SELECT COALESCE(organization_approved, FALSE)
@@ -298,7 +299,7 @@ class Event extends AbstractEntity
 		return $this->organization_id;
 	}
 
-	private static function updateExtremumDates($event_id, PDO $db)
+	private static function updateExtremumDates($event_id, ExtendedPDO $db)
 	{
 		$q_upd_first = 'UPDATE events SET first_event_date = (SELECT MIN((events_dates.event_date :: DATE || \' \' || events_dates.start_time) :: TIMESTAMPTZ)
      FROM events_dates
@@ -315,7 +316,7 @@ class Event extends AbstractEntity
 		if ($result === FALSE) throw new DBQueryException('CANT_UPDATE_DATES', $db);
 	}
 
-	private static function saveRegistrationInfo(PDO $db, $event_id, array $data)
+	private static function saveRegistrationInfo(ExtendedPDO $db, $event_id, array $data)
 	{
 		if (isset($data['registration_locally']) && filter_var($data['registration_locally'], FILTER_VALIDATE_BOOLEAN) == true) {
 			RegistrationForm::create($event_id, $data['registration_fields'], $db);
@@ -340,7 +341,7 @@ class Event extends AbstractEntity
 		return new Result(true, 'Данные успешно обновлены');
 	}
 
-	private static function getAvailableNotificationTime(PDO $db, DateTime $dt, $organization_id): DateTime
+	private static function getAvailableNotificationTime(ExtendedPDO $db, DateTime $dt, $organization_id): DateTime
 	{
 		$dt_clone = clone $dt;
 		$q_get_notifications = App::queryFactory()
@@ -511,7 +512,7 @@ class Event extends AbstractEntity
 		$data['vk_post'] = $data['is_free'] == true && is_numeric($data['min_price']) ? (int) $data['min_price'] : null;
 	}
 
-	public static function create(PDO $db, Organization $organization, array $data)
+	public static function create(ExtendedPDO $db, Organization $organization, array $data)
 	{
 		try {
 			$db->beginTransaction();
@@ -617,7 +618,7 @@ class Event extends AbstractEntity
 		}
 	}
 
-	private static function updateVkPostInformation(PDO $db, $event_id, array $data)
+	private static function updateVkPostInformation(ExtendedPDO $db, $event_id, array $data)
 	{
 		if ($data['vk_post_id'] == null) return;
 		$q_upd_vk_post = App::queryFactory()->newUpdate();
@@ -631,7 +632,7 @@ class Event extends AbstractEntity
 		$result = $p_upd_post->execute($q_upd_vk_post->getBindValues());
 	}
 
-	private static function saveEventTags(PDO $db, $event_id, array $tags)
+	private static function saveEventTags(ExtendedPDO $db, $event_id, array $tags)
 	{
 
 		$p_upd = $db->prepare('UPDATE events_tags SET status = FALSE WHERE event_id = :event_id');
@@ -662,7 +663,7 @@ class Event extends AbstractEntity
 		}
 	}
 
-	private static function saveDates($dates, PDO $db, $event_id)
+	private static function saveDates($dates, ExtendedPDO $db, $event_id)
 	{
 		$p_set_inactive = $db->prepare('UPDATE events_dates SET status = FALSE WHERE event_id = :event_id');
 		$p_set_inactive->execute(array(':event_id' => $event_id));
@@ -685,7 +686,7 @@ class Event extends AbstractEntity
 		self::updateExtremumDates($event_id, $db);
 	}
 
-	private static function getNotificationTypeId($name, PDO $db): int
+	private static function getNotificationTypeId($name, ExtendedPDO $db): int
 	{
 		$q_get_type_id = App::queryFactory()->newSelect();
 		$q_get_type_id
@@ -697,7 +698,7 @@ class Event extends AbstractEntity
 		$p_get_type_id = $db->prepare($q_get_type_id->getStatement());
 		$p_get_type_id->execute($q_get_type_id->getBindValues());
 
-		if ($p_get_type_id->rowCount() != 1) throw new LogicException('CANT_FIND_TYPE');
+		if ($p_get_type_id->rowCount() != 1) throw new LogicException('CANT_FIND_TYPE: ' . $name);
 		$rows = $p_get_type_id->fetchAll();
 
 		return $rows[0]['id'];
@@ -899,7 +900,7 @@ class Event extends AbstractEntity
 
 	//TODO: Припилить платные аккаунты и их типы уведомлений
 
-	private static function saveNotifications(array $notifications, PDO $db)
+	private static function saveNotifications(array $notifications, ExtendedPDO $db)
 	{
 		$q_ins_notification = App::queryFactory()->newInsert();
 
@@ -1057,6 +1058,24 @@ class Event extends AbstractEntity
 				)->getData();
 			} else {
 				$result_data[self::REGISTERED_USERS_FIELD_NAME] = null;
+			}
+		}
+
+		if (isset($fields[self::TICKETS_FIELD_NAME])) {
+			if ($user instanceof User) {
+				$result_data[self::TICKETS_FIELD_NAME] = UsersCollection::filter(
+					$this->db,
+					$user,
+					array_merge(Fields::parseFilters($fields[self::TICKETS_FIELD_NAME]['filters'] ?? ''), array('registered_users' => $this)),
+					Fields::parseFields($fields[self::TICKETS_FIELD_NAME]['fields'] ?? ''),
+					array(
+						'length' => $length ?? $fields[self::TICKETS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+						'offset' => $offset ?? $fields[self::TICKETS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
+					),
+					$order_by ?? $fields[self::TICKETS_FIELD_NAME]['order_by'] ?? array()
+				)->getData();
+			} else {
+				$result_data[self::TICKETS_FIELD_NAME] = null;
 			}
 		}
 		return new Result(true, '', $result_data);

@@ -226,7 +226,7 @@ $__modules['events'] = array(
 				$__fields
 			);
 			if (isset($__request['approved'])) {
-				RegistrationForm::setApproved($__user, $event, $registration_uuid, $__request['approved']);
+				RegistrationForm::setApprovedStatus($__user, $event, $registration_uuid, $__request['approved']);
 				$updated = true;
 			}
 			if (isset($__request['checkout'])) {

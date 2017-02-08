@@ -6,7 +6,7 @@ require_once 'Class.RegisteredUser.php';
 class UsersCollection extends AbstractCollection
 {
 
-	public static function filter(PDO $db,
+	public static function filter(ExtendedPDO $db,
 																AbstractUser $user = null,
 																array $filters = null,
 																array $fields = null,
@@ -206,12 +206,8 @@ class UsersCollection extends AbstractCollection
 		$q_get_users->cols($_fields);
 
 		$q_get_users->orderBy($order_by);
-		$p_get_events = $db->prepare($q_get_users->getStatement());
-//		echo $q_get_users->getStatement();
-		$result = $p_get_events->execute($statement_array);
-		if ($result === FALSE) throw new DBQueryException(implode(';', $db->errorInfo()), $db);
 
-		$users = $p_get_events->fetchAll(PDO::FETCH_CLASS, $class_name);
+		$users = $db->prepareExecute($q_get_users, '', $statement_array)->fetchAll(PDO::FETCH_CLASS, $class_name);
 		if (count($users) == 0 && $is_one_user) throw new LogicException('CANT_FIND_USER');
 		$result_users = array();
 		if ($is_one_user) {
@@ -224,7 +220,7 @@ class UsersCollection extends AbstractCollection
 
 	}
 
-	public static function one(PDO $db, AbstractUser $user, int $id, array $fields = null): Friend
+	public static function one(ExtendedPDO $db, AbstractUser $user, int $id, array $fields = null): Friend
 	{
 		$friend = parent::one($db, $user, $id, $fields);
 		return $friend;

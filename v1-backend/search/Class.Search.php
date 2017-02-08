@@ -15,13 +15,13 @@ class GlobalSearch
     const ORGANIZATIONS_FIELD_NAME = 'organizations';
     const EVENTS_FIELD_NAME = 'events';
 
-    /**
-     * GlobalSearch constructor.
-     * @param $query
-     * @param $tags
-     * @param PDO $db
-     */
-    public function __construct($query, $tags, PDO $db)
+	/**
+	 * GlobalSearch constructor.
+	 * @param $query
+	 * @param $tags
+	 * @param ExtendedPDO|PDO $db
+	 */
+    public function __construct($query, $tags, ExtendedPDO $db)
     {
         $this->initial_query = $query;
         $this->query = $query;
