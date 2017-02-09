@@ -601,18 +601,10 @@
 
 		{custom_fields}
 
-		<div class="-align_center">
-			<button class="button -color_neutral_accent RippleEffect" type="button"><span class="Text">Предпросмотр</span></button>
-		</div>
-
 		<button class="button -color_neutral -size_low -rounded fa_icon fa-plus-circle AddRegistrationCustomField RippleEffect" type="button"><span class="Text">Добавить поле</span></button>
 
-
-		<h3>Дополнительно</h3>
-
-		<div class="form_unit form_accent_block">
-			<input id="edit_event_registration_approvement_required" class="form_checkbox" type="checkbox" name="registration_approvement_required">
-			<label class="form_label" for="edit_event_registration_approvement_required"><span>Отправлять письма с подтверждением регистрации</span></label>
+		<div class="-align_center">
+			<button class="button -color_neutral_accent RippleEffect" type="button"><span class="Text">Предпросмотр</span></button>
 		</div>
 
 	</fieldset>
@@ -621,17 +613,16 @@
 
 <script type="javascript/template" id="tmpl-edit-event-registration-predefined-field">
 	<div class="form_unit form_accent_block">
-		<input id="edit_event_registration_{type}_field_enable" class="form_checkbox Switch" type="checkbox" name="registration_{type}_field_enable" data-switch_id="registration_{type}_field">
-		<label class="form_label" for="edit_event_registration_{type}_field_enable"><span>{name}</span></label>
+		<input id="edit_event_registration_{id}_field_enable" class="form_checkbox Switch" type="checkbox" name="registration_fields" value="{id}" data-switch_id="registration_{id}_field">
+		<label class="form_label" for="edit_event_registration_{id}_field_enable"><span>{name}</span></label>
 	</div>
 	<div class="form_fieldset">
 		<p>{description}</p>
-		<fieldset class="Switching" data-switch_id="registration_{type}_field" disabled>
-			<input type="hidden" name="registration_{type}_field" value="{type}">
-			<input type="hidden" name="registration_{type}_field_label" value="{name}">
+		<fieldset class="Switching" data-switch_id="registration_{id}_field" disabled>
+			<input type="hidden" name="registration_{id}_field_type" value="{type}">
 			<div class="form_unit">
-				<input id="edit_event_registration_{type}_field_required" class="form_checkbox" type="checkbox" name="registration_{type}_field_required">
-				<label class="form_label" for="edit_event_registration_{type}_field_required"><span>Обязательное поле</span></label>
+				<input id="edit_event_registration_{id}_field_required" class="form_checkbox" type="checkbox" name="registration_{id}_field_required">
+				<label class="form_label" for="edit_event_registration_{id}_field_required"><span>Обязательное поле</span></label>
 			</div>
 		</fieldset>
 	</div>
@@ -639,33 +630,30 @@
 
 <script type="javascript/template" id="tmpl-edit-event-registration-custom-field">
 	<fieldset class="form_fieldset RegistrationCustomField">
+		<input id="edit_event_registration_{id}_custom_field_enable" type="hidden" name="registration_fields" value="{id}">
 		<button class="button -size_low fa_icon fa-times RemoveRegistrationCustomField" type="button"><span class="Text">Удалить поле</span></button>
 		<p>Добавьте дополнительное поле, если это требуется для регистрации.</p>
 		<div class="form_unit">
 			<label class="form_label" for="edit_event_registration_{id}_custom_field_label">Наименование поля</label>
-			<input id="edit_event_registration_{id}_custom_field_label" class="form_input" type="text" name="registration_{id}_custom_field_label" value="{label}" autocomplete="off" required>
+			<input id="edit_event_registration_{id}_custom_field_label" class="form_input" type="text" name="registration_{id}_field_label" value="{label}" autocomplete="off" required>
 		</div>
 		<div class="form_unit">
-			<input id="edit_event_registration_{id}_custom_field_required" class="form_checkbox" type="checkbox" name="registration_{id}_custom_field_required">
+			<input id="edit_event_registration_{id}_custom_field_required" class="form_checkbox" type="checkbox" name="registration_{id}_field_required">
 			<label class="form_label" for="edit_event_registration_{id}_custom_field_required"><span>Обязательное поле</span></label>
 		</div>
 		<h6>Тип</h6>
-		<div class="form_group -parts_e_e_e_e">
+		<div class="form_group -parts_e_e_e">
 			<div class="form_unit">
-				<input id="edit_event_registration_{id}_custom_field_text_type" class="form_radio" type="radio" name="registration_{id}_custom_field_type" value="text" required>
-				<label class="form_label" for="edit_event_registration_{id}_custom_field_text_type"><span>Текстовое</span></label>
+				<input id="edit_event_registration_{id}_custom_field_additional_text_type" class="form_radio" type="radio" name="registration_{id}_field_type" value="additional_text" required>
+				<label class="form_label" for="edit_event_registration_{id}_custom_field_additional_text_type"><span>Текстовое</span></label>
 			</div>
 			<div class="form_unit">
-				<input id="edit_event_registration_{id}_custom_field_number_type" class="form_radio" type="radio" name="registration_{id}_custom_field_type" value="number" required>
-				<label class="form_label" for="edit_event_registration_{id}_custom_field_number_type"><span>Числовое</span></label>
+				<input id="edit_event_registration_{id}_custom_field_email_type" class="form_radio" type="radio" name="registration_{id}_field_type" value="email" required>
+				<label class="form_label" for="edit_event_registration_{id}_custom_field_email_type"><span>E-mail</span></label>
 			</div>
 			<div class="form_unit">
-				<input id="edit_event_registration_{id}_custom_field_date_type" class="form_radio" type="radio" name="registration_{id}_custom_field_type" value="date" required>
-				<label class="form_label" for="edit_event_registration_{id}_custom_field_date_type"><span>Дата</span></label>
-			</div>
-			<div class="form_unit">
-				<input id="edit_event_registration_{id}_custom_field_choose_type" class="form_radio" type="radio" name="registration_{id}_custom_field_type" value="choose" required>
-				<label class="form_label" for="edit_event_registration_{id}_custom_field_choose_type"><span>Выбор ответа</span></label>
+				<input id="edit_event_registration_{id}_custom_field_phone_number_type" class="form_radio" type="radio" name="registration_{id}_field_type" value="phone_number" required>
+				<label class="form_label" for="edit_event_registration_{id}_custom_field_phone_number_type"><span>Телефонный номер</span></label>
 			</div>
 		</div>
 	</fieldset>

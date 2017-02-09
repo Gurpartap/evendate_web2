@@ -22,7 +22,7 @@ OneEvent = extending(OneEntity, (function() {
 			 * @type {RegistrationFieldModel.TYPES}
 			 */
 			this.type = '';
-			this.label = '';
+			this.label = null;
 			this.required = false;
 		}
 		/**

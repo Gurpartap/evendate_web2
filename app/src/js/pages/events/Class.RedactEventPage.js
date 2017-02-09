@@ -640,10 +640,10 @@ RedactEventPage.prototype.render = function() {
 			registration_till_display_date: 'Дата',
 			tomorrow_date: page_vars.tomorrow_date,
 			predefined_field: tmpl('edit-event-registration-predefined-field', [
-				{type: 'email', name: 'E-mail', description: 'Текстовое поле для ввода адреса электронной почты'},
-				{type: 'first_name', name: 'Имя', description: 'Текстовое поле для ввода имени'},
-				{type: 'last_name', name: 'Фамилия', description: 'Текстовое поле для ввода фамилии'},
-				{type: 'phone_number', name: 'Номер телефона', description: 'Текстовое поля для ввода номера телефона'}
+				{id: RedactEventPage.lastRegistrationCustomFieldId++, type: 'email', name: 'E-mail', description: 'Текстовое поле для ввода адреса электронной почты'},
+				{id: RedactEventPage.lastRegistrationCustomFieldId++, type: 'first_name', name: 'Имя', description: 'Текстовое поле для ввода имени'},
+				{id: RedactEventPage.lastRegistrationCustomFieldId++, type: 'last_name', name: 'Фамилия', description: 'Текстовое поле для ввода фамилии'},
+				{id: RedactEventPage.lastRegistrationCustomFieldId++, type: 'phone_number', name: 'Номер телефона', description: 'Текстовое поля для ввода номера телефона'}
 			])
 		};
 	
