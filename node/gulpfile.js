@@ -18,6 +18,8 @@ var gulp = require('gulp'),
 		app_js: [
 			'../app/src/js/lib.js',
 			'../app/src/js/node_connection.js',
+			'../app/src/js/entities/*.js',
+			'../app/src/js/data_models/**/*.js',
 			'../app/src/js/entities/**/*.js',
 			'../app/src/js/utils/**/*.js',
 			'../app/src/js/modals/**/*.js',
