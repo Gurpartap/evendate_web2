@@ -60,6 +60,38 @@ RedactEventPage.handleImgUpload = function($context, source, filename) {
 		.trigger('click.CallModal');
 };
 
+RedactEventPage.lastRegistrationCustomFieldId = 0;
+
+/**
+ *
+ * @param {Array} [registration_data]
+ * @return {jQuery}
+ */
+RedactEventPage.buildRegistrationCustomField = function(registration_data) {
+	var $fields;
+	registration_data = registration_data ? registration_data : [{}];
+	
+	$fields = tmpl('edit-event-registration-custom-field', registration_data.map(function(data) {
+		if (!data.id) {
+			data.id = RedactEventPage.lastRegistrationCustomFieldId++;
+		}
+		return data;
+	}));
+	registration_data.forEach(function(data) {
+		if (data.required) {
+			$fields.find('#edit_event_registration_'+data.id+'_custom_field_required').prop('checked', true);
+		}
+		if (data.type) {
+			$fields.find('#edit_event_registration_'+data.id+'_custom_field_'+data.type+'_type').prop('checked', true);
+		}
+	});
+	$fields.find('.RemoveRegistrationCustomField').on('click.RemoveRegistrationCustomField', function() {
+		$(this).closest('.RegistrationCustomField').remove();
+	});
+	
+	return $fields;
+};
+
 RedactEventPage.prototype.fetchData = function() {
 	if(this.event.id){
 		return this.fetching_data_defer = this.event.fetchEvent(this.fields);
@@ -243,10 +275,34 @@ RedactEventPage.prototype.init = function() {
 		}
 	}
 	
+	/**
+	 *
+	 * @param {jQuery} $input
+	 */
+	function convertToNumericInput($input) {
+		if($input.is('input')) {
+			$input.inputmask({
+				alias: 'numeric',
+				autoGroup: false,
+				digits: 2,
+				digitsOptional: true,
+				allowPlus: false,
+				allowMinus: false,
+				rightAlign: false
+			});
+		} else {
+			$input = $input.find('input');
+			if($input.length) {
+				convertToNumericInput($input);
+			}
+		}
+	}
+	
 	bindDatePickers(PAGE.$wrapper);
 	bindTimeInput(PAGE.$wrapper);
 	bindSelect2(PAGE.$wrapper);
 	bindTabs(PAGE.$wrapper);
+	bindControlSwitch(PAGE.$wrapper);
 	__APP.MODALS.bindCallModal(PAGE.$wrapper);
 	bindLimitInputSize(PAGE.$wrapper);
 	bindRippleEffect(PAGE.$wrapper);
@@ -514,25 +570,15 @@ RedactEventPage.prototype.init = function() {
 		$this.closest('.form_group').find('input').val($this.data('default_address')).trigger('input');
 	});
 	
-	PAGE.$wrapper.find('#edit_event_delayed_publication').off('change.DelayedPublication').on('change.DelayedPublication', function() {
-		PAGE.$wrapper.find('.DelayedPublication').toggleStatus('disabled');
-	});
-	
-	PAGE.$wrapper.find('#edit_event_registration_required').off('change.RequireRegistration').on('change.RequireRegistration', function() {
-		PAGE.$wrapper.find('.EditEventRegistrationWrap').toggleStatus('disabled');
-	});
-	
 	PAGE.$wrapper.find('#edit_event_free').off('change.FreeEvent').on('change.FreeEvent', function() {
 		PAGE.$wrapper.find('.MinPrice').toggleStatus('disabled');
 	});
 	
-	PAGE.$wrapper.find('.MinPrice').find('input').inputmask({
-		'alias': 'numeric',
-		'autoGroup': false,
-		'digits': 2,
-		'digitsOptional': true,
-		'placeholder': '0',
-		'rightAlign': false
+	convertToNumericInput(PAGE.$wrapper.find('.MinPrice'));
+	convertToNumericInput(PAGE.$wrapper.find('#edit_event_registration_limit_count'));
+	
+	PAGE.$wrapper.find('.AddRegistrationCustomField').off('click.AddRegistrationCustomField').on('click.AddRegistrationCustomField', function() {
+		RedactEventPage.buildRegistrationCustomField().insertBefore($(this));
 	});
 	
 	PAGE.$wrapper.find('.LoadImg').off('change.LoadImg').on('change.LoadImg', function(e) {
@@ -592,7 +638,13 @@ RedactEventPage.prototype.render = function() {
 		}),
 		registration_props = {
 			registration_till_display_date: 'Дата',
-			tomorrow_date: page_vars.tomorrow_date
+			tomorrow_date: page_vars.tomorrow_date,
+			predefined_field: tmpl('edit-event-registration-predefined-field', [
+				{type: 'email', name: 'E-mail', description: 'Текстовое поле для ввода адреса электронной почты'},
+				{type: 'first_name', name: 'Имя', description: 'Текстовое поле для ввода имени'},
+				{type: 'last_name', name: 'Фамилия', description: 'Текстовое поле для ввода фамилии'},
+				{type: 'phone_number', name: 'Номер телефона', description: 'Текстовое поля для ввода номера телефона'}
+			])
 		};
 	
 	
@@ -610,13 +662,15 @@ RedactEventPage.prototype.render = function() {
 	}
 	
 	if (PAGE.event.registration_required) {
-		var m_registration_till = moment.unix(PAGE.event.registration_till);
-		registration_props = $.extend(registration_props, {
-			registration_till_display_date: m_registration_till.format(__LOCALES.ru_RU.DATE.DATE_FORMAT),
-			registration_till_date: m_registration_till.format(__C.DATE_FORMAT),
-			registration_till_time_hours: m_registration_till.format('HH'),
-			registration_till_time_minutes: m_registration_till.format('mm')
-		});
+		if (PAGE.event.registration_till) {
+			var m_registration_till = moment.unix(PAGE.event.registration_till);
+			registration_props = $.extend(registration_props, {
+				registration_till_display_date: m_registration_till.format(__LOCALES.ru_RU.DATE.DATE_FORMAT),
+				registration_till_date: m_registration_till.format(__C.DATE_FORMAT),
+				registration_till_time_hours: m_registration_till.format('HH'),
+				registration_till_time_minutes: m_registration_till.format('mm')
+			});
+		}
 	}
 	
 	if (PAGE.event.image_horizontal_url) {
@@ -629,7 +683,6 @@ RedactEventPage.prototype.render = function() {
 		page_vars.public_at_data_label = m_public_at.format('DD.MM.YYYY');
 		page_vars.public_at_time_hours = m_public_at.format('HH');
 		page_vars.public_at_time_minutes = m_public_at.format('mm');
-		page_vars.public_at_checkbox_attribute = 'checked';
 	}
 	console.log(page_vars);
 	
@@ -645,6 +698,10 @@ RedactEventPage.prototype.render = function() {
 	})));
 	
 	PAGE.init();
+	
+	if(page_vars.public_at != null) {
+		PAGE.$wrapper.find('#edit_event_delayed_publication').prop('checked', true).trigger('change');
+	}
 	
 	if (is_edit) {
 		(function selectDates($view, raw_dates, is_same_time) {
@@ -717,8 +774,14 @@ RedactEventPage.prototype.render = function() {
 		}
 		if (PAGE.event.registration_required) {
 			PAGE.$wrapper.find('#edit_event_registration_required').prop('checked', true).trigger('change');
+			if (PAGE.event.registration_till) {
+				PAGE.$wrapper.find('#edit_event_registration_limit_by_date').prop('checked', true).trigger('change');
+			}
 		}
-		if(page_vars.created_at == null) {
+		if (page_vars.registration_fields && page_vars.registration_fields.length) {
+			RedactEventPage.buildRegistrationCustomField(page_vars.registration_fields).insertBefore(PAGE.$wrapper.find('.AddRegistrationCustomField'));
+		}
+		if(page_vars.public_at == null) {
 			PAGE.$wrapper.find('#edit_event_delayed_publication').toggleStatus('disabled');
 		}
 	}

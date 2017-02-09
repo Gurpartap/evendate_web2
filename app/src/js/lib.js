@@ -472,7 +472,7 @@ $.fn.extend({
 							else if (value != "on")
 								output[name] = value;
 							else
-								output[name] = el.checked ? true : false;
+								output[name] = !!el.checked;
 							break;
 						}
 					}
@@ -1340,6 +1340,7 @@ function bindTabs($parent) {
 	$parent.find('.Tabs').not('.-Handled_Tabs').each(function(i, elem) {
 		var $this = $(elem),
 			tabs_id = $this.data('tabs_id'),
+			focus_on_change = !!$this.data('focus_on_change'),
 			mutation_observer = new MutationObserver(function(records) {
 				var $wrappers,
 					$target;
@@ -1395,6 +1396,15 @@ function bindTabs($parent) {
 				$setting_tab.addClass(__C.CLASSES.NEW_ACTIVE);
 				$setting_body.addClass(__C.CLASSES.NEW_ACTIVE);
 				$this.trigger('change.tabs');
+				if (focus_on_change) {
+					$('html').stop().animate({
+							scrollTop: Math.ceil($setting_body.offset().top - 150)
+						}, {
+							duration: 400,
+							easing: 'swing'
+						}
+					);
+				}
 			}
 		};
 		
@@ -1446,7 +1456,7 @@ function bindSelect2($parent) {
 	$parent = $parent ? $parent : $('body');
 	$parent.find('.ToSelect2').not('.-Handled_ToSelect2').each(function(i, el) {
 		initSelect2($(el));
-	});
+	}).addClass('-Handled_ToSelect2');
 }
 
 function bindRippleEffect($parent) {
@@ -1649,6 +1659,23 @@ function bindCollapsing($parent) {
 		
 		$instance.data('instance', $instance);
 	}).addClass('Handled_Collapsing');
+}
+
+function bindControlSwitch($parent) {
+	$parent = $parent ? $parent : $('body');
+	$parent.find('.Switch').not('.-Handled_Switch').each(function(i, el) {
+		var $switch = $(el),
+			switch_id = $switch.data('switch_id'),
+			$switching = $parent.find('.Switching[data-switch_id="'+switch_id+'"]');
+		
+		$switch.on('change.Switch', function() {
+			if($switching.is('fieldset')) {
+				$switching.prop('disabled', !$switching.prop('disabled'));
+			} else {
+				$switching.toggleStatus('disabled');
+			}
+		});
+	}).addClass('-Handled_Switch');
 }
 
 function bindPageLinks($parent) {
