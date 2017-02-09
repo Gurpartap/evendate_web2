@@ -1829,32 +1829,6 @@ function showSettingsModal() {
 		}
 	});
 }
-
-function getFriendsList($friends_right_list, cb) {
-	$.ajax({
-		url: '/api/v1/users/friends?page=0&length=500',
-		success: function(res) {
-			if (res.data.length == 0) {
-				$('.no-friends-block').removeClass(__C.CLASSES.HIDDEN);
-				$('.friends-right-bar, .friends-main-content, .one-friend-profile').addClass(__C.CLASSES.HIDDEN);
-				return;
-			}
-			$friends_right_list.find('.friends-list').empty();
-			$friends_right_list.removeClass(__C.CLASSES.HIDDEN);
-			tmpl('friend-item', res.data, $friends_right_list.find('.friends-list'));
-			$friends_right_list.find('.friends-count').text(res.data.length);
-			bindPageLinks($friends_right_list);
-			if ($friends_right_list.height() > window.innerHeight - 200) {
-				$friends_right_list.find('.friends-list').slimscroll({
-					height: window.innerHeight - 200,
-					width: '100%'
-				});
-			}
-			
-			if (cb) cb(res);
-		}
-	});
-}
 if (window.location.hostname.indexOf('.test.evendate.ru') == -1){
 	window.socket = io.connect(window.location.protocol == 'https:' ? ':8443' : ':8080', {secure: window.location.protocol == 'https:'});
 }else{
@@ -3839,95 +3813,6 @@ SearchResults.prototype.fetchEventsAndOrganizations = function(events_ajax_data,
 	});
 };
 /**
- * @requires ../Class.OneEntity.js
- */
-/**
- *
- * @constructor
- * @augments OneEntity
- * @param {(string|number)} [tag_id]
- * @param {boolean} [is_loading_continuous]
- */
-function OneTag(tag_id, is_loading_continuous) {
-	this.id = tag_id ? tag_id : 0;
-	this.name = '';
-	
-	if (tag_id && is_loading_continuous) {
-		this.loading = true;
-		this.fetchTag(function() {
-			this.loading = false;
-			$(window).trigger('fetch.OneTag');
-		});
-	}
-}
-OneTag.extend(OneEntity);
-/**
- *
- * @param {(string|number)} tag_id
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-OneTag.fetchTag = function(tag_id, success) {
-	return __APP.SERVER.getData('/api/v1/tags/' + tag_id, {}, success);
-};
-/**
- *
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-OneTag.prototype.fetchTag = function(success) {
-	var self = this;
-	return this.constructor.fetchTag(self.id, function(data) {
-		self.setData(data[0]);
-		if (success && typeof success == 'function') {
-			success.call(self, data[0]);
-		}
-	});
-};
-/**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneTag.js
- */
-/**
- * @typedef {AJAXData} TagsCollectionAJAXData
- * @property {string} name
- * @property {(string|number)} event_id
- * @property {string} used_since
- * @property {string} used_till
- */
-/**
- *
- * @constructor
- * @augments EntitiesCollection
- */
-function TagsCollection() {}
-TagsCollection.extend(EntitiesCollection);
-TagsCollection.prototype.collection_of = OneTag;
-/**
- *
- * @param {AJAXData} data
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-TagsCollection.fetchTags = function(data, success) {
-	return __APP.SERVER.getData('/api/v1/tags/', data, success);
-};
-/**
- *
- * @param {TagsCollectionAJAXData} data
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-TagsCollection.prototype.fetchTags = function(data, success) {
-	var self = this;
-	return this.constructor.fetchTags(data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
-/**
  * @typedef {object} StatisticsUnit
  * @property {number} time_value
  * @property {number} value
@@ -4731,6 +4616,95 @@ UsersCollection.prototype.fetchOrganizationStaff = function(org_id, length, data
 			length: length
 		});
 	return UsersCollection.fetchOrganizationStaff(org_id, ajax_data, function(data) {
+		self.setData(data);
+		if (success && typeof success == 'function') {
+			success.call(self, data);
+		}
+	});
+};
+/**
+ * @requires ../Class.OneEntity.js
+ */
+/**
+ *
+ * @constructor
+ * @augments OneEntity
+ * @param {(string|number)} [tag_id]
+ * @param {boolean} [is_loading_continuous]
+ */
+function OneTag(tag_id, is_loading_continuous) {
+	this.id = tag_id ? tag_id : 0;
+	this.name = '';
+	
+	if (tag_id && is_loading_continuous) {
+		this.loading = true;
+		this.fetchTag(function() {
+			this.loading = false;
+			$(window).trigger('fetch.OneTag');
+		});
+	}
+}
+OneTag.extend(OneEntity);
+/**
+ *
+ * @param {(string|number)} tag_id
+ * @param {AJAXCallback} [success]
+ * @returns {jqPromise}
+ */
+OneTag.fetchTag = function(tag_id, success) {
+	return __APP.SERVER.getData('/api/v1/tags/' + tag_id, {}, success);
+};
+/**
+ *
+ * @param {AJAXCallback} [success]
+ * @returns {jqPromise}
+ */
+OneTag.prototype.fetchTag = function(success) {
+	var self = this;
+	return this.constructor.fetchTag(self.id, function(data) {
+		self.setData(data[0]);
+		if (success && typeof success == 'function') {
+			success.call(self, data[0]);
+		}
+	});
+};
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.OneTag.js
+ */
+/**
+ * @typedef {AJAXData} TagsCollectionAJAXData
+ * @property {string} name
+ * @property {(string|number)} event_id
+ * @property {string} used_since
+ * @property {string} used_till
+ */
+/**
+ *
+ * @constructor
+ * @augments EntitiesCollection
+ */
+function TagsCollection() {}
+TagsCollection.extend(EntitiesCollection);
+TagsCollection.prototype.collection_of = OneTag;
+/**
+ *
+ * @param {AJAXData} data
+ * @param {AJAXCallback} [success]
+ * @returns {jqPromise}
+ */
+TagsCollection.fetchTags = function(data, success) {
+	return __APP.SERVER.getData('/api/v1/tags/', data, success);
+};
+/**
+ *
+ * @param {TagsCollectionAJAXData} data
+ * @param {AJAXCallback} [success]
+ * @returns {jqPromise}
+ */
+TagsCollection.prototype.fetchTags = function(data, success) {
+	var self = this;
+	return this.constructor.fetchTags(data, function(data) {
 		self.setData(data);
 		if (success && typeof success == 'function') {
 			success.call(self, data);
@@ -9096,210 +9070,71 @@ EventPage.prototype.render = function() {
  * @constructor
  * @augments Page
  */
-function FriendsPage() {
-	Page.apply(this);
-	
-	this.wrapper_tmpl = 'friends';
-	this.page_title = 'Друзья';
+function OnboardingPage() {
+	Page.apply(this, arguments);
+	this.ajax_data = {
+		length: 30,
+		offset: 0,
+		fields: 'img_small_url'
+	};
+	this.disable_upload = false;
+	this.block_scroll = true;
 }
-FriendsPage.extend(Page);
+OnboardingPage.extend(Page);
 
-FriendsPage.prototype.render = function() {
-	var $view = this.$view,
-		page_number = 0;
-	
-	function getFeed() {
-		if (page_number == 0) {
-			$view.find('.friend-events-block').remove();
+OnboardingPage.prototype.init = function() {
+	bindRippleEffect(this.$wrapper);
+	bindPageLinks(this.$wrapper);
+	this.$wrapper.find('.Link').on('click', function() {
+		if($(this).is('.SkipOnboarding')){
+			cookies.setItem('skip_onboarding', 1, moment().add(7, 'd')._d);
 		}
-		$.ajax({
-			url: '/api/v1/users/feed?fields=entity,created_at,user,type_code,event{fields:"organization_logo_small_url,image_square_vertical_url,organization_short_name"},organization{fields:"subscribed_count,img_medium_url"}&&order_by=-created_at&length=10&offset=' + (10 * page_number++),
-			success: function(res) {
-				var cards_by_users = {};
-				res.data.forEach(function(stat) {
-					var date = moment.unix(stat.created_at),
-						ent = stat[stat.entity],
-						key = [stat.entity, stat.stat_type_id, stat.user.id, date.format('DD.MM')].join('-');
-					if (cards_by_users.hasOwnProperty(key) == false) {
-						cards_by_users[key] = {
-							user: stat.user,
-							entity: stat.entity,
-							type_code: stat.type_code,
-							date: date.format(__C.DATE_FORMAT) == moment().format(__C.DATE_FORMAT) ? 'Сегодня' : date.format('DD.MM'),
-							action_name: __C.ACTION_NAMES[stat.type_code][0],
-							first_name: stat.user.first_name,
-							friend_id: stat.user.id,
-							avatar_url: stat.user.avatar_url,
-							last_name: stat.user.last_name,
-							entities: []
-						};
-					}
-					cards_by_users[key].entities.push(ent);
-				});
-				
-				$.each(cards_by_users, function(key, value) {
-					var $card = tmpl('friends-feed-card', value),
-						item_tmpl_name = value.entity == __C.ENTITIES.EVENT ? 'friends-feed-event' : 'friends-feed-organization';
-					
-					value.entities.forEach(function(ent) {
-						$card.append(tmpl(item_tmpl_name, ent));
-					});
-					$load_btn.before($card);
-				});
-				$load_btn.removeClass(__C.CLASSES.HIDDEN).find('.btn').removeClass(__C.CLASSES.DISABLED);
-				bindPageLinks($view);
-			}
-		});
-	}
-	
-	if(__APP.USER.id === -1){
-		__APP.changeState('/feed/');
-	} else {
-		var $main_content = $view.find('.friends-main-content').removeClass(__C.CLASSES.HIDDEN),
-			$friends_right_list = $view.find('.friends-right-bar'),
-			$load_btn = $view.find('.load-more-btn').addClass(__C.CLASSES.HIDDEN),
-			$user_content = $view.find('.one-friend-main-content').addClass(__C.CLASSES.HIDDEN);
-		
-		
-		getFriendsList($friends_right_list, function(res) {});
-		$load_btn.find('.btn').on('click', getFeed);
-		getFeed();
-	}
+		__APP.SIDEBAR.updateSubscriptions();
+	});
 };
-/**
- * @requires ../Class.Page.js
- */
-/**
- *
- * @constructor
- * @augments Page
- * @param {(string|number)} friend_id
- */
-function OneFriendPage(friend_id) {
-	Page.apply(this);
-	
-	this.wrapper_tmpl = 'friends';
-	this.friend_id = friend_id;
-}
-OneFriendPage.extend(Page);
 
-OneFriendPage.prototype.render = function() {
-	var $view = this.$view,
-		friend_id = this.friend_id,
-		$content = $view.find('.one-friend-main-content'),
-		page_number = 0;
-	
+OnboardingPage.prototype.bindSubscriptions = function() {
+	this.$wrapper.find(".OnboardingOrgItem").not('.-Handled_OnboardingOrgItem').on('click', function() {
+		var $this = $(this);
+		if ($this.hasClass(__C.CLASSES.NEW_ACTIVE)) {
+			__APP.USER.unsubscribeFromOrganization($this.data("organization_id"));
+		} else {
+			__APP.USER.subscribeToOrganization($this.data("organization_id"));
+		}
+		$this.toggleClass(__C.CLASSES.NEW_ACTIVE);
+	}).addClass('-Handled_OnboardingOrgItem');
+};
+
+OnboardingPage.prototype.render = function() {
+	var PAGE = this,
+		$loader = tmpl('loader', {});
 	
 	if(__APP.USER.id === -1){
-		$view.find('.friends-right-bar').remove();
-		$view.find('.back-to-friends-list').remove();
-	} else {
-		getFriendsList($view.find('.friends-right-bar'), function() {
-			$('.friend-item.friend-' + friend_id).addClass(__C.CLASSES.ACTIVE).siblings().removeClass(__C.CLASSES.ACTIVE);
-		});
+		__APP.changeState('/feed/actual', true, true);
+		return null;
 	}
-	
-	$view.find('.friends-main-content').addClass(__C.CLASSES.HIDDEN);
-	$content.removeClass(__C.CLASSES.HIDDEN).empty();
-	
-	function getFriendFeed() {
-		var $load_btn = $content.find('.load-more-btn');
-		if (page_number == 0) {
-			$content.find('.friend-events-block').remove();
+	function appendRecommendations(organizations) {
+		$loader.detach();
+		if (organizations.length) {
+			PAGE.$wrapper.find(".RecommendationsWrapper").last().append(tmpl("onboarding-recommendation", organizations));
+			PAGE.bindSubscriptions();
+			PAGE.block_scroll = false;
+		} else {
+			PAGE.disable_upload = true;
 		}
-		$.ajax({
-			url: '/api/v1/users/' + friend_id + '/actions?fields=entity,created_at,user,type_code,event{fields:"organization_logo_small_url,image_square_vertical_url,organization_short_name"},organization{fields:"subscribed_count,img_medium_url"}&&order_by=-created_at&length=10&offset=' + (10 * page_number++),
-			success: function(res) {
-				var hide_btn = false;
-				if ((res.data.length == 0 && page_number != 1) || (res.data.length < 10 && res.data.length > 0)) {
-					$load_btn.addClass(__C.CLASSES.HIDDEN);
-					hide_btn = true;
-				} else if (res.data.length == 0 && page_number == 1) {
-					$load_btn.before(tmpl('no-activity', {}));
-					$load_btn.addClass(__C.CLASSES.HIDDEN);
-					hide_btn = true;
-				}
-				var cards_by_users = {};
-				res.data.forEach(function(stat) {
-					var date = moment.unix(stat.created_at),
-						ent = stat[stat.entity],
-						key = [stat.entity, stat.stat_type_id, stat.user.id, date.format('DD.MM')].join('-');
-					if (cards_by_users.hasOwnProperty(key) == false) {
-						cards_by_users[key] = {
-							user: stat.user,
-							entity: stat.entity,
-							type_code: stat.type_code,
-							date: date.format(__C.DATE_FORMAT) == moment().format(__C.DATE_FORMAT) ? 'Сегодня' : date.format('DD.MM'),
-							action_name: __C.ACTION_NAMES[stat.type_code][0].capitalize(),
-							first_name: stat.user.first_name,
-							avatar_url: stat.user.avatar_url,
-							friend_id: stat.user.id,
-							last_name: stat.user.last_name,
-							entities: []
-						};
-					}
-					
-					cards_by_users[key].entities.push(ent);
-				});
-				
-				$.each(cards_by_users, function(key, value) {
-					var $card = tmpl('friends-feed-card-short', value),
-						item_tmpl_name = value.entity == __C.ENTITIES.EVENT ? 'friends-feed-event' : 'friends-feed-organization';
-					
-					value.entities.forEach(function(ent) {
-						$card.append(tmpl(item_tmpl_name, ent));
-					});
-					$load_btn.before($card);
-				});
-				if (!hide_btn) {
-					$load_btn.removeClass(__C.CLASSES.HIDDEN).find('.btn').removeClass(__C.CLASSES.DISABLED);
-				}
-				$load_btn.off('click').on('click', getFriendFeed);
-				bindPageLinks($view);
-			}
-		});
 	}
 	
-	$.ajax({
-		url: '/api/v1/users/' + friend_id + '?fields=subscriptions',
-		success: function(res) {
-			$content.append(tmpl('friends-page-header', res.data[0]));
-			__APP.changeTitle(res.data[0].first_name + ' ' + res.data[0].last_name);
-			$content.find('.friend-user-link').on('click', function() {
-				window.open(res.data[0].link, '_blank');
-			});
-			
-			if (res.data[0].subscriptions.length == 0) {
-				tmpl('no-subscriptions', {}, $content.find('.one-friend-subscriptions'));
-			} else {
-				tmpl('friends-subscription', res.data[0].subscriptions, $content.find('.one-friend-subscriptions'))
+	PAGE.$wrapper.html(tmpl("onboarding-main", {}));
+	PAGE.init();
+	PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
+	OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
+	PAGE.$wrapper.find(".RecommendationsScrollbar").scrollbar({
+		onScroll: function(y, x) {
+			if (y.scroll == y.maxScroll && !PAGE.disable_upload && !PAGE.block_scroll) {
+				PAGE.block_scroll = true;
+				PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
+				OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
 			}
-			
-			
-			$content.find('.friend-subscription-block').each(function(index) {
-				var $this = $(this);
-				setTimeout(function() {
-					$this.fadeIn(300);
-				}, index * 40 + 500);
-			});
-			$content.find('.user-btn').on('click', function() {
-				var $this = $(this);
-				$this.addClass(__C.CLASSES.ACTIVE);
-				$this.siblings().removeClass(__C.CLASSES.ACTIVE);
-				$content.find('.' + $this.data('tab'))
-					.removeClass(__C.CLASSES.HIDDEN)
-					.siblings()
-					.addClass(__C.CLASSES.HIDDEN);
-			});
-			
-			if(__APP.USER.id === -1){
-				$view.find('.back-to-friends-list').remove();
-			} else {
-				$view.find('.back-to-friends-list').on('click', function() {
-					__APP.changeState('/friends');
-				});
-			}
-			getFriendFeed();
 		}
 	});
 };
@@ -10164,200 +9999,6 @@ SearchPage.prototype.render = function() {
  * @requires ../Class.Page.js
  */
 /**
- *
- * @constructor
- * @augments Page
- */
-function OnboardingPage() {
-	Page.apply(this, arguments);
-	this.ajax_data = {
-		length: 30,
-		offset: 0,
-		fields: 'img_small_url'
-	};
-	this.disable_upload = false;
-	this.block_scroll = true;
-}
-OnboardingPage.extend(Page);
-
-OnboardingPage.prototype.init = function() {
-	bindRippleEffect(this.$wrapper);
-	bindPageLinks(this.$wrapper);
-	this.$wrapper.find('.Link').on('click', function() {
-		if($(this).is('.SkipOnboarding')){
-			cookies.setItem('skip_onboarding', 1, moment().add(7, 'd')._d);
-		}
-		__APP.SIDEBAR.updateSubscriptions();
-	});
-};
-
-OnboardingPage.prototype.bindSubscriptions = function() {
-	this.$wrapper.find(".OnboardingOrgItem").not('.-Handled_OnboardingOrgItem').on('click', function() {
-		var $this = $(this);
-		if ($this.hasClass(__C.CLASSES.NEW_ACTIVE)) {
-			__APP.USER.unsubscribeFromOrganization($this.data("organization_id"));
-		} else {
-			__APP.USER.subscribeToOrganization($this.data("organization_id"));
-		}
-		$this.toggleClass(__C.CLASSES.NEW_ACTIVE);
-	}).addClass('-Handled_OnboardingOrgItem');
-};
-
-OnboardingPage.prototype.render = function() {
-	var PAGE = this,
-		$loader = tmpl('loader', {});
-	
-	if(__APP.USER.id === -1){
-		__APP.changeState('/feed/actual', true, true);
-		return null;
-	}
-	function appendRecommendations(organizations) {
-		$loader.detach();
-		if (organizations.length) {
-			PAGE.$wrapper.find(".RecommendationsWrapper").last().append(tmpl("onboarding-recommendation", organizations));
-			PAGE.bindSubscriptions();
-			PAGE.block_scroll = false;
-		} else {
-			PAGE.disable_upload = true;
-		}
-	}
-	
-	PAGE.$wrapper.html(tmpl("onboarding-main", {}));
-	PAGE.init();
-	PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
-	OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
-	PAGE.$wrapper.find(".RecommendationsScrollbar").scrollbar({
-		onScroll: function(y, x) {
-			if (y.scroll == y.maxScroll && !PAGE.disable_upload && !PAGE.block_scroll) {
-				PAGE.block_scroll = true;
-				PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
-				OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
-			}
-		}
-	});
-};
-/**
- * @requires Class.StatisticsPage.js
- */
-/**
- *
- * @constructor
- * @augments StatisticsPage
- */
-function StatisticsOverviewPage() {
-	StatisticsPage.apply(this);
-	this.my_organizations_fields = ['img_medium_url', 'subscribed_count', 'staff'];
-	this.page_title = 'Организации';
-	this.my_organizations = new OrganizationsCollection();
-}
-StatisticsOverviewPage.extend(StatisticsPage);
-
-StatisticsOverviewPage.buildMyOrganizationsBlocks = function(organizations) {
-	return tmpl('statistics-overview-organization', organizations.map(function(org) {
-		var avatars_max_count = 2,
-			staff_additional_fields = {
-				is_link: true,
-				avatar_classes: ['-size_100x100', '-rounded']
-			},
-			org_roles = [
-				{
-					name: OneUser.ROLE.ADMIN,
-					title: 'Администраторы',
-					staff: UsersCollection.getSpecificStaff(OneUser.ROLE.ADMIN, org.staff, staff_additional_fields),
-					plural_name: OneUser.ROLE.ADMIN + 's'
-				}, {
-					name: OneUser.ROLE.MODERATOR,
-					title: 'Модераторы',
-					staff: UsersCollection.getSpecificStaff(OneUser.ROLE.MODERATOR, org.staff, staff_additional_fields),
-					plural_name: OneUser.ROLE.MODERATOR + 's'
-				}
-			];
-		org_roles.forEach(function(role) {
-			org[role.plural_name] = __APP.BUILD.avatarCollection(role.staff, avatars_max_count, {
-				dataset: {
-					modal_type: 'editors',
-					modal_specific_role: role.name,
-					modal_title: role.title,
-					modal_organization_id: org.id
-				},
-				classes: ['-size_30x30', '-rounded', '-shifted', 'CallModal'],
-				counter_classes: ['-size_30x30','-color_marginal_primary']
-			});
-		});
-		return $.extend(true, {}, org, {
-			subscribers: org.subscribed_count + getUnitsText(org.subscribed_count, __LOCALES.ru_RU.TEXTS.SUBSCRIBERS),
-			buttons: __APP.BUILD.link({
-				title: 'Редактировать',
-				classes: ['button', 'fa_icon', 'fa-pencil', '-color_neutral', 'RippleEffect'],
-				page: '/organization/' + org.id + '/edit'
-			}, {
-				title: 'Создать событие',
-				classes: ['button', 'fa_icon', 'fa-plus', '-color_accent', 'RippleEffect'],
-				page: '/add/event/to/' + org.id
-			})
-		});
-	}));
-};
-
-StatisticsOverviewPage.prototype.fetchData = function() {
-	return this.fetching_data_defer = this.my_organizations.fetchMyOrganizations('admin', this.my_organizations_fields, 10, '');
-};
-
-StatisticsOverviewPage.prototype.bindOrganizationsEvents = function($parent) {
-	trimAvatarsCollection($parent);
-	bindPageLinks($parent);
-	__APP.MODALS.bindCallModal($parent);
-	bindRippleEffect($parent);
-	return $parent;
-};
-
-StatisticsOverviewPage.prototype.bindUploadOnScroll = function() {
-	var PAGE = this,
-		$window = $(window),
-		scrollEvent = function() {
-			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.disable_upload) {
-				$window.off('scroll.uploadOrganizations');
-				PAGE.my_organizations.fetchMyOrganizations('admin', PAGE.my_organizations_fields, 10, '', function(organizations) {
-					var $organizations = StatisticsOverviewPage.buildMyOrganizationsBlocks(organizations);
-					if (organizations.length) {
-						PAGE.$wrapper.find('.StatOverviewOrganizations').append($organizations);
-						PAGE.bindOrganizationsEvents($organizations);
-						$window.on('scroll.uploadOrganizations', scrollEvent);
-					} else {
-						PAGE.disable_upload = true;
-					}
-				});
-			}
-		};
-	
-	if (!PAGE.disable_upload) {
-		$window.on('scroll.uploadOrganizations', scrollEvent);
-	}
-};
-
-StatisticsOverviewPage.prototype.init = function() {
-	this.bindOrganizationsEvents(this.$wrapper);
-	this.bindUploadOnScroll();
-};
-
-StatisticsOverviewPage.prototype.render = function() {
-	if(__APP.USER.id === -1){
-		__APP.changeState('/feed/actual', true, true);
-		return null;
-	}
-	this.$wrapper.html(tmpl('statistics-overview-wrapper', {
-		organizations: StatisticsOverviewPage.buildMyOrganizationsBlocks(this.my_organizations)
-	}));
-	this.init();
-};
-
-StatisticsOverviewPage.prototype.destroy = function() {
-	$(window).off('scroll.uploadOrganizations');
-};
-/**
- * @requires ../Class.Page.js
- */
-/**
  * @class UserPage
  * @extends Page
  */
@@ -10648,6 +10289,124 @@ MyProfilePage = extending(UserPage, (function() {
 	
 	return MyProfilePage;
 }()));
+/**
+ * @requires Class.StatisticsPage.js
+ */
+/**
+ *
+ * @constructor
+ * @augments StatisticsPage
+ */
+function StatisticsOverviewPage() {
+	StatisticsPage.apply(this);
+	this.my_organizations_fields = ['img_medium_url', 'subscribed_count', 'staff'];
+	this.page_title = 'Организации';
+	this.my_organizations = new OrganizationsCollection();
+}
+StatisticsOverviewPage.extend(StatisticsPage);
+
+StatisticsOverviewPage.buildMyOrganizationsBlocks = function(organizations) {
+	return tmpl('statistics-overview-organization', organizations.map(function(org) {
+		var avatars_max_count = 2,
+			staff_additional_fields = {
+				is_link: true,
+				avatar_classes: ['-size_100x100', '-rounded']
+			},
+			org_roles = [
+				{
+					name: OneUser.ROLE.ADMIN,
+					title: 'Администраторы',
+					staff: UsersCollection.getSpecificStaff(OneUser.ROLE.ADMIN, org.staff, staff_additional_fields),
+					plural_name: OneUser.ROLE.ADMIN + 's'
+				}, {
+					name: OneUser.ROLE.MODERATOR,
+					title: 'Модераторы',
+					staff: UsersCollection.getSpecificStaff(OneUser.ROLE.MODERATOR, org.staff, staff_additional_fields),
+					plural_name: OneUser.ROLE.MODERATOR + 's'
+				}
+			];
+		org_roles.forEach(function(role) {
+			org[role.plural_name] = __APP.BUILD.avatarCollection(role.staff, avatars_max_count, {
+				dataset: {
+					modal_type: 'editors',
+					modal_specific_role: role.name,
+					modal_title: role.title,
+					modal_organization_id: org.id
+				},
+				classes: ['-size_30x30', '-rounded', '-shifted', 'CallModal'],
+				counter_classes: ['-size_30x30','-color_marginal_primary']
+			});
+		});
+		return $.extend(true, {}, org, {
+			subscribers: org.subscribed_count + getUnitsText(org.subscribed_count, __LOCALES.ru_RU.TEXTS.SUBSCRIBERS),
+			buttons: __APP.BUILD.link({
+				title: 'Редактировать',
+				classes: ['button', 'fa_icon', 'fa-pencil', '-color_neutral', 'RippleEffect'],
+				page: '/organization/' + org.id + '/edit'
+			}, {
+				title: 'Создать событие',
+				classes: ['button', 'fa_icon', 'fa-plus', '-color_accent', 'RippleEffect'],
+				page: '/add/event/to/' + org.id
+			})
+		});
+	}));
+};
+
+StatisticsOverviewPage.prototype.fetchData = function() {
+	return this.fetching_data_defer = this.my_organizations.fetchMyOrganizations('admin', this.my_organizations_fields, 10, '');
+};
+
+StatisticsOverviewPage.prototype.bindOrganizationsEvents = function($parent) {
+	trimAvatarsCollection($parent);
+	bindPageLinks($parent);
+	__APP.MODALS.bindCallModal($parent);
+	bindRippleEffect($parent);
+	return $parent;
+};
+
+StatisticsOverviewPage.prototype.bindUploadOnScroll = function() {
+	var PAGE = this,
+		$window = $(window),
+		scrollEvent = function() {
+			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.disable_upload) {
+				$window.off('scroll.uploadOrganizations');
+				PAGE.my_organizations.fetchMyOrganizations('admin', PAGE.my_organizations_fields, 10, '', function(organizations) {
+					var $organizations = StatisticsOverviewPage.buildMyOrganizationsBlocks(organizations);
+					if (organizations.length) {
+						PAGE.$wrapper.find('.StatOverviewOrganizations').append($organizations);
+						PAGE.bindOrganizationsEvents($organizations);
+						$window.on('scroll.uploadOrganizations', scrollEvent);
+					} else {
+						PAGE.disable_upload = true;
+					}
+				});
+			}
+		};
+	
+	if (!PAGE.disable_upload) {
+		$window.on('scroll.uploadOrganizations', scrollEvent);
+	}
+};
+
+StatisticsOverviewPage.prototype.init = function() {
+	this.bindOrganizationsEvents(this.$wrapper);
+	this.bindUploadOnScroll();
+};
+
+StatisticsOverviewPage.prototype.render = function() {
+	if(__APP.USER.id === -1){
+		__APP.changeState('/feed/actual', true, true);
+		return null;
+	}
+	this.$wrapper.html(tmpl('statistics-overview-wrapper', {
+		organizations: StatisticsOverviewPage.buildMyOrganizationsBlocks(this.my_organizations)
+	}));
+	this.init();
+};
+
+StatisticsOverviewPage.prototype.destroy = function() {
+	$(window).off('scroll.uploadOrganizations');
+};
 /**
  *
  * @class jqPromise
@@ -10996,15 +10755,15 @@ __APP = {
 		'search': {
 			'^([^/]+)': SearchPage
 		},
-		'friends': FriendsPage,
+		'friends': MyProfilePage,
 		'friend': {
-			'^([0-9]+)': OneFriendPage,
-			'': FriendsPage
+			'^([0-9]+)': UserPage,
+			'': MyProfilePage
 		},
 		'user': {
 			'me': MyProfilePage,
 			'^([0-9]+)': UserPage,
-			'': FriendsPage
+			'': MyProfilePage
 		},
 		'statistics': {
 			'organization': {

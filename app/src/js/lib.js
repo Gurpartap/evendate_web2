@@ -1829,29 +1829,3 @@ function showSettingsModal() {
 		}
 	});
 }
-
-function getFriendsList($friends_right_list, cb) {
-	$.ajax({
-		url: '/api/v1/users/friends?page=0&length=500',
-		success: function(res) {
-			if (res.data.length == 0) {
-				$('.no-friends-block').removeClass(__C.CLASSES.HIDDEN);
-				$('.friends-right-bar, .friends-main-content, .one-friend-profile').addClass(__C.CLASSES.HIDDEN);
-				return;
-			}
-			$friends_right_list.find('.friends-list').empty();
-			$friends_right_list.removeClass(__C.CLASSES.HIDDEN);
-			tmpl('friend-item', res.data, $friends_right_list.find('.friends-list'));
-			$friends_right_list.find('.friends-count').text(res.data.length);
-			bindPageLinks($friends_right_list);
-			if ($friends_right_list.height() > window.innerHeight - 200) {
-				$friends_right_list.find('.friends-list').slimscroll({
-					height: window.innerHeight - 200,
-					width: '100%'
-				});
-			}
-			
-			if (cb) cb(res);
-		}
-	});
-}

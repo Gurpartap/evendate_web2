@@ -346,15 +346,15 @@ __APP = {
 		'search': {
 			'^([^/]+)': SearchPage
 		},
-		'friends': FriendsPage,
+		'friends': MyProfilePage,
 		'friend': {
-			'^([0-9]+)': OneFriendPage,
-			'': FriendsPage
+			'^([0-9]+)': UserPage,
+			'': MyProfilePage
 		},
 		'user': {
 			'me': MyProfilePage,
 			'^([0-9]+)': UserPage,
-			'': FriendsPage
+			'': MyProfilePage
 		},
 		'statistics': {
 			'organization': {
