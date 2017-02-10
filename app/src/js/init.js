@@ -75,7 +75,7 @@ $(document)
 		
 		if (window['moment'] != undefined) {
 			moment.locale(navigator.language);
-			moment.tz.setDefault('Europe/Moscow');
+			//moment.tz.setDefault('Europe/Moscow');
 			moment.updateLocale('ru', {
 				monthsShort: __LOCALES.ru_RU.DATE.MONTH_SHORT_NAMES,
 				calendar: {

@@ -10,25 +10,6 @@
 function RedactEventPage(event_id) {
 	Page.apply(this);
 	this.page_title = 'Редактирование события';
-	
-	this.fields = [
-		'image_horizontal_large_url',
-		'description',
-		'location',
-		'can_edit',
-		'registration_required',
-		'registration_till',
-		'is_free',
-		'min_price',
-		'organization_logo_small_url',
-		'organization_short_name',
-		'is_same_time',
-		'dates{length:0,fields:"start_time,end_time"}',
-		'tags',
-		'detail_info_url',
-		'public_at',
-		'canceled'
-	];
 	this.event = new OneEvent(event_id);
 }
 RedactEventPage.extend(Page);
@@ -64,18 +45,19 @@ RedactEventPage.lastRegistrationCustomFieldId = 0;
 
 /**
  *
- * @param {Array} [registration_data]
+ * @param {RegistrationFieldModel|Array<RegistrationFieldModel>|RegistrationFieldsCollection} [registration_data]
  * @return {jQuery}
  */
 RedactEventPage.buildRegistrationCustomField = function(registration_data) {
+	registration_data = registration_data ? (registration_data instanceof Array ? registration_data : [registration_data]) : [{}];
 	var $fields;
-	registration_data = registration_data ? registration_data : [{}];
 	
-	$fields = tmpl('edit-event-registration-custom-field', registration_data.map(function(data) {
-		if (!data.id) {
-			data.id = RedactEventPage.lastRegistrationCustomFieldId++;
+	$fields = tmpl('edit-event-registration-custom-field', registration_data.filter(function(data) {
+		if (RegistrationFieldModel.isCustomField(data)) {
+			data.id = data.id ? data.id : RedactEventPage.lastRegistrationCustomFieldId++;
+			return true;
 		}
-		return data;
+		return false;
 	}));
 	registration_data.forEach(function(data) {
 		if (data.required) {
@@ -94,7 +76,7 @@ RedactEventPage.buildRegistrationCustomField = function(registration_data) {
 
 RedactEventPage.prototype.fetchData = function() {
 	if(this.event.id){
-		return this.fetching_data_defer = this.event.fetchEvent(this.fields);
+		return this.fetching_data_defer = this.event.fetchEvent(EventPage.fields);
 	}
 	return Page.prototype.fetchData.call(this);
 };
@@ -116,28 +98,8 @@ RedactEventPage.prototype.init = function() {
 			$event_tags = $form.find('input.EventTags'),
 			form_data = $form.serializeForm(),
 			is_edit = !!(PAGE.event.id),
-			is_form_valid,
-			data = {
-				event_id: null,
-				title: null,
-				image_horizontal: null,
-				organization_id: null,
-				location: null,
-				description: null,
-				detail_info_url: null,
-				different_time: null,
-				dates: [],
-				tags: null,
-				registration_required: null,
-				registration_till: null,
-				is_free: null,
-				min_price: null,
-				delayed_publication: null,
-				public_at: null,
-				filenames: {
-					horizontal: null
-				}
-			};
+			send_data,
+			is_form_valid;
 		
 		is_form_valid = (function validation($form, Calendar) {
 			var is_valid = true,
@@ -165,7 +127,7 @@ RedactEventPage.prototype.init = function() {
 				return false;
 			}
 			
-			$form.find(':required').not(':disabled').each(function() {
+			$form.find(':required').not($form.find(':disabled')).each(function() {
 				var $this = $(this);
 				
 				if ($this.val().trim() === '') {
@@ -200,6 +162,10 @@ RedactEventPage.prototype.init = function() {
 				is_valid = failSubmit($event_tags.siblings('.EventTags'), is_valid, 'Необходимо выбрать хотя бы один тэг');
 			}
 			
+			if (form_data.registration_limit_by_quantity && (!form_data.registration_fields || !form_data.registration_fields.length)) {
+				is_valid = failSubmit($form.find('#edit_event_registration_fields'), is_valid, 'Должно быть выбрано хотя бы одно поле регистрации в анкете');
+			}
+			
 			if (!is_edit) {
 				$form.find('.DataUrl').each(function() {
 					var $this = $(this);
@@ -221,52 +187,93 @@ RedactEventPage.prototype.init = function() {
 		}
 		
 		if (is_form_valid) {
-			$.extend(true, data, form_data);
+			
+			send_data = {
+				event_id: parseInt(form_data.event_id) ? parseInt(form_data.event_id) : null,
+				title: form_data.title,
+				organization_id: form_data.organization_id,
+				description: form_data.description,
+				location: form_data.location,
+				detail_info_url: form_data.detail_info_url,
+				image_horizontal: form_data.image_horizontal,
+				filenames: {horizontal: form_data.filename_horizontal},
+				is_free: form_data.is_free,
+				min_price: form_data.is_free ? null : form_data.min_price
+			};
+			
+			send_data.registration_required = form_data.registration_required;
+			if (form_data.registration_required) {
+				if (form_data.registration_limit_by_date) {
+					send_data.registration_till = moment(
+						form_data.registration_till_date + 'T' +
+						form_data.registration_till_time_hours + ':' +
+						form_data.registration_till_time_minutes + ':00'
+					).tz('UTC').format();
+				}
+				
+				if (form_data.registration_limit_by_quantity) {
+					send_data.registration_locally = true;
+					send_data.registration_limit_count = form_data.registration_limit_count;
+				}
+				
+				if (form_data.registration_fields && form_data.registration_fields.length) {
+					send_data.registration_locally = true;
+					send_data.registration_fields = (new RegistrationFieldsCollection()).setData(form_data.registration_fields.map(function(id) {
+						var field = new RegistrationFieldModel();
+						field.setData({
+							type: form_data['registration_' + id + '_field_type'],
+							required: form_data['registration_' + id + '_field_required']
+						});
+						if (form_data['registration_' + id + '_field_label']) {
+							field.setData({label: form_data['registration_' + id + '_field_label']});
+						}
+						
+						return field;
+					})).getArrayCopy();
+				}
+			}
 			
 			if(form_data.tags){
-				data.tags = form_data.tags.split(',');
-			}
-			data.filenames = {
-				horizontal: data.filename_horizontal
-			};
-			if (data.registration_required) {
-				data.registration_till = "" + data.registration_till_date + 'T' + data.registration_till_time_hours + ':' + data.registration_till_time_minutes + ':00'
-			}
-			if (data.delayed_publication) {
-				data.public_at = "" + data.public_at_date + 'T' + data.public_at_time_hours + ':' + data.public_at_time_minutes + ':00'
+				send_data.tags = form_data.tags.split(',');
 			}
 			
-			if (data.different_time) {
-				var selected_days_rows = $('.SelectedDaysRows').children();
-				
-				selected_days_rows.each(function() {
-					var $this = $(this);
-					data.dates.push({
-						event_date: $this.find('.DatePicker').data('selected_day'),
-						start_time: $this.find('.StartHours').val() + ':' + $this.find('.StartMinutes').val(),
-						end_time: $this.find('.EndHours').val() + ':' + $this.find('.EndMinutes').val()
-					});
+			send_data.delayed_publication = form_data.delayed_publication;
+			if (form_data.delayed_publication) {
+				send_data.public_at = moment(
+					form_data.public_at_date + 'T' +
+					form_data.public_at_time_hours + ':' +
+					form_data.public_at_time_minutes + ':00'
+				).tz('UTC').format();
+			}
+			
+			send_data.different_time = form_data.different_time;
+			send_data.dates = new DateModelsCollection();
+			if (form_data.different_time) {
+				PAGE.$wrapper.find('.SelectedDaysRows').children().each(function(i, row) {
+					var $row = $(row);
+					send_data.dates.push((new DateModel()).setData({
+						event_date: $row.find('.DatePicker').data('selected_day'),
+						start_time: $row.find('.StartHours').val() + ':' + $row.find('.StartMinutes').val(),
+						end_time: $row.find('.EndHours').val() + ':' + $row.find('.EndMinutes').val()
+					}));
 				});
 			} else {
-				var $main_time = PAGE.$wrapper.find('.MainTime'),
-					start_time = $main_time.find('.StartHours').val() + ':' + $main_time.find('.StartMinutes').val(),
-					end_time = $main_time.find('.EndHours').val() + ':' + $main_time.find('.EndMinutes').val();
-				
 				MainCalendar.selected_days.forEach(function(day) {
-					data.dates.push({
+					send_data.dates.push((new DateModel()).setData({
 						event_date: day,
-						start_time: start_time,
-						end_time: end_time
-					})
+						start_time: form_data.start_hours + ':' + form_data.start_minutes,
+						end_time: form_data.end_hours + ':' + form_data.end_minutes
+					}));
 				});
 			}
+			send_data.dates = send_data.dates.getArrayCopy();
 			
 			PAGE.$wrapper.addClass('-faded');
 			try {
 				if (is_edit) {
-					PAGE.event.updateEvent(data, afterSubmit, onError);
+					PAGE.event.updateEvent(send_data, afterSubmit, onError);
 				} else {
-					PAGE.event.createEvent(data, afterSubmit, onError);
+					PAGE.event.createEvent(send_data, afterSubmit, onError);
 				}
 			} catch (e) {
 				PAGE.$wrapper.removeClass('-faded');
@@ -469,10 +476,6 @@ RedactEventPage.prototype.init = function() {
 		MainCalendar.$calendar.on('days-changed.displayFormattedText', displayFormattedText);
 		MainCalendar.$calendar.on('days-changed.buildTable', BuildSelectedDaysTable);
 		
-		PAGE.$wrapper.find('#edit_event_different_time').on('change', function() {
-			PAGE.$wrapper.find('.MainTime').toggleStatus('disabled');
-		});
-		
 		AddRowDatePicker.$datepicker.on('date-picked', function() {
 			MainCalendar.selectDays(AddRowDatePicker.selected_day);
 		});
@@ -634,6 +637,7 @@ RedactEventPage.prototype.render = function() {
 			button_text: is_edit ? 'Сохранить' : 'Опубликовать'
 		}),
 		registration_props = {
+			registration_limit_count: PAGE.event.registration_limit_count,
 			registration_till_display_date: 'Дата',
 			tomorrow_date: page_vars.tomorrow_date,
 			predefined_field: tmpl('edit-event-registration-predefined-field', [
@@ -645,12 +649,12 @@ RedactEventPage.prototype.render = function() {
 		};
 	
 	
-	if(__APP.USER.id === -1){
+	if (__APP.USER.id === -1) {
 		__APP.changeState('/feed/actual', true, true);
 		return null;
 	}
-	if(window.location.pathname.contains('event/add')){
-		if(this.organization_id){
+	if (window.location.pathname.contains('event/add')) {
+		if (this.organization_id) {
 			__APP.changeState('/add/event/to/' + this.organization_id, true, true);
 		} else {
 			__APP.changeState('/add/event', true, true);
@@ -774,11 +778,24 @@ RedactEventPage.prototype.render = function() {
 			if (PAGE.event.registration_till) {
 				PAGE.$wrapper.find('#edit_event_registration_limit_by_date').prop('checked', true).trigger('change');
 			}
+			if (PAGE.event.registration_limit_count) {
+				PAGE.$wrapper.find('#edit_event_registration_limit_by_quantity').prop('checked', true).trigger('change');
+			}
+			if (page_vars.registration_fields && page_vars.registration_fields.length) {
+				PAGE.$wrapper.find('.AddRegistrationCustomField').before(RedactEventPage.buildRegistrationCustomField(page_vars.registration_fields.filter(function(field) {
+					var is_custom_field = RegistrationFieldModel.isCustomField(field);
+					if (!is_custom_field) {
+						PAGE.$wrapper.find('#edit_event_registration_'+field.type+'_field_enable').prop('checked', true).trigger('change');
+						if (field.required) {
+							PAGE.$wrapper.find('#edit_event_registration_'+field.type+'_field_required').prop('checked', true);
+						}
+					}
+					
+					return is_custom_field;
+				})));
+			}
 		}
-		if (page_vars.registration_fields && page_vars.registration_fields.length) {
-			RedactEventPage.buildRegistrationCustomField(page_vars.registration_fields).insertBefore(PAGE.$wrapper.find('.AddRegistrationCustomField'));
-		}
-		if(page_vars.public_at == null) {
+		if (page_vars.public_at == null) {
 			PAGE.$wrapper.find('#edit_event_delayed_publication').toggleStatus('disabled');
 		}
 	}

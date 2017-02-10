@@ -1,6 +1,6 @@
 /**
  *
- * @param {jQuery} $calendar
+ * @param {(jQuery|Element|string)} $calendar
  * @param {object} options
  * @constructor
  */

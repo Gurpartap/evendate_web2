@@ -23,8 +23,14 @@ Fields = (function() {
 				var output = {},
 					prop;
 				for (prop in this) {
-					if(this.hasOwnProperty(prop)){
-						output[prop] = this[prop] instanceof Array ? this[prop].join(',') : this[prop];
+					if (this.hasOwnProperty(prop)) {
+						if (this[prop] instanceof Array) {
+							output[prop] = this[prop].join(',');
+						} else if (this[prop] instanceof Fields) {
+							output[prop] = this[prop].toString();
+						} else {
+							output[prop] = this[prop];
+						}
 					}
 				}
 				return JSON.stringify(output);
@@ -78,7 +84,7 @@ Fields = (function() {
 			if(split.length > 1){
 				subset = JSON.parse('{' + split[1].replace(/(\w+):/g, function(str, m1) {return '"'+m1+'":';}));
 				if(subset.fields){
-					subset.fields = subset.fields.split(',');
+					subset.fields = new (Function.prototype.bind.apply(Fields, [null].concat(subset.fields.split(','))))();
 				}
 				if(subset.order_by){
 					subset.order_by = subset.order_by.split(',');

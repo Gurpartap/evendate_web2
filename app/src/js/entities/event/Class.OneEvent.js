@@ -200,7 +200,7 @@ OneEvent = extending(OneEntity, (function() {
 	};
 	/**
 	 *
-	 * @param {(string|Array)} fields
+	 * @param {(Fields|string|Array)} fields
 	 * @param {AJAXCallback} [success]
 	 * @returns {jqPromise}
 	 */

@@ -70,6 +70,15 @@ EntitiesCollection = extending(Array, (function() {
 	};
 	/**
 	 *
+	 * @return {Array}
+	 */
+	EntitiesCollection.prototype.getArrayCopy = function() {
+		return this.map(function(el) {
+			return el;
+		})
+	};
+	/**
+	 *
 	 * @param {(string|number)} id
 	 * @returns {Array<OneEntity>}
 	 */

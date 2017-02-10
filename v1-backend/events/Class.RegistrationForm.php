@@ -30,7 +30,7 @@ class RegistrationForm
 		return $p_get_field->fetch();
 	}
 
-	private static function addFormField(int $event_id, string $type, string $label, bool $required, PDO $db)
+	private static function addFormField(int $event_id, string $type, string $label = null, bool $required, PDO $db)
 	{
 		$q_ins_field = App::queryFactory()->newInsert();
 		$field_type_info = self::getFormFieldTypeInfo($type, $db);

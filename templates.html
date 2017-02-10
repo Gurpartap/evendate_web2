@@ -419,38 +419,40 @@
 			<div class="event_datepicker_form">
 				<p>Выбраны даты:</p>
 				<div class="selected_days EventSelectedDaysText"><p>Даты не выбраны</p></div>
-				<div class="form_group MainTime -parts_e_2">
-					<div class="form_unit -inline">
-						<label class="form_label">Начало</label>
-						<div class="form_unit">
-							<div class="form_group -time_input TimeInput">
-								<div class="form_unit">
-									<input class="form_input StartHours">
+				<fieldset class="Switching MainTime" data-switch_id="different_time">
+					<div class="form_group -parts_e_2">
+						<div class="form_unit -inline">
+							<label class="form_label">Начало</label>
+							<div class="form_unit">
+								<div class="form_group -time_input TimeInput">
+									<div class="form_unit">
+										<input class="form_input StartHours" name="start_hours">
+									</div>
+									<span class="divider">:</span>
+									<div class="form_unit">
+										<input class="form_input StartMinutes" name="start_minutes">
+									</div>
 								</div>
-								<span class="divider">:</span>
-								<div class="form_unit">
-									<input class="form_input StartMinutes">
+							</div>
+						</div>
+						<div class="form_unit -inline">
+							<label class="form_label">Конец</label>
+							<div class="form_unit">
+								<div class="form_group -time_input TimeInput">
+									<div class="form_unit">
+										<input class="form_input EndHours" name="end_hours">
+									</div>
+									<span class="divider">:</span>
+									<div class="form_unit">
+										<input class="form_input EndMinutes" name="end_minutes">
+									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-					<div class="form_unit -inline">
-						<label class="form_label">Конец</label>
-						<div class="form_unit">
-							<div class="form_group -time_input TimeInput">
-								<div class="form_unit">
-									<input class="form_input EndHours">
-								</div>
-								<span class="divider">:</span>
-								<div class="form_unit">
-									<input class="form_input EndMinutes">
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
+				</fieldset>
 				<div class="form_unit">
-					<input id="edit_event_different_time" class="form_checkbox CollapsingTrigger" type="checkbox" name="different_time" tabindex="-1" data-collapsing_id="event_edit_date_picker">
+					<input id="edit_event_different_time" class="form_checkbox CollapsingTrigger Switch" type="checkbox" name="different_time" tabindex="-1" data-collapsing_id="event_edit_date_picker" data-switch_id="different_time">
 					<label class="form_label" for="edit_event_different_time"><span>Разное время</span></label>
 				</div>
 			</div>
@@ -460,6 +462,7 @@
 			<div class="collapsing_content CollapsingContent">
 				<table class="event_selected_days_table">
 					<colgroup>
+						<col width="0%">
 						<col width="7%">
 						<col width="21%">
 						<col width="10%">
@@ -469,10 +472,11 @@
 					<thead>
 						<tr>
 							<th></th>
-							<th>День</th>
-							<th></th>
-							<th>Время начала</th>
-							<th>Время конца</th>
+							<th data-sort-method="none"></th>
+							<th data-sort-method="none">День</th>
+							<th data-sort-method="none"></th>
+							<th data-sort-method="none">Время начала</th>
+							<th data-sort-method="none">Время конца</th>
 						</tr>
 					</thead>
 					<tbody class="SelectedDaysRows">
@@ -538,13 +542,13 @@
 	<p class="form_text">Если на ваше событие требуется регистрация, вы можете настроить её параметры здесь. Вы можете задать крайний срок регистрации, максимальное количество мест, </p>
 
 	<div class="form_unit form_accent_block">
-		<input id="edit_event_registration_required" class="form_checkbox CollapsingTrigger Switch" type="checkbox" name="registration_required" data-collapsing_id="registration_wrapper" data-collapsing_trigger="change"  data-switch_id="registration_required">
+		<input id="edit_event_registration_required" class="form_checkbox Switch" type="checkbox" name="registration_required" data-switch_id="registration">
 		<label class="form_label" for="edit_event_registration_required"><span>Обязательная регистрация на событие</span></label>
 	</div>
 
-	<fieldset class="Switching" data-switch_id="registration_required" disabled>
+	<fieldset class="Switching" data-switch_id="registration" disabled>
 
-		<h3>Ограничение на количество регистраций</h3>
+		<h3>Ограничение регистраций</h3>
 
 		<div class="form_unit form_accent_block">
 			<input id="edit_event_registration_limit_by_date" class="form_checkbox Switch" type="checkbox" name="registration_limit_by_date" data-switch_id="registration_limit_by_date">
@@ -556,9 +560,9 @@
 
 				<div class="form_unit -inline">
 					<label class="form_label">Дата окончания регистрации</label>
-					<div class="form_select -valign_center form_datepicker DatePicker" data-min_date="{tomorrow_date}">
-						<label>{registration_till_data_label}</label>
-						<input name="registration_till_date" value="{registration_till_data}" type="hidden" required>
+					<div class="form_select -valign_center form_datepicker DatePicker" data-selected_day="{registration_till_date}" data-min_date="{tomorrow_date}">
+						<label>{registration_till_display_date}</label>
+						<input name="registration_till_date" value="{registration_till_date}" type="hidden" required>
 					</div>
 				</div>
 
@@ -590,12 +594,12 @@
 		<fieldset class="Switching" data-switch_id="registration_limit_by_quantity" disabled>
 			<div class="form_unit RegistrationQuantity -inline">
 				<label class="form_label" for="edit_event_registration_limit_count">Максимальное кол-во</label>
-				<input id="edit_event_registration_limit_count" class="form_input" type="text" name="registration_limit_count" autocomplete="off" placeholder="1" required>
+				<input id="edit_event_registration_limit_count" class="form_input" type="text" name="registration_limit_count" value="{registration_limit_count}" autocomplete="off" placeholder="1" required>
 			</div>
 		</fieldset>
 
 
-		<h3>Анкета регистрации</h3>
+		<h3 id="edit_event_registration_fields">Анкета регистрации</h3>
 
 		{predefined_field}
 
@@ -613,16 +617,16 @@
 
 <script type="javascript/template" id="tmpl-edit-event-registration-predefined-field">
 	<div class="form_unit form_accent_block">
-		<input id="edit_event_registration_{id}_field_enable" class="form_checkbox Switch" type="checkbox" name="registration_fields" value="{id}" data-switch_id="registration_{id}_field">
-		<label class="form_label" for="edit_event_registration_{id}_field_enable"><span>{name}</span></label>
+		<input id="edit_event_registration_{type}_field_enable" class="form_checkbox Switch" type="checkbox" name="registration_fields" value="{id}" data-switch_id="registration_{type}_field">
+		<label class="form_label" for="edit_event_registration_{type}_field_enable"><span>{name}</span></label>
 	</div>
 	<div class="form_fieldset">
 		<p>{description}</p>
-		<fieldset class="Switching" data-switch_id="registration_{id}_field" disabled>
+		<fieldset class="Switching" data-switch_id="registration_{type}_field" disabled>
 			<input type="hidden" name="registration_{id}_field_type" value="{type}">
 			<div class="form_unit">
-				<input id="edit_event_registration_{id}_field_required" class="form_checkbox" type="checkbox" name="registration_{id}_field_required">
-				<label class="form_label" for="edit_event_registration_{id}_field_required"><span>Обязательное поле</span></label>
+				<input id="edit_event_registration_{type}_field_required" class="form_checkbox" type="checkbox" name="registration_{id}_field_required">
+				<label class="form_label" for="edit_event_registration_{type}_field_required"><span>Обязательное поле</span></label>
 			</div>
 		</fieldset>
 	</div>
@@ -642,18 +646,14 @@
 			<label class="form_label" for="edit_event_registration_{id}_custom_field_required"><span>Обязательное поле</span></label>
 		</div>
 		<h6>Тип</h6>
-		<div class="form_group -parts_e_e_e">
+		<div class="form_group -parts_e_e">
 			<div class="form_unit">
-				<input id="edit_event_registration_{id}_custom_field_additional_text_type" class="form_radio" type="radio" name="registration_{id}_field_type" value="additional_text" required>
-				<label class="form_label" for="edit_event_registration_{id}_custom_field_additional_text_type"><span>Текстовое</span></label>
+				<input id="edit_event_registration_{id}_custom_field_additional_text_type" class="form_radio" type="radio" name="registration_{id}_field_type" value="custom" required>
+				<label class="form_label" for="edit_event_registration_{id}_custom_field_additional_text_type"><span>Текст</span></label>
 			</div>
 			<div class="form_unit">
-				<input id="edit_event_registration_{id}_custom_field_email_type" class="form_radio" type="radio" name="registration_{id}_field_type" value="email" required>
-				<label class="form_label" for="edit_event_registration_{id}_custom_field_email_type"><span>E-mail</span></label>
-			</div>
-			<div class="form_unit">
-				<input id="edit_event_registration_{id}_custom_field_phone_number_type" class="form_radio" type="radio" name="registration_{id}_field_type" value="phone_number" required>
-				<label class="form_label" for="edit_event_registration_{id}_custom_field_phone_number_type"><span>Телефонный номер</span></label>
+				<input id="edit_event_registration_{id}_custom_field_extended_type" class="form_radio" type="radio" name="registration_{id}_field_type" value="extended_custom" required>
+				<label class="form_label" for="edit_event_registration_{id}_custom_field_extended_type"><span>Расширенный текст</span></label>
 			</div>
 		</div>
 	</fieldset>
@@ -661,6 +661,7 @@
 
 <script type="javascript/template" id="tmpl-selected-table-day">
 	<tr class="TableDay_{date}" data-date="{date}">
+		<td>{datetime}</td>
 		<td><button class="remove_date RemoveRow" type="button">&times;</button></td>
 		<td>
 			<div class="form_unit">
@@ -879,8 +880,8 @@
 
 <script type="javascript/template" id="tmpl-event-date-time-row">
 	<div class="event_additional_field_split">
-		<div class="event_additional_field"><p>{date}</p></div>
-		<div class="event_additional_field"><p>{time}</p></div>
+		<div class="event_additional_field"><span>{date}</span></div>
+		<div class="event_additional_field"><span>{time}</span></div>
 	</div>
 </script>
 

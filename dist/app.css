@@ -4254,7 +4254,7 @@ body.-open_modal > .modal_wrapper {
 	display: inline-block;
 	vertical-align: top;
 	width: 50%;
-	margin: 0;
+	margin: 0 0 .4em;
 }
 
 .event_additional_field > .external_link {
