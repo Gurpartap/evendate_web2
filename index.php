@@ -6,13 +6,13 @@ require_once 'v1-backend/users/Class.User.php';
 require_once 'v1-backend/users/Class.NotAuthorizedUser.php';
 require_once 'v1-backend/tags/Class.TagsCollection.php';
 try {
-    $user = new User($__db);
-    if (isset($_GET['logout']) && $_GET['logout'] == true) {
-        $user->logout();
-    } else {
-        header('Location: /feed');
-        die();
-    }
+	$user = new User($__db);
+	if (isset($_GET['logout']) && $_GET['logout'] == true) {
+		$user->logout();
+	} else {
+		header('Location: /feed');
+		die();
+	}
 } catch (Exception $e) {
 }
 $title = 'Evendate';
@@ -56,7 +56,7 @@ $title = 'Evendate';
         <a class="close-ref" href="#">
             <svg fill="#222222" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
                 <path
-                    d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
                 <path d="M0 0h24v24H0z" fill="none"/>
             </svg>
         </a>
@@ -236,7 +236,7 @@ $title = 'Evendate';
                 <div class="text-slide" data-slide="1">
                     <h2 class="js-animate-this">Получай только то,<br>что любишь</h2>
                     <div class="js-animate-this">
-                        <p>Образование, Искусство, Спорт, Бизнес, Клубы и Бары
+                        <p>Образование, Искусство, Спорт, Бизнес, Клубы и Бары.
                             Лента будет состоять только из тех событий, которые тебе интересны, а система рекомендаций
                             всегда посоветует что-нибудь новое. </p>
                         <div class="slide-cta js-animate-this hidden-sm hidden-xs">
@@ -258,8 +258,8 @@ $title = 'Evendate';
                 </div>
                 <div class="text-slide" data-slide="2">
                     <h2 class="js-animate-this">Узнай куда пойдут<br/>твои друзья</h2>
-                    <p class="js-animate-this">Лента активности поможет узнать какие нравятся места и куда собираются
-                        пойти друзья из социальных сетей. Открывайте новое и ходите на события вместе.</p>
+                    <p class="js-animate-this">С помощью ленты активности можно увидеть места, которые нравятся твоим
+                        друзьям из социальных сетей, и узнать, какие мероприятия они хотят посетить.</p>
                     <div class="slide-cta js-animate-this hidden-sm hidden-xs">
                         <span>Войти через: </span>
                         <a class="slide-cta-button hover-fill vk-auth-btn auth-small-btn social-btn vk-btn" href="#">
@@ -317,7 +317,7 @@ $title = 'Evendate';
                         <div class="col-md-3">
                             <div class="interests-block">
                                 <div class="interest-img-wrapper"><img
-                                        src="app/assets/img/objects/step-4/education.png">
+                                            src="app/assets/img/objects/step-4/education.png">
                                     <div class="selected-overlay">
                                         <div class="selected-overlay-icon-wrapper">
                                             <i class="fa fa-check" aria-hidden="true"></i>

@@ -11,7 +11,7 @@ require_once $BACKEND_FULL_PATH . '/events/Class.NotificationsCollection.php';
 
 $__modules['events'] = array(
 	'GET' => array(
-		'{/(id:[0-9]+)/registrations/(uuid:\w+-\w+-\w+-\w+-\w+)/qr}' => function ($event_id, $uuid) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+		'{/(id:[0-9]+)/tickets/(uuid:\w+-\w+-\w+-\w+-\w+)/qr}' => function ($event_id, $uuid) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
 			$format = 'png';
 			$available_types = ['png', 'svg', 'pdf', 'eps'];
 			$headers = array(
@@ -37,6 +37,9 @@ $__modules['events'] = array(
 			echo file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/qr/' . $event_id . '/' . $uuid . '?format=' . $format . '&size=' . $size);
 			die();
 		},
+		'{/(id:[0-9]+)/tickets}' => function ($event_id, $uuid) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+			//TODO: make it clear to get all tickets
+		},
 		'{{/(id:[0-9]+)}/notifications}' => function ($id) use ($__db, $__order_by, $__request, $__offset, $__length, $__user, $__fields) {
 			$event = EventsCollection::one(
 				$__db,
@@ -46,7 +49,7 @@ $__modules['events'] = array(
 
 			return $event->getNotifications($__user, $__fields, $__length, $__offset, $__order_by);
 		},
-		'{{/(id:[0-9]+)}/registered_users}' => function ($id) use ($__db, $__request, $__user, $__fields, $__pagination, $__order_by) {
+		'{{/(id:[0-9]+)}/participants}' => function ($id) use ($__db, $__request, $__user, $__fields, $__pagination, $__order_by) {
 
 			$event = EventsCollection::one(
 				$__db,
@@ -170,7 +173,7 @@ $__modules['events'] = array(
 			Statistics::Event($event, $__user, $__db, Statistics::EVENT_FAVE);
 			return $__user->addFavoriteEvent($event);
 		},
-		'{{/(id:[0-9]+)}/registrations}' => function ($id) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+		'{{/(id:[0-9]+)}/orders}' => function ($id) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
 			$event = EventsCollection::one(
 				$__db,
 				$__user,
@@ -216,7 +219,7 @@ $__modules['events'] = array(
 			);
 			return $notification->update($__db, $__request);
 		},
-		'{/(id:[0-9]+)/registrations/(uuid:\w+-\w+-\w+-\w+-\w+)}' => function ($id, $registration_uuid) use ($__request, $__fields, $__db, $__user) {
+		'{/(id:[0-9]+)/tickets/(uuid:\w+-\w+-\w+-\w+-\w+)}' => function ($id, $registration_uuid) use ($__request, $__fields, $__db, $__user) {
 
 			$updated = false;
 			$event = EventsCollection::one(
@@ -239,20 +242,6 @@ $__modules['events'] = array(
 			} else {
 				return new Result(false, 'Не указаны поля для обновления');
 			}
-		},
-		'{{/(id:[0-9]+)}/registrations}' => function ($id) use ($__db, $__request, $__user) {
-			$event = EventsCollection::one(
-				$__db,
-				$__user,
-				intval($id),
-				array());
-
-			if (isset($__request['status']) && filter_var($__request['status'], FILTER_VALIDATE_BOOLEAN) == false) {
-				return $event->unregisterUser($__user);
-			} else {
-				throw new BadArgumentException('STATUS_FIELD_CAN_BE_ONLY_FALSE', $__db);
-			}
-
 		},
 		'{/(id:[0-9]+)}' => function ($id) use ($__db, $__request, $__user) {
 			$event = EventsCollection::one($__db, $__user, intval($id), array());

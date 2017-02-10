@@ -4,7 +4,6 @@ require_once $BACKEND_FULL_PATH . '/organizations/Class.Organization.php';
 require_once $BACKEND_FULL_PATH . '/tags/Class.Tag.php';
 require_once $BACKEND_FULL_PATH . '/tags/Class.TagsCollection.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.RegistrationForm.php';
-require_once $BACKEND_FULL_PATH . '/events/Class.Registration.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.RegistrationFieldsCollection.php';
 
 class Event extends AbstractEntity
@@ -121,10 +120,12 @@ class Event extends AbstractEntity
 		'favored_users_count',
 		'public_at',
 		'registration_required',
+		'registration_since',
 		'registration_till',
 		'registration_approvement_required',
 		'registration_limit_count',
 		'registration_locally',
+		'ticketing_locally',
 		'is_free',
 		'min_price',
 		'vk_image_url',
@@ -323,6 +324,29 @@ class Event extends AbstractEntity
 		}
 	}
 
+	private static function saveTicketingInfo(ExtendedPDO $db, $event_id, $data)
+	{
+		if (isset($data['ticketing_locally']) && filter_var($data['ticketing_locally'], FILTER_VALIDATE_BOOLEAN) == true) {
+			foreach ($data['ticket_types'] as $ticket_type) {
+				TicketType::create($event_id, $ticket_type, $db);
+			}
+		}
+	}
+
+	private static function updateTicketingInfo(ExtendedPDO $db, $event_id, $data)
+	{
+		$q_upd = App::queryFactory()->newUpdate()
+			->table('ticket_types')
+			->cols(array(
+
+			));
+		if (isset($data['ticketing_locally']) && filter_var($data['ticketing_locally'], FILTER_VALIDATE_BOOLEAN) == true) {
+			foreach ($data['ticket_types'] as $ticket_type) {
+				TicketType::create($event_id, $ticket_type, $db);
+			}
+		}
+	}
+
 	public function setCanceled(bool $value, User $user)
 	{
 		$q_upd_event = App::queryFactory()->newUpdate();
@@ -506,10 +530,10 @@ class Event extends AbstractEntity
 			$data['is_free'] = filter_var($data['is_free'], FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
 		}
 
-		$data['min_price'] = $data['is_free'] == 'false' && is_numeric($data['min_price']) ? (int) $data['min_price'] : null;
+		$data['min_price'] = $data['is_free'] == 'false' && is_numeric($data['min_price']) ? (int)$data['min_price'] : null;
 
 		/*VK posting data*/
-		$data['vk_post'] = $data['is_free'] == true && is_numeric($data['min_price']) ? (int) $data['min_price'] : null;
+		$data['vk_post'] = $data['is_free'] == true && is_numeric($data['min_price']) ? (int)$data['min_price'] : null;
 	}
 
 	public static function create(ExtendedPDO $db, Organization $organization, array $data)
@@ -565,6 +589,7 @@ class Event extends AbstractEntity
 			self::saveDates($data['dates'], $db, $event_id);
 			self::saveEventTags($db, $event_id, $data['tags']);
 			self::saveRegistrationInfo($db, $event_id, $data);
+			self::saveTicketingInfo($db, $event_id, $data);
 
 			$notification_date = self::getAvailableNotificationTime($db, $data['notification_at'], $organization->getId());
 
