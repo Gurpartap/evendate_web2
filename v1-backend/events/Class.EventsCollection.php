@@ -76,12 +76,13 @@ class EventsCollection extends AbstractCollection
 			$result = $p_get_organization_id->execute($q_get_organization_id->getBindValues());
 			if ($result !== FALSE) {
 				if ($p_get_organization_id->rowCount() == 1) {
+					$org_id = $p_get_organization_id->fetchColumn(0);
 					try{
 						/*check if can make private instance*/
-						$_organization = OrganizationsCollection::onePrivate($db, $user, $p_get_organization_id->fetchColumn(0), null, array('privileges'));
+						$_organization = OrganizationsCollection::onePrivate($db, $user, $org_id, null, array('privileges'));
 						$getting_personal_events = true;
 					}catch(Exception $e){
-						$_organization = OrganizationsCollection::one($db, $user, $p_get_organization_id->fetchColumn(0), array('privileges'));
+						$_organization = OrganizationsCollection::one($db, $user, $org_id, array('privileges'));
 					}
 				}
 			}
