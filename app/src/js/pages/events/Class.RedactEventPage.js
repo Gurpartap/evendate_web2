@@ -89,199 +89,6 @@ RedactEventPage.prototype.init = function() {
 		$prev_page_button = $buttons.filter('#edit_event_prev_page'),
 		$submit_button = $buttons.filter('#edit_event_submit');
 	
-	function submitEditEvent() {
-		var $form = PAGE.$wrapper.find("#edit-event-form"),
-			/**
-			 * @type {Calendar} MainCalendar
-			 */
-			MainCalendar = PAGE.$wrapper.find('.EventDatesCalendar').resolveInstance(),
-			$event_tags = $form.find('input.EventTags'),
-			form_data = $form.serializeForm(),
-			is_edit = !!(PAGE.event.id),
-			send_data,
-			is_form_valid;
-		
-		is_form_valid = (function validation($form, Calendar) {
-			var is_valid = true,
-				$times = $form.find('#edit_event_different_time').prop('checked') ? $form.find('[class^="TableDay_"]') : $form.find('.MainTime');
-			
-			function failSubmit($element, is_form_valid, error_message){
-				var $cut_tab,
-					$Tabs;
-				if(is_form_valid){
-					$cut_tab = $element.parents('.TabsBody:last');
-					$Tabs = $cut_tab.closest('.Tabs').resolveInstance();
-					$Tabs.setToTab($Tabs.find('.TabsBodyWrapper:first').children().index($cut_tab));
-					$('html').stop().animate({
-							scrollTop: Math.ceil($element.offset().top - 150)
-						}, {
-							duration: 400,
-							easing: 'swing',
-							complete: function() {
-								showNotifier({text: error_message, status: false});
-							}
-						}
-					);
-				}
-				handleErrorField($element);
-				return false;
-			}
-			
-			$form.find(':required').not($form.find(':disabled')).each(function() {
-				var $this = $(this);
-				
-				if ($this.val().trim() === '') {
-					is_valid = failSubmit($this, is_valid, 'Заполните все обязательные поля');
-				} else if ($this.hasClass('LimitSize') && $this.val().trim().length > $this.data('maxlength')) {
-					is_valid = failSubmit($this, is_valid, 'Количество символов превышает установленное значение');
-				}
-			});
-			
-			if (!Calendar.selected_days.length) {
-				is_valid = failSubmit(Calendar.$calendar, is_valid, 'Выберите даты для события');
-			}
-			
-			$times.each(function() {
-				var $row = $(this),
-					$inputs = $row.find('.StartHours, .StartMinutes, .EndHours, .EndMinutes'),
-					start = $row.find('.StartHours').val().trim() + $row.find('.StartMinutes').val().trim(),
-					end = $row.find('.EndHours').val().trim() + $row.find('.EndMinutes').val().trim();
-				
-				$inputs.each(function() {
-					var $input = $(this);
-					if ($input.val().trim() === '') {
-						is_valid = failSubmit($input, is_valid, 'Заполните время события');
-					}
-				});
-				if (is_valid && start > end) {
-					is_valid = failSubmit($row, is_valid, 'Начальное время не может быть позже конечного');
-				}
-			});
-			
-			if ($event_tags.val().trim() === '') {
-				is_valid = failSubmit($event_tags.siblings('.EventTags'), is_valid, 'Необходимо выбрать хотя бы один тэг');
-			}
-			
-			if (form_data.registration_limit_by_quantity && (!form_data.registration_fields || !form_data.registration_fields.length)) {
-				is_valid = failSubmit($form.find('#edit_event_registration_fields'), is_valid, 'Должно быть выбрано хотя бы одно поле регистрации в анкете');
-			}
-			
-			if (!is_edit) {
-				$form.find('.DataUrl').each(function() {
-					var $this = $(this);
-					if ($this.val().trim() === "") {
-						is_valid = failSubmit($this.closest('.ImgLoadWrap'), is_valid, 'Пожалуйста, добавьте к событию обложку');
-					}
-				});
-			}
-			
-			return is_valid;
-		})($form, MainCalendar);
-		
-		function afterSubmit() {
-			__APP.changeState('/event/' + PAGE.event.id);
-		}
-		
-		function onError() {
-			PAGE.$wrapper.removeClass('-faded');
-		}
-		
-		if (is_form_valid) {
-			
-			send_data = {
-				event_id: parseInt(form_data.event_id) ? parseInt(form_data.event_id) : null,
-				title: form_data.title,
-				organization_id: form_data.organization_id,
-				description: form_data.description,
-				location: form_data.location,
-				detail_info_url: form_data.detail_info_url,
-				image_horizontal: form_data.image_horizontal,
-				filenames: {horizontal: form_data.filename_horizontal},
-				is_free: form_data.is_free,
-				min_price: form_data.is_free ? null : form_data.min_price
-			};
-			
-			send_data.registration_required = form_data.registration_required;
-			if (form_data.registration_required) {
-				if (form_data.registration_limit_by_date) {
-					send_data.registration_till = moment(
-						form_data.registration_till_date + 'T' +
-						form_data.registration_till_time_hours + ':' +
-						form_data.registration_till_time_minutes + ':00'
-					).tz('UTC').format();
-				}
-				
-				if (form_data.registration_limit_by_quantity) {
-					send_data.registration_locally = true;
-					send_data.registration_limit_count = form_data.registration_limit_count;
-				}
-				
-				if (form_data.registration_fields && form_data.registration_fields.length) {
-					send_data.registration_locally = true;
-					send_data.registration_fields = (new RegistrationFieldsCollection()).setData(form_data.registration_fields.map(function(id) {
-						var field = new RegistrationFieldModel();
-						field.setData({
-							type: form_data['registration_' + id + '_field_type'],
-							required: form_data['registration_' + id + '_field_required']
-						});
-						if (form_data['registration_' + id + '_field_label']) {
-							field.setData({label: form_data['registration_' + id + '_field_label']});
-						}
-						
-						return field;
-					})).getArrayCopy();
-				}
-			}
-			
-			if(form_data.tags){
-				send_data.tags = form_data.tags.split(',');
-			}
-			
-			send_data.delayed_publication = form_data.delayed_publication;
-			if (form_data.delayed_publication) {
-				send_data.public_at = moment(
-					form_data.public_at_date + 'T' +
-					form_data.public_at_time_hours + ':' +
-					form_data.public_at_time_minutes + ':00'
-				).tz('UTC').format();
-			}
-			
-			send_data.different_time = form_data.different_time;
-			send_data.dates = new DateModelsCollection();
-			if (form_data.different_time) {
-				PAGE.$wrapper.find('.SelectedDaysRows').children().each(function(i, row) {
-					var $row = $(row);
-					send_data.dates.push((new DateModel()).setData({
-						event_date: $row.find('.DatePicker').data('selected_day'),
-						start_time: $row.find('.StartHours').val() + ':' + $row.find('.StartMinutes').val(),
-						end_time: $row.find('.EndHours').val() + ':' + $row.find('.EndMinutes').val()
-					}));
-				});
-			} else {
-				MainCalendar.selected_days.forEach(function(day) {
-					send_data.dates.push((new DateModel()).setData({
-						event_date: day,
-						start_time: form_data.start_hours + ':' + form_data.start_minutes,
-						end_time: form_data.end_hours + ':' + form_data.end_minutes
-					}));
-				});
-			}
-			send_data.dates = send_data.dates.getArrayCopy();
-			
-			PAGE.$wrapper.addClass('-faded');
-			try {
-				if (is_edit) {
-					PAGE.event.updateEvent(send_data, afterSubmit, onError);
-				} else {
-					PAGE.event.createEvent(send_data, afterSubmit, onError);
-				}
-			} catch (e) {
-				PAGE.$wrapper.removeClass('-faded');
-				console.error(e);
-			}
-		}
-	}
-	
 	/**
 	 *
 	 * @param {jQuery} $input
@@ -570,6 +377,10 @@ RedactEventPage.prototype.init = function() {
 		$this.closest('.form_group').find('input').val($this.data('default_address')).trigger('input');
 	});
 	
+	PAGE.$wrapper.find('#edit_event_is_online').off('change.OnlineEvent').on('change.OnlineEvent', function() {
+		PAGE.$wrapper.find('#edit_event_placepicker').prop('required', !$(this).prop('checked'));
+	});
+	
 	PAGE.$wrapper.find('#edit_event_free').off('change.FreeEvent').on('change.FreeEvent', function() {
 		PAGE.$wrapper.find('.MinPrice').toggleStatus('disabled');
 	});
@@ -623,7 +434,205 @@ RedactEventPage.prototype.init = function() {
 		$main_tabs.prevTab();
 	});
 	
-	$submit_button.off('click.Submit').on('click.Submit', submitEditEvent);
+	$submit_button.off('click.Submit').on('click.Submit', function submitEditEvent() {
+		var $form = PAGE.$wrapper.find("#edit-event-form"),
+			/**
+			 * @type {Calendar} MainCalendar
+			 */
+			MainCalendar = PAGE.$wrapper.find('.EventDatesCalendar').resolveInstance(),
+			$event_tags = $form.find('input.EventTags'),
+			form_data = $form.serializeForm(),
+			is_edit = !!(PAGE.event.id),
+			send_data,
+			is_form_valid;
+		
+		is_form_valid = (function validation($form, Calendar) {
+			var is_valid = true,
+				$times = $form.find('#edit_event_different_time').prop('checked') ? $form.find('[class^="TableDay_"]') : $form.find('.MainTime');
+			
+			function failSubmit($element, is_form_valid, error_message){
+				var $cut_tab,
+					$Tabs;
+				if(is_form_valid){
+					$cut_tab = $element.parents('.TabsBody:last');
+					$Tabs = $cut_tab.closest('.Tabs').resolveInstance();
+					$Tabs.setToTab($Tabs.find('.TabsBodyWrapper:first').children().index($cut_tab));
+					$('html').stop().animate({
+							scrollTop: Math.ceil($element.offset().top - 150)
+						}, {
+							duration: 400,
+							easing: 'swing',
+							complete: function() {
+								showNotifier({text: error_message, status: false});
+							}
+						}
+					);
+				}
+				handleErrorField($element);
+				return false;
+			}
+			
+			$form.find(':required').not($form.find(':disabled')).each(function() {
+				var $this = $(this);
+				
+				if ($this.val().trim() === '') {
+					is_valid = failSubmit($this, is_valid, 'Заполните все обязательные поля');
+				} else if ($this.hasClass('LimitSize') && $this.val().trim().length > $this.data('maxlength')) {
+					is_valid = failSubmit($this, is_valid, 'Количество символов превышает установленное значение');
+				}
+			});
+			
+			if (!Calendar.selected_days.length) {
+				is_valid = failSubmit(Calendar.$calendar, is_valid, 'Выберите даты для события');
+			}
+			
+			$times.each(function() {
+				var $row = $(this),
+					$inputs = $row.find('.StartHours, .StartMinutes, .EndHours, .EndMinutes'),
+					start = $row.find('.StartHours').val().trim() + $row.find('.StartMinutes').val().trim(),
+					end = $row.find('.EndHours').val().trim() + $row.find('.EndMinutes').val().trim();
+				
+				$inputs.each(function() {
+					var $input = $(this);
+					if ($input.val().trim() === '') {
+						is_valid = failSubmit($input, is_valid, 'Заполните время события');
+					}
+				});
+				if (is_valid && start > end) {
+					is_valid = failSubmit($row, is_valid, 'Начальное время не может быть позже конечного');
+				}
+			});
+			
+			if ($event_tags.val().trim() === '') {
+				is_valid = failSubmit($event_tags.siblings('.EventTags'), is_valid, 'Необходимо выбрать хотя бы один тэг');
+			}
+			
+			if (form_data.registration_limit_by_quantity && (!form_data.registration_fields || !form_data.registration_fields.length)) {
+				is_valid = failSubmit($form.find('#edit_event_registration_fields'), is_valid, 'Должно быть выбрано хотя бы одно поле регистрации в анкете');
+			}
+			
+			if (!is_edit) {
+				$form.find('.DataUrl').each(function() {
+					var $this = $(this);
+					if ($this.val().trim() === "") {
+						is_valid = failSubmit($this.closest('.ImgLoadWrap'), is_valid, 'Пожалуйста, добавьте к событию обложку');
+					}
+				});
+			}
+			
+			return is_valid;
+		})($form, MainCalendar);
+		
+		function afterSubmit() {
+			__APP.changeState('/event/' + PAGE.event.id);
+		}
+		
+		function onError(e) {
+			PAGE.$wrapper.removeClass('-faded');
+			console.error(e);
+			console.log({
+				MainCalendar: MainCalendar,
+				send_data: send_data,
+				form_data: form_data
+			});
+		}
+		
+		if (is_form_valid) {
+			
+			try {
+				send_data = {
+					event_id: parseInt(form_data.event_id) ? parseInt(form_data.event_id) : null,
+					title: form_data.title.trim(),
+					organization_id: form_data.organization_id,
+					description: form_data.description.trim(),
+					is_online: form_data.is_online,
+					location: form_data.location && form_data.location.trim() ? form_data.location.trim() : null,
+					detail_info_url: form_data.detail_info_url ? form_data.detail_info_url.trim() : null,
+					image_horizontal: form_data.image_horizontal,
+					filenames: {horizontal: form_data.filename_horizontal},
+					is_free: form_data.is_free,
+					min_price: form_data.is_free ? null : form_data.min_price
+				};
+				
+				send_data.registration_required = form_data.registration_required;
+				if (form_data.registration_required) {
+					if (form_data.registration_limit_by_date) {
+						send_data.registration_till = moment(
+							form_data.registration_till_date + 'T' +
+							form_data.registration_till_time_hours + ':' +
+							form_data.registration_till_time_minutes + ':00'
+						).tz('UTC').format();
+					}
+					
+					if (form_data.registration_limit_by_quantity) {
+						send_data.registration_locally = true;
+						send_data.registration_limit_count = form_data.registration_limit_count;
+					}
+					
+					if (form_data.registration_fields && form_data.registration_fields.length) {
+						send_data.registration_locally = true;
+						send_data.registration_fields = (new RegistrationFieldsCollection()).setData(form_data.registration_fields.map(function(id) {
+							var field = new RegistrationFieldModel();
+							field.required = form_data['registration_' + id + '_field_required'];
+							if (form_data['registration_' + id + '_field_type']) {
+								field.type = form_data['registration_' + id + '_field_type'];
+							}
+							if (form_data['registration_' + id + '_field_label']) {
+								field.label = form_data['registration_' + id + '_field_label'].trim();
+							}
+							
+							return field;
+						})).getArrayCopy();
+					}
+				}
+				
+				if(form_data.tags){
+					send_data.tags = form_data.tags.split(',');
+				}
+				
+				send_data.delayed_publication = form_data.delayed_publication;
+				if (form_data.delayed_publication) {
+					send_data.public_at = moment(
+						form_data.public_at_date + 'T' +
+						form_data.public_at_time_hours + ':' +
+						form_data.public_at_time_minutes + ':00'
+					).tz('UTC').format();
+				}
+				
+				send_data.different_time = form_data.different_time;
+				send_data.dates = new DateModelsCollection();
+				if (form_data.different_time) {
+					PAGE.$wrapper.find('.SelectedDaysRows').children().each(function(i, row) {
+						var $row = $(row);
+						send_data.dates.push((new DateModel()).setData({
+							event_date: $row.find('.DatePicker').data('selected_day'),
+							start_time: $row.find('.StartHours').val() + ':' + $row.find('.StartMinutes').val(),
+							end_time: $row.find('.EndHours').val() + ':' + $row.find('.EndMinutes').val()
+						}));
+					});
+				} else {
+					MainCalendar.selected_days.forEach(function(day) {
+						send_data.dates.push((new DateModel()).setData({
+							event_date: day,
+							start_time: form_data.start_hours + ':' + form_data.start_minutes,
+							end_time: form_data.end_hours + ':' + form_data.end_minutes
+						}));
+					});
+				}
+				send_data.dates = send_data.dates.getArrayCopy();
+				
+				PAGE.$wrapper.addClass('-faded');
+				
+				if (is_edit) {
+					PAGE.event.updateEvent(send_data, afterSubmit, onError);
+				} else {
+					PAGE.event.createEvent(send_data, afterSubmit, onError);
+				}
+			} catch (e) {
+				onError(e);
+			}
+		}
+	});
 };
 
 RedactEventPage.prototype.render = function() {

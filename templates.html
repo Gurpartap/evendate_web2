@@ -313,10 +313,16 @@
 							<h2><label for="edit_event_placepicker">Место проведения</label></h2>
 							<div class="form_group -parts_3_1">
 								<div class="form_unit">
-									<input id="edit_event_placepicker" class="form_input Placepicker" name="location" value="{location}" required>
+									<input id="edit_event_placepicker" class="form_input" name="location" value="{location}" required>
 								</div>
 								<div class="form_unit">
 									<button class="button -color_primary -size_wide RippleEffect EditEventDefaultAddress" type="button" tabindex="-1">По умолчанию</button>
+								</div>
+							</div>
+							<div class="form_group -align_center">
+								<div class="form_unit">
+									<input id="edit_event_is_online" class="form_checkbox" type="checkbox" name="is_online">
+									<label class="form_label" for="edit_event_is_online"><span>Online - событие</span></label>
 								</div>
 							</div>
 
@@ -529,7 +535,7 @@
 		<div class="form_unit">
 			<div class="img_holder">
 				<img class="edit_event_img_preview_hor EditEventImgPreview ImgPreview" src="{image_horizontal_url}">
-				<img src="/app/img/edit_event/edit_event_img_placeholder_hor.png">
+				<img src="/app/img/edit_event/edit_event_img_placeholder_hor.png" height="553">
 				<input id="edit_event_image_horizontal_src" class="DataUrl" type="hidden" name="image_horizontal" value="{image_horizontal_base64}">
 				<input id="edit_event_image_horizontal_filename" class="FileName" type="hidden" name="filename_horizontal" value="{image_horizontal_filename}">
 			</div>
@@ -816,13 +822,12 @@
 			<div class="event_content">
 				<h3 class="event_title" title="{title}">{title}</h3>
 				<div class="event_description">{description}</div>
-				<div class="event_map CallModal EventMap" data-modal_type="map" style="background-image: url('https://maps.googleapis.com/maps/api/staticmap?markers={location_sanitized}&zoom=15&size=640x640&scale=2&format=png&maptype=roadmap&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg')" data-modal_map_location="{location_sanitized}"></div>
+				{event_map}
 			</div>
 		</div>
 		<div class="event_additional_content">
 			{event_edit_functions}
-			{event_registration_information}
-			{event_price_information}
+			{event_additional_info}
 			<div class="event_additional_field">
 				<label class="event_additional_field_label">Организатор</label>
 				{organization_avatar_block}
@@ -855,12 +860,20 @@
 	</div>
 </script>
 
+<script type="javascript/template" id="tmpl-event-map">
+	<div class="event_map CallModal EventMap" data-modal_type="map" style="background-image: url('https://maps.googleapis.com/maps/api/staticmap?markers={location_sanitized}&zoom=15&size=640x640&scale=2&format=png&maptype=roadmap&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg')" data-modal_map_location="{location_sanitized}"></div>
+</script>
+
 <script type="javascript/template" id="tmpl-event-registration-info">
 	<p class="event_additional_info -text_color_accent -transform_uppercase">Регистрация до {registration_till}</p>
 </script>
 
 <script type="javascript/template" id="tmpl-event-price-info">
 	<p class="event_additional_info -text_color_accent">от {min_price} руб.</p>
+</script>
+
+<script type="javascript/template" id="tmpl-event-additional-info">
+	<p class="event_additional_info {classes}">{text}</p>
 </script>
 
 <script type="javascript/template" id="tmpl-event-date-time">
@@ -885,7 +898,7 @@
 	</div>
 </script>
 
-<script type="javascript/template" id="tmpl-event-additional-info">
+<script type="javascript/template" id="tmpl-event-additional-field">
 	<div class="event_additional_field">
 		<label class="event_additional_field_label">{key}</label>
 		<p>{value}</p>

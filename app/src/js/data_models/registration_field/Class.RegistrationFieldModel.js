@@ -16,7 +16,7 @@ RegistrationFieldModel = extending(OneEntity, (function() {
 		 *
 		 * @type {RegistrationFieldModel.TYPES}
 		 */
-		this.type = '';
+		this.type = null;
 		this.label = null;
 		this.required = false;
 	}

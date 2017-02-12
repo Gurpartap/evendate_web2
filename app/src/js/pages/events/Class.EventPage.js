@@ -25,6 +25,9 @@ EventPage = extending(Page, (function() {
 		'is_favorite',
 		'description',
 		'location',
+		'latitude',
+		'longitude',
+		'is_online',
 		'can_edit',
 		'is_free',
 		'min_price',
@@ -192,6 +195,7 @@ EventPage = extending(Page, (function() {
 		var PAGE = this,
 			avatars_collection_classes = ['-rounded','-bordered','-size_small','AvatarsCollection','CallModal'],
 			$event_additional_fields = $(),
+			$event_additional_information = $(),
 			organization = new OneOrganization(PAGE.event.organization_id);
 		organization.setData({
 			short_name: PAGE.event.organization_short_name,
@@ -203,8 +207,29 @@ EventPage = extending(Page, (function() {
 			avatars_collection_classes.push('-subscribed');
 		}
 		
+		if (PAGE.event.registration_till) {
+			$event_additional_information = $event_additional_information.add(tmpl('event-additional-info', {
+				classes: '-text_color_accent -transform_uppercase',
+				text: 'Регистрация до ' + moment.unix(PAGE.event.registration_till).calendar(null, __LOCALES.ru_RU.DATE.CALENDAR_DATE_TIME)
+			}));
+		}
+		
+		if (!PAGE.event.is_free) {
+			$event_additional_information = $event_additional_information.add(tmpl('event-additional-info', {
+				classes: '-text_color_accent',
+				text: 'от ' + (PAGE.event.min_price ? formatCurrency(PAGE.event.min_price) : '0') + ' руб.'
+			}));
+		}
+		
+		if (PAGE.event.is_online) {
+			$event_additional_information = $event_additional_information.add(tmpl('event-additional-info', {
+				classes: '-text_color_accent',
+				text: 'Online'
+			}));
+		}
+		
 		if (PAGE.event.is_same_time) {
-			$event_additional_fields = $event_additional_fields.add(tmpl('event-additional-info', {
+			$event_additional_fields = $event_additional_fields.add(tmpl('event-additional-field', {
 				key: 'Время',
 				value: displayTimeRange(PAGE.event.dates[0].start_time, PAGE.event.dates[0].end_time)
 			}));
@@ -216,11 +241,13 @@ EventPage = extending(Page, (function() {
 				}, PAGE.event.is_same_time))
 			}));
 		}
-		$event_additional_fields = $event_additional_fields.add(tmpl('event-additional-info', {
-			key: 'Место',
-			value: PAGE.event.location
-		}));
-		$event_additional_fields = $event_additional_fields.add(tmpl('event-additional-info', {
+		if(PAGE.event.location) {
+			$event_additional_fields = $event_additional_fields.add(tmpl('event-additional-field', {
+				key: 'Место',
+				value: PAGE.event.location
+			}));
+		}
+		$event_additional_fields = $event_additional_fields.add(tmpl('event-additional-field', {
 			key: 'Теги',
 			value: __APP.BUILD.tags(PAGE.event.tags)
 		}));
@@ -245,10 +272,9 @@ EventPage = extending(Page, (function() {
 				counter_classes: ['-size_30x30','-bordered','-color_marginal','-castable']
 			}, PAGE.event.favored_users_count),
 			notifications: EventPage.buildNotifications(PAGE.event.notifications, PAGE.event.id, PAGE.event.last_event_date),
-			location_sanitized: encodeURI(PAGE.event.location),
+			event_map: PAGE.event.location ? tmpl('event-map', {location_sanitized: encodeURI(PAGE.event.location)}) : '',
 			event_edit_functions: PAGE.event.can_edit ? tmpl('event-edit-functions', PAGE.event) : '',
-			event_registration_information: PAGE.event.registration_till ? tmpl('event-registration-info', {registration_till: moment.unix(PAGE.event.registration_till).format('D MMMM')}) : '',
-			event_price_information: PAGE.event.is_free ? '' : tmpl('event-price-info', {min_price: PAGE.event.min_price ? formatCurrency(PAGE.event.min_price) : '0'}),
+			event_additional_info: $event_additional_information,
 			canceled: PAGE.event.canceled ? '' : '-hidden',
 			organization_avatar_block: __APP.BUILD.avatarBlocks(organization, {
 				block_classes: ['-size_small'],

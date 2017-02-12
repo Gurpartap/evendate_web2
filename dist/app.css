@@ -2155,6 +2155,7 @@ a.button:hover {text-decoration: none}
 	left: 0;
 	right: 0;
 	top: 0;
+	padding: 1px;
 
 	-webkit-transform: translateX(-100%);
 	-moz-transform: translateX(-100%);
@@ -4248,7 +4249,7 @@ body.-open_modal > .modal_wrapper {
 	font-size: .88rem;
 	margin: 2em 0 .5em;
 }
-.event_additional_field > p {margin-top: .4em}
+.event_additional_field > p {margin: .4em 0}
 .event_additional_field_split {font-size: 0}
 .event_additional_field_split > .event_additional_field {
 	display: inline-block;
