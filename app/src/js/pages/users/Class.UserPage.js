@@ -121,7 +121,7 @@ UserPage = extending(Page, (function() {
 				active_type = $this.find('.TabsBody').filter('.'+__C.CLASSES.NEW_ACTIVE).data('tab_body_type');
 			$window.off(Object.values(event_names).join(' '));
 			$window.on(event_names[active_type], function() {
-				if ( isScrollLeft(200) ) {
+				if ( isScrollRemain(200) ) {
 					switch (active_type) {
 						case 'activities': {
 							self.uploadEntities('activities');
@@ -137,7 +137,7 @@ UserPage = extending(Page, (function() {
 		});
 		
 		$window.on(event_names.activities, function() {
-			if (isScrollLeft(200)) {
+			if (isScrollRemain(200)) {
 				self.uploadEntities('activities');
 			}
 		});

@@ -1397,13 +1397,7 @@ function bindTabs($parent) {
 				$setting_body.addClass(__C.CLASSES.NEW_ACTIVE);
 				$this.trigger('change.tabs');
 				if (focus_on_change) {
-					$('html').stop().animate({
-							scrollTop: Math.ceil($setting_body.offset().top - 150)
-						}, {
-							duration: 400,
-							easing: 'swing'
-						}
-					);
+					scrollTo($setting_body, 400);
 				}
 			}
 		};
@@ -1751,11 +1745,41 @@ function isNotDesktop() {
 }
 
 /**
+ *
+ * @param {(jQuery|number)} $element
+ * @param {number} [duration=400]
+ * @param {Function} [complete]
+ *
+ * @return {number} New scrollTop value
+ */
+function scrollTo($element, duration, complete) {
+	var scroll_top;
+	if ($element instanceof jQuery) {
+		scroll_top = $element.offset().top - 150;
+	} else {
+		scroll_top = $element - 150;
+	}
+	if (complete && !(complete instanceof Function)) {
+		complete = function() {};
+	}
+	$('body').stop().animate({
+			scrollTop: Math.ceil(scroll_top)
+		}, {
+			duration: duration ? duration : 400,
+			easing: 'swing',
+			complete: complete
+		}
+	);
+	
+	return scroll_top;
+}
+
+/**
  * Returning true if scroll passes ending threshold + left argument
  * @param {int} left
  * @return {boolean}
  */
-function isScrollLeft(left) {
+function isScrollRemain(left) {
 	return ($(window).height() + $(window).scrollTop() + +(left)) >= $(document).height();
 }
 

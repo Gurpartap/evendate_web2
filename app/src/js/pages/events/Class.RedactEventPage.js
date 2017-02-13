@@ -457,16 +457,9 @@ RedactEventPage.prototype.init = function() {
 					$cut_tab = $element.parents('.TabsBody:last');
 					$Tabs = $cut_tab.closest('.Tabs').resolveInstance();
 					$Tabs.setToTab($Tabs.find('.TabsBodyWrapper:first').children().index($cut_tab));
-					$('html').stop().animate({
-							scrollTop: Math.ceil($element.offset().top - 150)
-						}, {
-							duration: 400,
-							easing: 'swing',
-							complete: function() {
-								showNotifier({text: error_message, status: false});
-							}
-						}
-					);
+					scrollTo($element, 400, function() {
+						showNotifier({text: error_message, status: false});
+					});
 				}
 				handleErrorField($element);
 				return false;
