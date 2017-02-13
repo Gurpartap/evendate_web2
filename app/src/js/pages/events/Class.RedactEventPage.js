@@ -331,6 +331,9 @@ RedactEventPage.prototype.init = function() {
 	
 	$main_tabs = $main_tabs.resolveInstance();
 	
+	//TODO: perepilit' placepicker
+	PAGE.$wrapper.find(".Placepicker").placepicker();
+	
 	PAGE.$wrapper.find('.EventTags').select2({
 		tags: true,
 		width: '100%',
