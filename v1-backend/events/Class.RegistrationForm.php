@@ -1,5 +1,10 @@
 <?php
 
+require_once $BACKEND_FULL_PATH . '/events/Class.Order.php';
+require_once $BACKEND_FULL_PATH . '/events/Class.Ticket.php';
+require_once $BACKEND_FULL_PATH . '/events/Class.TicketsCollection.php';
+
+
 class RegistrationForm
 {
 	protected $event;
@@ -90,16 +95,16 @@ class RegistrationForm
 	{
 		$db = App::DB();
 		$q_ins_reg = App::queryFactory()->newInsert();
-		$q_ins_reg->into('users_registrations')
+		$q_ins_reg->into('registration_forms')
 			->cols(array(
 				'user_id' => $user->getId(),
 				'event_id' => $event->getId(),
 				'status' => 'true',
-				'organization_approvement_status_id' => $approvement_required ? self::REGISTRATION_STATUS_IS_PENDING_ID : self::REGISTRATION_STATUS_APPROVED,
+				'registration_status_id' => $approvement_required ? self::REGISTRATION_STATUS_IS_PENDING_ID : self::REGISTRATION_STATUS_APPROVED_ID,
 			))
 			->onConflictUpdate(array('user_id', 'event_id'), array(
 				'status' => 'true',
-				'organization_approvement_status_id' => $approvement_required ? self::REGISTRATION_STATUS_IS_PENDING_ID : self::REGISTRATION_STATUS_APPROVED
+				'registration_status_id' => $approvement_required ? self::REGISTRATION_STATUS_IS_PENDING_ID : self::REGISTRATION_STATUS_APPROVED_ID
 			))
 			->returning(array('id', 'uuid'));
 
@@ -108,18 +113,24 @@ class RegistrationForm
 		$user_reg_uuid = $result['uuid'];
 
 		/* Form inserted, insert fields */
-		$q_ins_fields = 'INSERT INTO registration_info(user_registration_id, registration_form_field_id, value, created_at) 
+		$q_ins_fields = 'INSERT INTO registration_field_values(
+				registration_form_id, 
+				registration_form_field_id, 
+				value, 
+				created_at) 
 		
-			SELECT :user_registration_id AS user_registration_id, id AS registration_form_field_id, :val AS value, NOW() AS created_ad
+			SELECT :registration_form_id AS registration_form_id, id AS registration_form_field_id, :val AS value, NOW() AS created_ad
 			 FROM registration_form_fields
 			 WHERE registration_form_fields.uuid = :uuid
-			ON CONFLICT (user_registration_id, registration_form_field_id) DO UPDATE SET updated_at = NOW(),
+			ON CONFLICT (registration_form_id, registration_form_field_id) 
+			DO UPDATE SET 
+			updated_at = NOW(),
 			value = :val';
 		$p_ins_field = $db->prepare($q_ins_fields);
 
 		foreach ($fields as $field) {
 			$result = $p_ins_field->execute(array(
-				':user_registration_id' => $user_reg_id,
+				':registration_form_id' => $user_reg_id,
 				':val' => $field['value'],
 				':uuid' => $field['uuid'],
 			));
@@ -204,9 +215,9 @@ class RegistrationForm
 
 		if (!in_array($value, self::REGISTRATION_STATUSES)) throw new InvalidArgumentException('INVALID_APPROVEMENT_STATUS');
 		$q_upd_approved = App::queryFactory()->newUpdate()
-			->table('users_registrations')
+			->table('registration_forms')
 			->cols(array(
-				'organization_approvement_status_id' => self::REGISTRATION_STATUS_IDS[$value]
+				'registration_status_id' => self::REGISTRATION_STATUS_IDS[$value]
 			))
 			->where('uuid = ?', $uuid);
 
@@ -215,6 +226,23 @@ class RegistrationForm
 
 		return new Result(true, 'Данные успешно обновлены');
 
+	}
+
+	public static function processOrder(Event $event, AbstractUser $user, ExtendedPDO $db, array $tickets)
+	{
+		try{
+			$db->beginTransaction();
+
+			$order_id = Order::create($event, $user, $db, $tickets);
+			$tickets = Ticket::createBatch($event, $order_id, $db, $tickets);
+
+			$db->commit();
+
+			return $tickets;
+		}catch (Exception $e){
+			$db->rollBack();
+			throw $e;
+		}
 	}
 
 }

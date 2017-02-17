@@ -23,10 +23,11 @@ class ExtendedPDO extends PDO
 			$bind_values = $query->getBindValues();
 		}
 		$result = $prep->execute($bind_values);
-		if ($result === FALSE) throw new DBQueryException($error_name, $this);
+		if ($result === FALSE) {
+			throw new DBQueryException($error_name, $this);
+		}
 		return $prep;
 	}
-
 }
 
 $__db = new ExtendedPDO(App::$DB_DSN, App::$DB_USER, App::$DB_PASSWORD, $driver_options);

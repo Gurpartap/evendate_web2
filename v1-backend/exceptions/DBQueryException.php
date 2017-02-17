@@ -14,7 +14,6 @@ class DBQueryException extends AbstractException{
 		}else{
 			$this->user_message = $user_message;
 		}
-		$description = "FILE:\n {$this->getFile()}\n LINE: \n {$this->getLine()}\n Description: \n {$this->message}.\n Trace: \n {$this->getTraceAsString()}";
 		parent::__construct($message, $db, $file, $file_line);
 	}
 }

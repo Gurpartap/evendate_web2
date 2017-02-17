@@ -5,6 +5,8 @@ require_once $BACKEND_FULL_PATH . '/tags/Class.Tag.php';
 require_once $BACKEND_FULL_PATH . '/tags/Class.TagsCollection.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.RegistrationForm.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.RegistrationFieldsCollection.php';
+require_once $BACKEND_FULL_PATH . '/events/Class.TicketType.php';
+require_once $BACKEND_FULL_PATH . '/events/Class.TicketTypesCollection.php';
 
 class Event extends AbstractEntity
 {
@@ -24,6 +26,7 @@ class Event extends AbstractEntity
 	const ORGANIZATION_NOTIFICATIONS_LIMIT = 2;
 	const IS_FAVORITE_FIELD_NAME = 'is_favorite';
 	const TICKETS_FIELD_NAME = 'tickets';
+	const TICKETS_TYPES_FIELD_NAME = 'ticket_types';
 	const IS_SEEN_FIELD_NAME = 'is_seen';
 	const TAGS_FIELD_NAME = 'tags';
 	const DATES_FIELD_NAME = 'dates';
@@ -260,6 +263,8 @@ class Event extends AbstractEntity
 	protected $is_free;
 	protected $min_price;
 	protected $canceled;
+	protected $ticketing_locally;
+	protected $registration_locally;
 
 	private $tags;
 
@@ -328,21 +333,28 @@ class Event extends AbstractEntity
 	{
 		if (isset($data['ticketing_locally']) && filter_var($data['ticketing_locally'], FILTER_VALIDATE_BOOLEAN) == true) {
 			foreach ($data['ticket_types'] as $ticket_type) {
+				//it will auto update if ticket uuid is same
 				TicketType::create($event_id, $ticket_type, $db);
 			}
-		}
-	}
 
-	private static function updateTicketingInfo(ExtendedPDO $db, $event_id, $data)
-	{
-		$q_upd = App::queryFactory()->newUpdate()
-			->table('ticket_types')
-			->cols(array(
-
-			));
-		if (isset($data['ticketing_locally']) && filter_var($data['ticketing_locally'], FILTER_VALIDATE_BOOLEAN) == true) {
-			foreach ($data['ticket_types'] as $ticket_type) {
-				TicketType::create($event_id, $ticket_type, $db);
+			//TODO: update start_after_ticket_type_uuid fields
+//			foreach ($data['ticket_types'] as $ticket_type) {
+//				//it will auto update if ticket uuid is same
+//				TicketType::create($event_id, $ticket_type, $db);
+//			}
+		}else{
+			if (isset($data['registration_locally']) && filter_var($data['registration_locally'], FILTER_VALIDATE_BOOLEAN) == true) {
+				TicketType::create($event_id, array(
+					'type_code' => 'registration',
+					'name' => 'Регистрация на событие',
+					'comment' => 'Регистрация на событие ' . $data['title'],
+					'price' => 0,
+					'sell_start_date' => $data['registration_since'] ?? null,
+					'sell_end_date' => $data['registration_till'] ?? null,
+					'amount' => $data['registration_limit_count'] ?? null,
+					'min_count_per_user' => 1,
+					'max_count_per_user' => 1
+				), $db);
 			}
 		}
 	}
@@ -576,11 +588,8 @@ class Event extends AbstractEntity
 					'status' => $data['public_at'] instanceof DateTime ? 'false' : 'true',
 				))->returning(array('id'));
 
-			$p_ins_event = $db->prepare($q_ins_event->getStatement());
+			$p_ins_event = $db->prepareExecute($q_ins_event, 'CANT_CREATE_EVENT');
 
-			$result = $p_ins_event->execute($q_ins_event->getBindValues());
-
-			if ($result === FALSE) throw new DBQueryException('CANT_CREATE_EVENT', $db);
 
 			$result = $p_ins_event->fetch(PDO::FETCH_ASSOC);
 			$event_id = $result['id'];
@@ -988,7 +997,7 @@ class Event extends AbstractEntity
 		);
 	}
 
-	public function getRegistrationFields(User $user, array $fields = null, $order_by = null): Result
+	public function getRegistrationFields(AbstractUser $user, array $fields = null, $order_by = null): Result
 	{
 		return RegistrationFieldsCollection::filter(
 			$this->db,
@@ -1050,12 +1059,9 @@ class Event extends AbstractEntity
 		}
 
 		if (isset($fields[self::REGISTRATION_FIELDS_FIELD_NAME])) {
-			if ($user instanceof User) {
-				$result_data[self::REGISTRATION_FIELDS_FIELD_NAME] = $this->getRegistrationFields($user,
-					Fields::parseFields($fields[self::REGISTRATION_FIELDS_FIELD_NAME]['fields'] ?? ''))->getData();
-			} else {
-				$result_data[self::REGISTRATION_FIELDS_FIELD_NAME] = array();
-			}
+			$result_data[self::REGISTRATION_FIELDS_FIELD_NAME] = $this->getRegistrationFields($user,
+				Fields::parseFields($fields[self::REGISTRATION_FIELDS_FIELD_NAME]['fields'] ?? ''))->getData();
+
 		}
 
 		if (isset($fields[self::STATISTICS_FIELD_NAME])) {
@@ -1103,6 +1109,22 @@ class Event extends AbstractEntity
 				$result_data[self::TICKETS_FIELD_NAME] = null;
 			}
 		}
+
+		if (isset($fields[self::TICKETS_TYPES_FIELD_NAME])) {
+			$result_data[self::TICKETS_TYPES_FIELD_NAME] = TicketTypesCollection::filter(
+				$this->db,
+				$user,
+				array('event' => $this),
+				Fields::parseFields($fields[self::TICKETS_TYPES_FIELD_NAME]['fields'] ?? ''),
+				array(
+					'length' => $length ?? $fields[self::TICKETS_TYPES_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+					'offset' => $offset ?? $fields[self::TICKETS_TYPES_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
+				),
+				$order_by ?? $fields[self::TICKETS_TYPES_FIELD_NAME]['order_by'] ?? array()
+			)->getData();
+		}
+
+
 		return new Result(true, '', $result_data);
 	}
 
@@ -1224,8 +1246,9 @@ class Event extends AbstractEntity
 			if (isset($data['dates']) && count($data['dates']) > 0) {
 				self::saveDates($data['dates'], $this->db, $this->getId());
 			}
-			self::saveRegistrationInfo($this->db, $this->getId(), $data);
 
+			self::saveRegistrationInfo($this->db, $this->getId(), $data);
+			self::saveTicketingInfo($this->db, $this->getId(), $data);
 
 			self::saveNotifications($this->generateNotifications($data), $this->db);
 			self::updateVkPostInformation($this->db, $this->getId(), $data);
@@ -1340,22 +1363,12 @@ class Event extends AbstractEntity
 		return new Result(true, '', array('is_seen' => $p_get_event->rowCount() > 0));
 	}
 
-
-	private function updateRegisteredCount()
+	/**
+	 * @return mixed
+	 */
+	public function getTicketingLocally()
 	{
-		$q_upd_event = 'UPDATE events SET registered_count = (SELECT COUNT(id) FROM users_registrations
-     WHERE users_registrations.status = TRUE
-           AND users_registrations.organization_approved = TRUE
-           AND users_registrations.event_id = events.id
-      GROUP BY users_registrations.event_id) WHERE events.id = :event_id';
-
-		$p_upd_event = $this->db->prepare($q_upd_event);
-		$result = $p_upd_event->execute(array(
-			':event_id' => $this->getId()
-		));
-
-		if ($result === FALSE) throw new DBQueryException('', $this->db);
-
+		return $this->ticketing_locally;
 	}
 
 	private function getRegistrationAvailable()
@@ -1372,15 +1385,19 @@ class Event extends AbstractEntity
 		return $p_get_available->fetchColumn(0);
 	}
 
-	public function registerUser(AbstractUser $user, array $filled_fields)
+	public function registerUser(AbstractUser $user, array $request)
 	{
+		$filled_fields = $request['registration_fields'];
 		if ($user instanceof User === false) throw new PrivilegesException('NOT_AUTHORIZED_FOR_REGISTRATION', $this->db);
+		if ($this->registration_locally == false) throw new InvalidArgumentException('REGISTRATION_NOT_AVAILABLE');
 		if ($this->getRegistrationAvailable() == false) throw new InvalidArgumentException('REGISTRATION_FINISHED');
 		$fields = $this->getRegistrationFields($user)->getData();
 		$merged_fields = [];
+
 		foreach ($fields as $field) {
 			$merged_fields[$field['uuid']] = $field;
 		}
+
 		foreach ($filled_fields as $filled_field) {
 			if (isset($merged_fields[$filled_field['uuid']])) {
 				$merged_fields[$filled_field['uuid']]['value'] = trim($filled_field['value']);
@@ -1389,12 +1406,12 @@ class Event extends AbstractEntity
 
 		$errors = array();
 
-		foreach ($merged_fields as $final_field) {
+		foreach ($merged_fields as $key => $final_field) {
 
 			if ($final_field['required'] == true &&
 				(!isset($final_field['value']) || empty($final_field['value']))
 			) {
-				$final_field['error'] = 'This field is required';
+				$final_field['error'] = 'Поле обязательно для заполнения';
 				$errors[] = $final_field;
 			}
 
@@ -1402,33 +1419,42 @@ class Event extends AbstractEntity
 				case 'email': {
 					if ($final_field['required'] == true) {
 						if (filter_var($final_field['value'], FILTER_VALIDATE_EMAIL) == FALSE) {
-							$final_field['error'] = 'This is not valid email.';
+							$final_field['error'] = 'Укажите, пожалуйста, валидный E-mail.';
 							$errors[] = $final_field;
 						}
 					}
 				}
 			}
+
+			$merged_fields[$key] = $final_field;
 		}
-		if (count($errors) > 0) return new Result(false, 'Возникла ошибка во время регистрации', $errors);
+		if (count($errors) > 0) return new Result(false, 'Возникла ошибка во время регистрации', $merged_fields);
 
 		if (isset($this->registration_approvement_required)) {
 			$approve_required = $this->registration_approvement_required;
 		} else {
-			$q_get_approve_information = App::queryFactory()->newSelect()
-				->cols(array('registration_approvement_required'))
-				->from('events')
+			$q_get_approve_information = App::queryFactory()->newSelect();
+			$q_get_approve_information->cols(array('registration_approvement_required'))
+				->from('view_events')
 				->where('id = ?', $this->id);
-			$p_get_approve_information = $this->db->prepare($q_get_approve_information->getStatement());
-			$result = $p_get_approve_information->execute($p_get_approve_information->getBindValues());
-			if ($result === FALSE) throw new DBQueryException(implode(';', $this->db->errorInfo()), $this->db);
-
-			$approve_required = $p_get_approve_information->fetchColumn(0);
+			$approve_required = $this->db->prepareExecute($q_get_approve_information)->fetchColumn(0);
 		}
 
 		$result = RegistrationForm::registerUser($user, $this, $merged_fields, $approve_required);
+
+		if($this->ticketing_locally == false){
+			if (!isset($request['tickets']) || !is_array($request['tickets'])){
+				$request['tickets'] = array();
+			}
+			$request['tickets'][] = array(
+				'count' => '1',
+			);
+		}
+
+		RegistrationForm::processOrder($this, $user, $this->db, $request['tickets']);
+
 		if ($result->getStatus()) {
 			$user->addFavoriteEvent($this);
-			$this->updateRegisteredCount();
 		}
 		return $result;
 	}
@@ -1436,7 +1462,6 @@ class Event extends AbstractEntity
 	public function unregisterUser(AbstractUser $user)
 	{
 		$result = RegistrationForm::unregisterUser($user, $this);
-		$this->updateRegisteredCount();
 		return $result;
 	}
 

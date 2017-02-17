@@ -233,6 +233,7 @@ class EventsCollection extends AbstractCollection
 					}
 					break;
 				}
+				case 'registration_available':
 				case 'registration_locally':
 				case 'registration_required': {
 					if (filter_var($value, FILTER_VALIDATE_BOOLEAN) == true) {

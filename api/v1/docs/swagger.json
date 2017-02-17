@@ -2034,6 +2034,115 @@
         }
       }
     },
+    "/events/{Id}/ticket_types": {
+      "get": {
+        "tags": [
+          "Event"
+        ],
+        "summary": "Get all ticket types for event[doing]. It's empty if ticketing_locally == false",
+        "description": "",
+        "operationId": "getEventTicketTypes",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "Event ID",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "length",
+            "in": "query",
+            "description": "Items count",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Items count",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "description": "Order column name",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Additional fields and sub-entities",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Notification"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/{Id}/ticket_types/{UUID}": {
+      "get": {
+        "tags": [
+          "Event"
+        ],
+        "summary": "Get one specified ticket type for event",
+        "description": "",
+        "operationId": "getEventTicketType",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "Event ID",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Additional fields and sub-entities",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "UUID",
+            "in": "path",
+            "description": "Notification UUID",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        }
+      }
+    },
     "/events/{Id}/registrations": {
       "put": {
         "tags": [
@@ -3564,6 +3673,12 @@
         "[registration_locally]": {
           "type": "boolean"
         },
+        "[ticket_types]": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TicketType"
+          }
+        },
         "[registration_till]": {
           "type": "string"
         },
@@ -3813,6 +3928,96 @@
           "format": "int64"
         },
         "[expires_on]": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "Ticket": {
+      "type": "object",
+      "properties": {
+        "device_token": {
+          "type": "string"
+        },
+        "client_type": {
+          "type": "string"
+        },
+        "[device_name]": {
+          "type": "string"
+        },
+        "[created_at]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[updated_at]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[expires_on]": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "TicketType": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string"
+        },
+        "event_id": {
+          "type": "integer"
+        },
+        "type_code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "[comment]": {
+          "type": "string"
+        },
+        "[created_at]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[updated_at]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[price]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[sell_start_date]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[sell_end_date]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[start_after_ticket_type_uuid]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[amount]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[min_count_per_user]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[max_count_per_user]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[promocode]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[promocode_effort]": {
           "type": "integer",
           "format": "int64"
         }

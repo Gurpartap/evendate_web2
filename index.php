@@ -5,6 +5,7 @@ require_once 'v1-backend/users/Class.AbstractUser.php';
 require_once 'v1-backend/users/Class.User.php';
 require_once 'v1-backend/users/Class.NotAuthorizedUser.php';
 require_once 'v1-backend/tags/Class.TagsCollection.php';
+
 try {
 	$user = new User($__db);
 	if (isset($_GET['logout']) && $_GET['logout'] == true) {
@@ -13,8 +14,7 @@ try {
 		header('Location: /feed');
 		die();
 	}
-} catch (Exception $e) {
-}
+} catch (Exception $e) {}
 $title = 'Evendate';
 ?>
 <!doctype html>

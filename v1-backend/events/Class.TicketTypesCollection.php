@@ -6,7 +6,7 @@ class TicketTypesCollection extends AbstractCollection{
 																array $filters = null,
 																array $fields = null,
 																array $pagination = null,
-																array $order_by = array('id'))
+																array $order_by = array('type_code'))
 	{
 
 		$q_get = App::queryFactory()->newSelect();
@@ -14,7 +14,7 @@ class TicketTypesCollection extends AbstractCollection{
 		$is_one_type = false;
 		$from_table = 'view_ticket_types';
 
-		$cols = Fields::mergeFields(Tag::getAdditionalCols(), $fields, Tag::getDefaultCols());
+		$cols = Fields::mergeFields(TicketType::getAdditionalCols(), $fields, TicketType::getDefaultCols());
 
 
 		if (isset($pagination['offset'])) {
@@ -49,9 +49,9 @@ class TicketTypesCollection extends AbstractCollection{
 			->cols($cols)
 			->orderBy($order_by);
 
-		$p_get_tags = $db->prepareExecute($q_get, '', $statements)->fetchAll(PDO::FETCH_CLASS, 'TicketType');
-		$types = $p_get_tags;
-		if (count($types) == 0 && $is_one_type) throw new LogicException('CANT_FIND_TAG');
+		$p_get_types = $db->prepareExecute($q_get, '', $statements)->fetchAll(PDO::FETCH_CLASS, 'TicketType');
+		$types = $p_get_types;
+		if (count($types) == 0 && $is_one_type) throw new LogicException('CANT_FIND_TYPE');
 		if ($is_one_type) return $types[0];
 		$result = array();
 		foreach ($types as $type) {

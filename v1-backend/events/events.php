@@ -37,8 +37,17 @@ $__modules['events'] = array(
 			echo file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/qr/' . $event_id . '/' . $uuid . '?format=' . $format . '&size=' . $size);
 			die();
 		},
-		'{/(id:[0-9]+)/tickets}' => function ($event_id, $uuid) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
-			//TODO: make it clear to get all tickets
+		'{/(id:[0-9]+)/tickets}' => function ($event_id) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
+
+			$__request['event'] = EventsCollection::one($__db, $__user, $event_id, array());
+
+			return TicketsCollection::filter($__db,
+				$__user,
+				$__request,
+				$__fields,
+				$__pagination,
+				$__order_by ?? array()
+			);
 		},
 		'{{/(id:[0-9]+)}/notifications}' => function ($id) use ($__db, $__order_by, $__request, $__offset, $__length, $__user, $__fields) {
 			$event = EventsCollection::one(
@@ -62,6 +71,44 @@ $__modules['events'] = array(
 				$__db,
 				$__user,
 				array_merge($__request ?? array(), array('registered_users' => $event)),
+				$__fields ?? array(),
+				$__pagination,
+				$__order_by ?? array());
+
+		},
+
+		'{{/(id:[0-9]+)}/ticket_types/(uuid:\w+-\w+-\w+-\w+-\w+)}' => function ($id, $uuid) use ($__db, $__request, $__user, $__fields, $__pagination, $__order_by) {
+
+			$event = EventsCollection::one(
+				$__db,
+				$__user,
+				intval($id),
+				$__fields);
+
+
+			$result = TicketTypesCollection::filter(
+				$__db,
+				$__user,
+				array('uuid' => $uuid),
+				$__fields ?? array(),
+				$__pagination,
+				$__order_by ?? array());
+
+			return new Result(true, '', array($result->getParams($__user, $__fields)->getData()));
+		},
+		'{{/(id:[0-9]+)}/ticket_types}' => function ($id) use ($__db, $__request, $__user, $__fields, $__pagination, $__order_by) {
+
+			$event = EventsCollection::one(
+				$__db,
+				$__user,
+				intval($id),
+				$__fields);
+
+
+			return TicketTypesCollection::filter(
+				$__db,
+				$__user,
+				array_merge($__request ?? array(), array('event' => $event)),
 				$__fields ?? array(),
 				$__pagination,
 				$__order_by ?? array());
@@ -183,7 +230,7 @@ $__modules['events'] = array(
 			if (!isset($__request['payload']) || !isset($__request['payload']['registration_fields']))
 				throw new InvalidArgumentException('REGISTRATION_FIELDS_NOT_FOUND');
 
-			return $event->registerUser($__user, $__request['payload']['registration_fields']);
+			return $event->registerUser($__user, $__request['payload']);
 		},
 		'' => function () use ($__db, $__request, $__user) {
 			if ($__user instanceof User) {
@@ -229,7 +276,7 @@ $__modules['events'] = array(
 				$__fields
 			);
 			if (isset($__request['approved'])) {
-				RegistrationForm::setApprovedStatus($__user, $event, $registration_uuid, $__request['approved']);
+				RegistrationForm::setApprovedStatus($__user, $event, $registration_uuid, $__request['approved_status']);
 				$updated = true;
 			}
 			if (isset($__request['checkout'])) {

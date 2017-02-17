@@ -30,8 +30,9 @@
         "6"
       ],
       "registration_required": true,
-      "registration_till": "2016-12-29T18:00:00",
+      "registration_till": "2018-12-29T18:00:00",
       "is_free": false,
+      "is_online": false,
       "min_price": 500,
       "delayed_publication": false,
       "public_at": null,
@@ -78,7 +79,7 @@
         "horizontal": "C0J7HAe2.jpg"
       },
       "registration_required": true,
-      "registration_till": "2016-12-29T18:00:00",
+      "registration_till": "2018-12-29T18:00:00",
       "registration_locally": true,
       "registration_limit_count": 100,
       "registration_approvement_required": false,
@@ -137,6 +138,7 @@
         "6"
       ],
       "is_free": true,
+      "is_online": false,
       "min_price": 50,
       "delayed_publication": false,
       "public_at": null,
@@ -144,7 +146,7 @@
         "horizontal": "C0J7HAe2.jpg"
       },
       "registration_required": true,
-      "registration_till": "2016-12-29T18:00:00",
+      "registration_till": "2019-12-29T18:00:00",
       "registration_locally": true,
       "ticketing_locally": true,
       "registration_limit_count": null,
@@ -185,7 +187,7 @@
           "min_count_per_user": 1,
           "max_count_per_user": 2,
           "promocode": 2,
-          "promocode_effort": "-10"
+          "promocode_effort": 10
         },
         {
           "name": "Лекция и семинар",
@@ -198,7 +200,7 @@
           "min_count_per_user": 1,
           "max_count_per_user": 20,
           "promocode": "i_am_looser",
-          "promocode_effort": "-10"
+          "promocode_effort": 10
         }
       ],
       "registration_till_time_minutes": "00",

@@ -14,7 +14,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS'){
 	return;
 }
 
-
 try {
 
 	require_once "{$BACKEND_FULL_PATH}/bin/Class.Result.php";
