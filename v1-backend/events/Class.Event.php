@@ -141,19 +141,17 @@ class Event extends AbstractEntity
 			AND favorite_events.user_id = :user_id
 			AND favorite_events.event_id = view_events.id) IS NOT NULL AS ' . self::IS_FAVORITE_FIELD_NAME,
 
-		self::IS_REGISTERED_FIELD_NAME => '(SELECT (COUNT(view_registration_forms.id) > 0) :: BOOLEAN
-			FROM view_registration_forms
+		self::IS_REGISTERED_FIELD_NAME => '(SELECT (COUNT(view_tickets_orders.id) > 0) :: BOOLEAN
+			FROM view_tickets_orders
 			WHERE
-			view_registration_forms.status = TRUE
-			 AND view_registration_forms.user_id = :user_id
-			 AND view_registration_forms.event_id = view_events.id) :: BOOLEAN AS ' . self::IS_REGISTERED_FIELD_NAME,
+			 view_tickets_orders.user_id = :user_id
+			 AND view_tickets_orders.event_id = view_events.id) :: BOOLEAN AS ' . self::IS_REGISTERED_FIELD_NAME,
 
 
-		self::REGISTRATION_APPROVE_STATUS_FIELD_NAME => '(SELECT view_registration_forms.registration_status
-			FROM view_registration_forms
-			WHERE view_registration_forms.status = TRUE
-			AND view_registration_forms.user_id = :user_id
-			AND view_registration_forms.event_id = view_events.id) AS ' . self::REGISTRATION_APPROVE_STATUS_FIELD_NAME,
+		self::REGISTRATION_APPROVE_STATUS_FIELD_NAME => '(SELECT view_tickets_orders.status_type_code
+			FROM view_tickets_orders
+			WHERE view_tickets_orders.user_id = :user_id
+			AND view_tickets_orders.event_id = view_events.id) AS ' . self::REGISTRATION_APPROVE_STATUS_FIELD_NAME,
 
 		self::RANDOM_FIELD_NAME => '(SELECT created_at / (random() * 9 + 1)
 			FROM view_events AS ve
@@ -1421,6 +1419,7 @@ class Event extends AbstractEntity
 		if ($this->getRegistrationAvailable() == false) throw new InvalidArgumentException('REGISTRATION_FINISHED');
 		$fields = $this->getRegistrationFields($user)->getData();
 		$merged_fields = [];
+		$return_fields = [];
 
 		foreach ($fields as $field) {
 			$merged_fields[$field['uuid']] = $field;
@@ -1453,8 +1452,8 @@ class Event extends AbstractEntity
 					}
 				}
 			}
-
 			$merged_fields[$key] = $final_field;
+			$return_fields[] = $final_field;
 		}
 		if (count($errors) > 0) return new Result(false, 'Возникла ошибка во время регистрации', $merged_fields);
 
@@ -1468,7 +1467,6 @@ class Event extends AbstractEntity
 			$approve_required = $this->db->prepareExecute($q_get_approve_information)->fetchColumn(0);
 		}
 
-		$result = RegistrationForm::registerUser($user, $this, $merged_fields, $approve_required);
 
 		if ($this->ticketing_locally == false) {
 			if (!isset($request['tickets']) || !is_array($request['tickets'])) {
@@ -1479,18 +1477,23 @@ class Event extends AbstractEntity
 			);
 		}
 
-		RegistrationForm::processOrder($this, $user, $this->db, $request['tickets']);
+		$order_info = RegistrationForm::processOrder($this, $user, $this->db, $request['tickets']);
+		$result = RegistrationForm::registerUser($order_info['order_info']['id'], $user, $this, $merged_fields, $approve_required);
+
+		$order = OrdersCollection::oneByUUID($this->db,
+			$user,
+			$order_info['order_info']['uuid'],
+			array());
 
 		if ($result->getStatus()) {
 			$user->addFavoriteEvent($this);
 		}
-		return $result;
-	}
 
-	public function unregisterUser(AbstractUser $user)
-	{
-		$result = RegistrationForm::unregisterUser($user, $this);
-		return $result;
+		return new Result(true, '', array(
+			'registration_fields' => $return_fields,
+			'order' => $order->getParams($user, Order::getDefaultCols())->getData(),
+			'tickets' => TicketsCollection::filter($this->db, $user, array('order' => $order), array())->getData()
+		));
 	}
 
 }
