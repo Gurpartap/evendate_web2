@@ -152,7 +152,7 @@ class Organization extends AbstractEntity
 		$this->db = App::DB();
 	}
 
-	private static function addMailInfo(User $user, $data, $id, PDO $db)
+	private static function addMailInfo(User $user, $data, $id, ExtendedPDO $db)
 	{
 		$q_ins_mail = App::queryFactory()->newInsert()
 			->into('emails')
@@ -407,7 +407,7 @@ class Organization extends AbstractEntity
 		return new Result(true, '', $result_data);
 	}
 
-	private function getSubscribed(PDO $db, AbstractUser $user, array $fields = null, array $filters, array $order_by = null, array $pagination = null)
+	private function getSubscribed(ExtendedPDO $db, AbstractUser $user, array $fields = null, array $filters, array $order_by = null, array $pagination = null)
 	{
 		$filters['organization'] = $this;
 		return UsersCollection::filter(
@@ -667,7 +667,7 @@ class Organization extends AbstractEntity
 		return new Result(true, '');
 	}
 
-	private static function addOwner(User $user, int $organization_id, PDO $db)
+	private static function addOwner(User $user, int $organization_id, ExtendedPDO $db)
 	{
 		$q_ins_owner = App::queryFactory()->newInsert();
 
@@ -686,7 +686,7 @@ class Organization extends AbstractEntity
 		if ($result === FALSE) throw new DBQueryException('CANT_CREATE_ORGANIZATION', $db);
 	}
 
-	public static function create($data, User $user, PDO $db)
+	public static function create($data, User $user, ExtendedPDO $db)
 	{
 		$q_ins_organization = App::queryFactory()->newInsert();
 

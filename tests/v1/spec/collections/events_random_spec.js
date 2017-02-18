@@ -3,10 +3,11 @@
  */
 
 var
-    frisby = require('frisby'),
+
     fs = require("fs"),
     path = require('path'),
-    env = require(path.join(__dirname, '../env.js'));
+    env = require(path.join(__dirname, '../env.js')),
+    frisby = env.frisby;
 
 frisby.globalSetup({
     request: {
@@ -25,7 +26,7 @@ frisby.create('Get random events')
         request_id: String
     })
     .after(function (err, res, body) {
-        if (err){
+        if (err) {
             env.logger.error(err);
         }
     })
@@ -45,7 +46,7 @@ frisby.create('Get random events')
                     request_id: String
                 })
                 .after(function (err, res, body) {
-                    if (err){
+                    if (err) {
                         env.logger.error(err);
                     }
                 })

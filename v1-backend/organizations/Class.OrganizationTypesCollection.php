@@ -2,12 +2,12 @@
 
 class OrganizationTypesCollection extends AbstractCollection{
 
-	public static function filter(PDO $db,
+	public static function filter(ExtendedPDO $db,
 																AbstractUser $user = null,
-	                              array $filters = null,
-	                              array $fields = null,
-	                              array $pagination = null,
-	                              array $order_by = array('id')){
+																array $filters = null,
+																array $fields = null,
+																array $pagination = null,
+																array $order_by = array('id')){
 
 		$q_get_types = App::queryFactory()->newSelect();
 		$statements = array();
@@ -50,9 +50,7 @@ class OrganizationTypesCollection extends AbstractCollection{
 				}
 			}
 		}
-		$p_get_types = $db->prepare($q_get_types->getStatement());
-		$p_get_types->execute($statements);
-		$types = $p_get_types->fetchAll(PDO::FETCH_CLASS, 'OrganizationType');
+		$types = $db->prepareExecute($q_get_types, '', $statements)->fetchAll(PDO::FETCH_CLASS, 'OrganizationType');
 		if (count($types) == 0 && $is_one_type) throw new LogicException('CANT_FIND_TYPE');
 		$result_events = array();
 		foreach($types as $tag){

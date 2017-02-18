@@ -24,7 +24,7 @@ class Roles
         return self::ROLE_IDS[$role];
     }
 
-    public static function getUsersPrivilegesInOrganization(User $user, Organization $organization, PDO $db)
+    public static function getUsersPrivilegesInOrganization(User $user, Organization $organization, ExtendedPDO $db)
     {
         $q_get_privileges = App::queryFactory()
             ->newSelect()

@@ -1,25 +1,27 @@
-var
-    frisby = require('frisby'),
+let
     fs = require("fs"),
     path = require('path'),
     events = JSON.parse(fs.readFileSync(path.join(__dirname, './events.json'))),
     register_info = JSON.parse(fs.readFileSync(path.join(__dirname, './register.json'))),
-    env = require(path.join(__dirname, '../env.js'));
+    env = require(path.join(__dirname, '../env.js')),
+    frisby = env.frisby;
 
-frisby.globalSetup({
-    request: {
-        headers: {'Authorization': env.token}
-    }
-});
+let approve_statuses = [
+    'completed', 'is_pending', 'approved', 'rejected'
+];
+
+function getRandom(min, max){
+    return Math.floor(Math.random() * max) + min;
+}
 
 frisby
     .create('Get events with enabled registration')
     .get(env.api_url + 'events' +
-        '?fields=registration_till,registration_fields' +
+        '?fields=registration_till,registration_fields,ticket_types,ticketing_locally,' +
         '&registration_locally=true' +
         '&registration_required=true' +
         '&registered=false' +
-        '&order_by=-id,-registration_till&length=5')
+        '&order_by=-id,-registration_till&length=5&registration_available=true')
     .expectStatus(200)
     .expectJSONTypes({
         status: Boolean,
@@ -37,17 +39,24 @@ frisby
     })
     .afterJSON(function (events) {
         events.data.forEach(function (event, index) {
-            var send_data = [];
+            let send_data = [];
             event.registration_fields.forEach(function (field) {
-                var value = '';
+                let value = '';
                 if (register_info.hasOwnProperty(field.type)) {
                     value = register_info[field.type];
                 }
                 send_data.push({uuid: field.uuid, value: value});
             });
+            let _send = {registration_fields: send_data, tickets:[]};
+            if (event.ticketing_locally){
+                _send.tickets.push({uuid: event.ticket_types[0].uuid, count: 1});
+            }else{
+                _send.tickets.push({count: 1});
+            }
+            console.log(_send);
             frisby
                 .create('Register for event: ' + index)
-                .post(env.api_url + 'events/' + event.id + '/registrations', {registration_fields: send_data}, {json: true})
+                .post(env.api_url + 'events/' + event.id + '/orders', _send, {json: true})
                 .expectStatus(200)
                 .after(function (err, res, body) {
                     if (res.statusCode != 200){
@@ -67,7 +76,7 @@ frisby
                     if (index == 2 || index == 4) {
                         frisby
                             .create('Cancel registration for event: ' + index)
-                            .put(env.api_url + 'events/' + event.id + '/registrations?status=false')
+                            .put(env.api_url + 'events/' + event.id + '/tickets/' + json.data.uuid + '?status=false')
                             .expectStatus(200)
                             .expectJSONTypes({
                                 request_id: String,
@@ -87,7 +96,7 @@ frisby
                     }else{ // approve registrations
                         frisby
                             .create('Approve registration with UUID: ' + json.data.uuid)
-                            .put(env.api_url + 'events/' + event.id + '/registrations/' + json.data.uuid + '?approved=true')
+                            .put(env.api_url + 'events/' + event.id + '/tickets/' + json.data.uuid + '?approved_status=' + approve_statuses[getRandom(0, 4)])
                             .expectStatus(200)
                             .expectJSONTypes({
                                 request_id: String,

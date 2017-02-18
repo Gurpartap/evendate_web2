@@ -91,7 +91,7 @@ class OrganizationsStatistics extends AbstractAggregator
     private $organization;
 
 
-    public function __construct(PDO $db, Organization $organization, User $user)
+    public function __construct(ExtendedPDO $db, Organization $organization, User $user)
     {
         if (!$user->isAdmin($organization)) throw new PrivilegesException('', $db);
         $this->db = $db;

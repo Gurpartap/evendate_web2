@@ -1,9 +1,9 @@
 var
-    frisby = require('frisby'),
     fs = require("fs"),
     path = require('path'),
     events = JSON.parse(fs.readFileSync(path.join(__dirname, './events.json'))),
-    env = require(path.join(__dirname, '../env.js'));
+    env = require(path.join(__dirname, '../env.js')),
+    frisby = env.frisby;
 
 frisby.globalSetup({
     request: {
@@ -27,9 +27,7 @@ frisby
     })
     .expectJSONTypes({
         request_id: String,
-        data: {
-            event_id: Number
-        },
+        data: Object,
         status: Boolean,
         text: String
     })

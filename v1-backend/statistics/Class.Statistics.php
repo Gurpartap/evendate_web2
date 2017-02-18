@@ -61,7 +61,7 @@ class Statistics
 	const FIELD_FAVE_CONVERSION = 'fave_conversion';
 	const FIELD_AUDIENCE = 'audience';
 
-	public static function getTypeId($entity_type, $type_name, PDO $db)
+	public static function getTypeId($entity_type, $type_name, ExtendedPDO $db)
 	{
 		$q_get = App::queryFactory()
 			->newSelect()
@@ -77,7 +77,7 @@ class Statistics
 		return $p_get->fetchColumn(0);
 	}
 
-	private static function updateIOsBadges(PDO $db, AbstractUser $user, $type, Event $event = null, Organization $organization = null)
+	private static function updateIOsBadges(ExtendedPDO $db, AbstractUser $user, $type, Event $event = null, Organization $organization = null)
 	{
 //        if (App::$ENV != 'prod') return;
 		$exec_command = 'cd ' . App::getVar('node_path') . ' && ENV=' . App::$ENV . ' node update_ios_badges.js ' . $user->getId() . ' > /dev/null 2>/dev/null &';
@@ -99,7 +99,7 @@ class Statistics
 
 	}
 
-	public static function Event(Event $event, AbstractUser $user = null, PDO $db, $type, $no_update_badges = null)
+	public static function Event(Event $event, AbstractUser $user = null, ExtendedPDO $db, $type, $no_update_badges = null)
 	{
 		try {
 			$type_id = self::getTypeId(self::ENTITY_EVENT, $type, $db);
@@ -131,7 +131,7 @@ class Statistics
 		}
 	}
 
-	public static function Organization(Organization $organization, AbstractUser $user = null, PDO $db, $type, $no_update_badges = false)
+	public static function Organization(Organization $organization, AbstractUser $user = null, ExtendedPDO $db, $type, $no_update_badges = false)
 	{
 		try {
 			$type_id = self::getTypeId(self::ENTITY_ORGANIZATION, $type, $db);
@@ -156,7 +156,7 @@ class Statistics
 		}
 	}
 
-	public static function Friend(Friend $friend, AbstractUser $user = null, PDO $db, $type)
+	public static function Friend(Friend $friend, AbstractUser $user = null, ExtendedPDO $db, $type)
 	{
 		if ($friend->getId() == $user->getId()) return;
 		try {
@@ -177,7 +177,7 @@ class Statistics
 		$p_ins->execute($q_ins_event->getBindValues());
 	}
 
-	public static function StoreBatch(array $events, AbstractUser $user = null, PDO $db)
+	public static function StoreBatch(array $events, AbstractUser $user = null, ExtendedPDO $db)
 	{
 		$organization_events = 0;
 		$organization = null;

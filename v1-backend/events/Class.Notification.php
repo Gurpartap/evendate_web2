@@ -95,7 +95,7 @@ class Notification extends AbstractEntity
 	);
 
 
-	public function update(PDO $db, array $notification)
+	public function update(ExtendedPDO $db, array $notification)
 	{
 		if ($this->done == true) throw new LogicException('CANT_UPDATE_SENT_NOTIFICATION');
 		if (!isset($notification['notification_time'])) throw new LogicException('CANT_FIND_NOTIFICATION_TIME');
@@ -118,7 +118,7 @@ class Notification extends AbstractEntity
 		return new Result(true, 'Уведомление успешно обновлено', $result);
 	}
 
-	public function delete(PDO $db)
+	public function delete(ExtendedPDO $db)
 	{
 		$q_upd = App::queryFactory()->newUpdate();
 
