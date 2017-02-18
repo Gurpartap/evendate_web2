@@ -2034,18 +2034,94 @@
         }
       }
     },
-    "/events/{Id}/registrations": {
-      "post": {
+    "/events/{Id}/orders": {
+      "get": {
         "tags": [
           "Event"
         ],
-        "summary": "Register user for event",
+        "summary": "Get all orders by current user for event[doing]",
         "description": "",
-        "operationId": "createRegistrationByUser",
+        "operationId": "getEventOrders",
         "produces": [
           "application/json"
         ],
         "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "Event ID",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "length",
+            "in": "query",
+            "description": "Items count",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Items count",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "description": "Order column name",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Additional fields and sub-entities",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Order"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Event"
+        ],
+        "summary": "Register (buy tickets) by user",
+        "description": "",
+        "operationId": "addOrder",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "registration_fields",
+            "in": "body",
+            "description": "JSON string with filled events",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "tickets",
+            "in": "body",
+            "description": "JSON string with filled events `tickets:[{uuid:'', count:''}]`",
+            "required": true,
+            "type": "string"
+          },
           {
             "name": "Id",
             "in": "path",
@@ -2068,22 +2144,28 @@
         "tags": [
           "Event"
         ],
-        "summary": "Update one registration by registered user",
+        "summary": "Update order by user or administrator",
         "description": "",
-        "operationId": "updateRegistrationByUser",
+        "operationId": "updateOrder",
         "produces": [
           "application/json"
         ],
         "parameters": [
           {
-            "in": "query",
             "name": "status",
-            "description": "Registration status",
-            "required": false,
+            "in": "body",
+            "description": "Statuses [is_pending, approved, rejected, completed, returned_by_organization, payed] can be set only by admin. Values [payment_canceled_by_client, returned_by_client] only by user. Default values: completed (ticketing_locally == false && approvement_required == false), is_pending (ticketing_locally == false && approvement_required == true, wayting_for_payment(ticketing_locally == true && price > 0)",
+            "required": true,
             "type": "string",
             "enum": [
-              "true",
-              "false"
+              "is_pending",
+              "approved",
+              "rejected",
+              "completed",
+              "returned_by_organization",
+              "payed",
+              "payment_canceled_by_client",
+              "returned_by_client"
             ]
           },
           {
@@ -2105,40 +2187,18 @@
         }
       }
     },
-    "/events/{Id}/registrations/{UUID}": {
-      "put": {
+    "/events/{Id}/orders/{UUID}": {
+      "get": {
         "tags": [
           "Event"
         ],
-        "summary": "Update one registration status",
+        "summary": "Get one specified order by current user",
         "description": "",
-        "operationId": "updateRegistration",
+        "operationId": "getOneOrder",
         "produces": [
           "application/json"
         ],
         "parameters": [
-          {
-            "in": "query",
-            "name": "checkout",
-            "description": "Checkout status",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "true",
-              "false"
-            ]
-          },
-          {
-            "in": "query",
-            "name": "approved",
-            "description": "Approve status",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "true",
-              "false"
-            ]
-          },
           {
             "name": "Id",
             "in": "path",
@@ -2150,8 +2210,233 @@
           {
             "name": "UUID",
             "in": "path",
+            "description": "Order UUID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "path",
+            "description": "Additional fields",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        }
+      }
+    },
+    "/events/{Id}/ticket_types": {
+      "get": {
+        "tags": [
+          "Event"
+        ],
+        "summary": "Get all ticket types for event[doing]. It's empty if ticketing_locally == false",
+        "description": "",
+        "operationId": "getEventTicketTypes",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "Event ID",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "length",
+            "in": "query",
+            "description": "Items count",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Items count",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "description": "Order column name",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Additional fields and sub-entities",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Notification"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/{Id}/ticket_types/{UUID}": {
+      "get": {
+        "tags": [
+          "Event"
+        ],
+        "summary": "Get one specified ticket type for event",
+        "description": "",
+        "operationId": "getEventTicketType",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "Event ID",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Additional fields and sub-entities",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "UUID",
+            "in": "path",
             "description": "Notification UUID",
             "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        }
+      }
+    },
+    "/events/{Id}/tickets": {
+      "get": {
+        "tags": [
+          "Event"
+        ],
+        "summary": "Get all tickets by current user for event[doing]",
+        "description": "",
+        "operationId": "getEventTickets",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "Event ID",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "length",
+            "in": "query",
+            "description": "Items count",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Items count",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "description": "Order column name",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Additional fields and sub-entities",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Notification"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/events/{Id}/tickets/{UUID}": {
+      "get": {
+        "tags": [
+          "Event"
+        ],
+        "summary": "Get one specified ticket by current user",
+        "description": "",
+        "operationId": "getOneTicket",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "Event ID",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "UUID",
+            "in": "path",
+            "description": "Ticket UUID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "path",
+            "description": "Additional fields",
+            "required": false,
             "type": "string"
           }
         ],
@@ -2210,37 +2495,6 @@
             "name": "Id",
             "in": "path",
             "description": "ID of event for making favorite",
-            "required": true,
-            "type": "integer",
-            "format": "int64"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "schema": {
-              "$ref": "#/definitions/ApiResponse"
-            }
-          }
-        }
-      }
-    },
-    "/events/{Id}/registered_users": {
-      "get": {
-        "tags": [
-          "Event"
-        ],
-        "summary": "Get list of registered users (only for admin)",
-        "description": "",
-        "operationId": "getRegisteredUsers",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "Id",
-            "in": "path",
-            "description": "Event ID",
             "required": true,
             "type": "integer",
             "format": "int64"
@@ -3060,6 +3314,108 @@
         }
       }
     },
+    "/statistics/events/{Id}/orders": {
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "Get orders for event",
+        "description": "",
+        "operationId": "getStatEventOrders",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Additional fields",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/statistics/events/{Id}/tickets": {
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "Get tickets for event",
+        "description": "",
+        "operationId": "getStatEventTickets",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Additional fields",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/statistics/events/{Id}/participants": {
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "Get participants for event",
+        "description": "",
+        "operationId": "getStatEventParticipants",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Additional fields",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
     "/statistics/organizations/{Id}": {
       "get": {
         "tags": [
@@ -3565,10 +3921,16 @@
             "$ref": "#/definitions/User"
           }
         },
-        "[registered_users]": {
+        "[orders]": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/User"
+            "$ref": "#/definitions/Order"
+          }
+        },
+        "[tickets]": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Ticket"
           }
         },
         "[can_edit]": {
@@ -3590,23 +3952,29 @@
           "type": "integer",
           "format": "int64"
         },
+        "[ticketing_locally]": {
+          "type": "boolean"
+        },
         "[registration_locally]": {
           "type": "boolean"
+        },
+        "[ticket_types]": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TicketType"
+          }
         },
         "[registration_till]": {
           "type": "string"
         },
-        "[registration_approved]": {
+        "[registration_approve_status]": {
           "type": "string"
         },
         "[registration_available]": {
           "type": "boolean"
         },
-        "[registered_count]": {
-          "type": "string"
-        },
-        "[registered]": {
-          "type": "string"
+        "[is_registered]": {
+          "type": "boolean"
         },
         "[is_free]": {
           "type": "boolean"
@@ -3842,6 +4210,173 @@
           "format": "int64"
         },
         "[expires_on]": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "Ticket": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "type_code": {
+          "type": "string"
+        },
+        "ticket_type_uuid": {
+          "type": "string"
+        },
+        "ticket_order_uuid": {
+          "type": "string"
+        },
+        "status": {
+          "type": "boolean"
+        },
+        "checked_out": {
+          "type": "boolean"
+        },
+        "[price]": {
+          "type": "number"
+        },
+        "[created_at]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[updated_at]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[ticket_type]": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TicketType"
+          }
+        },
+        "[order]": {
+          "$ref": "#/definitions/Order"
+        },
+        "[user]": {
+          "$ref": "#/definitions/User"
+        }
+      }
+    },
+    "Order": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string"
+        },
+        "user_id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "event_id": {
+          "type": "string"
+        },
+        "status_type_code": {
+          "type": "string"
+        },
+        "[order_content]": {
+          "type": "string"
+        },
+        "[is_canceled]": {
+          "type": "boolean"
+        },
+        "[payed_at]": {
+          "type": "integer"
+        },
+        "[canceled_at]": {
+          "type": "integer"
+        },
+        "[status_name]": {
+          "type": "string"
+        },
+        "[status_id]": {
+          "type": "integer"
+        },
+        "[created_at]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[updated_at]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[tickets]": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Ticket"
+          }
+        },
+        "[user]": {
+          "$ref": "#/definitions/User"
+        }
+      }
+    },
+    "TicketType": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string"
+        },
+        "event_id": {
+          "type": "integer"
+        },
+        "type_code": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "[comment]": {
+          "type": "string"
+        },
+        "[created_at]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[updated_at]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[price]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[sell_start_date]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[sell_end_date]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[start_after_ticket_type_uuid]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[amount]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[min_count_per_user]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[max_count_per_user]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[promocode]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[promocode_effort]": {
           "type": "integer",
           "format": "int64"
         }

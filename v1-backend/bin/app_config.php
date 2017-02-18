@@ -98,7 +98,7 @@ class App
 		return self::$QUERY_FACTORY;
 	}
 
-	static function buildGlobal(PDO $db)
+	static function buildGlobal(ExtendedPDO $db)
 	{
 		self::$RESPONSE_FORMAT = (isset($_REQUEST['format']) && $_REQUEST['format'] == 'xml') ? 'xml' : 'json';
 		self::$RESPONSE_DOWNLOAD = (isset($_REQUEST['download']) && ($_REQUEST['download'] == '1' || $_REQUEST['download'] == 'true')) ? true : false;
@@ -131,15 +131,15 @@ class App
 		self::$QUERY_FACTORY = new QueryFactory('pgsql');
 	}
 
-	static function getCurrentUser(): AbstractUser
+	static function getCurrentUser() : AbstractUser
 	{
 		if (self::$__USER instanceof User)
 			return self::$__USER;
 		$token = isset(self::$__HEADERS['authorization']) ? self::$__HEADERS['authorization'] : null;
 
-		try {
+		try{
 			self::$__USER = new User(self::$__DB, $token);
-		} catch (Exception $e) {
+		}catch (Exception $e){
 			self::$__USER = new NotAuthorizedUser();
 		}
 		return self::$__USER;
@@ -160,7 +160,7 @@ class App
 		}
 	}
 
-	static public function DB(): PDO
+	static public function DB() : ExtendedPDO
 	{
 		return self::$__DB;
 	}
@@ -207,14 +207,6 @@ class App
 			$randomString .= $characters[rand(0, $charactersLength - 1)];
 		}
 		return $randomString;
-	}
-
-	public static function createMysqlDB()
-	{
-		global $__mysql_db;
-		$driver_options = array(PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION);
-		$mysql_opts = App::$SETTINGS->mysql_db;
-		$__mysql_db = new PDO('mysql:host=' . $mysql_opts->host . ';dbname=' . $mysql_opts->database . ';charset=utf8;port=' . $mysql_opts->port, $mysql_opts->user, $mysql_opts->password, $driver_options);
 	}
 
 	public static function getAuthURLs(string $type)

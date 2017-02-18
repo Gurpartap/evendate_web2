@@ -201,7 +201,8 @@ EditOrganizationPage.prototype.render = function() {
 		}
 		
 		function afterSubmit() {
-			socket.on('utils.updateImagesDone', function() {
+            socket.emit('utils.registrationFinished', additional_fields);
+            socket.on('utils.updateImagesDone', function() {
 				window.location.href = '/organization/' + PAGE.organization.id;
 			});
 			socket.emit('utils.updateImages');

@@ -112,12 +112,12 @@ class Organization extends AbstractEntity
                         ), 0) AS ' . self::RATING_OVERALL,
 		self::NEW_EVENTS_COUNT_FIELD_NAME => '(
 		SELECT
-			COUNT(view_events.id)
+			COUNT(*)
 			FROM view_events
 			WHERE
 				organization_id = view_organizations.id
-				AND
-				view_events.last_event_date > DATE_PART(\'epoch\', NOW()) :: INT
+				AND 
+				view_events.last_event_date_dt < NOW()::TIMESTAMPTZ
 				AND view_events.created_at > 
 					COALESCE((SELECT DATE_PART(\'epoch\', stat_organizations.created_at)::INT
 					    FROM stat_organizations
@@ -150,6 +150,24 @@ class Organization extends AbstractEntity
 	public function __construct()
 	{
 		$this->db = App::DB();
+	}
+
+	private static function addMailInfo(User $user, $data, $id, ExtendedPDO $db)
+	{
+		$q_ins_mail = App::queryFactory()->newInsert()
+			->into('emails')
+			->cols(array(
+				'email_type_id' => '1', //hardcoded in SQL also,
+				'recipient' => filter_var($user->getEmail(), FILTER_VALIDATE_EMAIL) === FALSE ? $data['email'] : $user->getEmail(),
+				'data' => json_encode(array(
+					'first_name' => $user->getFirstName(),
+					'last_name' => $user->getLastName(),
+					'organization_short_name' => $data['short_name'],
+					'organization_id' => $id,
+				)),
+				'status' => 'true'
+			));
+		$db->prepare($q_ins_mail->getStatement())->execute($q_ins_mail->getBindValues());
 	}
 
 	/**
@@ -389,7 +407,7 @@ class Organization extends AbstractEntity
 		return new Result(true, '', $result_data);
 	}
 
-	private function getSubscribed(PDO $db, AbstractUser $user, array $fields = null, array $filters, array $order_by = null, array $pagination = null)
+	private function getSubscribed(ExtendedPDO $db, AbstractUser $user, array $fields = null, array $filters, array $order_by = null, array $pagination = null)
 	{
 		$filters['organization'] = $this;
 		return UsersCollection::filter(
@@ -649,7 +667,7 @@ class Organization extends AbstractEntity
 		return new Result(true, '');
 	}
 
-	private static function addOwner(User $user, int $organization_id, PDO $db)
+	private static function addOwner(User $user, int $organization_id, ExtendedPDO $db)
 	{
 		$q_ins_owner = App::queryFactory()->newInsert();
 
@@ -668,7 +686,7 @@ class Organization extends AbstractEntity
 		if ($result === FALSE) throw new DBQueryException('CANT_CREATE_ORGANIZATION', $db);
 	}
 
-	public static function create($data, User $user, PDO $db)
+	public static function create($data, User $user, ExtendedPDO $db)
 	{
 		$q_ins_organization = App::queryFactory()->newInsert();
 
@@ -709,6 +727,7 @@ class Organization extends AbstractEntity
 		if ($result === FALSE) throw new DBQueryException('CANT_CREATE_ORGANIZATION', $db);
 		$result = $p_ins_organization->fetch(PDO::FETCH_ASSOC);
 		self::addOwner($user, $result['id'], $db);
+		self::addMailInfo($user, $data, $result['id'], $db);
 		@file_get_contents(App::DEFAULT_NODE_LOCATION . '/recommendations/organizations/' . $result['id']);
 		return new Result(true, '', array('organization_id' => $result['id']));
 	}

@@ -757,13 +757,6 @@ RedactEventPage.prototype.render = function() {
 	} else {
 		page_vars.header_text = 'Редактирование события';
 		page_vars.button_text = 'Сохранить';
-		if (PAGE.event.public_at !== null) {
-			var m_public_at = moment(PAGE.event.public_at);
-			page_vars.public_at_data = m_public_at.format('YYYY-MM-DD');
-			page_vars.public_at_data_label = m_public_at.format('DD.MM.YYYY');
-			page_vars.public_at_time_hours = m_public_at.format('HH');
-			page_vars.public_at_time_minutes = m_public_at.format('mm');
-		}
 		if (PAGE.event.registration_required) {
 			var m_registration_till = moment.unix(PAGE.event.registration_till);
 			page_vars.registration_till_data = m_registration_till.format('YYYY-MM-DD');
@@ -782,6 +775,7 @@ RedactEventPage.prototype.render = function() {
 		}
 		
 		page_vars = $.extend(true, {}, PAGE.event, page_vars);
+		console.log(page_vars);
 		PAGE.$wrapper.html(tmpl('edit-event-page', page_vars));
 		PAGE.init();
 		
@@ -830,9 +824,7 @@ RedactEventPage.prototype.render = function() {
 		if (PAGE.event.registration_required) {
 			PAGE.$wrapper.find('#edit_event_registration_required').prop('checked', true).trigger('change');
 		}
-		if (PAGE.event.public_at !== null) {
-			PAGE.$wrapper.find('#edit_event_delayed_publication').prop('checked', true).trigger('change');
-		}
+		PAGE.$wrapper.find('#edit_event_delayed_publication').toggleStatus('disabled');
 		PAGE.formatVKPost();
 	}
 };

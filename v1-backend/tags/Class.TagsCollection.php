@@ -6,7 +6,7 @@ require_once $BACKEND_FULL_PATH . '/bin/Class.AbstractCollection.php';
 class TagsCollection extends AbstractCollection
 {
 
-	public static function filter(PDO $db,
+	public static function filter(ExtendedPDO $db,
 																AbstractUser $user = null,
 																array $filters = null,
 																array $fields = null,
@@ -130,7 +130,7 @@ class TagsCollection extends AbstractCollection
 		return $fc . mb_substr($str, 1);
 	}
 
-	public static function create(PDO $db, string $name) : Tag
+	public static function create(ExtendedPDO $db, string $name) : Tag
 	{
 		$name = preg_replace('/\s+/', ' ', self::mb_ucfirst($name));
 

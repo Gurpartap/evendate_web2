@@ -26,7 +26,9 @@ module.exports = {
         GET_IMAGE_FROM_URL: 'image.getFromURL',
         UPDATE_IMAGES: 'utils.updateImages',
         UPDATE_IMAGES_DONE: 'utils.updateImagesDone',
-        FEEDBACK: 'utils.updateImages'
+        FEEDBACK: 'utils.feedback',
+        REGISTRATION_STARTED: 'utils.registrationStarted',
+        REGISTRATION_FINISHED: 'utils.registrationFinished'
     },
     getUrls: function (real_config) {
         return {

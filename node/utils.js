@@ -15,10 +15,10 @@ function setNullToUndefined(obj, key){
 
 module.exports = {
     replaceTags: function (text, object) {
-        for (var key in object) {
+        for (let key in object) {
             if (object.hasOwnProperty(key)) {
-                var value = object[key];
-                var key_expr = new RegExp('{' + key + '}', 'gim');
+                let value = object[key];
+                let key_expr = new RegExp('{' + key + '}', 'gim');
                 if (value == null) {
                     value = '';
                 }

@@ -1,8 +1,6 @@
 <?php
 
-ini_set("display_errors", 1);
-error_reporting(E_ALL);
-$DEBUG_MODE = true;
+
 require_once 'v1-backend/bin/env_variables.php';
 require_once "{$BACKEND_FULL_PATH}/bin/Class.Result.php";
 require_once "{$BACKEND_FULL_PATH}/bin/db.php";
@@ -18,6 +16,13 @@ require_once "{$BACKEND_FULL_PATH}/events/Class.Event.php";
 require_once "{$BACKEND_FULL_PATH}/users/Class.NotAuthorizedUser.php";
 require_once "{$BACKEND_FULL_PATH}/users/Class.User.php";
 
+if (App::$ENV == 'prod' || App::$ENV == 'test') {
+	$DEBUG_MODE = false;
+}else{
+	$DEBUG_MODE = true;
+	ini_set("display_errors", 1);
+	error_reporting(E_ALL);
+}
 App::buildGlobal($__db);
 
 try {
@@ -69,11 +74,11 @@ $url_parts = explode('/', $url);
 
 	<?php
 	if ($DEBUG_MODE) { ?>
-		<link rel="stylesheet" href="/dist/vendor.css?rev=40b7971db65b1cafe03cb542e61fb5ae">
-		<link rel="stylesheet" href="/dist/app.css?rev=b533d8579fc77b73281151faf99ef031"><?php
+		<link rel="stylesheet" href="/dist/vendor.css?rev=5602b9b9f8cddbb4f8133131a270a5ae">
+		<link rel="stylesheet" href="/dist/app.css?rev=b94fa44d2e0fcbce480f35ec9e974534"><?php
 	} else { ?>
-		<link rel="stylesheet" href="/dist/vendor.min.css?rev=294f8f20367db8d5e6aadde824138e62">
-		<link rel="stylesheet" href="/dist/app.min.css?rev=f70182b8ca20ba06528d18af4455f1b5"><?php
+		<link rel="stylesheet" href="/dist/vendor.min.css?rev=d48eec79ba0dcb66d3491c6bccde5f11">
+		<link rel="stylesheet" href="/dist/app.min.css?rev=19733b3537109a05f112bf15d2819bfe"><?php
 	} ?>
 
 	<?php
@@ -81,16 +86,16 @@ $url_parts = explode('/', $url);
 		if (count($url_parts) > 2) {
 			switch ($url_parts[1]) {
 				case 'organization': {
-					$item = OrganizationsCollection::one($__db, $user, $url_parts[2], array('description', 'subscribed_count'));
+					$item = OrganizationsCollection::one($__db, $user, intval($url_parts[2]), array('description', 'subscribed_count'));
 					$data = array(
-						'title' => htmlspecialchars('Evendate - ' . $item->getName()),
+						'title' => htmlspecialchars($item->getName()),
 						'description' => htmlspecialchars($item->getName() . ' в Evendate это больше ' . $item->getSubscribedCount() . ' подписчиков и самые интересные события! ' . $item->getDescription()),
 						'image' => htmlspecialchars($item->getBackgroundImgUrl())
 					);
 					break;
 				}
 				case 'event': {
-					$item = EventsCollection::one($__db, $user, $url_parts[2], array('description', 'organization_short_name'));
+					$item = EventsCollection::one($__db, $user, intval($url_parts[2]), array('description', 'organization_short_name'));
 					$params = $item->getParams($user, array('title', 'description', 'organization_short_name'))->getData();
 					$data = array(
 						'title' => htmlspecialchars($params['title'] . ' в ' . $params['organization_short_name'] . ' на Evendate'),
@@ -127,7 +132,7 @@ $url_parts = explode('/', $url);
 			}
 		}
 	} catch (Exception $e) {
-		header('Location: /');
+//		header('Location: /');
 	}
 
 	?>
@@ -221,15 +226,15 @@ $url_parts = explode('/', $url);
 
 	<div class="sidebar_main_wrapper scrollbar-outer SidebarScroll">
 		<nav class="sidebar_navigation SidebarNav"><?php
-			if(!$is_user_not_auth){ ?>
-				<a href="/my/profile" class="sidebar_navigation_item SidebarNavItem link Link"><span>Мой профиль</span></a><?php
-			}
 			if ($is_user_editor) { ?>
 				<a href="/statistics" class="sidebar_navigation_item SidebarNavItem link Link"><span>Статистика</span></a>
 				<a href="/add/event" class="sidebar_navigation_item SidebarNavItem link Link"><span>Создать событие</span></a><?php
 			} ?>
 			<a href="/feed" class="sidebar_navigation_item SidebarNavItem link Link"><span>События</span><span class="counter sidebar_navigation_counter -hidden SidebarNavFeedCounter"></span></a>
-			<a href="/organizations" class="sidebar_navigation_item SidebarNavItem link Link"><span>Каталог организаторов</span></a>
+			<a href="/organizations" class="sidebar_navigation_item SidebarNavItem link Link"><span>Организаторы</span></a><?php
+			if(!$is_user_not_auth){ ?>
+				<a href="/my/profile" class="sidebar_navigation_item SidebarNavItem link Link"><span>Мой профиль</span></a><?php
+			}?>
 		</nav>
 		<hr class="sidebar_divider">
 		<div class="sidebar_organizations_wrapper scrollbar-outer SidebarOrganizationsScroll"><?php
@@ -257,11 +262,11 @@ $url_parts = explode('/', $url);
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=1afde92ec9da9ac16bf41078ddc05616" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=58c8b9e649b9be73a5271dd12722ceec" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=9edd7064f93f57195e6666bc01586168" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=433a1fa1707d894e9edddc9b1cd9c6a9" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=3767e86f1db748115aafd09ea734b08b" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=b56d4bab9161fda2fe660bcd3197270d" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=1e2cc7cb25f5b3d10b6ab69e7fb9ea03" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=541fd78bf2e5ea367e4cd01c5b6e014e" charset="utf-8"></script><?php
 }	?>
 
 <?php

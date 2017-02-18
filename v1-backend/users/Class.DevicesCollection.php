@@ -3,12 +3,12 @@
 class DevicesCollection extends AbstractCollection{
 
 
-	public static function filter(PDO $db,
+	public static function filter(ExtendedPDO $db,
 																AbstractUser $user = null,
-	                              array $filters = null,
-	                              array $fields = null,
-	                              array $pagination = null,
-	                              array $order_by = array('id')
+																array $filters = null,
+																array $fields = null,
+																array $pagination = null,
+																array $order_by = array('id')
 	) {
 
 		$q_get_devices = App::queryFactory()->newSelect();
@@ -41,12 +41,8 @@ class DevicesCollection extends AbstractCollection{
 		}
 
 
-		$p_get_events = $db->prepare($q_get_devices->getStatement());
-		$result = $p_get_events->execute($statement_array);
 
-		if ($result === FALSE) throw new DBQueryException(implode(';', $db->errorInfo()), $db);
-
-		$devices = $p_get_events->fetchAll(PDO::FETCH_CLASS, 'Device');
+		$devices = $db->prepareExecute($q_get_devices, '', $statement_array)->fetchAll(PDO::FETCH_CLASS, 'Device');
 		if (count($devices) == 0 && $is_one_device) throw new LogicException('CANT_FIND_DEVICE');
 		$result_devices = array();
 		if ($is_one_device) return $devices[0];
@@ -56,7 +52,7 @@ class DevicesCollection extends AbstractCollection{
 		return new Result(true, '', $result_devices);
 	}
 
-	public static function one(PDO $db, AbstractUser $user, int $id, array $fields = null) : Device {
+	public static function one(ExtendedPDO $db, AbstractUser $user, int $id, array $fields = null) : Device {
 		return parent::one($db, $user, $id, $fields);
 
 	}

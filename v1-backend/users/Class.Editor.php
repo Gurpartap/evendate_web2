@@ -11,7 +11,7 @@ class Editor extends User
 	 * @param PDO $db
 	 * @param null $token
 	 */
-	public function __construct(PDO $db, $token = null)
+	public function __construct(ExtendedPDO $db, $token = null)
 	{
 		parent::__construct($db, App::getCurrentUser()->getToken());
 	}

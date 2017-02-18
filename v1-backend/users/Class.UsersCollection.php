@@ -6,7 +6,7 @@ require_once 'Class.RegisteredUser.php';
 class UsersCollection extends AbstractCollection
 {
 
-	public static function filter(PDO $db,
+	public static function filter(ExtendedPDO $db,
 																AbstractUser $user = null,
 																array $filters = null,
 																array $fields = null,
@@ -156,7 +156,7 @@ class UsersCollection extends AbstractCollection
 					}
 					break;
 				}
-				case 'registered_users': {
+				case 'participants': {
 					$getting_registered_users = true;
 					$class_name = 'RegisteredUser';
 					$default_cols = RegisteredUser::getDefaultCols();
@@ -169,19 +169,21 @@ class UsersCollection extends AbstractCollection
 					if ($user->isAdmin($value->getOrganization()) == false) throw new PrivilegesException('', $db);
 					$fields['event_id'] = 'event_id';
 					$q_get_users
-						->join('INNER', 'users_registrations', 'users_registrations.user_id = view_users.id')
-						->where('users_registrations.event_id = :event_id');
+						->join('INNER', 'view_tickets', 'view_tickets.user_id = view_users.id')
+						->join('INNER', 'view_tickets_orders', 'view_tickets.ticket_order_id = view_tickets_orders.id')
+						->where('view_tickets_orders.event_id = :event_id')
+						->where('view_tickets_orders.is_active = TRUE');
 					$statement_array[':event_id'] = $value->getId();
 					break;
 				}
-				case 'registered_status': {
-					if (!array_key_exists('registered_users', $filters)) throw new InvalidArgumentException('registered_users filter is required for ' . $name);
-					$_val = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
-					$q_get_users
-						->where('users_registrations.status = :registered_status');
-					$statement_array[':registered_status'] = $_val;
-					break;
-				}
+//				case 'registered_status': {
+//					if (!array_key_exists('registered_users', $filters)) throw new InvalidArgumentException('registered_users filter is required for ' . $name);
+//					$_val = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+//					$q_get_users
+//						->where('users_registrations.status = :registered_status');
+//					$statement_array[':registered_status'] = $_val;
+//					break;
+//				}
 				case 'organization_approved': {
 					if (!array_key_exists('registered_users', $filters)) throw new InvalidArgumentException('registered_users filter is required for ' . $name);
 					$_val = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
@@ -206,12 +208,8 @@ class UsersCollection extends AbstractCollection
 		$q_get_users->cols($_fields);
 
 		$q_get_users->orderBy($order_by);
-		$p_get_events = $db->prepare($q_get_users->getStatement());
-//		echo $q_get_users->getStatement();
-		$result = $p_get_events->execute($statement_array);
-		if ($result === FALSE) throw new DBQueryException(implode(';', $db->errorInfo()), $db);
 
-		$users = $p_get_events->fetchAll(PDO::FETCH_CLASS, $class_name);
+		$users = $db->prepareExecute($q_get_users, '', $statement_array)->fetchAll(PDO::FETCH_CLASS, $class_name);
 		if (count($users) == 0 && $is_one_user) throw new LogicException('CANT_FIND_USER');
 		$result_users = array();
 		if ($is_one_user) {
@@ -224,7 +222,7 @@ class UsersCollection extends AbstractCollection
 
 	}
 
-	public static function one(PDO $db, AbstractUser $user, int $id, array $fields = null): Friend
+	public static function one(ExtendedPDO $db, AbstractUser $user, int $id, array $fields = null): Friend
 	{
 		$friend = parent::one($db, $user, $id, $fields);
 		return $friend;

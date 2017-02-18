@@ -20,7 +20,6 @@ class Tag extends AbstractEntity
     protected static $ADDITIONAL_COLS = array(
         'created_at',
         'updated_at',
-
         self::EVENTS_COUNT_FIELD_NAME => '(SELECT count(events_tags.tag_id)
             FROM events_tags
             WHERE events_tags.tag_id = view_tags.id) AS ' . self::EVENTS_COUNT_FIELD_NAME,

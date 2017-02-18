@@ -221,6 +221,10 @@
 	</div>
 </script>
 
+<script type="javascript/template" id="tmpl-cap">
+	<div class="cap {classes}" {dataset} {attributes}><span class="cap_message">{message}</span></div>
+</script>
+
 <!-- Calendar -->
 
 <script type="javascript/template" id="tmpl-calendar">
@@ -905,14 +909,14 @@
 		</div>
 		<div class="page user_page_content Tabs">
 			<header class="user_page_content_header tabs_header -color_accent">
-				<span class="tab Tab -active">Активность</span>
-				<span class="tab Tab">Избранные события</span>
+				<span class="tab Tab">Активность</span>
+				<span class="tab Tab -active">Избранные события</span>
 			</header>
 			<div class="tab_bodies_wrap TabsBodyWrapper">
-				<div class="tab_body TabsBody UserActivities -active" data-tab_body_type="activities">
+				<div class="tab_body TabsBody UserActivities" data-tab_body_type="activities">
 					{activity_blocks}
 				</div>
-				<div class="tab_body TabsBody" data-tab_body_type="events">
+				<div class="tab_body TabsBody -active" data-tab_body_type="events">
 					{favored_event_blocks}
 				</div>
 			</div>
