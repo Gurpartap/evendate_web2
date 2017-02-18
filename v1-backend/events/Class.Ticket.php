@@ -9,6 +9,7 @@ class Ticket extends AbstractEntity
 
 	protected $uuid;
 	protected $type;
+	protected $user_id;
 	protected $created_at;
 	protected $updated_at;
 	protected $ticket_type_uuid;
@@ -218,5 +219,25 @@ class Ticket extends AbstractEntity
 		return new Result(true, '', $result_data);
 	}
 
+	public function setCheckOut($checkout){
+
+		$db = App::DB();
+		$value = filter_var($checkout, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+		$q_upd_col = App::queryFactory()->newUpdate()
+			->table('tickets')
+			->cols(array(
+				'checked_out' => $value
+			))
+			->where('uuid = ?', $this->uuid);
+		$p_upd_col = $db->prepareExecute($q_upd_col, 'CANT_UPDATE_INFO');
+		if ($p_upd_col->rowCount() != 1) throw new InvalidArgumentException('BAD_REGISTRATION_UUID', $db);
+
+		return new Result(true, 'Данные успешно обновлены');
+
+	}
+
+	public function getUserId(){
+		return $this->user_id;
+	}
 
 }

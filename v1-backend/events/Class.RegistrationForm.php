@@ -7,41 +7,7 @@ require_once $BACKEND_FULL_PATH . '/events/Class.TicketsCollection.php';
 
 class RegistrationForm
 {
-	protected $event;
-	private $db;
 
-	const REGISTRATION_STATUS_IS_PENDING = 'is_pending';
-	const REGISTRATION_STATUS_APPROVED = 'approved';
-	const REGISTRATION_STATUS_REJECTED = 'rejected';
-
-	const REGISTRATION_STATUSES = array(
-		self::REGISTRATION_STATUS_IS_PENDING,
-		self::REGISTRATION_STATUS_APPROVED,
-		self::REGISTRATION_STATUS_REJECTED
-	);
-
-	const REGISTRATION_STATUS_IS_PENDING_ID = 1;
-	const REGISTRATION_STATUS_APPROVED_ID = 2;
-	const REGISTRATION_STATUS_REJECTED_ID = 3;
-
-
-	const REGISTRATION_STATUS_IDS = array(
-		self::REGISTRATION_STATUS_IS_PENDING => self::REGISTRATION_STATUS_IS_PENDING_ID,
-		self::REGISTRATION_STATUS_APPROVED => self::REGISTRATION_STATUS_APPROVED_ID,
-		self::REGISTRATION_STATUS_REJECTED => self::REGISTRATION_STATUS_REJECTED_ID,
-	);
-
-
-	/**
-	 * RegistrationForm constructor.
-	 * @param Event $event
-	 * @param PDO $db
-	 */
-	public function __construct(Event $event, ExtendedPDO $db)
-	{
-		$this->event = $event;
-		$this->db = $db;
-	}
 
 	private static function getFormFieldTypeInfo(string $type, ExtendedPDO $db): array
 	{
@@ -91,38 +57,22 @@ class RegistrationForm
 		}
 	}
 
-	public static function registerUser(User $user, Event $event, array $fields, $approvement_required)
+	public static function registerUser($order_id, User $user, Event $event, array $fields, $approvement_required)
 	{
-		$db = App::DB();
-		$q_ins_reg = App::queryFactory()->newInsert();
-		$q_ins_reg->into('registration_forms')
-			->cols(array(
-				'user_id' => $user->getId(),
-				'event_id' => $event->getId(),
-				'status' => 'true',
-				'registration_status_id' => $approvement_required ? self::REGISTRATION_STATUS_IS_PENDING_ID : self::REGISTRATION_STATUS_APPROVED_ID,
-			))
-			->onConflictUpdate(array('user_id', 'event_id'), array(
-				'status' => 'true',
-				'registration_status_id' => $approvement_required ? self::REGISTRATION_STATUS_IS_PENDING_ID : self::REGISTRATION_STATUS_APPROVED_ID
-			))
-			->returning(array('id', 'uuid'));
 
-		$result = $db->prepareExecute($q_ins_reg, 'CANT_INSERT_REGISTRATION')->fetch(PDO::FETCH_ASSOC);
-		$user_reg_id = $result['id'];
-		$user_reg_uuid = $result['uuid'];
+		$db = App::DB();
 
 		/* Form inserted, insert fields */
 		$q_ins_fields = 'INSERT INTO registration_field_values(
-				registration_form_id, 
+				ticket_order_id, 
 				registration_form_field_id, 
 				value, 
 				created_at) 
 		
-			SELECT :registration_form_id AS registration_form_id, id AS registration_form_field_id, :val AS value, NOW() AS created_ad
+			SELECT :ticket_order_id AS ticket_order_id, id AS registration_form_field_id, :val AS value, NOW() AS created_ad
 			 FROM registration_form_fields
 			 WHERE registration_form_fields.uuid = :uuid
-			ON CONFLICT (registration_form_id, registration_form_field_id) 
+			ON CONFLICT (ticket_order_id, registration_form_field_id) 
 			DO UPDATE SET 
 			updated_at = NOW(),
 			value = :val';
@@ -130,7 +80,7 @@ class RegistrationForm
 
 		foreach ($fields as $field) {
 			$result = $p_ins_field->execute(array(
-				':registration_form_id' => $user_reg_id,
+				':ticket_order_id' => $order_id,
 				':val' => $field['value'],
 				':uuid' => $field['uuid'],
 			));
@@ -138,93 +88,7 @@ class RegistrationForm
 		}
 
 		$text = $approvement_required ? 'Данные успешно отправлены. Ожидайте подтверждения регистрации от организатора.' : 'Вы успешно зарегистированы на событие.';
-		return new Result(true, $text, array(
-			'uuid' => $user_reg_uuid
-		));
-	}
-
-	public static function unregisterUser(User $user, Event $event)
-	{
-		$db = App::DB();
-		$q_upd_reg = App::queryFactory()
-			->newUpdate()
-			->table('registration_forms')
-			->cols(array(
-				'status' => 'false',
-				'registration_status_id' => RegistrationForm::REGISTRATION_STATUS_REJECTED_ID
-			))
-			->where('user_id = ? ', $user->getId())
-			->where('event_id = ? ', $event->getId());
-
-		$db->prepareExecute($q_upd_reg, 'CANT_UPDATE_REGISTRATION');
-
-		return new Result(true, 'Регистрация успешно отменена');
-	}
-
-	private static function updateBooleanColumn($type, User $user, Event $event, $uuid, $bool_val)
-	{
-		if ($user->isEventAdmin($event) == false) throw new PrivilegesException(null, App::DB());
-		$db = App::DB();
-		$value = filter_var($bool_val, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
-		$q_upd_col = App::queryFactory()->newUpdate()
-			->table('users_registrations')
-			->cols(array(
-				$type => $value
-			))
-			->where('uuid = ?', $uuid)
-			->where('status = true')
-			->where('event_id = ?', $event->getId());
-		$p_upd_col = $db->prepareExecute($q_upd_col, 'CANT_UPDATE_INFO');
-		if ($p_upd_col->rowCount() != 1) throw new InvalidArgumentException('BAD_REGISTRATION_UUID', $db);
-
-
-		$q_get_user_id = App::queryFactory()->newSelect();
-		$q_get_user_id->cols(array(
-			'user_id'
-		))
-			->from('users_registrations')
-			->where('event_id = ?', $event->getId())
-			->where('status = true')
-			->where('uuid = ?', $uuid);
-
-		$p_get_user_id = $db->prepareExecute($q_get_user_id, 'CANT_UPDATE_BOOLEAN_COLUMN');
-
-		$user_id = $p_get_user_id->fetchColumn(0);
-
-		$event->addNotification(UsersCollection::one($db, $user, $user_id, array()),
-			array(
-				'notification_type' => $value == 'true' ? Notification::NOTIFICATION_TYPE_REGISTRATION_APPROVED : Notification::NOTIFICATION_TYPE_REGISTRATION_NOT_APPROVED,
-				'notification_time' => (new DateTime())->add(new DateInterval('PT5M'))->format('Y-m-d H:i:s')
-			));
-
-		return new Result(true, 'Данные успешно обновлены');
-	}
-
-	public static function setCheckOutStatus(User $user, Event $event, $uuid, $bool_val)
-	{
-		return self::updateBooleanColumn('checked_out', $user, $event, $uuid, $bool_val);
-	}
-
-	public static function setApprovedStatus(User $user, Event $event, $uuid, $value)
-	{
-//		return self::updateBooleanColumn('organization_approved', $user, $event, $uuid, $bool_val);
-
-		$db = App::DB();
-		if ($user->isEventAdmin($event) == false) throw new PrivilegesException(null, $db);
-
-		if (!in_array($value, self::REGISTRATION_STATUSES)) throw new InvalidArgumentException('INVALID_APPROVEMENT_STATUS');
-		$q_upd_approved = App::queryFactory()->newUpdate()
-			->table('registration_forms')
-			->cols(array(
-				'registration_status_id' => self::REGISTRATION_STATUS_IDS[$value]
-			))
-			->where('uuid = ?', $uuid);
-
-		$p_upd = $db->prepareExecute($q_upd_approved, 'CANT_UPDATE_INFO');
-		if ($p_upd->rowCount() != 1) throw new InvalidArgumentException('CANT_UPDATE_INFO', $db);
-
-		return new Result(true, 'Данные успешно обновлены');
-
+		return new Result(true, $text);
 	}
 
 	public static function processOrder(Event $event, AbstractUser $user, ExtendedPDO $db, array $tickets)
@@ -232,16 +96,33 @@ class RegistrationForm
 		try{
 			$db->beginTransaction();
 
-			$order_id = Order::create($event, $user, $db, $tickets);
-			$tickets = Ticket::createBatch($event, $order_id, $db, $tickets);
+			$order_info = Order::create($event, $user, $db, $tickets);
+			$tickets = Ticket::createBatch($event, $order_info['id'], $db, $tickets);
 
 			$db->commit();
 
-			return $tickets;
+			return array('order_info' => $order_info, 'tickets' => $tickets);
 		}catch (Exception $e){
 			$db->rollBack();
 			throw $e;
 		}
+	}
+
+	public static function getFilledFields(ExtendedPDO $db, Order $order){
+		$q_get = App::queryFactory()->newSelect();
+		$q_get->from('view_registration_field_values')
+			->cols(array(
+				'form_field_uuid',
+				'form_field_label',
+				'form_field_type',
+				'form_field_required',
+				'value',
+				'created_at',
+				'updated_at'
+			))->where('ticket_order_uuid = ?', $order->getUUID());
+
+		$result = $db->prepareExecute($q_get, 'CANT_GET_FILLED_FIELDS')->fetchAll();
+		return new Result(true, '', $result);
 	}
 
 }

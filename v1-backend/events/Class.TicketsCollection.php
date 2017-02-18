@@ -11,7 +11,7 @@ class TicketsCollection extends AbstractCollection
 																array $filters = null,
 																array $fields = null,
 																array $pagination = null,
-																array $order_by = array('id'))
+																array $order_by = array('uuid'))
 	{
 
 		$q_get_tickets = App::queryFactory()->newSelect();

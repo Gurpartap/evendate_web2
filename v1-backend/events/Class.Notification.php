@@ -49,6 +49,8 @@ class Notification extends AbstractEntity
 	const NOTIFICATION_TYPE_BEFORE_QUARTER_OF_HOUR = 'notification-before-quarter-of-hour';
 	const NOTIFICATION_TYPE_CUSTOM = 'notification-custom';
 	const NOTIFICATION_TYPE_REGISTRATION_APPROVED = 'notification-registration-approved';
+	const NOTIFICATION_TYPE_REGISTRATION_CHECKED_OUT = 'notification-registration-checked-out';
+	const NOTIFICATION_TYPE_REGISTRATION_NOT_CHECKED_OUT = 'notification-registration-not-checked-out';
 	const NOTIFICATION_TYPE_REGISTRATION_NOT_APPROVED = 'notification-registration-not-approved';
 	const NOTIFICATION_TYPE_USERS = 'users-notification';
 

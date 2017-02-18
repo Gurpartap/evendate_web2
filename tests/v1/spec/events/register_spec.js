@@ -73,10 +73,13 @@ frisby
                     text: String
                 })
                 .afterJSON(function (json) {
+
+                    console.log(json.data);
+
                     if (index == 2 || index == 4) {
                         frisby
                             .create('Cancel registration for event: ' + index)
-                            .put(env.api_url + 'events/' + event.id + '/tickets/' + json.data.uuid + '?status=false')
+                            .put(env.api_url + 'events/' + event.id + '/orders/' + json.data.order.uuid + '?status=payment_canceled_by_client')
                             .expectStatus(200)
                             .expectJSONTypes({
                                 request_id: String,
@@ -96,7 +99,7 @@ frisby
                     }else{ // approve registrations
                         frisby
                             .create('Approve registration with UUID: ' + json.data.uuid)
-                            .put(env.api_url + 'events/' + event.id + '/tickets/' + json.data.uuid + '?approved_status=' + approve_statuses[getRandom(0, 4)])
+                            .put(env.api_url + 'events/' + event.id + '/orders/' + json.data.order.uuid + '?approved_status=' + approve_statuses[getRandom(0, 4)])
                             .expectStatus(200)
                             .expectJSONTypes({
                                 request_id: String,
