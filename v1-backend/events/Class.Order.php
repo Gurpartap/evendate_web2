@@ -1,7 +1,7 @@
 <?php
 
 
-class Order
+class Order extends AbstractEntity
 {
 
 	const STATUS_WAITING_PAYMENT = 1;
@@ -9,7 +9,14 @@ class Order
 	const STATUS_RETURNED = 3;
 	const STATUS_WITHOUT_PAYMENT = 4;
 
-	private $id;
+
+
+	const TICKETS_FIELD_NAME = 'tickets';
+	const USER_FIELD_NAME = 'user';
+
+	protected $id;
+	protected $uuid;
+	protected $user_id;
 
 
 	protected static $DEFAULT_COLS = array(
@@ -48,22 +55,50 @@ class Order
 		return $id;
 	}
 
-	public static function getById(int $id, ExtendedPDO $db): Order
-	{
-		$q_get = App::queryFactory()->newSelect();
-		$cols = Fields::mergeFields(self::$ADDITIONAL_COLS, array(), self::$DEFAULT_COLS);
-		$q_get->from('view_tickets_orders')
-			->cols($cols)
-			->where('id = ?', $id);
-		return $db->prepareExecute($q_get, 'CANT_GET_ORDER')->fetchObject('Order');
-	}
-
 	/**
 	 * @return mixed
 	 */
-	public function getId()
+	public function getId(): int
 	{
 		return $this->id;
+	}
+
+	public function getUUID(){
+		return $this->uuid;
+	}
+
+	public function getParams(AbstractUser $user = null, array $fields = null): Result
+	{
+		$result = parent::getParams($user, $fields)->getData();
+
+		if (isset($fields[self::TICKETS_FIELD_NAME]) && $user instanceof User) {
+			$result[self::TICKETS_FIELD_NAME] = TicketsCollection::filter(
+				App::DB(),
+				$user,
+				array('order' => $this),
+				Fields::parseFields($fields[self::TICKETS_FIELD_NAME]['fields'] ?? ''),
+				array(
+					'length' => $fields[self::TICKETS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+					'offset' => $fields[self::TICKETS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
+				),
+				Fields::parseOrderBy($fields[self::TICKETS_FIELD_NAME]['order_by'] ?? ''))->getData();
+		}
+
+		if (isset($fields[self::USER_FIELD_NAME]) && $user instanceof User) {
+			$result[self::USER_FIELD_NAME] = UsersCollection::filter($this->db,
+				$user,
+				array('id' => $this->user_id),
+				Fields::parseFields($fields[self::USER_FIELD_NAME]['fields'] ?? ''),
+				array(
+					'length' => $fields[self::USER_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+					'offset' => $fields[self::USER_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
+				),
+				Fields::parseOrderBy($fields[self::USER_FIELD_NAME]['order_by'] ?? ''))->getData();
+		}
+
+		return new Result(true, '', $result);
+
+
 	}
 
 

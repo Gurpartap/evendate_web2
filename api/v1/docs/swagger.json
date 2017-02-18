@@ -2034,6 +2034,158 @@
         }
       }
     },
+    "/events/{Id}/orders": {
+      "get": {
+        "tags": [
+          "Event"
+        ],
+        "summary": "Get all orders by current user for event[doing]",
+        "description": "",
+        "operationId": "getEventOrders",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "Event ID",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "length",
+            "in": "query",
+            "description": "Items count",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Items count",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "description": "Order column name",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Additional fields and sub-entities",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Notification"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Event"
+        ],
+        "summary": "Register (buy tickets) by user",
+        "description": "",
+        "operationId": "addOrder",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "registration_fields",
+            "in": "body",
+            "description": "JSON string with filled events",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "tickets",
+            "in": "body",
+            "description": "JSON string with filled events `tickets:[{uuid:'', count:''}]`",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "Event ID",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        }
+      }
+    },
+    "/events/{Id}/orders/{UUID}": {
+      "get": {
+        "tags": [
+          "Event"
+        ],
+        "summary": "Get one specified order by current user",
+        "description": "",
+        "operationId": "getOneOrder",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "Event ID",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "UUID",
+            "in": "path",
+            "description": "Order UUID",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "path",
+            "description": "Additional fields",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "schema": {
+              "$ref": "#/definitions/ApiResponse"
+            }
+          }
+        }
+      }
+    },
     "/events/{Id}/ticket_types": {
       "get": {
         "tags": [
@@ -2143,29 +2295,18 @@
         }
       }
     },
-    "/events/{Id}/registrations": {
-      "put": {
+    "/events/{Id}/tickets": {
+      "get": {
         "tags": [
           "Event"
         ],
-        "summary": "Update one registration by registered user",
+        "summary": "Get all tickets by current user for event[doing]",
         "description": "",
-        "operationId": "updateRegistrationByUser",
+        "operationId": "getEventTickets",
         "produces": [
           "application/json"
         ],
         "parameters": [
-          {
-            "in": "query",
-            "name": "status",
-            "description": "Registration status",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "true",
-              "false"
-            ]
-          },
           {
             "name": "Id",
             "in": "path",
@@ -2173,52 +2314,63 @@
             "required": true,
             "type": "integer",
             "format": "int64"
+          },
+          {
+            "name": "length",
+            "in": "query",
+            "description": "Items count",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "description": "Items count",
+            "required": false,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "order_by",
+            "in": "query",
+            "description": "Order column name",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Additional fields and sub-entities",
+            "required": false,
+            "type": "string"
           }
         ],
         "responses": {
           "200": {
             "description": "successful operation",
             "schema": {
-              "$ref": "#/definitions/ApiResponse"
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Notification"
+              }
             }
           }
         }
       }
     },
-    "/events/{Id}/registrations/{UUID}": {
-      "put": {
+    "/events/{Id}/tickets/{UUID}": {
+      "get": {
         "tags": [
           "Event"
         ],
-        "summary": "Update one registration status",
+        "summary": "Get one specified ticket by current user",
         "description": "",
-        "operationId": "updateRegistration",
+        "operationId": "getOneTicket",
         "produces": [
           "application/json"
         ],
         "parameters": [
-          {
-            "in": "query",
-            "name": "checkout",
-            "description": "Checkout status",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "true",
-              "false"
-            ]
-          },
-          {
-            "in": "query",
-            "name": "approved",
-            "description": "Approve status",
-            "required": false,
-            "type": "string",
-            "enum": [
-              "true",
-              "false"
-            ]
-          },
           {
             "name": "Id",
             "in": "path",
@@ -2230,8 +2382,15 @@
           {
             "name": "UUID",
             "in": "path",
-            "description": "Notification UUID",
+            "description": "Ticket UUID",
             "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "path",
+            "description": "Additional fields",
+            "required": false,
             "type": "string"
           }
         ],
@@ -3140,6 +3299,108 @@
         }
       }
     },
+    "/statistics/events/{Id}/orders": {
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "Get orders for event",
+        "description": "",
+        "operationId": "getStatEventOrders",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Additional fields",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/statistics/events/{Id}/tickets": {
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "Get tickets for event",
+        "description": "",
+        "operationId": "getStatEventTickets",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Additional fields",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
+    "/statistics/events/{Id}/participants": {
+      "get": {
+        "tags": [
+          "Statistics"
+        ],
+        "summary": "Get participants for event",
+        "description": "",
+        "operationId": "getStatEventParticipants",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "Id",
+            "in": "path",
+            "description": "",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "fields",
+            "in": "query",
+            "description": "Additional fields",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation"
+          }
+        }
+      }
+    },
     "/statistics/organizations/{Id}": {
       "get": {
         "tags": [
@@ -3645,10 +3906,16 @@
             "$ref": "#/definitions/User"
           }
         },
-        "[registered_users]": {
+        "[orders]": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/User"
+            "$ref": "#/definitions/Order"
+          }
+        },
+        "[tickets]": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Ticket"
           }
         },
         "[can_edit]": {
@@ -3670,6 +3937,9 @@
           "type": "integer",
           "format": "int64"
         },
+        "[ticketing_locally]": {
+          "type": "boolean"
+        },
         "[registration_locally]": {
           "type": "boolean"
         },
@@ -3682,17 +3952,14 @@
         "[registration_till]": {
           "type": "string"
         },
-        "[registration_approved]": {
+        "[registration_approve_status]": {
           "type": "string"
         },
         "[registration_available]": {
           "type": "boolean"
         },
-        "[registered_count]": {
-          "type": "string"
-        },
-        "[registered]": {
-          "type": "string"
+        "[is_registered]": {
+          "type": "boolean"
         },
         "[is_free]": {
           "type": "boolean"
@@ -3936,14 +4203,30 @@
     "Ticket": {
       "type": "object",
       "properties": {
-        "device_token": {
+        "uuid": {
           "type": "string"
         },
-        "client_type": {
+        "user_id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "type_code": {
           "type": "string"
         },
-        "[device_name]": {
+        "ticket_type_uuid": {
           "type": "string"
+        },
+        "ticket_order_uuid": {
+          "type": "string"
+        },
+        "status": {
+          "type": "boolean"
+        },
+        "checked_out": {
+          "type": "boolean"
+        },
+        "[price]": {
+          "type": "number"
         },
         "[created_at]": {
           "type": "integer",
@@ -3953,9 +4236,70 @@
           "type": "integer",
           "format": "int64"
         },
-        "[expires_on]": {
+        "[ticket_type]": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TicketType"
+          }
+        },
+        "[order]": {
+          "$ref": "#/definitions/Order"
+        },
+        "[user]": {
+          "$ref": "#/definitions/User"
+        }
+      }
+    },
+    "Order": {
+      "type": "object",
+      "properties": {
+        "uuid": {
+          "type": "string"
+        },
+        "user_id": {
           "type": "integer",
           "format": "int64"
+        },
+        "event_id": {
+          "type": "string"
+        },
+        "status_type_code": {
+          "type": "string"
+        },
+        "[order_content]": {
+          "type": "string"
+        },
+        "[is_canceled]": {
+          "type": "boolean"
+        },
+        "[payed_at]": {
+          "type": "integer"
+        },
+        "[canceled_at]": {
+          "type": "integer"
+        },
+        "[status_name]": {
+          "type": "string"
+        },
+        "[status_id]": {
+          "type": "integer"
+        },
+        "[created_at]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[updated_at]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[tickets]": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Ticket"
+          }
+        },
+        "[user]": {
+          "$ref": "#/definitions/User"
         }
       }
     },

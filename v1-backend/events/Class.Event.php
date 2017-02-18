@@ -43,9 +43,9 @@ class Event extends AbstractEntity
 
 	const REGISTRATION_FIELDS_FIELD_NAME = 'registration_fields';
 	const IS_REGISTERED_FIELD_NAME = 'is_registered';
-	const REGISTRATION_APPROVED_FIELD_NAME = 'registration_approved';
-	const REGISTRATION_UUID_FIELD_NAME = 'registration_uuid';
-	const REGISTRATION_QR_FIELD_NAME = 'registration_qr';
+	const REGISTRATION_APPROVE_STATUS_FIELD_NAME = 'registration_approve_status';
+	const ORDERS_FIELD_NAME = 'orders';
+
 
 
 	const RANDOM_FIELD_NAME = 'random';
@@ -133,7 +133,7 @@ class Event extends AbstractEntity
 		'min_price',
 		'vk_image_url',
 		'registration_available',
-		'registered_count',
+//		'registered_count',
 
 		self::IS_FAVORITE_FIELD_NAME => '(SELECT id IS NOT NULL
 			FROM favorite_events
@@ -141,30 +141,19 @@ class Event extends AbstractEntity
 			AND favorite_events.user_id = :user_id
 			AND favorite_events.event_id = view_events.id) IS NOT NULL AS ' . self::IS_FAVORITE_FIELD_NAME,
 
-		self::IS_REGISTERED_FIELD_NAME => '(SELECT users_registrations.id IS NOT NULL
-			FROM users_registrations
-			WHERE users_registrations.status = TRUE
-			AND users_registrations.user_id = :user_id
-			AND users_registrations.event_id = view_events.id) IS NOT NULL AS ' . self::IS_REGISTERED_FIELD_NAME,
+		self::IS_REGISTERED_FIELD_NAME => '(SELECT (COUNT(view_registration_forms.id) > 0) :: BOOLEAN
+			FROM view_registration_forms
+			WHERE
+			view_registration_forms.status = TRUE
+			 AND view_registration_forms.user_id = :user_id
+			 AND view_registration_forms.event_id = view_events.id) :: BOOLEAN AS ' . self::IS_REGISTERED_FIELD_NAME,
 
 
-		self::REGISTRATION_APPROVED_FIELD_NAME => '(SELECT COALESCE(organization_approved, FALSE)
-			FROM users_registrations
-			WHERE users_registrations.status = TRUE
-			AND users_registrations.user_id = :user_id
-			AND users_registrations.event_id = view_events.id) = TRUE AS ' . self::REGISTRATION_APPROVED_FIELD_NAME,
-
-		self::REGISTRATION_UUID_FIELD_NAME => '(SELECT uuid
-			FROM users_registrations
-			WHERE users_registrations.status = TRUE
-			AND users_registrations.user_id = :user_id
-			AND users_registrations.event_id = view_events.id) = TRUE AS ' . self::REGISTRATION_UUID_FIELD_NAME,
-
-		self::REGISTRATION_QR_FIELD_NAME => '(SELECT \'https://evendate.ru/api/v1/events/\' || view_events.id || \'/registrations/\' || view_users_registrations.uuid || \'/qr?format=png&size=10\'
-			FROM view_users_registrations
-			WHERE view_users_registrations.status = TRUE
-			AND view_users_registrations.user_id = :user_id
-			AND view_users_registrations.event_id = view_events.id) AS ' . self::REGISTRATION_QR_FIELD_NAME,
+		self::REGISTRATION_APPROVE_STATUS_FIELD_NAME => '(SELECT view_registration_forms.registration_status
+			FROM view_registration_forms
+			WHERE view_registration_forms.status = TRUE
+			AND view_registration_forms.user_id = :user_id
+			AND view_registration_forms.event_id = view_events.id) AS ' . self::REGISTRATION_APPROVE_STATUS_FIELD_NAME,
 
 		self::RANDOM_FIELD_NAME => '(SELECT created_at / (random() * 9 + 1)
 			FROM view_events AS ve
@@ -342,7 +331,7 @@ class Event extends AbstractEntity
 //				//it will auto update if ticket uuid is same
 //				TicketType::create($event_id, $ticket_type, $db);
 //			}
-		}else{
+		} else {
 			if (isset($data['registration_locally']) && filter_var($data['registration_locally'], FILTER_VALIDATE_BOOLEAN) == true) {
 				TicketType::create($event_id, array(
 					'type_code' => 'registration',
@@ -491,6 +480,14 @@ class Event extends AbstractEntity
 		&& filter_var($data['registration_locally'], FILTER_VALIDATE_BOOLEAN)
 			? 'true' : 'false';
 
+		$data['ticketing_locally'] = isset($data['ticketing_locally'])
+		&& filter_var($data['ticketing_locally'], FILTER_VALIDATE_BOOLEAN)
+			? 'true' : 'false';
+
+		$data['is_online'] = isset($data['is_online'])
+		&& filter_var($data['is_online'], FILTER_VALIDATE_BOOLEAN)
+			? 'true' : 'false';
+
 		if ($data['registration_locally'] === 'true') {
 			$data['registration_limit_count'] = isset($data['registration_limit_count'])
 			&& is_numeric($data['registration_limit_count'])
@@ -505,9 +502,18 @@ class Event extends AbstractEntity
 				|| count($data['registration_fields']) < 1
 			) throw new InvalidArgumentException('BAD_REGISTRATION_FIELDS');
 
+			if ($data['ticketing_locally'] === 'true'){
+				if (!isset($data['ticket_types'])
+					|| !is_array($data['ticket_types'])
+					|| count($data['ticket_types']) < 1
+				) {
+					throw new InvalidArgumentException('BAD_TICKET_TYPES');
+				}
+			}
 		} else {
 			$data['registration_limit_count'] = null;
 			$data['registration_approvement_required'] = null;
+			$data['ticketing_locally'] = 'false';
 		}
 
 		try {
@@ -518,6 +524,10 @@ class Event extends AbstractEntity
 			}
 		} catch (Exception $e) {
 			$data['registration_till'] = null;
+		}
+
+		if ($data['is_online'] === 'false'){
+			if (is_null($data['location']) || empty($data['location'])) throw new InvalidArgumentException('LOCATION_IS_NULL');
 		}
 
 		$sorted_by_start_time = $data['dates'];
@@ -579,11 +589,13 @@ class Event extends AbstractEntity
 					'detail_info_url' => $data['detail_info_url'],
 					'registration_required' => $data['registration_required'],
 					'registration_locally' => $data['registration_locally'],
+					'ticketing_locally' => $data['ticketing_locally'],
 					'registration_limit_count' => $data['registration_limit_count'],
 					'registration_approvement_required' => $data['registration_approvement_required'],
 					'registration_till' => $data['registration_till'] instanceof DateTime ? $data['registration_till']->format('Y-m-d H:i:s') : null,
 					'public_at' => $data['public_at'] instanceof DateTime ? $data['public_at']->format('Y-m-d H:i:s') : null,
 					'is_free' => $data['is_free'],
+					'is_online' => $data['is_online'],
 					'min_price' => $data['min_price'],
 					'status' => $data['public_at'] instanceof DateTime ? 'false' : 'true',
 				))->returning(array('id'));
@@ -1048,6 +1060,19 @@ class Event extends AbstractEntity
 				),
 				Fields::parseOrderBy($fields[self::TAGS_FIELD_NAME]['order_by'] ?? ''))->getData();
 		}
+		if (isset($fields[self::ORDERS_FIELD_NAME]) && $user instanceof User) {
+			if ($user->isAdmin($this->getOrganization())){
+				$result_data[self::ORDERS_FIELD_NAME] = OrdersCollection::filter($this->db,
+					$user,
+					array('event' => $this),
+					Fields::parseFields($fields[self::ORDERS_FIELD_NAME]['fields'] ?? ''),
+					array(
+						'length' => $fields[self::ORDERS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+						'offset' => $fields[self::ORDERS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
+					),
+					Fields::parseOrderBy($fields[self::ORDERS_FIELD_NAME]['order_by'] ?? ''))->getData();
+			}
+		}
 
 		if (isset($fields[self::NOTIFICATIONS_FIELD_NAME])) {
 			if ($user instanceof User) {
@@ -1094,10 +1119,10 @@ class Event extends AbstractEntity
 
 		if (isset($fields[self::TICKETS_FIELD_NAME])) {
 			if ($user instanceof User) {
-				$result_data[self::TICKETS_FIELD_NAME] = UsersCollection::filter(
+				$result_data[self::TICKETS_FIELD_NAME] = TicketsCollection::filter(
 					$this->db,
 					$user,
-					array_merge(Fields::parseFilters($fields[self::TICKETS_FIELD_NAME]['filters'] ?? ''), array('registered_users' => $this)),
+					array_merge(Fields::parseFilters($fields[self::TICKETS_FIELD_NAME]['filters'] ?? ''), array('event' => $this)),
 					Fields::parseFields($fields[self::TICKETS_FIELD_NAME]['fields'] ?? ''),
 					array(
 						'length' => $length ?? $fields[self::TICKETS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
@@ -1164,13 +1189,14 @@ class Event extends AbstractEntity
 	{
 
 		try {
+			$this->db->beginTransaction();
+
 			$q_upd_event = App::queryFactory()->newUpdate();
 
 			self::generateQueryData($data);
 
 			$data['creator_id'] = $editor->getId();
 
-			$this->db->beginTransaction();
 
 			$q_upd_event
 				->table('events')
@@ -1187,11 +1213,13 @@ class Event extends AbstractEntity
 					'detail_info_url' => $data['detail_info_url'],
 					'registration_required' => $data['registration_required'],
 					'registration_locally' => $data['registration_locally'],
+					'ticketing_locally' => $data['ticketing_locally'],
 					'registration_limit_count' => $data['registration_limit_count'],
 					'registration_approvement_required' => $data['registration_approvement_required'],
 					'registration_till' => $data['registration_till'] instanceof DateTime ? $data['registration_till']->format('Y-m-d H:i:s') : null,
 					'public_at' => $data['public_at'] instanceof DateTime ? $data['public_at']->format('Y-m-d H:i:s') : null,
 					'is_free' => $data['is_free'],
+					'is_online' => $data['is_online'],
 					'min_price' => $data['min_price'],
 					'status' => $data['public_at'] instanceof DateTime ? 'false' : 'true',
 				))
@@ -1442,8 +1470,8 @@ class Event extends AbstractEntity
 
 		$result = RegistrationForm::registerUser($user, $this, $merged_fields, $approve_required);
 
-		if($this->ticketing_locally == false){
-			if (!isset($request['tickets']) || !is_array($request['tickets'])){
+		if ($this->ticketing_locally == false) {
+			if (!isset($request['tickets']) || !is_array($request['tickets'])) {
 				$request['tickets'] = array();
 			}
 			$request['tickets'][] = array(

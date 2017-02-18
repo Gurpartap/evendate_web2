@@ -27,9 +27,7 @@ frisby
     })
     .expectJSONTypes({
         request_id: String,
-        data: {
-            event_id: Number
-        },
+        data: Object,
         status: Boolean,
         text: String
     })

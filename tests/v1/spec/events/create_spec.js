@@ -39,13 +39,12 @@ frisby
                     .expectStatus(200)
                     .expectJSONTypes({
                         request_id: String,
-                        data: {
-                            event_id: Number
-                        },
+                        data: Object,
                         status: Boolean,
                         text: String
                     })
                     .after(function (err, res, body) {
+                        console.log(body);
                         if (res.statusCode != 200) {
                             console.log(body);
                         }

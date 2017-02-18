@@ -17,7 +17,7 @@ function getRandom(min, max){
 frisby
     .create('Get events with enabled registration')
     .get(env.api_url + 'events' +
-        '?fields=registration_till,registration_fields' +
+        '?fields=registration_till,registration_fields,ticket_types,ticketing_locally,' +
         '&registration_locally=true' +
         '&registration_required=true' +
         '&registered=false' +
@@ -47,9 +47,16 @@ frisby
                 }
                 send_data.push({uuid: field.uuid, value: value});
             });
+            let _send = {registration_fields: send_data, tickets:[]};
+            if (event.ticketing_locally){
+                _send.tickets.push({uuid: event.ticket_types[0].uuid, count: 1});
+            }else{
+                _send.tickets.push({count: 1});
+            }
+            console.log(_send);
             frisby
                 .create('Register for event: ' + index)
-                .post(env.api_url + 'events/' + event.id + '/orders', {registration_fields: send_data, tickets:[{count: 1}]}, {json: true})
+                .post(env.api_url + 'events/' + event.id + '/orders', _send, {json: true})
                 .expectStatus(200)
                 .after(function (err, res, body) {
                     if (res.statusCode != 200){

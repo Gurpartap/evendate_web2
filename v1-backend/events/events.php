@@ -8,6 +8,8 @@ require_once $BACKEND_FULL_PATH . '/tags/Class.Tag.php';
 require_once $BACKEND_FULL_PATH . '/tags/Class.TagsCollection.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.Notification.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.NotificationsCollection.php';
+require_once $BACKEND_FULL_PATH . '/events/Class.OrdersCollection.php';
+require_once $BACKEND_FULL_PATH . '/events/Class.Order.php';
 
 $__modules['events'] = array(
 	'GET' => array(
@@ -39,9 +41,41 @@ $__modules['events'] = array(
 		},
 		'{/(id:[0-9]+)/tickets}' => function ($event_id) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
 
+			if ($__user instanceof User == false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
+
 			$__request['event'] = EventsCollection::one($__db, $__user, $event_id, array());
 
 			return TicketsCollection::filter($__db,
+				$__user,
+				$__request,
+				$__fields,
+				$__pagination,
+				$__order_by ?? array()
+			);
+		},
+		'{/(id:[0-9]+)/orders/(uuid:\w+-\w+-\w+-\w+-\w+)}' => function ($event_id) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
+
+			if ($__user instanceof User == false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
+			$__request['event'] = EventsCollection::one($__db, $__user, $event_id, array());
+			if ($__user->isAdmin($__request['event']->getOrganization()) == false) throw new PrivilegesException('NOT_ADMIN', $__db);
+
+
+			return OrdersCollection::filter($__db,
+				$__user,
+				$__request,
+				$__fields,
+				$__pagination,
+				$__order_by ?? array()
+			);
+		},
+		'{/(id:[0-9]+)/orders}' => function ($event_id) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
+
+			if ($__user instanceof User == false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
+			$__request['event'] = EventsCollection::one($__db, $__user, $event_id, array());
+			if ($__user->isAdmin($__request['event']->getOrganization()) == false) throw new PrivilegesException('NOT_ADMIN', $__db);
+
+
+			return OrdersCollection::filter($__db,
 				$__user,
 				$__request,
 				$__fields,
@@ -57,24 +91,6 @@ $__modules['events'] = array(
 				$__fields);
 
 			return $event->getNotifications($__user, $__fields, $__length, $__offset, $__order_by);
-		},
-		'{{/(id:[0-9]+)}/participants}' => function ($id) use ($__db, $__request, $__user, $__fields, $__pagination, $__order_by) {
-
-			$event = EventsCollection::one(
-				$__db,
-				$__user,
-				intval($id),
-				$__fields);
-
-
-			return UsersCollection::filter(
-				$__db,
-				$__user,
-				array_merge($__request ?? array(), array('registered_users' => $event)),
-				$__fields ?? array(),
-				$__pagination,
-				$__order_by ?? array());
-
 		},
 
 		'{{/(id:[0-9]+)}/ticket_types/(uuid:\w+-\w+-\w+-\w+-\w+)}' => function ($id, $uuid) use ($__db, $__request, $__user, $__fields, $__pagination, $__order_by) {

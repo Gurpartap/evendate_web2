@@ -3,6 +3,11 @@
 class TicketType extends AbstractEntity
 {
 
+	const START_AFTER_FIELD_NAME = 'start_after_ticket_type_uuid';
+	const AMOUNT_FIELD_NAME = 'amount';
+	const PROMOCODE_FIELD_NAME = 'promocode';
+	const PROMOCODE_EFFORT_FIELD_NAME = 'promocode_effort';
+
 	protected static $DEFAULT_COLS = array(
 		'uuid',
 		'event_id',
@@ -15,16 +20,18 @@ class TicketType extends AbstractEntity
 		'price',
 		'sell_start_date',
 		'sell_end_date',
-		'start_after_ticket_type_uuid',
-		'amount',
+		'created_at',
+		'updated_at',
 		'min_count_per_user',
 		'max_count_per_user',
-		'promocode',
-		'promocode_effort',
-		'created_at',
-		'updated_at'
 	);
 
+	public static $FIELDS_FOR_ADMINISTRATOR = array(
+		self::START_AFTER_FIELD_NAME,
+		self::AMOUNT_FIELD_NAME,
+		self::PROMOCODE_FIELD_NAME,
+		self::PROMOCODE_EFFORT_FIELD_NAME,
+	);
 
 	private static function checkData(array $data)
 	{
@@ -46,7 +53,7 @@ class TicketType extends AbstractEntity
 		if (isset($data['sell_start_date']) && !is_null($data['sell_start_date'])) {
 			if ($data['sell_start_date'] instanceof DateTime) {
 				$data['sell_start_date'] = $data['sell_start_date']->format('Y-m-d H:i:s');
-			}else{
+			} else {
 				$data['sell_start_date'] = (new DateTime($data['sell_start_date']))->format('Y-m-d H:i:s');
 			}
 		} else {
@@ -143,5 +150,19 @@ class TicketType extends AbstractEntity
 		$ticket_type['uuid'] = $uuid;
 		self::create($event, $ticket_type, $db);
 	}
+
+	public function getParams(AbstractUser $user = null, array $fields = null): Result
+	{
+		$result = parent::getParams($user, $fields)->getData();
+
+		foreach (self::$FIELDS_FOR_ADMINISTRATOR as $field){
+			if (isset($fields[self::START_AFTER_FIELD_NAME]) && property_exists($this, $field)){
+				$result[$field] = $this->$field;
+			}
+		}
+
+		return new Result(true, '', $result);
+	}
+
 
 }

@@ -148,16 +148,15 @@ class RegistrationForm
 		$db = App::DB();
 		$q_upd_reg = App::queryFactory()
 			->newUpdate()
-			->table('users_registrations')
+			->table('registration_forms')
 			->cols(array(
-				'status' => 'false'
+				'status' => 'false',
+				'registration_status_id' => RegistrationForm::REGISTRATION_STATUS_REJECTED_ID
 			))
 			->where('user_id = ? ', $user->getId())
 			->where('event_id = ? ', $event->getId());
 
-		$p_upd_reg = $db->prepare($q_upd_reg->getStatement());
-		$result = $p_upd_reg->execute($q_upd_reg->getBindValues());
-		if ($result === FALSE) throw new DBQueryException('CANT_UPDATE_REGISTRATION', $db);
+		$db->prepareExecute($q_upd_reg, 'CANT_UPDATE_REGISTRATION');
 
 		return new Result(true, 'Регистрация успешно отменена');
 	}

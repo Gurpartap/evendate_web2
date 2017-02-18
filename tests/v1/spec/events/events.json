@@ -81,6 +81,7 @@
       "registration_required": true,
       "registration_till": "2018-12-29T18:00:00",
       "registration_locally": true,
+      "ticketing_locally": false,
       "registration_limit_count": 100,
       "registration_approvement_required": false,
       "registration_fields": [

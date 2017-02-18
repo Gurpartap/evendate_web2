@@ -1,4 +1,4 @@
-var
+let
     fs = require("fs"),
     path = require('path'),
     events = JSON.parse(fs.readFileSync(path.join(__dirname, './events.json'))),
@@ -11,8 +11,8 @@ frisby.globalSetup({
     }
 });
 
-var create_event = events[0].payload;
-var update_event = events[1].payload;
+let create_event = events[0].payload;
+let update_event = events[1].payload;
 
 frisby
     .create('Create event for update')
@@ -28,14 +28,12 @@ frisby
     })
     .expectJSONTypes({
         request_id: String,
-        data: {
-            event_id: Number
-        },
+        data: Object,
         status: Boolean,
         text: String
     })
     .afterJSON(function (json) {
-        var event_id = json.data.event_id;
+        let event_id = json.data.event_id;
         frisby
             .create('Update event')
             .put(env.api_url + 'events/' + event_id, update_event, {json: true})
@@ -50,9 +48,7 @@ frisby
             })
             .expectJSONTypes({
                 request_id: String,
-                data: {
-                    event_id: Number
-                },
+                data: Object,
                 status: Boolean,
                 text: String
             })

@@ -12,9 +12,22 @@ class TicketTypesCollection extends AbstractCollection{
 		$q_get = App::queryFactory()->newSelect();
 		$statements = array();
 		$is_one_type = false;
-		$from_table = 'view_ticket_types';
 
-		$cols = Fields::mergeFields(TicketType::getAdditionalCols(), $fields, TicketType::getDefaultCols());
+		$additional_cols = TicketType::getAdditionalCols();
+
+		//For administrators there are additional fields
+		if (isset($filters['event']) && $user instanceof User){
+			if ($filters['event'] instanceof Event){
+				if ($user->isAdmin($filters['event']->getOrganization())){
+					$additional_cols = array_merge(TicketType::getAdditionalCols(), TicketType::$FIELDS_FOR_ADMINISTRATOR);
+					$from_table = 'view_all_ticket_types';
+				}
+			}
+		}else{
+			$from_table = 'view_ticket_types';
+		}
+
+		$cols = Fields::mergeFields($additional_cols, $fields, TicketType::getDefaultCols());
 
 
 		if (isset($pagination['offset'])) {
@@ -43,7 +56,6 @@ class TicketTypesCollection extends AbstractCollection{
 			}
 		}
 
-
 		$q_get->distinct()
 			->from($from_table)
 			->cols($cols)
@@ -58,6 +70,15 @@ class TicketTypesCollection extends AbstractCollection{
 			$result[] = $type->getParams($user, $fields)->getData();
 		}
 		return new Result(true, '', $result);
+	}
+
+
+	public static function oneByUUID(ExtendedPDO $db,
+																	 AbstractUser $user,
+																	 string $uuid,
+																	 array $fields = null) : TicketType
+	{
+		return self::filter($db, $user, array('uuid' => $uuid), $fields);
 	}
 
 }
