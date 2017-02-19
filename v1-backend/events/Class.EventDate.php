@@ -24,6 +24,8 @@ class EventDate extends AbstractEntity{
 		'id',
 		'start_time',
 		'end_time',
+		'start_time_utc',
+		'end_time_utc',
 		'created_at',
 		'updated_at',
 		'event_id::INT',

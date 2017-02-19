@@ -2,6 +2,8 @@
 
 
 require_once $BACKEND_FULL_PATH . '/bin/Class.AbstractEntity.php';
+require_once $BACKEND_FULL_PATH . '/organizations/Class.CitiesCollection.php';
+require_once $BACKEND_FULL_PATH . '/organizations/Class.CountriesCollection.php';
 
 class Organization extends AbstractEntity
 {
@@ -16,6 +18,8 @@ class Organization extends AbstractEntity
 	const STAFF_FIELD_NAME = 'staff';
 	const IS_NEW_FIELD_NAME = 'is_new';
 	const PRIVILEGES_FIELD_NAME = 'privileges';
+	const CITY_FIELD_NAME = 'city';
+	const COUNTRY_FIELD_NAME = 'country';
 
 	const IMAGES_PATH = 'organizations_images/';
 	const IMAGE_SIZE_LARGE = '/large/';
@@ -85,6 +89,14 @@ class Organization extends AbstractEntity
 		'vk_url',
 		'is_private',
 		'brand_color',
+		'country_id',
+		'city_en_name',
+		'city_local_name',
+		'city_timediff_seconds',
+		'country_en_name',
+		'country_local_name',
+		'country_language',
+		'country_language_short',
 		self::RANDOM_FIELD_NAME => '(SELECT created_at / (random() * 9 + 1)
 			FROM view_organizations AS vo
 			WHERE vo.id = view_organizations.id) AS random',
@@ -404,6 +416,36 @@ class Organization extends AbstractEntity
 			}
 		}
 
+
+		$city_fields = $fields[Organization::CITY_FIELD_NAME] ?? null;
+		if (is_array($city_fields)) {
+			$result_data[Organization::CITY_FIELD_NAME] = CitiesCollection::filter(
+				App::DB(),
+				$user,
+				array('organization' => $this),
+				Fields::parseFields($city_fields['fields'] ?? ''),
+				array(
+					'length' => $city_fields['length'] ?? App::DEFAULT_LENGTH,
+					'offset' => $city_fields['offset'] ?? App::DEFAULT_OFFSET
+				)
+			)->getData();
+		}
+
+		$country_fields = $fields[Organization::COUNTRY_FIELD_NAME] ?? null;
+		if (is_array($country_fields)) {
+			$result_data[Organization::COUNTRY_FIELD_NAME] = CountriesCollection::filter(
+				App::DB(),
+				$user,
+				array('organization' => $this),
+				Fields::parseFields($country_fields['fields'] ?? ''),
+				array(
+					'length' => $country_fields['length'] ?? App::DEFAULT_LENGTH,
+					'offset' => $country_fields['offset'] ?? App::DEFAULT_OFFSET
+				)
+			)->getData();
+		}
+
+
 		return new Result(true, '', $result_data);
 	}
 
@@ -518,6 +560,12 @@ class Organization extends AbstractEntity
 			$data['default_address'] = null;
 		}
 
+		if (isset($data['city_id'])) {
+			$data['city_id'] = filter_var($data['city_id'], FILTER_VALIDATE_INT);
+		} else {
+			$data['city_id'] = 1;
+		}
+
 
 		if (isset($data['vk_url'])) {
 			$data['vk_url'] = trim($data['vk_url']);
@@ -578,6 +626,7 @@ class Organization extends AbstractEntity
 				'description' => $data['description'],
 				'default_address' => $data['default_address'],
 				'vk_url' => $data['vk_url'],
+				'city_id' => $data['city_id'],
 				'vk_url_path' => $data['vk_url_path'],
 				'facebook_url_path' => $data['facebook_url_path'],
 				'facebook_url' => $data['facebook_url'],
@@ -702,6 +751,7 @@ class Organization extends AbstractEntity
 				'description' => $data['description'],
 				'default_address' => $data['default_address'],
 				'vk_url' => $data['vk_url'],
+				'city_id' => $data['city_id'],
 				'vk_url_path' => $data['vk_url_path'],
 				'facebook_url_path' => $data['facebook_url_path'],
 				'facebook_url' => $data['facebook_url'],

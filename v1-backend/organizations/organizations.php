@@ -153,6 +153,26 @@ $__modules['organizations'] = array(
 				$__order_by ?? array('order_position', 'id')
 			);
 		},
+		'countries' => function () use ($__db, $__request, $__request, $__pagination, $__user, $__fields, $__order_by) {
+			return CountriesCollection::filter(
+				$__db,
+				$__user,
+				$__request,
+				$__fields,
+				$__pagination,
+				$__order_by ?? array('id')
+			);
+		},
+		'cities' => function () use ($__db, $__request, $__request, $__pagination, $__user, $__fields, $__order_by) {
+			return CitiesCollection::filter(
+				$__db,
+				$__user,
+				$__request,
+				$__fields,
+				$__pagination,
+				$__order_by ?? array('id')
+			);
+		},
 		'' => function () use ($__db, $__request, $__user, $__pagination, $__fields, $__order_by) {
 			return OrganizationsCollection::filter(
 				$__db,
