@@ -93,7 +93,7 @@ class App
 		return self::$obj->$name;
 	}
 
-	public static function queryFactory() : QueryFactory
+	public static function queryFactory(): QueryFactory
 	{
 		return self::$QUERY_FACTORY;
 	}
@@ -238,6 +238,15 @@ class App
 
 	public static function prepareStatisticsData()
 	{
+
+	}
+
+	public static function setSessionTimezone($tz)
+	{
+		$tz = trim($tz);
+		if (preg_match('/^[\-\+]\d\d:\d\d$/', $tz)) {
+			self::$__DB->query("SET SESSION TIME ZONE INTERVAL '+08:00' HOUR TO MINUTE;");
+		} else throw new InvalidArgumentException('BAD_TIMEZONE');
 
 	}
 }
