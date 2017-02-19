@@ -5,41 +5,95 @@ require_once $BACKEND_FULL_PATH . '/statistics/Class.AbstractAggregator.php';
 require_once $BACKEND_FULL_PATH . '/statistics/Class.OrganizationsStatistics.php';
 require_once $BACKEND_FULL_PATH . '/statistics/Class.EventsStatistics.php';
 require_once $BACKEND_FULL_PATH . '/statistics/Class.Statistics.php';
+require_once $BACKEND_FULL_PATH . '/events/Class.OrdersCollection.php';
+require_once $BACKEND_FULL_PATH . '/events/Class.TicketsCollection.php';
 
 
 $__modules['statistics'] = array(
-    'GET' => array(
-        '{/events/(id:[0-9]+)}' => function ($id) use ($__db, $__request, $__user, $__fields) {
-            $event = EventsCollection::one(
-                $__db,
-                $__user,
-                $id,
-                array()
-            );
-            $stats = new EventsStatistics($__db, $event, $__user);
-            return $stats->get($__fields,
-                $__request['scale'] ?? Statistics::SCALE_MONTH,
-                new DateTime($__request['since'] ?? null),
-                new DateTime($__request['till'] ?? null)
-            );
-        },
-        '{/organizations/(id:[0-9]+)}' => function ($id) use ($__db, $__request, $__user, $__fields) {
-            $organization = OrganizationsCollection::one(
-                $__db,
-                $__user,
-                $id,
-                array()
-            );
-            $stats = new OrganizationsStatistics($__db, $organization, $__user);
-            return $stats->get($__fields,
-                $__request['scale'] ?? Statistics::SCALE_MONTH,
-                new DateTime($__request['since'] ?? null),
-                new DateTime($__request['till'] ?? null));
-        },
-    ),
-    'POST' => array(
-        'batch' => function () use ($__db, $__request, $__user) {
-            return Statistics::storeBatch($__request['payload'], $__user, $__db);
-        }
-    )
+	'GET' => array(
+		'{/events/(id:[0-9]+)}/orders' => function ($id) use ($__db, $__request, $__user, $__fields, $__pagination) {
+			if ($__user instanceof User == false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
+			$__request['statistics_event'] = EventsCollection::one($__db, $__user, $id, array());
+
+			if (!$__user->isAdmin($__request['statistics_event']->getOrganization())) throw new PrivilegesException('NOT_ADMIN', $__db);
+
+			return OrdersCollection::filter($__db,
+				$__user,
+				$__request,
+				$__fields,
+				$__pagination,
+				$__order_by ?? array()
+			);
+		},
+		'{/events/(id:[0-9]+)}/tickets' => function ($id) use ($__db, $__request, $__user, $__fields, $__pagination) {
+			if ($__user instanceof User == false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
+			$__request['statistics_event'] = EventsCollection::one($__db, $__user, $id, array());
+
+			if (!$__user->isAdmin($__request['statistics_event']->getOrganization())) throw new PrivilegesException('NOT_ADMIN', $__db);
+
+			return TicketsCollection::filter($__db,
+				$__user,
+				$__request,
+				$__fields,
+				$__pagination,
+				$__order_by ?? array()
+			);
+		},
+		'{/events/(id:[0-9]+)}/participants' => function ($id) use ($__db, $__request, $__user, $__fields, $__pagination) {
+
+			if ($__user instanceof User == false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
+			$__request['statistics_event'] = EventsCollection::one($__db, $__user, $id, array());
+
+			if (!$__user->isAdmin($__request['statistics_event']->getOrganization())) throw new PrivilegesException('NOT_ADMIN', $__db);
+
+			$event = EventsCollection::one(
+				$__db,
+				$__user,
+				intval($id),
+				$__fields);
+
+
+			return UsersCollection::filter(
+				$__db,
+				$__user,
+				array_merge($__request ?? array(), array('participants' => $event)),
+				$__fields ?? array(),
+				$__pagination,
+				$__order_by ?? array());
+
+
+		},
+		'{/events/(id:[0-9]+)}' => function ($id) use ($__db, $__request, $__user, $__fields) {
+			$event = EventsCollection::one(
+				$__db,
+				$__user,
+				$id,
+				array()
+			);
+			$stats = new EventsStatistics($__db, $event, $__user);
+			return $stats->get($__fields,
+				$__request['scale'] ?? Statistics::SCALE_MONTH,
+				new DateTime($__request['since'] ?? null),
+				new DateTime($__request['till'] ?? null)
+			);
+		},
+		'{/organizations/(id:[0-9]+)}' => function ($id) use ($__db, $__request, $__user, $__fields) {
+			$organization = OrganizationsCollection::one(
+				$__db,
+				$__user,
+				$id,
+				array()
+			);
+			$stats = new OrganizationsStatistics($__db, $organization, $__user);
+			return $stats->get($__fields,
+				$__request['scale'] ?? Statistics::SCALE_MONTH,
+				new DateTime($__request['since'] ?? null),
+				new DateTime($__request['till'] ?? null));
+		},
+	),
+	'POST' => array(
+		'batch' => function () use ($__db, $__request, $__user) {
+			return Statistics::storeBatch($__request['payload'], $__user, $__db);
+		}
+	)
 );

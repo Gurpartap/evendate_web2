@@ -17,6 +17,6 @@ use Aura\SqlQuery\Common;
  * @package Aura.SqlQuery
  *
  */
-class Select extends Common\Select
+class Select extends Common\Select implements Common\QueryInterface
 {
 }

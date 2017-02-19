@@ -15,9 +15,8 @@ class RegisteredUser extends Friend
 
 		$db = App::DB();
 
-		$q_get_registration_fields = App::queryFactory()
-			->newSelect()
-			->from('view_registration_fields')
+		$q_get_registration_fields = App::queryFactory()->newSelect();
+		$q_get_registration_fields->from('view_registration_fields')
 			->cols(array(
 				'uuid',
 				'field_type',
@@ -31,14 +30,10 @@ class RegisteredUser extends Friend
 		->where('user_id = ?', $this->getId())
 		->where('event_id = ?', $this->event_id);
 
-		$p_get_registration_fields = $db->prepare($q_get_registration_fields->getStatement());
-		$result = $p_get_registration_fields->execute($q_get_registration_fields->getBindValues());
+		$p_get_registration_fields = $db->prepareExecute($q_get_registration_fields);
 
-		if ($result === FALSE) throw new DBQueryException('', $this->db);
-
-		$q_get_registration_info = App::queryFactory()
-			->newSelect()
-			->from('view_users_registrations')
+		$q_get_registration_info = App::queryFactory()->newSelect();
+		$q_get_registration_info->from('view_users_registrations')
 			->cols(array(
 				'uuid',
 				'checked_out',
@@ -50,10 +45,7 @@ class RegisteredUser extends Friend
 		->where('user_id = ?', $this->getId())
 		->where('event_id = ?', $this->event_id);
 
-		$p_get_info = $db->prepare($q_get_registration_info->getStatement());
-		$result = $p_get_info->execute($q_get_registration_info->getBindValues());
-
-		if ($result === FALSE) throw new DBQueryException('', $this->db);
+		$p_get_info = $db->prepareExecute($q_get_registration_info);
 
 		$result = $p_get_info->fetch();
 		$result['fields'] = $p_get_registration_fields->fetchAll();

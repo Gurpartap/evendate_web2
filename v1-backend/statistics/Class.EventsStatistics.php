@@ -50,7 +50,7 @@ class EventsStatistics extends AbstractAggregator
     private $event;
 
 
-    public function __construct(PDO $db, Event $event, User $user)
+    public function __construct(ExtendedPDO $db, Event $event, User $user)
     {
         if (!$user->isAdmin($event->getOrganization())) throw new PrivilegesException('', $db);
         $this->db = $db;

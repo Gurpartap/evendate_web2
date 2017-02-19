@@ -26,7 +26,7 @@ class User extends AbstractUser
 		'privacy_mode' => array('public', 'only_friends', 'private')
 	);
 
-	public function __construct(PDO $db, $token = null)
+	public function __construct(ExtendedPDO $db, $token = null)
 	{
 		if ((!isset($_SESSION['id']) || trim($_SESSION['id']) == ''
 				|| !isset($_SESSION['token']) || trim($_SESSION['token']) == '')
@@ -132,7 +132,7 @@ class User extends AbstractUser
 
 	}
 
-	protected function getDB() : PDO
+	protected function getDB() : ExtendedPDO
 	{
 		return $this->db;
 	}

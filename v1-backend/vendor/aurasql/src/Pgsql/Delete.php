@@ -17,7 +17,7 @@ use Aura\SqlQuery\Common;
  * @package Aura.SqlQuery
  *
  */
-class Delete extends Common\Delete implements Common\ReturningInterface
+class Delete extends Common\Delete implements Common\ReturningInterface, Common\QueryInterface
 {
     /**
      *

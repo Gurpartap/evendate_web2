@@ -49,6 +49,8 @@ class Notification extends AbstractEntity
 	const NOTIFICATION_TYPE_BEFORE_QUARTER_OF_HOUR = 'notification-before-quarter-of-hour';
 	const NOTIFICATION_TYPE_CUSTOM = 'notification-custom';
 	const NOTIFICATION_TYPE_REGISTRATION_APPROVED = 'notification-registration-approved';
+	const NOTIFICATION_TYPE_REGISTRATION_CHECKED_OUT = 'notification-registration-checked-out';
+	const NOTIFICATION_TYPE_REGISTRATION_NOT_CHECKED_OUT = 'notification-registration-not-checked-out';
 	const NOTIFICATION_TYPE_REGISTRATION_NOT_APPROVED = 'notification-registration-not-approved';
 	const NOTIFICATION_TYPE_USERS = 'users-notification';
 
@@ -95,7 +97,7 @@ class Notification extends AbstractEntity
 	);
 
 
-	public function update(PDO $db, array $notification)
+	public function update(ExtendedPDO $db, array $notification)
 	{
 		if ($this->done == true) throw new LogicException('CANT_UPDATE_SENT_NOTIFICATION');
 		if (!isset($notification['notification_time'])) throw new LogicException('CANT_FIND_NOTIFICATION_TIME');
@@ -118,7 +120,7 @@ class Notification extends AbstractEntity
 		return new Result(true, 'Уведомление успешно обновлено', $result);
 	}
 
-	public function delete(PDO $db)
+	public function delete(ExtendedPDO $db)
 	{
 		$q_upd = App::queryFactory()->newUpdate();
 

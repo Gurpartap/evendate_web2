@@ -2,12 +2,12 @@
 
 class EventsDatesCollection extends AbstractCollection{
 
-	public static function filter(PDO $db,
+	public static function filter(ExtendedPDO $db,
 																AbstractUser $user = null,
-	                              array $filters = null,
-	                              array $fields = null,
-	                              array $pagination = null,
-	                              array $order_by = array('id')){
+																array $filters = null,
+																array $fields = null,
+																array $pagination = null,
+																array $order_by = array('id')){
 
 		$q_get_dates = App::queryFactory()->newSelect();
 
@@ -143,11 +143,8 @@ class EventsDatesCollection extends AbstractCollection{
 		$q_get_dates
 			->cols($cols)
 			->orderBy($order_by);
-		$p_get_events = $db->prepare($q_get_dates->getStatement());
-		$result = $p_get_events->execute($statement_array);
-		if ($result === FALSE) throw new DBQueryException(implode(';', $db->errorInfo()), $db);
 
-		$events_dates = $p_get_events->fetchAll(PDO::FETCH_CLASS, 'EventDate');
+		$events_dates = $db->prepareExecute($q_get_dates, '', $statement_array)->fetchAll(PDO::FETCH_CLASS, 'EventDate');
 		$result_dates = array();
 		foreach($events_dates as $event_date) {
 			$result_dates[] = $event_date->getParams($user, $_fields)->getData();
