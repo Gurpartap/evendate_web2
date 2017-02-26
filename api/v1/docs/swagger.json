@@ -3609,6 +3609,18 @@
           "items": {
             "$ref": "#/definitions/User"
           }
+        },
+        "[city]": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/City"
+          }
+        },
+        "[country]": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Country"
+          }
         }
       }
     },
@@ -3682,6 +3694,70 @@
           "format": "int64"
         },
         "[events_count]": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "City": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "en_name": {
+          "type": "string"
+        },
+        "country_id": {
+          "type": "string"
+        },
+        "local_name": {
+          "type": "string"
+        },
+        "[created_at]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[updated_at]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[timediff_seconds]": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "Country": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "en_name": {
+          "type": "string"
+        },
+        "local_name": {
+          "type": "string"
+        },
+        "language_short": {
+          "type": "string"
+        },
+        "[created_at]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[updated_at]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[language]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[cities_count]": {
           "type": "integer",
           "format": "int64"
         }
@@ -3762,6 +3838,14 @@
         },
         "[end_time]": {
           "type": "string"
+        },
+        "[start_time_utc]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[end_time_utc]": {
+          "type": "integer",
+          "format": "int64"
         },
         "[created_at]": {
           "type": "integer",

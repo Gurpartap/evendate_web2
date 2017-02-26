@@ -49,6 +49,16 @@ class OrganizationsCollection extends AbstractCollection
 					$statement_array[':type_id'] = $value;
 					break;
 				}
+				case 'city_id': {
+					$q_get_organizations->where('view_organizations.city_id = :city_id');
+					$statement_array[':city_id'] = $value;
+					break;
+				}
+				case 'country_id': {
+					$q_get_organizations->where('view_organizations.country_id = :country_id');
+					$statement_array[':city_id'] = $value;
+					break;
+				}
 				case 'q': {
 					$q_get_organizations->where('fts @@ to_tsquery(:search_stm)');
 					$statement_array[':search_stm'] = App::prepareSearchStatement($value);

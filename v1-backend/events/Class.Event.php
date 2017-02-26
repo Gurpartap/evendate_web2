@@ -47,7 +47,6 @@ class Event extends AbstractEntity
 	const ORDERS_FIELD_NAME = 'orders';
 
 
-
 	const RANDOM_FIELD_NAME = 'random';
 	const RATING_OVERALL = 'rating';
 	const RATING_FAVORED_FRIENDS = 'rating_favored_friends';
@@ -294,13 +293,14 @@ class Event extends AbstractEntity
 
 	private static function updateExtremumDates($event_id, ExtendedPDO $db)
 	{
-		$q_upd_first = 'UPDATE events SET first_event_date = (SELECT MIN((events_dates.event_date :: DATE || \' \' || events_dates.start_time) :: TIMESTAMPTZ)
+		$q_upd_first = 'UPDATE events SET first_event_date = (SELECT MIN(start_time_utc)
      FROM events_dates
      WHERE event_id = :event_id AND events_dates.status = TRUE) WHERE id = :event_id';
 
-		$q_upd_last = 'UPDATE events SET last_event_date = (SELECT MAX((events_dates.event_date :: DATE || \' \' || events_dates.start_time) :: TIMESTAMPTZ)
+		$q_upd_last = 'UPDATE events SET last_event_date = (SELECT MAX(start_time_utc)
      FROM events_dates
      WHERE event_id = :event_id AND events_dates.status = TRUE) WHERE id = :event_id';
+
 
 		$result = $db->prepare($q_upd_first)->execute(array(':event_id' => $event_id));
 		if ($result === FALSE) throw new DBQueryException('CANT_UPDATE_DATES', $db);
@@ -500,7 +500,7 @@ class Event extends AbstractEntity
 				|| count($data['registration_fields']) < 1
 			) throw new InvalidArgumentException('BAD_REGISTRATION_FIELDS');
 
-			if ($data['ticketing_locally'] === 'true'){
+			if ($data['ticketing_locally'] === 'true') {
 				if (!isset($data['ticket_types'])
 					|| !is_array($data['ticket_types'])
 					|| count($data['ticket_types']) < 1
@@ -524,7 +524,7 @@ class Event extends AbstractEntity
 			$data['registration_till'] = null;
 		}
 
-		if ($data['is_online'] === 'false'){
+		if ($data['is_online'] === 'false') {
 			if (is_null($data['location']) || empty($data['location'])) throw new InvalidArgumentException('LOCATION_IS_NULL');
 		}
 
@@ -654,7 +654,7 @@ class Event extends AbstractEntity
 
 			$db->commit();
 
-			@file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/events/' . $event_id);
+			@file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/events/' . $event_id . '?is_new=true');
 			return new Result(true, 'Событие успешно создано', array('event_id' => $event_id));
 		} catch (Exception $e) {
 			$db->rollBack();
@@ -709,19 +709,46 @@ class Event extends AbstractEntity
 
 	private static function saveDates($dates, ExtendedPDO $db, $event_id)
 	{
-		$p_set_inactive = $db->prepare('UPDATE events_dates SET status = FALSE WHERE event_id = :event_id');
-		$p_set_inactive->execute(array(':event_id' => $event_id));
+		$q_upd_inactive = App::queryFactory()->newUpdate();
+		$q_upd_inactive->table('events_dates')
+			->cols(array(
+				'status' => 'false'
+			))
+			->where('event_id = ?', $event_id);
 
-		$q_ins_dates = 'INSERT INTO events_dates(event_date, status, event_id, start_time, end_time)
-			VALUES(:event_date, TRUE, :event_id, :start_time, :end_time) RETURNING id';
+		$db->prepareExecute($q_upd_inactive, 'CANT_UPDATE_EVENT_DATES');
+
+		$q_ins_dates = 'INSERT INTO events_dates(event_date, status, event_id, start_time, end_time, start_time_utc, end_time_utc)
+			VALUES(:event_date, TRUE, :event_id, :start_time, :end_time, :start_time_utc, :end_time_utc) RETURNING id';
 		$p_ins_dates = $db->prepare($q_ins_dates);
 
+		$q_timediff = App::queryFactory()->newSelect();
+		$q_timediff->from('organizations')
+			->cols(array('timediff_seconds'))
+			->join('inner', 'cities', 'cities.id = organizations.city_id')
+			->where('organizations.id = (SELECT organization_id FROM events WHERE id = ?)', $event_id);
+
+		try {
+			$res = $db->prepareExecute($q_timediff, 'CANT_GET_TIMEDIFF');
+			$timediff = $res->fetchColumn(0);
+		} catch (Exception $e) {
+			$timediff = 0;
+		}
+
 		foreach ($dates as $date) {
+			$_start_time = new DateTime($date['event_date'] . ' ' . $date['start_time']);
+			$_end_time = new DateTime($date['event_date'] . ' ' . $date['end_time']);
+
+			$_start_time->sub(new DateInterval('PT' . $timediff . 'S'));
+			$_end_time->sub(new DateInterval('PT' . $timediff . 'S'));
+
 			$p_ins_dates->execute(array(
 				':event_date' => $date['event_date'],
 				':event_id' => $event_id,
 				':start_time' => $date['start_time'],
-				':end_time' => $date['end_time']
+				':end_time' => $date['end_time'],
+				':start_time_utc' => $_start_time->format('Y-m-d H:i:s'),
+				':end_time_utc' => $_end_time->format('Y-m-d H:i:s')
 			));
 
 			$p_ins_dates->fetch(PDO::FETCH_ASSOC);
@@ -1059,7 +1086,7 @@ class Event extends AbstractEntity
 				Fields::parseOrderBy($fields[self::TAGS_FIELD_NAME]['order_by'] ?? ''))->getData();
 		}
 		if (isset($fields[self::ORDERS_FIELD_NAME]) && $user instanceof User) {
-			if ($user->isAdmin($this->getOrganization())){
+			if ($user->isAdmin($this->getOrganization())) {
 				$result_data[self::ORDERS_FIELD_NAME] = OrdersCollection::filter($this->db,
 					$user,
 					array('event' => $this),
