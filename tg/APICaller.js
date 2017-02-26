@@ -1,5 +1,5 @@
 let rest = require('restler');
-const url = 'http://localhost/api/v1/';
+const url = 'https://evendate.ru/api/v1/';
 
 class APICaller {
 
@@ -19,7 +19,6 @@ class APICaller {
                     return reject(res);
                 } else if (res.status == false) {
                     return reject(res);
-
                 } else {
                     return resolve(res);
                 }
