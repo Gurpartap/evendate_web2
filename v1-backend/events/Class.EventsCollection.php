@@ -243,6 +243,7 @@ class EventsCollection extends AbstractCollection
 					break;
 				}
 				case 'is_canceled':
+				case 'is_free':
 				case 'is_delayed': {
 					if ($is_editor && filter_var($value, FILTER_VALIDATE_BOOLEAN) == true) {
 						$from_view = self::VIEW_ALL_EVENTS_WITH_ALIAS;

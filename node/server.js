@@ -6,7 +6,6 @@ var
     winston = require('winston'),
     express = require("express"),
     app = express(),
-    mysql = require('mysql'),
     rest = require('restler'),
     async = require('async'),
     fs = require("fs"),
@@ -113,7 +112,13 @@ try {
 
 sql.setDialect('postgres');
 
+console.log(pg_conn_string);
+
 pg.connect(pg_conn_string, function (err, client, done) {
+
+    if (err){
+        console.log(err);
+    }
 
     var checkNested = function (obj /*, level1, level2, ... levelN*/) {
             var args = Array.prototype.slice.call(arguments, 1);
@@ -149,7 +154,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
             var q_ins_user_upd_event = 'INSERT INTO recommendations_events (user_id, event_id, rating_favored_friends, ' +
                     ' rating_tags_in_favorites, rating_tags_in_hidden, rating_recent_created, ' +
                     ' rating_active_days, rating_texts_similarity, rating, updated_at)' +
-                    ' SELECT DISTINCT $1 AS user_id, view_events.id::INT AS event_id, 0 AS rating_favored_friends, ' +
+                    ' SELECT DISTINCT $1::INT AS user_id, view_events.id::INT AS event_id, 0 AS rating_favored_friends, ' +
                     ' 0 AS rating_tags_in_favorites, 0 AS rating_tags_in_hidden, 0 AS rating_recent_created, ' +
                     ' 0 AS rating_active_days, 0 AS rating_texts_similarity, 0 AS rating, NOW() AS updated_at ' +
                     ' FROM view_events' +
@@ -158,7 +163,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 q_upd_user_upd_org = 'INSERT INTO recommendations_organizations (user_id, organization_id, rating_subscribed_friends, ' +
                     ' rating_active_events_count, rating_last_events_count, rating_subscribed_in_social_network, rating_texts_similarity, ' +
                     ' rating, updated_at)' +
-                    ' SELECT $1 AS user_id, view_organizations.id::INT AS organization_id, 0 AS  rating_subscribed_friends, ' +
+                    ' SELECT $1::INT AS user_id, view_organizations.id::INT AS organization_id, 0 AS  rating_subscribed_friends, ' +
                     ' 0 AS rating_active_events_count, 0 AS rating_last_events_count, ' +
                     ' 0 AS rating_subscribed_in_social_network, 0 AS rating_texts_similarity, 0 AS rating, ' +
                     ' NOW() AS updated_at' +
@@ -168,7 +173,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 q_ins_events = 'INSERT INTO recommendations_events (user_id, event_id, rating_favored_friends, ' +
                     ' rating_tags_in_favorites, rating_tags_in_hidden, rating_recent_created, ' +
                     ' rating_active_days, rating_texts_similarity, rating, updated_at)' +
-                    ' SELECT users.id AS user_id, $1 AS event_id, 0 AS rating_favored_friends, ' +
+                    ' SELECT users.id AS user_id, $1::INT AS event_id, 0 AS rating_favored_friends, ' +
                     ' 0 AS rating_tags_in_favorites, 0 AS rating_tags_in_hidden, 0 AS rating_recent_created, ' +
                     ' 0 AS rating_active_days, 0 AS rating_texts_similarity, 0 AS rating, NOW() AS updated_at ' +
                     ' FROM users' +
@@ -177,7 +182,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 q_ins_organizations = 'INSERT INTO recommendations_organizations (user_id, organization_id, rating_subscribed_friends, ' +
                     ' rating_active_events_count, rating_last_events_count, rating_subscribed_in_social_network, rating_texts_similarity, ' +
                     ' rating, updated_at)' +
-                    ' SELECT users.id AS user_id, $1 AS organization_id, 0 AS  rating_subscribed_friends, ' +
+                    ' SELECT users.id AS user_id, $1::INT AS organization_id, 0 AS  rating_subscribed_friends, ' +
                     ' 0 AS rating_active_events_count, 0 AS rating_last_events_count, ' +
                     ' 0 AS rating_subscribed_in_social_network, 0 AS rating_texts_similarity, 0 AS rating, ' +
                     ' NOW() AS updated_at' +
@@ -1525,6 +1530,13 @@ pg.connect(pg_conn_string, function (err, client, done) {
             let scheduler = new MailScheduler(client, handleError);
             scheduler.scheduleIfFirstEvent(req.params.id);
         } catch (e) {
+        }
+
+        if (req.params.is_new){
+            try {
+                rest.get('http://localhost:5000/events/' + req.params.id)
+            } catch (e) {
+            }
         }
     });
 
