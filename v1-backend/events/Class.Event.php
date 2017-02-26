@@ -293,13 +293,14 @@ class Event extends AbstractEntity
 
 	private static function updateExtremumDates($event_id, ExtendedPDO $db)
 	{
-		$q_upd_first = 'UPDATE events SET first_event_date = (SELECT MIN((events_dates.event_date :: DATE || \' \' || events_dates.start_time) :: TIMESTAMPTZ)
+		$q_upd_first = 'UPDATE events SET first_event_date = (SELECT MIN(start_time_utc)
      FROM events_dates
      WHERE event_id = :event_id AND events_dates.status = TRUE) WHERE id = :event_id';
 
-		$q_upd_last = 'UPDATE events SET last_event_date = (SELECT MAX((events_dates.event_date :: DATE || \' \' || events_dates.start_time) :: TIMESTAMPTZ)
+		$q_upd_last = 'UPDATE events SET last_event_date = (SELECT MAX(start_time_utc)
      FROM events_dates
      WHERE event_id = :event_id AND events_dates.status = TRUE) WHERE id = :event_id';
+
 
 		$result = $db->prepare($q_upd_first)->execute(array(':event_id' => $event_id));
 		if ($result === FALSE) throw new DBQueryException('CANT_UPDATE_DATES', $db);
@@ -653,7 +654,7 @@ class Event extends AbstractEntity
 
 			$db->commit();
 
-			@file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/events/' . $event_id);
+			@file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/events/' . $event_id . '?is_new=true');
 			return new Result(true, 'Событие успешно создано', array('event_id' => $event_id));
 		} catch (Exception $e) {
 			$db->rollBack();
