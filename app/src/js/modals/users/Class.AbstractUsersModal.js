@@ -12,74 +12,93 @@ AbstractUsersModal = extending(AbstractModal, (function() {
 	 * @param {(string|number)} entity_id
 	 * @param {string} title
 	 * @constructor
+	 * @constructs AbstractUsersModal
 	 */
 	function AbstractUsersModal(entity_id, title) {
-		AbstractModal.call(this, {
-			content: '',
-			title: title,
-			type: this.constructor.name,
-			content_classes: ['ModalContent']
-		});
+		AbstractModal.call(this);
+		this.title = title;
 		this.entity_id = entity_id;
 		this.entities_length = 30;
-		this.disable_upload = false;
+		this.is_upload_disabled = false;
 		this.users = new UsersCollection();
 		this.is_first = true;
-		
-		this.content = this.modal.find('.ModalContent');
+		this.wrapper_is_scrollable = true;
 		
 		if (this.constructor === AbstractUsersModal) {
 			throw new Error("Can't instantiate abstract class!");
 		}
 	}
-	
+	/**
+	 *
+	 * @return {AbstractUsersModal}
+	 */
 	AbstractUsersModal.prototype.show = function() {
 		var self = this;
 		
-		__APP.MODALS.modal_wrapper.data('block_scroll', false);
-		__APP.MODALS.modal_wrapper.on('scroll.uploadUsers', function() {
-			if (!self.disable_upload) {
-				if (__APP.MODALS.modal_wrapper.height() + __APP.MODALS.modal_wrapper.scrollTop() >= self.modal.height()) {
-					if (!__APP.MODALS.modal_wrapper.data('block_scroll')) {
-						__APP.MODALS.modal_wrapper.data('block_scroll', true);
-						self.uploadUsers(function() {
-							__APP.MODALS.modal_wrapper.data('block_scroll', false);
-							__APP.MODALS.modal_destroyer.adjustHeight(self.modal.height());
-						});
-					}
-				}
-			}
-		});
-		if (!this.users.length) {
-			self.uploadUsers(function() {
-				AbstractModal.prototype.show.call(self);
-			});
-			
-		} else {
-			AbstractModal.prototype.show.call(self);
+		this.block_scroll = false;
+		if(this.users.length){
+			this.__show();
+			return this;
 		}
+		this.render();
+		this.uploadUsers(function() {
+			self.__show();
+		});
+		
+		return this;
 	};
-	
+	/**
+	 *
+	 * @return {AbstractUsersModal}
+	 */
+	AbstractUsersModal.prototype.init = function() {
+		bindPageLinks(this.modal);
+		this.__init();
+		
+		return this;
+	};
+	/**
+	 *
+	 * @return {AbstractUsersModal}
+	 */
+	AbstractUsersModal.prototype.onScrollToBottom = function(callback) {
+		var self = this;
+		
+		this.uploadUsers(function() {
+			callback.call(self);
+		});
+		
+		return this;
+	};
+	/**
+	 *
+	 * @return {AbstractUsersModal}
+	 */
 	AbstractUsersModal.prototype.hide = function() {
-		__APP.MODALS.modal_wrapper.data('block_scroll', false).off('scroll.uploadUsers');
-		__APP.MODALS.hideCurrent();
+		this.block_scroll = false;
+		this.modal_wrapper.off('scroll.uploadUsers');
+		this.__hide();
+		
+		return this;
 	};
-	
+	/**
+	 * @callback AbstractUsersModal.uploadUsersCallback
+	 * @param {Array} [users]
+	 */
+	/**
+	 *
+	 * @param {AbstractUsersModal.uploadUsersCallback} [callback]
+	 */
 	AbstractUsersModal.prototype.uploadUsers = function(callback) {};
 	/**
 	 *
 	 * @param {Array} users
-	 * @param {jQuery} $wrapper
 	 * @return {jQuery}
 	 */
-	AbstractUsersModal.prototype.buildUsers = function(users, $wrapper) {
+	AbstractUsersModal.prototype.buildUsers = function(users) {
 		var $users = $(),
-			last_is_fiends = false,
+			last_is_fiends = this.content_wrapper.find('.UserTombstone').eq(-1).data('is_friend') == 'true',
 			self = this;
-		
-		if (typeof $wrapper != 'undefined') {
-			last_is_fiends = $wrapper.find('.UserTombstone').eq(-1).data('is_friend') == 'true';
-		}
 		
 		users.forEach(function(user, i) {
 			if ((self.is_first && !i) || last_is_fiends != user.is_friend) {
@@ -93,7 +112,7 @@ AbstractUsersModal = extending(AbstractModal, (function() {
 				dataset: {is_friend: user.is_friend}
 			}));
 		});
-		$wrapper.append($users);
+		
 		return $users;
 	};
 	/**
@@ -104,17 +123,17 @@ AbstractUsersModal = extending(AbstractModal, (function() {
 		var self = this,
 			$new_users;
 		if (users.length) {
-			$new_users = this.buildUsers(users, this.content);
-			this.content.append($new_users);
+			$new_users = this.buildUsers(users);
+			this.content_wrapper.append($new_users);
 			this.is_first = false;
 			this.entities_length = 10;
-			__APP.MODALS.modal_destroyer.adjustHeight(this.modal.height());
-			bindPageLinks(this.modal);
+			this.adjustDestroyerHeight();
+			bindPageLinks($new_users);
 			$new_users.on('click.hideModal', function() {
 				self.hide();
 			});
 		} else {
-			this.disable_upload = true;
+			this.is_upload_disabled = true;
 		}
 	};
 	

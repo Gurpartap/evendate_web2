@@ -16,7 +16,7 @@ $(document)
 	})
 	.ajaxError(function(event, jqxhr, settings, thrownError) {
 		if (!(thrownError && thrownError == 'abort')) {
-			__APP.SERVER.ajaxErrorHandler(event, jqxhr, settings, thrownError);
+			ServerConnection.ajaxErrorHandler(event, jqxhr, settings, thrownError);
 		}
 	})
 	.ready(function() {

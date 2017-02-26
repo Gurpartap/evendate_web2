@@ -12,6 +12,7 @@ RegistrationFieldModel = extending(OneEntity, (function() {
 	 * @constructs RegistrationFieldModel
 	 */
 	function RegistrationFieldModel() {
+		this.uuid = null;
 		/**
 		 *
 		 * @type {RegistrationFieldModel.TYPES}

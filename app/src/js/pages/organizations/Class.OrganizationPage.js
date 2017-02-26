@@ -14,11 +14,11 @@ function OrganizationPage(organization_id) {
 	 * @property {string} scroll_event
 	 * @property {string} sort_date_type
 	 * @property {string} last_date
-	 * @property {boolean} disable_upload
+	 * @property {boolean} is_upload_disabled
 	 */
 	var	event_type_default = {
 			last_date: '',
-			disable_upload: false
+			is_upload_disabled: false
 		};
 	Page.apply(this, arguments);
 	this.fields = [
@@ -97,7 +97,7 @@ OrganizationPage.prototype.appendEvents = function(type, events) {
 	if (events.length) {
 		$output = __APP.BUILD.eventBlocks(events, type);
 	} else {
-		type.disable_upload = true;
+		type.is_upload_disabled = true;
 		$(window).off(type.scroll_event);
 		$output = tmpl('organization-feed-no-event', {
 			text: 'Больше событий нет :('
@@ -114,7 +114,7 @@ OrganizationPage.prototype.bindUploadEventsOnScroll = function(type) {
 	var PAGE = this,
 		$window = $(window),
 		scrollEvent = function() {
-			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !type.disable_upload) {
+			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !type.is_upload_disabled) {
 				$window.off(type.scroll_event);
 				PAGE[type.name + '_events'].fetchOrganizationsFeed(PAGE.organization.id, PAGE.events_fields, 10, function(events) {
 					PAGE.bindFeedEvents(PAGE.appendEvents(type, events));
@@ -123,7 +123,7 @@ OrganizationPage.prototype.bindUploadEventsOnScroll = function(type) {
 			}
 		};
 	
-	if (!type.disable_upload) {
+	if (!type.is_upload_disabled) {
 		$window.on(type.scroll_event, scrollEvent);
 	}
 };

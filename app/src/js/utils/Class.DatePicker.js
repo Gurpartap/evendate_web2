@@ -77,7 +77,7 @@ DatePicker.prototype.bindOpener = function(){
 DatePicker.prototype.openDialog = function(){
 	var datepicker_position = this.$datepicker.offset();
 	
-	$('body').after(this.$datepicker_modal);
+	$('body').append(this.$datepicker_modal);
 	this.$datepicker_modal.css({
 		top: datepicker_position.top + this.$datepicker.outerHeight() + 2,
 		left: datepicker_position.left + this.$datepicker.width() - this.$datepicker_modal.width(),

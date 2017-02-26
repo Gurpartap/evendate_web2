@@ -6,41 +6,53 @@
  * @extends AbstractModal
  */
 MediaModal = extending(AbstractModal, (function() {
+	/**
+	 *
+	 * @param {string} src
+	 * @param {string} format
+	 * @constructor
+	 * @constructs MediaModal
+	 */
 	function MediaModal(src, format) {
+		AbstractModal.call(this);
 		if (src) {
 			if (format == 'image') {
 				this.content = tmpl('modal-image-media-content', {src: src});
 			} else {
 				
 			}
-			AbstractModal.call(this, {
-				content: this.content,
-				type: 'MediaModal',
-				classes: ['-size_responsive'],
-				content_classes: ['img_holder', '-no_padding', 'ModalContent']
-			});
 			this.src = src;
 			this.format = format ? format : 'image';
-			this.modal.on('modal.show', function() {
-				__APP.MODALS.modal_wrapper.addClass('-blackened');
-			});
-			this.modal.on('modal.close', function() {
-				__APP.MODALS.modal_wrapper.removeClass('-blackened');
-			});
 		} else {
 			throw Error('To open media you need to pass media source (src)')
 		}
 	}
 	
 	/**
-	 * @lends MediaModal
+	 *
+	 * @return {MediaModal}
+	 */
+	MediaModal.prototype.render = function(){
+		this.__render({
+			classes: ['-size_responsive'],
+			content_classes: ['img_holder', '-no_padding']
+		});
+		
+		return this;
+	};
+	
+	/**
+	 *
+	 * @return {MediaModal}
 	 */
 	MediaModal.prototype.show = function() {
 		var self = this;
-		self.modal.find('img').on('load', function() {
-			__APP.MODALS.modal_destroyer.adjustHeight(self.modal.height());
+		this.content.on('load', function() {
+			self.adjustDestroyerHeight();
 		});
-		self.__show();
+		this.__show();
+		
+		return this;
 	};
 	
 	return MediaModal;

@@ -67,7 +67,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-button">
-	<button class="button {classes}" {dataset} type="button" {attributes}><span class="Text">{title}</span></button>
+	<button class="button {classes}" type="button" {attributes}><span class="Text">{title}</span></button>
 </script>
 
 <script type="javascript/template" id="tmpl-link">
@@ -225,6 +225,10 @@
 	<div class="cap {classes}" {dataset} {attributes}><span class="cap_message">{message}</span></div>
 </script>
 
+<script type="javascript/template" id="tmpl-required-star">
+	<span class="-text_color_accent"> * </span>
+</script>
+
 <!-- Calendar -->
 
 <script type="javascript/template" id="tmpl-calendar">
@@ -284,7 +288,7 @@
 	<div class="edit_event_overlay Tabs EditEventPageTabs" data-tabs_id="edit_event_pages" data-focus_on_change="true">
 		<div class="edit_event_page_wrapper">
 			<div class="page">
-				<form class="form-horizontal" id="edit-event-form">
+				<form id="edit-event-form">
 					<input id="edit_event_event_id" type="hidden" name="event_id" value="{id}">
 
 					<div class="edit_event_page_tab_bodies tab_bodies_wrap TabsBodyWrapper" data-tabs_id="edit_event_pages">
@@ -499,7 +503,7 @@
 
 <script type="javascript/template" id="tmpl-edit-event-cover-picker">
 	<h2>Обложка события</h2>
-	<div class="form_group -parts_e_2 EditEventImgLoadWrap ImgLoadWrap">
+	<div class="form_group -parts_e_2  ImgLoadWrap" data-aspect_ratio="16/9">
 		<div class="form_unit -centering">
 			<div class="wrapper">
 				<h4 class="form_label">Выберите способ загрузки:</h4>
@@ -511,22 +515,26 @@
 					<div class="tab_bodies_wrap TabsBodyWrapper">
 						<div class="tab_body TabsBody -active">
 							<div class="form_unit">
-								<input id="edit_event_load_by_url_hor" class="form_input" type="text" autocomplete="off" placeholder="Ссылка на изображение">
+								<input id="edit_event_load_by_url_hor" class="form_input LoadByURLAddress" type="text" autocomplete="off" placeholder="Ссылка на изображение">
 							</div>
 							<div class="form_unit">
-								<button class="button -color_accent RippleEffect LoadByURLButton" type="button" tabindex="-1" data-load_input="edit_event_load_by_url_hor">Загрузить</button>
+								<button class="button -color_accent RippleEffect LoadByURLButton" type="button" tabindex="-1">
+									<span class="Text">Загрузить</span>
+								</button>
 							</div>
 						</div>
 						<div class="tab_body TabsBody">
 							<div class="form_unit">
-								<button class="button -color_accent RippleEffect FileLoadButton" type="button"><input class="LoadImg -hidden" type="file" accept="image/*">Выбрать</button>
+								<button class="button -color_accent RippleEffect FileLoadButton" type="button" tabindex="-1">
+									<input class="LoadImg -hidden" type="file" accept="image/*">
+									<span class="Text">Выбрать</span>
+								</button>
 							</div>
 						</div>
 					</div>
 				</div>
-				<p class="FileNameText"></p>
 				<div class="form_unit">
-					<button class="button -color_accent_alt RippleEffect CallModal -hidden" type="button" data-modal_type="cropper" data-source_img="{image_horizontal_url}" data-aspect_ratio="16/9">
+					<button class="button -color_marginal_accent RippleEffect CropperButton -hidden" type="button" tabindex="-1">
 						<span class="Text">Кадрировать</span>
 					</button>
 				</div>
@@ -534,9 +542,9 @@
 		</div>
 		<div class="form_unit">
 			<div class="img_holder">
-				<img class="edit_event_img_preview_hor EditEventImgPreview ImgPreview" src="{image_horizontal_url}">
+				<img class="edit_event_img_preview_hor ImgPreview" src="{image_horizontal_url}">
 				<img src="/app/img/edit_event/edit_event_img_placeholder_hor.png" height="553">
-				<input id="edit_event_image_horizontal_src" class="DataUrl" type="hidden" name="image_horizontal" value="{image_horizontal_base64}">
+				<input id="edit_event_image_horizontal_source" class="ImgSrc" type="hidden" name="image_horizontal" value="{image_horizontal_base64}">
 				<input id="edit_event_image_horizontal_filename" class="FileName" type="hidden" name="filename_horizontal" value="{image_horizontal_filename}">
 			</div>
 		</div>
@@ -1219,7 +1227,7 @@
 
 <script type="javascript/template" id="tmpl-modal-header">
 	<header class="modal_header">
-		<h4>{title}</h4>
+		<span>{title}</span>
 		{close_button}
 	</header>
 </script>
@@ -1260,6 +1268,39 @@
 
 <script type="javascript/template" id="tmpl-modal-list-content">
 	<div class="list_modal_wrapper ListModalWrapper scrollbar-outer"></div>
+</script>
+
+<script type="javascript/template" id="tmpl-modal-registration-content">
+	<form class="form registration_modal_form RegistrationModalForm">
+		<h4>{event_title}</h4>
+		<p class="form_helptext">Чтобы зарегистрироваться на событие, заполните поля.</p>
+		<p class="form_helptext">Поля со звёздочкой ({required_star}) обязательны для заполнения.</p>
+		{fields}
+		<div class="form_unit">
+			<input id="registration_form_{modal_id}_agreement" class="form_checkbox" type="checkbox">
+			<label class="form_label" for="registration_form_{modal_id}_agreement"><span>Я согласен c условиями Пользовательского соглашения и Договором оказания услуг по организации мероприятия</span></label>
+		</div>
+
+		<div class="-align_center">
+			<button class="button -color_accent -rounded RippleEffect RegisterButton" type="button"><span class="Text">Зарегистрироваться</span></button>
+		</div>
+	</form>
+</script>
+
+<script type="javascript/template" id="tmpl-modal-registration-input-field">
+	<div class="form_unit">
+		<label class="form_label" for="registration_form_{modal_id}_{uuid}_input"><span>{label}</span>{required_star}</label>
+		<input id="registration_form_{modal_id}_{uuid}_input" class="form_input" type="text" name="{uuid}" autocomplete="off" placeholder="{label}" {required}>
+		<p class="form_helptext">{description}</p>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-modal-registration-textarea-field">
+	<div class="form_unit">
+		<label class="form_label" for="registration_form_{modal_id}_{uuid}_textarea"><span>{label}</span>{required_star}</label>
+		<textarea id="registration_form_{modal_id}_{uuid}_textarea" class="form_textarea" name="{uuid}" autocomplete="off" placeholder="{label}" {required}></textarea>
+		<p class="form_helptext">{description}</p>
+	</div>
 </script>
 
 <script type="javascript/template" id="tmpl-modal-users-divider">
@@ -1549,7 +1590,7 @@
 			</div>
 
 			<h3>Изображения</h3>
-			<div class="form_group -parts_e_2 EditEventImgLoadWrap ImgLoadWrap">
+			<div class="form_group -parts_e_2 ImgLoadWrap" data-aspect_ratio="1/1">
 				<div class="form_unit -centering">
 					<div class="wrapper">
 						<h4>Логотип</h4>
@@ -1563,22 +1604,27 @@
 							<div class="tab_bodies_wrap TabsBodyWrapper">
 								<div class="tab_body TabsBody -active">
 									<div class="form_unit">
-										<input id="add_organization_load_by_url_hor" class="form_input" type="text" autocomplete="off" placeholder="Ссылка на изображение">
+										<input id="add_organization_load_by_url_hor" class="form_input LoadByURLAddress" type="text" autocomplete="off" placeholder="Ссылка на изображение">
 									</div>
 									<div class="form_unit">
-										<button class="button -color_accent RippleEffect LoadByURLButton" type="button" tabindex="-1" data-load_input="add_organization_load_by_url_hor">Загрузить</button>
+										<button class="button -color_accent RippleEffect LoadByURLButton" type="button" tabindex="-1">
+											<span class="Text">Загрузить</span>
+										</button>
 									</div>
 								</div>
 								<div class="tab_body TabsBody">
 									<div class="form_unit">
-										<button class="button -color_accent RippleEffect FileLoadButton" type="button"><input class="LoadImg -hidden" type="file" accept="image/*">Выбрать</button>
+										<button class="button -color_accent RippleEffect FileLoadButton" type="button" tabindex="-1">
+											<input class="LoadImg -hidden" type="file" accept="image/*">
+											<span class="Text">Выбрать</span>
+										</button>
 									</div>
 								</div>
 							</div>
 						</div>
 						<p class="FileNameText"></p>
 						<div class="form_unit">
-							<button class="button -color_accent_alt RippleEffect CallModal -hidden" type="button" data-modal_type="cropper" data-source_img="{img_url}" data-aspect_ratio="1/1">
+							<button class="button -color_marginal_accent RippleEffect CropperButton -hidden" type="button" tabindex="-1">
 								<span class="Text">Кадрировать</span>
 							</button>
 						</div>
@@ -1586,14 +1632,14 @@
 				</div>
 				<div class="form_unit">
 					<div class="img_holder">
-						<img class="add_organization_img_preview_logo EditEventImgPreview ImgPreview" src="{img_url}">
+						<img class="add_organization_img_preview_logo ImgPreview" src="{img_url}">
 						<img src="/app/img/add_organization/preview.png">
-						<input id="add_organization_img_src" class="DataUrl" type="hidden" name="logo" value="{img_base64}">
+						<input id="add_organization_img_src" class="ImgSrc" type="hidden" name="logo" value="{img_base64}">
 						<input id="add_organization_img_filename" class="FileName" type="hidden" name="logo_filename" value="{logo_filename}">
 					</div>
 				</div>
 			</div>
-			<div class="form_group -parts_e_2 EditEventImgLoadWrap ImgLoadWrap">
+			<div class="form_group -parts_e_2 ImgLoadWrap" data-aspect_ratio="16/9">
 				<div class="form_unit -centering">
 					<div class="wrapper">
 						<h4>Фоновое изображение</h4>
@@ -1607,22 +1653,27 @@
 							<div class="tab_bodies_wrap TabsBodyWrapper">
 								<div class="tab_body TabsBody -active">
 									<div class="form_unit">
-										<input id="add_organization_load_by_url_vert" class="form_input" type="text" autocomplete="off" placeholder="Ссылка на изображение">
+										<input id="add_organization_load_by_url_vert" class="form_input LoadByURLAddress" type="text" autocomplete="off" placeholder="Ссылка на изображение">
 									</div>
 									<div class="form_unit">
-										<button class="button -color_accent RippleEffect LoadByURLButton" type="button" tabindex="-1" data-load_input="add_organization_load_by_url_vert">Загрузить</button>
+										<button class="button -color_accent RippleEffect LoadByURLButton" type="button" tabindex="-1">
+											<span class="Text">Загрузить</span>
+										</button>
 									</div>
 								</div>
 								<div class="tab_body TabsBody">
 									<div class="form_unit">
-										<button class="button -color_accent RippleEffect FileLoadButton" type="button"><input class="LoadImg -hidden" type="file" accept="image/*">Выбрать</button>
+										<button class="button -color_accent RippleEffect FileLoadButton" type="button" tabindex="-1">
+											<input class="LoadImg -hidden" type="file" accept="image/*">
+											<span class="Text">Выбрать</span>
+										</button>
 									</div>
 								</div>
 							</div>
 						</div>
 						<p class="FileNameText"></p>
 						<div class="form_unit">
-							<button class="button -color_accent_alt RippleEffect CallModal -hidden" type="button" data-modal_type="cropper" data-source_img="{background_img_url}" data-aspect_ratio="16/9">
+							<button class="button -color_marginal_accent RippleEffect CropperButton -hidden" type="button" tabindex="-1">
 								<span class="Text">Кадрировать</span>
 							</button>
 						</div>
@@ -1630,10 +1681,10 @@
 				</div>
 				<div class="form_unit">
 					<div class="img_holder">
-						<img class="add_organization_img_preview_background EditEventImgPreview ImgPreview" src="{background_img_url}">
+						<img class="add_organization_img_preview_background ImgPreview" src="{background_img_url}">
 						<img src="/app/img/add_organization/preview.png">
-						<input id="add_organization_background_src" class="DataUrl" type="hidden" name="background" value="{background_base64}">
-						<input class="FileName" type="hidden" name="background_filename" value="{background_filename}">
+						<input id="add_organization_background_src" class="ImgSrc" type="hidden" name="background" value="{background_base64}">
+						<input id="add_organization_background_filename" class="FileName" type="hidden" name="background_filename" value="{background_filename}">
 					</div>
 				</div>
 			</div>

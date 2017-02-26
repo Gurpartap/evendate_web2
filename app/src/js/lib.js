@@ -26,6 +26,38 @@ function extending(parent, children){
 	Object.defineProperty(children.prototype, '__super', {
 		value: parent
 	});
+	
+	/**
+	 *
+	 * @param {string} name
+	 * @param {...*} [args]
+	 * @return {*}
+	 */
+	children.prototype.uber = function uber(name, args) {
+		var method;
+		method = children.prototype[name];
+		if (method == this[name]) {
+			method = parent.prototype[name];
+		}
+		
+		return method.apply(this, Array.prototype.slice.apply(arguments, [1]));
+	};
+	
+	return children;
+}
+/**
+ * Extending jQuery object
+ * @param {Function} children
+ * @return {Function}
+ */
+function extendingJQuery(children){
+	children = extending(jQuery, children);
+	children.prototype.pushStack = function(elems) {
+		var ret = jQuery.merge(this.get(0) == elems ? new this.constructor(this.id, this.is_subscribed, this.options) : $(), elems);
+		ret.prevObject = this;
+		ret.context = this.context;
+		return ret;
+	};
 	return children;
 }
 /**
@@ -795,22 +827,6 @@ jQuery.makeSet = function(array) {
 	};
 }(window));
 
-var CollectionOfXHRs = extending(Array, (function(){
-	function CollectionOfXHRs(){}
-	
-	CollectionOfXHRs.prototype.abortAll = function() {
-		var cur;
-		while (this.length) {
-			cur = this.pop();
-			if(cur.state() === 'pending'){
-				//cur.abort();
-			}
-		}
-	};
-	
-	return CollectionOfXHRs;
-}()));
-
 /**===========================================================
  * Templates for jQuery
  *
@@ -861,7 +877,8 @@ function tmpl(template_type, items, addTo, direction) {
 			} else if (value instanceof jQuery) {
 				if (value.length) {
 					jQuery_pairs[key] = value;
-					keys[key] = value.is('tr') ? '<tbody id="JQ_tmpl_' + key + '"></tbody>' : '<div id="JQ_tmpl_' + key + '"></div>';
+					keys[key] = value.is('tr') ? '<tbody id="JQ_tmpl_' + key + '"></tbody>' :
+						value.is('span') ? '<span id="JQ_tmpl_' + key + '"></span>' : '<div id="JQ_tmpl_' + key + '"></div>';
 				}
 			} else if (value == null) {
 				keys[key] = '';
@@ -1670,6 +1687,88 @@ function bindControlSwitch($parent) {
 			}
 		});
 	}).addClass('-Handled_Switch');
+}
+/**
+ *
+ * @param {jQuery} $parent
+ * @return {jQuery}
+ */
+function bindCallModal($parent) {
+	$parent = $parent ? $parent : $('body');
+	return $parent.find('.CallModal').not('.-Handled_CallModal').each(function() {
+		var $this = $(this);
+		
+		$this.on('click.CallModal', function() {
+			var $this = $(this),
+				title = $this.data('modal_title'),
+				modal = $this.data('modal'),
+				modal_type = $this.data('modal_type');
+			
+			if (!modal) {
+				switch (modal_type) {
+					case 'favors': {
+						modal = new FavoredModal($this.data('modal_event_id'), title);
+						break;
+					}
+					case 'subscribers': {
+						modal = new SubscribersModal($this.data('modal_organization_id'), title);
+						break;
+					}
+					case 'editors': {
+						modal = new EditorsModal($this.data('modal_organization_id'), title, $this.data('modal_specific_role'));
+						break;
+					}
+					case 'map': {
+						modal = new MapModal($this.data('modal_map_location'), title);
+						break;
+					}
+					case 'media': {
+						var type = $this.data('modal_media_type'),
+							url = $this.data('modal_media_url');
+						if (!url) {
+							if ($this.is('img')) {
+								url = $this.attr('src');
+								type = 'image';
+							} else if ($this.is('video')) {
+								//url = $this.attr('url');
+								type = 'video';
+							} else {
+								var str = $this.css('background-image');
+								if (str !== 'none') {
+									if (str.indexOf('"') != -1) {
+										url = str.slice(str.indexOf('"') + 1, str.indexOf('"', str.indexOf('"') + 1));
+									} else {
+										url = str.slice(str.indexOf('(') + 1, str.indexOf(')'));
+									}
+									type = 'image';
+								}
+							}
+						}
+						modal = new MediaModal(url, type);
+						break;
+					}
+					case 'cropper': {
+						modal = new CropperModal($this.data('source_img'), $this.data());
+						break;
+					}
+					case 'friends_list': {
+						modal = new FriendsListModal($this.data('modal_entity'));
+						break;
+					}
+					case 'subscribers_list': {
+						modal = new SubscriptionsListModal($this.data('modal_entity'));
+						break;
+					}
+					default: {
+						modal = new StdModal(title, $this.data('modal_content'), $this.data('modal_style'));
+						break;
+					}
+				}
+				$this.data('modal', modal);
+			}
+			modal.show();
+		});
+	}).addClass('-Handled_CallModal');
 }
 
 function bindPageLinks($parent) {

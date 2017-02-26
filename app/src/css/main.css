@@ -46,7 +46,9 @@ body {
 	-webkit-font-smoothing: antialiased;
 	cursor: default;
 }
-.-state_statistics {
+.-state_statistics,
+.-state_edit_event,
+.-state_edit_organization {
 	--color_accent: var(--color_franklin);
 	--color_accent_alt: var(--color_franklin_alt);
 }
@@ -403,6 +405,13 @@ fieldset:disabled .form_select {cursor: default}
 	line-height: 20px;
 }
 
+.form_helptext {
+	margin: 0;
+	font-size: .8125em;
+	color: #9fa6b3;
+	color: var(--color_primary_50);
+}
+
 .form_prompt {
 	font-size: .9em;
 	text-align: right;
@@ -421,6 +430,10 @@ fieldset:disabled .form_select {cursor: default}
 	border: 1px solid var(--color_primary_30);
 	border-radius: 2px;
 }
+
+.form_input + .form_helptext,
+.form_select + .form_helptext,
+.form_textarea + .form_helptext {margin-top: 4px}
 
 :not(.-status_disabled) .form_input:not(:disabled):not(.-status_disabled):focus,
 :not(.-status_disabled) .form_textarea:not(:disabled):not(.-status_disabled):focus {
@@ -515,12 +528,13 @@ fieldset:disabled .form_select {cursor: default}
 .form_select2.select2-container > .select2-choice > .select2-arrow {top: 0}
 .form_select2.select2-container.select2-container-disabled > .select2-choice > .select2-arrow {background-color: inherit}
 
-.form_select2.select2-container > .select2-choice > .select2-arrow > b {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	height: 26px;
-	margin: auto;
+.form_select2.select2-container > .select2-choice > .select2-arrow > b:after {
+	font: normal normal normal 1em/1 FontAwesome;
+	content: "\f0d7";
+	text-rendering: auto;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	transform: translate(0, 0);
 }
 
 
@@ -598,6 +612,13 @@ fieldset:disabled .form_select {cursor: default}
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 	content: "\f00d";
+}
+
+.form_select2.form_input.select2-container-multi .select2-choices .select2-search-choice {
+	background-color: #f82969;
+	background-color: var(--color_accent);
+	border: 1px solid #f82969;
+	border: 1px solid var(--color_accent);
 }
 
 /* /Form Select2 */
@@ -1133,12 +1154,18 @@ a.button:hover {text-decoration: none}
 .button.-color_marginal_primary {color: #3e4d66; color: var(--color_primary);}
 
 .button.-color_accent_alt,
+.button.-color_bubble_gum_alt,
 .button.-color_neutral_accent,
-.button.-color_marginal_accent {color: #f82969; color: var(--color_accent);}
+.button.-color_marginal_accent,
+.button.-color_neutral_bubble_gum,
+.button.-color_marginal_bubble_gum {color: #f82969; color: var(--color_accent);}
 
 .-state_statistics .button.-color_accent_alt,
+.-state_statistics .button.-color_franklin_alt,
 .-state_statistics .button.-color_neutral_accent,
-.-state_statistics .button.-color_marginal_accent {color: #28be84}
+.-state_statistics .button.-color_marginal_accent,
+.-state_statistics .button.-color_neutral_franklin,
+.-state_statistics .button.-color_marginal_franklin {color: #28be84; color: var(--color_franklin);}
 
 
 
@@ -1147,7 +1174,7 @@ a.button:hover {text-decoration: none}
 
 .button.-color_primary {background-color: #3e4d66; background-color: var(--color_primary);}
 .button.-color_accent {background-color: #f82969; background-color: var(--color_accent);}
-.-state_statistics .button.-color_accent {background-color: #28be84}
+.-state_statistics .button.-color_accent {background-color: #28be84; background-color: var(--color_franklin);}
 
 .button.-color_primary_alt {background-color: rgba(83,121,184,0.24)}
 .button.-color_accent_alt {background-color: #ffdeeb}
@@ -1823,12 +1850,6 @@ html.-noscroll {
 	width: auto;
 	max-width: 80%;
 }
-.modal_unit.-size_responsive > .modal_content {display: inline-block}
-
-.modal_wrapper.-blackened > .modal_unit {
-	background-color: transparent;
-	box-shadow: none;
-}
 
 .modal_wrapper,
 .modal_unit {
@@ -1853,18 +1874,10 @@ body.-open_modal > .modal_wrapper {
 .modal_header {
 	min-height: 40px;
 	padding: 12px 25px 12px 16px;
-	background-color: #2e3b50;
-	background-color: var(--color_primary);
+	font-size: .875em;
 	text-align: left;
 }
 
-.modal_wrapper.-blackened .modal_header {border-bottom: 0}
-
-.modal_header > h4 {
-	margin: 0;
-	font-size: .875em;
-	color: #fff;
-}
 .-modal_destroyer {
 	position: absolute;
 	top: 0;
@@ -1873,18 +1886,9 @@ body.-open_modal > .modal_wrapper {
 	margin: auto 4px;
 	font-size: 1.6em;
 	font-weight: 100;
-	color: #fff;
 }
 .-modal_destroyer:hover {background-color: transparent !important}
 .-modal_destroyer > * {top: -1px}
-.modal_wrapper.-blackened .-modal_destroyer {
-	position: absolute;
-	bottom: 20px;
-	right: -5px;
-	color: #fff;
-	font-weight: 300;
-	background-color: transparent !important;
-}
 
 .modal_content {padding: 1.5em}
 .modal_content.-no_padding {padding: 0}
@@ -1922,8 +1926,8 @@ body.-open_modal > .modal_wrapper {
 	height: calc(100% - 40px);
 	padding: 0;
 }
-.list_modal_wrapper {
-	height: 100%;
+:not(.list_modal_wrapper) > .list_modal_wrapper {
+	max-height: 100%;
 	overflow: auto;
 }
 .list_modal_wrapper > .list_modal_wrapper {padding: 0 12px}
@@ -1942,6 +1946,15 @@ body.-open_modal > .modal_wrapper {
 	font-weight: 500;
 }
 
+
+.registration_modal_form .form_unit {margin-top: 1.5em}
+
+.registration_modal_form .form_label {
+	font-size: .875em;
+	font-weight: 400;
+	color: #657184;
+	color: var(--color_primary_80);
+}
 
 	/* /Modal */
 /* Calendar */
@@ -2415,10 +2428,17 @@ body.-open_modal > .modal_wrapper {
 .activity_block > .avatar {flex-shrink: 0}
 
 .activity_block_top {font-size: 0.88em}
+.activity_block_middle {
+	margin: 6px 0;
+	font-size: 1em;
+	line-height: 22px;
+	font-weight: 500;
+}
 .activity_block_bottom {font-size: 0.8125em}
 
 .activity_block_top,
 .activity_block_bottom {
+	margin: 0;
 	color: #657184;
 	color: var(--color_primary_80);
 }
@@ -2426,12 +2446,6 @@ body.-open_modal > .modal_wrapper {
 .activity_block_creator {
 	color: #3e4d66;
 	color: var(--color_primary);
-}
-
-.activity_block_middle {
-	font-weight: 500;
-	line-height: 22px;
-	margin: 6px 0;
 }
 
 .activity_block .avatar_badge {

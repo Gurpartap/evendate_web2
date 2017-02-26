@@ -46,245 +46,254 @@
  * @returns {__C.DEFERRED_STATES}
  */
 
+
 /**
- * @const
- * @namespace __APP
- * @property {object} SERVER
- * @property {object} SERVER.AJAX_METHOD
- * @property {CollectionOfXHRs} SERVER.CURRENT_CONNECTIONS
- * @property {string} EVENDATE_BEGIN
- * @property {object} AUTH_URLS
- * @property {string} AUTH_URLS.vk
- * @property {string} AUTH_URLS.google
- * @property {string} AUTH_URLS.facebook
- * @property {AbstractTopBar} TOP_BAR
- * @property {AbstractSidebar} SIDEBAR
- * @property {CurrentUser} USER
- * @property {Page} PREVIOUS_PAGE
- * @property {Page} CURRENT_PAGE
- * @property {object} ROUTING
- * @property {object} MODALS
- * @property {number} MODALS.last_id
- * @property {Object<number, AbstractModal>} MODALS.collection
- * @property {AbstractModal} MODALS.active_modal
- * @property {jQuery} MODALS.modal_destroyer
- * @property {jQuery} MODALS.modal_wrapper
- * @property {object} BUILD
+ * @class ServerConnection
  */
-__APP = {
-	SERVER: {
-		/**
-		 * @enum {string}
-		 */
-		AJAX_METHOD: {
-			GET: 'GET',
-			POST: 'POST',
-			PUT: 'PUT',
-			DELETE: 'DELETE'
-		},
-		
-		CURRENT_CONNECTIONS: new CollectionOfXHRs(),
-		/**
-		 *
-		 * @param {__APP.SERVER.AJAX_METHOD} ajax_method
-		 * @param {string} ajax_url
-		 * @param {(AJAXData|string)} ajax_data
-		 * @param {string} [content_type='application/x-www-form-urlencoded; charset=UTF-8']
-		 * @param {AJAXCallback} [success]
-		 * @param {function} [error]
-		 * @returns {jqPromise}
-		 */
-		dealAjax: function(ajax_method, ajax_url, ajax_data, content_type, success, error) {
-			var self = this,
-				jqXHR;
-			if(ajax_data.fields instanceof Fields){
-				ajax_data.fields = ajax_data.fields.toString();
-			}
-			jqXHR = $.ajax({
-				url: ajax_url,
-				data: ajax_data,
-				method: ajax_method,
-				contentType: content_type || 'application/x-www-form-urlencoded; charset=UTF-8'
-			});
-			__APP.SERVER.CURRENT_CONNECTIONS.push(jqXHR);
-			return jqXHR.fail(error).then(function(response, status_text, jqXHR) {
-				__APP.SERVER.ajaxHandler(response, function(data, text) {
-					if (success && typeof success == 'function') {
-						success.call(self, data);
-					}
-				}, __APP.SERVER.ajaxErrorHandler);
-				return response.data;
-			}).promise();
-		},
-		/**
-		 * @param {...(jqXHR|Deferred|jqPromise)} Deferreds
-		 * @param {function(..(Array|object))} [cb]
-		 * @return {jqPromise}
-		 */
-		multipleAjax: function multipleAjax(){
-			var with_callback = (arguments[arguments.length - 1] instanceof Function),
-				promises = with_callback ? Array.prototype.splice.call(arguments, 0, arguments.length - 1) : Array.prototype.slice.call(arguments),
-				parallel_promise;
-			parallel_promise = $.when.apply($, promises);
-			if(with_callback) {
-				parallel_promise.done(Array.prototype.shift.call(arguments));
-			}
-			return parallel_promise.promise();
-		},
-		/**
-		 *
-		 * @param {string} ajax_url
-		 * @param {AJAXData} ajax_data
-		 * @param {AJAXCallback} [success]
-		 * @param {function} [error]
-		 * @returns {jqPromise}
-		 */
-		getData: function getData(ajax_url, ajax_data, success, error) {
-			var self = this;
-			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.GET, ajax_url, __APP.SERVER.validateData(ajax_data), 'application/json', function(data) {
-				if (ajax_data.length != undefined && ajax_data.offset != undefined) {
-					ajax_data.offset += ajax_data.length;
-				}
-				if (success && typeof success == 'function') {
-					success.call(self, data);
-				}
-			}, error);
-		},
-		/**
-		 *
-		 * @param {string} ajax_url
-		 * @param {AJAXData} ajax_data
-		 * @param {AJAXCallback} [success]
-		 * @param {function} [error]
-		 * @returns {jqPromise}
-		 */
-		updateData: function updateData(ajax_url, ajax_data, success, error) {
-			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.PUT, ajax_url, ajax_data, 'application/json', success, error);
-		},
-		/**
-		 *
-		 * @param {string} ajax_url
-		 * @param {AJAXData} ajax_data
-		 * @param {boolean} is_payload
-		 * @param {AJAXCallback} [success]
-		 * @param {function} [error]
-		 * @returns {jqPromise}
-		 */
-		addData: function addData(ajax_url, ajax_data, is_payload, success, error) {
-			if(is_payload){
-				return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.POST, ajax_url, ajax_data, 'application/json', success, error);
-			}
-			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.POST, ajax_url, ajax_data, 'application/x-www-form-urlencoded; charset=UTF-8', success, error);
-		},
-		/**
-		 *
-		 * @param {string} ajax_url
-		 * @param {AJAXData} ajax_data
-		 * @param {AJAXCallback} [success]
-		 * @param {function} [error]
-		 * @returns {jqPromise}
-		 */
-		deleteData: function deleteData(ajax_url, ajax_data, success, error) {
-			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.DELETE, ajax_url, ajax_data, 'application/json', success, error);
-		},
-		/**
-		 *
-		 * @param {AJAXData} ajax_data
-		 * @returns {AJAXData}
-		 */
-		validateData: function validateData(ajax_data) {
-			if(ajax_data.fields){
-				if(Array.isArray(ajax_data.fields)){
-					if (ajax_data.order_by) {
-						ajax_data.order_by = ajax_data.order_by instanceof Array ? ajax_data.order_by : ajax_data.order_by.split(',');
-						ajax_data.fields = ajax_data.fields.merge(ajax_data.order_by.map(function(order_by) {
-							return order_by.trim().replace('-', '');
-						}));
-						ajax_data.order_by = ajax_data.order_by.join(',');
-					}
-					if (ajax_data.fields.length) {
-						ajax_data.fields = ajax_data.fields.join(',');
-					} else {
-						ajax_data.fields = undefined;
-					}
-				} else if(ajax_data.fields instanceof Fields){
-					if (ajax_data.order_by) {
-						ajax_data.order_by = ajax_data.order_by instanceof Array ? ajax_data.order_by : ajax_data.order_by.split(',');
-						ajax_data.order_by.forEach(function(field) {
-							ajax_data.fields[field.trim().replace('-', '')] = {};
-						});
-						ajax_data.order_by = ajax_data.order_by.join(',');
-					}
-					if (Object.keys(ajax_data.fields).length === 0) {
-						ajax_data.fields = undefined;
-					}
-					
-				}
-			}
-			return ajax_data;
-		},
-		
-		ajaxHandler: function ajaxHandler(result, success, error) {
-			error = typeof error !== 'undefined' ? error : function() {
+ServerConnection = (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs ServerConnection
+	 */
+	function ServerConnection() {
+		if (typeof ServerConnection.instance === 'object') {
+			return ServerConnection.instance;
+		}
+		this.current_connections = [];
+		ServerConnection.instance = this;
+	}
+	/**
+	 *
+	 * @enum {string}
+	 */
+	ServerConnection.HTTP_METHODS = {
+		GET: 'GET',
+		POST: 'POST',
+		PUT: 'PUT',
+		DELETE: 'DELETE'
+	};
+	Object.freeze(ServerConnection.HTTP_METHODS);
+	
+	function ajaxHandler(result, success, error) {
+		error = typeof error !== 'undefined' ? error : function() {
 				console.log(result);
 				showNotifier({text: 'Упс, что-то пошло не так', status: false});
 			};
-			success = typeof success !== 'function' ? function() {} : success;
-			try {
-				if (result.status) {
-					success(result.data, result.text);
-				} else {
-					error(result);
-				}
-			} catch (e) {
-				error(e);
-			}
-		},
-		
-		ajaxErrorHandler: function ajaxErrorHandler(event, jqxhr, settings, thrownError) {
-			var args = Array.prototype.slice.call(arguments),
-				debug = {},
-				fields;
-			if (args.length == 4) {
-				fields = ['event', 'jqxhr', 'settings', 'thrownError'];
-				args.forEach(function(arg, i) {
-					debug[fields[i]] = arg;
-				});
-			} else if (args.length == 1) {
-				debug = args[0];
+		success = typeof success !== 'function' ? function() {} : success;
+		try {
+			if (result.status) {
+				success(result.data, result.text);
 			} else {
-				args.forEach(function(arg, i) {
-					debug[i] = arg;
-				});
+				error(result);
 			}
-			console.groupCollapsed('AJAX error');
-			if (debug.thrownError)
-				console.log('Thrown error:', debug.thrownError);
-			if (debug.event && debug.event.type)
-				console.log('Error type:', debug.event.type);
-			if (debug.event && debug.event.text)
-				console.log('Description:', debug.event.text);
-			if (debug.jqxhr && debug.jqxhr.responseJSON && debug.jqxhr.responseJSON.text) {
-				console.log('Response:', debug.jqxhr.responseJSON.text);
-				showNotifier({text: debug.jqxhr.responseJSON.text, status: false});
-			}
-			if (debug.settings) {
-				console.log('URL:', debug.settings.url);
-				console.log('Method:', debug.settings.type);
-			}
-			if (debug.stack) {
-				console.log('Thrown error:', debug.name);
-				console.log('Description:', debug.message);
-				console.log('Error stacktrace:', debug.stack);
-			} else {
-				console.error('Error stacktrace:');
-			}
-			console.groupEnd();
-			
-			if (!window.errors_array)  window.errors_array = [];
-			window.errors_array.push(debug);
+		} catch (e) {
+			error(e);
 		}
-	},
+	}
+	
+	ServerConnection.ajaxErrorHandler = function(event, jqxhr, settings, thrownError) {
+		var args = Array.prototype.slice.call(arguments),
+			debug = {},
+			fields;
+		if (args.length == 4) {
+			fields = ['event', 'jqxhr', 'settings', 'thrownError'];
+			args.forEach(function(arg, i) {
+				debug[fields[i]] = arg;
+			});
+		} else if (args.length == 1) {
+			debug = args[0];
+		} else {
+			args.forEach(function(arg, i) {
+				debug[i] = arg;
+			});
+		}
+		console.groupCollapsed('AJAX error');
+		if (debug.thrownError)
+			console.log('Thrown error:', debug.thrownError);
+		if (debug.event && debug.event.type)
+			console.log('Error type:', debug.event.type);
+		if (debug.event && debug.event.text)
+			console.log('Description:', debug.event.text);
+		if (debug.jqxhr && debug.jqxhr.responseJSON && debug.jqxhr.responseJSON.text) {
+			console.log('Response:', debug.jqxhr.responseJSON.text);
+			showNotifier({text: debug.jqxhr.responseJSON.text, status: false});
+		}
+		if (debug.settings) {
+			console.log('URL:', debug.settings.url);
+			console.log('Method:', debug.settings.type);
+		}
+		if (debug.stack) {
+			console.log('Thrown error:', debug.name);
+			console.log('Description:', debug.message);
+			console.log('Error stacktrace:', debug.stack);
+		} else {
+			console.error('Error stacktrace:');
+		}
+		console.groupEnd();
+		
+		if (!window.errors_array)  window.errors_array = [];
+		window.errors_array.push(debug);
+	};
+	
+	/**
+	 *
+	 * @param {ServerConnection.HTTP_METHODS} http_method
+	 * @param {string} url
+	 * @param {(AJAXData|string)} ajax_data
+	 * @param {string} [content_type='application/x-www-form-urlencoded; charset=UTF-8']
+	 * @param {AJAXCallback} [success]
+	 * @param {function} [error]
+	 * @returns {jqPromise}
+	 */
+	ServerConnection.prototype.dealAjax = function(http_method, url, ajax_data, content_type, success, error) {
+		var self = this,
+			jqXHR;
+		if(ajax_data.fields instanceof Fields){
+			ajax_data.fields = ajax_data.fields.toString();
+		}
+		jqXHR = $.ajax({
+			url: url,
+			data: ajax_data,
+			method: http_method,
+			contentType: content_type || 'application/x-www-form-urlencoded; charset=UTF-8'
+		});
+		this.current_connections.push(jqXHR);
+		return jqXHR.fail(error).then(function(response, status_text, jqXHR) {
+			ajaxHandler(response, function(data, text) {
+				if (success && typeof success == 'function') {
+					success(data);
+				}
+			}, ServerConnection.ajaxErrorHandler);
+			return response.data;
+		}).promise();
+	};
+	
+	/**
+	 * @param {...(jqXHR|Deferred|jqPromise)} Deferreds
+	 * @param {function(..(Array|object))} [cb]
+	 * @return {jqPromise}
+	 */
+	ServerConnection.prototype.multipleAjax = function(){
+		var with_callback = (arguments[arguments.length - 1] instanceof Function),
+			promises = with_callback ? Array.prototype.splice.call(arguments, 0, arguments.length - 1) : Array.prototype.slice.call(arguments),
+			parallel_promise;
+		parallel_promise = $.when.apply($, promises);
+		if(with_callback) {
+			parallel_promise.done(Array.prototype.shift.call(arguments));
+		}
+		return parallel_promise.promise();
+	};
+	
+	/**
+	 *
+	 * @param {string} url
+	 * @param {AJAXData} ajax_data
+	 * @param {AJAXCallback} [success]
+	 * @param {function} [error]
+	 * @returns {jqPromise}
+	 */
+	ServerConnection.prototype.getData = function(url, ajax_data, success, error) {
+		return this.dealAjax(ServerConnection.HTTP_METHODS.GET, url, this.validateData(ajax_data), 'application/json', function(data) {
+			if (ajax_data.length != undefined && ajax_data.offset != undefined) {
+				ajax_data.offset += ajax_data.length;
+			}
+			if (success && typeof success == 'function') {
+				success(data);
+			}
+		}, error);
+	};
+	/**
+	 *
+	 * @param {string} url
+	 * @param {AJAXData} ajax_data
+	 * @param {AJAXCallback} [success]
+	 * @param {function} [error]
+	 * @returns {jqPromise}
+	 */
+	ServerConnection.prototype.updateData = function(url, ajax_data, success, error) {
+		return this.dealAjax(ServerConnection.HTTP_METHODS.PUT, url, ajax_data, 'application/json', success, error);
+	};
+	/**
+	 *
+	 * @param {string} url
+	 * @param {AJAXData} ajax_data
+	 * @param {boolean} is_payload
+	 * @param {AJAXCallback} [success]
+	 * @param {function} [error]
+	 * @returns {jqPromise}
+	 */
+	ServerConnection.prototype.addData = function(url, ajax_data, is_payload, success, error) {
+		if(is_payload){
+			return this.dealAjax(ServerConnection.HTTP_METHODS.POST, url, ajax_data, 'application/json', success, error);
+		}
+		return this.dealAjax(ServerConnection.HTTP_METHODS.POST, url, ajax_data, 'application/x-www-form-urlencoded; charset=UTF-8', success, error);
+	};
+	/**
+	 *
+	 * @param {string} url
+	 * @param {AJAXData} ajax_data
+	 * @param {AJAXCallback} [success]
+	 * @param {function} [error]
+	 * @returns {jqPromise}
+	 */
+	ServerConnection.prototype.deleteData = function(url, ajax_data, success, error) {
+		return this.dealAjax(ServerConnection.HTTP_METHODS.DELETE, url, ajax_data, 'application/json', success, error);
+	};
+	/**
+	 *
+	 * @param {AJAXData} ajax_data
+	 * @returns {AJAXData}
+	 */
+	ServerConnection.prototype.validateData = function(ajax_data) {
+		if(ajax_data.fields){
+			if(Array.isArray(ajax_data.fields)){
+				if (ajax_data.order_by) {
+					ajax_data.order_by = ajax_data.order_by instanceof Array ? ajax_data.order_by : ajax_data.order_by.split(',');
+					ajax_data.fields = ajax_data.fields.merge(ajax_data.order_by.map(function(order_by) {
+						return order_by.trim().replace('-', '');
+					}));
+					ajax_data.order_by = ajax_data.order_by.join(',');
+				}
+				if (ajax_data.fields.length) {
+					ajax_data.fields = ajax_data.fields.join(',');
+				} else {
+					ajax_data.fields = undefined;
+				}
+			} else if(ajax_data.fields instanceof Fields){
+				if (ajax_data.order_by) {
+					ajax_data.order_by = ajax_data.order_by instanceof Array ? ajax_data.order_by : ajax_data.order_by.split(',');
+					ajax_data.order_by.forEach(function(field) {
+						ajax_data.fields[field.trim().replace('-', '')] = {};
+					});
+					ajax_data.order_by = ajax_data.order_by.join(',');
+				}
+				if (Object.keys(ajax_data.fields).length === 0) {
+					ajax_data.fields = undefined;
+				}
+				
+			}
+		}
+		return ajax_data;
+	};
+	
+	ServerConnection.prototype.abortAllConnections = function() {
+		var cur;
+		while (this.current_connections.length) {
+			cur = this.current_connections.pop();
+			if(cur.state() === 'pending'){
+				//cur.abort();
+			}
+		}
+	};
+	
+	
+	return ServerConnection;
+}());
+
+
+__APP = {
+	SERVER: new ServerConnection(),
 	EVENDATE_BEGIN: '15-12-2015',
 	AUTH_URLS: {},
 	TOP_BAR: new AbstractTopBar(),
@@ -370,148 +379,7 @@ __APP = {
 			'': StatisticsOverviewPage
 		}
 	},
-	MODALS: {
-		last_id: 0,
-		collection: {},
-		active_modal: undefined,
-		modal_destroyer: $.extend({
-			adjustHeight: function(height) {
-				var html_height = $(window).height(),
-					modal_height = height;
-				this.height((modal_height > html_height) ? modal_height : html_height);
-			}
-		}, $('.modal_destroyer')),
-		modal_wrapper: $('.modal_wrapper'),
-		/**
-		 *
-		 * @param {AbstractModal} modal
-		 */
-		pushModal: function(modal) {
-			modal.id = ++__APP.MODALS.last_id;
-			__APP.MODALS.collection[modal.id] = modal;
-			var keys = Object.keys(__APP.MODALS.collection);
-			if (keys.length > 5) {
-				__APP.MODALS.collection[keys[0]].destroy();
-			}
-		},
-		hideCurrent: function() {
-			if (__APP.MODALS.active_modal !== undefined) {
-				__APP.MODALS.active_modal.__hide();
-				$('body').removeClass('-open_modal');
-			}
-		},
-		bindCallModal: function($parent) {
-			$parent = $parent ? $parent : $('body');
-			$parent.find('.CallModal').not('.-Handled_CallModal').each(function() {
-				var $this = $(this),
-					title = $this.data('modal_title'),
-					modal,
-					modal_id,
-					modal_type = $this.data('modal_type');
-				
-				$this.on('click.CallModal', function() {
-					modal_id = $this.data('modal_id');
-					if (__APP.MODALS.collection.hasOwnProperty(modal_id)) {
-						__APP.MODALS.collection[modal_id].show();
-					} else {
-						switch (modal_type) {
-							case 'favors': {
-								modal = new FavoredModal($this.data('modal_event_id'), title);
-								break;
-							}
-							case 'subscribers': {
-								modal = new SubscribersModal($this.data('modal_organization_id'), title);
-								break;
-							}
-							case 'editors': {
-								modal = new EditorsModal($this.data('modal_organization_id'), title, $this.data('modal_specific_role'));
-								break;
-							}
-							case 'map': {
-								modal = new MapModal($this.data('modal_map_location'), title);
-								break;
-							}
-							case 'media': {
-								var type = $this.data('modal_media_type'),
-									url = $this.data('modal_media_url');
-								if (!url) {
-									if ($this.is('img')) {
-										url = $this.attr('src');
-										type = 'image';
-									} else if ($this.is('video')) {
-										//url = $this.attr('url');
-										type = 'video';
-									} else {
-										var str = $this.css('background-image');
-										if (str !== 'none') {
-											if (str.indexOf('"') != -1) {
-												url = str.slice(str.indexOf('"') + 1, str.indexOf('"', str.indexOf('"') + 1));
-											} else {
-												url = str.slice(str.indexOf('(') + 1, str.indexOf(')'));
-											}
-											type = 'image';
-										}
-									}
-								}
-								modal = new MediaModal(url, type);
-								break;
-							}
-							case 'cropper': {
-								modal = new CropperModal($this.data('source_img'), {
-									'aspectRatio': eval($this.data('aspect_ratio'))
-								});
-								
-								modal.modal.one('modal.close', function() {
-									
-									$this.removeClass('-hidden').off('click.CallModal').on('click.CallModal', function() {
-										modal_id = $this.data('modal_id');
-										if (__APP.MODALS.collection.hasOwnProperty(modal_id)) {
-											if (__APP.MODALS.collection[modal_id].image_src == $this.data('source_img')) {
-												__APP.MODALS.collection[modal_id].show();
-											} else {
-												__APP.MODALS.collection[modal_id].destroy();
-												modal = new CropperModal($this.data('source_img'), {
-													'aspectRatio': eval($this.data('aspect_ratio'))
-												});
-												$this.data('modal_id', modal.id);
-												modal.initer = $this;
-												modal.show();
-											}
-										} else {
-											modal = new CropperModal($this.data('source_img'), {
-												'data': $this.data('crop_data'),
-												'aspectRatio': eval($this.data('aspect_ratio'))
-											});
-											$this.data('modal_id', modal.id);
-											modal.initer = $this;
-											modal.show();
-										}
-									});
-									
-								});
-								break;
-							}
-							case 'friends_list': {
-								modal = new FriendsListModal($this.data('modal_entity'));
-								break;
-							}
-							case 'subscribers_list': {
-								modal = new SubscriptionsListModal($this.data('modal_entity'));
-								break;
-							}
-							default: {
-								modal = new StdModal(title, $this.data('modal_content'));
-								break;
-							}
-						}
-						$this.data('modal_id', modal.id);
-						modal.initer = $this;
-						modal.show();
-					}
-				});
-			}).addClass('-Handled_CallModal');
-		}
-	},
+	MODALS: new Modals(),
 	BUILD: {
 		/**
 		 * @typedef {object} buildProps
@@ -1127,41 +995,43 @@ __APP = {
 		 * @return {jQuery}
 		 */
 		modal: function(props) {
-			var $modal, vars;
-			props = __APP.BUILD.normalizeBuildProps(props, ['content_classes']);
-			vars = {
-				modal_type: props.type,
-				modal_content: props.content,
-				modal_classes: props.classes,
-				modal_content_classes: props.content_classes
-			};
-			if(props.header){
-				vars.modal_header = props.header;
-			} else if(props.title) {
+			var $modal,
+				normalized_props = __APP.BUILD.normalizeBuildProps(props, ['content_classes']),
+				vars = {
+					modal_header: '',
+					modal_type: normalized_props.type,
+					modal_content: normalized_props.content,
+					modal_classes: normalized_props.classes,
+					modal_content_classes: normalized_props.content_classes,
+					modal_footer: ''
+				};
+			
+			if(normalized_props.header){
+				vars.modal_header = normalized_props.header;
+			} else if(normalized_props.title) {
 				vars.modal_header = tmpl('modal-header', {
-					title: props.title,
+					title: normalized_props.title,
 					close_button: __APP.BUILD.button({
 						classes: ['-empty','-modal_destroyer','CloseModal','RippleEffect'],
 						title: '×'
 					})
 				});
-			} else {
-				vars.header = '';
 			}
-			if(props.footer){
-				vars.modal_footer = props.footer;
-			} else if(props.footer_buttons) {
-				vars.modal_footer = tmpl('modal-footer', {footer_buttons: props.footer_buttons});
-			} else {
-				vars.modal_footer = '';
+			
+			if(normalized_props.footer){
+				vars.modal_footer = normalized_props.footer;
+			} else if(normalized_props.footer_buttons) {
+				vars.modal_footer = tmpl('modal-footer', {footer_buttons: normalized_props.footer_buttons});
 			}
+			
 			$modal = tmpl('modal', vars);
-			if(props.width){
-				$modal.width(props.width);
+			if(normalized_props.width){
+				$modal.width(normalized_props.width);
 			}
-			if(props.height){
-				$modal.height(props.height);
+			if(normalized_props.height){
+				$modal.height(normalized_props.height);
 			}
+			
 			return $modal;
 		}
 	},
@@ -1262,7 +1132,7 @@ __APP = {
 	reInit: function appReInit() {
 		$(window).off('scroll');
 		
-		__APP.SERVER.CURRENT_CONNECTIONS.abortAll();
+		__APP.SERVER.abortAllConnections();
 		__APP.PREVIOUS_PAGE = __APP.CURRENT_PAGE;
 		__APP.PREVIOUS_PAGE.destroy();
 		__APP.init();

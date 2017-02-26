@@ -77,7 +77,7 @@ StatisticsOverviewPage.prototype.bindUploadOnScroll = function() {
 	var PAGE = this,
 		$window = $(window),
 		scrollEvent = function() {
-			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.disable_upload) {
+			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.is_upload_disabled) {
 				$window.off('scroll.uploadOrganizations');
 				PAGE.my_organizations.fetchMyOrganizations('admin', PAGE.my_organizations_fields, 10, '', function(organizations) {
 					var $organizations = StatisticsOverviewPage.buildMyOrganizationsBlocks(organizations);
@@ -86,13 +86,13 @@ StatisticsOverviewPage.prototype.bindUploadOnScroll = function() {
 						PAGE.bindOrganizationsEvents($organizations);
 						$window.on('scroll.uploadOrganizations', scrollEvent);
 					} else {
-						PAGE.disable_upload = true;
+						PAGE.is_upload_disabled = true;
 					}
 				});
 			}
 		};
 	
-	if (!PAGE.disable_upload) {
+	if (!PAGE.is_upload_disabled) {
 		$window.on('scroll.uploadOrganizations', scrollEvent);
 	}
 };

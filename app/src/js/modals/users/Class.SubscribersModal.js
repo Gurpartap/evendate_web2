@@ -9,9 +9,9 @@ SubscribersModal = extending(AbstractUsersModal, (function() {
 	/**
 	 *
 	 * @param {(string|number)} organization_id
-	 * @param {string} [title='Подписались']
+	 * @param {string} [title=Подписались]
 	 * @constructor
-	 * @augments AbstractUsersModal
+	 * @constructs SubscribersModal
 	 */
 	function SubscribersModal(organization_id, title) {
 		if (organization_id) {
@@ -27,10 +27,15 @@ SubscribersModal = extending(AbstractUsersModal, (function() {
 		}
 	}
 	
+	/**
+	 *
+	 * @param {AbstractUsersModal.uploadUsersCallback} [callback]
+	 * @return {jqPromise}
+	 */
 	SubscribersModal.prototype.uploadUsers = function(callback) {
 		var self = this;
 		
-		this.users.fetchOrganizationSubscribers(this.entity_id, this.entities_length, this.ajax_data, function(users) {
+		return this.users.fetchOrganizationSubscribers(this.entity_id, this.entities_length, this.ajax_data, function(users) {
 			self.afterUpload(users);
 			if (callback && typeof callback == 'function') {
 				callback(users);

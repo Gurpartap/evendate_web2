@@ -11,35 +11,10 @@ function RedactEventPage(event_id) {
 	Page.apply(this);
 	this.page_title = 'Редактирование события';
 	this.event = new OneEvent(event_id);
+	this.state_name = 'edit_event';
 }
 RedactEventPage.extend(Page);
 
-/**
- *
- * @param {jQuery} $context
- * @param {string} source
- * @param {string} filename
- */
-RedactEventPage.handleImgUpload = function($context, source, filename) {
-	var $parent = $context.closest('.EditEventImgLoadWrap'),
-		$preview = $parent.find('.EditEventImgPreview'),
-		$file_name_text = $parent.find('.FileNameText'),
-		$file_name = $parent.find('.FileName'),
-		$data_url = $parent.find('.DataUrl'),
-		$button = $parent.find('.CallModal');
-	
-	$preview.attr('src', source);
-	$file_name_text.html('Загружен файл:<br>' + filename);
-	$file_name.val(filename);
-	$button
-		.data('source_img', source)
-		.on('crop', function(event, cropped_src, crop_data) {
-			$preview.attr('src', cropped_src);
-			$button.data('crop_data', crop_data);
-			$data_url.val('data.source').data('source', $preview.attr('src')).trigger('change');
-		})
-		.trigger('click.CallModal');
-};
 
 RedactEventPage.lastRegistrationCustomFieldId = 0;
 
@@ -84,10 +59,10 @@ RedactEventPage.prototype.fetchData = function() {
 RedactEventPage.prototype.init = function() {
 	var PAGE = this,
 		$main_tabs = PAGE.$wrapper.find('.EditEventPageTabs'),
-		$buttons = PAGE.$wrapper.find('.edit_event_buttons').children(),
-		$next_page_button = $buttons.filter('#edit_event_next_page'),
-		$prev_page_button = $buttons.filter('#edit_event_prev_page'),
-		$submit_button = $buttons.filter('#edit_event_submit');
+		$bottom_nav_buttons = PAGE.$wrapper.find('.edit_event_buttons').children(),
+		$next_page_button = $bottom_nav_buttons.filter('#edit_event_next_page'),
+		$prev_page_button = $bottom_nav_buttons.filter('#edit_event_prev_page'),
+		$submit_button = $bottom_nav_buttons.filter('#edit_event_submit');
 	
 	/**
 	 *
@@ -121,29 +96,7 @@ RedactEventPage.prototype.init = function() {
 	bindLimitInputSize(PAGE.$wrapper);
 	bindRippleEffect(PAGE.$wrapper);
 	bindFileLoadButton(PAGE.$wrapper);
-	(function bindLoadByURLButton() {
-		$('.LoadByURLButton').not('-Handled_LoadByURLButton').on('click', function() {
-			var $this = $(this),
-				$input = $('#' + $this.data('load_input'));
-			$this.data('url', $input.val());
-			window.current_load_button = $this;
-			socket.emit('image.getFromURL', $input.val());
-			window.paceOptions = {
-				catchupTime: 10000,
-				maxProgressPerFrame: 1,
-				ghostTime: Number.MAX_SAFE_INTEGER,
-				checkInterval: {
-					checkInterval: 10000
-				},
-				eventLag: {
-					minSamples: 1,
-					sampleCount: 30000000,
-					lagThreshold: 0.1
-				}
-			}; //хз зачем, все равно не работает
-			Pace.restart();
-		}).addClass('-Handled_LoadByURLButton');
-	})();
+	ImgLoader.init(PAGE.$wrapper);
 	(function initEditEventMainCalendar() {
 		//TODO: Refactor this!! Make it more readable
 		var $selected_days_text = PAGE.$wrapper.find('.EventSelectedDaysText'),
@@ -395,25 +348,6 @@ RedactEventPage.prototype.init = function() {
 		RedactEventPage.buildRegistrationCustomField().insertBefore($(this));
 	});
 	
-	PAGE.$wrapper.find('.LoadImg').off('change.LoadImg').on('change.LoadImg', function(e) {
-		var $this = $(e.target),
-			files = e.target.files,
-			reader;
-		
-		if (files.length == 0) return false;
-		for (var i = 0, f; f = files[i]; i++) {
-			reader = new FileReader();
-			if (!f.type.match('image.*'))  continue;
-			reader.onload = (function(the_file) {
-				return function(e) {
-					RedactEventPage.handleImgUpload($this, e.target.result, the_file.name);
-				};
-			})(f);
-			reader.readAsDataURL(f);
-		}
-		
-	});
-	
 	$main_tabs.on('change.tabs', function() {
 		if($main_tabs.currentTabsIndex === 0){
 			$prev_page_button.addClass(__C.CLASSES.NEW_HIDDEN);
@@ -653,6 +587,10 @@ RedactEventPage.prototype.render = function() {
 			])
 		};
 	
+	function resolveFilenameFromURL(url) {
+		return url ? url.split('/').reverse()[0] : '';
+	}
+	
 	
 	if (__APP.USER.id === -1) {
 		__APP.changeState('/feed/actual', true, true);
@@ -679,10 +617,6 @@ RedactEventPage.prototype.render = function() {
 		}
 	}
 	
-	if (PAGE.event.image_horizontal_url) {
-		page_vars.image_horizontal_filename = PAGE.event.image_horizontal_url.split('/').reverse()[0];
-	}
-	
 	if (PAGE.event.public_at != null) {
 		var m_public_at = moment.unix(PAGE.event.public_at);
 		page_vars.public_at_data = m_public_at.format('YYYY-MM-DD');
@@ -698,7 +632,7 @@ RedactEventPage.prototype.render = function() {
 		}),
 		cover_picker: tmpl('edit-event-cover-picker', {
 			image_horizontal_url: PAGE.event.image_horizontal_url,
-			image_horizontal_filename: PAGE.event.image_horizontal_filename
+			image_horizontal_filename: resolveFilenameFromURL(PAGE.event.image_horizontal_url)
 		}),
 		registration: tmpl('edit-event-registration', registration_props)
 	})));
@@ -761,16 +695,7 @@ RedactEventPage.prototype.render = function() {
 		
 		if (PAGE.event.image_horizontal_url) {
 			toDataUrl(PAGE.event.image_horizontal_url, function(base64_string) {
-				PAGE.$wrapper.find('#edit_event_image_horizontal_src').val(base64_string ? base64_string : null);
-			});
-			PAGE.$wrapper.find('.CallModal').removeClass(__C.CLASSES.NEW_HIDDEN).on('crop', function(event, cropped_src, crop_data) {
-				var $button = $(this),
-					$parent = $button.closest('.EditEventImgLoadWrap'),
-					$preview = $parent.find('.EditEventImgPreview'),
-					$data_url = $parent.find('.DataUrl');
-				$data_url.val('data.source').data('source', $preview.attr('src')).trigger('change');
-				$preview.attr('src', cropped_src);
-				$button.data('crop_data', crop_data);
+				PAGE.$wrapper.find('#edit_event_image_horizontal_source').val(base64_string ? base64_string : null);
 			});
 		}
 		

@@ -13,7 +13,7 @@ function OnboardingPage() {
 		offset: 0,
 		fields: 'img_small_url'
 	};
-	this.disable_upload = false;
+	this.is_upload_disabled = false;
 	this.block_scroll = true;
 }
 OnboardingPage.extend(Page);
@@ -56,7 +56,7 @@ OnboardingPage.prototype.render = function() {
 			PAGE.bindSubscriptions();
 			PAGE.block_scroll = false;
 		} else {
-			PAGE.disable_upload = true;
+			PAGE.is_upload_disabled = true;
 		}
 	}
 	
@@ -66,7 +66,7 @@ OnboardingPage.prototype.render = function() {
 	OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
 	PAGE.$wrapper.find(".RecommendationsScrollbar").scrollbar({
 		onScroll: function(y, x) {
-			if (y.scroll == y.maxScroll && !PAGE.disable_upload && !PAGE.block_scroll) {
+			if (y.scroll == y.maxScroll && !PAGE.is_upload_disabled && !PAGE.block_scroll) {
 				PAGE.block_scroll = true;
 				PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
 				OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);

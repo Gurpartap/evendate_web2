@@ -12,6 +12,7 @@ function EditOrganizationPage(organization_id) {
 	this.page_title = 'Редактировать организацию';
 	this.organization = new OneOrganization(organization_id);
 	this.categories = new CategoriesCollection();
+	this.state_name = 'edit_organization';
 	
 	this.fields = [
 		'description',
@@ -50,77 +51,13 @@ EditOrganizationPage.prototype.render = function() {
 	
 	function initEditEventPage($view) {
 		
-		function bindLoadByURLButton($view) {
-			$view.find('.LoadByURLButton').not('-Handled_LoadByURLButton').on('click', function() {
-				var $this = $(this),
-					$input = $('#' + $this.data('load_input'));
-				$this.data('url', $input.val());
-				window.current_load_button = $this;
-				socket.emit('image.getFromURL', $input.val());
-				window.paceOptions = {
-					catchupTime: 10000,
-					maxProgressPerFrame: 1,
-					ghostTime: Number.MAX_SAFE_INTEGER,
-					checkInterval: {
-						checkInterval: 10000
-					},
-					eventLag: {
-						minSamples: 1,
-						sampleCount: 30000000,
-						lagThreshold: 0.1
-					}
-				}; //хз зачем, все равно не работает
-				Pace.restart();
-			}).addClass('-Handled_LoadByURLButton');
-		}
-		
-		function handleImgUpload($context, source, filename) {
-			var $parent = $context.closest('.EditEventImgLoadWrap'),
-				$preview = $parent.find('.EditEventImgPreview'),
-				$file_name_text = $parent.find('.FileNameText'),
-				$file_name = $parent.find('.FileName'),
-				$data_url = $parent.find('.DataUrl'),
-				$button = $parent.find('.CallModal');
-			
-			$preview.attr('src', source);
-			$file_name_text.html('Загружен файл:<br>' + filename);
-			$file_name.val(filename);
-			$button
-				.data('source_img', source)
-				.on('crop', function(event, cropped_src, crop_data) {
-					$preview.attr('src', cropped_src);
-					$button.data('crop_data', crop_data);
-					$data_url.val('data.source').data('source', $preview.attr('src')).trigger('change');
-				})
-				.trigger('click.CallModal');
-		}
-		
-		
 		bindSelect2($view);
 		bindTabs($view);
 		bindLimitInputSize($view);
 		bindRippleEffect($view);
 		bindFileLoadButton($view);
-		bindLoadByURLButton($view);
+		ImgLoader.init($view);
 		
-		
-		$view.find('.LoadImg').off('change.LoadImg').on('change.LoadImg', function(e) {
-			var $this = $(e.target),
-				files = e.target.files;
-			
-			if (files.length == 0) return false;
-			for (var i = 0, f; f = files[i]; i++) {
-				var reader = new FileReader();
-				if (!f.type.match('image.*'))    continue;
-				reader.onload = (function(the_file) {
-					return function(e) {
-						handleImgUpload($this, e.target.result, the_file['name']);
-					};
-				})(f);
-				reader.readAsDataURL(f);
-			}
-			
-		});
 		
 		$view.find('#add_organization_submit').off('click.Submit').on('click.Submit', submitEditOrganization);
 		
@@ -287,17 +224,6 @@ EditOrganizationPage.prototype.render = function() {
 		initEditEventPage($view);
 		initOrganizationTypes(additional_fields.type_id);
 		
-		if (additional_fields.background_img_url && additional_fields.img_url) {
-			$view.find('.CallModal').removeClass('-hidden').on('crop', function(event, cropped_src, crop_data) {
-				var $button = $(this),
-					$parent = $button.closest('.EditEventImgLoadWrap'),
-					$preview = $parent.find('.EditEventImgPreview'),
-					$data_url = $parent.find('.DataUrl');
-				$data_url.val('data.source').data('source', $preview.attr('src')).trigger('change');
-				$preview.attr('src', cropped_src);
-				$button.data('crop_data', crop_data);
-			});
-		}
 		__APP.MODALS.bindCallModal($view);
 		
 		if (additional_fields.img_url) {

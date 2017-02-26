@@ -88,7 +88,7 @@ socket.on('image.getFromURLDone', function(response){
 	if(response.error){
 		showNotifier({text: response.error, status: false});
 	} else {
-		RedactEventPage.handleImgUpload(window.current_load_button, response.data, response.filename);
+		ImgLoader.handleImgUpload(ImgLoader.current_load_context, response.data, response.filename);
 	}
 });
 
