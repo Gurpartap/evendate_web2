@@ -161,12 +161,13 @@ class DBCaller {
                     return reject(err);
                 } else {
                     let topic_ids = [];
+                    console.log(topics);
                     topics.rows.forEach((topic) => {
                         if (topic.lvl1_tags > 0){
                             topic_ids.push(topic.id);
                         }else if (topic.lvl2_tags > 1){
                             topic_ids.push(topic.id);
-                        }else if (topic.lvl2_tags > 0 && topic.euristic > 0.03){
+                        }else if (topic.lvl2_tags > 0 && topic.euristic > 0.01){
                             topic_ids.push(topic.id);
                         }else if (topic.euristic > 0.04){
                             topic_ids.push(topic.id);
