@@ -18,13 +18,13 @@ SELECT
      INNER JOIN tags ON events_tags.tag_id = tags.id
    WHERE event_id = $1
          AND events_tags.status = TRUE
-         AND tags.name IN
-             (SELECT keyword
+         AND lower(tags.name) IN
+             (SELECT lower(keyword)
               FROM tg_topics
               WHERE tg_topics.parent_id =
                     (SELECT id
                      FROM tg_topics
-                     WHERE tg_topics.keyword = tg_t.keyword
+                     WHERE LOWER(tg_topics.keyword) = lower(tg_t.keyword)
                            AND tg_topics.parent_id
                                IS NULL
                     )
@@ -35,7 +35,7 @@ SELECT
    FROM events_tags
      INNER JOIN tags ON events_tags.tag_id = tags.id
    WHERE event_id = 4892 AND
-         tags.name = tg_t.keyword) AS lvl1_tags
+         lower(tags.name) = lower(tg_t.keyword)) AS lvl1_tags
 FROM tg_topics tg_t
 WHERE tg_t.parent_id IS NULL
 ORDER BY lvl1_tags DESC, lvl2_tags DESC, euristic DESC;

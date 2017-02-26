@@ -10,6 +10,18 @@ let telegram = require('telegram-bot-api'),
     bodyParser = require('body-parser'),
     express = require("express"),
     app = express(),
+    winston = require('winston'),
+    logger = new (winston.Logger)({
+        transports: [
+            new (winston.transports.Console)(),
+            new winston.transports.File({filename: __dirname + '/tg_debug.log', json: true})
+        ],
+        exceptionHandlers: [
+            new (winston.transports.Console)(),
+            new winston.transports.File({filename: __dirname + '/tg_exceptions.log', json: true})
+        ],
+        exitOnError: false
+    }),
     http = require('http'),
     ApiCaller = require('./APICaller'),
     DBCaller = require('./DBCaller'),
@@ -838,6 +850,7 @@ app.get('/events/:id', function (req, res) {
         id: req.params.id,
         fields: 'link,description'
     }).then(res => {
+        console.log(res);
         if (res.data.length == 1) {
             let _event = res.data[0];
             dbCaller.getToNotify(_event.id)

@@ -38,7 +38,7 @@ var
             new (winston.transports.Console)(),
             new winston.transports.File({filename: __dirname + '/exceptions.log', json: true})
         ],
-        exitOnError: true
+        exitOnError: false
     });
 
 process.on('uncaughtException', function (err) {
