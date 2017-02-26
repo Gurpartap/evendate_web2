@@ -27,6 +27,7 @@ var
     args = process.argv.slice(2),
     crypto = require('crypto'),
     bodyParser = require('body-parser'),
+    UpdateQueries = require('./UpdateQueries'),
     __rooms = {},
     logger = new (winston.Logger)({
         transports: [
@@ -111,8 +112,6 @@ try {
 }
 
 sql.setDialect('postgres');
-
-console.log(pg_conn_string);
 
 pg.connect(pg_conn_string, function (err, client, done) {
 
@@ -240,10 +239,9 @@ pg.connect(pg_conn_string, function (err, client, done) {
     }
 
     function updateEventsGeocodes(event_id) {
-        var q_get_events = 'SELECT id, location, location_updates FROM events ' +
-            '   WHERE event_id = ?';
 
-        client.query(q_get_events, [event_id], function (err, res) {
+        client.query('SELECT id, location, location_updates FROM events ' +
+            '   WHERE id = $1', [event_id], function (err, res) {
             if (handleError(err)) return;
             var queue = [],
                 url = 'https://geocode-maps.yandex.ru/1.x/?';
@@ -294,7 +292,15 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
     function updateRecommendations(data, cb) {
         if (!data) return cb();
-        let organizations_text = 'COALESCE((SELECT ts_rank_cd(\'{1.0, 0.7, 0.5, 0.3}\', vo.fts, query) :: REAL AS rank' +
+        let organizations_text =
+                "(SELECT" +
+                " CASE" +
+                " WHEN (SELECT LENGTH(users_interests_aggregated.aggregated_tsquery)" +
+                " FROM users_interests_aggregated" +
+                " WHERE users_interests_aggregated.user_id =" +
+                "     view_users_organizations.user_id) BETWEEN 3 AND  130000" +
+                " THEN" +
+                " COALESCE((SELECT ts_rank_cd(\'{1.0, 0.7, 0.5, 0.3}\', vo.fts, query) :: REAL AS rank" +
                 ' FROM view_organizations AS vo, to_tsquery(' +
                 ' (SELECT' +
                 ' users_interests_aggregated.aggregated_tsquery' +
@@ -302,140 +308,54 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 ' WHERE users_interests_aggregated.user_id =' +
                 ' view_users_organizations.user_id) ' +
                 ' ) AS query' +
-                ' WHERE vo.id = view_users_organizations.organization_id) :: REAL, 0)',
-            events_text = 'COALESCE((SELECT ts_rank_cd(\'{1.0, 0.7, 0.5, 0.3}\', ve.fts, query) :: REAL AS rank' +
-                '     FROM view_events AS ve, to_tsquery(' +
-                '         (SELECT users_interests_aggregated.aggregated_tsquery' +
-                '     FROM users_interests_aggregated' +
-                '     WHERE users_interests_aggregated.user_id =' +
-                '         view_users_events.user_id)' +
-                ' ) AS query' +
-                '     WHERE ve.id = view_users_events.event_id) :: REAL, 0)',
+                ' WHERE vo.id = view_users_organizations.organization_id) :: REAL, 0)' +
+                ' ELSE 0' +
+                ' END)',
+            events_text = "(SELECT" +
+                " CASE" +
+                " WHEN (SELECT LENGTH(users_interests_aggregated.aggregated_tsquery)" +
+                " FROM users_interests_aggregated" +
+                " WHERE users_interests_aggregated.user_id =" +
+                "     view_users_events.user_id) BETWEEN 3 AND 130000" +
+                " THEN" +
+                " COALESCE((SELECT ts_rank_cd('{1.0, 0.7, 0.5, 0.3}', ve.fts, query) :: REAL AS rank" +
+                " FROM view_events AS ve," +
+                "     to_tsquery((SELECT users_interests_aggregated.aggregated_tsquery" +
+                " FROM users_interests_aggregated" +
+                " WHERE users_interests_aggregated.user_id =" +
+                "     view_users_events.user_id)) AS query" +
+                " WHERE ve.id = view_users_events.event_id) :: REAL, 0)" +
+                " ELSE 0" +
+                " END)";
 
-            q_upd_organizations = 'UPDATE recommendations_organizations' +
-                ' SET' +
-                ' rating_subscribed_friends           = (SELECT COUNT(id)' +
-                ' FROM subscriptions' +
-                ' INNER JOIN view_friends ON view_friends.friend_id = subscriptions.user_id' +
-                ' WHERE subscriptions.organization_id = view_users_organizations.organization_id' +
-                ' AND subscriptions.status = TRUE' +
-                ' AND view_friends.user_id = view_users_organizations.user_id) :: INT,' +
-                ' rating_active_events_count          = (SELECT COUNT(id) / 5' +
-                ' FROM view_events' +
-                ' WHERE view_events.organization_id =' +
-                ' view_users_organizations.organization_id) :: INT,' +
-                ' rating_last_events_count            = (SELECT COUNT(id) * 2' +
-                ' FROM view_events' +
-                ' WHERE view_events.organization_id = view_users_organizations.organization_id' +
-                ' AND view_events.created_at >' +
-                ' DATE_PART(\'epoch\', (NOW() - INTERVAL \'7 days\'))) :: INT,' +
-                ' rating_subscribed_in_social_network = (SELECT COUNT(id) * 50' +
-                ' FROM view_organizations vo' +
-                ' WHERE vo.id = view_users_organizations.organization_id' +
-                ' AND vo.vk_url_path IN' +
-                ' (SELECT vk_groups.screen_name' +
-                ' FROM vk_groups' +
-                ' INNER JOIN vk_users_subscriptions' +
-                ' ON vk_users_subscriptions.vk_group_id = vk_groups.id' +
-                ' WHERE' +
-                ' vk_users_subscriptions.user_id =' +
-                ' view_users_organizations.user_id)) :: INT,' +
-                ' rating_texts_similarity             = ' + (data.organizations_update_texts === false ? 'rating_texts_similarity' : organizations_text) + ',' +
-                ' updated_at                          = NOW()' +
-                ' FROM (SELECT *' +
-                ' FROM view_users_organizations' +
-                ' {WHERE_PLACEHOLDER}) AS view_users_organizations' +
-                ' WHERE view_users_organizations.user_id = recommendations_organizations.user_id' +
-                ' AND view_users_organizations.organization_id = recommendations_organizations.organization_id ';
-
-        let q_upd_events = 'UPDATE recommendations_events' +
-                '     SET' +
-                '     rating_favored_friends   = (SELECT COUNT(id)' +
-                '     FROM favorite_events' +
-                '     INNER JOIN view_friends ON view_friends.friend_id = favorite_events.user_id' +
-                '     WHERE view_users_events.event_id = favorite_events.event_id' +
-                '     AND view_friends.user_id = view_users_events.user_id) :: INT,' +
-                '         rating_tags_in_favorites = COALESCE((SELECT SUM(t_favored_by_user.favored_with_tag_count) :: INT' +
-                '     FROM' +
-                '     (SELECT COUNT(events_tags.id) :: INT AS favored_with_tag_count' +
-                '     FROM events_tags' +
-                '     WHERE' +
-                '     events_tags.event_id IN (' +
-                '         SELECT favorite_events.event_id' +
-                '     FROM favorite_events' +
-                '     WHERE status = TRUE' +
-                '     AND favorite_events.user_id = view_users_events.user_id' +
-                ' )' +
-                '     AND events_tags.event_id = view_users_events.event_id' +
-                '     GROUP BY events_tags.tag_id) AS t_favored_by_user) :: INT, 0),' +
-                '     rating_tags_in_hidden    = COALESCE((SELECT SUM(favored_with_tag_count)' +
-                '     FROM' +
-                '     (SELECT COUNT(events_tags.id) :: INT AS favored_with_tag_count' +
-                '     FROM events_tags' +
-                '     WHERE' +
-                '     events_tags.event_id IN (' +
-                '         SELECT hidden_events.event_id' +
-                '     FROM hidden_events' +
-                '     WHERE status = TRUE' +
-                '     AND hidden_events.user_id = view_users_events.user_id' +
-                ' )' +
-                '     AND events_tags.event_id = view_users_events.event_id' +
-                '     GROUP BY events_tags.tag_id) AS favored_by_user) :: INT, 0),' +
-                '     rating_recent_created    = (SELECT CASE WHEN DATE_PART(\'epoch\', NOW()) > ve.created_at + 259200 :: INT' +
-                '     THEN 0' +
-                '     ELSE (259200 :: INT - (DATE_PART(\'epoch\', NOW()) - ve.created_at)) :: INT /' +
-                '     7200 END' +
-                '     FROM view_events AS ve' +
-                '     WHERE ve.id = view_users_events.event_id) :: INT,' +
-                '         rating_active_days       = (SELECT 1 / (CASE' +
-                '     WHEN (ve.registration_required = TRUE AND' +
-                '     ve.registration_till < DATE_PART(\'epoch\', NOW()))' +
-                '     THEN 1000' +
-                '     ELSE (SELECT CASE WHEN COUNT(id) :: INT = 0' +
-                '     THEN 1000' +
-                '     ELSE COUNT(id) :: INT END' +
-                '     FROM events_dates' +
-                '     WHERE' +
-                '     events_dates.event_id = ve.id' +
-                '     AND event_date > NOW()' +
-                '     AND event_date < (NOW() + INTERVAL \'10 days\')' +
-                '     AND status = TRUE' +
-                ' )' +
-                '     END) :: REAL * 10' +
-                '     FROM view_events AS ve' +
-                '     WHERE ve.id = view_users_events.event_id) :: INT,' +
-                '         rating_texts_similarity  = ' + (data.events_update_texts === false ? 'rating_texts_similarity' : events_text) + ',' +
-                '     updated_at               = NOW()' +
-                '     FROM (SELECT view_users_events.*' +
-                '     FROM view_users_events' +
-                '     INNER JOIN view_events ON view_users_events.event_id = view_events.id' +
-                '     WHERE view_events.last_event_date > (SELECT DATE_PART(\'epoch\', TIMESTAMPTZ \'yesterday\') :: INT)' +
-                '     AND view_users_events.user_id = $1) AS view_users_events' +
-                '     WHERE view_users_events.user_id = recommendations_events.user_id' +
-                '     AND view_users_events.event_id = recommendations_events.event_id' +
-                '     AND view_users_events.user_id = $2;',
+        let q_upd_events = UpdateQueries.upd_event_recommendations,
+            q_upd_organizations = UpdateQueries.upd_org_recommendations,
             upd_events = false,
             upd_organizations = false,
             operations = [], events_args = [], orgs_args = [];
 
+        q_upd_events = q_upd_events.replace("'{SIMILARITY_TEXT}'", data.events_update_texts === false ? 'rating_texts_similarity' : events_text);
+        q_upd_organizations = q_upd_organizations.replace("'{SIMILARITY_TEXT}'", data.organizations_update_texts  === false ? 'rating_texts_similarity' : organizations_text);
+
+
         if (data.user_id) {
             q_upd_organizations = q_upd_organizations + ' AND view_users_organizations.user_id = $1';
-            q_upd_organizations = q_upd_organizations.replace('{WHERE_PLACEHOLDER}', ' WHERE user_id = $2');
+            q_upd_organizations = q_upd_organizations.replace("'{WHERE_PLACEHOLDER}'", ' WHERE user_id = $2');
 
             q_upd_events = q_upd_events + ' AND view_users_events.user_id = $1';
-            q_upd_events = q_upd_organizations.replace('{WHERE_PLACEHOLDER}', ' WHERE user_id = $2');
+            q_upd_events = q_upd_events.replace("'{WHERE_PLACEHOLDER}'", ' AND user_id = $2');
 
             upd_events = upd_organizations = true;
             events_args = [data.user_id, data.user_id];
             orgs_args = [data.user_id, data.user_id];
         } else if (data.event_id) {
             q_upd_events = q_upd_events + ' AND view_users_events.event_id = $1';
-            q_upd_events = q_upd_organizations.replace('{WHERE_PLACEHOLDER}', ' WHERE event_id = $2');
+            q_upd_events = q_upd_events.replace("'{WHERE_PLACEHOLDER}'", ' AND event_id = $2');
             upd_events = true;
             events_args = [data.event_id, data.event_id];
         } else if (data.organization_id) {
             q_upd_organizations = q_upd_organizations + ' AND view_users_organizations.organization_id = $1';
-            q_upd_organizations = q_upd_organizations.replace('{WHERE_PLACEHOLDER}', ' WHERE organization_id = $2');
+            q_upd_organizations = q_upd_organizations.replace("'{WHERE_PLACEHOLDER}'", ' WHERE organization_id = $2');
             upd_organizations = true;
             events_args = [data.event_id, data.event_id];
         }
@@ -443,6 +363,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
         if (upd_events) {
             operations.push(function (callback) {
                 client.query(q_upd_events, events_args, function (err, result) {
+                    // fs.writeFileSync('./q_upd_events' + Utils.makeId(10) + '.sql', q_upd_events + '\n\n' + JSON.stringify(events_args), {encoding: 'utf8'})
                     if (err) handleError({error: err, name: 'q_upd_events'});
                     callback(null);
                 })
@@ -451,6 +372,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
         if (upd_organizations) {
             operations.push(function (callback) {
                 client.query(q_upd_organizations, orgs_args, function (err, result) {
+                    // fs.writeFileSync('./q_upd_orgs' + Utils.makeId(10) + '.sql', q_upd_organizations + '\n\n' + JSON.stringify(orgs_args), {encoding: 'utf8'})
                     if (err) handleError({error: err, name: 'q_upd_organizations'});
                     callback(null);
                 })
@@ -609,12 +531,15 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 client.query(q_get_interests, function (err, data) {
                     if (err) handleError({error: err, name: 'q_get_interests'});
                     var items = [],
+                        items_length = 0,
                         interest_types = ['education_university_name', 'education_faculty_name',
                             'occupation_name', 'interests', 'movies', 'tv', 'books', 'games', 'about'];
                     data.rows.forEach(function (row) {
                         interest_types.forEach(function (type) {
                             if (typeof row[type] == 'string') {
-                                items.push(cleanData(row[type]));
+                                let _clean = cleanData(row[type]);
+                                items_length += _clean.length;
+                                items.push(_clean);
                             }
                         });
                     });
@@ -622,12 +547,16 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     client.query(q_get_groups, function (error, groups_data) {
 
                         if (error) handleError({error: error, name: 'q_get_groups'});
-
                         groups_data.rows.forEach(function (row) {
+                            if (items_length >= 120000) return false;
+                            let _clean_name = cleanData(row.name),
+                                _clean_desc = cleanData(row.description);
 
-                            items.push(cleanData(row.name));
-                            items.push(cleanData(row.screen_name));
-                            items.push(cleanData(row.description));
+                            items_length += _clean_name.length;
+                            items_length += _clean_desc.length;
+
+                            items.push(_clean_name);
+                            items.push(_clean_desc);
                         });
                         var items_text = items.join(' '),
                             items_text_tsquery = items_text.trim().replace(/\s+/gmi, '|');
@@ -724,8 +653,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         q_user = users.update(user_to_ins).where(users.id.equals(user.id)).returning('id').toQuery();
                     }
 
-                    console.log('GETTING USER: ', is_new_user, result);
-
                     client.query(q_user, function (user_err, ins_result) {
 
                         if (err) return handleError({error: user_err, name: 'q_user'});
@@ -762,7 +689,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 } else {
                                     q_ins_sign_in = vk_sign_in.insert(vk_data);
                                 }
-                                console.log(vk_data);
                                 break;
                             }
                             case 'google': {
@@ -779,7 +705,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 } else {
                                     q_ins_sign_in = google_sign_in.insert(google_data);
                                 }
-                                console.log(google_data);
                                 break;
                             }
                             case 'facebook': {
@@ -794,7 +719,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 } else {
                                     q_ins_sign_in = facebook_sign_in.insert(facebook_data);
                                 }
-                                console.log(facebook_data);
                                 break;
                             }
 
@@ -1009,10 +933,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     }
                 }
 
-                console.log('getting users info', req_params);
                 rest.get(req_params.url, req_params)
                     .on('complete', function (result) {
-                        console.log('getting users info - DONE');
                         if (result instanceof Error) {
                             handleError(result);
                             callback(result, null);
@@ -1031,7 +953,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             } else {
                                 e = null;
                             }
-                            console.log('USERS DATA: ', result);
                             callback(e, result);
                         }
 
@@ -1041,7 +962,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 if (socket.retry_count > 5) {
                     socket.emit('error.retry');
                 } else {
-                    console.log(socket.retry_count);
                     socket.retry_count++;
                     getUsersInfo(oauth_data, function (user_info_error, user_info) {
 
@@ -1065,10 +985,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         user_info.type = oauth_data.type;
                         user_info.access_token = oauth_data.access_token;
                         oauth_data.email = oauth_data.email ? oauth_data.email : user_info.email;
-                        console.log('getting friends list start');
                         getFriendsList(user_info, function (friends_error, friends_data) {
 
-                            console.log('getting list done');
                             if (handleError(friends_error)) {
                                 setTimeout(function () {
                                     authTry(oauth_data);
@@ -1143,10 +1061,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         return;
                     }
                 }
-                console.log('getting groups list', req_params);
                 rest.get(req_params.url, req_params)
                     .on('complete', function (result) {
-                        console.log('getting groups list - done');
                         if (result instanceof Error) {
                             handleError(result);
                             callback(result, null);
@@ -1211,7 +1127,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
         socket.on(CONSTANTS.AUTH.OAUTH_DONE, function (oauth_data) {
             socket.retry_count = 0;
             try {
-                console.log('trying');
                 authTry(oauth_data);
             } catch (e) {
                 handleError(e);
@@ -1245,7 +1160,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
         });
 
         socket.on(CONSTANTS.UTILS.REGISTRATION_FINISHED, function (data) {
-            console.log('Reg finished', data);
 
             let q_upd_registration = Entities.organization_registrations.update({
                 finished: true
@@ -1330,7 +1244,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
         socket.on(CONSTANTS.NOTIFICATIONS.UPDATE_STATS, function () {
             if (config_index == 'local') {
-                console.log('strted');
                 updateEventsStats();
             }
         });
@@ -1445,7 +1358,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                                                         }
                                                                     })
                                                                     .on('complete', function (res) {
-                                                                        console.log(res);
                                                                         if (res instanceof Error) {
                                                                             handleError(result, CONSTANTS.VK_INTEGRATION.POST_ERROR, function () {
                                                                             }, socket);
@@ -1532,7 +1444,9 @@ pg.connect(pg_conn_string, function (err, client, done) {
         } catch (e) {
         }
 
-        if (req.params.is_new){
+
+        console.log(req.query);
+        if (req.query.is_new){
             try {
                 rest.get('http://localhost:5000/events/' + req.params.id)
             } catch (e) {
