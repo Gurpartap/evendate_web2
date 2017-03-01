@@ -34,6 +34,19 @@ RegistrationFieldModel = extending(OneEntity, (function() {
 		CUSTOM: 'custom',
 		EXTENDED_CUSTOM: 'extended_custom'
 	};
+	/**
+	 *
+	 * @enum {string}
+	 */
+	RegistrationFieldModel.DEFAULT_LABEL = {
+		EMAIL: 'E-mail',
+		FIRST_NAME: 'Имя',
+		LAST_NAME: 'Фамилия',
+		PHONE_NUMBER: 'Номер телефона',
+		ADDITIONAL_TEXT: 'Дополнительное текстовое поле',
+		CUSTOM: 'Дополнительное текстовое поле',
+		EXTENDED_CUSTOM: 'Дополнительное текстовое поле'
+	};
 	
 	/**
 	 *

@@ -55,6 +55,14 @@
 
 <!-- COMMONS -->
 
+<script type="javascript/template" id="tmpl-input">
+	<input class="{classes}" {attributes} {dataset}>
+</script>
+
+<script type="javascript/template" id="tmpl-textarea">
+	<textarea class="{classes}" {attributes} {dataset}>{value}</textarea>
+</script>
+
 <script type="javascript/template" id="tmpl-divider">
 	<hr title="{title}" {dataset}>
 </script>
@@ -64,6 +72,18 @@
 		<input id="{id}" class="{classes}" type="{type}" name="{name}" {attributes} {dataset} tabindex="-1">
 		<label class="form_label" for="{id}"><span>{label}</span></label>
 	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-form-unit">
+	<div class="form_unit {unit_classes}">
+		<label class="form_label {label_classes}" for="{id}">{label}</label>
+		{form_element}
+		{helptext}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-form-helptext">
+	<p class="form_helptext" {attributes} {dataset}>{text}</p>
 </script>
 
 <script type="javascript/template" id="tmpl-button">
@@ -622,7 +642,7 @@
 		<button class="button -color_neutral -size_low -rounded fa_icon fa-plus-circle AddRegistrationCustomField RippleEffect" type="button"><span class="Text">Добавить поле</span></button>
 
 		<div class="-align_center">
-			<button class="button -color_neutral_accent RippleEffect" type="button"><span class="Text">Предпросмотр</span></button>
+			<button class="button -color_neutral_accent RippleEffect RegistrationPreview" type="button"><span class="Text">Предпросмотр</span></button>
 		</div>
 
 	</fieldset>
@@ -1275,9 +1295,10 @@
 		<h4>{event_title}</h4>
 		<p class="form_helptext">Чтобы зарегистрироваться на событие, заполните поля.</p>
 		<p class="form_helptext">Поля со звёздочкой ({required_star}) обязательны для заполнения.</p>
+		<input id="registration_form_{modal_id}_event_id" type="hidden" name="event_id" value="{event_id}">
 		{fields}
 		<div class="form_unit">
-			<input id="registration_form_{modal_id}_agreement" class="form_checkbox" type="checkbox">
+			<input id="registration_form_{modal_id}_agreement" class="form_checkbox" type="checkbox" required>
 			<label class="form_label" for="registration_form_{modal_id}_agreement"><span>Я согласен c условиями Пользовательского соглашения и Договором оказания услуг по организации мероприятия</span></label>
 		</div>
 
@@ -1290,7 +1311,7 @@
 <script type="javascript/template" id="tmpl-modal-registration-input-field">
 	<div class="form_unit">
 		<label class="form_label" for="registration_form_{modal_id}_{uuid}_input"><span>{label}</span>{required_star}</label>
-		<input id="registration_form_{modal_id}_{uuid}_input" class="form_input" type="text" name="{uuid}" autocomplete="off" placeholder="{label}" {required}>
+		<input id="registration_form_{modal_id}_{uuid}_input" class="form_input Registration{type}Field" type="text" name="{uuid}" placeholder="{label}" {required}>
 		<p class="form_helptext">{description}</p>
 	</div>
 </script>
@@ -1298,7 +1319,7 @@
 <script type="javascript/template" id="tmpl-modal-registration-textarea-field">
 	<div class="form_unit">
 		<label class="form_label" for="registration_form_{modal_id}_{uuid}_textarea"><span>{label}</span>{required_star}</label>
-		<textarea id="registration_form_{modal_id}_{uuid}_textarea" class="form_textarea" name="{uuid}" autocomplete="off" placeholder="{label}" {required}></textarea>
+		<textarea id="registration_form_{modal_id}_{uuid}_textarea" class="form_textarea Registration{type}Field" name="{uuid}" placeholder="{label}" {required}></textarea>
 		<p class="form_helptext">{description}</p>
 	</div>
 </script>
@@ -1556,7 +1577,7 @@
 
 			<h3><label for="add_organization_short_name">Сокращенное название</label></h3>
 			<div class="form_unit">
-				<input id="add_organization_short_name" class="form_input LimitSize" type="text" name="short_name" value="{short_name}" autocomplete="off" placeholder="Сокращенное навание организации" data-maxlength="15" required>
+				<input id="add_organization_short_name" class="form_input LimitSize" type="text" name="short_name" value="{short_name}" autocomplete="off" placeholder="Сокращенное навание организации" data-maxlength="30" required>
 			</div>
 
 			<h3><label for="add_organization_email">Email</label></h3>

@@ -382,10 +382,16 @@ __APP = {
 	MODALS: new Modals(),
 	BUILD: {
 		/**
+		 * @typedef {(Array<string>|Object<string, *>)} HTMLDataset
+		 */
+		/**
+		 * @typedef {(Array<string>|Object<string, (string|number)>)} HTMLAttributes
+		 */
+		/**
 		 * @typedef {object} buildProps
-		 * @property {(Array<string>|string)} classes
-		 * @property {(Array<string>|object)} dataset
-		 * @property {(Array<string>|object)} attributes
+		 * @property {(Array<string>|string)} [classes]
+		 * @property {HTMLDataset} [dataset]
+		 * @property {HTMLAttributes} [attributes]
 		 */
 		/**
 		 *
@@ -416,7 +422,7 @@ __APP = {
 		},
 		/**
 		 *
-		 * @param {..buildProps} props
+		 * @param {...buildProps} props
 		 * @returns {jQuery}
 		 */
 		button: function buildButton(/**props*/) {
@@ -426,6 +432,44 @@ __APP = {
 			})).each(function(i, button) {
 				if(props[i].dataset) {
 					$(button).data(props[i].dataset);
+				}
+			});
+		},
+		/**
+		 *
+		 * @param {HTMLAttributes} [attributes]
+		 * @param {(Array<string>|string)} [classes]
+		 * @param {HTMLDataset} [dataset]
+		 * @returns {jQuery}
+		 */
+		input: function buildInput(attributes, classes, dataset) {
+			return tmpl('input', __APP.BUILD.normalizeBuildProps({
+				classes: classes,
+				attributes: attributes,
+				dataset: dataset
+			})).each(function(i, input) {
+				if(dataset) {
+					$(input).data(dataset);
+				}
+			});
+		},
+		/**
+		 *
+		 * @param {HTMLAttributes} [attributes]
+		 * @param {(Array<string>|string)} [classes]
+		 * @param {string} [value]
+		 * @param {HTMLDataset} [dataset]
+		 * @returns {jQuery}
+		 */
+		textarea: function buildTextarea(attributes, classes, value, dataset) {
+			return tmpl('textarea', __APP.BUILD.normalizeBuildProps({
+				value: value,
+				classes: classes,
+				attributes: attributes,
+				dataset: dataset
+			})).each(function(i, input) {
+				if(dataset) {
+					$(input).data(dataset);
 				}
 			});
 		},
@@ -461,19 +505,105 @@ __APP = {
 		},
 		/**
 		 *
-		 * @param {buildProps} props
+		 * @param {...buildProps} props
 		 * @returns {jQuery}
 		 */
 		radio: function buildRadio(props) {
-			return __APP.BUILD.radioCheckbox('radio', props);
+			return $.makeSet([].map.call(arguments, function(arg) {
+				return __APP.BUILD.radioCheckbox('radio', arg)
+			}));
 		},
 		/**
 		 *
-		 * @param {buildProps} props
+		 * @param {...buildProps} props
 		 * @returns {jQuery}
 		 */
 		checkbox: function buildCheckbox(props) {
-			return __APP.BUILD.radioCheckbox('checkbox', props);
+			return $.makeSet([].map.call(arguments, function(arg) {
+				return __APP.BUILD.radioCheckbox('checkbox', arg)
+			}));
+		},
+		/**
+		 *
+		 * @param {(string|Element|jQuery)} text
+		 * @param {HTMLDataset} [dataset]
+		 * @param {HTMLAttributes} [attributes]
+		 * @returns {jQuery}
+		 */
+		formHelpText: function buildFormHelpText(text, dataset, attributes) {
+			return tmpl('form-helptext', __APP.BUILD.normalizeBuildProps({
+				text: text,
+				dataset: dataset,
+				attributes: attributes
+			}));
+		},
+		/**
+		 *
+		 * @param {...buildProps} props
+		 * @param {(string|number)} props.id
+		 * @param {(jQuery|string)} props.label
+		 * @param {string} [props.type=text]
+		 * @param {string} [props.name]
+		 * @param {string} [props.value]
+		 * @param {number} [props.tabindex]
+		 * @param {boolean} [props.required]
+		 * @param {string} [props.placeholder]
+		 *
+		 * @param {(string|jQuery)} [props.helptext]
+		 * @param {HTMLDataset} [props.helptext_dataset]
+		 * @param {HTMLAttributes} [props.helptext_attributes]
+		 * @param {(Array<string>|string)} [props.unit_classes]
+		 * @param {(Array<string>|string)} [props.label_classes]
+		 * @returns {jQuery}
+		 */
+		formInput: function buildFormInput(props) {
+			var INPUT_TYPES = [
+				'hidden',
+				'text',
+				'search',
+				'tel',
+				'url',
+				'email',
+				'password',
+				'date',
+				'time',
+				'number',
+				'range',
+				'color',
+				'checkbox',
+				'radio',
+				'file',
+				'submit',
+				'image',
+				'reset',
+				'button'
+			];
+			return $.makeSet(Array.prototype.map.call(arguments, function(props) {
+				switch (props.type) {
+					case 'radio': return __APP.BUILD.radio(props);
+					case 'checkbox': return __APP.BUILD.checkbox(props);
+					default: return tmpl('form-unit', __APP.BUILD.normalizeBuildProps($.extend(true, {}, props, {
+						form_element: props.type === 'textarea' ?
+							__APP.BUILD.textarea($.extend({}, props.attributes, {
+								id: props.id,
+								name: props.name || undefined,
+								required: props.required || undefined,
+								placeholder: props.placeholder,
+								tabindex: props.tabindex
+							}), (props.classes ? ['form_textarea'].concat(props.classes) : ['form_textarea']), props.value, props.dataset) :
+							__APP.BUILD.input($.extend({}, props.attributes, {
+								id: props.id,
+								type: !props.type || INPUT_TYPES.indexOf(props.type) === -1 ? 'text' : props.type,
+								name: props.name || undefined,
+								value: props.value || undefined,
+								required: props.required || undefined,
+								placeholder: props.placeholder,
+								tabindex: props.tabindex
+							}), (props.classes ? ['form_input'].concat(props.classes) : ['form_input']), props.dataset),
+						helptext: __APP.BUILD.formHelpText(props.helptext, props.helptext_dataset, props.helptext_attributes)
+					}), ['unit_classes', 'label_classes']));
+				}
+			}));
 		},
 		/**
 		 *
@@ -1143,14 +1273,13 @@ __APP = {
 	}
 };
 /**
- *
- * @namespace __C
- * @property CLASSES
- * @property DATE_FORMAT
- * @property COLORS
- * @property STATS
- * @property ACTION_NAMES
- * @property ENTITIES
+ * @const
+ * @property {Object<string, string>} CLASSES
+ * @property {string} DATE_FORMAT
+ * @property {Object<string, string>} COLORS
+ * @property {Object<string, string>} STATS
+ * @property {Object<string, string[]>} ACTION_NAMES
+ * @property {Object<string, string>} ENTITIES
  */
 __C = {
 	CLASSES: {

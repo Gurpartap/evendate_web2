@@ -348,6 +348,24 @@ RedactEventPage.prototype.init = function() {
 		RedactEventPage.buildRegistrationCustomField().insertBefore($(this));
 	});
 	
+	PAGE.$wrapper.find('.RegistrationPreview').on('click.RegistrationPreview', function() {
+		var form_data = $(this).closest('fieldset').serializeForm(),
+			fields = new RegistrationFieldsCollection(),
+			modal;
+		
+		fields.setData(form_data.registration_fields.sort().map(function(field) {
+			return {
+				uuid: guid(),
+				type: form_data['registration_'+field+'_field_type'],
+				label: form_data['registration_'+field+'_field_label'] || RegistrationFieldModel.DEFAULT_LABEL[form_data['registration_'+field+'_field_type'].toUpperCase()],
+				required: form_data['registration_'+field+'_field_required']
+			};
+		}));
+		
+		modal = new PreviewRegistrationModal($(this).closest('form').find('#edit_event_title').val(), fields);
+		modal.show();
+	});
+	
 	$main_tabs.on('change.tabs', function() {
 		if($main_tabs.currentTabsIndex === 0){
 			$prev_page_button.addClass(__C.CLASSES.NEW_HIDDEN);

@@ -381,6 +381,12 @@ Math.roundTo = function(num, decimals) {
 }(window.jQuery));
 
 $.fn.extend({
+	/**
+	 *
+	 * @memberOf jQuery#
+	 * @param {string} statuses
+	 * @return {jQuery}
+	 */
 	toggleStatus: function(statuses) {
 		var $this = this;
 		
@@ -410,10 +416,9 @@ $.fn.extend({
 	 * Метод возвращает javaScript объект, состоящий из атрибутов name и value элементов формы.
 	 * Если output_type стоит на array, то возвращается массив из объектов с полями name и value (аналогично с serializeArray).
 	 *
-	 * @method external:"jQuery.fn".serializeForm
-	 *
+	 * @memberOf jQuery#
 	 * @param {string} [output_type=object]
-	 * @returns {Array|Object}
+	 * @returns {(Array|Object)}
 	 */
 	serializeForm: function(output_type) {
 		var zb = /^(?:input|select|textarea|keygen)/i,
@@ -526,6 +531,7 @@ $.fn.extend({
 	},
 	/**
 	 * jQuery adapter for Tablesort
+	 * @memberOf jQuery#
 	 * @param {object} [options]
 	 */
 	tablesort: function(options) {
@@ -539,14 +545,31 @@ $.fn.extend({
 	},
 	/**
 	 * Resolving instance from element
+	 * @memberOf jQuery#
 	 * @return {*}
 	 */
 	resolveInstance: function() {
 		var instance = this.data('instance');
 		return instance ? instance : this;
+	},
+	/**
+	 * Getting outer HTML string from jQuery collection
+	 * @memberOf jQuery#
+	 * @return {string}
+	 */
+	outerHTML: function() {
+		var str = '';
+		this.each(function(i, el) {
+			str += el.outerHTML;
+		});
+		return str;
 	}
 });
-
+/**
+ * Makes jQuery collection from the genuine array of HTML elements or jQuery objects
+ * @param {(Array<Element>|Array<jQuery>|Element)} array
+ * @return {jQuery}
+ */
 jQuery.makeSet = function(array) {
 	return $($.map(array, function(el) {return el.get();}));
 };
@@ -1253,6 +1276,38 @@ function formatCurrency(number, separator, decimal_separator) {
 		+ integer_part.substr(cast_pos).replace(/(\d{3})(?=\d)/g, '$1' + separator)
 		+ (numbers_decimals ? decimal_separator + numbers_decimals : '');
 }
+/**
+ * Generates guid-like string
+ * @return {string}
+ */
+function guid() {
+	function s4() {
+		return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+	}
+	
+	return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+}
+/**
+ * Validating form or fieldset
+ * @param {(Element|jQuery)} $form
+ * @return {boolean}
+ */
+function isFormValid($form) {
+	$form = $form instanceof Element ? $($form) : $form;
+	var is_valid = true,
+		$elements = $form.find('input, textarea');
+	
+	if (!$form[0].checkValidity()) {
+		$elements.each(function(i, el) {
+			if ( (el.required && (el.value.trim() === '' || !el.checkValidity())) || (el.value.trim() !== '' && !el.checkValidity()) ) {
+				handleErrorField(el);
+				is_valid = false;
+			}
+		});
+	}
+	
+	return is_valid;
+}
 
 
 function bindLimitInputSize($parent) {
@@ -1785,32 +1840,39 @@ function bindPageLinks($parent) {
 
 /**
  * Changes form unit`s state to error
- * @param {jQuery|Element} $unit
+ * @param {(jQuery|Element)} $unit
+ * @return {jQuery}
  */
 function handleErrorField($unit) {
-	if (!$unit instanceof jQuery) {
-		handleErrorField($($unit));
-	} else if (!$unit.is('.form_unit') && $unit.closest('.form_unit').length) {
-		handleErrorField($unit.closest('.form_unit'));
-	} else {
-		if (!$unit.closest('.form_unit').hasClass('-status_error')) {
-			var $input = $unit.find('input, select, textarea');
-			$unit
-				.toggleStatus('error')
-				.off('input.clear_error change.clear_error')
-				.one('input.clear_error change.clear_error', function() {
-					$unit.off('input.clear_error change.clear_error').toggleStatus('error');
-					$input.off('blur.clear_error');
-				});
-			$input
-				.off('blur.clear_error')
-				.one('blur.clear_error', function() {
-					if ($(this).val().trim() !== '') {
-						$unit.trigger('input.clear_error');
-					}
-				});
-		}
+	var $input;
+	
+	if (!($unit instanceof jQuery)) {
+		return handleErrorField($($unit));
 	}
+	if (!$unit.is('.form_unit')) {
+		if ($unit.closest('.form_unit').length)
+			return handleErrorField($unit.closest('.form_unit'));
+		return $unit;
+	}
+	
+	if (!$unit.closest('.form_unit').hasClass('-status_error')) {
+		$input = $unit.find('input, select, textarea');
+		$unit
+			.addClass('-status_error')
+			.off('input.ClearError change.ClearError')
+			.one('input.ClearError change.ClearError', function() {
+				$unit.off('input.ClearError change.ClearError').removeClass('-status_error');
+				$input.off('blur.ClearError');
+			});
+		$input
+			.off('blur.ClearError')
+			.one('blur.ClearError', function() {
+				if ($(this).val().trim() !== '') {
+					$unit.trigger('input.ClearError');
+				}
+			});
+	}
+	return $unit;
 }
 
 function toDataUrl(url, callback) {

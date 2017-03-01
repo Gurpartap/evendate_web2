@@ -690,7 +690,8 @@ label.-text_color_primary {color: #3e4d66; color: var(--color_primary);}
 
 p.-text_color_bubblegum,
 small.-text_color_bubblegum,
-label.-text_color_bubblegum,
+label.-text_color_bubblegum {color: #f82969; color: var(--color_bubblegum);}
+
 :not(.-state_statistics) p.-text_color_accent,
 :not(.-state_statistics) span.-text_color_accent,
 :not(.-state_statistics) small.-text_color_accent,
@@ -698,7 +699,8 @@ label.-text_color_bubblegum,
 
 p.-text_color_bubblegum_alt,
 small.-text_color_bubblegum_alt,
-label.-text_color_bubblegum_alt,
+label.-text_color_bubblegum_alt {color: #ff5f9e; color: var(--color_bubblegum_alt);}
+
 :not(.-state_statistics) p.-text_color_accent_alt,
 :not(.-state_statistics) span.-text_color_accent_alt,
 :not(.-state_statistics) small.-text_color_accent_alt,
@@ -706,7 +708,8 @@ label.-text_color_bubblegum_alt,
 
 p.-text_color_franklin,
 small.-text_color_franklin,
-label.-text_color_franklin,
+label.-text_color_franklin {color: #28be84; color: var(--color_franklin)}
+
 .-state_statistics p.-text_color_accent,
 .-state_statistics span.-text_color_accent,
 .-state_statistics small.-text_color_accent,
@@ -714,7 +717,8 @@ label.-text_color_franklin,
 
 p.-text_color_franklin_alt,
 small.-text_color_franklin_alt,
-label.-text_color_franklin_alt,
+label.-text_color_franklin_alt {color: #23d792; color: var(--color_franklin_alt);}
+
 .-state_statistics p.-text_color_accent_alt,
 .-state_statistics span.-text_color_accent_alt,
 .-state_statistics small.-text_color_accent_alt,
@@ -1215,8 +1219,7 @@ fieldset:disabled .form_select {cursor: default}
 	vertical-align: middle;
 	width: 20px;
 	height: 20px;
-	border: 1px solid #9fa6b3;
-	border: 1px solid var(--color_primary_50);
+	border: 1px solid;
 	border-radius: 2px;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
@@ -1559,8 +1562,10 @@ fieldset:disabled .form_select {cursor: default}
 /* Form -status */
 
 .form_unit.-status_error,
+.form_unit.-status_error > .form_label,
+.form_unit.-status_error > .form_helptext {color: #ff6b00; color: var(--color_error);}
 .form_unit.-status_error > .form_input:-moz-placeholder,
-.form_unit.-status_error > .form_textarea:-moz-placeholder,
+.form_unit.-status_error > .form_textarea:-moz-placeholder {color: #ff6b00; color: var(--color_error);}
 .form_unit.-status_error > .form_input::-webkit-input-placeholder,
 .form_unit.-status_error > .form_textarea::-webkit-input-placeholder {color: #ff6b00; color: var(--color_error);}
 
