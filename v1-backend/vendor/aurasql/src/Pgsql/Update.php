@@ -17,7 +17,7 @@ use Aura\SqlQuery\Common;
  * @package Aura.SqlQuery
  *
  */
-class Update extends Common\Update implements Common\ReturningInterface
+class Update extends Common\Update implements Common\ReturningInterface, Common\QueryInterface
 {
     /**
      *

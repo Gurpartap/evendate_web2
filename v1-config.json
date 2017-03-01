@@ -58,7 +58,7 @@
     },
     "domain": "test.evendate.ru",
     "node_domain": "test.evendate.ru",
-    "node_path": "/var/www/html/evendate_web2/node",
+    "node_path": "/var/www/html/node",
     "schema": "http://"
   },
   "local": {
@@ -122,10 +122,10 @@
       "app_id": "7471a586-01f3-4eef-b989-c809700a8658",
       "rest_key": "Mjk5OGFiYzYtMDViOS00ZmMzLTkzNmMtMWVkMWJlNDllMTk0"
     },
-    "domain": "dev.evendate.org",
-    "node_domain": "dev.evendate.org",
+    "domain": "dev.evendate.io",
+    "node_domain": "dev.evendate.io",
     "test": {
-      "domain": "localhost",
+      "domain": "dev.evendate.io",
       "token": "EAAYDHIPuIBYBAPmwIZAk3INqbI1GhyRX8YAMjlirVpYjiIC3KKS09DwzcOtYwlqcC5iEpYwlUdHczjtKoqgpXjfpFloWcYuHBbf6u8sCSH4DEK2AnfDicVghW5eKidZB3BMpvBfUxCQPZACp7KXbZAq5TPg6VT9QGmkPOAdthQZDZDundefinedicFo7r3WzgpHnvBs35DOpBKjSlotpAN5"
     },
     "schema": "http://",
@@ -198,7 +198,7 @@
     },
     "domain": "evendate.ru",
     "node_domain": "evendate.ru",
-    "node_path": "/var/www/html/evendate_web2/node",
+    "node_path": "/var/www/html/node",
     "schema": "https://"
   }
 }

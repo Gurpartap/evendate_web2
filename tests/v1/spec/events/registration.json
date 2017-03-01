@@ -1,0 +1,8 @@
+{
+  "registration_fields": [
+    {"uuid": "", "value": "hren"}
+  ],
+  "tickets": [
+    {"uuid": null, "count": 10}
+  ]
+}

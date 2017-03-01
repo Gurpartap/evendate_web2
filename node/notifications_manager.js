@@ -1,5 +1,4 @@
-var apn = require('apn'),
-    rest = require('restler'),
+var rest = require('restler'),
     gcm,
     Utils = require('./utils'),
     GCM = require('gcm').GCM;

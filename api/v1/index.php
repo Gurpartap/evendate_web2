@@ -14,7 +14,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS'){
 	return;
 }
 
-
 try {
 
 	require_once "{$BACKEND_FULL_PATH}/bin/Class.Result.php";
@@ -73,6 +72,10 @@ try {
 	$__order_by  = App::$__ORDER_BY;
 	$__pagination  = array('length' => $__length, 'offset' => $__offset);
 	$__modules = array();
+
+	if (isset($__request['tz']) && $_request_method == 'GET'){
+		App::setSessionTimezone($__request['tz']);
+	}
 
 	require_once "{$BACKEND_FULL_PATH}/{$_class_name}/{$_class_name}.php";
 

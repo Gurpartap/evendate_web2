@@ -3,7 +3,7 @@
 class DBQueryException extends AbstractException{
 	const ERROR_CODE = 10001;
 	const HTTP_CODE = 500;
-	public function __construct($message, \PDO $db, $user_message = '', $file = '', $file_line = 0){
+	public function __construct($message, ExtendedPDO $db, $user_message = '', $file = '', $file_line = 0){
 		if (is_array($message)){
 			$message = implode(';', $message);
 		}elseif ($message == '' || $message == null){
@@ -14,7 +14,6 @@ class DBQueryException extends AbstractException{
 		}else{
 			$this->user_message = $user_message;
 		}
-		$description = "FILE:\n {$this->getFile()}\n LINE: \n {$this->getLine()}\n Description: \n {$this->message}.\n Trace: \n {$this->getTraceAsString()}";
 		parent::__construct($message, $db, $file, $file_line);
 	}
 }

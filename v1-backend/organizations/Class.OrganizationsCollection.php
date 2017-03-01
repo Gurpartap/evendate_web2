@@ -7,7 +7,7 @@ class OrganizationsCollection extends AbstractCollection
 	private $user;
 
 
-	public static function filter(PDO $db,
+	public static function filter(ExtendedPDO $db,
 																AbstractUser $user = null,
 																array $filters = null,
 																array $fields = null,
@@ -47,6 +47,16 @@ class OrganizationsCollection extends AbstractCollection
 				case 'type_id': {
 					$q_get_organizations->where('view_organizations.organization_type_id = :type_id');
 					$statement_array[':type_id'] = $value;
+					break;
+				}
+				case 'city_id': {
+					$q_get_organizations->where('view_organizations.city_id = :city_id');
+					$statement_array[':city_id'] = $value;
+					break;
+				}
+				case 'country_id': {
+					$q_get_organizations->where('view_organizations.country_id = :country_id');
+					$statement_array[':city_id'] = $value;
 					break;
 				}
 				case 'q': {
@@ -165,9 +175,9 @@ class OrganizationsCollection extends AbstractCollection
 		}
 
 		if (isset($fields[Organization::NEW_EVENTS_COUNT_FIELD_NAME]) ||
-				isset($fields[Organization::IS_SUBSCRIBED_FIELD_NAME])
-				|| isset($fields[Organization::SUBSCRIPTION_ID_FIELD_NAME])
-				|| $return_one
+			isset($fields[Organization::IS_SUBSCRIBED_FIELD_NAME])
+			|| isset($fields[Organization::SUBSCRIPTION_ID_FIELD_NAME])
+			|| $return_one
 		) {
 			$statement_array[':user_id'] = $user->getId();
 		}
@@ -216,13 +226,9 @@ class OrganizationsCollection extends AbstractCollection
 		}
 
 
-//		echo $q_get_organizations->getStatement();
-		$p_search = $db->prepare($q_get_organizations->getStatement());
-		$p_search->execute($statement_array);
-
-//		print_r($statement_array);
-
-		$organizations = $p_search->fetchAll(PDO::FETCH_CLASS, $instance_class_name);
+		$organizations = $p_search = $db
+			->prepareExecute($q_get_organizations, '', $statement_array)
+			->fetchAll(PDO::FETCH_CLASS, $instance_class_name);
 
 		if ($return_one) {
 			if (count($organizations) < 1) throw new LogicException('CANT_FIND_ORGANIZATION');
@@ -238,7 +244,7 @@ class OrganizationsCollection extends AbstractCollection
 		return new Result(true, '', $result_array);
 	}
 
-	public static function one(PDO $db,
+	public static function one(ExtendedPDO $db,
 														 AbstractUser $user,
 														 int $id,
 														 array $fields = null,
@@ -253,7 +259,7 @@ class OrganizationsCollection extends AbstractCollection
 	}
 
 
-	public static function onePrivate(PDO $db,
+	public static function onePrivate(ExtendedPDO $db,
 																		AbstractUser $user,
 																		int $id,
 																		string $uuid = null,

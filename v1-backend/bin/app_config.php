@@ -93,12 +93,12 @@ class App
 		return self::$obj->$name;
 	}
 
-	public static function queryFactory() : QueryFactory
+	public static function queryFactory(): QueryFactory
 	{
 		return self::$QUERY_FACTORY;
 	}
 
-	static function buildGlobal(PDO $db)
+	static function buildGlobal(ExtendedPDO $db)
 	{
 		self::$RESPONSE_FORMAT = (isset($_REQUEST['format']) && $_REQUEST['format'] == 'xml') ? 'xml' : 'json';
 		self::$RESPONSE_DOWNLOAD = (isset($_REQUEST['download']) && ($_REQUEST['download'] == '1' || $_REQUEST['download'] == 'true')) ? true : false;
@@ -160,7 +160,7 @@ class App
 		}
 	}
 
-	static public function DB() : PDO
+	static public function DB() : ExtendedPDO
 	{
 		return self::$__DB;
 	}
@@ -209,14 +209,6 @@ class App
 		return $randomString;
 	}
 
-	public static function createMysqlDB()
-	{
-		global $__mysql_db;
-		$driver_options = array(PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION);
-		$mysql_opts = App::$SETTINGS->mysql_db;
-		$__mysql_db = new PDO('mysql:host=' . $mysql_opts->host . ';dbname=' . $mysql_opts->database . ';charset=utf8;port=' . $mysql_opts->port, $mysql_opts->user, $mysql_opts->password, $driver_options);
-	}
-
 	public static function getAuthURLs(string $type)
 	{
 		$is_mobile = $type == 'mobile' ? 'true' : 'false';
@@ -246,6 +238,15 @@ class App
 
 	public static function prepareStatisticsData()
 	{
+
+	}
+
+	public static function setSessionTimezone($tz)
+	{
+		$tz = trim($tz);
+		if (preg_match('/^[\-\+]\d\d:\d\d$/', $tz)) {
+			self::$__DB->query("SET SESSION TIME ZONE INTERVAL '+08:00' HOUR TO MINUTE;");
+		} else throw new InvalidArgumentException('BAD_TIMEZONE');
 
 	}
 }

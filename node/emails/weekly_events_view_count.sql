@@ -6,7 +6,7 @@ FROM stat_events
   AND events.organization_id = $3
   INNER JOIN stat_event_types ON stat_events.stat_type_id = stat_event_types.id
                                  AND stat_event_types.entity = 'event'
-                                 AND stat_event_types.type_code = 'view'
+                                 AND stat_event_types.type_code = 'view_detail'
 
   RIGHT OUTER JOIN (SELECT *
                     FROM generate_series(to_timestamp($2, 'YYYY-MM-DD'),

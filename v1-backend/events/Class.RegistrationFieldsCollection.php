@@ -6,7 +6,7 @@ class RegistrationFieldsCollection extends AbstractCollection
 {
 
 	public static function filter(
-		PDO $db,
+		ExtendedPDO $db,
 		AbstractUser $user = null,
 		array $filters = null,
 		array $fields = null,
@@ -47,12 +47,7 @@ class RegistrationFieldsCollection extends AbstractCollection
 		}
 
 
-		$p_get_notifications = $db->prepare($q_get_fields->getStatement());
-		$result = $p_get_notifications->execute($statement_array);
-
-		if ($result === FALSE) throw new DBQueryException(implode(';', $db->errorInfo()), $db);
-
-		$registration_fields = $p_get_notifications->fetchAll(PDO::FETCH_CLASS, 'RegistrationField');
+		$registration_fields = $db->prepareExecute($q_get_fields, '', $statement_array)->fetchAll(PDO::FETCH_CLASS, 'RegistrationField');
 		$result_fields = array();
 
 		foreach ($registration_fields as $field) {

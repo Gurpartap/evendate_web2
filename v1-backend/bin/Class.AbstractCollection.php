@@ -2,15 +2,15 @@
 
 abstract class AbstractCollection{
 
-	public abstract static function filter(PDO $db,
+	public abstract static function filter(ExtendedPDO $db,
 																				 AbstractUser $user = null,
-	                                       array $filters = null,
-	                                       array $fields = null,
-	                                       array $pagination = null,
-	                                       array $order_by = array('created_at'));
+																				 array $filters = null,
+																				 array $fields = null,
+																				 array $pagination = null,
+																				 array $order_by = array('created_at'));
 
 
-	public static function one(PDO $db,
+	public static function one(ExtendedPDO $db,
 														 AbstractUser $user,
 	                           int $id,
 	                           array $fields = null){
