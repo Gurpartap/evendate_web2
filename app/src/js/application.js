@@ -207,25 +207,29 @@ ServerConnection = (function() {
 	 *
 	 * @param {string} url
 	 * @param {AJAXData} ajax_data
+	 * @param {boolean} [is_payload]
 	 * @param {AJAXCallback} [success]
 	 * @param {function} [error]
 	 * @returns {jqPromise}
 	 */
-	ServerConnection.prototype.updateData = function(url, ajax_data, success, error) {
-		return this.dealAjax(ServerConnection.HTTP_METHODS.PUT, url, ajax_data, 'application/json', success, error);
+	ServerConnection.prototype.updateData = function(url, ajax_data, is_payload, success, error) {
+		if(is_payload){
+			return this.dealAjax(ServerConnection.HTTP_METHODS.PUT, url, JSON.stringify(ajax_data), 'application/json', success, error);
+		}
+		return this.dealAjax(ServerConnection.HTTP_METHODS.PUT, url, ajax_data, 'application/x-www-form-urlencoded; charset=UTF-8', success, error);
 	};
 	/**
 	 *
 	 * @param {string} url
 	 * @param {AJAXData} ajax_data
-	 * @param {boolean} is_payload
+	 * @param {boolean} [is_payload]
 	 * @param {AJAXCallback} [success]
 	 * @param {function} [error]
 	 * @returns {jqPromise}
 	 */
 	ServerConnection.prototype.addData = function(url, ajax_data, is_payload, success, error) {
 		if(is_payload){
-			return this.dealAjax(ServerConnection.HTTP_METHODS.POST, url, ajax_data, 'application/json', success, error);
+			return this.dealAjax(ServerConnection.HTTP_METHODS.POST, url, JSON.stringify(ajax_data), 'application/json', success, error);
 		}
 		return this.dealAjax(ServerConnection.HTTP_METHODS.POST, url, ajax_data, 'application/x-www-form-urlencoded; charset=UTF-8', success, error);
 	};

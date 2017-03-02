@@ -2302,28 +2302,41 @@ Fields = (function() {
 /**
  *
  * @abstract
+ * @class
  * @implements EntityInterface
  */
-function OneEntity() {}
-/**
- *
- * @param {(Array|object)} data
- * @returns {OneEntity}
- */
-OneEntity.prototype.setData = function(data) {
-	var field;
-	if (Array.isArray(data)) {
-		data = data[0];
-	}
-	for (field in data) {
-		if (this[field] instanceof EntitiesCollection || this[field] instanceof OneEntity) {
-			this[field].setData(data[field]);
-		} else {
-			this[field] = data[field];
+OneEntity = (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs OneEntity
+	 */
+	function OneEntity() {}
+	/**
+	 *
+	 * @param {(Array|object)} data
+	 * @returns {OneEntity}
+	 */
+	OneEntity.prototype.setData = function(data) {
+		var field;
+		if (Array.isArray(data)) {
+			data = data[0];
 		}
-	}
-	return this;
-};
+		for (field in data) {
+			if (data.hasOwnProperty(field) && this.hasOwnProperty(field)) {
+				if ((this[field] instanceof EntitiesCollection || this[field] instanceof OneEntity) && data[field] != null) {
+					this[field].setData(data[field]);
+				} else {
+					this[field] = data[field];
+				}
+			}
+		}
+		return this;
+	};
+	
+	return OneEntity;
+}());
+
 /**
  * @requires Class.OneEntity.js
  */
@@ -3036,7 +3049,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @returns {jqPromise}
 	 */
 	OneEvent.createEvent = function(new_event_data, success, error) {
-		return __APP.SERVER.addData('/api/v1/events/', JSON.stringify(new_event_data), true, success, error);
+		return __APP.SERVER.addData('/api/v1/events/', new_event_data, true, success, error);
 	};
 	/**
 	 *
@@ -3047,7 +3060,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @returns {jqPromise}
 	 */
 	OneEvent.updateEvent = function(event_id, data, success, error) {
-		return __APP.SERVER.updateData('/api/v1/events/' + event_id, JSON.stringify(data), success, error);
+		return __APP.SERVER.updateData('/api/v1/events/' + event_id, data, true, success, error);
 	};
 	/**
 	 *
@@ -3079,7 +3092,7 @@ OneEvent = extending(OneEntity, (function() {
 				}
 			}
 		});
-		return __APP.SERVER.updateData('/api/v1/events/' + event_id + '/status', data, function() {
+		return __APP.SERVER.updateData('/api/v1/events/' + event_id + '/status', data, false, function() {
 			if (success && typeof success == 'function') {
 				success.call(self, data);
 			}
@@ -3122,6 +3135,19 @@ OneEvent = extending(OneEntity, (function() {
 	 */
 	OneEvent.deleteEventNotification = function(event_id, notification_uuid, success) {
 		return __APP.SERVER.deleteData('/api/v1/events/' + event_id + '/notifications/' + notification_uuid, {}, success);
+	};
+	/**
+	 *
+	 * @param {(string|number)} event_id
+	 * @param {object} registration_fields
+	 * @param {AJAXCallback} [success]
+	 * @return {jqPromise}
+	 */
+	OneEvent.registerToEvent = function(event_id, registration_fields, success) {
+		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/orders', {
+			registration_fields: registration_fields,
+			tickets: [{count: 1}]
+		}, true, success);
 	};
 	/**
 	 *
@@ -3203,6 +3229,15 @@ OneEvent = extending(OneEntity, (function() {
 	 */
 	OneEvent.prototype.deleteNotification = function(notification_uuid, success) {
 		return this.constructor.deleteEventNotification(this.id, notification_uuid, success);
+	};
+	/**
+	 *
+	 * @param {object} registration_fields
+	 * @param {AJAXCallback} [success]
+	 * @return {jqPromise}
+	 */
+	OneEvent.prototype.registerToEvent = function(registration_fields, success) {
+		return this.constructor.registerToEvent(this.id, registration_fields, success);
 	};
 	
 	return OneEvent;
@@ -3791,7 +3826,7 @@ OneOrganization.fetchOrganization = function(org_id, fields, success) {
  * @returns {jqPromise}
  */
 OneOrganization.createOrganization = function(new_organization_data, success) {
-	return __APP.SERVER.addData('/api/v1/organizations/', JSON.stringify(new_organization_data), true, success);
+	return __APP.SERVER.addData('/api/v1/organizations/', new_organization_data, true, success);
 };
 /**
  *
@@ -3801,7 +3836,7 @@ OneOrganization.createOrganization = function(new_organization_data, success) {
  * @returns {jqPromise}
  */
 OneOrganization.updateOrganization = function(organization_id, organization_data, success) {
-	return __APP.SERVER.updateData('/api/v1/organizations/' + organization_id, JSON.stringify(organization_data), success);
+	return __APP.SERVER.updateData('/api/v1/organizations/' + organization_id, organization_data, true, success);
 };
 /**
  *
@@ -6030,7 +6065,7 @@ function AddToFavoriteButton(id, options) {
 			subscribed: __LOCALES.ru_RU.TEXTS.BUTTON.FAVORED
 		},
 		colors: {
-			subscribe: '-color_neutral_accent',
+			subscribe: '-color_marginal_accent',
 			unsubscribe: '-color_accent',
 			subscribed: '-color_accent'
 		},
@@ -7093,17 +7128,14 @@ PreviewRegistrationModal = extending(AbstractModal, (function() {
 	
 	/**
 	 *
-	 * @param {string} event_title
-	 * @param {RegistrationFieldsCollection|Array<RegistrationFieldModel>} registration_fields
+	 * @param {OneEvent} event
 	 * @constructor
 	 * @constructs PreviewRegistrationModal
 	 */
-	function PreviewRegistrationModal(event_title, registration_fields) {
+	function PreviewRegistrationModal(event) {
 		AbstractModal.call(this);
-		this.event_id = '';
+		this.event = event;
 		this.title = 'Регистрация';
-		this.event_title = event_title;
-		this.registration_fields = registration_fields;
 	}
 	/**
 	 *
@@ -7115,10 +7147,9 @@ PreviewRegistrationModal = extending(AbstractModal, (function() {
 			width: 400,
 			content: tmpl('modal-registration-content', {
 				modal_id: this.id,
-				event_id: this.event_id,
 				required_star: tmpl('required-star'),
-				event_title: this.event_title,
-				fields: $.makeSet(this.registration_fields.map(self.buildRegistrationField))
+				event_title: this.event.title,
+				fields: $.makeSet(this.event.registration_fields.map(self.buildRegistrationField.bind(self)))
 			})
 		});
 		
@@ -7176,33 +7207,36 @@ RegistrationModal = extending(PreviewRegistrationModal, (function() {
 	
 	/**
 	 *
-	 * @param {(string|number)} event_id
-	 * @param {string} event_title
-	 * @param {RegistrationFieldsCollection|Array<RegistrationFieldModel>} registration_fields
+	 * @param {OneEvent} event
 	 * @constructor
 	 * @constructs RegistrationModal
 	 */
-	function RegistrationModal(event_id, event_title, registration_fields) {
-		PreviewRegistrationModal.call(this, event_title, registration_fields);
-		this.event_id = event_id;
+	function RegistrationModal(event) {
+		PreviewRegistrationModal.call(this, event);
 	}
 	/**
 	 *
 	 * @return {RegistrationModal}
 	 */
 	RegistrationModal.prototype.init = function() {
-		
+		var self = this;
 		
 		this.content.find('.RegisterButton').on('click.Register', function() {
-			var $form = $(this).closest('.RegistrationModalForm'),
-				send_data;
+			var $register_button = $(this),
+				$form = $register_button.closest('.RegistrationModalForm');
 			
-			
+			$register_button.attr('disabled', true);
 			if (isFormValid($form)) {
-				send_data = $form.serializeForm();
-				console.log(send_data);
+				OneEvent.registerToEvent(self.event.id, $form.serializeForm()).always(function() {
+					$register_button.removeAttr('disabled');
+				}).done(function() {
+					self.hide();
+				});
+			} else {
+				$register_button.removeAttr('disabled');
 			}
 		});
+		
 		bindRippleEffect(this.content);
 		this.__init();
 		
@@ -8496,146 +8530,6 @@ StatisticsPage.prototype.updateScoreboards = function($scoreboards_wrapper, data
 /**
  *
  * @constructor
- * @augments StatisticsPage
- * @param {(string|number)} event_id
- */
-function StatisticsEventPage(event_id) {
-	StatisticsPage.apply(this, arguments);
-	this.id = event_id;
-	this.event = new OneEvent(this.id);
-}
-StatisticsEventPage.extend(StatisticsPage);
-/**
- * @requires Class.StatisticsEventPage.js
- */
-/**
- *
- * @constructor
- * @augments StatisticsEventPage
- * @param {(string|number)} event_id
- */
-function StatisticsEventAuditoryPage(event_id) {
-	StatisticsEventPage.apply(this, arguments);
-}
-StatisticsEventAuditoryPage.extend(StatisticsEventPage);
-
-StatisticsEventAuditoryPage.prototype.render = function() {};
-/**
- * @requires Class.StatisticsEventPage.js
- */
-/**
- *
- * @constructor
- * @augments StatisticsEventPage
- * @param {(string|number)} event_id
- */
-function StatisticsEventEditPage(event_id) {
-	StatisticsEventPage.apply(this, arguments);
-}
-StatisticsEventEditPage.extend(StatisticsEventPage);
-
-StatisticsEventEditPage.prototype.render = function() {};
-/**
- * @requires Class.StatisticsEventPage.js
- */
-/**
- *
- * @constructor
- * @augments StatisticsEventPage
- * @param {(string|number)} event_id
- */
-function StatisticsEventOverviewPage(event_id) {
-	StatisticsEventPage.apply(this, arguments);
-	
-	this.graphics_stats = new EventStatistics(this.id);
-	this.scoreboards_stats = new EventStatistics(this.id);
-}
-StatisticsEventOverviewPage.extend(StatisticsEventPage);
-
-StatisticsEventOverviewPage.prototype.fetchData = function() {
-	return this.fetching_data_defer = this.event.fetchEvent([
-		'image_horizontal_medium_url',
-		'organization_short_name',
-		'favored_users_count',
-		'is_same_time',
-		'dates'
-	]);
-};
-
-StatisticsEventOverviewPage.prototype.render = function() {
-	var PAGE = this;
-	
-	if(__APP.USER.id === -1){
-		__APP.changeState('/feed/actual', true, true);
-		return null;
-	}
-	__APP.changeTitle([{
-		title: 'Организации',
-		page: '/statistics'
-	}, {
-		title: this.event.organization_short_name,
-		page: '/statistics/organization/' + this.event.organization_id
-	}, this.event.title]);
-	
-	this.$wrapper.html(tmpl('eventstat-overview', $.extend(true, {}, this.event, {
-		dates_block: tmpl('eventstat-overview-datetime', {
-			date: displayDateRange(this.event.first_event_date, this.event.last_event_date),
-			time: this.event.is_same_time ? displayTimeRange(this.event.dates[0].start_time, this.event.dates[0].end_time) : 'Разное время'
-		})
-	})));
-	this.$wrapper.find('.EventStatAreaCharts').children('.AreaChart').html(tmpl('loader'));
-	
-	this.scoreboards_stats.fetchStatistics(Statistics.SCALES.OVERALL, false, ['notifications_sent', 'view', 'fave', 'view_detail', 'fave_conversion', 'open_conversion'], null, function(data) {
-		var scoreboards_data = {numbers: {}};
-		$.each(data, function(field, stats) {
-			scoreboards_data.numbers[field] = stats[0].value
-		});
-		PAGE.updateScoreboards(PAGE.$wrapper.find('.EventstatsScoreboards'), scoreboards_data, {
-			'fave': 'Добавлений в избранное',
-			'view': 'Просмотров события'
-		}, ['fave', 'view']);
-		PAGE.updateScoreboards(PAGE.$wrapper.find('.EventstatsBigScoreboards'), scoreboards_data, {
-			'notifications_sent': 'Уведомлений отправлено',
-			'view': 'Просмотров',
-			'view_detail': 'Открытий',
-			'open_conversion': 'Конверсия открытий',
-			'fave': 'Добавлений',
-			'fave_conversion': 'Конверсия добавлений'
-		}, ['notifications_sent', 'view', 'view_detail', 'open_conversion', 'fave', 'fave_conversion'], 'big');
-	});
-	
-	this.graphics_stats.fetchStatistics(Statistics.SCALES.DAY, moment(__APP.EVENDATE_BEGIN, 'DD-MM-YYYY').format(), ['notifications_sent', 'view', 'fave', 'view_detail', 'fave_conversion', 'open_conversion'], null, function(data) {
-		PAGE.buildAreaCharts(data, {
-			rangeSelector: {
-				selected: 1
-			}
-		});
-	});
-	
-	__APP.MODALS.bindCallModal(PAGE.$wrapper);
-	bindPageLinks(PAGE.$wrapper);
-};
-/**
- * @requires Class.StatisticsEventPage.js
- */
-/**
- *
- * @constructor
- * @augments StatisticsEventPage
- * @param {(string|number)} event_id
- */
-function StatisticsEventPromotionPage(event_id) {
-	StatisticsEventPage.apply(this, arguments);
-}
-StatisticsEventPromotionPage.extend(StatisticsEventPage);
-
-StatisticsEventPromotionPage.prototype.render = function() {};
-/**
- * @requires ../Class.StatisticsPage.js
- */
-/**
- *
- * @constructor
  * @abstract
  * @augments StatisticsPage
  * @param {(string|number)} org_id
@@ -9068,6 +8962,146 @@ StatisticsOrganizationSupportPage.extend(StatisticsOrganizationPage);
 
 StatisticsOrganizationSupportPage.prototype.render = function() {};
 /**
+ * @requires ../Class.StatisticsPage.js
+ */
+/**
+ *
+ * @constructor
+ * @augments StatisticsPage
+ * @param {(string|number)} event_id
+ */
+function StatisticsEventPage(event_id) {
+	StatisticsPage.apply(this, arguments);
+	this.id = event_id;
+	this.event = new OneEvent(this.id);
+}
+StatisticsEventPage.extend(StatisticsPage);
+/**
+ * @requires Class.StatisticsEventPage.js
+ */
+/**
+ *
+ * @constructor
+ * @augments StatisticsEventPage
+ * @param {(string|number)} event_id
+ */
+function StatisticsEventAuditoryPage(event_id) {
+	StatisticsEventPage.apply(this, arguments);
+}
+StatisticsEventAuditoryPage.extend(StatisticsEventPage);
+
+StatisticsEventAuditoryPage.prototype.render = function() {};
+/**
+ * @requires Class.StatisticsEventPage.js
+ */
+/**
+ *
+ * @constructor
+ * @augments StatisticsEventPage
+ * @param {(string|number)} event_id
+ */
+function StatisticsEventEditPage(event_id) {
+	StatisticsEventPage.apply(this, arguments);
+}
+StatisticsEventEditPage.extend(StatisticsEventPage);
+
+StatisticsEventEditPage.prototype.render = function() {};
+/**
+ * @requires Class.StatisticsEventPage.js
+ */
+/**
+ *
+ * @constructor
+ * @augments StatisticsEventPage
+ * @param {(string|number)} event_id
+ */
+function StatisticsEventOverviewPage(event_id) {
+	StatisticsEventPage.apply(this, arguments);
+	
+	this.graphics_stats = new EventStatistics(this.id);
+	this.scoreboards_stats = new EventStatistics(this.id);
+}
+StatisticsEventOverviewPage.extend(StatisticsEventPage);
+
+StatisticsEventOverviewPage.prototype.fetchData = function() {
+	return this.fetching_data_defer = this.event.fetchEvent([
+		'image_horizontal_medium_url',
+		'organization_short_name',
+		'favored_users_count',
+		'is_same_time',
+		'dates'
+	]);
+};
+
+StatisticsEventOverviewPage.prototype.render = function() {
+	var PAGE = this;
+	
+	if(__APP.USER.id === -1){
+		__APP.changeState('/feed/actual', true, true);
+		return null;
+	}
+	__APP.changeTitle([{
+		title: 'Организации',
+		page: '/statistics'
+	}, {
+		title: this.event.organization_short_name,
+		page: '/statistics/organization/' + this.event.organization_id
+	}, this.event.title]);
+	
+	this.$wrapper.html(tmpl('eventstat-overview', $.extend(true, {}, this.event, {
+		dates_block: tmpl('eventstat-overview-datetime', {
+			date: displayDateRange(this.event.first_event_date, this.event.last_event_date),
+			time: this.event.is_same_time ? displayTimeRange(this.event.dates[0].start_time, this.event.dates[0].end_time) : 'Разное время'
+		})
+	})));
+	this.$wrapper.find('.EventStatAreaCharts').children('.AreaChart').html(tmpl('loader'));
+	
+	this.scoreboards_stats.fetchStatistics(Statistics.SCALES.OVERALL, false, ['notifications_sent', 'view', 'fave', 'view_detail', 'fave_conversion', 'open_conversion'], null, function(data) {
+		var scoreboards_data = {numbers: {}};
+		$.each(data, function(field, stats) {
+			scoreboards_data.numbers[field] = stats[0].value
+		});
+		PAGE.updateScoreboards(PAGE.$wrapper.find('.EventstatsScoreboards'), scoreboards_data, {
+			'fave': 'Добавлений в избранное',
+			'view': 'Просмотров события'
+		}, ['fave', 'view']);
+		PAGE.updateScoreboards(PAGE.$wrapper.find('.EventstatsBigScoreboards'), scoreboards_data, {
+			'notifications_sent': 'Уведомлений отправлено',
+			'view': 'Просмотров',
+			'view_detail': 'Открытий',
+			'open_conversion': 'Конверсия открытий',
+			'fave': 'Добавлений',
+			'fave_conversion': 'Конверсия добавлений'
+		}, ['notifications_sent', 'view', 'view_detail', 'open_conversion', 'fave', 'fave_conversion'], 'big');
+	});
+	
+	this.graphics_stats.fetchStatistics(Statistics.SCALES.DAY, moment(__APP.EVENDATE_BEGIN, 'DD-MM-YYYY').format(), ['notifications_sent', 'view', 'fave', 'view_detail', 'fave_conversion', 'open_conversion'], null, function(data) {
+		PAGE.buildAreaCharts(data, {
+			rangeSelector: {
+				selected: 1
+			}
+		});
+	});
+	
+	__APP.MODALS.bindCallModal(PAGE.$wrapper);
+	bindPageLinks(PAGE.$wrapper);
+};
+/**
+ * @requires Class.StatisticsEventPage.js
+ */
+/**
+ *
+ * @constructor
+ * @augments StatisticsEventPage
+ * @param {(string|number)} event_id
+ */
+function StatisticsEventPromotionPage(event_id) {
+	StatisticsEventPage.apply(this, arguments);
+}
+StatisticsEventPromotionPage.extend(StatisticsEventPage);
+
+StatisticsEventPromotionPage.prototype.render = function() {};
+/**
  * @requires ../Class.Page.js
  */
 /**
@@ -9418,11 +9452,11 @@ RedactEventPage.prototype.init = function() {
 	});
 	
 	PAGE.$wrapper.find('.RegistrationPreview').on('click.RegistrationPreview', function() {
-		var form_data = $(this).closest('fieldset').serializeForm(),
-			fields = new RegistrationFieldsCollection(),
+		var form_data = $(this).closest('form').serializeForm(),
+			event = new OneEvent(),
 			modal;
 		
-		fields.setData(form_data.registration_fields.sort().map(function(field) {
+		form_data.registration_fields = (new RegistrationFieldsCollection()).setData(form_data.registration_fields.sort().map(function(field) {
 			return {
 				uuid: guid(),
 				type: form_data['registration_'+field+'_field_type'],
@@ -9430,8 +9464,9 @@ RedactEventPage.prototype.init = function() {
 				required: form_data['registration_'+field+'_field_required']
 			};
 		}));
+		event.setData(form_data);
 		
-		modal = new PreviewRegistrationModal($(this).closest('form').find('#edit_event_title').val(), fields);
+		modal = new PreviewRegistrationModal(event);
 		modal.show();
 	});
 	
@@ -11632,25 +11667,29 @@ ServerConnection = (function() {
 	 *
 	 * @param {string} url
 	 * @param {AJAXData} ajax_data
+	 * @param {boolean} [is_payload]
 	 * @param {AJAXCallback} [success]
 	 * @param {function} [error]
 	 * @returns {jqPromise}
 	 */
-	ServerConnection.prototype.updateData = function(url, ajax_data, success, error) {
-		return this.dealAjax(ServerConnection.HTTP_METHODS.PUT, url, ajax_data, 'application/json', success, error);
+	ServerConnection.prototype.updateData = function(url, ajax_data, is_payload, success, error) {
+		if(is_payload){
+			return this.dealAjax(ServerConnection.HTTP_METHODS.PUT, url, JSON.stringify(ajax_data), 'application/json', success, error);
+		}
+		return this.dealAjax(ServerConnection.HTTP_METHODS.PUT, url, ajax_data, 'application/x-www-form-urlencoded; charset=UTF-8', success, error);
 	};
 	/**
 	 *
 	 * @param {string} url
 	 * @param {AJAXData} ajax_data
-	 * @param {boolean} is_payload
+	 * @param {boolean} [is_payload]
 	 * @param {AJAXCallback} [success]
 	 * @param {function} [error]
 	 * @returns {jqPromise}
 	 */
 	ServerConnection.prototype.addData = function(url, ajax_data, is_payload, success, error) {
 		if(is_payload){
-			return this.dealAjax(ServerConnection.HTTP_METHODS.POST, url, ajax_data, 'application/json', success, error);
+			return this.dealAjax(ServerConnection.HTTP_METHODS.POST, url, JSON.stringify(ajax_data), 'application/json', success, error);
 		}
 		return this.dealAjax(ServerConnection.HTTP_METHODS.POST, url, ajax_data, 'application/x-www-form-urlencoded; charset=UTF-8', success, error);
 	};

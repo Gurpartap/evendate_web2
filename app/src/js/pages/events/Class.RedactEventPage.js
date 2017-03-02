@@ -349,11 +349,11 @@ RedactEventPage.prototype.init = function() {
 	});
 	
 	PAGE.$wrapper.find('.RegistrationPreview').on('click.RegistrationPreview', function() {
-		var form_data = $(this).closest('fieldset').serializeForm(),
-			fields = new RegistrationFieldsCollection(),
+		var form_data = $(this).closest('form').serializeForm(),
+			event = new OneEvent(),
 			modal;
 		
-		fields.setData(form_data.registration_fields.sort().map(function(field) {
+		form_data.registration_fields = (new RegistrationFieldsCollection()).setData(form_data.registration_fields.sort().map(function(field) {
 			return {
 				uuid: guid(),
 				type: form_data['registration_'+field+'_field_type'],
@@ -361,8 +361,9 @@ RedactEventPage.prototype.init = function() {
 				required: form_data['registration_'+field+'_field_required']
 			};
 		}));
+		event.setData(form_data);
 		
-		modal = new PreviewRegistrationModal($(this).closest('form').find('#edit_event_title').val(), fields);
+		modal = new PreviewRegistrationModal(event);
 		modal.show();
 	});
 	

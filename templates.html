@@ -957,9 +957,7 @@
 				{organization_avatar_block}
 				<a href="/event/{id}" class="link Link"><h3 class="feed_event_title">{title}</h3></a>
 				<div class="feed_event_buttons">
-					<!--<button class="feed_event_button fa_icon fa-share-alt -empty DropdownButton" type="button" data-dropdown="share_event_{id}" data-dd-pos-x="-100" data-dd-pos-y="5" data-dd-width="130"></button>-->
 					<button class="feed_event_button -empty HideEvent" type="button" data-event-id="{id}">×</button>
-					<div class="dropdown_box DropdownBox" data-dropdown_id="share_event_{id}"></div>
 				</div>
 			</header>
 			<footer class="feed_event_footer">
@@ -1295,7 +1293,6 @@
 		<h4>{event_title}</h4>
 		<p class="form_helptext">Чтобы зарегистрироваться на событие, заполните поля.</p>
 		<p class="form_helptext">Поля со звёздочкой ({required_star}) обязательны для заполнения.</p>
-		<input id="registration_form_{modal_id}_event_id" type="hidden" name="event_id" value="{event_id}">
 		{fields}
 		<div class="form_unit">
 			<input id="registration_form_{modal_id}_agreement" class="form_checkbox" type="checkbox" required>
@@ -1306,22 +1303,6 @@
 			<button class="button -color_accent -rounded RippleEffect RegisterButton" type="button"><span class="Text">Зарегистрироваться</span></button>
 		</div>
 	</form>
-</script>
-
-<script type="javascript/template" id="tmpl-modal-registration-input-field">
-	<div class="form_unit">
-		<label class="form_label" for="registration_form_{modal_id}_{uuid}_input"><span>{label}</span>{required_star}</label>
-		<input id="registration_form_{modal_id}_{uuid}_input" class="form_input Registration{type}Field" type="text" name="{uuid}" placeholder="{label}" {required}>
-		<p class="form_helptext">{description}</p>
-	</div>
-</script>
-
-<script type="javascript/template" id="tmpl-modal-registration-textarea-field">
-	<div class="form_unit">
-		<label class="form_label" for="registration_form_{modal_id}_{uuid}_textarea"><span>{label}</span>{required_star}</label>
-		<textarea id="registration_form_{modal_id}_{uuid}_textarea" class="form_textarea Registration{type}Field" name="{uuid}" placeholder="{label}" {required}></textarea>
-		<p class="form_helptext">{description}</p>
-	</div>
 </script>
 
 <script type="javascript/template" id="tmpl-modal-users-divider">

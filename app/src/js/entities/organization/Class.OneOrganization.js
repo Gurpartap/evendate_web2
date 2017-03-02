@@ -83,7 +83,7 @@ OneOrganization.fetchOrganization = function(org_id, fields, success) {
  * @returns {jqPromise}
  */
 OneOrganization.createOrganization = function(new_organization_data, success) {
-	return __APP.SERVER.addData('/api/v1/organizations/', JSON.stringify(new_organization_data), true, success);
+	return __APP.SERVER.addData('/api/v1/organizations/', new_organization_data, true, success);
 };
 /**
  *
@@ -93,7 +93,7 @@ OneOrganization.createOrganization = function(new_organization_data, success) {
  * @returns {jqPromise}
  */
 OneOrganization.updateOrganization = function(organization_id, organization_data, success) {
-	return __APP.SERVER.updateData('/api/v1/organizations/' + organization_id, JSON.stringify(organization_data), success);
+	return __APP.SERVER.updateData('/api/v1/organizations/' + organization_id, organization_data, true, success);
 };
 /**
  *

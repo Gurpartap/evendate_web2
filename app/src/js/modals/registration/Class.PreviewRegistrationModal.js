@@ -9,17 +9,14 @@ PreviewRegistrationModal = extending(AbstractModal, (function() {
 	
 	/**
 	 *
-	 * @param {string} event_title
-	 * @param {RegistrationFieldsCollection|Array<RegistrationFieldModel>} registration_fields
+	 * @param {OneEvent} event
 	 * @constructor
 	 * @constructs PreviewRegistrationModal
 	 */
-	function PreviewRegistrationModal(event_title, registration_fields) {
+	function PreviewRegistrationModal(event) {
 		AbstractModal.call(this);
-		this.event_id = '';
+		this.event = event;
 		this.title = 'Регистрация';
-		this.event_title = event_title;
-		this.registration_fields = registration_fields;
 	}
 	/**
 	 *
@@ -31,10 +28,9 @@ PreviewRegistrationModal = extending(AbstractModal, (function() {
 			width: 400,
 			content: tmpl('modal-registration-content', {
 				modal_id: this.id,
-				event_id: this.event_id,
 				required_star: tmpl('required-star'),
-				event_title: this.event_title,
-				fields: $.makeSet(this.registration_fields.map(self.buildRegistrationField))
+				event_title: this.event.title,
+				fields: $.makeSet(this.event.registration_fields.map(self.buildRegistrationField.bind(self)))
 			})
 		});
 		

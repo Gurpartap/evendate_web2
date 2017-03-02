@@ -114,7 +114,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @returns {jqPromise}
 	 */
 	OneEvent.createEvent = function(new_event_data, success, error) {
-		return __APP.SERVER.addData('/api/v1/events/', JSON.stringify(new_event_data), true, success, error);
+		return __APP.SERVER.addData('/api/v1/events/', new_event_data, true, success, error);
 	};
 	/**
 	 *
@@ -125,7 +125,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @returns {jqPromise}
 	 */
 	OneEvent.updateEvent = function(event_id, data, success, error) {
-		return __APP.SERVER.updateData('/api/v1/events/' + event_id, JSON.stringify(data), success, error);
+		return __APP.SERVER.updateData('/api/v1/events/' + event_id, data, true, success, error);
 	};
 	/**
 	 *
@@ -157,7 +157,7 @@ OneEvent = extending(OneEntity, (function() {
 				}
 			}
 		});
-		return __APP.SERVER.updateData('/api/v1/events/' + event_id + '/status', data, function() {
+		return __APP.SERVER.updateData('/api/v1/events/' + event_id + '/status', data, false, function() {
 			if (success && typeof success == 'function') {
 				success.call(self, data);
 			}
@@ -200,6 +200,19 @@ OneEvent = extending(OneEntity, (function() {
 	 */
 	OneEvent.deleteEventNotification = function(event_id, notification_uuid, success) {
 		return __APP.SERVER.deleteData('/api/v1/events/' + event_id + '/notifications/' + notification_uuid, {}, success);
+	};
+	/**
+	 *
+	 * @param {(string|number)} event_id
+	 * @param {object} registration_fields
+	 * @param {AJAXCallback} [success]
+	 * @return {jqPromise}
+	 */
+	OneEvent.registerToEvent = function(event_id, registration_fields, success) {
+		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/orders', {
+			registration_fields: registration_fields,
+			tickets: [{count: 1}]
+		}, true, success);
 	};
 	/**
 	 *
@@ -281,6 +294,15 @@ OneEvent = extending(OneEntity, (function() {
 	 */
 	OneEvent.prototype.deleteNotification = function(notification_uuid, success) {
 		return this.constructor.deleteEventNotification(this.id, notification_uuid, success);
+	};
+	/**
+	 *
+	 * @param {object} registration_fields
+	 * @param {AJAXCallback} [success]
+	 * @return {jqPromise}
+	 */
+	OneEvent.prototype.registerToEvent = function(registration_fields, success) {
+		return this.constructor.registerToEvent(this.id, registration_fields, success);
 	};
 	
 	return OneEvent;

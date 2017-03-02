@@ -9,33 +9,36 @@ RegistrationModal = extending(PreviewRegistrationModal, (function() {
 	
 	/**
 	 *
-	 * @param {(string|number)} event_id
-	 * @param {string} event_title
-	 * @param {RegistrationFieldsCollection|Array<RegistrationFieldModel>} registration_fields
+	 * @param {OneEvent} event
 	 * @constructor
 	 * @constructs RegistrationModal
 	 */
-	function RegistrationModal(event_id, event_title, registration_fields) {
-		PreviewRegistrationModal.call(this, event_title, registration_fields);
-		this.event_id = event_id;
+	function RegistrationModal(event) {
+		PreviewRegistrationModal.call(this, event);
 	}
 	/**
 	 *
 	 * @return {RegistrationModal}
 	 */
 	RegistrationModal.prototype.init = function() {
-		
+		var self = this;
 		
 		this.content.find('.RegisterButton').on('click.Register', function() {
-			var $form = $(this).closest('.RegistrationModalForm'),
-				send_data;
+			var $register_button = $(this),
+				$form = $register_button.closest('.RegistrationModalForm');
 			
-			
+			$register_button.attr('disabled', true);
 			if (isFormValid($form)) {
-				send_data = $form.serializeForm();
-				console.log(send_data);
+				OneEvent.registerToEvent(self.event.id, $form.serializeForm()).always(function() {
+					$register_button.removeAttr('disabled');
+				}).done(function() {
+					self.hide();
+				});
+			} else {
+				$register_button.removeAttr('disabled');
 			}
 		});
+		
 		bindRippleEffect(this.content);
 		this.__init();
 		

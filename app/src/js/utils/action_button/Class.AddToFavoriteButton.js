@@ -19,7 +19,7 @@ function AddToFavoriteButton(id, options) {
 			subscribed: __LOCALES.ru_RU.TEXTS.BUTTON.FAVORED
 		},
 		colors: {
-			subscribe: '-color_neutral_accent',
+			subscribe: '-color_marginal_accent',
 			unsubscribe: '-color_accent',
 			subscribed: '-color_accent'
 		},
