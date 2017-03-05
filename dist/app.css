@@ -849,17 +849,14 @@ hr[title]:before {
 	outline: none !important;
 	text-decoration: none !important;
 }
-[data-page],
+
 .link {cursor: pointer}
-[data-page]:not(.button):hover,
-[data-page]:not(.button):focus,
+
 .link:not(.button):hover,
 .link:not(.button):focus {
 	color: #f82969;
 	color: var(--color_accent);
 }
-
-.-state_statistics [data-page]:not(.button):hover {color: #28be84}
 
 /* /Common */
 /* Collapsing wrapper */
@@ -1747,8 +1744,11 @@ a.button:hover {text-decoration: none}
 .button.-color_neutral_alt {background-color: transparent}
 
 .button.-color_primary {background-color: #3e4d66; background-color: var(--color_primary);}
+
 .button.-color_accent {background-color: #f82969; background-color: var(--color_accent);}
-.-state_statistics .button.-color_accent {background-color: #28be84; background-color: var(--color_franklin);}
+.button.-color_bubblegum {background-color: #f82969; background-color: var(--color_bubblegum);}
+.button.-color_franklin {background-color: #28be84; background-color: var(--color_franklin);}
+.-state_statistics .button.-color_accent {background-color: #28be84}
 
 .button.-color_primary_alt {background-color: rgba(83,121,184,0.24)}
 .button.-color_accent_alt {background-color: #ffdeeb}
@@ -3511,20 +3511,6 @@ body.-open_modal > .modal_wrapper {
 
 .sidebar_wrapper {padding: 12px}
 
-.sidebar_navigation.-items_3 ~ .sidebar_organizations_wrapper,
-.sidebar_navigation:not([class*='-items_']) + .sidebar_organizations_wrapper {
-	height: -webkit-calc(100% - 114px);
-	height: calc(100% - 114px);
-}
-.sidebar_navigation.-items_4 ~ .sidebar_organizations_wrapper {
-	height: -webkit-calc(100% - 144px);
-	height: calc(100% - 144px);
-}
-.sidebar_navigation.-items_5 ~ .sidebar_organizations_wrapper {
-	height: -webkit-calc(100% - 174px);
-	height: calc(100% - 174px);
-}
-
 .sidebar_section_heading {
 	display: block;
 	margin: 6px 0 18px;
@@ -3566,6 +3552,20 @@ body.-open_modal > .modal_wrapper {
 	top: 0;
 	display: block;
 	margin: 3px 6px;
+}
+
+.sidebar_links {
+	padding: 12px;
+	text-align: center;
+	font-size: .8125em;
+	color: #9fa6b3;
+	color: var(--color_primary_50);
+}
+
+.sidebar_links > .link {
+	display: inline-block;
+	margin: 5px 6px;
+	white-space: nowrap;
 }
 
 /* ONBOARDING */

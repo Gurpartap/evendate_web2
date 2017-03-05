@@ -341,7 +341,7 @@ __APP = {
 			'day': {
 				'^([0-9]{4}-[0-9]{2}-[0-9]{2})': DayEventsPage //Very shitty way to detect date
 			},
-			'': FeedPage
+			'': ActualEventsPage
 		},
 		'organizations': {
 			'^([0-9]+)': CatalogPage,
@@ -381,7 +381,8 @@ __APP = {
 				'^([0-9]+)': StatisticsEventOverviewPage
 			},
 			'': StatisticsOverviewPage
-		}
+		},
+		'': ActualEventsPage
 	},
 	MODALS: new Modals(),
 	BUILD: {

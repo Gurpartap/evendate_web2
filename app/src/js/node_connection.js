@@ -38,7 +38,7 @@ socket.on('auth', function (data) {
 					} else if (data.subscriptions_count == 0) {
 						window.parent.location = '/onboarding';
 					} else {
-						window.parent.location = '/feed';
+						window.parent.location = '/';
 					}
 				}
 			} else {

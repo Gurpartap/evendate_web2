@@ -15,7 +15,7 @@ AbstractSidebar = (function () {
 	
 	AbstractSidebar.prototype.init = function () {
 		this.$sidebar.find('.SidebarNav').addClass('-items_' + this.$sidebar.find('.SidebarNavItem').not('.-hidden').length);
-		((window.innerHeight > 800) ? this.$sidebar.find('.SidebarOrganizationsScroll') : this.$sidebar.find('.SidebarScroll')).scrollbar({
+		this.$sidebar.find('.SidebarScroll').scrollbar({
 			disableBodyScroll: true
 		});
 	};

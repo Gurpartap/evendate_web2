@@ -1,562 +1,292 @@
 <?php
-require_once 'v1-backend/bin/db.php';
-require_once 'v1-backend/bin/Class.Result.php';
-require_once 'v1-backend/users/Class.AbstractUser.php';
-require_once 'v1-backend/users/Class.User.php';
-require_once 'v1-backend/users/Class.NotAuthorizedUser.php';
-require_once 'v1-backend/tags/Class.TagsCollection.php';
+
+
+require_once 'v1-backend/bin/env_variables.php';
+require_once "{$BACKEND_FULL_PATH}/bin/Class.Result.php";
+require_once "{$BACKEND_FULL_PATH}/bin/db.php";
+require_once "{$BACKEND_FULL_PATH}/bin/Class.RequestsParser.php";
+require_once "{$BACKEND_FULL_PATH}/bin/Class.Fields.php";
+require_once "{$BACKEND_FULL_PATH}/bin/Class.AbstractEntity.php";
+require_once "{$BACKEND_FULL_PATH}/bin/Class.AbstractCollection.php";
+require_once "{$BACKEND_FULL_PATH}/users/Class.AbstractUser.php";
+require_once "{$BACKEND_FULL_PATH}/organizations/Class.OrganizationsCollection.php";
+require_once "{$BACKEND_FULL_PATH}/organizations/Class.Organization.php";
+require_once "{$BACKEND_FULL_PATH}/events/Class.EventsCollection.php";
+require_once "{$BACKEND_FULL_PATH}/events/Class.Event.php";
+require_once "{$BACKEND_FULL_PATH}/users/Class.NotAuthorizedUser.php";
+require_once "{$BACKEND_FULL_PATH}/users/Class.User.php";
+
+if (App::$ENV == 'prod' || App::$ENV == 'test') {
+	$DEBUG_MODE = false;
+}else{
+	$DEBUG_MODE = true;
+	ini_set("display_errors", 1);
+	error_reporting(E_ALL);
+}
+App::buildGlobal($__db);
 
 try {
 	$user = new User($__db);
+
 	if (isset($_GET['logout']) && $_GET['logout'] == true) {
 		$user->logout();
-	} else {
-		header('Location: /feed');
-		die();
 	}
-} catch (Exception $e) {}
-$title = 'Evendate';
+
+	if (isset( $_REQUEST['q'] ) && $_REQUEST['q'] != 'onboarding' && !isset($_COOKIE['skip_onboarding']) && !isset($_COOKIE['open_add_organization'])) {
+		$subscriptions = OrganizationsCollection::filter(
+			$__db,
+			$user,
+			array('is_subscribed' => true),
+			array('created_at'),
+			array(),
+			array()
+		)->getData();
+		if (count($subscriptions) == 0) {
+			header('Location: /onboarding');
+		};
+	} else if (isset( $_REQUEST['q'] ) && $_REQUEST['q'] == 'onboarding' && isset($_COOKIE['skip_onboarding'])) {
+		header('Location: /');
+	}
+
+} catch (Exception $e) {
+	$user = App::getCurrentUser();
+//    header('Location: /');
+}
+
+$is_user_not_auth = $user instanceof NotAuthorizedUser;
+if ($is_user_not_auth) {
+	$is_user_editor = false;
+	$user_full_name = '';
+} else {
+	$is_user_editor = $user->isEditor();
+	$user_full_name = $user->getLastName() . ' ' . $user->getFirstName();
+}
+if (App::$ENV == 'prod' || App::$ENV == 'test') {
+	$DEBUG_MODE = false;
+}
+$url = parse_url($_SERVER['REQUEST_URI'])['path'];
+$url_parts = explode('/', $url);
 ?>
-<!doctype html>
-<html class="no-js">
+<!DOCTYPE html>
+<html lang="ru">
+
 <head>
-    <meta charset="utf-8">
-    <title>Evendate</title>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<title>Evendate</title>
+	<!-- =============== VENDOR STYLES ===============-->
+	<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i" rel="stylesheet">
 
-    <meta name="twitter:card" content="app">
-    <meta name="twitter:site" content="@evendate">
-    <meta name="twitter:description"
-          content="Evendate - простой и быстрый способ не пропускать события. Ты можешь выбирать из сотен организаторов разных событий и подписаться на всех, которые тебе интересны.">
-    <meta name="twitter:app:country" content="RU">
-    <meta name="twitter:app:name:iphone" content="Evendate">
-    <meta name="twitter:app:id:iphone" content="1044975200">
-    <meta name="twitter:app:name:ipad" content="Evendate">
-    <meta name="twitter:app:name:googleplay" content="Evendate">
-    <meta name="twitter:app:id:googleplay" content="ru.evendate.android">
+	<?php
+	if ($DEBUG_MODE) { ?>
+		<link rel="stylesheet" href="/dist/vendor.css?rev=514c11bff5a0b7b71eba77acf679a6e0">
+		<link rel="stylesheet" href="/dist/app.css?rev=4c4780b52d1ac0f4e4a1e17873240302"><?php
+	} else { ?>
+		<link rel="stylesheet" href="/dist/vendor.min.css?rev=d48eec79ba0dcb66d3491c6bccde5f11">
+		<link rel="stylesheet" href="/dist/app.min.css?rev=19733b3537109a05f112bf15d2819bfe"><?php
+	} ?>
 
-    <meta property="og:title" content="Evendate | Будь в курсе событий">
-    <meta property="og:url" content="https://evendate.ru">
-    <meta property="og:description"
-          content="Evendate - простой и быстрый способ не пропускать события. Ты можешь выбирать из сотен организаторов разных событий и подписаться на всех, которые тебе интересны.">
-    <meta property="og:type" content="website">
-    <meta property="og:image" content="https://evendate.ru/app/img/brand_2560x1600.jpg"/>
+	<?php
+	try {
+		if (count($url_parts) > 2) {
+			switch ($url_parts[1]) {
+				case 'organization': {
+					$item = OrganizationsCollection::one($__db, $user, intval($url_parts[2]), array('description', 'subscribed_count'));
+					$data = array(
+						'title' => htmlspecialchars($item->getName()),
+						'description' => htmlspecialchars($item->getName() . ' в Evendate это больше ' . $item->getSubscribedCount() . ' подписчиков и самые интересные события! ' . $item->getDescription()),
+						'image' => htmlspecialchars($item->getBackgroundImgUrl())
+					);
+					break;
+				}
+				case 'event': {
+					$item = EventsCollection::one($__db, $user, intval($url_parts[2]), array('description', 'organization_short_name'));
+					$params = $item->getParams($user, array('title', 'description', 'organization_short_name'))->getData();
+					$data = array(
+						'title' => htmlspecialchars($params['title'] . ' в ' . $params['organization_short_name'] . ' на Evendate'),
+						'description' => htmlspecialchars($params['description']),
+						'image' => htmlspecialchars($params['image_horizontal_url'])
+					);
+					break;
+				}
+				case 'organizations': {
+					$data = array(
+						'title' => htmlspecialchars('Каталог организаторов Evendate'),
+						'description' => htmlspecialchars('Сотни организаций публикуют свои события на Evendate. Не пропускайте ничего важного и интересного вокруг.'),
+						'image' => htmlspecialchars('https://evendate.ru/app/img/brand_2560x1600.jpg')
+					);
+					break;
+				}
+			}
+			if (isset($data)) {
+				$current_url = App::getVar('schema') . "$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+				echo "
+			<meta name=\"twitter:card\" content=\"summary\" />
+			<meta name=\"twitter:description\" content=\"{$data['description']}\">
+    	<meta name=\"twitter:app:country\" content=\"RU\">
+    	<meta name=\"twitter:app:name:iphone\" content=\"Evendate\">
+    	<meta name=\"twitter:app:id:iphone\" content=\"1044975200\">
+    	<meta name=\"twitter:app:name:ipad\" content=\"Evendate\">
+    	<meta name=\"twitter:app:name:googleplay\" content=\"Evendate\">
+    	<meta name=\"twitter:app:id:googleplay\" content=\"ru.evendate.android\">
 
-    <link href="app/assets/css/style.min.css" rel="stylesheet">
-    <link href="app/assets/css/bootstrap.min.css" rel="stylesheet">
-    <link href="vendor/fontawesome/css/font-awesome.min.css" rel="stylesheet">
+    	<meta property=\"og:url\" content=\"{$current_url}\">
+    	<meta property=\"og:title\" content=\"{$data['title']}\">
+    	<meta property=\"og:description\" content=\"{$data['description']}\">
+    	<meta property=\"og:image\" content=\"{$data['image']}\"/>";
+			}
+		}
+	} catch (Exception $e) {
+//		header('Location: /');
+	}
 
+	?>
+
+	<link rel="apple-touch-icon" sizes="57x57" href="/app/img/favicon/apple-icon-57x57.png">
+	<link rel="apple-touch-icon" sizes="60x60" href="/app/img/favicon/apple-icon-60x60.png">
+	<link rel="apple-touch-icon" sizes="72x72" href="/app/img/favicon/apple-icon-72x72.png">
+	<link rel="apple-touch-icon" sizes="76x76" href="/app/img/favicon/apple-icon-76x76.png">
+	<link rel="apple-touch-icon" sizes="114x114" href="/app/img/favicon/apple-icon-114x114.png">
+	<link rel="apple-touch-icon" sizes="120x120" href="/app/img/favicon/apple-icon-120x120.png">
+	<link rel="apple-touch-icon" sizes="144x144" href="/app/img/favicon/apple-icon-144x144.png">
+	<link rel="apple-touch-icon" sizes="152x152" href="/app/img/favicon/apple-icon-152x152.png">
+	<link rel="apple-touch-icon" sizes="180x180" href="/app/img/favicon/apple-icon-180x180.png">
+	<link rel="icon" type="image/png" sizes="192x192" href="/app/img/favicon/android-icon-192x192.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/app/img/favicon/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="96x96" href="/app/img/favicon/favicon-96x96.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/app/img/favicon/favicon-16x16.png">
+
+	<link rel="manifest" href="/manifest.json">
+	<meta name="msapplication-TileColor" content="#ffffff">
+	<meta name="msapplication-TileImage" content="/app/img/favicon/ms-icon-144x144.png">
+	<meta name="theme-color" content="#ffffff">
+	<!--    Push notifications in browser    -->
+	<script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js"></script>
 </head>
-<body class="home-page fader">
 
+<body>
+<div id="main_overlay">
+	<header id="main_header">
+		<div id="main_header_top">
+			<div class="page_wrapper">
+				<div class="main_header_wrapper">
+					<div id="page_title" class="-unselectable"></div>
+					<div id="search_bar">
+						<input id="search_bar_input" class="search-input" type="text"
+									 placeholder="Поиск мероприятий, организаторов и друзей">
+						<label class="search_block_icon fa_icon fa-search -empty" for="search_bar_input"></label>
+						<button class="search_block_icon adv_search_button fa_icon fa-sliders -empty -hidden"
+										type="button"></button>
+					</div>
+				</div><?php
+				if ($is_user_not_auth) { ?>
+					<div id="header_login_block">
+						<button class="button login_button -size_low -color_neutral_accent RippleEffect LoginButton" type="button">
+							<span class="Text">Войти</span>
+						</button>
+					</div><?php
+				} else { ?>
+					<div id="user_bar" class="-unselectable">
+					<div class="avatar_block -align_right -size_small">
+						<span class="avatar_name" title="<?= $user_full_name ?>"><?= $user_full_name ?></span>
+						<div class="avatar -rounded -bordered"><img src="<?= $user->getAvatarUrl() ?>"></div>
+					</div>
+					<div class="user_bar_forhead">
+						<div class="avatar_block -align_right -size_small">
+							<span class="avatar_name" title="<?= $user_full_name ?>"><?= $user_full_name ?></span>
+							<div class="avatar -rounded -bordered"><img src="<?= $user->getAvatarUrl() ?>"></div>
+						</div>
+						<div class="user_bar_buttons">
+							<button class="button -color_neutral RippleEffect OpenSettingsButton" type="button"><span
+									class="Text fa_icon fa-cog">Настройки</span></button>
+							<button class="button -color_neutral_accent RippleEffect LogoutButton" type="button"><span class="Text">Выйти</span>
+							</button>
+						</div>
+					</div>
+					</div><?php
+				} ?>
+			</div>
+		</div>
+		<div id="main_header_bottom">
+			<div class="page_wrapper HeaderTabsWrapper"></div>
+		</div>
+	</header>
+	<div id="main_section">
 
-<div class="ref-message">
-    <div class="fluid-width">
-        <a class="close-ref" href="#">
-            <svg fill="#222222" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
-                <path
-                        d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                <path d="M0 0h24v24H0z" fill="none"/>
-            </svg>
-        </a>
-        <h3 class="ref-title">Скачай приложение прямо сейчас.
-            <a class="download-link-button" target="_blank"
-               href="https://play.google.com/store/apps/details?id=ru.evendate.android"
-               data-ga-label="Android from Banner">
-                <svg width="30px" height="30px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
-                     xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-3.5 -3.5 55 55"
-                     enable-background="new -3.5 -3.5 55 55" xml:space="preserve">
-              <path fill="#FFFFFF" d="M12,36c0,1.1,0.9,2,2,2h2v7c0,1.7,1.3,3,3,3s3-1.3,3-3v-7h4v7c0,1.7,1.3,3,3,3s3-1.3,3-3v-7h2c1.1,0,2-0.9,2-2V16H12V36z
-                 M7,16c-1.7,0-3,1.3-3,3v14c0,1.7,1.3,3,3,3s3-1.3,3-3V19C10,17.3,8.7,16,7,16z M41,16c-1.7,0-3,1.3-3,3v14c0,1.7,1.3,3,3,3
-                s3-1.3,3-3V19C44,17.3,42.7,16,41,16z M31.1,4.3l2.6-2.6c0.4-0.4,0.4-1,0-1.4s-1-0.4-1.4,0l-3,2.9C27.7,2.5,25.9,2,24,2
-                c-1.9,0-3.7,0.5-5.3,1.3l-3-3c-0.4-0.4-1-0.4-1.4,0s-0.4,1,0,1.4l2.6,2.6C13.9,6.5,12,10,12,14h24C36,10,34,6.5,31.1,4.3z M20,10h-2
-                V8h2V10z M30,10h-2V8h2V10z"/>
-            </svg>
-            </a>
+		<div class="app_view -hidden PageView">
+			<div class="page_wrapper Content -fadeable"></div>
+		</div>
 
-            <a class="download-link-button js-ga-track" target="_blank"
-               href="https://itunes.apple.com/us/app/evendate/id1044975200?mt=8"
-               data-ga-label="iOS from Banner">
-                <svg width="30px" height="30px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
-                     xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-3.5 -3.5 55 55"
-                     enable-background="new -3.5 -3.5 55 55" xml:space="preserve">
-              <g>
-                  <g id="svg_1">
-                      <path fill="#FFFFFF" d="M36.8,24.9c0.1,7.1,6.2,9.4,6.3,9.5c-0.1,0.2-1,3.4-3.2,6.7c-1.9,2.8-4,5.7-7.2,5.7c-3.1,0.1-4.1-1.9-7.7-1.9
-                    c-3.6,0-4.7,1.8-7.7,1.9c-3.1,0.1-5.4-3.1-7.4-5.9c-4-5.8-7.1-16.4-3-23.6c2-3.6,5.7-5.8,9.7-5.9c3-0.1,5.9,2,7.7,2
-                    c1.8,0,5.3-2.5,9-2.1c1.5,0.1,5.8,0.6,8.6,4.6C41.6,16.1,36.7,18.9,36.8,24.9 M30.9,7.5c1.6-2,2.7-4.7,2.4-7.5
-                    c-2.4,0.1-5.2,1.6-6.9,3.5c-1.5,1.8-2.8,4.6-2.5,7.2C26.6,11,29.2,9.4,30.9,7.5"/>
-                  </g>
-              </g>
-            </svg>
-            </a>
-        </h3>
-    </div>
+	</div>
+</div>
+
+<aside id="main_sidebar" class="-unselectable">
+	<a href="/" class="brand_block link Link">
+		<svg width="135px" height="24.70001px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 135 24.70001">
+			<path id="evendate_logo_text" transform="translate(-2.375 -0.69998)" fill="#9fa6b3"
+						d="M18.675,16.4c0-5.3-3-8.5-8.1-8.5a8.42015,8.42015,0,0,0-8.2,8.7,8.38058,8.38058,0,0,0,8.5,8.8,7.55515,7.55515,0,0,0,7.5-5.2l-3.7-1.2a3.57051,3.57051,0,0,1-3.7,2.5,3.98288,3.98288,0,0,1-4.1-3.7h11.7A13.80487,13.80487,0,0,0,18.675,16.4Zm-11.8-1.6a3.55717,3.55717,0,0,1,3.7-3.2,3.363,3.363,0,0,1,3.7,3.2h-7.4Zm24.3-6.3-3.9,11-4.1-11h-4.9l6.7,16.4h4.4l6.5-16.4h-4.7Zm20.6,7.9c0-5.3-3-8.5-8.1-8.5a8.25038,8.25038,0,0,0-8.1,8.6,8.38058,8.38058,0,0,0,8.5,8.8,7.55522,7.55522,0,0,0,7.5-5.2l-3.8-1.1a3.57051,3.57051,0,0,1-3.7,2.5,3.98293,3.98293,0,0,1-4.1-3.7h11.7A13.79661,13.79661,0,0,0,51.775,16.4Zm-11.7-1.6a3.55712,3.55712,0,0,1,3.7-3.2,3.36289,3.36289,0,0,1,3.7,3.2h-7.4ZM62.975,8a5.385,5.385,0,0,0-4.7,2.5v-2h-4.3V24.9h4.4V15.4c0-1.9,1.1-3.4,3.1-3.4,2.1,0,3,1.4,3,3.3v9.6h4.4V14.5C68.875,10.9,66.975,8,62.975,8Zm24.8,13.9V0.7h-4.4v9.4c-0.5-.9-1.8-2-4.6-2-4.6,0-7.9,3.8-7.9,8.6,0,5,3.3,8.6,8,8.6a5.101,5.101,0,0,0,4.6-2.3,7.75394,7.75394,0,0,0,.2,1.9h4.2A26.28237,26.28237,0,0,1,87.775,21.9Zm-8.3-.6c-2.4,0-4.1-1.8-4.1-4.7s1.8-4.6,4.1-4.6,4,1.6,4,4.6S81.675,21.3,79.475,21.3Zm25.2,1V14.2c0-3.3-1.9-6.2-7.1-6.2-4.4,0-6.8,2.8-7,5.4l3.9,0.8a2.92541,2.92541,0,0,1,3.1-2.7c1.9,0,2.8,1,2.8,2.1a1.19858,1.19858,0,0,1-1.2,1.2l-4,.6c-2.8.4-5,2-5,5,0,2.6,2.1,4.9,5.6,4.9a5.40058,5.40058,0,0,0,4.8-2.4,12.30577,12.30577,0,0,0,.2,2h4.1A18.36784,18.36784,0,0,1,104.675,22.3Zm-4.3-4.2c0,3-1.8,3.9-3.6,3.9a1.89565,1.89565,0,0,1-2.1-1.9,2.094,2.094,0,0,1,2-2.1l3.7-.6v0.7Zm16.3-5.8V8.5h-3.3V3.6h-4.1V5.9a2.33883,2.33883,0,0,1-2.5,2.6h-0.8v3.9h3V20c0,3.2,2,5.1,5.2,5.1a5.9567,5.9567,0,0,0,2.5-.4V21a4.92317,4.92317,0,0,1-1.4.1,1.61828,1.61828,0,0,1-1.9-1.9V12.3h3.3Zm17.2,4.1a10.91279,10.91279,0,0,0-.47-3.3h-0.03a5.49026,5.49026,0,0,1-5.47-4.98,9.60458,9.60458,0,0,0-2.13-.22,8.25043,8.25043,0,0,0-8.1,8.6,8.38058,8.38058,0,0,0,8.5,8.8,7.55517,7.55517,0,0,0,7.5-5.2l-3.8-1.1a3.57051,3.57051,0,0,1-3.7,2.5,3.98284,3.98284,0,0,1-4.1-3.7h11.7A13.80487,13.80487,0,0,0,133.875,16.4Zm-11.7-1.6a3.55721,3.55721,0,0,1,3.7-3.2,3.363,3.363,0,0,1,3.7,3.2h-7.4Z"></path>
+			<circle id="evendate_logo_dot" cx="131" cy="6.90002" r="4" fill="#f82969"></circle>
+		</svg>
+		<img class="brand" src="/app/img/brand.png?v=f7ff6c58ee76c1a3a7ed091510e9e288">
+	</a>
+
+	<div class="sidebar_main_wrapper scrollbar-outer SidebarScroll">
+		<nav class="sidebar_navigation SidebarNav"><?php
+			if ($is_user_editor) { ?>
+				<a href="/statistics" class="sidebar_navigation_item SidebarNavItem link Link"><span>Статистика</span></a>
+				<a href="/add/event" class="sidebar_navigation_item SidebarNavItem link Link"><span>Создать событие</span></a><?php
+			} ?>
+			<a href="/feed" class="sidebar_navigation_item SidebarNavItem link Link"><span>События</span><span class="counter sidebar_navigation_counter -hidden SidebarNavFeedCounter"></span></a>
+			<a href="/organizations" class="sidebar_navigation_item SidebarNavItem link Link"><span>Организаторы</span></a><?php
+			if(!$is_user_not_auth){ ?>
+				<a href="/my/profile" class="sidebar_navigation_item SidebarNavItem link Link"><span>Мой профиль</span></a><?php
+			}?>
+		</nav>
+		<hr class="sidebar_divider">
+		<div class="sidebar_organizations_wrapper scrollbar-outer SidebarOrganizationsScroll"><?php
+			if (!$is_user_not_auth) { ?>
+				<div class="sidebar_wrapper">
+					<span class="sidebar_section_heading">Подписки</span>
+					<div class="sidebar_organizations_list SidebarOrganizationsList"></div>
+				</div><?php
+			} ?>
+		</div>
+		<div class="sidebar_links">
+			<a href="/landing.php" class="link">О нас</a>
+			<a href="/organization.php" class="link">Стать организатором</a>
+			<a href="//evendate.ru/docs/terms.pdf" class="link">Условия пользования</a>
+			<a href="//evendate.ru/docs/useragreement.pdf" class="link">Пользовательское соглашение</a>
+			<p>Evendate 2015-<?=(new DateTimeImmutable())->format('Y'); ?></p>
+		</div>
+	</div>
+
+</aside>
+
+<div class="modal_wrapper">
+	<div class="modal_destroyer"></div>
 </div>
 
 
-<div class="page-overlay-wrapper">
-    <div class="fade-gradient"></div>
-
-    <div class="overlay-sections">
-        <section class="about-section overlay-section">
-            <div class="fade-in">
-                <div class="fluid-width constrain-large">
-                    <h3 class="page-title text-center">Возникли вопросы?</h3>
-                    <p class="page-body text-center">Заполните форму и наша команда обязательно свяжется с Вами!</p>
-                    <form>
-                        <div class="form-group">
-                            <label for="feedback-name">Ваше имя</label>
-                            <input class="form-control" type="text" name="name" autocomplete="off"
-                                   id="feedback-name"
-                                   placeholder="Ваше имя" required="required">
-                        </div>
-                        <div class="form-group">
-                            <label for="feedback-email">Ваш email</label>
-                            <input class="form-control" type="email" name="email" autocomplete="off"
-                                   id="feedback-email"
-                                   placeholder="E-mail" required="required">
-                        </div>
-                        <div class="form-group">
-                            <label for="feedback-message">Ваше сообщение</label>
-                            <textarea class="form-control" name="message"
-                                      id="feedback-message"
-                                      autocomplete="off">Ваше сообщение</textarea>
-                        </div>
-                        <p class="page-body text-center">
-                            <a href="#" id="send-feedback">Отправить</a>
-                        </p>
-                    </form>
-                </div>
-            </div>
-        </section>
-        <section class="faq-section overlay-section">
-            <div class="fade-in">
-                <div class="fluid-width constrain-large text-center">
-                    <h2 class="page-title">Войдите через социальную сеть:</h2>
-                    <div class="">
-                        <a href="#" class="social-btn vk-btn vk-auth-btn">
-                            <i class="fa fa-vk"></i> ВКонтакте
-                        </a>
-                        <a href="#" class="social-btn fb-btn facebook-btn">
-                            <i class="fa fa-facebook"></i> Facebook
-                        </a>
-                        <a href="#" class="social-btn google-lus-btn google-plus-btn">
-                            <i class="fa fa-google"></i> Google
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </div>
-
-    <footer class="global-footer footer">
-        <div class="fluid-width mobile-full-width">
-            <div class="footer-branding float-left">
-                <div class="float-right footer-social-links">
-                    <a target="_blank" href="https://new.vk.com/evendate"
-                       class="footer-social-link">
-                        <i class="fa fa-vk"></i>
-                    </a>
-                    <a target="_blank" href="https://twitter.com/evendate"
-                       class="footer-social-link">
-                        <i class="fa fa-twitter"></i>
-                    </a>
-                    <a target="_blank" href="http://instagram.com/evendate"
-                       class="footer-social-link">
-                        <i class="fa fa-instagram"></i>
-                    </a>
-                </div>
-
-                <div class="footer-nav-links float-right">
-                    <a class="footer-nav-link feedback-link" target="_blank"
-                       href="#">Обратная связь</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-</div>
-
-<div class="header-wrapper">
-    <header class="header fluid-width mobile-full-width">
-        <a class="fader-link close-overlay" href="/" data-ga-label="Home" data-overlay-target="">
-            <svg width="135px" height="24.70001px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 135 24.70001">
-                <path id="evendate_logo_text" transform="translate(-2.375 -0.69998)" fill="#ffffff"
-                      d="M18.675,16.4c0-5.3-3-8.5-8.1-8.5a8.42015,8.42015,0,0,0-8.2,8.7,8.38058,8.38058,0,0,0,8.5,8.8,7.55515,7.55515,0,0,0,7.5-5.2l-3.7-1.2a3.57051,3.57051,0,0,1-3.7,2.5,3.98288,3.98288,0,0,1-4.1-3.7h11.7A13.80487,13.80487,0,0,0,18.675,16.4Zm-11.8-1.6a3.55717,3.55717,0,0,1,3.7-3.2,3.363,3.363,0,0,1,3.7,3.2h-7.4Zm24.3-6.3-3.9,11-4.1-11h-4.9l6.7,16.4h4.4l6.5-16.4h-4.7Zm20.6,7.9c0-5.3-3-8.5-8.1-8.5a8.25038,8.25038,0,0,0-8.1,8.6,8.38058,8.38058,0,0,0,8.5,8.8,7.55522,7.55522,0,0,0,7.5-5.2l-3.8-1.1a3.57051,3.57051,0,0,1-3.7,2.5,3.98293,3.98293,0,0,1-4.1-3.7h11.7A13.79661,13.79661,0,0,0,51.775,16.4Zm-11.7-1.6a3.55712,3.55712,0,0,1,3.7-3.2,3.36289,3.36289,0,0,1,3.7,3.2h-7.4ZM62.975,8a5.385,5.385,0,0,0-4.7,2.5v-2h-4.3V24.9h4.4V15.4c0-1.9,1.1-3.4,3.1-3.4,2.1,0,3,1.4,3,3.3v9.6h4.4V14.5C68.875,10.9,66.975,8,62.975,8Zm24.8,13.9V0.7h-4.4v9.4c-0.5-.9-1.8-2-4.6-2-4.6,0-7.9,3.8-7.9,8.6,0,5,3.3,8.6,8,8.6a5.101,5.101,0,0,0,4.6-2.3,7.75394,7.75394,0,0,0,.2,1.9h4.2A26.28237,26.28237,0,0,1,87.775,21.9Zm-8.3-.6c-2.4,0-4.1-1.8-4.1-4.7s1.8-4.6,4.1-4.6,4,1.6,4,4.6S81.675,21.3,79.475,21.3Zm25.2,1V14.2c0-3.3-1.9-6.2-7.1-6.2-4.4,0-6.8,2.8-7,5.4l3.9,0.8a2.92541,2.92541,0,0,1,3.1-2.7c1.9,0,2.8,1,2.8,2.1a1.19858,1.19858,0,0,1-1.2,1.2l-4,.6c-2.8.4-5,2-5,5,0,2.6,2.1,4.9,5.6,4.9a5.40058,5.40058,0,0,0,4.8-2.4,12.30577,12.30577,0,0,0,.2,2h4.1A18.36784,18.36784,0,0,1,104.675,22.3Zm-4.3-4.2c0,3-1.8,3.9-3.6,3.9a1.89565,1.89565,0,0,1-2.1-1.9,2.094,2.094,0,0,1,2-2.1l3.7-.6v0.7Zm16.3-5.8V8.5h-3.3V3.6h-4.1V5.9a2.33883,2.33883,0,0,1-2.5,2.6h-0.8v3.9h3V20c0,3.2,2,5.1,5.2,5.1a5.9567,5.9567,0,0,0,2.5-.4V21a4.92317,4.92317,0,0,1-1.4.1,1.61828,1.61828,0,0,1-1.9-1.9V12.3h3.3Zm17.2,4.1a10.91279,10.91279,0,0,0-.47-3.3h-0.03a5.49026,5.49026,0,0,1-5.47-4.98,9.60458,9.60458,0,0,0-2.13-.22,8.25043,8.25043,0,0,0-8.1,8.6,8.38058,8.38058,0,0,0,8.5,8.8,7.55517,7.55517,0,0,0,7.5-5.2l-3.8-1.1a3.57051,3.57051,0,0,1-3.7,2.5,3.98284,3.98284,0,0,1-4.1-3.7h11.7A13.80487,13.80487,0,0,0,133.875,16.4Zm-11.7-1.6a3.55721,3.55721,0,0,1,3.7-3.2,3.363,3.363,0,0,1,3.7,3.2h-7.4Z"></path>
-                <circle id="evendate_logo_dot" cx="131" cy="6.90002" r="4" fill="#f82969"></circle>
-            </svg>
-
-        </a>
-        <div class="header-nav-links">
-            <a class="header-nav-link hover-color organizations-link fader-link"
-               href="/to-organization">Организаторам</a>
-            <a class="header-nav-link faq-link hover-color fader-link faq-link faq-header-link"
-               data-overlay-target="faq-section" href="#">Войти</a>
-            <!--     HIDDEN LINK TO click()       -->
-            <a class="header-nav-link hover-color js-ga-track fader-link about-link about-header-link hidden"
-               data-overlay-target="about-section" href="#"></a>
-
-        </div>
-        <a class="header-nav-link hover-color organizations-link fader-link mobile-organizations"
-           href="/to-organization">Организаторам</a>
-    </header>
-    <nav class="mobile-nav">
-    </nav>
-</div>
-
-<section class="fixed-content fluid-width">
-    <div class="content">
-        <div class="constrain">
-
-            <div class="content-text">
-                <div class="text-slide active" data-slide="0">
-                    <h2 class="js-animate-this">Не упусти<br>самое важное</h2>
-                    <div class="js-animate-this">
-                        <p>Evendate объединяет людей разных интересов, позволяя каждому выбрать свои любимые места,
-                            подписаться на них и получать уведомления о новых событиях. </p>
-                        <div class="slide-cta hidden-sm hidden-xs">
-                            <span>Войти через: </span>
-                            <a class="slide-cta-button hover-fill vk-auth-btn auth-small-btn social-btn vk-btn"
-                               href="#">
-                                <i class="fa fa-vk"></i>
-                            </a>
-                            <a class="slide-cta-button hover-fill facebook-btn auth-small-btn social-btn fb-btn"
-                               href="#">
-                                <i class="fa fa-facebook"></i>
-                            </a>
-                            <a class="slide-cta-button hover-fill google-plus-btn auth-small-btn social-btn google-lus-btn"
-                               href="#">
-                                <i class="fa fa-google"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="text-slide" data-slide="1">
-                    <h2 class="js-animate-this">Получай только то,<br>что любишь</h2>
-                    <div class="js-animate-this">
-                        <p>Образование, Искусство, Спорт, Бизнес, Клубы и Бары.
-                            Лента будет состоять только из тех событий, которые тебе интересны, а система рекомендаций
-                            всегда посоветует что-нибудь новое. </p>
-                        <div class="slide-cta js-animate-this hidden-sm hidden-xs">
-                            <span>Войти через: </span>
-                            <a class="slide-cta-button hover-fill vk-auth-btn auth-small-btn social-btn vk-btn"
-                               href="#">
-                                <i class="fa fa-vk"></i>
-                            </a>
-                            <a class="slide-cta-button hover-fill facebook-btn auth-small-btn social-btn fb-btn"
-                               href="#">
-                                <i class="fa fa-facebook"></i>
-                            </a>
-                            <a class="slide-cta-button hover-fill google-plus-btn auth-small-btn social-btn google-lus-btn"
-                               href="#">
-                                <i class="fa fa-google"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="text-slide" data-slide="2">
-                    <h2 class="js-animate-this">Узнай куда пойдут<br/>твои друзья</h2>
-                    <p class="js-animate-this">С помощью ленты активности можно увидеть места, которые нравятся твоим
-                        друзьям из социальных сетей, и узнать, какие мероприятия они хотят посетить.</p>
-                    <div class="slide-cta js-animate-this hidden-sm hidden-xs">
-                        <span>Войти через: </span>
-                        <a class="slide-cta-button hover-fill vk-auth-btn auth-small-btn social-btn vk-btn" href="#">
-                            <i class="fa fa-vk"></i>
-                        </a>
-                        <a class="slide-cta-button hover-fill facebook-btn auth-small-btn social-btn fb-btn" href="#">
-                            <i class="fa fa-facebook"></i>
-                        </a>
-                        <a class="slide-cta-button hover-fill google-plus-btn auth-small-btn social-btn google-lus-btn"
-                           href="#">
-                            <i class="fa fa-google"></i>
-                        </a>
-                    </div>
-                    <div class="slide-cta hidden-md hidden-lg">
-                        <span>Скачать приложение: </span>
-                        <a class="slide-cta-button hover-fill js-ga-track" target="_blank"
-                           href="https://play.google.com/store/apps/details?id=ru.evendate.android">
-                            <svg width="30px" height="30px" version="1.1" id="Layer_1"
-                                 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                 x="0px" y="0px" viewBox="-3.5 -3.5 55 55" enable-background="new -3.5 -3.5 55 55"
-                                 xml:space="preserve">
-                      <path fill="#FFFFFF" d="M12,36c0,1.1,0.9,2,2,2h2v7c0,1.7,1.3,3,3,3s3-1.3,3-3v-7h4v7c0,1.7,1.3,3,3,3s3-1.3,3-3v-7h2c1.1,0,2-0.9,2-2V16H12V36z
-                         M7,16c-1.7,0-3,1.3-3,3v14c0,1.7,1.3,3,3,3s3-1.3,3-3V19C10,17.3,8.7,16,7,16z M41,16c-1.7,0-3,1.3-3,3v14c0,1.7,1.3,3,3,3
-                        s3-1.3,3-3V19C44,17.3,42.7,16,41,16z M31.1,4.3l2.6-2.6c0.4-0.4,0.4-1,0-1.4s-1-0.4-1.4,0l-3,2.9C27.7,2.5,25.9,2,24,2
-                        c-1.9,0-3.7,0.5-5.3,1.3l-3-3c-0.4-0.4-1-0.4-1.4,0s-0.4,1,0,1.4l2.6,2.6C13.9,6.5,12,10,12,14h24C36,10,34,6.5,31.1,4.3z M20,10h-2
-                        V8h2V10z M30,10h-2V8h2V10z"></path>
-                    </svg>
-                        </a>
-                        <a class="slide-cta-button hover-fill js-ga-track" target="_blank"
-                           href="http://itunes.apple.com/us/app/evendate/id1044975200?mt=8">
-                            <svg width="30px" height="30px" version="1.1" id="Layer_1"
-                                 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                                 x="0px" y="0px" viewBox="-3.5 -3.5 55 55" enable-background="new -3.5 -3.5 55 55"
-                                 xml:space="preserve">
-                      <g>
-                          <g id="svg_1">
-                              <path fill="#FFFFFF" d="M36.8,24.9c0.1,7.1,6.2,9.4,6.3,9.5c-0.1,0.2-1,3.4-3.2,6.7c-1.9,2.8-4,5.7-7.2,5.7c-3.1,0.1-4.1-1.9-7.7-1.9
-                            c-3.6,0-4.7,1.8-7.7,1.9c-3.1,0.1-5.4-3.1-7.4-5.9c-4-5.8-7.1-16.4-3-23.6c2-3.6,5.7-5.8,9.7-5.9c3-0.1,5.9,2,7.7,2
-                            c1.8,0,5.3-2.5,9-2.1c1.5,0.1,5.8,0.6,8.6,4.6C41.6,16.1,36.7,18.9,36.8,24.9 M30.9,7.5c1.6-2,2.7-4.7,2.4-7.5
-                            c-2.4,0.1-5.2,1.6-6.9,3.5c-1.5,1.8-2.8,4.6-2.5,7.2C26.6,11,29.2,9.4,30.9,7.5"></path>
-                          </g>
-                      </g>
-                    </svg>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            <div class="text-slide text-slide-3 container-centered text-slide-decorator" data-slide="3">
-                <h2 class="js-animate-this hidden-md hidden-lg">Скачай приложения<br/>прямо сейчас</h2>
-                <h1 class="js-animate-this choose-interests-text">
-                    <span class="hidden-sm hidden-xs">Выбери то, что интересно</span>
-                </h1>
-                <div class="js-animate-this hidden-sm hidden-xs is-mobile-hidden">
-                    <div class="row col-md-12">
-                        <div class="col-md-3">
-                            <div class="interests-block">
-                                <div class="interest-img-wrapper"><img
-                                            src="app/assets/img/objects/step-4/education.png">
-                                    <div class="selected-overlay">
-                                        <div class="selected-overlay-icon-wrapper">
-                                            <i class="fa fa-check" aria-hidden="true"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="interest-name">Образование</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="interests-block">
-                                <div class="interest-img-wrapper"><img src="app/assets/img/objects/step-4/art.png">
-                                    <div class="selected-overlay">
-                                        <div class="selected-overlay-icon-wrapper">
-                                            <i class="fa fa-check" aria-hidden="true"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="interest-name">Искусство</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="interests-block">
-                                <div class="interest-img-wrapper"><img src="app/assets/img/objects/step-4/sport.png">
-                                    <div class="selected-overlay">
-                                        <div class="selected-overlay-icon-wrapper">
-                                            <i class="fa fa-check" aria-hidden="true"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="interest-name">Спорт</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="interests-block">
-                                <div class="interest-img-wrapper"><img src="app/assets/img/objects/step-4/IT.png">
-                                    <div class="selected-overlay">
-                                        <div class="selected-overlay-icon-wrapper">
-                                            <i class="fa fa-check" aria-hidden="true"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="interest-name">IT</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row col-md-12">
-                        <div class="col-md-3">
-
-                            <div class="interests-block">
-                                <div class="interest-img-wrapper"><img src="app/assets/img/objects/step-4/design.png">
-                                    <div class="selected-overlay">
-                                        <div class="selected-overlay-icon-wrapper">
-                                            <i class="fa fa-check" aria-hidden="true"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="interest-name">Дизайн</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="interests-block">
-                                <div class="interest-img-wrapper"><img src="app/assets/img/objects/step-4/business.png">
-                                    <div class="selected-overlay">
-                                        <div class="selected-overlay-icon-wrapper">
-                                            <i class="fa fa-check" aria-hidden="true"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="interest-name">Стартапы и бизнес</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="interests-block">
-                                <div class="interest-img-wrapper"><img src="app/assets/img/objects/step-4/bars.png">
-                                    <div class="selected-overlay">
-                                        <div class="selected-overlay-icon-wrapper">
-                                            <i class="fa fa-check" aria-hidden="true"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="interest-name">Клубы и бары</div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="interests-block">
-                                <div class="interest-img-wrapper"><img src="app/assets/img/objects/step-4/fun.png">
-                                    <div class="selected-overlay">
-                                        <div class="selected-overlay-icon-wrapper">
-                                            <i class="fa fa-check" aria-hidden="true"></i>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="interest-name">Развлечения</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row col-md-12 text-center">
-                        <a class="auth-with-interests" href="#">Войти</a>
-                    </div>
-                </div>
-            </div>
-            <div class="device-frame">
-                <div class="image-slides">
-                    <img class="screen-shine init-image" src="app/assets/img/screen-shine.png"/>
-                    <img class="image-slide init-image" alt="Advertising - How Remarketing Keeps Customers Coming Back"
-                         src="app/assets/img/still1.jpg"/>
-                    <img class="image-slide init-image"
-                         alt="Content - Get Customers Interested by Telling a Great Story"
-                         src="app/assets/img/still2.jpg"/>
-                    <img class="image-slide init-image" alt="Lesson Recap - How Remarketing Keeps Customers Coming Back"
-                         src="app/assets/img/still3.jpg"/>
-                </div>
-                <img class="device init-image" src="app/assets/img/device.png"/>
-            </div>
-        </div>
-    </div>
-
-</section>
-<section class="scroll-container">
-    <section class="scroll-section scroll-section-one" data-from-time="0.01" data-to-time="1.33"
-             data-reverse-from-time="" data-reverse-to-time="">
-        <div class="scroll-section-content">
-            <img width="427" class="layer-object glasses initial-state init-image"
-                 src="app/assets/img/objects/coffee.png"/>
-            <img width="500" class="layer-object pencils initial-state init-image "
-                 src="app/assets/img/objects/pencil.png"/>
-            <img width="500" class="layer-object notebook initial-state init-image"
-                 src="app/assets/img/objects/notebook.png"/>
-            <img width="1660" class="section-bg section-bg-one initial-state init-image"
-                 src="app/assets/img/shapes/shapes1.png"/>
-        </div>
-
-    </section>
-    <section class="scroll-section scroll-section-two" data-from-time="1.50" data-to-time="2.67"
-             data-reverse-from-time="6.73" data-reverse-to-time="8.07">
-        <div class="scroll-section-content">
-            <img width="552" class="layer-object coffee js-load-async"
-                 data-image-src="app/assets/img/objects/donut.png"/>
-            <img width="455" class="layer-object donut js-load-async"
-                 data-image-src="app/assets/img/objects/glasses.png"/>
-            <img width="520" class="layer-object spoon js-load-async"
-                 data-image-src="app/assets/img/objects/spoon.png"/>
-            <img width="1693" class="section-bg section-bg-two js-load-async"
-                 data-image-src="app/assets/img/shapes/bg_cloud.png"/>
-        </div>
-
-    </section>
-    <section class="scroll-section scroll-section-three" data-from-time="2.83" data-to-time="4.00"
-             data-reverse-from-time="5.40" data-reverse-to-time="6.57">
-        <div class="scroll-section-content">
-            <img width="515" class="layer-object leash js-load-async"
-                 data-image-src="app/assets/img/objects/playstation.png"/>
-            <img width="418" class="layer-object newspaper js-load-async"
-                 data-image-src="app/assets/img/objects/tickets2.png"/>
-            <img width="422" class="layer-object sunglasses js-load-async"
-                 data-image-src="app/assets/img/objects/headphones.png"/>
-            <img width="1982" class="section-bg section-bg-three js-load-async"
-                 data-image-src="app/assets/img/shapes/shapes2.png"/>
-        </div>
-    </section>
-    <section class="scroll-section scroll-section-four" data-from-time="" data-to-time="" data-reverse-from-time="4.06"
-             data-reverse-to-time="5.23">
-        <div class="scroll-section-content">
-            <img width="512" class="layer-object candy js-load-async"
-                 data-image-src="app/assets/img/objects/Polaroid-Snap.png"/>
-            <img width="515" class="layer-object passport js-load-async"
-                 data-image-src="app/assets/img/objects/leash.png"/>
-            <img width="1688" class="section-bg section-bg-four js-load-async"
-                 data-image-src="app/assets/img/shapes/squares.png"/>
-        </div>
-
-    </section>
-</section>
-
-<footer class="footer fluid-width mobile-full-width">
-
-    <a href="#" data-ga-label="DownArrow" class="down-arrow hover-fill js-ga-track">
-        <svg width="30px" height="30px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
-             xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 60 60"
-             enable-background="new 0 0 60 60" xml:space="preserve">
-          <polygon fill="#FFFFFF" points="55.7,19.2 51.5,15.1 30,36.6 8.5,15.1 4.3,19.2 30,44.9 30,44.9 30,44.9 "/>
-        </svg>
-    </a>
-
-    <div class="float-right footer-social-links">
-        <a data-ga-label="G+" target="_blank" href="https://new.vk.com/evendate"
-           class="footer-social-link hover-fill js-ga-track">
-            <i class="fa fa-vk"></i>
-        </a>
-        <a data-ga-label="Twitter" target="_blank" href="https://twitter.com/evendate"
-           class="footer-social-link hover-fill js-ga-track">
-            <i class="fa fa-twitter"></i>
-        </a>
-        <a target="_blank" href="http://instagram.com/evendate.ru"
-           class="footer-social-link hover-fill js-ga-track">
-            <i class="fa fa-instagram"></i>
-        </a>
-    </div>
-
-    <div class="footer-nav-links float-right">
-        <a class="footer-nav-link feedback-link" target="_blank"
-           href="#">Обратная связь</a>
-    </div>
-</footer>
-
-<footer class="global-footer footer">
-    <div class="fluid-width mobile-full-width">
-        <div class="float-right footer-social-links">
-            <a target="_blank" href="https://new.vk.com/evendate"
-               class="footer-social-link">
-                <i class="fa fa-vk"></i>
-            </a>
-            <a target="_blank" href="https://twitter.com/evendate"
-               class="footer-social-link">
-                <i class="fa fa-twitter"></i>
-            </a>
-            <a target="_blank" href="http://instagram.com/evendate"
-               class="footer-social-link">
-                <i class="fa fa-instagram"></i>
-            </a>
-        </div>
-
-        <div class="footer-nav-links float-right">
-            <a class="footer-nav-link feedback-link" target="_blank"
-               href="#">Обратная связь</a>
-        </div>
-    </div>
-</footer>
-
-
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="assets/components/jquery.js"><\/script>');</script>
+<!-- =============== VENDOR SCRIPTS ===============-->
+<!-- Google MAPS -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg&libraries=places" async defer type="text/javascript"></script>
+<!-- SOCKET.IO -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js" type="text/javascript"></script>
-<script src="app/js/app.js"></script>
+
 <?php
-require_once('footer.php');
+if($DEBUG_MODE) { ?>
+	<script type="text/javascript" src="/dist/vendor.js?rev=a8d349fb077648d4d90e4a69f5725bb2" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=6e85e245d0d52088a03cd3781f40ddcc" charset="utf-8"></script><?php
+} else { ?>
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=ea5ddb9587bc7e42e0d8ef808c54a6b5" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=abab7169713e2ec8afdcaeed5eb0814e" charset="utf-8"></script><?php
+}	?>
+
+<?php
+require 'templates.html';
+require 'footer.php';
 ?>
-<script src="app/assets/js/scripts.min.js"></script>
+
 </body>
+
 </html>

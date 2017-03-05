@@ -147,7 +147,7 @@ FeedPage = extending(Page, (function() {
 			PAGE.initFeedCalendar();
 		}
 		
-		if(__APP.USER.id === -1){
+		if(__APP.USER.isLoggedOut()){
 			__APP.renderHeaderTabs([
 				{title: 'Актуальные', page: '/feed/actual'},
 				{title: 'По времени', page: '/feed/timeline'}
@@ -165,10 +165,6 @@ FeedPage = extending(Page, (function() {
 				{title: 'Рекомендованные', page: '/feed/recommendations'}/*,
 				 {title: 'Друзья', page: '/feed/friends/'},*/
 			]);
-		}
-		if (window.location.pathname == '/feed/' || window.location.pathname == '/feed' || !window.location.pathname.contains('feed')) {
-			__APP.changeState('/feed/actual', true, true);
-			return null;
 		}
 		
 		$window.off('scroll');
