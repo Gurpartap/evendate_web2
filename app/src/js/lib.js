@@ -30,6 +30,7 @@ __C = {
 		},
 		SIZES: {
 			X30: '-size_30x30',
+			X40: '-size_40x40',
 			X55: '-size_55x55',
 			LOW: '-size_low',
 			WIDE: '-size_wide',
@@ -96,6 +97,7 @@ __C = {
 		unsubscribe: ['удалил(а) подписки']
 	},
 	ENTITIES: {
+		USER: 'user',
 		EVENT: 'event',
 		ORGANIZATION: 'organization'
 	},

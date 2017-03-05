@@ -737,13 +737,15 @@ __APP = {
 			
 			return tmpl('avatar-block', (entities instanceof Array ? entities : [entities]).map(function(entity) {
 				var name, href;
-				if((props.entity && props.entity === __C.ENTITIES.ORGANIZATION) || !entity.first_name){
-					name = entity.short_name ? entity.short_name : entity.name;
-					href = '/organization/' + entity.id;
-				} else {
+				
+				if((props.entity && props.entity === __C.ENTITIES.USER) || entity instanceof OneUser || entity.first_name){
 					name = entity.full_name ? entity.full_name : (entity.first_name + ' ' + entity.last_name);
 					href = '/user/' + entity.id;
+				} else {
+					name = entity.short_name ? entity.short_name : entity.name;
+					href = '/organization/' + entity.id;
 				}
+				
 				return $.extend(true, {
 					avatar: __APP.BUILD.avatars(entity, {
 						classes: props.avatar_classes
@@ -1096,8 +1098,13 @@ __APP = {
 					divider: append_divider ? tmpl('subscriber-divider', {label: subscriber.is_friend ? 'Друзья' : 'Все подписчики'}) : '',
 					avatar_block: __APP.BUILD.avatarBlocks(subscriber, {
 						is_link: true,
-						entity: 'user',
-						avatar_classes: ['-size_40x40', '-rounded', '-bordered', '-shadowed'],
+						entity: __C.ENTITIES.USER,
+						avatar_classes: [
+							__C.CLASSES.SIZES.X40,
+							__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+							__C.CLASSES.UNIVERSAL_STATES.BORDERED,
+							__C.CLASSES.UNIVERSAL_STATES.SHADOWED
+						],
 						block_classes: ['subscriber']
 					})
 				};
