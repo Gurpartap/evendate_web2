@@ -20,7 +20,7 @@ UsersCollection = extending(EntitiesCollection, (function() {
 	 * @constructs UsersCollection
 	 */
 	function UsersCollection() {}
-	Object.defineProperty(UsersCollection.prototype, 'collection_of', {value: OneUser});
+	UsersCollection.prototype.collection_of = OneUser;
 	/**
 	 * Returns specified staff by role. Mixing additional_fields if needed.
 	 * @param {OneUser.ROLE} role
@@ -96,7 +96,7 @@ UsersCollection = extending(EntitiesCollection, (function() {
 	 * Returns specified staff by role. Mixing additional_fields if needed.
 	 * @param {OneUser.ROLE} role
 	 * @param {object} [additional_fields]
-	 * @return {(Array<OneUser>|UsersCollection|Array<object>)}
+	 * @return {(Array<OneUser>|UsersCollection|Array<Object>)}
 	 */
 	UsersCollection.prototype.getSpecificStaff = function(role, additional_fields) {
 		var specific_staff = [];

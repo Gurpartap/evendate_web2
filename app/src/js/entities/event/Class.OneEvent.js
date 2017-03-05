@@ -11,51 +11,150 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @constructor
 	 * @constructs OneEvent
-	 * @param {(string|number)} [event_id]
+	 * @param {(string|number)} [event_id=0]
 	 * @param {boolean} [is_loading_continuous]
+	 *
+	 *
+	 * @property {number} id
+	 * @property {?string} title
+	 * @property {?string} description
+	 *
+	 * @property {?string} location
+	 * @property {?string} latitude
+	 * @property {?string} longitude
+	 * @property {?boolean} is_online
+	 *
+	 * @property {?string} detail_info_url
+	 *
+	 * @property {Array} orders
+	 *
+	 * @property {?boolean} ticketing_locally
+	 * @property {Array} tickets
+	 * @property {Array} ticket_types
+	 *
+	 * @property {?boolean} registration_locally
+	 * @property {?boolean} registration_available
+	 * @property {?boolean} registration_required
+	 * @property {?number} registration_limit_count
+	 * @property {?string} registration_till
+	 * @property {?string} registration_approve_status
+	 * @property {?boolean} registration_approvement_required
+	 * @property {?boolean} is_registered
+	 * @property {?number} registered_count
+	 * @property {UsersCollection} registered_users
+	 * @property {RegistrationFieldsCollection} registration_fields
+	 *
+	 * @property {?number} organization_id
+	 * @property {?string} organization_short_name
+	 * @property {?string} organization_logo_large_url
+	 * @property {?string} organization_logo_medium_url
+	 * @property {?string} organization_logo_small_url
+	 *
+	 * @property {?string} image_vertical_url
+	 * @property {?string} image_horizontal_url
+	 * @property {?string} image_horizontal_large_url
+	 * @property {?string} image_horizontal_medium_url
+	 * @property {?string} image_horizontal_small_url
+	 *
+	 * @property {?boolean} is_free
+	 * @property {?number} min_price
+	 *
+	 * @property {DatesCollection} dates
+	 * @property {?boolean} is_same_time
+	 * @property {?number} first_event_date
+	 * @property {?number} last_event_date
+	 * @property {?number} nearest_event_date
+	 *
+	 * @property {TagsCollection} tags
+	 *
+	 * @property {Array} notifications
+	 *
+	 * @property {UsersCollection} favored
+	 * @property {?number} favored_users_count
+	 * @property {?number} favored_friends_count
+	 * @property {?boolean} is_favorite
+	 *
+	 * @property {?number} public_at
+	 * @property {?boolean} canceled
+	 * @property {?boolean} can_edit
+	 *
+	 * @property {?number} actuality
+	 *
+	 * @property {?number} creator_id
+	 * @property {?number} created_at
+	 * @property {?number} updated_at
 	 */
 	function OneEvent(event_id, is_loading_continuous) {
 		this.id = event_id ? event_id : 0;
-		this.title = '';
-		this.description = '';
-		this.location = '';
-		this.latitude = '';
-		this.longitude = '';
-		this.is_online = false;
-		this.detail_info_url = '';
-		this.can_edit = false;
-		this.registration_required = false;
-		this.registration_limit_count = 0;
-		this.registration_locally = false;
-		this.registration_till = '';
-		this.registration_approved = false;
-		this.registration_approvement_required = false;
-		this.registered_count = 0;
+		this.title = null;
+		this.description = null;
+		
+		this.location = null;
+		this.latitude = null;
+		this.longitude = null;
+		this.is_online = null;
+		
+		this.detail_info_url = null;
+		
+		this.orders = [];
+		
+		this.ticketing_locally = null;
+		this.tickets = [];
+		this.ticket_types = [];
+		
+		this.registration_locally = null;
+		this.registration_available = null;
+		this.registration_required = null;
+		this.registration_limit_count = null;
+		this.registration_till = null;
+		this.registration_approve_status = null;
+		this.registration_approvement_required = null;
+		this.is_registered = null;
+		this.registered_count = null;
 		this.registered_users = new UsersCollection();
 		this.registration_fields = new RegistrationFieldsCollection();
-		this.organization_id = 0;
-		this.organization_short_name = '';
-		this.image_vertical_url = '';
-		this.image_horizontal_url = '';
-		this.image_horizontal_large_url = '';
-		this.image_horizontal_small_url = '';
-		this.organization_logo_small_url = '';
-		this.is_free = false;
-		this.min_price = 0;
+		
+		this.organization_id = null;
+		this.organization_short_name = null;
+		this.organization_logo_large_url = null;
+		this.organization_logo_medium_url = null;
+		this.organization_logo_small_url = null;
+		
+		this.image_vertical_url = null;
+		this.image_horizontal_url = null;
+		this.image_horizontal_large_url = null;
+		this.image_horizontal_medium_url = null;
+		this.image_horizontal_small_url = null;
+		
+		this.is_free = null;
+		this.min_price = null;
+		
+		this.dates = new DatesCollection();
+		this.is_same_time = null;
 		this.first_event_date = null;
 		this.last_event_date = null;
 		this.nearest_event_date = null;
-		this.is_same_time = false;
-		this.dates = new DatesCollection();
-		this.tags = new TagsCollection();
-		this.notifications = [];
-		this.favored = new UsersCollection();
-		this.favored_users_count = 0;
-		this.is_favorite = false;
-		this.public_at = null;
-		this.canceled = false;
-		this.loading = false;
 		
+		this.tags = new TagsCollection();
+		
+		this.notifications = [];
+		
+		this.favored = new UsersCollection();
+		this.favored_users_count = null;
+		this.favored_friends_count = null;
+		this.is_favorite = null;
+		
+		this.public_at = null;
+		this.canceled = null;
+		this.can_edit = null;
+		
+		this.actuality = null;
+		
+		this.creator_id = null;
+		this.created_at = null;
+		this.updated_at = null;
+		
+		this.loading = false;
 		if (event_id && is_loading_continuous) {
 			this.loading = true;
 			this.fetchEvent([], function() {
@@ -211,7 +310,10 @@ OneEvent = extending(OneEntity, (function() {
 	OneEvent.registerToEvent = function(event_id, registration_fields, success) {
 		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/orders', {
 			registration_fields: registration_fields,
-			tickets: [{count: 1}]
+			tickets: [{
+				uuid: null,
+				count: 1
+			}]
 		}, true, success);
 	};
 	/**

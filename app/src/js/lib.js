@@ -1,18 +1,112 @@
 /**
- * Extending class
- * @param {Function} parent
+ * @const __C
+ * @property {Object<string, string>} CLASSES
+ * @property {string} DATE_FORMAT
+ * @property {Object<string, string>} COLORS
+ * @property {Object<string, string>} STATS
+ * @property {Object<string, string[]>} ACTION_NAMES
+ * @property {Object<string, string>} ENTITIES
  */
-Function.prototype.extend = function(parent) {
-	this.prototype = Object.create(parent.prototype);
-	this.prototype.constructor = this;
-	this.prototype.__super = parent.prototype;
-	this.prototype.__superCall = function(method_name) {
-		if (parent.prototype[method_name] && typeof parent.prototype[method_name] == 'function') {
-			return parent.prototype[method_name].call(this, Array.prototype.slice.call(1, arguments));
-		} else {
-			console.error('There is no "' + method_name + '" method in object "' + parent.prototype.constructor.name + '"');
-		}
-	};
+__C = {
+	CLASSES: {
+		TEXT_COLORS: {
+			ACCENT: '-text_color_accent'
+		},
+		COLORS: {
+			ACCENT: '-color_accent',
+			PRIMARY: '-color_primary',
+			NEUTRAL: '-color_neutral',
+			NEUTRAL_ACCENT: '-color_neutral_accent',
+			MARGINAL: '-color_marginal',
+			MARGINAL_PRIMARY: '-color_marginal_primary',
+			MARGINAL_ACCENT: '-color_marginal_accent'
+		},
+		UNIVERSAL_STATES: {
+			EMPTY: '-empty',
+			ROUNDED: '-rounded',
+			SHADOWED: '-shadowed',
+			BORDERED: '-bordered',
+			TRANSFORM_UPPERCASE: '-transform_uppercase'
+		},
+		SIZES: {
+			X30: '-size_30x30',
+			X55: '-size_55x55',
+			LOW: '-size_low',
+			WIDE: '-size_wide',
+			SMALL: '-size_small'
+		},
+		HOOKS: {
+			RIPPLE: 'RippleEffect',
+			ADD_TO_FAVORITES: 'AddToFavorites',
+			TEXT: 'Text',
+			CALL_MODAL: 'CallModal',
+			DROPDOWN_BUTTON: 'DropdownButton',
+			ADD_AVATAR: {
+				ANCESTOR: 'AddAvatarWrapper',
+				COLLECTION: 'AvatarsCollection',
+				QUANTITY: 'FavoredCount',
+				STATES: {
+					CAST: '-cast',
+					CASTABLE: '-castable',
+					SHIFT: '-shift',
+					SHIFTED: '-shifted'
+				}
+			}
+		},
+		ACTIVE: '-active',
+		DISABLED: '-disabled',
+		HIDDEN: '-hidden',
+		ICONS: {
+			STAR: 'fa-star',
+			STAR_O: 'fa-star-o',
+			BELL_O: 'fa-bell-o',
+			TIMES: 'fa-times',
+			PLUS: 'fa-plus',
+			CHECK: 'fa-check',
+			PENCIL: 'fa-pencil'
+		},
+		ICON_CLASS: 'fa_icon'
+	},
+	DATE_FORMAT: 'YYYY-MM-DD',
+	COLORS: {
+		PRIMARY: '#2e3b50',
+		MUTED: '#3e4d66',
+		MUTED_80: '#657184',
+		MUTED_50: '#9fa6b3',
+		MUTED_30: '#c5c9d1',
+		TEXT: '#4a4a4a',
+		ACCENT: '#f82969',
+		ACCENT_ALT: '#ff5f9e',
+		FRANKLIN: '#28be84',
+		FRANKLIN_ALT: '#23d792'
+	},
+	STATS: {
+		EVENT_VIEW: 'view',
+		EVENT_VIEW_DETAIL: 'view_detail',
+		EVENT_OPEN_SITE: 'open_site',
+		EVENT_OPEN_MAP: 'open_map',
+		ORGANIZATION_OPEN_SITE: 'open_site',
+		EVENT_ENTITY: 'event',
+		ORGANIZATION_ENTITY: 'organization'
+	},
+	ACTION_NAMES: {
+		fave: ['добавил(а) в избранное'],
+		unfave: ['удалил(а) из избранного'],
+		subscribe: ['добавил(а) подписки'],
+		unsubscribe: ['удалил(а) подписки']
+	},
+	ENTITIES: {
+		EVENT: 'event',
+		ORGANIZATION: 'organization'
+	},
+	/**
+	 * @enum {string}
+	 */
+	DEFERRED_STATES: {
+		PENDING: 'pending',
+		RESOLVED: 'resolved',
+		REJECTED: 'rejected'
+	}
 };
 /**
  * Extending class
@@ -52,12 +146,15 @@ function extending(parent, children){
  */
 function extendingJQuery(children){
 	children = extending(jQuery, children);
+	
 	children.prototype.pushStack = function(elems) {
-		var ret = jQuery.merge(this.get(0) == elems ? new this.constructor(this.id, this.is_subscribed, this.options) : $(), elems);
+		var ret = jQuery.merge(this.get(0) == elems ? new this.constructor() : $(), elems);
 		ret.prevObject = this;
 		ret.context = this.context;
 		return ret;
 	};
+	
+	
 	return children;
 }
 /**
@@ -775,9 +872,12 @@ jQuery.makeSet = function(array) {
  * http://www.gnu.org/licenses/gpl-3.0-standalone.html
  */
 (function(window){
+	/**
+	 *
+	 * @lends cookies
+	 */
 	window.cookies = {
 		/**
-		 *
 		 * @param {string} name
 		 * @return {(string|null)}
 		 */
@@ -1422,7 +1522,7 @@ function bindTabs($parent) {
 					$wrappers = $target.hasClass('TabsBody') ? $wrappers.add($target) : $wrappers;
 					$wrappers.each(function(i, wrapper) {
 						var $wrapper = $(wrapper);
-						if($wrapper.hasClass(__C.CLASSES.NEW_ACTIVE)) {
+						if($wrapper.hasClass(__C.CLASSES.ACTIVE)) {
 							$this.addClass('-in_progress');
 							$wrapper.parent().height($wrapper.outerHeight());
 						}
@@ -1449,7 +1549,7 @@ function bindTabs($parent) {
 		Object.defineProperties($this, {
 			'currentTabsIndex': {
 				get: function() {
-					return $tabs.index($tabs.filter('.'+__C.CLASSES.NEW_ACTIVE));
+					return $tabs.index($tabs.filter('.'+__C.CLASSES.ACTIVE));
 				}
 			},
 			'tabsCount': {
@@ -1462,11 +1562,11 @@ function bindTabs($parent) {
 		$this.setToTab = function(index) {
 			var $setting_tab = $tabs.eq(index),
 				$setting_body = $bodies.eq(index);
-			if ($setting_tab.length && !$setting_tab.hasClass(__C.CLASSES.NEW_ACTIVE)) {
-				$tabs.removeClass(__C.CLASSES.NEW_ACTIVE);
-				$bodies.removeClass(__C.CLASSES.NEW_ACTIVE);
-				$setting_tab.addClass(__C.CLASSES.NEW_ACTIVE);
-				$setting_body.addClass(__C.CLASSES.NEW_ACTIVE);
+			if ($setting_tab.length && !$setting_tab.hasClass(__C.CLASSES.ACTIVE)) {
+				$tabs.removeClass(__C.CLASSES.ACTIVE);
+				$bodies.removeClass(__C.CLASSES.ACTIVE);
+				$setting_tab.addClass(__C.CLASSES.ACTIVE);
+				$setting_body.addClass(__C.CLASSES.ACTIVE);
 				$this.trigger('change.tabs');
 				if (focus_on_change) {
 					scrollTo($setting_body, 400);
@@ -1482,11 +1582,11 @@ function bindTabs($parent) {
 			$this.setToTab($this.currentTabsIndex - 1);
 		};
 		
-		if (!$tabs.filter('.'+__C.CLASSES.NEW_ACTIVE).length) {
-			$tabs.eq(0).addClass(__C.CLASSES.NEW_ACTIVE);
+		if (!$tabs.filter('.'+__C.CLASSES.ACTIVE).length) {
+			$tabs.eq(0).addClass(__C.CLASSES.ACTIVE);
 		}
-		$bodies.removeClass(__C.CLASSES.NEW_ACTIVE).eq($this.currentTabsIndex).addClass(__C.CLASSES.NEW_ACTIVE);
-		$bodies_wrapper.height($bodies.filter('.'+__C.CLASSES.NEW_ACTIVE).outerHeight());
+		$bodies.removeClass(__C.CLASSES.ACTIVE).eq($this.currentTabsIndex).addClass(__C.CLASSES.ACTIVE);
+		$bodies_wrapper.height($bodies.filter('.'+__C.CLASSES.ACTIVE).outerHeight());
 		$bodies_wrapper.on('transitionend webkitTransitionEnd', function() {
 			$this.removeClass('-in_progress');
 			$this.trigger('progress_end')
@@ -1666,7 +1766,7 @@ function bindCollapsing($parent) {
 		
 		if($wrapper.hasClass('-fading')){
 			default_height = $instance.data('defaultHeight') < $content.height() ? $instance.data('defaultHeight') : $content.height();
-			if (!$instance.hasClass(__C.CLASSES.NEW_ACTIVE) && $wrapper.height() < default_height) {
+			if (!$instance.hasClass(__C.CLASSES.ACTIVE) && $wrapper.height() < default_height) {
 				$wrapper.height(default_height);
 			}
 		} else {
@@ -1675,13 +1775,13 @@ function bindCollapsing($parent) {
 		
 		function toggleCollapsing(){
 			$wrapper.addClass('-in_progress');
-			if ($instance.hasClass(__C.CLASSES.NEW_ACTIVE)) {
+			if ($instance.hasClass(__C.CLASSES.ACTIVE)) {
 				$wrapper.height(default_height);
 			} else {
 				$wrapper.height($content.outerHeight());
 			}
 			$wrapper.toggleClass('-opened');
-			$instance.toggleClass(__C.CLASSES.NEW_ACTIVE);
+			$instance.toggleClass(__C.CLASSES.ACTIVE);
 		}
 		
 		function changeProp(){
@@ -1691,14 +1791,14 @@ function bindCollapsing($parent) {
 		}
 		
 		$instance.openCollapsing = function() {
-			if(!$instance.hasClass(__C.CLASSES.NEW_ACTIVE)){
+			if(!$instance.hasClass(__C.CLASSES.ACTIVE)){
 				changeProp();
 				toggleCollapsing();
 			}
 		};
 		
 		$instance.closeCollapsing = function() {
-			if($instance.hasClass(__C.CLASSES.NEW_ACTIVE)){
+			if($instance.hasClass(__C.CLASSES.ACTIVE)){
 				changeProp();
 				toggleCollapsing();
 			}
@@ -1830,7 +1930,8 @@ function bindPageLinks($parent) {
 	$parent = $parent ? $parent : $('body');
 	$parent.find('.Link').not('.-Handled_Link').on('click.pageRender', function(e) {
 		var $this = $(this);
-		if ($this.hasClass(__C.CLASSES.DISABLED)) return true;
+		if ($this.hasClass(__C.CLASSES.DISABLED))
+			return false;
 		if (e.which == 1) {
 			e.preventDefault();
 			__APP.changeState($this.attr('href'));
@@ -1874,7 +1975,11 @@ function handleErrorField($unit) {
 	}
 	return $unit;
 }
-
+/**
+ * Getting base64-encoded string of the image from url
+ * @param {string} url
+ * @param {function({string})} callback
+ */
 function toDataUrl(url, callback) {
 	var xhr = new XMLHttpRequest();
 	xhr.responseType = 'blob';
@@ -1896,7 +2001,10 @@ function showNotifier(response) {
 		'status': response.status ? 'success' : 'danger'
 	});
 }
-
+/**
+ * Checks if device is mobile
+ * @return {boolean}
+ */
 function isNotDesktop() {
 	var check = false;
 	(function (a) {

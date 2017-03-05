@@ -3,12 +3,20 @@
  */
 /**
  *
- * @constructor
- * @augments Events
+ * @class FavoredEventsPage
+ * @extends FeedPage
  */
-function FavoredEventsPage() {
-	FeedPage.apply(this);
-	this.events = new FavoredEventsCollection();
-	this.page_title = 'Избранные события';
-}
-FavoredEventsPage.extend(FeedPage);
+FavoredEventsPage = extending(FeedPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs FavoredEventsPage
+	 */
+	function FavoredEventsPage() {
+		FeedPage.apply(this);
+		this.events = new FavoredEventsCollection();
+		this.page_title = 'Избранные события';
+	}
+	
+	return FavoredEventsPage
+}()));

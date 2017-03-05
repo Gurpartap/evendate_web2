@@ -3,12 +3,20 @@
  */
 /**
  *
- * @constructor
- * @augments FeedPage
+ * @class ActualEventsPage
+ * @extends FeedPage
  */
-function ActualEventsPage() {
-	FeedPage.apply(this);
-	this.events = new ActualEventsCollection();
-	this.page_title = 'Актуальные события';
-}
-ActualEventsPage.extend(FeedPage);
+ActualEventsPage = extending(FeedPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs ActualEventsPage
+	 */
+	function ActualEventsPage() {
+		FeedPage.apply(this);
+		this.events = new ActualEventsCollection();
+		this.page_title = 'Актуальные события';
+	}
+	
+	return ActualEventsPage
+}()));

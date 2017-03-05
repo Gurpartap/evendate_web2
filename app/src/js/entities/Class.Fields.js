@@ -45,28 +45,25 @@ Fields = (function() {
 	 * @param {...(Object|Array|string)} [obj]
 	 */
 	function Fields(obj) {
-		var args = Array.prototype.splice.call(arguments, 0),
-			field,
-			parsed_obj = {};
-		
-		args.forEach(function(arg) {
-			if(typeof arg === 'string'){
-				parsed_obj[arg] = {};
-			} else if (arg instanceof Array) {
-				arg.forEach(function(field) {
-					parsed_obj[field] = {};
-				});
-			} else if (arg instanceof Object) {
-				for(field in arg) {
-					parsed_obj[field] = arg[field];
+		this.add.apply(this, arguments);
+	}
+	
+	Object.defineProperty(Fields.prototype, 'toString', {
+		value: function() {
+			var fields = [],
+				field;
+			for(field in this){
+				if(this.hasOwnProperty(field)){
+					if(Object.keys(this[field]).length){
+						fields.push(field+this[field]);
+					} else {
+						fields.push(field);
+					}
 				}
 			}
-		});
-		
-		for(field in parsed_obj){
-			this[field] = new FieldsProps(parsed_obj[field]);
+			return fields.join(',');
 		}
-	}
+	});
 	
 	/**
 	 *
@@ -105,22 +102,31 @@ Fields = (function() {
 		return new Fields(parseFields(fields));
 	};
 	
-	Object.defineProperty(Fields.prototype, 'toString', {
-		value: function() {
-			var fields = [],
-				field;
-			for(field in this){
-				if(this.hasOwnProperty(field)){
-					if(Object.keys(this[field]).length){
-						fields.push(field+this[field]);
-					} else {
-						fields.push(field);
-					}
+	Fields.prototype.push = Fields.prototype.add = function() {
+		var args = Array.prototype.splice.call(arguments, 0),
+			field,
+			parsed_obj = {};
+		
+		args.forEach(function(arg) {
+			if(typeof arg === 'string'){
+				parsed_obj[arg] = {};
+			} else if (arg instanceof Array) {
+				arg.forEach(function(field) {
+					parsed_obj[field] = {};
+				});
+			} else if (arg instanceof Object) {
+				for(field in arg) {
+					parsed_obj[field] = arg[field];
 				}
 			}
-			return fields.join(',');
+		});
+		
+		for(field in parsed_obj){
+			this[field] = new FieldsProps(parsed_obj[field]);
 		}
-	});
+		
+		return this;
+	};
 	
 	return Fields;
 }());

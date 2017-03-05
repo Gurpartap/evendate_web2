@@ -29,11 +29,19 @@ RegistrationModal = extending(PreviewRegistrationModal, (function() {
 			
 			$register_button.attr('disabled', true);
 			if (isFormValid($form)) {
-				OneEvent.registerToEvent(self.event.id, $form.serializeForm()).always(function() {
-					$register_button.removeAttr('disabled');
-				}).done(function() {
-					self.hide();
-				});
+				OneEvent.registerToEvent(self.event.id, $form.serializeForm('array').map(function(field) {
+					return {
+						uuid: field.name,
+						value: field.value
+					};
+				}))
+					.always(function() {
+						$register_button.removeAttr('disabled');
+					})
+					.done(function() {
+						self.modal.trigger('registration:success');
+						self.hide();
+					});
 			} else {
 				$register_button.removeAttr('disabled');
 			}

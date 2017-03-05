@@ -11,44 +11,63 @@ OneUser = extending(OneEntity, (function() {
 	 *
 	 * @param {(string|number)} [user_id]
 	 * @constructs OneUser
+	 *
+	 * @property {(number|string)} id
+	 * @property {string} ?first_name
+	 * @property {string} ?last_name
+	 * @property {string} ?middle_name
+	 * @property {string} ?full_name
+	 * @property {OneUser.GENDER} ?gender
+	 * @property {string} ?avatar_url
+	 * @property {string} ?blurred_image_url
+	 * @property {string} ?link
+	 * @property {string} ?type
+	 * @property {string} ?role
+	 * @property {boolean} ?is_friend
+	 * @property {boolean} ?is_editor
+	 *
+	 * @property {Array<OneUser.ACCOUNTS>} accounts
+	 * @property {Object<OneUser.ACCOUNTS, string>} accounts_links
+	 * @property {string} ?vk_uid
+	 * @property {string} ?google_uid
+	 * @property {string} ?facebook_uid
+	 *
+	 * @property {OrganizationsCollection} subscriptions
+	 * @property {FavoredEventsCollection} favored
+	 * @property {UsersActivitiesCollection} actions
 	 */
 	function OneUser(user_id) {
 		var self = this;
 		
 		this.id = setDefaultValue(user_id, 0);
-		this.first_name = '';
-		this.last_name = '';
-		this.middle_name = '';
-		/**
-		 *
-		 * @type {OneUser.GENDER}
-		 */
-		this.gender = '';
-		this.avatar_url = '';
-		this.type = '';
-		this.is_friend = false;
-		this.is_editor = false;
-		this.blurred_image_url = '';
-		this.link = '';
-		/**
-		 *
-		 * @type {Array<OneUser.ACCOUNTS>}
-		 */
+		this.first_name = null;
+		this.last_name = null;
+		this.middle_name = null;
+		this.gender = null;
+		this.avatar_url = null;
+		this.blurred_image_url = null;
+		this.link = null;
+		this.type = null;
+		this.role = null;
+		this.is_friend = null;
+		this.is_editor = null;
+		
 		this.accounts = [];
-		/**
-		 *
-		 * @type {Object<OneUser.ACCOUNTS, string>}
-		 */
 		this.accounts_links = {};
+		this.vk_uid = null;
+		this.google_uid = null;
+		this.facebook_uid = null;
+		
+		this.subscriptions = new OrganizationsCollection();
+		this.favored = new FavoredEventsCollection();
+		this.actions = new UsersActivitiesCollection(user_id);
+		
 		Object.defineProperty(this, 'full_name', {
 			enumerable: true,
 			get: function() {
 				return self.first_name + ' ' + self.last_name;
 			}
 		});
-		this.subscriptions = new OrganizationsCollection();
-		this.favored = new FavoredEventsCollection();
-		this.actions = new UsersActivitiesCollection(user_id);
 	}
 	OneUser.prototype.subscriptions_fields = ['img_small_url', 'subscribed_count', 'new_events_count', 'actual_events_count'];
 	Object.freeze(OneUser.prototype.subscriptions_fields);
@@ -62,6 +81,7 @@ OneUser = extending(OneEntity, (function() {
 		MODERATOR: 'moderator',
 		ADMIN: 'admin'
 	};
+	Object.freeze(OneUser.ROLE);
 	/**
 	 * @const
 	 * @enum {string}
@@ -71,6 +91,7 @@ OneUser = extending(OneEntity, (function() {
 		FEMALE: 'female',
 		NEUTRAL: 'neutral'
 	};
+	Object.freeze(OneUser.GENDER);
 	/**
 	 * @const
 	 * @enum {string}
@@ -80,6 +101,7 @@ OneUser = extending(OneEntity, (function() {
 		GOOGLE: 'google',
 		FACEBOOK: 'facebook'
 	};
+	Object.freeze(OneUser.ACCOUNTS);
 	/**
 	 *
 	 * @param {(string|number)} user_id
@@ -186,8 +208,5 @@ OneUser = extending(OneEntity, (function() {
 		}).promise();
 	};
 	
-	Object.freeze(OneUser.ROLE);
-	Object.freeze(OneUser.GENDER);
-	Object.freeze(OneUser.ACCOUNTS);
 	return OneUser;
 }()));

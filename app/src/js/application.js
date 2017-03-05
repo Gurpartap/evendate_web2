@@ -736,7 +736,7 @@ __APP = {
 			
 			return tmpl('avatar-block', (entities instanceof Array ? entities : [entities]).map(function(entity) {
 				var name, href;
-				if((props.entity && props.entity === 'organization') || !entity.first_name){
+				if((props.entity && props.entity === __C.ENTITIES.ORGANIZATION) || !entity.first_name){
 					name = entity.short_name ? entity.short_name : entity.name;
 					href = '/organization/' + entity.id;
 				} else {
@@ -892,7 +892,7 @@ __APP = {
 		organizationItems: function buildOrganizationItems(organizations, additional_fields) {
 			organizations = organizations instanceof Array ? organizations : [organizations];
 			var orgs = organizations.map(function(org) {
-				org.counter_classes = org.new_events_count ? [] : [__C.CLASSES.NEW_HIDDEN];
+				org.counter_classes = org.new_events_count ? [] : [__C.CLASSES.HIDDEN];
 				return org;
 			});
 			return tmpl('organization-item', orgs.map(function(organization) {
@@ -916,23 +916,38 @@ __APP = {
 						page: '/organization/'+org.id,
 						classes: ['organization_unit_background'],
 						attributes: {
-							style: 'background-image: url(\''+(org.background_small_img_url || org.background_img_url)+'\')'
+							style: 'background-image: url("'+(org.background_small_img_url || org.background_img_url)+'")'
 						}
 					}) : '',
 					avatar: __APP.BUILD.avatars(org, {
-						classes: ['organization_unit_avatar','-size_55x55','-bordered','-rounded','-shadowed']
+						classes: [
+							'organization_unit_avatar',
+							__C.CLASSES.SIZES.X55,
+							__C.CLASSES.UNIVERSAL_STATES.BORDERED,
+							__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+							__C.CLASSES.UNIVERSAL_STATES.SHADOWED
+						]
 					}),
 					subscribe_button: new SubscribeButton(org.id, {
-						is_subscribed: org.is_subscribed,
+						is_checked: org.is_subscribed,
 						colors: {
-							subscribe: '-color_marginal_accent'
+							unchecked: __C.CLASSES.COLORS.MARGINAL_ACCENT,
+							unchecked_hover: __C.CLASSES.COLORS.MARGINAL_ACCENT
 						},
-						icons: null,
-						classes: ['-size_low', 'RippleEffect']
+						has_icons: false,
+						classes: [__C.CLASSES.SIZES.LOW, __C.CLASSES.HOOKS.RIPPLE]
 					}),
 					subscribed_text: org.subscribed_count + getUnitsText(org.subscribed_count, __LOCALES.ru_RU.TEXTS.SUBSCRIBERS),
 					redact_org_button: (org.role === OneUser.ROLE.UNAUTH || org.role === OneUser.ROLE.USER) ? '' : __APP.BUILD.link({
-						classes: ['button', '-size_low', '-color_marginal_primary', 'fa_icon', 'fa-pencil', '-empty', 'RippleEffect'],
+						classes: [
+							'button',
+							__C.CLASSES.SIZES.LOW,
+							__C.CLASSES.COLORS.MARGINAL_PRIMARY,
+							__C.CLASSES.ICON_CLASS,
+							__C.CLASSES.ICONS.PENCIL,
+							__C.CLASSES.UNIVERSAL_STATES.EMPTY,
+							__C.CLASSES.HOOKS.RIPPLE
+						],
 						page: 'organization/' + org.id + '/edit'
 					})
 				});
@@ -949,31 +964,77 @@ __APP = {
 				var sort_date_type = type.sort_date_type ? type.sort_date_type : 'nearest_event_date',
 					m_event_date = moment.unix(event[sort_date_type] ? event[sort_date_type] : event['first_event_date']),
 					different_day = type.last_date != m_event_date.format(__C.DATE_FORMAT),
-					avatars_collection_classes = ['-rounded','-bordered','-size_small','AvatarsCollection','CallModal'];
+					avatars_collection_classes = [
+						__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+						__C.CLASSES.UNIVERSAL_STATES.BORDERED,
+						__C.CLASSES.SIZES.SMALL,
+						__C.CLASSES.HOOKS.ADD_AVATAR.COLLECTION,
+						__C.CLASSES.HOOKS.CALL_MODAL
+					],
+					$action_buttons = $();
 				
 				if(event.is_favorite) {
-					avatars_collection_classes.push('-shifted');
+					avatars_collection_classes.push(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
+				}
+				
+				if (event.is_favorite != null) {
+					if (event.registration_locally || event.ticketing_locally) {
+						$action_buttons = $action_buttons.add(new AddToFavoriteButton(event.id, {
+							is_add_avatar: true,
+							is_checked: event.is_favorite,
+							classes: [
+								__C.CLASSES.UNIVERSAL_STATES.EMPTY,
+								__C.CLASSES.SIZES.LOW,
+								__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+								__C.CLASSES.HOOKS.ADD_TO_FAVORITES,
+								__C.CLASSES.HOOKS.RIPPLE
+							],
+							labels: null
+						}));
+						
+						if (event.ticketing_locally) {
+							
+						} else {
+							$action_buttons = $action_buttons.add(new RegisterButton(event, {
+								classes: [
+									'event_block_main_action_button',
+									__C.CLASSES.SIZES.LOW,
+									__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+									__C.CLASSES.HOOKS.ADD_TO_FAVORITES,
+									__C.CLASSES.HOOKS.RIPPLE
+								]
+							}));
+						}
+					} else {
+						$action_buttons = new AddToFavoriteButton(event.id, {
+							is_add_avatar: true,
+							is_checked: event.is_favorite,
+							classes: [
+								'event_block_main_action_button',
+								__C.CLASSES.SIZES.LOW,
+								__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+								__C.CLASSES.HOOKS.ADD_TO_FAVORITES,
+								__C.CLASSES.HOOKS.RIPPLE
+							]
+						});
+					}
 				}
 				
 				type.last_date = m_event_date.format(__C.DATE_FORMAT);
+				
 				return $.extend({}, event, {
 					divider: different_day ? tmpl('divider', {
 						title: m_event_date.calendar().capitalize()
 					}) : '',
-					add_to_favorite_button: new AddToFavoriteButton(event.id, {
-						is_add_avatar: true,
-						is_subscribed: event.is_favorite,
-						classes: ['-size_low', '-size_wide', '-rounded', 'AddToFavorites', 'RippleEffect']
-					}),
+					action_buttons: $action_buttons,
 					date: m_event_date.format(__C.DATE_FORMAT),
 					avatars_collection: __APP.BUILD.avatarCollection(event.favored, 4, {
 						dataset: {
 							modal_type: 'favors',
-							modal_event_id: event.id,
-							modal_title: 'Добавили в избранное'
+							modal_event_id: event.id
 						},
 						classes: avatars_collection_classes,
-						counter_classes: ['-size_30x30','-bordered','-color_marginal','-castable']
+						counter_classes: [__C.CLASSES.SIZES.X30, __C.CLASSES.UNIVERSAL_STATES.BORDERED, __C.CLASSES.COLORS.MARGINAL, __C.CLASSES.HOOKS.ADD_AVATAR.STATES.CASTABLE]
 					}, event.favored_users_count),
 					time: event.dates.reduce(function(times, date) {
 						if (moment.unix(date.event_date).format(__C.DATE_FORMAT) == m_event_date.format(__C.DATE_FORMAT)) {
@@ -1002,13 +1063,13 @@ __APP = {
 						new_events_count = cat.organizations.reduce(function(sum, org) {
 							return sum + org.new_events_count;
 						}, 0);
-						aside_classes = new_events_count ? ['counter'] : ['counter', __C.CLASSES.NEW_HIDDEN];
+						aside_classes = new_events_count ? ['counter'] : ['counter', __C.CLASSES.HIDDEN];
 					} else {
 						aside_classes = ['fa_icon', 'fa-angle-down', '-empty'];
 					}
 				} else {
 					new_events_count = '';
-					aside_classes = [__C.CLASSES.NEW_HIDDEN];
+					aside_classes = [__C.CLASSES.HIDDEN];
 				}
 				return {
 					category_id: cat.id,
@@ -1049,23 +1110,94 @@ __APP = {
 		eventCards: function buildEventCards(events) {
 			var $events;
 			events = events instanceof Array ? events : [events];
+			
 			$events = tmpl('feed-event', events.map(function(event) {
-				var avatars_collection_classes = ['-rounded','-bordered','-size_small','AvatarsCollection','CallModal'],
+				var avatars_collection_classes = [
+						__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+						__C.CLASSES.UNIVERSAL_STATES.BORDERED,
+						__C.CLASSES.SIZES.SMALL,
+						__C.CLASSES.HOOKS.ADD_AVATAR.COLLECTION,
+						__C.CLASSES.HOOKS.CALL_MODAL
+					],
 					feed_event_infos = [],
-					organization = new OneOrganization(event.organization_id);
+					organization = new OneOrganization(event.organization_id),
+					$action_button,
+					$header_buttons = $();
+				
 				organization.setData({
 					short_name: event.organization_short_name,
 					img_url: event.organization_logo_small_url
 				});
 				
+				
+				if (event.registration_locally || event.ticketing_locally) {
+					$header_buttons = new AddToFavoriteButton(event.id, {
+						is_add_avatar: true,
+						is_checked: event.is_favorite,
+						classes: [
+							'feed_event_header_button',
+							__C.CLASSES.SIZES.LOW,
+							__C.CLASSES.UNIVERSAL_STATES.EMPTY
+						],
+						labels: null,
+						icons: {
+							checked_hover: __C.CLASSES.ICONS.STAR
+						},
+						colors: {
+							checked: __C.CLASSES.TEXT_COLORS.ACCENT,
+							unchecked: '',
+							checked_hover: __C.CLASSES.TEXT_COLORS.ACCENT,
+							unchecked_hover: ''
+						}
+					});
+					
+					if (event.ticketing_locally) {
+						
+					} else {
+						$action_button = new RegisterButton(event, {
+							classes: [
+								__C.CLASSES.SIZES.LOW,
+								__C.CLASSES.SIZES.WIDE,
+								__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+								__C.CLASSES.HOOKS.RIPPLE
+							]
+						});
+					}
+				} else {
+					$action_button = new AddToFavoriteButton(event.id, {
+						is_add_avatar: true,
+						is_checked: event.is_favorite,
+						classes: [
+							__C.CLASSES.SIZES.LOW,
+							__C.CLASSES.SIZES.WIDE,
+							__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+							__C.CLASSES.HOOKS.RIPPLE
+						]
+					})
+				}
+				
+				$header_buttons = $header_buttons.add(__APP.BUILD.button({
+					classes: [
+						'feed_event_header_button',
+						__C.CLASSES.SIZES.LOW,
+						__C.CLASSES.ICON_CLASS,
+						__C.CLASSES.ICONS.TIMES,
+						__C.CLASSES.UNIVERSAL_STATES.EMPTY,
+						'HideEvent'
+					],
+					dataset: {
+						'event-id': event.id
+					}
+				}));
+				
 				if (event.is_favorite) {
-					avatars_collection_classes.push('-shifted');
+					avatars_collection_classes.push(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
 				}
 				feed_event_infos.push({
 					text: displayDateRange(event.dates[0].event_date, event.dates[event.dates.length - 1].event_date)
 					+ (event.is_same_time ? ', ' + displayTimeRange(event.dates[0].start_time, event.dates[0].end_time) : '')
 				});
-				if (event.registration_required) {
+				if (event.registration_required && event.registration_till) {
 					feed_event_infos.push({text: 'Регистрация до ' + moment.unix(event.registration_till).calendar().capitalize()});
 				}
 				if (event.is_free) {
@@ -1076,25 +1208,26 @@ __APP = {
 				
 				return $.extend(true, {
 					organization_avatar_block: __APP.BUILD.avatarBlocks(organization, {
-						block_classes: ['-size_small'],
+						block_classes: [__C.CLASSES.SIZES.SMALL],
 						is_link: true,
 						entity: 'organization'
 					}),
-					add_to_favorite_button: new AddToFavoriteButton(event.id, {
-						is_add_avatar: true,
-						is_subscribed: event.is_favorite,
-						classes: ['-size_low', '-size_wide', '-rounded', 'RippleEffect']
-					}),
+					action_button: $action_button,
 					avatars_collection: __APP.BUILD.avatarCollection(event.favored, 4, {
 						dataset: {
 							modal_type: 'favors',
-							modal_event_id: event.id,
-							modal_title: 'Добавили в избранное'
+							modal_event_id: event.id
 						},
 						classes: avatars_collection_classes,
-						counter_classes: ['-size_30x30','-bordered','-color_marginal_primary','-castable']
+						counter_classes: [
+							__C.CLASSES.SIZES.X30,
+							__C.CLASSES.UNIVERSAL_STATES.BORDERED,
+							__C.CLASSES.COLORS.MARGINAL_PRIMARY,
+							__C.CLASSES.HOOKS.ADD_AVATAR.STATES.CASTABLE
+						]
 					}, event.favored_users_count),
-					feed_event_infos: tmpl('feed-event-info', feed_event_infos)
+					feed_event_infos: tmpl('feed-event-info', feed_event_infos),
+					header_buttons: $header_buttons
 				}, event);
 			}));
 			
@@ -1104,7 +1237,7 @@ __APP = {
 				}, {accY: 100})
 			});
 			
-			if(__APP.USER.id === -1){
+			if(__APP.USER.isLoggedOut()){
 				$events.find('.HideEvent').remove();
 			}
 			
@@ -1180,7 +1313,7 @@ __APP = {
 			tab = __APP.BUILD.normalizeBuildProps(tab);
 			tab.classes.push('tab', 'Tab');
 			if (window.location.pathname.contains(tab.page)) {
-				tab.classes.push(__C.CLASSES.NEW_ACTIVE);
+				tab.classes.push(__C.CLASSES.ACTIVE);
 			}
 		});
 		$wrapper.html(tmpl('tabs-header', {
@@ -1258,10 +1391,10 @@ __APP = {
 		__APP.CURRENT_PAGE = Page.routeNewPage(window.location.pathname);
 		__APP.CURRENT_PAGE.fetchData();
 		__APP.CURRENT_PAGE.show();
-		$sidebar_nav_items.removeClass(__C.CLASSES.NEW_ACTIVE)
+		$sidebar_nav_items.removeClass(__C.CLASSES.ACTIVE)
 			.filter(function() {
 				return window.location.pathname.indexOf(this.getAttribute('href')) === 0;
-			}).addClass(__C.CLASSES.NEW_ACTIVE);
+			}).addClass(__C.CLASSES.ACTIVE);
 	},
 	reInit: function appReInit() {
 		$(window).off('scroll');
@@ -1276,65 +1409,6 @@ __APP = {
 		}
 	}
 };
-/**
- * @const
- * @property {Object<string, string>} CLASSES
- * @property {string} DATE_FORMAT
- * @property {Object<string, string>} COLORS
- * @property {Object<string, string>} STATS
- * @property {Object<string, string[]>} ACTION_NAMES
- * @property {Object<string, string>} ENTITIES
- */
-__C = {
-	CLASSES: {
-		ACTIVE: 'active',
-		NEW_ACTIVE: '-active',
-		DISABLED: 'disabled',
-		NEW_DISABLED: '-disabled',
-		HIDDEN: 'hidden',
-		NEW_HIDDEN: '-hidden'
-	},
-	DATE_FORMAT: 'YYYY-MM-DD',
-	COLORS: {
-		PRIMARY: '#2e3b50',
-		MUTED: '#3e4d66',
-		MUTED_80: '#657184',
-		MUTED_50: '#9fa6b3',
-		MUTED_30: '#c5c9d1',
-		TEXT: '#4a4a4a',
-		ACCENT: '#f82969',
-		ACCENT_ALT: '#ff5f9e',
-		FRANKLIN: '#28be84',
-		FRANKLIN_ALT: '#23d792'
-	},
-	STATS: {
-		EVENT_VIEW: 'view',
-		EVENT_VIEW_DETAIL: 'view_detail',
-		EVENT_OPEN_SITE: 'open_site',
-		EVENT_OPEN_MAP: 'open_map',
-		ORGANIZATION_OPEN_SITE: 'open_site',
-		EVENT_ENTITY: 'event',
-		ORGANIZATION_ENTITY: 'organization'
-	},
-	ACTION_NAMES: {
-		fave: ['добавил(а) в избранное'],
-		unfave: ['удалил(а) из избранного'],
-		subscribe: ['добавил(а) подписки'],
-		unsubscribe: ['удалил(а) подписки']
-	},
-	ENTITIES: {
-		EVENT: 'event',
-		ORGANIZATION: 'organization'
-	},
-	/**
-	 * @enum {string}
-	 */
-	DEFERRED_STATES: {
-		PENDING: 'pending',
-		RESOLVED: 'resolved',
-		REJECTED: 'rejected'
-	}
-};
 
 __ERRORS = [];
 
@@ -1347,7 +1421,8 @@ __LOCALES = {
 				FAVORED: 'В избранном',
 				ADD_SUBSCRIPTION: 'Подписаться',
 				REMOVE_SUBSCRIPTION: 'Отписаться',
-				SUBSCRIBED: 'Подписан'
+				SUBSCRIBED: 'Подписан',
+				EDIT: 'Изменить'
 			},
 			SUBSCRIBERS: {
 				NOM: ' подписчик',

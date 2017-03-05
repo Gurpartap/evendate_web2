@@ -253,7 +253,7 @@ AbstractModal = (function() {
 		$('body').addClass('-open_modal');
 		__APP.MODALS.active_modal = this;
 		
-		this.modal_wrapper.append(this.modal.addClass('-faded').removeClass(__C.CLASSES.NEW_HIDDEN));
+		this.modal_wrapper.append(this.modal.addClass('-faded').removeClass(__C.CLASSES.HIDDEN));
 		this.adjustDestroyerHeight();
 		
 		this.modal.trigger('modal:show');
@@ -289,7 +289,7 @@ AbstractModal = (function() {
 		this.modal.addClass('-faded');
 		this.modal.trigger('modal:disappear');
 		setTimeout(function() {
-			self.modal.addClass(__C.CLASSES.NEW_HIDDEN).trigger('modal:close');
+			self.modal.addClass(__C.CLASSES.HIDDEN).trigger('modal:close');
 			self.is_shown = false;
 		}, 200);
 		

@@ -1,18 +1,112 @@
 /**
- * Extending class
- * @param {Function} parent
+ * @const __C
+ * @property {Object<string, string>} CLASSES
+ * @property {string} DATE_FORMAT
+ * @property {Object<string, string>} COLORS
+ * @property {Object<string, string>} STATS
+ * @property {Object<string, string[]>} ACTION_NAMES
+ * @property {Object<string, string>} ENTITIES
  */
-Function.prototype.extend = function(parent) {
-	this.prototype = Object.create(parent.prototype);
-	this.prototype.constructor = this;
-	this.prototype.__super = parent.prototype;
-	this.prototype.__superCall = function(method_name) {
-		if (parent.prototype[method_name] && typeof parent.prototype[method_name] == 'function') {
-			return parent.prototype[method_name].call(this, Array.prototype.slice.call(1, arguments));
-		} else {
-			console.error('There is no "' + method_name + '" method in object "' + parent.prototype.constructor.name + '"');
-		}
-	};
+__C = {
+	CLASSES: {
+		TEXT_COLORS: {
+			ACCENT: '-text_color_accent'
+		},
+		COLORS: {
+			ACCENT: '-color_accent',
+			PRIMARY: '-color_primary',
+			NEUTRAL: '-color_neutral',
+			NEUTRAL_ACCENT: '-color_neutral_accent',
+			MARGINAL: '-color_marginal',
+			MARGINAL_PRIMARY: '-color_marginal_primary',
+			MARGINAL_ACCENT: '-color_marginal_accent'
+		},
+		UNIVERSAL_STATES: {
+			EMPTY: '-empty',
+			ROUNDED: '-rounded',
+			SHADOWED: '-shadowed',
+			BORDERED: '-bordered',
+			TRANSFORM_UPPERCASE: '-transform_uppercase'
+		},
+		SIZES: {
+			X30: '-size_30x30',
+			X55: '-size_55x55',
+			LOW: '-size_low',
+			WIDE: '-size_wide',
+			SMALL: '-size_small'
+		},
+		HOOKS: {
+			RIPPLE: 'RippleEffect',
+			ADD_TO_FAVORITES: 'AddToFavorites',
+			TEXT: 'Text',
+			CALL_MODAL: 'CallModal',
+			DROPDOWN_BUTTON: 'DropdownButton',
+			ADD_AVATAR: {
+				ANCESTOR: 'AddAvatarWrapper',
+				COLLECTION: 'AvatarsCollection',
+				QUANTITY: 'FavoredCount',
+				STATES: {
+					CAST: '-cast',
+					CASTABLE: '-castable',
+					SHIFT: '-shift',
+					SHIFTED: '-shifted'
+				}
+			}
+		},
+		ACTIVE: '-active',
+		DISABLED: '-disabled',
+		HIDDEN: '-hidden',
+		ICONS: {
+			STAR: 'fa-star',
+			STAR_O: 'fa-star-o',
+			BELL_O: 'fa-bell-o',
+			TIMES: 'fa-times',
+			PLUS: 'fa-plus',
+			CHECK: 'fa-check',
+			PENCIL: 'fa-pencil'
+		},
+		ICON_CLASS: 'fa_icon'
+	},
+	DATE_FORMAT: 'YYYY-MM-DD',
+	COLORS: {
+		PRIMARY: '#2e3b50',
+		MUTED: '#3e4d66',
+		MUTED_80: '#657184',
+		MUTED_50: '#9fa6b3',
+		MUTED_30: '#c5c9d1',
+		TEXT: '#4a4a4a',
+		ACCENT: '#f82969',
+		ACCENT_ALT: '#ff5f9e',
+		FRANKLIN: '#28be84',
+		FRANKLIN_ALT: '#23d792'
+	},
+	STATS: {
+		EVENT_VIEW: 'view',
+		EVENT_VIEW_DETAIL: 'view_detail',
+		EVENT_OPEN_SITE: 'open_site',
+		EVENT_OPEN_MAP: 'open_map',
+		ORGANIZATION_OPEN_SITE: 'open_site',
+		EVENT_ENTITY: 'event',
+		ORGANIZATION_ENTITY: 'organization'
+	},
+	ACTION_NAMES: {
+		fave: ['добавил(а) в избранное'],
+		unfave: ['удалил(а) из избранного'],
+		subscribe: ['добавил(а) подписки'],
+		unsubscribe: ['удалил(а) подписки']
+	},
+	ENTITIES: {
+		EVENT: 'event',
+		ORGANIZATION: 'organization'
+	},
+	/**
+	 * @enum {string}
+	 */
+	DEFERRED_STATES: {
+		PENDING: 'pending',
+		RESOLVED: 'resolved',
+		REJECTED: 'rejected'
+	}
 };
 /**
  * Extending class
@@ -52,12 +146,15 @@ function extending(parent, children){
  */
 function extendingJQuery(children){
 	children = extending(jQuery, children);
+	
 	children.prototype.pushStack = function(elems) {
-		var ret = jQuery.merge(this.get(0) == elems ? new this.constructor(this.id, this.is_subscribed, this.options) : $(), elems);
+		var ret = jQuery.merge(this.get(0) == elems ? new this.constructor() : $(), elems);
 		ret.prevObject = this;
 		ret.context = this.context;
 		return ret;
 	};
+	
+	
 	return children;
 }
 /**
@@ -775,9 +872,12 @@ jQuery.makeSet = function(array) {
  * http://www.gnu.org/licenses/gpl-3.0-standalone.html
  */
 (function(window){
+	/**
+	 *
+	 * @lends cookies
+	 */
 	window.cookies = {
 		/**
-		 *
 		 * @param {string} name
 		 * @return {(string|null)}
 		 */
@@ -1422,7 +1522,7 @@ function bindTabs($parent) {
 					$wrappers = $target.hasClass('TabsBody') ? $wrappers.add($target) : $wrappers;
 					$wrappers.each(function(i, wrapper) {
 						var $wrapper = $(wrapper);
-						if($wrapper.hasClass(__C.CLASSES.NEW_ACTIVE)) {
+						if($wrapper.hasClass(__C.CLASSES.ACTIVE)) {
 							$this.addClass('-in_progress');
 							$wrapper.parent().height($wrapper.outerHeight());
 						}
@@ -1449,7 +1549,7 @@ function bindTabs($parent) {
 		Object.defineProperties($this, {
 			'currentTabsIndex': {
 				get: function() {
-					return $tabs.index($tabs.filter('.'+__C.CLASSES.NEW_ACTIVE));
+					return $tabs.index($tabs.filter('.'+__C.CLASSES.ACTIVE));
 				}
 			},
 			'tabsCount': {
@@ -1462,11 +1562,11 @@ function bindTabs($parent) {
 		$this.setToTab = function(index) {
 			var $setting_tab = $tabs.eq(index),
 				$setting_body = $bodies.eq(index);
-			if ($setting_tab.length && !$setting_tab.hasClass(__C.CLASSES.NEW_ACTIVE)) {
-				$tabs.removeClass(__C.CLASSES.NEW_ACTIVE);
-				$bodies.removeClass(__C.CLASSES.NEW_ACTIVE);
-				$setting_tab.addClass(__C.CLASSES.NEW_ACTIVE);
-				$setting_body.addClass(__C.CLASSES.NEW_ACTIVE);
+			if ($setting_tab.length && !$setting_tab.hasClass(__C.CLASSES.ACTIVE)) {
+				$tabs.removeClass(__C.CLASSES.ACTIVE);
+				$bodies.removeClass(__C.CLASSES.ACTIVE);
+				$setting_tab.addClass(__C.CLASSES.ACTIVE);
+				$setting_body.addClass(__C.CLASSES.ACTIVE);
 				$this.trigger('change.tabs');
 				if (focus_on_change) {
 					scrollTo($setting_body, 400);
@@ -1482,11 +1582,11 @@ function bindTabs($parent) {
 			$this.setToTab($this.currentTabsIndex - 1);
 		};
 		
-		if (!$tabs.filter('.'+__C.CLASSES.NEW_ACTIVE).length) {
-			$tabs.eq(0).addClass(__C.CLASSES.NEW_ACTIVE);
+		if (!$tabs.filter('.'+__C.CLASSES.ACTIVE).length) {
+			$tabs.eq(0).addClass(__C.CLASSES.ACTIVE);
 		}
-		$bodies.removeClass(__C.CLASSES.NEW_ACTIVE).eq($this.currentTabsIndex).addClass(__C.CLASSES.NEW_ACTIVE);
-		$bodies_wrapper.height($bodies.filter('.'+__C.CLASSES.NEW_ACTIVE).outerHeight());
+		$bodies.removeClass(__C.CLASSES.ACTIVE).eq($this.currentTabsIndex).addClass(__C.CLASSES.ACTIVE);
+		$bodies_wrapper.height($bodies.filter('.'+__C.CLASSES.ACTIVE).outerHeight());
 		$bodies_wrapper.on('transitionend webkitTransitionEnd', function() {
 			$this.removeClass('-in_progress');
 			$this.trigger('progress_end')
@@ -1666,7 +1766,7 @@ function bindCollapsing($parent) {
 		
 		if($wrapper.hasClass('-fading')){
 			default_height = $instance.data('defaultHeight') < $content.height() ? $instance.data('defaultHeight') : $content.height();
-			if (!$instance.hasClass(__C.CLASSES.NEW_ACTIVE) && $wrapper.height() < default_height) {
+			if (!$instance.hasClass(__C.CLASSES.ACTIVE) && $wrapper.height() < default_height) {
 				$wrapper.height(default_height);
 			}
 		} else {
@@ -1675,13 +1775,13 @@ function bindCollapsing($parent) {
 		
 		function toggleCollapsing(){
 			$wrapper.addClass('-in_progress');
-			if ($instance.hasClass(__C.CLASSES.NEW_ACTIVE)) {
+			if ($instance.hasClass(__C.CLASSES.ACTIVE)) {
 				$wrapper.height(default_height);
 			} else {
 				$wrapper.height($content.outerHeight());
 			}
 			$wrapper.toggleClass('-opened');
-			$instance.toggleClass(__C.CLASSES.NEW_ACTIVE);
+			$instance.toggleClass(__C.CLASSES.ACTIVE);
 		}
 		
 		function changeProp(){
@@ -1691,14 +1791,14 @@ function bindCollapsing($parent) {
 		}
 		
 		$instance.openCollapsing = function() {
-			if(!$instance.hasClass(__C.CLASSES.NEW_ACTIVE)){
+			if(!$instance.hasClass(__C.CLASSES.ACTIVE)){
 				changeProp();
 				toggleCollapsing();
 			}
 		};
 		
 		$instance.closeCollapsing = function() {
-			if($instance.hasClass(__C.CLASSES.NEW_ACTIVE)){
+			if($instance.hasClass(__C.CLASSES.ACTIVE)){
 				changeProp();
 				toggleCollapsing();
 			}
@@ -1830,7 +1930,8 @@ function bindPageLinks($parent) {
 	$parent = $parent ? $parent : $('body');
 	$parent.find('.Link').not('.-Handled_Link').on('click.pageRender', function(e) {
 		var $this = $(this);
-		if ($this.hasClass(__C.CLASSES.DISABLED)) return true;
+		if ($this.hasClass(__C.CLASSES.DISABLED))
+			return false;
 		if (e.which == 1) {
 			e.preventDefault();
 			__APP.changeState($this.attr('href'));
@@ -1874,7 +1975,11 @@ function handleErrorField($unit) {
 	}
 	return $unit;
 }
-
+/**
+ * Getting base64-encoded string of the image from url
+ * @param {string} url
+ * @param {function({string})} callback
+ */
 function toDataUrl(url, callback) {
 	var xhr = new XMLHttpRequest();
 	xhr.responseType = 'blob';
@@ -1896,7 +2001,10 @@ function showNotifier(response) {
 		'status': response.status ? 'success' : 'danger'
 	});
 }
-
+/**
+ * Checks if device is mobile
+ * @return {boolean}
+ */
 function isNotDesktop() {
 	var check = false;
 	(function (a) {
@@ -2159,16 +2267,23 @@ socket.on('utils.registrationSaved', function (data) {
  * @typedef {function(({}|Array<{}>))} AJAXCallback
  */
 /**
- *
  * @interface
  */
-function EntityInterface() {}
-/**
- *
- * @param {(Array|object)} data
- * @returns {EntityInterface}
- */
-EntityInterface.prototype.setData = function(data) {};
+EntityInterface = (function() {
+	/**
+	 *
+	 * @interface
+	 */
+	function EntityInterface() {}
+	/**
+	 *
+	 * @param {(Array|object)} data
+	 * @returns {EntityInterface}
+	 */
+	EntityInterface.prototype.setData = function(data) {};
+	
+	return EntityInterface;
+}());
 /**
  * @class Fields
  */
@@ -2216,28 +2331,25 @@ Fields = (function() {
 	 * @param {...(Object|Array|string)} [obj]
 	 */
 	function Fields(obj) {
-		var args = Array.prototype.splice.call(arguments, 0),
-			field,
-			parsed_obj = {};
-		
-		args.forEach(function(arg) {
-			if(typeof arg === 'string'){
-				parsed_obj[arg] = {};
-			} else if (arg instanceof Array) {
-				arg.forEach(function(field) {
-					parsed_obj[field] = {};
-				});
-			} else if (arg instanceof Object) {
-				for(field in arg) {
-					parsed_obj[field] = arg[field];
+		this.add.apply(this, arguments);
+	}
+	
+	Object.defineProperty(Fields.prototype, 'toString', {
+		value: function() {
+			var fields = [],
+				field;
+			for(field in this){
+				if(this.hasOwnProperty(field)){
+					if(Object.keys(this[field]).length){
+						fields.push(field+this[field]);
+					} else {
+						fields.push(field);
+					}
 				}
 			}
-		});
-		
-		for(field in parsed_obj){
-			this[field] = new FieldsProps(parsed_obj[field]);
+			return fields.join(',');
 		}
-	}
+	});
 	
 	/**
 	 *
@@ -2276,22 +2388,31 @@ Fields = (function() {
 		return new Fields(parseFields(fields));
 	};
 	
-	Object.defineProperty(Fields.prototype, 'toString', {
-		value: function() {
-			var fields = [],
-				field;
-			for(field in this){
-				if(this.hasOwnProperty(field)){
-					if(Object.keys(this[field]).length){
-						fields.push(field+this[field]);
-					} else {
-						fields.push(field);
-					}
+	Fields.prototype.push = Fields.prototype.add = function() {
+		var args = Array.prototype.splice.call(arguments, 0),
+			field,
+			parsed_obj = {};
+		
+		args.forEach(function(arg) {
+			if(typeof arg === 'string'){
+				parsed_obj[arg] = {};
+			} else if (arg instanceof Array) {
+				arg.forEach(function(field) {
+					parsed_obj[field] = {};
+				});
+			} else if (arg instanceof Object) {
+				for(field in arg) {
+					parsed_obj[field] = arg[field];
 				}
 			}
-			return fields.join(',');
+		});
+		
+		for(field in parsed_obj){
+			this[field] = new FieldsProps(parsed_obj[field]);
 		}
-	});
+		
+		return this;
+	};
 	
 	return Fields;
 }());
@@ -2767,117 +2888,140 @@ UsersActivitiesCollection = extending(EntitiesCollection, (function() {
  */
 /**
  *
- * @constructor
- * @augments OneEntity
- * @param {(string|number)} [category_id]
- * @param {boolean} [is_loading_continuous]
+ * @class OneCategory
+ * @extends OneEntity
  */
-function OneCategory(category_id, is_loading_continuous) {
-	this.id = category_id ? category_id : 0;
-	this.name = '';
-	this.order_position = 0;
-	this.organizations = new OrganizationsCollection();
-	
-	if (category_id && is_loading_continuous) {
-		this.loading = true;
-		this.fetchCategory([], function() {
-			this.loading = false;
-			$(window).trigger('fetch.OneCategory');
-		});
-	}
-}
-OneCategory.extend(OneEntity);
-/**
- *
- * @param {(string|number)} category_id
- * @param {AJAXData} data
- * @param {AJAXCallback} [success]
- * @return {jqPromise}
- */
-OneCategory.fetchCategory = function(category_id, data, success) {
-	return __APP.SERVER.getData('/api/v1/organizations/types', $.extend({}, data, {id: category_id}), success);
-};
-/**
- *
- * @param {(Array|string)} fields
- * @param {AJAXCallback} [success]
- * @return {jqPromise}
- */
-OneCategory.prototype.fetchCategory = function(fields, success) {
-	var self = this;
-	return this.constructor.fetchCategory(self.id, {fields: fields}, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data[0]);
+OneCategory = extending(OneEntity, (function() {
+	/**
+	 *
+	 * @param {(string|number)} [category_id]
+	 * @param {boolean} [is_loading_continuous]
+	 * @constructor
+	 * @constructs OneCategory
+	 *
+	 * @property {(number|string)} id
+	 * @property {string} ?name
+	 * @property {number} ?order_position
+	 * @property {OrganizationsCollection} organizations
+	 */
+	function OneCategory(category_id, is_loading_continuous) {
+		this.id = setDefaultValue(category_id, 0);
+		this.name = null;
+		this.order_position = null;
+		this.organizations = new OrganizationsCollection();
+		
+		this.loading = false;
+		if (category_id && is_loading_continuous) {
+			this.loading = true;
+			this.fetchCategory([], function() {
+				this.loading = false;
+				$(window).trigger('fetch.OneCategory');
+			});
 		}
-	});
-};
+	}
+	/**
+	 *
+	 * @param {(string|number)} category_id
+	 * @param {AJAXData} data
+	 * @param {AJAXCallback} [success]
+	 * @return {jqPromise}
+	 */
+	OneCategory.fetchCategory = function(category_id, data, success) {
+		return __APP.SERVER.getData('/api/v1/organizations/types', $.extend({}, data, {id: category_id}), success);
+	};
+	/**
+	 *
+	 * @param {(Array|string)} fields
+	 * @param {AJAXCallback} [success]
+	 * @return {jqPromise}
+	 */
+	OneCategory.prototype.fetchCategory = function(fields, success) {
+		var self = this;
+		return this.constructor.fetchCategory(self.id, {fields: fields}, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data[0]);
+			}
+		});
+	};
+	
+	return OneCategory;
+}()));
 /**
  * @requires ../Class.EntitiesCollection.js
  * @requires Class.OneCategory.js
  */
 /**
  *
- * @constructor
- * @augments EntitiesCollection
+ * @class CategoriesCollection
+ * @extends EntitiesCollection
  */
-function CategoriesCollection() {}
-CategoriesCollection.extend(EntitiesCollection);
-CategoriesCollection.prototype.collection_of = OneCategory;
-/**
- *
- * @param {AJAXData} data
- * @param {AJAXCallback} [success]
- */
-CategoriesCollection.fetchCategories = function(data, success) {
-	return __APP.SERVER.getData('/api/v1/organizations/types', data, success);
-};
-/**
- *
- * @param {AJAXData} data
- * @param {(number|string)} [length]
- * @param {AJAXCallback} [success]
- */
-CategoriesCollection.prototype.fetchCategories = function(data, length, success) {
-	var self = this,
-		ajax_data = $.extend({}, data, {
-			offset: this.length,
-			length: length
+CategoriesCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs CategoriesCollection
+	 */
+	function CategoriesCollection() {}
+	
+	CategoriesCollection.prototype.collection_of = OneCategory;
+	/**
+	 *
+	 * @param {AJAXData} data
+	 * @param {AJAXCallback} [success]
+	 */
+	CategoriesCollection.fetchCategories = function(data, success) {
+		return __APP.SERVER.getData('/api/v1/organizations/types', data, success);
+	};
+	/**
+	 *
+	 * @param {AJAXData} data
+	 * @param {(number|string)} [length]
+	 * @param {AJAXCallback} [success]
+	 */
+	CategoriesCollection.prototype.fetchCategories = function(data, length, success) {
+		var self = this,
+			ajax_data = $.extend({}, data, {
+				offset: this.length,
+				length: length
+			});
+		return this.constructor.fetchCategories(ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data);
+			}
 		});
-	return this.constructor.fetchCategories(ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
+	};
+	/**
+	 *
+	 * @param {AJAXData} categories_ajax_data
+	 * @param {AJAXData} orgs_ajax_data
+	 * @param {(number|string)} [length]
+	 * @param {AJAXCallback} [success]
+	 */
+	CategoriesCollection.prototype.fetchCategoriesWithOrganizations = function(categories_ajax_data, orgs_ajax_data, length, success) {
+		var self = this,
+			ajax_data = $.extend({}, categories_ajax_data, {
+				offset: this.length,
+				length: length
+			}),
+			org_field = 'organizations' + JSON.stringify(__APP.SERVER.validateData(orgs_ajax_data));
+		if (!ajax_data.fields) {
+			ajax_data.fields = [];
+		} else if (!Array.isArray(ajax_data.fields)) {
+			ajax_data.fields = ajax_data.fields.split(',');
 		}
-	});
-};
-/**
- *
- * @param {AJAXData} categories_ajax_data
- * @param {AJAXData} orgs_ajax_data
- * @param {(number|string)} [length]
- * @param {AJAXCallback} [success]
- */
-CategoriesCollection.prototype.fetchCategoriesWithOrganizations = function(categories_ajax_data, orgs_ajax_data, length, success) {
-	var self = this,
-		ajax_data = $.extend({}, categories_ajax_data, {
-			offset: this.length,
-			length: length
-		}),
-		org_field = 'organizations' + JSON.stringify(__APP.SERVER.validateData(orgs_ajax_data));
-	if (!ajax_data.fields) {
-		ajax_data.fields = [];
-	} else if (!Array.isArray(ajax_data.fields)) {
-		ajax_data.fields = ajax_data.fields.split(',');
-	}
-	ajax_data.fields.push(org_field);
-	return this.constructor.fetchCategories(ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
+		ajax_data.fields.push(org_field);
+		return this.constructor.fetchCategories(ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data);
+			}
+		});
+	};
+	
+	return CategoriesCollection;
+}()));
 /**
  * @requires ../../data_models/date/Class.DateModel.js
  */
@@ -2918,21 +3062,408 @@ OneDate = extending(DateModel, (function() {
  */
 /**
  *
- * @constructor
- * @augments EntitiesCollection
+ * @class DatesCollection
+ * @extends EntitiesCollection
  */
-function DatesCollection() {}
-DatesCollection.prototype.collection_of = OneDate;
-DatesCollection.extend(EntitiesCollection);
+DatesCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs DatesCollection
+	 */
+	function DatesCollection() {}
+	DatesCollection.prototype.collection_of = OneDate;
+	/**
+	 *
+	 * @param {DatesCollectionAJAXData} ajax_data
+	 * @param {AJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	DatesCollection.fetchDates = function(ajax_data, success) {
+		return __APP.SERVER.getData('/api/v1/events/dates', ajax_data, success);
+	};
+	
+	return DatesCollection;
+}()));
+/**
+ * @requires ../Class.OneEntity.js
+ */
+/**
+ * @typedef {object} Privilege
+ * @property {number} role_id
+ * @property {OneUser.ROLE} name
+ */
 /**
  *
- * @param {DatesCollectionAJAXData} ajax_data
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
+ * @class OneOrganization
+ * @extends OneEntity
  */
-DatesCollection.fetchDates = function(ajax_data, success) {
-	return __APP.SERVER.getData('/api/v1/events/dates', ajax_data, success);
-};
+OneOrganization = extending(OneEntity, (function() {
+	/**
+	 *
+	 * @param {(string|number)} [organization_id=0]
+	 * @param {boolean} [is_loading_continuous]
+	 * @constructor
+	 * @constructs OneOrganization
+	 *
+	 * @property {number} id
+	 * @property {?string} name
+	 * @property {?string} short_name
+	 * @property {?string} description
+	 *
+	 * @property {?string} img_url
+	 * @property {?string} img_small_url
+	 * @property {?string} img_medium_url
+	 *
+	 * @property {?string} background_img_url
+	 * @property {?string} background_small_img_url
+	 * @property {?string} background_medium_img_url
+	 *
+	 * @property {?number} type_id
+	 * @property {?string} type_name
+	 *
+	 * @property {?string} site_url
+	 * @property {?string} default_address
+	 * @property {EventsCollection} events
+	 *
+	 * @property {?number} subscription_id
+	 * @property {?boolean} is_subscribed
+	 * @property {?number} subscribed_count
+	 * @property {UsersCollection} subscribed
+	 *
+	 * @property {Array<Privilege>} privileges
+	 * @property {?string} role
+	 *
+	 * @property {UsersCollection} staff
+	 *
+	 * @property {?string} email
+	 * @property {?boolean} is_new
+	 * @property {?number} new_events_count
+	 * @property {?number} actual_events_count
+	 *
+	 * @property {?boolean} is_private
+	 * @property {?string} brand_color
+	 * @property {?} city
+	 * @property {?} country
+	 *
+	 * @property {?string} vk_url
+	 * @property {?string} facebook_url
+	 *
+	 * @property {?boolean} status
+	 *
+	 * @property {boolean} loading
+	 */
+	function OneOrganization(organization_id, is_loading_continuous) {
+		this.id = organization_id || 0;
+		this.name = null;
+		this.short_name = null;
+		this.description = null;
+		this.img_url = null;
+		this.img_small_url = null;
+		this.img_medium_url = null;
+		this.background_img_url = null;
+		this.background_small_img_url = null;
+		this.background_medium_img_url = null;
+		this.type_id = null;
+		this.type_name = null;
+		this.site_url = null;
+		this.default_address = null;
+		this.events = new EventsCollection();
+		
+		this.subscription_id = null;
+		this.is_subscribed = null;
+		this.subscribed_count = null;
+		this.subscribed = new UsersCollection();
+		this.privileges = [];
+		
+		this.is_private = null;
+		this.brand_color = null;
+		this.city = null;
+		this.country = null;
+		
+		this.email = null;
+		this.role = null;
+		this.staff = new UsersCollection();
+		this.status = null;
+		
+		this.is_new = null;
+		this.new_events_count = null;
+		this.actual_events_count = null;
+		
+		this.vk_url = null;
+		this.facebook_url = null;
+		
+		this.loading = false;
+		if (organization_id && is_loading_continuous) {
+			this.loading = true;
+			this.fetchOrganization([], function() {
+				this.loading = false;
+				$(window).trigger('fetch.OneOrganization');
+			});
+		}
+	}
+	/**
+	 *
+	 * @param {(string|number)} org_id
+	 * @param {(string|Array)} fields
+	 * @param {AJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	OneOrganization.fetchOrganization = function(org_id, fields, success) {
+		return __APP.SERVER.getData('/api/v1/organizations/' + org_id, {fields: fields}, success);
+	};
+	/**
+	 * @typedef {AJAXData} OneOrganizationCreateOrganizationData
+	 * @property {string} [name]
+	 * @property {string} [short_name]
+	 * @property {string} [description]
+	 * @property {string} [site_url]
+	 * @property {string} [default_address]
+	 * @property {string} [vk_url]
+	 * @property {string} [facebook_url]
+	 * @property {string} [type_id]
+	 * @property {string} [background]
+	 * @property {string} [logo]
+	 * @property {string} [detail_info_url]
+	 * @property {string} [email]
+	 */
+	/**
+	 * @typedef {function({
+ *   organization_id: number
+ * })} OneOrganizationCreateOrganizationCallback
+	 */
+	/**
+	 *
+	 * @param {OneOrganizationCreateOrganizationData} new_organization_data
+	 * @param {OneOrganizationCreateOrganizationCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	OneOrganization.createOrganization = function(new_organization_data, success) {
+		return __APP.SERVER.addData('/api/v1/organizations/', new_organization_data, true, success);
+	};
+	/**
+	 *
+	 * @param {(string|number)} organization_id
+	 * @param {OneOrganizationCreateOrganizationData} organization_data
+	 * @param {OneOrganizationCreateOrganizationCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	OneOrganization.updateOrganization = function(organization_id, organization_data, success) {
+		return __APP.SERVER.updateData('/api/v1/organizations/' + organization_id, organization_data, true, success);
+	};
+	/**
+	 *
+	 * @param {(string|number)} org_id
+	 * @param {AJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	OneOrganization.subscribeOrganization = function(org_id, success) {
+		return __APP.SERVER.addData('/api/v1/organizations/' + org_id + '/subscriptions', {}, false, success);
+	};
+	/**
+	 *
+	 * @param {(string|number)} org_id
+	 * @param {AJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	OneOrganization.unsubscribeOrganization = function(org_id, success) {
+		return __APP.SERVER.deleteData('/api/v1/organizations/' + org_id + '/subscriptions', {}, success);
+	};
+	/**
+	 *
+	 * @param {(Array|object)} data
+	 * @returns {OneEntity}
+	 */
+	OneOrganization.prototype.setData = function(data) {
+		OneEntity.prototype.setData.call(this, data);
+		this.role = OneUser.recognizeRole(this.privileges);
+		return this;
+	};
+	/**
+	 *
+	 * @param {(string|Array)} fields
+	 * @param {AJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	OneOrganization.prototype.fetchOrganization = function(fields, success) {
+		var self = this;
+		return this.constructor.fetchOrganization(self.id, fields, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, self);
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {(string|Array)} fields
+	 * @param {AJAXData} [events_ajax_data]
+	 * @param {AJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	OneOrganization.prototype.fetchOrganizationWithEvents = function(fields, events_ajax_data, success) {
+		var _fields = fields;
+		_fields = _fields instanceof Array ? _fields : _fields.split(',');
+		_fields.push('events'.appendAjaxData(events_ajax_data));
+		return this.fetchOrganization(fields, success);
+	};
+	/**
+	 *
+	 * @param {OneOrganizationCreateOrganizationData} new_organization_data
+	 * @param {OneOrganizationCreateOrganizationCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	OneOrganization.prototype.createOrganization = function(new_organization_data, success) {
+		var self = this;
+		return OneOrganization.createOrganization(new_organization_data, function(response_data) {
+			self.setData(new_organization_data);
+			self.id = response_data.organization_id;
+			if (success && typeof success == 'function') {
+				success.call(self, self);
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {OneOrganizationCreateOrganizationData} organization_data
+	 * @param {OneOrganizationCreateOrganizationCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	OneOrganization.prototype.updateOrganization = function(organization_data, success) {
+		var self = this;
+		return OneOrganization.updateOrganization(self.id, organization_data, function(response_data) {
+			self.setData(organization_data);
+			if (success && typeof success == 'function') {
+				success.call(self, self);
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {AJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	OneOrganization.prototype.subscribe = function(success) {
+		var self = this;
+		return this.constructor.subscribeOrganization(this.id, function(data) {
+			this.is_subscribed = true;
+			this.subscribed_count++;
+			if (success && typeof success == 'function') {
+				success.call(self, data);
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {AJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	OneOrganization.prototype.unsubscribe = function(success) {
+		var self = this;
+		return this.constructor.unsubscribeOrganization(this.id, function(data) {
+			this.is_subscribed = false;
+			this.subscribed_count = this.subscribed_count ? this.subscribed_count - 1 : this.subscribed_count;
+			if (success && typeof success == 'function') {
+				success.call(self, data);
+			}
+		});
+	};
+	
+	return OneOrganization;
+}()));
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.OneOrganization.js
+ */
+/**
+ *
+ * @class OrganizationsCollection
+ * @extends EntitiesCollection
+ */
+OrganizationsCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs OrganizationsCollection
+	 */
+	function OrganizationsCollection() {}
+	OrganizationsCollection.prototype.collection_of = OneOrganization;
+	/**
+	 *
+	 * @param {AJAXData} data
+	 * @param {AJAXCallback} [success]
+	 */
+	OrganizationsCollection.fetchSubscribedOrganizations = function(data, success) {
+		return __APP.SERVER.getData('/api/v1/organizations/subscriptions', data, success);
+	};
+	/**
+	 *
+	 * @param {(string|Array)} [roles]
+	 * @param {AJAXData} [data]
+	 * @param {AJAXCallback} [success]
+	 */
+	OrganizationsCollection.fetchMyOrganizations = function(roles, data, success) {
+		roles = Array.isArray(roles) ? roles.join(',') : roles;
+		return __APP.SERVER.getData('/api/v1/organizations/', $.extend({}, data, {roles: roles}), success);
+	};
+	/**
+	 *
+	 * @param {AJAXData} data
+	 * @param {AJAXCallback} [success]
+	 */
+	OrganizationsCollection.fetchRecommendations = function(data, success) {
+		return __APP.SERVER.getData('/api/v1/organizations/recommendations', data, success);
+	};
+	/**
+	 *
+	 * @param {(Array|string)} [fields]
+	 * @param {(number|string)} [length]
+	 * @param {string} [order_by]
+	 * @param {AJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	OrganizationsCollection.prototype.fetchSubscribedOrganizations = function(fields, length, order_by, success) {
+		var self = this,
+			ajax_data = {
+				fields: fields,
+				offset: this.length,
+				length: length,
+				order_by: order_by || undefined
+			};
+		return this.constructor.fetchSubscribedOrganizations(ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data);
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {(Array<string>|string)} roles
+	 * @param {(Array<string>|string)} [fields]
+	 * @param {(number|string)} [length]
+	 * @param {string} [order_by]
+	 * @param {AJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	OrganizationsCollection.prototype.fetchMyOrganizations = function(roles, fields, length, order_by, success) {
+		var self = this,
+			ajax_data = {
+				fields: fields,
+				length: length,
+				offset: this.length,
+				order_by: order_by || undefined
+			};
+		return OrganizationsCollection.fetchMyOrganizations(roles, ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data);
+			}
+		});
+	};
+	
+	return OrganizationsCollection;
+}()));
 /**
  * @requires ../Class.OneEntity.js
  * @requires ../../data_models/registration_field/Class.RegistrationFieldsCollection.js
@@ -2946,51 +3477,150 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @constructor
 	 * @constructs OneEvent
-	 * @param {(string|number)} [event_id]
+	 * @param {(string|number)} [event_id=0]
 	 * @param {boolean} [is_loading_continuous]
+	 *
+	 *
+	 * @property {number} id
+	 * @property {?string} title
+	 * @property {?string} description
+	 *
+	 * @property {?string} location
+	 * @property {?string} latitude
+	 * @property {?string} longitude
+	 * @property {?boolean} is_online
+	 *
+	 * @property {?string} detail_info_url
+	 *
+	 * @property {Array} orders
+	 *
+	 * @property {?boolean} ticketing_locally
+	 * @property {Array} tickets
+	 * @property {Array} ticket_types
+	 *
+	 * @property {?boolean} registration_locally
+	 * @property {?boolean} registration_available
+	 * @property {?boolean} registration_required
+	 * @property {?number} registration_limit_count
+	 * @property {?string} registration_till
+	 * @property {?string} registration_approve_status
+	 * @property {?boolean} registration_approvement_required
+	 * @property {?boolean} is_registered
+	 * @property {?number} registered_count
+	 * @property {UsersCollection} registered_users
+	 * @property {RegistrationFieldsCollection} registration_fields
+	 *
+	 * @property {?number} organization_id
+	 * @property {?string} organization_short_name
+	 * @property {?string} organization_logo_large_url
+	 * @property {?string} organization_logo_medium_url
+	 * @property {?string} organization_logo_small_url
+	 *
+	 * @property {?string} image_vertical_url
+	 * @property {?string} image_horizontal_url
+	 * @property {?string} image_horizontal_large_url
+	 * @property {?string} image_horizontal_medium_url
+	 * @property {?string} image_horizontal_small_url
+	 *
+	 * @property {?boolean} is_free
+	 * @property {?number} min_price
+	 *
+	 * @property {DatesCollection} dates
+	 * @property {?boolean} is_same_time
+	 * @property {?number} first_event_date
+	 * @property {?number} last_event_date
+	 * @property {?number} nearest_event_date
+	 *
+	 * @property {TagsCollection} tags
+	 *
+	 * @property {Array} notifications
+	 *
+	 * @property {UsersCollection} favored
+	 * @property {?number} favored_users_count
+	 * @property {?number} favored_friends_count
+	 * @property {?boolean} is_favorite
+	 *
+	 * @property {?number} public_at
+	 * @property {?boolean} canceled
+	 * @property {?boolean} can_edit
+	 *
+	 * @property {?number} actuality
+	 *
+	 * @property {?number} creator_id
+	 * @property {?number} created_at
+	 * @property {?number} updated_at
 	 */
 	function OneEvent(event_id, is_loading_continuous) {
 		this.id = event_id ? event_id : 0;
-		this.title = '';
-		this.description = '';
-		this.location = '';
-		this.latitude = '';
-		this.longitude = '';
-		this.is_online = false;
-		this.detail_info_url = '';
-		this.can_edit = false;
-		this.registration_required = false;
-		this.registration_limit_count = 0;
-		this.registration_locally = false;
-		this.registration_till = '';
-		this.registration_approved = false;
-		this.registration_approvement_required = false;
-		this.registered_count = 0;
+		this.title = null;
+		this.description = null;
+		
+		this.location = null;
+		this.latitude = null;
+		this.longitude = null;
+		this.is_online = null;
+		
+		this.detail_info_url = null;
+		
+		this.orders = [];
+		
+		this.ticketing_locally = null;
+		this.tickets = [];
+		this.ticket_types = [];
+		
+		this.registration_locally = null;
+		this.registration_available = null;
+		this.registration_required = null;
+		this.registration_limit_count = null;
+		this.registration_till = null;
+		this.registration_approve_status = null;
+		this.registration_approvement_required = null;
+		this.is_registered = null;
+		this.registered_count = null;
 		this.registered_users = new UsersCollection();
 		this.registration_fields = new RegistrationFieldsCollection();
-		this.organization_id = 0;
-		this.organization_short_name = '';
-		this.image_vertical_url = '';
-		this.image_horizontal_url = '';
-		this.image_horizontal_large_url = '';
-		this.image_horizontal_small_url = '';
-		this.organization_logo_small_url = '';
-		this.is_free = false;
-		this.min_price = 0;
+		
+		this.organization_id = null;
+		this.organization_short_name = null;
+		this.organization_logo_large_url = null;
+		this.organization_logo_medium_url = null;
+		this.organization_logo_small_url = null;
+		
+		this.image_vertical_url = null;
+		this.image_horizontal_url = null;
+		this.image_horizontal_large_url = null;
+		this.image_horizontal_medium_url = null;
+		this.image_horizontal_small_url = null;
+		
+		this.is_free = null;
+		this.min_price = null;
+		
+		this.dates = new DatesCollection();
+		this.is_same_time = null;
 		this.first_event_date = null;
 		this.last_event_date = null;
 		this.nearest_event_date = null;
-		this.is_same_time = false;
-		this.dates = new DatesCollection();
-		this.tags = new TagsCollection();
-		this.notifications = [];
-		this.favored = new UsersCollection();
-		this.favored_users_count = 0;
-		this.is_favorite = false;
-		this.public_at = null;
-		this.canceled = false;
-		this.loading = false;
 		
+		this.tags = new TagsCollection();
+		
+		this.notifications = [];
+		
+		this.favored = new UsersCollection();
+		this.favored_users_count = null;
+		this.favored_friends_count = null;
+		this.is_favorite = null;
+		
+		this.public_at = null;
+		this.canceled = null;
+		this.can_edit = null;
+		
+		this.actuality = null;
+		
+		this.creator_id = null;
+		this.created_at = null;
+		this.updated_at = null;
+		
+		this.loading = false;
 		if (event_id && is_loading_continuous) {
 			this.loading = true;
 			this.fetchEvent([], function() {
@@ -3146,7 +3776,10 @@ OneEvent = extending(OneEntity, (function() {
 	OneEvent.registerToEvent = function(event_id, registration_fields, success) {
 		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/orders', {
 			registration_fields: registration_fields,
-			tickets: [{count: 1}]
+			tickets: [{
+				uuid: null,
+				count: 1
+			}]
 		}, true, success);
 	};
 	/**
@@ -3270,882 +3903,702 @@ OneEvent = extending(OneEntity, (function() {
  */
 /**
  *
- * @constructor
- * @augments EntitiesCollection
+ * @class EventsCollection
+ * @extends EntitiesCollection
  */
-function EventsCollection() {}
-EventsCollection.extend(EntitiesCollection);
-EventsCollection.prototype.collection_of = OneEvent;
-/**
- * @const
- * @enum {string}
- */
-EventsCollection.KIND = {
-	MY: 'my',
-	FAVORED: 'favored',
-	RECOMMENDED: 'recommended'
-};
-/**
- *
- * @param {EventsCollectionAJAXData} data
- * @param {EventsCollectionAJAXCallback} [success]
- * @returns {jqPromise}
- */
-EventsCollection.fetchEvents = function(data, success) {
-	return __APP.SERVER.getData('/api/v1/events/', data, success);
-};
-/**
- *
- * @param {EventsCollectionAJAXData} data
- * @param {EventsCollectionAJAXCallback} [success]
- * @returns {jqPromise}
- */
-EventsCollection.fetchMyEvents = function(data, success) {
-	return __APP.SERVER.getData('/api/v1/events/my', data, success);
-};
-/**
- *
- * @param {EventsCollectionAJAXData} data
- * @param {EventsCollectionAJAXCallback} [success]
- * @returns {jqPromise}
- */
-EventsCollection.fetchFavoredEvents = function(data, success) {
-	return __APP.SERVER.getData('/api/v1/events/favorites', data, success);
-};
-/**
- *
- * @param {EventsCollectionAJAXData} data
- * @param {EventsCollectionAJAXCallback} [success]
- * @returns {jqPromise}
- */
-EventsCollection.fetchRecommendedEvents = function(data, success) {
-	return __APP.SERVER.getData('/api/v1/events/recommendations', data, success);
-};
-/**
- *
- * @param {(number|string)} organization_id
- * @param {EventsCollectionAJAXData} data
- * @param {EventsCollectionAJAXCallback} [success]
- * @returns {jqPromise}
- */
-EventsCollection.fetchOrganizationsEvents = function(organization_id, data, success) {
-	return __APP.SERVER.getData('/api/v1/events/', $.extend({}, data, {organization_id: organization_id}), success);
-};
-/**
- *
- * @param {EventsCollection.KIND} [kind]
- * @param {EventsCollectionAJAXData} [data]
- * @param {(number|string)} [length]
- * @param {EventsCollectionAJAXCallback} [success]
- * @returns {jqPromise}
- */
-EventsCollection.prototype.fetchEvents = function(kind, data, length, success) {
-	var self = this,
-		method_name = 'fetchEvents',
-		ajax_data = $.extend({}, data, {
-			offset: this.length,
-			length: length
+EventsCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs EventsCollection
+	 */
+	function EventsCollection() {}
+	EventsCollection.prototype.collection_of = OneEvent;
+	/**
+	 * @const
+	 * @enum {string}
+	 */
+	EventsCollection.KIND = {
+		MY: 'my',
+		FAVORED: 'favored',
+		RECOMMENDED: 'recommended'
+	};
+	/**
+	 *
+	 * @param {EventsCollectionAJAXData} data
+	 * @param {EventsCollectionAJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	EventsCollection.fetchEvents = function(data, success) {
+		return __APP.SERVER.getData('/api/v1/events/', data, success);
+	};
+	/**
+	 *
+	 * @param {EventsCollectionAJAXData} data
+	 * @param {EventsCollectionAJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	EventsCollection.fetchMyEvents = function(data, success) {
+		return __APP.SERVER.getData('/api/v1/events/my', data, success);
+	};
+	/**
+	 *
+	 * @param {EventsCollectionAJAXData} data
+	 * @param {EventsCollectionAJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	EventsCollection.fetchFavoredEvents = function(data, success) {
+		return __APP.SERVER.getData('/api/v1/events/favorites', data, success);
+	};
+	/**
+	 *
+	 * @param {EventsCollectionAJAXData} data
+	 * @param {EventsCollectionAJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	EventsCollection.fetchRecommendedEvents = function(data, success) {
+		return __APP.SERVER.getData('/api/v1/events/recommendations', data, success);
+	};
+	/**
+	 *
+	 * @param {(number|string)} organization_id
+	 * @param {EventsCollectionAJAXData} data
+	 * @param {EventsCollectionAJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	EventsCollection.fetchOrganizationsEvents = function(organization_id, data, success) {
+		return __APP.SERVER.getData('/api/v1/events/', $.extend({}, data, {organization_id: organization_id}), success);
+	};
+	/**
+	 *
+	 * @param {EventsCollection.KIND} [kind]
+	 * @param {EventsCollectionAJAXData} [data]
+	 * @param {(number|string)} [length]
+	 * @param {EventsCollectionAJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	EventsCollection.prototype.fetchEvents = function(kind, data, length, success) {
+		var self = this,
+			method_name = 'fetchEvents',
+			ajax_data = $.extend({}, data, {
+				offset: this.length,
+				length: length
+			});
+		switch (kind) {
+			default: {
+				method_name = 'fetchEvents';
+				break;
+			}
+			case EventsCollection.KIND.MY: {
+				method_name = 'fetchMyEvents';
+				break;
+			}
+			case EventsCollection.KIND.FAVORED: {
+				method_name = 'fetchFavoredEvents';
+				break;
+			}
+			case EventsCollection.KIND.RECOMMENDED: {
+				method_name = 'fetchRecommendedEvents';
+				break;
+			}
+		}
+		return this.constructor[method_name](ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, self.last_pushed);
+			}
 		});
-	switch (kind) {
-		default: {
-			method_name = 'fetchEvents';
-			break;
-		}
-		case EventsCollection.KIND.MY: {
-			method_name = 'fetchMyEvents';
-			break;
-		}
-		case EventsCollection.KIND.FAVORED: {
-			method_name = 'fetchFavoredEvents';
-			break;
-		}
-		case EventsCollection.KIND.RECOMMENDED: {
-			method_name = 'fetchRecommendedEvents';
-			break;
-		}
+	};
+	/**
+	 *
+	 * @param {(Array|string)} [fields]
+	 * @param {(number|string)} [length]
+	 * @param {EventsCollectionAJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	EventsCollection.prototype.fetchFeed = function(fields, length, success) {
+		var self = this,
+			ajax_data = {
+				fields: fields,
+				offset: this.length,
+				length: length
+			};
+		return this.constructor.fetchEvents(ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, self.last_pushed);
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {(number|string)} organization_id
+	 * @param {EventsCollectionAJAXData} [data]
+	 * @param {(number|string)} [length]
+	 * @param {EventsCollectionAJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	EventsCollection.prototype.fetchOrganizationsEvents = function(organization_id, data, length, success) {
+		var self = this,
+			ajax_data = $.extend({}, data, {
+				offset: this.length,
+				length: length
+			});
+		return this.constructor.fetchOrganizationsEvents(organization_id, ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, self.last_pushed);
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {(number|string)} organization_id
+	 * @param {(Array|string)} [fields]
+	 * @param {(number|string)} [length]
+	 * @param {EventsCollectionAJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	EventsCollection.prototype.fetchOrganizationsFeed = function(organization_id, fields, length, success) {
+		var self = this,
+			ajax_data = {
+				fields: fields,
+				offset: this.length,
+				length: length
+			};
+		return this.constructor.fetchOrganizationsEvents(organization_id, ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, self.last_pushed);
+			}
+		});
+	};
+	
+	return EventsCollection;
+}()));
+/**
+ * @requires Class.EventsCollection.js
+ */
+/**
+ *
+ * @class ActualEventsCollection
+ * @extends EventsCollection
+ */
+ActualEventsCollection = extending(EventsCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs ActualEventsCollection
+	 */
+	function ActualEventsCollection() {}
+	/**
+	 *
+	 * @override
+	 */
+	ActualEventsCollection.fetchEvents = function(data, success) {
+		data.fields = data.fields ? (typeof data.fields === 'string') ? data.fields.split(',') : data.fields : [];
+		data.fields.push('actuality');
+		data.future = true;
+		data.order_by = '-actuality';
+		
+		return EventsCollection.fetchMyEvents(data, success);
+	};
+	
+	return ActualEventsCollection;
+}()));
+/**
+ * @requires Class.EventsCollection.js
+ */
+/**
+ *
+ * @class CanceledEventsCollection
+ * @extends EventsCollection
+ */
+CanceledEventsCollection = extending(EventsCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs CanceledEventsCollection
+	 */
+	function CanceledEventsCollection() {}
+	/**
+	 *
+	 * @override
+	 */
+	CanceledEventsCollection.fetchOrganizationsEvents = function(organization_id, data, success) {
+		data.fields = data.fields ? (typeof data.fields === 'string') ? data.fields.split(',') : data.fields : [];
+		data.fields.push('updated_at');
+		data.is_canceled = true;
+		data.order_by = '-updated_at';
+		return EventsCollection.fetchOrganizationsEvents(organization_id, data, success);
+	};
+	
+	return CanceledEventsCollection;
+}()));
+/**
+ * @requires Class.EventsCollection.js
+ */
+/**
+ *
+ * @class DayEventsCollection
+ * @extends EventsCollection
+ */
+DayEventsCollection = extending(EventsCollection, (function() {
+	/**
+	 *
+	 * @param {string} date
+	 * @constructor
+	 * @construct DayEventsCollection
+	 */
+	function DayEventsCollection(date) {
+		if (!date)
+			throw Error('DayEventsCollection must have date parameter');
+		this.date = date;
 	}
-	return this.constructor[method_name](ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
-/**
- *
- * @param {(Array|string)} [fields]
- * @param {(number|string)} [length]
- * @param {EventsCollectionAJAXCallback} [success]
- * @returns {jqPromise}
- */
-EventsCollection.prototype.fetchFeed = function(fields, length, success) {
-	var self = this,
-		ajax_data = {
-			fields: fields,
-			offset: this.length,
-			length: length
-		};
-	return this.constructor.fetchEvents(ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
-/**
- *
- * @param {(number|string)} organization_id
- * @param {EventsCollectionAJAXData} [data]
- * @param {(number|string)} [length]
- * @param {EventsCollectionAJAXCallback} [success]
- * @returns {jqPromise}
- */
-EventsCollection.prototype.fetchOrganizationsEvents = function(organization_id, data, length, success) {
-	var self = this,
-		ajax_data = $.extend({}, data, {
-			offset: this.length,
-			length: length
+	/**
+	 *
+	 * @param {string} date
+	 * @param {EventsCollectionAJAXData} data
+	 * @param {AJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	DayEventsCollection.fetchEvents = function(date, data, success) {
+		data.future = false;
+		data.date = date;
+		return EventsCollection.fetchMyEvents(data, success);
+	};
+	/**
+	 *
+	 * @override
+	 */
+	DayEventsCollection.prototype.fetchFeed = function(fields, length, success) {
+		var self = this,
+			ajax_data = {
+				fields: fields,
+				offset: this.length,
+				length: length
+			};
+		return this.constructor.fetchEvents(this.date, ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data);
+			}
 		});
-	return this.constructor.fetchOrganizationsEvents(organization_id, ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
-/**
- *
- * @param {(number|string)} organization_id
- * @param {(Array|string)} [fields]
- * @param {(number|string)} [length]
- * @param {EventsCollectionAJAXCallback} [success]
- * @returns {jqPromise}
- */
-EventsCollection.prototype.fetchOrganizationsFeed = function(organization_id, fields, length, success) {
-	var self = this,
-		ajax_data = {
-			fields: fields,
-			offset: this.length,
-			length: length
-		};
-	return this.constructor.fetchOrganizationsEvents(organization_id, ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
+	};
+	
+	return DayEventsCollection;
+}()));
 /**
  * @requires Class.EventsCollection.js
  */
 /**
  *
- * @constructor
- * @augments EventsCollection
+ * @class DelayedEventsCollection
+ * @extends EventsCollection
  */
-function ActualEventsCollection() {}
-ActualEventsCollection.extend(EventsCollection);
-/**
- *
- * @override
- */
-ActualEventsCollection.fetchEvents = function(data, success) {
-	data.fields = data.fields ? Array.isArray(data.fields) ? data.fields : data.fields.split(',') : [];
-	data.fields.push('actuality');
-	data.future = true;
-	data.order_by = '-actuality';
-	return EventsCollection.fetchMyEvents(data, success);
-};
-/**
- * @requires Class.EventsCollection.js
- */
-/**
- *
- * @constructor
- * @augments EventsCollection
- */
-function CanceledEventsCollection() {}
-CanceledEventsCollection.extend(EventsCollection);
-/**
- *
- * @override
- */
-CanceledEventsCollection.fetchOrganizationsEvents = function(organization_id, data, success) {
-	data.fields = data.fields ? Array.isArray(data.fields) ? data.fields : data.fields.split(',') : [];
-	data.fields.push('updated_at');
-	data.is_canceled = true;
-	data.order_by = '-updated_at';
-	return EventsCollection.fetchOrganizationsEvents(organization_id, data, success);
-};
-/**
- * @requires Class.EventsCollection.js
- */
-/**
- *
- * @constructor
- * @augments EventsCollection
- * @param {string} date
- */
-function DayEventsCollection(date) {
-	if (!date)
-		throw Error('DayEventsCollection must have date parameter');
-	this.date = date;
-}
-DayEventsCollection.extend(EventsCollection);
-/**
- *
- * @param {string} date
- * @param {EventsCollectionAJAXData} data
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-DayEventsCollection.fetchEvents = function(date, data, success) {
-	data.future = false;
-	data.date = date;
-	return EventsCollection.fetchMyEvents(data, success);
-};
-/**
- *
- * @override
- */
-DayEventsCollection.prototype.fetchFeed = function(fields, length, success) {
-	var self = this,
-		ajax_data = {
-			fields: fields,
-			offset: this.length,
-			length: length
-		};
-	return this.constructor.fetchEvents(this.date, ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
-/**
- * @requires Class.EventsCollection.js
- */
-/**
- *
- * @constructor
- * @augments EventsCollection
- */
-function DelayedEventsCollection() {}
-DelayedEventsCollection.extend(EventsCollection);
-/**
- *
- * @override
- */
-DelayedEventsCollection.fetchOrganizationsEvents = function(organization_id, data, success) {
-	data.fields = data.fields ? Array.isArray(data.fields) ? data.fields : data.fields.split(',') : [];
-	data.fields.push('public_at');
-	data.is_delayed = true;
-	data.is_canceled = false;
-	data.order_by = 'public_at';
-	return EventsCollection.fetchOrganizationsEvents(organization_id, data, success);
-};
+DelayedEventsCollection = extending(EventsCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs DelayedEventsCollection
+	 */
+	function DelayedEventsCollection() {}
+	/**
+	 *
+	 * @override
+	 */
+	DelayedEventsCollection.fetchOrganizationsEvents = function(organization_id, data, success) {
+		data.fields = data.fields ? (typeof data.fields === 'string') ? data.fields.split(',') : data.fields : [];
+		data.fields.push('public_at');
+		data.is_delayed = true;
+		data.is_canceled = false;
+		data.order_by = 'public_at';
+		return EventsCollection.fetchOrganizationsEvents(organization_id, data, success);
+	};
+	
+	return DelayedEventsCollection;
+}()));
 /**
  * @requires Class.OneEvent.js
  */
 /**
  *
- * @constructor
- * @augments OneEvent
- * @param {(string|number)} [event_id]
- * @param {boolean} [is_loading_continuous]
+ * @class OneEventWithStatistics
+ * @extends OneEvent
  */
-function OneEventWithStatistics(event_id, is_loading_continuous) {
-	OneEvent.apply(this, arguments);
-	this.view = 0;
-	this.view_detail = 0;
-	this.fave = 0;
-	this.unfave = 0;
-	this.open_site = 0;
-	this.notifications_sent = 0;
-}
-OneEventWithStatistics.extend(OneEvent);
+OneEventWithStatistics = extending(OneEvent, (function() {
+	/**
+	 *
+	 * @param {(string|number)} [event_id]
+	 * @param {boolean} [is_loading_continuous]
+	 * @constructor
+	 * @constructs OneEventWithStatistics
+	 */
+	function OneEventWithStatistics(event_id, is_loading_continuous) {
+		OneEvent.apply(this, arguments);
+		this.view = 0;
+		this.view_detail = 0;
+		this.fave = 0;
+		this.unfave = 0;
+		this.open_site = 0;
+		this.notifications_sent = 0;
+	}
+	
+	return OneEventWithStatistics;
+}()));
 /**
  * @requires Class.EventsCollection.js
  * @requires Class.OneEventWithStatistics.js
  */
 /**
  *
- * @constructor
- * @augments EventsCollection
+ * @class EventsWithStatisticsCollection
+ * @extends EventsCollection
  */
-function EventsWithStatisticsCollection() {}
-EventsWithStatisticsCollection.extend(EventsCollection);
-EventsWithStatisticsCollection.prototype.collection_of = OneEventWithStatistics;
-/**
- *
- * @param {EventsCollectionAJAXData} data
- * @param {EventsCollectionAJAXCallback} [success]
- * @returns {jqPromise}
- */
-EventsWithStatisticsCollection.fetchEvents = function(data, success) {
-	data.statistics = true;
-	return __APP.SERVER.getData('/api/v1/events/', data, success);
-};
-/**
- *
- * @param {EventsCollectionAJAXData} data
- * @param {EventsCollectionAJAXCallback} [success]
- * @returns {jqPromise}
- */
-EventsWithStatisticsCollection.fetchMyEvents = function(data, success) {
-	data.statistics = true;
-	return __APP.SERVER.getData('/api/v1/events/my', data, success);
-};
-/**
- *
- * @param {EventsCollectionAJAXData} data
- * @param {EventsCollectionAJAXCallback} [success]
- * @returns {jqPromise}
- */
-EventsWithStatisticsCollection.fetchFavoredEvents = function(data, success) {
-	data.statistics = true;
-	return __APP.SERVER.getData('/api/v1/events/favorites', data, success);
-};
-/**
- *
- * @param {EventsCollectionAJAXData} data
- * @param {EventsCollectionAJAXCallback} [success]
- * @returns {jqPromise}
- */
-EventsWithStatisticsCollection.fetchRecommendedEvents = function(data, success) {
-	data.statistics = true;
-	return __APP.SERVER.getData('/api/v1/events/recommendations', data, success);
-};
-/**
- *
- * @param {(number|string)} organization_id
- * @param {EventsCollectionAJAXData} data
- * @param {EventsCollectionAJAXCallback} [success]
- * @returns {jqPromise}
- */
-EventsWithStatisticsCollection.fetchOrganizationsEvents = function(organization_id, data, success) {
-	data.statistics = true;
-	return __APP.SERVER.getData('/api/v1/events/', $.extend({}, data, {organization_id: organization_id}), success);
-};
-/**
- * @requires Class.EventsCollection.js
- */
-/**
- *
- * @constructor
- * @augments EventsCollection
- */
-function FavoredEventsCollection() {}
-FavoredEventsCollection.extend(EventsCollection);
-/**
- *
- * @override
- */
-FavoredEventsCollection.fetchEvents = function(data, success) {
-	data.future = true;
-	return EventsCollection.fetchFavoredEvents(data, success);
-};
-/**
- * @requires Class.EventsCollection.js
- */
-/**
- *
- * @constructor
- * @augments EventsCollection
- */
-function FriendsEventsCollection() {}
-FriendsEventsCollection.extend(EventsCollection);
-/**
- *
- * @override
- */
-FriendsEventsCollection.fetchEvents = function(data, success) {
-	data.fields = data.fields ? Array.isArray(data.fields) ? data.fields : data.fields.split(',') : [];
-	data.fields.push('favored_friends_count');
-	data.future = true;
-	data.order_by = '-favored_friends_count';
-	return EventsCollection.fetchMyEvents(data, success);
-};
-/**
- * @requires Class.EventsCollection.js
- */
-/**
- *
- * @constructor
- * @augments EventsCollection
- */
-function FutureEventsCollection() {}
-FutureEventsCollection.extend(EventsCollection);
-/**
- *
- * @override
- */
-FutureEventsCollection.fetchOrganizationsEvents = function(organization_id, data, success) {
-	data.future = true;
-	data.order_by = 'nearest_event_date';
-	return EventsCollection.fetchOrganizationsEvents(organization_id, data, success);
-};
-/**
- * @requires Class.EventsCollection.js
- */
-/**
- *
- * @constructor
- * @augments EventsCollection
- */
-function PastEventsCollection() {}
-PastEventsCollection.extend(EventsCollection);
-/**
- *
- * @override
- */
-PastEventsCollection.fetchOrganizationsEvents = function(organization_id, data, success) {
-	data.till = moment().format(__C.DATE_FORMAT);
-	data.order_by = '-last_event_date';
-	return EventsCollection.fetchOrganizationsEvents(organization_id, data, success);
-};
-/**
- * @requires Class.EventsCollection.js
- */
-/**
- *
- * @constructor
- * @augments EventsCollection
- */
-function RecommendedEventsCollection() {}
-RecommendedEventsCollection.extend(EventsCollection);
-/**
- *
- * @override
- */
-RecommendedEventsCollection.fetchEvents = function(data, success) {
-	data.future = true;
-	data.order_by = '-rating';
-	return EventsCollection.fetchRecommendedEvents(data, success);
-};
-/**
- * @requires Class.EventsCollection.js
- */
-/**
- *
- * @constructor
- * @augments EventsCollection
- */
-function TimelineEventsCollection() {}
-TimelineEventsCollection.extend(EventsCollection);
-/**
- *
- * @override
- */
-TimelineEventsCollection.fetchEvents = function(data, success) {
-	data.future = true;
-	return EventsCollection.fetchMyEvents(data, success);
-};
-/**
- * @requires ../Class.OneEntity.js
- */
-/**
- * @typedef {object} Privilege
- * @property {number} role_id
- * @property {OneUser.ROLE} name
- */
-/**
- *
- * @constructor
- * @augments OneEntity
- * @param {(string|number)} [organization_id]
- * @param {boolean} [is_loading_continuous]
- */
-function OneOrganization(organization_id, is_loading_continuous) {
-	this.id = organization_id || 0;
-	this.name = '';
-	this.short_name = '';
-	this.description = '';
-	this.img_url = '';
-	this.img_small_url = '';
-	this.background_img_url = '';
-	this.background_medium_img_url = '';
-	this.type_id = 0;
-	this.type_name = '';
-	this.site_url = '';
-	this.default_address = '';
-	this.events = new EventsCollection();
-	this.is_subscribed = false;
-	this.subscribed_count = 0;
-	this.subscribed = new UsersCollection();
+EventsWithStatisticsCollection = extending(EventsCollection, (function() {
 	/**
-	 * @type {Array<Privilege>}
+	 *
+	 * @constructor
+	 * @constructs EventsWithStatisticsCollection
 	 */
-	this.privileges = [];
-	this.role = '';
-	this.staff = new UsersCollection();
+	function EventsWithStatisticsCollection() {}
+	EventsWithStatisticsCollection.prototype.collection_of = OneEventWithStatistics;
+	/**
+	 *
+	 * @param {EventsCollectionAJAXData} data
+	 * @param {EventsCollectionAJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	EventsWithStatisticsCollection.fetchEvents = function(data, success) {
+		data.statistics = true;
+		return __APP.SERVER.getData('/api/v1/events/', data, success);
+	};
+	/**
+	 *
+	 * @param {EventsCollectionAJAXData} data
+	 * @param {EventsCollectionAJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	EventsWithStatisticsCollection.fetchMyEvents = function(data, success) {
+		data.statistics = true;
+		return __APP.SERVER.getData('/api/v1/events/my', data, success);
+	};
+	/**
+	 *
+	 * @param {EventsCollectionAJAXData} data
+	 * @param {EventsCollectionAJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	EventsWithStatisticsCollection.fetchFavoredEvents = function(data, success) {
+		data.statistics = true;
+		return __APP.SERVER.getData('/api/v1/events/favorites', data, success);
+	};
+	/**
+	 *
+	 * @param {EventsCollectionAJAXData} data
+	 * @param {EventsCollectionAJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	EventsWithStatisticsCollection.fetchRecommendedEvents = function(data, success) {
+		data.statistics = true;
+		return __APP.SERVER.getData('/api/v1/events/recommendations', data, success);
+	};
+	/**
+	 *
+	 * @param {(number|string)} organization_id
+	 * @param {EventsCollectionAJAXData} data
+	 * @param {EventsCollectionAJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	EventsWithStatisticsCollection.fetchOrganizationsEvents = function(organization_id, data, success) {
+		data.statistics = true;
+		return __APP.SERVER.getData('/api/v1/events/', $.extend({}, data, {organization_id: organization_id}), success);
+	};
 	
-	if (organization_id && is_loading_continuous) {
-		this.loading = true;
-		this.fetchOrganization([], function() {
-			this.loading = false;
-			$(window).trigger('fetch.OneOrganization');
-		});
-	}
-}
-OneOrganization.extend(OneEntity);
+	return EventsWithStatisticsCollection;
+}()));
 /**
- *
- * @param {(string|number)} org_id
- * @param {(string|Array)} fields
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-OneOrganization.fetchOrganization = function(org_id, fields, success) {
-	return __APP.SERVER.getData('/api/v1/organizations/' + org_id, {fields: fields}, success);
-};
-/**
- * @typedef {AJAXData} OneOrganizationCreateOrganizationData
- * @property {string} [name]
- * @property {string} [short_name]
- * @property {string} [description]
- * @property {string} [site_url]
- * @property {string} [default_address]
- * @property {string} [vk_url]
- * @property {string} [facebook_url]
- * @property {string} [type_id]
- * @property {string} [background]
- * @property {string} [logo]
- * @property {string} [detail_info_url]
- * @property {string} [email]
- */
-/**
- * @typedef {function({
- *   organization_id: number
- * })} OneOrganizationCreateOrganizationCallback
+ * @requires Class.EventsCollection.js
  */
 /**
  *
- * @param {OneOrganizationCreateOrganizationData} new_organization_data
- * @param {OneOrganizationCreateOrganizationCallback} [success]
- * @returns {jqPromise}
+ * @class FavoredEventsCollection
+ * @extends EventsCollection
  */
-OneOrganization.createOrganization = function(new_organization_data, success) {
-	return __APP.SERVER.addData('/api/v1/organizations/', new_organization_data, true, success);
-};
+FavoredEventsCollection = extending(EventsCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs FavoredEventsCollection
+	 */
+	function FavoredEventsCollection() {}
+	/**
+	 *
+	 * @override
+	 */
+	FavoredEventsCollection.fetchEvents = function(data, success) {
+		data.future = true;
+		return EventsCollection.fetchFavoredEvents(data, success);
+	};
+	
+	return FavoredEventsCollection;
+}()));
 /**
- *
- * @param {(string|number)} organization_id
- * @param {OneOrganizationCreateOrganizationData} organization_data
- * @param {OneOrganizationCreateOrganizationCallback} [success]
- * @returns {jqPromise}
- */
-OneOrganization.updateOrganization = function(organization_id, organization_data, success) {
-	return __APP.SERVER.updateData('/api/v1/organizations/' + organization_id, organization_data, true, success);
-};
-/**
- *
- * @param {(string|number)} org_id
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-OneOrganization.subscribeOrganization = function(org_id, success) {
-	return __APP.SERVER.addData('/api/v1/organizations/' + org_id + '/subscriptions', {}, false, success);
-};
-/**
- *
- * @param {(string|number)} org_id
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-OneOrganization.unsubscribeOrganization = function(org_id, success) {
-	return __APP.SERVER.deleteData('/api/v1/organizations/' + org_id + '/subscriptions', {}, success);
-};
-/**
- *
- * @param {(Array|object)} data
- * @returns {OneEntity}
- */
-OneOrganization.prototype.setData = function(data) {
-	OneEntity.prototype.setData.call(this, data);
-	this.role = OneUser.recognizeRole(this.privileges);
-	return this;
-};
-/**
- *
- * @param {(string|Array)} fields
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-OneOrganization.prototype.fetchOrganization = function(fields, success) {
-	var self = this;
-	return this.constructor.fetchOrganization(self.id, fields, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, self);
-		}
-	});
-};
-/**
- *
- * @param {(string|Array)} fields
- * @param {AJAXData} [events_ajax_data]
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-OneOrganization.prototype.fetchOrganizationWithEvents = function(fields, events_ajax_data, success) {
-	var _fields = fields;
-	_fields = _fields instanceof Array ? _fields : _fields.split(',');
-	_fields.push('events'.appendAjaxData(events_ajax_data));
-	return this.fetchOrganization(fields, success);
-};
-/**
- *
- * @param {OneOrganizationCreateOrganizationData} new_organization_data
- * @param {OneOrganizationCreateOrganizationCallback} [success]
- * @returns {jqPromise}
- */
-OneOrganization.prototype.createOrganization = function(new_organization_data, success) {
-	var self = this;
-	return OneOrganization.createOrganization(new_organization_data, function(response_data) {
-		self.setData(new_organization_data);
-		self.id = response_data.organization_id;
-		if (success && typeof success == 'function') {
-			success.call(self, self);
-		}
-	});
-};
-/**
- *
- * @param {OneOrganizationCreateOrganizationData} organization_data
- * @param {OneOrganizationCreateOrganizationCallback} [success]
- * @returns {jqPromise}
- */
-OneOrganization.prototype.updateOrganization = function(organization_data, success) {
-	var self = this;
-	return OneOrganization.updateOrganization(self.id, organization_data, function(response_data) {
-		self.setData(organization_data);
-		if (success && typeof success == 'function') {
-			success.call(self, self);
-		}
-	});
-};
-/**
- *
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-OneOrganization.prototype.subscribe = function(success) {
-	var self = this;
-	return this.constructor.subscribeOrganization(this.id, function(data) {
-		this.is_subscribed = true;
-		this.subscribed_count++;
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
-/**
- *
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-OneOrganization.prototype.unsubscribe = function(success) {
-	var self = this;
-	return this.constructor.unsubscribeOrganization(this.id, function(data) {
-		this.is_subscribed = false;
-		this.subscribed_count = this.subscribed_count ? this.subscribed_count - 1 : this.subscribed_count;
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
-/**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneOrganization.js
+ * @requires Class.EventsCollection.js
  */
 /**
  *
- * @constructor
- * @augments EntitiesCollection
+ * @class FriendsEventsCollection
+ * @extends EventsCollection
  */
-function OrganizationsCollection() {}
-OrganizationsCollection.extend(EntitiesCollection);
-OrganizationsCollection.prototype.collection_of = OneOrganization;
+FriendsEventsCollection = extending(EventsCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs FriendsEventsCollection
+	 */
+	function FriendsEventsCollection() {}
+	/**
+	 *
+	 * @override
+	 */
+	FriendsEventsCollection.fetchEvents = function(data, success) {
+		data.fields = data.fields ? (typeof data.fields === 'string') ? data.fields.split(',') : data.fields : [];
+		data.fields.push('favored_friends_count');
+		data.future = true;
+		data.order_by = '-favored_friends_count';
+		return EventsCollection.fetchMyEvents(data, success);
+	};
+	
+	return FriendsEventsCollection;
+}()));
+/**
+ * @requires Class.EventsCollection.js
+ */
 /**
  *
- * @param {AJAXData} data
- * @param {AJAXCallback} [success]
+ * @class FutureEventsCollection
+ * @extends EventsCollection
  */
-OrganizationsCollection.fetchSubscribedOrganizations = function(data, success) {
-	return __APP.SERVER.getData('/api/v1/organizations/subscriptions', data, success);
-};
+FutureEventsCollection = extending(EventsCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs FutureEventsCollection
+	 */
+	function FutureEventsCollection() {}
+	/**
+	 *
+	 * @override
+	 */
+	FutureEventsCollection.fetchOrganizationsEvents = function(organization_id, data, success) {
+		data.future = true;
+		data.order_by = 'nearest_event_date';
+		return EventsCollection.fetchOrganizationsEvents(organization_id, data, success);
+	};
+	
+	return FutureEventsCollection;
+}()));
+/**
+ * @requires Class.EventsCollection.js
+ */
 /**
  *
- * @param {(string|Array)} [roles]
- * @param {AJAXData} [data]
- * @param {AJAXCallback} [success]
+ * @class PastEventsCollection
+ * @extends EventsCollection
  */
-OrganizationsCollection.fetchMyOrganizations = function(roles, data, success) {
-	roles = Array.isArray(roles) ? roles.join(',') : roles;
-	return __APP.SERVER.getData('/api/v1/organizations/', $.extend({}, data, {roles: roles}), success);
-};
+PastEventsCollection = extending(EventsCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs PastEventsCollection
+	 */
+	function PastEventsCollection() {}
+	/**
+	 *
+	 * @override
+	 */
+	PastEventsCollection.fetchOrganizationsEvents = function(organization_id, data, success) {
+		data.till = moment().format(__C.DATE_FORMAT);
+		data.order_by = '-last_event_date';
+		return EventsCollection.fetchOrganizationsEvents(organization_id, data, success);
+	};
+	
+	return PastEventsCollection;
+}()));
+/**
+ * @requires Class.EventsCollection.js
+ */
 /**
  *
- * @param {AJAXData} data
- * @param {AJAXCallback} [success]
+ * @class RecommendedEventsCollection
+ * @extends EventsCollection
  */
-OrganizationsCollection.fetchRecommendations = function(data, success) {
-	return __APP.SERVER.getData('/api/v1/organizations/recommendations', data, success);
-};
+RecommendedEventsCollection = extending(EventsCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs RecommendedEventsCollection
+	 */
+	function RecommendedEventsCollection() {}
+	/**
+	 *
+	 * @override
+	 */
+	RecommendedEventsCollection.fetchEvents = function(data, success) {
+		data.future = true;
+		data.order_by = '-rating';
+		return EventsCollection.fetchRecommendedEvents(data, success);
+	};
+	
+	return RecommendedEventsCollection;
+}()));
+/**
+ * @requires Class.EventsCollection.js
+ */
 /**
  *
- * @param {(Array|string)} [fields]
- * @param {(number|string)} [length]
- * @param {string} [order_by]
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
+ * @class TimelineEventsCollection
+ * @extends EventsCollection
  */
-OrganizationsCollection.prototype.fetchSubscribedOrganizations = function(fields, length, order_by, success) {
-	var self = this,
-		ajax_data = {
-			fields: fields,
-			offset: this.length,
-			length: length,
-			order_by: order_by || undefined
-		};
-	return this.constructor.fetchSubscribedOrganizations(ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
-/**
- *
- * @param {(Array<string>|string)} roles
- * @param {(Array<string>|string)} [fields]
- * @param {(number|string)} [length]
- * @param {string} [order_by]
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-OrganizationsCollection.prototype.fetchMyOrganizations = function(roles, fields, length, order_by, success) {
-	var self = this,
-		ajax_data = {
-			fields: fields,
-			length: length,
-			offset: this.length,
-			order_by: order_by || undefined
-		};
-	return OrganizationsCollection.fetchMyOrganizations(roles, ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
+TimelineEventsCollection = extending(EventsCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs TimelineEventsCollection
+	 */
+	function TimelineEventsCollection() {}
+	/**
+	 *
+	 * @override
+	 */
+	TimelineEventsCollection.fetchEvents = function(data, success) {
+		data.future = true;
+		return EventsCollection.fetchMyEvents(data, success);
+	};
+	
+	return TimelineEventsCollection;
+}()));
 /**
  * @requires ../Class.OneEntity.js
  */
 /**
- * @typedef {function({
+ *
+ * @class SearchResults
+ * @extends OneEntity
+ */
+SearchResults = extending(OneEntity, (function() {
+	/**
+	 * @typedef {function({
  *   [events]: Array<OneEvent>,
  *   [organizations]: Array<OneOrganization>
  * })} SearchResultsAJAXCallback
- */
-/**
- *
- * @constructor
- * @augments OneEntity
- * @param {string} query_string
- */
-function SearchResults(query_string) {
-	this.query_string = query_string;
-	this.events = new EventsCollection();
-	this.organizations = new OrganizationsCollection();
-}
-SearchResults.extend(OneEntity);
-/**
- *
- * @param {string} query_string
- * @returns {{ [q]: {string}, [tags]: {string} }}
- */
-SearchResults.sanitizeQueryVar = function(query_string) {
-	var data = {};
-	if (query_string.indexOf('#') === 0) {
-		data.tags = query_string.replace('#', '');
-	} else {
-		data.q = query_string;
+	 */
+	/**
+	 *
+	 * @param {string} query_string
+	 * @constructor
+	 * @constructs SearchResults
+	 */
+	function SearchResults(query_string) {
+		this.query_string = query_string;
+		this.events = new EventsCollection();
+		this.organizations = new OrganizationsCollection();
 	}
-	return data;
-};
-/**
- *
- * @param {string} query_string
- * @param {AJAXData} [ajax_data]
- * @param {SearchResultsAJAXCallback} [success]
- * @returns {jqPromise}
- */
-SearchResults.fetchEventsAndOrganizations = function(query_string, ajax_data, success) {
-	return __APP.SERVER.getData('/api/v1/search/', $.extend({}, SearchResults.sanitizeQueryVar(query_string), ajax_data), success);
-};
-/**
- *
- * @param {AJAXData} [events_ajax_data]
- * @param {function(organizations: Array<OneEvent>)} [success]
- * @returns {jqPromise}
- */
-SearchResults.prototype.fetchEvents = function(events_ajax_data, success) {
-	var self = this,
-		ajax_data = {
-			fields: 'events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length}))
-		};
+	/**
+	 *
+	 * @param {string} query_string
+	 * @returns {{ [q]: {string}, [tags]: {string} }}
+	 */
+	SearchResults.sanitizeQueryVar = function(query_string) {
+		var data = {};
+		if (query_string.indexOf('#') === 0) {
+			data.tags = query_string.replace('#', '');
+		} else {
+			data.q = query_string;
+		}
+		return data;
+	};
+	/**
+	 *
+	 * @param {string} query_string
+	 * @param {AJAXData} [ajax_data]
+	 * @param {SearchResultsAJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	SearchResults.fetchEventsAndOrganizations = function(query_string, ajax_data, success) {
+		return __APP.SERVER.getData('/api/v1/search/', $.extend({}, SearchResults.sanitizeQueryVar(query_string), ajax_data), success);
+	};
+	/**
+	 *
+	 * @param {AJAXData} [events_ajax_data]
+	 * @param {function(organizations: Array<OneEvent>)} [success]
+	 * @returns {jqPromise}
+	 */
+	SearchResults.prototype.fetchEvents = function(events_ajax_data, success) {
+		var self = this,
+			ajax_data = {
+				fields: 'events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length}))
+			};
+		
+		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data.events);
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {AJAXData} [organizations_ajax_data]
+	 * @param {function(organizations: Array<OneOrganization>)} [success]
+	 * @returns {jqPromise}
+	 */
+	SearchResults.prototype.fetchOrganizations = function(organizations_ajax_data, success) {
+		var self = this,
+			ajax_data = {
+				fields: 'organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length}))
+			};
+		
+		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data.organizations);
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {AJAXData} [events_ajax_data]
+	 * @param {AJAXData} [organizations_ajax_data]
+	 * @param {SearchResultsAJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	SearchResults.prototype.fetchEventsAndOrganizations = function(events_ajax_data, organizations_ajax_data, success) {
+		var self = this,
+			ajax_data = {fields: new Fields()};
+		
+		if (events_ajax_data) {
+			ajax_data.fields.push({
+				events: $.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length})
+			});
+		}
+		if (organizations_ajax_data && !SearchResults.sanitizeQueryVar(self.query_string).tags) {
+			ajax_data.fields.push({
+				organizations: $.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length})
+			});
+		}
+		
+		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data);
+			}
+		});
+	};
 	
-	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data.events);
-		}
-	});
-};
-/**
- *
- * @param {AJAXData} [organizations_ajax_data]
- * @param {function(organizations: Array<OneOrganization>)} [success]
- * @returns {jqPromise}
- */
-SearchResults.prototype.fetchOrganizations = function(organizations_ajax_data, success) {
-	var self = this,
-		ajax_data = {
-			fields: 'organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length}))
-		};
-	
-	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data.organizations);
-		}
-	});
-};
-/**
- *
- * @param {AJAXData} [events_ajax_data]
- * @param {AJAXData} [organizations_ajax_data]
- * @param {SearchResultsAJAXCallback} [success]
- * @returns {jqPromise}
- */
-SearchResults.prototype.fetchEventsAndOrganizations = function(events_ajax_data, organizations_ajax_data, success) {
-	var self = this,
-		ajax_data = {fields: []};
-	if (events_ajax_data) {
-		ajax_data.fields.push('events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length})));
-	}
-	if (organizations_ajax_data && !SearchResults.sanitizeQueryVar(self.query_string).tags) {
-		ajax_data.fields.push('organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length})));
-	}
-	return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
+	return SearchResults;
+}()));
 /**
  * @typedef {object} StatisticsUnit
  * @property {number} time_value
@@ -4163,305 +4616,284 @@ SearchResults.prototype.fetchEventsAndOrganizations = function(events_ajax_data,
  */
 /**
  * @typedef {object} StatisticsStdData
- * @property {Statistics.SCALES} scale
- * @property {string} since
- * @property {string} till
+ * @property {Statistics.SCALES} [scale]
+ * @property {string} [since]
+ * @property {string} [till]
  */
 /**
- *
- * @constructor
+ * @abstract
+ * @class Statistics
  * @implements EntityInterface
  */
-function Statistics() {
-	this.id = 0;
+Statistics = (function() {
 	/**
-	 * @type {Array<StatisticsUnit>}
+	 *
+	 * @constructor
+	 * @constructs Statistics
+	 *
+	 * @property {(number|string)} id
+	 * @property {Statistics.ENTITIES} entity
+	 * @property {Array<StatisticsUnit>} view
+	 * @property {Array<StatisticsUnit>} fave
+	 * @property {Array<StatisticsUnit>} unfave
+	 * @property {Array<StatisticsUnit>} notifications_sent
+	 * @property {Array<StatisticsUnit>} notifications_sent
+	 * @property {Object} dynamics
+	 * @property  {Array<StatisticsUnit>} dynamics.view
+	 * @property  {Array<StatisticsUnit>} dynamics.fave
 	 */
-	this.view = [];
+	function Statistics() {
+		this.id = 0;
+		this.entity = null;
+		this.view = [];
+		this.fave = [];
+		this.unfave = [];
+		this.notifications_sent = [];
+		
+		this.dynamics = {
+			view: [],
+			fave: []
+		};
+	}
 	/**
-	 * @type {Array<StatisticsUnit>}
+	 *
+	 * @param {(Array|object)} data
+	 * @returns {Statistics}
 	 */
-	this.fave = [];
-	/**
-	 * @type {Array<StatisticsUnit>}
-	 */
-	this.unfave = [];
-	/**
-	 * @type {Array<StatisticsUnit>}
-	 */
-	this.notifications_sent = [];
-	
-	this.dynamics = {
-		/**
-		 * @type {Array<StatisticsUnit>}
-		 */
-		view: [],
-		/**
-		 * @type {Array<StatisticsUnit>}
-		 */
-		fave: []
+	Statistics.prototype.setData = function(data) {
+		return $.extend(true, this, (data instanceof Array) ? data[0] : data);
 	};
-}
-/**
- *
- * @param {(Array|object)} data
- * @returns {Statistics}
- */
-Statistics.prototype.setData = function(data) {
-	return $.extend(true, this, (data instanceof Array) ? data[0] : data);
-};
-/**
- * @const
- * @enum {string}
- */
-Statistics.SCALES = {
-	MINUTE: 'minute',
-	HOUR: 'hour',
-	DAY: 'day',
-	WEEK: 'week',
-	MONTH: 'month',
-	YEAR: 'year',
-	OVERALL: 'overall'
-};
-/**
- * @const
- * @enum {string}
- */
-Statistics.ENTITIES = {
-	EVENT: 'events',
-	ORGANIZATION: 'organizations'
-};
-/**
- * @static
- * @param {Statistics.ENTITIES} entity
- * @param {(string|number)} id
- * @param {Statistics.SCALES} scale
- * @param {(string|object|boolean)} range
- * @param {string} range.since
- * @param {string} [range.till]
- * @param {(Array<string>|object<string, StatisticsStdData>)} statistics_fields
- * @param {?StatisticsStdData} [dynamics_ajax_data]
- * @param {(Array<string>|string)} [dynamics_ajax_data.fields]
- * @param {function} [success]
- * @return {jqPromise}
- */
-Statistics.fetchStatistics = function(entity, id, scale, range, statistics_fields, dynamics_ajax_data, success) {
-	var data = {
-		scale: scale,
-		fields: []
+	/**
+	 * @const
+	 * @enum {string}
+	 */
+	Statistics.SCALES = {
+		MINUTE: 'minute',
+		HOUR: 'hour',
+		DAY: 'day',
+		WEEK: 'week',
+		MONTH: 'month',
+		YEAR: 'year',
+		OVERALL: 'overall'
 	};
-	if (statistics_fields instanceof Array) {
-		data.fields = data.fields.concat(statistics_fields);
-	} else {
-		$.each(statistics_fields, function(field, options) {
-			if (Object.getOwnPropertyNames(options).length) {
-				data.fields.push(field + JSON.stringify(options));
-			} else {
-				data.fields.push(field);
+	/**
+	 * @const
+	 * @enum {string}
+	 */
+	Statistics.ENTITIES = {
+		EVENT: 'events',
+		ORGANIZATION: 'organizations'
+	};
+	/**
+	 * @static
+	 * @param {Statistics.ENTITIES} entity
+	 * @param {(string|number)} id
+	 * @param {Statistics.SCALES} scale
+	 * @param {(string|object|boolean)} range
+	 * @param {string} range.since
+	 * @param {string} [range.till]
+	 * @param {(Array<string>|object<string, StatisticsStdData>)} statistics_fields
+	 * @param {?StatisticsStdData} [dynamics_ajax_data]
+	 * @param {(Array<string>|string)} [dynamics_ajax_data.fields]
+	 * @param {function} [success]
+	 * @return {jqPromise}
+	 */
+	Statistics.fetchStatistics = function(entity, id, scale, range, statistics_fields, dynamics_ajax_data, success) {
+		var data = {
+			scale: scale,
+			fields: []
+		};
+		if (statistics_fields instanceof Array) {
+			data.fields = data.fields.concat(statistics_fields);
+		} else {
+			$.each(statistics_fields, function(field, options) {
+				if (Object.getOwnPropertyNames(options).length) {
+					data.fields.push(field + JSON.stringify(options));
+				} else {
+					data.fields.push(field);
+				}
+			});
+		}
+		if (dynamics_ajax_data) {
+			data.fields.push('dynamics' + JSON.stringify(__APP.SERVER.validateData(dynamics_ajax_data)));
+		}
+		
+		switch (typeof range) {
+			case 'string': {
+				if (range) data.since = range;
+				break;
+			}
+			case 'object': {
+				if (range.since) data.since = range.since;
+				if (range.till) data.till = range.till;
+				break;
+			}
+			default:
+			case 'boolean': break;
+		}
+		
+		return __APP.SERVER.getData('/api/v1/statistics/' + entity + '/' + id, data, success);
+	};
+	/**
+	 *
+	 * @param {Statistics.SCALES} scale
+	 * @param {(string|object|boolean)} range
+	 * @param {string} range.since
+	 * @param {string} [range.till]
+	 * @param {object<string, StatisticsStdData>} statistics_fields
+	 * @param {?object} dynamics_ajax_data
+	 * @param {Statistics.SCALES} [dynamics_ajax_data.scale]
+	 * @param {string} [dynamics_ajax_data.since]
+	 * @param {string} [dynamics_ajax_data.till]
+	 * @param {function} [success]
+	 * @return {jqPromise}
+	 */
+	Statistics.prototype.fetchStatistics = function(scale, range, statistics_fields, dynamics_ajax_data, success) {
+		var self = this;
+		return Statistics.fetchStatistics(this.entity, this.id, scale, range, statistics_fields, dynamics_ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data);
 			}
 		});
-	}
-	if (dynamics_ajax_data) {
-		data.fields.push('dynamics' + JSON.stringify(__APP.SERVER.validateData(dynamics_ajax_data)));
-	}
+	};
 	
-	switch (typeof range) {
-		case 'string': {
-			if (range) data.since = range;
-			break;
-		}
-		case 'object': {
-			if (range.since) data.since = range.since;
-			if (range.till) data.till = range.till;
-			break;
-		}
-		default:
-		case 'boolean': { break; }
-	}
-	
-	return __APP.SERVER.getData('/api/v1/statistics/' + entity + '/' + id, data, success);
-};
-/**
- *
- * @param {Statistics.SCALES} scale
- * @param {(string|object|boolean)} range
- * @param {string} range.since
- * @param {string} [range.till]
- * @param {object<string, StatisticsStdData>} statistics_fields
- * @param {?object} dynamics_ajax_data
- * @param {Statistics.SCALES} [dynamics_ajax_data.scale]
- * @param {string} [dynamics_ajax_data.since]
- * @param {string} [dynamics_ajax_data.till]
- * @param {function} [success]
- * @return {jqPromise}
- */
-Statistics.prototype.fetchStatistics = function(scale, range, statistics_fields, dynamics_ajax_data, success) {
-	var self = this;
-	return this.constructor.fetchStatistics(this.id, scale, range, statistics_fields, dynamics_ajax_data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
+	return Statistics;
+}());
 /**
  * @requires Class.Statistics.js
  */
 /**
  *
- * @constructor
- * @augments Statistics
- * @param {(string|number)} event_id
+ * @class EventStatistics
+ * @extends Statistics
  */
-function EventStatistics(event_id) {
-	Statistics.apply(this);
-	this.id = event_id;
+EventStatistics = extending(Statistics, (function() {
 	/**
-	 * @type {Array<StatisticsUnit>}
+	 *
+	 * @param {(string|number)} event_id
+	 * @constructor
+	 * @constructs EventStatistics
+	 *
+	 * @property {Array<StatisticsUnit>} open_site
+	 * @property {Array<StatisticsUnit>} view_detail
+	 * @property {Array<StatisticsConversionUnit>} open_conversion
+	 * @property {Array<StatisticsConversionUnit>} fave_conversion
+	 * @property {Object} dynamics
+	 * @property  {Array<StatisticsConversionUnit>} dynamics.fave_conversion
+	 * @property  {Array<StatisticsConversionUnit>} dynamics.open_conversion
 	 */
-	this.open_site = [];
-	/**
-	 * @type {Array<StatisticsUnit>}
-	 */
-	this.view_detail = [];
-	/**
-	 * @type {Array<StatisticsConversionUnit>}
-	 */
-	this.open_conversion = [];
-	/**
-	 * @type {Array<StatisticsConversionUnit>}
-	 */
-	this.fave_conversion = [];
-	/**
-	 * @type {Array<StatisticsConversionUnit>}
-	 */
-	this.dynamics.fave_conversion = [];
-	/**
-	 * @type {Array<StatisticsConversionUnit>}
-	 */
-	this.dynamics.open_conversion = [];
-}
-EventStatistics.extend(Statistics);
-/**
- *
- * @param {(string|number)} id
- * @param {Statistics.SCALES} scale
- * @param {(string|object|boolean)} range
- * @param {string} range.since
- * @param {string} [range.till]
- * @param {object<string, StatisticsStdData>} statistics_fields
- * @param {?object} dynamics_ajax_data
- * @param {Statistics.SCALES} [dynamics_ajax_data.scale]
- * @param {string} [dynamics_ajax_data.since]
- * @param {string} [dynamics_ajax_data.till]
- * @param {function} [success]
- * @return {jqPromise}
- */
-EventStatistics.fetchStatistics = function(id, scale, range, statistics_fields, dynamics_ajax_data, success) {
-	return Statistics.fetchStatistics(Statistics.ENTITIES.EVENT, id, scale, range, statistics_fields, dynamics_ajax_data, success);
-};
+	function EventStatistics(event_id) {
+		Statistics.apply(this);
+		
+		this.id = event_id;
+		this.entity = Statistics.ENTITIES.EVENT;
+		
+		this.open_site = [];
+		this.view_detail = [];
+		
+		this.open_conversion = [];
+		this.fave_conversion = [];
+		this.dynamics.fave_conversion = [];
+		this.dynamics.open_conversion = [];
+	}
+	
+	return EventStatistics;
+}()));
 /**
  * @requires Class.Statistics.js
  */
 /**
  *
- * @constructor
- * @augments Statistics
- * @param {(string|number)} organization_id
+ * @class OrganizationsStatistics
+ * @extends Statistics
  */
-function OrganizationsStatistics(organization_id) {
-	Statistics.apply(this);
-	this.id = organization_id;
+OrganizationsStatistics = extending(Statistics, (function() {
 	/**
-	 * @type {Array<StatisticsUnit>}
+	 *
+	 * @param {(string|number)} organization_id
+	 * @constructor
+	 * @constructs OrganizationsStatistics
+	 *
+	 * @property {Array<StatisticsUnit>} subscribe
+	 * @property {Array<StatisticsUnit>} unsubscribe
+	 * @property {Array<StatisticsConversionUnit>} conversion
+	 * @property {StatisticsAudience} audience
+	 * @property {Object} dynamics
+	 * @property  {Array<StatisticsUnit>} dynamics.subscribe
+	 * @property  {Array<StatisticsConversionUnit>} dynamics.conversion
 	 */
-	this.subscribe = [];
-	/**
-	 * @type {Array<StatisticsUnit>}
-	 */
-	this.unsubscribe = [];
-	/**
-	 * @type {Array<StatisticsConversionUnit>}
-	 */
-	this.conversion = [];
-	/**
-	 * @type {StatisticsAudience}
-	 */
-	this.audience = {};
-	/**
-	 * @type {Array<StatisticsUnit>}
-	 */
-	this.dynamics.subscribe = [];
-	/**
-	 * @type {Array<StatisticsConversionUnit>}
-	 */
-	this.dynamics.conversion = [];
-}
-OrganizationsStatistics.extend(Statistics);
-/**
- *
- * @param {(string|number)} id
- * @param {Statistics.SCALES} scale
- * @param {(string|object|boolean)} range
- * @param {string} range.since
- * @param {string} [range.till]
- * @param {object<string, StatisticsStdData>} statistics_fields
- * @param {?object} dynamics_ajax_data
- * @param {Statistics.SCALES} [dynamics_ajax_data.scale]
- * @param {string} [dynamics_ajax_data.since]
- * @param {string} [dynamics_ajax_data.till]
- * @param {function} [success]
- * @return {jqPromise}
- */
-OrganizationsStatistics.fetchStatistics = function(id, scale, range, statistics_fields, dynamics_ajax_data, success) {
-	return Statistics.fetchStatistics(Statistics.ENTITIES.ORGANIZATION, id, scale, range, statistics_fields, dynamics_ajax_data, success);
-};
+	function OrganizationsStatistics(organization_id) {
+		Statistics.apply(this);
+		
+		this.id = organization_id;
+		this.entity = Statistics.ENTITIES.ORGANIZATION;
+		
+		this.subscribe = [];
+		this.unsubscribe = [];
+		this.conversion = [];
+		this.audience = {};
+		
+		this.dynamics.subscribe = [];
+		this.dynamics.conversion = [];
+	}
+	
+	return OrganizationsStatistics;
+}()));
 /**
  * @requires ../Class.OneEntity.js
  */
 /**
  *
- * @constructor
- * @augments OneEntity
- * @param {(string|number)} [tag_id]
- * @param {boolean} [is_loading_continuous]
+ * @class OneTag
+ * @extends OneEntity
  */
-function OneTag(tag_id, is_loading_continuous) {
-	this.id = tag_id ? tag_id : 0;
-	this.name = '';
-	
-	if (tag_id && is_loading_continuous) {
-		this.loading = true;
-		this.fetchTag(function() {
-			this.loading = false;
-			$(window).trigger('fetch.OneTag');
-		});
-	}
-}
-OneTag.extend(OneEntity);
-/**
- *
- * @param {(string|number)} tag_id
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-OneTag.fetchTag = function(tag_id, success) {
-	return __APP.SERVER.getData('/api/v1/tags/' + tag_id, {}, success);
-};
-/**
- *
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-OneTag.prototype.fetchTag = function(success) {
-	var self = this;
-	return this.constructor.fetchTag(self.id, function(data) {
-		self.setData(data[0]);
-		if (success && typeof success == 'function') {
-			success.call(self, data[0]);
+OneTag = extending(OneEntity, function() {
+	/**
+	 *
+	 * @param {(string|number)} [tag_id]
+	 * @param {boolean} [is_loading_continuous]
+	 * @constructor
+	 * @constructs OneTag
+	 */
+	function OneTag(tag_id, is_loading_continuous) {
+		this.id = tag_id ? tag_id : 0;
+		this.name = '';
+		
+		if (tag_id && is_loading_continuous) {
+			this.loading = true;
+			this.fetchTag(function() {
+				this.loading = false;
+				$(window).trigger('fetch.OneTag');
+			});
 		}
-	});
-};
+	}
+	/**
+	 *
+	 * @param {(string|number)} tag_id
+	 * @param {AJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	OneTag.fetchTag = function(tag_id, success) {
+		return __APP.SERVER.getData('/api/v1/tags/' + tag_id, {}, success);
+	};
+	/**
+	 *
+	 * @param {AJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	OneTag.prototype.fetchTag = function(success) {
+		var self = this;
+		return this.constructor.fetchTag(self.id, function(data) {
+			self.setData(data[0]);
+			if (success && typeof success == 'function') {
+				success.call(self, data[0]);
+			}
+		});
+	};
+	
+	return OneTag;
+}());
 /**
  * @requires ../Class.EntitiesCollection.js
  * @requires Class.OneTag.js
@@ -4475,36 +4907,45 @@ OneTag.prototype.fetchTag = function(success) {
  */
 /**
  *
- * @constructor
- * @augments EntitiesCollection
+ * @class TagsCollection
+ * @extends EntitiesCollection
  */
-function TagsCollection() {}
-TagsCollection.extend(EntitiesCollection);
-TagsCollection.prototype.collection_of = OneTag;
-/**
- *
- * @param {AJAXData} data
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-TagsCollection.fetchTags = function(data, success) {
-	return __APP.SERVER.getData('/api/v1/tags/', data, success);
-};
-/**
- *
- * @param {TagsCollectionAJAXData} data
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-TagsCollection.prototype.fetchTags = function(data, success) {
-	var self = this;
-	return this.constructor.fetchTags(data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
+TagsCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs TagsCollection
+	 */
+	function TagsCollection() {}
+	
+	TagsCollection.prototype.collection_of = OneTag;
+	/**
+	 *
+	 * @param {AJAXData} data
+	 * @param {AJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	TagsCollection.fetchTags = function(data, success) {
+		return __APP.SERVER.getData('/api/v1/tags/', data, success);
+	};
+	/**
+	 *
+	 * @param {TagsCollectionAJAXData} data
+	 * @param {AJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	TagsCollection.prototype.fetchTags = function(data, success) {
+		var self = this;
+		return this.constructor.fetchTags(data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data);
+			}
+		});
+	};
+	
+	return TagsCollection;
+}()));
 /**
  * @requires ../Class.OneEntity.js
  * @requires ../activity/Class.UsersActivitiesCollection.js
@@ -4518,44 +4959,63 @@ OneUser = extending(OneEntity, (function() {
 	 *
 	 * @param {(string|number)} [user_id]
 	 * @constructs OneUser
+	 *
+	 * @property {(number|string)} id
+	 * @property {string} ?first_name
+	 * @property {string} ?last_name
+	 * @property {string} ?middle_name
+	 * @property {string} ?full_name
+	 * @property {OneUser.GENDER} ?gender
+	 * @property {string} ?avatar_url
+	 * @property {string} ?blurred_image_url
+	 * @property {string} ?link
+	 * @property {string} ?type
+	 * @property {string} ?role
+	 * @property {boolean} ?is_friend
+	 * @property {boolean} ?is_editor
+	 *
+	 * @property {Array<OneUser.ACCOUNTS>} accounts
+	 * @property {Object<OneUser.ACCOUNTS, string>} accounts_links
+	 * @property {string} ?vk_uid
+	 * @property {string} ?google_uid
+	 * @property {string} ?facebook_uid
+	 *
+	 * @property {OrganizationsCollection} subscriptions
+	 * @property {FavoredEventsCollection} favored
+	 * @property {UsersActivitiesCollection} actions
 	 */
 	function OneUser(user_id) {
 		var self = this;
 		
 		this.id = setDefaultValue(user_id, 0);
-		this.first_name = '';
-		this.last_name = '';
-		this.middle_name = '';
-		/**
-		 *
-		 * @type {OneUser.GENDER}
-		 */
-		this.gender = '';
-		this.avatar_url = '';
-		this.type = '';
-		this.is_friend = false;
-		this.is_editor = false;
-		this.blurred_image_url = '';
-		this.link = '';
-		/**
-		 *
-		 * @type {Array<OneUser.ACCOUNTS>}
-		 */
+		this.first_name = null;
+		this.last_name = null;
+		this.middle_name = null;
+		this.gender = null;
+		this.avatar_url = null;
+		this.blurred_image_url = null;
+		this.link = null;
+		this.type = null;
+		this.role = null;
+		this.is_friend = null;
+		this.is_editor = null;
+		
 		this.accounts = [];
-		/**
-		 *
-		 * @type {Object<OneUser.ACCOUNTS, string>}
-		 */
 		this.accounts_links = {};
+		this.vk_uid = null;
+		this.google_uid = null;
+		this.facebook_uid = null;
+		
+		this.subscriptions = new OrganizationsCollection();
+		this.favored = new FavoredEventsCollection();
+		this.actions = new UsersActivitiesCollection(user_id);
+		
 		Object.defineProperty(this, 'full_name', {
 			enumerable: true,
 			get: function() {
 				return self.first_name + ' ' + self.last_name;
 			}
 		});
-		this.subscriptions = new OrganizationsCollection();
-		this.favored = new FavoredEventsCollection();
-		this.actions = new UsersActivitiesCollection(user_id);
 	}
 	OneUser.prototype.subscriptions_fields = ['img_small_url', 'subscribed_count', 'new_events_count', 'actual_events_count'];
 	Object.freeze(OneUser.prototype.subscriptions_fields);
@@ -4569,6 +5029,7 @@ OneUser = extending(OneEntity, (function() {
 		MODERATOR: 'moderator',
 		ADMIN: 'admin'
 	};
+	Object.freeze(OneUser.ROLE);
 	/**
 	 * @const
 	 * @enum {string}
@@ -4578,6 +5039,7 @@ OneUser = extending(OneEntity, (function() {
 		FEMALE: 'female',
 		NEUTRAL: 'neutral'
 	};
+	Object.freeze(OneUser.GENDER);
 	/**
 	 * @const
 	 * @enum {string}
@@ -4587,6 +5049,7 @@ OneUser = extending(OneEntity, (function() {
 		GOOGLE: 'google',
 		FACEBOOK: 'facebook'
 	};
+	Object.freeze(OneUser.ACCOUNTS);
 	/**
 	 *
 	 * @param {(string|number)} user_id
@@ -4693,9 +5156,6 @@ OneUser = extending(OneEntity, (function() {
 		}).promise();
 	};
 	
-	Object.freeze(OneUser.ROLE);
-	Object.freeze(OneUser.GENDER);
-	Object.freeze(OneUser.ACCOUNTS);
 	return OneUser;
 }()));
 /**
@@ -4813,6 +5273,13 @@ CurrentUser = extending(OneUser, (function() {
 	};
 	/**
 	 *
+	 * @return {boolean}
+	 */
+	CurrentUser.prototype.isLoggedOut = function() {
+		return this.id === -1;
+	};
+	/**
+	 *
 	 * @param {(number|string)} [organization_id]
 	 * @param {AJAXCallback} [success]
 	 * @returns {(jqPromise|null)}
@@ -4877,7 +5344,7 @@ UsersCollection = extending(EntitiesCollection, (function() {
 	 * @constructs UsersCollection
 	 */
 	function UsersCollection() {}
-	Object.defineProperty(UsersCollection.prototype, 'collection_of', {value: OneUser});
+	UsersCollection.prototype.collection_of = OneUser;
 	/**
 	 * Returns specified staff by role. Mixing additional_fields if needed.
 	 * @param {OneUser.ROLE} role
@@ -4953,7 +5420,7 @@ UsersCollection = extending(EntitiesCollection, (function() {
 	 * Returns specified staff by role. Mixing additional_fields if needed.
 	 * @param {OneUser.ROLE} role
 	 * @param {object} [additional_fields]
-	 * @return {(Array<OneUser>|UsersCollection|Array<object>)}
+	 * @return {(Array<OneUser>|UsersCollection|Array<Object>)}
 	 */
 	UsersCollection.prototype.getSpecificStaff = function(role, additional_fields) {
 		var specific_staff = [];
@@ -5055,57 +5522,111 @@ UsersCollection = extending(EntitiesCollection, (function() {
 })());
 
 /**
- *
- * @param {(jQuery|Element|string)} $calendar
- * @param {object} options
- * @constructor
+ * @class Calendar
  */
-function Calendar($calendar, options){
-	this.options = {
-		classes: {
-			wrapper_class: 'calendar_wrapper',
-			header_class: 'calendar_header',
-			prev_btn_class: 'calendar_prev_btn',
-			next_btn_class: 'calendar_next_btn',
-			month_name_class: 'calendar_month_name',
-			table_class: 'calendar_month',
-			thead_class: 'calendar_thead',
-			tbody_class: 'calendar_tbody',
-			tr_class: 'calendar_week',
-			head_tr_class: 'calendar_weekdays_row',
-			th_class: 'calendar_weekday',
-			td_class: 'calendar_day',
-			td_additional_classes: [],
-			td_disabled_class: '-disabled',
-			table_cell_class: 'calendar_cell',
-			today_class: 'today'
-		},
-		additional_dataset: {},
-		selection_type: Calendar.SELECTION_TYPES.SINGLE,
-		weekday_selection: false,
-		month_selection: false,
-		disable_selection: false,
-		min_date: false,
-		max_date: false,
-		locale: 'ru',
-		labels: {}
+Calendar = (function() {
+	/**
+	 *
+	 * @param {(jQuery|Element|string)} $calendar
+	 * @param {object} [options]
+	 * @param   {object} [options.classes]
+	 * @param     {string} [options.classes.wrapper_class = 'calendar_wrapper']
+	 * @param     {string} [options.classes.header_class = 'calendar_header']
+	 * @param     {string} [options.classes.prev_btn_class = 'calendar_prev_btn']
+	 * @param     {string} [options.classes.next_btn_class = 'calendar_next_btn']
+	 * @param     {string} [options.classes.month_name_class = 'calendar_month_name']
+	 * @param     {string} [options.classes.table_class = 'calendar_month']
+	 * @param     {string} [options.classes.thead_class = 'calendar_thead']
+	 * @param     {string} [options.classes.tbody_class = 'calendar_tbody']
+	 * @param     {string} [options.classes.tr_class = 'calendar_week']
+	 * @param     {string} [options.classes.head_tr_class = 'calendar_weekdays_row']
+	 * @param     {string} [options.classes.th_class = 'calendar_weekday']
+	 * @param     {string} [options.classes.td_class = 'calendar_day']
+	 * @param     {Array} [options.classes.td_additional_classes]
+	 * @param     {string} [options.classes.td_disabled_class = '-disabled']
+	 * @param     {string} [options.classes.table_cell_class = 'calendar_cell']
+	 * @param     {string} [options.classes.today_class = 'today']
+	 * @param   {object} [options.additional_dataset]
+	 * @param   {string} [options.selection_type = Calendar.SELECTION_TYPES.SINGLE]
+	 * @param   {boolean} [options.weekday_selection = false]
+	 * @param   {boolean} [options.month_selection = false]
+	 * @param   {boolean} [options.disable_selection = false]
+	 * @param   {string} [options.min_date = false]
+	 * @param   {string} [options.max_date = false]
+	 * @param   {string} [options.locale = 'ru']
+	 * @param   {object} [options.labels]
+	 *
+	 * @constructor
+	 * @constructs Calendar
+	 */
+	function Calendar($calendar, options){
+		this.options = {
+			classes: {
+				wrapper_class: 'calendar_wrapper',
+				header_class: 'calendar_header',
+				prev_btn_class: 'calendar_prev_btn',
+				next_btn_class: 'calendar_next_btn',
+				month_name_class: 'calendar_month_name',
+				table_class: 'calendar_month',
+				thead_class: 'calendar_thead',
+				tbody_class: 'calendar_tbody',
+				tr_class: 'calendar_week',
+				head_tr_class: 'calendar_weekdays_row',
+				th_class: 'calendar_weekday',
+				td_class: 'calendar_day',
+				td_additional_classes: [],
+				td_disabled_class: '-disabled',
+				table_cell_class: 'calendar_cell',
+				today_class: 'today'
+			},
+			additional_dataset: {},
+			selection_type: Calendar.SELECTION_TYPES.SINGLE,
+			weekday_selection: false,
+			month_selection: false,
+			disable_selection: false,
+			min_date: false,
+			max_date: false,
+			locale: 'ru',
+			labels: {}
+		};
+		
+		if ($calendar instanceof Element || typeof $calendar == "string") {
+			$calendar = $($calendar);
+			if($calendar.length === 0)
+				throw new Error("Такого элемента не существует");
+			else if($calendar.length > 1)
+				throw new Error("Элементов с заданным аргументов найдено несколько");
+		}
+		if ($calendar instanceof jQuery) {
+			$.extend(true, this.options, options, $calendar.data());
+			if(this.options.min_date !== false && this.options.max_date !== false && moment(this.options.max_date).diff(this.options.min_date, 'days') <= 0){
+				this.options.max_date = false;
+			}
+			if(this.options.weekday_selection === true || this.options.month_selection === true ) {
+				this.options.selection_type = Calendar.SELECTION_TYPES.MULTI;
+			}
+			this.selected_days = [];
+			this.selected_weeks = {};
+			this.selected_months = [];
+			this.last_action = '';
+			this.last_selected_days = '';
+			this.now_selected_day = '';
+			this.prev_selected_day = '';
+			this.formatted_days = {};
+			this.$calendar = $calendar;
+			this.current_month = moment(new Date());
+			this._today = moment(new Date());
+		} else {
+			throw new TypeError("Аргумент должен быть экземпляром jQuery, элементом DOM, либо CSS селектором");
+		}
+	}
+	
+	Calendar.SELECTION_TYPES = {
+		SINGLE: 'single',
+		MULTI: 'multi'
 	};
 	
-	if ($calendar instanceof Element || typeof $calendar == "string") {
-		$calendar = $($calendar);
-		if($calendar.length === 0)
-			throw new Error("Такого элемента не существует");
-		else if($calendar.length > 1)
-			throw new Error("Элементов с заданным аргументов найдено несколько");
-	}
-	if ($calendar instanceof jQuery) {
-		$.extend(true, this.options, options, $calendar.data());
-		if(this.options.min_date !== false && this.options.max_date !== false && moment(this.options.max_date).diff(this.options.min_date, 'days') <= 0){
-			this.options.max_date = false;
-		}
-		if(this.options.weekday_selection === true || this.options.month_selection === true ) {
-			this.options.selection_type = Calendar.SELECTION_TYPES.MULTI;
-		}
+	Calendar.prototype.flush = function(){
 		this.selected_days = [];
 		this.selected_weeks = {};
 		this.selected_months = [];
@@ -5114,699 +5635,705 @@ function Calendar($calendar, options){
 		this.now_selected_day = '';
 		this.prev_selected_day = '';
 		this.formatted_days = {};
-		this.$calendar = $calendar;
-		this.current_month = moment(new Date());
-		this._today = moment(new Date());
-	} else {
-		throw new TypeError("Аргумент должен быть экземпляром jQuery, элементом DOM, либо CSS селектором");
-	}
-}
-
-Calendar.SELECTION_TYPES = {
-	SINGLE: 'single',
-	MULTI: 'multi'
-};
-
-Calendar.prototype.flush = function(){
-	this.selected_days = [];
-	this.selected_weeks = {};
-	this.selected_months = [];
-	this.last_action = '';
-	this.last_selected_days = '';
-	this.now_selected_day = '';
-	this.prev_selected_day = '';
-	this.formatted_days = {};
-	this.destroyTable();
-};
-
-Calendar.prototype.setMonth = function(month, year){
-	switch(month){
-		case 'prev':{
-			this.current_month = this.current_month.add(-1, 'months'); break;
+		this.destroyTable();
+	};
+	
+	Calendar.prototype.setMonth = function(month, year){
+		switch(month){
+			case 'prev':{
+				this.current_month = this.current_month.add(-1, 'months'); break;
+			}
+			case 'next':{
+				this.current_month = this.current_month.add(1, 'months'); break;
+			}
+			case 'current':{
+				this.current_month = moment(new Date()); break;
+			}
+			default: {
+				this.current_month = year ? this.current_month.set({'year': year, 'month': month-1}) : this.current_month.month(month-1);
+			}
 		}
-		case 'next':{
-			this.current_month = this.current_month.add(1, 'months'); break;
+		this.renderTable();
+		this.$calendar.trigger('month-changed');
+		return this;
+	};
+	
+	Calendar.prototype.destroyTable = function(){
+		this.$calendar.find('.'+this.options.classes.th_class).removeClass(__C.CLASSES.ACTIVE).off('click');
+		this.$calendar.find('.MonthName').removeClass(__C.CLASSES.ACTIVE).off('click');
+		this.$calendar.find('.CalendarTableBody').remove();
+		return this;
+	};
+	
+	Calendar.prototype.setMonthName = function(){
+		this.$calendar.find('.MonthName')
+			.data('month', this.current_month.month())
+			.text(this.current_month.format("MMMM YYYY").capitalize());
+		return this;
+	};
+	
+	Calendar.prototype.buildTable = function(){
+		var $calendar_table = this.$calendar.find('.CalendarTable'),
+			days_count = this.current_month.daysInMonth(),
+			first_day_in_month = this.current_month.date(1).day(),
+			last_day_in_month = this.current_month.date(days_count).day(),
+			td_days = [],
+			td_classes = [],
+			this_day,
+			this_moment,
+			dataset = [];
+		for(var name in this.options.additional_dataset){
+			if(this.options.additional_dataset.hasOwnProperty(name)){
+				dataset.push('data-'+name+'='+this.options.additional_dataset[name]);
+			}
 		}
-		case 'current':{
-			this.current_month = moment(new Date()); break;
-		}
-		default: {
-			this.current_month = year ? this.current_month.set({'year': year, 'month': month-1}) : this.current_month.month(month-1);
-		}
-	}
-	this.renderTable();
-	this.$calendar.trigger('month-changed');
-	return this;
-};
-
-Calendar.prototype.destroyTable = function(){
-	this.$calendar.find('.'+this.options.classes.th_class).removeClass(__C.CLASSES.NEW_ACTIVE).off('click');
-	this.$calendar.find('.MonthName').removeClass(__C.CLASSES.NEW_ACTIVE).off('click');
-	this.$calendar.find('.CalendarTableBody').remove();
-	return this;
-};
-
-Calendar.prototype.setMonthName = function(){
-	this.$calendar.find('.MonthName')
-		.data('month', this.current_month.month())
-		.text(this.current_month.format("MMMM YYYY").capitalize());
-	return this;
-};
-
-Calendar.prototype.buildTable = function(){
-	var $calendar_table = this.$calendar.find('.CalendarTable'),
-		days_count = this.current_month.daysInMonth(),
-		first_day_in_month = this.current_month.date(1).day(),
-		last_day_in_month = this.current_month.date(days_count).day(),
-		td_days = [],
-		td_classes = [],
-		this_day,
-		this_moment,
-		dataset = [];
-	for(var name in this.options.additional_dataset){
-		if(this.options.additional_dataset.hasOwnProperty(name)){
-			dataset.push('data-'+name+'='+this.options.additional_dataset[name]);
-		}
-	}
-	for(var day = 1; day <= days_count; day++){
-		this.current_month.date(day);
-		this_day = this.current_month.format(__C.DATE_FORMAT);
-		this_moment = moment(this_day);
-
-		td_classes = [
-			this.options.classes.table_cell_class,
-			this.options.classes.td_class,
-			'Day_'+this_day,
-			'DayOfWeek_'+this.current_month.day(),
-			'DayOfMonth_'+this.current_month.month()
-		].concat(this.options.classes.td_additional_classes);
-		if((this.options.min_date !== false && !(this_moment.diff(this.options.min_date, 'd') >= 0) ) || (this.options.max_date !== false && !(this_moment.diff(this.options.max_date, 'd') <= 0)))
-			td_classes.push(this.options.classes.td_disabled_class);
-		if(this.current_month.format(__C.DATE_FORMAT) == this._today.format(__C.DATE_FORMAT))
-			td_classes.push(this.options.classes.today_class);
-
-		td_days.push(tmpl('calendar-div', {
-			td_classes: td_classes.join(' '),
-			number: this.current_month.date(),
-			day_number: this.current_month.day(),
-			date: this.current_month.format(__C.DATE_FORMAT),
-			date_text: this.current_month.format('DD MMMM YYYY'),
-			dataset: dataset.join(' ')
-		}));
-	}
-	var curr_month_clone = this.current_month.clone();
-	if (first_day_in_month != 1){
-		curr_month_clone.add(-1, 'months');
-		curr_month_clone.date(curr_month_clone.daysInMonth());
-		do {
-			this_day = curr_month_clone.format(__C.DATE_FORMAT);
+		for(var day = 1; day <= days_count; day++){
+			this.current_month.date(day);
+			this_day = this.current_month.format(__C.DATE_FORMAT);
 			this_moment = moment(this_day);
+			
 			td_classes = [
 				this.options.classes.table_cell_class,
 				this.options.classes.td_class,
 				'Day_'+this_day,
-				'DayOfWeek_'+curr_month_clone.day(),
-				'DayOfMonth_'+curr_month_clone.month(),
-				'not_this_month'
+				'DayOfWeek_'+this.current_month.day(),
+				'DayOfMonth_'+this.current_month.month()
 			].concat(this.options.classes.td_additional_classes);
 			if((this.options.min_date !== false && !(this_moment.diff(this.options.min_date, 'd') >= 0) ) || (this.options.max_date !== false && !(this_moment.diff(this.options.max_date, 'd') <= 0)))
 				td_classes.push(this.options.classes.td_disabled_class);
-
-			td_days.unshift(tmpl('calendar-div', {
-				td_classes: td_classes.join(' '),
-				number: curr_month_clone.date(),
-				day_number: curr_month_clone.day(),
-				date: curr_month_clone.format(__C.DATE_FORMAT),
-				date_text: curr_month_clone.format('DD MMMM YYYY'),
-				dataset: dataset.join(' ')
-			}));
-			curr_month_clone.add(-1, 'days');
-		} while(curr_month_clone.day() != 0);
-	}
-
-	if (last_day_in_month != 0){
-		curr_month_clone = this.current_month.clone();
-		do {
-			curr_month_clone.add(1, 'days');
-			this_day = curr_month_clone.format(__C.DATE_FORMAT);
-			this_moment = moment(this_day);
-			td_classes = [
-				this.options.classes.table_cell_class,
-				this.options.classes.td_class,
-				'Day_'+this_day,
-				'DayOfWeek_'+curr_month_clone.day(),
-				'DayOfMonth_'+curr_month_clone.month(),
-				'not_this_month'
-			].concat(this.options.classes.td_additional_classes);
-			if((this.options.min_date !== false && !(this_moment.diff(this.options.min_date, 'd') >= 0) ) || (this.options.max_date !== false && !(this_moment.diff(this.options.max_date, 'd') <= 0)))
-				td_classes.push(this.options.classes.td_disabled_class);
-
+			if(this.current_month.format(__C.DATE_FORMAT) == this._today.format(__C.DATE_FORMAT))
+				td_classes.push(this.options.classes.today_class);
+			
 			td_days.push(tmpl('calendar-div', {
 				td_classes: td_classes.join(' '),
-				number: curr_month_clone.date(),
-				day_number: curr_month_clone.day(),
-				date: curr_month_clone.format(__C.DATE_FORMAT),
-				date_text: curr_month_clone.format('DD MMMM YYYY'),
+				number: this.current_month.date(),
+				day_number: this.current_month.day(),
+				date: this.current_month.format(__C.DATE_FORMAT),
+				date_text: this.current_month.format('DD MMMM YYYY'),
 				dataset: dataset.join(' ')
 			}));
-		} while(curr_month_clone.day() != 0);
-	}
-	var $tbody = $('<tbody>').addClass('CalendarTableBody'),
-		tds_in_tr = 0,
-		trs_count = 0,
-		$trs = [tmpl('calendar-row', {tr_class: this.options.classes.tr_class})];
-	for(var i = 0; i < td_days.length; i++){
-		if (tds_in_tr == 7 ){
-			$trs.push(tmpl('calendar-row', {tr_class: this.options.classes.tr_class}));
-			tds_in_tr = 0;
-			trs_count++;
 		}
-		$trs[trs_count].append(td_days[i]);
-		tds_in_tr++;
-	}
-	$trs.forEach(function(item){
-		$tbody.append(item);
-	});
-	$calendar_table.append($tbody);
-	return this;
-};
-
-Calendar.prototype.renderTable = function(){
-	this
-		.destroyTable()
-		.buildTable()
-		.activateSelectedDays()
-		.setMonthName();
-	
-	if(!this.options.disable_selection){
-		switch(this.options.selection_type){
-			case Calendar.SELECTION_TYPES.MULTI: {
-				this.bindDragSelection();
-				break;
-			}
-			case Calendar.SELECTION_TYPES.SINGLE: {
-				this.bindDaySelection();
-				break;
-			}
-			default: {break;}
+		var curr_month_clone = this.current_month.clone();
+		if (first_day_in_month != 1){
+			curr_month_clone.add(-1, 'months');
+			curr_month_clone.date(curr_month_clone.daysInMonth());
+			do {
+				this_day = curr_month_clone.format(__C.DATE_FORMAT);
+				this_moment = moment(this_day);
+				td_classes = [
+					this.options.classes.table_cell_class,
+					this.options.classes.td_class,
+					'Day_'+this_day,
+					'DayOfWeek_'+curr_month_clone.day(),
+					'DayOfMonth_'+curr_month_clone.month(),
+					'not_this_month'
+				].concat(this.options.classes.td_additional_classes);
+				if((this.options.min_date !== false && !(this_moment.diff(this.options.min_date, 'd') >= 0) ) || (this.options.max_date !== false && !(this_moment.diff(this.options.max_date, 'd') <= 0)))
+					td_classes.push(this.options.classes.td_disabled_class);
+				
+				td_days.unshift(tmpl('calendar-div', {
+					td_classes: td_classes.join(' '),
+					number: curr_month_clone.date(),
+					day_number: curr_month_clone.day(),
+					date: curr_month_clone.format(__C.DATE_FORMAT),
+					date_text: curr_month_clone.format('DD MMMM YYYY'),
+					dataset: dataset.join(' ')
+				}));
+				curr_month_clone.add(-1, 'days');
+			} while(curr_month_clone.day() != 0);
 		}
 		
-		if(this.options.weekday_selection === true){
-			this.bindWeekdaySelection();
+		if (last_day_in_month != 0){
+			curr_month_clone = this.current_month.clone();
+			do {
+				curr_month_clone.add(1, 'days');
+				this_day = curr_month_clone.format(__C.DATE_FORMAT);
+				this_moment = moment(this_day);
+				td_classes = [
+					this.options.classes.table_cell_class,
+					this.options.classes.td_class,
+					'Day_'+this_day,
+					'DayOfWeek_'+curr_month_clone.day(),
+					'DayOfMonth_'+curr_month_clone.month(),
+					'not_this_month'
+				].concat(this.options.classes.td_additional_classes);
+				if((this.options.min_date !== false && !(this_moment.diff(this.options.min_date, 'd') >= 0) ) || (this.options.max_date !== false && !(this_moment.diff(this.options.max_date, 'd') <= 0)))
+					td_classes.push(this.options.classes.td_disabled_class);
+				
+				td_days.push(tmpl('calendar-div', {
+					td_classes: td_classes.join(' '),
+					number: curr_month_clone.date(),
+					day_number: curr_month_clone.day(),
+					date: curr_month_clone.format(__C.DATE_FORMAT),
+					date_text: curr_month_clone.format('DD MMMM YYYY'),
+					dataset: dataset.join(' ')
+				}));
+			} while(curr_month_clone.day() != 0);
 		}
-		if(this.options.month_selection === true){
-			this.bindMonthSelection();
+		var $tbody = $('<tbody>').addClass('CalendarTableBody'),
+			tds_in_tr = 0,
+			trs_count = 0,
+			$trs = [tmpl('calendar-row', {tr_class: this.options.classes.tr_class})];
+		for(var i = 0; i < td_days.length; i++){
+			if (tds_in_tr == 7 ){
+				$trs.push(tmpl('calendar-row', {tr_class: this.options.classes.tr_class}));
+				tds_in_tr = 0;
+				trs_count++;
+			}
+			$trs[trs_count].append(td_days[i]);
+			tds_in_tr++;
 		}
-	}
-
-	return this;
-};
-
-Calendar.prototype.selectToday = function(){
-	this.$calendar.find('.'+this.options.classes.td_class+'.'+this.options.classes.today_class).addClass(__C.CLASSES.NEW_ACTIVE);
-	return this;
-};
+		$trs.forEach(function(item){
+			$tbody.append(item);
+		});
+		$calendar_table.append($tbody);
+		return this;
+	};
+	
+	Calendar.prototype.renderTable = function(){
+		this
+			.destroyTable()
+			.buildTable()
+			.activateSelectedDays()
+			.setMonthName();
+		
+		if(!this.options.disable_selection){
+			switch(this.options.selection_type){
+				case Calendar.SELECTION_TYPES.MULTI: {
+					this.bindDragSelection();
+					break;
+				}
+				case Calendar.SELECTION_TYPES.SINGLE: {
+					this.bindDaySelection();
+					break;
+				}
+				default: {break;}
+			}
+			
+			if(this.options.weekday_selection === true){
+				this.bindWeekdaySelection();
+			}
+			if(this.options.month_selection === true){
+				this.bindMonthSelection();
+			}
+		}
+		
+		return this;
+	};
+	
+	Calendar.prototype.selectToday = function(){
+		this.$calendar.find('.'+this.options.classes.td_class+'.'+this.options.classes.today_class).addClass(__C.CLASSES.ACTIVE);
+		return this;
+	};
 
 //TODO: Make formated days
 //TODO: Make range selection
-Calendar.prototype.formatDays = function(){
-	var genitive_month_names = {
-			'январь': 'января',
-			'февраль': 'февраля',
-			'март': 'марта',
-			'апрель': 'апреля',
-			'май': 'мая',
-			'июнь': 'июня',
-			'июль': 'июля',
-			'август': 'августа',
-			'сентябрь': 'сентября',
-			'октябрь': 'октября',
-			'ноябрь': 'ноября',
-			'декабрь': 'декабря'
-		},
-		_date = moment(this.now_selected_day),
-		month_num = _date.month(),
-		month = _date.month(month_num),
-		days_in_month = month.daysInMonth(),
-		_day = month.date(1);
-
-	if(typeof this.formatted_days[month_num] === 'undefined'){
-		this.formatted_days[month_num] = {};
-		this.formatted_days[month_num].selected_days = [];
-		this.formatted_days[month_num].month_name = genitive_month_names[_date.format('MMMM')];
-	}
-
-	this.formatted_days[month_num].selected_days.push(_date.format(__C.DATE_FORMAT));
-	this.formatted_days[month_num].text = '';
-
-	while(days_in_month){
-		console.log(this.formatted_days[month_num].selected_days);
-		if(this.formatted_days[month_num].selected_days.indexOf(_day.format(__C.DATE_FORMAT)) !== -1){
-			this.formatted_days[month_num].text += ''+_day.format('D');
+	Calendar.prototype.formatDays = function(){
+		var genitive_month_names = {
+				'январь': 'января',
+				'февраль': 'февраля',
+				'март': 'марта',
+				'апрель': 'апреля',
+				'май': 'мая',
+				'июнь': 'июня',
+				'июль': 'июля',
+				'август': 'августа',
+				'сентябрь': 'сентября',
+				'октябрь': 'октября',
+				'ноябрь': 'ноября',
+				'декабрь': 'декабря'
+			},
+			_date = moment(this.now_selected_day),
+			month_num = _date.month(),
+			month = _date.month(month_num),
+			days_in_month = month.daysInMonth(),
+			_day = month.date(1);
+		
+		if(typeof this.formatted_days[month_num] === 'undefined'){
+			this.formatted_days[month_num] = {};
+			this.formatted_days[month_num].selected_days = [];
+			this.formatted_days[month_num].month_name = genitive_month_names[_date.format('MMMM')];
 		}
-		_day = _day.add(1, 'd');
-		days_in_month--;
-	}
-	console.log(this.formatted_days[month_num].text);
-
-	return this;
-};
-
-Calendar.prototype.selectDays = function(days){
-	var self = this;
-
-	function select(day){
-		//var $this_day = self.$calendar.find('.Day_'+day);
 		
+		this.formatted_days[month_num].selected_days.push(_date.format(__C.DATE_FORMAT));
+		this.formatted_days[month_num].text = '';
 		
-		switch(self.options.selection_type){
-			case Calendar.SELECTION_TYPES.MULTI: {
-				if(self.selected_days.indexOf(day) === -1){
-					self.selected_days.push(day);
-					self.selected_days.sort();
+		while(days_in_month){
+			console.log(this.formatted_days[month_num].selected_days);
+			if(this.formatted_days[month_num].selected_days.indexOf(_day.format(__C.DATE_FORMAT)) !== -1){
+				this.formatted_days[month_num].text += ''+_day.format('D');
+			}
+			_day = _day.add(1, 'd');
+			days_in_month--;
+		}
+		console.log(this.formatted_days[month_num].text);
+		
+		return this;
+	};
+	
+	Calendar.prototype.selectDays = function(days){
+		var self = this;
+		
+		function select(day){
+			//var $this_day = self.$calendar.find('.Day_'+day);
+			
+			
+			switch(self.options.selection_type){
+				case Calendar.SELECTION_TYPES.MULTI: {
+					if(self.selected_days.indexOf(day) === -1){
+						self.selected_days.push(day);
+						self.selected_days.sort();
+					}
+					break;
 				}
-				break;
+				default:
+				case Calendar.SELECTION_TYPES.SINGLE: {
+					self.$calendar.find('.'+self.options.classes.td_class+'.'+__C.CLASSES.ACTIVE).removeClass(__C.CLASSES.ACTIVE);
+					self.selected_days = [day];
+					break;
+				}
 			}
-			default:
-			case Calendar.SELECTION_TYPES.SINGLE: {
-				self.$calendar.find('.'+self.options.classes.td_class+'.'+__C.CLASSES.NEW_ACTIVE).removeClass(__C.CLASSES.NEW_ACTIVE);
-				self.selected_days = [day];
-				break;
+			
+			//self.prev_selected_day = self.now_selected_day;
+			//self.now_selected_day = $this_day.data('date');
+			//this.formatDays();
+			
+			self.$calendar.find('.Day_'+day).addClass(__C.CLASSES.ACTIVE);
+		}
+		
+		
+		if(Array.isArray(days)){
+			var removing_days = [];
+			days.forEach(function(day){
+				if((self.options.min_date !== false && !(moment(day).diff(self.options.min_date) >= 0) ) || (self.options.max_date !== false && !(moment(day).diff(self.options.max_date) <= 0))){
+					removing_days.push(day);
+				} else {
+					select(day);
+				}
+			});
+			removing_days.forEach(function(day) {
+				days.splice(days.indexOf(day), 1)
+			})
+		} else {
+			if((self.options.min_date !== false && !(moment(days).diff(self.options.min_date) >= 0) ) || (self.options.max_date !== false && !(moment(days).diff(self.options.max_date) <=0))){
+				days = [];
+			} else {
+				select(days);
+				days = [days];
 			}
 		}
-
-		//self.prev_selected_day = self.now_selected_day;
-		//self.now_selected_day = $this_day.data('date');
-		//this.formatDays();
-
-		self.$calendar.find('.Day_'+day).addClass(__C.CLASSES.NEW_ACTIVE);
-	}
-
-
-	if(Array.isArray(days)){
-		var removing_days = [];
-		days.forEach(function(day){
-			if((self.options.min_date !== false && !(moment(day).diff(self.options.min_date) >= 0) ) || (self.options.max_date !== false && !(moment(day).diff(self.options.max_date) <= 0))){
-				removing_days.push(day);
+		if(days.length){
+			self.last_action = 'select';
+			self.last_selected_days = days;
+			self.$calendar.trigger('days-changed');
+		}
+		return this;
+	};
+	
+	Calendar.prototype.deselectDays = function(days){ // 2012-12-21
+		var self = this;
+		
+		function deselect(day){
+			var $this_day = self.$calendar.find('.Day_'+day),
+				$this_weekday = self.$calendar.find('.Week_'+$this_day.data('weekday')),
+				$this_month_name = self.$calendar.find('.MonthName'),
+				this_year = self.current_month.format('YYYY'),
+				this_month_num = self.current_month.format('MM'),
+				this_month = self.current_month.format('YYYY.MM'),
+				this_weekday_pos;
+			
+			self.selected_days.splice(self.selected_days.indexOf(day), 1);
+			self.selected_days.sort();
+			
+			if(self.selected_months.indexOf(this_month) !== -1){
+				$this_month_name.removeClass(__C.CLASSES.ACTIVE);
+				self.selected_months.splice(self.selected_months.indexOf(this_month), 1);
+			}
+			
+			if(typeof self.selected_weeks[this_year] !== 'undefined'){
+				if(typeof self.selected_weeks[this_year][this_month_num] !== 'undefined'){
+					this_weekday_pos = self.selected_weeks[this_year][this_month_num].indexOf($this_day.data('weekday'));
+					if(this_weekday_pos !== -1){
+						$this_weekday.removeClass(__C.CLASSES.ACTIVE);
+						self.selected_weeks[this_year][this_month_num].splice(this_weekday_pos, 1);
+					}
+				}
+			}
+			self.$calendar.find('.Day_'+day).removeClass(__C.CLASSES.ACTIVE);
+		}
+		
+		if(this.options.selection_type === Calendar.SELECTION_TYPES.MULTI){
+			if(Array.isArray(days)){
+				days.forEach(function(day){
+					deselect(day);
+				});
 			} else {
-				select(day);
+				deselect(days);
+			}
+			self.last_action = 'deselect';
+			self.last_selected_days = days;
+			self.$calendar.trigger('days-changed');
+		}
+		
+		
+		return this;
+	};
+	
+	Calendar.prototype.selectWeek = function(week){ // 0..6
+		var self = this,
+			$this_weekday = self.$calendar.find('.Week_'+week),
+			$this_weekday_days = self.$calendar.find('.DayOfWeek_'+week).not('.not_this_month'),
+			this_year = self.current_month.format('YYYY'),
+			this_month = self.current_month.format('MM'),
+			this_weekday_pos,
+			days = [];
+		
+		$this_weekday_days.each(function(i){
+			days.push($this_weekday_days.eq(i).data('date'));
+		});
+		
+		if(typeof self.selected_weeks[this_year] === 'undefined')
+			self.selected_weeks[this_year] = {};
+		if(typeof self.selected_weeks[this_year][this_month] === 'undefined')
+			self.selected_weeks[this_year][this_month] = [];
+		
+		this_weekday_pos = self.selected_weeks[this_year][this_month].indexOf(week);
+		
+		if(this_weekday_pos === -1){
+			$this_weekday.addClass(__C.CLASSES.ACTIVE);
+			self.selectDays(days);
+			self.selected_weeks[this_year][this_month].push(week)
+		} else {
+			$this_weekday.removeClass(__C.CLASSES.ACTIVE);
+			self.deselectDays(days);
+			self.selected_weeks[this_year][this_month].splice(this_weekday_pos, 1);
+		}
+		return this;
+	};
+	
+	Calendar.prototype.selectMonth = function(month){ // 0..11
+		var self = this,
+			$this_month_name = self.$calendar.find('.MonthName'),
+			$this_month_days = self.$calendar.find('.DayOfMonth_'+month),
+			this_month = self.current_month.format('YYYY.MM'),
+			this_month_pos = self.selected_months.indexOf(this_month),
+			days = [];
+		
+		$this_month_days.each(function(i){
+			days.push($this_month_days.eq(i).data('date'));
+		});
+		
+		if(this_month_pos === -1){
+			$this_month_name.addClass(__C.CLASSES.ACTIVE);
+			self.selectDays(days);
+			self.selected_months.push(this_month);
+		} else {
+			$this_month_name.removeClass(__C.CLASSES.ACTIVE);
+			self.deselectDays(days);
+			self.selected_months.splice(this_month_pos, 1);
+		}
+		return this;
+	};
+	
+	Calendar.prototype.bindMonthArrows = function(){
+		var self = this;
+		this.$calendar.find('.NextMonth').off('click.NextMonth').on('click.NextMonth', function(){
+			self.setMonth('next');
+		});
+		this.$calendar.find('.PrevMonth').off('click.PrevMonth').on('click.PrevMonth', function(){
+			self.setMonth('prev');
+		});
+		return this;
+	};
+	
+	Calendar.prototype.bindDaySelection = function(){
+		var self = this,
+			$days_in_month = self.$calendar.find('.'+this.options.classes.td_class),
+			$active_days = $days_in_month.not('.'+this.options.classes.td_disabled_class);
+		$days_in_month.off('click.bindDaySelection');
+		$active_days.on('click.bindDaySelection', function(){
+			if(self.options.selection_type === Calendar.SELECTION_TYPES.MULTI && $(this).hasClass(__C.CLASSES.ACTIVE)){
+				self.deselectDays($(this).data('date'));
+			} else {
+				self.selectDays($(this).data('date'));
 			}
 		});
-		removing_days.forEach(function(day) {
-			days.splice(days.indexOf(day), 1)
-		})
-	} else {
-		if((self.options.min_date !== false && !(moment(days).diff(self.options.min_date) >= 0) ) || (self.options.max_date !== false && !(moment(days).diff(self.options.max_date) <=0))){
-			days = [];
-		} else {
-			select(days);
-			days = [days];
+		return this;
+	};
+	
+	Calendar.prototype.bindWeekdaySelection = function(){
+		var self = this,
+			$weekdays = self.$calendar.find('.'+this.options.classes.th_class);
+		$weekdays.on('click', function(){
+			self.selectWeek($(this).data('weekday'));
+		});
+		return this;
+	};
+	
+	Calendar.prototype.bindMonthSelection = function(){
+		var self = this,
+			$this_month_name = self.$calendar.find('.MonthName');
+		$this_month_name.on('click', function(){
+			self.selectMonth($(this).data('month'));
+		});
+		return this;
+	};
+	
+	Calendar.prototype.bindDragSelection = function(){
+		var self = this;
+		
+		function selectDate($target){
+			$target = $target.is('.'+self.options.classes.td_class) ? $target : $target.closest('.'+self.options.classes.td_class);
+			if($target.not('.'+self.options.classes.td_disabled_class).length){
+				if($target.hasClass(__C.CLASSES.ACTIVE)){
+					self.deselectDays($target.data('date'));
+				} else {
+					self.selectDays($target.data('date'));
+				}
+			}
 		}
-	}
-	if(days.length){
-		self.last_action = 'select';
-		self.last_selected_days = days;
-		self.$calendar.trigger('days-changed');
-	}
-	return this;
-};
-
-Calendar.prototype.deselectDays = function(days){ // 2012-12-21
-	var self = this;
-
-	function deselect(day){
-		var $this_day = self.$calendar.find('.Day_'+day),
-			$this_weekday = self.$calendar.find('.Week_'+$this_day.data('weekday')),
-			$this_month_name = self.$calendar.find('.MonthName'),
+		
+		function disableDragSelection(){
+			self.$calendar.find('.'+self.options.classes.td_class).off('mouseenter.DragSelection');
+		}
+		
+		self.$calendar
+			.off('mousedown.RangeSelection')
+			.on('mousedown.RangeSelection', function(e){
+				selectDate($(e.target));
+				self.$calendar.find('.'+self.options.classes.td_class).not('.'+self.options.classes.td_disabled_class).on('mouseenter.DragSelection', function(e){
+					e.preventDefault();
+					selectDate($(e.target));
+				});
+			})
+			.on('mouseup', disableDragSelection)
+			.on('mouseleave', disableDragSelection);
+		return this;
+	};
+	
+	Calendar.prototype.activateSelectedDays = function(){
+		var self = this,
 			this_year = self.current_month.format('YYYY'),
-			this_month_num = self.current_month.format('MM'),
-			this_month = self.current_month.format('YYYY.MM'),
-			this_weekday_pos;
-
-		self.selected_days.splice(self.selected_days.indexOf(day), 1);
-		self.selected_days.sort();
-
-		if(self.selected_months.indexOf(this_month) !== -1){
-			$this_month_name.removeClass(__C.CLASSES.NEW_ACTIVE);
-			self.selected_months.splice(self.selected_months.indexOf(this_month), 1);
+			this_month_num = self.current_month.format('MM');
+		
+		self.selected_days.forEach(function(day){
+			self.$calendar.find('.Day_'+day).addClass(__C.CLASSES.ACTIVE)
+		});
+		
+		if(self.selected_months.indexOf(this_year + '.' + this_month_num) !== -1){
+			self.$calendar.find('.MonthName').addClass(__C.CLASSES.ACTIVE);
 		}
-
 		if(typeof self.selected_weeks[this_year] !== 'undefined'){
 			if(typeof self.selected_weeks[this_year][this_month_num] !== 'undefined'){
-				this_weekday_pos = self.selected_weeks[this_year][this_month_num].indexOf($this_day.data('weekday'));
-				if(this_weekday_pos !== -1){
-					$this_weekday.removeClass(__C.CLASSES.NEW_ACTIVE);
-					self.selected_weeks[this_year][this_month_num].splice(this_weekday_pos, 1);
-				}
+				self.selected_weeks[this_year][this_month_num].forEach(function(weekday) {
+					self.$calendar.find('.Week_'+weekday).addClass(__C.CLASSES.ACTIVE);
+				});
 			}
 		}
-		self.$calendar.find('.Day_'+day).removeClass(__C.CLASSES.NEW_ACTIVE);
-	}
-
-	if(this.options.selection_type === Calendar.SELECTION_TYPES.MULTI){
-		if(Array.isArray(days)){
-			days.forEach(function(day){
-				deselect(day);
-			});
-		} else {
-			deselect(days);
-		}
-		self.last_action = 'deselect';
-		self.last_selected_days = days;
-		self.$calendar.trigger('days-changed');
-	}
-
-
-	return this;
-};
-
-Calendar.prototype.selectWeek = function(week){ // 0..6
-	var self = this,
-		$this_weekday = self.$calendar.find('.Week_'+week),
-		$this_weekday_days = self.$calendar.find('.DayOfWeek_'+week).not('.not_this_month'),
-		this_year = self.current_month.format('YYYY'),
-		this_month = self.current_month.format('MM'),
-		this_weekday_pos,
-		days = [];
-
-	$this_weekday_days.each(function(i){
-		days.push($this_weekday_days.eq(i).data('date'));
-	});
-
-	if(typeof self.selected_weeks[this_year] === 'undefined')
-		self.selected_weeks[this_year] = {};
-	if(typeof self.selected_weeks[this_year][this_month] === 'undefined')
-		self.selected_weeks[this_year][this_month] = [];
-
-	this_weekday_pos = self.selected_weeks[this_year][this_month].indexOf(week);
-
-	if(this_weekday_pos === -1){
-		$this_weekday.addClass(__C.CLASSES.NEW_ACTIVE);
-		self.selectDays(days);
-		self.selected_weeks[this_year][this_month].push(week)
-	} else {
-		$this_weekday.removeClass(__C.CLASSES.NEW_ACTIVE);
-		self.deselectDays(days);
-		self.selected_weeks[this_year][this_month].splice(this_weekday_pos, 1);
-	}
-	return this;
-};
-
-Calendar.prototype.selectMonth = function(month){ // 0..11
-	var self = this,
-		$this_month_name = self.$calendar.find('.MonthName'),
-		$this_month_days = self.$calendar.find('.DayOfMonth_'+month),
-		this_month = self.current_month.format('YYYY.MM'),
-		this_month_pos = self.selected_months.indexOf(this_month),
-		days = [];
-
-	$this_month_days.each(function(i){
-		days.push($this_month_days.eq(i).data('date'));
-	});
-
-	if(this_month_pos === -1){
-		$this_month_name.addClass(__C.CLASSES.NEW_ACTIVE);
-		self.selectDays(days);
-		self.selected_months.push(this_month);
-	} else {
-		$this_month_name.removeClass(__C.CLASSES.NEW_ACTIVE);
-		self.deselectDays(days);
-		self.selected_months.splice(this_month_pos, 1);
-	}
-	return this;
-};
-
-Calendar.prototype.bindMonthArrows = function(){
-	var self = this;
-	this.$calendar.find('.NextMonth').off('click.NextMonth').on('click.NextMonth', function(){
-		self.setMonth('next');
-	});
-	this.$calendar.find('.PrevMonth').off('click.PrevMonth').on('click.PrevMonth', function(){
-		self.setMonth('prev');
-	});
-	return this;
-};
-
-Calendar.prototype.bindDaySelection = function(){
-	var self = this,
-		$days_in_month = self.$calendar.find('.'+this.options.classes.td_class),
-		$active_days = $days_in_month.not('.'+this.options.classes.td_disabled_class);
-	$days_in_month.off('click.bindDaySelection');
-	$active_days.on('click.bindDaySelection', function(){
-		if(self.options.selection_type === Calendar.SELECTION_TYPES.MULTI && $(this).hasClass(__C.CLASSES.NEW_ACTIVE)){
-			self.deselectDays($(this).data('date'));
-		} else {
-			self.selectDays($(this).data('date'));
-		}
-	});
-	return this;
-};
-
-Calendar.prototype.bindWeekdaySelection = function(){
-	var self = this,
-		$weekdays = self.$calendar.find('.'+this.options.classes.th_class);
-	$weekdays.on('click', function(){
-		self.selectWeek($(this).data('weekday'));
-	});
-	return this;
-};
-
-Calendar.prototype.bindMonthSelection = function(){
-	var self = this,
-		$this_month_name = self.$calendar.find('.MonthName');
-	$this_month_name.on('click', function(){
-		self.selectMonth($(this).data('month'));
-	});
-	return this;
-};
-
-Calendar.prototype.bindDragSelection = function(){
-	var self = this;
-
-	function selectDate($target){
-		$target = $target.is('.'+self.options.classes.td_class) ? $target : $target.closest('.'+self.options.classes.td_class);
-		if($target.not('.'+self.options.classes.td_disabled_class).length){
-			if($target.hasClass(__C.CLASSES.NEW_ACTIVE)){
-				self.deselectDays($target.data('date'));
-			} else {
-				self.selectDays($target.data('date'));
-			}
-		}
-	}
-
-	function disableDragSelection(){
-		self.$calendar.find('.'+self.options.classes.td_class).off('mouseenter.DragSelection');
-	}
-
-	self.$calendar
-		.off('mousedown.RangeSelection')
-		.on('mousedown.RangeSelection', function(e){
-			selectDate($(e.target));
-			self.$calendar.find('.'+self.options.classes.td_class).not('.'+self.options.classes.td_disabled_class).on('mouseenter.DragSelection', function(e){
-				e.preventDefault();
-				selectDate($(e.target));
-			});
-		})
-		.on('mouseup', disableDragSelection)
-		.on('mouseleave', disableDragSelection);
-	return this;
-};
-
-Calendar.prototype.activateSelectedDays = function(){
-	var self = this,
-		this_year = self.current_month.format('YYYY'),
-		this_month_num = self.current_month.format('MM');
-
-	self.selected_days.forEach(function(day){
-		self.$calendar.find('.Day_'+day).addClass(__C.CLASSES.NEW_ACTIVE)
-	});
-
-	if(self.selected_months.indexOf(this_year + '.' + this_month_num) !== -1){
-		self.$calendar.find('.MonthName').addClass(__C.CLASSES.NEW_ACTIVE);
-	}
-	if(typeof self.selected_weeks[this_year] !== 'undefined'){
-		if(typeof self.selected_weeks[this_year][this_month_num] !== 'undefined'){
-			self.selected_weeks[this_year][this_month_num].forEach(function(weekday) {
-				self.$calendar.find('.Week_'+weekday).addClass(__C.CLASSES.NEW_ACTIVE);
-			});
-		}
-	}
-	return this;
-};
-
-Calendar.prototype.setDaysWithEvents = function(){
-	var calendar = this,
-		ajax_data = {
-			since: calendar.current_month.startOf('month').format(__C.DATE_FORMAT),
-			till: calendar.current_month.endOf('month').format(__C.DATE_FORMAT),
-			length: 500,
-			my: true,
-			unique: true
-		};
-	calendar.$calendar.find('.feed_calendar_td').removeClass('Controller has_favorites').addClass(__C.CLASSES.NEW_DISABLED);
-	DatesCollection.fetchDates(ajax_data, function(data) {
-		data.forEach(function(day){
-			var $tr = calendar.$calendar.find('.Day_' + moment.unix(day.event_date).format(__C.DATE_FORMAT));
-			$tr
-				.html(tmpl('link', {
-					title: $tr.children().text(),
-					classes: $tr.children().get(0).classList,
-					page: '/feed/day/'+$tr.data('date')
-				}))
-				.addClass(day.favorites_count > 0 ? 'has_favorites' : '')
-				.removeClass(__C.CLASSES.NEW_DISABLED);
-		});
-		calendar.bindDaySelection();
-		bindPageLinks(calendar.$calendar);
-	});
-	return this;
-};
-
-Calendar.prototype.init = function(){
-	this.$calendar.empty().append(tmpl('calendar', this.options.classes));
-	if(this.options.weekday_selection){
-		this.$calendar.addClass('-weekday_selection');
-	}
-	if(this.options.month_selection){
-		this.$calendar.addClass('-month_selection');
-	}
-	this.$calendar.data('calendar', this);
-	this.$calendar.data('instance', this);
-	this.$calendar.data('days', this.selected_days);
-	this.$calendar.data('options', this.options);
-	this
-		.bindMonthArrows()
-		.renderTable();
-	return this;
-};
-
-function DatePicker($datepicker, options){
-	this.options = {
-		classes: {
-		},
-		close_on_pick: true,
-		min_date: false,
-		max_date: false,
-		labels: {}
+		return this;
 	};
-
-	if ($datepicker instanceof Element || typeof $datepicker == 'string') {
-		$datepicker = $($datepicker);
-		if($datepicker.length === 0)
-			throw new Error('Такого элемента не существует');
-		else if($datepicker.length > 1)
-			throw new Error('Элементов с заданным аргументов найдено несколько');
-	}
-	if ($datepicker instanceof jQuery) {
-		$.extend(true, this.options, options, $datepicker.data());
-		this.$datepicker = $datepicker;
-		this.$datepicker_modal = tmpl('datepicker', {});
-		this.$input = $datepicker.is('input') ? $datepicker : $datepicker.find('input');
-		this.calendar = new Calendar(this.$datepicker_modal.children('.DatePickerCalendar'), {
-			min_date: this.options.min_date,
-			max_date: this.options.max_date
-		});
-		this.prev_selected_day = (typeof this.options.selected_day !== 'undefined') ? this.options.selected_day : '';
-		this.selected_day = (typeof this.options.selected_day !== 'undefined') ? this.options.selected_day : '';
-		this.formated_selected_day = this.selected_day.toString().split('-').reverse().join('.');
-	} else {
-		throw new TypeError('Аргумент должен быть экземпляром jQuery, элементом DOM, либо CSS селектором');
-	}
-}
-
-
-DatePicker.prototype.init = function(){
-	var self = this;
-	this
-		.bindOpener()
-		.$datepicker.data('datepicker', this)
-		.data('instance', this);
-	this.$datepicker.addClass('-unselectable -Handled_DatePicker');
 	
-	this.calendar.init().$calendar.on('days-changed', function(){
-		self.prev_selected_day = self.selected_day;
-		self.selected_day = self.calendar.selected_days.toString();
-		self.formated_selected_day = self.calendar.selected_days.toString().split('-').reverse().join('.');
-		if(!self.$datepicker.is('input')){
-			self.$datepicker.find('label').text(self.formated_selected_day);
+	Calendar.prototype.setDaysWithEvents = function(){
+		var calendar = this,
+			ajax_data = {
+				since: calendar.current_month.startOf('month').format(__C.DATE_FORMAT),
+				till: calendar.current_month.endOf('month').format(__C.DATE_FORMAT),
+				length: 500,
+				my: true,
+				unique: true
+			};
+		calendar.$calendar.find('.feed_calendar_td').removeClass('Controller has_favorites').addClass(__C.CLASSES.DISABLED);
+		DatesCollection.fetchDates(ajax_data, function(data) {
+			data.forEach(function(day){
+				var $tr = calendar.$calendar.find('.Day_' + moment.unix(day.event_date).format(__C.DATE_FORMAT));
+				$tr
+					.html(tmpl('link', {
+						title: $tr.children().text(),
+						classes: $tr.children().get(0).classList,
+						page: '/feed/day/'+$tr.data('date')
+					}))
+					.addClass(day.favorites_count > 0 ? 'has_favorites' : '')
+					.removeClass(__C.CLASSES.DISABLED);
+			});
+			calendar.bindDaySelection();
+			bindPageLinks(calendar.$calendar);
+		});
+		return this;
+	};
+	
+	Calendar.prototype.init = function(){
+		this.$calendar.empty().append(tmpl('calendar', this.options.classes));
+		if(this.options.weekday_selection){
+			this.$calendar.addClass('-weekday_selection');
 		}
-		self.$input.val(self.selected_day).trigger('change');
+		if(this.options.month_selection){
+			this.$calendar.addClass('-month_selection');
+		}
+		this.$calendar.data('calendar', this);
+		this.$calendar.data('instance', this);
+		this.$calendar.data('days', this.selected_days);
+		this.$calendar.data('options', this.options);
+		this
+			.bindMonthArrows()
+			.renderTable();
+		return this;
+	};
+	
+	return Calendar;
+}());
+/**
+ * @class DatePicker
+ */
+DatePicker = (function() {
+	/**
+	 *
+	 * @param {(jQuery|Element|string)} $datepicker
+	 * @param {object} [options]
+	 * @constructor
+	 * @construct DatePicker
+	 */
+	function DatePicker($datepicker, options){
+		this.options = {
+			classes: {
+			},
+			close_on_pick: true,
+			min_date: false,
+			max_date: false,
+			labels: {}
+		};
 		
-		if(self.options.close_on_pick){
-			self.closeDialog();
+		if ($datepicker instanceof Element || typeof $datepicker == 'string') {
+			$datepicker = $($datepicker);
+			if($datepicker.length === 0)
+				throw new Error('Такого элемента не существует');
+			else if($datepicker.length > 1)
+				throw new Error('Элементов с заданным аргументов найдено несколько');
 		}
-		self.$datepicker.trigger('date-picked');
-	});
-	
-	return this;
-};
-
-
-DatePicker.prototype.bindOpener = function(){
-	var self = this;
-	function open(){
-		if(self.$input.is(':disabled')){
-			self.$datepicker.one('click', open);
+		if ($datepicker instanceof jQuery) {
+			$.extend(true, this.options, options, $datepicker.data());
+			this.$datepicker = $datepicker;
+			this.$datepicker_modal = tmpl('datepicker', {});
+			this.$input = $datepicker.is('input') ? $datepicker : $datepicker.find('input');
+			this.calendar = new Calendar(this.$datepicker_modal.children('.DatePickerCalendar'), {
+				min_date: this.options.min_date,
+				max_date: this.options.max_date
+			});
+			this.prev_selected_day = (typeof this.options.selected_day !== 'undefined') ? this.options.selected_day : '';
+			this.selected_day = (typeof this.options.selected_day !== 'undefined') ? this.options.selected_day : '';
+			this.formated_selected_day = this.selected_day.toString().split('-').reverse().join('.');
 		} else {
-			self.openDialog();
+			throw new TypeError('Аргумент должен быть экземпляром jQuery, элементом DOM, либо CSS селектором');
 		}
 	}
-	this.$datepicker.one('click', open);
-	return this;
-};
-
-
-DatePicker.prototype.openDialog = function(){
-	var datepicker_position = this.$datepicker.offset();
-	
-	$('body').append(this.$datepicker_modal);
-	this.$datepicker_modal.css({
-		top: datepicker_position.top + this.$datepicker.outerHeight() + 2,
-		left: datepicker_position.left + this.$datepicker.width() - this.$datepicker_modal.width(),
-		maxWidth: this.$datepicker.width()
-	});
-	this.calendar.renderTable();
-	this.bindCloseDialog();
-	return this;
-};
-
-
-DatePicker.prototype.bindCloseDialog = function(){
-	var self = this;
-
-	$(document)
-		.off('click.checkOnClick')
-		.on('click.checkOnClick', function(e){
-			var $this = $(e.target);
-			if(($this.closest(self.$datepicker_modal).length === 0 && $this.closest(self.$datepicker).length === 0) || $this.closest('.SubmitDatePicker').length){
+	/**
+	 *
+	 * @return {DatePicker}
+	 */
+	DatePicker.prototype.init = function(){
+		var self = this;
+		this
+			.bindOpener()
+			.$datepicker.data('datepicker', this)
+			.data('instance', this);
+		this.$datepicker.addClass('-unselectable -Handled_DatePicker');
+		
+		this.calendar.init().$calendar.on('days-changed', function(){
+			self.prev_selected_day = self.selected_day;
+			self.selected_day = self.calendar.selected_days.toString();
+			self.formated_selected_day = self.calendar.selected_days.toString().split('-').reverse().join('.');
+			if(!self.$datepicker.is('input')){
+				self.$datepicker.find('label').text(self.formated_selected_day);
+			}
+			self.$input.val(self.selected_day).trigger('change');
+			
+			if(self.options.close_on_pick){
 				self.closeDialog();
 			}
-		})
-		.off('keydown.checkOnKeyDown')
-		.on('keydown.checkOnKeyDown', function(e){
-			if(e.keyCode === 9 || e.keyCode === 13 || e.keyCode === 27){
-				self.closeDialog();
-			}
+			self.$datepicker.trigger('date-picked');
 		});
-
-	//TODO: BUG. Click on another datepicker doesn't close current
-	return this;
-};
-
-DatePicker.prototype.closeDialog = function() {
-	$(document).off('click.checkOnClick').off('keydown.checkOnKeyDown');
-	this.$datepicker_modal.detach();
-	this.calendar.flush();
-	this.bindOpener();
-	return this;
-};
-
-
-DatePicker.prototype.destroy = function(){
-	this.closeDialog().$datepicker.data('datepicker', '');
-	return this;
-};
-
+		
+		return this;
+	};
+	/**
+	 *
+	 * @return {DatePicker}
+	 */
+	DatePicker.prototype.bindOpener = function(){
+		var self = this;
+		function open(){
+			if(self.$input.is(':disabled')){
+				self.$datepicker.one('click', open);
+			} else {
+				self.openDialog();
+			}
+		}
+		this.$datepicker.one('click', open);
+		return this;
+	};
+	/**
+	 *
+	 * @return {DatePicker}
+	 */
+	DatePicker.prototype.openDialog = function(){
+		var datepicker_position = this.$datepicker.offset();
+		
+		$('body').append(this.$datepicker_modal);
+		this.$datepicker_modal.css({
+			top: datepicker_position.top + this.$datepicker.outerHeight() + 2,
+			left: datepicker_position.left + this.$datepicker.width() - this.$datepicker_modal.width(),
+			maxWidth: this.$datepicker.width()
+		});
+		this.calendar.renderTable();
+		this.bindCloseDialog();
+		return this;
+	};
+	/**
+	 *
+	 * @return {DatePicker}
+	 */
+	DatePicker.prototype.bindCloseDialog = function(){
+		var self = this;
+		
+		$(document)
+			.off('click.checkOnClick')
+			.on('click.checkOnClick', function(e){
+				var $this = $(e.target);
+				if(($this.closest(self.$datepicker_modal).length === 0 && $this.closest(self.$datepicker).length === 0) || $this.closest('.SubmitDatePicker').length){
+					self.closeDialog();
+				}
+			})
+			.off('keydown.checkOnKeyDown')
+			.on('keydown.checkOnKeyDown', function(e){
+				if(e.keyCode === 9 || e.keyCode === 13 || e.keyCode === 27){
+					self.closeDialog();
+				}
+			});
+		
+		//TODO: BUG. Click on another datepicker doesn't close current
+		return this;
+	};
+	/**
+	 *
+	 * @return {DatePicker}
+	 */
+	DatePicker.prototype.closeDialog = function() {
+		$(document).off('click.checkOnClick').off('keydown.checkOnKeyDown');
+		this.$datepicker_modal.detach();
+		this.calendar.flush();
+		this.bindOpener();
+		return this;
+	};
+	/**
+	 *
+	 * @return {DatePicker}
+	 */
+	DatePicker.prototype.destroy = function(){
+		this.closeDialog().$datepicker.data('datepicker', '');
+		return this;
+	};
+	
+	return DatePicker;
+}());
 /**
  * @class ImgLoader
  */
@@ -5841,7 +6368,7 @@ ImgLoader = (function() {
 			});
 			
 			if ($img_preview.attr('src')) {
-				$parent.find('.CropperButton').removeClass(__C.CLASSES.NEW_HIDDEN);
+				$parent.find('.CropperButton').removeClass(__C.CLASSES.HIDDEN);
 			}
 			
 			$parent.find('.LoadImg').off('change.LoadImg').on('change.LoadImg', function(e) {
@@ -5915,7 +6442,7 @@ ImgLoader = (function() {
 		
 		$parent.data('src', source);
 		$parent.find('.FileName').val(filename);
-		$parent.find('.CropperButton').removeClass(__C.CLASSES.NEW_HIDDEN);
+		$parent.find('.CropperButton').removeClass(__C.CLASSES.HIDDEN);
 		
 		ImgLoader.callImgCropper($parent, source);
 	};
@@ -5924,221 +6451,381 @@ ImgLoader = (function() {
 }());
 /**
  *
- * @constructor
- * @augments jQuery
- * @param {(number|string)} id
- * @param {object} options
+ * @abstract
+ * @class ActionButton
+ * @extends jQuery
  */
-function ActionButton(id, options) {
-	var self = this;
-	this.classes = $.extend(true, {subscribed_state: ''}, this.classes);
-	this.options = $.extend(true, this.options, options);
-	this.options.classes = this.options.classes ? this.options.classes : [];
-	this.states.forEach(function(state) {
-		self.classes[state] = [];
-		self.options.icons ? self.classes[state].push(self.options.icons[state]) : false;
-		self.options.colors ? self.classes[state].push(self.options.colors[state]) : false;
-		self.classes[state] = self.classes[state].join(' ');
-	});
-	this.is_subscribed = !!options.is_subscribed;
-	this.is_add_avatar = !!options.is_add_avatar;
-	this.id = id;
-	jQuery.fn.init.call(this, __APP.BUILD.button({
-		classes: (
-			self.is_subscribed ?
-				self.options.classes.concat(self.classes.subscribed).concat(self.classes.subscribed_state) :
-				self.options.classes.concat(self.classes.subscribe)
-		).concat('fa_icon'),
-		title: self.is_subscribed ? self.options.labels.subscribed : self.options.labels.subscribe
-	}));
-	this.initiate();
-}
-ActionButton.extend(jQuery);
-ActionButton.prototype.states = ['subscribe', 'unsubscribe', 'subscribed'];
-ActionButton.prototype.pushStack = function(elems) {
-	var ret = jQuery.merge(this.get(0) == elems ? new this.constructor(this.id, this.is_subscribed, this.options) : $(), elems);
-	ret.prevObject = this;
-	ret.context = this.context;
-	return ret;
-};
-
-
-ActionButton.prototype.addAvatar = function() {
-	var $wrapper = this.closest('.AddAvatarWrapper'),
-		$collection = $wrapper.find('.AvatarsCollection'),
-		$favored_count = $wrapper.find('.FavoredCount'),
-		$avatars = $collection.find('.avatar'),
-		amount = $avatars.length;
-	
-	if ($collection.data('max_amount') >= amount) {
-		if ($collection.hasClass('-shifted')) {
-			$collection.removeClass('-shifted');
-			$collection.width(amount == 1 ? 0 : ($avatars.outerWidth() * (amount - 1)) - (6 * (amount - 2)));
+ActionButton = extendingJQuery((function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs ActionButton
+	 * @param {object} [options]
+	 */
+	function ActionButton(options) {
+		options = options ? options : {};
+		var self = this;
+		
+		this.options = $.extend(true, {
+			classes: [],
+			icons: null,
+			colors: null,
+			labels: null
+		}, this.options, options);
+				
+		this.has_icon = options.hasOwnProperty('has_icon') ? !!options.has_icon : true;
+		this.is_checked = !!options.is_checked;
+		this.is_add_avatar = !!options.is_add_avatar;
+		
+		if (this.has_icon) {
+			this.options.classes.push(this.icon_class);
 		} else {
-			$collection.addClass('-shifted');
-			$collection.width(($avatars.outerWidth() * amount) - (6 * (amount - 1)));
+			this.options.icons = {};
 		}
-	} else {
-		if ($favored_count.length) {
-			var current_count = parseInt($favored_count.text());
-			if ($collection.hasClass('-shifted')) {
-				$favored_count.text(current_count - 1);
-				if (current_count - 1 <= 0) {
-					$favored_count.parent().addClass('-cast');
-				}
+		
+		this.options.icons = this.options.icons ? this.options.icons : {};
+		this.options.colors = this.options.colors ? this.options.colors : {};
+		this.options.labels = this.options.labels ? this.options.labels : {};
+		
+		this.classes = {};
+		$.each(ActionButton.STATES, function(field, state_name) {
+			self.classes[state_name] = []
+				.concat(self.options.icons ? self.options.icons[state_name] : [])
+				.concat(self.options.colors ? self.options.colors[state_name] : [])
+				.join(' ');
+		});
+		
+		jQuery.fn.init.call(this, __APP.BUILD.button(this.is_checked ? {
+				classes: this.options.classes.concat(this.classes[ActionButton.STATES.CHECKED]).concat(this.checked_state_class ? this.checked_state_class  : []),
+				title: this.options.labels[ActionButton.STATES.CHECKED]
+			} : {
+				classes: this.options.classes.concat(this.classes[ActionButton.STATES.UNCHECKED]),
+				title: this.options.labels[ActionButton.STATES.UNCHECKED]
+			}
+		));
+		
+		this.data('instance', this);
+		this.initiate();
+	}
+	/**
+	 *
+	 * @enum {string}
+	 */
+	ActionButton.STATES = {
+		CHECKED: 'checked',
+		UNCHECKED: 'unchecked',
+		CHECKED_HOVER: 'checked_hover',
+		UNCHECKED_HOVER: 'unchecked_hover'
+	};
+	
+	/**
+	 * @param {jQuery} $context
+	 */
+	function addAvatar($context) {
+		var $wrapper = $context.closest('.'+__C.CLASSES.HOOKS.ADD_AVATAR.ANCESTOR),
+			$collection = $wrapper.find('.'+__C.CLASSES.HOOKS.ADD_AVATAR.COLLECTION),
+			$favored_count = $wrapper.find('.'+__C.CLASSES.HOOKS.ADD_AVATAR.QUANTITY),
+			$avatars = $collection.find('.avatar'),
+			amount = $avatars.length;
+		
+		if ($collection.data('max_amount') >= amount) {
+			if ($collection.hasClass(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED)) {
+				$collection.removeClass(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
+				$collection.width(amount == 1 ? 0 : ($avatars.outerWidth() * (amount - 1)) - (6 * (amount - 2)));
 			} else {
-				$favored_count.text(current_count + 1);
-				$favored_count.parent().removeClass('-cast');
+				$collection.addClass(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
+				$collection.width(($avatars.outerWidth() * amount) - (6 * (amount - 1)));
 			}
-		}
-		$collection.toggleClass('-shift -shifted');
-	}
-};
-ActionButton.prototype.bindHoverEffects = function() {
-	var self = this;
-	this
-		.off('mouseenter.hoverSubscribed mouseleave.hoverSubscribed')
-		.on('mouseenter.hoverSubscribed', function() {
-			self.removeClass(self.classes.subscribed).addClass(self.classes.unsubscribe);
-			self.children('.Text').text(self.options.labels.unsubscribe);
-		})
-		.on('mouseleave.hoverSubscribed', function() {
-			self.removeClass(self.classes.unsubscribe).addClass(self.classes.subscribed);
-			self.children('.Text').text(self.options.labels.subscribed);
-		});
-};
-ActionButton.prototype.onClick = function() {};
-ActionButton.prototype.bindClick = function() {
-	var self = this;
-	this.on('click.subscribe', function() {
-		if(__APP.USER.id === -1){
-			(new AuthModal()).show();
 		} else {
-			self.onClick();
-			if(self.is_add_avatar){
-				self.addAvatar();
+			if ($favored_count.length) {
+				var current_count = parseInt($favored_count.text());
+				if ($collection.hasClass(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED)) {
+					$favored_count.text(current_count - 1);
+					if (current_count - 1 <= 0) {
+						$favored_count.parent().addClass(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.CAST);
+					}
+				} else {
+					$favored_count.text(current_count + 1);
+					$favored_count.parent().removeClass(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.CAST);
+				}
 			}
-			if (window.askToSubscribe instanceof Function) {
-				window.askToSubscribe();
-			}
+			$collection.toggleClass(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFT+' '+__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
 		}
-	});
-};
-ActionButton.prototype.afterSubscribe = function() {
-	this.removeClass([this.classes.subscribe, this.classes.subscribed].join(' '));
-	this.addClass([this.classes.subscribed_state, this.classes.unsubscribe].join(' '));
-	this.children('.Text').text(this.options.labels.unsubscribe);
-	this.is_subscribed = true;
-	this.bindHoverEffects();
-};
-ActionButton.prototype.afterUnsubscribe = function() {
-	this.removeClass([this.classes.subscribed_state, this.classes.unsubscribe, this.classes.subscribed].join(' '));
-	this.addClass(this.classes.subscribe);
-	this.children('.Text').text(this.options.labels.subscribe);
-	this.is_subscribed = false;
-	this.off('mouseenter.hoverSubscribed mouseleave.hoverSubscribed');
-};
-ActionButton.prototype.initiate = function() {
-	if (this.is_subscribed) {
-		this.bindHoverEffects();
 	}
-	this.bindClick();
-};
-/**
- * @requires Class.ActionButton.js
- */
-/**
- *
- * @constructor
- * @augments ActionButton
- * @param {(number|string)} id
- * @param {object} options
- */
-function AddToFavoriteButton(id, options) {
-	this.classes = {
-		subscribed_state: '-Favored'
-	};
-	this.options = {
-		labels: {
-			subscribe: __LOCALES.ru_RU.TEXTS.BUTTON.ADD_FAVORITE,
-			unsubscribe: __LOCALES.ru_RU.TEXTS.BUTTON.REMOVE_FAVORITE,
-			subscribed: __LOCALES.ru_RU.TEXTS.BUTTON.FAVORED
-		},
-		colors: {
-			subscribe: '-color_marginal_accent',
-			unsubscribe: '-color_accent',
-			subscribed: '-color_accent'
-		},
-		icons: {
-			subscribe: 'fa-star-o',
-			unsubscribe: 'fa-times',
-			subscribed: 'fa-star'
-		}
-	};
-	ActionButton.apply(this, [id, options]);
-}
-AddToFavoriteButton.extend(ActionButton);
-AddToFavoriteButton.prototype.onClick = function() {
-	var self = this;
 	
-	if (self.is_subscribed) {
-		OneEvent.deleteFavored(self.id, function() {
-			self.afterUnsubscribe();
-		});
-	} else {
-		OneEvent.addFavored(self.id, function() {
-			self.afterSubscribe();
-		});
-	}
-};
+	ActionButton.prototype.checked_state_class = '';
+	ActionButton.prototype.icon_class = __C.CLASSES.ICON_CLASS;
+	
+	ActionButton.prototype.onClick = function() {};
+	
+	ActionButton.prototype.afterCheck = function() {
+		var is_hovered = this.is(':hover');
+		
+		this.is_checked = true;
+		this
+			.removeClass(''.concat(this.classes[ActionButton.STATES.UNCHECKED_HOVER], ' ', this.classes[ActionButton.STATES.UNCHECKED]))
+			.addClass(''.concat(this.classes[is_hovered ? ActionButton.STATES.CHECKED_HOVER : ActionButton.STATES.CHECKED], ' ', this.checked_state_class))
+			.children('.'+__C.CLASSES.HOOKS.TEXT).text(this.options.labels[is_hovered ? ActionButton.STATES.CHECKED_HOVER : ActionButton.STATES.CHECKED]);
+	};
+	
+	ActionButton.prototype.afterUncheck = function() {
+		var is_hovered = this.is(':hover');
+		
+		this.is_checked = false;
+		this
+			.removeClass(''.concat(this.classes[ActionButton.STATES.CHECKED_HOVER], ' ', this.classes[ActionButton.STATES.CHECKED], ' ', this.checked_state_class))
+			.addClass(''.concat(this.classes[is_hovered ? ActionButton.STATES.UNCHECKED_HOVER : ActionButton.STATES.UNCHECKED]))
+			.children('.'+__C.CLASSES.HOOKS.TEXT).text(this.options.labels[is_hovered ? ActionButton.STATES.UNCHECKED_HOVER : ActionButton.STATES.UNCHECKED]);
+	};
+	
+	
+	ActionButton.prototype.initiate = function() {
+		var self = this;
+		
+		this
+			.on('mouseenter.HoverActionButton', function() {
+				self
+					.removeClass(self.classes[self.is_checked ? ActionButton.STATES.CHECKED : ActionButton.STATES.UNCHECKED])
+					.addClass(self.classes[self.is_checked ? ActionButton.STATES.CHECKED_HOVER : ActionButton.STATES.UNCHECKED_HOVER]);
+				self.children('.'+__C.CLASSES.HOOKS.TEXT).text(self.options.labels[self.is_checked ? ActionButton.STATES.CHECKED_HOVER : ActionButton.STATES.UNCHECKED_HOVER]);
+			})
+			
+			.on('mouseleave.LeaveActionButton', function() {
+				self
+					.removeClass(self.classes[self.is_checked ? ActionButton.STATES.CHECKED_HOVER : ActionButton.STATES.UNCHECKED_HOVER])
+					.addClass(self.classes[self.is_checked ? ActionButton.STATES.CHECKED : ActionButton.STATES.UNCHECKED]);
+				self.children('.'+__C.CLASSES.HOOKS.TEXT).text(self.options.labels[self.is_checked ? ActionButton.STATES.CHECKED : ActionButton.STATES.UNCHECKED]);
+			})
+			
+			.on('click.Action', function() {
+				if(__APP.USER.isLoggedOut()){
+					return (new AuthModal()).show();
+				}
+				self.onClick();
+				
+				if(self.is_add_avatar){
+					addAvatar(self);
+				}
+				if (window.askToSubscribe instanceof Function) {
+					window.askToSubscribe();
+				}
+			});
+	};
+	
+	
+	return ActionButton;
+}()));
 /**
  * @requires Class.ActionButton.js
  */
 /**
  *
- * @constructor
- * @augments ActionButton
- * @param {(number|string)} id
- * @param {object} options
+ * @class AddToFavoriteButton
+ * @extends ActionButton
  */
-function SubscribeButton(id, options) {
-	this.classes = {
-		subscribed_state: '-Subscribed'
-	};
-	this.options = {
-		labels: {
-			subscribe: __LOCALES.ru_RU.TEXTS.BUTTON.ADD_SUBSCRIPTION,
-			unsubscribe: __LOCALES.ru_RU.TEXTS.BUTTON.REMOVE_SUBSCRIPTION,
-			subscribed: __LOCALES.ru_RU.TEXTS.BUTTON.SUBSCRIBED
-		},
-		colors: {
-			subscribe: '-color_neutral_accent',
-			unsubscribe: '-color_accent',
-			subscribed: '-color_accent'
-		},
-		icons: {
-			subscribe: 'fa-plus',
-			unsubscribe: 'fa-times',
-			subscribed: 'fa-check'
+AddToFavoriteButton = extending(ActionButton, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs AddToFavoriteButton
+	 * @param {(number|string)} event_id
+	 * @param {object} [options]
+	 */
+	function AddToFavoriteButton(event_id, options) {
+		this.options = {
+			labels: {
+				checked: __LOCALES.ru_RU.TEXTS.BUTTON.FAVORED,
+				unchecked: __LOCALES.ru_RU.TEXTS.BUTTON.ADD_FAVORITE,
+				checked_hover: __LOCALES.ru_RU.TEXTS.BUTTON.REMOVE_FAVORITE,
+				unchecked_hover: __LOCALES.ru_RU.TEXTS.BUTTON.ADD_FAVORITE
+			},
+			colors: {
+				checked: __C.CLASSES.COLORS.ACCENT,
+				unchecked: __C.CLASSES.COLORS.MARGINAL_ACCENT,
+				checked_hover: __C.CLASSES.COLORS.ACCENT,
+				unchecked_hover: __C.CLASSES.COLORS.MARGINAL_ACCENT
+			},
+			icons: {
+				checked: __C.CLASSES.ICONS.STAR,
+				unchecked: __C.CLASSES.ICONS.STAR_O,
+				checked_hover: __C.CLASSES.ICONS.TIMES,
+				unchecked_hover: __C.CLASSES.ICONS.STAR_O
+			}
+		};
+		this.event_id = event_id;
+		ActionButton.call(this, options);
+	}
+	
+	AddToFavoriteButton.prototype.checked_state_class = '-Favored';
+	
+	AddToFavoriteButton.prototype.onClick = function() {
+		var self = this;
+		
+		if (this.is_checked) {
+			OneEvent.deleteFavored(this.event_id, function() {
+				self.afterUncheck();
+			});
+		} else {
+			OneEvent.addFavored(this.event_id, function() {
+				self.afterCheck();
+			});
 		}
 	};
-	ActionButton.apply(this, [id, options]);
-}
-SubscribeButton.extend(ActionButton);
-SubscribeButton.prototype.onClick = function() {
-	var self = this;
-	if (self.is_subscribed) {
-		__APP.USER.unsubscribeFromOrganization(self.id, function() {
-			self.afterUnsubscribe();
-			$(window).trigger('unsubscribe', [self.id]);
-		});
-	} else {
-		__APP.USER.subscribeToOrganization(self.id, function() {
-			self.afterSubscribe();
-			$(window).trigger('subscribe', [self.id]);
-		});
+	
+	
+	return AddToFavoriteButton;
+}()));
+/**
+ * @requires Class.ActionButton.js
+ */
+/**
+ *
+ * @class RegisterButton
+ * @extends ActionButton
+ */
+RegisterButton = extending(ActionButton, (function() {
+	/**
+	 *
+	 * @param {OneEvent} event
+	 * @param {object} [options]
+	 * @constructor
+	 * @constructs RegisterButton
+	 *
+	 * @property {OneEvent} event
+	 * @property {RegistrationModal} modal
+	 */
+	function RegisterButton(event, options) {
+		this.options = {
+			labels: {
+				checked: 'Зарегистрирован',
+				unchecked: 'Регистрация',
+				checked_hover: 'Зарегистрирован',
+				unchecked_hover: 'Регистрация'
+			},
+			colors: {
+				checked: __C.CLASSES.COLORS.ACCENT,
+				unchecked: __C.CLASSES.COLORS.MARGINAL_ACCENT,
+				checked_hover: __C.CLASSES.COLORS.ACCENT,
+				unchecked_hover: __C.CLASSES.COLORS.MARGINAL_ACCENT
+			},
+			icons: {
+				checked: __C.CLASSES.ICONS.CHECK,
+				unchecked: __C.CLASSES.ICONS.PENCIL,
+				checked_hover: __C.CLASSES.ICONS.CHECK,
+				unchecked_hover: __C.CLASSES.ICONS.PENCIL
+			}
+		};
+		this.event = event;
+		this.modal = null;
+		options.is_checked = event.is_registered;
+		ActionButton.call(this, options);
+		if (event.is_registered || !event.registration_available) {
+			this.off('click.RippleEffect').addClass('-Handled_RippleEffect');
+		}
 	}
-};
+	
+	RegisterButton.prototype.onClick = function() {
+		var self = this;
+		
+		/**
+		 *
+		 * @param {RegistrationModal} modal
+		 * @param {RegisterButton} button
+		 */
+		function bindOnRegister(modal, button) {
+			modal.modal.on('registration:success', function() {
+				modal.event.is_registered = true;
+				button.afterCheck();
+			});
+		}
+		
+		if (this.event.is_registered || !this.event.registration_available) {
+			this.off('click.RippleEffect').addClass('-Handled_RippleEffect');
+			return false;
+		}
+		
+		if (this.modal) {
+			this.modal.show();
+			bindOnRegister(this.modal, this);
+		} else if (this.event.registration_fields.length) {
+			this.modal = new RegistrationModal(this.event);
+			this.modal.show();
+			bindOnRegister(this.modal, this)
+		} else {
+			this.event.fetchEvent(new Fields('registration_fields')).done(function() {
+				self.modal = new RegistrationModal(self.event);
+				self.modal.show();
+				bindOnRegister(self.modal, self)
+			});
+		}
+		
+	};
+	
+	
+	return RegisterButton;
+}()));
+
+/**
+ * @requires Class.ActionButton.js
+ */
+/**
+ *
+ * @class SubscribeButton
+ * @extends ActionButton
+ */
+SubscribeButton = extending(ActionButton, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs SubscribeButton
+	 * @param {(number|string)} org_id
+	 * @param {object} [options]
+	 */
+	function SubscribeButton(org_id, options) {
+		this.options = {
+			labels: {
+				checked: __LOCALES.ru_RU.TEXTS.BUTTON.SUBSCRIBED,
+				unchecked: __LOCALES.ru_RU.TEXTS.BUTTON.ADD_SUBSCRIPTION,
+				checked_hover: __LOCALES.ru_RU.TEXTS.BUTTON.REMOVE_SUBSCRIPTION,
+				unchecked_hover: __LOCALES.ru_RU.TEXTS.BUTTON.ADD_SUBSCRIPTION
+			},
+			colors: {
+				checked: __C.CLASSES.COLORS.ACCENT,
+				unchecked: __C.CLASSES.COLORS.NEUTRAL_ACCENT,
+				checked_hover: __C.CLASSES.COLORS.ACCENT,
+				unchecked_hover: __C.CLASSES.COLORS.NEUTRAL_ACCENT
+			},
+			icons: {
+				checked: __C.CLASSES.ICONS.CHECK,
+				unchecked: __C.CLASSES.ICONS.PLUS,
+				checked_hover: __C.CLASSES.ICONS.TIMES,
+				unchecked_hover: __C.CLASSES.ICONS.PLUS
+			}
+		};
+		this.org_id = org_id;
+		ActionButton.call(this, options);
+	}
+	
+	SubscribeButton.prototype.checked_state_class = '-Subscribed';
+	
+	SubscribeButton.prototype.onClick = function() {
+		var self = this;
+		if (self.is_checked) {
+			__APP.USER.unsubscribeFromOrganization(self.org_id, function() {
+				self.afterUncheck();
+				$(window).trigger('unsubscribe', [self.org_id]);
+			});
+		} else {
+			__APP.USER.subscribeToOrganization(self.org_id, function() {
+				self.afterCheck();
+				$(window).trigger('subscribe', [self.org_id]);
+			});
+		}
+	};
+	
+	
+	return SubscribeButton;
+}()));
 /**
  * @class
  * @extends Array
@@ -6504,7 +7191,7 @@ AbstractModal = (function() {
 		$('body').addClass('-open_modal');
 		__APP.MODALS.active_modal = this;
 		
-		this.modal_wrapper.append(this.modal.addClass('-faded').removeClass(__C.CLASSES.NEW_HIDDEN));
+		this.modal_wrapper.append(this.modal.addClass('-faded').removeClass(__C.CLASSES.HIDDEN));
 		this.adjustDestroyerHeight();
 		
 		this.modal.trigger('modal:show');
@@ -6540,7 +7227,7 @@ AbstractModal = (function() {
 		this.modal.addClass('-faded');
 		this.modal.trigger('modal:disappear');
 		setTimeout(function() {
-			self.modal.addClass(__C.CLASSES.NEW_HIDDEN).trigger('modal:close');
+			self.modal.addClass(__C.CLASSES.HIDDEN).trigger('modal:close');
 			self.is_shown = false;
 		}, 200);
 		
@@ -7227,11 +7914,19 @@ RegistrationModal = extending(PreviewRegistrationModal, (function() {
 			
 			$register_button.attr('disabled', true);
 			if (isFormValid($form)) {
-				OneEvent.registerToEvent(self.event.id, $form.serializeForm()).always(function() {
-					$register_button.removeAttr('disabled');
-				}).done(function() {
-					self.hide();
-				});
+				OneEvent.registerToEvent(self.event.id, $form.serializeForm('array').map(function(field) {
+					return {
+						uuid: field.name,
+						value: field.value
+					};
+				}))
+					.always(function() {
+						$register_button.removeAttr('disabled');
+					})
+					.done(function() {
+						self.modal.trigger('registration:success');
+						self.hide();
+					});
 			} else {
 				$register_button.removeAttr('disabled');
 			}
@@ -7555,20 +8250,29 @@ SubscribersModal = extending(AbstractUsersModal, (function() {
 }()));
 
 /**
+ * @abstract
  * @class
  */
 AbstractSidebar = (function () {
+	/**
+	 *
+	 * @constructor
+	 * @constructs AbstractSidebar
+	 */
 	function AbstractSidebar() {
 		this.$sidebar = $('#main_sidebar');
 		this.$subscribed_orgs = $('.SidebarOrganizationsList');
 	}
+	
 	AbstractSidebar.prototype.init = function () {
 		this.$sidebar.find('.SidebarNav').addClass('-items_' + this.$sidebar.find('.SidebarNavItem').not('.-hidden').length);
 		((window.innerHeight > 800) ? this.$sidebar.find('.SidebarOrganizationsScroll') : this.$sidebar.find('.SidebarScroll')).scrollbar({
 			disableBodyScroll: true
 		});
 	};
+	
 	AbstractSidebar.prototype.updateSubscriptions = function () {};
+	
 	return AbstractSidebar;
 }());
 /**
@@ -7579,9 +8283,15 @@ AbstractSidebar = (function () {
  * @extends AbstractSidebar
  */
 Sidebar = extending(AbstractSidebar, (function () {
+	/**
+	 *
+	 * @constructor
+	 * @construct Sidebar
+	 */
 	function Sidebar() {
 		AbstractSidebar.call(this);
 	}
+	
 	Sidebar.prototype.init = function () {
 		var self = this;
 		self.updateSubscriptions();
@@ -7639,22 +8349,36 @@ Sidebar = extending(AbstractSidebar, (function () {
  * @extends AbstractSidebar
  */
 SidebarNoAuth = extending(AbstractSidebar, (function () {
+	/**
+	 *
+	 * @constructor
+	 * @constructs SidebarNoAuth
+	 */
 	function SidebarNoAuth() {
 		AbstractSidebar.call(this);
 	}
+	
 	SidebarNoAuth.prototype.init = function () {
-		this.$sidebar.find('.SidebarOrganizationsScroll').addClass(__C.CLASSES.NEW_HIDDEN);
+		this.$sidebar.find('.SidebarOrganizationsScroll').addClass(__C.CLASSES.HIDDEN);
 		AbstractSidebar.prototype.init.call(this);
 	};
+	
 	return SidebarNoAuth;
 }()));
 /**
+ * @abstract
  * @class
  */
 AbstractTopBar = (function () {
+	/**
+	 *
+	 * @constructor
+	 * @constructs AbstractTopBar
+	 */
 	function AbstractTopBar() {
 		this.$main_header = $('#main_header');
 	}
+	
 	AbstractTopBar.prototype.init = function () {
 		this.$main_header.find('#search_bar_input').on('keypress', function(e) {
 			if (e.which == 13) {
@@ -7665,6 +8389,7 @@ AbstractTopBar = (function () {
 		bindRippleEffect(this.$main_header);
 		bindPageLinks(this.$main_header);
 	};
+	
 	return AbstractTopBar;
 }());
 /**
@@ -7675,9 +8400,15 @@ AbstractTopBar = (function () {
  * @extends AbstractTopBar
  */
 TopBar = extending(AbstractTopBar, (function () {
+	/**
+	 *
+	 * @constructor
+	 * @constructs TopBar
+	 */
 	function TopBar() {
 		AbstractTopBar.call(this);
 	}
+	
 	TopBar.prototype.init = function () {
 		this.$main_header.find('#user_bar').on('click.openUserBar', function() {
 			var $this = $(this),
@@ -7694,6 +8425,7 @@ TopBar = extending(AbstractTopBar, (function () {
 		this.$main_header.find('.OpenSettingsButton').on('click', showSettingsModal);
 		AbstractTopBar.prototype.init.call(this);
 	};
+	
 	return TopBar;
 }()));
 /**
@@ -7704,2169 +8436,2376 @@ TopBar = extending(AbstractTopBar, (function () {
  * @extends AbstractTopBar
  */
 TopBarNoAuth = extending(AbstractTopBar, (function () {
+	/**
+	 *
+	 * @constructor
+	 * @constructs TopBarNoAuth
+	 */
 	function TopBarNoAuth() {
 		AbstractTopBar.call(this);
 	}
+	
 	TopBarNoAuth.prototype.init = function () {
 		this.$main_header.find('.LoginButton').on('click', function() {
 			(new AuthModal()).show();
 		});
 		AbstractTopBar.prototype.init.call(this);
 	};
+	
 	return TopBarNoAuth;
 }()));
 /**
  *
  * @abstract
+ * @class
  */
-function Page() {
-	this.name = this.constructor.name;
-	this.state_name = this.name;
-	this.page_title = '';
+Page = (function() {
 	/**
-	 * @name Page#$view
-	 * @type jQuery
+	 *
+	 * @constructor
+	 * @constructs Page
 	 */
-	this.$view = $('.PageView');
+	function Page() {
+		this.name = this.constructor.name;
+		this.state_name = this.name;
+		this.page_title = '';
+		/**
+		 * @name Page#$view
+		 * @type jQuery
+		 */
+		this.$view = $('.PageView');
+		/**
+		 * @name Page#$wrapper
+		 * @type jQuery
+		 */
+		this.$wrapper = $();
+		this.wrapper_tmpl = 'std';
+		this.with_header_tabs = false;
+		
+		this.rendering_defer = $.Deferred();
+		this.fetching_data_defer = $.Deferred();
+	}
 	/**
-	 * @name Page#$wrapper
-	 * @type jQuery
+	 * Routing
+	 * @param {string} path
+	 * @return {Page}
 	 */
-	this.$wrapper = $();
-	this.wrapper_tmpl = 'std';
-	this.with_header_tabs = false;
-	
-	this.rendering_defer = $.Deferred();
-	this.fetching_data_defer = $.Deferred();
-}
-/**
- * Routing
- * @param {string} path
- * @return {Page}
- */
-Page.routeNewPage = function(path) {
-	var path_split = decodeURIComponent(path).split('/').splice(1),
-		pages_child = __APP.ROUTING,
-		args = [], i, key, PageClass;
-	
-	for (i = 0; i < path_split.length; i++) {
-		if (pages_child.hasOwnProperty(path_split[i])) {
-			if (i < path_split.length - 1) {
-				pages_child = pages_child[path_split[i]];
-			} else {
-				PageClass = pages_child[path_split[i]];
-				break;
-			}
-		} else {
-			for (key in pages_child) {
-				if (key.indexOf('^') === 0 && (new RegExp(key)).test(path_split[i])) {
-					args.push(path_split[i]);
-					if (i < path_split.length - 1) {
-						pages_child = pages_child[key];
-					} else {
-						PageClass = pages_child[key];
-					}
+	Page.routeNewPage = function(path) {
+		var path_split = decodeURIComponent(path).split('/').splice(1),
+			pages_child = __APP.ROUTING,
+			args = [], i, key, PageClass;
+		
+		for (i = 0; i < path_split.length; i++) {
+			if (pages_child.hasOwnProperty(path_split[i])) {
+				if (i < path_split.length - 1) {
+					pages_child = pages_child[path_split[i]];
+				} else {
+					PageClass = pages_child[path_split[i]];
 					break;
+				}
+			} else {
+				for (key in pages_child) {
+					if (key.indexOf('^') === 0 && (new RegExp(key)).test(path_split[i])) {
+						args.push(path_split[i]);
+						if (i < path_split.length - 1) {
+							pages_child = pages_child[key];
+						} else {
+							PageClass = pages_child[key];
+						}
+						break;
+					}
 				}
 			}
 		}
-	}
-	PageClass = PageClass ? PageClass : pages_child; // In case of trailing slash in url
-	PageClass = PageClass.prototype instanceof Page ? PageClass : PageClass['']; // Open default page
-	return new (Function.prototype.bind.apply(PageClass, [null].concat(args)))(); // new Page(...args)
-};
-
-Page.prototype.show = function() {
-	var PAGE = this,
-		$main_header = $('#main_header'),
-		is_other_page = __APP.PREVIOUS_PAGE.wrapper_tmpl !== PAGE.wrapper_tmpl,
-		wrapper_field = is_other_page ? '$view' : '$wrapper',
-		$prev = __APP.PREVIOUS_PAGE[wrapper_field].length ? __APP.PREVIOUS_PAGE[wrapper_field] : is_other_page ? $('.PageView') : $('.PageView').find('.Content');
+		PageClass = PageClass ? PageClass : pages_child; // In case of trailing slash in url
+		PageClass = PageClass.prototype instanceof Page ? PageClass : PageClass['']; // Open default page
+		return new (Function.prototype.bind.apply(PageClass, [null].concat(args)))(); // new Page(...args)
+	};
 	
-	if (PAGE.page_title) {
-		__APP.changeTitle(PAGE.page_title);
-	}
-	$prev.addClass('-faded');
-	
-	setTimeout(function() {
-		$prev.addClass(__C.CLASSES.NEW_HIDDEN);
+	Page.prototype.show = function() {
+		var PAGE = this,
+			$main_header = $('#main_header'),
+			is_other_page = __APP.PREVIOUS_PAGE.wrapper_tmpl !== PAGE.wrapper_tmpl,
+			wrapper_field = is_other_page ? '$view' : '$wrapper',
+			$prev = __APP.PREVIOUS_PAGE[wrapper_field].length ? __APP.PREVIOUS_PAGE[wrapper_field] : is_other_page ? $('.PageView') : $('.PageView').find('.Content');
 		
-		if (PAGE.with_header_tabs) {
-			$main_header.addClass('-with_tabs');
-		} else {
-			$main_header.removeClass('-with_tabs');
+		if (PAGE.page_title) {
+			__APP.changeTitle(PAGE.page_title);
 		}
+		$prev.addClass('-faded');
 		
-		$('body').removeClass(function(index, css) {
-			return (css.match(/(^|\s)-state_\S+/g) || []).join(' ');
-		}).addClass('-state_' + PAGE.state_name.toUnderscore());
-		
-		if (is_other_page) {
-			PAGE.$view.html(tmpl(PAGE.wrapper_tmpl + '-wrapper', {}));
-		}
-		PAGE.$wrapper = PAGE.$view.find('.Content');
-		PAGE.$wrapper.empty();
-		
-		PAGE.$view.removeClass(__C.CLASSES.NEW_HIDDEN);
-		PAGE.$wrapper.removeClass(__C.CLASSES.NEW_HIDDEN);
-		PAGE[wrapper_field].addClass('-faded');
-		
-		PAGE.rendering_defer.resolve();
-	}, 200);
-	
-	$.when(PAGE.rendering_defer, PAGE.fetching_data_defer).done(function pageRender(){
-		$(window).scrollTop(0);
-		PAGE.render();
-		bindPageLinks();
 		setTimeout(function() {
-			PAGE[wrapper_field].removeClass('-faded');
+			$prev.addClass(__C.CLASSES.HIDDEN);
+			
+			if (PAGE.with_header_tabs) {
+				$main_header.addClass('-with_tabs');
+			} else {
+				$main_header.removeClass('-with_tabs');
+			}
+			
+			$('body').removeClass(function(index, css) {
+				return (css.match(/(^|\s)-state_\S+/g) || []).join(' ');
+			}).addClass('-state_' + PAGE.state_name.toUnderscore());
+			
+			if (is_other_page) {
+				PAGE.$view.html(tmpl(PAGE.wrapper_tmpl + '-wrapper', {}));
+			}
+			PAGE.$wrapper = PAGE.$view.find('.Content');
+			PAGE.$wrapper.empty();
+			
+			PAGE.$view.removeClass(__C.CLASSES.HIDDEN);
+			PAGE.$wrapper.removeClass(__C.CLASSES.HIDDEN);
+			PAGE[wrapper_field].addClass('-faded');
+			
+			PAGE.rendering_defer.resolve();
 		}, 200);
-	});
-};
-
-Page.prototype.fetchData = function() {
-	return this.fetching_data_defer.resolve().promise();
-};
-
-Page.prototype.render = function() {};
-
-Page.prototype.destroy = function() {};
+		
+		$.when(PAGE.rendering_defer, PAGE.fetching_data_defer).done(function pageRender(){
+			$(window).scrollTop(0);
+			PAGE.render();
+			bindPageLinks();
+			setTimeout(function() {
+				PAGE[wrapper_field].removeClass('-faded');
+			}, 200);
+		});
+	};
+	
+	Page.prototype.fetchData = function() {
+		return this.fetching_data_defer.resolve().promise();
+	};
+	
+	Page.prototype.render = function() {};
+	
+	Page.prototype.destroy = function() {};
+	
+	return Page;
+}());
 /**
  * @requires ../../Class.Page.js
  */
 /**
  *
  * @abstract
- * @augments Page
+ * @class FeedPage
+ * @extends Page
  */
-function FeedPage() {
-	Page.apply(this);
-	this.fields = [
-		'organization_name',
-		'organization_short_name',
-		'organization_logo_small_url',
-		'dates',
-		'is_same_time',
-		'favored_users_count',
-		'is_favorite',
-		'favored{fields:"is_friend",order_by:"-is_friend",length:10}',
-		'registration_required',
-		'registration_till',
-		'is_free',
-		'min_price'
-	];
-	this.events = new EventsCollection();
-	this.next_events_length = 20;
-	this.wrapper_tmpl = 'feed';
-	this.with_header_tabs = true;
-}
-FeedPage.extend(Page);
-
-FeedPage.prototype.bindFeedEvents = function($parent) {
-	trimAvatarsCollection($parent);
-	bindRippleEffect($parent);
-	bindDropdown($parent);
-	__APP.MODALS.bindCallModal($parent);
-	bindPageLinks($parent);
+FeedPage = extending(Page, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs FeedPage
+	 */
+	function FeedPage() {
+		Page.call(this);
+		this.fields = new Fields(
+			'organization_short_name',
+			'organization_logo_small_url',
+			'dates',
+			'is_same_time',
+			'favored_users_count',
+			'is_favorite',
+			'is_registered',
+			'ticketing_locally',
+			'registration_locally',
+			'registration_available',
+			'registration_required',
+			'registration_till',
+			'registration_limit_count',
+			'is_free',
+			'min_price', {
+				favored: {
+					fields: 'is_friend',
+					order_by: '-is_friend',
+					length: 10
+				}
+			}
+		);
+		this.events = new EventsCollection();
+		this.next_events_length = 20;
+		this.wrapper_tmpl = 'feed';
+		this.with_header_tabs = true;
+	}
 	
-	$parent.find('.HideEvent').not('.-Handled_HideEvent').each(function() {
-		var $this = $(this),
-			$event = $this.parents('.FeedEvent'),
-			event_id = $this.data("event-id");
+	FeedPage.prototype.bindFeedEvents = function($parent) {
+		trimAvatarsCollection($parent);
+		bindRippleEffect($parent);
+		bindDropdown($parent);
+		__APP.MODALS.bindCallModal($parent);
+		bindPageLinks($parent);
 		
-		$this.on('click', function() {
-			$event.addClass('-cancel');
-			OneEvent.changeEventStatus(event_id, OneEvent.STATUS.HIDE, function() {
-				$event.after(tmpl('button', {
-					classes: '-color_neutral ReturnEvent',
-					title: 'Вернуть событие',
-					dataset: 'data-event-id="' + event_id + '"'
-				}));
-				$event.siblings('.ReturnEvent').not('.-Handled_ReturnEvent').on('click', function() {
-					var $remove_button = $(this);
-					OneEvent.changeEventStatus(event_id, OneEvent.STATUS.SHOW, function() {
-						$remove_button.remove();
-						$event.removeClass('-cancel');
-					});
-				}).addClass('-Handled_ReturnEvent');
+		$parent.find('.HideEvent').not('.-Handled_HideEvent').each(function() {
+			var $this = $(this),
+				$event = $this.parents('.FeedEvent'),
+				event_id = $this.data("event-id");
+			
+			$this.on('click', function() {
+				$event.addClass('-cancel');
+				OneEvent.changeEventStatus(event_id, OneEvent.STATUS.HIDE, function() {
+					$event.after(tmpl('button', {
+						classes: '-color_neutral ReturnEvent',
+						title: 'Вернуть событие',
+						dataset: 'data-event-id="' + event_id + '"'
+					}));
+					$event.siblings('.ReturnEvent').not('.-Handled_ReturnEvent').on('click', function() {
+						var $remove_button = $(this);
+						OneEvent.changeEventStatus(event_id, OneEvent.STATUS.SHOW, function() {
+							$remove_button.remove();
+							$event.removeClass('-cancel');
+						});
+					}).addClass('-Handled_ReturnEvent');
+				});
 			});
-		});
-	}).addClass('-Handled_HideEvent');
-};
-
-FeedPage.prototype.addNoEventsBlock = function() {
-	var $no_events_block = tmpl('feed-no-event', {
-		text: 'Как насчет того, чтобы подписаться на организации?',
-		button: __APP.BUILD.link({
-			title: 'Перейти к каталогу',
-			classes: ['button', '-color_neutral_accent', 'RippleEffect'],
-			page: '/organizations'
-		})
-	}, this.$wrapper);
-	bindPageLinks($no_events_block);
-	bindRippleEffect($no_events_block);
-};
-/**
- *
- * @param {function(jQuery)} [success]
- * @returns {jqPromise}
- */
-FeedPage.prototype.appendEvents = function(success) {
-	var PAGE = this;
+		}).addClass('-Handled_HideEvent');
+	};
 	
-	PAGE.block_scroll = true;
-	return PAGE.events.fetchFeed(this.fields, this.next_events_length, function(events) {
-		var $events = __APP.BUILD.eventCards(events);
-		PAGE.block_scroll = false;
-		if ($events.length) {
-			PAGE.$wrapper.append($events);
-			PAGE.bindFeedEvents($events);
-			if (success && typeof success == 'function') {
-				success($events);
+	FeedPage.prototype.addNoEventsBlock = function() {
+		var $no_events_block = tmpl('feed-no-event', {
+			text: 'Как насчет того, чтобы подписаться на организации?',
+			button: __APP.BUILD.link({
+				title: 'Перейти к каталогу',
+				classes: ['button', '-color_neutral_accent', 'RippleEffect'],
+				page: '/organizations'
+			})
+		}, this.$wrapper);
+		bindPageLinks($no_events_block);
+		bindRippleEffect($no_events_block);
+	};
+	/**
+	 *
+	 * @param {function(jQuery)} [success]
+	 * @returns {jqPromise}
+	 */
+	FeedPage.prototype.appendEvents = function(success) {
+		var PAGE = this;
+		
+		PAGE.block_scroll = true;
+		return PAGE.events.fetchFeed(this.fields, this.next_events_length, function(events) {
+			var $events = __APP.BUILD.eventCards(events);
+			PAGE.block_scroll = false;
+			if ($events.length) {
+				PAGE.$wrapper.append($events);
+				PAGE.bindFeedEvents($events);
+				if (success && typeof success == 'function') {
+					success($events);
+				}
+			} else {
+				PAGE.addNoEventsBlock();
+				$(window).off('scroll.upload' + PAGE.constructor.name);
+			}
+		});
+	};
+	
+	FeedPage.prototype.initFeedCalendar = function() {
+		var PAGE = this,
+			selected_date = PAGE.events.date,
+			MainCalendar = new Calendar(PAGE.$view.find('.FeedCalendar'), {
+				classes: {
+					wrapper_class: 'feed_calendar_wrapper',
+					table_class: 'feed_calendar_table',
+					thead_class: 'feed_calendar_thead',
+					tbody_class: 'feed_calendar_tbody',
+					th_class: 'feed_calendar_th',
+					td_class: 'feed_calendar_td',
+					td_disabled: __C.CLASSES.DISABLED
+				}
+			});
+		
+		MainCalendar.init();
+		if (selected_date) {
+			MainCalendar.setMonth(selected_date.split('-')[1], selected_date.split('-')[0]).selectDays(selected_date);
+		}
+		MainCalendar.setDaysWithEvents();
+		MainCalendar.$calendar.on('month-changed', function() {
+			bindPageLinks(MainCalendar.$calendar);
+			MainCalendar.setDaysWithEvents();
+		});
+	};
+	
+	FeedPage.prototype.render = function() {
+		var PAGE = this,
+			$window = $(window);
+		
+		if (!(__APP.PREVIOUS_PAGE instanceof FeedPage)) {
+			PAGE.initFeedCalendar();
+		}
+		
+		if(__APP.USER.id === -1){
+			__APP.renderHeaderTabs([
+				{title: 'Актуальные', page: '/feed/actual'},
+				{title: 'По времени', page: '/feed/timeline'}
+			]);
+			
+			if(window.location.pathname == '/feed/favored' || window.location.pathname == '/feed/recommendations'){
+				__APP.changeState('/feed/actual', true, true);
+				return null;
 			}
 		} else {
-			PAGE.addNoEventsBlock();
-			$(window).off('scroll.upload' + PAGE.constructor.name);
+			__APP.renderHeaderTabs([
+				{title: 'Актуальные', page: '/feed/actual'},
+				{title: 'По времени', page: '/feed/timeline'},
+				{title: 'Избранные', page: '/feed/favored'},
+				{title: 'Рекомендованные', page: '/feed/recommendations'}/*,
+				 {title: 'Друзья', page: '/feed/friends/'},*/
+			]);
 		}
-	});
-};
-
-FeedPage.prototype.initFeedCalendar = function() {
-	var PAGE = this,
-		selected_date = PAGE.events.date,
-		MainCalendar = new Calendar(PAGE.$view.find('.FeedCalendar'), {
-			classes: {
-				wrapper_class: 'feed_calendar_wrapper',
-				table_class: 'feed_calendar_table',
-				thead_class: 'feed_calendar_thead',
-				tbody_class: 'feed_calendar_tbody',
-				th_class: 'feed_calendar_th',
-				td_class: 'feed_calendar_td',
-				td_disabled: __C.CLASSES.NEW_DISABLED
-			}
-		});
-	
-	MainCalendar.init();
-	if (selected_date) {
-		MainCalendar.setMonth(selected_date.split('-')[1], selected_date.split('-')[0]).selectDays(selected_date);
-	}
-	MainCalendar.setDaysWithEvents();
-	MainCalendar.$calendar.on('month-changed', function() {
-		bindPageLinks(MainCalendar.$calendar);
-		MainCalendar.setDaysWithEvents();
-	});
-};
-
-FeedPage.prototype.render = function() {
-	var PAGE = this,
-		$window = $(window);
-	
-	if (!(__APP.PREVIOUS_PAGE instanceof FeedPage)) {
-		PAGE.initFeedCalendar();
-	}
-	
-	if(__APP.USER.id === -1){
-		__APP.renderHeaderTabs([
-			{title: 'Актуальные', page: '/feed/actual'},
-			{title: 'По времени', page: '/feed/timeline'}
-		]);
-		
-		if(window.location.pathname == '/feed/favored' || window.location.pathname == '/feed/recommendations'){
+		if (window.location.pathname == '/feed/' || window.location.pathname == '/feed' || !window.location.pathname.contains('feed')) {
 			__APP.changeState('/feed/actual', true, true);
 			return null;
 		}
-	} else {
-		__APP.renderHeaderTabs([
-			{title: 'Актуальные', page: '/feed/actual'},
-			{title: 'По времени', page: '/feed/timeline'},
-			{title: 'Избранные', page: '/feed/favored'},
-			{title: 'Рекомендованные', page: '/feed/recommendations'}/*,
-			 {title: 'Друзья', page: '/feed/friends/'},*/
-		]);
-	}
-	if (window.location.pathname == '/feed/' || window.location.pathname == '/feed' || !window.location.pathname.contains('feed')) {
-		__APP.changeState('/feed/actual', true, true);
-		return null;
+		
+		$window.off('scroll');
+		PAGE.appendEvents(function() {
+			$window.on('scroll.upload' + PAGE.constructor.name, function() {
+				if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.block_scroll) {
+					PAGE.appendEvents();
+				}
+			})
+		});
+	};
+	
+	return FeedPage;
+}()));
+/**
+ * @requires Class.FeedPage.js
+ */
+/**
+ *
+ * @class ActualEventsPage
+ * @extends FeedPage
+ */
+ActualEventsPage = extending(FeedPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs ActualEventsPage
+	 */
+	function ActualEventsPage() {
+		FeedPage.apply(this);
+		this.events = new ActualEventsCollection();
+		this.page_title = 'Актуальные события';
 	}
 	
-	$window.off('scroll');
-	PAGE.appendEvents(function() {
-		$window.on('scroll.upload' + PAGE.constructor.name, function() {
-			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.block_scroll) {
-				PAGE.appendEvents();
-			}
-		})
-	});
-};
+	return ActualEventsPage
+}()));
 /**
  * @requires Class.FeedPage.js
  */
 /**
  *
- * @constructor
- * @augments FeedPage
+ * @class DayEventsPage
+ * @extends FeedPage
  */
-function ActualEventsPage() {
-	FeedPage.apply(this);
-	this.events = new ActualEventsCollection();
-	this.page_title = 'Актуальные события';
-}
-ActualEventsPage.extend(FeedPage);
+DayEventsPage = extending(FeedPage, (function() {
+	/**
+	 *
+	 * @param {string} date
+	 * @constructor
+	 * @constructs DayEventsPage
+	 */
+	function DayEventsPage(date) {
+		if (!date)
+			throw Error('DayEventsCollection must have date parameter');
+		FeedPage.apply(this);
+		this.date = date;
+		this.events = new DayEventsCollection(this.date);
+		this.page_title = 'События на ' + moment(this.date).format('D MMMM YYYY');
+	}
+	
+	return DayEventsPage
+}()));
 /**
  * @requires Class.FeedPage.js
  */
 /**
  *
- * @constructor
- * @augments Events
- * @param {string} date
+ * @class FavoredEventsPage
+ * @extends FeedPage
  */
-function DayEventsPage(date) {
-	if (!date)
-		throw Error('DayEventsCollection must have date parameter');
-	FeedPage.apply(this);
-	this.date = date;
-	this.events = new DayEventsCollection(this.date);
-	this.page_title = 'События на ' + moment(this.date).format('D MMMM YYYY');
-}
-DayEventsPage.extend(FeedPage);
+FavoredEventsPage = extending(FeedPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs FavoredEventsPage
+	 */
+	function FavoredEventsPage() {
+		FeedPage.apply(this);
+		this.events = new FavoredEventsCollection();
+		this.page_title = 'Избранные события';
+	}
+	
+	return FavoredEventsPage
+}()));
 /**
  * @requires Class.FeedPage.js
  */
 /**
  *
- * @constructor
- * @augments Events
+ * @class FriendsEventsPage
+ * @extends FeedPage
  */
-function FavoredEventsPage() {
-	FeedPage.apply(this);
-	this.events = new FavoredEventsCollection();
-	this.page_title = 'Избранные события';
-}
-FavoredEventsPage.extend(FeedPage);
+FriendsEventsPage = extending(FeedPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs FriendsEventsPage
+	 */
+	function FriendsEventsPage() {
+		FeedPage.apply(this);
+		this.events = new FriendsEventsCollection();
+		this.page_title = 'События друзей';
+	}
+	
+	return FriendsEventsPage
+}()));
 /**
  * @requires Class.FeedPage.js
  */
 /**
  *
- * @constructor
- * @augments Events
+ * @class RecommendedEventsPage
+ * @extends FeedPage
  */
-function FriendsEventsPage() {
-	FeedPage.apply(this);
-	this.events = new FriendsEventsCollection();
-	this.page_title = 'События друзей';
-}
-FriendsEventsPage.extend(FeedPage);
+RecommendedEventsPage = extending(FeedPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs RecommendedEventsPage
+	 */
+	function RecommendedEventsPage() {
+		FeedPage.apply(this);
+		this.events = new RecommendedEventsCollection();
+		this.page_title = 'Рекомендованные события';
+	}
+	
+	return RecommendedEventsPage
+}()));
 /**
  * @requires Class.FeedPage.js
  */
 /**
  *
- * @constructor
- * @augments Events
+ * @class TimelineEventsPage
+ * @extends FeedPage
  */
-function RecommendedEventsPage() {
-	FeedPage.apply(this);
-	this.events = new RecommendedEventsCollection();
-	this.page_title = 'Рекомендованные события';
-}
-RecommendedEventsPage.extend(FeedPage);
-/**
- * @requires Class.FeedPage.js
- */
-/**
- *
- * @constructor
- * @augments FeedPage
- */
-function TimelineEventsPage() {
-	FeedPage.apply(this);
-	this.events = new TimelineEventsCollection();
-	this.page_title = 'События по времени';
-}
-TimelineEventsPage.extend(FeedPage);
+TimelineEventsPage = extending(FeedPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs TimelineEventsPage
+	 */
+	function TimelineEventsPage() {
+		FeedPage.apply(this);
+		this.events = new TimelineEventsCollection();
+		this.page_title = 'События по времени';
+	}
+	
+	return TimelineEventsPage
+}()));
 /**
  * @requires ../Class.Page.js
  */
 /**
  *
- * @constructor
  * @abstract
- * @augments Page
+ * @class StatisticsPage
+ * @extends Page
  */
-function StatisticsPage() {
-	Page.apply(this);
-	this.state_name = 'statistics';
-	this.SCALES = {
-		MINUTE: 'minute',
-		HOUR: 'hour',
-		DAY: 'day',
-		WEEK: 'week',
-		MONTH: 'month',
-		YEAR: 'year',
-		OVERALL: 'overall'
-	};
-	this.highchart_defaults = {
-		chart: {
-			backgroundColor: null,
-			plotBorderWidth: null,
-			plotShadow: false,
-			style: {
-				fontFamily: 'inherit',
-				fontSize: 'inherit'
-			}
-		},
-		title: {
-			text: false
-		},
-		credits: {
-			enabled: false
-		}
-	};
-}
-StatisticsPage.extend(Page);
-/**
- *
- * @param {object} raw_data
- * @returns {object}
- */
-StatisticsPage.prototype.areaChartSeriesNormalize = function(raw_data) {
-	var CONVERSATIONS = {
-			open_conversion: {
-				with: 'open_site',
-				to: 'view'
-			},
-			fave_conversion: {
-				with: 'fave',
-				to: 'open_site'
-			},
-			conversion: {
-				with: 'subscribe',
-				to: 'view'
-			}
-		},
-		COMPARISONS = {
-			subscribe_unsubscribe: {
-				subscribe: 'subscribe',
-				unsubscribe: 'unsubscribe'
-			}
-		},
-		STD_NAMES = {
-			'notifications_sent': 'Отправлено уведомлений',
-			'view': 'Просмотры',
-			'view_detail': 'Открытий страницы события из ленты Evendate',
-			'conversion': 'Конверсия',
-			'subscribe': 'Подписалось',
-			'unsubscribe': 'Отписалось',
-			'open_site': 'Открытий страницы события',
-			'open_conversion': 'Конверсия просмотра события в ленте к открытию страницы события',
-			'fave': 'Кол-во пользователей, которые добавили событие в избранное',
-			'fave_conversion': 'Конверсия открытия страницы события к добавлениям в избранное'
-		},
-		HIDDEN_SERIES_OPTIONS = {
-			showInLegend: false,
-			lineWidth: 0,
-			fillOpacity: 0,
-			states: {
-				hover: {
-					enabled: false
-				}
-			}
-		},
-		output = {};
-	
-	function dataNormalize(raw_data, field, value_field_name) {
-		return {
-			name: STD_NAMES[field],
-			data: raw_data.map(function(line, i) {
-				return [moment.unix(line.time_value).valueOf(), line[value_field_name]];
-			})
-		}
-	}
-	
-	
-	$.each(raw_data, function(key, data){
-		output[key] = [];
-		if(CONVERSATIONS.hasOwnProperty(key)){
-			output[key].push($.extend(true, { tooltip: {valueSuffix: ' %'} }, dataNormalize(data, key, 'value')));
-			$.each(CONVERSATIONS[key], function(field_key, field) {
-				output[key].push($.extend(true, {}, HIDDEN_SERIES_OPTIONS, dataNormalize(data, field, field_key)));
-			})
-		}
-		else if(COMPARISONS.hasOwnProperty(key)) {
-			$.each(COMPARISONS[key], function(field_key, field) {
-				output[key].push(dataNormalize(data, field, field_key));
-			})
-		}
-		else {
-			output[key].push(dataNormalize(data, key, 'value'));
-		}
-	});
-	
-	return output;
-};
-/**
- *
- * @param {object} data
- * @param {object} [additional_options]
- */
-StatisticsPage.prototype.buildAreaCharts = function(data, additional_options) {
-	var self = this,
-		normalized_series = self.areaChartSeriesNormalize(data),
-		FIELDS = {
-			notifications_sent: {
-				title: 'Отправлено уведомлений пользователям',
-				wrapper_class: 'NotificationsSentAreaChart'
-			},
-			view: {
-				title: 'Просмотры',
-				wrapper_class: 'ViewAreaChart'
-			},
-			view_detail: {
-				title: 'Открытий страницы события',
-				wrapper_class: 'ViewDetailAreaChart'
-			},
-			open_site: {
-				title: 'Открытий страницы события из ленты Evendate',
-				wrapper_class: 'OpenSiteAreaChart'
-			},
-			open_conversion: {
-				title: 'Конверсия просмотров/открытий',
-				wrapper_class: 'OpenConversionsAreaChart'
-			},
-			fave: {
-				title: 'Добавлений в избранное',
-				wrapper_class: 'FaveAreaChart'
-			},
-			fave_conversion: {
-				title: 'Конверсия открытий/добавлений в избранное',
-				wrapper_class: 'FaveConversionsAreaChart'
-			},
-			subscribe_unsubscribe: {
-				title: 'Подписчики',
-				wrapper_class: 'SubscriberAreaChart'
-			},
-			conversion: {
-				title: 'Конверсия просмотров/подписок',
-				wrapper_class: 'ConversionAreaChart'
-			}
-		},
-		FILL_COLORS = [
-			['rgba(35, 215, 146, 0.18)', 'rgba(101, 101, 101, 0.6)', 'rgba(101, 101, 101, 0.6)'],
-			['rgba(35, 215, 146, 0.09)', 'rgba(101, 101, 101, 0.6)', 'rgba(101, 101, 101, 0.6)']
-		],
-		area_chart_options = $.extend(true, {}, self.highchart_defaults, {
+StatisticsPage = extending(Page, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs StatisticsPage
+	 */
+	function StatisticsPage() {
+		Page.apply(this);
+		this.state_name = 'statistics';
+		this.SCALES = {
+			MINUTE: 'minute',
+			HOUR: 'hour',
+			DAY: 'day',
+			WEEK: 'week',
+			MONTH: 'month',
+			YEAR: 'year',
+			OVERALL: 'overall'
+		};
+		this.highchart_defaults = {
 			chart: {
-				type: 'areaspline',
-				plotBackgroundColor: '#fcfcfc',
-				plotBorderColor: '#ebebeb',
-				plotBorderWidth: 1
+				backgroundColor: null,
+				plotBorderWidth: null,
+				plotShadow: false,
+				style: {
+					fontFamily: 'inherit',
+					fontSize: 'inherit'
+				}
 			},
-			colors: [__C.COLORS.FRANKLIN, __C.COLORS.MUTED_80, __C.COLORS.ACCENT, __C.COLORS.MUTED, __C.COLORS.MUTED_50, __C.COLORS.MUTED_30],
 			title: {
-				align: 'left',
-				margin: 20
+				text: false
 			},
-			legend: {
-				enabled: true,
-				align: 'left',
-				itemStyle: {color: __C.COLORS.TEXT, cursor: 'pointer', fontSize: '14px', fontWeight: '500', y: 0},
-				itemMarginTop: 24,
-				itemMarginBottom: 5,
-				symbolHeight: 18,
-				symbolWidth: 18,
-				symbolRadius: 9,
-				itemDistance: 42,
-				x: 30
-			},
-			plotOptions: {
-				series: {
-					states: {
-						hover: {
-							lineWidth: 2
-						}
-					}
+			credits: {
+				enabled: false
+			}
+		};
+	}
+	/**
+	 *
+	 * @param {object} raw_data
+	 * @returns {object}
+	 */
+	StatisticsPage.prototype.areaChartSeriesNormalize = function(raw_data) {
+		var CONVERSATIONS = {
+				open_conversion: {
+					with: 'open_site',
+					to: 'view'
 				},
-				areaspline: {
-					fillOpacity: 0.5,
-					marker: {
-						enabled: false,
-						symbol: 'circle',
-						radius: 2,
+				fave_conversion: {
+					with: 'fave',
+					to: 'open_site'
+				},
+				conversion: {
+					with: 'subscribe',
+					to: 'view'
+				}
+			},
+			COMPARISONS = {
+				subscribe_unsubscribe: {
+					subscribe: 'subscribe',
+					unsubscribe: 'unsubscribe'
+				}
+			},
+			STD_NAMES = {
+				'notifications_sent': 'Отправлено уведомлений',
+				'view': 'Просмотры',
+				'view_detail': 'Открытий страницы события из ленты Evendate',
+				'conversion': 'Конверсия',
+				'subscribe': 'Подписалось',
+				'unsubscribe': 'Отписалось',
+				'open_site': 'Открытий страницы события',
+				'open_conversion': 'Конверсия просмотра события в ленте к открытию страницы события',
+				'fave': 'Кол-во пользователей, которые добавили событие в избранное',
+				'fave_conversion': 'Конверсия открытия страницы события к добавлениям в избранное'
+			},
+			HIDDEN_SERIES_OPTIONS = {
+				showInLegend: false,
+				lineWidth: 0,
+				fillOpacity: 0,
+				states: {
+					hover: {
+						enabled: false
+					}
+				}
+			},
+			output = {};
+		
+		function dataNormalize(raw_data, field, value_field_name) {
+			return {
+				name: STD_NAMES[field],
+				data: raw_data.map(function(line, i) {
+					return [moment.unix(line.time_value).valueOf(), line[value_field_name]];
+				})
+			}
+		}
+		
+		
+		$.each(raw_data, function(key, data){
+			output[key] = [];
+			if(CONVERSATIONS.hasOwnProperty(key)){
+				output[key].push($.extend(true, { tooltip: {valueSuffix: ' %'} }, dataNormalize(data, key, 'value')));
+				$.each(CONVERSATIONS[key], function(field_key, field) {
+					output[key].push($.extend(true, {}, HIDDEN_SERIES_OPTIONS, dataNormalize(data, field, field_key)));
+				})
+			}
+			else if(COMPARISONS.hasOwnProperty(key)) {
+				$.each(COMPARISONS[key], function(field_key, field) {
+					output[key].push(dataNormalize(data, field, field_key));
+				})
+			}
+			else {
+				output[key].push(dataNormalize(data, key, 'value'));
+			}
+		});
+		
+		return output;
+	};
+	/**
+	 *
+	 * @param {object} data
+	 * @param {object} [additional_options]
+	 */
+	StatisticsPage.prototype.buildAreaCharts = function(data, additional_options) {
+		var self = this,
+			normalized_series = self.areaChartSeriesNormalize(data),
+			FIELDS = {
+				notifications_sent: {
+					title: 'Отправлено уведомлений пользователям',
+					wrapper_class: 'NotificationsSentAreaChart'
+				},
+				view: {
+					title: 'Просмотры',
+					wrapper_class: 'ViewAreaChart'
+				},
+				view_detail: {
+					title: 'Открытий страницы события',
+					wrapper_class: 'ViewDetailAreaChart'
+				},
+				open_site: {
+					title: 'Открытий страницы события из ленты Evendate',
+					wrapper_class: 'OpenSiteAreaChart'
+				},
+				open_conversion: {
+					title: 'Конверсия просмотров/открытий',
+					wrapper_class: 'OpenConversionsAreaChart'
+				},
+				fave: {
+					title: 'Добавлений в избранное',
+					wrapper_class: 'FaveAreaChart'
+				},
+				fave_conversion: {
+					title: 'Конверсия открытий/добавлений в избранное',
+					wrapper_class: 'FaveConversionsAreaChart'
+				},
+				subscribe_unsubscribe: {
+					title: 'Подписчики',
+					wrapper_class: 'SubscriberAreaChart'
+				},
+				conversion: {
+					title: 'Конверсия просмотров/подписок',
+					wrapper_class: 'ConversionAreaChart'
+				}
+			},
+			FILL_COLORS = [
+				['rgba(35, 215, 146, 0.18)', 'rgba(101, 101, 101, 0.6)', 'rgba(101, 101, 101, 0.6)'],
+				['rgba(35, 215, 146, 0.09)', 'rgba(101, 101, 101, 0.6)', 'rgba(101, 101, 101, 0.6)']
+			],
+			area_chart_options = $.extend(true, {}, self.highchart_defaults, {
+				chart: {
+					type: 'areaspline',
+					plotBackgroundColor: '#fcfcfc',
+					plotBorderColor: '#ebebeb',
+					plotBorderWidth: 1
+				},
+				colors: [__C.COLORS.FRANKLIN, __C.COLORS.MUTED_80, __C.COLORS.ACCENT, __C.COLORS.MUTED, __C.COLORS.MUTED_50, __C.COLORS.MUTED_30],
+				title: {
+					align: 'left',
+					margin: 20
+				},
+				legend: {
+					enabled: true,
+					align: 'left',
+					itemStyle: {color: __C.COLORS.TEXT, cursor: 'pointer', fontSize: '14px', fontWeight: '500', y: 0},
+					itemMarginTop: 24,
+					itemMarginBottom: 5,
+					symbolHeight: 18,
+					symbolWidth: 18,
+					symbolRadius: 9,
+					itemDistance: 42,
+					x: 30
+				},
+				plotOptions: {
+					series: {
 						states: {
 							hover: {
-								enabled: true
+								lineWidth: 2
 							}
 						}
 					},
-					dataGrouping: {
-						dateTimeLabelFormats: {
-							millisecond: ['%b %e, %H:%M:%S.%L', '%b %e, %H:%M:%S.%L', '-%H:%M:%S.%L'],
-							second: ['%b %e, %H:%M:%S', '%b %e, %H:%M:%S', '-%H:%M:%S'],
-							minute: ['%b %e, %H:%M', '%b %e, %H:%M', '-%H:%M'],
-							hour: ['%b %e, %H:%M', '%b %e, %H:%M', '-%H:%M'],
-							day: ['%b %e, %Y', '%b %e', '-%b %e, %Y'],
-							week: ['%b %e, %Y', '%b %e', '-%b %e, %Y'],
-							month: ['%B %Y', '%B', '-%B %Y'],
-							year: ['%Y', '%Y', '-%Y']
+					areaspline: {
+						fillOpacity: 0.5,
+						marker: {
+							enabled: false,
+							symbol: 'circle',
+							radius: 2,
+							states: {
+								hover: {
+									enabled: true
+								}
+							}
+						},
+						dataGrouping: {
+							dateTimeLabelFormats: {
+								millisecond: ['%b %e, %H:%M:%S.%L', '%b %e, %H:%M:%S.%L', '-%H:%M:%S.%L'],
+								second: ['%b %e, %H:%M:%S', '%b %e, %H:%M:%S', '-%H:%M:%S'],
+								minute: ['%b %e, %H:%M', '%b %e, %H:%M', '-%H:%M'],
+								hour: ['%b %e, %H:%M', '%b %e, %H:%M', '-%H:%M'],
+								day: ['%b %e, %Y', '%b %e', '-%b %e, %Y'],
+								week: ['%b %e, %Y', '%b %e', '-%b %e, %Y'],
+								month: ['%B %Y', '%B', '-%B %Y'],
+								year: ['%Y', '%Y', '-%Y']
+							}
 						}
 					}
-				}
-			},
-			tooltip: {
-				headerFormat: '<b>{point.key}</b><br/>',
-				positioner: function(labelWidth, labelHeight) {
-					return {
-						x: this.chart.plotLeft,
-						y: this.chart.plotTop
-					};
 				},
-				shadow: false,
-				shape: 'square',
-				valueDecimals: 0,
-				xDateFormat: '%e %b %Y',
-				shared: true
-			},
-			scrollbar: {enabled: false},
-			navigator: {
-				outlineColor: '#ebebeb',
-				outlineWidth: 1,
-				maskInside: false,
-				maskFill: 'rgba(245, 245, 245, 0.66)',
-				handles: {
-					backgroundColor: '#9fa7b6',
-					borderColor: '#fff'
+				tooltip: {
+					headerFormat: '<b>{point.key}</b><br/>',
+					positioner: function(labelWidth, labelHeight) {
+						return {
+							x: this.chart.plotLeft,
+							y: this.chart.plotTop
+						};
+					},
+					shadow: false,
+					shape: 'square',
+					valueDecimals: 0,
+					xDateFormat: '%e %b %Y',
+					shared: true
+				},
+				scrollbar: {enabled: false},
+				navigator: {
+					outlineColor: '#ebebeb',
+					outlineWidth: 1,
+					maskInside: false,
+					maskFill: 'rgba(245, 245, 245, 0.66)',
+					handles: {
+						backgroundColor: '#9fa7b6',
+						borderColor: '#fff'
+					},
+					xAxis: {
+						gridLineWidth: 0,
+						labels: {
+							align: 'left',
+							reserveSpace: true,
+							style: {
+								color: '#888'
+							},
+							x: 0,
+							y: null
+						}
+					}
+				},
+				rangeSelector: {
+					buttonTheme: {
+						width: null,
+						height: 22,
+						fill: 'none',
+						stroke: 'none',
+						r: 14,
+						style: {
+							color: __C.COLORS.MUTED_80,
+							fontSize: '13px',
+							fontWeight: '400',
+							textTransform: 'uppercase',
+							dominantBaseline: 'middle'
+						},
+						states: {
+							hover: {
+								fill: __C.COLORS.MUTED_50,
+								style: {
+									color: '#fff'
+								}
+							},
+							select: {
+								fill: __C.COLORS.MUTED_80,
+								style: {
+									color: '#fff',
+									fontWeight: '400'
+								}
+							}
+						}
+					},
+					buttons: [{
+						type: 'day',
+						count: 7,
+						text: "\xa0\xa0\xa0Неделя\xa0\xa0\xa0"
+					}, {
+						type: 'month',
+						count: 1,
+						text: "\xa0\xa0\xa0Месяц\xa0\xa0\xa0"
+					}, {
+						type: 'year',
+						count: 1,
+						text: "\xa0\xa0\xa0Год\xa0\xa0\xa0"
+					}, {
+						type: 'all',
+						text: "\xa0\xa0\xa0Все\xa0время\xa0\xa0\xa0"
+					}],
+					allButtonsEnabled: true,
+					selected: 2,
+					labelStyle: {
+						display: 'none'
+					},
+					inputEnabled: false
 				},
 				xAxis: {
-					gridLineWidth: 0,
-					labels: {
-						align: 'left',
-						reserveSpace: true,
-						style: {
-							color: '#888'
-						},
-						x: 0,
-						y: null
+					gridLineWidth: 1,
+					gridLineDashStyle: 'dash',
+					type: 'datetime',
+					showEmpty: false,
+					tickPosition: 'inside',
+					dateTimeLabelFormats: {
+						minute: '%H:%M',
+						hour: '%H:%M',
+						day: '%e %b',
+						week: '%e %b',
+						month: '%b %y',
+						year: '%Y'
+					}
+				},
+				yAxis: {
+					allowDecimals: false,
+					floor: 0,
+					min: 0,
+					gridLineDashStyle: 'dash',
+					opposite: false,
+					title: {
+						text: false
 					}
 				}
-			},
-			rangeSelector: {
-				buttonTheme: {
-					width: null,
-					height: 22,
-					fill: 'none',
-					stroke: 'none',
-					r: 14,
-					style: {
-						color: __C.COLORS.MUTED_80,
-						fontSize: '13px',
-						fontWeight: '400',
-						textTransform: 'uppercase',
-						dominantBaseline: 'middle'
-					},
-					states: {
-						hover: {
-							fill: __C.COLORS.MUTED_50,
-							style: {
-								color: '#fff'
-							}
-						},
-						select: {
-							fill: __C.COLORS.MUTED_80,
-							style: {
-								color: '#fff',
-								fontWeight: '400'
-							}
+			}, additional_options);
+		
+		$.each(normalized_series, function(key) {
+			var field_data = {
+				title: {text: FIELDS[key].title}
+			};
+			
+			field_data.series = normalized_series[key].map(function(series_unit, i) {
+				if (series_unit.fillOpacity !== 0) {
+					return $.extend(true, {}, series_unit, {
+						fillColor: {
+							linearGradient: {x1: 0, x2: 0, y1: 0, y2: 1},
+							stops: FILL_COLORS.map(function(colors_set, j) {
+								return [j, colors_set[i]];
+							})
 						}
-					}
-				},
-				buttons: [{
-					type: 'day',
-					count: 7,
-					text: "\xa0\xa0\xa0Неделя\xa0\xa0\xa0"
-				}, {
-					type: 'month',
-					count: 1,
-					text: "\xa0\xa0\xa0Месяц\xa0\xa0\xa0"
-				}, {
-					type: 'year',
-					count: 1,
-					text: "\xa0\xa0\xa0Год\xa0\xa0\xa0"
-				}, {
-					type: 'all',
-					text: "\xa0\xa0\xa0Все\xa0время\xa0\xa0\xa0"
-				}],
-				allButtonsEnabled: true,
-				selected: 2,
-				labelStyle: {
-					display: 'none'
-				},
-				inputEnabled: false
-			},
-			xAxis: {
-				gridLineWidth: 1,
-				gridLineDashStyle: 'dash',
-				type: 'datetime',
-				showEmpty: false,
-				tickPosition: 'inside',
-				dateTimeLabelFormats: {
-					minute: '%H:%M',
-					hour: '%H:%M',
-					day: '%e %b',
-					week: '%e %b',
-					month: '%b %y',
-					year: '%Y'
+					})
 				}
-			},
-			yAxis: {
-				allowDecimals: false,
-				floor: 0,
-				min: 0,
-				gridLineDashStyle: 'dash',
-				opposite: false,
-				title: {
-					text: false
+				return series_unit;
+			});
+			
+			if (key == 'conversion' || key == 'open_conversion' || key == 'fave_conversion') {
+				field_data.yAxis = {
+					max: 100,
+					labels: {
+						format: '{value}%'
+					}
+				};
+			}
+			
+			self.$wrapper.find('.' + FIELDS[key].wrapper_class).highcharts('StockChart', $.extend(true, {}, area_chart_options, field_data));
+		});
+	};
+	/**
+	 *
+	 * @param {jQuery} $scoreboards_wrapper
+	 * @param {object} data
+	 * @param {object} data.numbers
+	 * @param {object} [data.dynamics]
+	 * @param {object} [titles]
+	 * @param {Array} [order]
+	 * @param {string} [size="normal"]
+	 */
+	StatisticsPage.prototype.updateScoreboards = function($scoreboards_wrapper, data, titles, order, size) {
+		var with_dynamics = !!data.dynamics;
+		if (!order)
+			order = Object.keys(titles);
+		
+		order.forEach(function(field) {
+			var scoreboard_type = 'Scoreboard' + field.toCamelCase('_'),
+				$scoreboard = $scoreboards_wrapper.find('.' + scoreboard_type),
+				measure;
+			
+			switch (field) {
+				case 'conversion':
+				case 'open_conversion':
+				case 'fave_conversion': {
+					measure = '%';
+					break;
 				}
 			}
-		}, additional_options);
+			
+			if (!$scoreboard.length) {
+				$scoreboard = tmpl(with_dynamics ? 'scoreboard-with-dynamics' : 'scoreboard', {
+					type: scoreboard_type,
+					title: titles[field],
+					size: size ? '-size_' + size : '-size_normal',
+					number: 0 + measure,
+					dynamic_by_week: 0 + measure
+				}, $scoreboards_wrapper)
+			}
+			
+			if (data.numbers[field] !== undefined) {
+				$scoreboard.find('.ScoreboardNumber').animateNumber({
+					number: Math.round(data.numbers[field]),
+					suffix: measure
+				}, 2000, 'easeOutSine');
+			}
+			
+			if (with_dynamics) {
+				if (data.dynamics[field] !== undefined) {
+					$scoreboard
+						.find('.ScoreboardDynamic')
+						.animateNumber({
+							number: Math.round(data.dynamics[field]),
+							prefix: data.dynamics[field] == 0 ? undefined : (data.dynamics[field] > 0 ? '+' : '-'),
+							suffix: measure
+						}, 2000, 'easeOutSine')
+						.siblings('label')
+						.removeClass('fa-caret-up -text_color_franklin fa-caret-down -text_color_bubblegum')
+						.addClass(data.dynamics[field] == 0 ? '' : (data.dynamics[field] > 0 ? 'fa-caret-up -text_color_franklin' : 'fa-caret-down -text_color_bubblegum'));
+				}
+			}
+		});
+	};
 	
-	$.each(normalized_series, function(key) {
-		var field_data = {
-			title: {text: FIELDS[key].title}
-		};
+	return StatisticsPage;
+}()));
+/**
+ * @requires ../Class.StatisticsPage.js
+ */
+/**
+ *
+ * @class StatisticsEventPage
+ * @extends StatisticsPage
+ */
+StatisticsEventPage = extending(StatisticsPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs StatisticsEventPage
+	 * @param {(string|number)} event_id
+	 */
+	function StatisticsEventPage(event_id) {
+		StatisticsPage.apply(this, arguments);
+		this.id = event_id;
+		this.event = new OneEvent(this.id);
+	}
+	
+	return StatisticsEventPage;
+}()));
+/**
+ * @requires Class.StatisticsEventPage.js
+ */
+/**
+ *
+ * @class StatisticsEventAuditoryPage
+ * @extends StatisticsEventPage
+ */
+StatisticsEventAuditoryPage = extending(StatisticsEventPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs StatisticsEventAuditoryPage
+	 * @param {(string|number)} event_id
+	 */
+	function StatisticsEventAuditoryPage(event_id) {
+		StatisticsEventPage.apply(this, arguments);
+	}
+	
+	StatisticsEventAuditoryPage.prototype.render = function() {};
+	
+	return StatisticsEventAuditoryPage;
+}()));
+/**
+ * @requires Class.StatisticsEventPage.js
+ */
+/**
+ *
+ * @class StatisticsEventEditPage
+ * @extends StatisticsEventPage
+ */
+StatisticsEventEditPage = extending(StatisticsEventPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs StatisticsEventEditPage
+	 * @param {(string|number)} event_id
+	 */
+	function StatisticsEventEditPage(event_id) {
+		StatisticsEventPage.apply(this, arguments);
+	}
+	
+	StatisticsEventEditPage.prototype.render = function() {};
+	
+	return StatisticsEventEditPage;
+}()));
+/**
+ * @requires Class.StatisticsEventPage.js
+ */
+/**
+ *
+ * @class StatisticsEventOverviewPage
+ * @extends StatisticsEventPage
+ */
+StatisticsEventOverviewPage = extending(StatisticsEventPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs StatisticsEventOverviewPage
+	 * @param {(string|number)} event_id
+	 */
+	function StatisticsEventOverviewPage(event_id) {
+		StatisticsEventPage.apply(this, arguments);
 		
-		field_data.series = normalized_series[key].map(function(series_unit, i) {
-			if (series_unit.fillOpacity !== 0) {
-				return $.extend(true, {}, series_unit, {
-					fillColor: {
-						linearGradient: {x1: 0, x2: 0, y1: 0, y2: 1},
-						stops: FILL_COLORS.map(function(colors_set, j) {
-							return [j, colors_set[i]];
+		this.graphics_stats = new EventStatistics(this.id);
+		this.scoreboards_stats = new EventStatistics(this.id);
+	}
+	
+	StatisticsEventOverviewPage.prototype.fetchData = function() {
+		return this.fetching_data_defer = this.event.fetchEvent([
+			'image_horizontal_medium_url',
+			'organization_short_name',
+			'favored_users_count',
+			'is_same_time',
+			'dates'
+		]);
+	};
+	
+	StatisticsEventOverviewPage.prototype.render = function() {
+		var PAGE = this;
+		
+		if(__APP.USER.id === -1){
+			__APP.changeState('/feed/actual', true, true);
+			return null;
+		}
+		__APP.changeTitle([{
+			title: 'Организации',
+			page: '/statistics'
+		}, {
+			title: this.event.organization_short_name,
+			page: '/statistics/organization/' + this.event.organization_id
+		}, this.event.title]);
+		
+		this.$wrapper.html(tmpl('eventstat-overview', $.extend(true, {}, this.event, {
+			dates_block: tmpl('eventstat-overview-datetime', {
+				date: displayDateRange(this.event.first_event_date, this.event.last_event_date),
+				time: this.event.is_same_time ? displayTimeRange(this.event.dates[0].start_time, this.event.dates[0].end_time) : 'Разное время'
+			})
+		})));
+		this.$wrapper.find('.EventStatAreaCharts').children('.AreaChart').html(tmpl('loader'));
+		
+		this.scoreboards_stats.fetchStatistics(Statistics.SCALES.OVERALL, false, ['notifications_sent', 'view', 'fave', 'view_detail', 'fave_conversion', 'open_conversion'], null, function(data) {
+			var scoreboards_data = {numbers: {}};
+			$.each(data, function(field, stats) {
+				scoreboards_data.numbers[field] = stats[0].value
+			});
+			PAGE.updateScoreboards(PAGE.$wrapper.find('.EventstatsScoreboards'), scoreboards_data, {
+				'fave': 'Добавлений в избранное',
+				'view': 'Просмотров события'
+			}, ['fave', 'view']);
+			PAGE.updateScoreboards(PAGE.$wrapper.find('.EventstatsBigScoreboards'), scoreboards_data, {
+				'notifications_sent': 'Уведомлений отправлено',
+				'view': 'Просмотров',
+				'view_detail': 'Открытий',
+				'open_conversion': 'Конверсия открытий',
+				'fave': 'Добавлений',
+				'fave_conversion': 'Конверсия добавлений'
+			}, ['notifications_sent', 'view', 'view_detail', 'open_conversion', 'fave', 'fave_conversion'], 'big');
+		});
+		
+		this.graphics_stats.fetchStatistics(Statistics.SCALES.DAY, moment(__APP.EVENDATE_BEGIN, 'DD-MM-YYYY').format(), ['notifications_sent', 'view', 'fave', 'view_detail', 'fave_conversion', 'open_conversion'], null, function(data) {
+			PAGE.buildAreaCharts(data, {
+				rangeSelector: {
+					selected: 1
+				}
+			});
+		});
+		
+		__APP.MODALS.bindCallModal(PAGE.$wrapper);
+		bindPageLinks(PAGE.$wrapper);
+	};
+	
+	return StatisticsEventOverviewPage;
+}()));
+/**
+ * @requires Class.StatisticsEventPage.js
+ */
+/**
+ *
+ * @class StatisticsEventPromotionPage
+ * @extends StatisticsEventPage
+ */
+StatisticsEventPromotionPage = extending(StatisticsEventPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs StatisticsEventPromotionPage
+	 * @param {(string|number)} event_id
+	 */
+	function StatisticsEventPromotionPage(event_id) {
+		StatisticsEventPage.apply(this, arguments);
+	}
+	
+	StatisticsEventPromotionPage.prototype.render = function() {};
+	
+	return StatisticsEventPromotionPage;
+}()));
+/**
+ * @requires ../Class.StatisticsPage.js
+ */
+/**
+ * @abstract
+ * @class StatisticsOrganizationPage
+ * @extends StatisticsPage
+ */
+StatisticsOrganizationPage = extending(StatisticsPage, (function() {
+	/**
+	 *
+	 * @param {(string|number)} org_id
+	 * @constructor
+	 * @constructs StatisticsOrganizationPage
+	 */
+	function StatisticsOrganizationPage(org_id) {
+		StatisticsPage.apply(this);
+		this.id = org_id;
+		this.organization = new OneOrganization(this.id);
+		this.with_header_tabs = true;
+	}
+	
+	StatisticsOrganizationPage.prototype.fetchData = function() {
+		return this.fetching_data_defer = this.organization.fetchOrganization([
+			'description',
+			'img_medium_url',
+			'default_address',
+			'staff',
+			'privileges',
+			'events'.appendAjaxData({
+				length: 3,
+				future: true,
+				is_canceled: true,
+				is_delayed: true,
+				fields: [
+					'organization_short_name',
+					'public_at'
+				],
+				order_by: 'nearest_event_date'
+			})
+		]);
+	};
+	
+	StatisticsOrganizationPage.prototype.renderHeaderTabs = function(){
+		__APP.renderHeaderTabs([
+			{title: 'Обзор', page: '/statistics/organization/'+this.id+'/overview'},
+			{title: 'События', page: '/statistics/organization/'+this.id+'/events'}
+		]);
+	};
+	
+	return StatisticsOrganizationPage;
+}()));
+/**
+ * @requires Class.StatisticsOrganizationPage.js
+ */
+/**
+ *
+ * @class StatisticsOrganizationAuditoryPage
+ * @extends StatisticsOrganizationPage
+ */
+StatisticsOrganizationAuditoryPage = extending(StatisticsOrganizationPage, (function() {
+	/**
+	 *
+	 * @param {(string|number)} org_id
+	 * @constructor
+	 * @constructs StatisticsOrganizationAuditoryPage
+	 */
+	function StatisticsOrganizationAuditoryPage(org_id) {
+		StatisticsOrganizationPage.apply(this, arguments);
+	}
+	
+	StatisticsOrganizationAuditoryPage.prototype.render = function() {};
+	
+	return StatisticsOrganizationAuditoryPage;
+}()));
+/**
+ * @requires Class.StatisticsOrganizationPage.js
+ */
+/**
+ *
+ * @class StatisticsOrganizationEventsPage
+ * @extends StatisticsOrganizationPage
+ */
+StatisticsOrganizationEventsPage = extending(StatisticsOrganizationPage, (function() {
+	/**
+	 *
+	 * @param {(string|number)} org_id
+	 * @constructor
+	 * @constructs StatisticsOrganizationAuditoryPage
+	 */
+	function StatisticsOrganizationEventsPage(org_id) {
+		StatisticsOrganizationPage.apply(this, arguments);
+		
+		this.block_scroll = false;
+		this.future_events_data = {
+			future: true,
+			canceled_shown: true
+		};
+		this.past_events_data = {
+			canceled_shown: true,
+			order_by: '-first_event_date'
+		};
+		this.future_events = new EventsWithStatisticsCollection();
+		this.past_events = new EventsWithStatisticsCollection();
+	}
+	
+	StatisticsOrganizationEventsPage.buildEventRows = function(events, date_field) {
+		var $events = tmpl('orgstat-events-row', events.map(function(event) {
+			return $.extend({}, event, {
+				date: moment.unix(event[date_field]).format(__LOCALES.ru_RU.DATE.DATE_FORMAT),
+				timestamp: event[date_field],
+				conversion: Math.round(event.view == 0 ? (event.view_detail * 100 / event).view : 0) + '%'
+			});
+		}));
+		bindPageLinks($events);
+		return $events;
+	};
+	
+	StatisticsOrganizationEventsPage.prototype.fetchData = function() {
+		return this.fetching_data_defer = this.organization.fetchOrganization([]);
+	};
+	
+	StatisticsOrganizationEventsPage.prototype.render = function() {
+		var this_page = this,
+			$window = $(window),
+			$past_events_wrapper,
+			past_events_tablesort;
+		
+		if(__APP.USER.id === -1){
+			__APP.changeState('/feed/actual', true, true);
+			return null;
+		}
+		
+		this.renderHeaderTabs();
+		__APP.changeTitle([{
+			title: 'Организации',
+			page: '/statistics'
+		}, this.organization.short_name + ' - события']);
+		
+		this.$wrapper.html(tmpl('orgstat-events-page'));
+		
+		this.future_events.fetchOrganizationsEvents(this.organization.id, this.future_events_data, 0, function() {
+			if(this.length){
+				this_page.$wrapper.find('.OrgStatFutureEventsWrapper').html(tmpl('orgstat-events-wrapper', {
+					title: 'Предстоящие события',
+					rows: StatisticsOrganizationEventsPage.buildEventRows(this_page.future_events, 'nearest_event_date')
+				})).find('table').tablesort();
+			}
+		});
+		
+		this.past_events.fetchOrganizationsEvents(this.organization.id, this.past_events_data, 30, function() {
+			if(this.length){
+				$past_events_wrapper = this_page.$wrapper.find('.OrgStatPastEventsWrapper');
+				$past_events_wrapper.html(tmpl('orgstat-events-wrapper', {
+					title: 'Прошедшие события',
+					rows: StatisticsOrganizationEventsPage.buildEventRows(this_page.past_events, 'first_event_date')
+				}));
+				past_events_tablesort = $past_events_wrapper.find('table').tablesort();
+				
+				$window.on('scroll.uploadEvents', function() {
+					if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !this_page.block_scroll) {
+						this_page.block_scroll = true;
+						
+						this_page.past_events.fetchOrganizationsEvents(this_page.organization.id, this_page.past_events_data, 30, function(events) {
+							this_page.block_scroll = false;
+							if (events.length) {
+								$past_events_wrapper.find('tbody').append(StatisticsOrganizationEventsPage.buildEventRows(events, 'first_event_date'));
+								past_events_tablesort.refresh();
+							} else {
+								$(window).off('scroll.uploadEvents');
+							}
 						})
 					}
 				})
 			}
-			return series_unit;
 		});
-		
-		if (key == 'conversion' || key == 'open_conversion' || key == 'fave_conversion') {
-			field_data.yAxis = {
-				max: 100,
-				labels: {
-					format: '{value}%'
-				}
-			};
-		}
-		
-		self.$wrapper.find('.' + FIELDS[key].wrapper_class).highcharts('StockChart', $.extend(true, {}, area_chart_options, field_data));
-	});
-};
-/**
- *
- * @param {jQuery} $scoreboards_wrapper
- * @param {object} data
- * @param {object} data.numbers
- * @param {object} [data.dynamics]
- * @param {object} [titles]
- * @param {Array} [order]
- * @param {string} [size="normal"]
- */
-StatisticsPage.prototype.updateScoreboards = function($scoreboards_wrapper, data, titles, order, size) {
-	var with_dynamics = data.dynamics ? true : false;
-	if (!order)
-		order = Object.keys(titles);
+	};
 	
-	order.forEach(function(field) {
-		var scoreboard_type = 'Scoreboard' + field.toCamelCase('_'),
-			$scoreboard = $scoreboards_wrapper.find('.' + scoreboard_type),
-			measure;
-		
-		switch (field) {
-			case 'conversion':
-			case 'open_conversion':
-			case 'fave_conversion': {
-				measure = '%';
-				break;
-			}
-		}
-		
-		if (!$scoreboard.length) {
-			$scoreboard = tmpl(with_dynamics ? 'scoreboard-with-dynamics' : 'scoreboard', {
-				type: scoreboard_type,
-				title: titles[field],
-				size: size ? '-size_' + size : '-size_normal',
-				number: 0 + measure,
-				dynamic_by_week: 0 + measure
-			}, $scoreboards_wrapper)
-		}
-		
-		if (data.numbers[field] !== undefined) {
-			$scoreboard.find('.ScoreboardNumber').animateNumber({
-				number: Math.round(data.numbers[field]),
-				suffix: measure
-			}, 2000, 'easeOutSine');
-		}
-		
-		if (with_dynamics) {
-			if (data.dynamics[field] !== undefined) {
-				$scoreboard
-					.find('.ScoreboardDynamic')
-					.animateNumber({
-						number: Math.round(data.dynamics[field]),
-						prefix: data.dynamics[field] == 0 ? undefined : (data.dynamics[field] > 0 ? '+' : '-'),
-						suffix: measure
-					}, 2000, 'easeOutSine')
-					.siblings('label')
-					.removeClass('fa-caret-up -color_franklin fa-caret-down -color_bubblegum')
-					.addClass(data.dynamics[field] == 0 ? '' : (data.dynamics[field] > 0 ? 'fa-caret-up -color_franklin' : 'fa-caret-down -color_bubblegum'));
-			}
-		}
-	});
-};
+	return StatisticsOrganizationEventsPage;
+}()));
 /**
- * @requires ../Class.StatisticsPage.js
+ * @requires Class.StatisticsOrganizationPage.js
  */
 /**
  *
- * @constructor
- * @abstract
- * @augments StatisticsPage
- * @param {(string|number)} org_id
+ * @class StatisticsOrganizationOverviewPage
+ * @extends StatisticsOrganizationPage
  */
-function StatisticsOrganizationPage(org_id) {
-	StatisticsPage.apply(this);
-	this.id = org_id;
-	this.organization = new OneOrganization(this.id);
-	this.with_header_tabs = true;
-}
-StatisticsOrganizationPage.extend(StatisticsPage);
-
-StatisticsOrganizationPage.prototype.fetchData = function() {
-	return this.fetching_data_defer = this.organization.fetchOrganization([
-		'description',
-		'img_medium_url',
-		'default_address',
-		'staff',
-		'privileges',
-		'events'.appendAjaxData({
+StatisticsOrganizationOverviewPage = extending(StatisticsOrganizationPage, (function() {
+	/**
+	 *
+	 * @param {(string|number)} org_id
+	 * @constructor
+	 * @constructs StatisticsOrganizationOverviewPage
+	 */
+	function StatisticsOrganizationOverviewPage(org_id) {
+		StatisticsOrganizationPage.apply(this, arguments);
+		this.graphics_stats = new OrganizationsStatistics(this.id);
+		this.other_stats = new OrganizationsStatistics(this.id);
+	}
+	/**
+	 *
+	 * @param {string} title
+	 * @param staff
+	 * @return {jQuery}
+	 */
+	StatisticsOrganizationOverviewPage.buildStaffBlock = function(title, staff) {
+		if (staff.length) {
+			return tmpl('orgstat-overview-sidebar-wrapper-title', {title: title}).add(__APP.BUILD.avatarBlocks(staff, {
+				avatar_classes: ['-size_40x40','-rounded'],
+				entity: 'user',
+				is_link: true
+			}));
+		}
+		return $();
+	};
+	
+	StatisticsOrganizationOverviewPage.prototype.fetchData = function() {
+		return this.fetching_data_defer = this.organization.fetchOrganizationWithEvents([
+			'description',
+			'img_medium_url',
+			'default_address',
+			'staff',
+			'privileges'
+		], {
 			length: 3,
-			future: true,
-			is_canceled: true,
-			is_delayed: true,
 			fields: [
 				'organization_short_name',
 				'public_at'
 			],
+			is_delayed: true,
+			filters: 'future=true,is_canceled=false',
 			order_by: 'nearest_event_date'
-		})
-	]);
-};
-
-StatisticsOrganizationPage.prototype.renderHeaderTabs = function(){
-	__APP.renderHeaderTabs([
-		{title: 'Обзор', page: '/statistics/organization/'+this.id+'/overview'},
-		{title: 'События', page: '/statistics/organization/'+this.id+'/events'}
-	]);
-};
-/**
- * @requires Class.StatisticsOrganizationPage.js
- */
-/**
- *
- * @constructor
- * @augments StatisticsOrganizationPage
- * @param {(string|number)} org_id
- */
-function StatisticsOrganizationAuditoryPage(org_id) {
-	StatisticsOrganizationPage.apply(this, arguments);
-}
-StatisticsOrganizationAuditoryPage.extend(StatisticsOrganizationPage);
-
-StatisticsOrganizationAuditoryPage.prototype.render = function() {};
-/**
- * @requires Class.StatisticsOrganizationPage.js
- */
-/**
- *
- * @constructor
- * @augments StatisticsOrganizationPage
- * @param {(string|number)} org_id
- */
-function StatisticsOrganizationEventsPage(org_id) {
-	StatisticsOrganizationPage.apply(this, arguments);
-	
-	this.block_scroll = false;
-	this.future_events_data = {
-		future: true,
-		canceled_shown: true
-	};
-	this.past_events_data = {
-		canceled_shown: true,
-		order_by: '-first_event_date'
-	};
-	this.future_events = new EventsWithStatisticsCollection();
-	this.past_events = new EventsWithStatisticsCollection();
-}
-StatisticsOrganizationEventsPage.extend(StatisticsOrganizationPage);
-
-
-StatisticsOrganizationEventsPage.buildEventRows = function(events, date_field) {
-	var $events = tmpl('orgstat-events-row', events.map(function(event) {
-		return $.extend({}, event, {
-			date: moment.unix(event[date_field]).format(__LOCALES.ru_RU.DATE.DATE_FORMAT),
-			timestamp: event[date_field],
-			conversion: Math.round(event.view == 0 ? (event.view_detail * 100 / event).view : 0) + '%'
 		});
-	}));
-	bindPageLinks($events);
-	return $events;
-};
-
-StatisticsOrganizationEventsPage.prototype.fetchData = function() {
-	return this.fetching_data_defer = this.organization.fetchOrganization([]);
-};
-
-StatisticsOrganizationEventsPage.prototype.render = function() {
-	var this_page = this,
-		$window = $(window),
-		$past_events_wrapper,
-		past_events_tablesort;
-	
-	if(__APP.USER.id === -1){
-		__APP.changeState('/feed/actual', true, true);
-		return null;
-	}
-	
-	this.renderHeaderTabs();
-	__APP.changeTitle([{
-		title: 'Организации',
-		page: '/statistics'
-	}, this.organization.short_name + ' - события']);
-	
-	this.$wrapper.html(tmpl('orgstat-events-page'));
-	
-	this.future_events.fetchOrganizationsEvents(this.organization.id, this.future_events_data, 0, function() {
-		if(this.length){
-			this_page.$wrapper.find('.OrgStatFutureEventsWrapper').html(tmpl('orgstat-events-wrapper', {
-				title: 'Предстоящие события',
-				rows: StatisticsOrganizationEventsPage.buildEventRows(this_page.future_events, 'nearest_event_date')
-			})).find('table').tablesort();
-		}
-	});
-	
-	this.past_events.fetchOrganizationsEvents(this.organization.id, this.past_events_data, 30, function() {
-		if(this.length){
-			$past_events_wrapper = this_page.$wrapper.find('.OrgStatPastEventsWrapper');
-			$past_events_wrapper.html(tmpl('orgstat-events-wrapper', {
-				title: 'Прошедшие события',
-				rows: StatisticsOrganizationEventsPage.buildEventRows(this_page.past_events, 'first_event_date')
-			}));
-			past_events_tablesort = $past_events_wrapper.find('table').tablesort();
-			
-			$window.on('scroll.uploadEvents', function() {
-				if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !this_page.block_scroll) {
-					this_page.block_scroll = true;
-					
-					this_page.past_events.fetchOrganizationsEvents(this_page.organization.id, this_page.past_events_data, 30, function(events) {
-						this_page.block_scroll = false;
-						if (events.length) {
-							$past_events_wrapper.find('tbody').append(StatisticsOrganizationEventsPage.buildEventRows(events, 'first_event_date'));
-							past_events_tablesort.refresh();
-						} else {
-							$(window).off('scroll.uploadEvents');
-						}
-					})
-				}
-			})
-		}
-	});
-};
-/**
- * @requires Class.StatisticsOrganizationPage.js
- */
-/**
- *
- * @constructor
- * @augments StatisticsOrganizationPage
- * @param {(string|number)} org_id
- */
-function StatisticsOrganizationOverviewPage(org_id) {
-	StatisticsOrganizationPage.apply(this, arguments);
-	this.graphics_stats = new OrganizationsStatistics(this.id);
-	this.other_stats = new OrganizationsStatistics(this.id);
-}
-StatisticsOrganizationOverviewPage.extend(StatisticsOrganizationPage);
-/**
- *
- * @param {string} title
- * @param staff
- * @return {jQuery}
- */
-StatisticsOrganizationOverviewPage.buildStaffBlock = function(title, staff) {
-	if (staff.length) {
-		return tmpl('orgstat-staff-block', {
-			title: title,
-			avatars: __APP.BUILD.avatarBlocks(staff, {
-				avatar_classes: ['-size_40x40','-rounded'],
-				entity: 'user',
-				is_link: true
-			})
-		});
-	} else {
-		return tmpl('orgstat-staff-block', {hidden: __C.CLASSES.NEW_HIDDEN});
-	}
-};
-
-StatisticsOrganizationOverviewPage.prototype.fetchData = function() {
-	return this.fetching_data_defer = this.organization.fetchOrganizationWithEvents([
-		'description',
-		'img_medium_url',
-		'default_address',
-		'staff',
-		'privileges'
-	], {
-		length: 3,
-		future: true,
-		is_canceled: true,
-		is_delayed: true,
-		fields: [
-			'organization_short_name',
-			'public_at'
-		],
-		order_by: 'nearest_event_date'
-	});
-};
-
-StatisticsOrganizationOverviewPage.prototype.buildAreaCharts = function() {
-	var self = this;
-	StatisticsPage.prototype.buildAreaCharts.call(self, {
-		subscribe_unsubscribe: self.graphics_stats.subscribe.map(function(el, i) {
-			return {
-				time_value: el.time_value,
-				subscribe: el.value,
-				unsubscribe: self.graphics_stats.unsubscribe[i].value
-			}
-		}),
-		view: self.graphics_stats.view,
-		conversion: self.graphics_stats.conversion
-	});
-};
-
-StatisticsOrganizationOverviewPage.prototype.buildPieChart = function($container, data) {
-	var pie_chart_options = {
-		chart: {
-			type: 'pie',
-			height: 200,
-			style: {
-				fontFamily: 'inherit',
-				fontSize: 'inherit'
-			}
-		},
-		colors: [__C.COLORS.FRANKLIN, __C.COLORS.ACCENT, __C.COLORS.MUTED, __C.COLORS.MUTED_80, __C.COLORS.MUTED_50, __C.COLORS.MUTED_30],
-		tooltip: {
-			pointFormat: '<b>{point.percentage:.1f}%</b>'
-		},
-		plotOptions: {
-			pie: {
-				center: [45, '50%'],
-				allowPointSelect: true,
-				cursor: 'pointer',
-				size: 120,
-				dataLabels: {
-					distance: -35,
-					defer: false,
-					formatter: function() {
-						return this.percentage > 15 ? Math.round(this.percentage) + '%' : null;
-					},
-					style: {"color": "#fff", "fontSize": "20px", "fontWeight": "300", "textShadow": "none"},
-					y: -6
-				},
-				showInLegend: true
-			}
-		},
-		legend: {
-			align: 'right',
-			verticalAlign: 'top',
-			layout: 'vertical',
-			width: 100,
-			symbolHeight: 0,
-			symbolWidth: 0,
-			itemMarginBottom: 5,
-			labelFormatter: function() {
-				return '<span style="color: ' + this.color + '">' + this.name + '</span>'
-			},
-			itemStyle: {cursor: 'pointer', fontSize: '14px', fontWeight: '500'},
-			y: 12
-		}
 	};
 	
-	function pieChartSeriesNormalize(raw_data) {
-		var STD_NAMES = {
-			"browser": "Браузер",
-			"android": "Аndroid",
-			"ios": "iOS",
-			"female": "Женщины",
-			"male": "Мужчины",
-			"other": "Остальные",
-			null: "Не указано"
-		};
-		return [{
-			data: raw_data.map(function(line, i) {
+	StatisticsOrganizationOverviewPage.prototype.buildAreaCharts = function() {
+		var self = this;
+		StatisticsPage.prototype.buildAreaCharts.call(self, {
+			subscribe_unsubscribe: self.graphics_stats.subscribe.map(function(el, i) {
 				return {
-					name: line.name ? STD_NAMES[line.name] : STD_NAMES[line.gender],
-					y: line.count
+					time_value: el.time_value,
+					subscribe: el.value,
+					unsubscribe: self.graphics_stats.unsubscribe[i].value
 				}
-			})
-		}];
-	}
-	
-	$container.highcharts($.extend(true, {}, this.highchart_defaults, pie_chart_options, {series: pieChartSeriesNormalize(data)}));
-};
-
-StatisticsOrganizationOverviewPage.prototype.render = function() {
-	var PAGE = this,
-		stat_dynamics = {
-			scale: Statistics.SCALES.WEEK,
-			fields: [
-				'subscribe',
-				'view',
-				'fave',
-				'conversion'
-			]
-		},
-		staffs_additional_fields = {
-			is_link: true,
-			avatar_classes: ['-size_40x40', '-rounded']
-		},
-		storage_data_name = 'org_stats_' + this.id + '_data',
-		storage_until_name = 'org_stats_' + this.id + '_until',
-		is_cached_data_actual = moment.unix(window.sessionStorage.getItem(storage_until_name)).isAfter(moment());
-	
-	if(__APP.USER.id === -1){
-		__APP.changeState('/feed/actual', true, true);
-		return null;
-	}
-	
-	if (!window.location.pathname.contains('overview')) {
-		__APP.changeState(window.location.pathname+'/overview', true);
-	}
-	this.renderHeaderTabs();
-	__APP.changeTitle([{
-		title: 'Организации',
-		page: '/statistics'
-	}, this.organization.short_name]);
-	
-	this.$wrapper.html(tmpl('orgstat-overview', $.extend(true, {}, this.organization, {
-		avatar_block: __APP.BUILD.avatarBlocks(this.organization, {
-			entity: 'organization',
-			block_classes: ['-stack']
-		}),
-		staff_block: StatisticsOrganizationOverviewPage.buildStaffBlock('Администраторы', this.organization.staff.getSpecificStaff(OneUser.ROLE.ADMIN, staffs_additional_fields))
-			.add(StatisticsOrganizationOverviewPage.buildStaffBlock('Модераторы', this.organization.staff.getSpecificStaff(OneUser.ROLE.MODERATOR, staffs_additional_fields))),
-		event_blocks: tmpl('orgstat-event-block', this.organization.events.map(function(event) {
-			var badges = [];
-			if (event.canceled)
-				badges.push({title: 'Отменено'});
-			if (event.public_at && moment.unix(event.public_at).isBefore())
-				badges.push({title: 'Не опубликовано'});
-			
-			return {
-				id: event.id,
-				title: event.title,
-				organization_short_name: event.organization_short_name,
-				day: moment.unix(event.first_event_date).format("D"),
-				month: moment.unix(event.first_event_date).format("MMM"),
-				badges: tmpl('orgstat-event-block-badge', badges)
-			};
-		}))
-	})));
-	
-	if (is_cached_data_actual) {
-		this.graphics_stats.setData(JSON.parse(window.sessionStorage.getItem(storage_data_name)));
-		this.buildAreaCharts();
-	} else {
-		this.$wrapper.find('.OrgStatAreaCharts').children('.AreaChart').append(tmpl('loader'));
-		this.graphics_stats.fetchStatistics(Statistics.SCALES.DAY, moment(__APP.EVENDATE_BEGIN, 'DD-MM-YYYY').format(), ['view', 'subscribe', 'unsubscribe', 'conversion'], null, function() {
-			window.sessionStorage.setItem(storage_data_name, JSON.stringify(PAGE.graphics_stats));
-			window.sessionStorage.setItem(storage_until_name, moment().add(15, 'm').unix());
-			PAGE.buildAreaCharts();
+			}),
+			view: self.graphics_stats.view,
+			conversion: self.graphics_stats.conversion
 		});
-	}
+	};
 	
-	this.other_stats.fetchStatistics(Statistics.SCALES.OVERALL, false, ['subscribe', 'view', 'fave', 'conversion', 'audience'], stat_dynamics, function(stat_data) {
-		var scoreboards_data = {numbers: {}, dynamics: {}};
-		
-		$.each(stat_data.dynamics, function(field, dynamics) {
-			scoreboards_data.dynamics[field] = dynamics[0].value;
-			scoreboards_data.numbers[field] = stat_data[field][0].value;
-		});
-		PAGE.buildPieChart(PAGE.$wrapper.find('.GenderPieChart'), this.audience.gender);
-		PAGE.buildPieChart(PAGE.$wrapper.find('.DevicePieChart'), this.audience.devices);
-		
-		PAGE.updateScoreboards(PAGE.$wrapper.find('.Scoreboards'), scoreboards_data, {
-			'subscribe': 'Подписчиков организатора',
-			'fave': 'Добавлений в избранное',
-			'view': 'Просмотров организатора',
-			'conversion': 'Конверсия открытий/подписок'
-		}, ['subscribe', 'fave', 'view', 'conversion']);
-		
-	});
-	
-	bindRippleEffect(this.$wrapper);
-	bindPageLinks(this.$wrapper);
-};
-/**
- * @requires Class.StatisticsOrganizationPage.js
- */
-/**
- *
- * @constructor
- * @augments StatisticsOrganizationPage
- * @param {(string|number)} org_id
- */
-function StatisticsOrganizationPromotionPage(org_id) {
-	StatisticsOrganizationPage.apply(this, arguments);
-}
-StatisticsOrganizationPromotionPage.extend(StatisticsOrganizationPage);
-
-StatisticsOrganizationPromotionPage.prototype.render = function() {};
-/**
- * @requires Class.StatisticsOrganizationPage.js
- */
-/**
- *
- * @constructor
- * @augments StatisticsOrganizationPage
- * @param {(string|number)} org_id
- */
-function StatisticsOrganizationSettingsPage(org_id) {
-	StatisticsOrganizationPage.apply(this, arguments);
-}
-StatisticsOrganizationSettingsPage.extend(StatisticsOrganizationPage);
-
-StatisticsOrganizationSettingsPage.prototype.render = function() {};
-/**
- * @requires Class.StatisticsOrganizationPage.js
- */
-/**
- *
- * @constructor
- * @augments StatisticsOrganizationPage
- * @param {(string|number)} org_id
- */
-function StatisticsOrganizationSupportPage(org_id) {
-	StatisticsOrganizationPage.apply(this, arguments);
-}
-StatisticsOrganizationSupportPage.extend(StatisticsOrganizationPage);
-
-StatisticsOrganizationSupportPage.prototype.render = function() {};
-/**
- * @requires ../Class.StatisticsPage.js
- */
-/**
- *
- * @constructor
- * @augments StatisticsPage
- * @param {(string|number)} event_id
- */
-function StatisticsEventPage(event_id) {
-	StatisticsPage.apply(this, arguments);
-	this.id = event_id;
-	this.event = new OneEvent(this.id);
-}
-StatisticsEventPage.extend(StatisticsPage);
-/**
- * @requires Class.StatisticsEventPage.js
- */
-/**
- *
- * @constructor
- * @augments StatisticsEventPage
- * @param {(string|number)} event_id
- */
-function StatisticsEventAuditoryPage(event_id) {
-	StatisticsEventPage.apply(this, arguments);
-}
-StatisticsEventAuditoryPage.extend(StatisticsEventPage);
-
-StatisticsEventAuditoryPage.prototype.render = function() {};
-/**
- * @requires Class.StatisticsEventPage.js
- */
-/**
- *
- * @constructor
- * @augments StatisticsEventPage
- * @param {(string|number)} event_id
- */
-function StatisticsEventEditPage(event_id) {
-	StatisticsEventPage.apply(this, arguments);
-}
-StatisticsEventEditPage.extend(StatisticsEventPage);
-
-StatisticsEventEditPage.prototype.render = function() {};
-/**
- * @requires Class.StatisticsEventPage.js
- */
-/**
- *
- * @constructor
- * @augments StatisticsEventPage
- * @param {(string|number)} event_id
- */
-function StatisticsEventOverviewPage(event_id) {
-	StatisticsEventPage.apply(this, arguments);
-	
-	this.graphics_stats = new EventStatistics(this.id);
-	this.scoreboards_stats = new EventStatistics(this.id);
-}
-StatisticsEventOverviewPage.extend(StatisticsEventPage);
-
-StatisticsEventOverviewPage.prototype.fetchData = function() {
-	return this.fetching_data_defer = this.event.fetchEvent([
-		'image_horizontal_medium_url',
-		'organization_short_name',
-		'favored_users_count',
-		'is_same_time',
-		'dates'
-	]);
-};
-
-StatisticsEventOverviewPage.prototype.render = function() {
-	var PAGE = this;
-	
-	if(__APP.USER.id === -1){
-		__APP.changeState('/feed/actual', true, true);
-		return null;
-	}
-	__APP.changeTitle([{
-		title: 'Организации',
-		page: '/statistics'
-	}, {
-		title: this.event.organization_short_name,
-		page: '/statistics/organization/' + this.event.organization_id
-	}, this.event.title]);
-	
-	this.$wrapper.html(tmpl('eventstat-overview', $.extend(true, {}, this.event, {
-		dates_block: tmpl('eventstat-overview-datetime', {
-			date: displayDateRange(this.event.first_event_date, this.event.last_event_date),
-			time: this.event.is_same_time ? displayTimeRange(this.event.dates[0].start_time, this.event.dates[0].end_time) : 'Разное время'
-		})
-	})));
-	this.$wrapper.find('.EventStatAreaCharts').children('.AreaChart').html(tmpl('loader'));
-	
-	this.scoreboards_stats.fetchStatistics(Statistics.SCALES.OVERALL, false, ['notifications_sent', 'view', 'fave', 'view_detail', 'fave_conversion', 'open_conversion'], null, function(data) {
-		var scoreboards_data = {numbers: {}};
-		$.each(data, function(field, stats) {
-			scoreboards_data.numbers[field] = stats[0].value
-		});
-		PAGE.updateScoreboards(PAGE.$wrapper.find('.EventstatsScoreboards'), scoreboards_data, {
-			'fave': 'Добавлений в избранное',
-			'view': 'Просмотров события'
-		}, ['fave', 'view']);
-		PAGE.updateScoreboards(PAGE.$wrapper.find('.EventstatsBigScoreboards'), scoreboards_data, {
-			'notifications_sent': 'Уведомлений отправлено',
-			'view': 'Просмотров',
-			'view_detail': 'Открытий',
-			'open_conversion': 'Конверсия открытий',
-			'fave': 'Добавлений',
-			'fave_conversion': 'Конверсия добавлений'
-		}, ['notifications_sent', 'view', 'view_detail', 'open_conversion', 'fave', 'fave_conversion'], 'big');
-	});
-	
-	this.graphics_stats.fetchStatistics(Statistics.SCALES.DAY, moment(__APP.EVENDATE_BEGIN, 'DD-MM-YYYY').format(), ['notifications_sent', 'view', 'fave', 'view_detail', 'fave_conversion', 'open_conversion'], null, function(data) {
-		PAGE.buildAreaCharts(data, {
-			rangeSelector: {
-				selected: 1
+	StatisticsOrganizationOverviewPage.prototype.buildPieChart = function($container, data) {
+		var pie_chart_options = {
+			chart: {
+				type: 'pie',
+				height: 200,
+				style: {
+					fontFamily: 'inherit',
+					fontSize: 'inherit'
+				}
+			},
+			colors: [__C.COLORS.FRANKLIN, __C.COLORS.ACCENT, __C.COLORS.MUTED, __C.COLORS.MUTED_80, __C.COLORS.MUTED_50, __C.COLORS.MUTED_30],
+			tooltip: {
+				pointFormat: '<b>{point.percentage:.1f}%</b>'
+			},
+			plotOptions: {
+				pie: {
+					center: [45, '50%'],
+					allowPointSelect: true,
+					cursor: 'pointer',
+					size: 120,
+					dataLabels: {
+						distance: -35,
+						defer: false,
+						formatter: function() {
+							return this.percentage > 15 ? Math.round(this.percentage) + '%' : null;
+						},
+						style: {"color": "#fff", "fontSize": "20px", "fontWeight": "300", "textShadow": "none"},
+						y: -6
+					},
+					showInLegend: true
+				}
+			},
+			legend: {
+				align: 'right',
+				verticalAlign: 'top',
+				layout: 'vertical',
+				width: 100,
+				symbolHeight: 0,
+				symbolWidth: 0,
+				itemMarginBottom: 5,
+				labelFormatter: function() {
+					return '<span style="color: ' + this.color + '">' + this.name + '</span>'
+				},
+				itemStyle: {cursor: 'pointer', fontSize: '14px', fontWeight: '500'},
+				y: 12
 			}
-		});
-	});
+		};
+		
+		function pieChartSeriesNormalize(raw_data) {
+			var STD_NAMES = {
+				"browser": "Браузер",
+				"android": "Аndroid",
+				"ios": "iOS",
+				"female": "Женщины",
+				"male": "Мужчины",
+				"other": "Остальные",
+				null: "Не указано"
+			};
+			return [{
+				data: raw_data.map(function(line, i) {
+					return {
+						name: line.name ? STD_NAMES[line.name] : STD_NAMES[line.gender],
+						y: line.count
+					}
+				})
+			}];
+		}
+		
+		$container.highcharts($.extend(true, {}, this.highchart_defaults, pie_chart_options, {series: pieChartSeriesNormalize(data)}));
+	};
 	
-	__APP.MODALS.bindCallModal(PAGE.$wrapper);
-	bindPageLinks(PAGE.$wrapper);
-};
+	StatisticsOrganizationOverviewPage.prototype.render = function() {
+		var PAGE = this,
+			stat_dynamics = {
+				scale: Statistics.SCALES.WEEK,
+				fields: [
+					'subscribe',
+					'view',
+					'fave',
+					'conversion'
+				]
+			},
+			staffs_additional_fields = {
+				is_link: true,
+				avatar_classes: ['-size_40x40', '-rounded']
+			},
+			storage_data_name = 'org_stats_' + this.id + '_data',
+			storage_until_name = 'org_stats_' + this.id + '_until',
+			is_cached_data_actual = moment.unix(window.sessionStorage.getItem(storage_until_name)).isAfter(moment());
+		
+		if(__APP.USER.id === -1){
+			__APP.changeState('/feed/actual', true, true);
+			return null;
+		}
+		
+		if (!window.location.pathname.contains('overview')) {
+			__APP.changeState(window.location.pathname+'/overview', true);
+		}
+		this.renderHeaderTabs();
+		__APP.changeTitle([{
+			title: 'Организации',
+			page: '/statistics'
+		}, this.organization.short_name]);
+		
+		this.$wrapper.html(tmpl('orgstat-overview', $.extend(true, {}, this.organization, {
+			avatar_block: __APP.BUILD.avatarBlocks(this.organization, {
+				entity: 'organization',
+				block_classes: ['-stack']
+			}),
+			staff_block: StatisticsOrganizationOverviewPage.buildStaffBlock('Администраторы', this.organization.staff.getSpecificStaff(OneUser.ROLE.ADMIN, staffs_additional_fields))
+				.add(StatisticsOrganizationOverviewPage.buildStaffBlock('Модераторы', this.organization.staff.getSpecificStaff(OneUser.ROLE.MODERATOR, staffs_additional_fields))),
+			event_blocks: this.organization.events.length ? tmpl('orgstat-overview-sidebar-wrapper', {
+				content: tmpl('orgstat-overview-sidebar-wrapper-title', {title: 'Предстоящие события'})
+					.add(tmpl('orgstat-event-block', this.organization.events.map(function(event) {
+						var badges = [];
+						if (event.canceled)
+							badges.push({title: 'Отменено'});
+						if (event.public_at && moment.unix(event.public_at).isBefore())
+							badges.push({title: 'Не опубликовано'});
+						
+						return {
+							id: event.id,
+							title: event.title,
+							organization_short_name: event.organization_short_name,
+							day: moment.unix(event.first_event_date).format("D"),
+							month: moment.unix(event.first_event_date).format("MMM"),
+							badges: tmpl('orgstat-event-block-badge', badges)
+						};
+					})))
+			}) : ''
+		})));
+		
+		if (is_cached_data_actual) {
+			this.graphics_stats.setData(JSON.parse(window.sessionStorage.getItem(storage_data_name)));
+			this.buildAreaCharts();
+		} else {
+			this.$wrapper.find('.OrgStatAreaCharts').children('.AreaChart').append(tmpl('loader'));
+			this.graphics_stats.fetchStatistics(Statistics.SCALES.DAY, moment(__APP.EVENDATE_BEGIN, 'DD-MM-YYYY').format(), ['view', 'subscribe', 'unsubscribe', 'conversion'], null, function() {
+				window.sessionStorage.setItem(storage_data_name, JSON.stringify(PAGE.graphics_stats));
+				window.sessionStorage.setItem(storage_until_name, moment().add(15, 'm').unix());
+				PAGE.buildAreaCharts();
+			});
+		}
+		
+		this.other_stats.fetchStatistics(Statistics.SCALES.OVERALL, false, ['subscribe', 'view', 'fave', 'conversion', 'audience'], stat_dynamics, function(stat_data) {
+			var scoreboards_data = {numbers: {}, dynamics: {}};
+			
+			$.each(stat_data.dynamics, function(field, dynamics) {
+				scoreboards_data.dynamics[field] = dynamics[0].value;
+				scoreboards_data.numbers[field] = stat_data[field][0].value;
+			});
+			PAGE.buildPieChart(PAGE.$wrapper.find('.GenderPieChart'), this.audience.gender);
+			PAGE.buildPieChart(PAGE.$wrapper.find('.DevicePieChart'), this.audience.devices);
+			
+			PAGE.updateScoreboards(PAGE.$wrapper.find('.Scoreboards'), scoreboards_data, {
+				'subscribe': 'Подписчиков организатора',
+				'fave': 'Добавлений в избранное',
+				'view': 'Просмотров организатора',
+				'conversion': 'Конверсия открытий/подписок'
+			}, ['subscribe', 'fave', 'view', 'conversion']);
+			
+		});
+		
+		bindRippleEffect(this.$wrapper);
+		bindPageLinks(this.$wrapper);
+	};
+	
+	return StatisticsOrganizationOverviewPage;
+}()));
 /**
- * @requires Class.StatisticsEventPage.js
+ * @requires Class.StatisticsOrganizationPage.js
  */
 /**
  *
- * @constructor
- * @augments StatisticsEventPage
- * @param {(string|number)} event_id
+ * @class StatisticsOrganizationPromotionPage
+ * @extends StatisticsOrganizationPage
  */
-function StatisticsEventPromotionPage(event_id) {
-	StatisticsEventPage.apply(this, arguments);
-}
-StatisticsEventPromotionPage.extend(StatisticsEventPage);
-
-StatisticsEventPromotionPage.prototype.render = function() {};
+StatisticsOrganizationPromotionPage = extending(StatisticsOrganizationPage, (function() {
+	/**
+	 *
+	 * @param {(string|number)} org_id
+	 * @constructor
+	 * @constructs StatisticsOrganizationPromotionPage
+	 */
+	function StatisticsOrganizationPromotionPage(org_id) {
+		StatisticsOrganizationPage.apply(this, arguments);
+	}
+	
+	StatisticsOrganizationPromotionPage.prototype.render = function() {};
+	
+	return StatisticsOrganizationPromotionPage;
+}()));
+/**
+ * @requires Class.StatisticsOrganizationPage.js
+ */
+/**
+ *
+ * @class StatisticsOrganizationSettingsPage
+ * @extends StatisticsOrganizationPage
+ */
+StatisticsOrganizationSettingsPage = extending(StatisticsOrganizationPage, (function() {
+	/**
+	 *
+	 * @param {(string|number)} org_id
+	 * @constructor
+	 * @constructs StatisticsOrganizationSettingsPage
+	 */
+	function StatisticsOrganizationSettingsPage(org_id) {
+		StatisticsOrganizationPage.apply(this, arguments);
+	}
+	
+	StatisticsOrganizationSettingsPage.prototype.render = function() {};
+	
+	return StatisticsOrganizationSettingsPage;
+}()));
+/**
+ * @requires Class.StatisticsOrganizationPage.js
+ */
+/**
+ *
+ * @class StatisticsOrganizationSupportPage
+ * @extends StatisticsOrganizationPage
+ */
+StatisticsOrganizationSupportPage = extending(StatisticsOrganizationPage, (function() {
+	/**
+	 *
+	 * @param {(string|number)} org_id
+	 * @constructor
+	 * @constructs StatisticsOrganizationSupportPage
+	 */
+	function StatisticsOrganizationSupportPage(org_id) {
+		StatisticsOrganizationPage.apply(this, arguments);
+	}
+	
+	StatisticsOrganizationSupportPage.prototype.render = function() {};
+	
+	return StatisticsOrganizationSupportPage;
+}()));
 /**
  * @requires ../Class.Page.js
  */
 /**
  *
- * @constructor
- * @augments Page
- * @param {(string|number)} [event_id]
+ * @class RedactEventPage
+ * @extends Page
  */
-function RedactEventPage(event_id) {
-	Page.apply(this);
-	this.page_title = 'Редактирование события';
-	this.event = new OneEvent(event_id);
-	this.state_name = 'edit_event';
-}
-RedactEventPage.extend(Page);
-
-
-RedactEventPage.lastRegistrationCustomFieldId = 0;
-
-/**
- *
- * @param {RegistrationFieldModel|Array<RegistrationFieldModel>|RegistrationFieldsCollection} [registration_data]
- * @return {jQuery}
- */
-RedactEventPage.buildRegistrationCustomField = function(registration_data) {
-	registration_data = registration_data ? (registration_data instanceof Array ? registration_data : [registration_data]) : [{}];
-	var $fields;
-	
-	$fields = tmpl('edit-event-registration-custom-field', registration_data.filter(function(data) {
-		if (RegistrationFieldModel.isCustomField(data)) {
-			data.id = data.id ? data.id : RedactEventPage.lastRegistrationCustomFieldId++;
-			return true;
-		}
-		return false;
-	}));
-	registration_data.forEach(function(data) {
-		if (data.required) {
-			$fields.find('#edit_event_registration_'+data.id+'_custom_field_required').prop('checked', true);
-		}
-		if (data.type) {
-			$fields.find('#edit_event_registration_'+data.id+'_custom_field_'+data.type+'_type').prop('checked', true);
-		}
-	});
-	$fields.find('.RemoveRegistrationCustomField').on('click.RemoveRegistrationCustomField', function() {
-		$(this).closest('.RegistrationCustomField').remove();
-	});
-	
-	return $fields;
-};
-
-RedactEventPage.prototype.fetchData = function() {
-	if(this.event.id){
-		return this.fetching_data_defer = this.event.fetchEvent(EventPage.fields);
+RedactEventPage = extending(Page, (function() {
+	/**
+	 *
+	 * @param {(string|number)} [event_id]
+	 * @constructor
+	 * @constructs RedactEventPage
+	 */
+	function RedactEventPage(event_id) {
+		Page.apply(this);
+		this.page_title = 'Редактирование события';
+		this.event = new OneEvent(event_id);
+		this.state_name = 'edit_event';
 	}
-	return Page.prototype.fetchData.call(this);
-};
-
-RedactEventPage.prototype.init = function() {
-	var PAGE = this,
-		$main_tabs = PAGE.$wrapper.find('.EditEventPageTabs'),
-		$bottom_nav_buttons = PAGE.$wrapper.find('.edit_event_buttons').children(),
-		$next_page_button = $bottom_nav_buttons.filter('#edit_event_next_page'),
-		$prev_page_button = $bottom_nav_buttons.filter('#edit_event_prev_page'),
-		$submit_button = $bottom_nav_buttons.filter('#edit_event_submit');
+	
+	
+	RedactEventPage.lastRegistrationCustomFieldId = 0;
 	
 	/**
 	 *
-	 * @param {jQuery} $input
+	 * @param {RegistrationFieldModel|Array<RegistrationFieldModel>|RegistrationFieldsCollection} [registration_data]
+	 * @return {jQuery}
 	 */
-	function convertToNumericInput($input) {
-		if($input.is('input')) {
-			$input.inputmask({
-				alias: 'numeric',
-				autoGroup: false,
-				digits: 2,
-				digitsOptional: true,
-				allowPlus: false,
-				allowMinus: false,
-				rightAlign: false
-			});
-		} else {
-			$input = $input.find('input');
-			if($input.length) {
-				convertToNumericInput($input);
+	RedactEventPage.buildRegistrationCustomField = function(registration_data) {
+		registration_data = registration_data ? (registration_data instanceof Array ? registration_data : [registration_data]) : [{}];
+		var $fields;
+		
+		$fields = tmpl('edit-event-registration-custom-field', registration_data.filter(function(data) {
+			if (RegistrationFieldModel.isCustomField(data)) {
+				data.id = data.id ? data.id : RedactEventPage.lastRegistrationCustomFieldId++;
+				return true;
 			}
-		}
-	}
+			return false;
+		}));
+		registration_data.forEach(function(data) {
+			if (data.required) {
+				$fields.find('#edit_event_registration_'+data.id+'_custom_field_required').prop('checked', true);
+			}
+			if (data.type) {
+				$fields.find('#edit_event_registration_'+data.id+'_custom_field_'+data.type+'_type').prop('checked', true);
+			}
+		});
+		$fields.find('.RemoveRegistrationCustomField').on('click.RemoveRegistrationCustomField', function() {
+			$(this).closest('.RegistrationCustomField').remove();
+		});
+		$fields.find('.RegistrationCustomFieldLabel, .RegistrationCustomFieldType').on('change.RemoveRegistrationFieldUUID', function() {
+			$(this).closest('.RegistrationCustomField').find('.RegistrationCustomFieldUUID').val('');
+		});
+		
+		return $fields;
+	};
 	
-	bindDatePickers(PAGE.$wrapper);
-	bindTimeInput(PAGE.$wrapper);
-	bindSelect2(PAGE.$wrapper);
-	bindTabs(PAGE.$wrapper);
-	bindControlSwitch(PAGE.$wrapper);
-	__APP.MODALS.bindCallModal(PAGE.$wrapper);
-	bindLimitInputSize(PAGE.$wrapper);
-	bindRippleEffect(PAGE.$wrapper);
-	bindFileLoadButton(PAGE.$wrapper);
-	ImgLoader.init(PAGE.$wrapper);
-	(function initEditEventMainCalendar() {
-		//TODO: Refactor this!! Make it more readable
-		var $selected_days_text = PAGE.$wrapper.find('.EventSelectedDaysText'),
-			$selected_days_table_rows = PAGE.$wrapper.find('.SelectedDaysRows'),
-			MainCalendar = new Calendar('.EventDatesCalendar', {
-				weekday_selection: true,
-				month_selection: true,
-				min_date: moment().format(__C.DATE_FORMAT)
-			}),
-			AddRowDatePicker = PAGE.$wrapper.find('.AddDayToTable').data('datepicker'),
-			dates = {},
-			genitive_month_names = {
-				'январь': 'января',
-				'февраль': 'февраля',
-				'март': 'марта',
-				'апрель': 'апреля',
-				'май': 'мая',
-				'июнь': 'июня',
-				'июль': 'июля',
-				'август': 'августа',
-				'сентябрь': 'сентября',
-				'октябрь': 'октября',
-				'ноябрь': 'ноября',
-				'декабрь': 'декабря'
-			},
-			$fucking_table = $();
-		MainCalendar.init();
-		
-		function bindRemoveRow($parent) {
-			$parent.find('.RemoveRow').not('.-Handled_RemoveRow').each(function(i, elem) {
-				$(elem).on('click', function() {
-					MainCalendar.deselectDays($(this).closest('tr').data('date'));
-				}).addClass('-Handled_RemoveRow');
-			});
+	RedactEventPage.prototype.fetchData = function() {
+		if(this.event.id){
+			return this.fetching_data_defer = this.event.fetchEvent(EventPage.fields);
 		}
+		return Page.prototype.fetchData.call(this);
+	};
+	
+	RedactEventPage.prototype.init = function() {
+		var PAGE = this,
+			$main_tabs = PAGE.$wrapper.find('.EditEventPageTabs'),
+			$bottom_nav_buttons = PAGE.$wrapper.find('.edit_event_buttons').children(),
+			$next_page_button = $bottom_nav_buttons.filter('#edit_event_next_page'),
+			$prev_page_button = $bottom_nav_buttons.filter('#edit_event_prev_page'),
+			$submit_button = $bottom_nav_buttons.filter('#edit_event_submit');
 		
-		function displayFormattedText() {
-			dates = {};
-			MainCalendar.selected_days.forEach(function(date, i, days) {
-				var _date = moment(date);
-				
-				if (typeof dates[_date.month()] === 'undefined') {
-					dates[_date.month()] = {};
-					dates[_date.month()].selected_days = [];
-					dates[_date.month()].month_name = genitive_month_names[_date.format('MMMM')];
-				}
-				dates[_date.month()].selected_days.push(_date.date());
-			});
-			
-			$selected_days_text.empty().removeClass('hidden');
-			if (Object.keys(dates).length) {
-				$.each(dates, function(i, elem) {
-					$selected_days_text.append($('<p>').text(elem.selected_days.join(', ') + ' ' + elem.month_name))
+		/**
+		 *
+		 * @param {jQuery} $input
+		 */
+		function convertToNumericInput($input) {
+			if($input.is('input')) {
+				$input.inputmask({
+					alias: 'numeric',
+					autoGroup: false,
+					digits: 2,
+					digitsOptional: true,
+					allowPlus: false,
+					allowMinus: false,
+					rightAlign: false
 				});
 			} else {
-				$selected_days_text.html('<p>Даты не выбраны</p>');
+				$input = $input.find('input');
+				if($input.length) {
+					convertToNumericInput($input);
+				}
 			}
 		}
 		
-		function doTheFuckingSort($rows, $parent) {
-			$rows.sort(function(a, b) {
-				var an = $(a).data('date'),
-					bn = $(b).data('date');
-				
-				if (an > bn) return 1;
-				else if (an < bn) return -1;
-				else return 0;
-			});
-			$rows.detach().appendTo($parent);
-		}
-		
-		function buildTable(selected_days) {
-			//TODO: BUG. On multiple selection (month or weekday) duplicates appearing in table.
-			//TODO: Bind time on building table
-			var $output = $(),
-				today = moment().format(__C.DATE_FORMAT);
-			if (Array.isArray(selected_days)) {
-				selected_days.forEach(function(day) {
-					$output = $output.add(tmpl('selected-table-day', {
-						date: day,
-						formatted_date: day.split('-').reverse().join('.'),
-						today: today
-					}));
-				});
-			}
-			else {
-				$output = tmpl('selected-table-day', {
-					date: selected_days,
-					formatted_date: selected_days.split('-').reverse().join('.'),
-					today: today
-				});
-			}
-			bindDatePickers($output);
-			bindTimeInput($output);
-			bindRemoveRow($output);
+		bindDatePickers(PAGE.$wrapper);
+		bindTimeInput(PAGE.$wrapper);
+		bindSelect2(PAGE.$wrapper);
+		bindTabs(PAGE.$wrapper);
+		bindControlSwitch(PAGE.$wrapper);
+		__APP.MODALS.bindCallModal(PAGE.$wrapper);
+		bindLimitInputSize(PAGE.$wrapper);
+		bindRippleEffect(PAGE.$wrapper);
+		bindFileLoadButton(PAGE.$wrapper);
+		ImgLoader.init(PAGE.$wrapper);
+		(function initEditEventMainCalendar() {
+			//TODO: Refactor this!! Make it more readable
+			var $selected_days_text = PAGE.$wrapper.find('.EventSelectedDaysText'),
+				$selected_days_table_rows = PAGE.$wrapper.find('.SelectedDaysRows'),
+				MainCalendar = new Calendar('.EventDatesCalendar', {
+					weekday_selection: true,
+					month_selection: true,
+					min_date: moment().format(__C.DATE_FORMAT)
+				}),
+				AddRowDatePicker = PAGE.$wrapper.find('.AddDayToTable').data('datepicker'),
+				dates = {},
+				genitive_month_names = {
+					'январь': 'января',
+					'февраль': 'февраля',
+					'март': 'марта',
+					'апрель': 'апреля',
+					'май': 'мая',
+					'июнь': 'июня',
+					'июль': 'июля',
+					'август': 'августа',
+					'сентябрь': 'сентября',
+					'октябрь': 'октября',
+					'ноябрь': 'ноября',
+					'декабрь': 'декабря'
+				},
+				$fucking_table = $();
+			MainCalendar.init();
 			
-			$fucking_table = $fucking_table.add($output);
-			$output.find('.DatePicker').each(function() {
-				var DP = $(this).data('datepicker');
-				DP.$datepicker.on('date-picked', function() {
-					MainCalendar.deselectDays(DP.prev_selected_day).selectDays(DP.selected_day);
-					doTheFuckingSort($fucking_table, $selected_days_table_rows)
+			function bindRemoveRow($parent) {
+				$parent.find('.RemoveRow').not('.-Handled_RemoveRow').each(function(i, elem) {
+					$(elem).on('click', function() {
+						MainCalendar.deselectDays($(this).closest('tr').data('date'));
+					}).addClass('-Handled_RemoveRow');
 				});
-			});
-			doTheFuckingSort($fucking_table, $selected_days_table_rows);
-		}
-		
-		function BuildSelectedDaysTable() {
-			if (MainCalendar.last_action === 'select') {
-				buildTable(MainCalendar.last_selected_days);
 			}
-			else if (MainCalendar.last_action === 'deselect') {
-				if (Array.isArray(MainCalendar.last_selected_days)) {
-					var classes = [];
-					MainCalendar.last_selected_days.forEach(function(day) {
-						classes.push('.TableDay_' + day);
+			
+			function displayFormattedText() {
+				dates = {};
+				MainCalendar.selected_days.forEach(function(date, i, days) {
+					var _date = moment(date);
+					
+					if (typeof dates[_date.month()] === 'undefined') {
+						dates[_date.month()] = {};
+						dates[_date.month()].selected_days = [];
+						dates[_date.month()].month_name = genitive_month_names[_date.format('MMMM')];
+					}
+					dates[_date.month()].selected_days.push(_date.date());
+				});
+				
+				$selected_days_text.empty().removeClass('hidden');
+				if (Object.keys(dates).length) {
+					$.each(dates, function(i, elem) {
+						$selected_days_text.append($('<p>').text(elem.selected_days.join(', ') + ' ' + elem.month_name))
 					});
-					$fucking_table.remove(classes.join(', '));
-					$fucking_table = $fucking_table.not(classes.join(', '));
+				} else {
+					$selected_days_text.html('<p>Даты не выбраны</p>');
+				}
+			}
+			
+			function doTheFuckingSort($rows, $parent) {
+				$rows.sort(function(a, b) {
+					var an = $(a).data('date'),
+						bn = $(b).data('date');
+					
+					if (an > bn) return 1;
+					else if (an < bn) return -1;
+					else return 0;
+				});
+				$rows.detach().appendTo($parent);
+			}
+			
+			function buildTable(selected_days) {
+				//TODO: BUG. On multiple selection (month or weekday) duplicates appearing in table.
+				//TODO: Bind time on building table
+				var $output = $(),
+					today = moment().format(__C.DATE_FORMAT);
+				if (Array.isArray(selected_days)) {
+					selected_days.forEach(function(day) {
+						$output = $output.add(tmpl('selected-table-day', {
+							date: day,
+							formatted_date: day.split('-').reverse().join('.'),
+							today: today
+						}));
+					});
 				}
 				else {
-					$fucking_table.remove('.TableDay_' + MainCalendar.last_selected_days);
-					$fucking_table = $fucking_table.not('.TableDay_' + MainCalendar.last_selected_days);
+					$output = tmpl('selected-table-day', {
+						date: selected_days,
+						formatted_date: selected_days.split('-').reverse().join('.'),
+						today: today
+					});
 				}
+				bindDatePickers($output);
+				bindTimeInput($output);
+				bindRemoveRow($output);
+				
+				$fucking_table = $fucking_table.add($output);
+				$output.find('.DatePicker').each(function() {
+					var DP = $(this).data('datepicker');
+					DP.$datepicker.on('date-picked', function() {
+						MainCalendar.deselectDays(DP.prev_selected_day).selectDays(DP.selected_day);
+						doTheFuckingSort($fucking_table, $selected_days_table_rows)
+					});
+				});
+				doTheFuckingSort($fucking_table, $selected_days_table_rows);
 			}
 			
-			doTheFuckingSort($fucking_table, $selected_days_table_rows);
-			
-			//TODO: Do not forget to rename 'fucking' names
-			//TODO: Please, don't forget to rename 'fucking' names
-			
-		}
-		
-		buildTable(MainCalendar.selected_days);
-		PAGE.$wrapper.find('.SelectedDaysRows').toggleStatus('disabled');
-		
-		MainCalendar.$calendar.on('days-changed.displayFormattedText', displayFormattedText);
-		MainCalendar.$calendar.on('days-changed.buildTable', BuildSelectedDaysTable);
-		
-		AddRowDatePicker.$datepicker.on('date-picked', function() {
-			MainCalendar.selectDays(AddRowDatePicker.selected_day);
-		});
-		
-	})();
-	(function initOrganization(selected_id) {
-		OrganizationsCollection.fetchMyOrganizations(['admin', 'moderator'], {fields: ['default_address']}, function(data) {
-			var $wrapper = $('.EditEventOrganizations'),
-				organizations_options = $(),
-				$default_address_button = PAGE.$wrapper.find('.EditEventDefaultAddress'),
-				$select = $wrapper.find('#edit_event_organization'),
-				selected_address;
-			
-			data.forEach(function(organization) {
-				if (organization.id == selected_id) {
-					selected_address = organization.default_address;
+			function BuildSelectedDaysTable() {
+				if (MainCalendar.last_action === 'select') {
+					buildTable(MainCalendar.last_selected_days);
 				}
-				organizations_options = organizations_options.add(tmpl('option', {
-					val: organization.id,
-					data: "data-image-url='" + organization.img_url + "' data-default-address='" + organization.default_address + "'",
-					display_name: organization.name
-				}));
+				else if (MainCalendar.last_action === 'deselect') {
+					if (Array.isArray(MainCalendar.last_selected_days)) {
+						var classes = [];
+						MainCalendar.last_selected_days.forEach(function(day) {
+							classes.push('.TableDay_' + day);
+						});
+						$fucking_table.remove(classes.join(', '));
+						$fucking_table = $fucking_table.not(classes.join(', '));
+					}
+					else {
+						$fucking_table.remove('.TableDay_' + MainCalendar.last_selected_days);
+						$fucking_table = $fucking_table.not('.TableDay_' + MainCalendar.last_selected_days);
+					}
+				}
+				
+				doTheFuckingSort($fucking_table, $selected_days_table_rows);
+				
+				//TODO: Do not forget to rename 'fucking' names
+				//TODO: Please, don't forget to rename 'fucking' names
+				
+			}
+			
+			buildTable(MainCalendar.selected_days);
+			PAGE.$wrapper.find('.SelectedDaysRows').toggleStatus('disabled');
+			
+			MainCalendar.$calendar.on('days-changed.displayFormattedText', displayFormattedText);
+			MainCalendar.$calendar.on('days-changed.buildTable', BuildSelectedDaysTable);
+			
+			AddRowDatePicker.$datepicker.on('date-picked', function() {
+				MainCalendar.selectDays(AddRowDatePicker.selected_day);
 			});
 			
-			$select.append(organizations_options).select2({
-				containerCssClass: 'form_select2',
-				dropdownCssClass: 'form_select2_drop'
-			}).on('change', function() {
-				$default_address_button.data('default_address', $(this).children(":selected").data('default-address'));
+		})();
+		(function initOrganization(selected_id) {
+			OrganizationsCollection.fetchMyOrganizations(['admin', 'moderator'], {fields: ['default_address']}, function(data) {
+				var $wrapper = $('.EditEventOrganizations'),
+					organizations_options = $(),
+					$default_address_button = PAGE.$wrapper.find('.EditEventDefaultAddress'),
+					$select = $wrapper.find('#edit_event_organization'),
+					selected_address;
+				
+				data.forEach(function(organization) {
+					if (organization.id == selected_id) {
+						selected_address = organization.default_address;
+					}
+					organizations_options = organizations_options.add(tmpl('option', {
+						val: organization.id,
+						data: "data-image-url='" + organization.img_url + "' data-default-address='" + organization.default_address + "'",
+						display_name: organization.name
+					}));
+				});
+				
+				$select.append(organizations_options).select2({
+					containerCssClass: 'form_select2',
+					dropdownCssClass: 'form_select2_drop'
+				}).on('change', function() {
+					$default_address_button.data('default_address', $(this).children(":selected").data('default-address'));
+				});
+				if (selected_id) {
+					$select.select2('val', selected_id);
+					$default_address_button.data('default_address', selected_address);
+				} else {
+					$default_address_button.data('default_address', data[0].default_address);
+				}
+				if (organizations_options.length > 1) {
+					$wrapper.removeClass('-hidden');
+				} else {
+					$wrapper.addClass('-hidden');
+				}
 			});
-			if (selected_id) {
-				$select.select2('val', selected_id);
-				$default_address_button.data('default_address', selected_address);
-			} else {
-				$default_address_button.data('default_address', data[0].default_address);
-			}
-			if (organizations_options.length > 1) {
-				$wrapper.removeClass('-hidden');
-			} else {
-				$wrapper.addClass('-hidden');
-			}
-		});
-	})(PAGE.event.organization_id);
-	
-	bindCollapsing(PAGE.$wrapper);
-	
-	$main_tabs = $main_tabs.resolveInstance();
-	
-	//TODO: perepilit' placepicker
-	PAGE.$wrapper.find(".Placepicker").placepicker();
-	
-	PAGE.$wrapper.find('.EventTags').select2({
-		tags: true,
-		width: '100%',
-		placeholder: "Выберите до 5 тегов",
-		maximumSelectionLength: 5,
-		maximumSelectionSize: 5,
-		tokenSeparators: [',', ';'],
-		multiple: true,
-		createSearchChoice: function(term, data) {
-			if ($(data).filter(function() {
-					return this.text.localeCompare(term) === 0;
-				}).length === 0) {
-				return {
-					id: term,
-					text: term
-				};
-			}
-		},
-		ajax: {
-			url: '/api/v1/tags/',
-			dataType: 'JSON',
-			data: function(term, page) {
-				return {
-					name: term // search term
-				};
+		})(PAGE.event.organization_id);
+		
+		bindCollapsing(PAGE.$wrapper);
+		
+		$main_tabs = $main_tabs.resolveInstance();
+		
+		//TODO: perepilit' placepicker
+		PAGE.$wrapper.find(".Placepicker").placepicker();
+		
+		PAGE.$wrapper.find('.EventTags').select2({
+			tags: true,
+			width: '100%',
+			placeholder: "Выберите до 5 тегов",
+			maximumSelectionLength: 5,
+			maximumSelectionSize: 5,
+			tokenSeparators: [',', ';'],
+			multiple: true,
+			createSearchChoice: function(term, data) {
+				if ($(data).filter(function() {
+						return this.text.localeCompare(term) === 0;
+					}).length === 0) {
+					return {
+						id: term,
+						text: term
+					};
+				}
 			},
-			results: function(data) {
-				var _data = [];
-				data.data.forEach(function(value) {
-					value.text = value.name;
-					_data.push(value);
-				});
+			ajax: {
+				url: '/api/v1/tags/',
+				dataType: 'JSON',
+				data: function(term, page) {
+					return {
+						name: term // search term
+					};
+				},
+				results: function(data) {
+					var _data = [];
+					data.data.forEach(function(value) {
+						value.text = value.name;
+						_data.push(value);
+					});
+					return {
+						results: _data
+					}
+				}
+			},
+			containerCssClass: "form_select2",
+			dropdownCssClass: "form_select2_drop"
+		});
+		
+		PAGE.$wrapper.find('.EditEventDefaultAddress').off('click.defaultAddress').on('click.defaultAddress', function() {
+			var $this = $(this);
+			$this.closest('.form_group').find('input').val($this.data('default_address')).trigger('input');
+		});
+		
+		PAGE.$wrapper.find('#edit_event_is_online').off('change.OnlineEvent').on('change.OnlineEvent', function() {
+			PAGE.$wrapper.find('#edit_event_placepicker').prop('required', !$(this).prop('checked'));
+		});
+		
+		PAGE.$wrapper.find('#edit_event_free').off('change.FreeEvent').on('change.FreeEvent', function() {
+			PAGE.$wrapper.find('.MinPrice').toggleStatus('disabled');
+		});
+		
+		convertToNumericInput(PAGE.$wrapper.find('.MinPrice'));
+		convertToNumericInput(PAGE.$wrapper.find('#edit_event_registration_limit_count'));
+		
+		PAGE.$wrapper.find('.AddRegistrationCustomField').off('click.AddRegistrationCustomField').on('click.AddRegistrationCustomField', function() {
+			RedactEventPage.buildRegistrationCustomField().insertBefore($(this));
+		});
+		
+		PAGE.$wrapper.find('.RegistrationPreview').on('click.RegistrationPreview', function() {
+			var form_data = $(this).closest('form').serializeForm(),
+				event = new OneEvent(),
+				modal;
+			
+			form_data.registration_fields = (new RegistrationFieldsCollection()).setData(form_data.registration_fields.sort().map(function(field) {
 				return {
-					results: _data
-				}
-			}
-		},
-		containerCssClass: "form_select2",
-		dropdownCssClass: "form_select2_drop"
-	});
-	
-	PAGE.$wrapper.find('.EditEventDefaultAddress').off('click.defaultAddress').on('click.defaultAddress', function() {
-		var $this = $(this);
-		$this.closest('.form_group').find('input').val($this.data('default_address')).trigger('input');
-	});
-	
-	PAGE.$wrapper.find('#edit_event_is_online').off('change.OnlineEvent').on('change.OnlineEvent', function() {
-		PAGE.$wrapper.find('#edit_event_placepicker').prop('required', !$(this).prop('checked'));
-	});
-	
-	PAGE.$wrapper.find('#edit_event_free').off('change.FreeEvent').on('change.FreeEvent', function() {
-		PAGE.$wrapper.find('.MinPrice').toggleStatus('disabled');
-	});
-	
-	convertToNumericInput(PAGE.$wrapper.find('.MinPrice'));
-	convertToNumericInput(PAGE.$wrapper.find('#edit_event_registration_limit_count'));
-	
-	PAGE.$wrapper.find('.AddRegistrationCustomField').off('click.AddRegistrationCustomField').on('click.AddRegistrationCustomField', function() {
-		RedactEventPage.buildRegistrationCustomField().insertBefore($(this));
-	});
-	
-	PAGE.$wrapper.find('.RegistrationPreview').on('click.RegistrationPreview', function() {
-		var form_data = $(this).closest('form').serializeForm(),
-			event = new OneEvent(),
-			modal;
-		
-		form_data.registration_fields = (new RegistrationFieldsCollection()).setData(form_data.registration_fields.sort().map(function(field) {
-			return {
-				uuid: guid(),
-				type: form_data['registration_'+field+'_field_type'],
-				label: form_data['registration_'+field+'_field_label'] || RegistrationFieldModel.DEFAULT_LABEL[form_data['registration_'+field+'_field_type'].toUpperCase()],
-				required: form_data['registration_'+field+'_field_required']
-			};
-		}));
-		event.setData(form_data);
-		
-		modal = new PreviewRegistrationModal(event);
-		modal.show();
-	});
-	
-	$main_tabs.on('change.tabs', function() {
-		if($main_tabs.currentTabsIndex === 0){
-			$prev_page_button.addClass(__C.CLASSES.NEW_HIDDEN);
-		} else {
-			$prev_page_button.removeClass(__C.CLASSES.NEW_HIDDEN);
-		}
-		if ($main_tabs.currentTabsIndex === $main_tabs.tabsCount - 1) {
-			$next_page_button.addClass(__C.CLASSES.NEW_HIDDEN);
-			$submit_button.removeClass(__C.CLASSES.NEW_HIDDEN);
-		} else {
-			$next_page_button.removeClass(__C.CLASSES.NEW_HIDDEN);
-			$submit_button.addClass(__C.CLASSES.NEW_HIDDEN);
-		}
-	});
-	
-	$next_page_button.off('click.nextPage').on('click.nextPage', function() {
-		$main_tabs.nextTab();
-	});
-	
-	$prev_page_button.off('click.nextPage').on('click.prevPage', function() {
-		$main_tabs.prevTab();
-	});
-	
-	$submit_button.off('click.Submit').on('click.Submit', function submitEditEvent() {
-		var $form = PAGE.$wrapper.find("#edit-event-form"),
-			/**
-			 * @type {Calendar} MainCalendar
-			 */
-			MainCalendar = PAGE.$wrapper.find('.EventDatesCalendar').resolveInstance(),
-			$event_tags = $form.find('input.EventTags'),
-			form_data = $form.serializeForm(),
-			is_edit = !!(PAGE.event.id),
-			send_data,
-			is_form_valid;
-		
-		is_form_valid = (function validation($form, Calendar) {
-			var is_valid = true,
-				$times = $form.find('#edit_event_different_time').prop('checked') ? $form.find('[class^="TableDay_"]') : $form.find('.MainTime');
-			
-			function failSubmit($element, is_form_valid, error_message){
-				var $cut_tab,
-					$Tabs;
-				if(is_form_valid){
-					$cut_tab = $element.parents('.TabsBody:last');
-					$Tabs = $cut_tab.closest('.Tabs').resolveInstance();
-					$Tabs.setToTab($Tabs.find('.TabsBodyWrapper:first').children().index($cut_tab));
-					scrollTo($element, 400, function() {
-						showNotifier({text: error_message, status: false});
-					});
-				}
-				handleErrorField($element);
-				return false;
-			}
-			
-			$form.find(':required').not($form.find(':disabled')).each(function() {
-				var $this = $(this);
-				
-				if ($this.val().trim() === '') {
-					is_valid = failSubmit($this, is_valid, 'Заполните все обязательные поля');
-				} else if ($this.hasClass('LimitSize') && $this.val().trim().length > $this.data('maxlength')) {
-					is_valid = failSubmit($this, is_valid, 'Количество символов превышает установленное значение');
-				}
-			});
-			
-			if (!Calendar.selected_days.length) {
-				is_valid = failSubmit(Calendar.$calendar, is_valid, 'Выберите даты для события');
-			}
-			
-			$times.each(function() {
-				var $row = $(this),
-					$inputs = $row.find('.StartHours, .StartMinutes, .EndHours, .EndMinutes'),
-					start = $row.find('.StartHours').val().trim() + $row.find('.StartMinutes').val().trim(),
-					end = $row.find('.EndHours').val().trim() + $row.find('.EndMinutes').val().trim();
-				
-				$inputs.each(function() {
-					var $input = $(this);
-					if ($input.val().trim() === '') {
-						is_valid = failSubmit($input, is_valid, 'Заполните время события');
-					}
-				});
-				if (is_valid && start > end) {
-					is_valid = failSubmit($row, is_valid, 'Начальное время не может быть позже конечного');
-				}
-			});
-			
-			if ($event_tags.val().trim() === '') {
-				is_valid = failSubmit($event_tags.siblings('.EventTags'), is_valid, 'Необходимо выбрать хотя бы один тэг');
-			}
-			
-			if (form_data.registration_limit_by_quantity && (!form_data.registration_fields || !form_data.registration_fields.length)) {
-				is_valid = failSubmit($form.find('#edit_event_registration_fields'), is_valid, 'Должно быть выбрано хотя бы одно поле регистрации в анкете');
-			}
-			
-			if (!is_edit) {
-				$form.find('.DataUrl').each(function() {
-					var $this = $(this);
-					if ($this.val().trim() === "") {
-						is_valid = failSubmit($this.closest('.ImgLoadWrap'), is_valid, 'Пожалуйста, добавьте к событию обложку');
-					}
-				});
-			}
-			
-			return is_valid;
-		})($form, MainCalendar);
-		
-		function afterSubmit() {
-			__APP.changeState('/event/' + PAGE.event.id);
-		}
-		
-		function onError(e) {
-			PAGE.$wrapper.removeClass('-faded');
-			console.error(e);
-			console.log({
-				MainCalendar: MainCalendar,
-				send_data: send_data,
-				form_data: form_data
-			});
-		}
-		
-		if (is_form_valid) {
-			
-			try {
-				send_data = {
-					event_id: parseInt(form_data.event_id) ? parseInt(form_data.event_id) : null,
-					title: form_data.title.trim(),
-					organization_id: form_data.organization_id,
-					description: form_data.description.trim(),
-					is_online: form_data.is_online,
-					location: form_data.location && form_data.location.trim() ? form_data.location.trim() : null,
-					detail_info_url: form_data.detail_info_url ? form_data.detail_info_url.trim() : null,
-					image_horizontal: form_data.image_horizontal,
-					filenames: {horizontal: form_data.filename_horizontal},
-					is_free: form_data.is_free,
-					min_price: form_data.is_free ? null : form_data.min_price
+					uuid: guid(),
+					type: form_data['registration_'+field+'_field_type'],
+					label: form_data['registration_'+field+'_field_label'] || RegistrationFieldModel.DEFAULT_LABEL[form_data['registration_'+field+'_field_type'].toUpperCase()],
+					required: form_data['registration_'+field+'_field_required']
 				};
-				
-				send_data.registration_required = form_data.registration_required;
-				if (form_data.registration_required) {
-					if (form_data.registration_limit_by_date) {
-						send_data.registration_till = moment(
-							form_data.registration_till_date + 'T' +
-							form_data.registration_till_time_hours + ':' +
-							form_data.registration_till_time_minutes + ':00'
-						).tz('UTC').format();
-					}
-					
-					if (form_data.registration_limit_by_quantity) {
-						send_data.registration_locally = true;
-						send_data.registration_limit_count = form_data.registration_limit_count;
-					}
-					
-					if (form_data.registration_fields && form_data.registration_fields.length) {
-						send_data.registration_locally = true;
-						send_data.registration_fields = (new RegistrationFieldsCollection()).setData(form_data.registration_fields.map(function(id) {
-							var field = new RegistrationFieldModel();
-							field.required = form_data['registration_' + id + '_field_required'];
-							if (form_data['registration_' + id + '_field_type']) {
-								field.type = form_data['registration_' + id + '_field_type'];
-							}
-							if (form_data['registration_' + id + '_field_label']) {
-								field.label = form_data['registration_' + id + '_field_label'].trim();
-							}
-							
-							return field;
-						})).getArrayCopy();
-					}
-				}
-				
-				if(form_data.tags){
-					send_data.tags = form_data.tags.split(',');
-				}
-				
-				send_data.delayed_publication = form_data.delayed_publication;
-				if (form_data.delayed_publication) {
-					send_data.public_at = moment(
-						form_data.public_at_date + 'T' +
-						form_data.public_at_time_hours + ':' +
-						form_data.public_at_time_minutes + ':00'
-					).tz('UTC').format();
-				}
-				
-				send_data.different_time = form_data.different_time;
-				send_data.dates = new DateModelsCollection();
-				if (form_data.different_time) {
-					PAGE.$wrapper.find('.SelectedDaysRows').children().each(function(i, row) {
-						var $row = $(row);
-						send_data.dates.push((new DateModel()).setData({
-							event_date: $row.find('.DatePicker').data('selected_day'),
-							start_time: $row.find('.StartHours').val() + ':' + $row.find('.StartMinutes').val(),
-							end_time: $row.find('.EndHours').val() + ':' + $row.find('.EndMinutes').val()
-						}));
-					});
-				} else {
-					MainCalendar.selected_days.forEach(function(day) {
-						send_data.dates.push((new DateModel()).setData({
-							event_date: day,
-							start_time: form_data.start_hours + ':' + form_data.start_minutes,
-							end_time: form_data.end_hours + ':' + form_data.end_minutes
-						}));
-					});
-				}
-				send_data.dates = send_data.dates.getArrayCopy();
-				
-				PAGE.$wrapper.addClass('-faded');
-				
-				if (is_edit) {
-					PAGE.event.updateEvent(send_data, afterSubmit, onError);
-				} else {
-					PAGE.event.createEvent(send_data, afterSubmit, onError);
-				}
-			} catch (e) {
-				onError(e);
-			}
-		}
-	});
-};
-
-RedactEventPage.prototype.render = function() {
-	var PAGE = this,
-		is_edit = !!PAGE.event.id,
-		page_vars = $.extend(true, {}, Object.getProps(PAGE.event), {
-			event_id: PAGE.event.id ? PAGE.event.id : undefined,
-			public_at_data_label: 'Дата',
-			current_date: moment().format(__C.DATE_FORMAT),
-			tomorrow_date: moment().add(1, 'd').format(__C.DATE_FORMAT),
-			button_text: is_edit ? 'Сохранить' : 'Опубликовать'
-		}),
-		registration_props = {
-			registration_limit_count: PAGE.event.registration_limit_count,
-			registration_till_display_date: 'Дата',
-			tomorrow_date: page_vars.tomorrow_date,
-			predefined_field: tmpl('edit-event-registration-predefined-field', [
-				{id: RedactEventPage.lastRegistrationCustomFieldId++, type: 'email', name: 'E-mail', description: 'Текстовое поле для ввода адреса электронной почты'},
-				{id: RedactEventPage.lastRegistrationCustomFieldId++, type: 'first_name', name: 'Имя', description: 'Текстовое поле для ввода имени'},
-				{id: RedactEventPage.lastRegistrationCustomFieldId++, type: 'last_name', name: 'Фамилия', description: 'Текстовое поле для ввода фамилии'},
-				{id: RedactEventPage.lastRegistrationCustomFieldId++, type: 'phone_number', name: 'Номер телефона', description: 'Текстовое поля для ввода номера телефона'}
-			])
-		};
-	
-	function resolveFilenameFromURL(url) {
-		return url ? url.split('/').reverse()[0] : '';
-	}
-	
-	
-	if (__APP.USER.id === -1) {
-		__APP.changeState('/feed/actual', true, true);
-		return null;
-	}
-	if (window.location.pathname.contains('event/add')) {
-		if (this.organization_id) {
-			__APP.changeState('/add/event/to/' + this.organization_id, true, true);
-		} else {
-			__APP.changeState('/add/event', true, true);
-		}
-		return null;
-	}
-	
-	if (PAGE.event.registration_required) {
-		if (PAGE.event.registration_till) {
-			var m_registration_till = moment.unix(PAGE.event.registration_till);
-			registration_props = $.extend(registration_props, {
-				registration_till_display_date: m_registration_till.format(__LOCALES.ru_RU.DATE.DATE_FORMAT),
-				registration_till_date: m_registration_till.format(__C.DATE_FORMAT),
-				registration_till_time_hours: m_registration_till.format('HH'),
-				registration_till_time_minutes: m_registration_till.format('mm')
-			});
-		}
-	}
-	
-	if (PAGE.event.public_at != null) {
-		var m_public_at = moment.unix(PAGE.event.public_at);
-		page_vars.public_at_data = m_public_at.format('YYYY-MM-DD');
-		page_vars.public_at_data_label = m_public_at.format('DD.MM.YYYY');
-		page_vars.public_at_time_hours = m_public_at.format('HH');
-		page_vars.public_at_time_minutes = m_public_at.format('mm');
-	}
-	console.log(page_vars);
-	
-	PAGE.$wrapper.html(tmpl('edit-event-page', $.extend(page_vars, {
-		date_picker: tmpl('edit-event-datepicker', {
-			today: page_vars.current_date
-		}),
-		cover_picker: tmpl('edit-event-cover-picker', {
-			image_horizontal_url: PAGE.event.image_horizontal_url,
-			image_horizontal_filename: resolveFilenameFromURL(PAGE.event.image_horizontal_url)
-		}),
-		registration: tmpl('edit-event-registration', registration_props)
-	})));
-	
-	PAGE.init();
-	
-	if(page_vars.public_at != null) {
-		PAGE.$wrapper.find('#edit_event_delayed_publication').prop('checked', true).trigger('change');
-	}
-	
-	if (is_edit) {
-		(function selectDates($view, raw_dates, is_same_time) {
-			var MainCalendar = $view.find('.EventDatesCalendar').data('calendar'),
-				start_time = raw_dates[0].start_time.split(':'),
-				end_time = raw_dates[0].end_time ? raw_dates[0].end_time.split(':') : [],
-				$table_rows = $view.find('.SelectedDaysRows'),
-				dates = [],
-				$day_row;
+			}));
+			event.setData(form_data);
 			
-			if (is_same_time) {
-				$day_row = $view.find('.MainTime');
-				$day_row.find('.StartHours').val(start_time[0]);
-				$day_row.find('.StartMinutes').val(start_time[1]);
-				if (end_time.length) {
-					$day_row.find('.EndHours').val(end_time[0]);
-					$day_row.find('.EndMinutes').val(end_time[1]);
-				}
+			modal = new PreviewRegistrationModal(event);
+			modal.show();
+		});
+		
+		$main_tabs.on('change.tabs', function() {
+			if($main_tabs.currentTabsIndex === 0){
+				$prev_page_button.addClass(__C.CLASSES.HIDDEN);
 			} else {
-				PAGE.$wrapper.find('#edit_event_different_time').prop('checked', true).trigger('change');
+				$prev_page_button.removeClass(__C.CLASSES.HIDDEN);
 			}
+			if ($main_tabs.currentTabsIndex === $main_tabs.tabsCount - 1) {
+				$next_page_button.addClass(__C.CLASSES.HIDDEN);
+				$submit_button.removeClass(__C.CLASSES.HIDDEN);
+			} else {
+				$next_page_button.removeClass(__C.CLASSES.HIDDEN);
+				$submit_button.addClass(__C.CLASSES.HIDDEN);
+			}
+		});
+		
+		$next_page_button.off('click.nextPage').on('click.nextPage', function() {
+			$main_tabs.nextTab();
+		});
+		
+		$prev_page_button.off('click.nextPage').on('click.prevPage', function() {
+			$main_tabs.prevTab();
+		});
+		
+		$submit_button.off('click.Submit').on('click.Submit', function submitEditEvent() {
+			var $form = PAGE.$wrapper.find("#edit-event-form"),
+				/**
+				 * @type {Calendar} MainCalendar
+				 */
+				MainCalendar = PAGE.$wrapper.find('.EventDatesCalendar').resolveInstance(),
+				$event_tags = $form.find('input.EventTags'),
+				form_data = $form.serializeForm(),
+				is_edit = !!(PAGE.event.id),
+				send_data,
+				is_form_valid;
 			
-			raw_dates.forEach(function(date) {
-				date.event_date = moment.unix(date.event_date).format('YYYY-MM-DD');
-				dates.push(date.event_date);
-			});
-			MainCalendar.selectDays(dates);
-			raw_dates.forEach(function(date) {
-				var $day_row = $table_rows.find('.TableDay_' + date.event_date),
-					start_time = date.start_time.split(':'),
-					end_time = date.end_time ? date.end_time.split(':') : [];
-				$day_row.find('.StartHours').val(start_time[0]);
-				$day_row.find('.StartMinutes').val(start_time[1]);
-				if (end_time.length) {
-					$day_row.find('.EndHours').val(end_time[0]);
-					$day_row.find('.EndMinutes').val(end_time[1]);
+			is_form_valid = (function validation($form, Calendar) {
+				var is_valid = true,
+					$times = $form.find('#edit_event_different_time').prop('checked') ? $form.find('[class^="TableDay_"]') : $form.find('.MainTime');
+				
+				function failSubmit($element, is_form_valid, error_message){
+					var $cut_tab,
+						$Tabs;
+					if(is_form_valid){
+						$cut_tab = $element.parents('.TabsBody:last');
+						$Tabs = $cut_tab.closest('.Tabs').resolveInstance();
+						$Tabs.setToTab($Tabs.find('.TabsBodyWrapper:first').children().index($cut_tab));
+						scrollTo($element, 400, function() {
+							showNotifier({text: error_message, status: false});
+						});
+					}
+					handleErrorField($element);
+					return false;
 				}
-			});
-		})(PAGE.$wrapper, PAGE.event.dates, PAGE.event.is_same_time);
-		(function selectTags($view, tags) {
-			var selected_tags = [];
-			tags.forEach(function(tag) {
-				selected_tags.push({
-					id: parseInt(tag.id),
-					text: tag.name
+				
+				$form.find(':required').not($form.find(':disabled')).each(function() {
+					var $this = $(this);
+					
+					if ($this.val().trim() === '') {
+						is_valid = failSubmit($this, is_valid, 'Заполните все обязательные поля');
+					} else if ($this.hasClass('LimitSize') && $this.val().trim().length > $this.data('maxlength')) {
+						is_valid = failSubmit($this, is_valid, 'Количество символов превышает установленное значение');
+					}
 				});
-			});
+				
+				if (!Calendar.selected_days.length) {
+					is_valid = failSubmit(Calendar.$calendar, is_valid, 'Выберите даты для события');
+				}
+				
+				$times.each(function() {
+					var $row = $(this),
+						$inputs = $row.find('.StartHours, .StartMinutes, .EndHours, .EndMinutes'),
+						start = $row.find('.StartHours').val().trim() + $row.find('.StartMinutes').val().trim(),
+						end = $row.find('.EndHours').val().trim() + $row.find('.EndMinutes').val().trim();
+					
+					$inputs.each(function() {
+						var $input = $(this);
+						if ($input.val().trim() === '') {
+							is_valid = failSubmit($input, is_valid, 'Заполните время события');
+						}
+					});
+					if (is_valid && start > end) {
+						is_valid = failSubmit($row, is_valid, 'Начальное время не может быть позже конечного');
+					}
+				});
+				
+				if ($event_tags.val().trim() === '') {
+					is_valid = failSubmit($event_tags.siblings('.EventTags'), is_valid, 'Необходимо выбрать хотя бы один тэг');
+				}
+				
+				if (form_data.registration_limit_by_quantity && (!form_data.registration_fields || !form_data.registration_fields.length)) {
+					is_valid = failSubmit($form.find('#edit_event_registration_fields'), is_valid, 'Должно быть выбрано хотя бы одно поле регистрации в анкете');
+				}
+				
+				if (!is_edit) {
+					$form.find('.DataUrl').each(function() {
+						var $this = $(this);
+						if ($this.val().trim() === "") {
+							is_valid = failSubmit($this.closest('.ImgLoadWrap'), is_valid, 'Пожалуйста, добавьте к событию обложку');
+						}
+					});
+				}
+				
+				return is_valid;
+			})($form, MainCalendar);
 			
-			$view.find('#event_tags').select2('data', selected_tags);
-		})(PAGE.$wrapper, PAGE.event.tags);
-		
-		if (PAGE.event.image_horizontal_url) {
-			toDataUrl(PAGE.event.image_horizontal_url, function(base64_string) {
-				PAGE.$wrapper.find('#edit_event_image_horizontal_source').val(base64_string ? base64_string : null);
-			});
-		}
-		
-		if (!PAGE.event.is_free) {
-			PAGE.$wrapper.find('#edit_event_free').prop('checked', false).trigger('change');
-			PAGE.$wrapper.find('#edit_event_min_price').val(PAGE.event.min_price);
-		}
-		if (PAGE.event.registration_required) {
-			PAGE.$wrapper.find('#edit_event_registration_required').prop('checked', true).trigger('change');
-			if (PAGE.event.registration_till) {
-				PAGE.$wrapper.find('#edit_event_registration_limit_by_date').prop('checked', true).trigger('change');
+			function afterSubmit() {
+				__APP.changeState('/event/' + PAGE.event.id);
 			}
-			if (PAGE.event.registration_limit_count) {
-				PAGE.$wrapper.find('#edit_event_registration_limit_by_quantity').prop('checked', true).trigger('change');
+			
+			function onError(e) {
+				PAGE.$wrapper.removeClass('-faded');
+				console.error(e);
+				console.log({
+					MainCalendar: MainCalendar,
+					send_data: send_data,
+					form_data: form_data
+				});
 			}
-			if (page_vars.registration_fields && page_vars.registration_fields.length) {
-				PAGE.$wrapper.find('.AddRegistrationCustomField').before(RedactEventPage.buildRegistrationCustomField(page_vars.registration_fields.filter(function(field) {
-					var is_custom_field = RegistrationFieldModel.isCustomField(field);
-					if (!is_custom_field) {
-						PAGE.$wrapper.find('#edit_event_registration_'+field.type+'_field_enable').prop('checked', true).trigger('change');
-						if (field.required) {
-							PAGE.$wrapper.find('#edit_event_registration_'+field.type+'_field_required').prop('checked', true);
+			
+			if (is_form_valid) {
+				
+				try {
+					send_data = {
+						event_id: parseInt(form_data.event_id) ? parseInt(form_data.event_id) : null,
+						title: form_data.title.trim(),
+						organization_id: form_data.organization_id,
+						description: form_data.description.trim(),
+						is_online: form_data.is_online,
+						location: form_data.location && form_data.location.trim() ? form_data.location.trim() : null,
+						detail_info_url: form_data.detail_info_url ? form_data.detail_info_url.trim() : null,
+						image_horizontal: form_data.image_horizontal,
+						filenames: {horizontal: form_data.filename_horizontal},
+						is_free: form_data.is_free,
+						min_price: form_data.is_free ? null : form_data.min_price
+					};
+					
+					send_data.registration_required = form_data.registration_required;
+					if (form_data.registration_required) {
+						if (form_data.registration_limit_by_date) {
+							send_data.registration_till = moment(
+								form_data.registration_till_date + 'T' +
+								form_data.registration_till_time_hours + ':' +
+								form_data.registration_till_time_minutes + ':00'
+							).tz('UTC').format();
+						}
+						
+						if (form_data.registration_limit_by_quantity) {
+							send_data.registration_locally = true;
+							send_data.registration_limit_count = form_data.registration_limit_count;
+						}
+						
+						if (form_data.registration_fields && form_data.registration_fields.length) {
+							send_data.registration_locally = true;
+							send_data.registration_fields = (new RegistrationFieldsCollection()).setData(form_data.registration_fields.map(function(id) {
+								var field = new RegistrationFieldModel();
+								
+								field.required = form_data['registration_' + id + '_field_required'];
+								if (form_data['registration_' + id + '_field_uuid']) {
+									field.uuid = form_data['registration_' + id + '_field_uuid'];
+								}
+								if (form_data['registration_' + id + '_field_type']) {
+									field.type = form_data['registration_' + id + '_field_type'];
+								}
+								if (form_data['registration_' + id + '_field_label']) {
+									field.label = form_data['registration_' + id + '_field_label'].trim();
+								}
+								
+								return field;
+							})).getArrayCopy();
 						}
 					}
 					
-					return is_custom_field;
-				})));
+					if(form_data.tags){
+						send_data.tags = form_data.tags.split(',');
+					}
+					
+					send_data.delayed_publication = form_data.delayed_publication;
+					if (form_data.delayed_publication) {
+						send_data.public_at = moment(
+							form_data.public_at_date + 'T' +
+							form_data.public_at_time_hours + ':' +
+							form_data.public_at_time_minutes + ':00'
+						).tz('UTC').format();
+					}
+					
+					send_data.different_time = form_data.different_time;
+					send_data.dates = new DateModelsCollection();
+					if (form_data.different_time) {
+						PAGE.$wrapper.find('.SelectedDaysRows').children().each(function(i, row) {
+							var $row = $(row);
+							send_data.dates.push((new DateModel()).setData({
+								event_date: $row.find('.DatePicker').data('selected_day'),
+								start_time: $row.find('.StartHours').val() + ':' + $row.find('.StartMinutes').val(),
+								end_time: $row.find('.EndHours').val() + ':' + $row.find('.EndMinutes').val()
+							}));
+						});
+					} else {
+						MainCalendar.selected_days.forEach(function(day) {
+							send_data.dates.push((new DateModel()).setData({
+								event_date: day,
+								start_time: form_data.start_hours + ':' + form_data.start_minutes,
+								end_time: form_data.end_hours + ':' + form_data.end_minutes
+							}));
+						});
+					}
+					send_data.dates = send_data.dates.getArrayCopy();
+					
+					PAGE.$wrapper.addClass('-faded');
+					
+					if (is_edit) {
+						PAGE.event.updateEvent(send_data, afterSubmit, onError);
+					} else {
+						PAGE.event.createEvent(send_data, afterSubmit, onError);
+					}
+				} catch (e) {
+					onError(e);
+				}
+			}
+		});
+	};
+	
+	RedactEventPage.prototype.render = function() {
+		var PAGE = this,
+			is_edit = !!PAGE.event.id,
+			page_vars = $.extend(true, {}, Object.getProps(PAGE.event), {
+				event_id: PAGE.event.id ? PAGE.event.id : undefined,
+				public_at_data_label: 'Дата',
+				current_date: moment().format(__C.DATE_FORMAT),
+				tomorrow_date: moment().add(1, 'd').format(__C.DATE_FORMAT),
+				button_text: is_edit ? 'Сохранить' : 'Опубликовать'
+			}),
+			registration_props = {
+				registration_limit_count: PAGE.event.registration_limit_count,
+				registration_till_display_date: 'Дата',
+				tomorrow_date: page_vars.tomorrow_date,
+				predefined_field: tmpl('edit-event-registration-predefined-field', [
+					{id: RedactEventPage.lastRegistrationCustomFieldId++, type: 'email', name: 'E-mail', description: 'Текстовое поле для ввода адреса электронной почты'},
+					{id: RedactEventPage.lastRegistrationCustomFieldId++, type: 'first_name', name: 'Имя', description: 'Текстовое поле для ввода имени'},
+					{id: RedactEventPage.lastRegistrationCustomFieldId++, type: 'last_name', name: 'Фамилия', description: 'Текстовое поле для ввода фамилии'},
+					{id: RedactEventPage.lastRegistrationCustomFieldId++, type: 'phone_number', name: 'Номер телефона', description: 'Текстовое поля для ввода номера телефона'}
+				])
+			};
+		
+		function resolveFilenameFromURL(url) {
+			return url ? url.split('/').reverse()[0] : '';
+		}
+		
+		
+		if (__APP.USER.id === -1) {
+			__APP.changeState('/feed/actual', true, true);
+			return null;
+		}
+		if (window.location.pathname.contains('event/add')) {
+			if (this.organization_id) {
+				__APP.changeState('/add/event/to/' + this.organization_id, true, true);
+			} else {
+				__APP.changeState('/add/event', true, true);
+			}
+			return null;
+		}
+		
+		if (PAGE.event.registration_required) {
+			if (PAGE.event.registration_till) {
+				var m_registration_till = moment.unix(PAGE.event.registration_till);
+				registration_props = $.extend(registration_props, {
+					registration_till_display_date: m_registration_till.format(__LOCALES.ru_RU.DATE.DATE_FORMAT),
+					registration_till_date: m_registration_till.format(__C.DATE_FORMAT),
+					registration_till_time_hours: m_registration_till.format('HH'),
+					registration_till_time_minutes: m_registration_till.format('mm')
+				});
 			}
 		}
-		if (page_vars.public_at == null) {
-			PAGE.$wrapper.find('#edit_event_delayed_publication').toggleStatus('disabled');
+		
+		if (PAGE.event.public_at != null) {
+			var m_public_at = moment.unix(PAGE.event.public_at);
+			page_vars.public_at_data = m_public_at.format('YYYY-MM-DD');
+			page_vars.public_at_data_label = m_public_at.format('DD.MM.YYYY');
+			page_vars.public_at_time_hours = m_public_at.format('HH');
+			page_vars.public_at_time_minutes = m_public_at.format('mm');
 		}
-	}
-};
+		console.log(page_vars);
+		
+		PAGE.$wrapper.html(tmpl('edit-event-page', $.extend(page_vars, {
+			date_picker: tmpl('edit-event-datepicker', {
+				today: page_vars.current_date
+			}),
+			cover_picker: tmpl('edit-event-cover-picker', {
+				image_horizontal_url: PAGE.event.image_horizontal_url,
+				image_horizontal_filename: resolveFilenameFromURL(PAGE.event.image_horizontal_url)
+			}),
+			registration: tmpl('edit-event-registration', registration_props)
+		})));
+		
+		PAGE.init();
+		
+		if(page_vars.public_at != null) {
+			PAGE.$wrapper.find('#edit_event_delayed_publication').prop('checked', true).trigger('change');
+		}
+		
+		if (is_edit) {
+			(function selectDates($view, raw_dates, is_same_time) {
+				var MainCalendar = $view.find('.EventDatesCalendar').data('calendar'),
+					start_time = raw_dates[0].start_time.split(':'),
+					end_time = raw_dates[0].end_time ? raw_dates[0].end_time.split(':') : [],
+					$table_rows = $view.find('.SelectedDaysRows'),
+					dates = [],
+					$day_row;
+				
+				if (is_same_time) {
+					$day_row = $view.find('.MainTime');
+					$day_row.find('.StartHours').val(start_time[0]);
+					$day_row.find('.StartMinutes').val(start_time[1]);
+					if (end_time.length) {
+						$day_row.find('.EndHours').val(end_time[0]);
+						$day_row.find('.EndMinutes').val(end_time[1]);
+					}
+				} else {
+					PAGE.$wrapper.find('#edit_event_different_time').prop('checked', true).trigger('change');
+				}
+				
+				raw_dates.forEach(function(date) {
+					date.event_date = moment.unix(date.event_date).format('YYYY-MM-DD');
+					dates.push(date.event_date);
+				});
+				MainCalendar.selectDays(dates);
+				raw_dates.forEach(function(date) {
+					var $day_row = $table_rows.find('.TableDay_' + date.event_date),
+						start_time = date.start_time.split(':'),
+						end_time = date.end_time ? date.end_time.split(':') : [];
+					$day_row.find('.StartHours').val(start_time[0]);
+					$day_row.find('.StartMinutes').val(start_time[1]);
+					if (end_time.length) {
+						$day_row.find('.EndHours').val(end_time[0]);
+						$day_row.find('.EndMinutes').val(end_time[1]);
+					}
+				});
+			})(PAGE.$wrapper, PAGE.event.dates, PAGE.event.is_same_time);
+			(function selectTags($view, tags) {
+				var selected_tags = [];
+				tags.forEach(function(tag) {
+					selected_tags.push({
+						id: parseInt(tag.id),
+						text: tag.name
+					});
+				});
+				
+				$view.find('#event_tags').select2('data', selected_tags);
+			})(PAGE.$wrapper, PAGE.event.tags);
+			
+			if (PAGE.event.image_horizontal_url) {
+				toDataUrl(PAGE.event.image_horizontal_url, function(base64_string) {
+					PAGE.$wrapper.find('#edit_event_image_horizontal_source').val(base64_string ? base64_string : null);
+				});
+			}
+			
+			if (!PAGE.event.is_free) {
+				PAGE.$wrapper.find('#edit_event_free').prop('checked', false).trigger('change');
+				PAGE.$wrapper.find('#edit_event_min_price').val(PAGE.event.min_price);
+			}
+			if (PAGE.event.registration_required) {
+				PAGE.$wrapper.find('#edit_event_registration_required').prop('checked', true).trigger('change');
+				if (PAGE.event.registration_till) {
+					PAGE.$wrapper.find('#edit_event_registration_limit_by_date').prop('checked', true).trigger('change');
+				}
+				if (PAGE.event.registration_limit_count) {
+					PAGE.$wrapper.find('#edit_event_registration_limit_by_quantity').prop('checked', true).trigger('change');
+				}
+				if (page_vars.registration_fields && page_vars.registration_fields.length) {
+					PAGE.$wrapper.find('.AddRegistrationCustomField').before(RedactEventPage.buildRegistrationCustomField(page_vars.registration_fields.filter(function(field) {
+						var is_custom_field = RegistrationFieldModel.isCustomField(field);
+						if (!is_custom_field) {
+							PAGE.$wrapper.find('#edit_event_registration_'+field.type+'_field_uuid').val(field.uuid);
+							PAGE.$wrapper.find('#edit_event_registration_'+field.type+'_field_enable').prop('checked', true).trigger('change');
+							if (field.required) {
+								PAGE.$wrapper.find('#edit_event_registration_'+field.type+'_field_required').prop('checked', true);
+							}
+						}
+						
+						return is_custom_field;
+					})));
+				}
+			}
+			if (page_vars.public_at == null) {
+				PAGE.$wrapper.find('#edit_event_delayed_publication').toggleStatus('disabled');
+			}
+		}
+	};
+	
+	return RedactEventPage;
+}()));
 /**
  * @requires Class.RedactEventPage.js
  */
 /**
  *
- * @constructor
- * @augments RedactEventPage
- * @param {(string|number)} [org_id]
+ * @class AddEventPage
+ * @extends RedactEventPage
  */
-function AddEventPage(org_id) {
-	RedactEventPage.apply(this);
-	this.page_title = 'Добавить событие';
-	this.organization_id = org_id;
-}
-AddEventPage.extend(RedactEventPage);
+AddEventPage = extending(RedactEventPage, (function() {
+	/**
+	 *
+	 * @param {(string|number)} [org_id]
+	 * @constructor
+	 * @constructs AddEventPage
+	 */
+	function AddEventPage(org_id) {
+		RedactEventPage.apply(this);
+		this.page_title = 'Добавить событие';
+		this.organization_id = org_id;
+	}
+	
+	return AddEventPage;
+}()));
 /**
  * @requires ../Class.Page.js
  */
@@ -9907,6 +10846,7 @@ EventPage = extending(Page, (function() {
 		'detail_info_url',
 		'canceled',
 		'public_at',
+		'is_registered',
 		'registration_required',
 		'registration_approvement_required',
 		'registration_till',
@@ -10041,13 +10981,13 @@ EventPage = extending(Page, (function() {
 		
 		PAGE.$wrapper.find('.CancelEvent').on('click.CancelEvent', function() {
 			PAGE.event.changeEventStatus(OneEvent.STATUS.CANCEL, function() {
-				PAGE.$wrapper.find('.event_canceled_cap').removeClass('-hidden');
+				PAGE.$wrapper.find('.event_canceled_cap').removeClass(__C.CLASSES.HIDDEN);
 			});
 		});
 		
 		PAGE.$wrapper.find('.CancelCancellation').on('click.CancelCancellation', function() {
 			PAGE.event.changeEventStatus(OneEvent.STATUS.BRING_BACK, function() {
-				PAGE.$wrapper.find('.event_canceled_cap').addClass('-hidden');
+				PAGE.$wrapper.find('.event_canceled_cap').addClass(__C.CLASSES.HIDDEN);
 			});
 		});
 		
@@ -10062,10 +11002,18 @@ EventPage = extending(Page, (function() {
 	
 	EventPage.prototype.render = function() {
 		var PAGE = this,
-			avatars_collection_classes = ['-rounded','-bordered','-size_small','AvatarsCollection','CallModal'],
+			avatars_collection_classes = [
+				__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+				__C.CLASSES.UNIVERSAL_STATES.BORDERED,
+				__C.CLASSES.SIZES.SMALL,
+				__C.CLASSES.HOOKS.ADD_AVATAR.COLLECTION,
+				__C.CLASSES.HOOKS.CALL_MODAL
+			],
+			$action_buttons = $(),
 			$event_additional_fields = $(),
 			$event_additional_information = $(),
 			organization = new OneOrganization(PAGE.event.organization_id);
+		
 		organization.setData({
 			short_name: PAGE.event.organization_short_name,
 			img_url: PAGE.event.organization_logo_small_url
@@ -10073,26 +11021,95 @@ EventPage = extending(Page, (function() {
 		
 		__APP.changeTitle(PAGE.event.title);
 		if (PAGE.event.is_favorite) {
-			avatars_collection_classes.push('-subscribed');
+			avatars_collection_classes.push(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
+		}
+		
+		$action_buttons = __APP.BUILD.button({
+			classes: [
+				__C.CLASSES.UNIVERSAL_STATES.EMPTY,
+				__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+				__C.CLASSES.SIZES.LOW,
+				__C.CLASSES.ICON_CLASS,
+				__C.CLASSES.ICONS.BELL_O,
+				__C.CLASSES.COLORS.NEUTRAL,
+				__C.CLASSES.HOOKS.RIPPLE,
+				__C.CLASSES.HOOKS.DROPDOWN_BUTTON
+			],
+			dataset: {
+				dropdown: 'edit_notification',
+				ddWidth: 190,
+				ddPosX: 'self.center',
+				ddPosY: 6
+			}
+		});
+		
+		if (PAGE.event.registration_locally || PAGE.event.ticketing_locally) {
+			$action_buttons = $action_buttons.add(new AddToFavoriteButton(PAGE.event.id, {
+				is_add_avatar: true,
+				is_checked: PAGE.event.is_favorite,
+				classes: [
+					__C.CLASSES.UNIVERSAL_STATES.EMPTY,
+					__C.CLASSES.SIZES.LOW,
+					__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+					__C.CLASSES.HOOKS.RIPPLE
+				],
+				labels: null,
+				colors: {
+					unchecked: __C.CLASSES.COLORS.NEUTRAL_ACCENT,
+					unchecked_hover: __C.CLASSES.COLORS.NEUTRAL_ACCENT
+				}
+			}));
+			
+			if (PAGE.event.ticketing_locally) {
+				
+			} else {
+				$action_buttons = $action_buttons.add(new RegisterButton(PAGE.event, {
+					classes: [
+						'event_main_action_button',
+						__C.CLASSES.SIZES.LOW,
+						__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+						__C.CLASSES.HOOKS.RIPPLE
+					],
+					colors: {
+						unchecked: __C.CLASSES.COLORS.NEUTRAL_ACCENT,
+						unchecked_hover: __C.CLASSES.COLORS.NEUTRAL_ACCENT
+					}
+				}));
+			}
+		} else {
+			$action_buttons = $action_buttons.add(new AddToFavoriteButton(PAGE.event.id, {
+				is_add_avatar: true,
+				is_checked: PAGE.event.is_favorite,
+				classes: [
+					'event_main_action_button',
+					__C.CLASSES.SIZES.LOW,
+					__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+					__C.CLASSES.HOOKS.RIPPLE
+				],
+				colors: {
+					unchecked: __C.CLASSES.COLORS.NEUTRAL_ACCENT,
+					unchecked_hover: __C.CLASSES.COLORS.NEUTRAL_ACCENT
+				}
+			}));
 		}
 		
 		if (PAGE.event.registration_till) {
 			$event_additional_information = $event_additional_information.add(tmpl('event-additional-info', {
-				classes: '-text_color_accent -transform_uppercase',
+				classes: __C.CLASSES.TEXT_COLORS.ACCENT + ' ' + __C.CLASSES.UNIVERSAL_STATES.TRANSFORM_UPPERCASE,
 				text: 'Регистрация до ' + moment.unix(PAGE.event.registration_till).calendar(null, __LOCALES.ru_RU.DATE.CALENDAR_DATE_TIME)
 			}));
 		}
 		
 		if (!PAGE.event.is_free) {
 			$event_additional_information = $event_additional_information.add(tmpl('event-additional-info', {
-				classes: '-text_color_accent',
+				classes: __C.CLASSES.TEXT_COLORS.ACCENT,
 				text: 'от ' + (PAGE.event.min_price ? formatCurrency(PAGE.event.min_price) : '0') + ' руб.'
 			}));
 		}
 		
 		if (PAGE.event.is_online) {
 			$event_additional_information = $event_additional_information.add(tmpl('event-additional-info', {
-				classes: '-text_color_accent',
+				classes: __C.CLASSES.TEXT_COLORS.ACCENT,
 				text: 'Online'
 			}));
 		}
@@ -10110,7 +11127,7 @@ EventPage = extending(Page, (function() {
 				}, PAGE.event.is_same_time))
 			}));
 		}
-		if(PAGE.event.location) {
+		if (PAGE.event.location) {
 			$event_additional_fields = $event_additional_fields.add(tmpl('event-additional-field', {
 				key: 'Место',
 				value: PAGE.event.location
@@ -10126,33 +11143,33 @@ EventPage = extending(Page, (function() {
 		}
 		
 		PAGE.$wrapper.html(tmpl('event-page', $.extend({}, PAGE.event, {
-			add_to_favorite_button: new AddToFavoriteButton(PAGE.event.id, {
-				is_add_avatar: true,
-				is_subscribed: PAGE.event.is_favorite,
-				classes: ['event_favourite_button', '-size_low', '-rounded', 'RippleEffect']
-			}),
+			action_buttons: $action_buttons,
 			avatars_collection: __APP.BUILD.avatarCollection(PAGE.event.favored, 6, {
 				dataset: {
 					modal_type: 'favors',
-					modal_event_id: PAGE.event.id,
-					modal_title: 'Добавили в избранное'
+					modal_event_id: PAGE.event.id
 				},
 				classes: avatars_collection_classes,
-				counter_classes: ['-size_30x30','-bordered','-color_marginal','-castable']
+				counter_classes: [
+					__C.CLASSES.SIZES.X30,
+					__C.CLASSES.UNIVERSAL_STATES.BORDERED,
+					__C.CLASSES.COLORS.MARGINAL,
+					__C.CLASSES.HOOKS.ADD_AVATAR.STATES.CASTABLE
+				]
 			}, PAGE.event.favored_users_count),
 			notifications: EventPage.buildNotifications(PAGE.event.notifications, PAGE.event.id, PAGE.event.last_event_date),
 			event_map: PAGE.event.location ? tmpl('event-map', {location_sanitized: encodeURI(PAGE.event.location)}) : '',
 			event_edit_functions: PAGE.event.can_edit ? tmpl('event-edit-functions', PAGE.event) : '',
 			event_additional_info: $event_additional_information,
-			canceled: PAGE.event.canceled ? '' : '-hidden',
+			canceled: PAGE.event.canceled ? '' : __C.CLASSES.HIDDEN,
 			organization_avatar_block: __APP.BUILD.avatarBlocks(organization, {
-				block_classes: ['-size_small'],
+				block_classes: [__C.CLASSES.SIZES.SMALL],
 				is_link: true,
-				entity: 'organization'
+				entity: __C.ENTITIES.ORGANIZATION
 			}),
 			event_additional_fields: $event_additional_fields,
 			cancel_cancellation: PAGE.event.can_edit ? tmpl('button', {
-					classes: '-color_primary RippleEffect CancelCancellation',
+					classes: __C.CLASSES.COLORS.PRIMARY + ' ' + __C.CLASSES.HOOKS.RIPPLE + ' CancelCancellation',
 					title: 'Вернуть событие'
 				}) : ''
 		})));
@@ -10192,978 +11209,928 @@ EventPage = extending(Page, (function() {
  */
 /**
  *
- * @constructor
- * @augments Page
+ * @class OnboardingPage
+ * @extends Page
  */
-function OnboardingPage() {
-	Page.apply(this, arguments);
-	this.ajax_data = {
-		length: 30,
-		offset: 0,
-		fields: 'img_small_url'
+OnboardingPage = extending(Page, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs OnboardingPage
+	 */
+	function OnboardingPage() {
+		Page.apply(this, arguments);
+		this.ajax_data = {
+			length: 30,
+			offset: 0,
+			fields: 'img_small_url'
+		};
+		this.is_upload_disabled = false;
+		this.block_scroll = true;
+	}
+	
+	OnboardingPage.prototype.init = function() {
+		bindRippleEffect(this.$wrapper);
+		bindPageLinks(this.$wrapper);
+		this.$wrapper.find('.Link').on('click', function() {
+			if($(this).is('.SkipOnboarding')){
+				cookies.setItem('skip_onboarding', 1, moment().add(7, 'd')._d);
+			}
+			__APP.SIDEBAR.updateSubscriptions();
+		});
 	};
-	this.is_upload_disabled = false;
-	this.block_scroll = true;
-}
-OnboardingPage.extend(Page);
-
-OnboardingPage.prototype.init = function() {
-	bindRippleEffect(this.$wrapper);
-	bindPageLinks(this.$wrapper);
-	this.$wrapper.find('.Link').on('click', function() {
-		if($(this).is('.SkipOnboarding')){
-			cookies.setItem('skip_onboarding', 1, moment().add(7, 'd')._d);
-		}
-		__APP.SIDEBAR.updateSubscriptions();
-	});
-};
-
-OnboardingPage.prototype.bindSubscriptions = function() {
-	this.$wrapper.find(".OnboardingOrgItem").not('.-Handled_OnboardingOrgItem').on('click', function() {
-		var $this = $(this);
-		if ($this.hasClass(__C.CLASSES.NEW_ACTIVE)) {
-			__APP.USER.unsubscribeFromOrganization($this.data("organization_id"));
-		} else {
-			__APP.USER.subscribeToOrganization($this.data("organization_id"));
-		}
-		$this.toggleClass(__C.CLASSES.NEW_ACTIVE);
-	}).addClass('-Handled_OnboardingOrgItem');
-};
-
-OnboardingPage.prototype.render = function() {
-	var PAGE = this,
-		$loader = tmpl('loader', {});
 	
-	if(__APP.USER.id === -1){
-		__APP.changeState('/feed/actual', true, true);
-		return null;
-	}
-	function appendRecommendations(organizations) {
-		$loader.detach();
-		if (organizations.length) {
-			PAGE.$wrapper.find(".RecommendationsWrapper").last().append(tmpl("onboarding-recommendation", organizations));
-			PAGE.bindSubscriptions();
-			PAGE.block_scroll = false;
-		} else {
-			PAGE.is_upload_disabled = true;
-		}
-	}
+	OnboardingPage.prototype.bindSubscriptions = function() {
+		this.$wrapper.find(".OnboardingOrgItem").not('.-Handled_OnboardingOrgItem').on('click', function() {
+			var $this = $(this);
+			if ($this.hasClass(__C.CLASSES.ACTIVE)) {
+				__APP.USER.unsubscribeFromOrganization($this.data("organization_id"));
+			} else {
+				__APP.USER.subscribeToOrganization($this.data("organization_id"));
+			}
+			$this.toggleClass(__C.CLASSES.ACTIVE);
+		}).addClass('-Handled_OnboardingOrgItem');
+	};
 	
-	PAGE.$wrapper.html(tmpl("onboarding-main", {}));
-	PAGE.init();
-	PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
-	OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
-	PAGE.$wrapper.find(".RecommendationsScrollbar").scrollbar({
-		onScroll: function(y, x) {
-			if (y.scroll == y.maxScroll && !PAGE.is_upload_disabled && !PAGE.block_scroll) {
-				PAGE.block_scroll = true;
-				PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
-				OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
+	OnboardingPage.prototype.render = function() {
+		var PAGE = this,
+			$loader = tmpl('loader', {});
+		
+		if(__APP.USER.id === -1){
+			__APP.changeState('/feed/actual', true, true);
+			return null;
+		}
+		function appendRecommendations(organizations) {
+			$loader.detach();
+			if (organizations.length) {
+				PAGE.$wrapper.find(".RecommendationsWrapper").last().append(tmpl("onboarding-recommendation", organizations));
+				PAGE.bindSubscriptions();
+				PAGE.block_scroll = false;
+			} else {
+				PAGE.is_upload_disabled = true;
 			}
 		}
-	});
-};
+		
+		PAGE.$wrapper.html(tmpl("onboarding-main", {}));
+		PAGE.init();
+		PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
+		OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
+		PAGE.$wrapper.find(".RecommendationsScrollbar").scrollbar({
+			onScroll: function(y, x) {
+				if (y.scroll == y.maxScroll && !PAGE.is_upload_disabled && !PAGE.block_scroll) {
+					PAGE.block_scroll = true;
+					PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
+					OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
+				}
+			}
+		});
+	};
+	
+	return OnboardingPage
+}()));
 /**
  * @requires ../Class.Page.js
  */
 /**
  *
- * @constructor
- * @augments Page
- * @param {(string|number)} [organization_id]
+ * @class EditOrganizationPage
+ * @extends Page
  */
-function EditOrganizationPage(organization_id) {
-	Page.apply(this);
-	this.page_title = 'Редактировать организацию';
-	this.organization = new OneOrganization(organization_id);
-	this.categories = new CategoriesCollection();
-	this.state_name = 'edit_organization';
-	
-	this.fields = [
-		'description',
-		'site_url',
-		'default_address',
-		'vk_url',
-		'facebook_url',
-		'email'
-	];
-}
-EditOrganizationPage.extend(Page);
-
-EditOrganizationPage.prototype.fetchData = function() {
-	if (this.organization.id) {
-		return this.fetching_data_defer = this.organization.fetchOrganization(this.fields);
-	}
-	return Page.prototype.fetchData.call(this);
-};
-
-EditOrganizationPage.prototype.render = function() {
-	var PAGE = this,
-		$view = this.$view,
-		$wrapper = this.$wrapper,
-		organization_id = this.organization.id,
-		additional_fields,
-		local_storage;
-	
-	if(__APP.USER.id === -1){
-		__APP.changeState('/feed/actual', true, true);
-		return null;
-	}
-	if(window.location.pathname.contains('organization/add')){
-		__APP.changeState('/add/organization', true, true);
-		return null;
+EditOrganizationPage = extending(Page, (function() {
+	/**
+	 *
+	 * @param {(string|number)} [organization_id]
+	 * @constructor
+	 * @constructs EditOrganizationPage
+	 */
+	function EditOrganizationPage(organization_id) {
+		Page.apply(this);
+		this.page_title = 'Редактировать организацию';
+		this.organization = new OneOrganization(organization_id);
+		this.categories = new CategoriesCollection();
+		this.state_name = 'edit_organization';
+		
+		this.fields = [
+			'description',
+			'site_url',
+			'default_address',
+			'vk_url',
+			'facebook_url',
+			'email'
+		];
 	}
 	
-	function initEditEventPage($view) {
-		
-		bindSelect2($view);
-		bindTabs($view);
-		bindLimitInputSize($view);
-		bindRippleEffect($view);
-		bindFileLoadButton($view);
-		ImgLoader.init($view);
-		
-		
-		$view.find('#add_organization_submit').off('click.Submit').on('click.Submit', submitEditOrganization);
-		
-	}
+	EditOrganizationPage.prototype.fetchData = function() {
+		if (this.organization.id) {
+			return this.fetching_data_defer = this.organization.fetchOrganization(this.fields);
+		}
+		return Page.prototype.fetchData.call(this);
+	};
 	
-	function initOrganizationTypes(selected_id) {
-		PAGE.categories.fetchCategories({}, 0, function(data) {
-			var $wrapper = $view.find('.EditEventOrganizations'),
-				organizations_options = $(),
-				$select = $wrapper.find('#add_organization_type');
+	EditOrganizationPage.prototype.render = function() {
+		var PAGE = this,
+			$view = this.$view,
+			$wrapper = this.$wrapper,
+			organization_id = this.organization.id,
+			additional_fields,
+			local_storage;
+		
+		if(__APP.USER.id === -1){
+			__APP.changeState('/feed/actual', true, true);
+			return null;
+		}
+		if(window.location.pathname.contains('organization/add')){
+			__APP.changeState('/add/organization', true, true);
+			return null;
+		}
+		
+		function initEditEventPage($view) {
 			
-			data.forEach(function(organization) {
-				organizations_options = organizations_options.add(tmpl('option', {
-					val: organization.id,
-					display_name: organization.name
-				}));
-			});
+			bindSelect2($view);
+			bindTabs($view);
+			bindLimitInputSize($view);
+			bindRippleEffect($view);
+			bindFileLoadButton($view);
+			ImgLoader.init($view);
 			
-			$select.append(organizations_options).select2({
-				containerCssClass: 'form_select2',
-				dropdownCssClass: 'form_select2_drop'
-			});
-			if (selected_id) {
-				$select.select2('val', selected_id);
-			}
-			if (organizations_options.length > 1) {
-				$wrapper.removeClass('-hidden');
-			} else {
-				$wrapper.addClass('-hidden');
-			}
-		});
-	}
-	
-	function submitEditOrganization() {
-		function formValidation($form, for_edit) {
-			var is_valid = true,
-				$times = $form.find('#edit_event_different_time').prop('checked') ? $form.find('[class^="TableDay_"]') : $form.find('.MainTime');
+			$view.find('#add_organization_address').placepicker();
 			
-			$form.find(':required').not(':disabled').each(function() {
-				var $this = $(this),
-					max_length = $this.data('maxlength');
-				if ($this.val() === "" || (max_length && $this.val().length > max_length)) {
-					if (is_valid) {
-						$('body').stop().animate({scrollTop: Math.ceil($this.offset().top - 150)}, 1000, 'swing');
-					}
-					handleErrorField($this);
-					is_valid = false;
+			$view.find('#add_organization_submit').off('click.Submit').on('click.Submit', submitEditOrganization);
+			
+		}
+		
+		function initOrganizationTypes(selected_id) {
+			PAGE.categories.fetchCategories({}, 0, function(data) {
+				var $wrapper = $view.find('.EditEventOrganizations'),
+					organizations_options = $(),
+					$select = $wrapper.find('#add_organization_type');
+				
+				data.forEach(function(organization) {
+					organizations_options = organizations_options.add(tmpl('option', {
+						val: organization.id,
+						display_name: organization.name
+					}));
+				});
+				
+				$select.append(organizations_options).select2({
+					containerCssClass: 'form_select2',
+					dropdownCssClass: 'form_select2_drop'
+				});
+				if (selected_id) {
+					$select.select2('val', selected_id);
+				}
+				if (organizations_options.length > 1) {
+					$wrapper.removeClass('-hidden');
+				} else {
+					$wrapper.addClass('-hidden');
 				}
 			});
-			
-			$times.each(function() {
-				var $row = $(this),
-					start = $row.find('.StartHours').val() + $row.find('.StartMinutes').val(),
-					end = $row.find('.EndHours').val() + $row.find('.EndMinutes').val();
-				if (start > end) {
-					if (is_valid) {
-						$('body').stop().animate({scrollTop: Math.ceil($row.offset().top - 150)}, 1000, 'swing');
-					}
-					showNotifier({text: 'Начальное время не может быть меньше конечного', status: false});
-					is_valid = false;
-				}
-			});
-			
-			if (!for_edit) {
-				$form.find('.DataUrl').each(function() {
-					var $this = $(this);
-					if ($this.val() === "") {
+		}
+		
+		function submitEditOrganization() {
+			function formValidation($form, for_edit) {
+				var is_valid = true,
+					$times = $form.find('#edit_event_different_time').prop('checked') ? $form.find('[class^="TableDay_"]') : $form.find('.MainTime');
+				
+				$form.find(':required').not(':disabled').each(function() {
+					var $this = $(this),
+						max_length = $this.data('maxlength');
+					if ($this.val() === "" || (max_length && $this.val().length > max_length)) {
 						if (is_valid) {
-							$('body').stop().animate({scrollTop: Math.ceil($this.closest('.EditEventImgLoadWrap').offset().top - 150)}, 1000, 'swing', function() {
-								showNotifier({text: 'Пожалуйста, добавьте обложку организации', status: false})
-							});
+							$('body').stop().animate({scrollTop: Math.ceil($this.offset().top - 150)}, 1000, 'swing');
 						}
+						handleErrorField($this);
 						is_valid = false;
 					}
 				});
-			}
-			return is_valid;
-		}
-		
-		function afterSubmit() {
-            socket.emit('utils.registrationFinished', additional_fields);
-            socket.on('utils.updateImagesDone', function() {
-				window.location.href = '/organization/' + PAGE.organization.id;
-			});
-			socket.emit('utils.updateImages');
-		}
-		
-		var $form = $view.find("#add-organization-form"),
-			data = {
-				organization_id: null,
-				name: null,
-				short_name: null,
-				type_id: null,
-				background_filename: null,
-				logo_filename: null,
-				default_address: null,
-				location: null,
-				description: null,
-				site_url: null,
-				vk_url: null,
-				facebook_url: null,
-				email: null,
-				filenames: {
-					background: null,
-					logo: null
+				
+				$times.each(function() {
+					var $row = $(this),
+						start = $row.find('.StartHours').val() + $row.find('.StartMinutes').val(),
+						end = $row.find('.EndHours').val() + $row.find('.EndMinutes').val();
+					if (start > end) {
+						if (is_valid) {
+							$('body').stop().animate({scrollTop: Math.ceil($row.offset().top - 150)}, 1000, 'swing');
+						}
+						showNotifier({text: 'Начальное время не может быть меньше конечного', status: false});
+						is_valid = false;
+					}
+				});
+				
+				if (!for_edit) {
+					$form.find('.DataUrl').each(function() {
+						var $this = $(this);
+						if ($this.val() === "") {
+							if (is_valid) {
+								$('body').stop().animate({scrollTop: Math.ceil($this.closest('.EditEventImgLoadWrap').offset().top - 150)}, 1000, 'swing', function() {
+									showNotifier({text: 'Пожалуйста, добавьте обложку организации', status: false})
+								});
+							}
+							is_valid = false;
+						}
+					});
 				}
-			},
-			form_data = $form.serializeForm(),
-			valid_form = formValidation($form, !!(form_data.organization_id));
-		
-		if (valid_form) {
-			$.extend(true, data, form_data);
-			
-			data.filenames = {
-				background: data.background_filename,
-				logo: data.logo_filename
-			};
-			
-			if (PAGE.organization.id) {
-				PAGE.organization.updateOrganization(data, afterSubmit);
-			} else {
-				PAGE.organization.createOrganization(data, afterSubmit);
+				return is_valid;
 			}
 			
+			function afterSubmit() {
+				socket.emit('utils.registrationFinished', additional_fields);
+				socket.on('utils.updateImagesDone', function() {
+					window.location.href = '/organization/' + PAGE.organization.id;
+				});
+				socket.emit('utils.updateImages');
+			}
+			
+			var $form = $view.find("#add-organization-form"),
+				data = {
+					organization_id: null,
+					name: null,
+					short_name: null,
+					type_id: null,
+					background_filename: null,
+					logo_filename: null,
+					default_address: null,
+					location: null,
+					description: null,
+					site_url: null,
+					vk_url: null,
+					facebook_url: null,
+					email: null,
+					filenames: {
+						background: null,
+						logo: null
+					}
+				},
+				form_data = $form.serializeForm(),
+				valid_form = formValidation($form, !!(form_data.organization_id));
+			
+			if (valid_form) {
+				$.extend(true, data, form_data);
+				
+				data.filenames = {
+					background: data.background_filename,
+					logo: data.logo_filename
+				};
+				
+				if (PAGE.organization.id) {
+					PAGE.organization.updateOrganization(data, afterSubmit);
+				} else {
+					PAGE.organization.createOrganization(data, afterSubmit);
+				}
+				
+				
+			}
 			
 		}
 		
-	}
+		
+		if (!organization_id) {
+			try {
+				local_storage = JSON.parse(window.localStorage.getItem('organization_info'));
+			} catch (e) {
+				local_storage = {}
+			}
+			
+			additional_fields = $.extend({
+				header_text: 'Новый организатор'
+			}, local_storage, true);
+			
+			cookies.removeItem('open_add_organization', '/');
+			window.localStorage.removeItem('organization_info');
+			
+			$wrapper.html(tmpl('add-organization-page', additional_fields));
+			initEditEventPage($view);
+			__APP.MODALS.bindCallModal($view);
+			initOrganizationTypes();
+		} else {
+			additional_fields = $.extend(true, {}, this.organization);
+			
+			additional_fields.header_text = 'Редактирование организации';
+			
+			if (additional_fields.background_img_url) {
+				additional_fields.background_filename = additional_fields.background_img_url.split('/').reverse()[0];
+			}
+			if (additional_fields.img_url) {
+				additional_fields.logo_filename = additional_fields.img_url.split('/').reverse()[0];
+			}
+			
+			$.extend(true, additional_fields, additional_fields);
+			$wrapper.html(tmpl('add-organization-page', additional_fields));
+			
+			initEditEventPage($view);
+			initOrganizationTypes(additional_fields.type_id);
+			
+			__APP.MODALS.bindCallModal($view);
+			
+			if (additional_fields.img_url) {
+				toDataUrl(additional_fields.img_url, function(base64_string) {
+					$view.find('#add_organization_img_src').val(base64_string ? base64_string : null);
+				});
+			}
+			if (additional_fields.background_img_url) {
+				toDataUrl(additional_fields.background_img_url, function(base64_string) {
+					$view.find('#add_organization_background_src').val(base64_string ? base64_string : null);
+				});
+			}
+		}
+	};
 	
-	
-	if (!organization_id) {
-		try {
-			local_storage = JSON.parse(window.localStorage.getItem('organization_info'));
-		} catch (e) {
-			local_storage = {}
-		}
-		
-		additional_fields = $.extend({
-			header_text: 'Новый организатор'
-		}, local_storage, true);
-		
-		cookies.removeItem('open_add_organization', '/');
-		window.localStorage.removeItem('organization_info');
-		
-		$wrapper.html(tmpl('add-organization-page', additional_fields));
-		initEditEventPage($view);
-		__APP.MODALS.bindCallModal($view);
-		initOrganizationTypes();
-	} else {
-		additional_fields = $.extend(true, {}, this.organization);
-		
-		additional_fields.header_text = 'Редактирование организации';
-		
-		if (additional_fields.background_img_url) {
-			additional_fields.background_filename = additional_fields.background_img_url.split('/').reverse()[0];
-		}
-		if (additional_fields.img_url) {
-			additional_fields.logo_filename = additional_fields.img_url.split('/').reverse()[0];
-		}
-		
-		$.extend(true, additional_fields, additional_fields);
-		$wrapper.html(tmpl('add-organization-page', additional_fields));
-		
-		initEditEventPage($view);
-		initOrganizationTypes(additional_fields.type_id);
-		
-		__APP.MODALS.bindCallModal($view);
-		
-		if (additional_fields.img_url) {
-			toDataUrl(additional_fields.img_url, function(base64_string) {
-				$view.find('#add_organization_img_src').val(base64_string ? base64_string : null);
-			});
-		}
-		if (additional_fields.background_img_url) {
-			toDataUrl(additional_fields.background_img_url, function(base64_string) {
-				$view.find('#add_organization_background_src').val(base64_string ? base64_string : null);
-			});
-		}
-	}
-};
+	return EditOrganizationPage;
+}()));
 /**
  * @requires Class.EditOrganizationPage.js
  */
 /**
  *
- * @constructor
- * @augments EditOrganizationPage
+ * @class AddOrganizationPage
+ * @extends EditOrganizationPage
  */
-function AddOrganizationPage() {
-	EditOrganizationPage.apply(this);
-	this.page_title = 'Новая организация';
-}
-AddOrganizationPage.extend(EditOrganizationPage);
+AddOrganizationPage = extending(EditOrganizationPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs AddOrganizationPage
+	 */
+	function AddOrganizationPage() {
+		EditOrganizationPage.apply(this);
+		this.page_title = 'Новая организация';
+	}
+	
+	return AddOrganizationPage;
+}()));
 /**
  * @requires ../Class.Page.js
  */
 /**
  *
- * @constructor
- * @augments Page
- * @param {(string|number)} [category_id]
+ * @class CatalogPage
+ * @extends Page
  */
-function CatalogPage(category_id) {
-	Page.apply(this);
+CatalogPage = extending(Page, (function() {
+	/**
+	 *
+	 * @param {(string|number)} [category_id]
+	 * @constructor
+	 * @constructs CatalogPage
+	 */
+	function CatalogPage(category_id) {
+		Page.apply(this);
+		
+		this.wrapper_tmpl = 'organizations';
+		
+		this.categories_ajax_data = {order_by: 'order_position'};
+		this.organizations_ajax_data = {
+			fields: [
+				'background_small_img_url',
+				'img_small_url',
+				'is_subscribed',
+				'subscribed_count',
+				'privileges'
+			],
+			order_by: '-subscribed_count'
+		};
+		
+		this.default_title = 'Организации';
+		
+		this.selected_category_id = category_id;
+		this.categories = new CategoriesCollection();
+		this.all_organizations = new OrganizationsCollection();
+		
+	}
 	
-	this.wrapper_tmpl = 'organizations';
-	
-	this.categories_ajax_data = {order_by: 'order_position'};
-	this.organizations_ajax_data = {
-		fields: [
-			'background_small_img_url',
-			'img_small_url',
-			'is_subscribed',
-			'subscribed_count',
-			'privileges'
-		],
-		order_by: '-subscribed_count'
+	CatalogPage.prototype.fetchData = function() {
+		var self = this;
+		return this.fetching_data_defer = this.categories.fetchCategoriesWithOrganizations(this.categories_ajax_data, this.organizations_ajax_data, 0).done(function() {
+			self.all_organizations = self.categories
+				.reduce(function(collection, cat) {
+					return collection.setData(cat.organizations);
+				}, new OrganizationsCollection())
+				.sort(function(a, b) {
+					return b.subscribed_count - a.subscribed_count;
+				});
+		});
+	};
+	/**
+	 *
+	 * @param {(string|number)} category_id
+	 */
+	CatalogPage.prototype.selectCategory = function(category_id) {
+		this.selected_category_id = category_id ? category_id : this.selected_category_id;
+		this.$view.find('.Category').filter('[data-category-id="' + this.selected_category_id + '"]').addClass(__C.CLASSES.ACTIVE);
+		__APP.changeState('/organizations/' + this.selected_category_id, true);
+		__APP.changeTitle(this.categories.getByID(this.selected_category_id).name);
 	};
 	
-	this.default_title = 'Организации';
-	
-	this.selected_category_id = category_id;
-	this.categories = new CategoriesCollection();
-	this.all_organizations = new OrganizationsCollection();
-	
-}
-CatalogPage.extend(Page);
-
-CatalogPage.prototype.fetchData = function() {
-	var self = this;
-	return this.fetching_data_defer = this.categories.fetchCategoriesWithOrganizations(this.categories_ajax_data, this.organizations_ajax_data, 0).done(function() {
-		self.all_organizations = self.categories
-			.reduce(function(collection, cat) {
-				return collection.setData(cat.organizations);
-			}, new OrganizationsCollection())
-			.sort(function(a, b) {
-				return b.subscribed_count - a.subscribed_count;
-			});
-	});
-};
-/**
- *
- * @param {(string|number)} category_id
- */
-CatalogPage.prototype.selectCategory = function(category_id) {
-	this.selected_category_id = category_id ? category_id : this.selected_category_id;
-	this.$view.find('.Category').filter('[data-category-id="' + this.selected_category_id + '"]').addClass(__C.CLASSES.NEW_ACTIVE);
-	__APP.changeState('/organizations/' + this.selected_category_id, true);
-	__APP.changeTitle(this.categories.getByID(this.selected_category_id).name);
-};
-
-CatalogPage.prototype.init = function() {
-	var PAGE = this,
-		$categories = PAGE.$view.find('.Category');
-	
-	function bindOrganizationsEvents() {
-		bindRippleEffect(PAGE.$view);
-		bindPageLinks(PAGE.$view);
-	}
-	
-	$(window).on('subscribe.updateCatalog', function(e, id) {
-		var org = PAGE.all_organizations.getByID(id);
-		org.is_subscribed = true;
-		org.subscribed_count++;
-	});
-	$(window).on('unsubscribe.updateCatalog', function(e, id) {
-		var org = PAGE.all_organizations.getByID(id);
-		org.is_subscribed = false;
-		org.subscribed_count--;
-	});
-	
-	bindOrganizationsEvents();
-	
-	PAGE.$view.find('.OrganizationsCategoriesScroll').scrollbar({disableBodyScroll: true});
-	
-	PAGE.$view.find('.ShowAllOrganizations').on('click.showAllOrganizations', function() {
-		$categories.removeClass(__C.CLASSES.NEW_ACTIVE).siblings('.SubcategoryWrap').height(0);
-		PAGE.selected_category_id = undefined;
+	CatalogPage.prototype.init = function() {
+		var PAGE = this,
+			$categories = PAGE.$view.find('.Category');
 		
-		__APP.changeState('/organizations', true);
-		__APP.changeTitle(PAGE.default_title);
-		PAGE.$wrapper.html(__APP.BUILD.organizationCard(PAGE.all_organizations));
-		bindOrganizationsEvents();
-	});
-	
-	$categories.on('click.selectCategory', function() {
-		var $this = $(this),
-			category_id = $this.data('category-id'),
-			$wrap = $this.next('.SubcategoryWrap'),
-			is_parent_category = !!$wrap.length,
-			is_this_active = $this.hasClass(__C.CLASSES.NEW_ACTIVE);
-		
-		$this.parent().find('.Category').not($this).removeClass(__C.CLASSES.NEW_ACTIVE).filter('.SubcategoryWrap').height(0);
-		if (is_parent_category) {
-			$wrap.height(is_this_active ? 0 : $wrap.children().outerHeight());
-			$this.toggleClass(__C.CLASSES.NEW_ACTIVE);
-		} else {
-			if (is_this_active) {
-				PAGE.categories = new CategoriesCollection();
-				PAGE.categories.fetchCategoriesWithOrganizations(PAGE.categories_ajax_data, PAGE.organizations_ajax_data, 0, function() {
-					PAGE.render();
-				});
-			} else {
-				PAGE.selectCategory(category_id);
-				PAGE.$wrapper.html(__APP.BUILD.organizationCard(PAGE.categories.getByID(category_id).organizations));
-				bindOrganizationsEvents();
-			}
+		function bindOrganizationsEvents() {
+			bindRippleEffect(PAGE.$view);
+			bindPageLinks(PAGE.$view);
 		}
-	});
-};
-
-CatalogPage.prototype.render = function() {
-	this.$view.find('.OrganizationsCategoriesScroll').html(__APP.BUILD.organisationsCategoriesItems(this.categories));
-	this.$wrapper.html(__APP.BUILD.organizationCard(this.selected_category_id ? this.categories.getByID(this.selected_category_id).organizations : this.all_organizations));
+		
+		$(window).on('subscribe.updateCatalog', function(e, id) {
+			var org = PAGE.all_organizations.getByID(id);
+			org.is_subscribed = true;
+			org.subscribed_count++;
+		});
+		$(window).on('unsubscribe.updateCatalog', function(e, id) {
+			var org = PAGE.all_organizations.getByID(id);
+			org.is_subscribed = false;
+			org.subscribed_count--;
+		});
+		
+		bindOrganizationsEvents();
+		
+		PAGE.$view.find('.OrganizationsCategoriesScroll').scrollbar({disableBodyScroll: true});
+		
+		PAGE.$view.find('.ShowAllOrganizations').on('click.showAllOrganizations', function() {
+			$categories.removeClass(__C.CLASSES.ACTIVE).siblings('.SubcategoryWrap').height(0);
+			PAGE.selected_category_id = undefined;
+			
+			__APP.changeState('/organizations', true);
+			__APP.changeTitle(PAGE.default_title);
+			PAGE.$wrapper.html(__APP.BUILD.organizationCard(PAGE.all_organizations));
+			bindOrganizationsEvents();
+		});
+		
+		$categories.on('click.selectCategory', function() {
+			var $this = $(this),
+				category_id = $this.data('category-id'),
+				$wrap = $this.next('.SubcategoryWrap'),
+				is_parent_category = !!$wrap.length,
+				is_this_active = $this.hasClass(__C.CLASSES.ACTIVE);
+			
+			$this.parent().find('.Category').not($this).removeClass(__C.CLASSES.ACTIVE).filter('.SubcategoryWrap').height(0);
+			if (is_parent_category) {
+				$wrap.height(is_this_active ? 0 : $wrap.children().outerHeight());
+				$this.toggleClass(__C.CLASSES.ACTIVE);
+			} else {
+				if (is_this_active) {
+					PAGE.categories = new CategoriesCollection();
+					PAGE.categories.fetchCategoriesWithOrganizations(PAGE.categories_ajax_data, PAGE.organizations_ajax_data, 0, function() {
+						PAGE.render();
+					});
+				} else {
+					PAGE.selectCategory(category_id);
+					PAGE.$wrapper.html(__APP.BUILD.organizationCard(PAGE.categories.getByID(category_id).organizations));
+					bindOrganizationsEvents();
+				}
+			}
+		});
+	};
 	
-	if (this.selected_category_id) {
-		this.selectCategory(this.selected_category_id);
-	} else {
-		__APP.changeTitle(this.default_title);
-	}
-	this.init();
-};
-
-CatalogPage.prototype.destroy = function() {
-	$(window).off('subscribe.updateCatalog unsubscribe.updateCatalog');
-};
+	CatalogPage.prototype.render = function() {
+		this.$view.find('.OrganizationsCategoriesScroll').html(__APP.BUILD.organisationsCategoriesItems(this.categories));
+		this.$wrapper.html(__APP.BUILD.organizationCard(this.selected_category_id ? this.categories.getByID(this.selected_category_id).organizations : this.all_organizations));
+		
+		if (this.selected_category_id) {
+			this.selectCategory(this.selected_category_id);
+		} else {
+			__APP.changeTitle(this.default_title);
+		}
+		this.init();
+	};
+	
+	CatalogPage.prototype.destroy = function() {
+		$(window).off('subscribe.updateCatalog unsubscribe.updateCatalog');
+	};
+	
+	return CatalogPage;
+}()));
 /**
  * @requires ../Class.Page.js
  */
 /**
  *
- * @constructor
- * @augments Page
- * @param {(string|number)} organization_id
+ * @class OrganizationPage
+ * @extends Page
  */
-function OrganizationPage(organization_id) {
+OrganizationPage = extending(Page, (function() {
 	/**
-	 * @typedef {object} OrganizationPage~EventType
-	 * @property {string} name
-	 * @property {string} scroll_event
-	 * @property {string} sort_date_type
-	 * @property {string} last_date
-	 * @property {boolean} is_upload_disabled
+	 *
+	 * @param {(string|number)} organization_id
+	 * @constructor
+	 * @constructs OrganizationPage
 	 */
-	var	event_type_default = {
+	function OrganizationPage(organization_id) {
+		/**
+		 * @typedef {Object} OrganizationPage~EventType
+		 * @property {string} name
+		 * @property {string} scroll_event
+		 * @property {string} sort_date_type
+		 * @property {string} last_date
+		 * @property {boolean} is_upload_disabled
+		 */
+		var	event_type_default = {
 			last_date: '',
 			is_upload_disabled: false
 		};
-	Page.apply(this, arguments);
-	this.fields = [
-		'img_small_url',
-		'background_medium_img_url',
-		'description',
-		'site_url',
-		'is_subscribed',
-		'privileges',
-		'default_address',
-		'subscribed_count',
-		'subscribed{fields:"is_friend",order_by:"-is_friend,first_name",length:10}'
-	];
-	this.events_fields = [
-		'image_horizontal_medium_url',
-		'favored_users_count',
-		'is_favorite',
-		'favored{length:5}',
-		'dates'
-	];
-	
+		Page.apply(this, arguments);
+		this.fields = new Fields(
+			'img_small_url',
+			'background_medium_img_url',
+			'description',
+			'site_url',
+			'is_subscribed',
+			'privileges',
+			'default_address',
+			'subscribed_count', {
+				subscribed: {
+					fields: 'is_friend',
+					order_by: '-is_friend,first_name',
+					length: 10
+				}
+			}
+		);
+		this.events_fields = new Fields(
+			'image_horizontal_medium_url',
+			'favored_users_count',
+			'is_favorite',
+			'is_registered',
+			'registration_available',
+			'registration_locally',
+			'ticketing_locally',
+			'dates', {
+				favored: {
+					length: 5
+				}
+			}
+		);
+		
+		/**
+		 * @name OrganizationPage#event_types
+		 * @type object
+		 * @enum {OrganizationPage~EventType}
+		 */
+		this.event_types = {
+			future: $.extend(true, {}, event_type_default, {
+				name: 'future',
+				scroll_event: 'scroll.uploadFutureEvents',
+				sort_date_type: 'nearest_event_date'
+			}),
+			past: $.extend(true, {}, event_type_default, {
+				name: 'past',
+				scroll_event: 'scroll.uploadPastEvents',
+				sort_date_type: 'last_event_date'
+			}),
+			delayed: $.extend(true, {}, event_type_default, {
+				name: 'delayed',
+				scroll_event: 'scroll.uploadDelayedEvents',
+				sort_date_type: 'public_at'
+			}),
+			canceled: $.extend(true, {}, event_type_default, {
+				name: 'canceled',
+				scroll_event: 'scroll.uploadCanceledEvents',
+				sort_date_type: 'first_event_date'
+			})
+		};
+		
+		this.events_load = 0;
+		this.future_events = new FutureEventsCollection();
+		this.past_events = new PastEventsCollection();
+		this.delayed_events = new DelayedEventsCollection();
+		this.canceled_events = new CanceledEventsCollection();
+		this.organization = new OneOrganization(organization_id);
+	}
 	/**
-	 * @name OrganizationPage#event_types
-	 * @type object
-	 * @enum {OrganizationPage~EventType}
+	 *
+	 * @return {jqPromise}
 	 */
-	this.event_types = {
-		future: $.extend(true, {}, event_type_default, {
-			name: 'future',
-			scroll_event: 'scroll.uploadFutureEvents',
-			sort_date_type: 'nearest_event_date'
-		}),
-		past: $.extend(true, {}, event_type_default, {
-			name: 'past',
-			scroll_event: 'scroll.uploadPastEvents',
-			sort_date_type: 'last_event_date'
-		}),
-		delayed: $.extend(true, {}, event_type_default, {
-			name: 'delayed',
-			scroll_event: 'scroll.uploadDelayedEvents',
-			sort_date_type: 'public_at'
-		}),
-		canceled: $.extend(true, {}, event_type_default, {
-			name: 'canceled',
-			scroll_event: 'scroll.uploadCanceledEvents',
-			sort_date_type: 'first_event_date'
-		})
+	OrganizationPage.prototype.fetchData = function() {
+		var self = this;
+		return this.fetching_data_defer = this.organization.fetchOrganization(this.fields).done(function(data) {
+			self.is_admin = self.organization.role != OneUser.ROLE.USER;
+			self.max_events_load = self.is_admin ? 4 : 2;
+		}).promise();
+	};
+	/**
+	 *
+	 * @param {OrganizationPage~EventType} type
+	 * @param {Array<OneEvent>} events
+	 * @returns {jQuery}
+	 */
+	OrganizationPage.prototype.appendEvents = function(type, events) {
+		var $wrapper = this.$wrapper.find('.' + type.name.capitalize() + 'Events'),
+			$output;
+		
+		if (events.length) {
+			$output = __APP.BUILD.eventBlocks(events, type);
+		} else {
+			type.is_upload_disabled = true;
+			$(window).off(type.scroll_event);
+			$output = tmpl('organization-feed-no-event', {
+				text: 'Больше событий нет :('
+			});
+		}
+		$wrapper.append($output);
+		return $output;
+	};
+	/**
+	 *
+	 * @param {OrganizationPage~EventType} type
+	 */
+	OrganizationPage.prototype.bindUploadEventsOnScroll = function(type) {
+		var PAGE = this,
+			$window = $(window),
+			scrollEvent = function() {
+				if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !type.is_upload_disabled) {
+					$window.off(type.scroll_event);
+					PAGE[type.name + '_events'].fetchOrganizationsFeed(PAGE.organization.id, PAGE.events_fields, 10, function(events) {
+						PAGE.bindFeedEvents(PAGE.appendEvents(type, events));
+						$window.on(type.scroll_event, scrollEvent);
+					});
+				}
+			};
+		
+		if (!type.is_upload_disabled) {
+			$window.on(type.scroll_event, scrollEvent);
+		}
 	};
 	
-	this.events_load = 0;
-	this.future_events = new FutureEventsCollection();
-	this.past_events = new PastEventsCollection();
-	this.delayed_events = new DelayedEventsCollection();
-	this.canceled_events = new CanceledEventsCollection();
-	this.organization = new OneOrganization(organization_id);
-}
-OrganizationPage.extend(Page);
-
-OrganizationPage.prototype.fetchData = function() {
-	var self = this;
-	return this.fetching_data_defer = this.organization.fetchOrganization(this.fields).done(function(data) {
-		self.is_admin = self.organization.role != OneUser.ROLE.USER;
-		self.max_events_load = self.is_admin ? 4 : 2;
-	});
-};
-/**
- *
- * @param {OrganizationPage~EventType} type
- * @param {Array<OneEvent>} events
- * @returns {jQuery}
- */
-OrganizationPage.prototype.appendEvents = function(type, events) {
-	var $wrapper = this.$wrapper.find('.' + type.name.capitalize() + 'Events'),
-		$output;
+	OrganizationPage.prototype.bindFeedEvents = function($parent) {
+		bindRippleEffect($parent);
+		trimAvatarsCollection($parent);
+		__APP.MODALS.bindCallModal($parent);
+		bindPageLinks($parent);
+	};
 	
-	if (events.length) {
-		$output = __APP.BUILD.eventBlocks(events, type);
-	} else {
-		type.is_upload_disabled = true;
-		$(window).off(type.scroll_event);
-		$output = tmpl('organization-feed-no-event', {
-			text: 'Больше событий нет :('
-		});
-	}
-	$wrapper.append($output);
-	return $output;
-};
-/**
- *
- * @param {OrganizationPage~EventType} type
- */
-OrganizationPage.prototype.bindUploadEventsOnScroll = function(type) {
-	var PAGE = this,
-		$window = $(window),
-		scrollEvent = function() {
-			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !type.is_upload_disabled) {
-				$window.off(type.scroll_event);
-				PAGE[type.name + '_events'].fetchOrganizationsFeed(PAGE.organization.id, PAGE.events_fields, 10, function(events) {
-					PAGE.bindFeedEvents(PAGE.appendEvents(type, events));
-					$window.on(type.scroll_event, scrollEvent);
-				});
-			}
-		};
-	
-	if (!type.is_upload_disabled) {
-		$window.on(type.scroll_event, scrollEvent);
-	}
-};
-
-OrganizationPage.prototype.bindFeedEvents = function($parent) {
-	bindRippleEffect($parent);
-	trimAvatarsCollection($parent);
-	__APP.MODALS.bindCallModal($parent);
-	bindPageLinks($parent);
-};
-
-OrganizationPage.prototype.init = function() {
-	var PAGE = this,
-		$subscribers_scroll;
-	bindTabs(PAGE.$wrapper);
-	PAGE.bindFeedEvents(PAGE.$wrapper);
-	__APP.MODALS.bindCallModal(PAGE.$wrapper);
-	
-	PAGE.$wrapper.find('.Tabs').on('change.tabs', function() {
-		var scroll_events = [];
-		$.each(PAGE.event_types, function() {
-			scroll_events.push(this.scroll_event);
-		});
-		$(window).off(scroll_events.join(' '));
-		PAGE.bindUploadEventsOnScroll(PAGE.event_types[$(this).find('.Tab.-active').data('type')]);
-	});
-	
-	PAGE.$wrapper.find('.ExternalPage').on('click.sendStat', function() {
-		storeStat(PAGE.organization.id, __C.STATS.ORGANIZATION_ENTITY, __C.STATS.ORGANIZATION_OPEN_SITE);
-	});
-	
-	$subscribers_scroll = PAGE.$wrapper.find('.SubscribersScroll').scrollbar({
-		disableBodyScroll: true,
-		onScroll: function(y) {
-			if (y.scroll == y.maxScroll) {
-				PAGE.organization.subscribed.fetchOrganizationSubscribers(PAGE.organization.id, 10, {
-					fields: 'is_friend',
-					order_by: '-is_friend,first_name'
-				}, function(subscribed) {
-					if (subscribed.length) {
-						$subscribers_scroll.append(__APP.BUILD.subscribers(subscribed, PAGE.organization.subscribed[PAGE.organization.subscribed.length - 1].is_friend));
-					} else {
-						$subscribers_scroll.off('scroll.onScroll');
-					}
-					bindPageLinks($subscribers_scroll);
-				});
-			}
-		}
-	});
-};
-
-OrganizationPage.prototype.render = function() {
-	var PAGE = this,
-		organization = new OneOrganization(PAGE.organization.id);
-	organization.setData(PAGE.organization);
-	__APP.changeTitle(organization.short_name);
-	organization.short_name = undefined;
-	$('.SidebarOrganizationsList').find('[data-organization_id="' + organization.id + '"]').find('.OrganizationCounter').addClass('-hidden');
-	
-	PAGE.$wrapper.html(tmpl('organization-wrapper', $.extend(true, {
-		background_image: organization.background_img_url ? tmpl('organization-background-image', organization) : '',
-		avatar_block: __APP.BUILD.avatarBlocks(organization, {
-			block_classes: ['organization_title_block'],
-			avatar_classes: ['-size_small','organization_avatar'],
-			entity: 'organization'
-		}),
-		subscribe_button: new SubscribeButton(organization.id, {
-			is_subscribed: organization.is_subscribed,
-			colors: {
-				subscribe: '-color_accent',
-				unsubscribe: '-color_neutral',
-				subscribed: '-color_neutral'
-			},
-			classes: ['-size_low', '-fill', 'RippleEffect']
-		}),
-		has_address: organization.default_address ? '' : '-hidden',
-		redact_org_button: (organization.role == OneUser.ROLE.ADMIN) ? __APP.BUILD.link({
-			title: 'Изменить',
-			classes: ['button', '-fill', '-color_neutral', 'fa_icon', 'fa-pencil', 'RippleEffect'],
-			page: 'organization/' + organization.id + '/edit/'
-		}) : '',
-		hidden_for_users: PAGE.is_admin ? '' : '-hidden',
-		subscribed_blocks: __APP.BUILD.subscribers(organization.subscribed)
-	}, organization)));
-	
-	PAGE.$wrapper.on('events_load.FutureEvents events_load.PastEvents events_load.DelayedEvents events_load.CanceledEvents', function(e) {
-		if (e.namespace == 'FutureEvents') {
-			PAGE.init();
-			PAGE.bindUploadEventsOnScroll(PAGE.event_types.future);
-		}
-		PAGE.bindFeedEvents(PAGE.$wrapper.find('.' + e.namespace));
-		if (++PAGE.events_load == PAGE.max_events_load) {
-			PAGE.$wrapper.off('events_load');
-		}
-	});
-	
-	
-	PAGE.future_events.fetchOrganizationsFeed(organization.id, PAGE.events_fields, 10, function(future_events) {
-		PAGE.appendEvents(PAGE.event_types.future, future_events);
-		PAGE.$wrapper.trigger('events_load.FutureEvents');
-	});
-	
-	PAGE.past_events.fetchOrganizationsFeed(organization.id, PAGE.events_fields, 10, function(past_events) {
-		PAGE.appendEvents(PAGE.event_types.past, past_events);
-		PAGE.$wrapper.trigger('events_load.PastEvents');
-	});
-	
-	if (PAGE.is_admin) {
-		PAGE.delayed_events.fetchOrganizationsFeed(organization.id, PAGE.events_fields, 10, function(delayed_events) {
-			PAGE.appendEvents(PAGE.event_types.delayed, delayed_events);
-			PAGE.$wrapper.trigger('events_load.DelayedEvents');
+	OrganizationPage.prototype.init = function() {
+		var PAGE = this,
+			$subscribers_scroll;
+		bindTabs(PAGE.$wrapper);
+		PAGE.bindFeedEvents(PAGE.$wrapper);
+		__APP.MODALS.bindCallModal(PAGE.$wrapper);
+		
+		PAGE.$wrapper.find('.Tabs').on('change.tabs', function() {
+			var scroll_events = [];
+			$.each(PAGE.event_types, function() {
+				scroll_events.push(this.scroll_event);
+			});
+			$(window).off(scroll_events.join(' '));
+			PAGE.bindUploadEventsOnScroll(PAGE.event_types[$(this).find('.Tab.-active').data('type')]);
 		});
 		
-		PAGE.canceled_events.fetchOrganizationsFeed(organization.id, PAGE.events_fields, 10, function(canceled_events) {
-			PAGE.appendEvents(PAGE.event_types.canceled, canceled_events);
-			PAGE.$wrapper.trigger('events_load.CanceledEvents');
+		PAGE.$wrapper.find('.ExternalPage').on('click.sendStat', function() {
+			storeStat(PAGE.organization.id, __C.STATS.ORGANIZATION_ENTITY, __C.STATS.ORGANIZATION_OPEN_SITE);
 		});
-	}
-};
+		
+		$subscribers_scroll = PAGE.$wrapper.find('.SubscribersScroll').scrollbar({
+			disableBodyScroll: true,
+			onScroll: function(y) {
+				if (y.scroll == y.maxScroll) {
+					PAGE.organization.subscribed.fetchOrganizationSubscribers(PAGE.organization.id, 10, {
+						fields: 'is_friend',
+						order_by: '-is_friend,first_name'
+					}, function(subscribed) {
+						if (subscribed.length) {
+							$subscribers_scroll.append(__APP.BUILD.subscribers(subscribed, PAGE.organization.subscribed[PAGE.organization.subscribed.length - 1].is_friend));
+						} else {
+							$subscribers_scroll.off('scroll.onScroll');
+						}
+						bindPageLinks($subscribers_scroll);
+					});
+				}
+			}
+		});
+	};
+	
+	OrganizationPage.prototype.render = function() {
+		var PAGE = this,
+			organization = new OneOrganization(PAGE.organization.id);
+		organization.setData(PAGE.organization);
+		__APP.changeTitle(organization.short_name);
+		organization.short_name = undefined;
+		$('.SidebarOrganizationsList').find('[data-organization_id="' + organization.id + '"]').find('.OrganizationCounter').addClass(__C.CLASSES.HIDDEN);
+		PAGE.$wrapper.html(tmpl('organization-wrapper', $.extend(true, {
+			background_image: organization.background_img_url ? tmpl('organization-background-image', organization) : '',
+			avatar_block: __APP.BUILD.avatarBlocks(organization, {
+				block_classes: ['organization_title_block'],
+				avatar_classes: [__C.CLASSES.SIZES.SMALL, 'organization_avatar'],
+				entity: __C.ENTITIES.ORGANIZATION
+			}),
+			subscribe_button: new SubscribeButton(organization.id, {
+				is_checked: organization.is_subscribed,
+				colors: {
+					checked: __C.CLASSES.COLORS.NEUTRAL,
+					unchecked: __C.CLASSES.COLORS.ACCENT,
+					checked_hover: __C.CLASSES.COLORS.NEUTRAL,
+					unchecked_hover: __C.CLASSES.COLORS.ACCENT
+				},
+				classes: [__C.CLASSES.SIZES.LOW, __C.CLASSES.SIZES.WIDE, __C.CLASSES.HOOKS.RIPPLE]
+			}),
+			has_address: organization.default_address ? '' : __C.CLASSES.HIDDEN,
+			redact_org_button: (organization.role == OneUser.ROLE.ADMIN) ? __APP.BUILD.link({
+					title: __LOCALES.ru_RU.TEXTS.BUTTON.EDIT,
+					classes: ['button', __C.CLASSES.SIZES.WIDE, __C.CLASSES.COLORS.NEUTRAL, __C.CLASSES.ICON_CLASS, __C.CLASSES.ICONS.PENCIL, __C.CLASSES.HOOKS.RIPPLE],
+					page: 'organization/' + organization.id + '/edit/'
+				}) : '',
+			hidden_for_users: PAGE.is_admin ? '' : __C.CLASSES.HIDDEN,
+			subscribed_blocks: __APP.BUILD.subscribers(organization.subscribed)
+		}, organization)));
+		
+		PAGE.$wrapper.on('events_load.FutureEvents events_load.PastEvents events_load.DelayedEvents events_load.CanceledEvents', function(e) {
+			if (e.namespace == 'FutureEvents') {
+				PAGE.init();
+				PAGE.bindUploadEventsOnScroll(PAGE.event_types.future);
+			}
+			PAGE.bindFeedEvents(PAGE.$wrapper.find('.' + e.namespace));
+			if (++PAGE.events_load == PAGE.max_events_load) {
+				PAGE.$wrapper.off('events_load');
+			}
+		});
+		
+		
+		PAGE.future_events.fetchOrganizationsFeed(organization.id, PAGE.events_fields, 10, function(future_events) {
+			PAGE.appendEvents(PAGE.event_types.future, future_events);
+			PAGE.$wrapper.trigger('events_load.FutureEvents');
+		});
+		
+		PAGE.past_events.fetchOrganizationsFeed(organization.id, PAGE.events_fields, 10, function(past_events) {
+			PAGE.appendEvents(PAGE.event_types.past, past_events);
+			PAGE.$wrapper.trigger('events_load.PastEvents');
+		});
+		
+		if (PAGE.is_admin) {
+			PAGE.delayed_events.fetchOrganizationsFeed(organization.id, PAGE.events_fields, 10, function(delayed_events) {
+				PAGE.appendEvents(PAGE.event_types.delayed, delayed_events);
+				PAGE.$wrapper.trigger('events_load.DelayedEvents');
+			});
+			
+			PAGE.canceled_events.fetchOrganizationsFeed(organization.id, PAGE.events_fields, 10, function(canceled_events) {
+				PAGE.appendEvents(PAGE.event_types.canceled, canceled_events);
+				PAGE.$wrapper.trigger('events_load.CanceledEvents');
+			});
+		}
+	};
+	
+	return OrganizationPage;
+}()));
 /**
  * @requires ../Class.Page.js
  */
 /**
  *
- * @constructor
- * @augments Page
- * @param {string} search
+ * @class SearchPage
+ * @extends Page
  */
-function SearchPage(search) {
-	Page.apply(this, arguments);
-	
-	this.page_title = 'Поиск';
-	this.$search_bar_input = $('#search_bar_input');
-	this.search_string = decodeURIComponent(search);
-	this.events_ajax_data = {
-		length: 10,
-		fields: [
-			'image_horizontal_medium_url',
-			'detail_info_url',
-			'is_favorite',
-			'nearest_event_date',
-			'can_edit',
-			'location',
-			'registration_required',
-			'registration_till',
-			'is_free',
-			'min_price',
-			'favored_users_count',
-			'organization_name',
-			'organization_short_name',
-			'organization_logo_small_url',
-			'description',
-			'favored',
-			'is_same_time',
-			'tags',
-			'dates'
-		],
-		order_by: 'nearest_event_date,-first_event_date'
-	};
-	this.organizations_ajax_data = {
-		length: 30,
-		fields: [
-			'subscribed_count',
-			'img_small_url'
-		]
-	};
-	this.past_events = false;
-	this.search_results = new SearchResults(this.search_string);
-}
-SearchPage.extend(Page);
-/**
- *
- * @param {(OneOrganization|Array<OneOrganization>|OrganizationsCollection)} organizations
- * @returns {jQuery}
- */
-SearchPage.buildOrganizationItems = function(organizations) {
-	return __APP.BUILD.organizationItems(organizations, {
-		block_classes: ['-show'],
-		avatar_classes: ['-size_50x50', '-rounded'],
-		counter_classes: [__C.CLASSES.NEW_HIDDEN]
-	})
-};
-/**
- *
- * @param {(OneEvent|Array<OneEvent>|EventsCollection)} events
- * @returns {jQuery}
- */
-SearchPage.buildEventCards = function(events) {
-	var $events = $();
-	if (events.length == 0) {
-		$events = tmpl('search-no-events', {});
-	} else {
-		events.forEach(function(event) {
-			if(event.nearest_event_date == undefined && !this.past_events){
-				$events = $events.add(tmpl('divider', {title: 'Прошедшие события'}));
-				this.past_events = true;
-			}
-			$events = $events.add(__APP.BUILD.eventCards(event));
-		});
-	}
-	return $events
-};
-
-SearchPage.prototype.fetchData = function() {
-	return this.fetching_data_defer = this.search_results.fetchEventsAndOrganizations(this.events_ajax_data, this.organizations_ajax_data);
-};
-
-SearchPage.prototype.init = function() {
-	var PAGE = this,
-		$window = $(window),
-		$organizations_scrollbar;
-	
-	function bindFeedEvents($parent) {
-		trimAvatarsCollection($parent);
-		bindRippleEffect($parent);
-		__APP.MODALS.bindCallModal($parent);
-		bindPageLinks($parent);
+SearchPage = extending(Page, (function() {
+	/**
+	 *
+	 * @param {string} search
+	 * @constructor
+	 * @constructs SearchPage
+	 */
+	function SearchPage(search) {
+		Page.apply(this, arguments);
 		
-		$parent.find('.HideEvent').addClass(__C.CLASSES.NEW_HIDDEN);
-	}
-	
-	$organizations_scrollbar = this.$wrapper.find('.SearchOrganizationsScrollbar').scrollbar({
-		disableBodyScroll: true,
-		onScroll: function(y) {
-			if (y.scroll == y.maxScroll) {
-				PAGE.search_results.fetchOrganizations(PAGE.organizations_ajax_data, function(organizations) {
-					if (organizations.length) {
-						$organizations_scrollbar.append(SearchPage.buildOrganizationItems(organizations));
-					} else {
-						$organizations_scrollbar.off('scroll.onScroll');
-					}
-					bindPageLinks($organizations_scrollbar);
-				});
-			}
-		}
-	});
-	$window.off('scroll.upload' + PAGE.constructor.name);
-	$window.on('scroll.upload' + PAGE.constructor.name, function() {
-		if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.block_scroll) {
-			PAGE.block_scroll = true;
-			PAGE.search_results.fetchEvents(PAGE.events_ajax_data, function(events) {
-				var $events;
-				if(events.length){
-					$events = SearchPage.buildEventCards(events);
-					PAGE.$wrapper.find('.SearchEvents').append($events);
-					bindFeedEvents($events);
-					PAGE.block_scroll = false;
-				} else {
-					$window.off('scroll.upload' + PAGE.constructor.name);
-				}
-			});
-		}
-	});
-	bindFeedEvents(this.$wrapper);
-};
-
-SearchPage.prototype.render = function() {
-	var data = {};
-	
-	this.$search_bar_input.val(this.search_string);
-	
-	data.events = SearchPage.buildEventCards(this.search_results.events);
-	if (this.search_results.organizations.length == 0) {
-		data.no_organizations = __C.CLASSES.NEW_HIDDEN;
-	} else {
-		data.organizations = SearchPage.buildOrganizationItems(this.search_results.organizations);
-	}
-	
-	this.$wrapper.append(tmpl('search-wrapper', data));
-	this.init();
-};
-/**
- * @requires Class.StatisticsPage.js
- */
-/**
- *
- * @constructor
- * @augments StatisticsPage
- */
-function StatisticsOverviewPage() {
-	StatisticsPage.apply(this);
-	this.my_organizations_fields = ['img_medium_url', 'subscribed_count', 'staff'];
-	this.page_title = 'Организации';
-	this.my_organizations = new OrganizationsCollection();
-}
-StatisticsOverviewPage.extend(StatisticsPage);
-
-StatisticsOverviewPage.buildMyOrganizationsBlocks = function(organizations) {
-	return tmpl('statistics-overview-organization', organizations.map(function(org) {
-		var avatars_max_count = 2,
-			staff_additional_fields = {
-				is_link: true,
-				avatar_classes: ['-size_100x100', '-rounded']
-			},
-			org_roles = [
-				{
-					name: OneUser.ROLE.ADMIN,
-					title: 'Администраторы',
-					staff: UsersCollection.getSpecificStaff(OneUser.ROLE.ADMIN, org.staff, staff_additional_fields),
-					plural_name: OneUser.ROLE.ADMIN + 's'
-				}, {
-					name: OneUser.ROLE.MODERATOR,
-					title: 'Модераторы',
-					staff: UsersCollection.getSpecificStaff(OneUser.ROLE.MODERATOR, org.staff, staff_additional_fields),
-					plural_name: OneUser.ROLE.MODERATOR + 's'
-				}
-			];
-		org_roles.forEach(function(role) {
-			org[role.plural_name] = __APP.BUILD.avatarCollection(role.staff, avatars_max_count, {
-				dataset: {
-					modal_type: 'editors',
-					modal_specific_role: role.name,
-					modal_title: role.title,
-					modal_organization_id: org.id
-				},
-				classes: ['-size_30x30', '-rounded', '-shifted', 'CallModal'],
-				counter_classes: ['-size_30x30','-color_marginal_primary']
-			});
-		});
-		return $.extend(true, {}, org, {
-			subscribers: org.subscribed_count + getUnitsText(org.subscribed_count, __LOCALES.ru_RU.TEXTS.SUBSCRIBERS),
-			buttons: __APP.BUILD.link({
-				title: 'Редактировать',
-				classes: ['button', 'fa_icon', 'fa-pencil', '-color_neutral', 'RippleEffect'],
-				page: '/organization/' + org.id + '/edit'
-			}, {
-				title: 'Создать событие',
-				classes: ['button', 'fa_icon', 'fa-plus', '-color_accent', 'RippleEffect'],
-				page: '/add/event/to/' + org.id
-			})
-		});
-	}));
-};
-
-StatisticsOverviewPage.prototype.fetchData = function() {
-	return this.fetching_data_defer = this.my_organizations.fetchMyOrganizations('admin', this.my_organizations_fields, 10, '');
-};
-
-StatisticsOverviewPage.prototype.bindOrganizationsEvents = function($parent) {
-	trimAvatarsCollection($parent);
-	bindPageLinks($parent);
-	__APP.MODALS.bindCallModal($parent);
-	bindRippleEffect($parent);
-	return $parent;
-};
-
-StatisticsOverviewPage.prototype.bindUploadOnScroll = function() {
-	var PAGE = this,
-		$window = $(window),
-		scrollEvent = function() {
-			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.is_upload_disabled) {
-				$window.off('scroll.uploadOrganizations');
-				PAGE.my_organizations.fetchMyOrganizations('admin', PAGE.my_organizations_fields, 10, '', function(organizations) {
-					var $organizations = StatisticsOverviewPage.buildMyOrganizationsBlocks(organizations);
-					if (organizations.length) {
-						PAGE.$wrapper.find('.StatOverviewOrganizations').append($organizations);
-						PAGE.bindOrganizationsEvents($organizations);
-						$window.on('scroll.uploadOrganizations', scrollEvent);
-					} else {
-						PAGE.is_upload_disabled = true;
-					}
-				});
-			}
+		this.page_title = 'Поиск';
+		this.$search_bar_input = $('#search_bar_input');
+		this.search_string = decodeURIComponent(search);
+		this.events_ajax_data = {
+			length: 10,
+			fields: new Fields(
+				'image_horizontal_medium_url',
+				'detail_info_url',
+				'nearest_event_date',
+				'can_edit',
+				'location',
+				'is_favorite',
+				'is_registered',
+				'registration_available',
+				'registration_locally',
+				'registration_required',
+				'registration_till',
+				'ticketing_locally',
+				'is_free',
+				'min_price',
+				'favored_users_count',
+				'organization_name',
+				'organization_short_name',
+				'organization_logo_small_url',
+				'description',
+				'favored',
+				'is_same_time',
+				'tags',
+				'dates'
+			),
+			order_by: 'nearest_event_date,-first_event_date'
 		};
+		this.organizations_ajax_data = {
+			length: 30,
+			fields: new Fields([
+				'subscribed_count',
+				'img_small_url'
+			])
+		};
+		this.past_events = false;
+		this.search_results = new SearchResults(this.search_string);
+	}
+	/**
+	 *
+	 * @param {(OneOrganization|Array<OneOrganization>|OrganizationsCollection)} organizations
+	 * @returns {jQuery}
+	 */
+	SearchPage.buildOrganizationItems = function(organizations) {
+		return __APP.BUILD.organizationItems(organizations, {
+			block_classes: ['-show'],
+			avatar_classes: ['-size_50x50', '-rounded'],
+			counter_classes: [__C.CLASSES.HIDDEN]
+		})
+	};
+	/**
+	 *
+	 * @param {(OneEvent|Array<OneEvent>|EventsCollection)} events
+	 * @returns {jQuery}
+	 */
+	SearchPage.buildEventCards = function(events) {
+		var $events = $();
+		if (events.length == 0) {
+			$events = tmpl('search-no-events', {});
+		} else {
+			events.forEach(function(event) {
+				if(event.nearest_event_date == undefined && !this.past_events){
+					$events = $events.add(tmpl('divider', {title: 'Прошедшие события'}));
+					this.past_events = true;
+				}
+				$events = $events.add(__APP.BUILD.eventCards(event));
+			});
+		}
+		return $events
+	};
 	
-	if (!PAGE.is_upload_disabled) {
-		$window.on('scroll.uploadOrganizations', scrollEvent);
-	}
-};
-
-StatisticsOverviewPage.prototype.init = function() {
-	this.bindOrganizationsEvents(this.$wrapper);
-	this.bindUploadOnScroll();
-};
-
-StatisticsOverviewPage.prototype.render = function() {
-	if(__APP.USER.id === -1){
-		__APP.changeState('/feed/actual', true, true);
-		return null;
-	}
-	this.$wrapper.html(tmpl('statistics-overview-wrapper', {
-		organizations: StatisticsOverviewPage.buildMyOrganizationsBlocks(this.my_organizations)
-	}));
-	this.init();
-};
-
-StatisticsOverviewPage.prototype.destroy = function() {
-	$(window).off('scroll.uploadOrganizations');
-};
+	SearchPage.prototype.fetchData = function() {
+		return this.fetching_data_defer = this.search_results.fetchEventsAndOrganizations(this.events_ajax_data, this.organizations_ajax_data);
+	};
+	
+	SearchPage.prototype.init = function() {
+		var PAGE = this,
+			$window = $(window),
+			$organizations_scrollbar;
+		
+		function bindFeedEvents($parent) {
+			trimAvatarsCollection($parent);
+			bindRippleEffect($parent);
+			__APP.MODALS.bindCallModal($parent);
+			bindPageLinks($parent);
+			
+			$parent.find('.HideEvent').remove();
+		}
+		
+		$organizations_scrollbar = this.$wrapper.find('.SearchOrganizationsScrollbar').scrollbar({
+			disableBodyScroll: true,
+			onScroll: function(y) {
+				if (y.scroll == y.maxScroll) {
+					PAGE.search_results.fetchOrganizations(PAGE.organizations_ajax_data, function(organizations) {
+						if (organizations.length) {
+							$organizations_scrollbar.append(SearchPage.buildOrganizationItems(organizations));
+						} else {
+							$organizations_scrollbar.off('scroll.onScroll');
+						}
+						bindPageLinks($organizations_scrollbar);
+					});
+				}
+			}
+		});
+		$window.off('scroll.upload' + PAGE.constructor.name);
+		$window.on('scroll.upload' + PAGE.constructor.name, function() {
+			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.block_scroll) {
+				PAGE.block_scroll = true;
+				PAGE.search_results.fetchEvents(PAGE.events_ajax_data, function(events) {
+					var $events;
+					if(events.length){
+						$events = SearchPage.buildEventCards(events);
+						PAGE.$wrapper.find('.SearchEvents').append($events);
+						bindFeedEvents($events);
+						PAGE.block_scroll = false;
+					} else {
+						$window.off('scroll.upload' + PAGE.constructor.name);
+					}
+				});
+			}
+		});
+		bindFeedEvents(this.$wrapper);
+	};
+	
+	SearchPage.prototype.render = function() {
+		var data = {};
+		
+		this.$search_bar_input.val(this.search_string);
+		
+		data.events = SearchPage.buildEventCards(this.search_results.events);
+		if (this.search_results.organizations.length == 0) {
+			data.no_organizations = __C.CLASSES.HIDDEN;
+		} else {
+			data.organizations = SearchPage.buildOrganizationItems(this.search_results.organizations);
+		}
+		
+		this.$wrapper.append(tmpl('search-wrapper', data));
+		this.init();
+	};
+	
+	return SearchPage;
+}()));
 /**
  * @requires ../Class.Page.js
  */
@@ -11188,7 +12155,11 @@ UserPage = extending(Page, (function() {
 			activities: false
 		};
 		this.favored_fetch_data = {
-			fields: ['image_horizontal_medium_url', 'favored', 'is_favorite', 'dates'],
+			fields: new Fields(
+				'image_horizontal_medium_url',
+				'favored',
+				'dates'
+			),
 			order_by: 'nearest_event_date,-first_event_date',
 			length: 10
 		};
@@ -11284,7 +12255,7 @@ UserPage = extending(Page, (function() {
 		
 		this.$wrapper.find('.Tabs').on('change.tabs', function() {
 			var $this = $(this),
-				active_type = $this.find('.TabsBody').filter('.'+__C.CLASSES.NEW_ACTIVE).data('tab_body_type');
+				active_type = $this.find('.TabsBody').filter('.'+__C.CLASSES.ACTIVE).data('tab_body_type');
 			$window.off(Object.values(event_names).join(' '));
 			$window.on(event_names[active_type], function() {
 				if ( isScrollRemain(200) ) {
@@ -11352,7 +12323,7 @@ UserPage = extending(Page, (function() {
 				},
 				title: 'Показать все'
 			}) : '',
-			friends_hidden: __C.CLASSES.NEW_HIDDEN,
+			friends_hidden: __C.CLASSES.HIDDEN,
 			favored_event_blocks: $favored_events
 		}));
 		this.uploadEntities('activities');
@@ -11376,6 +12347,7 @@ MyProfilePage = extending(UserPage, (function() {
 	function MyProfilePage() {
 		UserPage.call(this, __APP.USER.id);
 		this.page_title = 'Мой профиль';
+		this.favored_fetch_data.fields.push('is_favorite');
 		this.user = __APP.USER;
 	}
 	
@@ -11457,6 +12429,134 @@ MyProfilePage = extending(UserPage, (function() {
 	};
 	
 	return MyProfilePage;
+}()));
+/**
+ * @requires Class.StatisticsPage.js
+ */
+/**
+ *
+ * @class StatisticsOverviewPage
+ * @extends StatisticsPage
+ */
+StatisticsOverviewPage = extending(StatisticsPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs StatisticsOverviewPage
+	 */
+	function StatisticsOverviewPage() {
+		StatisticsPage.apply(this);
+		this.my_organizations_fields = ['img_medium_url', 'subscribed_count', 'staff'];
+		this.page_title = 'Организации';
+		this.my_organizations = new OrganizationsCollection();
+	}
+	
+	StatisticsOverviewPage.buildMyOrganizationsBlocks = function(organizations) {
+		return tmpl('statistics-overview-organization', organizations.map(function(org) {
+			var avatars_max_count = 2,
+				staff_additional_fields = {
+					is_link: true,
+					avatar_classes: ['-size_100x100', '-rounded']
+				},
+				org_roles = [
+					{
+						name: OneUser.ROLE.ADMIN,
+						title: 'Администраторы',
+						staff: UsersCollection.getSpecificStaff(OneUser.ROLE.ADMIN, org.staff, staff_additional_fields),
+						plural_name: OneUser.ROLE.ADMIN + 's'
+					}, {
+						name: OneUser.ROLE.MODERATOR,
+						title: 'Модераторы',
+						staff: UsersCollection.getSpecificStaff(OneUser.ROLE.MODERATOR, org.staff, staff_additional_fields),
+						plural_name: OneUser.ROLE.MODERATOR + 's'
+					}
+				];
+			
+			org_roles.forEach(function(role) {
+				org[role.plural_name] = __APP.BUILD.avatarCollection(role.staff, avatars_max_count, {
+					dataset: {
+						modal_type: 'editors',
+						modal_specific_role: role.name,
+						modal_title: role.title,
+						modal_organization_id: org.id
+					},
+					classes: ['-size_30x30', '-rounded', '-shifted', 'CallModal'],
+					counter_classes: ['-size_30x30','-color_marginal_primary']
+				});
+			});
+			
+			return $.extend(true, {}, org, {
+				subscribers: org.subscribed_count + getUnitsText(org.subscribed_count, __LOCALES.ru_RU.TEXTS.SUBSCRIBERS),
+				buttons: __APP.BUILD.link({
+					title: 'Редактировать',
+					classes: ['button', 'fa_icon', 'fa-pencil', '-color_neutral', 'RippleEffect'],
+					page: '/organization/' + org.id + '/edit'
+				}, {
+					title: 'Создать событие',
+					classes: ['button', 'fa_icon', 'fa-plus', '-color_accent', 'RippleEffect'],
+					page: '/add/event/to/' + org.id
+				})
+			});
+		}));
+	};
+	
+	StatisticsOverviewPage.prototype.fetchData = function() {
+		return this.fetching_data_defer = this.my_organizations.fetchMyOrganizations('admin', this.my_organizations_fields, 10, '');
+	};
+	
+	StatisticsOverviewPage.prototype.bindOrganizationsEvents = function($parent) {
+		trimAvatarsCollection($parent);
+		bindPageLinks($parent);
+		__APP.MODALS.bindCallModal($parent);
+		bindRippleEffect($parent);
+		return $parent;
+	};
+	
+	StatisticsOverviewPage.prototype.bindUploadOnScroll = function() {
+		var PAGE = this,
+			$window = $(window),
+			scrollEvent = function() {
+				if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.is_upload_disabled) {
+					$window.off('scroll.uploadOrganizations');
+					PAGE.my_organizations.fetchMyOrganizations('admin', PAGE.my_organizations_fields, 10, '', function(organizations) {
+						var $organizations = StatisticsOverviewPage.buildMyOrganizationsBlocks(organizations);
+						if (organizations.length) {
+							PAGE.$wrapper.find('.StatOverviewOrganizations').append($organizations);
+							PAGE.bindOrganizationsEvents($organizations);
+							$window.on('scroll.uploadOrganizations', scrollEvent);
+						} else {
+							PAGE.is_upload_disabled = true;
+						}
+					});
+				}
+			};
+		
+		if (!PAGE.is_upload_disabled) {
+			$window.on('scroll.uploadOrganizations', scrollEvent);
+		}
+	};
+	
+	StatisticsOverviewPage.prototype.init = function() {
+		this.bindOrganizationsEvents(this.$wrapper);
+		this.bindUploadOnScroll();
+	};
+	
+	StatisticsOverviewPage.prototype.render = function() {
+		if(__APP.USER.id === -1){
+			__APP.changeState('/feed/actual', true, true);
+			return null;
+		}
+		this.$wrapper.html(tmpl('statistics-overview-wrapper', {
+			organizations: StatisticsOverviewPage.buildMyOrganizationsBlocks(this.my_organizations)
+		}));
+		this.init();
+	};
+	
+	StatisticsOverviewPage.prototype.destroy = function() {
+		$(window).off('scroll.uploadOrganizations');
+	};
+	
+	return StatisticsOverviewPage;
 }()));
 /**
  *
@@ -12196,7 +13296,7 @@ __APP = {
 			
 			return tmpl('avatar-block', (entities instanceof Array ? entities : [entities]).map(function(entity) {
 				var name, href;
-				if((props.entity && props.entity === 'organization') || !entity.first_name){
+				if((props.entity && props.entity === __C.ENTITIES.ORGANIZATION) || !entity.first_name){
 					name = entity.short_name ? entity.short_name : entity.name;
 					href = '/organization/' + entity.id;
 				} else {
@@ -12352,7 +13452,7 @@ __APP = {
 		organizationItems: function buildOrganizationItems(organizations, additional_fields) {
 			organizations = organizations instanceof Array ? organizations : [organizations];
 			var orgs = organizations.map(function(org) {
-				org.counter_classes = org.new_events_count ? [] : [__C.CLASSES.NEW_HIDDEN];
+				org.counter_classes = org.new_events_count ? [] : [__C.CLASSES.HIDDEN];
 				return org;
 			});
 			return tmpl('organization-item', orgs.map(function(organization) {
@@ -12376,23 +13476,38 @@ __APP = {
 						page: '/organization/'+org.id,
 						classes: ['organization_unit_background'],
 						attributes: {
-							style: 'background-image: url(\''+(org.background_small_img_url || org.background_img_url)+'\')'
+							style: 'background-image: url("'+(org.background_small_img_url || org.background_img_url)+'")'
 						}
 					}) : '',
 					avatar: __APP.BUILD.avatars(org, {
-						classes: ['organization_unit_avatar','-size_55x55','-bordered','-rounded','-shadowed']
+						classes: [
+							'organization_unit_avatar',
+							__C.CLASSES.SIZES.X55,
+							__C.CLASSES.UNIVERSAL_STATES.BORDERED,
+							__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+							__C.CLASSES.UNIVERSAL_STATES.SHADOWED
+						]
 					}),
 					subscribe_button: new SubscribeButton(org.id, {
-						is_subscribed: org.is_subscribed,
+						is_checked: org.is_subscribed,
 						colors: {
-							subscribe: '-color_marginal_accent'
+							unchecked: __C.CLASSES.COLORS.MARGINAL_ACCENT,
+							unchecked_hover: __C.CLASSES.COLORS.MARGINAL_ACCENT
 						},
-						icons: null,
-						classes: ['-size_low', 'RippleEffect']
+						has_icons: false,
+						classes: [__C.CLASSES.SIZES.LOW, __C.CLASSES.HOOKS.RIPPLE]
 					}),
 					subscribed_text: org.subscribed_count + getUnitsText(org.subscribed_count, __LOCALES.ru_RU.TEXTS.SUBSCRIBERS),
 					redact_org_button: (org.role === OneUser.ROLE.UNAUTH || org.role === OneUser.ROLE.USER) ? '' : __APP.BUILD.link({
-						classes: ['button', '-size_low', '-color_marginal_primary', 'fa_icon', 'fa-pencil', '-empty', 'RippleEffect'],
+						classes: [
+							'button',
+							__C.CLASSES.SIZES.LOW,
+							__C.CLASSES.COLORS.MARGINAL_PRIMARY,
+							__C.CLASSES.ICON_CLASS,
+							__C.CLASSES.ICONS.PENCIL,
+							__C.CLASSES.UNIVERSAL_STATES.EMPTY,
+							__C.CLASSES.HOOKS.RIPPLE
+						],
 						page: 'organization/' + org.id + '/edit'
 					})
 				});
@@ -12409,31 +13524,77 @@ __APP = {
 				var sort_date_type = type.sort_date_type ? type.sort_date_type : 'nearest_event_date',
 					m_event_date = moment.unix(event[sort_date_type] ? event[sort_date_type] : event['first_event_date']),
 					different_day = type.last_date != m_event_date.format(__C.DATE_FORMAT),
-					avatars_collection_classes = ['-rounded','-bordered','-size_small','AvatarsCollection','CallModal'];
+					avatars_collection_classes = [
+						__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+						__C.CLASSES.UNIVERSAL_STATES.BORDERED,
+						__C.CLASSES.SIZES.SMALL,
+						__C.CLASSES.HOOKS.ADD_AVATAR.COLLECTION,
+						__C.CLASSES.HOOKS.CALL_MODAL
+					],
+					$action_buttons = $();
 				
 				if(event.is_favorite) {
-					avatars_collection_classes.push('-shifted');
+					avatars_collection_classes.push(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
+				}
+				
+				if (event.is_favorite != null) {
+					if (event.registration_locally || event.ticketing_locally) {
+						$action_buttons = $action_buttons.add(new AddToFavoriteButton(event.id, {
+							is_add_avatar: true,
+							is_checked: event.is_favorite,
+							classes: [
+								__C.CLASSES.UNIVERSAL_STATES.EMPTY,
+								__C.CLASSES.SIZES.LOW,
+								__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+								__C.CLASSES.HOOKS.ADD_TO_FAVORITES,
+								__C.CLASSES.HOOKS.RIPPLE
+							],
+							labels: null
+						}));
+						
+						if (event.ticketing_locally) {
+							
+						} else {
+							$action_buttons = $action_buttons.add(new RegisterButton(event, {
+								classes: [
+									'event_block_main_action_button',
+									__C.CLASSES.SIZES.LOW,
+									__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+									__C.CLASSES.HOOKS.ADD_TO_FAVORITES,
+									__C.CLASSES.HOOKS.RIPPLE
+								]
+							}));
+						}
+					} else {
+						$action_buttons = new AddToFavoriteButton(event.id, {
+							is_add_avatar: true,
+							is_checked: event.is_favorite,
+							classes: [
+								'event_block_main_action_button',
+								__C.CLASSES.SIZES.LOW,
+								__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+								__C.CLASSES.HOOKS.ADD_TO_FAVORITES,
+								__C.CLASSES.HOOKS.RIPPLE
+							]
+						});
+					}
 				}
 				
 				type.last_date = m_event_date.format(__C.DATE_FORMAT);
+				
 				return $.extend({}, event, {
 					divider: different_day ? tmpl('divider', {
 						title: m_event_date.calendar().capitalize()
 					}) : '',
-					add_to_favorite_button: new AddToFavoriteButton(event.id, {
-						is_add_avatar: true,
-						is_subscribed: event.is_favorite,
-						classes: ['-size_low', '-size_wide', '-rounded', 'AddToFavorites', 'RippleEffect']
-					}),
+					action_buttons: $action_buttons,
 					date: m_event_date.format(__C.DATE_FORMAT),
 					avatars_collection: __APP.BUILD.avatarCollection(event.favored, 4, {
 						dataset: {
 							modal_type: 'favors',
-							modal_event_id: event.id,
-							modal_title: 'Добавили в избранное'
+							modal_event_id: event.id
 						},
 						classes: avatars_collection_classes,
-						counter_classes: ['-size_30x30','-bordered','-color_marginal','-castable']
+						counter_classes: [__C.CLASSES.SIZES.X30, __C.CLASSES.UNIVERSAL_STATES.BORDERED, __C.CLASSES.COLORS.MARGINAL, __C.CLASSES.HOOKS.ADD_AVATAR.STATES.CASTABLE]
 					}, event.favored_users_count),
 					time: event.dates.reduce(function(times, date) {
 						if (moment.unix(date.event_date).format(__C.DATE_FORMAT) == m_event_date.format(__C.DATE_FORMAT)) {
@@ -12462,13 +13623,13 @@ __APP = {
 						new_events_count = cat.organizations.reduce(function(sum, org) {
 							return sum + org.new_events_count;
 						}, 0);
-						aside_classes = new_events_count ? ['counter'] : ['counter', __C.CLASSES.NEW_HIDDEN];
+						aside_classes = new_events_count ? ['counter'] : ['counter', __C.CLASSES.HIDDEN];
 					} else {
 						aside_classes = ['fa_icon', 'fa-angle-down', '-empty'];
 					}
 				} else {
 					new_events_count = '';
-					aside_classes = [__C.CLASSES.NEW_HIDDEN];
+					aside_classes = [__C.CLASSES.HIDDEN];
 				}
 				return {
 					category_id: cat.id,
@@ -12509,23 +13670,94 @@ __APP = {
 		eventCards: function buildEventCards(events) {
 			var $events;
 			events = events instanceof Array ? events : [events];
+			
 			$events = tmpl('feed-event', events.map(function(event) {
-				var avatars_collection_classes = ['-rounded','-bordered','-size_small','AvatarsCollection','CallModal'],
+				var avatars_collection_classes = [
+						__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+						__C.CLASSES.UNIVERSAL_STATES.BORDERED,
+						__C.CLASSES.SIZES.SMALL,
+						__C.CLASSES.HOOKS.ADD_AVATAR.COLLECTION,
+						__C.CLASSES.HOOKS.CALL_MODAL
+					],
 					feed_event_infos = [],
-					organization = new OneOrganization(event.organization_id);
+					organization = new OneOrganization(event.organization_id),
+					$action_button,
+					$header_buttons = $();
+				
 				organization.setData({
 					short_name: event.organization_short_name,
 					img_url: event.organization_logo_small_url
 				});
 				
+				
+				if (event.registration_locally || event.ticketing_locally) {
+					$header_buttons = new AddToFavoriteButton(event.id, {
+						is_add_avatar: true,
+						is_checked: event.is_favorite,
+						classes: [
+							'feed_event_header_button',
+							__C.CLASSES.SIZES.LOW,
+							__C.CLASSES.UNIVERSAL_STATES.EMPTY
+						],
+						labels: null,
+						icons: {
+							checked_hover: __C.CLASSES.ICONS.STAR
+						},
+						colors: {
+							checked: __C.CLASSES.TEXT_COLORS.ACCENT,
+							unchecked: '',
+							checked_hover: __C.CLASSES.TEXT_COLORS.ACCENT,
+							unchecked_hover: ''
+						}
+					});
+					
+					if (event.ticketing_locally) {
+						
+					} else {
+						$action_button = new RegisterButton(event, {
+							classes: [
+								__C.CLASSES.SIZES.LOW,
+								__C.CLASSES.SIZES.WIDE,
+								__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+								__C.CLASSES.HOOKS.RIPPLE
+							]
+						});
+					}
+				} else {
+					$action_button = new AddToFavoriteButton(event.id, {
+						is_add_avatar: true,
+						is_checked: event.is_favorite,
+						classes: [
+							__C.CLASSES.SIZES.LOW,
+							__C.CLASSES.SIZES.WIDE,
+							__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+							__C.CLASSES.HOOKS.RIPPLE
+						]
+					})
+				}
+				
+				$header_buttons = $header_buttons.add(__APP.BUILD.button({
+					classes: [
+						'feed_event_header_button',
+						__C.CLASSES.SIZES.LOW,
+						__C.CLASSES.ICON_CLASS,
+						__C.CLASSES.ICONS.TIMES,
+						__C.CLASSES.UNIVERSAL_STATES.EMPTY,
+						'HideEvent'
+					],
+					dataset: {
+						'event-id': event.id
+					}
+				}));
+				
 				if (event.is_favorite) {
-					avatars_collection_classes.push('-shifted');
+					avatars_collection_classes.push(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
 				}
 				feed_event_infos.push({
 					text: displayDateRange(event.dates[0].event_date, event.dates[event.dates.length - 1].event_date)
 					+ (event.is_same_time ? ', ' + displayTimeRange(event.dates[0].start_time, event.dates[0].end_time) : '')
 				});
-				if (event.registration_required) {
+				if (event.registration_required && event.registration_till) {
 					feed_event_infos.push({text: 'Регистрация до ' + moment.unix(event.registration_till).calendar().capitalize()});
 				}
 				if (event.is_free) {
@@ -12536,25 +13768,26 @@ __APP = {
 				
 				return $.extend(true, {
 					organization_avatar_block: __APP.BUILD.avatarBlocks(organization, {
-						block_classes: ['-size_small'],
+						block_classes: [__C.CLASSES.SIZES.SMALL],
 						is_link: true,
 						entity: 'organization'
 					}),
-					add_to_favorite_button: new AddToFavoriteButton(event.id, {
-						is_add_avatar: true,
-						is_subscribed: event.is_favorite,
-						classes: ['-size_low', '-size_wide', '-rounded', 'RippleEffect']
-					}),
+					action_button: $action_button,
 					avatars_collection: __APP.BUILD.avatarCollection(event.favored, 4, {
 						dataset: {
 							modal_type: 'favors',
-							modal_event_id: event.id,
-							modal_title: 'Добавили в избранное'
+							modal_event_id: event.id
 						},
 						classes: avatars_collection_classes,
-						counter_classes: ['-size_30x30','-bordered','-color_marginal_primary','-castable']
+						counter_classes: [
+							__C.CLASSES.SIZES.X30,
+							__C.CLASSES.UNIVERSAL_STATES.BORDERED,
+							__C.CLASSES.COLORS.MARGINAL_PRIMARY,
+							__C.CLASSES.HOOKS.ADD_AVATAR.STATES.CASTABLE
+						]
 					}, event.favored_users_count),
-					feed_event_infos: tmpl('feed-event-info', feed_event_infos)
+					feed_event_infos: tmpl('feed-event-info', feed_event_infos),
+					header_buttons: $header_buttons
 				}, event);
 			}));
 			
@@ -12564,7 +13797,7 @@ __APP = {
 				}, {accY: 100})
 			});
 			
-			if(__APP.USER.id === -1){
+			if(__APP.USER.isLoggedOut()){
 				$events.find('.HideEvent').remove();
 			}
 			
@@ -12640,7 +13873,7 @@ __APP = {
 			tab = __APP.BUILD.normalizeBuildProps(tab);
 			tab.classes.push('tab', 'Tab');
 			if (window.location.pathname.contains(tab.page)) {
-				tab.classes.push(__C.CLASSES.NEW_ACTIVE);
+				tab.classes.push(__C.CLASSES.ACTIVE);
 			}
 		});
 		$wrapper.html(tmpl('tabs-header', {
@@ -12718,10 +13951,10 @@ __APP = {
 		__APP.CURRENT_PAGE = Page.routeNewPage(window.location.pathname);
 		__APP.CURRENT_PAGE.fetchData();
 		__APP.CURRENT_PAGE.show();
-		$sidebar_nav_items.removeClass(__C.CLASSES.NEW_ACTIVE)
+		$sidebar_nav_items.removeClass(__C.CLASSES.ACTIVE)
 			.filter(function() {
 				return window.location.pathname.indexOf(this.getAttribute('href')) === 0;
-			}).addClass(__C.CLASSES.NEW_ACTIVE);
+			}).addClass(__C.CLASSES.ACTIVE);
 	},
 	reInit: function appReInit() {
 		$(window).off('scroll');
@@ -12736,65 +13969,6 @@ __APP = {
 		}
 	}
 };
-/**
- * @const
- * @property {Object<string, string>} CLASSES
- * @property {string} DATE_FORMAT
- * @property {Object<string, string>} COLORS
- * @property {Object<string, string>} STATS
- * @property {Object<string, string[]>} ACTION_NAMES
- * @property {Object<string, string>} ENTITIES
- */
-__C = {
-	CLASSES: {
-		ACTIVE: 'active',
-		NEW_ACTIVE: '-active',
-		DISABLED: 'disabled',
-		NEW_DISABLED: '-disabled',
-		HIDDEN: 'hidden',
-		NEW_HIDDEN: '-hidden'
-	},
-	DATE_FORMAT: 'YYYY-MM-DD',
-	COLORS: {
-		PRIMARY: '#2e3b50',
-		MUTED: '#3e4d66',
-		MUTED_80: '#657184',
-		MUTED_50: '#9fa6b3',
-		MUTED_30: '#c5c9d1',
-		TEXT: '#4a4a4a',
-		ACCENT: '#f82969',
-		ACCENT_ALT: '#ff5f9e',
-		FRANKLIN: '#28be84',
-		FRANKLIN_ALT: '#23d792'
-	},
-	STATS: {
-		EVENT_VIEW: 'view',
-		EVENT_VIEW_DETAIL: 'view_detail',
-		EVENT_OPEN_SITE: 'open_site',
-		EVENT_OPEN_MAP: 'open_map',
-		ORGANIZATION_OPEN_SITE: 'open_site',
-		EVENT_ENTITY: 'event',
-		ORGANIZATION_ENTITY: 'organization'
-	},
-	ACTION_NAMES: {
-		fave: ['добавил(а) в избранное'],
-		unfave: ['удалил(а) из избранного'],
-		subscribe: ['добавил(а) подписки'],
-		unsubscribe: ['удалил(а) подписки']
-	},
-	ENTITIES: {
-		EVENT: 'event',
-		ORGANIZATION: 'organization'
-	},
-	/**
-	 * @enum {string}
-	 */
-	DEFERRED_STATES: {
-		PENDING: 'pending',
-		RESOLVED: 'resolved',
-		REJECTED: 'rejected'
-	}
-};
 
 __ERRORS = [];
 
@@ -12807,7 +13981,8 @@ __LOCALES = {
 				FAVORED: 'В избранном',
 				ADD_SUBSCRIPTION: 'Подписаться',
 				REMOVE_SUBSCRIPTION: 'Отписаться',
-				SUBSCRIBED: 'Подписан'
+				SUBSCRIBED: 'Подписан',
+				EDIT: 'Изменить'
 			},
 			SUBSCRIBERS: {
 				NOM: ' подписчик',

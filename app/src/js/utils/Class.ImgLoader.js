@@ -32,7 +32,7 @@ ImgLoader = (function() {
 			});
 			
 			if ($img_preview.attr('src')) {
-				$parent.find('.CropperButton').removeClass(__C.CLASSES.NEW_HIDDEN);
+				$parent.find('.CropperButton').removeClass(__C.CLASSES.HIDDEN);
 			}
 			
 			$parent.find('.LoadImg').off('change.LoadImg').on('change.LoadImg', function(e) {
@@ -106,7 +106,7 @@ ImgLoader = (function() {
 		
 		$parent.data('src', source);
 		$parent.find('.FileName').val(filename);
-		$parent.find('.CropperButton').removeClass(__C.CLASSES.NEW_HIDDEN);
+		$parent.find('.CropperButton').removeClass(__C.CLASSES.HIDDEN);
 		
 		ImgLoader.callImgCropper($parent, source);
 	};

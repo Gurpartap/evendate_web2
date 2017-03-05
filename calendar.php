@@ -69,13 +69,12 @@ $url_parts = explode('/', $url);
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<title>Evendate</title>
 	<!-- =============== VENDOR STYLES ===============-->
-	<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i&subset=cyrillic"
-				rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i" rel="stylesheet">
 
 	<?php
 	if ($DEBUG_MODE) { ?>
-		<link rel="stylesheet" href="/dist/vendor.css?rev=6c182c99b1410851c858d358d81612a7">
-		<link rel="stylesheet" href="/dist/app.css?rev=d4ac171dbd1a2d4d2374661ade1d60c8"><?php
+		<link rel="stylesheet" href="/dist/vendor.css?rev=514c11bff5a0b7b71eba77acf679a6e0">
+		<link rel="stylesheet" href="/dist/app.css?rev=27f25772ed21f545464fbc787aadd208"><?php
 	} else { ?>
 		<link rel="stylesheet" href="/dist/vendor.min.css?rev=d48eec79ba0dcb66d3491c6bccde5f11">
 		<link rel="stylesheet" href="/dist/app.min.css?rev=19733b3537109a05f112bf15d2819bfe"><?php
@@ -256,14 +255,14 @@ $url_parts = explode('/', $url);
 
 <!-- =============== VENDOR SCRIPTS ===============-->
 <!-- Google MAPS -->
-<script src="https://maps.googleapis.com/maps/api/js?sensor=true&libraries=places"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg&libraries=places" async defer type="text/javascript"></script>
 <!-- SOCKET.IO -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js" type="text/javascript"></script>
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=9538b2fe122b80923eb4fbc2d0ca3d04" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=e82592d7d287141dfa737e715f47095b" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=296bbc87130e5926cf7c309f619f91e0" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=c5a067d86e513efd1f61bb0233a94304" charset="utf-8"></script><?php
 } else { ?>
 	<script type="text/javascript" src="/dist/vendor.min.js?rev=ea5ddb9587bc7e42e0d8ef808c54a6b5" charset="utf-8"></script>
 	<script type="text/javascript" src="/dist/app.min.js?rev=abab7169713e2ec8afdcaeed5eb0814e" charset="utf-8"></script><?php
