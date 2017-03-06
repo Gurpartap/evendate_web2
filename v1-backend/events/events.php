@@ -172,6 +172,15 @@ $__modules['events'] = array(
 				array('length' => $__length, 'offset' => $__offset),
 				$__order_by ?? array('nearest_event_date', 'first_event_date'));
 		},
+		'tickets' => function () use ($__db, $__request, $__fields, $__user, $__order_by, $__offset, $__length) { /*MY EVENTS!*/
+			return TicketsCollection::filter(
+				$__db,
+				$__user,
+				array_merge($__request, array('user' => $__user)),
+				$__fields,
+				array('length' => $__length, 'offset' => $__offset),
+				$__order_by ?? array('checked_out'));
+		},
 		'recommendations' => function () use ($__db, $__request, $__fields, $__user, $__order_by, $__pagination) { /*MY EVENTS!*/
 			return EventsCollection::filter(
 				$__db,

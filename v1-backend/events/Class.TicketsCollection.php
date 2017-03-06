@@ -62,6 +62,17 @@ class TicketsCollection extends AbstractCollection
 					}
 					break;
 				}
+				case 'user': {
+					if ($value instanceof User) {
+						$q_get_tickets->where('user_id = ?', $user->getId());
+					}
+					break;
+				}
+				case 'checked_out': {
+					if (filter_var($value, FILTER_VALIDATE_BOOLEAN)) {
+						$q_get_tickets->where('checked_out = ?', $value);
+					}
+				}
 			}
 		}
 
