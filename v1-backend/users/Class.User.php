@@ -93,7 +93,7 @@ class User extends AbstractUser
 	}
 
 
-	public function isAdmin(Organization $organization) : bool
+	public function isAdmin(Organization $organization): bool
 	{
 		$q_get_is_admin = App::queryFactory()
 			->newSelect()
@@ -110,7 +110,7 @@ class User extends AbstractUser
 		return $p_get->rowCount() > 0;
 	}
 
-	public function isEventAdmin(Event $event) : bool
+	public function isEventAdmin(Event $event): bool
 	{
 		$q_get_is_admin = App::queryFactory()
 			->newSelect()
@@ -132,7 +132,7 @@ class User extends AbstractUser
 
 	}
 
-	protected function getDB() : ExtendedPDO
+	protected function getDB(): ExtendedPDO
 	{
 		return $this->db;
 	}
@@ -160,13 +160,23 @@ class User extends AbstractUser
 	{
 		$q_ins_favorite = 'INSERT INTO favorite_events(user_id, event_id, status, created_at)
 			VALUES (:user_id, :event_id, TRUE, NOW())
-			ON CONFLICT (user_id, event_id) DO UPDATE SET status = TRUE RETURNING id::INT';
+			ON CONFLICT (user_id, event_id) 
+			DO UPDATE SET status = TRUE 
+			RETURNING id::INT';
 		$p_ins_favorite = $this->db->prepare($q_ins_favorite);
 		$result = $p_ins_favorite->execute(array(
 			':user_id' => $this->getId(),
 			':event_id' => $event->getId()
 		));
+
 		if ($result === FALSE) throw new DBQueryException('CANT_MAKE_FAVORITE', $this->db);
+
+
+		try {
+			$event->addNotification($this, array(
+				'notification_type' => Notification::NOTIFICATION_TYPE_BEFORE_DAY
+			));
+		} catch (Exception $e) {}
 
 		return new Result(true, 'Событие успешно добавлено в избранное');
 	}
