@@ -108,6 +108,7 @@ class OrganizationsCollection extends AbstractCollection
 					break;
 				}
 				case 'id': {
+					$getting_private_organization = true;
 					foreach (Organization::getAdditionalCols() as $key => $val) {
 						if (is_numeric($key)) {
 							$cols[] = $val;
