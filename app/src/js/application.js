@@ -915,11 +915,11 @@ __APP = {
 		organizationCard: function buildOrganisationCard(organizations) {
 			return tmpl('organization-card', organizations.map(function(org) {
 				return $.extend(true, {}, org, {
-					background_image: org.background_small_img_url || org.background_img_url ? __APP.BUILD.link({
+					background_image: (org.background_small_img_url || org.background_img_url) ? __APP.BUILD.link({
 						page: '/organization/'+org.id,
 						classes: ['organization_unit_background'],
 						attributes: {
-							style: 'background-image: url("'+(org.background_small_img_url || org.background_img_url)+'")'
+							style: 'background-image: url('+(org.background_small_img_url || org.background_img_url)+')'
 						}
 					}) : '',
 					avatar: __APP.BUILD.avatars(org, {
