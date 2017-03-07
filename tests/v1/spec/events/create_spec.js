@@ -32,7 +32,7 @@ frisby
     .afterJSON(json => {
         events.forEach(function (value, index) {
             if (value.payload) {
-                value.payload.organization_id = json.data[index].id;
+                value.payload.organization_id = 146;//json.data[index].id;
                 frisby
                     .create('Create event: ' + index)
                     .post(env.api_url + 'events', value.payload, {json: true})
