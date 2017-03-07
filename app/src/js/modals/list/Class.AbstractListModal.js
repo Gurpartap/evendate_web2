@@ -3,68 +3,98 @@
  */
 /**
  * @class
+ * @abstract
  * @extends AbstractModal
  */
 AbstractListModal = extending(AbstractModal, (function() {
-	
+	/**
+	 *
+	 * @param {OneEntity} entity
+	 * @constructor
+	 * @constructs AbstractListModal
+	 */
 	function AbstractListModal(entity) {
-		AbstractModal.call(this, {
-			type: this.constructor.name,
-			title: this.title,
-			content: tmpl('modal-list-content'),
+		AbstractModal.call(this);
+		this.content = tmpl('modal-list-content');
+		this.entity = entity;
+		this.entities = new EntitiesCollection();
+		this.content_is_scrollable = true;
+	}
+	
+	/**
+	 *
+	 * @return {AbstractListModal}
+	 */
+	AbstractListModal.prototype.render = function() {
+		this.__render({
 			width: 384,
 			height: 'calc(100% - 140px)',
 			classes: ['-fixed'],
 			content_classes: ['list_modal_content']
 		});
-		this.entity = entity;
-		/**
-		 * @abstract
-		 * @type {EntitiesCollection}
-		 */
-		this.entities = new EntitiesCollection();
-		/**
-		 * @type jQuery
-		 */
-		this.$entities_wrapper = this.modal.find('.ListModalWrapper');
-		this.block_scroll = false;
-	}
-	
-	AbstractListModal.prototype.uploadEntities = function() {};
-	
-	AbstractListModal.prototype.buildEntities = function(entities) {};
-	
-	AbstractListModal.prototype.init = function() {
-		var self = this,
-			$loader;
 		
-		this.$entities_wrapper.scrollbar({
-			disableBodyScroll: true,
-			onScroll: function(y) {
-				if (y.scroll == y.maxScroll) {
-					$loader = __APP.BUILD.loaderBlock(self.$entities_wrapper);
-					self.uploadEntities().done(function(){
-						$loader.remove();
-					});
-				}
-			}
-		});
+		return this;
 	};
-	
+	/**
+	 *
+	 * @abstract
+	 * @return {jqPromise}
+	 */
+	AbstractListModal.prototype.uploadEntities = function() {
+		return $.Deferred.resolve().promise();
+	};
+	/**
+	 *
+	 * @abstract
+	 * @param {EntitiesCollection} entities
+	 * @return {jQuery}
+	 */
+	AbstractListModal.prototype.buildEntities = function(entities) {
+		return $();
+	};
+	/**
+	 *
+	 * @return {AbstractListModal}
+	 */
 	AbstractListModal.prototype.show = function() {
 		var self = this;
-		if(this.$entities_wrapper.children().length) {
+		
+		if(this.content.children().length) {
 			this.__show();
-			self.init();
-		} else {
-			this.$entities_wrapper.append(this.buildEntities(this.entities));
-			if (this.entities.length < 5) {
-				this.uploadEntities().done(function() {
-					self.__show();
-					self.init();
-				});
-			}
+			return this;
 		}
+		
+		this.render();
+		this.content.append(this.buildEntities(this.entities));
+		
+		if (this.entities.length < 5) {
+			this.uploadEntities().done(function() {
+				self.__show();
+			});
+		} else {
+			this.__show();
+		}
+		
+		return this;
+	};
+	/**
+	 *
+	 * @return {AbstractListModal}
+	 */
+	AbstractListModal.prototype.onScrollToBottom = function(callback) {
+		var self = this,
+			$loader = __APP.BUILD.loaderBlock(this.content);
+		
+		this.uploadEntities()
+			.fail(function() {
+				self.block_scroll = false;
+			})
+			.done(function(){
+				$loader.remove();
+				callback.call(self);
+			});
+		
+		return this;
 	};
 	
 	return AbstractListModal;

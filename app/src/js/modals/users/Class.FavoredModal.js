@@ -9,12 +9,13 @@ FavoredModal = extending(AbstractUsersModal, (function() {
 	/**
 	 *
 	 * @param {(number|string)} event_id
-	 * @param {string} [title='Добавили в избранное']
+	 * @param {string} [title=Добавили в избранное]
 	 * @constructor
+	 * @constructs FavoredModal
 	 */
 	function FavoredModal(event_id, title) {
 		if (event_id) {
-			AbstractUsersModal.apply(this, [event_id, title ? title : 'Добавили в избранное']);
+			AbstractUsersModal.call(this, event_id, title ? title : 'Добавили в избранное');
 			this.ajax_data = {
 				fields: ['is_friend'],
 				order_by: '-is_friend,first_name'
@@ -24,10 +25,15 @@ FavoredModal = extending(AbstractUsersModal, (function() {
 		}
 	}
 	
+	/**
+	 *
+	 * @param {AbstractUsersModal.uploadUsersCallback} [callback]
+	 * @return {jqPromise}
+	 */
 	FavoredModal.prototype.uploadUsers = function(callback) {
 		var self = this;
 		
-		this.users.fetchEventFavorites(this.entity_id, this.entities_length, this.ajax_data, function(users) {
+		return this.users.fetchEventFavorites(this.entity_id, this.entities_length, this.ajax_data, function(users) {
 			self.afterUpload(users);
 			if (callback && typeof callback == 'function') {
 				callback(users);

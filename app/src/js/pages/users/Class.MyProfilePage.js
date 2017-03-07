@@ -13,6 +13,7 @@ MyProfilePage = extending(UserPage, (function() {
 	function MyProfilePage() {
 		UserPage.call(this, __APP.USER.id);
 		this.page_title = 'Мой профиль';
+		this.favored_fetch_data.fields.push('is_favorite');
 		this.user = __APP.USER;
 	}
 	

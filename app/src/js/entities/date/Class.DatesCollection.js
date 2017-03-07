@@ -14,18 +14,26 @@
  */
 /**
  *
- * @constructor
- * @augments EntitiesCollection
+ * @class DatesCollection
+ * @extends EntitiesCollection
  */
-function DatesCollection() {}
-DatesCollection.prototype.collection_of = OneDate;
-DatesCollection.extend(EntitiesCollection);
-/**
- *
- * @param {DatesCollectionAJAXData} ajax_data
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-DatesCollection.fetchDates = function(ajax_data, success) {
-	return __APP.SERVER.getData('/api/v1/events/dates', ajax_data, success);
-};
+DatesCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs DatesCollection
+	 */
+	function DatesCollection() {}
+	DatesCollection.prototype.collection_of = OneDate;
+	/**
+	 *
+	 * @param {DatesCollectionAJAXData} ajax_data
+	 * @param {AJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	DatesCollection.fetchDates = function(ajax_data, success) {
+		return __APP.SERVER.getData('/api/v1/events/dates', ajax_data, success);
+	};
+	
+	return DatesCollection;
+}()));

@@ -73,7 +73,9 @@ class TicketType extends AbstractEntity
 		if (isset($data['amount'])) {
 			$data['amount'] = filter_var($data['amount'], FILTER_VALIDATE_INT, $num_price_options);
 			if (!is_numeric($data['amount'])) throw new InvalidArgumentException('BAD_AMOUNT');
-		} else throw new InvalidArgumentException('BAD_AMOUNT');
+		} else {
+			$data['amount'] = null;
+		};
 
 		if (isset($data['min_count_per_user']) && !is_null($data['min_count_per_user'])) {
 			$data['min_count_per_user'] = filter_var($data['min_count_per_user'], FILTER_VALIDATE_INT, $num_price_options);
@@ -130,7 +132,7 @@ class TicketType extends AbstractEntity
 			'min_count_per_user' => $ticket_type['min_count_per_user'],
 			'max_count_per_user' => $ticket_type['max_count_per_user'],
 			'promocode' => $ticket_type['promocode'],
-			'promocode_effort' => $ticket_type['promocode_effort'],
+			'promocode_effort' => $ticket_type['promocode_effort']
 		);
 
 		$q_ins
@@ -138,8 +140,11 @@ class TicketType extends AbstractEntity
 			->cols($cols);
 
 		if (isset($ticket_type['uuid']) && !is_null($ticket_type['uuid']) && trim($ticket_type['uuid']) != '') {
+			$q_ins = App::queryFactory()->newUpdate();
 			$cols['updated_at'] = (new DateTime())->format('Y-m-d H:i:s');
-			$q_ins->onConflictUpdate(array('uuid'), $cols);
+			$q_ins->table('ticket_types')
+			->cols($cols)
+			->where('uuid = ?', $ticket_type['uuid']);
 		}
 		return $db->prepareExecute($q_ins, 'CANT_INSERT_TICKET_TYPES');
 	}
@@ -155,8 +160,8 @@ class TicketType extends AbstractEntity
 	{
 		$result = parent::getParams($user, $fields)->getData();
 
-		foreach (self::$FIELDS_FOR_ADMINISTRATOR as $field){
-			if (isset($fields[self::START_AFTER_FIELD_NAME]) && property_exists($this, $field)){
+		foreach (self::$FIELDS_FOR_ADMINISTRATOR as $field) {
+			if (isset($fields[self::START_AFTER_FIELD_NAME]) && property_exists($this, $field)) {
 				$result[$field] = $this->$field;
 			}
 		}
@@ -164,5 +169,9 @@ class TicketType extends AbstractEntity
 		return new Result(true, '', $result);
 	}
 
+
+	public static function removeTicketsByUUID(ExtendedPDO $db, array $types){
+
+	}
 
 }

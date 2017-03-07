@@ -8,13 +8,14 @@
 EditorsModal = extending(AbstractUsersModal, (function() {
 	/**
 	 *
-	 * @constructor
 	 * @param {(string|number)} organization_id
-	 * @param {string} [title='Редаторы']
+	 * @param {string} [title=Редаторы]
 	 * @param {OneUser.ROLE} [specific_role]
+	 * @constructor
+	 * @constructs EditorsModal
 	 */
 	function EditorsModal(organization_id, title, specific_role) {
-		AbstractUsersModal.apply(this, [organization_id, title ? title : 'Редакторы']);
+		AbstractUsersModal.call(this, organization_id, title ? title : 'Редакторы');
 		this.ajax_data = {
 			order_by: 'role,first_name'
 		};
@@ -23,15 +24,15 @@ EditorsModal = extending(AbstractUsersModal, (function() {
 			this.ajax_data.roles = specific_role;
 		}
 	}
-	
 	/**
 	 *
-	 * @param {function({Array})} callback
+	 * @param {AbstractUsersModal.uploadUsersCallback} [callback]
+	 * @return {jqPromise}
 	 */
 	EditorsModal.prototype.uploadUsers = function(callback) {
 		var self = this;
 		
-		this.users.fetchOrganizationStaff(this.entity_id, this.entities_length, this.ajax_data, function(users) {
+		return this.users.fetchOrganizationStaff(this.entity_id, this.entities_length, this.ajax_data, function(users) {
 			self.afterUpload(users);
 			if (callback && typeof callback == 'function') {
 				callback(users);
@@ -41,21 +42,16 @@ EditorsModal = extending(AbstractUsersModal, (function() {
 	/**
 	 *
 	 * @param {Array} users
-	 * @param {jQuery} $wrapper
 	 * @return {jQuery}
 	 */
-	EditorsModal.prototype.buildUsers = function(users, $wrapper) {
+	EditorsModal.prototype.buildUsers = function(users) {
 		var $users = $(),
-			last_role = false,
+			last_role = this.content_wrapper.find('.UserTombstone').last().data('role'),
 			labels = {
 				admin: 'Администраторы',
 				moderator: 'Модераторы'
 			},
 			self = this;
-		
-		if (typeof $wrapper != 'undefined') {
-			last_role = $wrapper.find('.UserTombstone').last().data('role');
-		}
 		
 		users.forEach(function(user, i) {
 			if ((self.is_first && !i) || last_role != user.role) {
@@ -69,7 +65,7 @@ EditorsModal = extending(AbstractUsersModal, (function() {
 				dataset: {role: user.role}
 			}));
 		});
-		$wrapper.append($users);
+		
 		return $users;
 	};
 	

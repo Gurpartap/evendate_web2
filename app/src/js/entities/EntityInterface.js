@@ -12,13 +12,20 @@
  * @typedef {function(({}|Array<{}>))} AJAXCallback
  */
 /**
- *
  * @interface
  */
-function EntityInterface() {}
-/**
- *
- * @param {(Array|object)} data
- * @returns {EntityInterface}
- */
-EntityInterface.prototype.setData = function(data) {};
+EntityInterface = (function() {
+	/**
+	 *
+	 * @interface
+	 */
+	function EntityInterface() {}
+	/**
+	 *
+	 * @param {(Array|object)} data
+	 * @returns {EntityInterface}
+	 */
+	EntityInterface.prototype.setData = function(data) {};
+	
+	return EntityInterface;
+}());

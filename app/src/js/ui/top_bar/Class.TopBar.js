@@ -6,9 +6,15 @@
  * @extends AbstractTopBar
  */
 TopBar = extending(AbstractTopBar, (function () {
+	/**
+	 *
+	 * @constructor
+	 * @constructs TopBar
+	 */
 	function TopBar() {
 		AbstractTopBar.call(this);
 	}
+	
 	TopBar.prototype.init = function () {
 		this.$main_header.find('#user_bar').on('click.openUserBar', function() {
 			var $this = $(this),
@@ -25,5 +31,6 @@ TopBar = extending(AbstractTopBar, (function () {
 		this.$main_header.find('.OpenSettingsButton').on('click', showSettingsModal);
 		AbstractTopBar.prototype.init.call(this);
 	};
+	
 	return TopBar;
 }()));

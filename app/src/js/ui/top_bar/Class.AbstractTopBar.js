@@ -1,10 +1,17 @@
 /**
+ * @abstract
  * @class
  */
 AbstractTopBar = (function () {
+	/**
+	 *
+	 * @constructor
+	 * @constructs AbstractTopBar
+	 */
 	function AbstractTopBar() {
 		this.$main_header = $('#main_header');
 	}
+	
 	AbstractTopBar.prototype.init = function () {
 		this.$main_header.find('#search_bar_input').on('keypress', function(e) {
 			if (e.which == 13) {
@@ -15,5 +22,6 @@ AbstractTopBar = (function () {
 		bindRippleEffect(this.$main_header);
 		bindPageLinks(this.$main_header);
 	};
+	
 	return AbstractTopBar;
 }());

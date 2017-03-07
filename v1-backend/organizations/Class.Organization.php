@@ -513,7 +513,7 @@ class Organization extends AbstractEntity
 
 		if (!isset($data['short_name'])) throw new InvalidArgumentException('Краткое название организации обязательно.');
 		if (mb_strlen($data['short_name']) < 3) throw new InvalidArgumentException('Слишком короткое сокращение. Должно быть не менее 3 символов.');
-		if (mb_strlen($data['short_name']) > 15) throw new InvalidArgumentException('Слишком длинное сокращение. Должно быть не более 15 символов.');
+		if (mb_strlen($data['short_name']) > 30) throw new InvalidArgumentException('Слишком длинное сокращение. Должно быть не более 30 символов.');
 		$data['short_name'] = trim($data['short_name']);
 
 		if (isset($data['site_url'])) {

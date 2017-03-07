@@ -8,29 +8,19 @@
 CropperModal = extending(AbstractModal, (function() {
 	/**
 	 *
-	 * @param image_src
-	 * @param cropper_options
+	 * @param {string} image_src
+	 * @param {object} [cropper_options]
 	 * @constructor
+	 * @constructs CropperModal
 	 */
 	function CropperModal(image_src, cropper_options) {
+		AbstractModal.call(this);
 		if (image_src) {
 			cropper_options = typeof cropper_options == 'object' ? cropper_options : {};
-			AbstractModal.call(this, {
-				content: tmpl('modal-cropper-content', {image_src: this.image_src}),
-				type: 'CropperModal',
-				classes: ['-size_wide'],
-				content_classes: ['-no_padding', 'img_holder'],
-				footer: tmpl('modal-footer', {
-					footer_buttons: $()
-						.add(tmpl('button', {classes: '-color_primary CropButton RippleEffect', title: 'Кадрировать'}))
-						.add(tmpl('button', {classes: '-color_default DestroyCropButton RippleEffect', title: 'Отмена'}))
-				})
-			});
 			this.image_src = image_src;
-			
-			this.cropper = this.modal.find('.Cropper');
-			this.crop_button = this.modal.find('.CropButton');
-			this.destroy_crop_button = this.modal.find('.DestroyCropButton');
+			this.content = tmpl('modal-cropper-content', {
+				image_src: this.image_src
+			});
 			this.options = $.extend({
 				viewMode: 1,
 				responsive: false,
@@ -42,35 +32,65 @@ CropperModal = extending(AbstractModal, (function() {
 			throw Error('To initiate cropper you need to pass image source (image_src)')
 		}
 	}
-	
-	
-	CropperModal.prototype.show = function() {
-		var self = this;
+	/**
+	 *
+	 * @return {CropperModal}
+	 */
+	CropperModal.prototype.render = function() {
+		var self = this,
+			$image = this.content;
 		
-		self.cropper.on('load', function() {
-			self.cropper.cropper(self.options);
-		}).attr('src', self.image_src);
-		
-		self.__show();
-		
-		self.modal.on('modal.beforeDestroy', function() {
-			self.cropper.cropper('destroy');
-			self.crop_button.off('click.Crop');
-			self.destroy_crop_button.off('click.DestroyCrop');
+		this.__render({
+			classes: ['-size_wide'],
+			content_classes: ['-no_padding', 'img_holder'],
+			footer_buttons: tmpl('button', [
+				{classes: '-color_primary CropButton RippleEffect', title: 'Кадрировать'},
+				{classes: '-color_default DestroyCropButton RippleEffect', title: 'Отмена'}
+			])
 		});
 		
-		self.crop_button.off('click.Crop').on('click.Crop', function() {
-			self.crop();
-			__APP.MODALS.hideCurrent();
-		});
-		self.destroy_crop_button.off('click.DestroyCrop').on('click.DestroyCrop', function() {
-			__APP.MODALS.hideCurrent();
-		});
+		$image.on('load', function() {
+			$image.cropper(self.options);
+		}).attr('src', this.image_src);
+		
+		return this;
 	};
-	
-	CropperModal.prototype.crop = function() {
+	/**
+	 *
+	 * @return {CropperModal}
+	 */
+	CropperModal.prototype.init = function() {
 		var self = this;
-		self.initer.trigger('crop', [self.cropper.cropper('getCroppedCanvas').toDataURL(), self.cropper.cropper('getData')]);
+		
+		this.modal.find('.CropButton').on('click.Crop', function() {
+			self.crop();
+			self.hide();
+		});
+		this.modal.find('.DestroyCropButton').on('click.DestroyCrop', function() {
+			self.hide();
+		});
+		
+		return this;
+	};
+	/**
+	 * @protected
+	 * @return {CropperModal}
+	 */
+	CropperModal.prototype.destroyNested = function() {
+		this.content.cropper('destroy');
+		this.modal.find('.CropButton').off('click.Crop');
+		this.modal.find('.DestroyCropButton').off('click.DestroyCrop');
+		
+		return this;
+	};
+	/**
+	 *
+	 * @return {CropperModal}
+	 */
+	CropperModal.prototype.crop = function() {
+		this.modal.trigger('crop', [this.content.cropper('getCroppedCanvas').toDataURL()]);
+		
+		return this;
 	};
 	
 	return CropperModal;

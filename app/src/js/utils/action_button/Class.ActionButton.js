@@ -1,122 +1,166 @@
 /**
  *
- * @constructor
- * @augments jQuery
- * @param {(number|string)} id
- * @param {object} options
+ * @abstract
+ * @class ActionButton
+ * @extends jQuery
  */
-function ActionButton(id, options) {
-	var self = this;
-	this.classes = $.extend(true, {subscribed_state: ''}, this.classes);
-	this.options = $.extend(true, this.options, options);
-	this.options.classes = this.options.classes ? this.options.classes : [];
-	this.states.forEach(function(state) {
-		self.classes[state] = [];
-		self.options.icons ? self.classes[state].push(self.options.icons[state]) : false;
-		self.options.colors ? self.classes[state].push(self.options.colors[state]) : false;
-		self.classes[state] = self.classes[state].join(' ');
-	});
-	this.is_subscribed = !!options.is_subscribed;
-	this.is_add_avatar = !!options.is_add_avatar;
-	this.id = id;
-	jQuery.fn.init.call(this, __APP.BUILD.button({
-		classes: (
-			self.is_subscribed ?
-				self.options.classes.concat(self.classes.subscribed).concat(self.classes.subscribed_state) :
-				self.options.classes.concat(self.classes.subscribe)
-		).concat('fa_icon'),
-		title: self.is_subscribed ? self.options.labels.subscribed : self.options.labels.subscribe
-	}));
-	this.initiate();
-}
-ActionButton.extend(jQuery);
-ActionButton.prototype.states = ['subscribe', 'unsubscribe', 'subscribed'];
-ActionButton.prototype.pushStack = function(elems) {
-	var ret = jQuery.merge(this.get(0) == elems ? new this.constructor(this.id, this.is_subscribed, this.options) : $(), elems);
-	ret.prevObject = this;
-	ret.context = this.context;
-	return ret;
-};
-
-
-ActionButton.prototype.addAvatar = function() {
-	var $wrapper = this.closest('.AddAvatarWrapper'),
-		$collection = $wrapper.find('.AvatarsCollection'),
-		$favored_count = $wrapper.find('.FavoredCount'),
-		$avatars = $collection.find('.avatar'),
-		amount = $avatars.length;
-	
-	if ($collection.data('max_amount') >= amount) {
-		if ($collection.hasClass('-shifted')) {
-			$collection.removeClass('-shifted');
-			$collection.width(amount == 1 ? 0 : ($avatars.outerWidth() * (amount - 1)) - (6 * (amount - 2)));
+ActionButton = extendingJQuery((function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs ActionButton
+	 * @param {object} [options]
+	 */
+	function ActionButton(options) {
+		options = options ? options : {};
+		var self = this;
+		
+		this.options = $.extend(true, {
+			classes: [],
+			icons: null,
+			colors: null,
+			labels: null
+		}, this.options, options);
+				
+		this.has_icon = options.hasOwnProperty('has_icon') ? !!options.has_icon : true;
+		this.is_checked = !!options.is_checked;
+		this.is_add_avatar = !!options.is_add_avatar;
+		
+		if (this.has_icon) {
+			this.options.classes.push(this.icon_class);
 		} else {
-			$collection.addClass('-shifted');
-			$collection.width(($avatars.outerWidth() * amount) - (6 * (amount - 1)));
+			this.options.icons = {};
 		}
-	} else {
-		if ($favored_count.length) {
-			var current_count = parseInt($favored_count.text());
-			if ($collection.hasClass('-shifted')) {
-				$favored_count.text(current_count - 1);
-				if (current_count - 1 <= 0) {
-					$favored_count.parent().addClass('-cast');
-				}
-			} else {
-				$favored_count.text(current_count + 1);
-				$favored_count.parent().removeClass('-cast');
-			}
-		}
-		$collection.toggleClass('-shift -shifted');
-	}
-};
-ActionButton.prototype.bindHoverEffects = function() {
-	var self = this;
-	this
-		.off('mouseenter.hoverSubscribed mouseleave.hoverSubscribed')
-		.on('mouseenter.hoverSubscribed', function() {
-			self.removeClass(self.classes.subscribed).addClass(self.classes.unsubscribe);
-			self.children('.Text').text(self.options.labels.unsubscribe);
-		})
-		.on('mouseleave.hoverSubscribed', function() {
-			self.removeClass(self.classes.unsubscribe).addClass(self.classes.subscribed);
-			self.children('.Text').text(self.options.labels.subscribed);
+		
+		this.options.icons = this.options.icons ? this.options.icons : {};
+		this.options.colors = this.options.colors ? this.options.colors : {};
+		this.options.labels = this.options.labels ? this.options.labels : {};
+		
+		this.classes = {};
+		$.each(ActionButton.STATES, function(field, state_name) {
+			self.classes[state_name] = []
+				.concat(self.options.icons ? self.options.icons[state_name] : [])
+				.concat(self.options.colors ? self.options.colors[state_name] : [])
+				.join(' ');
 		});
-};
-ActionButton.prototype.onClick = function() {};
-ActionButton.prototype.bindClick = function() {
-	var self = this;
-	this.on('click.subscribe', function() {
-		if(__APP.USER.id === -1){
-			(new AuthModal()).show();
-		} else {
-			self.onClick();
-			if(self.is_add_avatar){
-				self.addAvatar();
+		
+		jQuery.fn.init.call(this, __APP.BUILD.button(this.is_checked ? {
+				classes: this.options.classes.concat(this.classes[ActionButton.STATES.CHECKED]).concat(this.checked_state_class ? this.checked_state_class  : []),
+				title: this.options.labels[ActionButton.STATES.CHECKED]
+			} : {
+				classes: this.options.classes.concat(this.classes[ActionButton.STATES.UNCHECKED]),
+				title: this.options.labels[ActionButton.STATES.UNCHECKED]
 			}
-			if (window.askToSubscribe instanceof Function) {
-				window.askToSubscribe();
-			}
-		}
-	});
-};
-ActionButton.prototype.afterSubscribe = function() {
-	this.removeClass([this.classes.subscribe, this.classes.subscribed].join(' '));
-	this.addClass([this.classes.subscribed_state, this.classes.unsubscribe].join(' '));
-	this.children('.Text').text(this.options.labels.unsubscribe);
-	this.is_subscribed = true;
-	this.bindHoverEffects();
-};
-ActionButton.prototype.afterUnsubscribe = function() {
-	this.removeClass([this.classes.subscribed_state, this.classes.unsubscribe, this.classes.subscribed].join(' '));
-	this.addClass(this.classes.subscribe);
-	this.children('.Text').text(this.options.labels.subscribe);
-	this.is_subscribed = false;
-	this.off('mouseenter.hoverSubscribed mouseleave.hoverSubscribed');
-};
-ActionButton.prototype.initiate = function() {
-	if (this.is_subscribed) {
-		this.bindHoverEffects();
+		));
+		
+		this.data('instance', this);
+		this.initiate();
 	}
-	this.bindClick();
-};
+	/**
+	 *
+	 * @enum {string}
+	 */
+	ActionButton.STATES = {
+		CHECKED: 'checked',
+		UNCHECKED: 'unchecked',
+		CHECKED_HOVER: 'checked_hover',
+		UNCHECKED_HOVER: 'unchecked_hover'
+	};
+	
+	/**
+	 * @param {jQuery} $context
+	 */
+	function addAvatar($context) {
+		var $wrapper = $context.closest('.'+__C.CLASSES.HOOKS.ADD_AVATAR.ANCESTOR),
+			$collection = $wrapper.find('.'+__C.CLASSES.HOOKS.ADD_AVATAR.COLLECTION),
+			$favored_count = $wrapper.find('.'+__C.CLASSES.HOOKS.ADD_AVATAR.QUANTITY),
+			$avatars = $collection.find('.avatar'),
+			amount = $avatars.length;
+		
+		if ($collection.data('max_amount') >= amount) {
+			if ($collection.hasClass(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED)) {
+				$collection.removeClass(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
+				$collection.width(amount == 1 ? 0 : ($avatars.outerWidth() * (amount - 1)) - (6 * (amount - 2)));
+			} else {
+				$collection.addClass(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
+				$collection.width(($avatars.outerWidth() * amount) - (6 * (amount - 1)));
+			}
+		} else {
+			if ($favored_count.length) {
+				var current_count = parseInt($favored_count.text());
+				if ($collection.hasClass(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED)) {
+					$favored_count.text(current_count - 1);
+					if (current_count - 1 <= 0) {
+						$favored_count.parent().addClass(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.CAST);
+					}
+				} else {
+					$favored_count.text(current_count + 1);
+					$favored_count.parent().removeClass(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.CAST);
+				}
+			}
+			$collection.toggleClass(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFT+' '+__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
+		}
+	}
+	
+	ActionButton.prototype.checked_state_class = '';
+	ActionButton.prototype.icon_class = __C.CLASSES.ICON_CLASS;
+	
+	ActionButton.prototype.onClick = function() {};
+	
+	ActionButton.prototype.afterCheck = function() {
+		var is_hovered = this.is(':hover');
+		
+		this.is_checked = true;
+		this
+			.removeClass(''.concat(this.classes[ActionButton.STATES.UNCHECKED_HOVER], ' ', this.classes[ActionButton.STATES.UNCHECKED]))
+			.addClass(''.concat(this.classes[is_hovered ? ActionButton.STATES.CHECKED_HOVER : ActionButton.STATES.CHECKED], ' ', this.checked_state_class))
+			.children('.'+__C.CLASSES.HOOKS.TEXT).text(this.options.labels[is_hovered ? ActionButton.STATES.CHECKED_HOVER : ActionButton.STATES.CHECKED]);
+	};
+	
+	ActionButton.prototype.afterUncheck = function() {
+		var is_hovered = this.is(':hover');
+		
+		this.is_checked = false;
+		this
+			.removeClass(''.concat(this.classes[ActionButton.STATES.CHECKED_HOVER], ' ', this.classes[ActionButton.STATES.CHECKED], ' ', this.checked_state_class))
+			.addClass(''.concat(this.classes[is_hovered ? ActionButton.STATES.UNCHECKED_HOVER : ActionButton.STATES.UNCHECKED]))
+			.children('.'+__C.CLASSES.HOOKS.TEXT).text(this.options.labels[is_hovered ? ActionButton.STATES.UNCHECKED_HOVER : ActionButton.STATES.UNCHECKED]);
+	};
+	
+	
+	ActionButton.prototype.initiate = function() {
+		var self = this;
+		
+		this
+			.on('mouseenter.HoverActionButton', function() {
+				self
+					.removeClass(self.classes[self.is_checked ? ActionButton.STATES.CHECKED : ActionButton.STATES.UNCHECKED])
+					.addClass(self.classes[self.is_checked ? ActionButton.STATES.CHECKED_HOVER : ActionButton.STATES.UNCHECKED_HOVER]);
+				self.children('.'+__C.CLASSES.HOOKS.TEXT).text(self.options.labels[self.is_checked ? ActionButton.STATES.CHECKED_HOVER : ActionButton.STATES.UNCHECKED_HOVER]);
+			})
+			
+			.on('mouseleave.LeaveActionButton', function() {
+				self
+					.removeClass(self.classes[self.is_checked ? ActionButton.STATES.CHECKED_HOVER : ActionButton.STATES.UNCHECKED_HOVER])
+					.addClass(self.classes[self.is_checked ? ActionButton.STATES.CHECKED : ActionButton.STATES.UNCHECKED]);
+				self.children('.'+__C.CLASSES.HOOKS.TEXT).text(self.options.labels[self.is_checked ? ActionButton.STATES.CHECKED : ActionButton.STATES.UNCHECKED]);
+			})
+			
+			.on('click.Action', function() {
+				if(__APP.USER.isLoggedOut()){
+					return (new AuthModal()).show();
+				}
+				self.onClick();
+				
+				if(self.is_add_avatar){
+					addAvatar(self);
+				}
+				if (window.askToSubscribe instanceof Function) {
+					window.askToSubscribe();
+				}
+			});
+	};
+	
+	
+	return ActionButton;
+}()));
