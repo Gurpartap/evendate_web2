@@ -13,7 +13,9 @@ EventsWithStatisticsCollection = extending(EventsCollection, (function() {
 	 * @constructor
 	 * @constructs EventsWithStatisticsCollection
 	 */
-	function EventsWithStatisticsCollection() {}
+	function EventsWithStatisticsCollection() {
+		EventsCollection.call(this);
+	}
 	EventsWithStatisticsCollection.prototype.collection_of = OneEventWithStatistics;
 	/**
 	 *

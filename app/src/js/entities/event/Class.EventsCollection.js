@@ -35,7 +35,9 @@ EventsCollection = extending(EntitiesCollection, (function() {
 	 * @constructor
 	 * @constructs EventsCollection
 	 */
-	function EventsCollection() {}
+	function EventsCollection() {
+		EntitiesCollection.call(this);
+	}
 	EventsCollection.prototype.collection_of = OneEvent;
 	/**
 	 * @const

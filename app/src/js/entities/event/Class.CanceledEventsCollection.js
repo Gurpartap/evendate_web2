@@ -12,7 +12,9 @@ CanceledEventsCollection = extending(EventsCollection, (function() {
 	 * @constructor
 	 * @constructs CanceledEventsCollection
 	 */
-	function CanceledEventsCollection() {}
+	function CanceledEventsCollection() {
+		EventsCollection.call(this);
+	}
 	/**
 	 *
 	 * @override

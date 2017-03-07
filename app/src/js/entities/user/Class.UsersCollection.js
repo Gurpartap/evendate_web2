@@ -19,7 +19,9 @@ UsersCollection = extending(EntitiesCollection, (function() {
 	 * @constructor
 	 * @constructs UsersCollection
 	 */
-	function UsersCollection() {}
+	function UsersCollection() {
+		EntitiesCollection.call(this);
+	}
 	UsersCollection.prototype.collection_of = OneUser;
 	/**
 	 * Returns specified staff by role. Mixing additional_fields if needed.

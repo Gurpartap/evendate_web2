@@ -32,7 +32,9 @@ CatalogPage = extending(Page, (function() {
 		
 		this.default_title = 'Организации';
 		
+		this.selected_city_name = __APP.LOCATION.city;
 		this.selected_category_id = category_id;
+		this.cities = new CitiesCollection();
 		this.categories = new CategoriesCollection();
 		this.all_organizations = new OrganizationsCollection();
 		
@@ -40,7 +42,7 @@ CatalogPage = extending(Page, (function() {
 	
 	CatalogPage.prototype.fetchData = function() {
 		var self = this;
-		return this.fetching_data_defer = this.categories.fetchCategoriesWithOrganizations(this.categories_ajax_data, this.organizations_ajax_data, 0).done(function() {
+		return this.fetching_data_defer = __APP.SERVER.multipleAjax(this.categories.fetchCategoriesWithOrganizations(this.categories_ajax_data, this.organizations_ajax_data, 0).done(function() {
 			self.all_organizations = self.categories
 				.reduce(function(collection, cat) {
 					return collection.setData(cat.organizations);
@@ -48,7 +50,7 @@ CatalogPage = extending(Page, (function() {
 				.sort(function(a, b) {
 					return b.subscribed_count - a.subscribed_count;
 				});
-		});
+		}), this.cities.fetchCities(null, null, 'local_name'));
 	};
 	/**
 	 *
@@ -84,6 +86,14 @@ CatalogPage = extending(Page, (function() {
 		bindOrganizationsEvents();
 		
 		PAGE.$view.find('.OrganizationsCategoriesScroll').scrollbar({disableBodyScroll: true});
+		
+		PAGE.$view.find('#organizations_cities_select').select2({
+			containerCssClass: 'form_select2',
+			dropdownCssClass: 'form_select2_drop'
+		}).on('change', function() {
+			var city = PAGE.cities.getByID($(this).val());
+			// Filter orgs by city
+		});
 		
 		PAGE.$view.find('.ShowAllOrganizations').on('click.showAllOrganizations', function() {
 			$categories.removeClass(__C.CLASSES.ACTIVE).siblings('.SubcategoryWrap').height(0);
@@ -122,6 +132,12 @@ CatalogPage = extending(Page, (function() {
 	};
 	
 	CatalogPage.prototype.render = function() {
+		this.$view.find('#organizations_cities_select').append(tmpl('option', this.cities.map(function(city) {
+			return {
+				val: city.id,
+				display_name: city.local_name
+			}
+		})));
 		this.$view.find('.OrganizationsCategoriesScroll').html(__APP.BUILD.organisationsCategoriesItems(this.categories));
 		this.$wrapper.html(__APP.BUILD.organizationCard(this.selected_category_id ? this.categories.getByID(this.selected_category_id).organizations : this.all_organizations));
 		

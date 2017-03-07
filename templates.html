@@ -17,6 +17,9 @@
 <script type="javascript/template" id="tmpl-organizations-wrapper">
 	<div class="page_wrapper">
 		<aside class="organizations_aside">
+			<div class="form_unit">
+				<select id="organizations_cities_select" class="OrganizationsCities" name="city" title=""></select>
+			</div>
 			<div class="page organizations_categories">
 				<header class="organizations_categories_header">
 					<span class="organizations_categories_title -unselectable">Рубрики</span>
@@ -1308,6 +1311,15 @@
 
 <script type="javascript/template" id="tmpl-modal-users-divider">
 	<p class="modal_divider">{label}</p>
+</script>
+
+<script type="javascript/template" id="tmpl-modal-city-choose-content">
+	<div class="form_unit -inline">
+		<label class="form_label">Ваш город</label>
+		<div class="form_unit">
+			<select id="city_choose_modal_select" class="CityChooseModalSelect" name="city" title="">{cities}</select>
+		</div>
+	</div>
 </script>
 
 
