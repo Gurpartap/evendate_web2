@@ -359,6 +359,13 @@ __APP = {
 			'': ActualEventsPage
 		},
 		'organizations': {
+			'at': {
+				'^([0-9]+)': CatalogPage,
+				'^([^/]+)': {
+					'^([0-9]+)': CatalogPage,
+					'': CatalogPage
+				}
+			},
 			'^([0-9]+)': CatalogPage,
 			'': CatalogPage
 		},
