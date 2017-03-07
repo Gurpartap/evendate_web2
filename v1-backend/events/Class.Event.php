@@ -1513,7 +1513,7 @@ class Event extends AbstractEntity
 			$merged_fields[$key] = $final_field;
 			$return_fields[] = $final_field;
 		}
-		if (count($errors) > 0) return new Result(false, 'Возникла ошибка во время регистрации', array('registration_fields' => $merged_fields));
+		if (count($errors) > 0) return new Result(false, 'Возникла ошибка во время регистрации', array('registration_fields' => $return_fields));
 
 		if (isset($this->registration_approvement_required)) {
 			$approve_required = $this->registration_approvement_required;
