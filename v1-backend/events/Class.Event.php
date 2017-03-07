@@ -1416,9 +1416,6 @@ class Event extends AbstractEntity
 		return new Result(true, '', array('is_seen' => $p_get_event->rowCount() > 0));
 	}
 
-	/**
-	 * @return mixed
-	 */
 	public function getTicketingLocally()
 	{
 		return $this->ticketing_locally;

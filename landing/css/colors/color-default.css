@@ -1,69 +1,69 @@
 /*
- *Ultima Default Color Scheme hex: #ff6f69
+ *Ultima Default Color Scheme hex: #28be84
  *Copyright 2014 8Guild.com
  */
  
 .side-navi ul li.current a {
-	-webkit-box-shadow: 0 0 0 2px #ff6f69;
-	-moz-box-shadow: 0 0 0 2px #ff6f69;
-	box-shadow: 0 0 0 2px #ff6f69;
+	-webkit-box-shadow: 0 0 0 2px #28be84;
+	-moz-box-shadow: 0 0 0 2px #28be84;
+	box-shadow: 0 0 0 2px #28be84;
 }
 .jumbotron {
-  background-color: #ff6f69;
+  background-color: #28be84;
 }
 .gallery li.gall-expanded > a::after {
-	border-bottom-color: #ff6f69;
+	border-bottom-color: #28be84;
 }
 .gall-expander {
-	background: #ff6f69;
+	background: #28be84;
 }
 .pricing-plan.highlited .body {
-	background-color: #ff6f69;
+	background-color: #28be84;
 }
 .hero {
-	background-color: #ff6f69;
+	background-color: #28be84;
 }
 .page-block.color {
-	background-color: #ff6f69;
+	background-color: #28be84;
 }
 .social-networks a:hover {
-	color: #ff6f69;
+	color: #28be84;
 }
 .footer {
-	background-color: #ff6f69;
+	background-color: #28be84;
 }
 .cs-page header {
-	background-color: #ff6f69;
+	background-color: #28be84;
 }
 .cs-page .footer {
-	background-color: #ff6f69;
+	background-color: #28be84;
 }
 .coming-soon header {
-	background-color: #ff6f69;
+	background-color: #28be84;
 }
 .middle-block {
-	background-color: #ff6f69;
+	background-color: #28be84;
 }
 .stiky-header {
-	border-bottom-color: #ff6f69;
+	border-bottom-color: #28be84;
 }
 .main-navi ul li:hover a {
-	color: #ff6f69;
+	color: #28be84;
 }
 .main-navi ul li.active a {
-	color: #ff6f69;
-	border-top-color: #ff6f69;
+	color: #28be84;
+	border-top-color: #28be84;
 }
 
 @media screen and (max-width: 991px) {
 	.main-navi.open { 
-	border-bottom-color: #ff6f69;
+	border-bottom-color: #28be84;
 	}
 	.main-navi ul li a:hover {
-		color: #ff6f69;
+		color: #28be84;
 	}
 	.main-navi ul li.active a {
-		color: #ff6f69;
-		border-left-color: #ff6f69;
+		color: #28be84;
+		border-left-color: #28be84;
 	}
 }
