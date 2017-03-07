@@ -3,13 +3,21 @@
  */
 /**
  *
- * @constructor
- * @augments StatisticsOrganizationPage
- * @param {(string|number)} org_id
+ * @class StatisticsOrganizationSettingsPage
+ * @extends StatisticsOrganizationPage
  */
-function StatisticsOrganizationSettingsPage(org_id) {
-	StatisticsOrganizationPage.apply(this, arguments);
-}
-StatisticsOrganizationSettingsPage.extend(StatisticsOrganizationPage);
-
-StatisticsOrganizationSettingsPage.prototype.render = function() {};
+StatisticsOrganizationSettingsPage = extending(StatisticsOrganizationPage, (function() {
+	/**
+	 *
+	 * @param {(string|number)} org_id
+	 * @constructor
+	 * @constructs StatisticsOrganizationSettingsPage
+	 */
+	function StatisticsOrganizationSettingsPage(org_id) {
+		StatisticsOrganizationPage.apply(this, arguments);
+	}
+	
+	StatisticsOrganizationSettingsPage.prototype.render = function() {};
+	
+	return StatisticsOrganizationSettingsPage;
+}()));

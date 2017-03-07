@@ -16,7 +16,7 @@ $(document)
 	})
 	.ajaxError(function(event, jqxhr, settings, thrownError) {
 		if (!(thrownError && thrownError == 'abort')) {
-			__APP.SERVER.ajaxErrorHandler(event, jqxhr, settings, thrownError);
+			ServerConnection.ajaxErrorHandler(event, jqxhr, settings, thrownError);
 		}
 	})
 	.ready(function() {
@@ -75,7 +75,7 @@ $(document)
 		
 		if (window['moment'] != undefined) {
 			moment.locale(navigator.language);
-			moment.tz.setDefault('Europe/Moscow');
+			//moment.tz.setDefault('Europe/Moscow');
 			moment.updateLocale('ru', {
 				monthsShort: __LOCALES.ru_RU.DATE.MONTH_SHORT_NAMES,
 				calendar: {

@@ -318,10 +318,34 @@ class Event extends AbstractEntity
 
 	private static function saveTicketingInfo(ExtendedPDO $db, $event_id, $data)
 	{
+
+		$_ticket_types = TicketTypesCollection::filter($db,
+			App::getCurrentUser(),
+			array('event' => EventsCollection::one($db, App::getCurrentUser(), $event_id, array())),
+			array()
+		)->getData();
+
+		$tickets_by_uuid = array();
+		$registration_ticket = null;
+		foreach ($_ticket_types as $type) {
+			$tickets_by_uuid[$type['uuid']] = array(
+				'data' => $type,
+				'to_switch_off' => true,
+				'uuid' => $type['uuid']
+			);
+			if ($type['type_code'] == 'registration') {
+				$registration_ticket = $type;
+			}
+		}
+
 		if (isset($data['ticketing_locally']) && filter_var($data['ticketing_locally'], FILTER_VALIDATE_BOOLEAN) == true) {
 			foreach ($data['ticket_types'] as $ticket_type) {
 				//it will auto update if ticket uuid is same
 				TicketType::create($event_id, $ticket_type, $db);
+				if (isset($tickets_by_uuid[$ticket_type['uuid']])) {
+					$tickets_by_uuid[$ticket_type['uuid']]['to_switch_off'] = false;
+					TicketType::create($event_id, $ticket_type, $db);
+				}
 			}
 
 			//TODO: update start_after_ticket_type_uuid fields
@@ -332,6 +356,7 @@ class Event extends AbstractEntity
 		} else {
 			if (isset($data['registration_locally']) && filter_var($data['registration_locally'], FILTER_VALIDATE_BOOLEAN) == true) {
 				TicketType::create($event_id, array(
+					'uuid' => $registration_ticket['uuid'],
 					'type_code' => 'registration',
 					'name' => 'Регистрация на событие',
 					'comment' => 'Регистрация на событие ' . $data['title'],
@@ -524,6 +549,7 @@ class Event extends AbstractEntity
 			$data['registration_till'] = null;
 		}
 
+
 		if ($data['is_online'] === 'false') {
 			if (is_null($data['location']) || empty($data['location'])) throw new InvalidArgumentException('LOCATION_IS_NULL');
 		}
@@ -543,6 +569,12 @@ class Event extends AbstractEntity
 
 		$data['latitude'] = is_numeric($data['latitude']) ? (float)$data['latitude'] : null;
 		$data['longitude'] = is_numeric($data['longitude']) ? (float)$data['longitude'] : null;
+
+
+		if (is_null($data['registration_till']) && $data['registration_locally'] === 'true') {
+			$first_event = $data['dates'][0];
+			$data['registration_till'] = new DateTime($first_event['event_date'] . ' ' . $first_event['start_time']);
+		}
 
 		if (!isset($data['is_free'])) {
 			$data['is_free'] = 'true';
@@ -945,7 +977,7 @@ class Event extends AbstractEntity
 					'done' => 'TRUE',
 					'status' => 'FALSE',
 				))->where(
-					'id = ?', array_search(Notification::NOTIFICATION_TYPE_ONE_DAY_REGISTRATION_CLOSE, $existing_notification_types)
+					'id = ?', array_search(Notification::NOTIFICATION_TYPE_CHANGED_REGISTRATION, $existing_notification_types)
 				);
 			$p_upd_notification = $this->db->prepare($q_upd_notification->getStatement());
 			$p_upd_notification->execute($q_upd_notification->getBindValues());
@@ -1302,7 +1334,6 @@ class Event extends AbstractEntity
 
 			self::saveRegistrationInfo($this->db, $this->getId(), $data);
 			self::saveTicketingInfo($this->db, $this->getId(), $data);
-
 			self::saveNotifications($this->generateNotifications($data), $this->db);
 			self::updateVkPostInformation($this->db, $this->getId(), $data);
 
@@ -1482,7 +1513,7 @@ class Event extends AbstractEntity
 			$merged_fields[$key] = $final_field;
 			$return_fields[] = $final_field;
 		}
-		if (count($errors) > 0) return new Result(false, 'Возникла ошибка во время регистрации', $merged_fields);
+		if (count($errors) > 0) return new Result(false, 'Возникла ошибка во время регистрации', array('registration_fields' => $merged_fields));
 
 		if (isset($this->registration_approvement_required)) {
 			$approve_required = $this->registration_approvement_required;
@@ -1497,11 +1528,10 @@ class Event extends AbstractEntity
 
 		if ($this->ticketing_locally == false) {
 			if (!isset($request['tickets']) || !is_array($request['tickets'])) {
-				$request['tickets'] = array();
+				$request['tickets'] = array(array(
+					'count' => '1',
+				));
 			}
-			$request['tickets'][] = array(
-				'count' => '1',
-			);
 		}
 
 		$order_info = RegistrationForm::processOrder($this, $user, $this->db, $request['tickets']);

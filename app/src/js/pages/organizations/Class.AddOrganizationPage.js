@@ -3,11 +3,19 @@
  */
 /**
  *
- * @constructor
- * @augments EditOrganizationPage
+ * @class AddOrganizationPage
+ * @extends EditOrganizationPage
  */
-function AddOrganizationPage() {
-	EditOrganizationPage.apply(this);
-	this.page_title = 'Новая организация';
-}
-AddOrganizationPage.extend(EditOrganizationPage);
+AddOrganizationPage = extending(EditOrganizationPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs AddOrganizationPage
+	 */
+	function AddOrganizationPage() {
+		EditOrganizationPage.apply(this);
+		this.page_title = 'Новая организация';
+	}
+	
+	return AddOrganizationPage;
+}()));

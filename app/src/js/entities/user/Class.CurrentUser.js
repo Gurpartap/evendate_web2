@@ -113,6 +113,13 @@ CurrentUser = extending(OneUser, (function() {
 	};
 	/**
 	 *
+	 * @return {boolean}
+	 */
+	CurrentUser.prototype.isLoggedOut = function() {
+		return this.id === -1;
+	};
+	/**
+	 *
 	 * @param {(number|string)} [organization_id]
 	 * @param {AJAXCallback} [success]
 	 * @returns {(jqPromise|null)}

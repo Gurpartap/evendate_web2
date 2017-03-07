@@ -1,18 +1,114 @@
 /**
- * Extending class
- * @param {Function} parent
+ * @const __C
+ * @property {Object<string, string>} CLASSES
+ * @property {string} DATE_FORMAT
+ * @property {Object<string, string>} COLORS
+ * @property {Object<string, string>} STATS
+ * @property {Object<string, string[]>} ACTION_NAMES
+ * @property {Object<string, string>} ENTITIES
  */
-Function.prototype.extend = function(parent) {
-	this.prototype = Object.create(parent.prototype);
-	this.prototype.constructor = this;
-	this.prototype.__super = parent.prototype;
-	this.prototype.__superCall = function(method_name) {
-		if (parent.prototype[method_name] && typeof parent.prototype[method_name] == 'function') {
-			return parent.prototype[method_name].call(this, Array.prototype.slice.call(1, arguments));
-		} else {
-			console.error('There is no "' + method_name + '" method in object "' + parent.prototype.constructor.name + '"');
-		}
-	};
+__C = {
+	CLASSES: {
+		TEXT_COLORS: {
+			ACCENT: '-text_color_accent'
+		},
+		COLORS: {
+			ACCENT: '-color_accent',
+			PRIMARY: '-color_primary',
+			NEUTRAL: '-color_neutral',
+			NEUTRAL_ACCENT: '-color_neutral_accent',
+			MARGINAL: '-color_marginal',
+			MARGINAL_PRIMARY: '-color_marginal_primary',
+			MARGINAL_ACCENT: '-color_marginal_accent'
+		},
+		UNIVERSAL_STATES: {
+			EMPTY: '-empty',
+			ROUNDED: '-rounded',
+			SHADOWED: '-shadowed',
+			BORDERED: '-bordered',
+			TRANSFORM_UPPERCASE: '-transform_uppercase'
+		},
+		SIZES: {
+			X30: '-size_30x30',
+			X40: '-size_40x40',
+			X55: '-size_55x55',
+			LOW: '-size_low',
+			WIDE: '-size_wide',
+			SMALL: '-size_small'
+		},
+		HOOKS: {
+			RIPPLE: 'RippleEffect',
+			ADD_TO_FAVORITES: 'AddToFavorites',
+			TEXT: 'Text',
+			CALL_MODAL: 'CallModal',
+			DROPDOWN_BUTTON: 'DropdownButton',
+			ADD_AVATAR: {
+				ANCESTOR: 'AddAvatarWrapper',
+				COLLECTION: 'AvatarsCollection',
+				QUANTITY: 'FavoredCount',
+				STATES: {
+					CAST: '-cast',
+					CASTABLE: '-castable',
+					SHIFT: '-shift',
+					SHIFTED: '-shifted'
+				}
+			}
+		},
+		ACTIVE: '-active',
+		DISABLED: '-disabled',
+		HIDDEN: '-hidden',
+		ICONS: {
+			STAR: 'fa-star',
+			STAR_O: 'fa-star-o',
+			BELL_O: 'fa-bell-o',
+			TIMES: 'fa-times',
+			PLUS: 'fa-plus',
+			CHECK: 'fa-check',
+			PENCIL: 'fa-pencil'
+		},
+		ICON_CLASS: 'fa_icon'
+	},
+	DATE_FORMAT: 'YYYY-MM-DD',
+	COLORS: {
+		PRIMARY: '#2e3b50',
+		MUTED: '#3e4d66',
+		MUTED_80: '#657184',
+		MUTED_50: '#9fa6b3',
+		MUTED_30: '#c5c9d1',
+		TEXT: '#4a4a4a',
+		ACCENT: '#f82969',
+		ACCENT_ALT: '#ff5f9e',
+		FRANKLIN: '#28be84',
+		FRANKLIN_ALT: '#23d792'
+	},
+	STATS: {
+		EVENT_VIEW: 'view',
+		EVENT_VIEW_DETAIL: 'view_detail',
+		EVENT_OPEN_SITE: 'open_site',
+		EVENT_OPEN_MAP: 'open_map',
+		ORGANIZATION_OPEN_SITE: 'open_site',
+		EVENT_ENTITY: 'event',
+		ORGANIZATION_ENTITY: 'organization'
+	},
+	ACTION_NAMES: {
+		fave: ['добавил(а) в избранное'],
+		unfave: ['удалил(а) из избранного'],
+		subscribe: ['добавил(а) подписки'],
+		unsubscribe: ['удалил(а) подписки']
+	},
+	ENTITIES: {
+		USER: 'user',
+		EVENT: 'event',
+		ORGANIZATION: 'organization'
+	},
+	/**
+	 * @enum {string}
+	 */
+	DEFERRED_STATES: {
+		PENDING: 'pending',
+		RESOLVED: 'resolved',
+		REJECTED: 'rejected'
+	}
 };
 /**
  * Extending class
@@ -26,6 +122,41 @@ function extending(parent, children){
 	Object.defineProperty(children.prototype, '__super', {
 		value: parent
 	});
+	
+	/**
+	 *
+	 * @param {string} name
+	 * @param {...*} [args]
+	 * @return {*}
+	 */
+	children.prototype.uber = function uber(name, args) {
+		var method;
+		method = children.prototype[name];
+		if (method == this[name]) {
+			method = parent.prototype[name];
+		}
+		
+		return method.apply(this, Array.prototype.slice.apply(arguments, [1]));
+	};
+	
+	return children;
+}
+/**
+ * Extending jQuery object
+ * @param {Function} children
+ * @return {Function}
+ */
+function extendingJQuery(children){
+	children = extending(jQuery, children);
+	
+	children.prototype.pushStack = function(elems) {
+		var ret = jQuery.merge(this.get(0) == elems ? new this.constructor() : $(), elems);
+		ret.prevObject = this;
+		ret.context = this.context;
+		return ret;
+	};
+	
+	
 	return children;
 }
 /**
@@ -87,6 +218,20 @@ Object.props = function(obj) {
 	Object.keys(obj).forEach(function(prop) {
 		if (typeof obj[prop] !== 'function') {
 			props.push(prop);
+		}
+	});
+	return props;
+};
+/**
+ * Returns objects` own properties
+ * @param {object} obj
+ * @return {object}
+ */
+Object.getProps = function(obj) {
+	var props = {};
+	$.each(obj, function(key, value) {
+		if (typeof value !== 'function') {
+			props[key] = value;
 		}
 	});
 	return props;
@@ -335,6 +480,12 @@ Math.roundTo = function(num, decimals) {
 }(window.jQuery));
 
 $.fn.extend({
+	/**
+	 *
+	 * @memberOf jQuery#
+	 * @param {string} statuses
+	 * @return {jQuery}
+	 */
 	toggleStatus: function(statuses) {
 		var $this = this;
 		
@@ -354,8 +505,6 @@ $.fn.extend({
 			$this.closest('.form_unit').toggleStatus(statuses);
 		} else if ($this.length) {
 			$this.find('.form_unit').toggleStatus(statuses);
-		} else {
-			throw Error('Argument not found');
 		}
 		
 		return this;
@@ -366,10 +515,9 @@ $.fn.extend({
 	 * Метод возвращает javaScript объект, состоящий из атрибутов name и value элементов формы.
 	 * Если output_type стоит на array, то возвращается массив из объектов с полями name и value (аналогично с serializeArray).
 	 *
-	 * @method external:"jQuery.fn".serializeForm
-	 *
+	 * @memberOf jQuery#
 	 * @param {string} [output_type=object]
-	 * @returns {Array|Object}
+	 * @returns {(Array|Object)}
 	 */
 	serializeForm: function(output_type) {
 		var zb = /^(?:input|select|textarea|keygen)/i,
@@ -460,7 +608,7 @@ $.fn.extend({
 							else if (value != "on")
 								output[name] = value;
 							else
-								output[name] = el.checked ? true : false;
+								output[name] = !!el.checked;
 							break;
 						}
 					}
@@ -482,6 +630,7 @@ $.fn.extend({
 	},
 	/**
 	 * jQuery adapter for Tablesort
+	 * @memberOf jQuery#
 	 * @param {object} [options]
 	 */
 	tablesort: function(options) {
@@ -492,9 +641,34 @@ $.fn.extend({
 		} else {
 			console.error('Tablesort is not defined');
 		}
+	},
+	/**
+	 * Resolving instance from element
+	 * @memberOf jQuery#
+	 * @return {*}
+	 */
+	resolveInstance: function() {
+		var instance = this.data('instance');
+		return instance ? instance : this;
+	},
+	/**
+	 * Getting outer HTML string from jQuery collection
+	 * @memberOf jQuery#
+	 * @return {string}
+	 */
+	outerHTML: function() {
+		var str = '';
+		this.each(function(i, el) {
+			str += el.outerHTML;
+		});
+		return str;
 	}
 });
-
+/**
+ * Makes jQuery collection from the genuine array of HTML elements or jQuery objects
+ * @param {(Array<Element>|Array<jQuery>|Element)} array
+ * @return {jQuery}
+ */
 jQuery.makeSet = function(array) {
 	return $($.map(array, function(el) {return el.get();}));
 };
@@ -700,9 +874,12 @@ jQuery.makeSet = function(array) {
  * http://www.gnu.org/licenses/gpl-3.0-standalone.html
  */
 (function(window){
+	/**
+	 *
+	 * @lends cookies
+	 */
 	window.cookies = {
 		/**
-		 *
 		 * @param {string} name
 		 * @return {(string|null)}
 		 */
@@ -775,22 +952,6 @@ jQuery.makeSet = function(array) {
 	};
 }(window));
 
-var CollectionOfXHRs = extending(Array, (function(){
-	function CollectionOfXHRs(){}
-	
-	CollectionOfXHRs.prototype.abortAll = function() {
-		var cur;
-		while (this.length) {
-			cur = this.pop();
-			if(cur.state() === 'pending'){
-				//cur.abort();
-			}
-		}
-	};
-	
-	return CollectionOfXHRs;
-}()));
-
 /**===========================================================
  * Templates for jQuery
  *
@@ -802,70 +963,75 @@ var CollectionOfXHRs = extending(Array, (function(){
  */
 function tmpl(template_type, items, addTo, direction) {
 	items = items ? items : {};
+	var $tmpl = $('#tmpl-' + template_type),
+		wrapMap = {
+			thead: [ 1, "<table>", "</table>" ],
+			col: [ 2, "<table><colgroup>", "</colgroup></table>" ],
+			tr: [ 2, "<table><tbody>", "</tbody></table>" ],
+			td: [ 3, "<table><tbody><tr>", "</tr></tbody></table>" ],
+			_default: [ 1, "<div>", "</div>" ]
+		},
+		result = $(),
+		html_val;
 	
-	var wrapMap = {
-		thead: [ 1, "<table>", "</table>" ],
-		col: [ 2, "<table><colgroup>", "</colgroup></table>" ],
-		tr: [ 2, "<table><tbody>", "</tbody></table>" ],
-		td: [ 3, "<table><tbody><tr>", "</tr></tbody></table>" ],
-		_default: [ 1, "<div>", "</div>" ]
-	};
 	wrapMap.tbody = wrapMap.tfoot = wrapMap.colgroup = wrapMap.caption = wrapMap.thead;
 	wrapMap.th = wrapMap.td;
 	
-	var htmlEntities = function(str) {
-			return String(str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-		},
-		replaceTags = function(html, object) {
-			var jQuery_pairs = {},
-				keys = {},
-				wrap = wrapMap[ ( /<([\w:]+)/.exec( html ) || [ "", "" ] )[ 1 ].toLowerCase() ] || wrapMap._default,
-				j = wrap[ 0 ];
-			$.each(object, function(key, value) {
-				if ($.type(value) == 'string') {
-					keys[key] = htmlEntities(value);
-				} else if (value instanceof jQuery) {
-					if (value.length) {
-						jQuery_pairs[key] = value;
-						keys[key] = value.is('tr') ? '<tbody id="JQ_tmpl_' + key + '"></tbody>' : '<div id="JQ_tmpl_' + key + '"></div>';
-					}
-				} else if (value == null) {
-					keys[key] = '';
-				} else {
-					keys[key] = value;
-				}
-			});
-			
-			html = $(html ? wrap[ 1 ] + html.format(keys) + wrap[ 2 ] : '');
-			$.each(jQuery_pairs, function(key, value) {
-				html.find('#JQ_tmpl_' + key).append(value);
-				if(value.is('tr')){
-					value.parent('tbody').removeAttr('id');
-				} else {
-					value.unwrap();
-				}
-			});
-			while ( j-- ) {
-				html = html.children();
-			}
-			return html;
-		},
-		
-		result = $(),
-		html_val = $('#tmpl-' + template_type).html()
-			.replace(/(?:\/\*(?:[\s\S]*?)\*\/)|(?:([\s;])+\/\/(?:.*)$)/gim, '')// comments
-			.replace(/\\s{2,}|\t|\n|\r/gim, '')// spaces, tabs, new lines
-			.trim();
-	
-	if (html_val === undefined) {
+	if(!$tmpl.length) {
 		console.group('tmpl_error');
 		console.log('error in ' + template_type);
 		console.log('items', items);
 		console.log('addTo', addTo);
-		console.log('html_val', html_val);
 		console.log('inputs', {template_type: template_type, items: items, addTo: addTo, direction: direction});
 		console.groupEnd();
+		return $();
 	}
+	
+	function htmlEntities(str) {
+		return String(str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+	}
+	
+	function replaceTags(html, object) {
+		var jQuery_pairs = {},
+			keys = {},
+			wrap = wrapMap[ ( /<([\w:]+)/.exec( html ) || [ "", "" ] )[ 1 ].toLowerCase() ] || wrapMap._default,
+			j = wrap[ 0 ];
+		$.each(object, function(key, value) {
+			if ($.type(value) == 'string') {
+				keys[key] = htmlEntities(value);
+			} else if (value instanceof jQuery) {
+				if (value.length) {
+					jQuery_pairs[key] = value;
+					keys[key] = value.is('tr') ? '<tbody id="JQ_tmpl_' + key + '"></tbody>' :
+						value.is('span') ? '<span id="JQ_tmpl_' + key + '"></span>' : '<div id="JQ_tmpl_' + key + '"></div>';
+				}
+			} else if (value == null) {
+				keys[key] = '';
+			} else {
+				keys[key] = value;
+			}
+		});
+		
+		html = $(html ? wrap[ 1 ] + html.format(keys) + wrap[ 2 ] : '');
+		$.each(jQuery_pairs, function(key, value) {
+			html.find('#JQ_tmpl_' + key).append(value);
+			if(value.is('tr')){
+				value.parent('tbody').removeAttr('id');
+			} else {
+				value.unwrap();
+			}
+		});
+		while ( j-- ) {
+			html = html.children();
+		}
+		return html;
+	}
+	
+	html_val = $tmpl.html()
+		.replace(/(?:\/\*(?:[\s\S]*?)\*\/)|(?:([\s;])+\/\/(?:.*)$)/gim, '')// comments
+		.replace(/\\s{2,}|\t|\n|\r/gim, '')// spaces, tabs, new lines
+		.trim();
+	
 	if (Array.isArray(items)) {
 		result = $.makeSet(items.map(function(item) {
 			return replaceTags(html_val, item);
@@ -1212,6 +1378,38 @@ function formatCurrency(number, separator, decimal_separator) {
 		+ integer_part.substr(cast_pos).replace(/(\d{3})(?=\d)/g, '$1' + separator)
 		+ (numbers_decimals ? decimal_separator + numbers_decimals : '');
 }
+/**
+ * Generates guid-like string
+ * @return {string}
+ */
+function guid() {
+	function s4() {
+		return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
+	}
+	
+	return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+}
+/**
+ * Validating form or fieldset
+ * @param {(Element|jQuery)} $form
+ * @return {boolean}
+ */
+function isFormValid($form) {
+	$form = $form instanceof Element ? $($form) : $form;
+	var is_valid = true,
+		$elements = $form.find('input, textarea');
+	
+	if (!$form[0].checkValidity()) {
+		$elements.each(function(i, el) {
+			if ( (el.required && (el.value.trim() === '' || !el.checkValidity())) || (el.value.trim() !== '' && !el.checkValidity()) ) {
+				handleErrorField(el);
+				is_valid = false;
+			}
+		});
+	}
+	
+	return is_valid;
+}
 
 
 function bindLimitInputSize($parent) {
@@ -1315,37 +1513,100 @@ function bindTabs($parent) {
 	$parent = $parent ? $parent : $('body');
 	$parent.find('.Tabs').not('.-Handled_Tabs').each(function(i, elem) {
 		var $this = $(elem),
-			$wrapper = $this.find('.TabsBodyWrapper'),
-			$tabs = $this.find('.Tab'),
-			$bodies = $this.find('.TabsBody'),
+			tabs_id = $this.data('tabs_id'),
+			focus_on_change = !!$this.data('focus_on_change'),
 			mutation_observer = new MutationObserver(function(records) {
+				var $wrappers,
+					$target;
 				records.forEach(function(record){
-					var $wrapper = $(record.target);
-					if($wrapper.hasClass(__C.CLASSES.NEW_ACTIVE)) {
-						$wrapper.parent().height($wrapper.height());
-					}
+					$target = $(record.target);
+					$wrappers = $target.parents('.TabsBody');
+					$wrappers = $target.hasClass('TabsBody') ? $wrappers.add($target) : $wrappers;
+					$wrappers.each(function(i, wrapper) {
+						var $wrapper = $(wrapper);
+						if($wrapper.hasClass(__C.CLASSES.ACTIVE)) {
+							$this.addClass('-in_progress');
+							$wrapper.parent().height($wrapper.outerHeight());
+						}
+					});
 				});
-			});
+			}),
+			$bodies_wrapper,
+			$bodies,
+			$header_wrapper,
+			$tabs;
 		
-		if (!$tabs.filter('.-active').length) {
-			$tabs.eq(0).addClass(__C.CLASSES.NEW_ACTIVE);
+		if(tabs_id){
+			$bodies_wrapper = $this.find('.TabsBodyWrapper[data-tabs_id="'+tabs_id+'"]');
+			$bodies = $bodies_wrapper.children('.TabsBody');
+			$header_wrapper = $this.find('.HeaderTabs[data-tabs_id="'+tabs_id+'"]');
+			$tabs = $header_wrapper.children('.Tab');
+		} else {
+			$bodies_wrapper = $this.find('.TabsBodyWrapper:first');
+			$bodies = $bodies_wrapper.children('.TabsBody');
+			$header_wrapper = $this.find('.HeaderTabs:first');
+			$tabs = $header_wrapper.children('.Tab');
 		}
-		$bodies.removeClass(__C.CLASSES.NEW_ACTIVE).eq($tabs.index($tabs.filter('.-active'))).addClass(__C.CLASSES.NEW_ACTIVE);
-		$wrapper.height($bodies.filter('.'+__C.CLASSES.NEW_ACTIVE).height());
+		
+		Object.defineProperties($this, {
+			'currentTabsIndex': {
+				get: function() {
+					return $tabs.index($tabs.filter('.'+__C.CLASSES.ACTIVE));
+				}
+			},
+			'tabsCount': {
+				get: function() {
+					return $tabs.length;
+				}
+			}
+		});
+		
+		$this.setToTab = function(index) {
+			var $setting_tab = $tabs.eq(index),
+				$setting_body = $bodies.eq(index);
+			if ($setting_tab.length && !$setting_tab.hasClass(__C.CLASSES.ACTIVE)) {
+				$tabs.removeClass(__C.CLASSES.ACTIVE);
+				$bodies.removeClass(__C.CLASSES.ACTIVE);
+				$setting_tab.addClass(__C.CLASSES.ACTIVE);
+				$setting_body.addClass(__C.CLASSES.ACTIVE);
+				$this.trigger('change.tabs');
+				if (focus_on_change) {
+					scrollTo($setting_body, 400);
+				}
+			}
+		};
+		
+		$this.nextTab = function() {
+			$this.setToTab($this.currentTabsIndex + 1);
+		};
+		
+		$this.prevTab = function() {
+			$this.setToTab($this.currentTabsIndex - 1);
+		};
+		
+		if (!$tabs.filter('.'+__C.CLASSES.ACTIVE).length) {
+			$tabs.eq(0).addClass(__C.CLASSES.ACTIVE);
+		}
+		$bodies.removeClass(__C.CLASSES.ACTIVE).eq($this.currentTabsIndex).addClass(__C.CLASSES.ACTIVE);
+		$bodies_wrapper.height($bodies.filter('.'+__C.CLASSES.ACTIVE).outerHeight());
+		$bodies_wrapper.on('transitionend webkitTransitionEnd', function() {
+			$this.removeClass('-in_progress');
+			$this.trigger('progress_end')
+		});
 		$bodies.each(function(i, body) {
-			mutation_observer.observe(body, {childList: true});
+			mutation_observer.observe(body, {
+				childList: true,
+				subtree: true,
+				attributes: true,
+				attributeFilter: ['class']
+			});
 		});
 		
 		$tabs.on('click', function() {
-			if (!$(this).hasClass(__C.CLASSES.NEW_ACTIVE)) {
-				$tabs.removeClass(__C.CLASSES.NEW_ACTIVE);
-				$bodies.removeClass(__C.CLASSES.NEW_ACTIVE);
-				$(this).addClass(__C.CLASSES.NEW_ACTIVE);
-				$bodies.eq($tabs.index(this)).addClass(__C.CLASSES.NEW_ACTIVE);
-				$wrapper.height($bodies.filter('.'+__C.CLASSES.NEW_ACTIVE).height());
-				$this.trigger('change.tabs');
-			}
-		})
+			$this.setToTab($tabs.index(this));
+		});
+		
+		$this.data('instance', $this);
 	}).addClass('-Handled_Tabs');
 }
 
@@ -1363,7 +1624,7 @@ function bindSelect2($parent) {
 	$parent = $parent ? $parent : $('body');
 	$parent.find('.ToSelect2').not('.-Handled_ToSelect2').each(function(i, el) {
 		initSelect2($(el));
-	});
+	}).addClass('-Handled_ToSelect2');
 }
 
 function bindRippleEffect($parent) {
@@ -1387,10 +1648,10 @@ function bindRippleEffect($parent) {
 		
 		$ripple
 			.css({top: y + 'px', left: x + 'px'})
-			.addClass('animate')
-			.one('animationend webkitAnimationEnd', function() {
-				$ripple.removeClass('animate');
-			});
+			.addClass('animate');
+		setTimeout(function() {
+			$ripple.removeClass('animate');
+		}, 650);
 	}).addClass('-Handled_RippleEffect');
 }
 
@@ -1470,38 +1731,209 @@ function bindFileLoadButton($parent) {
 
 function bindCollapsing($parent) {
 	$parent = $parent ? $parent : $('body');
-	$parent.find('.CollapsingButton').each(function() {
-		var $button = $(this),
-			$wrapper = $button.siblings('.CollapsingWrapper'),
-			$content = $wrapper.children(),
-			default_height = $wrapper.data('defaultHeight') < $content.height() ? $wrapper.data('defaultHeight') : $content.height();
+	$parent.find('.Collapsing').not('.-Handled_Collapsing').each(function() {
+		var $instance = $(this),
+			collapsing_id = $instance.data('collapsing_id'),
+			mutation_observer = new MutationObserver(function(records) {
+				var $contents,
+					$target;
+				records.forEach(function(record){
+					$target = $(record.target);
+					$contents = $target.parents('.CollapsingContent');
+					$contents = $target.hasClass('CollapsingContent') ? $contents.add($target) : $contents;
+					$contents.each(function(i, content) {
+						var $content = $(content),
+							$wrapper = $content.parent();
+						if ($wrapper.hasClass('-opened')) {
+							$wrapper.addClass('-in_progress').height($content.outerHeight());
+						}
+					});
+				});
+			}),
+			default_height,
+			$wrapper,
+			$content,
+			$trigger,
+			trigger_event;
 		
-		function toggleCollapsing() {
-			if ($wrapper.hasClass('-opened')) {
+		if(collapsing_id){
+			$wrapper = $instance.find('.CollapsingWrapper[data-collapsing_id="'+collapsing_id+'"]');
+			$trigger = $instance.find('.CollapsingTrigger[data-collapsing_id="'+collapsing_id+'"]');
+		} else {
+			$wrapper = $instance.find('.CollapsingWrapper:first');
+			$trigger = $instance.find('.CollapsingTrigger:first');
+		}
+		$content = $wrapper.children('.CollapsingContent');
+		trigger_event = $trigger.is(':checkbox') || $trigger.is(':radio') ? 'change' : 'click';
+		
+		if($wrapper.hasClass('-fading')){
+			default_height = $instance.data('defaultHeight') < $content.height() ? $instance.data('defaultHeight') : $content.height();
+			if (!$instance.hasClass(__C.CLASSES.ACTIVE) && $wrapper.height() < default_height) {
 				$wrapper.height(default_height);
-				$wrapper.on('click.toggleCollapsing', toggleCollapsing);
+			}
+		} else {
+			default_height = $instance.data('defaultHeight') ? $instance.data('defaultHeight') : 0;
+		}
+		
+		function toggleCollapsing(){
+			$wrapper.addClass('-in_progress');
+			if ($instance.hasClass(__C.CLASSES.ACTIVE)) {
+				$wrapper.height(default_height);
 			} else {
 				$wrapper.height($content.outerHeight());
-				$wrapper.off('click.toggleCollapsing');
 			}
 			$wrapper.toggleClass('-opened');
+			$instance.toggleClass(__C.CLASSES.ACTIVE);
 		}
 		
-		if (!$wrapper.hasClass('-opened')) {
-			$wrapper.on('click.toggleCollapsing', toggleCollapsing);
-			if ($wrapper.height() < default_height) {
-				$wrapper.height(default_height);
+		function changeProp(){
+			if (trigger_event === 'change') {
+				$trigger.prop('checked', !$trigger.prop('checked'));
 			}
 		}
-		$button.on('click.toggleCollapsing', toggleCollapsing);
-	})
+		
+		$instance.openCollapsing = function() {
+			if(!$instance.hasClass(__C.CLASSES.ACTIVE)){
+				changeProp();
+				toggleCollapsing();
+			}
+		};
+		
+		$instance.closeCollapsing = function() {
+			if($instance.hasClass(__C.CLASSES.ACTIVE)){
+				changeProp();
+				toggleCollapsing();
+			}
+		};
+		
+		$trigger.on(trigger_event+'.toggleCollapsing', function() {
+			toggleCollapsing();
+		});
+		
+		$wrapper
+			.on('click', function(){
+				$instance.openCollapsing();
+			})
+			.on('transitionend webkitTransitionEnd', function() {
+				$wrapper.removeClass('-in_progress');
+			});
+		
+		mutation_observer.observe($wrapper.get(0), {
+			childList: true,
+			subtree: true,
+			attributes: true,
+			attributeFilter: ['class']
+		});
+		
+		$instance.data('instance', $instance);
+	}).addClass('Handled_Collapsing');
+}
+
+function bindControlSwitch($parent) {
+	$parent = $parent ? $parent : $('body');
+	$parent.find('.Switch').not('.-Handled_Switch').each(function(i, el) {
+		var $switch = $(el),
+			switch_id = $switch.data('switch_id'),
+			$switching = $parent.find('.Switching[data-switch_id="'+switch_id+'"]');
+		
+		$switch.on('change.Switch', function() {
+			if($switching.is('fieldset')) {
+				$switching.prop('disabled', !$switching.prop('disabled'));
+			} else {
+				$switching.toggleStatus('disabled');
+			}
+		});
+	}).addClass('-Handled_Switch');
+}
+/**
+ *
+ * @param {jQuery} $parent
+ * @return {jQuery}
+ */
+function bindCallModal($parent) {
+	$parent = $parent ? $parent : $('body');
+	return $parent.find('.CallModal').not('.-Handled_CallModal').each(function() {
+		var $this = $(this);
+		
+		$this.on('click.CallModal', function() {
+			var $this = $(this),
+				title = $this.data('modal_title'),
+				modal = $this.data('modal'),
+				modal_type = $this.data('modal_type');
+			
+			if (!modal) {
+				switch (modal_type) {
+					case 'favors': {
+						modal = new FavoredModal($this.data('modal_event_id'), title);
+						break;
+					}
+					case 'subscribers': {
+						modal = new SubscribersModal($this.data('modal_organization_id'), title);
+						break;
+					}
+					case 'editors': {
+						modal = new EditorsModal($this.data('modal_organization_id'), title, $this.data('modal_specific_role'));
+						break;
+					}
+					case 'map': {
+						modal = new MapModal($this.data('modal_map_location'), title);
+						break;
+					}
+					case 'media': {
+						var type = $this.data('modal_media_type'),
+							url = $this.data('modal_media_url');
+						if (!url) {
+							if ($this.is('img')) {
+								url = $this.attr('src');
+								type = 'image';
+							} else if ($this.is('video')) {
+								//url = $this.attr('url');
+								type = 'video';
+							} else {
+								var str = $this.css('background-image');
+								if (str !== 'none') {
+									if (str.indexOf('"') != -1) {
+										url = str.slice(str.indexOf('"') + 1, str.indexOf('"', str.indexOf('"') + 1));
+									} else {
+										url = str.slice(str.indexOf('(') + 1, str.indexOf(')'));
+									}
+									type = 'image';
+								}
+							}
+						}
+						modal = new MediaModal(url, type);
+						break;
+					}
+					case 'cropper': {
+						modal = new CropperModal($this.data('source_img'), $this.data());
+						break;
+					}
+					case 'friends_list': {
+						modal = new FriendsListModal($this.data('modal_entity'));
+						break;
+					}
+					case 'subscribers_list': {
+						modal = new SubscriptionsListModal($this.data('modal_entity'));
+						break;
+					}
+					default: {
+						modal = new StdModal(title, $this.data('modal_content'), $this.data('modal_style'));
+						break;
+					}
+				}
+				$this.data('modal', modal);
+			}
+			modal.show();
+		});
+	}).addClass('-Handled_CallModal');
 }
 
 function bindPageLinks($parent) {
 	$parent = $parent ? $parent : $('body');
 	$parent.find('.Link').not('.-Handled_Link').on('click.pageRender', function(e) {
 		var $this = $(this);
-		if ($this.hasClass(__C.CLASSES.DISABLED)) return true;
+		if ($this.hasClass(__C.CLASSES.DISABLED))
+			return false;
 		if (e.which == 1) {
 			e.preventDefault();
 			__APP.changeState($this.attr('href'));
@@ -1511,34 +1943,45 @@ function bindPageLinks($parent) {
 
 /**
  * Changes form unit`s state to error
- * @param {jQuery} $unit
+ * @param {(jQuery|Element)} $unit
+ * @return {jQuery}
  */
 function handleErrorField($unit) {
-	if (!$unit instanceof jQuery) {
-		handleErrorField($($unit));
-	} else if (!$unit.is('.form_unit')) {
-		handleErrorField($unit.closest('.form_unit'));
-	} else {
-		if (!$unit.closest('form_unit').hasClass('-status_error')) {
-			var $input = $unit.find('input, select, textarea');
-			$unit
-				.toggleStatus('error')
-				.off('input.clear_error change.clear_error')
-				.one('input.clear_error change.clear_error', function() {
-					$unit.off('input.clear_error change.clear_error').toggleStatus('error');
-					$input.off('blur.clear_error');
-				});
-			$input
-				.off('blur.clear_error')
-				.one('blur.clear_error', function() {
-					if ($(this).val() !== "") {
-						$unit.trigger('input.clear_error');
-					}
-				});
-		}
+	var $input;
+	
+	if (!($unit instanceof jQuery)) {
+		return handleErrorField($($unit));
 	}
+	if (!$unit.is('.form_unit')) {
+		if ($unit.closest('.form_unit').length)
+			return handleErrorField($unit.closest('.form_unit'));
+		return $unit;
+	}
+	
+	if (!$unit.closest('.form_unit').hasClass('-status_error')) {
+		$input = $unit.find('input, select, textarea');
+		$unit
+			.addClass('-status_error')
+			.off('input.ClearError change.ClearError')
+			.one('input.ClearError change.ClearError', function() {
+				$unit.off('input.ClearError change.ClearError').removeClass('-status_error');
+				$input.off('blur.ClearError');
+			});
+		$input
+			.off('blur.ClearError')
+			.one('blur.ClearError', function() {
+				if ($(this).val().trim() !== '') {
+					$unit.trigger('input.ClearError');
+				}
+			});
+	}
+	return $unit;
 }
-
+/**
+ * Getting base64-encoded string of the image from url
+ * @param {string} url
+ * @param {function({string})} callback
+ */
 function toDataUrl(url, callback) {
 	var xhr = new XMLHttpRequest();
 	xhr.responseType = 'blob';
@@ -1560,7 +2003,10 @@ function showNotifier(response) {
 		'status': response.status ? 'success' : 'danger'
 	});
 }
-
+/**
+ * Checks if device is mobile
+ * @return {boolean}
+ */
 function isNotDesktop() {
 	var check = false;
 	(function (a) {
@@ -1570,11 +2016,41 @@ function isNotDesktop() {
 }
 
 /**
+ *
+ * @param {(jQuery|number)} $element
+ * @param {number} [duration=400]
+ * @param {Function} [complete]
+ *
+ * @return {number} New scrollTop value
+ */
+function scrollTo($element, duration, complete) {
+	var scroll_top;
+	if ($element instanceof jQuery) {
+		scroll_top = $element.offset().top - 150;
+	} else {
+		scroll_top = $element - 150;
+	}
+	if (complete && !(complete instanceof Function)) {
+		complete = function() {};
+	}
+	$('body').stop().animate({
+			scrollTop: Math.ceil(scroll_top)
+		}, {
+			duration: duration ? duration : 400,
+			easing: 'swing',
+			complete: complete
+		}
+	);
+	
+	return scroll_top;
+}
+
+/**
  * Returning true if scroll passes ending threshold + left argument
  * @param {int} left
  * @return {boolean}
  */
-function isScrollLeft(left) {
+function isScrollRemain(left) {
 	return ($(window).height() + $(window).scrollTop() + +(left)) >= $(document).height();
 }
 
@@ -1645,32 +2121,6 @@ function showSettingsModal() {
 					});
 					$modal.modal('hide');
 				});
-		}
-	});
-}
-
-function getFriendsList($friends_right_list, cb) {
-	$.ajax({
-		url: '/api/v1/users/friends?page=0&length=500',
-		success: function(res) {
-			if (res.data.length == 0) {
-				$('.no-friends-block').removeClass(__C.CLASSES.HIDDEN);
-				$('.friends-right-bar, .friends-main-content, .one-friend-profile').addClass(__C.CLASSES.HIDDEN);
-				return;
-			}
-			$friends_right_list.find('.friends-list').empty();
-			$friends_right_list.removeClass(__C.CLASSES.HIDDEN);
-			tmpl('friend-item', res.data, $friends_right_list.find('.friends-list'));
-			$friends_right_list.find('.friends-count').text(res.data.length);
-			bindPageLinks($friends_right_list);
-			if ($friends_right_list.height() > window.innerHeight - 200) {
-				$friends_right_list.find('.friends-list').slimscroll({
-					height: window.innerHeight - 200,
-					width: '100%'
-				});
-			}
-			
-			if (cb) cb(res);
 		}
 	});
 }

@@ -3,16 +3,24 @@
  */
 /**
  *
- * @constructor
- * @augments EventsCollection
+ * @class TimelineEventsCollection
+ * @extends EventsCollection
  */
-function TimelineEventsCollection() {}
-TimelineEventsCollection.extend(EventsCollection);
-/**
- *
- * @override
- */
-TimelineEventsCollection.fetchEvents = function(data, success) {
-	data.future = true;
-	return EventsCollection.fetchMyEvents(data, success);
-};
+TimelineEventsCollection = extending(EventsCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs TimelineEventsCollection
+	 */
+	function TimelineEventsCollection() {}
+	/**
+	 *
+	 * @override
+	 */
+	TimelineEventsCollection.fetchEvents = function(data, success) {
+		data.future = true;
+		return EventsCollection.fetchMyEvents(data, success);
+	};
+	
+	return TimelineEventsCollection;
+}()));

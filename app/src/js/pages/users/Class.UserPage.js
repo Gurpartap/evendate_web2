@@ -22,7 +22,11 @@ UserPage = extending(Page, (function() {
 			activities: false
 		};
 		this.favored_fetch_data = {
-			fields: ['image_horizontal_medium_url', 'favored', 'is_favorite', 'dates'],
+			fields: new Fields(
+				'image_horizontal_medium_url',
+				'favored',
+				'dates'
+			),
 			order_by: 'nearest_event_date,-first_event_date',
 			length: 10
 		};
@@ -118,10 +122,10 @@ UserPage = extending(Page, (function() {
 		
 		this.$wrapper.find('.Tabs').on('change.tabs', function() {
 			var $this = $(this),
-				active_type = $this.find('.TabsBody').filter('.'+__C.CLASSES.NEW_ACTIVE).data('tab_body_type');
+				active_type = $this.find('.TabsBody').filter('.'+__C.CLASSES.ACTIVE).data('tab_body_type');
 			$window.off(Object.values(event_names).join(' '));
 			$window.on(event_names[active_type], function() {
-				if ( isScrollLeft(200) ) {
+				if ( isScrollRemain(200) ) {
 					switch (active_type) {
 						case 'activities': {
 							self.uploadEntities('activities');
@@ -137,7 +141,7 @@ UserPage = extending(Page, (function() {
 		});
 		
 		$window.on(event_names.activities, function() {
-			if (isScrollLeft(200)) {
+			if (isScrollRemain(200)) {
 				self.uploadEntities('activities');
 			}
 		});
@@ -186,7 +190,7 @@ UserPage = extending(Page, (function() {
 				},
 				title: 'Показать все'
 			}) : '',
-			friends_hidden: __C.CLASSES.NEW_HIDDEN,
+			friends_hidden: __C.CLASSES.HIDDEN,
 			favored_event_blocks: $favored_events
 		}));
 		this.uploadEntities('activities');
