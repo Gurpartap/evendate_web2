@@ -333,7 +333,7 @@ class Event extends AbstractEntity
 				'to_switch_off' => true,
 				'uuid' => $type['uuid']
 			);
-			if ($type['type_code'] == 'registration'){
+			if ($type['type_code'] == 'registration') {
 				$registration_ticket = $type;
 			}
 		}
@@ -342,7 +342,7 @@ class Event extends AbstractEntity
 			foreach ($data['ticket_types'] as $ticket_type) {
 				//it will auto update if ticket uuid is same
 				TicketType::create($event_id, $ticket_type, $db);
-				if (isset($tickets_by_uuid[$ticket_type['uuid']])){
+				if (isset($tickets_by_uuid[$ticket_type['uuid']])) {
 					$tickets_by_uuid[$ticket_type['uuid']]['to_switch_off'] = false;
 					TicketType::create($event_id, $ticket_type, $db);
 				}
@@ -1528,11 +1528,10 @@ class Event extends AbstractEntity
 
 		if ($this->ticketing_locally == false) {
 			if (!isset($request['tickets']) || !is_array($request['tickets'])) {
-				$request['tickets'] = array();
+				$request['tickets'] = array(array(
+					'count' => '1',
+				));
 			}
-			$request['tickets'][] = array(
-				'count' => '1',
-			);
 		}
 
 		$order_info = RegistrationForm::processOrder($this, $user, $this->db, $request['tickets']);
