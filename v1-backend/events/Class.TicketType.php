@@ -73,7 +73,9 @@ class TicketType extends AbstractEntity
 		if (isset($data['amount'])) {
 			$data['amount'] = filter_var($data['amount'], FILTER_VALIDATE_INT, $num_price_options);
 			if (!is_numeric($data['amount'])) throw new InvalidArgumentException('BAD_AMOUNT');
-		} else throw new InvalidArgumentException('BAD_AMOUNT');
+		} else {
+			$data['amount'] = null;
+		};
 
 		if (isset($data['min_count_per_user']) && !is_null($data['min_count_per_user'])) {
 			$data['min_count_per_user'] = filter_var($data['min_count_per_user'], FILTER_VALIDATE_INT, $num_price_options);
