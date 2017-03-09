@@ -465,6 +465,7 @@ class EventsCollection extends AbstractCollection
 		if (array_key_exists(Event::FAVORED_FRIENDS_COUNT_FIELD_NAME, $fields) ||
 			array_key_exists(Event::IS_REGISTERED_FIELD_NAME, $fields) ||
 			array_key_exists(Event::TICKETS_FIELD_NAME, $fields) ||
+			array_key_exists(Event::TICKETS_COUNT_FIELD_NAME, $fields) ||
 			array_key_exists(Event::REGISTRATION_APPROVE_STATUS_FIELD_NAME, $fields)
 		) {
 			$statement_array[':user_id'] = $user->getId();
@@ -483,7 +484,7 @@ class EventsCollection extends AbstractCollection
 		}
 
 
-		$events = $db->prepareExecute($q_get_events, '', $statement_array)->fetchAll(PDO::FETCH_CLASS, 'Event');
+		$events = $db->prepareExecute($q_get_events, 'CANT_GET_EVENTS', $statement_array)->fetchAll(PDO::FETCH_CLASS, 'Event');
 		if (count($events) == 0 && $is_one_event) throw new LogicException('CANT_FIND_EVENT: ' . $filters['id']);
 		$result_events = array();
 		if ($is_one_event) return $events[0];

@@ -45,6 +45,7 @@ class Event extends AbstractEntity
 	const IS_REGISTERED_FIELD_NAME = 'is_registered';
 	const REGISTRATION_APPROVE_STATUS_FIELD_NAME = 'registration_approve_status';
 	const ORDERS_FIELD_NAME = 'orders';
+	const TICKETS_COUNT_FIELD_NAME = 'tickets_count';
 
 
 	const RANDOM_FIELD_NAME = 'random';
@@ -161,6 +162,10 @@ class Event extends AbstractEntity
 			FROM view_editors
 			WHERE id = :user_id AND organization_id = view_events.organization_id) IS NOT NULL AS ' . self::CAN_EDIT_FIELD_NAME,
 
+		self::TICKETS_COUNT_FIELD_NAME => '(SELECT COALESCE(COUNT(view_tickets.id)::INT, 0)
+			FROM view_tickets
+			WHERE view_tickets.event_id = view_events.id AND status = TRUE AND is_active = TRUE AND view_tickets.user_id = :user_id)::INT AS ' . self::TICKETS_COUNT_FIELD_NAME,
+
 		self::IS_SEEN_FIELD_NAME => '(
 		SELECT
 			COUNT(ve.id)
@@ -251,6 +256,7 @@ class Event extends AbstractEntity
 	protected $canceled;
 	protected $ticketing_locally;
 	protected $registration_locally;
+	protected $tickets_count;
 
 	private $tags;
 
