@@ -1418,6 +1418,7 @@ __APP = {
 	},
 	init: function appInit() {
 		var $sidebar_nav_items = $('.SidebarNavItem');
+		
 		__APP.CURRENT_PAGE = Page.routeNewPage(window.location.pathname);
 		__APP.CURRENT_PAGE.fetchData();
 		__APP.CURRENT_PAGE.show();

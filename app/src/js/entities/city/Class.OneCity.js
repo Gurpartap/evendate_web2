@@ -16,6 +16,7 @@ OneCity = extending(OneEntity, (function() {
 	 * @property {?string} en_name
 	 * @property {?number} country_id
 	 * @property {?string} local_name
+	 * @property {CategoriesCollection} organization_type
 	 * @property {?number} timediff_seconds
 	 */
 	function OneCity(city_id) {
@@ -24,6 +25,7 @@ OneCity = extending(OneEntity, (function() {
 		this.en_name = null;
 		this.country_id = null;
 		this.local_name = null;
+		this.organization_type = new CategoriesCollection();
 		this.timediff_seconds = null;
 	}
 	

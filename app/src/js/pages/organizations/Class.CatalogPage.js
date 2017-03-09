@@ -52,17 +52,20 @@ CatalogPage = extending(Page, (function() {
 		return this.fetching_data_defer =	this.cities.fetchCities(null, 0, 'local_name', function() {
 			if (self.selected_city_name) {
 				self.selected_city = this.getByName(self.selected_city_name);
-				self.categories_ajax_data.filter = 'city_id=' + self.selected_city.id;
+				self.categories_ajax_data.city_id = self.selected_city.id;
+				self.organizations_ajax_data.filters = 'city_id=' + self.selected_city.id;
 			}
-		}).done(this.categories.fetchCategoriesWithOrganizations(this.categories_ajax_data, this.organizations_ajax_data, 0).done(function() {
-			self.all_organizations = self.categories
-				.reduce(function(collection, cat) {
-					return collection.setData(cat.organizations);
-				}, new OrganizationsCollection())
-				.sort(function(a, b) {
-					return b.subscribed_count - a.subscribed_count;
-				});
-		})).promise();
+		}).done(function() {
+			return self.categories.fetchCategoriesWithOrganizations(self.categories_ajax_data, self.organizations_ajax_data, 0).done(function() {
+				self.all_organizations = self.categories
+					.reduce(function(collection, cat) {
+						return collection.setData(cat.organizations);
+					}, new OrganizationsCollection())
+					.sort(function(a, b) {
+						return b.subscribed_count - a.subscribed_count;
+					});
+			});
+		}).promise();
 	};
 	/**
 	 *
@@ -73,6 +76,10 @@ CatalogPage = extending(Page, (function() {
 		this.$view.find('.Category').filter('[data-category-id="' + this.selected_category_id + '"]').addClass(__C.CLASSES.ACTIVE);
 		__APP.changeState('/organizations/at/' + this.selected_city_name + '/' + this.selected_category_id, true);
 		__APP.changeTitle(this.categories.getByID(this.selected_category_id).name);
+	};
+	
+	CatalogPage.prototype.activate = function() {
+		
 	};
 	
 	CatalogPage.prototype.init = function() {
@@ -102,11 +109,11 @@ CatalogPage = extending(Page, (function() {
 		PAGE.$view.find('#organizations_cities_select').select2({
 			containerCssClass: 'form_select2',
 			dropdownCssClass: 'form_select2_drop'
-		}).select2('val', PAGE.cities.getByName(PAGE.selected_city_name).id).on('change', function() {
-			__APP.changeState('/organizations/at/' + PAGE.cities.getByID($(this).val()).en_name);
+		}).select2('val', PAGE.cities.getByName(PAGE.selected_city_name).id).off('change.SelectCity').on('change.SelectCity', function() {
+			__APP.changeState('/organizations/at/' + PAGE.cities.getByID($(this).val()).en_name, true, true);
 		});
 		
-		PAGE.$view.find('.ShowAllOrganizations').on('click.showAllOrganizations', function() {
+		PAGE.$view.find('.ShowAllOrganizations').off('click.showAllOrganizations').on('click.showAllOrganizations', function() {
 			$categories.removeClass(__C.CLASSES.ACTIVE).siblings('.SubcategoryWrap').height(0);
 			PAGE.selected_category_id = undefined;
 			
@@ -116,7 +123,7 @@ CatalogPage = extending(Page, (function() {
 			bindOrganizationsEvents();
 		});
 		
-		$categories.on('click.selectCategory', function() {
+		$categories.off('click.selectCategory').on('click.selectCategory', function() {
 			var $this = $(this),
 				category_id = $this.data('category-id'),
 				$wrap = $this.next('.SubcategoryWrap'),
@@ -143,7 +150,7 @@ CatalogPage = extending(Page, (function() {
 	};
 	
 	CatalogPage.prototype.render = function() {
-		this.$view.find('#organizations_cities_select').append(tmpl('option', this.cities.map(function(city) {
+		this.$view.find('#organizations_cities_select').html(tmpl('option', this.cities.map(function(city) {
 			return {
 				val: city.id,
 				display_name: city.local_name
@@ -152,7 +159,7 @@ CatalogPage = extending(Page, (function() {
 		this.$view.find('.OrganizationsCategoriesScroll').html(__APP.BUILD.organisationsCategoriesItems(this.categories));
 		this.$wrapper.html(__APP.BUILD.organizationCard(this.selected_category_id ? this.categories.getByID(this.selected_category_id).organizations : this.all_organizations));
 		
-		if (window.location.pathname == '/organizations' || window.location.pathname == '/organizations/') {
+		if ((window.location.pathname == '/organizations' || window.location.pathname == '/organizations/') && this.selected_city_name) {
 			__APP.changeState('/organizations/at/' + this.selected_city_name, true);
 		}
 		if (this.selected_category_id) {

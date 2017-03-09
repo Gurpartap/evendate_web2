@@ -63,7 +63,7 @@ CityChooseModal = extending(AbstractModal, (function() {
 		this.content.find('#city_choose_modal_select').select2({
 			containerCssClass: 'form_select2',
 			dropdownCssClass: 'form_select2_drop'
-		});
+		}).select2('val', 1);
 		this.__init();
 		
 		return this;
@@ -76,6 +76,7 @@ CityChooseModal = extending(AbstractModal, (function() {
 		__APP.USER.selected_city = this.cities.getByID(this.content.find('#city_choose_modal_select').val());
 		localStorage.setItem('selected_city', JSON.stringify(__APP.USER.selected_city));
 		this.__hide();
+		window.location.reload();
 		
 		return this;
 	};
