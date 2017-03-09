@@ -8,23 +8,22 @@ App::init();
 
 $driver_options = array(
 	PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+	PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
 );
-if (!isset($_SERVER['ENV']) || $_SERVER['ENV'] == 'dev' || $_SERVER['ENV'] == 'local') {
-	$driver_options[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
-}
 
 class ExtendedPDO extends PDO
 {
 
-	public function prepareExecute(Aura\SqlQuery\QueryInterface $query, $error_name = 'QUERY_ERROR', array $bind_values = array()) : PDOStatement
+	public function prepareExecute(Aura\SqlQuery\QueryInterface $query, $error_name = 'QUERY_ERROR', array $bind_values = array()): PDOStatement
 	{
 		$prep = $this->prepare($query->getStatement());
 		if ($bind_values == null) {
 			$bind_values = $query->getBindValues();
 		}
-		$result = $prep->execute($bind_values);
-		if ($result === FALSE) {
-			throw new DBQueryException(var_export($this->errorInfo(), true), $this, $error_name);
+		try{
+			$prep->execute($bind_values);
+		}catch(PDOException $e){
+			throw new DBQueryException(var_export($e, true), $this, $error_name);
 		}
 		return $prep;
 	}
