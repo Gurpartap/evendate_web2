@@ -27,13 +27,13 @@ class Ticket extends AbstractEntity
 		'ticket_order_uuid',
 		'status',
 		'checked_out',
-		'uuid'
+		'uuid',
+		'price'
 	);
 
 	protected static $ADDITIONAL_COLS = array(
 		'created_at',
-		'updated_at',
-		'price'
+		'updated_at'
 	);
 
 	private static function getTicketTypeInfo(Event $event, ExtendedPDO $db, string $uuid = null, string $type_code = null): array

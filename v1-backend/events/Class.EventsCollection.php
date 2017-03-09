@@ -225,7 +225,8 @@ class EventsCollection extends AbstractCollection
 				}
 				case 'is_registered':
 				case 'registered': {
-					if (filter_var($value, FILTER_VALIDATE_BOOLEAN) == true) {
+				$val = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+				if ($val) {
 						$from_view = self::VIEW_ALL_EVENTS_WITH_ALIAS;
 						$operand = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'IN' : 'NOT IN';
 						$q_get_events->where('id ' . $operand . ' (SELECT event_id FROM view_tickets WHERE user_id = :user_id AND is_active = TRUE)');
@@ -236,8 +237,8 @@ class EventsCollection extends AbstractCollection
 				case 'registration_available':
 				case 'registration_locally':
 				case 'registration_required': {
-					if (filter_var($value, FILTER_VALIDATE_BOOLEAN) == true) {
-						$from_view = self::VIEW_ALL_EVENTS_WITH_ALIAS;
+					$val = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+					if ($val != null) {
 						$q_get_events->where($name . ' = :' . $name);
 						$statement_array[':' . $name] = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
 					}
@@ -246,18 +247,20 @@ class EventsCollection extends AbstractCollection
 				case 'is_canceled':
 				case 'is_free':
 				case 'is_delayed': {
-					if ($is_editor && filter_var($value, FILTER_VALIDATE_BOOLEAN) == true) {
+				$val = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+				if ($is_editor) {
 						$from_view = self::VIEW_ALL_EVENTS_WITH_ALIAS;
 						$q_get_events->where($name . ' = :' . $name);
-						$statement_array[':' . $name] = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+						$statement_array[':' . $name] = $val ? 'true' : 'false';
 					}
 					break;
 				}
 				case 'future': {
-					if (filter_var($value, FILTER_VALIDATE_BOOLEAN) == true) {
+					$val = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+					if ($val) {
 						$q_get_events->where("view_events.last_event_date > (SELECT DATE_PART('epoch', TIMESTAMP 'today') :: INT)");
-					} else if (filter_var($value, FILTER_VALIDATE_BOOLEAN) == false){
-						$q_get_events->where("view_events.last_event_date <= (SELECT DATE_PART('epoch', TIMESTAMP 'today') :: INT)");
+					} else if ($val == false){
+						$q_get_events->where("view_events.last_event_date < (SELECT DATE_PART('epoch', TIMESTAMP 'today') :: INT)");
 					}
 					break;
 				}
