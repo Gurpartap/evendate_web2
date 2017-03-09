@@ -49,6 +49,13 @@ class TicketsCollection extends AbstractCollection
 					}
 					break;
 				}
+				case 'event_id': {
+					$event = EventsCollection::one($db, $user, intval($value), array());
+
+					$q_get_tickets->where('event_id = ?', $event->getId());
+					$q_get_tickets->where('user_id = ?', $user->getId());
+					break;
+				}
 				case 'statistics_event': {
 					if ($value instanceof Event) {
 						$q_get_tickets->where('event_id = ?', $value->getId());

@@ -14,6 +14,6 @@ class DBQueryException extends AbstractException{
 		}else{
 			$this->user_message = $user_message;
 		}
-		parent::__construct($message, $db, $file, $file_line);
+		parent::__construct($message, $db, $this->user_message);
 	}
 }

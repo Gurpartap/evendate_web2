@@ -27,9 +27,7 @@ class PrivateOrganization extends Organization
 				'creator_id' => $user->getId()
 			))
 			->returning(array('uuid'));
-		$p_ins_invitation = $this->db->prepare($q_ins_invitation->getStatement());
-		$result = $p_ins_invitation->execute($q_ins_invitation->getBindValues());
-		if ($result === FALSE) throw new DBQueryException('CANT_INSERT_INVITATION', $this->db);
+		$p_ins_invitation = $this->db->prepareExecute($q_ins_invitation, 'CANT_INSERT_INVITATION');
 		return new Result(true, '', array(
 			'uuid' => $p_ins_invitation->fetchColumn(0)
 		));
@@ -44,9 +42,7 @@ class PrivateOrganization extends Organization
 				'status' => 'false'
 			))
 			->where('uuid = ?', $uuid);
-		$p_upd_invitation = $this->db->prepare($q_upd_invitation->getStatement());
-		$result = $p_upd_invitation->execute($q_upd_invitation->getBindValues());
-		if ($result === FALSE) throw new DBQueryException('CANT_INSERT_INVITATION', $this->db);
+		$this->db->prepareExecute($q_upd_invitation, 'CANT_REVOKE_INVITATION');
 		return new Result(true);
 	}
 
@@ -79,9 +75,7 @@ class PrivateOrganization extends Organization
 			->returning(array(
 				'uuid'
 			));
-		$p_ins_invitation = $this->db->prepare($q_ins_invitation->getStatement());
-		$result = $p_ins_invitation->execute($q_ins_invitation->getBindValues());
-		if ($result === FALSE) throw new DBQueryException('CANT_INSERT_INVITATION', $this->db);
+		$p_ins_invitation = $this->db->prepareExecute($q_ins_invitation, 'CANT_INSERT_INVITATION');
 		return new Result(true, '', array(
 			'uuid' => $p_ins_invitation->fetchColumn(0)
 		));
@@ -97,9 +91,7 @@ class PrivateOrganization extends Organization
 				'status' => 'false'
 			))
 			->where('uuid = ? ', $uuid);
-		$p_upd_invitation = $this->db->prepare($q_upd_invitation->getStatement());
-		$result = $p_upd_invitation->execute($q_upd_invitation->getBindValues());
-		if ($result === FALSE) throw new DBQueryException('CANT_UPDATE_INVITATION', $this->db);
+		$this->db->prepareExecute($q_upd_invitation, 'CANT_UPDATE_INVITATION');
 		return new Result(true, '');
 
 	}
@@ -127,9 +119,7 @@ class PrivateOrganization extends Organization
 			->where('organization_id = ?', $this->getId())
 			->where('status = true')
 			->orderBy($order_by ?? array());
-		$p_get_links = $this->db->prepare($q_get_links->getStatement());
-		$result = $p_get_links->execute($q_get_links->getBindValues());
-		if ($result === FALSE) throw new DBQueryException('CANT_GET_INVITATIONS', $this->db);
+		$p_get_links = $this->db->prepareExecute($q_get_links, 'CANT_GET_INVITATIONS');
 		return new Result(true, '', $p_get_links->fetchAll());
 	}
 
@@ -166,9 +156,7 @@ class PrivateOrganization extends Organization
 			->from('view_invited_users')
 			->where('organization_id = ?', $this->getId())
 			->where('status = true');
-		$p_get_links = $this->db->prepare($q_get_links->getStatement());
-		$result = $p_get_links->execute($q_get_links->getBindValues());
-		if ($result === FALSE) throw new DBQueryException('CANT_INSERT_INVITATION', $this->db);
+		$p_get_links = $this->db->prepareExecute($q_get_links, 'CANT_INSERT_INVITATION');
 		return new Result(true, '', $p_get_links->fetchAll());
 	}
 

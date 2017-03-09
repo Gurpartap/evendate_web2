@@ -185,8 +185,7 @@ try {
 			'exception_line' => isset($_exception) ? $_exception->getLine() : null
 		))
 		->returning(array('uuid'));
-	$p_ins_log = $__db->prepare($q_ins_log->getStatement());
-	$p_ins_log->execute($q_ins_log->getBindValues());
+	$p_ins_log = $__db->prepareExecute($q_ins_log);
 	$log_res = $p_ins_log->fetch(PDO::FETCH_ASSOC);
 
 	if ($log_res != FALSE){
