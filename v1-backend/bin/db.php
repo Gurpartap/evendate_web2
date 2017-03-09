@@ -24,7 +24,7 @@ class ExtendedPDO extends PDO
 		}
 		$result = $prep->execute($bind_values);
 		if ($result === FALSE) {
-			throw new DBQueryException($error_name, $this);
+			throw new DBQueryException(var_export($this->errorInfo(), true), $this, $error_name);
 		}
 		return $prep;
 	}
