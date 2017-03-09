@@ -77,11 +77,11 @@ class EventsCollection extends AbstractCollection
 			if ($result !== FALSE) {
 				if ($p_get_organization_id->rowCount() == 1) {
 					$org_id = $p_get_organization_id->fetchColumn(0);
-					try{
+					try {
 						/*check if can make private instance*/
 						$_organization = OrganizationsCollection::onePrivate($db, $user, $org_id, null, array('privileges'));
 						$getting_personal_events = true;
-					}catch(Exception $e){
+					} catch (Exception $e) {
 						$_organization = OrganizationsCollection::one($db, $user, $org_id, array('privileges'));
 					}
 				}
@@ -223,6 +223,7 @@ class EventsCollection extends AbstractCollection
 					}
 					break;
 				}
+				case 'is_registered':
 				case 'registered': {
 					if (filter_var($value, FILTER_VALIDATE_BOOLEAN) == true) {
 						$from_view = self::VIEW_ALL_EVENTS_WITH_ALIAS;
@@ -255,6 +256,8 @@ class EventsCollection extends AbstractCollection
 				case 'future': {
 					if (filter_var($value, FILTER_VALIDATE_BOOLEAN) == true) {
 						$q_get_events->where("view_events.last_event_date > (SELECT DATE_PART('epoch', TIMESTAMP 'today') :: INT)");
+					} else if (filter_var($value, FILTER_VALIDATE_BOOLEAN) == false){
+						$q_get_events->where("view_events.last_event_date <= (SELECT DATE_PART('epoch', TIMESTAMP 'today') :: INT)");
 					}
 					break;
 				}
