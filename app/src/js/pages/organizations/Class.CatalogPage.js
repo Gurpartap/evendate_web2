@@ -53,7 +53,6 @@ CatalogPage = extending(Page, (function() {
 			if (self.selected_city_name) {
 				self.selected_city = this.getByName(self.selected_city_name);
 				self.categories_ajax_data.city_id = self.selected_city.id;
-				self.organizations_ajax_data.filters = 'city_id=' + self.selected_city.id;
 			}
 		}).done(function() {
 			return self.categories.fetchCategoriesWithOrganizations(self.categories_ajax_data, self.organizations_ajax_data, 0).done(function() {
@@ -78,13 +77,10 @@ CatalogPage = extending(Page, (function() {
 		__APP.changeTitle(this.categories.getByID(this.selected_category_id).name);
 	};
 	
-	CatalogPage.prototype.activate = function() {
-		
-	};
-	
 	CatalogPage.prototype.init = function() {
 		var PAGE = this,
-			$categories = PAGE.$view.find('.Category');
+			$categories = PAGE.$view.find('.Category'),
+			$organizations_cities_select = PAGE.$view.find('#organizations_cities_select');
 		
 		function bindOrganizationsEvents() {
 			bindRippleEffect(PAGE.$view);
@@ -106,12 +102,15 @@ CatalogPage = extending(Page, (function() {
 		
 		PAGE.$view.find('.OrganizationsCategoriesScroll').scrollbar({disableBodyScroll: true});
 		
-		PAGE.$view.find('#organizations_cities_select').select2({
+		$organizations_cities_select.select2({
 			containerCssClass: 'form_select2',
 			dropdownCssClass: 'form_select2_drop'
-		}).select2('val', PAGE.cities.getByName(PAGE.selected_city_name).id).off('change.SelectCity').on('change.SelectCity', function() {
+		}).off('change.SelectCity').on('change.SelectCity', function() {
 			__APP.changeState('/organizations/at/' + PAGE.cities.getByID($(this).val()).en_name, true, true);
 		});
+		if (PAGE.selected_city_name) {
+			$organizations_cities_select.select2('val', PAGE.cities.getByName(PAGE.selected_city_name).id);
+		}
 		
 		PAGE.$view.find('.ShowAllOrganizations').off('click.showAllOrganizations').on('click.showAllOrganizations', function() {
 			$categories.removeClass(__C.CLASSES.ACTIVE).siblings('.SubcategoryWrap').height(0);
@@ -154,7 +153,7 @@ CatalogPage = extending(Page, (function() {
 			return {
 				val: city.id,
 				display_name: city.local_name
-			}
+			};
 		})));
 		this.$view.find('.OrganizationsCategoriesScroll').html(__APP.BUILD.organisationsCategoriesItems(this.categories));
 		this.$wrapper.html(__APP.BUILD.organizationCard(this.selected_category_id ? this.categories.getByID(this.selected_category_id).organizations : this.all_organizations));

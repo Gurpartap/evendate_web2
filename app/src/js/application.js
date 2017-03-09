@@ -298,6 +298,9 @@ ServerConnection = (function() {
 
 
 __APP = {
+	/**
+	 * @type {ServerConnection}
+	 */
 	SERVER: new ServerConnection(),
 	EVENDATE_BEGIN: '15-12-2015',
 	AUTH_URLS: {},
@@ -1415,6 +1418,9 @@ __APP = {
 		} else {
 			console.error('Need to pass page name');
 		}
+	},
+	reload: function() {
+		return __APP.changeState(location.pathname, true, true);
 	},
 	init: function appInit() {
 		var $sidebar_nav_items = $('.SidebarNavItem');

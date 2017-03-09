@@ -76,7 +76,7 @@ CityChooseModal = extending(AbstractModal, (function() {
 		__APP.USER.selected_city = this.cities.getByID(this.content.find('#city_choose_modal_select').val());
 		localStorage.setItem('selected_city', JSON.stringify(__APP.USER.selected_city));
 		this.__hide();
-		window.location.reload();
+		__APP.reload();
 		
 		return this;
 	};
