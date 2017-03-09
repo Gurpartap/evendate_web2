@@ -179,7 +179,7 @@ class Organization extends AbstractEntity
 				)),
 				'status' => 'true'
 			));
-		$db->prepare($q_ins_mail->getStatement())->execute($q_ins_mail->getBindValues());
+		$db->prepareExecute($q_ins_mail);
 	}
 
 	/**
@@ -229,11 +229,7 @@ class Organization extends AbstractEntity
 			VALUES(:organization_id, :user_id, TRUE)
 			ON CONFLICT(organization_id, user_id) DO UPDATE SET status = TRUE RETURNING id::INT';
 
-		$p_ins_sub = $this->db->prepare($q_ins_sub);
-		$result = $p_ins_sub->execute(array(':organization_id' => $this->getId(), ':user_id' => $user->getId()));
-
-		if ($result === FALSE)
-			throw new DBQueryException('SUBSCRIPTION_QUERY_ERROR', $this->db);
+		$this->db->prepareExecuteRaw($q_ins_sub, array(':organization_id' => $this->getId(), ':user_id' => $user->getId()), 'SUBSCRIPTION_QUERY_ERROR');
 
 		return new Result(true, 'Подписка успешно оформлена');
 	}
@@ -241,12 +237,14 @@ class Organization extends AbstractEntity
 	public function deleteSubscription(User $user)
 	{
 		$q_upd_sub = 'UPDATE subscriptions
-			SET status = FALSE
+			SET status = FALSE, updated_at = NOW()
 			WHERE user_id = :user_id
 			AND organization_id = :organization_id
 			RETURNING id::INT';
-		$p_upd_sub = $this->db->prepare($q_upd_sub);
-		$p_upd_sub->execute(array(':organization_id' => $this->getId(), ':user_id' => $user->getId()));
+		$this->db->prepareExecuteRaw($q_upd_sub, array(
+			':organization_id' => $this->getId(),
+			':user_id' => $user->getId()
+		));
 		return new Result(true, 'Подписка успешно отменена');
 	}
 
@@ -486,14 +484,10 @@ class Organization extends AbstractEntity
 			->where('subscriptions.user_id = :user_id')
 			->where('subscriptions.organization_id = :organization_id')
 			->where('subscriptions.status = TRUE');
-		$p_get_subscribed = $this->db->prepare($q_get_subscribed->getStatement());
-
-		$result = $p_get_subscribed->execute(array(
+		$p_get_subscribed = $this->db->prepareExecute($q_get_subscribed, 'CANT_GET_SUBSCRIBE_STATUS', array(
 			':user_id' => $user->getId(),
 			':organization_id' => $this->getId()
 		));
-
-		if ($result === FALSE) throw new DBQueryException('CANT_GET_SUBSCRIBE_STATUS', $this->db);
 
 		$result = array(
 			'is_subscribed' => $p_get_subscribed->rowCount() == 1,
@@ -641,13 +635,8 @@ class Organization extends AbstractEntity
 		$q_upd_organization
 			->where('id = ?', $this->id);
 
-		$p_upd_organization = $this->db->prepare($q_upd_organization->getStatement());
-
-
-		$result = $p_upd_organization->execute($q_upd_organization->getBindValues());
-
+		$this->db->prepareExecute($q_upd_organization, 'CANT_UPDATE_ORGANIZATION');
 		@file_get_contents(App::DEFAULT_NODE_LOCATION . '/recommendations/organizations/' . $this->id);
-		if ($result === FALSE) throw new DBQueryException('CANT_UPDATE_ORGANIZATION', $this->db);
 		return new Result(true, '', array('organization_id' => $this->getId()));
 	}
 
@@ -664,11 +653,9 @@ class Organization extends AbstractEntity
 				'role_id' => Roles::getId($role),
 			));
 		$ins_data = $q_ins_staff->getBindValues();
-		$p_ins_staff = $this->db->prepare($q_ins_staff->getStatement() . ' ON CONFLICT (user_id, organization_id) DO UPDATE SET status = TRUE, role_id = :role_id');
 		$ins_data[':role_id'] = Roles::getId($role);
-		$result = $p_ins_staff->execute($ins_data);
-
-		if ($result === FALSE) throw new DBQueryException('CANT_ADD_STAFF', $this->db);
+		$this->db->prepareExecuteRaw($q_ins_staff->getStatement() . ' ON CONFLICT (user_id, organization_id) DO UPDATE SET status = TRUE, role_id = :role_id',
+			$ins_data, 'CANT_ADD_STAFF');
 		return new Result(true, '');
 	}
 
@@ -679,8 +666,8 @@ class Organization extends AbstractEntity
 
 		if ($role == Roles::ROLE_ADMIN) {
 			$q_get_admins = App::queryFactory()
-				->newSelect()
-				->from('users_organizations')
+				->newSelect();
+			$q_get_admins->from('users_organizations')
 				->cols(array(
 					'1 AS role_admin_id',
 					'(SELECT COUNT(user_id) 
@@ -692,9 +679,7 @@ class Organization extends AbstractEntity
 				->where('users_organizations.status = TRUE')
 				->where('users_organizations.organization_id = ?', $this->getId());
 
-			$p_get_admins = $this->db->prepare($q_get_admins->getStatement());
-			$result = $p_get_admins->execute($q_get_admins->getBindValues());
-			if ($result === FALSE) throw new DBQueryException('CANT_GET_ADMINS', $this->db);
+			$p_get_admins = $this->db->prepareExecute($q_get_admins, 'CANT_GET_ADMINS');
 
 			$admins = $p_get_admins->fetch();
 			if ($admins['admins_count'] == 1) throw new LogicException('Невозможно удалить единственного администратора');
@@ -709,10 +694,7 @@ class Organization extends AbstractEntity
 			->where('organization_id = ?', $this->getId())
 			->where('role_id = ?', Roles::getId($role));
 
-		$p_get_admins = $this->db->prepare($q_upd_staff->getStatement());
-		$result = $p_get_admins->execute($q_upd_staff->getBindValues());
-
-		if ($result === FALSE) throw new DBQueryException('CANT_DELETE_STAFF', $this->db);
+		$this->db->prepareExecute($q_upd_staff, 'CANT_DELETE_STAFF');
 		return new Result(true, '');
 	}
 
@@ -730,9 +712,7 @@ class Organization extends AbstractEntity
 				'role_id' => Roles::ROLE_ADMIN_ID,
 			));
 
-		$p_ins_owner = $db->prepare($q_ins_owner->getStatement());
-		$result = $p_ins_owner->execute($q_ins_owner->getBindValues());
-		if ($result === FALSE) throw new DBQueryException('CANT_CREATE_ORGANIZATION', $db);
+		$db->prepareExecute($q_ins_owner);
 	}
 
 	public static function create($data, User $user, ExtendedPDO $db)
@@ -769,13 +749,7 @@ class Organization extends AbstractEntity
 		$q_ins_organization
 			->returning(array('id'));
 
-		$p_ins_organization = $db->prepare($q_ins_organization->getStatement());
-
-		$result = $p_ins_organization->execute($q_ins_organization->getBindValues());
-
-
-		if ($result === FALSE) throw new DBQueryException('CANT_CREATE_ORGANIZATION', $db);
-		$result = $p_ins_organization->fetch(PDO::FETCH_ASSOC);
+		$result = $db->prepareExecute($q_ins_organization, 'CANT_CREATE_ORGANIZATION')->fetch(PDO::FETCH_ASSOC);
 		self::addOwner($user, $result['id'], $db);
 		self::addMailInfo($user, $data, $result['id'], $db);
 		@file_get_contents(App::DEFAULT_NODE_LOCATION . '/recommendations/organizations/' . $result['id']);

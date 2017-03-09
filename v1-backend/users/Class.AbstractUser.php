@@ -72,9 +72,7 @@ abstract class AbstractUser implements UserInterface
 			))
 			->where('user_id = ?', $this->id);
 
-		$p_get = $this->db->prepare($q_get_interests->getStatement());
-		$result = $p_get->execute($q_get_interests->getBindValues());
-		if ($result === FALSE) throw new DBQueryException('CANT_GET_INTERESTS', $this->db);
+		$p_get = $this->db->prepareExecute($q_get_interests, 'CANT_GET_INTERESTS');
 
 
 		$q_get_subscribed_groups = App::queryFactory()->newSelect()
@@ -83,9 +81,7 @@ abstract class AbstractUser implements UserInterface
 			->join('inner', 'vk_users_subscriptions', 'vk_groups.id=vk_users_subscriptions.vk_group_id')
 			->where('vk_users_subscriptions.user_id = ?', $this->id);
 
-		$p_get_groups = $this->db->prepare($q_get_subscribed_groups->getStatement());
-		$result = $p_get_groups->execute($q_get_subscribed_groups->getBindValues());
-		if ($result === FALSE) throw new DBQueryException('CANT_GET_INTERESTS', $this->db);
+		$p_get_groups = $this->db->prepareExecute($q_get_subscribed_groups, 'CANT_GET_INTERESTS');
 		$groups = $p_get_groups->fetchAll();
 		$groups_text = array();
 		foreach ($groups as $group) {

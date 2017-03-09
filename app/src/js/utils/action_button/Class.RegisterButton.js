@@ -42,10 +42,9 @@ RegisterButton = extending(ActionButton, (function() {
 		this.modal = null;
 		options.is_checked = event.is_registered;
 		ActionButton.call(this, options);
-		if (event.is_registered || !event.registration_available) {
-			this.off('click.RippleEffect').addClass('-Handled_RippleEffect');
-		}
 	}
+	
+	RegisterButton.prototype.checked_state_class = '-state_unselectable';
 	
 	RegisterButton.prototype.onClick = function() {
 		var self = this;
@@ -82,6 +81,14 @@ RegisterButton = extending(ActionButton, (function() {
 			});
 		}
 		
+	};
+	
+	RegisterButton.prototype.initiate = function() {
+		if (this.event.registration_available) {
+			ActionButton.prototype.initiate.call(this);
+		} else {
+			this.attr('disabled', true);
+		}
 	};
 	
 	

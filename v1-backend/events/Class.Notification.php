@@ -113,10 +113,7 @@ class Notification extends AbstractEntity
 			))
 			->where('uuid = ?', $this->uuid);
 
-		$p_upd = $db->prepare($q_upd_notification->getStatement());
-		$result = $p_upd->execute($q_upd_notification->getBindValues());
-		if ($result === FALSE) throw new DBQueryException('', $db);
-		$result = $p_upd->fetch(PDO::FETCH_ASSOC);
+		$result = $db->prepareExecute($q_upd_notification, 'CANT_UPDATE_NOTIFICATION')->fetch(PDO::FETCH_ASSOC);;
 		return new Result(true, 'Уведомление успешно обновлено', $result);
 	}
 
@@ -129,12 +126,7 @@ class Notification extends AbstractEntity
 			->set('status', 'false')
 			->where('uuid = ?', $this->uuid);
 
-		$p_upd = $db->prepare($q_upd->getStatement());
-
-		$result = $p_upd->execute($q_upd->getBindValues());
-
-		if ($result === FALSE) throw new DBQueryException('CANT_DELETE_NOTIFICATION', $db);
-
+		$db->prepareExecute($q_upd, 'CANT_DELETE_NOTIFICATION');
 		return new Result(true, 'Уведомление успешно удалено');
 	}
 
@@ -151,8 +143,7 @@ class Notification extends AbstractEntity
 			->set('notification_time', $dt->format('Y-m-d H:i:s'))
 			->where('id = ?', $this->id);
 
-		$p_upd = App::DB()->prepare($q_upd->getStatement());
-		$p_upd->execute($q_upd->getBindValues());
+		App::DB()->prepareExecute($q_upd);
 
 		return $this->notification_time = $dt->getTimestamp();
 	}

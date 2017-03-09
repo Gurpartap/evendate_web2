@@ -8,26 +8,56 @@ App::init();
 
 $driver_options = array(
 	PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+	PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
 );
-if (!isset($_SERVER['ENV']) || $_SERVER['ENV'] == 'dev' || $_SERVER['ENV'] == 'local') {
-	$driver_options[PDO::ATTR_ERRMODE] = PDO::ERRMODE_EXCEPTION;
-}
 
 class ExtendedPDO extends PDO
 {
 
-	public function prepareExecute(Aura\SqlQuery\QueryInterface $query, $error_name = 'QUERY_ERROR', array $bind_values = array()) : PDOStatement
+
+	private function handleError(Exception $e, $name)
+	{
+		throw new DBQueryException(var_export($e, true), $this, $name);
+	}
+
+	public function prepareExecute(Aura\SqlQuery\QueryInterface $query, $error_name = 'QUERY_ERROR', array $bind_values = array()): PDOStatement
 	{
 		$prep = $this->prepare($query->getStatement());
 		if ($bind_values == null) {
 			$bind_values = $query->getBindValues();
 		}
-		$result = $prep->execute($bind_values);
-		if ($result === FALSE) {
-			throw new DBQueryException($error_name, $this);
+		try {
+			$prep->execute($bind_values);
+		} catch (PDOException $e) {
+			$this->handleError($e, $error_name);
 		}
 		return $prep;
 	}
+
+	public function prepareExecuteRaw(string $query, array $params, $error_name = 'QUERY_ERROR'): PDOStatement
+	{
+		$prep = $this->prepare($query);
+		try {
+			$prep->execute($params);
+		} catch (PDOException $e) {
+			$this->handleError($e, $error_name);
+		}
+		return $prep;
+	}
+
+	public function bulkPrepareExecuteRaw(string $query, array $rows, $error_name = 'QUERY_ERROR')
+	{
+		$prep = $this->prepare($query);
+		try {
+			foreach ($rows as $params) {
+				$prep->execute($params);
+			}
+		} catch (PDOException $e) {
+			$this->handleError($e, $error_name);
+		}
+		return $prep;
+	}
+
 }
 
 $__db = new ExtendedPDO(App::$DB_DSN, App::$DB_USER, App::$DB_PASSWORD, $driver_options);

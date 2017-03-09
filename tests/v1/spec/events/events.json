@@ -30,7 +30,7 @@
         "6"
       ],
       "registration_required": true,
-      "registration_till": "2018-12-29T18:00:00",
+      "registration_till": null,
       "is_free": false,
       "is_online": false,
       "min_price": 500,

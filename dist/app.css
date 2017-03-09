@@ -1847,6 +1847,12 @@ a.button:hover {text-decoration: none}
 .-state_statistics .button.-color_neutral_accent > .ripple,
 .-state_statistics .button.-color_marginal_accent > .ripple {background-color: #23d792}
 
+
+.button.-state_unselectable {cursor: default}
+.button.-state_unselectable[class*="-color_"]:hover {box-shadow: none}
+.button.-state_unselectable > .ripple,
+.-state_statistics .button.-state_unselectable > .ripple {background-color: transparent}
+
 /*/Button*/
 /*Friend*/
 

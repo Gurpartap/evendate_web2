@@ -2289,7 +2289,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Notification"
+                "$ref": "#/definitions/TicketType"
               }
             }
           }
@@ -2335,7 +2335,7 @@
           "200": {
             "description": "successful operation",
             "schema": {
-              "$ref": "#/definitions/ApiResponse"
+              "$ref": "#/definitions/TicketType"
             }
           }
         }
@@ -2398,7 +2398,7 @@
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Notification"
+                "$ref": "#/definitions/Ticket"
               }
             }
           }
@@ -4017,6 +4017,10 @@
             "$ref": "#/definitions/Ticket"
           }
         },
+        "[tickets_count]": {
+          "type": "integer",
+          "format": "int64"
+        },
         "[can_edit]": {
           "type": "boolean"
         },
@@ -4324,7 +4328,7 @@
         "checked_out": {
           "type": "boolean"
         },
-        "[price]": {
+        "price": {
           "type": "number"
         },
         "[created_at]": {
@@ -4336,7 +4340,6 @@
           "format": "int64"
         },
         "[ticket_type]": {
-          "type": "array",
           "items": {
             "$ref": "#/definitions/TicketType"
           }
@@ -4365,20 +4368,20 @@
         "status_type_code": {
           "type": "string"
         },
+        "payed_at": {
+          "type": "integer"
+        },
+        "status_name": {
+          "type": "string"
+        },
         "[order_content]": {
           "type": "string"
         },
         "[is_canceled]": {
           "type": "boolean"
         },
-        "[payed_at]": {
-          "type": "integer"
-        },
         "[canceled_at]": {
           "type": "integer"
-        },
-        "[status_name]": {
-          "type": "string"
         },
         "[status_id]": {
           "type": "integer"
