@@ -4017,6 +4017,10 @@
             "$ref": "#/definitions/Ticket"
           }
         },
+        "[tickets_count]": {
+          "type": "integer",
+          "format": "int64"
+        },
         "[can_edit]": {
           "type": "boolean"
         },
@@ -4336,7 +4340,6 @@
           "format": "int64"
         },
         "[ticket_type]": {
-          "type": "array",
           "items": {
             "$ref": "#/definitions/TicketType"
           }
