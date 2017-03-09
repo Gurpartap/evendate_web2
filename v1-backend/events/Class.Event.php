@@ -1185,7 +1185,7 @@ class Event extends AbstractEntity
 						'length' => $length ?? $fields[self::TICKETS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 						'offset' => $offset ?? $fields[self::TICKETS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
 					),
-					$order_by ?? $fields[self::TICKETS_FIELD_NAME]['order_by'] ?? array()
+					$order_by ?? Fields::parseOrderBy($fields[self::TICKETS_FIELD_NAME]['order_by']) ?? array()
 				)->getData();
 			} else {
 				$result_data[self::TICKETS_FIELD_NAME] = null;
@@ -1202,7 +1202,7 @@ class Event extends AbstractEntity
 					'length' => $length ?? $fields[self::TICKETS_TYPES_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 					'offset' => $offset ?? $fields[self::TICKETS_TYPES_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
 				),
-				$order_by ?? $fields[self::TICKETS_TYPES_FIELD_NAME]['order_by'] ?? array()
+				$order_by ?? Fields::parseOrderBy($fields[self::TICKETS_TYPES_FIELD_NAME]['order_by']) ?? array()
 			)->getData();
 		}
 
