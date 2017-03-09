@@ -47,12 +47,10 @@ class Editor extends User
 					WHERE users_organizations.status = TRUE
 					AND users_organizations.user_id = :user_id
 					AND users_organizations.organization_id = :organization_id;';
-			$p_get_default = $this->getDB()->prepare($q_get_org);
-			$result = $p_get_default->execute(array(
+			$p_get_default = $this->getDB()->prepareExecuteRaw($q_get_org, array(
 				':user_id' => $this->getId(),
 				':organization_id' => $organization->getId()
-			));
-			if ($result === FALSE) throw new DBQueryException('', $this->getDB());
+			), 'CANT_GET_IS_EDITOR');
 			return $p_get_default->rowCount() != 0;
 		} else {
 			return $this->is_editor;
@@ -70,14 +68,11 @@ class Editor extends User
 			->where('users_organizations.organization_id = :organization_id')
 			->where('users_roles.name = \'admin\'');
 
-		$p_get_data = $this->db->prepare($q_get->getStatement());
-
-		$result = $p_get_data->execute(array(
+		$p_get_data = $this->db->prepareExecute($q_get, 'CANT_GET_USERS_ORGANIZATIONS', array(
 			':user_id' => $this->getId(),
 			':organization_id' => $organization->getId()
 		));
 
-		if ($result == FALSE) throw new DBQueryException('CANT_GET_USERS_ORGANIZATIONS', $this->db);
 		return $p_get_data->rowCount() > 0;
 	}
 
@@ -89,11 +84,9 @@ class Editor extends User
 				AND users_organizations.user_id = :user_id
 				ORDER BY by_default DESC
 				LIMIT 1';
-		$p_get_default = $this->getDB()->prepare($q_get_default);
-		$result = $p_get_default->execute(array(
+		$p_get_default = $this->getDB()->prepareExecuteRaw($q_get_default, array(
 			':user_id' => $this->getId()
-		));
-		if ($result === FALSE) throw new DBQueryException('', $this->getDB());
+		), 'CANT_GET_DEFAULT_ORGANIZATION');
 		$row = $p_get_default->fetch();
 		return OrganizationsCollection::one(
 			$this->getDB(),

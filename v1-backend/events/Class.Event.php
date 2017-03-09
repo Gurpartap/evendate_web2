@@ -308,11 +308,8 @@ class Event extends AbstractEntity
      WHERE event_id = :event_id AND events_dates.status = TRUE) WHERE id = :event_id';
 
 
-		$result = $db->prepare($q_upd_first)->execute(array(':event_id' => $event_id));
-		if ($result === FALSE) throw new DBQueryException('CANT_UPDATE_DATES', $db);
-
-		$result = $db->prepare($q_upd_last)->execute(array(':event_id' => $event_id));
-		if ($result === FALSE) throw new DBQueryException('CANT_UPDATE_DATES', $db);
+		$db->prepareExecuteRaw($q_upd_first, array(':event_id' => $event_id), 'CANT_UPDATE_DATES');
+		$db->prepareExecuteRaw($q_upd_last, array(':event_id' => $event_id), 'CANT_UPDATE_DATES');
 	}
 
 	private static function saveRegistrationInfo(ExtendedPDO $db, $event_id, array $data)
@@ -388,10 +385,8 @@ class Event extends AbstractEntity
 				'canceled' => $value ? 'TRUE' : 'FALSE'
 			))
 			->where('id = ?', $this->getId());
-		$p_upd = $this->db->prepare($q_upd_event->getStatement());
-		$result = $p_upd->execute($q_upd_event->getBindValues());
+		$this->db->prepareExecute($q_upd_event, 'CANT_SET_TICKETING_INFO');
 		self::saveNotifications($this->generateNotifications(array('canceled' => $value)), $this->db);
-		if ($result === FALSE) throw new DBQueryException('CANT_UPDATE_EVENT', $this->db);
 		return new Result(true, 'Данные успешно обновлены');
 	}
 
@@ -412,10 +407,11 @@ class Event extends AbstractEntity
 			->where('events_notifications.notification_type_id = ?', Notification::NOTIFICATION_TYPE_NOW_ID)
 			->groupBy(array('events_notifications.notification_time::DATE'))
 			->orderBy(array('available_date'));
-
-		$p_get_notifications = $db->prepare($q_get_notifications->getStatement());
-		$result = $p_get_notifications->execute($q_get_notifications->getBindValues());
-		if ($result === FALSE) return $dt_clone;
+		try {
+			$p_get_notifications = $db->prepareExecute($q_get_notifications, 'CANT_GET_NOTIFICATION_TIME');
+		} catch (Exception $e) {
+			return $dt_clone;
+		}
 		if ($p_get_notifications->rowCount() == 0) return $dt_clone;
 		$rows = $p_get_notifications->fetchAll();
 
@@ -710,21 +706,30 @@ class Event extends AbstractEntity
 				'event_id' => $event_id
 			))
 			->where('id = ?', $data['vk_post_id']);
-		$p_upd_post = $db->prepare($q_upd_vk_post->getStatement());
-		$result = $p_upd_post->execute($q_upd_vk_post->getBindValues());
+		$db->prepareExecute($q_upd_vk_post);
 	}
 
 	private static function saveEventTags(ExtendedPDO $db, $event_id, array $tags)
 	{
 
-		$p_upd = $db->prepare('UPDATE events_tags SET status = FALSE WHERE event_id = :event_id');
-		$p_upd->execute(array(':event_id' => $event_id));
+		$q_ins_tags = App::queryFactory()->newUpdate();
+		$q_ins_tags->table('events_tags')
+			->cols(array(
+					'status' => 'FALSE'
+				)
+			)
+			->set('updated_at', 'NOW()')
+			->where('event_id = ?', $event_id);
+
+		$p_upd = $db->prepareExecute($q_ins_tags, 'CANT_DISABLE_TAGS');
+		$p_upd->execute();
 
 		$q_ins_tags = 'INSERT INTO events_tags(event_id, tag_id, status)
 			VALUES(:event_id, :tag_id, TRUE) RETURNING id';
-		$p_ins_tags = $db->prepare($q_ins_tags);
 
 		$inserted_count = 0;
+
+		$rows = array();
 
 		foreach ($tags as $name) {
 			if (is_numeric($name)) {
@@ -734,15 +739,13 @@ class Event extends AbstractEntity
 			}
 
 			if ($inserted_count == self::TAGS_LIMIT) break;
-			$p_ins_tags->execute(array(
+			$rows[] = (array(
 				':event_id' => $event_id,
 				':tag_id' => $tag_id
 			));
-
-			$result = $p_ins_tags->fetch(PDO::FETCH_ASSOC);
-
 			$inserted_count++;
 		}
+		$db->bulkPrepareExecuteRaw($q_ins_tags, $rows, 'CANT_INSERT_TAGS');
 	}
 
 	private static function saveDates($dates, ExtendedPDO $db, $event_id)
@@ -758,7 +761,6 @@ class Event extends AbstractEntity
 
 		$q_ins_dates = 'INSERT INTO events_dates(event_date, status, event_id, start_time, end_time, start_time_utc, end_time_utc)
 			VALUES(:event_date, TRUE, :event_id, :start_time, :end_time, :start_time_utc, :end_time_utc) RETURNING id';
-		$p_ins_dates = $db->prepare($q_ins_dates);
 
 		$q_timediff = App::queryFactory()->newSelect();
 		$q_timediff->from('organizations')
@@ -773,6 +775,8 @@ class Event extends AbstractEntity
 			$timediff = 0;
 		}
 
+		$rows = array();
+
 		foreach ($dates as $date) {
 			$_start_time = new DateTime($date['event_date'] . ' ' . $date['start_time']);
 			$_end_time = new DateTime($date['event_date'] . ' ' . $date['end_time']);
@@ -780,7 +784,7 @@ class Event extends AbstractEntity
 			$_start_time->sub(new DateInterval('PT' . $timediff . 'S'));
 			$_end_time->sub(new DateInterval('PT' . $timediff . 'S'));
 
-			$p_ins_dates->execute(array(
+			$rows[] = (array(
 				':event_date' => $date['event_date'],
 				':event_id' => $event_id,
 				':start_time' => $date['start_time'],
@@ -788,9 +792,9 @@ class Event extends AbstractEntity
 				':start_time_utc' => $_start_time->format('Y-m-d H:i:s'),
 				':end_time_utc' => $_end_time->format('Y-m-d H:i:s')
 			));
-
-			$p_ins_dates->fetch(PDO::FETCH_ASSOC);
 		}
+
+		$db->bulkPrepareExecuteRaw($q_ins_dates, $rows, 'CANT_INSERT_DATES');
 
 		self::updateExtremumDates($event_id, $db);
 	}
@@ -804,8 +808,7 @@ class Event extends AbstractEntity
 			->where(
 				'type = ?', $name
 			);
-		$p_get_type_id = $db->prepare($q_get_type_id->getStatement());
-		$p_get_type_id->execute($q_get_type_id->getBindValues());
+		$p_get_type_id = $db->prepareExecute($q_get_type_id, 'CANT_FIND_NOTIFICATION_TYPE_ID');
 
 		if ($p_get_type_id->rowCount() != 1) throw new LogicException('CANT_FIND_TYPE: ' . $name);
 		$rows = $p_get_type_id->fetchAll();
@@ -822,9 +825,7 @@ class Event extends AbstractEntity
 			->where(
 				'type = ?', $name
 			);
-		$p_get_type_id = $this->db->prepare($q_get_type_id->getStatement());
-		$p_get_type_id->execute($q_get_type_id->getBindValues());
-
+		$p_get_type_id = $this->db->prepareExecute($q_get_type_id, 'CANT_FIND_NOTIFICATION_TYPE');
 		if ($p_get_type_id->rowCount() != 1) throw new LogicException('CANT_FIND_TYPE');
 		$rows = $p_get_type_id->fetchAll();
 
@@ -847,8 +848,7 @@ class Event extends AbstractEntity
 			->where('done = FALSE', $this->id)
 			->where('user_id IS NULL');
 
-		$p_get_notifications = $this->db->prepare($q_get_notifications->getStatement());
-		$p_get_notifications->execute($q_get_notifications->getBindValues());
+		$p_get_notifications = $this->db->prepareExecute($q_get_notifications, 'CANT_GET_NOTIFICATIONS_FOR_CREATION');
 
 		$notifications = $p_get_notifications->fetchAll();
 
@@ -937,8 +937,7 @@ class Event extends AbstractEntity
 				))->where(
 					'id = ?', array_search(Notification::NOTIFICATION_TYPE_CANCELED, $existing_notification_types)
 				);
-			$p_upd_notification = $this->db->prepare($q_upd_notification->getStatement());
-			$p_upd_notification->execute($q_upd_notification->getBindValues());
+			$p_upd_notification = $this->db->prepareExecute($q_upd_notification);
 
 		}
 
@@ -985,8 +984,7 @@ class Event extends AbstractEntity
 				))->where(
 					'id = ?', array_search(Notification::NOTIFICATION_TYPE_CHANGED_REGISTRATION, $existing_notification_types)
 				);
-			$p_upd_notification = $this->db->prepare($q_upd_notification->getStatement());
-			$p_upd_notification->execute($q_upd_notification->getBindValues());
+			$this->db->prepareExecute($q_upd_notification, 'CANT_UPDATE_NOTIFICATION: registration_till');
 		}
 
 
@@ -1017,8 +1015,7 @@ class Event extends AbstractEntity
 			$q_ins_notification
 				->into('events_notifications')
 				->cols($notification);
-			$p_ins_notification = $db->prepare($q_ins_notification->getStatement());
-			$p_ins_notification->execute($q_ins_notification->getBindValues());
+			$db->prepareExecute($q_ins_notification, 'CANT_SAVE_NOTIFICATION');
 		}
 
 	}
@@ -1221,13 +1218,11 @@ class Event extends AbstractEntity
 		$q_ins_hidden = 'INSERT INTO hidden_events(event_id, user_id, status)
 			VALUES(:event_id, :user_id, TRUE)
 			ON CONFLICT(event_id, user_id) DO UPDATE SET status = TRUE';
-		$p_ins_hidden = $this->db->prepare($q_ins_hidden);
-		$result = $p_ins_hidden->execute(array(
+		$this->db->prepareExecuteRaw($q_ins_hidden, array(
 			':event_id' => $this->getId(),
 			':user_id' => $user->getId()
-		));
+		), 'CANT_HIDE_EVENT');
 
-		if ($result === FALSE) throw new DBQueryException('', $this->db);
 		return new Result(true, 'Событие успешно скрыто');
 	}
 
@@ -1238,13 +1233,11 @@ class Event extends AbstractEntity
 			WHERE user_id = :user_id AND
 			event_id = :event_id
 			';
-		$p_upd_hidden = $this->db->prepare($q_upd_hidden);
-		$result = $p_upd_hidden->execute(array(
+		$this->db->prepareExecuteRaw($q_upd_hidden, array(
 			':event_id' => $this->getId(),
 			':user_id' => $user->getId()
-		));
+		), 'CANT_REMOVE_HIDDEN');
 
-		if ($result === FALSE) throw new DBQueryException('', $this->db);
 		return new Result(true, 'Событие успешно удалено из скрытых');
 	}
 
@@ -1326,11 +1319,7 @@ class Event extends AbstractEntity
 			}
 
 
-			$p_upd_event = $this->db->prepare($q_upd_event->getStatement());
-			$result = $p_upd_event->execute($q_upd_event->getBindValues());
-
-
-			if ($result === FALSE) throw new DBQueryException(implode(';', $this->db->errorInfo()), $this->db);
+			$this->db->prepareExecute($q_upd_event, 'CANT_UPDATE_EVENT');
 
 			self::saveEventTags($this->db, $this->getId(), $data['tags']);
 
@@ -1385,9 +1374,7 @@ class Event extends AbstractEntity
 					->where('notification_type_id = ? ', $notification_type_id)
 					->where('status = true')
 					->where('done = false');
-				$p_upd_notifications = $this->db->prepare($q_upd_notifications->getStatement());
-				$r = $p_upd_notifications->execute($q_upd_notifications->getBindValues());
-				if ($r === FALSE) throw new DBQueryException('CANT_UPDATE_NOTIFICATIONS', $this->db);
+				$this->db->prepareExecute($q_upd_notifications, 'CANT_UPDATE_NOTIFICATIONS');
 			} else throw new InvalidArgumentException('CANT_FIND_NOTIFICATION_TYPE');
 		} // notifications by exact time
 		elseif (isset($notification['notification_time'])) {
@@ -1409,9 +1396,7 @@ class Event extends AbstractEntity
 				'sent_time' => null
 			))
 			->returning(array('uuid'));
-		$p_ins = $this->db->prepare($q_ins_notification->getStatement());
-		$result = $p_ins->execute($q_ins_notification->getBindValues());
-		if ($result === FALSE) throw new DBQueryException('', $this->db);
+		$p_ins = $this->db->prepareExecute($q_ins_notification, 'CANT_ADD_NOTIFICATION');
 		$result = $p_ins->fetch(PDO::FETCH_ASSOC);
 		$result['notification_time'] = $time->getTimestamp();
 		return new Result(true, 'Уведомление успешно добавлено', $result);
@@ -1425,12 +1410,10 @@ class Event extends AbstractEntity
 			->where(self::MY_EVENTS_QUERY_PART)
 			->where('id = :event_id');
 
-		$p_get_event = $this->db->prepare($q_get_in_feed->getStatement());
-		$result = $p_get_event->execute(array(
+		$p_get_event = $this->db->prepareExecute($q_get_in_feed, 'CANT_DETERMINE_IS_IN_USER_FEED', array(
 			':event_id' => $this->getId(),
 			':user_id' => $user->getId()
 		));
-		if ($result === FALSE) throw new DBQueryException('', $this->db);
 		return new Result(true, '', array('is_in_feed' => $p_get_event->rowCount() > 0));
 	}
 
@@ -1445,8 +1428,7 @@ class Event extends AbstractEntity
 			->where('user_id = :user_id')
 			->limit(1);
 
-		$p_get_event = $this->db->prepare($q_get_is_seen->getStatement());
-		$p_get_event->execute(array(
+		$p_get_event = $this->db->prepareExecute($q_get_is_seen, 'CANT_GET_IS_SEEN_BY_USER', array(
 			':event_id' => $this->getId(),
 			':user_id' => $user->getId()
 		));
@@ -1464,13 +1446,11 @@ class Event extends AbstractEntity
 	private function getRegistrationAvailable()
 	{
 		$q_get_available = App::queryFactory()
-			->newSelect()
-			->from('view_events')
+			->newSelect();
+		$q_get_available->from('view_events')
 			->cols(array('registration_available'))
 			->where('id = ?', $this->getId());
-		$p_get_available = $this->db->prepare($q_get_available->getStatement());
-		$result = $p_get_available->execute($q_get_available->getBindValues());
-		if ($result === FALSE) throw new DBQueryException(implode(';', $this->db->errorInfo()), $this->db);
+		$p_get_available = $this->db->prepareExecute($q_get_available, 'CANT_GET_AVAILABILITY');
 		if ($p_get_available->rowCount() != 1) throw new InvalidArgumentException('BAD_EVENT_ID');
 		return $p_get_available->fetchColumn(0);
 	}

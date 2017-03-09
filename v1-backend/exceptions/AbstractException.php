@@ -14,15 +14,6 @@ abstract class AbstractException extends \Exception{
 		$this->db = $db;
 	}
 
-	public function write(){
-		$q_ins = App::queryFactory()->newInsert();
-		$q_ins
-			->cols(array(
-				':' => ''
-			));
-		$this->db->prepare($q_ins->getStatement());
-	}
-
 	public function getUserMessage(){
 		return $this->user_message;
 	}

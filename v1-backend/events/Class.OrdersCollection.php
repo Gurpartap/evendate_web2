@@ -42,6 +42,11 @@ class OrdersCollection extends AbstractCollection
 					}
 					break;
 				}
+				case 'user': {
+					if ($value instanceof User) {
+						$q_get_orders->where('user_id = ?', $value->getId());
+					}
+				}
 			}
 		}
 

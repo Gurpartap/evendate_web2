@@ -90,9 +90,7 @@ class EventsStatistics extends AbstractAggregator
             }
         }
 
-        $q_get_data = $this->db->prepare($query);
-
-        $q_get_data->execute($statements);
+        $q_get_data = $this->db->prepareExecuteRaw($query, $statements, 'CANT_GET_EVENTS_STATS');
 
         return new Result(true, '', $q_get_data->fetchAll());
     }
