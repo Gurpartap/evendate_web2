@@ -111,8 +111,7 @@ class TagsCollection extends AbstractCollection
 			->cols($cols)
 			->orderBy($order_by);
 
-		$p_get_tags = $db->prepare($q_get_tags->getStatement());
-		$p_get_tags->execute($statements);
+		$p_get_tags = $db->prepareExecute($q_get_tags, 'CANT_FIND_TAG', $statements);
 		$tags = $p_get_tags->fetchAll(PDO::FETCH_CLASS, 'Tag');
 		if (count($tags) == 0 && $is_one_tag) throw new LogicException('CANT_FIND_TAG');
 		if ($is_one_tag) return $tags[0];
@@ -143,9 +142,7 @@ class TagsCollection extends AbstractCollection
 		if (count($tags) == 0) {
 			$q_ins_tag = 'INSERT INTO tags(name, status)
 								VALUES(:name, TRUE) RETURNING id';
-			$p_ins_tag = $db->prepare($q_ins_tag);
-
-			$p_ins_tag->execute(array(
+			$p_ins_tag = $db->prepareExecuteRaw($q_ins_tag, array(
 				':name' => $name
 			));
 
