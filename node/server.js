@@ -648,7 +648,19 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     if (is_new_user) {
                         q_user = users.insert(user_to_ins).returning('id').toQuery();
                     } else {
-                        user = result.rows[0];
+
+                        // case when user changed his email, we'll select account related to current auth social network
+                        let network_index = 0;
+                        if (result.rows.length > 1){
+                            result.rows.forEach(function(row, row_index){
+                                if (row[data.type + '_uid'] != null){
+                                    network_index = row_index;
+                                }
+                            });
+                        }
+
+
+                        user = result.rows[network_index];
                         subscriptions_count = user.subscriptions_count;
                         q_user = users.update(user_to_ins).where(users.id.equals(user.id)).returning('id').toQuery();
                     }
@@ -1472,7 +1484,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
             updateRecommendations({user_id: req.params.id}, logger.info);
         });
     });
-
 
     app.get('/utils/qr/:event_id/:uuid', function (req, res) {
         var format = 'png',

@@ -20,9 +20,7 @@ TagsCollection = extending(EntitiesCollection, (function() {
 	 * @constructor
 	 * @constructs TagsCollection
 	 */
-	function TagsCollection() {
-		EntitiesCollection.call(this);
-	}
+	function TagsCollection() {}
 	
 	TagsCollection.prototype.collection_of = OneTag;
 	/**

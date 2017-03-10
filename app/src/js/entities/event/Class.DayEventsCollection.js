@@ -16,7 +16,6 @@ DayEventsCollection = extending(EventsCollection, (function() {
 	function DayEventsCollection(date) {
 		if (!date)
 			throw Error('DayEventsCollection must have date parameter');
-		EventsCollection.call(this);
 		this.date = date;
 	}
 	/**

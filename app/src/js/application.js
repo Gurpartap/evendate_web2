@@ -140,16 +140,16 @@ ServerConnection = (function() {
 	 *
 	 * @param {ServerConnection.HTTP_METHODS} http_method
 	 * @param {string} url
-	 * @param {(AJAXData|string)} [ajax_data]
+	 * @param {(AJAXData|string)} ajax_data
 	 * @param {string} [content_type='application/x-www-form-urlencoded; charset=UTF-8']
 	 * @param {AJAXCallback} [success]
 	 * @param {function} [error]
 	 * @returns {jqPromise}
 	 */
 	ServerConnection.prototype.dealAjax = function(http_method, url, ajax_data, content_type, success, error) {
-		ajax_data = ajax_data || {};
-		var jqXHR;
-		if (ajax_data.fields instanceof Fields){
+		var self = this,
+			jqXHR;
+		if(ajax_data.fields instanceof Fields){
 			ajax_data.fields = ajax_data.fields.toString();
 		}
 		jqXHR = $.ajax({
@@ -250,7 +250,6 @@ ServerConnection = (function() {
 	 * @returns {AJAXData}
 	 */
 	ServerConnection.prototype.validateData = function(ajax_data) {
-		ajax_data = ajax_data || {};
 		if(ajax_data.fields){
 			if(Array.isArray(ajax_data.fields)){
 				if (ajax_data.order_by) {
@@ -298,26 +297,9 @@ ServerConnection = (function() {
 
 
 __APP = {
-	/**
-	 * @type {ServerConnection}
-	 */
 	SERVER: new ServerConnection(),
 	EVENDATE_BEGIN: '15-12-2015',
 	AUTH_URLS: {},
-	/**
-	 * @property {string} ip
-	 * @property {string} country_code
-	 * @property {string} country_name
-	 * @property {string} region_code
-	 * @property {string} region_name
-	 * @property {string} city
-	 * @property {string} zip_code
-	 * @property {string} time_zone
-	 * @property {number} latitude
-	 * @property {number} longitude
-	 * @property {number} metro_code
-	 */
-	LOCATION: {},
 	TOP_BAR: new AbstractTopBar(),
 	SIDEBAR: new AbstractSidebar(),
 	USER: new CurrentUser(),
@@ -362,13 +344,6 @@ __APP = {
 			'': ActualEventsPage
 		},
 		'organizations': {
-			'at': {
-				'^([0-9]+)': CatalogPage,
-				'^([^/]+)': {
-					'^([0-9]+)': CatalogPage,
-					'': CatalogPage
-				}
-			},
 			'^([0-9]+)': CatalogPage,
 			'': CatalogPage
 		},
@@ -1419,12 +1394,8 @@ __APP = {
 			console.error('Need to pass page name');
 		}
 	},
-	reload: function() {
-		return __APP.changeState(location.pathname, true, true);
-	},
 	init: function appInit() {
 		var $sidebar_nav_items = $('.SidebarNavItem');
-		
 		__APP.CURRENT_PAGE = Page.routeNewPage(window.location.pathname);
 		__APP.CURRENT_PAGE.fetchData();
 		__APP.CURRENT_PAGE.show();

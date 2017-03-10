@@ -13,9 +13,7 @@ DateModelsCollection = extending(EntitiesCollection, (function() {
 	 * @constructor
 	 * @constructs DateModelsCollection
 	 */
-	function DateModelsCollection() {
-		EntitiesCollection.call(this);
-	}
+	function DateModelsCollection() {}
 	DateModelsCollection.prototype.collection_of = DateModel;
 	
 	return DateModelsCollection;
