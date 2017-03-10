@@ -3,13 +3,21 @@
  */
 /**
  *
- * @constructor
- * @augments StatisticsEventPage
- * @param {(string|number)} event_id
+ * @class StatisticsEventAuditoryPage
+ * @extends StatisticsEventPage
  */
-function StatisticsEventAuditoryPage(event_id) {
-	StatisticsEventPage.apply(this, arguments);
-}
-StatisticsEventAuditoryPage.extend(StatisticsEventPage);
-
-StatisticsEventAuditoryPage.prototype.render = function() {};
+StatisticsEventAuditoryPage = extending(StatisticsEventPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs StatisticsEventAuditoryPage
+	 * @param {(string|number)} event_id
+	 */
+	function StatisticsEventAuditoryPage(event_id) {
+		StatisticsEventPage.apply(this, arguments);
+	}
+	
+	StatisticsEventAuditoryPage.prototype.render = function() {};
+	
+	return StatisticsEventAuditoryPage;
+}()));

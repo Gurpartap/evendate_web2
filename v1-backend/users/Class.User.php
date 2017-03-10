@@ -35,30 +35,29 @@ class User extends AbstractUser
 			throw new AuthorizationException('Пользователь с такими данными не найден', $db);
 		}
 		if (isset($_SESSION['id'])) {
-			$p_get_user = $db->prepare("SELECT users.*, tokens.id AS token_id,
+			$query = "SELECT users.*, tokens.id AS token_id,
 				(SELECT COUNT(user_id)::INT FROM users_organizations WHERE user_id = users.id AND status = TRUE) > 0 AS is_editor
 				FROM users
 				INNER JOIN tokens ON tokens.user_id = users.id
 				WHERE users.id = :id
 				AND tokens.token = :token
-				AND tokens.expires_on > DATE_PART('epoch', CURRENT_TIMESTAMP)::INT");
+				AND tokens.expires_on > DATE_PART('epoch', CURRENT_TIMESTAMP)::INT";
 			$stm = array(
 				':id' => $_SESSION['id'],
 				':token' => $_SESSION['token']
 			);
 		} else {
-			$p_get_user = $db->prepare("SELECT users.*,tokens.id AS token_id,
+			$query = "SELECT users.*,tokens.id AS token_id,
 				(SELECT COUNT(user_id) FROM users_organizations WHERE user_id = users.id AND status = TRUE) > 0 AS is_editor
 				FROM users
 				INNER JOIN tokens ON tokens.user_id = users.id
 				WHERE
-					tokens.token = :token");
+					tokens.token = :token";
 			$stm = array(':token' => $token);
 		}
 
-		$p_get_user->execute($stm);
+		$p_get_user = $db->prepareExecuteRaw($query, $stm, 'CANT_FIND_USER');
 
-		if ($p_get_user === FALSE) throw new DBQueryException('USER_NOT_EXIST', $db);
 		if ($p_get_user->rowCount() !== 1) throw new AuthorizationException('Пользователь с такими данными не найден', $db);
 		$row = $p_get_user->fetch();
 
@@ -104,9 +103,7 @@ class User extends AbstractUser
 			->where('users_organizations.user_id = ?', $this->getId())
 			->where('status = TRUE')
 			->where('users_roles.name = ?', Roles::ROLE_ADMIN);
-		$p_get = $this->db->prepare($q_get_is_admin->getStatement());
-		$result = $p_get->execute($q_get_is_admin->getBindValues());
-		if ($result === FALSE) throw new DBQueryException('CANT_GET_ADMIN_STATUS', $this->db);
+		$p_get = $this->db->prepareExecute($q_get_is_admin, 'CANT_GET_ADMIN_STATUS');
 		return $p_get->rowCount() > 0;
 	}
 
@@ -121,9 +118,7 @@ class User extends AbstractUser
 			->where('users_organizations.user_id = ?', $this->getId())
 			->where('status = TRUE')
 			->where('users_roles.name = ?', Roles::ROLE_ADMIN);
-		$p_get = $this->db->prepare($q_get_is_admin->getStatement());
-		$result = $p_get->execute($q_get_is_admin->getBindValues());
-		if ($result === FALSE) throw new DBQueryException('CANT_GET_ADMIN_STATUS', $this->db);
+		$p_get = $this->db->prepareExecute($q_get_is_admin, 'CANT_GET_ADMIN_STATUS');
 		return $p_get->rowCount() > 0;
 	}
 
@@ -160,24 +155,11 @@ class User extends AbstractUser
 	{
 		$q_ins_favorite = 'INSERT INTO favorite_events(user_id, event_id, status, created_at)
 			VALUES (:user_id, :event_id, TRUE, NOW())
-			ON CONFLICT (user_id, event_id) 
-			DO UPDATE SET status = TRUE 
-			RETURNING id::INT';
-		$p_ins_favorite = $this->db->prepare($q_ins_favorite);
-		$result = $p_ins_favorite->execute(array(
+			ON CONFLICT (user_id, event_id) DO UPDATE SET status = TRUE RETURNING id::INT';
+		$this->db->prepareExecuteRaw($q_ins_favorite, array(
 			':user_id' => $this->getId(),
 			':event_id' => $event->getId()
-		));
-
-		if ($result === FALSE) throw new DBQueryException('CANT_MAKE_FAVORITE', $this->db);
-
-
-		try {
-			$event->addNotification($this, array(
-				'notification_type' => Notification::NOTIFICATION_TYPE_BEFORE_DAY
-			));
-		} catch (Exception $e) {}
-
+		), 'CANT_MAKE_FAVORITE');
 		return new Result(true, 'Событие успешно добавлено в избранное');
 	}
 
@@ -186,12 +168,10 @@ class User extends AbstractUser
 		$q_upd_favorite = 'UPDATE favorite_events SET status = FALSE
 			WHERE  user_id = :user_id
 			 AND event_id = :event_id';
-		$p_ins_favorite = $this->db->prepare($q_upd_favorite);
-		$result = $p_ins_favorite->execute(array(
+		$p_ins_favorite = $this->db->prepareExecuteRaw($q_upd_favorite, array(
 			':user_id' => $this->getId(),
 			':event_id' => $event->getId()
-		));
-		if ($result === FALSE) throw new DBQueryException('CANT_DELETE_FAVORITE', $this->db);
+		), 'CANT_DELETE_FAVORITE');
 		return new Result(true, 'Событие успешно удалено из избранных');
 	}
 
@@ -202,12 +182,15 @@ class User extends AbstractUser
 			user_id = :user_id
 			AND event_id = :event_id
 			AND status = TRUE';
-		$p_get_is_fav = $this->db->prepare($q_get_is_fav);
-		$p_get_is_fav->execute(array(
-			':user_id' => $this->getId(),
-			':event_id' => $event->getId()
-		));
-		if ($p_get_is_fav === FALSE) return new Result(false, '', false);
+		try {
+			$p_get_is_fav = $this->db->prepareExecuteRaw($q_get_is_fav, array(
+				':user_id' => $this->getId(),
+				':event_id' => $event->getId()
+			), 'CANT_FIND_FAVORITE');
+
+		} catch (Exception $e) {
+			return new Result(false, '', false);
+		}
 		return new Result(true, '', $p_get_is_fav->rowCount() == 1);
 	}
 
@@ -235,10 +218,7 @@ class User extends AbstractUser
 		$cols['show_to_friends'] = '1';
 
 		$q_upd->cols($cols);
-		$p_upd = $this->db->prepare($q_upd->getStatement());
-		$result = $p_upd->execute($q_upd->getBindValues());
-
-		if ($result === FALSE) throw new DBQueryException('CANT_UPDATE_SETTINGS', $this->db);
+		$this->db->prepareExecute($q_upd, 'CANT_UPDATE_SETTINGS');
 
 		return new Result(true, '');
 	}
@@ -273,31 +253,28 @@ class User extends AbstractUser
 			os_version = :os_version
 			WHERE user_id = :user_id
 			AND tokens.token = :token';
-		$p_upd = $this->db->prepare($q_upd_device_token);
-		$res = $p_upd->execute(array(
+		$p_upd = $this->db->prepareExecuteRaw($q_upd_device_token, array(
 			':device_token' => $device_token,
 			':user_id' => $this->getId(),
 			':token' => $this->token,
 			':model' => $device_model,
 			':os_version' => $device_os_version,
 			':client_type' => $client_type
-		));
+		), 'CANT_UPDATE_DEVICE_TOKEN');
 
 
 		//disable same tokens for this user (device tokens can duplicate)
-		$q_upd_token = "UPDATE tokens SET expires_on = DATE_PART('epoch', CURRENT_TIMESTAMP)::INT
+		$q_upd_token = "UPDATE tokens SET expires_on = DATE_PART('epoch', CURRENT_TIMESTAMP)::INT, updated_at = NOW()
 			WHERE user_id = :user_id
 			AND client_type = :client_type
 			AND device_token = :device_token
 			AND tokens.token != :token";
-		$p_upd_token = $this->db->prepare($q_upd_token);
-		$res2 = $p_upd_token->execute(array(
+		$this->db->prepareExecuteRaw($q_upd_token, array(
 			':device_token' => $device_token,
 			':user_id' => $this->getId(),
 			':token' => $this->token,
 			':client_type' => $client_type
-		));
-		if ($res === FALSE || $res2 === FALSE) throw new DBQueryException('CANT UPDATE TOKEN', $this->db);
+		), 'CANT_UPDATE_TOKEN');
 		return new Result(true, '', array('token' => $this->token));
 	}
 

@@ -38,10 +38,7 @@ class Device extends AbstractEntity{
 			->set('expires_on', 'NOW()')
 			->where('id = :id');
 
-		$p_upd_device = App::DB()->prepare($q_upd);
-		$result = $p_upd_device->execute(array(':id' => $this->getId()));
-
-		if ($result === FALSE) throw new DBQueryException('', App::DB());
+		App::DB()->prepareExecute($q_upd, 'CANT_DELETE_DEVICE', array(':id' => $this->getId()));
 		return new Result(true, 'Данные успешно обновлены');
 	}
 

@@ -68,22 +68,19 @@ class EventsCollection extends AbstractCollection
 			$_organization = OrganizationsCollection::one($db, $user, $filters['organization_id'], array('privileges'));
 		} elseif (array_key_exists('id', $filters)) {
 			$q_get_organization_id = App::queryFactory()
-				->newSelect()
-				->cols(array('organization_id'))
+				->newSelect();
+			$q_get_organization_id->cols(array('organization_id'))
 				->from('view_all_events')
 				->where('id = ?', $filters['id']);
-			$p_get_organization_id = $db->prepare($q_get_organization_id->getStatement());
-			$result = $p_get_organization_id->execute($q_get_organization_id->getBindValues());
-			if ($result !== FALSE) {
-				if ($p_get_organization_id->rowCount() == 1) {
-					$org_id = $p_get_organization_id->fetchColumn(0);
-					try{
-						/*check if can make private instance*/
-						$_organization = OrganizationsCollection::onePrivate($db, $user, $org_id, null, array('privileges'));
-						$getting_personal_events = true;
-					}catch(Exception $e){
-						$_organization = OrganizationsCollection::one($db, $user, $org_id, array('privileges'));
-					}
+			$p_get_organization_id = $db->prepareExecute($q_get_organization_id);
+			if ($p_get_organization_id->rowCount() == 1) {
+				$org_id = $p_get_organization_id->fetchColumn(0);
+				try {
+					/*check if can make private instance*/
+					$_organization = OrganizationsCollection::onePrivate($db, $user, $org_id, null, array('privileges'));
+					$getting_personal_events = true;
+				} catch (Exception $e) {
+					$_organization = OrganizationsCollection::one($db, $user, $org_id, array('privileges'));
 				}
 			}
 		}
@@ -223,8 +220,10 @@ class EventsCollection extends AbstractCollection
 					}
 					break;
 				}
+				case 'is_registered':
 				case 'registered': {
-					if (filter_var($value, FILTER_VALIDATE_BOOLEAN) == true) {
+				$val = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+				if ($val) {
 						$from_view = self::VIEW_ALL_EVENTS_WITH_ALIAS;
 						$operand = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'IN' : 'NOT IN';
 						$q_get_events->where('id ' . $operand . ' (SELECT event_id FROM view_tickets WHERE user_id = :user_id AND is_active = TRUE)');
@@ -235,8 +234,8 @@ class EventsCollection extends AbstractCollection
 				case 'registration_available':
 				case 'registration_locally':
 				case 'registration_required': {
-					if (filter_var($value, FILTER_VALIDATE_BOOLEAN) == true) {
-						$from_view = self::VIEW_ALL_EVENTS_WITH_ALIAS;
+					$val = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+					if ($val != null) {
 						$q_get_events->where($name . ' = :' . $name);
 						$statement_array[':' . $name] = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
 					}
@@ -245,16 +244,20 @@ class EventsCollection extends AbstractCollection
 				case 'is_canceled':
 				case 'is_free':
 				case 'is_delayed': {
-					if ($is_editor && filter_var($value, FILTER_VALIDATE_BOOLEAN) == true) {
+				$val = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+				if ($is_editor) {
 						$from_view = self::VIEW_ALL_EVENTS_WITH_ALIAS;
 						$q_get_events->where($name . ' = :' . $name);
-						$statement_array[':' . $name] = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+						$statement_array[':' . $name] = $val ? 'true' : 'false';
 					}
 					break;
 				}
 				case 'future': {
-					if (filter_var($value, FILTER_VALIDATE_BOOLEAN) == true) {
+					$val = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+					if ($val) {
 						$q_get_events->where("view_events.last_event_date > (SELECT DATE_PART('epoch', TIMESTAMP 'today') :: INT)");
+					} else if ($val == false){
+						$q_get_events->where("view_events.last_event_date < (SELECT DATE_PART('epoch', TIMESTAMP 'today') :: INT)");
 					}
 					break;
 				}
@@ -459,6 +462,8 @@ class EventsCollection extends AbstractCollection
 		if (array_key_exists(Event::FAVORED_FRIENDS_COUNT_FIELD_NAME, $fields) ||
 			array_key_exists(Event::IS_REGISTERED_FIELD_NAME, $fields) ||
 			array_key_exists(Event::TICKETS_FIELD_NAME, $fields) ||
+			array_key_exists(Event::ORDERS_FIELD_NAME, $fields) ||
+			array_key_exists(Event::TICKETS_COUNT_FIELD_NAME, $fields) ||
 			array_key_exists(Event::REGISTRATION_APPROVE_STATUS_FIELD_NAME, $fields)
 		) {
 			$statement_array[':user_id'] = $user->getId();
@@ -477,7 +482,7 @@ class EventsCollection extends AbstractCollection
 		}
 
 
-		$events = $db->prepareExecute($q_get_events, '', $statement_array)->fetchAll(PDO::FETCH_CLASS, 'Event');
+		$events = $db->prepareExecute($q_get_events, 'CANT_GET_EVENTS', $statement_array)->fetchAll(PDO::FETCH_CLASS, 'Event');
 		if (count($events) == 0 && $is_one_event) throw new LogicException('CANT_FIND_EVENT: ' . $filters['id']);
 		$result_events = array();
 		if ($is_one_event) return $events[0];

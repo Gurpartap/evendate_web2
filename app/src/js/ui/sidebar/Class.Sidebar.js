@@ -6,9 +6,15 @@
  * @extends AbstractSidebar
  */
 Sidebar = extending(AbstractSidebar, (function () {
+	/**
+	 *
+	 * @constructor
+	 * @construct Sidebar
+	 */
 	function Sidebar() {
 		AbstractSidebar.call(this);
 	}
+	
 	Sidebar.prototype.init = function () {
 		var self = this;
 		self.updateSubscriptions();

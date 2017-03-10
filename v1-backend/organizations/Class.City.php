@@ -10,6 +10,7 @@ class City extends AbstractEntity
 	protected $updated_at;
 
 	const COUNTRY_FIELD_NAME = 'country';
+	const ORGANIZATIONS_TYPES_FIELD_NAME = 'organizations_types';
 
 	protected static $DEFAULT_COLS = array(
 		'id',
@@ -39,6 +40,19 @@ class City extends AbstractEntity
 					$_fields,
 					array()
 				)->getParams($user, $_fields)->getData();
+		}
+
+		if (isset($fields[self::ORGANIZATIONS_TYPES_FIELD_NAME])) {
+			$_fields =
+				Fields::parseFields($fields[self::ORGANIZATIONS_TYPES_FIELD_NAME]['fields'] ?? '');
+			$result_data[self::ORGANIZATIONS_TYPES_FIELD_NAME] =
+				OrganizationTypesCollection::filter(
+					App::DB(),
+					$user,
+					array('city_id' => $this->id),
+					$_fields,
+					array()
+				)->getData();
 		}
 		return new Result(true, '', $result_data);
 	}

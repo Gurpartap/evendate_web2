@@ -746,7 +746,7 @@ socket.on('auth', function (data) {
                     } else if (data.subscriptions_count == 0) {
                         window.parent.location = '/onboarding';
                     } else {
-                        window.parent.location = '/feed';
+                        window.parent.location = '/';
                     }
                 }
             } else {
@@ -767,7 +767,7 @@ socket.on('utils.registrationSaved', function (data) {
     $('.with-register, .no-register').toggleClass('hidden');
     $('.faq-link').click();
     cookies.setItem('open_add_organization', 1, Infinity);
-    window.localStorage.setItem('organization_info', JSON.stringify(_data));
+    sessionStorage.setItem('organization_info', JSON.stringify(_data));
 });
 
 socket.on('error.retry', function () {

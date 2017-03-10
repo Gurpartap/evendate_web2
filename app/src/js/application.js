@@ -46,247 +46,278 @@
  * @returns {__C.DEFERRED_STATES}
  */
 
+
 /**
- * @const
- * @namespace __APP
- * @property {object} SERVER
- * @property {object} SERVER.AJAX_METHOD
- * @property {CollectionOfXHRs} SERVER.CURRENT_CONNECTIONS
- * @property {string} EVENDATE_BEGIN
- * @property {object} AUTH_URLS
- * @property {string} AUTH_URLS.vk
- * @property {string} AUTH_URLS.google
- * @property {string} AUTH_URLS.facebook
- * @property {AbstractTopBar} TOP_BAR
- * @property {AbstractSidebar} SIDEBAR
- * @property {CurrentUser} USER
- * @property {Page} PREVIOUS_PAGE
- * @property {Page} CURRENT_PAGE
- * @property {object} ROUTING
- * @property {object} MODALS
- * @property {number} MODALS.last_id
- * @property {Object<number, AbstractModal>} MODALS.collection
- * @property {AbstractModal} MODALS.active_modal
- * @property {jQuery} MODALS.modal_destroyer
- * @property {jQuery} MODALS.modal_wrapper
- * @property {object} BUILD
+ * @class ServerConnection
  */
-__APP = {
-	SERVER: {
-		/**
-		 * @enum {string}
-		 */
-		AJAX_METHOD: {
-			GET: 'GET',
-			POST: 'POST',
-			PUT: 'PUT',
-			DELETE: 'DELETE'
-		},
-		
-		CURRENT_CONNECTIONS: new CollectionOfXHRs(),
-		/**
-		 *
-		 * @param {__APP.SERVER.AJAX_METHOD} ajax_method
-		 * @param {string} ajax_url
-		 * @param {(AJAXData|string)} ajax_data
-		 * @param {string} [content_type='application/x-www-form-urlencoded; charset=UTF-8']
-		 * @param {AJAXCallback} [success]
-		 * @param {function} [error]
-		 * @returns {jqPromise}
-		 */
-		dealAjax: function(ajax_method, ajax_url, ajax_data, content_type, success, error) {
-			var self = this,
-				jqXHR;
-			if(ajax_data.fields instanceof Fields){
-				ajax_data.fields = ajax_data.fields.toString();
-			}
-			jqXHR = $.ajax({
-				url: ajax_url,
-				data: ajax_data,
-				method: ajax_method,
-				contentType: content_type || 'application/x-www-form-urlencoded; charset=UTF-8'
-			});
-			__APP.SERVER.CURRENT_CONNECTIONS.push(jqXHR);
-			return jqXHR.fail(error).then(function(response, status_text, jqXHR) {
-				__APP.SERVER.ajaxHandler(response, function(data, text) {
-					if (success && typeof success == 'function') {
-						success.call(self, data);
-					}
-				}, __APP.SERVER.ajaxErrorHandler);
-				return response.data;
-			}).promise();
-		},
-		/**
-		 * @param {...(jqXHR|Deferred|jqPromise)} Deferreds
-		 * @param {function(..(Array|object))} [cb]
-		 * @return {jqPromise}
-		 */
-		multipleAjax: function multipleAjax(){
-			var with_callback = (arguments[arguments.length - 1] instanceof Function),
-				promises = with_callback ? Array.prototype.splice.call(arguments, 0, arguments.length - 1) : Array.prototype.slice.call(arguments),
-				parallel_promise;
-			parallel_promise = $.when.apply($, promises);
-			if(with_callback) {
-				parallel_promise.done(Array.prototype.shift.call(arguments));
-			}
-			return parallel_promise.promise();
-		},
-		/**
-		 *
-		 * @param {string} ajax_url
-		 * @param {AJAXData} ajax_data
-		 * @param {AJAXCallback} [success]
-		 * @param {function} [error]
-		 * @returns {jqPromise}
-		 */
-		getData: function getData(ajax_url, ajax_data, success, error) {
-			var self = this;
-			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.GET, ajax_url, __APP.SERVER.validateData(ajax_data), 'application/json', function(data) {
-				if (ajax_data.length != undefined && ajax_data.offset != undefined) {
-					ajax_data.offset += ajax_data.length;
-				}
-				if (success && typeof success == 'function') {
-					success.call(self, data);
-				}
-			}, error);
-		},
-		/**
-		 *
-		 * @param {string} ajax_url
-		 * @param {AJAXData} ajax_data
-		 * @param {AJAXCallback} [success]
-		 * @param {function} [error]
-		 * @returns {jqPromise}
-		 */
-		updateData: function updateData(ajax_url, ajax_data, success, error) {
-			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.PUT, ajax_url, ajax_data, 'application/json', success, error);
-		},
-		/**
-		 *
-		 * @param {string} ajax_url
-		 * @param {AJAXData} ajax_data
-		 * @param {boolean} is_payload
-		 * @param {AJAXCallback} [success]
-		 * @param {function} [error]
-		 * @returns {jqPromise}
-		 */
-		addData: function addData(ajax_url, ajax_data, is_payload, success, error) {
-			if(is_payload){
-				return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.POST, ajax_url, ajax_data, 'application/json', success, error);
-			}
-			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.POST, ajax_url, ajax_data, 'application/x-www-form-urlencoded; charset=UTF-8', success, error);
-		},
-		/**
-		 *
-		 * @param {string} ajax_url
-		 * @param {AJAXData} ajax_data
-		 * @param {AJAXCallback} [success]
-		 * @param {function} [error]
-		 * @returns {jqPromise}
-		 */
-		deleteData: function deleteData(ajax_url, ajax_data, success, error) {
-			return __APP.SERVER.dealAjax(__APP.SERVER.AJAX_METHOD.DELETE, ajax_url, ajax_data, 'application/json', success, error);
-		},
-		/**
-		 *
-		 * @param {AJAXData} ajax_data
-		 * @returns {AJAXData}
-		 */
-		validateData: function validateData(ajax_data) {
-			if(ajax_data.fields){
-				if(Array.isArray(ajax_data.fields)){
-					if (ajax_data.order_by) {
-						ajax_data.order_by = ajax_data.order_by instanceof Array ? ajax_data.order_by : ajax_data.order_by.split(',');
-						ajax_data.fields = ajax_data.fields.merge(ajax_data.order_by.map(function(order_by) {
-							return order_by.trim().replace('-', '');
-						}));
-						ajax_data.order_by = ajax_data.order_by.join(',');
-					}
-					if (ajax_data.fields.length) {
-						ajax_data.fields = ajax_data.fields.join(',');
-					} else {
-						ajax_data.fields = undefined;
-					}
-				} else if(ajax_data.fields instanceof Fields){
-					if (ajax_data.order_by) {
-						ajax_data.order_by = ajax_data.order_by instanceof Array ? ajax_data.order_by : ajax_data.order_by.split(',');
-						ajax_data.order_by.forEach(function(field) {
-							ajax_data.fields[field.trim().replace('-', '')] = {};
-						});
-						ajax_data.order_by = ajax_data.order_by.join(',');
-					}
-					if (Object.keys(ajax_data.fields).length === 0) {
-						ajax_data.fields = undefined;
-					}
-					
-				}
-			}
-			return ajax_data;
-		},
-		
-		ajaxHandler: function ajaxHandler(result, success, error) {
-			error = typeof error !== 'undefined' ? error : function() {
+ServerConnection = (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs ServerConnection
+	 */
+	function ServerConnection() {
+		if (typeof ServerConnection.instance === 'object') {
+			return ServerConnection.instance;
+		}
+		this.current_connections = [];
+		ServerConnection.instance = this;
+	}
+	/**
+	 *
+	 * @enum {string}
+	 */
+	ServerConnection.HTTP_METHODS = {
+		GET: 'GET',
+		POST: 'POST',
+		PUT: 'PUT',
+		DELETE: 'DELETE'
+	};
+	Object.freeze(ServerConnection.HTTP_METHODS);
+	
+	function ajaxHandler(result, success, error) {
+		error = typeof error !== 'undefined' ? error : function() {
 				console.log(result);
 				showNotifier({text: 'Упс, что-то пошло не так', status: false});
 			};
-			success = typeof success !== 'function' ? function() {} : success;
-			try {
-				if (result.status) {
-					success(result.data, result.text);
-				} else {
-					error(result);
-				}
-			} catch (e) {
-				error(e);
-			}
-		},
-		
-		ajaxErrorHandler: function ajaxErrorHandler(event, jqxhr, settings, thrownError) {
-			var args = Array.prototype.slice.call(arguments),
-				debug = {},
-				fields;
-			if (args.length == 4) {
-				fields = ['event', 'jqxhr', 'settings', 'thrownError'];
-				args.forEach(function(arg, i) {
-					debug[fields[i]] = arg;
-				});
-			} else if (args.length == 1) {
-				debug = args[0];
+		success = typeof success !== 'function' ? function() {} : success;
+		try {
+			if (result.status) {
+				success(result.data, result.text);
 			} else {
-				args.forEach(function(arg, i) {
-					debug[i] = arg;
-				});
+				error(result);
 			}
-			console.groupCollapsed('AJAX error');
-			if (debug.thrownError)
-				console.log('Thrown error:', debug.thrownError);
-			if (debug.event && debug.event.type)
-				console.log('Error type:', debug.event.type);
-			if (debug.event && debug.event.text)
-				console.log('Description:', debug.event.text);
-			if (debug.jqxhr && debug.jqxhr.responseJSON && debug.jqxhr.responseJSON.text) {
-				console.log('Response:', debug.jqxhr.responseJSON.text);
-				showNotifier({text: debug.jqxhr.responseJSON.text, status: false});
-			}
-			if (debug.settings) {
-				console.log('URL:', debug.settings.url);
-				console.log('Method:', debug.settings.type);
-			}
-			if (debug.stack) {
-				console.log('Thrown error:', debug.name);
-				console.log('Description:', debug.message);
-				console.log('Error stacktrace:', debug.stack);
-			} else {
-				console.error('Error stacktrace:');
-			}
-			console.groupEnd();
-			
-			if (!window.errors_array)  window.errors_array = [];
-			window.errors_array.push(debug);
+		} catch (e) {
+			error(e);
 		}
-	},
+	}
+	
+	ServerConnection.ajaxErrorHandler = function(event, jqxhr, settings, thrownError) {
+		var args = Array.prototype.slice.call(arguments),
+			debug = {},
+			fields;
+		if (args.length == 4) {
+			fields = ['event', 'jqxhr', 'settings', 'thrownError'];
+			args.forEach(function(arg, i) {
+				debug[fields[i]] = arg;
+			});
+		} else if (args.length == 1) {
+			debug = args[0];
+		} else {
+			args.forEach(function(arg, i) {
+				debug[i] = arg;
+			});
+		}
+		console.groupCollapsed('AJAX error');
+		if (debug.thrownError)
+			console.log('Thrown error:', debug.thrownError);
+		if (debug.event && debug.event.type)
+			console.log('Error type:', debug.event.type);
+		if (debug.event && debug.event.text)
+			console.log('Description:', debug.event.text);
+		if (debug.jqxhr && debug.jqxhr.responseJSON && debug.jqxhr.responseJSON.text) {
+			console.log('Response:', debug.jqxhr.responseJSON.text);
+			showNotifier({text: debug.jqxhr.responseJSON.text, status: false});
+		}
+		if (debug.settings) {
+			console.log('URL:', debug.settings.url);
+			console.log('Method:', debug.settings.type);
+		}
+		if (debug.stack) {
+			console.log('Thrown error:', debug.name);
+			console.log('Description:', debug.message);
+			console.log('Error stacktrace:', debug.stack);
+		} else {
+			console.error('Error stacktrace:');
+		}
+		console.groupEnd();
+		
+		if (!window.errors_array)  window.errors_array = [];
+		window.errors_array.push(debug);
+	};
+	
+	/**
+	 *
+	 * @param {ServerConnection.HTTP_METHODS} http_method
+	 * @param {string} url
+	 * @param {(AJAXData|string)} [ajax_data]
+	 * @param {string} [content_type='application/x-www-form-urlencoded; charset=UTF-8']
+	 * @param {AJAXCallback} [success]
+	 * @param {function} [error]
+	 * @returns {jqPromise}
+	 */
+	ServerConnection.prototype.dealAjax = function(http_method, url, ajax_data, content_type, success, error) {
+		ajax_data = ajax_data || {};
+		var jqXHR;
+		if (ajax_data.fields instanceof Fields){
+			ajax_data.fields = ajax_data.fields.toString();
+		}
+		jqXHR = $.ajax({
+			url: url,
+			data: ajax_data,
+			method: http_method,
+			contentType: content_type || 'application/x-www-form-urlencoded; charset=UTF-8'
+		});
+		this.current_connections.push(jqXHR);
+		return jqXHR.fail(error).then(function(response, status_text, jqXHR) {
+			ajaxHandler(response, function(data, text) {
+				if (success && typeof success == 'function') {
+					success(data);
+				}
+			}, ServerConnection.ajaxErrorHandler);
+			return response.data;
+		}).promise();
+	};
+	
+	/**
+	 * @param {...(jqXHR|Deferred|jqPromise)} Deferreds
+	 * @param {function(..(Array|object))} [cb]
+	 * @return {jqPromise}
+	 */
+	ServerConnection.prototype.multipleAjax = function(){
+		var with_callback = (arguments[arguments.length - 1] instanceof Function),
+			promises = with_callback ? Array.prototype.splice.call(arguments, 0, arguments.length - 1) : Array.prototype.slice.call(arguments),
+			parallel_promise;
+		parallel_promise = $.when.apply($, promises);
+		if(with_callback) {
+			parallel_promise.done(Array.prototype.shift.call(arguments));
+		}
+		return parallel_promise.promise();
+	};
+	
+	/**
+	 *
+	 * @param {string} url
+	 * @param {AJAXData} ajax_data
+	 * @param {AJAXCallback} [success]
+	 * @param {function} [error]
+	 * @returns {jqPromise}
+	 */
+	ServerConnection.prototype.getData = function(url, ajax_data, success, error) {
+		return this.dealAjax(ServerConnection.HTTP_METHODS.GET, url, this.validateData(ajax_data), 'application/json', function(data) {
+			if (ajax_data.length != undefined && ajax_data.offset != undefined) {
+				ajax_data.offset += ajax_data.length;
+			}
+			if (success && typeof success == 'function') {
+				success(data);
+			}
+		}, error);
+	};
+	/**
+	 *
+	 * @param {string} url
+	 * @param {AJAXData} ajax_data
+	 * @param {boolean} [is_payload]
+	 * @param {AJAXCallback} [success]
+	 * @param {function} [error]
+	 * @returns {jqPromise}
+	 */
+	ServerConnection.prototype.updateData = function(url, ajax_data, is_payload, success, error) {
+		if(is_payload){
+			return this.dealAjax(ServerConnection.HTTP_METHODS.PUT, url, JSON.stringify(ajax_data), 'application/json', success, error);
+		}
+		return this.dealAjax(ServerConnection.HTTP_METHODS.PUT, url, ajax_data, 'application/x-www-form-urlencoded; charset=UTF-8', success, error);
+	};
+	/**
+	 *
+	 * @param {string} url
+	 * @param {AJAXData} ajax_data
+	 * @param {boolean} [is_payload]
+	 * @param {AJAXCallback} [success]
+	 * @param {function} [error]
+	 * @returns {jqPromise}
+	 */
+	ServerConnection.prototype.addData = function(url, ajax_data, is_payload, success, error) {
+		if(is_payload){
+			return this.dealAjax(ServerConnection.HTTP_METHODS.POST, url, JSON.stringify(ajax_data), 'application/json', success, error);
+		}
+		return this.dealAjax(ServerConnection.HTTP_METHODS.POST, url, ajax_data, 'application/x-www-form-urlencoded; charset=UTF-8', success, error);
+	};
+	/**
+	 *
+	 * @param {string} url
+	 * @param {AJAXData} ajax_data
+	 * @param {AJAXCallback} [success]
+	 * @param {function} [error]
+	 * @returns {jqPromise}
+	 */
+	ServerConnection.prototype.deleteData = function(url, ajax_data, success, error) {
+		return this.dealAjax(ServerConnection.HTTP_METHODS.DELETE, url, ajax_data, 'application/json', success, error);
+	};
+	/**
+	 *
+	 * @param {AJAXData} ajax_data
+	 * @returns {AJAXData}
+	 */
+	ServerConnection.prototype.validateData = function(ajax_data) {
+		ajax_data = ajax_data || {};
+		if(ajax_data.fields){
+			if(Array.isArray(ajax_data.fields)){
+				if (ajax_data.order_by) {
+					ajax_data.order_by = ajax_data.order_by instanceof Array ? ajax_data.order_by : ajax_data.order_by.split(',');
+					ajax_data.fields = ajax_data.fields.merge(ajax_data.order_by.map(function(order_by) {
+						return order_by.trim().replace('-', '');
+					}));
+					ajax_data.order_by = ajax_data.order_by.join(',');
+				}
+				if (ajax_data.fields.length) {
+					ajax_data.fields = ajax_data.fields.join(',');
+				} else {
+					ajax_data.fields = undefined;
+				}
+			} else if(ajax_data.fields instanceof Fields){
+				if (ajax_data.order_by) {
+					ajax_data.order_by = ajax_data.order_by instanceof Array ? ajax_data.order_by : ajax_data.order_by.split(',');
+					ajax_data.order_by.forEach(function(field) {
+						ajax_data.fields[field.trim().replace('-', '')] = {};
+					});
+					ajax_data.order_by = ajax_data.order_by.join(',');
+				}
+				if (Object.keys(ajax_data.fields).length === 0) {
+					ajax_data.fields = undefined;
+				}
+				
+			}
+		}
+		return ajax_data;
+	};
+	
+	ServerConnection.prototype.abortAllConnections = function() {
+		var cur;
+		while (this.current_connections.length) {
+			cur = this.current_connections.pop();
+			if(cur.state() === 'pending'){
+				//cur.abort();
+			}
+		}
+	};
+	
+	
+	return ServerConnection;
+}());
+
+
+__APP = {
+	/**
+	 * @type {ServerConnection}
+	 */
+	SERVER: new ServerConnection(),
 	EVENDATE_BEGIN: '15-12-2015',
 	AUTH_URLS: {},
+	/**
+	 * @property {string} ip
+	 * @property {string} country_code
+	 * @property {string} country_name
+	 * @property {string} region_code
+	 * @property {string} region_name
+	 * @property {string} city
+	 * @property {string} zip_code
+	 * @property {string} time_zone
+	 * @property {number} latitude
+	 * @property {number} longitude
+	 * @property {number} metro_code
+	 */
+	LOCATION: {},
 	TOP_BAR: new AbstractTopBar(),
 	SIDEBAR: new AbstractSidebar(),
 	USER: new CurrentUser(),
@@ -328,9 +359,16 @@ __APP = {
 			'day': {
 				'^([0-9]{4}-[0-9]{2}-[0-9]{2})': DayEventsPage //Very shitty way to detect date
 			},
-			'': FeedPage
+			'': ActualEventsPage
 		},
 		'organizations': {
+			'at': {
+				'^([0-9]+)': CatalogPage,
+				'^([^/]+)': {
+					'^([0-9]+)': CatalogPage,
+					'': CatalogPage
+				}
+			},
 			'^([0-9]+)': CatalogPage,
 			'': CatalogPage
 		},
@@ -346,15 +384,15 @@ __APP = {
 		'search': {
 			'^([^/]+)': SearchPage
 		},
-		'friends': FriendsPage,
+		'friends': MyProfilePage,
 		'friend': {
-			'^([0-9]+)': OneFriendPage,
-			'': FriendsPage
+			'^([0-9]+)': UserPage,
+			'': MyProfilePage
 		},
 		'user': {
 			'me': MyProfilePage,
 			'^([0-9]+)': UserPage,
-			'': FriendsPage
+			'': MyProfilePage
 		},
 		'statistics': {
 			'organization': {
@@ -368,156 +406,22 @@ __APP = {
 				'^([0-9]+)': StatisticsEventOverviewPage
 			},
 			'': StatisticsOverviewPage
-		}
-	},
-	MODALS: {
-		last_id: 0,
-		collection: {},
-		active_modal: undefined,
-		modal_destroyer: $.extend({
-			adjustHeight: function(height) {
-				var html_height = $(window).height(),
-					modal_height = height;
-				this.height((modal_height > html_height) ? modal_height : html_height);
-			}
-		}, $('.modal_destroyer')),
-		modal_wrapper: $('.modal_wrapper'),
-		/**
-		 *
-		 * @param {AbstractModal} modal
-		 */
-		pushModal: function(modal) {
-			modal.id = ++__APP.MODALS.last_id;
-			__APP.MODALS.collection[modal.id] = modal;
-			var keys = Object.keys(__APP.MODALS.collection);
-			if (keys.length > 5) {
-				__APP.MODALS.collection[keys[0]].destroy();
-			}
 		},
-		hideCurrent: function() {
-			if (__APP.MODALS.active_modal !== undefined) {
-				__APP.MODALS.active_modal.__hide();
-				$('body').removeClass('-open_modal');
-			}
-		},
-		bindCallModal: function($parent) {
-			$parent = $parent ? $parent : $('body');
-			$parent.find('.CallModal').not('.-Handled_CallModal').each(function() {
-				var $this = $(this),
-					title = $this.data('modal_title'),
-					modal,
-					modal_id,
-					modal_type = $this.data('modal_type');
-				
-				$this.on('click.CallModal', function() {
-					modal_id = $this.data('modal_id');
-					if (__APP.MODALS.collection.hasOwnProperty(modal_id)) {
-						__APP.MODALS.collection[modal_id].show();
-					} else {
-						switch (modal_type) {
-							case 'favors': {
-								modal = new FavoredModal($this.data('modal_event_id'), title);
-								break;
-							}
-							case 'subscribers': {
-								modal = new SubscribersModal($this.data('modal_organization_id'), title);
-								break;
-							}
-							case 'editors': {
-								modal = new EditorsModal($this.data('modal_organization_id'), title, $this.data('modal_specific_role'));
-								break;
-							}
-							case 'map': {
-								modal = new MapModal($this.data('modal_map_location'), title);
-								break;
-							}
-							case 'media': {
-								var type = $this.data('modal_media_type'),
-									url = $this.data('modal_media_url');
-								if (!url) {
-									if ($this.is('img')) {
-										url = $this.attr('src');
-										type = 'image';
-									} else if ($this.is('video')) {
-										//url = $this.attr('url');
-										type = 'video';
-									} else {
-										var str = $this.css('background-image');
-										if (str !== 'none') {
-											if (str.indexOf('"') != -1) {
-												url = str.slice(str.indexOf('"') + 1, str.indexOf('"', str.indexOf('"') + 1));
-											} else {
-												url = str.slice(str.indexOf('(') + 1, str.indexOf(')'));
-											}
-											type = 'image';
-										}
-									}
-								}
-								modal = new MediaModal(url, type);
-								break;
-							}
-							case 'cropper': {
-								modal = new CropperModal($this.data('source_img'), {
-									'aspectRatio': eval($this.data('aspect_ratio'))
-								});
-								
-								modal.modal.one('modal.close', function() {
-									
-									$this.removeClass('-hidden').off('click.CallModal').on('click.CallModal', function() {
-										modal_id = $this.data('modal_id');
-										if (__APP.MODALS.collection.hasOwnProperty(modal_id)) {
-											if (__APP.MODALS.collection[modal_id].image_src == $this.data('source_img')) {
-												__APP.MODALS.collection[modal_id].show();
-											} else {
-												__APP.MODALS.collection[modal_id].destroy();
-												modal = new CropperModal($this.data('source_img'), {
-													'aspectRatio': eval($this.data('aspect_ratio'))
-												});
-												$this.data('modal_id', modal.id);
-												modal.initer = $this;
-												modal.show();
-											}
-										} else {
-											modal = new CropperModal($this.data('source_img'), {
-												'data': $this.data('crop_data'),
-												'aspectRatio': eval($this.data('aspect_ratio'))
-											});
-											$this.data('modal_id', modal.id);
-											modal.initer = $this;
-											modal.show();
-										}
-									});
-									
-								});
-								break;
-							}
-							case 'friends_list': {
-								modal = new FriendsListModal($this.data('modal_entity'));
-								break;
-							}
-							case 'subscribers_list': {
-								modal = new SubscriptionsListModal($this.data('modal_entity'));
-								break;
-							}
-							default: {
-								modal = new StdModal(title, $this.data('modal_content'));
-								break;
-							}
-						}
-						$this.data('modal_id', modal.id);
-						modal.initer = $this;
-						modal.show();
-					}
-				});
-			}).addClass('-Handled_CallModal');
-		}
+		'': ActualEventsPage
 	},
+	MODALS: new Modals(),
 	BUILD: {
 		/**
+		 * @typedef {(Array<string>|Object<string, *>)} HTMLDataset
+		 */
+		/**
+		 * @typedef {(Array<string>|Object<string, (string|number)>)} HTMLAttributes
+		 */
+		/**
 		 * @typedef {object} buildProps
-		 * @property {(Array<string>|string)} classes
-		 * @property {(Array<string>|object)} dataset
-		 * @property {(Array<string>|object)} attributes
+		 * @property {(Array<string>|string)} [classes]
+		 * @property {HTMLDataset} [dataset]
+		 * @property {HTMLAttributes} [attributes]
 		 */
 		/**
 		 *
@@ -548,7 +452,7 @@ __APP = {
 		},
 		/**
 		 *
-		 * @param {..buildProps} props
+		 * @param {...buildProps} props
 		 * @returns {jQuery}
 		 */
 		button: function buildButton(/**props*/) {
@@ -558,6 +462,44 @@ __APP = {
 			})).each(function(i, button) {
 				if(props[i].dataset) {
 					$(button).data(props[i].dataset);
+				}
+			});
+		},
+		/**
+		 *
+		 * @param {HTMLAttributes} [attributes]
+		 * @param {(Array<string>|string)} [classes]
+		 * @param {HTMLDataset} [dataset]
+		 * @returns {jQuery}
+		 */
+		input: function buildInput(attributes, classes, dataset) {
+			return tmpl('input', __APP.BUILD.normalizeBuildProps({
+				classes: classes,
+				attributes: attributes,
+				dataset: dataset
+			})).each(function(i, input) {
+				if(dataset) {
+					$(input).data(dataset);
+				}
+			});
+		},
+		/**
+		 *
+		 * @param {HTMLAttributes} [attributes]
+		 * @param {(Array<string>|string)} [classes]
+		 * @param {string} [value]
+		 * @param {HTMLDataset} [dataset]
+		 * @returns {jQuery}
+		 */
+		textarea: function buildTextarea(attributes, classes, value, dataset) {
+			return tmpl('textarea', __APP.BUILD.normalizeBuildProps({
+				value: value,
+				classes: classes,
+				attributes: attributes,
+				dataset: dataset
+			})).each(function(i, input) {
+				if(dataset) {
+					$(input).data(dataset);
 				}
 			});
 		},
@@ -593,19 +535,105 @@ __APP = {
 		},
 		/**
 		 *
-		 * @param {buildProps} props
+		 * @param {...buildProps} props
 		 * @returns {jQuery}
 		 */
 		radio: function buildRadio(props) {
-			return __APP.BUILD.radioCheckbox('radio', props);
+			return $.makeSet([].map.call(arguments, function(arg) {
+				return __APP.BUILD.radioCheckbox('radio', arg)
+			}));
 		},
 		/**
 		 *
-		 * @param {buildProps} props
+		 * @param {...buildProps} props
 		 * @returns {jQuery}
 		 */
 		checkbox: function buildCheckbox(props) {
-			return __APP.BUILD.radioCheckbox('checkbox', props);
+			return $.makeSet([].map.call(arguments, function(arg) {
+				return __APP.BUILD.radioCheckbox('checkbox', arg)
+			}));
+		},
+		/**
+		 *
+		 * @param {(string|Element|jQuery)} text
+		 * @param {HTMLDataset} [dataset]
+		 * @param {HTMLAttributes} [attributes]
+		 * @returns {jQuery}
+		 */
+		formHelpText: function buildFormHelpText(text, dataset, attributes) {
+			return tmpl('form-helptext', __APP.BUILD.normalizeBuildProps({
+				text: text,
+				dataset: dataset,
+				attributes: attributes
+			}));
+		},
+		/**
+		 *
+		 * @param {...buildProps} props
+		 * @param {(string|number)} props.id
+		 * @param {(jQuery|string)} props.label
+		 * @param {string} [props.type=text]
+		 * @param {string} [props.name]
+		 * @param {string} [props.value]
+		 * @param {number} [props.tabindex]
+		 * @param {boolean} [props.required]
+		 * @param {string} [props.placeholder]
+		 *
+		 * @param {(string|jQuery)} [props.helptext]
+		 * @param {HTMLDataset} [props.helptext_dataset]
+		 * @param {HTMLAttributes} [props.helptext_attributes]
+		 * @param {(Array<string>|string)} [props.unit_classes]
+		 * @param {(Array<string>|string)} [props.label_classes]
+		 * @returns {jQuery}
+		 */
+		formInput: function buildFormInput(props) {
+			var INPUT_TYPES = [
+				'hidden',
+				'text',
+				'search',
+				'tel',
+				'url',
+				'email',
+				'password',
+				'date',
+				'time',
+				'number',
+				'range',
+				'color',
+				'checkbox',
+				'radio',
+				'file',
+				'submit',
+				'image',
+				'reset',
+				'button'
+			];
+			return $.makeSet(Array.prototype.map.call(arguments, function(props) {
+				switch (props.type) {
+					case 'radio': return __APP.BUILD.radio(props);
+					case 'checkbox': return __APP.BUILD.checkbox(props);
+					default: return tmpl('form-unit', __APP.BUILD.normalizeBuildProps($.extend(true, {}, props, {
+						form_element: props.type === 'textarea' ?
+							__APP.BUILD.textarea($.extend({}, props.attributes, {
+								id: props.id,
+								name: props.name || undefined,
+								required: props.required || undefined,
+								placeholder: props.placeholder,
+								tabindex: props.tabindex
+							}), (props.classes ? ['form_textarea'].concat(props.classes) : ['form_textarea']), props.value, props.dataset) :
+							__APP.BUILD.input($.extend({}, props.attributes, {
+								id: props.id,
+								type: !props.type || INPUT_TYPES.indexOf(props.type) === -1 ? 'text' : props.type,
+								name: props.name || undefined,
+								value: props.value || undefined,
+								required: props.required || undefined,
+								placeholder: props.placeholder,
+								tabindex: props.tabindex
+							}), (props.classes ? ['form_input'].concat(props.classes) : ['form_input']), props.dataset),
+						helptext: __APP.BUILD.formHelpText(props.helptext, props.helptext_dataset, props.helptext_attributes)
+					}), ['unit_classes', 'label_classes']));
+				}
+			}));
 		},
 		/**
 		 *
@@ -734,13 +762,15 @@ __APP = {
 			
 			return tmpl('avatar-block', (entities instanceof Array ? entities : [entities]).map(function(entity) {
 				var name, href;
-				if((props.entity && props.entity === 'organization') || !entity.first_name){
-					name = entity.short_name ? entity.short_name : entity.name;
-					href = '/organization/' + entity.id;
-				} else {
+				
+				if((props.entity && props.entity === __C.ENTITIES.USER) || entity instanceof OneUser || entity.first_name){
 					name = entity.full_name ? entity.full_name : (entity.first_name + ' ' + entity.last_name);
 					href = '/user/' + entity.id;
+				} else {
+					name = entity.short_name ? entity.short_name : entity.name;
+					href = '/organization/' + entity.id;
 				}
+				
 				return $.extend(true, {
 					avatar: __APP.BUILD.avatars(entity, {
 						classes: props.avatar_classes
@@ -890,7 +920,7 @@ __APP = {
 		organizationItems: function buildOrganizationItems(organizations, additional_fields) {
 			organizations = organizations instanceof Array ? organizations : [organizations];
 			var orgs = organizations.map(function(org) {
-				org.counter_classes = org.new_events_count ? [] : [__C.CLASSES.NEW_HIDDEN];
+				org.counter_classes = org.new_events_count ? [] : [__C.CLASSES.HIDDEN];
 				return org;
 			});
 			return tmpl('organization-item', orgs.map(function(organization) {
@@ -910,27 +940,42 @@ __APP = {
 		organizationCard: function buildOrganisationCard(organizations) {
 			return tmpl('organization-card', organizations.map(function(org) {
 				return $.extend(true, {}, org, {
-					background_image: org.background_small_img_url || org.background_img_url ? __APP.BUILD.link({
+					background_image: (org.background_small_img_url || org.background_img_url) ? __APP.BUILD.link({
 						page: '/organization/'+org.id,
 						classes: ['organization_unit_background'],
 						attributes: {
-							style: 'background-image: url(\''+(org.background_small_img_url || org.background_img_url)+'\')'
+							style: 'background-image: url('+(org.background_small_img_url || org.background_img_url)+')'
 						}
 					}) : '',
 					avatar: __APP.BUILD.avatars(org, {
-						classes: ['organization_unit_avatar','-size_55x55','-bordered','-rounded','-shadowed']
+						classes: [
+							'organization_unit_avatar',
+							__C.CLASSES.SIZES.X55,
+							__C.CLASSES.UNIVERSAL_STATES.BORDERED,
+							__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+							__C.CLASSES.UNIVERSAL_STATES.SHADOWED
+						]
 					}),
 					subscribe_button: new SubscribeButton(org.id, {
-						is_subscribed: org.is_subscribed,
+						is_checked: org.is_subscribed,
 						colors: {
-							subscribe: '-color_marginal_accent'
+							unchecked: __C.CLASSES.COLORS.MARGINAL_ACCENT,
+							unchecked_hover: __C.CLASSES.COLORS.MARGINAL_ACCENT
 						},
-						icons: null,
-						classes: ['-size_low', 'RippleEffect']
+						has_icons: false,
+						classes: [__C.CLASSES.SIZES.LOW, __C.CLASSES.HOOKS.RIPPLE]
 					}),
 					subscribed_text: org.subscribed_count + getUnitsText(org.subscribed_count, __LOCALES.ru_RU.TEXTS.SUBSCRIBERS),
 					redact_org_button: (org.role === OneUser.ROLE.UNAUTH || org.role === OneUser.ROLE.USER) ? '' : __APP.BUILD.link({
-						classes: ['button', '-size_low', '-color_marginal_primary', 'fa_icon', 'fa-pencil', '-empty', 'RippleEffect'],
+						classes: [
+							'button',
+							__C.CLASSES.SIZES.LOW,
+							__C.CLASSES.COLORS.MARGINAL_PRIMARY,
+							__C.CLASSES.ICON_CLASS,
+							__C.CLASSES.ICONS.PENCIL,
+							__C.CLASSES.UNIVERSAL_STATES.EMPTY,
+							__C.CLASSES.HOOKS.RIPPLE
+						],
 						page: 'organization/' + org.id + '/edit'
 					})
 				});
@@ -947,31 +992,77 @@ __APP = {
 				var sort_date_type = type.sort_date_type ? type.sort_date_type : 'nearest_event_date',
 					m_event_date = moment.unix(event[sort_date_type] ? event[sort_date_type] : event['first_event_date']),
 					different_day = type.last_date != m_event_date.format(__C.DATE_FORMAT),
-					avatars_collection_classes = ['-rounded','-bordered','-size_small','AvatarsCollection','CallModal'];
+					avatars_collection_classes = [
+						__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+						__C.CLASSES.UNIVERSAL_STATES.BORDERED,
+						__C.CLASSES.SIZES.SMALL,
+						__C.CLASSES.HOOKS.ADD_AVATAR.COLLECTION,
+						__C.CLASSES.HOOKS.CALL_MODAL
+					],
+					$action_buttons = $();
 				
 				if(event.is_favorite) {
-					avatars_collection_classes.push('-shifted');
+					avatars_collection_classes.push(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
+				}
+				
+				if (event.is_favorite != null) {
+					if (event.registration_locally || event.ticketing_locally) {
+						$action_buttons = $action_buttons.add(new AddToFavoriteButton(event.id, {
+							is_add_avatar: true,
+							is_checked: event.is_favorite,
+							classes: [
+								__C.CLASSES.UNIVERSAL_STATES.EMPTY,
+								__C.CLASSES.SIZES.LOW,
+								__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+								__C.CLASSES.HOOKS.ADD_TO_FAVORITES,
+								__C.CLASSES.HOOKS.RIPPLE
+							],
+							labels: null
+						}));
+						
+						if (event.ticketing_locally) {
+							
+						} else {
+							$action_buttons = $action_buttons.add(new RegisterButton(event, {
+								classes: [
+									'event_block_main_action_button',
+									__C.CLASSES.SIZES.LOW,
+									__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+									__C.CLASSES.HOOKS.ADD_TO_FAVORITES,
+									__C.CLASSES.HOOKS.RIPPLE
+								]
+							}));
+						}
+					} else {
+						$action_buttons = new AddToFavoriteButton(event.id, {
+							is_add_avatar: true,
+							is_checked: event.is_favorite,
+							classes: [
+								'event_block_main_action_button',
+								__C.CLASSES.SIZES.LOW,
+								__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+								__C.CLASSES.HOOKS.ADD_TO_FAVORITES,
+								__C.CLASSES.HOOKS.RIPPLE
+							]
+						});
+					}
 				}
 				
 				type.last_date = m_event_date.format(__C.DATE_FORMAT);
+				
 				return $.extend({}, event, {
 					divider: different_day ? tmpl('divider', {
 						title: m_event_date.calendar().capitalize()
 					}) : '',
-					add_to_favorite_button: new AddToFavoriteButton(event.id, {
-						is_add_avatar: true,
-						is_subscribed: event.is_favorite,
-						classes: ['-size_low', '-size_wide', '-rounded', 'AddToFavorites', 'RippleEffect']
-					}),
+					action_buttons: $action_buttons,
 					date: m_event_date.format(__C.DATE_FORMAT),
 					avatars_collection: __APP.BUILD.avatarCollection(event.favored, 4, {
 						dataset: {
 							modal_type: 'favors',
-							modal_event_id: event.id,
-							modal_title: 'Добавили в избранное'
+							modal_event_id: event.id
 						},
 						classes: avatars_collection_classes,
-						counter_classes: ['-size_30x30','-bordered','-color_marginal','-castable']
+						counter_classes: [__C.CLASSES.SIZES.X30, __C.CLASSES.UNIVERSAL_STATES.BORDERED, __C.CLASSES.COLORS.MARGINAL, __C.CLASSES.HOOKS.ADD_AVATAR.STATES.CASTABLE]
 					}, event.favored_users_count),
 					time: event.dates.reduce(function(times, date) {
 						if (moment.unix(date.event_date).format(__C.DATE_FORMAT) == m_event_date.format(__C.DATE_FORMAT)) {
@@ -1000,13 +1091,13 @@ __APP = {
 						new_events_count = cat.organizations.reduce(function(sum, org) {
 							return sum + org.new_events_count;
 						}, 0);
-						aside_classes = new_events_count ? ['counter'] : ['counter', __C.CLASSES.NEW_HIDDEN];
+						aside_classes = new_events_count ? ['counter'] : ['counter', __C.CLASSES.HIDDEN];
 					} else {
 						aside_classes = ['fa_icon', 'fa-angle-down', '-empty'];
 					}
 				} else {
 					new_events_count = '';
-					aside_classes = [__C.CLASSES.NEW_HIDDEN];
+					aside_classes = [__C.CLASSES.HIDDEN];
 				}
 				return {
 					category_id: cat.id,
@@ -1032,8 +1123,13 @@ __APP = {
 					divider: append_divider ? tmpl('subscriber-divider', {label: subscriber.is_friend ? 'Друзья' : 'Все подписчики'}) : '',
 					avatar_block: __APP.BUILD.avatarBlocks(subscriber, {
 						is_link: true,
-						entity: 'user',
-						avatar_classes: ['-size_40x40', '-rounded', '-bordered', '-shadowed'],
+						entity: __C.ENTITIES.USER,
+						avatar_classes: [
+							__C.CLASSES.SIZES.X40,
+							__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+							__C.CLASSES.UNIVERSAL_STATES.BORDERED,
+							__C.CLASSES.UNIVERSAL_STATES.SHADOWED
+						],
 						block_classes: ['subscriber']
 					})
 				};
@@ -1047,23 +1143,94 @@ __APP = {
 		eventCards: function buildEventCards(events) {
 			var $events;
 			events = events instanceof Array ? events : [events];
+			
 			$events = tmpl('feed-event', events.map(function(event) {
-				var avatars_collection_classes = ['-rounded','-bordered','-size_small','AvatarsCollection','CallModal'],
+				var avatars_collection_classes = [
+						__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+						__C.CLASSES.UNIVERSAL_STATES.BORDERED,
+						__C.CLASSES.SIZES.SMALL,
+						__C.CLASSES.HOOKS.ADD_AVATAR.COLLECTION,
+						__C.CLASSES.HOOKS.CALL_MODAL
+					],
 					feed_event_infos = [],
-					organization = new OneOrganization(event.organization_id);
+					organization = new OneOrganization(event.organization_id),
+					$action_button,
+					$header_buttons = $();
+				
 				organization.setData({
 					short_name: event.organization_short_name,
 					img_url: event.organization_logo_small_url
 				});
 				
+				
+				if (event.registration_locally || event.ticketing_locally) {
+					$header_buttons = new AddToFavoriteButton(event.id, {
+						is_add_avatar: true,
+						is_checked: event.is_favorite,
+						classes: [
+							'feed_event_header_button',
+							__C.CLASSES.SIZES.LOW,
+							__C.CLASSES.UNIVERSAL_STATES.EMPTY
+						],
+						labels: null,
+						icons: {
+							checked_hover: __C.CLASSES.ICONS.STAR
+						},
+						colors: {
+							checked: __C.CLASSES.TEXT_COLORS.ACCENT,
+							unchecked: '',
+							checked_hover: __C.CLASSES.TEXT_COLORS.ACCENT,
+							unchecked_hover: ''
+						}
+					});
+					
+					if (event.ticketing_locally) {
+						
+					} else {
+						$action_button = new RegisterButton(event, {
+							classes: [
+								__C.CLASSES.SIZES.LOW,
+								__C.CLASSES.SIZES.WIDE,
+								__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+								__C.CLASSES.HOOKS.RIPPLE
+							]
+						});
+					}
+				} else {
+					$action_button = new AddToFavoriteButton(event.id, {
+						is_add_avatar: true,
+						is_checked: event.is_favorite,
+						classes: [
+							__C.CLASSES.SIZES.LOW,
+							__C.CLASSES.SIZES.WIDE,
+							__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+							__C.CLASSES.HOOKS.RIPPLE
+						]
+					})
+				}
+				
+				$header_buttons = $header_buttons.add(__APP.BUILD.button({
+					classes: [
+						'feed_event_header_button',
+						__C.CLASSES.SIZES.LOW,
+						__C.CLASSES.ICON_CLASS,
+						__C.CLASSES.ICONS.TIMES,
+						__C.CLASSES.UNIVERSAL_STATES.EMPTY,
+						'HideEvent'
+					],
+					dataset: {
+						'event-id': event.id
+					}
+				}));
+				
 				if (event.is_favorite) {
-					avatars_collection_classes.push('-shifted');
+					avatars_collection_classes.push(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
 				}
 				feed_event_infos.push({
 					text: displayDateRange(event.dates[0].event_date, event.dates[event.dates.length - 1].event_date)
 					+ (event.is_same_time ? ', ' + displayTimeRange(event.dates[0].start_time, event.dates[0].end_time) : '')
 				});
-				if (event.registration_required) {
+				if (event.registration_required && event.registration_till) {
 					feed_event_infos.push({text: 'Регистрация до ' + moment.unix(event.registration_till).calendar().capitalize()});
 				}
 				if (event.is_free) {
@@ -1074,25 +1241,26 @@ __APP = {
 				
 				return $.extend(true, {
 					organization_avatar_block: __APP.BUILD.avatarBlocks(organization, {
-						block_classes: ['-size_small'],
+						block_classes: [__C.CLASSES.SIZES.SMALL],
 						is_link: true,
 						entity: 'organization'
 					}),
-					add_to_favorite_button: new AddToFavoriteButton(event.id, {
-						is_add_avatar: true,
-						is_subscribed: event.is_favorite,
-						classes: ['-size_low', '-size_wide', '-rounded', 'RippleEffect']
-					}),
+					action_button: $action_button,
 					avatars_collection: __APP.BUILD.avatarCollection(event.favored, 4, {
 						dataset: {
 							modal_type: 'favors',
-							modal_event_id: event.id,
-							modal_title: 'Добавили в избранное'
+							modal_event_id: event.id
 						},
 						classes: avatars_collection_classes,
-						counter_classes: ['-size_30x30','-bordered','-color_marginal_primary','-castable']
+						counter_classes: [
+							__C.CLASSES.SIZES.X30,
+							__C.CLASSES.UNIVERSAL_STATES.BORDERED,
+							__C.CLASSES.COLORS.MARGINAL_PRIMARY,
+							__C.CLASSES.HOOKS.ADD_AVATAR.STATES.CASTABLE
+						]
 					}, event.favored_users_count),
-					feed_event_infos: tmpl('feed-event-info', feed_event_infos)
+					feed_event_infos: tmpl('feed-event-info', feed_event_infos),
+					header_buttons: $header_buttons
 				}, event);
 			}));
 			
@@ -1102,7 +1270,7 @@ __APP = {
 				}, {accY: 100})
 			});
 			
-			if(__APP.USER.id === -1){
+			if(__APP.USER.isLoggedOut()){
 				$events.find('.HideEvent').remove();
 			}
 			
@@ -1127,41 +1295,43 @@ __APP = {
 		 * @return {jQuery}
 		 */
 		modal: function(props) {
-			var $modal, vars;
-			props = __APP.BUILD.normalizeBuildProps(props, ['content_classes']);
-			vars = {
-				modal_type: props.type,
-				modal_content: props.content,
-				modal_classes: props.classes,
-				modal_content_classes: props.content_classes
-			};
-			if(props.header){
-				vars.modal_header = props.header;
-			} else if(props.title) {
+			var $modal,
+				normalized_props = __APP.BUILD.normalizeBuildProps(props, ['content_classes']),
+				vars = {
+					modal_header: '',
+					modal_type: normalized_props.type,
+					modal_content: normalized_props.content,
+					modal_classes: normalized_props.classes,
+					modal_content_classes: normalized_props.content_classes,
+					modal_footer: ''
+				};
+			
+			if(normalized_props.header){
+				vars.modal_header = normalized_props.header;
+			} else if(normalized_props.title) {
 				vars.modal_header = tmpl('modal-header', {
-					title: props.title,
+					title: normalized_props.title,
 					close_button: __APP.BUILD.button({
 						classes: ['-empty','-modal_destroyer','CloseModal','RippleEffect'],
 						title: '×'
 					})
 				});
-			} else {
-				vars.header = '';
 			}
-			if(props.footer){
-				vars.modal_footer = props.footer;
-			} else if(props.footer_buttons) {
-				vars.modal_footer = tmpl('modal-footer', {footer_buttons: props.footer_buttons});
-			} else {
-				vars.modal_footer = '';
+			
+			if(normalized_props.footer){
+				vars.modal_footer = normalized_props.footer;
+			} else if(normalized_props.footer_buttons) {
+				vars.modal_footer = tmpl('modal-footer', {footer_buttons: normalized_props.footer_buttons});
 			}
+			
 			$modal = tmpl('modal', vars);
-			if(props.width){
-				$modal.width(props.width);
+			if(normalized_props.width){
+				$modal.width(normalized_props.width);
 			}
-			if(props.height){
-				$modal.height(props.height);
+			if(normalized_props.height){
+				$modal.height(normalized_props.height);
 			}
+			
 			return $modal;
 		}
 	},
@@ -1176,7 +1346,7 @@ __APP = {
 			tab = __APP.BUILD.normalizeBuildProps(tab);
 			tab.classes.push('tab', 'Tab');
 			if (window.location.pathname.contains(tab.page)) {
-				tab.classes.push(__C.CLASSES.NEW_ACTIVE);
+				tab.classes.push(__C.CLASSES.ACTIVE);
 			}
 		});
 		$wrapper.html(tmpl('tabs-header', {
@@ -1249,20 +1419,24 @@ __APP = {
 			console.error('Need to pass page name');
 		}
 	},
+	reload: function() {
+		return __APP.changeState(location.pathname, true, true);
+	},
 	init: function appInit() {
 		var $sidebar_nav_items = $('.SidebarNavItem');
+		
 		__APP.CURRENT_PAGE = Page.routeNewPage(window.location.pathname);
 		__APP.CURRENT_PAGE.fetchData();
 		__APP.CURRENT_PAGE.show();
-		$sidebar_nav_items.removeClass(__C.CLASSES.NEW_ACTIVE)
+		$sidebar_nav_items.removeClass(__C.CLASSES.ACTIVE)
 			.filter(function() {
 				return window.location.pathname.indexOf(this.getAttribute('href')) === 0;
-			}).addClass(__C.CLASSES.NEW_ACTIVE);
+			}).addClass(__C.CLASSES.ACTIVE);
 	},
 	reInit: function appReInit() {
 		$(window).off('scroll');
 		
-		__APP.SERVER.CURRENT_CONNECTIONS.abortAll();
+		__APP.SERVER.abortAllConnections();
 		__APP.PREVIOUS_PAGE = __APP.CURRENT_PAGE;
 		__APP.PREVIOUS_PAGE.destroy();
 		__APP.init();
@@ -1270,66 +1444,6 @@ __APP = {
 		if (!(__APP.CURRENT_PAGE instanceof SearchPage)) {
 			$('#search_bar_input').val('');
 		}
-	}
-};
-/**
- *
- * @namespace __C
- * @property CLASSES
- * @property DATE_FORMAT
- * @property COLORS
- * @property STATS
- * @property ACTION_NAMES
- * @property ENTITIES
- */
-__C = {
-	CLASSES: {
-		ACTIVE: 'active',
-		NEW_ACTIVE: '-active',
-		DISABLED: 'disabled',
-		NEW_DISABLED: '-disabled',
-		HIDDEN: 'hidden',
-		NEW_HIDDEN: '-hidden'
-	},
-	DATE_FORMAT: 'YYYY-MM-DD',
-	COLORS: {
-		PRIMARY: '#2e3b50',
-		MUTED: '#3e4d66',
-		MUTED_80: '#657184',
-		MUTED_50: '#9fa6b3',
-		MUTED_30: '#c5c9d1',
-		TEXT: '#4a4a4a',
-		ACCENT: '#f82969',
-		ACCENT_ALT: '#ff5f9e',
-		FRANKLIN: '#28be84',
-		FRANKLIN_ALT: '#23d792'
-	},
-	STATS: {
-		EVENT_VIEW: 'view',
-		EVENT_VIEW_DETAIL: 'view_detail',
-		EVENT_OPEN_SITE: 'open_site',
-		EVENT_OPEN_MAP: 'open_map',
-		ORGANIZATION_OPEN_SITE: 'open_site',
-		EVENT_ENTITY: 'event',
-		ORGANIZATION_ENTITY: 'organization'
-	},
-	ACTION_NAMES: {
-		fave: ['добавил(а) в избранное'],
-		unfave: ['удалил(а) из избранного'],
-		subscribe: ['добавил(а) подписки'],
-		unsubscribe: ['удалил(а) подписки']
-	},
-	ENTITIES: {
-		EVENT: 'event',
-		ORGANIZATION: 'organization'
-	},
-	/**
-	 * @enum {string}
-	 */
-	DEFERRED_STATES: {
-		PENDING: 'pending',
-		RESOLVED: 'resolved',
-		REJECTED: 'rejected'
 	}
 };
 
@@ -1344,7 +1458,8 @@ __LOCALES = {
 				FAVORED: 'В избранном',
 				ADD_SUBSCRIPTION: 'Подписаться',
 				REMOVE_SUBSCRIPTION: 'Отписаться',
-				SUBSCRIBED: 'Подписан'
+				SUBSCRIBED: 'Подписан',
+				EDIT: 'Изменить'
 			},
 			SUBSCRIBERS: {
 				NOM: ' подписчик',

@@ -11,33 +11,44 @@
  */
 /**
  *
- * @constructor
- * @augments EntitiesCollection
+ * @class TagsCollection
+ * @extends EntitiesCollection
  */
-function TagsCollection() {}
-TagsCollection.extend(EntitiesCollection);
-TagsCollection.prototype.collection_of = OneTag;
-/**
- *
- * @param {AJAXData} data
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-TagsCollection.fetchTags = function(data, success) {
-	return __APP.SERVER.getData('/api/v1/tags/', data, success);
-};
-/**
- *
- * @param {TagsCollectionAJAXData} data
- * @param {AJAXCallback} [success]
- * @returns {jqPromise}
- */
-TagsCollection.prototype.fetchTags = function(data, success) {
-	var self = this;
-	return this.constructor.fetchTags(data, function(data) {
-		self.setData(data);
-		if (success && typeof success == 'function') {
-			success.call(self, data);
-		}
-	});
-};
+TagsCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs TagsCollection
+	 */
+	function TagsCollection() {
+		EntitiesCollection.call(this);
+	}
+	
+	TagsCollection.prototype.collection_of = OneTag;
+	/**
+	 *
+	 * @param {AJAXData} data
+	 * @param {AJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	TagsCollection.fetchTags = function(data, success) {
+		return __APP.SERVER.getData('/api/v1/tags/', data, success);
+	};
+	/**
+	 *
+	 * @param {TagsCollectionAJAXData} data
+	 * @param {AJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	TagsCollection.prototype.fetchTags = function(data, success) {
+		var self = this;
+		return this.constructor.fetchTags(data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data);
+			}
+		});
+	};
+	
+	return TagsCollection;
+}()));

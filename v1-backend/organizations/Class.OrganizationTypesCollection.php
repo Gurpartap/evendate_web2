@@ -38,6 +38,11 @@ class OrganizationTypesCollection extends AbstractCollection{
 					$is_one_type = true;
 					break;
 				}
+				case 'city_id': {
+					$q_get_types->where('id IN (SELECT DISTINCT type_id FROM organizations WHERE city_id = :city_id)');
+					$statements[':city_id'] = $value;
+					break;
+				}
 				case 'name': {
 					if (isset($filters['strict']) && $filters['strict'] == true){
 						$q_get_types->where('LOWER(name) = LOWER(:name)');
@@ -54,7 +59,7 @@ class OrganizationTypesCollection extends AbstractCollection{
 		if (count($types) == 0 && $is_one_type) throw new LogicException('CANT_FIND_TYPE');
 		$result_events = array();
 		foreach($types as $tag){
-			$result_events[] = $tag->getParams($user, $fields)->getData();
+			$result_events[] = $tag->getParamsWithFilters($user, $fields, $filters)->getData();
 		}
 		return new Result(true, '', $result_events);
 	}

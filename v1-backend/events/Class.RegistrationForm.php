@@ -20,7 +20,7 @@ class RegistrationForm
 		return $p_get_field->fetch();
 	}
 
-	private static function addFormField(int $event_id, string $type, string $label, bool $required, ExtendedPDO $db)
+	private static function addFormField(int $event_id, string $type, string $label = null, bool $required, ExtendedPDO $db)
 	{
 		$q_ins_field = App::queryFactory()->newInsert();
 		$field_type_info = self::getFormFieldTypeInfo($type, $db);
@@ -67,8 +67,7 @@ class RegistrationForm
 				ticket_order_id, 
 				registration_form_field_id, 
 				value, 
-				created_at) 
-		
+				created_at) 		
 			SELECT :ticket_order_id AS ticket_order_id, id AS registration_form_field_id, :val AS value, NOW() AS created_ad
 			 FROM registration_form_fields
 			 WHERE registration_form_fields.uuid = :uuid
@@ -76,16 +75,17 @@ class RegistrationForm
 			DO UPDATE SET 
 			updated_at = NOW(),
 			value = :val';
-		$p_ins_field = $db->prepare($q_ins_fields);
+
+		$rows = array();
 
 		foreach ($fields as $field) {
-			$result = $p_ins_field->execute(array(
+			$rows[] = array(
 				':ticket_order_id' => $order_id,
 				':val' => $field['value'],
 				':uuid' => $field['uuid'],
-			));
-			if ($result === FALSE) throw new DBQueryException('CANT_INSERT_FIELD_WITH_ID: ' . $field['uuid'], $db);
+			);
 		}
+		$db->bulkPrepareExecuteRaw($q_ins_fields, $rows, 'CANT_FINISH_REGISTRATION');
 
 		$text = $approvement_required ? 'Данные успешно отправлены. Ожидайте подтверждения регистрации от организатора.' : 'Вы успешно зарегистированы на событие.';
 		return new Result(true, $text);
@@ -93,7 +93,7 @@ class RegistrationForm
 
 	public static function processOrder(Event $event, AbstractUser $user, ExtendedPDO $db, array $tickets)
 	{
-		try{
+		try {
 			$db->beginTransaction();
 
 			$order_info = Order::create($event, $user, $db, $tickets);
@@ -102,13 +102,14 @@ class RegistrationForm
 			$db->commit();
 
 			return array('order_info' => $order_info, 'tickets' => $tickets);
-		}catch (Exception $e){
+		} catch (Exception $e) {
 			$db->rollBack();
 			throw $e;
 		}
 	}
 
-	public static function getFilledFields(ExtendedPDO $db, Order $order){
+	public static function getFilledFields(ExtendedPDO $db, Order $order)
+	{
 		$q_get = App::queryFactory()->newSelect();
 		$q_get->from('view_registration_field_values')
 			->cols(array(

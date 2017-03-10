@@ -49,6 +49,13 @@ class TicketsCollection extends AbstractCollection
 					}
 					break;
 				}
+				case 'event_id': {
+					$event = EventsCollection::one($db, $user, intval($value), array());
+
+					$q_get_tickets->where('event_id = ?', $event->getId());
+					$q_get_tickets->where('user_id = ?', $user->getId());
+					break;
+				}
 				case 'statistics_event': {
 					if ($value instanceof Event) {
 						$q_get_tickets->where('event_id = ?', $value->getId());
@@ -61,6 +68,17 @@ class TicketsCollection extends AbstractCollection
 						$q_get_tickets->where('ticket_order_uuid = ?', $value->getUUID());
 					}
 					break;
+				}
+				case 'user': {
+					if ($value instanceof User) {
+						$q_get_tickets->where('user_id = ?', $user->getId());
+					}
+					break;
+				}
+				case 'checked_out': {
+					if (filter_var($value, FILTER_VALIDATE_BOOLEAN)) {
+						$q_get_tickets->where('checked_out = ?', $value);
+					}
 				}
 			}
 		}

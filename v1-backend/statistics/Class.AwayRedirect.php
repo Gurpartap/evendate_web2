@@ -10,7 +10,6 @@ class AwayRedirect{
 				'url' => $request['url'] ?? null,
 				'params' => json_encode($request)
 			));
-		$p_ins = App::DB()->prepare($q_ins_away->getStatement());
-		$p_ins->execute($q_ins_away->getBindValues());
+		App::DB()->prepareExecute($q_ins_away, 'CANT_INSERT_REDIRECT_DATA');
 	}
 }

@@ -3,46 +3,59 @@
  */
 /**
  *
- * @constructor
- * @augments ActionButton
- * @param {(number|string)} id
- * @param {object} options
+ * @class SubscribeButton
+ * @extends ActionButton
  */
-function SubscribeButton(id, options) {
-	this.classes = {
-		subscribed_state: '-Subscribed'
-	};
-	this.options = {
-		labels: {
-			subscribe: __LOCALES.ru_RU.TEXTS.BUTTON.ADD_SUBSCRIPTION,
-			unsubscribe: __LOCALES.ru_RU.TEXTS.BUTTON.REMOVE_SUBSCRIPTION,
-			subscribed: __LOCALES.ru_RU.TEXTS.BUTTON.SUBSCRIBED
-		},
-		colors: {
-			subscribe: '-color_neutral_accent',
-			unsubscribe: '-color_accent',
-			subscribed: '-color_accent'
-		},
-		icons: {
-			subscribe: 'fa-plus',
-			unsubscribe: 'fa-times',
-			subscribed: 'fa-check'
+SubscribeButton = extending(ActionButton, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs SubscribeButton
+	 * @param {(number|string)} org_id
+	 * @param {object} [options]
+	 */
+	function SubscribeButton(org_id, options) {
+		this.options = {
+			labels: {
+				checked: __LOCALES.ru_RU.TEXTS.BUTTON.SUBSCRIBED,
+				unchecked: __LOCALES.ru_RU.TEXTS.BUTTON.ADD_SUBSCRIPTION,
+				checked_hover: __LOCALES.ru_RU.TEXTS.BUTTON.REMOVE_SUBSCRIPTION,
+				unchecked_hover: __LOCALES.ru_RU.TEXTS.BUTTON.ADD_SUBSCRIPTION
+			},
+			colors: {
+				checked: __C.CLASSES.COLORS.ACCENT,
+				unchecked: __C.CLASSES.COLORS.NEUTRAL_ACCENT,
+				checked_hover: __C.CLASSES.COLORS.ACCENT,
+				unchecked_hover: __C.CLASSES.COLORS.NEUTRAL_ACCENT
+			},
+			icons: {
+				checked: __C.CLASSES.ICONS.CHECK,
+				unchecked: __C.CLASSES.ICONS.PLUS,
+				checked_hover: __C.CLASSES.ICONS.TIMES,
+				unchecked_hover: __C.CLASSES.ICONS.PLUS
+			}
+		};
+		this.org_id = org_id;
+		ActionButton.call(this, options);
+	}
+	
+	SubscribeButton.prototype.checked_state_class = '-Subscribed';
+	
+	SubscribeButton.prototype.onClick = function() {
+		var self = this;
+		if (self.is_checked) {
+			__APP.USER.unsubscribeFromOrganization(self.org_id, function() {
+				self.afterUncheck();
+				$(window).trigger('unsubscribe', [self.org_id]);
+			});
+		} else {
+			__APP.USER.subscribeToOrganization(self.org_id, function() {
+				self.afterCheck();
+				$(window).trigger('subscribe', [self.org_id]);
+			});
 		}
 	};
-	ActionButton.apply(this, [id, options]);
-}
-SubscribeButton.extend(ActionButton);
-SubscribeButton.prototype.onClick = function() {
-	var self = this;
-	if (self.is_subscribed) {
-		__APP.USER.unsubscribeFromOrganization(self.id, function() {
-			self.afterUnsubscribe();
-			$(window).trigger('unsubscribe', [self.id]);
-		});
-	} else {
-		__APP.USER.subscribeToOrganization(self.id, function() {
-			self.afterSubscribe();
-			$(window).trigger('subscribe', [self.id]);
-		});
-	}
-};
+	
+	
+	return SubscribeButton;
+}()));

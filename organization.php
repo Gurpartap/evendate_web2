@@ -1,20 +1,3 @@
-<?php
-require_once 'v1-backend/bin/db.php';
-require_once 'v1-backend/bin/Class.Result.php';
-require_once 'v1-backend/users/Class.AbstractUser.php';
-require_once 'v1-backend/users/Class.User.php';
-require_once 'v1-backend/users/Class.NotAuthorizedUser.php';
-require_once 'v1-backend/tags/Class.TagsCollection.php';
-try {
-    $user = new User($__db);
-    if (isset($_GET['logout']) && $_GET['logout'] == true) {
-        $user->logout();
-    } else {
-        header('Location: /feed');
-        die();
-    }
-} catch (Exception $e) {}
-?>
 <!doctype html>
 <html class="no-js">
 <head>
@@ -191,7 +174,7 @@ try {
 
         </a>
         <div class="header-nav-links">
-            <a class="header-nav-link hover-color users-link " href="/">Пользователям</a>
+            <a class="header-nav-link hover-color users-link " href="/landing.php">Пользователям</a>
             <a class="header-nav-link faq-link hover-color fader-link faq-link faq-header-link"
                data-overlay-target="faq-section" href="#">Войти</a>
 
@@ -200,7 +183,7 @@ try {
         </div>
 
         <a class="header-nav-link hover-color users-link fader-link mobile-organizations"
-           href="/">Пользователям</a>
+           href="/landing.php">Пользователям</a>
     </header>
 </div>
 

@@ -83,6 +83,7 @@ $__modules['events'] = array(
 				$__order_by ?? array()
 			);
 		},
+
 		'{{/(id:[0-9]+)}/notifications}' => function ($id) use ($__db, $__order_by, $__request, $__offset, $__length, $__user, $__fields) {
 			$event = EventsCollection::one(
 				$__db,
@@ -172,6 +173,15 @@ $__modules['events'] = array(
 				array('length' => $__length, 'offset' => $__offset),
 				$__order_by ?? array('nearest_event_date', 'first_event_date'));
 		},
+		'tickets' => function () use ($__db, $__request, $__fields, $__user, $__order_by, $__offset, $__length) { /*MY EVENTS!*/
+			return TicketsCollection::filter(
+				$__db,
+				$__user,
+				array_merge($__request, array('user' => $__user)),
+				$__fields,
+				array('length' => $__length, 'offset' => $__offset),
+				$__order_by ?? array('checked_out'));
+		},
 		'recommendations' => function () use ($__db, $__request, $__fields, $__user, $__order_by, $__pagination) { /*MY EVENTS!*/
 			return EventsCollection::filter(
 				$__db,
@@ -208,6 +218,15 @@ $__modules['events'] = array(
 				$__request,
 				$__fields,
 				array('length' => $__length, 'offset' => $__offset),
+				$__order_by ?? array()
+			);
+		},
+		'orders' => function () use ($__db, $__request, $__fields, $__user, $__order_by, $__offset, $__length, $__pagination) {
+			return OrdersCollection::filter($__db,
+				$__user,
+				array_merge($__request, array('user' => $__user)),
+				$__fields,
+				$__pagination,
 				$__order_by ?? array()
 			);
 		},

@@ -81,6 +81,8 @@ class Order extends AbstractEntity
 		'event_id',
 		'user_id',
 		'status_type_code',
+		'payed_at',
+		'status_name',
 	);
 
 	protected static $ADDITIONAL_COLS = array(

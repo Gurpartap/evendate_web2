@@ -64,15 +64,13 @@ class Statistics
 	public static function getTypeId($entity_type, $type_name, ExtendedPDO $db)
 	{
 		$q_get = App::queryFactory()
-			->newSelect()
-			->from('stat_event_types')
+			->newSelect();
+		$q_get->from('stat_event_types')
 			->cols(array('id'))
 			->where('type_code = ?', $type_name)
 			->where('entity = ?', $entity_type);
 
-		$p_get = $db->prepare($q_get->getStatement());
-		$res = $p_get->execute($q_get->getBindValues());
-		if ($res === FALSE) throw new DBQueryException('', $db);
+		$p_get = $db->prepareExecute($q_get, 'CANT_GET_STATS_TYPE_ID');
 		if ($p_get->rowCount() < 1) throw new InvalidArgumentException('', $db);
 		return $p_get->fetchColumn(0);
 	}
@@ -120,15 +118,15 @@ class Statistics
 		$q_ins_event = 'INSERT INTO stat_events(event_id, token_id, stat_type_id, created_at)
 				VALUES (:event_id, :token_id, :stat_type_id, NOW())';
 
-		$p_ins = $db->prepare($q_ins_event);
-		$p_ins->execute(array(
+		$db->prepareExecuteRaw($q_ins_event, array(
 			':event_id' => $event->getId(),
 			':token_id' => $user ? $user->getTokenId() : null,
 			':stat_type_id' => $type_id
-		));
+		), 'CANT_INSERT_EVENT_STATS');
 		if ($no_update_badges !== true) {
 			self::updateIOsBadges($db, $user, $type, $event);
 		}
+		return true;
 	}
 
 	public static function Organization(Organization $organization, AbstractUser $user = null, ExtendedPDO $db, $type, $no_update_badges = false)
@@ -140,16 +138,15 @@ class Statistics
 		}
 
 		$q_ins_event = App::queryFactory()
-			->newInsert()
-			->into('stat_organizations')
+			->newInsert();
+		$q_ins_event->into('stat_organizations')
 			->cols(array(
 				'organization_id' => $organization->getId(),
 				'token_id' => $user ? $user->getTokenId() : null,
 				'stat_type_id' => $type_id
 			));
 
-		$p_ins = $db->prepare($q_ins_event->getStatement());
-		$p_ins->execute($q_ins_event->getBindValues());
+		$db->prepareExecute($q_ins_event);
 
 		if ($no_update_badges !== true && $user instanceof User) {
 			self::updateIOsBadges($db, $user, $type, null, $organization);
@@ -165,16 +162,15 @@ class Statistics
 			return;
 		}
 		$q_ins_event = App::queryFactory()
-			->newInsert()
-			->into('stat_users')
+			->newInsert();
+		$q_ins_event->into('stat_users')
 			->cols(array(
 				'user_id' => $friend->getId(),
 				'token_id' => $user ? $user->getTokenId() : null,
 				'stat_type_id' => $type_id
 			));
 
-		$p_ins = $db->prepare($q_ins_event->getStatement());
-		$p_ins->execute($q_ins_event->getBindValues());
+		$p_ins = $db->prepareExecute($q_ins_event->getStatement());
 	}
 
 	public static function StoreBatch(array $events, AbstractUser $user = null, ExtendedPDO $db)

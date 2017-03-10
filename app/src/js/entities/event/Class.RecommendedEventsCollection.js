@@ -3,17 +3,27 @@
  */
 /**
  *
- * @constructor
- * @augments EventsCollection
+ * @class RecommendedEventsCollection
+ * @extends EventsCollection
  */
-function RecommendedEventsCollection() {}
-RecommendedEventsCollection.extend(EventsCollection);
-/**
- *
- * @override
- */
-RecommendedEventsCollection.fetchEvents = function(data, success) {
-	data.future = true;
-	data.order_by = '-rating';
-	return EventsCollection.fetchRecommendedEvents(data, success);
-};
+RecommendedEventsCollection = extending(EventsCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs RecommendedEventsCollection
+	 */
+	function RecommendedEventsCollection() {
+		EventsCollection.call(this);
+	}
+	/**
+	 *
+	 * @override
+	 */
+	RecommendedEventsCollection.fetchEvents = function(data, success) {
+		data.future = true;
+		data.order_by = '-rating';
+		return EventsCollection.fetchRecommendedEvents(data, success);
+	};
+	
+	return RecommendedEventsCollection;
+}()));
