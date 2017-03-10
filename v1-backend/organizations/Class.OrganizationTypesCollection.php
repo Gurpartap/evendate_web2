@@ -38,6 +38,11 @@ class OrganizationTypesCollection extends AbstractCollection{
 					$is_one_type = true;
 					break;
 				}
+				case 'city_id': {
+					$q_get_types->where('id IN (SELECT DISTINCT type_id FROM organizations WHERE city_id = :city_id)');
+					$statements[':city_id'] = $value;
+					break;
+				}
 				case 'name': {
 					if (isset($filters['strict']) && $filters['strict'] == true){
 						$q_get_types->where('LOWER(name) = LOWER(:name)');
