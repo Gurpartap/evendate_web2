@@ -18,6 +18,7 @@ EditOrganizationPage = extending(Page, (function() {
 		this.page_title = 'Редактировать организацию';
 		this.organization = new OneOrganization(organization_id);
 		this.categories = new CategoriesCollection();
+		this.cities = new CitiesCollection();
 		this.state_name = 'edit_organization';
 		
 		this.fields = [
@@ -28,13 +29,18 @@ EditOrganizationPage = extending(Page, (function() {
 			'facebook_url',
 			'email'
 		];
+		
+		this.adding_is_over = false;
 	}
 	
 	EditOrganizationPage.prototype.fetchData = function() {
+		var cities_promise = this.cities.fetchCities(null, 0, 'local_name');
+		
 		if (this.organization.id) {
-			return this.fetching_data_defer = this.organization.fetchOrganization(this.fields);
+			return this.fetching_data_defer = __APP.SERVER.multipleAjax(cities_promise, this.organization.fetchOrganization(this.fields));
 		}
-		return Page.prototype.fetchData.call(this);
+		
+		return this.fetching_data_defer = cities_promise;
 	};
 	
 	EditOrganizationPage.prototype.render = function() {
@@ -69,30 +75,42 @@ EditOrganizationPage = extending(Page, (function() {
 			
 		}
 		
-		function initOrganizationTypes(selected_id) {
-			PAGE.categories.fetchCategories({}, 0, function(data) {
-				var $wrapper = $view.find('.EditEventOrganizations'),
-					organizations_options = $(),
-					$select = $wrapper.find('#add_organization_type');
-				
-				data.forEach(function(organization) {
-					organizations_options = organizations_options.add(tmpl('option', {
-						val: organization.id,
-						display_name: organization.name
-					}));
-				});
-				
-				$select.append(organizations_options).select2({
+		function initCities(selected_id) {
+			var $select = $view.find('#add_organization_city');
+			
+			$select
+				.append(tmpl('option', PAGE.cities.map(function(city) {
+					return {
+						val: city.id,
+						display_name: city.local_name
+					};
+				})))
+				.select2({
 					containerCssClass: 'form_select2',
 					dropdownCssClass: 'form_select2_drop'
 				});
+			if (selected_id) {
+				$select.select2('val', selected_id);
+			}
+		}
+		
+		function initOrganizationTypes(selected_id) {
+			PAGE.categories.fetchCategories({}, 0, function(categories) {
+				var $select = $view.find('#add_organization_type');
+				
+				$select
+					.html(tmpl('option', categories.map(function(category) {
+						return {
+							val: category.id,
+							display_name: category.name
+						};
+					})))
+					.select2({
+						containerCssClass: 'form_select2',
+						dropdownCssClass: 'form_select2_drop'
+					});
 				if (selected_id) {
 					$select.select2('val', selected_id);
-				}
-				if (organizations_options.length > 1) {
-					$wrapper.removeClass('-hidden');
-				} else {
-					$wrapper.addClass('-hidden');
 				}
 			});
 		}
@@ -144,6 +162,10 @@ EditOrganizationPage = extending(Page, (function() {
 			}
 			
 			function afterSubmit() {
+				PAGE.adding_is_over = true;
+				sessionStorage.removeItem('organization_info');
+				$('.SidebarNav').find('.ContinueRegistration').remove();
+				
 				socket.emit('utils.registrationFinished', additional_fields);
 				socket.on('utils.updateImagesDone', function() {
 					window.location.href = '/organization/' + PAGE.organization.id;
@@ -196,7 +218,7 @@ EditOrganizationPage = extending(Page, (function() {
 		
 		if (!organization_id) {
 			try {
-				local_storage = JSON.parse(window.localStorage.getItem('organization_info'));
+				local_storage = JSON.parse(sessionStorage.getItem('organization_info') ? sessionStorage.getItem('organization_info') : localStorage.getItem('organization_info'));
 			} catch (e) {
 				local_storage = {}
 			}
@@ -206,13 +228,11 @@ EditOrganizationPage = extending(Page, (function() {
 			}, local_storage, true);
 			
 			cookies.removeItem('open_add_organization', '/');
-			window.localStorage.removeItem('organization_info');
+			sessionStorage.removeItem('organization_info');
 			
 			$wrapper.html(tmpl('add-organization-page', additional_fields));
-			initEditEventPage($view);
-			__APP.MODALS.bindCallModal($view);
-			initOrganizationTypes();
 		} else {
+			this.adding_is_over = true;
 			additional_fields = $.extend(true, {}, this.organization);
 			
 			additional_fields.header_text = 'Редактирование организации';
@@ -227,10 +247,6 @@ EditOrganizationPage = extending(Page, (function() {
 			$.extend(true, additional_fields, additional_fields);
 			$wrapper.html(tmpl('add-organization-page', additional_fields));
 			
-			initEditEventPage($view);
-			initOrganizationTypes(additional_fields.type_id);
-			
-			__APP.MODALS.bindCallModal($view);
 			
 			if (additional_fields.img_url) {
 				toDataUrl(additional_fields.img_url, function(base64_string) {
@@ -242,6 +258,39 @@ EditOrganizationPage = extending(Page, (function() {
 					$view.find('#add_organization_background_src').val(base64_string ? base64_string : null);
 				});
 			}
+		}
+		
+		initEditEventPage($view);
+		__APP.MODALS.bindCallModal($view);
+		initOrganizationTypes(additional_fields.type_id);
+		initCities(additional_fields.city_id || __APP.USER.selected_city.id);
+	};
+	
+	EditOrganizationPage.prototype.destroy = function() {
+		var data = this.$wrapper.find('#add-organization-form').serializeForm(),
+			$sidebar_nav = $('.SidebarNav');
+		
+		if (!this.adding_is_over) {
+			if (!$sidebar_nav.find('.ContinueRegistration').length) {
+				$sidebar_nav.prepend(__APP.BUILD.link({
+					page: '/add/organization',
+					title: 'Продолжить регистрацию',
+					classes: ['sidebar_navigation_item', 'SidebarNavItem', 'ContinueRegistration']
+				}));
+				bindPageLinks($sidebar_nav);
+			}
+			sessionStorage.setItem('organization_info', JSON.stringify({
+				city_id: data.city_id,
+				type_id: data.type_id,
+				name: data.name,
+				short_name: data.short_name,
+				email: data.email,
+				site_url: data.site_url,
+				default_address: data.default_address,
+				description: data.description,
+				facebook_url: data.facebook_url,
+				vk_url: data.vk_url
+			}));
 		}
 	};
 	
