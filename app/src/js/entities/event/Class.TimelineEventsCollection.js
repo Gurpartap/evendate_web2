@@ -12,9 +12,7 @@ TimelineEventsCollection = extending(EventsCollection, (function() {
 	 * @constructor
 	 * @constructs TimelineEventsCollection
 	 */
-	function TimelineEventsCollection() {
-		EventsCollection.call(this);
-	}
+	function TimelineEventsCollection() {}
 	/**
 	 *
 	 * @override

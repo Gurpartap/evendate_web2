@@ -13,7 +13,6 @@ UsersActivitiesCollection = extending(EntitiesCollection, (function() {
 	 * @constructs UsersActivitiesCollection
 	 */
 	function UsersActivitiesCollection(user_id) {
-		EntitiesCollection.call(this);
 		Object.defineProperty(this, 'user_id', {value: user_id});
 	}
 	Object.defineProperty(UsersActivitiesCollection.prototype, 'collection_of', {value: OneAbstractActivity});

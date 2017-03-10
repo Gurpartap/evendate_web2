@@ -40,7 +40,6 @@ CurrentUser = extending(OneUser, (function() {
 			return CurrentUser.instance;
 		}
 		OneUser.call(this, 'me');
-		this.selected_city = new OneCity();
 		this.friends = new UsersCollection();
 		this.friends_activities = new FriendsActivitiesCollection();
 		CurrentUser.instance = this;

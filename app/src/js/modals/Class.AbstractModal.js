@@ -97,63 +97,63 @@ AbstractModal = (function() {
 		switch (this.style) {
 			case AbstractModal.STYLES.OK_ONLY: {
 				$footer_buttons = __APP.BUILD.button({
-					classes: [__C.CLASSES.COLORS.PRIMARY,__C.CLASSES.SIZES.LOW, __C.CLASSES.HOOKS.CLOSE_MODAL, __C.CLASSES.HOOKS.RIPPLE],
+					classes: ['-color_primary', 'CloseModal', 'RippleEffect'],
 					title: 'OK'
 				});
 				break;
 			}
 			case AbstractModal.STYLES.OK_CANCEL: {
 				$footer_buttons = __APP.BUILD.button({
-					classes: [__C.CLASSES.COLORS.PRIMARY,__C.CLASSES.SIZES.LOW, __C.CLASSES.HOOKS.CLOSE_MODAL, __C.CLASSES.HOOKS.RIPPLE],
+					classes: ['-color_primary', 'CloseModal', 'RippleEffect'],
 					title: 'OK'
 				}, {
-					classes: [__C.CLASSES.COLORS.DEFAULT,__C.CLASSES.SIZES.LOW, __C.CLASSES.HOOKS.CLOSE_MODAL, __C.CLASSES.HOOKS.RIPPLE],
+					classes: ['-color_default', 'CloseModal', 'RippleEffect'],
 					title: 'Отмена'
 				});
 				break;
 			}
 			case AbstractModal.STYLES.ABORT_RETRY_IGNORE: {
 				$footer_buttons = __APP.BUILD.button({
-					classes: [__C.CLASSES.COLORS.MARGINAL_BUBBLEGUM,__C.CLASSES.SIZES.LOW, __C.CLASSES.HOOKS.CLOSE_MODAL, __C.CLASSES.HOOKS.RIPPLE],
+					classes: ['-color_marginal_bubble_gum', 'CloseModal', 'RippleEffect'],
 					title: 'Прервать'
 				}, {
-					classes: [__C.CLASSES.COLORS.DEFAULT,__C.CLASSES.SIZES.LOW, __C.CLASSES.HOOKS.CLOSE_MODAL, __C.CLASSES.HOOKS.RIPPLE],
+					classes: ['-color_default', 'CloseModal', 'RippleEffect'],
 					title: 'Повтор'
 				}, {
-					classes: [__C.CLASSES.COLORS.DEFAULT,__C.CLASSES.SIZES.LOW, __C.CLASSES.HOOKS.CLOSE_MODAL, __C.CLASSES.HOOKS.RIPPLE],
+					classes: ['-color_default', 'CloseModal', 'RippleEffect'],
 					title: 'Пропустить'
 				});
 				break;
 			}
 			case AbstractModal.STYLES.YES_NO_CANCEL: {
 				$footer_buttons = __APP.BUILD.button({
-					classes: [__C.CLASSES.COLORS.MARGINAL_FRANKLIN,__C.CLASSES.SIZES.LOW, __C.CLASSES.HOOKS.CLOSE_MODAL, __C.CLASSES.HOOKS.RIPPLE],
+					classes: ['-color_marginal_franklin', 'CloseModal', 'RippleEffect'],
 					title: 'Да'
 				}, {
-					classes: [__C.CLASSES.COLORS.MARGINAL_BUBBLEGUM,__C.CLASSES.SIZES.LOW, __C.CLASSES.HOOKS.CLOSE_MODAL, __C.CLASSES.HOOKS.RIPPLE],
+					classes: ['-color_marginal_bubble_gum', 'CloseModal', 'RippleEffect'],
 					title: 'Нет'
 				}, {
-					classes: [__C.CLASSES.COLORS.DEFAULT,__C.CLASSES.SIZES.LOW, __C.CLASSES.HOOKS.CLOSE_MODAL, __C.CLASSES.HOOKS.RIPPLE],
+					classes: ['-color_default', 'CloseModal', 'RippleEffect'],
 					title: 'Отмена'
 				});
 				break;
 			}
 			case AbstractModal.STYLES.YES_NO: {
 				$footer_buttons = __APP.BUILD.button({
-					classes: [__C.CLASSES.COLORS.MARGINAL_FRANKLIN,__C.CLASSES.SIZES.LOW, __C.CLASSES.HOOKS.CLOSE_MODAL, __C.CLASSES.HOOKS.RIPPLE],
+					classes: ['-color_marginal_franklin', 'CloseModal', 'RippleEffect'],
 					title: 'Да'
 				}, {
-					classes: [__C.CLASSES.COLORS.MARGINAL_BUBBLEGUM,__C.CLASSES.SIZES.LOW, __C.CLASSES.HOOKS.CLOSE_MODAL, __C.CLASSES.HOOKS.RIPPLE],
+					classes: ['-color_marginal_bubble_gum', 'CloseModal', 'RippleEffect'],
 					title: 'Нет'
 				});
 				break;
 			}
 			case AbstractModal.STYLES.RETRY_CANCEL: {
 				$footer_buttons = __APP.BUILD.button({
-					classes: [__C.CLASSES.COLORS.DEFAULT,__C.CLASSES.SIZES.LOW, __C.CLASSES.HOOKS.CLOSE_MODAL, __C.CLASSES.HOOKS.RIPPLE],
+					classes: ['-color_default', 'CloseModal', 'RippleEffect'],
 					title: 'Повтор'
 				}, {
-					classes: [__C.CLASSES.COLORS.DEFAULT,__C.CLASSES.SIZES.LOW, __C.CLASSES.HOOKS.CLOSE_MODAL, __C.CLASSES.HOOKS.RIPPLE],
+					classes: ['-color_default', 'CloseModal', 'RippleEffect'],
 					title: 'Отмена'
 				});
 				break;

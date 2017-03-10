@@ -767,7 +767,7 @@ socket.on('utils.registrationSaved', function (data) {
     $('.with-register, .no-register').toggleClass('hidden');
     $('.faq-link').click();
     cookies.setItem('open_add_organization', 1, Infinity);
-    sessionStorage.setItem('organization_info', JSON.stringify(_data));
+    window.localStorage.setItem('organization_info', JSON.stringify(_data));
 });
 
 socket.on('error.retry', function () {

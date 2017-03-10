@@ -15,11 +15,8 @@
 </script>
 
 <script type="javascript/template" id="tmpl-organizations-wrapper">
-	<div class="page_wrapper -organizations_wrapper">
+	<div class="page_wrapper">
 		<aside class="organizations_aside">
-			<div class="form_unit">
-				<select id="organizations_cities_select" class="OrganizationsCities" name="city" title=""></select>
-			</div>
 			<div class="page organizations_categories">
 				<header class="organizations_categories_header">
 					<span class="organizations_categories_title -unselectable">Рубрики</span>
@@ -1313,15 +1310,6 @@
 	<p class="modal_divider">{label}</p>
 </script>
 
-<script type="javascript/template" id="tmpl-modal-city-choose-content">
-	<div class="form_unit -inline">
-		<label class="form_label">Ваш город</label>
-		<div class="form_unit">
-			<select id="city_choose_modal_select" class="CityChooseModalSelect" name="city" title="">{cities}</select>
-		</div>
-	</div>
-</script>
-
 
 <!-- Search  -->
 
@@ -1556,16 +1544,12 @@
 			<h2>{header_text}</h2>
 			<input id="add_organization_organization_id" type="hidden" name="organization_id" value="{id}">
 
-			<h3><label for="add_organization_city">Город</label></h3>
-			<div class="form_unit">
-				<select id="add_organization_city" name="city_id">
-					<option value="0" disabled selected></option>
-				</select>
-			</div>
 
-			<h3><label for="add_organization_type">Категория</label></h3>
-			<div class="form_unit">
-				<select id="add_organization_type" name="type_id"></select>
+			<div class="EditEventOrganizations -hidden">
+				<h3><label for="add_organization_type">Категория</label></h3>
+				<div class="form_unit">
+					<select id="add_organization_type" name="type_id"></select>
+				</div>
 			</div>
 
 			<h3><label for="add_organization_title">Полное название</label></h3>
