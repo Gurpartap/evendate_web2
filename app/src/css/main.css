@@ -3354,7 +3354,7 @@ body.-open_modal > .modal_wrapper {
 
 /* ORGANIZATIONS */
 
-.-state_catalog_page #main_section .page_wrapper {
+.page_wrapper.-organizations_wrapper {
 	padding: 40px 0;
 }
 
