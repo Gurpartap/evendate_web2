@@ -56,7 +56,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 *
 	 * @property {?boolean} is_private
 	 * @property {?string} brand_color
-	 * @property {?OneCity} city
+	 * @property {?} city
 	 * @property {?} country
 	 *
 	 * @property {?string} vk_url
@@ -91,7 +91,7 @@ OneOrganization = extending(OneEntity, (function() {
 		
 		this.is_private = null;
 		this.brand_color = null;
-		this.city = new OneCity();
+		this.city = null;
 		this.country = null;
 		
 		this.email = null;

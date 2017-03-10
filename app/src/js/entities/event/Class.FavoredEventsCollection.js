@@ -12,9 +12,7 @@ FavoredEventsCollection = extending(EventsCollection, (function() {
 	 * @constructor
 	 * @constructs FavoredEventsCollection
 	 */
-	function FavoredEventsCollection() {
-		EventsCollection.call(this);
-	}
+	function FavoredEventsCollection() {}
 	/**
 	 *
 	 * @override

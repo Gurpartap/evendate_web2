@@ -13,9 +13,7 @@ OrganizationsCollection = extending(EntitiesCollection, (function() {
 	 * @constructor
 	 * @constructs OrganizationsCollection
 	 */
-	function OrganizationsCollection() {
-		EntitiesCollection.call(this);
-	}
+	function OrganizationsCollection() {}
 	OrganizationsCollection.prototype.collection_of = OneOrganization;
 	/**
 	 *

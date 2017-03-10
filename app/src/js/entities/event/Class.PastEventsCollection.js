@@ -12,9 +12,7 @@ PastEventsCollection = extending(EventsCollection, (function() {
 	 * @constructor
 	 * @constructs PastEventsCollection
 	 */
-	function PastEventsCollection() {
-		EventsCollection.call(this);
-	}
+	function PastEventsCollection() {}
 	/**
 	 *
 	 * @override
