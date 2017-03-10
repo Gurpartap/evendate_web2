@@ -59,7 +59,7 @@ class OrganizationTypesCollection extends AbstractCollection{
 		if (count($types) == 0 && $is_one_type) throw new LogicException('CANT_FIND_TYPE');
 		$result_events = array();
 		foreach($types as $tag){
-			$result_events[] = $tag->getParams($user, $fields)->getData();
+			$result_events[] = $tag->getParamsWithFilters($user, $fields, $filters)->getData();
 		}
 		return new Result(true, '', $result_events);
 	}

@@ -13,7 +13,9 @@ RegistrationFieldsCollection = extending(EntitiesCollection, (function() {
 	 * @constructor
 	 * @constructs RegistrationFieldsCollection
 	 */
-	function RegistrationFieldsCollection() {}
+	function RegistrationFieldsCollection() {
+		EntitiesCollection.call(this);
+	}
 	RegistrationFieldsCollection.prototype.collection_of = RegistrationFieldModel;
 	/**
 	 *

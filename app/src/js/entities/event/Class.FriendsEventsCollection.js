@@ -12,7 +12,9 @@ FriendsEventsCollection = extending(EventsCollection, (function() {
 	 * @constructor
 	 * @constructs FriendsEventsCollection
 	 */
-	function FriendsEventsCollection() {}
+	function FriendsEventsCollection() {
+		EventsCollection.call(this);
+	}
 	/**
 	 *
 	 * @override
