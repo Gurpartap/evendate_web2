@@ -136,7 +136,7 @@ try {
 	$_error_name = $dbe->getMessage();
 	$_function_called = true;
 	$_exception = $dbe;
-	$_db_query = $__db->getQueryInfo();
+	$_db_query = array('query' => $__db->getQueryInfo(), 'info' => $dbe->getInternalMessage());
 }catch(AbstractException $ae){
 	$_http_code = $ae->getHttpCode();
 	$_internal_code = $ae->getInternalCode();
@@ -180,7 +180,7 @@ try {
 			'headers' => json_encode($__headers ?? array()),
 			'response_http_status' => $_http_code,
 			'time' => $request_time->format('Y-m-d H:i:s'),
-			'db_query' => $_db_query ?? NULL,
+			'db_query' => json_encode($_db_query ?? NULL),
 			'exception_text' => isset($_exception) ? $_exception->getMessage() : null,
 			'exception_trace' => isset($_exception) ? $_exception->getTraceAsString() : null,
 			'exception_file' => isset($_exception) ? $_exception->getFile() : null,

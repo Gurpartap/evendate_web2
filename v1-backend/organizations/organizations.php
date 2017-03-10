@@ -164,6 +164,29 @@ $__modules['organizations'] = array(
 			);
 		},
 		'cities' => function () use ($__db, $__request, $__request, $__pagination, $__user, $__fields, $__order_by) {
+			if (isset($__fields) && isset($__fields['distance'])) {
+				if (!isset($__request['latitude']) || !isset($__request['longitude'])) {
+					if (!empty($_SERVER['HTTP_CLIENT_IP']))   //check ip from share internet
+					{
+						$ip = $_SERVER['HTTP_CLIENT_IP'];
+					} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))   //to check ip is pass from proxy
+					{
+						$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+					} else {
+						$ip = $_SERVER['REMOTE_ADDR'];
+					}
+					try{
+						$geo_data = @file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/location?ip=' . $ip);
+						$geo_data = json_decode($geo_data, true);
+						if (!isset($geo_data['latitude']) || !isset($geo_data['longitude'])) throw new InvalidArgumentException('CANT_GET_GEO_FROM_IP');
+						$__request['latitude'] = $geo_data['latitude'];
+						$__request['longitude'] = $geo_data['longitude'];
+					}catch (Exception $e){
+						throw new InvalidArgumentException('CANT_GET_GEO_FROM_IP');
+					}
+				}
+			}
+
 			return CitiesCollection::filter(
 				$__db,
 				$__user,
@@ -222,11 +245,11 @@ $__modules['organizations'] = array(
 				null,
 				$__fields
 			);
-			if (isset($__request['email']) && filter_var($__request['email'], FILTER_VALIDATE_EMAIL)){
+			if (isset($__request['email']) && filter_var($__request['email'], FILTER_VALIDATE_EMAIL)) {
 				return $organization->inviteUserByEmail($__request['email'], $__user);
-			}elseif (isset($__request['user_id'])){
+			} elseif (isset($__request['user_id'])) {
 				return $organization->inviteUserById($__request['user_id'], $__user);
-			}else{
+			} else {
 				throw new InvalidArgumentException('EMAIL_OR_USER_ID_ARE_REQUIRED');
 			}
 		},

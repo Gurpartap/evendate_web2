@@ -26,7 +26,7 @@ class ExtendedPDO extends PDO
 
 	private function handleError(Exception $e, $name)
 	{
-		throw new DBQueryException(var_export($e, true), $this, $name);
+		throw new DBQueryException($e->getMessage(), $this, $name);
 	}
 
 	public function prepareExecute(Aura\SqlQuery\QueryInterface $query, $error_name = 'QUERY_ERROR', array $bind_values = array()): PDOStatement
@@ -35,7 +35,7 @@ class ExtendedPDO extends PDO
 		$prep = $this->prepare($query->getStatement());
 		if ($bind_values == null) {
 			$bind_values = $query->getBindValues();
-			$this->values = $query->getBindValues();
+			$this->values = $bind_values;
 		} else {
 			$this->values = $bind_values;
 		}
