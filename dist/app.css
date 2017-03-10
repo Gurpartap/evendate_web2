@@ -2478,10 +2478,10 @@ body.-open_modal > .modal_wrapper {
 }
 
 .modal_footer {
-	padding: 12px 18px;
+	padding: 15px 25px;
 	text-align: right;
-	background-color: #f6f6f6;
-	background-color: var(--color_gray_material);
+	border-top: 1px solid #c5c9d1;
+	border-top: 1px solid var(--color_primary_30);
 }
 
 .modal_footer > .button + .button {margin-left: .5em}
@@ -3913,7 +3913,7 @@ body.-open_modal > .modal_wrapper {
 
 /* ORGANIZATIONS */
 
-.page_wrapper.-organizations_wrapper {
+.-state_catalog_page #main_section .page_wrapper {
 	padding: 40px 0;
 }
 

@@ -13,9 +13,7 @@ CategoriesCollection = extending(EntitiesCollection, (function() {
 	 * @constructor
 	 * @constructs CategoriesCollection
 	 */
-	function CategoriesCollection() {
-		EntitiesCollection.call(this);
-	}
+	function CategoriesCollection() {}
 	
 	CategoriesCollection.prototype.collection_of = OneCategory;
 	/**
