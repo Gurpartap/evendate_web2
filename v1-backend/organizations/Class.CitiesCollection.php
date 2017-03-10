@@ -65,6 +65,11 @@ class CitiesCollection extends AbstractCollection
 		}
 
 
+		if (isset($fields['distance'])){
+			$statement_array[':latitude'] = $filters['latitude'];
+			$statement_array[':longitude'] = $filters['longitude'];
+		}
+
 		$q_get_cities
 			->cols($cols)
 			->orderBy($order_by);

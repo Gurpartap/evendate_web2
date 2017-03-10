@@ -11,6 +11,7 @@ class City extends AbstractEntity
 
 	const COUNTRY_FIELD_NAME = 'country';
 	const ORGANIZATIONS_TYPES_FIELD_NAME = 'organizations_types';
+	const DISTANCE_FIELD_NAME = 'distance';
 
 	protected static $DEFAULT_COLS = array(
 		'id',
@@ -22,7 +23,9 @@ class City extends AbstractEntity
 	protected static $ADDITIONAL_COLS = array(
 		'timediff_seconds',
 		'created_at',
-		'updated_at'
+		'updated_at',
+		self::DISTANCE_FIELD_NAME => '(SELECT ((point(c.longitude, c.latitude) <@> point(:longitude, :latitude)))::INT AS distance 
+		FROM cities AS c WHERE c.id = view_cities.id)::INT AS ' . self::DISTANCE_FIELD_NAME
 	);
 
 	public function getParams(AbstractUser $user = null, array $fields = null): Result
