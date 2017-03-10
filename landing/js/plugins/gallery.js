@@ -344,8 +344,8 @@ var Grid = (function() {
 			// create Preview structure:
 			this.$title = $( '<h3></h3>' );
 			this.$description = $( '<p></p>' );
-			this.$href = $( '<a class="btn btn-primary" href="#">Visit Website</a>' );
-			this.$details = $( '<div class="gall-details"></div>' ).append( this.$title, this.$description, this.$href );
+			this.$href = $( '' );
+			this.$details = $( '<div class="gall-details"></div>' ).append( this.$title, this.$description);
 			this.$loading = $( '<div class="gall-loading"></div>' );
 			this.$fullimage = $( '<div class="gall-fullimg"></div>' ).append( this.$loading );
 			this.$closePreview = $( '<span class="gall-close"></span>' );
