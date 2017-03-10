@@ -1522,18 +1522,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
         qr_svg.pipe(res);
     });
 
-    app.get('/utils/location/', function (req, res) {
-
-        rest.get('https://freegeoip.net/json/?q=' + req.query.ip)
-            .on('complete', (result) => {
-                if (result instanceof Error){
-                    res.json({status: false});
-                }else{
-                    res.json(result);
-                }
-            });
-    });
-
     app.get('/utils/invitation-qr/:organization_id/:uuid', function (req, res) {
         var format = 'png',
             available_types = ['png', 'svg', 'pdf', 'eps'],
