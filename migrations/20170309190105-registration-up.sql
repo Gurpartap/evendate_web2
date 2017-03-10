@@ -1,0 +1,1 @@
+ALTER TABLE log_requests ADD COLUMN db_query TEXT DEFAULT NULL;
