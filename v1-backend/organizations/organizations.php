@@ -176,7 +176,7 @@ $__modules['organizations'] = array(
 						$ip = $_SERVER['REMOTE_ADDR'];
 					}
 					try{
-						$geo_data = @file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/location?ip=' . $ip);
+						$geo_data = @file_get_contents('https://freegeoip.net/json/' . $ip);
 						$geo_data = json_decode($geo_data, true);
 						if (!isset($geo_data['latitude']) || !isset($geo_data['longitude'])) throw new InvalidArgumentException('CANT_GET_GEO_FROM_IP');
 						$__request['latitude'] = $geo_data['latitude'];
