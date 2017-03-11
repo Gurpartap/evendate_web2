@@ -275,11 +275,11 @@ $url_parts = explode('/', $url);
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=514246a1160aff0ce49e1f0b7d761b73" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=2ca2ddd1f4e99fc4bd94bc1790b926e9" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=869a993ceac58dbac5947af67876be9f" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=2fa9d5593ce172212f6b79600b919218" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=1de8b4b4fb8e45448d257b7d75c6d63f" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=050a3571bc83181c5c117de8b66d8a90" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=49071e46ab3a66c5c29b173a1ebc69b0" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=c742556c7b97192dcae5d5d788eb0702" charset="utf-8"></script><?php
 }	?>
 
 <?php

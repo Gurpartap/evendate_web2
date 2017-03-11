@@ -1,6 +1,6 @@
 /**
  * @typedef {object} AJAXData
- * @property {(Array|string|undefined)} [fields]
+ * @property {(Fields|Array|string|undefined)} [fields]
  * @property {(string|undefined)} [format=json] Sets the response format. Can be xml or json. Default: json
  * @property {(boolean|undefined)} [download=false] If flag is TRUE server will set additional headers to make response downloadble in browser. Default: false
  * @property {(boolean|undefined)} [nude_data=false] If nude_data is TRUE server response with only data, without status code and description. Default: false

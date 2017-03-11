@@ -218,13 +218,9 @@ String.prototype.appendAjaxData = function(data) {
  * @return {Array}
  */
 Object.props = function(obj) {
-	var props = [];
-	Object.keys(obj).forEach(function(prop) {
-		if (typeof obj[prop] !== 'function') {
-			props.push(prop);
-		}
+	return Object.keys(obj).filter(function(prop) {
+		return typeof obj[prop] !== 'function';
 	});
-	return props;
 };
 /**
  * Returns objects` own properties
@@ -2290,7 +2286,7 @@ socket.on('utils.registrationSaved', function (data) {
 
 /**
  * @typedef {object} AJAXData
- * @property {(Array|string|undefined)} [fields]
+ * @property {(Fields|Array|string|undefined)} [fields]
  * @property {(string|undefined)} [format=json] Sets the response format. Can be xml or json. Default: json
  * @property {(boolean|undefined)} [download=false] If flag is TRUE server will set additional headers to make response downloadble in browser. Default: false
  * @property {(boolean|undefined)} [nude_data=false] If nude_data is TRUE server response with only data, without status code and description. Default: false
@@ -2341,19 +2337,18 @@ Fields = (function() {
 		
 		Object.defineProperty(FieldsProps.prototype, 'toString', {
 			value: function() {
-				var output = {},
-					prop;
-				for (prop in this) {
-					if (this.hasOwnProperty(prop)) {
-						if (this[prop] instanceof Array) {
-							output[prop] = this[prop].join(',');
-						} else if (this[prop] instanceof Fields) {
-							output[prop] = this[prop].toString();
-						} else {
-							output[prop] = this[prop];
-						}
-					}
-				}
+				var self = this,
+					props = Object.props(this),
+					output = {};
+				
+				if (props.length === 0)
+					return '';
+				
+				props.forEach(function(prop) {
+					output[prop] = (self[prop] instanceof Array || self[prop] instanceof Fields) ? self[prop].toString() : self[prop];
+				});
+				
+				
 				return JSON.stringify(output);
 			}
 		});
@@ -2371,18 +2366,15 @@ Fields = (function() {
 	
 	Object.defineProperty(Fields.prototype, 'toString', {
 		value: function() {
-			var fields = [],
-				field;
-			for(field in this){
-				if(this.hasOwnProperty(field)){
-					if(Object.keys(this[field]).length){
-						fields.push(field+this[field]);
-					} else {
-						fields.push(field);
-					}
-				}
-			}
-			return fields.join(',');
+			var self = this,
+				fields = Object.props(this);
+			
+			if (fields.length === 0)
+				return undefined;
+			
+			return fields.map(function(field_name) {
+				return field_name + self[field_name];
+			}).join(',');
 		}
 	});
 	
@@ -2601,50 +2593,6 @@ EntitiesCollection = extending(Array, (function() {
  * @requires ../../entities/Class.OneEntity.js
  */
 /**
- *
- * @class DateModel
- * @extends OneEntity
- */
-DateModel = extending(OneEntity, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs DateModel
-	 */
-	function DateModel() {
-		this.event_date = '';
-		this.start_time = '';
-		this.end_time = '';
-	}
-	
-	return DateModel;
-}()));
-/**
- * @requires ../../entities/Class.EntitiesCollection.js
- * @requires Class.DateModel.js
- */
-/**
- *
- * @class DateModelsCollection
- * @extends EntitiesCollection
- */
-DateModelsCollection = extending(EntitiesCollection, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs DateModelsCollection
-	 */
-	function DateModelsCollection() {
-		EntitiesCollection.call(this);
-	}
-	DateModelsCollection.prototype.collection_of = DateModel;
-	
-	return DateModelsCollection;
-}()));
-/**
- * @requires ../../entities/Class.OneEntity.js
- */
-/**
  * @class RegistrationFieldModel
  * @extends OneEntity
  */
@@ -2774,6 +2722,50 @@ RegistrationFieldsCollection = extending(EntitiesCollection, (function() {
 	};
 	
 	return RegistrationFieldsCollection;
+}()));
+/**
+ * @requires ../../entities/Class.OneEntity.js
+ */
+/**
+ *
+ * @class DateModel
+ * @extends OneEntity
+ */
+DateModel = extending(OneEntity, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs DateModel
+	 */
+	function DateModel() {
+		this.event_date = '';
+		this.start_time = '';
+		this.end_time = '';
+	}
+	
+	return DateModel;
+}()));
+/**
+ * @requires ../../entities/Class.EntitiesCollection.js
+ * @requires Class.DateModel.js
+ */
+/**
+ *
+ * @class DateModelsCollection
+ * @extends EntitiesCollection
+ */
+DateModelsCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs DateModelsCollection
+	 */
+	function DateModelsCollection() {
+		EntitiesCollection.call(this);
+	}
+	DateModelsCollection.prototype.collection_of = DateModel;
+	
+	return DateModelsCollection;
 }()));
 /**
  * @requires ../Class.OneEntity.js
@@ -3164,7 +3156,16 @@ CitiesCollection = extending(EntitiesCollection, (function() {
 	 * @return {jqPromise}
 	 */
 	CitiesCollection.fetchCities = function(data, success) {
-		return __APP.SERVER.getData('/api/v1/organizations/cities', data, success);
+		var location = {};
+		
+		try {
+			location = {
+				latitude: __APP.LOCATION.latitude,
+				longitude: __APP.LOCATION.longitude
+			};
+		} catch (e) {}
+		
+		return __APP.SERVER.getData('/api/v1/organizations/cities', $.extend(location, data), success);
 	};
 	/**
 	 *
@@ -3197,6 +3198,7 @@ CitiesCollection = extending(EntitiesCollection, (function() {
 	 */
 	CitiesCollection.prototype.fetchCities = function(fields, length, order_by, success) {
 		var self = this;
+		
 		return CitiesCollection.fetchCities({
 			fields: fields || undefined,
 			offset: this.length,
@@ -7627,7 +7629,7 @@ CityChooseModal = extending(AbstractModal, (function() {
 		
 		if(!this.cities){
 			this.cities = new CitiesCollection();
-			this.cities.fetchCities('timediff_seconds', 0, 'local_name', function() {
+			this.cities.fetchCities('timediff_seconds', 0, 'distance,local_name', function() {
 				self.__show();
 			});
 			return this;
@@ -11614,6 +11616,298 @@ OnboardingPage = extending(Page, (function() {
  */
 /**
  *
+ * @class SearchPage
+ * @extends Page
+ */
+SearchPage = extending(Page, (function() {
+	/**
+	 *
+	 * @param {string} search
+	 * @constructor
+	 * @constructs SearchPage
+	 */
+	function SearchPage(search) {
+		Page.apply(this, arguments);
+		
+		this.page_title = 'Поиск';
+		this.$search_bar_input = $('#search_bar_input');
+		this.search_string = decodeURIComponent(search);
+		this.events_ajax_data = {
+			length: 10,
+			fields: new Fields(
+				'image_horizontal_medium_url',
+				'detail_info_url',
+				'nearest_event_date',
+				'can_edit',
+				'location',
+				'is_favorite',
+				'is_registered',
+				'registration_available',
+				'registration_locally',
+				'registration_required',
+				'registration_till',
+				'ticketing_locally',
+				'is_free',
+				'min_price',
+				'favored_users_count',
+				'organization_name',
+				'organization_short_name',
+				'organization_logo_small_url',
+				'description',
+				'favored',
+				'is_same_time',
+				'tags',
+				'dates'
+			),
+			order_by: 'nearest_event_date,-first_event_date'
+		};
+		this.organizations_ajax_data = {
+			length: 30,
+			fields: new Fields([
+				'subscribed_count',
+				'img_small_url'
+			])
+		};
+		this.past_events = false;
+		this.search_results = new SearchResults(this.search_string);
+	}
+	/**
+	 *
+	 * @param {(OneOrganization|Array<OneOrganization>|OrganizationsCollection)} organizations
+	 * @returns {jQuery}
+	 */
+	SearchPage.buildOrganizationItems = function(organizations) {
+		return __APP.BUILD.organizationItems(organizations, {
+			block_classes: ['-show'],
+			avatar_classes: ['-size_50x50', '-rounded'],
+			counter_classes: [__C.CLASSES.HIDDEN]
+		})
+	};
+	/**
+	 *
+	 * @param {(OneEvent|Array<OneEvent>|EventsCollection)} events
+	 * @returns {jQuery}
+	 */
+	SearchPage.buildEventCards = function(events) {
+		var $events = $();
+		if (events.length == 0) {
+			$events = tmpl('search-no-events', {});
+		} else {
+			events.forEach(function(event) {
+				if(event.nearest_event_date == undefined && !this.past_events){
+					$events = $events.add(tmpl('divider', {title: 'Прошедшие события'}));
+					this.past_events = true;
+				}
+				$events = $events.add(__APP.BUILD.eventCards(event));
+			});
+		}
+		return $events
+	};
+	
+	SearchPage.prototype.fetchData = function() {
+		return this.fetching_data_defer = this.search_results.fetchEventsAndOrganizations(this.events_ajax_data, this.organizations_ajax_data);
+	};
+	
+	SearchPage.prototype.init = function() {
+		var PAGE = this,
+			$window = $(window),
+			$organizations_scrollbar;
+		
+		function bindFeedEvents($parent) {
+			trimAvatarsCollection($parent);
+			bindRippleEffect($parent);
+			__APP.MODALS.bindCallModal($parent);
+			bindPageLinks($parent);
+			
+			$parent.find('.HideEvent').remove();
+		}
+		
+		$organizations_scrollbar = this.$wrapper.find('.SearchOrganizationsScrollbar').scrollbar({
+			disableBodyScroll: true,
+			onScroll: function(y) {
+				if (y.scroll == y.maxScroll) {
+					PAGE.search_results.fetchOrganizations(PAGE.organizations_ajax_data, function(organizations) {
+						if (organizations.length) {
+							$organizations_scrollbar.append(SearchPage.buildOrganizationItems(organizations));
+						} else {
+							$organizations_scrollbar.off('scroll.onScroll');
+						}
+						bindPageLinks($organizations_scrollbar);
+					});
+				}
+			}
+		});
+		$window.off('scroll.upload' + PAGE.constructor.name);
+		$window.on('scroll.upload' + PAGE.constructor.name, function() {
+			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.block_scroll) {
+				PAGE.block_scroll = true;
+				PAGE.search_results.fetchEvents(PAGE.events_ajax_data, function(events) {
+					var $events;
+					if(events.length){
+						$events = SearchPage.buildEventCards(events);
+						PAGE.$wrapper.find('.SearchEvents').append($events);
+						bindFeedEvents($events);
+						PAGE.block_scroll = false;
+					} else {
+						$window.off('scroll.upload' + PAGE.constructor.name);
+					}
+				});
+			}
+		});
+		bindFeedEvents(this.$wrapper);
+	};
+	
+	SearchPage.prototype.render = function() {
+		var data = {};
+		
+		this.$search_bar_input.val(this.search_string);
+		
+		data.events = SearchPage.buildEventCards(this.search_results.events);
+		if (this.search_results.organizations.length == 0) {
+			data.no_organizations = __C.CLASSES.HIDDEN;
+		} else {
+			data.organizations = SearchPage.buildOrganizationItems(this.search_results.organizations);
+		}
+		
+		this.$wrapper.append(tmpl('search-wrapper', data));
+		this.init();
+	};
+	
+	return SearchPage;
+}()));
+/**
+ * @requires Class.StatisticsPage.js
+ */
+/**
+ *
+ * @class StatisticsOverviewPage
+ * @extends StatisticsPage
+ */
+StatisticsOverviewPage = extending(StatisticsPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs StatisticsOverviewPage
+	 */
+	function StatisticsOverviewPage() {
+		StatisticsPage.apply(this);
+		this.my_organizations_fields = ['img_medium_url', 'subscribed_count', 'staff'];
+		this.page_title = 'Организации';
+		this.my_organizations = new OrganizationsCollection();
+	}
+	
+	StatisticsOverviewPage.buildMyOrganizationsBlocks = function(organizations) {
+		return tmpl('statistics-overview-organization', organizations.map(function(org) {
+			var avatars_max_count = 2,
+				staff_additional_fields = {
+					is_link: true,
+					avatar_classes: ['-size_100x100', '-rounded']
+				},
+				org_roles = [
+					{
+						name: OneUser.ROLE.ADMIN,
+						title: 'Администраторы',
+						staff: UsersCollection.getSpecificStaff(OneUser.ROLE.ADMIN, org.staff, staff_additional_fields),
+						plural_name: OneUser.ROLE.ADMIN + 's'
+					}, {
+						name: OneUser.ROLE.MODERATOR,
+						title: 'Модераторы',
+						staff: UsersCollection.getSpecificStaff(OneUser.ROLE.MODERATOR, org.staff, staff_additional_fields),
+						plural_name: OneUser.ROLE.MODERATOR + 's'
+					}
+				];
+			
+			org_roles.forEach(function(role) {
+				org[role.plural_name] = __APP.BUILD.avatarCollection(role.staff, avatars_max_count, {
+					dataset: {
+						modal_type: 'editors',
+						modal_specific_role: role.name,
+						modal_title: role.title,
+						modal_organization_id: org.id
+					},
+					classes: ['-size_30x30', '-rounded', '-shifted', 'CallModal'],
+					counter_classes: ['-size_30x30','-color_marginal_primary']
+				});
+			});
+			
+			return $.extend(true, {}, org, {
+				subscribers: org.subscribed_count + getUnitsText(org.subscribed_count, __LOCALES.ru_RU.TEXTS.SUBSCRIBERS),
+				buttons: __APP.BUILD.link({
+					title: 'Редактировать',
+					classes: ['button', 'fa_icon', 'fa-pencil', '-color_neutral', 'RippleEffect'],
+					page: '/organization/' + org.id + '/edit'
+				}, {
+					title: 'Создать событие',
+					classes: ['button', 'fa_icon', 'fa-plus', '-color_accent', 'RippleEffect'],
+					page: '/add/event/to/' + org.id
+				})
+			});
+		}));
+	};
+	
+	StatisticsOverviewPage.prototype.fetchData = function() {
+		return this.fetching_data_defer = this.my_organizations.fetchMyOrganizations('admin', this.my_organizations_fields, 10, '');
+	};
+	
+	StatisticsOverviewPage.prototype.bindOrganizationsEvents = function($parent) {
+		trimAvatarsCollection($parent);
+		bindPageLinks($parent);
+		__APP.MODALS.bindCallModal($parent);
+		bindRippleEffect($parent);
+		return $parent;
+	};
+	
+	StatisticsOverviewPage.prototype.bindUploadOnScroll = function() {
+		var PAGE = this,
+			$window = $(window),
+			scrollEvent = function() {
+				if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.is_upload_disabled) {
+					$window.off('scroll.uploadOrganizations');
+					PAGE.my_organizations.fetchMyOrganizations('admin', PAGE.my_organizations_fields, 10, '', function(organizations) {
+						var $organizations = StatisticsOverviewPage.buildMyOrganizationsBlocks(organizations);
+						if (organizations.length) {
+							PAGE.$wrapper.find('.StatOverviewOrganizations').append($organizations);
+							PAGE.bindOrganizationsEvents($organizations);
+							$window.on('scroll.uploadOrganizations', scrollEvent);
+						} else {
+							PAGE.is_upload_disabled = true;
+						}
+					});
+				}
+			};
+		
+		if (!PAGE.is_upload_disabled) {
+			$window.on('scroll.uploadOrganizations', scrollEvent);
+		}
+	};
+	
+	StatisticsOverviewPage.prototype.init = function() {
+		this.bindOrganizationsEvents(this.$wrapper);
+		this.bindUploadOnScroll();
+	};
+	
+	StatisticsOverviewPage.prototype.render = function() {
+		if(__APP.USER.id === -1){
+			__APP.changeState('/feed/actual', true, true);
+			return null;
+		}
+		this.$wrapper.html(tmpl('statistics-overview-wrapper', {
+			organizations: StatisticsOverviewPage.buildMyOrganizationsBlocks(this.my_organizations)
+		}));
+		this.init();
+	};
+	
+	StatisticsOverviewPage.prototype.destroy = function() {
+		$(window).off('scroll.uploadOrganizations');
+	};
+	
+	return StatisticsOverviewPage;
+}()));
+/**
+ * @requires ../Class.Page.js
+ */
+/**
+ *
  * @class EditOrganizationPage
  * @extends Page
  */
@@ -11979,12 +12273,12 @@ CatalogPage = extending(Page, (function() {
 	CatalogPage.prototype.fetchData = function() {
 		var self = this;
 		
-		return this.fetching_data_defer =	this.cities.fetchCities(null, 0, 'local_name', function() {
+		return this.fetching_data_defer =	this.cities.fetchCities(null, 0, 'distance,local_name', function() {
 			if (self.selected_city_name) {
 				self.selected_city = this.getByName(self.selected_city_name);
 				self.categories_ajax_data.city_id = self.selected_city.id;
 			}
-		}).done(function() {
+		}).then(function() {
 			return self.categories.fetchCategoriesWithOrganizations(self.categories_ajax_data, self.organizations_ajax_data, 0).done(function() {
 				self.all_organizations = self.categories
 					.reduce(function(collection, cat) {
@@ -12372,298 +12666,6 @@ OrganizationPage = extending(Page, (function() {
 	};
 	
 	return OrganizationPage;
-}()));
-/**
- * @requires ../Class.Page.js
- */
-/**
- *
- * @class SearchPage
- * @extends Page
- */
-SearchPage = extending(Page, (function() {
-	/**
-	 *
-	 * @param {string} search
-	 * @constructor
-	 * @constructs SearchPage
-	 */
-	function SearchPage(search) {
-		Page.apply(this, arguments);
-		
-		this.page_title = 'Поиск';
-		this.$search_bar_input = $('#search_bar_input');
-		this.search_string = decodeURIComponent(search);
-		this.events_ajax_data = {
-			length: 10,
-			fields: new Fields(
-				'image_horizontal_medium_url',
-				'detail_info_url',
-				'nearest_event_date',
-				'can_edit',
-				'location',
-				'is_favorite',
-				'is_registered',
-				'registration_available',
-				'registration_locally',
-				'registration_required',
-				'registration_till',
-				'ticketing_locally',
-				'is_free',
-				'min_price',
-				'favored_users_count',
-				'organization_name',
-				'organization_short_name',
-				'organization_logo_small_url',
-				'description',
-				'favored',
-				'is_same_time',
-				'tags',
-				'dates'
-			),
-			order_by: 'nearest_event_date,-first_event_date'
-		};
-		this.organizations_ajax_data = {
-			length: 30,
-			fields: new Fields([
-				'subscribed_count',
-				'img_small_url'
-			])
-		};
-		this.past_events = false;
-		this.search_results = new SearchResults(this.search_string);
-	}
-	/**
-	 *
-	 * @param {(OneOrganization|Array<OneOrganization>|OrganizationsCollection)} organizations
-	 * @returns {jQuery}
-	 */
-	SearchPage.buildOrganizationItems = function(organizations) {
-		return __APP.BUILD.organizationItems(organizations, {
-			block_classes: ['-show'],
-			avatar_classes: ['-size_50x50', '-rounded'],
-			counter_classes: [__C.CLASSES.HIDDEN]
-		})
-	};
-	/**
-	 *
-	 * @param {(OneEvent|Array<OneEvent>|EventsCollection)} events
-	 * @returns {jQuery}
-	 */
-	SearchPage.buildEventCards = function(events) {
-		var $events = $();
-		if (events.length == 0) {
-			$events = tmpl('search-no-events', {});
-		} else {
-			events.forEach(function(event) {
-				if(event.nearest_event_date == undefined && !this.past_events){
-					$events = $events.add(tmpl('divider', {title: 'Прошедшие события'}));
-					this.past_events = true;
-				}
-				$events = $events.add(__APP.BUILD.eventCards(event));
-			});
-		}
-		return $events
-	};
-	
-	SearchPage.prototype.fetchData = function() {
-		return this.fetching_data_defer = this.search_results.fetchEventsAndOrganizations(this.events_ajax_data, this.organizations_ajax_data);
-	};
-	
-	SearchPage.prototype.init = function() {
-		var PAGE = this,
-			$window = $(window),
-			$organizations_scrollbar;
-		
-		function bindFeedEvents($parent) {
-			trimAvatarsCollection($parent);
-			bindRippleEffect($parent);
-			__APP.MODALS.bindCallModal($parent);
-			bindPageLinks($parent);
-			
-			$parent.find('.HideEvent').remove();
-		}
-		
-		$organizations_scrollbar = this.$wrapper.find('.SearchOrganizationsScrollbar').scrollbar({
-			disableBodyScroll: true,
-			onScroll: function(y) {
-				if (y.scroll == y.maxScroll) {
-					PAGE.search_results.fetchOrganizations(PAGE.organizations_ajax_data, function(organizations) {
-						if (organizations.length) {
-							$organizations_scrollbar.append(SearchPage.buildOrganizationItems(organizations));
-						} else {
-							$organizations_scrollbar.off('scroll.onScroll');
-						}
-						bindPageLinks($organizations_scrollbar);
-					});
-				}
-			}
-		});
-		$window.off('scroll.upload' + PAGE.constructor.name);
-		$window.on('scroll.upload' + PAGE.constructor.name, function() {
-			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.block_scroll) {
-				PAGE.block_scroll = true;
-				PAGE.search_results.fetchEvents(PAGE.events_ajax_data, function(events) {
-					var $events;
-					if(events.length){
-						$events = SearchPage.buildEventCards(events);
-						PAGE.$wrapper.find('.SearchEvents').append($events);
-						bindFeedEvents($events);
-						PAGE.block_scroll = false;
-					} else {
-						$window.off('scroll.upload' + PAGE.constructor.name);
-					}
-				});
-			}
-		});
-		bindFeedEvents(this.$wrapper);
-	};
-	
-	SearchPage.prototype.render = function() {
-		var data = {};
-		
-		this.$search_bar_input.val(this.search_string);
-		
-		data.events = SearchPage.buildEventCards(this.search_results.events);
-		if (this.search_results.organizations.length == 0) {
-			data.no_organizations = __C.CLASSES.HIDDEN;
-		} else {
-			data.organizations = SearchPage.buildOrganizationItems(this.search_results.organizations);
-		}
-		
-		this.$wrapper.append(tmpl('search-wrapper', data));
-		this.init();
-	};
-	
-	return SearchPage;
-}()));
-/**
- * @requires Class.StatisticsPage.js
- */
-/**
- *
- * @class StatisticsOverviewPage
- * @extends StatisticsPage
- */
-StatisticsOverviewPage = extending(StatisticsPage, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs StatisticsOverviewPage
-	 */
-	function StatisticsOverviewPage() {
-		StatisticsPage.apply(this);
-		this.my_organizations_fields = ['img_medium_url', 'subscribed_count', 'staff'];
-		this.page_title = 'Организации';
-		this.my_organizations = new OrganizationsCollection();
-	}
-	
-	StatisticsOverviewPage.buildMyOrganizationsBlocks = function(organizations) {
-		return tmpl('statistics-overview-organization', organizations.map(function(org) {
-			var avatars_max_count = 2,
-				staff_additional_fields = {
-					is_link: true,
-					avatar_classes: ['-size_100x100', '-rounded']
-				},
-				org_roles = [
-					{
-						name: OneUser.ROLE.ADMIN,
-						title: 'Администраторы',
-						staff: UsersCollection.getSpecificStaff(OneUser.ROLE.ADMIN, org.staff, staff_additional_fields),
-						plural_name: OneUser.ROLE.ADMIN + 's'
-					}, {
-						name: OneUser.ROLE.MODERATOR,
-						title: 'Модераторы',
-						staff: UsersCollection.getSpecificStaff(OneUser.ROLE.MODERATOR, org.staff, staff_additional_fields),
-						plural_name: OneUser.ROLE.MODERATOR + 's'
-					}
-				];
-			
-			org_roles.forEach(function(role) {
-				org[role.plural_name] = __APP.BUILD.avatarCollection(role.staff, avatars_max_count, {
-					dataset: {
-						modal_type: 'editors',
-						modal_specific_role: role.name,
-						modal_title: role.title,
-						modal_organization_id: org.id
-					},
-					classes: ['-size_30x30', '-rounded', '-shifted', 'CallModal'],
-					counter_classes: ['-size_30x30','-color_marginal_primary']
-				});
-			});
-			
-			return $.extend(true, {}, org, {
-				subscribers: org.subscribed_count + getUnitsText(org.subscribed_count, __LOCALES.ru_RU.TEXTS.SUBSCRIBERS),
-				buttons: __APP.BUILD.link({
-					title: 'Редактировать',
-					classes: ['button', 'fa_icon', 'fa-pencil', '-color_neutral', 'RippleEffect'],
-					page: '/organization/' + org.id + '/edit'
-				}, {
-					title: 'Создать событие',
-					classes: ['button', 'fa_icon', 'fa-plus', '-color_accent', 'RippleEffect'],
-					page: '/add/event/to/' + org.id
-				})
-			});
-		}));
-	};
-	
-	StatisticsOverviewPage.prototype.fetchData = function() {
-		return this.fetching_data_defer = this.my_organizations.fetchMyOrganizations('admin', this.my_organizations_fields, 10, '');
-	};
-	
-	StatisticsOverviewPage.prototype.bindOrganizationsEvents = function($parent) {
-		trimAvatarsCollection($parent);
-		bindPageLinks($parent);
-		__APP.MODALS.bindCallModal($parent);
-		bindRippleEffect($parent);
-		return $parent;
-	};
-	
-	StatisticsOverviewPage.prototype.bindUploadOnScroll = function() {
-		var PAGE = this,
-			$window = $(window),
-			scrollEvent = function() {
-				if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.is_upload_disabled) {
-					$window.off('scroll.uploadOrganizations');
-					PAGE.my_organizations.fetchMyOrganizations('admin', PAGE.my_organizations_fields, 10, '', function(organizations) {
-						var $organizations = StatisticsOverviewPage.buildMyOrganizationsBlocks(organizations);
-						if (organizations.length) {
-							PAGE.$wrapper.find('.StatOverviewOrganizations').append($organizations);
-							PAGE.bindOrganizationsEvents($organizations);
-							$window.on('scroll.uploadOrganizations', scrollEvent);
-						} else {
-							PAGE.is_upload_disabled = true;
-						}
-					});
-				}
-			};
-		
-		if (!PAGE.is_upload_disabled) {
-			$window.on('scroll.uploadOrganizations', scrollEvent);
-		}
-	};
-	
-	StatisticsOverviewPage.prototype.init = function() {
-		this.bindOrganizationsEvents(this.$wrapper);
-		this.bindUploadOnScroll();
-	};
-	
-	StatisticsOverviewPage.prototype.render = function() {
-		if(__APP.USER.id === -1){
-			__APP.changeState('/feed/actual', true, true);
-			return null;
-		}
-		this.$wrapper.html(tmpl('statistics-overview-wrapper', {
-			organizations: StatisticsOverviewPage.buildMyOrganizationsBlocks(this.my_organizations)
-		}));
-		this.init();
-	};
-	
-	StatisticsOverviewPage.prototype.destroy = function() {
-		$(window).off('scroll.uploadOrganizations');
-	};
-	
-	return StatisticsOverviewPage;
 }()));
 /**
  * @requires ../Class.Page.js
@@ -13217,34 +13219,33 @@ ServerConnection = (function() {
 	 */
 	ServerConnection.prototype.validateData = function(ajax_data) {
 		ajax_data = ajax_data || {};
-		if(ajax_data.fields){
-			if(Array.isArray(ajax_data.fields)){
-				if (ajax_data.order_by) {
-					ajax_data.order_by = ajax_data.order_by instanceof Array ? ajax_data.order_by : ajax_data.order_by.split(',');
-					ajax_data.fields = ajax_data.fields.merge(ajax_data.order_by.map(function(order_by) {
-						return order_by.trim().replace('-', '');
-					}));
-					ajax_data.order_by = ajax_data.order_by.join(',');
-				}
-				if (ajax_data.fields.length) {
-					ajax_data.fields = ajax_data.fields.join(',');
-				} else {
-					ajax_data.fields = undefined;
-				}
-			} else if(ajax_data.fields instanceof Fields){
-				if (ajax_data.order_by) {
-					ajax_data.order_by = ajax_data.order_by instanceof Array ? ajax_data.order_by : ajax_data.order_by.split(',');
-					ajax_data.order_by.forEach(function(field) {
-						ajax_data.fields[field.trim().replace('-', '')] = {};
-					});
-					ajax_data.order_by = ajax_data.order_by.join(',');
-				}
-				if (Object.keys(ajax_data.fields).length === 0) {
-					ajax_data.fields = undefined;
-				}
-				
+		var order_by = [];
+		
+		if (ajax_data.order_by) {
+			order_by = (typeof ajax_data.order_by === 'string') ? ajax_data.order_by.split(',') : ajax_data.order_by;
+			order_by = order_by.map(function(unit) {
+				return unit.trim().replace('-', '');
+			});
+			
+			if (ajax_data.order_by instanceof Array) {
+				ajax_data.order_by = ajax_data.order_by.join(',');
 			}
 		}
+		
+		if (!ajax_data.fields) {
+			ajax_data.fields = order_by;
+		} else {
+			if (ajax_data.fields instanceof Array) {
+				ajax_data.fields = ajax_data.fields.merge(order_by);
+			} else if (ajax_data.fields instanceof Fields && order_by.length) {
+				order_by.forEach(function(unit) {
+					ajax_data.fields.add(unit);
+				});
+			}
+		}
+		
+		ajax_data.fields = (ajax_data.fields = ajax_data.fields.toString()) ? ajax_data.fields : undefined;
+		
 		return ajax_data;
 	};
 	

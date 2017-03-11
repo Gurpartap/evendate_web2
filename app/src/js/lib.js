@@ -218,13 +218,9 @@ String.prototype.appendAjaxData = function(data) {
  * @return {Array}
  */
 Object.props = function(obj) {
-	var props = [];
-	Object.keys(obj).forEach(function(prop) {
-		if (typeof obj[prop] !== 'function') {
-			props.push(prop);
-		}
+	return Object.keys(obj).filter(function(prop) {
+		return typeof obj[prop] !== 'function';
 	});
-	return props;
 };
 /**
  * Returns objects` own properties

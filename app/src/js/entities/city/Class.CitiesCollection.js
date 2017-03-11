@@ -25,7 +25,16 @@ CitiesCollection = extending(EntitiesCollection, (function() {
 	 * @return {jqPromise}
 	 */
 	CitiesCollection.fetchCities = function(data, success) {
-		return __APP.SERVER.getData('/api/v1/organizations/cities', data, success);
+		var location = {};
+		
+		try {
+			location = {
+				latitude: __APP.LOCATION.latitude,
+				longitude: __APP.LOCATION.longitude
+			};
+		} catch (e) {}
+		
+		return __APP.SERVER.getData('/api/v1/organizations/cities', $.extend(location, data), success);
 	};
 	/**
 	 *
@@ -58,6 +67,7 @@ CitiesCollection = extending(EntitiesCollection, (function() {
 	 */
 	CitiesCollection.prototype.fetchCities = function(fields, length, order_by, success) {
 		var self = this;
+		
 		return CitiesCollection.fetchCities({
 			fields: fields || undefined,
 			offset: this.length,

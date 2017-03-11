@@ -251,34 +251,33 @@ ServerConnection = (function() {
 	 */
 	ServerConnection.prototype.validateData = function(ajax_data) {
 		ajax_data = ajax_data || {};
-		if(ajax_data.fields){
-			if(Array.isArray(ajax_data.fields)){
-				if (ajax_data.order_by) {
-					ajax_data.order_by = ajax_data.order_by instanceof Array ? ajax_data.order_by : ajax_data.order_by.split(',');
-					ajax_data.fields = ajax_data.fields.merge(ajax_data.order_by.map(function(order_by) {
-						return order_by.trim().replace('-', '');
-					}));
-					ajax_data.order_by = ajax_data.order_by.join(',');
-				}
-				if (ajax_data.fields.length) {
-					ajax_data.fields = ajax_data.fields.join(',');
-				} else {
-					ajax_data.fields = undefined;
-				}
-			} else if(ajax_data.fields instanceof Fields){
-				if (ajax_data.order_by) {
-					ajax_data.order_by = ajax_data.order_by instanceof Array ? ajax_data.order_by : ajax_data.order_by.split(',');
-					ajax_data.order_by.forEach(function(field) {
-						ajax_data.fields[field.trim().replace('-', '')] = {};
-					});
-					ajax_data.order_by = ajax_data.order_by.join(',');
-				}
-				if (Object.keys(ajax_data.fields).length === 0) {
-					ajax_data.fields = undefined;
-				}
-				
+		var order_by = [];
+		
+		if (ajax_data.order_by) {
+			order_by = (typeof ajax_data.order_by === 'string') ? ajax_data.order_by.split(',') : ajax_data.order_by;
+			order_by = order_by.map(function(unit) {
+				return unit.trim().replace('-', '');
+			});
+			
+			if (ajax_data.order_by instanceof Array) {
+				ajax_data.order_by = ajax_data.order_by.join(',');
 			}
 		}
+		
+		if (!ajax_data.fields) {
+			ajax_data.fields = order_by;
+		} else {
+			if (ajax_data.fields instanceof Array) {
+				ajax_data.fields = ajax_data.fields.merge(order_by);
+			} else if (ajax_data.fields instanceof Fields && order_by.length) {
+				order_by.forEach(function(unit) {
+					ajax_data.fields.add(unit);
+				});
+			}
+		}
+		
+		ajax_data.fields = (ajax_data.fields = ajax_data.fields.toString()) ? ajax_data.fields : undefined;
+		
 		return ajax_data;
 	};
 	

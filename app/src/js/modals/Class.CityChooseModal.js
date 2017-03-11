@@ -26,7 +26,7 @@ CityChooseModal = extending(AbstractModal, (function() {
 		
 		if(!this.cities){
 			this.cities = new CitiesCollection();
-			this.cities.fetchCities('timediff_seconds', 0, 'local_name', function() {
+			this.cities.fetchCities('timediff_seconds', 0, 'distance,local_name', function() {
 				self.__show();
 			});
 			return this;

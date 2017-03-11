@@ -49,12 +49,12 @@ CatalogPage = extending(Page, (function() {
 	CatalogPage.prototype.fetchData = function() {
 		var self = this;
 		
-		return this.fetching_data_defer =	this.cities.fetchCities(null, 0, 'local_name', function() {
+		return this.fetching_data_defer =	this.cities.fetchCities(null, 0, 'distance,local_name', function() {
 			if (self.selected_city_name) {
 				self.selected_city = this.getByName(self.selected_city_name);
 				self.categories_ajax_data.city_id = self.selected_city.id;
 			}
-		}).done(function() {
+		}).then(function() {
 			return self.categories.fetchCategoriesWithOrganizations(self.categories_ajax_data, self.organizations_ajax_data, 0).done(function() {
 				self.all_organizations = self.categories
 					.reduce(function(collection, cat) {
