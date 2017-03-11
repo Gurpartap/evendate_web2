@@ -20,19 +20,18 @@ Fields = (function() {
 		
 		Object.defineProperty(FieldsProps.prototype, 'toString', {
 			value: function() {
-				var output = {},
-					prop;
-				for (prop in this) {
-					if (this.hasOwnProperty(prop)) {
-						if (this[prop] instanceof Array) {
-							output[prop] = this[prop].join(',');
-						} else if (this[prop] instanceof Fields) {
-							output[prop] = this[prop].toString();
-						} else {
-							output[prop] = this[prop];
-						}
-					}
-				}
+				var self = this,
+					props = Object.props(this),
+					output = {};
+				
+				if (props.length === 0)
+					return '';
+				
+				props.forEach(function(prop) {
+					output[prop] = (self[prop] instanceof Array || self[prop] instanceof Fields) ? self[prop].toString() : self[prop];
+				});
+				
+				
 				return JSON.stringify(output);
 			}
 		});
@@ -50,18 +49,15 @@ Fields = (function() {
 	
 	Object.defineProperty(Fields.prototype, 'toString', {
 		value: function() {
-			var fields = [],
-				field;
-			for(field in this){
-				if(this.hasOwnProperty(field)){
-					if(Object.keys(this[field]).length){
-						fields.push(field+this[field]);
-					} else {
-						fields.push(field);
-					}
-				}
-			}
-			return fields.join(',');
+			var self = this,
+				fields = Object.props(this);
+			
+			if (fields.length === 0)
+				return undefined;
+			
+			return fields.map(function(field_name) {
+				return field_name + self[field_name];
+			}).join(',');
 		}
 	});
 	

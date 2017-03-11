@@ -12,7 +12,9 @@ RecommendedEventsCollection = extending(EventsCollection, (function() {
 	 * @constructor
 	 * @constructs RecommendedEventsCollection
 	 */
-	function RecommendedEventsCollection() {}
+	function RecommendedEventsCollection() {
+		EventsCollection.call(this);
+	}
 	/**
 	 *
 	 * @override

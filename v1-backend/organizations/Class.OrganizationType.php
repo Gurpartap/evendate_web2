@@ -7,6 +7,7 @@ class OrganizationType extends AbstractEntity{
 	protected $created_at;
 	protected $updated_at;
 	protected $order_position;
+	protected $city_id;
 
 	const RANDOM_FIELD_NAME = 'random';
 	const ORGANIZATIONS_FIELD_NAME = 'organizations';
@@ -41,6 +42,28 @@ class OrganizationType extends AbstractEntity{
 				),
 				Fields::parseOrderBy($fields[self::ORGANIZATIONS_FIELD_NAME]['order_by'] ?? '')
 			)->getData();
+		}
+		return new Result(true, '', $result_data);
+	}
+
+
+
+	public function getParamsWithFilters(AbstractUser $user = null, array $fields = null, $filters = array()): Result
+	{
+		$result_data = parent::getParams($user, $fields)->getData();
+		if (isset($fields[self::ORGANIZATIONS_FIELD_NAME])) {
+			$result_data[self::ORGANIZATIONS_FIELD_NAME] =
+				OrganizationsCollection::filter(
+					App::DB(),
+					$user,
+					array_merge($filters, array('type_id' => $this->id)),
+					Fields::parseFields($fields[self::ORGANIZATIONS_FIELD_NAME]['fields'] ?? ''),
+					array(
+						'length' => $fields[self::ORGANIZATIONS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+						'offset' => $fields[self::ORGANIZATIONS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
+					),
+					Fields::parseOrderBy($fields[self::ORGANIZATIONS_FIELD_NAME]['order_by'] ?? '')
+				)->getData();
 		}
 		return new Result(true, '', $result_data);
 	}
