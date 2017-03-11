@@ -484,6 +484,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         }
                     };
 
+                console.log(url)
+
                 rest.get(url, req_params)
                     .on('complete', function (result) {
                         if (result instanceof Error) {
@@ -664,6 +666,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         subscriptions_count = user.subscriptions_count;
                         q_user = users.update(user_to_ins).where(users.id.equals(user.id)).returning('id').toQuery();
                     }
+
+                    console.log(q_user.text, q_user.values);
 
                     client.query(q_user, function (user_err, ins_result) {
 
