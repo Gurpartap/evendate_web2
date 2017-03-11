@@ -12,7 +12,9 @@ ActualEventsCollection = extending(EventsCollection, (function() {
 	 * @constructor
 	 * @constructs ActualEventsCollection
 	 */
-	function ActualEventsCollection() {}
+	function ActualEventsCollection() {
+		EventsCollection.call(this);
+	}
 	/**
 	 *
 	 * @override

@@ -13,8 +13,17 @@ EntitiesCollection = extending(Array, (function() {
 	 *
 	 * @constructor
 	 * @constructs EntitiesCollection
+	 *
+	 * @property {object} __lookup
+	 * @property {Array<collection_of>} last_pushed
 	 */
 	function EntitiesCollection() {
+		Object.defineProperty(this, '__lookup', {
+			value: {},
+			writable: true,
+			enumerable: false,
+			configurable: false
+		});
 		Object.defineProperty(this, 'last_pushed', {
 			value: [],
 			writable: true,
@@ -39,12 +48,7 @@ EntitiesCollection = extending(Array, (function() {
 	 * @returns {(OneEntity|null)}
 	 */
 	EntitiesCollection.prototype.getByID = function(id) {
-		for (var i = 0; i < this.length; i++) {
-			if (this[i].id == id) {
-				return this[i];
-			}
-		}
-		return null;
+		return this.__lookup.hasOwnProperty(id) ? this.__lookup[id] : null;
 	};
 	/**
 	 *
@@ -60,10 +64,16 @@ EntitiesCollection = extending(Array, (function() {
 	 * @returns {number}
 	 */
 	EntitiesCollection.prototype.push = function(element) {
+		var item;
 		this.last_pushed = [];
 		for (var i = 0; i < arguments.length; i++) {
 			if (!arguments[i].id || (arguments[i].id && !this.has(arguments[i].id))) {
-				this.last_pushed.push(this[this.length++] = arguments[i] instanceof this.collection_of ? arguments[i] : (new this.collection_of()).setData(arguments[i]));
+				item = (arguments[i] instanceof this.collection_of) ? arguments[i] : (new this.collection_of()).setData(arguments[i]);
+				this.last_pushed.push(item);
+				this[this.length++] = item;
+				if (arguments[i].id) {
+					this.__lookup[arguments[i].id] = item;
+				}
 			}
 		}
 		return this.length;
@@ -84,6 +94,7 @@ EntitiesCollection = extending(Array, (function() {
 	 */
 	EntitiesCollection.prototype.remove = function(id) {
 		if (this.has(id)) {
+			delete this.__lookup[id];
 			return this.splice(this.indexOf(this.getByID(id)), 1);
 		}
 		return [];

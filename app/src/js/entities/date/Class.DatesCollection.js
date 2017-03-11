@@ -23,7 +23,9 @@ DatesCollection = extending(EntitiesCollection, (function() {
 	 * @constructor
 	 * @constructs DatesCollection
 	 */
-	function DatesCollection() {}
+	function DatesCollection() {
+		EntitiesCollection.call(this);
+	}
 	DatesCollection.prototype.collection_of = OneDate;
 	/**
 	 *
