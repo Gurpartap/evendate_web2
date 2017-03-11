@@ -170,7 +170,7 @@ class Statistics
 				'stat_type_id' => $type_id
 			));
 
-		$p_ins = $db->prepareExecute($q_ins_event->getStatement());
+		$p_ins = $db->prepareExecute($q_ins_event, 'CANT_SAVE_FRIEND_STATS');
 	}
 
 	public static function StoreBatch(array $events, AbstractUser $user = null, ExtendedPDO $db)

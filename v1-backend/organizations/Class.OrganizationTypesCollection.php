@@ -58,8 +58,8 @@ class OrganizationTypesCollection extends AbstractCollection{
 		$types = $db->prepareExecute($q_get_types, '', $statements)->fetchAll(PDO::FETCH_CLASS, 'OrganizationType');
 		if (count($types) == 0 && $is_one_type) throw new LogicException('CANT_FIND_TYPE');
 		$result_events = array();
-		foreach($types as $tag){
-			$result_events[] = $tag->getParams($user, $fields)->getData();
+		foreach($types as $type){
+			$result_events[] = $type->getParamsWithFilters($user, $fields, $filters)->getData();
 		}
 		return new Result(true, '', $result_events);
 	}
