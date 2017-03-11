@@ -22,7 +22,8 @@ $(document)
 	.ready(function() {
 		var OneSignal = window.OneSignal || [],
 			user_jqhxr,
-			auth_urls_jqxhr;
+			auth_urls_jqxhr,
+			geolocation_jqxhr;
 		
 		OneSignal.push(["init", {
 			appId: "7471a586-01f3-4eef-b989-c809700a8658",
@@ -119,9 +120,29 @@ $(document)
 			action: 'get_urls',
 			mobile: isNotDesktop()
 		});
+		geolocation_jqxhr = outerAjax('https://freegeoip.net/json/');
 		
-		__APP.SERVER.multipleAjax(user_jqhxr, auth_urls_jqxhr, function(user_data, auth_urls) {
+		__APP.SERVER.multipleAjax(user_jqhxr, auth_urls_jqxhr, geolocation_jqxhr, function(user_data, auth_urls, geolocation) {
+			var selected_city = JSON.parse(localStorage.getItem('selected_city'));
+			
+			__APP.LOCATION = geolocation;
 			__APP.AUTH_URLS = auth_urls;
+			
+			if (selected_city) {
+				__APP.USER.selected_city.setData(selected_city);
+			} else {
+				(new CitiesCollection()).fetchCities('timediff_seconds', null, null, function() {
+					var selected_city;
+					if (this.has(__APP.LOCATION.city)) {
+						selected_city = this.getByName(__APP.LOCATION.city);
+						__APP.USER.selected_city.setData(selected_city);
+						localStorage.setItem('selected_city', JSON.stringify(selected_city));
+					} else {
+						(new CityChooseModal(this)).show();
+					}
+				});
+			}
+			
 			if(__APP.USER.id === -1){
 				__APP.TOP_BAR = new TopBarNoAuth();
 				__APP.SIDEBAR = new SidebarNoAuth();

@@ -8,6 +8,17 @@ Page = (function() {
 	 *
 	 * @constructor
 	 * @constructs Page
+	 *
+	 * @property {string} name
+	 * @property {string} state_name
+	 * @property {string} page_title
+	 * @property {jQuery} $view
+	 * @property {jQuery} $wrapper
+	 * @property {string} wrapper_tmpl
+	 * @property {boolean} with_header_tabs
+	 *
+	 * @property {jqPromise} rendering_defer
+	 * @property {jqPromise} fetching_data_defer
 	 */
 	function Page() {
 		this.name = this.constructor.name;

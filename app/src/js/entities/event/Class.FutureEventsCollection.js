@@ -12,7 +12,9 @@ FutureEventsCollection = extending(EventsCollection, (function() {
 	 * @constructor
 	 * @constructs FutureEventsCollection
 	 */
-	function FutureEventsCollection() {}
+	function FutureEventsCollection() {
+		EventsCollection.call(this);
+	}
 	/**
 	 *
 	 * @override

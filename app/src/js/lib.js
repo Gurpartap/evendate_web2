@@ -15,11 +15,14 @@ __C = {
 		COLORS: {
 			ACCENT: '-color_accent',
 			PRIMARY: '-color_primary',
+			DEFAULT: '-color_default',
 			NEUTRAL: '-color_neutral',
 			NEUTRAL_ACCENT: '-color_neutral_accent',
 			MARGINAL: '-color_marginal',
+			MARGINAL_ACCENT: '-color_marginal_accent',
 			MARGINAL_PRIMARY: '-color_marginal_primary',
-			MARGINAL_ACCENT: '-color_marginal_accent'
+			MARGINAL_FRANKLIN: '-color_marginal_franklin',
+			MARGINAL_BUBBLEGUM: '-color_marginal_bubble_gum'
 		},
 		UNIVERSAL_STATES: {
 			EMPTY: '-empty',
@@ -41,6 +44,7 @@ __C = {
 			ADD_TO_FAVORITES: 'AddToFavorites',
 			TEXT: 'Text',
 			CALL_MODAL: 'CallModal',
+			CLOSE_MODAL: 'CloseModal',
 			DROPDOWN_BUTTON: 'DropdownButton',
 			ADD_AVATAR: {
 				ANCESTOR: 'AddAvatarWrapper',
@@ -214,13 +218,9 @@ String.prototype.appendAjaxData = function(data) {
  * @return {Array}
  */
 Object.props = function(obj) {
-	var props = [];
-	Object.keys(obj).forEach(function(prop) {
-		if (typeof obj[prop] !== 'function') {
-			props.push(prop);
-		}
+	return Object.keys(obj).filter(function(prop) {
+		return typeof obj[prop] !== 'function';
 	});
-	return props;
 };
 /**
  * Returns objects` own properties
@@ -1002,8 +1002,15 @@ function tmpl(template_type, items, addTo, direction) {
 			} else if (value instanceof jQuery) {
 				if (value.length) {
 					jQuery_pairs[key] = value;
-					keys[key] = value.is('tr') ? '<tbody id="JQ_tmpl_' + key + '"></tbody>' :
-						value.is('span') ? '<span id="JQ_tmpl_' + key + '"></span>' : '<div id="JQ_tmpl_' + key + '"></div>';
+					if (value.is('tr')) {
+						keys[key] = '<tbody id="JQ_tmpl_' + key + '"></tbody>';
+					} else if (value.is('span')) {
+						keys[key] = '<span id="JQ_tmpl_' + key + '"></span>';
+					} else if (value.is('option')) {
+						keys[key] = '<optgroup id="JQ_tmpl_' + key + '"></optgroup>';
+					} else {
+						keys[key] = '<div id="JQ_tmpl_' + key + '"></div>';
+					}
 				}
 			} else if (value == null) {
 				keys[key] = '';
@@ -1409,6 +1416,28 @@ function isFormValid($form) {
 	}
 	
 	return is_valid;
+}
+/**
+ *
+ * @param {string} url
+ * @param {(AJAXData|string)} [data]
+ * @param {string} [content_type='application/x-www-form-urlencoded; charset=UTF-8']
+ */
+function outerAjax(url, data, content_type) {
+	data = data || {};
+	var jqXHR;
+	if (data.fields instanceof Fields){
+		data.fields = data.fields.toString();
+	}
+	jqXHR = $.ajax({
+		url: url,
+		data: data,
+		method: 'GET',
+		contentType: content_type || 'application/x-www-form-urlencoded; charset=UTF-8'
+	});
+	return jqXHR.then(function(response, status_text, jqXHR) {
+		return response;
+	}).promise();
 }
 
 

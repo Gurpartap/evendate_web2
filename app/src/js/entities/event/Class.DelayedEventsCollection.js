@@ -12,7 +12,9 @@ DelayedEventsCollection = extending(EventsCollection, (function() {
 	 * @constructor
 	 * @constructs DelayedEventsCollection
 	 */
-	function DelayedEventsCollection() {}
+	function DelayedEventsCollection() {
+		EventsCollection.call(this);
+	}
 	/**
 	 *
 	 * @override
