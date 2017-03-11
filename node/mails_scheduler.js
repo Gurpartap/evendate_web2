@@ -3,7 +3,6 @@ let restler = require('restler');
 let moment = require("moment");
 let async = require("async");
 let Utils = require("./utils");
-const exporter = require('highcharts-export-server');
 
 class MailScheduler {
 
@@ -180,6 +179,7 @@ class MailScheduler {
     }
 
     scheduleWeeklyEmails() {
+        const exporter = require('highcharts-export-server');
         //Set up a pool of PhantomJS workers
         exporter.initPool();
         let start = MailScheduler.getLastWeekStart().format('YYYY-MM-DD');
