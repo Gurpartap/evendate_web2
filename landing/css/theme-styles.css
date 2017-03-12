@@ -1068,7 +1068,7 @@ img {
 }
 
 .nav-tabs {
-    border-bottom: 1px solid #313447;
+    border-bottom: 1px solid #28be84;
     margin-bottom: 30px
 }
 
@@ -1095,13 +1095,13 @@ img {
 }
 
 .nav-tabs > li > a:hover {
-    border-color: #9a9ba4 #9a9ba4 #313447;
+    border-color: #28be84 #28be84 #28be84;
     background-color: transparent
 }
 
 .nav-tabs > li.active > a, .nav-tabs > li.active > a:focus, .nav-tabs > li.active > a:hover {
     color: #313447;
-    border: 1px solid #313447;
+    border: 1px solid #28be84;
     border-bottom: 1px solid transparent
 }
 
@@ -1896,6 +1896,10 @@ img {
     border-radius: 5px 5px 0 0
 }
 
+.pricing-plan .header.highlited {
+    background-color: #28be84;
+}
+
 .pricing-plan .header h3 {
     font-size: 1.7em;
     color: #fff;
@@ -2127,7 +2131,8 @@ img {
     width: 100%;
     font-size: 3.2em;
     text-align: center;
-    margin-bottom: 20px
+    margin-bottom: 20px;
+    color: #28be84;
 }
 
 .testimonials-slider {
