@@ -3839,11 +3839,11 @@
         "[end_time]": {
           "type": "string"
         },
-        "[start_time_utc]": {
+        "[start_datetime_utc]": {
           "type": "integer",
           "format": "int64"
         },
-        "[end_time_utc]": {
+        "[end_datetime_utc]": {
           "type": "integer",
           "format": "int64"
         },
