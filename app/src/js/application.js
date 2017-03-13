@@ -1501,6 +1501,19 @@ __LOCALES = {
 					FEM: 'поделилась событием',
 					NEU: 'поделилось событием'
 				}
+			},
+			TICKET_STATUSES: {
+				WAITING_FOR_PAYMENT: 'Ожидание оплаты',
+				PAYED: 'Оплачено',
+				RETURNED_BY_ORGANIZATION: 'Возврат билетов организатором',
+				WITHOUT_PAYMENT: 'Билет без оплаты',
+				PAYMENT_CANCELED_AUTO: 'Отмена оплаты автоматическая',
+				PAYMENT_CANCELED_BY_CLIENT: 'Отмена оплаты клиентом',
+				RETURNED_BY_CLIENT: 'Возврат билетов пользователем',
+				COMPLETED: 'Выполнено',
+				IS_PENDING: 'Ожидает подтверждения',
+				APPROVED: 'Подтверждено',
+				REJECTED: 'Отказано в регистрации'
 			}
 		},
 		DATE: {

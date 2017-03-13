@@ -26,11 +26,11 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @property {?string} detail_info_url
 	 *
-	 * @property {Array} orders
+	 * @property {OrdersCollection} orders
 	 *
 	 * @property {?boolean} ticketing_locally
-	 * @property {Array} tickets
-	 * @property {Array} ticket_types
+	 * @property {TicketsCollection} tickets
+	 * @property {TicketTypesCollection} ticket_types
 	 *
 	 * @property {?boolean} registration_locally
 	 * @property {?boolean} registration_available
@@ -96,11 +96,11 @@ OneEvent = extending(OneEntity, (function() {
 		
 		this.detail_info_url = null;
 		
-		this.orders = [];
+		this.orders = new OrdersCollection(event_id);
 		
 		this.ticketing_locally = null;
-		this.tickets = [];
-		this.ticket_types = [];
+		this.tickets = new TicketsCollection(event_id);
+		this.ticket_types = new TicketTypesCollection(event_id);
 		
 		this.registration_locally = null;
 		this.registration_available = null;
