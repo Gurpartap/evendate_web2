@@ -189,8 +189,8 @@
       "port": 27017
     },
     "https":{
-      "key_path": "/etc/letsencrypt/live/evendate.ru/privkey.pem",
-      "cert_path": "/etc/letsencrypt/live/evendate.ru/fullchain.pem"
+      "key_path": "/etc/letsencrypt/live/evendate.ru-0001/privkey.pem",
+      "cert_path": "/etc/letsencrypt/live/evendate.ru-0001/fullchain.pem"
     },
     "test": {
       "domain": "evendate.ru",
