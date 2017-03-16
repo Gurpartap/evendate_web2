@@ -46,7 +46,15 @@ class TicketsCollection extends AbstractCollection
 				case 'event': {
 					if ($value instanceof Event) {
 						$q_get_tickets->where('event_id = ?', $value->getId());
+
 					}
+					break;
+				}
+				case 'user_name': {
+					$value = '%' . trim($value) . '%';
+					$q_get_tickets->where('user_id IN (SELECT id FROM view_users_names WHERE first_last_name LIKE :query OR last_first_name LIKE :query OR last_name LIKE :query OR first_name LIKE :query OR email = :query)')
+						->bindValue('query', $value);
+					$getting_statistics = true;
 					break;
 				}
 				case 'event_id': {
@@ -69,6 +77,12 @@ class TicketsCollection extends AbstractCollection
 					}
 					break;
 				}
+				case 'number': {
+					$getting_statistics = true;
+					$value = intval(preg_replace("/[^0-9,.]/", "", $value));
+					$q_get_tickets->where('number = ?', $value);
+					break;
+				}
 				case 'user': {
 					if ($value instanceof User) {
 						$q_get_tickets->where('user_id = ?', $user->getId());
@@ -89,8 +103,8 @@ class TicketsCollection extends AbstractCollection
 					INNER JOIN view_all_events ON view_all_events.id = view_tickets.event_id 
 						AND users_organizations.organization_id = view_all_events.organization_id 
 					WHERE users_organizations.role_id = 1
-					AND users_organization.user_id = ?
-					AND status = TRUE
+					AND users_organizations.user_id = ?
+					AND users_organizations.status = TRUE
 					) > 0', $user->getId());
 		} else {
 			$q_get_tickets->where('user_id = ?', $user->getId());
