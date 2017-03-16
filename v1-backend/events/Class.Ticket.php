@@ -28,6 +28,7 @@ class Ticket extends AbstractEntity
 		'status',
 		'checked_out',
 		'uuid',
+		'number',
 		'price'
 	);
 
@@ -213,6 +214,21 @@ class Ticket extends AbstractEntity
 					->getData();
 			} else {
 				$result_data[self::ORDER_FIELD_NAME] = null;
+			}
+		}
+
+		if (isset($fields[self::USER_FIELD_NAME])) {
+			if ($user instanceof User) {
+				$user_fields = Fields::parseFields($fields[self::USER_FIELD_NAME]['fields'] ?? '');
+				$result_data[self::USER_FIELD_NAME] = UsersCollection::one(
+					App::DB(),
+					$user,
+					$this->user_id,
+					$user_fields
+				)->getParams($user, $user_fields)
+					->getData();
+			} else {
+				$result_data[self::USER_FIELD_NAME] = null;
 			}
 		}
 

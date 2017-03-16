@@ -32,7 +32,7 @@ try {
 		$user->logout();
 	}
 
-	if (isset( $_REQUEST['q'] ) && $_REQUEST['q'] != 'onboarding' && !isset($_COOKIE['skip_onboarding']) && !isset($_COOKIE['open_add_organization'])) {
+	if (isset( $_REQUEST['q'] ) && $_REQUEST['q'] != 'onboarding' && !isset($_COOKIE['skip_onboarding'])) {
 		$subscriptions = OrganizationsCollection::filter(
 			$__db,
 			$user,

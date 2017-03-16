@@ -227,7 +227,7 @@ EditOrganizationPage = extending(Page, (function() {
 				header_text: 'Новый организатор'
 			}, local_storage, true);
 			
-			cookies.removeItem('open_add_organization', '/');
+			//cookies.removeItem('open_add_organization', '/');
 			sessionStorage.removeItem('organization_info');
 			
 			$wrapper.html(tmpl('add-organization-page', additional_fields));
