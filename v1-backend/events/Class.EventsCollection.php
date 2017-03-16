@@ -451,6 +451,22 @@ class EventsCollection extends AbstractCollection
 						FROM hidden_events
 						WHERE hidden_events.user_id = :user_id)');
 
+					$q_get_subscriptions_count = App::queryFactory()->newSelect();
+						$q_get_subscriptions_count
+						->from('subscriptions')
+						->cols(array('COUNT(id) AS subs_count'))
+						->where('user_id = ?', $user->getId())
+						->where('status = TRUE');
+
+					$subs_count = $db->prepareExecute($q_get_subscriptions_count, 'CANT_COUNT_SUBSCRIPTIONS')->fetchColumn(0);
+
+					if ($subs_count > 0){
+						$q_get_events->where('city_id IN (SELECT
+						organizations.city_id
+						FROM subscriptions
+						INNER JOIN organizations ON subscriptions.organization_id = organizations.id
+						WHERE subscriptions.user_id = :user_id AND subscriptions.status = TRUE AND organizations.status = TRUE) OR view_events.is_online = TRUE');
+					}
 
 					$order_by = array('rating DESC');
 					$statement_array[':user_id'] = $user->getId();
