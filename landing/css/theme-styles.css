@@ -2616,7 +2616,7 @@ div.line {
 
 .wizard .body {
     width: 100%;
-    background-color: #e7e7ea;
+    background-color: rgba(40, 190, 132, 0.06);
     -webkit-border-radius: 0 0 5px 5px;
     -moz-border-radius: 0 0 5px 5px;
     border-radius: 0 0 5px 5px
