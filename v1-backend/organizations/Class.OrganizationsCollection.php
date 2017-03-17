@@ -186,7 +186,6 @@ class OrganizationsCollection extends AbstractCollection
 
 		if (isset($getting_private_organization) && $getting_private_organization == true) {
 			$instance_class_name = 'PrivateOrganization';
-		} else {
 			$q_get_organizations
 				->where('(is_private = false OR (
 				
