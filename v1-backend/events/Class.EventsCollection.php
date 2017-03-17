@@ -475,10 +475,10 @@ class EventsCollection extends AbstractCollection
 				case 'can_edit': {
 					$val = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
 					$operand = $val ? 'IN' : ' NOT IN ';
-					$q_get_events->where('id ' . $operand .' (SELECT user_id 
+					$q_get_events->where('organization_id ' . $operand .' (SELECT organization_id 
 							FROM users_organizations 
-							WHERE organization_id = view_events.organization_id 
-							AND users_organizations.status = TRUE)');
+							WHERE status = TRUE
+							AND users_organizations.user_id = :user_id)');
 					$statement_array[':user_id'] = $user->getId();
 					break;
 				}
