@@ -35,7 +35,6 @@ socket.on('auth', function (data) {
 				if (data.hasOwnProperty('mobile') && data.mobile == true) {
 					window.location.href = '/mobileAuthDone.php?token=' + data.token + '&email=' + data.email;
 				} else {
-					debugger;
 					if (sessionStorage.getItem('organization_info')) {
 						window.parent.location = '/add/organization';
 					} else if (data.subscriptions_count == 0) {

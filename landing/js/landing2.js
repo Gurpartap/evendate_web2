@@ -141,13 +141,55 @@ $(document).ready(function (e) {
 	
 	/*Subscriptions Form Validation*/
 	$('.subscribe-form').validate();
-	
-	
-	var _graph_data = [
-		{lineChartData: [65, 69, 84, 75, 89, 95], barChartData: [72, 78, 84, 74, 87, 94]},
-		{lineChartData: [36, 49, 59, 72, 83, 88], barChartData: [72, 78, 84, 74, 87, 94]},
-		{lineChartData: [100, 100, 100, 75, 89, 95], barChartData: [90, 92, 96, 100, 100, 100]}
-	];
+
+    function validateEmail(email) {
+        var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(email);
+    }
+
+    function sendForm(el, event){
+        var $form = $(el).parents("form"),
+            $required = $form.find(":required"),
+            is_valid = true;
+
+        $required.each(function (i, el) {
+            var $this = $(el);
+            if ($this.is("[type='email']") && !validateEmail($this.val())) {
+                $this.parents(".form-group").addClass("has-error");
+                $this.one("input", function () {
+                    $(this).parents(".form-group").removeClass("has-error");
+                });
+                is_valid = false;
+            } else if (!$this.val().trim()) {
+                $this.parents(".form-group").addClass("has-error");
+                $this.one("input", function () {
+                    $(this).parents(".form-group").removeClass("has-error");
+                });
+                is_valid = false;
+            }
+        });
+        if (is_valid) {
+            $form.find('.form-group').hide();
+            $(el).hide();
+            var arr = $form.serializeArray(),
+                data = {};
+
+            arr.forEach(function (val) {
+                data[val.name] = val.value;
+            });
+
+            socket.emit('utils.feedback', data);
+        }
+        return data;
+    }
+
+
+
+    $("#send-feedback").off('click').on("click", function (e) {
+        sendForm(this);
+        $('.response-holder').html('<p class="result-message">Спасибо за интерес к нашему сервису.<br>Ожидайте ответ в течение суток.</p>');
+        e.preventDefault();
+    });
 
 ////////////////////////////*APPLICATION WIZARD*/////////////////////////
 	
@@ -239,66 +281,6 @@ $(document).ready(function (e) {
 			}
 		}
 	}
-
-
-///////////////////////////////////*CHARTS*/////////////////////////////
-	
-	
-	var random_index = Math.floor(Math.random() * 3),
-		_data = _graph_data[random_index];
-	
-	//////////*Line Chart*///////////
-	var lineChartData = {
-		options: {
-			legend: {
-				display: false
-			}
-		},
-		labels: ["сентябрь", "октябрь", "нобярь", "декабрь", "январь", "февраль"],
-		datasets: [
-			{
-				fillColor: "rgba(220,220,220,0)",
-				strokeColor: "#28be84",
-				pointColor: "#28be84",
-				pointStrokeColor: "#fff",
-				data: _data.lineChartData
-			}
-			// ,
-			// {
-			// 	fillColor : "rgba(151,187,205,0)",
-			// 	strokeColor : "rgba(49,52,71,1)",
-			// 	pointColor : "rgba(255,111,105,1)",
-			// 	pointStrokeColor : "#fff",
-			// 	data : [28,48,40,19,96,27]
-			// }
-		]
-	};
-	
-	$('#lineChart').waypoint(function () {
-		var lineChart = new Chart(document.getElementById("lineChart").getContext("2d")).Line(lineChartData, {
-			options: {
-				xAxes: [{
-					display: false
-				}]
-			}
-		});
-	}, {offset: '75%', triggerOnce: true});
-	
-	
-	//////////*Bar Chart*///////////
-	var barChartData = {
-		labels: ["сентябрь", "октябрь", "нобярь", "декабрь", "январь", "февраль"],
-		datasets: [
-			{
-				fillColor: "rgba(40, 190, 132, 0.5)",
-				strokeColor: "rgba(40, 190, 132, 1)",
-				data: _data.barChartData
-			}
-		]
-	};
-	$('#barChart').waypoint(function () {
-		var barChart = new Chart(document.getElementById("barChart").getContext("2d")).Bar(barChartData);
-	}, {offset: '75%', triggerOnce: true});
 	
 	$.ajax('/auth.php', {
 		method: 'GET',
