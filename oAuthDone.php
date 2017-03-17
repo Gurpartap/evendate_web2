@@ -25,7 +25,7 @@
     <meta name="theme-color" content="#ffffff">
 
 </head>
-<body>
+<body style="margin: 0;">
 <div class="mask-loading">
     <div class="spinner">
         <div class="double-bounce1"></div>
