@@ -170,7 +170,7 @@ class DBCaller {
                         }
                     });
                     let q_get_chat_ids = Entities.tg_sub_topics.select(
-                        Entities.tg_sub_topics.star()
+                        Entities.tg_sub_topics.star().distinct()
                     ).where(Entities.tg_sub_topics.tg_topic_id.in(topic_ids))
                         .where(Entities.tg_sub_topics.status.equals(true)).toQuery();
                     console.log(q_get_chat_ids.text);

@@ -1920,7 +1920,7 @@ img {
 }
 
 .pricing-plan .body {
-    padding: 40px 0 15px;
+    padding: 40px 0 0;
     background-color: #e7e7ea;
     -webkit-border-radius: 0 0 5px 5px;
     -moz-border-radius: 0 0 5px 5px;

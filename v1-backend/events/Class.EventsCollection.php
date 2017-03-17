@@ -217,6 +217,7 @@ class EventsCollection extends AbstractCollection
 					if ($_organization instanceof Organization) {
 						$q_get_events->where('organization_id = :organization_id');
 						$statement_array[':organization_id'] = $_organization->getId();
+						$getting_personal_events = true;
 					}
 					break;
 				}
