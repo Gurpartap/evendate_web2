@@ -1,0 +1,55 @@
+<script type="javascript/template" id="tmpl-std-wrapper">
+	<div class="page_wrapper Content -fadeable"></div>
+</script>
+
+<script type="javascript/template" id="tmpl-feed-wrapper">
+	<div class="page_wrapper">
+		<div class="feed_event_cards_wrapper feed_events FeedEvents Content -fadeable"></div>
+		<div class="event_vulcan">
+			<div class="page feed_calendar FeedCalendar"></div>
+			<div class="FeedVulcanEvents"></div>
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-organizations-wrapper">
+	<div class="page_wrapper -organizations_wrapper">
+		<aside class="organizations_aside">
+			<div class="form_unit">
+				<select id="organizations_cities_select" class="OrganizationsCities" name="city" title=""></select>
+			</div>
+			<div class="page organizations_categories">
+				<header class="organizations_categories_header">
+					<span class="organizations_categories_title -unselectable">Рубрики</span>
+					<span class="action -color_accent ShowAllOrganizations">Все</span>
+				</header>
+				<div class="organizations_categories_container scrollbar-outer OrganizationsCategoriesScroll">{organization_categories}</div>
+			</div>
+			<!--<button class="button -low -fill -color_neutral_accent RippleEffect" type="button">Предложить организатора</button>-->
+		</aside>
+
+		<div class="organizations_wrapper Content OrganizationsWrapper -fadeable">{organization_units}</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-friends-wrapper">
+	<div class="page_wrapper -fadeable" style="padding-top: 100px;">
+
+		<div class="no-friends-block hidden">
+			<div class="no-friends-text">Ваших друзей пока нет в Evendate</div>
+		</div>
+		<div class="friends-main-content hidden">
+
+			<div class="load-more-btn hidden" data-page-number="0">
+				<button class="btn btn-lg disabled btn-pink-empty"> Загрузить еще...</button>
+			</div>
+		</div>
+		<div class="one-friend-profile one-friend-main-content"></div>
+
+		<div class="friends-right-bar hidden">
+			<div class="friends-bar-header"> Друзья <span class="label label-blue friends-count"></span>
+			</div>
+			<div class="friends-list"></div>
+		</div>
+	</div>
+</script>

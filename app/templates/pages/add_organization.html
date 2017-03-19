@@ -1,0 +1,169 @@
+<script type="javascript/template" id="tmpl-add-organization-page">
+
+	<div class="page add_organization_page">
+		<form class="form-horizontal" id="add-organization-form">
+
+			<h2>{header_text}</h2>
+			<input id="add_organization_organization_id" type="hidden" name="organization_id" value="{id}">
+
+			<h3><label for="add_organization_city">Город</label></h3>
+			<div class="form_unit">
+				<select id="add_organization_city" name="city_id">
+					<option value="0" disabled selected></option>
+				</select>
+			</div>
+
+			<h3><label for="add_organization_type">Категория</label></h3>
+			<div class="form_unit">
+				<select id="add_organization_type" name="type_id"></select>
+			</div>
+
+			<h3><label for="add_organization_title">Полное название</label></h3>
+			<div class="form_unit">
+				<input id="add_organization_title" class="form_input LimitSize" type="text" name="name" value="{name}" autocomplete="off" placeholder="Название организации" data-maxlength="150" required>
+			</div>
+
+			<h3><label for="add_organization_short_name">Сокращенное название</label></h3>
+			<div class="form_unit">
+				<input id="add_organization_short_name" class="form_input LimitSize" type="text" name="short_name" value="{short_name}" autocomplete="off" placeholder="Сокращенное навание организации" data-maxlength="30" required>
+			</div>
+
+			<h3><label for="add_organization_email">Email</label></h3>
+			<div class="form_unit">
+				<input id="add_organization_email" class="form_input" type="text" name="email" value="{email}" autocomplete="off" placeholder="Email для связи">
+			</div>
+
+			<h3><label for="add_organization_site_url">Официальный сайт</label></h3>
+			<div class="form_unit">
+				<input id="add_organization_site_url" class="form_input" type="text" name="site_url" value="{site_url}" autocomplete="off" placeholder="Адрес сайта">
+			</div>
+
+			<h3><label for="add_organization_address">Адрес</label></h3>
+			<div class="form_unit">
+				<input id="add_organization_address" class="form_input" type="text" name="default_address" value="{default_address}" autocomplete="off" placeholder="Фактический адрес">
+			</div>
+
+			<h3><label for="add_organization_description">Описание</label></h3>
+			<div class="form_unit">
+				<textarea id="add_organization_description" class="form_textarea LimitSize" data-maxlength="250" name="description" placeholder="Не более 250 символов" required>{description}</textarea>
+			</div>
+
+			<h3><label for="add_organization_facebook_url">Группа в Facebook</label></h3>
+			<div class="form_unit">
+				<input id="add_organization_facebook_url" class="form_input" type="text" name="facebook_url" value="{facebook_url}" autocomplete="off" placeholder="Ссылка на официальную группу в Facebook">
+			</div>
+
+			<h3><label for="add_organization_vk_url">Группа во ВКонтакте</label></h3>
+			<div class="form_unit">
+				<input id="add_organization_vk_url" class="form_input" type="text" name="vk_url" value="{vk_url}" autocomplete="off" placeholder="Ссылка на официальную группу во ВКонтакте">
+			</div>
+
+			<h3>Изображения</h3>
+			<div class="form_group -parts_e_2 ImgLoadWrap" data-aspect_ratio="1/1">
+				<div class="form_unit -centering">
+					<div class="wrapper">
+						<h4>Логотип</h4>
+						<p>минимальный размер 500x500 </p>
+						<p>рекомендуемый формат: png с прозрачным фоном</p>
+						<div class="Tabs">
+							<header class="tabs_header HeaderTabs -color_accent">
+								<span class="tab Tab -active">По ссылке</span>
+								<span class="tab Tab">С компьютера</span>
+							</header>
+							<div class="tab_bodies_wrap TabsBodyWrapper">
+								<div class="tab_body TabsBody -active">
+									<div class="form_unit">
+										<input id="add_organization_load_by_url_hor" class="form_input LoadByURLAddress" type="text" autocomplete="off" placeholder="Ссылка на изображение">
+									</div>
+									<div class="form_unit">
+										<button class="button -color_accent RippleEffect LoadByURLButton" type="button" tabindex="-1">
+											<span class="Text">Загрузить</span>
+										</button>
+									</div>
+								</div>
+								<div class="tab_body TabsBody">
+									<div class="form_unit">
+										<button class="button -color_accent RippleEffect FileLoadButton" type="button" tabindex="-1">
+											<input class="LoadImg -hidden" type="file" accept="image/*">
+											<span class="Text">Выбрать</span>
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+						<p class="FileNameText"></p>
+						<div class="form_unit">
+							<button class="button -color_marginal_accent RippleEffect CropperButton -hidden" type="button" tabindex="-1">
+								<span class="Text">Кадрировать</span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="form_unit">
+					<div class="img_holder">
+						<img class="add_organization_img_preview_logo ImgPreview" src="{img_url}">
+						<img src="/app/img/add_organization/preview.png">
+						<input id="add_organization_img_src" class="ImgSrc" type="hidden" name="logo" value="{img_base64}">
+						<input id="add_organization_img_filename" class="FileName" type="hidden" name="logo_filename" value="{logo_filename}">
+					</div>
+				</div>
+			</div>
+			<div class="form_group -parts_e_2 ImgLoadWrap" data-aspect_ratio="16/9">
+				<div class="form_unit -centering">
+					<div class="wrapper">
+						<h4>Фоновое изображение</h4>
+						<p>минимальный размер 1366x768 </p>
+						<p>рекомендуемый формат: jpeg/jpg</p>
+						<div class="Tabs">
+							<header class="tabs_header HeaderTabs -color_accent">
+								<span class="tab Tab -active">По ссылке</span>
+								<span class="tab Tab">С компьютера</span>
+							</header>
+							<div class="tab_bodies_wrap TabsBodyWrapper">
+								<div class="tab_body TabsBody -active">
+									<div class="form_unit">
+										<input id="add_organization_load_by_url_vert" class="form_input LoadByURLAddress" type="text" autocomplete="off" placeholder="Ссылка на изображение">
+									</div>
+									<div class="form_unit">
+										<button class="button -color_accent RippleEffect LoadByURLButton" type="button" tabindex="-1">
+											<span class="Text">Загрузить</span>
+										</button>
+									</div>
+								</div>
+								<div class="tab_body TabsBody">
+									<div class="form_unit">
+										<button class="button -color_accent RippleEffect FileLoadButton" type="button" tabindex="-1">
+											<input class="LoadImg -hidden" type="file" accept="image/*">
+											<span class="Text">Выбрать</span>
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+						<p class="FileNameText"></p>
+						<div class="form_unit">
+							<button class="button -color_marginal_accent RippleEffect CropperButton -hidden" type="button" tabindex="-1">
+								<span class="Text">Кадрировать</span>
+							</button>
+						</div>
+					</div>
+				</div>
+				<div class="form_unit">
+					<div class="img_holder">
+						<img class="add_organization_img_preview_background ImgPreview" src="{background_img_url}">
+						<img src="/app/img/add_organization/preview.png">
+						<input id="add_organization_background_src" class="ImgSrc" type="hidden" name="background" value="{background_base64}">
+						<input id="add_organization_background_filename" class="FileName" type="hidden" name="background_filename" value="{background_filename}">
+					</div>
+				</div>
+			</div>
+
+			<div class="form_unit -align_center">
+				<button id="add_organization_submit" class="button RippleEffect -color_accent" type="button">Сохранить</button>
+			</div>
+		</form>
+		<div class="alert">
+
+		</div>
+	</div>
+</script>

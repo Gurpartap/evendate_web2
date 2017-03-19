@@ -1,0 +1,34 @@
+<script type="javascript/template" id="tmpl-feed-event">
+	<div class="page feed_event FeedEvent">
+		<a href="/event/{id}" class="feed_event_img_side link Link" style="background-image: url('{image_horizontal_url}')"></a>
+		<aside class="feed_event_info_side AddAvatarWrapper">
+			<header class="feed_event_header">
+				{organization_avatar_block}
+				<div class="feed_event_header_buttons">
+					{header_buttons}
+				</div>
+			</header>
+			<h3 class="feed_event_title"><a href="/event/{id}" class="link Link">{title}</a></h3>
+			<footer class="feed_event_footer">
+				{feed_event_infos}
+				<div class="form_group -parts_e_2">
+					<div class="form_unit">{avatars_collection}</div>
+					<div class="form_unit">{action_button}</div>
+				</div>
+			</footer>
+		</aside>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-feed-event-info">
+	<p class="feed_event_info">{text}</p>
+</script>
+
+<script type="javascript/template" id="tmpl-feed-no-event">
+	<div class="feed_no_event -centering">
+		<div>
+			<p class="feed_no_event_text">{text}</p>
+			{button}
+		</div>
+	</div>
+</script>

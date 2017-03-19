@@ -1,0 +1,64 @@
+<script type="javascript/template" id="tmpl-orgstat-overview">
+	<div class="page orgstat_overview">
+		<aside class="orgstat_overview_sidebar">
+			<header class="orgstat_overview_sidebar_header">
+				<span class="orgstat_overview_sidebar_title">Об организаторе</span>
+				<!--<span class="stamp -color_accent">Starter</span>-->
+			</header>
+			<div class="orgstat_overview_sidebar_wrapper orgstat_overview_sidebar_top -align_center">
+				{avatar_block}
+				<p class="orgstat_overview_sidebar_title">{name}</p>
+				<p class="orgstat_overview_sidebar_description">{description}</p>
+				<p class="orgstat_overview_sidebar_location">{default_address}</p>
+				<a href="/organization/{id}/edit" class="button -color_neutral -size_low fa_icon fa-pencil RippleEffect link Link"><span class="Text">Редактировать</span></a>
+			</div>
+			<div class="orgstat_overview_sidebar_wrapper -align_center -hidden">
+				<button class="button -color_telegram -size_low fa_icon fa-send RippleEffect" type="button"><span class="Text">Создать Telegram бота</span></button>
+			</div>
+			<div class="orgstat_overview_sidebar_wrapper">
+				{staff_block}
+			</div>
+			{event_blocks}
+			<div class="orgstat_overview_sidebar_wrapper">
+				<p class="orgstat_overview_sidebar_title">Аудитория</p>
+				<div class="GenderPieChart"></div>
+				<div class="DevicePieChart"></div>
+			</div>
+		</aside>
+		<div class="orgstat_overview_content OrgstatOverviewContent">
+			<header class="orgstat_overview_header Scoreboards">{scoreboards}</header>
+			<div class="orgstat_overview_charts OrgStatAreaCharts">
+				<div class="orgstat_overview_chart AreaChart SubscriberAreaChart"></div>
+				<div class="orgstat_overview_chart AreaChart ViewAreaChart"></div>
+				<div class="orgstat_overview_chart AreaChart ConversionAreaChart"></div>
+			</div>
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-orgstat-overview-sidebar-wrapper">
+	<div class="orgstat_overview_sidebar_wrapper">
+		{content}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-orgstat-overview-sidebar-wrapper-title">
+	<p class="orgstat_overview_sidebar_title">{title}</p>
+</script>
+
+<script type="javascript/template" id="tmpl-orgstat-event-block">
+	<a href="/statistics/event/{id}" class="orgstat_event_block link Link">
+		<aside class="orgstat_event_block_date">
+			<span>{day}</span><br>
+			<span>{month}</span>
+		</aside>
+		<div class="orgstat_event_block_body">
+			<p class="orgstat_event_block_name">{title}</p>
+			{badges}
+		</div>
+	</a>
+</script>
+
+<script type="javascript/template" id="tmpl-orgstat-event-block-badge">
+	<span class="orgstat_event_block_badge">{title}</span>
+</script>

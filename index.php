@@ -280,10 +280,12 @@ if($DEBUG_MODE) { ?>
 } else { ?>
 	<script type="text/javascript" src="/dist/vendor.min.js?rev=3814501776793e2f67d09d4500242d5e" charset="utf-8"></script>
 	<script type="text/javascript" src="/dist/app.min.js?rev=a855c7bd8fb69f3df4fda8696e50e274" charset="utf-8"></script><?php
-}	?>
+}
 
-<?php
-require 'templates.html';
+foreach (glob("app/templates/{*/*/*/*,*/*/*,*/*,*}.html", GLOB_BRACE) as $filename) {
+	// ¯\_(ツ)_/¯
+	require_once($filename);
+}
 require 'footer.php';
 ?>
 

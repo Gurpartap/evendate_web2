@@ -1,0 +1,210 @@
+<script type="javascript/template" id="tmpl-input">
+	<input class="{classes}" {attributes} {dataset}>
+</script>
+
+<script type="javascript/template" id="tmpl-textarea">
+	<textarea class="{classes}" {attributes} {dataset}>{value}</textarea>
+</script>
+
+<script type="javascript/template" id="tmpl-divider">
+	<hr title="{title}" {dataset}>
+</script>
+
+<script type="javascript/template" id="tmpl-radio-checkbox">
+	<div class="{unit_classes}">
+		<input id="{id}" class="{classes}" type="{type}" name="{name}" {attributes} {dataset} tabindex="-1">
+		<label class="form_label" for="{id}"><span>{label}</span></label>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-form-unit">
+	<div class="form_unit {unit_classes}">
+		<label class="form_label {label_classes}" for="{id}">{label}</label>
+		{form_element}
+		{helptext}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-form-helptext">
+	<p class="form_helptext" {attributes} {dataset}>{text}</p>
+</script>
+
+<script type="javascript/template" id="tmpl-button">
+	<button class="button {classes}" type="button" {attributes}><span class="Text">{title}</span></button>
+</script>
+
+<script type="javascript/template" id="tmpl-link">
+	<a href="{page}" class="link {classes} Link" {dataset} {attributes}>{title}</a>
+</script>
+
+<script type="javascript/template" id="tmpl-tag">
+	<a class="tag_unit link Link {classes}" href="{page}" {dataset} {attributes}>{name}</a>
+</script>
+
+<script type="javascript/template" id="tmpl-user-tombstone">
+	<{html_tag} class="user_tombstone {tombstone_classes}" {attributes} {dataset}>
+	{avatar}
+	<p class="user_tombstone_title">{name}</p>
+	</{html_tag}>
+</script>
+
+<script type="javascript/template" id="tmpl-option">
+	<option value="{val}" {data}>{display_name}</option>
+</script>
+
+<script type="javascript/template" id="tmpl-subscriber-divider">
+	<span class="organization_subscribers_divider -text_color_accent">{label}</span>
+</script>
+
+<script type="javascript/template" id="tmpl-subscriber">
+	{divider}
+	{avatar_block}
+</script>
+
+<script type="javascript/template" id="tmpl-avatar-block">
+	<{html_tag} class="avatar_block {block_classes}" {attributes} {dataset}>
+	{avatar}
+	<span class="avatar_name">{name}</span>
+	</{html_tag}>
+</script>
+
+<script type="javascript/template" id="tmpl-avatars-collection">
+	<div class="avatars_collection AvatarsCollection {classes}" {dataset}>{avatars}</div>
+	<span class="counter {counter_classes}">+<span class="FavoredCount">{more_avatars_count}</span></span>
+</script>
+
+<script type="javascript/template" id="tmpl-avatar">
+	<div class="avatar {classes}" title="{name}" {dataset} {attributes}>
+		<img src="{avatar_url}" onerror="this.onerror=null;this.src='/app/img/brand_logo.png'">
+		{badge}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-avatar-badge">
+	<span class="avatar_badge"><i class="fa fa-{icon_class}"></i></span>
+</script>
+
+<script type="javascript/template" id="tmpl-organization-item">
+	<a href="/organization/{id}" class="organization_item {block_classes} link Link" data-organization_id="{id}" {dataset}>
+		{avatar_block}
+		<span class="counter organization_counter OrganizationCounter {counter_classes}">{new_events_count}</span>
+	</a>
+</script>
+
+<script type="javascript/template" id="tmpl-activity-block">
+	<div class="activity_block -type_{type_code} -entity_{entity}">
+		{creator_avatar}
+		<div class="activity_block_content">
+			<p class="activity_block_top"><a href="{creator_url}" class="activity_block_creator link Link">{creator_name}</a> {additional_info}</p>
+			<p class="activity_block_middle"><a href="{entity_url}" class="link Link">{hero_text}</a></p>
+			<p class="activity_block_bottom">{date}</p>
+		</div>
+		<a class="activity_block_image img_holder link Link" href="{entity_url}">
+			<img src="{img_url}" height="48" onerror="this.onerror=null;this.src='/app/img/brand_logo.png'">
+		</a>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-tabs-header">
+	<header class="tabs_header HeaderTabs -color_{color}">
+		{tabs}
+	</header>
+</script>
+
+<script type="javascript/template" id="tmpl-tab">
+	<span class="tab Tab {classes}" {dataset}>{label}</span>
+</script>
+
+<script type="javascript/template" id="tmpl-loader">
+	<div class="loader">
+		<div class="loader_dot"></div>
+		<div class="loader_dot"></div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-loader-block">
+	<div class="loader_block">{loader}</div>
+</script>
+
+<script type="javascript/template" id="tmpl-vk-share-button">
+	<button class="ShareButton share_icon {classes}" data-title="VK" data-href="http://vk.com/share.php?url=http://evendate.ru/event/{id}?title={title}&description={description}&image={image_horizontal_url}&noparse=false"></button>
+</script>
+
+<script type="javascript/template" id="tmpl-facebook-share-button">
+	<button class="ShareButton share_icon {classes}" data-title="Facebook" data-href="http://www.facebook.com/dialog/share?app_id=1692270867652630&display=popup&title={title}&quote={description}&href=http://evendate.ru/event/{id}&redirect_uri=http://evendate.ru/event/{id}image[0][url]={image_horizontal_large_url}&image[0][user_generated]=true"></button>
+</script>
+
+<script type="javascript/template" id="tmpl-twitter-share-button">
+	<button class="ShareButton share_icon twitter {classes}" data-title="Twitter" data-href="https://twitter.com/share?url=http://evendate.ru/event/{id}?text={title}&via=evendate.ru&hashtags=#evendate"></button>
+</script>
+
+<script type="javascript/template" id="tmpl-event-card">
+	<div class="event_card">
+		<div class="event_card_img" style="background-image: url('{image_horizontal_small_url}')"></div>
+		<div class="event_card_description">
+			<span>{title}</span>
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-event-block">
+	{divider}
+	<div class="event_block" data-event-id="{id}" data-event_date="{date}">
+		<a href="/event/{id}" class="event_block_img img_holder link Link" style="background-image: url({image_horizontal_medium_url})"></a>
+		<div class="event_block_info">
+			<header class="event_block_title">
+				<a href="/event/{id}" class="link Link">{title}</a>
+			</header>
+			<div class="event_block_service">
+				<p><small>{time}</small></p>
+				<div class="event_block_action_buttons AddAvatarWrapper">
+					<div class="event_block_add_avatar_wrapper">{avatars_collection}</div>
+					{action_buttons}
+				</div>
+			</div>
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-ticket-card">
+	<div class="page ticket_card {card_classes}">
+		<div class="ticket_card_cover img_holder">
+			<img src="{image_horizontal_medium_url}" title="{title}">
+		</div>
+		<div class="ticket_card_content">
+			<p class="ticket_card_event_title">{title}</p>
+			<p class="ticket_card_type_name">{ticket_type_name}</p>
+			<p class="ticket_card_dates">{formatted_dates}</p>
+			<p class="ticket_card_location">{location}</p>
+		</div>
+		<div class="ticket_card_status">
+			<span>{status_name}</span>
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-scoreboard">
+	<div class="scoreboard {size} {type}">
+		<span class="scoreboard_number ScoreboardNumber">{number}</span>
+		<span class="scoreboard_title">{title}</span>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-scoreboard-with-dynamics">
+	<div class="scoreboard {size} {type}">
+		<span class="scoreboard_number ScoreboardNumber">{number}</span>
+		<p class="scoreboard_dynamic">
+			<label class="scoreboard_dynamic_icon fa_icon {icon_classes}"></label>
+			<span class="ScoreboardDynamic">{dynamic_by_week}</span><span> за неделю</span>
+		</p>
+		<span class="scoreboard_title">{title}</span>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-cap">
+	<div class="cap {classes}" {dataset} {attributes}><span class="cap_message">{message}</span></div>
+</script>
+
+<script type="javascript/template" id="tmpl-required-star">
+	<span class="-text_color_accent"> * </span>
+</script>

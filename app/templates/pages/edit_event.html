@@ -1,0 +1,436 @@
+<script type="javascript/template" id="tmpl-edit-event-page">
+
+	<div class="edit_event_overlay Tabs EditEventPageTabs" data-tabs_id="edit_event_pages" data-focus_on_change="true">
+		<div class="edit_event_page_wrapper">
+			<div class="page">
+				<form id="edit-event-form">
+					<input id="edit_event_event_id" type="hidden" name="event_id" value="{id}">
+
+					<div class="edit_event_page_tab_bodies tab_bodies_wrap TabsBodyWrapper" data-tabs_id="edit_event_pages">
+
+
+						<div class="tab_body TabsBody -active">
+							<div class="EditEventOrganizations -hidden">
+								<h2><label for="edit_event_organization">Организация</label></h2>
+								<div class="form_unit">
+									<select id="edit_event_organization" name="organization_id"></select>
+								</div>
+							</div>
+
+							<h2><label for="edit_event_title">Название</label></h2>
+							<div class="form_unit">
+								<input id="edit_event_title" class="form_input LimitSize" type="text" name="title" value="{title}" autocomplete="off" placeholder="Название мероприятия" data-maxlength="150" required>
+							</div>
+
+							<h2><label for="edit_event_description">Описание</label></h2>
+							<div class="form_unit">
+								<textarea id="edit_event_description" class="form_textarea LimitSize" data-maxlength="1000" name="description" placeholder="Не более 1000 символов" required>{description}</textarea>
+							</div>
+
+							{date_picker}
+
+							<h2><label for="edit_event_placepicker">Место проведения</label></h2>
+							<div class="form_group -parts_3_1">
+								<div class="form_unit">
+									<input id="edit_event_placepicker" class="form_input Placepicker" name="location" value="{location}" required>
+								</div>
+								<div class="form_unit">
+									<button class="button -color_primary -size_wide RippleEffect EditEventDefaultAddress" type="button" tabindex="-1">По умолчанию</button>
+								</div>
+							</div>
+							<div class="form_group -align_center">
+								<div class="form_unit">
+									<input id="edit_event_is_online" class="form_checkbox" type="checkbox" name="is_online">
+									<label class="form_label" for="edit_event_is_online"><span>Online - событие</span></label>
+								</div>
+							</div>
+
+							<h2><label for="event_tags">Теги</label></h2>
+							<div class="form_unit">
+								<input id="event_tags" class="form_input EventTags" type="text" name="tags" autocomplete="off">
+							</div>
+
+							<h2>Цена</h2>
+							<div class="form_group -parts_1_3">
+								<div class="form_unit">
+									<input id="edit_event_free" class="form_checkbox" type="checkbox" checked name="is_free">
+									<label class="form_label" for="edit_event_free"><span>Бесплатно</span></label>
+								</div>
+								<div class="form_unit -inline -status_disabled MinPrice">
+									<label class="form_label" for="edit_event_min_price"><span>Цена от</span></label>
+									<input id="edit_event_min_price" class="form_input" type="text" name="min_price" autocomplete="off" disabled placeholder="Минимальная цена">
+								</div>
+							</div>
+
+							<h2><label for="edit_event_url">Ссылка на страницу мероприятия</label></h2>
+							<div class="form_unit">
+								<input id="edit_event_url" class="form_input" type="text" name="detail_info_url" value="{detail_info_url}" autocomplete="off" placeholder="Ссылка">
+							</div>
+
+							{cover_picker}
+						</div>
+
+
+						<div class="tab_body TabsBody">
+							{registration}
+						</div>
+
+
+						<div class="tab_body TabsBody">
+							<h2><label for="event_tags">Публикация</label></h2>
+
+							<div class="form_unit form_accent_block">
+								<input id="edit_event_delayed_publication" class="form_checkbox Switch" type="checkbox" name="delayed_publication" data-switch_id="delayed_publication">
+								<label class="form_label" for="edit_event_delayed_publication"><span>Отложенная публикация</span></label>
+							</div>
+
+							<fieldset class="Switching" data-switch_id="delayed_publication" disabled>
+								<div class="form_group -parts_e_2">
+
+									<div class="form_unit -inline">
+										<label class="form_label">Дата</label>
+										<div class="form_select -valign_center form_datepicker DatePicker" data-min_date="{current_date}"><label>{public_at_data_label}</label><input type="hidden" name="public_at_date" value="{public_at_data}" required></div>
+									</div>
+
+									<div class="form_unit -inline">
+										<label class="form_label">Время</label>
+										<div class="form_unit">
+											<div class="form_group -time_input TimeInput">
+												<div class="form_unit">
+													<input class="form_input" name="public_at_time_hours" value="{public_at_time_hours}" required>
+												</div>
+												<span class="divider">:</span>
+												<div class="form_unit">
+													<input class="form_input" name="public_at_time_minutes" value="{public_at_time_minutes}" required>
+												</div>
+											</div>
+										</div>
+									</div>
+
+								</div>
+							</fieldset>
+
+						</div>
+
+
+					</div>
+				</form>
+			</div>
+			<div class="edit_event_buttons -align_right">
+				<button id="edit_event_submit" class="button RippleEffect -color_accent -hidden" type="button"><span class="Text">{button_text}</span></button>
+				<button id="edit_event_next_page" class="button RippleEffect -color_accent" type="button">
+					<span class="Text"><span>Далее</span><span class="fa fa-angle-right"></span></span>
+				</button>
+				<button id="edit_event_prev_page" class="button RippleEffect -color_neutral -hidden" type="button">
+					<span class="Text"><span class="fa fa-angle-left"></span><span>Назад</span></span>
+				</button>
+			</div>
+		</div>
+
+		<div class="page event_edit_navigation HeaderTabs" data-tabs_id="edit_event_pages">
+			<div class="event_edit_navigation_item Tab"><span>1. Описание</span></div>
+			<div class="event_edit_navigation_item Tab"><span>2. Регистрация на событие</span></div>
+			<div class="event_edit_navigation_item Tab"><span>3. Публикация</span></div>
+		</div>
+	</div>
+
+</script>
+
+<script type="javascript/template" id="tmpl-edit-event-datepicker">
+	<div class="EditEventDatePickerCollapsing Collapsing" data-collapsing_id="event_edit_date_picker">
+		<h2>Дата и время</h2>
+		<div class="event_datepicker">
+			<div class="EventDatesCalendar event_datepicker_calendar"></div>
+			<div class="event_datepicker_form">
+				<p>Выбраны даты:</p>
+				<div class="selected_days EventSelectedDaysText"><p>Даты не выбраны</p></div>
+				<fieldset class="Switching MainTime" data-switch_id="different_time">
+					<div class="form_group -parts_e_2">
+						<div class="form_unit -inline">
+							<label class="form_label">Начало</label>
+							<div class="form_unit">
+								<div class="form_group -time_input TimeInput">
+									<div class="form_unit">
+										<input class="form_input StartHours" name="start_hours">
+									</div>
+									<span class="divider">:</span>
+									<div class="form_unit">
+										<input class="form_input StartMinutes" name="start_minutes">
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="form_unit -inline">
+							<label class="form_label">Конец</label>
+							<div class="form_unit">
+								<div class="form_group -time_input TimeInput">
+									<div class="form_unit">
+										<input class="form_input EndHours" name="end_hours">
+									</div>
+									<span class="divider">:</span>
+									<div class="form_unit">
+										<input class="form_input EndMinutes" name="end_minutes">
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</fieldset>
+				<div class="form_unit">
+					<input id="edit_event_different_time" class="form_checkbox CollapsingTrigger Switch" type="checkbox" name="different_time" tabindex="-1" data-collapsing_id="event_edit_date_picker" data-switch_id="different_time">
+					<label class="form_label" for="edit_event_different_time"><span>Разное время</span></label>
+				</div>
+			</div>
+		</div>
+
+		<div id="edit_event_selected_days_wrapper" class="collapsing_wrapper -inset CollapsingWrapper" data-collapsing_id="event_edit_date_picker">
+			<div class="collapsing_content CollapsingContent">
+				<table class="event_selected_days_table">
+					<colgroup>
+						<col width="0%">
+						<col width="7%">
+						<col width="21%">
+						<col width="10%">
+						<col width="31%">
+						<col width="31%">
+					</colgroup>
+					<thead>
+						<tr>
+							<th></th>
+							<th data-sort-method="none"></th>
+							<th data-sort-method="none">День</th>
+							<th data-sort-method="none"></th>
+							<th data-sort-method="none">Время начала</th>
+							<th data-sort-method="none">Время конца</th>
+						</tr>
+					</thead>
+					<tbody class="SelectedDaysRows">
+					</tbody>
+				</table>
+				<div style="display: inline-block">
+					<input id="new_date" type="hidden">
+					<button class="button form_datepicker -color_default event_selected_days_add_date AddDayToTable DatePicker RippleEffect" type="button" data-min_date="{today}"><span>Добавить день</span></button>
+				</div>
+			</div>
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-edit-event-cover-picker">
+	<h2>Обложка события</h2>
+	<div class="form_group -parts_e_2  ImgLoadWrap" data-aspect_ratio="16/9">
+		<div class="form_unit -centering">
+			<div class="wrapper">
+				<h4 class="form_label">Выберите способ загрузки:</h4>
+				<div class="Tabs">
+					<header class="tabs_header HeaderTabs -color_accent">
+						<span class="tab Tab -active">По ссылке</span>
+						<span class="tab Tab">С компьютера</span>
+					</header>
+					<div class="tab_bodies_wrap TabsBodyWrapper">
+						<div class="tab_body TabsBody -active">
+							<div class="form_unit">
+								<input id="edit_event_load_by_url_hor" class="form_input LoadByURLAddress" type="text" autocomplete="off" placeholder="Ссылка на изображение">
+							</div>
+							<div class="form_unit">
+								<button class="button -color_accent RippleEffect LoadByURLButton" type="button" tabindex="-1">
+									<span class="Text">Загрузить</span>
+								</button>
+							</div>
+						</div>
+						<div class="tab_body TabsBody">
+							<div class="form_unit">
+								<button class="button -color_accent RippleEffect FileLoadButton" type="button" tabindex="-1">
+									<input class="LoadImg -hidden" type="file" accept="image/*">
+									<span class="Text">Выбрать</span>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="form_unit">
+					<button class="button -color_marginal_accent RippleEffect CropperButton -hidden" type="button" tabindex="-1">
+						<span class="Text">Кадрировать</span>
+					</button>
+				</div>
+			</div>
+		</div>
+		<div class="form_unit">
+			<div class="img_holder">
+				<img class="edit_event_img_preview_hor ImgPreview" src="{image_horizontal_url}">
+				<img src="/app/img/edit_event/edit_event_img_placeholder_hor.png" height="553">
+				<input id="edit_event_image_horizontal_source" class="ImgSrc" type="hidden" name="image_horizontal" value="{image_horizontal_base64}">
+				<input id="edit_event_image_horizontal_filename" class="FileName" type="hidden" name="filename_horizontal" value="{image_horizontal_filename}">
+			</div>
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-edit-event-registration">
+	<h2>Настройка регистрации на событие</h2>
+	<p class="form_text">Если на ваше событие требуется регистрация, вы можете настроить её параметры здесь. Вы можете задать крайний срок регистрации, максимальное количество мест, </p>
+
+	<div class="form_unit form_accent_block">
+		<input id="edit_event_registration_required" class="form_checkbox Switch" type="checkbox" name="registration_required" data-switch_id="registration">
+		<label class="form_label" for="edit_event_registration_required"><span>Обязательная регистрация на событие</span></label>
+	</div>
+
+	<fieldset class="Switching" data-switch_id="registration" disabled>
+
+		<h3>Ограничение регистраций</h3>
+
+		<div class="form_unit form_accent_block">
+			<input id="edit_event_registration_limit_by_date" class="form_checkbox Switch" type="checkbox" name="registration_limit_by_date" data-switch_id="registration_limit_by_date">
+			<label class="form_label" for="edit_event_registration_limit_by_date"><span>По крайней дате регистрации</span></label>
+		</div>
+
+		<fieldset class="Switching" data-switch_id="registration_limit_by_date" disabled>
+			<div class="form_group -parts_3_1">
+
+				<div class="form_unit -inline">
+					<label class="form_label">Дата окончания регистрации</label>
+					<div class="form_select -valign_center form_datepicker DatePicker" data-selected_day="{registration_till_date}" data-min_date="{tomorrow_date}">
+						<label>{registration_till_display_date}</label>
+						<input name="registration_till_date" value="{registration_till_date}" type="hidden" required>
+					</div>
+				</div>
+
+				<div class="form_unit -inline">
+					<label class="form_label">Время</label>
+					<div class="form_unit">
+						<div class="form_group -time_input TimeInput">
+							<div class="form_unit">
+								<input class="form_input" name="registration_till_time_hours" value="{registration_till_time_hours}" required>
+							</div>
+							<span class="divider">:</span>
+							<div class="form_unit">
+								<input class="form_input" name="registration_till_time_minutes" value="{registration_till_time_minutes}" required>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</fieldset>
+
+
+
+		<div class="form_unit form_accent_block">
+			<input id="edit_event_registration_limit_by_quantity" class="form_checkbox Switch" type="checkbox" name="registration_limit_by_quantity" data-switch_id="registration_limit_by_quantity">
+			<label class="form_label" for="edit_event_registration_limit_by_quantity"><span>По максимальному количеству регистраций</span></label>
+		</div>
+
+		<fieldset class="Switching" data-switch_id="registration_limit_by_quantity" disabled>
+			<div class="form_unit RegistrationQuantity -inline">
+				<label class="form_label" for="edit_event_registration_limit_count">Максимальное кол-во</label>
+				<input id="edit_event_registration_limit_count" class="form_input" type="text" name="registration_limit_count" value="{registration_limit_count}" autocomplete="off" placeholder="1" required>
+			</div>
+		</fieldset>
+
+
+		<h3 id="edit_event_registration_fields">Анкета регистрации</h3>
+
+		{predefined_field}
+
+		{custom_fields}
+
+		<button class="button -color_neutral -size_low -rounded fa_icon fa-plus-circle AddRegistrationCustomField RippleEffect" type="button"><span class="Text">Добавить поле</span></button>
+
+		<div class="-align_center">
+			<button class="button -color_neutral_accent RippleEffect RegistrationPreview" type="button"><span class="Text">Предпросмотр</span></button>
+		</div>
+
+	</fieldset>
+
+</script>
+
+<script type="javascript/template" id="tmpl-edit-event-registration-predefined-field">
+	<div class="form_unit form_accent_block">
+		<input id="edit_event_registration_{type}_field_enable" class="form_checkbox Switch" type="checkbox" name="registration_fields" value="{id}" data-switch_id="registration_{type}_field">
+		<label class="form_label" for="edit_event_registration_{type}_field_enable"><span>{name}</span></label>
+	</div>
+	<input id="edit_event_registration_{type}_field_uuid" type="hidden" name="registration_{id}_field_uuid" value="{uuid}">
+	<div class="form_fieldset">
+		<p>{description}</p>
+		<fieldset class="Switching" data-switch_id="registration_{type}_field" disabled>
+			<input type="hidden" name="registration_{id}_field_type" value="{type}">
+			<div class="form_unit">
+				<input id="edit_event_registration_{type}_field_required" class="form_checkbox" type="checkbox" name="registration_{id}_field_required">
+				<label class="form_label" for="edit_event_registration_{type}_field_required"><span>Обязательное поле</span></label>
+			</div>
+		</fieldset>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-edit-event-registration-custom-field">
+	<fieldset class="form_fieldset RegistrationCustomField">
+		<input id="edit_event_registration_{id}_custom_field_enable" type="hidden" name="registration_fields" value="{id}">
+		<input id="edit_event_registration_{id}_custom_field_uuid" class="RegistrationCustomFieldUUID" type="hidden" name="registration_{id}_field_uuid" value="{uuid}">
+		<button class="button -size_low fa_icon fa-times RemoveRegistrationCustomField" type="button"><span class="Text">Удалить поле</span></button>
+		<p>Добавьте дополнительное поле, если это требуется для регистрации.</p>
+		<div class="form_unit">
+			<label class="form_label" for="edit_event_registration_{id}_custom_field_label">Наименование поля</label>
+			<input id="edit_event_registration_{id}_custom_field_label" class="form_input RegistrationCustomFieldLabel" type="text" name="registration_{id}_field_label" value="{label}" autocomplete="off" required>
+		</div>
+		<div class="form_unit">
+			<input id="edit_event_registration_{id}_custom_field_required" class="form_checkbox" type="checkbox" name="registration_{id}_field_required">
+			<label class="form_label" for="edit_event_registration_{id}_custom_field_required"><span>Обязательное поле</span></label>
+		</div>
+		<h6>Тип</h6>
+		<div class="form_group -parts_e_e">
+			<div class="form_unit">
+				<input id="edit_event_registration_{id}_custom_field_additional_text_type" class="form_radio RegistrationCustomFieldType" type="radio" name="registration_{id}_field_type" value="additional_text" required>
+				<label class="form_label" for="edit_event_registration_{id}_custom_field_additional_text_type"><span>Текст</span></label>
+			</div>
+			<div class="form_unit">
+				<input id="edit_event_registration_{id}_custom_field_extended_custom_type" class="form_radio RegistrationCustomFieldType" type="radio" name="registration_{id}_field_type" value="extended_custom" required>
+				<label class="form_label" for="edit_event_registration_{id}_custom_field_extended_custom_type"><span>Расширенный текст</span></label>
+			</div>
+		</div>
+	</fieldset>
+</script>
+
+<script type="javascript/template" id="tmpl-selected-table-day">
+	<tr class="TableDay_{date}" data-date="{date}">
+		<td>{datetime}</td>
+		<td><button class="remove_date RemoveRow" type="button">&times;</button></td>
+		<td>
+			<div class="form_unit">
+				<input class="form_input form_datepicker DatePicker" value="{formatted_date}" data-selected_day="{date}" data-min_date="{today}">
+			</div>
+		</td>
+		<td></td>
+		<td>
+			<div class="form_unit -inline">
+				<label class="form_label">Начало</label>
+				<div class="form_unit">
+					<div class="form_group -time_input TimeInput">
+						<div class="form_unit">
+							<input class="form_input StartHours" value="{start_hours}">
+						</div>
+						<span class="divider">:</span>
+						<div class="form_unit">
+							<input class="form_input StartMinutes" value="{start_minutes}">
+						</div>
+					</div>
+				</div>
+			</div>
+		</td>
+		<td>
+			<div class="form_unit -inline">
+				<label class="form_label">Конец</label>
+				<div class="form_unit">
+					<div class="form_group -time_input TimeInput">
+						<div class="form_unit">
+							<input class="form_input EndHours" value="{end_hours}">
+						</div>
+						<span class="divider">:</span>
+						<div class="form_unit">
+							<input class="form_input EndMinutes" value="{end_minutes}">
+						</div>
+					</div>
+				</div>
+			</div>
+		</td>
+	</tr>
+</script>
