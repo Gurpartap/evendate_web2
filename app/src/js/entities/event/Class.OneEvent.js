@@ -29,7 +29,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {OrdersCollection} orders
 	 *
 	 * @property {?boolean} ticketing_locally
-	 * @property {TicketsCollection} tickets
+	 * @property {EventsTicketsCollection} tickets
 	 * @property {TicketTypesCollection} ticket_types
 	 *
 	 * @property {?boolean} registration_locally
@@ -61,9 +61,9 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @property {DatesCollection} dates
 	 * @property {?boolean} is_same_time
-	 * @property {?number} first_event_date
-	 * @property {?number} last_event_date
-	 * @property {?number} nearest_event_date
+	 * @property {?timestamp} first_event_date
+	 * @property {?timestamp} last_event_date
+	 * @property {?timestamp} nearest_event_date
 	 *
 	 * @property {TagsCollection} tags
 	 *
@@ -99,7 +99,7 @@ OneEvent = extending(OneEntity, (function() {
 		this.orders = new OrdersCollection(event_id);
 		
 		this.ticketing_locally = null;
-		this.tickets = new TicketsCollection(event_id);
+		this.tickets = new EventsTicketsCollection(event_id);
 		this.ticket_types = new TicketTypesCollection(event_id);
 		
 		this.registration_locally = null;

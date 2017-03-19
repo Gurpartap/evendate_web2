@@ -334,6 +334,7 @@ __APP = {
 			'organization': AddOrganizationPage
 		},
 		'my': {
+			'tickets': MyTicketsPage,
 			'profile': MyProfilePage,
 			'': MyProfilePage
 		},
@@ -1277,6 +1278,76 @@ __APP = {
 		},
 		/**
 		 *
+		 * @param {(OneExtendedTicket|Array<OneExtendedTicket>|ExtendedTicketsCollection)} tickets
+		 * @return {jQuery}
+		 */
+		ticketCards: function buildTicketCard(tickets) {
+			tickets = (tickets instanceof Array) ? tickets : [tickets];
+			
+			return tmpl('ticket-card', tickets.map(function(ticket) {
+				var props = __APP.BUILD.normalizeBuildProps({
+					card_classes: [],
+					title: ticket.event.title,
+					location: ticket.event.location,
+					status_name: ticket.status_name,
+					status_type_code: ticket.status_type_code,
+					ticket_type_name: ticket.ticket_type.name,
+					image_horizontal_medium_url: ticket.event.image_horizontal_medium_url
+				}, ['card_classes']),	event_date;
+				
+				switch (props.status_type_code) {
+					case OneExtendedTicket.TICKET_STATUSES.PAYED:
+					case OneExtendedTicket.TICKET_STATUSES.APPROVED:
+					case OneExtendedTicket.TICKET_STATUSES.WITHOUT_PAYMENT: {
+						props.card_classes.push(__C.CLASSES.STATUS.SUCCESS);
+						break;
+					}
+					case OneExtendedTicket.TICKET_STATUSES.IS_PENDING:
+					case OneExtendedTicket.TICKET_STATUSES.WAITING_FOR_PAYMENT: {
+						props.card_classes.push(__C.CLASSES.STATUS.PENDING);
+						break;
+					}
+					case OneExtendedTicket.TICKET_STATUSES.REJECTED:
+					case OneExtendedTicket.TICKET_STATUSES.RETURNED_BY_CLIENT:
+					case OneExtendedTicket.TICKET_STATUSES.RETURNED_BY_ORGANIZATION: {
+						props.card_classes.push(__C.CLASSES.STATUS.ERROR);
+						break;
+					}
+				}
+				
+				switch (props.status_type_code) {
+					case OneExtendedTicket.TICKET_STATUSES.IS_PENDING:
+					case OneExtendedTicket.TICKET_STATUSES.WAITING_FOR_PAYMENT:
+					case OneExtendedTicket.TICKET_STATUSES.RETURNED_BY_ORGANIZATION:
+					case OneExtendedTicket.TICKET_STATUSES.RETURNED_BY_CLIENT:
+					case OneExtendedTicket.TICKET_STATUSES.REJECTED: {
+						props.card_classes.push(__C.CLASSES.STATUS.DISABLED);
+						break;
+					}
+					default: {
+						props.card_classes.push(__C.CLASSES.HOOKS.CALL_MODAL);
+						break;
+					}
+				}
+				
+				if (ticket.event.is_same_time) {
+					event_date = ticket.event.dates[0];
+					props.formatted_dates = displayDateRange(event_date.event_date, ticket.event.dates[ticket.event.dates.length - 1].event_date) + ', ' + displayTimeRange(event_date.start_time, event_date.end_time);
+				} else {
+					event_date = ticket.event.nearest_event_date;
+					props.formatted_dates = displayDateRange(event_date, event_date);
+				}
+				
+				return props;
+			})).each(function(i, ticket) {
+				$(ticket).data({
+					modal_type: __C.MODAL_TYPES.TICKET,
+					ticket: tickets[i]
+				});
+			});
+		},
+		/**
+		 *
 		 * @param {{
 		 *    [type]: string,
 		 *    [content]: string|jQuery,
@@ -1503,17 +1574,21 @@ __LOCALES = {
 				}
 			},
 			TICKET_STATUSES: {
-				WAITING_FOR_PAYMENT: 'Ожидание оплаты',
-				PAYED: 'Оплачено',
-				RETURNED_BY_ORGANIZATION: 'Возврат билетов организатором',
-				WITHOUT_PAYMENT: 'Билет без оплаты',
-				PAYMENT_CANCELED_AUTO: 'Отмена оплаты автоматическая',
-				PAYMENT_CANCELED_BY_CLIENT: 'Отмена оплаты клиентом',
-				RETURNED_BY_CLIENT: 'Возврат билетов пользователем',
-				COMPLETED: 'Выполнено',
+				USED: 'Билет использован',
+				
+				WAITING_FOR_PAYMENT: 'Ожидает оплаты',
 				IS_PENDING: 'Ожидает подтверждения',
+				
 				APPROVED: 'Подтверждено',
-				REJECTED: 'Отказано в регистрации'
+				PAYED: 'Оплачено',
+				WITHOUT_PAYMENT: 'Подтверждено',
+				
+				TICKETS_ARE_OVER: 'Билеты закончились',
+				RETURNED_BY_ORGANIZATION: 'Возврат билета организатором',
+				PAYMENT_CANCELED_AUTO: 'Отмена транзакции',
+				PAYMENT_CANCELED_BY_CLIENT: 'Отменено клиентом',
+				RETURNED_BY_CLIENT: 'Возврат билета',
+				REJECTED: 'Отклонено'
 			}
 		},
 		DATE: {

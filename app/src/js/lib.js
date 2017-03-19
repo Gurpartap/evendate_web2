@@ -31,6 +31,13 @@ __C = {
 			BORDERED: '-bordered',
 			TRANSFORM_UPPERCASE: '-transform_uppercase'
 		},
+		STATUS: {
+			SUCCESS: '-status_success',
+			WARNING: '-status_warning',
+			PENDING: '-status_pending',
+			ERROR: '-status_error',
+			DISABLED: '-status_disabled'
+		},
 		SIZES: {
 			X30: '-size_30x30',
 			X40: '-size_40x40',
@@ -73,6 +80,17 @@ __C = {
 		ICON_CLASS: 'fa_icon'
 	},
 	DATE_FORMAT: 'YYYY-MM-DD',
+	MODAL_TYPES: {
+		FAVORS: 'favors',
+		SUBSCRIBERS: 'subscribers',
+		EDITORS: 'editors',
+		MAP: 'map',
+		MEDIA: 'media',
+		CROPPER: 'cropper',
+		FRIENDS_LIST: 'friends_list',
+		SUBSCRIBERS_LIST: 'subscribers_list',
+		TICKET: 'ticket'
+	},
 	COLORS: {
 		PRIMARY: '#2e3b50',
 		MUTED: '#3e4d66',
@@ -93,12 +111,6 @@ __C = {
 		ORGANIZATION_OPEN_SITE: 'open_site',
 		EVENT_ENTITY: 'event',
 		ORGANIZATION_ENTITY: 'organization'
-	},
-	ACTION_NAMES: {
-		fave: ['добавил(а) в избранное'],
-		unfave: ['удалил(а) из избранного'],
-		subscribe: ['добавил(а) подписки'],
-		unsubscribe: ['удалил(а) подписки']
 	},
 	ENTITIES: {
 		USER: 'user',

@@ -1,29 +1,29 @@
 /**
  * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneTicketType.js
+ * @requires Class.OneTicket.js
  */
 /**
  *
- * @class TicketsCollection
+ * @class EventsTicketsCollection
  * @extends EntitiesCollection
  */
-TicketsCollection = extending(EntitiesCollection, (function() {
+EventsTicketsCollection = extending(EntitiesCollection, (function() {
 	/**
 	 *
 	 * @param {(string|number)} [event_id=0]
 	 *
 	 * @constructor
-	 * @constructs TicketsCollection
+	 * @constructs EventsTicketsCollection
 	 *
 	 * @property {(string|number)} event_id
 	 */
-	function TicketsCollection(event_id) {
+	function EventsTicketsCollection(event_id) {
 		EntitiesCollection.call(this);
 		
 		this.event_id = setDefaultValue(event_id, 0);
 	}
 	
-	TicketsCollection.prototype.collection_of = OneTicket;
+	EventsTicketsCollection.prototype.collection_of = OneTicket;
 	
 	/**
 	 *
@@ -33,7 +33,7 @@ TicketsCollection = extending(EntitiesCollection, (function() {
 	 *
 	 * @return {jqPromise}
 	 */
-	TicketsCollection.fetchTickets = function(event_id, ajax_data, success) {
+	EventsTicketsCollection.fetchTickets = function(event_id, ajax_data, success) {
 		return __APP.SERVER.getData('/api/v1/events/' + event_id + '/tickets', ajax_data, success);
 	};
 	/**
@@ -45,10 +45,10 @@ TicketsCollection = extending(EntitiesCollection, (function() {
 	 *
 	 * @return {jqPromise}
 	 */
-	TicketsCollection.prototype.fetchTickets = function(fields, length, order_by, success) {
+	EventsTicketsCollection.prototype.fetchTickets = function(fields, length, order_by, success) {
 		var self = this;
 		
-		return TicketsCollection.fetchTickets(this.event_id, {
+		return EventsTicketsCollection.fetchTickets(this.event_id, {
 			fields: fields || undefined,
 			offset: this.length,
 			length: length || undefined,
@@ -61,5 +61,5 @@ TicketsCollection = extending(EntitiesCollection, (function() {
 		});
 	};
 	
-	return TicketsCollection;
+	return EventsTicketsCollection;
 }()));

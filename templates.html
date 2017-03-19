@@ -226,6 +226,23 @@
 	</div>
 </script>
 
+<script type="javascript/template" id="tmpl-ticket-card">
+	<div class="page ticket_card {card_classes}">
+		<div class="ticket_card_cover img_holder">
+			<img src="{image_horizontal_medium_url}" title="{title}">
+		</div>
+		<div class="ticket_card_content">
+			<p class="ticket_card_event_title">{title}</p>
+			<p class="ticket_card_type_name">{ticket_type_name}</p>
+			<p class="ticket_card_dates">{formatted_dates}</p>
+			<p class="ticket_card_location">{location}</p>
+		</div>
+		<div class="ticket_card_status">
+			<span>{status_name}</span>
+		</div>
+	</div>
+</script>
+
 <script type="javascript/template" id="tmpl-scoreboard">
 	<div class="scoreboard {size} {type}">
 		<span class="scoreboard_number ScoreboardNumber">{number}</span>
@@ -1032,6 +1049,12 @@
 
 <script type="javascript/template" id="tmpl-user-page-social-link">
 	<{html_tag} class="social_link -color_{slug} -valign_center" {attributes}><i class="fa fa-{icon_slug}"></i></{html_tag}>
+</script>
+
+<!-- My Tickets Page -->
+
+<script type="javascript/template" id="tmpl-my-tickets-wrapper">
+	<div class="tickets_wrapper TicketsWrapper">{tickets}</div>
 </script>
 
 <!-- STATISTICS -->

@@ -20,14 +20,14 @@ OneOrder = extending(OneEntity, (function() {
 	 * @property {?string} order_content
 	 * @property {?boolean} is_canceled
 	 * @property {?number} status_id
-	 * @property {?OneOrder.TICKET_STATUSES} status_type_code
+	 * @property {?OneOrder.EXTENDED_ORDER_STATUSES} status_type_code
 	 * @property {?TEXTS.TICKET_STATUSES} status_name
 	 * @property {?number} created_at
 	 * @property {?number} updated_at
 	 * @property {?number} payed_at
 	 * @property {?number} canceled_at
 	 *
-	 * @property {TicketsCollection} tickets
+	 * @property {EventsTicketsCollection} tickets
 	 * @property {OneUser} user
 	 */
 	function OneOrder(event_id, uuid) {
@@ -44,14 +44,14 @@ OneOrder = extending(OneEntity, (function() {
 		this.payed_at = null;
 		this.canceled_at = null;
 		
-		this.tickets = new TicketsCollection();
+		this.tickets = new EventsTicketsCollection();
 		this.user_id = null;
 		this.user = new OneUser();
 		
 		Object.defineProperty(this, 'status_name', {
 			get: function() {
-				for( var prop in OneOrder.TICKET_STATUSES ) {
-					if( OneOrder.TICKET_STATUSES.hasOwnProperty(prop) && OneOrder.TICKET_STATUSES[ prop ] === self.status_type_code )
+				for( var prop in OneOrder.EXTENDED_ORDER_STATUSES ) {
+					if( OneOrder.EXTENDED_ORDER_STATUSES.hasOwnProperty(prop) && OneOrder.EXTENDED_ORDER_STATUSES[ prop ] === self.status_type_code )
 						return __LOCALES.ru_RU.TEXTS.TICKET_STATUSES[ prop ];
 				}
 			}
@@ -62,19 +62,26 @@ OneOrder = extending(OneEntity, (function() {
 	 *
 	 * @enum {string}
 	 */
-	OneOrder.TICKET_STATUSES = {
+	OneOrder.ORDER_STATUSES = {
 		WAITING_FOR_PAYMENT: 'waiting_for_payment',
-		PAYED: 'payed',
-		RETURNED_BY_ORGANIZATION: 'returned_by_organization',
-		WITHOUT_PAYMENT: 'without_payment',
-		PAYMENT_CANCELED_AUTO: 'payment_canceled_auto',
-		PAYMENT_CANCELED_BY_CLIENT: 'payment_canceled_by_client',
-		RETURNED_BY_CLIENT: 'returned_by_client',
-		COMPLETED: 'completed',
 		IS_PENDING: 'is_pending',
+		
 		APPROVED: 'approved',
+		PAYED: 'payed',
+		WITHOUT_PAYMENT: 'without_payment',
+		
+		RETURNED_BY_ORGANIZATION: 'returned_by_organization',
+		RETURNED_BY_CLIENT: 'returned_by_client',
 		REJECTED: 'rejected'
 	};
+	/**
+	 *
+	 * @enum {string}
+	 */
+	OneOrder.EXTENDED_ORDER_STATUSES = $.extend({
+		PAYMENT_CANCELED_AUTO: 'payment_canceled_auto',
+		PAYMENT_CANCELED_BY_CLIENT: 'payment_canceled_by_client'
+	}, OneOrder.ORDER_STATUSES);
 	/**
 	 *
 	 * @param {(string|number)} event_id
