@@ -1920,7 +1920,7 @@ img {
 }
 
 .pricing-plan .body {
-    padding: 40px 0 15px;
+    padding: 40px 0 0;
     background-color: #e7e7ea;
     -webkit-border-radius: 0 0 5px 5px;
     -moz-border-radius: 0 0 5px 5px;
@@ -2616,7 +2616,7 @@ div.line {
 
 .wizard .body {
     width: 100%;
-    background-color: #e7e7ea;
+    background-color: rgba(40, 190, 132, 0.06);
     -webkit-border-radius: 0 0 5px 5px;
     -moz-border-radius: 0 0 5px 5px;
     border-radius: 0 0 5px 5px
@@ -3391,3 +3391,20 @@ div.line {
 .main-navi ul{
     line-height: 1;
 }
+
+.columns {
+	display: flex;
+	justify-content: space-around;
+	flex-wrap: wrap;
+}
+
+.social-btn {
+	width: 200px;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	color: #fff;
+}
+
+.social-btn.vk-btn {background-color: #567ca4}
+.social-btn.fb-btn {background-color: #3b5998}
+.social-btn.google-lus-btn {background-color: #dd4b39}

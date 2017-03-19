@@ -217,13 +217,14 @@ class EventsCollection extends AbstractCollection
 					if ($_organization instanceof Organization) {
 						$q_get_events->where('organization_id = :organization_id');
 						$statement_array[':organization_id'] = $_organization->getId();
+						$getting_personal_events = true;
 					}
 					break;
 				}
 				case 'is_registered':
 				case 'registered': {
-				$val = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-				if ($val) {
+					$val = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+					if ($val) {
 						$from_view = self::VIEW_ALL_EVENTS_WITH_ALIAS;
 						$operand = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'IN' : 'NOT IN';
 						$q_get_events->where('id ' . $operand . ' (SELECT event_id FROM view_tickets WHERE user_id = :user_id AND is_active = TRUE)');
@@ -244,8 +245,8 @@ class EventsCollection extends AbstractCollection
 				case 'is_canceled':
 				case 'is_free':
 				case 'is_delayed': {
-				$val = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-				if ($is_editor) {
+					$val = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+					if ($is_editor) {
 						$from_view = self::VIEW_ALL_EVENTS_WITH_ALIAS;
 						$q_get_events->where($name . ' = :' . $name);
 						$statement_array[':' . $name] = $val ? 'true' : 'false';
@@ -256,7 +257,7 @@ class EventsCollection extends AbstractCollection
 					$val = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
 					if ($val) {
 						$q_get_events->where("view_events.last_event_date > (SELECT DATE_PART('epoch', TIMESTAMP 'today') :: INT)");
-					} else if ($val == false){
+					} else if ($val == false) {
 						$q_get_events->where("view_events.last_event_date < (SELECT DATE_PART('epoch', TIMESTAMP 'today') :: INT)");
 					}
 					break;
@@ -451,8 +452,34 @@ class EventsCollection extends AbstractCollection
 						FROM hidden_events
 						WHERE hidden_events.user_id = :user_id)');
 
+					$q_get_subscriptions_count = App::queryFactory()->newSelect();
+						$q_get_subscriptions_count
+						->from('subscriptions')
+						->cols(array('COUNT(id) AS subs_count'))
+						->where('user_id = ?', $user->getId())
+						->where('status = TRUE');
+
+					$subs_count = $db->prepareExecute($q_get_subscriptions_count, 'CANT_COUNT_SUBSCRIPTIONS')->fetchColumn(0);
+
+					if ($subs_count > 0){
+						$q_get_events->where('city_id IN (SELECT
+						organizations.city_id
+						FROM subscriptions
+						INNER JOIN organizations ON subscriptions.organization_id = organizations.id
+						WHERE subscriptions.user_id = :user_id AND subscriptions.status = TRUE AND organizations.status = TRUE) OR view_events.is_online = TRUE');
+					}
 
 					$order_by = array('rating DESC');
+					$statement_array[':user_id'] = $user->getId();
+					break;
+				}
+				case 'can_edit': {
+					$val = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+					$operand = $val ? 'IN' : ' NOT IN ';
+					$q_get_events->where('organization_id ' . $operand .' (SELECT organization_id 
+							FROM users_organizations 
+							WHERE status = TRUE
+							AND users_organizations.user_id = :user_id)');
 					$statement_array[':user_id'] = $user->getId();
 					break;
 				}

@@ -1,374 +1,1049 @@
 <!doctype html>
-<html class="no-js">
+<!--Conditionals for IE9 Support-->
+<!--[if IE 9]>
+<html lang="en" class="ie ie9"><![endif]-->
+<html>
 <head>
-    <meta charset="utf-8">
-    <title>Evendate для организаторов</title>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta charset="utf-8">
+  <title>Evendate</title>
 
-    <meta name="twitter:card" content="app">
-    <meta name="twitter:site" content="@evendate">
-    <meta name="twitter:description"
-          content="Evendate даёт возможность каждому организатору бесплатно публиковать события и привлекать новых подписчиков. После публикации все подписчики получат уведомление и гарантированно ничего не пропустят.">
-    <meta name="twitter:app:country" content="RU">
-    <meta name="twitter:app:name:iphone" content="Evendate">
-    <meta name="twitter:app:id:iphone" content="1044975200">
-    <meta name="twitter:app:name:ipad" content="Evendate">
-    <meta name="twitter:app:name:googleplay" content="Evendate">
-    <meta name="twitter:app:id:googleplay" content="ru.evendate.android">
 
-    <meta property="og:title" content="Evendate | Будь в курсе событий">
-    <meta property="og:url" content="https://evendate.ru">
-    <meta property="og:description"
-          content="Evendate даёт возможность каждому организатору бесплатно публиковать события и привлекать новых подписчиков. После публикации все подписчики получат уведомление и гарантированно ничего не пропустят.">
-    <meta property="og:type" content="website">
-    <meta property="og:image" content="https://evendate.ru/app/img/brand_2560x1600.jpg"/>
+  <meta name="twitter:card" content="app">
+  <meta name="twitter:site" content="@evendate">
+  <meta name="twitter:description"
+        content="Evendate - простой и быстрый способ не пропускать события. Ты можешь выбирать из сотен организаторов разных событий и подписаться на всех, которые тебе интересны.">
+  <meta name="twitter:app:country" content="RU">
+  <meta name="twitter:app:name:iphone" content="Evendate">
+  <meta name="twitter:app:id:iphone" content="1044975200">
+  <meta name="twitter:app:name:ipad" content="Evendate">
+  <meta name="twitter:app:name:googleplay" content="Evendate">
+  <meta name="twitter:app:id:googleplay" content="ru.evendate.android">
 
-    <link href="app/assets/css/style.min.css" rel="stylesheet">
-    <link href="app/assets/css/organization.css" rel="stylesheet">
-    <link href="app/assets/css/bootstrap.min.css" rel="stylesheet">
-    <link href="vendor/fontawesome/css/font-awesome.min.css" rel="stylesheet">
+  <meta property="og:title" content="Evendate | Будь в курсе событий">
+  <meta property="og:url" content="https://evendate.ru">
+  <meta property="og:description"
+        content="Evendate - простой и быстрый способ не пропускать события. Ты можешь выбирать из сотен организаторов разных событий и подписаться на всех, которые тебе интересны.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://evendate.ru/app/img/brand_2560x1600.jpg"/>
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <!--Google Fonts-->
+  <link href='http://fonts.googleapis.com/css?family=Roboto:400,100,300,500,700' rel='stylesheet' type='text/css'>
+  <!--Bootstrap 3.3.2-->
+  <link href="./landing/css/bootstrap.min.css" rel="stylesheet" media="screen">
+  <!--Icon Fonts-->
+  <link href="/app/src/vendor/fontawesome/font-awesome.min.css" rel="stylesheet" media="screen">
+  <link href="./landing/css/icon-moon.css" rel="stylesheet" media="screen">
+  <!--Animations-->
+  <link href="./landing/css/animate.css" rel="stylesheet" media="screen">
+  <!--Theme Styles-->
+  <link href="./landing/css/theme-styles.css" rel="stylesheet" media="screen">
+  <!--Color Schemes-->
+  <link class="color-scheme" href="./landing/css/colors/color-default.css" rel="stylesheet" media="screen">
+  <!--Modernizr-->
+  <script src="./landing/js/libs/modernizr.custom.js"></script>
+  <!--Adding Media Queries and Canvas Support for IE8-->
+  <!--[if lt IE 9]>
+  <script src="./landing/js/plugins/respond.min.js"></script>
+  <script src="./landing/js/plugins/excanvas.js"></script>
+  <![endif]-->
 
 </head>
-<body class="home-page fader organization-page">
 
+<!--Body-->
+<body class="space-top">
 
-<div class="ref-message">
-    <div class="fluid-width">
-        <a class="close-ref" href="#">
-            <svg fill="#222222" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
-                <path
-                    d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                <path d="M0 0h24v24H0z" fill="none"/>
-            </svg>
-        </a>
-        <h3 class="ref-title">Скачай приложение прямо сейчас.
-            <a class="download-link-button" target="_blank"
-               href="https://play.google.com/store/apps/details?id=ru.evendate.android"
-               data-ga-label="Android from Banner">
-                <svg width="30px" height="30px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
-                     xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-3.5 -3.5 55 55"
-                     enable-background="new -3.5 -3.5 55 55" xml:space="preserve">
-              <path fill="#FFFFFF" d="M12,36c0,1.1,0.9,2,2,2h2v7c0,1.7,1.3,3,3,3s3-1.3,3-3v-7h4v7c0,1.7,1.3,3,3,3s3-1.3,3-3v-7h2c1.1,0,2-0.9,2-2V16H12V36z
-                 M7,16c-1.7,0-3,1.3-3,3v14c0,1.7,1.3,3,3,3s3-1.3,3-3V19C10,17.3,8.7,16,7,16z M41,16c-1.7,0-3,1.3-3,3v14c0,1.7,1.3,3,3,3
-                s3-1.3,3-3V19C44,17.3,42.7,16,41,16z M31.1,4.3l2.6-2.6c0.4-0.4,0.4-1,0-1.4s-1-0.4-1.4,0l-3,2.9C27.7,2.5,25.9,2,24,2
-                c-1.9,0-3.7,0.5-5.3,1.3l-3-3c-0.4-0.4-1-0.4-1.4,0s-0.4,1,0,1.4l2.6,2.6C13.9,6.5,12,10,12,14h24C36,10,34,6.5,31.1,4.3z M20,10h-2
-                V8h2V10z M30,10h-2V8h2V10z"/>
-            </svg>
-            </a>
-
-            <a class="download-link-button js-ga-track" target="_blank"
-               href="https://itunes.apple.com/us/app/evendate/id1044975200?mt=8"
-               data-ga-label="iOS from Banner">
-                <svg width="30px" height="30px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
-                     xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-3.5 -3.5 55 55"
-                     enable-background="new -3.5 -3.5 55 55" xml:space="preserve">
-              <g>
-                  <g id="svg_1">
-                      <path fill="#FFFFFF" d="M36.8,24.9c0.1,7.1,6.2,9.4,6.3,9.5c-0.1,0.2-1,3.4-3.2,6.7c-1.9,2.8-4,5.7-7.2,5.7c-3.1,0.1-4.1-1.9-7.7-1.9
-                    c-3.6,0-4.7,1.8-7.7,1.9c-3.1,0.1-5.4-3.1-7.4-5.9c-4-5.8-7.1-16.4-3-23.6c2-3.6,5.7-5.8,9.7-5.9c3-0.1,5.9,2,7.7,2
-                    c1.8,0,5.3-2.5,9-2.1c1.5,0.1,5.8,0.6,8.6,4.6C41.6,16.1,36.7,18.9,36.8,24.9 M30.9,7.5c1.6-2,2.7-4.7,2.4-7.5
-                    c-2.4,0.1-5.2,1.6-6.9,3.5c-1.5,1.8-2.8,4.6-2.5,7.2C26.6,11,29.2,9.4,30.9,7.5"/>
-                  </g>
-              </g>
-            </svg>
-            </a>
-        </h3>
-    </div>
+<!--Page Preloading-->
+<div id="preloader">
+  <div id="spinner"></div>
 </div>
 
-
-<div class="page-overlay-wrapper">
-    <div class="fade-gradient"></div>
-
-    <div class="overlay-sections">
-        <section class="about-section overlay-section">
-            <div class="fade-in">
-                <div class="fluid-width constrain-large">
-                    <h3 class="page-title text-center">Возникли вопросы?</h3>
-                    <p class="page-body text-center">Заполните форму и наша команда обязательно свяжется с Вами!</p>
-                    <form>
-                        <div class="form-group">
-                            <label for="feedback-name">Ваше имя</label>
-                            <input class="form-control" type="text" name="name" autocomplete="off"
-                                   id="feedback-name"
-                                   placeholder="Ваше имя" required="required">
-                        </div>
-                        <div class="form-group">
-                            <label for="feedback-email">Ваш email</label>
-                            <input class="form-control" type="email" name="email" autocomplete="off"
-                                   id="feedback-email"
-                                   placeholder="E-mail" required="required">
-                        </div>
-                        <div class="form-group">
-                            <label for="feedback-message">Ваше сообщение</label>
-                            <textarea class="form-control" name="message"
-                                      id="feedback-message"
-                                      autocomplete="off">Ваше сообщение</textarea>
-                        </div>
-                        <p class="page-body text-center">
-                            <a href="#" id="send-feedback">Отправить</a>
-                        </p>
-                    </form>
-                </div>
-            </div>
-        </section>
-        <section class="faq-section overlay-section">
-            <div class="fade-in">
-                <div class="fluid-width constrain-large text-center">
-                    <h2 class="page-title with-register hidden">Чтобы продолжить регистрацию, войдите через социальную
-                        сеть:</h2>
-                    <h2 class="page-title no-register">Войдите через социальную сеть:</h2>
-                    <div class="">
-                        <a href="#" class="social-btn vk-btn vk-auth-btn">
-                            <i class="fa fa-vk"></i> ВКонтакте
-                        </a>
-                        <a href="#" class="social-btn fb-btn facebook-btn">
-                            <i class="fa fa-facebook"></i> Facebook
-                        </a>
-                        <a href="#" class="social-btn google-lus-btn google-plus-btn">
-                            <i class="fa fa-google"></i> Google
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </section>
+<!--Header-->
+<header class="stiky-header">
+  <div class="container group">
+    <div class="">
+      <a class="logo" href="/"><img src="/app/img/brand.png?v=f7ff6c58ee76c1a3a7ed091510e9e288" alt="Evendate"></a>
     </div>
-
-    <footer class="global-footer footer">
-        <div class="fluid-width mobile-full-width">
-            <div class="footer-branding float-left">
-                <div class="float-right footer-social-links">
-                    <a target="_blank" href="https://new.vk.com/evendate"
-                       class="footer-social-link">
-                        <i class="fa fa-vk"></i>
-                    </a>
-                    <a target="_blank" href="https://twitter.com/evendate"
-                       class="footer-social-link">
-                        <i class="fa fa-twitter"></i>
-                    </a>
-                    <a target="_blank" href="http://instagram.com/evendate"
-                       class="footer-social-link">
-                        <i class="fa fa-instagram"></i>
-                    </a>
-                </div>
-
-                <div class="footer-nav-links float-right">
-                    <a class="footer-nav-link feedback-link" target="_blank"
-                       href="#">Обратная связь</a>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-</div>
-
-<div class="header-wrapper">
-    <header class="header fluid-width mobile-full-width">
-        <a class="fader-link close-overlay" href="/index.php" data-ga-label="Home" data-overlay-target="">
-            <svg width="135px" height="24.70001px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 135 24.70001">
-                <path id="evendate_logo_text" transform="translate(-2.375 -0.69998)" fill="#ffffff"
-                      d="M18.675,16.4c0-5.3-3-8.5-8.1-8.5a8.42015,8.42015,0,0,0-8.2,8.7,8.38058,8.38058,0,0,0,8.5,8.8,7.55515,7.55515,0,0,0,7.5-5.2l-3.7-1.2a3.57051,3.57051,0,0,1-3.7,2.5,3.98288,3.98288,0,0,1-4.1-3.7h11.7A13.80487,13.80487,0,0,0,18.675,16.4Zm-11.8-1.6a3.55717,3.55717,0,0,1,3.7-3.2,3.363,3.363,0,0,1,3.7,3.2h-7.4Zm24.3-6.3-3.9,11-4.1-11h-4.9l6.7,16.4h4.4l6.5-16.4h-4.7Zm20.6,7.9c0-5.3-3-8.5-8.1-8.5a8.25038,8.25038,0,0,0-8.1,8.6,8.38058,8.38058,0,0,0,8.5,8.8,7.55522,7.55522,0,0,0,7.5-5.2l-3.8-1.1a3.57051,3.57051,0,0,1-3.7,2.5,3.98293,3.98293,0,0,1-4.1-3.7h11.7A13.79661,13.79661,0,0,0,51.775,16.4Zm-11.7-1.6a3.55712,3.55712,0,0,1,3.7-3.2,3.36289,3.36289,0,0,1,3.7,3.2h-7.4ZM62.975,8a5.385,5.385,0,0,0-4.7,2.5v-2h-4.3V24.9h4.4V15.4c0-1.9,1.1-3.4,3.1-3.4,2.1,0,3,1.4,3,3.3v9.6h4.4V14.5C68.875,10.9,66.975,8,62.975,8Zm24.8,13.9V0.7h-4.4v9.4c-0.5-.9-1.8-2-4.6-2-4.6,0-7.9,3.8-7.9,8.6,0,5,3.3,8.6,8,8.6a5.101,5.101,0,0,0,4.6-2.3,7.75394,7.75394,0,0,0,.2,1.9h4.2A26.28237,26.28237,0,0,1,87.775,21.9Zm-8.3-.6c-2.4,0-4.1-1.8-4.1-4.7s1.8-4.6,4.1-4.6,4,1.6,4,4.6S81.675,21.3,79.475,21.3Zm25.2,1V14.2c0-3.3-1.9-6.2-7.1-6.2-4.4,0-6.8,2.8-7,5.4l3.9,0.8a2.92541,2.92541,0,0,1,3.1-2.7c1.9,0,2.8,1,2.8,2.1a1.19858,1.19858,0,0,1-1.2,1.2l-4,.6c-2.8.4-5,2-5,5,0,2.6,2.1,4.9,5.6,4.9a5.40058,5.40058,0,0,0,4.8-2.4,12.30577,12.30577,0,0,0,.2,2h4.1A18.36784,18.36784,0,0,1,104.675,22.3Zm-4.3-4.2c0,3-1.8,3.9-3.6,3.9a1.89565,1.89565,0,0,1-2.1-1.9,2.094,2.094,0,0,1,2-2.1l3.7-.6v0.7Zm16.3-5.8V8.5h-3.3V3.6h-4.1V5.9a2.33883,2.33883,0,0,1-2.5,2.6h-0.8v3.9h3V20c0,3.2,2,5.1,5.2,5.1a5.9567,5.9567,0,0,0,2.5-.4V21a4.92317,4.92317,0,0,1-1.4.1,1.61828,1.61828,0,0,1-1.9-1.9V12.3h3.3Zm17.2,4.1a10.91279,10.91279,0,0,0-.47-3.3h-0.03a5.49026,5.49026,0,0,1-5.47-4.98,9.60458,9.60458,0,0,0-2.13-.22,8.25043,8.25043,0,0,0-8.1,8.6,8.38058,8.38058,0,0,0,8.5,8.8,7.55517,7.55517,0,0,0,7.5-5.2l-3.8-1.1a3.57051,3.57051,0,0,1-3.7,2.5,3.98284,3.98284,0,0,1-4.1-3.7h11.7A13.80487,13.80487,0,0,0,133.875,16.4Zm-11.7-1.6a3.55721,3.55721,0,0,1,3.7-3.2,3.363,3.363,0,0,1,3.7,3.2h-7.4Z"></path>
-                <circle id="evendate_logo_dot" cx="131" cy="6.90002" r="4" fill="#f82969"></circle>
-            </svg>
-
-        </a>
-        <div class="header-nav-links">
-            <a class="header-nav-link hover-color users-link " href="/landing.php">Пользователям</a>
-            <a class="header-nav-link faq-link hover-color fader-link faq-link faq-header-link"
-               data-overlay-target="faq-section" href="#">Войти</a>
-
-            <a class="header-nav-link hover-color js-ga-track fader-link about-link about-header-link hidden"
-               data-overlay-target="about-section" href="#"></a>
-        </div>
-
-        <a class="header-nav-link hover-color users-link fader-link mobile-organizations"
-           href="/landing.php">Пользователям</a>
-    </header>
-</div>
-
-<section class="fixed-content fluid-width">
-    <div class="content">
-        <div class="constrain">
-
-            <div class="content-text">
-                <div class="text-slide active" data-slide="0">
-                    <h2 class="js-animate-this">Увеличивайте количество<br>посетителей</h2>
-                    <div class="js-animate-this">
-                        <p>Социальные сети не ориентированы на афишу, поэтому большая часть событий остается
-                            незамеченной в ленте новостей, а рассылки отправляются в спам.</p>
-                        <p>Evendate даёт возможность каждому организатору бесплатно публиковать события и привлекать новых
-                            подписчиков. После публикации все подписчики получат уведомление и
-                            гарантированно ничего не пропустят.</p>
-                    </div>
-                </div>
-                <div class="text-slide" data-slide="1">
-                    <h2 class="js-animate-this">Анализируйте отдачу</h2>
-                    <div class="js-animate-this">
-                        <p>В личном кабинете организатора отображается детальная аналитика активности аудитории.
-                            Evendate покажет вам точки роста количества посетителей и их вовлеченность, позволяя
-                            совершать повторную продажу.</p>
-                        <p>Вы можете анализировать не только общую страницу, но и отдельное событие, сравнивая их
-                            популярность с другими.</p>
-                    </div>
-                </div>
-                <div class="text-slide" data-slide="2">
-                    <h2 class="js-animate-this">Будьте ближе<br>к своей аудитории</h2>
-                    <div class="js-animate-this">
-                        <p>Получайте реальные данные о интересах вашей аудитории, основанные на их
-                            соц сетях и активности внутри платформы.
-                        </p>
-                        <p>Это позволит улучшить качество контента и рекламировать события только для тех, кому они
-                            действительно интересны, а полученную информацию выгружать в CRM или Excel.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="text-slide text-slide-3 container-centered" data-slide="3">
-                <h1 class="js-animate-this choose-interests-text">У Вас есть события? <br>Добавьте свою организацияю за
-                    2 минуты.</h1>
-                <div class="js-animate-this">
-                    <div class="col-md-2"></div>
-                    <form class="col-md-8 register-organization">
-                        <div class="form-group">
-                            <label for="organization-name">Название организатора</label>
-                            <input type="text" name="name" class="form-control" id="organization-name"
-                                   placeholder="Название">
-                        </div>
-                        <div class="form-group">
-                            <label for="organization-email">Email адрес</label>
-                            <input type="email" name="email" class="form-control" id="organization-email"
-                                   placeholder="Email">
-                        </div>
-                        <div class="form-group">
-                            <label for="organization-link">Ссылка на сайт или группу в соц. сетях</label>
-                            <input type="text" name="site_url" class="form-control" id="organization-link"
-                                   placeholder="http://...">
-                        </div>
-                        <input name="type" type="hidden" value="attempt-to-register">
-                        <div class="row col-md-12 text-center">
-                            <a class="continue-organization-registration" href="#">Продолжить</a>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="device-frame">
-                <div class="image-slides">
-                    <img class="screen-shine init-image" src="app/assets/img/screen-shine.png"/>
-                    <img class="image-slide init-image" alt="Advertising - How Remarketing Keeps Customers Coming Back"
-                         src="app/assets/img/organizations/still1.jpg"/>
-                    <img class="image-slide init-image"
-                         alt="Content - Get Customers Interested by Telling a Great Story"
-                         src="app/assets/img/organizations/still2.jpg"/>
-                    <img class="image-slide init-image" alt="Lesson Recap - How Remarketing Keeps Customers Coming Back"
-                         src="app/assets/img/organizations/still3.jpg"/>
-                </div>
-                <img class="device init-image" src="app/assets/img/organizations/device.png"/>
-            </div>
-        </div>
+    <div class="navi-toggle group">
+      <span class="dot"></span><span class="line"></span>
+      <span class="dot"></span><span class="line"></span>
+      <span class="dot"></span><span class="line"></span>
+      <span class="dot"></span><span class="line"></span>
     </div>
+    <nav class="main-navi">
+      <ul>
+        <li class="active"><a class="scroll-up" href="#">Главная</a></li>
+        <li><a class="scroll" href="#features">Возможности</a></li>
+        <li><a class="scroll" href="#gallery">Как это работает</a></li>
+        <li><a class="scroll" href="#pricing">Цены</a></li>
+        <li><a class="scroll" href="#start-using">Начать использовать</a></li>
+        <li><a class="scroll" href="#contacts">Контакты</a></li>
+      </ul>
+    </nav>
+  </div>
+</header>
 
+<!--Hero Unit with Slider-->
+<section class="hero">
+  <div class="container">
+
+    <!--Hero Slider-->
+    <div class="row">
+      <div class="hero-slider">
+        <div class="slide first-slide">
+          <div class="col-lg-5 col-md-5 col-sm-5 animated">
+            <h2 style="margin-top:50px;" class="text-light text-left">Evendate - все для организатора
+              событий</h2>
+            <p>Evendate позволяет продавать билеты, снижать стоимость повторной продажи и увеличивать вовлеченность
+            посетителей событий</p>
+            <p><b>Наше главное преимущество</b> - оптимизация ваших издержек, благодаря тому, что больше не придется
+              привлекать пользователей на каждое событие в отдельности</p>
+<!--            <p>Evendate предоставляет инструменты для оптимизации затрат сил и денег на всех этапах организации-->
+<!--              события: от анализа интересов аудитории, до аналитики проведенного мероприятия и повторного взаимодействия-->
+<!--              с аудиторией.</p>-->
+<!--            <p><b>Наше главное преимущество</b> – оптимизация ваших издержек.</p>-->
+          </div>
+          <div class="col-lg-7 col-md-7 col-sm-7 animated">
+            <img class="pull-right" src="./landing/img/hero-slider/imac-2.png" width="689" height="659"
+                 alt="Evendate - все для организатора событий"/>
+          </div>
+        </div>
+        <div class="slide">
+          <div class="col-lg-5 col-md-5 col-sm-5 animated fadeInUp">
+            <h2 style="margin-top:50px;" class="text-light text-left">Мобильные приложения для ваших клиентов</h2>
+            <p>Пользователи Evendate получают возможность подписаться на интересные им места, чтобы видеть ленту событий
+              и получать уведомления</p>
+            <p>Клиенты не пропустят ваши события благодаря push-уведомлениям и удобному календарю</p>
+          </div>
+          <div class="col-lg-7 col-md-7 col-sm-7 animated fadeInRight">
+            <img class="iphone" src="./landing/img/hero-slider/iphone-2.png" width="649" height="400"
+                 alt="Мобильные приложения Evendate"/>
+          </div>
+        </div>
+        <div class="slide">
+          <div class="col-lg-4 col-md-4 col-sm-4 animated fadeInDown">
+            <h2 style="margin-top:70px;" class="text-light text-left">Повторные продажи</h2>
+            <p>Социальные сети не ориентированы на афишу, поэтому большая часть событий остается незамеченной в ленте
+              новостей, а рассылки отправляются в спам</p>
+            <p>Evendate даёт возможность каждому организатору бесплатно публиковать события и привлекать новых
+              подписчиков</p>
+          </div>
+          <div class="col-lg-8 col-md-8 col-sm-8 animated fadeInRight">
+            <div class="video">
+              <img src="./landing/img/hero-slider/macbook.png" width="782" height="422" alt=""/>
+              <div class="vide-holder">
+                <iframe width="720" height="405" src="https://www.youtube.com/embed/1qZs6qmnKkA" frameborder="0"
+                        allowfullscreen></iframe>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!--Close Hero Slider-->
+  </div>
+</section><!--Close Hero-->
+
+<!--Features-->
+<section class="page-block" id="features">
+  <div class="container">
+    <div class="row page-header">
+      <h2>Возможности Evendate</h2>
+      <span>4 простых шага для увеличения продаж</span>
+    </div>
+    <div class="row features">
+      <div class="col-lg-3 col-md-3 col-sm-3">
+        <div class="feature-img"><img src="./landing/img/features/feature1.png" width="123" height="120"
+                                      alt="Добавьте свою организацию"/></div>
+        <h3>Создайте страницу организации</h3>
+
+        <!--TODO: Сделать в конце ссылку как привлекать пользователей-->
+        <p>Создайте страницу организации – так ваша аудитория всегда будет знать о новых мероприятиях</p>
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-3">
+        <div class="feature-img"><img src="./landing/img/features/feature3.png" width="72" height="72"
+                                      alt="Публикуйте события"/>
+        </div>
+        <h3>Публикуйте <br>события</h3>
+        <p>Опишите ваше событие, задайте время публикации, настройте форму регистрации и продажи билетов. Все подписчики
+          сразу получат push-уведомления о событии на мобильные устройства и в браузере</p>
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-3">
+        <div class="feature-img"><img src="./landing/img/features/feature2.png" width="131" height="131"
+                                      alt="Привлечение пользователей"/></div>
+        <h3>Привлекайте пользователей</h3>
+        <p>Расскажите в социальных сетях, в оффлайне и на вашем сайте о странице вашей организации– так вы упростите
+          взаимодействие с ними</p>
+      </div>
+      <div class="col-lg-3 col-md-3 col-sm-3">
+        <div class="feature-img"><img src="./landing/img/features/feature4.png" width="131" height="131"
+                                      alt="Рост продаж"/></div>
+        <h3>Продавайте и анализируйте</h3>
+        <p>Мы гарантируем снижение стоимости привлечения клиентов за счет оптимизации затрат на взаимодействие с
+          аудиторией и увеличение количества повторных продаж. Не верьте нам на слово, убедитесь в этом в нашей панели
+          аналитики</p>
+      </div>
+    </div>
+  </div>
+  <!--Tabs-->
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Nav tabs -->
+      <ul class="nav nav-tabs central">
+        <li class="active"><a href="#to-all" data-toggle="tab">Всем организаторам</a></li>
+        <li><a href="#to-anticafe" data-toggle="tab">Антикафе</a></li>
+        <li><a href="#to-universities" data-toggle="tab">Университеты</a></li>
+        <li><a href="#to-parks" data-toggle="tab">Парки и музеи</a></li>
+        <li><a href="#to-cinema" data-toggle="tab">Кинотеатры</a></li>
+        <li><a href="#to-enterprise" data-toggle="tab">Крупный бизнес</a></li>
+      </ul>
+    </div>
+  </div>
+  <!-- Tab panes -->
+  <div class="container">
+    <div class="row tab-content central">
+      <div class="tab-pane fade in active col-lg-12" id="to-all">
+        <div class="row">
+          <div class="col-lg-6 col-md-6 animated fadeInLeft">
+            <img src="./landing/img/features/all.png" alt="Публикуйте события"/>
+          </div>
+          <div class="col-lg-6 col-md-6 animated fadeInRight">
+            <div class="row">
+              <div class="col-lg-12">
+                <h2>Экономьте на повторных продажах</h2>
+                <p class="double-space-bottom">Оповещения о новых событиях и социальный фактор повысят вовлеченность и
+                  снизят стоимость повторной продажи вашим клиентам</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-2"><i class="feature-icon fa fa-bullhorn"></i></div>
+              <div class="col-lg-10">
+                <p class="double-space-bottom">Публикация информации о событиях дает возможность всем желающим
+                  пользователям подписаться на вашу организацию. Информируйте подписчиков о новых событиях и о любых
+                  изменениях в
+                  расписании, ценах, адресе и т.д.</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-2"><i class="feature-icon fa fa-area-chart"></i></div>
+              <div class="col-lg-10">
+                <p class="double-space-bottom">Получайте реальные данные об интересах вашей аудитории, основанные на их
+                  социальных сетях и активности внутри платформы</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-2"><i class="feature-icon fa fa-th-list"></i></div>
+              <div class="col-lg-10">
+                <p>Создавайте формы регистрации с возможностью последующего контроля входа - достаточно отсканировать QR
+                  код в нашем приложении</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane fade col-lg-12" id="to-anticafe">
+        <div class="row">
+          <div class="col-lg-6 col-md-6 animated fadeInLeft">
+            <img src="./landing/img/features/anticafe.png" alt="Создавайте постоянную аудиторию"/>
+          </div>
+          <div class="col-lg-6 col-md-6 animated fadeInRight">
+            <div class="row">
+              <div class="col-lg-12">
+                <h2>Создавайте постоянную аудиторию</h2>
+                <p class="double-space-bottom">Evendate поможет сформировать постоянную лояльную аудитория вашего
+                  антикафе</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-2"><i class="feature-icon fa fa-money"></i></div>
+              <div class="col-lg-10">
+                <p class="double-space-bottom">Сэкономьте на создании и поддержке приложения для своего антикафе.
+                  Достаточно зарегистрироваться у нас и начать публиковать события</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-2"><i class="feature-icon fa fa-ticket"></i></div>
+              <div class="col-lg-10">
+                <p class="double-space-bottom">Продавайте билеты на ваши события через Evendate, чтобы клиенты могли
+                  быстро и просто их приобретать и использовать</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-2"><i class="feature-icon fa fa-share-alt"></i></div>
+              <div class="col-lg-10">
+                <p>Рассказывайте посетителям о том, что все события антикафе доступны в мобильных приложениях. Нужны
+                  плакаты, постеры или тейбл тенты?
+                  Свяжитесь с нами и мы бесплатно предоставим их, чтобы было легче привлекать аудиторию</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane fade col-lg-12" id="to-universities">
+        <div class="row">
+          <div class="col-lg-6 col-md-6 animated fadeInLeft">
+            <img src="./landing/img/features/universities.png" alt="Используйте платные функции бесплатно"/>
+          </div>
+          <div class="col-lg-6 col-md-6 animated fadeInRight">
+            <div class="row">
+              <div class="col-lg-12">
+                <h2>Используйте платные функции бесплатно</h2>
+                <p class="double-space-bottom">Для всех бюджетных учреждений все функции Evendate, включая расширенную
+                  аналитику и продажу билетов, полностью бесплатны</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-2"><i class="feature-icon fa fa-bell"></i></div>
+              <div class="col-lg-10">
+                <p class="double-space-bottom">Используйте оповещения для привлечения большего числа студентов на
+                  проводимые события</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-2"><i class="feature-icon fa fa-bullseye"></i></div>
+              <div class="col-lg-10">
+                <p class="double-space-bottom">Собирайте информацию обо всех событиях в одном месте - избавьте студентов
+                  от необходимости мониторить сайт
+                  и многочисленные группы в социальных сетях. Единый инструмент поможет понять, что более интересно
+                  студентам</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-2"><i class="feature-icon fa fa-unlock"></i></div>
+              <div class="col-lg-10">
+                <p>Предоставьте представителям студенческих организаций доступ для публикации событий и экономьте на
+                  изготовлении печатных афиш</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-2"><i class="feature-icon fa fa-graduation-cap"></i></div>
+              <div class="col-lg-10">
+                <p>Привлекайте абитуриентов, показывая им насыщенную студенческую жизнь и качество проводимых
+                  мероприятий</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane fade col-lg-12" id="to-cinema">
+        <div class="row">
+          <div class="col-lg-6 col-md-6 animated fadeInLeft">
+            <img class="img-center" src="./landing/img/features/cinema.png"
+                 alt="Информируйте о премьерах и помогайте зрителям собрать компанию"/>
+          </div>
+          <div class="col-lg-6 col-md-6 animated fadeInRight">
+            <div class="row">
+              <div class="col-lg-12">
+                <h2>Информируйте о премьерах и помогайте зрителям собрать компанию</h2>
+                <p class="double-space-bottom">Увеличивайте количество посетителей вашего кинотеатра с помощью
+                  оповещений о премьерах фильмов</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-2"><i class="feature-icon fa fa-cubes"></i></div>
+              <div class="col-lg-10">
+                <p class="double-space-bottom">Формируйте постоянную аудиторию кинотеатра без необходимости
+                  платить за разработку и сопровождение собственного мобильного приложения для Android и iOS</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-2"><i class="feature-icon fa fa-calendar-check-o"></i></div>
+              <div class="col-lg-10">
+                <p class="double-space-bottom">О фильмах класса "ААА" знают все, но вы сможете оповещать абсолютно обо
+                  всех
+                  премьерах</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-2"><i class="feature-icon fa fa-user-plus"></i></div>
+              <div class="col-lg-10">
+                <p class="double-space-bottom">Приложения позволят посетителям увидеть, на какой фильм хотят пойти их
+                  друзья. Это позволит привлечь еще больше людей</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane fade col-lg-12" id="to-parks">
+        <div class="row">
+          <div class="col-lg-6 col-md-6 animated fadeInLeft">
+            <img src="./landing/img/features/parks-and-museums.png" alt="Публикуйте события" style="margin-top: 70px;"/>
+          </div>
+          <div class="col-lg-6 col-md-6 animated fadeInRight">
+            <div class="row">
+              <div class="col-lg-12">
+                <h2>Продавайте больше билетов</h2>
+                <p class="double-space-bottom">Оповещайте заинтересованных пользователей обо всех новых выставках,
+                  встречах, мастер-классах и мероприятиях в разы проще, чем по email.</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-2"><i class="feature-icon fa fa-dot-circle-o"></i></div>
+              <div class="col-lg-10">
+                <p class="double-space-bottom">Привлекайте активную постоянную аудиторию с помощью push-уведомлений и
+                  Telegram ботов</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-2"><i class="feature-icon fa fa-ticket"></i></div>
+              <div class="col-lg-10">
+                <p class="double-space-bottom">Продавайте билеты быстро и удобно. Так же Evendate отлично подходит для
+                  оповещения о событиях даже при продаже билетов через свои сайты.</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-2"><i class="feature-icon fa fa-th-list"></i></div>
+              <div class="col-lg-10">
+                <p>Создавайте формы регистрации с возможностью последующего контроля входа - достаточно отсканировать QR
+                  код в нашем приложении.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="tab-pane fade col-lg-12" id="to-enterprise">
+        <div class="row">
+          <div class="col-lg-6 col-md-6 animated fadeInLeft">
+            <img src="./landing/img/features/parks-and-museums.png" alt="Публикуйте события" style="margin-top: 70px;"/>
+          </div>
+          <div class="col-lg-6 col-md-6 animated fadeInRight">
+            <div class="row">
+              <div class="col-lg-12">
+                <h2>Держите в курсе событий своих сотрудников</h2>
+                <p class="double-space-bottom">Evendate позволяет создавать приватные организации, доступ к которым
+                  возможен только по приглашениям</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-2"><i class="feature-icon fa fa-area-chart"></i></div>
+              <div class="col-lg-10">
+                <p class="double-space-bottom">Анализируйте активность сотрудников и их интересы. Увеличивайте
+                  вовлеченность благодаря социальному фактору</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-2"><i class="feature-icon fa fa-bullhorn"></i></div>
+              <div class="col-lg-10">
+                <p class="double-space-bottom">Информируйте сотрудников через приложения и push уведомления о новых
+                  корпоративных событиях и об изменениях в
+                  расписании, адресе или любой другой информации</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-2"><i class="feature-icon fa fa-th-list"></i></div>
+              <div class="col-lg-10">
+                <p>Создавайте формы регистрации с возможностью последующего контроля входа - достаточно отсканировать QR
+                  код в нашем приложении. Нет больше необходимости в email рассылках и Google Forms</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
-<section class="scroll-container">
-    <section class="scroll-section scroll-section-one" data-from-time="0.01" data-to-time="1.33"
-             data-reverse-from-time="" data-reverse-to-time="">
-        <div class="scroll-section-content">
-            <img width="500" class="layer-object pencils initial-state init-image "
-                 src="app/assets/img/organizations/objects/plane.png"/>
-            <img width="1660" class="section-bg section-bg-one initial-state init-image"
-                 src="app/assets/img/organizations/shapes/pattern1.png"/>
-        </div>
 
-    </section>
-    <section class="scroll-section scroll-section-two" data-from-time="1.50" data-to-time="2.67"
-             data-reverse-from-time="6.73" data-reverse-to-time="8.07">
-        <div class="scroll-section-content">
-            <img width="250" class="layer-object coffee js-load-async"
-                 data-image-src="app/assets/img/organizations/objects/pins.png"/>
-            <img width="400" class="layer-object spoon js-load-async"
-                 data-image-src="app/assets/img/organizations/objects/line.png"/>
-            <img width="1693" class="section-bg section-bg-two js-load-async"
-                 data-image-src="app/assets/img/organizations/shapes/pattern2.png"/>
-        </div>
-    </section>
-    <section class="scroll-section scroll-section-three" data-from-time="2.83" data-to-time="4.00"
-             data-reverse-from-time="5.40" data-reverse-to-time="6.57">
-        <div class="scroll-section-content">
+<!--&lt;!&ndash;Charts&ndash;&gt;-->
+<!--<section class="page-block less-space-bottom" id="charts">-->
+<!--<div class="container">-->
+<!--<div class="row page-header">-->
+<!--<h2>Результаты наших клиентов</h2>-->
+<!--&lt;!&ndash;<span>на примере антикафе</span>&ndash;&gt;-->
+<!--</div>-->
+<!--<div class="row">-->
+<!--<div class="col-lg-6 col-md-6 col-sm-6 chart">-->
+<!--<h3>Охват аудитории</h3>-->
+<!--<canvas id="lineChart" width="550" height="320"></canvas>-->
+<!--</div>-->
+<!--<div class="col-lg-6 col-md-6 col-sm-6 chart">-->
+<!--<h3>Процент проданных билетов</h3>-->
+<!--<canvas id="barChart" width="550" height="320"></canvas>-->
+<!--</div>-->
+<!--</div>-->
+<!--&lt;!&ndash;<div class="row">&ndash;&gt;-->
+<!--&lt;!&ndash;<div class="col-lg-6 col-md-6 col-sm-6 chart">&ndash;&gt;-->
+<!--&lt;!&ndash;<h3>Pie Chart</h3>&ndash;&gt;-->
+<!--&lt;!&ndash;<div class="group">&ndash;&gt;-->
+<!--&lt;!&ndash;<div class="pie-chart">&ndash;&gt;-->
+<!--&lt;!&ndash;<canvas id="pieChart" width="260" height="260"></canvas>&ndash;&gt;-->
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
+<!--&lt;!&ndash;<div class="pie-chart-legend animated-legend">&ndash;&gt;-->
+<!--&lt;!&ndash;<div style="color:#ff6f69;" class="label"><span>20%</span>Item01</div>&ndash;&gt;-->
+<!--&lt;!&ndash;<div style="color:#e7e7ea;" class="label"><span>25%</span>Item02</div>&ndash;&gt;-->
+<!--&lt;!&ndash;<div style="color:#313447;" class="label"><span>40%</span>Item01</div>&ndash;&gt;-->
+<!--&lt;!&ndash;<div style="color:#ffad10;" class="label"><span>15%</span>Item02</div>&ndash;&gt;-->
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
+<!--&lt;!&ndash;<div class="col-lg-6 col-md-6 col-sm-6 chart">&ndash;&gt;-->
+<!--&lt;!&ndash;<h3>Doughnut Chart</h3>&ndash;&gt;-->
+<!--&lt;!&ndash;<div class="group">&ndash;&gt;-->
+<!--&lt;!&ndash;<div class="pie-chart">&ndash;&gt;-->
+<!--&lt;!&ndash;<canvas id="doughnutChart" width="260" height="260"></canvas>&ndash;&gt;-->
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
+<!--&lt;!&ndash;<div class="pie-chart-legend animated-legend">&ndash;&gt;-->
+<!--&lt;!&ndash;<div style="color:#ff6f69;" class="label"><span>20%</span>Item01</div>&ndash;&gt;-->
+<!--&lt;!&ndash;<div style="color:#e7e7ea;" class="label"><span>25%</span>Item02</div>&ndash;&gt;-->
+<!--&lt;!&ndash;<div style="color:#313447;" class="label"><span>40%</span>Item01</div>&ndash;&gt;-->
+<!--&lt;!&ndash;<div style="color:#ffad10;" class="label"><span>15%</span>Item02</div>&ndash;&gt;-->
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
+<!--&lt;!&ndash;</div>&ndash;&gt;-->
+<!--</div>-->
+<!--</section>-->
 
-            <img width="1982" class="section-bg section-bg-three js-load-async"
-                 data-image-src="app/assets/img/organizations/shapes/pattern3.png"/>
-        </div>
-    </section>
-    <section class="scroll-section scroll-section-four" data-from-time="" data-to-time="" data-reverse-from-time="4.06"
-             data-reverse-to-time="5.23">
-        <div class="scroll-section-content">
-        </div>
-
-    </section>
+<!--Gallery-->
+<section class="page-block" id="gallery">
+  <div class="container">
+    <div class="row page-header">
+      <h2>Как это работает</h2>
+      <span></span>
+    </div>
+    <div class="row">
+      <ul class="gallery">
+        <li>
+          <a href="#" data-largesrc="/landing/img/gallery/gal-1.png" data-title="Страница организатора"
+             data-description="Каждый организатор получает страницу, на которой представлена основная информация и предстоящие события.
+             Пользователи могут открывтаь страницу в каталоге или по прямой ссылке<br><br>
+             Чем больше подписчиков, тем выше в каталоге и вероятность подписки новых пользователей.
+               Доступны расширенные настройки дизайна страницы организации, в том числе добавление своего домена,
+             применение фирменных цветов и дополнительные уведомления">
+            <img src="/landing/img/gallery/gal-1.png" alt="Страница организатора"/>
+            <span class="img-caption">Страница организатора</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" data-largesrc="./landing/img/gallery/gal-3.png" data-title="Создание события"
+             data-description="Публикация информации о событии и настройка регистрации занимают не больше 5 минут.
+             При этом можно создавать гибкую форму для заполнения и настраивать ценообразование.<br>
+             <br> Интеграции с ВКонтакте, Facebook и Instagram помогут не делать одну и ту же работу много раз">
+            <img src="./landing/img/gallery/gal-3.png" alt="Создание события"/>
+            <span class="img-caption">Создание события</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" data-largesrc="./landing/img/gallery/gal-4.png" data-title="Аналитика и продажи"
+             data-description="Все цифры по охвату аудитории, подписчикам, динамике просмотров страницы и продажам билетов
+             визуализированы и всегда под рукой. Данные собираются со всех платформ, на которых есть evendate - Web, Android, iOS.
+             В том числе вы можете видеть сколько было отправлено push уведомлений, сколько из них было открыто.<br><br>
+            В панели управления доступны все заказы ваших клиентов и регистрационные данные">
+            <img src="./landing/img/gallery/gal-4.png" alt="Общая аналитика и продажи"/>
+            <span class="img-caption">Аналитика и продажи</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" data-largesrc="./landing/img/gallery/gal-8.png" data-title="Аналитика интересов"
+             data-description="
+             <b>Одним из главных преимуществ</b> платформы является возможность анализа интересов аудитории вашей организации.
+              Благодаря авторизации с помощью социальными сетей и нашим алгоритмам анализа интересов, вы сможете
+              понимать, что больше понравится вашей аудитории, соответственно, привлекать больше людей">
+            <img src="./landing/img/gallery/gal-8.png" alt="Аналитика интересов"/>
+            <span class="img-caption">Аналитика интересов</span>
+          </a>
+        </li>
+        <!-- User's part-->
+        <li>
+          <a href="#" data-largesrc="./landing/img/gallery/gal-2.png" data-title="Уведомления"
+             data-description="
+             После добавления события организатором, на которого
+             подписан пользователь, приходит push-уведомление на все устройтва: в браузер, iOS и Android смартфоны.
+             Процент просмотров в социальных сетях в среднем составляет 7% от аудитории, в случае email - 14%
+             Процент просмотров push-уведомлений <b>больше 60%</b>.
+             <br><br>
+             На странице события каждый пользователь может узнать всю необходимую информацию, зарегистрироваться,
+             купить билет, добавить событие в избранное или добавить дополнительные уведомления-напоминания, чтобы не пропустить
+">
+            <img src="./landing/img/gallery/gal-2.png" alt="Уведомления"/>
+            <span class="img-caption">Мобильные приложения и уведомления</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" data-largesrc="./landing/img/gallery/gal-7.png" data-title="Лента событий"
+             data-description="
+             В ленте отображаются все актуальные события организаторов, на которых подписан пользователь.
+             Одна из важных причин, почему люди посещают различные события - приятно провести время в компании друзей.
+             Поэтому доступна информация о друзьях из социальных сетей, которые заинтересованы в каждом событии.
+             Также пользователь может сохранять билеты посещенных событий на память">
+            <img src="./landing/img/gallery/gal-7.png" alt="Лента событий"/>
+            <span class="img-caption">Лента событий</span>
+          </a>
+        </li>
+        <li>
+          <a href="#" data-largesrc="./landing/img/gallery/gal-5.png" data-title="Рекомендации"
+             data-description="
+             Лента рекомендаций составляется автоматически на основе интересов пользователя
+              из социальных сетей и активности внутри платформы. Мы гарантируем, что все пользователи,
+              которым интересны события, похожие на ваши, узнают о ваших событиях тоже
+             ">
+            <img src="./landing/img/gallery/gal-5.png" alt="Рекомендации"/>
+            <span class="img-caption">Рекомендации</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div>
 </section>
 
-<footer class="footer fluid-width mobile-full-width">
-
-    <a href="index.html" data-ga-label="DownArrow" class="down-arrow hover-fill js-ga-track">
-        <svg width="30px" height="30px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg"
-             xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 60 60"
-             enable-background="new 0 0 60 60" xml:space="preserve">
-          <polygon fill="#FFFFFF" points="55.7,19.2 51.5,15.1 30,36.6 8.5,15.1 4.3,19.2 30,44.9 30,44.9 30,44.9 "/>
-        </svg>
-    </a>
-
-    <div class="float-right footer-social-links">
-        <a data-ga-label="G+" target="_blank" href="https://new.vk.com/evendate"
-           class="footer-social-link hover-fill js-ga-track">
-            <i class="fa fa-vk"></i>
-        </a>
-        <a data-ga-label="Twitter" target="_blank" href="https://twitter.com/evendate"
-           class="footer-social-link hover-fill js-ga-track">
-            <i class="fa fa-twitter"></i>
-        </a>
-        <a target="_blank" href="http://instagram.com/evendate.ru"
-           class="footer-social-link hover-fill js-ga-track">
-            <i class="fa fa-instagram"></i>
-        </a>
+<!--Testimonials-->
+<section class="page-block color" id="testimonials">
+  <div class="container">
+    <div class="row">
+      <div id="testimonials-slider" class="testimonials-slider carousel slide" data-ride="carousel">
+        <!-- Indicators -->
+        <ol class="carousel-indicators">
+          <li data-target="#testimonials-slider" data-slide-to="0" class="active"></li>
+          <li data-target="#testimonials-slider" data-slide-to="1"></li>
+        </ol>
+        <!-- Wrapper for slides -->
+        <div class="carousel-inner">
+          <div class="item active">
+            <div class="container">
+              <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12">
+                  <img class="img-center" src="./landing/img/features/how-it-works-today.png"/>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="item">
+            <div class="container">
+              <div class="row">
+                <div class="col-lg-12 col-md-12 col-sm-12">
+                  <img class="img-center" src="./landing/img/features/how-it-works-with-evendate.png"/>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!--<div class="item">-->
+          <!--<div class="container">-->
+          <!--<div class="row">-->
+          <!--<div class="col-lg-3 col-md-3 col-sm-4">-->
+          <!--<img class="img-circle img-center" src="./landing/img/testimonials/doe.png" width="192"-->
+          <!--height="192" alt="Jonathan Doe"/>-->
+          <!--</div>-->
+          <!--<div class="col-lg-9 col-md-9 col-sm-8">-->
+          <!--<blockquote>-->
+          <!--<p class="text-light">Lorem ipsum dolor sit amet, consectetur adipiscing elit.-->
+          <!--Integer posuere erat a ante.</p>-->
+          <!--<footer class="text-light">Jonathan Doe</footer>-->
+          <!--</blockquote>-->
+          <!--</div>-->
+          <!--</div>-->
+          <!--</div>-->
+          <!--</div>-->
+        </div>
+      </div>
     </div>
+  </div>
+</section>
 
-    <div class="footer-nav-links float-right">
-        <a class="footer-nav-link feedback-link" target="_blank"
-           href="#">Обратная связь</a>
+<!--Pricing Plans-->
+<section class="page-block" id="pricing">
+  <div class="container">
+    <div class="row page-header">
+      <h2>Стоимость</h2>
+      <span>Публикация событий БЕСПЛАТНО</span>
     </div>
+    <div class="row">
+      <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="pricing-plan">
+          <div class="header">
+            <h3>Базовый</h3>
+            <span class="price">Бесплатно</span>
+          </div>
+          <div class="body">
+            <ul>
+              <li>Публикация событий</li>
+              <li>Базовая аналитика по охвату</li>
+              <li>1 push уведомление на событие</li>
+            </ul>
+            <!--<div class="buy-btn"><a class="btn btn-primary" href="#">Купить</a></div>-->
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="pricing-plan">
+          <div class="header highlited">
+            <h3>Расширенный</h3>
+            <span class="price">800 ₽/мес</span>
+          </div>
+          <div class="body">
+            <ul>
+              <li>Публикация событий</li>
+              <li>Расширенная аналитика интересов аудитории</li>
+              <li>Возможность создания ботов для Telegram, Slack</li>
+              <li>1 дополнительное push уведомление на событие</li>
+            </ul>
+            <!--<div class="buy-btn"><a class="btn btn-primary" href="#">Купить</a></div>-->
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="pricing-plan">
+          <div class="header">
+            <h3>Полный</h3>
+            <span class="price">1400 ₽/мес</span>
+          </div>
+          <div class="body">
+            <ul>
+              <li>Публикация событий</li>
+              <li>Продажа билетов</li>
+              <li>Расширенная аналитика интересов аудитории</li>
+              <li>Возможность создания ботов для Telegram, Slack</li>
+              <li>1 дополнительное push уведомление на событие</li>
+            </ul>
+            <!--<div class="buy-btn"><a class="btn btn-primary" href="#">Купить</a></div>-->
+          </div>
+        </div>
+      </div>
+      <!--<div class="col-lg-3 col-md-3 col-sm-3">-->
+      <!--<div class="pricing-plan">-->
+      <!--<div class="header">-->
+      <!--<h3>Приватные организации</h3>-->
+      <!--<span class="price">799 ₽/мес</span>-->
+      <!--</div>-->
+      <!--<div class="body">-->
+      <!--<ul>-->
+      <!--<li>Lots of Components</li>-->
+      <!--<li>Cool Icons</li>-->
+      <!--<li>Unlimited colors</li>-->
+      <!--</ul>-->
+      <!--<div class="buy-btn"><a class="btn btn-primary" href="#">Buy</a></div>-->
+      <!--</div>-->
+      <!--</div>-->
+      <!--</div>-->
+    </div>
+  </div>
+</section>
+
+<!--Application Wizard-->
+<section class="page-block" id="start-using">
+  <div class="container">
+    <div class="row page-header">
+      <h2>Начните сейчас экономить и зарабатывать больше</h2>
+      <span></span>
+    </div>
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="wizard">
+          <div class="header">
+            <h3>Регистрация организации</h3>
+            <div class="progress-bar group">
+              <div class="overlay"></div>
+              <div class="line"></div>
+              <a class="step-link left current" href="#step01" data-toggle="tab"><span class="status"></span></a>
+              <a class="step-link middle" href="#step02" data-toggle="tab"><span class="status"></span></a>
+              <a class="step-link right" data-toggle="tab"><span class="status"></span></a>
+            </div>
+          </div>
+
+          <form method="post" id="wizard-form" class="wizard-form body" role="form">
+
+            <!--Step 1-->
+            <div class="wizard-step fade in active" id="step01">
+              <div class="tabs">
+                <div class="tab row fade in active" id="tab01">
+                  <div class="col-lg-12">
+                    <div class="row">
+                      <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                        <label for="name">Название организации</label>
+                        <input type="text" name="name" class="form-control" id="name"
+                               placeholder="Введите название вашей организации (места)" required>
+                      </div>
+                      <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                        <label for="email">Email</label>
+                        <input type="email" name="email" class="form-control" id="email"
+                               placeholder="Введите ваш email" required>
+                      </div>
+                      <div class="col-lg-12 col-md-12 col-sm-12 form-group">
+                        <label for="site_url">Сайт</label>
+                        <input type="text" name="site_url" class="form-control" id="site_url"
+                               placeholder="Адрес официального сайта или сообщества в социальной сети">
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!--Step 2-->
+            <div class="wizard-step fade" id="step02">
+              <div class="tabs">
+                <div class="tab fade in active text-center" id="auth">
+                  <h3 class="page-title">Войдите через социальную сеть:</h3>
+                  <div class="columns">
+                    <button data-auth_network="vk"
+                            class="AuthButton column btn btn-default social-btn vk-btn vk-auth-btn"><i
+                        class="fa fa-vk"></i> ВКонтакте
+                    </button>
+                    <button data-auth_network="facebook"
+                            class="AuthButton column btn btn-default social-btn fb-btn facebook-btn"><i
+                        class="fa fa-facebook"></i> Facebook
+                    </button>
+                    <button data-auth_network="google"
+                            class="AuthButton column btn btn-default social-btn google-lus-btn google-plus-btn"><i
+                        class="fa fa-google"></i> Google
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="wizard-footer group">
+              <div class="buttons">
+                <a class="btn btn-primary prev-tab hidden">Назад</a>
+                <a class="btn btn-primary next-tab">Продолжить</a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--FAQ-->
+<!--<section class="page-block faq" id="faq">-->
+<!--<div class="container">-->
+<!--<div class="row page-header">-->
+<!--<h2>FAQ</h2>-->
+<!--<span>Ответы на часто задаваемые вопросы</span>-->
+<!--</div>-->
+<!--<div class="row">-->
+<!--<div class="col-lg-3 col-md-4 col-sm-4">-->
+<!--<img class="img-center" src="img/faq-icon.png" alt="FAQ"/>-->
+<!--</div>-->
+<!--<div class="col-lg-8 col-md-8 col-sm-8">-->
+<!--<div class="panel-group" id="accordion-faq">-->
+<!--<div class="panel">-->
+<!--<a class="panel-heading collapsed" data-toggle="collapse" data-parent="#accordion-faq" href="#collapse1">FAQ 01-->
+<!--<div class="indicator"><div class="icon"><span class="hr-line"></span><span class="vr-line"></span></div></div>-->
+<!--</a>-->
+<!--<div id="collapse1" class="panel-collapse collapse">-->
+<!--<div class="panel-body">-->
+<!--Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione.-->
+<!--</div>-->
+<!--</div>-->
+<!--</div>-->
+<!--<div class="panel">-->
+<!--<a class="panel-heading collapsed" data-toggle="collapse" data-parent="#accordion-faq" href="#collapse2">FAQ 02-->
+<!--<div class="indicator"><div class="icon"><span class="hr-line"></span><span class="vr-line"></span></div></div>-->
+<!--</a>-->
+<!--<div id="collapse2" class="panel-collapse collapse">-->
+<!--<div class="panel-body">-->
+<!--Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione.-->
+<!--</div>-->
+<!--</div>-->
+<!--</div>-->
+<!--<div class="panel">-->
+<!--<a class="panel-heading" data-toggle="collapse" data-parent="#accordion-faq" href="#collapse3">FAQ 03-->
+<!--<div class="indicator"><div class="icon"><span class="hr-line"></span><span class="vr-line"></span></div></div>-->
+<!--</a>-->
+<!--<div id="collapse3" class="panel-collapse collapse in">-->
+<!--<div class="panel-body">-->
+<!--Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione.-->
+<!--</div>-->
+<!--</div>-->
+<!--</div>-->
+<!--</div>-->
+<!--</div>-->
+<!--</div>-->
+<!--</div>-->
+<!--</section>-->
+
+
+<!--Mobile Apps-->
+<section class="page-block mobile-apps" id="apps">
+  <div class="container">
+    <div class="row page-header">
+      <h2>Мобильные приложения</h2>
+      <span>Используйте на всех платформах</span>
+    </div>
+    <div class="row">
+      <div class="col-lg-4 col-md-4">
+        <div class="row">
+          <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="row space-bottom">
+              <div class="col-lg-9 col-md-9">
+                <h3>Почему это важно?</h3>
+              </div>
+              <!--<div class="col-lg-3 col-md-3">-->
+              <!--<img class="img-center" src="./landing/img/apps-icon.png" alt="Мобильные приложения"/>-->
+              <!--</div>-->
+            </div>
+            <div class="row">
+              <div class="col-lg-12 col-md-12">
+                <p class="text-justify">
+                  <b>4.5 часа в день - среднее время пользования телефоном людей в возрасте от 18 до 33.</b>
+                  Мобильные приложения для iOS и Android позволят привлечь больше внимания к вашим событиям и повысить
+                  продажи.
+                </p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-lg-10 col-md-11">
+                <a class="btn btn-primary btn-block" href="https://play.google.com/store/apps/details?id=ru.evendate.android" target="_blank"><i class="icon-android"></i>Google Play</a>
+                <a class="btn btn-primary btn-block" href="https://itunes.apple.com/us/app/evendate/id1044975200?mt=8" target="_blank"><i class="icon-apple"></i>App Store</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-8 col-md-8">
+        <img class="double-space-top" src="./landing/img/features/parks.png" alt="Мобильные приложения"/>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--Contacts-->
+<section class="page-block contacts" id="contacts">
+  <div class="container">
+    <div class="row page-header">
+      <h2>Контакты</h2>
+      <span>Обращайтесь по всем вопросам</span>
+    </div>
+    <div class="row">
+      <div class="col-lg-4 col-md-4">
+        <div class="row space-bottom">
+          <div class="col-lg-9 col-md-9">
+            <h3>Сотрудничество</h3>
+          </div>
+          <div class="col-lg-3 col-md-3">
+            <img class="img-center" src="./landing/img/contacts/man.png" alt="О нас"/>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-12">
+            <p class="text-justify">Команда Evendate разрабатывает комплексное решение для всех организаторов событий.
+              Мы открыты к вашим предложением и готовы ответить на все возникающие вопросы.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-4 col-lg-offset-1">
+        <div class="row space-bottom">
+          <div class="col-lg-8 col-md-8">
+            <h3>Контакты</h3>
+          </div>
+          <div class="col-lg-4 col-md-4">
+            <img class="img-center" src="./landing/img/contacts/map.png" alt="Контакты"/>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-12">
+            <p>+7 495 641 61 05<br/>support@evendate.ru<br/>team@evendate.ru</p>
+          </div>
+          <div class="col-lg-12">
+            <p>109542, Москва, Рязанский проспект, 99.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3 col-md-4 col-lg-offset-1">
+        <div class="row space-bottom">
+          <div class="col-lg-8 col-md-8">
+            <h3>Обратная связь</h3>
+          </div>
+          <div class="col-lg-4 col-md-4">
+            <img class="img-center" src="./landing/img/contacts/plan.png" alt="Адрес"/>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-12">
+            <form method="post" class="feedback-form ajax-form" role="form">
+              <div class="form-group">
+                <label class="sr-only" for="feedback-name">Ваше имя</label>
+                <input type="text" class="form-control" name="name" id="feedback-name" placeholder="Ваше имя">
+              </div>
+              <div class="form-group">
+                <label class="sr-only" for="feedback-email">Email</label>
+                <input type="email" class="form-control" name="email" id="feedback-email" placeholder="Email">
+              </div>
+              <div class="form-group">
+                <label class="sr-only" for="feedback-message">Сообщение</label>
+                <textarea class="form-control" name="message" id="feedback-message" rows="5"
+                          placeholder="Сообщение"></textarea>
+              </div>
+              <button type="button" id="send-feedback" class="btn btn-primary">Отправить</button>
+              <!-- Validation Response -->
+              <div class="response-holder"></div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--Social Networks-->
+<section class="page-block" id="social">
+  <div class="container">
+    <div class="row page-header">
+      <h2>Мы в социальных сетях</h2>
+    </div>
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="social-networks">
+          <a class="fa fa-facebook tooltipped" target="_blank" href="https://facebook.com/evendate" title="Facebook"></a>
+          <a class="fa fa-vk tooltipped" target="_blank" href="https://vk.com/evendate" title="ВКонтакте"></a>
+          <a class="fa fa-twitter tooltipped" target="_blank" href="https://twitter.com/evendate" title="Twitter"></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--Footer-->
+<footer class="footer">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-4">
+        <p class="text-light"><a href="https://evendate.ru/docs/terms.pdf" target="_blank">Условия использования</a></p>
+        <p class="text-light"><a href="https://evendate.ru/docs/useragreement.pdf" target="_blank">Пользовательское
+          соглашение</a></p>
+        <p class="text-light"><a href="/api/v1/docs/index.html" target="_blank">API</a></p>
+      </div>
+      <div class="col-lg-4">
+        <p class="text-light"><a href="https://itunes.apple.com/us/app/evendate/id1044975200?mt=8" target="_blank">App
+          Store</a></p>
+        <p class="text-light"><a href="https://play.google.com/store/apps/details?id=ru.evendate.android"
+                                 target="_blank">Google Play</a></p>
+        <p class="text-light"><a href="https://t.me/evendateBot">Telegram Bot</a></p>
+      </div>
+      <div class="col-lg-4">
+        <p class="text-light">&nbsp;</p>
+        <p class="text-light">&copy; 2015 - 2017 Evendate</p>
+        <p class="text-light"></p>
+      </div>
+    </div>
+  </div>
 </footer>
 
-<footer class="global-footer footer">
-    <div class="fluid-width mobile-full-width">
-        <div class="float-right footer-social-links">
-            <a target="_blank" href="https://new.vk.com/evendate"
-               class="footer-social-link">
-                <i class="fa fa-vk"></i>
-            </a>
-            <a target="_blank" href="https://twitter.com/evendate"
-               class="footer-social-link">
-                <i class="fa fa-twitter"></i>
-            </a>
-            <a target="_blank" href="http://instagram.com/evendate"
-               class="footer-social-link">
-                <i class="fa fa-instagram"></i>
-            </a>
-        </div>
+<!--Scroll To Top Button-->
+<div id="scroll-top" class="scroll-up"><i class="icon-arrow-up"></i></div>
 
-        <div class="footer-nav-links float-right">
-            <a class="footer-nav-link feedback-link" target="_blank"
-               href="#">Обратная связь</a>
-        </div>
-    </div>
-</footer>
-
-
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-<script>window.jQuery || document.write('<script src="assets/components/jquery.js"><\/script>');</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js" type="text/javascript"></script>
-<script src="app/js/app.js"></script>
-<?php
-require_once('footer.php');
-?>
-<script src="app/assets/js/scripts.min.js"></script>
-</body>
+<script src="./app/src/js/node_connection.js"></script>
+
+<!--Javascript (jQuery) Libraries and Plugins-->
+<script src="./landing/js/libs/jquery-1.11.2.min.js"></script>
+
+<script src="./app/src/js/lib.js"></script>
+
+<script src="./landing/js/libs/jquery.easing.1.3.js"></script>
+<script src="./landing/js/plugins/bootstrap.min.js"></script>
+<script src="./landing/js/plugins/jquery.touchSwipe.min.js"></script>
+<script src="./landing/js/plugins/jquery.placeholder.js"></script>
+<script src="./landing/js/plugins/icheck.min.js"></script>
+<script src="./landing/js/plugins/jquery.validate.min.js"></script>
+<script src="./landing/js/plugins/gallery.js"></script>
+<script src="./landing/js/plugins/jquery.fitvids.js"></script>
+<script src="./landing/js/plugins/jquery.bxslider.min.js"></script>
+<script src="./landing/js/plugins/chart.js"></script>
+<script src="./landing/js/plugins/waypoints.min.js"></script>
+<script src="./landing/js/plugins/smoothscroll.js"></script>
+<!--<script src="./landing/mailer/mailer.js"></script>-->
+<script src="./landing/js/landing2.js"></script>
+
+</body><!--Close Body-->
 </html>
