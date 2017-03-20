@@ -3913,6 +3913,10 @@
         "[is_same_time]": {
           "type": "boolean"
         },
+        "[sold_tickets_count]": {
+          "type": "integer",
+          "format": "int64"
+        },
         "[latitude]": {
           "type": "number",
           "format": "float"
