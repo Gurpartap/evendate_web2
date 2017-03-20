@@ -7,6 +7,8 @@ require_once $BACKEND_FULL_PATH . '/statistics/Class.EventsStatistics.php';
 require_once $BACKEND_FULL_PATH . '/statistics/Class.Statistics.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.OrdersCollection.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.TicketsCollection.php';
+require_once $BACKEND_FULL_PATH . '/events/Class.NotificationsCollection.php';
+require_once $BACKEND_FULL_PATH . '/events/Class.Notification.php';
 
 
 $__modules['statistics'] = array(
