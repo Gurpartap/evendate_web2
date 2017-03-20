@@ -45,7 +45,8 @@ class Event extends AbstractEntity
 	const IS_REGISTERED_FIELD_NAME = 'is_registered';
 	const REGISTRATION_APPROVE_STATUS_FIELD_NAME = 'registration_approve_status';
 	const ORDERS_FIELD_NAME = 'orders';
-	const TICKETS_COUNT_FIELD_NAME = 'tickets_count';
+	const MY_TICKETS_COUNT_FIELD_NAME = 'my_tickets_count';
+	const SOLD_TICKETS_COUNT_FIELD_NAME = 'sold_tickets_count';
 
 
 	const RANDOM_FIELD_NAME = 'random';
@@ -162,9 +163,22 @@ class Event extends AbstractEntity
 			FROM view_editors
 			WHERE id = :user_id AND organization_id = view_events.organization_id) IS NOT NULL AS ' . self::CAN_EDIT_FIELD_NAME,
 
-		self::TICKETS_COUNT_FIELD_NAME => '(SELECT COALESCE(COUNT(view_tickets.id)::INT, 0)
+		self::SOLD_TICKETS_COUNT_FIELD_NAME => '(SELECT COALESCE(COUNT(view_tickets.id)::INT, 0)
 			FROM view_tickets
-			WHERE view_tickets.event_id = view_events.id AND status = TRUE AND is_active = TRUE AND view_tickets.user_id = :user_id)::INT AS ' . self::TICKETS_COUNT_FIELD_NAME,
+			INNER JOIN events ON events.id = view_tickets.event_id
+			INNER JOIN users_organizations ON users_organizations.organization_id = events.organization_id
+			WHERE view_tickets.event_id = view_events.id 
+			AND view_tickets.status = TRUE 
+			AND users_organizations.status = TRUE 
+			AND view_tickets.is_active = TRUE
+			AND users_organizations.user_id = :user_id)::INT AS ' . self::SOLD_TICKETS_COUNT_FIELD_NAME,
+
+		self::MY_TICKETS_COUNT_FIELD_NAME => '(SELECT COALESCE(COUNT(view_tickets.id)::INT, 0)
+			FROM view_tickets
+			WHERE view_tickets.event_id = view_events.id 
+			AND status = TRUE 
+			AND is_active = TRUE 
+			AND view_tickets.user_id = :user_id)::INT AS ' . self::MY_TICKETS_COUNT_FIELD_NAME,
 
 		self::IS_SEEN_FIELD_NAME => '(
 		SELECT
