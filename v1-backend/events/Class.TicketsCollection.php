@@ -90,9 +90,8 @@ class TicketsCollection extends AbstractCollection
 					break;
 				}
 				case 'checkout': {
-					if (filter_var($value, FILTER_VALIDATE_BOOLEAN)) {
-						$q_get_tickets->where('checked_out = ?', $value);
-					}
+					$val = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+					$q_get_tickets->where('checked_out = ?', $val);
 				}
 			}
 		}
