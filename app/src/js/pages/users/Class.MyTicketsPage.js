@@ -21,7 +21,10 @@ MyTicketsPage = extending(Page, (function() {
 		this.disable_uploads = false;
 		this.block_scroll = false;
 		
-		this.fetch_tickets_fields = new Fields('created_at', 'ticket_type', 'order', {
+		this.fetch_tickets_fields = new Fields('created_at', 'number', 'ticket_type', {
+			order: {
+				fields: new Fields('created_at')
+			},
 			event: {
 				fields: new Fields('dates', 'is_same_time', 'image_horizontal_medium_url', 'location')
 			}

@@ -79,8 +79,8 @@ $url_parts = explode('/', $url);
 
 	<?php
 	if ($DEBUG_MODE) { ?>
-		<link rel="stylesheet" href="/dist/vendor.css?rev=514c11bff5a0b7b71eba77acf679a6e0">
-		<link rel="stylesheet" href="/dist/app.css?rev=6010e719058623d0df7ade5165369b13"><?php
+		<link rel="stylesheet" href="/dist/vendor.css?rev=8cfcfa2b74ed50d4c89e781ed429c4c3">
+		<link rel="stylesheet" href="/dist/app.css?rev=9b1b2c6896b20c81dd9999091220e8a7"><?php
 	} else { ?>
 		<link rel="stylesheet" href="/dist/vendor.min.css?rev=70c41e05eb03157e444e43cfbf3d185d">
 		<link rel="stylesheet" href="/dist/app.min.css?rev=30393d1a4eeefe6985807f19e13a4d4d"><?php
@@ -239,7 +239,8 @@ $url_parts = explode('/', $url);
 			<a href="/feed" class="sidebar_navigation_item SidebarNavItem link Link"><span>События</span><span class="counter sidebar_navigation_counter -hidden SidebarNavFeedCounter"></span></a>
 			<a href="/organizations" class="sidebar_navigation_item SidebarNavItem link Link"><span>Организаторы</span></a><?php
 			if(!$is_user_not_auth){ ?>
-				<a href="/my/profile" class="sidebar_navigation_item SidebarNavItem link Link"><span>Мой профиль</span></a><?php
+				<a href="/my/profile" class="sidebar_navigation_item SidebarNavItem link Link"><span>Мой профиль</span></a>
+				<a href="/my/tickets" class="sidebar_navigation_item SidebarNavItem link Link"><span>Мои билеты</span></a><?php
 			}?>
 		</nav>
 		<hr class="sidebar_divider">
@@ -275,8 +276,8 @@ $url_parts = explode('/', $url);
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=5debb6320f112d04d1b0ea49967dad8f" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=aa538660d5e6df2a95d023274770394a" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=e3c0090172d379ce78d4f740718c5a7b" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=e9d9360d6f3471ae36d1760ed851057c" charset="utf-8"></script><?php
 } else { ?>
 	<script type="text/javascript" src="/dist/vendor.min.js?rev=3814501776793e2f67d09d4500242d5e" charset="utf-8"></script>
 	<script type="text/javascript" src="/dist/app.min.js?rev=a855c7bd8fb69f3df4fda8696e50e274" charset="utf-8"></script><?php

@@ -46,7 +46,18 @@ __C = {
 			WIDE: '-size_wide',
 			SMALL: '-size_small'
 		},
+		MODAL_STATES: {
+			FIXED: '-fixed',
+			NO_PADDING: '-no_padding',
+			SIZE: {
+				WIDE: '-size_wide',
+				NARROW: '-size_narrow',
+				TINY: '-size_tiny',
+				RESPONSIVE: '-size_responsive'
+			}
+		},
 		HOOKS: {
+			HANDLED: '-Handled_',
 			RIPPLE: 'RippleEffect',
 			ADD_TO_FAVORITES: 'AddToFavorites',
 			TEXT: 'Text',
@@ -1382,9 +1393,11 @@ function displayTimeRange(start_time, end_time) {
  * @param {(string|number)} number
  * @param {string} [separator=' ']
  * @param {string} [decimal_separator='.']
+ * @param {string} [before]
+ * @param {string} [after]
  * @return {string}
  */
-function formatCurrency(number, separator, decimal_separator) {
+function formatCurrency(number, separator, decimal_separator, before, after) {
 	number = +number || 0;
 	separator = separator || ' ';
 	decimal_separator = decimal_separator || '.';
@@ -1392,10 +1405,21 @@ function formatCurrency(number, separator, decimal_separator) {
 		negative = number < 0 ? '-' : '',
 		integer_part = parseInt(Math.abs(number), 10) + '',
 		cast_pos = integer_part.length > 3 ? integer_part.length % 3 : 0;
-	return negative
+	return ''
+		+ (before ? (before + separator) : '')
+		+ negative
 		+ (cast_pos ? integer_part.substr(0, cast_pos) + separator : '')
 		+ integer_part.substr(cast_pos).replace(/(\d{3})(?=\d)/g, '$1' + separator)
-		+ (numbers_decimals ? decimal_separator + numbers_decimals : '');
+		+ (numbers_decimals ? decimal_separator + numbers_decimals : '')
+		+ (after ? (separator + after) : '');
+}
+/**
+ *
+ * @param {(string|number)} number
+ * @return {string}
+ */
+function formatTicketNumber(number) {
+	return ('' + number).replace(/(\d{3})/g, '$1 ').trim();
 }
 /**
  * Generates guid-like string
@@ -1893,36 +1917,37 @@ function bindControlSwitch($parent) {
  */
 function bindCallModal($parent) {
 	$parent = $parent ? $parent : $('body');
-	return $parent.find('.CallModal').not('.-Handled_CallModal').each(function() {
+	return $parent.find('.' + __C.CLASSES.HOOKS.CALL_MODAL).not('.' + __C.CLASSES.HOOKS.HANDLED + __C.CLASSES.HOOKS.CALL_MODAL).each(function() {
 		var $this = $(this);
 		
 		$this.on('click.CallModal', function() {
 			var $this = $(this),
-				title = $this.data('modal_title'),
-				modal = $this.data('modal'),
-				modal_type = $this.data('modal_type');
+				data = $this.data(),
+				title = data.modal_title,
+				modal = data.modal,
+				modal_type = data.modal_type;
 			
 			if (!modal) {
 				switch (modal_type) {
-					case 'favors': {
-						modal = new FavoredModal($this.data('modal_event_id'), title);
+					case __C.MODAL_TYPES.FAVORS: {
+						modal = new FavoredModal(data.modal_event_id, title);
 						break;
 					}
-					case 'subscribers': {
-						modal = new SubscribersModal($this.data('modal_organization_id'), title);
+					case __C.MODAL_TYPES.SUBSCRIBERS: {
+						modal = new SubscribersModal(data.modal_organization_id, title);
 						break;
 					}
-					case 'editors': {
-						modal = new EditorsModal($this.data('modal_organization_id'), title, $this.data('modal_specific_role'));
+					case __C.MODAL_TYPES.EDITORS: {
+						modal = new EditorsModal(data.modal_organization_id, title, data.modal_specific_role);
 						break;
 					}
-					case 'map': {
-						modal = new MapModal($this.data('modal_map_location'), title);
+					case __C.MODAL_TYPES.MAP: {
+						modal = new MapModal(data.modal_map_location, title);
 						break;
 					}
-					case 'media': {
-						var type = $this.data('modal_media_type'),
-							url = $this.data('modal_media_url');
+					case __C.MODAL_TYPES.MEDIA: {
+						var type = data.modal_media_type,
+							url = data.modal_media_url;
 						if (!url) {
 							if ($this.is('img')) {
 								url = $this.attr('src');
@@ -1945,20 +1970,24 @@ function bindCallModal($parent) {
 						modal = new MediaModal(url, type);
 						break;
 					}
-					case 'cropper': {
-						modal = new CropperModal($this.data('source_img'), $this.data());
+					case __C.MODAL_TYPES.CROPPER: {
+						modal = new CropperModal(data.source_img, data);
 						break;
 					}
-					case 'friends_list': {
-						modal = new FriendsListModal($this.data('modal_entity'));
+					case __C.MODAL_TYPES.FRIENDS_LIST: {
+						modal = new FriendsListModal(data.modal_entity);
 						break;
 					}
-					case 'subscribers_list': {
-						modal = new SubscriptionsListModal($this.data('modal_entity'));
+					case __C.MODAL_TYPES.SUBSCRIBERS_LIST: {
+						modal = new SubscriptionsListModal(data.modal_entity);
+						break;
+					}
+					case __C.MODAL_TYPES.TICKET: {
+						modal = new TicketModal(data.ticket || data.ticket_uuid);
 						break;
 					}
 					default: {
-						modal = new StdModal(title, $this.data('modal_content'), $this.data('modal_style'));
+						modal = new StdModal(title, data.modal_content, data.modal_style);
 						break;
 					}
 				}
@@ -1966,7 +1995,7 @@ function bindCallModal($parent) {
 			}
 			modal.show();
 		});
-	}).addClass('-Handled_CallModal');
+	}).addClass(__C.CLASSES.HOOKS.HANDLED + __C.CLASSES.HOOKS.CALL_MODAL);
 }
 
 function bindPageLinks($parent) {

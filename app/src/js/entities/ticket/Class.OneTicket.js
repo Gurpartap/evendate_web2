@@ -24,6 +24,8 @@ OneTicket = extending(OneEntity, (function() {
 	 * @property {?boolean} status
 	 * @property {?boolean} checked_out
 	 * @property {?(string|number)} price
+	 * @property {?(string|number)} number
+	 * @property {?timestamp} created_at
 	 *
 	 * @property {OneTicketType} ticket_type
 	 * @property {OneOrder} order
@@ -39,9 +41,12 @@ OneTicket = extending(OneEntity, (function() {
 		this.status = null;
 		this.checked_out = null;
 		this.price = null;
+		this.number = null;
 		this.ticket_type = new OneTicketType();
 		this.order = new OneOrder();
 		this.user = new OneUser();
+		
+		this.created_at = null;
 	}
 	
 	/**

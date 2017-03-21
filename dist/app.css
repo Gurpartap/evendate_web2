@@ -2406,7 +2406,7 @@ html.-noscroll {
 	background-color: #fff;
 	background-color: var(--color_page);
 	box-shadow: 0 2px 15px hsla(0,0%,0%,.2);
-	border-radius: 2px;
+	border-radius: 3px;
 	text-align: left;
 }
 
@@ -4408,15 +4408,21 @@ body.-open_modal > .modal_wrapper {
 }
 
 .ticket_card {
-	width: 260px;
 	overflow: hidden;
 	border-radius: 3px;
+}
+
+.ticket_card:not(.-ticket_extended) {
+	width: 260px;
 	margin-bottom: 36px;
 }
 
+.ticket_card.-ticket_extended {width: 450px}
+
 .ticket_card_cover {}
 
-.ticket_card_content {padding: 12px 12px 40px}
+.ticket_card_content {padding: 12px}
+.ticket_card:not(.-ticket_extended) > .ticket_card_content {padding-bottom: 40px}
 
 .ticket_card_event_title,
 .ticket_card_type_name,
@@ -4431,8 +4437,13 @@ body.-open_modal > .modal_wrapper {
 
 .ticket_card_type_name {
 	height: 3em;
-	font-size: 18px;
+	font-size: 1.125em;
 	font-weight: 800;
+}
+
+.ticket_card.-ticket_extended .ticket_card_type_name {
+	font-size: 1.5em;
+	height: auto;
 }
 
 .ticket_card_dates {
@@ -4442,9 +4453,23 @@ body.-open_modal > .modal_wrapper {
 }
 
 .ticket_card_location {
+	margin-bottom: 60px;
 	font-size: .875em;
 	font-weight: 500;
+	color: #657184;
+	color: var(--color_primary_80);
 }
+.ticket_card_location:last-child {margin-bottom: 0}
+
+.ticket_card_additional_field {
+	display: flex;
+	justify-content: space-between;
+	font-size: .875em;
+	font-weight: 500;
+	color: #3e4d66;
+	color: var(--color_primary);
+}
+.ticket_card_additional_field + .ticket_card_additional_field {margin-top: 6px}
 
 .ticket_card_status {
 	display: flex;
@@ -4460,9 +4485,11 @@ body.-open_modal > .modal_wrapper {
 	background-color: var(--color_primary);
 }
 
-.ticket_card:not(.-status_disabled) {cursor: pointer}
+.ticket_card:not(.-ticket_extended):not(.-status_disabled) {cursor: pointer}
 
-.ticket_card:not(.-status_disabled):hover .ticket_card_type_name {
+
+.ticket_card.-ticket_extended .ticket_card_event_title,
+.ticket_card:not(.-ticket_extended):not(.-status_disabled):hover .ticket_card_type_name {
 	color: #f82969;
 	color: var(--color_accent);
 }

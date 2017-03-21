@@ -910,12 +910,11 @@ Builder = (function() {
 	/**
 	 *
 	 * @param {(OneExtendedTicket|Array<OneExtendedTicket>|ExtendedTicketsCollection)} tickets
-	 * @return {jQuery}
+	 * @return Array
 	 */
-	Builder.prototype.ticketCards = function buildTicketCard(tickets) {
-		tickets = (tickets instanceof Array) ? tickets : [tickets];
+	Builder.normalizeTicketProps = function(tickets) {
 		
-		return tmpl('ticket-card', tickets.map(function(ticket) {
+		return (tickets instanceof Array ? tickets : [tickets]).map(function(ticket) {
 			var props = Builder.normalizeBuildProps({
 				card_classes: [],
 				title: ticket.event.title,
@@ -970,7 +969,16 @@ Builder = (function() {
 			}
 			
 			return props;
-		})).each(function(i, ticket) {
+		});
+	};
+	/**
+	 *
+	 * @param {(OneExtendedTicket|Array<OneExtendedTicket>|ExtendedTicketsCollection)} tickets
+	 * @return {jQuery}
+	 */
+	Builder.prototype.ticketCards = function buildTicketCard(tickets) {
+		
+		return tmpl('ticket-card', Builder.normalizeTicketProps(tickets)).each(function(i, ticket) {
 			$(ticket).data({
 				modal_type: __C.MODAL_TYPES.TICKET,
 				ticket: tickets[i]

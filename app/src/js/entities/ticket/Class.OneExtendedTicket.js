@@ -25,6 +25,8 @@ OneExtendedTicket = extending(OneTicket, (function() {
 	 * @property {?OneExtendedTicket.TICKET_STATUSES} status_type_code
 	 * @property {?boolean} checked_out
 	 * @property {?(string|number)} price
+	 * @property {?(string|number)} number
+	 * @property {?timestamp} created_at
 	 *
 	 * @property {OneTicketType} ticket_type
 	 * @property {OneOrder} order

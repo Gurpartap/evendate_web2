@@ -46,7 +46,18 @@ __C = {
 			WIDE: '-size_wide',
 			SMALL: '-size_small'
 		},
+		MODAL_STATES: {
+			FIXED: '-fixed',
+			NO_PADDING: '-no_padding',
+			SIZE: {
+				WIDE: '-size_wide',
+				NARROW: '-size_narrow',
+				TINY: '-size_tiny',
+				RESPONSIVE: '-size_responsive'
+			}
+		},
 		HOOKS: {
+			HANDLED: '-Handled_',
 			RIPPLE: 'RippleEffect',
 			ADD_TO_FAVORITES: 'AddToFavorites',
 			TEXT: 'Text',
@@ -1382,9 +1393,11 @@ function displayTimeRange(start_time, end_time) {
  * @param {(string|number)} number
  * @param {string} [separator=' ']
  * @param {string} [decimal_separator='.']
+ * @param {string} [before]
+ * @param {string} [after]
  * @return {string}
  */
-function formatCurrency(number, separator, decimal_separator) {
+function formatCurrency(number, separator, decimal_separator, before, after) {
 	number = +number || 0;
 	separator = separator || ' ';
 	decimal_separator = decimal_separator || '.';
@@ -1392,10 +1405,21 @@ function formatCurrency(number, separator, decimal_separator) {
 		negative = number < 0 ? '-' : '',
 		integer_part = parseInt(Math.abs(number), 10) + '',
 		cast_pos = integer_part.length > 3 ? integer_part.length % 3 : 0;
-	return negative
+	return ''
+		+ (before ? (before + separator) : '')
+		+ negative
 		+ (cast_pos ? integer_part.substr(0, cast_pos) + separator : '')
 		+ integer_part.substr(cast_pos).replace(/(\d{3})(?=\d)/g, '$1' + separator)
-		+ (numbers_decimals ? decimal_separator + numbers_decimals : '');
+		+ (numbers_decimals ? decimal_separator + numbers_decimals : '')
+		+ (after ? (separator + after) : '');
+}
+/**
+ *
+ * @param {(string|number)} number
+ * @return {string}
+ */
+function formatTicketNumber(number) {
+	return ('' + number).replace(/(\d{3})/g, '$1 ').trim();
 }
 /**
  * Generates guid-like string
@@ -1893,36 +1917,37 @@ function bindControlSwitch($parent) {
  */
 function bindCallModal($parent) {
 	$parent = $parent ? $parent : $('body');
-	return $parent.find('.CallModal').not('.-Handled_CallModal').each(function() {
+	return $parent.find('.' + __C.CLASSES.HOOKS.CALL_MODAL).not('.' + __C.CLASSES.HOOKS.HANDLED + __C.CLASSES.HOOKS.CALL_MODAL).each(function() {
 		var $this = $(this);
 		
 		$this.on('click.CallModal', function() {
 			var $this = $(this),
-				title = $this.data('modal_title'),
-				modal = $this.data('modal'),
-				modal_type = $this.data('modal_type');
+				data = $this.data(),
+				title = data.modal_title,
+				modal = data.modal,
+				modal_type = data.modal_type;
 			
 			if (!modal) {
 				switch (modal_type) {
-					case 'favors': {
-						modal = new FavoredModal($this.data('modal_event_id'), title);
+					case __C.MODAL_TYPES.FAVORS: {
+						modal = new FavoredModal(data.modal_event_id, title);
 						break;
 					}
-					case 'subscribers': {
-						modal = new SubscribersModal($this.data('modal_organization_id'), title);
+					case __C.MODAL_TYPES.SUBSCRIBERS: {
+						modal = new SubscribersModal(data.modal_organization_id, title);
 						break;
 					}
-					case 'editors': {
-						modal = new EditorsModal($this.data('modal_organization_id'), title, $this.data('modal_specific_role'));
+					case __C.MODAL_TYPES.EDITORS: {
+						modal = new EditorsModal(data.modal_organization_id, title, data.modal_specific_role);
 						break;
 					}
-					case 'map': {
-						modal = new MapModal($this.data('modal_map_location'), title);
+					case __C.MODAL_TYPES.MAP: {
+						modal = new MapModal(data.modal_map_location, title);
 						break;
 					}
-					case 'media': {
-						var type = $this.data('modal_media_type'),
-							url = $this.data('modal_media_url');
+					case __C.MODAL_TYPES.MEDIA: {
+						var type = data.modal_media_type,
+							url = data.modal_media_url;
 						if (!url) {
 							if ($this.is('img')) {
 								url = $this.attr('src');
@@ -1945,20 +1970,24 @@ function bindCallModal($parent) {
 						modal = new MediaModal(url, type);
 						break;
 					}
-					case 'cropper': {
-						modal = new CropperModal($this.data('source_img'), $this.data());
+					case __C.MODAL_TYPES.CROPPER: {
+						modal = new CropperModal(data.source_img, data);
 						break;
 					}
-					case 'friends_list': {
-						modal = new FriendsListModal($this.data('modal_entity'));
+					case __C.MODAL_TYPES.FRIENDS_LIST: {
+						modal = new FriendsListModal(data.modal_entity);
 						break;
 					}
-					case 'subscribers_list': {
-						modal = new SubscriptionsListModal($this.data('modal_entity'));
+					case __C.MODAL_TYPES.SUBSCRIBERS_LIST: {
+						modal = new SubscriptionsListModal(data.modal_entity);
+						break;
+					}
+					case __C.MODAL_TYPES.TICKET: {
+						modal = new TicketModal(data.ticket || data.ticket_uuid);
 						break;
 					}
 					default: {
-						modal = new StdModal(title, $this.data('modal_content'), $this.data('modal_style'));
+						modal = new StdModal(title, data.modal_content, data.modal_style);
 						break;
 					}
 				}
@@ -1966,7 +1995,7 @@ function bindCallModal($parent) {
 			}
 			modal.show();
 		});
-	}).addClass('-Handled_CallModal');
+	}).addClass(__C.CLASSES.HOOKS.HANDLED + __C.CLASSES.HOOKS.CALL_MODAL);
 }
 
 function bindPageLinks($parent) {
@@ -2672,6 +2701,50 @@ EntitiesCollection = extending(Array, (function() {
  * @requires ../../entities/Class.OneEntity.js
  */
 /**
+ *
+ * @class DateModel
+ * @extends OneEntity
+ */
+DateModel = extending(OneEntity, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs DateModel
+	 */
+	function DateModel() {
+		this.event_date = '';
+		this.start_time = '';
+		this.end_time = '';
+	}
+	
+	return DateModel;
+}()));
+/**
+ * @requires ../../entities/Class.EntitiesCollection.js
+ * @requires Class.DateModel.js
+ */
+/**
+ *
+ * @class DateModelsCollection
+ * @extends EntitiesCollection
+ */
+DateModelsCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs DateModelsCollection
+	 */
+	function DateModelsCollection() {
+		EntitiesCollection.call(this);
+	}
+	DateModelsCollection.prototype.collection_of = DateModel;
+	
+	return DateModelsCollection;
+}()));
+/**
+ * @requires ../../entities/Class.OneEntity.js
+ */
+/**
  * @class RegistrationFieldModel
  * @extends OneEntity
  */
@@ -2801,50 +2874,6 @@ RegistrationFieldsCollection = extending(EntitiesCollection, (function() {
 	};
 	
 	return RegistrationFieldsCollection;
-}()));
-/**
- * @requires ../../entities/Class.OneEntity.js
- */
-/**
- *
- * @class DateModel
- * @extends OneEntity
- */
-DateModel = extending(OneEntity, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs DateModel
-	 */
-	function DateModel() {
-		this.event_date = '';
-		this.start_time = '';
-		this.end_time = '';
-	}
-	
-	return DateModel;
-}()));
-/**
- * @requires ../../entities/Class.EntitiesCollection.js
- * @requires Class.DateModel.js
- */
-/**
- *
- * @class DateModelsCollection
- * @extends EntitiesCollection
- */
-DateModelsCollection = extending(EntitiesCollection, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs DateModelsCollection
-	 */
-	function DateModelsCollection() {
-		EntitiesCollection.call(this);
-	}
-	DateModelsCollection.prototype.collection_of = DateModel;
-	
-	return DateModelsCollection;
 }()));
 /**
  * @requires ../Class.OneEntity.js
@@ -5452,6 +5481,8 @@ OneTicket = extending(OneEntity, (function() {
 	 * @property {?boolean} status
 	 * @property {?boolean} checked_out
 	 * @property {?(string|number)} price
+	 * @property {?(string|number)} number
+	 * @property {?timestamp} created_at
 	 *
 	 * @property {OneTicketType} ticket_type
 	 * @property {OneOrder} order
@@ -5467,9 +5498,12 @@ OneTicket = extending(OneEntity, (function() {
 		this.status = null;
 		this.checked_out = null;
 		this.price = null;
+		this.number = null;
 		this.ticket_type = new OneTicketType();
 		this.order = new OneOrder();
 		this.user = new OneUser();
+		
+		this.created_at = null;
 	}
 	
 	/**
@@ -5598,6 +5632,8 @@ OneExtendedTicket = extending(OneTicket, (function() {
 	 * @property {?OneExtendedTicket.TICKET_STATUSES} status_type_code
 	 * @property {?boolean} checked_out
 	 * @property {?(string|number)} price
+	 * @property {?(string|number)} number
+	 * @property {?timestamp} created_at
 	 *
 	 * @property {OneTicketType} ticket_type
 	 * @property {OneOrder} order
@@ -8684,6 +8720,90 @@ StdModal = extending(AbstractModal, (function() {
 	return StdModal;
 }()));
 /**
+ * @requires Class.AbstractModal.js
+ */
+/**
+ * @class TicketModal
+ * @extends AbstractModal
+ */
+TicketModal = extending(AbstractModal, (function() {
+	/**
+	 *
+	 * @param {(OneExtendedTicket|string)} ticket
+	 * @constructor
+	 * @constructs TicketModal
+	 *
+	 * @property {OneExtendedTicket} ticket
+	 * @property {string} ticket_uuid
+	 * @property {boolean} is_ticket_exists
+	 */
+	function TicketModal(ticket) {
+		var build_props,
+			date;
+		
+		AbstractModal.call(this);
+		if (ticket instanceof OneExtendedTicket) {
+			this.ticket = ticket;
+			this.is_ticket_exists = true;
+		} else if (typeof ticket === 'string') {
+			this.ticket = new OneExtendedTicket(ticket);
+			this.is_ticket_exists = false;
+		} else {
+			throw Error('Constructor needs instance of OneExtendedTicket class to create new instance of TicketModal');
+		}
+		this.width = 450;
+		
+		build_props = Builder.normalizeTicketProps(ticket).shift();
+		build_props.card_classes.push('-ticket_extended');
+		
+		date = ticket.order.payed_at || ticket.created_at;
+		this.content = tmpl('modal-ticket-content', $.extend(build_props, {
+			number_formatted: formatTicketNumber(ticket.number),
+			payed_at_formatted: (ticket.order.payed_at ? 'Куплен ' : 'Приобретен ') + moment.unix(date).format(__LOCALES.ru_RU.DATE.DATE_TIME_FORMAT),
+			price_formatted: +ticket.price ? formatCurrency(ticket.price, ' ', '.', '', 'руб.') : 'Беплатно'
+		}));
+	}
+	/**
+	 *
+	 * @return {TicketModal}
+	 */
+	TicketModal.prototype.render = function(){
+		this.__render({
+			width: this.width,
+			content_classes: [__C.CLASSES.MODAL_STATES.NO_PADDING]
+		});
+		
+		return this;
+	};
+	/**
+	 *
+	 * @return {TicketModal}
+	 */
+	TicketModal.prototype.show = function(){
+		var self = this;
+		
+		if (!this.is_ticket_exists) {
+			this.ticket.fetchTicket(new Fields('created_at', 'number', 'ticket_type', {
+				order: {
+					fields: new Fields('created_at')
+				},
+				event: {
+					fields: new Fields('dates', 'is_same_time', 'image_horizontal_medium_url', 'location')
+				}
+			})).done(function() {
+				self.is_ticket_exists = true;
+				self.__show();
+			});
+		} else {
+			this.__show();
+		}
+		
+		return this;
+	};
+	
+	return TicketModal;
+}()));
+/**
  * @requires ../Class.AbstractModal.js
  */
 /**
@@ -9567,25 +9687,25 @@ Builder = (function() {
 					return this.checkbox(props);
 				default:
 					return tmpl('form-unit', Builder.normalizeBuildProps($.extend(true, {}, props, {
-					form_element: props.type === 'textarea' ?
-						this.textarea($.extend({}, props.attributes, {
-							id: props.id,
-							name: props.name || undefined,
-							required: props.required || undefined,
-							placeholder: props.placeholder,
-							tabindex: props.tabindex
-						}), (props.classes ? ['form_textarea'].concat(props.classes) : ['form_textarea']), props.value, props.dataset) :
-						this.input($.extend({}, props.attributes, {
-							id: props.id,
-							type: !props.type || INPUT_TYPES.indexOf(props.type) === -1 ? 'text' : props.type,
-							name: props.name || undefined,
-							value: props.value || undefined,
-							required: props.required || undefined,
-							placeholder: props.placeholder,
-							tabindex: props.tabindex
-						}), (props.classes ? ['form_input'].concat(props.classes) : ['form_input']), props.dataset),
-					helptext: this.formHelpText(props.helptext, props.helptext_dataset, props.helptext_attributes)
-				}), ['unit_classes', 'label_classes']));
+						form_element: props.type === 'textarea' ?
+							this.textarea($.extend({}, props.attributes, {
+								id: props.id,
+								name: props.name || undefined,
+								required: props.required || undefined,
+								placeholder: props.placeholder,
+								tabindex: props.tabindex
+							}), (props.classes ? ['form_textarea'].concat(props.classes) : ['form_textarea']), props.value, props.dataset) :
+							this.input($.extend({}, props.attributes, {
+								id: props.id,
+								type: !props.type || INPUT_TYPES.indexOf(props.type) === -1 ? 'text' : props.type,
+								name: props.name || undefined,
+								value: props.value || undefined,
+								required: props.required || undefined,
+								placeholder: props.placeholder,
+								tabindex: props.tabindex
+							}), (props.classes ? ['form_input'].concat(props.classes) : ['form_input']), props.dataset),
+						helptext: this.formHelpText(props.helptext, props.helptext_dataset, props.helptext_attributes)
+					}), ['unit_classes', 'label_classes']));
 			}
 		}));
 	};
@@ -9820,7 +9940,12 @@ Builder = (function() {
 		
 		return tmpl('avatars-collection', data);
 	};
-		
+	/**
+	 *
+	 * @param {(OneAbstractActivity|Array<OneAbstractActivity>|UsersActivitiesCollection)} activities
+	 * @param {buildProps} props
+	 * @return {jQuery}
+	 */
 	Builder.prototype.activity = function buildActivity(activities, props){
 		var self = this,
 			ICON_CLASSES = {};
@@ -10246,12 +10371,11 @@ Builder = (function() {
 	/**
 	 *
 	 * @param {(OneExtendedTicket|Array<OneExtendedTicket>|ExtendedTicketsCollection)} tickets
-	 * @return {jQuery}
+	 * @return Array
 	 */
-	Builder.prototype.ticketCards = function buildTicketCard(tickets) {
-		tickets = (tickets instanceof Array) ? tickets : [tickets];
+	Builder.normalizeTicketProps = function(tickets) {
 		
-		return tmpl('ticket-card', tickets.map(function(ticket) {
+		return (tickets instanceof Array ? tickets : [tickets]).map(function(ticket) {
 			var props = Builder.normalizeBuildProps({
 				card_classes: [],
 				title: ticket.event.title,
@@ -10306,7 +10430,16 @@ Builder = (function() {
 			}
 			
 			return props;
-		})).each(function(i, ticket) {
+		});
+	};
+	/**
+	 *
+	 * @param {(OneExtendedTicket|Array<OneExtendedTicket>|ExtendedTicketsCollection)} tickets
+	 * @return {jQuery}
+	 */
+	Builder.prototype.ticketCards = function buildTicketCard(tickets) {
+		
+		return tmpl('ticket-card', Builder.normalizeTicketProps(tickets)).each(function(i, ticket) {
 			$(ticket).data({
 				modal_type: __C.MODAL_TYPES.TICKET,
 				ticket: tickets[i]
@@ -12154,6 +12287,90 @@ StatisticsOrganizationSupportPage = extending(StatisticsOrganizationPage, (funct
  */
 /**
  *
+ * @class OnboardingPage
+ * @extends Page
+ */
+OnboardingPage = extending(Page, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs OnboardingPage
+	 */
+	function OnboardingPage() {
+		Page.apply(this, arguments);
+		this.ajax_data = {
+			length: 30,
+			offset: 0,
+			fields: 'img_small_url'
+		};
+		this.is_upload_disabled = false;
+		this.block_scroll = true;
+	}
+	
+	OnboardingPage.prototype.init = function() {
+		bindRippleEffect(this.$wrapper);
+		bindPageLinks(this.$wrapper);
+		this.$wrapper.find('.Link').on('click', function() {
+			if($(this).is('.SkipOnboarding')){
+				cookies.setItem('skip_onboarding', 1, moment().add(7, 'd')._d);
+			}
+			__APP.SIDEBAR.updateSubscriptions();
+		});
+	};
+	
+	OnboardingPage.prototype.bindSubscriptions = function() {
+		this.$wrapper.find(".OnboardingOrgItem").not('.-Handled_OnboardingOrgItem').on('click', function() {
+			var $this = $(this);
+			if ($this.hasClass(__C.CLASSES.ACTIVE)) {
+				__APP.USER.unsubscribeFromOrganization($this.data("organization_id"));
+			} else {
+				__APP.USER.subscribeToOrganization($this.data("organization_id"));
+			}
+			$this.toggleClass(__C.CLASSES.ACTIVE);
+		}).addClass('-Handled_OnboardingOrgItem');
+	};
+	
+	OnboardingPage.prototype.render = function() {
+		var PAGE = this,
+			$loader = tmpl('loader', {});
+		
+		if(__APP.USER.id === -1){
+			__APP.changeState('/feed/actual', true, true);
+			return null;
+		}
+		function appendRecommendations(organizations) {
+			$loader.detach();
+			if (organizations.length) {
+				PAGE.$wrapper.find(".RecommendationsWrapper").last().append(tmpl("onboarding-recommendation", organizations));
+				PAGE.bindSubscriptions();
+				PAGE.block_scroll = false;
+			} else {
+				PAGE.is_upload_disabled = true;
+			}
+		}
+		
+		PAGE.$wrapper.html(tmpl("onboarding-main", {}));
+		PAGE.init();
+		PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
+		OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
+		PAGE.$wrapper.find(".RecommendationsScrollbar").scrollbar({
+			onScroll: function(y, x) {
+				if (y.scroll == y.maxScroll && !PAGE.is_upload_disabled && !PAGE.block_scroll) {
+					PAGE.block_scroll = true;
+					PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
+					OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
+				}
+			}
+		});
+	};
+	
+	return OnboardingPage
+}()));
+/**
+ * @requires ../Class.Page.js
+ */
+/**
+ *
  * @class RedactEventPage
  * @extends Page
  */
@@ -13337,90 +13554,6 @@ EventPage = extending(Page, (function() {
 	return EventPage;
 }()));
 
-/**
- * @requires ../Class.Page.js
- */
-/**
- *
- * @class OnboardingPage
- * @extends Page
- */
-OnboardingPage = extending(Page, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs OnboardingPage
-	 */
-	function OnboardingPage() {
-		Page.apply(this, arguments);
-		this.ajax_data = {
-			length: 30,
-			offset: 0,
-			fields: 'img_small_url'
-		};
-		this.is_upload_disabled = false;
-		this.block_scroll = true;
-	}
-	
-	OnboardingPage.prototype.init = function() {
-		bindRippleEffect(this.$wrapper);
-		bindPageLinks(this.$wrapper);
-		this.$wrapper.find('.Link').on('click', function() {
-			if($(this).is('.SkipOnboarding')){
-				cookies.setItem('skip_onboarding', 1, moment().add(7, 'd')._d);
-			}
-			__APP.SIDEBAR.updateSubscriptions();
-		});
-	};
-	
-	OnboardingPage.prototype.bindSubscriptions = function() {
-		this.$wrapper.find(".OnboardingOrgItem").not('.-Handled_OnboardingOrgItem').on('click', function() {
-			var $this = $(this);
-			if ($this.hasClass(__C.CLASSES.ACTIVE)) {
-				__APP.USER.unsubscribeFromOrganization($this.data("organization_id"));
-			} else {
-				__APP.USER.subscribeToOrganization($this.data("organization_id"));
-			}
-			$this.toggleClass(__C.CLASSES.ACTIVE);
-		}).addClass('-Handled_OnboardingOrgItem');
-	};
-	
-	OnboardingPage.prototype.render = function() {
-		var PAGE = this,
-			$loader = tmpl('loader', {});
-		
-		if(__APP.USER.id === -1){
-			__APP.changeState('/feed/actual', true, true);
-			return null;
-		}
-		function appendRecommendations(organizations) {
-			$loader.detach();
-			if (organizations.length) {
-				PAGE.$wrapper.find(".RecommendationsWrapper").last().append(tmpl("onboarding-recommendation", organizations));
-				PAGE.bindSubscriptions();
-				PAGE.block_scroll = false;
-			} else {
-				PAGE.is_upload_disabled = true;
-			}
-		}
-		
-		PAGE.$wrapper.html(tmpl("onboarding-main", {}));
-		PAGE.init();
-		PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
-		OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
-		PAGE.$wrapper.find(".RecommendationsScrollbar").scrollbar({
-			onScroll: function(y, x) {
-				if (y.scroll == y.maxScroll && !PAGE.is_upload_disabled && !PAGE.block_scroll) {
-					PAGE.block_scroll = true;
-					PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
-					OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
-				}
-			}
-		});
-	};
-	
-	return OnboardingPage
-}()));
 /**
  * @requires ../Class.Page.js
  */
@@ -14799,7 +14932,10 @@ MyTicketsPage = extending(Page, (function() {
 		this.disable_uploads = false;
 		this.block_scroll = false;
 		
-		this.fetch_tickets_fields = new Fields('created_at', 'ticket_type', 'order', {
+		this.fetch_tickets_fields = new Fields('created_at', 'number', 'ticket_type', {
+			order: {
+				fields: new Fields('created_at')
+			},
 			event: {
 				fields: new Fields('dates', 'is_same_time', 'image_horizontal_medium_url', 'location')
 			}
@@ -15411,6 +15547,8 @@ __LOCALES = {
 		},
 		DATE: {
 			DATE_FORMAT: 'DD.MM.YYYY',
+			TIME_FORMAT: 'HH:mm',
+			DATE_TIME_FORMAT: 'DD.MM.YYYY HH:mm',
 			MONTH_SHORT_NAMES: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
 			MONTH_NAMES: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
 			CALENDAR_DATE_TIME: {
