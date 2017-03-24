@@ -16,6 +16,8 @@ class TicketTypesCollection extends AbstractCollection{
 		$additional_cols = TicketType::getAdditionalCols();
 
 		//For administrators there are additional fields
+
+		$from_table = 'view_ticket_types';
 		if (isset($filters['event']) && $user instanceof User){
 			if ($filters['event'] instanceof Event){
 				if ($user->isAdmin($filters['event']->getOrganization())){
@@ -23,8 +25,6 @@ class TicketTypesCollection extends AbstractCollection{
 					$from_table = 'view_all_ticket_types';
 				}
 			}
-		}else{
-			$from_table = 'view_ticket_types';
 		}
 
 		$cols = Fields::mergeFields($additional_cols, $fields, TicketType::getDefaultCols());
