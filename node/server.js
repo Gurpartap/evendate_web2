@@ -787,27 +787,35 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
                                 updateUsersInterestsAggregated(user.id, function () {
                                     insertRecommendationsAccordance({user_id: user.id}, function () {
+                                        let recs_updated = false,
+                                            updatedSend = () => {
+                                                if (recs_updated) return;
+                                                recs_updated = true;
+                                                socket.emit('auth', {
+                                                    email: data.oauth_data.email,
+                                                    user_id: user.id,
+                                                    token: user_token,
+                                                    mobile: token_type == 'mobile',
+                                                    type: data.type,
+                                                    subscriptions_count: subscriptions_count
+                                                });
+                                            };
+
                                         updateRecommendations({
                                             user_id: user.id,
                                             organizations_update_texts: false,
                                             events_update_texts: false
                                         }, function () {
-                                            socket.emit('auth', {
-                                                email: data.oauth_data.email,
-                                                user_id: user.id,
-                                                token: user_token,
-                                                mobile: token_type == 'mobile',
-                                                type: data.type,
-                                                subscriptions_count: subscriptions_count
-                                            });
-
                                             updateRecommendations({
                                                 user_id: user.id,
                                                 organizations_update_texts: true,
                                                 events_update_texts: true
-                                            }, function () {
-                                            });
+                                            }, updatedSend);
+                                            setTimeout(() => {
+                                                updatedSend();
+                                            }, 5000);
                                         });
+
                                     });
                                 });
 
