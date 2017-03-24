@@ -14,6 +14,15 @@ $driver_options = array(
 class ExtendedPDO extends PDO
 {
 
+	private $query;
+	private $values;
+
+	public function getQueryInfo(){
+		return array(
+			'query' => $this->query,
+			'values' => json_encode($this->values)
+		);
+	}
 
 	private function handleError(Exception $e, $name)
 	{
@@ -22,6 +31,7 @@ class ExtendedPDO extends PDO
 
 	public function prepareExecute(Aura\SqlQuery\QueryInterface $query, $error_name = 'QUERY_ERROR', array $bind_values = array()): PDOStatement
 	{
+		$this->query = $query->getStatement();
 		$prep = $this->prepare($query->getStatement());
 		if ($bind_values == null) {
 			$bind_values = $query->getBindValues();
@@ -39,6 +49,8 @@ class ExtendedPDO extends PDO
 
 	public function prepareExecuteRaw(string $query, array $params, $error_name = 'QUERY_ERROR'): PDOStatement
 	{
+		$this->query = $query;
+		$this->values = $params;
 		$prep = $this->prepare($query);
 		try {
 			$prep->execute($params);
@@ -57,6 +69,8 @@ class ExtendedPDO extends PDO
 			}
 		} catch (PDOException $e) {
 			$this->handleError($e, $error_name);
+			$this->query = $query;
+			$this->values = $params;
 		}
 		return $prep;
 	}
