@@ -695,6 +695,7 @@ api.on('inline.callback.query', function (msg) {
                 || users[user_key].search_results.length < command[1]) {
                 return startFromMenu(msg.message.chat.id);
             }
+            users[user_key].search.reply_markup.inline_keyboard[0][0].url = _event.url;
             users[user_key].search.reply_markup.inline_keyboard[1].forEach((value, index) => {
 
                 let showing_emoji = index == command[1] ? '✅ ' : '';
@@ -810,6 +811,7 @@ api.on('inline.callback.query', function (msg) {
                 || users[user_key].recommendations[command[0]].results.length < command[1]) {
                 return startFromMenu(msg.message.chat.id);
             }
+            users[user_key].recommendations.reply_markup.inline_keyboard[0][0].url = _event.url;
             users[user_key].recommendations[command[0]].reply_markup.inline_keyboard[1].forEach((value, index) => {
 
                 let showing_emoji = index == command[1] ? '✅ ' : '';

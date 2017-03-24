@@ -281,7 +281,9 @@ $(document).ready(function (e) {
 			}
 		}
 	}
-	
+
+	cookies.setItem('skip_onboarding', true);
+
 	$.ajax('/auth.php', {
 		method: 'GET',
 		data: {
