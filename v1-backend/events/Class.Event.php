@@ -1193,17 +1193,23 @@ class Event extends AbstractEntity
 
 		if (isset($fields[self::TICKETS_FIELD_NAME])) {
 			if ($user instanceof User) {
+				$ticket_fields = Fields::parseFields($fields[self::TICKETS_FIELD_NAME]['fields'] ?? '');
 				$result_data[self::TICKETS_FIELD_NAME] = TicketsCollection::filter(
 					$this->db,
 					$user,
 					array_merge(Fields::parseFilters($fields[self::TICKETS_FIELD_NAME]['filters'] ?? ''), array('event' => $this)),
-					Fields::parseFields($fields[self::TICKETS_FIELD_NAME]['fields'] ?? ''),
+					$ticket_fields,
 					array(
 						'length' => $length ?? $fields[self::TICKETS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 						'offset' => $offset ?? $fields[self::TICKETS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
 					),
 					$order_by ?? Fields::parseOrderBy($fields[self::TICKETS_FIELD_NAME]['order_by'] ?? '') ?? array()
-				)->getData();
+				);
+				if ($result_data[self::TICKETS_FIELD_NAME] instanceof Ticket) {
+					$result_data[self::TICKETS_FIELD_NAME]->getParams($user, $ticket_fields)->getData();
+				}else{
+					$result_data[self::TICKETS_FIELD_NAME] = $result_data[self::TICKETS_FIELD_NAME]->getData();
+				}
 			} else {
 				$result_data[self::TICKETS_FIELD_NAME] = null;
 			}
