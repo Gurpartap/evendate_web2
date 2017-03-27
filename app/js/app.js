@@ -95,9 +95,9 @@ $.fn.extend({
                         }
                     }
                     return null == c ? null : {
-                            name: b.name,
-                            value: std
-                        }
+                        name: b.name,
+                        value: std
+                    }
                 }).get();
             }
             case 'object':
@@ -738,7 +738,10 @@ socket.on('auth', function (data) {
             }
 
             if (res.status) {
-                if (data.hasOwnProperty('mobile') && data.mobile == true) {
+                var search_data = searchToObject();
+                if (search_data.redirect_to) {
+                    window.parent.location = search_data.redirect_to;
+                } else if (data.hasOwnProperty('mobile') && data.mobile == true) {
                     window.location.href = '/mobileAuthDone.php?token=' + data.token + '&email=' + data.email;
                 } else {
                     if (sessionStorage.getItem('organization_info')) {
