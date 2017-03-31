@@ -157,7 +157,7 @@ StatisticsOrganizationOverviewPage = extending(StatisticsOrganizationPage, (func
 			},
 			storage_data_name = 'org_stats_' + this.id + '_data',
 			storage_until_name = 'org_stats_' + this.id + '_until',
-			is_cached_data_actual = moment.unix(window.sessionStorage.getItem(storage_until_name)).isAfter(moment());
+			is_cached_data_actual = moment.unix(sessionStorage.getItem(storage_until_name)).isAfter(moment());
 		
 		if(__APP.USER.id === -1){
 			__APP.changeState('/feed/actual', true, true);
@@ -202,13 +202,13 @@ StatisticsOrganizationOverviewPage = extending(StatisticsOrganizationPage, (func
 		})));
 		
 		if (is_cached_data_actual) {
-			this.graphics_stats.setData(JSON.parse(window.sessionStorage.getItem(storage_data_name)));
+			this.graphics_stats.setData(JSON.parse(sessionStorage.getItem(storage_data_name)));
 			this.buildAreaCharts();
 		} else {
 			this.$wrapper.find('.OrgStatAreaCharts').children('.AreaChart').append(tmpl('loader'));
 			this.graphics_stats.fetchStatistics(Statistics.SCALES.DAY, moment(__APP.EVENDATE_BEGIN, 'DD-MM-YYYY').format(), ['view', 'subscribe', 'unsubscribe', 'conversion'], null, function() {
-				window.sessionStorage.setItem(storage_data_name, JSON.stringify(PAGE.graphics_stats));
-				window.sessionStorage.setItem(storage_until_name, moment().add(15, 'm').unix());
+				sessionStorage.setItem(storage_data_name, JSON.stringify(PAGE.graphics_stats));
+				sessionStorage.setItem(storage_until_name, moment().add(15, 'm').unix());
 				PAGE.buildAreaCharts();
 			});
 		}
