@@ -29,8 +29,8 @@ MapModal = extending(AbstractModal, (function() {
 	 */
 	MapModal.prototype.render = function(){
 		this.__render({
-			classes: ['-size_wide'],
-			content_classes: ['-no_padding']
+			classes: [__C.CLASSES.FLOATING_MATERIAL, __C.CLASSES.MODAL_STATES.SIZE.WIDE],
+			content_classes: [__C.CLASSES.MODAL_STATES.NO_PADDING]
 		});
 		
 		return this;

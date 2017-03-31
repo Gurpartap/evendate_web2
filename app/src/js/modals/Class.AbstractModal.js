@@ -319,7 +319,9 @@ AbstractModal = (function() {
 	 * @return {AbstractModal}
 	 */
 	AbstractModal.prototype.render = function(){
-		return this.__render();
+		return this.__render({
+			classes: [__C.CLASSES.FLOATING_MATERIAL]
+		});
 	};
 	/**
 	 * @return {AbstractModal}

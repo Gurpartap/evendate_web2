@@ -80,10 +80,10 @@ $url_parts = explode('/', $url);
 	<?php
 	if ($DEBUG_MODE) { ?>
 		<link rel="stylesheet" href="/dist/vendor.css?rev=514c11bff5a0b7b71eba77acf679a6e0">
-		<link rel="stylesheet" href="/dist/app.css?rev=d4aa48a23b53bb32274943253837588b"><?php
+		<link rel="stylesheet" href="/dist/app.css?rev=6eccc2bacb08ffaecf6e391aa1d5d964"><?php
 	} else { ?>
-		<link rel="stylesheet" href="/dist/vendor.min.css?rev=70c41e05eb03157e444e43cfbf3d185d">
-		<link rel="stylesheet" href="/dist/app.min.css?rev=30393d1a4eeefe6985807f19e13a4d4d"><?php
+		<link rel="stylesheet" href="/dist/vendor.min.css?rev=06ab404610392c5da1392043f51a9b85">
+		<link rel="stylesheet" href="/dist/app.min.css?rev=e7a6c2f58b2954988099a88ac65be042"><?php
 	} ?>
 
 	<?php
@@ -239,7 +239,8 @@ $url_parts = explode('/', $url);
 			<a href="/feed" class="sidebar_navigation_item SidebarNavItem link Link"><span>События</span><span class="counter sidebar_navigation_counter -hidden SidebarNavFeedCounter"></span></a>
 			<a href="/organizations" class="sidebar_navigation_item SidebarNavItem link Link"><span>Организаторы</span></a><?php
 			if(!$is_user_not_auth){ ?>
-				<a href="/my/profile" class="sidebar_navigation_item SidebarNavItem link Link"><span>Мой профиль</span></a><?php
+				<a href="/my/profile" class="sidebar_navigation_item SidebarNavItem link Link"><span>Мой профиль</span></a>
+				<a href="/my/tickets" class="sidebar_navigation_item SidebarNavItem link Link"><span>Мои билеты</span></a><?php
 			}?>
 		</nav>
 		<hr class="sidebar_divider">
@@ -275,15 +276,17 @@ $url_parts = explode('/', $url);
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=571b08a9894bb2316751a2cd7d91644a" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=ff5dbccc934406ceeef6236941375386" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=5debb6320f112d04d1b0ea49967dad8f" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=8709064f554cfd4066b803c2a6b8a2f9" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=3814501776793e2f67d09d4500242d5e" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=a855c7bd8fb69f3df4fda8696e50e274" charset="utf-8"></script><?php
-}	?>
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=bdeef984f695248e8e953a15121c83f3" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=4a3d6cf4c7ce17d929e46c935fb830bd" charset="utf-8"></script><?php
+}
 
-<?php
-require 'templates.html';
+foreach (glob("app/templates/{*/*/*/*,*/*/*,*/*,*}.html", GLOB_BRACE) as $filename) {
+	// ¯\_(ツ)_/¯
+	require_once($filename);
+}
 require 'footer.php';
 ?>
 

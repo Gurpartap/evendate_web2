@@ -29,7 +29,7 @@ AbstractListModal = extending(AbstractModal, (function() {
 		this.__render({
 			width: 384,
 			height: 'calc(100% - 140px)',
-			classes: ['-fixed'],
+			classes: ['material', '-floating', '-fixed'],
 			content_classes: ['list_modal_content']
 		});
 		

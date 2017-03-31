@@ -131,7 +131,7 @@ SearchPage = extending(Page, (function() {
 				PAGE.search_results.fetchEvents(PAGE.events_ajax_data, function(events) {
 					var $events;
 					if(events.length){
-						$events = SearchPage.buildEventCards(events);
+						$events = SearchPage.buildEventCards(PAGE.search_results.events.last_pushed);
 						PAGE.$wrapper.find('.SearchEvents').append($events);
 						bindFeedEvents($events);
 						PAGE.block_scroll = false;

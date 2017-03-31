@@ -10,5 +10,5 @@ FROM organization_registrations
                       AND emails.created_at BETWEEN (NOW() - INTERVAL '1 DAYS') AND (NOW() + INTERVAL '1 DAYS')
 WHERE finished = FALSE
       AND
-      DATE_PART('epoch', NOW()) :: INT - DATE_PART('epoch', organization_registrations.created_at) :: INT > 86400
+      (DATE_PART('epoch', NOW()) :: INT - DATE_PART('epoch', organization_registrations.created_at) :: INT) < 86400
       AND emails.id IS NULL

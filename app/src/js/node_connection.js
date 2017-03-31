@@ -5,6 +5,7 @@ if (window.location.hostname.indexOf('.test.evendate.ru') == -1) {
 }
 
 socket.on('auth', function (data) {
+    var organization_info;
 
     $.ajax({
         url: 'auth.php',
@@ -36,7 +37,12 @@ socket.on('auth', function (data) {
                 } else if (data.hasOwnProperty('mobile') && data.mobile == true) {
                     window.location.href = '/mobileAuthDone.php?token=' + data.token + '&email=' + data.email;
                 } else {
-                    if (sessionStorage.getItem('organization_info')) {
+                    try {
+	                    organization_info = sessionStorage.getItem('organization_info');
+                    } catch (e) {
+	                    organization_info = '';
+                    }
+                    if (organization_info) {
                         window.parent.location = '/add/organization';
                     } else if (data.subscriptions_count == 0) {
                         window.parent.location = '/onboarding';
@@ -121,10 +127,3 @@ socket.on('vk.post.error', function (response) {
     console.log(response);
     showNotifier({text: 'Не удалось опубликовать событие в группе vk. Пожалуйста, попробуйте еще раз.', status: false});
 });
-/*
- socket.on('utils.registrationSaved', function (data) {
- var _data = $('#wizard-form').serializeForm();
- _data.uuid = data.uuid;
- cookies.setItem('open_add_organization', 1, Infinity);
- window.sessionStorage.setItem('organization_info', JSON.stringify(_data));
- });*/

@@ -1,0 +1,25 @@
+<script type="javascript/template" id="tmpl-organization-card">
+	<div class="page organization_unit">
+		{background_image}
+		<div class="organization_unit_content">
+			{avatar}
+			<a href="/organization/{id}" class="link Link"><h5 class="organization_unit_title">{short_name}</h5></a>
+			<span class="organization_unit_subscribers">{subscribed_text}</span>
+			{redact_org_button}
+			{subscribe_button}
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-organization-category">
+	<div class="organizations_category Category" data-category-id="{category_id}">
+		<span class="organizations_category_title">{category_name}</span>
+		<span class="organizations_category_aside {aside_classes}">{new_events_count}</span>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-organization-subcategories-wrapper">
+	<div class="collapsing_wrapper -inset SubcategoryWrap">
+		<div class="organizations_subcategories_container collapsing_content">{organization_subcategories}</div>
+	</div>
+</script>

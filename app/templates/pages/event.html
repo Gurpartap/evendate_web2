@@ -1,0 +1,117 @@
+<script type="javascript/template" id="tmpl-event-page">
+	<div class="page event_page">
+		<div class="event_main_content">
+			<header class="event_header">
+				<div class="event_image CallModal" data-modal_type="media" style="background-image: url('{image_horizontal_large_url}')"></div>
+				<div class="event_image_bottom AddAvatarWrapper">
+					<div class="event_image_bottom_wrap">{avatars_collection}</div>
+					<div class="event_image_bottom_wrap">
+						{action_buttons}
+						<div class="dropdown_box DropdownBox" data-dropdown_id="edit_notification">
+							<header class="dropdown_header">Настройка напоминания</header>
+							<form class="dropdown_box_wrapper">
+								{notifications}
+							</form>
+						</div>
+					</div>
+				</div>
+			</header>
+			<div class="event_content">
+				<h3 class="event_title" title="{title}">{title}</h3>
+				<div class="event_description">{description}</div>
+				{event_map}
+			</div>
+		</div>
+		<div class="event_additional_content">
+			{event_edit_functions}
+			{event_additional_info}
+			<div class="event_additional_field">
+				<label class="event_additional_field_label">Организатор</label>
+				{organization_avatar_block}
+			</div>
+			<div class="event_calendar EventCalendar"></div>
+			{event_additional_fields}<!--
+			<div class="share_block">
+				<label class="share_title -color_primary -transform_uppercase">Поделиться</label>
+				<div class="share_icons -size_small">{share_block}</div>
+			</div>-->
+		</div>
+		<div class="event_canceled_cap -unselectable -centering {canceled}"><div><p>Организатор отменил событие</p>{cancel_cancellation}</div></div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-event-edit-functions">
+	<button class="button -color_neutral -size_wide RippleEffect DropdownButton" data-dropdown="redact_event" data-dd-width="self" type="button">Редактирование события</button>
+	<div class="dropdown_box DropdownBox" data-dropdown_id="redact_event">
+		<div class="dropdown_list"><button class="dropdown_button -size_wide -color_accent RippleEffect CloseDropdown DropdownButton" data-dropdown="cancel_event" data-dd-width="self" type="button">Отменить событие</button></div>
+		<div class="dropdown_list"><a href="/event/{id}/edit" class="dropdown_button link -size_wide -color_neutral RippleEffect CloseDropdown Link">Редактировать</a></div>
+	</div>
+	<div class="dropdown_box DropdownBox" data-dropdown_id="cancel_event">
+		<div class="dropdown_box_wrapper">
+			<p>Вы уверены, что хотите отменить событие?</p>
+		</div>
+		<footer class="dropdown_box_footer">
+			<span class="action -color_neutral CloseDropdown">Отмена</span>
+			<span class="action -color_error CloseDropdown CancelEvent">Да</span>
+		</footer>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-event-map">
+	<div class="event_map CallModal EventMap" data-modal_type="map" style="background-image: url('https://maps.googleapis.com/maps/api/staticmap?markers={location_sanitized}&zoom=15&size=640x640&scale=2&format=png&maptype=roadmap&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg')" data-modal_map_location="{location_sanitized}"></div>
+</script>
+
+<script type="javascript/template" id="tmpl-event-registration-info">
+	<p class="event_additional_info -text_color_accent -transform_uppercase">Регистрация до {registration_till}</p>
+</script>
+
+<script type="javascript/template" id="tmpl-event-price-info">
+	<p class="event_additional_info -text_color_accent">от {min_price} руб.</p>
+</script>
+
+<script type="javascript/template" id="tmpl-event-additional-info">
+	<p class="event_additional_info {classes}">{text}</p>
+</script>
+
+<script type="javascript/template" id="tmpl-event-date-time">
+	<div class="event_additional_field Collapsing" data-collapsing_id="event_dates" data-default-height="80">
+		<div class="collapsing_wrapper CollapsingWrapper -fading" data-collapsing_id="event_dates">
+			<div class="collapsing_content CollapsingContent">
+				<div class="event_additional_field_split">
+					<div class="event_additional_field"><label class="event_additional_field_label">Дата</label></div>
+					<div class="event_additional_field"><label class="event_additional_field_label">Время</label></div>
+				</div>
+				{date_times}
+			</div>
+		</div>
+		<button class="collapsing_button CollapsingTrigger fa_icon fa-chevron-down -empty" data-collapsing_id="event_dates" data-collapsing_trigger="click"></button>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-event-date-time-row">
+	<div class="event_additional_field_split">
+		<div class="event_additional_field"><span>{date}</span></div>
+		<div class="event_additional_field"><span>{time}</span></div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-event-additional-field">
+	<div class="event_additional_field">
+		<label class="event_additional_field_label">{key}</label>
+		<p>{value}</p>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-event-detail-link">
+	<div class="event_additional_field">
+		<label class="event_additional_field_label">Подробнее</label>
+		<a class="fa_icon fa-external-link external_link ExternalLink" href="{detail_info_url}" target="_blank">{detail_info_url}</a>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-event-vulcan">
+	<div class="event_vulcan">
+		<header class="event_vulcan_header">Похожие мероприятия</header>
+		{event_cards}
+	</div>
+</script>

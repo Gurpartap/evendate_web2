@@ -1206,7 +1206,7 @@ class Event extends AbstractEntity
 					$order_by ?? Fields::parseOrderBy($fields[self::TICKETS_FIELD_NAME]['order_by'] ?? '') ?? array()
 				);
 				if ($result_data[self::TICKETS_FIELD_NAME] instanceof Ticket) {
-					$result_data[self::TICKETS_FIELD_NAME]->getParams($user, $ticket_fields)->getData();
+					$result_data[self::TICKETS_FIELD_NAME] = $result_data[self::TICKETS_FIELD_NAME]->getParams($user, $ticket_fields)->getData();
 				}else{
 					$result_data[self::TICKETS_FIELD_NAME] = $result_data[self::TICKETS_FIELD_NAME]->getData();
 				}

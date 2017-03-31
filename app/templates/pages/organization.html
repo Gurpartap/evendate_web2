@@ -1,0 +1,55 @@
+<script type="javascript/template" id="tmpl-organization-wrapper">
+	<div class="page organization_info_page">
+		{background_image}
+		<div class="organization_description_block">
+			<header class="organization_header">
+				{avatar_block}
+				<div class="organization_header_button OrganizationSubscribeButtonWrap">{subscribe_button}</div>
+			</header>
+			<p class="organization_description">{description}</p>
+			<div class="organization_metas">
+				<div class="organization_meta">
+					<a class="button -color_marginal fa_icon fa-external-link RippleEffect ExternalPage" href="{site_url}" target="_blank">Подробнее</a>
+				</div>
+				<div class="organization_meta">
+					<small class="-text_color_marginal {has_address}">Адрес организатора:</small>
+					<p class="organization_address">{default_address}</p>
+				</div>
+				<div class="organization_meta">{redact_org_button}</div>
+			</div>
+		</div>
+		<div class="organization_feed Tabs">
+			<div class="tabs_header HeaderTabs -color_accent">
+				<span class="tab Tab -active" data-type="future">Будущие</span>
+				<span class="tab Tab" data-type="past">Прошедшие</span>
+				<span class="tab Tab {hidden_for_users}" data-type="delayed">Отложенные</span>
+				<span class="tab Tab {hidden_for_users}" data-type="canceled">Отмененные</span>
+			</div>
+			<div class="tab_bodies_wrap TabsBodyWrapper">
+				<div class="tab_body TabsBody FutureEvents -active"></div>
+				<div class="tab_body TabsBody PastEvents"></div>
+				<div class="tab_body TabsBody DelayedEvents"></div>
+				<div class="tab_body TabsBody CanceledEvents"></div>
+			</div>
+		</div>
+	</div>
+	<div class="page organization_subscribers_page -fixed">
+		<header class="organization_subscribers_header">
+			<span class="organization_subscribers_header_text">Подписчики</span>
+			<span class="counter -color_accent">{subscribed_count}</span>
+		</header>
+		<div class="organization_subscribers_wrapper scrollbar-outer SubscribersScroll">
+			{subscribed_blocks}
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-organization-background-image">
+	<div class="organization_background_image img_holder">
+		<img class="CallModal" src="{background_medium_img_url}" data-modal_type="media" data-modal_media_type="image" data-modal_media_url="{background_img_url}">
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-organization-feed-no-event">
+	<p class="organization_feed_text">{text}</p>
+</script>

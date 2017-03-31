@@ -163,7 +163,9 @@ EditOrganizationPage = extending(Page, (function() {
 			
 			function afterSubmit() {
 				PAGE.adding_is_over = true;
-				sessionStorage.removeItem('organization_info');
+				try {
+					sessionStorage.removeItem('organization_info');
+				} catch (e) {}
 				$('.SidebarNav').find('.ContinueRegistration').remove();
 				
 				socket.emit('utils.registrationFinished', additional_fields);
@@ -219,6 +221,7 @@ EditOrganizationPage = extending(Page, (function() {
 		if (!organization_id) {
 			try {
 				local_storage = JSON.parse(sessionStorage.getItem('organization_info') ? sessionStorage.getItem('organization_info') : localStorage.getItem('organization_info'));
+				sessionStorage.removeItem('organization_info');
 			} catch (e) {
 				local_storage = {}
 			}
@@ -226,9 +229,6 @@ EditOrganizationPage = extending(Page, (function() {
 			additional_fields = $.extend({
 				header_text: 'Новый организатор'
 			}, local_storage, true);
-			
-			//cookies.removeItem('open_add_organization', '/');
-			sessionStorage.removeItem('organization_info');
 			
 			$wrapper.html(tmpl('add-organization-page', additional_fields));
 		} else {
@@ -279,18 +279,20 @@ EditOrganizationPage = extending(Page, (function() {
 				}));
 				bindPageLinks($sidebar_nav);
 			}
-			sessionStorage.setItem('organization_info', JSON.stringify({
-				city_id: data.city_id,
-				type_id: data.type_id,
-				name: data.name,
-				short_name: data.short_name,
-				email: data.email,
-				site_url: data.site_url,
-				default_address: data.default_address,
-				description: data.description,
-				facebook_url: data.facebook_url,
-				vk_url: data.vk_url
-			}));
+			try {
+				sessionStorage.setItem('organization_info', JSON.stringify({
+					city_id: data.city_id,
+					type_id: data.type_id,
+					name: data.name,
+					short_name: data.short_name,
+					email: data.email,
+					site_url: data.site_url,
+					default_address: data.default_address,
+					description: data.description,
+					facebook_url: data.facebook_url,
+					vk_url: data.vk_url
+				}));
+			} catch (e) {}
 		}
 	};
 	

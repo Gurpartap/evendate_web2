@@ -584,10 +584,10 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 });
             },
             saveDataInDB = function (data) {
-                var subscriptions_count = 0;
+                let subscriptions_count = 0;
                 socket.retry_count = 0;
                 function getUIDValues() {
-                    var result = {
+                    let result = {
                         google_uid: null,
                         facebook_uid: null,
                         vk_uid: null
@@ -617,14 +617,14 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     }
                 }
 
-                var UIDs = getUIDValues(),
+                let UIDs = getUIDValues(),
                     users = Entities.users,
                     user_token = data.oauth_data.access_token + data.oauth_data.secret + Utils.makeId(),
                     q_get_user =
                         users
                             .select(users.id, users.vk_uid, users.facebook_uid, users.google_uid,
                                 '(SELECT COUNT(id) FROM subscriptions WHERE subscriptions.user_id = users.id AND subscriptions.status = TRUE) AS subscriptions_count')
-                            .where(users.email.equals(data.oauth_data.email))
+                            .where(users.email.isNotNull().and(users.email.equals(data.oauth_data.email)))
                             .or(users.vk_uid.isNotNull().and(users.vk_uid.equals(UIDs.vk_uid)))
                             .or(users.facebook_uid.isNotNull().and(users.facebook_uid.equals(UIDs.facebook_uid)))
                             .or(users.google_uid.isNotNull().and(users.google_uid.equals(UIDs.google_uid)))
@@ -632,7 +632,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     user_to_ins = {
                         first_name: data.user_info.first_name,
                         last_name: data.user_info.last_name,
-                        email: data.oauth_data.email,
+                        email: data.oauth_data.email == 'null' ? null : data.oauth_data.email,
                         token: user_token,
                         avatar_url: data.user_info.photo_100,
                         gender: data.user_info.gender
@@ -649,7 +649,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 client.query(q_get_user, function (err, result) {
                     if (handleError(err)) return;
 
-                    var q_user,
+                    let q_user,
                         is_new_user = result.rows.length == 0,
                         user;
 
@@ -673,7 +673,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         q_user = users.update(user_to_ins).where(users.id.equals(user.id)).returning('id').toQuery();
                     }
 
-                    console.log(q_user.text, q_user.values);
+                    console.log(q_user.text);
+                    console.log(q_user.values);
 
                     client.query(q_user, function (user_err, ins_result) {
 
@@ -688,7 +689,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             };
                         }
 
-                        var q_ins_sign_in,
+                        let q_ins_sign_in,
                             vk_sign_in = Entities.vk_sign_in,
                             google_sign_in = Entities.google_sign_in,
                             tokens = Entities.tokens,
@@ -696,7 +697,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
                         switch (data.type) {
                             case 'vk': {
-                                var vk_data = {
+                                let vk_data = {
                                     uid: UIDs.vk_uid,
                                     user_id: user.id,
                                     access_token: data.oauth_data.access_token,
@@ -714,7 +715,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 break;
                             }
                             case 'google': {
-                                var google_data = {
+                                let google_data = {
                                     user_id: user.id,
                                     google_id: user.id,
                                     access_token: data.oauth_data.access_token,
@@ -730,7 +731,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 break;
                             }
                             case 'facebook': {
-                                var facebook_data = {
+                                let facebook_data = {
                                     user_id: user.id,
                                     uid: UIDs.facebook_uid,
                                     access_token: data.oauth_data.access_token,
@@ -746,7 +747,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
                         }
 
-                        var q_ins_interests = Entities.users_interests.insert({
+                        let q_ins_interests = Entities.users_interests.insert({
                             user_id: user.id,
                             city: data.user_info.city,
                             education_university: data.user_info.university,
@@ -769,8 +770,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             network_type: data.type
                         }).toQuery();
 
-                        var insertToken = function () {
-                            var token_type = (data.oauth_data.hasOwnProperty('mobile') && data.oauth_data.mobile == 'true') ? 'mobile' : 'bearer',
+                        let insertToken = function () {
+                            let token_type = (data.oauth_data.hasOwnProperty('mobile') && data.oauth_data.mobile == 'true') ? 'mobile' : 'bearer',
                                 token_time = token_type == 'mobile' ? moment().add(1, 'months').unix() : moment().add(10, 'days').unix(),
                                 q_ins_token = tokens.insert({
                                     token: user_token,
@@ -926,7 +927,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 });
             },
             getUsersInfo = function (data, callback) {
-                var req_params;
+                let req_params;
 
                 switch (data.type) {
                     case 'vk': {
@@ -976,7 +977,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             handleError(result);
                             callback(result, null);
                         } else {
-                            var e = {};
+                            let e = {};
                             if (data.type == 'vk') {
                                 if (result) {
                                     if (result.hasOwnProperty('response') == false) {

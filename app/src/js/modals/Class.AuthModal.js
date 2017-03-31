@@ -28,8 +28,8 @@ AuthModal = extending(AbstractModal, (function() {
 	 */
 	AuthModal.prototype.render = function() {
 		this.__render({
-			classes: ['-size_tiny'],
-			content_classes: ['-align_center']
+			classes: [__C.CLASSES.FLOATING_MATERIAL, __C.CLASSES.MODAL_STATES.SIZE.TINY],
+			content_classes: [__C.CLASSES.ALIGN.CENTER]
 		});
 		
 		return this;
