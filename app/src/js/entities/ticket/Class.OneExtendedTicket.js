@@ -77,6 +77,22 @@ OneExtendedTicket = extending(OneTicket, (function() {
 	};
 	/**
 	 *
+	 * @param {OneEvent} event
+	 * @return {OneExtendedTicket}
+	 */
+	OneExtendedTicket.extractTicketFromEvent = function(event) {
+		var _event = new OneEvent(),
+			ticket = new OneExtendedTicket(event.id);
+		
+		_event.setData(event);
+		ticket.setData($.extend(_event.tickets[0], {
+			event: _event
+		}));
+		
+		return ticket;
+	};
+	/**
+	 *
 	 * @param {(string|number)} event_id
 	 * @param {(string|number)} uuid
 	 * @param {(Fields|string)} [fields]
@@ -91,7 +107,7 @@ OneExtendedTicket = extending(OneTicket, (function() {
 		
 		event_ajax_data = $.extend(true, {}, fields.get('event'), {
 			fields: new Fields({tickets: {
-				filter: 'uuid=' + uuid,
+				filters: 'uuid=' + uuid,
 				fields: fields
 			}})
 		});

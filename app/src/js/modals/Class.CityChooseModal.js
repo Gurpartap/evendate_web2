@@ -50,6 +50,7 @@ CityChooseModal = extending(AbstractModal, (function() {
 			}))
 		});
 		this.__render({
+			classes: [__C.CLASSES.FLOATING_MATERIAL],
 			width: 400
 		});
 		

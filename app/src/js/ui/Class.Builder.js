@@ -907,6 +907,7 @@ Builder = (function() {
 		
 		return $events;
 	};
+	
 	/**
 	 *
 	 * @param {(OneExtendedTicket|Array<OneExtendedTicket>|ExtendedTicketsCollection)} tickets
@@ -981,7 +982,7 @@ Builder = (function() {
 		return tmpl('ticket-card', Builder.normalizeTicketProps(tickets)).each(function(i, ticket) {
 			$(ticket).data({
 				modal_type: __C.MODAL_TYPES.TICKET,
-				ticket: tickets[i]
+				tickets: tickets[i]
 			});
 		});
 	};
@@ -1021,7 +1022,7 @@ Builder = (function() {
 			vars.modal_header = tmpl('modal-header', {
 				title: normalized_props.title,
 				close_button: this.button({
-					classes: ['-empty','-modal_destroyer','CloseModal','RippleEffect'],
+					classes: [__C.CLASSES.UNIVERSAL_STATES.EMPTY, '-modal_destroyer', __C.CLASSES.HOOKS.CLOSE_MODAL, __C.CLASSES.HOOKS.RIPPLE],
 					title: '×'
 				})
 			});

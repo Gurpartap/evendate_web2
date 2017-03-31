@@ -41,11 +41,11 @@ CropperModal = extending(AbstractModal, (function() {
 			$image = this.content;
 		
 		this.__render({
-			classes: ['-size_wide'],
-			content_classes: ['-no_padding', 'img_holder'],
+			classes: [__C.CLASSES.FLOATING_MATERIAL, __C.CLASSES.MODAL_STATES.SIZE.WIDE],
+			content_classes: [__C.CLASSES.MODAL_STATES.NO_PADDING, __C.CLASSES.IMG_HOLDER],
 			footer_buttons: tmpl('button', [
-				{classes: '-color_primary CropButton RippleEffect', title: 'Кадрировать'},
-				{classes: '-color_default DestroyCropButton RippleEffect', title: 'Отмена'}
+				{classes: [__C.CLASSES.COLORS.PRIMARY, 'CropButton', __C.CLASSES.HOOKS.RIPPLE].join(' '), title: 'Кадрировать'},
+				{classes: [__C.CLASSES.COLORS.DEFAULT, 'DestroyCropButton', __C.CLASSES.HOOKS.RIPPLE].join(' '), title: 'Отмена'}
 			])
 		});
 		

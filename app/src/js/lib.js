@@ -9,6 +9,9 @@
  */
 __C = {
 	CLASSES: {
+		MATERIAL: 'material',
+		FLOATING_MATERIAL: 'material -floating',
+		IMG_HOLDER: 'img_holder',
 		TEXT_COLORS: {
 			ACCENT: '-text_color_accent'
 		},
@@ -23,6 +26,11 @@ __C = {
 			MARGINAL_PRIMARY: '-color_marginal_primary',
 			MARGINAL_FRANKLIN: '-color_marginal_franklin',
 			MARGINAL_BUBBLEGUM: '-color_marginal_bubble_gum'
+		},
+		ALIGN: {
+			LEFT: '-align_left',
+			CENTER: '-align_center',
+			RIGHT: '-align_right'
 		},
 		UNIVERSAL_STATES: {
 			EMPTY: '-empty',
@@ -86,7 +94,10 @@ __C = {
 			TIMES: 'fa-times',
 			PLUS: 'fa-plus',
 			CHECK: 'fa-check',
-			PENCIL: 'fa-pencil'
+			PENCIL: 'fa-pencil',
+			EYE: 'fa-eye',
+			EYE_CLOSE: 'fa-eye-slash',
+			TICKET: 'fa-ticket'
 		},
 		ICON_CLASS: 'fa_icon'
 	},
@@ -100,7 +111,7 @@ __C = {
 		CROPPER: 'cropper',
 		FRIENDS_LIST: 'friends_list',
 		SUBSCRIBERS_LIST: 'subscribers_list',
-		TICKET: 'ticket'
+		TICKET: 'tickets'
 	},
 	COLORS: {
 		PRIMARY: '#2e3b50',
@@ -1983,7 +1994,7 @@ function bindCallModal($parent) {
 						break;
 					}
 					case __C.MODAL_TYPES.TICKET: {
-						modal = new TicketModal(data.ticket || data.ticket_uuid);
+						modal = new TicketsModal(data.tickets || data.ticket_uuid);
 						break;
 					}
 					default: {

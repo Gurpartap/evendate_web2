@@ -20,6 +20,7 @@ EventPage = extending(Page, (function() {
 	}
 	
 	EventPage.fields = new Fields([
+		'image_horizontal_medium_url',
 		'image_horizontal_large_url',
 		'favored_users_count',
 		'is_favorite',
@@ -61,7 +62,11 @@ EventPage = extending(Page, (function() {
 		},
 		notifications: {
 			fields: new Fields('notification_type', 'done')
-		}
+		},
+		orders: {
+			fields: new Fields('created_at')
+		},
+		tickets: new Fields('created_at', 'number', 'ticket_type')
 	});
 	
 	/**

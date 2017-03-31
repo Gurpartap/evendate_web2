@@ -1,24 +1,26 @@
 <script type="javascript/template" id="tmpl-modal-ticket-content">
 	<div class="ticket_card {card_classes}">
-		<div class="ticket_card_cover img_holder">
-			<img src="{image_horizontal_medium_url}" title="{title}">
-		</div>
-		<div class="ticket_card_content">
-			<p class="ticket_card_event_title">{title}</p>
-			<p class="ticket_card_type_name">{ticket_type_name}</p>
-			<p class="ticket_card_dates">{formatted_dates}</p>
-			<p class="ticket_card_location">{location}</p>
-			<div class="ticket_card_additional_field">
-				<span>Билет №{number_formatted}</span>
-				<span>{price_formatted}</span>
+		<div class="ticket_card_wrapper">
+			<div class="ticket_card_cover img_holder">
+				<img src="{image_horizontal_medium_url}" title="{title}">
 			</div>
-			<div class="ticket_card_additional_field">
-				<span>{payed_at_formatted}</span>
-				<span></span>
+			<div class="ticket_card_content">
+				<p class="ticket_card_event_title">{title}</p>
+				<p class="ticket_card_type_name">{ticket_type_name}</p>
+				<p class="ticket_card_dates">{formatted_dates}</p>
+				<p class="ticket_card_location">{location}</p>
+				<div class="ticket_card_additional_field">
+					<span>Билет №{number_formatted}</span>
+					<span>{price_formatted}</span>
+				</div>
+				<div class="ticket_card_additional_field">
+					<span>{payed_at_formatted}</span>
+					<span></span>
+				</div>
 			</div>
-		</div>
-		<div class="ticket_card_status">
-			<span>{status_name}</span>
+			<div class="ticket_card_status">
+				<span>{status_name}</span>
+			</div>
 		</div>
 	</div>
 </script>

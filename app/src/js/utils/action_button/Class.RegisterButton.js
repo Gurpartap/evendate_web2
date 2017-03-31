@@ -15,14 +15,14 @@ RegisterButton = extending(ActionButton, (function() {
 	 * @constructs RegisterButton
 	 *
 	 * @property {OneEvent} event
-	 * @property {RegistrationModal} modal
+	 * @property {(RegistrationModal|TicketsModal)} modal
 	 */
 	function RegisterButton(event, options) {
 		this.options = {
 			labels: {
 				checked: 'Зарегистрирован',
 				unchecked: 'Регистрация',
-				checked_hover: 'Зарегистрирован',
+				checked_hover: 'Открыть билеты',
 				unchecked_hover: 'Регистрация'
 			},
 			colors: {
@@ -34,7 +34,7 @@ RegisterButton = extending(ActionButton, (function() {
 			icons: {
 				checked: __C.CLASSES.ICONS.CHECK,
 				unchecked: __C.CLASSES.ICONS.PENCIL,
-				checked_hover: __C.CLASSES.ICONS.CHECK,
+				checked_hover: __C.CLASSES.ICONS.TICKET,
 				unchecked_hover: __C.CLASSES.ICONS.PENCIL
 			}
 		};
@@ -44,50 +44,82 @@ RegisterButton = extending(ActionButton, (function() {
 		ActionButton.call(this, options);
 	}
 	
-	RegisterButton.prototype.checked_state_class = '-state_unselectable';
+	RegisterButton.prototype.checked_state_class = '-Registered';
 	
 	RegisterButton.prototype.onClick = function() {
-		var self = this;
+		var self = this,
+			ticket,
+			promise;
 		
 		/**
 		 *
 		 * @param {RegistrationModal} modal
 		 * @param {RegisterButton} button
 		 */
-		function bindOnRegister(modal, button) {
-			modal.modal.on('registration:success', function() {
+		function showRegistrationModal(modal, button) {
+			modal.show();
+			modal.modal.one('registration:success', function() {
 				modal.event.is_registered = true;
 				button.afterCheck();
 			});
 		}
 		
-		if (this.event.is_registered || !this.event.registration_available) {
-			this.off('click.RippleEffect').addClass('-Handled_RippleEffect');
+		if (!this.event.registration_available && !this.event.is_registered) {
+			this.off('click.RippleEffect').addClass(__C.CLASSES.HOOKS.HANDLED + __C.CLASSES.HOOKS.RIPPLE);
 			return false;
 		}
 		
-		if (this.modal) {
-			this.modal.show();
-			bindOnRegister(this.modal, this);
-		} else if (this.event.registration_fields.length) {
-			this.modal = new RegistrationModal(this.event);
-			this.modal.show();
-			bindOnRegister(this.modal, this)
+		if (!this.event.is_registered) {
+			if (this.modal && this.modal instanceof RegistrationModal) {
+				showRegistrationModal(this.modal, this);
+			} else if (this.event.registration_fields.length) {
+				this.modal = new RegistrationModal(this.event);
+				showRegistrationModal(this.modal, this)
+			} else {
+				this.event.fetchEvent(new Fields('registration_fields')).done(function() {
+					self.modal = new RegistrationModal(self.event);
+					showRegistrationModal(self.modal, self)
+				});
+			}
 		} else {
-			this.event.fetchEvent(new Fields('registration_fields')).done(function() {
-				self.modal = new RegistrationModal(self.event);
-				self.modal.show();
-				bindOnRegister(self.modal, self)
-			});
+			if (this.modal && this.modal instanceof TicketsModal) {
+				this.modal.show();
+			} else {
+				if (this.event.tickets.length) {
+					ticket = OneExtendedTicket.extractTicketFromEvent(this.event);
+					promise = ticket.fetchTicket(new Fields('created_at', 'number', 'ticket_type', {
+						order: {
+							fields: new Fields('created_at')
+						},
+						event: {
+							fields: new Fields('dates', 'is_same_time', 'image_horizontal_medium_url', 'location')
+						}
+					}));
+				} else {
+					promise = this.event.fetchEvent(new Fields('dates', 'is_same_time', 'image_horizontal_medium_url', 'location', {
+						orders: {
+							fields: new Fields('created_at')
+						},
+						tickets: new Fields('created_at', 'number', 'ticket_type')
+					})).done(function() {
+						return ticket = OneExtendedTicket.extractTicketFromEvent(self.event);
+					});
+				}
+				
+				promise.done(function() {
+					self.modal = new TicketsModal(ticket);
+					self.modal.show();
+				});
+			}
 		}
 		
 	};
 	
 	RegisterButton.prototype.initiate = function() {
-		if (this.event.registration_available) {
-			ActionButton.prototype.initiate.call(this);
-		} else {
+		if (!this.event.registration_available && !this.event.is_registered) {
 			this.attr('disabled', true);
+		} else {
+			ActionButton.prototype.initiate.call(this);
 		}
 	};
 	

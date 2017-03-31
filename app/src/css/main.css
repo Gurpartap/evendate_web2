@@ -22,6 +22,13 @@
 	--color_gray_material: #f6f6f6;
 	--color_background_gray: #f9f9fa;
 	--color_page: #fff;
+
+
+	--material_shadow: 0 0 4px hsla(0,0%,0%,.08);
+	--material2_shadow: 0 1px 7px hsla(0,0%,0%,.2);
+	--floating_material_shadow: 0 2px 15px hsla(0,0%,0%,.2);
+
+	--material_border_radius: 3px;
 }
 
 * {
@@ -1844,10 +1851,6 @@ html.-noscroll {
 	display: block;
 	width: 800px;
 	margin: 100px auto;
-	background-color: #fff;
-	background-color: var(--color_page);
-	box-shadow: 0 2px 15px hsla(0,0%,0%,.2);
-	border-radius: 3px;
 	text-align: left;
 }
 
@@ -1911,6 +1914,8 @@ body.-open_modal > .modal_wrapper {
 
 .modal_content {padding: 1.5em}
 .modal_content.-no_padding {padding: 0}
+
+.modal_content + .modal_content {margin-top: 36px}
 
 .modal_divider {
 	margin-bottom: 15px;
@@ -2599,6 +2604,24 @@ body.-open_modal > .modal_wrapper {
 
 
 /* /Page */
+
+/* Material */
+
+.material {
+	background-color: #fff;
+	background-color: var(--color_page);
+	box-shadow: 0 0 4px hsla(0,0%,0%,.08);
+	box-shadow: var(--material_shadow);
+	border-radius: 3px;
+	border-radius: var(--material_border_radius);
+}
+
+.material.-floating {
+	box-shadow: 0 2px 15px hsla(0,0%,0%,.2);
+	box-shadow: var(--floating_material_shadow);
+}
+
+/* /Material */
 
 /* FUCK YOU BOOTSTRAP */
 
@@ -3848,9 +3871,10 @@ body.-open_modal > .modal_wrapper {
 	padding: 50px 0;
 }
 
-.ticket_card {
+.ticket_card_wrapper {
 	overflow: hidden;
 	border-radius: 3px;
+	border-radius: var(--material_border_radius);
 }
 
 .ticket_card:not(.-ticket_extended) {
@@ -3858,12 +3882,37 @@ body.-open_modal > .modal_wrapper {
 	margin-bottom: 36px;
 }
 
+.ticket_card:not(.-ticket_extended):before,
+.ticket_card:not(.-ticket_extended):after {
+	content: '';
+	position: absolute;
+	left: 0;
+	right: 0;
+	width: 36px;
+	margin: auto;
+	background-color: #f6f6f6;
+	z-index: 1;
+}
+
+.ticket_card:not(.-ticket_extended):before {
+	bottom: calc(100% - 10px);
+	height: 24px;
+	border-radius: 50%;
+	box-shadow: inset 0 0 4px hsla(0,0%,0%,.08);
+	box-shadow: inset var(--material_shadow);
+}
+
+.ticket_card:not(.-ticket_extended):after {
+	bottom: 100%;
+	height: 14px;
+}
+
 .ticket_card.-ticket_extended {width: 450px}
 
 .ticket_card_cover {}
 
 .ticket_card_content {padding: 12px}
-.ticket_card:not(.-ticket_extended) > .ticket_card_content {padding-bottom: 40px}
+.ticket_card:not(.-ticket_extended) .ticket_card_content {padding-bottom: 40px}
 
 .ticket_card_event_title,
 .ticket_card_type_name,
@@ -3926,28 +3975,28 @@ body.-open_modal > .modal_wrapper {
 	background-color: var(--color_primary);
 }
 
-.ticket_card:not(.-ticket_extended):not(.-status_disabled) {cursor: pointer}
+.ticket_card:not(.-ticket_extended):not(.-status_disabled) > .ticket_card_wrapper {cursor: pointer}
 
 
 .ticket_card.-ticket_extended .ticket_card_event_title,
-.ticket_card:not(.-ticket_extended):not(.-status_disabled):hover .ticket_card_type_name {
+.ticket_card:not(.-ticket_extended):not(.-status_disabled) > .ticket_card_wrapper:hover .ticket_card_type_name {
 	color: #f82969;
 	color: var(--color_accent);
 }
 
-.ticket_card.-status_disabled > .ticket_card_content {opacity: .5}
+.ticket_card.-status_disabled .ticket_card_content {opacity: .5}
 
-.ticket_card.-status_success > .ticket_card_status {
+.ticket_card.-status_success .ticket_card_status {
 	background-color: #00dc88;
 	background-color: var(--color_franklin);
 }
 
-.ticket_card.-status_pending > .ticket_card_status {
+.ticket_card.-status_pending .ticket_card_status {
 	background-color: #ff9f00;
 	background-color: var(--color_warning);
 }
 
-.ticket_card.-status_error > .ticket_card_status {
+.ticket_card.-status_error .ticket_card_status {
 	background-color: #fd7b6e;
 	background-color: var(--color_error);
 }
