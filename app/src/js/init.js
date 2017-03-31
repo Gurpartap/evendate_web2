@@ -123,7 +123,13 @@ $(document)
 		geolocation_jqxhr = outerAjax('https://freegeoip.net/json/');
 		
 		__APP.SERVER.multipleAjax(user_jqhxr, auth_urls_jqxhr, geolocation_jqxhr, function(user_data, auth_urls, geolocation) {
-			var selected_city = JSON.parse(localStorage.getItem('selected_city'));
+			var selected_city;
+			
+			try {
+				selected_city = JSON.parse(localStorage.getItem('selected_city'));
+			} catch (e) {
+				selected_city = false;
+			}
 			
 			__APP.LOCATION = geolocation;
 			__APP.AUTH_URLS = auth_urls;

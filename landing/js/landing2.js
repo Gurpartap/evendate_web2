@@ -304,7 +304,9 @@ $(document).ready(function (e) {
 					
 					socket.emit('utils.feedback', form_data);
 					socket.emit('utils.registrationStarted', form_data);
-					sessionStorage.setItem('organization_info', JSON.stringify(form_data));
+					try {
+						sessionStorage.setItem('organization_info', JSON.stringify(form_data));
+					} catch (e) {}
 					
 					if (isNotDesktop()) {
 						window.location.href = auth_urls[network];
