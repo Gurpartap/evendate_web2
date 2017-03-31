@@ -773,9 +773,8 @@ Builder = (function() {
 	Builder.prototype.eventCards = function buildEventCards(events) {
 		var self = this,
 			$events;
-		events = events instanceof Array ? events : [events];
 		
-		$events = tmpl('feed-event', events.map(function(event) {
+		$events = tmpl('feed-event', (events instanceof Array ? events : [events]).map(function(event) {
 			var avatars_collection_classes = [
 					__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
 					__C.CLASSES.UNIVERSAL_STATES.BORDERED,

@@ -86,7 +86,9 @@ OneExtendedTicket = extending(OneTicket, (function() {
 		
 		_event.setData(event);
 		ticket.setData($.extend(_event.tickets[0], {
-			event: _event
+			event: _event,
+			event_id: _event.id,
+			order: _event.orders.getByUUID(_event.tickets[0].ticket_order_uuid)
 		}));
 		
 		return ticket;
@@ -112,7 +114,7 @@ OneExtendedTicket = extending(OneTicket, (function() {
 			}})
 		});
 		
-		return __APP.SERVER.getData('/api/v1/events', event_ajax_data, success);
+		return __APP.SERVER.getData('/api/v1/events/' + event_id, event_ajax_data, success);
 	};
 	/**
 	 *
