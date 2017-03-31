@@ -7,6 +7,8 @@ require_once $BACKEND_FULL_PATH . '/statistics/Class.EventsStatistics.php';
 require_once $BACKEND_FULL_PATH . '/statistics/Class.Statistics.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.OrdersCollection.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.TicketsCollection.php';
+require_once $BACKEND_FULL_PATH . '/events/Class.NotificationsCollection.php';
+require_once $BACKEND_FULL_PATH . '/events/Class.Notification.php';
 
 
 $__modules['statistics'] = array(
@@ -95,5 +97,35 @@ $__modules['statistics'] = array(
 		'batch' => function () use ($__db, $__request, $__user) {
 			return Statistics::storeBatch($__request['payload'], $__user, $__db);
 		}
+	),
+	'PUT' => array(
+		'{/events/(id:[0-9]+)/tickets/(uuid:\w+-\w+-\w+-\w+-\w+)}' => function ($id, $uuid) use ($__request, $__fields, $__db, $__user) {
+			$updated = false;
+			$event = EventsCollection::one(
+				$__db,
+				$__user,
+				$id,
+				$__fields
+			);
+			if (isset($__request['checkout'])) {
+				$value = filter_var($__request['checkout'], FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+				$ticket = TicketsCollection::oneByUUID($__db, $__user, $uuid, array());
+				$ticket->setCheckOut($__request['checkout']);
+				$event->addNotification(UsersCollection::one($__db, $__user, $ticket->getUserId(), array()),
+					array(
+						'notification_type' => $value == 'true' ?
+							Notification::NOTIFICATION_TYPE_REGISTRATION_CHECKED_OUT :
+							Notification::NOTIFICATION_TYPE_REGISTRATION_NOT_CHECKED_OUT,
+						'notification_time' => (new DateTime())->add(new DateInterval('PT5M'))->format('Y-m-d H:i:s')
+					));
+				$updated = true;
+			}
+			if ($updated) {
+				return new Result(true, 'Данные успешно обновлены');
+			} else {
+				return new Result(false, 'Не указаны поля для обновления');
+			}
+		},
+
 	)
 );

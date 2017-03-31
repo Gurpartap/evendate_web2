@@ -52,7 +52,7 @@ class TicketsCollection extends AbstractCollection
 				}
 				case 'user_name': {
 					$value = '%' . trim($value) . '%';
-					$q_get_tickets->where('user_id IN (SELECT id FROM view_users_names WHERE first_last_name LIKE :query OR last_first_name LIKE :query OR last_name LIKE :query OR first_name LIKE :query OR email = :query)')
+					$q_get_tickets->where('user_id IN (SELECT id FROM view_users_names WHERE LOWER(first_last_name) LIKE LOWER(:query) OR LOWER(last_first_name) LIKE LOWER(:query) OR LOWER(last_name) LIKE LOWER(:query) OR LOWER(first_name) LIKE LOWER(:query) OR LOWER(email) = LOWER(:query))')
 						->bindValue('query', $value);
 					$getting_statistics = true;
 					break;
@@ -89,10 +89,9 @@ class TicketsCollection extends AbstractCollection
 					}
 					break;
 				}
-				case 'checked_out': {
-					if (filter_var($value, FILTER_VALIDATE_BOOLEAN)) {
-						$q_get_tickets->where('checked_out = ?', $value);
-					}
+				case 'checkout': {
+					$val = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+					$q_get_tickets->where('checked_out = ?', $val);
 				}
 			}
 		}

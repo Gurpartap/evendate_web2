@@ -115,7 +115,7 @@ sql.setDialect('postgres');
 
 pg.connect(pg_conn_string, function (err, client, done) {
 
-    if (err){
+    if (err) {
         console.log(err);
     }
 
@@ -335,7 +335,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
             operations = [], events_args = [], orgs_args = [];
 
         q_upd_events = q_upd_events.replace("'{SIMILARITY_TEXT}'", data.events_update_texts === false ? 'rating_texts_similarity' : events_text);
-        q_upd_organizations = q_upd_organizations.replace("'{SIMILARITY_TEXT}'", data.organizations_update_texts  === false ? 'rating_texts_similarity' : organizations_text);
+        q_upd_organizations = q_upd_organizations.replace("'{SIMILARITY_TEXT}'", data.organizations_update_texts === false ? 'rating_texts_similarity' : organizations_text);
 
 
         if (data.user_id) {
@@ -484,7 +484,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         }
                     };
 
-                console.log(url)
+                console.log(url);
 
                 rest.get(url, req_params)
                     .on('complete', function (result) {
@@ -549,8 +549,9 @@ pg.connect(pg_conn_string, function (err, client, done) {
                     client.query(q_get_groups, function (error, groups_data) {
 
                         if (error) handleError({error: error, name: 'q_get_groups'});
-                        groups_data.rows.forEach(function (row) {
-                            if (items_length >= 120000) return false;
+                        console.time('Start');
+                        groups_data.rows.every(function (row) {
+                            if (items_length >= 50000) return false;
                             let _clean_name = cleanData(row.name),
                                 _clean_desc = cleanData(row.description);
 
@@ -559,7 +560,9 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
                             items.push(_clean_name);
                             items.push(_clean_desc);
+                            return true
                         });
+                        console.timeEnd('Start');
                         var items_text = items.join(' '),
                             items_text_tsquery = items_text.trim().replace(/\s+/gmi, '|');
 
@@ -569,7 +572,10 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             ' ON CONFLICT(user_id) DO UPDATE ' +
                             ' SET aggregated_text = $4, aggregated_tsquery = $5, updated_at = NOW()';
 
+                        console.time('InterestsIns');
+
                         client.query(q_ins_interests, [user_id, items_text, items_text_tsquery, items_text, items_text_tsquery], function (err, data) {
+                            console.timeEnd('InterestsIns');
                             if (err) handleError({error: err, name: 'q_ins_interests'});
                             if (callback) callback(err);
                         });
@@ -653,9 +659,9 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
                         // case when user changed his email, we'll select account related to current auth social network
                         let network_index = 0;
-                        if (result.rows.length > 1){
-                            result.rows.forEach(function(row, row_index){
-                                if (row[data.type + '_uid'] != null){
+                        if (result.rows.length > 1) {
+                            result.rows.forEach(function (row, row_index) {
+                                if (row[data.type + '_uid'] != null) {
                                     network_index = row_index;
                                 }
                             });
@@ -781,20 +787,35 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
                                 updateUsersInterestsAggregated(user.id, function () {
                                     insertRecommendationsAccordance({user_id: user.id}, function () {
+                                        let recs_updated = false,
+                                            updatedSend = () => {
+                                                if (recs_updated) return;
+                                                recs_updated = true;
+                                                socket.emit('auth', {
+                                                    email: data.oauth_data.email,
+                                                    user_id: user.id,
+                                                    token: user_token,
+                                                    mobile: token_type == 'mobile',
+                                                    type: data.type,
+                                                    subscriptions_count: subscriptions_count
+                                                });
+                                            };
+
                                         updateRecommendations({
                                             user_id: user.id,
-                                            organizations_update_texts: true,
+                                            organizations_update_texts: false,
                                             events_update_texts: false
                                         }, function () {
-                                            socket.emit('auth', {
-                                                email: data.oauth_data.email,
+                                            updateRecommendations({
                                                 user_id: user.id,
-                                                token: user_token,
-                                                mobile: token_type == 'mobile',
-                                                type: data.type,
-                                                subscriptions_count: subscriptions_count
-                                            });
+                                                organizations_update_texts: true,
+                                                events_update_texts: true
+                                            }, updatedSend);
+                                            setTimeout(() => {
+                                                updatedSend();
+                                            }, 5000);
                                         });
+
                                     });
                                 });
 
@@ -1462,7 +1483,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
 
         console.log(req.query);
-        if (req.query.is_new){
+        if (req.query.is_new) {
             try {
                 rest.get('http://localhost:5000/events/' + req.params.id)
             } catch (e) {

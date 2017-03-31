@@ -488,7 +488,7 @@ class EventsCollection extends AbstractCollection
 
 		if (array_key_exists(Event::FAVORED_FRIENDS_COUNT_FIELD_NAME, $fields) ||
 			array_key_exists(Event::IS_REGISTERED_FIELD_NAME, $fields) ||
-			array_key_exists(Event::TICKETS_COUNT_FIELD_NAME, $fields) ||
+			array_key_exists(Event::SOLD_TICKETS_COUNT_FIELD_NAME, $fields) ||
 			array_key_exists(Event::REGISTRATION_APPROVE_STATUS_FIELD_NAME, $fields)
 		) {
 			$statement_array[':user_id'] = $user->getId();

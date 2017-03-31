@@ -26,7 +26,7 @@ class Ticket extends AbstractEntity
 		'ticket_type_uuid',
 		'ticket_order_uuid',
 		'status',
-		'checked_out',
+		'checkout',
 		'uuid',
 		'number',
 		'price'

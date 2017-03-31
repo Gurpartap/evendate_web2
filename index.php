@@ -32,7 +32,7 @@ try {
 		$user->logout();
 	}
 
-	if (isset( $_REQUEST['q'] ) && $_REQUEST['q'] != 'onboarding' && !isset($_COOKIE['skip_onboarding'])) {
+	if (isset( $_REQUEST['q'] ) && $_REQUEST['q'] != 'onboarding' && (!isset($_COOKIE['skip_onboarding']) || filter_var($_COOKIE['skip_onboarding'], FILTER_VALIDATE_BOOLEAN) == false)) {
 		$subscriptions = OrganizationsCollection::filter(
 			$__db,
 			$user,
@@ -79,7 +79,7 @@ $url_parts = explode('/', $url);
 
 	<?php
 	if ($DEBUG_MODE) { ?>
-		<link rel="stylesheet" href="/dist/vendor.css?rev=514c11bff5a0b7b71eba77acf679a6e0">
+		<link rel="stylesheet" href="/dist/vendor.css?rev=e8dae9f1a9a24f2c79a739f24c1ea7eb">
 		<link rel="stylesheet" href="/dist/app.css?rev=6eccc2bacb08ffaecf6e391aa1d5d964"><?php
 	} else { ?>
 		<link rel="stylesheet" href="/dist/vendor.min.css?rev=70c41e05eb03157e444e43cfbf3d185d">
@@ -276,8 +276,8 @@ $url_parts = explode('/', $url);
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=ed3d88a1d45ca4b0ff79997bbc143f03" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=79f3281bfcf071f7a0ae69646939b5ab" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=091480ceb7abe109bfb4b1bd8f0a96e8" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=506cec1fb081d4152d74e85d887eb330" charset="utf-8"></script><?php
 } else { ?>
 	<script type="text/javascript" src="/dist/vendor.min.js?rev=3814501776793e2f67d09d4500242d5e" charset="utf-8"></script>
 	<script type="text/javascript" src="/dist/app.min.js?rev=a855c7bd8fb69f3df4fda8696e50e274" charset="utf-8"></script><?php

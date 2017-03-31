@@ -183,11 +183,8 @@ class OrganizationsCollection extends AbstractCollection
 			$statement_array[':user_id'] = $user->getId();
 		}
 
-
-		if (isset($getting_private_organization) && $getting_private_organization == true) {
-			$instance_class_name = 'PrivateOrganization';
-			$q_get_organizations
-				->where('(is_private = false OR (
+		$q_get_organizations
+			->where('(is_private = false OR (
 				
 					id IN 
 						(SELECT organization_id FROM organizations_invitations WHERE 
@@ -202,14 +199,16 @@ class OrganizationsCollection extends AbstractCollection
 					
 					))');
 
-			if (array_key_exists(Organization::IS_SUBSCRIBED_FIELD_NAME, $filters) == false) {
-				$statement_array[':user_id'] = $user->getId();
-			}
-			if ($user instanceof User) {
-				$statement_array[':email'] = $user->getEmail();
-			} else {
-				$statement_array[':email'] = '-';
-			}
+		$statement_array[':user_id'] = $user->getId();
+		if ($user instanceof User) {
+			$statement_array[':email'] = $user->getEmail();
+		} else {
+			$statement_array[':email'] = '-';
+		}
+
+
+		if (isset($getting_private_organization) && $getting_private_organization == true) {
+			$instance_class_name = 'PrivateOrganization';
 		}
 
 
