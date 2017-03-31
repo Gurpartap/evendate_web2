@@ -148,7 +148,20 @@ ActionButton = extendingJQuery((function() {
 			
 			.on('click.Action', function() {
 				if(__APP.USER.isLoggedOut()){
-					return (new AuthModal()).show();
+					if (self instanceof SubscribeButton) {
+						cookies.setItem('auth_command', 'subscribe_to');
+						cookies.setItem('auth_entity_id', self.org_id);
+						return (new AuthModal(location.origin + '/organization/' + self.org_id)).show();
+					} else {
+						if (self instanceof AddToFavoriteButton) {
+							cookies.setItem('auth_command', 'add_to_favorite');
+							cookies.setItem('auth_entity_id', self.event_id);
+						} else {
+							cookies.removeItem('auth_command');
+							cookies.removeItem('auth_entity_id');
+						}
+						return (new AuthModal(location.origin + '/event/' + self.event_id)).show();
+					}
 				}
 				self.onClick();
 				
