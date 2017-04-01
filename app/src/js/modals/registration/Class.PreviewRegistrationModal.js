@@ -25,6 +25,7 @@ PreviewRegistrationModal = extending(AbstractModal, (function() {
 	PreviewRegistrationModal.prototype.render = function() {
 		var self = this;
 		this.__render({
+			classes: ['material', '-floating'],
 			width: 400,
 			content: tmpl('modal-registration-content', {
 				modal_id: this.id,

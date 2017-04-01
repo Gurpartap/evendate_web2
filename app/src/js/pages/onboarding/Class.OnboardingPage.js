@@ -19,6 +19,7 @@ OnboardingPage = extending(Page, (function() {
 			offset: 0,
 			fields: 'img_small_url'
 		};
+		this.state_name = 'onboarding_page';
 		this.is_upload_disabled = false;
 		this.block_scroll = true;
 	}

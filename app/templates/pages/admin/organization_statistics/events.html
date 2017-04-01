@@ -1,0 +1,46 @@
+<script type="javascript/template" id="tmpl-orgstat-events-page">
+	<div class="page orgstat_events_page">
+		<header class="orgstat_events_page_header"></header>
+		<div class="OrgStatFutureEventsWrapper"></div>
+		<div class="OrgStatPastEventsWrapper"></div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-orgstat-events-wrapper">
+	<h3 class="orgstat_events_title">{title}</h3>
+	<table class="statistics_table">
+		<colgroup>
+			<col>
+			<col width="144px">
+			<col width="100px">
+			<col width="100px">
+			<col width="144px">
+			<col width="110px">
+			<col width="144px">
+		</colgroup>
+		<thead>
+			<tr>
+				<th class="-unselectable" align="left">Название события</th>
+				<th class="-unselectable" data-sort-order="desc">Дата события</th>
+				<th class="-unselectable" data-sort-order="desc">Просмотров</th>
+				<th class="-unselectable" data-sort-order="desc">Открытий</th>
+				<th class="-unselectable" data-sort-order="desc">Доб. в избранное</th>
+				<th class="-unselectable" data-sort-order="desc">Конверсия</th>
+				<th class="-unselectable" data-sort-order="desc">Уведомлений</th>
+			</tr>
+		</thead>
+		{rows}
+	</table>
+</script>
+
+<script type="javascript/template" id="tmpl-orgstat-events-row">
+	<tr>
+		<td><a href="/statistics/event/{id}" class="link Link">{title}</a></td>
+		<td align="center" data-sort="{timestamp}">{date}</td>
+		<td align="center" class="-text_big -highlighted">{view}</td>
+		<td align="center" class="-text_big -highlighted">{view_detail}</td>
+		<td align="center" class="-text_big -highlighted">{fave}</td>
+		<td align="center" class="-text_big -highlighted">{conversion}</td>
+		<td align="center" class="-text_big -highlighted">{notifications_sent}</td>
+	</tr>
+</script>

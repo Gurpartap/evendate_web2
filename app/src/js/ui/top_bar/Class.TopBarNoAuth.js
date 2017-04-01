@@ -17,7 +17,9 @@ TopBarNoAuth = extending(AbstractTopBar, (function () {
 	
 	TopBarNoAuth.prototype.init = function () {
 		this.$main_header.find('.LoginButton').on('click', function() {
-			(new AuthModal()).show();
+			cookies.removeItem('auth_command');
+			cookies.removeItem('auth_entity_id');
+			(new AuthModal(location.href)).show();
 		});
 		AbstractTopBar.prototype.init.call(this);
 	};

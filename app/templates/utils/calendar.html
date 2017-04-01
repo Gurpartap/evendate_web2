@@ -1,0 +1,40 @@
+<script type="javascript/template" id="tmpl-calendar">
+	<div class="{wrapper_class} -unselectable">
+		<div class="{header_class}">
+			<button class="PrevMonth {prev_btn_class} fa_icon fa-chevron-left" type="button"></button>
+			<span class="MonthName {month_name_class}"></span>
+			<button class="NextMonth {next_btn_class} fa_icon fa-chevron-right" type="button"></button>
+		</div>
+		<table class="CalendarTable {table_class}">
+			<colgroup>
+				<col valign="middle">
+				<col valign="middle">
+				<col valign="middle">
+				<col valign="middle">
+				<col valign="middle">
+				<col valign="middle">
+				<col valign="middle">
+			</colgroup>
+			<thead class="{thead_class}">
+				<tr class="{head_tr_class}">
+					<th class="{table_cell_class} {th_class} Week_1" data-weekday="1"><span>Пн</span></th>
+					<th class="{table_cell_class} {th_class} Week_2" data-weekday="2"><span>Вт</span></th>
+					<th class="{table_cell_class} {th_class} Week_3" data-weekday="3"><span>Ср</span></th>
+					<th class="{table_cell_class} {th_class} Week_4" data-weekday="4"><span>Чт</span></th>
+					<th class="{table_cell_class} {th_class} Week_5" data-weekday="5"><span>Пт</span></th>
+					<th class="{table_cell_class} {th_class} Week_6" data-weekday="6"><span>Сб</span></th>
+					<th class="{table_cell_class} {th_class} Week_0" data-weekday="0"><span>Вс</span></th>
+				</tr>
+			</thead>
+			<tbody class="CalendarTableBody {tbody_class}"></tbody>
+		</table>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-calendar-row">
+	<tr class="{tr_class}"></tr>
+</script>
+
+<script type="javascript/template" id="tmpl-calendar-div">
+	<td class="{td_classes}" data-weekday="{day_number}" data-date="{date}" data-title="{date_text}" {dataset}><span class="day_num">{number}</span></td>
+</script>

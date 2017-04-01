@@ -16,7 +16,7 @@ MediaModal = extending(AbstractModal, (function() {
 	function MediaModal(src, format) {
 		AbstractModal.call(this);
 		if (src) {
-			if (format == 'image') {
+			if (format === 'image') {
 				this.content = tmpl('modal-image-media-content', {src: src});
 			} else {
 				
@@ -34,8 +34,8 @@ MediaModal = extending(AbstractModal, (function() {
 	 */
 	MediaModal.prototype.render = function(){
 		this.__render({
-			classes: ['-size_responsive'],
-			content_classes: ['img_holder', '-no_padding']
+			classes: [__C.CLASSES.FLOATING_MATERIAL, __C.CLASSES.MODAL_STATES.SIZE.RESPONSIVE],
+			content_classes: [__C.CLASSES.IMG_HOLDER, __C.CLASSES.MODAL_STATES.NO_PADDING]
 		});
 		
 		return this;

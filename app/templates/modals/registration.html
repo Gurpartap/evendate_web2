@@ -1,0 +1,16 @@
+<script type="javascript/template" id="tmpl-modal-registration-content">
+	<form class="form registration_modal_form RegistrationModalForm">
+		<h4>{event_title}</h4>
+		<p class="form_helptext">Чтобы зарегистрироваться на событие, заполните поля.</p>
+		<p class="form_helptext">Поля со звёздочкой ({required_star}) обязательны для заполнения.</p>
+		{fields}
+		<div class="form_unit">
+			<input id="registration_form_{modal_id}_agreement" class="form_checkbox" type="checkbox" required>
+			<label class="form_label" for="registration_form_{modal_id}_agreement"><span>Я согласен c условиями Пользовательского соглашения и Договором оказания услуг по организации мероприятия</span></label>
+		</div>
+
+		<div class="-align_center">
+			<button class="button -color_accent -rounded RippleEffect RegisterButton" type="button"><span class="Text">Зарегистрироваться</span></button>
+		</div>
+	</form>
+</script>

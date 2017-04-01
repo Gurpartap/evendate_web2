@@ -50,6 +50,7 @@ CityChooseModal = extending(AbstractModal, (function() {
 			}))
 		});
 		this.__render({
+			classes: [__C.CLASSES.FLOATING_MATERIAL],
 			width: 400
 		});
 		
@@ -74,7 +75,9 @@ CityChooseModal = extending(AbstractModal, (function() {
 	 */
 	CityChooseModal.prototype.hide = function() {
 		__APP.USER.selected_city = this.cities.getByID(this.content.find('#city_choose_modal_select').val());
-		localStorage.setItem('selected_city', JSON.stringify(__APP.USER.selected_city));
+		try {
+			localStorage.setItem('selected_city', JSON.stringify(__APP.USER.selected_city));
+		} catch (e) {}
 		this.__hide();
 		__APP.reload();
 		

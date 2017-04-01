@@ -1,0 +1,22 @@
+<script type="javascript/template" id="tmpl-modal">
+	<div class="modal_unit {modal_type} {modal_classes} -hidden -faded">
+		{modal_header}
+		<div class="modal_content ModalContent {modal_content_classes}">
+			{modal_content}
+		</div>
+		{modal_footer}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-modal-header">
+	<header class="modal_header">
+		<span>{title}</span>
+		{close_button}
+	</header>
+</script>
+
+<script type="javascript/template" id="tmpl-modal-footer">
+	<footer class="modal_footer">
+		{footer_buttons}
+	</footer>
+</script>
