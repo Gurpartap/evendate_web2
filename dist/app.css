@@ -858,15 +858,32 @@ hr[title]:before {
 	color: inherit;
 	outline: none !important;
 	text-decoration: none !important;
+	cursor: pointer;
 }
 
-.link {cursor: pointer}
+.link.-color_accent,
+.link.-text_color_accent {color: #f82969; color: var(--color_accent);}
 
-.link:not(.button):hover,
-.link:not(.button):focus {
-	color: #f82969;
-	color: var(--color_accent);
-}
+.link.-color_bubble_gum,
+.link.-text_color_bubble_gum {color: #f82969; color: var(--color_bubblegum);}
+
+.link.-color_bubble_gum_alt,
+.link.-text_color_bubble_gum_alt {color: #ff5f9e; color: var(--color_bubblegum_alt);}
+
+.link.-color_franklin,
+.link.-text_color_franklin {color: #00dc88; color: var(--color_franklin);}
+
+.link.-color_franklin_alt,
+.link.-text_color_franklin_alt {color: #23d792; color: var(--color_franklin_alt);}
+
+.link.-color_marginal,
+.link.-text_color_marginal {color: #9fa6b3;	color: var(--color_primary_50);}
+
+.link.-color_neutral,
+.link.-text_color_neutral {color: #c5c9d1;	color: var(--color_primary_30);}
+
+.link:not(.button):not([class*="color"]):hover,
+.link:not(.button):not([class*="color"]):focus {color: #f82969;	color: var(--color_accent);}
 
 /* /Common */
 /* Collapsing wrapper */
@@ -1709,6 +1726,10 @@ a.button:hover {text-decoration: none}
 
 .button.-color_primary,
 .button.-color_accent,
+.button.-color_franklin,
+.button.-color_franklin_alt,
+.button.-color_bubble_gum,
+.button.-color_bubble_gum_alt,
 .button.-color_telegram,
 .button.-color_vk,
 .button.-color_google,
@@ -3175,9 +3196,20 @@ body.-open_modal > .modal_wrapper {
 	border-radius: var(--material_border_radius);
 }
 
-.material.-floating {
+.material.-level_2_material {
+	box-shadow: 0 1px 7px hsla(0,0%,0%,.2);
+	--material_shadow: var(--material2_shadow);
+}
+
+.material.-floating_material {
 	box-shadow: 0 2px 15px hsla(0,0%,0%,.2);
-	box-shadow: var(--floating_material_shadow);
+	--material_shadow: var(--floating_material_shadow);
+}
+
+.material.-dark_material {
+	background-color: #3e4d66;
+	background-color: var(--color_primary);
+	color: #fff;
 }
 
 /* /Material */
@@ -4338,6 +4370,14 @@ body.-open_modal > .modal_wrapper {
 	text-transform: uppercase;
 	text-align: center;
 }
+
+.become_org_wrapper {
+	text-align: center;
+	padding: 12px;
+	margin-bottom: 24px;
+}
+
+.become_org_wrapper > .button {margin-bottom: 18px}
 
 /* event_card */
 

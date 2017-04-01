@@ -153,6 +153,13 @@ FeedPage = extending(Page, (function() {
 				{title: 'По времени', page: '/feed/timeline'}
 			]);
 			
+			PAGE.$view.find('.BecomeOrg').on('click', function(e) {
+				cookies.removeItem('auth_command');
+				cookies.removeItem('auth_entity_id');
+				(new AuthModal(location.origin + '/add/organization')).show();
+				
+				return false;
+			});
 			if(window.location.pathname == '/feed/favored' || window.location.pathname == '/feed/recommendations'){
 				__APP.changeState('/feed/actual', true, true);
 				return null;
