@@ -10,7 +10,7 @@
 __C = {
 	CLASSES: {
 		MATERIAL: 'material',
-		FLOATING_MATERIAL: 'material -floating',
+		FLOATING_MATERIAL: 'material -floating_material',
 		IMG_HOLDER: 'img_holder',
 		TEXT_COLORS: {
 			ACCENT: '-text_color_accent'
