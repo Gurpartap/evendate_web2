@@ -120,9 +120,8 @@ $(document)
 			action: 'get_urls',
 			mobile: isNotDesktop()
 		});
-		geolocation_jqxhr = outerAjax('https://freegeoip.net/json/');
 		
-		__APP.SERVER.multipleAjax(user_jqhxr, auth_urls_jqxhr, geolocation_jqxhr, function(user_data, auth_urls, geolocation) {
+		__APP.SERVER.multipleAjax(user_jqhxr, auth_urls_jqxhr, function(user_data, auth_urls) {
 			var selected_city;
 			
 			try {
@@ -131,21 +130,13 @@ $(document)
 				selected_city = false;
 			}
 			
-			__APP.LOCATION = geolocation;
 			__APP.AUTH_URLS = auth_urls;
 			
 			if (selected_city) {
 				__APP.USER.selected_city.setData(selected_city);
 			} else {
-				(new CitiesCollection()).fetchCities('timediff_seconds', null, null, function() {
-					var selected_city;
-					if (this.has(__APP.LOCATION.city)) {
-						selected_city = this.getByName(__APP.LOCATION.city);
-						__APP.USER.selected_city.setData(selected_city);
-						localStorage.setItem('selected_city', JSON.stringify(selected_city));
-					} else {
-						(new CityChooseModal(this)).show();
-					}
+				(new CitiesCollection()).fetchCities(new Fields('timediff_seconds', 'distance'), null, '-distance', function() {
+					(new CityChooseModal(this)).show();
 				});
 			}
 			
