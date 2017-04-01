@@ -22,7 +22,6 @@ __APP = {
 	 * @property {number} longitude
 	 * @property {number} metro_code
 	 */
-	LOCATION: {},
 	TOP_BAR: new AbstractTopBar(),
 	SIDEBAR: new AbstractSidebar(),
 	USER: new CurrentUser(),
