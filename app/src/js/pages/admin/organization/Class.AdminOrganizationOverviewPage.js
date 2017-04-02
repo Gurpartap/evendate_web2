@@ -1,20 +1,20 @@
 /**
- * @requires Class.StatisticsOrganizationPage.js
+ * @requires Class.AdminOrganizationPage.js
  */
 /**
  *
- * @class StatisticsOrganizationOverviewPage
- * @extends StatisticsOrganizationPage
+ * @class AdminOrganizationOverviewPage
+ * @extends AdminOrganizationPage
  */
-StatisticsOrganizationOverviewPage = extending(StatisticsOrganizationPage, (function() {
+AdminOrganizationOverviewPage = extending(AdminOrganizationPage, (function() {
 	/**
 	 *
 	 * @param {(string|number)} org_id
 	 * @constructor
-	 * @constructs StatisticsOrganizationOverviewPage
+	 * @constructs AdminOrganizationOverviewPage
 	 */
-	function StatisticsOrganizationOverviewPage(org_id) {
-		StatisticsOrganizationPage.apply(this, arguments);
+	function AdminOrganizationOverviewPage(org_id) {
+		AdminOrganizationPage.apply(this, arguments);
 		this.graphics_stats = new OrganizationsStatistics(this.id);
 		this.other_stats = new OrganizationsStatistics(this.id);
 	}
@@ -24,7 +24,7 @@ StatisticsOrganizationOverviewPage = extending(StatisticsOrganizationPage, (func
 	 * @param staff
 	 * @return {jQuery}
 	 */
-	StatisticsOrganizationOverviewPage.buildStaffBlock = function(title, staff) {
+	AdminOrganizationOverviewPage.buildStaffBlock = function(title, staff) {
 		if (staff.length) {
 			return tmpl('orgstat-overview-sidebar-wrapper-title', {title: title}).add(__APP.BUILD.avatarBlocks(staff, {
 				avatar_classes: ['-size_40x40','-rounded'],
@@ -35,7 +35,7 @@ StatisticsOrganizationOverviewPage = extending(StatisticsOrganizationPage, (func
 		return $();
 	};
 	
-	StatisticsOrganizationOverviewPage.prototype.fetchData = function() {
+	AdminOrganizationOverviewPage.prototype.fetchData = function() {
 		return this.fetching_data_defer = this.organization.fetchOrganizationWithEvents([
 			'description',
 			'img_medium_url',
@@ -54,9 +54,9 @@ StatisticsOrganizationOverviewPage = extending(StatisticsOrganizationPage, (func
 		});
 	};
 	
-	StatisticsOrganizationOverviewPage.prototype.buildAreaCharts = function() {
+	AdminOrganizationOverviewPage.prototype.buildAreaCharts = function() {
 		var self = this;
-		StatisticsPage.prototype.buildAreaCharts.call(self, {
+		AdminPage.prototype.buildAreaCharts.call(self, {
 			subscribe_unsubscribe: self.graphics_stats.subscribe.map(function(el, i) {
 				return {
 					time_value: el.time_value,
@@ -69,7 +69,7 @@ StatisticsOrganizationOverviewPage = extending(StatisticsOrganizationPage, (func
 		});
 	};
 	
-	StatisticsOrganizationOverviewPage.prototype.buildPieChart = function($container, data) {
+	AdminOrganizationOverviewPage.prototype.buildPieChart = function($container, data) {
 		var pie_chart_options = {
 			chart: {
 				type: 'pie',
@@ -140,7 +140,7 @@ StatisticsOrganizationOverviewPage = extending(StatisticsOrganizationPage, (func
 		$container.highcharts($.extend(true, {}, this.highchart_defaults, pie_chart_options, {series: pieChartSeriesNormalize(data)}));
 	};
 	
-	StatisticsOrganizationOverviewPage.prototype.render = function() {
+	AdminOrganizationOverviewPage.prototype.render = function() {
 		var PAGE = this,
 			stat_dynamics = {
 				scale: Statistics.SCALES.WEEK,
@@ -170,7 +170,7 @@ StatisticsOrganizationOverviewPage = extending(StatisticsOrganizationPage, (func
 		this.renderHeaderTabs();
 		__APP.changeTitle([{
 			title: 'Организации',
-			page: '/statistics'
+			page: '/admin'
 		}, this.organization.short_name]);
 		
 		this.$wrapper.html(tmpl('orgstat-overview', $.extend(true, {}, this.organization, {
@@ -178,8 +178,8 @@ StatisticsOrganizationOverviewPage = extending(StatisticsOrganizationPage, (func
 				entity: 'organization',
 				block_classes: ['-stack']
 			}),
-			staff_block: StatisticsOrganizationOverviewPage.buildStaffBlock('Администраторы', this.organization.staff.getSpecificStaff(OneUser.ROLE.ADMIN, staffs_additional_fields))
-				.add(StatisticsOrganizationOverviewPage.buildStaffBlock('Модераторы', this.organization.staff.getSpecificStaff(OneUser.ROLE.MODERATOR, staffs_additional_fields))),
+			staff_block: AdminOrganizationOverviewPage.buildStaffBlock('Администраторы', this.organization.staff.getSpecificStaff(OneUser.ROLE.ADMIN, staffs_additional_fields))
+			                                          .add(AdminOrganizationOverviewPage.buildStaffBlock('Модераторы', this.organization.staff.getSpecificStaff(OneUser.ROLE.MODERATOR, staffs_additional_fields))),
 			event_blocks: this.organization.events.length ? tmpl('orgstat-overview-sidebar-wrapper', {
 				content: tmpl('orgstat-overview-sidebar-wrapper-title', {title: 'Предстоящие события'})
 					.add(tmpl('orgstat-event-block', this.organization.events.map(function(event) {
@@ -236,5 +236,5 @@ StatisticsOrganizationOverviewPage = extending(StatisticsOrganizationPage, (func
 		bindPageLinks(this.$wrapper);
 	};
 	
-	return StatisticsOrganizationOverviewPage;
+	return AdminOrganizationOverviewPage;
 }()));

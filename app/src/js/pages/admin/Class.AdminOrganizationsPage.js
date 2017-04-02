@@ -1,25 +1,25 @@
 /**
- * @requires Class.StatisticsPage.js
+ * @requires Class.AdminPage.js
  */
 /**
  *
- * @class StatisticsOverviewPage
- * @extends StatisticsPage
+ * @class AdminOrganizationsPage
+ * @extends AdminPage
  */
-StatisticsOverviewPage = extending(StatisticsPage, (function() {
+AdminOrganizationsPage = extending(AdminPage, (function() {
 	/**
 	 *
 	 * @constructor
-	 * @constructs StatisticsOverviewPage
+	 * @constructs AdminOrganizationsPage
 	 */
-	function StatisticsOverviewPage() {
-		StatisticsPage.apply(this);
+	function AdminOrganizationsPage() {
+		AdminPage.apply(this);
 		this.my_organizations_fields = ['img_medium_url', 'subscribed_count', 'staff'];
 		this.page_title = 'Организации';
 		this.my_organizations = new OrganizationsCollection();
 	}
 	
-	StatisticsOverviewPage.buildMyOrganizationsBlocks = function(organizations) {
+	AdminOrganizationsPage.buildMyOrganizationsBlocks = function(organizations) {
 		return tmpl('statistics-overview-organization', organizations.map(function(org) {
 			var avatars_max_count = 2,
 				staff_additional_fields = {
@@ -68,11 +68,11 @@ StatisticsOverviewPage = extending(StatisticsPage, (function() {
 		}));
 	};
 	
-	StatisticsOverviewPage.prototype.fetchData = function() {
+	AdminOrganizationsPage.prototype.fetchData = function() {
 		return this.fetching_data_defer = this.my_organizations.fetchMyOrganizations('admin', this.my_organizations_fields, 10, '');
 	};
 	
-	StatisticsOverviewPage.prototype.bindOrganizationsEvents = function($parent) {
+	AdminOrganizationsPage.prototype.bindOrganizationsEvents = function($parent) {
 		trimAvatarsCollection($parent);
 		bindPageLinks($parent);
 		__APP.MODALS.bindCallModal($parent);
@@ -80,14 +80,14 @@ StatisticsOverviewPage = extending(StatisticsPage, (function() {
 		return $parent;
 	};
 	
-	StatisticsOverviewPage.prototype.bindUploadOnScroll = function() {
+	AdminOrganizationsPage.prototype.bindUploadOnScroll = function() {
 		var PAGE = this,
 			$window = $(window),
 			scrollEvent = function() {
 				if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.is_upload_disabled) {
 					$window.off('scroll.uploadOrganizations');
 					PAGE.my_organizations.fetchMyOrganizations('admin', PAGE.my_organizations_fields, 10, '', function(organizations) {
-						var $organizations = StatisticsOverviewPage.buildMyOrganizationsBlocks(organizations);
+						var $organizations = AdminOrganizationsPage.buildMyOrganizationsBlocks(organizations);
 						if (organizations.length) {
 							PAGE.$wrapper.find('.StatOverviewOrganizations').append($organizations);
 							PAGE.bindOrganizationsEvents($organizations);
@@ -104,25 +104,25 @@ StatisticsOverviewPage = extending(StatisticsPage, (function() {
 		}
 	};
 	
-	StatisticsOverviewPage.prototype.init = function() {
+	AdminOrganizationsPage.prototype.init = function() {
 		this.bindOrganizationsEvents(this.$wrapper);
 		this.bindUploadOnScroll();
 	};
 	
-	StatisticsOverviewPage.prototype.render = function() {
+	AdminOrganizationsPage.prototype.render = function() {
 		if(__APP.USER.id === -1){
 			__APP.changeState('/feed/actual', true, true);
 			return null;
 		}
 		this.$wrapper.html(tmpl('statistics-overview-wrapper', {
-			organizations: StatisticsOverviewPage.buildMyOrganizationsBlocks(this.my_organizations)
+			organizations: AdminOrganizationsPage.buildMyOrganizationsBlocks(this.my_organizations)
 		}));
 		this.init();
 	};
 	
-	StatisticsOverviewPage.prototype.destroy = function() {
+	AdminOrganizationsPage.prototype.destroy = function() {
 		$(window).off('scroll.uploadOrganizations');
 	};
 	
-	return StatisticsOverviewPage;
+	return AdminOrganizationsPage;
 }()));

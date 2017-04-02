@@ -1,26 +1,26 @@
 /**
- * @requires Class.StatisticsEventPage.js
+ * @requires Class.AdminEventPage.js
  */
 /**
  *
- * @class StatisticsEventOverviewPage
- * @extends StatisticsEventPage
+ * @class AdminEventOverviewPage
+ * @extends AdminEventPage
  */
-StatisticsEventOverviewPage = extending(StatisticsEventPage, (function() {
+AdminEventOverviewPage = extending(AdminEventPage, (function() {
 	/**
 	 *
 	 * @constructor
-	 * @constructs StatisticsEventOverviewPage
+	 * @constructs AdminEventOverviewPage
 	 * @param {(string|number)} event_id
 	 */
-	function StatisticsEventOverviewPage(event_id) {
-		StatisticsEventPage.apply(this, arguments);
+	function AdminEventOverviewPage(event_id) {
+		AdminEventPage.apply(this, arguments);
 		
 		this.graphics_stats = new EventStatistics(this.id);
 		this.scoreboards_stats = new EventStatistics(this.id);
 	}
 	
-	StatisticsEventOverviewPage.prototype.fetchData = function() {
+	AdminEventOverviewPage.prototype.fetchData = function() {
 		return this.fetching_data_defer = this.event.fetchEvent(new Fields(
 			'image_horizontal_medium_url',
 			'organization_short_name',
@@ -30,7 +30,7 @@ StatisticsEventOverviewPage = extending(StatisticsEventPage, (function() {
 		));
 	};
 	
-	StatisticsEventOverviewPage.prototype.render = function() {
+	AdminEventOverviewPage.prototype.render = function() {
 		var PAGE = this;
 		
 		if(__APP.USER.id === -1){
@@ -39,10 +39,10 @@ StatisticsEventOverviewPage = extending(StatisticsEventPage, (function() {
 		}
 		__APP.changeTitle([{
 			title: 'Организации',
-			page: '/statistics'
+			page: '/admin'
 		}, {
 			title: this.event.organization_short_name,
-			page: '/statistics/organization/' + this.event.organization_id
+			page: '/admin/organization/' + this.event.organization_id
 		}, this.event.title]);
 		
 		this.$wrapper.html(tmpl('eventstat-overview', $.extend(true, {}, this.event, {
@@ -84,5 +84,5 @@ StatisticsEventOverviewPage = extending(StatisticsEventPage, (function() {
 		bindPageLinks(PAGE.$wrapper);
 	};
 	
-	return StatisticsEventOverviewPage;
+	return AdminEventOverviewPage;
 }()));

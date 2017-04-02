@@ -4,18 +4,18 @@
 /**
  *
  * @abstract
- * @class StatisticsPage
+ * @class AdminPage
  * @extends Page
  */
-StatisticsPage = extending(Page, (function() {
+AdminPage = extending(Page, (function() {
 	/**
 	 *
 	 * @constructor
-	 * @constructs StatisticsPage
+	 * @constructs AdminPage
 	 */
-	function StatisticsPage() {
+	function AdminPage() {
 		Page.apply(this);
-		this.state_name = 'statistics';
+		this.state_name = 'admin';
 		this.SCALES = {
 			MINUTE: 'minute',
 			HOUR: 'hour',
@@ -48,7 +48,7 @@ StatisticsPage = extending(Page, (function() {
 	 * @param {object} raw_data
 	 * @returns {object}
 	 */
-	StatisticsPage.prototype.areaChartSeriesNormalize = function(raw_data) {
+	AdminPage.prototype.areaChartSeriesNormalize = function(raw_data) {
 		var CONVERSATIONS = {
 				open_conversion: {
 					with: 'open_site',
@@ -128,7 +128,7 @@ StatisticsPage = extending(Page, (function() {
 	 * @param {object} data
 	 * @param {object} [additional_options]
 	 */
-	StatisticsPage.prototype.buildAreaCharts = function(data, additional_options) {
+	AdminPage.prototype.buildAreaCharts = function(data, additional_options) {
 		var self = this,
 			normalized_series = self.areaChartSeriesNormalize(data),
 			FIELDS = {
@@ -389,7 +389,7 @@ StatisticsPage = extending(Page, (function() {
 	 * @param {Array} [order]
 	 * @param {string} [size="normal"]
 	 */
-	StatisticsPage.prototype.updateScoreboards = function($scoreboards_wrapper, data, titles, order, size) {
+	AdminPage.prototype.updateScoreboards = function($scoreboards_wrapper, data, titles, order, size) {
 		var with_dynamics = !!data.dynamics;
 		if (!order)
 			order = Object.keys(titles);
@@ -442,5 +442,5 @@ StatisticsPage = extending(Page, (function() {
 		});
 	};
 	
-	return StatisticsPage;
+	return AdminPage;
 }()));

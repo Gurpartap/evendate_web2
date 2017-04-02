@@ -1,26 +1,26 @@
 /**
- * @requires ../Class.StatisticsPage.js
+ * @requires ../Class.AdminPage.js
  */
 /**
  * @abstract
- * @class StatisticsOrganizationPage
- * @extends StatisticsPage
+ * @class AdminOrganizationPage
+ * @extends AdminPage
  */
-StatisticsOrganizationPage = extending(StatisticsPage, (function() {
+AdminOrganizationPage = extending(AdminPage, (function() {
 	/**
 	 *
 	 * @param {(string|number)} org_id
 	 * @constructor
-	 * @constructs StatisticsOrganizationPage
+	 * @constructs AdminOrganizationPage
 	 */
-	function StatisticsOrganizationPage(org_id) {
-		StatisticsPage.apply(this);
+	function AdminOrganizationPage(org_id) {
+		AdminPage.apply(this);
 		this.id = org_id;
 		this.organization = new OneOrganization(this.id);
 		this.with_header_tabs = true;
 	}
 	
-	StatisticsOrganizationPage.prototype.fetchData = function() {
+	AdminOrganizationPage.prototype.fetchData = function() {
 		return this.fetching_data_defer = this.organization.fetchOrganization([
 			'description',
 			'img_medium_url',
@@ -41,12 +41,12 @@ StatisticsOrganizationPage = extending(StatisticsPage, (function() {
 		]);
 	};
 	
-	StatisticsOrganizationPage.prototype.renderHeaderTabs = function(){
+	AdminOrganizationPage.prototype.renderHeaderTabs = function(){
 		__APP.renderHeaderTabs([
-			{title: 'Обзор', page: '/statistics/organization/'+this.id+'/overview'},
-			{title: 'События', page: '/statistics/organization/'+this.id+'/events'}
+			{title: 'Обзор', page: '/admin/organization/'+this.id+'/overview'},
+			{title: 'События', page: '/admin/organization/'+this.id+'/events'}
 		]);
 	};
 	
-	return StatisticsOrganizationPage;
+	return AdminOrganizationPage;
 }()));

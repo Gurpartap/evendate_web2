@@ -46,34 +46,30 @@ Page = (function() {
 	 * @return {Page}
 	 */
 	Page.routeNewPage = function(path) {
-		var path_split = decodeURIComponent(path).split('/').splice(1),
-			pages_child = __APP.ROUTING,
-			args = [], i, key, PageClass;
+		var path_map = decodeURIComponent(path).split('/'),
+			args = [],
+			PageClass;
 		
-		for (i = 0; i < path_split.length; i++) {
-			if (pages_child.hasOwnProperty(path_split[i])) {
-				if (i < path_split.length - 1) {
-					pages_child = pages_child[path_split[i]];
-				} else {
-					PageClass = pages_child[path_split[i]];
-					break;
-				}
-			} else {
-				for (key in pages_child) {
-					if (key.indexOf('^') === 0 && (new RegExp(key)).test(path_split[i])) {
-						args.push(path_split[i]);
-						if (i < path_split.length - 1) {
-							pages_child = pages_child[key];
-						} else {
-							PageClass = pages_child[key];
-						}
-						break;
+		PageClass = path_map.reduce(function(tree_chunk, path_chunk) {
+			if (!path_chunk)
+				return tree_chunk;
+			
+			if (tree_chunk.hasOwnProperty(path_chunk))
+				return tree_chunk[path_chunk];
+			else
+				return Object.keys(tree_chunk).reduce(function(found_chunk, key) {
+					if (!found_chunk && key.indexOf('^') === 0 && (new RegExp(key)).test(path_chunk)) {
+						args.push(path_chunk);
+						
+						return tree_chunk[key];
 					}
-				}
-			}
-		}
-		PageClass = PageClass ? PageClass : pages_child; // In case of trailing slash in url
-		PageClass = PageClass.prototype instanceof Page ? PageClass : PageClass['']; // Open default page
+					
+					return found_chunk;
+				}, false);
+			
+		}, __APP.ROUTING);
+		
+		PageClass = (PageClass.prototype instanceof Page) ? PageClass : ((PageClass[''] && PageClass[''].prototype instanceof Page) ? PageClass[''] : NotFoundPage); // Open default page
 		return new (Function.prototype.bind.apply(PageClass, [null].concat(args)))(); // new Page(...args)
 	};
 	

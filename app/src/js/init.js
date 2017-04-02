@@ -10,6 +10,22 @@ window.paceOptions = {
 __stats = [];
 askToSubscribe = null;
 
+function checkRedirects(pathname) {
+	if (__APP.USER.isLoggedOut()) {
+		if (pathname.contains('/admin')) {
+			return __APP.changeState('/', true, true);
+		}
+	}
+	
+	if (pathname.contains('/statistics')) {
+		return __APP.changeState(pathname.replace('statistics', 'admin'), true, true);
+	}
+	
+	return false;
+}
+
+checkRedirects(window.location.pathname);
+
 $(document)
 	.ajaxStart(function() {
 		Pace.restart()
@@ -22,8 +38,7 @@ $(document)
 	.ready(function() {
 		var OneSignal = window.OneSignal || [],
 			user_jqhxr,
-			auth_urls_jqxhr,
-			geolocation_jqxhr;
+			auth_urls_jqxhr;
 		
 		OneSignal.push(["init", {
 			appId: "7471a586-01f3-4eef-b989-c809700a8658",
@@ -124,6 +139,8 @@ $(document)
 		__APP.SERVER.multipleAjax(user_jqhxr, auth_urls_jqxhr, function(user_data, auth_urls) {
 			var selected_city;
 			
+			checkRedirects(window.location.pathname);
+			
 			try {
 				selected_city = JSON.parse(localStorage.getItem('selected_city'));
 			} catch (e) {
@@ -140,7 +157,7 @@ $(document)
 				});
 			}
 			
-			if(__APP.USER.id === -1){
+			if(__APP.USER.isLoggedOut()){
 				__APP.TOP_BAR = new TopBarNoAuth();
 				__APP.SIDEBAR = new SidebarNoAuth();
 			} else {

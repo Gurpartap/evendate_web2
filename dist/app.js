@@ -4622,6 +4622,126 @@ OrdersCollection = extending(EntitiesCollection, (function() {
  * @requires ../Class.OneEntity.js
  */
 /**
+ *
+ * @class SearchResults
+ * @extends OneEntity
+ */
+SearchResults = extending(OneEntity, (function() {
+	/**
+	 * @typedef {function({
+ *   [events]: Array<OneEvent>,
+ *   [organizations]: Array<OneOrganization>
+ * })} SearchResultsAJAXCallback
+	 */
+	/**
+	 *
+	 * @param {string} query_string
+	 * @constructor
+	 * @constructs SearchResults
+	 */
+	function SearchResults(query_string) {
+		this.query_string = query_string;
+		this.events = new EventsCollection();
+		this.organizations = new OrganizationsCollection();
+	}
+	/**
+	 *
+	 * @param {string} query_string
+	 * @returns {{ [q]: {string}, [tags]: {string} }}
+	 */
+	SearchResults.sanitizeQueryVar = function(query_string) {
+		var data = {};
+		if (query_string.indexOf('#') === 0) {
+			data.tags = query_string.replace('#', '');
+		} else {
+			data.q = query_string;
+		}
+		return data;
+	};
+	/**
+	 *
+	 * @param {string} query_string
+	 * @param {AJAXData} [ajax_data]
+	 * @param {SearchResultsAJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	SearchResults.fetchEventsAndOrganizations = function(query_string, ajax_data, success) {
+		return __APP.SERVER.getData('/api/v1/search/', $.extend({}, SearchResults.sanitizeQueryVar(query_string), ajax_data), success);
+	};
+	/**
+	 *
+	 * @param {AJAXData} [events_ajax_data]
+	 * @param {function(organizations: Array<OneEvent>)} [success]
+	 * @returns {jqPromise}
+	 */
+	SearchResults.prototype.fetchEvents = function(events_ajax_data, success) {
+		var self = this,
+			ajax_data = {
+				fields: 'events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length}))
+			};
+		
+		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data.events);
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {AJAXData} [organizations_ajax_data]
+	 * @param {function(organizations: Array<OneOrganization>)} [success]
+	 * @returns {jqPromise}
+	 */
+	SearchResults.prototype.fetchOrganizations = function(organizations_ajax_data, success) {
+		var self = this,
+			ajax_data = {
+				fields: 'organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length}))
+			};
+		
+		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data.organizations);
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {AJAXData} [events_ajax_data]
+	 * @param {AJAXData} [organizations_ajax_data]
+	 * @param {SearchResultsAJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	SearchResults.prototype.fetchEventsAndOrganizations = function(events_ajax_data, organizations_ajax_data, success) {
+		var self = this,
+			ajax_data = {fields: new Fields()};
+		
+		if (events_ajax_data) {
+			ajax_data.fields.push({
+				events: $.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length})
+			});
+		}
+		if (organizations_ajax_data && !SearchResults.sanitizeQueryVar(self.query_string).tags) {
+			ajax_data.fields.push({
+				organizations: $.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length})
+			});
+		}
+		
+		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data);
+			}
+		});
+	};
+	
+	return SearchResults;
+}()));
+/**
+ * @requires ../Class.OneEntity.js
+ */
+/**
  * @typedef {object} Privilege
  * @property {number} role_id
  * @property {OneUser.ROLE} name
@@ -5239,126 +5359,6 @@ OrganizationsStatistics = extending(Statistics, (function() {
 	}
 	
 	return OrganizationsStatistics;
-}()));
-/**
- * @requires ../Class.OneEntity.js
- */
-/**
- *
- * @class SearchResults
- * @extends OneEntity
- */
-SearchResults = extending(OneEntity, (function() {
-	/**
-	 * @typedef {function({
- *   [events]: Array<OneEvent>,
- *   [organizations]: Array<OneOrganization>
- * })} SearchResultsAJAXCallback
-	 */
-	/**
-	 *
-	 * @param {string} query_string
-	 * @constructor
-	 * @constructs SearchResults
-	 */
-	function SearchResults(query_string) {
-		this.query_string = query_string;
-		this.events = new EventsCollection();
-		this.organizations = new OrganizationsCollection();
-	}
-	/**
-	 *
-	 * @param {string} query_string
-	 * @returns {{ [q]: {string}, [tags]: {string} }}
-	 */
-	SearchResults.sanitizeQueryVar = function(query_string) {
-		var data = {};
-		if (query_string.indexOf('#') === 0) {
-			data.tags = query_string.replace('#', '');
-		} else {
-			data.q = query_string;
-		}
-		return data;
-	};
-	/**
-	 *
-	 * @param {string} query_string
-	 * @param {AJAXData} [ajax_data]
-	 * @param {SearchResultsAJAXCallback} [success]
-	 * @returns {jqPromise}
-	 */
-	SearchResults.fetchEventsAndOrganizations = function(query_string, ajax_data, success) {
-		return __APP.SERVER.getData('/api/v1/search/', $.extend({}, SearchResults.sanitizeQueryVar(query_string), ajax_data), success);
-	};
-	/**
-	 *
-	 * @param {AJAXData} [events_ajax_data]
-	 * @param {function(organizations: Array<OneEvent>)} [success]
-	 * @returns {jqPromise}
-	 */
-	SearchResults.prototype.fetchEvents = function(events_ajax_data, success) {
-		var self = this,
-			ajax_data = {
-				fields: 'events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length}))
-			};
-		
-		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data.events);
-			}
-		});
-	};
-	/**
-	 *
-	 * @param {AJAXData} [organizations_ajax_data]
-	 * @param {function(organizations: Array<OneOrganization>)} [success]
-	 * @returns {jqPromise}
-	 */
-	SearchResults.prototype.fetchOrganizations = function(organizations_ajax_data, success) {
-		var self = this,
-			ajax_data = {
-				fields: 'organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length}))
-			};
-		
-		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data.organizations);
-			}
-		});
-	};
-	/**
-	 *
-	 * @param {AJAXData} [events_ajax_data]
-	 * @param {AJAXData} [organizations_ajax_data]
-	 * @param {SearchResultsAJAXCallback} [success]
-	 * @returns {jqPromise}
-	 */
-	SearchResults.prototype.fetchEventsAndOrganizations = function(events_ajax_data, organizations_ajax_data, success) {
-		var self = this,
-			ajax_data = {fields: new Fields()};
-		
-		if (events_ajax_data) {
-			ajax_data.fields.push({
-				events: $.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length})
-			});
-		}
-		if (organizations_ajax_data && !SearchResults.sanitizeQueryVar(self.query_string).tags) {
-			ajax_data.fields.push({
-				organizations: $.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length})
-			});
-		}
-		
-		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data);
-			}
-		});
-	};
-	
-	return SearchResults;
 }()));
 /**
  * @requires ../Class.OneEntity.js
@@ -10864,33 +10864,29 @@ Page = (function() {
 	 * @return {Page}
 	 */
 	Page.routeNewPage = function(path) {
-		var path_split = decodeURIComponent(path).split('/').splice(1),
-			pages_child = __APP.ROUTING,
-			args = [], i, key, PageClass;
+		var path_map = decodeURIComponent(path).split('/'),
+			args = [],
+			PageClass;
 		
-		for (i = 0; i < path_split.length; i++) {
-			if (pages_child.hasOwnProperty(path_split[i])) {
-				if (i < path_split.length - 1) {
-					pages_child = pages_child[path_split[i]];
-				} else {
-					PageClass = pages_child[path_split[i]];
-					break;
-				}
-			} else {
-				for (key in pages_child) {
-					if (key.indexOf('^') === 0 && (new RegExp(key)).test(path_split[i])) {
-						args.push(path_split[i]);
-						if (i < path_split.length - 1) {
-							pages_child = pages_child[key];
-						} else {
-							PageClass = pages_child[key];
-						}
-						break;
+		PageClass = path_map.reduce(function(tree_chunk, path_chunk) {
+			if (!path_chunk)
+				return tree_chunk;
+			
+			if (tree_chunk.hasOwnProperty(path_chunk))
+				return tree_chunk[path_chunk];
+			else
+				return Object.keys(tree_chunk).reduce(function(found_chunk, key) {
+					if (!found_chunk && key.indexOf('^') === 0 && (new RegExp(key)).test(path_chunk)) {
+						args.push(path_chunk);
+						
+						return tree_chunk[key];
 					}
-				}
-			}
-		}
-		PageClass = PageClass ? PageClass : pages_child; // In case of trailing slash in url
+					
+					return found_chunk;
+				}, false);
+			
+		}, __APP.ROUTING);
+		
 		PageClass = PageClass.prototype instanceof Page ? PageClass : PageClass['']; // Open default page
 		return new (Function.prototype.bind.apply(PageClass, [null].concat(args)))(); // new Page(...args)
 	};
@@ -10953,6 +10949,1121 @@ Page = (function() {
 	
 	return Page;
 }());
+/**
+ * @requires ../Class.Page.js
+ */
+/**
+ *
+ * @abstract
+ * @class AdminPage
+ * @extends Page
+ */
+AdminPage = extending(Page, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs AdminPage
+	 */
+	function AdminPage() {
+		Page.apply(this);
+		this.state_name = 'admin';
+		this.SCALES = {
+			MINUTE: 'minute',
+			HOUR: 'hour',
+			DAY: 'day',
+			WEEK: 'week',
+			MONTH: 'month',
+			YEAR: 'year',
+			OVERALL: 'overall'
+		};
+		this.highchart_defaults = {
+			chart: {
+				backgroundColor: null,
+				plotBorderWidth: null,
+				plotShadow: false,
+				style: {
+					fontFamily: 'inherit',
+					fontSize: 'inherit'
+				}
+			},
+			title: {
+				text: false
+			},
+			credits: {
+				enabled: false
+			}
+		};
+	}
+	/**
+	 *
+	 * @param {object} raw_data
+	 * @returns {object}
+	 */
+	AdminPage.prototype.areaChartSeriesNormalize = function(raw_data) {
+		var CONVERSATIONS = {
+				open_conversion: {
+					with: 'open_site',
+					to: 'view'
+				},
+				fave_conversion: {
+					with: 'fave',
+					to: 'open_site'
+				},
+				conversion: {
+					with: 'subscribe',
+					to: 'view'
+				}
+			},
+			COMPARISONS = {
+				subscribe_unsubscribe: {
+					subscribe: 'subscribe',
+					unsubscribe: 'unsubscribe'
+				}
+			},
+			STD_NAMES = {
+				'notifications_sent': 'Отправлено уведомлений',
+				'view': 'Просмотры',
+				'view_detail': 'Открытий страницы события из ленты Evendate',
+				'conversion': 'Конверсия',
+				'subscribe': 'Подписалось',
+				'unsubscribe': 'Отписалось',
+				'open_site': 'Открытий страницы события',
+				'open_conversion': 'Конверсия просмотра события в ленте к открытию страницы события',
+				'fave': 'Кол-во пользователей, которые добавили событие в избранное',
+				'fave_conversion': 'Конверсия открытия страницы события к добавлениям в избранное'
+			},
+			HIDDEN_SERIES_OPTIONS = {
+				showInLegend: false,
+				lineWidth: 0,
+				fillOpacity: 0,
+				states: {
+					hover: {
+						enabled: false
+					}
+				}
+			},
+			output = {};
+		
+		function dataNormalize(raw_data, field, value_field_name) {
+			return {
+				name: STD_NAMES[field],
+				data: raw_data.map(function(line, i) {
+					return [moment.unix(line.time_value).valueOf(), line[value_field_name]];
+				})
+			}
+		}
+		
+		
+		$.each(raw_data, function(key, data){
+			output[key] = [];
+			if(CONVERSATIONS.hasOwnProperty(key)){
+				output[key].push($.extend(true, { tooltip: {valueSuffix: ' %'} }, dataNormalize(data, key, 'value')));
+				$.each(CONVERSATIONS[key], function(field_key, field) {
+					output[key].push($.extend(true, {}, HIDDEN_SERIES_OPTIONS, dataNormalize(data, field, field_key)));
+				})
+			}
+			else if(COMPARISONS.hasOwnProperty(key)) {
+				$.each(COMPARISONS[key], function(field_key, field) {
+					output[key].push(dataNormalize(data, field, field_key));
+				})
+			}
+			else {
+				output[key].push(dataNormalize(data, key, 'value'));
+			}
+		});
+		
+		return output;
+	};
+	/**
+	 *
+	 * @param {object} data
+	 * @param {object} [additional_options]
+	 */
+	AdminPage.prototype.buildAreaCharts = function(data, additional_options) {
+		var self = this,
+			normalized_series = self.areaChartSeriesNormalize(data),
+			FIELDS = {
+				notifications_sent: {
+					title: 'Отправлено уведомлений пользователям',
+					wrapper_class: 'NotificationsSentAreaChart'
+				},
+				view: {
+					title: 'Просмотры',
+					wrapper_class: 'ViewAreaChart'
+				},
+				view_detail: {
+					title: 'Открытий страницы события',
+					wrapper_class: 'ViewDetailAreaChart'
+				},
+				open_site: {
+					title: 'Открытий страницы события из ленты Evendate',
+					wrapper_class: 'OpenSiteAreaChart'
+				},
+				open_conversion: {
+					title: 'Конверсия просмотров/открытий',
+					wrapper_class: 'OpenConversionsAreaChart'
+				},
+				fave: {
+					title: 'Добавлений в избранное',
+					wrapper_class: 'FaveAreaChart'
+				},
+				fave_conversion: {
+					title: 'Конверсия открытий/добавлений в избранное',
+					wrapper_class: 'FaveConversionsAreaChart'
+				},
+				subscribe_unsubscribe: {
+					title: 'Подписчики',
+					wrapper_class: 'SubscriberAreaChart'
+				},
+				conversion: {
+					title: 'Конверсия просмотров/подписок',
+					wrapper_class: 'ConversionAreaChart'
+				}
+			},
+			FILL_COLORS = [
+				['rgba(35, 215, 146, 0.18)', 'rgba(101, 101, 101, 0.6)', 'rgba(101, 101, 101, 0.6)'],
+				['rgba(35, 215, 146, 0.09)', 'rgba(101, 101, 101, 0.6)', 'rgba(101, 101, 101, 0.6)']
+			],
+			area_chart_options = $.extend(true, {}, self.highchart_defaults, {
+				chart: {
+					type: 'areaspline',
+					plotBackgroundColor: '#fcfcfc',
+					plotBorderColor: '#ebebeb',
+					plotBorderWidth: 1
+				},
+				colors: [__C.COLORS.FRANKLIN, __C.COLORS.MUTED_80, __C.COLORS.ACCENT, __C.COLORS.MUTED, __C.COLORS.MUTED_50, __C.COLORS.MUTED_30],
+				title: {
+					align: 'left',
+					margin: 20
+				},
+				legend: {
+					enabled: true,
+					align: 'left',
+					itemStyle: {color: __C.COLORS.TEXT, cursor: 'pointer', fontSize: '14px', fontWeight: '500', y: 0},
+					itemMarginTop: 24,
+					itemMarginBottom: 5,
+					symbolHeight: 18,
+					symbolWidth: 18,
+					symbolRadius: 9,
+					itemDistance: 42,
+					x: 30
+				},
+				plotOptions: {
+					series: {
+						states: {
+							hover: {
+								lineWidth: 2
+							}
+						}
+					},
+					areaspline: {
+						fillOpacity: 0.5,
+						marker: {
+							enabled: false,
+							symbol: 'circle',
+							radius: 2,
+							states: {
+								hover: {
+									enabled: true
+								}
+							}
+						},
+						dataGrouping: {
+							dateTimeLabelFormats: {
+								millisecond: ['%b %e, %H:%M:%S.%L', '%b %e, %H:%M:%S.%L', '-%H:%M:%S.%L'],
+								second: ['%b %e, %H:%M:%S', '%b %e, %H:%M:%S', '-%H:%M:%S'],
+								minute: ['%b %e, %H:%M', '%b %e, %H:%M', '-%H:%M'],
+								hour: ['%b %e, %H:%M', '%b %e, %H:%M', '-%H:%M'],
+								day: ['%b %e, %Y', '%b %e', '-%b %e, %Y'],
+								week: ['%b %e, %Y', '%b %e', '-%b %e, %Y'],
+								month: ['%B %Y', '%B', '-%B %Y'],
+								year: ['%Y', '%Y', '-%Y']
+							}
+						}
+					}
+				},
+				tooltip: {
+					headerFormat: '<b>{point.key}</b><br/>',
+					positioner: function(labelWidth, labelHeight) {
+						return {
+							x: this.chart.plotLeft,
+							y: this.chart.plotTop
+						};
+					},
+					shadow: false,
+					shape: 'square',
+					valueDecimals: 0,
+					xDateFormat: '%e %b %Y',
+					shared: true
+				},
+				scrollbar: {enabled: false},
+				navigator: {
+					outlineColor: '#ebebeb',
+					outlineWidth: 1,
+					maskInside: false,
+					maskFill: 'rgba(245, 245, 245, 0.66)',
+					handles: {
+						backgroundColor: '#9fa7b6',
+						borderColor: '#fff'
+					},
+					xAxis: {
+						gridLineWidth: 0,
+						labels: {
+							align: 'left',
+							reserveSpace: true,
+							style: {
+								color: '#888'
+							},
+							x: 0,
+							y: null
+						}
+					}
+				},
+				rangeSelector: {
+					buttonTheme: {
+						width: null,
+						height: 22,
+						fill: 'none',
+						stroke: 'none',
+						r: 14,
+						style: {
+							color: __C.COLORS.MUTED_80,
+							fontSize: '13px',
+							fontWeight: '400',
+							textTransform: 'uppercase',
+							dominantBaseline: 'middle'
+						},
+						states: {
+							hover: {
+								fill: __C.COLORS.MUTED_50,
+								style: {
+									color: '#fff'
+								}
+							},
+							select: {
+								fill: __C.COLORS.MUTED_80,
+								style: {
+									color: '#fff',
+									fontWeight: '400'
+								}
+							}
+						}
+					},
+					buttons: [{
+						type: 'day',
+						count: 7,
+						text: "\xa0\xa0\xa0Неделя\xa0\xa0\xa0"
+					}, {
+						type: 'month',
+						count: 1,
+						text: "\xa0\xa0\xa0Месяц\xa0\xa0\xa0"
+					}, {
+						type: 'year',
+						count: 1,
+						text: "\xa0\xa0\xa0Год\xa0\xa0\xa0"
+					}, {
+						type: 'all',
+						text: "\xa0\xa0\xa0Все\xa0время\xa0\xa0\xa0"
+					}],
+					allButtonsEnabled: true,
+					selected: 2,
+					labelStyle: {
+						display: 'none'
+					},
+					inputEnabled: false
+				},
+				xAxis: {
+					gridLineWidth: 1,
+					gridLineDashStyle: 'dash',
+					type: 'datetime',
+					showEmpty: false,
+					tickPosition: 'inside',
+					dateTimeLabelFormats: {
+						minute: '%H:%M',
+						hour: '%H:%M',
+						day: '%e %b',
+						week: '%e %b',
+						month: '%b %y',
+						year: '%Y'
+					}
+				},
+				yAxis: {
+					allowDecimals: false,
+					floor: 0,
+					min: 0,
+					gridLineDashStyle: 'dash',
+					opposite: false,
+					title: {
+						text: false
+					}
+				}
+			}, additional_options);
+		
+		$.each(normalized_series, function(key) {
+			var field_data = {
+				title: {text: FIELDS[key].title}
+			};
+			
+			field_data.series = normalized_series[key].map(function(series_unit, i) {
+				if (series_unit.fillOpacity !== 0) {
+					return $.extend(true, {}, series_unit, {
+						fillColor: {
+							linearGradient: {x1: 0, x2: 0, y1: 0, y2: 1},
+							stops: FILL_COLORS.map(function(colors_set, j) {
+								return [j, colors_set[i]];
+							})
+						}
+					})
+				}
+				return series_unit;
+			});
+			
+			if (key == 'conversion' || key == 'open_conversion' || key == 'fave_conversion') {
+				field_data.yAxis = {
+					max: 100,
+					labels: {
+						format: '{value}%'
+					}
+				};
+			}
+			
+			self.$wrapper.find('.' + FIELDS[key].wrapper_class).highcharts('StockChart', $.extend(true, {}, area_chart_options, field_data));
+		});
+	};
+	/**
+	 *
+	 * @param {jQuery} $scoreboards_wrapper
+	 * @param {object} data
+	 * @param {object} data.numbers
+	 * @param {object} [data.dynamics]
+	 * @param {object} [titles]
+	 * @param {Array} [order]
+	 * @param {string} [size="normal"]
+	 */
+	AdminPage.prototype.updateScoreboards = function($scoreboards_wrapper, data, titles, order, size) {
+		var with_dynamics = !!data.dynamics;
+		if (!order)
+			order = Object.keys(titles);
+		
+		order.forEach(function(field) {
+			var scoreboard_type = 'Scoreboard' + field.toCamelCase('_'),
+				$scoreboard = $scoreboards_wrapper.find('.' + scoreboard_type),
+				measure;
+			
+			switch (field) {
+				case 'conversion':
+				case 'open_conversion':
+				case 'fave_conversion': {
+					measure = '%';
+					break;
+				}
+			}
+			
+			if (!$scoreboard.length) {
+				$scoreboard = tmpl(with_dynamics ? 'scoreboard-with-dynamics' : 'scoreboard', {
+					type: scoreboard_type,
+					title: titles[field],
+					size: size ? '-size_' + size : '-size_normal',
+					number: 0 + measure,
+					dynamic_by_week: 0 + measure
+				}, $scoreboards_wrapper)
+			}
+			
+			if (data.numbers[field] !== undefined) {
+				$scoreboard.find('.ScoreboardNumber').animateNumber({
+					number: Math.round(data.numbers[field]),
+					suffix: measure
+				}, 2000, 'easeOutSine');
+			}
+			
+			if (with_dynamics) {
+				if (data.dynamics[field] !== undefined) {
+					$scoreboard
+						.find('.ScoreboardDynamic')
+						.animateNumber({
+							number: Math.round(data.dynamics[field]),
+							prefix: data.dynamics[field] == 0 ? undefined : (data.dynamics[field] > 0 ? '+' : '-'),
+							suffix: measure
+						}, 2000, 'easeOutSine')
+						.siblings('label')
+						.removeClass('fa-caret-up -text_color_franklin fa-caret-down -text_color_bubblegum')
+						.addClass(data.dynamics[field] == 0 ? '' : (data.dynamics[field] > 0 ? 'fa-caret-up -text_color_franklin' : 'fa-caret-down -text_color_bubblegum'));
+				}
+			}
+		});
+	};
+	
+	return AdminPage;
+}()));
+/**
+ * @requires ../Class.AdminPage.js
+ */
+/**
+ *
+ * @class AdminEventPage
+ * @extends AdminPage
+ */
+AdminEventPage = extending(AdminPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs AdminEventPage
+	 * @param {(string|number)} event_id
+	 */
+	function AdminEventPage(event_id) {
+		AdminPage.apply(this, arguments);
+		this.id = event_id;
+		this.event = new OneEvent(this.id);
+	}
+	
+	return AdminEventPage;
+}()));
+/**
+ * @requires Class.AdminEventPage.js
+ */
+/**
+ *
+ * @class AdminEventAuditoryPage
+ * @extends AdminEventPage
+ */
+AdminEventAuditoryPage = extending(AdminEventPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs AdminEventAuditoryPage
+	 * @param {(string|number)} event_id
+	 */
+	function AdminEventAuditoryPage(event_id) {
+		AdminEventPage.apply(this, arguments);
+	}
+	
+	AdminEventAuditoryPage.prototype.render = function() {};
+	
+	return AdminEventAuditoryPage;
+}()));
+/**
+ * @requires Class.AdminEventPage.js
+ */
+/**
+ *
+ * @class AdminEventOverviewPage
+ * @extends AdminEventPage
+ */
+AdminEventOverviewPage = extending(AdminEventPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs AdminEventOverviewPage
+	 * @param {(string|number)} event_id
+	 */
+	function AdminEventOverviewPage(event_id) {
+		AdminEventPage.apply(this, arguments);
+		
+		this.graphics_stats = new EventStatistics(this.id);
+		this.scoreboards_stats = new EventStatistics(this.id);
+	}
+	
+	AdminEventOverviewPage.prototype.fetchData = function() {
+		return this.fetching_data_defer = this.event.fetchEvent(new Fields(
+			'image_horizontal_medium_url',
+			'organization_short_name',
+			'favored_users_count',
+			'is_same_time',
+			'dates'
+		));
+	};
+	
+	AdminEventOverviewPage.prototype.render = function() {
+		var PAGE = this;
+		
+		if(__APP.USER.id === -1){
+			__APP.changeState('/feed/actual', true, true);
+			return null;
+		}
+		__APP.changeTitle([{
+			title: 'Организации',
+			page: '/admin'
+		}, {
+			title: this.event.organization_short_name,
+			page: '/admin/organization/' + this.event.organization_id
+		}, this.event.title]);
+		
+		this.$wrapper.html(tmpl('eventstat-overview', $.extend(true, {}, this.event, {
+			dates_block: tmpl('eventstat-overview-datetime', {
+				date: displayDateRange(this.event.first_event_date, this.event.last_event_date),
+				time: this.event.is_same_time ? displayTimeRange(this.event.dates[0].start_time, this.event.dates[0].end_time) : 'Разное время'
+			})
+		})));
+		this.$wrapper.find('.EventStatAreaCharts').children('.AreaChart').html(tmpl('loader'));
+		
+		this.scoreboards_stats.fetchStatistics(Statistics.SCALES.OVERALL, false, ['notifications_sent', 'view', 'fave', 'view_detail', 'fave_conversion', 'open_conversion'], null, function(data) {
+			var scoreboards_data = {numbers: {}};
+			$.each(data, function(field, stats) {
+				scoreboards_data.numbers[field] = stats[0].value
+			});
+			PAGE.updateScoreboards(PAGE.$wrapper.find('.EventstatsScoreboards'), scoreboards_data, {
+				'fave': 'Добавлений в избранное',
+				'view': 'Просмотров события'
+			}, ['fave', 'view']);
+			PAGE.updateScoreboards(PAGE.$wrapper.find('.EventstatsBigScoreboards'), scoreboards_data, {
+				'notifications_sent': 'Уведомлений отправлено',
+				'view': 'Просмотров',
+				'view_detail': 'Открытий',
+				'open_conversion': 'Конверсия открытий',
+				'fave': 'Добавлений',
+				'fave_conversion': 'Конверсия добавлений'
+			}, ['notifications_sent', 'view', 'view_detail', 'open_conversion', 'fave', 'fave_conversion'], 'big');
+		});
+		
+		this.graphics_stats.fetchStatistics(Statistics.SCALES.DAY, moment(__APP.EVENDATE_BEGIN, 'DD-MM-YYYY').format(), ['notifications_sent', 'view', 'fave', 'view_detail', 'fave_conversion', 'open_conversion'], null, function(data) {
+			PAGE.buildAreaCharts(data, {
+				rangeSelector: {
+					selected: 1
+				}
+			});
+		});
+		
+		__APP.MODALS.bindCallModal(PAGE.$wrapper);
+		bindPageLinks(PAGE.$wrapper);
+	};
+	
+	return AdminEventOverviewPage;
+}()));
+/**
+ * @requires Class.AdminEventPage.js
+ */
+/**
+ *
+ * @class AdminEventPromotionPage
+ * @extends AdminEventPage
+ */
+AdminEventPromotionPage = extending(AdminEventPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs AdminEventPromotionPage
+	 * @param {(string|number)} event_id
+	 */
+	function AdminEventPromotionPage(event_id) {
+		AdminEventPage.apply(this, arguments);
+	}
+	
+	AdminEventPromotionPage.prototype.render = function() {};
+	
+	return AdminEventPromotionPage;
+}()));
+/**
+ * @requires Class.AdminEventPage.js
+ */
+/**
+ *
+ * @class AdminStatisticsEventEditPage
+ * @extends AdminEventPage
+ */
+AdminStatisticsEventEditPage = extending(AdminEventPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs AdminStatisticsEventEditPage
+	 * @param {(string|number)} event_id
+	 */
+	function AdminStatisticsEventEditPage(event_id) {
+		AdminEventPage.apply(this, arguments);
+	}
+	
+	AdminStatisticsEventEditPage.prototype.render = function() {};
+	
+	return AdminStatisticsEventEditPage;
+}()));
+/**
+ * @requires ../Class.AdminPage.js
+ */
+/**
+ * @abstract
+ * @class AdminOrganizationPage
+ * @extends AdminPage
+ */
+AdminOrganizationPage = extending(AdminPage, (function() {
+	/**
+	 *
+	 * @param {(string|number)} org_id
+	 * @constructor
+	 * @constructs AdminOrganizationPage
+	 */
+	function AdminOrganizationPage(org_id) {
+		AdminPage.apply(this);
+		this.id = org_id;
+		this.organization = new OneOrganization(this.id);
+		this.with_header_tabs = true;
+	}
+	
+	AdminOrganizationPage.prototype.fetchData = function() {
+		return this.fetching_data_defer = this.organization.fetchOrganization([
+			'description',
+			'img_medium_url',
+			'default_address',
+			'staff',
+			'privileges',
+			'events'.appendAjaxData({
+				length: 3,
+				future: true,
+				is_canceled: true,
+				is_delayed: true,
+				fields: [
+					'organization_short_name',
+					'public_at'
+				],
+				order_by: 'nearest_event_date'
+			})
+		]);
+	};
+	
+	AdminOrganizationPage.prototype.renderHeaderTabs = function(){
+		__APP.renderHeaderTabs([
+			{title: 'Обзор', page: '/admin/organization/'+this.id+'/overview'},
+			{title: 'События', page: '/admin/organization/'+this.id+'/events'}
+		]);
+	};
+	
+	return AdminOrganizationPage;
+}()));
+/**
+ * @requires Class.AdminOrganizationPage.js
+ */
+/**
+ *
+ * @class AdminOrganizationAuditoryPage
+ * @extends AdminOrganizationPage
+ */
+AdminOrganizationAuditoryPage = extending(AdminOrganizationPage, (function() {
+	/**
+	 *
+	 * @param {(string|number)} org_id
+	 * @constructor
+	 * @constructs AdminOrganizationAuditoryPage
+	 */
+	function AdminOrganizationAuditoryPage(org_id) {
+		AdminOrganizationPage.apply(this, arguments);
+	}
+	
+	AdminOrganizationAuditoryPage.prototype.render = function() {};
+	
+	return AdminOrganizationAuditoryPage;
+}()));
+/**
+ * @requires Class.AdminOrganizationPage.js
+ */
+/**
+ *
+ * @class AdminOrganizationEventsPage
+ * @extends AdminOrganizationPage
+ */
+AdminOrganizationEventsPage = extending(AdminOrganizationPage, (function() {
+	/**
+	 *
+	 * @param {(string|number)} org_id
+	 * @constructor
+	 * @constructs AdminOrganizationAuditoryPage
+	 */
+	function AdminOrganizationEventsPage(org_id) {
+		AdminOrganizationPage.apply(this, arguments);
+		
+		this.block_scroll = false;
+		this.future_events_data = {
+			future: true,
+			canceled_shown: true
+		};
+		this.past_events_data = {
+			canceled_shown: true,
+			order_by: '-first_event_date'
+		};
+		this.future_events = new EventsWithStatisticsCollection();
+		this.past_events = new EventsWithStatisticsCollection();
+	}
+	
+	AdminOrganizationEventsPage.buildEventRows = function(events, date_field) {
+		var $events = tmpl('orgstat-events-row', events.map(function(event) {
+			return $.extend({}, event, {
+				date: moment.unix(event[date_field]).format(__LOCALES.ru_RU.DATE.DATE_FORMAT),
+				timestamp: event[date_field],
+				conversion: Math.round(event.view == 0 ? (event.view_detail * 100 / event).view : 0) + '%'
+			});
+		}));
+		bindPageLinks($events);
+		return $events;
+	};
+	
+	AdminOrganizationEventsPage.prototype.fetchData = function() {
+		return this.fetching_data_defer = this.organization.fetchOrganization([]);
+	};
+	
+	AdminOrganizationEventsPage.prototype.render = function() {
+		var this_page = this,
+			$window = $(window),
+			$past_events_wrapper,
+			past_events_tablesort;
+		
+		if(__APP.USER.id === -1){
+			__APP.changeState('/feed/actual', true, true);
+			return null;
+		}
+		
+		this.renderHeaderTabs();
+		__APP.changeTitle([{
+			title: 'Организации',
+			page: '/admin'
+		}, this.organization.short_name + ' - события']);
+		
+		this.$wrapper.html(tmpl('orgstat-events-page'));
+		
+		this.future_events.fetchOrganizationsEvents(this.organization.id, this.future_events_data, 0, function() {
+			if(this.length){
+				this_page.$wrapper.find('.OrgStatFutureEventsWrapper').html(tmpl('orgstat-events-wrapper', {
+					title: 'Предстоящие события',
+					rows: AdminOrganizationEventsPage.buildEventRows(this_page.future_events, 'nearest_event_date')
+				})).find('table').tablesort();
+			}
+		});
+		
+		this.past_events.fetchOrganizationsEvents(this.organization.id, this.past_events_data, 30, function() {
+			if(this.length){
+				$past_events_wrapper = this_page.$wrapper.find('.OrgStatPastEventsWrapper');
+				$past_events_wrapper.html(tmpl('orgstat-events-wrapper', {
+					title: 'Прошедшие события',
+					rows: AdminOrganizationEventsPage.buildEventRows(this_page.past_events, 'first_event_date')
+				}));
+				past_events_tablesort = $past_events_wrapper.find('table').tablesort();
+				
+				$window.on('scroll.uploadEvents', function() {
+					if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !this_page.block_scroll) {
+						this_page.block_scroll = true;
+						
+						this_page.past_events.fetchOrganizationsEvents(this_page.organization.id, this_page.past_events_data, 30, function(events) {
+							this_page.block_scroll = false;
+							if (events.length) {
+								$past_events_wrapper.find('tbody').append(AdminOrganizationEventsPage.buildEventRows(events, 'first_event_date'));
+								past_events_tablesort.refresh();
+							} else {
+								$(window).off('scroll.uploadEvents');
+							}
+						})
+					}
+				})
+			}
+		});
+	};
+	
+	return AdminOrganizationEventsPage;
+}()));
+/**
+ * @requires Class.AdminOrganizationPage.js
+ */
+/**
+ *
+ * @class AdminOrganizationOverviewPage
+ * @extends AdminOrganizationPage
+ */
+AdminOrganizationOverviewPage = extending(AdminOrganizationPage, (function() {
+	/**
+	 *
+	 * @param {(string|number)} org_id
+	 * @constructor
+	 * @constructs AdminOrganizationOverviewPage
+	 */
+	function AdminOrganizationOverviewPage(org_id) {
+		AdminOrganizationPage.apply(this, arguments);
+		this.graphics_stats = new OrganizationsStatistics(this.id);
+		this.other_stats = new OrganizationsStatistics(this.id);
+	}
+	/**
+	 *
+	 * @param {string} title
+	 * @param staff
+	 * @return {jQuery}
+	 */
+	AdminOrganizationOverviewPage.buildStaffBlock = function(title, staff) {
+		if (staff.length) {
+			return tmpl('orgstat-overview-sidebar-wrapper-title', {title: title}).add(__APP.BUILD.avatarBlocks(staff, {
+				avatar_classes: ['-size_40x40','-rounded'],
+				entity: 'user',
+				is_link: true
+			}));
+		}
+		return $();
+	};
+	
+	AdminOrganizationOverviewPage.prototype.fetchData = function() {
+		return this.fetching_data_defer = this.organization.fetchOrganizationWithEvents([
+			'description',
+			'img_medium_url',
+			'default_address',
+			'staff',
+			'privileges'
+		], {
+			length: 3,
+			fields: [
+				'organization_short_name',
+				'public_at'
+			],
+			is_delayed: true,
+			filters: 'future=true,is_canceled=false',
+			order_by: 'nearest_event_date'
+		});
+	};
+	
+	AdminOrganizationOverviewPage.prototype.buildAreaCharts = function() {
+		var self = this;
+		AdminPage.prototype.buildAreaCharts.call(self, {
+			subscribe_unsubscribe: self.graphics_stats.subscribe.map(function(el, i) {
+				return {
+					time_value: el.time_value,
+					subscribe: el.value,
+					unsubscribe: self.graphics_stats.unsubscribe[i].value
+				}
+			}),
+			view: self.graphics_stats.view,
+			conversion: self.graphics_stats.conversion
+		});
+	};
+	
+	AdminOrganizationOverviewPage.prototype.buildPieChart = function($container, data) {
+		var pie_chart_options = {
+			chart: {
+				type: 'pie',
+				height: 200,
+				style: {
+					fontFamily: 'inherit',
+					fontSize: 'inherit'
+				}
+			},
+			colors: [__C.COLORS.FRANKLIN, __C.COLORS.ACCENT, __C.COLORS.MUTED, __C.COLORS.MUTED_80, __C.COLORS.MUTED_50, __C.COLORS.MUTED_30],
+			tooltip: {
+				pointFormat: '<b>{point.percentage:.1f}%</b>'
+			},
+			plotOptions: {
+				pie: {
+					center: [45, '50%'],
+					allowPointSelect: true,
+					cursor: 'pointer',
+					size: 120,
+					dataLabels: {
+						distance: -35,
+						defer: false,
+						formatter: function() {
+							return this.percentage > 15 ? Math.round(this.percentage) + '%' : null;
+						},
+						style: {"color": "#fff", "fontSize": "20px", "fontWeight": "300", "textShadow": "none"},
+						y: -6
+					},
+					showInLegend: true
+				}
+			},
+			legend: {
+				align: 'right',
+				verticalAlign: 'top',
+				layout: 'vertical',
+				width: 100,
+				symbolHeight: 0,
+				symbolWidth: 0,
+				itemMarginBottom: 5,
+				labelFormatter: function() {
+					return '<span style="color: ' + this.color + '">' + this.name + '</span>'
+				},
+				itemStyle: {cursor: 'pointer', fontSize: '14px', fontWeight: '500'},
+				y: 12
+			}
+		};
+		
+		function pieChartSeriesNormalize(raw_data) {
+			var STD_NAMES = {
+				"browser": "Браузер",
+				"android": "Аndroid",
+				"ios": "iOS",
+				"female": "Женщины",
+				"male": "Мужчины",
+				"other": "Остальные",
+				null: "Не указано"
+			};
+			return [{
+				data: raw_data.map(function(line, i) {
+					return {
+						name: line.name ? STD_NAMES[line.name] : STD_NAMES[line.gender],
+						y: line.count
+					}
+				})
+			}];
+		}
+		
+		$container.highcharts($.extend(true, {}, this.highchart_defaults, pie_chart_options, {series: pieChartSeriesNormalize(data)}));
+	};
+	
+	AdminOrganizationOverviewPage.prototype.render = function() {
+		var PAGE = this,
+			stat_dynamics = {
+				scale: Statistics.SCALES.WEEK,
+				fields: [
+					'subscribe',
+					'view',
+					'fave',
+					'conversion'
+				]
+			},
+			staffs_additional_fields = {
+				is_link: true,
+				avatar_classes: ['-size_40x40', '-rounded']
+			},
+			storage_data_name = 'org_stats_' + this.id + '_data',
+			storage_until_name = 'org_stats_' + this.id + '_until',
+			is_cached_data_actual = moment.unix(sessionStorage.getItem(storage_until_name)).isAfter(moment());
+		
+		if(__APP.USER.id === -1){
+			__APP.changeState('/feed/actual', true, true);
+			return null;
+		}
+		
+		if (!window.location.pathname.contains('overview')) {
+			__APP.changeState(window.location.pathname+'/overview', true);
+		}
+		this.renderHeaderTabs();
+		__APP.changeTitle([{
+			title: 'Организации',
+			page: '/admin'
+		}, this.organization.short_name]);
+		
+		this.$wrapper.html(tmpl('orgstat-overview', $.extend(true, {}, this.organization, {
+			avatar_block: __APP.BUILD.avatarBlocks(this.organization, {
+				entity: 'organization',
+				block_classes: ['-stack']
+			}),
+			staff_block: AdminOrganizationOverviewPage.buildStaffBlock('Администраторы', this.organization.staff.getSpecificStaff(OneUser.ROLE.ADMIN, staffs_additional_fields))
+			                                          .add(AdminOrganizationOverviewPage.buildStaffBlock('Модераторы', this.organization.staff.getSpecificStaff(OneUser.ROLE.MODERATOR, staffs_additional_fields))),
+			event_blocks: this.organization.events.length ? tmpl('orgstat-overview-sidebar-wrapper', {
+				content: tmpl('orgstat-overview-sidebar-wrapper-title', {title: 'Предстоящие события'})
+					.add(tmpl('orgstat-event-block', this.organization.events.map(function(event) {
+						var badges = [];
+						if (event.canceled)
+							badges.push({title: 'Отменено'});
+						if (event.public_at && moment.unix(event.public_at).isBefore())
+							badges.push({title: 'Не опубликовано'});
+						
+						return {
+							id: event.id,
+							title: event.title,
+							organization_short_name: event.organization_short_name,
+							day: moment.unix(event.first_event_date).format("D"),
+							month: moment.unix(event.first_event_date).format("MMM"),
+							badges: tmpl('orgstat-event-block-badge', badges)
+						};
+					})))
+			}) : ''
+		})));
+		
+		if (is_cached_data_actual) {
+			this.graphics_stats.setData(JSON.parse(sessionStorage.getItem(storage_data_name)));
+			this.buildAreaCharts();
+		} else {
+			this.$wrapper.find('.OrgStatAreaCharts').children('.AreaChart').append(tmpl('loader'));
+			this.graphics_stats.fetchStatistics(Statistics.SCALES.DAY, moment(__APP.EVENDATE_BEGIN, 'DD-MM-YYYY').format(), ['view', 'subscribe', 'unsubscribe', 'conversion'], null, function() {
+				sessionStorage.setItem(storage_data_name, JSON.stringify(PAGE.graphics_stats));
+				sessionStorage.setItem(storage_until_name, moment().add(15, 'm').unix());
+				PAGE.buildAreaCharts();
+			});
+		}
+		
+		this.other_stats.fetchStatistics(Statistics.SCALES.OVERALL, false, ['subscribe', 'view', 'fave', 'conversion', 'audience'], stat_dynamics, function(stat_data) {
+			var scoreboards_data = {numbers: {}, dynamics: {}};
+			
+			$.each(stat_data.dynamics, function(field, dynamics) {
+				scoreboards_data.dynamics[field] = dynamics[0].value;
+				scoreboards_data.numbers[field] = stat_data[field][0].value;
+			});
+			PAGE.buildPieChart(PAGE.$wrapper.find('.GenderPieChart'), this.audience.gender);
+			PAGE.buildPieChart(PAGE.$wrapper.find('.DevicePieChart'), this.audience.devices);
+			
+			PAGE.updateScoreboards(PAGE.$wrapper.find('.Scoreboards'), scoreboards_data, {
+				'subscribe': 'Подписчиков организатора',
+				'fave': 'Добавлений в избранное',
+				'view': 'Просмотров организатора',
+				'conversion': 'Конверсия открытий/подписок'
+			}, ['subscribe', 'fave', 'view', 'conversion']);
+			
+		});
+		
+		bindRippleEffect(this.$wrapper);
+		bindPageLinks(this.$wrapper);
+	};
+	
+	return AdminOrganizationOverviewPage;
+}()));
+/**
+ * @requires Class.AdminOrganizationPage.js
+ */
+/**
+ *
+ * @class AdminOrganizationPromotionPage
+ * @extends AdminOrganizationPage
+ */
+AdminOrganizationPromotionPage = extending(AdminOrganizationPage, (function() {
+	/**
+	 *
+	 * @param {(string|number)} org_id
+	 * @constructor
+	 * @constructs AdminOrganizationPromotionPage
+	 */
+	function AdminOrganizationPromotionPage(org_id) {
+		AdminOrganizationPage.apply(this, arguments);
+	}
+	
+	AdminOrganizationPromotionPage.prototype.render = function() {};
+	
+	return AdminOrganizationPromotionPage;
+}()));
+/**
+ * @requires Class.AdminOrganizationPage.js
+ */
+/**
+ *
+ * @class AdminOrganizationSettingsPage
+ * @extends AdminOrganizationPage
+ */
+AdminOrganizationSettingsPage = extending(AdminOrganizationPage, (function() {
+	/**
+	 *
+	 * @param {(string|number)} org_id
+	 * @constructor
+	 * @constructs AdminOrganizationSettingsPage
+	 */
+	function AdminOrganizationSettingsPage(org_id) {
+		AdminOrganizationPage.apply(this, arguments);
+	}
+	
+	AdminOrganizationSettingsPage.prototype.render = function() {};
+	
+	return AdminOrganizationSettingsPage;
+}()));
+/**
+ * @requires Class.AdminOrganizationPage.js
+ */
+/**
+ *
+ * @class AdminOrganizationSupportPage
+ * @extends AdminOrganizationPage
+ */
+AdminOrganizationSupportPage = extending(AdminOrganizationPage, (function() {
+	/**
+	 *
+	 * @param {(string|number)} org_id
+	 * @constructor
+	 * @constructs AdminOrganizationSupportPage
+	 */
+	function AdminOrganizationSupportPage(org_id) {
+		AdminOrganizationPage.apply(this, arguments);
+	}
+	
+	AdminOrganizationSupportPage.prototype.render = function() {};
+	
+	return AdminOrganizationSupportPage;
+}()));
 /**
  * @requires ../../Class.Page.js
  */
@@ -11278,1119 +12389,154 @@ TimelineEventsPage = extending(FeedPage, (function() {
 	return TimelineEventsPage
 }()));
 /**
- * @requires ../Class.Page.js
+ * @requires Class.Page.js
  */
 /**
  *
- * @abstract
- * @class StatisticsPage
+ * @class NotFoundPage
  * @extends Page
  */
-StatisticsPage = extending(Page, (function() {
+NotFoundPage = extending(Page, (function() {
 	/**
 	 *
 	 * @constructor
-	 * @constructs StatisticsPage
+	 * @constructs NotFoundPage
 	 */
-	function StatisticsPage() {
-		Page.apply(this);
-		this.state_name = 'statistics';
-		this.SCALES = {
-			MINUTE: 'minute',
-			HOUR: 'hour',
-			DAY: 'day',
-			WEEK: 'week',
-			MONTH: 'month',
-			YEAR: 'year',
-			OVERALL: 'overall'
-		};
-		this.highchart_defaults = {
-			chart: {
-				backgroundColor: null,
-				plotBorderWidth: null,
-				plotShadow: false,
-				style: {
-					fontFamily: 'inherit',
-					fontSize: 'inherit'
-				}
-			},
-			title: {
-				text: false
-			},
-			credits: {
-				enabled: false
-			}
-		};
+	function NotFoundPage() {
+		Page.call(this);
 	}
+	
+	NotFoundPage.prototype.render = function() {};
+	
+	return NotFoundPage;
+}()));
+/**
+ * @requires Class.AdminPage.js
+ */
+/**
+ *
+ * @class AdminOrganizationsPage
+ * @extends AdminPage
+ */
+AdminOrganizationsPage = extending(AdminPage, (function() {
 	/**
 	 *
-	 * @param {object} raw_data
-	 * @returns {object}
+	 * @constructor
+	 * @constructs AdminOrganizationsPage
 	 */
-	StatisticsPage.prototype.areaChartSeriesNormalize = function(raw_data) {
-		var CONVERSATIONS = {
-				open_conversion: {
-					with: 'open_site',
-					to: 'view'
+	function AdminOrganizationsPage() {
+		AdminPage.apply(this);
+		this.my_organizations_fields = ['img_medium_url', 'subscribed_count', 'staff'];
+		this.page_title = 'Организации';
+		this.my_organizations = new OrganizationsCollection();
+	}
+	
+	AdminOrganizationsPage.buildMyOrganizationsBlocks = function(organizations) {
+		return tmpl('statistics-overview-organization', organizations.map(function(org) {
+			var avatars_max_count = 2,
+				staff_additional_fields = {
+					is_link: true,
+					avatar_classes: ['-size_100x100', '-rounded']
 				},
-				fave_conversion: {
-					with: 'fave',
-					to: 'open_site'
-				},
-				conversion: {
-					with: 'subscribe',
-					to: 'view'
-				}
-			},
-			COMPARISONS = {
-				subscribe_unsubscribe: {
-					subscribe: 'subscribe',
-					unsubscribe: 'unsubscribe'
-				}
-			},
-			STD_NAMES = {
-				'notifications_sent': 'Отправлено уведомлений',
-				'view': 'Просмотры',
-				'view_detail': 'Открытий страницы события из ленты Evendate',
-				'conversion': 'Конверсия',
-				'subscribe': 'Подписалось',
-				'unsubscribe': 'Отписалось',
-				'open_site': 'Открытий страницы события',
-				'open_conversion': 'Конверсия просмотра события в ленте к открытию страницы события',
-				'fave': 'Кол-во пользователей, которые добавили событие в избранное',
-				'fave_conversion': 'Конверсия открытия страницы события к добавлениям в избранное'
-			},
-			HIDDEN_SERIES_OPTIONS = {
-				showInLegend: false,
-				lineWidth: 0,
-				fillOpacity: 0,
-				states: {
-					hover: {
-						enabled: false
-					}
-				}
-			},
-			output = {};
-		
-		function dataNormalize(raw_data, field, value_field_name) {
-			return {
-				name: STD_NAMES[field],
-				data: raw_data.map(function(line, i) {
-					return [moment.unix(line.time_value).valueOf(), line[value_field_name]];
-				})
-			}
-		}
-		
-		
-		$.each(raw_data, function(key, data){
-			output[key] = [];
-			if(CONVERSATIONS.hasOwnProperty(key)){
-				output[key].push($.extend(true, { tooltip: {valueSuffix: ' %'} }, dataNormalize(data, key, 'value')));
-				$.each(CONVERSATIONS[key], function(field_key, field) {
-					output[key].push($.extend(true, {}, HIDDEN_SERIES_OPTIONS, dataNormalize(data, field, field_key)));
-				})
-			}
-			else if(COMPARISONS.hasOwnProperty(key)) {
-				$.each(COMPARISONS[key], function(field_key, field) {
-					output[key].push(dataNormalize(data, field, field_key));
-				})
-			}
-			else {
-				output[key].push(dataNormalize(data, key, 'value'));
-			}
-		});
-		
-		return output;
-	};
-	/**
-	 *
-	 * @param {object} data
-	 * @param {object} [additional_options]
-	 */
-	StatisticsPage.prototype.buildAreaCharts = function(data, additional_options) {
-		var self = this,
-			normalized_series = self.areaChartSeriesNormalize(data),
-			FIELDS = {
-				notifications_sent: {
-					title: 'Отправлено уведомлений пользователям',
-					wrapper_class: 'NotificationsSentAreaChart'
-				},
-				view: {
-					title: 'Просмотры',
-					wrapper_class: 'ViewAreaChart'
-				},
-				view_detail: {
-					title: 'Открытий страницы события',
-					wrapper_class: 'ViewDetailAreaChart'
-				},
-				open_site: {
-					title: 'Открытий страницы события из ленты Evendate',
-					wrapper_class: 'OpenSiteAreaChart'
-				},
-				open_conversion: {
-					title: 'Конверсия просмотров/открытий',
-					wrapper_class: 'OpenConversionsAreaChart'
-				},
-				fave: {
-					title: 'Добавлений в избранное',
-					wrapper_class: 'FaveAreaChart'
-				},
-				fave_conversion: {
-					title: 'Конверсия открытий/добавлений в избранное',
-					wrapper_class: 'FaveConversionsAreaChart'
-				},
-				subscribe_unsubscribe: {
-					title: 'Подписчики',
-					wrapper_class: 'SubscriberAreaChart'
-				},
-				conversion: {
-					title: 'Конверсия просмотров/подписок',
-					wrapper_class: 'ConversionAreaChart'
-				}
-			},
-			FILL_COLORS = [
-				['rgba(35, 215, 146, 0.18)', 'rgba(101, 101, 101, 0.6)', 'rgba(101, 101, 101, 0.6)'],
-				['rgba(35, 215, 146, 0.09)', 'rgba(101, 101, 101, 0.6)', 'rgba(101, 101, 101, 0.6)']
-			],
-			area_chart_options = $.extend(true, {}, self.highchart_defaults, {
-				chart: {
-					type: 'areaspline',
-					plotBackgroundColor: '#fcfcfc',
-					plotBorderColor: '#ebebeb',
-					plotBorderWidth: 1
-				},
-				colors: [__C.COLORS.FRANKLIN, __C.COLORS.MUTED_80, __C.COLORS.ACCENT, __C.COLORS.MUTED, __C.COLORS.MUTED_50, __C.COLORS.MUTED_30],
-				title: {
-					align: 'left',
-					margin: 20
-				},
-				legend: {
-					enabled: true,
-					align: 'left',
-					itemStyle: {color: __C.COLORS.TEXT, cursor: 'pointer', fontSize: '14px', fontWeight: '500', y: 0},
-					itemMarginTop: 24,
-					itemMarginBottom: 5,
-					symbolHeight: 18,
-					symbolWidth: 18,
-					symbolRadius: 9,
-					itemDistance: 42,
-					x: 30
-				},
-				plotOptions: {
-					series: {
-						states: {
-							hover: {
-								lineWidth: 2
-							}
-						}
-					},
-					areaspline: {
-						fillOpacity: 0.5,
-						marker: {
-							enabled: false,
-							symbol: 'circle',
-							radius: 2,
-							states: {
-								hover: {
-									enabled: true
-								}
-							}
-						},
-						dataGrouping: {
-							dateTimeLabelFormats: {
-								millisecond: ['%b %e, %H:%M:%S.%L', '%b %e, %H:%M:%S.%L', '-%H:%M:%S.%L'],
-								second: ['%b %e, %H:%M:%S', '%b %e, %H:%M:%S', '-%H:%M:%S'],
-								minute: ['%b %e, %H:%M', '%b %e, %H:%M', '-%H:%M'],
-								hour: ['%b %e, %H:%M', '%b %e, %H:%M', '-%H:%M'],
-								day: ['%b %e, %Y', '%b %e', '-%b %e, %Y'],
-								week: ['%b %e, %Y', '%b %e', '-%b %e, %Y'],
-								month: ['%B %Y', '%B', '-%B %Y'],
-								year: ['%Y', '%Y', '-%Y']
-							}
-						}
-					}
-				},
-				tooltip: {
-					headerFormat: '<b>{point.key}</b><br/>',
-					positioner: function(labelWidth, labelHeight) {
-						return {
-							x: this.chart.plotLeft,
-							y: this.chart.plotTop
-						};
-					},
-					shadow: false,
-					shape: 'square',
-					valueDecimals: 0,
-					xDateFormat: '%e %b %Y',
-					shared: true
-				},
-				scrollbar: {enabled: false},
-				navigator: {
-					outlineColor: '#ebebeb',
-					outlineWidth: 1,
-					maskInside: false,
-					maskFill: 'rgba(245, 245, 245, 0.66)',
-					handles: {
-						backgroundColor: '#9fa7b6',
-						borderColor: '#fff'
-					},
-					xAxis: {
-						gridLineWidth: 0,
-						labels: {
-							align: 'left',
-							reserveSpace: true,
-							style: {
-								color: '#888'
-							},
-							x: 0,
-							y: null
-						}
-					}
-				},
-				rangeSelector: {
-					buttonTheme: {
-						width: null,
-						height: 22,
-						fill: 'none',
-						stroke: 'none',
-						r: 14,
-						style: {
-							color: __C.COLORS.MUTED_80,
-							fontSize: '13px',
-							fontWeight: '400',
-							textTransform: 'uppercase',
-							dominantBaseline: 'middle'
-						},
-						states: {
-							hover: {
-								fill: __C.COLORS.MUTED_50,
-								style: {
-									color: '#fff'
-								}
-							},
-							select: {
-								fill: __C.COLORS.MUTED_80,
-								style: {
-									color: '#fff',
-									fontWeight: '400'
-								}
-							}
-						}
-					},
-					buttons: [{
-						type: 'day',
-						count: 7,
-						text: "\xa0\xa0\xa0Неделя\xa0\xa0\xa0"
+				org_roles = [
+					{
+						name: OneUser.ROLE.ADMIN,
+						title: 'Администраторы',
+						staff: UsersCollection.getSpecificStaff(OneUser.ROLE.ADMIN, org.staff, staff_additional_fields),
+						plural_name: OneUser.ROLE.ADMIN + 's'
 					}, {
-						type: 'month',
-						count: 1,
-						text: "\xa0\xa0\xa0Месяц\xa0\xa0\xa0"
-					}, {
-						type: 'year',
-						count: 1,
-						text: "\xa0\xa0\xa0Год\xa0\xa0\xa0"
-					}, {
-						type: 'all',
-						text: "\xa0\xa0\xa0Все\xa0время\xa0\xa0\xa0"
-					}],
-					allButtonsEnabled: true,
-					selected: 2,
-					labelStyle: {
-						display: 'none'
-					},
-					inputEnabled: false
-				},
-				xAxis: {
-					gridLineWidth: 1,
-					gridLineDashStyle: 'dash',
-					type: 'datetime',
-					showEmpty: false,
-					tickPosition: 'inside',
-					dateTimeLabelFormats: {
-						minute: '%H:%M',
-						hour: '%H:%M',
-						day: '%e %b',
-						week: '%e %b',
-						month: '%b %y',
-						year: '%Y'
+						name: OneUser.ROLE.MODERATOR,
+						title: 'Модераторы',
+						staff: UsersCollection.getSpecificStaff(OneUser.ROLE.MODERATOR, org.staff, staff_additional_fields),
+						plural_name: OneUser.ROLE.MODERATOR + 's'
 					}
-				},
-				yAxis: {
-					allowDecimals: false,
-					floor: 0,
-					min: 0,
-					gridLineDashStyle: 'dash',
-					opposite: false,
-					title: {
-						text: false
-					}
-				}
-			}, additional_options);
-		
-		$.each(normalized_series, function(key) {
-			var field_data = {
-				title: {text: FIELDS[key].title}
-			};
+				];
 			
-			field_data.series = normalized_series[key].map(function(series_unit, i) {
-				if (series_unit.fillOpacity !== 0) {
-					return $.extend(true, {}, series_unit, {
-						fillColor: {
-							linearGradient: {x1: 0, x2: 0, y1: 0, y2: 1},
-							stops: FILL_COLORS.map(function(colors_set, j) {
-								return [j, colors_set[i]];
-							})
-						}
-					})
-				}
-				return series_unit;
+			org_roles.forEach(function(role) {
+				org[role.plural_name] = __APP.BUILD.avatarCollection(role.staff, avatars_max_count, {
+					dataset: {
+						modal_type: 'editors',
+						modal_specific_role: role.name,
+						modal_title: role.title,
+						modal_organization_id: org.id
+					},
+					classes: ['-size_30x30', '-rounded', '-shifted', 'CallModal'],
+					counter_classes: ['-size_30x30','-color_marginal_primary']
+				});
 			});
 			
-			if (key == 'conversion' || key == 'open_conversion' || key == 'fave_conversion') {
-				field_data.yAxis = {
-					max: 100,
-					labels: {
-						format: '{value}%'
-					}
-				};
-			}
-			
-			self.$wrapper.find('.' + FIELDS[key].wrapper_class).highcharts('StockChart', $.extend(true, {}, area_chart_options, field_data));
-		});
-	};
-	/**
-	 *
-	 * @param {jQuery} $scoreboards_wrapper
-	 * @param {object} data
-	 * @param {object} data.numbers
-	 * @param {object} [data.dynamics]
-	 * @param {object} [titles]
-	 * @param {Array} [order]
-	 * @param {string} [size="normal"]
-	 */
-	StatisticsPage.prototype.updateScoreboards = function($scoreboards_wrapper, data, titles, order, size) {
-		var with_dynamics = !!data.dynamics;
-		if (!order)
-			order = Object.keys(titles);
-		
-		order.forEach(function(field) {
-			var scoreboard_type = 'Scoreboard' + field.toCamelCase('_'),
-				$scoreboard = $scoreboards_wrapper.find('.' + scoreboard_type),
-				measure;
-			
-			switch (field) {
-				case 'conversion':
-				case 'open_conversion':
-				case 'fave_conversion': {
-					measure = '%';
-					break;
-				}
-			}
-			
-			if (!$scoreboard.length) {
-				$scoreboard = tmpl(with_dynamics ? 'scoreboard-with-dynamics' : 'scoreboard', {
-					type: scoreboard_type,
-					title: titles[field],
-					size: size ? '-size_' + size : '-size_normal',
-					number: 0 + measure,
-					dynamic_by_week: 0 + measure
-				}, $scoreboards_wrapper)
-			}
-			
-			if (data.numbers[field] !== undefined) {
-				$scoreboard.find('.ScoreboardNumber').animateNumber({
-					number: Math.round(data.numbers[field]),
-					suffix: measure
-				}, 2000, 'easeOutSine');
-			}
-			
-			if (with_dynamics) {
-				if (data.dynamics[field] !== undefined) {
-					$scoreboard
-						.find('.ScoreboardDynamic')
-						.animateNumber({
-							number: Math.round(data.dynamics[field]),
-							prefix: data.dynamics[field] == 0 ? undefined : (data.dynamics[field] > 0 ? '+' : '-'),
-							suffix: measure
-						}, 2000, 'easeOutSine')
-						.siblings('label')
-						.removeClass('fa-caret-up -text_color_franklin fa-caret-down -text_color_bubblegum')
-						.addClass(data.dynamics[field] == 0 ? '' : (data.dynamics[field] > 0 ? 'fa-caret-up -text_color_franklin' : 'fa-caret-down -text_color_bubblegum'));
-				}
-			}
-		});
-	};
-	
-	return StatisticsPage;
-}()));
-/**
- * @requires ../Class.StatisticsPage.js
- */
-/**
- *
- * @class StatisticsEventPage
- * @extends StatisticsPage
- */
-StatisticsEventPage = extending(StatisticsPage, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs StatisticsEventPage
-	 * @param {(string|number)} event_id
-	 */
-	function StatisticsEventPage(event_id) {
-		StatisticsPage.apply(this, arguments);
-		this.id = event_id;
-		this.event = new OneEvent(this.id);
-	}
-	
-	return StatisticsEventPage;
-}()));
-/**
- * @requires Class.StatisticsEventPage.js
- */
-/**
- *
- * @class StatisticsEventAuditoryPage
- * @extends StatisticsEventPage
- */
-StatisticsEventAuditoryPage = extending(StatisticsEventPage, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs StatisticsEventAuditoryPage
-	 * @param {(string|number)} event_id
-	 */
-	function StatisticsEventAuditoryPage(event_id) {
-		StatisticsEventPage.apply(this, arguments);
-	}
-	
-	StatisticsEventAuditoryPage.prototype.render = function() {};
-	
-	return StatisticsEventAuditoryPage;
-}()));
-/**
- * @requires Class.StatisticsEventPage.js
- */
-/**
- *
- * @class StatisticsEventEditPage
- * @extends StatisticsEventPage
- */
-StatisticsEventEditPage = extending(StatisticsEventPage, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs StatisticsEventEditPage
-	 * @param {(string|number)} event_id
-	 */
-	function StatisticsEventEditPage(event_id) {
-		StatisticsEventPage.apply(this, arguments);
-	}
-	
-	StatisticsEventEditPage.prototype.render = function() {};
-	
-	return StatisticsEventEditPage;
-}()));
-/**
- * @requires Class.StatisticsEventPage.js
- */
-/**
- *
- * @class StatisticsEventOverviewPage
- * @extends StatisticsEventPage
- */
-StatisticsEventOverviewPage = extending(StatisticsEventPage, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs StatisticsEventOverviewPage
-	 * @param {(string|number)} event_id
-	 */
-	function StatisticsEventOverviewPage(event_id) {
-		StatisticsEventPage.apply(this, arguments);
-		
-		this.graphics_stats = new EventStatistics(this.id);
-		this.scoreboards_stats = new EventStatistics(this.id);
-	}
-	
-	StatisticsEventOverviewPage.prototype.fetchData = function() {
-		return this.fetching_data_defer = this.event.fetchEvent(new Fields(
-			'image_horizontal_medium_url',
-			'organization_short_name',
-			'favored_users_count',
-			'is_same_time',
-			'dates'
-		));
-	};
-	
-	StatisticsEventOverviewPage.prototype.render = function() {
-		var PAGE = this;
-		
-		if(__APP.USER.id === -1){
-			__APP.changeState('/feed/actual', true, true);
-			return null;
-		}
-		__APP.changeTitle([{
-			title: 'Организации',
-			page: '/statistics'
-		}, {
-			title: this.event.organization_short_name,
-			page: '/statistics/organization/' + this.event.organization_id
-		}, this.event.title]);
-		
-		this.$wrapper.html(tmpl('eventstat-overview', $.extend(true, {}, this.event, {
-			dates_block: tmpl('eventstat-overview-datetime', {
-				date: displayDateRange(this.event.first_event_date, this.event.last_event_date),
-				time: this.event.is_same_time ? displayTimeRange(this.event.dates[0].start_time, this.event.dates[0].end_time) : 'Разное время'
-			})
-		})));
-		this.$wrapper.find('.EventStatAreaCharts').children('.AreaChart').html(tmpl('loader'));
-		
-		this.scoreboards_stats.fetchStatistics(Statistics.SCALES.OVERALL, false, ['notifications_sent', 'view', 'fave', 'view_detail', 'fave_conversion', 'open_conversion'], null, function(data) {
-			var scoreboards_data = {numbers: {}};
-			$.each(data, function(field, stats) {
-				scoreboards_data.numbers[field] = stats[0].value
-			});
-			PAGE.updateScoreboards(PAGE.$wrapper.find('.EventstatsScoreboards'), scoreboards_data, {
-				'fave': 'Добавлений в избранное',
-				'view': 'Просмотров события'
-			}, ['fave', 'view']);
-			PAGE.updateScoreboards(PAGE.$wrapper.find('.EventstatsBigScoreboards'), scoreboards_data, {
-				'notifications_sent': 'Уведомлений отправлено',
-				'view': 'Просмотров',
-				'view_detail': 'Открытий',
-				'open_conversion': 'Конверсия открытий',
-				'fave': 'Добавлений',
-				'fave_conversion': 'Конверсия добавлений'
-			}, ['notifications_sent', 'view', 'view_detail', 'open_conversion', 'fave', 'fave_conversion'], 'big');
-		});
-		
-		this.graphics_stats.fetchStatistics(Statistics.SCALES.DAY, moment(__APP.EVENDATE_BEGIN, 'DD-MM-YYYY').format(), ['notifications_sent', 'view', 'fave', 'view_detail', 'fave_conversion', 'open_conversion'], null, function(data) {
-			PAGE.buildAreaCharts(data, {
-				rangeSelector: {
-					selected: 1
-				}
-			});
-		});
-		
-		__APP.MODALS.bindCallModal(PAGE.$wrapper);
-		bindPageLinks(PAGE.$wrapper);
-	};
-	
-	return StatisticsEventOverviewPage;
-}()));
-/**
- * @requires Class.StatisticsEventPage.js
- */
-/**
- *
- * @class StatisticsEventPromotionPage
- * @extends StatisticsEventPage
- */
-StatisticsEventPromotionPage = extending(StatisticsEventPage, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs StatisticsEventPromotionPage
-	 * @param {(string|number)} event_id
-	 */
-	function StatisticsEventPromotionPage(event_id) {
-		StatisticsEventPage.apply(this, arguments);
-	}
-	
-	StatisticsEventPromotionPage.prototype.render = function() {};
-	
-	return StatisticsEventPromotionPage;
-}()));
-/**
- * @requires ../Class.StatisticsPage.js
- */
-/**
- * @abstract
- * @class StatisticsOrganizationPage
- * @extends StatisticsPage
- */
-StatisticsOrganizationPage = extending(StatisticsPage, (function() {
-	/**
-	 *
-	 * @param {(string|number)} org_id
-	 * @constructor
-	 * @constructs StatisticsOrganizationPage
-	 */
-	function StatisticsOrganizationPage(org_id) {
-		StatisticsPage.apply(this);
-		this.id = org_id;
-		this.organization = new OneOrganization(this.id);
-		this.with_header_tabs = true;
-	}
-	
-	StatisticsOrganizationPage.prototype.fetchData = function() {
-		return this.fetching_data_defer = this.organization.fetchOrganization([
-			'description',
-			'img_medium_url',
-			'default_address',
-			'staff',
-			'privileges',
-			'events'.appendAjaxData({
-				length: 3,
-				future: true,
-				is_canceled: true,
-				is_delayed: true,
-				fields: [
-					'organization_short_name',
-					'public_at'
-				],
-				order_by: 'nearest_event_date'
-			})
-		]);
-	};
-	
-	StatisticsOrganizationPage.prototype.renderHeaderTabs = function(){
-		__APP.renderHeaderTabs([
-			{title: 'Обзор', page: '/statistics/organization/'+this.id+'/overview'},
-			{title: 'События', page: '/statistics/organization/'+this.id+'/events'}
-		]);
-	};
-	
-	return StatisticsOrganizationPage;
-}()));
-/**
- * @requires Class.StatisticsOrganizationPage.js
- */
-/**
- *
- * @class StatisticsOrganizationAuditoryPage
- * @extends StatisticsOrganizationPage
- */
-StatisticsOrganizationAuditoryPage = extending(StatisticsOrganizationPage, (function() {
-	/**
-	 *
-	 * @param {(string|number)} org_id
-	 * @constructor
-	 * @constructs StatisticsOrganizationAuditoryPage
-	 */
-	function StatisticsOrganizationAuditoryPage(org_id) {
-		StatisticsOrganizationPage.apply(this, arguments);
-	}
-	
-	StatisticsOrganizationAuditoryPage.prototype.render = function() {};
-	
-	return StatisticsOrganizationAuditoryPage;
-}()));
-/**
- * @requires Class.StatisticsOrganizationPage.js
- */
-/**
- *
- * @class StatisticsOrganizationEventsPage
- * @extends StatisticsOrganizationPage
- */
-StatisticsOrganizationEventsPage = extending(StatisticsOrganizationPage, (function() {
-	/**
-	 *
-	 * @param {(string|number)} org_id
-	 * @constructor
-	 * @constructs StatisticsOrganizationAuditoryPage
-	 */
-	function StatisticsOrganizationEventsPage(org_id) {
-		StatisticsOrganizationPage.apply(this, arguments);
-		
-		this.block_scroll = false;
-		this.future_events_data = {
-			future: true,
-			canceled_shown: true
-		};
-		this.past_events_data = {
-			canceled_shown: true,
-			order_by: '-first_event_date'
-		};
-		this.future_events = new EventsWithStatisticsCollection();
-		this.past_events = new EventsWithStatisticsCollection();
-	}
-	
-	StatisticsOrganizationEventsPage.buildEventRows = function(events, date_field) {
-		var $events = tmpl('orgstat-events-row', events.map(function(event) {
-			return $.extend({}, event, {
-				date: moment.unix(event[date_field]).format(__LOCALES.ru_RU.DATE.DATE_FORMAT),
-				timestamp: event[date_field],
-				conversion: Math.round(event.view == 0 ? (event.view_detail * 100 / event).view : 0) + '%'
+			return $.extend(true, {}, org, {
+				subscribers: org.subscribed_count + getUnitsText(org.subscribed_count, __LOCALES.ru_RU.TEXTS.SUBSCRIBERS),
+				buttons: __APP.BUILD.link({
+					title: 'Редактировать',
+					classes: ['button', 'fa_icon', 'fa-pencil', '-color_neutral', 'RippleEffect'],
+					page: '/organization/' + org.id + '/edit'
+				}, {
+					title: 'Создать событие',
+					classes: ['button', 'fa_icon', 'fa-plus', '-color_accent', 'RippleEffect'],
+					page: '/add/event/to/' + org.id
+				})
 			});
 		}));
-		bindPageLinks($events);
-		return $events;
 	};
 	
-	StatisticsOrganizationEventsPage.prototype.fetchData = function() {
-		return this.fetching_data_defer = this.organization.fetchOrganization([]);
+	AdminOrganizationsPage.prototype.fetchData = function() {
+		return this.fetching_data_defer = this.my_organizations.fetchMyOrganizations('admin', this.my_organizations_fields, 10, '');
 	};
 	
-	StatisticsOrganizationEventsPage.prototype.render = function() {
-		var this_page = this,
-			$window = $(window),
-			$past_events_wrapper,
-			past_events_tablesort;
-		
-		if(__APP.USER.id === -1){
-			__APP.changeState('/feed/actual', true, true);
-			return null;
-		}
-		
-		this.renderHeaderTabs();
-		__APP.changeTitle([{
-			title: 'Организации',
-			page: '/statistics'
-		}, this.organization.short_name + ' - события']);
-		
-		this.$wrapper.html(tmpl('orgstat-events-page'));
-		
-		this.future_events.fetchOrganizationsEvents(this.organization.id, this.future_events_data, 0, function() {
-			if(this.length){
-				this_page.$wrapper.find('.OrgStatFutureEventsWrapper').html(tmpl('orgstat-events-wrapper', {
-					title: 'Предстоящие события',
-					rows: StatisticsOrganizationEventsPage.buildEventRows(this_page.future_events, 'nearest_event_date')
-				})).find('table').tablesort();
-			}
-		});
-		
-		this.past_events.fetchOrganizationsEvents(this.organization.id, this.past_events_data, 30, function() {
-			if(this.length){
-				$past_events_wrapper = this_page.$wrapper.find('.OrgStatPastEventsWrapper');
-				$past_events_wrapper.html(tmpl('orgstat-events-wrapper', {
-					title: 'Прошедшие события',
-					rows: StatisticsOrganizationEventsPage.buildEventRows(this_page.past_events, 'first_event_date')
-				}));
-				past_events_tablesort = $past_events_wrapper.find('table').tablesort();
-				
-				$window.on('scroll.uploadEvents', function() {
-					if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !this_page.block_scroll) {
-						this_page.block_scroll = true;
-						
-						this_page.past_events.fetchOrganizationsEvents(this_page.organization.id, this_page.past_events_data, 30, function(events) {
-							this_page.block_scroll = false;
-							if (events.length) {
-								$past_events_wrapper.find('tbody').append(StatisticsOrganizationEventsPage.buildEventRows(events, 'first_event_date'));
-								past_events_tablesort.refresh();
-							} else {
-								$(window).off('scroll.uploadEvents');
-							}
-						})
-					}
-				})
-			}
-		});
+	AdminOrganizationsPage.prototype.bindOrganizationsEvents = function($parent) {
+		trimAvatarsCollection($parent);
+		bindPageLinks($parent);
+		__APP.MODALS.bindCallModal($parent);
+		bindRippleEffect($parent);
+		return $parent;
 	};
 	
-	return StatisticsOrganizationEventsPage;
-}()));
-/**
- * @requires Class.StatisticsOrganizationPage.js
- */
-/**
- *
- * @class StatisticsOrganizationOverviewPage
- * @extends StatisticsOrganizationPage
- */
-StatisticsOrganizationOverviewPage = extending(StatisticsOrganizationPage, (function() {
-	/**
-	 *
-	 * @param {(string|number)} org_id
-	 * @constructor
-	 * @constructs StatisticsOrganizationOverviewPage
-	 */
-	function StatisticsOrganizationOverviewPage(org_id) {
-		StatisticsOrganizationPage.apply(this, arguments);
-		this.graphics_stats = new OrganizationsStatistics(this.id);
-		this.other_stats = new OrganizationsStatistics(this.id);
-	}
-	/**
-	 *
-	 * @param {string} title
-	 * @param staff
-	 * @return {jQuery}
-	 */
-	StatisticsOrganizationOverviewPage.buildStaffBlock = function(title, staff) {
-		if (staff.length) {
-			return tmpl('orgstat-overview-sidebar-wrapper-title', {title: title}).add(__APP.BUILD.avatarBlocks(staff, {
-				avatar_classes: ['-size_40x40','-rounded'],
-				entity: 'user',
-				is_link: true
-			}));
-		}
-		return $();
-	};
-	
-	StatisticsOrganizationOverviewPage.prototype.fetchData = function() {
-		return this.fetching_data_defer = this.organization.fetchOrganizationWithEvents([
-			'description',
-			'img_medium_url',
-			'default_address',
-			'staff',
-			'privileges'
-		], {
-			length: 3,
-			fields: [
-				'organization_short_name',
-				'public_at'
-			],
-			is_delayed: true,
-			filters: 'future=true,is_canceled=false',
-			order_by: 'nearest_event_date'
-		});
-	};
-	
-	StatisticsOrganizationOverviewPage.prototype.buildAreaCharts = function() {
-		var self = this;
-		StatisticsPage.prototype.buildAreaCharts.call(self, {
-			subscribe_unsubscribe: self.graphics_stats.subscribe.map(function(el, i) {
-				return {
-					time_value: el.time_value,
-					subscribe: el.value,
-					unsubscribe: self.graphics_stats.unsubscribe[i].value
-				}
-			}),
-			view: self.graphics_stats.view,
-			conversion: self.graphics_stats.conversion
-		});
-	};
-	
-	StatisticsOrganizationOverviewPage.prototype.buildPieChart = function($container, data) {
-		var pie_chart_options = {
-			chart: {
-				type: 'pie',
-				height: 200,
-				style: {
-					fontFamily: 'inherit',
-					fontSize: 'inherit'
-				}
-			},
-			colors: [__C.COLORS.FRANKLIN, __C.COLORS.ACCENT, __C.COLORS.MUTED, __C.COLORS.MUTED_80, __C.COLORS.MUTED_50, __C.COLORS.MUTED_30],
-			tooltip: {
-				pointFormat: '<b>{point.percentage:.1f}%</b>'
-			},
-			plotOptions: {
-				pie: {
-					center: [45, '50%'],
-					allowPointSelect: true,
-					cursor: 'pointer',
-					size: 120,
-					dataLabels: {
-						distance: -35,
-						defer: false,
-						formatter: function() {
-							return this.percentage > 15 ? Math.round(this.percentage) + '%' : null;
-						},
-						style: {"color": "#fff", "fontSize": "20px", "fontWeight": "300", "textShadow": "none"},
-						y: -6
-					},
-					showInLegend: true
-				}
-			},
-			legend: {
-				align: 'right',
-				verticalAlign: 'top',
-				layout: 'vertical',
-				width: 100,
-				symbolHeight: 0,
-				symbolWidth: 0,
-				itemMarginBottom: 5,
-				labelFormatter: function() {
-					return '<span style="color: ' + this.color + '">' + this.name + '</span>'
-				},
-				itemStyle: {cursor: 'pointer', fontSize: '14px', fontWeight: '500'},
-				y: 12
-			}
-		};
-		
-		function pieChartSeriesNormalize(raw_data) {
-			var STD_NAMES = {
-				"browser": "Браузер",
-				"android": "Аndroid",
-				"ios": "iOS",
-				"female": "Женщины",
-				"male": "Мужчины",
-				"other": "Остальные",
-				null: "Не указано"
-			};
-			return [{
-				data: raw_data.map(function(line, i) {
-					return {
-						name: line.name ? STD_NAMES[line.name] : STD_NAMES[line.gender],
-						y: line.count
-					}
-				})
-			}];
-		}
-		
-		$container.highcharts($.extend(true, {}, this.highchart_defaults, pie_chart_options, {series: pieChartSeriesNormalize(data)}));
-	};
-	
-	StatisticsOrganizationOverviewPage.prototype.render = function() {
+	AdminOrganizationsPage.prototype.bindUploadOnScroll = function() {
 		var PAGE = this,
-			stat_dynamics = {
-				scale: Statistics.SCALES.WEEK,
-				fields: [
-					'subscribe',
-					'view',
-					'fave',
-					'conversion'
-				]
-			},
-			staffs_additional_fields = {
-				is_link: true,
-				avatar_classes: ['-size_40x40', '-rounded']
-			},
-			storage_data_name = 'org_stats_' + this.id + '_data',
-			storage_until_name = 'org_stats_' + this.id + '_until',
-			is_cached_data_actual = moment.unix(sessionStorage.getItem(storage_until_name)).isAfter(moment());
+			$window = $(window),
+			scrollEvent = function() {
+				if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.is_upload_disabled) {
+					$window.off('scroll.uploadOrganizations');
+					PAGE.my_organizations.fetchMyOrganizations('admin', PAGE.my_organizations_fields, 10, '', function(organizations) {
+						var $organizations = AdminOrganizationsPage.buildMyOrganizationsBlocks(organizations);
+						if (organizations.length) {
+							PAGE.$wrapper.find('.StatOverviewOrganizations').append($organizations);
+							PAGE.bindOrganizationsEvents($organizations);
+							$window.on('scroll.uploadOrganizations', scrollEvent);
+						} else {
+							PAGE.is_upload_disabled = true;
+						}
+					});
+				}
+			};
 		
+		if (!PAGE.is_upload_disabled) {
+			$window.on('scroll.uploadOrganizations', scrollEvent);
+		}
+	};
+	
+	AdminOrganizationsPage.prototype.init = function() {
+		this.bindOrganizationsEvents(this.$wrapper);
+		this.bindUploadOnScroll();
+	};
+	
+	AdminOrganizationsPage.prototype.render = function() {
 		if(__APP.USER.id === -1){
 			__APP.changeState('/feed/actual', true, true);
 			return null;
 		}
-		
-		if (!window.location.pathname.contains('overview')) {
-			__APP.changeState(window.location.pathname+'/overview', true);
-		}
-		this.renderHeaderTabs();
-		__APP.changeTitle([{
-			title: 'Организации',
-			page: '/statistics'
-		}, this.organization.short_name]);
-		
-		this.$wrapper.html(tmpl('orgstat-overview', $.extend(true, {}, this.organization, {
-			avatar_block: __APP.BUILD.avatarBlocks(this.organization, {
-				entity: 'organization',
-				block_classes: ['-stack']
-			}),
-			staff_block: StatisticsOrganizationOverviewPage.buildStaffBlock('Администраторы', this.organization.staff.getSpecificStaff(OneUser.ROLE.ADMIN, staffs_additional_fields))
-				.add(StatisticsOrganizationOverviewPage.buildStaffBlock('Модераторы', this.organization.staff.getSpecificStaff(OneUser.ROLE.MODERATOR, staffs_additional_fields))),
-			event_blocks: this.organization.events.length ? tmpl('orgstat-overview-sidebar-wrapper', {
-				content: tmpl('orgstat-overview-sidebar-wrapper-title', {title: 'Предстоящие события'})
-					.add(tmpl('orgstat-event-block', this.organization.events.map(function(event) {
-						var badges = [];
-						if (event.canceled)
-							badges.push({title: 'Отменено'});
-						if (event.public_at && moment.unix(event.public_at).isBefore())
-							badges.push({title: 'Не опубликовано'});
-						
-						return {
-							id: event.id,
-							title: event.title,
-							organization_short_name: event.organization_short_name,
-							day: moment.unix(event.first_event_date).format("D"),
-							month: moment.unix(event.first_event_date).format("MMM"),
-							badges: tmpl('orgstat-event-block-badge', badges)
-						};
-					})))
-			}) : ''
-		})));
-		
-		if (is_cached_data_actual) {
-			this.graphics_stats.setData(JSON.parse(sessionStorage.getItem(storage_data_name)));
-			this.buildAreaCharts();
-		} else {
-			this.$wrapper.find('.OrgStatAreaCharts').children('.AreaChart').append(tmpl('loader'));
-			this.graphics_stats.fetchStatistics(Statistics.SCALES.DAY, moment(__APP.EVENDATE_BEGIN, 'DD-MM-YYYY').format(), ['view', 'subscribe', 'unsubscribe', 'conversion'], null, function() {
-				sessionStorage.setItem(storage_data_name, JSON.stringify(PAGE.graphics_stats));
-				sessionStorage.setItem(storage_until_name, moment().add(15, 'm').unix());
-				PAGE.buildAreaCharts();
-			});
-		}
-		
-		this.other_stats.fetchStatistics(Statistics.SCALES.OVERALL, false, ['subscribe', 'view', 'fave', 'conversion', 'audience'], stat_dynamics, function(stat_data) {
-			var scoreboards_data = {numbers: {}, dynamics: {}};
-			
-			$.each(stat_data.dynamics, function(field, dynamics) {
-				scoreboards_data.dynamics[field] = dynamics[0].value;
-				scoreboards_data.numbers[field] = stat_data[field][0].value;
-			});
-			PAGE.buildPieChart(PAGE.$wrapper.find('.GenderPieChart'), this.audience.gender);
-			PAGE.buildPieChart(PAGE.$wrapper.find('.DevicePieChart'), this.audience.devices);
-			
-			PAGE.updateScoreboards(PAGE.$wrapper.find('.Scoreboards'), scoreboards_data, {
-				'subscribe': 'Подписчиков организатора',
-				'fave': 'Добавлений в избранное',
-				'view': 'Просмотров организатора',
-				'conversion': 'Конверсия открытий/подписок'
-			}, ['subscribe', 'fave', 'view', 'conversion']);
-			
-		});
-		
-		bindRippleEffect(this.$wrapper);
-		bindPageLinks(this.$wrapper);
+		this.$wrapper.html(tmpl('statistics-overview-wrapper', {
+			organizations: AdminOrganizationsPage.buildMyOrganizationsBlocks(this.my_organizations)
+		}));
+		this.init();
 	};
 	
-	return StatisticsOrganizationOverviewPage;
-}()));
-/**
- * @requires Class.StatisticsOrganizationPage.js
- */
-/**
- *
- * @class StatisticsOrganizationPromotionPage
- * @extends StatisticsOrganizationPage
- */
-StatisticsOrganizationPromotionPage = extending(StatisticsOrganizationPage, (function() {
-	/**
-	 *
-	 * @param {(string|number)} org_id
-	 * @constructor
-	 * @constructs StatisticsOrganizationPromotionPage
-	 */
-	function StatisticsOrganizationPromotionPage(org_id) {
-		StatisticsOrganizationPage.apply(this, arguments);
-	}
+	AdminOrganizationsPage.prototype.destroy = function() {
+		$(window).off('scroll.uploadOrganizations');
+	};
 	
-	StatisticsOrganizationPromotionPage.prototype.render = function() {};
-	
-	return StatisticsOrganizationPromotionPage;
-}()));
-/**
- * @requires Class.StatisticsOrganizationPage.js
- */
-/**
- *
- * @class StatisticsOrganizationSettingsPage
- * @extends StatisticsOrganizationPage
- */
-StatisticsOrganizationSettingsPage = extending(StatisticsOrganizationPage, (function() {
-	/**
-	 *
-	 * @param {(string|number)} org_id
-	 * @constructor
-	 * @constructs StatisticsOrganizationSettingsPage
-	 */
-	function StatisticsOrganizationSettingsPage(org_id) {
-		StatisticsOrganizationPage.apply(this, arguments);
-	}
-	
-	StatisticsOrganizationSettingsPage.prototype.render = function() {};
-	
-	return StatisticsOrganizationSettingsPage;
-}()));
-/**
- * @requires Class.StatisticsOrganizationPage.js
- */
-/**
- *
- * @class StatisticsOrganizationSupportPage
- * @extends StatisticsOrganizationPage
- */
-StatisticsOrganizationSupportPage = extending(StatisticsOrganizationPage, (function() {
-	/**
-	 *
-	 * @param {(string|number)} org_id
-	 * @constructor
-	 * @constructs StatisticsOrganizationSupportPage
-	 */
-	function StatisticsOrganizationSupportPage(org_id) {
-		StatisticsOrganizationPage.apply(this, arguments);
-	}
-	
-	StatisticsOrganizationSupportPage.prototype.render = function() {};
-	
-	return StatisticsOrganizationSupportPage;
+	return AdminOrganizationsPage;
 }()));
 /**
  * @requires ../Class.Page.js
@@ -14601,134 +14747,6 @@ SearchPage = extending(Page, (function() {
 	return SearchPage;
 }()));
 /**
- * @requires Class.StatisticsPage.js
- */
-/**
- *
- * @class StatisticsOverviewPage
- * @extends StatisticsPage
- */
-StatisticsOverviewPage = extending(StatisticsPage, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs StatisticsOverviewPage
-	 */
-	function StatisticsOverviewPage() {
-		StatisticsPage.apply(this);
-		this.my_organizations_fields = ['img_medium_url', 'subscribed_count', 'staff'];
-		this.page_title = 'Организации';
-		this.my_organizations = new OrganizationsCollection();
-	}
-	
-	StatisticsOverviewPage.buildMyOrganizationsBlocks = function(organizations) {
-		return tmpl('statistics-overview-organization', organizations.map(function(org) {
-			var avatars_max_count = 2,
-				staff_additional_fields = {
-					is_link: true,
-					avatar_classes: ['-size_100x100', '-rounded']
-				},
-				org_roles = [
-					{
-						name: OneUser.ROLE.ADMIN,
-						title: 'Администраторы',
-						staff: UsersCollection.getSpecificStaff(OneUser.ROLE.ADMIN, org.staff, staff_additional_fields),
-						plural_name: OneUser.ROLE.ADMIN + 's'
-					}, {
-						name: OneUser.ROLE.MODERATOR,
-						title: 'Модераторы',
-						staff: UsersCollection.getSpecificStaff(OneUser.ROLE.MODERATOR, org.staff, staff_additional_fields),
-						plural_name: OneUser.ROLE.MODERATOR + 's'
-					}
-				];
-			
-			org_roles.forEach(function(role) {
-				org[role.plural_name] = __APP.BUILD.avatarCollection(role.staff, avatars_max_count, {
-					dataset: {
-						modal_type: 'editors',
-						modal_specific_role: role.name,
-						modal_title: role.title,
-						modal_organization_id: org.id
-					},
-					classes: ['-size_30x30', '-rounded', '-shifted', 'CallModal'],
-					counter_classes: ['-size_30x30','-color_marginal_primary']
-				});
-			});
-			
-			return $.extend(true, {}, org, {
-				subscribers: org.subscribed_count + getUnitsText(org.subscribed_count, __LOCALES.ru_RU.TEXTS.SUBSCRIBERS),
-				buttons: __APP.BUILD.link({
-					title: 'Редактировать',
-					classes: ['button', 'fa_icon', 'fa-pencil', '-color_neutral', 'RippleEffect'],
-					page: '/organization/' + org.id + '/edit'
-				}, {
-					title: 'Создать событие',
-					classes: ['button', 'fa_icon', 'fa-plus', '-color_accent', 'RippleEffect'],
-					page: '/add/event/to/' + org.id
-				})
-			});
-		}));
-	};
-	
-	StatisticsOverviewPage.prototype.fetchData = function() {
-		return this.fetching_data_defer = this.my_organizations.fetchMyOrganizations('admin', this.my_organizations_fields, 10, '');
-	};
-	
-	StatisticsOverviewPage.prototype.bindOrganizationsEvents = function($parent) {
-		trimAvatarsCollection($parent);
-		bindPageLinks($parent);
-		__APP.MODALS.bindCallModal($parent);
-		bindRippleEffect($parent);
-		return $parent;
-	};
-	
-	StatisticsOverviewPage.prototype.bindUploadOnScroll = function() {
-		var PAGE = this,
-			$window = $(window),
-			scrollEvent = function() {
-				if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.is_upload_disabled) {
-					$window.off('scroll.uploadOrganizations');
-					PAGE.my_organizations.fetchMyOrganizations('admin', PAGE.my_organizations_fields, 10, '', function(organizations) {
-						var $organizations = StatisticsOverviewPage.buildMyOrganizationsBlocks(organizations);
-						if (organizations.length) {
-							PAGE.$wrapper.find('.StatOverviewOrganizations').append($organizations);
-							PAGE.bindOrganizationsEvents($organizations);
-							$window.on('scroll.uploadOrganizations', scrollEvent);
-						} else {
-							PAGE.is_upload_disabled = true;
-						}
-					});
-				}
-			};
-		
-		if (!PAGE.is_upload_disabled) {
-			$window.on('scroll.uploadOrganizations', scrollEvent);
-		}
-	};
-	
-	StatisticsOverviewPage.prototype.init = function() {
-		this.bindOrganizationsEvents(this.$wrapper);
-		this.bindUploadOnScroll();
-	};
-	
-	StatisticsOverviewPage.prototype.render = function() {
-		if(__APP.USER.id === -1){
-			__APP.changeState('/feed/actual', true, true);
-			return null;
-		}
-		this.$wrapper.html(tmpl('statistics-overview-wrapper', {
-			organizations: StatisticsOverviewPage.buildMyOrganizationsBlocks(this.my_organizations)
-		}));
-		this.init();
-	};
-	
-	StatisticsOverviewPage.prototype.destroy = function() {
-		$(window).off('scroll.uploadOrganizations');
-	};
-	
-	return StatisticsOverviewPage;
-}()));
-/**
  * @requires ../Class.Page.js
  */
 /**
@@ -15388,6 +15406,19 @@ __APP = {
 	PREVIOUS_PAGE: new Page(),
 	CURRENT_PAGE: new Page(),
 	ROUTING: {
+		'admin': {
+			'organization': {
+				'^([0-9]+)': {
+					'overview': AdminOrganizationOverviewPage,
+					'events': AdminOrganizationEventsPage,
+					'': AdminOrganizationOverviewPage
+				}
+			},
+			'event': {
+				'^([0-9]+)': AdminEventOverviewPage
+			},
+			'': AdminOrganizationsPage
+		},
 		'add': {
 			'event': {
 				'to': {
@@ -15458,19 +15489,6 @@ __APP = {
 			'me': MyProfilePage,
 			'^([0-9]+)': UserPage,
 			'': MyProfilePage
-		},
-		'statistics': {
-			'organization': {
-				'^([0-9]+)': {
-					'overview': StatisticsOrganizationOverviewPage,
-					'events': StatisticsOrganizationEventsPage,
-					'': StatisticsOrganizationOverviewPage
-				}
-			},
-			'event': {
-				'^([0-9]+)': StatisticsEventOverviewPage
-			},
-			'': StatisticsOverviewPage
 		},
 		'': ActualEventsPage
 	},
@@ -15564,14 +15582,15 @@ __APP = {
 		return __APP.changeState(location.pathname, true, true);
 	},
 	init: function appInit() {
-		var $sidebar_nav_items = $('.SidebarNavItem');
+		var $sidebar_nav_items = $('.SidebarNavItem'),
+			pathname = window.location.pathname;
 		
-		__APP.CURRENT_PAGE = Page.routeNewPage(window.location.pathname);
+		__APP.CURRENT_PAGE = Page.routeNewPage(pathname);
 		__APP.CURRENT_PAGE.fetchData();
 		__APP.CURRENT_PAGE.show();
 		$sidebar_nav_items.removeClass(__C.CLASSES.ACTIVE)
 			.filter(function() {
-				return window.location.pathname.indexOf(this.getAttribute('href')) === 0;
+				return pathname.indexOf(this.getAttribute('href')) === 0;
 			}).addClass(__C.CLASSES.ACTIVE);
 	},
 	reInit: function appReInit() {
@@ -15745,6 +15764,12 @@ window.paceOptions = {
 __stats = [];
 askToSubscribe = null;
 
+(function redirects(pathname) {
+	if (pathname.indexOf('/statistics') !== -1) {
+		return __APP.changeState(pathname.replace('statistics', 'admin'), true, true);
+	}
+})(window.location.pathname);
+
 $(document)
 	.ajaxStart(function() {
 		Pace.restart()
@@ -15757,8 +15782,7 @@ $(document)
 	.ready(function() {
 		var OneSignal = window.OneSignal || [],
 			user_jqhxr,
-			auth_urls_jqxhr,
-			geolocation_jqxhr;
+			auth_urls_jqxhr;
 		
 		OneSignal.push(["init", {
 			appId: "7471a586-01f3-4eef-b989-c809700a8658",

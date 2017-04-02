@@ -80,9 +80,9 @@ $url_parts = explode('/', $url);
 	<?php
 	if ($DEBUG_MODE) { ?>
 		<link rel="stylesheet" href="/dist/vendor.css?rev=514c11bff5a0b7b71eba77acf679a6e0">
-		<link rel="stylesheet" href="/dist/app.css?rev=a859afa175ffbdc29b05e63d87f4f406"><?php
+		<link rel="stylesheet" href="/dist/app.css?rev=005dd2f6b5823e562bed9de115343127"><?php
 	} else { ?>
-		<link rel="stylesheet" href="/dist/vendor.min.css?rev=06ab404610392c5da1392043f51a9b85">
+		<link rel="stylesheet" href="/dist/vendor.min.css?rev=70c41e05eb03157e444e43cfbf3d185d">
 		<link rel="stylesheet" href="/dist/app.min.css?rev=0d6e6cd27fe68f7c877e2b76c66594ea"><?php
 	} ?>
 
@@ -233,7 +233,7 @@ $url_parts = explode('/', $url);
 	<div class="sidebar_main_wrapper scrollbar-outer SidebarScroll">
 		<nav class="sidebar_navigation SidebarNav"><?php
 			if ($is_user_editor) { ?>
-				<a href="/statistics" class="sidebar_navigation_item SidebarNavItem link Link"><span>Статистика</span></a>
+				<a href="/admin" class="sidebar_navigation_item SidebarNavItem link Link"><span>Администрирование</span></a>
 				<a href="/add/event" class="sidebar_navigation_item SidebarNavItem link Link"><span>Создать событие</span></a><?php
 			} ?>
 			<a href="/feed" class="sidebar_navigation_item SidebarNavItem link Link"><span>События</span><span class="counter sidebar_navigation_counter -hidden SidebarNavFeedCounter"></span></a>
@@ -276,11 +276,11 @@ $url_parts = explode('/', $url);
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=2a75f8eb4f516d506683a4252c4c780e" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=5ef163ba0307b7dee38faf5619d58e40" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=fd52ef7eb72a4e4d656ff78935bdb8e2" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=158d2bd9c3757b6b51bbd30aab99caa5" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=cb0b469d29810470bf28c21aba1d3b15" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=d8535b9c6a41e54bf548bc49c3dc12f3" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=a58e2a98b63d759854d831072fb38e2f" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=cd8807fd5c3780895e7e803d63595e1b" charset="utf-8"></script><?php
 }
 
 foreach (glob("app/templates/{*/*/*/*,*/*/*,*/*,*}.html", GLOB_BRACE) as $filename) {

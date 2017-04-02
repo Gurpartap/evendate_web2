@@ -28,6 +28,19 @@ __APP = {
 	PREVIOUS_PAGE: new Page(),
 	CURRENT_PAGE: new Page(),
 	ROUTING: {
+		'admin': {
+			'organization': {
+				'^([0-9]+)': {
+					'overview': AdminOrganizationOverviewPage,
+					'events': AdminOrganizationEventsPage,
+					'': AdminOrganizationOverviewPage
+				}
+			},
+			'event': {
+				'^([0-9]+)': AdminEventOverviewPage
+			},
+			'': AdminOrganizationsPage
+		},
 		'add': {
 			'event': {
 				'to': {
@@ -98,19 +111,6 @@ __APP = {
 			'me': MyProfilePage,
 			'^([0-9]+)': UserPage,
 			'': MyProfilePage
-		},
-		'statistics': {
-			'organization': {
-				'^([0-9]+)': {
-					'overview': StatisticsOrganizationOverviewPage,
-					'events': StatisticsOrganizationEventsPage,
-					'': StatisticsOrganizationOverviewPage
-				}
-			},
-			'event': {
-				'^([0-9]+)': StatisticsEventOverviewPage
-			},
-			'': StatisticsOverviewPage
 		},
 		'': ActualEventsPage
 	},
@@ -204,14 +204,15 @@ __APP = {
 		return __APP.changeState(location.pathname, true, true);
 	},
 	init: function appInit() {
-		var $sidebar_nav_items = $('.SidebarNavItem');
+		var $sidebar_nav_items = $('.SidebarNavItem'),
+			pathname = window.location.pathname;
 		
-		__APP.CURRENT_PAGE = Page.routeNewPage(window.location.pathname);
+		__APP.CURRENT_PAGE = Page.routeNewPage(pathname);
 		__APP.CURRENT_PAGE.fetchData();
 		__APP.CURRENT_PAGE.show();
 		$sidebar_nav_items.removeClass(__C.CLASSES.ACTIVE)
 			.filter(function() {
-				return window.location.pathname.indexOf(this.getAttribute('href')) === 0;
+				return pathname.indexOf(this.getAttribute('href')) === 0;
 			}).addClass(__C.CLASSES.ACTIVE);
 	},
 	reInit: function appReInit() {

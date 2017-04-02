@@ -1,5 +1,4 @@
 <script type="javascript/template" id="tmpl-statistics-overview-wrapper">
-	<!--<div class="page statistics_overview_activity"></div>-->
 	<div class="statistics_overview_wrapper StatOverviewOrganizations">
 		{organizations}
 	</div>
@@ -15,12 +14,12 @@
 <script type="javascript/template" id="tmpl-statistics-overview-organization">
 	<div class="page organization_card">
 		<aside class="organization_card_side">
-			<a href="/statistics/organization/{id}" class="avatar -size_100x100 link Link">
+			<a href="/admin/organization/{id}" class="avatar -size_100x100 link Link">
 				<img src="{img_medium_url}" onerror="this.onerror=null;this.src='/app/img/brand_logo.png'">
 			</a>
 		</aside>
 		<div class="organization_card_content">
-			<a href="/statistics/organization/{id}" class="organization_card_title link Link">{short_name}</a>
+			<a href="/admin/organization/{id}" class="organization_card_title link Link">{short_name}</a>
 			<div class="organization_card_info">
 				<span class="organization_card_field">{future_events}</span>
 				<span class="organization_card_field">{subscribers}</span>
