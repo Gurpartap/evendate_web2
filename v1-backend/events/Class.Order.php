@@ -82,6 +82,7 @@ class Order extends AbstractEntity
 		'user_id',
 		'status_type_code',
 		'payed_at',
+		'created_at',
 		'status_name',
 	);
 
@@ -90,7 +91,6 @@ class Order extends AbstractEntity
 		'is_canceled',
 		'payed_at',
 		'canceled_at',
-		'created_at',
 		'updated_at',
 		'status_name',
 		'status_id'

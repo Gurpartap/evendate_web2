@@ -157,7 +157,7 @@ OneEvent = extending(OneEntity, (function() {
 		this.loading = false;
 		if (event_id && is_loading_continuous) {
 			this.loading = true;
-			this.fetchEvent([], function() {
+			this.fetchEvent(undefined, function() {
 				this.loading = false;
 				$(window).trigger('fetch.OneEvent');
 			});
@@ -182,7 +182,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @returns {jqPromise}
 	 */
 	OneEvent.fetchEvent = function(event_id, fields, success) {
-		return __APP.SERVER.getData('/api/v1/events/' + event_id, fields || (Array.isArray(fields) && fields.length) ? {fields: fields} : {}, success);
+		return __APP.SERVER.getData('/api/v1/events/' + event_id, {fields: new Fields(fields)}, success);
 	};
 	/**
 	 * @typedef {function({
@@ -324,9 +324,9 @@ OneEvent = extending(OneEntity, (function() {
 	 */
 	OneEvent.prototype.fetchEvent = function(fields, success) {
 		var self = this;
-		return this.constructor.fetchEvent(self.id, fields, function(data) {
+		return OneEvent.fetchEvent(self.id, fields, function(data) {
 			self.setData(data[0]);
-			if (success && typeof success == 'function') {
+			if (success && typeof success === 'function') {
 				success.call(self, data[0]);
 			}
 		});
