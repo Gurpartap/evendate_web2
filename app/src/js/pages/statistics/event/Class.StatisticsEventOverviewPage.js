@@ -21,13 +21,13 @@ StatisticsEventOverviewPage = extending(StatisticsEventPage, (function() {
 	}
 	
 	StatisticsEventOverviewPage.prototype.fetchData = function() {
-		return this.fetching_data_defer = this.event.fetchEvent([
+		return this.fetching_data_defer = this.event.fetchEvent(new Fields(
 			'image_horizontal_medium_url',
 			'organization_short_name',
 			'favored_users_count',
 			'is_same_time',
 			'dates'
-		]);
+		));
 	};
 	
 	StatisticsEventOverviewPage.prototype.render = function() {

@@ -87,20 +87,16 @@ RegisterButton = extending(ActionButton, (function() {
 			} else {
 				if (this.event.tickets.length) {
 					ticket = OneExtendedTicket.extractTicketFromEvent(this.event);
-					promise = ticket.fetchTicket(new Fields('created_at', 'number', 'ticket_type', {
-						order: {
-							fields: new Fields('created_at')
-						},
+					promise = ticket.fetchTicket(new Fields('created_at', 'number', 'ticket_type', 'order', {
 						event: {
 							fields: new Fields('dates', 'is_same_time', 'image_horizontal_medium_url', 'location')
 						}
 					}));
 				} else {
 					promise = this.event.fetchEvent(new Fields('dates', 'is_same_time', 'image_horizontal_medium_url', 'location', {
-						orders: {
-							fields: new Fields('created_at')
-						},
-						tickets: new Fields('created_at', 'number', 'ticket_type')
+						tickets: {
+							fields: new Fields('created_at', 'number', 'ticket_type', 'order')
+						}
 					})).done(function() {
 						return ticket = OneExtendedTicket.extractTicketFromEvent(self.event);
 					});

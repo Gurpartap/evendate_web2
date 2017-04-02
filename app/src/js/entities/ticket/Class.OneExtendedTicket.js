@@ -67,12 +67,26 @@ OneExtendedTicket = extending(OneTicket, (function() {
 	 */
 	OneExtendedTicket.extractTicketFromData = function(data) {
 		return data.map(function(event) {
-			var ticket_data = event.tickets.length === 1 ? event.tickets.shift() : event.tickets;
+			var ticket_data = event.tickets.length === 1 ? event.tickets.shift() : event.tickets,
+				order_data = ticket_data.order,
+				ticket_type_data = ticket_data.ticket_type;
 			
-			delete event.tickets;
-			ticket_data.event = event;
+			if (!order_data && event.orders) {
+				order_data = event.orders.reduce(function(found_order, order) {
+					return found_order ? found_order : (order.uuid === ticket_data.ticket_order_uuid ? order : false);
+				}, false);
+			}
+			if (!ticket_type_data && event.ticket_types) {
+				ticket_type_data = event.ticket_types.reduce(function(found_ticket_type, ticket_type) {
+					return found_ticket_type ? found_ticket_type : (ticket_type.uuid === ticket_data.ticket_type_uuid ? ticket_type : false);
+				}, false);
+			}
 			
-			return ticket_data;
+			return $.extend(ticket_data, {
+				event: event,
+				order: order_data,
+				ticket_type: ticket_type_data
+			});
 		});
 	};
 	/**
@@ -107,11 +121,13 @@ OneExtendedTicket = extending(OneTicket, (function() {
 		
 		fields = Fields.parseFields(fields);
 		
-		event_ajax_data = $.extend(true, {}, fields.get('event'), {
-			fields: new Fields({tickets: {
-				filters: 'uuid=' + uuid,
-				fields: fields
-			}})
+		event_ajax_data = $.extend(true, {}, fields.pull('event'), {
+			fields: new Fields({
+				tickets: {
+					filters: 'uuid=' + uuid,
+					fields: fields
+				}
+			})
 		});
 		
 		return __APP.SERVER.getData('/api/v1/events/' + event_id, event_ajax_data, success);
@@ -129,7 +145,7 @@ OneExtendedTicket = extending(OneTicket, (function() {
 		return OneExtendedTicket.fetchTicket(this.event_id, this.uuid, fields, function(data) {
 			var ticket_data = OneExtendedTicket.extractTicketFromData(data);
 			self.setData(ticket_data);
-			if (success && typeof success == 'function') {
+			if (success && typeof success === 'function') {
 				success.call(self, ticket_data);
 			}
 		});
