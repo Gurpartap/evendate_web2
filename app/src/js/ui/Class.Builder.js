@@ -197,7 +197,8 @@ Builder = (function() {
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.formInput = function buildFormInput(props) {
-		var INPUT_TYPES = [
+		var self = this,
+			INPUT_TYPES = [
 			'hidden',
 			'text',
 			'search',
@@ -221,29 +222,35 @@ Builder = (function() {
 		return $.makeSet(Array.prototype.map.call(arguments, function(props) {
 			switch (props.type) {
 				case 'radio':
-					return this.radio(props);
+					return self.radio(props);
 				case 'checkbox':
-					return this.checkbox(props);
+					return self.checkbox(props);
 				default:
 					return tmpl('form-unit', Builder.normalizeBuildProps($.extend(true, {}, props, {
 						form_element: props.type === 'textarea' ?
-							this.textarea($.extend({}, props.attributes, {
-								id: props.id,
-								name: props.name || undefined,
-								required: props.required || undefined,
-								placeholder: props.placeholder,
-								tabindex: props.tabindex
-							}), (props.classes ? ['form_textarea'].concat(props.classes) : ['form_textarea']), props.value, props.dataset) :
-							this.input($.extend({}, props.attributes, {
-								id: props.id,
-								type: !props.type || INPUT_TYPES.indexOf(props.type) === -1 ? 'text' : props.type,
-								name: props.name || undefined,
-								value: props.value || undefined,
-								required: props.required || undefined,
-								placeholder: props.placeholder,
-								tabindex: props.tabindex
-							}), (props.classes ? ['form_input'].concat(props.classes) : ['form_input']), props.dataset),
-						helptext: this.formHelpText(props.helptext, props.helptext_dataset, props.helptext_attributes)
+						              self.textarea($.extend(
+						              	{},
+							              props.attributes,
+							              {
+								              id: props.id,
+								              name: props.name || undefined,
+								              required: props.required || undefined,
+								              placeholder: props.placeholder,
+								              tabindex: props.tabindex
+							              }), (props.classes ? ['form_textarea'].concat(props.classes) : ['form_textarea']), props.value, props.dataset) :
+						              self.input($.extend(
+						              	{},
+							              props.attributes,
+							              {
+								              id: props.id,
+								              type: !props.type || INPUT_TYPES.indexOf(props.type) === -1 ? 'text' : props.type,
+								              name: props.name || undefined,
+								              value: props.value || undefined,
+								              required: props.required || undefined,
+								              placeholder: props.placeholder,
+								              tabindex: props.tabindex
+							              }), (props.classes ? ['form_input'].concat(props.classes) : ['form_input']), props.dataset),
+						helptext: self.formHelpText(props.helptext, props.helptext_dataset, props.helptext_attributes)
 					}), ['unit_classes', 'label_classes']));
 			}
 		}));
