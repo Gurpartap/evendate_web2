@@ -929,6 +929,8 @@ Builder = (function() {
 				status_name: ticket.status_name,
 				status_type_code: ticket.status_type_code,
 				ticket_type_name: ticket.ticket_type.name,
+				image_horizontal_url: ticket.event.image_horizontal_url,
+				image_horizontal_large_url: ticket.event.image_horizontal_large_url || ticket.event.image_horizontal_url,
 				image_horizontal_medium_url: ticket.event.image_horizontal_medium_url
 			}, ['card_classes']),	event_date;
 			

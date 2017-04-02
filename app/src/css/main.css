@@ -3949,7 +3949,9 @@ body.-open_modal > .modal_wrapper {
 
 .ticket_card.-ticket_extended {width: 450px}
 
-.ticket_card_cover {}
+.ticket_card_cover > img {
+	width: 100%;
+}
 
 .ticket_card_content {padding: 12px}
 .ticket_card:not(.-ticket_extended) .ticket_card_content {padding-bottom: 40px}
