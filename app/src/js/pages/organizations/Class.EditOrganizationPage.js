@@ -183,11 +183,6 @@ EditOrganizationPage = extending(Page, (function() {
 			if (valid_form) {
 				data.setData(form_data);
 				
-				data.filenames = {
-					background: data.background_filename,
-					logo: data.logo_filename
-				};
-				
 				if (PAGE.organization.id) {
 					PAGE.organization.updateOrganization(data, afterSubmit);
 				} else {
