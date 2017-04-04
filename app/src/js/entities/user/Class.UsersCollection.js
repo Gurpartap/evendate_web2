@@ -27,19 +27,13 @@ UsersCollection = extending(EntitiesCollection, (function() {
 	 * Returns specified staff by role. Mixing additional_fields if needed.
 	 * @param {OneUser.ROLE} role
 	 * @param {(Array<OneUser>|UsersCollection)} staff
-	 * @param {object} [additional_fields]
-	 * @return {(Array<OneUser>|UsersCollection|Array<object>)}
+	 * @return {Array<OneUser>}
 	 */
-	UsersCollection.getSpecificStaff = function(role, staff, additional_fields) {
-		var specific_staff = [];
-		staff.forEach(function(man) {
-			if (man.role == role) {
-				specific_staff.push($.extend(true, {
-					name: man.first_name + ' ' + man.last_name
-				}, man, additional_fields))
-			}
+	UsersCollection.getSpecificStaff = function(role, staff) {
+		
+		return staff.filter(function(man) {
+			return man.role === role;
 		});
-		return specific_staff;
 	};
 	/**
 	 *
@@ -97,19 +91,11 @@ UsersCollection = extending(EntitiesCollection, (function() {
 	/**
 	 * Returns specified staff by role. Mixing additional_fields if needed.
 	 * @param {OneUser.ROLE} role
-	 * @param {object} [additional_fields]
-	 * @return {(Array<OneUser>|UsersCollection|Array<Object>)}
+	 * @return {Array<OneUser>}
 	 */
-	UsersCollection.prototype.getSpecificStaff = function(role, additional_fields) {
-		var specific_staff = [];
-		this.forEach(function(man) {
-			if (man.role == role) {
-				specific_staff.push($.extend(true, {
-					name: man.first_name + ' ' + man.last_name
-				}, man, additional_fields))
-			}
-		});
-		return specific_staff;
+	UsersCollection.prototype.getSpecificStaff = function(role) {
+		
+		return UsersCollection.getSpecificStaff(role, this);
 	};
 	/**
 	 *

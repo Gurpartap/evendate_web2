@@ -48,6 +48,8 @@ OneOrganization = extending(OneEntity, (function() {
 	 * @property {?string} role
 	 *
 	 * @property {UsersCollection} staff
+	 * @property {Array<OneUser>} admins
+	 * @property {Array<OneUser>} moderators
 	 *
 	 * @property {?string} email
 	 * @property {?boolean} is_new
@@ -67,6 +69,8 @@ OneOrganization = extending(OneEntity, (function() {
 	 * @property {boolean} loading
 	 */
 	function OneOrganization(organization_id, is_loading_continuous) {
+		var self = this;
+		
 		this.id = organization_id || 0;
 		this.name = null;
 		this.short_name = null;
@@ -95,7 +99,6 @@ OneOrganization = extending(OneEntity, (function() {
 		this.country = null;
 		
 		this.email = null;
-		this.role = null;
 		this.staff = new UsersCollection();
 		this.status = null;
 		
@@ -105,6 +108,24 @@ OneOrganization = extending(OneEntity, (function() {
 		
 		this.vk_url = null;
 		this.facebook_url = null;
+		
+		Object.defineProperties(this, {
+			'role': {
+				get: function() {
+					return OneUser.recognizeRole(self.privileges);
+				}
+			},
+			'admins': {
+				get: function() {
+					return self.staff.getSpecificStaff(OneUser.ROLE.ADMIN);
+				}
+			},
+			'moderators': {
+				get: function() {
+					return self.staff.getSpecificStaff(OneUser.ROLE.MODERATOR);
+				}
+			}
+		});
 		
 		this.loading = false;
 		if (organization_id && is_loading_continuous) {
@@ -118,7 +139,7 @@ OneOrganization = extending(OneEntity, (function() {
 	/**
 	 *
 	 * @param {(string|number)} org_id
-	 * @param {(string|Array)} fields
+	 * @param {(Fields|string|Array)} [fields]
 	 * @param {AJAXCallback} [success]
 	 * @returns {jqPromise}
 	 */
@@ -184,17 +205,7 @@ OneOrganization = extending(OneEntity, (function() {
 	};
 	/**
 	 *
-	 * @param {(Array|object)} data
-	 * @returns {OneEntity}
-	 */
-	OneOrganization.prototype.setData = function(data) {
-		OneEntity.prototype.setData.call(this, data);
-		this.role = OneUser.recognizeRole(this.privileges);
-		return this;
-	};
-	/**
-	 *
-	 * @param {(string|Array)} fields
+	 * @param {(Fields|string|Array)} [fields]
 	 * @param {AJAXCallback} [success]
 	 * @returns {jqPromise}
 	 */

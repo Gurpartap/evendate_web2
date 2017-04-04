@@ -44,7 +44,8 @@ AdminOrganizationPage = extending(AdminPage, (function() {
 	AdminOrganizationPage.prototype.renderHeaderTabs = function(){
 		__APP.renderHeaderTabs([
 			{title: 'Обзор', page: '/admin/organization/'+this.id+'/overview'},
-			{title: 'События', page: '/admin/organization/'+this.id+'/events'}
+			{title: 'События', page: '/admin/organization/'+this.id+'/events'},
+			{title: 'Настройки', page: '/admin/organization/'+this.id+'/settings'}
 		]);
 	};
 	

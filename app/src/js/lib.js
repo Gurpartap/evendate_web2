@@ -67,6 +67,7 @@ __C = {
 		HOOKS: {
 			HANDLED: '-Handled_',
 			RIPPLE: 'RippleEffect',
+			ADD_STAFF: 'AddStaff',
 			ADD_TO_FAVORITES: 'AddToFavorites',
 			TEXT: 'Text',
 			CALL_MODAL: 'CallModal',

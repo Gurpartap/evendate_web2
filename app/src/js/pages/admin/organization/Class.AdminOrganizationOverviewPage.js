@@ -151,10 +151,6 @@ AdminOrganizationOverviewPage = extending(AdminOrganizationPage, (function() {
 					'conversion'
 				]
 			},
-			staffs_additional_fields = {
-				is_link: true,
-				avatar_classes: ['-size_40x40', '-rounded']
-			},
 			storage_data_name = 'org_stats_' + this.id + '_data',
 			storage_until_name = 'org_stats_' + this.id + '_until',
 			is_cached_data_actual = moment.unix(sessionStorage.getItem(storage_until_name)).isAfter(moment());
@@ -173,13 +169,21 @@ AdminOrganizationOverviewPage = extending(AdminOrganizationPage, (function() {
 			page: '/admin'
 		}, this.organization.short_name]);
 		
+		function extendStaffProps(staff) {
+			return $.extend({}, staff, {
+				is_link: true,
+				avatar_classes: ['-size_40x40', '-rounded']
+			});
+		}
+		
+		
 		this.$wrapper.html(tmpl('orgstat-overview', $.extend(true, {}, this.organization, {
 			avatar_block: __APP.BUILD.avatarBlocks(this.organization, {
 				entity: 'organization',
 				block_classes: ['-stack']
 			}),
-			staff_block: AdminOrganizationOverviewPage.buildStaffBlock('Администраторы', this.organization.staff.getSpecificStaff(OneUser.ROLE.ADMIN, staffs_additional_fields))
-			                                          .add(AdminOrganizationOverviewPage.buildStaffBlock('Модераторы', this.organization.staff.getSpecificStaff(OneUser.ROLE.MODERATOR, staffs_additional_fields))),
+			staff_block: AdminOrganizationOverviewPage.buildStaffBlock('Администраторы', this.organization.admins.map(extendStaffProps))
+			                                          .add(AdminOrganizationOverviewPage.buildStaffBlock('Модераторы', this.organization.moderators.map(extendStaffProps))),
 			event_blocks: this.organization.events.length ? tmpl('orgstat-overview-sidebar-wrapper', {
 				content: tmpl('orgstat-overview-sidebar-wrapper-title', {title: 'Предстоящие события'})
 					.add(tmpl('orgstat-event-block', this.organization.events.map(function(event) {

@@ -42,7 +42,7 @@ AdminOrganizationEventsPage = extending(AdminOrganizationPage, (function() {
 	};
 	
 	AdminOrganizationEventsPage.prototype.fetchData = function() {
-		return this.fetching_data_defer = this.organization.fetchOrganization([]);
+		return this.fetching_data_defer = this.organization.fetchOrganization();
 	};
 	
 	AdminOrganizationEventsPage.prototype.render = function() {
@@ -50,11 +50,6 @@ AdminOrganizationEventsPage = extending(AdminOrganizationPage, (function() {
 			$window = $(window),
 			$past_events_wrapper,
 			past_events_tablesort;
-		
-		if(__APP.USER.id === -1){
-			__APP.changeState('/feed/actual', true, true);
-			return null;
-		}
 		
 		this.renderHeaderTabs();
 		__APP.changeTitle([{

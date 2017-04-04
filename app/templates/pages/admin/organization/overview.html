@@ -2,12 +2,12 @@
 	<div class="page orgstat_overview">
 		<aside class="orgstat_overview_sidebar">
 			<header class="orgstat_overview_sidebar_header">
-				<span class="orgstat_overview_sidebar_title">Об организаторе</span>
+				<span class="small_title">Об организаторе</span>
 				<!--<span class="stamp -color_accent">Starter</span>-->
 			</header>
 			<div class="orgstat_overview_sidebar_wrapper orgstat_overview_sidebar_top -align_center">
 				{avatar_block}
-				<p class="orgstat_overview_sidebar_title">{name}</p>
+				<p class="small_title">{name}</p>
 				<p class="orgstat_overview_sidebar_description">{description}</p>
 				<p class="orgstat_overview_sidebar_location">{default_address}</p>
 				<a href="/organization/{id}/edit" class="button -color_neutral -size_low fa_icon fa-pencil RippleEffect link Link"><span class="Text">Редактировать</span></a>
@@ -20,7 +20,7 @@
 			</div>
 			{event_blocks}
 			<div class="orgstat_overview_sidebar_wrapper">
-				<p class="orgstat_overview_sidebar_title">Аудитория</p>
+				<p class="small_title">Аудитория</p>
 				<div class="GenderPieChart"></div>
 				<div class="DevicePieChart"></div>
 			</div>
@@ -43,7 +43,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-orgstat-overview-sidebar-wrapper-title">
-	<p class="orgstat_overview_sidebar_title">{title}</p>
+	<p class="small_title">{title}</p>
 </script>
 
 <script type="javascript/template" id="tmpl-orgstat-event-block">

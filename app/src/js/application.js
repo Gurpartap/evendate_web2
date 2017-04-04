@@ -33,6 +33,7 @@ __APP = {
 				'^([0-9]+)': {
 					'overview': AdminOrganizationOverviewPage,
 					'events': AdminOrganizationEventsPage,
+					'settings': AdminOrganizationSettingsPage,
 					'': AdminOrganizationOverviewPage
 				}
 			},

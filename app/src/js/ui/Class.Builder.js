@@ -406,6 +406,35 @@ Builder = (function() {
 			}, props);
 		}));
 	};
+	
+	Builder.prototype.addUserAvatarBlock = function(role, props) {
+		var name;
+		
+		props = Builder.normalizeBuildProps(props, ['avatar_classes', 'block_classes']);
+		props.block_classes.push('link', __C.CLASSES.HOOKS.ADD_STAFF, __C.CLASSES.HOOKS.CALL_MODAL);
+		
+		switch (role) {
+			case OneUser.ROLE.ADMIN: {
+				name = 'Добавить администратора';
+				break;
+			}
+			case OneUser.ROLE.MODERATOR: {
+				name = 'Добавить модератора';
+				break;
+			}
+		}
+		
+		return tmpl('avatar-block', $.extend({
+			html_tag: 'div',
+			name: name,
+			avatar: tmpl('avatar', {
+				classes: props.avatar_classes,
+				avatar_url: window.location.origin + '/app/img/add_user.svg'
+			})
+		}, props)).data({
+		
+		});
+	};
 	/**
 	 *
 	 * @param {(OneUser|UsersCollection|OneOrganization|OrganizationsCollection|Array)} entities
