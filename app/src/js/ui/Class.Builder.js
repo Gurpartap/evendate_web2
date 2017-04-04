@@ -522,7 +522,7 @@ Builder = (function() {
 	 * @return {jQuery}
 	 */
 	Builder.prototype.activity = function buildActivity(activities, props){
-		var self = this,
+		var build = this instanceof Builder ? this : new Builder(),
 			ICON_CLASSES = {};
 		
 		ICON_CLASSES[OneAbstractActivity.TYPES.SUBSCRIBE] = 'plus';
@@ -530,7 +530,7 @@ Builder = (function() {
 		ICON_CLASSES[OneAbstractActivity.TYPES.UNSUBSCRIBE] = ICON_CLASSES[OneAbstractActivity.TYPES.UNFAVE] = 'minus';
 		
 		props = Builder.normalizeBuildProps(props, ['avatar_classes']);
-		props.avatar_classes.push('-size_50x50', '-rounded');
+		props.avatar_classes.push(__C.CLASSES.SIZES.X50, __C.CLASSES.UNIVERSAL_STATES.ROUNDED);
 		
 		return tmpl('activity-block', (activities instanceof Array ? activities : [activities]).map(function(activity) {
 			var entity_props = {},
@@ -557,7 +557,7 @@ Builder = (function() {
 				}
 			}
 			return $.extend(entity_props, {
-				creator_avatar: self.avatars(activity.user, {
+				creator_avatar: build.avatars(activity.user, {
 					classes: props.avatar_classes,
 					is_link: props.avatar_is_link,
 					badge: tmpl('avatar-badge', {icon_class: ICON_CLASSES[activity.type_code]})

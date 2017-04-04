@@ -49,6 +49,7 @@ __C = {
 		SIZES: {
 			X30: '-size_30x30',
 			X40: '-size_40x40',
+			X50: '-size_50x50',
 			X55: '-size_55x55',
 			LOW: '-size_low',
 			WIDE: '-size_wide',
