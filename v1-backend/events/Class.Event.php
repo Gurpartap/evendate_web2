@@ -1332,7 +1332,7 @@ class Event extends AbstractEntity
 				$query_data[':image_horizontal'] = $img_horizontal_filename;
 				App::saveImage($data['image_horizontal'],
 					self::IMAGES_PATH . self::IMG_SIZE_TYPE_LARGE . '/' . $img_horizontal_filename,
-					14000);
+					50000);
 				$q_upd_event->cols(array(
 					'image_horizontal' => $img_horizontal_filename
 				));
