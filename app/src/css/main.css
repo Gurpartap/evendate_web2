@@ -243,6 +243,7 @@ a.-odd:focus {text-decoration: none}
 .counter,
 .form_radio + .form_label,
 .form_checkbox + .form_label,
+fieldset:disabled,
 .-unselectable {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
@@ -407,6 +408,7 @@ fieldset {
 }
 
 fieldset:disabled {opacity: .4}
+fieldset:disabled fieldset:disabled {opacity: 1}
 
 fieldset:disabled input,
 fieldset:disabled select,
@@ -1288,6 +1290,12 @@ a.button:hover {text-decoration: none}
 	background-color: var(--color_gray_material);
 	box-shadow: none;
 }
+.button:disabled.-color_accent,
+.button:disabled.-color_bubblegum,
+.button:disabled.-color_franklin,
+.button.-status_disabled.-color_accent,
+.button.-status_disabled.-color_bubblegum,
+.button.-status_disabled.-color_franklin {color: #fff}
 
 /* TODO: Ripple on checkboxes and radios */
 

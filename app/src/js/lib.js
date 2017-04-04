@@ -1469,6 +1469,22 @@ function isFormValid($form) {
 /**
  *
  * @param {string} url
+ * @returns {string}
+ */
+function getFilenameFromURL(url) {
+	return url.split('\\').pop().split('/').pop();
+}
+/**
+ *
+ * @param {string} string
+ * @returns {boolean}
+ */
+function isBase64(string) {
+	return string.contains(';base64,');
+}
+/**
+ *
+ * @param {string} url
  * @param {(AJAXData|string)} [data]
  * @param {string} [content_type='application/x-www-form-urlencoded; charset=UTF-8']
  */

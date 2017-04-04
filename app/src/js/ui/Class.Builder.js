@@ -134,6 +134,11 @@ Builder = (function() {
 				props.classes.unshift('form_' + type);
 			}
 			props.unit_classes.unshift('form_unit');
+			if(!props.attributes.checked) {
+				delete props.attributes.checked;
+			}
+			props.attributes.tabindex = props.attributes.tabindex ? props.attributes.tabindex : -1;
+			
 			return tmpl('radio-checkbox', $.extend(props, {type: type}));
 		} else {
 			throw Error('Принимаемый аргумент type может быть либо "radio" либо "checkbox", придурок')

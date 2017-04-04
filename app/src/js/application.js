@@ -31,6 +31,11 @@ __APP = {
 		'admin': {
 			'organization': {
 				'^([0-9]+)': {
+					'add': {
+						'event': AddEventPage,
+						'': AddEventPage
+					},
+					'edit': EditOrganizationPage,
 					'overview': AdminOrganizationOverviewPage,
 					'events': AdminOrganizationEventsPage,
 					'settings': AdminOrganizationSettingsPage,
@@ -38,7 +43,10 @@ __APP = {
 				}
 			},
 			'event': {
-				'^([0-9]+)': AdminEventOverviewPage
+				'^([0-9]+)': {
+					'edit': RedactEventPage,
+					'': AdminEventOverviewPage
+				}
 			},
 			'': AdminOrganizationsPage
 		},
@@ -62,7 +70,13 @@ __APP = {
 				'^([0-9]+)': AddEventPage,
 				'': AddEventPage
 			},
-			'add': AddEventPage,
+			'add': {
+				'to': {
+					'^([0-9]+)': AddEventPage,
+					'': AddEventPage
+				},
+				'': AddEventPage
+			},
 			'^([0-9]+)': {
 				'edit': RedactEventPage,
 				'': EventPage

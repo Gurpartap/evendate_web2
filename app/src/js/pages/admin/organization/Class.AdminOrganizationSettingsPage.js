@@ -19,20 +19,41 @@ AdminOrganizationSettingsPage = extending(AdminOrganizationPage, (function() {
 	
 	AdminOrganizationSettingsPage.prototype.fetchData = function() {
 		return this.fetching_data_defer = this.organization.fetchOrganization(new Fields(
+			'city',
+			'country',
+			'default_address',
+			'description',
+			'brand_color',
+			'is_private',
 			'email',
 			'privileges',
-			'staff'
+			'staff',
+			'site_url'
 		));
+	};
+	/**
+	 *
+	 * @returns {jqPromise}
+	 */
+	AdminOrganizationSettingsPage.prototype.updateOrganizationData = function() {
+		return this.organization.updateOrganization(new OrganizationModel(this.organization));
 	};
 	
 	AdminOrganizationSettingsPage.prototype.init = function() {
 		var self = this;
 		
 		bindCallModal(this.$wrapper);
-		/*
-		this.$wrapper.find('.'+__C.CLASSES.HOOKS.ADD_STAFF).on('click', function() {
+		bindRippleEffect(this.$wrapper);
 		
-		});*/
+		this.$wrapper.find('#org_admin_settings_is_private').on('change', function() {
+			self.organization.is_private = $(this).prop('checked');
+			self.updateOrganizationData();
+		});
+		
+		this.$wrapper.find('.SaveLocal').on('click', function() {
+			self.organization.setData($(this).closest('.SaveLocalWrapper').serializeForm());
+			self.updateOrganizationData();
+		});
 		
 		this.$view.on('staff:add', function(e, role, staff) {
 			self.$wrapper.find('.StaffCollection').filter(function(i, elem) {
@@ -62,7 +83,23 @@ AdminOrganizationSettingsPage = extending(AdminOrganizationPage, (function() {
 			admin_avatar_blocks: __APP.BUILD.avatarBlocks(this.organization.admins, staffs_additional_fields)
 			                          .add(__APP.BUILD.addUserAvatarBlock(OneUser.ROLE.ADMIN, {avatar_classes: [__C.CLASSES.SIZES.X40, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]})),
 			moderator_avatar_blocks: __APP.BUILD.avatarBlocks(this.organization.moderators, staffs_additional_fields)
-			                              .add(__APP.BUILD.addUserAvatarBlock(OneUser.ROLE.MODERATOR, {avatar_classes: [__C.CLASSES.SIZES.X40, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]}))
+			                              .add(__APP.BUILD.addUserAvatarBlock(OneUser.ROLE.MODERATOR, {avatar_classes: [__C.CLASSES.SIZES.X40, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]})),
+			private_checkbox: __APP.BUILD.checkbox({
+				id: 'org_admin_settings_is_private',
+				name: 'is_private',
+				label: 'Закрытая организация',
+				attributes: {
+					checked: self.organization.is_private
+				}
+			}),
+			subdomain_radio: __APP.BUILD.radio({
+				id: 'org_admin_settings_subdomain_enabled',
+				name: 'domains'
+			}),
+			other_domain_radio: __APP.BUILD.radio({
+				id: 'org_admin_settings_other_domain_enabled',
+				name: 'domains'
+			})
 		})));
 		
 		this.init();
