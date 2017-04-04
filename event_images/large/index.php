@@ -122,6 +122,14 @@ class SimpleImage
 $_path = $_REQUEST['path'];
 $size = $_REQUEST['width'];
 
+if (!is_numeric($size)) {
+	header('500 Internal Server Error', true, 500);
+} else {
+	if ($size > 5120) {
+		$size = 5120;
+	}
+}
+
 $image = new SimpleImage();
 
 $headers = array(
