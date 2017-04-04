@@ -102,5 +102,12 @@ $RECYCLE.BIN/
 user_images/blurred/*
 user_images/default/*
 
-event_images/*/*
+
+event_images/large/*.jpeg
+event_images/large/*.jpg
+event_images/large/*.png
+event_images/medium/*
+event_images/small/*
+event_images/square/*
+event_images/vk/*
 organizations_images/*/*

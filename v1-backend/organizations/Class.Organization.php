@@ -497,7 +497,7 @@ class Organization extends AbstractEntity
 		return $result;
 	}
 
-	private static function checkData(&$data)
+	private static function checkData(&$data, $is_update = false)
 	{
 		if (!isset($data['name'])) throw new InvalidArgumentException('Название организации обязательно.');
 		if (mb_strlen($data['name']) < 3) throw new InvalidArgumentException('Слишком короткое название. Должно быть не менее 3 символов.');
@@ -585,9 +585,15 @@ class Organization extends AbstractEntity
 			&& !empty($data['background_filename'])
 		) {
 			$background_filename = md5(App::generateRandomString() . '-background') . '.' . App::getImageExtension($data['background_filename']);
-			App::saveImage($data['background'], self::IMAGES_PATH . self::IMAGE_TYPE_BACKGROUND . self::IMAGE_SIZE_LARGE . $background_filename, 14000);
+			App::saveImage($data['background'], self::IMAGES_PATH . self::IMAGE_TYPE_BACKGROUND . self::IMAGE_SIZE_LARGE . $background_filename, 50000);
 			$data['background_img_url'] = $background_filename;
-		} else throw new InvalidArgumentException('Фоновое изображение обязательно');
+			$data['background_change'] = true;
+		} elseif ($is_update) {
+			$data['background_change'] = false;
+		} else {
+			$data['background_change'] = true;
+			$data['background_img_url'] = 'default.jpg';
+		}
 
 		if (isset($data['logo'])
 			&& !empty($data['logo'])
@@ -597,8 +603,11 @@ class Organization extends AbstractEntity
 			&& !empty($data['logo_filename'])
 		) {
 			$logo_filename = md5(App::generateRandomString() . '-logo') . '.' . App::getImageExtension($data['logo_filename']);
-			App::saveImage($data['logo'], self::IMAGES_PATH . self::IMAGE_TYPE_LOGO . self::IMAGE_SIZE_LARGE . $logo_filename, 14000);
+			App::saveImage($data['logo'], self::IMAGES_PATH . self::IMAGE_TYPE_LOGO . self::IMAGE_SIZE_LARGE . $logo_filename, 50000);
 			$data['img_url'] = $logo_filename;
+			$data['logo_change'] = true;
+		} elseif ($is_update) {
+			$data['logo_change'] = false;
 		} else throw new InvalidArgumentException('Логотип обязателен');
 	}
 
@@ -610,7 +619,7 @@ class Organization extends AbstractEntity
 
 		$q_upd_organization->table('organizations');
 
-		self::checkData($data);
+		self::checkData($data, true);
 
 		$q_upd_organization->cols(array(
 				'name' => $data['name'],
@@ -624,13 +633,23 @@ class Organization extends AbstractEntity
 				'vk_url_path' => $data['vk_url_path'],
 				'facebook_url_path' => $data['facebook_url_path'],
 				'facebook_url' => $data['facebook_url'],
-				'background_img_url' => $data['background_img_url'],
-				'img_url' => $data['img_url'],
 				'is_private' => $data['is_private'],
 				'brand_color' => $data['brand_color'],
 				'email' => $data['email']
 			)
 		);
+
+		if ($data['background_change']) {
+			$q_upd_organization->cols(array(
+				'background_img_url' => $data['background_img_url'],
+			));
+		}
+
+		if ($data['logo_change']) {
+			$q_upd_organization->cols(array(
+				'img_url' => $data['img_url'],
+			));
+		}
 
 		$q_upd_organization
 			->where('id = ?', $this->id);
