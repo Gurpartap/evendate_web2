@@ -1,0 +1,5 @@
+Options +FollowSymLinks
+
+RewriteEngine on
+RewriteCond %{QUERY_STRING} ^width=(.*)$
+RewriteRule ^(.*)$ index.php?path=$1 [NC,L,QSA]
