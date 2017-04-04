@@ -168,7 +168,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 */
 	/**
 	 *
-	 * @param {OneOrganizationCreateOrganizationData} new_organization_data
+	 * @param {OrganizationModel} new_organization_data
 	 * @param {OneOrganizationCreateOrganizationCallback} [success]
 	 * @returns {jqPromise}
 	 */
@@ -178,7 +178,7 @@ OneOrganization = extending(OneEntity, (function() {
 	/**
 	 *
 	 * @param {(string|number)} organization_id
-	 * @param {OneOrganizationCreateOrganizationData} organization_data
+	 * @param {OrganizationModel} organization_data
 	 * @param {OneOrganizationCreateOrganizationCallback} [success]
 	 * @returns {jqPromise}
 	 */
@@ -233,7 +233,7 @@ OneOrganization = extending(OneEntity, (function() {
 	};
 	/**
 	 *
-	 * @param {OneOrganizationCreateOrganizationData} new_organization_data
+	 * @param {OrganizationModel} new_organization_data
 	 * @param {OneOrganizationCreateOrganizationCallback} [success]
 	 * @returns {jqPromise}
 	 */
@@ -249,7 +249,7 @@ OneOrganization = extending(OneEntity, (function() {
 	};
 	/**
 	 *
-	 * @param {OneOrganizationCreateOrganizationData} organization_data
+	 * @param {OrganizationModel} organization_data
 	 * @param {OneOrganizationCreateOrganizationCallback} [success]
 	 * @returns {jqPromise}
 	 */

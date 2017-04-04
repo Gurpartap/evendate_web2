@@ -140,7 +140,7 @@ ServerConnection = (function() {
 	/**
 	 *
 	 * @param {string} url
-	 * @param {AJAXData} ajax_data
+	 * @param {(object|string)} ajax_data
 	 * @param {AJAXCallback} [success]
 	 * @param {function} [error]
 	 * @returns {jqPromise}
@@ -158,7 +158,7 @@ ServerConnection = (function() {
 	/**
 	 *
 	 * @param {string} url
-	 * @param {AJAXData} ajax_data
+	 * @param {(object|string)} ajax_data
 	 * @param {boolean} [is_payload]
 	 * @param {AJAXCallback} [success]
 	 * @param {function} [error]
@@ -173,7 +173,7 @@ ServerConnection = (function() {
 	/**
 	 *
 	 * @param {string} url
-	 * @param {AJAXData} ajax_data
+	 * @param {(object|string)} ajax_data
 	 * @param {boolean} [is_payload]
 	 * @param {AJAXCallback} [success]
 	 * @param {function} [error]

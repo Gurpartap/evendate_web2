@@ -176,30 +176,12 @@ EditOrganizationPage = extending(Page, (function() {
 			}
 			
 			var $form = $view.find("#add-organization-form"),
-				data = {
-					organization_id: null,
-					name: null,
-					short_name: null,
-					type_id: null,
-					background_filename: null,
-					logo_filename: null,
-					default_address: null,
-					location: null,
-					description: null,
-					site_url: null,
-					vk_url: null,
-					facebook_url: null,
-					email: null,
-					filenames: {
-						background: null,
-						logo: null
-					}
-				},
+				data = new OrganizationModel(),
 				form_data = $form.serializeForm(),
 				valid_form = formValidation($form, !!(form_data.organization_id));
 			
 			if (valid_form) {
-				$.extend(true, data, form_data);
+				data.setData(form_data);
 				
 				data.filenames = {
 					background: data.background_filename,
