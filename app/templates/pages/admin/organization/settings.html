@@ -3,7 +3,7 @@
 		<div class="org_admin_settings_wrapper">
 			<h3>Редактирование организации</h3>
 			<p class="-text_color_marginal">Перейдите в раздел редактирования, чтобы изменить данные организации</p>
-			<a href="/add/event/{id}" class="button -color_neutral_accent -size_low fa_icon fa-pencil Link RippleEffect"><span class="Text">Редактировать</span></a>
+			<a href="/admin/organization/{id}/edit" class="button -color_neutral_accent -size_low fa_icon fa-pencil Link RippleEffect"><span class="Text">Редактировать</span></a>
 		</div>
 
 		<div class="org_admin_settings_wrapper">
@@ -24,12 +24,12 @@
 			</div>
 		</div>
 
-		<fieldset class="org_admin_settings_wrapper" disabled title="Эта функция временно недоступна">
+		<fieldset class="org_admin_settings_wrapper SaveLocalWrapper">
 			<h3><label for="org_admin_settings_email">Электронная почта</label></h3>
 			<p class="-text_color_marginal">Вы можете изменить электронную почту для связи</p>
 			<div class="form_group -unite -parts_e_4">
 				<input id="org_admin_settings_email" class="form_input" name="email" value="{email}" placeholder="E-mail" required>
-				<button class="button -color_accent SaveEmail RippleEffect" type="button"><span class="Text">Сохранить</span></button>
+				<button class="button -color_accent SaveLocal RippleEffect" type="button"><span class="Text">Сохранить</span></button>
 			</div>
 		</fieldset>
 
@@ -40,54 +40,30 @@
 			<p class="-text_color_marginal">Закрытые организации могут публиковать непубличные мероприятия и предоставлять доступ для просмотра по приглашениям. Рекомендуется использовать для внутренних корпоративных мероприятий, где организатор может выслать приглашение конкретным сотрудникам.</p>
 		</fieldset>
 
-		<fieldset class="org_admin_settings_wrapper" disabled title="Эта функция временно недоступна">
+		<fieldset class="org_admin_settings_wrapper SaveLocalWrapper" disabled title="Эта функция временно недоступна">
 			<h3>Интеграция с сервисами</h3>
 			<p class="-text_color_marginal">Публикуйте события сразу в Evendate, Facebook и Вконтакте</p>
 			{fb_vk_integration_checkboxes}
 			<fieldset class="Switching" data-switch_id="facebook_integration" disabled>
 				<div class="form_group -unite -parts_e_4">
 					<input id="org_admin_settings_facebook_integration" class="form_input" name="facebook_profile" value="{facebook_profile}" placeholder="Ссылка на профиль Facebook" title="Ссылка на профиль Facebook" required>
-					<button class="button -color_accent SaveFacebookProfile RippleEffect" type="button"><span class="Text">Сохранить</span></button>
+					<button class="button -color_accent SaveLocal RippleEffect" type="button"><span class="Text">Сохранить</span></button>
 				</div>
 			</fieldset>
 			<p class="-text_color_marginal">Интегрируйтесь с Telegram и Slack</p>
 			{slack_telegram_integration_checkboxes}
 		</fieldset>
 
-		<fieldset disabled title="Эта функция временно недоступна">
+		<fieldset class="SaveLocalWrapper" disabled title="Эта функция временно недоступна">
 			<div class="org_admin_settings_wrapper">
 				<h3>Брендирование</h3>
 				<p class="-text_color_marginal">Вы можете изменить цвет элементов страницы организации в соответствии с вашей стилистикой</p>
+				<label class="form_label" for="org_admin_settings_brand_color">Фирменный цвет</label>
+				<div class="form_unit -unite -parts_e_4">
+					<input id="org_admin_settings_brand_color" class="form_input" name="brand_color" value="{brand_color}" placeholder="#3e4d66">
+					<button class="button -color_accent SaveLocal RippleEffect" type="button"><span class="Text">Сохранить</span></button>
+				</div>
 			</div>
-			<table class="statistics_table">
-				<thead>
-					<tr>
-						<th width="250px">Название элемента</th>
-						<th>Цвет</th>
-						<th>Статус</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>
-							{brand_top_panel_checkbox}
-						</td>
-						<td><div class="color_picker ColorPicker"><input class="form_input" name="brand_top_panel_color" value="{brand_top_panel_color}"></div></td>
-						<td align="right">
-							<button class="button -color_accent -size_low RippleEffect" type="button"><span class="Text">Подключить</span></button>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							{brand_buttons_checkbox}
-						</td>
-						<td><div class="color_picker ColorPicker"><input class="form_input" name="brand_buttons_color" value="{brand_buttons_color}"></div></td>
-						<td align="right">
-							<button class="button -color_accent -size_low RippleEffect" type="button"><span class="Text">Подключить</span></button>
-						</td>
-					</tr>
-				</tbody>
-			</table>
 		</fieldset>
 
 		<fieldset class="org_admin_settings_wrapper" disabled title="Эта функция временно недоступна">

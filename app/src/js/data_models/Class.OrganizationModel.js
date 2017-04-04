@@ -28,6 +28,7 @@ OrganizationModel = extending(OneEntity, (function() {
 	 * @property {?string} email
 	 * @property {?string} city_id
 	 * @property {?string} country_id
+	 * @property {?boolean} is_private
 	 */
 	function OrganizationModel(data) {
 		this.organization_id = null;
@@ -47,6 +48,7 @@ OrganizationModel = extending(OneEntity, (function() {
 		this.email = null;
 		this.city_id = null;
 		this.country_id = null;
+		this.is_private = null;
 		
 		if (data) {
 			setData(this, data);
