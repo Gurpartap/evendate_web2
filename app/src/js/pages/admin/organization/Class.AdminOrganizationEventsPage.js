@@ -22,6 +22,7 @@ AdminOrganizationEventsPage = extending(AdminOrganizationPage, (function() {
 			canceled_shown: true
 		};
 		this.past_events_data = {
+			future: false,
 			canceled_shown: true,
 			order_by: '-first_event_date'
 		};
@@ -34,7 +35,7 @@ AdminOrganizationEventsPage = extending(AdminOrganizationPage, (function() {
 			return $.extend({}, event, {
 				date: moment.unix(event[date_field]).format(__LOCALES.ru_RU.DATE.DATE_FORMAT),
 				timestamp: event[date_field],
-				conversion: Math.round(event.view == 0 ? (event.view_detail * 100 / event).view : 0) + '%'
+				conversion: Math.round(event.view == 0 ? event.view : (event.view_detail * 100 / event.view)) + '%'
 			});
 		}));
 		bindPageLinks($events);
