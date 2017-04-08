@@ -113,7 +113,8 @@ __C = {
 		CROPPER: 'cropper',
 		FRIENDS_LIST: 'friends_list',
 		SUBSCRIBERS_LIST: 'subscribers_list',
-		TICKET: 'tickets'
+		TICKET: 'tickets',
+		ADD_STAFF: 'add_staff'
 	},
 	COLORS: {
 		PRIMARY: '#2e3b50',
@@ -1946,85 +1947,93 @@ function bindControlSwitch($parent) {
  */
 function bindCallModal($parent) {
 	$parent = $parent ? $parent : $('body');
-	return $parent.find('.' + __C.CLASSES.HOOKS.CALL_MODAL).not('.' + __C.CLASSES.HOOKS.HANDLED + __C.CLASSES.HOOKS.CALL_MODAL).each(function() {
-		var $this = $(this);
-		
-		$this.on('click.CallModal', function() {
-			var $this = $(this),
-				data = $this.data(),
-				title = data.modal_title,
-				modal = data.modal,
-				modal_type = data.modal_type;
+	return $parent
+		.find('.' + __C.CLASSES.HOOKS.CALL_MODAL)
+		.not('.' + __C.CLASSES.HOOKS.HANDLED + __C.CLASSES.HOOKS.CALL_MODAL)
+		.each(function() {
+			var $this = $(this);
 			
-			if (!modal) {
-				switch (modal_type) {
-					case __C.MODAL_TYPES.FAVORS: {
-						modal = new FavoredModal(data.modal_event_id, title);
-						break;
-					}
-					case __C.MODAL_TYPES.SUBSCRIBERS: {
-						modal = new SubscribersModal(data.modal_organization_id, title);
-						break;
-					}
-					case __C.MODAL_TYPES.EDITORS: {
-						modal = new EditorsModal(data.modal_organization_id, title, data.modal_specific_role);
-						break;
-					}
-					case __C.MODAL_TYPES.MAP: {
-						modal = new MapModal(data.modal_map_location, title);
-						break;
-					}
-					case __C.MODAL_TYPES.MEDIA: {
-						var type = data.modal_media_type,
-							url = data.modal_media_url;
-						if (!url) {
-							if ($this.is('img')) {
-								url = $this.attr('src');
-								type = 'image';
-							} else if ($this.is('video')) {
-								//url = $this.attr('url');
-								type = 'video';
-							} else {
-								var str = $this.css('background-image');
-								if (str !== 'none') {
-									if (str.indexOf('"') != -1) {
-										url = str.slice(str.indexOf('"') + 1, str.indexOf('"', str.indexOf('"') + 1));
-									} else {
-										url = str.slice(str.indexOf('(') + 1, str.indexOf(')'));
-									}
+			$this.on('click.CallModal', function() {
+				var $this = $(this),
+					data = $this.data(),
+					title = data.modal_title,
+					modal = data.modal,
+					modal_type = data.modal_type;
+				
+				if (!modal) {
+					switch (modal_type) {
+						case __C.MODAL_TYPES.FAVORS: {
+							modal = new FavoredModal(data.modal_event_id, title);
+							break;
+						}
+						case __C.MODAL_TYPES.SUBSCRIBERS: {
+							modal = new SubscribersModal(data.modal_organization_id, title);
+							break;
+						}
+						case __C.MODAL_TYPES.EDITORS: {
+							modal = new EditorsModal(data.modal_organization_id, title, data.modal_specific_role);
+							break;
+						}
+						case __C.MODAL_TYPES.MAP: {
+							modal = new MapModal(data.modal_map_location, title);
+							break;
+						}
+						case __C.MODAL_TYPES.MEDIA: {
+							var type = data.modal_media_type,
+								url = data.modal_media_url;
+							if (!url) {
+								if ($this.is('img')) {
+									url = $this.attr('src');
 									type = 'image';
+								} else if ($this.is('video')) {
+									//url = $this.attr('url');
+									type = 'video';
+								} else {
+									var str = $this.css('background-image');
+									if (str !== 'none') {
+										if (str.indexOf('"') != -1) {
+											url = str.slice(str.indexOf('"') + 1, str.indexOf('"', str.indexOf('"') + 1));
+										} else {
+											url = str.slice(str.indexOf('(') + 1, str.indexOf(')'));
+										}
+										type = 'image';
+									}
 								}
 							}
+							modal = new MediaModal(url, type);
+							break;
 						}
-						modal = new MediaModal(url, type);
-						break;
+						case __C.MODAL_TYPES.CROPPER: {
+							modal = new CropperModal(data.source_img, data);
+							break;
+						}
+						case __C.MODAL_TYPES.FRIENDS_LIST: {
+							modal = new FriendsListModal(data.modal_entity);
+							break;
+						}
+						case __C.MODAL_TYPES.SUBSCRIBERS_LIST: {
+							modal = new SubscriptionsListModal(data.modal_entity);
+							break;
+						}
+						case __C.MODAL_TYPES.TICKET: {
+							modal = new TicketsModal(data.tickets || data.ticket_uuid);
+							break;
+						}
+						case __C.MODAL_TYPES.ADD_STAFF: {
+							modal = new AddStaffModal(data.modal_org_id, data.modal_role);
+							break;
+						}
+						default: {
+							modal = new StdModal(title, data.modal_content, data.modal_style);
+							break;
+						}
 					}
-					case __C.MODAL_TYPES.CROPPER: {
-						modal = new CropperModal(data.source_img, data);
-						break;
-					}
-					case __C.MODAL_TYPES.FRIENDS_LIST: {
-						modal = new FriendsListModal(data.modal_entity);
-						break;
-					}
-					case __C.MODAL_TYPES.SUBSCRIBERS_LIST: {
-						modal = new SubscriptionsListModal(data.modal_entity);
-						break;
-					}
-					case __C.MODAL_TYPES.TICKET: {
-						modal = new TicketsModal(data.tickets || data.ticket_uuid);
-						break;
-					}
-					default: {
-						modal = new StdModal(title, data.modal_content, data.modal_style);
-						break;
-					}
+					$this.data('modal', modal);
 				}
-				$this.data('modal', modal);
-			}
-			modal.show();
-		});
-	}).addClass(__C.CLASSES.HOOKS.HANDLED + __C.CLASSES.HOOKS.CALL_MODAL);
+				modal.show();
+			});
+		})
+		.addClass(__C.CLASSES.HOOKS.HANDLED + __C.CLASSES.HOOKS.CALL_MODAL);
 }
 
 function bindPageLinks($parent) {

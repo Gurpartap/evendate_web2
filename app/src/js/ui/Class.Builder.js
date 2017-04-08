@@ -401,6 +401,7 @@ Builder = (function() {
 			}
 			
 			return $.extend(true, {
+				id: entity.id,
 				avatar: self.avatars(entity, {
 					classes: props.avatar_classes
 				}),
@@ -411,8 +412,14 @@ Builder = (function() {
 			}, props);
 		}));
 	};
-	
-	Builder.prototype.addUserAvatarBlock = function(role, props) {
+	/**
+	 *
+	 * @param {(number|string)} org_id
+	 * @param {OneUser.ROLE} role
+	 * @param {buildProps} props
+	 * @returns {jQuery}
+	 */
+	Builder.prototype.addUserAvatarBlock = function(org_id, role, props) {
 		var name;
 		
 		props = Builder.normalizeBuildProps(props, ['avatar_classes', 'block_classes']);
@@ -437,7 +444,9 @@ Builder = (function() {
 				avatar_url: window.location.origin + '/app/img/add_user.svg'
 			})
 		}, props)).data({
-		
+			modal_type: 'add_staff',
+			modal_org_id: org_id,
+			modal_role: role
 		});
 	};
 	/**
