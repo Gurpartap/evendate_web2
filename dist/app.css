@@ -5232,7 +5232,7 @@ fieldset + .org_admin_settings_wrapper,
 .org_admin_settings_tariff_head {
 	display: flex;
 	justify-content: space-between;
-	align-items: flex-start;
+	align-items: center;
 }
 
 .org_admin_settings_tariff_title,
@@ -5243,9 +5243,8 @@ fieldset + .org_admin_settings_wrapper,
 	color: var(--color_primary_30);
 }
 
-.org_admin_settings_tariff_title {
-	flex-grow: 1;
-}
+.org_admin_settings_tariff_title {flex-grow: 1}
+.org_admin_settings_tariff_button {margin-left: 1em}
 
 /* Event Admin Overview */
 

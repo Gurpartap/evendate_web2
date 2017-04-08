@@ -93,20 +93,6 @@
 				<div class="org_admin_settings_tariff_head">
 					<span class="org_admin_settings_tariff_title -text_color_accent">Базовый</span>
 					<span class="org_admin_settings_tariff_price -text_color_accent">0 руб./мес.</span>
-					<div class="org_admin_settings_tariff_button">
-						{tariff_basic_button}
-					</div>
-				</div>
-				<p class="-text_color_marginal"></p>
-			</div>
-
-			<div class="org_admin_settings_tariff">
-				<div class="org_admin_settings_tariff_head">
-					<span class="org_admin_settings_tariff_title">Расширенный</span>
-					<span class="org_admin_settings_tariff_price">800 руб./мес.</span>
-					<div class="org_admin_settings_tariff_button">
-						{tariff_ext_button}
-					</div>
 				</div>
 				<p class="-text_color_marginal"></p>
 			</div>
@@ -116,7 +102,8 @@
 					<span class="org_admin_settings_tariff_title">Полный</span>
 					<span class="org_admin_settings_tariff_price">1400 руб./мес.</span>
 					<div class="org_admin_settings_tariff_button">
-						{tariff_full_button}
+						<a href="{traiff_url}" class="button -color_accent {tariff_button_classes}">Подключить</a>
+						{tariff_rest_time}
 					</div>
 				</div>
 				<p class="-text_color_marginal"></p>
