@@ -1242,7 +1242,7 @@ class Event extends AbstractEntity
 			':event_id' => $this->getId(),
 			':user_id' => $user->getId()
 		), 'CANT_HIDE_EVENT');
-
+		$user->deleteFavoriteEvent($this);
 		return new Result(true, 'Событие успешно скрыто');
 	}
 
