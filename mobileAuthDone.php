@@ -21,7 +21,7 @@
         <!-- END panel-->
         <div class="p-lg text-center">
             <span>&copy;</span>
-            <span>2015</span>
+            <span>2017</span>
             <span>-</span>
             <span>Evendate</span>
         </div>
@@ -37,5 +37,17 @@
 
 <!-- =============== APP SCRIPTS ===============-->
 <script src="app/js/app.js"></script>
+<script>
+  if (window.opener){
+      var __data = searchToObject();
+      try{
+          window.opener.localStorage.setItem('token', window.__data.token);
+          window.opener.location.reload();
+      }catch (e){
+          window.opener.postMessage(JSON.stringify(__data), '*');
+      }
+      window.close();
+  }
+</script>
 </body>
 </html>
