@@ -160,6 +160,7 @@ class User extends AbstractUser
 			':user_id' => $this->getId(),
 			':event_id' => $event->getId()
 		), 'CANT_MAKE_FAVORITE');
+		$event->show($this);
 		return new Result(true, 'Событие успешно добавлено в избранное');
 	}
 
