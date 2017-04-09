@@ -379,10 +379,27 @@ pg.connect(pg_conn_string, function (err, client, done) {
             })
         }
         async.parallel(operations, function (err, results) {
+            console.log('Updated', data);
             cb(err, results);
         });
     }
 
+    function globalUpdateRecommendations(){
+        let q = Entities.users.select(Entities.users.id).toQuery();
+        client.query(q, function(err, users){
+            if (err) return handleError(err);
+            let queue = [];
+            users.rows.forEach(function(user){
+                queue.push(function(callback){
+                    console.log('Updating for user: ' + user.id);
+                    updateRecommendations({user_id: user.id}, callback);
+                });
+            });
+            async.series(queue, function(err, results){
+                if (err) handleError(err);
+            })
+        })
+    }
 
     try {
         new CronJob('*/1 * * * *', function () {
@@ -435,6 +452,15 @@ pg.connect(pg_conn_string, function (err, client, done) {
         logger.error(ex);
     }
 
+//every day at 4:30 am
+    try {
+        new CronJob('30 1 * * *', function () {
+            globalUpdateRecommendations();
+        }, null, true);
+    } catch (ex) {
+        logger.error(ex);
+    }
+
     try {
         new CronJob('*/1 * * * *', function () {
             let mailer = new Mailer(transporter, logger);
@@ -459,7 +485,9 @@ pg.connect(pg_conn_string, function (err, client, done) {
     if (args.indexOf('--send-emails-force') !== -1) {
         let mailer = new Mailer(transporter);
         mailer.sendScheduled(client, handleError);
-
+    }
+    if (args.indexOf('--global-update-recommendations') !== -1) {
+        globalUpdateRecommendations();
     }
 
     var ioHandlers = function (socket) {
@@ -814,7 +842,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                             }, updatedSend);
                                             setTimeout(() => {
                                                 updatedSend();
-                                            }, 5000);
+                                            }, 3000);
                                         });
 
                                     });
