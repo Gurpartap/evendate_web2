@@ -454,6 +454,9 @@ class EventsCollection extends AbstractCollection
 
 					$q_get_events->where('organization_is_private = false');
 
+					$q_get_events->where("view_events.last_event_date > (SELECT DATE_PART('epoch', TIMESTAMP 'today') :: INT)");
+
+
 					$q_get_subscriptions_count = App::queryFactory()->newSelect();
 						$q_get_subscriptions_count
 						->from('subscriptions')
