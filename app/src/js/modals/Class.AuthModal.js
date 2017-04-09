@@ -42,17 +42,20 @@ AuthModal = extending(AbstractModal, (function() {
 		
 		this.modal.find('.AuthButton').each(function() {
 			$(this).on('click', function (e) {
-				var network = $(this).data('auth_network'),
-					url = __APP.AUTH_URLS[network];
+				var network = $(this).data('auth_network');
 				
 				if (yaCounter32442130) {
 					yaCounter32442130.reachGoal(network.toUpperCase() + 'AuthStart');
 				}
-				url = url + (url.indexOf('?') ? '&' : '?') + 'redirect_to=' + encodeURIComponent(self.redirect_to);
+				
+				try {
+					window.localStorage.setItem('redirect_to', encodeURIComponent(self.redirect_to));
+				} catch (e) {}
+				
 				if (isNotDesktop()) {
-					window.location.href = url;
+					window.location.href = __APP.AUTH_URLS[network];
 				} else {
-					window.open(url, network.toUpperCase() + '_AUTH_WINDOW', 'status=1,toolbar=0,menubar=0&height=500,width=700');
+					window.open(__APP.AUTH_URLS[network], network.toUpperCase() + '_AUTH_WINDOW', 'status=1,toolbar=0,menubar=0&height=500,width=700');
 				}
 				e.preventDefault();
 			});
