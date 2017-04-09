@@ -452,6 +452,8 @@ class EventsCollection extends AbstractCollection
 						FROM hidden_events
 						WHERE hidden_events.user_id = :user_id)');
 
+					$q_get_events->where('organization_is_private = false');
+
 					$q_get_subscriptions_count = App::queryFactory()->newSelect();
 						$q_get_subscriptions_count
 						->from('subscriptions')
