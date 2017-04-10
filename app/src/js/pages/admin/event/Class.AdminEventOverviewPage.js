@@ -33,10 +33,7 @@ AdminEventOverviewPage = extending(AdminEventPage, (function() {
 	AdminEventOverviewPage.prototype.render = function() {
 		var PAGE = this;
 		
-		if(__APP.USER.id === -1){
-			__APP.changeState('/feed/actual', true, true);
-			return null;
-		}
+		this.renderHeaderTabs();
 		__APP.changeTitle([{
 			title: 'Организации',
 			page: '/admin'
@@ -44,6 +41,10 @@ AdminEventOverviewPage = extending(AdminEventPage, (function() {
 			title: this.event.organization_short_name,
 			page: '/admin/organization/' + this.event.organization_id
 		}, this.event.title]);
+		
+		if (!checkRedirect('overview', '/admin/event/'+this.event.id+'/overview', true)) {
+			return null;
+		}
 		
 		this.$wrapper.html(tmpl('eventstat-overview', $.extend(true, {}, this.event, {
 			dates_block: tmpl('eventstat-overview-datetime', {

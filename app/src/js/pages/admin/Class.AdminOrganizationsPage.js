@@ -47,7 +47,7 @@ AdminOrganizationsPage = extending(AdminPage, (function() {
 				buttons: __APP.BUILD.link({
 					title: 'Редактировать',
 					classes: ['button', 'fa_icon', 'fa-pencil', '-color_neutral', 'RippleEffect'],
-					page: '/organization/' + org.id + '/edit'
+					page: '/admin/organization/' + org.id + '/edit'
 				}, {
 					title: 'Создать событие',
 					classes: ['button', 'fa_icon', 'fa-plus', '-color_accent', 'RippleEffect'],

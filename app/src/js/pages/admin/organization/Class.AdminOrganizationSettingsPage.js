@@ -15,10 +15,8 @@ AdminOrganizationSettingsPage = extending(AdminOrganizationPage, (function() {
 	 */
 	function AdminOrganizationSettingsPage(org_id) {
 		AdminOrganizationPage.call(this, org_id);
-	}
-	
-	AdminOrganizationSettingsPage.prototype.fetchData = function() {
-		return this.fetching_data_defer = this.organization.fetchOrganization(new Fields(
+		
+		this.organization_fields = new Fields(
 			'city',
 			'country',
 			'default_address',
@@ -29,8 +27,8 @@ AdminOrganizationSettingsPage = extending(AdminOrganizationPage, (function() {
 			'privileges',
 			'staff',
 			'site_url'
-		));
-	};
+		);
+	}
 	/**
 	 *
 	 * @returns {jqPromise}

@@ -35,7 +35,7 @@ __APP = {
 						'event': AddEventPage,
 						'': AddEventPage
 					},
-					'edit': EditOrganizationPage,
+					'edit': AdminOrganizationEditPage,
 					'overview': AdminOrganizationOverviewPage,
 					'events': AdminOrganizationEventsPage,
 					'settings': AdminOrganizationSettingsPage,
@@ -44,7 +44,8 @@ __APP = {
 			},
 			'event': {
 				'^([0-9]+)': {
-					'edit': RedactEventPage,
+					'overview': AdminEventOverviewPage,
+					'edit': AdminEventEditPage,
 					'': AdminEventOverviewPage
 				}
 			},
@@ -78,7 +79,7 @@ __APP = {
 				'': AddEventPage
 			},
 			'^([0-9]+)': {
-				'edit': RedactEventPage,
+				'edit': EditEventPage,
 				'': EventPage
 			},
 			'': FeedPage
@@ -199,6 +200,7 @@ __APP = {
 	 * @param {string} page_name
 	 * @param {boolean} [soft_change=false]
 	 * @param {boolean} [reload=false]
+	 * @return {boolean} false
 	 */
 	changeState: function changeState(page_name, soft_change, reload) {
 		if (page_name) {
@@ -214,6 +216,8 @@ __APP = {
 		} else {
 			console.error('Need to pass page name');
 		}
+		
+		return false;
 	},
 	reload: function() {
 		return __APP.changeState(location.pathname, true, true);

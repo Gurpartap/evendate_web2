@@ -17,6 +17,21 @@ AdminOrganizationOverviewPage = extending(AdminOrganizationPage, (function() {
 		AdminOrganizationPage.apply(this, arguments);
 		this.graphics_stats = new OrganizationsStatistics(this.id);
 		this.other_stats = new OrganizationsStatistics(this.id);
+		
+		this.organization_fields = new Fields(
+			'description',
+			'img_medium_url',
+			'default_address',
+			'staff',
+			'privileges', {
+				events: {
+					length: 3,
+					filters: 'future=true,is_canceled=false,is_delayed=true',
+					fields: new Fields('organization_short_name',	'public_at'),
+					order_by: 'nearest_event_date'
+				}
+			}
+		);
 	}
 	/**
 	 *
@@ -33,25 +48,6 @@ AdminOrganizationOverviewPage = extending(AdminOrganizationPage, (function() {
 			}));
 		}
 		return $();
-	};
-	
-	AdminOrganizationOverviewPage.prototype.fetchData = function() {
-		return this.fetching_data_defer = this.organization.fetchOrganizationWithEvents([
-			'description',
-			'img_medium_url',
-			'default_address',
-			'staff',
-			'privileges'
-		], {
-			length: 3,
-			fields: [
-				'organization_short_name',
-				'public_at'
-			],
-			is_delayed: true,
-			filters: 'future=true,is_canceled=false',
-			order_by: 'nearest_event_date'
-		});
 	};
 	
 	AdminOrganizationOverviewPage.prototype.buildAreaCharts = function() {
@@ -155,14 +151,11 @@ AdminOrganizationOverviewPage = extending(AdminOrganizationPage, (function() {
 			storage_until_name = 'org_stats_' + this.id + '_until',
 			is_cached_data_actual = moment.unix(sessionStorage.getItem(storage_until_name)).isAfter(moment());
 		
-		if(__APP.USER.id === -1){
-			__APP.changeState('/feed/actual', true, true);
+		
+		if (!checkRedirect('overview', '/admin/organization/'+this.organization.id+'/overview', true)) {
 			return null;
 		}
 		
-		if (!window.location.pathname.contains('overview')) {
-			__APP.changeState(window.location.pathname+'/overview', true);
-		}
 		this.renderHeaderTabs();
 		__APP.changeTitle([{
 			title: 'Организации',

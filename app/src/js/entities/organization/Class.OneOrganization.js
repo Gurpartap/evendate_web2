@@ -239,25 +239,12 @@ OneOrganization = extending(OneEntity, (function() {
 	 */
 	OneOrganization.prototype.fetchOrganization = function(fields, success) {
 		var self = this;
-		return this.constructor.fetchOrganization(self.id, fields, function(data) {
+		return OneOrganization.fetchOrganization(self.id, fields, function(data) {
 			self.setData(data);
 			if (success && typeof success == 'function') {
 				success.call(self, self);
 			}
 		});
-	};
-	/**
-	 *
-	 * @param {(string|Array)} fields
-	 * @param {AJAXData} [events_ajax_data]
-	 * @param {AJAXCallback} [success]
-	 * @returns {jqPromise}
-	 */
-	OneOrganization.prototype.fetchOrganizationWithEvents = function(fields, events_ajax_data, success) {
-		var _fields = fields;
-		_fields = _fields instanceof Array ? _fields : _fields.split(',');
-		_fields.push('events'.appendAjaxData(events_ajax_data));
-		return this.fetchOrganization(fields, success);
 	};
 	/**
 	 *

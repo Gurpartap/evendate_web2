@@ -42,10 +42,6 @@ AdminOrganizationEventsPage = extending(AdminOrganizationPage, (function() {
 		return $events;
 	};
 	
-	AdminOrganizationEventsPage.prototype.fetchData = function() {
-		return this.fetching_data_defer = this.organization.fetchOrganization();
-	};
-	
 	AdminOrganizationEventsPage.prototype.render = function() {
 		var this_page = this,
 			$window = $(window),

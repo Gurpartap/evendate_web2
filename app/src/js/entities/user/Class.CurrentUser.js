@@ -56,7 +56,7 @@ CurrentUser = extending(OneUser, (function() {
 	};
 	/**
 	 *
-	 * @param {(Array|string)} [fields]
+	 * @param {(Fields|Array|string)} [fields]
 	 * @param {AJAXCallback} [success]
 	 * @returns {jqPromise}
 	 */

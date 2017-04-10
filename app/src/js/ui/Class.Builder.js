@@ -652,7 +652,7 @@ Builder = (function() {
 							__C.CLASSES.UNIVERSAL_STATES.EMPTY,
 							__C.CLASSES.HOOKS.RIPPLE
 						],
-						page: 'organization/' + org.id + '/edit'
+						page: '/admin/organization/' + org.id + '/edit'
 					})
 			});
 		}))

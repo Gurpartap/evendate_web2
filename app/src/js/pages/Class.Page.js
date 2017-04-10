@@ -12,6 +12,7 @@ Page = (function() {
 	 * @property {string} name
 	 * @property {string} state_name
 	 * @property {string} page_title
+	 * @property {(jQuery|Array|string)} page_title_obj
 	 * @property {jQuery} $view
 	 * @property {jQuery} $wrapper
 	 * @property {string} wrapper_tmpl
@@ -23,19 +24,20 @@ Page = (function() {
 	function Page() {
 		this.name = this.constructor.name;
 		this.state_name = this.name;
-		this.page_title = '';
+		this.page_title = setDefaultValue(this.page_title, '');
+		this.page_title_obj = setDefaultValue(this.page_title_obj, '');
 		/**
 		 * @name Page#$view
 		 * @type jQuery
 		 */
-		this.$view = $('.PageView');
+		this.$view = setDefaultValue(this.$view, $('.PageView'));
 		/**
 		 * @name Page#$wrapper
 		 * @type jQuery
 		 */
-		this.$wrapper = $();
-		this.wrapper_tmpl = 'std';
-		this.with_header_tabs = false;
+		this.$wrapper = setDefaultValue(this.$wrapper, $());
+		this.wrapper_tmpl = setDefaultValue(this.wrapper_tmpl, 'std');
+		this.with_header_tabs = setDefaultValue(this.with_header_tabs, false);
 		
 		this.rendering_defer = $.Deferred();
 		this.fetching_data_defer = $.Deferred();
@@ -80,9 +82,6 @@ Page = (function() {
 			wrapper_field = is_other_page ? '$view' : '$wrapper',
 			$prev = __APP.PREVIOUS_PAGE[wrapper_field].length ? __APP.PREVIOUS_PAGE[wrapper_field] : is_other_page ? $('.PageView') : $('.PageView').find('.Content');
 		
-		if (PAGE.page_title) {
-			__APP.changeTitle(PAGE.page_title);
-		}
 		$prev.addClass('-faded');
 		
 		setTimeout(function() {
@@ -112,6 +111,10 @@ Page = (function() {
 		}, 200);
 		
 		$.when(PAGE.rendering_defer, PAGE.fetching_data_defer).done(function pageRender(){
+			if (PAGE.page_title) {
+				__APP.changeTitle(PAGE.page_title_obj ? PAGE.page_title_obj : PAGE.page_title);
+			}
+			PAGE.renderHeaderTabs();
 			$(window).scrollTop(0);
 			PAGE.render();
 			bindPageLinks();
@@ -120,6 +123,8 @@ Page = (function() {
 			}, 200);
 		});
 	};
+	
+	Page.prototype.renderHeaderTabs = function() {};
 	
 	Page.prototype.fetchData = function() {
 		return this.fetching_data_defer.resolve().promise();

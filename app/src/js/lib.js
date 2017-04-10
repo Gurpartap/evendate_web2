@@ -153,32 +153,18 @@ __C = {
 };
 /**
  * Extending class
- * @param {Function} parent
+ * @param {...Function} parents
  * @param {Function} children
  * @return {Function}
  */
-function extending(parent, children){
-	children.prototype = $.extend(Object.create(parent.prototype), children.prototype);
-	children.prototype.constructor = children;
-	Object.defineProperty(children.prototype, '__super', {
-		value: parent
-	});
+function extending(/**...parents, children*/){
+	var children = Array.prototype.pop.call(arguments),
+		parents = Array.prototype.slice.call(arguments);
 	
-	/**
-	 *
-	 * @param {string} name
-	 * @param {...*} [args]
-	 * @return {*}
-	 */
-	children.prototype.uber = function uber(name, args) {
-		var method;
-		method = children.prototype[name];
-		if (method == this[name]) {
-			method = parent.prototype[name];
-		}
-		
-		return method.apply(this, Array.prototype.slice.apply(arguments, [1]));
-	};
+	parents.forEach(function(parent) {
+		children.prototype = $.extend(Object.create(parent.prototype), children.prototype);
+	});
+	children.prototype.constructor = children;
 	
 	return children;
 }
@@ -188,7 +174,8 @@ function extending(parent, children){
  * @return {Function}
  */
 function extendingJQuery(children){
-	children = extending(jQuery, children);
+	children.prototype = $.extend(Object.create(jQuery.prototype), children.prototype);
+	children.prototype.constructor = children;
 	
 	children.prototype.pushStack = function(elems) {
 		var ret = jQuery.merge(this.get(0) == elems ? new this.constructor() : $(), elems);
@@ -1469,11 +1456,11 @@ function isFormValid($form) {
 }
 /**
  *
- * @param {string} url
+ * @param {string} [url]
  * @returns {string}
  */
 function getFilenameFromURL(url) {
-	return url.split('\\').pop().split('/').pop();
+	return url ? url.split('\\').pop().split('/').pop() : '';
 }
 /**
  *
