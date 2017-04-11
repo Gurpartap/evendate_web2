@@ -407,7 +407,10 @@ fieldset {
 	border: 0;
 }
 
-fieldset:disabled {opacity: .4}
+fieldset:disabled {
+	opacity: .4;
+	pointer-events: none;
+}
 fieldset:disabled fieldset:disabled {opacity: 1}
 
 fieldset:disabled input,

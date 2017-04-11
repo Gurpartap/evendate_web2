@@ -79,11 +79,11 @@ $url_parts = explode('/', $url);
 
 	<?php
 	if ($DEBUG_MODE) { ?>
-		<link rel="stylesheet" href="/dist/vendor.css?rev=222849f37da65362cea21d1f6c065d96">
-		<link rel="stylesheet" href="/dist/app.css?rev=487057f39becc9ec65efa5a9c86fe0f9"><?php
+		<link rel="stylesheet" href="/dist/vendor.css?rev=49a7a319c49633e65b7797a91103cd52">
+		<link rel="stylesheet" href="/dist/app.css?rev=611d3fa91a15ab45e34feddb54ea4788"><?php
 	} else { ?>
-		<link rel="stylesheet" href="/dist/vendor.min.css?rev=65126fe9feeec91a1ea52b34ce76d797">
-		<link rel="stylesheet" href="/dist/app.min.css?rev=378e088a2c10fd1fd413ad75395abc94"><?php
+		<link rel="stylesheet" href="/dist/vendor.min.css?rev=8c5a5c986058ac3ca42cdbedc9e29d70">
+		<link rel="stylesheet" href="/dist/app.min.css?rev=0f22866c8da0a274a46152780eada62d"><?php
 	} ?>
 
 	<?php
@@ -276,11 +276,11 @@ $url_parts = explode('/', $url);
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=fd52ef7eb72a4e4d656ff78935bdb8e2" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=d459c6a8d500f1b9d4e825767a60e5b2" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=183ce8dae7e92eb9b4bbc4c8c438e18f" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=9e3ceabfe1184301a454d440c9fc8af0" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=080e018b70b1f608ea953b9530bd8c09" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=85b22b179bbaedcc6d4a7e4e6c86e540" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=009545a44bc852a52c9d67b37d86df31" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=88f90f34f94bb70634bdd9334f7268e6" charset="utf-8"></script><?php
 }
 
 foreach (glob("app/templates/{*/*/*/*,*/*/*,*/*,*}.html", GLOB_BRACE) as $filename) {
