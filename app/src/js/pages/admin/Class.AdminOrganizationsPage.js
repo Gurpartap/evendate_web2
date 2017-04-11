@@ -1,47 +1,65 @@
 /**
- * @requires Class.StatisticsPage.js
+ * @requires Class.AdminPage.js
  */
 /**
  *
- * @class StatisticsOverviewPage
- * @extends StatisticsPage
+ * @class AdminOrganizationsPage
+ * @extends AdminPage
  */
-StatisticsOverviewPage = extending(StatisticsPage, (function() {
+AdminOrganizationsPage = extending(AdminPage, (function() {
 	/**
 	 *
 	 * @constructor
-	 * @constructs StatisticsOverviewPage
+	 * @constructs AdminOrganizationsPage
 	 */
-	function StatisticsOverviewPage() {
-		StatisticsPage.apply(this);
+	function AdminOrganizationsPage() {
+		AdminPage.apply(this);
 		this.my_organizations_fields = ['img_medium_url', 'subscribed_count', 'staff'];
 		this.page_title = 'Организации';
 		this.my_organizations = new OrganizationsCollection();
 	}
 	
-	StatisticsOverviewPage.buildMyOrganizationsBlocks = function(organizations) {
+	/**
+	 *
+	 * @param {(OrganizationsCollection|Array<OneOrganization>)} organizations
+	 * @return {jQuery}
+	 */
+	AdminOrganizationsPage.buildMyOrganizationsBlocks = function(organizations) {
 		return tmpl('statistics-overview-organization', organizations.map(function(org) {
+			
 			var avatars_max_count = 2,
-				staff_additional_fields = {
-					is_link: true,
-					avatar_classes: ['-size_100x100', '-rounded']
-				},
 				org_roles = [
 					{
 						name: OneUser.ROLE.ADMIN,
 						title: 'Администраторы',
-						staff: UsersCollection.getSpecificStaff(OneUser.ROLE.ADMIN, org.staff, staff_additional_fields),
-						plural_name: OneUser.ROLE.ADMIN + 's'
+						staff: org.admins,
+						plural_name: OneUser.ROLE.ADMIN + 's_block'
 					}, {
 						name: OneUser.ROLE.MODERATOR,
 						title: 'Модераторы',
-						staff: UsersCollection.getSpecificStaff(OneUser.ROLE.MODERATOR, org.staff, staff_additional_fields),
-						plural_name: OneUser.ROLE.MODERATOR + 's'
+						staff: org.moderators,
+						plural_name: OneUser.ROLE.MODERATOR + 's_block'
 					}
 				];
 			
-			org_roles.forEach(function(role) {
-				org[role.plural_name] = __APP.BUILD.avatarCollection(role.staff, avatars_max_count, {
+			return $.extend(true, {}, org, {
+				subscribers: org.subscribed_count + getUnitsText(org.subscribed_count, __LOCALES.ru_RU.TEXTS.SUBSCRIBERS),
+				buttons: __APP.BUILD.link({
+					title: 'Редактировать',
+					classes: ['button', 'fa_icon', 'fa-pencil', '-color_neutral', 'RippleEffect'],
+					page: '/admin/organization/' + org.id + '/edit'
+				}, {
+					title: 'Создать событие',
+					classes: ['button', 'fa_icon', 'fa-plus', '-color_accent', 'RippleEffect'],
+					page: '/add/event/to/' + org.id
+				})
+			}, org_roles.reduce(function(obj, role) {
+				obj[role.plural_name] = __APP.BUILD.avatarCollection(role.staff.map(function(staff) {
+					return $.extend({}, staff, {
+						is_link: true,
+						avatar_classes: ['-size_100x100', '-rounded']
+					});
+				}), avatars_max_count, {
 					dataset: {
 						modal_type: 'editors',
 						modal_specific_role: role.name,
@@ -51,28 +69,17 @@ StatisticsOverviewPage = extending(StatisticsPage, (function() {
 					classes: ['-size_30x30', '-rounded', '-shifted', 'CallModal'],
 					counter_classes: ['-size_30x30','-color_marginal_primary']
 				});
-			});
-			
-			return $.extend(true, {}, org, {
-				subscribers: org.subscribed_count + getUnitsText(org.subscribed_count, __LOCALES.ru_RU.TEXTS.SUBSCRIBERS),
-				buttons: __APP.BUILD.link({
-					title: 'Редактировать',
-					classes: ['button', 'fa_icon', 'fa-pencil', '-color_neutral', 'RippleEffect'],
-					page: '/organization/' + org.id + '/edit'
-				}, {
-					title: 'Создать событие',
-					classes: ['button', 'fa_icon', 'fa-plus', '-color_accent', 'RippleEffect'],
-					page: '/add/event/to/' + org.id
-				})
-			});
+				
+				return obj;
+			}, {}));
 		}));
 	};
 	
-	StatisticsOverviewPage.prototype.fetchData = function() {
+	AdminOrganizationsPage.prototype.fetchData = function() {
 		return this.fetching_data_defer = this.my_organizations.fetchMyOrganizations('admin', this.my_organizations_fields, 10, '');
 	};
 	
-	StatisticsOverviewPage.prototype.bindOrganizationsEvents = function($parent) {
+	AdminOrganizationsPage.prototype.bindOrganizationsEvents = function($parent) {
 		trimAvatarsCollection($parent);
 		bindPageLinks($parent);
 		__APP.MODALS.bindCallModal($parent);
@@ -80,15 +87,15 @@ StatisticsOverviewPage = extending(StatisticsPage, (function() {
 		return $parent;
 	};
 	
-	StatisticsOverviewPage.prototype.bindUploadOnScroll = function() {
+	AdminOrganizationsPage.prototype.bindUploadOnScroll = function() {
 		var PAGE = this,
 			$window = $(window),
 			scrollEvent = function() {
 				if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.is_upload_disabled) {
 					$window.off('scroll.uploadOrganizations');
 					PAGE.my_organizations.fetchMyOrganizations('admin', PAGE.my_organizations_fields, 10, '', function(organizations) {
-						var $organizations = StatisticsOverviewPage.buildMyOrganizationsBlocks(organizations);
-						if (organizations.length) {
+						var $organizations = AdminOrganizationsPage.buildMyOrganizationsBlocks(PAGE.my_organizations.last_pushed);
+						if (PAGE.my_organizations.last_pushed.length) {
 							PAGE.$wrapper.find('.StatOverviewOrganizations').append($organizations);
 							PAGE.bindOrganizationsEvents($organizations);
 							$window.on('scroll.uploadOrganizations', scrollEvent);
@@ -104,25 +111,25 @@ StatisticsOverviewPage = extending(StatisticsPage, (function() {
 		}
 	};
 	
-	StatisticsOverviewPage.prototype.init = function() {
+	AdminOrganizationsPage.prototype.init = function() {
 		this.bindOrganizationsEvents(this.$wrapper);
 		this.bindUploadOnScroll();
 	};
 	
-	StatisticsOverviewPage.prototype.render = function() {
+	AdminOrganizationsPage.prototype.render = function() {
 		if(__APP.USER.id === -1){
 			__APP.changeState('/feed/actual', true, true);
 			return null;
 		}
 		this.$wrapper.html(tmpl('statistics-overview-wrapper', {
-			organizations: StatisticsOverviewPage.buildMyOrganizationsBlocks(this.my_organizations)
+			organizations: AdminOrganizationsPage.buildMyOrganizationsBlocks(this.my_organizations)
 		}));
 		this.init();
 	};
 	
-	StatisticsOverviewPage.prototype.destroy = function() {
+	AdminOrganizationsPage.prototype.destroy = function() {
 		$(window).off('scroll.uploadOrganizations');
 	};
 	
-	return StatisticsOverviewPage;
+	return AdminOrganizationsPage;
 }()));

@@ -223,7 +223,7 @@ OrganizationPage = extending(Page, (function() {
 			redact_org_button: (organization.role == OneUser.ROLE.ADMIN) ? __APP.BUILD.link({
 					title: __LOCALES.ru_RU.TEXTS.BUTTON.EDIT,
 					classes: ['button', __C.CLASSES.SIZES.WIDE, __C.CLASSES.COLORS.NEUTRAL, __C.CLASSES.ICON_CLASS, __C.CLASSES.ICONS.PENCIL, __C.CLASSES.HOOKS.RIPPLE],
-					page: 'organization/' + organization.id + '/edit/'
+					page: '/admin/organization/' + organization.id + '/edit/'
 				}) : '',
 			hidden_for_users: PAGE.is_admin ? '' : __C.CLASSES.HIDDEN,
 			subscribed_blocks: __APP.BUILD.subscribers(organization.subscribed)

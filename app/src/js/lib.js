@@ -49,6 +49,7 @@ __C = {
 		SIZES: {
 			X30: '-size_30x30',
 			X40: '-size_40x40',
+			X50: '-size_50x50',
 			X55: '-size_55x55',
 			LOW: '-size_low',
 			WIDE: '-size_wide',
@@ -67,6 +68,7 @@ __C = {
 		HOOKS: {
 			HANDLED: '-Handled_',
 			RIPPLE: 'RippleEffect',
+			ADD_STAFF: 'AddStaff',
 			ADD_TO_FAVORITES: 'AddToFavorites',
 			TEXT: 'Text',
 			CALL_MODAL: 'CallModal',
@@ -111,7 +113,8 @@ __C = {
 		CROPPER: 'cropper',
 		FRIENDS_LIST: 'friends_list',
 		SUBSCRIBERS_LIST: 'subscribers_list',
-		TICKET: 'tickets'
+		TICKET: 'tickets',
+		ADD_STAFF: 'add_staff'
 	},
 	COLORS: {
 		PRIMARY: '#2e3b50',
@@ -150,32 +153,18 @@ __C = {
 };
 /**
  * Extending class
- * @param {Function} parent
+ * @param {...Function} parents
  * @param {Function} children
  * @return {Function}
  */
-function extending(parent, children){
-	children.prototype = $.extend(Object.create(parent.prototype), children.prototype);
-	children.prototype.constructor = children;
-	Object.defineProperty(children.prototype, '__super', {
-		value: parent
-	});
+function extending(/**...parents, children*/){
+	var children = Array.prototype.pop.call(arguments),
+		parents = Array.prototype.slice.call(arguments);
 	
-	/**
-	 *
-	 * @param {string} name
-	 * @param {...*} [args]
-	 * @return {*}
-	 */
-	children.prototype.uber = function uber(name, args) {
-		var method;
-		method = children.prototype[name];
-		if (method == this[name]) {
-			method = parent.prototype[name];
-		}
-		
-		return method.apply(this, Array.prototype.slice.apply(arguments, [1]));
-	};
+	parents.forEach(function(parent) {
+		children.prototype = $.extend(Object.create(parent.prototype), children.prototype);
+	});
+	children.prototype.constructor = children;
 	
 	return children;
 }
@@ -185,7 +174,8 @@ function extending(parent, children){
  * @return {Function}
  */
 function extendingJQuery(children){
-	children = extending(jQuery, children);
+	children.prototype = $.extend(Object.create(jQuery.prototype), children.prototype);
+	children.prototype.constructor = children;
 	
 	children.prototype.pushStack = function(elems) {
 		var ret = jQuery.merge(this.get(0) == elems ? new this.constructor() : $(), elems);
@@ -1466,6 +1456,22 @@ function isFormValid($form) {
 }
 /**
  *
+ * @param {string} [url]
+ * @returns {string}
+ */
+function getFilenameFromURL(url) {
+	return url ? url.split('\\').pop().split('/').pop() : '';
+}
+/**
+ *
+ * @param {string} string
+ * @returns {boolean}
+ */
+function isBase64(string) {
+	return string.contains(';base64,');
+}
+/**
+ *
  * @param {string} url
  * @param {(AJAXData|string)} [data]
  * @param {string} [content_type='application/x-www-form-urlencoded; charset=UTF-8']
@@ -1928,85 +1934,93 @@ function bindControlSwitch($parent) {
  */
 function bindCallModal($parent) {
 	$parent = $parent ? $parent : $('body');
-	return $parent.find('.' + __C.CLASSES.HOOKS.CALL_MODAL).not('.' + __C.CLASSES.HOOKS.HANDLED + __C.CLASSES.HOOKS.CALL_MODAL).each(function() {
-		var $this = $(this);
-		
-		$this.on('click.CallModal', function() {
-			var $this = $(this),
-				data = $this.data(),
-				title = data.modal_title,
-				modal = data.modal,
-				modal_type = data.modal_type;
+	return $parent
+		.find('.' + __C.CLASSES.HOOKS.CALL_MODAL)
+		.not('.' + __C.CLASSES.HOOKS.HANDLED + __C.CLASSES.HOOKS.CALL_MODAL)
+		.each(function() {
+			var $this = $(this);
 			
-			if (!modal) {
-				switch (modal_type) {
-					case __C.MODAL_TYPES.FAVORS: {
-						modal = new FavoredModal(data.modal_event_id, title);
-						break;
-					}
-					case __C.MODAL_TYPES.SUBSCRIBERS: {
-						modal = new SubscribersModal(data.modal_organization_id, title);
-						break;
-					}
-					case __C.MODAL_TYPES.EDITORS: {
-						modal = new EditorsModal(data.modal_organization_id, title, data.modal_specific_role);
-						break;
-					}
-					case __C.MODAL_TYPES.MAP: {
-						modal = new MapModal(data.modal_map_location, title);
-						break;
-					}
-					case __C.MODAL_TYPES.MEDIA: {
-						var type = data.modal_media_type,
-							url = data.modal_media_url;
-						if (!url) {
-							if ($this.is('img')) {
-								url = $this.attr('src');
-								type = 'image';
-							} else if ($this.is('video')) {
-								//url = $this.attr('url');
-								type = 'video';
-							} else {
-								var str = $this.css('background-image');
-								if (str !== 'none') {
-									if (str.indexOf('"') != -1) {
-										url = str.slice(str.indexOf('"') + 1, str.indexOf('"', str.indexOf('"') + 1));
-									} else {
-										url = str.slice(str.indexOf('(') + 1, str.indexOf(')'));
-									}
+			$this.on('click.CallModal', function() {
+				var $this = $(this),
+					data = $this.data(),
+					title = data.modal_title,
+					modal = data.modal,
+					modal_type = data.modal_type;
+				
+				if (!modal) {
+					switch (modal_type) {
+						case __C.MODAL_TYPES.FAVORS: {
+							modal = new FavoredModal(data.modal_event_id, title);
+							break;
+						}
+						case __C.MODAL_TYPES.SUBSCRIBERS: {
+							modal = new SubscribersModal(data.modal_organization_id, title);
+							break;
+						}
+						case __C.MODAL_TYPES.EDITORS: {
+							modal = new EditorsModal(data.modal_organization_id, title, data.modal_specific_role);
+							break;
+						}
+						case __C.MODAL_TYPES.MAP: {
+							modal = new MapModal(data.modal_map_location, title);
+							break;
+						}
+						case __C.MODAL_TYPES.MEDIA: {
+							var type = data.modal_media_type,
+								url = data.modal_media_url;
+							if (!url) {
+								if ($this.is('img')) {
+									url = $this.attr('src');
 									type = 'image';
+								} else if ($this.is('video')) {
+									//url = $this.attr('url');
+									type = 'video';
+								} else {
+									var str = $this.css('background-image');
+									if (str !== 'none') {
+										if (str.indexOf('"') != -1) {
+											url = str.slice(str.indexOf('"') + 1, str.indexOf('"', str.indexOf('"') + 1));
+										} else {
+											url = str.slice(str.indexOf('(') + 1, str.indexOf(')'));
+										}
+										type = 'image';
+									}
 								}
 							}
+							modal = new MediaModal(url, type);
+							break;
 						}
-						modal = new MediaModal(url, type);
-						break;
+						case __C.MODAL_TYPES.CROPPER: {
+							modal = new CropperModal(data.source_img, data);
+							break;
+						}
+						case __C.MODAL_TYPES.FRIENDS_LIST: {
+							modal = new FriendsListModal(data.modal_entity);
+							break;
+						}
+						case __C.MODAL_TYPES.SUBSCRIBERS_LIST: {
+							modal = new SubscriptionsListModal(data.modal_entity);
+							break;
+						}
+						case __C.MODAL_TYPES.TICKET: {
+							modal = new TicketsModal(data.tickets || data.ticket_uuid);
+							break;
+						}
+						case __C.MODAL_TYPES.ADD_STAFF: {
+							modal = new AddStaffModal(data.modal_org_id, data.modal_role);
+							break;
+						}
+						default: {
+							modal = new StdModal(title, data.modal_content, data.modal_style);
+							break;
+						}
 					}
-					case __C.MODAL_TYPES.CROPPER: {
-						modal = new CropperModal(data.source_img, data);
-						break;
-					}
-					case __C.MODAL_TYPES.FRIENDS_LIST: {
-						modal = new FriendsListModal(data.modal_entity);
-						break;
-					}
-					case __C.MODAL_TYPES.SUBSCRIBERS_LIST: {
-						modal = new SubscriptionsListModal(data.modal_entity);
-						break;
-					}
-					case __C.MODAL_TYPES.TICKET: {
-						modal = new TicketsModal(data.tickets || data.ticket_uuid);
-						break;
-					}
-					default: {
-						modal = new StdModal(title, data.modal_content, data.modal_style);
-						break;
-					}
+					$this.data('modal', modal);
 				}
-				$this.data('modal', modal);
-			}
-			modal.show();
-		});
-	}).addClass(__C.CLASSES.HOOKS.HANDLED + __C.CLASSES.HOOKS.CALL_MODAL);
+				modal.show();
+			});
+		})
+		.addClass(__C.CLASSES.HOOKS.HANDLED + __C.CLASSES.HOOKS.CALL_MODAL);
 }
 
 function bindPageLinks($parent) {

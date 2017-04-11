@@ -12,7 +12,7 @@
 
 <script type="javascript/template" id="tmpl-radio-checkbox">
 	<div class="{unit_classes}">
-		<input id="{id}" class="{classes}" type="{type}" name="{name}" {attributes} {dataset} tabindex="-1">
+		<input id="{id}" class="{classes}" type="{type}" name="{name}" {attributes} {dataset}>
 		<label class="form_label" for="{id}"><span>{label}</span></label>
 	</div>
 </script>
@@ -62,7 +62,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-avatar-block">
-	<{html_tag} class="avatar_block {block_classes}" {attributes} {dataset}>
+	<{html_tag} class="avatar_block User{id} {block_classes}" {attributes} {dataset}>
 	{avatar}
 	<span class="avatar_name">{name}</span>
 	</{html_tag}>

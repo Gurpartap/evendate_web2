@@ -134,6 +134,11 @@ Builder = (function() {
 				props.classes.unshift('form_' + type);
 			}
 			props.unit_classes.unshift('form_unit');
+			if(!props.attributes.checked) {
+				delete props.attributes.checked;
+			}
+			props.attributes.tabindex = props.attributes.tabindex ? props.attributes.tabindex : -1;
+			
 			return tmpl('radio-checkbox', $.extend(props, {type: type}));
 		} else {
 			throw Error('Принимаемый аргумент type может быть либо "radio" либо "checkbox", придурок')
@@ -396,6 +401,7 @@ Builder = (function() {
 			}
 			
 			return $.extend(true, {
+				id: entity.id,
 				avatar: self.avatars(entity, {
 					classes: props.avatar_classes
 				}),
@@ -405,6 +411,43 @@ Builder = (function() {
 				name: name
 			}, props);
 		}));
+	};
+	/**
+	 *
+	 * @param {(number|string)} org_id
+	 * @param {OneUser.ROLE} role
+	 * @param {buildProps} props
+	 * @returns {jQuery}
+	 */
+	Builder.prototype.addUserAvatarBlock = function(org_id, role, props) {
+		var name;
+		
+		props = Builder.normalizeBuildProps(props, ['avatar_classes', 'block_classes']);
+		props.block_classes.push('link', __C.CLASSES.HOOKS.ADD_STAFF, __C.CLASSES.HOOKS.CALL_MODAL);
+		
+		switch (role) {
+			case OneUser.ROLE.ADMIN: {
+				name = 'Добавить администратора';
+				break;
+			}
+			case OneUser.ROLE.MODERATOR: {
+				name = 'Добавить модератора';
+				break;
+			}
+		}
+		
+		return tmpl('avatar-block', $.extend({
+			html_tag: 'div',
+			name: name,
+			avatar: tmpl('avatar', {
+				classes: props.avatar_classes,
+				avatar_url: window.location.origin + '/app/img/add_user.svg'
+			})
+		}, props)).data({
+			modal_type: 'add_staff',
+			modal_org_id: org_id,
+			modal_role: role
+		});
 	};
 	/**
 	 *
@@ -493,7 +536,7 @@ Builder = (function() {
 	 * @return {jQuery}
 	 */
 	Builder.prototype.activity = function buildActivity(activities, props){
-		var self = this,
+		var build = this instanceof Builder ? this : new Builder(),
 			ICON_CLASSES = {};
 		
 		ICON_CLASSES[OneAbstractActivity.TYPES.SUBSCRIBE] = 'plus';
@@ -501,7 +544,7 @@ Builder = (function() {
 		ICON_CLASSES[OneAbstractActivity.TYPES.UNSUBSCRIBE] = ICON_CLASSES[OneAbstractActivity.TYPES.UNFAVE] = 'minus';
 		
 		props = Builder.normalizeBuildProps(props, ['avatar_classes']);
-		props.avatar_classes.push('-size_50x50', '-rounded');
+		props.avatar_classes.push(__C.CLASSES.SIZES.X50, __C.CLASSES.UNIVERSAL_STATES.ROUNDED);
 		
 		return tmpl('activity-block', (activities instanceof Array ? activities : [activities]).map(function(activity) {
 			var entity_props = {},
@@ -528,7 +571,7 @@ Builder = (function() {
 				}
 			}
 			return $.extend(entity_props, {
-				creator_avatar: self.avatars(activity.user, {
+				creator_avatar: build.avatars(activity.user, {
 					classes: props.avatar_classes,
 					is_link: props.avatar_is_link,
 					badge: tmpl('avatar-badge', {icon_class: ICON_CLASSES[activity.type_code]})
@@ -609,7 +652,7 @@ Builder = (function() {
 							__C.CLASSES.UNIVERSAL_STATES.EMPTY,
 							__C.CLASSES.HOOKS.RIPPLE
 						],
-						page: 'organization/' + org.id + '/edit'
+						page: '/admin/organization/' + org.id + '/edit'
 					})
 			});
 		}))
