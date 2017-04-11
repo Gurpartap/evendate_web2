@@ -1,8 +1,3 @@
-<?php
-if (isset($_REQUEST['redirect_to'])) {
-	header('Location: ' . $_REQUEST['redirect_to']);
-}
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

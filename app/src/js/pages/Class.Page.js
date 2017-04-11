@@ -12,6 +12,7 @@ Page = (function() {
 	 * @property {string} name
 	 * @property {string} state_name
 	 * @property {string} page_title
+	 * @property {(jQuery|Array|string)} page_title_obj
 	 * @property {jQuery} $view
 	 * @property {jQuery} $wrapper
 	 * @property {string} wrapper_tmpl
@@ -23,19 +24,20 @@ Page = (function() {
 	function Page() {
 		this.name = this.constructor.name;
 		this.state_name = this.name;
-		this.page_title = '';
+		this.page_title = setDefaultValue(this.page_title, '');
+		this.page_title_obj = setDefaultValue(this.page_title_obj, '');
 		/**
 		 * @name Page#$view
 		 * @type jQuery
 		 */
-		this.$view = $('.PageView');
+		this.$view = setDefaultValue(this.$view, $('.PageView'));
 		/**
 		 * @name Page#$wrapper
 		 * @type jQuery
 		 */
-		this.$wrapper = $();
-		this.wrapper_tmpl = 'std';
-		this.with_header_tabs = false;
+		this.$wrapper = setDefaultValue(this.$wrapper, $());
+		this.wrapper_tmpl = setDefaultValue(this.wrapper_tmpl, 'std');
+		this.with_header_tabs = setDefaultValue(this.with_header_tabs, false);
 		
 		this.rendering_defer = $.Deferred();
 		this.fetching_data_defer = $.Deferred();
@@ -46,34 +48,30 @@ Page = (function() {
 	 * @return {Page}
 	 */
 	Page.routeNewPage = function(path) {
-		var path_split = decodeURIComponent(path).split('/').splice(1),
-			pages_child = __APP.ROUTING,
-			args = [], i, key, PageClass;
+		var path_map = decodeURIComponent(path).split('/'),
+			args = [],
+			PageClass;
 		
-		for (i = 0; i < path_split.length; i++) {
-			if (pages_child.hasOwnProperty(path_split[i])) {
-				if (i < path_split.length - 1) {
-					pages_child = pages_child[path_split[i]];
-				} else {
-					PageClass = pages_child[path_split[i]];
-					break;
-				}
-			} else {
-				for (key in pages_child) {
-					if (key.indexOf('^') === 0 && (new RegExp(key)).test(path_split[i])) {
-						args.push(path_split[i]);
-						if (i < path_split.length - 1) {
-							pages_child = pages_child[key];
-						} else {
-							PageClass = pages_child[key];
-						}
-						break;
+		PageClass = path_map.reduce(function(tree_chunk, path_chunk) {
+			if (!path_chunk)
+				return tree_chunk;
+			
+			if (tree_chunk.hasOwnProperty(path_chunk))
+				return tree_chunk[path_chunk];
+			else
+				return Object.keys(tree_chunk).reduce(function(found_chunk, key) {
+					if (!found_chunk && key.indexOf('^') === 0 && (new RegExp(key)).test(path_chunk)) {
+						args.push(path_chunk);
+						
+						return tree_chunk[key];
 					}
-				}
-			}
-		}
-		PageClass = PageClass ? PageClass : pages_child; // In case of trailing slash in url
-		PageClass = PageClass.prototype instanceof Page ? PageClass : PageClass['']; // Open default page
+					
+					return found_chunk;
+				}, false);
+			
+		}, __APP.ROUTING);
+		
+		PageClass = (PageClass.prototype instanceof Page) ? PageClass : ((PageClass[''] && PageClass[''].prototype instanceof Page) ? PageClass[''] : NotFoundPage); // Open default page
 		return new (Function.prototype.bind.apply(PageClass, [null].concat(args)))(); // new Page(...args)
 	};
 	
@@ -84,9 +82,6 @@ Page = (function() {
 			wrapper_field = is_other_page ? '$view' : '$wrapper',
 			$prev = __APP.PREVIOUS_PAGE[wrapper_field].length ? __APP.PREVIOUS_PAGE[wrapper_field] : is_other_page ? $('.PageView') : $('.PageView').find('.Content');
 		
-		if (PAGE.page_title) {
-			__APP.changeTitle(PAGE.page_title);
-		}
 		$prev.addClass('-faded');
 		
 		setTimeout(function() {
@@ -116,6 +111,10 @@ Page = (function() {
 		}, 200);
 		
 		$.when(PAGE.rendering_defer, PAGE.fetching_data_defer).done(function pageRender(){
+			if (PAGE.page_title) {
+				__APP.changeTitle(PAGE.page_title_obj ? PAGE.page_title_obj : PAGE.page_title);
+			}
+			PAGE.renderHeaderTabs();
 			$(window).scrollTop(0);
 			PAGE.render();
 			bindPageLinks();
@@ -124,6 +123,8 @@ Page = (function() {
 			}, 200);
 		});
 	};
+	
+	Page.prototype.renderHeaderTabs = function() {};
 	
 	Page.prototype.fetchData = function() {
 		return this.fetching_data_defer.resolve().promise();

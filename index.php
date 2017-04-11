@@ -107,11 +107,11 @@ $url_parts = explode('/', $url);
 
 	<?php
 	if ($DEBUG_MODE) { ?>
-    <link rel="stylesheet" href="/dist/vendor.css?rev=514c11bff5a0b7b71eba77acf679a6e0">
-    <link rel="stylesheet" href="/dist/app.css?rev=a859afa175ffbdc29b05e63d87f4f406"><?php
+    <link rel="stylesheet" href="/dist/vendor.css?rev=222849f37da65362cea21d1f6c065d96">
+    <link rel="stylesheet" href="/dist/app.css?rev=611d3fa91a15ab45e34feddb54ea4788"><?php
 	} else { ?>
-    <link rel="stylesheet" href="/dist/vendor.min.css?rev=06ab404610392c5da1392043f51a9b85">
-    <link rel="stylesheet" href="/dist/app.min.css?rev=0d6e6cd27fe68f7c877e2b76c66594ea"><?php
+    <link rel="stylesheet" href="/dist/vendor.min.css?rev=65126fe9feeec91a1ea52b34ce76d797">
+    <link rel="stylesheet" href="/dist/app.min.css?rev=0f22866c8da0a274a46152780eada62d"><?php
 	} ?>
 
 	<?php
@@ -261,9 +261,8 @@ $url_parts = explode('/', $url);
   <div class="sidebar_main_wrapper scrollbar-outer SidebarScroll">
     <nav class="sidebar_navigation SidebarNav"><?php
 			if ($is_user_editor) { ?>
-        <a href="/statistics" class="sidebar_navigation_item SidebarNavItem link Link"><span>Статистика</span></a>
-        <a href="/add/event"
-           class="sidebar_navigation_item SidebarNavItem link Link"><span>Создать событие</span></a><?php
+				<a href="/admin" class="sidebar_navigation_item SidebarNavItem link Link"><span>Администрирование</span></a>
+				<a href="/add/event" class="sidebar_navigation_item SidebarNavItem link Link"><span>Создать событие</span></a><?php
 			} ?>
       <a href="/feed" class="sidebar_navigation_item SidebarNavItem link Link"><span>События</span><span
             class="counter sidebar_navigation_counter -hidden SidebarNavFeedCounter"></span></a>
@@ -307,14 +306,12 @@ $url_parts = explode('/', $url);
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js" type="text/javascript"></script>
 
 <?php
-if ($DEBUG_MODE) { ?>
-  <script type="text/javascript" src="/dist/vendor.js?rev=2a75f8eb4f516d506683a4252c4c780e" charset="utf-8"></script>
-  <script type="text/javascript" src="/dist/app.js?rev=5ef163ba0307b7dee38faf5619d58e40" charset="utf-8"></script><?php
+if($DEBUG_MODE) { ?>
+	<script type="text/javascript" src="/dist/vendor.js?rev=f0f83c148037a12eed8c33c5a23422c0" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=f5c2f77e652432f38885178e62fd6034" charset="utf-8"></script><?php
 } else { ?>
-  <script type="text/javascript" src="/dist/vendor.min.js?rev=cb0b469d29810470bf28c21aba1d3b15"
-          charset="utf-8"></script>
-  <script type="text/javascript" src="/dist/app.min.js?rev=d8535b9c6a41e54bf548bc49c3dc12f3"
-          charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=48536a7bb08ed37d95539943c761d623" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=85448858af9b190c90f856dd3cbf87b5" charset="utf-8"></script><?php
 }
 
 foreach (glob("app/templates/{*/*/*/*,*/*/*,*/*,*}.html", GLOB_BRACE) as $filename) {

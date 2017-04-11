@@ -1,12 +1,12 @@
 /**
- * @requires Class.RedactEventPage.js
+ * @requires Class.AbstractEditEventPage.js
  */
 /**
  *
  * @class AddEventPage
- * @extends RedactEventPage
+ * @extends AbstractEditEventPage
  */
-AddEventPage = extending(RedactEventPage, (function() {
+AddEventPage = extending(AbstractEditEventPage, (function() {
 	/**
 	 *
 	 * @param {(string|number)} [org_id]
@@ -14,7 +14,7 @@ AddEventPage = extending(RedactEventPage, (function() {
 	 * @constructs AddEventPage
 	 */
 	function AddEventPage(org_id) {
-		RedactEventPage.apply(this);
+		AbstractEditEventPage.call(this);
 		this.page_title = 'Добавить событие';
 		this.organization_id = org_id;
 	}

@@ -111,40 +111,40 @@ UserPage = extending(Page, (function() {
 	
 	UserPage.prototype.init = function() {
 		var self = this,
-			$window = $(window),
 			event_names = {
 				activities: 'scroll.uploadActivities',
 				events: 'scroll.uploadEvents'
 			};
 		
-		bindTabs(this.$wrapper);
-		UserPage.bindEvents(this.$wrapper);
-		
-		this.$wrapper.find('.Tabs').on('change.tabs', function() {
-			var $this = $(this),
-				active_type = $this.find('.TabsBody').filter('.'+__C.CLASSES.ACTIVE).data('tab_body_type');
+		function bindScrollEvents(page, event_names) {
+			var active_type = page.$wrapper.find('.TabsBody').filter('.'+__C.CLASSES.ACTIVE).data('tab_body_type'),
+				$window = $(window);
+			
 			$window.off(Object.values(event_names).join(' '));
 			$window.on(event_names[active_type], function() {
 				if ( isScrollRemain(200) ) {
 					switch (active_type) {
 						case 'activities': {
-							self.uploadEntities('activities');
+							page.uploadEntities('activities');
 							break;
 						}
 						case 'events': {
-							self.uploadEntities('events');
+							page.uploadEntities('events');
 							break;
 						}
 					}
 				}
 			});
+		}
+		
+		bindTabs(this.$wrapper);
+		UserPage.bindEvents(this.$wrapper);
+		
+		this.$wrapper.find('.Tabs').on('change.tabs', function() {
+			bindScrollEvents(self, event_names);
 		});
 		
-		$window.on(event_names.activities, function() {
-			if (isScrollRemain(200)) {
-				self.uploadEntities('activities');
-			}
-		});
+		bindScrollEvents(this, event_names);
 	};
 	
 	UserPage.prototype.render = function() {

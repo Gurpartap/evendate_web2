@@ -1,0 +1,13 @@
+<script type="javascript/template" id="tmpl-modal-add-staff-content">
+	<form id="add_staff_form_{modal_id}" class="add_staff_modal_form">
+		<input type="hidden" name="role" value="{role}">
+		<input type="hidden" name="id" value="{org_id}">
+		<div class="form_unit">
+			<label class="form_label -align_center" for="add_staff_search_by_name_{modal_id}">Выберете пользователя Evendate, которого вы хотите сделать участником</label>
+			<input id="add_staff_search_by_name_{modal_id}" class="SearchByName -align_left" type="text" name="user_id" autocomplete="off" placeholder="Имя пользователя">
+		</div>
+		<div class="form_unit">
+			<button class="button -color_accent AddStaff" type="button"><span class="Text">Сделать участником</span></button>
+		</div>
+	</form>
+</script>

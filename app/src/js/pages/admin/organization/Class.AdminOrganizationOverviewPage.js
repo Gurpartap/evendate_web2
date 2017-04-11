@@ -1,22 +1,37 @@
 /**
- * @requires Class.StatisticsOrganizationPage.js
+ * @requires Class.AdminOrganizationPage.js
  */
 /**
  *
- * @class StatisticsOrganizationOverviewPage
- * @extends StatisticsOrganizationPage
+ * @class AdminOrganizationOverviewPage
+ * @extends AdminOrganizationPage
  */
-StatisticsOrganizationOverviewPage = extending(StatisticsOrganizationPage, (function() {
+AdminOrganizationOverviewPage = extending(AdminOrganizationPage, (function() {
 	/**
 	 *
 	 * @param {(string|number)} org_id
 	 * @constructor
-	 * @constructs StatisticsOrganizationOverviewPage
+	 * @constructs AdminOrganizationOverviewPage
 	 */
-	function StatisticsOrganizationOverviewPage(org_id) {
-		StatisticsOrganizationPage.apply(this, arguments);
+	function AdminOrganizationOverviewPage(org_id) {
+		AdminOrganizationPage.apply(this, arguments);
 		this.graphics_stats = new OrganizationsStatistics(this.id);
 		this.other_stats = new OrganizationsStatistics(this.id);
+		
+		this.organization_fields = new Fields(
+			'description',
+			'img_medium_url',
+			'default_address',
+			'staff',
+			'privileges', {
+				events: {
+					length: 3,
+					filters: 'future=true,is_canceled=false,is_delayed=true',
+					fields: new Fields('organization_short_name',	'public_at'),
+					order_by: 'nearest_event_date'
+				}
+			}
+		);
 	}
 	/**
 	 *
@@ -24,7 +39,7 @@ StatisticsOrganizationOverviewPage = extending(StatisticsOrganizationPage, (func
 	 * @param staff
 	 * @return {jQuery}
 	 */
-	StatisticsOrganizationOverviewPage.buildStaffBlock = function(title, staff) {
+	AdminOrganizationOverviewPage.buildStaffBlock = function(title, staff) {
 		if (staff.length) {
 			return tmpl('orgstat-overview-sidebar-wrapper-title', {title: title}).add(__APP.BUILD.avatarBlocks(staff, {
 				avatar_classes: ['-size_40x40','-rounded'],
@@ -35,28 +50,9 @@ StatisticsOrganizationOverviewPage = extending(StatisticsOrganizationPage, (func
 		return $();
 	};
 	
-	StatisticsOrganizationOverviewPage.prototype.fetchData = function() {
-		return this.fetching_data_defer = this.organization.fetchOrganizationWithEvents([
-			'description',
-			'img_medium_url',
-			'default_address',
-			'staff',
-			'privileges'
-		], {
-			length: 3,
-			fields: [
-				'organization_short_name',
-				'public_at'
-			],
-			is_delayed: true,
-			filters: 'future=true,is_canceled=false',
-			order_by: 'nearest_event_date'
-		});
-	};
-	
-	StatisticsOrganizationOverviewPage.prototype.buildAreaCharts = function() {
+	AdminOrganizationOverviewPage.prototype.buildAreaCharts = function() {
 		var self = this;
-		StatisticsPage.prototype.buildAreaCharts.call(self, {
+		AdminPage.prototype.buildAreaCharts.call(self, {
 			subscribe_unsubscribe: self.graphics_stats.subscribe.map(function(el, i) {
 				return {
 					time_value: el.time_value,
@@ -69,7 +65,7 @@ StatisticsOrganizationOverviewPage = extending(StatisticsOrganizationPage, (func
 		});
 	};
 	
-	StatisticsOrganizationOverviewPage.prototype.buildPieChart = function($container, data) {
+	AdminOrganizationOverviewPage.prototype.buildPieChart = function($container, data) {
 		var pie_chart_options = {
 			chart: {
 				type: 'pie',
@@ -140,7 +136,7 @@ StatisticsOrganizationOverviewPage = extending(StatisticsOrganizationPage, (func
 		$container.highcharts($.extend(true, {}, this.highchart_defaults, pie_chart_options, {series: pieChartSeriesNormalize(data)}));
 	};
 	
-	StatisticsOrganizationOverviewPage.prototype.render = function() {
+	AdminOrganizationOverviewPage.prototype.render = function() {
 		var PAGE = this,
 			stat_dynamics = {
 				scale: Statistics.SCALES.WEEK,
@@ -151,35 +147,36 @@ StatisticsOrganizationOverviewPage = extending(StatisticsOrganizationPage, (func
 					'conversion'
 				]
 			},
-			staffs_additional_fields = {
-				is_link: true,
-				avatar_classes: ['-size_40x40', '-rounded']
-			},
 			storage_data_name = 'org_stats_' + this.id + '_data',
 			storage_until_name = 'org_stats_' + this.id + '_until',
 			is_cached_data_actual = moment.unix(sessionStorage.getItem(storage_until_name)).isAfter(moment());
 		
-		if(__APP.USER.id === -1){
-			__APP.changeState('/feed/actual', true, true);
+		
+		if (!checkRedirect('overview', '/admin/organization/'+this.organization.id+'/overview', true)) {
 			return null;
 		}
 		
-		if (!window.location.pathname.contains('overview')) {
-			__APP.changeState(window.location.pathname+'/overview', true);
-		}
 		this.renderHeaderTabs();
 		__APP.changeTitle([{
 			title: 'Организации',
-			page: '/statistics'
+			page: '/admin'
 		}, this.organization.short_name]);
+		
+		function extendStaffProps(staff) {
+			return $.extend({}, staff, {
+				is_link: true,
+				avatar_classes: ['-size_40x40', '-rounded']
+			});
+		}
+		
 		
 		this.$wrapper.html(tmpl('orgstat-overview', $.extend(true, {}, this.organization, {
 			avatar_block: __APP.BUILD.avatarBlocks(this.organization, {
 				entity: 'organization',
 				block_classes: ['-stack']
 			}),
-			staff_block: StatisticsOrganizationOverviewPage.buildStaffBlock('Администраторы', this.organization.staff.getSpecificStaff(OneUser.ROLE.ADMIN, staffs_additional_fields))
-				.add(StatisticsOrganizationOverviewPage.buildStaffBlock('Модераторы', this.organization.staff.getSpecificStaff(OneUser.ROLE.MODERATOR, staffs_additional_fields))),
+			staff_block: AdminOrganizationOverviewPage.buildStaffBlock('Администраторы', this.organization.admins.map(extendStaffProps))
+			                                          .add(AdminOrganizationOverviewPage.buildStaffBlock('Модераторы', this.organization.moderators.map(extendStaffProps))),
 			event_blocks: this.organization.events.length ? tmpl('orgstat-overview-sidebar-wrapper', {
 				content: tmpl('orgstat-overview-sidebar-wrapper-title', {title: 'Предстоящие события'})
 					.add(tmpl('orgstat-event-block', this.organization.events.map(function(event) {
@@ -236,5 +233,5 @@ StatisticsOrganizationOverviewPage = extending(StatisticsOrganizationPage, (func
 		bindPageLinks(this.$wrapper);
 	};
 	
-	return StatisticsOrganizationOverviewPage;
+	return AdminOrganizationOverviewPage;
 }()));
