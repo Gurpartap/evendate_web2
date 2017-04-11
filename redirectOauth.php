@@ -17,22 +17,36 @@
 require_once 'footer.php';
 ?>
 <script>
-    $(document).ready(function () {
-        var data = $.extend(searchToObject(), hashToObject(), true);
-        var link = '/oAuthDone.php?',
-            params = [];
-        for (var key in data) {
-            if (data.hasOwnProperty(key)) {
-                params.push(key + '=' + data[key]);
-            }
-        }
-        if (data.mobile == 'true'){
-            window.location.href = link + params.join('&');
-        }else{
-            window.opener.location.href = link + params.join('&');
-            window.close();
-        }
-    });
+	$(document).ready(function () {
+		var data = $.extend(searchToObject(), hashToObject(), true),
+			params = [],
+			link,
+			redirect_to;
+
+		for (var key in data) {
+			if (data.hasOwnProperty(key)) {
+				params.push(key + '=' + data[key]);
+			}
+		}
+
+		try {
+			redirect_to = window.localStorage.getItem('redirect_to');
+			window.localStorage.removeItem('redirect_to');
+		} catch (e) {}
+
+		if (redirect_to) {
+			params.push('redirect_to=' + redirect_to);
+		}
+
+		link = '/oAuthDone.php?' + params.join('&');
+
+		if (data.mobile == 'true'){
+			window.location.href = link;
+		}else{
+			window.opener.location.href = link;
+			window.close();
+		}
+	});
 
 
 </script>
