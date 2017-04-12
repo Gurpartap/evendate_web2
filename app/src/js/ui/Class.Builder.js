@@ -729,6 +729,7 @@ Builder = (function() {
 			type.last_date = m_event_date.format(__C.DATE_FORMAT);
 			
 			return $.extend({}, event, {
+				cover_width: 220,
 				divider: different_day ? tmpl('divider', {
 						title: m_event_date.calendar().capitalize()
 					}) : '',
@@ -825,7 +826,8 @@ Builder = (function() {
 			$events;
 		
 		$events = tmpl('feed-event', (events instanceof Array ? events : [events]).map(function(event) {
-			var avatars_collection_classes = [
+			var card_cover_width = 405,
+				avatars_collection_classes = [
 					__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
 					__C.CLASSES.UNIVERSAL_STATES.BORDERED,
 					__C.CLASSES.SIZES.SMALL,
@@ -920,6 +922,7 @@ Builder = (function() {
 			}
 			
 			return $.extend(true, {
+				cover_width: card_cover_width,
 				organization_avatar_block: self.avatarBlocks(organization, {
 					block_classes: [__C.CLASSES.SIZES.SMALL],
 					is_link: true,
@@ -1030,7 +1033,10 @@ Builder = (function() {
 	 */
 	Builder.prototype.ticketCards = function buildTicketCard(tickets) {
 		
-		return tmpl('ticket-card', Builder.normalizeTicketProps(tickets)).each(function(i, ticket) {
+		return tmpl('ticket-card', Builder.normalizeTicketProps(tickets).map(function(ticket) {
+			ticket.cover_width = 260;
+			return ticket;
+		})).each(function(i, ticket) {
 			$(ticket).data({
 				modal_type: __C.MODAL_TYPES.TICKET,
 				tickets: tickets[i]

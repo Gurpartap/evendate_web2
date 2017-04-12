@@ -47,6 +47,7 @@ AdminEventOverviewPage = extending(AdminEventPage, (function() {
 		}
 		
 		this.$wrapper.html(tmpl('eventstat-overview', $.extend(true, {}, this.event, {
+			cover_width: 280,
 			dates_block: tmpl('eventstat-overview-datetime', {
 				date: displayDateRange(this.event.first_event_date, this.event.last_event_date),
 				time: this.event.is_same_time ? displayTimeRange(this.event.dates[0].start_time, this.event.dates[0].end_time) : 'Разное время'

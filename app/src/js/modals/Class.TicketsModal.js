@@ -39,6 +39,7 @@ TicketsModal = extending(AbstractModal, (function() {
 		this.content = tmpl('modal-ticket-content', Builder.normalizeTicketProps(this.tickets).map(function(props, i) {
 			var data = self.tickets[i].order.payed_at || self.tickets[i].created_at;
 			
+			props.cover_width = 450;
 			props.card_classes.push('-ticket_extended');
 			
 			return $.extend(props, {

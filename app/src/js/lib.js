@@ -1080,6 +1080,67 @@ function tmpl(template_type, items, addTo, direction) {
 	}
 	return result;
 }
+/**
+ *
+ * @param {string} str
+ * @param {object} [options]
+ * @return {{
+ *    anchor: string
+ *    authority: string
+ *    directory: string
+ *    file: string
+ *    host: string
+ *    password: string
+ *    path: string
+ *    port: string
+ *    protocol: string
+ *    query: string
+ *    queryKey: Object
+ *    relative: string
+ *    source: string
+ *    user: string
+ *    userInfo: string
+ *    wo_query: string
+ * }}
+ */
+function parseUri(str, options) {
+	var o = {
+			strictMode: false,
+			key: ["source","protocol","authority","userInfo","user","password","host","port","relative","path","directory","file","query","anchor"],
+			q:   {
+				name:   "queryKey",
+				parser: /(?:^|&)([^&=]*)=?([^&]*)/g
+			},
+			parser: {
+				strict: /^(?:([^:\/?#]+):)?(?:\/\/((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?))?((((?:[^?#\/]*\/)*)([^?#]*))(?:\?([^#]*))?(?:#(.*))?)/,
+				loose:  /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/
+			}
+		},
+		m = o.parser[o.strictMode ? 'strict' : 'loose'].exec(str),
+		uri = {},
+		i = 14;
+	
+	if (options) {
+		$.extend(o, options);
+	}
+	
+	while (i--) uri[o.key[i]] = m[i] || '';
+	
+	uri[o.q.name] = {};
+	uri[o.key[12]].replace(o.q.parser, function($0, $1, $2) {
+		if ($1) uri[o.q.name][$1] = $2;
+	});
+	
+	Object.defineProperties(uri, {
+		wo_query: {
+			get: function() {
+				return uri[o.key[1]] + '://' + uri[o.key[6]] + uri[o.key[9]];
+			}
+		}
+	});
+	
+	return uri;
+}
 
 function storeStat(entity_id, entity_type, event_type) {
 	window.__stats = window.__stats ? window.__stats : [];
@@ -1967,7 +2028,8 @@ function bindCallModal($parent) {
 						}
 						case __C.MODAL_TYPES.MEDIA: {
 							var type = data.modal_media_type,
-								url = data.modal_media_url;
+								url = data.modal_media_url,
+								parsed_url;
 							if (!url) {
 								if ($this.is('img')) {
 									url = $this.attr('src');
@@ -1987,7 +2049,7 @@ function bindCallModal($parent) {
 									}
 								}
 							}
-							modal = new MediaModal(url, type);
+							modal = new MediaModal(parseUri(url).wo_query, type);
 							break;
 						}
 						case __C.MODAL_TYPES.CROPPER: {

@@ -150,7 +150,9 @@
 <script type="javascript/template" id="tmpl-event-block">
 	{divider}
 	<div class="event_block" data-event-id="{id}" data-event_date="{date}">
-		<a href="/event/{id}" class="event_block_img img_holder link Link" style="background-image: url({image_horizontal_medium_url})"></a>
+		<a href="/event/{id}" class="event_block_img img_holder link Link">
+			<img src="{image_horizontal_url}?width={cover_width}" title="{title}" width="{cover_width}">
+		</a>
 		<div class="event_block_info">
 			<header class="event_block_title">
 				<a href="/event/{id}" class="link Link">{title}</a>
@@ -170,7 +172,7 @@
 	<div class="ticket_card {card_classes}">
 		<div class="material ticket_card_wrapper">
 			<div class="ticket_card_cover img_holder">
-				<img src="{image_horizontal_medium_url}" title="{title}">
+				<img src="{image_horizontal_url}?width={cover_width}" title="{title}" width="{cover_width}">
 			</div>
 			<div class="ticket_card_content">
 				<p class="ticket_card_event_title">{title}</p>
