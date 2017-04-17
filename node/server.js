@@ -736,7 +736,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                     photo_max_orig: data.user_info.photo_max_orig
                                 };
                                 if (user.vk_uid != null) { // user already exists in vk_users table
-                                    q_ins_sign_in = vk_sign_in.update(vk_data).where(vk_sign_in.user_id.equals(user.id));
+                                    q_ins_sign_in = vk_sign_in.update(vk_data).where(vk_sign_in.uid.equals(user.vk_uid));
                                 } else {
                                     q_ins_sign_in = vk_sign_in.insert(vk_data);
                                 }
@@ -752,7 +752,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                     cover_photo_url: data.user_info.cover && data.user_info.cover.coverPhoto ? data.user_info.cover.coverPhoto.url : null
                                 };
                                 if (user.google_uid != null) {
-                                    q_ins_sign_in = google_sign_in.update(google_data).where(google_sign_in.user_id.equals(user.id));
+                                    q_ins_sign_in = google_sign_in.update(google_data).where(google_sign_in.google_id.equals(user.google_uid));
                                 } else {
                                     q_ins_sign_in = google_sign_in.insert(google_data);
                                 }
@@ -766,7 +766,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                     expires_in: data.oauth_data.expires_in
                                 };
                                 if (user.facebook_uid != null) {
-                                    q_ins_sign_in = facebook_sign_in.update(facebook_data).where(facebook_sign_in.user_id.equals(user.id));
+                                    q_ins_sign_in = facebook_sign_in.update(facebook_data).where(facebook_sign_in.uid.equals(user.facebook_uid));
                                 } else {
                                     q_ins_sign_in = facebook_sign_in.insert(facebook_data);
                                 }
@@ -852,7 +852,12 @@ pg.connect(pg_conn_string, function (err, client, done) {
                             });
                         };
 
-                        client.query(q_ins_sign_in.returning('id').toQuery(), function (sign_in_err) {
+                        let q_ins_sign_in_query = q_ins_sign_in.returning('id').toQuery()
+
+                        console.log(q_ins_sign_in_query.text);
+                        console.log(q_ins_sign_in_query.values);
+
+                        client.query(q_ins_sign_in_query, function (sign_in_err) {
                             if (handleError(sign_in_err)) {
                                 socket.emit('error.retry');
                                 return;
