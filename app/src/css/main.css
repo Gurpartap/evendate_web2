@@ -769,6 +769,54 @@ fieldset:disabled .form_select {cursor: default}
 .-state_admin .form_unit:not(.-status_disabled) > .form_checkbox:not(:disabled) + .form_label:hover:before {border-color: #00dc88}
 
 /* /Form Radio & Checkbox */
+/* Form Radio Group */
+
+.radio_group {
+	display: flex;
+}
+
+.radio_group > .form_unit {
+	margin: 0;
+}
+
+
+.radio_group > .form_unit > .form_label {
+	margin: 0;
+	padding: 4px 8px;
+	word-wrap: normal;
+	border: 1px solid #c5c9d1;
+	border: 1px solid var(--color_primary_30);
+}
+
+.radio_group > .form_unit + .form_unit > .form_label {border-left: 0}
+
+.radio_group > .form_unit:first-child > .form_label {border-radius: 3px 0 0 3px}
+.radio_group > .form_unit:last-child > .form_label {border-radius: 0 3px 3px 0}
+
+.radio_group > .form_unit > .form_radio:not(:checked) + .form_label {
+	color: #9fa6b3;
+	color: var(--color_primary_50);
+}
+
+.radio_group > .form_unit > .form_radio:checked + .form_label {
+	color: #3e4d66;
+	color: var(--color_primary);
+	background-color: #f9f9fa;
+	background-color: var(--color_background_gray);
+}
+
+.radio_group > .form_unit > .form_label > span {
+	display: block;
+	margin: 0;
+	width: auto;
+	font-size: .8125em;
+	font-weight: 500;
+}
+
+.radio_group > .form_unit > .form_label:before,
+.radio_group > .form_unit > .form_label:after {content: initial}
+
+/* /Form Radio Group */
 /* Form -inline */
 
 .form_unit.-inline {

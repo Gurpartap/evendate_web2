@@ -170,6 +170,32 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @param {buildProps} props
+	 * @param {string} props.name
+	 * @param {(jQuery|buildProps)} props.units
+	 * @return {jQuery}
+	 */
+	Builder.prototype.radioGroup = function(props) {
+		var self = this,
+			build_props = $.extend({}, Builder.normalizeBuildProps(props));
+		
+		if (!(build_props.units instanceof jQuery)) {
+			build_props.units = self.radio.apply(self, build_props.units.map(function(unit) {
+				var item = $.extend(unit, {
+					name: build_props.name
+				});
+				if (!item.id) {
+					item.id = guid();
+				}
+				
+				return item;
+			}));
+		}
+		
+		return tmpl('radio-group', build_props);
+	};
+	/**
+	 *
 	 * @param {(string|Element|jQuery)} text
 	 * @param {HTMLDataset} [dataset]
 	 * @param {HTMLAttributes} [attributes]
