@@ -43,6 +43,7 @@ class Event extends AbstractEntity
 
 	const REGISTRATION_FIELDS_FIELD_NAME = 'registration_fields';
 	const IS_REGISTERED_FIELD_NAME = 'is_registered';
+	const IS_HIDDEN_FIELD_NAME = 'is_hidden';
 	const REGISTRATION_APPROVE_STATUS_FIELD_NAME = 'registration_approve_status';
 	const ORDERS_FIELD_NAME = 'orders';
 	const MY_TICKETS_COUNT_FIELD_NAME = 'my_tickets_count';
@@ -148,6 +149,12 @@ class Event extends AbstractEntity
 			 view_tickets_orders.user_id = :user_id
 			 AND view_tickets_orders.event_id = view_events.id) :: BOOLEAN AS ' . self::IS_REGISTERED_FIELD_NAME,
 
+		self::IS_HIDDEN_FIELD_NAME => '(SELECT (COUNT(hidden_events.id) > 0) :: BOOLEAN
+			FROM hidden_events
+			WHERE
+			 hidden_events.user_id = :user_id
+			 AND status = TRUE
+			 AND hidden_events.event_id = view_events.id) :: BOOLEAN AS ' . self::IS_HIDDEN_FIELD_NAME,
 
 		self::REGISTRATION_APPROVE_STATUS_FIELD_NAME => '(SELECT view_tickets_orders.status_type_code
 			FROM view_tickets_orders
