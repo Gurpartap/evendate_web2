@@ -104,7 +104,9 @@ AdminOrganizationSettingsPage = extending(AdminOrganizationPage, (function() {
 			other_domain_radio: __APP.BUILD.radio({
 				id: 'org_admin_settings_other_domain_enabled',
 				name: 'domains'
-			})
+			}),
+			customer_id: __APP.USER.id,
+			cps_email: __APP.USER.email
 		})));
 		
 		this.init();

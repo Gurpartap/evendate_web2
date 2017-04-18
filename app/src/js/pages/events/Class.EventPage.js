@@ -199,6 +199,7 @@ EventPage = extending(Page, (function() {
 	
 	EventPage.prototype.render = function() {
 		var PAGE = this,
+			cover_width = 630,
 			avatars_collection_classes = [
 				__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
 				__C.CLASSES.UNIVERSAL_STATES.BORDERED,
@@ -340,6 +341,7 @@ EventPage = extending(Page, (function() {
 		}
 		
 		PAGE.$wrapper.html(tmpl('event-page', $.extend({}, PAGE.event, {
+			cover_width: cover_width,
 			action_buttons: $action_buttons,
 			avatars_collection: __APP.BUILD.avatarCollection(PAGE.event.favored, 6, {
 				dataset: {
