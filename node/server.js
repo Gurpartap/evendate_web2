@@ -384,18 +384,18 @@ pg.connect(pg_conn_string, function (err, client, done) {
         });
     }
 
-    function globalUpdateRecommendations(){
+    function globalUpdateRecommendations() {
         let q = Entities.users.select(Entities.users.id).toQuery();
-        client.query(q, function(err, users){
+        client.query(q, function (err, users) {
             if (err) return handleError(err);
             let queue = [];
-            users.rows.forEach(function(user){
-                queue.push(function(callback){
+            users.rows.forEach(function (user) {
+                queue.push(function (callback) {
                     console.log('Updating for user: ' + user.id);
                     updateRecommendations({user_id: user.id}, callback);
                 });
             });
-            async.series(queue, function(err, results){
+            async.series(queue, function (err, results) {
                 if (err) handleError(err);
             })
         })
@@ -1618,6 +1618,10 @@ pg.connect(pg_conn_string, function (err, client, done) {
         qr_svg.pipe(res);
     });
 
+    app.get('/log', function (req, res) {
+        console.log(req);
+        res.json({status: true});
+    });
     app.listen(8000, function () {
         console.log('Node listening on port 8000!');
     });

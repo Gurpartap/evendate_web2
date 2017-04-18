@@ -76,7 +76,12 @@ class Result
 
 	public function __toString()
 	{
-		header("Content-Type: application/json");
+		if ($this->format == 'json') {
+			header("Content-Type: application/json");
+		} else {
+			header("Content-Type: application/xml");
+		}
+
 		http_response_code($this->http_code ?? 200);
 		if ($this->getNude()) {
 			$arr = $this->data;
@@ -97,7 +102,14 @@ class Result
 				);
 			}
 		}
-		$res = json_encode($arr);
+		if ($this->is_nude){
+			return $arr;
+		}
+		if ($this->format == 'json') {
+			$res = json_encode($arr);
+		} else {
+			$res = json_encode($arr);
+		}
 		return $res;
 	}
 
@@ -120,9 +132,14 @@ class Result
 		}
 	}
 
-	public function setNude($nude_data)
+	public function setNude($is_nude)
 	{
-		$this->is_nude = $nude_data;
+		$this->is_nude = $is_nude;
+	}
+
+	public function setNudeData($nude_data)
+	{
+		$this->data = $nude_data;
 	}
 
 	public function setRequestUUID(string $uuid)
