@@ -53,20 +53,22 @@ AbstractEditOrganizationPage = extending(Page, (function() {
 		function initCities(selected_id) {
 			var $select = PAGE.$wrapper.find('#add_organization_city');
 			
-			$select
-				.append(tmpl('option', PAGE.cities.map(function(city) {
-					return {
-						val: city.id,
-						display_name: city.local_name
-					};
-				})))
-				.select2({
-					containerCssClass: 'form_select2',
-					dropdownCssClass: 'form_select2_drop'
-				});
-			if (selected_id) {
-				$select.select2('val', selected_id);
-			}
+			PAGE.cities.fetchCities(null, 0, 'local_name', function() {
+				$select
+					.append(tmpl('option', PAGE.cities.map(function(city) {
+						return {
+							val: city.id,
+							display_name: city.local_name
+						};
+					})))
+					.select2({
+						containerCssClass: 'form_select2',
+						dropdownCssClass: 'form_select2_drop'
+					});
+				if (selected_id) {
+					$select.select2('val', selected_id);
+				}
+			});
 		}
 		
 		function initOrganizationTypes(selected_id) {
