@@ -20,6 +20,32 @@ ExtendedTicketsCollection = extending(EntitiesCollection, (function() {
 	ExtendedTicketsCollection.prototype.collection_of = OneExtendedTicket;
 	/**
 	 *
+	 * @param {(Fields|Array|string|undefined)} [fields]
+	 *
+	 * @return {AJAXData}
+	 */
+	ExtendedTicketsCollection.convertTicketFieldsToEventAjaxData = function(fields) {
+		fields = fields ? Fields.parseFields(fields) : new Fields();
+		var events_ajax_data = {},
+			events_fields;
+		
+		if (fields.has('event')) {
+			events_ajax_data = fields.pull('event');
+		}
+		
+		events_fields = new Fields({tickets: {fields: fields}});
+		
+		if (events_ajax_data.fields) {
+			events_ajax_data.fields = Fields.parseFields(events_ajax_data.fields);
+			events_ajax_data.fields.push(events_fields);
+		} else {
+			events_ajax_data.fields = events_fields;
+		}
+		
+		return events_ajax_data;
+	};
+	/**
+	 *
 	 * @param {OneEvent} event
 	 * @return {ExtendedTicketsCollection}
 	 */
@@ -37,6 +63,7 @@ ExtendedTicketsCollection = extending(EntitiesCollection, (function() {
 		
 		return tickets;
 	};
+	
 	
 	return ExtendedTicketsCollection;
 }()));

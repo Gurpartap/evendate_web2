@@ -734,7 +734,7 @@ Builder = (function() {
 					}) : '',
 				action_buttons: $action_buttons,
 				date: m_event_date.format(__C.DATE_FORMAT),
-				avatars_collection: self.avatarCollection(event.favored, 4, {
+				avatars_collection: self.avatarCollection(event.favored, 3, {
 					dataset: {
 						modal_type: 'favors',
 						modal_event_id: event.id

@@ -4508,10 +4508,10 @@ body.-open_modal > .modal_wrapper {
 	border-radius: var(--material_border_radius);
 }
 
-.ticket_card:not(.-ticket_extended) {
-	width: 260px;
-	margin-bottom: 36px;
-}
+.ticket_card {margin-bottom: 36px}
+
+.ticket_card:not(.-ticket_extended) {width: 260px}
+.ticket_card.-ticket_extended {width: 450px}
 
 .ticket_card:not(.-ticket_extended):before,
 .ticket_card:not(.-ticket_extended):after {
@@ -4537,8 +4537,6 @@ body.-open_modal > .modal_wrapper {
 	bottom: 100%;
 	height: 14px;
 }
-
-.ticket_card.-ticket_extended {width: 450px}
 
 .ticket_card_cover > img {
 	width: 100%;
