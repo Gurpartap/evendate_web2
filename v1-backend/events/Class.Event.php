@@ -233,21 +233,27 @@ class Event extends AbstractEntity
                     AND event_id = view_events.id 
                     AND favorite_events.user_id IN (SELECT friend_id FROM view_friends WHERE user_id = :user_id)) AS ' . self::FAVORED_FRIENDS_COUNT_FIELD_NAME,
 
-		self::ACTUALITY_FIELD_NAME => '(SELECT 1 / (CASE
-                                              WHEN (ve.registration_required = TRUE AND ve.registration_till < DATE_PART(\'epoch\', NOW()))
-                                              THEN 1000
-                                              ELSE (SELECT
-                                              CASE WHEN COUNT(id)::INT = 0 THEN 1000 ELSE COUNT(id)::INT END
-                                              FROM events_dates
-                                              WHERE
-                                              events_dates.event_id = ve.id
-                                              AND event_date > NOW()
-                                              AND event_date < (NOW() + INTERVAL \'10 days\')
-                                              AND status = TRUE
-                                              )
-                                              END)::REAL * 10
-                                            FROM view_events AS ve
-                                            WHERE ve.id = view_events.id)::REAL AS ' . self::ACTUALITY_FIELD_NAME
+		self::ACTUALITY_FIELD_NAME => '(
+		(SELECT
+                                CASE
+                                WHEN DATE_PART(\'epoch\', NOW()) > ve.created_at + 259200 :: FLOAT     THEN 0
+                                ELSE (259200 :: FLOAT - (DATE_PART(\'epoch\', NOW()) - ve.created_at)) :: FLOAT /     7200::FLOAT
+                                END
+                              FROM view_events AS ve
+                              WHERE ve.id = view_events.id) :: FLOAT 
+     + 
+     (SELECT (CASE
+                                          WHEN (ve.registration_required = TRUE AND     ve.registration_till < DATE_PART(\'epoch\', NOW())) THEN 1 / 1000
+                                          ELSE (SELECT CASE WHEN COUNT(id) :: FLOAT = 0     THEN 1 / 1000     ELSE 1 / COUNT(id) :: FLOAT
+                                                       END
+                                                FROM events_dates
+                                                WHERE     events_dates.event_id = ve.id
+                                                          AND event_date > NOW()
+                                                          AND event_date < (NOW() + INTERVAL \'10 days\')
+                                                          AND status = TRUE )     END) :: FLOAT * 10
+                              FROM view_events AS ve
+                              WHERE ve.id = view_events.id) :: FLOAT
+     )::FLOAT AS ' . self::ACTUALITY_FIELD_NAME
 	);
 
 	protected $description;
@@ -491,6 +497,11 @@ class Event extends AbstractEntity
 		$data['title'] = trim($data['title']);
 		$data['description'] = trim($data['description']);
 		$data['detail_info_url'] = trim($data['detail_info_url']);
+		if (empty($data['detail_info_url'])) {
+			$data['detail_info_url'] = null;
+		} else {
+			$data['detail_info_url'] = filter_var($data['detail_info_url'], FILTER_VALIDATE_URL, FILTER_NULL_ON_FAILURE);
+		}
 
 		$data['location'] = isset($data['address']) ? trim($data['address']) : $data['location'];
 		$data['latitude'] = isset($data['geo']['coordinates']['G']) ? $data['geo']['coordinates']['G'] : null;
@@ -572,6 +583,16 @@ class Event extends AbstractEntity
 			$data['registration_till'] = null;
 		}
 
+		try {
+			if (isset($data['additional_notification_time']) && $data['additional_notification_time'] != null) {
+				$data['additional_notification_time'] = isset($data['additional_notification_time']) ? new DateTime($data['additional_notification_time']) : null;
+			} else {
+				$data['registration_till'] = null;
+			}
+		} catch (Exception $e) {
+			$data['additional_notification_time'] = null;
+		}
+
 
 		if ($data['is_online'] === 'false') {
 			if (is_null($data['location']) || empty($data['location'])) throw new InvalidArgumentException('LOCATION_IS_NULL');
@@ -615,6 +636,14 @@ class Event extends AbstractEntity
 	{
 		try {
 			$db->beginTransaction();
+
+			$tariff_info = Tariff::getForOrganization($db, App::getCurrentUser(), array('organization' => $organization),
+				Fields::parseFields('event_publications,available_event_publications,available_additional_notifications')
+			)->getData();
+
+			if ($tariff_info['event_publications'] >= $tariff_info['available_event_publications'])
+				throw new LogicException('Извините, Ваш тарифный план не позволяет добавить больше событий. Вы можете сменить тарифный план в настройках организации.');
+
 			if (!isset($data['dates']) || count($data['dates']) == 0)
 				throw new InvalidArgumentException('Укажите, пожалуйста, даты');
 
@@ -697,15 +726,23 @@ class Event extends AbstractEntity
 				)), $db);
 			}
 
+			if ($tariff_info['available_additional_notifications'] > 0 &&
+				$data['additional_notification_time'] instanceof DateTime) {
+				self::saveNotifications(array(array(
+					'event_id' => $event_id,
+					'notification_type_id' => self::getNotificationTypeId(Notification::NOTIFICATION_TYPE_ADDITIONAL_FOR_ORGANIZATION, $db),
+					'notification_time' => $data['additional_notification_time']->format('Y-m-d H:i:s'),
+					'status' => 'TRUE',
+					'done' => 'FALSE'
+				)), $db);
+			}
+
 			self::updateVkPostInformation($db, $event_id, $data);
 
 			App::saveImage($data['image_horizontal'],
 				self::IMAGES_PATH . self::IMG_SIZE_TYPE_LARGE . '/' . $img_horizontal_filename,
 				50000);
 
-//            App::saveImage($data['image_vertical'],
-//                self::IMAGES_PATH . self::IMG_SIZE_TYPE_LARGE . '/' . $img_vertical_filename,
-//                14000);
 
 			$db->commit();
 
@@ -1214,7 +1251,7 @@ class Event extends AbstractEntity
 				);
 				if ($result_data[self::TICKETS_FIELD_NAME] instanceof Ticket) {
 					$result_data[self::TICKETS_FIELD_NAME] = $result_data[self::TICKETS_FIELD_NAME]->getParams($user, $ticket_fields)->getData();
-				}else{
+				} else {
 					$result_data[self::TICKETS_FIELD_NAME] = $result_data[self::TICKETS_FIELD_NAME]->getData();
 				}
 			} else {
@@ -1273,6 +1310,11 @@ class Event extends AbstractEntity
 
 		try {
 			$this->db->beginTransaction();
+
+			$tariff_info = Tariff::getForOrganization($this->db, App::getCurrentUser(), array('organization' => $organization),
+				Fields::parseFields('event_publications,available_event_publications,available_additional_notifications')
+			)->getData();
+
 
 			$q_upd_event = App::queryFactory()->newUpdate();
 
@@ -1361,6 +1403,23 @@ class Event extends AbstractEntity
 
 			$this->db->commit();
 
+
+			if ($tariff_info['available_additional_notifications'] > 0 &&
+				$data['additional_notification_time'] instanceof DateTime) {
+				if ($this->disableNotificationByType(self::getNotificationTypeId(
+					Notification::NOTIFICATION_TYPE_ADDITIONAL_FOR_ORGANIZATION, $this->db
+				))){
+					self::saveNotifications(array(array(
+						'event_id' => $this->id,
+						'notification_type_id' => self::getNotificationTypeId(Notification::NOTIFICATION_TYPE_ADDITIONAL_FOR_ORGANIZATION, $db),
+						'notification_time' => $data['additional_notification_time']->format('Y-m-d H:i:s'),
+						'status' => 'TRUE',
+						'done' => 'FALSE'
+					)), $db);
+				}
+			}
+
+
 			@file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/events/' . $this->getId());
 		} catch (Exception $e) {
 			$this->db->rollback();
@@ -1368,6 +1427,24 @@ class Event extends AbstractEntity
 		}
 
 		return new Result(true, 'Событие успешно сохранено!', array('event_id' => $this->getId()));
+	}
+
+
+	private function disableNotificationByType($notification_type_id){
+		$q_upd = App::queryFactory();
+		$q_upd->newUpdate()
+			->table('events_notifications')
+			->cols(array(
+				'status' => 'false'
+			))
+			->where('event_id = ?', $this->id)
+			->where('status IS FALSE')
+			->where('done IS FALSE')
+			->where('notification_type_id = ?', $notification_type_id);
+
+		$res = $this->db->prepareExecute($q_upd, 'CANT_UPDATE_ADDITIONAL_NOTIFICATION');
+		return $res->rowCount() == 1;
+
 	}
 
 	public function addNotification(UserInterface $user, array $notification)
@@ -1554,6 +1631,7 @@ class Event extends AbstractEntity
 
 		if ($result->getStatus()) {
 			$user->addFavoriteEvent($this);
+			$this->addNotification($user, array('notification_type' => 'notification-before-day'));
 		}
 
 		return new Result(true, '', array(

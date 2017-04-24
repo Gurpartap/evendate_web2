@@ -4,6 +4,7 @@
 require_once $BACKEND_FULL_PATH . '/bin/Class.AbstractEntity.php';
 require_once $BACKEND_FULL_PATH . '/organizations/Class.CitiesCollection.php';
 require_once $BACKEND_FULL_PATH . '/organizations/Class.CountriesCollection.php';
+require_once $BACKEND_FULL_PATH . '/payments/Class.Tariff.php';
 
 class Organization extends AbstractEntity
 {
@@ -20,6 +21,7 @@ class Organization extends AbstractEntity
 	const PRIVILEGES_FIELD_NAME = 'privileges';
 	const CITY_FIELD_NAME = 'city';
 	const COUNTRY_FIELD_NAME = 'country';
+	const TARIFF_FIELD_NAME = 'tariff';
 
 	const IMAGES_PATH = 'organizations_images/';
 	const IMAGE_SIZE_LARGE = '/large/';
@@ -58,6 +60,7 @@ class Organization extends AbstractEntity
 	protected $created_at;
 	protected $subscribed_count;
 	protected $is_subscribed;
+	protected $city_id;
 
 
 	protected $db;
@@ -87,6 +90,7 @@ class Organization extends AbstractEntity
 		'background_small_img_url',
 		'facebook_url',
 		'vk_url',
+		'city_id',
 		'is_private',
 		'brand_color',
 		'country_id',
@@ -251,6 +255,16 @@ class Organization extends AbstractEntity
 	/**
 	 * @return mixed
 	 */
+	public function getCityId()
+	{
+		return $this->city_id;
+	}
+
+
+
+	/**
+	 * @return mixed
+	 */
 	public function getName()
 	{
 		return $this->name;
@@ -335,6 +349,8 @@ class Organization extends AbstractEntity
 	{
 		return $this->img_medium_url;
 	}
+
+
 
 	/**
 	 * @return mixed
@@ -440,6 +456,16 @@ class Organization extends AbstractEntity
 					'length' => $country_fields['length'] ?? App::DEFAULT_LENGTH,
 					'offset' => $country_fields['offset'] ?? App::DEFAULT_OFFSET
 				)
+			)->getData();
+		}
+
+		$tariff_fields = $fields[Organization::TARIFF_FIELD_NAME] ?? null;
+		if (is_array($tariff_fields)) {
+			$result_data[Organization::TARIFF_FIELD_NAME] = Tariff::getForOrganization(
+				App::DB(),
+				$user,
+				array('organization' => $this),
+				Fields::parseFields($tariff_fields['fields'] ?? '')
 			)->getData();
 		}
 

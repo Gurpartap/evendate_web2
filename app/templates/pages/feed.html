@@ -1,6 +1,8 @@
 <script type="javascript/template" id="tmpl-feed-event">
 	<div class="page feed_event FeedEvent">
-		<a href="/event/{id}" class="feed_event_img_side link Link" style="background-image: url('{image_horizontal_url}')"></a>
+		<a href="/event/{id}" class="feed_event_img_side img_holder link Link">
+			<img src="{image_horizontal_url}?width={cover_width}" width="{cover_width}">
+		</a>
 		<aside class="feed_event_info_side AddAvatarWrapper">
 			<header class="feed_event_header">
 				{organization_avatar_block}
