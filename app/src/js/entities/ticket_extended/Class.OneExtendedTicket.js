@@ -1,5 +1,5 @@
 /**
- * @requires Class.OneTicket.js
+ * @requires ../ticket/Class.OneTicket.js
  */
 /**
  * @class OneExtendedTicket

@@ -129,7 +129,7 @@ EventsCollection = extending(EntitiesCollection, (function() {
 		}
 		return this.constructor[method_name](ajax_data, function(data) {
 			self.setData(data);
-			if (success && typeof success == 'function') {
+			if (success && typeof success === 'function') {
 				success.call(self, self.last_pushed);
 			}
 		});
@@ -150,7 +150,7 @@ EventsCollection = extending(EntitiesCollection, (function() {
 			};
 		return this.constructor.fetchEvents(ajax_data, function(data) {
 			self.setData(data);
-			if (success && typeof success == 'function') {
+			if (success && typeof success === 'function') {
 				success.call(self, self.last_pushed);
 			}
 		});
@@ -169,9 +169,9 @@ EventsCollection = extending(EntitiesCollection, (function() {
 				offset: this.length,
 				length: length
 			});
-		return EventsCollection.fetchOrganizationsEvents(organization_id, ajax_data, function(data) {
+		return this.constructor.fetchOrganizationsEvents(organization_id, ajax_data, function(data) {
 			self.setData(data);
-			if (success && typeof success == 'function') {
+			if (success && typeof success === 'function') {
 				success.call(self, self.last_pushed);
 			}
 		});
@@ -193,7 +193,7 @@ EventsCollection = extending(EntitiesCollection, (function() {
 			};
 		return this.constructor.fetchOrganizationsEvents(organization_id, ajax_data, function(data) {
 			self.setData(data);
-			if (success && typeof success == 'function') {
+			if (success && typeof success === 'function') {
 				success.call(self, self.last_pushed);
 			}
 		});
