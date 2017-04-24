@@ -17,7 +17,7 @@ require_once "{$BACKEND_FULL_PATH}/users/Class.NotAuthorizedUser.php";
 require_once "{$BACKEND_FULL_PATH}/users/Class.User.php";
 
 if (App::$ENV == 'prod' || App::$ENV == 'test') {
-	$DEBUG_MODE = false;
+	$DEBUG_MODE = isset( $_GET['debug'] ) ? $_GET['debug'] : false;
 } else {
 	$DEBUG_MODE = true;
 	ini_set("display_errors", 1);
