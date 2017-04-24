@@ -7,6 +7,9 @@ class Tariff extends AbstractEntity
 	const FREE_ID = 1;
 	const EVENT_PUBLICATIONS_FIELD_NAME = 'event_publications';
 
+	const FULL_PRICE = 800;
+	const FULL_ID = 2;
+
 	protected static $DEFAULT_COLS = array(
 		'tariff_id',
 		'name'

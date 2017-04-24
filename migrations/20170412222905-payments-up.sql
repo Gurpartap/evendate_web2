@@ -185,7 +185,7 @@ CREATE OR REPLACE VIEW view_organizations_tariffs AS
               FROM tariffs
               WHERE is_default_for_city = TRUE
                     AND
-                    organizations.city_id = available_in_city))
+                    organizations.city_id = available_in_city), 1)
       AS tariff_id,
     COALESCE(view_payments.payment_id,
              NULL)                                                                               AS payment_id,
@@ -234,7 +234,7 @@ CREATE OR REPLACE VIEW view_organizations_tariffs AS
                                  FROM tariffs
                                  WHERE is_default_for_city = TRUE
                                        AND
-                                       organizations.city_id = available_in_city)) = default_tariff.id;
+                                       organizations.city_id = available_in_city), 1) = default_tariff.id;
 
 
 INSERT INTO notification_types (id, type, timediff, text)
