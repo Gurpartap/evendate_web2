@@ -20,7 +20,7 @@ class Payment
 			->cols(array(
 				'organization_id' => $organization->getId(),
 				'user_id' => $user->getId(),
-				'sum' => 800 //TODO: Getting this var from db
+				'sum' => Tariff::FULL_PRICE //TODO: Getting this var from db
 			))->returning(array('uuid'));
 		$uuid = $db->prepareExecute($q_ins, 'CANT_CREATE_PAYMENT')->fetchColumn(0);
 		return new Result(true, '', array('uuid' => $uuid, 'sum' => Tariff::FULL_PRICE));
