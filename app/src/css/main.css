@@ -406,11 +406,14 @@ fieldset {
 	margin: 0;
 	border: 0;
 }
-
+.-status_disabled.-status_disabled,
 fieldset:disabled {
 	opacity: .4;
 	pointer-events: none;
 }
+.-status_disabled .-status_disabled,
+fieldset:disabled .-status_disabled,
+.-status_disabled fieldset:disabled,
 fieldset:disabled fieldset:disabled {opacity: 1}
 
 fieldset:disabled input,
@@ -1727,7 +1730,16 @@ a.button:hover {text-decoration: none}
 /* /Tabs */
 /* Loader */
 
-.loader_block {}
+
+.loader_dot,
+.loader:only-child,
+.loader_block.-loader_overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
 
 .loader,
 .loader_block {
@@ -1736,24 +1748,13 @@ a.button:hover {text-decoration: none}
 	margin: auto;
 }
 
+.loader_dot,
 .loader:only-child {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
 	width: 50px;
 	height: 50px;
 }
 
 .loader_dot {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	width: 50px;
-	height: 50px;
 	margin: auto;
 	border-radius: 50%;
 	background-color: #f82969;
@@ -2946,7 +2947,7 @@ body.-open_modal > .modal_wrapper {
 	transition: opacity .2s ease, visibility .2s ease;
 }
 
-.-fadeable:not(.-faded) {
+.-fadeable {
 	opacity: 1;
 	visibility: visible;
 }

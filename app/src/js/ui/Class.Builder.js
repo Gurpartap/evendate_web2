@@ -306,6 +306,18 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @param {jQuery} [$wrapper]
+	 * @param {string} [direction]
+	 * @return {jQuery}
+	 */
+	Builder.prototype.overlayLoader = function buildLoaderBlock($wrapper, direction) {
+		return tmpl('loader-block', {
+			classes: '-loader_overlay',
+			loader: tmpl('loader')
+		}, $wrapper, direction);
+	};
+	/**
+	 *
 	 * @param {Object<OneUser.ACCOUNTS, string>} [accounts_links]
 	 * @returns {jQuery}
 	 */
