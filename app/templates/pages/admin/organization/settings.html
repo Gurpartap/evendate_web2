@@ -91,29 +91,35 @@
 			<h3>Сменить тариф</h3>
 			<div class="org_admin_settings_tariff">
 				<div class="org_admin_settings_tariff_head">
-					<span class="org_admin_settings_tariff_title -text_color_accent">Базовый</span>
-					<span class="org_admin_settings_tariff_price -text_color_accent">0 руб./мес.</span>
+					<span class="org_admin_settings_tariff_title">Базовый</span>
+					<span class="org_admin_settings_tariff_price">0 руб./мес.</span>
 				</div>
 				<p class="-text_color_marginal"></p>
 			</div>
-
-			<form class="org_admin_settings_tariff" action="https://money.yandex.ru/eshop.xml" method="post" target="_blank">
-				<input name="shopId" value="132896" type="hidden">
-				<input name="scid" value="97111" type="hidden">
-				<input name="customerNumber" value="{customer_id}" type="hidden">
-				<input name="cps_phone" value="{cps_phone}" type="hidden">
-				<input name="cps_email" value="{cps_email}" type="hidden">
-				<input name="sum" value="1" type="hidden">
+			<div class="org_admin_settings_tariff">
 				<div class="org_admin_settings_tariff_head">
-					<span class="org_admin_settings_tariff_title">Полный</span>
-					<span class="org_admin_settings_tariff_price">1400 руб./мес.</span>
+					<span class="org_admin_settings_tariff_title -text_color_accent">Полный</span>
+					<span class="org_admin_settings_tariff_price -text_color_accent">800 руб./мес.</span>
 					<div class="org_admin_settings_tariff_button">
-						<button type="submit" class="button -color_accent {tariff_button_classes}">Подключить</button>
-						{tariff_rest_time}
+						{tariff_button}
 					</div>
 				</div>
-				<p class="-text_color_marginal"></p>
-			</form>
+				<p class="-text_color_marginal -align_right">{tariff_service_info}</p>
+			</div>
 		</fieldset>
 	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-admin-organization-payment-form">
+	<form id="org_admin_settings_tariff_{payment_uuid}" class="-hidden" action="https://money.yandex.ru/eshop.xml" method="post">
+		<input name="shopId" value="132896" type="hidden">
+		<input name="scid" value="97111" type="hidden">
+		<input name="customerNumber" value="{customer_id}" type="hidden">
+		<input name="cps_email" value="{cps_email}" type="hidden">
+		<input name="shopFailURL" value="{callback_url}" type="hidden">
+		<input name="shopSuccessURL" value="{callback_url}" type="hidden">
+		<input name="shopDefaultUrl" value="{callback_url}" type="hidden">
+		<input name="evendate_payment_id" value="{payment_uuid}" type="hidden">
+		<input name="sum" value="{sum}" type="hidden">
+	</form>
 </script>
