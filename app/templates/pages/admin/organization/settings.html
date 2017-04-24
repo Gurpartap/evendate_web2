@@ -87,7 +87,7 @@
 			</table>
 		</fieldset>
 
-		<fieldset class="org_admin_settings_wrapper" disabled title="Эта функция временно недоступна">
+		<fieldset class="org_admin_settings_wrapper">
 			<h3>Сменить тариф</h3>
 			<div class="org_admin_settings_tariff">
 				<div class="org_admin_settings_tariff_head">
@@ -97,17 +97,23 @@
 				<p class="-text_color_marginal"></p>
 			</div>
 
-			<div class="org_admin_settings_tariff">
+			<form class="org_admin_settings_tariff" action="https://money.yandex.ru/eshop.xml" method="post" target="_blank">
+				<input name="shopId" value="132896" type="hidden">
+				<input name="scid" value="97111" type="hidden">
+				<input name="customerNumber" value="{customer_id}" type="hidden">
+				<input name="cps_phone" value="{cps_phone}" type="hidden">
+				<input name="cps_email" value="{cps_email}" type="hidden">
+				<input name="sum" value="1" type="hidden">
 				<div class="org_admin_settings_tariff_head">
 					<span class="org_admin_settings_tariff_title">Полный</span>
 					<span class="org_admin_settings_tariff_price">1400 руб./мес.</span>
 					<div class="org_admin_settings_tariff_button">
-						<a href="{traiff_url}" class="button -color_accent {tariff_button_classes}">Подключить</a>
+						<button type="submit" class="button -color_accent {tariff_button_classes}">Подключить</button>
 						{tariff_rest_time}
 					</div>
 				</div>
 				<p class="-text_color_marginal"></p>
-			</div>
+			</form>
 		</fieldset>
 	</div>
 </script>

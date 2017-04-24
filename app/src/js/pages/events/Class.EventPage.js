@@ -199,6 +199,7 @@ EventPage = extending(Page, (function() {
 	
 	EventPage.prototype.render = function() {
 		var PAGE = this,
+			cover_width = 630,
 			this_event = PAGE.event,
 			avatars_collection_classes = [
 				__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
@@ -228,7 +229,7 @@ EventPage = extending(Page, (function() {
 			$event_additional_fields = $(),
 			$event_additional_information = $(),
 			organization = new OneOrganization(this_event.organization_id);
-		
+
 		organization.setData({
 			short_name: this_event.organization_short_name,
 			img_url: this_event.organization_logo_small_url
@@ -238,7 +239,7 @@ EventPage = extending(Page, (function() {
 		if (this_event.is_favorite) {
 			avatars_collection_classes.push(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
 		}
-		
+
 		if (this_event.registration_locally || this_event.ticketing_locally) {
 			$action_buttons = $action_buttons.add(new AddToFavoriteButton(this_event.id, {
 				is_add_avatar: true,
@@ -339,6 +340,7 @@ EventPage = extending(Page, (function() {
 		}
 		
 		PAGE.$wrapper.html(tmpl('event-page', $.extend({}, this_event, {
+			cover_width: cover_width,
 			action_buttons: $action_buttons,
 			avatars_collection: __APP.BUILD.avatarCollection(this_event.favored, 6, {
 				dataset: {

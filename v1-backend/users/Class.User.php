@@ -291,6 +291,7 @@ class User extends AbstractUser
 			->getParams($this, $fields)
 			->getData();
 
+		$data['email'] = $this->email;
 		$data['is_editor'] = $this->isEditor();
 
 		return new Result(true, '', array($data));

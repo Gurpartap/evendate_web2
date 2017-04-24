@@ -135,15 +135,18 @@ if (checkRedirect()) {
 				}
 			});
 			
-			user_jqhxr = __APP.USER.fetchUser(new Fields('accounts', 'accounts_links', {
-				friends: {
-					fields: ['is_friend'],
-					length: 4
-				},
-				subscriptions: {
-					fields: ['img_small_url', 'subscribed_count', 'new_events_count', 'actual_events_count']
-				}
-			}));
+			user_jqhxr = __APP.USER.fetchUser(new Fields(
+				'email',
+				'accounts',
+				'accounts_links', {
+					friends: {
+						fields: ['is_friend'],
+						length: 4
+					},
+					subscriptions: {
+						fields: ['img_small_url', 'subscribed_count', 'new_events_count', 'actual_events_count']
+					}
+				}));
 			auth_urls_jqxhr = __APP.SERVER.getData('/auth.php', {
 				action: 'get_urls',
 				mobile: isNotDesktop()

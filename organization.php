@@ -29,7 +29,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <!--Google Fonts-->
-  <link href='http://fonts.googleapis.com/css?family=Roboto:400,100,300,500,700' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,100,300,500,700' rel='stylesheet' type='text/css'>
   <!--Bootstrap 3.3.2-->
   <link href="./landing/css/bootstrap.min.css" rel="stylesheet" media="screen">
   <!--Icon Fonts-->

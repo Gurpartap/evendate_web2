@@ -2,6 +2,7 @@
  * @requires Class.OneUser.js
  */
 /**
+ * @singleton
  * @class CurrentUser
  * @extends OneUser
  */
@@ -32,17 +33,49 @@ CurrentUser = extending(OneUser, (function() {
 	}()));
 	/**
 	 *
-	 * @constructs - Implements singleton
-	 * @augments OneUser
+	 * @constructor
+	 * @constructs CurrentUser
+	 *
+	 * @property {(number|string)} id
+	 * @property {string} ?first_name
+	 * @property {string} ?last_name
+	 * @property {string} ?middle_name
+	 * @property {string} ?full_name
+	 * @property {OneUser.GENDER} ?gender
+	 * @property {string} ?avatar_url
+	 * @property {string} ?blurred_image_url
+	 * @property {string} ?link
+	 * @property {string} ?type
+	 * @property {string} ?role
+	 * @property {string} ?email
+	 * @property {boolean} ?is_friend
+	 * @property {boolean} ?is_editor
+	 *
+	 * @property {Array<OneUser.ACCOUNTS>} accounts
+	 * @property {Object<OneUser.ACCOUNTS, string>} accounts_links
+	 * @property {string} ?vk_uid
+	 * @property {string} ?google_uid
+	 * @property {string} ?facebook_uid
+	 *
+	 * @property {OrganizationsCollection} subscriptions
+	 * @property {FavoredEventsCollection} favored
+	 * @property {UsersActivitiesCollection} actions
+	 *
+	 * @property {OneCity} selected_city
+	 * @property {UsersCollection} friends
+	 * @property {FriendsActivitiesCollection} friends_activities
 	 */
 	function CurrentUser() {
 		if (typeof CurrentUser.instance === 'object') {
 			return CurrentUser.instance;
 		}
 		OneUser.call(this, 'me');
+		
+		this.email = null;
 		this.selected_city = new OneCity();
 		this.friends = new UsersCollection();
 		this.friends_activities = new FriendsActivitiesCollection();
+		
 		CurrentUser.instance = this;
 	}
 	/**

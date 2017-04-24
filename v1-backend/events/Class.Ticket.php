@@ -67,7 +67,6 @@ class Ticket extends AbstractEntity
 
 	}
 
-
 	private static function compareTicketWithType($type, $ticket_data)
 	{
 		$now = (new DateTime())->format('U');
@@ -171,7 +170,6 @@ class Ticket extends AbstractEntity
 			}
 		}
 	}
-
 
 	public function getParams(AbstractUser $user = null, array $fields = null): Result
 	{
