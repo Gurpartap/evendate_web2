@@ -40,9 +40,10 @@ TicketsModal = extending(AbstractModal, (function() {
 			var data = self.tickets[i].order.payed_at || self.tickets[i].created_at;
 			
 			props.cover_width = 450;
-			props.card_classes.push('-ticket_extended');
+			props.card_classes.push('-ticket_extended', __C.CLASSES.FLOATING_MATERIAL);
 			
 			return $.extend(props, {
+				cover_height: 253,
 				number_formatted: formatTicketNumber(self.tickets[i].number),
 				payed_at_formatted: (self.tickets[i].order.payed_at ? 'Куплен ' : 'Приобретен ') + moment.unix(data).format(__LOCALES.ru_RU.DATE.DATE_TIME_FORMAT),
 				price_formatted: +self.tickets[i].price ? formatCurrency(self.tickets[i].price, ' ', '.', '', 'руб.') : 'Бесплатно'
@@ -51,7 +52,7 @@ TicketsModal = extending(AbstractModal, (function() {
 		
 		this.__render({
 			width: this.width,
-			content_classes: [__C.CLASSES.FLOATING_MATERIAL, __C.CLASSES.MODAL_STATES.NO_PADDING]
+			content_classes: [__C.CLASSES.MODAL_STATES.NO_PADDING]
 		});
 		
 		return this;

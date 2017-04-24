@@ -9,11 +9,11 @@
 OneEvent = extending(OneEntity, (function() {
 	/**
 	 *
-	 * @constructor
-	 * @constructs OneEvent
 	 * @param {(string|number)} [event_id=0]
 	 * @param {boolean} [is_loading_continuous]
 	 *
+	 * @constructor
+	 * @constructs OneEvent
 	 *
 	 * @property {number} id
 	 * @property {?string} title
@@ -177,7 +177,7 @@ OneEvent = extending(OneEntity, (function() {
 	/**
 	 *
 	 * @param {(string|number)} event_id
-	 * @param {(string|Array)} [fields]
+	 * @param {(Fields|string|Array)} [fields]
 	 * @param {AJAXCallback} [success]
 	 * @returns {jqPromise}
 	 */

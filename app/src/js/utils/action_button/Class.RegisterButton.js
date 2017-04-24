@@ -48,6 +48,8 @@ RegisterButton = extending(ActionButton, (function() {
 	
 	RegisterButton.prototype.onClick = function() {
 		var self = this,
+			tickets_fields = ['created_at', 'number', 'ticket_type', 'order'],
+			events_fields = ['dates', 'is_same_time', 'image_horizontal_medium_url', 'location'],
 			ticket,
 			promise;
 		
@@ -86,19 +88,19 @@ RegisterButton = extending(ActionButton, (function() {
 				this.modal.show();
 			} else {
 				if (this.event.tickets.length) {
-					ticket = OneExtendedTicket.extractTicketFromEvent(this.event);
-					promise = ticket.fetchTicket(new Fields('created_at', 'number', 'ticket_type', 'order', {
+					ticket = new EventsExtendedTicketsCollection(this.event.id);
+					promise = ticket.fetchTickets(new Fields(tickets_fields, {
 						event: {
-							fields: new Fields('dates', 'is_same_time', 'image_horizontal_medium_url', 'location')
+							fields: new Fields(events_fields)
 						}
 					}));
 				} else {
-					promise = this.event.fetchEvent(new Fields('dates', 'is_same_time', 'image_horizontal_medium_url', 'location', {
+					promise = this.event.fetchEvent(new Fields(events_fields, {
 						tickets: {
-							fields: new Fields('created_at', 'number', 'ticket_type', 'order')
+							fields: new Fields(tickets_fields)
 						}
 					})).done(function() {
-						return ticket = OneExtendedTicket.extractTicketFromEvent(self.event);
+						return ticket = ExtendedTicketsCollection.extractTicketsFromEvent(self.event);
 					});
 				}
 				

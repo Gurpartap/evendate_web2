@@ -21,10 +21,7 @@ MyTicketsPage = extending(Page, (function() {
 		this.disable_uploads = false;
 		this.block_scroll = false;
 		
-		this.fetch_tickets_fields = new Fields('created_at', 'number', 'ticket_type', {
-			order: {
-				fields: new Fields('created_at')
-			},
+		this.fetch_tickets_fields = new Fields('created_at', 'number', 'ticket_type', 'order', {
 			event: {
 				fields: new Fields('dates', 'is_same_time', 'image_horizontal_medium_url', 'location')
 			}
@@ -42,8 +39,6 @@ MyTicketsPage = extending(Page, (function() {
 		
 		$(window).on('scroll.uploadTickets', function() {
 			if (isScrollRemain(200)) {
-				
-				
 				var $loader;
 				
 				if(!self.disable_uploads && !self.block_scroll){
@@ -59,9 +54,7 @@ MyTicketsPage = extending(Page, (function() {
 						}
 						$loader.remove();
 					});
-					
 				}
-				
 			}
 		});
 	};

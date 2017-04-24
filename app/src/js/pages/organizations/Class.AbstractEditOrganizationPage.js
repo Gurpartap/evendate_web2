@@ -53,20 +53,22 @@ AbstractEditOrganizationPage = extending(Page, (function() {
 		function initCities(selected_id) {
 			var $select = PAGE.$wrapper.find('#add_organization_city');
 			
-			$select
-				.append(tmpl('option', PAGE.cities.map(function(city) {
-					return {
-						val: city.id,
-						display_name: city.local_name
-					};
-				})))
-				.select2({
-					containerCssClass: 'form_select2',
-					dropdownCssClass: 'form_select2_drop'
-				});
-			if (selected_id) {
-				$select.select2('val', selected_id);
-			}
+			PAGE.cities.fetchCities(null, 0, 'local_name', function() {
+				$select
+					.append(tmpl('option', PAGE.cities.map(function(city) {
+						return {
+							val: city.id,
+							display_name: city.local_name
+						};
+					})))
+					.select2({
+						containerCssClass: 'form_select2',
+						dropdownCssClass: 'form_select2_drop'
+					});
+				if (selected_id) {
+					$select.select2('val', selected_id);
+				}
+			});
 		}
 		
 		function initOrganizationTypes(selected_id) {
@@ -95,7 +97,8 @@ AbstractEditOrganizationPage = extending(Page, (function() {
 				org_model = new OrganizationModel(),
 				form_data = $form.serializeForm(),
 				valid_form = formValidation($form, !!(form_data.organization_id)),
-				method_name = PAGE.organization.id ? 'updateOrganization' : 'createOrganization';
+				method_name = PAGE.organization.id ? 'updateOrganization' : 'createOrganization',
+				$loader;
 			
 			function formValidation($form, for_edit) {
 				var is_valid = true,
@@ -143,6 +146,8 @@ AbstractEditOrganizationPage = extending(Page, (function() {
 			}
 			
 			if (valid_form) {
+				PAGE.$wrapper.addClass(__C.CLASSES.STATUS.DISABLED);
+				$loader = __APP.BUILD.overlayLoader(PAGE.$view);
 				org_model.setData(form_data);
 				
 				PAGE.organization[method_name](org_model, function() {
@@ -156,7 +161,9 @@ AbstractEditOrganizationPage = extending(Page, (function() {
 						uuid: PAGE.$wrapper.find('#add_organization_organization_registration_uuid').val()
 					});
 					socket.on('utils.updateImagesDone', function() {
-						window.location.href = '/organization/' + PAGE.organization.id;
+						PAGE.$wrapper.removeClass(__C.CLASSES.STATUS.DISABLED);
+						$loader.remove();
+						__APP.changeState('/organization/' + PAGE.organization.id);
 					});
 					socket.emit('utils.updateImages');
 				});

@@ -25,6 +25,12 @@ UserPage = extending(Page, (function() {
 			fields: new Fields(
 				'image_horizontal_medium_url',
 				'favored',
+				'favored_users_count',
+				'is_favorite',
+				'is_registered',
+				'registration_available',
+				'registration_locally',
+				'ticketing_locally',
 				'dates'
 			),
 			order_by: 'nearest_event_date,-first_event_date',

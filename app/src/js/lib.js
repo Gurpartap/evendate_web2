@@ -981,12 +981,13 @@ jQuery.makeSet = function(array) {
  *
  * @param {string} template_type
  * @param {(object|Array)} [items={}]
- * @param {jQuery} [addTo]
+ * @param {(jQuery|Element)} [addTo]
  * @param {string} [direction="append"]
  * @returns {jQuery}
  */
 function tmpl(template_type, items, addTo, direction) {
 	items = items ? items : {};
+	addTo = addTo instanceof Element ? $(addTo) : addTo;
 	var $tmpl = $('#tmpl-' + template_type),
 		wrapMap = {
 			thead: [ 1, "<table>", "</table>" ],
@@ -1070,10 +1071,10 @@ function tmpl(template_type, items, addTo, direction) {
 	} else {
 		result = replaceTags(html_val, items);
 	}
-	if (addTo == null || addTo == undefined) {
+	if (addTo == null) {
 		return result;
 	}
-	if (direction == 'prepend') {
+	if (direction === 'prepend') {
 		addTo.prepend(result);
 	} else {
 		addTo.append(result);

@@ -401,7 +401,8 @@ AbstractEditEventPage = extending(Page, (function() {
 				form_data = $form.serializeForm(),
 				is_edit = !!(PAGE.event.id),
 				send_data,
-				is_form_valid;
+				is_form_valid,
+				$loader = $();
 			
 			is_form_valid = (function validation($form, Calendar) {
 				var is_valid = true,
@@ -474,11 +475,14 @@ AbstractEditEventPage = extending(Page, (function() {
 			})($form, MainCalendar);
 			
 			function afterSubmit() {
+				PAGE.$wrapper.removeClass(__C.CLASSES.STATUS.DISABLED);
+				$loader.remove();
 				__APP.changeState('/event/' + PAGE.event.id);
 			}
 			
 			function onError(e) {
-				PAGE.$wrapper.removeClass('-faded');
+				PAGE.$wrapper.removeClass(__C.CLASSES.STATUS.DISABLED);
+				$loader.remove();
 				console.error(e);
 				console.log({
 					MainCalendar: MainCalendar,
@@ -488,7 +492,8 @@ AbstractEditEventPage = extending(Page, (function() {
 			}
 			
 			if (is_form_valid) {
-				
+				PAGE.$wrapper.addClass(__C.CLASSES.STATUS.DISABLED);
+				$loader = __APP.BUILD.overlayLoader(PAGE.$view);
 				try {
 					send_data = {
 						event_id: parseInt(form_data.event_id) ? parseInt(form_data.event_id) : null,
@@ -575,8 +580,6 @@ AbstractEditEventPage = extending(Page, (function() {
 					}
 					send_data.dates = send_data.dates.getArrayCopy();
 					
-					PAGE.$wrapper.addClass('-faded');
-					
 					if (is_edit) {
 						PAGE.event.updateEvent(send_data, afterSubmit, onError);
 					} else {
@@ -634,7 +637,6 @@ AbstractEditEventPage = extending(Page, (function() {
 			page_vars.public_at_time_hours = m_public_at.format('HH');
 			page_vars.public_at_time_minutes = m_public_at.format('mm');
 		}
-		console.log(page_vars);
 		
 		PAGE.$wrapper.html(tmpl('edit-event-page', $.extend(page_vars, {
 			date_picker: tmpl('edit-event-datepicker', {
