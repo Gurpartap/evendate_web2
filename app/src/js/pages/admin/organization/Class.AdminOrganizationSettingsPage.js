@@ -26,7 +26,21 @@ AdminOrganizationSettingsPage = extending(AdminOrganizationPage, (function() {
 			'email',
 			'privileges',
 			'staff',
-			'site_url'
+			'site_url', {
+				tariff: {
+					fields: new Fields(
+						'till',
+						'available_additional_notifications',
+						'available_event_publications',
+						'available_tickets_selling',
+						'available_telegram_bots',
+						'available_slack_bots',
+						'available_auditory_analytics',
+						'available_in_city',
+						'price'
+					)
+				}
+			}
 		);
 	}
 	/**
