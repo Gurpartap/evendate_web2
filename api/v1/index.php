@@ -165,6 +165,10 @@ try {
 	$_result->setNude(App::$RESPONSE_NUDE);
 
 
+	if(App::$RESPONSE_NUDE){
+		$__request['response'] = $_result->__toString();
+	}
+
 	$q_ins_log = App::queryFactory()->newInsert();
 	$q_ins_log
 		->into('log_requests')

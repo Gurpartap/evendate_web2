@@ -55,6 +55,8 @@ class App
 	const DEFAULT_OFFSET = 0;
 	const DEFAULT_NODE_LOCATION = 'http://localhost:8000';
 
+	const DB_DATETIME_FORMAT = 'Y-m-d H:i:s';
+
 	/*
 	 * init config options for deploy and visioning
 	 * */

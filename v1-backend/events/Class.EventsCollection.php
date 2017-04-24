@@ -229,6 +229,7 @@ class EventsCollection extends AbstractCollection
 						$operand = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'IN' : 'NOT IN';
 						$q_get_events->where('id ' . $operand . ' (SELECT event_id FROM view_tickets WHERE user_id = :user_id AND is_active = TRUE)');
 						$statement_array[':user_id'] = $user->getId();
+						$getting_personal_events = true;
 					}
 					break;
 				}
@@ -450,7 +451,14 @@ class EventsCollection extends AbstractCollection
 					$q_get_events->where('id NOT IN (SELECT
 						hidden_events.event_id
 						FROM hidden_events
-						WHERE hidden_events.user_id = :user_id)');
+						WHERE hidden_events.user_id = :user_id
+						AND hidden_events.status = TRUE)');
+
+					$q_get_events->where('id NOT IN (SELECT
+						favorite_events.event_id
+						FROM favorite_events
+						WHERE favorite_events.user_id = :user_id
+						AND favorite_events.status = TRUE)');
 
 					$q_get_events->where('organization_is_private = false');
 
@@ -458,7 +466,7 @@ class EventsCollection extends AbstractCollection
 
 
 					$q_get_subscriptions_count = App::queryFactory()->newSelect();
-						$q_get_subscriptions_count
+					$q_get_subscriptions_count
 						->from('subscriptions')
 						->cols(array('COUNT(id) AS subs_count'))
 						->where('user_id = ?', $user->getId())
@@ -466,8 +474,8 @@ class EventsCollection extends AbstractCollection
 
 					$subs_count = $db->prepareExecute($q_get_subscriptions_count, 'CANT_COUNT_SUBSCRIPTIONS')->fetchColumn(0);
 
-					if ($subs_count > 0){
-						$q_get_events->where('(city_id IN (SELECT
+					if ($subs_count > 0) {
+						$q_get_events->where('(city_id IN (SELECT DISTINCT
 						organizations.city_id
 						FROM subscriptions
 						INNER JOIN organizations ON subscriptions.organization_id = organizations.id
@@ -481,11 +489,14 @@ class EventsCollection extends AbstractCollection
 				case 'can_edit': {
 					$val = filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
 					$operand = $val ? 'IN' : ' NOT IN ';
-					$q_get_events->where('organization_id ' . $operand .' (SELECT organization_id 
+					$q_get_events->where('organization_id ' . $operand . ' (SELECT organization_id 
 							FROM users_organizations 
 							WHERE status = TRUE
 							AND users_organizations.user_id = :user_id)');
 					$statement_array[':user_id'] = $user->getId();
+					if ($val) {
+						$getting_personal_events = true;
+					}
 					break;
 				}
 			}
@@ -508,8 +519,7 @@ class EventsCollection extends AbstractCollection
 			$canceled_condition ? $q_get_events->where($canceled_condition) : false;
 		}
 		if (!isset($getting_personal_events) || $getting_personal_events == false) {
-			$q_get_events
-				->where('organization_is_private = false');
+			$q_get_events->where('organization_is_private = false');
 		}
 
 

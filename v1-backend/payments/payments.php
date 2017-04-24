@@ -1,7 +1,6 @@
 <?php
 
 require_once $BACKEND_FULL_PATH . '/payments/Class.Payment.php';
-require_once $BACKEND_FULL_PATH . '/tags/Class.Tag.php';
 
 $__modules['payments'] = array(
 //	'GET' => array(),
@@ -26,8 +25,14 @@ $__modules['payments'] = array(
 			return $result;
 		},
 		// is using by yandex.kassa
-		'aviso' => function(){
-
+		'aviso' => function() use ($__db, $__request){
+			$result = new Result(true, '', array(), 0, 'xml');
+			$data = Payment::avisoPayment($__request, $__db);
+			$result->setNudeData($data);
+			App::$RESPONSE_FORMAT = 'xml';
+			App::$RESPONSE_NUDE = true;
+			@file_get_contents(App::DEFAULT_NODE_LOCATION . '/log?data=' . $data);
+			return $result;
 		}
 	),
 	'PUT' => array()
