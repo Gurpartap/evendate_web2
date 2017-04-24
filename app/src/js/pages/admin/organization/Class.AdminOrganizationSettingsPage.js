@@ -139,7 +139,7 @@ AdminOrganizationSettingsPage = extending(AdminOrganizationPage, (function() {
 				title: 'Оплатить',
 				classes: [__C.CLASSES.COLORS.ACCENT, __C.CLASSES.HOOKS.RIPPLE, 'ActivatePayment']
 			}),
-			tariff_service_info: self.organization.tariff.is_full ? '' : 'Оплачен до ' + moment.unix(self.organization.tariff.till).calendar(null, {
+			tariff_service_info: !self.organization.tariff.is_full ? '' : 'Оплачен до ' + moment.unix(self.organization.tariff.till).calendar(null, {
 				sameDay: '[Сегодня]',
 				nextDay: '[Завтра]',
 				nextWeek: 'D MMMM YYYY',
