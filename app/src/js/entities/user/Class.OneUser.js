@@ -10,6 +10,7 @@ OneUser = extending(OneEntity, (function() {
 	/**
 	 *
 	 * @param {(string|number)} [user_id]
+	 * @constructor
 	 * @constructs OneUser
 	 *
 	 * @property {(number|string)} id

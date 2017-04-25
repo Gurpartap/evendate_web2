@@ -55,6 +55,8 @@ class App
 	const DEFAULT_OFFSET = 0;
 	const DEFAULT_NODE_LOCATION = 'http://localhost:8000';
 
+	const DB_DATETIME_FORMAT = 'Y-m-d H:i:s';
+
 	/*
 	 * init config options for deploy and visioning
 	 * */
@@ -131,15 +133,15 @@ class App
 		self::$QUERY_FACTORY = new QueryFactory('pgsql');
 	}
 
-	static function getCurrentUser() : AbstractUser
+	static function getCurrentUser(): AbstractUser
 	{
 		if (self::$__USER instanceof User)
 			return self::$__USER;
 		$token = isset(self::$__HEADERS['authorization']) ? self::$__HEADERS['authorization'] : null;
 
-		try{
+		try {
 			self::$__USER = new User(self::$__DB, $token);
-		}catch (Exception $e){
+		} catch (Exception $e) {
 			self::$__USER = new NotAuthorizedUser();
 		}
 		return self::$__USER;
@@ -160,7 +162,7 @@ class App
 		}
 	}
 
-	static public function DB() : ExtendedPDO
+	static public function DB(): ExtendedPDO
 	{
 		return self::$__DB;
 	}
@@ -248,5 +250,40 @@ class App
 			self::$__DB->query("SET SESSION TIME ZONE INTERVAL '+08:00' HOUR TO MINUTE;");
 		} else throw new InvalidArgumentException('BAD_TIMEZONE');
 
+	}
+
+	public static function logRequest(ExtendedPDO $__db, array $__request, User $__user = null, $_request_method, $_class_name, $_args, $_method_name,
+																		$__headers, $_http_code, DateTime $request_time, $_db_query, Exception $_exception = null)
+	{
+		$q_ins_log = self::queryFactory()->newInsert();
+		$q_ins_log
+			->into('log_requests')
+			->cols(array(
+				'body' => json_encode($__request ?? array()),
+				'body_json' => json_encode($__request ?? array()),
+				'user_id' => isset($__user) && ($__user instanceof User) ? $__user->getId() : null,
+				'method' => $_request_method ?? '',
+				'class' => $_class_name ?? '',
+				'args' => json_encode($_args ?? array()),
+				'method_name' => $_method_name ?? '',
+				'response_status' => null,
+				'headers' => json_encode($__headers ?? array()),
+				'response_http_status' => $_http_code,
+				'time' => $request_time->format('Y-m-d H:i:s'),
+				'db_query' => json_encode($_db_query ?? NULL),
+				'exception_text' => isset($_exception) ? $_exception->getMessage() : null,
+				'exception_trace' => isset($_exception) ? $_exception->getTraceAsString() : null,
+				'exception_file' => isset($_exception) ? $_exception->getFile() : null,
+				'exception_line' => isset($_exception) ? $_exception->getLine() : null
+			))
+			->returning(array('uuid'));
+		$p_ins_log = $__db->prepareExecute($q_ins_log);
+		$log_res = $p_ins_log->fetch(PDO::FETCH_ASSOC);
+
+		if ($log_res != FALSE) {
+			return $log_res['uuid'];
+		} else {
+			return null;
+		}
 	}
 }

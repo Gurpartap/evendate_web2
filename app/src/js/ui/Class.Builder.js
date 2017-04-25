@@ -332,6 +332,18 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @param {jQuery} [$wrapper]
+	 * @param {string} [direction]
+	 * @return {jQuery}
+	 */
+	Builder.prototype.overlayLoader = function buildLoaderBlock($wrapper, direction) {
+		return tmpl('loader-block', {
+			classes: '-loader_overlay',
+			loader: tmpl('loader')
+		}, $wrapper, direction);
+	};
+	/**
+	 *
 	 * @param {Object<OneUser.ACCOUNTS, string>} [accounts_links]
 	 * @returns {jQuery}
 	 */
@@ -761,7 +773,7 @@ Builder = (function() {
 					}) : '',
 				action_buttons: $action_buttons,
 				date: m_event_date.format(__C.DATE_FORMAT),
-				avatars_collection: self.avatarCollection(event.favored, 4, {
+				avatars_collection: self.avatarCollection(event.favored, 3, {
 					dataset: {
 						modal_type: 'favors',
 						modal_event_id: event.id

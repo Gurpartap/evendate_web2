@@ -25,30 +25,13 @@ MyTicketsCollection = extending(ExtendedTicketsCollection, (function() {
 	 */
 	MyTicketsCollection.fetchTickets = function(ajax_data, success) {
 		ajax_data = ajax_data ? ajax_data : {};
-		var events_ajax_data = {},
-			event_fields;
+		var events_ajax_data = ExtendedTicketsCollection.convertTicketFieldsToEventAjaxData(ajax_data.fields);
 		
-		if (ajax_data.fields) {
-			ajax_data.fields = Fields.parseFields(ajax_data.fields);
-			if (ajax_data.fields.has('event')) {
-				events_ajax_data = ajax_data.fields.pull('event');
-			}
-		}
-		
-		events_ajax_data.length = ajax_data.length;
-		events_ajax_data.offset = ajax_data.offset;
-		ajax_data.length = 0;
-		ajax_data.offset = undefined;
-		event_fields = new Fields({tickets: ajax_data});
-		if (events_ajax_data.fields) {
-			events_ajax_data.fields = Fields.parseFields(events_ajax_data.fields);
-			events_ajax_data.fields.push(event_fields);
-		} else {
-			events_ajax_data.fields = event_fields;
-		}
-		events_ajax_data.registered = true;
-		
-		return __APP.SERVER.getData('/api/v1/events', events_ajax_data, success);
+		return __APP.SERVER.getData('/api/v1/events', $.extend(events_ajax_data, {
+			length: ajax_data.length,
+			offset: ajax_data.offset,
+			registered: true
+		}), success);
 	};
 	/**
 	 *
@@ -68,8 +51,13 @@ MyTicketsCollection = extending(ExtendedTicketsCollection, (function() {
 			length: length || undefined,
 			order_by: order_by || undefined
 		}).then(function(data) {
-			self.setData(OneExtendedTicket.extractTicketFromData(data));
-			if (success && typeof success == 'function') {
+			self.setData(data.map(ExtendedTicketsCollection.extractTicketsFromEvent).reduce(function(collection, current){
+				collection.push.apply(collection, current);
+				
+				return collection;
+			}, []));
+			
+			if (success && typeof success === 'function') {
 				success.call(self, self.last_pushed);
 			}
 			return self.last_pushed;

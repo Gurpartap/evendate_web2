@@ -72,8 +72,8 @@ EventPage = extending(Page, (function() {
 	/**
 	 *
 	 * @param {Array} raw_notifications
-	 * @param {OneEvent.id} event_id
-	 * @param {OneEvent.last_event_date} last_date
+	 * @param {(number|string)} event_id
+	 * @param {timestamp} last_date
 	 * @return {jQuery}
 	 */
 	EventPage.buildNotifications = function(raw_notifications, event_id, last_date) {
@@ -200,6 +200,7 @@ EventPage = extending(Page, (function() {
 	EventPage.prototype.render = function() {
 		var PAGE = this,
 			cover_width = 630,
+			this_event = PAGE.event,
 			avatars_collection_classes = [
 				__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
 				__C.CLASSES.UNIVERSAL_STATES.BORDERED,
@@ -207,44 +208,42 @@ EventPage = extending(Page, (function() {
 				__C.CLASSES.HOOKS.ADD_AVATAR.COLLECTION,
 				__C.CLASSES.HOOKS.CALL_MODAL
 			],
-			$action_buttons = $(),
+			$action_buttons = __APP.BUILD.button({
+				classes: [
+					__C.CLASSES.UNIVERSAL_STATES.EMPTY,
+					__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+					__C.CLASSES.SIZES.LOW,
+					__C.CLASSES.ICON_CLASS,
+					__C.CLASSES.ICONS.BELL_O,
+					__C.CLASSES.COLORS.NEUTRAL,
+					__C.CLASSES.HOOKS.RIPPLE,
+					__C.CLASSES.HOOKS.DROPDOWN_BUTTON
+				],
+				dataset: {
+					dropdown: 'edit_notification',
+					ddWidth: 190,
+					ddPosX: 'self.center',
+					ddPosY: 6
+				}
+			}),
 			$event_additional_fields = $(),
 			$event_additional_information = $(),
-			organization = new OneOrganization(PAGE.event.organization_id);
-		
+			organization = new OneOrganization(this_event.organization_id);
+
 		organization.setData({
-			short_name: PAGE.event.organization_short_name,
-			img_url: PAGE.event.organization_logo_small_url
+			short_name: this_event.organization_short_name,
+			img_url: this_event.organization_logo_small_url
 		});
 		
-		__APP.changeTitle(PAGE.event.title);
-		if (PAGE.event.is_favorite) {
+		__APP.changeTitle(this_event.title);
+		if (this_event.is_favorite) {
 			avatars_collection_classes.push(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
 		}
-		
-		$action_buttons = __APP.BUILD.button({
-			classes: [
-				__C.CLASSES.UNIVERSAL_STATES.EMPTY,
-				__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
-				__C.CLASSES.SIZES.LOW,
-				__C.CLASSES.ICON_CLASS,
-				__C.CLASSES.ICONS.BELL_O,
-				__C.CLASSES.COLORS.NEUTRAL,
-				__C.CLASSES.HOOKS.RIPPLE,
-				__C.CLASSES.HOOKS.DROPDOWN_BUTTON
-			],
-			dataset: {
-				dropdown: 'edit_notification',
-				ddWidth: 190,
-				ddPosX: 'self.center',
-				ddPosY: 6
-			}
-		});
-		
-		if (PAGE.event.registration_locally || PAGE.event.ticketing_locally) {
-			$action_buttons = $action_buttons.add(new AddToFavoriteButton(PAGE.event.id, {
+
+		if (this_event.registration_locally || this_event.ticketing_locally) {
+			$action_buttons = $action_buttons.add(new AddToFavoriteButton(this_event.id, {
 				is_add_avatar: true,
-				is_checked: PAGE.event.is_favorite,
+				is_checked: this_event.is_favorite,
 				classes: [
 					__C.CLASSES.UNIVERSAL_STATES.EMPTY,
 					__C.CLASSES.SIZES.LOW,
@@ -258,10 +257,10 @@ EventPage = extending(Page, (function() {
 				}
 			}));
 			
-			if (PAGE.event.ticketing_locally) {
+			if (this_event.ticketing_locally) {
 				
 			} else {
-				$action_buttons = $action_buttons.add(new RegisterButton(PAGE.event, {
+				$action_buttons = $action_buttons.add(new RegisterButton(this_event, {
 					classes: [
 						'event_main_action_button',
 						__C.CLASSES.SIZES.LOW,
@@ -275,9 +274,9 @@ EventPage = extending(Page, (function() {
 				}));
 			}
 		} else {
-			$action_buttons = $action_buttons.add(new AddToFavoriteButton(PAGE.event.id, {
+			$action_buttons = $action_buttons.add(new AddToFavoriteButton(this_event.id, {
 				is_add_avatar: true,
-				is_checked: PAGE.event.is_favorite,
+				is_checked: this_event.is_favorite,
 				classes: [
 					'event_main_action_button',
 					__C.CLASSES.SIZES.LOW,
@@ -291,62 +290,62 @@ EventPage = extending(Page, (function() {
 			}));
 		}
 		
-		if (PAGE.event.registration_till) {
+		if (this_event.registration_required) {
 			$event_additional_information = $event_additional_information.add(tmpl('event-additional-info', {
 				classes: __C.CLASSES.TEXT_COLORS.ACCENT + ' ' + __C.CLASSES.UNIVERSAL_STATES.TRANSFORM_UPPERCASE,
-				text: 'Регистрация до ' + moment.unix(PAGE.event.registration_till).calendar(null, __LOCALES.ru_RU.DATE.CALENDAR_DATE_TIME)
+				text: (this_event.registration_till ? 'Регистрация до ' + moment.unix(this_event.registration_till).calendar(null, __LOCALES.ru_RU.DATE.CALENDAR_DATE_TIME) : 'Регистрация обязательна')
 			}));
 		}
 		
-		if (!PAGE.event.is_free) {
+		if (!this_event.is_free) {
 			$event_additional_information = $event_additional_information.add(tmpl('event-additional-info', {
 				classes: __C.CLASSES.TEXT_COLORS.ACCENT,
-				text: 'от ' + (PAGE.event.min_price ? formatCurrency(PAGE.event.min_price) : '0') + ' руб.'
+				text: 'от ' + (this_event.min_price ? formatCurrency(this_event.min_price) : '0') + ' руб.'
 			}));
 		}
 		
-		if (PAGE.event.is_online) {
+		if (this_event.is_online) {
 			$event_additional_information = $event_additional_information.add(tmpl('event-additional-info', {
 				classes: __C.CLASSES.TEXT_COLORS.ACCENT,
 				text: 'Online'
 			}));
 		}
 		
-		if (PAGE.event.is_same_time) {
+		if (this_event.is_same_time) {
 			$event_additional_fields = $event_additional_fields.add(tmpl('event-additional-field', {
 				key: 'Время',
-				value: displayTimeRange(PAGE.event.dates[0].start_time, PAGE.event.dates[0].end_time)
+				value: displayTimeRange(this_event.dates[0].start_time, this_event.dates[0].end_time)
 			}));
 		} else {
 			$event_additional_fields = $event_additional_fields.add(tmpl('event-date-time', {
-				date_times: tmpl('event-date-time-row', formatDates(PAGE.event.dates, {
+				date_times: tmpl('event-date-time-row', formatDates(this_event.dates, {
 					date: '{D} {MMMMs}',
 					time: '{T}'
-				}, PAGE.event.is_same_time))
+				}, this_event.is_same_time))
 			}));
 		}
-		if (PAGE.event.location) {
+		if (this_event.location) {
 			$event_additional_fields = $event_additional_fields.add(tmpl('event-additional-field', {
 				key: 'Место',
-				value: PAGE.event.location
+				value: this_event.location
 			}));
 		}
 		$event_additional_fields = $event_additional_fields.add(tmpl('event-additional-field', {
 			key: 'Теги',
-			value: __APP.BUILD.tags(PAGE.event.tags)
+			value: __APP.BUILD.tags(this_event.tags)
 		}));
 		
-		if (PAGE.event.detail_info_url) {
-			$event_additional_fields = $event_additional_fields.add(tmpl('event-detail-link', {detail_info_url: PAGE.event.detail_info_url}));
+		if (this_event.detail_info_url) {
+			$event_additional_fields = $event_additional_fields.add(tmpl('event-detail-link', {detail_info_url: this_event.detail_info_url}));
 		}
 		
-		PAGE.$wrapper.html(tmpl('event-page', $.extend({}, PAGE.event, {
+		PAGE.$wrapper.html(tmpl('event-page', $.extend({}, this_event, {
 			cover_width: cover_width,
 			action_buttons: $action_buttons,
-			avatars_collection: __APP.BUILD.avatarCollection(PAGE.event.favored, 6, {
+			avatars_collection: __APP.BUILD.avatarCollection(this_event.favored, 6, {
 				dataset: {
 					modal_type: 'favors',
-					modal_event_id: PAGE.event.id
+					modal_event_id: this_event.id
 				},
 				classes: avatars_collection_classes,
 				counter_classes: [
@@ -355,26 +354,26 @@ EventPage = extending(Page, (function() {
 					__C.CLASSES.COLORS.MARGINAL,
 					__C.CLASSES.HOOKS.ADD_AVATAR.STATES.CASTABLE
 				]
-			}, PAGE.event.favored_users_count),
-			notifications: EventPage.buildNotifications(PAGE.event.notifications, PAGE.event.id, PAGE.event.last_event_date),
-			event_map: PAGE.event.location ? tmpl('event-map', {location_sanitized: encodeURI(PAGE.event.location)}) : '',
-			event_edit_functions: PAGE.event.can_edit ? tmpl('event-edit-functions', PAGE.event) : '',
+			}, this_event.favored_users_count),
+			notifications: EventPage.buildNotifications(this_event.notifications, this_event.id, this_event.last_event_date),
+			event_map: this_event.location ? tmpl('event-map', {location_sanitized: encodeURI(this_event.location)}) : '',
+			event_edit_functions: this_event.can_edit ? tmpl('event-edit-functions', this_event) : '',
 			event_additional_info: $event_additional_information,
-			canceled: PAGE.event.canceled ? '' : __C.CLASSES.HIDDEN,
+			canceled: this_event.canceled ? '' : __C.CLASSES.HIDDEN,
 			organization_avatar_block: __APP.BUILD.avatarBlocks(organization, {
 				block_classes: [__C.CLASSES.SIZES.SMALL],
 				is_link: true,
 				entity: __C.ENTITIES.ORGANIZATION
 			}),
 			event_additional_fields: $event_additional_fields,
-			cancel_cancellation: PAGE.event.can_edit ? tmpl('button', {
+			cancel_cancellation: this_event.can_edit ? tmpl('button', {
 					classes: __C.CLASSES.COLORS.PRIMARY + ' ' + __C.CLASSES.HOOKS.RIPPLE + ' CancelCancellation',
 					title: 'Вернуть событие'
 				}) : ''
 		})));
 		
-		if (PAGE.event.is_same_time) {
-			var m_nearest_date = PAGE.event.nearest_event_date ? moment.unix(PAGE.event.nearest_event_date) : moment.unix(PAGE.event.first_event_date);
+		if (this_event.is_same_time) {
+			var m_nearest_date = this_event.nearest_event_date ? moment.unix(this_event.nearest_event_date) : moment.unix(this_event.first_event_date);
 			PAGE.calendar = new Calendar(PAGE.$wrapper.find('.EventCalendar'), {
 				classes: {
 					wrapper_class: 'feed_calendar_wrapper',
@@ -387,7 +386,7 @@ EventPage = extending(Page, (function() {
 				.init()
 				.setMonth(m_nearest_date.format('M'), m_nearest_date.format('YYYY'))
 				.selectDays(
-					PAGE.event.dates.map(function(date) {
+					this_event.dates.map(function(date) {
 						return moment.unix(date.event_date).format(__C.DATE_FORMAT)
 					})
 				);

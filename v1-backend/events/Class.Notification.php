@@ -54,6 +54,8 @@ class Notification extends AbstractEntity
 	const NOTIFICATION_TYPE_REGISTRATION_NOT_APPROVED = 'notification-registration-not-approved';
 	const NOTIFICATION_TYPE_USERS = 'users-notification';
 
+	const NOTIFICATION_TYPE_ADDITIONAL_FOR_ORGANIZATION = 'notification-additional-for-organization';
+
 	const NOTIFICATION_TYPE_NOW_ID = 1;
 
 	const USERS_NOTIFICATION_ID = 13;

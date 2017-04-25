@@ -46,6 +46,9 @@ RegistrationModal = extending(PreviewRegistrationModal, (function() {
 				$register_button.removeAttr('disabled');
 			}
 		});
+		this.content.find('.RegistrationFirstNameField').val(__APP.USER.first_name);
+		this.content.find('.RegistrationLastNameField').val(__APP.USER.last_name);
+		this.content.find('.RegistrationEmailField').val(__APP.USER.email);
 		
 		bindRippleEffect(this.content);
 		this.__init();

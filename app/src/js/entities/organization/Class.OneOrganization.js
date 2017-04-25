@@ -46,6 +46,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 *
 	 * @property {Array<Privilege>} privileges
 	 * @property {?string} role
+	 * @property {TariffModel} tariff
 	 *
 	 * @property {UsersCollection} staff
 	 * @property {Array<OneUser>} admins
@@ -95,6 +96,7 @@ OneOrganization = extending(OneEntity, (function() {
 		
 		this.is_private = null;
 		this.brand_color = null;
+		this.tariff = new TariffModel();
 		this.city = new OneCity();
 		this.country = null;
 		

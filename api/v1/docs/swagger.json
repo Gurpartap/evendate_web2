@@ -3611,16 +3611,15 @@
           }
         },
         "[city]": {
-          "type": "array",
           "items": {
             "$ref": "#/definitions/City"
           }
         },
         "[country]": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Country"
-          }
+          "$ref": "#/definitions/Country"
+        },
+        "[tariff]": {
+          "$ref": "#/definitions/Tariff"
         }
       }
     },
@@ -3758,6 +3757,55 @@
           "format": "int64"
         },
         "[cities_count]": {
+          "type": "integer",
+          "format": "int64"
+        }
+      }
+    },
+    "Tariff": {
+      "type": "object",
+      "properties": {
+        "tariff_id": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "name": {
+          "type": "string"
+        },
+        "[since]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[till]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[available_additional_notifications]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[available_event_publications]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[available_tickets_selling]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[available_telegram_bots]": {
+          "type": "boolean"
+        },
+        "[available_slack_bots]": {
+          "type": "boolean"
+        },
+        "[available_auditory_analytics]": {
+          "type": "boolean"
+        },
+        "[available_in_city]": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "[price]": {
           "type": "integer",
           "format": "int64"
         }
@@ -3985,6 +4033,9 @@
         "[is_favorite]": {
           "type": "boolean"
         },
+        "[is_hidden]": {
+          "type": "boolean"
+        },
         "[tags]": {
           "type": "array",
           "items": {
@@ -4099,6 +4150,10 @@
         "organization_id": {
           "type": "integer",
           "format": "int64"
+        },
+        "additional_notification_time": {
+          "type": "string",
+          "format": "date"
         },
         "location_object": {
           "type": "object",
@@ -4329,7 +4384,7 @@
         "status": {
           "type": "boolean"
         },
-        "checked_out": {
+        "checkout": {
           "type": "boolean"
         },
         "price": {

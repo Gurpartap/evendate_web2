@@ -36,22 +36,22 @@ SET
          ) AS favored_by_user) :: INT, 0),
   rating_recent_created    = (SELECT
                                 CASE
-                                WHEN DATE_PART('epoch', NOW()) > ve.created_at + 259200 :: INT     THEN 0
-                                ELSE (259200 :: INT - (DATE_PART('epoch', NOW()) - ve.created_at)) :: INT /     7200
+                                WHEN DATE_PART('epoch', NOW()) > ve.created_at + 259200 :: FLOAT     THEN 0
+                                ELSE (259200 :: FLOAT - (DATE_PART('epoch', NOW()) - ve.created_at)) :: FLOAT /     7200
                                 END
                               FROM view_events AS ve
-                              WHERE ve.id = view_users_events.event_id) :: INT,
+                              WHERE ve.id = view_users_events.event_id) :: FLOAT,
   rating_active_days       = (SELECT 1 / (CASE
-                                          WHEN (ve.registration_required = TRUE AND     ve.registration_till < DATE_PART('epoch', NOW())) THEN 1000
-                                          ELSE (SELECT CASE WHEN COUNT(id) :: INT = 0     THEN 1000     ELSE COUNT(id) :: INT
+                                          WHEN (ve.registration_required = TRUE AND     ve.registration_till < DATE_PART('epoch', NOW())) THEN 1000::FLOAT
+                                          ELSE (SELECT CASE WHEN COUNT(id) :: INT = 0     THEN 1000::FLOAT     ELSE COUNT(id) :: FLOAT
                                                        END
                                                 FROM events_dates
                                                 WHERE     events_dates.event_id = ve.id
                                                           AND event_date > NOW()
                                                           AND event_date < (NOW() + INTERVAL '10 days')
-                                                          AND status = TRUE )     END) :: REAL * 10
+                                                          AND status = TRUE )     END) :: FLOAT * 10
                               FROM view_events AS ve
-                              WHERE ve.id = view_users_events.event_id) :: INT,
+                              WHERE ve.id = view_users_events.event_id) :: FLOAT,
   rating_texts_similarity  = '{SIMILARITY_TEXT}',
   updated_at               = NOW()
 FROM
