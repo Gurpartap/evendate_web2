@@ -18,7 +18,7 @@ class OrganizationsCollection extends AbstractCollection
 		$statement_array = array();
 		$_friend = null;
 		$return_one = isset($filters['id']);
-		$cols = Fields::mergeFields(Organization::getAdditionalCols(), $fields, Organization::getDefaultCols());
+		$cols = Fields::mergeFields(Organization::getAdditionalCols(), $fields ?? array(), Organization::getDefaultCols());
 		$q_get_organizations = App::queryFactory()->newSelect();
 
 		$q_get_organizations
