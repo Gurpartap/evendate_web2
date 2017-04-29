@@ -107,6 +107,21 @@ class User extends AbstractUser
 		return $p_get->rowCount() > 0;
 	}
 
+	public function isModerator(Organization $organization): bool
+	{
+		$q_get_is_admin = App::queryFactory()
+			->newSelect()
+			->from('users_organizations')
+			->cols(array('user_id'))
+			->join('inner', 'users_roles', 'users_organizations.role_id = users_roles.id')
+			->where('organization_id = ?', $organization->getId())
+			->where('users_organizations.user_id = ?', $this->getId())
+			->where('status = TRUE')
+			->where('users_roles.name = ?', Roles::ROLE_MODERATOR);
+		$p_get = $this->db->prepareExecute($q_get_is_admin, 'CANT_GET_ADMIN_STATUS');
+		return $p_get->rowCount() > 0;
+	}
+
 	public function isEventAdmin(Event $event): bool
 	{
 		$q_get_is_admin = App::queryFactory()

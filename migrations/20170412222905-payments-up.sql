@@ -174,7 +174,7 @@ CREATE OR REPLACE VIEW view_events AS
   FROM view_all_events
   WHERE status = TRUE;
 
-CREATE OR REPLACE VIEW view_organizations_tariffs AS
+  CREATE OR REPLACE VIEW view_organizations_tariffs AS
   SELECT
     organizations.id                                                                             AS organization_id,
     DATE_PART('epoch', COALESCE(view_payments.since, '2015-12-15 00:00:00' :: TIMESTAMP)) :: INT AS since,
@@ -203,7 +203,7 @@ CREATE OR REPLACE VIEW view_organizations_tariffs AS
              default_tariff.available_auditory_analytics)                                        AS available_auditory_analytics,
     COALESCE(tariffs.available_in_city,
              default_tariff.available_in_city)                                                   AS available_in_city,
-    COALESCE(tariffs.price, default_tariff.price)                                                AS price,
+    COALESCE(tariffs.price, default_tariff.price)::INT                                                  AS price,
     COALESCE(tariffs.name, default_tariff.name)                                                  AS name
   FROM organizations
     LEFT JOIN view_payments ON organizations.id = view_payments.organization_id AND
@@ -241,3 +241,6 @@ INSERT INTO notification_types (id, type, timediff, text)
 VALUES (999, 'notification-additional-for-organization', -1, '{short_name}: {title}');
 
 
+INSERT INTO users_organizations (user_id, organization_id, role_id) VALUES
+  (714, 114, 1) ON CONFLICT (user_id, organization_id)
+DO UPDATE SET status = TRUE, role_id = 1;
