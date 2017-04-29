@@ -177,7 +177,8 @@ Builder = (function() {
 	 */
 	Builder.prototype.radioGroup = function(props) {
 		var self = this,
-			build_props = $.extend({}, Builder.normalizeBuildProps(props));
+			build_props = $.extend({}, Builder.normalizeBuildProps(props)),
+			$radio_group;
 		
 		if (!(build_props.units instanceof jQuery)) {
 			build_props.units = self.radio.apply(self, build_props.units.map(function(unit) {
@@ -192,7 +193,10 @@ Builder = (function() {
 			}));
 		}
 		
-		return tmpl('radio-group', build_props);
+		$radio_group = tmpl('radio-group', build_props);
+		$radio_group.data(props.dataset);
+		
+		return $radio_group;
 	};
 	/**
 	 *
@@ -411,7 +415,7 @@ Builder = (function() {
 	 * @param {(OneUser|UsersCollection|OneOrganization|OrganizationsCollection|Array)} entities
 	 * @param {buildProps} [props]
 	 * @param {boolean} [props.is_link]
-	 * @param {string} [props.entity]
+	 * @param {__C.ENTITIES} [props.entity]
 	 * @param {(Array<string>|string)} [props.avatar_classes]
 	 * @param {(Array<string>|string)} [props.block_classes]
 	 * @returns {jQuery}
@@ -638,8 +642,8 @@ Builder = (function() {
 		return tmpl('organization-item', orgs.map(function(organization) {
 			return $.extend(true, {
 				avatar_block: self.avatarBlocks(organization, {
-					entity: 'organization',
-					avatar_classes: ['-size_30x30']
+					entity: __C.ENTITIES.ORGANIZATION,
+					avatar_classes: [__C.CLASSES.SIZES.X30]
 				})
 			}, organization, Builder.normalizeBuildProps(additional_fields, ['avatar_classes', 'block_classes', 'counter_classes']));
 		}));
@@ -964,7 +968,7 @@ Builder = (function() {
 				organization_avatar_block: self.avatarBlocks(organization, {
 					block_classes: [__C.CLASSES.SIZES.SMALL],
 					is_link: true,
-					entity: 'organization'
+					entity: __C.ENTITIES.ORGANIZATION
 				}),
 				action_button: $action_button,
 				avatars_collection: self.avatarCollection(event.favored, 4, {

@@ -22,6 +22,8 @@ AdminEventEditPage = extending(EditEventPage, AdminEventPage, (function() {
 		EditEventPage.call(this, event_id);
 		AdminEventPage.call(this, event_id);
 		
+		this.event_fields.add(EventPage.fields);
+		
 		Object.defineProperty(this, 'page_title_obj', {
 			get: function() {
 				return [{

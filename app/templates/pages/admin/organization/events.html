@@ -8,25 +8,25 @@
 
 <script type="javascript/template" id="tmpl-orgstat-events-wrapper">
 	<h3 class="orgstat_events_title">{title}</h3>
-	<table class="statistics_table">
+	<table class="orgstat_events_table statistics_table -table_fixed">
 		<colgroup>
 			<col>
 			<col width="144px">
+			<col width="120px">
 			<col width="100px">
-			<col width="100px">
-			<col width="144px">
+			<col width="160px">
 			<col width="110px">
 			<col width="144px">
 		</colgroup>
 		<thead>
 			<tr>
-				<th class="-unselectable" align="left">Название события</th>
-				<th class="-unselectable" data-sort-order="desc">Дата события</th>
-				<th class="-unselectable" data-sort-order="desc">Просмотров</th>
-				<th class="-unselectable" data-sort-order="desc">Открытий</th>
-				<th class="-unselectable" data-sort-order="desc">Доб. в избранное</th>
-				<th class="-unselectable" data-sort-order="desc">Конверсия</th>
-				<th class="-unselectable" data-sort-order="desc">Уведомлений</th>
+				<th class="-unselectable" align="left"><span class="Text">Название события</span></th>
+				<th class="-unselectable" data-sort-order="desc"><span class="Text">Дата события</span></th>
+				<th class="-unselectable" data-sort-order="desc"><span class="Text">Просмотров</span></th>
+				<th class="-unselectable" data-sort-order="desc"><span class="Text">Открытий</span></th>
+				<th class="-unselectable" data-sort-order="desc"><span class="Text">Доб. в избранное</span></th>
+				<th class="-unselectable" data-sort-order="desc"><span class="Text">Конверсия</span></th>
+				<th class="-unselectable" data-sort-order="desc"><span class="Text">Уведомлений</span></th>
 			</tr>
 		</thead>
 		{rows}
@@ -35,12 +35,12 @@
 
 <script type="javascript/template" id="tmpl-orgstat-events-row">
 	<tr>
-		<td><a href="/admin/event/{id}" class="link Link">{title}</a></td>
-		<td align="center" data-sort="{timestamp}">{date}</td>
-		<td align="center" class="-text_big -highlighted">{view}</td>
-		<td align="center" class="-text_big -highlighted">{view_detail}</td>
-		<td align="center" class="-text_big -highlighted">{fave}</td>
-		<td align="center" class="-text_big -highlighted">{conversion}</td>
-		<td align="center" class="-text_big -highlighted">{notifications_sent}</td>
+		<td><a href="/admin/event/{id}" class="link Link Text">{title}</a></td>
+		<td align="center" data-sort="{timestamp}"><span class="Text">{date}</span></td>
+		<td align="center" class="-text_big -highlighted"><span class="Text">{view}</span></td>
+		<td align="center" class="-text_big -highlighted"><span class="Text">{view_detail}</span></td>
+		<td align="center" class="-text_big -highlighted"><span class="Text">{fave}</span></td>
+		<td align="center" class="-text_big -highlighted"><span class="Text">{conversion}</span></td>
+		<td align="center" class="-text_big -highlighted"><span class="Text">{notifications_sent}</span></td>
 	</tr>
 </script>

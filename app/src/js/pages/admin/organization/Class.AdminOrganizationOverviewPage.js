@@ -42,9 +42,9 @@ AdminOrganizationOverviewPage = extending(AdminOrganizationPage, (function() {
 	AdminOrganizationOverviewPage.buildStaffBlock = function(title, staff) {
 		if (staff.length) {
 			return tmpl('orgstat-overview-sidebar-wrapper-title', {title: title}).add(__APP.BUILD.avatarBlocks(staff, {
-				avatar_classes: ['-size_40x40','-rounded'],
-				entity: 'user',
-				is_link: true
+				is_link: true,
+				entity: __C.ENTITIES.USER,
+				avatar_classes: [__C.CLASSES.SIZES.X40, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]
 			}));
 		}
 		return $();
@@ -172,7 +172,7 @@ AdminOrganizationOverviewPage = extending(AdminOrganizationPage, (function() {
 		
 		this.$wrapper.html(tmpl('orgstat-overview', $.extend(true, {}, this.organization, {
 			avatar_block: __APP.BUILD.avatarBlocks(this.organization, {
-				entity: 'organization',
+				entity: __C.ENTITIES.ORGANIZATION,
 				block_classes: ['-stack']
 			}),
 			staff_block: AdminOrganizationOverviewPage.buildStaffBlock('Администраторы', this.organization.admins.map(extendStaffProps))

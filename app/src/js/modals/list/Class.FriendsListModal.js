@@ -45,8 +45,8 @@ FriendsListModal = extending(AbstractListModal, (function() {
 	FriendsListModal.prototype.buildEntities = function(entities) {
 		var $blocks = __APP.BUILD.avatarBlocks(entities, {
 			is_link: true,
-			entity: 'user',
-			avatar_classes: ['-size_40x40', '-rounded']
+			entity: __C.ENTITIES.USER,
+			avatar_classes: [__C.CLASSES.SIZES.X40, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]
 		});
 		bindPageLinks($blocks);
 		
