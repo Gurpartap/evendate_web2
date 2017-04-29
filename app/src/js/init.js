@@ -111,7 +111,7 @@ if (checkRedirect()) {
 						sameDay: '[Сегодня]',
 						nextDay: '[Завтра]',
 						lastDay: '[Вчера]',
-						nextWeek: 'dddd',
+						nextWeek: 'D MMMM',
 						lastWeek: 'D MMMM',
 						sameElse: 'D MMMM'
 					}

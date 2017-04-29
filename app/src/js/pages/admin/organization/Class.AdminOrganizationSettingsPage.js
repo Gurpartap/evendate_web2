@@ -14,6 +14,8 @@ AdminOrganizationSettingsPage = extending(AdminOrganizationPage, (function() {
 	 * @constructs AdminOrganizationSettingsPage
 	 */
 	function AdminOrganizationSettingsPage(org_id) {
+		var self = this;
+		
 		AdminOrganizationPage.call(this, org_id);
 		
 		this.organization_fields = new Fields(
@@ -26,7 +28,21 @@ AdminOrganizationSettingsPage = extending(AdminOrganizationPage, (function() {
 			'email',
 			'privileges',
 			'staff',
-			'site_url'
+			'site_url', {
+				tariff: {
+					fields: new Fields(
+						'till',
+						'available_additional_notifications',
+						'available_event_publications',
+						'available_tickets_selling',
+						'available_telegram_bots',
+						'available_slack_bots',
+						'available_auditory_analytics',
+						'available_in_city',
+						'price'
+					)
+				}
+			}
 		);
 	}
 	/**
@@ -68,6 +84,20 @@ AdminOrganizationSettingsPage = extending(AdminOrganizationPage, (function() {
 			
 			bindPageLinks($staff_collection);
 		});
+		
+		this.$wrapper.find('.ActivatePayment').on('click', function() {
+			__APP.SERVER.addData('/api/v1/payments/organizations/', {
+				organization_id: self.organization.id
+			}, false, function(data) {
+				tmpl('admin-organization-payment-form', {
+					customer_id: __APP.USER.full_name,
+					cps_email: __APP.USER.email,
+					callback_url: location.href,
+					payment_uuid: data.uuid,
+					sum: data.sum
+				}, self.$wrapper).submit().remove();
+			});
+		});
 	};
 	
 	AdminOrganizationSettingsPage.prototype.render = function() {
@@ -105,8 +135,17 @@ AdminOrganizationSettingsPage = extending(AdminOrganizationPage, (function() {
 				id: 'org_admin_settings_other_domain_enabled',
 				name: 'domains'
 			}),
-			customer_id: __APP.USER.id,
-			cps_email: __APP.USER.email
+			tariff_button: __APP.BUILD.button({
+				title: 'Оплатить',
+				classes: [__C.CLASSES.COLORS.ACCENT, __C.CLASSES.HOOKS.RIPPLE, 'ActivatePayment']
+			}),
+			tariff_service_info: !self.organization.tariff.is_full ? '' : 'Оплачен до ' + moment.unix(self.organization.tariff.till).calendar(null, {
+				sameDay: '[Сегодня]',
+				nextDay: '[Завтра]',
+				nextWeek: 'D MMMM YYYY',
+				lastWeek: 'D MMMM YYYY',
+				sameElse: 'D MMMM YYYY'
+			})
 		})));
 		
 		this.init();

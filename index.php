@@ -17,7 +17,7 @@ require_once "{$BACKEND_FULL_PATH}/users/Class.NotAuthorizedUser.php";
 require_once "{$BACKEND_FULL_PATH}/users/Class.User.php";
 
 if (App::$ENV == 'prod' || App::$ENV == 'test') {
-	$DEBUG_MODE = false;
+	$DEBUG_MODE = isset( $_GET['debug'] ) ? true : false;
 } else {
 	$DEBUG_MODE = true;
 	ini_set("display_errors", 1);
@@ -107,11 +107,11 @@ $url_parts = explode('/', $url);
 
 	<?php
 	if ($DEBUG_MODE) { ?>
-    <link rel="stylesheet" href="/dist/vendor.css?rev=1262c374cf9abc51bcbb10d4db75a6a6">
-    <link rel="stylesheet" href="/dist/app.css?rev=4bb555d8076a06477d1278f0a3777331"><?php
+    <link rel="stylesheet" href="/dist/vendor.css?rev=222849f37da65362cea21d1f6c065d96">
+    <link rel="stylesheet" href="/dist/app.css?rev=9a4b70a5c98ba9c76093bc210aa44c9d"><?php
 	} else { ?>
-    <link rel="stylesheet" href="/dist/vendor.min.css?rev=cbe2b2559846ddb626ea63478232b92b">
-    <link rel="stylesheet" href="/dist/app.min.css?rev=ffd87eaa0e4aded0b4f364459bbcddd5"><?php
+    <link rel="stylesheet" href="/dist/vendor.min.css?rev=65126fe9feeec91a1ea52b34ce76d797">
+    <link rel="stylesheet" href="/dist/app.min.css?rev=225d163f1b4e412d2b3c8f3ff85ebeae"><?php
 	} ?>
 
 	<?php
@@ -307,11 +307,11 @@ $url_parts = explode('/', $url);
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=2c96086cf1760fc8b61488f94d0e2566" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=daf43b732257ecab4b0472c3da39c35a" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=514246a1160aff0ce49e1f0b7d761b73" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=7d0203323b9ed5cd8cddefcb44fd82dd" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=c06c9110591f0cc7bab2e46e0bfe8a73" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=6bbd0d9212e5423bfad62017c9fa45a1" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=1de8b4b4fb8e45448d257b7d75c6d63f" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=10ce5c0b70adf2462e2a3ca1197e4fb3" charset="utf-8"></script><?php
 }
 
 foreach (glob("app/templates/{*/*/*/*,*/*/*,*/*,*}.html", GLOB_BRACE) as $filename) {
