@@ -35,7 +35,7 @@ RegistrationFieldsCollection = extending(EntitiesCollection, (function() {
 				RegistrationFieldModel.TYPES.EXTENDED_CUSTOM
 			];
 		
-		this.last_pushed = [];
+		this.last_pushed.splice(0);
 		
 		types.forEach(function(type) {
 			entities.forEach(function(entity) {

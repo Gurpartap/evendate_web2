@@ -237,8 +237,8 @@ ServerConnection = (function() {
 		var cur;
 		while (this.current_connections.length) {
 			cur = this.current_connections.pop();
-			if(cur.state() === 'pending'){
-				//cur.abort();
+			if(cur.state !== 200 || cur.state() === 'pending'){
+				cur.abort();
 			}
 		}
 	};

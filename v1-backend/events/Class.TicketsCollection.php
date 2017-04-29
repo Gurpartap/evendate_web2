@@ -79,8 +79,8 @@ class TicketsCollection extends AbstractCollection
 				}
 				case 'number': {
 					$getting_statistics = true;
-					$value = intval(preg_replace("/[^0-9,.]/", "", $value));
-					$q_get_tickets->where('number = ?', $value);
+					$value = '%' . intval(preg_replace("/[^0-9,.]/", "", $value)) . '%';
+					$q_get_tickets->where('number LIKE :query')->bindValue('query', $value);
 					break;
 				}
 				case 'user': {

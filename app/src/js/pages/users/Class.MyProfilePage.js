@@ -37,9 +37,9 @@ MyProfilePage = extending(UserPage, (function() {
 		
 		if(this.user.subscriptions.length) {
 			$subscribed_orgs = __APP.BUILD.avatarBlocks(this.user.subscriptions.slice(0,4), {
-				avatar_classes: ['-size_30x30'],
-				entity: 'organization',
-				is_link: true
+				is_link: true,
+				entity: __C.ENTITIES.ORGANIZATION,
+				avatar_classes: [__C.CLASSES.SIZES.X30]
 			});
 		} else {
 			$subscribed_orgs = __APP.BUILD.cap('Нет подписок');
@@ -47,9 +47,9 @@ MyProfilePage = extending(UserPage, (function() {
 		
 		if(this.user.friends.length) {
 			$subscribed_users = __APP.BUILD.avatarBlocks(this.user.friends.slice(0,4), {
-				avatar_classes: ['-size_30x30', '-rounded'],
-				entity: 'user',
-				is_link: true
+				is_link: true,
+				entity: __C.ENTITIES.USER,
+				avatar_classes: [__C.CLASSES.SIZES.X30, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]
 			});
 		} else {
 			$subscribed_users = __APP.BUILD.cap('Нет друзей');

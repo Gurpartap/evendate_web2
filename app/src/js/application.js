@@ -45,6 +45,7 @@ __APP = {
 			'event': {
 				'^([0-9]+)': {
 					'overview': AdminEventOverviewPage,
+					'check_in': AdminEventCheckInPage,
 					'edit': AdminEventEditPage,
 					'': AdminEventOverviewPage
 				}
@@ -331,7 +332,7 @@ __LOCALES = {
 			CALENDAR_DATE_TIME: {
 				sameDay: '[Сегодня в] HH:mm',
 				lastDay: '[Вчера в] HH:mm',
-				nextWeek: 'dddd [в] HH:mm',
+				nextWeek: 'D MMMM [в] HH:mm',
 				lastWeek: 'D MMMM [в] HH:mm',
 				sameElse: 'D MMMM [в] HH:mm'
 			}

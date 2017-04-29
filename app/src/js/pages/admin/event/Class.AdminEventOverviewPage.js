@@ -18,17 +18,12 @@ AdminEventOverviewPage = extending(AdminEventPage, (function() {
 		
 		this.graphics_stats = new EventStatistics(this.id);
 		this.scoreboards_stats = new EventStatistics(this.id);
-	}
-	
-	AdminEventOverviewPage.prototype.fetchData = function() {
-		return this.fetching_data_defer = this.event.fetchEvent(new Fields(
-			'image_horizontal_medium_url',
-			'organization_short_name',
+		this.event_fields.add(new Fields(
 			'favored_users_count',
 			'is_same_time',
 			'dates'
 		));
-	};
+	}
 	
 	AdminEventOverviewPage.prototype.render = function() {
 		var PAGE = this;

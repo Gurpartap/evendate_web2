@@ -20,9 +20,12 @@ EventsTicketsCollection = extending(EntitiesCollection, (function() {
 	function EventsTicketsCollection(event_id) {
 		EntitiesCollection.call(this);
 		
-		this.event_id = setDefaultValue(event_id, 0);
+		Object.defineProperty(this, 'event_id', {
+			value: setDefaultValue(event_id, 0)
+		});
 	}
 	
+	EntitiesCollection.prototype.ID_PROP_NAME = 'uuid';
 	EventsTicketsCollection.prototype.collection_of = OneTicket;
 	
 	/**

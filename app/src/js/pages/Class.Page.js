@@ -81,7 +81,6 @@ Page = (function() {
 			is_other_page = __APP.PREVIOUS_PAGE.wrapper_tmpl !== PAGE.wrapper_tmpl,
 			wrapper_field = is_other_page ? '$view' : '$wrapper',
 			$prev = __APP.PREVIOUS_PAGE[wrapper_field].length ? __APP.PREVIOUS_PAGE[wrapper_field] : is_other_page ? $('.PageView') : $('.PageView').find('.Content');
-		
 		$prev.addClass('-faded');
 		
 		setTimeout(function() {
@@ -111,7 +110,7 @@ Page = (function() {
 		}, 200);
 		
 		$.when(PAGE.rendering_defer, PAGE.fetching_data_defer).done(function pageRender(){
-			if (PAGE.page_title) {
+			if (PAGE.page_title_obj || PAGE.page_title) {
 				__APP.changeTitle(PAGE.page_title_obj ? PAGE.page_title_obj : PAGE.page_title);
 			}
 			PAGE.renderHeaderTabs();
