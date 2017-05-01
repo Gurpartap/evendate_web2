@@ -3620,6 +3620,9 @@
         },
         "[tariff]": {
           "$ref": "#/definitions/Tariff"
+        },
+        "[interests]": {
+          "type": "array"
         }
       }
     },
@@ -3671,6 +3674,9 @@
           "items": {
             "$ref": "#/definitions/Organization"
           }
+        },
+        "[interests]": {
+          "type": "array"
         }
       }
     },

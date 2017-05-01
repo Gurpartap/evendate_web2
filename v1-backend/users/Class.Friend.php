@@ -1,15 +1,17 @@
 <?php
 
-require_once $BACKEND_FULL_PATH .'/organizations/Class.OrganizationsCollection.php';
-require_once $BACKEND_FULL_PATH .'/organizations/Class.Organization.php';
+require_once $BACKEND_FULL_PATH . '/organizations/Class.OrganizationsCollection.php';
+require_once $BACKEND_FULL_PATH . '/organizations/Class.Organization.php';
 
-class Friend extends AbstractEntity implements UserInterface {
+class Friend extends AbstractEntity implements UserInterface
+{
 
 	const RANDOM_FIELD_NAME = 'random';
 	const LINK_FIELD_NAME = 'link';
 	const ACCOUNTS_LINKS_FIELD_NAME = 'accounts_links';
 	const ACCOUNTS_FIELD_NAME = 'accounts';
 	const FAVORED_FIELD_NAME = 'favored';
+	const INTERESTS_FIELD_NAME = 'interests';
 	const SUBSCRIPTIONS_FIELD_NAME = 'subscriptions';
 	const ACTIONS_FIELD_NAME = 'actions';
 
@@ -42,6 +44,14 @@ class Friend extends AbstractEntity implements UserInterface {
 			END
 			FROM users AS u
 			WHERE u.id = view_users.id) AS ' . self::LINK_FIELD_NAME,
+		'email' => '(SELECT CASE WHEN view_users.id IN (SELECT subscriptions.user_id 
+					FROM subscriptions
+					 INNER JOIN users_organizations ON users_organizations.organization_id = subscriptions.organization_id
+					 WHERE users_organizations.role_id = 1 
+					 AND users_organizations.status = TRUE 
+					 AND subscriptions.status = TRUE
+					 AND users_organizations.user_id = :user_id
+					) THEN view_users.email ELSE null END AS email) AS email'
 	);
 
 	protected $first_name;
@@ -61,8 +71,9 @@ class Friend extends AbstractEntity implements UserInterface {
 
 
 	public function getSubscriptions(array $fields,
-	                                 array $pagination,
-	                                 array $order_by){
+																	 array $pagination,
+																	 array $order_by)
+	{
 		$subscriptions = OrganizationsCollection::filter(
 			App::DB(),
 			App::getCurrentUser(),
@@ -75,11 +86,12 @@ class Friend extends AbstractEntity implements UserInterface {
 	}
 
 
-	public function getParams(AbstractUser $user = null, array $fields = null) : Result{
+	public function getParams(AbstractUser $user = null, array $fields = null): Result
+	{
 		$result_data = parent::getParams($user, $fields)->getData();
 
 
-		if (isset($fields[self::SUBSCRIPTIONS_FIELD_NAME])){
+		if (isset($fields[self::SUBSCRIPTIONS_FIELD_NAME])) {
 			$result_data[self::SUBSCRIPTIONS_FIELD_NAME] =
 				$this->getSubscriptions(
 					Fields::parseFields($fields[self::SUBSCRIPTIONS_FIELD_NAME]['fields'] ?? ''),
@@ -91,7 +103,7 @@ class Friend extends AbstractEntity implements UserInterface {
 				)->getData();
 		}
 
-		if (isset($fields[self::ACCOUNTS_LINKS_FIELD_NAME])){
+		if (isset($fields[self::ACCOUNTS_LINKS_FIELD_NAME])) {
 
 			$account_links = array();
 
@@ -107,7 +119,7 @@ class Friend extends AbstractEntity implements UserInterface {
 			$result_data[self::ACCOUNTS_LINKS_FIELD_NAME] = $account_links;
 		}
 
-		if (isset($fields[self::ACCOUNTS_FIELD_NAME])){
+		if (isset($fields[self::ACCOUNTS_FIELD_NAME])) {
 
 			$account_types = array();
 
@@ -123,7 +135,7 @@ class Friend extends AbstractEntity implements UserInterface {
 			$result_data[self::ACCOUNTS_FIELD_NAME] = $account_types;
 		}
 
-		if (isset($fields[self::ACTIONS_FIELD_NAME])){
+		if (isset($fields[self::ACTIONS_FIELD_NAME])) {
 			$result_data[self::ACTIONS_FIELD_NAME] = ActionsCollection::filter(
 				App::DB(),
 				App::getCurrentUser(),
@@ -138,7 +150,7 @@ class Friend extends AbstractEntity implements UserInterface {
 				Fields::parseOrderBy($fields[self::ACTIONS_FIELD_NAME]['order_by'] ?? ''))->getData();
 		}
 
-		if (isset($fields[self::FAVORED_FIELD_NAME])){
+		if (isset($fields[self::FAVORED_FIELD_NAME])) {
 			$result_data[self::FAVORED_FIELD_NAME] = EventsCollection::filter(
 				App::DB(),
 				App::getCurrentUser(),
@@ -151,6 +163,34 @@ class Friend extends AbstractEntity implements UserInterface {
 					'offset' => $fields[self::FAVORED_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET,
 				),
 				Fields::parseOrderBy($fields[self::FAVORED_FIELD_NAME]['order_by'] ?? ''))->getData();
+		}
+
+
+		if (isset($fields[self::INTERESTS_FIELD_NAME])) {
+			$q_get_is_admin = App::queryFactory()->newSelect();
+			$q_get_is_admin->from('subscriptions')
+				->cols(array('subscriptions.created_at'))
+				->join('inner', 'users_organizations', 'users_organizations.organization_id = subscriptions.organization_id')
+				->where('users_organizations.role_id = 1')
+				->where('users_organizations.status = TRUE')
+				->where('subscriptions.status = TRUE')
+				->where('users_organizations.user_id = ?', App::getCurrentUser()->getId());
+			$res = App::DB()->prepareExecute($q_get_is_admin, 'CANT_CHECK_IS_ADMIN');
+			if ($res->rowCount() == 0) throw new PrivilegesException('', App::DB());
+
+			$q_get_interests = App::queryFactory()->newSelect();
+			$q_get_interests->from('view_user_interests')
+				->cols(array(
+					'topic_id',
+					'topic_name',
+					'value::NUMERIC',
+					'updated_at',
+				))
+				->where('user_id = ?', $this->getId());
+			$res = App::DB()->prepareExecute($q_get_interests, 'CANT_GET_INTERESTS');
+
+
+			$result_data[self::INTERESTS_FIELD_NAME] = $res->fetchAll();
 		}
 
 		return new Result(true, '', $result_data);
