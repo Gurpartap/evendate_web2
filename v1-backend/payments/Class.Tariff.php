@@ -45,7 +45,7 @@ class Tariff extends AbstractEntity
 	public static function getForOrganization(ExtendedPDO $db, User $user, array $filters, $fields): Result
 	{
 		if (!isset ($filters['organization']) || $filters['organization'] instanceof Organization == false) throw new InvalidArgumentException('NOT_ORGANIZATION');
-		if (!$user->isAdmin($filters['organization'])) throw new PrivilegesException('WHAT_ARE_DOING_MAN', $db);
+		if (!$user->isAdmin($filters['organization']) && !$user->isModerator($filters['organization'])) throw new PrivilegesException('WHAT_ARE_DOING_MAN', $db);
 
 		$_fields = Fields::mergeFields(self::getAdditionalCols(), $fields, self::getDefaultCols());
 
