@@ -22,7 +22,7 @@ OneTicket = extending(OneEntity, (function() {
 	 * @property {?string} ticket_type_uuid
 	 * @property {?string} ticket_order_uuid
 	 * @property {?boolean} status
-	 * @property {?boolean} checked_out
+	 * @property {?boolean} checkout
 	 * @property {?(string|number)} price
 	 * @property {?(string|number)} number
 	 * @property {?timestamp} created_at
@@ -39,7 +39,7 @@ OneTicket = extending(OneEntity, (function() {
 		this.ticket_type_uuid = null;
 		this.ticket_order_uuid = null;
 		this.status = null;
-		this.checked_out = null;
+		this.checkout = null;
 		this.price = null;
 		this.number = null;
 		this.ticket_type = new OneTicketType();
@@ -65,6 +65,30 @@ OneTicket = extending(OneEntity, (function() {
 	};
 	/**
 	 *
+	 * @param {(string|number)} event_id
+	 * @param {(string|number)} uuid
+	 * @param {AJAXCallback} [success]
+	 * @return {jqPromise}
+	 */
+	OneTicket.check = function(event_id, uuid, success) {
+		return __APP.SERVER.updateData('/api/v1/statistics/events/' + event_id + '/tickets/' + uuid, {
+			checkout: true
+		}, false, success);
+	};
+	/**
+	 *
+	 * @param {(string|number)} event_id
+	 * @param {(string|number)} uuid
+	 * @param {AJAXCallback} [success]
+	 * @return {jqPromise}
+	 */
+	OneTicket.uncheck = function(event_id, uuid, success) {
+		return __APP.SERVER.updateData('/api/v1/statistics/events/' + event_id + '/tickets/' + uuid, {
+			checkout: false
+		}, false, success);
+	};
+	/**
+	 *
 	 * @param {(Fields|string)} [fields]
 	 * @param {AJAXCallback} [success]
 	 *
@@ -75,8 +99,40 @@ OneTicket = extending(OneEntity, (function() {
 		
 		return OneTicket.fetchTicket(this.event_id, this.uuid, fields, function(data) {
 			self.setData(data);
-			if (success && typeof success == 'function') {
+			if (success && typeof success === 'function') {
 				success.call(self, data);
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	OneTicket.prototype.check = function(success) {
+		var self = this;
+		
+		return OneTicket.check(this.event_id, this.uuid, function() {
+			self.checkout = true;
+			if (success && typeof success === 'function') {
+				success.call(self, self);
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	OneTicket.prototype.uncheck = function(success) {
+		var self = this;
+		
+		return OneTicket.uncheck(this.event_id, this.uuid, function() {
+			self.checkout = false;
+			if (success && typeof success === 'function') {
+				success.call(self, self);
 			}
 		});
 	};

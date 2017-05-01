@@ -1,0 +1,44 @@
+<script type="javascript/template" id="tmpl-event-admin-check-in-page">
+	<div class="event_admin_check_in material">
+		<header class="event_admin_check_in_header">
+			<h2 class="event_admin_check_in_title">Контроль входа</h2>
+			{radio_group}
+			<div class="event_admin_check_in_progress_bar">
+				{progress_bar}
+			</div>
+			<div class="event_admin_check_in_search_bar">
+				<input id="event_admin_check_in_search" class="event_admin_check_in_search form_input SearchTickets -rounded" required placeholder="Поиск билетов">
+				<span class="event_admin_check_in_search_clear ClearSearch">&times;</span>
+			</div>
+		</header>
+		<table class="statistics_table event_admin_check_in_table CheckInTable -tickets_status_awaiting">
+			<thead>
+				<tr>
+					<th class="-unselectable" data-sort-order="desc"><span class="Text">Номер билета</span></th>
+					<th class="-unselectable" align="left" data-sort-order="desc"><span class="Text">Держатель</span></th>
+					<th class="-unselectable" align="left" data-sort-order="desc"><span class="Text">Название билета</span></th>
+					<th class="-unselectable" align="left" data-sort-order="desc" width="250px"><span class="Text">Статус</span></th>
+				</tr>
+			</thead>
+			{rows}
+		</table>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-event-admin-check-in-row">
+	<tr class="Ticket Ticket_{ticket_id} {state_modificator}" data-ticket_uuid="{ticket_id}">
+		<td align="center"><span class="Text">{number}</span></td>
+		<td data-sort="{full_name}">{avatar_block}</td>
+		<td><span class="Text">{ticket_type}</span></td>
+		<td>
+			<span class="check_in_ticket_status StatusText Text">{status_text}</span>
+			<span class="check_in_ticket_action action CheckoutTicket Text">{action_text}</span>
+		</td>
+	</tr>
+</script>
+
+<script type="javascript/template" id="tmpl-event-admin-check-in-row-no-tickets">
+	<tr>
+		<td colspan="4" align="center"><span class="Text">{text}</span></td>
+	</tr>
+</script>

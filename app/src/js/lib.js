@@ -137,6 +137,9 @@ __C = {
 		EVENT_ENTITY: 'event',
 		ORGANIZATION_ENTITY: 'organization'
 	},
+	/**
+	 * @enum {string}
+	 */
 	ENTITIES: {
 		USER: 'user',
 		EVENT: 'event',
@@ -656,15 +659,35 @@ $.fn.extend({
 	 * jQuery adapter for Tablesort
 	 * @memberOf jQuery#
 	 * @param {object} [options]
+	 *
+	 * @return {(Tablesort|null)}
 	 */
 	tablesort: function(options) {
-		if(!options)
-			options = {};
+		options = setDefaultValue(options, {});
+		var table = this.get(0),
+			instance = null,
+			observer;
+		
 		if(Tablesort && typeof Tablesort === 'function'){
-			return Tablesort(this.get(0), options);
+			instance = new Tablesort(table, options);
+			observer = new MutationObserver(function() {
+				instance.refresh();
+			});
+			
+			observer.observe(table, {
+				attributes: true,
+				childList: true
+			});
+			
+			this.data({
+				tablesort_instance: instance,
+				mutation_observer_instance: observer
+			});
+			
 		} else {
 			console.error('Tablesort is not defined');
 		}
+		return instance;
 	},
 	/**
 	 * Resolving instance from element
@@ -1021,6 +1044,7 @@ function tmpl(template_type, items, addTo, direction) {
 			keys = {},
 			wrap = wrapMap[ ( /<([\w:]+)/.exec( html ) || [ "", "" ] )[ 1 ].toLowerCase() ] || wrapMap._default,
 			j = wrap[ 0 ];
+		
 		$.each(object, function(key, value) {
 			if ($.type(value) == 'string') {
 				keys[key] = htmlEntities(value);
@@ -1988,6 +2012,13 @@ function bindControlSwitch($parent) {
 			}
 		});
 	}).addClass('-Handled_Switch');
+}
+
+function bindProgressBar($parent) {
+	$parent = $parent ? $parent : $('body');
+	$parent.find('.ProgressBar').not('.-Handled_ProgressBar').each(function(i, el) {
+	
+	}).addClass('-Handled_ProgressBar');
 }
 /**
  *

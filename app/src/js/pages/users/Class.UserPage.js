@@ -170,9 +170,9 @@ UserPage = extending(Page, (function() {
 		
 		if(this.user.subscriptions.length) {
 			$subscribed_orgs = __APP.BUILD.avatarBlocks(this.user.subscriptions.slice(0,4), {
-				avatar_classes: ['-size_30x30'],
-				entity: 'organization',
-				is_link: true
+				is_link: true,
+				entity: __C.ENTITIES.ORGANIZATION,
+				avatar_classes: [__C.CLASSES.SIZES.X30]
 			});
 		} else {
 			$subscribed_orgs = __APP.BUILD.cap('Нет подписок');

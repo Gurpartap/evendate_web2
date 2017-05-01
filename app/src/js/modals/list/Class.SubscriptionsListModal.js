@@ -41,8 +41,8 @@ SubscriptionsListModal = extending(AbstractListModal, (function() {
 	SubscriptionsListModal.prototype.buildEntities = function(entities) {
 		var $blocks = __APP.BUILD.avatarBlocks(entities, {
 			is_link: true,
-			entity: 'organization',
-			avatar_classes: ['-size_40x40', '-rounded']
+			entity: __C.ENTITIES.ORGANIZATION,
+			avatar_classes: [__C.CLASSES.SIZES.X40, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]
 		});
 		bindPageLinks($blocks);
 		

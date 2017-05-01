@@ -80,7 +80,7 @@ class Editor extends User
 	{
 		$q_get_default = 'SELECT users_organizations.organization_id
 				FROM users_organizations
-				WHERE users_organizations.status = 1
+				WHERE users_organizations.status = TRUE
 				AND users_organizations.user_id = :user_id
 				ORDER BY by_default DESC
 				LIMIT 1';

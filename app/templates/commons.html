@@ -17,6 +17,12 @@
 	</div>
 </script>
 
+<script type="javascript/template" id="tmpl-radio-group">
+	<div class="radio_group {classes} RadioGroup" {dataset} {attributes}>
+		{units}
+	</div>
+</script>
+
 <script type="javascript/template" id="tmpl-form-unit">
 	<div class="form_unit {unit_classes}">
 		<label class="form_label {label_classes}" for="{id}">{label}</label>
@@ -113,6 +119,14 @@
 
 <script type="javascript/template" id="tmpl-tab">
 	<span class="tab Tab {classes}" {dataset}>{label}</span>
+</script>
+
+<script type="javascript/template" id="tmpl-progress-bar">
+	<div class="progress_bar {classes} ProgressBar" {dataset} {attributes}>
+		<div class="progress_bar_strip">
+			<div class="progress_bar_strip_complete ProgressBarComplete"></div>
+		</div>
+	</div>
 </script>
 
 <script type="javascript/template" id="tmpl-loader">
