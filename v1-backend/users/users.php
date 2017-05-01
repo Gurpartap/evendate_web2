@@ -192,6 +192,7 @@ $__modules['users'] = array(
 			return $__user->updateSettings($__request);
 		},
 		'{me/devices}' => function () use ($__request, $__user, $__db, $__fields) {
+			if ($__user instanceof NotAuthorizedUser) return new Result(false, '');
 			$token = $__user->updateDeviceToken($__request['device_token'], $__request['client_type'], $__request['model'], $__request['os_version']);
 			$info = $__user->getMainInfo($__fields ?? array())->getData();
 			$info = array_merge($info, $token->getData());
