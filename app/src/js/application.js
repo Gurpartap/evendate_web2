@@ -242,10 +242,6 @@ __APP = {
 		__APP.PREVIOUS_PAGE = __APP.CURRENT_PAGE;
 		__APP.PREVIOUS_PAGE.destroy();
 		__APP.init();
-		
-		if (!(__APP.CURRENT_PAGE instanceof SearchPage)) {
-			$('#search_bar_input').val('');
-		}
 	}
 };
 

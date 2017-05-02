@@ -62,11 +62,15 @@ MyProfilePage = extending(UserPage, (function() {
 		}
 		
 		this.$wrapper.append(tmpl('user-page', {
-			tombstone: __APP.BUILD.userTombstones(this.user, {avatar_classes: ['-bordered', '-shadowed']}),
+			tombstone: __APP.BUILD.userTombstones(this.user, {avatar_classes: [__C.CLASSES.UNIVERSAL_STATES.BORDERED, __C.CLASSES.UNIVERSAL_STATES.SHADOWED]}),
 			links: __APP.BUILD.socialLinks(this.user.accounts_links),
+			subscribe_button: __APP.BUILD.button({
+				classes: [__C.CLASSES.COLORS.NEUTRAL_ACCENT, __C.CLASSES.HOOKS.RIPPLE, 'LogoutButton'],
+				title: 'Выйти'
+			}),
 			subscribed_orgs: $subscribed_orgs,
 			show_all_subscribed_orgs_button: this.user.subscriptions.length ? __APP.BUILD.button({
-				classes: ['-color_neutral_accent','CallModal','RippleEffect'],
+				classes: [__C.CLASSES.COLORS.NEUTRAL_ACCENT, __C.CLASSES.HOOKS.CALL_MODAL, __C.CLASSES.HOOKS.RIPPLE],
 				dataset: {
 					modal_type: 'subscribers_list',
 					modal_entity: this.user
@@ -75,7 +79,7 @@ MyProfilePage = extending(UserPage, (function() {
 			}) : '',
 			subscribed_users: $subscribed_users,
 			show_all_subscribed_users_button: this.user.friends.length ? __APP.BUILD.button({
-				classes: ['-color_neutral_accent','CallModal','RippleEffect'],
+				classes: [__C.CLASSES.COLORS.NEUTRAL_ACCENT, __C.CLASSES.HOOKS.CALL_MODAL, __C.CLASSES.HOOKS.RIPPLE],
 				dataset: {
 					modal_type: 'friends_list',
 					modal_entity: this.user
@@ -84,6 +88,7 @@ MyProfilePage = extending(UserPage, (function() {
 			}) : '',
 			favored_event_blocks: $favored_events
 		}));
+		
 		if(this.user.actions.length){
 			$activities = __APP.BUILD.activity(this.user.actions);
 			this.$wrapper.find('.TabsBody').filter('[data-tab_body_type="activities"]').append($activities);
@@ -91,6 +96,7 @@ MyProfilePage = extending(UserPage, (function() {
 		} else {
 			this.uploadEntities('activities');
 		}
+		this.$wrapper.find('.LogoutButton').on('click', __APP.USER.logout);
 		this.init();
 	};
 	

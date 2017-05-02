@@ -135,6 +135,13 @@ if (checkRedirect()) {
 				}
 			});
 			
+			if (isNotDesktop()) {
+				$('.DownloadAppBand').addClass('-open_band');
+				$('.CloseDownloadAppBand').one('click', function() {
+					$('.DownloadAppBand').removeClass('-open_band');
+				});
+			}
+			
 			user_jqhxr = __APP.USER.fetchUser(new Fields(
 				'email',
 				'accounts',

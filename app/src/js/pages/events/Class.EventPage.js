@@ -377,7 +377,8 @@ EventPage = extending(Page, (function() {
 			PAGE.calendar = new Calendar(PAGE.$wrapper.find('.EventCalendar'), {
 				classes: {
 					wrapper_class: 'feed_calendar_wrapper',
-					td_class: 'event_calendar_day'
+					td_class: 'event_calendar_day',
+					table_class: 'feed_calendar_table'
 				},
 				selection_type: Calendar.SELECTION_TYPES.MULTI,
 				disable_selection: true
