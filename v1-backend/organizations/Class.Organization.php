@@ -22,6 +22,7 @@ class Organization extends AbstractEntity
 	const CITY_FIELD_NAME = 'city';
 	const COUNTRY_FIELD_NAME = 'country';
 	const TARIFF_FIELD_NAME = 'tariff';
+	const INTERESTS_FIELD_NAME = 'interests';
 
 	const IMAGES_PATH = 'organizations_images/';
 	const IMAGE_SIZE_LARGE = '/large/';
@@ -428,6 +429,23 @@ class Organization extends AbstractEntity
 				}
 				$result_data[Organization::PRIVILEGES_FIELD_NAME] = array($_array);
 			}
+		}
+
+		if (isset($fields[Organization::INTERESTS_FIELD_NAME])) {
+			if (!$user->isAdmin($this)) throw new PrivilegesException('', $this->db);
+			$q_get_interests = App::queryFactory()->newSelect();
+			$q_get_interests->from('view_organization_auditory_interests')
+				->cols(array(
+					'topic_id',
+					'topic_name',
+					'value::NUMERIC'
+				))
+				->where('organization_id = ?', $this->getId());
+			$res = App::DB()->prepareExecute($q_get_interests, 'CANT_GET_INTERESTS');
+
+
+			$result_data[self::INTERESTS_FIELD_NAME] = $res->fetchAll();
+
 		}
 
 
