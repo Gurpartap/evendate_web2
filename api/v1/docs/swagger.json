@@ -3622,7 +3622,11 @@
           "$ref": "#/definitions/Tariff"
         },
         "[interests]": {
-          "type": "array"
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int64"
+          }
         }
       }
     },
@@ -3676,7 +3680,11 @@
           }
         },
         "[interests]": {
-          "type": "array"
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int64"
+          }
         }
       }
     },

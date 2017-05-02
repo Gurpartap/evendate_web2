@@ -260,7 +260,7 @@ AbstractEditEventPage = extending(Page, (function() {
 						display_name: organization.name
 					}));
 				});
-				if (!selected_address) {
+				if (selected_id && !selected_address) {
 					return __APP.changeState('/', true, true);
 				}
 				
