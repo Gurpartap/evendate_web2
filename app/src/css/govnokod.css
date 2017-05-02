@@ -71,10 +71,7 @@
 	color: #ffffff;
 }
 .uk-notify-message > .close {
-	visibility: hidden;
-}
-.uk-notify-message:hover > .close {
-	visibility: visible;
+	display: none;
 }
 
 /* ========================================================================

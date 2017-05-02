@@ -147,6 +147,7 @@ SearchPage = extending(Page, (function() {
 	SearchPage.prototype.render = function() {
 		var data = {};
 		
+		$('.TopBarOverlay').addClass('-open_search_bar');
 		this.$search_bar_input.val(this.search_string);
 		
 		data.events = SearchPage.buildEventCards(this.search_results.events);
@@ -158,6 +159,11 @@ SearchPage = extending(Page, (function() {
 		
 		this.$wrapper.append(tmpl('search-wrapper', data));
 		this.init();
+	};
+	
+	SearchPage.prototype.destroy = function() {
+		$('.TopBarOverlay').removeClass('-open_search_bar');
+		this.$search_bar_input.val('');
 	};
 	
 	return SearchPage;

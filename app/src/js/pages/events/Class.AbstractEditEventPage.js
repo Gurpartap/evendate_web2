@@ -260,6 +260,9 @@ AbstractEditEventPage = extending(Page, (function() {
 						display_name: organization.name
 					}));
 				});
+				if (selected_id && !selected_address) {
+					return __APP.changeState('/', true, true);
+				}
 				
 				$select.append(organizations_options).select2({
 					containerCssClass: 'form_select2',

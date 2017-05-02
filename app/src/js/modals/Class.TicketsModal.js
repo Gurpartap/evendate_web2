@@ -27,7 +27,7 @@ TicketsModal = extending(AbstractModal, (function() {
 		} else {
 			throw Error('Constructor needs instance of OneExtendedTicket class to create new instance of TicketsModal');
 		}
-		this.width = 450;
+		//this.width = 450;
 	}
 	/**
 	 *
@@ -51,7 +51,7 @@ TicketsModal = extending(AbstractModal, (function() {
 		}));
 		
 		this.__render({
-			width: this.width,
+			//width: this.width,
 			content_classes: [__C.CLASSES.MODAL_STATES.NO_PADDING]
 		});
 		
