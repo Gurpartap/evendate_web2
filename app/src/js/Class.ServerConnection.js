@@ -101,6 +101,7 @@ ServerConnection = (function() {
 	ServerConnection.prototype.dealAjax = function(http_method, url, ajax_data, content_type, success, error) {
 		ajax_data = ajax_data || {};
 		var jqXHR;
+		
 		if (ajax_data.fields instanceof Fields){
 			ajax_data.fields = ajax_data.fields.toString();
 		}
@@ -111,9 +112,10 @@ ServerConnection = (function() {
 			contentType: content_type || 'application/x-www-form-urlencoded; charset=UTF-8'
 		});
 		this.current_connections.push(jqXHR);
+		
 		return jqXHR.fail(error).then(function(response, status_text, jqXHR) {
 			ajaxHandler(response, function(data, text) {
-				if (success && typeof success == 'function') {
+				if (success && typeof success === 'function') {
 					success(data);
 				}
 			}, ServerConnection.ajaxErrorHandler);

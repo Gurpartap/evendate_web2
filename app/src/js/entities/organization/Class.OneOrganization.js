@@ -172,20 +172,22 @@ OneOrganization = extending(OneEntity, (function() {
 	 *
 	 * @param {OrganizationModel} new_organization_data
 	 * @param {OneOrganizationCreateOrganizationCallback} [success]
+	 * @param {function} [error]
 	 * @returns {jqPromise}
 	 */
-	OneOrganization.createOrganization = function(new_organization_data, success) {
-		return __APP.SERVER.addData('/api/v1/organizations/', new_organization_data, true, success);
+	OneOrganization.createOrganization = function(new_organization_data, success, error) {
+		return __APP.SERVER.addData('/api/v1/organizations/', new_organization_data, true, success, error);
 	};
 	/**
 	 *
 	 * @param {(string|number)} organization_id
 	 * @param {OrganizationModel} organization_data
 	 * @param {OneOrganizationCreateOrganizationCallback} [success]
+	 * @param {function} [error]
 	 * @returns {jqPromise}
 	 */
-	OneOrganization.updateOrganization = function(organization_id, organization_data, success) {
-		return __APP.SERVER.updateData('/api/v1/organizations/' + organization_id, organization_data, true, success);
+	OneOrganization.updateOrganization = function(organization_id, organization_data, success, error) {
+		return __APP.SERVER.updateData('/api/v1/organizations/' + organization_id, organization_data, true, success, error);
 	};
 	/**
 	 *
@@ -243,7 +245,7 @@ OneOrganization = extending(OneEntity, (function() {
 		var self = this;
 		return OneOrganization.fetchOrganization(self.id, fields, function(data) {
 			self.setData(data);
-			if (success && typeof success == 'function') {
+			if (success && typeof success === 'function') {
 				success.call(self, self);
 			}
 		});
@@ -252,32 +254,34 @@ OneOrganization = extending(OneEntity, (function() {
 	 *
 	 * @param {OrganizationModel} new_organization_data
 	 * @param {OneOrganizationCreateOrganizationCallback} [success]
+	 * @param {function} [error]
 	 * @returns {jqPromise}
 	 */
-	OneOrganization.prototype.createOrganization = function(new_organization_data, success) {
+	OneOrganization.prototype.createOrganization = function(new_organization_data, success, error) {
 		var self = this;
 		return OneOrganization.createOrganization(new_organization_data, function(response_data) {
 			self.setData(new_organization_data);
 			self.id = response_data.organization_id;
-			if (success && typeof success == 'function') {
+			if (success && typeof success === 'function') {
 				success.call(self, self);
 			}
-		});
+		}, error);
 	};
 	/**
 	 *
 	 * @param {OrganizationModel} organization_data
 	 * @param {OneOrganizationCreateOrganizationCallback} [success]
+	 * @param {function} [error]
 	 * @returns {jqPromise}
 	 */
-	OneOrganization.prototype.updateOrganization = function(organization_data, success) {
+	OneOrganization.prototype.updateOrganization = function(organization_data, success, error) {
 		var self = this;
 		return OneOrganization.updateOrganization(self.id, organization_data, function(response_data) {
 			self.setData(organization_data);
-			if (success && typeof success == 'function') {
+			if (success && typeof success === 'function') {
 				success.call(self, self);
 			}
-		});
+		}, error);
 	};
 	/**
 	 *

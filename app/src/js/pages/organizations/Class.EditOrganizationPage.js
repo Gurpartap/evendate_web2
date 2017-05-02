@@ -35,6 +35,11 @@ EditOrganizationPage = extending(AbstractEditOrganizationPage, (function() {
 		var self = this,
 			additional_fields;
 		
+		if (this.organization.role === OneUser.ROLE.USER) {
+			debugger;
+			return __APP.changeState('/', true, true);
+		}
+		
 		this.adding_is_over = true;
 		additional_fields = $.extend(true, {}, this.organization);
 		

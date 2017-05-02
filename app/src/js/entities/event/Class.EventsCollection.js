@@ -136,7 +136,7 @@ EventsCollection = extending(EntitiesCollection, (function() {
 	};
 	/**
 	 *
-	 * @param {(Array|string)} [fields]
+	 * @param {(Fields|Array|string)} [fields]
 	 * @param {(number|string)} [length]
 	 * @param {EventsCollectionAJAXCallback} [success]
 	 * @returns {jqPromise}
@@ -179,7 +179,7 @@ EventsCollection = extending(EntitiesCollection, (function() {
 	/**
 	 *
 	 * @param {(number|string)} organization_id
-	 * @param {(Array|string)} [fields]
+	 * @param {(Fields|Array|string)} [fields]
 	 * @param {(number|string)} [length]
 	 * @param {EventsCollectionAJAXCallback} [success]
 	 * @returns {jqPromise}

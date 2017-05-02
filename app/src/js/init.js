@@ -44,7 +44,9 @@ if (checkRedirect()) {
 			Pace.restart()
 		})
 		.ajaxError(function(event, jqxhr, settings, thrownError) {
-			if (!(thrownError && thrownError == 'abort')) {
+			if (thrownError && thrownError === 'Forbidden') {
+				__APP.changeState('/', true, true);
+			} else if (!(thrownError && thrownError === 'abort')) {
 				ServerConnection.ajaxErrorHandler(event, jqxhr, settings, thrownError);
 			}
 		})
@@ -134,6 +136,13 @@ if (checkRedirect()) {
 					__APP.reInit();
 				}
 			});
+			
+			if (isNotDesktop()) {
+				$('.DownloadAppBand').addClass('-open_band');
+				$('.CloseDownloadAppBand').one('click', function() {
+					$('.DownloadAppBand').removeClass('-open_band');
+				});
+			}
 			
 			user_jqhxr = __APP.USER.fetchUser(new Fields(
 				'email',
