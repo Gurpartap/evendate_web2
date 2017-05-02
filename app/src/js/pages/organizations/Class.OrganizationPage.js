@@ -24,9 +24,11 @@ OrganizationPage = extending(Page, (function() {
 		 */
 		var	event_type_default = {
 			last_date: '',
+			block_scroll: false,
 			is_upload_disabled: false
 		};
-		Page.apply(this, arguments);
+		Page.call(this);
+		
 		this.fields = new Fields(
 			'img_small_url',
 			'background_medium_img_url',
@@ -60,7 +62,6 @@ OrganizationPage = extending(Page, (function() {
 		
 		/**
 		 * @name OrganizationPage#event_types
-		 * @type object
 		 * @enum {OrganizationPage~EventType}
 		 */
 		this.event_types = {
@@ -86,7 +87,8 @@ OrganizationPage = extending(Page, (function() {
 			})
 		};
 		
-		this.events_load = 0;
+		this.current_tab = this.event_types.future.name;
+		this.is_admin = false;
 		this.future_events = new FutureEventsCollection();
 		this.past_events = new PastEventsCollection();
 		this.delayed_events = new DelayedEventsCollection();
@@ -99,80 +101,74 @@ OrganizationPage = extending(Page, (function() {
 	 */
 	OrganizationPage.prototype.fetchData = function() {
 		var self = this;
+		
 		return this.fetching_data_defer = this.organization.fetchOrganization(this.fields).done(function(data) {
-			self.is_admin = self.organization.role != OneUser.ROLE.USER;
-			self.max_events_load = self.is_admin ? 4 : 2;
+			self.is_admin = self.organization.role !== OneUser.ROLE.USER;
 		}).promise();
 	};
 	/**
 	 *
 	 * @param {OrganizationPage~EventType} type
-	 * @param {Array<OneEvent>} events
-	 * @returns {jQuery}
+	 * @param {function} [success]
 	 */
-	OrganizationPage.prototype.appendEvents = function(type, events) {
-		var $wrapper = this.$wrapper.find('.' + type.name.capitalize() + 'Events'),
+	OrganizationPage.prototype.fetchAndAppendFeed = function(type, success) {
+		var PAGE = this,
+			$wrapper,
+			$loader,
 			$output;
 		
-		if (events.length) {
-			$output = __APP.BUILD.eventBlocks(events, type);
-		} else {
-			type.is_upload_disabled = true;
-			$(window).off(type.scroll_event);
-			$output = tmpl('organization-feed-no-event', {
-				text: 'Больше событий нет :('
-			});
-		}
-		$wrapper.append($output);
-		return $output;
-	};
-	/**
-	 *
-	 * @param {OrganizationPage~EventType} type
-	 */
-	OrganizationPage.prototype.bindUploadEventsOnScroll = function(type) {
-		var PAGE = this,
-			$window = $(window),
-			scrollEvent = function() {
-				if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !type.is_upload_disabled) {
-					$window.off(type.scroll_event);
-					PAGE[type.name + '_events'].fetchOrganizationsFeed(PAGE.organization.id, PAGE.events_fields, 10, function(events) {
-						PAGE.bindFeedEvents(PAGE.appendEvents(type, events));
-						$window.on(type.scroll_event, scrollEvent);
+		if (!type.is_upload_disabled && !type.block_scroll) {
+			$wrapper = this.$wrapper.find('.' + type.name.capitalize() + 'Events');
+			$loader = __APP.BUILD.loaderBlock($wrapper);
+			
+			type.block_scroll = true;
+			PAGE[type.name + '_events'].fetchOrganizationsFeed(PAGE.organization.id, PAGE.events_fields, 10, function(events) {
+				$loader.remove();
+				type.block_scroll = false;
+				if (events.length) {
+					$output = __APP.BUILD.eventBlocks(events, type);
+				} else {
+					type.is_upload_disabled = true;
+					$output = tmpl('organization-feed-no-event', {
+						text: 'Больше событий нет :('
 					});
 				}
-			};
-		
-		if (!type.is_upload_disabled) {
-			$window.on(type.scroll_event, scrollEvent);
+				$wrapper.append($output);
+				PAGE.bindFeedEvents($output);
+				
+				if (isFunction(success)) {
+					success();
+				}
+			});
 		}
 	};
 	
 	OrganizationPage.prototype.bindFeedEvents = function($parent) {
 		bindRippleEffect($parent);
 		trimAvatarsCollection($parent);
-		__APP.MODALS.bindCallModal($parent);
+		bindCallModal($parent);
 		bindPageLinks($parent);
 	};
 	
 	OrganizationPage.prototype.init = function() {
 		var PAGE = this,
 			$subscribers_scroll;
+		
 		bindTabs(PAGE.$wrapper);
-		PAGE.bindFeedEvents(PAGE.$wrapper);
-		__APP.MODALS.bindCallModal(PAGE.$wrapper);
+		bindCallModal(PAGE.$wrapper);
 		
 		PAGE.$wrapper.find('.Tabs').on('change.tabs', function() {
-			var scroll_events = [];
-			$.each(PAGE.event_types, function() {
-				scroll_events.push(this.scroll_event);
-			});
-			$(window).off(scroll_events.join(' '));
-			PAGE.bindUploadEventsOnScroll(PAGE.event_types[$(this).find('.Tab.-active').data('type')]);
+			PAGE.current_tab = $(this).find('.Tab.-active').data('type');
 		});
 		
 		PAGE.$wrapper.find('.ExternalPage').on('click.sendStat', function() {
 			storeStat(PAGE.organization.id, __C.STATS.ORGANIZATION_ENTITY, __C.STATS.ORGANIZATION_OPEN_SITE);
+		});
+		
+		$(window).on('scroll.uploadEvents', function() {
+			if (isScrollRemain(200)) {
+				PAGE.fetchAndAppendFeed(PAGE.event_types[PAGE.current_tab]);
+			}
 		});
 		
 		$subscribers_scroll = PAGE.$wrapper.find('.SubscribersScroll').scrollbar({
@@ -198,10 +194,10 @@ OrganizationPage = extending(Page, (function() {
 	OrganizationPage.prototype.render = function() {
 		var PAGE = this,
 			organization = new OneOrganization(PAGE.organization.id);
+		
 		organization.setData(PAGE.organization);
 		__APP.changeTitle(organization.short_name);
-		organization.short_name = undefined;
-		$('.SidebarOrganizationsList').find('[data-organization_id="' + organization.id + '"]').find('.OrganizationCounter').addClass(__C.CLASSES.HIDDEN);
+		__APP.SIDEBAR.$subscribed_orgs.find('[data-organization_id="' + organization.id + '"]').find('.OrganizationCounter').addClass(__C.CLASSES.HIDDEN);
 		PAGE.$wrapper.html(tmpl('organization-wrapper', $.extend(true, {
 			background_image: organization.background_img_url ? tmpl('organization-background-image', organization) : '',
 			avatar_block: __APP.BUILD.avatarBlocks(organization, {
@@ -220,7 +216,7 @@ OrganizationPage = extending(Page, (function() {
 				classes: [__C.CLASSES.SIZES.LOW, __C.CLASSES.SIZES.WIDE, __C.CLASSES.HOOKS.RIPPLE]
 			}),
 			has_address: organization.default_address ? '' : __C.CLASSES.HIDDEN,
-			redact_org_button: (organization.role == OneUser.ROLE.ADMIN) ? __APP.BUILD.link({
+			redact_org_button: (organization.role === OneUser.ROLE.ADMIN) ? __APP.BUILD.link({
 					title: __LOCALES.ru_RU.TEXTS.BUTTON.EDIT,
 					classes: ['button', __C.CLASSES.SIZES.WIDE, __C.CLASSES.COLORS.NEUTRAL, __C.CLASSES.ICON_CLASS, __C.CLASSES.ICONS.PENCIL, __C.CLASSES.HOOKS.RIPPLE],
 					page: '/admin/organization/' + organization.id + '/edit/'
@@ -229,38 +225,14 @@ OrganizationPage = extending(Page, (function() {
 			subscribed_blocks: __APP.BUILD.subscribers(organization.subscribed)
 		}, organization)));
 		
-		PAGE.$wrapper.on('events_load.FutureEvents events_load.PastEvents events_load.DelayedEvents events_load.CanceledEvents', function(e) {
-			if (e.namespace == 'FutureEvents') {
-				PAGE.init();
-				PAGE.bindUploadEventsOnScroll(PAGE.event_types.future);
-			}
-			PAGE.bindFeedEvents(PAGE.$wrapper.find('.' + e.namespace));
-			if (++PAGE.events_load == PAGE.max_events_load) {
-				PAGE.$wrapper.off('events_load');
-			}
-		});
+		PAGE.init();
 		
-		
-		PAGE.future_events.fetchOrganizationsFeed(organization.id, PAGE.events_fields, 10, function(future_events) {
-			PAGE.appendEvents(PAGE.event_types.future, future_events);
-			PAGE.$wrapper.trigger('events_load.FutureEvents');
-		});
-		
-		PAGE.past_events.fetchOrganizationsFeed(organization.id, PAGE.events_fields, 10, function(past_events) {
-			PAGE.appendEvents(PAGE.event_types.past, past_events);
-			PAGE.$wrapper.trigger('events_load.PastEvents');
-		});
+		PAGE.fetchAndAppendFeed(PAGE.event_types.future);
+		PAGE.fetchAndAppendFeed(PAGE.event_types.past);
 		
 		if (PAGE.is_admin) {
-			PAGE.delayed_events.fetchOrganizationsFeed(organization.id, PAGE.events_fields, 10, function(delayed_events) {
-				PAGE.appendEvents(PAGE.event_types.delayed, delayed_events);
-				PAGE.$wrapper.trigger('events_load.DelayedEvents');
-			});
-			
-			PAGE.canceled_events.fetchOrganizationsFeed(organization.id, PAGE.events_fields, 10, function(canceled_events) {
-				PAGE.appendEvents(PAGE.event_types.canceled, canceled_events);
-				PAGE.$wrapper.trigger('events_load.CanceledEvents');
-			});
+			PAGE.fetchAndAppendFeed(PAGE.event_types.delayed);
+			PAGE.fetchAndAppendFeed(PAGE.event_types.canceled);
 		}
 	};
 	

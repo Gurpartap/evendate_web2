@@ -114,11 +114,11 @@ $url_parts = explode('/', $url);
 
 	<?php
 	if ($DEBUG_MODE) { ?>
-    <link rel="stylesheet" href="/dist/vendor.css?rev=222849f37da65362cea21d1f6c065d96">
-    <link rel="stylesheet" href="/dist/app.css?rev=9a4b70a5c98ba9c76093bc210aa44c9d"><?php
+    <link rel="stylesheet" href="/dist/vendor.css?rev=01881479bb2749e6ec6019158d9d6ff3">
+    <link rel="stylesheet" href="/dist/app.css?rev=8cc529895bebf2a5a5d650b48f0061a5"><?php
 	} else { ?>
-    <link rel="stylesheet" href="/dist/vendor.min.css?rev=65126fe9feeec91a1ea52b34ce76d797">
-    <link rel="stylesheet" href="/dist/app.min.css?rev=225d163f1b4e412d2b3c8f3ff85ebeae"><?php
+    <link rel="stylesheet" href="/dist/vendor.min.css?rev=e46d174772066f6b572327c83c31b57f">
+    <link rel="stylesheet" href="/dist/app.min.css?rev=522c90f11186862e37f60d379ff5f216"><?php
 	} ?>
 
 	<?php
@@ -200,47 +200,117 @@ $url_parts = explode('/', $url);
 </head>
 
 <body>
+
+<aside id="main_sidebar" class="-unselectable">
+	<a href="/" class="brand_block link Link">
+		<svg width="135px" height="24.70001px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 135 24.70001">
+			<path id="evendate_logo_text" transform="translate(-2.375 -0.69998)" fill="#9fa6b3"
+						d="M18.675,16.4c0-5.3-3-8.5-8.1-8.5a8.42015,8.42015,0,0,0-8.2,8.7,8.38058,8.38058,0,0,0,8.5,8.8,7.55515,7.55515,0,0,0,7.5-5.2l-3.7-1.2a3.57051,3.57051,0,0,1-3.7,2.5,3.98288,3.98288,0,0,1-4.1-3.7h11.7A13.80487,13.80487,0,0,0,18.675,16.4Zm-11.8-1.6a3.55717,3.55717,0,0,1,3.7-3.2,3.363,3.363,0,0,1,3.7,3.2h-7.4Zm24.3-6.3-3.9,11-4.1-11h-4.9l6.7,16.4h4.4l6.5-16.4h-4.7Zm20.6,7.9c0-5.3-3-8.5-8.1-8.5a8.25038,8.25038,0,0,0-8.1,8.6,8.38058,8.38058,0,0,0,8.5,8.8,7.55522,7.55522,0,0,0,7.5-5.2l-3.8-1.1a3.57051,3.57051,0,0,1-3.7,2.5,3.98293,3.98293,0,0,1-4.1-3.7h11.7A13.79661,13.79661,0,0,0,51.775,16.4Zm-11.7-1.6a3.55712,3.55712,0,0,1,3.7-3.2,3.36289,3.36289,0,0,1,3.7,3.2h-7.4ZM62.975,8a5.385,5.385,0,0,0-4.7,2.5v-2h-4.3V24.9h4.4V15.4c0-1.9,1.1-3.4,3.1-3.4,2.1,0,3,1.4,3,3.3v9.6h4.4V14.5C68.875,10.9,66.975,8,62.975,8Zm24.8,13.9V0.7h-4.4v9.4c-0.5-.9-1.8-2-4.6-2-4.6,0-7.9,3.8-7.9,8.6,0,5,3.3,8.6,8,8.6a5.101,5.101,0,0,0,4.6-2.3,7.75394,7.75394,0,0,0,.2,1.9h4.2A26.28237,26.28237,0,0,1,87.775,21.9Zm-8.3-.6c-2.4,0-4.1-1.8-4.1-4.7s1.8-4.6,4.1-4.6,4,1.6,4,4.6S81.675,21.3,79.475,21.3Zm25.2,1V14.2c0-3.3-1.9-6.2-7.1-6.2-4.4,0-6.8,2.8-7,5.4l3.9,0.8a2.92541,2.92541,0,0,1,3.1-2.7c1.9,0,2.8,1,2.8,2.1a1.19858,1.19858,0,0,1-1.2,1.2l-4,.6c-2.8.4-5,2-5,5,0,2.6,2.1,4.9,5.6,4.9a5.40058,5.40058,0,0,0,4.8-2.4,12.30577,12.30577,0,0,0,.2,2h4.1A18.36784,18.36784,0,0,1,104.675,22.3Zm-4.3-4.2c0,3-1.8,3.9-3.6,3.9a1.89565,1.89565,0,0,1-2.1-1.9,2.094,2.094,0,0,1,2-2.1l3.7-.6v0.7Zm16.3-5.8V8.5h-3.3V3.6h-4.1V5.9a2.33883,2.33883,0,0,1-2.5,2.6h-0.8v3.9h3V20c0,3.2,2,5.1,5.2,5.1a5.9567,5.9567,0,0,0,2.5-.4V21a4.92317,4.92317,0,0,1-1.4.1,1.61828,1.61828,0,0,1-1.9-1.9V12.3h3.3Zm17.2,4.1a10.91279,10.91279,0,0,0-.47-3.3h-0.03a5.49026,5.49026,0,0,1-5.47-4.98,9.60458,9.60458,0,0,0-2.13-.22,8.25043,8.25043,0,0,0-8.1,8.6,8.38058,8.38058,0,0,0,8.5,8.8,7.55517,7.55517,0,0,0,7.5-5.2l-3.8-1.1a3.57051,3.57051,0,0,1-3.7,2.5,3.98284,3.98284,0,0,1-4.1-3.7h11.7A13.80487,13.80487,0,0,0,133.875,16.4Zm-11.7-1.6a3.55721,3.55721,0,0,1,3.7-3.2,3.363,3.363,0,0,1,3.7,3.2h-7.4Z"></path>
+			<circle id="evendate_logo_dot" cx="131" cy="6.90002" r="4" fill="#f82969"></circle>
+		</svg>
+		<img class="brand" src="/app/img/brand.png?v=f7ff6c58ee76c1a3a7ed091510e9e288">
+	</a>
+
+	<div class="sidebar_main_wrapper scrollbar-outer SidebarScroll">
+		<nav class="sidebar_navigation SidebarNav"><?php
+			if ($is_user_editor) { ?>
+				<a href="/admin" class="sidebar_navigation_item SidebarNavItem link Link"><span>Администрирование</span></a>
+				<a href="/add/event" class="sidebar_navigation_item SidebarNavItem link Link"><span>Создать событие</span></a><?php
+			} ?>
+			<a href="/feed" class="sidebar_navigation_item SidebarNavItem link Link"><span>События</span><span
+					class="counter sidebar_navigation_counter -hidden SidebarNavFeedCounter"></span></a>
+			<a href="/organizations"
+				 class="sidebar_navigation_item SidebarNavItem link Link"><span>Организаторы</span></a><?php
+			if (!$is_user_not_auth) { ?>
+				<a href="/my/profile" class="sidebar_navigation_item SidebarNavItem link Link"><span>Мой профиль</span></a>
+				<a href="/my/tickets" class="sidebar_navigation_item SidebarNavItem link Link"><span>Мои билеты</span></a><?php
+			} ?>
+		</nav>
+		<hr class="sidebar_divider">
+		<div class="sidebar_organizations_wrapper scrollbar-outer SidebarOrganizationsScroll"><?php
+			if (!$is_user_not_auth) { ?>
+				<div class="sidebar_wrapper">
+					<span class="sidebar_section_heading">Подписки</span>
+					<div class="sidebar_organizations_list SidebarOrganizationsList"></div>
+				</div><?php
+			} ?>
+		</div>
+		<div class="sidebar_links">
+			<a href="/landing.php" class="link">О нас</a>
+			<a href="/organization.php" class="link">Стать организатором</a>
+			<a href="//evendate.ru/docs/terms.pdf" class="link">Условия пользования</a>
+			<a href="//evendate.ru/docs/useragreement.pdf" class="link">Пользовательское соглашение</a>
+			<p>Evendate 2015-<?= (new DateTimeImmutable())->format('Y'); ?></p>
+		</div>
+	</div>
+
+</aside>
+
 <div id="main_overlay">
   <header id="main_header">
     <div id="main_header_top">
-      <div class="page_wrapper">
-        <div class="main_header_wrapper">
-          <div id="page_title" class="-unselectable"></div>
-          <div id="search_bar">
-            <input id="search_bar_input" class="search-input" type="text"
-                   placeholder="Поиск мероприятий, организаторов и друзей">
-            <label class="search_block_icon fa_icon fa-search -empty" for="search_bar_input"></label>
-            <button class="search_block_icon adv_search_button fa_icon fa-sliders -empty -hidden"
-                    type="button"></button>
-          </div>
-        </div><?php
+			<div class="page_wrapper">
+				<div id="main_header_overlay" class="TopBarOverlay">
+
+					<div class="main_header_wrapper">
+
+						<button id="sidebar_burger" class="header_button fa_icon fa-bars -empty SidebarBurger"></button>
+						<div id="page_title" class="-unselectable"></div>
+
+					</div>
+					<div class="main_header_wrapper">
+
+						<div id="search_block" class="TopBarSearchBar">
+							<div id="search_bar">
+								<input id="search_bar_input" class="form_input -rounded TopBarSearchInput" type="text" placeholder="Поиск мероприятий и организаторов">
+								<button id="search_block_button" class="header_button fa_icon fa-search -empty TopBarSearchButton" type="button"></button>
+							</div>
+						</div><?php
+
+						if ($is_user_not_auth) { ?>
+							<div id="header_login_block">
+								<button class="button login_button -size_low -color_neutral_accent RippleEffect LoginButton" type="button">
+									<span class="Text">Войти</span>
+								</button>
+							</div><?php
+						} else { ?>
+							<div id="user_bar" class="-unselectable">
+								<a class="avatar -size_40x40 -rounded -bordered Link" href="/my/profile"><img src="<?= $user->getAvatarUrl() ?>" title="<?= $user_full_name ?>"></a>
+							</div><?php
+						} ?>
+
+					</div>
+
+				</div>
+			</div>
+
+			<div class="page_wrapper -hidden">
+				<div id="title">
+					<button class="sidebar_burger fa_icon fa-bars -empty"></button>
+					<div id="page_title" class="-unselectable"></div>
+				</div>
+				<div id="search_bar_wrapper">
+					<button class="search_block_icon fa_icon fa-search -empty"></button>
+					<div id="search_bar">
+						<input id="search_bar_input" class="form_input -rounded" type="text" placeholder="Поиск мероприятий, организаторов и друзей">
+						<button class="search_block_icon adv_search_button fa_icon fa-sliders -empty -hidden" type="button"></button>
+					</div>
+				</div><?php
 				if ($is_user_not_auth) { ?>
-          <div id="header_login_block">
-            <button class="button login_button -size_low -color_neutral_accent RippleEffect LoginButton" type="button">
-              <span class="Text">Войти</span>
-            </button>
-          </div><?php
+					<div id="header_login_block">
+						<button class="button login_button -size_low -color_neutral_accent RippleEffect LoginButton" type="button">
+							<span class="Text">Войти</span>
+						</button>
+					</div><?php
 				} else { ?>
-          <div id="user_bar" class="-unselectable">
-          <div class="avatar_block -align_right -size_small">
-            <span class="avatar_name" title="<?= $user_full_name ?>"><?= $user_full_name ?></span>
-            <div class="avatar -rounded -bordered"><img src="<?= $user->getAvatarUrl() ?>"></div>
-          </div>
-          <div class="user_bar_forhead">
-            <div class="avatar_block -align_right -size_small">
-              <span class="avatar_name" title="<?= $user_full_name ?>"><?= $user_full_name ?></span>
-              <div class="avatar -rounded -bordered"><img src="<?= $user->getAvatarUrl() ?>"></div>
-            </div>
-            <div class="user_bar_buttons">
-              <button class="button -color_neutral RippleEffect OpenSettingsButton" type="button"><span
-                    class="Text fa_icon fa-cog">Настройки</span></button>
-              <button class="button -color_neutral_accent RippleEffect LogoutButton" type="button"><span class="Text">Выйти</span>
-              </button>
-            </div>
-          </div>
-          </div><?php
+					<a id="user_bar" href="/my/profile" class="-unselectable link Link">
+						<div class="avatar_block -align_right -size_small">
+							<span class="avatar_name" title="<?= $user_full_name ?>"><?= $user_full_name ?></span>
+							<div class="avatar -rounded -bordered"><img src="<?= $user->getAvatarUrl() ?>"></div>
+						</div>
+					</a><?php
 				} ?>
-      </div>
+			</div>
     </div>
     <div id="main_header_bottom">
       <div class="page_wrapper HeaderTabsWrapper"></div>
@@ -251,54 +321,19 @@ $url_parts = explode('/', $url);
     <div class="app_view -hidden PageView">
       <div class="page_wrapper Content -fadeable"></div>
     </div>
+		<div id="main_section_cap" class="MainSectionCap"></div>
 
   </div>
 </div>
 
-<aside id="main_sidebar" class="-unselectable">
-  <a href="/" class="brand_block link Link">
-    <svg width="135px" height="24.70001px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 135 24.70001">
-      <path id="evendate_logo_text" transform="translate(-2.375 -0.69998)" fill="#9fa6b3"
-            d="M18.675,16.4c0-5.3-3-8.5-8.1-8.5a8.42015,8.42015,0,0,0-8.2,8.7,8.38058,8.38058,0,0,0,8.5,8.8,7.55515,7.55515,0,0,0,7.5-5.2l-3.7-1.2a3.57051,3.57051,0,0,1-3.7,2.5,3.98288,3.98288,0,0,1-4.1-3.7h11.7A13.80487,13.80487,0,0,0,18.675,16.4Zm-11.8-1.6a3.55717,3.55717,0,0,1,3.7-3.2,3.363,3.363,0,0,1,3.7,3.2h-7.4Zm24.3-6.3-3.9,11-4.1-11h-4.9l6.7,16.4h4.4l6.5-16.4h-4.7Zm20.6,7.9c0-5.3-3-8.5-8.1-8.5a8.25038,8.25038,0,0,0-8.1,8.6,8.38058,8.38058,0,0,0,8.5,8.8,7.55522,7.55522,0,0,0,7.5-5.2l-3.8-1.1a3.57051,3.57051,0,0,1-3.7,2.5,3.98293,3.98293,0,0,1-4.1-3.7h11.7A13.79661,13.79661,0,0,0,51.775,16.4Zm-11.7-1.6a3.55712,3.55712,0,0,1,3.7-3.2,3.36289,3.36289,0,0,1,3.7,3.2h-7.4ZM62.975,8a5.385,5.385,0,0,0-4.7,2.5v-2h-4.3V24.9h4.4V15.4c0-1.9,1.1-3.4,3.1-3.4,2.1,0,3,1.4,3,3.3v9.6h4.4V14.5C68.875,10.9,66.975,8,62.975,8Zm24.8,13.9V0.7h-4.4v9.4c-0.5-.9-1.8-2-4.6-2-4.6,0-7.9,3.8-7.9,8.6,0,5,3.3,8.6,8,8.6a5.101,5.101,0,0,0,4.6-2.3,7.75394,7.75394,0,0,0,.2,1.9h4.2A26.28237,26.28237,0,0,1,87.775,21.9Zm-8.3-.6c-2.4,0-4.1-1.8-4.1-4.7s1.8-4.6,4.1-4.6,4,1.6,4,4.6S81.675,21.3,79.475,21.3Zm25.2,1V14.2c0-3.3-1.9-6.2-7.1-6.2-4.4,0-6.8,2.8-7,5.4l3.9,0.8a2.92541,2.92541,0,0,1,3.1-2.7c1.9,0,2.8,1,2.8,2.1a1.19858,1.19858,0,0,1-1.2,1.2l-4,.6c-2.8.4-5,2-5,5,0,2.6,2.1,4.9,5.6,4.9a5.40058,5.40058,0,0,0,4.8-2.4,12.30577,12.30577,0,0,0,.2,2h4.1A18.36784,18.36784,0,0,1,104.675,22.3Zm-4.3-4.2c0,3-1.8,3.9-3.6,3.9a1.89565,1.89565,0,0,1-2.1-1.9,2.094,2.094,0,0,1,2-2.1l3.7-.6v0.7Zm16.3-5.8V8.5h-3.3V3.6h-4.1V5.9a2.33883,2.33883,0,0,1-2.5,2.6h-0.8v3.9h3V20c0,3.2,2,5.1,5.2,5.1a5.9567,5.9567,0,0,0,2.5-.4V21a4.92317,4.92317,0,0,1-1.4.1,1.61828,1.61828,0,0,1-1.9-1.9V12.3h3.3Zm17.2,4.1a10.91279,10.91279,0,0,0-.47-3.3h-0.03a5.49026,5.49026,0,0,1-5.47-4.98,9.60458,9.60458,0,0,0-2.13-.22,8.25043,8.25043,0,0,0-8.1,8.6,8.38058,8.38058,0,0,0,8.5,8.8,7.55517,7.55517,0,0,0,7.5-5.2l-3.8-1.1a3.57051,3.57051,0,0,1-3.7,2.5,3.98284,3.98284,0,0,1-4.1-3.7h11.7A13.80487,13.80487,0,0,0,133.875,16.4Zm-11.7-1.6a3.55721,3.55721,0,0,1,3.7-3.2,3.363,3.363,0,0,1,3.7,3.2h-7.4Z"></path>
-      <circle id="evendate_logo_dot" cx="131" cy="6.90002" r="4" fill="#f82969"></circle>
-    </svg>
-    <img class="brand" src="/app/img/brand.png?v=f7ff6c58ee76c1a3a7ed091510e9e288">
-  </a>
-
-  <div class="sidebar_main_wrapper scrollbar-outer SidebarScroll">
-    <nav class="sidebar_navigation SidebarNav"><?php
-			if ($is_user_editor) { ?>
-				<a href="/admin" class="sidebar_navigation_item SidebarNavItem link Link"><span>Администрирование</span></a>
-				<a href="/add/event" class="sidebar_navigation_item SidebarNavItem link Link"><span>Создать событие</span></a><?php
-			} ?>
-      <a href="/feed" class="sidebar_navigation_item SidebarNavItem link Link"><span>События</span><span
-            class="counter sidebar_navigation_counter -hidden SidebarNavFeedCounter"></span></a>
-      <a href="/organizations"
-         class="sidebar_navigation_item SidebarNavItem link Link"><span>Организаторы</span></a><?php
-			if (!$is_user_not_auth) { ?>
-        <a href="/my/profile" class="sidebar_navigation_item SidebarNavItem link Link"><span>Мой профиль</span></a>
-        <a href="/my/tickets" class="sidebar_navigation_item SidebarNavItem link Link"><span>Мои билеты</span></a><?php
-			} ?>
-    </nav>
-    <hr class="sidebar_divider">
-    <div class="sidebar_organizations_wrapper scrollbar-outer SidebarOrganizationsScroll"><?php
-			if (!$is_user_not_auth) { ?>
-        <div class="sidebar_wrapper">
-          <span class="sidebar_section_heading">Подписки</span>
-          <div class="sidebar_organizations_list SidebarOrganizationsList"></div>
-        </div><?php
-			} ?>
-    </div>
-    <div class="sidebar_links">
-      <a href="/landing.php" class="link">О нас</a>
-      <a href="/organization.php" class="link">Стать организатором</a>
-      <a href="//evendate.ru/docs/terms.pdf" class="link">Условия пользования</a>
-      <a href="//evendate.ru/docs/useragreement.pdf" class="link">Пользовательское соглашение</a>
-      <p>Evendate 2015-<?= (new DateTimeImmutable())->format('Y'); ?></p>
-    </div>
-  </div>
-
-</aside>
+<div id="download_app_band" class="material -floating_material DownloadAppBand">
+	<div id="download_app_wrapper">
+		<span>Скачайте приложение прямо сейчас!</span>
+		<a href="https://itunes.apple.com/us/app/evendate/id1044975200?mt=8" class="button -color_default fa_icon fa-apple -empty"></a>
+		<a href="https://play.google.com/store/apps/details?id=ru.evendate.android" class="button -color_default fa_icon fa-android -empty"></a>
+	</div>
+	<button id="download_app_close_button" class="CloseDownloadAppBand" type="button">&times;</button>
+</div>
 
 <div class="modal_wrapper">
   <div class="modal_destroyer"></div>
@@ -314,11 +349,11 @@ $url_parts = explode('/', $url);
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=23f69fa3a3e48796404492a0b967c604" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=f01f8eea721e30a8485365df1347256f" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=46929e8e46980b349ca51e7add504321" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=8911495fbe7766b5a22fd6e8089f6ed8" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=b79b91e4c50a1ee6199291a7c73fdc74" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=537ecfb5585ab30520089bebfb3cb735" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=592b01601ff005533f0d10586d750b99" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=af168048db957a8ac077aa9133efe0e3" charset="utf-8"></script><?php
 }
 
 foreach (glob("app/templates/{*/*/*/*,*/*/*,*/*,*}.html", GLOB_BRACE) as $filename) {

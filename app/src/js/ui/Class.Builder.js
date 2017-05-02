@@ -574,7 +574,7 @@ Builder = (function() {
 	/**
 	 *
 	 * @param {(OneAbstractActivity|Array<OneAbstractActivity>|UsersActivitiesCollection)} activities
-	 * @param {buildProps} props
+	 * @param {buildProps} [props]
 	 * @return {jQuery}
 	 */
 	Builder.prototype.activity = function buildActivity(activities, props){
@@ -771,7 +771,7 @@ Builder = (function() {
 			type.last_date = m_event_date.format(__C.DATE_FORMAT);
 			
 			return $.extend({}, event, {
-				cover_width: 220,
+				cover_width: 550,
 				divider: different_day ? tmpl('divider', {
 						title: m_event_date.calendar().capitalize()
 					}) : '',
@@ -865,9 +865,10 @@ Builder = (function() {
 	 */
 	Builder.prototype.eventCards = function buildEventCards(events) {
 		var self = this,
-			$events;
+			$events,
+			_events = events instanceof Array ? events : [events];
 		
-		$events = tmpl('feed-event', (events instanceof Array ? events : [events]).map(function(event) {
+		$events = tmpl('feed-event', _events.map(function(event) {
 			var card_cover_width = 405,
 				avatars_collection_classes = [
 					__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
@@ -989,7 +990,7 @@ Builder = (function() {
 			}, event);
 		}));
 		
-		events.forEach(function(event, i) {
+		_events.forEach(function(event, i) {
 			$events.eq(i).appear(function() {
 				storeStat(event.id, __C.STATS.EVENT_ENTITY, __C.STATS.EVENT_VIEW);
 			}, {accY: 100})

@@ -18,14 +18,16 @@ EntitiesCollection = extending(Array, (function() {
 	 * @property {Array<OneEntity>} last_pushed
 	 */
 	function EntitiesCollection() {
-		Object.defineProperty(this, '__lookup', {
-			value: {},
-			writable: true,
-			enumerable: false,
-			configurable: false
-		});
-		Object.defineProperty(this, 'last_pushed', {
-			value: []
+		Object.defineProperties(this, {
+			__lookup: {
+				value: {},
+				writable: true,
+				enumerable: false,
+				configurable: false
+			},
+			'last_pushed': {
+				value: []
+			}
 		});
 	}
 	EntitiesCollection.prototype.ID_PROP_NAME = 'id';

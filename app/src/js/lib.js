@@ -1558,6 +1558,14 @@ function isBase64(string) {
 }
 /**
  *
+ * @param {*} variable
+ * @return {boolean}
+ */
+function isFunction(variable) {
+	return (variable && typeof variable === 'function');
+}
+/**
+ *
  * @param {string} url
  * @param {(AJAXData|string)} [data]
  * @param {string} [content_type='application/x-www-form-urlencoded; charset=UTF-8']
@@ -2251,65 +2259,4 @@ function isScrollRemain(left) {
  */
 function setDefaultValue(variable, default_value) {
 	return variable = typeof variable === 'undefined' ? default_value : variable;
-}
-
-
-/* OLD CODE */
-
-function showSettingsModal() {
-	var $modal = $('#settings-modal');
-	$modal.remove();
-	
-	$.ajax({
-		url: '/api/v1/users/me/settings',
-		type: 'GET',
-		success: function(res) {
-			$modal = tmpl('settings-modal', res.data);
-			$modal
-				.appendTo($('body'))
-				.on('shown.bs.modal', function() {
-					if (res.data.hasOwnProperty('show_to_friends')) {
-						$modal.find('.show-to-friends').prop('checked', res.data.show_to_friends);
-					}
-					if (res.data.hasOwnProperty('notify_in_browser')) {
-						$modal.find('.notify-in-browser').prop('checked', res.data.notify_in_browser);
-					}
-					$modal.find('.notify-in-browser').on('change', function() {
-						var $this = $(this);
-						if ($this.prop('checked')) {
-							if (Notify.needsPermission) {
-								Notify.requestPermission(function() {
-								}, function() {
-									$this.prop('checked', false);
-									showNotifier({
-										status: false,
-										text: 'Мы не можем включить уведомления в браузере. Вы запретили их для нас :('
-									});
-								});
-							}
-						}
-					})
-				})
-				.modal();
-			$modal
-				.find('.save-settings-btn')
-				.off('click')
-				.on('click', function() {
-					var _data = {};
-					$modal.find('input').each(function() {
-						var $this = $(this);
-						_data[$this.attr('name')] = $this.prop('checked');
-					});
-					
-					Pace.ignore(function() {
-						$.ajax({
-							url: '/api/v1/users/me/settings',
-							type: 'PUT',
-							data: _data
-						});
-					});
-					$modal.modal('hide');
-				});
-		}
-	});
 }
