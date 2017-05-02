@@ -230,10 +230,12 @@ __APP = {
 		__APP.CURRENT_PAGE = Page.routeNewPage(pathname);
 		__APP.CURRENT_PAGE.fetchData();
 		__APP.CURRENT_PAGE.show();
-		$sidebar_nav_items.removeClass(__C.CLASSES.ACTIVE)
+		$sidebar_nav_items
+			.removeClass(__C.CLASSES.ACTIVE)
 			.filter(function() {
 				return pathname.indexOf(this.getAttribute('href')) === 0;
-			}).addClass(__C.CLASSES.ACTIVE);
+			})
+			.addClass(__C.CLASSES.ACTIVE);
 	},
 	reInit: function appReInit() {
 		$(window).off('scroll');
