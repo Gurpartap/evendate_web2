@@ -401,6 +401,42 @@ pg.connect(pg_conn_string, function (err, client, done) {
         })
     }
 
+    function updateAuditoryInterests() {
+        let q = Entities.users.select(Entities.users.id).toQuery();
+        client.query(q, function (err, users) {
+            if (err) return handleError(err);
+            let queue = [],
+                q_ins_value = `INSERT INTO auditory_interests(tg_topic_id, user_id, value, created_at)
+             VALUES($1, $2, $3, NOW()) ON CONFLICT (tg_topic_id, user_id) DO UPDATE SET 
+             value = $3, updated_at = NOW()`,
+                q_get_params = UpdateQueries.get_user_interests;
+            users.rows.forEach(function (user) {
+                queue.push(function (callback) {
+                    client.query(q_get_params, [user.id], function (err, res) {
+                        if (err) {
+                            handleError(err);
+                            callback(err);
+                        }
+                        let values_sum = 0;
+                        res.rows.forEach(topic => {
+                            values_sum += parseFloat(topic.value);
+                        });
+
+                        res.rows.forEach(topic => {
+                            let _value = values_sum === 0 ? 0 : (parseFloat(topic.value) / values_sum) * 100;
+                            client.query(q_ins_value, [topic.tg_topic_id, topic.user_id, _value]);
+                        });
+                        callback(null);
+                    })
+                });
+            });
+            async.parallelLimit(queue, 10, function (err, results) {
+                if (err) handleError(err);
+            })
+        })
+
+    }
+
     try {
         new CronJob('*/1 * * * *', function () {
             if (config_index == 'prod' || args.indexOf('--resize-images') !== -1) {
@@ -461,6 +497,15 @@ pg.connect(pg_conn_string, function (err, client, done) {
         logger.error(ex);
     }
 
+//every day at 3:30 am
+    try {
+        new CronJob('30 0 * * *', function () {
+            updateAuditoryInterests();
+        }, null, true);
+    } catch (ex) {
+        logger.error(ex);
+    }
+
     try {
         new CronJob('*/1 * * * *', function () {
             let mailer = new Mailer(transporter, logger);
@@ -488,6 +533,9 @@ pg.connect(pg_conn_string, function (err, client, done) {
     }
     if (args.indexOf('--global-update-recommendations') !== -1) {
         globalUpdateRecommendations();
+    }
+    if (args.indexOf('--update-interests') !== -1) {
+        updateAuditoryInterests();
     }
 
     var ioHandlers = function (socket) {
