@@ -25,7 +25,7 @@ EventsTicketsCollection = extending(EntitiesCollection, (function() {
 		});
 	}
 	
-	EntitiesCollection.prototype.ID_PROP_NAME = 'uuid';
+	EventsTicketsCollection.prototype.ID_PROP_NAME = 'uuid';
 	EventsTicketsCollection.prototype.collection_of = OneTicket;
 	
 	/**
