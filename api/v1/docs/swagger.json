@@ -3620,6 +3620,13 @@
         },
         "[tariff]": {
           "$ref": "#/definitions/Tariff"
+        },
+        "[interests]": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int64"
+          }
         }
       }
     },
@@ -3670,6 +3677,13 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/Organization"
+          }
+        },
+        "[interests]": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       }
