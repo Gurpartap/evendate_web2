@@ -160,12 +160,14 @@ AbstractEditOrganizationPage = extending(Page, (function() {
 					socket.emit('utils.registrationFinished', {
 						uuid: PAGE.$wrapper.find('#add_organization_organization_registration_uuid').val()
 					});
-					socket.on('utils.updateImagesDone', function() {
-						PAGE.$wrapper.removeClass(__C.CLASSES.STATUS.DISABLED);
-						$loader.remove();
-						__APP.changeState('/organization/' + PAGE.organization.id);
-					});
 					socket.emit('utils.updateImages');
+					
+					PAGE.$wrapper.removeClass(__C.CLASSES.STATUS.DISABLED);
+					$loader.remove();
+					__APP.changeState('/organization/' + PAGE.organization.id);
+				}, function() {
+					PAGE.$wrapper.removeClass(__C.CLASSES.STATUS.DISABLED);
+					$loader.remove();
 				});
 			}
 		}
