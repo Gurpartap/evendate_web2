@@ -1,5 +1,6 @@
 /**
  * @requires ../ticket/Class.OneTicket.js
+ * @requires ../order/Class.OneOrder.js
  */
 /**
  * @class OneExtendedTicket

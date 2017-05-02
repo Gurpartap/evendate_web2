@@ -19,7 +19,9 @@ AdminOrganizationPage = extending(AdminPage, (function() {
 		this.organization = new OneOrganization(this.id);
 		this.with_header_tabs = true;
 		
-		this.organization_fields = new Fields();
+		this.organization_fields = new Fields(
+			'privileges'
+		);
 	}
 	
 	AdminOrganizationPage.prototype.fetchData = function() {

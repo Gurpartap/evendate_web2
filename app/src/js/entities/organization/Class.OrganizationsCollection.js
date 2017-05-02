@@ -45,7 +45,7 @@ OrganizationsCollection = extending(EntitiesCollection, (function() {
 	};
 	/**
 	 *
-	 * @param {(Array|string)} [fields]
+	 * @param {(Fields|Array|string)} [fields]
 	 * @param {(number|string)} [length]
 	 * @param {string} [order_by]
 	 * @param {AJAXCallback} [success]
@@ -69,7 +69,7 @@ OrganizationsCollection = extending(EntitiesCollection, (function() {
 	/**
 	 *
 	 * @param {(Array<string>|string)} roles
-	 * @param {(Array<string>|string)} [fields]
+	 * @param {(Fields|Array<string>|string)} [fields]
 	 * @param {(number|string)} [length]
 	 * @param {string} [order_by]
 	 * @param {AJAXCallback} [success]
@@ -83,10 +83,11 @@ OrganizationsCollection = extending(EntitiesCollection, (function() {
 				offset: this.length,
 				order_by: order_by || undefined
 			};
+		
 		return OrganizationsCollection.fetchMyOrganizations(roles, ajax_data, function(data) {
 			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data);
+			if (isFunction(success)) {
+				success.call(self, self.last_pushed);
 			}
 		});
 	};
