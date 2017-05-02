@@ -48,6 +48,10 @@ AdminOrganizationEventsPage = extending(AdminOrganizationPage, (function() {
 			$past_events_wrapper,
 			past_events_tablesort;
 		
+		if (this.organization.role === OneUser.ROLE.USER) {
+			return __APP.changeState('/', true, true);
+		}
+		
 		this.renderHeaderTabs();
 		__APP.changeTitle([{
 			title: 'Организации',

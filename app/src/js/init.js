@@ -44,7 +44,9 @@ if (checkRedirect()) {
 			Pace.restart()
 		})
 		.ajaxError(function(event, jqxhr, settings, thrownError) {
-			if (!(thrownError && thrownError == 'abort')) {
+			if (thrownError && thrownError === 'Forbidden') {
+				__APP.changeState('/', true, true);
+			} else if (!(thrownError && thrownError === 'abort')) {
 				ServerConnection.ajaxErrorHandler(event, jqxhr, settings, thrownError);
 			}
 		})

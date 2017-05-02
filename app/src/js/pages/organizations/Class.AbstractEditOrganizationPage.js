@@ -25,6 +25,7 @@ AbstractEditOrganizationPage = extending(Page, (function() {
 			'site_url',
 			'default_address',
 			'vk_url',
+			'privileges',
 			'facebook_url',
 			'email'
 		);
