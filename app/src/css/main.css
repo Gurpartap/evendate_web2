@@ -112,6 +112,11 @@ h6 {font-size: 1rem}
 	font-size: .875rem;
 }
 
+a {
+	color: #337ab7;
+	text-decoration: none;
+}
+
 
 p,
 .text {
@@ -388,6 +393,7 @@ table {
 	background-color: transparent;
 	text-align: center;
 	transition: transform .3s ease;
+	cursor: pointer;
 }
 .collapsing_button:hover,
 .collapsing_wrapper.-fading:not(.-opened):hover + .collapsing_button {color: #f82969; color: var(--color_bubblegum);}
@@ -2962,6 +2968,7 @@ body.-open_modal > .modal_wrapper {
 	margin: auto;
 	padding: 0 54px 0 16px;
 	font-size: .8125em;
+	color: #fff;
 	border: 0;
 	background-color: transparent;
 	box-shadow: none;
