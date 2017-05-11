@@ -3621,6 +3621,198 @@ DatesCollection = extending(EntitiesCollection, (function() {
 }()));
 /**
  * @requires ../Class.OneEntity.js
+ */
+/**
+ *
+ * @class OneOrder
+ * @extends OneEntity
+ */
+OneOrder = extending(OneEntity, (function() {
+	/**
+	 *
+	 * @param {(string|number)} [event_id]
+	 * @param {(string|number)} [uuid]
+	 *
+	 * @constructor
+	 * @constructs
+	 *
+	 * @property {?(string|number)} uuid
+	 * @property {?(string|number)} user_id
+	 * @property {?string} order_content
+	 * @property {?boolean} is_canceled
+	 * @property {?number} status_id
+	 * @property {?OneOrder.EXTENDED_ORDER_STATUSES} status_type_code
+	 * @property {?TEXTS.TICKET_STATUSES} status_name
+	 * @property {?number} created_at
+	 * @property {?number} updated_at
+	 * @property {?number} payed_at
+	 * @property {?number} canceled_at
+	 *
+	 * @property {EventsTicketsCollection} tickets
+	 * @property {OneUser} user
+	 */
+	function OneOrder(event_id, uuid) {
+		var self = this;
+		
+		this.uuid = setDefaultValue(uuid, 0);
+		this.event_id = setDefaultValue(event_id, 0);
+		this.order_content = null;
+		this.is_canceled = null;
+		this.status_id = null;
+		this.status_type_code = null;
+		this.created_at = null;
+		this.updated_at = null;
+		this.payed_at = null;
+		this.canceled_at = null;
+		
+		this.tickets = new EventsTicketsCollection();
+		this.user_id = null;
+		this.user = new OneUser();
+		
+		Object.defineProperty(this, 'status_name', {
+			get: function() {
+				for( var prop in OneOrder.EXTENDED_ORDER_STATUSES ) {
+					if( OneOrder.EXTENDED_ORDER_STATUSES.hasOwnProperty(prop) && OneOrder.EXTENDED_ORDER_STATUSES[ prop ] === self.status_type_code )
+						return __LOCALES.ru_RU.TEXTS.TICKET_STATUSES[ prop ];
+				}
+			}
+		});
+	}
+	
+	/**
+	 *
+	 * @enum {string}
+	 */
+	OneOrder.ORDER_STATUSES = {
+		WAITING_FOR_PAYMENT: 'waiting_for_payment',
+		IS_PENDING: 'is_pending',
+		
+		APPROVED: 'approved',
+		PAYED: 'payed',
+		WITHOUT_PAYMENT: 'without_payment',
+		
+		RETURNED_BY_ORGANIZATION: 'returned_by_organization',
+		RETURNED_BY_CLIENT: 'returned_by_client',
+		REJECTED: 'rejected'
+	};
+	/**
+	 *
+	 * @enum {string}
+	 */
+	OneOrder.EXTENDED_ORDER_STATUSES = $.extend({
+		PAYMENT_CANCELED_AUTO: 'payment_canceled_auto',
+		PAYMENT_CANCELED_BY_CLIENT: 'payment_canceled_by_client'
+	}, OneOrder.ORDER_STATUSES);
+	/**
+	 *
+	 * @param {(string|number)} event_id
+	 * @param {(string|number)} uuid
+	 * @param {(Fields|string)} [fields]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	OneOrder.fetchOrder = function(event_id, uuid, fields, success) {
+		return __APP.SERVER.getData('/api/v1/events/' + event_id + '/orders/' + uuid, {
+			fields: fields
+		}, success);
+	};
+	/**
+	 *
+	 * @param {(Fields|string)} [fields]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	OneOrder.prototype.fetchOrder = function(fields, success) {
+		var self = this;
+		return OneOrder.fetchOrder(this.event_id, this.uuid, fields, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data);
+			}
+		});
+	};
+	
+	return OneOrder;
+}()));
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.OneOrder.js
+ */
+/**
+ *
+ * @class OrdersCollection
+ * @extends EntitiesCollection
+ */
+OrdersCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @param {(string|number)} [event_id=0]
+	 *
+	 * @constructor
+	 * @constructs OrdersCollection
+	 *
+	 * @property {(string|number)} event_id
+	 */
+	function OrdersCollection(event_id) {
+		EntitiesCollection.call(this);
+		
+		this.event_id = setDefaultValue(event_id, 0);
+	}
+	
+	OrdersCollection.prototype.collection_of = OneOrder;
+	/**
+	 *
+	 * @param {string} uuid
+	 * @return {(OneOrder|undefined)}
+	 */
+	OrdersCollection.prototype.getByUUID = function(uuid) {
+		var found = this.filter(function(element) {
+			return element.uuid === uuid;
+		});
+		
+		return found.shift();
+	};
+	
+	/**
+	 *
+	 * @param {(string|number)} event_id
+	 * @param {AJAXData} [ajax_data]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	OrdersCollection.fetchOrders = function(event_id, ajax_data, success) {
+		return __APP.SERVER.getData('/api/v1/events/' + event_id + '/orders', ajax_data, success);
+	};
+	/**
+	 *
+	 * @param {(Fields|string)} [fields]
+	 * @param {number} [length]
+	 * @param {(string|Array)} [order_by]
+	 * @param {AJAXCallback} [success]
+	 */
+	OrdersCollection.prototype.fetchOrders = function(fields, length, order_by, success) {
+		var self = this;
+		
+		return OrdersCollection.fetchOrders(this.event_id, {
+			fields: fields || undefined,
+			offset: this.length,
+			length: length || undefined,
+			order_by: order_by || undefined
+		}, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, self.last_pushed);
+			}
+		});
+	};
+	
+	return OrdersCollection;
+}()));
+/**
+ * @requires ../Class.OneEntity.js
  * @requires ../../data_models/registration_field/Class.RegistrationFieldsCollection.js
  */
 /**
@@ -4660,198 +4852,6 @@ TimelineEventsCollection = extending(EventsCollection, (function() {
  * @requires ../Class.OneEntity.js
  */
 /**
- *
- * @class OneOrder
- * @extends OneEntity
- */
-OneOrder = extending(OneEntity, (function() {
-	/**
-	 *
-	 * @param {(string|number)} [event_id]
-	 * @param {(string|number)} [uuid]
-	 *
-	 * @constructor
-	 * @constructs
-	 *
-	 * @property {?(string|number)} uuid
-	 * @property {?(string|number)} user_id
-	 * @property {?string} order_content
-	 * @property {?boolean} is_canceled
-	 * @property {?number} status_id
-	 * @property {?OneOrder.EXTENDED_ORDER_STATUSES} status_type_code
-	 * @property {?TEXTS.TICKET_STATUSES} status_name
-	 * @property {?number} created_at
-	 * @property {?number} updated_at
-	 * @property {?number} payed_at
-	 * @property {?number} canceled_at
-	 *
-	 * @property {EventsTicketsCollection} tickets
-	 * @property {OneUser} user
-	 */
-	function OneOrder(event_id, uuid) {
-		var self = this;
-		
-		this.uuid = setDefaultValue(uuid, 0);
-		this.event_id = setDefaultValue(event_id, 0);
-		this.order_content = null;
-		this.is_canceled = null;
-		this.status_id = null;
-		this.status_type_code = null;
-		this.created_at = null;
-		this.updated_at = null;
-		this.payed_at = null;
-		this.canceled_at = null;
-		
-		this.tickets = new EventsTicketsCollection();
-		this.user_id = null;
-		this.user = new OneUser();
-		
-		Object.defineProperty(this, 'status_name', {
-			get: function() {
-				for( var prop in OneOrder.EXTENDED_ORDER_STATUSES ) {
-					if( OneOrder.EXTENDED_ORDER_STATUSES.hasOwnProperty(prop) && OneOrder.EXTENDED_ORDER_STATUSES[ prop ] === self.status_type_code )
-						return __LOCALES.ru_RU.TEXTS.TICKET_STATUSES[ prop ];
-				}
-			}
-		});
-	}
-	
-	/**
-	 *
-	 * @enum {string}
-	 */
-	OneOrder.ORDER_STATUSES = {
-		WAITING_FOR_PAYMENT: 'waiting_for_payment',
-		IS_PENDING: 'is_pending',
-		
-		APPROVED: 'approved',
-		PAYED: 'payed',
-		WITHOUT_PAYMENT: 'without_payment',
-		
-		RETURNED_BY_ORGANIZATION: 'returned_by_organization',
-		RETURNED_BY_CLIENT: 'returned_by_client',
-		REJECTED: 'rejected'
-	};
-	/**
-	 *
-	 * @enum {string}
-	 */
-	OneOrder.EXTENDED_ORDER_STATUSES = $.extend({
-		PAYMENT_CANCELED_AUTO: 'payment_canceled_auto',
-		PAYMENT_CANCELED_BY_CLIENT: 'payment_canceled_by_client'
-	}, OneOrder.ORDER_STATUSES);
-	/**
-	 *
-	 * @param {(string|number)} event_id
-	 * @param {(string|number)} uuid
-	 * @param {(Fields|string)} [fields]
-	 * @param {AJAXCallback} [success]
-	 *
-	 * @return {jqPromise}
-	 */
-	OneOrder.fetchOrder = function(event_id, uuid, fields, success) {
-		return __APP.SERVER.getData('/api/v1/events/' + event_id + '/orders/' + uuid, {
-			fields: fields
-		}, success);
-	};
-	/**
-	 *
-	 * @param {(Fields|string)} [fields]
-	 * @param {AJAXCallback} [success]
-	 *
-	 * @return {jqPromise}
-	 */
-	OneOrder.prototype.fetchOrder = function(fields, success) {
-		var self = this;
-		return OneOrder.fetchOrder(this.event_id, this.uuid, fields, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data);
-			}
-		});
-	};
-	
-	return OneOrder;
-}()));
-/**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneOrder.js
- */
-/**
- *
- * @class OrdersCollection
- * @extends EntitiesCollection
- */
-OrdersCollection = extending(EntitiesCollection, (function() {
-	/**
-	 *
-	 * @param {(string|number)} [event_id=0]
-	 *
-	 * @constructor
-	 * @constructs OrdersCollection
-	 *
-	 * @property {(string|number)} event_id
-	 */
-	function OrdersCollection(event_id) {
-		EntitiesCollection.call(this);
-		
-		this.event_id = setDefaultValue(event_id, 0);
-	}
-	
-	OrdersCollection.prototype.collection_of = OneOrder;
-	/**
-	 *
-	 * @param {string} uuid
-	 * @return {(OneOrder|undefined)}
-	 */
-	OrdersCollection.prototype.getByUUID = function(uuid) {
-		var found = this.filter(function(element) {
-			return element.uuid === uuid;
-		});
-		
-		return found.shift();
-	};
-	
-	/**
-	 *
-	 * @param {(string|number)} event_id
-	 * @param {AJAXData} [ajax_data]
-	 * @param {AJAXCallback} [success]
-	 *
-	 * @return {jqPromise}
-	 */
-	OrdersCollection.fetchOrders = function(event_id, ajax_data, success) {
-		return __APP.SERVER.getData('/api/v1/events/' + event_id + '/orders', ajax_data, success);
-	};
-	/**
-	 *
-	 * @param {(Fields|string)} [fields]
-	 * @param {number} [length]
-	 * @param {(string|Array)} [order_by]
-	 * @param {AJAXCallback} [success]
-	 */
-	OrdersCollection.prototype.fetchOrders = function(fields, length, order_by, success) {
-		var self = this;
-		
-		return OrdersCollection.fetchOrders(this.event_id, {
-			fields: fields || undefined,
-			offset: this.length,
-			length: length || undefined,
-			order_by: order_by || undefined
-		}, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, self.last_pushed);
-			}
-		});
-	};
-	
-	return OrdersCollection;
-}()));
-/**
- * @requires ../Class.OneEntity.js
- */
-/**
  * @typedef {object} Privilege
  * @property {number} role_id
  * @property {OneUser.ROLE} name
@@ -5297,126 +5297,6 @@ OrganizationsCollection = extending(EntitiesCollection, (function() {
 	return OrganizationsCollection;
 }()));
 /**
- * @requires ../Class.OneEntity.js
- */
-/**
- *
- * @class SearchResults
- * @extends OneEntity
- */
-SearchResults = extending(OneEntity, (function() {
-	/**
-	 * @typedef {function({
- *   [events]: Array<OneEvent>,
- *   [organizations]: Array<OneOrganization>
- * })} SearchResultsAJAXCallback
-	 */
-	/**
-	 *
-	 * @param {string} query_string
-	 * @constructor
-	 * @constructs SearchResults
-	 */
-	function SearchResults(query_string) {
-		this.query_string = query_string;
-		this.events = new EventsCollection();
-		this.organizations = new OrganizationsCollection();
-	}
-	/**
-	 *
-	 * @param {string} query_string
-	 * @returns {{ [q]: {string}, [tags]: {string} }}
-	 */
-	SearchResults.sanitizeQueryVar = function(query_string) {
-		var data = {};
-		if (query_string.indexOf('#') === 0) {
-			data.tags = query_string.replace('#', '');
-		} else {
-			data.q = query_string;
-		}
-		return data;
-	};
-	/**
-	 *
-	 * @param {string} query_string
-	 * @param {AJAXData} [ajax_data]
-	 * @param {SearchResultsAJAXCallback} [success]
-	 * @returns {jqPromise}
-	 */
-	SearchResults.fetchEventsAndOrganizations = function(query_string, ajax_data, success) {
-		return __APP.SERVER.getData('/api/v1/search/', $.extend({}, SearchResults.sanitizeQueryVar(query_string), ajax_data), success);
-	};
-	/**
-	 *
-	 * @param {AJAXData} [events_ajax_data]
-	 * @param {function(organizations: Array<OneEvent>)} [success]
-	 * @returns {jqPromise}
-	 */
-	SearchResults.prototype.fetchEvents = function(events_ajax_data, success) {
-		var self = this,
-			ajax_data = {
-				fields: 'events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length}))
-			};
-		
-		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data.events);
-			}
-		});
-	};
-	/**
-	 *
-	 * @param {AJAXData} [organizations_ajax_data]
-	 * @param {function(organizations: Array<OneOrganization>)} [success]
-	 * @returns {jqPromise}
-	 */
-	SearchResults.prototype.fetchOrganizations = function(organizations_ajax_data, success) {
-		var self = this,
-			ajax_data = {
-				fields: 'organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length}))
-			};
-		
-		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data.organizations);
-			}
-		});
-	};
-	/**
-	 *
-	 * @param {AJAXData} [events_ajax_data]
-	 * @param {AJAXData} [organizations_ajax_data]
-	 * @param {SearchResultsAJAXCallback} [success]
-	 * @returns {jqPromise}
-	 */
-	SearchResults.prototype.fetchEventsAndOrganizations = function(events_ajax_data, organizations_ajax_data, success) {
-		var self = this,
-			ajax_data = {fields: new Fields()};
-		
-		if (events_ajax_data) {
-			ajax_data.fields.push({
-				events: $.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length})
-			});
-		}
-		if (organizations_ajax_data && !SearchResults.sanitizeQueryVar(self.query_string).tags) {
-			ajax_data.fields.push({
-				organizations: $.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length})
-			});
-		}
-		
-		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data);
-			}
-		});
-	};
-	
-	return SearchResults;
-}()));
-/**
  * @typedef {object} StatisticsUnit
  * @property {number} time_value
  * @property {number} value
@@ -5656,6 +5536,126 @@ OrganizationsStatistics = extending(Statistics, (function() {
 	}
 	
 	return OrganizationsStatistics;
+}()));
+/**
+ * @requires ../Class.OneEntity.js
+ */
+/**
+ *
+ * @class SearchResults
+ * @extends OneEntity
+ */
+SearchResults = extending(OneEntity, (function() {
+	/**
+	 * @typedef {function({
+ *   [events]: Array<OneEvent>,
+ *   [organizations]: Array<OneOrganization>
+ * })} SearchResultsAJAXCallback
+	 */
+	/**
+	 *
+	 * @param {string} query_string
+	 * @constructor
+	 * @constructs SearchResults
+	 */
+	function SearchResults(query_string) {
+		this.query_string = query_string;
+		this.events = new EventsCollection();
+		this.organizations = new OrganizationsCollection();
+	}
+	/**
+	 *
+	 * @param {string} query_string
+	 * @returns {{ [q]: {string}, [tags]: {string} }}
+	 */
+	SearchResults.sanitizeQueryVar = function(query_string) {
+		var data = {};
+		if (query_string.indexOf('#') === 0) {
+			data.tags = query_string.replace('#', '');
+		} else {
+			data.q = query_string;
+		}
+		return data;
+	};
+	/**
+	 *
+	 * @param {string} query_string
+	 * @param {AJAXData} [ajax_data]
+	 * @param {SearchResultsAJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	SearchResults.fetchEventsAndOrganizations = function(query_string, ajax_data, success) {
+		return __APP.SERVER.getData('/api/v1/search/', $.extend({}, SearchResults.sanitizeQueryVar(query_string), ajax_data), success);
+	};
+	/**
+	 *
+	 * @param {AJAXData} [events_ajax_data]
+	 * @param {function(organizations: Array<OneEvent>)} [success]
+	 * @returns {jqPromise}
+	 */
+	SearchResults.prototype.fetchEvents = function(events_ajax_data, success) {
+		var self = this,
+			ajax_data = {
+				fields: 'events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length}))
+			};
+		
+		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data.events);
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {AJAXData} [organizations_ajax_data]
+	 * @param {function(organizations: Array<OneOrganization>)} [success]
+	 * @returns {jqPromise}
+	 */
+	SearchResults.prototype.fetchOrganizations = function(organizations_ajax_data, success) {
+		var self = this,
+			ajax_data = {
+				fields: 'organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length}))
+			};
+		
+		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data.organizations);
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {AJAXData} [events_ajax_data]
+	 * @param {AJAXData} [organizations_ajax_data]
+	 * @param {SearchResultsAJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	SearchResults.prototype.fetchEventsAndOrganizations = function(events_ajax_data, organizations_ajax_data, success) {
+		var self = this,
+			ajax_data = {fields: new Fields()};
+		
+		if (events_ajax_data) {
+			ajax_data.fields.push({
+				events: $.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length})
+			});
+		}
+		if (organizations_ajax_data && !SearchResults.sanitizeQueryVar(self.query_string).tags) {
+			ajax_data.fields.push({
+				organizations: $.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length})
+			});
+		}
+		
+		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data);
+			}
+		});
+	};
+	
+	return SearchResults;
 }()));
 /**
  * @requires ../Class.OneEntity.js
@@ -11511,6 +11511,112 @@ Builder = (function() {
  * @abstract
  * @class
  */
+AbstractTopBar = (function () {
+	/**
+	 *
+	 * @constructor
+	 * @constructs AbstractTopBar
+	 *
+	 * @property {jQuery} $main_header
+	 */
+	function AbstractTopBar() {
+		this.$main_header = $('#main_header');
+	}
+	
+	AbstractTopBar.prototype.init = function () {
+		var $overlay = this.$main_header.find('.TopBarOverlay'),
+			$search_button = $overlay.find('.TopBarSearchButton'),
+			$search_input = $overlay.find('.TopBarSearchInput');
+			
+		$search_button.on('click.OpenSearchBar', function() {
+			if ($overlay.hasClass('-open_search_bar')) {
+				__APP.changeState('/search/' + encodeURIComponent($search_input.val()));
+			} else {
+				$overlay.addClass('-open_search_bar');
+				$search_input.focus();
+			}
+		});
+		
+		$search_input.on('keypress', function(e) {
+			if (e.which === 13) {
+				__APP.changeState('/search/' + encodeURIComponent($search_input.val()));
+			}
+		}).on('keydown', function(e) {
+			if (e.keyCode === 27) {
+				$overlay.removeClass('-open_search_bar');
+				$search_input.val('');
+			}
+		}).on('blur', function() {
+			if ($search_input.val() === '') {
+				$overlay.removeClass('-open_search_bar');
+			}
+		});
+		
+		this.$main_header.find('.SidebarBurger').add($('.MainSectionCap')).on('click', function() {
+			$('body').toggleClass('-open_sidebar');
+		});
+		
+		bindRippleEffect(this.$main_header);
+		bindPageLinks(this.$main_header);
+	};
+	
+	return AbstractTopBar;
+}());
+/**
+ * @requires Class.AbstractTopBar.js
+ */
+/**
+ * @class
+ * @extends AbstractTopBar
+ */
+TopBar = extending(AbstractTopBar, (function () {
+	/**
+	 *
+	 * @constructor
+	 * @constructs TopBar
+	 */
+	function TopBar() {
+		AbstractTopBar.call(this);
+	}
+	
+	TopBar.prototype.init = function () {
+		AbstractTopBar.prototype.init.call(this);
+	};
+	
+	return TopBar;
+}()));
+/**
+ * @requires Class.AbstractTopBar.js
+ */
+/**
+ * @class
+ * @extends AbstractTopBar
+ */
+TopBarNoAuth = extending(AbstractTopBar, (function () {
+	/**
+	 *
+	 * @constructor
+	 * @constructs TopBarNoAuth
+	 */
+	function TopBarNoAuth() {
+		AbstractTopBar.call(this);
+	}
+	
+	TopBarNoAuth.prototype.init = function () {
+		this.$main_header.find('.LoginButton').on('click', function() {
+			cookies.removeItem('auth_command');
+			cookies.removeItem('auth_entity_id');
+			(new AuthModal(location.href)).show();
+		});
+		AbstractTopBar.prototype.init.call(this);
+	};
+	
+	return TopBarNoAuth;
+}()));
+/**
+ * @abstract
+ * @class
+ */
 AbstractSidebar = (function () {
 	/**
 	 *
@@ -11622,112 +11728,6 @@ SidebarNoAuth = extending(AbstractSidebar, (function () {
 	};
 	
 	return SidebarNoAuth;
-}()));
-/**
- * @abstract
- * @class
- */
-AbstractTopBar = (function () {
-	/**
-	 *
-	 * @constructor
-	 * @constructs AbstractTopBar
-	 *
-	 * @property {jQuery} $main_header
-	 */
-	function AbstractTopBar() {
-		this.$main_header = $('#main_header');
-	}
-	
-	AbstractTopBar.prototype.init = function () {
-		var $overlay = this.$main_header.find('.TopBarOverlay'),
-			$search_button = $overlay.find('.TopBarSearchButton'),
-			$search_input = $overlay.find('.TopBarSearchInput');
-			
-		$search_button.on('click.OpenSearchBar', function() {
-			if ($overlay.hasClass('-open_search_bar')) {
-				__APP.changeState('/search/' + encodeURIComponent($search_input.val()));
-			} else {
-				$overlay.addClass('-open_search_bar');
-				$search_input.focus();
-			}
-		});
-		
-		$search_input.on('keypress', function(e) {
-			if (e.which === 13) {
-				__APP.changeState('/search/' + encodeURIComponent($search_input.val()));
-			}
-		}).on('keydown', function(e) {
-			if (e.keyCode === 27) {
-				$overlay.removeClass('-open_search_bar');
-				$search_input.val('');
-			}
-		}).on('blur', function() {
-			if ($search_input.val() === '') {
-				$overlay.removeClass('-open_search_bar');
-			}
-		});
-		
-		this.$main_header.find('.SidebarBurger').add($('.MainSectionCap')).on('click', function() {
-			$('body').toggleClass('-open_sidebar');
-		});
-		
-		bindRippleEffect(this.$main_header);
-		bindPageLinks(this.$main_header);
-	};
-	
-	return AbstractTopBar;
-}());
-/**
- * @requires Class.AbstractTopBar.js
- */
-/**
- * @class
- * @extends AbstractTopBar
- */
-TopBar = extending(AbstractTopBar, (function () {
-	/**
-	 *
-	 * @constructor
-	 * @constructs TopBar
-	 */
-	function TopBar() {
-		AbstractTopBar.call(this);
-	}
-	
-	TopBar.prototype.init = function () {
-		AbstractTopBar.prototype.init.call(this);
-	};
-	
-	return TopBar;
-}()));
-/**
- * @requires Class.AbstractTopBar.js
- */
-/**
- * @class
- * @extends AbstractTopBar
- */
-TopBarNoAuth = extending(AbstractTopBar, (function () {
-	/**
-	 *
-	 * @constructor
-	 * @constructs TopBarNoAuth
-	 */
-	function TopBarNoAuth() {
-		AbstractTopBar.call(this);
-	}
-	
-	TopBarNoAuth.prototype.init = function () {
-		this.$main_header.find('.LoginButton').on('click', function() {
-			cookies.removeItem('auth_command');
-			cookies.removeItem('auth_entity_id');
-			(new AuthModal(location.href)).show();
-		});
-		AbstractTopBar.prototype.init.call(this);
-	};
-	
-	return TopBarNoAuth;
 }()));
 /**
  *
@@ -15477,91 +15477,6 @@ EventPage = extending(Page, (function() {
 }()));
 
 /**
- * @requires ../Class.Page.js
- */
-/**
- *
- * @class OnboardingPage
- * @extends Page
- */
-OnboardingPage = extending(Page, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs OnboardingPage
-	 */
-	function OnboardingPage() {
-		Page.apply(this, arguments);
-		this.ajax_data = {
-			length: 30,
-			offset: 0,
-			fields: 'img_small_url'
-		};
-		this.state_name = 'onboarding_page';
-		this.is_upload_disabled = false;
-		this.block_scroll = true;
-	}
-	
-	OnboardingPage.prototype.init = function() {
-		bindRippleEffect(this.$wrapper);
-		bindPageLinks(this.$wrapper);
-		this.$wrapper.find('.Link').on('click', function() {
-			if($(this).is('.SkipOnboarding')){
-				cookies.setItem('skip_onboarding', 1, moment().add(7, 'd')._d);
-			}
-			__APP.SIDEBAR.updateSubscriptions();
-		});
-	};
-	
-	OnboardingPage.prototype.bindSubscriptions = function() {
-		this.$wrapper.find(".OnboardingOrgItem").not('.-Handled_OnboardingOrgItem').on('click', function() {
-			var $this = $(this);
-			if ($this.hasClass(__C.CLASSES.ACTIVE)) {
-				__APP.USER.unsubscribeFromOrganization($this.data("organization_id"));
-			} else {
-				__APP.USER.subscribeToOrganization($this.data("organization_id"));
-			}
-			$this.toggleClass(__C.CLASSES.ACTIVE);
-		}).addClass('-Handled_OnboardingOrgItem');
-	};
-	
-	OnboardingPage.prototype.render = function() {
-		var PAGE = this,
-			$loader = tmpl('loader', {});
-		
-		if(__APP.USER.id === -1){
-			__APP.changeState('/feed/actual', true, true);
-			return null;
-		}
-		function appendRecommendations(organizations) {
-			$loader.detach();
-			if (organizations.length) {
-				PAGE.$wrapper.find(".RecommendationsWrapper").last().append(tmpl("onboarding-recommendation", organizations));
-				PAGE.bindSubscriptions();
-				PAGE.block_scroll = false;
-			} else {
-				PAGE.is_upload_disabled = true;
-			}
-		}
-		
-		PAGE.$wrapper.html(tmpl("onboarding-main", {}));
-		PAGE.init();
-		PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
-		OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
-		PAGE.$wrapper.find(".RecommendationsScrollbar").scrollbar({
-			onScroll: function(y, x) {
-				if (y.scroll == y.maxScroll && !PAGE.is_upload_disabled && !PAGE.block_scroll) {
-					PAGE.block_scroll = true;
-					PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
-					OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
-				}
-			}
-		});
-	};
-	
-	return OnboardingPage
-}()));
-/**
  * @requires Class.AbstractEditOrganizationPage.js
  */
 /**
@@ -16047,6 +15962,91 @@ OrganizationPage = extending(Page, (function() {
 	};
 	
 	return OrganizationPage;
+}()));
+/**
+ * @requires ../Class.Page.js
+ */
+/**
+ *
+ * @class OnboardingPage
+ * @extends Page
+ */
+OnboardingPage = extending(Page, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs OnboardingPage
+	 */
+	function OnboardingPage() {
+		Page.apply(this, arguments);
+		this.ajax_data = {
+			length: 30,
+			offset: 0,
+			fields: 'img_small_url'
+		};
+		this.state_name = 'onboarding_page';
+		this.is_upload_disabled = false;
+		this.block_scroll = true;
+	}
+	
+	OnboardingPage.prototype.init = function() {
+		bindRippleEffect(this.$wrapper);
+		bindPageLinks(this.$wrapper);
+		this.$wrapper.find('.Link').on('click', function() {
+			if($(this).is('.SkipOnboarding')){
+				cookies.setItem('skip_onboarding', 1, moment().add(7, 'd')._d);
+			}
+			__APP.SIDEBAR.updateSubscriptions();
+		});
+	};
+	
+	OnboardingPage.prototype.bindSubscriptions = function() {
+		this.$wrapper.find(".OnboardingOrgItem").not('.-Handled_OnboardingOrgItem').on('click', function() {
+			var $this = $(this);
+			if ($this.hasClass(__C.CLASSES.ACTIVE)) {
+				__APP.USER.unsubscribeFromOrganization($this.data("organization_id"));
+			} else {
+				__APP.USER.subscribeToOrganization($this.data("organization_id"));
+			}
+			$this.toggleClass(__C.CLASSES.ACTIVE);
+		}).addClass('-Handled_OnboardingOrgItem');
+	};
+	
+	OnboardingPage.prototype.render = function() {
+		var PAGE = this,
+			$loader = tmpl('loader', {});
+		
+		if(__APP.USER.id === -1){
+			__APP.changeState('/feed/actual', true, true);
+			return null;
+		}
+		function appendRecommendations(organizations) {
+			$loader.detach();
+			if (organizations.length) {
+				PAGE.$wrapper.find(".RecommendationsWrapper").last().append(tmpl("onboarding-recommendation", organizations));
+				PAGE.bindSubscriptions();
+				PAGE.block_scroll = false;
+			} else {
+				PAGE.is_upload_disabled = true;
+			}
+		}
+		
+		PAGE.$wrapper.html(tmpl("onboarding-main", {}));
+		PAGE.init();
+		PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
+		OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
+		PAGE.$wrapper.find(".RecommendationsScrollbar").scrollbar({
+			onScroll: function(y, x) {
+				if (y.scroll == y.maxScroll && !PAGE.is_upload_disabled && !PAGE.block_scroll) {
+					PAGE.block_scroll = true;
+					PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
+					OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
+				}
+			}
+		});
+	};
+	
+	return OnboardingPage
 }()));
 /**
  * @requires ../Class.Page.js

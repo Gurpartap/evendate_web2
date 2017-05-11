@@ -13,6 +13,8 @@ var gulp = require('gulp'),
 	srcs = {
 		vendor_js: [
 			'../app/src/vendor/jquery/jquery.js',
+			'../app/src/vendor/jquery.dataTables/js/jquery.dataTables.js',
+			'../app/src/vendor/jquery.dataTables/js/*.js',
 			'../app/src/vendor/**/*.js'
 		],
 		app_js: [
@@ -28,7 +30,10 @@ var gulp = require('gulp'),
 			'../app/src/js/application.js',
 			'../app/src/js/init.js'
 		],
-		vendor_css: '../app/src/vendor/**/*.css',
+		vendor_css: [
+			'../app/src/vendor/jquery.dataTables/css/jquery.dataTables.css',
+			'../app/src/vendor/**/*.css'
+		],
 		app_css: [
 			'../app/src/css/govnokod.css',
 			'../app/src/css/main.css'
