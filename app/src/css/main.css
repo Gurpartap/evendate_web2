@@ -4035,8 +4035,8 @@ body.-open_modal > .modal_wrapper {
 }
 
 .event_block_title {
-	height: -webkit-calc(100% - 55px);
-	height: calc(100% - 55px);
+	height: -webkit-calc(3em * 1.2);
+	height: calc(3em * 1.2);
 	font-size: 1.05em;
 	font-weight: bold;
 	line-height: 1.2;
@@ -4045,6 +4045,8 @@ body.-open_modal > .modal_wrapper {
 
 
 .event_block_service .avatars_collection {cursor: pointer}
+
+.event_block_service > p {margin: 0}
 
 .event_block_action_buttons {
 	display: flex;
@@ -4469,6 +4471,8 @@ a.social_link.-color_facebook {color: #3b5998}
 	margin: 12px;
 	padding: 12px;
 }
+
+.-another_user .event_block_action_buttons_wrapper {display: none}
 
 /* EDIT ORGANIZATION */
 
