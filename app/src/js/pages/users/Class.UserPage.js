@@ -102,7 +102,7 @@ UserPage = extending(Page, (function() {
 					if(type_data.extra_function && typeof type_data.extra_function === 'function'){
 						type_data.extra_function(entities);
 					}
-					$entities = type_data.build_method.apply(self, [entities].concat(type_data.build_extra_arguments));
+					$entities = type_data.build_method.apply(__APP.BUILD, [entities].concat(type_data.build_extra_arguments));
 					$wrapper.append($entities);
 					UserPage.bindEvents($entities);
 				} else {
@@ -185,6 +185,7 @@ UserPage = extending(Page, (function() {
 		}
 		
 		this.$wrapper.append(tmpl('user-page', {
+			wrapper_classes: '-another_user',
 			tombstone: __APP.BUILD.userTombstones(this.user, {avatar_classes: [__C.CLASSES.UNIVERSAL_STATES.BORDERED, __C.CLASSES.UNIVERSAL_STATES.SHADOWED]}),
 			links: __APP.BUILD.socialLinks(this.user.accounts_links),
 			subscribed_orgs: $subscribed_orgs,
