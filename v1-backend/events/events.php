@@ -53,20 +53,18 @@ $__modules['events'] = array(
 				$__order_by ?? array()
 			);
 		},
-		'{/(id:[0-9]+)/orders/(uuid:\w+-\w+-\w+-\w+-\w+)}' => function ($event_id) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
+		'{/(id:[0-9]+)/orders/(uuid:\w+-\w+-\w+-\w+-\w+)}' => function ($event_id, $uuid) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
 
 			if ($__user instanceof User == false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
 			$__request['event'] = EventsCollection::one($__db, $__user, $event_id, array());
 			if ($__user->isAdmin($__request['event']->getOrganization()) == false) throw new PrivilegesException('NOT_ADMIN', $__db);
 
 
-			return OrdersCollection::filter($__db,
+			return OrdersCollection::oneByUUID($__db,
 				$__user,
-				$__request,
-				$__fields,
-				$__pagination,
-				$__order_by ?? array()
-			);
+				$uuid,
+				$__fields ?? array()
+			)->getParams($__user, $__fields);
 		},
 		'{/(id:[0-9]+)/orders}' => function ($event_id) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
 

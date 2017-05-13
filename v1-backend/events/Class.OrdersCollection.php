@@ -32,6 +32,7 @@ class OrdersCollection extends AbstractCollection
 		foreach ($filters as $name => $value) {
 			switch ($name) {
 				case 'uuid': {
+					$getting_statistics = true;
 					$q_get_orders->where('uuid = ?', $value);
 					$is_one_order = true;
 					break;
@@ -52,14 +53,14 @@ class OrdersCollection extends AbstractCollection
 
 
 		if (isset($getting_statistics) && $getting_statistics === true) {
-			$q_get_orders->where('(SELECT COUNT(user_id) 
+			$q_get_orders->where('((SELECT COUNT(user_id) 
 					FROM users_organizations
 					INNER JOIN view_all_events ON view_all_events.id = view_tickets_orders.event_id 
 						AND users_organizations.organization_id = view_all_events.organization_id 
 					WHERE users_organizations.role_id = 1
-					AND users_organization.user_id = ?
-					AND status = TRUE
-					) > 0', $user->getId());
+					AND users_organizations.user_id = ?
+					AND users_organizations.status = TRUE
+					) > 0 OR (user_id = ?))', $user->getId(), $user->getId());
 		} else {
 			$q_get_orders->where('user_id = ?', $user->getId());
 		}
