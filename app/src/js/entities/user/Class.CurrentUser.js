@@ -71,7 +71,6 @@ CurrentUser = extending(OneUser, (function() {
 		}
 		OneUser.call(this, 'me');
 		
-		this.email = null;
 		this.selected_city = new OneCity();
 		this.friends = new UsersCollection();
 		this.friends_activities = new FriendsActivitiesCollection();
