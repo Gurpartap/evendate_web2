@@ -115,10 +115,10 @@ $url_parts = explode('/', $url);
 	<?php
 	if ($DEBUG_MODE) { ?>
     <link rel="stylesheet" href="/dist/vendor.css?rev=02bc2f50a99c1167d48fb75e2e503163">
-    <link rel="stylesheet" href="/dist/app.css?rev=0cc32e88bdf929528caf15b6b21bdebd"><?php
+    <link rel="stylesheet" href="/dist/app.css?rev=fad00fc03fb00f793b8ab11c2627ebb2"><?php
 	} else { ?>
     <link rel="stylesheet" href="/dist/vendor.min.css?rev=4165c69f5d04ec431ab5bc41425847a5">
-    <link rel="stylesheet" href="/dist/app.min.css?rev=4c951bde496be01743a88cd3b31d2f6c"><?php
+    <link rel="stylesheet" href="/dist/app.min.css?rev=a048317458ac997321d1d4832e16e4f1"><?php
 	} ?>
 
 	<?php
@@ -317,7 +317,7 @@ $url_parts = explode('/', $url);
     </div>
   </header>
   <div id="main_section">
-
+		<div class="app_inspectors_wrapper AppInspectorsWrapper"></div>
     <div class="app_view -hidden PageView">
       <div class="page_wrapper Content -fadeable"></div>
     </div>
@@ -349,11 +349,11 @@ $url_parts = explode('/', $url);
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=87e5ab6b255a69a64ecb850dae7056ff" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=f448a27ac837e02e4e569b561281d75b" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=2d3cadcb3f112da3932947b38d2aaa5e" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=907ff6c2661340e009a653fbd0dabf94" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=2deef147e9692ec528c5915e1f27602a" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=0f0b45d0d73325b72db7b8779e1e344e" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=c658f986a76fad69de6f6812bc984ec1" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=2e824d66278afdaf0ca3a83b688debaf" charset="utf-8"></script><?php
 }
 
 foreach (glob("app/templates/{*/*/*/*,*/*/*,*/*,*}.html", GLOB_BRACE) as $filename) {
