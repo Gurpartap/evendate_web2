@@ -58,6 +58,14 @@
 	<option value="{val}" {data}>{display_name}</option>
 </script>
 
+<script type="javascript/template" id="tmpl-user-social-links-wrapper">
+	<div class="social_link_wrapper">{links}</div>
+</script>
+
+<script type="javascript/template" id="tmpl-user-social-link">
+	<{html_tag} class="social_link -color_{slug} -valign_center {classes}" {attributes}><i class="fa_icon fa-{icon_slug}"></i></{html_tag}>
+</script>
+
 <script type="javascript/template" id="tmpl-subscriber-divider">
 	<span class="organization_subscribers_divider -text_color_accent">{label}</span>
 </script>

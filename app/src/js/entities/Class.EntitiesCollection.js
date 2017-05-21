@@ -99,6 +99,17 @@ EntitiesCollection = extending(Array, (function() {
 		}
 		return [];
 	};
+	/**
+	 *
+	 * @return {EntitiesCollection}
+	 */
+	EntitiesCollection.prototype.empty = function() {
+		this.last_pushed.splice(0, this.last_pushed.length);
+		this.__lookup = {};
+		this.splice(0, this.length);
+		
+		return this;
+	};
 	
 	return EntitiesCollection;
 }()));

@@ -132,7 +132,7 @@ if (checkRedirect()) {
 			 * Bind only on 'back' action
 			 */
 			History.Adapter.bind(window, 'statechange', function() {
-				if (History.getCurrentIndex() - 1 !== History.getState().data._index) {
+				if (!History.stateChangeHandled) {
 					__APP.reInit();
 				}
 			});

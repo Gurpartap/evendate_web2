@@ -116,9 +116,9 @@ Builder = (function() {
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.link = function buildLink(props) {
-		return tmpl('link', [].map.call(arguments, function(arg) {
+		return bindPageLinks(tmpl('link', [].map.call(arguments, function(arg) {
 			return Builder.normalizeBuildProps(arg);
-		}));
+		})));
 	};
 	/**
 	 *
@@ -349,32 +349,37 @@ Builder = (function() {
 	/**
 	 *
 	 * @param {Object<OneUser.ACCOUNTS, string>} [accounts_links]
+	 * @param {buildProps} [props]
 	 * @returns {jQuery}
 	 */
-	Builder.prototype.socialLinks = function buildSocialLinks(accounts_links) {
+	Builder.prototype.socialLinks = function buildSocialLinks(accounts_links, props) {
 		var props_array = [],
 			ICON_SLUGS = {
 				VK: 'vk',
 				GOOGLE: 'google-plus',
 				FACEBOOK: 'facebook-official'
 			};
+		
 		$.each(OneUser.ACCOUNTS, function(slug, account) {
-			var props = {
+			var acc_props = {
 				slug: account,
 				icon_slug: ICON_SLUGS[slug]
 			};
+			
 			if(accounts_links.hasOwnProperty(account)){
-				props.html_tag = 'a';
-				props.attributes = {
+				acc_props.html_tag = 'a';
+				acc_props.attributes = {
 					href: accounts_links[account],
 					target: '_blank'
 				};
 			} else {
-				props.html_tag = 'span';
+				acc_props.html_tag = 'span';
 			}
-			props_array.push(Builder.normalizeBuildProps(props))
+			
+			props_array.push(Builder.normalizeBuildProps($.extend(acc_props, props)));
 		});
-		return tmpl('user-page-social-link', props_array);
+		
+		return tmpl('user-social-links-wrapper', {links: tmpl('user-social-link', props_array)});
 	};
 	/**
 	 *
