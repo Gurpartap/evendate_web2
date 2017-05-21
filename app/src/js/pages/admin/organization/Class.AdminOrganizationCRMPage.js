@@ -74,7 +74,7 @@ AdminOrganizationCRMPage = extending(AdminOrganizationPage, (function() {
 	AdminOrganizationCRMPage.prototype.initCRMTable = function() {
 		var self = this;
 		
-		this.CRMTable = this.$wrapper.find('.CRMTable').DataTable({
+		this.CRMTable = this.$wrapper.find('.CRMTable').eq(0).DataTable({
 			paging: true,
 			columnDefs: [
 				{
@@ -162,11 +162,14 @@ AdminOrganizationCRMPage = extending(AdminOrganizationPage, (function() {
 				};
 			}));
 			
-			if (self.CRMTable) {
-				self.CRMTable.rows.add($rows).rows().recalcHeight().columns.adjust().fixedColumns().relayout().draw();
-			} else {
-				self.$wrapper.find('.CRMTable').children('tbody').append($rows);
+			if (!self.CRMTable) {
 				self.initCRMTable();
+			}
+			self.CRMTable.rows.add($rows).draw();
+			try {
+				self.CRMTable.rows().recalcHeight().columns.adjust().fixedColumns().relayout().draw();
+			} catch (e) {
+				__APP.reload();
 			}
 			
 			self.$wrapper.find('.CRMTableWrapper').removeClass(__C.CLASSES.STATUS.DISABLED);
