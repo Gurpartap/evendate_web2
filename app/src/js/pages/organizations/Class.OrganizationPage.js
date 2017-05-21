@@ -165,8 +165,11 @@ OrganizationPage = extending(Page, (function() {
 			storeStat(PAGE.organization.id, __C.STATS.ORGANIZATION_ENTITY, __C.STATS.ORGANIZATION_OPEN_SITE);
 		});
 		
+		if (isScrollRemain(1000)) {
+			PAGE.fetchAndAppendFeed(PAGE.event_types[PAGE.current_tab]);
+		}
 		$(window).on('scroll.uploadEvents', function() {
-			if (isScrollRemain(200)) {
+			if (isScrollRemain(1000)) {
 				PAGE.fetchAndAppendFeed(PAGE.event_types[PAGE.current_tab]);
 			}
 		});

@@ -2031,10 +2031,10 @@ a.button:hover {text-decoration: none}
 	margin: 20px 0;
 	overflow: hidden;
 
-	-webkit-transition: height .5s ease;
-	-moz-transition: height .5s ease;
-	-o-transition: height .5s ease;
-	transition: height .5s ease;
+	-webkit-transition: height .4s ease;
+	-moz-transition: height .4s ease;
+	-o-transition: height .4s ease;
+	transition: height .4s ease;
 }
 
 .tab_body {
@@ -3974,7 +3974,7 @@ body.-open_modal > .modal_wrapper {
 	display: inline-block;
 	vertical-align: top;
 	width: 600px;
-	margin-top: 36px;
+	margin: 36px 0;
 	border-radius: 4px;
 	overflow: hidden;
 }
