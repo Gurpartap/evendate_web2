@@ -5329,6 +5329,126 @@ OrganizationsCollection = extending(EntitiesCollection, (function() {
 	return OrganizationsCollection;
 }()));
 /**
+ * @requires ../Class.OneEntity.js
+ */
+/**
+ *
+ * @class SearchResults
+ * @extends OneEntity
+ */
+SearchResults = extending(OneEntity, (function() {
+	/**
+	 * @typedef {function({
+ *   [events]: Array<OneEvent>,
+ *   [organizations]: Array<OneOrganization>
+ * })} SearchResultsAJAXCallback
+	 */
+	/**
+	 *
+	 * @param {string} query_string
+	 * @constructor
+	 * @constructs SearchResults
+	 */
+	function SearchResults(query_string) {
+		this.query_string = query_string;
+		this.events = new EventsCollection();
+		this.organizations = new OrganizationsCollection();
+	}
+	/**
+	 *
+	 * @param {string} query_string
+	 * @returns {{ [q]: {string}, [tags]: {string} }}
+	 */
+	SearchResults.sanitizeQueryVar = function(query_string) {
+		var data = {};
+		if (query_string.indexOf('#') === 0) {
+			data.tags = query_string.replace('#', '');
+		} else {
+			data.q = query_string;
+		}
+		return data;
+	};
+	/**
+	 *
+	 * @param {string} query_string
+	 * @param {AJAXData} [ajax_data]
+	 * @param {SearchResultsAJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	SearchResults.fetchEventsAndOrganizations = function(query_string, ajax_data, success) {
+		return __APP.SERVER.getData('/api/v1/search/', $.extend({}, SearchResults.sanitizeQueryVar(query_string), ajax_data), success);
+	};
+	/**
+	 *
+	 * @param {AJAXData} [events_ajax_data]
+	 * @param {function(organizations: Array<OneEvent>)} [success]
+	 * @returns {jqPromise}
+	 */
+	SearchResults.prototype.fetchEvents = function(events_ajax_data, success) {
+		var self = this,
+			ajax_data = {
+				fields: 'events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length}))
+			};
+		
+		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data.events);
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {AJAXData} [organizations_ajax_data]
+	 * @param {function(organizations: Array<OneOrganization>)} [success]
+	 * @returns {jqPromise}
+	 */
+	SearchResults.prototype.fetchOrganizations = function(organizations_ajax_data, success) {
+		var self = this,
+			ajax_data = {
+				fields: 'organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length}))
+			};
+		
+		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data.organizations);
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {AJAXData} [events_ajax_data]
+	 * @param {AJAXData} [organizations_ajax_data]
+	 * @param {SearchResultsAJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	SearchResults.prototype.fetchEventsAndOrganizations = function(events_ajax_data, organizations_ajax_data, success) {
+		var self = this,
+			ajax_data = {fields: new Fields()};
+		
+		if (events_ajax_data) {
+			ajax_data.fields.push({
+				events: $.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length})
+			});
+		}
+		if (organizations_ajax_data && !SearchResults.sanitizeQueryVar(self.query_string).tags) {
+			ajax_data.fields.push({
+				organizations: $.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length})
+			});
+		}
+		
+		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data);
+			}
+		});
+	};
+	
+	return SearchResults;
+}()));
+/**
  * @typedef {object} StatisticsUnit
  * @property {number} time_value
  * @property {number} value
@@ -5568,126 +5688,6 @@ OrganizationsStatistics = extending(Statistics, (function() {
 	}
 	
 	return OrganizationsStatistics;
-}()));
-/**
- * @requires ../Class.OneEntity.js
- */
-/**
- *
- * @class SearchResults
- * @extends OneEntity
- */
-SearchResults = extending(OneEntity, (function() {
-	/**
-	 * @typedef {function({
- *   [events]: Array<OneEvent>,
- *   [organizations]: Array<OneOrganization>
- * })} SearchResultsAJAXCallback
-	 */
-	/**
-	 *
-	 * @param {string} query_string
-	 * @constructor
-	 * @constructs SearchResults
-	 */
-	function SearchResults(query_string) {
-		this.query_string = query_string;
-		this.events = new EventsCollection();
-		this.organizations = new OrganizationsCollection();
-	}
-	/**
-	 *
-	 * @param {string} query_string
-	 * @returns {{ [q]: {string}, [tags]: {string} }}
-	 */
-	SearchResults.sanitizeQueryVar = function(query_string) {
-		var data = {};
-		if (query_string.indexOf('#') === 0) {
-			data.tags = query_string.replace('#', '');
-		} else {
-			data.q = query_string;
-		}
-		return data;
-	};
-	/**
-	 *
-	 * @param {string} query_string
-	 * @param {AJAXData} [ajax_data]
-	 * @param {SearchResultsAJAXCallback} [success]
-	 * @returns {jqPromise}
-	 */
-	SearchResults.fetchEventsAndOrganizations = function(query_string, ajax_data, success) {
-		return __APP.SERVER.getData('/api/v1/search/', $.extend({}, SearchResults.sanitizeQueryVar(query_string), ajax_data), success);
-	};
-	/**
-	 *
-	 * @param {AJAXData} [events_ajax_data]
-	 * @param {function(organizations: Array<OneEvent>)} [success]
-	 * @returns {jqPromise}
-	 */
-	SearchResults.prototype.fetchEvents = function(events_ajax_data, success) {
-		var self = this,
-			ajax_data = {
-				fields: 'events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length}))
-			};
-		
-		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data.events);
-			}
-		});
-	};
-	/**
-	 *
-	 * @param {AJAXData} [organizations_ajax_data]
-	 * @param {function(organizations: Array<OneOrganization>)} [success]
-	 * @returns {jqPromise}
-	 */
-	SearchResults.prototype.fetchOrganizations = function(organizations_ajax_data, success) {
-		var self = this,
-			ajax_data = {
-				fields: 'organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length}))
-			};
-		
-		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data.organizations);
-			}
-		});
-	};
-	/**
-	 *
-	 * @param {AJAXData} [events_ajax_data]
-	 * @param {AJAXData} [organizations_ajax_data]
-	 * @param {SearchResultsAJAXCallback} [success]
-	 * @returns {jqPromise}
-	 */
-	SearchResults.prototype.fetchEventsAndOrganizations = function(events_ajax_data, organizations_ajax_data, success) {
-		var self = this,
-			ajax_data = {fields: new Fields()};
-		
-		if (events_ajax_data) {
-			ajax_data.fields.push({
-				events: $.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length})
-			});
-		}
-		if (organizations_ajax_data && !SearchResults.sanitizeQueryVar(self.query_string).tags) {
-			ajax_data.fields.push({
-				organizations: $.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length})
-			});
-		}
-		
-		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data);
-			}
-		});
-	};
-	
-	return SearchResults;
 }()));
 /**
  * @requires ../Class.OneEntity.js
@@ -5938,6 +5938,201 @@ OneTicket = extending(OneEntity, (function() {
 	
 	return OneTicket;
 }()));
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.OneTicket.js
+ */
+/**
+ *
+ * @class EventsTicketsCollection
+ * @extends EntitiesCollection
+ */
+EventsTicketsCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @param {(string|number)} [event_id=0]
+	 *
+	 * @constructor
+	 * @constructs EventsTicketsCollection
+	 *
+	 * @property {(string|number)} event_id
+	 */
+	function EventsTicketsCollection(event_id) {
+		EntitiesCollection.call(this);
+		
+		Object.defineProperty(this, 'event_id', {
+			value: setDefaultValue(event_id, 0)
+		});
+	}
+	
+	EventsTicketsCollection.prototype.ID_PROP_NAME = 'uuid';
+	EventsTicketsCollection.prototype.collection_of = OneTicket;
+	
+	/**
+	 *
+	 * @param {(string|number)} event_id
+	 * @param {AJAXData} [ajax_data]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	EventsTicketsCollection.fetchTickets = function(event_id, ajax_data, success) {
+		return __APP.SERVER.getData('/api/v1/events/' + event_id + '/tickets', ajax_data, success);
+	};
+	/**
+	 *
+	 * @param {(Fields|string)} [fields]
+	 * @param {number} [length]
+	 * @param {(string|Array)} [order_by]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	EventsTicketsCollection.prototype.fetchTickets = function(fields, length, order_by, success) {
+		var self = this;
+		
+		return EventsTicketsCollection.fetchTickets(this.event_id, {
+			fields: fields || undefined,
+			offset: this.length,
+			length: length || undefined,
+			order_by: order_by || undefined
+		}, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, self.last_pushed);
+			}
+		});
+	};
+	
+	return EventsTicketsCollection;
+}()));
+/**
+ * @requires Class.EventsTicketsCollection.js
+ */
+/**
+ *
+ * @class AdminEventsTicketsCollection
+ * @extends EventsTicketsCollection
+ */
+AdminEventsTicketsCollection = extending(EventsTicketsCollection, (function() {
+	/**
+	 * @param {(string|number)} event_id
+	 *
+	 * @constructor
+	 * @constructs AdminEventsTicketsCollection
+	 */
+	function AdminEventsTicketsCollection(event_id) {
+		EventsTicketsCollection.call(this, event_id);
+	}
+	
+	/**
+	 *
+	 * @param {(string|number)} event_id
+	 * @param {AJAXData} [ajax_data]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	AdminEventsTicketsCollection.fetchTickets = function(event_id, ajax_data, success) {
+		ajax_data = ajax_data ? ajax_data : {};
+		
+		return __APP.SERVER.getData('/api/v1/statistics/events/'+event_id+'/tickets', ajax_data, success);
+	};
+	/**
+	 *
+	 * @param {(Fields|string)} [fields]
+	 * @param {number} [length]
+	 * @param {(string|Array)} [order_by]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	AdminEventsTicketsCollection.prototype.fetchTickets = function(fields, length, order_by, success) {
+		var self = this;
+		
+		return AdminEventsTicketsCollection.fetchTickets(this.event_id, {
+			fields: fields || undefined,
+			offset: this.length,
+			length: length || undefined,
+			order_by: order_by || undefined
+		}, function(data) {
+			self.setData(data);
+			if (success && typeof success === 'function') {
+				success.call(self, self.last_pushed);
+			}
+		});
+	};
+	
+	return AdminEventsTicketsCollection;
+}())); 
+/**
+ * @requires Class.AdminEventsTicketsCollection.js
+ */
+/**
+ *
+ * @class SearchAdminEventsTicketsCollection
+ * @extends AdminEventsTicketsCollection
+ */
+SearchAdminEventsTicketsCollection = extending(AdminEventsTicketsCollection, (function() {
+	/**
+	 * @param {(string|number)} query_string
+	 * @param {(string|number)} event_id
+	 *
+	 * @constructor
+	 * @constructs SearchAdminEventsTicketsCollection
+	 */
+	function SearchAdminEventsTicketsCollection(query_string, event_id) {
+		AdminEventsTicketsCollection.call(this, event_id);
+		this.query_string = query_string;
+	}
+	
+	/**
+	 *
+	 * @param {(string|number)} query_string
+	 * @param {(string|number)} event_id
+	 * @param {AJAXData} [ajax_data]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	SearchAdminEventsTicketsCollection.fetchTickets = function(query_string, event_id, ajax_data, success) {
+		ajax_data = ajax_data ? ajax_data : {};
+		
+		if ($.isNumeric(query_string)) {
+			ajax_data.number = query_string;
+		} else {
+			ajax_data.user_name = query_string;
+		}
+		
+		return AdminEventsTicketsCollection.fetchTickets(event_id, ajax_data, success);
+	};
+	/**
+	 *
+	 * @param {(Fields|string)} [fields]
+	 * @param {number} [length]
+	 * @param {(string|Array)} [order_by]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	SearchAdminEventsTicketsCollection.prototype.fetchTickets = function(fields, length, order_by, success) {
+		var self = this;
+		
+		return SearchAdminEventsTicketsCollection.fetchTickets(this.query_string, this.event_id, {
+			fields: fields || undefined,
+			offset: this.length,
+			length: length || undefined,
+			order_by: order_by || undefined
+		}, function(data) {
+			self.setData(data);
+			if (success && typeof success === 'function') {
+				success.call(self, self.last_pushed);
+			}
+		});
+	};
+	
+	return SearchAdminEventsTicketsCollection;
+}())); 
 /**
  * @requires ../ticket/Class.OneTicket.js
  * @requires ../order/Class.OneOrder.js
@@ -6293,201 +6488,6 @@ MyTicketsCollection = extending(ExtendedTicketsCollection, (function() {
 	};
 	
 	return MyTicketsCollection;
-}())); 
-/**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneTicket.js
- */
-/**
- *
- * @class EventsTicketsCollection
- * @extends EntitiesCollection
- */
-EventsTicketsCollection = extending(EntitiesCollection, (function() {
-	/**
-	 *
-	 * @param {(string|number)} [event_id=0]
-	 *
-	 * @constructor
-	 * @constructs EventsTicketsCollection
-	 *
-	 * @property {(string|number)} event_id
-	 */
-	function EventsTicketsCollection(event_id) {
-		EntitiesCollection.call(this);
-		
-		Object.defineProperty(this, 'event_id', {
-			value: setDefaultValue(event_id, 0)
-		});
-	}
-	
-	EventsTicketsCollection.prototype.ID_PROP_NAME = 'uuid';
-	EventsTicketsCollection.prototype.collection_of = OneTicket;
-	
-	/**
-	 *
-	 * @param {(string|number)} event_id
-	 * @param {AJAXData} [ajax_data]
-	 * @param {AJAXCallback} [success]
-	 *
-	 * @return {jqPromise}
-	 */
-	EventsTicketsCollection.fetchTickets = function(event_id, ajax_data, success) {
-		return __APP.SERVER.getData('/api/v1/events/' + event_id + '/tickets', ajax_data, success);
-	};
-	/**
-	 *
-	 * @param {(Fields|string)} [fields]
-	 * @param {number} [length]
-	 * @param {(string|Array)} [order_by]
-	 * @param {AJAXCallback} [success]
-	 *
-	 * @return {jqPromise}
-	 */
-	EventsTicketsCollection.prototype.fetchTickets = function(fields, length, order_by, success) {
-		var self = this;
-		
-		return EventsTicketsCollection.fetchTickets(this.event_id, {
-			fields: fields || undefined,
-			offset: this.length,
-			length: length || undefined,
-			order_by: order_by || undefined
-		}, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, self.last_pushed);
-			}
-		});
-	};
-	
-	return EventsTicketsCollection;
-}()));
-/**
- * @requires Class.EventsTicketsCollection.js
- */
-/**
- *
- * @class AdminEventsTicketsCollection
- * @extends EventsTicketsCollection
- */
-AdminEventsTicketsCollection = extending(EventsTicketsCollection, (function() {
-	/**
-	 * @param {(string|number)} event_id
-	 *
-	 * @constructor
-	 * @constructs AdminEventsTicketsCollection
-	 */
-	function AdminEventsTicketsCollection(event_id) {
-		EventsTicketsCollection.call(this, event_id);
-	}
-	
-	/**
-	 *
-	 * @param {(string|number)} event_id
-	 * @param {AJAXData} [ajax_data]
-	 * @param {AJAXCallback} [success]
-	 *
-	 * @return {jqPromise}
-	 */
-	AdminEventsTicketsCollection.fetchTickets = function(event_id, ajax_data, success) {
-		ajax_data = ajax_data ? ajax_data : {};
-		
-		return __APP.SERVER.getData('/api/v1/statistics/events/'+event_id+'/tickets', ajax_data, success);
-	};
-	/**
-	 *
-	 * @param {(Fields|string)} [fields]
-	 * @param {number} [length]
-	 * @param {(string|Array)} [order_by]
-	 * @param {AJAXCallback} [success]
-	 *
-	 * @return {jqPromise}
-	 */
-	AdminEventsTicketsCollection.prototype.fetchTickets = function(fields, length, order_by, success) {
-		var self = this;
-		
-		return AdminEventsTicketsCollection.fetchTickets(this.event_id, {
-			fields: fields || undefined,
-			offset: this.length,
-			length: length || undefined,
-			order_by: order_by || undefined
-		}, function(data) {
-			self.setData(data);
-			if (success && typeof success === 'function') {
-				success.call(self, self.last_pushed);
-			}
-		});
-	};
-	
-	return AdminEventsTicketsCollection;
-}())); 
-/**
- * @requires Class.AdminEventsTicketsCollection.js
- */
-/**
- *
- * @class SearchAdminEventsTicketsCollection
- * @extends AdminEventsTicketsCollection
- */
-SearchAdminEventsTicketsCollection = extending(AdminEventsTicketsCollection, (function() {
-	/**
-	 * @param {(string|number)} query_string
-	 * @param {(string|number)} event_id
-	 *
-	 * @constructor
-	 * @constructs SearchAdminEventsTicketsCollection
-	 */
-	function SearchAdminEventsTicketsCollection(query_string, event_id) {
-		AdminEventsTicketsCollection.call(this, event_id);
-		this.query_string = query_string;
-	}
-	
-	/**
-	 *
-	 * @param {(string|number)} query_string
-	 * @param {(string|number)} event_id
-	 * @param {AJAXData} [ajax_data]
-	 * @param {AJAXCallback} [success]
-	 *
-	 * @return {jqPromise}
-	 */
-	SearchAdminEventsTicketsCollection.fetchTickets = function(query_string, event_id, ajax_data, success) {
-		ajax_data = ajax_data ? ajax_data : {};
-		
-		if ($.isNumeric(query_string)) {
-			ajax_data.number = query_string;
-		} else {
-			ajax_data.user_name = query_string;
-		}
-		
-		return AdminEventsTicketsCollection.fetchTickets(event_id, ajax_data, success);
-	};
-	/**
-	 *
-	 * @param {(Fields|string)} [fields]
-	 * @param {number} [length]
-	 * @param {(string|Array)} [order_by]
-	 * @param {AJAXCallback} [success]
-	 *
-	 * @return {jqPromise}
-	 */
-	SearchAdminEventsTicketsCollection.prototype.fetchTickets = function(fields, length, order_by, success) {
-		var self = this;
-		
-		return SearchAdminEventsTicketsCollection.fetchTickets(this.query_string, this.event_id, {
-			fields: fields || undefined,
-			offset: this.length,
-			length: length || undefined,
-			order_by: order_by || undefined
-		}, function(data) {
-			self.setData(data);
-			if (success && typeof success === 'function') {
-				success.call(self, self.last_pushed);
-			}
-		});
-	};
-	
-	return SearchAdminEventsTicketsCollection;
 }())); 
 /**
  * @requires ../Class.OneEntity.js
@@ -11360,7 +11360,7 @@ Builder = (function() {
 		var self = this;
 		
 		return tmpl('subscriber', subscribers.map(function(subscriber, i) {
-			var append_divider = (typeof last_is_fiend == 'undefined') || last_is_fiend != subscriber.is_friend;
+			var append_divider = (typeof last_is_fiend === 'undefined') || last_is_fiend !== subscriber.is_friend;
 			
 			last_is_fiend = subscriber.is_friend;
 			return {
@@ -11672,112 +11672,6 @@ Builder = (function() {
  * @abstract
  * @class
  */
-AbstractTopBar = (function () {
-	/**
-	 *
-	 * @constructor
-	 * @constructs AbstractTopBar
-	 *
-	 * @property {jQuery} $main_header
-	 */
-	function AbstractTopBar() {
-		this.$main_header = $('#main_header');
-	}
-	
-	AbstractTopBar.prototype.init = function () {
-		var $overlay = this.$main_header.find('.TopBarOverlay'),
-			$search_button = $overlay.find('.TopBarSearchButton'),
-			$search_input = $overlay.find('.TopBarSearchInput');
-			
-		$search_button.on('click.OpenSearchBar', function() {
-			if ($overlay.hasClass('-open_search_bar')) {
-				__APP.changeState('/search/' + encodeURIComponent($search_input.val()));
-			} else {
-				$overlay.addClass('-open_search_bar');
-				$search_input.focus();
-			}
-		});
-		
-		$search_input.on('keypress', function(e) {
-			if (e.which === 13) {
-				__APP.changeState('/search/' + encodeURIComponent($search_input.val()));
-			}
-		}).on('keydown', function(e) {
-			if (e.keyCode === 27) {
-				$overlay.removeClass('-open_search_bar');
-				$search_input.val('');
-			}
-		}).on('blur', function() {
-			if ($search_input.val() === '') {
-				$overlay.removeClass('-open_search_bar');
-			}
-		});
-		
-		this.$main_header.find('.SidebarBurger').add($('.MainSectionCap')).on('click', function() {
-			$('body').toggleClass('-open_sidebar');
-		});
-		
-		bindRippleEffect(this.$main_header);
-		bindPageLinks(this.$main_header);
-	};
-	
-	return AbstractTopBar;
-}());
-/**
- * @requires Class.AbstractTopBar.js
- */
-/**
- * @class
- * @extends AbstractTopBar
- */
-TopBar = extending(AbstractTopBar, (function () {
-	/**
-	 *
-	 * @constructor
-	 * @constructs TopBar
-	 */
-	function TopBar() {
-		AbstractTopBar.call(this);
-	}
-	
-	TopBar.prototype.init = function () {
-		AbstractTopBar.prototype.init.call(this);
-	};
-	
-	return TopBar;
-}()));
-/**
- * @requires Class.AbstractTopBar.js
- */
-/**
- * @class
- * @extends AbstractTopBar
- */
-TopBarNoAuth = extending(AbstractTopBar, (function () {
-	/**
-	 *
-	 * @constructor
-	 * @constructs TopBarNoAuth
-	 */
-	function TopBarNoAuth() {
-		AbstractTopBar.call(this);
-	}
-	
-	TopBarNoAuth.prototype.init = function () {
-		this.$main_header.find('.LoginButton').on('click', function() {
-			cookies.removeItem('auth_command');
-			cookies.removeItem('auth_entity_id');
-			(new AuthModal(location.href)).show();
-		});
-		AbstractTopBar.prototype.init.call(this);
-	};
-	
-	return TopBarNoAuth;
-}()));
-/**
- * @abstract
- * @class
- */
 AbstractSidebar = (function () {
 	/**
 	 *
@@ -11889,6 +11783,112 @@ SidebarNoAuth = extending(AbstractSidebar, (function () {
 	};
 	
 	return SidebarNoAuth;
+}()));
+/**
+ * @abstract
+ * @class
+ */
+AbstractTopBar = (function () {
+	/**
+	 *
+	 * @constructor
+	 * @constructs AbstractTopBar
+	 *
+	 * @property {jQuery} $main_header
+	 */
+	function AbstractTopBar() {
+		this.$main_header = $('#main_header');
+	}
+	
+	AbstractTopBar.prototype.init = function () {
+		var $overlay = this.$main_header.find('.TopBarOverlay'),
+			$search_button = $overlay.find('.TopBarSearchButton'),
+			$search_input = $overlay.find('.TopBarSearchInput');
+			
+		$search_button.on('click.OpenSearchBar', function() {
+			if ($overlay.hasClass('-open_search_bar')) {
+				__APP.changeState('/search/' + encodeURIComponent($search_input.val()));
+			} else {
+				$overlay.addClass('-open_search_bar');
+				$search_input.focus();
+			}
+		});
+		
+		$search_input.on('keypress', function(e) {
+			if (e.which === 13) {
+				__APP.changeState('/search/' + encodeURIComponent($search_input.val()));
+			}
+		}).on('keydown', function(e) {
+			if (e.keyCode === 27) {
+				$overlay.removeClass('-open_search_bar');
+				$search_input.val('');
+			}
+		}).on('blur', function() {
+			if ($search_input.val() === '') {
+				$overlay.removeClass('-open_search_bar');
+			}
+		});
+		
+		this.$main_header.find('.SidebarBurger').add($('.MainSectionCap')).on('click', function() {
+			$('body').toggleClass('-open_sidebar');
+		});
+		
+		bindRippleEffect(this.$main_header);
+		bindPageLinks(this.$main_header);
+	};
+	
+	return AbstractTopBar;
+}());
+/**
+ * @requires Class.AbstractTopBar.js
+ */
+/**
+ * @class
+ * @extends AbstractTopBar
+ */
+TopBar = extending(AbstractTopBar, (function () {
+	/**
+	 *
+	 * @constructor
+	 * @constructs TopBar
+	 */
+	function TopBar() {
+		AbstractTopBar.call(this);
+	}
+	
+	TopBar.prototype.init = function () {
+		AbstractTopBar.prototype.init.call(this);
+	};
+	
+	return TopBar;
+}()));
+/**
+ * @requires Class.AbstractTopBar.js
+ */
+/**
+ * @class
+ * @extends AbstractTopBar
+ */
+TopBarNoAuth = extending(AbstractTopBar, (function () {
+	/**
+	 *
+	 * @constructor
+	 * @constructs TopBarNoAuth
+	 */
+	function TopBarNoAuth() {
+		AbstractTopBar.call(this);
+	}
+	
+	TopBarNoAuth.prototype.init = function () {
+		this.$main_header.find('.LoginButton').on('click', function() {
+			cookies.removeItem('auth_command');
+			cookies.removeItem('auth_entity_id');
+			(new AuthModal(location.href)).show();
+		});
+		AbstractTopBar.prototype.init.call(this);
+	};
+	
+	return TopBarNoAuth;
 }()));
 /**
  *
@@ -15891,176 +15891,6 @@ OnboardingPage = extending(Page, (function() {
 	return OnboardingPage
 }()));
 /**
- * @requires ../Class.Page.js
- */
-/**
- *
- * @class SearchPage
- * @extends Page
- */
-SearchPage = extending(Page, (function() {
-	/**
-	 *
-	 * @param {string} search
-	 * @constructor
-	 * @constructs SearchPage
-	 */
-	function SearchPage(search) {
-		Page.apply(this, arguments);
-		
-		this.page_title = 'Поиск';
-		this.$search_bar_input = $('#search_bar_input');
-		this.search_string = decodeURIComponent(search);
-		this.events_ajax_data = {
-			length: 10,
-			fields: new Fields(
-				'image_horizontal_medium_url',
-				'detail_info_url',
-				'nearest_event_date',
-				'can_edit',
-				'location',
-				'is_favorite',
-				'is_registered',
-				'registration_available',
-				'registration_locally',
-				'registration_required',
-				'registration_till',
-				'ticketing_locally',
-				'is_free',
-				'min_price',
-				'favored_users_count',
-				'organization_name',
-				'organization_short_name',
-				'organization_logo_small_url',
-				'description',
-				'favored',
-				'is_same_time',
-				'tags',
-				'dates'
-			),
-			order_by: 'nearest_event_date,-first_event_date'
-		};
-		this.organizations_ajax_data = {
-			length: 30,
-			fields: new Fields([
-				'subscribed_count',
-				'img_small_url'
-			])
-		};
-		this.past_events = false;
-		this.search_results = new SearchResults(this.search_string);
-	}
-	/**
-	 *
-	 * @param {(OneOrganization|Array<OneOrganization>|OrganizationsCollection)} organizations
-	 * @returns {jQuery}
-	 */
-	SearchPage.buildOrganizationItems = function(organizations) {
-		return __APP.BUILD.organizationItems(organizations, {
-			block_classes: ['-show'],
-			avatar_classes: ['-size_50x50', '-rounded'],
-			counter_classes: [__C.CLASSES.HIDDEN]
-		})
-	};
-	/**
-	 *
-	 * @param {(OneEvent|Array<OneEvent>|EventsCollection)} events
-	 * @returns {jQuery}
-	 */
-	SearchPage.buildEventCards = function(events) {
-		var $events = $();
-		if (events.length == 0) {
-			$events = tmpl('search-no-events', {});
-		} else {
-			events.forEach(function(event) {
-				if(event.nearest_event_date == undefined && !this.past_events){
-					$events = $events.add(tmpl('divider', {title: 'Прошедшие события'}));
-					this.past_events = true;
-				}
-				$events = $events.add(__APP.BUILD.eventCards(event));
-			});
-		}
-		return $events
-	};
-	
-	SearchPage.prototype.fetchData = function() {
-		return this.fetching_data_defer = this.search_results.fetchEventsAndOrganizations(this.events_ajax_data, this.organizations_ajax_data);
-	};
-	
-	SearchPage.prototype.init = function() {
-		var PAGE = this,
-			$window = $(window),
-			$organizations_scrollbar;
-		
-		function bindFeedEvents($parent) {
-			trimAvatarsCollection($parent);
-			bindRippleEffect($parent);
-			__APP.MODALS.bindCallModal($parent);
-			bindPageLinks($parent);
-			
-			$parent.find('.HideEvent').remove();
-		}
-		
-		$organizations_scrollbar = this.$wrapper.find('.SearchOrganizationsScrollbar').scrollbar({
-			disableBodyScroll: true,
-			onScroll: function(y) {
-				if (y.scroll == y.maxScroll) {
-					PAGE.search_results.fetchOrganizations(PAGE.organizations_ajax_data, function(organizations) {
-						if (organizations.length) {
-							$organizations_scrollbar.append(SearchPage.buildOrganizationItems(organizations));
-						} else {
-							$organizations_scrollbar.off('scroll.onScroll');
-						}
-						bindPageLinks($organizations_scrollbar);
-					});
-				}
-			}
-		});
-		$window.off('scroll.upload' + PAGE.constructor.name);
-		$window.on('scroll.upload' + PAGE.constructor.name, function() {
-			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.block_scroll) {
-				PAGE.block_scroll = true;
-				PAGE.search_results.fetchEvents(PAGE.events_ajax_data, function(events) {
-					var $events;
-					if(events.length){
-						$events = SearchPage.buildEventCards(PAGE.search_results.events.last_pushed);
-						PAGE.$wrapper.find('.SearchEvents').append($events);
-						bindFeedEvents($events);
-						PAGE.block_scroll = false;
-					} else {
-						$window.off('scroll.upload' + PAGE.constructor.name);
-					}
-				});
-			}
-		});
-		bindFeedEvents(this.$wrapper);
-	};
-	
-	SearchPage.prototype.render = function() {
-		var data = {};
-		
-		$('.TopBarOverlay').addClass('-open_search_bar');
-		this.$search_bar_input.val(this.search_string);
-		
-		data.events = SearchPage.buildEventCards(this.search_results.events);
-		if (this.search_results.organizations.length == 0) {
-			data.no_organizations = __C.CLASSES.HIDDEN;
-		} else {
-			data.organizations = SearchPage.buildOrganizationItems(this.search_results.organizations);
-		}
-		
-		this.$wrapper.append(tmpl('search-wrapper', data));
-		this.init();
-	};
-	
-	SearchPage.prototype.destroy = function() {
-		$('.TopBarOverlay').removeClass('-open_search_bar');
-		this.$search_bar_input.val('');
-	};
-	
-	return SearchPage;
-}()));
-/**
  * @requires Class.AbstractEditOrganizationPage.js
  */
 /**
@@ -16461,7 +16291,7 @@ OrganizationPage = extending(Page, (function() {
 	
 	OrganizationPage.prototype.init = function() {
 		var PAGE = this,
-			$subscribers_scroll;
+			$subscribers_scroll = PAGE.$wrapper.find('.SubscribersScroll');
 		
 		bindTabs(PAGE.$wrapper);
 		bindCallModal(PAGE.$wrapper);
@@ -16483,19 +16313,26 @@ OrganizationPage = extending(Page, (function() {
 			}
 		});
 		
-		$subscribers_scroll = PAGE.$wrapper.find('.SubscribersScroll').scrollbar({
+		$subscribers_scroll.scrollbar({
 			disableBodyScroll: true,
 			onScroll: function(y) {
-				if (y.scroll == y.maxScroll) {
+				var $loader,
+					last_is_friend = PAGE.organization.subscribed.last_pushed[PAGE.organization.subscribed.last_pushed.length - 1].is_friend;
+				
+				if (y.scroll + 200 >= y.maxScroll && !$subscribers_scroll.block_scroll) {
+					$subscribers_scroll.block_scroll = true;
+					$loader = __APP.BUILD.loaderBlock($subscribers_scroll);
 					PAGE.organization.subscribed.fetchOrganizationSubscribers(PAGE.organization.id, 10, {
 						fields: 'is_friend',
 						order_by: '-is_friend,first_name'
 					}, function(subscribed) {
 						if (subscribed.length) {
-							$subscribers_scroll.append(__APP.BUILD.subscribers(subscribed, PAGE.organization.subscribed[PAGE.organization.subscribed.length - 1].is_friend));
+							$subscribers_scroll.append(__APP.BUILD.subscribers(subscribed, last_is_friend));
+							$subscribers_scroll.block_scroll = false;
 						} else {
 							$subscribers_scroll.off('scroll.onScroll');
 						}
+						$loader.remove();
 						bindPageLinks($subscribers_scroll);
 					});
 				}
@@ -16549,6 +16386,176 @@ OrganizationPage = extending(Page, (function() {
 	};
 	
 	return OrganizationPage;
+}()));
+/**
+ * @requires ../Class.Page.js
+ */
+/**
+ *
+ * @class SearchPage
+ * @extends Page
+ */
+SearchPage = extending(Page, (function() {
+	/**
+	 *
+	 * @param {string} search
+	 * @constructor
+	 * @constructs SearchPage
+	 */
+	function SearchPage(search) {
+		Page.apply(this, arguments);
+		
+		this.page_title = 'Поиск';
+		this.$search_bar_input = $('#search_bar_input');
+		this.search_string = decodeURIComponent(search);
+		this.events_ajax_data = {
+			length: 10,
+			fields: new Fields(
+				'image_horizontal_medium_url',
+				'detail_info_url',
+				'nearest_event_date',
+				'can_edit',
+				'location',
+				'is_favorite',
+				'is_registered',
+				'registration_available',
+				'registration_locally',
+				'registration_required',
+				'registration_till',
+				'ticketing_locally',
+				'is_free',
+				'min_price',
+				'favored_users_count',
+				'organization_name',
+				'organization_short_name',
+				'organization_logo_small_url',
+				'description',
+				'favored',
+				'is_same_time',
+				'tags',
+				'dates'
+			),
+			order_by: 'nearest_event_date,-first_event_date'
+		};
+		this.organizations_ajax_data = {
+			length: 30,
+			fields: new Fields([
+				'subscribed_count',
+				'img_small_url'
+			])
+		};
+		this.past_events = false;
+		this.search_results = new SearchResults(this.search_string);
+	}
+	/**
+	 *
+	 * @param {(OneOrganization|Array<OneOrganization>|OrganizationsCollection)} organizations
+	 * @returns {jQuery}
+	 */
+	SearchPage.buildOrganizationItems = function(organizations) {
+		return __APP.BUILD.organizationItems(organizations, {
+			block_classes: ['-show'],
+			avatar_classes: ['-size_50x50', '-rounded'],
+			counter_classes: [__C.CLASSES.HIDDEN]
+		})
+	};
+	/**
+	 *
+	 * @param {(OneEvent|Array<OneEvent>|EventsCollection)} events
+	 * @returns {jQuery}
+	 */
+	SearchPage.buildEventCards = function(events) {
+		var $events = $();
+		if (events.length == 0) {
+			$events = tmpl('search-no-events', {});
+		} else {
+			events.forEach(function(event) {
+				if(event.nearest_event_date == undefined && !this.past_events){
+					$events = $events.add(tmpl('divider', {title: 'Прошедшие события'}));
+					this.past_events = true;
+				}
+				$events = $events.add(__APP.BUILD.eventCards(event));
+			});
+		}
+		return $events
+	};
+	
+	SearchPage.prototype.fetchData = function() {
+		return this.fetching_data_defer = this.search_results.fetchEventsAndOrganizations(this.events_ajax_data, this.organizations_ajax_data);
+	};
+	
+	SearchPage.prototype.init = function() {
+		var PAGE = this,
+			$window = $(window),
+			$organizations_scrollbar;
+		
+		function bindFeedEvents($parent) {
+			trimAvatarsCollection($parent);
+			bindRippleEffect($parent);
+			__APP.MODALS.bindCallModal($parent);
+			bindPageLinks($parent);
+			
+			$parent.find('.HideEvent').remove();
+		}
+		
+		$organizations_scrollbar = this.$wrapper.find('.SearchOrganizationsScrollbar').scrollbar({
+			disableBodyScroll: true,
+			onScroll: function(y) {
+				if (y.scroll == y.maxScroll) {
+					PAGE.search_results.fetchOrganizations(PAGE.organizations_ajax_data, function(organizations) {
+						if (organizations.length) {
+							$organizations_scrollbar.append(SearchPage.buildOrganizationItems(organizations));
+						} else {
+							$organizations_scrollbar.off('scroll.onScroll');
+						}
+						bindPageLinks($organizations_scrollbar);
+					});
+				}
+			}
+		});
+		$window.off('scroll.upload' + PAGE.constructor.name);
+		$window.on('scroll.upload' + PAGE.constructor.name, function() {
+			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.block_scroll) {
+				PAGE.block_scroll = true;
+				PAGE.search_results.fetchEvents(PAGE.events_ajax_data, function(events) {
+					var $events;
+					if(events.length){
+						$events = SearchPage.buildEventCards(PAGE.search_results.events.last_pushed);
+						PAGE.$wrapper.find('.SearchEvents').append($events);
+						bindFeedEvents($events);
+						PAGE.block_scroll = false;
+					} else {
+						$window.off('scroll.upload' + PAGE.constructor.name);
+					}
+				});
+			}
+		});
+		bindFeedEvents(this.$wrapper);
+	};
+	
+	SearchPage.prototype.render = function() {
+		var data = {};
+		
+		$('.TopBarOverlay').addClass('-open_search_bar');
+		this.$search_bar_input.val(this.search_string);
+		
+		data.events = SearchPage.buildEventCards(this.search_results.events);
+		if (this.search_results.organizations.length == 0) {
+			data.no_organizations = __C.CLASSES.HIDDEN;
+		} else {
+			data.organizations = SearchPage.buildOrganizationItems(this.search_results.organizations);
+		}
+		
+		this.$wrapper.append(tmpl('search-wrapper', data));
+		this.init();
+	};
+	
+	SearchPage.prototype.destroy = function() {
+		$('.TopBarOverlay').removeClass('-open_search_bar');
+		this.$search_bar_input.val('');
+	};
+	
+	return SearchPage;
 }()));
 /**
  * @requires ../Class.Page.js

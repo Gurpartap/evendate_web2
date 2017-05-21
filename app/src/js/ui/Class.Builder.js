@@ -844,7 +844,7 @@ Builder = (function() {
 		var self = this;
 		
 		return tmpl('subscriber', subscribers.map(function(subscriber, i) {
-			var append_divider = (typeof last_is_fiend == 'undefined') || last_is_fiend != subscriber.is_friend;
+			var append_divider = (typeof last_is_fiend === 'undefined') || last_is_fiend !== subscriber.is_friend;
 			
 			last_is_fiend = subscriber.is_friend;
 			return {
