@@ -4503,7 +4503,8 @@ body.-open_modal > .modal_wrapper {
 }
 
 .feed_event_header_button {
-	font-size: 1em;
+	font-size: 2em;
+	line-height: 1;
 	color: #9fa6b3;
 	color: var(--color_primary_50);
 	opacity: .4;

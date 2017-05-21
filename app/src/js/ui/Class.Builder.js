@@ -873,7 +873,7 @@ Builder = (function() {
 			$events,
 			_events = events instanceof Array ? events : [events];
 		
-		$events = tmpl('feed-event', _events.map(function(event) {
+		$events = tmpl('event-card', _events.map(function(event) {
 			var card_cover_width = 405,
 				avatars_collection_classes = [
 					__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
@@ -943,14 +943,13 @@ Builder = (function() {
 				classes: [
 					'feed_event_header_button',
 					__C.CLASSES.SIZES.LOW,
-					__C.CLASSES.ICON_CLASS,
-					__C.CLASSES.ICONS.TIMES,
 					__C.CLASSES.UNIVERSAL_STATES.EMPTY,
 					'HideEvent'
 				],
 				dataset: {
 					'event-id': event.id
-				}
+				},
+				title: '×'
 			}));
 			
 			if (event.is_favorite) {
@@ -990,7 +989,7 @@ Builder = (function() {
 						__C.CLASSES.HOOKS.ADD_AVATAR.STATES.CASTABLE
 					]
 				}, event.favored_users_count),
-				feed_event_infos: tmpl('feed-event-info', feed_event_infos),
+				feed_event_infos: tmpl('event-card-info', feed_event_infos),
 				header_buttons: $header_buttons
 			}, event);
 		}));

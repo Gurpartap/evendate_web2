@@ -2264,10 +2264,11 @@ function scrollTo($element, duration, complete) {
 
 /**
  * Returning true if scroll passes ending threshold + left argument
- * @param {int} left
+ * @param {number} [left=200]
  * @return {boolean}
  */
 function isScrollRemain(left) {
+	left = left ? left : 200;
 	return ($(window).height() + $(window).scrollTop() + +(left)) >= $(document).height();
 }
 

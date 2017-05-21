@@ -159,7 +159,7 @@
 <script type="javascript/template" id="tmpl-twitter-share-button">
 	<button class="ShareButton share_icon twitter {classes}" data-title="Twitter" data-href="https://twitter.com/share?url=http://evendate.ru/event/{id}?text={title}&via=evendate.ru&hashtags=#evendate"></button>
 </script>
-
+<!--
 <script type="javascript/template" id="tmpl-event-card">
 	<div class="event_card">
 		<div class="event_card_img" style="background-image: url('{image_horizontal_small_url}')"></div>
@@ -167,6 +167,34 @@
 			<span>{title}</span>
 		</div>
 	</div>
+</script>-->
+
+<script type="javascript/template" id="tmpl-event-card">
+	<div class="page feed_event FeedEvent">
+		<a href="/event/{id}" class="feed_event_img_side img_holder link Link">
+			<img src="{image_horizontal_url}?width={cover_width}" width="{cover_width}">
+		</a>
+		<aside class="feed_event_info_side AddAvatarWrapper">
+			<header class="feed_event_header">
+				{organization_avatar_block}
+				<div class="feed_event_header_buttons">
+					{header_buttons}
+				</div>
+			</header>
+			<h3 class="feed_event_title"><a href="/event/{id}" class="link Link">{title}</a></h3>
+			<footer class="feed_event_footer">
+				{feed_event_infos}
+				<div class="form_group -parts_e_2">
+					<div class="form_unit">{avatars_collection}</div>
+					<div class="form_unit">{action_button}</div>
+				</div>
+			</footer>
+		</aside>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-event-card-info">
+	<p class="feed_event_info">{text}</p>
 </script>
 
 <script type="javascript/template" id="tmpl-event-block">

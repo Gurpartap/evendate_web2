@@ -94,7 +94,8 @@ FeedPage = extending(Page, (function() {
 	 * @returns {jqPromise}
 	 */
 	FeedPage.prototype.appendEvents = function(success) {
-		var PAGE = this;
+		var PAGE = this,
+			$loader = __APP.BUILD.loaderBlock(PAGE.$wrapper);
 		
 		PAGE.block_scroll = true;
 		return PAGE.events.fetchFeed(this.fields, this.next_events_length, function(events) {
@@ -103,13 +104,14 @@ FeedPage = extending(Page, (function() {
 			if ($events.length) {
 				PAGE.$wrapper.append($events);
 				PAGE.bindFeedEvents($events);
-				if (success && typeof success == 'function') {
+				if (isFunction(success)) {
 					success($events);
 				}
 			} else {
 				PAGE.addNoEventsBlock();
 				$(window).off('scroll.upload' + PAGE.constructor.name);
 			}
+			$loader.remove();
 		});
 	};
 	
@@ -176,8 +178,11 @@ FeedPage = extending(Page, (function() {
 		
 		$window.off('scroll');
 		PAGE.appendEvents(function() {
+			if (isScrollRemain(1000)) {
+				PAGE.appendEvents();
+			}
 			$window.on('scroll.upload' + PAGE.constructor.name, function() {
-				if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.block_scroll) {
+				if (isScrollRemain(1000) && !PAGE.block_scroll) {
 					PAGE.appendEvents();
 				}
 			})
