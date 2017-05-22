@@ -127,18 +127,12 @@ UserPage = extending(Page, (function() {
 				$window = $(window);
 			
 			$window.off(Object.values(event_names).join(' '));
+			if ( isScrollRemain(1000) ) {
+				page.uploadEntities(active_type);
+			}
 			$window.on(event_names[active_type], function() {
-				if ( isScrollRemain(200) ) {
-					switch (active_type) {
-						case 'activities': {
-							page.uploadEntities('activities');
-							break;
-						}
-						case 'events': {
-							page.uploadEntities('events');
-							break;
-						}
-					}
+				if ( isScrollRemain(1000) ) {
+					page.uploadEntities(active_type);
 				}
 			});
 		}
