@@ -11,25 +11,25 @@
 
 						<div class="tab_body TabsBody -active">
 							<div class="EditEventOrganizations -hidden">
-								<h2><label for="edit_event_organization">Организация</label></h2>
+								<h2><label for="edit_event_organization">Организация <span class="required_star">*</span></label></h2>
 								<div class="form_unit">
 									<select id="edit_event_organization" name="organization_id"></select>
 								</div>
 							</div>
 
-							<h2><label for="edit_event_title">Название</label></h2>
+							<h2><label for="edit_event_title">Название <span class="required_star">*</span></label></h2>
 							<div class="form_unit">
 								<input id="edit_event_title" class="form_input LimitSize" type="text" name="title" value="{title}" autocomplete="off" placeholder="Название мероприятия" data-maxlength="150" required>
 							</div>
 
-							<h2><label for="edit_event_description">Описание</label></h2>
+							<h2><label for="edit_event_description">Описание <span class="required_star">*</span></label></h2>
 							<div class="form_unit">
 								<textarea id="edit_event_description" class="form_textarea LimitSize" data-maxlength="1000" name="description" placeholder="Не более 1000 символов" required>{description}</textarea>
 							</div>
 
 							{date_picker}
 
-							<h2><label for="edit_event_placepicker">Место проведения</label></h2>
+							<h2><label for="edit_event_placepicker">Место проведения <span class="required_star">*</span></label></h2>
 							<div class="form_group -parts_3_1">
 								<div class="form_unit">
 									<input id="edit_event_placepicker" class="form_input Placepicker" name="location" value="{location}" required>
@@ -45,21 +45,24 @@
 								</div>
 							</div>
 
-							<h2><label for="event_tags">Теги</label></h2>
-							<div class="form_unit">
-								<input id="event_tags" class="form_input EventTags" type="text" name="tags" autocomplete="off">
-							</div>
-
-							<h2>Цена</h2>
+							<h2>Цена <span class="required_star">*</span></h2>
 							<div class="form_group -parts_1_3">
-								<div class="form_unit">
-									<input id="edit_event_free" class="form_checkbox" type="checkbox" checked name="is_free">
+								<div class="form_unit -inline">
 									<label class="form_label" for="edit_event_free"><span>Бесплатно</span></label>
+									<div class="form_unit">
+										<input id="edit_event_free" class="form_checkbox" type="checkbox" checked name="is_free">
+										<label class="form_label" for="edit_event_free"></label>
+									</div>
 								</div>
 								<div class="form_unit -inline -status_disabled MinPrice">
 									<label class="form_label" for="edit_event_min_price"><span>Цена от</span></label>
 									<input id="edit_event_min_price" class="form_input" type="text" name="min_price" autocomplete="off" disabled placeholder="Минимальная цена">
 								</div>
+							</div>
+
+							<h2><label for="event_tags">Теги <span class="required_star">*</span></label></h2>
+							<div class="form_unit">
+								<input id="event_tags" class="form_input EventTags" type="text" name="tags" autocomplete="off">
 							</div>
 
 							<h2><label for="edit_event_url">Ссылка на страницу мероприятия</label></h2>
@@ -137,8 +140,9 @@
 </script>
 
 <script type="javascript/template" id="tmpl-edit-event-datepicker">
+	<input class="form_input StartHours" name="start_hours">
 	<div class="EditEventDatePickerCollapsing Collapsing" data-collapsing_id="event_edit_date_picker">
-		<h2>Дата и время</h2>
+		<h2>Дата и время <span class="required_star">*</span></h2>
 		<div class="event_datepicker">
 			<div class="EventDatesCalendar event_datepicker_calendar"></div>
 			<div class="event_datepicker_form">
@@ -147,7 +151,7 @@
 				<fieldset class="Switching MainTime" data-switch_id="different_time">
 					<div class="form_group -parts_e_2">
 						<div class="form_unit -inline">
-							<label class="form_label">Начало</label>
+							<label class="form_label">Начало <span class="required_star">*</span></label>
 							<div class="form_unit">
 								<div class="form_group -time_input TimeInput">
 									<div class="form_unit">
@@ -161,7 +165,7 @@
 							</div>
 						</div>
 						<div class="form_unit -inline">
-							<label class="form_label">Конец</label>
+							<label class="form_label">Конец <span class="required_star">*</span></label>
 							<div class="form_unit">
 								<div class="form_group -time_input TimeInput">
 									<div class="form_unit">
@@ -217,7 +221,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-edit-event-cover-picker">
-	<h2>Обложка события</h2>
+	<h2>Обложка события <span class="required_star">*</span></h2>
 	<div class="form_group -parts_e_2  ImgLoadWrap" data-aspect_ratio="16/9">
 		<div class="form_unit -centering">
 			<div class="wrapper">

@@ -64,7 +64,6 @@ try {
 	if (isset($_REQUEST['redirect_to'])) {
 		header('Location: ' . $_REQUEST['redirect_to']);
 	}
-//    header('Location: /');
 }
 
 try {
@@ -115,9 +114,9 @@ $url_parts = explode('/', $url);
 	<?php
 	if ($DEBUG_MODE) { ?>
     <link rel="stylesheet" href="/dist/vendor.css?rev=3b6878c5b89f643e8d96b1b336b7d4fc">
-    <link rel="stylesheet" href="/dist/app.css?rev=0ef8f53f740caf81936fa267534e5206"><?php
+    <link rel="stylesheet" href="/dist/app.css?rev=80fd02b3200b3e976d1b1f76653d867e"><?php
 	} else { ?>
-    <link rel="stylesheet" href="/dist/vendor.min.css?rev=4165c69f5d04ec431ab5bc41425847a5">
+    <link rel="stylesheet" href="/dist/vendor.min.css?rev=32eaf6bc652f6da46bdffad58e1f62d4">
     <link rel="stylesheet" href="/dist/app.min.css?rev=bb8a0ef19a7a789b48b10fd00b4b71f6"><?php
 	} ?>
 
@@ -349,11 +348,11 @@ $url_parts = explode('/', $url);
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=87e5ab6b255a69a64ecb850dae7056ff" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=7626193ef96886a485745eedf8e4030a" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=6adb877b90a5dc5a92614e764035d6de" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=e94806b9f517d8f987e888240721d3c6" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=2deef147e9692ec528c5915e1f27602a" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=8cf6f43b6731d82691a72f4e5216a4df" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=14ec42665feac2dbdf0613e8778fb5c6" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=14e082166616f6bd48f707c889e423ed" charset="utf-8"></script><?php
 }
 
 foreach (glob("app/templates/{*/*/*/*,*/*/*,*/*,*}.html", GLOB_BRACE) as $filename) {

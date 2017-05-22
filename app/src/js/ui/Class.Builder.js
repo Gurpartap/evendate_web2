@@ -290,6 +290,11 @@ Builder = (function() {
 			}
 		}));
 	};
+	
+	Builder.prototype.timeInput = function(props) {
+		
+		//return
+	};
 	/**
 	 *
 	 * @param {string|Element|jQuery} message

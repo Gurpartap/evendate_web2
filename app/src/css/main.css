@@ -202,6 +202,15 @@ label.-transform_uppercase {text-transform: uppercase}
 /* /Typography */
 /* Common */
 
+.required_star {
+	display: inline;
+	vertical-align: super;
+	font-size: .8em;
+	font-weight: bold;
+	color: #f82969;
+	color: var(--color_bubblegum);
+}
+
 a.-odd,
 a.-odd:hover {color: inherit}
 a.-odd:hover,
@@ -1110,7 +1119,12 @@ fieldset:disabled .form_select {cursor: default}
 /* /Form -inline */
 /* /Form group */
 
-.form_group {margin-bottom: .875em}
+.form_group {
+	display: flex;
+	align-items: center;
+	justify-content: space-around;
+	margin-bottom: .875em;
+}
 .form_group > .form_unit {
 	display: inline-block;
 	vertical-align: top;
@@ -1343,6 +1357,13 @@ fieldset:disabled .form_select {cursor: default}
 	display: inline-block;
 	vertical-align: middle;
 	margin: 0.3em;
+}
+
+.form_input.-time_input {
+	width: 60px;
+	padding: 6px;
+	font-size: 1rem;
+	text-align: center;
 }
 
 /* /Form group */
@@ -4438,12 +4459,7 @@ body.-open_modal > .modal_wrapper {
 	width: 1062px;
 }
 
-.feed_event_cards_wrapper {
-	width: 100%;
-/*	min-width: 745px;
-	max-width: 900px;
-	width: 65%;*/
-}
+.feed_event_cards_wrapper {width: 100%}
 
 .feed_events {
 	display: inline-block;
@@ -4454,7 +4470,8 @@ body.-open_modal > .modal_wrapper {
 .feed_event {
 	display: flex;
 	height: 227px;
-	margin: 24px 0;
+	max-width: 800px;
+	margin: 24px auto;
 	overflow: hidden;
 	text-align: left;
 
