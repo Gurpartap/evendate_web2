@@ -5059,7 +5059,7 @@ body.-open_modal > .modal_wrapper {
 }
 
 .feed_event_header_button {
-	font-size: 2em;
+	font-size: 1em;
 	line-height: 1;
 	color: #9fa6b3;
 	color: var(--color_primary_50);
@@ -5074,6 +5074,8 @@ body.-open_modal > .modal_wrapper {
 .feed_event_header_button:hover {opacity: 1}
 
 .feed_event_header_button + .feed_event_header_button {margin-left: .4em}
+
+.feed_event_header_button.feed_event_header_button_hide_event {font-size: 1.6em}
 
 .feed_event_title {
 	max-height: 3.3em;

@@ -1681,12 +1681,17 @@ function trimAvatarsCollection($parent) {
 	$parent = $parent ? $parent : $('body');
 	$parent.find('.AvatarsCollection').each(function() {
 		var $collection = $(this),
+			is_shifted = $collection.hasClass('-shifted'),
+			is_subscribed = $collection.hasClass('-subscribed'),
 			$avatars = $collection.find('.avatar'),
-			amount = $avatars.length;
-		if (($collection.hasClass('-subscribed') || $collection.hasClass('-shifted')) && amount < $collection.data('max_amount')) {
-			$collection.width(amount == 1 ? ($avatars.outerWidth() * amount) : ($avatars.outerWidth() * amount) - (6 * (amount - 1)));
+			avatar_width = $avatars.outerWidth(),
+			amount = $avatars.length,
+			kink = 6;
+		
+		if ((is_subscribed || is_shifted) && amount < $collection.data('max_amount')) {
+			$collection.width(amount === 1 ? (avatar_width * amount) : (avatar_width * amount) - (kink * (amount - 1)));
 		} else {
-			$collection.width(amount == 1 ? 0 : ($avatars.outerWidth() * (amount - 1)) - (6 * (amount - 2)));
+			$collection.width(amount === 1 ? 0 : (avatar_width * (amount - 1)) - (kink * (amount - 2)));
 		}
 		$collection.addClass('-trimmed');
 	});

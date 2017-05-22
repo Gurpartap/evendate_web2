@@ -506,8 +506,10 @@ Builder = (function() {
 		var map = function() {},
 			tmp = [],
 			output_entities;
+		
 		if(!entities || (entities instanceof Array && !entities.length))
 			return;
+		
 		props = Builder.normalizeBuildProps(props);
 		function userMap(user) {
 			return $.extend(true, {
@@ -534,9 +536,8 @@ Builder = (function() {
 				break;
 			}
 			default: {
-				if(!(entities instanceof Array)){
-					tmp = [entities];
-				}
+				tmp = entities instanceof Array ? entities : [entities];
+				
 				map = tmp[0].avatar_url ? userMap : orgMap;
 				break;
 			}
@@ -556,20 +557,19 @@ Builder = (function() {
 	 */
 	Builder.prototype.avatarCollection = function buildAvatarCollection(entities, max_count, props, overall_avatars_count) {
 		var data = Builder.normalizeBuildProps(props, ['counter_classes']),
-			i, count;
+			left = max_count;
 		
 		data.dataset.max_amount = max_count;
 		data.classes.push('-max_' + max_count);
 		
-		data.avatars = this.avatars(__APP.USER);
-		for(i = 0, count = 1; count <= max_count; i++){
-			if (!entities[i]) break;
-			if (entities[i].id != __APP.USER.id) {
-				data.avatars = data.avatars.add(this.avatars(entities[i]));
-				count++;
+		data.avatars = this.avatars(__APP.USER).add(this.avatars(entities.filter(function(entity) {
+			if (__APP.USER.id == entity.id) {
+				return false;
 			}
-		}
-		data.more_avatars_count = (count <= max_count) ? 0 : ( (overall_avatars_count ? overall_avatars_count : entities.length) - max_count );
+			return !(left-- <= 0);
+		})));
+		
+		data.more_avatars_count = ( (overall_avatars_count ? overall_avatars_count : entities.length) - max_count );
 		if(data.more_avatars_count <= 0){
 			data.counter_classes.push('-cast');
 		}
@@ -942,6 +942,7 @@ Builder = (function() {
 			$header_buttons = $header_buttons.add(self.button({
 				classes: [
 					'feed_event_header_button',
+					'feed_event_header_button_hide_event',
 					__C.CLASSES.SIZES.LOW,
 					__C.CLASSES.UNIVERSAL_STATES.EMPTY,
 					'HideEvent'

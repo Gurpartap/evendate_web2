@@ -34,12 +34,12 @@ FeedPage = extending(Page, (function() {
 				favored: {
 					fields: 'is_friend',
 					order_by: '-is_friend',
-					length: 10
+					length: 5
 				}
 			}
 		);
 		this.events = new EventsCollection();
-		this.next_events_length = 20;
+		this.next_events_length = 10;
 		this.wrapper_tmpl = 'feed';
 		this.with_header_tabs = true;
 	}
@@ -98,8 +98,10 @@ FeedPage = extending(Page, (function() {
 			$loader = __APP.BUILD.loaderBlock(PAGE.$wrapper);
 		
 		PAGE.block_scroll = true;
+		
 		return PAGE.events.fetchFeed(this.fields, this.next_events_length, function(events) {
 			var $events = __APP.BUILD.eventCards(PAGE.events.last_pushed);
+			
 			PAGE.block_scroll = false;
 			if ($events.length) {
 				PAGE.$wrapper.append($events);
