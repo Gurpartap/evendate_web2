@@ -3658,8 +3658,8 @@ body.-open_modal > .modal_wrapper {
 	align-items: center;
 }
 .main_header_wrapper:first-child {
-	max-width: -webkit-calc(100% - 106px);
-	max-width: calc(100% - 106px);
+	max-width: -webkit-calc(100% - 150px);
+	max-width: calc(100% - 150px);
 
 	-webkit-transition: max-width .4s ease;
 	-moz-transition: max-width .4s ease;
@@ -3667,12 +3667,10 @@ body.-open_modal > .modal_wrapper {
 	transition: max-width .4s ease;
 }
 .-open_search_bar .main_header_wrapper:first-child {
-	max-width: -webkit-calc(100% - 352px);
-	max-width: calc(100% - 352px);
+	max-width: -webkit-calc(100% - 300px);
+	max-width: calc(100% - 300px);
 }
-.main_header_wrapper:last-child {
-	max-width: 352px;
-}
+.main_header_wrapper:last-child {max-width: 300px}
 
 
 .header_button {
