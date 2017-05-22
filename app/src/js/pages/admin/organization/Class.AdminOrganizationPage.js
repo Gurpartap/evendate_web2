@@ -12,6 +12,10 @@ AdminOrganizationPage = extending(AdminPage, (function() {
 	 * @param {(string|number)} org_id
 	 * @constructor
 	 * @constructs AdminOrganizationPage
+	 *
+	 * @property {(number|string)} id
+	 * @property {Fields} organization_fields
+	 * @property {OneOrganization} organization
 	 */
 	function AdminOrganizationPage(org_id) {
 		AdminPage.apply(this);
@@ -32,6 +36,7 @@ AdminOrganizationPage = extending(AdminPage, (function() {
 		__APP.renderHeaderTabs([
 			{title: 'Обзор', page: '/admin/organization/'+this.id+'/overview'},
 			{title: 'События', page: '/admin/organization/'+this.id+'/events'},
+			{title: 'CRM', page: '/admin/organization/'+this.id+'/crm'},
 			{title: 'Настройки', page: '/admin/organization/'+this.id+'/settings'},
 			{title: 'Редактирование', page: '/admin/organization/'+this.id+'/edit'}
 		]);

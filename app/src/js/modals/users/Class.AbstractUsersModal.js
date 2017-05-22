@@ -40,7 +40,9 @@ AbstractUsersModal = extending(AbstractModal, (function() {
 			this.__show();
 			return this;
 		}
-		this.render();
+		this.render({
+			width: '60%'
+		});
 		this.uploadUsers(function() {
 			self.__show();
 		});

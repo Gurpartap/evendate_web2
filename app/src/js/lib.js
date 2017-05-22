@@ -103,6 +103,11 @@ __C = {
 		},
 		ICON_CLASS: 'fa_icon'
 	},
+	SOCICON_CLASSES: {
+		'vk': 'fa-vk',
+		'google': 'fa-google-plus',
+		'facebook': 'fa-facebook-official'
+	},
 	DATE_FORMAT: 'YYYY-MM-DD',
 	MODAL_TYPES: {
 		FAVORS: 'favors',
@@ -1566,6 +1571,22 @@ function isFunction(variable) {
 }
 /**
  *
+ * @param {number} end
+ * @param {number} [start]
+ * @param {number} [step]
+ * @return {Array}
+ */
+function range(end, start, step) {
+	var array = [];
+	
+	for (start = (start ? start : 0), step = (step ? step : 1); start !== end; start += step) {
+		array.push(start);
+	}
+	
+	return array;
+}
+/**
+ *
  * @param {string} url
  * @param {(AJAXData|string)} [data]
  * @param {string} [content_type='application/x-www-form-urlencoded; charset=UTF-8']
@@ -1660,12 +1681,17 @@ function trimAvatarsCollection($parent) {
 	$parent = $parent ? $parent : $('body');
 	$parent.find('.AvatarsCollection').each(function() {
 		var $collection = $(this),
+			is_shifted = $collection.hasClass('-shifted'),
+			is_subscribed = $collection.hasClass('-subscribed'),
 			$avatars = $collection.find('.avatar'),
-			amount = $avatars.length;
-		if (($collection.hasClass('-subscribed') || $collection.hasClass('-shifted')) && amount < $collection.data('max_amount')) {
-			$collection.width(amount == 1 ? ($avatars.outerWidth() * amount) : ($avatars.outerWidth() * amount) - (6 * (amount - 1)));
+			avatar_width = $avatars.outerWidth(),
+			amount = $avatars.length,
+			kink = 6;
+		
+		if ((is_subscribed || is_shifted) && amount < $collection.data('max_amount')) {
+			$collection.width(amount === 1 ? (avatar_width * amount) : (avatar_width * amount) - (kink * (amount - 1)));
 		} else {
-			$collection.width(amount == 1 ? 0 : ($avatars.outerWidth() * (amount - 1)) - (6 * (amount - 2)));
+			$collection.width(amount === 1 ? 0 : (avatar_width * (amount - 1)) - (kink * (amount - 2)));
 		}
 		$collection.addClass('-trimmed');
 	});
@@ -2021,13 +2047,6 @@ function bindControlSwitch($parent) {
 		});
 	}).addClass('-Handled_Switch');
 }
-
-function bindProgressBar($parent) {
-	$parent = $parent ? $parent : $('body');
-	$parent.find('.ProgressBar').not('.-Handled_ProgressBar').each(function(i, el) {
-	
-	}).addClass('-Handled_ProgressBar');
-}
 /**
  *
  * @param {jQuery} $parent
@@ -2124,14 +2143,20 @@ function bindCallModal($parent) {
 		})
 		.addClass(__C.CLASSES.HOOKS.HANDLED + __C.CLASSES.HOOKS.CALL_MODAL);
 }
-
+/**
+ *
+ * @param {jQuery} [$parent]
+ * @return {jQuery}
+ */
 function bindPageLinks($parent) {
 	$parent = $parent ? $parent : $('body');
-	$parent.find('.Link').not('.-Handled_Link').on('click.pageRender', function(e) {
+	var $links = $parent.is('.Link') ? $parent : $parent.find('.Link');
+	
+	return $links.not('.-Handled_Link').on('click.pageRender', function(e) {
 		var $this = $(this);
 		if ($this.hasClass(__C.CLASSES.DISABLED))
 			return false;
-		if (e.which == 1) {
+		if (e.which === 1) {
 			e.preventDefault();
 			__APP.changeState($this.attr('href'));
 		}
@@ -2244,10 +2269,11 @@ function scrollTo($element, duration, complete) {
 
 /**
  * Returning true if scroll passes ending threshold + left argument
- * @param {int} left
+ * @param {number} [left=200]
  * @return {boolean}
  */
 function isScrollRemain(left) {
+	left = left ? left : 200;
 	return ($(window).height() + $(window).scrollTop() + +(left)) >= $(document).height();
 }
 

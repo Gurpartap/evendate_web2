@@ -127,18 +127,12 @@ UserPage = extending(Page, (function() {
 				$window = $(window);
 			
 			$window.off(Object.values(event_names).join(' '));
+			if ( isScrollRemain(1000) ) {
+				page.uploadEntities(active_type);
+			}
 			$window.on(event_names[active_type], function() {
-				if ( isScrollRemain(200) ) {
-					switch (active_type) {
-						case 'activities': {
-							page.uploadEntities('activities');
-							break;
-						}
-						case 'events': {
-							page.uploadEntities('events');
-							break;
-						}
-					}
+				if ( isScrollRemain(1000) ) {
+					page.uploadEntities(active_type);
 				}
 			});
 		}
@@ -187,7 +181,9 @@ UserPage = extending(Page, (function() {
 		this.$wrapper.append(tmpl('user-page', {
 			wrapper_classes: '-another_user',
 			tombstone: __APP.BUILD.userTombstones(this.user, {avatar_classes: [__C.CLASSES.UNIVERSAL_STATES.BORDERED, __C.CLASSES.UNIVERSAL_STATES.SHADOWED]}),
-			links: __APP.BUILD.socialLinks(this.user.accounts_links),
+			links: __APP.BUILD.socialLinks(this.user.accounts_links, {
+				classes: __C.CLASSES.UNIVERSAL_STATES.ROUNDED
+			}),
 			subscribed_orgs: $subscribed_orgs,
 			show_all_subscribed_orgs_button: this.user.subscriptions.length ? __APP.BUILD.button({
 				classes: [__C.CLASSES.COLORS.NEUTRAL_ACCENT, __C.CLASSES.HOOKS.CALL_MODAL, __C.CLASSES.HOOKS.RIPPLE],

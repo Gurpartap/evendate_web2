@@ -316,12 +316,24 @@ AbstractModal = (function() {
 	};
 	/**
 	 *
+	 * @param {object} [props]
+	 * @param {(Array<string>|string)} [props.classes]
+	 * @param {(Array<string>|string)} [props.content_classes]
+	 * @param {(number|string)} [props.width]
+	 * @param {(number|string)} [props.height]
+	 * @param {jQuery} [props.header]
+	 * @param {jQuery} [props.footer]
+	 * @param {jQuery} [props.footer]
+	 * @param {jQuery} [props.footer_buttons]
+	 * @param {Object<string, *>} [props.dataset]
+	 * @param {Object<string, (string|number|boolean)>} [props.attributes]
 	 * @return {AbstractModal}
 	 */
-	AbstractModal.prototype.render = function(){
-		return this.__render({
+	AbstractModal.prototype.render = function(props){
+		
+		return this.__render($.extend({
 			classes: [__C.CLASSES.FLOATING_MATERIAL]
-		});
+		}, props));
 	};
 	/**
 	 * @return {AbstractModal}

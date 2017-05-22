@@ -1,0 +1,82 @@
+<script type="javascript/template" id="tmpl-admin-organization-crm-page">
+	<div class="org_admin_crm_page material -level_2_material">
+		<div class="org_admin_crm_page_table_wrapper CRMTableWrapper">
+			<header class="org_admin_crm_page_header">
+				<div class="org_admin_crm_page_header_wrapper">
+					<h3 class="org_admin_crm_page_title">CRM</h3>
+					<div class="org_admin_crm_page_table_search_block">
+						<input class="form_input -rounded -search_bar CRMTableSearch" placeholder="Поиск клиентов">
+					</div>
+				</div>
+				<div class="org_admin_crm_page_header_wrapper"><!--
+					<button class="action fa_icon fa-columns" type="button">Колонки</button>-->
+				</div>
+			</header>
+
+			<table class="table -data_table_override CRMTable">
+				<thead>
+					<tr>
+						<th>Имя клиента</th>
+						<th>E-mail</th>
+						<th>Аккаунты</th>
+						<th>Пол</th>
+
+						<th>Страна</th>
+						<th>Город</th>
+						<th>Дата авторизации</th>
+						<th>Дата подписки</th>
+						<th>Дата отписки</th>
+						<th>Заходы на организатора</th>
+						<th>Заходы на события</th>
+						<th>Получил уведомлений</th>
+						<th>Открыл уведомлений</th>
+						<th>Скрыл уведомлений</th>
+						<th>Регистраций на события</th>
+						<th>Добавил в избранное</th>
+						<th>Поделился событием</th>
+						<th>Средний чек</th>
+						<th>Общий средний чек</th>
+						<th>Затраты на мои билеты</th>
+						<th>Затраты на билеты всех организаторов</th>
+						<th>Друзья из соц. сетей</th>
+						<th>Лояльность</th>
+						<th>Платёжеспособность</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</div>
+
+		{loader}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-admin-organization-crm-page-tr">
+	<tr>
+		<td>{name}</td>
+		<td>{email}</td>
+		<td>{accounts}</td>
+		<td>{gender}</td>
+
+		<td>Страна</td>
+		<td>Город</td>
+		<td>Дата авторизации</td>
+		<td>Дата подписки</td>
+		<td>Дата отписки</td>
+		<td>Заходы на организатора</td>
+		<td>Заходы на события</td>
+		<td>Получил уведомлений</td>
+		<td>Открыл уведомлений</td>
+		<td>Скрыл уведомлений</td>
+		<td>Регистраций на события</td>
+		<td>Добавил в избранное</td>
+		<td>Поделился событием</td>
+		<td>Средний чек</td>
+		<td>Общий средний чек</td>
+		<td>Затраты на мои билеты</td>
+		<td>Затраты на билеты всех организаторов</td>
+		<td>Друзья из соц. сетей</td>
+		<td>Лояльность</td>
+		<td>Платёжеспособность</td>
+	</tr>
+</script>
