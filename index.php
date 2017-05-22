@@ -350,10 +350,10 @@ $url_parts = explode('/', $url);
 <?php
 if($DEBUG_MODE) { ?>
 	<script type="text/javascript" src="/dist/vendor.js?rev=87e5ab6b255a69a64ecb850dae7056ff" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=6f6b3bb50413295493e5e46370786801" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/app.js?rev=7626193ef96886a485745eedf8e4030a" charset="utf-8"></script><?php
 } else { ?>
 	<script type="text/javascript" src="/dist/vendor.min.js?rev=2deef147e9692ec528c5915e1f27602a" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=1aa03ca38ed698c901afffca66a9f264" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/app.min.js?rev=8cf6f43b6731d82691a72f4e5216a4df" charset="utf-8"></script><?php
 }
 
 foreach (glob("app/templates/{*/*/*/*,*/*/*,*/*,*}.html", GLOB_BRACE) as $filename) {

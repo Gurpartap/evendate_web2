@@ -165,23 +165,21 @@ if (checkRedirect()) {
 			
 			__APP.SERVER.multipleAjax(user_jqhxr, auth_urls_jqxhr, cities_jqxhr, function(user_data, auth_urls, cities) {
 				__APP.USER.selected_city.setData(cities[0]);
+				__APP.AUTH_URLS = auth_urls;
 				
-				if (checkRedirect()) {
-					__APP.AUTH_URLS = auth_urls;
-					
-					
-					if(__APP.USER.isLoggedOut()){
-						__APP.TOP_BAR = new TopBarNoAuth();
-						__APP.SIDEBAR = new SidebarNoAuth();
-					} else {
-						__APP.TOP_BAR = new TopBar();
-						__APP.SIDEBAR = new Sidebar();
-					}
-					__APP.TOP_BAR.init();
-					__APP.SIDEBAR.init();
-					__APP.init();
-					bindPageLinks();
+				checkRedirect();
+				
+				if(__APP.USER.isLoggedOut()){
+					__APP.TOP_BAR = new TopBarNoAuth();
+					__APP.SIDEBAR = new SidebarNoAuth();
+				} else {
+					__APP.TOP_BAR = new TopBar();
+					__APP.SIDEBAR = new Sidebar();
 				}
+				__APP.TOP_BAR.init();
+				__APP.SIDEBAR.init();
+				__APP.init();
+				bindPageLinks();
 			});
 			
 			setInterval(function () {
