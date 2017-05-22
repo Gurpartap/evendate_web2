@@ -33,28 +33,35 @@ MyTicketsPage = extending(Page, (function() {
 		return this.fetching_data_defer = this.tickets.fetchTickets(this.fetch_tickets_fields, this.fetch_tickets_quantity);
 	};
 	
+	MyTicketsPage.prototype.fetchAndAppendTickets = function() {
+		var self = this,
+			$loader;
+		
+		if (!self.disable_uploads && !self.block_scroll) {
+			$loader = __APP.BUILD.loaderBlock(self.$wrapper);
+			self.block_scroll = true;
+			self.tickets.fetchTickets(self.fetch_tickets_fields, self.fetch_tickets_quantity).done(function(tickets) {
+				self.block_scroll = false;
+				if (tickets.length) {
+					self.$wrapper.find('.TicketsWrapper').append(__APP.BUILD.ticketCards(tickets))
+				} else {
+					self.disable_uploads = true;
+				}
+				$loader.remove();
+			});
+		}
+	};
+	
 	MyTicketsPage.prototype.init = function() {
 		var self = this;
 		bindCallModal(this.$wrapper);
 		
+		if (isScrollRemain(1000)) {
+			self.fetchAndAppendTickets();
+		}
 		$(window).on('scroll.uploadTickets', function() {
-			if (isScrollRemain(200)) {
-				var $loader;
-				
-				if(!self.disable_uploads && !self.block_scroll){
-					$loader = __APP.BUILD.loaderBlock(self.$wrapper);
-					self.block_scroll = true;
-					
-					self.tickets.fetchTickets(self.fetch_tickets_fields, self.fetch_tickets_quantity).done(function(tickets) {
-						self.block_scroll = false;
-						if (tickets.length) {
-							self.$wrapper.find('.TicketsWrapper').append(__APP.BUILD.ticketCards(tickets))
-						} else {
-							self.disable_uploads = true;
-						}
-						$loader.remove();
-					});
-				}
+			if (isScrollRemain(1000)) {
+				self.fetchAndAppendTickets();
 			}
 		});
 	};
