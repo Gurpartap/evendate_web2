@@ -116,9 +116,9 @@ Builder = (function() {
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.link = function buildLink(props) {
-		return tmpl('link', [].map.call(arguments, function(arg) {
+		return bindPageLinks(tmpl('link', [].map.call(arguments, function(arg) {
 			return Builder.normalizeBuildProps(arg);
-		}));
+		})));
 	};
 	/**
 	 *
@@ -349,32 +349,37 @@ Builder = (function() {
 	/**
 	 *
 	 * @param {Object<OneUser.ACCOUNTS, string>} [accounts_links]
+	 * @param {buildProps} [props]
 	 * @returns {jQuery}
 	 */
-	Builder.prototype.socialLinks = function buildSocialLinks(accounts_links) {
+	Builder.prototype.socialLinks = function buildSocialLinks(accounts_links, props) {
 		var props_array = [],
 			ICON_SLUGS = {
 				VK: 'vk',
 				GOOGLE: 'google-plus',
 				FACEBOOK: 'facebook-official'
 			};
+		
 		$.each(OneUser.ACCOUNTS, function(slug, account) {
-			var props = {
+			var acc_props = {
 				slug: account,
 				icon_slug: ICON_SLUGS[slug]
 			};
+			
 			if(accounts_links.hasOwnProperty(account)){
-				props.html_tag = 'a';
-				props.attributes = {
+				acc_props.html_tag = 'a';
+				acc_props.attributes = {
 					href: accounts_links[account],
 					target: '_blank'
 				};
 			} else {
-				props.html_tag = 'span';
+				acc_props.html_tag = 'span';
 			}
-			props_array.push(Builder.normalizeBuildProps(props))
+			
+			props_array.push(Builder.normalizeBuildProps($.extend(acc_props, props)));
 		});
-		return tmpl('user-page-social-link', props_array);
+		
+		return tmpl('user-social-links-wrapper', {links: tmpl('user-social-link', props_array)});
 	};
 	/**
 	 *
@@ -501,8 +506,10 @@ Builder = (function() {
 		var map = function() {},
 			tmp = [],
 			output_entities;
+		
 		if(!entities || (entities instanceof Array && !entities.length))
 			return;
+		
 		props = Builder.normalizeBuildProps(props);
 		function userMap(user) {
 			return $.extend(true, {
@@ -529,9 +536,8 @@ Builder = (function() {
 				break;
 			}
 			default: {
-				if(!(entities instanceof Array)){
-					tmp = [entities];
-				}
+				tmp = entities instanceof Array ? entities : [entities];
+				
 				map = tmp[0].avatar_url ? userMap : orgMap;
 				break;
 			}
@@ -551,20 +557,19 @@ Builder = (function() {
 	 */
 	Builder.prototype.avatarCollection = function buildAvatarCollection(entities, max_count, props, overall_avatars_count) {
 		var data = Builder.normalizeBuildProps(props, ['counter_classes']),
-			i, count;
+			left = max_count;
 		
 		data.dataset.max_amount = max_count;
 		data.classes.push('-max_' + max_count);
 		
-		data.avatars = this.avatars(__APP.USER);
-		for(i = 0, count = 1; count <= max_count; i++){
-			if (!entities[i]) break;
-			if (entities[i].id != __APP.USER.id) {
-				data.avatars = data.avatars.add(this.avatars(entities[i]));
-				count++;
+		data.avatars = this.avatars(__APP.USER).add(this.avatars(entities.filter(function(entity) {
+			if (__APP.USER.id == entity.id) {
+				return false;
 			}
-		}
-		data.more_avatars_count = (count <= max_count) ? 0 : ( (overall_avatars_count ? overall_avatars_count : entities.length) - max_count );
+			return !(left-- <= 0);
+		})));
+		
+		data.more_avatars_count = ( (overall_avatars_count ? overall_avatars_count : entities.length) - max_count );
 		if(data.more_avatars_count <= 0){
 			data.counter_classes.push('-cast');
 		}
@@ -839,7 +844,7 @@ Builder = (function() {
 		var self = this;
 		
 		return tmpl('subscriber', subscribers.map(function(subscriber, i) {
-			var append_divider = (typeof last_is_fiend == 'undefined') || last_is_fiend != subscriber.is_friend;
+			var append_divider = (typeof last_is_fiend === 'undefined') || last_is_fiend !== subscriber.is_friend;
 			
 			last_is_fiend = subscriber.is_friend;
 			return {
@@ -868,7 +873,7 @@ Builder = (function() {
 			$events,
 			_events = events instanceof Array ? events : [events];
 		
-		$events = tmpl('feed-event', _events.map(function(event) {
+		$events = tmpl('event-card', _events.map(function(event) {
 			var card_cover_width = 405,
 				avatars_collection_classes = [
 					__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
@@ -937,15 +942,15 @@ Builder = (function() {
 			$header_buttons = $header_buttons.add(self.button({
 				classes: [
 					'feed_event_header_button',
+					'feed_event_header_button_hide_event',
 					__C.CLASSES.SIZES.LOW,
-					__C.CLASSES.ICON_CLASS,
-					__C.CLASSES.ICONS.TIMES,
 					__C.CLASSES.UNIVERSAL_STATES.EMPTY,
 					'HideEvent'
 				],
 				dataset: {
 					'event-id': event.id
-				}
+				},
+				title: '×'
 			}));
 			
 			if (event.is_favorite) {
@@ -985,7 +990,7 @@ Builder = (function() {
 						__C.CLASSES.HOOKS.ADD_AVATAR.STATES.CASTABLE
 					]
 				}, event.favored_users_count),
-				feed_event_infos: tmpl('feed-event-info', feed_event_infos),
+				feed_event_infos: tmpl('event-card-info', feed_event_infos),
 				header_buttons: $header_buttons
 			}, event);
 		}));

@@ -38,6 +38,7 @@ __APP = {
 					'edit': AdminOrganizationEditPage,
 					'overview': AdminOrganizationOverviewPage,
 					'events': AdminOrganizationEventsPage,
+					'crm': AdminOrganizationCRMPage,
 					'settings': AdminOrganizationSettingsPage,
 					'': AdminOrganizationOverviewPage
 				}
@@ -204,8 +205,9 @@ __APP = {
 	 * @return {boolean} false
 	 */
 	changeState: function changeState(page_name, soft_change, reload) {
+		History.stateChangeHandled = true;
 		if (page_name) {
-			page_name = page_name.indexOf('/') == 0 ? page_name : '/' + page_name;
+			page_name = page_name.indexOf('/') === 0 ? page_name : '/' + page_name;
 			if (soft_change) {
 				History.replaceState({_index: History.getCurrentIndex()}, '', page_name);
 			} else {
@@ -217,6 +219,7 @@ __APP = {
 		} else {
 			console.error('Need to pass page name');
 		}
+		History.stateChangeHandled = false;
 		
 		return false;
 	},
@@ -334,9 +337,13 @@ __LOCALES = {
 				lastWeek: 'D MMMM [в] HH:mm',
 				sameElse: 'D MMMM [в] HH:mm'
 			}
-		}
+		},
+		DATATABLES_URL: '//cdn.datatables.net/plug-ins/1.10.15/i18n/Russian.json'
 	}
 };
+
+__LOCALE = __LOCALES.ru_RU;
+
 Object.seal(__APP);
 Object.freeze(__APP.SERVER);
 Object.freeze(__APP.ROUTING);

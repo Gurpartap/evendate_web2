@@ -11,6 +11,8 @@ CityChooseModal = extending(AbstractModal, (function() {
 	 * @param {(Array<OneCity>|CitiesCollection)} [cities]
 	 * @constructor
 	 * @constructs CityChooseModal
+	 *
+	 * @property {CitiesCollection} cities
 	 */
 	function CityChooseModal(cities) {
 		AbstractModal.call(this, AbstractModal.STYLES.OK_ONLY);

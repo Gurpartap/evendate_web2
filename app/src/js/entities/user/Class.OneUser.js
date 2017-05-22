@@ -19,6 +19,7 @@ OneUser = extending(OneEntity, (function() {
 	 * @property {string} ?middle_name
 	 * @property {string} ?full_name
 	 * @property {OneUser.GENDER} ?gender
+	 * @property {string} ?email
 	 * @property {string} ?avatar_url
 	 * @property {string} ?blurred_image_url
 	 * @property {string} ?link
@@ -45,6 +46,7 @@ OneUser = extending(OneEntity, (function() {
 		this.last_name = null;
 		this.middle_name = null;
 		this.gender = null;
+		this.email = null;
 		this.avatar_url = null;
 		this.blurred_image_url = null;
 		this.link = null;

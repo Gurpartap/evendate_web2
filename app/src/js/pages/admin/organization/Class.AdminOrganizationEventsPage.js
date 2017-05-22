@@ -11,7 +11,7 @@ AdminOrganizationEventsPage = extending(AdminOrganizationPage, (function() {
 	 *
 	 * @param {(string|number)} org_id
 	 * @constructor
-	 * @constructs AdminOrganizationAuditoryPage
+	 * @constructs AdminOrganizationEventsPage
 	 */
 	function AdminOrganizationEventsPage(org_id) {
 		AdminOrganizationPage.apply(this, arguments);
