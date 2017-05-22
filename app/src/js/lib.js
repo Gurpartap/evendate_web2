@@ -2145,7 +2145,7 @@ function bindCallModal($parent) {
 }
 /**
  *
- * @param {jQuery} $parent
+ * @param {jQuery} [$parent]
  * @return {jQuery}
  */
 function bindPageLinks($parent) {

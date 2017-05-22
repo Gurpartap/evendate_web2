@@ -53,7 +53,8 @@ if (checkRedirect()) {
 		.ready(function() {
 			var OneSignal = window.OneSignal || [],
 				user_jqhxr,
-				auth_urls_jqxhr;
+				auth_urls_jqxhr,
+				cities_jqxhr;
 			
 			OneSignal.push(["init", {
 				appId: "7471a586-01f3-4eef-b989-c809700a8658",
@@ -160,26 +161,14 @@ if (checkRedirect()) {
 				action: 'get_urls',
 				mobile: isNotDesktop()
 			});
+			cities_jqxhr = (new CitiesCollection()).fetchCities(new Fields('timediff_seconds', 'distance'), 1, 'distance');
 			
-			__APP.SERVER.multipleAjax(user_jqhxr, auth_urls_jqxhr, function(user_data, auth_urls) {
-				var selected_city;
+			__APP.SERVER.multipleAjax(user_jqhxr, auth_urls_jqxhr, cities_jqxhr, function(user_data, auth_urls, cities) {
+				__APP.USER.selected_city.setData(cities[0]);
 				
 				if (checkRedirect()) {
-					try {
-						selected_city = JSON.parse(localStorage.getItem('selected_city'));
-					} catch (e) {
-						selected_city = false;
-					}
-					
 					__APP.AUTH_URLS = auth_urls;
 					
-					if (selected_city) {
-						__APP.USER.selected_city.setData(selected_city);
-					} else {
-						(new CitiesCollection()).fetchCities(new Fields('timediff_seconds', 'distance'), null, '-distance', function() {
-							(new CityChooseModal(this)).show();
-						});
-					}
 					
 					if(__APP.USER.isLoggedOut()){
 						__APP.TOP_BAR = new TopBarNoAuth();
