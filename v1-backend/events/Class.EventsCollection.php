@@ -519,7 +519,22 @@ class EventsCollection extends AbstractCollection
 			$canceled_condition ? $q_get_events->where($canceled_condition) : false;
 		}
 		if (!isset($getting_personal_events) || $getting_personal_events == false) {
-			$q_get_events->where('organization_is_private = false');
+			$q_get_events->where('(organization_is_private = false OR
+			  (
+					organization_id IN 
+						(SELECT organization_id FROM organizations_invitations WHERE 
+						(user_id = :my_user_id OR email = :my_email) AND status = true) 						
+					OR	 
+					organization_id IN 
+					(SELECT organization_id FROM subscriptions WHERE user_id = :my_user_id AND status = true) 
+				
+					OR 
+					organization_id IN 
+					(SELECT organization_id FROM users_organizations WHERE user_id = :my_user_id AND status = true))
+			)');
+
+			$statement_array[':my_user_id'] = App::getCurrentUser()->getId();
+			$statement_array[':my_email'] = App::getCurrentUser()->getEmail();
 		}
 
 
