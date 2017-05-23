@@ -246,6 +246,18 @@
 
 	<fieldset class="Switching" data-switch_id="registration" disabled>
 
+		<p class="form_text">Форма регистрации может храниться как в Evendate, так и на внешнем сайте</p>
+
+		<div class="form_unit">
+			<input id="edit_event_registration_side" class="form_checkbox" type="checkbox">
+			<label class="form_label" for="edit_event_registration_side"><span>Регистрация на внешнем сайте</span></label>
+		</div>
+
+		<div class="form_unit">
+			<input id="edit_event_registration_locally" class="form_checkbox Switch" name="registration_locally" type="checkbox" data-switch_id="registration_locally">
+			<label class="form_label" for="edit_event_registration_locally"><span>Регистрация через Evendate</span></label>
+		</div>
+
 		<h3>Ограничение регистраций</h3>
 
 		<div class="form_unit form_accent_block">
@@ -283,18 +295,23 @@
 			</div>
 		</fieldset>
 
+		<h3></h3>
 
-		<h3 id="edit_event_registration_fields">Анкета регистрации</h3>
+		<fieldset class="Switching" data-switch_id="registration_locally" disabled>
 
-		{predefined_field}
+			<h3 id="edit_event_registration_fields">Анкета регистрации</h3>
 
-		{custom_fields}
+			{predefined_field}
 
-		<button class="button -color_neutral -size_low -rounded fa_icon fa-plus-circle AddRegistrationCustomField RippleEffect" type="button"><span class="Text">Добавить поле</span></button>
+			{custom_fields}
 
-		<div class="-align_center">
-			<button class="button -color_neutral_accent RippleEffect RegistrationPreview" type="button"><span class="Text">Предпросмотр</span></button>
-		</div>
+			<button class="button -color_neutral -size_low -rounded fa_icon fa-plus-circle AddRegistrationCustomField RippleEffect" type="button"><span class="Text">Добавить поле</span></button>
+
+			<div class="-align_center">
+				<button class="button -color_neutral_accent RippleEffect RegistrationPreview" type="button"><span class="Text">Предпросмотр</span></button>
+			</div>
+
+		</fieldset>
 
 	</fieldset>
 

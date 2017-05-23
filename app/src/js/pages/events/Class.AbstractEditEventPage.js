@@ -522,22 +522,22 @@ AbstractEditEventPage = extending(Page, (function() {
 						image_horizontal: form_data.image_horizontal,
 						filenames: {horizontal: form_data.filename_horizontal},
 						is_free: form_data.is_free,
-						min_price: form_data.is_free ? null : form_data.min_price
+						min_price: form_data.is_free ? null : form_data.min_price,
+						registration_required: form_data.registration_required,
+						registration_locally: form_data.registration_locally
 					};
 					
-					send_data.registration_required = form_data.registration_required;
 					if (form_data.registration_required) {
+						
 						if (form_data.registration_limit_by_date) {
 							send_data.registration_till = moment(form_data.registration_till_date + ' ' +	form_data.registration_till_time).tz('UTC').format();
 						}
 						
 						if (form_data.registration_limit_by_quantity) {
-							send_data.registration_locally = true;
 							send_data.registration_limit_count = form_data.registration_limit_count;
 						}
 						
 						if (form_data.registration_fields && form_data.registration_fields.length) {
-							send_data.registration_locally = true;
 							send_data.registration_fields = (new RegistrationFieldsCollection()).setData(form_data.registration_fields.map(function(id) {
 								var field = new RegistrationFieldModel();
 								

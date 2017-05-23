@@ -348,8 +348,8 @@ $url_parts = explode('/', $url);
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=27eb89681ab4f17a3a4d1d844277ab55" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=a8778e3c76811455299b5fe09b8b2750" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=87e5ab6b255a69a64ecb850dae7056ff" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=24d11e1154418bb89e5abc083a6d504a" charset="utf-8"></script><?php
 } else { ?>
 	<script type="text/javascript" src="/dist/vendor.min.js?rev=14ec42665feac2dbdf0613e8778fb5c6" charset="utf-8"></script>
 	<script type="text/javascript" src="/dist/app.min.js?rev=14e082166616f6bd48f707c889e423ed" charset="utf-8"></script><?php
