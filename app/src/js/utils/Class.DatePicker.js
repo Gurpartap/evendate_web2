@@ -54,6 +54,16 @@ DatePicker = (function() {
 			.data('instance', this);
 		this.$datepicker.addClass('-unselectable -Handled_DatePicker');
 		
+		if (this.$input.length) {
+			this.$input.attr('readonly', true);
+			Object.defineProperty(this.$input.get(0), 'value', {
+				get: function() {
+					
+					return self.selected_day;
+				}
+			});
+		}
+		
 		this.calendar.init().$calendar.on('days-changed', function(){
 			self.prev_selected_day = self.selected_day;
 			self.selected_day = self.calendar.selected_days.toString();

@@ -1,7 +1,10 @@
 /**
  * @requires Class.ServerConnection.js
  */
-
+/**
+ *
+ * @const __APP
+ */
 __APP = {
 	/**
 	 * @type {ServerConnection}
@@ -251,7 +254,10 @@ __APP = {
 };
 
 __ERRORS = [];
-
+/**
+ *
+ * @const __LOCALES
+ */
 __LOCALES = {
 	ru_RU: {
 		TEXTS: {

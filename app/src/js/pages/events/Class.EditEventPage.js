@@ -28,41 +28,27 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 		
 		(function selectDates($view, raw_dates, is_same_time) {
 			var MainCalendar = $view.find('.EventDatesCalendar').data('calendar'),
-				start_time = raw_dates[0].start_time.split(':'),
-				end_time = raw_dates[0].end_time ? raw_dates[0].end_time.split(':') : [],
-				$table_rows = $view.find('.SelectedDaysRows'),
-				dates = [],
-				$day_row;
+				$table_rows = $view.find('.SelectedDaysRows');
 			
-			if (is_same_time) {
-				$day_row = $view.find('.MainTime');
-				$day_row.find('.StartHours').val(start_time[0]);
-				$day_row.find('.StartMinutes').val(start_time[1]);
-				if (end_time.length) {
-					$day_row.find('.EndHours').val(end_time[0]);
-					$day_row.find('.EndMinutes').val(end_time[1]);
-				}
-			} else {
+			if (!is_same_time) {
 				PAGE.$wrapper.find('#edit_event_different_time').prop('checked', true).trigger('change');
 			}
 			
+			MainCalendar.selectDays(raw_dates.map(function(date) {
+				
+				return moment.unix(date.event_date).format(__C.DATE_FORMAT)
+			}));
+			
 			raw_dates.forEach(function(date) {
-				date.event_date = moment.unix(date.event_date).format('YYYY-MM-DD');
-				dates.push(date.event_date);
-			});
-			MainCalendar.selectDays(dates);
-			raw_dates.forEach(function(date) {
-				var $day_row = $table_rows.find('.TableDay_' + date.event_date),
-					start_time = date.start_time.split(':'),
-					end_time = date.end_time ? date.end_time.split(':') : [];
-				$day_row.find('.StartHours').val(start_time[0]);
-				$day_row.find('.StartMinutes').val(start_time[1]);
-				if (end_time.length) {
-					$day_row.find('.EndHours').val(end_time[0]);
-					$day_row.find('.EndMinutes').val(end_time[1]);
+				var $day_row = $table_rows.find('.TableDay_' + moment.unix(date.event_date).format(__C.DATE_FORMAT));
+				
+				$day_row.find('.StartTime').val(date.start_time);
+				if (date.end_time.length) {
+					$day_row.find('.EndTime').val(date.end_time);
 				}
 			});
 		})(PAGE.$wrapper, PAGE.event.dates, PAGE.event.is_same_time);
+		
 		(function selectTags($view, tags) {
 			var selected_tags = [];
 			tags.forEach(function(tag) {

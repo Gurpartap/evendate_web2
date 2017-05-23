@@ -587,7 +587,7 @@ class Event extends AbstractEntity
 			if (isset($data['additional_notification_time']) && $data['additional_notification_time'] != null) {
 				$data['additional_notification_time'] = isset($data['additional_notification_time']) ? new DateTime($data['additional_notification_time']) : null;
 			} else {
-				$data['registration_till'] = null;
+				$data['additional_notification_time'] = null;
 			}
 		} catch (Exception $e) {
 			$data['additional_notification_time'] = null;

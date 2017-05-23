@@ -772,8 +772,18 @@ fieldset:disabled .form_select {cursor: default}
 	box-shadow: 0 0 4px 0 var(--color_franklin);
 }
 
+.form_input:-moz-placeholder,
+.form_textarea:-moz-placeholder {
+	color: #9fa6b3;
+	color: var(--color_primary_50);
+	-webkit-transition: color .2s ease;
+	transition: color .2s ease;
+}
+
 .form_input::-webkit-input-placeholder,
 .form_textarea::-webkit-input-placeholder {
+	color: #9fa6b3;
+	color: var(--color_primary_50);
 	-webkit-transition: color .2s ease;
 	transition: color .2s ease;
 }
@@ -805,6 +815,7 @@ fieldset:disabled .form_select {cursor: default}
 .form_datepicker {
 	flex-grow: 0;
 	width: 200px;
+	cursor: pointer;
 }
 
 .form_fieldset {
@@ -1362,7 +1373,6 @@ fieldset:disabled .form_select {cursor: default}
 .form_input.-time_input {
 	width: 60px;
 	padding: 6px;
-	font-size: 1rem;
 	text-align: center;
 }
 
@@ -1436,9 +1446,15 @@ fieldset:disabled .form_select {cursor: default}
 
 .search_icon + .form_input.-search_bar {padding-left: 36px}
 
+.form_input.-search_bar:-moz-placeholder {
+	font-weight: 500;
+	color: #9fa6b3;
+	color: var(--color_primary_50);
+}
 .form_input.-search_bar::-webkit-input-placeholder {
 	font-weight: 500;
 	color: #9fa6b3;
+	color: var(--color_primary_50);
 }
 
 .search_icon {

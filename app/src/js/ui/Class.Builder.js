@@ -292,6 +292,7 @@ Builder = (function() {
 									
 									return self.input($.extend({},	props.attributes,	defined_attributes), classes.concat('form_input', '-time_input'), props.dataset).inputmask("hh:mm", {
 										insertMode: false,
+										clearIncomplete: true,
 										placeholder: '  :  ',
 										greedy: false,
 										showMaskOnHover: false

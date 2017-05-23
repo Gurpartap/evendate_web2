@@ -89,7 +89,6 @@ AbstractEditEventPage = extending(Page, (function() {
 		}
 		
 		bindDatePickers(PAGE.$wrapper);
-		bindTimeInput(PAGE.$wrapper);
 		bindSelect2(PAGE.$wrapper);
 		bindTabs(PAGE.$wrapper);
 		bindControlSwitch(PAGE.$wrapper);
@@ -172,26 +171,39 @@ AbstractEditEventPage = extending(Page, (function() {
 			function buildTable(selected_days) {
 				//TODO: BUG. On multiple selection (month or weekday) duplicates appearing in table.
 				//TODO: Bind time on building table
-				var $output = $(),
-					today = moment().format(__C.DATE_FORMAT);
-				if (Array.isArray(selected_days)) {
-					selected_days.forEach(function(day) {
-						$output = $output.add(tmpl('selected-table-day', {
+				var $output;
+				
+				/**
+				 *
+				 * @param {(Array<string>|string)} days
+				 * @return {jQuery}
+				 */
+				function buildTableRow(days) {
+					days = days instanceof Array ? days : [days];
+					var today = moment().format(__C.DATE_FORMAT);
+					
+					return tmpl('selected-table-day', days.map(function(day, i) {
+						
+						return {
 							date: day,
 							formatted_date: day.split('-').reverse().join('.'),
-							today: today
-						}));
-					});
+							today: today,
+							start_time: __APP.BUILD.formInput({
+								name: 'start_time',
+								type: 'time',
+								classes: ['StartTime']
+							}),
+							end_time: __APP.BUILD.formInput({
+								name: 'end_time',
+								type: 'time',
+								classes: ['EndTime']
+							})
+						};
+					}));
 				}
-				else {
-					$output = tmpl('selected-table-day', {
-						date: selected_days,
-						formatted_date: selected_days.split('-').reverse().join('.'),
-						today: today
-					});
-				}
+				
+				$output = buildTableRow(selected_days);
 				bindDatePickers($output);
-				bindTimeInput($output);
 				bindRemoveRow($output);
 				
 				$fucking_table = $fucking_table.add($output);
@@ -212,6 +224,7 @@ AbstractEditEventPage = extending(Page, (function() {
 				else if (MainCalendar.last_action === 'deselect') {
 					if (Array.isArray(MainCalendar.last_selected_days)) {
 						var classes = [];
+						
 						MainCalendar.last_selected_days.forEach(function(day) {
 							classes.push('.TableDay_' + day);
 						});
@@ -442,13 +455,13 @@ AbstractEditEventPage = extending(Page, (function() {
 				
 				$times.each(function() {
 					var $row = $(this),
-						$inputs = $row.find('.StartHours, .StartMinutes, .EndHours, .EndMinutes'),
-						start = $row.find('.StartHours').val().trim() + $row.find('.StartMinutes').val().trim(),
-						end = $row.find('.EndHours').val().trim() + $row.find('.EndMinutes').val().trim();
+						$inputs = $row.find('.StartTime, .EndTime'),
+						start = $inputs.filter('.StartTime').inputmask('unmaskedvalue'),
+						end = $inputs.filter('.EndTime').inputmask('unmaskedvalue');
 					
 					$inputs.each(function() {
 						var $input = $(this);
-						if ($input.val().trim() === '') {
+						if ($input.val() === '') {
 							is_valid = failSubmit($input, is_valid, 'Заполните время события');
 						}
 					});
@@ -515,11 +528,7 @@ AbstractEditEventPage = extending(Page, (function() {
 					send_data.registration_required = form_data.registration_required;
 					if (form_data.registration_required) {
 						if (form_data.registration_limit_by_date) {
-							send_data.registration_till = moment(
-								form_data.registration_till_date + 'T' +
-								form_data.registration_till_time_hours + ':' +
-								form_data.registration_till_time_minutes + ':00'
-							).tz('UTC').format();
+							send_data.registration_till = moment(form_data.registration_till_date + ' ' +	form_data.registration_till_time).tz('UTC').format();
 						}
 						
 						if (form_data.registration_limit_by_quantity) {
@@ -554,32 +563,35 @@ AbstractEditEventPage = extending(Page, (function() {
 					
 					send_data.delayed_publication = form_data.delayed_publication;
 					if (form_data.delayed_publication) {
-						send_data.public_at = moment(
-							form_data.public_at_date + 'T' +
-							form_data.public_at_time_hours + ':' +
-							form_data.public_at_time_minutes + ':00'
-						).tz('UTC').format();
+						send_data.public_at = moment(form_data.public_at_date + ' ' + form_data.public_at_time).tz('UTC').format();
 					}
 					
 					send_data.different_time = form_data.different_time;
 					send_data.dates = new DateModelsCollection();
 					if (form_data.different_time) {
-						PAGE.$wrapper.find('.SelectedDaysRows').children().each(function(i, row) {
-							var $row = $(row);
-							send_data.dates.push((new DateModel()).setData({
-								event_date: $row.find('.DatePicker').data('selected_day'),
-								start_time: $row.find('.StartHours').val() + ':' + $row.find('.StartMinutes').val(),
-								end_time: $row.find('.EndHours').val() + ':' + $row.find('.EndMinutes').val()
-							}));
-						});
+						if (!(form_data.event_date instanceof Array)) {
+							form_data.event_date = [form_data.event_date];
+							form_data.start_time = [form_data.start_time];
+							form_data.end_time = [form_data.end_time];
+						}
+						
+						send_data.dates.setData(form_data.event_date.map(function(date, i) {
+							
+							return {
+								event_date: date,
+								start_time: form_data.start_time[i],
+								end_time: form_data.end_time[i]
+							};
+						}));
 					} else {
-						MainCalendar.selected_days.forEach(function(day) {
-							send_data.dates.push((new DateModel()).setData({
+						send_data.dates.setData(MainCalendar.selected_days.map(function(day) {
+							
+							return {
 								event_date: day,
-								start_time: form_data.start_hours + ':' + form_data.start_minutes,
-								end_time: form_data.end_hours + ':' + form_data.end_minutes
-							}));
-						});
+								start_time: form_data.start_time,
+								end_time: form_data.end_time
+							};
+						}));
 					}
 					send_data.dates = send_data.dates.getArrayCopy();
 					
@@ -605,9 +617,22 @@ AbstractEditEventPage = extending(Page, (function() {
 				tomorrow_date: moment().add(1, 'd').format(__C.DATE_FORMAT),
 				button_text: is_edit ? 'Сохранить' : 'Опубликовать'
 			}),
+			m_registration_till = moment.unix(PAGE.event.registration_till),
+			m_public_at = moment.unix(PAGE.event.public_at),
 			registration_props = {
 				registration_limit_count: PAGE.event.registration_limit_count,
 				registration_till_display_date: 'Дата',
+				registration_till_time_input: __APP.BUILD.formInput({
+					label: 'Время',
+					id: 'edit_event_registration_till_time',
+					type: 'time',
+					name: 'registration_till_time',
+					value: PAGE.event.registration_till ? m_registration_till.format('HH:mm') : undefined,
+					unit_classes: ['-inline'],
+					attributes: {
+						required: true
+					}
+				}),
 				tomorrow_date: page_vars.tomorrow_date,
 				predefined_field: tmpl('edit-event-registration-predefined-field', [
 					{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'email', name: 'E-mail', description: 'Текстовое поле для ввода адреса электронной почты'},
@@ -623,33 +648,56 @@ AbstractEditEventPage = extending(Page, (function() {
 		
 		if (PAGE.event.registration_required) {
 			if (PAGE.event.registration_till) {
-				var m_registration_till = moment.unix(PAGE.event.registration_till);
 				registration_props = $.extend(registration_props, {
 					registration_till_display_date: m_registration_till.format(__LOCALES.ru_RU.DATE.DATE_FORMAT),
-					registration_till_date: m_registration_till.format(__C.DATE_FORMAT),
-					registration_till_time_hours: m_registration_till.format('HH'),
-					registration_till_time_minutes: m_registration_till.format('mm')
+					registration_till_date: m_registration_till.format(__C.DATE_FORMAT)
 				});
 			}
 		}
 		
 		if (PAGE.event.public_at != null) {
-			var m_public_at = moment.unix(PAGE.event.public_at);
-			page_vars.public_at_data = m_public_at.format('YYYY-MM-DD');
-			page_vars.public_at_data_label = m_public_at.format('DD.MM.YYYY');
-			page_vars.public_at_time_hours = m_public_at.format('HH');
-			page_vars.public_at_time_minutes = m_public_at.format('mm');
+			page_vars.public_at_data = m_public_at.format(__C.DATE_FORMAT);
+			page_vars.public_at_data_label = m_public_at.format(__LOCALE.DATE.DATE_FORMAT);
 		}
 		
 		PAGE.$wrapper.html(tmpl('edit-event-page', $.extend(page_vars, {
 			date_picker: tmpl('edit-event-datepicker', {
+				start_time: __APP.BUILD.formInput({
+					label: 'Начало',
+					id: 'edit_event_start_time',
+					name: 'start_time',
+					type: 'time',
+					classes: ['StartTime'],
+					unit_classes: ['-inline'],
+					value: PAGE.event.dates.length ? PAGE.event.dates[0].start_time : undefined
+				}),
+				end_time: __APP.BUILD.formInput({
+					label: 'Конец',
+					id: 'edit_event_end_time',
+					name: 'end_time',
+					type: 'time',
+					classes: ['EndTime'],
+					unit_classes: ['-inline'],
+					value: PAGE.event.dates.length ? PAGE.event.dates[0].end_time : undefined
+				}),
 				today: page_vars.current_date
 			}),
 			cover_picker: tmpl('edit-event-cover-picker', {
 				image_horizontal_url: PAGE.event.image_horizontal_url,
 				image_horizontal_filename: getFilenameFromURL(PAGE.event.image_horizontal_url)
 			}),
-			registration: tmpl('edit-event-registration', registration_props)
+			registration: tmpl('edit-event-registration', registration_props),
+			public_at_time_input: __APP.BUILD.formInput({
+				label: 'Время',
+				id: 'edit_event_public_at_time',
+				name: 'public_at_time',
+				type: 'time',
+				unit_classes: ['-inline'],
+				value: PAGE.event.public_at ? m_public_at.format('HH:mm') : undefined,
+				attributes: {
+					required: true
+				}
+			})
 		})));
 		
 		PAGE.init();

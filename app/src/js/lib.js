@@ -595,15 +595,20 @@ $.fn.extend({
 			default: {
 				var output = {};
 				elements.filter(function() {
-					var a = this.type;
-					return this.name && !$(this).is(':disabled') && zb.test(this.nodeName) && !yb.test(a) && !T.test(a)
+					
+					return this.name && !$(this).is(':disabled') && zb.test(this.nodeName) && !yb.test(this.type) && !T.test(this.type)
 				}).each(function(i, el) {
 					var $element = $(el),
 						name = el.name,
-						value = $element.val();
+						value = $element.val(),
+						hasSameName = function(i, el){
+							var $el = $(el);
+							
+							return $el.is(':enabled') && $el.is('[name="' + name + '"]')
+						};
 					
-					if (elements.filter("[name='" + name + "']").length > 1 && value != "") {
-						output[name] = typeof(output[name]) == "undefined" ? [] : output[name];
+					if (elements.filter(hasSameName).length > 1 && value != '') {
+						output[name] = typeof(output[name]) === "undefined" ? [] : output[name];
 						output[name].push(value ? value.replace(xb, "\r\n") : value)
 					}
 					else if ($element.attr('type') === 'hidden' && value.indexOf('data.') === 0) {
@@ -621,8 +626,8 @@ $.fn.extend({
 					}
 				});
 				elements.filter(function() {
-					var a = this.type;
-					return this.name && !$(this).is(":disabled") && T.test(a) && ((this.checked && this.value != "on") || (this.value == "on" && a == "checkbox"))
+					
+					return this.name && !$(this).is(":disabled") && T.test(this.type) && ((this.checked && this.value !== "on") || (this.value === "on" && this.type === "checkbox"))
 				}).each(function(i, el) {
 					var name = el.name,
 						value = el.value;
@@ -633,11 +638,11 @@ $.fn.extend({
 							break;
 						}
 						case 'checkbox': {
-							if (elements.filter("[name='" + name + "']").length > 1 && value != "on") {
-								output[name] = typeof(output[name]) == "undefined" ? [] : output[name];
+							if (elements.filter("[name='" + name + "']").length > 1 && value !== "on") {
+								output[name] = typeof(output[name]) === "undefined" ? [] : output[name];
 								output[name].push(value)
 							}
-							else if (value != "on")
+							else if (value !== "on")
 								output[name] = value;
 							else
 								output[name] = !!el.checked;
@@ -1704,13 +1709,6 @@ function bindDatePickers($parent) {
 	}).addClass('-Handled_DatePicker');
 }
 
-function bindTimeInput($parent) {
-	$parent = $parent ? $parent : $('body');
-	$parent.find('.TimeInput').not('.-Handled_TimeInput').each(function(i, elem) {
-		initTimeInput(elem);
-	}).addClass('-Handled_TimeInput');
-}
-
 function bindTabs($parent) {
 	$parent = $parent ? $parent : $('body');
 	$parent.find('.Tabs').not('.-Handled_Tabs').each(function(i, elem) {
@@ -2039,11 +2037,15 @@ function bindControlSwitch($parent) {
 			$switching = $parent.find('.Switching[data-switch_id="'+switch_id+'"]');
 		
 		$switch.on('change.Switch', function() {
-			if($switching.is('fieldset')) {
-				$switching.prop('disabled', !$switching.prop('disabled'));
-			} else {
-				$switching.toggleStatus('disabled');
-			}
+			$switching.each(function(i, switching) {
+				var $switching = $(switching);
+				
+				if($switching.is('fieldset')) {
+					$switching.prop('disabled', !$switching.prop('disabled'));
+				} else {
+					$switching.toggleStatus('disabled');
+				}
+			});
 		});
 	}).addClass('-Handled_Switch');
 }
