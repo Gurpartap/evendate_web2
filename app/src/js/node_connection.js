@@ -113,7 +113,7 @@ socket.on('vk.getGroupsToPostDone', function (response) {
                 $groups.append(tmpl('option', {
                     val: option.gid,
                     display_name: option.name,
-                    data: "data-img='" + option.photo + "'"
+                    dataset: "data-img='" + option.photo + "'"
                 }));
             });
             initSelect2($groups);

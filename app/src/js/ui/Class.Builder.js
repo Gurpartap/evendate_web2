@@ -122,6 +122,23 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @param {(...buildProps|Array<buildProps>)} props
+	 * @return {jQuery}
+	 */
+	Builder.prototype.option = function buildOption(props) {
+		var args = props instanceof Array ? props : arguments;
+		
+		return tmpl('option', [].map.call(args, function(arg) {
+			
+			return Builder.normalizeBuildProps(arg);
+		})).each(function(i, option) {
+			if (args[i].dataset) {
+				$(option).data(args[i].dataset);
+			}
+		});
+	};
+	/**
+	 *
 	 * @param {string} type - checkbox or radio
 	 * @param {buildProps} props
 	 * @param {(Array<string>|string)} [props.unit_classes]

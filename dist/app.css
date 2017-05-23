@@ -1688,7 +1688,7 @@ fieldset:disabled .form_select {cursor: default}
 
 .form_group {
 	display: flex;
-	align-items: center;
+	align-items: baseline;
 	justify-content: space-around;
 	margin-bottom: .875em;
 }

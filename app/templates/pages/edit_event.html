@@ -13,7 +13,7 @@
 							<div class="EditEventOrganizations -hidden">
 								<h2><label for="edit_event_organization">Организация <span class="required_star">*</span></label></h2>
 								<div class="form_unit">
-									<select id="edit_event_organization" name="organization_id"></select>
+									<select id="edit_event_organization" name="organization_id">{organization_options}</select>
 								</div>
 							</div>
 
@@ -102,6 +102,24 @@
 
 								</div>
 							</fieldset>
+
+
+							<div class="form_group -parts_e_2">
+								<div class="form_unit form_accent_block -status_disabled">
+									<input id="edit_event_additional_notification" class="form_checkbox Switch" type="checkbox" name="additional_notification" data-switch_id="additional_notification" disabled>
+									<label class="form_label" for="edit_event_additional_notification"><span>Дополнительное уведомление</span></label>
+								</div>
+
+								<small class="form_unit -align_right">
+									<a id="edit_event_buy_subscription" href="/admin/organization/{organization_id}/settings" class="action -color_accent Link">доступно с подпиской</a>
+								</small>
+							</div>
+
+							<fieldset class="Switching" data-switch_id="additional_notification" disabled>
+
+							</fieldset>
+
+
 
 						</div>
 
@@ -291,7 +309,7 @@
 		<fieldset class="Switching" data-switch_id="registration_limit_by_quantity" disabled>
 			<div class="form_unit RegistrationQuantity -inline">
 				<label class="form_label" for="edit_event_registration_limit_count">Максимальное кол-во</label>
-				<input id="edit_event_registration_limit_count" class="form_input" type="text" name="registration_limit_count" value="{registration_limit_count}" autocomplete="off" placeholder="1" required>
+				<input id="edit_event_registration_limit_count" class="form_input" type="text" name="registration_limit_count" value="{registration_limit_count}" autocomplete="off" placeholder="3 000" required>
 			</div>
 		</fieldset>
 

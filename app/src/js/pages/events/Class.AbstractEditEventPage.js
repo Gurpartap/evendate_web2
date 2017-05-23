@@ -19,9 +19,22 @@ AbstractEditEventPage = extending(Page, (function() {
 		this.event = new OneEvent();
 		this.state_name = 'admin';
 		this.organization_id = null;
+		
+		this.my_organizations = new OrganizationsCollection();
+		this.my_organizations_fields = new Fields(
+			'default_address', {
+				tariff: {
+					fields: new Fields('available_additional_notifications')
+				}
+			}
+		);
 	}
 	
 	AbstractEditEventPage.lastRegistrationCustomFieldId = 0;
+	
+	AbstractEditEventPage.prototype.fetchData = function() {
+		return this.fetching_data_defer = this.my_organizations.fetchMyOrganizations(['admin', 'moderator'], this.my_organizations_fields);
+	};
 	
 	/**
 	 *
@@ -256,46 +269,20 @@ AbstractEditEventPage = extending(Page, (function() {
 			
 		})();
 		(function initOrganization(selected_id) {
-			OrganizationsCollection.fetchMyOrganizations(['admin', 'moderator'], {fields: ['default_address']}, function(data) {
-				var $wrapper = $('.EditEventOrganizations'),
-					organizations_options = $(),
-					$default_address_button = PAGE.$wrapper.find('.EditEventDefaultAddress'),
-					$select = $wrapper.find('#edit_event_organization'),
-					selected_address;
-				
-				data.forEach(function(organization) {
-					if (organization.id == selected_id) {
-						selected_address = organization.default_address;
-					}
-					organizations_options = organizations_options.add(tmpl('option', {
-						val: organization.id,
-						data: "data-image-url='" + organization.img_url + "' data-default-address='" + organization.default_address + "'",
-						display_name: organization.name
-					}));
-				});
-				if (selected_id && !selected_address) {
-					return __APP.changeState('/', true, true);
-				}
-				
-				$select.append(organizations_options).select2({
-					containerCssClass: 'form_select2',
-					dropdownCssClass: 'form_select2_drop'
-				}).on('change', function() {
-					$default_address_button.data('default_address', $(this).children(":selected").data('default-address'));
-				});
-				if (selected_id) {
-					$select.select2('val', selected_id);
-					$default_address_button.data('default_address', selected_address);
-				} else {
-					$default_address_button.data('default_address', data[0].default_address);
-				}
-				if (organizations_options.length > 1) {
-					$wrapper.removeClass('-hidden');
-				} else {
-					$wrapper.addClass('-hidden');
-				}
+			var $select = PAGE.$wrapper.find('#edit_event_organization');
+			
+			$select.select2({
+				containerCssClass: 'form_select2',
+				dropdownCssClass: 'form_select2_drop'
+			}).on('change', function() {
+				PAGE.organization_id = this.value;
 			});
-		})(PAGE.event.organization_id);
+			
+			PAGE.organization_id = selected_id ? selected_id : PAGE.my_organizations[0].id;
+			
+			$select.select2('val', PAGE.organization_id);
+			
+		})(PAGE.organization_id || PAGE.event.organization_id);
 		
 		bindCollapsing(PAGE.$wrapper);
 		
@@ -347,7 +334,7 @@ AbstractEditEventPage = extending(Page, (function() {
 		
 		PAGE.$wrapper.find('.EditEventDefaultAddress').off('click.defaultAddress').on('click.defaultAddress', function() {
 			var $this = $(this);
-			$this.closest('.form_group').find('input').val($this.data('default_address')).trigger('input');
+			$this.closest('.form_group').find('input').val(PAGE.my_organizations.getByID(PAGE.organization_id).default_address).trigger('input');
 		});
 		
 		PAGE.$wrapper.find('#edit_event_is_online').off('change.OnlineEvent').on('change.OnlineEvent', function() {
@@ -610,6 +597,7 @@ AbstractEditEventPage = extending(Page, (function() {
 	AbstractEditEventPage.prototype.render = function() {
 		var PAGE = this,
 			is_edit = !!PAGE.event.id,
+			$organizations_wrapper,
 			page_vars = $.extend(true, {}, Object.getProps(PAGE.event), {
 				event_id: PAGE.event.id ? PAGE.event.id : undefined,
 				public_at_data_label: 'Дата',
@@ -646,6 +634,10 @@ AbstractEditEventPage = extending(Page, (function() {
 			return null;
 		}
 		
+		if ((PAGE.event.organization_id && !PAGE.my_organizations.has(PAGE.event.organization_id)) || (PAGE.organization_id && !PAGE.my_organizations.has(PAGE.organization_id))) {
+			return __APP.changeState('/', true, true);
+		}
+		
 		if (PAGE.event.registration_required) {
 			if (PAGE.event.registration_till) {
 				registration_props = $.extend(registration_props, {
@@ -661,6 +653,18 @@ AbstractEditEventPage = extending(Page, (function() {
 		}
 		
 		PAGE.$wrapper.html(tmpl('edit-event-page', $.extend(page_vars, {
+			organization_options: __APP.BUILD.option(PAGE.my_organizations.map(function(organization) {
+				
+				return {
+					val: organization.id,
+					dataset: {
+						organization: organization,
+						'image-url': organization.img_url,
+						'default-address': organization.default_address
+					},
+					display_name: organization.name
+				};
+			})),
 			date_picker: tmpl('edit-event-datepicker', {
 				start_time: __APP.BUILD.formInput({
 					label: 'Начало',
@@ -697,8 +701,16 @@ AbstractEditEventPage = extending(Page, (function() {
 				attributes: {
 					required: true
 				}
-			})
+			}),
+			organization_id: PAGE.organization_id || PAGE.event.organization_id
 		})));
+		
+		$organizations_wrapper = PAGE.$wrapper.find('.EditEventOrganizations');
+		if (PAGE.my_organizations.length > 1) {
+			$organizations_wrapper.removeClass(__C.CLASSES.HIDDEN);
+		} else {
+			$organizations_wrapper.addClass(__C.CLASSES.HIDDEN);
+		}
 		
 		PAGE.init();
 		
