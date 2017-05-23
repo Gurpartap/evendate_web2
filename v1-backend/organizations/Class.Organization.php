@@ -801,7 +801,7 @@ class Organization extends AbstractEntity
 				'background_img_url' => $data['background_img_url'],
 				'img_url' => $data['img_url'],
 				'creator_id' => $user->getId(),
-				'images_domain' => 'https://dn' . rand(1, 4) . '.evendate.ru/',
+				'images_domain' => 'https://dn' . rand(1, 4) . '.evendate.io/',
 				'email' => $data['email'],
 				'is_private' => $data['is_private'],
 				'brand_color' => $data['brand_color'],

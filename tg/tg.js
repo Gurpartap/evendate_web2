@@ -635,7 +635,7 @@ api.on('message', function (message) {
                 chat_id: message.chat.id,
                 text: 'Бот разработан командой Evendate.\n\n' +
                 'EvendateBot поможет не пропускать интересные события. За подробной инструкцией по работе нажмите нажмите /faq. \n\n' +
-                'https://evendate.ru'
+                'https://evendate.io'
             })
                 .catch((err) => {
                     console.log(err)

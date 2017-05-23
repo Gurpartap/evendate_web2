@@ -36,7 +36,7 @@ CREATE OR REPLACE VIEW view_all_events AS
             WHERE event_id = events.id AND status = TRUE) AS sb) = 1) :: BOOL
                                                                                        AS is_same_time,
     events.organization_id :: INT,
-    'http://evendate.ru/event/' || events.id                                           AS link,
+    'http://evendate.io/event/' || events.id                                           AS link,
     events.images_domain || 'event_images/large/' || events.image_vertical             AS image_vertical_url,
     events.images_domain || 'event_images/large/' || events.image_horizontal           AS image_horizontal_url,
     events.images_domain || 'event_images/large/' || events.image_vertical             AS image_vertical_large_url,

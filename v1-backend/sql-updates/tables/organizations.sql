@@ -18,7 +18,7 @@ CREATE TABLE organizations
   notification_suffix TEXT,
   vk_url_path VARCHAR(255),
   facebook_url_path VARCHAR(255),
-  images_domain VARCHAR(50) DEFAULT 'http://evendate.ru/'::character varying,
+  images_domain VARCHAR(50) DEFAULT 'http://evendate.io/'::character varying,
   status BOOLEAN DEFAULT true NOT NULL,
   new_status BOOLEAN DEFAULT true NOT NULL,
   fts TSVECTOR,
