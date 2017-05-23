@@ -1541,9 +1541,9 @@ pg.connect(pg_conn_string, function (err, client, done) {
         }
 
         try {
-            insertRecommendationsAccordance({event_id: req.params.id}, function () {
-                updateRecommendations({event_id: req.params.id}, logger.info)
-            });
+            // insertRecommendationsAccordance({event_id: req.params.id}, function () {
+            //     updateRecommendations({event_id: req.params.id}, logger.info)
+            // });
         } catch (e) {
         }
 
