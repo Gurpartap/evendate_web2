@@ -138,7 +138,7 @@ class User extends AbstractUser
 
 		$bind_values = array();
 		$index = 0;
-		$where_str[] = array();
+		$where_str = array();
 
 		foreach ($role_names as $role_name) {
 			if (!in_array($role_name, Roles::ROLES)) throw new InvalidArgumentException();
@@ -148,7 +148,7 @@ class User extends AbstractUser
 		}
 
 		$q_get_is_admin
-			->where(implode(' OR ', $where_str))
+			->where('(' . implode(' OR ', $where_str) . ')')
 			->bindValues($bind_values);
 
 		$p_get = $this->db->prepareExecute($q_get_is_admin, 'CANT_GET_ADMIN_STATUS');

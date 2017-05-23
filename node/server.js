@@ -1122,6 +1122,8 @@ pg.connect(pg_conn_string, function (err, client, done) {
                                 user_info.photo_100 = user_info.hasOwnProperty('picture') ? user_info.picture.data.url : '';
                             }
 
+                            console.log(user_info);
+
                             getGroupsList(user_info, function (groups_error, groups_data) {
 
                                 if (handleError(friends_error)) {
