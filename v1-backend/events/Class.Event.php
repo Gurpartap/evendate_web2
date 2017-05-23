@@ -727,7 +727,8 @@ class Event extends AbstractEntity
 			}
 
 			if ($tariff_info['available_additional_notifications'] > 0 &&
-				$data['additional_notification_time'] instanceof DateTime) {
+				$data['additional_notification_time'] instanceof DateTime
+			) {
 				self::saveNotifications(array(array(
 					'event_id' => $event_id,
 					'notification_type_id' => self::getNotificationTypeId(Notification::NOTIFICATION_TYPE_ADDITIONAL_FOR_ORGANIZATION, $db),
@@ -1405,10 +1406,12 @@ class Event extends AbstractEntity
 
 
 			if ($tariff_info['available_additional_notifications'] > 0 &&
-				$data['additional_notification_time'] instanceof DateTime) {
+				$data['additional_notification_time'] instanceof DateTime
+			) {
 				if ($this->disableNotificationByType(self::getNotificationTypeId(
 					Notification::NOTIFICATION_TYPE_ADDITIONAL_FOR_ORGANIZATION, $this->db
-				))){
+				))
+				) {
 					self::saveNotifications(array(array(
 						'event_id' => $this->id,
 						'notification_type_id' => self::getNotificationTypeId(Notification::NOTIFICATION_TYPE_ADDITIONAL_FOR_ORGANIZATION, $db),
@@ -1430,7 +1433,8 @@ class Event extends AbstractEntity
 	}
 
 
-	private function disableNotificationByType($notification_type_id){
+	private function disableNotificationByType($notification_type_id)
+	{
 		$q_upd = App::queryFactory();
 		$q_upd->newUpdate()
 			->table('events_notifications')
@@ -1631,7 +1635,11 @@ class Event extends AbstractEntity
 
 		if ($result->getStatus()) {
 			$user->addFavoriteEvent($this);
-			$this->addNotification($user, array('notification_type' => 'notification-before-day'));
+			try {
+				$this->addNotification($user, array('notification_type' => 'notification-before-day'));
+			} catch (Exception $e) {
+			}
+
 		}
 
 		return new Result(true, '', array(
