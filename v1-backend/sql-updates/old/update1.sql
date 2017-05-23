@@ -154,7 +154,7 @@ CREATE VIEW view_events AS
     events.registration_till,
     events.is_free,
     events.organization_id :: INT,
-    'http://evendate.ru/event.php?id=' || events.id                           AS link,
+    'http://evendate.io/event.php?id=' || events.id                           AS link,
     TRUE                                                                      AS status,
     events.images_domain || 'event_images/large/' || events.image_vertical    AS image_vertical_url,
     events.images_domain || 'event_images/large/' || events.image_horizontal  AS image_horizontal_url,

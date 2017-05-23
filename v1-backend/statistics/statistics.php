@@ -24,7 +24,7 @@ $__modules['statistics'] = array(
 				$uuid,
 				$__fields
 			)->getParams($__user, $__fields);
-			return new Result($data->getStatus(),'', array($data->getData()));
+			return new Result($data->getStatus(), '', array($data->getData()));
 		},
 		'{/events/(id:[0-9]+)}/participants' => function ($id) use ($__db, $__request, $__user, $__fields, $__pagination) {
 
@@ -81,7 +81,8 @@ $__modules['statistics'] = array(
 			if ($__user instanceof User == false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
 			$__request['statistics_event'] = EventsCollection::one($__db, $__user, $id, array());
 
-			if (!$__user->isAdmin($__request['statistics_event']->getOrganization())) throw new PrivilegesException('NOT_ADMIN', $__db);
+			if (!$__user->hasRights($__request['statistics_event']->getOrganization(), array(Roles::ROLE_MODERATOR, Roles::ROLE_ADMIN)))
+				throw new PrivilegesException('NOT_ADMIN', $__db);
 
 			return TicketsCollection::filter($__db,
 				$__user,

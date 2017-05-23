@@ -22,7 +22,7 @@ CREATE TABLE events
   image_horizontal VARCHAR(255),
   location_object TEXT,
   dates_range BOOLEAN DEFAULT false NOT NULL,
-  images_domain VARCHAR(50) DEFAULT 'http://evendate.ru/'::character varying,
+  images_domain VARCHAR(50) DEFAULT 'http://evendate.io/'::character varying,
   status BOOLEAN DEFAULT true NOT NULL,
   registration_required BOOLEAN DEFAULT false NOT NULL,
   registration_till TIMESTAMP,
