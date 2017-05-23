@@ -41,7 +41,7 @@ $__modules['users'] = array(
 			);
 		},
 		'friends' => function () use ($__user, $__request, $__fields, $__pagination, $__order_by, $__db) {
-			if ($__user instanceof User === false) throw new PrivilegesException('', $__db);
+			if ($__user instanceof User === false) return new Result(false, 'BAD_USER', array());
 			return UsersCollection::filter(
 				$__db,
 				$__user,
