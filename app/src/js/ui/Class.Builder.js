@@ -224,6 +224,7 @@ Builder = (function() {
 	 * @param {boolean} [props.required]
 	 * @param {string} [props.placeholder]
 	 *
+	 * @param {string} [props.label]
 	 * @param {(string|jQuery)} [props.helptext]
 	 * @param {HTMLDataset} [props.helptext_dataset]
 	 * @param {HTMLAttributes} [props.helptext_attributes]
@@ -254,6 +255,7 @@ Builder = (function() {
 			'reset',
 			'button'
 		];
+		
 		return $.makeSet(Array.prototype.map.call(arguments, function(props) {
 			switch (props.type) {
 				case 'radio':
@@ -262,38 +264,53 @@ Builder = (function() {
 					return self.checkbox(props);
 				default:
 					return tmpl('form-unit', Builder.normalizeBuildProps($.extend(true, {}, props, {
-						form_element: props.type === 'textarea' ?
-						              self.textarea($.extend(
-						              	{},
-							              props.attributes,
-							              {
-								              id: props.id,
-								              name: props.name || undefined,
-								              required: props.required || undefined,
-								              placeholder: props.placeholder,
-								              tabindex: props.tabindex
-							              }), (props.classes ? ['form_textarea'].concat(props.classes) : ['form_textarea']), props.value, props.dataset) :
-						              self.input($.extend(
-						              	{},
-							              props.attributes,
-							              {
-								              id: props.id,
-								              type: !props.type || INPUT_TYPES.indexOf(props.type) === -1 ? 'text' : props.type,
-								              name: props.name || undefined,
-								              value: props.value || undefined,
-								              required: props.required || undefined,
-								              placeholder: props.placeholder,
-								              tabindex: props.tabindex
-							              }), (props.classes ? ['form_input'].concat(props.classes) : ['form_input']), props.dataset),
-						helptext: self.formHelpText(props.helptext, props.helptext_dataset, props.helptext_attributes)
-					}), ['unit_classes', 'label_classes']));
+						label: props.label ? tmpl('label', Builder.normalizeBuildProps({
+							id: props.id,
+							label: props.label,
+							label_classes: props.label_classes
+						}, ['label_classes'])) : '',
+						form_element: (function(props) {
+							var classes = props.classes ? props.classes : [],
+								defined_attributes = {
+									id: props.id,
+									name: props.name,
+									required: props.required,
+									placeholder: props.placeholder,
+									tabindex: props.tabindex
+								};
+							
+							switch (props.type) {
+								case 'textarea': {
+									
+									return self.textarea($.extend({},	props.attributes,	defined_attributes), classes.concat('form_textarea'), props.value, props.dataset);
+								}
+								case 'time': {
+									defined_attributes = $.extend(defined_attributes, {
+										value: props.value,
+										placeholder: '23:59'
+									});
+									
+									return self.input($.extend({},	props.attributes,	defined_attributes), classes.concat('form_input', '-time_input'), props.dataset).inputmask("hh:mm", {
+										insertMode: false,
+										placeholder: '  :  ',
+										greedy: false,
+										showMaskOnHover: false
+									});
+								}
+								default: {
+									defined_attributes = $.extend(defined_attributes, {
+										type: !props.type || INPUT_TYPES.indexOf(props.type) === -1 ? 'text' : props.type,
+										value: props.value
+									});
+									
+									return self.input($.extend({},	props.attributes,	defined_attributes), classes.concat('form_input'), props.dataset);
+								}
+							}
+						})(props),
+						helptext: props.helptext ? self.formHelpText(props.helptext, props.helptext_dataset, props.helptext_attributes) : ''
+					}), ['unit_classes']));
 			}
 		}));
-	};
-	
-	Builder.prototype.timeInput = function(props) {
-		
-		//return
 	};
 	/**
 	 *
