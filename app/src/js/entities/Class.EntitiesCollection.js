@@ -30,7 +30,6 @@ EntitiesCollection = extending(Array, (function() {
 			}
 		});
 	}
-	EntitiesCollection.prototype.ID_PROP_NAME = 'id';
 	EntitiesCollection.prototype.collection_of = OneEntity;
 	/**
 	 *
@@ -64,18 +63,23 @@ EntitiesCollection = extending(Array, (function() {
 	 * @returns {number}
 	 */
 	EntitiesCollection.prototype.push = function(element) {
-		var item;
+		var item,
+			ID_PROP_NAME = this.collection_of.prototype.ID_PROP_NAME,
+			entities = arguments;
+		
 		this.last_pushed.splice(0);
-		for (var i = 0; i < arguments.length; i++) {
-			if (!arguments[i][this.ID_PROP_NAME] || (arguments[i][this.ID_PROP_NAME] && !this.has(arguments[i][this.ID_PROP_NAME]))) {
-				item = (arguments[i] instanceof this.collection_of) ? arguments[i] : (new this.collection_of()).setData(arguments[i]);
+		
+		for (var i = 0, entity = entities[i]; i < entities.length; entity = entities[++i]) {
+			if (!entity[ID_PROP_NAME] || (entity[ID_PROP_NAME] && !this.has(entity[ID_PROP_NAME]))) {
+				item = (entity instanceof this.collection_of) ? entity : (new this.collection_of()).setData(entity);
 				this.last_pushed.push(item);
 				this[this.length++] = item;
-				if (arguments[i][this.ID_PROP_NAME]) {
-					this.__lookup[arguments[i][this.ID_PROP_NAME]] = item;
+				if (item[ID_PROP_NAME]) {
+					this.__lookup[item[ID_PROP_NAME]] = item;
 				}
 			}
 		}
+		
 		return this.length;
 	};
 	/**

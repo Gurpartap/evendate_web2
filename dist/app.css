@@ -2643,10 +2643,13 @@ a.button:hover {text-decoration: none}
 	-o-transform: translateX(-100%);
 	transform: translateX(-100%);
 
-	-webkit-transition: transform .5s ease;
-	-moz-transition: transform .5s ease;
-	-o-transition: transform .5s ease;
-	transition: transform .5s ease;
+	-webkit-transition: transform .5s ease, visibility .5s ease, opacity .5s ease;
+	-moz-transition: transform .5s ease, visibility .5s ease, opacity .5s ease;
+	-o-transition: transform .5s ease, visibility .5s ease, opacity .5s ease;
+	transition: transform .5s ease, visibility .5s ease, opacity .5s ease;
+
+	visibility: hidden;
+	opacity: 0;
 }
 .tab_body.-active {
 	-webkit-transform: translateX(0);
@@ -2654,6 +2657,9 @@ a.button:hover {text-decoration: none}
 	-ms-transform: translateX(0);
 	-o-transform: translateX(0);
 	transform: translateX(0);
+
+	visibility: visible;
+	opacity: 1;
 }
 
 .tab_body.-active ~ .tab_body {

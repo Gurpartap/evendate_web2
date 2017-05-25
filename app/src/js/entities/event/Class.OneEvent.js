@@ -1,5 +1,12 @@
 /**
  * @requires ../Class.OneEntity.js
+ * @requires ../date/Class.DatesCollection.js
+ * @requires ../tag/Class.TagsCollection.js
+ * @requires ../order/Class.OrdersCollection.js
+ * @requires ../ticket/Class.EventsTicketsCollection.js
+ * @requires ../ticket_type/Class.TicketTypesCollection.js
+ * @requires ../user/Class.UsersCollection.js
+ * @requires ../notification/Class.NotificationsCollection.js
  * @requires ../../data_models/registration_field/Class.RegistrationFieldsCollection.js
  */
 /**
@@ -67,7 +74,9 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @property {TagsCollection} tags
 	 *
-	 * @property {Array} notifications
+	 * @property {NotificationsCollection} notifications
+	 *
+	 * @property {timestamp} additional_notification_time
 	 *
 	 * @property {UsersCollection} favored
 	 * @property {?number} favored_users_count
@@ -137,7 +146,9 @@ OneEvent = extending(OneEntity, (function() {
 		
 		this.tags = new TagsCollection();
 		
-		this.notifications = [];
+		this.notifications = new NotificationsCollection();
+		
+		this.additional_notification_time = null;
 		
 		this.favored = new UsersCollection();
 		this.favored_users_count = null;

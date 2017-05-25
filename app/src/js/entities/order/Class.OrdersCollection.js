@@ -24,18 +24,6 @@ OrdersCollection = extending(EntitiesCollection, (function() {
 	}
 	
 	OrdersCollection.prototype.collection_of = OneOrder;
-	/**
-	 *
-	 * @param {string} uuid
-	 * @return {(OneOrder|undefined)}
-	 */
-	OrdersCollection.prototype.getByUUID = function(uuid) {
-		var found = this.filter(function(element) {
-			return element.uuid === uuid;
-		});
-		
-		return found.shift();
-	};
 	
 	/**
 	 *
@@ -65,7 +53,7 @@ OrdersCollection = extending(EntitiesCollection, (function() {
 			order_by: order_by || undefined
 		}, function(data) {
 			self.setData(data);
-			if (success && typeof success == 'function') {
+			if (isFunction(success)) {
 				success.call(self, self.last_pushed);
 			}
 		});
