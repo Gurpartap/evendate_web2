@@ -1132,10 +1132,11 @@ fieldset:disabled .form_select {cursor: default}
 
 .form_group {
 	display: flex;
-	align-items: baseline;
+	align-items: center;
 	justify-content: space-around;
 	margin-bottom: .875em;
 }
+.form_group.-valign_baseline {align-items: baseline}
 .form_group > .form_unit {
 	display: inline-block;
 	vertical-align: top;
@@ -2087,10 +2088,13 @@ a.button:hover {text-decoration: none}
 	-o-transform: translateX(-100%);
 	transform: translateX(-100%);
 
-	-webkit-transition: transform .5s ease;
-	-moz-transition: transform .5s ease;
-	-o-transition: transform .5s ease;
-	transition: transform .5s ease;
+	-webkit-transition: transform .5s ease, visibility .5s ease, opacity .5s ease;
+	-moz-transition: transform .5s ease, visibility .5s ease, opacity .5s ease;
+	-o-transition: transform .5s ease, visibility .5s ease, opacity .5s ease;
+	transition: transform .5s ease, visibility .5s ease, opacity .5s ease;
+
+	visibility: hidden;
+	opacity: 0;
 }
 .tab_body.-active {
 	-webkit-transform: translateX(0);
@@ -2098,6 +2102,9 @@ a.button:hover {text-decoration: none}
 	-ms-transform: translateX(0);
 	-o-transform: translateX(0);
 	transform: translateX(0);
+
+	visibility: visible;
+	opacity: 1;
 }
 
 .tab_body.-active ~ .tab_body {

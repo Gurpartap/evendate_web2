@@ -1001,7 +1001,7 @@ Builder = (function() {
 				+ (event.is_same_time ? ', ' + displayTimeRange(event.dates[0].start_time, event.dates[0].end_time) : '')
 			});
 			if (event.registration_required && event.registration_till) {
-				feed_event_infos.push({text: 'Регистрация до ' + moment.unix(event.registration_till).calendar().capitalize()});
+				feed_event_infos.push({text: 'Регистрация до ' + moment.unix(event.registration_till).calendar().toLowerCase()});
 			}
 			if (event.is_free) {
 				feed_event_infos.push({text: 'Бесплатно'});

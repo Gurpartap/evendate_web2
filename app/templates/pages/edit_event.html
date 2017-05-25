@@ -104,19 +104,33 @@
 							</fieldset>
 
 
-							<div class="form_group -parts_e_2">
-								<div class="form_unit form_accent_block -status_disabled">
-									<input id="edit_event_additional_notification" class="form_checkbox Switch" type="checkbox" name="additional_notification" data-switch_id="additional_notification" disabled>
+							<div class="form_group -parts_e_2 -valign_baseline">
+								<div class="form_unit form_accent_block AdditionalNotificationSwitchParent -status_disabled">
+									<input id="edit_event_additional_notification" class="form_checkbox Switch AdditionalNotificationSwitch" type="checkbox" name="additional_notification" data-switch_id="additional_notification" disabled>
 									<label class="form_label" for="edit_event_additional_notification"><span>Дополнительное уведомление</span></label>
 								</div>
 
 								<small class="form_unit -align_right">
-									<a id="edit_event_buy_subscription" href="/admin/organization/{organization_id}/settings" class="action -color_accent Link">доступно с подпиской</a>
+									<a id="edit_event_buy_subscription" href="/admin/organization/{organization_id}/settings" class="action -color_accent Link BuySubscriptionLink">доступно с подпиской</a>
 								</small>
 							</div>
 
 							<fieldset class="Switching" data-switch_id="additional_notification" disabled>
+								<p>Отправьте повторное уведомление подписчикам. После публикации события дату и время отправки можно редактировать, а так же вы можете отправить уведомление индивидуальному подписчику.</p>
 
+								<div class="form_group">
+
+									<div class="form_unit -inline">
+										<label class="form_label">Дата</label>
+										<div class="form_select -valign_center form_datepicker DatePicker" data-min_date="{current_date}">
+											<label>{additional_notification_data_label}</label>
+											<input type="hidden" name="additional_notification_date" value="{additional_notification_data}" required>
+										</div>
+									</div>
+
+									{additional_notification_time_input}
+
+								</div>
 							</fieldset>
 
 

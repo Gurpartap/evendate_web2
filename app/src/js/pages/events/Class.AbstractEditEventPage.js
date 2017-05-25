@@ -36,6 +36,25 @@ AbstractEditEventPage = extending(Page, (function() {
 		return this.fetching_data_defer = this.my_organizations.fetchMyOrganizations(['admin', 'moderator'], this.my_organizations_fields);
 	};
 	
+	AbstractEditEventPage.prototype.checkTariffAvailabilities = function() {
+		var self = this,
+			organization = self.my_organizations.getByID(self.organization_id),
+			$additional_notification_switch = self.$wrapper.find('.AdditionalNotificationSwitch');
+		
+		if (organization.tariff.available_additional_notifications) {
+			$additional_notification_switch.prop('disabled', false);
+			$additional_notification_switch.closest('.AdditionalNotificationSwitchParent').removeClass(__C.CLASSES.STATUS.DISABLED);
+			self.$wrapper.find('.BuySubscriptionLink').addClass(__C.CLASSES.HIDDEN);
+		} else {
+			if ($additional_notification_switch.prop('checked')) {
+				$additional_notification_switch.prop('checked', false).trigger('change');
+			}
+			$additional_notification_switch.prop('disabled', true);
+			$additional_notification_switch.closest('.AdditionalNotificationSwitchParent').addClass(__C.CLASSES.STATUS.DISABLED);
+			self.$wrapper.find('.BuySubscriptionLink').removeClass(__C.CLASSES.HIDDEN).attr('href', '/admin/organization/'+ self.organization_id +'/settings');
+		}
+	};
+	
 	/**
 	 *
 	 * @param {RegistrationFieldModel|Array<RegistrationFieldModel>|RegistrationFieldsCollection} [registration_data]
@@ -77,7 +96,6 @@ AbstractEditEventPage = extending(Page, (function() {
 			$next_page_button = $bottom_nav_buttons.filter('#edit_event_next_page'),
 			$prev_page_button = $bottom_nav_buttons.filter('#edit_event_prev_page'),
 			$submit_button = $bottom_nav_buttons.filter('#edit_event_submit');
-		
 		/**
 		 *
 		 * @param {jQuery} $input
@@ -110,6 +128,9 @@ AbstractEditEventPage = extending(Page, (function() {
 		bindRippleEffect(PAGE.$wrapper);
 		bindFileLoadButton(PAGE.$wrapper);
 		ImgLoader.init(PAGE.$wrapper);
+		
+		PAGE.checkTariffAvailabilities(PAGE.organization_id);
+		
 		(function initEditEventMainCalendar() {
 			//TODO: Refactor this!! Make it more readable
 			var $selected_days_text = PAGE.$wrapper.find('.EventSelectedDaysText'),
@@ -275,14 +296,13 @@ AbstractEditEventPage = extending(Page, (function() {
 				containerCssClass: 'form_select2',
 				dropdownCssClass: 'form_select2_drop'
 			}).on('change', function() {
-				PAGE.organization_id = this.value;
+				PAGE.organization_id = +this.value;
+				PAGE.checkTariffAvailabilities(PAGE.organization_id);
 			});
-			
-			PAGE.organization_id = selected_id ? selected_id : PAGE.my_organizations[0].id;
 			
 			$select.select2('val', PAGE.organization_id);
 			
-		})(PAGE.organization_id || PAGE.event.organization_id);
+		})(PAGE.organization_id);
 		
 		bindCollapsing(PAGE.$wrapper);
 		
@@ -553,6 +573,10 @@ AbstractEditEventPage = extending(Page, (function() {
 						send_data.public_at = moment(form_data.public_at_date + ' ' + form_data.public_at_time).tz('UTC').format();
 					}
 					
+					if (form_data.additional_notification) {
+						send_data.additional_notification_time = moment(form_data.additional_notification_date + ' ' + form_data.additional_notification_time).tz('UTC').format();
+					}
+					
 					send_data.different_time = form_data.different_time;
 					send_data.dates = new DateModelsCollection();
 					if (form_data.different_time) {
@@ -601,9 +625,11 @@ AbstractEditEventPage = extending(Page, (function() {
 			page_vars = $.extend(true, {}, Object.getProps(PAGE.event), {
 				event_id: PAGE.event.id ? PAGE.event.id : undefined,
 				public_at_data_label: 'Дата',
+				additional_notification_data_label: 'Дата',
 				current_date: moment().format(__C.DATE_FORMAT),
 				tomorrow_date: moment().add(1, 'd').format(__C.DATE_FORMAT),
-				button_text: is_edit ? 'Сохранить' : 'Опубликовать'
+				button_text: is_edit ? 'Сохранить' : 'Опубликовать',
+				additional_notification: PAGE.event.notifications.getByID(OneNotification.NOTIFICATIN_TYPES.ADDITIONAL_FOR_ORGANIZATION)
 			}),
 			m_registration_till = moment.unix(PAGE.event.registration_till),
 			m_public_at = moment.unix(PAGE.event.public_at),
@@ -628,7 +654,8 @@ AbstractEditEventPage = extending(Page, (function() {
 					{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'last_name', name: 'Фамилия', description: 'Текстовое поле для ввода фамилии'},
 					{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'phone_number', name: 'Номер телефона', description: 'Текстовое поля для ввода номера телефона'}
 				])
-			};
+			},
+			m_additional_notification_time;
 		
 		if (!checkRedirect('event/add', (this.organization_id ? '/add/event/to/' + this.organization_id : '/add/event'))) {
 			return null;
@@ -651,6 +678,14 @@ AbstractEditEventPage = extending(Page, (function() {
 			page_vars.public_at_data = m_public_at.format(__C.DATE_FORMAT);
 			page_vars.public_at_data_label = m_public_at.format(__LOCALE.DATE.DATE_FORMAT);
 		}
+		
+		if (page_vars.additional_notification) {
+			m_additional_notification_time = moment.unix(page_vars.additional_notification.notification_time);
+			page_vars.additional_notification_data = m_additional_notification_time.format(__C.DATE_FORMAT);
+			page_vars.additional_notification_data_label = m_additional_notification_time.format(__LOCALE.DATE.DATE_FORMAT);
+		}
+		
+		PAGE.organization_id = PAGE.organization_id ? PAGE.organization_id : PAGE.my_organizations[0].id;
 		
 		PAGE.$wrapper.html(tmpl('edit-event-page', $.extend(page_vars, {
 			organization_options: __APP.BUILD.option(PAGE.my_organizations.map(function(organization) {
@@ -698,6 +733,17 @@ AbstractEditEventPage = extending(Page, (function() {
 				type: 'time',
 				unit_classes: ['-inline'],
 				value: PAGE.event.public_at ? m_public_at.format('HH:mm') : undefined,
+				attributes: {
+					required: true
+				}
+			}),
+			additional_notification_time_input: __APP.BUILD.formInput({
+				label: 'Время',
+				id: 'edit_event_additional_notification_time',
+				name: 'additional_notification_time',
+				type: 'time',
+				unit_classes: ['-inline'],
+				value: page_vars.additional_notification ? m_additional_notification_time.format('HH:mm') : undefined,
 				attributes: {
 					required: true
 				}

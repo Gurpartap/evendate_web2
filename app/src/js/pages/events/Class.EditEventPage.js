@@ -14,9 +14,20 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 	 * @constructs EditEventPage
 	 */
 	function EditEventPage(event_id) {
+		var self = this;
+		
 		AbstractEditEventPage.call(this);
 		this.page_title = 'Редактирование события';
 		this.event = new OneEvent(event_id);
+		
+		Object.defineProperty(this, 'organization_id', {
+			get: function() {
+				return self.event.organization_id;
+			},
+			set: function(val) {
+				self.event.organization_id = val;
+			}
+		})
 	}
 	
 	EditEventPage.prototype.fetchData = function() {
@@ -104,6 +115,10 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 		}
 		if (page_vars.public_at == null) {
 			PAGE.$wrapper.find('#edit_event_delayed_publication').toggleStatus('disabled');
+		}
+		
+		if (page_vars.additional_notification) {
+			PAGE.$wrapper.find('.AdditionalNotificationSwitch').prop('disabled', false).trigger('change');
 		}
 	};
 	

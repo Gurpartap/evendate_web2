@@ -1688,10 +1688,11 @@ fieldset:disabled .form_select {cursor: default}
 
 .form_group {
 	display: flex;
-	align-items: baseline;
+	align-items: center;
 	justify-content: space-around;
 	margin-bottom: .875em;
 }
+.form_group.-valign_baseline {align-items: baseline}
 .form_group > .form_unit {
 	display: inline-block;
 	vertical-align: top;
