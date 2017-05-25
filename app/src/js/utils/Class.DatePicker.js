@@ -64,7 +64,7 @@ DatePicker = (function() {
 			});
 		}
 		
-		this.calendar.init().$calendar.on('days-changed', function(){
+		this.calendar.init().$calendar.on('change:days', function(){
 			self.prev_selected_day = self.selected_day;
 			self.selected_day = self.calendar.selected_days.toString();
 			self.formated_selected_day = self.calendar.selected_days.toString().split('-').reverse().join('.');

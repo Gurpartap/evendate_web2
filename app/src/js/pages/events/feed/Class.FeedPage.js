@@ -137,7 +137,7 @@ FeedPage = extending(Page, (function() {
 			MainCalendar.setMonth(selected_date.split('-')[1], selected_date.split('-')[0]).selectDays(selected_date);
 		}
 		MainCalendar.setDaysWithEvents();
-		MainCalendar.$calendar.on('month-changed', function() {
+		MainCalendar.$calendar.on('change:month', function() {
 			bindPageLinks(MainCalendar.$calendar);
 			MainCalendar.setDaysWithEvents();
 		});

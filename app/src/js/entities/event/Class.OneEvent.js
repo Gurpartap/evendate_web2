@@ -202,19 +202,33 @@ OneEvent = extending(OneEntity, (function() {
 	 */
 	/**
 	 * @typedef {object} OneEventCreateEventData
-	 * @property {string} [title]
-	 * @property {string} [description]
+	 *
+	 * @property {number} [event_id]
+	 * @property {integer} organization_id
+	 * @property {string} title
+	 * @property {string} description
+	 * @property {(DateModelsCollection|Array<DateModel>)} dates
+	 * @property {Array<(string|number)>} tags
 	 * @property {string} [location]
-	 * @property {integer} [organization_id]
+	 * @property {boolean} [is_online]
 	 * @property {object} [location_object]
 	 * @property {number} [location_object.latitude]
 	 * @property {number} [location_object.longitude]
 	 * @property {number} [longitude]
 	 * @property {number} [latitude]
 	 * @property {string} [image_horizontal]
+	 * @property {{horizontal: string}} filenames
 	 * @property {string} [detail_info_url]
-	 * @property {DatesCollection} [dates]
-	 * @property {Array<(string|number)>} [tags]
+	 * @property {string} [additional_notification]
+	 * @property {boolean} [is_free]
+	 * @property {(string|number)} [min_price]
+	 * @property {boolean} [delayed_publication]
+	 * @property {string} [public_at]
+	 * @property {boolean} [registration_required]
+	 * @property {string} [registration_till]
+	 * @property {(string|number)} [registration_limit_count]
+	 * @property {(RegistrationFieldsCollection|Array<RegistrationFieldModel>)} [registration_fields]
+	 * @property {boolean} [registration_locally]
 	 */
 	/**
 	 *

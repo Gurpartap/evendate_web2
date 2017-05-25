@@ -3,7 +3,7 @@
 	<div class="edit_event_overlay Tabs EditEventPageTabs" data-tabs_id="edit_event_pages" data-focus_on_change="true">
 		<div class="edit_event_page_wrapper">
 			<div class="page">
-				<form id="edit-event-form">
+				<form id="edit_event_form" class="EditEventForm">
 					<input id="edit_event_event_id" type="hidden" name="event_id" value="{id}">
 
 					<div class="edit_event_page_tab_bodies tab_bodies_wrap TabsBodyWrapper" data-tabs_id="edit_event_pages">
@@ -19,12 +19,12 @@
 
 							<h2><label for="edit_event_title">Название <span class="required_star">*</span></label></h2>
 							<div class="form_unit">
-								<input id="edit_event_title" class="form_input LimitSize" type="text" name="title" value="{title}" autocomplete="off" placeholder="Название мероприятия" data-maxlength="150" required>
+								<input id="edit_event_title" class="form_input LimitSize OnChangeCrossPost" type="text" name="title" value="{title}" autocomplete="off" placeholder="Название мероприятия" data-maxlength="150" required>
 							</div>
 
 							<h2><label for="edit_event_description">Описание <span class="required_star">*</span></label></h2>
 							<div class="form_unit">
-								<textarea id="edit_event_description" class="form_textarea LimitSize" data-maxlength="1000" name="description" placeholder="Не более 1000 символов" required>{description}</textarea>
+								<textarea id="edit_event_description" class="form_textarea LimitSize OnChangeCrossPost" data-maxlength="1000" name="description" placeholder="Не более 1000 символов" required>{description}</textarea>
 							</div>
 
 							{date_picker}
@@ -32,7 +32,7 @@
 							<h2><label for="edit_event_placepicker">Место проведения <span class="required_star">*</span></label></h2>
 							<div class="form_group -parts_3_1">
 								<div class="form_unit">
-									<input id="edit_event_placepicker" class="form_input Placepicker" name="location" value="{location}" required>
+									<input id="edit_event_placepicker" class="form_input Placepicker OnChangeCrossPost" name="location" value="{location}" required>
 								</div>
 								<div class="form_unit">
 									<button class="button -color_primary -size_wide RippleEffect EditEventDefaultAddress" type="button" tabindex="-1">По умолчанию</button>
@@ -50,13 +50,13 @@
 								<div class="form_unit -inline">
 									<label class="form_label" for="edit_event_free"><span>Бесплатно</span></label>
 									<div class="form_unit">
-										<input id="edit_event_free" class="form_checkbox" type="checkbox" checked name="is_free">
+										<input id="edit_event_free" class="form_checkbox OnChangeCrossPost" type="checkbox" checked name="is_free">
 										<label class="form_label" for="edit_event_free"></label>
 									</div>
 								</div>
 								<div class="form_unit -inline -status_disabled MinPrice">
 									<label class="form_label" for="edit_event_min_price"><span>Цена от</span></label>
-									<input id="edit_event_min_price" class="form_input" type="text" name="min_price" autocomplete="off" disabled placeholder="Минимальная цена">
+									<input id="edit_event_min_price" class="form_input OnChangeCrossPost" type="text" name="min_price" autocomplete="off" disabled placeholder="Минимальная цена">
 								</div>
 							</div>
 
@@ -67,7 +67,7 @@
 
 							<h2><label for="edit_event_url">Ссылка на страницу мероприятия</label></h2>
 							<div class="form_unit">
-								<input id="edit_event_url" class="form_input" type="text" name="detail_info_url" value="{detail_info_url}" autocomplete="off" placeholder="Ссылка">
+								<input id="edit_event_url" class="form_input OnChangeCrossPost" type="text" name="detail_info_url" value="{detail_info_url}" autocomplete="off" placeholder="Ссылка">
 							</div>
 
 							{cover_picker}
@@ -116,7 +116,7 @@
 							</div>
 
 							<fieldset class="Switching" data-switch_id="additional_notification" disabled>
-								<p>Отправьте повторное уведомление подписчикам. После публикации события дату и время отправки можно редактировать, а так же вы можете отправить уведомление индивидуальному подписчику.</p>
+								<p class="form_text">Отправьте повторное уведомление подписчикам. После публикации события дату и время отправки можно редактировать, а так же вы можете отправить уведомление индивидуальному подписчику.</p>
 
 								<div class="form_group">
 
@@ -132,6 +132,49 @@
 
 								</div>
 							</fieldset>
+
+
+
+							<div class="Collapsing">
+								<div class="form_unit form_accent_block">
+									<input id="edit_event_to_public_vk" class="form_checkbox CollapsingTrigger Switch" type="checkbox" name="to_post_vk" tabindex="-1" data-collapsing_id="public_vk" data-switch_id="public_vk">
+									<label class="form_label" for="edit_event_to_public_vk"><span>Опубликовать Вконтакте</span></label>
+								</div>
+								<div id="edit_event_vk_publication" class="collapsing_wrapper -inset Switching CollapsingWrapper" data-collapsing_id="public_vk" data-switch_id="public_vk">
+									<div class="collapsing_content CollapsingContent">
+										<div class="EditEventVkGroup">
+											<h4 class="form_label"><label for="edit_event_vk_groups">Сообщество</label></h4>
+											<div class="form_unit -status_disabled">
+												<select id="edit_event_vk_groups" class="form_select2 ToSelect2" name="vk_group" disabled></select>
+											</div>
+										</div>
+										<h4 class="form_label"><label for="edit_event_description">Пост</label></h4>
+										<div class="form_unit -status_disabled">
+											<textarea id="edit_event_vk_post" class="form_textarea" name="vk_post" placeholder="" disabled style="height: 10em"></textarea>
+										</div>
+										<div class="form_group EditEventImgLoadWrap ImgLoadWrap -parts_2_3">
+											<div class="form_unit -status_disabled">
+												<div class="edit_event_vk_img">
+													<input id="edit_event_vk_image_src" class="DataUrl" type="hidden" name="vk_image_src" value="{vk_image_base64}" disabled>
+													<input id="edit_event_vk_image_filename" class="FileName" type="hidden" name="vk_image_filename" value="{vk_image_filename}" disabled>
+													<div class="edit_event_vk_img_preview"><img class="EditEventImgPreview ImgPreview" src="{vk_image_url}"></div>
+													<footer class="edit_event_vk_img_footer form_group -parts_e_2">
+														<div class="form_unit -status_disabled"><button class="action DeleteImg -color_error" type="button">Удалить</button></div>
+														<div class="form_unit -status_disabled" align="right">
+															<button class="action CallModal -color_primary" type="button" data-modal_type="cropper" data-source_img="{vk_image_url}" data-aspect_ratio="16/9">
+																<span class="Text">Кадрировать</span>
+															</button>
+														</div>
+													</footer>
+												</div>
+											</div>
+											<div class="edit_event_vk_right_block form_unit -status_disabled -centering">
+												<button class="button -color_neutral_primary FileLoadButton RippleEffect" type="button"><input class="LoadImg -hidden" type="file" accept="image/*"><span class="Text">Изменить</span></button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
 
 
 
@@ -272,7 +315,7 @@
 	<p class="form_text">Если на ваше событие требуется регистрация, вы можете настроить её параметры здесь. Вы можете задать крайний срок регистрации, максимальное количество мест, </p>
 
 	<div class="form_unit form_accent_block">
-		<input id="edit_event_registration_required" class="form_checkbox Switch" type="checkbox" name="registration_required" data-switch_id="registration">
+		<input id="edit_event_registration_required" class="form_checkbox Switch OnChangeCrossPost" type="checkbox" name="registration_required" data-switch_id="registration">
 		<label class="form_label" for="edit_event_registration_required"><span>Обязательная регистрация на событие</span></label>
 	</div>
 
@@ -304,7 +347,7 @@
 					<label class="form_label">Дата окончания регистрации</label>
 					<div class="form_select -valign_center form_datepicker DatePicker" data-selected_day="{registration_till_date}" data-min_date="{tomorrow_date}">
 						<label>{registration_till_display_date}</label>
-						<input name="registration_till_date" value="{registration_till_date}" type="hidden" required>
+						<input name="registration_till_date" class="OnChangeCrossPost" value="{registration_till_date}" type="hidden" required>
 					</div>
 				</div>
 
