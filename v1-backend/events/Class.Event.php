@@ -25,6 +25,7 @@ class Event extends AbstractEntity
 	const TAGS_LIMIT = 5;
 	const ORGANIZATION_NOTIFICATIONS_LIMIT = 2;
 	const IS_FAVORITE_FIELD_NAME = 'is_favorite';
+	const IS_NOW_FIELD_NAME = 'is_now';
 	const TICKETS_FIELD_NAME = 'tickets';
 	const TICKETS_TYPES_FIELD_NAME = 'ticket_types';
 	const IS_SEEN_FIELD_NAME = 'is_seen';
@@ -142,6 +143,12 @@ class Event extends AbstractEntity
 			WHERE favorite_events.status = TRUE
 			AND favorite_events.user_id = :user_id
 			AND favorite_events.event_id = view_events.id) IS NOT NULL AS ' . self::IS_FAVORITE_FIELD_NAME,
+
+		self::IS_NOW_FIELD_NAME => '(SELECT (COUNT(id) > 0) :: BOOLEAN
+			FROM events_dates
+			WHERE events_dates.status = TRUE
+			AND NOW() BETWEEN events_dates.start_time_utc AND events_dates.end_time_utc
+			AND events_dates.event_id = view_events.id) :: BOOLEAN AS ' . self::IS_NOW_FIELD_NAME,
 
 		self::IS_REGISTERED_FIELD_NAME => '(SELECT (COUNT(view_tickets_orders.id) > 0) :: BOOLEAN
 			FROM view_tickets_orders

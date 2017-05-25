@@ -4050,6 +4050,9 @@
         "[is_hidden]": {
           "type": "boolean"
         },
+        "[is_now]": {
+          "type": "boolean"
+        },
         "[tags]": {
           "type": "array",
           "items": {
