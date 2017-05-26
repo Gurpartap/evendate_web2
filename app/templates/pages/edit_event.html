@@ -13,7 +13,7 @@
 							<div class="EditEventOrganizations -hidden">
 								<h2><label for="edit_event_organization">Организация <span class="required_star">*</span></label></h2>
 								<div class="form_unit">
-									<select id="edit_event_organization" name="organization_id">{organization_options}</select>
+									<select id="edit_event_organization" name="organization_id" class="EditEventOrganizationsSelect">{organization_options}</select>
 								</div>
 							</div>
 
@@ -40,7 +40,7 @@
 							</div>
 							<div class="form_group -align_center">
 								<div class="form_unit">
-									<input id="edit_event_is_online" class="form_checkbox" type="checkbox" name="is_online">
+									<input id="edit_event_is_online" class="form_checkbox EditEventIsOnline" type="checkbox" name="is_online">
 									<label class="form_label" for="edit_event_is_online"><span>Online - событие</span></label>
 								</div>
 							</div>
@@ -50,14 +50,13 @@
 								<div class="form_unit -inline">
 									<label class="form_label" for="edit_event_free"><span>Бесплатно</span></label>
 									<div class="form_unit">
-										<input id="edit_event_free" class="form_checkbox OnChangeCrossPost" type="checkbox" checked name="is_free">
+										<input id="edit_event_free" class="form_checkbox Switch OnChangeCrossPost" type="checkbox" checked name="is_free" data-switch_id="is_free">
 										<label class="form_label" for="edit_event_free"></label>
 									</div>
 								</div>
-								<div class="form_unit -inline -status_disabled MinPrice">
-									<label class="form_label" for="edit_event_min_price"><span>Цена от</span></label>
-									<input id="edit_event_min_price" class="form_input OnChangeCrossPost" type="text" name="min_price" autocomplete="off" disabled placeholder="Минимальная цена">
-								</div>
+								<fieldset class="form_unit Switching" data-switch_id="is_free" disabled>
+									{min_price_input}
+								</fieldset>
 							</div>
 
 							<h2><label for="event_tags">Теги <span class="required_star">*</span></label></h2>
@@ -111,7 +110,7 @@
 								</div>
 
 								<small class="form_unit -align_right">
-									<a id="edit_event_buy_subscription" href="/admin/organization/{organization_id}/settings" class="action -color_accent Link BuySubscriptionLink">доступно с подпиской</a>
+									<a id="edit_event_buy_subscription" href="/admin/organization/{organization_id}/settings#change_tariff" class="action -color_accent Link BuySubscriptionLink">доступно с подпиской</a>
 								</small>
 							</div>
 
@@ -135,32 +134,36 @@
 
 
 
-							<div class="Collapsing">
+							<fieldset class="Collapsing">
 								<div class="form_unit form_accent_block">
 									<input id="edit_event_to_public_vk" class="form_checkbox CollapsingTrigger Switch" type="checkbox" name="to_post_vk" tabindex="-1" data-collapsing_id="public_vk" data-switch_id="public_vk">
 									<label class="form_label" for="edit_event_to_public_vk"><span>Опубликовать Вконтакте</span></label>
 								</div>
-								<div id="edit_event_vk_publication" class="collapsing_wrapper -inset Switching CollapsingWrapper" data-collapsing_id="public_vk" data-switch_id="public_vk">
+
+								<fieldset id="edit_event_vk_publication" class="collapsing_wrapper -inset Switching CollapsingWrapper" data-collapsing_id="public_vk" data-switch_id="public_vk" disabled>
 									<div class="collapsing_content CollapsingContent">
+
 										<div class="EditEventVkGroup">
-											<h4 class="form_label"><label for="edit_event_vk_groups">Сообщество</label></h4>
-											<div class="form_unit -status_disabled">
-												<select id="edit_event_vk_groups" class="form_select2 ToSelect2" name="vk_group" disabled></select>
+											<h4><label for="edit_event_vk_groups">Сообщество</label></h4>
+											<div class="form_unit">
+												<select id="edit_event_vk_groups" class="form_select2 ToSelect2 VkGroupsSelect" name="vk_group"></select>
 											</div>
 										</div>
-										<h4 class="form_label"><label for="edit_event_description">Пост</label></h4>
-										<div class="form_unit -status_disabled">
-											<textarea id="edit_event_vk_post" class="form_textarea" name="vk_post" placeholder="" disabled style="height: 10em"></textarea>
+
+										<h4><label for="edit_event_description">Пост</label></h4>
+										<div class="form_unit">
+											<textarea id="edit_event_vk_post" class="form_textarea VKPostText" name="vk_post" placeholder="" readonly style="height: 10em"></textarea>
 										</div>
+
 										<div class="form_group EditEventImgLoadWrap ImgLoadWrap -parts_2_3">
-											<div class="form_unit -status_disabled">
+											<div class="form_unit">
 												<div class="edit_event_vk_img">
-													<input id="edit_event_vk_image_src" class="DataUrl" type="hidden" name="vk_image_src" value="{vk_image_base64}" disabled>
-													<input id="edit_event_vk_image_filename" class="FileName" type="hidden" name="vk_image_filename" value="{vk_image_filename}" disabled>
+													<input id="edit_event_vk_image_src" class="DataUrl" type="hidden" name="vk_image_src" value="{vk_image_base64}">
+													<input id="edit_event_vk_image_filename" class="FileName" type="hidden" name="vk_image_filename" value="{vk_image_filename}">
 													<div class="edit_event_vk_img_preview"><img class="EditEventImgPreview ImgPreview" src="{vk_image_url}"></div>
 													<footer class="edit_event_vk_img_footer form_group -parts_e_2">
-														<div class="form_unit -status_disabled"><button class="action DeleteImg -color_error" type="button">Удалить</button></div>
-														<div class="form_unit -status_disabled" align="right">
+														<div class="form_unit"><button class="action DeleteImg -color_error" type="button">Удалить</button></div>
+														<div class="form_unit" align="right">
 															<button class="action CallModal -color_primary" type="button" data-modal_type="cropper" data-source_img="{vk_image_url}" data-aspect_ratio="16/9">
 																<span class="Text">Кадрировать</span>
 															</button>
@@ -168,13 +171,14 @@
 													</footer>
 												</div>
 											</div>
-											<div class="edit_event_vk_right_block form_unit -status_disabled -centering">
+											<div class="edit_event_vk_right_block form_unit -centering">
 												<button class="button -color_neutral_primary FileLoadButton RippleEffect" type="button"><input class="LoadImg -hidden" type="file" accept="image/*"><span class="Text">Изменить</span></button>
 											</div>
 										</div>
+
 									</div>
-								</div>
-							</div>
+								</fieldset>
+							</fieldset>
 
 
 
@@ -184,12 +188,12 @@
 					</div>
 				</form>
 			</div>
-			<div class="edit_event_buttons -align_right">
-				<button id="edit_event_submit" class="button RippleEffect -color_accent -hidden" type="button"><span class="Text">{button_text}</span></button>
-				<button id="edit_event_next_page" class="button RippleEffect -color_accent" type="button">
+			<div class="edit_event_buttons -align_right EditEventBottomButtons">
+				<button id="edit_event_submit" class="button RippleEffect -color_accent -hidden EditEventSubmitButton" type="button"><span class="Text">{button_text}</span></button>
+				<button id="edit_event_next_page" class="button RippleEffect -color_accent EditEventNextPageButton" type="button">
 					<span class="Text"><span>Далее</span><span class="fa fa-angle-right"></span></span>
 				</button>
-				<button id="edit_event_prev_page" class="button RippleEffect -color_neutral -hidden" type="button">
+				<button id="edit_event_prev_page" class="button RippleEffect -color_neutral -hidden EditEventPrevPageButton" type="button">
 					<span class="Text"><span class="fa fa-angle-left"></span><span>Назад</span></span>
 				</button>
 			</div>
@@ -364,10 +368,7 @@
 		</div>
 
 		<fieldset class="Switching" data-switch_id="registration_limit_by_quantity" disabled>
-			<div class="form_unit RegistrationQuantity -inline">
-				<label class="form_label" for="edit_event_registration_limit_count">Максимальное кол-во</label>
-				<input id="edit_event_registration_limit_count" class="form_input" type="text" name="registration_limit_count" value="{registration_limit_count}" autocomplete="off" placeholder="3 000" required>
-			</div>
+			{registration_limit_count_input}
 		</fieldset>
 
 		<h3></h3>

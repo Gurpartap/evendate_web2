@@ -52,9 +52,9 @@ AbstractEditEventPage = extending(Page, (function() {
 		var form_data = this.$wrapper.find('.EditEventForm').serializeForm(),
 			send_data =  {
 				event_id: parseInt(form_data.event_id) ? parseInt(form_data.event_id) : null,
-				title: form_data.title.trim(),
+				title: form_data.title ? form_data.title.trim() : '',
 				organization_id: form_data.organization_id,
-				description: form_data.description.trim(),
+				description: form_data.description ? form_data.description.trim() : '',
 				different_time: !!form_data.different_time,
 				dates: new DateModelsCollection(),
 				is_online: !!form_data.is_online,
@@ -189,7 +189,7 @@ AbstractEditEventPage = extending(Page, (function() {
 			}
 			$additional_notification_switch.prop('disabled', true);
 			$additional_notification_switch.closest('.AdditionalNotificationSwitchParent').addClass(__C.CLASSES.STATUS.DISABLED);
-			self.$wrapper.find('.BuySubscriptionLink').removeClass(__C.CLASSES.HIDDEN).attr('href', '/admin/organization/'+ self.organization_id +'/settings');
+			self.$wrapper.find('.BuySubscriptionLink').removeClass(__C.CLASSES.HIDDEN).attr('href', '/admin/organization/'+ self.organization_id +'/settings#change_tariff');
 		}
 	};
 	
@@ -204,7 +204,10 @@ AbstractEditEventPage = extending(Page, (function() {
 		this.MainCalendar.$calendar.on('change:days.crossPostingToVK', function() {
 			self.formatVKPost();
 		});
-		
+		this.$wrapper.find('.VKPostText').one('dblclick', function() {
+			self.deInitCrossPosting();
+			$(this).removeAttr('readonly');
+		});
 	};
 	
 	AbstractEditEventPage.prototype.deInitCrossPosting = function() {
@@ -219,12 +222,12 @@ AbstractEditEventPage = extending(Page, (function() {
 		
 		post_text += data.title ? data.title + '\n\n' : '';
 		
-		if (data.dates) {
+		if (data.dates && data.dates.length) {
 			post_text += (data.dates.length > 1) ? 'Дата начала: ' : 'Начало: ';
 			post_text += moment(data.dates[0].event_date).format('D MMMM YYYY');
 			
-			if (data.dates.length === 1) {
-				post_text += data.dates[0].start_time ? ' в ' : data.dates[0].start_time;
+			if (data.dates.length === 1 && data.dates[0].start_time) {
+				post_text += ' в ' + data.dates[0].start_time;
 			}
 		}
 		
@@ -251,7 +254,7 @@ AbstractEditEventPage = extending(Page, (function() {
 		}
 		
 		
-		this.$wrapper.find('#edit_event_vk_post').val(post_text);
+		this.$wrapper.find('.VKPostText').val(post_text);
 	};
 	
 	
@@ -275,35 +278,127 @@ AbstractEditEventPage = extending(Page, (function() {
 	};
 	
 	
+	AbstractEditEventPage.prototype.submitForm = function() {
+		var PAGE = this,
+			$form = PAGE.$wrapper.find(".EditEventForm"),
+			$event_tags = $form.find('input.EventTags'),
+			form_data = $form.serializeForm(),
+			is_edit = !!(PAGE.event.id),
+			send_data,
+			is_form_valid,
+			$loader = $();
+		
+		is_form_valid = (function validation($form, Calendar) {
+			var is_valid = true,
+				$times = $form.find('#edit_event_different_time').prop('checked') ? $form.find('[class^="TableDay_"]') : $form.find('.MainTime');
+			
+			function failSubmit($element, is_form_valid, error_message){
+				var $cut_tab,
+					$Tabs;
+				if(is_form_valid){
+					$cut_tab = $element.parents('.TabsBody:last');
+					$Tabs = $cut_tab.closest('.Tabs').resolveInstance();
+					$Tabs.setToTab($Tabs.find('.TabsBodyWrapper:first').children().index($cut_tab));
+					scrollTo($element, 400, function() {
+						showNotifier({text: error_message, status: false});
+					});
+				}
+				handleErrorField($element);
+				return false;
+			}
+			
+			$form.find(':required').not($form.find(':disabled')).each(function() {
+				var $this = $(this);
+				
+				if ($this.val().trim() === '') {
+					is_valid = failSubmit($this, is_valid, 'Заполните все обязательные поля');
+				} else if ($this.hasClass('LimitSize') && $this.val().trim().length > $this.data('maxlength')) {
+					is_valid = failSubmit($this, is_valid, 'Количество символов превышает установленное значение');
+				}
+			});
+			
+			if (!Calendar.selected_days.length) {
+				is_valid = failSubmit(Calendar.$calendar, is_valid, 'Выберите даты для события');
+			}
+			
+			$times.each(function() {
+				var $row = $(this),
+					$inputs = $row.find('.StartTime, .EndTime'),
+					start = $inputs.filter('.StartTime').inputmask('unmaskedvalue'),
+					end = $inputs.filter('.EndTime').inputmask('unmaskedvalue');
+				
+				$inputs.each(function() {
+					var $input = $(this);
+					if ($input.val() === '') {
+						is_valid = failSubmit($input, is_valid, 'Заполните время события');
+					}
+				});
+				if (is_valid && start > end) {
+					is_valid = failSubmit($row, is_valid, 'Начальное время не может быть позже конечного');
+				}
+			});
+			
+			if ($event_tags.val().trim() === '') {
+				is_valid = failSubmit($event_tags.siblings('.EventTags'), is_valid, 'Необходимо выбрать хотя бы один тэг');
+			}
+			
+			if (form_data.registration_limit_by_quantity && (!form_data.registration_fields || !form_data.registration_fields.length)) {
+				is_valid = failSubmit($form.find('#edit_event_registration_fields'), is_valid, 'Должно быть выбрано хотя бы одно поле регистрации в анкете');
+			}
+			
+			if (!is_edit) {
+				$form.find('.DataUrl').each(function() {
+					var $this = $(this);
+					if ($this.val().trim() === "") {
+						is_valid = failSubmit($this.closest('.ImgLoadWrap'), is_valid, 'Пожалуйста, добавьте к событию обложку');
+					}
+				});
+			}
+			
+			return is_valid;
+		})($form, PAGE.MainCalendar);
+		
+		function afterSubmit() {
+			PAGE.$wrapper.removeClass(__C.CLASSES.STATUS.DISABLED);
+			$loader.remove();
+			__APP.changeState('/event/' + PAGE.event.id);
+		}
+		
+		function onError(e) {
+			PAGE.$wrapper.removeClass(__C.CLASSES.STATUS.DISABLED);
+			$loader.remove();
+			console.error(e);
+			console.log({
+				MainCalendar: PAGE.MainCalendar,
+				send_data: send_data,
+				form_data: form_data
+			});
+		}
+		
+		if (is_form_valid) {
+			PAGE.$wrapper.addClass(__C.CLASSES.STATUS.DISABLED);
+			$loader = __APP.BUILD.overlayLoader(PAGE.$view);
+			try {
+				send_data = this.gatherSendData();
+				if (is_edit) {
+					PAGE.event.updateEvent(send_data, afterSubmit, onError);
+				} else {
+					PAGE.event.createEvent(send_data, afterSubmit, onError);
+				}
+			} catch (e) {
+				onError(e);
+			}
+		}
+	};
+	
+	
 	AbstractEditEventPage.prototype.init = function() {
 		var PAGE = this,
 			$main_tabs = PAGE.$wrapper.find('.EditEventPageTabs'),
-			$bottom_nav_buttons = PAGE.$wrapper.find('.edit_event_buttons').children(),
-			$next_page_button = $bottom_nav_buttons.filter('#edit_event_next_page'),
-			$prev_page_button = $bottom_nav_buttons.filter('#edit_event_prev_page'),
-			$submit_button = $bottom_nav_buttons.filter('#edit_event_submit');
-		/**
-		 *
-		 * @param {jQuery} $input
-		 */
-		function convertToNumericInput($input) {
-			if($input.is('input')) {
-				$input.inputmask({
-					alias: 'numeric',
-					autoGroup: false,
-					digits: 2,
-					digitsOptional: true,
-					allowPlus: false,
-					allowMinus: false,
-					rightAlign: false
-				});
-			} else {
-				$input = $input.find('input');
-				if($input.length) {
-					convertToNumericInput($input);
-				}
-			}
-		}
+			$bottom_nav_buttons = PAGE.$wrapper.find('.EditEventBottomButtons').children(),
+			$next_page_button = $bottom_nav_buttons.filter('.EditEventNextPageButton'),
+			$prev_page_button = $bottom_nav_buttons.filter('.EditEventPrevPageButton'),
+			$submit_button = $bottom_nav_buttons.filter('.EditEventSubmitButton');
 		
 		bindDatePickers(PAGE.$wrapper);
 		bindSelect2(PAGE.$wrapper);
@@ -477,7 +572,7 @@ AbstractEditEventPage = extending(Page, (function() {
 			
 		})();
 		(function initOrganization() {
-			var $select = PAGE.$wrapper.find('#edit_event_organization');
+			var $select = PAGE.$wrapper.find('.EditEventOrganizationsSelect');
 			
 			$select.select2({
 				containerCssClass: 'form_select2',
@@ -489,6 +584,26 @@ AbstractEditEventPage = extending(Page, (function() {
 			
 			$select.select2('val', PAGE.organization_id);
 			
+		})();
+		(function checkVkPublicationAbility() {
+			if (__APP.USER.accounts.contains(OneUser.ACCOUNTS.VK)) {
+				PAGE.$wrapper.off('VKGroupsUploadDone').on('VKGroupsUploadDone', function(e, status, data) {
+					if (status) {
+						PAGE.$wrapper.find('select.VkGroupsSelect').append(__APP.BUILD.option(data.map(function(option) {
+							
+							return {
+								val: option.gid,
+								display_name: option.name,
+								dataset: {
+									img: option.photo
+								}
+							};
+						}))).trigger('change');
+						PAGE.initCrossPosting();
+					}
+				});
+				socket.emit('vk.getGroupsToPost', __APP.USER.id);
+			}
 		})();
 		
 		bindCollapsing(PAGE.$wrapper);
@@ -540,20 +655,12 @@ AbstractEditEventPage = extending(Page, (function() {
 		});
 		
 		PAGE.$wrapper.find('.EditEventDefaultAddress').off('click.defaultAddress').on('click.defaultAddress', function() {
-			var $this = $(this);
-			$this.closest('.form_group').find('input').val(PAGE.my_organizations.getByID(PAGE.organization_id).default_address).trigger('input');
+			PAGE.$wrapper.find('.Placepicker').val(PAGE.my_organizations.getByID(PAGE.organization_id).default_address).trigger('input').trigger('change');
 		});
 		
-		PAGE.$wrapper.find('#edit_event_is_online').off('change.OnlineEvent').on('change.OnlineEvent', function() {
+		PAGE.$wrapper.find('.EditEventIsOnline').off('change.OnlineEvent').on('change.OnlineEvent', function() {
 			PAGE.$wrapper.find('#edit_event_placepicker').prop('required', !$(this).prop('checked'));
 		});
-		
-		PAGE.$wrapper.find('#edit_event_free').off('change.FreeEvent').on('change.FreeEvent', function() {
-			PAGE.$wrapper.find('.MinPrice').toggleStatus('disabled');
-		});
-		
-		convertToNumericInput(PAGE.$wrapper.find('.MinPrice'));
-		convertToNumericInput(PAGE.$wrapper.find('#edit_event_registration_limit_count'));
 		
 		PAGE.$wrapper.find('.AddRegistrationCustomField').off('click.AddRegistrationCustomField').on('click.AddRegistrationCustomField', function() {
 			AbstractEditEventPage.buildRegistrationCustomField().insertBefore($(this));
@@ -593,124 +700,12 @@ AbstractEditEventPage = extending(Page, (function() {
 			}
 		});
 		
-		$next_page_button.off('click.nextPage').on('click.nextPage', function() {
-			$main_tabs.nextTab();
-		});
+		$next_page_button.off('click.nextPage').on('click.nextPage', $main_tabs.nextTab);
 		
-		$prev_page_button.off('click.nextPage').on('click.prevPage', function() {
-			$main_tabs.prevTab();
-		});
+		$prev_page_button.off('click.nextPage').on('click.prevPage', $main_tabs.prevTab);
 		
 		$submit_button.off('click.Submit').on('click.Submit', function submitEditEvent() {
-			var $form = PAGE.$wrapper.find(".EditEventForm"),
-				$event_tags = $form.find('input.EventTags'),
-				form_data = $form.serializeForm(),
-				is_edit = !!(PAGE.event.id),
-				send_data,
-				is_form_valid,
-				$loader = $();
-			
-			is_form_valid = (function validation($form, Calendar) {
-				var is_valid = true,
-					$times = $form.find('#edit_event_different_time').prop('checked') ? $form.find('[class^="TableDay_"]') : $form.find('.MainTime');
-				
-				function failSubmit($element, is_form_valid, error_message){
-					var $cut_tab,
-						$Tabs;
-					if(is_form_valid){
-						$cut_tab = $element.parents('.TabsBody:last');
-						$Tabs = $cut_tab.closest('.Tabs').resolveInstance();
-						$Tabs.setToTab($Tabs.find('.TabsBodyWrapper:first').children().index($cut_tab));
-						scrollTo($element, 400, function() {
-							showNotifier({text: error_message, status: false});
-						});
-					}
-					handleErrorField($element);
-					return false;
-				}
-				
-				$form.find(':required').not($form.find(':disabled')).each(function() {
-					var $this = $(this);
-					
-					if ($this.val().trim() === '') {
-						is_valid = failSubmit($this, is_valid, 'Заполните все обязательные поля');
-					} else if ($this.hasClass('LimitSize') && $this.val().trim().length > $this.data('maxlength')) {
-						is_valid = failSubmit($this, is_valid, 'Количество символов превышает установленное значение');
-					}
-				});
-				
-				if (!Calendar.selected_days.length) {
-					is_valid = failSubmit(Calendar.$calendar, is_valid, 'Выберите даты для события');
-				}
-				
-				$times.each(function() {
-					var $row = $(this),
-						$inputs = $row.find('.StartTime, .EndTime'),
-						start = $inputs.filter('.StartTime').inputmask('unmaskedvalue'),
-						end = $inputs.filter('.EndTime').inputmask('unmaskedvalue');
-					
-					$inputs.each(function() {
-						var $input = $(this);
-						if ($input.val() === '') {
-							is_valid = failSubmit($input, is_valid, 'Заполните время события');
-						}
-					});
-					if (is_valid && start > end) {
-						is_valid = failSubmit($row, is_valid, 'Начальное время не может быть позже конечного');
-					}
-				});
-				
-				if ($event_tags.val().trim() === '') {
-					is_valid = failSubmit($event_tags.siblings('.EventTags'), is_valid, 'Необходимо выбрать хотя бы один тэг');
-				}
-				
-				if (form_data.registration_limit_by_quantity && (!form_data.registration_fields || !form_data.registration_fields.length)) {
-					is_valid = failSubmit($form.find('#edit_event_registration_fields'), is_valid, 'Должно быть выбрано хотя бы одно поле регистрации в анкете');
-				}
-				
-				if (!is_edit) {
-					$form.find('.DataUrl').each(function() {
-						var $this = $(this);
-						if ($this.val().trim() === "") {
-							is_valid = failSubmit($this.closest('.ImgLoadWrap'), is_valid, 'Пожалуйста, добавьте к событию обложку');
-						}
-					});
-				}
-				
-				return is_valid;
-			})($form, PAGE.MainCalendar);
-			
-			function afterSubmit() {
-				PAGE.$wrapper.removeClass(__C.CLASSES.STATUS.DISABLED);
-				$loader.remove();
-				__APP.changeState('/event/' + PAGE.event.id);
-			}
-			
-			function onError(e) {
-				PAGE.$wrapper.removeClass(__C.CLASSES.STATUS.DISABLED);
-				$loader.remove();
-				console.error(e);
-				console.log({
-					MainCalendar: PAGE.MainCalendar,
-					send_data: send_data,
-					form_data: form_data
-				});
-			}
-			
-			if (is_form_valid) {
-				PAGE.$wrapper.addClass(__C.CLASSES.STATUS.DISABLED);
-				$loader = __APP.BUILD.overlayLoader(PAGE.$view);
-				try {
-					send_data = this.gatherSendData();
-					if (is_edit) {
-						PAGE.event.updateEvent(send_data, afterSubmit, onError);
-					} else {
-						PAGE.event.createEvent(send_data, afterSubmit, onError);
-					}
-				} catch (e) {
-					onError(e);
-				}
-			}
+			PAGE.submitForm();
 		});
 	};
 	
@@ -730,7 +725,6 @@ AbstractEditEventPage = extending(Page, (function() {
 			m_registration_till = moment.unix(PAGE.event.registration_till),
 			m_public_at = moment.unix(PAGE.event.public_at),
 			registration_props = {
-				registration_limit_count: PAGE.event.registration_limit_count,
 				registration_till_display_date: 'Дата',
 				registration_till_time_input: __APP.BUILD.formInput({
 					label: 'Время',
@@ -740,9 +734,17 @@ AbstractEditEventPage = extending(Page, (function() {
 					value: PAGE.event.registration_till ? m_registration_till.format('HH:mm') : undefined,
 					classes: ['OnChangeCrossPost'],
 					unit_classes: ['-inline'],
-					attributes: {
-						required: true
-					}
+					required: true
+				}),
+				registration_limit_count_input: __APP.BUILD.formInput({
+					label: 'Максимальное кол-во',
+					id: 'edit_event_registration_limit_count',
+					name: 'registration_limit_count',
+					type: 'number',
+					unit_classes: ['-inline', 'RegistrationQuantity'],
+					value: PAGE.event.registration_limit_count,
+					placeholder: '3 000',
+					required: true
 				}),
 				tomorrow_date: page_vars.tomorrow_date,
 				predefined_field: tmpl('edit-event-registration-predefined-field', [
@@ -805,7 +807,8 @@ AbstractEditEventPage = extending(Page, (function() {
 					type: 'time',
 					classes: ['StartTime', 'OnChangeCrossPost'],
 					unit_classes: ['-inline'],
-					value: PAGE.event.dates.length ? PAGE.event.dates[0].start_time : undefined
+					value: PAGE.event.dates.length ? PAGE.event.dates[0].start_time : undefined,
+					required: true
 				}),
 				end_time: __APP.BUILD.formInput({
 					label: 'Конец',
@@ -817,6 +820,16 @@ AbstractEditEventPage = extending(Page, (function() {
 					value: PAGE.event.dates.length ? PAGE.event.dates[0].end_time : undefined
 				}),
 				today: page_vars.current_date
+			}),
+			min_price_input: __APP.BUILD.formInput({
+				label: 'Цена от',
+				id: 'edit_event_min_price',
+				name: 'min_price',
+				type: 'number',
+				unit_classes: ['-inline', 'MinPrice'],
+				classes: ['OnChangeCrossPost'],
+				value: PAGE.event.min_price,
+				placeholder: 'Минимальная цена'
 			}),
 			cover_picker: tmpl('edit-event-cover-picker', {
 				image_horizontal_url: PAGE.event.image_horizontal_url,
@@ -830,9 +843,7 @@ AbstractEditEventPage = extending(Page, (function() {
 				type: 'time',
 				unit_classes: ['-inline'],
 				value: PAGE.event.public_at ? m_public_at.format('HH:mm') : undefined,
-				attributes: {
-					required: true
-				}
+				required: true
 			}),
 			additional_notification_time_input: __APP.BUILD.formInput({
 				label: 'Время',
@@ -841,9 +852,7 @@ AbstractEditEventPage = extending(Page, (function() {
 				type: 'time',
 				unit_classes: ['-inline'],
 				value: page_vars.additional_notification ? m_additional_notification_time.format('HH:mm') : undefined,
-				attributes: {
-					required: true
-				}
+				required: true
 			}),
 			organization_id: PAGE.organization_id || PAGE.event.organization_id
 		})));
@@ -856,10 +865,6 @@ AbstractEditEventPage = extending(Page, (function() {
 		}
 		
 		PAGE.init();
-		
-		if(page_vars.public_at != null) {
-			PAGE.$wrapper.find('#edit_event_delayed_publication').prop('checked', true).trigger('change');
-		}
 		
 		this.renderRest(page_vars);
 	};

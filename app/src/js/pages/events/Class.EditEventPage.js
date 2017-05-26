@@ -81,6 +81,12 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 			});
 		}
 		
+		if(page_vars.public_at != null) {
+			PAGE.$wrapper.find('#edit_event_delayed_publication').prop('checked', true).trigger('change');
+		} else {
+			PAGE.$wrapper.find('#edit_event_delayed_publication').toggleStatus('disabled');
+		}
+		
 		if (!PAGE.event.is_free) {
 			PAGE.$wrapper.find('#edit_event_free').prop('checked', false).trigger('change');
 			PAGE.$wrapper.find('#edit_event_min_price').val(PAGE.event.min_price);
@@ -112,9 +118,6 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 					return is_custom_field;
 				})));
 			}
-		}
-		if (page_vars.public_at == null) {
-			PAGE.$wrapper.find('#edit_event_delayed_publication').toggleStatus('disabled');
 		}
 		
 		if (page_vars.additional_notification) {

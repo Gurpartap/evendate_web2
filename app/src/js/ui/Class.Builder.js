@@ -291,7 +291,7 @@ Builder = (function() {
 								defined_attributes = {
 									id: props.id,
 									name: props.name,
-									required: props.required,
+									required: props.required ? props.required : undefined,
 									placeholder: props.placeholder,
 									tabindex: props.tabindex
 								};
@@ -302,12 +302,11 @@ Builder = (function() {
 									return self.textarea($.extend({},	props.attributes,	defined_attributes), classes.concat('form_textarea'), props.value, props.dataset);
 								}
 								case 'time': {
-									defined_attributes = $.extend(defined_attributes, {
-										value: props.value,
-										placeholder: '23:59'
-									});
 									
-									return self.input($.extend({},	props.attributes,	defined_attributes), classes.concat('form_input', '-time_input'), props.dataset).inputmask("hh:mm", {
+									return self.input($.extend({},	props.attributes,	defined_attributes, {
+										value: (props.value != null) ? props.value : undefined,
+										placeholder: '23:59'
+									}), classes.concat('form_input', '-time_input'), props.dataset).inputmask("hh:mm", {
 										insertMode: false,
 										clearIncomplete: true,
 										placeholder: '  :  ',
@@ -315,13 +314,27 @@ Builder = (function() {
 										showMaskOnHover: false
 									});
 								}
-								default: {
-									defined_attributes = $.extend(defined_attributes, {
-										type: !props.type || INPUT_TYPES.indexOf(props.type) === -1 ? 'text' : props.type,
-										value: props.value
-									});
+								case 'number': {
 									
-									return self.input($.extend({},	props.attributes,	defined_attributes), classes.concat('form_input'), props.dataset);
+									return self.input($.extend({},	props.attributes,	defined_attributes, {
+										autocomplete: 'off',
+										value: (props.value != null) ? props.value : undefined
+									}), classes.concat('form_input'), props.dataset).inputmask({
+										alias: 'numeric',
+										autoGroup: false,
+										digits: 2,
+										digitsOptional: true,
+										allowPlus: false,
+										allowMinus: false,
+										rightAlign: false
+									});
+								}
+								default: {
+									
+									return self.input($.extend({},	props.attributes,	defined_attributes, {
+										type: !props.type || INPUT_TYPES.indexOf(props.type) === -1 ? 'text' : props.type,
+										value: (props.value != null) ? props.value : undefined
+									}), classes.concat('form_input'), props.dataset);
 								}
 							}
 						})(props),

@@ -2097,6 +2097,8 @@ a.button:hover {text-decoration: none}
 	opacity: 0;
 }
 .tab_body.-active {
+	position: relative;
+
 	-webkit-transform: translateX(0);
 	-moz-transform: translateX(0);
 	-ms-transform: translateX(0);

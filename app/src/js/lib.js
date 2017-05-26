@@ -607,7 +607,7 @@ $.fn.extend({
 							return $el.is(':enabled') && $el.is('[name="' + name + '"]')
 						};
 					
-					if (elements.filter(hasSameName).length > 1 && value != '') {
+					if (elements.filter(hasSameName).length > 1) {
 						output[name] = typeof(output[name]) === "undefined" ? [] : output[name];
 						output[name].push(value ? value.replace(xb, "\r\n") : value)
 					}
@@ -1657,31 +1657,6 @@ function initSelect2($element, options) {
 	$element.select2(opt).addClass('-Handled_ToSelect2')
 }
 
-function initTimeInput(time_field) {
-	var $time_field = $(time_field),
-		$hours = $time_field.find('input').eq(0),
-		$minutes = $time_field.find('input').eq(1);
-	
-	function onBlur() {
-		var $this = $(this);
-		if ($this.val() == "0" || $this.val() === "") {
-			$this.val("00");
-		}
-		else if ($this.val() <= 9) {
-			$this.val("0" + parseInt($this.val()));
-		}
-	}
-	
-	$hours.inputmask('Regex', {regex: "([01]?[0-9]|2[0-3])"}).on('keyup', function() {
-		if ($hours.val() > 2 || $hours.val() == "00") {
-			$minutes.focus();
-			$hours.trigger('blur');
-		}
-	}).on('blur', onBlur);
-	$minutes.inputmask('Regex', {regex: "[0-5][0-9]"}).on('blur', onBlur);
-	$time_field.addClass('-Handled_TimeInput');
-}
-
 function trimAvatarsCollection($parent) {
 	$parent = $parent ? $parent : $('body');
 	$parent.find('.AvatarsCollection').each(function() {
@@ -1716,19 +1691,17 @@ function bindTabs($parent) {
 			tabs_id = $this.data('tabs_id'),
 			focus_on_change = !!$this.data('focus_on_change'),
 			mutation_observer = new MutationObserver(function(records) {
-				var $wrappers,
-					$target;
-				records.forEach(function(record){
-					$target = $(record.target);
+				var $target = $(records[records.length - 1].target),
 					$wrappers = $target.parents('.TabsBody');
-					$wrappers = $target.hasClass('TabsBody') ? $wrappers.add($target) : $wrappers;
-					$wrappers.each(function(i, wrapper) {
-						var $wrapper = $(wrapper);
-						if($wrapper.hasClass(__C.CLASSES.ACTIVE)) {
-							$this.addClass('-in_progress');
-							$wrapper.parent().height($wrapper.outerHeight());
-						}
-					});
+				
+				$wrappers = $target.hasClass('TabsBody') ? $wrappers.add($target) : $wrappers;
+				$wrappers.each(function(i, wrapper) {
+					var $wrapper = $(wrapper);
+					
+					if($wrapper.hasClass(__C.CLASSES.ACTIVE)) {
+						$this.addClass('-in_progress');
+						$wrapper.parent().height($wrapper.outerHeight());
+					}
 				});
 			}),
 			$bodies_wrapper,
@@ -1790,8 +1763,9 @@ function bindTabs($parent) {
 		$bodies.removeClass(__C.CLASSES.ACTIVE).eq($this.currentTabsIndex).addClass(__C.CLASSES.ACTIVE);
 		$bodies_wrapper.height($bodies.filter('.'+__C.CLASSES.ACTIVE).outerHeight());
 		$bodies_wrapper.on('transitionend webkitTransitionEnd', function() {
+			//$bodies_wrapper.height('auto');
 			$this.removeClass('-in_progress');
-			$this.trigger('progress_end')
+			$this.trigger('progress_end');
 		});
 		$bodies.each(function(i, body) {
 			mutation_observer.observe(body, {
@@ -1935,19 +1909,17 @@ function bindCollapsing($parent) {
 		var $instance = $(this),
 			collapsing_id = $instance.data('collapsing_id'),
 			mutation_observer = new MutationObserver(function(records) {
-				var $contents,
-					$target;
-				records.forEach(function(record){
-					$target = $(record.target);
+				var $target = $(records[records.length - 1].target),
 					$contents = $target.parents('.CollapsingContent');
-					$contents = $target.hasClass('CollapsingContent') ? $contents.add($target) : $contents;
-					$contents.each(function(i, content) {
-						var $content = $(content),
-							$wrapper = $content.parent();
-						if ($wrapper.hasClass('-opened')) {
-							$wrapper.addClass('-in_progress').height($content.outerHeight());
-						}
-					});
+				
+				$contents = $target.hasClass('CollapsingContent') ? $contents.add($target) : $contents;
+				$contents.each(function(i, content) {
+					var $content = $(content),
+						$wrapper = $content.parent();
+					
+					if ($wrapper.hasClass('-opened')) {
+						$wrapper.addClass('-in_progress').height($content.outerHeight());
+					}
 				});
 			}),
 			default_height,
@@ -1977,6 +1949,7 @@ function bindCollapsing($parent) {
 		
 		function toggleCollapsing(){
 			$wrapper.addClass('-in_progress');
+			$wrapper.parents('.TabsBodyWrapper').height('auto');
 			if ($instance.hasClass(__C.CLASSES.ACTIVE)) {
 				$wrapper.height(default_height);
 			} else {
@@ -2032,12 +2005,11 @@ function bindCollapsing($parent) {
 function bindControlSwitch($parent) {
 	$parent = $parent ? $parent : $('body');
 	$parent.find('.Switch').not('.-Handled_Switch').each(function(i, el) {
-		var $switch = $(el),
-			switch_id = $switch.data('switch_id'),
-			$switching = $parent.find('.Switching[data-switch_id="'+switch_id+'"]');
+		var $switch = $(el);
 		
+		$switch.switching = $parent.find('.Switching[data-switch_id="'+$switch.data('switch_id')+'"]');
 		$switch.on('change.Switch', function() {
-			$switching.each(function(i, switching) {
+			$switch.switching.each(function(i, switching) {
 				var $switching = $(switching);
 				
 				if($switching.is('fieldset')) {
