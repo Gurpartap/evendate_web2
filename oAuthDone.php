@@ -69,12 +69,13 @@ require_once('footer.php');
             }
             $pr_text.text(texts_array[text_number++]);
         }, 3000);
-
-    $(document).ready(function () {
-        var data = $.extend(searchToObject(), hashToObject(), true);
-        socket.emit('auth.oauthDone', data);
-        socket.on('vk.needEmail', function () {
-            $('.panel').toggleClass('hidden');
-        });
-    });
 </script>
+
+
+<?php
+require_once 'v1-backend/bin/env_variables.php';
+require_once 'v1-backend/bin/db.php';
+App::buildGlobal($__db);
+require_once("{$BACKEND_FULL_PATH}/auth/Class.AuthHandler.php");
+$auth_handler = new AuthHandler($_REQUEST);
+$auth_handler->startAuth();
