@@ -19,8 +19,11 @@ AbstractEditEventPage = extending(Page, (function() {
 	 * @property {?Calendar} MainCalendar
 	 * @property {OrganizationsCollection} my_organizations
 	 * @property {Fields} my_organizations_fields
+	 * @property {boolean} is_edit
 	 */
 	function AbstractEditEventPage() {
+		var self = this;
+		
 		Page.call(this);
 		
 		this.event = new OneEvent();
@@ -33,10 +36,19 @@ AbstractEditEventPage = extending(Page, (function() {
 		this.my_organizations_fields = new Fields(
 			'default_address', {
 				tariff: {
-					fields: new Fields('available_additional_notifications')
+					fields: new Fields(
+						'available_event_publications',
+						'available_additional_notifications'
+					)
 				}
 			}
 		);
+		
+		Object.defineProperty(this, 'is_edit', {
+			get: function() {
+				return !!self.event.id;
+			}
+		});
 	}
 	
 	AbstractEditEventPage.lastRegistrationCustomFieldId = 0;
@@ -177,7 +189,9 @@ AbstractEditEventPage = extending(Page, (function() {
 	AbstractEditEventPage.prototype.checkTariffAvailabilities = function() {
 		var self = this,
 			organization = self.my_organizations.getByID(self.organization_id),
-			$additional_notification_switch = self.$wrapper.find('.AdditionalNotificationSwitch');
+			$form_overall_fields = self.$wrapper.find('.FormOverallFields'),
+			$additional_notification_switch = self.$wrapper.find('.AdditionalNotificationSwitch'),
+			$available_event_publications_wrapper = self.$wrapper.find('.AvailableEventPublicationsWrapper');
 		
 		if (organization.tariff.available_additional_notifications) {
 			$additional_notification_switch.prop('disabled', false);
@@ -191,6 +205,14 @@ AbstractEditEventPage = extending(Page, (function() {
 			$additional_notification_switch.closest('.AdditionalNotificationSwitchParent').addClass(__C.CLASSES.STATUS.DISABLED);
 			self.$wrapper.find('.BuySubscriptionLink').removeClass(__C.CLASSES.HIDDEN).attr('href', '/admin/organization/'+ self.organization_id +'/settings#change_tariff');
 		}
+		
+		if (organization.tariff.available_event_publications <= 5) {
+			$available_event_publications_wrapper.removeClass(__C.CLASSES.HIDDEN);
+			$available_event_publications_wrapper.find('.AvailableEventPublications').text(organization.tariff.available_event_publications);
+		} else {
+			$available_event_publications_wrapper.addClass(__C.CLASSES.HIDDEN);
+		}
+		$form_overall_fields.attr('disabled', (organization.tariff.available_event_publications <= 0 && !self.is_edit));
 	};
 	
 	
@@ -208,6 +230,27 @@ AbstractEditEventPage = extending(Page, (function() {
 			self.deInitCrossPosting();
 			$(this).removeAttr('readonly');
 		});
+		
+		(function initVKImageCoping() {
+			var $wrapper = self.$wrapper.find('.EventEditHorizontalImageHolder'),
+				$src = $wrapper.find('.ImgSrc'),
+				$file_name = $wrapper.find('.FileName'),
+				$vk_wrapper = self.$wrapper.find('.EditEventVKImageHolder'),
+				$vk_preview = $vk_wrapper.find('.ImgPreview'),
+				$vk_src = $vk_wrapper.find('.ImgSrc'),
+				$vk_file_name = $vk_wrapper.find('.FileName'),
+				mutation_observer = new MutationObserver(function() {
+					var src = $src.val();
+					
+					$vk_preview.attr('src', $src.val());
+					$vk_src.val($src.val());
+					$vk_file_name.val($file_name.val());
+				});
+			
+			mutation_observer.observe($src.get(0), {
+				attributes: true
+			})
+		})();
 	};
 	
 	AbstractEditEventPage.prototype.deInitCrossPosting = function() {
@@ -598,7 +641,8 @@ AbstractEditEventPage = extending(Page, (function() {
 									img: option.photo
 								}
 							};
-						}))).trigger('change');
+						}))).trigger('change').prop('disabled', data.length === 1);
+						
 						PAGE.initCrossPosting();
 					}
 				});
@@ -755,6 +799,11 @@ AbstractEditEventPage = extending(Page, (function() {
 				])
 			},
 			m_additional_notification_time;
+		
+		if (__APP.USER.isLoggedOut()) {
+			__APP.changeState('/feed/actual', true, true);
+			return null;
+		}
 		
 		if (!checkRedirect('event/add', (this.organization_id ? '/add/event/to/' + this.organization_id : '/add/event'))) {
 			return null;

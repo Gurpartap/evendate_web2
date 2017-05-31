@@ -1281,6 +1281,9 @@ fieldset:disabled .form_select {cursor: default}
 .form_text {
 	font-size: 14px;
 	line-height: 20px;
+	color: #657184;
+	color: var(--color_primary_80);
+	font-weight: 500;
 }
 
 .form_helptext {
@@ -1414,7 +1417,10 @@ fieldset:disabled .form_select {cursor: default}
 	border: 0;
 	border-radius: 2px;
 	box-shadow: 0 1px 2px #b3b3b3;
+	color: #4a4a4a;
+	color: var(--color_text);
 }
+
 .form_select2.select2-dropdown-open > .select2-choice {border-radius: 3px 3px 0 0}
 
 .form_select2.select2-container > .select2-choice > .select2-chosen {
@@ -1425,9 +1431,13 @@ fieldset:disabled .form_select {cursor: default}
 	border-color: #ddd;
 	background-color: #f9f9fa;
 	background-color: var(--color_background_gray);
+	box-shadow: none;
 }
 .form_select2.select2-container > .select2-choice > .select2-arrow {top: 0}
-.form_select2.select2-container.select2-container-disabled > .select2-choice > .select2-arrow {background-color: inherit}
+.form_select2.select2-container.select2-container-disabled > .select2-choice > .select2-arrow {
+	background-color: inherit;
+	opacity: .3;
+}
 
 .form_select2.select2-container > .select2-choice > .select2-arrow > b:after {
 	font: normal normal normal 1em/1 FontAwesome;
@@ -2188,6 +2198,7 @@ a.button:hover {text-decoration: none}
 	color: var(--color_primary_50);
 	background-color: #f6f6f6;
 	background-color: var(--color_gray_material);
+	opacity: .4;
 	box-shadow: none;
 }
 .button:disabled.-color_accent,
@@ -4395,31 +4406,31 @@ body.-open_modal > .modal_wrapper {
 	width: 100%;
 }
 
-.edit_event_img_preview_vert {
-	top: 131px;
-	left: 7px;
-	width: 95px;
-	height: 135px;
+.edit_event_vk_img {
+	margin-bottom: 24px;
 }
 
-.edit_event_vk_img {box-shadow: 0 0 5px rgba(0, 0, 0, 0.2)}
-
 .edit_event_vk_img_preview {
-	width: 251px;
-	height: 141px;
+	width: 400px;
+	height: 225px;
+	border-radius: 3px;
 	overflow: hidden;
 }
 
 .edit_event_vk_img_preview > img {width: 100%}
 
-.edit_event_vk_img_footer {
-	padding: 15px;
-	background-color: #fff;
-	background-color: var(--color_page);
-}
-.edit_event_vk_img_footer .action {font-size: .8em}
+.edit_event_vk_img_preview > img[src=''] + .edit_event_vk_img_preview_dash_border,
+.edit_event_vk_img_preview > img:not([src]) + .edit_event_vk_img_preview_dash_border {display: block}
 
-.edit_event_vk_right_block {height: 200px}
+.edit_event_vk_img_preview_dash_border {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: none;
+	border: 1px dashed;
+}
 
 
 /* ORGANIZATIONS */

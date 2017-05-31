@@ -1692,7 +1692,7 @@ function bindTabs($parent) {
 			focus_on_change = !!$this.data('focus_on_change'),
 			mutation_observer = new MutationObserver(function(records) {
 				var $target = $(records[records.length - 1].target),
-					$wrappers = $target.parents('.TabsBody');
+					$wrappers = $target.closest('.TabsBody');
 				
 				$wrappers = $target.hasClass('TabsBody') ? $wrappers.add($target) : $wrappers;
 				$wrappers.each(function(i, wrapper) {
@@ -1711,15 +1711,13 @@ function bindTabs($parent) {
 		
 		if(tabs_id){
 			$bodies_wrapper = $this.find('.TabsBodyWrapper[data-tabs_id="'+tabs_id+'"]');
-			$bodies = $bodies_wrapper.children('.TabsBody');
 			$header_wrapper = $this.find('.HeaderTabs[data-tabs_id="'+tabs_id+'"]');
-			$tabs = $header_wrapper.children('.Tab');
 		} else {
 			$bodies_wrapper = $this.find('.TabsBodyWrapper:first');
-			$bodies = $bodies_wrapper.children('.TabsBody');
 			$header_wrapper = $this.find('.HeaderTabs:first');
-			$tabs = $header_wrapper.children('.Tab');
 		}
+		$bodies = $bodies_wrapper.children('.TabsBody');
+		$tabs = $header_wrapper.children('.Tab');
 		
 		Object.defineProperties($this, {
 			'currentTabsIndex': {
@@ -1757,24 +1755,33 @@ function bindTabs($parent) {
 			$this.setToTab($this.currentTabsIndex - 1);
 		};
 		
+		$this.connectMutationObserver = function() {
+			$bodies.each(function(i, body) {
+				mutation_observer.observe(body, {
+					childList: true,
+					subtree: true,
+					attributes: true,
+					attributeFilter: ['class']
+				});
+			});
+		};
+		
+		$this.disconnectMutationObserver = function() {
+			mutation_observer.disconnect();
+			$bodies_wrapper.height('auto');
+		};
+		
 		if (!$tabs.filter('.'+__C.CLASSES.ACTIVE).length) {
 			$tabs.eq(0).addClass(__C.CLASSES.ACTIVE);
 		}
 		$bodies.removeClass(__C.CLASSES.ACTIVE).eq($this.currentTabsIndex).addClass(__C.CLASSES.ACTIVE);
 		$bodies_wrapper.height($bodies.filter('.'+__C.CLASSES.ACTIVE).outerHeight());
-		$bodies_wrapper.on('transitionend webkitTransitionEnd', function() {
-			//$bodies_wrapper.height('auto');
+		$bodies_wrapper.on('transitionend', function() {
 			$this.removeClass('-in_progress');
 			$this.trigger('progress_end');
 		});
-		$bodies.each(function(i, body) {
-			mutation_observer.observe(body, {
-				childList: true,
-				subtree: true,
-				attributes: true,
-				attributeFilter: ['class']
-			});
-		});
+		
+		$this.connectMutationObserver();
 		
 		$tabs.on('click', function() {
 			$this.setToTab($tabs.index(this));
@@ -1948,8 +1955,10 @@ function bindCollapsing($parent) {
 		}
 		
 		function toggleCollapsing(){
+			var parent_Tabs = $wrapper.parents('.Tabs').resolveInstance();
+			
+			parent_Tabs.disconnectMutationObserver();
 			$wrapper.addClass('-in_progress');
-			$wrapper.parents('.TabsBodyWrapper').height('auto');
 			if ($instance.hasClass(__C.CLASSES.ACTIVE)) {
 				$wrapper.height(default_height);
 			} else {
@@ -1957,6 +1966,7 @@ function bindCollapsing($parent) {
 			}
 			$wrapper.toggleClass('-opened');
 			$instance.toggleClass(__C.CLASSES.ACTIVE);
+			parent_Tabs.connectMutationObserver();
 		}
 		
 		function changeProp(){
@@ -1987,7 +1997,7 @@ function bindCollapsing($parent) {
 			.on('click', function(){
 				$instance.openCollapsing();
 			})
-			.on('transitionend webkitTransitionEnd', function() {
+			.on('transitionend', function() {
 				$wrapper.removeClass('-in_progress');
 			});
 		
