@@ -40,6 +40,7 @@ class Event extends AbstractEntity
 	/*ONLY FOR ADMINS*/
 	const STATISTICS_FIELD_NAME = 'statistics';
 	const REGISTERED_USERS_FIELD_NAME = 'registered_users';
+	const ORDERS_COUNT_FIELD_NAME = 'orders_count';
 	/*ONLY FOR ADMINS*/
 
 	const REGISTRATION_FIELDS_FIELD_NAME = 'registration_fields';
@@ -187,12 +188,28 @@ class Event extends AbstractEntity
 			AND view_tickets.is_active = TRUE
 			AND users_organizations.user_id = :user_id)::INT AS ' . self::SOLD_TICKETS_COUNT_FIELD_NAME,
 
+		self::ORDERS_COUNT_FIELD_NAME => '(SELECT COALESCE(COUNT(view_tickets_orders.id)::INT, 0)
+			FROM view_tickets_orders
+			INNER JOIN events ON events.id = view_tickets_orders.event_id
+			INNER JOIN users_organizations ON users_organizations.organization_id = events.organization_id
+			WHERE view_tickets_orders.event_id = view_events.id 
+			AND view_tickets_orders.status = TRUE 
+			AND users_organizations.status = TRUE 
+			AND users_organizations.user_id = :user_id)::INT AS ' . self::ORDERS_COUNT_FIELD_NAME,
+
 		self::MY_TICKETS_COUNT_FIELD_NAME => '(SELECT COALESCE(COUNT(view_tickets.id)::INT, 0)
 			FROM view_tickets
 			WHERE view_tickets.event_id = view_events.id 
 			AND status = TRUE 
 			AND is_active = TRUE 
 			AND view_tickets.user_id = :user_id)::INT AS ' . self::MY_TICKETS_COUNT_FIELD_NAME,
+
+		self::ORDERS_COUNT_FIELD_NAME => '(SELECT COALESCE(COUNT(view_tickets.id)::INT, 0)
+			FROM view_tickets
+			WHERE view_tickets.event_id = view_events.id 
+			AND status = TRUE 
+			AND is_active = TRUE 
+			AND view_tickets.user_id = :user_id)::INT AS ' . self::ORDERS_COUNT_FIELD_NAME,
 
 		self::IS_SEEN_FIELD_NAME => '(
 		SELECT
