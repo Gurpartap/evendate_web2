@@ -145,15 +145,15 @@ class Order extends AbstractEntity
 		}
 
 		if (isset($fields[self::USER_FIELD_NAME]) && $user instanceof User) {
-			$result[self::USER_FIELD_NAME] = UsersCollection::filter($this->db,
+			$user_fields = Fields::parseFields($fields[self::USER_FIELD_NAME]['fields'] ?? '');
+			$result[self::USER_FIELD_NAME] = UsersCollection::filter(App::DB(),
 				$user,
 				array('id' => $this->user_id),
-				Fields::parseFields($fields[self::USER_FIELD_NAME]['fields'] ?? ''),
 				array(
 					'length' => $fields[self::USER_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 					'offset' => $fields[self::USER_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
 				),
-				Fields::parseOrderBy($fields[self::USER_FIELD_NAME]['order_by'] ?? ''))->getData();
+				Fields::parseOrderBy($fields[self::USER_FIELD_NAME]['order_by'] ?? ''))->getParams($user, $user_fields)->getData();
 		}
 
 		if (isset($fields[self::REGISTRATION_FIELDS_FIELD_NAME]) && $user instanceof User) {
