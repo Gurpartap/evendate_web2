@@ -27,6 +27,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {?string} detail_info_url
 	 *
 	 * @property {OrdersCollection} orders
+	 * @property {number} orders_count
 	 *
 	 * @property {?boolean} ticketing_locally
 	 * @property {EventsTicketsCollection} tickets
@@ -97,6 +98,7 @@ OneEvent = extending(OneEntity, (function() {
 		this.detail_info_url = null;
 		
 		this.orders = new OrdersCollection(event_id);
+		this.orders_count = null;
 		
 		this.ticketing_locally = null;
 		this.tickets = new EventsTicketsCollection(event_id);

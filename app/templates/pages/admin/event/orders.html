@@ -1,0 +1,61 @@
+<script type="javascript/template" id="tmpl-admin-event-orders-page">
+	<div class="event_admin_orders_page material -level_2_material">
+		<div class="event_admin_orders_page_table_wrapper OrdersTableWrapper -status_disabled">
+			<header class="event_admin_orders_page_header">
+				<h3 class="event_admin_orders_page_title">Заказы</h3>
+				<div class="event_admin_orders_page_table_search_block">
+					<input class="form_input -rounded -search_bar OrdersTableSearch" placeholder="Поиск заказов">
+				</div>
+			</header>
+
+			<table class="table -data_table_override -data_table_row_selection OrdersTable">
+				<thead>
+					<tr>
+						<th>Номер заказа</th>
+						<th>Статус заказа</th>
+						<th>Покупатель</th>
+						<th>E-mail</th>
+						<th>Время покупки</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</div>
+
+		{loader}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-admin-event-orders-page-tr">
+	<tr data-order_uuid="{uuid}">
+		<td>
+			<div class="data_tables_row_expand_wrapper">
+				<span class="data_tables_row_expand fa_icon DataTableRowExpand fa-plus"></span>
+				<span class="Text">{number}</span>
+			</div>
+		</td>
+		<td><span class="order_status -order_status_{status_type_code}">{status_text}</span></td>
+		<td>{orderer}</td>
+		<td>{email}</td>
+		<td>{buy_time}</td>
+	</tr>
+</script>
+
+<script type="javascript/template" id="tmpl-admin-event-orders-page-table-child-row">
+	<div class="event_admin_orders_page_table_child_row collapsing_wrapper -smooth_hiding CollapsingWrapper">
+		<div class="collapsing_content CollapsingContent">
+			<table>
+				{ticket_rows}
+			</table>
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-admin-event-orders-page-ticket-row">
+	<tr>
+		<td class="child_ladder">{number}</td>
+		<td>{ticket_type_name}</td>
+		<td>{price}</td>
+		<td><small class="-transform_uppercase -text_color_marginal">{used}</small></td>
+	</tr>
+</script>

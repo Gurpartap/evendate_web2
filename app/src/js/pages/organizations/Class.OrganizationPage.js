@@ -178,7 +178,6 @@ OrganizationPage = extending(Page, (function() {
 			$subscribers_scroll.scrollbar({
 				disableBodyScroll: true,
 				onScroll: function(y) {
-					debugger;
 					var $loader,
 						last_is_friend = PAGE.organization.subscribed.last_pushed[PAGE.organization.subscribed.last_pushed.length - 1].is_friend;
 					
