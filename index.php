@@ -114,11 +114,11 @@ $url_parts = explode('/', $url);
 
 	<?php
 	if ($DEBUG_MODE) { ?>
-    <link rel="stylesheet" href="/dist/vendor.css?rev=3b6878c5b89f643e8d96b1b336b7d4fc">
-    <link rel="stylesheet" href="/dist/app.css?rev=a360ab4dce947752775ce991ce30e76a"><?php
+    <link rel="stylesheet" href="/dist/vendor.css?rev=02bc2f50a99c1167d48fb75e2e503163">
+    <link rel="stylesheet" href="/dist/app.css?rev=0cc32e88bdf929528caf15b6b21bdebd"><?php
 	} else { ?>
     <link rel="stylesheet" href="/dist/vendor.min.css?rev=4165c69f5d04ec431ab5bc41425847a5">
-    <link rel="stylesheet" href="/dist/app.min.css?rev=bb8a0ef19a7a789b48b10fd00b4b71f6"><?php
+    <link rel="stylesheet" href="/dist/app.min.css?rev=4c951bde496be01743a88cd3b31d2f6c"><?php
 	} ?>
 
 	<?php
@@ -317,7 +317,7 @@ $url_parts = explode('/', $url);
     </div>
   </header>
   <div id="main_section">
-
+		<div class="app_inspectors_wrapper AppInspectorsWrapper"></div>
     <div class="app_view -hidden PageView">
       <div class="page_wrapper Content -fadeable"></div>
     </div>
@@ -349,11 +349,11 @@ $url_parts = explode('/', $url);
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=472e75c55e41ff550b96f5d131cf3c49" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=9afc925b9bb724d6fb59941c7c310b62" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=87e5ab6b255a69a64ecb850dae7056ff" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=f448a27ac837e02e4e569b561281d75b" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=7e48e0c55a201e4613139f50e682e1d4" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=c252299b2b44d97793b4d2cca605e4d3" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=2deef147e9692ec528c5915e1f27602a" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=0f0b45d0d73325b72db7b8779e1e344e" charset="utf-8"></script><?php
 }
 
 foreach (glob("app/templates/{*/*/*/*,*/*/*,*/*,*}.html", GLOB_BRACE) as $filename) {
