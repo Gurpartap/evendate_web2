@@ -44,12 +44,21 @@ class Friend extends AbstractEntity implements UserInterface
 			END
 			FROM users AS u
 			WHERE u.id = view_users.id) AS ' . self::LINK_FIELD_NAME,
+
 		'email' => '(SELECT CASE WHEN view_users.id IN (SELECT subscriptions.user_id 
 					FROM subscriptions
 					 INNER JOIN users_organizations ON users_organizations.organization_id = subscriptions.organization_id
 					 WHERE users_organizations.role_id = 1 
 					 AND users_organizations.status = TRUE 
 					 AND subscriptions.status = TRUE
+					 AND users_organizations.user_id = :user_id
+					) OR (SELECT ticket_orders.user_id 
+					FROM ticket_orders
+						INNER JOIN events ON ticket_orders.event_id = events.id
+					 INNER JOIN users_organizations ON users_organizations.organization_id = events.organization_id
+					 WHERE users_organizations.role_id = 1 
+					 AND users_organizations.status = TRUE 
+					 AND events.status = TRUE
 					 AND users_organizations.user_id = :user_id
 					) THEN view_users.email ELSE null END AS email) AS email'
 	);

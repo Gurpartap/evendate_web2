@@ -83,6 +83,7 @@ class Order extends AbstractEntity
 		'status_type_code',
 		'payed_at',
 		'created_at',
+		'number',
 		'status_name',
 	);
 
