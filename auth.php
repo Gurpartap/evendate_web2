@@ -3,6 +3,7 @@
 
 require_once 'v1-backend/bin/db.php';
 require_once 'v1-backend/bin/Class.Result.php';
+require_once 'v1-backend/auth/Class.NewUser.php';
 
 if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'get_urls') {
 	if (isset($_REQUEST['mobile']) && $_REQUEST['mobile'] == 'true') {
@@ -33,9 +34,7 @@ try {
 
 
 	if ($row_user_info = $p_get_user->fetch()) {
-		$_SESSION['email'] = $row_user_info['email'];
-		$_SESSION['id'] = $row_user_info['user_id'];
-		$_SESSION['token'] = $row_user_info['token'];
+		NewUser::setSession($row_user_info);
 		echo new Result(true, 'Данные успешно получены');
 	} else {
 		echo new Result(false, 'Пользователь с такими данными не найден');

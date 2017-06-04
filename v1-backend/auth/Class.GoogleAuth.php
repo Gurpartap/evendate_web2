@@ -65,5 +65,38 @@ class GoogleAuth extends AbstractAuth
 		return $this;
 	}
 
+	public function saveSignInData($user_id)
+	{
+		$p_ins = App::queryFactory()->newInsert();
+		$p_ins
+			->into('google_sign_in')
+			->cols(array(
+				'google_id' => $this->getUID(),
+				'user_id' => $user_id,
+				'access_token' => $this->oauth_data['access_token'],
+				'expires_in' => $this->oauth_data['expires_in'],
+				'etag' => $this->user_info['etag'],
+				'cover_photo_url' => isset($this->user_info['cover']['coverPhoto']) ? $this->user_info['cover']['coverPhoto'] : null
+			));
+		App::DB()->prepareExecute($p_ins, 'CANT_INSERT_VK_DATA');
+
+	}
+
+	public function saveFriendsList($user_id)
+	{
+		if (count($this->friends_list) == 0) return;
+		$q_ins = App::queryFactory()->newInsert()->into('google_friends');
+
+		foreach ($this->friends_list as $friend) {
+			$q_ins
+				->addRow(array(
+					'user_id' => $user_id,
+					'friend_uid' => $friend['uid'],
+				));
+		}
+		$q_ins->onConflictDoNothing();
+		App::DB()->prepareExecute($q_ins, 'CANT_INSERT_VK_DATA');
+	}
+
 
 }

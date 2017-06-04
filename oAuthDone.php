@@ -36,9 +36,7 @@
     Загрузка данных...
   </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js" type="text/javascript"></script>
 <script src="/vendor/jquery/dist/jquery.js" type="text/javascript"></script>
-<script src="/app/js/app.js"></script>
 
 </body>
 <?php
@@ -69,13 +67,31 @@ require_once('footer.php');
             }
             $pr_text.text(texts_array[text_number++]);
         }, 3000);
+		<?php
+		try {
+			require_once 'v1-backend/bin/env_variables.php';
+			require_once 'v1-backend/bin/db.php';
+			App::buildGlobal($__db);
+			require_once("{$BACKEND_FULL_PATH}/auth/Class.AuthHandler.php");
+			$auth_handler = new AuthHandler($_REQUEST);
+			$new_user = $auth_handler->startAuth();
+			echo 'var user_data = ' . json_encode(array(
+					'token' => $auth_handler->getProvider()->getUserToken(),
+					'email' => $auth_handler->getProvider()->getOauthData()['email'],
+					'user_id' => $auth_handler->getUserId()
+				)) . ';';
+		} catch (Exception $e) {
+			echo "window.location.reload();";
+		}
+		?>
+  if (user_data){
+      $.ajax({
+          url: 'auth.php',
+          data: user_data,
+          success: function(res){
+              debugger;
+              window.location.href = '/';
+          }
+      })
+  }
 </script>
-
-
-<?php
-require_once 'v1-backend/bin/env_variables.php';
-require_once 'v1-backend/bin/db.php';
-App::buildGlobal($__db);
-require_once("{$BACKEND_FULL_PATH}/auth/Class.AuthHandler.php");
-$auth_handler = new AuthHandler($_REQUEST);
-$auth_handler->startAuth();

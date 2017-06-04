@@ -19,6 +19,8 @@ abstract class AbstractAuth
 
 	protected $URLS;
 
+	static $type_name;
+
 	/**
 	 * AbstractAuth constructor.
 	 * @param $oauth_data
@@ -46,6 +48,12 @@ abstract class AbstractAuth
 
 	public abstract function saveSignInData($user_id);
 
+	public abstract function saveFriendsList($user_id);
+
+	public function saveInterests($user_id)
+	{
+		return;
+	}
 
 	protected function getBodyJSON(\GuzzleHttp\Psr7\Response $response, bool $object = true)
 	{

@@ -33,7 +33,7 @@ class FacebookAuth extends AbstractAuth
 		);
 		$this->friends_list = $this->getBodyJSON($response);
 
-		if (isset($this->friends_list['data'])){
+		if (isset($this->friends_list['data'])) {
 			$this->friends_list = $this->friends_list['data'];
 		}
 		return $this;
@@ -61,37 +61,43 @@ class FacebookAuth extends AbstractAuth
 	}
 
 
-
 	public function getSex()
 	{
-		if ($this->user_info['gender'] == 'male' || $this->user_info['gender'] == 'female'){
+		if ($this->user_info['gender'] == 'male' || $this->user_info['gender'] == 'female') {
 			return $this->user_info['gender'];
-		}else{
+		} else {
 			return null;
 		}
 	}
 
 	public function saveSignInData($user_id)
 	{
-
-		$ins_data = array(
-			'uid' => $this->getUID(),
-			'user_id' => $user_id,
-			'access_token' => $this->oauth_data['access_token'],
-			'expires_in' => $this->oauth_data['expires_in'],
-			'secret' => null,
-			'photo_50' => $this->user_info['photo_50'],
-			'photo_100' => $this->user_info['photo_100'],
-			'photo_max_orig' => $this->user_info['photo_max_orig']
-		);
-
 		$p_ins = App::queryFactory()->newInsert();
 		$p_ins
-			->into('vk_sign_in')
-			->cols($ins_data)
-			->onConflictUpdate(array('uid'), $ins_data);
-		App::DB()->prepareExecute($p_ins, 'CANT_INSERT_VK_DATA');
+			->into('facebook_sign_in')
+			->cols(array(
+				'uid' => $this->getUID(),
+				'user_id' => $user_id,
+				'access_token' => $this->oauth_data['access_token'],
+				'expires_in' => $this->oauth_data['expires_in']
+			));
+		App::DB()->prepareExecute($p_ins, 'CANT_INSERT_FACEBOOK_DATA');
 	}
 
+	public function saveFriendsList($user_id)
+	{
+		if (count($this->friends_list) == 0) return;
+		$q_ins = App::queryFactory()->newInsert()->into('facebook_friends');
 
+		foreach ($this->friends_list as $friend) {
+			$q_ins
+				->addRow(array(
+					'user_id' => $user_id,
+					'friend_uid' => $friend['id'],
+				));
+		}
+		$q_ins->onConflictDoNothing();
+		App::DB()->prepareExecute($q_ins, 'CANT_INSERT_VK_DATA');
+
+	}
 }

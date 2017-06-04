@@ -65,7 +65,6 @@ class VkAuth extends AbstractAuth
 		return $this;
 	}
 
-
 	public function getRemoteGroupsList()
 	{
 		$response = $this->client->request('GET', $this->URLS[self::$type_name]['GET_GROUPS_LIST'],
@@ -87,13 +86,87 @@ class VkAuth extends AbstractAuth
 
 		if (!isset($this->groups_data['response'])) throw new RuntimeException('ERROR_IN_RESPONSE');
 		$this->groups_data = $this->groups_data['response'];
-
+		unset($this->groups_data[0]);
 		return $this;
 	}
 
 	public function getUID()
 	{
 		return $this->oauth_data['user_id'];
+	}
+
+	public function saveSignInData($user_id)
+	{
+		$p_ins = App::queryFactory()->newInsert();
+		$p_ins
+			->into('vk_sign_in')
+			->cols(array(
+				'uid' => $this->getUID(),
+				'user_id' => $user_id,
+				'access_token' => $this->oauth_data['access_token'],
+				'expires_in' => $this->oauth_data['expires_in'],
+				'secret' => NULL,
+				'photo_50' => $this->user_info['photo_50'],
+				'photo_100' => $this->user_info['photo_100'],
+				'photo_max_orig' => $this->user_info['photo_max_orig']
+			));
+		App::DB()->prepareExecute($p_ins, 'CANT_INSERT_VK_DATA');
+
+	}
+
+	public function saveFriendsList($user_id)
+	{
+		if (count($this->friends_list) == 0) return;
+		$q_ins = App::queryFactory()->newInsert()->into('vk_friends');
+
+		foreach ($this->friends_list as $friend) {
+			$q_ins
+				->addRow(array(
+					'user_id' => $user_id,
+					'friend_uid' => $friend['uid'],
+				));
+		}
+
+		$q_ins->onConflictDoNothing();
+		App::DB()->prepareExecute($q_ins, 'CANT_INSERT_VK_DATA');
+
+	}
+
+	public function saveInterests($user_id)
+	{
+		$p_ins_group = App::queryFactory()->newInsert();
+		$p_ins_group->into('vk_groups');
+		$group_ids = [];
+
+		foreach ($this->groups_data as $group) {
+			$data = array(
+				'gid' => $group['gid'],
+				'name' => $group['name'],
+				'screen_name' => $group['screen_name'],
+				'description' => $group['description'],
+				'photo' => $group['photo']
+			);
+			$p_ins_group->cols($data)
+				->onConflictUpdate(array('gid'), $data)
+				->returning(array('id'));
+			$group = App::DB()->prepareExecute($p_ins_group, 'CANT_INSERT_GROUP')->fetch();
+			$group_ids[] = $group['id'];
+		}
+
+		$p_ins_sub = App::queryFactory()->newInsert();
+		$p_ins_sub->into('vk_users_subscriptions');
+
+
+		foreach($group_ids as $group_id){
+			$p_ins_sub->addRow(array(
+				'vk_group_id' => $group_id,
+				'user_id' => $user_id
+			));
+		}
+		if (count($group_ids) > 0){
+			$p_ins_sub->onConflictDoNothing();
+			App::DB()->prepareExecute($p_ins_sub, 'CANT_INSERT_SUBSCRIPTION')->fetch();
+		}
 	}
 
 

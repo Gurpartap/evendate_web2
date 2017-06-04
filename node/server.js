@@ -332,10 +332,12 @@ pg.connect(pg_conn_string, function (err, client, done) {
             q_upd_organizations = UpdateQueries.upd_org_recommendations,
             upd_events = false,
             upd_organizations = false,
-            operations = [], events_args = [], orgs_args = [];
+            operations = [],
+            events_args = [],
+            orgs_args = [];
 
-        q_upd_events = q_upd_events.replace("'{SIMILARITY_TEXT}'", data.events_update_texts === false ? 'rating_texts_similarity' : events_text);
-        q_upd_organizations = q_upd_organizations.replace("'{SIMILARITY_TEXT}'", data.organizations_update_texts === false ? 'rating_texts_similarity' : organizations_text);
+        q_upd_events = q_upd_events.replace("'{SIMILARITY_TEXT}'", data.events_update_texts == false ? 'rating_texts_similarity' : events_text);
+        q_upd_organizations = q_upd_organizations.replace("'{SIMILARITY_TEXT}'", data.organizations_update_texts == false ? 'rating_texts_similarity' : organizations_text);
 
 
         if (data.user_id) {
@@ -901,9 +903,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
                         };
 
                         let q_ins_sign_in_query = q_ins_sign_in.returning('id').toQuery()
-
-                        console.log(q_ins_sign_in_query.text);
-                        console.log(q_ins_sign_in_query.values);
 
                         client.query(q_ins_sign_in_query, function (sign_in_err) {
                             if (handleError(sign_in_err)) {
@@ -1589,8 +1588,13 @@ pg.connect(pg_conn_string, function (err, client, done) {
     });
 
     app.get('/recommendations/users/:id', function (req, res) {
+        res.json({status: true});
         insertRecommendationsAccordance({organization_id: req.params.id}, function () {
-            updateRecommendations({user_id: req.params.id}, logger.info);
+            updateRecommendations({
+                user_id: req.params.id,
+                events_update_texts: req.params.update_texts,
+                organizations_update_texts: req.params.update_texts
+            }, logger.info);
         });
     });
 
