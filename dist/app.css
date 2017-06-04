@@ -4891,7 +4891,7 @@ body.-open_modal > .modal_wrapper {
 .event_block_add_avatar_wrapper,
 .event_block_action_buttons_wrapper {margin: 6px 0}
 .event_block_action_buttons_wrapper > .button + .button {margin-left: 6px}
-.event_block_main_action_button {width: 200px}
+.event_block_main_action_button {width: 180px}
 
 /* /event_block */
 /* ticket_card */
@@ -5933,10 +5933,6 @@ fieldset + .org_admin_settings_wrapper,
 }
 
 @media (max-width: 767px) {
-	html {
-		font-size: 18px;
-	}
-
 	.feed_event {
 		height: auto;
 		flex-direction: column;
