@@ -52,7 +52,7 @@ class Friend extends AbstractEntity implements UserInterface
 					 AND users_organizations.status = TRUE 
 					 AND subscriptions.status = TRUE
 					 AND users_organizations.user_id = :user_id
-					) OR (SELECT ticket_orders.user_id 
+					) OR view_users.id IN (SELECT ticket_orders.user_id 
 					FROM ticket_orders
 						INNER JOIN events ON ticket_orders.event_id = events.id
 					 INNER JOIN users_organizations ON users_organizations.organization_id = events.organization_id
