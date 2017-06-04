@@ -10,11 +10,14 @@ AdminOrganizationOverviewPage = extending(AdminOrganizationPage, (function() {
 	/**
 	 *
 	 * @param {(string|number)} org_id
+	 *
 	 * @constructor
 	 * @constructs AdminOrganizationOverviewPage
+	 *
+	 * @property {OneOrganization} organization
 	 */
 	function AdminOrganizationOverviewPage(org_id) {
-		AdminOrganizationPage.apply(this, arguments);
+		AdminOrganizationPage.call(this, org_id);
 		this.graphics_stats = new OrganizationsStatistics(this.id);
 		this.other_stats = new OrganizationsStatistics(this.id);
 		
@@ -35,17 +38,19 @@ AdminOrganizationOverviewPage = extending(AdminOrganizationPage, (function() {
 	}
 	/**
 	 *
+	 * @param {(string|number)} org_id
 	 * @param {string} title
 	 * @param staff
+	 * @param {OneUser.ROLE} user_role
 	 * @return {jQuery}
 	 */
-	AdminOrganizationOverviewPage.buildStaffBlock = function(title, staff) {
+	AdminOrganizationOverviewPage.buildStaffBlock = function(org_id, title, staff, user_role) {
 		if (staff.length) {
-			return tmpl('orgstat-overview-sidebar-wrapper-title', {title: title}).add(__APP.BUILD.avatarBlocks(staff, {
+			return tmpl('orgstat-overview-sidebar-wrapper-title', {title: title}).add(__APP.BUILD.staffAvatarBlocks(org_id, staff, {
 				is_link: true,
 				entity: __C.ENTITIES.USER,
 				avatar_classes: [__C.CLASSES.SIZES.X40, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]
-			}));
+			}, user_role === OneUser.ROLE.ADMIN));
 		}
 		return $();
 	};
@@ -175,8 +180,8 @@ AdminOrganizationOverviewPage = extending(AdminOrganizationPage, (function() {
 				entity: __C.ENTITIES.ORGANIZATION,
 				block_classes: ['-stack']
 			}),
-			staff_block: AdminOrganizationOverviewPage.buildStaffBlock('Администраторы', this.organization.admins.map(extendStaffProps))
-			                                          .add(AdminOrganizationOverviewPage.buildStaffBlock('Модераторы', this.organization.moderators.map(extendStaffProps))),
+			staff_block: AdminOrganizationOverviewPage.buildStaffBlock(this.organization.id, 'Администраторы', this.organization.admins.map(extendStaffProps), this.organization.role)
+			                                          .add(AdminOrganizationOverviewPage.buildStaffBlock(this.organization.id, 'Модераторы', this.organization.moderators.map(extendStaffProps), this.organization.role)),
 			event_blocks: this.organization.events.length ? tmpl('orgstat-overview-sidebar-wrapper', {
 				content: tmpl('orgstat-overview-sidebar-wrapper-title', {title: 'Предстоящие события'})
 					.add(tmpl('orgstat-event-block', this.organization.events.map(function(event) {

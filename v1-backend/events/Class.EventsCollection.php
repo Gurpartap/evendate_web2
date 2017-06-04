@@ -263,6 +263,14 @@ class EventsCollection extends AbstractCollection
 					}
 					break;
 				}
+				case 'city_id': {
+					$val = filter_var($value, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+					if ($val != null) {
+						$q_get_events->where("city_id = :city_id");
+						$statement_array[':city_id'] = $val;
+					}
+					break;
+				}
 				case 'bounds': {
 					$points = explode(',', $value);
 

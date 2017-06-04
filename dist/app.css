@@ -2500,6 +2500,7 @@ a.button:hover {text-decoration: none}
 	cursor: pointer;
 	opacity: .9;
 }
+.action.-no_uppercase {text-transform: none}
 .action.-color_primary {color: #3e4d66; color: var(--color_primary);}
 .action.-color_accent {color: #f82969; color: var(--color_accent);}
 .-state_admin .action.-color_accent {color: #00dc88}
@@ -3302,6 +3303,54 @@ body.-open_modal > .modal_wrapper {
 
 
 /* /Avatar Block */
+/* Staff Avatar Block */
+
+
+.staff_avatar_block {
+	display: flex;
+	align-items: stretch;
+	justify-content: space-between;
+}
+
+.staff_avatar_remove {
+	display: none;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	font-size: 1.3em;
+	color: #9fa6b3;
+	color: var(--color_primary_50);
+	opacity: 0;
+	cursor: pointer;
+}
+
+.staff_avatar_block.-can_edit > .staff_avatar_remove {display: flex}
+
+
+.staff_avatar_block:hover > .staff_avatar_remove {opacity: 1}
+
+.staff_avatar_remove:hover {
+	color: #00dc88;
+	color: var(--color_franklin);
+}
+
+
+
+.staff_avatar_block.-in_progress {
+	display: block;
+	width: 100%;
+	overflow: hidden;
+}
+
+.staff_avatar_block_shuttle {
+	display: flex;
+	align-items: center;
+	width: 200%;
+}
+
+
+/* /Staff Avatar Block */
 /* Subscriber */
 
 .subscriber {
@@ -4961,7 +5010,7 @@ body.-open_modal > .modal_wrapper {
 .event_block_add_avatar_wrapper,
 .event_block_action_buttons_wrapper {margin: 6px 0}
 .event_block_action_buttons_wrapper > .button + .button {margin-left: 6px}
-.event_block_main_action_button {width: 200px}
+.event_block_main_action_button {width: 180px}
 
 /* /event_block */
 /* ticket_card */
@@ -5528,7 +5577,7 @@ body.-open_modal > .modal_wrapper {
 	font-weight: 400;
 }
 
-.orgstat_overview_sidebar_wrapper > .avatar_block {
+.orgstat_overview_sidebar_wrapper > .staff_avatar_block {
 	padding: 6px 0;
 	font-weight: 400;
 }
@@ -5618,17 +5667,23 @@ fieldset + .org_admin_settings_wrapper,
 
 .org_admin_settings_staff {
 	display: flex;
-	justify-content: space-between;
+	justify-content: space-around;
 	align-items: stretch;
 }
 
-.org_admin_settings_staff_wrapper {flex: 0 0 50%}
+.org_admin_settings_staff_wrapper {
+	flex: none;
+	max-width: 45%;
+	margin-right: auto;
+}
 
-.org_admin_settings_admins_collection > .avatar_block {
+.org_admin_settings_admins_collection > .avatar_block,
+.org_admin_settings_admins_collection > .staff_avatar_block {
 	margin: 12px 0;
 	font-size: .875em;
-	font-weight: normal;
 }
+
+.org_admin_settings_admins_collection .avatar_block {font-weight: normal}
 
 .org_admin_settings_domain_table {
 	width: 100%;
@@ -6029,10 +6084,6 @@ fieldset + .org_admin_settings_wrapper,
 }
 
 @media (max-width: 767px) {
-	html {
-		font-size: 18px;
-	}
-
 	.feed_event {
 		height: auto;
 		flex-direction: column;
