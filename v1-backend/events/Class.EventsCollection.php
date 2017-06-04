@@ -263,6 +263,14 @@ class EventsCollection extends AbstractCollection
 					}
 					break;
 				}
+				case 'city_id': {
+					$val = filter_var($value, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+					if ($val != null) {
+						$q_get_events->where("city_id = :city_id");
+						$statement_array[':city_id'] = $val;
+					}
+					break;
+				}
 				case 'bounds': {
 					$points = explode(',', $value);
 
@@ -506,6 +514,7 @@ class EventsCollection extends AbstractCollection
 			array_key_exists(Event::IS_REGISTERED_FIELD_NAME, $fields) ||
 			array_key_exists(Event::IS_HIDDEN_FIELD_NAME, $fields) ||
 			array_key_exists(Event::SOLD_TICKETS_COUNT_FIELD_NAME, $fields) ||
+			array_key_exists(Event::ORDERS_COUNT_FIELD_NAME, $fields) ||
 			array_key_exists(Event::REGISTRATION_APPROVE_STATUS_FIELD_NAME, $fields)
 		) {
 			$statement_array[':user_id'] = $user->getId();

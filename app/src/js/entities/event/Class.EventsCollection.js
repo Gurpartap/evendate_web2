@@ -109,6 +109,7 @@ EventsCollection = extending(EntitiesCollection, (function() {
 				offset: this.length,
 				length: length
 			});
+		
 		switch (kind) {
 			default: {
 				method_name = 'fetchEvents';
@@ -127,9 +128,10 @@ EventsCollection = extending(EntitiesCollection, (function() {
 				break;
 			}
 		}
+		
 		return this.constructor[method_name](ajax_data, function(data) {
 			self.setData(data);
-			if (success && typeof success === 'function') {
+			if (isFunction(success)) {
 				success.call(self, self.last_pushed);
 			}
 		});
@@ -138,19 +140,21 @@ EventsCollection = extending(EntitiesCollection, (function() {
 	 *
 	 * @param {(Fields|Array|string)} [fields]
 	 * @param {(number|string)} [length]
+	 * @param {EventsCollectionAJAXData} [filters]
 	 * @param {EventsCollectionAJAXCallback} [success]
 	 * @returns {jqPromise}
 	 */
-	EventsCollection.prototype.fetchFeed = function(fields, length, success) {
+	EventsCollection.prototype.fetchFeed = function(fields, length, filters, success) {
 		var self = this,
-			ajax_data = {
+			ajax_data = $.extend({
 				fields: fields,
 				offset: this.length,
 				length: length
-			};
+			}, filters);
+		
 		return this.constructor.fetchEvents(ajax_data, function(data) {
 			self.setData(data);
-			if (success && typeof success === 'function') {
+			if (isFunction(success)) {
 				success.call(self, self.last_pushed);
 			}
 		});
