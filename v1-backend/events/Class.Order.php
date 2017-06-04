@@ -83,6 +83,7 @@ class Order extends AbstractEntity
 		'status_type_code',
 		'payed_at',
 		'created_at',
+		'number',
 		'status_name',
 	);
 
@@ -149,6 +150,7 @@ class Order extends AbstractEntity
 			$result[self::USER_FIELD_NAME] = UsersCollection::filter(App::DB(),
 				$user,
 				array('id' => $this->user_id),
+				$user_fields,
 				array(
 					'length' => $fields[self::USER_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 					'offset' => $fields[self::USER_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET

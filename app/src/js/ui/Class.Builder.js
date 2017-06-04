@@ -423,6 +423,7 @@ Builder = (function() {
 	 * @param {__C.ENTITIES} [props.entity]
 	 * @param {(Array<string>|string)} [props.avatar_classes]
 	 * @param {(Array<string>|string)} [props.block_classes]
+	 *
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.avatarBlocks = function buildAvatarBlocks(entities, props) {
@@ -458,6 +459,54 @@ Builder = (function() {
 				name: name
 			}, props);
 		}));
+	};
+	/**
+	 *
+	 * @param {(string|number)} organization_id
+	 * @param {(OneUser|UsersCollection|Array)} entities
+	 * @param {buildProps} [props]
+	 * @param {boolean} can_edit
+	 *
+	 * @returns {jQuery}
+	 */
+	Builder.prototype.staffAvatarBlocks = function(organization_id, entities, props, can_edit) {
+		var self = this;
+		
+		return tmpl('staff-avatar-block', entities.map(function(entity) {
+			
+			return {
+				avatar_block: self.avatarBlocks(entity, props),
+				can_edit: can_edit ? '-can_edit' : ''
+			}
+		})).each(function(i, el) {
+			var data = {
+				user: entities[i]
+			};
+			
+			if (props && props.dataset) {
+				$.extend(data, props.dataset);
+			}
+			
+			$(el).data(data);
+		}).find('.RemoveStaff').on('click.RemoveStaff', function() {
+			var $avatar_block = $(this).closest('.StaffAvatarBlock'),
+				user = $avatar_block.data('user'),
+				$removing = tmpl('staff-avatar-block-removing', {
+					username: [user.first_name, user.last_name].join(' ')
+				});
+			
+			OneOrganization.removeStaff(organization_id, user.id, user.role).done(function() {
+				$avatar_block.after($removing);
+				$avatar_block.detach();
+				
+				$removing.find('.ReturnStaff').on('click', function() {
+					OneOrganization.addStaff(organization_id, user.id, user.role).done(function() {
+						$removing.after($avatar_block);
+						$removing.remove();
+					});
+				});
+			});
+		}).end();
 	};
 	/**
 	 *

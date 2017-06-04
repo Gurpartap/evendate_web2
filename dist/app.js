@@ -161,6 +161,7 @@ __C = {
 };
 /**
  * Extending class
+ *
  * @param {...Function} parents
  * @param {Function} children
  * @return {Function}
@@ -178,6 +179,7 @@ function extending(/**...parents, children*/){
 }
 /**
  * Extending jQuery object
+ *
  * @param {Function} children
  * @return {Function}
  */
@@ -197,6 +199,7 @@ function extendingJQuery(children){
 }
 /**
  * Returns capitalized string
+ *
  * @return {string}
  */
 String.prototype.capitalize = function() {
@@ -204,12 +207,14 @@ String.prototype.capitalize = function() {
 };
 /**
  * Checks if string contains some substring
+ *
  * @param {(string|RegExp)} it
  * @return {boolean}
  */
 String.prototype.contains = function(it) {return this.search(it) !== -1;};
 /**
  * Works like printf. Variables must be inside the {braces}. Returns formatted string
+ *
  * @param {object} fields
  * @return {string}
  */
@@ -220,6 +225,7 @@ String.prototype.format = function(fields) {
 };
 /**
  * Converts {delimiter}-separated string into CamelCase
+ *
  * @param {string} [delimiter=' ']
  * @return {string}
  */
@@ -228,6 +234,7 @@ String.prototype.toCamelCase = function(delimiter) {
 };
 /**
  * Makes CamelCase to_underscore
+ *
  * @return {string}
  */
 String.prototype.toUnderscore = function() {
@@ -246,6 +253,7 @@ String.prototype.appendAjaxData = function(data) {
 };
 /**
  * Returns array of objects` own properties
+ *
  * @param {object} obj
  * @return {Array}
  */
@@ -256,6 +264,7 @@ Object.props = function(obj) {
 };
 /**
  * Returns objects` own properties
+ *
  * @param {object} obj
  * @return {object}
  */
@@ -270,6 +279,7 @@ Object.getProps = function(obj) {
 };
 /**
  * Returns array of objects` own methods
+ *
  * @param {object} obj
  * @return {Array}
  */
@@ -286,6 +296,7 @@ Object.methods = function(obj) {
 if (typeof Object.values !== 'function') {
 	/**
 	 * Returns array of objects` own properties` values
+	 *
 	 * @param {object} obj
 	 * @return {Array}
 	 */
@@ -301,6 +312,7 @@ if (typeof Object.values !== 'function') {
 }
 /**
  * Converts object into string of html data set
+ *
  * @return {string}
  */
 Object.toHtmlDataSet = function() {
@@ -312,6 +324,7 @@ Object.toHtmlDataSet = function() {
 };
 /**
  * Converts object into string of html attributes
+ *
  * @return {string}
  */
 Object.toHtmlAttributes = function() {
@@ -323,6 +336,7 @@ Object.toHtmlAttributes = function() {
 };
 /**
  * Returns copy of original array and appends additional_values
+ *
  * @param {Array} original
  * @param {...(number|string|boolean|object|Array)} [additional_values]
  * @return {Array}
@@ -357,6 +371,7 @@ Array.newFrom = function(original, additional_values) {
 };
 /**
  * Returns string of elements, separated by space
+ *
  * @return {string}
  */
 Array.toSpaceSeparatedString = function() {
@@ -364,6 +379,7 @@ Array.toSpaceSeparatedString = function() {
 };
 /**
  * Cleans array from specific values. If no delete_value is passed, deletes undefined values,
+ *
  * @param {*} [delete_value]
  * @return {Array}
  */
@@ -378,6 +394,7 @@ Array.prototype.clean = function(delete_value) {
 };
 /**
  * Merges arrays without duplicates
+ *
  * @param {...Array} array
  * @return {Array}
  */
@@ -400,6 +417,7 @@ Array.prototype.merge = function(array) {
 };
 /**
  * Checks if array contains some element
+ *
  * @param {*} it
  * @return {boolean}
  */
@@ -437,6 +455,7 @@ if (![].includes) {
 }
 /**
  * Returns rounded num to specific count of decimals
+ *
  * @param {(number|string)} num
  * @param {number} decimals
  * @return {number}
@@ -662,6 +681,7 @@ $.fn.extend({
 	},
 	/**
 	 * jQuery adapter for Tablesort
+	 *
 	 * @memberOf jQuery#
 	 * @param {object} [options]
 	 *
@@ -696,6 +716,7 @@ $.fn.extend({
 	},
 	/**
 	 * Resolving instance from element
+	 *
 	 * @memberOf jQuery#
 	 * @return {*}
 	 */
@@ -705,6 +726,7 @@ $.fn.extend({
 	},
 	/**
 	 * Getting outer HTML string from jQuery collection
+	 *
 	 * @memberOf jQuery#
 	 * @return {string}
 	 */
@@ -718,6 +740,7 @@ $.fn.extend({
 });
 /**
  * Makes jQuery collection from the genuine array of HTML elements or jQuery objects
+ *
  * @param {(Array<Element>|Array<jQuery>|Element)} array
  * @return {jQuery}
  */
@@ -1010,7 +1033,7 @@ jQuery.makeSet = function(array) {
  * @param {string} template_type
  * @param {(object|Array)} [items={}]
  * @param {(jQuery|Element)} [addTo]
- * @param {string} [direction="append"]
+ * @param {string} [direction="append"] - can be "append" or "prepend"
  * @returns {jQuery}
  */
 function tmpl(template_type, items, addTo, direction) {
@@ -1111,6 +1134,9 @@ function tmpl(template_type, items, addTo, direction) {
 	return result;
 }
 /**
+ *
+ * Parses URI and returns object like PHP parse_url function do
+ * @link http://php.net/manual/ru/function.parse-url.php
  *
  * @param {string} str
  * @param {object} [options]
@@ -1232,6 +1258,7 @@ function getGenderText(gender, cases) {
 
 /**
  * Returns formatted array of format variable
+ *
  * @param {(Array<OneDate>|DatesCollection)} dates
  * @param {(string|Array|jQuery|object)} format
  * @param {boolean} [is_same_time=false]
@@ -1427,6 +1454,7 @@ function formatDates(dates, format, is_same_time) {
 }
 /**
  * Cutting out seconds in time string
+ *
  * @param {string} time
  * @return {string}
  */
@@ -1439,6 +1467,7 @@ function trimSeconds(time) {
 }
 /**
  * Returns formatted range of dates
+ *
  * @param {timestamp} first_date
  * @param {timestamp} last_date
  * @returns {string}
@@ -1464,6 +1493,7 @@ function displayDateRange(first_date, last_date) {
 }
 /**
  * Returns formatted times range
+ *
  * @param {string} start_time
  * @param {string} [end_time]
  * @returns {string}
@@ -1481,6 +1511,8 @@ function displayTimeRange(start_time, end_time) {
 	}
 }
 /**
+ *
+ * Returns formatted currency
  *
  * @param {(string|number)} number
  * @param {string} [separator=' ']
@@ -1506,6 +1538,7 @@ function formatCurrency(number, separator, decimal_separator, before, after) {
 		+ (after ? (separator + after) : '');
 }
 /**
+ * Making ticket number more readable ( 999999999 => 999 999 999 )
  *
  * @param {(string|number)} number
  * @return {string}
@@ -1514,7 +1547,8 @@ function formatTicketNumber(number) {
 	return ('' + number).replace(/(\d{3})/g, '$1 ').trim();
 }
 /**
- * Generates guid-like string
+ * Generates guid-like string (actually, it`s not guid, just randomly compiled string)
+ *
  * @return {string}
  */
 function guid() {
@@ -1526,6 +1560,7 @@ function guid() {
 }
 /**
  * Validating form or fieldset
+ *
  * @param {(Element|jQuery)} $form
  * @return {boolean}
  */
@@ -1547,6 +1582,8 @@ function isFormValid($form) {
 }
 /**
  *
+ * Gets filename from url, or empty string, if there is no filename in URL
+ *
  * @param {string} [url]
  * @returns {string}
  */
@@ -1554,6 +1591,8 @@ function getFilenameFromURL(url) {
 	return url ? url.split('\\').pop().split('/').pop() : '';
 }
 /**
+ *
+ * Checks is the argument is base64 encoded string
  *
  * @param {string} string
  * @returns {boolean}
@@ -1563,6 +1602,8 @@ function isBase64(string) {
 }
 /**
  *
+ * Checks is the argument is function
+ *
  * @param {*} variable
  * @return {boolean}
  */
@@ -1570,6 +1611,8 @@ function isFunction(variable) {
 	return (variable && typeof variable === 'function');
 }
 /**
+ *
+ * Returns array of the numbers
  *
  * @param {number} end
  * @param {number} [start]
@@ -3157,6 +3200,147 @@ RegistrationFieldsCollection = extending(EntitiesCollection, (function() {
  * @requires ../Class.OneEntity.js
  */
 /**
+ *
+ * @class OneCategory
+ * @extends OneEntity
+ */
+OneCategory = extending(OneEntity, (function() {
+	/**
+	 *
+	 * @param {(string|number)} [category_id]
+	 * @param {boolean} [is_loading_continuous]
+	 * @constructor
+	 * @constructs OneCategory
+	 *
+	 * @property {(number|string)} id
+	 * @property {string} ?name
+	 * @property {number} ?order_position
+	 * @property {OrganizationsCollection} organizations
+	 */
+	function OneCategory(category_id, is_loading_continuous) {
+		this.id = setDefaultValue(category_id, 0);
+		this.name = null;
+		this.order_position = null;
+		this.organizations = new OrganizationsCollection();
+		
+		this.loading = false;
+		if (category_id && is_loading_continuous) {
+			this.loading = true;
+			this.fetchCategory([], function() {
+				this.loading = false;
+				$(window).trigger('fetch.OneCategory');
+			});
+		}
+	}
+	/**
+	 *
+	 * @param {(string|number)} category_id
+	 * @param {AJAXData} data
+	 * @param {AJAXCallback} [success]
+	 * @return {jqPromise}
+	 */
+	OneCategory.fetchCategory = function(category_id, data, success) {
+		return __APP.SERVER.getData('/api/v1/organizations/types', $.extend({}, data, {id: category_id}), success);
+	};
+	/**
+	 *
+	 * @param {(Array|string)} fields
+	 * @param {AJAXCallback} [success]
+	 * @return {jqPromise}
+	 */
+	OneCategory.prototype.fetchCategory = function(fields, success) {
+		var self = this;
+		return this.constructor.fetchCategory(self.id, {fields: fields}, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data[0]);
+			}
+		});
+	};
+	
+	return OneCategory;
+}()));
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.OneCategory.js
+ */
+/**
+ *
+ * @class CategoriesCollection
+ * @extends EntitiesCollection
+ */
+CategoriesCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs CategoriesCollection
+	 */
+	function CategoriesCollection() {
+		EntitiesCollection.call(this);
+	}
+	
+	CategoriesCollection.prototype.collection_of = OneCategory;
+	/**
+	 *
+	 * @param {AJAXData} data
+	 * @param {AJAXCallback} [success]
+	 */
+	CategoriesCollection.fetchCategories = function(data, success) {
+		return __APP.SERVER.getData('/api/v1/organizations/types', data, success);
+	};
+	/**
+	 *
+	 * @param {AJAXData} data
+	 * @param {(number|string)} [length]
+	 * @param {AJAXCallback} [success]
+	 */
+	CategoriesCollection.prototype.fetchCategories = function(data, length, success) {
+		var self = this,
+			ajax_data = $.extend({}, data, {
+				offset: this.length,
+				length: length
+			});
+		return this.constructor.fetchCategories(ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data);
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {AJAXData} categories_ajax_data
+	 * @param {AJAXData} orgs_ajax_data
+	 * @param {(number|string)} [length]
+	 * @param {AJAXCallback} [success]
+	 */
+	CategoriesCollection.prototype.fetchCategoriesWithOrganizations = function(categories_ajax_data, orgs_ajax_data, length, success) {
+		var self = this,
+			ajax_data = $.extend({}, categories_ajax_data, {
+				offset: this.length,
+				length: length
+			}),
+			org_field = 'organizations' + JSON.stringify(__APP.SERVER.validateData(orgs_ajax_data));
+		if (!ajax_data.fields) {
+			ajax_data.fields = [];
+		} else if (!Array.isArray(ajax_data.fields)) {
+			ajax_data.fields = ajax_data.fields.split(',');
+		}
+		ajax_data.fields.push(org_field);
+		return this.constructor.fetchCategories(ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data);
+			}
+		});
+	};
+	
+	return CategoriesCollection;
+}()));
+/**
+ * @requires ../Class.OneEntity.js
+ */
+/**
  * @abstract
  * @class OneAbstractActivity
  * @extends OneEntity
@@ -3340,147 +3524,6 @@ UsersActivitiesCollection = extending(EntitiesCollection, (function() {
 	};
 	
 	return UsersActivitiesCollection;
-}()));
-/**
- * @requires ../Class.OneEntity.js
- */
-/**
- *
- * @class OneCategory
- * @extends OneEntity
- */
-OneCategory = extending(OneEntity, (function() {
-	/**
-	 *
-	 * @param {(string|number)} [category_id]
-	 * @param {boolean} [is_loading_continuous]
-	 * @constructor
-	 * @constructs OneCategory
-	 *
-	 * @property {(number|string)} id
-	 * @property {string} ?name
-	 * @property {number} ?order_position
-	 * @property {OrganizationsCollection} organizations
-	 */
-	function OneCategory(category_id, is_loading_continuous) {
-		this.id = setDefaultValue(category_id, 0);
-		this.name = null;
-		this.order_position = null;
-		this.organizations = new OrganizationsCollection();
-		
-		this.loading = false;
-		if (category_id && is_loading_continuous) {
-			this.loading = true;
-			this.fetchCategory([], function() {
-				this.loading = false;
-				$(window).trigger('fetch.OneCategory');
-			});
-		}
-	}
-	/**
-	 *
-	 * @param {(string|number)} category_id
-	 * @param {AJAXData} data
-	 * @param {AJAXCallback} [success]
-	 * @return {jqPromise}
-	 */
-	OneCategory.fetchCategory = function(category_id, data, success) {
-		return __APP.SERVER.getData('/api/v1/organizations/types', $.extend({}, data, {id: category_id}), success);
-	};
-	/**
-	 *
-	 * @param {(Array|string)} fields
-	 * @param {AJAXCallback} [success]
-	 * @return {jqPromise}
-	 */
-	OneCategory.prototype.fetchCategory = function(fields, success) {
-		var self = this;
-		return this.constructor.fetchCategory(self.id, {fields: fields}, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data[0]);
-			}
-		});
-	};
-	
-	return OneCategory;
-}()));
-/**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneCategory.js
- */
-/**
- *
- * @class CategoriesCollection
- * @extends EntitiesCollection
- */
-CategoriesCollection = extending(EntitiesCollection, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs CategoriesCollection
-	 */
-	function CategoriesCollection() {
-		EntitiesCollection.call(this);
-	}
-	
-	CategoriesCollection.prototype.collection_of = OneCategory;
-	/**
-	 *
-	 * @param {AJAXData} data
-	 * @param {AJAXCallback} [success]
-	 */
-	CategoriesCollection.fetchCategories = function(data, success) {
-		return __APP.SERVER.getData('/api/v1/organizations/types', data, success);
-	};
-	/**
-	 *
-	 * @param {AJAXData} data
-	 * @param {(number|string)} [length]
-	 * @param {AJAXCallback} [success]
-	 */
-	CategoriesCollection.prototype.fetchCategories = function(data, length, success) {
-		var self = this,
-			ajax_data = $.extend({}, data, {
-				offset: this.length,
-				length: length
-			});
-		return this.constructor.fetchCategories(ajax_data, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data);
-			}
-		});
-	};
-	/**
-	 *
-	 * @param {AJAXData} categories_ajax_data
-	 * @param {AJAXData} orgs_ajax_data
-	 * @param {(number|string)} [length]
-	 * @param {AJAXCallback} [success]
-	 */
-	CategoriesCollection.prototype.fetchCategoriesWithOrganizations = function(categories_ajax_data, orgs_ajax_data, length, success) {
-		var self = this,
-			ajax_data = $.extend({}, categories_ajax_data, {
-				offset: this.length,
-				length: length
-			}),
-			org_field = 'organizations' + JSON.stringify(__APP.SERVER.validateData(orgs_ajax_data));
-		if (!ajax_data.fields) {
-			ajax_data.fields = [];
-		} else if (!Array.isArray(ajax_data.fields)) {
-			ajax_data.fields = ajax_data.fields.split(',');
-		}
-		ajax_data.fields.push(org_field);
-		return this.constructor.fetchCategories(ajax_data, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data);
-			}
-		});
-	};
-	
-	return CategoriesCollection;
 }()));
 /**
  * @requires ../Class.OneEntity.js
@@ -4178,6 +4221,7 @@ EventsCollection = extending(EntitiesCollection, (function() {
 				offset: this.length,
 				length: length
 			});
+		
 		switch (kind) {
 			default: {
 				method_name = 'fetchEvents';
@@ -4196,9 +4240,10 @@ EventsCollection = extending(EntitiesCollection, (function() {
 				break;
 			}
 		}
+		
 		return this.constructor[method_name](ajax_data, function(data) {
 			self.setData(data);
-			if (success && typeof success === 'function') {
+			if (isFunction(success)) {
 				success.call(self, self.last_pushed);
 			}
 		});
@@ -4207,19 +4252,21 @@ EventsCollection = extending(EntitiesCollection, (function() {
 	 *
 	 * @param {(Fields|Array|string)} [fields]
 	 * @param {(number|string)} [length]
+	 * @param {EventsCollectionAJAXData} [filters]
 	 * @param {EventsCollectionAJAXCallback} [success]
 	 * @returns {jqPromise}
 	 */
-	EventsCollection.prototype.fetchFeed = function(fields, length, success) {
+	EventsCollection.prototype.fetchFeed = function(fields, length, filters, success) {
 		var self = this,
-			ajax_data = {
+			ajax_data = $.extend({
 				fields: fields,
 				offset: this.length,
 				length: length
-			};
+			}, filters);
+		
 		return this.constructor.fetchEvents(ajax_data, function(data) {
 			self.setData(data);
-			if (success && typeof success === 'function') {
+			if (isFunction(success)) {
 				success.call(self, self.last_pushed);
 			}
 		});
@@ -4369,16 +4416,17 @@ DayEventsCollection = extending(EventsCollection, (function() {
 	 *
 	 * @override
 	 */
-	DayEventsCollection.prototype.fetchFeed = function(fields, length, success) {
+	DayEventsCollection.prototype.fetchFeed = function(fields, length, filters, success) {
 		var self = this,
-			ajax_data = {
+			ajax_data = $.extend({
 				fields: fields,
 				offset: this.length,
 				length: length
-			};
+			}, filters);
+		
 		return this.constructor.fetchEvents(this.date, ajax_data, function(data) {
 			self.setData(data);
-			if (success && typeof success == 'function') {
+			if (isFunction(success)) {
 				success.call(self, data);
 			}
 		});
@@ -4886,247 +4934,6 @@ OrdersCollection = extending(EntitiesCollection, (function() {
 	return OrdersCollection;
 }()));
 /**
- * @typedef {object} StatisticsUnit
- * @property {number} time_value
- * @property {number} value
- */
-/**
- * @typedef {StatisticsUnit} StatisticsConversionUnit
- * @property {number} to
- * @property {number} with
- */
-/**
- * @typedef {object} StatisticsAudience
- * @property {Array<{name: {string}, count: {number}}>} devices
- * @property {Array<{gender: {?string}, count: {number}}>} gender
- */
-/**
- * @typedef {object} StatisticsStdData
- * @property {Statistics.SCALES} [scale]
- * @property {string} [since]
- * @property {string} [till]
- */
-/**
- * @abstract
- * @class Statistics
- * @implements EntityInterface
- */
-Statistics = (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs Statistics
-	 *
-	 * @property {(number|string)} id
-	 * @property {Statistics.ENTITIES} entity
-	 * @property {Array<StatisticsUnit>} view
-	 * @property {Array<StatisticsUnit>} fave
-	 * @property {Array<StatisticsUnit>} unfave
-	 * @property {Array<StatisticsUnit>} notifications_sent
-	 * @property {Array<StatisticsUnit>} notifications_sent
-	 * @property {Object} dynamics
-	 * @property  {Array<StatisticsUnit>} dynamics.view
-	 * @property  {Array<StatisticsUnit>} dynamics.fave
-	 */
-	function Statistics() {
-		this.id = 0;
-		this.entity = null;
-		this.view = [];
-		this.fave = [];
-		this.unfave = [];
-		this.notifications_sent = [];
-		
-		this.dynamics = {
-			view: [],
-			fave: []
-		};
-	}
-	/**
-	 *
-	 * @param {(Array|object)} data
-	 * @returns {Statistics}
-	 */
-	Statistics.prototype.setData = function(data) {
-		return $.extend(true, this, (data instanceof Array) ? data[0] : data);
-	};
-	/**
-	 * @const
-	 * @enum {string}
-	 */
-	Statistics.SCALES = {
-		MINUTE: 'minute',
-		HOUR: 'hour',
-		DAY: 'day',
-		WEEK: 'week',
-		MONTH: 'month',
-		YEAR: 'year',
-		OVERALL: 'overall'
-	};
-	/**
-	 * @const
-	 * @enum {string}
-	 */
-	Statistics.ENTITIES = {
-		EVENT: 'events',
-		ORGANIZATION: 'organizations'
-	};
-	/**
-	 * @static
-	 * @param {Statistics.ENTITIES} entity
-	 * @param {(string|number)} id
-	 * @param {Statistics.SCALES} scale
-	 * @param {(string|object|boolean)} range
-	 * @param {string} range.since
-	 * @param {string} [range.till]
-	 * @param {(Array<string>|object<string, StatisticsStdData>)} statistics_fields
-	 * @param {?StatisticsStdData} [dynamics_ajax_data]
-	 * @param {(Array<string>|string)} [dynamics_ajax_data.fields]
-	 * @param {function} [success]
-	 * @return {jqPromise}
-	 */
-	Statistics.fetchStatistics = function(entity, id, scale, range, statistics_fields, dynamics_ajax_data, success) {
-		var data = {
-			scale: scale,
-			fields: []
-		};
-		if (statistics_fields instanceof Array) {
-			data.fields = data.fields.concat(statistics_fields);
-		} else {
-			$.each(statistics_fields, function(field, options) {
-				if (Object.getOwnPropertyNames(options).length) {
-					data.fields.push(field + JSON.stringify(options));
-				} else {
-					data.fields.push(field);
-				}
-			});
-		}
-		if (dynamics_ajax_data) {
-			data.fields.push('dynamics' + JSON.stringify(__APP.SERVER.validateData(dynamics_ajax_data)));
-		}
-		
-		switch (typeof range) {
-			case 'string': {
-				if (range) data.since = range;
-				break;
-			}
-			case 'object': {
-				if (range.since) data.since = range.since;
-				if (range.till) data.till = range.till;
-				break;
-			}
-			default:
-			case 'boolean': break;
-		}
-		
-		return __APP.SERVER.getData('/api/v1/statistics/' + entity + '/' + id, data, success);
-	};
-	/**
-	 *
-	 * @param {Statistics.SCALES} scale
-	 * @param {(string|object|boolean)} range
-	 * @param {string} range.since
-	 * @param {string} [range.till]
-	 * @param {object<string, StatisticsStdData>} statistics_fields
-	 * @param {?object} dynamics_ajax_data
-	 * @param {Statistics.SCALES} [dynamics_ajax_data.scale]
-	 * @param {string} [dynamics_ajax_data.since]
-	 * @param {string} [dynamics_ajax_data.till]
-	 * @param {function} [success]
-	 * @return {jqPromise}
-	 */
-	Statistics.prototype.fetchStatistics = function(scale, range, statistics_fields, dynamics_ajax_data, success) {
-		var self = this;
-		return Statistics.fetchStatistics(this.entity, this.id, scale, range, statistics_fields, dynamics_ajax_data, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data);
-			}
-		});
-	};
-	
-	return Statistics;
-}());
-/**
- * @requires Class.Statistics.js
- */
-/**
- *
- * @class EventStatistics
- * @extends Statistics
- */
-EventStatistics = extending(Statistics, (function() {
-	/**
-	 *
-	 * @param {(string|number)} event_id
-	 * @constructor
-	 * @constructs EventStatistics
-	 *
-	 * @property {Array<StatisticsUnit>} open_site
-	 * @property {Array<StatisticsUnit>} view_detail
-	 * @property {Array<StatisticsConversionUnit>} open_conversion
-	 * @property {Array<StatisticsConversionUnit>} fave_conversion
-	 * @property {Object} dynamics
-	 * @property  {Array<StatisticsConversionUnit>} dynamics.fave_conversion
-	 * @property  {Array<StatisticsConversionUnit>} dynamics.open_conversion
-	 */
-	function EventStatistics(event_id) {
-		Statistics.apply(this);
-		
-		this.id = event_id;
-		this.entity = Statistics.ENTITIES.EVENT;
-		
-		this.open_site = [];
-		this.view_detail = [];
-		
-		this.open_conversion = [];
-		this.fave_conversion = [];
-		this.dynamics.fave_conversion = [];
-		this.dynamics.open_conversion = [];
-	}
-	
-	return EventStatistics;
-}()));
-/**
- * @requires Class.Statistics.js
- */
-/**
- *
- * @class OrganizationsStatistics
- * @extends Statistics
- */
-OrganizationsStatistics = extending(Statistics, (function() {
-	/**
-	 *
-	 * @param {(string|number)} organization_id
-	 * @constructor
-	 * @constructs OrganizationsStatistics
-	 *
-	 * @property {Array<StatisticsUnit>} subscribe
-	 * @property {Array<StatisticsUnit>} unsubscribe
-	 * @property {Array<StatisticsConversionUnit>} conversion
-	 * @property {StatisticsAudience} audience
-	 * @property {Object} dynamics
-	 * @property  {Array<StatisticsUnit>} dynamics.subscribe
-	 * @property  {Array<StatisticsConversionUnit>} dynamics.conversion
-	 */
-	function OrganizationsStatistics(organization_id) {
-		Statistics.apply(this);
-		
-		this.id = organization_id;
-		this.entity = Statistics.ENTITIES.ORGANIZATION;
-		
-		this.subscribe = [];
-		this.unsubscribe = [];
-		this.conversion = [];
-		this.audience = {};
-		
-		this.dynamics.subscribe = [];
-		this.dynamics.conversion = [];
-	}
-	
-	return OrganizationsStatistics;
-}()));
-/**
  * @requires ../Class.OneEntity.js
  */
 /**
@@ -5173,7 +4980,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 * @property {UsersCollection} subscribed
 	 *
 	 * @property {Array<Privilege>} privileges
-	 * @property {?string} role
+	 * @property {?OneUser.ROLE} role
 	 * @property {TariffModel} tariff
 	 *
 	 * @property {UsersCollection} staff
@@ -5693,6 +5500,247 @@ SearchResults = extending(OneEntity, (function() {
 	};
 	
 	return SearchResults;
+}()));
+/**
+ * @typedef {object} StatisticsUnit
+ * @property {number} time_value
+ * @property {number} value
+ */
+/**
+ * @typedef {StatisticsUnit} StatisticsConversionUnit
+ * @property {number} to
+ * @property {number} with
+ */
+/**
+ * @typedef {object} StatisticsAudience
+ * @property {Array<{name: {string}, count: {number}}>} devices
+ * @property {Array<{gender: {?string}, count: {number}}>} gender
+ */
+/**
+ * @typedef {object} StatisticsStdData
+ * @property {Statistics.SCALES} [scale]
+ * @property {string} [since]
+ * @property {string} [till]
+ */
+/**
+ * @abstract
+ * @class Statistics
+ * @implements EntityInterface
+ */
+Statistics = (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs Statistics
+	 *
+	 * @property {(number|string)} id
+	 * @property {Statistics.ENTITIES} entity
+	 * @property {Array<StatisticsUnit>} view
+	 * @property {Array<StatisticsUnit>} fave
+	 * @property {Array<StatisticsUnit>} unfave
+	 * @property {Array<StatisticsUnit>} notifications_sent
+	 * @property {Array<StatisticsUnit>} notifications_sent
+	 * @property {Object} dynamics
+	 * @property  {Array<StatisticsUnit>} dynamics.view
+	 * @property  {Array<StatisticsUnit>} dynamics.fave
+	 */
+	function Statistics() {
+		this.id = 0;
+		this.entity = null;
+		this.view = [];
+		this.fave = [];
+		this.unfave = [];
+		this.notifications_sent = [];
+		
+		this.dynamics = {
+			view: [],
+			fave: []
+		};
+	}
+	/**
+	 *
+	 * @param {(Array|object)} data
+	 * @returns {Statistics}
+	 */
+	Statistics.prototype.setData = function(data) {
+		return $.extend(true, this, (data instanceof Array) ? data[0] : data);
+	};
+	/**
+	 * @const
+	 * @enum {string}
+	 */
+	Statistics.SCALES = {
+		MINUTE: 'minute',
+		HOUR: 'hour',
+		DAY: 'day',
+		WEEK: 'week',
+		MONTH: 'month',
+		YEAR: 'year',
+		OVERALL: 'overall'
+	};
+	/**
+	 * @const
+	 * @enum {string}
+	 */
+	Statistics.ENTITIES = {
+		EVENT: 'events',
+		ORGANIZATION: 'organizations'
+	};
+	/**
+	 * @static
+	 * @param {Statistics.ENTITIES} entity
+	 * @param {(string|number)} id
+	 * @param {Statistics.SCALES} scale
+	 * @param {(string|object|boolean)} range
+	 * @param {string} range.since
+	 * @param {string} [range.till]
+	 * @param {(Array<string>|object<string, StatisticsStdData>)} statistics_fields
+	 * @param {?StatisticsStdData} [dynamics_ajax_data]
+	 * @param {(Array<string>|string)} [dynamics_ajax_data.fields]
+	 * @param {function} [success]
+	 * @return {jqPromise}
+	 */
+	Statistics.fetchStatistics = function(entity, id, scale, range, statistics_fields, dynamics_ajax_data, success) {
+		var data = {
+			scale: scale,
+			fields: []
+		};
+		if (statistics_fields instanceof Array) {
+			data.fields = data.fields.concat(statistics_fields);
+		} else {
+			$.each(statistics_fields, function(field, options) {
+				if (Object.getOwnPropertyNames(options).length) {
+					data.fields.push(field + JSON.stringify(options));
+				} else {
+					data.fields.push(field);
+				}
+			});
+		}
+		if (dynamics_ajax_data) {
+			data.fields.push('dynamics' + JSON.stringify(__APP.SERVER.validateData(dynamics_ajax_data)));
+		}
+		
+		switch (typeof range) {
+			case 'string': {
+				if (range) data.since = range;
+				break;
+			}
+			case 'object': {
+				if (range.since) data.since = range.since;
+				if (range.till) data.till = range.till;
+				break;
+			}
+			default:
+			case 'boolean': break;
+		}
+		
+		return __APP.SERVER.getData('/api/v1/statistics/' + entity + '/' + id, data, success);
+	};
+	/**
+	 *
+	 * @param {Statistics.SCALES} scale
+	 * @param {(string|object|boolean)} range
+	 * @param {string} range.since
+	 * @param {string} [range.till]
+	 * @param {object<string, StatisticsStdData>} statistics_fields
+	 * @param {?object} dynamics_ajax_data
+	 * @param {Statistics.SCALES} [dynamics_ajax_data.scale]
+	 * @param {string} [dynamics_ajax_data.since]
+	 * @param {string} [dynamics_ajax_data.till]
+	 * @param {function} [success]
+	 * @return {jqPromise}
+	 */
+	Statistics.prototype.fetchStatistics = function(scale, range, statistics_fields, dynamics_ajax_data, success) {
+		var self = this;
+		return Statistics.fetchStatistics(this.entity, this.id, scale, range, statistics_fields, dynamics_ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data);
+			}
+		});
+	};
+	
+	return Statistics;
+}());
+/**
+ * @requires Class.Statistics.js
+ */
+/**
+ *
+ * @class EventStatistics
+ * @extends Statistics
+ */
+EventStatistics = extending(Statistics, (function() {
+	/**
+	 *
+	 * @param {(string|number)} event_id
+	 * @constructor
+	 * @constructs EventStatistics
+	 *
+	 * @property {Array<StatisticsUnit>} open_site
+	 * @property {Array<StatisticsUnit>} view_detail
+	 * @property {Array<StatisticsConversionUnit>} open_conversion
+	 * @property {Array<StatisticsConversionUnit>} fave_conversion
+	 * @property {Object} dynamics
+	 * @property  {Array<StatisticsConversionUnit>} dynamics.fave_conversion
+	 * @property  {Array<StatisticsConversionUnit>} dynamics.open_conversion
+	 */
+	function EventStatistics(event_id) {
+		Statistics.apply(this);
+		
+		this.id = event_id;
+		this.entity = Statistics.ENTITIES.EVENT;
+		
+		this.open_site = [];
+		this.view_detail = [];
+		
+		this.open_conversion = [];
+		this.fave_conversion = [];
+		this.dynamics.fave_conversion = [];
+		this.dynamics.open_conversion = [];
+	}
+	
+	return EventStatistics;
+}()));
+/**
+ * @requires Class.Statistics.js
+ */
+/**
+ *
+ * @class OrganizationsStatistics
+ * @extends Statistics
+ */
+OrganizationsStatistics = extending(Statistics, (function() {
+	/**
+	 *
+	 * @param {(string|number)} organization_id
+	 * @constructor
+	 * @constructs OrganizationsStatistics
+	 *
+	 * @property {Array<StatisticsUnit>} subscribe
+	 * @property {Array<StatisticsUnit>} unsubscribe
+	 * @property {Array<StatisticsConversionUnit>} conversion
+	 * @property {StatisticsAudience} audience
+	 * @property {Object} dynamics
+	 * @property  {Array<StatisticsUnit>} dynamics.subscribe
+	 * @property  {Array<StatisticsConversionUnit>} dynamics.conversion
+	 */
+	function OrganizationsStatistics(organization_id) {
+		Statistics.apply(this);
+		
+		this.id = organization_id;
+		this.entity = Statistics.ENTITIES.ORGANIZATION;
+		
+		this.subscribe = [];
+		this.unsubscribe = [];
+		this.conversion = [];
+		this.audience = {};
+		
+		this.dynamics.subscribe = [];
+		this.dynamics.conversion = [];
+	}
+	
+	return OrganizationsStatistics;
 }()));
 /**
  * @requires ../Class.OneEntity.js
@@ -10946,6 +10994,7 @@ Builder = (function() {
 	 * @param {__C.ENTITIES} [props.entity]
 	 * @param {(Array<string>|string)} [props.avatar_classes]
 	 * @param {(Array<string>|string)} [props.block_classes]
+	 *
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.avatarBlocks = function buildAvatarBlocks(entities, props) {
@@ -10981,6 +11030,54 @@ Builder = (function() {
 				name: name
 			}, props);
 		}));
+	};
+	/**
+	 *
+	 * @param {(string|number)} organization_id
+	 * @param {(OneUser|UsersCollection|Array)} entities
+	 * @param {buildProps} [props]
+	 * @param {boolean} can_edit
+	 *
+	 * @returns {jQuery}
+	 */
+	Builder.prototype.staffAvatarBlocks = function(organization_id, entities, props, can_edit) {
+		var self = this;
+		
+		return tmpl('staff-avatar-block', entities.map(function(entity) {
+			
+			return {
+				avatar_block: self.avatarBlocks(entity, props),
+				can_edit: can_edit ? '-can_edit' : ''
+			}
+		})).each(function(i, el) {
+			var data = {
+				user: entities[i]
+			};
+			
+			if (props && props.dataset) {
+				$.extend(data, props.dataset);
+			}
+			
+			$(el).data(data);
+		}).find('.RemoveStaff').on('click.RemoveStaff', function() {
+			var $avatar_block = $(this).closest('.StaffAvatarBlock'),
+				user = $avatar_block.data('user'),
+				$removing = tmpl('staff-avatar-block-removing', {
+					username: [user.first_name, user.last_name].join(' ')
+				});
+			
+			OneOrganization.removeStaff(organization_id, user.id, user.role).done(function() {
+				$avatar_block.after($removing);
+				$avatar_block.detach();
+				
+				$removing.find('.ReturnStaff').on('click', function() {
+					OneOrganization.addStaff(organization_id, user.id, user.role).done(function() {
+						$removing.after($avatar_block);
+						$removing.remove();
+					});
+				});
+			});
+		}).end();
 	};
 	/**
 	 *
@@ -14462,11 +14559,14 @@ AdminOrganizationOverviewPage = extending(AdminOrganizationPage, (function() {
 	/**
 	 *
 	 * @param {(string|number)} org_id
+	 *
 	 * @constructor
 	 * @constructs AdminOrganizationOverviewPage
+	 *
+	 * @property {OneOrganization} organization
 	 */
 	function AdminOrganizationOverviewPage(org_id) {
-		AdminOrganizationPage.apply(this, arguments);
+		AdminOrganizationPage.call(this, org_id);
 		this.graphics_stats = new OrganizationsStatistics(this.id);
 		this.other_stats = new OrganizationsStatistics(this.id);
 		
@@ -14487,17 +14587,19 @@ AdminOrganizationOverviewPage = extending(AdminOrganizationPage, (function() {
 	}
 	/**
 	 *
+	 * @param {(string|number)} org_id
 	 * @param {string} title
 	 * @param staff
+	 * @param {OneUser.ROLE} user_role
 	 * @return {jQuery}
 	 */
-	AdminOrganizationOverviewPage.buildStaffBlock = function(title, staff) {
+	AdminOrganizationOverviewPage.buildStaffBlock = function(org_id, title, staff, user_role) {
 		if (staff.length) {
-			return tmpl('orgstat-overview-sidebar-wrapper-title', {title: title}).add(__APP.BUILD.avatarBlocks(staff, {
+			return tmpl('orgstat-overview-sidebar-wrapper-title', {title: title}).add(__APP.BUILD.staffAvatarBlocks(org_id, staff, {
 				is_link: true,
 				entity: __C.ENTITIES.USER,
 				avatar_classes: [__C.CLASSES.SIZES.X40, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]
-			}));
+			}, user_role === OneUser.ROLE.ADMIN));
 		}
 		return $();
 	};
@@ -14627,8 +14729,8 @@ AdminOrganizationOverviewPage = extending(AdminOrganizationPage, (function() {
 				entity: __C.ENTITIES.ORGANIZATION,
 				block_classes: ['-stack']
 			}),
-			staff_block: AdminOrganizationOverviewPage.buildStaffBlock('Администраторы', this.organization.admins.map(extendStaffProps))
-			                                          .add(AdminOrganizationOverviewPage.buildStaffBlock('Модераторы', this.organization.moderators.map(extendStaffProps))),
+			staff_block: AdminOrganizationOverviewPage.buildStaffBlock(this.organization.id, 'Администраторы', this.organization.admins.map(extendStaffProps), this.organization.role)
+			                                          .add(AdminOrganizationOverviewPage.buildStaffBlock(this.organization.id, 'Модераторы', this.organization.moderators.map(extendStaffProps), this.organization.role)),
 			event_blocks: this.organization.events.length ? tmpl('orgstat-overview-sidebar-wrapper', {
 				content: tmpl('orgstat-overview-sidebar-wrapper-title', {title: 'Предстоящие события'})
 					.add(tmpl('orgstat-event-block', this.organization.events.map(function(event) {
@@ -14724,6 +14826,8 @@ AdminOrganizationSettingsPage = extending(AdminOrganizationPage, (function() {
 	 * @param {(string|number)} org_id
 	 * @constructor
 	 * @constructs AdminOrganizationSettingsPage
+	 *
+	 * @property {OneOrganization} organization
 	 */
 	function AdminOrganizationSettingsPage(org_id) {
 		var self = this;
@@ -14757,6 +14861,24 @@ AdminOrganizationSettingsPage = extending(AdminOrganizationPage, (function() {
 			}
 		);
 	}
+	
+	/**
+	 *
+	 * @param {(string|number)} org_id
+	 * @param {(OneUser|UsersCollection|Array)} staff
+	 * @param {OneUser.ROLE} role
+	 * @param {OneUser.ROLE} user_role
+	 *
+	 * @returns {jQuery}
+	 */
+	AdminOrganizationSettingsPage.buildStaffBlock = function(org_id, staff, role, user_role) {
+		return __APP.BUILD.staffAvatarBlocks(org_id, staff, {
+			is_link: true,
+			avatar_classes: [__C.CLASSES.SIZES.X40, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]
+		}, user_role === OneUser.ROLE.ADMIN).add(__APP.BUILD.addUserAvatarBlock(org_id, role, {
+			avatar_classes: [__C.CLASSES.SIZES.X40, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]
+		}));
+	};
 	/**
 	 *
 	 * @returns {jqPromise}
@@ -14827,10 +14949,8 @@ AdminOrganizationSettingsPage = extending(AdminOrganizationPage, (function() {
 		}, this.organization.short_name + ' - настройки']);
 		
 		this.$wrapper.html(tmpl('admin-organization-settings-page', $.extend({}, this.organization, {
-			admin_avatar_blocks: __APP.BUILD.avatarBlocks(this.organization.admins, staffs_additional_fields)
-			                          .add(__APP.BUILD.addUserAvatarBlock(this.organization.id, OneUser.ROLE.ADMIN, {avatar_classes: [__C.CLASSES.SIZES.X40, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]})),
-			moderator_avatar_blocks: __APP.BUILD.avatarBlocks(this.organization.moderators, staffs_additional_fields)
-			                              .add(__APP.BUILD.addUserAvatarBlock(this.organization.id, OneUser.ROLE.MODERATOR, {avatar_classes: [__C.CLASSES.SIZES.X40, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]})),
+			admin_avatar_blocks: AdminOrganizationSettingsPage.buildStaffBlock(this.organization.id, this.organization.admins, OneUser.ROLE.ADMIN, this.organization.role),
+			moderator_avatar_blocks: AdminOrganizationSettingsPage.buildStaffBlock(this.organization.id, this.organization.moderators, OneUser.ROLE.MODERATOR, this.organization.role),
 			private_checkbox: __APP.BUILD.checkbox({
 				id: 'org_admin_settings_is_private',
 				name: 'is_private',
@@ -14934,6 +15054,7 @@ FeedPage = extending(Page, (function() {
 		);
 		this.events = new EventsCollection();
 		this.next_events_length = 10;
+		this.cities = new CitiesCollection();
 		this.wrapper_tmpl = 'feed';
 		this.with_header_tabs = true;
 	}
@@ -14993,7 +15114,7 @@ FeedPage = extending(Page, (function() {
 		
 		PAGE.block_scroll = true;
 		
-		return PAGE.events.fetchFeed(this.fields, this.next_events_length, function(events) {
+		return PAGE.events.fetchFeed(this.fields, this.next_events_length, {city_id: __APP.USER.selected_city.id}, function(events) {
 			var $events = __APP.BUILD.eventCards(PAGE.events.last_pushed);
 			
 			PAGE.block_scroll = false;
@@ -15037,12 +15158,38 @@ FeedPage = extending(Page, (function() {
 		});
 	};
 	
+	FeedPage.prototype.initCitySelect = function() {
+		var PAGE = this;
+		
+		PAGE.cities.fetchCities(null, 0, 'distance,local_name').done(function() {
+			
+			PAGE.$view.find('.FeedCitiesSelect')
+			    .html(tmpl('option', PAGE.cities.map(function(city) {
+				    return {
+					    val: city.id,
+					    display_name: city.local_name
+				    };
+			    })))
+			    .select2({
+				    containerCssClass: 'form_select2',
+				    dropdownCssClass: 'form_select2_drop'
+			    })
+			    .select2('val', __APP.USER.selected_city.id)
+			    .off('change.SelectCity')
+			    .on('change.SelectCity', function() {
+				    __APP.USER.selected_city = PAGE.cities.getByID($(this).val());
+				    __APP.reload();
+			    });
+		});
+	};
+	
 	FeedPage.prototype.render = function() {
 		var PAGE = this,
 			$window = $(window);
 		
 		if (!(__APP.PREVIOUS_PAGE instanceof FeedPage)) {
 			PAGE.initFeedCalendar();
+			PAGE.initCitySelect();
 		}
 		
 		if(__APP.USER.isLoggedOut()){
@@ -15058,7 +15205,7 @@ FeedPage = extending(Page, (function() {
 				
 				return false;
 			});
-			if(window.location.pathname == '/feed/favored' || window.location.pathname == '/feed/recommendations'){
+			if(window.location.pathname === '/feed/favored' || window.location.pathname === '/feed/recommendations'){
 				__APP.changeState('/feed/actual', true, true);
 				return null;
 			}
@@ -16078,7 +16225,10 @@ CatalogPage = extending(Page, (function() {
 			containerCssClass: 'form_select2',
 			dropdownCssClass: 'form_select2_drop'
 		}).off('change.SelectCity').on('change.SelectCity', function() {
-			__APP.changeState('/organizations/at/' + PAGE.cities.getByID($(this).val()).en_name, true, true);
+			var selected_city = PAGE.cities.getByID($(this).val());
+			
+			__APP.USER.selected_city = selected_city;
+			__APP.changeState('/organizations/at/' + selected_city.en_name, true, true);
 		});
 		if (PAGE.selected_city_name) {
 			$organizations_cities_select.select2('val', PAGE.cities.getByName(PAGE.selected_city_name).id);
@@ -16327,7 +16477,6 @@ OrganizationPage = extending(Page, (function() {
 			$subscribers_scroll.scrollbar({
 				disableBodyScroll: true,
 				onScroll: function(y) {
-					debugger;
 					var $loader,
 						last_is_friend = PAGE.organization.subscribed.last_pushed[PAGE.organization.subscribed.last_pushed.length - 1].is_friend;
 					
@@ -17081,10 +17230,11 @@ ServerConnection = (function() {
 		
 		return jqXHR.fail(error).then(function(response, status_text, jqXHR) {
 			ajaxHandler(response, function(data, text) {
-				if (success && typeof success === 'function') {
+				if (isFunction(success)) {
 					success(data);
 				}
 			}, ServerConnection.ajaxErrorHandler);
+			
 			return response.data;
 		}).promise();
 	};
@@ -17162,7 +17312,7 @@ ServerConnection = (function() {
 	 * @returns {jqPromise}
 	 */
 	ServerConnection.prototype.deleteData = function(url, ajax_data, success, error) {
-		return this.dealAjax(ServerConnection.HTTP_METHODS.DELETE, url, ajax_data, 'application/json', success, error);
+		return this.dealAjax(ServerConnection.HTTP_METHODS.DELETE, url + '?' + $.param(ajax_data), {}, 'application/json', success, error);
 	};
 	/**
 	 *

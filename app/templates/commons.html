@@ -82,6 +82,19 @@
 	</{html_tag}>
 </script>
 
+<script type="javascript/template" id="tmpl-staff-avatar-block">
+	<div class="staff_avatar_block {can_edit} StaffAvatarBlock">
+		{avatar_block}
+		<span class="staff_avatar_remove RemoveStaff">×</span>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-staff-avatar-block-removing">
+	<div class="staff_avatar_block">
+		<span class="staff_avatar_block_return">{username} удален(а) из списка. Хотите <span class="action -color_accent -no_uppercase ReturnStaff">вернуть</span>?</span>
+	</div>
+</script>
+
 <script type="javascript/template" id="tmpl-avatars-collection">
 	<div class="avatars_collection AvatarsCollection {classes}" {dataset}>{avatars}</div>
 	<span class="counter {counter_classes}">+<span class="FavoredCount">{more_avatars_count}</span></span>
