@@ -34,7 +34,7 @@
 				<span class="Text">{number}</span>
 			</div>
 		</td>
-		<td><span class="order_status -order_status_{status_type_code}">{status_text}</span></td>
+		<td>{status}</td>
 		<td>{orderer}</td>
 		<td>{email}</td>
 		<td>{buy_time}</td>
@@ -53,7 +53,7 @@
 
 <script type="javascript/template" id="tmpl-admin-event-orders-page-ticket-row">
 	<tr>
-		<td class="child_ladder">{number}</td>
+		<td class="child_ladder">Билет {number}</td>
 		<td>{ticket_type_name}</td>
 		<td>{price}</td>
 		<td><small class="-transform_uppercase -text_color_marginal">{used}</small></td>

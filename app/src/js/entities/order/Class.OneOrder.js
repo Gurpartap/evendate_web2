@@ -17,6 +17,7 @@ OneOrder = extending(OneEntity, (function() {
 	 *
 	 * @property {?(string|number)} uuid
 	 * @property {?(string|number)} user_id
+	 * @property {?(string|number)} number
 	 * @property {?string} order_content
 	 * @property {?boolean} is_canceled
 	 * @property {?number} status_id
@@ -35,6 +36,7 @@ OneOrder = extending(OneEntity, (function() {
 		
 		this.uuid = setDefaultValue(uuid, 0);
 		this.event_id = setDefaultValue(event_id, 0);
+		this.number = null;
 		this.order_content = null;
 		this.is_canceled = null;
 		this.status_id = null;

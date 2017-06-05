@@ -27,7 +27,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {?string} detail_info_url
 	 *
 	 * @property {OrdersCollection} orders
-	 * @property {number} orders_count
+	 * @property {?number} orders_count
 	 *
 	 * @property {?boolean} ticketing_locally
 	 * @property {EventsTicketsCollection} tickets

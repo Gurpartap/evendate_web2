@@ -327,6 +327,40 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @param {OneOrder.EXTENDED_ORDER_STATUSES} order_status
+	 *
+	 * @return {jQuery}
+	 */
+	Builder.prototype.orderStatusBlock = function(order_status) {
+		
+		return tmpl('order-status', {
+			name: localeFromNamespace(order_status, OneOrder.EXTENDED_ORDER_STATUSES, __LOCALE.TEXTS.TICKET_STATUSES),
+			status: (function(order_status){
+				switch (order_status) {
+					case OneOrder.EXTENDED_ORDER_STATUSES.PAYED:
+					case OneOrder.EXTENDED_ORDER_STATUSES.APPROVED:
+					case OneOrder.EXTENDED_ORDER_STATUSES.WITHOUT_PAYMENT: {
+						return 'success';
+					}
+					
+					case OneOrder.EXTENDED_ORDER_STATUSES.IS_PENDING:
+					case OneOrder.EXTENDED_ORDER_STATUSES.WAITING_FOR_PAYMENT: {
+						return 'warning';
+					}
+					
+					case OneOrder.EXTENDED_ORDER_STATUSES.REJECTED:
+					case OneOrder.EXTENDED_ORDER_STATUSES.RETURNED_BY_CLIENT:
+					case OneOrder.EXTENDED_ORDER_STATUSES.PAYMENT_CANCELED_AUTO:
+					case OneOrder.EXTENDED_ORDER_STATUSES.RETURNED_BY_ORGANIZATION:
+					case OneOrder.EXTENDED_ORDER_STATUSES.PAYMENT_CANCELED_BY_CLIENT: {
+						return 'error';
+					}
+				}
+			}(order_status))
+		});
+	};
+	/**
+	 *
 	 * @param {jQuery} [$wrapper]
 	 * @param {string} [direction]
 	 * @return {jQuery}

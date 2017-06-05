@@ -84,9 +84,8 @@ AdminEventOrdersPage = extending(AdminEventPage, (function() {
 				
 				return {
 					uuid: order.uuid,
-					number: order.uuid,
-					status_type_code: order.status_type_code,
-					status_text: localeFromNamespace(order.status_type_code, OneOrder.EXTENDED_ORDER_STATUSES, __LOCALE.TEXTS.TICKET_STATUSES),
+					number: formatTicketNumber(order.number),
+					status: __APP.BUILD.orderStatusBlock(order.status_type_code),
 					orderer: order.user.full_name,
 					email: order.user.email,
 					buy_time: moment.unix(order.created_at).format(__LOCALE.DATE.DATE_TIME_FORMAT)
@@ -106,6 +105,7 @@ AdminEventOrdersPage = extending(AdminEventPage, (function() {
 						ticket_rows: tmpl('admin-event-orders-page-ticket-row', self.orders.getByUUID($tr.data('order_uuid')).tickets.map(function(ticket) {
 							
 							return $.extend({}, ticket, {
+								number: formatTicketNumber(ticket.number),
 								ticket_type_name: ticket.ticket_type.name,
 								price: ticket.price ? ticket.price : 'Бесплатно',
 								used: ticket.checkout ? 'Билет использован' : ''
