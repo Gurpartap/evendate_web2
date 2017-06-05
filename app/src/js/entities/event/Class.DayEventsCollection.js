@@ -34,16 +34,17 @@ DayEventsCollection = extending(EventsCollection, (function() {
 	 *
 	 * @override
 	 */
-	DayEventsCollection.prototype.fetchFeed = function(fields, length, success) {
+	DayEventsCollection.prototype.fetchFeed = function(fields, length, filters, success) {
 		var self = this,
-			ajax_data = {
+			ajax_data = $.extend({
 				fields: fields,
 				offset: this.length,
 				length: length
-			};
+			}, filters);
+		
 		return this.constructor.fetchEvents(this.date, ajax_data, function(data) {
 			self.setData(data);
-			if (success && typeof success == 'function') {
+			if (isFunction(success)) {
 				success.call(self, data);
 			}
 		});

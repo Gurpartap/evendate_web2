@@ -45,7 +45,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 * @property {UsersCollection} subscribed
 	 *
 	 * @property {Array<Privilege>} privileges
-	 * @property {?string} role
+	 * @property {?OneUser.ROLE} role
 	 * @property {TariffModel} tariff
 	 *
 	 * @property {UsersCollection} staff
