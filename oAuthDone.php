@@ -36,9 +36,7 @@
     Загрузка данных...
   </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js" type="text/javascript"></script>
 <script src="/vendor/jquery/dist/jquery.js" type="text/javascript"></script>
-<script src="/app/js/app.js"></script>
 
 </body>
 <?php
@@ -70,11 +68,24 @@ require_once('footer.php');
             $pr_text.text(texts_array[text_number++]);
         }, 3000);
 
-    $(document).ready(function () {
-        var data = $.extend(searchToObject(), hashToObject(), true);
-        socket.emit('auth.oauthDone', data);
-        socket.on('vk.needEmail', function () {
-            $('.panel').toggleClass('hidden');
-        });
+    console.time('AuthStart');
+    $.ajax({
+        url: '/api/v1/auth/' + window.location.search,
+        success: function (res) {
+            if (res.status) {
+                if (res.data) {
+                    $.ajax({
+                        url: 'auth.php',
+                        data: res.data,
+                        success: function (res) {
+                            console.timeEnd('AuthStart');
+                            window.location.href = '/';
+                        }
+                    });
+                } else {
+                    window.location.reload();
+                }
+            }
+        }
     });
 </script>
