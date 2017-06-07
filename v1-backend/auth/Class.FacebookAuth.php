@@ -46,7 +46,6 @@ class FacebookAuth extends AbstractAuth
 		return $this;
 	}
 
-
 	public function fillToInsData()
 	{
 		$this->to_ins_data = array(
@@ -59,7 +58,6 @@ class FacebookAuth extends AbstractAuth
 		);
 		return $this;
 	}
-
 
 	public function getSex()
 	{
@@ -94,10 +92,13 @@ class FacebookAuth extends AbstractAuth
 				->addRow(array(
 					'user_id' => $user_id,
 					'friend_uid' => $friend['id'],
-				));
+				))
+				->set('updated_at', 'NOW()');
 		}
 		$q_ins->onConflictDoNothing();
-		App::DB()->prepareExecute($q_ins, 'CANT_INSERT_VK_DATA');
+		App::DB()->prepareExecute($q_ins, 'CANT_INSERT_FB_DATA');
 
 	}
+
+
 }

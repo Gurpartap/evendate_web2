@@ -12,6 +12,7 @@ class AuthHandler
 	private $oauth_data;
 	private $provider;
 	private $user_id;
+	private $provider_name;
 
 	/**
 	 * AuthHandler constructor.
@@ -28,14 +29,17 @@ class AuthHandler
 		switch ($this->oauth_data['type']) {
 			case 'vk': {
 				$provider = new VkAuth($this->oauth_data);
+				$this->provider_name = 'vk';
 				break;
 			}
 			case 'facebook': {
 				$provider = new FacebookAuth($this->oauth_data);
+				$this->provider_name = 'facebook';
 				break;
 			}
 			case 'google': {
 				$provider = new GoogleAuth($this->oauth_data);
+				$this->provider_name = 'google';
 				break;
 			}
 			default: {
@@ -70,12 +74,12 @@ class AuthHandler
 		$is_new_user = $p->rowCount() == 0;
 
 		$_data = array(
-			'first_name' => $provider->getUserInfo()['first_name'],
-			'last_name' => $provider->getUserInfo()['last_name'],
+			'first_name' => $provider->getToInsData()['first_name'],
+			'last_name' => $provider->getToInsData()['last_name'],
 			'token' => $provider->getUserToken(),
-			'email' => $provider->getOauthData()['email'],
-			'avatar_url' => $provider->getUserInfo()['avatar_url'],
-			'gender' => $provider->getUserInfo()['gender'],
+			'email' => $provider->getToInsData()['email'],
+			'avatar_url' => $provider->getToInsData()['avatar_url'],
+			'gender' => $provider->getToInsData()['gender'],
 		);
 
 		if ($is_new_user) {
@@ -102,8 +106,50 @@ class AuthHandler
 		$provider->saveSignInData($this->user_id);
 		$provider->saveFriendsList($this->user_id);
 		$provider->saveInterests($this->user_id);
-		@file_get_contents(App::DEFAULT_NODE_LOCATION . '/recommendations/users/' . $this->user_id);
+		@file_get_contents(App::DEFAULT_NODE_LOCATION . '/recommendations/users/' . $this->user_id . '?update_texts=true');
+		try {
+			$this->updateRecs();
+		} catch (Exception $e) {
+		}
+
 		return $this->saveToken($provider);
+	}
+
+	private function updateRecs()
+	{
+
+		$q_ins_recs = 'INSERT INTO recommendations_organizations(organization_id, user_id) 
+						SELECT id AS organization_id, :user_id AS user_id 
+						FROM organizations ON CONFLICT DO NOTHING';
+		App::DB()->prepareExecuteRaw($q_ins_recs, array(
+			':user_id' => $this->user_id
+		), 'CANT_UPDATE_RECS');
+
+		$q_upd = 'UPDATE recommendations_organizations
+								SET 
+								rating_subscribed_in_social_network = (SELECT COUNT(id) * 50
+								FROM view_organizations vo
+								WHERE vo.id = view_users_organizations.organization_id AND
+								vo.vk_url_path IN (SELECT vk_groups.screen_name
+								FROM vk_groups
+								INNER JOIN vk_users_subscriptions
+								ON vk_users_subscriptions.vk_group_id = vk_groups.id
+								WHERE vk_users_subscriptions.user_id = view_users_organizations.user_id)) :: INT,
+								
+								  rating_active_events_count          = (SELECT COUNT(id) / 5
+                                         FROM events
+                                         WHERE events.organization_id =
+                                               view_users_organizations.organization_id
+                                               AND events.last_event_date > NOW()) :: INT,
+								updated_at = NOW()
+								FROM (SELECT *
+										FROM view_users_organizations WHERE user_id = :user_id) AS view_users_organizations
+								WHERE view_users_organizations.user_id = recommendations_organizations.user_id
+								AND view_users_organizations.organization_id = recommendations_organizations.organization_id';
+
+		App::DB()->prepareExecuteRaw($q_upd, array(
+			':user_id' => $this->user_id
+		));
 	}
 
 	private function saveToken(AbstractAuth $provider)
@@ -117,14 +163,14 @@ class AuthHandler
 				'token' => $provider->getUserToken(),
 				'user_id' => $this->user_id,
 				'token_type' => isset($oauth_data['mobile']) && $oauth_data['mobile'] == true ? 'mobile' : 'bearer',
-				'expires_on' => 0
+				'expires_on' => 1609459140
 			))
 			->returning(array('id'));
 
 		App::DB()->prepareExecute($q_ins, 'CANT_SAVE_TOKEN')->fetch();
 
 		return new NewUser(array(
-			'email' => $provider->getOauthData()['email'],
+			'email' => $provider->getToInsData()['email'],
 			'token' => $provider->getUserToken(),
 			'user_id' => $this->user_id
 		));

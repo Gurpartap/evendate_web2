@@ -124,7 +124,8 @@ class VkAuth extends AbstractAuth
 				->addRow(array(
 					'user_id' => $user_id,
 					'friend_uid' => $friend['uid'],
-				));
+				))
+				->set('updated_at', 'NOW()');
 		}
 
 		$q_ins->onConflictDoNothing();

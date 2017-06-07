@@ -348,6 +348,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
             q_upd_events = q_upd_events.replace("'{WHERE_PLACEHOLDER}'", ' AND user_id = $2');
 
             upd_events = upd_organizations = true;
+            upd_events = data.update_events == undefined ? upd_events : data.update_events;
             events_args = [data.user_id, data.user_id];
             orgs_args = [data.user_id, data.user_id];
         } else if (data.event_id) {
@@ -1592,9 +1593,12 @@ pg.connect(pg_conn_string, function (err, client, done) {
         insertRecommendationsAccordance({organization_id: req.params.id}, function () {
             updateRecommendations({
                 user_id: req.params.id,
-                events_update_texts: req.params.update_texts,
-                organizations_update_texts: req.params.update_texts
-            }, logger.info);
+                events_update_texts: req.query.update_texts,
+                update_events: req.query.update_events,
+                organizations_update_texts: req.query.update_texts
+            }, (data) => {
+                logger.info(data);
+            });
         });
     });
 

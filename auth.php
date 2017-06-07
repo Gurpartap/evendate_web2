@@ -17,20 +17,21 @@ if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'get_urls') {
 
 try {
 
-	$q_get_user = 'SELECT users.id AS user_id, users.token, users.email
+	$q_get_user = 'SELECT users.id AS user_id, tokens.token, users.email
 				FROM users
+				INNER JOIN tokens ON users.id = tokens.user_id
 				WHERE (users.email = :email
-					AND users.token = :token) 
+					AND tokens.token = :token) 
 					OR 
 					(users.id = :user_id
-					AND users.token = :token) ';
+					AND tokens.token = :token)';
 	$p_get_user = $__db->prepareExecuteRaw($q_get_user, array(
 		':email' => $_REQUEST['email'] ?? null,
 		':user_id' => $_REQUEST['user_id'] ?? null,
 		':token' => $_REQUEST['token'] ?? null
 	), 'CANT_FIND_USER');
 
-	if ($p_get_user->rowCount() != 1) throw new LogicException('Пользователь с такими данными не найден');
+	if ($p_get_user->rowCount() == 0) throw new LogicException('Пользователь с такими данными не найден');
 
 
 	if ($row_user_info = $p_get_user->fetch()) {

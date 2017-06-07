@@ -52,7 +52,7 @@ class GoogleAuth extends AbstractAuth
 		$this->to_ins_data = array(
 			'first_name' => $this->user_info['name']['givenName'],
 			'last_name' => $this->user_info['name']['familyName'],
-			'avatar_url' => $this->user_info['name']['familyName'],
+			'avatar_url' => isset($this->user_info['cover']['coverPhoto']['url']) ? $this->user_info['cover']['coverPhoto']['url'] : null,
 			'gender' => $this->getSex(),
 			'token' => $this->getUserToken(),
 			'email' => null,
@@ -76,7 +76,7 @@ class GoogleAuth extends AbstractAuth
 				'access_token' => $this->oauth_data['access_token'],
 				'expires_in' => $this->oauth_data['expires_in'],
 				'etag' => $this->user_info['etag'],
-				'cover_photo_url' => isset($this->user_info['cover']['coverPhoto']) ? $this->user_info['cover']['coverPhoto'] : null
+				'cover_photo_url' => isset($this->user_info['cover']['coverPhoto']['url']) ? $this->user_info['cover']['coverPhoto']['url'] : null
 			));
 		App::DB()->prepareExecute($p_ins, 'CANT_INSERT_VK_DATA');
 
@@ -92,10 +92,12 @@ class GoogleAuth extends AbstractAuth
 				->addRow(array(
 					'user_id' => $user_id,
 					'friend_uid' => $friend['uid'],
-				));
+				))
+				->set('updated_at', 'NOW()')
+			->bind;
 		}
 		$q_ins->onConflictDoNothing();
-		App::DB()->prepareExecute($q_ins, 'CANT_INSERT_VK_DATA');
+		App::DB()->prepareExecute($q_ins, 'CANT_INSERT_GOOGLE_DATA');
 	}
 
 
