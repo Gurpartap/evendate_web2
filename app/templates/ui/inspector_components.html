@@ -1,0 +1,38 @@
+<script type="javascript/template" id="tmpl-app-inspector-fields-wrapper">
+	<div class="app_inspector_fields_wrapper {classes}">{fields}</div>
+</script>
+
+
+<script type="javascript/template" id="tmpl-app-inspector-field">
+	<div class="app_inspector_field {classes}">
+		<span class="app_inspector_field_name">{name}</span>
+		<span class="app_inspector_field_value">{value}</span>
+	</div>
+</script>
+
+
+<script type="javascript/template" id="tmpl-app-inspector-title">
+	<h6 class="app_inspector_subtitle">{title}</h6>
+</script>
+
+<script type="javascript/template" id="tmpl-app-inspector-ticket">
+	<div class="app_inspector_ticket">
+		<div class="app_inspector_ticket_body">
+			{fields}
+		</div>
+		{footer}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-app-inspector-ticket-footer">
+	<footer class="app_inspector_ticket_footer"><span>Билет использован</span></footer>
+</script>
+
+<script type="javascript/template" id="tmpl-app-inspector-event">
+	<a class="app_inspector_event Link" href="/event/{id}">
+		<img src="{image_horizontal_url}?width=108" width="108" height="61">
+		<div class="app_inspector_event_body">
+			<span class="app_inspector_event_title">{title}</span>
+		</div>
+	</a>
+</script>

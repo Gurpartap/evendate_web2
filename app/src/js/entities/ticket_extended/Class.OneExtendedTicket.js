@@ -43,11 +43,7 @@ OneExtendedTicket = extending(OneTicket, (function() {
 		Object.defineProperties(this, {
 			status_name: {
 				get: function() {
-					for( var prop in OneExtendedTicket.TICKET_STATUSES ) {
-						if( OneExtendedTicket.TICKET_STATUSES.hasOwnProperty(prop) && OneExtendedTicket.TICKET_STATUSES[ prop ] === self.order.status_type_code )
-							return __LOCALES.ru_RU.TEXTS.TICKET_STATUSES[ prop ];
-					}
-					return '';
+					return localeFromNamespace(self.order.status_type_code, OneExtendedTicket.TICKET_STATUSES, __LOCALES.ru_RU.TEXTS.TICKET_STATUSES);
 				}
 			},
 			status_type_code: {
@@ -57,6 +53,8 @@ OneExtendedTicket = extending(OneTicket, (function() {
 			}
 		});
 	}
+	
+	OneExtendedTicket.prototype.ID_PROP_NAME = 'uuid';
 	
 	OneExtendedTicket.TICKET_STATUSES = $.extend({
 		USED: 'used'
@@ -103,7 +101,7 @@ OneExtendedTicket = extending(OneTicket, (function() {
 		ticket.setData($.extend(_event.tickets[0], {
 			event: _event,
 			event_id: _event.id,
-			order: _event.orders.getByUUID(_event.tickets[0].ticket_order_uuid)
+			order: _event.orders.getByID(_event.tickets[0].ticket_order_uuid)
 		}));
 		
 		return ticket;
