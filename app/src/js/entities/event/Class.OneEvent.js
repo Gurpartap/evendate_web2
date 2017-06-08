@@ -1,6 +1,6 @@
 /**
  * @requires ../Class.OneEntity.js
- * @requires ../../data_models/registration_field/Class.RegistrationFieldsCollection.js
+ * @requires ../../data_models/registration_field/Class.RegistrationFieldModelsCollection.js
  */
 /**
  * @class OneEvent
@@ -43,7 +43,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {?boolean} is_registered
 	 * @property {?number} registered_count
 	 * @property {UsersCollection} registered_users
-	 * @property {RegistrationFieldsCollection} registration_fields
+	 * @property {RegistrationFieldModelsCollection} registration_fields
 	 *
 	 * @property {?number} organization_id
 	 * @property {?string} organization_short_name
@@ -114,7 +114,7 @@ OneEvent = extending(OneEntity, (function() {
 		this.is_registered = null;
 		this.registered_count = null;
 		this.registered_users = new UsersCollection();
-		this.registration_fields = new RegistrationFieldsCollection();
+		this.registration_fields = new RegistrationFieldModelsCollection();
 		
 		this.organization_id = null;
 		this.organization_short_name = null;

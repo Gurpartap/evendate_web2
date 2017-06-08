@@ -4,25 +4,25 @@
  */
 /**
  *
- * @class RegistrationFieldsCollection
+ * @class RegistrationFieldModelsCollection
  * @extends EntitiesCollection
  */
-RegistrationFieldsCollection = extending(EntitiesCollection, (function() {
+RegistrationFieldModelsCollection = extending(EntitiesCollection, (function() {
 	/**
 	 *
 	 * @constructor
-	 * @constructs RegistrationFieldsCollection
+	 * @constructs RegistrationFieldModelsCollection
 	 */
-	function RegistrationFieldsCollection() {
+	function RegistrationFieldModelsCollection() {
 		EntitiesCollection.call(this);
 	}
-	RegistrationFieldsCollection.prototype.collection_of = RegistrationFieldModel;
+	RegistrationFieldModelsCollection.prototype.collection_of = RegistrationFieldModel;
 	/**
 	 *
 	 * @param {...object} element
 	 * @returns {number}
 	 */
-	RegistrationFieldsCollection.prototype.push = function(element) {
+	RegistrationFieldModelsCollection.prototype.push = function(element) {
 		var self = this,
 			entities = Array.prototype.slice.call(arguments),
 			types = [
@@ -47,5 +47,5 @@ RegistrationFieldsCollection = extending(EntitiesCollection, (function() {
 		return this.length;
 	};
 	
-	return RegistrationFieldsCollection;
+	return RegistrationFieldModelsCollection;
 }()));

@@ -102,7 +102,7 @@ AdminEventOrdersPage = extending(AdminEventPage, (function() {
 				
 				if (!row.child.isShown()) {
 					row.child( tmpl('admin-event-orders-page-table-child-row', {
-						ticket_rows: tmpl('admin-event-orders-page-ticket-row', self.orders.getByUUID($tr.data('order_uuid')).tickets.map(function(ticket) {
+						ticket_rows: tmpl('admin-event-orders-page-ticket-row', self.orders.getByID($tr.data('order_uuid')).tickets.map(function(ticket) {
 							
 							return $.extend({}, ticket, {
 								number: formatTicketNumber(ticket.number),
@@ -137,7 +137,7 @@ AdminEventOrdersPage = extending(AdminEventPage, (function() {
 						data.inspector.hide();
 					} else {
 						if (!(data.inspector instanceof OrderAppInspector)) {
-							data.inspector = new OrderAppInspector(self.orders.getByUUID($this.data('order_uuid')));
+							data.inspector = new OrderAppInspector(self.orders.getByID($this.data('order_uuid')));
 							$this.data(data);
 						}
 						data.inspector.show();

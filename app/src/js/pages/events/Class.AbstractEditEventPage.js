@@ -25,7 +25,7 @@ AbstractEditEventPage = extending(Page, (function() {
 	
 	/**
 	 *
-	 * @param {RegistrationFieldModel|Array<RegistrationFieldModel>|RegistrationFieldsCollection} [registration_data]
+	 * @param {RegistrationFieldModel|Array<RegistrationFieldModel>|RegistrationFieldModelsCollection} [registration_data]
 	 * @return {jQuery}
 	 */
 	AbstractEditEventPage.buildRegistrationCustomField = function(registration_data) {
@@ -357,7 +357,7 @@ AbstractEditEventPage = extending(Page, (function() {
 				event = new OneEvent(),
 				modal;
 			
-			form_data.registration_fields = (new RegistrationFieldsCollection()).setData(form_data.registration_fields.sort().map(function(field) {
+			form_data.registration_fields = (new RegistrationFieldModelsCollection()).setData(form_data.registration_fields.sort().map(function(field) {
 				return {
 					uuid: guid(),
 					type: form_data['registration_'+field+'_field_type'],
@@ -529,7 +529,7 @@ AbstractEditEventPage = extending(Page, (function() {
 						
 						if (form_data.registration_fields && form_data.registration_fields.length) {
 							send_data.registration_locally = true;
-							send_data.registration_fields = (new RegistrationFieldsCollection()).setData(form_data.registration_fields.map(function(id) {
+							send_data.registration_fields = (new RegistrationFieldModelsCollection()).setData(form_data.registration_fields.map(function(id) {
 								var field = new RegistrationFieldModel();
 								
 								field.required = form_data['registration_' + id + '_field_required'];

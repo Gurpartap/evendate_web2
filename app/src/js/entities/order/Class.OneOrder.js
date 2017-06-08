@@ -1,5 +1,6 @@
 /**
  * @requires ../Class.OneEntity.js
+ * @requires ../../data_models/registration_field/Class.RegistrationFieldModelsCollection.js
  */
 /**
  *
@@ -29,6 +30,7 @@ OneOrder = extending(OneEntity, (function() {
 	 * @property {?number} canceled_at
 	 *
 	 * @property {EventsTicketsCollection} tickets
+	 * @property {RegistrationFieldsCollection} registration_fields
 	 * @property {OneUser} user
 	 */
 	function OneOrder(event_id, uuid) {
@@ -57,6 +59,8 @@ OneOrder = extending(OneEntity, (function() {
 			}
 		});
 	}
+	
+	OneOrder.prototype.ID_PROP_NAME = 'uuid';
 	
 	/**
 	 *

@@ -54,6 +54,8 @@ OneExtendedTicket = extending(OneTicket, (function() {
 		});
 	}
 	
+	OneExtendedTicket.prototype.ID_PROP_NAME = 'uuid';
+	
 	OneExtendedTicket.TICKET_STATUSES = $.extend({
 		USED: 'used'
 	}, OneOrder.EXTENDED_ORDER_STATUSES);
@@ -99,7 +101,7 @@ OneExtendedTicket = extending(OneTicket, (function() {
 		ticket.setData($.extend(_event.tickets[0], {
 			event: _event,
 			event_id: _event.id,
-			order: _event.orders.getByUUID(_event.tickets[0].ticket_order_uuid)
+			order: _event.orders.getByID(_event.tickets[0].ticket_order_uuid)
 		}));
 		
 		return ticket;
