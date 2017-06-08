@@ -174,31 +174,33 @@ OrganizationPage = extending(Page, (function() {
 			}
 		});
 		
-		$subscribers_scroll.scrollbar({
-			disableBodyScroll: true,
-			onScroll: function(y) {
-				var $loader,
-					last_is_friend = PAGE.organization.subscribed.last_pushed[PAGE.organization.subscribed.last_pushed.length - 1].is_friend;
-				
-				if (y.scroll + 200 >= y.maxScroll && !$subscribers_scroll.block_scroll) {
-					$subscribers_scroll.block_scroll = true;
-					$loader = __APP.BUILD.loaderBlock($subscribers_scroll);
-					PAGE.organization.subscribed.fetchOrganizationSubscribers(PAGE.organization.id, 10, {
-						fields: 'is_friend',
-						order_by: '-is_friend,first_name'
-					}, function(subscribed) {
-						if (subscribed.length) {
-							$subscribers_scroll.append(__APP.BUILD.subscribers(subscribed, last_is_friend));
-							$subscribers_scroll.block_scroll = false;
-						} else {
-							$subscribers_scroll.off('scroll.onScroll');
-						}
-						$loader.remove();
-						bindPageLinks($subscribers_scroll);
-					});
+		if (PAGE.organization.subscribed.last_pushed.length) {
+			$subscribers_scroll.scrollbar({
+				disableBodyScroll: true,
+				onScroll: function(y) {
+					var $loader,
+						last_is_friend = PAGE.organization.subscribed.last_pushed[PAGE.organization.subscribed.last_pushed.length - 1].is_friend;
+					
+					if (y.scroll + 200 >= y.maxScroll && !$subscribers_scroll.block_scroll) {
+						$subscribers_scroll.block_scroll = true;
+						$loader = __APP.BUILD.loaderBlock($subscribers_scroll);
+						PAGE.organization.subscribed.fetchOrganizationSubscribers(PAGE.organization.id, 10, {
+							fields: 'is_friend',
+							order_by: '-is_friend,first_name'
+						}, function(subscribed) {
+							if (subscribed.length) {
+								$subscribers_scroll.append(__APP.BUILD.subscribers(subscribed, last_is_friend));
+								$subscribers_scroll.block_scroll = false;
+							} else {
+								$subscribers_scroll.off('scroll.onScroll');
+							}
+							$loader.remove();
+							bindPageLinks($subscribers_scroll);
+						});
+					}
 				}
-			}
-		});
+			});
+		}
 	};
 	
 	OrganizationPage.prototype.render = function() {

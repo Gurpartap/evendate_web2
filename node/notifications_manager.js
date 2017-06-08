@@ -85,7 +85,7 @@ NotificationsManager.prototype.create = function (notification, device, type) {
                         en: note.alert,
                         ru: note.alert
                     },
-                    url: 'https://evendate.ru/event/' + note.payload.event_id,
+                    url: 'https://evendate.io/event/' + note.payload.event_id,
                     isChromeWeb: true,
                     include_player_ids: [device.device_token],
                     data: note.payload
@@ -117,7 +117,7 @@ NotificationsManager.prototype.create = function (notification, device, type) {
                             en: note.alert,
                             ru: note.alert
                         },
-                        url: 'https://evendate.ru/event/' + note.payload.event_id,
+                        url: 'https://evendate.io/event/' + note.payload.event_id,
                         isAndroid: true,
                         include_player_ids: [device.device_token],
                         data: note.payload

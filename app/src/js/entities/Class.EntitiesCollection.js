@@ -77,11 +77,14 @@ EntitiesCollection = extending(Array, (function() {
 				if (item[ID_PROP_NAME]) {
 					this.__lookup[item[ID_PROP_NAME]] = item;
 				}
+				this.createAdditionalLookup(item);
 			}
 		}
 		
 		return this.length;
 	};
+	
+	EntitiesCollection.prototype.createAdditionalLookup = function() {};
 	/**
 	 *
 	 * @return {Array}

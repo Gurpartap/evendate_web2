@@ -1,5 +1,5 @@
 let rest = require('restler');
-const url = 'https://evendate.ru/api/v1/';
+const url = 'https://evendate.io/api/v1/';
 
 class APICaller {
 

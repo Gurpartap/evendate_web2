@@ -115,10 +115,11 @@ ServerConnection = (function() {
 		
 		return jqXHR.fail(error).then(function(response, status_text, jqXHR) {
 			ajaxHandler(response, function(data, text) {
-				if (success && typeof success === 'function') {
+				if (isFunction(success)) {
 					success(data);
 				}
 			}, ServerConnection.ajaxErrorHandler);
+			
 			return response.data;
 		}).promise();
 	};
@@ -196,7 +197,7 @@ ServerConnection = (function() {
 	 * @returns {jqPromise}
 	 */
 	ServerConnection.prototype.deleteData = function(url, ajax_data, success, error) {
-		return this.dealAjax(ServerConnection.HTTP_METHODS.DELETE, url, ajax_data, 'application/json', success, error);
+		return this.dealAjax(ServerConnection.HTTP_METHODS.DELETE, url + '?' + $.param(ajax_data), {}, 'application/json', success, error);
 	};
 	/**
 	 *

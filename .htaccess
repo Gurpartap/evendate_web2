@@ -1,13 +1,18 @@
 <IfModule mod_rewrite.c>
 RewriteEngine On
 
+
+RewriteCond %{HTTP_HOST} ^evendate.ru [NC]
+RewriteRule !^(api($|/)|.*auth.*) https://evendate.io%{REQUEST_URI} [L,R=301]
+
+
 RewriteCond %{HTTP_HOST}  ^www\.(.+)$  [NC]
 RewriteRule ^(.*)         https://%1/$1 [L,R=301]
 
 RewriteRule ^(.*)to-organization(.*)$ organization.php
 
 
-RewriteCond %{HTTP_HOST} ^evendate\.ru [NC]
+RewriteCond %{HTTP_HOST} ^evendate\.io [NC]
 RewriteCond %{HTTPS} off
 RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 

@@ -263,6 +263,14 @@ class EventsCollection extends AbstractCollection
 					}
 					break;
 				}
+				case 'city_id': {
+					$val = filter_var($value, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+					if ($val != null) {
+						$q_get_events->where("city_id = :city_id");
+						$statement_array[':city_id'] = $val;
+					}
+					break;
+				}
 				case 'bounds': {
 					$points = explode(',', $value);
 
@@ -325,8 +333,8 @@ class EventsCollection extends AbstractCollection
 				case 'favorites': {
 					if ($value instanceof NotAuthorizedUser) break;
 					if ($value instanceof UserInterface == false) break;
-					$q_get_events->where("id IN (SELECT DISTINCT event_id FROM favorite_events WHERE status = TRUE AND user_id = :user_id)");
-					$statement_array[':user_id'] = $value->getId();
+					$q_get_events->where("id IN (SELECT DISTINCT event_id FROM favorite_events WHERE status = TRUE AND user_id = :favorites_user_id)");
+					$statement_array[':favorites_user_id'] = $value->getId();
 					break;
 				}
 				case 'since': {
@@ -506,6 +514,7 @@ class EventsCollection extends AbstractCollection
 			array_key_exists(Event::IS_REGISTERED_FIELD_NAME, $fields) ||
 			array_key_exists(Event::IS_HIDDEN_FIELD_NAME, $fields) ||
 			array_key_exists(Event::SOLD_TICKETS_COUNT_FIELD_NAME, $fields) ||
+			array_key_exists(Event::ORDERS_COUNT_FIELD_NAME, $fields) ||
 			array_key_exists(Event::REGISTRATION_APPROVE_STATUS_FIELD_NAME, $fields)
 		) {
 			$statement_array[':user_id'] = $user->getId();
@@ -519,7 +528,22 @@ class EventsCollection extends AbstractCollection
 			$canceled_condition ? $q_get_events->where($canceled_condition) : false;
 		}
 		if (!isset($getting_personal_events) || $getting_personal_events == false) {
-			$q_get_events->where('organization_is_private = false');
+			$q_get_events->where('(organization_is_private = false OR
+			  (
+					organization_id IN 
+						(SELECT organization_id FROM organizations_invitations WHERE 
+						(user_id = :my_user_id OR email = :my_email) AND status = true) 						
+					OR	 
+					organization_id IN 
+					(SELECT organization_id FROM subscriptions WHERE user_id = :my_user_id AND status = true) 
+				
+					OR 
+					organization_id IN 
+					(SELECT organization_id FROM users_organizations WHERE user_id = :my_user_id AND status = true))
+			)');
+
+			$statement_array[':my_user_id'] = App::getCurrentUser()->getId();
+			$statement_array[':my_email'] = App::getCurrentUser()->getEmail();
 		}
 
 

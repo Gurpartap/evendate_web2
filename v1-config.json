@@ -57,7 +57,7 @@
       "port": 27017
     },
     "domain": "test.evendate.ru",
-    "node_domain": "test.evendate.ru",
+    "node_domain": "test.evendate.io",
     "node_path": "/var/www/html/node",
     "schema": "http://"
   },
@@ -189,15 +189,15 @@
       "port": 27017
     },
     "https":{
-      "key_path": "/etc/letsencrypt/live/evendate.ru-0001/privkey.pem",
-      "cert_path": "/etc/letsencrypt/live/evendate.ru-0001/fullchain.pem"
+      "key_path": "/etc/letsencrypt/live/evendate.io/privkey.pem",
+      "cert_path": "/etc/letsencrypt/live/evendate.io/fullchain.pem"
     },
     "test": {
-      "domain": "evendate.ru",
+      "domain": "evendate.io",
       "token": "EAAYDHIPuIBYBAPmwIZAk3INqbI1GhyRX8YAMjlirVpYjiIC3KKS09DwzcOtYwlqcC5iEpYwlUdHczjtKoqgpXjfpFloWcYuHBbf6u8sCSH4DEK2AnfDicVghW5eKidZB3BMpvBfUxCQPZACp7KXbZAq5TPg6VT9QGmkPOAdthQZDZDundefinedicFo7r3WzgpHnvBs35DOpBKjSlotpAN5"
     },
-    "domain": "evendate.ru",
-    "node_domain": "evendate.ru",
+    "domain": "evendate.io",
+    "node_domain": "evendate.io",
     "node_path": "/var/www/html/node",
     "schema": "https://"
   }

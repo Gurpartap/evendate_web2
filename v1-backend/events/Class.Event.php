@@ -25,6 +25,7 @@ class Event extends AbstractEntity
 	const TAGS_LIMIT = 5;
 	const ORGANIZATION_NOTIFICATIONS_LIMIT = 2;
 	const IS_FAVORITE_FIELD_NAME = 'is_favorite';
+	const IS_NOW_FIELD_NAME = 'is_now';
 	const TICKETS_FIELD_NAME = 'tickets';
 	const TICKETS_TYPES_FIELD_NAME = 'ticket_types';
 	const IS_SEEN_FIELD_NAME = 'is_seen';
@@ -39,6 +40,7 @@ class Event extends AbstractEntity
 	/*ONLY FOR ADMINS*/
 	const STATISTICS_FIELD_NAME = 'statistics';
 	const REGISTERED_USERS_FIELD_NAME = 'registered_users';
+	const ORDERS_COUNT_FIELD_NAME = 'orders_count';
 	/*ONLY FOR ADMINS*/
 
 	const REGISTRATION_FIELDS_FIELD_NAME = 'registration_fields';
@@ -143,6 +145,12 @@ class Event extends AbstractEntity
 			AND favorite_events.user_id = :user_id
 			AND favorite_events.event_id = view_events.id) IS NOT NULL AS ' . self::IS_FAVORITE_FIELD_NAME,
 
+		self::IS_NOW_FIELD_NAME => '(SELECT (COUNT(id) > 0) :: BOOLEAN
+			FROM events_dates
+			WHERE events_dates.status = TRUE
+			AND NOW() BETWEEN events_dates.start_time_utc AND events_dates.end_time_utc
+			AND events_dates.event_id = view_events.id) :: BOOLEAN AS ' . self::IS_NOW_FIELD_NAME,
+
 		self::IS_REGISTERED_FIELD_NAME => '(SELECT (COUNT(view_tickets_orders.id) > 0) :: BOOLEAN
 			FROM view_tickets_orders
 			WHERE
@@ -180,12 +188,28 @@ class Event extends AbstractEntity
 			AND view_tickets.is_active = TRUE
 			AND users_organizations.user_id = :user_id)::INT AS ' . self::SOLD_TICKETS_COUNT_FIELD_NAME,
 
+		self::ORDERS_COUNT_FIELD_NAME => '(SELECT COALESCE(COUNT(view_tickets_orders.id)::INT, 0)
+			FROM view_tickets_orders
+			INNER JOIN events ON events.id = view_tickets_orders.event_id
+			INNER JOIN users_organizations ON users_organizations.organization_id = events.organization_id
+			WHERE view_tickets_orders.event_id = view_events.id 
+			AND view_tickets_orders.status = TRUE 
+			AND users_organizations.status = TRUE 
+			AND users_organizations.user_id = :user_id)::INT AS ' . self::ORDERS_COUNT_FIELD_NAME,
+
 		self::MY_TICKETS_COUNT_FIELD_NAME => '(SELECT COALESCE(COUNT(view_tickets.id)::INT, 0)
 			FROM view_tickets
 			WHERE view_tickets.event_id = view_events.id 
 			AND status = TRUE 
 			AND is_active = TRUE 
 			AND view_tickets.user_id = :user_id)::INT AS ' . self::MY_TICKETS_COUNT_FIELD_NAME,
+
+		self::ORDERS_COUNT_FIELD_NAME => '(SELECT COALESCE(COUNT(view_tickets.id)::INT, 0)
+			FROM view_tickets
+			WHERE view_tickets.event_id = view_events.id 
+			AND status = TRUE 
+			AND is_active = TRUE 
+			AND view_tickets.user_id = :user_id)::INT AS ' . self::ORDERS_COUNT_FIELD_NAME,
 
 		self::IS_SEEN_FIELD_NAME => '(
 		SELECT
@@ -665,7 +689,7 @@ class Event extends AbstractEntity
 					'organization_id' => $organization->getId(),
 					'latitude' => $data['latitude'],
 					'longitude' => $data['longitude'],
-					'images_domain' => 'https://dn' . rand(1, 4) . '.evendate.ru/',
+					'images_domain' => 'https://dn' . rand(1, 4) . '.evendate.io/',
 					'image_vertical' => $img_vertical_filename,
 					'image_horizontal' => $img_horizontal_filename,
 					'detail_info_url' => $data['detail_info_url'],
@@ -727,7 +751,8 @@ class Event extends AbstractEntity
 			}
 
 			if ($tariff_info['available_additional_notifications'] > 0 &&
-				$data['additional_notification_time'] instanceof DateTime) {
+				$data['additional_notification_time'] instanceof DateTime
+			) {
 				self::saveNotifications(array(array(
 					'event_id' => $event_id,
 					'notification_type_id' => self::getNotificationTypeId(Notification::NOTIFICATION_TYPE_ADDITIONAL_FOR_ORGANIZATION, $db),
@@ -1405,10 +1430,12 @@ class Event extends AbstractEntity
 
 
 			if ($tariff_info['available_additional_notifications'] > 0 &&
-				$data['additional_notification_time'] instanceof DateTime) {
+				$data['additional_notification_time'] instanceof DateTime
+			) {
 				if ($this->disableNotificationByType(self::getNotificationTypeId(
 					Notification::NOTIFICATION_TYPE_ADDITIONAL_FOR_ORGANIZATION, $this->db
-				))){
+				))
+				) {
 					self::saveNotifications(array(array(
 						'event_id' => $this->id,
 						'notification_type_id' => self::getNotificationTypeId(Notification::NOTIFICATION_TYPE_ADDITIONAL_FOR_ORGANIZATION, $db),
@@ -1430,7 +1457,8 @@ class Event extends AbstractEntity
 	}
 
 
-	private function disableNotificationByType($notification_type_id){
+	private function disableNotificationByType($notification_type_id)
+	{
 		$q_upd = App::queryFactory();
 		$q_upd->newUpdate()
 			->table('events_notifications')
@@ -1631,7 +1659,11 @@ class Event extends AbstractEntity
 
 		if ($result->getStatus()) {
 			$user->addFavoriteEvent($this);
-			$this->addNotification($user, array('notification_type' => 'notification-before-day'));
+			try {
+				$this->addNotification($user, array('notification_type' => 'notification-before-day'));
+			} catch (Exception $e) {
+			}
+
 		}
 
 		return new Result(true, '', array(

@@ -1,6 +1,13 @@
 /**
  * @requires ../../entities/Class.OneEntity.js
  */
+
+/**
+ * @typedef {object} RegistrationFieldLike
+ * @property {string} type
+ * @property {boolean} required
+ * @property {?string} label
+ */
 /**
  * @class RegistrationFieldModel
  * @extends OneEntity
@@ -50,7 +57,7 @@ RegistrationFieldModel = extending(OneEntity, (function() {
 	
 	/**
 	 *
-	 * @param {(RegistrationFieldModel|{type: {string}, required: {boolean}, [label]: {?string}})} field
+	 * @param {(RegistrationFieldModel|RegistrationFieldLike)} field
 	 * @return {boolean}
 	 */
 	RegistrationFieldModel.isCustomField = function(field) {

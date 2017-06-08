@@ -7,7 +7,7 @@
  * @requires ../ticket_type/Class.TicketTypesCollection.js
  * @requires ../user/Class.UsersCollection.js
  * @requires ../notification/Class.NotificationsCollection.js
- * @requires ../../data_models/registration_field/Class.RegistrationFieldsCollection.js
+ * @requires ../../data_models/registration_field/Class.RegistrationFieldModelsCollection.js
  */
 /**
  * @class OneEvent
@@ -34,6 +34,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {?string} detail_info_url
 	 *
 	 * @property {OrdersCollection} orders
+	 * @property {?number} orders_count
 	 *
 	 * @property {?boolean} ticketing_locally
 	 * @property {EventsTicketsCollection} tickets
@@ -49,7 +50,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {?boolean} is_registered
 	 * @property {?number} registered_count
 	 * @property {UsersCollection} registered_users
-	 * @property {RegistrationFieldsCollection} registration_fields
+	 * @property {RegistrationFieldModelsCollection} registration_fields
 	 *
 	 * @property {?number} organization_id
 	 * @property {?string} organization_short_name
@@ -106,6 +107,7 @@ OneEvent = extending(OneEntity, (function() {
 		this.detail_info_url = null;
 		
 		this.orders = new OrdersCollection(event_id);
+		this.orders_count = null;
 		
 		this.ticketing_locally = null;
 		this.tickets = new EventsTicketsCollection(event_id);
@@ -121,7 +123,7 @@ OneEvent = extending(OneEntity, (function() {
 		this.is_registered = null;
 		this.registered_count = null;
 		this.registered_users = new UsersCollection();
-		this.registration_fields = new RegistrationFieldsCollection();
+		this.registration_fields = new RegistrationFieldModelsCollection();
 		
 		this.organization_id = null;
 		this.organization_short_name = null;

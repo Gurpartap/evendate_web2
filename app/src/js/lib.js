@@ -89,12 +89,14 @@ __C = {
 		ACTIVE: '-active',
 		DISABLED: '-disabled',
 		HIDDEN: '-hidden',
+		SHOW: '-show',
 		ICONS: {
 			STAR: 'fa-star',
 			STAR_O: 'fa-star-o',
 			BELL_O: 'fa-bell-o',
 			TIMES: 'fa-times',
 			PLUS: 'fa-plus',
+			MINUS: 'fa-minus',
 			CHECK: 'fa-check',
 			PENCIL: 'fa-pencil',
 			EYE: 'fa-eye',
@@ -161,6 +163,7 @@ __C = {
 };
 /**
  * Extending class
+ *
  * @param {...Function} parents
  * @param {Function} children
  * @return {Function}
@@ -178,6 +181,7 @@ function extending(/**...parents, children*/){
 }
 /**
  * Extending jQuery object
+ *
  * @param {Function} children
  * @return {Function}
  */
@@ -197,6 +201,7 @@ function extendingJQuery(children){
 }
 /**
  * Returns capitalized string
+ *
  * @return {string}
  */
 String.prototype.capitalize = function() {
@@ -204,12 +209,14 @@ String.prototype.capitalize = function() {
 };
 /**
  * Checks if string contains some substring
+ *
  * @param {(string|RegExp)} it
  * @return {boolean}
  */
 String.prototype.contains = function(it) {return this.search(it) !== -1;};
 /**
  * Works like printf. Variables must be inside the {braces}. Returns formatted string
+ *
  * @param {object} fields
  * @return {string}
  */
@@ -220,6 +227,7 @@ String.prototype.format = function(fields) {
 };
 /**
  * Converts {delimiter}-separated string into CamelCase
+ *
  * @param {string} [delimiter=' ']
  * @return {string}
  */
@@ -228,6 +236,7 @@ String.prototype.toCamelCase = function(delimiter) {
 };
 /**
  * Makes CamelCase to_underscore
+ *
  * @return {string}
  */
 String.prototype.toUnderscore = function() {
@@ -246,6 +255,7 @@ String.prototype.appendAjaxData = function(data) {
 };
 /**
  * Returns array of objects` own properties
+ *
  * @param {object} obj
  * @return {Array}
  */
@@ -256,6 +266,7 @@ Object.props = function(obj) {
 };
 /**
  * Returns objects` own properties
+ *
  * @param {object} obj
  * @return {object}
  */
@@ -270,6 +281,7 @@ Object.getProps = function(obj) {
 };
 /**
  * Returns array of objects` own methods
+ *
  * @param {object} obj
  * @return {Array}
  */
@@ -286,6 +298,7 @@ Object.methods = function(obj) {
 if (typeof Object.values !== 'function') {
 	/**
 	 * Returns array of objects` own properties` values
+	 *
 	 * @param {object} obj
 	 * @return {Array}
 	 */
@@ -301,6 +314,7 @@ if (typeof Object.values !== 'function') {
 }
 /**
  * Converts object into string of html data set
+ *
  * @return {string}
  */
 Object.toHtmlDataSet = function() {
@@ -312,6 +326,7 @@ Object.toHtmlDataSet = function() {
 };
 /**
  * Converts object into string of html attributes
+ *
  * @return {string}
  */
 Object.toHtmlAttributes = function() {
@@ -323,6 +338,7 @@ Object.toHtmlAttributes = function() {
 };
 /**
  * Returns copy of original array and appends additional_values
+ *
  * @param {Array} original
  * @param {...(number|string|boolean|object|Array)} [additional_values]
  * @return {Array}
@@ -357,6 +373,7 @@ Array.newFrom = function(original, additional_values) {
 };
 /**
  * Returns string of elements, separated by space
+ *
  * @return {string}
  */
 Array.toSpaceSeparatedString = function() {
@@ -364,6 +381,7 @@ Array.toSpaceSeparatedString = function() {
 };
 /**
  * Cleans array from specific values. If no delete_value is passed, deletes undefined values,
+ *
  * @param {*} [delete_value]
  * @return {Array}
  */
@@ -378,6 +396,7 @@ Array.prototype.clean = function(delete_value) {
 };
 /**
  * Merges arrays without duplicates
+ *
  * @param {...Array} array
  * @return {Array}
  */
@@ -400,6 +419,7 @@ Array.prototype.merge = function(array) {
 };
 /**
  * Checks if array contains some element
+ *
  * @param {*} it
  * @return {boolean}
  */
@@ -437,6 +457,7 @@ if (![].includes) {
 }
 /**
  * Returns rounded num to specific count of decimals
+ *
  * @param {(number|string)} num
  * @param {number} decimals
  * @return {number}
@@ -667,6 +688,7 @@ $.fn.extend({
 	},
 	/**
 	 * jQuery adapter for Tablesort
+	 *
 	 * @memberOf jQuery#
 	 * @param {object} [options]
 	 *
@@ -701,6 +723,7 @@ $.fn.extend({
 	},
 	/**
 	 * Resolving instance from element
+	 *
 	 * @memberOf jQuery#
 	 * @return {*}
 	 */
@@ -710,6 +733,7 @@ $.fn.extend({
 	},
 	/**
 	 * Getting outer HTML string from jQuery collection
+	 *
 	 * @memberOf jQuery#
 	 * @return {string}
 	 */
@@ -723,6 +747,7 @@ $.fn.extend({
 });
 /**
  * Makes jQuery collection from the genuine array of HTML elements or jQuery objects
+ *
  * @param {(Array<Element>|Array<jQuery>|Element)} array
  * @return {jQuery}
  */
@@ -1015,7 +1040,7 @@ jQuery.makeSet = function(array) {
  * @param {string} template_type
  * @param {(object|Array)} [items={}]
  * @param {(jQuery|Element)} [addTo]
- * @param {string} [direction="append"]
+ * @param {string} [direction="append"] - can be "append" or "prepend"
  * @returns {jQuery}
  */
 function tmpl(template_type, items, addTo, direction) {
@@ -1116,6 +1141,9 @@ function tmpl(template_type, items, addTo, direction) {
 	return result;
 }
 /**
+ *
+ * Parses URI and returns object like PHP parse_url function do
+ * @link http://php.net/manual/ru/function.parse-url.php
  *
  * @param {string} str
  * @param {object} [options]
@@ -1237,6 +1265,7 @@ function getGenderText(gender, cases) {
 
 /**
  * Returns formatted array of format variable
+ *
  * @param {(Array<OneDate>|DatesCollection)} dates
  * @param {(string|Array|jQuery|object)} format
  * @param {boolean} [is_same_time=false]
@@ -1432,6 +1461,7 @@ function formatDates(dates, format, is_same_time) {
 }
 /**
  * Cutting out seconds in time string
+ *
  * @param {string} time
  * @return {string}
  */
@@ -1444,6 +1474,7 @@ function trimSeconds(time) {
 }
 /**
  * Returns formatted range of dates
+ *
  * @param {timestamp} first_date
  * @param {timestamp} last_date
  * @returns {string}
@@ -1469,6 +1500,7 @@ function displayDateRange(first_date, last_date) {
 }
 /**
  * Returns formatted times range
+ *
  * @param {string} start_time
  * @param {string} [end_time]
  * @returns {string}
@@ -1486,6 +1518,8 @@ function displayTimeRange(start_time, end_time) {
 	}
 }
 /**
+ *
+ * Returns formatted currency
  *
  * @param {(string|number)} number
  * @param {string} [separator=' ']
@@ -1511,6 +1545,7 @@ function formatCurrency(number, separator, decimal_separator, before, after) {
 		+ (after ? (separator + after) : '');
 }
 /**
+ * Making ticket number more readable ( 999999999 => 999 999 999 )
  *
  * @param {(string|number)} number
  * @return {string}
@@ -1519,7 +1554,8 @@ function formatTicketNumber(number) {
 	return ('' + number).replace(/(\d{3})/g, '$1 ').trim();
 }
 /**
- * Generates guid-like string
+ * Generates guid-like string (actually, it`s not guid, just randomly compiled string)
+ *
  * @return {string}
  */
 function guid() {
@@ -1531,6 +1567,7 @@ function guid() {
 }
 /**
  * Validating form or fieldset
+ *
  * @param {(Element|jQuery)} $form
  * @return {boolean}
  */
@@ -1552,6 +1589,8 @@ function isFormValid($form) {
 }
 /**
  *
+ * Gets filename from url, or empty string, if there is no filename in URL
+ *
  * @param {string} [url]
  * @returns {string}
  */
@@ -1559,6 +1598,8 @@ function getFilenameFromURL(url) {
 	return url ? url.split('\\').pop().split('/').pop() : '';
 }
 /**
+ *
+ * Checks is the argument is base64 encoded string
  *
  * @param {string} string
  * @returns {boolean}
@@ -1568,6 +1609,8 @@ function isBase64(string) {
 }
 /**
  *
+ * Checks is the argument is function
+ *
  * @param {*} variable
  * @return {boolean}
  */
@@ -1575,6 +1618,8 @@ function isFunction(variable) {
 	return (variable && typeof variable === 'function');
 }
 /**
+ *
+ * Returns array of the numbers
  *
  * @param {number} end
  * @param {number} [start]
@@ -1589,6 +1634,20 @@ function range(end, start, step) {
 	}
 	
 	return array;
+}
+/**
+ *
+ * @param {string} slug
+ * @param {object} namespace
+ * @param {object} locales
+ * @return {string}
+ */
+function localeFromNamespace(slug, namespace, locales) {
+	for( var prop in namespace ) {
+		if( namespace.hasOwnProperty(prop) && namespace[ prop ] === slug )
+			return locales[ prop ];
+	}
+	return '';
 }
 /**
  *

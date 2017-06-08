@@ -122,6 +122,39 @@ class User extends AbstractUser
 		return $p_get->rowCount() > 0;
 	}
 
+	public function hasRights(Organization $organization, array $role_names)
+	{
+
+		if (count($role_names) == 0) throw new InvalidArgumentException('ROLE_NAMES_ARE_REQUIRED');
+
+		$q_get_is_admin = App::queryFactory()
+			->newSelect()
+			->from('users_organizations')
+			->cols(array('user_id'))
+			->join('inner', 'users_roles', 'users_organizations.role_id = users_roles.id')
+			->where('organization_id = ?', $organization->getId())
+			->where('users_organizations.user_id = ?', $this->getId())
+			->where('status = TRUE');
+
+		$bind_values = array();
+		$index = 0;
+		$where_str = array();
+
+		foreach ($role_names as $role_name) {
+			if (!in_array($role_name, Roles::ROLES)) throw new InvalidArgumentException();
+			$where_str[] = 'users_roles.name = :name_' . $index;
+			$bind_values[':name_' . $index] = $role_name;
+			$index++;
+		}
+
+		$q_get_is_admin
+			->where('(' . implode(' OR ', $where_str) . ')')
+			->bindValues($bind_values);
+
+		$p_get = $this->db->prepareExecute($q_get_is_admin, 'CANT_GET_ADMIN_STATUS');
+		return $p_get->rowCount() > 0;
+	}
+
 	public function isEventAdmin(Event $event): bool
 	{
 		$q_get_is_admin = App::queryFactory()

@@ -40,6 +40,7 @@ FeedPage = extending(Page, (function() {
 		);
 		this.events = new EventsCollection();
 		this.next_events_length = 10;
+		this.cities = new CitiesCollection();
 		this.wrapper_tmpl = 'feed';
 		this.with_header_tabs = true;
 	}
@@ -99,7 +100,7 @@ FeedPage = extending(Page, (function() {
 		
 		PAGE.block_scroll = true;
 		
-		return PAGE.events.fetchFeed(this.fields, this.next_events_length, function(events) {
+		return PAGE.events.fetchFeed(this.fields, this.next_events_length, {city_id: __APP.USER.selected_city.id}, function(events) {
 			var $events = __APP.BUILD.eventCards(PAGE.events.last_pushed);
 			
 			PAGE.block_scroll = false;
@@ -143,12 +144,38 @@ FeedPage = extending(Page, (function() {
 		});
 	};
 	
+	FeedPage.prototype.initCitySelect = function() {
+		var PAGE = this;
+		
+		PAGE.cities.fetchCities(null, 0, 'distance,local_name').done(function() {
+			
+			PAGE.$view.find('.FeedCitiesSelect')
+			    .html(tmpl('option', PAGE.cities.map(function(city) {
+				    return {
+					    val: city.id,
+					    display_name: city.local_name
+				    };
+			    })))
+			    .select2({
+				    containerCssClass: 'form_select2',
+				    dropdownCssClass: 'form_select2_drop'
+			    })
+			    .select2('val', __APP.USER.selected_city.id)
+			    .off('change.SelectCity')
+			    .on('change.SelectCity', function() {
+				    __APP.USER.selected_city = PAGE.cities.getByID($(this).val());
+				    __APP.reload();
+			    });
+		});
+	};
+	
 	FeedPage.prototype.render = function() {
 		var PAGE = this,
 			$window = $(window);
 		
 		if (!(__APP.PREVIOUS_PAGE instanceof FeedPage)) {
 			PAGE.initFeedCalendar();
+			PAGE.initCitySelect();
 		}
 		
 		if(__APP.USER.isLoggedOut()){
@@ -164,7 +191,7 @@ FeedPage = extending(Page, (function() {
 				
 				return false;
 			});
-			if(window.location.pathname == '/feed/favored' || window.location.pathname == '/feed/recommendations'){
+			if(window.location.pathname === '/feed/favored' || window.location.pathname === '/feed/recommendations'){
 				__APP.changeState('/feed/actual', true, true);
 				return null;
 			}

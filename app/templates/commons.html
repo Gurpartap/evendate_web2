@@ -62,6 +62,12 @@
 	<option class="{classes}" value="{val}" {attributes} {dataset}>{display_name}</option>
 </script>
 
+<script type="javascript/template" id="tmpl-order-status">
+	<div class="order_status -order_status_{status}">
+		<span class="order_status_name">{name}</span>
+	</div>
+</script>
+
 <script type="javascript/template" id="tmpl-user-social-links-wrapper">
 	<div class="social_link_wrapper">{links}</div>
 </script>
@@ -84,6 +90,19 @@
 	{avatar}
 	<span class="avatar_name">{name}</span>
 	</{html_tag}>
+</script>
+
+<script type="javascript/template" id="tmpl-staff-avatar-block">
+	<div class="staff_avatar_block {can_edit} StaffAvatarBlock">
+		{avatar_block}
+		<span class="staff_avatar_remove RemoveStaff">×</span>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-staff-avatar-block-removing">
+	<div class="staff_avatar_block">
+		<span class="staff_avatar_block_return">{username} удален(а) из списка. Хотите <span class="action -color_accent -no_uppercase ReturnStaff">вернуть</span>?</span>
+	</div>
 </script>
 
 <script type="javascript/template" id="tmpl-avatars-collection">

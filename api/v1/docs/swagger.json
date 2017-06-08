@@ -3979,6 +3979,10 @@
           "type": "integer",
           "format": "int64"
         },
+        "[orders_count]": {
+          "type": "integer",
+          "format": "int64"
+        },
         "[latitude]": {
           "type": "number",
           "format": "float"
@@ -4048,6 +4052,9 @@
           "type": "boolean"
         },
         "[is_hidden]": {
+          "type": "boolean"
+        },
+        "[is_now]": {
           "type": "boolean"
         },
         "[tags]": {

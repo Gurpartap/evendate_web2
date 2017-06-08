@@ -116,8 +116,8 @@ $url_parts = explode('/', $url);
     <link rel="stylesheet" href="/dist/vendor.css?rev=3b6878c5b89f643e8d96b1b336b7d4fc">
     <link rel="stylesheet" href="/dist/app.css?rev=7d42f3de4d0a54346c91e96f169c810d"><?php
 	} else { ?>
-    <link rel="stylesheet" href="/dist/vendor.min.css?rev=4165c69f5d04ec431ab5bc41425847a5">
-    <link rel="stylesheet" href="/dist/app.min.css?rev=bb8a0ef19a7a789b48b10fd00b4b71f6"><?php
+    <link rel="stylesheet" href="/dist/vendor.min.css?rev=9310f56067330ec211093da56557d261">
+    <link rel="stylesheet" href="/dist/app.min.css?rev=83506d67f5cad9d39581b4fad14afeeb"><?php
 	} ?>
 
 	<?php
@@ -316,7 +316,7 @@ $url_parts = explode('/', $url);
     </div>
   </header>
   <div id="main_section">
-
+		<div class="app_inspectors_wrapper AppInspectorsWrapper"></div>
     <div class="app_view -hidden PageView">
       <div class="page_wrapper Content -fadeable"></div>
     </div>

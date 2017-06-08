@@ -47,6 +47,8 @@ OneTicketType = extending(OneEntity, (function() {
 		this.promocode_effort = null;
 	}
 	
+	OneTicketType.prototype.ID_PROP_NAME = 'uuid';
+	
 	/**
 	 *
 	 * @param {(string|number)} event_id

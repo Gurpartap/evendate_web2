@@ -49,6 +49,7 @@ __APP = {
 			'event': {
 				'^([0-9]+)': {
 					'overview': AdminEventOverviewPage,
+					'orders': AdminEventOrdersPage,
 					'check_in': AdminEventCheckInPage,
 					'edit': AdminEventEditPage,
 					'': AdminEventOverviewPage
@@ -249,6 +250,7 @@ __APP = {
 	reInit: function appReInit() {
 		$(window).off('scroll');
 		
+		AbstractAppInspector.hideCurrent();
 		__APP.SERVER.abortAllConnections();
 		__APP.PREVIOUS_PAGE = __APP.CURRENT_PAGE;
 		__APP.PREVIOUS_PAGE.destroy();
@@ -323,7 +325,7 @@ __LOCALES = {
 				
 				APPROVED: 'Подтверждено',
 				PAYED: 'Оплачено',
-				WITHOUT_PAYMENT: 'Подтверждено',
+				WITHOUT_PAYMENT: 'Без оплаты',
 				
 				TICKETS_ARE_OVER: 'Билеты закончились',
 				RETURNED_BY_ORGANIZATION: 'Возврат билета организатором',

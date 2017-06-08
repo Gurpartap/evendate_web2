@@ -106,7 +106,10 @@ CatalogPage = extending(Page, (function() {
 			containerCssClass: 'form_select2',
 			dropdownCssClass: 'form_select2_drop'
 		}).off('change.SelectCity').on('change.SelectCity', function() {
-			__APP.changeState('/organizations/at/' + PAGE.cities.getByID($(this).val()).en_name, true, true);
+			var selected_city = PAGE.cities.getByID($(this).val());
+			
+			__APP.USER.selected_city = selected_city;
+			__APP.changeState('/organizations/at/' + selected_city.en_name, true, true);
 		});
 		if (PAGE.selected_city_name) {
 			$organizations_cities_select.select2('val', PAGE.cities.getByName(PAGE.selected_city_name).id);
