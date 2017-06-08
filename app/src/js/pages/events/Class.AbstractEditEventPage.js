@@ -75,6 +75,7 @@ AbstractEditEventPage = extending(Page, (function() {
 				image_horizontal: form_data.image_horizontal,
 				filenames: {horizontal: form_data.filename_horizontal},
 				is_free: !!form_data.is_free,
+				vk_post: !!form_data.vk_post,
 				min_price: form_data.is_free ? null : form_data.min_price,
 				delayed_publication: !!form_data.delayed_publication,
 				registration_required: !!form_data.registration_required,
@@ -149,6 +150,15 @@ AbstractEditEventPage = extending(Page, (function() {
 			}));
 		}
 		send_data.dates = send_data.dates.getArrayCopy();
+		
+		if (form_data.vk_post) {
+			send_data.vk = {
+				guid: form_data.vk_guid,
+				image: form_data.vk_image,
+				filename: form_data.vk_filename,
+				description: form_data.vk_description
+			}
+		}
 		
 		return send_data;
 	};

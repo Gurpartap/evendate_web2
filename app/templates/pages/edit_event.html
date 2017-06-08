@@ -149,7 +149,7 @@
 
 								<fieldset class="Collapsing">
 									<div class="form_unit form_accent_block">
-										<input id="edit_event_to_public_vk" class="form_checkbox CollapsingTrigger Switch" type="checkbox" name="to_post_vk" tabindex="-1" data-collapsing_id="public_vk" data-switch_id="public_vk">
+										<input id="edit_event_to_public_vk" class="form_checkbox CollapsingTrigger Switch" type="checkbox" name="vk_post" tabindex="-1" data-collapsing_id="public_vk" data-switch_id="public_vk">
 										<label class="form_label" for="edit_event_to_public_vk"><span>Опубликовать Вконтакте</span></label>
 									</div>
 
@@ -160,20 +160,20 @@
 												<wbr>
 												<h4 class="form_text"><label for="edit_event_vk_groups">Сообщество</label></h4>
 												<div class="form_unit">
-													<select id="edit_event_vk_groups" class="form_select2 ToSelect2 VkGroupsSelect" name="vk_group"></select>
+													<select id="edit_event_vk_groups" class="form_select2 ToSelect2 VkGroupsSelect" name="vk_guid"></select>
 												</div>
 											</div>
 
 											<h4 class="form_text"><label for="edit_event_description">Описание</label></h4>
 											<div class="form_unit">
-												<textarea id="edit_event_vk_post" class="form_textarea VKPostText" name="vk_post" placeholder="" readonly style="height: 10em"></textarea>
+												<textarea id="edit_event_vk_post" class="form_textarea VKPostText" name="vk_description" placeholder="" readonly style="height: 10em"></textarea>
 											</div>
 
 											<h4 class="form_text"><label for="edit_event_description">Обложка</label></h4>
 											<div class="form_unit">
 												<div class="edit_event_vk_img EditEventVKImageHolder">
-													<input id="edit_event_vk_image_src" class="ImgSrc" type="hidden" name="vk_image_src" value="{vk_image_base64}">
-													<input id="edit_event_vk_image_filename" class="FileName" type="hidden" name="vk_image_filename" value="{vk_image_filename}">
+													<input id="edit_event_vk_image_src" class="ImgSrc" type="hidden" name="vk_image" value="{vk_image_base64}">
+													<input id="edit_event_vk_image_filename" class="FileName" type="hidden" name="vk_filename" value="{vk_image_filename}">
 													<div class="edit_event_vk_img_preview">
 														<img class="ImgPreview" src="{vk_image_url}">
 														<div class="edit_event_vk_img_preview_dash_border"></div>

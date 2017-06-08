@@ -231,6 +231,12 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {(string|number)} [registration_limit_count]
 	 * @property {(RegistrationFieldsCollection|Array<RegistrationFieldModel>)} [registration_fields]
 	 * @property {boolean} [registration_locally]
+	 * @property {boolean} [vk_post]
+	 * @property {object} [vk]
+	 * @property {string} [vk.guid]
+	 * @property {string} [vk.image]
+	 * @property {string} [vk.filename]
+	 * @property {string} [vk.description]
 	 */
 	/**
 	 *
