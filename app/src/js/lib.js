@@ -89,12 +89,14 @@ __C = {
 		ACTIVE: '-active',
 		DISABLED: '-disabled',
 		HIDDEN: '-hidden',
+		SHOW: '-show',
 		ICONS: {
 			STAR: 'fa-star',
 			STAR_O: 'fa-star-o',
 			BELL_O: 'fa-bell-o',
 			TIMES: 'fa-times',
 			PLUS: 'fa-plus',
+			MINUS: 'fa-minus',
 			CHECK: 'fa-check',
 			PENCIL: 'fa-pencil',
 			EYE: 'fa-eye',
@@ -1627,6 +1629,20 @@ function range(end, start, step) {
 	}
 	
 	return array;
+}
+/**
+ *
+ * @param {string} slug
+ * @param {object} namespace
+ * @param {object} locales
+ * @return {string}
+ */
+function localeFromNamespace(slug, namespace, locales) {
+	for( var prop in namespace ) {
+		if( namespace.hasOwnProperty(prop) && namespace[ prop ] === slug )
+			return locales[ prop ];
+	}
+	return '';
 }
 /**
  *

@@ -1,5 +1,6 @@
 /**
  * @requires ../Class.OneEntity.js
+ * @requires ../../data_models/registration_field/Class.RegistrationFieldModelsCollection.js
  */
 /**
  *
@@ -17,6 +18,7 @@ OneOrder = extending(OneEntity, (function() {
 	 *
 	 * @property {?(string|number)} uuid
 	 * @property {?(string|number)} user_id
+	 * @property {?(string|number)} number
 	 * @property {?string} order_content
 	 * @property {?boolean} is_canceled
 	 * @property {?number} status_id
@@ -28,6 +30,7 @@ OneOrder = extending(OneEntity, (function() {
 	 * @property {?number} canceled_at
 	 *
 	 * @property {EventsTicketsCollection} tickets
+	 * @property {RegistrationFieldsCollection} registration_fields
 	 * @property {OneUser} user
 	 */
 	function OneOrder(event_id, uuid) {
@@ -35,6 +38,7 @@ OneOrder = extending(OneEntity, (function() {
 		
 		this.uuid = setDefaultValue(uuid, 0);
 		this.event_id = setDefaultValue(event_id, 0);
+		this.number = null;
 		this.order_content = null;
 		this.is_canceled = null;
 		this.status_id = null;
@@ -45,18 +49,18 @@ OneOrder = extending(OneEntity, (function() {
 		this.canceled_at = null;
 		
 		this.tickets = new EventsTicketsCollection();
+		this.registration_fields = new RegistrationFieldsCollection();
 		this.user_id = null;
 		this.user = new OneUser();
 		
 		Object.defineProperty(this, 'status_name', {
 			get: function() {
-				for( var prop in OneOrder.EXTENDED_ORDER_STATUSES ) {
-					if( OneOrder.EXTENDED_ORDER_STATUSES.hasOwnProperty(prop) && OneOrder.EXTENDED_ORDER_STATUSES[ prop ] === self.status_type_code )
-						return __LOCALES.ru_RU.TEXTS.TICKET_STATUSES[ prop ];
-				}
+				return localeFromNamespace(self.status_type_code, OneOrder.EXTENDED_ORDER_STATUSES, __LOCALES.ru_RU.TEXTS.TICKET_STATUSES);
 			}
 		});
 	}
+	
+	OneOrder.prototype.ID_PROP_NAME = 'uuid';
 	
 	/**
 	 *

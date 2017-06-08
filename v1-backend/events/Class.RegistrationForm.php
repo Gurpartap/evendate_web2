@@ -116,6 +116,7 @@ class RegistrationForm
 				'form_field_uuid',
 				'form_field_label',
 				'form_field_type',
+				'form_field_type_id',
 				'form_field_required',
 				'value',
 				'created_at',
