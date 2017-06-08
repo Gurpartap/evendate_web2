@@ -78,12 +78,12 @@ RegistrationField = extending(OneEntity, (function() {
 	RegistrationField.prototype.ID_PROP_NAME = 'form_field_uuid';
 	/**
 	 *
-	 * @enum {string}
+	 * @alias RegistrationFieldModel.TYPES
 	 */
 	RegistrationField.TYPES = RegistrationFieldModel.TYPES;
 	/**
 	 *
-	 * @enum {string}
+	 * @alias RegistrationFieldModel.DEFAULT_LABEL
 	 */
 	RegistrationField.DEFAULT_LABEL = RegistrationFieldModel.DEFAULT_LABEL;
 	/**

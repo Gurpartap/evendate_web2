@@ -137,7 +137,7 @@ AdminEventOrdersPage = extending(AdminEventPage, (function() {
 						data.inspector.hide();
 					} else {
 						if (!(data.inspector instanceof OrderAppInspector)) {
-							data.inspector = new OrderAppInspector(self.orders.getByID($this.data('order_uuid')));
+							data.inspector = new OrderAppInspector(self.orders.getByID($this.data('order_uuid')), self.event);
 							$this.data(data);
 						}
 						data.inspector.show();
