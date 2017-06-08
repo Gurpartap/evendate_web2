@@ -244,6 +244,7 @@ __APP = {
 	reInit: function appReInit() {
 		$(window).off('scroll');
 		
+		AbstractAppInspector.hideCurrent();
 		__APP.SERVER.abortAllConnections();
 		__APP.PREVIOUS_PAGE = __APP.CURRENT_PAGE;
 		__APP.PREVIOUS_PAGE.destroy();

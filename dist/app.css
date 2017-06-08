@@ -4041,6 +4041,87 @@ body.-open_modal > .modal_wrapper {
 
 .app_inspector_content {padding: 12px 18px}
 
+.app_inspector_subtitle {
+	display: block;
+	margin: 36px 0 18px;
+	font-size: .8125em;
+	font-weight: bold;
+	color: #9fa6b3;
+	color: var(--color_primary_50);
+	text-transform: uppercase;
+}
+
+.app_inspector_wrapper {
+	display: flex;
+	justify-content: flex-end;
+	align-items: baseline;
+	margin: 36px 0;
+}
+
+
+.app_inspector_ticket {
+	border-radius: 3px;
+	background-color: #f9f9fa;
+	background-color: var(--color_background_gray);
+}
+
+.app_inspector_ticket_unit {
+	padding: 12px 12px 20px;
+	font-size: .875em;
+}
+.app_inspector_ticket_unit > .app_inspector_ticket_unit_value {font-size: 1.2857em}
+
+.app_inspector_ticket_top_wrapper {
+	display: flex;
+	align-items: flex-start;
+}
+
+.app_inspector_ticket_top_wrapper > .app_inspector_ticket_unit {
+	flex: none;
+	width: 50%;
+}
+.app_inspector_ticket_top_wrapper > .app_inspector_ticket_unit > .app_inspector_ticket_unit_value {
+	font-size: 1em;
+	color: #3e4d66;
+	color: var(--color_primary);
+}
+
+
+.app_inspector_ticket_footer {
+	display: flex;
+	height: 24px;
+	justify-content: center;
+	align-items: center;
+	background-color: #e2e4e8;
+	border-radius: 0 0 3px 3px;
+}
+
+.app_inspector_ticket_footer > span {
+	color: #9fa6b3;
+	color: var(--color_primary_50);
+	font-size: .6875em;
+	font-weight: bold;
+	text-transform: uppercase;
+}
+
+.app_inspector_ticket_unit_name,
+.app_inspector_ticket_unit_value {
+	display: block;
+	font-weight: 500;
+	line-height: 1.2;
+}
+
+.app_inspector_ticket_unit_name {
+	margin-top: .4em;
+	color: #9fa6b3;
+	color: var(--color_primary_50);
+}
+
+.app_inspector_ticket_unit_value {
+	color: #2e3b50;
+	color: var(--color_dark_primary);
+}
+
 /* /App Inspector */
 /* App View */
 

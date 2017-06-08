@@ -1,0 +1,27 @@
+<script type="javascript/template" id="tmpl-app-inspector-title">
+	<h6 class="app_inspector_subtitle">{title}</h6>
+</script>
+
+<script type="javascript/template" id="tmpl-app-inspector-ticket">
+	<div class="app_inspector_ticket">
+		<div class="app_inspector_ticket_top_wrapper">
+			<div class="app_inspector_ticket_unit">
+				<span class="app_inspector_ticket_unit_name">Номер</span>
+				<span class="app_inspector_ticket_unit_value">{number}</span>
+			</div>
+			<div class="app_inspector_ticket_unit">
+				<span class="app_inspector_ticket_unit_name">Цена</span>
+				<span class="app_inspector_ticket_unit_value">{price}</span>
+			</div>
+		</div>
+		<div class="app_inspector_ticket_unit">
+			<span class="app_inspector_ticket_unit_name">Название</span>
+			<span class="app_inspector_ticket_unit_value">{name}</span>
+		</div>
+		{footer}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-app-inspector-ticket-footer">
+	<footer class="app_inspector_ticket_footer"><span>Билет использован</span></footer>
+</script>

@@ -47,6 +47,7 @@ OneOrder = extending(OneEntity, (function() {
 		this.canceled_at = null;
 		
 		this.tickets = new EventsTicketsCollection();
+		this.registration_fields = new RegistrationFieldsCollection();
 		this.user_id = null;
 		this.user = new OneUser();
 		

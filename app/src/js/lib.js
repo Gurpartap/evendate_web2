@@ -89,6 +89,7 @@ __C = {
 		ACTIVE: '-active',
 		DISABLED: '-disabled',
 		HIDDEN: '-hidden',
+		SHOW: '-show',
 		ICONS: {
 			STAR: 'fa-star',
 			STAR_O: 'fa-star-o',

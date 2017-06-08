@@ -25,7 +25,7 @@ AdminEventOrdersPage = extending(AdminEventPage, (function() {
 		AdminEventPage.call(this, event_id);
 		
 		this.orders = new OrdersCollection(event_id);
-		this.orders_fields = new Fields('created_at', {
+		this.orders_fields = new Fields('created_at', 'registration_fields', {
 			user: {/*
 				fields: new Fields('email')*/
 			},
@@ -129,9 +129,19 @@ AdminEventOrdersPage = extending(AdminEventPage, (function() {
 			});
 			
 			$rows.on('click.SelectRow', function(e) {
-				var $this = $(this);
+				var $this = $(this),
+					data = $this.data();
 				
 				if (!$(e.target).hasClass('DataTableRowExpand')) {
+					if (data.inspector && data.inspector.is_shown) {
+						data.inspector.hide();
+					} else {
+						if (!(data.inspector instanceof OrderAppInspector)) {
+							data.inspector = new OrderAppInspector(self.orders.getByUUID($this.data('order_uuid')));
+							$this.data(data);
+						}
+						data.inspector.show();
+					}
 					$rows.not($this).removeClass('-selected');
 					$this.toggleClass('-selected');
 				}
