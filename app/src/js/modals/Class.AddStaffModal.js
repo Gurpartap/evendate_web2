@@ -50,6 +50,12 @@ AddStaffModal = extending(AbstractModal, (function() {
 		
 		bindRippleEffect(this.content);
 		
+		function format(user) {
+			return __APP.BUILD.avatarBlocks(user, {
+				avatar_classes: [__C.CLASSES.SIZES.X30, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]
+			}).outerHTML();
+		}
+		
 		$search_by_name_input.select2({
 			width: '100%',
 			placeholder: $search_by_name_input.attr('placeholder'),
@@ -60,17 +66,19 @@ AddStaffModal = extending(AbstractModal, (function() {
 					return {name: searchTerm};
 				},
 				results: function(remoteData, pageNumber, query) {
+					var users = new UsersCollection();
+					
+					users.setData(remoteData.data);
+					
 					return {
-						results: remoteData.data.map(function(user) {
-							return {
-								id: user.id,
-								text: [user.last_name, user.first_name, user.middle_name].join(' ').trim()
-							}
-						})
+						results: users,
+						text: format
 					};
 				}
 			},
-			dropdownCssClass: "form_select2_drop"
+			dropdownCssClass: 'form_select2_drop',
+			formatResult: format,
+			formatSelection: format
 		});
 		
 		this.content.find('.AddStaff').on('click', function() {
