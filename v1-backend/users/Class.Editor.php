@@ -156,11 +156,24 @@ class Editor extends User
 			));
 		$results = App::getBodyJSON($response);
 
+		$q_ins_group = App::queryFactory()->newInsert();
+		$q_ins_group->into('vk_groups');
+
 		$_res = array();
 		if (isset($results['response'])){
 			unset($results['response'][0]);
 			foreach ($results['response'] as $item){
 				$_res[] = $item;
+				$data = array(
+					'gid' => $item['gid'],
+					'name' => $item['name'],
+					'screen_name' => $item['screen_name'],
+					'photo' => $item['photo']
+				);
+				$q_ins_group->cols($data)
+					->onConflictUpdate(array('gid'), $data)
+					->returning(array('id'));
+				App::DB()->prepareExecute($q_ins_group, 'CANT_INSERT_GROUP')->fetch();
 			}
 		}
 		return new Result(true, '', $_res);

@@ -4153,6 +4153,9 @@
         "[actuality]": {
           "type": "integer",
           "format": "int64"
+        },
+        "[vk_post_link]": {
+          "type": "string"
         }
       }
     },
