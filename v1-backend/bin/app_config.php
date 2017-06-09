@@ -315,4 +315,10 @@ class App
 			)
 		);
 	}
+
+	public static function getBodyJSON(\GuzzleHttp\Psr7\Response $response, bool $object = true)
+	{
+		return json_decode($response->getBody()->getContents(), $object);
+	}
+
 }

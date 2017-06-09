@@ -37,6 +37,7 @@
   </div>
 </div>
 <script src="/vendor/jquery/dist/jquery.js" type="text/javascript"></script>
+<script src="/app/js/app.js" type="text/javascript"></script>
 
 </body>
 <?php
@@ -66,20 +67,28 @@ require_once('footer.php');
                 window.clearInterval(interval);
             }
             $pr_text.text(texts_array[text_number++]);
-        }, 3000);
+        }, 3000),
+        data = $.extend(searchToObject(), hashToObject(), true)
+    ;
 
-    console.time('AuthStart');
     $.ajax({
         url: '/api/v1/auth/' + window.location.search,
-        success: function (res) {
-            if (res.status) {
-                if (res.data) {
+        success: function (auth_res) {
+            if (auth_res.status) {
+                if (auth_res.data) {
                     $.ajax({
                         url: 'auth.php',
-                        data: res.data,
+                        data: auth_res.data,
                         success: function (res) {
-                            console.timeEnd('AuthStart');
-                            window.location.href = '/';
+                            if (data.mobile == 'true') {
+                                var __params = [];
+                                for (var key in auth_res.data){
+                                    __params.push(key + '=' + auth_res.data[key]);
+                                }
+                                window.location.href = '/mobileAuthDone.php?' + __params.join('&');
+                            } else {
+                                window.location.href = '/';
+                            }
                         }
                     });
                 } else {

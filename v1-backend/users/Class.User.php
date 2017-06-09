@@ -345,4 +345,28 @@ class User extends AbstractUser
 		return new Result(true, '', array($data));
 	}
 
+	public function getVkAccessToken()
+	{
+		$q_get = App::queryFactory()->newSelect();
+		$q_get->from('vk_sign_in')
+			->cols(array(
+				'uid',
+				'access_token',
+				'expires_in',
+				'secret',
+				'user_id',
+				'created_at',
+				'updated_at',
+				'photo_50',
+				'photo_100',
+				'photo_max_orig',
+			))->where('user_id = ?', $this->getId())
+			->orderBy(array('id DESC'))
+			->limit(1);
+
+		$res = $this->db->prepareExecute($q_get, 'CANT_GET_ACCESS_TOKEN');
+		if ($res->rowCount() != 1) throw new LogicException('CANT_GET_ACCESS_TOKEN');
+		return $res->fetch();
+	}
+
 }

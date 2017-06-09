@@ -9,6 +9,10 @@ require_once $BACKEND_FULL_PATH . '/events/Class.EventsCollection.php';
 
 $__modules['organizations'] = array(
 	'GET' => array(
+		'{vk_groups}' => function () use ($__db, $__pagination, $__request, $__user, $__fields, $__order_by) {
+			if ($__user instanceof User === false) throw new PrivilegesException('', $__db);
+			return $__user->getEditorInstance()->getVkGroupsToPost();
+		},
 		'{(id:[0-9]+)/staff}' => function ($id) use ($__db, $__pagination, $__request, $__user, $__fields, $__order_by) {
 			return UsersCollection::filter(
 				$__db,
