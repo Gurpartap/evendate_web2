@@ -78,8 +78,10 @@ class VkPost
 					'image_path' => $image_data['path'],
 					'message' => $data['description'],
 					'event_id' => $data['event_id'],
+					'post_id' => $image_res['response']['post_id'],
 					'group_id' => $data['guid']
 				));
+			App::DB()->prepareExecute($q_ins, 'CANT_SAVE_VK_POST');
 		}
 
 		return $image_res;

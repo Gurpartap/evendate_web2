@@ -40,6 +40,7 @@ class Event extends AbstractEntity
 	const ACTUALITY_FIELD_NAME = 'actuality';
 	const NOTIFICATIONS_FIELD_NAME = 'notifications';
 	const CAN_EDIT_FIELD_NAME = 'can_edit';
+	const VK_POST_LINK_FIELD_NAME = 'vk_post_link';
 
 	/*ONLY FOR ADMINS*/
 	const STATISTICS_FIELD_NAME = 'statistics';
@@ -176,6 +177,12 @@ class Event extends AbstractEntity
 		self::RANDOM_FIELD_NAME => '(SELECT created_at / (random() * 9 + 1)
 			FROM view_events AS ve
 			WHERE ve.id = view_events.id) AS ' . self::RANDOM_FIELD_NAME,
+
+		self::VK_POST_LINK_FIELD_NAME => '(SELECT \'https://vk.com/wall-\' || vk_groups.gid || \'_\' || vk_posts.post_id
+			FROM vk_posts
+			 INNER JOIN vk_groups ON vk_groups.gid::TEXT = vk_posts.group_id
+			WHERE vk_posts.event_id = view_events.id
+			) AS ' . self::VK_POST_LINK_FIELD_NAME,
 
 
 		self::CAN_EDIT_FIELD_NAME => '(SELECT id IS NOT NULL
