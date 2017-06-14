@@ -66,7 +66,9 @@ EventPage = extending(Page, (function() {
 		orders: {
 			fields: new Fields('created_at')
 		},
-		tickets: new Fields('created_at', 'number', 'ticket_type')
+		tickets: {
+			fields: new Fields('created_at', 'number', 'ticket_type')
+		}
 	});
 	
 	/**

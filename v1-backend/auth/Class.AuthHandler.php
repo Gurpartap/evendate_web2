@@ -66,7 +66,7 @@ class AuthHandler
 		$q_get_user = App::queryFactory()->newSelect();
 		$q_get_user
 			->from('users')
-			->cols(array('id'))
+			->cols(array('id', 'vk_uid', 'google_uid', 'facebook_uid'))
 			->where('email IS NOT NULL AND email = ?', $provider->getToInsData()['email'])
 			->orWhere(strtolower($type) . '_uid = ?', $provider->getUID());
 
@@ -83,14 +83,28 @@ class AuthHandler
 		);
 
 		if ($is_new_user) {
-
+			$_data[strtolower($type) . '_uid'] = $provider->getUID();
 			$q_user = App::queryFactory()->newInsert()
 				->cols($_data)
 				->into('users')
 				->returning(array('id'));
 
 		} else {
-			$current_user = $p->fetch();
+			if ($p->rowCount() > 1) {
+				$q_get_user = App::queryFactory()->newSelect();
+				$q_get_user
+					->from('users')
+					->cols(array('id', 'vk_uid', 'google_uid', 'facebook_uid'))
+					->where(strtolower($type) . '_uid = ?', $provider->getUID());
+				$p_uid = App::DB()->prepareExecute($q_get_user, 'CANT_FIND_USER_ERROR');
+				if ($p_uid->rowCount() > 0) {
+					$current_user = $p_uid->fetch();
+				}else{
+					$current_user = $p->fetch();
+				}
+			}else{
+				$current_user = $p->fetch();
+			}
 
 			$q_user = App::queryFactory()->newUpdate()
 				->cols($_data)
