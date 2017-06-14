@@ -19,6 +19,7 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 		AbstractEditEventPage.call(this);
 		this.page_title = 'Редактирование события';
 		this.event = new OneEvent(event_id);
+		this.event_fields = EventPage.fields.copy();
 		
 		Object.defineProperty(this, 'organization_id', {
 			get: function() {
@@ -32,7 +33,7 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 	
 	EditEventPage.prototype.fetchData = function() {
 		return this.fetching_data_defer = __APP.SERVER.multipleAjax(
-			this.event.fetchEvent(EventPage.fields),
+			this.event.fetchEvent(this.event_fields),
 			this.my_organizations.fetchMyOrganizations(['admin', 'moderator'], this.my_organizations_fields)
 		);
 	};
@@ -122,6 +123,12 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 		
 		if (page_vars.additional_notification) {
 			PAGE.$wrapper.find('.AdditionalNotificationSwitch').prop('disabled', false).trigger('change');
+		}
+		
+		PAGE.$wrapper.find('.VkPostFieldset').prop('disabled', true);
+		
+		if (PAGE.event.vk_post_link) {
+			PAGE.$wrapper.find('.VkPostTrigger').prop('checked', true);
 		}
 	};
 	

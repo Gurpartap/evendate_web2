@@ -122,6 +122,26 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @param {string} href
+	 * @param {string} title
+	 * @param {(string|Array<string>)} [classes]
+	 * @param {(string|Object<string, string>|Array<string>)} [dataset]
+	 * @param {(string|Object<string, string>|Array<string>)} [attributes]
+	 *
+	 * @returns {jQuery}
+	 */
+	Builder.prototype.action = function buildAction(href, title, classes, dataset, attributes) {
+		
+		return tmpl('action-button', Builder.normalizeBuildProps({
+			href: href,
+			title: title,
+			classes: classes,
+			dataset: dataset,
+			attributes: attributes
+		}));
+	};
+	/**
+	 *
 	 * @param {(...buildProps|Array<buildProps>)} props
 	 * @return {jQuery}
 	 */

@@ -90,6 +90,8 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @property {?number} actuality
 	 *
+	 * @property {?string} vk_post_link
+	 *
 	 * @property {?number} creator_id
 	 * @property {?number} created_at
 	 * @property {?number} updated_at
@@ -162,6 +164,8 @@ OneEvent = extending(OneEntity, (function() {
 		this.can_edit = null;
 		
 		this.actuality = null;
+		
+		this.vk_post_link = null;
 		
 		this.creator_id = null;
 		this.created_at = null;

@@ -100,16 +100,3 @@ socket.on('image.getFromURLDone', function (response) {
 		ImgLoader.handleImgUpload(ImgLoader.current_load_context, response.data, response.filename);
 	}
 });
-
-socket.on('vk.getGroupsToPostDone', function (response) {
-	if (response.error) {
-		showNotifier({text: response.error, status: false});
-	} else {
-		__APP.CURRENT_PAGE.$wrapper.trigger('VKGroupsUploadDone', [response.data.response.splice(0, 1), response.data.response]);
-	}
-});
-
-socket.on('vk.post.error', function (response) {
-	console.log(response);
-	showNotifier({text: 'Не удалось опубликовать событие в группе vk. Пожалуйста, попробуйте еще раз.', status: false});
-});

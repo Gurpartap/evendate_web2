@@ -311,26 +311,6 @@ AbstractEditEventPage = extending(Page, (function() {
 	};
 	
 	
-	AbstractEditEventPage.prototype.toggleVkImg = function() {
-		var PAGE = this,
-			$wrap = PAGE.$wrapper.find('#edit_event_vk_publication').find('.EditEventImgLoadWrap'),
-			$left_block = $wrap.children().eq(0),
-			$right_block = $wrap.children().eq(1);
-		
-		if (!$left_block.hasClass('-hidden')) {
-			$right_block.find('.LoadImg').off('change.ToggleVkImg').one('change.ToggleVkImg', function() {
-				PAGE.toggleVkImg();
-			});
-			$right_block.find('.Text').text('Добавить картинку');
-		} else {
-			$right_block.find('.LoadImg').off('change.ToggleVkImg');
-			$right_block.find('.Text').text('Изменить');
-		}
-		$left_block.toggleClass('-hidden');
-		$right_block.toggleClass('-align_center');
-	};
-	
-	
 	AbstractEditEventPage.prototype.submitForm = function() {
 		var PAGE = this,
 			$form = PAGE.$wrapper.find(".EditEventForm"),
@@ -624,6 +604,7 @@ AbstractEditEventPage = extending(Page, (function() {
 			});
 			
 		})();
+		
 		(function initOrganization() {
 			var $select = PAGE.$wrapper.find('.EditEventOrganizationsSelect');
 			
@@ -638,25 +619,33 @@ AbstractEditEventPage = extending(Page, (function() {
 			$select.select2('val', PAGE.organization_id);
 			
 		})();
+		
 		(function checkVkPublicationAbility() {
 			if (__APP.USER.accounts.contains(OneUser.ACCOUNTS.VK)) {
-				PAGE.$wrapper.off('VKGroupsUploadDone').on('VKGroupsUploadDone', function(e, status, data) {
-					if (status) {
-						PAGE.$wrapper.find('select.VkGroupsSelect').append(__APP.BUILD.option(data.map(function(option) {
-							
-							return {
-								val: option.gid,
-								display_name: option.name,
-								dataset: {
-									img: option.photo
-								}
-							};
-						}))).trigger('change').prop('disabled', data.length === 1);
+				__APP.SERVER.dealAjax(ServerConnection.HTTP_METHODS.GET, '/api/v1/organizations/vk_groups').done(function(groups) {
+					var $vk_group_select = PAGE.$wrapper.find('select.VkGroupsSelect');
+					
+					$vk_group_select.append(__APP.BUILD.option(groups.map(function(group) {
 						
-						PAGE.initCrossPosting();
+						return {
+							val: group.gid,
+							display_name: group.name,
+							dataset: {
+								img: group.photo
+							}
+						};
+					}))).trigger('change');
+					
+					if (groups.length === 1) {
+						$vk_group_select.prop('disabled', true).after(__APP.BUILD.input({
+							type: 'hidden',
+							name: 'vk_guid',
+							value: $vk_group_select.val()
+						}));
 					}
+					
+					PAGE.initCrossPosting();
 				});
-				socket.emit('vk.getGroupsToPost', __APP.USER.id);
 			}
 		})();
 		
@@ -913,7 +902,14 @@ AbstractEditEventPage = extending(Page, (function() {
 				value: page_vars.additional_notification ? m_additional_notification_time.format('HH:mm') : undefined,
 				required: true
 			}),
-			organization_id: PAGE.organization_id || PAGE.event.organization_id
+			organization_id: PAGE.organization_id || PAGE.event.organization_id,
+			vk_post_link: PAGE.event.vk_post_link ? __APP.BUILD.action(
+				PAGE.event.vk_post_link,
+				'Страница публикации во Вконтакте',
+				[__C.CLASSES.COLORS.ACCENT, '-no_uppercase'],
+				{},
+				{target: '_blank'}
+			) : ''
 		})));
 		
 		$organizations_wrapper = PAGE.$wrapper.find('.EditEventOrganizations');
