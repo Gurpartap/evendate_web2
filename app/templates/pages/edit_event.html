@@ -2,7 +2,7 @@
 
 	<div class="edit_event_overlay Tabs EditEventPageTabs" data-tabs_id="edit_event_pages" data-focus_on_change="true">
 		<div class="edit_event_page_wrapper">
-			<div class="page">
+			<div class="material -level_2_material">
 				<form id="edit_event_form" class="EditEventForm">
 					<input id="edit_event_event_id" type="hidden" name="event_id" value="{id}">
 
@@ -19,7 +19,7 @@
 
 							<p class="form_text AvailableEventPublicationsWrapper -hidden">
 								<span>Осталось событий: <span class="AvailableEventPublications">{available_event_publications}</span></span><br>
-								<span>Перейти на <a href="/admin/organization/1/settings#change_tariff" class="link -color_accent Link BuySubscriptionLink">Premium</a></span>
+								<span>Перейти на <a href="/admin/organization/1/settings#change_tariff" class="link -color_accent Link BuySubscriptionLink">полный тариф</a></span>
 							</p>
 
 							<fieldset class="FormOverallFields">
@@ -207,11 +207,15 @@
 			</div>
 		</div>
 
-		<div class="page event_edit_navigation HeaderTabs" data-tabs_id="edit_event_pages">
-			<div class="event_edit_navigation_item Tab"><span>1. Описание</span></div>
-			<div class="event_edit_navigation_item Tab"><span>2. Регистрация на событие</span></div>
-			<div class="event_edit_navigation_item Tab"><span>3. Публикация</span></div>
+		<div class="event_edit_navigation">
+			<div class="event_edit_navigation_material material -level_2_material HeaderTabs" data-tabs_id="edit_event_pages">
+				<div class="event_edit_navigation_item Tab"><span>1. Описание</span></div>
+				<div class="event_edit_navigation_item Tab"><span>2. Регистрация на событие</span></div>
+				<div class="event_edit_navigation_item Tab"><span>3. Публикация</span></div>
+			</div><!--
+			<button class="button -color_bubblegum -size_wide RippleEffect">Отменить событие</button>-->
 		</div>
+
 	</div>
 
 </script>
