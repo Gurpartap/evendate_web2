@@ -132,7 +132,7 @@ Builder = (function() {
 	 */
 	Builder.prototype.action = function buildAction(href, title, classes, dataset, attributes) {
 		
-		return tmpl('action-button', Builder.normalizeBuildProps({
+		return tmpl('action-link', Builder.normalizeBuildProps({
 			href: href,
 			title: title,
 			classes: classes,
