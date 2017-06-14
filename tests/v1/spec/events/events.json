@@ -42,7 +42,14 @@
       "registration_till_date": "2016-12-29",
       "registration_till_time_hours": "18",
       "registration_till_time_minutes": "00",
-      "filename_horizontal": "C0J7HAe2.jpg"
+      "filename_horizontal": "C0J7HAe2.jpg",
+      "vk_post": false,
+      "vk": {
+        "description": "",
+        "image": "",
+        "filename": "C0J7HAe2.jpg",
+        "guid": "115901747"
+      }
     },
     "name": "single event"
   },
