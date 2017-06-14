@@ -93,7 +93,7 @@ AbstractEditEventPage = extending(Page, (function() {
 			}
 			
 			if (form_data.registration_fields && form_data.registration_fields.length) {
-				send_data.registration_fields = (new RegistrationFieldsCollection()).setData(form_data.registration_fields.map(function(id) {
+				send_data.registration_fields = (new RegistrationFieldModelsCollection()).setData(form_data.registration_fields.map(function(id) {
 					var field = new RegistrationFieldModel();
 					
 					field.required = form_data['registration_' + id + '_field_required'];

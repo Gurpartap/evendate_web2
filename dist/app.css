@@ -894,10 +894,10 @@ table {
 .link.-color_accent,
 .link.-text_color_accent {color: #f82969; color: var(--color_accent);}
 
-.link.-color_bubble_gum,
+.link.-color_bubblegum,
 .link.-text_color_bubble_gum {color: #f82969; color: var(--color_bubblegum);}
 
-.link.-color_bubble_gum_alt,
+.link.-color_bubblegum_alt,
 .link.-text_color_bubble_gum_alt {color: #ff5f9e; color: var(--color_bubblegum_alt);}
 
 .link.-color_franklin,
@@ -2204,8 +2204,8 @@ a.button:hover {text-decoration: none}
 .button.-color_accent,
 .button.-color_franklin,
 .button.-color_franklin_alt,
-.button.-color_bubble_gum,
-.button.-color_bubble_gum_alt,
+.button.-color_bubblegum,
+.button.-color_bubblegum_alt,
 .button.-color_telegram,
 .button.-color_vk,
 .button.-color_google,
@@ -2225,7 +2225,7 @@ a.button:hover {text-decoration: none}
 .button.-color_neutral_primary,
 .button.-color_marginal_primary {color: #3e4d66; color: var(--color_primary);}
 
-.button.-color_bubble_gum_alt,
+.button.-color_bubblegum_alt,
 .button.-text_color_bubble_gum,
 .button.-color_neutral_bubble_gum,
 .button.-color_marginal_bubble_gum {color: #f82969; color: var(--color_bubblegum);}
@@ -4615,11 +4615,16 @@ body.-open_modal > .modal_wrapper {
 .edit_event_page_wrapper {
 	width: 700px;
 }
+
 .event_edit_navigation {
 	position: fixed;
 	width: 300px;
 	margin-left: 24px;
+}
+
+.event_edit_navigation_material {
 	padding: 6px 0;
+	margin-bottom: 24px;
 }
 
 .event_edit_navigation_item {
