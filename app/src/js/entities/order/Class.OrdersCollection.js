@@ -53,7 +53,7 @@ OrdersCollection = extending(EntitiesCollection, (function() {
 			order_by: order_by || undefined
 		}, function(data) {
 			self.setData(data);
-			if (success && typeof success == 'function') {
+			if (isFunction(success)) {
 				success.call(self, self.last_pushed);
 			}
 		});

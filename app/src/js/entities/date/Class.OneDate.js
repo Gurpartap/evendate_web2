@@ -11,6 +11,15 @@ OneDate = extending(DateModel, (function() {
 	 *
 	 * @constructor
 	 * @constructs OneDate
+	 *
+	 * @property {number} id
+	 * @property {number} event_id
+	 * @property {number} organization_id
+	 * @property {number} events_count
+	 * @property {number} favored_count
+	 * @property {timestamp} event_date
+	 * @property {string} start_time
+	 * @property {string} end_time
 	 */
 	function OneDate() {
 		DateModel.call(this);

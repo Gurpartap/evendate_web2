@@ -131,7 +131,7 @@ Calendar = (function() {
 			}
 		}
 		this.renderTable();
-		this.$calendar.trigger('month-changed');
+		this.$calendar.trigger('change:month');
 		return this;
 	};
 	
@@ -402,7 +402,7 @@ Calendar = (function() {
 		if(days.length){
 			self.last_action = 'select';
 			self.last_selected_days = days;
-			self.$calendar.trigger('days-changed');
+			self.$calendar.trigger('change:days');
 		}
 		return this;
 	};
@@ -449,7 +449,7 @@ Calendar = (function() {
 			}
 			self.last_action = 'deselect';
 			self.last_selected_days = days;
-			self.$calendar.trigger('days-changed');
+			self.$calendar.trigger('change:days');
 		}
 		
 		

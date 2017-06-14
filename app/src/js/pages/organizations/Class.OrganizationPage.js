@@ -176,10 +176,13 @@ OrganizationPage = extending(Page, (function() {
 		
 		if (PAGE.organization.subscribed.last_pushed.length) {
 			$subscribers_scroll.scrollbar({
-				disableBodyScroll: true,
 				onScroll: function(y) {
 					var $loader,
-						last_is_friend = PAGE.organization.subscribed.last_pushed[PAGE.organization.subscribed.last_pushed.length - 1].is_friend;
+						last_is_friend = false;
+					
+					if (PAGE.organization.subscribed.last_pushed.length) {
+						last_is_friend = PAGE.organization.subscribed.last_pushed[PAGE.organization.subscribed.last_pushed.length - 1].is_friend
+					}
 					
 					if (y.scroll + 200 >= y.maxScroll && !$subscribers_scroll.block_scroll) {
 						$subscribers_scroll.block_scroll = true;
