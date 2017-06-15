@@ -80,7 +80,10 @@ Page = (function() {
 			$main_header = $('#main_header'),
 			is_other_page = __APP.PREVIOUS_PAGE.wrapper_tmpl !== PAGE.wrapper_tmpl,
 			wrapper_field = is_other_page ? '$view' : '$wrapper',
-			$prev = __APP.PREVIOUS_PAGE[wrapper_field].length ? __APP.PREVIOUS_PAGE[wrapper_field] : is_other_page ? $('.PageView') : $('.PageView').find('.Content');
+			$prev = __APP.PREVIOUS_PAGE[wrapper_field].length ? __APP.PREVIOUS_PAGE[wrapper_field] : is_other_page ? $('.PageView') : $('.PageView').find('.Content'),
+			state = History.getState(),
+			$scroll_to;
+		
 		$prev.addClass('-faded');
 		
 		setTimeout(function() {
@@ -116,9 +119,13 @@ Page = (function() {
 			PAGE.renderHeaderTabs();
 			$(window).scrollTop(0);
 			PAGE.render();
+			$scroll_to = (state.data.parsed_page_uri && state.data.parsed_page_uri.anchor) ? PAGE.$wrapper.find('#' + state.data.parsed_page_uri.anchor) : $();
 			bindPageLinks();
 			setTimeout(function() {
 				PAGE[wrapper_field].removeClass('-faded');
+				if ($scroll_to.length) {
+					scrollTo($scroll_to, 400);
+				}
 			}, 200);
 		});
 	};

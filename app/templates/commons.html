@@ -10,6 +10,10 @@
 	<hr title="{title}" {dataset}>
 </script>
 
+<script type="javascript/template" id="tmpl-label">
+	<label class="form_label {label_classes}" for="{id}">{label}</label>
+</script>
+
 <script type="javascript/template" id="tmpl-radio-checkbox">
 	<div class="{unit_classes}">
 		<input id="{id}" class="{classes}" type="{type}" name="{name}" {attributes} {dataset}>
@@ -25,7 +29,7 @@
 
 <script type="javascript/template" id="tmpl-form-unit">
 	<div class="form_unit {unit_classes}">
-		<label class="form_label {label_classes}" for="{id}">{label}</label>
+		{label}
 		{form_element}
 		{helptext}
 	</div>
@@ -43,6 +47,10 @@
 	<a href="{page}" class="link {classes} Link" {dataset} {attributes}>{title}</a>
 </script>
 
+<script type="javascript/template" id="tmpl-action-link">
+	<a href="{href}" class="action {classes}" {dataset} {attributes}>{title}</a>
+</script>
+
 <script type="javascript/template" id="tmpl-tag">
 	<a class="tag_unit link Link {classes}" href="{page}" {dataset} {attributes}>{name}</a>
 </script>
@@ -55,7 +63,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-option">
-	<option value="{val}" {data}>{display_name}</option>
+	<option class="{classes}" value="{val}" {attributes} {dataset}>{display_name}</option>
 </script>
 
 <script type="javascript/template" id="tmpl-order-status">

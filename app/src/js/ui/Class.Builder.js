@@ -122,6 +122,43 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @param {string} href
+	 * @param {string} title
+	 * @param {(string|Array<string>)} [classes]
+	 * @param {(string|Object<string, string>|Array<string>)} [dataset]
+	 * @param {(string|Object<string, string>|Array<string>)} [attributes]
+	 *
+	 * @returns {jQuery}
+	 */
+	Builder.prototype.action = function buildAction(href, title, classes, dataset, attributes) {
+		
+		return tmpl('action-link', Builder.normalizeBuildProps({
+			href: href,
+			title: title,
+			classes: classes,
+			dataset: dataset,
+			attributes: attributes
+		}));
+	};
+	/**
+	 *
+	 * @param {(...buildProps|Array<buildProps>)} props
+	 * @return {jQuery}
+	 */
+	Builder.prototype.option = function buildOption(props) {
+		var args = props instanceof Array ? props : arguments;
+		
+		return tmpl('option', [].map.call(args, function(arg) {
+			
+			return Builder.normalizeBuildProps(arg);
+		})).each(function(i, option) {
+			if (args[i].dataset) {
+				$(option).data(args[i].dataset);
+			}
+		});
+	};
+	/**
+	 *
 	 * @param {string} type - checkbox or radio
 	 * @param {buildProps} props
 	 * @param {(Array<string>|string)} [props.unit_classes]
@@ -224,6 +261,7 @@ Builder = (function() {
 	 * @param {boolean} [props.required]
 	 * @param {string} [props.placeholder]
 	 *
+	 * @param {string} [props.label]
 	 * @param {(string|jQuery)} [props.helptext]
 	 * @param {HTMLDataset} [props.helptext_dataset]
 	 * @param {HTMLAttributes} [props.helptext_attributes]
@@ -254,6 +292,7 @@ Builder = (function() {
 			'reset',
 			'button'
 		];
+		
 		return $.makeSet(Array.prototype.map.call(arguments, function(props) {
 			switch (props.type) {
 				case 'radio':
@@ -262,31 +301,65 @@ Builder = (function() {
 					return self.checkbox(props);
 				default:
 					return tmpl('form-unit', Builder.normalizeBuildProps($.extend(true, {}, props, {
-						form_element: props.type === 'textarea' ?
-						              self.textarea($.extend(
-						              	{},
-							              props.attributes,
-							              {
-								              id: props.id,
-								              name: props.name || undefined,
-								              required: props.required || undefined,
-								              placeholder: props.placeholder,
-								              tabindex: props.tabindex
-							              }), (props.classes ? ['form_textarea'].concat(props.classes) : ['form_textarea']), props.value, props.dataset) :
-						              self.input($.extend(
-						              	{},
-							              props.attributes,
-							              {
-								              id: props.id,
-								              type: !props.type || INPUT_TYPES.indexOf(props.type) === -1 ? 'text' : props.type,
-								              name: props.name || undefined,
-								              value: props.value || undefined,
-								              required: props.required || undefined,
-								              placeholder: props.placeholder,
-								              tabindex: props.tabindex
-							              }), (props.classes ? ['form_input'].concat(props.classes) : ['form_input']), props.dataset),
-						helptext: self.formHelpText(props.helptext, props.helptext_dataset, props.helptext_attributes)
-					}), ['unit_classes', 'label_classes']));
+						label: props.label ? tmpl('label', Builder.normalizeBuildProps({
+							id: props.id,
+							label: props.label,
+							label_classes: props.label_classes
+						}, ['label_classes'])) : '',
+						form_element: (function(props) {
+							var classes = props.classes ? props.classes : [],
+								defined_attributes = {
+									id: props.id,
+									name: props.name,
+									required: props.required ? props.required : undefined,
+									placeholder: props.placeholder,
+									tabindex: props.tabindex
+								};
+							
+							switch (props.type) {
+								case 'textarea': {
+									
+									return self.textarea($.extend({},	props.attributes,	defined_attributes), classes.concat('form_textarea'), props.value, props.dataset);
+								}
+								case 'time': {
+									
+									return self.input($.extend({},	props.attributes,	defined_attributes, {
+										value: (props.value != null) ? props.value : undefined,
+										placeholder: '23:59'
+									}), classes.concat('form_input', '-time_input'), props.dataset).inputmask("hh:mm", {
+										insertMode: false,
+										clearIncomplete: true,
+										placeholder: '  :  ',
+										greedy: false,
+										showMaskOnHover: false
+									});
+								}
+								case 'number': {
+									
+									return self.input($.extend({},	props.attributes,	defined_attributes, {
+										autocomplete: 'off',
+										value: (props.value != null) ? props.value : undefined
+									}), classes.concat('form_input'), props.dataset).inputmask({
+										alias: 'numeric',
+										autoGroup: false,
+										digits: 2,
+										digitsOptional: true,
+										allowPlus: false,
+										allowMinus: false,
+										rightAlign: false
+									});
+								}
+								default: {
+									
+									return self.input($.extend({},	props.attributes,	defined_attributes, {
+										type: !props.type || INPUT_TYPES.indexOf(props.type) === -1 ? 'text' : props.type,
+										value: (props.value != null) ? props.value : undefined
+									}), classes.concat('form_input'), props.dataset);
+								}
+							}
+						})(props),
+						helptext: props.helptext ? self.formHelpText(props.helptext, props.helptext_dataset, props.helptext_attributes) : ''
+					}), ['unit_classes']));
 			}
 		}));
 	};
@@ -1044,7 +1117,7 @@ Builder = (function() {
 				+ (event.is_same_time ? ', ' + displayTimeRange(event.dates[0].start_time, event.dates[0].end_time) : '')
 			});
 			if (event.registration_required && event.registration_till) {
-				feed_event_infos.push({text: 'Регистрация до ' + moment.unix(event.registration_till).calendar().capitalize()});
+				feed_event_infos.push({text: 'Регистрация до ' + moment.unix(event.registration_till).calendar().toLowerCase()});
 			}
 			if (event.is_free) {
 				feed_event_infos.push({text: 'Бесплатно'});

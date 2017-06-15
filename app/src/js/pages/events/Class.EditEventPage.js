@@ -14,13 +14,28 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 	 * @constructs EditEventPage
 	 */
 	function EditEventPage(event_id) {
+		var self = this;
+		
 		AbstractEditEventPage.call(this);
 		this.page_title = 'Редактирование события';
 		this.event = new OneEvent(event_id);
+		this.event_fields = EventPage.fields.copy();
+		
+		Object.defineProperty(this, 'organization_id', {
+			get: function() {
+				return self.event.organization_id;
+			},
+			set: function(val) {
+				self.event.organization_id = val;
+			}
+		})
 	}
 	
 	EditEventPage.prototype.fetchData = function() {
-		return this.fetching_data_defer = this.event.fetchEvent(EventPage.fields);
+		return this.fetching_data_defer = __APP.SERVER.multipleAjax(
+			this.event.fetchEvent(this.event_fields),
+			this.my_organizations.fetchMyOrganizations(['admin', 'moderator'], this.my_organizations_fields)
+		);
 	};
 	
 	EditEventPage.prototype.renderRest = function(page_vars) {
@@ -28,41 +43,27 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 		
 		(function selectDates($view, raw_dates, is_same_time) {
 			var MainCalendar = $view.find('.EventDatesCalendar').data('calendar'),
-				start_time = raw_dates[0].start_time.split(':'),
-				end_time = raw_dates[0].end_time ? raw_dates[0].end_time.split(':') : [],
-				$table_rows = $view.find('.SelectedDaysRows'),
-				dates = [],
-				$day_row;
+				$table_rows = $view.find('.SelectedDaysRows');
 			
-			if (is_same_time) {
-				$day_row = $view.find('.MainTime');
-				$day_row.find('.StartHours').val(start_time[0]);
-				$day_row.find('.StartMinutes').val(start_time[1]);
-				if (end_time.length) {
-					$day_row.find('.EndHours').val(end_time[0]);
-					$day_row.find('.EndMinutes').val(end_time[1]);
-				}
-			} else {
+			if (!is_same_time) {
 				PAGE.$wrapper.find('#edit_event_different_time').prop('checked', true).trigger('change');
 			}
 			
+			MainCalendar.selectDays(raw_dates.map(function(date) {
+				
+				return moment.unix(date.event_date).format(__C.DATE_FORMAT)
+			}));
+			
 			raw_dates.forEach(function(date) {
-				date.event_date = moment.unix(date.event_date).format('YYYY-MM-DD');
-				dates.push(date.event_date);
-			});
-			MainCalendar.selectDays(dates);
-			raw_dates.forEach(function(date) {
-				var $day_row = $table_rows.find('.TableDay_' + date.event_date),
-					start_time = date.start_time.split(':'),
-					end_time = date.end_time ? date.end_time.split(':') : [];
-				$day_row.find('.StartHours').val(start_time[0]);
-				$day_row.find('.StartMinutes').val(start_time[1]);
-				if (end_time.length) {
-					$day_row.find('.EndHours').val(end_time[0]);
-					$day_row.find('.EndMinutes').val(end_time[1]);
+				var $day_row = $table_rows.find('.TableDay_' + moment.unix(date.event_date).format(__C.DATE_FORMAT));
+				
+				$day_row.find('.StartTime').val(date.start_time);
+				if (date.end_time.length) {
+					$day_row.find('.EndTime').val(date.end_time);
 				}
 			});
 		})(PAGE.$wrapper, PAGE.event.dates, PAGE.event.is_same_time);
+		
 		(function selectTags($view, tags) {
 			var selected_tags = [];
 			tags.forEach(function(tag) {
@@ -81,12 +82,23 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 			});
 		}
 		
+		if(page_vars.public_at != null) {
+			PAGE.$wrapper.find('#edit_event_delayed_publication').prop('checked', true).trigger('change');
+		} else {
+			PAGE.$wrapper.find('#edit_event_delayed_publication').toggleStatus('disabled');
+		}
+		
 		if (!PAGE.event.is_free) {
 			PAGE.$wrapper.find('#edit_event_free').prop('checked', false).trigger('change');
 			PAGE.$wrapper.find('#edit_event_min_price').val(PAGE.event.min_price);
 		}
 		if (PAGE.event.registration_required) {
 			PAGE.$wrapper.find('#edit_event_registration_required').prop('checked', true).trigger('change');
+			if (PAGE.event.registration_locally) {
+				PAGE.$wrapper.find('#edit_event_registration_locally').prop('checked', true).trigger('change');
+			} else {
+				PAGE.$wrapper.find('#edit_event_registration_side').prop('checked', true).trigger('change');
+			}
 			if (PAGE.event.registration_till) {
 				PAGE.$wrapper.find('#edit_event_registration_limit_by_date').prop('checked', true).trigger('change');
 			}
@@ -108,8 +120,15 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 				})));
 			}
 		}
-		if (page_vars.public_at == null) {
-			PAGE.$wrapper.find('#edit_event_delayed_publication').toggleStatus('disabled');
+		
+		if (page_vars.additional_notification) {
+			PAGE.$wrapper.find('.AdditionalNotificationSwitch').prop('disabled', false).trigger('change');
+		}
+		
+		PAGE.$wrapper.find('.VkPostFieldset').prop('disabled', true);
+		
+		if (PAGE.event.vk_post_link) {
+			PAGE.$wrapper.find('.VkPostTrigger').prop('checked', true);
 		}
 	};
 	
