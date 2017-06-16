@@ -16,6 +16,55 @@ use Elasticsearch\ClientBuilder;
 
 $__modules['events'] = array(
 	'GET' => array(
+		'{update/drop-index}' => function () use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+			$client = ClientBuilder::create()->build();
+
+			$params = ['index' => 'events'];
+			$response = $client->indices()->delete($params);
+			return $response;
+		},
+		'{update/index}' => function () use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+
+			$client = ClientBuilder::create()->build();
+
+
+			$params = [
+				'index' => 'events',
+				'body' => [
+					'settings' => [
+						'analysis' => [
+							'filter' => [
+								'russian_stop' => [
+									"type" => "stop",
+									"stopwords" => "_russian_"
+								],
+								"russian_keywords" => [
+									"type" => "keyword_marker",
+									"keywords" => ["пример"]
+								],
+								"russian_stemmer" => [
+									"type" => "stemmer",
+									"language" => "russian"
+								]
+							],
+							'analyzer' => [
+								"russian" => [
+									"tokenizer" => "standard",
+									"filter" => [
+										"lowercase",
+										"russian_stop",
+										"russian_keywords",
+										"russian_stemmer"
+									]
+								]
+							]
+						]
+					]
+				]
+			];
+			$result = $client->indices()->create($params);
+			return $result;
+		},
 		'{update/search}' => function () use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
 
 			$client = ClientBuilder::create()->build();
@@ -27,22 +76,23 @@ $__modules['events'] = array(
 				Fields::parseFields('tags,description,title'),
 				array('length' => 10)
 			)->getData();
-			foreach ($events as $event){
+			foreach ($events as $event) {
 
 				$body = $event;
 				$body['tags'] = array();
-				foreach ($event['tags'] as $tag){
+				foreach ($event['tags'] as $tag) {
 					$body['tags'][] = $tag['name'];
 				}
 
-				try{
+				try {
 					$client->delete(array(
 						'index' => 'search',
 						'type' => 'event',
 						'id' => $event['id']
 					));
 
-				}catch(Exception $e){}
+				} catch (Exception $e) {
+				}
 
 				$response = $client->index(array(
 					'index' => 'search',
