@@ -77,6 +77,7 @@ class Organization extends AbstractEntity
 		'organization_type_id',
 		'organization_type_order'
 	);
+
 	protected static $ADDITIONAL_COLS = array(
 		'description',
 		'email',

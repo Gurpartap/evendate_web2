@@ -11,8 +11,51 @@ require_once $BACKEND_FULL_PATH . '/events/Class.NotificationsCollection.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.OrdersCollection.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.Order.php';
 
+require_once "{$BACKEND_FULL_PATH}/vendor/autoload.php";
+use Elasticsearch\ClientBuilder;
+
 $__modules['events'] = array(
 	'GET' => array(
+		'{update/search}' => function () use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+
+			$client = ClientBuilder::create()->build();
+
+			$events = EventsCollection::filter(
+				$__db,
+				$__user,
+				array('future' => true),
+				Fields::parseFields('tags,description,title'),
+				array('length' => 10)
+			)->getData();
+			foreach ($events as $event){
+
+				$body = $event;
+				$body['tags'] = array();
+				foreach ($event['tags'] as $tag){
+					$body['tags'][] = $tag['name'];
+				}
+
+				try{
+					$client->delete(array(
+						'index' => 'search',
+						'type' => 'event',
+						'id' => $event['id']
+					));
+
+				}catch(Exception $e){}
+
+				$response = $client->index(array(
+					'index' => 'search',
+					'type' => 'event',
+					'id' => $event['id'],
+					'body' => $body
+				));
+
+				print_r($response);
+
+			}
+		},
+
 		'{/(id:[0-9]+)/tickets/(uuid:\w+-\w+-\w+-\w+-\w+)/qr}' => function ($event_id, $uuid) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
 			$format = 'png';
 			$available_types = ['png', 'svg', 'pdf', 'eps'];
