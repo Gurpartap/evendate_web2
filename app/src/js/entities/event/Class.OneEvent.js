@@ -1,6 +1,13 @@
 /**
  * @requires ../Class.OneEntity.js
- * @requires ../../data_models/registration_field/Class.RegistrationFieldsCollection.js
+ * @requires ../date/Class.DatesCollection.js
+ * @requires ../tag/Class.TagsCollection.js
+ * @requires ../order/Class.OrdersCollection.js
+ * @requires ../ticket/Class.EventsTicketsCollection.js
+ * @requires ../ticket_type/Class.TicketTypesCollection.js
+ * @requires ../user/Class.UsersCollection.js
+ * @requires ../notification/Class.NotificationsCollection.js
+ * @requires ../../data_models/registration_field/Class.RegistrationFieldModelsCollection.js
  */
 /**
  * @class OneEvent
@@ -27,6 +34,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {?string} detail_info_url
 	 *
 	 * @property {OrdersCollection} orders
+	 * @property {?number} orders_count
 	 *
 	 * @property {?boolean} ticketing_locally
 	 * @property {EventsTicketsCollection} tickets
@@ -42,7 +50,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {?boolean} is_registered
 	 * @property {?number} registered_count
 	 * @property {UsersCollection} registered_users
-	 * @property {RegistrationFieldsCollection} registration_fields
+	 * @property {RegistrationFieldModelsCollection} registration_fields
 	 *
 	 * @property {?number} organization_id
 	 * @property {?string} organization_short_name
@@ -67,7 +75,9 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @property {TagsCollection} tags
 	 *
-	 * @property {Array} notifications
+	 * @property {NotificationsCollection} notifications
+	 *
+	 * @property {timestamp} additional_notification_time
 	 *
 	 * @property {UsersCollection} favored
 	 * @property {?number} favored_users_count
@@ -79,6 +89,8 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {?boolean} can_edit
 	 *
 	 * @property {?number} actuality
+	 *
+	 * @property {?string} vk_post_link
 	 *
 	 * @property {?number} creator_id
 	 * @property {?number} created_at
@@ -97,6 +109,7 @@ OneEvent = extending(OneEntity, (function() {
 		this.detail_info_url = null;
 		
 		this.orders = new OrdersCollection(event_id);
+		this.orders_count = null;
 		
 		this.ticketing_locally = null;
 		this.tickets = new EventsTicketsCollection(event_id);
@@ -112,7 +125,7 @@ OneEvent = extending(OneEntity, (function() {
 		this.is_registered = null;
 		this.registered_count = null;
 		this.registered_users = new UsersCollection();
-		this.registration_fields = new RegistrationFieldsCollection();
+		this.registration_fields = new RegistrationFieldModelsCollection();
 		
 		this.organization_id = null;
 		this.organization_short_name = null;
@@ -137,7 +150,9 @@ OneEvent = extending(OneEntity, (function() {
 		
 		this.tags = new TagsCollection();
 		
-		this.notifications = [];
+		this.notifications = new NotificationsCollection();
+		
+		this.additional_notification_time = null;
 		
 		this.favored = new UsersCollection();
 		this.favored_users_count = null;
@@ -149,6 +164,8 @@ OneEvent = extending(OneEntity, (function() {
 		this.can_edit = null;
 		
 		this.actuality = null;
+		
+		this.vk_post_link = null;
 		
 		this.creator_id = null;
 		this.created_at = null;
@@ -191,19 +208,39 @@ OneEvent = extending(OneEntity, (function() {
 	 */
 	/**
 	 * @typedef {object} OneEventCreateEventData
-	 * @property {string} [title]
-	 * @property {string} [description]
+	 *
+	 * @property {number} [event_id]
+	 * @property {integer} organization_id
+	 * @property {string} title
+	 * @property {string} description
+	 * @property {(DateModelsCollection|Array<DateModel>)} dates
+	 * @property {Array<(string|number)>} tags
 	 * @property {string} [location]
-	 * @property {integer} [organization_id]
+	 * @property {boolean} [is_online]
 	 * @property {object} [location_object]
 	 * @property {number} [location_object.latitude]
 	 * @property {number} [location_object.longitude]
 	 * @property {number} [longitude]
 	 * @property {number} [latitude]
 	 * @property {string} [image_horizontal]
+	 * @property {{horizontal: string}} filenames
 	 * @property {string} [detail_info_url]
-	 * @property {DatesCollection} [dates]
-	 * @property {Array<(string|number)>} [tags]
+	 * @property {string} [additional_notification]
+	 * @property {boolean} [is_free]
+	 * @property {(string|number)} [min_price]
+	 * @property {boolean} [delayed_publication]
+	 * @property {string} [public_at]
+	 * @property {boolean} [registration_required]
+	 * @property {string} [registration_till]
+	 * @property {(string|number)} [registration_limit_count]
+	 * @property {(RegistrationFieldsCollection|Array<RegistrationFieldModel>)} [registration_fields]
+	 * @property {boolean} [registration_locally]
+	 * @property {boolean} [vk_post]
+	 * @property {object} [vk]
+	 * @property {string} [vk.guid]
+	 * @property {string} [vk.image]
+	 * @property {string} [vk.filename]
+	 * @property {string} [vk.description]
 	 */
 	/**
 	 *

@@ -13,6 +13,8 @@ require_once "{$BACKEND_FULL_PATH}/exceptions/InvalidFileException.php";
 require_once "{$BACKEND_FULL_PATH}/exceptions/NoMethodException.php";
 require_once "{$BACKEND_FULL_PATH}/exceptions/PrivilegesException.php";
 require_once "{$BACKEND_FULL_PATH}/exceptions/AuthorizationException.php";
+require_once "{$BACKEND_FULL_PATH}/bin/Class.RequestsParser.php";
+require_once "{$BACKEND_FULL_PATH}/bin/Class.Fields.php";
 
 
 class App
@@ -286,4 +288,37 @@ class App
 			return null;
 		}
 	}
+
+	public static function getSocialUrls()
+	{
+		return array(
+			'VK' => array(
+				'GET_ACCESS_TOKEN' => 'https://oauth.vk.com/access_token',
+				'GET_FRIENDS_LIST' => 'https://api.vk.com/method/friends.get',
+				'GET_USER_INFO' => 'https://api.vk.com/method/users.get',
+				'GET_GROUPS_LIST' => 'https://api.vk.com/method/groups.get',
+				'GET_GROUPS_PART' => '/method/groups.get',
+				'POST_TO_WALL' => 'https://api.vk.com/method/wall.post',
+				'POST_TO_WALL_PART' => '/method/wall.post',
+				'GET_WALL_PHOTO_UPLOAD_SERVER' => 'https://api.vk.com/method/photos.getWallUploadServer',
+				'SAVE_WALL_PHOTO_UPLOAD' => 'https://api.vk.com/method/photos.saveWallPhoto'
+			),
+			'FACEBOOK' => array(
+				'GET_ACCESS_TOKEN' => 'https://graph.facebook.com/v2.3/oauth/access_token',
+				'GET_USER_INFO' => 'https://graph.facebook.com/me',
+				'GET_FRIENDS_LIST' => 'https://graph.facebook.com/me/friends'
+			),
+			'GOOGLE' => array(
+				'GET_ACCESS_TOKEN' => 'https://www.googleapis.com/oauth2/v1/tokeninfo',
+				'GET_USER_INFO' => 'https://www.googleapis.com/plus/v1/people/me',
+				'GET_FRIENDS_LIST' => 'https://www.googleapis.com/plus/v1/people/me/people/visible'
+			)
+		);
+	}
+
+	public static function getBodyJSON(\GuzzleHttp\Psr7\Response $response, bool $object = true)
+	{
+		return json_decode($response->getBody()->getContents(), $object);
+	}
+
 }

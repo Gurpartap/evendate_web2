@@ -36,45 +36,79 @@
     Загрузка данных...
   </div>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js" type="text/javascript"></script>
 <script src="/vendor/jquery/dist/jquery.js" type="text/javascript"></script>
-<script src="/app/js/app.js"></script>
+<script src="/app/js/app.js" type="text/javascript"></script>
 
 </body>
 <?php
 require_once('footer.php');
 ?>
 <script>
-    var texts_array = [
-            'Ожидание ответа от сервера в городе Гринбоу, штат Алабама...',
-            'Считаем количество конфет в коробке ...',
-            'Считаем количество пингвинов в Арктике ...',
-            'Считаем количество зябликов в Зимбабве ...',
-            'Вычисляем количество произведенных в восточном Парагвае кирпичей ...',
-            'Считаем количество антарктических утконосов в Австралии ...',
-            'Вычисляем как сильно влияет размножение зябликов на экономику Зимбабве ...',
-            'Вычислили, что точно также, как и производство кирпичей в восточном Парагвае на популяцию антарктического утконоса ...',
-            'Получаем ваши личные данные ...',
-            'Осталось совсем чуть чуть ...'
-        ],
-        $pr_text = $('#progress-text').css('color', '#003471'),
-        text_number = 0,
-        first = Math.floor((Math.random() * 40) + 1),
-        interval = setInterval(function () {
-            var inc = Math.floor((Math.random() * 5) + 1);
-            if (first < 90) {
-                first = first + inc;
-            } else {
-                window.clearInterval(interval);
-            }
-            $pr_text.text(texts_array[text_number++]);
-        }, 3000);
+	var texts_array = [
+			'Ожидание ответа от сервера в городе Гринбоу, штат Алабама...',
+			'Считаем количество конфет в коробке ...',
+			'Считаем количество пингвинов в Арктике ...',
+			'Считаем количество зябликов в Зимбабве ...',
+			'Вычисляем количество произведенных в восточном Парагвае кирпичей ...',
+			'Считаем количество антарктических утконосов в Австралии ...',
+			'Вычисляем как сильно влияет размножение зябликов на экономику Зимбабве ...',
+			'Вычислили, что точно также, как и производство кирпичей в восточном Парагвае на популяцию антарктического утконоса ...',
+			'Получаем ваши личные данные ...',
+			'Осталось совсем чуть чуть ...'
+		],
+		$pr_text = $('#progress-text').css('color', '#003471'),
+		text_number = 0,
+		first = Math.floor((Math.random() * 40) + 1),
+		interval = setInterval(function () {
+			var inc = Math.floor((Math.random() * 5) + 1);
+			if (first < 90) {
+				first = first + inc;
+			} else {
+				window.clearInterval(interval);
+			}
+			$pr_text.text(texts_array[text_number++]);
+		}, 3000),
+		data = $.extend(searchToObject(), hashToObject(), true);
 
-    $(document).ready(function () {
-        var data = $.extend(searchToObject(), hashToObject(), true);
-        socket.emit('auth.oauthDone', data);
-        socket.on('vk.needEmail', function () {
-            $('.panel').toggleClass('hidden');
-        });
-    });
+	$.ajax({
+		url: '/api/v1/auth/' + window.location.search,
+		success: function (auth_res) {
+			if (auth_res.status) {
+				if (auth_res.data) {
+					$.ajax({
+						url: 'auth.php',
+						data: auth_res.data,
+						success: function (res) {
+							var organization_info = null,
+								__params = [];
+
+							if (data.redirect_to) {
+								window.location.href = data.redirect_to;
+							} else if (data.mobile == 'true') {
+								for (var key in auth_res.data){
+									__params.push(key + '=' + auth_res.data[key]);
+								}
+								window.location.href = '/mobileAuthDone.php?' + __params.join('&');
+							} else {
+								try {
+									organization_info = sessionStorage.getItem('organization_info');
+								} catch (e) {}
+
+								if (organization_info) {
+									window.location = '/add/organization';
+								} else if (data.subscriptions_count == 0) {
+									window.location = '/onboarding';
+								} else {
+									window.location = '/';
+								}
+
+							}
+						}
+					});
+				} else {
+					window.location.reload();
+				}
+			}
+		}
+	});
 </script>

@@ -6,6 +6,7 @@
  * @license http://opensource.org/licenses/bsd-license.php BSD
  *
  */
+
 namespace Aura\SqlQuery\Pgsql;
 
 use Aura\SqlQuery\Common;
@@ -57,6 +58,18 @@ class Insert extends Common\Insert implements Common\ReturningInterface, Common\
 		return $this->addReturning($cols);
 	}
 
+	/**
+	 *
+	 * Makes onConflictUpdate for Postgres.
+	 *
+	 *
+	 * @param array $conflict_cols The column(s) to check conflicts.
+	 * @param array $col_values The column(s) to update.
+	 *
+	 * @return self
+	 *
+	 */
+
 	public function onConflictUpdate(array $conflict_cols, array $col_values)
 	{
 		$this->on_conflict = array(
@@ -64,6 +77,11 @@ class Insert extends Common\Insert implements Common\ReturningInterface, Common\
 			'col_values' => $col_values
 		);
 		return $this;
+	}
+
+	public function onConflictDoNothing()
+	{
+		$this->on_conflict_do_nothing = true;
 	}
 
 

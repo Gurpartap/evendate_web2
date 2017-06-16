@@ -4,6 +4,7 @@ require_once $BACKEND_FULL_PATH . '/organizations/Class.Organization.php';
 require_once $BACKEND_FULL_PATH . '/tags/Class.Tag.php';
 require_once $BACKEND_FULL_PATH . '/tags/Class.TagsCollection.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.RegistrationForm.php';
+require_once $BACKEND_FULL_PATH . '/events/Class.VkPost.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.RegistrationFieldsCollection.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.TicketType.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.TicketTypesCollection.php';
@@ -12,6 +13,9 @@ class Event extends AbstractEntity
 {
 
 	const IMAGES_PATH = '/event_images/';
+
+	const IMG_VK_POST_COVER = 'vk';
+
 
 	const IMG_ORIENTATION_TYPE_VERTICAL = 'vertical';
 	const IMG_ORIENTATION_TYPE_HORIZONTAL = 'horizontal';
@@ -36,6 +40,7 @@ class Event extends AbstractEntity
 	const ACTUALITY_FIELD_NAME = 'actuality';
 	const NOTIFICATIONS_FIELD_NAME = 'notifications';
 	const CAN_EDIT_FIELD_NAME = 'can_edit';
+	const VK_POST_LINK_FIELD_NAME = 'vk_post_link';
 
 	/*ONLY FOR ADMINS*/
 	const STATISTICS_FIELD_NAME = 'statistics';
@@ -172,6 +177,12 @@ class Event extends AbstractEntity
 		self::RANDOM_FIELD_NAME => '(SELECT created_at / (random() * 9 + 1)
 			FROM view_events AS ve
 			WHERE ve.id = view_events.id) AS ' . self::RANDOM_FIELD_NAME,
+
+		self::VK_POST_LINK_FIELD_NAME => '(SELECT \'https://vk.com/wall-\' || vk_groups.gid || \'_\' || vk_posts.post_id
+			FROM vk_posts
+			 INNER JOIN vk_groups ON vk_groups.gid::TEXT = vk_posts.group_id
+			WHERE vk_posts.event_id = view_events.id
+			) AS ' . self::VK_POST_LINK_FIELD_NAME,
 
 
 		self::CAN_EDIT_FIELD_NAME => '(SELECT id IS NOT NULL
@@ -396,7 +407,7 @@ class Event extends AbstractEntity
 			foreach ($data['ticket_types'] as $ticket_type) {
 				//it will auto update if ticket uuid is same
 				TicketType::create($event_id, $ticket_type, $db);
-				if (isset($tickets_by_uuid[$ticket_type['uuid']])) {
+				if (isset($ticket_type['uuid']) && isset($tickets_by_uuid[$ticket_type['uuid']])) {
 					$tickets_by_uuid[$ticket_type['uuid']]['to_switch_off'] = false;
 					TicketType::create($event_id, $ticket_type, $db);
 				}
@@ -611,7 +622,7 @@ class Event extends AbstractEntity
 			if (isset($data['additional_notification_time']) && $data['additional_notification_time'] != null) {
 				$data['additional_notification_time'] = isset($data['additional_notification_time']) ? new DateTime($data['additional_notification_time']) : null;
 			} else {
-				$data['registration_till'] = null;
+				$data['additional_notification_time'] = null;
 			}
 		} catch (Exception $e) {
 			$data['additional_notification_time'] = null;
@@ -653,7 +664,7 @@ class Event extends AbstractEntity
 		$data['min_price'] = $data['is_free'] == 'false' && is_numeric($data['min_price']) ? (int)$data['min_price'] : null;
 
 		/*VK posting data*/
-		$data['vk_post'] = $data['is_free'] == true && is_numeric($data['min_price']) ? (int)$data['min_price'] : null;
+		$data['vk_post'] = isset($data['vk_post']) ? filter_var($data['vk_post'], FILTER_VALIDATE_BOOLEAN) : false;
 	}
 
 	public static function create(ExtendedPDO $db, Organization $organization, array $data)
@@ -717,6 +728,14 @@ class Event extends AbstractEntity
 			self::saveEventTags($db, $event_id, $data['tags']);
 			self::saveRegistrationInfo($db, $event_id, $data);
 			self::saveTicketingInfo($db, $event_id, $data);
+			$data['vk']['event_id'] = $event_id;
+			if (isset($data['vk_post']) && isset($data['vk']) && $data['vk_post'] === true){
+				VkPost::create(
+					$data['vk'],
+					App::getCurrentUser()->getEditorInstance(),
+					new \GuzzleHttp\Client()
+				);
+			}
 
 			$notification_date = self::getAvailableNotificationTime($db, $data['notification_at'], $organization->getId());
 
@@ -761,8 +780,6 @@ class Event extends AbstractEntity
 					'done' => 'FALSE'
 				)), $db);
 			}
-
-			self::updateVkPostInformation($db, $event_id, $data);
 
 			App::saveImage($data['image_horizontal'],
 				self::IMAGES_PATH . self::IMG_SIZE_TYPE_LARGE . '/' . $img_horizontal_filename,
@@ -1424,7 +1441,6 @@ class Event extends AbstractEntity
 			self::saveRegistrationInfo($this->db, $this->getId(), $data);
 			self::saveTicketingInfo($this->db, $this->getId(), $data);
 			self::saveNotifications($this->generateNotifications($data), $this->db);
-			self::updateVkPostInformation($this->db, $this->getId(), $data);
 
 			$this->db->commit();
 

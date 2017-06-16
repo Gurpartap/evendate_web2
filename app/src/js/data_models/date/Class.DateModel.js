@@ -11,6 +11,10 @@ DateModel = extending(OneEntity, (function() {
 	 *
 	 * @constructor
 	 * @constructs DateModel
+	 *
+	 * @property {(string|timestamp)} event_date
+	 * @property {string} start_time
+	 * @property {string} end_time
 	 */
 	function DateModel() {
 		this.event_date = '';

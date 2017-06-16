@@ -1,7 +1,10 @@
 /**
  * @requires Class.ServerConnection.js
  */
-
+/**
+ *
+ * @const __APP
+ */
 __APP = {
 	/**
 	 * @type {ServerConnection}
@@ -46,6 +49,7 @@ __APP = {
 			'event': {
 				'^([0-9]+)': {
 					'overview': AdminEventOverviewPage,
+					'orders': AdminEventOrdersPage,
 					'check_in': AdminEventCheckInPage,
 					'edit': AdminEventEditPage,
 					'': AdminEventOverviewPage
@@ -205,13 +209,16 @@ __APP = {
 	 * @return {boolean} false
 	 */
 	changeState: function changeState(page_name, soft_change, reload) {
+		var parsed_uri;
+		
 		History.stateChangeHandled = true;
 		if (page_name) {
 			page_name = page_name.indexOf('/') === 0 ? page_name : '/' + page_name;
+			parsed_uri = parseUri(page_name);
 			if (soft_change) {
-				History.replaceState({_index: History.getCurrentIndex()}, '', page_name);
+				History.replaceState({parsed_page_uri: parsed_uri}, '', parsed_uri.path);
 			} else {
-				History.pushState({_index: History.getCurrentIndex()}, '', page_name);
+				History.pushState({parsed_page_uri: parsed_uri}, '', parsed_uri.path);
 			}
 			if (!soft_change || (soft_change && reload)) {
 				__APP.reInit();
@@ -243,6 +250,7 @@ __APP = {
 	reInit: function appReInit() {
 		$(window).off('scroll');
 		
+		AbstractAppInspector.hideCurrent();
 		__APP.SERVER.abortAllConnections();
 		__APP.PREVIOUS_PAGE = __APP.CURRENT_PAGE;
 		__APP.PREVIOUS_PAGE.destroy();
@@ -251,7 +259,10 @@ __APP = {
 };
 
 __ERRORS = [];
-
+/**
+ *
+ * @const __LOCALES
+ */
 __LOCALES = {
 	ru_RU: {
 		TEXTS: {
@@ -314,7 +325,7 @@ __LOCALES = {
 				
 				APPROVED: 'Подтверждено',
 				PAYED: 'Оплачено',
-				WITHOUT_PAYMENT: 'Подтверждено',
+				WITHOUT_PAYMENT: 'Без оплаты',
 				
 				TICKETS_ARE_OVER: 'Билеты закончились',
 				RETURNED_BY_ORGANIZATION: 'Возврат билета организатором',

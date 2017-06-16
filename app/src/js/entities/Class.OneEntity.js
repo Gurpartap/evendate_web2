@@ -15,6 +15,8 @@ OneEntity = (function() {
 	 * @constructs OneEntity
 	 */
 	function OneEntity() {}
+	
+	OneEntity.prototype.ID_PROP_NAME = 'id';
 	/**
 	 *
 	 * @param {(Array|object)} data

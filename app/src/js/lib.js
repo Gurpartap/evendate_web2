@@ -89,12 +89,14 @@ __C = {
 		ACTIVE: '-active',
 		DISABLED: '-disabled',
 		HIDDEN: '-hidden',
+		SHOW: '-show',
 		ICONS: {
 			STAR: 'fa-star',
 			STAR_O: 'fa-star-o',
 			BELL_O: 'fa-bell-o',
 			TIMES: 'fa-times',
 			PLUS: 'fa-plus',
+			MINUS: 'fa-minus',
 			CHECK: 'fa-check',
 			PENCIL: 'fa-pencil',
 			EYE: 'fa-eye',
@@ -614,15 +616,20 @@ $.fn.extend({
 			default: {
 				var output = {};
 				elements.filter(function() {
-					var a = this.type;
-					return this.name && !$(this).is(':disabled') && zb.test(this.nodeName) && !yb.test(a) && !T.test(a)
+					
+					return this.name && !$(this).is(':disabled') && zb.test(this.nodeName) && !yb.test(this.type) && !T.test(this.type)
 				}).each(function(i, el) {
 					var $element = $(el),
 						name = el.name,
-						value = $element.val();
+						value = $element.val(),
+						hasSameName = function(i, el){
+							var $el = $(el);
+							
+							return $el.is(':enabled') && $el.is('[name="' + name + '"]')
+						};
 					
-					if (elements.filter("[name='" + name + "']").length > 1 && value != "") {
-						output[name] = typeof(output[name]) == "undefined" ? [] : output[name];
+					if (elements.filter(hasSameName).length > 1) {
+						output[name] = typeof(output[name]) === "undefined" ? [] : output[name];
 						output[name].push(value ? value.replace(xb, "\r\n") : value)
 					}
 					else if ($element.attr('type') === 'hidden' && value.indexOf('data.') === 0) {
@@ -640,8 +647,8 @@ $.fn.extend({
 					}
 				});
 				elements.filter(function() {
-					var a = this.type;
-					return this.name && !$(this).is(":disabled") && T.test(a) && ((this.checked && this.value != "on") || (this.value == "on" && a == "checkbox"))
+					
+					return this.name && !$(this).is(":disabled") && T.test(this.type) && ((this.checked && this.value !== "on") || (this.value === "on" && this.type === "checkbox"))
 				}).each(function(i, el) {
 					var name = el.name,
 						value = el.value;
@@ -652,11 +659,11 @@ $.fn.extend({
 							break;
 						}
 						case 'checkbox': {
-							if (elements.filter("[name='" + name + "']").length > 1 && value != "on") {
-								output[name] = typeof(output[name]) == "undefined" ? [] : output[name];
+							if (elements.filter("[name='" + name + "']").length > 1 && value !== "on") {
+								output[name] = typeof(output[name]) === "undefined" ? [] : output[name];
 								output[name].push(value)
 							}
-							else if (value != "on")
+							else if (value !== "on")
 								output[name] = value;
 							else
 								output[name] = !!el.checked;
@@ -1630,6 +1637,20 @@ function range(end, start, step) {
 }
 /**
  *
+ * @param {string} slug
+ * @param {object} namespace
+ * @param {object} locales
+ * @return {string}
+ */
+function localeFromNamespace(slug, namespace, locales) {
+	for( var prop in namespace ) {
+		if( namespace.hasOwnProperty(prop) && namespace[ prop ] === slug )
+			return locales[ prop ];
+	}
+	return '';
+}
+/**
+ *
  * @param {string} url
  * @param {(AJAXData|string)} [data]
  * @param {string} [content_type='application/x-www-form-urlencoded; charset=UTF-8']
@@ -1695,31 +1716,6 @@ function initSelect2($element, options) {
 	$element.select2(opt).addClass('-Handled_ToSelect2')
 }
 
-function initTimeInput(time_field) {
-	var $time_field = $(time_field),
-		$hours = $time_field.find('input').eq(0),
-		$minutes = $time_field.find('input').eq(1);
-	
-	function onBlur() {
-		var $this = $(this);
-		if ($this.val() == "0" || $this.val() === "") {
-			$this.val("00");
-		}
-		else if ($this.val() <= 9) {
-			$this.val("0" + parseInt($this.val()));
-		}
-	}
-	
-	$hours.inputmask('Regex', {regex: "([01]?[0-9]|2[0-3])"}).on('keyup', function() {
-		if ($hours.val() > 2 || $hours.val() == "00") {
-			$minutes.focus();
-			$hours.trigger('blur');
-		}
-	}).on('blur', onBlur);
-	$minutes.inputmask('Regex', {regex: "[0-5][0-9]"}).on('blur', onBlur);
-	$time_field.addClass('-Handled_TimeInput');
-}
-
 function trimAvatarsCollection($parent) {
 	$parent = $parent ? $parent : $('body');
 	$parent.find('.AvatarsCollection').each(function() {
@@ -1747,13 +1743,6 @@ function bindDatePickers($parent) {
 	}).addClass('-Handled_DatePicker');
 }
 
-function bindTimeInput($parent) {
-	$parent = $parent ? $parent : $('body');
-	$parent.find('.TimeInput').not('.-Handled_TimeInput').each(function(i, elem) {
-		initTimeInput(elem);
-	}).addClass('-Handled_TimeInput');
-}
-
 function bindTabs($parent) {
 	$parent = $parent ? $parent : $('body');
 	$parent.find('.Tabs').not('.-Handled_Tabs').each(function(i, elem) {
@@ -1761,19 +1750,17 @@ function bindTabs($parent) {
 			tabs_id = $this.data('tabs_id'),
 			focus_on_change = !!$this.data('focus_on_change'),
 			mutation_observer = new MutationObserver(function(records) {
-				var $wrappers,
-					$target;
-				records.forEach(function(record){
-					$target = $(record.target);
-					$wrappers = $target.parents('.TabsBody');
-					$wrappers = $target.hasClass('TabsBody') ? $wrappers.add($target) : $wrappers;
-					$wrappers.each(function(i, wrapper) {
-						var $wrapper = $(wrapper);
-						if($wrapper.hasClass(__C.CLASSES.ACTIVE)) {
-							$this.addClass('-in_progress');
-							$wrapper.parent().height($wrapper.outerHeight());
-						}
-					});
+				var $target = $(records[records.length - 1].target),
+					$wrappers = $target.closest('.TabsBody');
+				
+				$wrappers = $target.hasClass('TabsBody') ? $wrappers.add($target) : $wrappers;
+				$wrappers.each(function(i, wrapper) {
+					var $wrapper = $(wrapper);
+					
+					if($wrapper.hasClass(__C.CLASSES.ACTIVE)) {
+						$this.addClass('-in_progress');
+						$wrapper.parent().height($wrapper.outerHeight());
+					}
 				});
 			}),
 			$bodies_wrapper,
@@ -1783,15 +1770,13 @@ function bindTabs($parent) {
 		
 		if(tabs_id){
 			$bodies_wrapper = $this.find('.TabsBodyWrapper[data-tabs_id="'+tabs_id+'"]');
-			$bodies = $bodies_wrapper.children('.TabsBody');
 			$header_wrapper = $this.find('.HeaderTabs[data-tabs_id="'+tabs_id+'"]');
-			$tabs = $header_wrapper.children('.Tab');
 		} else {
 			$bodies_wrapper = $this.find('.TabsBodyWrapper:first');
-			$bodies = $bodies_wrapper.children('.TabsBody');
 			$header_wrapper = $this.find('.HeaderTabs:first');
-			$tabs = $header_wrapper.children('.Tab');
 		}
+		$bodies = $bodies_wrapper.children('.TabsBody');
+		$tabs = $header_wrapper.children('.Tab');
 		
 		Object.defineProperties($this, {
 			'currentTabsIndex': {
@@ -1829,23 +1814,33 @@ function bindTabs($parent) {
 			$this.setToTab($this.currentTabsIndex - 1);
 		};
 		
+		$this.connectMutationObserver = function() {
+			$bodies.each(function(i, body) {
+				mutation_observer.observe(body, {
+					childList: true,
+					subtree: true,
+					attributes: true,
+					attributeFilter: ['class']
+				});
+			});
+		};
+		
+		$this.disconnectMutationObserver = function() {
+			mutation_observer.disconnect();
+			$bodies_wrapper.height('auto');
+		};
+		
 		if (!$tabs.filter('.'+__C.CLASSES.ACTIVE).length) {
 			$tabs.eq(0).addClass(__C.CLASSES.ACTIVE);
 		}
 		$bodies.removeClass(__C.CLASSES.ACTIVE).eq($this.currentTabsIndex).addClass(__C.CLASSES.ACTIVE);
 		$bodies_wrapper.height($bodies.filter('.'+__C.CLASSES.ACTIVE).outerHeight());
-		$bodies_wrapper.on('transitionend webkitTransitionEnd', function() {
+		$bodies_wrapper.on('transitionend', function() {
 			$this.removeClass('-in_progress');
-			$this.trigger('progress_end')
+			$this.trigger('progress_end');
 		});
-		$bodies.each(function(i, body) {
-			mutation_observer.observe(body, {
-				childList: true,
-				subtree: true,
-				attributes: true,
-				attributeFilter: ['class']
-			});
-		});
+		
+		$this.connectMutationObserver();
 		
 		$tabs.on('click', function() {
 			$this.setToTab($tabs.index(this));
@@ -1980,19 +1975,17 @@ function bindCollapsing($parent) {
 		var $instance = $(this),
 			collapsing_id = $instance.data('collapsing_id'),
 			mutation_observer = new MutationObserver(function(records) {
-				var $contents,
-					$target;
-				records.forEach(function(record){
-					$target = $(record.target);
+				var $target = $(records[records.length - 1].target),
 					$contents = $target.parents('.CollapsingContent');
-					$contents = $target.hasClass('CollapsingContent') ? $contents.add($target) : $contents;
-					$contents.each(function(i, content) {
-						var $content = $(content),
-							$wrapper = $content.parent();
-						if ($wrapper.hasClass('-opened')) {
-							$wrapper.addClass('-in_progress').height($content.outerHeight());
-						}
-					});
+				
+				$contents = $target.hasClass('CollapsingContent') ? $contents.add($target) : $contents;
+				$contents.each(function(i, content) {
+					var $content = $(content),
+						$wrapper = $content.parent();
+					
+					if ($wrapper.hasClass('-opened')) {
+						$wrapper.addClass('-in_progress').height($content.outerHeight());
+					}
 				});
 			}),
 			default_height,
@@ -2021,6 +2014,9 @@ function bindCollapsing($parent) {
 		}
 		
 		function toggleCollapsing(){
+			var parent_Tabs = $wrapper.parents('.Tabs').resolveInstance();
+			
+			parent_Tabs.disconnectMutationObserver();
 			$wrapper.addClass('-in_progress');
 			if ($instance.hasClass(__C.CLASSES.ACTIVE)) {
 				$wrapper.height(default_height);
@@ -2029,6 +2025,7 @@ function bindCollapsing($parent) {
 			}
 			$wrapper.toggleClass('-opened');
 			$instance.toggleClass(__C.CLASSES.ACTIVE);
+			parent_Tabs.connectMutationObserver();
 		}
 		
 		function changeProp(){
@@ -2059,7 +2056,7 @@ function bindCollapsing($parent) {
 			.on('click', function(){
 				$instance.openCollapsing();
 			})
-			.on('transitionend webkitTransitionEnd', function() {
+			.on('transitionend', function() {
 				$wrapper.removeClass('-in_progress');
 			});
 		
@@ -2077,16 +2074,19 @@ function bindCollapsing($parent) {
 function bindControlSwitch($parent) {
 	$parent = $parent ? $parent : $('body');
 	$parent.find('.Switch').not('.-Handled_Switch').each(function(i, el) {
-		var $switch = $(el),
-			switch_id = $switch.data('switch_id'),
-			$switching = $parent.find('.Switching[data-switch_id="'+switch_id+'"]');
+		var $switch = $(el);
 		
+		$switch.switching = $parent.find('.Switching[data-switch_id="'+$switch.data('switch_id')+'"]');
 		$switch.on('change.Switch', function() {
-			if($switching.is('fieldset')) {
-				$switching.prop('disabled', !$switching.prop('disabled'));
-			} else {
-				$switching.toggleStatus('disabled');
-			}
+			$switch.switching.each(function(i, switching) {
+				var $switching = $(switching);
+				
+				if($switching.is('fieldset')) {
+					$switching.prop('disabled', !$switching.prop('disabled'));
+				} else {
+					$switching.toggleStatus('disabled');
+				}
+			});
 		});
 	}).addClass('-Handled_Switch');
 }

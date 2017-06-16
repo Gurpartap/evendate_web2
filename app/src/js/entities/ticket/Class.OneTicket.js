@@ -48,6 +48,7 @@ OneTicket = extending(OneEntity, (function() {
 		
 		this.created_at = null;
 	}
+	OneTicket.prototype.ID_PROP_NAME = 'uuid';
 	
 	/**
 	 *

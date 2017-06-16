@@ -22,7 +22,11 @@ AdminEventPage = extending(AdminPage, (function() {
 		AdminPage.call(this);
 		this.id = event_id;
 		this.event = new OneEvent(this.id);
-		this.event_fields = new Fields('organization_short_name', 'ticketing_locally', 'registration_locally');
+		this.event_fields = new Fields(
+			'organization_short_name',
+			'ticketing_locally',
+			'registration_locally'
+		);
 		
 		this.with_header_tabs = true;
 	}
@@ -37,6 +41,7 @@ AdminEventPage = extending(AdminPage, (function() {
 		tabs.push({title: 'Обзор', page: '/admin/event/'+this.id+'/overview'});
 		if (this.event.registration_locally || this.event.ticketing_locally) {
 			tabs.push({title: 'Контроль входа', page: '/admin/event/'+this.id+'/check_in'});
+			tabs.push({title: 'Заказы', page: '/admin/event/'+this.id+'/orders'});
 		}
 		tabs.push({title: 'Редактирование', page: '/admin/event/'+this.id+'/edit'});
 		

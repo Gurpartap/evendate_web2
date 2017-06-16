@@ -1,6 +1,10 @@
 <?php
 
 require_once $BACKEND_FULL_PATH . '/events/Class.Event.php';
+require "{$BACKEND_FULL_PATH}/vendor/autoload.php";
+
+use GuzzleHttp\Client;
+
 
 class Editor extends User
 {
@@ -95,7 +99,8 @@ class Editor extends User
 		);
 	}
 
-	private function inviteUser(Friend $friend = null, string $email, Organization $organization){
+	private function inviteUser(Friend $friend = null, string $email, Organization $organization)
+	{
 
 	}
 
@@ -117,5 +122,60 @@ class Editor extends User
 	public function revokeInvitationLink()
 	{
 
+	}
+
+	public function getVkGroupsToPost()
+	{
+		$q_get_token = App::queryFactory()->newSelect();
+		$q_get_token->from('vk_sign_in')
+			->cols(array('id', 'secret', 'access_token'))
+			->where('user_id = ?', $this->getId())
+			->orderBy(array('id DESC'));
+
+		$p_user = App::DB()->prepareExecute($q_get_token, 'CANT_GET_TOKEN')->fetch();
+
+		$URL_PART = '/method/groups.get';
+
+		$params = array('access_token=' . $p_user['access_token'],
+			'extended=1',
+			'fields=can_post,is_admin,admin_level,type',
+			'filter=admin, editor, moder');
+		$sig = md5($URL_PART . '?' . implode('&', $params) . $p_user['secret']);
+
+		$client = new Client([
+			// You can set any number of default request options.
+			'timeout' => 10.0,
+		]);
+
+		$response = $client->request('GET',
+			'https://api.vk.com/method/groups.get?' . implode('&', $params) . '&sig=' . $sig,
+			array(
+				'headers' => array(
+					'Accept-Language' => 'ru,en-us'
+				)
+			));
+		$results = App::getBodyJSON($response);
+
+		$q_ins_group = App::queryFactory()->newInsert();
+		$q_ins_group->into('vk_groups');
+
+		$_res = array();
+		if (isset($results['response'])){
+			unset($results['response'][0]);
+			foreach ($results['response'] as $item){
+				$_res[] = $item;
+				$data = array(
+					'gid' => $item['gid'],
+					'name' => $item['name'],
+					'screen_name' => $item['screen_name'],
+					'photo' => $item['photo']
+				);
+				$q_ins_group->cols($data)
+					->onConflictUpdate(array('gid'), $data)
+					->returning(array('id'));
+				App::DB()->prepareExecute($q_ins_group, 'CANT_INSERT_GROUP')->fetch();
+			}
+		}
+		return new Result(true, '', $_res);
 	}
 }

@@ -64,7 +64,6 @@ try {
 	if (isset($_REQUEST['redirect_to'])) {
 		header('Location: ' . $_REQUEST['redirect_to']);
 	}
-//    header('Location: /');
 }
 
 try {
@@ -115,10 +114,10 @@ $url_parts = explode('/', $url);
 	<?php
 	if ($DEBUG_MODE) { ?>
     <link rel="stylesheet" href="/dist/vendor.css?rev=3b6878c5b89f643e8d96b1b336b7d4fc">
-    <link rel="stylesheet" href="/dist/app.css?rev=460d5502ec05964fa467a4506364b078"><?php
+    <link rel="stylesheet" href="/dist/app.css?rev=7c1af3913d8bf11f8c92de33cd7b5fa9"><?php
 	} else { ?>
     <link rel="stylesheet" href="/dist/vendor.min.css?rev=4165c69f5d04ec431ab5bc41425847a5">
-    <link rel="stylesheet" href="/dist/app.min.css?rev=cfd74f7ce7169a986797198545b5e74e"><?php
+    <link rel="stylesheet" href="/dist/app.min.css?rev=6c3bc51b7576b902976255501170d6e2"><?php
 	} ?>
 
 	<?php
@@ -317,7 +316,7 @@ $url_parts = explode('/', $url);
     </div>
   </header>
   <div id="main_section">
-
+		<div class="app_inspectors_wrapper AppInspectorsWrapper"></div>
     <div class="app_view -hidden PageView">
       <div class="page_wrapper Content -fadeable"></div>
     </div>
@@ -349,11 +348,11 @@ $url_parts = explode('/', $url);
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=27eb89681ab4f17a3a4d1d844277ab55" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=15cb3f26e73e2e4063e6562bfd4f2c43" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=9dfd1dcae2ac8c6f55b47389e26f5dd6" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=d0f91f39346b8ed4ccc65408251908dd" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=e81345e63040401d2ee1e8938e772d23" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=5b5ad24cecd31df98e1aa1a1a2c472c2" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=14edc2da46a0db0db3df4994aa61a42e" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=d32b5c7617cf6938cf9edc33eace5744" charset="utf-8"></script><?php
 }
 
 foreach (glob("app/templates/{*/*/*/*,*/*/*,*/*,*}.html", GLOB_BRACE) as $filename) {

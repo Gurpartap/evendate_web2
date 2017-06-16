@@ -6,6 +6,7 @@
  * @license http://opensource.org/licenses/bsd-license.php BSD
  *
  */
+
 namespace Aura\SqlQuery\Common;
 
 use Aura\SqlQuery\AbstractDmlQuery;
@@ -78,6 +79,7 @@ class Insert extends AbstractDmlQuery implements InsertInterface
 	 */
 	protected $col_order = array();
 	protected $on_conflict;
+	protected $on_conflict_do_nothing;
 
 	/**
 	 *
@@ -121,7 +123,7 @@ class Insert extends AbstractDmlQuery implements InsertInterface
 			. $this->buildFlags()
 			. $this->buildInto()
 			. $this->buildValuesForInsert()
-			. $this->buildOnConflictUpdate()
+			. $this->buildOnConflict()
 			. $this->buildReturning();
 	}
 
@@ -375,18 +377,18 @@ class Insert extends AbstractDmlQuery implements InsertInterface
 	}
 
 
-	protected function buildOnConflictUpdate()
+	protected function buildOnConflict()
 	{
 		if ($this->on_conflict) {
-
-
 			$values = array();
 			foreach ($this->on_conflict['col_values'] as $col => $value) {
-				$values[] = "{$col} = {$value}";
+				$values[] = "{$col} = " . \App::Db()->quote($value);
 			}
 
 			return PHP_EOL . "ON CONFLICT (" . $this->indentCsv($this->on_conflict['conflict_cols']) . ") 
 					DO UPDATE SET " . $this->indentCsv($values);
+		} elseif ($this->on_conflict_do_nothing) {
+			return PHP_EOL . " ON CONFLICT DO NOTHING";
 		}
 
 		return '';
