@@ -52,7 +52,7 @@ class EventsStatistics extends AbstractAggregator
 
     public function __construct(ExtendedPDO $db, Event $event, User $user)
     {
-        if (!$user->isAdmin($event->getOrganization())) throw new PrivilegesException('', $db);
+        if (!$user->isAdmin($event->getOrganization())) throw new PrivilegesException('NOT_ADMIN', $db);
         $this->db = $db;
         $this->event = $event;
     }
@@ -86,7 +86,7 @@ class EventsStatistics extends AbstractAggregator
                 break;
             }
             default: {
-                throw new InvalidArgumentException();
+                break;
             }
         }
 

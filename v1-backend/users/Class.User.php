@@ -32,7 +32,7 @@ class User extends AbstractUser
 				|| !isset($_SESSION['token']) || trim($_SESSION['token']) == '')
 			&& $token == null
 		) {
-			throw new AuthorizationException('Пользователь с такими данными не найден', $db);
+			throw new AuthorizationException('CANT_FIND_USER', $db);
 		}
 		if (isset($_SESSION['id'])) {
 			$query = "SELECT users.*, tokens.id AS token_id,
@@ -58,7 +58,7 @@ class User extends AbstractUser
 
 		$p_get_user = $db->prepareExecuteRaw($query, $stm, 'CANT_FIND_USER');
 
-		if ($p_get_user->rowCount() !== 1) throw new AuthorizationException('Пользователь с такими данными не найден', $db);
+		if ($p_get_user->rowCount() !== 1) throw new AuthorizationException('CANT_FIND_USER', $db);
 		$row = $p_get_user->fetch();
 
 		$this->db = $db;
@@ -187,7 +187,7 @@ class User extends AbstractUser
 
 	public function getEditorInstance()
 	{
-		if (!$this->isEditor()) throw new PrivilegesException('Недостаточно прав для совершения действия', $this->db);
+		if (!$this->isEditor()) throw new PrivilegesException('NOT_EDITOR', $this->db);
 		if ($this->editor_instance instanceof Editor == false) {
 			$this->editor_instance = new Editor($this->db);
 		}

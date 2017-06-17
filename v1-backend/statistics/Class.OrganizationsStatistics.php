@@ -93,7 +93,7 @@ class OrganizationsStatistics extends AbstractAggregator
 
 	public function __construct(ExtendedPDO $db, Organization $organization, User $user)
 	{
-		if (!$user->isAdmin($organization)) throw new PrivilegesException('', $db);
+		if (!$user->isAdmin($organization)) throw new PrivilegesException('NOT_ADMIN', $db);
 		$this->db = $db;
 		$this->organization = $organization;
 	}
@@ -137,7 +137,7 @@ class OrganizationsStatistics extends AbstractAggregator
 				break;
 			}
 			default: {
-				throw new InvalidArgumentException();
+				break;
 			}
 		}
 
