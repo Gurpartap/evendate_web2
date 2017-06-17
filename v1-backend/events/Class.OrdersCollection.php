@@ -43,6 +43,13 @@ class OrdersCollection extends AbstractCollection
 					}
 					break;
 				}
+				case 'statistics_event': {
+					if ($value instanceof Event) {
+						$q_get_orders->where('event_id = ?', $value->getId());
+						$getting_statistics = true;
+					}
+					break;
+				}
 				case 'user': {
 					if ($value instanceof User) {
 						$q_get_orders->where('user_id = ?', $value->getId());

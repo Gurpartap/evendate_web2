@@ -86,7 +86,7 @@ class OrganizationsCollection extends AbstractCollection
 					$values = explode(',', $value);
 					$in_ids = [];
 					foreach ($values as $curr_value) {
-						if (in_array($curr_value, Roles::ROLES) == false) throw new InvalidArgumentException('CANT_FIND_ROLE: ' . $curr_value);
+						if (in_array($curr_value, Roles::ROLES) == false) throw new BadArgumentException('CANT_FIND_ROLE', $db, $curr_value);
 						$in_ids[] = Roles::getId($curr_value);
 					}
 					if (count($in_ids) == 0) break;

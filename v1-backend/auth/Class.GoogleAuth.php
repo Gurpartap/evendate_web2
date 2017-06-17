@@ -78,7 +78,7 @@ class GoogleAuth extends AbstractAuth
 				'etag' => $this->user_info['etag'],
 				'cover_photo_url' => isset($this->user_info['cover']['coverPhoto']['url']) ? $this->user_info['cover']['coverPhoto']['url'] : null
 			));
-		App::DB()->prepareExecute($p_ins, 'CANT_INSERT_VK_DATA');
+		App::DB()->prepareExecute($p_ins, 'CANT_INSERT_GOOGLE_DATA');
 
 	}
 

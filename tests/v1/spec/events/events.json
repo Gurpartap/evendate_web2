@@ -111,6 +111,44 @@
           "type": "last_name",
           "label": "",
           "required": false
+        },
+        {
+          "type": "select",
+          "label": "Выберите ваш пол",
+          "required": false,
+          "values": [
+            {
+              "value": "Мужской",
+              "uuid": null
+            },
+            {
+              "value": "Женский",
+              "uuid": null
+            },
+            {
+              "value": "Другое",
+              "uuid": null
+            }
+          ]
+        },
+        {
+          "type": "select_multi",
+          "label": "Просто выбор нескольких вариантов",
+          "required": false,
+          "values": [
+            {
+              "value": "Мужской",
+              "uuid": null
+            },
+            {
+              "value": "Женский",
+              "uuid": null
+            },
+            {
+              "value": "Другое",
+              "uuid": null
+            }
+          ]
         }
       ],
       "registration_till_date": "2016-12-29",
