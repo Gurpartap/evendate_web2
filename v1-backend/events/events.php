@@ -286,7 +286,7 @@ $__modules['events'] = array(
 			if (isset($__request['canceled'])) {
 				$result = $event->setCanceled(filter_var($__request['canceled'], FILTER_VALIDATE_BOOLEAN), $__user);
 			}
-			if (!isset($__request['canceled']) && !isset($__request['hidden'])) throw new BadMethodCallException('Bad Request');
+			if (!isset($__request['canceled']) && !isset($__request['hidden'])) throw new BadMethodCallException('BAD_REQUEST_NO_FIELDS');
 			return $result;
 		},
 		'{/(id:[0-9]+)/notifications/(uuid:\w+-\w+-\w+-\w+-\w+)}' => function ($id, $notification_uuid) use ($__request, $__fields, $__db, $__user) {
@@ -322,7 +322,7 @@ $__modules['events'] = array(
 		'{/(id:[0-9]+)}' => function ($id) use ($__db, $__request, $__user) {
 			$event = EventsCollection::one($__db, $__user, intval($id), array());
 
-			if (!isset($__request['payload'])) throw new BadMethodCallException('Bad Request');
+			if (!isset($__request['payload'])) throw new BadMethodCallException('BAD_REQUEST_NO_PAYLOAD');
 			if (isset($__request['payload']['organization_id'])) {
 				$organization = OrganizationsCollection::one($__db, $__user, intval($__request['payload']['organization_id']), array());
 			} else {

@@ -73,17 +73,17 @@ class Ticket extends AbstractEntity
 		$now = (new DateTime())->format('U');
 
 		if (!is_null($type['sold_count']) && $type['sold_count'] >= $type['amount'])
-			throw new InvalidArgumentException('TICKETS_ALL_SOLD: ' . $ticket_data['uuid']);
+			throw new BadArgumentException('TICKETS_ALL_SOLD', App::DB(), $ticket_data['uuid']);
 		if (!is_null($type['sell_end_date']) && $now > $type['sell_end_date'])
-			throw new InvalidArgumentException('TICKETS_SELL_FINISHED: ' . $ticket_data['uuid']);
+			throw new BadArgumentException('TICKETS_SELL_FINISHED', App::DB(), $ticket_data['uuid']);
 
 		if (!is_null($type['sell_start_date']) && $now < $type['sell_start_date'])
-			throw new InvalidArgumentException('REGISTRATION_DID_NOT_START: ' . $ticket_data['uuid']);
+			throw new BadArgumentException('REGISTRATION_DID_NOT_START', App::DB(), $ticket_data['uuid']);
 
 		if (!is_null($type['min_count_per_user']) && $ticket_data['count'] < $type['min_count_per_user'])
-			throw new InvalidArgumentException('TOO_FEW_TICKETS: ' . $ticket_data['uuid']);
+			throw new BadArgumentException('TOO_FEW_TICKETS', App::DB(), $ticket_data['uuid']);
 		if (!is_null($type['max_count_per_user']) && $ticket_data['count'] < $type['max_count_per_user'])
-			throw new InvalidArgumentException('TOO_MANY_TICKETS: ' . $ticket_data['uuid']);
+			throw new BadArgumentException('TOO_MANY_TICKETS', App::DB(), $ticket_data['uuid']);
 
 	}
 

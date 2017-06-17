@@ -10,7 +10,7 @@ let approve_statuses = [
     'completed', 'is_pending', 'approved', 'rejected'
 ];
 
-function getRandom(min, max){
+function getRandom(min, max) {
     return Math.floor(Math.random() * max) + min;
 }
 
@@ -30,10 +30,10 @@ frisby
         request_id: String
     })
     .after(function (err, res, body) {
-        if (res.statusCode != 200){
+        if (res.statusCode != 200) {
             console.log(body);
         }
-        if (err){
+        if (err) {
             env.logger.error(err);
         }
     })
@@ -44,13 +44,21 @@ frisby
                 let value = '';
                 if (register_info.hasOwnProperty(field.type)) {
                     value = register_info[field.type];
+                } else if (field.type === 'select') {
+                    value = [field.values[getRandom(0, field.values.length)].uuid];
+                } else if (field.type === 'select_multi') {
+                    let count = getRandom(0, field.values.length);
+                    value = [];
+                    for (let k =0; k < count; k++){
+                        value.push(field.values[getRandom(0, field.values.length)].uuid);
+                    }
                 }
                 send_data.push({uuid: field.uuid, value: value});
             });
-            let _send = {registration_fields: send_data, tickets:[]};
-            if (event.ticketing_locally){
+            let _send = {registration_fields: send_data, tickets: []};
+            if (event.ticketing_locally) {
                 _send.tickets.push({uuid: event.ticket_types[0].uuid, count: 1});
-            }else{
+            } else {
                 _send.tickets.push({count: 1});
             }
             console.log(_send);
@@ -59,10 +67,10 @@ frisby
                 .post(env.api_url + 'events/' + event.id + '/orders', _send, {json: true})
                 .expectStatus(200)
                 .after(function (err, res, body) {
-                    if (res.statusCode != 200){
+                    if (res.statusCode != 200) {
                         console.log(body);
                     }
-                    if (err){
+                    if (err) {
                         env.logger.error(err);
                     }
                 })
@@ -88,15 +96,15 @@ frisby
                                 text: String
                             })
                             .after(function (err, res, body) {
-                                if (res.statusCode != 200){
+                                if (res.statusCode != 200) {
                                     console.log(body);
                                 }
-                                if (err){
+                                if (err) {
                                     env.logger.error(err);
                                 }
                             })
                             .toss()
-                    }else{ // approve registrations
+                    } else { // approve registrations
                         frisby
                             .create('Approve registration with UUID: ' + json.data.uuid)
                             .put(env.api_url + 'events/' + event.id + '/orders/' + json.data.order.uuid + '?approved_status=' + approve_statuses[getRandom(0, 4)])
@@ -108,10 +116,10 @@ frisby
                                 text: String
                             })
                             .after(function (err, res, body) {
-                                if (res.statusCode != 200){
+                                if (res.statusCode != 200) {
                                     console.log(body);
                                 }
-                                if (err){
+                                if (err) {
                                     env.logger.error(err);
                                 }
                             })
