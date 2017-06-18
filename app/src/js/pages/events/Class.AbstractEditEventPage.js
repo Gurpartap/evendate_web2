@@ -37,8 +37,8 @@ AbstractEditEventPage = extending(Page, (function() {
 			'default_address', {
 				tariff: {
 					fields: new Fields(
-						'available_event_publications',
-						'available_additional_notifications'
+						'available_additional_notifications',
+						'event_publications'
 					)
 				}
 			}
@@ -217,13 +217,13 @@ AbstractEditEventPage = extending(Page, (function() {
 			self.$wrapper.find('.BuySubscriptionLink').removeClass(__C.CLASSES.HIDDEN).attr('href', '/admin/organization/'+ self.organization_id +'/settings#change_tariff');
 		}
 		
-		if (organization.tariff.available_event_publications <= 5) {
+		if (organization.tariff.event_publications <= 5) {
 			$available_event_publications_wrapper.removeClass(__C.CLASSES.HIDDEN);
-			$available_event_publications_wrapper.find('.AvailableEventPublications').text(organization.tariff.available_event_publications);
+			$available_event_publications_wrapper.find('.AvailableEventPublications').text(organization.tariff.event_publications);
 		} else {
 			$available_event_publications_wrapper.addClass(__C.CLASSES.HIDDEN);
 		}
-		$form_overall_fields.attr('disabled', (organization.tariff.available_event_publications <= 0 && !self.is_edit));
+		$form_overall_fields.attr('disabled', (organization.tariff.event_publications <= 0 && !self.is_edit));
 	};
 	
 	
