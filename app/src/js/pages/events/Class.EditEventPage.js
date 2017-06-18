@@ -105,6 +105,9 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 			if (PAGE.event.registration_limit_count) {
 				PAGE.$wrapper.find('#edit_event_registration_limit_by_quantity').prop('checked', true).trigger('change');
 			}
+			if (PAGE.event.registration_approvement_required) {
+				PAGE.$wrapper.find('#edit_event_registration_approvement_required').prop('checked', true).trigger('change');
+			}
 			if (page_vars.registration_fields && page_vars.registration_fields.length) {
 				PAGE.$wrapper.find('.AddRegistrationCustomField').before(AbstractEditEventPage.buildRegistrationCustomField(page_vars.registration_fields.filter(function(field) {
 					var is_custom_field = RegistrationFieldModel.isCustomField(field);

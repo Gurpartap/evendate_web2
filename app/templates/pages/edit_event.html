@@ -383,9 +383,8 @@
 			{registration_limit_count_input}
 		</fieldset>
 
-		<h3></h3>
-
 		<fieldset class="Switching" data-switch_id="registration_locally" disabled>
+			<wbr>
 
 			<h3 id="edit_event_registration_fields">Анкета регистрации</h3>
 
@@ -397,6 +396,13 @@
 
 			<div class="-align_center">
 				<button class="button -color_neutral_accent RippleEffect RegistrationPreview" type="button"><span class="Text">Предпросмотр</span></button>
+			</div>
+
+			<h3>Подтверждение анкеты</h3>
+			<p class="form_text">Подписчик будет зарегистрирован только после подтверждения заявки модератором или администратором</p>
+			<div class="form_unit">
+				<input id="edit_event_registration_approvement_required" class="form_checkbox" type="checkbox" name="registration_approvement_required">
+				<label class="form_label" for="edit_event_registration_approvement_required"><span>Подтверждать анкету вручную</span></label>
 			</div>
 
 		</fieldset>
