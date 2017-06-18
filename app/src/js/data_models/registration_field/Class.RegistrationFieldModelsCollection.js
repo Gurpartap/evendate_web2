@@ -41,9 +41,12 @@ RegistrationFieldModelsCollection = extending(EntitiesCollection, (function() {
 			entities.forEach(function(entity) {
 				if (entity.type == type) {
 					self.last_pushed.push(self[self.length++] = (entity instanceof self.collection_of) ? entity : (new self.collection_of()).setData(entity));
+				} else if (entity.type === RegistrationFieldModel.TYPES.SELECT || entity.type === RegistrationFieldModel.TYPES.SELECT_MULTI) {
+					self.last_pushed.push(self[self.length++] = (entity instanceof RegistrationSelectFieldModel) ? entity : (new RegistrationSelectFieldModel()).setData(entity));
 				}
 			});
 		});
+		
 		return this.length;
 	};
 	
