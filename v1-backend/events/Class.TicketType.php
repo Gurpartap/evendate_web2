@@ -151,7 +151,7 @@ class TicketType extends AbstractEntity
 
 	public static function update(Event $event, User $user, $uuid, $ticket_type, ExtendedPDO $db)
 	{
-		if ($user->isEventAdmin($event) == false) throw new PrivilegesException('', $db);
+		if ($user->isEventAdmin($event) == false) throw new PrivilegesException('CANT_CHANGE_THIS_EVENT', $db);
 		$ticket_type['uuid'] = $uuid;
 		self::create($event, $ticket_type, $db);
 	}

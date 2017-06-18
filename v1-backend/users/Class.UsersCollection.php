@@ -70,7 +70,7 @@ class UsersCollection extends AbstractCollection
 				}
 				case 'staff': {
 					if ($value instanceof Organization) {
-						if (!$user->hasRights($value, array(Roles::ROLE_ADMIN, Roles::ROLE_MODERATOR))) throw new PrivilegesException('', $db);
+						if (!$user->hasRights($value, array(Roles::ROLE_ADMIN, Roles::ROLE_MODERATOR))) throw new PrivilegesException('NOT_ADMIN_OR_MODERATOR', $db);
 						$q_get_users
 							->join('INNER', 'users_organizations', 'users_organizations.user_id = view_users.id')
 							->join('INNER', 'users_roles', 'users_roles.id = users_organizations.role_id')
@@ -185,7 +185,7 @@ class UsersCollection extends AbstractCollection
 //					break;
 //				}
 				case 'organization_approved': {
-					if (!array_key_exists('registered_users', $filters)) throw new InvalidArgumentException('registered_users filter is required for ' . $name);
+					if (!array_key_exists('registered_users', $filters)) throw new BadArgumentException('REGISTERED_USERS_REQUIRED', $db, $name);
 					$_val = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
 					$q_get_users
 						->where('users_registrations.organization_approved = :organization_approved');
@@ -193,7 +193,7 @@ class UsersCollection extends AbstractCollection
 					break;
 				}
 				case 'registered_checked_out': {
-					if (!array_key_exists('registered_users', $filters)) throw new InvalidArgumentException('registered_users filter is required for ' . $name);
+					if (!array_key_exists('registered_users', $filters)) throw new BadArgumentException('REGISTERED_USERS_REQUIRED', $db, $name);
 					$_val = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
 					$q_get_users
 						->where('users_registrations.checked_out = :checked_out');

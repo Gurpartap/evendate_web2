@@ -548,7 +548,7 @@ class EventsCollection extends AbstractCollection
 
 
 		$events = $db->prepareExecute($q_get_events, 'CANT_GET_EVENTS', $statement_array)->fetchAll(PDO::FETCH_CLASS, 'Event');
-		if (count($events) == 0 && $is_one_event) throw new LogicException('CANT_FIND_EVENT: ' . $filters['id']);
+		if (count($events) == 0 && $is_one_event) throw new LogicException('CANT_FIND_EVENT');
 		$result_events = array();
 		if ($is_one_event) return $events[0];
 		foreach ($events as $event) {

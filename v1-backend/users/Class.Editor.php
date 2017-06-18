@@ -29,7 +29,7 @@ class Editor extends User
 				$this,
 				intval($data['organization_id']), array());
 			if (!$this->isEditor($organization))
-				throw new PrivilegesException('Вы не являетесь редактором данной организации', $this->getDB());
+				throw new PrivilegesException('NOT_EDITOR', $this->getDB());
 		} else {
 			$organization = $this->getDefaultOrganization();
 		}

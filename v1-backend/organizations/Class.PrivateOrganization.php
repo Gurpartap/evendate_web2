@@ -11,8 +11,8 @@ class PrivateOrganization extends Organization
 	private function inviteUser($email = null, User $user, UserInterface $friend = null)
 	{
 
-		if ($user->isAdmin($this) == false) throw new PrivilegesException('', $this->db);
-		if ($email == null && $friend == null) throw new InvalidArgumentException();
+		if ($user->isAdmin($this) == false) throw new PrivilegesException('NOT_ADMIN', $this->db);
+		if ($email == null && $friend == null) throw new InvalidArgumentException('CANT_FIND_USER');
 
 		$q_ins_invitation = App::queryFactory()->newInsert()
 			->into('organizations_invitations')
@@ -35,7 +35,7 @@ class PrivateOrganization extends Organization
 
 	public function revokeInvitation(User $user, $uuid)
 	{
-		if ($user->isAdmin($this) == false) throw new PrivilegesException('', $this->db);
+		if ($user->isAdmin($this) == false) throw new PrivilegesException('NOT_ADMIN', $this->db);
 		$q_upd_invitation = App::queryFactory()->newUpdate()
 			->table('organizations_invitations')
 			->cols(array(
@@ -63,7 +63,7 @@ class PrivateOrganization extends Organization
 
 	public function createInvitationLink(User $user)
 	{
-		if ($user->isAdmin($this) == false) throw new PrivilegesException('', $this->db);
+		if ($user->isAdmin($this) == false) throw new PrivilegesException('NOT_ADMIN', $this->db);
 
 		$q_ins_invitation = App::queryFactory()->newInsert()
 			->into('organizations_invitation_links')
@@ -83,7 +83,7 @@ class PrivateOrganization extends Organization
 
 	public function revokeInvitationLink(User $user, $uuid)
 	{
-		if ($user->isAdmin($this) == false) throw new PrivilegesException('', $this->db);
+		if ($user->isAdmin($this) == false) throw new PrivilegesException('NOT_ADMIN', $this->db);
 
 		$q_upd_invitation = App::queryFactory()->newUpdate()
 			->table('organizations_invitation_links')
@@ -98,7 +98,7 @@ class PrivateOrganization extends Organization
 
 	public function getInvitationLinks(User $user, array $fields = null, array $order_by = null)
 	{
-		if ($user->isAdmin($this) == false) throw new PrivilegesException('', $this->db);
+		if ($user->isAdmin($this) == false) throw new PrivilegesException('NOT_ADMIN', $this->db);
 
 		$_fields = Fields::mergeFields(array(
 			'creator_id',
@@ -125,7 +125,7 @@ class PrivateOrganization extends Organization
 
 	public function getInvitedUsers(User $user, array $fields, array $order_by)
 	{
-		if ($user->isAdmin($this) == false) throw new PrivilegesException('', $this->db);
+		if ($user->isAdmin($this) == false) throw new PrivilegesException('NOT_ADMIN', $this->db);
 		$_fields = Fields::mergeFields(array(
 			'organization_id',
 			'user_id',

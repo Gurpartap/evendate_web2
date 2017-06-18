@@ -51,7 +51,13 @@ class RegistrationFieldsCollection extends AbstractCollection
 		$result_fields = array();
 
 		foreach ($registration_fields as $field) {
-			$result_fields[] = $field->getParams($user, $fields)->getData();
+			$to_add = $field->getParams($user, $fields)->getData();
+			if (isset($to_add['values']) && $to_add['values'] != null){
+				try{
+					$to_add['values'] = json_decode($to_add['values'], true);
+				}catch(Exception $e){}
+			}
+			$result_fields[] = $to_add;
 		}
 		return new Result(true, '', $result_fields);
 	}
