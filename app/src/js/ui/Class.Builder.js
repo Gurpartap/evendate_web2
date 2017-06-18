@@ -113,6 +113,7 @@ Builder = (function() {
 	 *
 	 * @param {...buildProps} props
 	 * @param {string} props.page
+	 *
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.link = function buildLink(props) {
@@ -130,7 +131,7 @@ Builder = (function() {
 	 *
 	 * @returns {jQuery}
 	 */
-	Builder.prototype.action = function buildAction(href, title, classes, dataset, attributes) {
+	Builder.prototype.actionLink = function buildActionLink(href, title, classes, dataset, attributes) {
 		
 		return tmpl('action-link', Builder.normalizeBuildProps({
 			href: href,
@@ -138,6 +139,21 @@ Builder = (function() {
 			classes: classes,
 			dataset: dataset,
 			attributes: attributes
+		}));
+	};
+	/**
+	 *
+	 * @param {...buildProps} props
+	 * @param {string} props.title
+	 *
+	 * @returns {jQuery}
+	 */
+	Builder.prototype.actionButton = function buildActionButton(props) {
+		var _props = props instanceof Array ? props : [].slice.call(arguments);
+		
+		return tmpl('action-button', _props.map(function(prop) {
+			
+			return Builder.normalizeBuildProps(prop);
 		}));
 	};
 	/**
@@ -272,26 +288,26 @@ Builder = (function() {
 	Builder.prototype.formInput = function buildFormInput(props) {
 		var self = this,
 			INPUT_TYPES = [
-			'hidden',
-			'text',
-			'search',
-			'tel',
-			'url',
-			'email',
-			'password',
-			'date',
-			'time',
-			'number',
-			'range',
-			'color',
-			'checkbox',
-			'radio',
-			'file',
-			'submit',
-			'image',
-			'reset',
-			'button'
-		];
+				'hidden',
+				'text',
+				'search',
+				'tel',
+				'url',
+				'email',
+				'password',
+				'date',
+				'time',
+				'number',
+				'range',
+				'color',
+				'checkbox',
+				'radio',
+				'file',
+				'submit',
+				'image',
+				'reset',
+				'button'
+			];
 		
 		return $.makeSet(Array.prototype.map.call(arguments, function(props) {
 			switch (props.type) {
@@ -820,12 +836,12 @@ Builder = (function() {
 		return tmpl('organization-card', organizations.map(function(org) {
 			return $.extend(true, {}, org, {
 				background_image: (org.background_small_img_url || org.background_img_url) ? self.link({
-						page: '/organization/'+org.id,
-						classes: ['organization_unit_background'],
-						attributes: {
-							style: 'background-image: url('+(org.background_small_img_url || org.background_img_url)+')'
-						}
-					}) : '',
+					page: '/organization/'+org.id,
+					classes: ['organization_unit_background'],
+					attributes: {
+						style: 'background-image: url('+(org.background_small_img_url || org.background_img_url)+')'
+					}
+				}) : '',
 				avatar: self.avatars(org, {
 					classes: [
 						'organization_unit_avatar',
@@ -846,17 +862,17 @@ Builder = (function() {
 				}),
 				subscribed_text: org.subscribed_count + getUnitsText(org.subscribed_count, __LOCALES.ru_RU.TEXTS.SUBSCRIBERS),
 				redact_org_button: (org.role === OneUser.ROLE.UNAUTH || org.role === OneUser.ROLE.USER) ? '' : self.link({
-						classes: [
-							'button',
-							__C.CLASSES.SIZES.LOW,
-							__C.CLASSES.COLORS.MARGINAL_PRIMARY,
-							__C.CLASSES.ICON_CLASS,
-							__C.CLASSES.ICONS.PENCIL,
-							__C.CLASSES.UNIVERSAL_STATES.EMPTY,
-							__C.CLASSES.HOOKS.RIPPLE
-						],
-						page: '/admin/organization/' + org.id + '/edit'
-					})
+					classes: [
+						'button',
+						__C.CLASSES.SIZES.LOW,
+						__C.CLASSES.COLORS.MARGINAL_PRIMARY,
+						__C.CLASSES.ICON_CLASS,
+						__C.CLASSES.ICONS.PENCIL,
+						__C.CLASSES.UNIVERSAL_STATES.EMPTY,
+						__C.CLASSES.HOOKS.RIPPLE
+					],
+					page: '/admin/organization/' + org.id + '/edit'
+				})
 			});
 		}))
 	};
@@ -902,7 +918,7 @@ Builder = (function() {
 					}));
 					
 					if (event.ticketing_locally) {
-						
+					
 					} else {
 						$action_buttons = $action_buttons.add(new RegisterButton(event, {
 							classes: [
@@ -934,8 +950,8 @@ Builder = (function() {
 			return $.extend({}, event, {
 				cover_width: 550,
 				divider: different_day ? tmpl('divider', {
-						title: m_event_date.calendar().capitalize()
-					}) : '',
+					title: m_event_date.calendar().capitalize()
+				}) : '',
 				action_buttons: $action_buttons,
 				date: m_event_date.format(__C.DATE_FORMAT),
 				avatars_collection: self.avatarCollection(event.favored, 3, {
@@ -1071,7 +1087,7 @@ Builder = (function() {
 				});
 				
 				if (event.ticketing_locally) {
-					
+				
 				} else {
 					$action_button = new RegisterButton(event, {
 						classes: [
@@ -1114,7 +1130,7 @@ Builder = (function() {
 			}
 			feed_event_infos.push({
 				text: displayDateRange(event.dates[0].event_date, event.dates[event.dates.length - 1].event_date)
-				+ (event.is_same_time ? ', ' + displayTimeRange(event.dates[0].start_time, event.dates[0].end_time) : '')
+				      + (event.is_same_time ? ', ' + displayTimeRange(event.dates[0].start_time, event.dates[0].end_time) : '')
 			});
 			if (event.registration_required && event.registration_till) {
 				feed_event_infos.push({text: 'Регистрация до ' + moment.unix(event.registration_till).calendar().toLowerCase()});
@@ -1163,6 +1179,62 @@ Builder = (function() {
 		
 		return $events;
 	};
+	/**
+	 *
+	 * @param {(RegistrationFieldsCollection|Array<RegistrationField>|RegistrationField)} fields
+	 *
+	 * @return {jQuery}
+	 */
+	Builder.prototype.registrationFields = function buildRegistrationFields(fields) {
+		if (fields instanceof RegistrationField) {
+			fields = [fields];
+		} else if (!(fields instanceof Array)) {
+			throw TypeError('Component builder accepts only RegistrationFieldsCollection, RegistrationField or array of RegistrationField object types');
+		}
+		
+		var $fields = $(),
+			name_fields = [],
+			types_queue = [
+				RegistrationField.TYPES.EMAIL,
+				RegistrationField.TYPES.PHONE_NUMBER,
+				RegistrationField.TYPES.ADDITIONAL_TEXT,
+				RegistrationField.TYPES.CUSTOM,
+				RegistrationField.TYPES.EXTENDED_CUSTOM
+			];
+		
+		if (fields.__types[RegistrationField.TYPES.FIRST_NAME].length || fields.__types[RegistrationField.TYPES.LAST_NAME].length) {
+			if (fields.__types[RegistrationField.TYPES.LAST_NAME].length) {
+				name_fields.push({
+					name: 'Фамилия',
+					value: fields.__types[RegistrationField.TYPES.LAST_NAME][0].value
+				});
+			}
+			if (fields.__types[RegistrationField.TYPES.FIRST_NAME].length) {
+				name_fields.push({
+					name: 'Имя',
+					value: fields.__types[RegistrationField.TYPES.FIRST_NAME][0].value
+				});
+			}
+			$fields = $fields.add(tmpl('fields-wrapper', {
+				classes: name_fields.length === 2 ? '-columns_2' : '',
+				fields: tmpl('field', name_fields)
+			}));
+		}
+		
+		return $fields.add(tmpl('field', types_queue.reduce(function(batch, type) {
+			if (type === RegistrationField.TYPES.FIRST_NAME || type === RegistrationField.TYPES.LAST_NAME) {
+				return batch;
+			}
+			
+			return batch.concat(fields.__types[type].map(function(field) {
+				
+				return {
+					name: field.label || RegistrationField.DEFAULT_LABEL[type],
+					value: field.value || '—'
+				};
+			}));
+		}, [])));
+	};
 	
 	/**
 	 *
@@ -1210,7 +1282,7 @@ Builder = (function() {
 				case OneExtendedTicket.TICKET_STATUSES.RETURNED_BY_ORGANIZATION:
 				case OneExtendedTicket.TICKET_STATUSES.RETURNED_BY_CLIENT:
 				case OneExtendedTicket.TICKET_STATUSES.REJECTED: {
-					props.card_classes.push(__C.CLASSES.STATUS.DISABLED);
+					props.card_classes.push(__C.CLASSES.DISABLED);
 					break;
 				}
 				default: {

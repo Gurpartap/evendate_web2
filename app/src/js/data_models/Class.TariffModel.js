@@ -20,6 +20,7 @@ TariffModel = extending(OneEntity, (function() {
 	 * @property {?timestamp} till
 	 * @property {?number} available_additional_notifications
 	 * @property {?number} available_event_publications
+	 * @property {?number} event_publications
 	 * @property {?number} available_tickets_selling
 	 * @property {?boolean} available_telegram_bots
 	 * @property {?boolean} available_slack_bots
@@ -36,6 +37,7 @@ TariffModel = extending(OneEntity, (function() {
 		this.till = null;
 		this.available_additional_notifications = null;
 		this.available_event_publications = null;
+		this.event_publications = null;
 		this.available_tickets_selling = null;
 		this.available_telegram_bots = null;
 		this.available_slack_bots = null;

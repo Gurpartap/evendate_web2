@@ -140,7 +140,7 @@ UserPage = extending(Page, (function() {
 		bindTabs(this.$wrapper);
 		UserPage.bindEvents(this.$wrapper);
 		
-		this.$wrapper.find('.Tabs').on('change.tabs', function() {
+		this.$wrapper.find('.Tabs').on('tabs:change', function() {
 			bindScrollEvents(self, event_names);
 		});
 		
