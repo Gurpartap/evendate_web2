@@ -26,8 +26,8 @@ AdminEventOrdersPage = extending(AdminEventPage, (function() {
 		
 		this.orders = new EventOrdersCollection(event_id);
 		this.orders_fields = new Fields('created_at', 'registration_fields', {
-			user: {/*
-				fields: new Fields('email')*/
+			user: {
+				fields: new Fields('email')
 			},
 			tickets: {
 				fields: new Fields('ticket_type')
@@ -151,11 +151,11 @@ AdminEventOrdersPage = extending(AdminEventPage, (function() {
 				self.initOrdersTable();
 			}
 			self.ordersTable.rows.add($rows).draw();/*
-			try {
-				self.ordersTable.rows().recalcHeight().columns.adjust().fixedColumns().relayout().draw();
-			} catch (e) {
-				__APP.reload();
-			}*/
+			 try {
+			 self.ordersTable.rows().recalcHeight().columns.adjust().fixedColumns().relayout().draw();
+			 } catch (e) {
+			 __APP.reload();
+			 }*/
 			
 			self.$loader.remove();
 			self.$wrapper.find('.OrdersTableWrapper').removeClass(__C.CLASSES.STATUS.DISABLED);

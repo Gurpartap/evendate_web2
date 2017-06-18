@@ -30,7 +30,7 @@ OrderAppInspector = extending(AbstractAppInspector, (function() {
 			tickets_title: AbstractAppInspector.build.title('Билеты'),
 			tickets: AbstractAppInspector.build.tickets(this.order.tickets),
 			registration_form_title: AbstractAppInspector.build.title('Анкета регистрации'),
-			registration_fields: AbstractAppInspector.build.registrationFields(this.order.registration_fields),
+			registration_fields: __APP.BUILD.registrationFields(this.order.registration_fields),
 			event_title: AbstractAppInspector.build.title('Событие'),
 			event: AbstractAppInspector.build.event(this.event)
 		});

@@ -79,7 +79,8 @@ AbstractEditEventPage = extending(Page, (function() {
 				min_price: form_data.is_free ? null : form_data.min_price,
 				delayed_publication: !!form_data.delayed_publication,
 				registration_required: !!form_data.registration_required,
-				registration_locally: !!form_data.registration_locally
+				registration_locally: !!form_data.registration_locally,
+				registration_approvement_required: !!form_data.registration_approvement_required
 			};
 		
 		if (form_data.registration_required) {
@@ -728,7 +729,7 @@ AbstractEditEventPage = extending(Page, (function() {
 			modal.show();
 		});
 		
-		$main_tabs.on('change.tabs', function() {
+		$main_tabs.on('tabs:change', function() {
 			if($main_tabs.currentTabsIndex === 0){
 				$prev_page_button.addClass(__C.CLASSES.HIDDEN);
 			} else {
@@ -903,7 +904,7 @@ AbstractEditEventPage = extending(Page, (function() {
 				required: true
 			}),
 			organization_id: PAGE.organization_id || PAGE.event.organization_id,
-			vk_post_link: PAGE.event.vk_post_link ? __APP.BUILD.action(
+			vk_post_link: PAGE.event.vk_post_link ? __APP.BUILD.actionLink(
 				PAGE.event.vk_post_link,
 				'Страница публикации во Вконтакте',
 				[__C.CLASSES.COLORS.ACCENT, '-no_uppercase'],
