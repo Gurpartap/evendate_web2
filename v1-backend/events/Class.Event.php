@@ -1678,23 +1678,35 @@ class Event extends AbstractEntity
 						$possible_by_uuid[$possible['uuid']] = $possible;
 					}
 
-					$final_field['value'] = array_unique($final_field['value'], SORT_STRING);
 					$final_field['ins_values'] = array();
-					foreach ($final_field['value'] as $selected) {
-						if (!isset($possible_by_uuid[$selected])) {
+					if (is_array($final_field['value'])) {
+						$final_field['value'] = array_unique($final_field['value'], SORT_STRING);
+						foreach ($final_field['value'] as $selected) {
+							if (!isset($possible_by_uuid[$selected])) {
+								$final_field['error'] = 'Выбранное значение отсутствует в списке возможных.';
+								$errors[] = $final_field;
+							} else {
+								$final_field['ins_values'][] = array(
+									'uuid' => $selected,
+									'value' => $possible_by_uuid[$selected]['value']
+								);
+							}
+						}
+					} else {
+						$value_uuid = $final_field['value'];
+						if (!isset($possible_by_uuid[$value_uuid])) {
 							$final_field['error'] = 'Выбранное значение отсутствует в списке возможных.';
 							$errors[] = $final_field;
 						} else {
 							$final_field['ins_values'][] = array(
-								'uuid' => $selected,
-								'value' => $possible_by_uuid[$selected]['value']
+								'uuid' => $value_uuid,
+								'value' => $possible_by_uuid[$value_uuid]['value']
 							);
 						}
 					}
 					$final_field['value'] = null;
 					break;
 				}
-
 			}
 			$merged_fields[$key] = $final_field;
 			$return_fields[] = $final_field;

@@ -103,7 +103,7 @@ AdminEventRequestsPage = extending(AdminEventPage, (function() {
 			});
 		}
 		
-		AbstractOrdersCollection.prototype.collection_of = OneRequest;
+		RequestsCollection.prototype.collection_of = OneRequest;
 		
 		RequestsCollection.fetchOrders = RequestsCollection.fetchRequests = EventOrdersCollection.fetchOrders;
 		RequestsCollection.prototype.fetchAllRequests = EventOrdersCollection.prototype.fetchAllOrders;
