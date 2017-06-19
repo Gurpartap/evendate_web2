@@ -77,6 +77,13 @@ class TicketsCollection extends AbstractCollection
 					}
 					break;
 				}
+				case 'statistics_order': {
+					if ($value instanceof Order) {
+						$q_get_tickets->where('ticket_order_uuid = ?', $value->getUUID());
+						$getting_statistics = true;
+					}
+					break;
+				}
 				case 'number': {
 					$getting_statistics = true;
 					$value = '%' . intval(preg_replace("/[^0-9,.]/", "", $value)) . '%';
