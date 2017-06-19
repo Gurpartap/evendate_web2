@@ -38,6 +38,7 @@ AbstractEditEventPage = extending(Page, (function() {
 				tariff: {
 					fields: new Fields(
 						'available_additional_notifications',
+						'available_event_publications',
 						'event_publications'
 					)
 				}

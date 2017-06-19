@@ -1224,6 +1224,8 @@ Builder = (function() {
 				RegistrationField.TYPES.PHONE_NUMBER,
 				RegistrationField.TYPES.ADDITIONAL_TEXT,
 				RegistrationField.TYPES.CUSTOM,
+				RegistrationField.TYPES.SELECT,
+				RegistrationField.TYPES.SELECT_MULTI,
 				RegistrationField.TYPES.EXTENDED_CUSTOM
 			];
 		
@@ -1255,7 +1257,22 @@ Builder = (function() {
 				
 				return {
 					name: field.label || RegistrationField.DEFAULT_LABEL[type],
-					value: field.value || '—'
+					value: (function(field) {
+						switch (field.type) {
+							case RegistrationFieldModel.TYPES.SELECT:
+							case RegistrationFieldModel.TYPES.SELECT_MULTI: {
+								
+								return field.values.length ? field.values.map(function(value) {
+									
+									return value.value;
+								}).join(', ') : '—'
+							}
+							default: {
+								
+								return field.value || '—'
+							}
+						}
+					}(field))
 				};
 			}));
 		}, [])));
