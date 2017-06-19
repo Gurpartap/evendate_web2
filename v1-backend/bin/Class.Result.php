@@ -172,4 +172,14 @@ class Result
 	{
 		return $this->status;
 	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getText()
+	{
+		return $this->text;
+	}
+
+
 }

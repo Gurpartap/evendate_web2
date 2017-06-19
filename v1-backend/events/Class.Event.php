@@ -1653,11 +1653,20 @@ class Event extends AbstractEntity
 				case 'select_multi':
 				case 'select': {
 					if ($final_field['required'] == true) {
-						if ($final_field['type'] == 'select' && (!is_array($final_field['value']) || count($final_field['value']) != 1)) {
-							$final_field['error'] = 'Укажите, пожалуйста, валидные значения.';
-							$errors[] = $final_field;
-							$final_field['value'] = null;
-							break;
+						if ($final_field['type'] == 'select') {
+							if (is_array($final_field['value'])) {
+								if (count($final_field['value']) != 1) {
+									$final_field['error'] = 'Укажите, пожалуйста, валидные значения.';
+									$errors[] = $final_field;
+									$final_field['value'] = null;
+									break;
+								}
+							} elseif ($final_field['value'] == null) {
+								$final_field['error'] = 'Укажите, пожалуйста, валидные значения.';
+								$errors[] = $final_field;
+								$final_field['value'] = null;
+								break;
+							}
 						}
 					} elseif ($final_field['value'] == null) {
 						break;
@@ -1682,7 +1691,7 @@ class Event extends AbstractEntity
 							);
 						}
 					}
-				$final_field['value'] = null;
+					$final_field['value'] = null;
 					break;
 				}
 

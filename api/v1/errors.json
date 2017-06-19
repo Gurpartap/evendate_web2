@@ -111,6 +111,7 @@
   "CANT_FIND_TAG": "Невозможно найти указанный тэг",
   "NOT_EDITOR": "Вы не являетесь редактором данной организации",
   "UNEXPECTED_VALUES": "Указаны недопустимые значения",
-  "REGISTERED_USERS_REQUIRED": "Фильтр \'registered_users\' обязателен",
+  "REGISTERED_USERS_REQUIRED": "Фильтр registered_users обязателен",
+  "BAD_REQUEST:NOT_IMPLEMENTED": "Указанный метод не существует",
   "ROLE_NAMES_ARE_REQUIRED": "Небходимо указать роли"
 }

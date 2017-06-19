@@ -36,6 +36,13 @@ if (config_index == 'local') {
             timeout: (30*1000)
         }
     });
+}else{
+    frisby.globalSetup({
+        request: {
+            headers: {'Authorization': real_config.token},
+            timeout: (30*1000)
+        }
+    });
 }
 
 
