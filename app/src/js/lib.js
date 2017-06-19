@@ -584,16 +584,53 @@ $.fn.extend({
 		
 		switch (output_type) {
 			case 'array': {
-				/* Работает так же как и serializeArray, с некоторыми модификациями */
-				return elements.filter(function() {
+				var $checkboxes,
+					array = [],
+					lookup = {};
+				
+				$checkboxes = elements.filter(function() {
+					
+					return this.name && !$(this).is(":disabled") && this.type === 'checkbox';
+				});
+				
+				$checkboxes.each(function() {
+					if (lookup[this.name]) {
+						lookup[this.name] = lookup[this.name].add(this);
+					} else {
+						lookup[this.name] = $(this);
+					}
+				});
+				
+				$.each(lookup, function(name, $checkboxes) {
+					var values;
+					
+					if ($checkboxes.length === 1) {
+						values = $checkboxes.val() === 'on' ? $checkboxes.prop('checked') : $checkboxes.val();
+						
+					} else {
+						values = [];
+						
+						$checkboxes.filter(':checked').each(function() {
+							values.push(this.value === 'on' ? this.checked : this.value);
+						});
+					}
+					
+					array.push({
+						name: name,
+						value: values
+					});
+				});
+				
+				elements.not($checkboxes).filter(function() {
 					var a = this.type;
+					
 					return this.name
 					       && !$(this).is(":disabled")
 					       && zb.test(this.nodeName)
 					       && !yb.test(a)
 					       && ((this.checked && this.value != "on") || a != "radio")
 					       && ((this.checked && this.value != "on") || this.value == "on" || a != "checkbox")
-				}).map(function(a, b) {
+				}).each(function(a, b) {
 					var c = $(this).val(),
 						std = "";
 					switch (this.type) {
@@ -606,11 +643,15 @@ $.fn.extend({
 							std = c.replace(xb, "\r\n");
 						}
 					}
-					return null == c ? null : {
-						name: b.name,
-						value: std
+					if (null != c) {
+						array.push({
+							name: b.name,
+							value: std
+						});
 					}
-				}).get();
+				});
+				
+				return array;
 			}
 			case 'object':
 			default: {
@@ -1569,15 +1610,45 @@ function guid() {
  * Validating form or fieldset
  *
  * @param {(Element|jQuery)} $form
+ *
  * @return {boolean}
  */
 function isFormValid($form) {
 	$form = $form instanceof Element ? $($form) : $form;
 	var is_valid = true,
-		$elements = $form.find('input, textarea');
+		$elements = $form.find('input, textarea'),
+		$rest = $elements,
+		lookup = {};
 	
 	if (!$form[0].checkValidity()) {
+		
 		$elements.each(function(i, el) {
+			if (el.name) {
+				lookup[el.name] = lookup[el.name] ? lookup[el.name].add(el) : $(el);
+			}
+		});
+		
+		$.each(lookup, function(name, $elements) {
+			var active_count = 0;
+			
+			if ($elements.length > 1) {
+				active_count = $elements.filter(function(i, el) {
+					
+					return !$(el).is(":disabled")
+					   && ((el.checked && el.value != "on") || el.type != "radio")
+					   && ((el.checked && el.value != "on") || el.value == "on" || el.type != "checkbox");
+				}).length;
+				
+				if (!active_count) {
+					handleErrorField($elements);
+					is_valid = false;
+				}
+				
+				$rest = $rest.not($elements);
+			}
+		});
+		
+		$rest.each(function(i, el) {
 			if ( (el.required && (el.value.trim() === '' || !el.checkValidity())) || (el.value.trim() !== '' && !el.checkValidity()) ) {
 				handleErrorField(el);
 				is_valid = false;

@@ -200,6 +200,11 @@ AbstractEditEventPage = extending(Page, (function() {
 				return true;
 			}
 			return false;
+		}).map(function(data) {
+			
+			return $.extend({}, data, {
+				registration_custom_field_values: (data.values && data.values.length) ? AbstractEditEventPage.buildRegistrationCustomFieldValues(data.id, data.values) : ''
+			});
 		}));
 		
 		$fields.find('.RegistrationCustomFieldType').select2({
@@ -255,7 +260,10 @@ AbstractEditEventPage = extending(Page, (function() {
 		
 		$values.find('.AddValue').on('click.AddValue', function() {
 			var last_value_id = +$values.data('last_value_id') + 1,
-				$new_value = AbstractEditEventPage.buildRegistrationCustomFieldValue(field_id, last_value_id, {value: 'Вариант '+last_value_id});
+				$new_value = AbstractEditEventPage.buildRegistrationCustomFieldValue(field_id, {
+					value: 'Вариант '+last_value_id,
+					value_id: last_value_id
+				});
 			
 			$values.find('.RegistrationCustomFieldValuesWrapper').append($new_value);
 			$values.data('last_value_id', last_value_id);
@@ -265,13 +273,13 @@ AbstractEditEventPage = extending(Page, (function() {
 		return $values;
 	};
 	
-	AbstractEditEventPage.buildRegistrationCustomFieldValue = function(field_id, value_id, values) {
+	AbstractEditEventPage.buildRegistrationCustomFieldValue = function(field_id, values) {
 		var _values = values instanceof Array ? values : values ? [values] : [],
-			$value = tmpl('edit-event-registration-custom-field-value', _values.map(function(value) {
+			$value = tmpl('edit-event-registration-custom-field-value', _values.map(function(value, i) {
 			
 			return {
 				id: field_id,
-				value_id: value_id,
+				value_id: value.value_id || i,
 				value_uuid: value.uuid,
 				checkbox_radio: __APP.BUILD.checkbox({
 					attributes: {
@@ -279,7 +287,7 @@ AbstractEditEventPage = extending(Page, (function() {
 					}
 				}),
 				input: __APP.BUILD.input({
-					name: 'registration_' +field_id+ '_field_' +value_id+ '_value',
+					name: 'registration_' +field_id+ '_field_' +(value.value_id || i)+ '_value',
 					value: value.value
 				}, ['edit_event_registration_custom_field_value_input', 'form_input', '-flat', 'ValueInput'])
 			};
@@ -807,17 +815,30 @@ AbstractEditEventPage = extending(Page, (function() {
 		
 		PAGE.$wrapper.find('.RegistrationPreview').on('click.RegistrationPreview', function() {
 			var form_data = $(this).closest('form').serializeForm(),
+				registration_fields = new RegistrationFieldModelsCollection(),
 				event = new OneEvent(),
 				modal;
 			
-			form_data.registration_fields = (new RegistrationFieldModelsCollection()).setData(form_data.registration_fields.sort().map(function(field) {
-				return {
-					uuid: guid(),
-					type: form_data['registration_'+field+'_field_type'],
-					label: form_data['registration_'+field+'_field_label'] || RegistrationFieldModel.DEFAULT_LABEL[form_data['registration_'+field+'_field_type'].toUpperCase()],
-					required: form_data['registration_'+field+'_field_required']
-				};
-			}));
+			if (form_data.registration_fields) {
+				registration_fields.setData(form_data.registration_fields.sort().map(function(field) {
+					
+					return {
+						uuid: guid(),
+						type: form_data['registration_'+field+'_field_type'],
+						label: form_data['registration_'+field+'_field_label'] || RegistrationFieldModel.DEFAULT_LABEL[form_data['registration_'+field+'_field_type'].toUpperCase()],
+						required: form_data['registration_'+field+'_field_required'],
+						values: form_data['registration_'+field+'_field_values'] ? form_data['registration_'+field+'_field_values'].map(function(value_id) {
+							var value = new RegistrationSelectFieldValue();
+							
+							value.value = form_data['registration_' +field+ '_field_' +value_id+ '_value'];
+							value.uuid = form_data['registration_' +field+ '_field_' +value_id+ '_value_uuid'] || guid();
+							
+							return value;
+						}) : null
+					};
+				}))
+			}
+			form_data.registration_fields = registration_fields;
 			event.setData(form_data);
 			
 			modal = new PreviewRegistrationModal(event);
@@ -887,9 +908,9 @@ AbstractEditEventPage = extending(Page, (function() {
 				}),
 				tomorrow_date: page_vars.tomorrow_date,
 				predefined_field: tmpl('edit-event-registration-predefined-field', [
-					{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'email', name: 'E-mail', description: 'Текстовое поле для ввода адреса электронной почты'},
-					{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'first_name', name: 'Имя', description: 'Текстовое поле для ввода имени'},
 					{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'last_name', name: 'Фамилия', description: 'Текстовое поле для ввода фамилии'},
+					{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'first_name', name: 'Имя', description: 'Текстовое поле для ввода имени'},
+					{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'email', name: 'E-mail', description: 'Текстовое поле для ввода адреса электронной почты'},
 					{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'phone_number', name: 'Номер телефона', description: 'Текстовое поля для ввода номера телефона'}
 				])
 			},

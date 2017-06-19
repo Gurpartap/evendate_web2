@@ -79,6 +79,7 @@ Builder = (function() {
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.input = function buildInput(attributes, classes, dataset) {
+		
 		return tmpl('input', Builder.normalizeBuildProps({
 			classes: classes,
 			attributes: attributes,
@@ -88,6 +89,30 @@ Builder = (function() {
 				$(input).data(dataset);
 			}
 		});
+	};
+	/**
+	 *
+	 * @param {Array<buildProps>} values
+	 * @param {HTMLAttributes} [attributes]
+	 * @param {(Array<string>|string)} [classes]
+	 * @param {HTMLDataset} [dataset]
+	 * @param {(string|number)} [default_value]
+	 * @returns {jQuery}
+	 */
+	Builder.prototype.select = function buildSelect(values, attributes, classes, dataset, default_value) {
+		var $select =  tmpl('select', Builder.normalizeBuildProps({
+			options: __APP.BUILD.option(values),
+			classes: classes,
+			attributes: attributes,
+			dataset: dataset
+		}));
+		
+		if (dataset) {
+			$select.data(dataset);
+		}
+		$select.val(default_value ? default_value : (values[0].val || values[0].display_name));
+		
+		return $select;
 	};
 	/**
 	 *

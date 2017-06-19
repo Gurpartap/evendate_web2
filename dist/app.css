@@ -3195,7 +3195,7 @@ body.-open_modal > .modal_wrapper {
 }
 
 
-.registration_modal_form .form_unit {margin-top: 1.5em}
+.registration_modal_form > .form_unit {margin-top: 1.5em}
 
 .registration_modal_form .form_label {
 	font-size: .875em;
