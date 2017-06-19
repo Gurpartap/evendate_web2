@@ -50,6 +50,7 @@ __APP = {
 				'^([0-9]+)': {
 					'overview': AdminEventOverviewPage,
 					'orders': AdminEventOrdersPage,
+					'requests': AdminEventRequestsPage,
 					'check_in': AdminEventCheckInPage,
 					'edit': AdminEventEditPage,
 					'': AdminEventOverviewPage
@@ -144,6 +145,7 @@ __APP = {
 	 */
 	renderHeaderTabs: function renderHeaderTabs(tabs) {
 		var $wrapper = $('#main_header_bottom').find('.HeaderTabsWrapper');
+		
 		tabs = tabs instanceof Array ? tabs : [tabs];
 		tabs.forEach(function(tab) {
 			tab = Builder.normalizeBuildProps(tab);
@@ -156,7 +158,7 @@ __APP = {
 			color: 'default',
 			tabs: tmpl('link', tabs)
 		}));
-		bindTabs($wrapper);
+		bindTabs($wrapper, false);
 		bindPageLinks($wrapper);
 	},
 	/**

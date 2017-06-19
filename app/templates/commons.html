@@ -6,6 +6,10 @@
 	<textarea class="{classes}" {attributes} {dataset}>{value}</textarea>
 </script>
 
+<script type="javascript/template" id="tmpl-select">
+	<select class="{classes}" {attributes} {dataset}>{options}</select>
+</script>
+
 <script type="javascript/template" id="tmpl-divider">
 	<hr title="{title}" {dataset}>
 </script>
@@ -39,6 +43,17 @@
 	<p class="form_helptext" {attributes} {dataset}>{text}</p>
 </script>
 
+<script type="javascript/template" id="tmpl-fields-wrapper">
+	<div class="fields_wrapper {classes}">{fields}</div>
+</script>
+
+<script type="javascript/template" id="tmpl-field">
+	<div class="field {classes}">
+		<span class="field_name">{name}</span>
+		<span class="field_value">{value}</span>
+	</div>
+</script>
+
 <script type="javascript/template" id="tmpl-button">
 	<button class="button {classes}" type="button" {attributes}><span class="Text">{title}</span></button>
 </script>
@@ -49,6 +64,10 @@
 
 <script type="javascript/template" id="tmpl-action-link">
 	<a href="{href}" class="action {classes}" {dataset} {attributes}>{title}</a>
+</script>
+
+<script type="javascript/template" id="tmpl-action-button">
+	<button class="action {classes}" type="button" {attributes}><span class="Text">{title}</span></button>
 </script>
 
 <script type="javascript/template" id="tmpl-tag">

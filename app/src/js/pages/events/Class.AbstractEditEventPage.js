@@ -37,8 +37,9 @@ AbstractEditEventPage = extending(Page, (function() {
 			'default_address', {
 				tariff: {
 					fields: new Fields(
+						'available_additional_notifications',
 						'available_event_publications',
-						'available_additional_notifications'
+						'event_publications'
 					)
 				}
 			}
@@ -52,6 +53,7 @@ AbstractEditEventPage = extending(Page, (function() {
 	}
 	
 	AbstractEditEventPage.lastRegistrationCustomFieldId = 0;
+	AbstractEditEventPage.lastRegistrationCustomFieldValueId = 0;
 	
 	AbstractEditEventPage.prototype.fetchData = function() {
 		return this.fetching_data_defer = this.my_organizations.fetchMyOrganizations(['admin', 'moderator'], this.my_organizations_fields);
@@ -79,7 +81,8 @@ AbstractEditEventPage = extending(Page, (function() {
 				min_price: form_data.is_free ? null : form_data.min_price,
 				delayed_publication: !!form_data.delayed_publication,
 				registration_required: !!form_data.registration_required,
-				registration_locally: !!form_data.registration_locally
+				registration_locally: !!form_data.registration_locally,
+				registration_approvement_required: !!form_data.registration_approvement_required
 			};
 		
 		if (form_data.registration_required) {
@@ -94,14 +97,35 @@ AbstractEditEventPage = extending(Page, (function() {
 			
 			if (form_data.registration_fields && form_data.registration_fields.length) {
 				send_data.registration_fields = (new RegistrationFieldModelsCollection()).setData(form_data.registration_fields.map(function(id) {
-					var field = new RegistrationFieldModel();
+					var field;
+					
+					if (form_data['registration_' + id + '_field_type']) {
+						switch (form_data['registration_' + id + '_field_type']) {
+							case RegistrationFieldModel.TYPES.SELECT:
+							case RegistrationFieldModel.TYPES.SELECT_MULTI: {
+								field = new RegistrationSelectFieldModel();
+								
+								field.values = form_data['registration_' + id + '_field_values'].map(function(value_id) {
+									var value = new RegistrationSelectFieldValue();
+									
+									value.value = form_data['registration_' +id+ '_field_' +value_id+ '_value'];
+									value.uuid = setDefaultValue(form_data['registration_' +id+ '_field_' +value_id+ '_value_uuid'], null);
+									
+									return value;
+								});
+								break;
+							}
+							default: {
+								field = new RegistrationFieldModel();
+								break;
+							}
+						}
+						field.type = form_data['registration_' + id + '_field_type'];
+					}
 					
 					field.required = form_data['registration_' + id + '_field_required'];
 					if (form_data['registration_' + id + '_field_uuid']) {
 						field.uuid = form_data['registration_' + id + '_field_uuid'];
-					}
-					if (form_data['registration_' + id + '_field_type']) {
-						field.type = form_data['registration_' + id + '_field_type'];
 					}
 					if (form_data['registration_' + id + '_field_label']) {
 						field.label = form_data['registration_' + id + '_field_label'].trim();
@@ -177,15 +201,46 @@ AbstractEditEventPage = extending(Page, (function() {
 				return true;
 			}
 			return false;
+		}).map(function(data) {
+			
+			return $.extend({}, data, {
+				registration_custom_field_values: (data.values && data.values.length) ? AbstractEditEventPage.buildRegistrationCustomFieldValues(data.id, data.values) : ''
+			});
 		}));
+		
+		$fields.find('.RegistrationCustomFieldType').select2({
+			containerCssClass: 'form_select2',
+			dropdownCssClass: 'form_select2_drop form_select2_drop_no_search'
+		}).on('change.SelectRegistrationCustomFieldType', function() {
+			var $this = $(this),
+				$field = $this.closest('.RegistrationCustomField'),
+				$values_wrap = $field.find('.RegistrationCustomFieldValues');
+			
+			switch ($this.val()) {
+				case RegistrationFieldModel.TYPES.ADDITIONAL_TEXT:
+				case RegistrationFieldModel.TYPES.EXTENDED_CUSTOM: {
+					$values_wrap.html('');
+					break;
+				}
+				case RegistrationFieldModel.TYPES.SELECT:
+				case RegistrationFieldModel.TYPES.SELECT_MULTI: {
+					if ($values_wrap.is(':empty')) {
+						$values_wrap.html(AbstractEditEventPage.buildRegistrationCustomFieldValues($field.find('.RegistrationFieldId').val()));
+					}
+					break;
+				}
+			}
+		});
+		
 		registration_data.forEach(function(data) {
 			if (data.required) {
 				$fields.find('#edit_event_registration_'+data.id+'_custom_field_required').prop('checked', true);
 			}
 			if (data.type) {
-				$fields.find('#edit_event_registration_'+data.id+'_custom_field_'+data.type+'_type').prop('checked', true);
+				$fields.find('#edit_event_registration_'+data.id+'_field_type').select2('val', data.type);
 			}
 		});
+		
 		$fields.find('.RemoveRegistrationCustomField').on('click.RemoveRegistrationCustomField', function() {
 			$(this).closest('.RegistrationCustomField').remove();
 		});
@@ -194,6 +249,56 @@ AbstractEditEventPage = extending(Page, (function() {
 		});
 		
 		return $fields;
+	};
+	
+	AbstractEditEventPage.buildRegistrationCustomFieldValues = function(field_id, values) {
+		var _values = values instanceof Array ? values : [],
+			$values = tmpl('edit-event-registration-custom-field-values', {
+				id: field_id,
+				values: AbstractEditEventPage.buildRegistrationCustomFieldValue(field_id, _values),
+				last_value_id: _values.length
+			});
+		
+		$values.find('.AddValue').on('click.AddValue', function() {
+			var last_value_id = +$values.data('last_value_id') + 1,
+				$new_value = AbstractEditEventPage.buildRegistrationCustomFieldValue(field_id, {
+					value: 'Вариант '+last_value_id,
+					value_id: last_value_id
+				});
+			
+			$values.find('.RegistrationCustomFieldValuesWrapper').append($new_value);
+			$values.data('last_value_id', last_value_id);
+			$new_value.find('.ValueInput').focus().get(0).select();
+		});
+		
+		return $values;
+	};
+	
+	AbstractEditEventPage.buildRegistrationCustomFieldValue = function(field_id, values) {
+		var _values = values instanceof Array ? values : values ? [values] : [],
+			$value = tmpl('edit-event-registration-custom-field-value', _values.map(function(value, i) {
+			
+			return {
+				id: field_id,
+				value_id: value.value_id || i,
+				value_uuid: value.uuid,
+				checkbox_radio: __APP.BUILD.checkbox({
+					attributes: {
+						disabled: true
+					}
+				}),
+				input: __APP.BUILD.input({
+					name: 'registration_' +field_id+ '_field_' +(value.value_id || i)+ '_value',
+					value: value.value
+				}, ['edit_event_registration_custom_field_value_input', 'form_input', '-flat', 'ValueInput'])
+			};
+		}));
+		
+		$value.find('.RemoveValue').on('click.RemoveValue', function() {
+			$value.remove();
+		});
+		
+		return $value;
 	};
 	
 	AbstractEditEventPage.prototype.checkTariffAvailabilities = function() {
@@ -216,13 +321,13 @@ AbstractEditEventPage = extending(Page, (function() {
 			self.$wrapper.find('.BuySubscriptionLink').removeClass(__C.CLASSES.HIDDEN).attr('href', '/admin/organization/'+ self.organization_id +'/settings#change_tariff');
 		}
 		
-		if (organization.tariff.available_event_publications <= 5) {
+		if (organization.tariff.events_publication_left <= 5) {
 			$available_event_publications_wrapper.removeClass(__C.CLASSES.HIDDEN);
-			$available_event_publications_wrapper.find('.AvailableEventPublications').text(organization.tariff.available_event_publications);
+			$available_event_publications_wrapper.find('.AvailableEventPublications').text(organization.tariff.events_publication_left);
 		} else {
 			$available_event_publications_wrapper.addClass(__C.CLASSES.HIDDEN);
 		}
-		$form_overall_fields.attr('disabled', (organization.tariff.available_event_publications <= 0 && !self.is_edit));
+		$form_overall_fields.attr('disabled', (organization.tariff.events_publication_left <= 0 && !self.is_edit));
 	};
 	
 	
@@ -711,24 +816,37 @@ AbstractEditEventPage = extending(Page, (function() {
 		
 		PAGE.$wrapper.find('.RegistrationPreview').on('click.RegistrationPreview', function() {
 			var form_data = $(this).closest('form').serializeForm(),
+				registration_fields = new RegistrationFieldModelsCollection(),
 				event = new OneEvent(),
 				modal;
 			
-			form_data.registration_fields = (new RegistrationFieldModelsCollection()).setData(form_data.registration_fields.sort().map(function(field) {
-				return {
-					uuid: guid(),
-					type: form_data['registration_'+field+'_field_type'],
-					label: form_data['registration_'+field+'_field_label'] || RegistrationFieldModel.DEFAULT_LABEL[form_data['registration_'+field+'_field_type'].toUpperCase()],
-					required: form_data['registration_'+field+'_field_required']
-				};
-			}));
+			if (form_data.registration_fields) {
+				registration_fields.setData(form_data.registration_fields.sort().map(function(field) {
+					
+					return {
+						uuid: guid(),
+						type: form_data['registration_'+field+'_field_type'],
+						label: form_data['registration_'+field+'_field_label'] || RegistrationFieldModel.DEFAULT_LABEL[form_data['registration_'+field+'_field_type'].toUpperCase()],
+						required: form_data['registration_'+field+'_field_required'],
+						values: form_data['registration_'+field+'_field_values'] ? form_data['registration_'+field+'_field_values'].map(function(value_id) {
+							var value = new RegistrationSelectFieldValue();
+							
+							value.value = form_data['registration_' +field+ '_field_' +value_id+ '_value'];
+							value.uuid = form_data['registration_' +field+ '_field_' +value_id+ '_value_uuid'] || guid();
+							
+							return value;
+						}) : null
+					};
+				}))
+			}
+			form_data.registration_fields = registration_fields;
 			event.setData(form_data);
 			
 			modal = new PreviewRegistrationModal(event);
 			modal.show();
 		});
 		
-		$main_tabs.on('change.tabs', function() {
+		$main_tabs.on('tabs:change', function() {
 			if($main_tabs.currentTabsIndex === 0){
 				$prev_page_button.addClass(__C.CLASSES.HIDDEN);
 			} else {
@@ -791,9 +909,9 @@ AbstractEditEventPage = extending(Page, (function() {
 				}),
 				tomorrow_date: page_vars.tomorrow_date,
 				predefined_field: tmpl('edit-event-registration-predefined-field', [
-					{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'email', name: 'E-mail', description: 'Текстовое поле для ввода адреса электронной почты'},
-					{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'first_name', name: 'Имя', description: 'Текстовое поле для ввода имени'},
 					{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'last_name', name: 'Фамилия', description: 'Текстовое поле для ввода фамилии'},
+					{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'first_name', name: 'Имя', description: 'Текстовое поле для ввода имени'},
+					{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'email', name: 'E-mail', description: 'Текстовое поле для ввода адреса электронной почты'},
 					{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'phone_number', name: 'Номер телефона', description: 'Текстовое поля для ввода номера телефона'}
 				])
 			},
@@ -903,7 +1021,7 @@ AbstractEditEventPage = extending(Page, (function() {
 				required: true
 			}),
 			organization_id: PAGE.organization_id || PAGE.event.organization_id,
-			vk_post_link: PAGE.event.vk_post_link ? __APP.BUILD.action(
+			vk_post_link: PAGE.event.vk_post_link ? __APP.BUILD.actionLink(
 				PAGE.event.vk_post_link,
 				'Страница публикации во Вконтакте',
 				[__C.CLASSES.COLORS.ACCENT, '-no_uppercase'],

@@ -14,7 +14,7 @@ OneOrder = extending(OneEntity, (function() {
 	 * @param {(string|number)} [uuid]
 	 *
 	 * @constructor
-	 * @constructs
+	 * @constructs OneOrder
 	 *
 	 * @property {?(string|number)} uuid
 	 * @property {?(string|number)} user_id
@@ -22,12 +22,18 @@ OneOrder = extending(OneEntity, (function() {
 	 * @property {?string} order_content
 	 * @property {?boolean} is_canceled
 	 * @property {?number} status_id
-	 * @property {?OneOrder.EXTENDED_ORDER_STATUSES} status_type_code
+	 * @property {?(OneOrder.ORDER_STATUSES|OneOrder.EXTENDED_ORDER_STATUSES)} status_type_code
 	 * @property {?TEXTS.TICKET_STATUSES} status_name
-	 * @property {?number} created_at
-	 * @property {?number} updated_at
-	 * @property {?number} payed_at
-	 * @property {?number} canceled_at
+	 *
+	 * @property {?timestamp} created_at
+	 * @property {?timestamp} updated_at
+	 * @property {?timestamp} payed_at
+	 * @property {?timestamp} canceled_at
+	 *
+	 * @property {?Moment} m_created_at
+	 * @property {?Moment} m_updated_at
+	 * @property {?Moment} m_payed_at
+	 * @property {?Moment} m_canceled_at
 	 *
 	 * @property {EventsTicketsCollection} tickets
 	 * @property {RegistrationFieldsCollection} registration_fields
@@ -43,6 +49,7 @@ OneOrder = extending(OneEntity, (function() {
 		this.is_canceled = null;
 		this.status_id = null;
 		this.status_type_code = null;
+		
 		this.created_at = null;
 		this.updated_at = null;
 		this.payed_at = null;
@@ -53,9 +60,36 @@ OneOrder = extending(OneEntity, (function() {
 		this.user_id = null;
 		this.user = new OneUser();
 		
-		Object.defineProperty(this, 'status_name', {
-			get: function() {
-				return localeFromNamespace(self.status_type_code, OneOrder.EXTENDED_ORDER_STATUSES, __LOCALES.ru_RU.TEXTS.TICKET_STATUSES);
+		
+		Object.defineProperties(this, {
+			status_name: {
+				get: function() {
+					return localeFromNamespace(self.status_type_code, OneOrder.EXTENDED_ORDER_STATUSES, __LOCALES.ru_RU.TEXTS.TICKET_STATUSES);
+				}
+			},
+			m_created_at: {
+				get: function() {
+					
+					return moment.unix(self.created_at)
+				}
+			},
+			m_updated_at: {
+				get: function() {
+					
+					return moment.unix(self.updated_at)
+				}
+			},
+			m_payed_at: {
+				get: function() {
+					
+					return moment.unix(self.payed_at)
+				}
+			},
+			m_canceled_at: {
+				get: function() {
+					
+					return moment.unix(self.canceled_at)
+				}
 			}
 		});
 	}
@@ -96,9 +130,25 @@ OneOrder = extending(OneEntity, (function() {
 	 * @return {jqPromise}
 	 */
 	OneOrder.fetchOrder = function(event_id, uuid, fields, success) {
+		
 		return __APP.SERVER.getData('/api/v1/events/' + event_id + '/orders/' + uuid, {
 			fields: fields
 		}, success);
+	};
+	/**
+	 *
+	 * @param {(string|number)} event_id
+	 * @param {(string|number)} uuid
+	 * @param {(OneOrder.ORDER_STATUSES|OneOrder.EXTENDED_ORDER_STATUSES)} new_status
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	OneOrder.changeStatus = function(event_id, uuid, new_status, success) {
+		
+		return __APP.SERVER.updateData('/api/v1/events/' + event_id + '/orders/' + uuid, {
+			status: new_status
+		}, false, success);
 	};
 	/**
 	 *
@@ -109,10 +159,29 @@ OneOrder = extending(OneEntity, (function() {
 	 */
 	OneOrder.prototype.fetchOrder = function(fields, success) {
 		var self = this;
+		
 		return OneOrder.fetchOrder(this.event_id, this.uuid, fields, function(data) {
 			self.setData(data);
-			if (success && typeof success == 'function') {
+			if (isFunction(success)) {
 				success.call(self, data);
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {(OneOrder.ORDER_STATUSES|OneOrder.EXTENDED_ORDER_STATUSES)} new_status
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	OneOrder.prototype.changeStatus = function(new_status, success) {
+		var self = this;
+		
+		return OneOrder.changeStatus(this.event_id, this.uuid, new_status, function() {
+			self.status_type_code = new_status;
+			
+			if (isFunction(success)) {
+				success.call(self, self);
 			}
 		});
 	};

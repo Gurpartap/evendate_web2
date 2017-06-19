@@ -446,7 +446,7 @@ if (![].includes) {
 		while (k < len) {
 			var currentElement = O[k];
 			if (searchElement === currentElement ||
-				(searchElement !== searchElement && currentElement !== currentElement)
+			    (searchElement !== searchElement && currentElement !== currentElement)
 			) {
 				return true;
 			}
@@ -584,16 +584,53 @@ $.fn.extend({
 		
 		switch (output_type) {
 			case 'array': {
-				/* Работает так же как и serializeArray, с некоторыми модификациями */
-				return elements.filter(function() {
+				var $checkboxes,
+					array = [],
+					lookup = {};
+				
+				$checkboxes = elements.filter(function() {
+					
+					return this.name && !$(this).is(":disabled") && this.type === 'checkbox';
+				});
+				
+				$checkboxes.each(function() {
+					if (lookup[this.name]) {
+						lookup[this.name] = lookup[this.name].add(this);
+					} else {
+						lookup[this.name] = $(this);
+					}
+				});
+				
+				$.each(lookup, function(name, $checkboxes) {
+					var values;
+					
+					if ($checkboxes.length === 1) {
+						values = $checkboxes.val() === 'on' ? $checkboxes.prop('checked') : $checkboxes.val();
+						
+					} else {
+						values = [];
+						
+						$checkboxes.filter(':checked').each(function() {
+							values.push(this.value === 'on' ? this.checked : this.value);
+						});
+					}
+					
+					array.push({
+						name: name,
+						value: values
+					});
+				});
+				
+				elements.not($checkboxes).filter(function() {
 					var a = this.type;
+					
 					return this.name
-						&& !$(this).is(":disabled")
-						&& zb.test(this.nodeName)
-						&& !yb.test(a)
-						&& ((this.checked && this.value != "on") || a != "radio")
-						&& ((this.checked && this.value != "on") || this.value == "on" || a != "checkbox")
-				}).map(function(a, b) {
+					       && !$(this).is(":disabled")
+					       && zb.test(this.nodeName)
+					       && !yb.test(a)
+					       && ((this.checked && this.value != "on") || a != "radio")
+					       && ((this.checked && this.value != "on") || this.value == "on" || a != "checkbox")
+				}).each(function(a, b) {
 					var c = $(this).val(),
 						std = "";
 					switch (this.type) {
@@ -606,11 +643,15 @@ $.fn.extend({
 							std = c.replace(xb, "\r\n");
 						}
 					}
-					return null == c ? null : {
-						name: b.name,
-						value: std
+					if (null != c) {
+						array.push({
+							name: b.name,
+							value: std
+						});
 					}
-				}).get();
+				});
+				
+				return array;
 			}
 			case 'object':
 			default: {
@@ -1119,9 +1160,9 @@ function tmpl(template_type, items, addTo, direction) {
 	}
 	
 	html_val = $tmpl.html()
-		.replace(/(?:\/\*(?:[\s\S]*?)\*\/)|(?:([\s;])+\/\/(?:.*)$)/gim, '')// comments
-		.replace(/\\s{2,}|\t|\n|\r/gim, '')// spaces, tabs, new lines
-		.trim();
+	                .replace(/(?:\/\*(?:[\s\S]*?)\*\/)|(?:([\s;])+\/\/(?:.*)$)/gim, '')// comments
+	                .replace(/\\s{2,}|\t|\n|\r/gim, '')// spaces, tabs, new lines
+	                .trim();
 	
 	if (Array.isArray(items)) {
 		result = $.makeSet(items.map(function(item) {
@@ -1537,12 +1578,12 @@ function formatCurrency(number, separator, decimal_separator, before, after) {
 		integer_part = parseInt(Math.abs(number), 10) + '',
 		cast_pos = integer_part.length > 3 ? integer_part.length % 3 : 0;
 	return ''
-		+ (before ? (before + separator) : '')
-		+ negative
-		+ (cast_pos ? integer_part.substr(0, cast_pos) + separator : '')
-		+ integer_part.substr(cast_pos).replace(/(\d{3})(?=\d)/g, '$1' + separator)
-		+ (numbers_decimals ? decimal_separator + numbers_decimals : '')
-		+ (after ? (separator + after) : '');
+	       + (before ? (before + separator) : '')
+	       + negative
+	       + (cast_pos ? integer_part.substr(0, cast_pos) + separator : '')
+	       + integer_part.substr(cast_pos).replace(/(\d{3})(?=\d)/g, '$1' + separator)
+	       + (numbers_decimals ? decimal_separator + numbers_decimals : '')
+	       + (after ? (separator + after) : '');
 }
 /**
  * Making ticket number more readable ( 999999999 => 999 999 999 )
@@ -1569,15 +1610,45 @@ function guid() {
  * Validating form or fieldset
  *
  * @param {(Element|jQuery)} $form
+ *
  * @return {boolean}
  */
 function isFormValid($form) {
 	$form = $form instanceof Element ? $($form) : $form;
 	var is_valid = true,
-		$elements = $form.find('input, textarea');
+		$elements = $form.find('input, textarea'),
+		$rest = $elements,
+		lookup = {};
 	
 	if (!$form[0].checkValidity()) {
+		
 		$elements.each(function(i, el) {
+			if (el.name) {
+				lookup[el.name] = lookup[el.name] ? lookup[el.name].add(el) : $(el);
+			}
+		});
+		
+		$.each(lookup, function(name, $elements) {
+			var active_count = 0;
+			
+			if ($elements.length > 1) {
+				active_count = $elements.filter(function(i, el) {
+					
+					return !$(el).is(":disabled")
+					   && ((el.checked && el.value != "on") || el.type != "radio")
+					   && ((el.checked && el.value != "on") || el.value == "on" || el.type != "checkbox");
+				}).length;
+				
+				if (!active_count) {
+					handleErrorField($elements);
+					is_valid = false;
+				}
+				
+				$rest = $rest.not($elements);
+			}
+		});
+		
+		$rest.each(function(i, el) {
 			if ( (el.required && (el.value.trim() === '' || !el.checkValidity())) || (el.value.trim() !== '' && !el.checkValidity()) ) {
 				handleErrorField(el);
 				is_valid = false;
@@ -1743,8 +1814,10 @@ function bindDatePickers($parent) {
 	}).addClass('-Handled_DatePicker');
 }
 
-function bindTabs($parent) {
+function bindTabs($parent, is_height_dynamic) {
 	$parent = $parent ? $parent : $('body');
+	is_height_dynamic = (typeof is_height_dynamic === 'boolean') ? is_height_dynamic : true;
+	
 	$parent.find('.Tabs').not('.-Handled_Tabs').each(function(i, elem) {
 		var $this = $(elem),
 			tabs_id = $this.data('tabs_id'),
@@ -1794,12 +1867,13 @@ function bindTabs($parent) {
 		$this.setToTab = function(index) {
 			var $setting_tab = $tabs.eq(index),
 				$setting_body = $bodies.eq(index);
+			
 			if ($setting_tab.length && !$setting_tab.hasClass(__C.CLASSES.ACTIVE)) {
 				$tabs.removeClass(__C.CLASSES.ACTIVE);
 				$bodies.removeClass(__C.CLASSES.ACTIVE);
 				$setting_tab.addClass(__C.CLASSES.ACTIVE);
 				$setting_body.addClass(__C.CLASSES.ACTIVE);
-				$this.trigger('change.tabs');
+				$this.trigger('tabs:change');
 				if (focus_on_change) {
 					scrollTo($setting_body, 400);
 				}
@@ -1834,13 +1908,15 @@ function bindTabs($parent) {
 			$tabs.eq(0).addClass(__C.CLASSES.ACTIVE);
 		}
 		$bodies.removeClass(__C.CLASSES.ACTIVE).eq($this.currentTabsIndex).addClass(__C.CLASSES.ACTIVE);
-		$bodies_wrapper.height($bodies.filter('.'+__C.CLASSES.ACTIVE).outerHeight());
 		$bodies_wrapper.on('transitionend', function() {
 			$this.removeClass('-in_progress');
 			$this.trigger('progress_end');
 		});
 		
-		$this.connectMutationObserver();
+		if (is_height_dynamic) {
+			$bodies_wrapper.height($bodies.filter('.'+__C.CLASSES.ACTIVE).outerHeight());
+			$this.connectMutationObserver();
+		}
 		
 		$tabs.on('click', function() {
 			$this.setToTab($tabs.index(this));
