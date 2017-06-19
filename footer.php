@@ -1,7 +1,7 @@
 <!-- Yandex.Metrika counter -->
-<script src="https://mc.yandex.ru/metrika/watch.js" type="text/javascript"></script>
-<script type="text/javascript">try {
-        var yaCounter32442130 = new Ya.Metrika({
+<script src="https://mc.yandex.ru/metrika/tag.js" type="text/javascript"></script>
+<script type="text/javascript"> try {
+        var yaCounter32442130 = new Ya.Metrika2({
             id: 32442130,
             clickmap: true,
             trackLinks: true,
@@ -10,10 +10,10 @@
             trackHash: true
         });
     } catch (e) {
-    }</script>
+    } </script>
 <noscript>
-    <div><img src="https://mc.yandex.ru/watch/32442130" style="position:absolute; left:-9999px;" alt=""/></div>
-</noscript><!-- /Yandex.Metrika counter -->
+  <div><img src="https://mc.yandex.ru/watch/32442130" style="position:absolute; left:-9999px;" alt=""/></div>
+</noscript> <!-- /Yandex.Metrika counter -->
 
 
 <script>
@@ -21,14 +21,14 @@
 
         var _oauth_urls = JSON.parse('<?php
 
-            require_once 'v1-backend/bin/db.php';
-            require_once 'v1-backend/bin/Class.Result.php';
+					require_once 'v1-backend/bin/db.php';
+					require_once 'v1-backend/bin/Class.Result.php';
 
-            echo json_encode(array(
-                'mobile' => App::getAuthURLs('mobile')->getData(),
-                'popup' => App::getAuthURLs('popup')->getData(),
-            ));
-            ?>');
+					echo json_encode(array(
+						'mobile' => App::getAuthURLs('mobile')->getData(),
+						'popup' => App::getAuthURLs('popup')->getData(),
+					));
+					?>');
 
 
         function openAuthLink(type) {
@@ -41,7 +41,7 @@
         }
 
         $('.vk-auth-btn').on('click', function (e) {
-            if (yaCounter32442130){
+            if (yaCounter32442130) {
                 yaCounter32442130.reachGoal('VkAuthStart');
             }
             openAuthLink('vk');
@@ -49,7 +49,7 @@
         });
 
         $('.google-plus-btn').on('click', function (e) {
-            if (yaCounter32442130){
+            if (yaCounter32442130) {
                 yaCounter32442130.reachGoal('GoogleAuthStart');
             }
             openAuthLink('google');
@@ -57,7 +57,7 @@
         });
 
         $('.facebook-btn').on('click', function (e) {
-            if (yaCounter32442130){
+            if (yaCounter32442130) {
                 yaCounter32442130.reachGoal('FacebookAuthStart');
             }
             openAuthLink('facebook');
@@ -68,7 +68,7 @@
 </script>
 <?php
 if (isset($user) && $user instanceof User) {
-    echo "<script>
+	echo "<script>
                         window.intercomSettings = {
                         app_id: \"spd4kf55\",
                         name: \"{$user->getFirstName()} {$user->getLastName()}\", // Full name
@@ -80,7 +80,7 @@ if (isset($user) && $user instanceof User) {
                         </script>
                         <script>(function(){var w=window;var ic=w.Intercom;if(typeof ic===\"function\"){ic('reattach_activator');ic('update',intercomSettings);}else{var d=document;var i=function(){i.c(arguments)};i.q=[];i.c=function(args){i.q.push(args)};w.Intercom=i;function l(){var s=d.createElement('script');s.type='text/javascript';s.async=true;s.src='https://widget.intercom.io/widget/spd4kf55';var x=d.getElementsByTagName('script')[0];x.parentNode.insertBefore(s,x);}if(w.attachEvent){w.attachEvent('onload',l);}else{w.addEventListener('load',l,false);}}})()</script>";
 } else {
-    echo "
+	echo "
 <script>
     window.intercomSettings = {
         app_id: \"spd4kf55\"
@@ -134,7 +134,7 @@ if (isset($user) && $user instanceof User) {
         m.parentNode.insertBefore(a, m)
     })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
 
-    if (ga){
+    if (ga) {
         ga('create', 'UA-69300084-3', 'auto');
         ga('send', 'pageview');
     }
