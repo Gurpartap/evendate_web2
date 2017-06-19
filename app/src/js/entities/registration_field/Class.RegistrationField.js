@@ -17,6 +17,7 @@ RegistrationField = extending(OneEntity, (function() {
 	 * @property {?number} form_field_type_id
 	 * @property {?boolean} form_field_required
 	 * @property {?string} value
+	 * @property {?Array<RegistrationSelectFieldValue>} values
 	 *
 	 * @property {?string} uuid
 	 * @property {?string} label
@@ -35,6 +36,7 @@ RegistrationField = extending(OneEntity, (function() {
 		this.form_field_type_id = null;
 		this.form_field_required = null;
 		this.value = null;
+		this.values = [];
 		
 		this.created_at = null;
 		this.updated_at = null;
