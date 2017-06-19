@@ -136,7 +136,7 @@ class Order extends AbstractEntity
 			$result[self::TICKETS_FIELD_NAME] = TicketsCollection::filter(
 				App::DB(),
 				$user,
-				array('order' => $this),
+				array('statistics_order' => $this),
 				Fields::parseFields($fields[self::TICKETS_FIELD_NAME]['fields'] ?? ''),
 				array(
 					'length' => $fields[self::TICKETS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
