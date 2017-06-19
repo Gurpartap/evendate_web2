@@ -30,6 +30,7 @@ frisby
         }
     })
     .afterJSON(json => {
+        console.log(json);
         events.forEach(function (value, index) {
             if (value.payload) {
                 if (index == 0) {
@@ -38,6 +39,7 @@ frisby
 
                 }
                 value.payload.organization_id = 146;//json.data[index].id;
+                console.log(env.api_url + 'events');
                 frisby
                     .create('Create event: ' + index)
                     .post(env.api_url + 'events', value.payload, {json: true})
