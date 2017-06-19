@@ -1262,7 +1262,7 @@ Builder = (function() {
 							case RegistrationFieldModel.TYPES.SELECT:
 							case RegistrationFieldModel.TYPES.SELECT_MULTI: {
 								
-								return field.values.length ? field.values.map(function(value) {
+								return (field.values && field.values.length) ? field.values.map(function(value) {
 									
 									return value.value;
 								}).join(', ') : '—'
