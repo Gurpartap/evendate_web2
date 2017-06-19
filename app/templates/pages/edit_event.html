@@ -430,31 +430,54 @@
 </script>
 
 <script type="javascript/template" id="tmpl-edit-event-registration-custom-field">
-	<fieldset class="form_fieldset RegistrationCustomField">
-		<input id="edit_event_registration_{id}_custom_field_enable" type="hidden" name="registration_fields" value="{id}">
+	<fieldset class="edit_event_registration_custom_field form_fieldset RegistrationCustomField">
+		<p class="form_text">В этом поле вы можете запросить у пользователей любые данные или задать вопрос.</p>
+		<input id="edit_event_registration_{id}_custom_field_enable" class="RegistrationFieldId" type="hidden" name="registration_fields" value="{id}">
 		<input id="edit_event_registration_{id}_custom_field_uuid" class="RegistrationCustomFieldUUID" type="hidden" name="registration_{id}_field_uuid" value="{uuid}">
-		<button class="button -size_low fa_icon fa-times RemoveRegistrationCustomField" type="button"><span class="Text">Удалить поле</span></button>
-		<p>Добавьте дополнительное поле, если это требуется для регистрации.</p>
+		<button class="edit_event_registration_custom_field_remove_button RemoveRegistrationCustomField" type="button">&times;</button>
+
 		<div class="form_unit">
 			<label class="form_label" for="edit_event_registration_{id}_custom_field_label">Наименование поля</label>
 			<input id="edit_event_registration_{id}_custom_field_label" class="form_input RegistrationCustomFieldLabel" type="text" name="registration_{id}_field_label" value="{label}" autocomplete="off" required>
 		</div>
+
+		<div class="form_unit">
+			<label class="form_label" for="edit_event_registration_{id}_field_type">Тип поля</label>
+			<select id="edit_event_registration_{id}_field_type" class="form_select2 RegistrationCustomFieldType" name="registration_{id}_field_type" required>
+				<option value="additional_text">Текст</option>
+				<option value="extended_custom">Расширенный текст</option>
+				<option value="select_multi">Несколько вариантов</option>
+				<option value="select">Один вариант</option>
+			</select>
+		</div>
+
+		<div class="edit_event_registration_custom_field_values RegistrationCustomFieldValues">{registration_custom_field_values}</div>
+
 		<div class="form_unit">
 			<input id="edit_event_registration_{id}_custom_field_required" class="form_checkbox" type="checkbox" name="registration_{id}_field_required">
 			<label class="form_label" for="edit_event_registration_{id}_custom_field_required"><span>Обязательное поле</span></label>
 		</div>
-		<h6>Тип</h6>
-		<div class="form_group -parts_e_e">
-			<div class="form_unit">
-				<input id="edit_event_registration_{id}_custom_field_additional_text_type" class="form_radio RegistrationCustomFieldType" type="radio" name="registration_{id}_field_type" value="additional_text" required>
-				<label class="form_label" for="edit_event_registration_{id}_custom_field_additional_text_type"><span>Текст</span></label>
-			</div>
-			<div class="form_unit">
-				<input id="edit_event_registration_{id}_custom_field_extended_custom_type" class="form_radio RegistrationCustomFieldType" type="radio" name="registration_{id}_field_type" value="extended_custom" required>
-				<label class="form_label" for="edit_event_registration_{id}_custom_field_extended_custom_type"><span>Расширенный текст</span></label>
-			</div>
-		</div>
 	</fieldset>
+</script>
+
+<script type="javascript/template" id="tmpl-edit-event-registration-custom-field-values">
+	<div class="RegistrationCustomFieldValuesItem" data-last_value_id="{last_value_id}">
+		<h6>Варианты ответа</h6>
+		<div class="edit_event_registration_custom_field_values_wrapper RegistrationCustomFieldValuesWrapper">
+			{values}
+		</div>
+		<button class="button -color_franklin_alt fa_icon fa-plus-square-o AddValue" type="button">Добавить вариант</button>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-edit-event-registration-custom-field-value">
+	<div class="edit_event_registration_custom_field_value">
+		<input type="hidden" name="registration_{id}_field_{value_id}_value_uuid" value="{value_uuid}">
+		<input type="hidden" name="registration_{id}_field_values" value="{value_id}">
+		{checkbox_radio}
+		{input}
+		<button class="edit_event_registration_custom_field_value_remove_button RemoveValue" type="button">&times;</button>
+	</div>
 </script>
 
 <script type="javascript/template" id="tmpl-selected-table-day">

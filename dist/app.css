@@ -1506,6 +1506,7 @@ fieldset:disabled .form_select {cursor: default}
 
 .form_select {
 	-moz-appearance: none;
+	padding-right: 24px;
 	background-color: #fff;
 	background-color: var(--color_page);
 	border: 0;
@@ -1569,6 +1570,9 @@ fieldset:disabled .form_select {cursor: default}
 	line-height: 2.2em;
 	padding-left: 0.6em;
 }
+
+.form_select2.select2-dropdown-open.select2-drop-above .select2-choice,
+.form_select2.select2-dropdown-open.select2-drop-above .select2-choices {border: 0}
 .form_select2.select2-container.select2-container-disabled > .select2-choice {
 	border-color: #ddd;
 	background-color: #f9f9fa;
@@ -1594,9 +1598,7 @@ fieldset:disabled .form_select {cursor: default}
 
 .form_select2_drop.select2-drop-active {
 	font-size: .9rem;
-	border-top: 1px solid;
-	border-color: #c5c9d1;
-	border-color: var(--color_primary_30);
+	border: 0;
 	box-shadow: 0 1px 2px #d9d9d9;
 }
 .select2-drop.select2-drop-above.select2-drop-active {
@@ -1614,6 +1616,8 @@ fieldset:disabled .form_select {cursor: default}
 	background-color: #c5c9d1;
 	background-color: var(--color_primary_30);
 }
+
+.form_select2_drop_no_search > .select2-search {display: none}
 
 
 .form_select2.form_input {overflow: hidden}
@@ -1836,6 +1840,26 @@ fieldset:disabled .form_select {cursor: default}
 }
 
 /* /Form -inline */
+/* /Form flat */
+
+.form_input.-flat {
+	height: 30px;
+	padding: 0;
+	border: 0;
+	border-bottom: 2px solid transparent;
+	background-color: transparent;
+}
+
+:not(.-status_disabled) .form_input.-flat:not(:disabled):not(.-status_disabled):focus {
+	background-color: transparent;
+	border: 0;
+	border-bottom: 2px solid;
+	border-color: #c5c9d1;
+	border-color: var(--color_primary_30);
+	box-shadow: none;
+}
+
+/* /Form flat */
 /* /Form group */
 
 .form_group {
@@ -4802,7 +4826,59 @@ body,
 }
 
 
-/* ORGANIZATIONS */
+.edit_event_registration_custom_field {
+	padding: 12px 24px 30px;
+}
+
+.edit_event_registration_custom_field > .form_unit {margin: 24px 0}
+
+.edit_event_registration_custom_field_remove_button {
+	position: absolute;
+	top: 0;
+	right: 0;
+	height: 46px;
+	width: 46px;
+	line-height: 1;
+	font-size: 34px;
+	color: #c5c9d1;
+	color: var(--color_primary_30);
+	background-color: transparent;
+	border: 0;
+	z-index: 1;
+}
+
+.edit_event_registration_custom_field_remove_button:hover {
+	color: #9fa6b3;
+	color: var(--color_primary_50);
+}
+
+.edit_event_registration_custom_field_values {
+	margin: 36px 0;
+}
+
+.edit_event_registration_custom_field_value {
+	display: flex;
+	align-items: center;
+	margin-bottom: 12px;
+}
+
+.edit_event_registration_custom_field_value > .form_unit {margin-bottom: 0}
+
+.edit_event_registration_custom_field_value_remove_button {
+	width: 30px;
+	height: 30px;
+	font-size: 1.4em;
+	line-height: 1;
+	background-color: transparent;
+	border: 0;
+	visibility: hidden;
+}
+
+.edit_event_registration_custom_field_value:hover > .edit_event_registration_custom_field_value_remove_button,
+.edit_event_registration_custom_field_value_input:focus + .edit_event_registration_custom_field_value_remove_button {visibility: visible}
+
+
+	/* ORGANIZATIONS */
 
 .page_wrapper.-organizations_wrapper {
 	padding: 40px 0;

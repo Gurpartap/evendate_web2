@@ -25,24 +25,26 @@ RegistrationFieldModelsCollection = extending(EntitiesCollection, (function() {
 	RegistrationFieldModelsCollection.prototype.push = function(element) {
 		var self = this,
 			entities = Array.prototype.slice.call(arguments),
-			types = [
+			types_queue = [
 				RegistrationFieldModel.TYPES.FIRST_NAME,
 				RegistrationFieldModel.TYPES.LAST_NAME,
-				RegistrationFieldModel.TYPES.EMAIL,
-				RegistrationFieldModel.TYPES.PHONE_NUMBER,
-				RegistrationFieldModel.TYPES.ADDITIONAL_TEXT,
-				RegistrationFieldModel.TYPES.CUSTOM,
-				RegistrationFieldModel.TYPES.EXTENDED_CUSTOM
+			  'rest'
 			];
 		
 		this.last_pushed.splice(0);
 		
-		types.forEach(function(type) {
+		types_queue.forEach(function(type) {
 			entities.forEach(function(entity) {
-				if (entity.type == type) {
-					self.last_pushed.push(self[self.length++] = (entity instanceof self.collection_of) ? entity : (new self.collection_of()).setData(entity));
-				} else if (entity.type === RegistrationFieldModel.TYPES.SELECT || entity.type === RegistrationFieldModel.TYPES.SELECT_MULTI) {
-					self.last_pushed.push(self[self.length++] = (entity instanceof RegistrationSelectFieldModel) ? entity : (new RegistrationSelectFieldModel()).setData(entity));
+				if (type !== 'rest') {
+					if (entity.type === type) {
+						self.last_pushed.push(self[self.length++] = (entity instanceof self.collection_of) ? entity : (new self.collection_of()).setData(entity));
+					}
+				} else {
+					if (entity.type === RegistrationFieldModel.TYPES.SELECT || entity.type === RegistrationFieldModel.TYPES.SELECT_MULTI) {
+						self.last_pushed.push(self[self.length++] = (entity instanceof RegistrationSelectFieldModel) ? entity : (new RegistrationSelectFieldModel()).setData(entity));
+					} else {
+						self.last_pushed.push(self[self.length++] = (entity instanceof self.collection_of) ? entity : (new self.collection_of()).setData(entity));
+					}
 				}
 			});
 		});

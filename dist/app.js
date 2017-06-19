@@ -3178,24 +3178,26 @@ RegistrationFieldModelsCollection = extending(EntitiesCollection, (function() {
 	RegistrationFieldModelsCollection.prototype.push = function(element) {
 		var self = this,
 			entities = Array.prototype.slice.call(arguments),
-			types = [
+			types_queue = [
 				RegistrationFieldModel.TYPES.FIRST_NAME,
 				RegistrationFieldModel.TYPES.LAST_NAME,
-				RegistrationFieldModel.TYPES.EMAIL,
-				RegistrationFieldModel.TYPES.PHONE_NUMBER,
-				RegistrationFieldModel.TYPES.ADDITIONAL_TEXT,
-				RegistrationFieldModel.TYPES.CUSTOM,
-				RegistrationFieldModel.TYPES.EXTENDED_CUSTOM
+			  'rest'
 			];
 		
 		this.last_pushed.splice(0);
 		
-		types.forEach(function(type) {
+		types_queue.forEach(function(type) {
 			entities.forEach(function(entity) {
-				if (entity.type == type) {
-					self.last_pushed.push(self[self.length++] = (entity instanceof self.collection_of) ? entity : (new self.collection_of()).setData(entity));
-				} else if (entity.type === RegistrationFieldModel.TYPES.SELECT || entity.type === RegistrationFieldModel.TYPES.SELECT_MULTI) {
-					self.last_pushed.push(self[self.length++] = (entity instanceof RegistrationSelectFieldModel) ? entity : (new RegistrationSelectFieldModel()).setData(entity));
+				if (type !== 'rest') {
+					if (entity.type === type) {
+						self.last_pushed.push(self[self.length++] = (entity instanceof self.collection_of) ? entity : (new self.collection_of()).setData(entity));
+					}
+				} else {
+					if (entity.type === RegistrationFieldModel.TYPES.SELECT || entity.type === RegistrationFieldModel.TYPES.SELECT_MULTI) {
+						self.last_pushed.push(self[self.length++] = (entity instanceof RegistrationSelectFieldModel) ? entity : (new RegistrationSelectFieldModel()).setData(entity));
+					} else {
+						self.last_pushed.push(self[self.length++] = (entity instanceof self.collection_of) ? entity : (new self.collection_of()).setData(entity));
+					}
 				}
 			});
 		});
@@ -3216,28 +3218,6 @@ RegistrationFieldModelsCollection = extending(EntitiesCollection, (function() {
 RegistrationSelectFieldModel = extending(RegistrationFieldModel, (function() {
 	/**
 	 *
-	 * @class RegistrationSelectFieldValue
-	 */
-	RegistrationSelectFieldValue = (function() {
-		/**
-		 *
-		 * @param {(string|number)} [value]
-		 *
-		 * @constructor
-		 * @constructs RegistrationSelectFieldValue
-		 *
-		 * @property {?(string|number)} value
-		 * @property {?string} uuid
-		 */
-		function RegistrationSelectFieldValue(value) {
-			this.value = setDefaultValue(value, null);
-			this.uuid = null;
-		}
-		
-		return RegistrationSelectFieldValue;
-	});
-	/**
-	 *
 	 * @constructor
 	 * @constructs RegistrationFieldModel
 	 *
@@ -3252,6 +3232,28 @@ RegistrationSelectFieldModel = extending(RegistrationFieldModel, (function() {
 	
 	return RegistrationSelectFieldModel;
 }()));
+/**
+ *
+ * @class RegistrationSelectFieldValue
+ */
+RegistrationSelectFieldValue = (function() {
+	/**
+	 *
+	 * @param {(string|number)} [value]
+	 *
+	 * @constructor
+	 * @constructs RegistrationSelectFieldValue
+	 *
+	 * @property {?(string|number)} value
+	 * @property {?string} uuid
+	 */
+	function RegistrationSelectFieldValue(value) {
+		this.value = setDefaultValue(value, null);
+		this.uuid = null;
+	}
+	
+	return RegistrationSelectFieldValue;
+}());
 /**
  * @requires ../Class.OneEntity.js
  */
@@ -14002,6 +14004,7 @@ AbstractEditEventPage = extending(Page, (function() {
 	}
 	
 	AbstractEditEventPage.lastRegistrationCustomFieldId = 0;
+	AbstractEditEventPage.lastRegistrationCustomFieldValueId = 0;
 	
 	AbstractEditEventPage.prototype.fetchData = function() {
 		return this.fetching_data_defer = this.my_organizations.fetchMyOrganizations(['admin', 'moderator'], this.my_organizations_fields);
@@ -14045,14 +14048,35 @@ AbstractEditEventPage = extending(Page, (function() {
 			
 			if (form_data.registration_fields && form_data.registration_fields.length) {
 				send_data.registration_fields = (new RegistrationFieldModelsCollection()).setData(form_data.registration_fields.map(function(id) {
-					var field = new RegistrationFieldModel();
+					var field;
+					
+					if (form_data['registration_' + id + '_field_type']) {
+						switch (form_data['registration_' + id + '_field_type']) {
+							case RegistrationFieldModel.TYPES.SELECT:
+							case RegistrationFieldModel.TYPES.SELECT_MULTI: {
+								field = new RegistrationSelectFieldModel();
+								
+								field.values = form_data['registration_' + id + '_field_values'].map(function(value_id) {
+									var value = new RegistrationSelectFieldValue();
+									
+									value.value = form_data['registration_' +id+ '_field_' +value_id+ '_value'];
+									value.uuid = setDefaultValue(form_data['registration_' +id+ '_field_' +value_id+ '_value_uuid'], null);
+									
+									return value;
+								});
+								break;
+							}
+							default: {
+								field = new RegistrationFieldModel();
+								break;
+							}
+						}
+						field.type = form_data['registration_' + id + '_field_type'];
+					}
 					
 					field.required = form_data['registration_' + id + '_field_required'];
 					if (form_data['registration_' + id + '_field_uuid']) {
 						field.uuid = form_data['registration_' + id + '_field_uuid'];
-					}
-					if (form_data['registration_' + id + '_field_type']) {
-						field.type = form_data['registration_' + id + '_field_type'];
 					}
 					if (form_data['registration_' + id + '_field_label']) {
 						field.label = form_data['registration_' + id + '_field_label'].trim();
@@ -14129,14 +14153,40 @@ AbstractEditEventPage = extending(Page, (function() {
 			}
 			return false;
 		}));
+		
+		$fields.find('.RegistrationCustomFieldType').select2({
+			containerCssClass: 'form_select2',
+			dropdownCssClass: 'form_select2_drop form_select2_drop_no_search'
+		}).on('change.SelectRegistrationCustomFieldType', function() {
+			var $this = $(this),
+				$field = $this.closest('.RegistrationCustomField'),
+				$values_wrap = $field.find('.RegistrationCustomFieldValues');
+			
+			switch ($this.val()) {
+				case RegistrationFieldModel.TYPES.ADDITIONAL_TEXT:
+				case RegistrationFieldModel.TYPES.EXTENDED_CUSTOM: {
+					$values_wrap.html('');
+					break;
+				}
+				case RegistrationFieldModel.TYPES.SELECT:
+				case RegistrationFieldModel.TYPES.SELECT_MULTI: {
+					if ($values_wrap.is(':empty')) {
+						$values_wrap.html(AbstractEditEventPage.buildRegistrationCustomFieldValues($field.find('.RegistrationFieldId').val()));
+					}
+					break;
+				}
+			}
+		});
+		
 		registration_data.forEach(function(data) {
 			if (data.required) {
 				$fields.find('#edit_event_registration_'+data.id+'_custom_field_required').prop('checked', true);
 			}
 			if (data.type) {
-				$fields.find('#edit_event_registration_'+data.id+'_custom_field_'+data.type+'_type').prop('checked', true);
+				$fields.find('#edit_event_registration_'+data.id+'_field_type').select2('val', data.type);
 			}
 		});
+		
 		$fields.find('.RemoveRegistrationCustomField').on('click.RemoveRegistrationCustomField', function() {
 			$(this).closest('.RegistrationCustomField').remove();
 		});
@@ -14145,6 +14195,53 @@ AbstractEditEventPage = extending(Page, (function() {
 		});
 		
 		return $fields;
+	};
+	
+	AbstractEditEventPage.buildRegistrationCustomFieldValues = function(field_id, values) {
+		var _values = values instanceof Array ? values : [],
+			$values = tmpl('edit-event-registration-custom-field-values', {
+				id: field_id,
+				values: AbstractEditEventPage.buildRegistrationCustomFieldValue(field_id, _values),
+				last_value_id: _values.length
+			});
+		
+		$values.find('.AddValue').on('click.AddValue', function() {
+			var last_value_id = +$values.data('last_value_id') + 1,
+				$new_value = AbstractEditEventPage.buildRegistrationCustomFieldValue(field_id, last_value_id, {value: 'Вариант '+last_value_id});
+			
+			$values.find('.RegistrationCustomFieldValuesWrapper').append($new_value);
+			$values.data('last_value_id', last_value_id);
+			$new_value.find('.ValueInput').focus().get(0).select();
+		});
+		
+		return $values;
+	};
+	
+	AbstractEditEventPage.buildRegistrationCustomFieldValue = function(field_id, value_id, values) {
+		var _values = values instanceof Array ? values : values ? [values] : [],
+			$value = tmpl('edit-event-registration-custom-field-value', _values.map(function(value) {
+			
+			return {
+				id: field_id,
+				value_id: value_id,
+				value_uuid: value.uuid,
+				checkbox_radio: __APP.BUILD.checkbox({
+					attributes: {
+						disabled: true
+					}
+				}),
+				input: __APP.BUILD.input({
+					name: 'registration_' +field_id+ '_field_' +value_id+ '_value',
+					value: value.value
+				}, ['edit_event_registration_custom_field_value_input', 'form_input', '-flat', 'ValueInput'])
+			};
+		}));
+		
+		$value.find('.RemoveValue').on('click.RemoveValue', function() {
+			$value.remove();
+		});
+		
+		return $value;
 	};
 	
 	AbstractEditEventPage.prototype.checkTariffAvailabilities = function() {
