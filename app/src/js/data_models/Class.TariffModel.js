@@ -45,9 +45,16 @@ TariffModel = extending(OneEntity, (function() {
 		this.available_in_city = null;
 		this.price = null;
 		
-		Object.defineProperty(this, 'is_full', {
-			get: function() {
-				return self.price !== 0;
+		Object.defineProperties(this, {
+			is_full: {
+				get: function() {
+					return self.price !== 0;
+				}
+			},
+			events_publication_left: {
+				get: function() {
+					return self.available_event_publications - self.event_publications;
+				}
 			}
 		});
 		

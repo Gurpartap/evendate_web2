@@ -29,7 +29,6 @@ RegistrationModal = extending(PreviewRegistrationModal, (function() {
 			
 			$register_button.attr('disabled', true);
 			if (isFormValid($form)) {
-				/*
 				OneEvent.registerToEvent(self.event.id, $form.serializeForm('array').map(function(field) {
 					
 					return {
@@ -43,7 +42,7 @@ RegistrationModal = extending(PreviewRegistrationModal, (function() {
 					.done(function() {
 						self.modal.trigger('registration:success');
 						self.hide();
-					});*/
+					});
 			} else {
 				$register_button.removeAttr('disabled');
 			}
