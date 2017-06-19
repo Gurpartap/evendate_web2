@@ -20,7 +20,7 @@ require_once "{$BACKEND_FULL_PATH}/vendor/Mobile_Detect/Mobile_Detect.php";
 $detect = new Mobile_Detect();
 
 if ($detect->isMobile() && !isset($_GET['full_version'])){
-	header('Location: /mobile/' );
+	header('Location: /mobile?from=' . urlencode($_SERVER['REQUEST_URI']));
 }
 
 if (App::$ENV == 'prod' || App::$ENV == 'test') {
