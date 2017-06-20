@@ -310,7 +310,6 @@ $__modules['events'] = array(
 			if (isset($__request['status'])) {
 				$order = OrdersCollection::oneByUUID($__db, $__user, $uuid, array());
 				$order->setStatus($__request['status'], $__user, $event);
-
 				$updated = true;
 			}
 			if ($updated) {
