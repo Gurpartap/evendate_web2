@@ -103,7 +103,7 @@ AdminOrganizationCRMPage = extending(AdminOrganizationPage, (function() {
 			fixedColumns: true,
 			scrollX: '100%',
 			scrollCollapse: true,
-			dom: '<"data_tables_pagination"p>t<"data_tables_pagination"p>',
+			dom: 't<"data_tables_pagination"p>',
 			language: {
 				url: __LOCALE.DATATABLES_URL
 			}

@@ -940,7 +940,7 @@ fieldset:disabled .form_select {cursor: default}
 .form_textarea:disabled {opacity: .5}
 
 .form_input,
-.form_select {height: 2.2rem}
+.form_select {height: 32px}
 
 .form_textarea {
 	height: 10em;
@@ -1697,8 +1697,8 @@ fieldset:disabled .form_select {cursor: default}
 .button {
 	display: inline-block;
 	vertical-align: bottom;
-	height: 2.2rem;
-	min-width: 2.2rem;
+	height: 32px;
+	min-width: 32px;
 	font-family: inherit;
 	font-size: .81em;
 	font-weight: 500;
@@ -5621,10 +5621,13 @@ fieldset + .org_admin_settings_wrapper,
 
 .event_admin_check_in_progress_bar {
 	flex: 1;
-	margin: 0 24px;
+	margin-left: 24px;
 }
 
-.event_admin_check_in_search_bar {width: 20%}
+.event_admin_check_in_search_bar {
+	width: 20%;
+	margin-right: 24px;
+}
 
 .event_admin_check_in_search_bar > .event_admin_check_in_search {
 	padding-right: 35px;
