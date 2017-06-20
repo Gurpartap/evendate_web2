@@ -1682,6 +1682,9 @@ class Event extends AbstractEntity
 					if (is_array($final_field['value'])) {
 						$final_field['value'] = array_unique($final_field['value'], SORT_STRING);
 						foreach ($final_field['value'] as $selected) {
+							if (is_array($final_field['value'])){
+								$selected = $selected[''];
+							}
 							if (!isset($possible_by_uuid[$selected])) {
 								$final_field['error'] = 'Выбранное значение отсутствует в списке возможных.';
 								$errors[] = $final_field;
@@ -1692,7 +1695,20 @@ class Event extends AbstractEntity
 								);
 							}
 						}
-					} else {
+					}elseif(is_array($final_field['values'])) { // specially for android
+						foreach ($final_field['values'] as $selected) {
+							$_uuid = $selected['uuid'];
+							if (!isset($possible_by_uuid[$_uuid])) {
+								$final_field['error'] = 'Выбранное значение отсутствует в списке возможных.';
+								$errors[] = $final_field;
+							} else {
+								$final_field['ins_values'][] = array(
+									'uuid' => $_uuid,
+									'value' => $possible_by_uuid[$_uuid]['value']
+								);
+							}
+						}
+					}else {
 						$value_uuid = $final_field['value'];
 						if (!isset($possible_by_uuid[$value_uuid])) {
 							$final_field['error'] = 'Выбранное значение отсутствует в списке возможных.';
