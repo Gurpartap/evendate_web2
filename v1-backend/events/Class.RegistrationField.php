@@ -16,6 +16,7 @@ class RegistrationField extends AbstractEntity{
 		'type',
 		'label',
 		'required',
+		'values',
 		'uuid'
 	);
 

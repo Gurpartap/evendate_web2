@@ -20,7 +20,7 @@ require_once "{$BACKEND_FULL_PATH}/vendor/Mobile_Detect/Mobile_Detect.php";
 $detect = new Mobile_Detect();
 
 if ($detect->isMobile() && !isset($_GET['full_version'])){
-	header('Location: /mobile/' );
+	header('Location: /mobile?from=' . urlencode($_SERVER['REQUEST_URI']));
 }
 
 if (App::$ENV == 'prod' || App::$ENV == 'test') {
@@ -64,6 +64,7 @@ try {
 	if (isset($_REQUEST['redirect_to'])) {
 		header('Location: ' . $_REQUEST['redirect_to']);
 	}
+//    header('Location: /');
 }
 
 try {
@@ -114,10 +115,10 @@ $url_parts = explode('/', $url);
 	<?php
 	if ($DEBUG_MODE) { ?>
     <link rel="stylesheet" href="/dist/vendor.css?rev=3b6878c5b89f643e8d96b1b336b7d4fc">
-    <link rel="stylesheet" href="/dist/app.css?rev=7c1af3913d8bf11f8c92de33cd7b5fa9"><?php
+    <link rel="stylesheet" href="/dist/app.css?rev=c3a87adbf6ce66fefd9af082abca533f"><?php
 	} else { ?>
     <link rel="stylesheet" href="/dist/vendor.min.css?rev=4165c69f5d04ec431ab5bc41425847a5">
-    <link rel="stylesheet" href="/dist/app.min.css?rev=6c3bc51b7576b902976255501170d6e2"><?php
+    <link rel="stylesheet" href="/dist/app.min.css?rev=245ed3ef724268532ceb0fd1115639ab"><?php
 	} ?>
 
 	<?php
@@ -348,11 +349,11 @@ $url_parts = explode('/', $url);
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=9dfd1dcae2ac8c6f55b47389e26f5dd6" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=d0f91f39346b8ed4ccc65408251908dd" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=146f5848a62f0eb23e708df154cc0417" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=5820799b6a734b0d3be82cdb50c831b7" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=14edc2da46a0db0db3df4994aa61a42e" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=d32b5c7617cf6938cf9edc33eace5744" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=dbff9ede98622feff9252bac81e12aca" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=11396e8f113a785105a35ebb74449e59" charset="utf-8"></script><?php
 }
 
 foreach (glob("app/templates/{*/*/*/*,*/*/*,*/*,*}.html", GLOB_BRACE) as $filename) {

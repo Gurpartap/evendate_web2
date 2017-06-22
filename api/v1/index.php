@@ -22,6 +22,7 @@ try {
 	require_once "{$BACKEND_FULL_PATH}/bin/Class.Fields.php";
 	require_once "{$BACKEND_FULL_PATH}/bin/Class.AbstractEntity.php";
 	require_once "{$BACKEND_FULL_PATH}/bin/Class.AbstractCollection.php";
+	require_once "{$BACKEND_FULL_PATH}/bin/errors/Errors.php";
 	require_once "{$BACKEND_FULL_PATH}/users/Class.AbstractUser.php";
 	require_once "{$BACKEND_FULL_PATH}/users/Class.User.php";
 	require_once "{$BACKEND_FULL_PATH}/users/Class.NotAuthorizedUser.php";
@@ -32,6 +33,7 @@ try {
 	require_once "{$BACKEND_FULL_PATH}/events/Class.EventDate.php";
 	require_once "{$BACKEND_FULL_PATH}/events/Class.EventsDatesCollection.php";
 	require_once "{$BACKEND_FULL_PATH}/users/Class.UsersCollection.php";
+	require_once "{$BACKEND_FULL_PATH}/users/Interface.UserInterface.php";
 	require_once "{$BACKEND_FULL_PATH}/users/Interface.UserInterface.php";
 
 	if (App::$ENV == 'prod') {
@@ -164,6 +166,7 @@ try {
 	$_result->setDownloadable(App::$RESPONSE_DOWNLOAD);
 	$_result->setNude(App::$RESPONSE_NUDE);
 
+	$_result->setText(Errors::getDescription($__request['lang'] ?? 'ru', $_result->getText()));
 
 	if(App::$RESPONSE_NUDE){
 		$__request['response'] = $_result->__toString();

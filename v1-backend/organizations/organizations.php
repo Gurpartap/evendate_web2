@@ -10,7 +10,7 @@ require_once $BACKEND_FULL_PATH . '/events/Class.EventsCollection.php';
 $__modules['organizations'] = array(
 	'GET' => array(
 		'{vk_groups}' => function () use ($__db, $__pagination, $__request, $__user, $__fields, $__order_by) {
-			if ($__user instanceof User === false) throw new PrivilegesException('', $__db);
+			if ($__user instanceof User === false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
 			return $__user->getEditorInstance()->getVkGroupsToPost();
 		},
 		'{(id:[0-9]+)/staff}' => function ($id) use ($__db, $__pagination, $__request, $__user, $__fields, $__order_by) {
@@ -224,8 +224,8 @@ $__modules['organizations'] = array(
 	),
 	'POST' => array(
 		'{(id:[0-9]+)/staff}' => function ($id) use ($__db, $__pagination, $__request, $__user, $__fields, $__order_by) {
-			if (!isset($__request['user_id'])) throw new InvalidArgumentException('Укажите ID пользовател');
-			if (!isset($__request['role'])) throw new InvalidArgumentException('Укажите роль пользователя');
+			if (!isset($__request['user_id'])) throw new InvalidArgumentException('USER_ID_REQUIRED');
+			if (!isset($__request['role'])) throw new InvalidArgumentException('USER_ROLE_REQUIRED');
 			return OrganizationsCollection::one($__db, $__user, $id, array())->addStaff(
 				$__user, UsersCollection::one($__db, $__user, $__request['user_id'], array()), $__request['role']
 			);
@@ -284,8 +284,8 @@ $__modules['organizations'] = array(
 			return $result;
 		},
 		'{(id:[0-9]+)/staff}' => function ($id) use ($__db, $__pagination, $__request, $__user, $__fields, $__order_by) {
-			if (!isset($__request['user_id'])) throw new InvalidArgumentException('Укажите ID пользовател');
-			if (!isset($__request['role'])) throw new InvalidArgumentException('Укажите роль пользователя');
+			if (!isset($__request['user_id'])) throw new InvalidArgumentException('USER_ID_REQUIRED');
+			if (!isset($__request['role'])) throw new InvalidArgumentException('USER_ROLE_REQUIRED');
 			return OrganizationsCollection::one($__db, $__user, $id, array())->deleteStaff(
 				$__user, UsersCollection::one($__db, $__user, $__request['user_id'], array()), $__request['role']
 			);

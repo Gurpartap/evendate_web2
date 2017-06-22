@@ -25,7 +25,8 @@ AdminEventPage = extending(AdminPage, (function() {
 		this.event_fields = new Fields(
 			'organization_short_name',
 			'ticketing_locally',
-			'registration_locally'
+			'registration_locally',
+			'registration_approvement_required'
 		);
 		
 		this.with_header_tabs = true;
@@ -39,6 +40,9 @@ AdminEventPage = extending(AdminPage, (function() {
 		var tabs = [];
 		
 		tabs.push({title: 'Обзор', page: '/admin/event/'+this.id+'/overview'});
+		if (this.event.registration_approvement_required) {
+			tabs.push({title: 'Заявки', page: '/admin/event/'+this.id+'/requests'});
+		}
 		if (this.event.registration_locally || this.event.ticketing_locally) {
 			tabs.push({title: 'Контроль входа', page: '/admin/event/'+this.id+'/check_in'});
 			tabs.push({title: 'Заказы', page: '/admin/event/'+this.id+'/orders'});

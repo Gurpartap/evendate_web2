@@ -1,0 +1,96 @@
+<script type="javascript/template" id="tmpl-event-admin-requests-page">
+	<div class="event_admin_requests_page material -level_2_material">
+		<div class="event_admin_requests_list_wrapper Tabs">
+			<header class="event_admin_requests_header">
+				<div class="event_admin_requests_header_wrapper RequestsPageHeaderWrapper">
+					<div class="event_admin_requests_page_title_wrapper">
+						<h3 class="event_admin_requests_page_title">Заявки</h3>
+					</div>
+					<div class="event_admin_requests_search_block">
+						<div class="event_admin_requests_search_bar">
+							<input class="event_admin_requests_search_bar_input form_input -rounded RequestsPageSearch" type="text">
+							<button class="event_admin_requests_search_block_button fa_icon fa-search -empty RequestsPageSearchButton" type="button"></button>
+						</div>
+					</div>
+				</div>
+				<div class="event_admin_requests_tabs tabs_header -color_accent HeaderTabs">
+					<span class="tab Tab -active" data-requests_list_name="new">Новые</span>
+					<span class="tab Tab" data-requests_list_name="approved">Принятые</span>
+					<span class="tab Tab" data-requests_list_name="rejected">Отклоненные</span>
+				</div>
+			</header>
+			<div class="event_admin_requests_lists tab_bodies_wrap TabsBodyWrapper RequestsLists">
+				<section class="tab_body TabsBody -active">{loader}</section>
+			</div>
+			<footer class="event_admin_requests_footer">
+				<button class="action -color_accent -no_uppercase ApproveAllRequests" type="button">Принять все заявки</button>
+			</footer>
+		</div>
+		<div class="event_admin_request_detail scrollbar-outer RequestDetailScrollbar">
+			<div class="event_admin_request_detail_wrapper RequestDetail">
+				{request_detail}
+			</div>
+		</div>
+	</div>
+</script>
+
+
+
+<script type="javascript/template" id="tmpl-event-admin-requests-lists">
+	<section class="event_admin_requests_list_scroll_wrapper tab_body TabsBody -active">
+		<div class="event_admin_requests_list_scroll scrollbar-outer RequestsListScrollbar NewRequestsList">{new_requests}</div>
+	</section>
+	<section class="event_admin_requests_list_scroll_wrapper tab_body TabsBody">
+		<div class="event_admin_requests_list_scroll scrollbar-outer RequestsListScrollbar ApprovedRequestsList">{approved_requests}</div>
+	</section>
+	<section class="event_admin_requests_list_scroll_wrapper tab_body TabsBody">
+		<div class="event_admin_requests_list_scroll scrollbar-outer RequestsListScrollbar RejectedRequestsList">{rejected_requests}</div>
+	</section>
+</script>
+
+
+<script type="javascript/template" id="tmpl-event-admin-request-item">
+	<article class="event_admin_request_item RequestItem">
+		<div class="event_admin_request_item_content">
+			<aside class="event_admin_request_item_aside">{orderer_avatar}</aside>
+			<div class="event_admin_request_item_body">
+				<div class="event_admin_request_item_head">
+					<div class="event_admin_request_item_head_wrap">
+						<span class="event_admin_request_item_head_text">Заказ</span>
+						<span class="event_admin_request_item_head_text event_admin_request_number">{order_number}</span>
+					</div>
+					<div class="event_admin_request_item_head_wrap">
+						<span class="event_admin_request_item_head_text">{request_time}</span>
+						<span class="event_admin_request_item_head_text">{request_date}</span>
+					</div>
+				</div>
+				<h5 class="event_admin_request_item_name">{orderer_full_name}</h5>
+			</div>
+		</div>
+		<footer class="event_admin_request_item_footer">
+			{action_buttons}
+		</footer>
+	</article>
+</script>
+
+<script type="javascript/template" id="tmpl-event-admin-request-detail">
+	<header class="event_admin_request_detail_header">
+		<div class="event_admin_request_detail_header_main">
+			<h3 class="event_admin_request_detail_title">Заказ {order_number}</h3>
+			<span class="event_admin_request_detail_subtitle">{orderer_full_name}</span>
+		</div>
+		<aside class="event_admin_request_detail_header_side">{orderer_avatar}</aside>
+	</header>
+	<h6 class="event_admin_request_detail_registration_form_title">Анкета пользователя</h6>
+	<div class="event_admin_request_detail_registration_form_fields">
+		{registration_fields}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-event-admin-request-detail-no-select">
+	<p><span class="-text_color_primary_30">Выберите заявку из списка слева, чтобы получить дополнительную информацию по ней</span></p>
+</script>
+
+<script type="javascript/template" id="tmpl-event-admin-no-request-items">
+	<p class="event_admin_no_request_items">Нет заявок</p>
+</script>

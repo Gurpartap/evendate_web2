@@ -334,7 +334,7 @@ class Event extends AbstractEntity
 
 		foreach ($dates as $date) {
 			if (strtotime($date['start_time']) > strtotime($date['end_time']))
-				throw new LogicException('Время начала не может быть больше времени окончания события');
+				throw new LogicException('START_TIME_LESS_END_TIME');
 		}
 
 		function sortFunc($a, $b)
@@ -439,7 +439,7 @@ class Event extends AbstractEntity
 	public function setCanceled(bool $value, User $user)
 	{
 		$q_upd_event = App::queryFactory()->newUpdate();
-		if ($user->getEditorInstance()->isEditor($this->getOrganization()) == false) throw new PrivilegesException('', $this->db);
+		if ($user->getEditorInstance()->isEditor($this->getOrganization()) == false) throw new PrivilegesException('CANT_CHANGE_THIS_EVENT', $this->db);
 
 		$q_upd_event
 			->table('events')
@@ -506,13 +506,13 @@ class Event extends AbstractEntity
 	private static function generateQueryData(&$data)
 	{
 		if (isset($data['description'])) {
-			if (mb_strlen($data['description']) <= 50) throw new InvalidArgumentException('Слишком короткое описание. Должно быть не менее 50 символов.');
-			if (mb_strlen($data['description']) > 1000) throw new InvalidArgumentException('Слишком длинное описание. Должно быть не более 1000 символов.');
+			if (mb_strlen($data['description']) <= 50) throw new InvalidArgumentException('TOO_SHORT_DESCRIPTION');
+			if (mb_strlen($data['description']) > 1000) throw new InvalidArgumentException('TOO_LARGE_DESCRIPTION');
 		}
 
 		if (isset($data['title'])) {
-			if (mb_strlen($data['title']) < 3) throw new InvalidArgumentException('Слишком короткое название. Должно быть не менее 3 символов.');
-			if (mb_strlen($data['title']) > 150) throw new InvalidArgumentException('Слишком длинное название. Должно быть не более 150 символов.');
+			if (mb_strlen($data['title']) < 3) throw new InvalidArgumentException('TOO_SHORT_TITLE');
+			if (mb_strlen($data['title']) > 150) throw new InvalidArgumentException('TOO_LARGE_TITLE');
 		}
 
 		function sortByStartTime($a, $b)
@@ -545,13 +545,13 @@ class Event extends AbstractEntity
 		$data['file_names'] = $data['filenames'] ?? $data['file_names'];
 		$data['vk_post_id'] = $data['vk_post_id'] ?? null;
 
-		if (!isset($data['tags']) || !is_array($data['tags'])) throw new LogicException('Укажите хотя бы один тег');
+		if (!isset($data['tags']) || !is_array($data['tags'])) throw new LogicException('TAGS_SHOULD_NOT_BE_EMPTY');
 
 		try {
 			if (isset($data['public_at']) && $data['public_at'] != null) {
 				$data['public_at'] = new DateTime($data['public_at']);
 				if ($data['public_at'] < new DateTime()) {
-					throw new InvalidArgumentException('Время отложенной публикации не может быть меньше текущего времени.');
+					throw new InvalidArgumentException('PUBLIC_AT_LESS_NOW');
 				}
 				$data['notification_at'] = clone $data['public_at'];
 				$data['notification_at']->modify('+10 minutes');
@@ -677,10 +677,10 @@ class Event extends AbstractEntity
 			)->getData();
 
 			if ($tariff_info['event_publications'] >= $tariff_info['available_event_publications'])
-				throw new LogicException('Извините, Ваш тарифный план не позволяет добавить больше событий. Вы можете сменить тарифный план в настройках организации.');
+				throw new LogicException('TARIFF_LIMITATIONS');
 
 			if (!isset($data['dates']) || count($data['dates']) == 0)
-				throw new InvalidArgumentException('Укажите, пожалуйста, даты');
+				throw new InvalidArgumentException('NO_DATES_ERROR');
 
 			$q_ins_event = App::queryFactory()->newInsert();
 			$random_string = App::generateRandomString();
@@ -729,7 +729,7 @@ class Event extends AbstractEntity
 			self::saveRegistrationInfo($db, $event_id, $data);
 			self::saveTicketingInfo($db, $event_id, $data);
 			$data['vk']['event_id'] = $event_id;
-			if (isset($data['vk_post']) && isset($data['vk']) && $data['vk_post'] === true){
+			if (isset($data['vk_post']) && isset($data['vk']) && $data['vk_post'] === true) {
 				VkPost::create(
 					$data['vk'],
 					App::getCurrentUser()->getEditorInstance(),
@@ -910,7 +910,7 @@ class Event extends AbstractEntity
 			);
 		$p_get_type_id = $db->prepareExecute($q_get_type_id, 'CANT_FIND_NOTIFICATION_TYPE_ID');
 
-		if ($p_get_type_id->rowCount() != 1) throw new LogicException('CANT_FIND_TYPE: ' . $name);
+		if ($p_get_type_id->rowCount() != 1) throw new BadArgumentException('CANT_FIND_TYPE', App::DB(), $name);
 		$rows = $p_get_type_id->fetchAll();
 
 		return $rows[0]['id'];
@@ -1504,6 +1504,7 @@ class Event extends AbstractEntity
 					array('length' => 1),
 					array('event_date', 'start_time')
 				)->getData();
+				if (count($first_event_date) < 1) return false;
 				$first_event_date = $first_event_date[0];
 				$event_date = DateTime::createFromFormat('U', $first_event_date['event_date']);
 				$first_event_date = DateTime::createFromFormat('Y-m-d H:i:s', $event_date->format('Y-m-d') . ' ' . $first_event_date['start_time']);
@@ -1616,7 +1617,14 @@ class Event extends AbstractEntity
 
 		foreach ($filled_fields as $filled_field) {
 			if (isset($merged_fields[$filled_field['uuid']])) {
-				$merged_fields[$filled_field['uuid']]['value'] = trim($filled_field['value']);
+				if (!is_array($filled_field['value'])) {
+					$merged_fields[$filled_field['uuid']]['value'] = trim($filled_field['value']);
+				} else {
+					$merged_fields[$filled_field['uuid']]['value'] = $filled_field['value'];
+				}
+				if (isset($filled_field['values']) && is_array($filled_field['values'])) {
+					$merged_fields[$filled_field['uuid']]['_values'] = $filled_field['values'];
+				}
 			}
 		}
 
@@ -1624,11 +1632,14 @@ class Event extends AbstractEntity
 
 		foreach ($merged_fields as $key => $final_field) {
 
-			if ($final_field['required'] == true &&
-				(!isset($final_field['value']) || empty($final_field['value']))
-			) {
-				$final_field['error'] = 'Поле обязательно для заполнения';
-				$errors[] = $final_field;
+			if ($final_field['required'] == true) {
+				if (!isset($final_field['value'])
+					|| (is_array($final_field['value']) && count($final_field['value']) < 1)
+					|| (!is_array($final_field['value']) && empty($final_field['value']))
+				) {
+					$final_field['error'] = 'Поле обязательно для заполнения';
+					$errors[] = $final_field;
+				}
 			}
 
 			switch ($final_field['type']) {
@@ -1639,6 +1650,85 @@ class Event extends AbstractEntity
 							$errors[] = $final_field;
 						}
 					}
+					break;
+				}
+
+				case 'select_multi':
+				case 'select': {
+					if ($final_field['required'] == true) {
+						if ($final_field['type'] == 'select') {
+							if (is_array($final_field['value'])) {
+								if (count($final_field['value']) != 1) {
+									$final_field['error'] = 'Укажите, пожалуйста, валидные значения.';
+									$errors[] = $final_field;
+									$final_field['value'] = null;
+									break;
+								}
+							} elseif (isset($final_field['_values']) && is_array($final_field['_values'])) {
+								if (count($final_field['_values']) != 1) {
+									$final_field['error'] = 'Укажите, пожалуйста, валидные значения.';
+									$errors[] = $final_field;
+									$final_field['_values'] = null;
+									break;
+								}
+							} elseif ($final_field['value'] == null) {
+								$final_field['error'] = 'Укажите, пожалуйста, валидные значения.';
+								$errors[] = $final_field;
+								$final_field['value'] = null;
+								break;
+							}
+						}
+					} elseif ($final_field['value'] == null && $final_field['values'] == null) {
+						break;
+					}
+
+					$possible_by_uuid = array();
+
+					foreach ($final_field['values'] as $possible) {
+						$possible_by_uuid[$possible['uuid']] = $possible;
+					}
+
+					$final_field['ins_values'] = array();
+					if (is_array($final_field['value'])) {
+						$final_field['value'] = array_unique($final_field['value'], SORT_STRING);
+						foreach ($final_field['value'] as $selected) {
+							if (!isset($possible_by_uuid[$selected])) {
+								$final_field['error'] = 'Выбранное значение отсутствует в списке возможных.';
+								$errors[] = $final_field;
+							} else {
+								$final_field['ins_values'][] = array(
+									'uuid' => $selected,
+									'value' => $possible_by_uuid[$selected]['value']
+								);
+							}
+						}
+					} elseif (isset($final_field['_values']) && is_array($final_field['_values'])) { // specially for android
+						foreach ($final_field['_values'] as $selected) {
+							$_uuid = $selected['uuid'];
+							if (!isset($possible_by_uuid[$_uuid])) {
+								$final_field['error'] = 'Выбранное значение отсутствует в списке возможных.';
+								$errors[] = $final_field;
+							} else {
+								$final_field['ins_values'][] = array(
+									'uuid' => $_uuid,
+									'value' => $possible_by_uuid[$_uuid]['value']
+								);
+							}
+						}
+					} else {
+						$value_uuid = $final_field['value'];
+						if (!isset($possible_by_uuid[$value_uuid])) {
+							$final_field['error'] = 'Выбранное значение отсутствует в списке возможных.';
+							$errors[] = $final_field;
+						} else {
+							$final_field['ins_values'][] = array(
+								'uuid' => $value_uuid,
+								'value' => $possible_by_uuid[$value_uuid]['value']
+							);
+						}
+					}
+					$final_field['value'] = null;
+					break;
 				}
 			}
 			$merged_fields[$key] = $final_field;
@@ -1674,12 +1764,11 @@ class Event extends AbstractEntity
 			array());
 
 		if ($result->getStatus()) {
-			$user->addFavoriteEvent($this);
 			try {
+				$user->addFavoriteEvent($this);
 				$this->addNotification($user, array('notification_type' => 'notification-before-day'));
 			} catch (Exception $e) {
 			}
-
 		}
 
 		return new Result(true, '', array(

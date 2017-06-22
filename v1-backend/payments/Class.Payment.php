@@ -14,7 +14,7 @@ class Payment
 
 	public static function createForOrganization(Organization $organization, User $user, ExtendedPDO $db, array $data)
 	{
-		if (!$user->isAdmin($organization)) throw new PrivilegesException(null, $db);
+		if (!$user->hasRights($organization, array(Roles::ROLE_ADMIN, Roles::ROLE_MODERATOR))) throw new PrivilegesException(null, $db);
 		$q_ins = App::queryFactory()->newInsert();
 		$q_ins->into('organizations_payments')
 			->cols(array(

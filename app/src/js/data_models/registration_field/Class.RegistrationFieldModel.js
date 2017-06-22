@@ -39,7 +39,9 @@ RegistrationFieldModel = extending(OneEntity, (function() {
 		PHONE_NUMBER: 'phone_number',
 		ADDITIONAL_TEXT: 'additional_text',
 		CUSTOM: 'custom',
-		EXTENDED_CUSTOM: 'extended_custom'
+		EXTENDED_CUSTOM: 'extended_custom',
+		SELECT: 'select',
+		SELECT_MULTI: 'select_multi'
 	};
 	/**
 	 *
@@ -52,7 +54,9 @@ RegistrationFieldModel = extending(OneEntity, (function() {
 		PHONE_NUMBER: 'Номер телефона',
 		ADDITIONAL_TEXT: 'Дополнительное текстовое поле',
 		CUSTOM: 'Дополнительное текстовое поле',
-		EXTENDED_CUSTOM: 'Дополнительное текстовое поле'
+		EXTENDED_CUSTOM: 'Дополнительное текстовое поле',
+		SELECT: 'Выбор одного варианта',
+		SELECT_MULTI: 'Выбор нескольких вариантов'
 	};
 	
 	/**
@@ -69,7 +73,9 @@ RegistrationFieldModel = extending(OneEntity, (function() {
 			default:
 			case RegistrationFieldModel.TYPES.CUSTOM:
 			case RegistrationFieldModel.TYPES.EXTENDED_CUSTOM:
-			case RegistrationFieldModel.TYPES.ADDITIONAL_TEXT: return true;
+			case RegistrationFieldModel.TYPES.ADDITIONAL_TEXT:
+			case RegistrationFieldModel.TYPES.SELECT:
+			case RegistrationFieldModel.TYPES.SELECT_MULTI: return true;
 		}
 	};
 	

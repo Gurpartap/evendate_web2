@@ -30,6 +30,7 @@ RegistrationModal = extending(PreviewRegistrationModal, (function() {
 			$register_button.attr('disabled', true);
 			if (isFormValid($form)) {
 				OneEvent.registerToEvent(self.event.id, $form.serializeForm('array').map(function(field) {
+					
 					return {
 						uuid: field.name,
 						value: field.value
@@ -51,6 +52,10 @@ RegistrationModal = extending(PreviewRegistrationModal, (function() {
 		this.content.find('.RegistrationEmailField').val(__APP.USER.email);
 		
 		bindRippleEffect(this.content);
+		this.content.find('.ToSelect2').select2({
+			containerCssClass: 'form_select2',
+			dropdownCssClass: 'form_select2_drop form_select2_drop_no_search'
+		});
 		this.__init();
 		
 		return this;

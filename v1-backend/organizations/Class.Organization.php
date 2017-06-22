@@ -433,7 +433,7 @@ class Organization extends AbstractEntity
 		}
 
 		if (isset($fields[Organization::INTERESTS_FIELD_NAME])) {
-			if (!$user->isAdmin($this)) throw new PrivilegesException('', $this->db);
+			if (!$user->isAdmin($this)) throw new PrivilegesException('NOT_ADMIN', $this->db);
 			$q_get_interests = App::queryFactory()->newSelect();
 			$q_get_interests->from('view_organization_auditory_interests')
 				->cols(array(
@@ -544,15 +544,15 @@ class Organization extends AbstractEntity
 
 	private static function checkData(&$data, $is_update = false)
 	{
-		if (!isset($data['name'])) throw new InvalidArgumentException('Название организации обязательно.');
-		if (mb_strlen($data['name']) < 3) throw new InvalidArgumentException('Слишком короткое название. Должно быть не менее 3 символов.');
-		if (mb_strlen($data['name']) > 150) throw new InvalidArgumentException('Слишком длинное название. Должно быть не более 150 символов.');
+		if (!isset($data['name'])) throw new InvalidArgumentException('ORGANIZATION_NAME_REQUIRED');
+		if (mb_strlen($data['name']) < 3) throw new InvalidArgumentException('TOO_SHORT_TITLE');
+		if (mb_strlen($data['name']) > 150) throw new InvalidArgumentException('TOO_LARGE_TITLE');
 		$data['name'] = trim($data['name']);
 
 
-		if (!isset($data['short_name'])) throw new InvalidArgumentException('Краткое название организации обязательно.');
-		if (mb_strlen($data['short_name']) < 3) throw new InvalidArgumentException('Слишком короткое сокращение. Должно быть не менее 3 символов.');
-		if (mb_strlen($data['short_name']) > 30) throw new InvalidArgumentException('Слишком длинное сокращение. Должно быть не более 30 символов.');
+		if (!isset($data['short_name'])) throw new InvalidArgumentException('ORGANIZATION_SHORT_NAME_REQUIRED');
+		if (mb_strlen($data['short_name']) < 3) throw new InvalidArgumentException('TOO_SHORT_SHORT_NAME');
+		if (mb_strlen($data['short_name']) > 30) throw new InvalidArgumentException('TOO_LARGE_SHORT_NAME');
 		$data['short_name'] = trim($data['short_name']);
 
 		if (isset($data['site_url'])) {
@@ -588,9 +588,9 @@ class Organization extends AbstractEntity
 			$data['brand_color'] = null;
 		}
 
-		if (!isset($data['description'])) throw new InvalidArgumentException('Описание название организации обязательно.');
-		if (mb_strlen($data['description']) <= 50) throw new InvalidArgumentException('Слишком короткое описание. Должно быть не менее 50 символов.');
-		if (mb_strlen($data['description']) > 250) throw new InvalidArgumentException('Слишком длинное описание. Должно быть не более 250 символов.');
+		if (!isset($data['description'])) throw new InvalidArgumentException('ORGANIZATION_DESCRIPTION_REQUIRED');
+		if (mb_strlen($data['description']) <= 50) throw new InvalidArgumentException('TOO_SHORT_DESCRIPTION');
+		if (mb_strlen($data['description']) > 250) throw new InvalidArgumentException('TOO_LARGE_DESCRIPTION');
 		$data['description'] = trim($data['description']);
 
 		if (isset($data['default_address'])) {
@@ -653,7 +653,7 @@ class Organization extends AbstractEntity
 			$data['logo_change'] = true;
 		} elseif ($is_update) {
 			$data['logo_change'] = false;
-		} else throw new InvalidArgumentException('Логотип обязателен');
+		} else throw new InvalidArgumentException('LOGO_REQUIRED');
 	}
 
 	public function update(User $user, array $data)
@@ -706,7 +706,7 @@ class Organization extends AbstractEntity
 
 	public function addStaff(User $user, Friend $friend, $role)
 	{
-		if (!$user->isAdmin($this)) throw new PrivilegesException(null, $this->db);
+		if (!$user->isAdmin($this)) throw new PrivilegesException('NOT_ADMIN', $this->db);
 		$q_ins_staff = App::queryFactory()
 			->newInsert()
 			->into('users_organizations')
@@ -726,7 +726,7 @@ class Organization extends AbstractEntity
 	public function deleteStaff(User $user, Friend $friend, $role)
 	{
 
-		if (!$user->isAdmin($this)) throw new PrivilegesException(null, $this->db);
+		if (!$user->isAdmin($this)) throw new PrivilegesException('NOT_ADMIN', $this->db);
 
 		if ($role == Roles::ROLE_ADMIN) {
 			$q_get_admins = App::queryFactory()
@@ -746,7 +746,7 @@ class Organization extends AbstractEntity
 			$p_get_admins = $this->db->prepareExecute($q_get_admins, 'CANT_GET_ADMINS');
 
 			$admins = $p_get_admins->fetch();
-			if ($admins['admins_count'] == 1) throw new LogicException('Невозможно удалить единственного администратора');
+			if ($admins['admins_count'] == 1) throw new LogicException('CANT_REMOVE_SINGLE_ADMIN');
 		}
 		$q_upd_staff = App::queryFactory()
 			->newUpdate()

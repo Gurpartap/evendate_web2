@@ -80,10 +80,10 @@ class AuthHandler
 			'email' => $provider->getToInsData()['email'],
 			'avatar_url' => $provider->getToInsData()['avatar_url'],
 			'gender' => $provider->getToInsData()['gender'],
+			strtolower($type) . '_uid' => $provider->getUID()
 		);
 
 		if ($is_new_user) {
-			$_data[strtolower($type) . '_uid'] = $provider->getUID();
 			$q_user = App::queryFactory()->newInsert()
 				->cols($_data)
 				->into('users')

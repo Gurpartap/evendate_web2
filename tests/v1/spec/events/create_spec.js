@@ -30,6 +30,7 @@ frisby
         }
     })
     .afterJSON(json => {
+        console.log(json);
         events.forEach(function (value, index) {
             if (value.payload) {
                 if (index == 0) {
@@ -38,6 +39,7 @@ frisby
 
                 }
                 value.payload.organization_id = 146;//json.data[index].id;
+                console.log(env.api_url + 'events');
                 frisby
                     .create('Create event: ' + index)
                     .post(env.api_url + 'events', value.payload, {json: true})
@@ -60,32 +62,5 @@ frisby
                     .toss();
             }
         });
-
-        // test vk integration
-
-        let value = events[0];
-        value.payload.vk_post = true;
-        value.payload.organization_id = 146;//json.data[index].id;
-        frisby
-            .create('Create event for vk cross-post ')
-            .post(env.api_url + 'events', value.payload, {json: true})
-            .addHeader('Authorization', 'ad5305acba807d19a7b32fb008d3ab8277763376f3067540b79598c33ccbbfa092061b697629686c2b90e')
-            .expectStatus(200)
-            .expectJSONTypes({
-                request_id: String,
-                data: Object,
-                status: Boolean,
-                text: String
-            })
-            .after(function (err, res, body) {
-                console.log(body);
-                if (res.statusCode != 200) {
-                    console.log(body);
-                }
-                if (err) {
-                    env.logger.error(err);
-                }
-            })
-            .toss();
     })
     .toss();

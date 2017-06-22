@@ -157,7 +157,7 @@ OrganizationPage = extending(Page, (function() {
 		bindTabs(PAGE.$wrapper);
 		bindCallModal(PAGE.$wrapper);
 		
-		PAGE.$wrapper.find('.Tabs').on('change.tabs', function() {
+		PAGE.$wrapper.find('.Tabs').on('tabs:change', function() {
 			PAGE.current_tab = $(this).find('.Tab.-active').data('type');
 		});
 		

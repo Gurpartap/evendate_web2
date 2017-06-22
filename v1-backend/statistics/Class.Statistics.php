@@ -71,7 +71,7 @@ class Statistics
 			->where('entity = ?', $entity_type);
 
 		$p_get = $db->prepareExecute($q_get, 'CANT_GET_STATS_TYPE_ID');
-		if ($p_get->rowCount() < 1) throw new InvalidArgumentException('', $db);
+		if ($p_get->rowCount() < 1) throw new InvalidArgumentException('NOT_ADMIN', $db);
 		return $p_get->fetchColumn(0);
 	}
 
