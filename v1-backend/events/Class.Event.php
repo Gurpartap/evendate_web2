@@ -1622,6 +1622,9 @@ class Event extends AbstractEntity
 				} else {
 					$merged_fields[$filled_field['uuid']]['value'] = $filled_field['value'];
 				}
+				if (isset($filled_field['values']) && is_array($filled_field['values'])) {
+					$merged_fields[$filled_field['uuid']]['_values'] = $filled_field['values'];
+				}
 			}
 		}
 
@@ -1661,6 +1664,13 @@ class Event extends AbstractEntity
 									$final_field['value'] = null;
 									break;
 								}
+							} elseif (isset($final_field['_values']) && is_array($final_field['_values'])) {
+								if (count($final_field['_values']) != 1) {
+									$final_field['error'] = 'Укажите, пожалуйста, валидные значения.';
+									$errors[] = $final_field;
+									$final_field['_values'] = null;
+									break;
+								}
 							} elseif ($final_field['value'] == null) {
 								$final_field['error'] = 'Укажите, пожалуйста, валидные значения.';
 								$errors[] = $final_field;
@@ -1668,7 +1678,7 @@ class Event extends AbstractEntity
 								break;
 							}
 						}
-					} elseif ($final_field['value'] == null) {
+					} elseif ($final_field['value'] == null && $final_field['values'] == null) {
 						break;
 					}
 
@@ -1682,9 +1692,6 @@ class Event extends AbstractEntity
 					if (is_array($final_field['value'])) {
 						$final_field['value'] = array_unique($final_field['value'], SORT_STRING);
 						foreach ($final_field['value'] as $selected) {
-							if (is_array($final_field['value'])){
-								$selected = $selected[''];
-							}
 							if (!isset($possible_by_uuid[$selected])) {
 								$final_field['error'] = 'Выбранное значение отсутствует в списке возможных.';
 								$errors[] = $final_field;
@@ -1695,8 +1702,8 @@ class Event extends AbstractEntity
 								);
 							}
 						}
-					}elseif(is_array($final_field['values'])) { // specially for android
-						foreach ($final_field['values'] as $selected) {
+					} elseif (isset($final_field['_values']) && is_array($final_field['_values'])) { // specially for android
+						foreach ($final_field['_values'] as $selected) {
 							$_uuid = $selected['uuid'];
 							if (!isset($possible_by_uuid[$_uuid])) {
 								$final_field['error'] = 'Выбранное значение отсутствует в списке возможных.';
@@ -1708,7 +1715,7 @@ class Event extends AbstractEntity
 								);
 							}
 						}
-					}else {
+					} else {
 						$value_uuid = $final_field['value'];
 						if (!isset($possible_by_uuid[$value_uuid])) {
 							$final_field['error'] = 'Выбранное значение отсутствует в списке возможных.';
@@ -1762,7 +1769,6 @@ class Event extends AbstractEntity
 				$this->addNotification($user, array('notification_type' => 'notification-before-day'));
 			} catch (Exception $e) {
 			}
-
 		}
 
 		return new Result(true, '', array(
