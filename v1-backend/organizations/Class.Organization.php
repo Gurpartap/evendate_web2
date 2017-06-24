@@ -23,6 +23,7 @@ class Organization extends AbstractEntity
 	const COUNTRY_FIELD_NAME = 'country';
 	const TARIFF_FIELD_NAME = 'tariff';
 	const INTERESTS_FIELD_NAME = 'interests';
+	const SEARCH_SCORE_FIELD_NAME = 'search_score';
 
 	const IMAGES_PATH = 'organizations_images/';
 	const IMAGE_SIZE_LARGE = '/large/';
@@ -103,6 +104,7 @@ class Organization extends AbstractEntity
 		'country_local_name',
 		'country_language',
 		'country_language_short',
+		self::SEARCH_SCORE_FIELD_NAME => '(SELECT score::FLOAT FROM temp_organization_ratings WHERE organization_id = view_organizations.id)::FLOAT AS ' . self::SEARCH_SCORE_FIELD_NAME,
 		self::RANDOM_FIELD_NAME => '(SELECT created_at / (random() * 9 + 1)
 			FROM view_organizations AS vo
 			WHERE vo.id = view_organizations.id) AS random',
@@ -369,6 +371,7 @@ class Organization extends AbstractEntity
 	{
 		return $this->img_small_url;
 	}
+
 
 	public function getParams(AbstractUser $user = null, array $fields = null): Result
 	{
@@ -699,6 +702,13 @@ class Organization extends AbstractEntity
 		$q_upd_organization
 			->where('id = ?', $this->id);
 
+
+		try{
+			OrganizationsCollection::reindexCollection($this->db, App::getCurrentUser(), array(
+				'id' => $this->id
+			));
+		}catch(Exception $e){}
+
 		$this->db->prepareExecute($q_upd_organization, 'CANT_UPDATE_ORGANIZATION');
 		@file_get_contents(App::DEFAULT_NODE_LOCATION . '/recommendations/organizations/' . $this->id);
 		return new Result(true, '', array('organization_id' => $this->getId()));
@@ -816,6 +826,14 @@ class Organization extends AbstractEntity
 		$result = $db->prepareExecute($q_ins_organization, 'CANT_CREATE_ORGANIZATION')->fetch(PDO::FETCH_ASSOC);
 		self::addOwner($user, $result['id'], $db);
 		self::addMailInfo($user, $data, $result['id'], $db);
+
+
+		try{
+			OrganizationsCollection::reindexCollection($db, App::getCurrentUser(), array(
+				'id' => $result['id']
+			));
+		}catch(Exception $e){}
+
 		@file_get_contents(App::DEFAULT_NODE_LOCATION . '/recommendations/organizations/' . $result['id']);
 		return new Result(true, '', array('organization_id' => $result['id']));
 	}

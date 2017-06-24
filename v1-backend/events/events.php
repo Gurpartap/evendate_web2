@@ -10,100 +10,19 @@ require_once $BACKEND_FULL_PATH . '/events/Class.Notification.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.NotificationsCollection.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.OrdersCollection.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.Order.php';
+require_once $BACKEND_FULL_PATH . '/search/Class.ElasticUpdater.php';
 
-require_once "{$BACKEND_FULL_PATH}/vendor/autoload.php";
-use Elasticsearch\ClientBuilder;
 
 $__modules['events'] = array(
 	'GET' => array(
 		'{update/drop-index}' => function () use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
-			$client = ClientBuilder::create()->build();
-
-			$params = ['index' => 'events'];
-			$response = $client->indices()->delete($params);
-			return $response;
+			return EventsCollection::dropElasticIndex();
 		},
 		'{update/index}' => function () use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
-
-			$client = ClientBuilder::create()->build();
-
-
-			$params = [
-				'index' => 'events',
-				'body' => [
-					'settings' => [
-						'analysis' => [
-							'filter' => [
-								'russian_stop' => [
-									"type" => "stop",
-									"stopwords" => "_russian_"
-								],
-								"russian_keywords" => [
-									"type" => "keyword_marker",
-									"keywords" => ["пример"]
-								],
-								"russian_stemmer" => [
-									"type" => "stemmer",
-									"language" => "russian"
-								]
-							],
-							'analyzer' => [
-								"russian" => [
-									"tokenizer" => "standard",
-									"filter" => [
-										"lowercase",
-										"russian_stop",
-										"russian_keywords",
-										"russian_stemmer"
-									]
-								]
-							]
-						]
-					]
-				]
-			];
-			$result = $client->indices()->create($params);
-			return $result;
+			return EventsCollection::createElasticIndex();
 		},
 		'{update/search}' => function () use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
-
-			$client = ClientBuilder::create()->build();
-
-			$events = EventsCollection::filter(
-				$__db,
-				$__user,
-				array('future' => true),
-				Fields::parseFields('tags,description,title'),
-				array('length' => 10)
-			)->getData();
-			foreach ($events as $event) {
-
-				$body = $event;
-				$body['tags'] = array();
-				foreach ($event['tags'] as $tag) {
-					$body['tags'][] = $tag['name'];
-				}
-
-				try {
-					$client->delete(array(
-						'index' => 'search',
-						'type' => 'event',
-						'id' => $event['id']
-					));
-
-				} catch (Exception $e) {
-				}
-
-				$response = $client->index(array(
-					'index' => 'search',
-					'type' => 'event',
-					'id' => $event['id'],
-					'body' => $body
-				));
-
-				print_r($response);
-
-			}
+			return EventsCollection::reindexCollection($__db, $__user);
 		},
 
 		'{/(id:[0-9]+)/tickets/(uuid:\w+-\w+-\w+-\w+-\w+)/qr}' => function ($event_id, $uuid) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
@@ -247,6 +166,7 @@ $__modules['events'] = array(
 				);
 		},
 		'search' => function () use ($__db, $__request, $__user, $__offset, $__length, $__fields, $__order_by) {
+
 			return EventsCollection::filter(
 				$__db,
 				$__user,

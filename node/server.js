@@ -509,6 +509,16 @@ pg.connect(pg_conn_string, function (err, client, done) {
         logger.error(ex);
     }
 
+//every day at 3:30 am
+    try {
+        new CronJob('30 2 * * *', function () {
+            rest.get('https://localhost/api/v1/events/update/search');
+            rest.get('https://localhost/api/v1/organizations/update/search');
+        }, null, true);
+    } catch (ex) {
+        logger.error(ex);
+    }
+
     try {
         new CronJob('*/1 * * * *', function () {
             let mailer = new Mailer(transporter, logger);

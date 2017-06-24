@@ -6,9 +6,21 @@ require_once $BACKEND_FULL_PATH . '/organizations/Class.Organization.php';
 require_once $BACKEND_FULL_PATH . '/organizations/Class.PrivateOrganization.php';
 require_once $BACKEND_FULL_PATH . '/organizations/Class.OrganizationType.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.EventsCollection.php';
+require_once "{$BACKEND_FULL_PATH}/vendor/autoload.php";
+use Elasticsearch\ClientBuilder;
 
 $__modules['organizations'] = array(
 	'GET' => array(
+		'{update/drop-index}' => function () use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+			return OrganizationsCollection::dropElasticIndex();
+		},
+		'{update/index}' => function () use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+		},
+		'{update/search}' => function () use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+			return OrganizationsCollection::reindexCollection($__db, $__user, $__request);
+		},
+
+
 		'{vk_groups}' => function () use ($__db, $__pagination, $__request, $__user, $__fields, $__order_by) {
 			if ($__user instanceof User === false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
 			return $__user->getEditorInstance()->getVkGroupsToPost();
