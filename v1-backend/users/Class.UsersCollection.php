@@ -140,6 +140,13 @@ class UsersCollection extends AbstractCollection
 					}
 					break;
 				}
+				case 'email': {
+					$value = mb_strtolower(trim($value));
+					if (empty($value)) break;
+					$q_get_users->where('LOWER(email) = LOWER(:email)');
+					$statement_array[':email'] = $value;
+					break;
+				}
 				case 'name': {
 					$value = mb_strtolower(trim($value));
 					if (empty($value)) break;
