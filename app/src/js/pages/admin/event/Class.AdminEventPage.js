@@ -22,15 +22,17 @@ AdminEventPage = extending(AdminPage, (function() {
 		AdminPage.call(this);
 		this.id = event_id;
 		this.event = new OneEvent(this.id);
-		this.event_fields = new Fields(
-			'organization_short_name',
-			'ticketing_locally',
-			'registration_locally',
-			'registration_approvement_required'
-		);
+		this.event_fields = AdminEventPage.fields;
 		
 		this.with_header_tabs = true;
 	}
+	
+	AdminEventPage.fields = new Fields(
+		'organization_short_name',
+		'ticketing_locally',
+		'registration_locally',
+		'registration_approvement_required'
+	);
 	
 	AdminEventPage.prototype.fetchData = function() {
 		return this.fetching_data_defer = this.event.fetchEvent(this.event_fields);

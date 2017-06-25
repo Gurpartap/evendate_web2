@@ -132,7 +132,7 @@ PreviewRegistrationModal = extending(AbstractModal, (function() {
 			}
 			default: {
 				
-				return __APP.BUILD.formInput({
+				return __APP.BUILD.formUnit({
 					id: 'registration_form_' + this.id + '_' + field.uuid,
 					type: field.type === RegistrationFieldModel.TYPES.EXTENDED_CUSTOM ? 'textarea' : field.type,
 					name: field.uuid,

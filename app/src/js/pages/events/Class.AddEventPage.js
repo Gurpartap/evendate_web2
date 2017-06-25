@@ -19,5 +19,13 @@ AddEventPage = extending(AbstractEditEventPage, (function() {
 		this.organization_id = org_id;
 	}
 	
+	AddEventPage.prototype.preRender = function() {
+		AbstractEditEventPage.prototype.preRender.call(this);
+		
+		this.render_vars.button_text = 'Опубликовать';
+		
+		this.render_vars.ticket_types = tmpl('edit-event-tickets-row-empty');
+	};
+	
 	return AddEventPage;
 }()));

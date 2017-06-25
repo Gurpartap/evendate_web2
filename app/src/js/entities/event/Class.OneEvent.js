@@ -77,8 +77,6 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @property {NotificationsCollection} notifications
 	 *
-	 * @property {timestamp} additional_notification_time
-	 *
 	 * @property {UsersCollection} favored
 	 * @property {?number} favored_users_count
 	 * @property {?number} favored_friends_count
@@ -151,8 +149,6 @@ OneEvent = extending(OneEntity, (function() {
 		this.tags = new TagsCollection();
 		
 		this.notifications = new NotificationsCollection();
-		
-		this.additional_notification_time = null;
 		
 		this.favored = new UsersCollection();
 		this.favored_users_count = null;

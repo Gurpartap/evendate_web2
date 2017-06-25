@@ -111,6 +111,7 @@ __C = {
 		'facebook': 'fa-facebook-official'
 	},
 	DATE_FORMAT: 'YYYY-MM-DD',
+	TIME_FORMAT: 'HH:mm',
 	MODAL_TYPES: {
 		FAVORS: 'favors',
 		SUBSCRIBERS: 'subscribers',
@@ -1687,6 +1688,16 @@ function isBase64(string) {
  */
 function isFunction(variable) {
 	return (variable && typeof variable === 'function');
+}
+/**
+ *
+ * @param {*} variable
+ *
+ * @return {boolean}
+ */
+function empty(variable) {
+	
+	return variable == null;
 }
 /**
  *

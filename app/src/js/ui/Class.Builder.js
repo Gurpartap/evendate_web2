@@ -33,6 +33,7 @@ Builder = (function() {
 	 * @param {Array<string>} [classes]
 	 * @param {Array<string>} [datasets]
 	 * @param {Array<string>} [attributes]
+	 *
 	 * @returns {buildProps}
 	 */
 	Builder.normalizeBuildProps = function normalizeBuildProps(props, classes, datasets, attributes) {
@@ -59,6 +60,7 @@ Builder = (function() {
 	/**
 	 *
 	 * @param {...buildProps} props
+	 *
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.button = function buildButton(/**props*/) {
@@ -76,6 +78,7 @@ Builder = (function() {
 	 * @param {HTMLAttributes} [attributes]
 	 * @param {(Array<string>|string)} [classes]
 	 * @param {HTMLDataset} [dataset]
+	 *
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.input = function buildInput(attributes, classes, dataset) {
@@ -97,6 +100,7 @@ Builder = (function() {
 	 * @param {(Array<string>|string)} [classes]
 	 * @param {HTMLDataset} [dataset]
 	 * @param {(string|number)} [default_value]
+	 *
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.select = function buildSelect(values, attributes, classes, dataset, default_value) {
@@ -116,10 +120,37 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @param {string} name
+	 * @param {string} label
+	 * @param {string} value - YYYY-MM-DD
+	 * @param {HTMLAttributes} [attributes]
+	 * @param {(Array<string>|string)} [classes]
+	 * @param {HTMLDataset} [dataset]
+	 *
+	 * @return {jQuery}
+	 */
+	Builder.prototype.dateSelect = function(name, label, value, attributes, classes, dataset) {
+		var $date_select = tmpl('date-select', Builder.normalizeBuildProps({
+			name: name,
+			label: label,
+			value: value,
+			attributes: attributes || {},
+			classes: classes || [],
+			dataset: dataset || {}
+		}));
+		
+		(new DatePicker($date_select, dataset || {})).init();
+		$date_select.addClass('-Handled_DatePicker');
+		
+		return $date_select;
+	};
+	/**
+	 *
 	 * @param {HTMLAttributes} [attributes]
 	 * @param {(Array<string>|string)} [classes]
 	 * @param {string} [value]
 	 * @param {HTMLDataset} [dataset]
+	 *
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.textarea = function buildTextarea(attributes, classes, value, dataset) {
@@ -179,7 +210,9 @@ Builder = (function() {
 		return tmpl('action-button', _props.map(function(prop) {
 			
 			return Builder.normalizeBuildProps(prop);
-		}));
+		})).each(function(i) {
+			$(this).data(_props[i].dataset);
+		});
 	};
 	/**
 	 *
@@ -310,7 +343,7 @@ Builder = (function() {
 	 * @param {(Array<string>|string)} [props.label_classes]
 	 * @returns {jQuery}
 	 */
-	Builder.prototype.formInput = function buildFormInput(props) {
+	Builder.prototype.formUnit = function buildFormUnit(props) {
 		var self = this,
 			INPUT_TYPES = [
 				'hidden',
@@ -341,12 +374,14 @@ Builder = (function() {
 				case 'checkbox':
 					return self.checkbox(props);
 				default:
-					return tmpl('form-unit', Builder.normalizeBuildProps($.extend(true, {}, props, {
+					return tmpl('form-unit', Builder.normalizeBuildProps({
+						unit_classes: props.unit_classes || [],
 						label: props.label ? tmpl('label', Builder.normalizeBuildProps({
 							id: props.id,
 							label: props.label,
 							label_classes: props.label_classes
 						}, ['label_classes'])) : '',
+						helptext: props.helptext ? self.formHelpText(props.helptext, props.helptext_dataset, props.helptext_attributes) : '',
 						form_element: (function(props) {
 							var classes = props.classes ? props.classes : [],
 								defined_attributes = {
@@ -358,16 +393,37 @@ Builder = (function() {
 								};
 							
 							switch (props.type) {
+								case 'date': {
+									
+									return self.dateSelect(
+										props.name,
+										(props.value ? moment(props.value).format(__LOCALE.DATE.DATE_FORMAT) : 'Дата'),
+										props.value,
+										$.extend({}, props.attributes, {
+											required: props.required ? props.required : undefined
+										}),
+										classes,
+										props.dataset
+									);
+								}
 								case 'textarea': {
 									
-									return self.textarea($.extend({},	props.attributes,	defined_attributes), classes.concat('form_textarea'), props.value, props.dataset);
+									return self.textarea(
+										$.extend({}, props.attributes, defined_attributes),
+										classes.concat('form_textarea'),
+										props.value,
+										props.dataset
+									);
 								}
 								case 'time': {
 									
-									return self.input($.extend({},	props.attributes,	defined_attributes, {
-										value: (props.value != null) ? props.value : undefined,
-										placeholder: '23:59'
-									}), classes.concat('form_input', '-time_input'), props.dataset).inputmask("hh:mm", {
+									return self.input(
+										$.extend({}, props.attributes, defined_attributes, {
+											value: (props.value != null) ? props.value : undefined, placeholder: '23:59'
+										}),
+										classes.concat('form_input', '-time_input'),
+										props.dataset
+									).inputmask('hh:mm', {
 										insertMode: false,
 										clearIncomplete: true,
 										placeholder: '  :  ',
@@ -377,10 +433,13 @@ Builder = (function() {
 								}
 								case 'number': {
 									
-									return self.input($.extend({},	props.attributes,	defined_attributes, {
-										autocomplete: 'off',
-										value: (props.value != null) ? props.value : undefined
-									}), classes.concat('form_input'), props.dataset).inputmask({
+									return self.input(
+										$.extend({}, props.attributes, defined_attributes, {
+											autocomplete: 'off', value: (props.value != null) ? props.value : undefined
+										}),
+										classes.concat('form_input'),
+										props.dataset
+									).inputmask({
 										alias: 'numeric',
 										autoGroup: false,
 										digits: 2,
@@ -392,15 +451,18 @@ Builder = (function() {
 								}
 								default: {
 									
-									return self.input($.extend({},	props.attributes,	defined_attributes, {
-										type: !props.type || INPUT_TYPES.indexOf(props.type) === -1 ? 'text' : props.type,
-										value: (props.value != null) ? props.value : undefined
-									}), classes.concat('form_input'), props.dataset);
+									return self.input(
+										$.extend({}, props.attributes, defined_attributes, {
+											type: !props.type || INPUT_TYPES.indexOf(props.type) === -1 ? 'text' : props.type,
+											value: (props.value != null) ? props.value : undefined
+										}),
+										classes.concat('form_input'),
+										props.dataset
+									);
 								}
 							}
-						})(props),
-						helptext: props.helptext ? self.formHelpText(props.helptext, props.helptext_dataset, props.helptext_attributes) : ''
-					}), ['unit_classes']));
+						})(props)
+					}, ['unit_classes']));
 			}
 		}));
 	};
