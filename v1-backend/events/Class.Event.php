@@ -41,6 +41,7 @@ class Event extends AbstractEntity
 	const NOTIFICATIONS_FIELD_NAME = 'notifications';
 	const CAN_EDIT_FIELD_NAME = 'can_edit';
 	const VK_POST_LINK_FIELD_NAME = 'vk_post_link';
+	const SEARCH_SCORE_FIELD_NAME = 'search_score';
 
 	/*ONLY FOR ADMINS*/
 	const STATISTICS_FIELD_NAME = 'statistics';
@@ -218,9 +219,11 @@ class Event extends AbstractEntity
 		self::ORDERS_COUNT_FIELD_NAME => '(SELECT COALESCE(COUNT(view_tickets.id)::INT, 0)
 			FROM view_tickets
 			WHERE view_tickets.event_id = view_events.id 
-			AND status = TRUE 
+			AND status = TRUE R
 			AND is_active = TRUE 
 			AND view_tickets.user_id = :user_id)::INT AS ' . self::ORDERS_COUNT_FIELD_NAME,
+
+		self::SEARCH_SCORE_FIELD_NAME => '(SELECT score::FLOAT FROM temp_event_ratings WHERE event_id = view_events.id)::FLOAT AS ' . self::SEARCH_SCORE_FIELD_NAME,
 
 		self::IS_SEEN_FIELD_NAME => '(
 		SELECT
@@ -787,6 +790,12 @@ class Event extends AbstractEntity
 
 
 			$db->commit();
+
+			try{
+				EventsCollection::reindexCollection($db, App::getCurrentUser(), array(
+					'id' => $event_id
+				));
+			}catch(Exception $e){}
 
 			@file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/events/' . $event_id . '?is_new=true');
 			return new Result(true, 'Событие успешно создано', array('event_id' => $event_id));
@@ -1444,6 +1453,12 @@ class Event extends AbstractEntity
 
 			$this->db->commit();
 
+
+			try{
+				EventsCollection::reindexCollection($this->db, App::getCurrentUser(), array(
+					'id' => $this->id
+				));
+			}catch(Exception $e){}
 
 			if ($tariff_info['available_additional_notifications'] > 0 &&
 				$data['additional_notification_time'] instanceof DateTime

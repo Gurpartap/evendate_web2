@@ -8,6 +8,7 @@
     "body-parser": "^1.15.2",
     "cron": "^1.0.9",
     "easyimage": "~2.1.0",
+    "elasticsearch": "^13.0.1",
     "express": "^4.14.0",
     "gcm": "^1.0.1",
     "gm": "^1.21.1",
