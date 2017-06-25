@@ -22,6 +22,8 @@ class EventsCollection extends AbstractCollection
 				&& is_array($params['privileges'])
 				&& count($params['privileges']) > 0
 			);
+		}else{
+			return false;
 		}
 	}
 
@@ -95,6 +97,15 @@ class EventsCollection extends AbstractCollection
 		}
 
 		$db->beginTransaction();
+
+
+		$db->prepareExecuteRaw('CREATE TEMP TABLE IF NOT EXISTS temp_event_ratings
+					(
+						event_id INT,
+						score FLOAT
+					)
+					ON COMMIT DELETE ROWS;
+					', array());
 
 		foreach ($filters as $name => $value) {
 			switch ($name) {
@@ -421,13 +432,6 @@ class EventsCollection extends AbstractCollection
 				}
 				case 'q': {
 
-					$db->prepareExecuteRaw('CREATE TEMP TABLE temp_event_ratings
-					(
-						event_id INT,
-						score FLOAT
-					)
-					ON COMMIT DELETE ROWS;
-					', array());
 
 					$params = [
 						'index' => 'events',
@@ -687,7 +691,8 @@ class EventsCollection extends AbstractCollection
 			$__user,
 			$filters,
 			Fields::parseFields('tags,description,title'),
-			array('length' => 100000)
+			array('length' => 100000),
+			array('id DESC')
 		)->getData();
 		$responses = array();
 		foreach ($events as $event) {

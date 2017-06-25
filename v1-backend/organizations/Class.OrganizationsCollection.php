@@ -31,6 +31,17 @@ class OrganizationsCollection extends AbstractCollection
 
 		$db->beginTransaction();
 
+
+
+
+		$db->prepareExecuteRaw('CREATE TEMP TABLE IF NOT EXISTS temp_organization_ratings
+					(
+						organization_id INT,
+						score FLOAT
+					)
+					ON COMMIT DELETE ROWS;
+					', array());
+
 		$instance_class_name = 'Organization';
 
 		foreach ($filters as $name => $value) {
@@ -66,16 +77,6 @@ class OrganizationsCollection extends AbstractCollection
 					break;
 				}
 				case 'q': {
-
-
-
-					$db->prepareExecuteRaw('CREATE TEMP TABLE temp_organization_ratings
-					(
-						organization_id INT,
-						score FLOAT
-					)
-					ON COMMIT DELETE ROWS;
-					', array());
 
 					$params = [
 						'index' => 'organizations',
