@@ -422,6 +422,7 @@ class OrganizationsCollection extends AbstractCollection
 			Fields::parseFields('city_local_name,description,country_local_name,default_address,vk_url,facebook_url'),
 			array('length' => 10000)
 		)->getData();
+		$responses = array();
 		foreach ($organizations as $organization) {
 
 			$body = $organization;
@@ -436,16 +437,16 @@ class OrganizationsCollection extends AbstractCollection
 			} catch (Exception $e) {
 			}
 
-			$response = $client->index(array(
+			$responses[] = $client->index(array(
 				'index' => 'organizations',
 				'type' => 'organization',
 				'id' => $organization['id'],
 				'body' => $body
 			));
 
-			return $response;
-
 		}
+		return new Result(true, '', $responses);
+
 	}
 
 

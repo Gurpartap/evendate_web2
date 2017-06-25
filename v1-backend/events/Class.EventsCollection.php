@@ -689,6 +689,7 @@ class EventsCollection extends AbstractCollection
 			Fields::parseFields('tags,description,title'),
 			array('length' => 100000)
 		)->getData();
+		$responses = array();
 		foreach ($events as $event) {
 
 			$body = $event;
@@ -707,16 +708,16 @@ class EventsCollection extends AbstractCollection
 			} catch (Exception $e) {
 			}
 
-			$response = $client->index(array(
+			$responses[] = $client->index(array(
 				'index' => 'events',
 				'type' => 'event',
 				'id' => $event['id'],
 				'body' => $body
 			));
 
-			return $response;
-
 		}
+
+		return new Result(true, '', $responses);
 	}
 
 

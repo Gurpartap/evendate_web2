@@ -440,6 +440,17 @@ pg.connect(pg_conn_string, function (err, client, done) {
 
     }
 
+    function updateSearchIndexes() {
+        rest.get('http://localhost/api/v1/events/update/search')
+            .on('complete', function (e) {
+                console.log(e);
+            });
+        rest.get('http://localhost/api/v1/organizations/update/search')
+            .on('complete', function (e) {
+                console.log(e);
+            });
+    }
+
     try {
         new CronJob('*/1 * * * *', function () {
             if (config_index == 'prod' || args.indexOf('--resize-images') !== -1) {
@@ -512,8 +523,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
 //every day at 3:30 am
     try {
         new CronJob('30 2 * * *', function () {
-            rest.get('https://localhost/api/v1/events/update/search');
-            rest.get('https://localhost/api/v1/organizations/update/search');
+            updateSearchIndexes();
         }, null, true);
     } catch (ex) {
         logger.error(ex);
@@ -534,6 +544,11 @@ pg.connect(pg_conn_string, function (err, client, done) {
     if (args.indexOf('--schedule-emails-failed') !== -1) {
         let scheduler = new MailScheduler(client, handleError);
         scheduler.scheduleOrganizationRegistrationFailed();
+    }
+
+
+    if (args.indexOf('--update-search-index') !== -1) {
+        updateSearchIndexes();
     }
 
     if (args.indexOf('--schedule-emails-weekly') !== -1) {

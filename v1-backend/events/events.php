@@ -22,7 +22,7 @@ $__modules['events'] = array(
 			return EventsCollection::createElasticIndex();
 		},
 		'{update/search}' => function () use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
-			return EventsCollection::reindexCollection($__db, $__user);
+			return EventsCollection::reindexCollection($__db, $__user, array());
 		},
 
 		'{/(id:[0-9]+)/tickets/(uuid:\w+-\w+-\w+-\w+-\w+)/qr}' => function ($event_id, $uuid) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
