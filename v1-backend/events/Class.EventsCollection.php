@@ -2,6 +2,9 @@
 
 require_once 'Class.Event.php';
 require_once "{$BACKEND_FULL_PATH}/organizations/Class.PrivateOrganization.php";
+require_once "{$BACKEND_FULL_PATH}/vendor/autoload.php";
+use Elasticsearch\ClientBuilder;
+
 
 class EventsCollection extends AbstractCollection
 {
@@ -90,6 +93,8 @@ class EventsCollection extends AbstractCollection
 		} else {
 			$is_editor = false;
 		}
+
+		$db->beginTransaction();
 
 		foreach ($filters as $name => $value) {
 			switch ($name) {
@@ -415,8 +420,53 @@ class EventsCollection extends AbstractCollection
 					break;
 				}
 				case 'q': {
-					$q_get_events->where('fts @@ to_tsquery(:search_stm)');
-					$statement_array[':search_stm'] = App::prepareSearchStatement($value);
+
+					$db->prepareExecuteRaw('CREATE TEMP TABLE temp_event_ratings
+					(
+						event_id INT,
+						score FLOAT
+					)
+					ON COMMIT DELETE ROWS;
+					', array());
+
+					$params = [
+						'index' => 'events',
+						'type' => 'event',
+						'body' => [
+							'query' => [
+								'multi_match' => [
+									'query' => $value,
+									'type' => 'cross_fields',
+									'fields' => ['title^5', 'description^2', 'tags^3', 'location'],
+									"operator" => "or"
+								]
+							]
+						]
+					];
+
+
+					$client = ClientBuilder::create()->build();
+					$results = $client->search($params);
+
+					$q_ins_ratings = App::queryFactory()->newInsert()
+						->into('temp_event_ratings');
+
+					if (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
+						foreach ($results['hits']['hits'] as $item) {
+							$q_ins_ratings->addRow(array(
+								'event_id' => $item['_id'],
+								'score' => $item['_score'],
+							));
+						}
+						$db->prepareExecute($q_ins_ratings);
+						$q_get_events->where('id IN (SELECT event_id FROM temp_event_ratings)');
+					}else{
+						$q_get_events->where('1 = 2');
+					}
+					$fields[] = Event::SEARCH_SCORE_FIELD_NAME;
+					$_fields[] = Event::getAdditionalCols()[Event::SEARCH_SCORE_FIELD_NAME];
+
+
 					break;
 				}
 				case 'tags': {
@@ -546,8 +596,8 @@ class EventsCollection extends AbstractCollection
 			$statement_array[':my_email'] = App::getCurrentUser()->getEmail();
 		}
 
-
 		$events = $db->prepareExecute($q_get_events, 'CANT_GET_EVENTS', $statement_array)->fetchAll(PDO::FETCH_CLASS, 'Event');
+		$db->commit();
 		if (count($events) == 0 && $is_one_event) throw new LogicException('CANT_FIND_EVENT');
 		$result_events = array();
 		if ($is_one_event) return $events[0];
@@ -565,4 +615,110 @@ class EventsCollection extends AbstractCollection
 		$event = self::filter($db, $user, array('id' => $id), $fields);
 		return $event;
 	}
+
+	public static function createElasticIndex()
+	{
+		$client = ClientBuilder::create()->build();
+
+		$params = [
+			'index' => 'events',
+			'body' => [
+				'settings' => [
+					'analysis' => [
+						'filter' => [
+							'russian_stop' => [
+								"type" => "stop",
+								"stopwords" => "_russian_"
+							],
+							"russian_stemmer" => [
+								"type" => "stemmer",
+								"language" => "russian"
+							]
+						],
+						'analyzer' => [
+							"russian" => [
+								"tokenizer" => "standard",
+								"filter" => [
+									"lowercase",
+									"russian_stop",
+									"russian_morphology",
+									"english_morphology",
+									"russian_stemmer"
+								]
+							]
+						]
+					]
+				],
+				'mappings' => [
+					'_default_' => [
+						'properties' => [
+							'title' => [
+								'type' => 'text',
+								"analyzer" => "russian"
+							],
+							'description' => [
+								'type' => 'text',
+								"analyzer" => "russian"
+							],
+							'location' => [
+								'type' => 'text',
+								"analyzer" => "russian"
+							],
+							'tags' => [
+								'type' => 'text',
+								"analyzer" => "russian"
+							]
+						]
+					]
+				]
+			]
+		];
+		$result = $client->indices()->create($params);
+		return $result;
+	}
+
+	public static function reindexCollection(ExtendedPDO $__db, AbstractUser $__user, array $filters = array())
+	{
+
+		$client = ClientBuilder::create()->build();
+
+		$events = EventsCollection::filter(
+			$__db,
+			$__user,
+			$filters,
+			Fields::parseFields('tags,description,title'),
+			array('length' => 100000)
+		)->getData();
+		$responses = array();
+		foreach ($events as $event) {
+
+			$body = $event;
+			$body['tags'] = array();
+			foreach ($event['tags'] as $tag) {
+				$body['tags'][] = $tag['name'];
+			}
+
+			try {
+				$client->delete(array(
+					'index' => 'events',
+					'type' => 'event',
+					'id' => $event['id']
+				));
+
+			} catch (Exception $e) {
+			}
+
+			$responses[] = $client->index(array(
+				'index' => 'events',
+				'type' => 'event',
+				'id' => $event['id'],
+				'body' => $body
+			));
+
+		}
+
+		return new Result(true, '', $responses);
+	}
+
+
 }
