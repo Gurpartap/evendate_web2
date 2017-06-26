@@ -22,3 +22,6 @@ begin
   return query select 0::float;
 end
 $$ language plpgsql stable;
+
+
+ALTER TABLE registration_form_fields ADD COLUMN order_number INT;
