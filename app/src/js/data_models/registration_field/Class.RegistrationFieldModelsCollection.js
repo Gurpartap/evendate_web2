@@ -35,7 +35,7 @@ RegistrationFieldModelsCollection = extending(EntitiesCollection, (function() {
 				self.last_pushed.push(self[self.length++] = (entity instanceof self.collection_of) ? entity : (new self.collection_of()).setData(entity));
 			}
 		});
-		this.sortByType();
+		//this.sortByType();
 		
 		return this.length;
 	};
@@ -44,11 +44,10 @@ RegistrationFieldModelsCollection = extending(EntitiesCollection, (function() {
 		var types_queue = [
 			RegistrationFieldModel.TYPES.LAST_NAME,
 			RegistrationFieldModel.TYPES.FIRST_NAME,
-			RegistrationFieldModel.TYPES.EMAIL,
-			RegistrationFieldModel.TYPES.PHONE_NUMBER
+			RegistrationFieldModel.TYPES.EMAIL
 		];
 		
-		return this.sort(function(a, b) {
+		this.sort(function(a, b) {
 			var a_i = types_queue.indexOf(a.type),
 				b_i = types_queue.indexOf(b.type);
 			
@@ -66,6 +65,8 @@ RegistrationFieldModelsCollection = extending(EntitiesCollection, (function() {
 			
 			return 0;
 		});
+		
+		return this;
 	};
 	
 	return RegistrationFieldModelsCollection;
