@@ -991,8 +991,11 @@ fieldset:disabled .form_select {cursor: default}
 }
 
 .form_fieldset {
-	margin: 24px 0 36px;
 	padding: 12px 24px;
+}
+
+.form_fieldset.-color_marginal {
+	margin: 24px 0 36px;
 	background-color: #f6f6f6;
 	background-color: var(--color_gray_material);
 	border-radius: 2px;
@@ -1004,7 +1007,7 @@ fieldset:disabled .form_select {cursor: default}
 }
 
 :not(select).form_select:after {
-	content: "\f0d7";
+	content: "\f073";
 	position: absolute;
 	right: 0;
 	top: 0;
@@ -1309,7 +1312,10 @@ fieldset:disabled .form_select {cursor: default}
 	text-align: right;
 }
 
-/* /Form -inline */
+.-inline > .form_input,
+.-inline > .form_textarea {flex: 1}
+
+	/* /Form -inline */
 /* /Form flat */
 
 .form_input.-flat {
@@ -1339,11 +1345,14 @@ fieldset:disabled .form_select {cursor: default}
 	margin-bottom: .875em;
 }
 .form_group.-valign_baseline {align-items: baseline}
+.form_group.-align_left {justify-content: flex-start}
+.form_group.-align_right {justify-content: flex-end}
 .form_group > .form_unit {
 	display: inline-block;
 	vertical-align: top;
 	margin-bottom: 0;
 }
+.form_group > .form_unit + .form_unit {margin-left: 12px}
 .form_group > .form_unit.-inline {display: inline-flex}
 
 .form_group.-parts_e_2 > .form_unit,
@@ -4370,6 +4379,10 @@ body,
 	line-height: 1;
 	font-weight: 100;
 	opacity: .5;
+}
+
+.edit_event_ticket_type_expanded {
+	padding: 24px;
 }
 
 

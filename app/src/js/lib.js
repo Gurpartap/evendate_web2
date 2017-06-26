@@ -1949,9 +1949,13 @@ function bindShareButtons($parent) {
 
 function bindSelect2($parent) {
 	$parent = $parent ? $parent : $('body');
-	$parent.find('.ToSelect2').not('.-Handled_ToSelect2').each(function(i, el) {
+	var $selects = $parent.is('.ToSelect2') ? $parent : $parent.find('.ToSelect2');
+	
+	$selects.not('.-Handled_ToSelect2').each(function(i, el) {
 		initSelect2($(el));
 	}).addClass('-Handled_ToSelect2');
+	
+	return $selects;
 }
 
 function bindRippleEffect($parent) {
@@ -2058,8 +2062,10 @@ function bindFileLoadButton($parent) {
 
 function bindCollapsing($parent) {
 	$parent = $parent ? $parent : $('body');
-	$parent.find('.Collapsing').not('.-Handled_Collapsing').each(function() {
+	$parent.find('.CollapsingWrapper').not('.-Handled_Collapsing').each(function() {
 		var $instance = $(this),
+			$wrapper = $instance,
+			$collapsing_parent = $wrapper.closest('.Collapsing'),
 			collapsing_id = $instance.data('collapsing_id'),
 			mutation_observer = new MutationObserver(function(records) {
 				var $target = $(records[records.length - 1].target),
@@ -2076,20 +2082,12 @@ function bindCollapsing($parent) {
 				});
 			}),
 			default_height,
-			$wrapper,
-			$content,
-			$trigger,
-			trigger_event;
+			$content = $wrapper.children('.CollapsingContent');
 		
-		if(collapsing_id){
-			$wrapper = $instance.find('.CollapsingWrapper[data-collapsing_id="'+collapsing_id+'"]');
-			$trigger = $instance.find('.CollapsingTrigger[data-collapsing_id="'+collapsing_id+'"]');
-		} else {
-			$wrapper = $instance.find('.CollapsingWrapper:first');
-			$trigger = $instance.find('.CollapsingTrigger:first');
-		}
-		$content = $wrapper.children('.CollapsingContent');
-		trigger_event = $trigger.is(':checkbox') || $trigger.is(':radio') ? 'change' : 'click';
+		$collapsing_parent = $collapsing_parent.length ? $collapsing_parent : $parent;
+		
+		$instance.$trigger = $collapsing_parent.find(collapsing_id ? '.CollapsingTrigger[data-collapsing_id="'+collapsing_id+'"]' : '.CollapsingTrigger:first');
+		
 		
 		if($wrapper.hasClass('-fading')){
 			default_height = $instance.data('defaultHeight') < $content.height() ? $instance.data('defaultHeight') : $content.height();
@@ -2102,8 +2100,10 @@ function bindCollapsing($parent) {
 		
 		function toggleCollapsing(){
 			var parent_Tabs = $wrapper.parents('.Tabs').resolveInstance();
-			
-			parent_Tabs.disconnectMutationObserver();
+			debugger;
+			if (parent_Tabs.length) {
+				parent_Tabs.disconnectMutationObserver();
+			}
 			$wrapper.addClass('-in_progress');
 			if ($instance.hasClass(__C.CLASSES.ACTIVE)) {
 				$wrapper.height(default_height);
@@ -2112,32 +2112,52 @@ function bindCollapsing($parent) {
 			}
 			$wrapper.toggleClass('-opened');
 			$instance.toggleClass(__C.CLASSES.ACTIVE);
-			parent_Tabs.connectMutationObserver();
-		}
-		
-		function changeProp(){
-			if (trigger_event === 'change') {
-				$trigger.prop('checked', !$trigger.prop('checked'));
+			if (parent_Tabs.length) {
+				parent_Tabs.connectMutationObserver();
 			}
 		}
 		
+		function changeProp(){
+			$instance.$trigger.each(function() {
+				var $trigger = $(this);
+				
+				if ($trigger.is(':checkbox')) {
+					$trigger.prop('checked', !$trigger.prop('checked'));
+				}
+			});
+		}
+		
+		$instance.toggleCollapsing = function() {
+			changeProp();
+			toggleCollapsing();
+		};
+		
 		$instance.openCollapsing = function() {
 			if(!$instance.hasClass(__C.CLASSES.ACTIVE)){
-				changeProp();
-				toggleCollapsing();
+				$instance.toggleCollapsing();
 			}
 		};
 		
 		$instance.closeCollapsing = function() {
 			if($instance.hasClass(__C.CLASSES.ACTIVE)){
-				changeProp();
-				toggleCollapsing();
+				$instance.toggleCollapsing();
 			}
 		};
 		
-		$trigger.on(trigger_event+'.toggleCollapsing', function() {
-			toggleCollapsing();
-		});
+		$instance.bindTrigger = function($trigger) {
+			var trigger_event = $trigger.is(':checkbox') || $trigger.is(':radio') ? 'change' : 'click';
+			
+			if ($trigger) {
+				$trigger.on(trigger_event+'.toggleCollapsing', toggleCollapsing);
+				$instance.$trigger = $instance.$trigger.add($trigger);
+			} else {
+				$instance.$trigger.on(trigger_event+'.toggleCollapsing', toggleCollapsing);
+			}
+			
+			$instance.$trigger.addClass('-Handled_CollapsingTrigger');
+		};
+		
+		$instance.bindTrigger($instance.$trigger);
 		
 		$wrapper
 			.on('click', function(){
@@ -2146,6 +2166,7 @@ function bindCollapsing($parent) {
 			.on('transitionend', function() {
 				$wrapper.removeClass('-in_progress');
 			});
+		
 		
 		mutation_observer.observe($wrapper.get(0), {
 			childList: true,

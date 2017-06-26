@@ -264,7 +264,7 @@
 						<div class="tab_body TabsBody">
 							<h2>Продажа билетов</h2>
 							<p class="form_text">Настройте продажу билетов на ваше событие через Evendate</p>
-							<table class="event_edit_ticket_types_table table -simple_table -full_page_width">
+							<table class="event_edit_ticket_types_table table -simple_table -full_page_width Collapsing">
 								<thead>
 									<tr>
 										<th width="55%" align="left">Название</th>
@@ -414,7 +414,7 @@
 		<label class="form_label" for="edit_event_registration_{type}_field_enable"><span>{name}</span></label>
 	</div>
 	<input id="edit_event_registration_{type}_field_uuid" type="hidden" name="registration_{id}_field_uuid" value="{uuid}">
-	<div class="form_fieldset">
+	<div class="form_fieldset -color_marginal">
 		<p>{description}</p>
 		<fieldset class="Switching" data-switch_id="registration_{type}_field" disabled>
 			<input type="hidden" name="registration_{id}_field_type" value="{type}">
@@ -427,7 +427,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-edit-event-registration-custom-field">
-	<fieldset class="edit_event_registration_custom_field form_fieldset RegistrationCustomField">
+	<fieldset class="edit_event_registration_custom_field form_fieldset -color_marginal RegistrationCustomField">
 		<p class="form_text">В этом поле вы можете запросить у пользователей любые данные или задать вопрос.</p>
 		<input id="edit_event_registration_{id}_custom_field_enable" class="RegistrationFieldId" type="hidden" name="registration_fields" value="{id}">
 		<input id="edit_event_registration_{id}_custom_field_uuid" class="RegistrationCustomFieldUUID" type="hidden" name="registration_{id}_field_uuid" value="{uuid}">
@@ -468,7 +468,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-edit-event-registration-custom-field-value">
-	<div class="edit_event_registration_custom_field_value">
+	<div class="edit_event_registration_custom_field_value RegistrationFieldValue">
 		<input type="hidden" name="registration_{id}_field_{value_id}_value_uuid" value="{value_uuid}">
 		<input type="hidden" name="registration_{id}_field_values" value="{value_id}">
 		{checkbox_radio}
@@ -480,13 +480,73 @@
 <script type="javascript/template" id="tmpl-edit-event-tickets-row">
 	<tr>
 		<td><input class="form_input" name="ticket_type_{row_num}_name" value="{name}" placeholder="Название типа билета"></td>
-		<td><input class="form_input" type="number" name="ticket_type_{row_num}_quantity" value="{quantity}" placeholder="0"></td>
+		<td>{amount_input}</td>
 		<td>
 			<input class="TicketTypeId" type="hidden" name="ticket_types" value="{row_num}">
 			<div class="edit_event_ticket_type_last_column">
-				<input class="form_input" type="number" name="ticket_type_{row_num}_price" value="{price}" placeholder="0">
+				{price_input}
 				<button class="event_edit_ticket_type_expand_button action -color_marginal fa_icon fa-sliders TicketTypeExpandButton" type="button"></button>
-				<button class="event_edit_ticket_type_delete_button action -color_marginal TicketTypeDelete" type="button">&times;</button>
+				<button class="event_edit_ticket_type_delete_button action -color_marginal TicketTypeDeleteButton" type="button">&times;</button>
+			</div>
+		</td>
+	</tr>
+	<tr class="ExpandRow">
+		<td class="-no_padding" colspan="3">
+			<div class="collapsing_wrapper -inset CollapsingWrapper">
+				<div class="collapsing_content CollapsingContent">
+					<div class="edit_event_ticket_type_expanded">
+						<h3>Дополнительные настройки</h3>
+						<h4>Начало продажи билета</h4>
+						<p class="form_text">Момент времени, после которого начнутся продажи билетов этого типа</p>
+						<div class="form_fieldset">
+							<div class="form_group -align_left">
+								{tickets_sell_start_date_checkbox}
+								<fieldset class="form_unit Switching" data-switch_id="ticket_type_{row_num}_start_by_date">
+									{tickets_sell_start_date_select}
+								</fieldset>
+							</div>
+							<fieldset class="form_group -align_left" title="Эта функция доступна только с полным тарифом" disabled>
+								{tickets_sell_start_after_checkbox}
+								<fieldset class="form_unit Switching" data-switch_id="ticket_type_{row_num}_start_after">
+									{tickets_sell_start_after_select}
+								</fieldset>
+							</fieldset>
+						</div>
+
+						<h4>Конец продажи билета</h4>
+						<p class="form_text">Момент времени, до которого можно купить билеты этого типа</p>
+						<div class="form_fieldset form_group -align_left">
+							{tickets_sell_end_date_select}
+						</div>
+
+						<fieldset title="Эта функция доступна только с полным тарифом" disabled>
+							{promo_enable_checkbox}
+							<fieldset class="Switching" data-switch_id="ticket_type_{row_num}_promo" disabled>
+								<p class="form_text">При вводе этого слова подписчики получат скидку на стоимость билета этого типа</p>
+								<div class="form_group -align_left">
+									{promo_input}
+									{promo_effort_input}
+									<div class="form_unit -inline">
+										<label class="form_label">%</label>
+									</div>
+								</div>
+							</fieldset>
+						</fieldset>
+
+						<h4>Количество билетов за заказ</h4>
+						<p class="form_text">Задайте минимальное и максимальное число билетов этого типа в «одни руки»</p>
+						<div class="form_fieldset form_group">
+							{tickets_by_order_min_amount_input}
+							{tickets_by_order_max_amount_input}
+						</div>
+
+						<p class="form_text">Некоторые функции доступны только с <a href="/admin/organization/1/settings#change_tariff" class="link -color_accent Link BuySubscriptionLink">полным тарифом</a></p>
+
+						<div class="form_unit -align_center">
+							{close_expanded_button}
+						</div>
+					</div>
+				</div>
 			</div>
 		</td>
 	</tr>
@@ -495,49 +555,5 @@
 <script type="javascript/template" id="tmpl-edit-event-tickets-row-empty">
 	<tr class="EmptyRow">
 		<td colspan="3" align="center"><p class="form_text">Вы не добавили ни одного билета</p></td>
-	</tr>
-</script>
-
-<script type="javascript/template" id="tmpl-edit-event-tickets-row-expanded">
-	<tr class="ExpandRow">
-		<td class="-no_padding" colspan="3">
-			<div class="collapsing_wrapper CollapsingWrapper">
-				<div class="collapsing_content CollapsingContent">
-					<h3>Дополнительные настройки</h3>
-					<h4>Начало продажи билета</h4>
-					<p class="form_text">Момент времени, после которого начнутся продажи билетов этого типа</p>
-					<div class="form_group">
-						{tickets_sell_start_date_checkbox}
-						{tickets_sell_start_date_select}
-					</div>
-					<div class="form_group">
-						{tickets_sell_start_after_checkbox}
-						{tickets_sell_start_after_select}
-					</div>
-
-					<h4>Начало продажи билета</h4>
-					<p class="form_text">Момент времени, до которого можно купить билеты этого типа</p>
-					{tickets_sell_start_date_select}
-
-					{promo_enable_checkbox}
-					<p class="form_text">При вводе этого слова подписчики получат скидку на стоимость билета этого типа</p>
-					<div class="form_group">
-						{promo_input}
-						{promo_effort_input}
-					</div>
-
-					<h4>Количество билетов за заказ</h4>
-					<p class="form_text">Задайте минимальное и максимальное число билетов этого типа в «одни руки»</p>
-					<div class="form_group">
-						{tickets_by_order_min_amount_input}
-						{tickets_by_order_max_amount_input}
-					</div>
-
-					<div class="form_unit -align_center">
-						{close_expanded_button}
-					</div>
-				</div>
-			</div>
-		</td>
 	</tr>
 </script>

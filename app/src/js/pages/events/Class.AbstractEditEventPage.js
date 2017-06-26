@@ -246,7 +246,7 @@ AbstractEditEventPage = extending(Page, (function() {
 			}));
 		
 		$value.find('.RemoveValue').on('click.RemoveValue', function() {
-			$value.remove();
+			$(this).closest('.RegistrationFieldValue').remove();
 		});
 		
 		return $value;
@@ -259,34 +259,171 @@ AbstractEditEventPage = extending(Page, (function() {
 	 * @return {jQuery}
 	 */
 	AbstractEditEventPage.ticketTypeRowsBuilder = function(ticket_types) {
-		var _ticket_types = ticket_types ? (ticket_types instanceof Array ? ticket_types : [ticket_types]) : [{}];
+		var _ticket_types = ticket_types ? (ticket_types instanceof Array ? ticket_types : [ticket_types]) : [new OneTicketType()],
+			$rows = tmpl('edit-event-tickets-row', _ticket_types.map(function(ticket_type) {
+				var row_id = ++AbstractEditEventPage.lastTicketTypeRowId;
+				
+				return {
+					row_num: row_id,
+					name: ticket_type.name,
+					amount_input: __APP.BUILD.inputNumber({
+						id: 'event_edit_ticket_type_' + row_id + '_amount',
+						name: 'ticket_type_' + row_id + '_amount',
+						value: ticket_type.amount || '',
+						placeholder: 0,
+						required: true
+					}),
+					price_input: __APP.BUILD.inputNumber({
+						id: 'event_edit_ticket_type_' + row_id + '_price',
+						name: 'ticket_type_' + row_id + '_price',
+						value: ticket_type.price || '',
+						placeholder: 0,
+						required: true
+					}),
+					
+					tickets_sell_start_date_checkbox: __APP.BUILD.formUnit({
+						id: 'event_edit_ticket_type_' + row_id + '_start_by_date',
+						label: 'По дате',
+						type: 'checkbox',
+						name: 'ticket_type_' + row_id + '_start_by_date',
+						dataset: {
+							switch_id: 'ticket_type_' + row_id + '_start_by_date'
+						},
+						classes: ['TicketTypeStartByDateSwitch', 'Switch'],
+						unit_classes: ['-inline']
+					}),
+					tickets_sell_start_date_select: __APP.BUILD.formUnit({
+						type: 'date',
+						name: 'ticket_type_' + row_id + '_sell_start_date',
+						value: ticket_type.formatted_sell_start_date
+					}),
+					tickets_sell_start_after_checkbox: __APP.BUILD.formUnit({
+						id: 'event_edit_ticket_type_' + row_id + '_start_after',
+						label: 'По истечении продаж билета',
+						type: 'checkbox',
+						name: 'ticket_type_' + row_id + '_start_after',
+						dataset: {
+							switch_id: 'ticket_type_' + row_id + '_start_after'
+						},
+						classes: ['TicketTypeStartAfterSwitch', 'Switch'],
+						unit_classes: ['-inline']
+					}),
+					tickets_sell_start_after_select: bindSelect2(__APP.BUILD.select([{
+						display_name: 'Выберите',
+						val: ''
+					}], {name: 'ticket_type_' + row_id + '_start_after_uuid'})),
+					tickets_sell_end_date_select: __APP.BUILD.formUnit({
+						label: 'Дата',
+						type: 'date',
+						name: 'ticket_type_' + row_id + '_sell_end_date',
+						value: ticket_type.formatted_sell_end_date,
+						unit_classes: ['-inline']
+					}),
+					promo_enable_checkbox: __APP.BUILD.formUnit({
+						id: 'event_edit_ticket_type_' + row_id + '_promo_checkbox',
+						label: 'Промокод',
+						type: 'checkbox',
+						name: 'ticket_type_' + row_id + '_promo_checkbox',
+						dataset: {
+							switch_id: 'ticket_type_' + row_id + '_promo'
+						},
+						classes: ['TicketTypePromoSwitch', 'Switch'],
+						unit_classes: ['form_accent_block', '-inline']
+					}),
+					promo_input: __APP.BUILD.formUnit({
+						id: 'event_edit_ticket_type_' + row_id + '_promocode',
+						label: 'Слово',
+						name: 'ticket_type_' + row_id + '_promocode',
+						value: ticket_type.promocode,
+						unit_classes: ['-inline'],
+						required: true
+					}),
+					promo_effort_input: __APP.BUILD.formUnit({
+						id: 'event_edit_ticket_type_' + row_id + '_promocode_effort',
+						type: 'number',
+						label: 'снизит стоимость на',
+						name: 'ticket_type_' + row_id + '_promocode_effort',
+						value: ticket_type.promocode_effort,
+						unit_classes: ['-inline'],
+						required: true,
+						attributes: {
+							size: 2
+						}
+					}),
+					tickets_by_order_min_amount_input: __APP.BUILD.formUnit({
+						id: 'event_edit_ticket_type_' + row_id + '_min_count_per_user',
+						type: 'number',
+						label: 'Минимум',
+						name: 'ticket_type_' + row_id + '_min_count_per_user',
+						value: ticket_type.min_count_per_user || 1,
+						unit_classes: ['-inline'],
+						required: true,
+						attributes: {
+							size: 6
+						}
+					}),
+					tickets_by_order_max_amount_input: __APP.BUILD.formUnit({
+						id: 'event_edit_ticket_type_' + row_id + '_max_count_per_user',
+						type: 'number',
+						label: 'Максимум',
+						name: 'ticket_type_' + row_id + '_max_count_per_user',
+						value: ticket_type.max_count_per_user || 1,
+						unit_classes: ['-inline'],
+						attributes: {
+							size: 6
+						}
+					}),
+					close_expanded_button: __APP.BUILD.actionButton({
+						title: 'Скрыть настройки',
+						classes: ['-color_marginal', 'TicketTypeHideButton']
+					}).on('click.HideTicketType', function() {
+						$(this).closest('.CollapsingWrapper').resolveInstance().closeCollapsing();
+					})
+				};
+			}));
 		
-		return tmpl('edit-event-tickets-row', _ticket_types.map(function(ticket_type) {
-			
-			return {
-				row_num: AbstractEditEventPage.lastTicketTypeRowId++,
-				name: ticket_type.name,
-				quantity: ticket_type.amount,
-				price: ticket_type.price
-			};
-		})).each(function(i) {
-			var $row = $(this);
+		bindControlSwitch($rows);
+		bindCollapsing($rows);
+		bindPageLinks($rows);
+		
+		$rows.not('.ExpandRow').each(function(i) {
+			var $row = $(this),
+				$expanded_row = $row.next('.ExpandRow');
 			
 			$row.data('ticket_type', _ticket_types[i]);
 			
 			$row.find('.TicketTypeExpandButton').on('click.ExpandTicketType', function() {
-				if ($row.next().length && $row.next().is('.ExpandRow')) {
+				$expanded_row.find('.CollapsingWrapper').resolveInstance().toggleCollapsing();
+			});
+			
+			$row.find('.TicketTypeDeleteButton').on('click.DeleteTicketType', function() {
+				var $parent = $row.parent();
 				
-				} else {
-					$row.after(AbstractEditEventPage.ticketTypeExpandRowBuilder($row.find('.TicketTypeId').val()));
+				$expanded_row.remove();
+				$row.remove();
+				
+				if (!$parent.children().length) {
+					$parent.append(tmpl('edit-event-tickets-row-empty'));
 				}
 			});
+			
 		});
-	};
-	
-	AbstractEditEventPage.ticketTypeExpandRowBuilder = function(row_id) {
 		
-		return tmpl('edit-event-tickets-row-expanded');
+		$rows.filter('.ExpandRow').each(function(i) {
+			var $expanded_row = $(this);
+			
+			$expanded_row.data('ticket_type', _ticket_types[i]);
+			
+			if (_ticket_types[i].sell_start_date) {
+				$expanded_row.find('.TicketTypeStartByDateSwitch').prop('checked', true).trigger('change');
+			}
+			if (_ticket_types[i].promocode) {
+				$expanded_row.find('.TicketTypePromoSwitch').prop('checked', true).trigger('change');
+			}
+			
+		});
+		
+		return $rows;
 	};
 	
 	AbstractEditEventPage.prototype.fetchData = function() {

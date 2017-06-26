@@ -95,6 +95,33 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @param {HTMLAttributes} [attributes]
+	 * @param {(Array<string>|string)} [classes]
+	 * @param {HTMLDataset} [dataset]
+	 *
+	 * @returns {jQuery}
+	 */
+	Builder.prototype.inputNumber = function buildInput(attributes, classes, dataset) {
+		attributes = attributes ? attributes : {};
+		classes = classes ? classes : [];
+		dataset = dataset ? dataset : {};
+		
+		return this.input(
+			attributes,
+			classes.concat('form_input'),
+			dataset
+		).inputmask({
+			alias: 'numeric',
+			autoGroup: false,
+			digits: 2,
+			digitsOptional: true,
+			allowPlus: false,
+			allowMinus: false,
+			rightAlign: false
+		});
+	};
+	/**
+	 *
 	 * @param {Array<buildProps>} values
 	 * @param {HTMLAttributes} [attributes]
 	 * @param {(Array<string>|string)} [classes]
@@ -433,21 +460,13 @@ Builder = (function() {
 								}
 								case 'number': {
 									
-									return self.input(
+									return self.inputNumber(
 										$.extend({}, props.attributes, defined_attributes, {
 											autocomplete: 'off', value: (props.value != null) ? props.value : undefined
 										}),
-										classes.concat('form_input'),
+										classes,
 										props.dataset
-									).inputmask({
-										alias: 'numeric',
-										autoGroup: false,
-										digits: 2,
-										digitsOptional: true,
-										allowPlus: false,
-										allowMinus: false,
-										rightAlign: false
-									});
+									);
 								}
 								default: {
 									
