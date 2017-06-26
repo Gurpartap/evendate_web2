@@ -29,19 +29,6 @@ class OrganizationsCollection extends AbstractCollection
 			->distinct()
 			->from('view_organizations');
 
-		$db->beginTransaction();
-
-
-
-
-		$db->prepareExecuteRaw('CREATE TEMP TABLE IF NOT EXISTS temp_organization_ratings
-					(
-						organization_id INT,
-						score FLOAT
-					)
-					ON COMMIT DELETE ROWS;
-					', array());
-
 		$instance_class_name = 'Organization';
 
 		foreach ($filters as $name => $value) {
@@ -78,6 +65,19 @@ class OrganizationsCollection extends AbstractCollection
 				}
 				case 'q': {
 
+					$db->beginTransaction();
+
+
+					$db->prepareExecuteRaw('CREATE TEMP TABLE IF NOT EXISTS temp_organization_ratings
+					(
+						organization_id INT,
+						score FLOAT
+					)
+					ON COMMIT DELETE ROWS;
+					', array());
+
+					$should_end_transaction = true;
+
 					$params = [
 						'index' => 'organizations',
 						'type' => 'organization',
@@ -109,7 +109,7 @@ class OrganizationsCollection extends AbstractCollection
 						}
 						$db->prepareExecute($q_ins_ratings);
 						$q_get_organizations->where('id IN (SELECT organization_id FROM temp_organization_ratings)');
-					}else{
+					} else {
 						$q_get_organizations->where('1 = 2');
 					}
 					$fields[] = Organization::SEARCH_SCORE_FIELD_NAME;
@@ -282,7 +282,9 @@ class OrganizationsCollection extends AbstractCollection
 		$organizations = $p_search = $db
 			->prepareExecute($q_get_organizations, '', $statement_array)
 			->fetchAll(PDO::FETCH_CLASS, $instance_class_name);
-		$db->commit();
+		if (isset($should_end_transaction) && $should_end_transaction){
+			$db->commit();
+		}
 
 		if ($return_one) {
 			if (count($organizations) < 1) throw new LogicException('CANT_FIND_ORGANIZATION');
@@ -326,7 +328,6 @@ class OrganizationsCollection extends AbstractCollection
 		);
 		return $organization;
 	}
-
 
 
 	public static function createElasticIndex()
@@ -415,14 +416,21 @@ class OrganizationsCollection extends AbstractCollection
 	public static function reindexCollection(ExtendedPDO $__db, AbstractUser $__user, array $filters = array())
 	{
 		$client = ClientBuilder::create()->build();
+		$fields = Fields::parseFields('city_local_name,description,country_local_name,default_address,vk_url,facebook_url');
 
 		$organizations = OrganizationsCollection::filter(
 			$__db,
 			$__user,
 			$filters,
-			Fields::parseFields('city_local_name,description,country_local_name,default_address,vk_url,facebook_url'),
+			$fields,
 			array('length' => 10000)
-		)->getData();
+		);
+		if ($organizations instanceof Organization) {
+			$organizations = array($organizations->getParams($__user, $fields)->getData());
+		} else {
+			$organizations = $organizations->getData();
+		}
+
 		$responses = array();
 		foreach ($organizations as $organization) {
 
