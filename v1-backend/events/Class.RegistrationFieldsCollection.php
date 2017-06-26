@@ -11,7 +11,7 @@ class RegistrationFieldsCollection extends AbstractCollection
 		array $filters = null,
 		array $fields = null,
 		array $pagination = null,
-		array $order_by = array('id'))
+		array $order_by = array('order_number'))
 	{
 
 		$q_get_fields = App::queryFactory()->newSelect();
