@@ -223,8 +223,7 @@ class Event extends AbstractEntity
 			AND is_active = TRUE 
 			AND view_tickets.user_id = :user_id)::INT AS ' . self::ORDERS_COUNT_FIELD_NAME,
 
-		self::SEARCH_SCORE_FIELD_NAME => '(SELECT score::FLOAT FROM temp_event_ratings WHERE event_id = view_events.id)::FLOAT AS ' . self::SEARCH_SCORE_FIELD_NAME,
-
+		self::SEARCH_SCORE_FIELD_NAME => '(SELECT get_event_search_score(view_events.id)) AS ' . self::SEARCH_SCORE_FIELD_NAME,
 		self::IS_SEEN_FIELD_NAME => '(
 		SELECT
 			COUNT(ve.id)

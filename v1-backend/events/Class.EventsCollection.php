@@ -22,7 +22,7 @@ class EventsCollection extends AbstractCollection
 				&& is_array($params['privileges'])
 				&& count($params['privileges']) > 0
 			);
-		}else{
+		} else {
 			return false;
 		}
 	}
@@ -95,17 +95,6 @@ class EventsCollection extends AbstractCollection
 		} else {
 			$is_editor = false;
 		}
-
-		$db->beginTransaction();
-
-
-		$db->prepareExecuteRaw('CREATE TEMP TABLE IF NOT EXISTS temp_event_ratings
-					(
-						event_id INT,
-						score FLOAT
-					)
-					ON COMMIT DELETE ROWS;
-					', array());
 
 		foreach ($filters as $name => $value) {
 			switch ($name) {
@@ -432,6 +421,18 @@ class EventsCollection extends AbstractCollection
 				}
 				case 'q': {
 
+					$db->beginTransaction();
+
+
+					$db->prepareExecuteRaw('CREATE TEMP TABLE IF NOT EXISTS temp_event_ratings
+					(
+						event_id INT,
+						score FLOAT
+					)
+					ON COMMIT DELETE ROWS;
+					', array());
+
+					$should_end_transaction = true;
 
 					$params = [
 						'index' => 'events',
@@ -464,7 +465,7 @@ class EventsCollection extends AbstractCollection
 						}
 						$db->prepareExecute($q_ins_ratings);
 						$q_get_events->where('id IN (SELECT event_id FROM temp_event_ratings)');
-					}else{
+					} else {
 						$q_get_events->where('1 = 2');
 					}
 					$fields[] = Event::SEARCH_SCORE_FIELD_NAME;
@@ -601,7 +602,11 @@ class EventsCollection extends AbstractCollection
 		}
 
 		$events = $db->prepareExecute($q_get_events, 'CANT_GET_EVENTS', $statement_array)->fetchAll(PDO::FETCH_CLASS, 'Event');
-		$db->commit();
+
+		if (isset($should_end_transaction) && $should_end_transaction) {
+			$db->commit();
+		}
+
 		if (count($events) == 0 && $is_one_event) throw new LogicException('CANT_FIND_EVENT');
 		$result_events = array();
 		if ($is_one_event) return $events[0];
@@ -686,14 +691,21 @@ class EventsCollection extends AbstractCollection
 
 		$client = ClientBuilder::create()->build();
 
-		$events = EventsCollection::filter(
+		$fields = Fields::parseFields('tags,description,title');
+
+		$events = self::filter(
 			$__db,
 			$__user,
 			$filters,
-			Fields::parseFields('tags,description,title'),
+			$fields,
 			array('length' => 100000),
 			array('id DESC')
-		)->getData();
+		);
+		if ($events instanceof Event) {
+			$events = array($events->getParams($__user, $fields)->getData());
+		} else {
+			$events = $events->getData();
+		}
 		$responses = array();
 		foreach ($events as $event) {
 
