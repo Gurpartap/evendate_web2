@@ -1,5 +1,9 @@
 <?php
 
+require_once "{$BACKEND_FULL_PATH}/vendor/autoload.php";
+use Elasticsearch\ClientBuilder;
+
+
 class OrganizationsCollection extends AbstractCollection
 {
 
@@ -24,6 +28,19 @@ class OrganizationsCollection extends AbstractCollection
 		$q_get_organizations
 			->distinct()
 			->from('view_organizations');
+
+		$db->beginTransaction();
+
+
+
+
+		$db->prepareExecuteRaw('CREATE TEMP TABLE IF NOT EXISTS temp_organization_ratings
+					(
+						organization_id INT,
+						score FLOAT
+					)
+					ON COMMIT DELETE ROWS;
+					', array());
 
 		$instance_class_name = 'Organization';
 
@@ -60,8 +77,45 @@ class OrganizationsCollection extends AbstractCollection
 					break;
 				}
 				case 'q': {
-					$q_get_organizations->where('fts @@ to_tsquery(:search_stm)');
-					$statement_array[':search_stm'] = App::prepareSearchStatement($value);
+
+					$params = [
+						'index' => 'organizations',
+						'type' => 'organization',
+						'body' => [
+							'query' => [
+								'multi_match' => [
+									'query' => $value,
+									'type' => 'cross_fields',
+									'fields' => ['name^5', 'short_name^5', 'description^2', 'type_name^3', 'city_local_name', 'country_local_name', 'default_address', 'vk_url', 'facebook_url'],
+									"operator" => "or"
+								]
+							]
+						]
+					];
+
+
+					$client = ClientBuilder::create()->build();
+					$results = $client->search($params);
+
+					$q_ins_ratings = App::queryFactory()->newInsert()
+						->into('temp_organization_ratings');
+
+					if (isset($results['hits']['hits']) && count($results['hits']['hits']) > 0) {
+						foreach ($results['hits']['hits'] as $item) {
+							$q_ins_ratings->addRow(array(
+								'organization_id' => $item['_id'],
+								'score' => $item['_score'],
+							));
+						}
+						$db->prepareExecute($q_ins_ratings);
+						$q_get_organizations->where('id IN (SELECT organization_id FROM temp_organization_ratings)');
+					}else{
+						$q_get_organizations->where('1 = 2');
+					}
+					$fields[] = Organization::SEARCH_SCORE_FIELD_NAME;
+					$cols[] = Organization::getAdditionalCols()[Organization::SEARCH_SCORE_FIELD_NAME];
+
+
 					break;
 				}
 				case 'invitation_key': {
@@ -228,6 +282,7 @@ class OrganizationsCollection extends AbstractCollection
 		$organizations = $p_search = $db
 			->prepareExecute($q_get_organizations, '', $statement_array)
 			->fetchAll(PDO::FETCH_CLASS, $instance_class_name);
+		$db->commit();
 
 		if ($return_one) {
 			if (count($organizations) < 1) throw new LogicException('CANT_FIND_ORGANIZATION');
@@ -271,4 +326,129 @@ class OrganizationsCollection extends AbstractCollection
 		);
 		return $organization;
 	}
+
+
+
+	public static function createElasticIndex()
+	{
+
+		$client = ClientBuilder::create()->build();
+
+
+		$params = [
+			'index' => 'organizations',
+			'body' => [
+				'settings' => [
+					'analysis' => [
+						'filter' => [
+							'russian_stop' => [
+								"type" => "stop",
+								"stopwords" => "_russian_"
+							],
+							"russian_stemmer" => [
+								"type" => "stemmer",
+								"language" => "russian"
+							]
+						],
+						'analyzer' => [
+							"russian" => [
+								"tokenizer" => "standard",
+								"filter" => [
+									"lowercase",
+									"russian_stop",
+									"russian_morphology",
+									"english_morphology",
+									"russian_stemmer"
+								]
+							]
+						]
+					]
+				],
+				'mappings' => [
+					'_default_' => [
+						'properties' => [
+							'name' => [
+								'type' => 'text',
+								"analyzer" => "russian"
+							],
+							'short_name' => [
+								'type' => 'text',
+								"analyzer" => "russian"
+							],
+							'description' => [
+								'type' => 'text',
+								"analyzer" => "russian"
+							],
+							'type_name' => [
+								'type' => 'text',
+								"analyzer" => "russian"
+							],
+							'city_local_name' => [
+								'type' => 'text',
+								"analyzer" => "russian"
+							],
+							'country_local_name' => [
+								'type' => 'text',
+								"analyzer" => "russian"
+							],
+							'default_address' => [
+								'type' => 'text',
+								"analyzer" => "russian"
+							],
+							'vk_url' => [
+								'type' => 'text',
+								"analyzer" => "russian"
+							],
+							'facebook_url' => [
+								'type' => 'text',
+								"analyzer" => "russian"
+							]
+						]
+					]
+				]
+			]
+		];
+		$result = $client->indices()->create($params);
+		return $result;
+	}
+
+	public static function reindexCollection(ExtendedPDO $__db, AbstractUser $__user, array $filters = array())
+	{
+		$client = ClientBuilder::create()->build();
+
+		$organizations = OrganizationsCollection::filter(
+			$__db,
+			$__user,
+			$filters,
+			Fields::parseFields('city_local_name,description,country_local_name,default_address,vk_url,facebook_url'),
+			array('length' => 10000)
+		)->getData();
+		$responses = array();
+		foreach ($organizations as $organization) {
+
+			$body = $organization;
+
+			try {
+				$client->delete(array(
+					'index' => 'organizations',
+					'type' => 'organization',
+					'id' => $organization['id']
+				));
+
+			} catch (Exception $e) {
+			}
+
+			$responses[] = $client->index(array(
+				'index' => 'organizations',
+				'type' => 'organization',
+				'id' => $organization['id'],
+				'body' => $body
+			));
+
+		}
+		return new Result(true, '', $responses);
+
+	}
+
+
 }

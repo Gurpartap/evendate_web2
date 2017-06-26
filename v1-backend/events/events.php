@@ -10,9 +10,21 @@ require_once $BACKEND_FULL_PATH . '/events/Class.Notification.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.NotificationsCollection.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.OrdersCollection.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.Order.php';
+require_once $BACKEND_FULL_PATH . '/search/Class.ElasticUpdater.php';
+
 
 $__modules['events'] = array(
 	'GET' => array(
+		'{update/drop-index}' => function () use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+			return EventsCollection::dropElasticIndex();
+		},
+		'{update/index}' => function () use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+			return EventsCollection::createElasticIndex();
+		},
+		'{update/search}' => function () use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+			return EventsCollection::reindexCollection($__db, $__user, array());
+		},
+
 		'{/(id:[0-9]+)/tickets/(uuid:\w+-\w+-\w+-\w+-\w+)/qr}' => function ($event_id, $uuid) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
 			$format = 'png';
 			$available_types = ['png', 'svg', 'pdf', 'eps'];
@@ -154,6 +166,7 @@ $__modules['events'] = array(
 				);
 		},
 		'search' => function () use ($__db, $__request, $__user, $__offset, $__length, $__fields, $__order_by) {
+
 			return EventsCollection::filter(
 				$__db,
 				$__user,
