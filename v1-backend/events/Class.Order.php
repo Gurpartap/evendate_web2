@@ -194,7 +194,6 @@ class Order extends AbstractEntity
 				'order_status_id' => self::STATUSES[$status_code]
 			))
 			->where('event_id = ?', $event->getId())
-			->where('user_id = ?', $user->getId())
 			->where('uuid = ?', $this->uuid);
 
 		App::DB()->prepareExecute($q_upd_order, 'CANT_UPDATE_ORDER');

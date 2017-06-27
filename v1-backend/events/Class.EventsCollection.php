@@ -603,6 +603,9 @@ class EventsCollection extends AbstractCollection
 
 		$events = $db->prepareExecute($q_get_events, 'CANT_GET_EVENTS', $statement_array)->fetchAll(PDO::FETCH_CLASS, 'Event');
 
+//		echo $q_get_events->getStatement();
+//		print_r($statement_array);
+
 		if (isset($should_end_transaction) && $should_end_transaction) {
 			$db->commit();
 		}
