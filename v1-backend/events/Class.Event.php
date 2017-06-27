@@ -200,12 +200,11 @@ class Event extends AbstractEntity
 			AND view_tickets.is_active = TRUE
 			AND users_organizations.user_id = :user_id)::INT AS ' . self::SOLD_TICKETS_COUNT_FIELD_NAME,
 
-		self::ORDERS_COUNT_FIELD_NAME => '(SELECT COALESCE(COUNT(view_tickets_orders.id)::INT, 0)
+		self::ORDERS_COUNT_FIELD_NAME => '(SELECT COALESCE(COUNT(view_tickets_orders.id)::INT, 0) ' . self::ORDERS_COUNT_FIELD_NAME . '
 			FROM view_tickets_orders
 			INNER JOIN events ON events.id = view_tickets_orders.event_id
 			INNER JOIN users_organizations ON users_organizations.organization_id = events.organization_id
 			WHERE view_tickets_orders.event_id = view_events.id 
-			AND view_tickets_orders.status = TRUE 
 			AND users_organizations.status = TRUE 
 			AND users_organizations.user_id = :user_id)::INT AS ' . self::ORDERS_COUNT_FIELD_NAME,
 
@@ -216,12 +215,12 @@ class Event extends AbstractEntity
 			AND is_active = TRUE 
 			AND view_tickets.user_id = :user_id)::INT AS ' . self::MY_TICKETS_COUNT_FIELD_NAME,
 
-		self::ORDERS_COUNT_FIELD_NAME => '(SELECT COALESCE(COUNT(view_tickets.id)::INT, 0)
-			FROM view_tickets
-			WHERE view_tickets.event_id = view_events.id 
-			AND status = TRUE
-			AND is_active = TRUE 
-			AND view_tickets.user_id = :user_id)::INT AS ' . self::ORDERS_COUNT_FIELD_NAME,
+//		self::ORDERS_COUNT_FIELD_NAME => '(SELECT COALESCE(COUNT(view_tickets.id)::INT, 0)
+//			FROM view_tickets
+//			WHERE view_tickets.event_id = view_events.id
+//			AND status = TRUE
+//			AND is_active = TRUE
+//			AND view_tickets.user_id = :user_id)::INT AS ' . self::ORDERS_COUNT_FIELD_NAME,
 
 		self::SEARCH_SCORE_FIELD_NAME => '(SELECT get_event_search_score(view_events.id)) AS ' . self::SEARCH_SCORE_FIELD_NAME,
 		self::IS_SEEN_FIELD_NAME => '(
@@ -1185,7 +1184,7 @@ class Event extends AbstractEntity
 			array('event' => $this),
 			Fields::parseFields($fields[self::REGISTRATION_FIELDS_FIELD_NAME]['fields'] ?? ''),
 			array(),
-			$order_by ?? $fields[self::REGISTRATION_FIELDS_FIELD_NAME]['order_by'] ?? array()
+			array('order_number')
 		);
 	}
 
@@ -1631,10 +1630,10 @@ class Event extends AbstractEntity
 
 		foreach ($filled_fields as $filled_field) {
 			if (isset($merged_fields[$filled_field['uuid']])) {
-				if (!is_array($filled_field['value'])) {
+				if (isset($filled_field['value']) && !is_array($filled_field['value'])) {
 					$merged_fields[$filled_field['uuid']]['value'] = trim($filled_field['value']);
 				} else {
-					$merged_fields[$filled_field['uuid']]['value'] = $filled_field['value'];
+					$merged_fields[$filled_field['uuid']]['value'] = $filled_field['value'] ?? null;
 				}
 				if (isset($filled_field['values']) && is_array($filled_field['values'])) {
 					$merged_fields[$filled_field['uuid']]['_values'] = $filled_field['values'];
@@ -1647,9 +1646,9 @@ class Event extends AbstractEntity
 		foreach ($merged_fields as $key => $final_field) {
 
 			if ($final_field['required'] == true) {
-				if (!isset($final_field['value'])
+				if ((!isset($final_field['value']) && !isset($final_field['values']))
 					|| (is_array($final_field['value']) && count($final_field['value']) < 1)
-					|| (!is_array($final_field['value']) && empty($final_field['value']))
+					|| (!is_array($final_field['value']) && empty($final_field['value']) && !is_array($final_field['values']) && empty($final_field['values']))
 				) {
 					$final_field['error'] = 'Поле обязательно для заполнения';
 					$errors[] = $final_field;
