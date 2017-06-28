@@ -262,19 +262,21 @@
 
 
 						<div class="tab_body TabsBody">
-							<h2>Продажа билетов</h2>
-							<p class="form_text">Настройте продажу билетов на ваше событие через Evendate</p>
-							<table class="event_edit_ticket_types_table table -simple_table -full_page_width Collapsing">
-								<thead>
-									<tr>
-										<th width="55%" align="left">Название</th>
-										<th width="10%" align="left">Количество</th>
-										<th width="35%" align="left">Цена, ₽</th>
-									</tr>
-								</thead>
-								<tbody class="TicketTypes">{ticket_types}</tbody>
-							</table>
-							<div class="form_unit -align_center">{add_ticket_type_button}</div>
+							<fieldset disabled>
+								<h2>Продажа билетов</h2>
+								<p class="form_text">Настройте продажу билетов на ваше событие через Evendate</p>
+								<table class="event_edit_ticket_types_table table -simple_table -full_page_width Collapsing">
+									<thead>
+										<tr>
+											<th width="55%" align="left">Название</th>
+											<th width="10%" align="left">Количество</th>
+											<th width="35%" align="left">Цена, ₽</th>
+										</tr>
+									</thead>
+									<tbody class="TicketTypes">{ticket_types}</tbody>
+								</table>
+								<div class="form_unit -align_center">{add_ticket_type_button}</div>
+							</fieldset>
 						</div>
 
 
@@ -479,11 +481,12 @@
 
 <script type="javascript/template" id="tmpl-edit-event-tickets-row">
 	<tr>
-		<td><input class="form_input" name="ticket_type_{row_num}_name" value="{name}" placeholder="Название типа билета"></td>
+		<td>{name_input}</td>
 		<td>{amount_input}</td>
 		<td>
 			<input class="TicketTypeId" type="hidden" name="ticket_types" value="{row_num}">
-			<div class="edit_event_ticket_type_last_column">
+			<input class="TicketType{row_num}UUID" type="hidden" name="ticket_type_{row_num}_uuid" value="{uuid}">
+			<div class="edit_event_ticket_type_last_column form_group">
 				{price_input}
 				<button class="event_edit_ticket_type_expand_button action -color_marginal fa_icon fa-sliders TicketTypeExpandButton" type="button"></button>
 				<button class="event_edit_ticket_type_delete_button action -color_marginal TicketTypeDeleteButton" type="button">&times;</button>
@@ -501,7 +504,7 @@
 						<div class="form_fieldset">
 							<div class="form_group -align_left">
 								{tickets_sell_start_date_checkbox}
-								<fieldset class="form_unit Switching" data-switch_id="ticket_type_{row_num}_start_by_date">
+								<fieldset class="form_unit Switching" data-switch_id="ticket_type_{row_num}_start_by_date" disabled>
 									{tickets_sell_start_date_select}
 								</fieldset>
 							</div>

@@ -1538,14 +1538,6 @@ fieldset:disabled .form_select {cursor: default}
 	cursor: pointer;
 }
 
-.form_datepicker {
-	display: flex;
-	align-items: center;
-	flex-grow: 0;
-	width: 200px;
-	cursor: pointer;
-}
-
 .form_fieldset {
 	padding: 12px 24px;
 }
@@ -1563,6 +1555,38 @@ fieldset:disabled .form_select {cursor: default}
 }
 
 :not(select).form_select:after {
+	content: "\f0d7";
+	position: absolute;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	height: 16px;
+	margin: auto .5rem;
+	font-family: FontAwesome;
+}
+
+/* Form DatePicker */
+
+
+.form_datepicker {
+	display: flex;
+	align-items: center;
+	flex-grow: 0;
+	width: 200px;
+	cursor: pointer;
+
+	padding: 0 24px 0 .6rem;
+	font-size: .9rem;
+	line-height: normal;
+
+	height: 32px;
+	border: 1px solid;
+	border-radius: 3px;
+	background-color: transparent;
+}
+
+
+.form_datepicker:after {
 	content: "\f073";
 	position: absolute;
 	right: 0;
@@ -1573,6 +1597,7 @@ fieldset:disabled .form_select {cursor: default}
 	font-family: FontAwesome;
 }
 
+/* /Form DatePicker */
 /* Form Select2 */
 
 .form_select2 {
@@ -4918,7 +4943,7 @@ body,
 }
 
 .edit_event_ticket_type_last_column {
-	display: flex;
+	margin-bottom: 0;
 }
 
 .event_edit_ticket_type_delete_button,

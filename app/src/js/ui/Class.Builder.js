@@ -103,7 +103,7 @@ Builder = (function() {
 	 */
 	Builder.prototype.inputNumber = function buildInput(attributes, classes, dataset) {
 		attributes = attributes ? attributes : {};
-		classes = classes ? classes : [];
+		classes = classes ? classes instanceof Array ? classes : classes.split(',') : [];
 		dataset = dataset ? dataset : {};
 		
 		return this.input(
@@ -131,7 +131,11 @@ Builder = (function() {
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.select = function buildSelect(values, attributes, classes, dataset, default_value) {
-		var $select =  tmpl('select', Builder.normalizeBuildProps({
+		var $select;
+		
+		values.unshift({id: '-1'});
+		
+		$select =  tmpl('select', Builder.normalizeBuildProps({
 			options: __APP.BUILD.option(values),
 			classes: classes,
 			attributes: attributes,
@@ -141,7 +145,7 @@ Builder = (function() {
 		if (dataset) {
 			$select.data(dataset);
 		}
-		$select.val(default_value ? default_value : (values[0].val || values[0].display_name));
+		$select.val(default_value ? default_value : '-1');
 		
 		return $select;
 	};
@@ -410,7 +414,7 @@ Builder = (function() {
 						}, ['label_classes'])) : '',
 						helptext: props.helptext ? self.formHelpText(props.helptext, props.helptext_dataset, props.helptext_attributes) : '',
 						form_element: (function(props) {
-							var classes = props.classes ? props.classes : [],
+							var classes = props.classes ? props.classes instanceof Array ? props.classes : props.classes.split(',') : [],
 								defined_attributes = {
 									id: props.id,
 									name: props.name,

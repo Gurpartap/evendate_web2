@@ -1733,6 +1733,31 @@ function localeFromNamespace(slug, namespace, locales) {
 }
 /**
  *
+ * @param {jQuery} $element
+ * @param {object} [options]
+ *
+ * @return {jQuery}
+ */
+function initSelect2($element, options) {
+	var opt = {
+		placeholder: 'Выберите',
+		allowClear: true,
+		containerCssClass: 'form_select2',
+		dropdownCssClass: 'form_select2_drop'
+	};
+	
+	if ($element.hasClass('-Handled_ToSelect2')) {
+		$element.select2('destroy');
+	}
+	if (options) {
+		$.extend(true, opt, options);
+	}
+	$element.select2(opt).addClass('-Handled_ToSelect2');
+	
+	return $element;
+}
+/**
+ *
  * @param {string} url
  * @param {(AJAXData|string)} [data]
  * @param {string} [content_type='application/x-www-form-urlencoded; charset=UTF-8']
@@ -1782,20 +1807,6 @@ function bindLimitInputSize($parent) {
 			$prompt.text(length + '/' + max);
 		})
 	}).addClass('-Handled_LimitSize');
-}
-
-function initSelect2($element, options) {
-	var opt = {
-		containerCssClass: 'form_select2',
-		dropdownCssClass: 'form_select2_drop'
-	};
-	if ($element.hasClass('-Handled_ToSelect2')) {
-		$element.select2('destroy');
-	}
-	if (options) {
-		$.extend(true, opt, options);
-	}
-	$element.select2(opt).addClass('-Handled_ToSelect2')
 }
 
 function trimAvatarsCollection($parent) {

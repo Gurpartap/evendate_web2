@@ -74,17 +74,13 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 			});
 		})(this.$wrapper, this.event.dates, this.event.is_same_time);
 		
-		(function selectTags($view, tags) {
-			var selected_tags = [];
-			tags.forEach(function(tag) {
-				selected_tags.push({
-					id: parseInt(tag.id),
-					text: tag.name
-				});
-			});
+		this.$wrapper.find('input.EventTags').select2('data', this.event.tags.map(function(tag) {
 			
-			$view.find('#event_tags').select2('data', selected_tags);
-		})(this.$wrapper, this.event.tags);
+			return {
+				id: parseInt(tag.id),
+				text: tag.name
+			};
+		}));
 		
 		if (this.event.image_horizontal_url) {
 			toDataUrl(this.event.image_horizontal_url, function(base64_string) {
@@ -131,6 +127,12 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 						self.$wrapper.find('#edit_event_registration_'+field.type+'_field_required').prop('checked', true);
 					}
 				}
+			});
+		}
+		
+		if (this.event.ticket_types.length) {
+			this.$wrapper.find('.OnChangeRemoveUUID').one('change.RemoveUUID', function() {
+				self.$wrapper.find('.TicketType'+$(this).data('row_number')+'UUID').val('').trigger('change');
 			});
 		}
 		
