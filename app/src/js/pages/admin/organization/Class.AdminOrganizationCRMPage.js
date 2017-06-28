@@ -142,9 +142,9 @@ AdminOrganizationCRMPage = extending(AdminOrganizationPage, (function() {
 			var $rows = tmpl('admin-organization-crm-page-tr', subscribers.map(function(subscriber) {
 				
 				return {
-					name: __APP.BUILD.link({
-						title: subscriber.full_name,
-						page: '/user/' + subscriber.id
+					user_avatar_block: __APP.BUILD.avatarBlocks(subscriber, {
+						entity: __C.ENTITIES.USER,
+						avatar_classes: [__C.CLASSES.SIZES.X30, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]
 					}),
 					email: subscriber.email,
 					accounts: __APP.BUILD.socialLinks(subscriber.accounts_links),
