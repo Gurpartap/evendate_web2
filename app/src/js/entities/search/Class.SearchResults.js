@@ -95,7 +95,10 @@ SearchResults = extending(OneEntity, (function() {
 	 */
 	SearchResults.prototype.fetchEventsAndOrganizations = function(events_ajax_data, organizations_ajax_data, success) {
 		var self = this,
-			ajax_data = {fields: new Fields()};
+			ajax_data = {
+				fields: new Fields('search_score'),
+				order: '-search_score'
+			};
 		
 		if (events_ajax_data) {
 			ajax_data.fields.push({
@@ -110,7 +113,7 @@ SearchResults = extending(OneEntity, (function() {
 		
 		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
 			self.setData(data);
-			if (success && typeof success == 'function') {
+			if (isFunction(success)) {
 				success.call(self, data);
 			}
 		});
