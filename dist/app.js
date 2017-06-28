@@ -13244,6 +13244,43 @@ AbstractAppInspector = extendingJQuery((function() {
  */
 /**
  *
+ * @class ClientAppInspector
+ * @extends AbstractAppInspector
+ */
+ClientAppInspector = extending(AbstractAppInspector, (function() {
+	/**
+	 *
+	 * @param {OneUser} client
+	 *
+	 * @constructor
+	 * @constructs ClientAppInspector
+	 *
+	 * @property {OneUser} client
+	 *
+	 */
+	function ClientAppInspector(client) {
+		
+		this.client = client;
+		
+		this.title = 'Клиент ' + client.full_name;
+		this.$content = tmpl('order-app-inspector', {
+			client: AbstractAppInspector.build.avatarBlock(client),
+			interests_title: AbstractAppInspector.build.title('Интересы'),
+			interests_spiderweb_chart: ''
+		});
+		
+		AbstractAppInspector.call(this);
+	}
+	
+	
+	
+	return ClientAppInspector;
+}()));
+/**
+ * @requires Class.AbstractAppInspector.js
+ */
+/**
+ *
  * @class OrderAppInspector
  * @extends AbstractAppInspector
  */
