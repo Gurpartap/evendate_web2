@@ -52,8 +52,7 @@ RegistrationModal = extending(PreviewRegistrationModal, (function() {
 		this.content.find('.RegistrationEmailField').val(__APP.USER.email);
 		
 		bindRippleEffect(this.content);
-		this.content.find('.ToSelect2').select2({
-			containerCssClass: 'form_select2',
+		initSelect2(this.content.find('.ToSelect2'), {
 			dropdownCssClass: 'form_select2_drop form_select2_drop_no_search'
 		});
 		this.__init();

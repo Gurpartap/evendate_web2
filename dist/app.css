@@ -1057,6 +1057,30 @@ a.social_link.-color_facebook {color: #3b5998}
 /* /Old Table */
 /* DataTables Theme */
 
+.table.-simple_table > thead {
+	border-bottom: 2px solid #e2e4e8;
+}
+
+.table.-simple_table th {
+	font-weight: 500;
+	color: #657184;
+	color: var(--color_primary_80);
+}
+
+.table.-simple_table th,
+.table.-simple_table td {padding: 12px}
+
+.table.-simple_table th:first-child,
+.table.-simple_table td:first-child {padding-left: 24px}
+
+.table.-simple_table th:last-child,
+.table.-simple_table td:last-child {padding-right: 24px}
+
+.table.-simple_table td.-no_padding {padding: 0}
+
+/* /Old Table */
+/* DataTables Theme */
+
 table.table.-data_table_override {
 	width: 100%;
 	margin: 0;
@@ -1496,7 +1520,7 @@ fieldset:disabled .form_select {cursor: default}
 .form_textarea:disabled {opacity: .5}
 
 .form_input,
-.form_select {height: 2.2rem}
+.form_select {height: 32px}
 
 .form_textarea {
 	height: 10em;
@@ -1514,15 +1538,12 @@ fieldset:disabled .form_select {cursor: default}
 	cursor: pointer;
 }
 
-.form_datepicker {
-	flex-grow: 0;
-	width: 200px;
-	cursor: pointer;
+.form_fieldset {
+	padding: 12px 24px;
 }
 
-.form_fieldset {
+.form_fieldset.-color_marginal {
 	margin: 24px 0 36px;
-	padding: 12px 24px;
 	background-color: #f6f6f6;
 	background-color: var(--color_gray_material);
 	border-radius: 2px;
@@ -1544,6 +1565,39 @@ fieldset:disabled .form_select {cursor: default}
 	font-family: FontAwesome;
 }
 
+/* Form DatePicker */
+
+
+.form_datepicker {
+	display: flex;
+	align-items: center;
+	flex-grow: 0;
+	width: 200px;
+	cursor: pointer;
+
+	padding: 0 24px 0 .6rem;
+	font-size: .9rem;
+	line-height: normal;
+
+	height: 32px;
+	border: 1px solid;
+	border-radius: 3px;
+	background-color: transparent;
+}
+
+
+.form_datepicker:after {
+	content: "\f073";
+	position: absolute;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	height: 16px;
+	margin: auto .5rem;
+	font-family: FontAwesome;
+}
+
+/* /Form DatePicker */
 /* Form Select2 */
 
 .form_select2 {
@@ -1627,7 +1681,7 @@ fieldset:disabled .form_select {cursor: default}
 	box-shadow: none;
 }
 .form_select2.form_input.select2-container-multi > .select2-choices,
-.form_select2.form_input.select2-container-multi > .select2-choices > .select2-search-field > input {min-height: 2rem}
+.form_select2.form_input.select2-container-multi > .select2-choices > .select2-search-field > input {min-height: 30px}
 .form_select2.form_input.select2-container-multi > .select2-choices > .select2-search-field > input {
 	padding: 0;
 	margin: 0;
@@ -1839,7 +1893,10 @@ fieldset:disabled .form_select {cursor: default}
 	text-align: right;
 }
 
-/* /Form -inline */
+.-inline > .form_input,
+.-inline > .form_textarea {flex: 1}
+
+	/* /Form -inline */
 /* /Form flat */
 
 .form_input.-flat {
@@ -1869,11 +1926,14 @@ fieldset:disabled .form_select {cursor: default}
 	margin-bottom: .875em;
 }
 .form_group.-valign_baseline {align-items: baseline}
+.form_group.-align_left {justify-content: flex-start}
+.form_group.-align_right {justify-content: flex-end}
 .form_group > .form_unit {
 	display: inline-block;
 	vertical-align: top;
 	margin-bottom: 0;
 }
+.form_group > .form_unit + .form_unit {margin-left: 12px}
 .form_group > .form_unit.-inline {display: inline-flex}
 
 .form_group.-parts_e_2 > .form_unit,
@@ -2253,8 +2313,8 @@ fieldset:disabled .form_select {cursor: default}
 .button {
 	display: inline-block;
 	vertical-align: bottom;
-	height: 2.2rem;
-	min-width: 2.2rem;
+	height: 32px;
+	min-width: 32px;
 	font-family: inherit;
 	font-size: .81em;
 	font-weight: 500;
@@ -2293,7 +2353,7 @@ fieldset:disabled .form_select {cursor: default}
 }
 .button.-no_uppercase {text-transform: none}
 
-a.button {line-height: 2.2rem}
+a.button {line-height: 32px}
 a.button.-size_low {line-height: 1.88rem}
 a.button,
 a.button:hover {text-decoration: none}
@@ -4720,7 +4780,7 @@ body,
 }
 
 .edit_event_page_tab_bodies > .tab_body {
-	padding: 24px 36px 48px;
+	padding: 24px 24px 36px;
 }
 
 .selected_days {
@@ -4754,14 +4814,15 @@ body,
 	border-right: 1px solid var(--color_primary_30);
 }
 
+.edit_event_page_wrapper .-full_page_width {
+	width: -webkit-calc(100% + 48px);
+	width: calc(100% + 48px);
+	margin-left: -24px;
+	margin-right: -24px;
+}
+
 #edit_event_selected_days_wrapper {text-align: center}
 
-#edit_event_vk_publication,
-#edit_event_selected_days_wrapper {
-	width: -webkit-calc(100% + 72px);
-	width: calc(100% + 72px);
-	margin: 0 -36px;
-}
 #edit_event_vk_publication {margin-bottom: 20px}
 #edit_event_vk_publication > .collapsing_content {padding: 0 30px}
 
@@ -4877,8 +4938,40 @@ body,
 .edit_event_registration_custom_field_value:hover > .edit_event_registration_custom_field_value_remove_button,
 .edit_event_registration_custom_field_value_input:focus + .edit_event_registration_custom_field_value_remove_button {visibility: visible}
 
+.event_edit_ticket_types_table {
+	margin-bottom: 24px;
+}
 
-	/* ORGANIZATIONS */
+.edit_event_ticket_type_last_column {
+	margin-bottom: 0;
+}
+
+.event_edit_ticket_type_delete_button,
+.event_edit_ticket_type_expand_button {
+	flex: none;
+	width: 32px;
+	margin-left: 12px;
+}
+
+.event_edit_ticket_type_expand_button {}
+
+.event_edit_ticket_type_delete_button {
+	font-size: 2em;
+	line-height: 1;
+	font-weight: 100;
+	opacity: .5;
+}
+
+.edit_event_ticket_type_expanded {
+	padding: 24px;
+}
+
+.edit_event_ticket_type_expanded_footer {
+	margin-top: 36px;
+}
+
+
+/* ORGANIZATIONS */
 
 .page_wrapper.-organizations_wrapper {
 	padding: 40px 0;
@@ -6177,10 +6270,13 @@ fieldset + .org_admin_settings_wrapper,
 
 .event_admin_check_in_progress_bar {
 	flex: 1;
-	margin: 0 24px;
+	margin-left: 24px;
 }
 
-.event_admin_check_in_search_bar {width: 20%}
+.event_admin_check_in_search_bar {
+	width: 20%;
+	margin-right: 24px;
+}
 
 .event_admin_check_in_search_bar > .event_admin_check_in_search {
 	padding-right: 35px;

@@ -22,19 +22,26 @@ AbstractEditEventPage = extending(Page, (function() {
 	 * @property {boolean} is_edit
 	 */
 	function AbstractEditEventPage() {
-		var self = this;
+		var self = this,
+			fields = [
+				'id',
+				'title',
+				'description',
+				'location',
+				'detail_info_url',
+				'organization_id',
+				'image_horizontal_url'
+			];
 		
 		Page.call(this);
 		
 		this.event = new OneEvent();
 		this.state_name = 'admin';
-		this.organization_id = null;
 		
 		this.MainCalendar = null;
 		
 		this.my_organizations = new OrganizationsCollection();
-		this.my_organizations_fields = new Fields(
-			'default_address', {
+		this.my_organizations_fields = new Fields('default_address', {
 				tariff: {
 					fields: new Fields(
 						'available_additional_notifications',
@@ -42,18 +49,428 @@ AbstractEditEventPage = extending(Page, (function() {
 						'event_publications'
 					)
 				}
-			}
-		);
+			});
 		
-		Object.defineProperty(this, 'is_edit', {
-			get: function() {
-				return !!self.event.id;
+		this.render_vars = {
+			organization_options: null,
+			start_time: null,
+			end_time: null,
+			min_price_input: null,
+			image_horizontal_filename: null,
+			
+			registration_till_date_select: null,
+			registration_till_time_input: null,
+			registration_limit_count_input: null,
+			registration_predefined_fields: null,
+			registration_custom_fields: null,
+			
+			ticket_types: null,
+			add_ticket_type_button: null,
+			
+			public_at_date_select: null,
+			public_at_time_input: null,
+			additional_notification_date_select: null,
+			additional_notification_time_input: null,
+			vk_image_base64: null,
+			vk_image_filename: null,
+			vk_image_url: null,
+			vk_post_link: null,
+			
+			button_text: null
+		};
+		
+		fields.forEach(function(field) {
+			Object.defineProperty(self.render_vars, field, {
+				enumerable: true,
+				get: function() {
+					
+					return self.event[field];
+				}
+			});
+		});
+		
+		Object.defineProperties(this.render_vars, {
+			organizations_wrapper_classes: {
+				enumerable: true,
+				get: function() {
+					
+					return (self.my_organizations.length < 2) ? __C.CLASSES.HIDDEN : '';
+				}
+			},
+			current_date: {
+				enumerable: true,
+				get: function() {
+					
+					return moment().format(__C.DATE_FORMAT);
+				}
+			}
+		});
+		
+		Object.defineProperties(this, {
+			organization_id: {
+				get: function() {
+					return self.event.organization_id;
+				},
+				set: function(val) {
+					self.event.organization_id = val;
+				}
+			},
+			is_edit: {
+				get: function() {
+					return !!self.event.id;
+				}
 			}
 		});
 	}
 	
 	AbstractEditEventPage.lastRegistrationCustomFieldId = 0;
-	AbstractEditEventPage.lastRegistrationCustomFieldValueId = 0;
+	AbstractEditEventPage.lastTicketTypeRowId = 0;
+	/**
+	 *
+	 * @param {RegistrationFieldModel|Array<RegistrationFieldModel>|RegistrationFieldModelsCollection} [registration_data]
+	 * @return {jQuery}
+	 */
+	AbstractEditEventPage.registrationCustomFieldBuilder = function(registration_data) {
+		registration_data = registration_data ? (registration_data instanceof Array ? registration_data : [registration_data]) : [{}];
+		var $fields;
+		
+		$fields = tmpl('edit-event-registration-custom-field', registration_data.filter(function(data) {
+			if (RegistrationFieldModel.isCustomField(data)) {
+				data.id = data.id ? data.id : AbstractEditEventPage.lastRegistrationCustomFieldId++;
+				return true;
+			}
+			return false;
+		}).map(function(data) {
+			
+			return $.extend({}, data, {
+				registration_custom_field_values: (data.values && data.values.length) ? AbstractEditEventPage.registrationCustomFieldValuesBuilder(data.id, data.values) : ''
+			});
+		}));
+		
+		initSelect2($fields.find('.RegistrationCustomFieldType'), {
+			dropdownCssClass: 'form_select2_drop form_select2_drop_no_search'
+		}).on('change.SelectRegistrationCustomFieldType', function() {
+			var $this = $(this),
+				$field = $this.closest('.RegistrationCustomField'),
+				$values_wrap = $field.find('.RegistrationCustomFieldValues');
+			
+			switch ($this.val()) {
+				case RegistrationFieldModel.TYPES.ADDITIONAL_TEXT:
+				case RegistrationFieldModel.TYPES.EXTENDED_CUSTOM: {
+					$values_wrap.html('');
+					break;
+				}
+				case RegistrationFieldModel.TYPES.SELECT:
+				case RegistrationFieldModel.TYPES.SELECT_MULTI: {
+					if ($values_wrap.is(':empty')) {
+						$values_wrap.html(AbstractEditEventPage.registrationCustomFieldValuesBuilder($field.find('.RegistrationFieldId').val()));
+					}
+					break;
+				}
+			}
+		});
+		
+		registration_data.forEach(function(data) {
+			if (data.required) {
+				$fields.find('#edit_event_registration_'+data.id+'_custom_field_required').prop('checked', true);
+			}
+			if (data.type) {
+				$fields.find('#edit_event_registration_'+data.id+'_field_type').select2('val', data.type);
+			}
+		});
+		
+		$fields.find('.RemoveRegistrationCustomField').on('click.RemoveRegistrationCustomField', function() {
+			$(this).closest('.RegistrationCustomField').remove();
+		});
+		$fields.find('.RegistrationCustomFieldLabel, .RegistrationCustomFieldType').on('change.RemoveRegistrationFieldUUID', function() {
+			$(this).closest('.RegistrationCustomField').find('.RegistrationCustomFieldUUID').val('');
+		});
+		
+		return $fields;
+	};
+	/**
+	 *
+	 * @param {number} field_id
+	 * @param {Array<RegistrationSelectFieldValue>|RegistrationSelectFieldValue} values
+	 *
+	 * @return {jQuery}
+	 */
+	AbstractEditEventPage.registrationCustomFieldValuesBuilder = function(field_id, values) {
+		var _values = values instanceof Array ? values : [],
+			$values = tmpl('edit-event-registration-custom-field-values', {
+				id: field_id,
+				values: AbstractEditEventPage.registrationCustomFieldValueBuilder(field_id, _values),
+				last_value_id: _values.length
+			});
+		
+		$values.find('.AddValue').on('click.AddValue', function() {
+			var last_value_id = +$values.data('last_value_id') + 1,
+				$new_value = AbstractEditEventPage.registrationCustomFieldValueBuilder(field_id, {
+					value: 'Вариант '+last_value_id,
+					value_id: last_value_id
+				});
+			
+			$values.find('.RegistrationCustomFieldValuesWrapper').append($new_value);
+			$values.data('last_value_id', last_value_id);
+			$new_value.find('.ValueInput').focus().get(0).select();
+		});
+		
+		return $values;
+	};
+	/**
+	 *
+	 * @param {number} field_id
+	 * @param {Array<RegistrationSelectFieldValue>|RegistrationSelectFieldValue} values
+	 *
+	 * @return {jQuery}
+	 */
+	AbstractEditEventPage.registrationCustomFieldValueBuilder = function(field_id, values) {
+		var _values = values instanceof Array ? values : values ? [values] : [],
+			$value = tmpl('edit-event-registration-custom-field-value', _values.map(function(value, i) {
+				
+				return {
+					id: field_id,
+					value_id: value.value_id || i,
+					value_uuid: value.uuid,
+					checkbox_radio: __APP.BUILD.checkbox({
+						attributes: {
+							disabled: true
+						}
+					}),
+					input: __APP.BUILD.input({
+						name: 'registration_' +field_id+ '_field_' +(value.value_id || i)+ '_value',
+						value: value.value
+					}, ['edit_event_registration_custom_field_value_input', 'form_input', '-flat', 'ValueInput'])
+				};
+			}));
+		
+		$value.find('.RemoveValue').on('click.RemoveValue', function() {
+			$(this).closest('.RegistrationFieldValue').remove();
+		});
+		
+		return $value;
+	};
+	
+	/**
+	 *
+	 * @param {OneTicketType|Array<OneTicketType>|TicketTypesCollection} [ticket_types]
+	 *
+	 * @return {jQuery}
+	 */
+	AbstractEditEventPage.ticketTypeRowsBuilder = function(ticket_types) {
+		var _ticket_types = ticket_types ? (ticket_types instanceof Array ? ticket_types : [ticket_types]) : [new OneTicketType()],
+			$rows = tmpl('edit-event-tickets-row', _ticket_types.map(function(ticket_type) {
+				var row_id = ++AbstractEditEventPage.lastTicketTypeRowId;
+				
+				return {
+					row_num: row_id,
+					name_input: __APP.BUILD.formUnit({
+						id: 'event_edit_ticket_type_' + row_id + '_name',
+						classes: 'OnChangeRemoveUUID',
+						name: 'ticket_type_' + row_id + '_name',
+						value: ticket_type.name || '',
+						placeholder: 'Название типа билета',
+						required: true,
+						dataset: {
+							row_number: row_id
+						}
+					}),
+					amount_input: __APP.BUILD.formUnit({
+						id: 'event_edit_ticket_type_' + row_id + '_amount',
+						classes: 'OnChangeRemoveUUID',
+						name: 'ticket_type_' + row_id + '_amount',
+						value: ticket_type.amount || '',
+						placeholder: 0,
+						required: true,
+						dataset: {
+							row_number: row_id
+						}
+					}),
+					price_input: __APP.BUILD.formUnit({
+						id: 'event_edit_ticket_type_' + row_id + '_price',
+						classes: 'OnChangeRemoveUUID',
+						name: 'ticket_type_' + row_id + '_price',
+						value: ticket_type.price || '',
+						placeholder: 0,
+						required: true,
+						dataset: {
+							row_number: row_id
+						}
+					}),
+					tickets_sell_start_date_checkbox: __APP.BUILD.formUnit({
+						id: 'event_edit_ticket_type_' + row_id + '_start_by_date',
+						label: 'По дате',
+						type: 'checkbox',
+						name: 'ticket_type_' + row_id + '_start_by_date',
+						dataset: {
+							row_number: row_id,
+							switch_id: 'ticket_type_' + row_id + '_start_by_date'
+						},
+						classes: ['TicketTypeStartByDateSwitch', 'Switch', 'OnChangeRemoveUUID'],
+						unit_classes: ['-inline']
+					}),
+					tickets_sell_start_date_select: __APP.BUILD.formUnit({
+						type: 'date',
+						name: 'ticket_type_' + row_id + '_sell_start_date',
+						value: ticket_type.formatted_sell_start_date,
+						classes: 'OnChangeRemoveUUID',
+						dataset: {
+							row_number: row_id
+						}
+					}),
+					tickets_sell_start_after_checkbox: __APP.BUILD.formUnit({
+						id: 'event_edit_ticket_type_' + row_id + '_start_after',
+						label: 'По истечении продаж билета',
+						type: 'checkbox',
+						name: 'ticket_type_' + row_id + '_start_after',
+						dataset: {
+							row_number: row_id,
+							switch_id: 'ticket_type_' + row_id + '_start_after'
+						},
+						classes: ['TicketTypeStartAfterSwitch', 'Switch', 'OnChangeRemoveUUID'],
+						unit_classes: ['-inline']
+					}),
+					tickets_sell_start_after_select: initSelect2(__APP.BUILD.select([{
+						display_name: 'Выберите',
+						val: ''
+					}], {
+						name: 'ticket_type_' + row_id + '_start_after_uuid'
+					}, 'OnChangeRemoveUUID', {
+						row_number: row_id
+					})),
+					tickets_sell_end_date_select: __APP.BUILD.formUnit({
+						label: 'Дата',
+						type: 'date',
+						name: 'ticket_type_' + row_id + '_sell_end_date',
+						value: ticket_type.formatted_sell_end_date,
+						unit_classes: ['-inline'],
+						classes: 'OnChangeRemoveUUID',
+						dataset: {
+							row_number: row_id
+						}
+					}),
+					promo_enable_checkbox: __APP.BUILD.formUnit({
+						id: 'event_edit_ticket_type_' + row_id + '_promo_checkbox',
+						label: 'Промокод',
+						type: 'checkbox',
+						name: 'ticket_type_' + row_id + '_promo_checkbox',
+						dataset: {
+							row_number: row_id,
+							switch_id: 'ticket_type_' + row_id + '_promo'
+						},
+						classes: ['TicketTypePromoSwitch', 'Switch', 'OnChangeRemoveUUID'],
+						unit_classes: ['form_accent_block', '-inline']
+					}),
+					promo_input: __APP.BUILD.formUnit({
+						id: 'event_edit_ticket_type_' + row_id + '_promocode',
+						label: 'Слово',
+						name: 'ticket_type_' + row_id + '_promocode',
+						value: ticket_type.promocode,
+						unit_classes: ['-inline'],
+						required: true,
+						classes: 'OnChangeRemoveUUID',
+						dataset: {
+							row_number: row_id
+						}
+					}),
+					promo_effort_input: __APP.BUILD.formUnit({
+						id: 'event_edit_ticket_type_' + row_id + '_promocode_effort',
+						type: 'number',
+						label: 'снизит стоимость на',
+						name: 'ticket_type_' + row_id + '_promocode_effort',
+						value: ticket_type.promocode_effort,
+						unit_classes: ['-inline'],
+						required: true,
+						attributes: {
+							size: 2
+						},
+						classes: 'OnChangeRemoveUUID',
+						dataset: {
+							row_number: row_id
+						}
+					}),
+					tickets_by_order_min_amount_input: __APP.BUILD.formUnit({
+						id: 'event_edit_ticket_type_' + row_id + '_min_count_per_user',
+						type: 'number',
+						label: 'Минимум',
+						name: 'ticket_type_' + row_id + '_min_count_per_user',
+						value: ticket_type.min_count_per_user || 1,
+						unit_classes: ['-inline'],
+						required: true,
+						attributes: {
+							size: 6
+						},
+						classes: 'OnChangeRemoveUUID',
+						dataset: {
+							row_number: row_id
+						}
+					}),
+					tickets_by_order_max_amount_input: __APP.BUILD.formUnit({
+						id: 'event_edit_ticket_type_' + row_id + '_max_count_per_user',
+						type: 'number',
+						label: 'Максимум',
+						name: 'ticket_type_' + row_id + '_max_count_per_user',
+						value: ticket_type.max_count_per_user || 1,
+						unit_classes: ['-inline'],
+						attributes: {
+							size: 6
+						},
+						classes: 'OnChangeRemoveUUID',
+						dataset: {
+							row_number: row_id
+						}
+					}),
+					close_expanded_button: __APP.BUILD.actionButton({
+						title: 'Скрыть настройки',
+						classes: ['-color_marginal', 'TicketTypeHideButton']
+					}).on('click.HideTicketType', function() {
+						$(this).closest('.CollapsingWrapper').resolveInstance().closeCollapsing();
+					})
+				};
+			}));
+		
+		bindControlSwitch($rows);
+		bindCollapsing($rows);
+		bindPageLinks($rows);
+		
+		$rows.not('.ExpandRow').each(function(i) {
+			var $row = $(this),
+				$expanded_row = $row.next('.ExpandRow');
+			
+			$row.data('ticket_type', _ticket_types[i]);
+			$row.find('.TicketTypeExpandButton').on('click.ExpandTicketType', function() {
+				$expanded_row.find('.CollapsingWrapper').resolveInstance().toggleCollapsing();
+			});
+			
+			$row.find('.TicketTypeDeleteButton').on('click.DeleteTicketType', function() {
+				var $parent = $row.parent();
+				
+				$expanded_row.remove();
+				$row.remove();
+				
+				if (!$parent.children().length) {
+					$parent.append(tmpl('edit-event-tickets-row-empty'));
+				}
+			});
+			
+		});
+		
+		$rows.filter('.ExpandRow').each(function(i) {
+			var $expanded_row = $(this);
+			
+			$expanded_row.data('ticket_type', _ticket_types[i]);
+			
+			if (_ticket_types[i].sell_start_date) {
+				$expanded_row.find('.TicketTypeStartByDateSwitch').prop('checked', true).trigger('change');
+			}
+			if (_ticket_types[i].promocode) {
+				$expanded_row.find('.TicketTypePromoSwitch').prop('checked', true).trigger('change');
+			}
+			
+		});
+		
+		return $rows;
+	};
 	
 	AbstractEditEventPage.prototype.fetchData = function() {
 		return this.fetching_data_defer = this.my_organizations.fetchMyOrganizations(['admin', 'moderator'], this.my_organizations_fields);
@@ -75,7 +492,9 @@ AbstractEditEventPage = extending(Page, (function() {
 				location: form_data.location && form_data.location.trim() ? form_data.location.trim() : null,
 				detail_info_url: form_data.detail_info_url ? form_data.detail_info_url.trim() : null,
 				image_horizontal: form_data.image_horizontal,
-				filenames: {horizontal: form_data.filename_horizontal},
+				filenames: {
+					horizontal: form_data.filename_horizontal
+				},
 				is_free: !!form_data.is_free,
 				vk_post: !!form_data.vk_post,
 				min_price: form_data.is_free ? null : form_data.min_price,
@@ -88,7 +507,7 @@ AbstractEditEventPage = extending(Page, (function() {
 		if (form_data.registration_required) {
 			
 			if (form_data.registration_limit_by_date) {
-				send_data.registration_till = moment(form_data.registration_till_date + ' ' +	form_data.registration_till_time).tz('UTC').format();
+				send_data.registration_till = moment(form_data.registration_till_date + (form_data.registration_till_time ? ' ' +	form_data.registration_till_time : '')).tz('UTC').format();
 			}
 			
 			if (form_data.registration_limit_by_quantity) {
@@ -140,6 +559,26 @@ AbstractEditEventPage = extending(Page, (function() {
 			send_data.tags = form_data.tags.split(',');
 		}
 		
+		if (form_data.ticket_types) {
+			send_data.ticket_types = (form_data.ticket_types instanceof Array ? form_data.ticket_types : [form_data.ticket_types]).map(function(id) {
+				
+				return {
+					uuid: form_data['ticket_type_' + id + '_uuid'] || null,
+					name: form_data['ticket_type_' + id + '_name'],
+					amount: form_data['ticket_type_' + id + '_amount'],
+					price: form_data['ticket_type_' + id + '_price'],
+					promocode: form_data['ticket_type_' + id + '_promocode'] || null,
+					promocode_effort: form_data['ticket_type_' + id + '_promocode_effort'] || null,
+					start_after_ticket_type_uuid: form_data['ticket_type_' + id + '_start_after_ticket_type_uuid'] || null,
+					sell_start_date: form_data['ticket_type_' + id + '_start_by_date'] ? form_data['ticket_type_' + id + '_sell_start_date'] : null,
+					sell_end_date: form_data['ticket_type_' + id + '_sell_end_date'] || null,
+					min_count_per_user: form_data['ticket_type_' + id + '_min_count_per_user'],
+					max_count_per_user: form_data['ticket_type_' + id + '_max_count_per_user']
+				};
+			});
+			send_data.ticketing_locally = true;
+		}
+		
 		if (form_data.delayed_publication) {
 			send_data.public_at = moment(form_data.public_at_date + ' ' + form_data.public_at_time).tz('UTC').format();
 		}
@@ -186,120 +625,6 @@ AbstractEditEventPage = extending(Page, (function() {
 		
 		return send_data;
 	};
-	/**
-	 *
-	 * @param {RegistrationFieldModel|Array<RegistrationFieldModel>|RegistrationFieldModelsCollection} [registration_data]
-	 * @return {jQuery}
-	 */
-	AbstractEditEventPage.buildRegistrationCustomField = function(registration_data) {
-		registration_data = registration_data ? (registration_data instanceof Array ? registration_data : [registration_data]) : [{}];
-		var $fields;
-		
-		$fields = tmpl('edit-event-registration-custom-field', registration_data.filter(function(data) {
-			if (RegistrationFieldModel.isCustomField(data)) {
-				data.id = data.id ? data.id : AbstractEditEventPage.lastRegistrationCustomFieldId++;
-				return true;
-			}
-			return false;
-		}).map(function(data) {
-			
-			return $.extend({}, data, {
-				registration_custom_field_values: (data.values && data.values.length) ? AbstractEditEventPage.buildRegistrationCustomFieldValues(data.id, data.values) : ''
-			});
-		}));
-		
-		$fields.find('.RegistrationCustomFieldType').select2({
-			containerCssClass: 'form_select2',
-			dropdownCssClass: 'form_select2_drop form_select2_drop_no_search'
-		}).on('change.SelectRegistrationCustomFieldType', function() {
-			var $this = $(this),
-				$field = $this.closest('.RegistrationCustomField'),
-				$values_wrap = $field.find('.RegistrationCustomFieldValues');
-			
-			switch ($this.val()) {
-				case RegistrationFieldModel.TYPES.ADDITIONAL_TEXT:
-				case RegistrationFieldModel.TYPES.EXTENDED_CUSTOM: {
-					$values_wrap.html('');
-					break;
-				}
-				case RegistrationFieldModel.TYPES.SELECT:
-				case RegistrationFieldModel.TYPES.SELECT_MULTI: {
-					if ($values_wrap.is(':empty')) {
-						$values_wrap.html(AbstractEditEventPage.buildRegistrationCustomFieldValues($field.find('.RegistrationFieldId').val()));
-					}
-					break;
-				}
-			}
-		});
-		
-		registration_data.forEach(function(data) {
-			if (data.required) {
-				$fields.find('#edit_event_registration_'+data.id+'_custom_field_required').prop('checked', true);
-			}
-			if (data.type) {
-				$fields.find('#edit_event_registration_'+data.id+'_field_type').select2('val', data.type);
-			}
-		});
-		
-		$fields.find('.RemoveRegistrationCustomField').on('click.RemoveRegistrationCustomField', function() {
-			$(this).closest('.RegistrationCustomField').remove();
-		});
-		$fields.find('.RegistrationCustomFieldLabel, .RegistrationCustomFieldType').on('change.RemoveRegistrationFieldUUID', function() {
-			$(this).closest('.RegistrationCustomField').find('.RegistrationCustomFieldUUID').val('');
-		});
-		
-		return $fields;
-	};
-	
-	AbstractEditEventPage.buildRegistrationCustomFieldValues = function(field_id, values) {
-		var _values = values instanceof Array ? values : [],
-			$values = tmpl('edit-event-registration-custom-field-values', {
-				id: field_id,
-				values: AbstractEditEventPage.buildRegistrationCustomFieldValue(field_id, _values),
-				last_value_id: _values.length
-			});
-		
-		$values.find('.AddValue').on('click.AddValue', function() {
-			var last_value_id = +$values.data('last_value_id') + 1,
-				$new_value = AbstractEditEventPage.buildRegistrationCustomFieldValue(field_id, {
-					value: 'Вариант '+last_value_id,
-					value_id: last_value_id
-				});
-			
-			$values.find('.RegistrationCustomFieldValuesWrapper').append($new_value);
-			$values.data('last_value_id', last_value_id);
-			$new_value.find('.ValueInput').focus().get(0).select();
-		});
-		
-		return $values;
-	};
-	
-	AbstractEditEventPage.buildRegistrationCustomFieldValue = function(field_id, values) {
-		var _values = values instanceof Array ? values : values ? [values] : [],
-			$value = tmpl('edit-event-registration-custom-field-value', _values.map(function(value, i) {
-			
-			return {
-				id: field_id,
-				value_id: value.value_id || i,
-				value_uuid: value.uuid,
-				checkbox_radio: __APP.BUILD.checkbox({
-					attributes: {
-						disabled: true
-					}
-				}),
-				input: __APP.BUILD.input({
-					name: 'registration_' +field_id+ '_field_' +(value.value_id || i)+ '_value',
-					value: value.value
-				}, ['edit_event_registration_custom_field_value_input', 'form_input', '-flat', 'ValueInput'])
-			};
-		}));
-		
-		$value.find('.RemoveValue').on('click.RemoveValue', function() {
-			$value.remove();
-		});
-		
-		return $value;
-	};
 	
 	AbstractEditEventPage.prototype.checkTariffAvailabilities = function() {
 		var self = this,
@@ -330,17 +655,53 @@ AbstractEditEventPage = extending(Page, (function() {
 		$form_overall_fields.attr('disabled', (organization.tariff.events_publication_left <= 0 && !self.is_edit));
 	};
 	
-	
-	
 	AbstractEditEventPage.prototype.initCrossPosting = function() {
 		var self = this;
 		
-		this.$wrapper.find('.OnChangeCrossPost').on('change.crossPostingToVK', function() {
-			self.formatVKPost();
-		});
-		this.MainCalendar.$calendar.on('change:days.crossPostingToVK', function() {
-			self.formatVKPost();
-		});
+		function formatVKPost() {
+			var data = self.gatherSendData(),
+				post_text = '',
+				m_registration_till;
+			
+			post_text += data.title ? data.title + '\n\n' : '';
+			
+			if (data.dates && data.dates.length) {
+				post_text += (data.dates.length > 1) ? 'Дата начала: ' : 'Начало: ';
+				post_text += moment(data.dates[0].event_date).format('D MMMM YYYY');
+				
+				if (data.dates.length === 1 && data.dates[0].start_time) {
+					post_text += ' в ' + data.dates[0].start_time;
+				}
+			}
+			
+			if (data.registration_required && data.registration_till) {
+				m_registration_till = moment(data.registration_till);
+				post_text += ' (регистрация заканчивается: ' + m_registration_till.format('D MMMM YYYY') + ' в ' + m_registration_till.format('HH:mm') + ')\n';
+			} else {
+				post_text += '\n';
+			}
+			
+			
+			post_text += data.location ? data.location + '\n\n' : '';
+			post_text += data.description ? data.description + '\n\n' : '';
+			
+			if (!data.is_free) {
+				post_text += data.min_price ? 'Цена от ' + data.min_price + '\n\n' : '';
+			}
+			
+			
+			if (data.detail_info_url) {
+				post_text += data.detail_info_url;
+			} else if (data.event_id) {
+				post_text += 'https://evendate.ru/event/' + data.event_id;
+			}
+			
+			
+			self.$wrapper.find('.VKPostText').val(post_text);
+		}
+		
+		this.$wrapper.find('.OnChangeCrossPost').on('change.crossPostingToVK', formatVKPost);
+		this.MainCalendar.$calendar.on('change:days.crossPostingToVK', formatVKPost);
 		this.$wrapper.find('.VKPostText').one('dblclick', function() {
 			self.deInitCrossPosting();
 			$(this).removeAttr('readonly');
@@ -357,14 +718,14 @@ AbstractEditEventPage = extending(Page, (function() {
 				mutation_observer = new MutationObserver(function() {
 					var src = $src.val();
 					
-					$vk_preview.attr('src', $src.val());
-					$vk_src.val($src.val());
+					$vk_preview.attr('src', src);
+					$vk_src.val(src);
 					$vk_file_name.val($file_name.val());
 				});
 			
 			mutation_observer.observe($src.get(0), {
 				attributes: true
-			})
+			});
 		})();
 	};
 	
@@ -372,49 +733,6 @@ AbstractEditEventPage = extending(Page, (function() {
 		this.$wrapper.find('.OnChangeCrossPost').off('change.crossPostingToVK');
 		this.MainCalendar.$calendar.off('change:days.crossPostingToVK');
 	};
-	
-	AbstractEditEventPage.prototype.formatVKPost = function() {
-		var data = this.gatherSendData(),
-			post_text = '',
-			m_registration_till;
-		
-		post_text += data.title ? data.title + '\n\n' : '';
-		
-		if (data.dates && data.dates.length) {
-			post_text += (data.dates.length > 1) ? 'Дата начала: ' : 'Начало: ';
-			post_text += moment(data.dates[0].event_date).format('D MMMM YYYY');
-			
-			if (data.dates.length === 1 && data.dates[0].start_time) {
-				post_text += ' в ' + data.dates[0].start_time;
-			}
-		}
-		
-		if (data.registration_required && data.registration_till) {
-			m_registration_till = moment(data.registration_till);
-			post_text += ' (регистрация заканчивается: ' + m_registration_till.format('D MMMM YYYY') + ' в ' + m_registration_till.format('HH:mm') + ')\n';
-		} else {
-			post_text += '\n';
-		}
-		
-		
-		post_text += data.location ? data.location + '\n\n' : '';
-		post_text += data.description ? data.description + '\n\n' : '';
-		
-		if (!data.is_free) {
-			post_text += data.min_price ? 'Цена от ' + data.min_price + '\n\n' : '';
-		}
-		
-		
-		if (data.detail_info_url) {
-			post_text += data.detail_info_url;
-		} else if (data.event_id) {
-			post_text += 'https://evendate.ru/event/' + data.event_id;
-		}
-		
-		
-		this.$wrapper.find('.VKPostText').val(post_text);
-	};
-	
 	
 	AbstractEditEventPage.prototype.submitForm = function() {
 		var PAGE = this,
@@ -548,6 +866,49 @@ AbstractEditEventPage = extending(Page, (function() {
 		bindFileLoadButton(PAGE.$wrapper);
 		ImgLoader.init(PAGE.$wrapper);
 		
+		initSelect2(PAGE.$wrapper.find('.EditEventOrganizationsSelect')).on('change', function() {
+			PAGE.organization_id = +this.value;
+			PAGE.checkTariffAvailabilities(PAGE.organization_id);
+		}).select2('val', PAGE.organization_id);
+		initSelect2(PAGE.$wrapper.find('.EventTags'), {
+			tags: true,
+			width: '100%',
+			placeholder: "Выберите до 5 тегов",
+			maximumSelectionLength: 5,
+			maximumSelectionSize: 5,
+			tokenSeparators: [',', ';'],
+			multiple: true,
+			createSearchChoice: function(term, data) {
+				if ($(data).filter(function() {
+						return this.text.localeCompare(term) === 0;
+					}).length === 0) {
+					return {
+						id: term,
+						text: term
+					};
+				}
+			},
+			ajax: {
+				url: '/api/v1/tags/',
+				dataType: 'JSON',
+				data: function(term, page) {
+					return {
+						name: term // search term
+					};
+				},
+				results: function(data) {
+					var _data = [];
+					data.data.forEach(function(value) {
+						value.text = value.name;
+						_data.push(value);
+					});
+					return {
+						results: _data
+					}
+				}
+			}
+		});
+		
 		PAGE.checkTariffAvailabilities(PAGE.organization_id);
 		
 		(function initEditEventMainCalendar() {
@@ -642,12 +1003,12 @@ AbstractEditEventPage = extending(Page, (function() {
 							date: day,
 							formatted_date: day.split('-').reverse().join('.'),
 							today: today,
-							start_time: __APP.BUILD.formInput({
+							start_time: __APP.BUILD.formUnit({
 								name: 'start_time',
 								type: 'time',
 								classes: ['StartTime']
 							}),
-							end_time: __APP.BUILD.formInput({
+							end_time: __APP.BUILD.formUnit({
 								name: 'end_time',
 								type: 'time',
 								classes: ['EndTime']
@@ -710,21 +1071,6 @@ AbstractEditEventPage = extending(Page, (function() {
 			
 		})();
 		
-		(function initOrganization() {
-			var $select = PAGE.$wrapper.find('.EditEventOrganizationsSelect');
-			
-			$select.select2({
-				containerCssClass: 'form_select2',
-				dropdownCssClass: 'form_select2_drop'
-			}).on('change', function() {
-				PAGE.organization_id = +this.value;
-				PAGE.checkTariffAvailabilities(PAGE.organization_id);
-			});
-			
-			$select.select2('val', PAGE.organization_id);
-			
-		})();
-		
 		(function checkVkPublicationAbility() {
 			if (__APP.USER.accounts.contains(OneUser.ACCOUNTS.VK)) {
 				__APP.SERVER.dealAjax(ServerConnection.HTTP_METHODS.GET, '/api/v1/organizations/vk_groups').done(function(groups) {
@@ -761,47 +1107,6 @@ AbstractEditEventPage = extending(Page, (function() {
 		//TODO: perepilit' placepicker
 		PAGE.$wrapper.find(".Placepicker").placepicker();
 		
-		PAGE.$wrapper.find('.EventTags').select2({
-			tags: true,
-			width: '100%',
-			placeholder: "Выберите до 5 тегов",
-			maximumSelectionLength: 5,
-			maximumSelectionSize: 5,
-			tokenSeparators: [',', ';'],
-			multiple: true,
-			createSearchChoice: function(term, data) {
-				if ($(data).filter(function() {
-						return this.text.localeCompare(term) === 0;
-					}).length === 0) {
-					return {
-						id: term,
-						text: term
-					};
-				}
-			},
-			ajax: {
-				url: '/api/v1/tags/',
-				dataType: 'JSON',
-				data: function(term, page) {
-					return {
-						name: term // search term
-					};
-				},
-				results: function(data) {
-					var _data = [];
-					data.data.forEach(function(value) {
-						value.text = value.name;
-						_data.push(value);
-					});
-					return {
-						results: _data
-					}
-				}
-			},
-			containerCssClass: "form_select2",
-			dropdownCssClass: "form_select2_drop"
-		});
-		
 		PAGE.$wrapper.find('.EditEventDefaultAddress').off('click.defaultAddress').on('click.defaultAddress', function() {
 			PAGE.$wrapper.find('.Placepicker').val(PAGE.my_organizations.getByID(PAGE.organization_id).default_address).trigger('input').trigger('change');
 		});
@@ -811,7 +1116,7 @@ AbstractEditEventPage = extending(Page, (function() {
 		});
 		
 		PAGE.$wrapper.find('.AddRegistrationCustomField').off('click.AddRegistrationCustomField').on('click.AddRegistrationCustomField', function() {
-			AbstractEditEventPage.buildRegistrationCustomField().insertBefore($(this));
+			AbstractEditEventPage.registrationCustomFieldBuilder().insertBefore($(this));
 		});
 		
 		PAGE.$wrapper.find('.RegistrationPreview').on('click.RegistrationPreview', function() {
@@ -870,52 +1175,171 @@ AbstractEditEventPage = extending(Page, (function() {
 		});
 	};
 	
-	AbstractEditEventPage.prototype.render = function() {
-		var PAGE = this,
-			is_edit = !!PAGE.event.id,
-			$organizations_wrapper,
-			page_vars = $.extend(true, {}, Object.getProps(PAGE.event), {
-				event_id: PAGE.event.id ? PAGE.event.id : undefined,
-				public_at_data_label: 'Дата',
-				additional_notification_data_label: 'Дата',
-				current_date: moment().format(__C.DATE_FORMAT),
-				tomorrow_date: moment().add(1, 'd').format(__C.DATE_FORMAT),
-				button_text: is_edit ? 'Сохранить' : 'Опубликовать',
-				additional_notification: PAGE.event.notifications.getByID(OneNotification.NOTIFICATIN_TYPES.ADDITIONAL_FOR_ORGANIZATION)
-			}),
-			m_registration_till = moment.unix(PAGE.event.registration_till),
-			m_public_at = moment.unix(PAGE.event.public_at),
-			registration_props = {
-				registration_till_display_date: 'Дата',
-				registration_till_time_input: __APP.BUILD.formInput({
-					label: 'Время',
-					id: 'edit_event_registration_till_time',
-					type: 'time',
-					name: 'registration_till_time',
-					value: PAGE.event.registration_till ? m_registration_till.format('HH:mm') : undefined,
-					classes: ['OnChangeCrossPost'],
-					unit_classes: ['-inline'],
-					required: true
-				}),
-				registration_limit_count_input: __APP.BUILD.formInput({
-					label: 'Максимальное кол-во',
-					id: 'edit_event_registration_limit_count',
-					name: 'registration_limit_count',
-					type: 'number',
-					unit_classes: ['-inline', 'RegistrationQuantity'],
-					value: PAGE.event.registration_limit_count,
-					placeholder: '3 000',
-					required: true
-				}),
-				tomorrow_date: page_vars.tomorrow_date,
-				predefined_field: tmpl('edit-event-registration-predefined-field', [
-					{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'last_name', name: 'Фамилия', description: 'Текстовое поле для ввода фамилии'},
-					{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'first_name', name: 'Имя', description: 'Текстовое поле для ввода имени'},
-					{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'email', name: 'E-mail', description: 'Текстовое поле для ввода адреса электронной почты'},
-					{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'phone_number', name: 'Номер телефона', description: 'Текстовое поля для ввода номера телефона'}
-				])
+	AbstractEditEventPage.prototype.preRender = function() {
+		var self = this,
+			m_registration_till = moment.unix(this.event.registration_till),
+			m_public_at = moment.unix(this.event.public_at),
+			additional_notification = this.event.notifications.getByID(OneNotification.NOTIFICATIN_TYPES.ADDITIONAL_FOR_ORGANIZATION),
+			m_additional_notification_time = additional_notification ? moment.unix(additional_notification.notification_time) : null;
+		
+		this.render_vars.organization_options = __APP.BUILD.option(this.my_organizations.map(function(organization) {
+			
+			return {
+				val: organization.id,
+				dataset: {
+					organization: organization,
+					'image-url': organization.img_url,
+					'default-address': organization.default_address
+				},
+				display_name: organization.name
+			};
+		}));
+		
+		this.render_vars.start_time = __APP.BUILD.formUnit({
+			label: 'Начало',
+			id: 'edit_event_start_time',
+			name: 'start_time',
+			type: 'time',
+			classes: ['StartTime', 'OnChangeCrossPost'],
+			unit_classes: ['-inline'],
+			value: this.event.dates.length ? this.event.dates[0].start_time : undefined,
+			required: true
+		});
+		
+		this.render_vars.end_time = __APP.BUILD.formUnit({
+			label: 'Конец',
+			id: 'edit_event_end_time',
+			name: 'end_time',
+			type: 'time',
+			classes: ['EndTime'],
+			unit_classes: ['-inline'],
+			value: this.event.dates.length ? this.event.dates[0].end_time : undefined
+		});
+		
+		this.render_vars.min_price_input = __APP.BUILD.formUnit({
+			label: 'Цена от',
+			id: 'edit_event_min_price',
+			name: 'min_price',
+			type: 'number',
+			unit_classes: ['-inline', 'MinPrice'],
+			classes: ['OnChangeCrossPost'],
+			value: this.event.min_price,
+			placeholder: 'Минимальная цена'
+		});
+		
+		this.render_vars.registration_till_date_select = __APP.BUILD.formUnit({
+			label: 'Дата окончания регистрации',
+			name: 'registration_till_date',
+			type: 'date',
+			value: this.event.registration_till ? m_registration_till.format(__C.DATE_FORMAT) : undefined,
+			required: true,
+			unit_classes: ['-inline'],
+			attributes: {
+				class: 'OnChangeCrossPost'
 			},
-			m_additional_notification_time;
+			dataset: {
+				selected_day: this.event.registration_till ? m_registration_till.format(__C.DATE_FORMAT) : '',
+				min_date: moment().add(1, 'd').format(__C.DATE_FORMAT)
+			}
+		});
+		
+		this.render_vars.registration_till_time_input = __APP.BUILD.formUnit({
+			label: 'Время',
+			id: 'edit_event_registration_till_time',
+			type: 'time',
+			name: 'registration_till_time',
+			value: this.event.registration_till ? m_registration_till.format(__C.TIME_FORMAT) : undefined,
+			classes: ['OnChangeCrossPost'],
+			unit_classes: ['-inline'],
+			required: true
+		});
+		
+		this.render_vars.registration_limit_count_input = __APP.BUILD.formUnit({
+			label: 'Максимальное кол-во',
+			id: 'edit_event_registration_limit_count',
+			name: 'registration_limit_count',
+			type: 'number',
+			unit_classes: ['-inline', 'RegistrationQuantity'],
+			value: this.event.registration_limit_count,
+			placeholder: '3 000',
+			required: true
+		});
+		
+		this.render_vars.registration_predefined_fields = tmpl('edit-event-registration-predefined-field', [
+			{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'last_name', name: 'Фамилия', description: 'Текстовое поле для ввода фамилии'},
+			{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'first_name', name: 'Имя', description: 'Текстовое поле для ввода имени'},
+			{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'email', name: 'E-mail', description: 'Текстовое поле для ввода адреса электронной почты'},
+			{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'phone_number', name: 'Номер телефона', description: 'Текстовое поля для ввода номера телефона'}
+		]);
+		
+		this.render_vars.add_ticket_type_button = __APP.BUILD.actionButton({
+			title: 'Добавить билет',
+			classes: [__C.CLASSES.COLORS.ACCENT, __C.CLASSES.ICON_CLASS, __C.CLASSES.ICONS.PLUS]
+		}).on('click.AddTicketTypeRow', function() {
+			var $table = self.$wrapper.find('.TicketTypes'),
+				$collapsings = $table.find('.ExpandRow').find('.CollapsingWrapper');
+			
+			$table.siblings('tbody').remove();
+			
+			if ($table.children().length === 1 && $table.children().hasClass('EmptyRow')) {
+				$table.html(AbstractEditEventPage.ticketTypeRowsBuilder());
+			} else {
+				$table.append(AbstractEditEventPage.ticketTypeRowsBuilder());
+			}
+			
+			if ($collapsings.length) {
+				$collapsings.each(function() {
+					$(this).resolveInstance().closeCollapsing();
+				});
+			}
+		});
+		
+		this.render_vars.public_at_date_select = __APP.BUILD.formUnit({
+			label: 'Дата',
+			name: 'public_at_date',
+			type: 'date',
+			value: this.event.public_at ? m_public_at.format(__C.DATE_FORMAT) : undefined,
+			required: true,
+			unit_classes: ['-inline'],
+			dataset: {
+				min_date: moment().format(__C.DATE_FORMAT)
+			}
+		});
+		
+		this.render_vars.public_at_time_input = __APP.BUILD.formUnit({
+			label: 'Время',
+			id: 'edit_event_public_at_time',
+			name: 'public_at_time',
+			type: 'time',
+			unit_classes: ['-inline'],
+			value: this.event.public_at ? m_public_at.format(__C.TIME_FORMAT) : undefined,
+			required: true
+		});
+		
+		this.render_vars.additional_notification_date_select = __APP.BUILD.formUnit({
+			label: 'Дата',
+			name: 'additional_notification_date',
+			type: 'date',
+			value: additional_notification ? m_additional_notification_time.format(__C.DATE_FORMAT) : undefined,
+			required: true,
+			unit_classes: ['-inline'],
+			dataset: {
+				min_date: moment().format(__C.DATE_FORMAT)
+			}
+		});
+		
+		this.render_vars.additional_notification_time_input = __APP.BUILD.formUnit({
+			label: 'Время',
+			id: 'edit_event_additional_notification_time',
+			name: 'additional_notification_time',
+			type: 'time',
+			unit_classes: ['-inline'],
+			value: additional_notification ? m_additional_notification_time.format(__C.TIME_FORMAT) : undefined,
+			required: true
+		});
+	};
+	
+	AbstractEditEventPage.prototype.render = function() {
 		
 		if (__APP.USER.isLoggedOut()) {
 			__APP.changeState('/feed/actual', true, true);
@@ -926,123 +1350,18 @@ AbstractEditEventPage = extending(Page, (function() {
 			return null;
 		}
 		
-		if ((PAGE.event.organization_id && !PAGE.my_organizations.has(PAGE.event.organization_id)) || (PAGE.organization_id && !PAGE.my_organizations.has(PAGE.organization_id))) {
+		if (this.organization_id && !this.my_organizations.has(this.organization_id)) {
 			return __APP.changeState('/', true, true);
 		}
 		
-		if (PAGE.event.registration_required) {
-			if (PAGE.event.registration_till) {
-				registration_props = $.extend(registration_props, {
-					registration_till_display_date: m_registration_till.format(__LOCALES.ru_RU.DATE.DATE_FORMAT),
-					registration_till_date: m_registration_till.format(__C.DATE_FORMAT)
-				});
-			}
-		}
+		this.organization_id = this.organization_id ? this.organization_id : this.my_organizations[0].id;
 		
-		if (PAGE.event.public_at != null) {
-			page_vars.public_at_data = m_public_at.format(__C.DATE_FORMAT);
-			page_vars.public_at_data_label = m_public_at.format(__LOCALE.DATE.DATE_FORMAT);
-		}
+		this.preRender();
 		
-		if (page_vars.additional_notification) {
-			m_additional_notification_time = moment.unix(page_vars.additional_notification.notification_time);
-			page_vars.additional_notification_data = m_additional_notification_time.format(__C.DATE_FORMAT);
-			page_vars.additional_notification_data_label = m_additional_notification_time.format(__LOCALE.DATE.DATE_FORMAT);
-		}
+		this.$wrapper.html(tmpl('edit-event-page', this.render_vars));
 		
-		PAGE.organization_id = PAGE.organization_id ? PAGE.organization_id : PAGE.my_organizations[0].id;
-		
-		PAGE.$wrapper.html(tmpl('edit-event-page', $.extend(page_vars, {
-			organization_options: __APP.BUILD.option(PAGE.my_organizations.map(function(organization) {
-				
-				return {
-					val: organization.id,
-					dataset: {
-						organization: organization,
-						'image-url': organization.img_url,
-						'default-address': organization.default_address
-					},
-					display_name: organization.name
-				};
-			})),
-			date_picker: tmpl('edit-event-datepicker', {
-				start_time: __APP.BUILD.formInput({
-					label: 'Начало',
-					id: 'edit_event_start_time',
-					name: 'start_time',
-					type: 'time',
-					classes: ['StartTime', 'OnChangeCrossPost'],
-					unit_classes: ['-inline'],
-					value: PAGE.event.dates.length ? PAGE.event.dates[0].start_time : undefined,
-					required: true
-				}),
-				end_time: __APP.BUILD.formInput({
-					label: 'Конец',
-					id: 'edit_event_end_time',
-					name: 'end_time',
-					type: 'time',
-					classes: ['EndTime'],
-					unit_classes: ['-inline'],
-					value: PAGE.event.dates.length ? PAGE.event.dates[0].end_time : undefined
-				}),
-				today: page_vars.current_date
-			}),
-			min_price_input: __APP.BUILD.formInput({
-				label: 'Цена от',
-				id: 'edit_event_min_price',
-				name: 'min_price',
-				type: 'number',
-				unit_classes: ['-inline', 'MinPrice'],
-				classes: ['OnChangeCrossPost'],
-				value: PAGE.event.min_price,
-				placeholder: 'Минимальная цена'
-			}),
-			cover_picker: tmpl('edit-event-cover-picker', {
-				image_horizontal_url: PAGE.event.image_horizontal_url,
-				image_horizontal_filename: getFilenameFromURL(PAGE.event.image_horizontal_url)
-			}),
-			registration: tmpl('edit-event-registration', registration_props),
-			public_at_time_input: __APP.BUILD.formInput({
-				label: 'Время',
-				id: 'edit_event_public_at_time',
-				name: 'public_at_time',
-				type: 'time',
-				unit_classes: ['-inline'],
-				value: PAGE.event.public_at ? m_public_at.format('HH:mm') : undefined,
-				required: true
-			}),
-			additional_notification_time_input: __APP.BUILD.formInput({
-				label: 'Время',
-				id: 'edit_event_additional_notification_time',
-				name: 'additional_notification_time',
-				type: 'time',
-				unit_classes: ['-inline'],
-				value: page_vars.additional_notification ? m_additional_notification_time.format('HH:mm') : undefined,
-				required: true
-			}),
-			organization_id: PAGE.organization_id || PAGE.event.organization_id,
-			vk_post_link: PAGE.event.vk_post_link ? __APP.BUILD.actionLink(
-				PAGE.event.vk_post_link,
-				'Страница публикации во Вконтакте',
-				[__C.CLASSES.COLORS.ACCENT, '-no_uppercase'],
-				{},
-				{target: '_blank'}
-			) : ''
-		})));
-		
-		$organizations_wrapper = PAGE.$wrapper.find('.EditEventOrganizations');
-		if (PAGE.my_organizations.length > 1) {
-			$organizations_wrapper.removeClass(__C.CLASSES.HIDDEN);
-		} else {
-			$organizations_wrapper.addClass(__C.CLASSES.HIDDEN);
-		}
-		
-		PAGE.init();
-		
-		this.renderRest(page_vars);
+		this.init();
 	};
-	
-	AbstractEditEventPage.prototype.renderRest = function(page_vars) {};
 	
 	return AbstractEditEventPage;
 }()));

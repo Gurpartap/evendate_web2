@@ -31,6 +31,8 @@ OneTicketType = extending(OneEntity, (function() {
 	 * @property {?number} promocode_effort
 	 */
 	function OneTicketType(event_id, uuid) {
+		var self = this;
+		
 		this.uuid = setDefaultValue(uuid, 0);
 		this.event_id = setDefaultValue(event_id, 0);
 		this.type_code = null;
@@ -45,6 +47,21 @@ OneTicketType = extending(OneEntity, (function() {
 		this.max_count_per_user = null;
 		this.promocode = null;
 		this.promocode_effort = null;
+		
+		Object.defineProperties(this, {
+			formatted_sell_start_date: {
+				get: function() {
+					
+					return self.sell_start_date ? moment.unix(self.sell_start_date).format(__LOCALE.DATE.DATE_FORMAT) : '';
+				}
+			},
+			formatted_sell_end_date: {
+				get: function() {
+					
+					return self.sell_end_date ? moment.unix(self.sell_end_date).format(__LOCALE.DATE.DATE_FORMAT) : '';
+				}
+			}
+		});
 	}
 	
 	OneTicketType.prototype.ID_PROP_NAME = 'uuid';

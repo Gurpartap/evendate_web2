@@ -148,24 +148,21 @@ FeedPage = extending(Page, (function() {
 		var PAGE = this;
 		
 		PAGE.cities.fetchCities(null, 0, 'distance,local_name').done(function() {
+			var $select = PAGE.$view.find('.FeedCitiesSelect');
 			
-			PAGE.$view.find('.FeedCitiesSelect')
-			    .html(tmpl('option', PAGE.cities.map(function(city) {
-				    return {
-					    val: city.id,
-					    display_name: city.local_name
-				    };
-			    })))
-			    .select2({
-				    containerCssClass: 'form_select2',
-				    dropdownCssClass: 'form_select2_drop'
-			    })
-			    .select2('val', __APP.USER.selected_city.id)
-			    .off('change.SelectCity')
-			    .on('change.SelectCity', function() {
-				    __APP.USER.selected_city = PAGE.cities.getByID($(this).val());
-				    __APP.reload();
-			    });
+			$select.html(tmpl('option', PAGE.cities.map(function(city) {
+				
+				return {
+					val: city.id,
+					display_name: city.local_name
+				};
+			})));
+			
+			initSelect2($select);
+			$select.select2('val', __APP.USER.selected_city.id).off('change.SelectCity').on('change.SelectCity', function() {
+					__APP.USER.selected_city = PAGE.cities.getByID($(this).val());
+					__APP.reload();
+				});
 		});
 	};
 	
