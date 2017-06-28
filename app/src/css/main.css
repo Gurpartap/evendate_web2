@@ -1184,7 +1184,6 @@ fieldset:disabled .form_select {cursor: default}
 
 .form_radio + .form_label,
 .form_checkbox + .form_label {
-	display: inline-block;
 	margin-bottom: 0;
 	font-weight: normal;
 	white-space: nowrap;
