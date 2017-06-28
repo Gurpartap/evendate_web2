@@ -2100,7 +2100,7 @@ function bindCollapsing($parent) {
 		
 		function toggleCollapsing(){
 			var parent_Tabs = $wrapper.parents('.Tabs').resolveInstance();
-			debugger;
+			
 			if (parent_Tabs.length) {
 				parent_Tabs.disconnectMutationObserver();
 			}
@@ -2159,13 +2159,15 @@ function bindCollapsing($parent) {
 		
 		$instance.bindTrigger($instance.$trigger);
 		
-		$wrapper
-			.on('click', function(){
+		$wrapper.on('transitionend', function() {
+			$wrapper.removeClass('-in_progress');
+		});
+		
+		if (default_height) {
+			$wrapper.on('click.OpenCollapsing', function() {
 				$instance.openCollapsing();
-			})
-			.on('transitionend', function() {
-				$wrapper.removeClass('-in_progress');
 			});
+		}
 		
 		
 		mutation_observer.observe($wrapper.get(0), {

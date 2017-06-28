@@ -391,7 +391,6 @@ AbstractEditEventPage = extending(Page, (function() {
 				$expanded_row = $row.next('.ExpandRow');
 			
 			$row.data('ticket_type', _ticket_types[i]);
-			
 			$row.find('.TicketTypeExpandButton').on('click.ExpandTicketType', function() {
 				$expanded_row.find('.CollapsingWrapper').resolveInstance().toggleCollapsing();
 			});
@@ -1221,7 +1220,8 @@ AbstractEditEventPage = extending(Page, (function() {
 			title: 'Добавить билет',
 			classes: [__C.CLASSES.COLORS.ACCENT, __C.CLASSES.ICON_CLASS, __C.CLASSES.ICONS.PLUS]
 		}).on('click.AddTicketTypeRow', function() {
-			var $table = self.$wrapper.find('.TicketTypes');
+			var $table = self.$wrapper.find('.TicketTypes'),
+				$collapsings = $table.find('.ExpandRow').find('.CollapsingWrapper');
 			
 			$table.siblings('tbody').remove();
 			
@@ -1229,6 +1229,12 @@ AbstractEditEventPage = extending(Page, (function() {
 				$table.html(AbstractEditEventPage.ticketTypeRowsBuilder());
 			} else {
 				$table.append(AbstractEditEventPage.ticketTypeRowsBuilder());
+			}
+			
+			if ($collapsings.length) {
+				$collapsings.each(function() {
+					$(this).resolveInstance().closeCollapsing();
+				});
 			}
 		});
 		
