@@ -104,7 +104,7 @@ class Organization extends AbstractEntity
 		'country_local_name',
 		'country_language',
 		'country_language_short',
-		self::SEARCH_SCORE_FIELD_NAME => '(SELECT score::FLOAT FROM temp_organization_ratings WHERE organization_id = view_organizations.id)::FLOAT AS ' . self::SEARCH_SCORE_FIELD_NAME,
+		self::SEARCH_SCORE_FIELD_NAME => '(SELECT get_organization_search_score(view_organizations.id)) AS ' . self::SEARCH_SCORE_FIELD_NAME,
 		self::RANDOM_FIELD_NAME => '(SELECT created_at / (random() * 9 + 1)
 			FROM view_organizations AS vo
 			WHERE vo.id = view_organizations.id) AS random',
