@@ -27,6 +27,8 @@ ServerConnection = (function() {
 	};
 	Object.freeze(ServerConnection.HTTP_METHODS);
 	
+	ServerConnection.MAX_ENTITIES_LENGTH = 10000;
+	
 	function ajaxHandler(result, success, error) {
 		error = typeof error !== 'undefined' ? error : function() {
 				console.log(result);

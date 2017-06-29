@@ -79,7 +79,7 @@ AdminEventOrdersPage = extending(AdminEventPage, (function() {
 			loader: (this.$loader = __APP.BUILD.overlayLoader())
 		}));
 		
-		this.orders.fetchAllOrders(this.event.orders_count, this.orders_fields).done(function() {
+		this.orders.fetchAllOrders(this.orders_fields).done(function() {
 			var $rows = tmpl('admin-event-orders-page-tr', self.orders.map(function(order) {
 				
 				return {

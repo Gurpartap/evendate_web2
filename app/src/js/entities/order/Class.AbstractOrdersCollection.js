@@ -45,6 +45,8 @@ AbstractOrdersCollection = extending(EntitiesCollection, (function() {
 	 * @param {number} [length]
 	 * @param {(string|Array)} [order_by]
 	 * @param {AJAXCallback} [success]
+	 *
+	 * @returns {jqPromise}
 	 */
 	AbstractOrdersCollection.prototype.fetchOrders = function(fields, length, order_by, success) {
 		var self = this;
@@ -63,37 +65,28 @@ AbstractOrdersCollection = extending(EntitiesCollection, (function() {
 	};
 	/**
 	 *
-	 * @param {number} orders_count
 	 * @param {(Fields|Array<string>|string)} [fields]
 	 * @param {(Array<string>|string)} [order_by]
 	 * @param {AJAXCallback} [success]
+	 *
 	 * @returns {jqPromise}
 	 */
-	AbstractOrdersCollection.prototype.fetchAllOrders = function(orders_count, fields, order_by, success) {
-		var self = this,
-			orders = [],
-			laps = Math.ceil(orders_count / 100);
+	AbstractOrdersCollection.prototype.fetchAllOrders = function(fields, order_by, success) {
+		var self = this;
 		
 		this.empty();
 		
-		return __APP.SERVER.multipleAjax.apply(__APP.SERVER, (new Array(laps)).fill(true).map(function(el, i) {
-			
-			return self.constructor.fetchOrders(self.event_id, {
-				fields: fields || undefined,
-				offset: i * 100,
-				order_by: order_by || undefined
-			}).then(function(chunk) {
-				
-				orders = orders.concat(chunk);
-				
-				return chunk;
-			});
-		})).then(function() {
-			self.setData(orders);
-			
+		return this.constructor.fetchOrders(this.event_id, {
+			fields: fields || undefined,
+			offset: 0,
+			length: ServerConnection.MAX_ENTITIES_LENGTH,
+			order_by: order_by || undefined
+		}, function(data) {
+			self.setData(data);
 			if (isFunction(success)) {
 				success.call(self, self.last_pushed);
 			}
+		}).then(function() {
 			
 			return self.last_pushed;
 		});
