@@ -144,7 +144,7 @@ class VkAuth extends AbstractAuth
 				'gid' => $group['gid'],
 				'name' => $group['name'],
 				'screen_name' => $group['screen_name'],
-				'description' => $group['description'],
+				'description' => $group['description'] ?? null,
 				'photo' => $group['photo']
 			);
 			$p_ins_group->cols($data)
