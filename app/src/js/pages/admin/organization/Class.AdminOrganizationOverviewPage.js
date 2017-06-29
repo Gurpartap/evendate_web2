@@ -91,12 +91,23 @@ AdminOrganizationOverviewPage = extending(AdminOrganizationPage, (function() {
 					cursor: 'pointer',
 					size: 120,
 					dataLabels: {
+						inside: false,
 						distance: -35,
+						overflow: 'none',
+						crop: false,
 						defer: false,
 						formatter: function() {
 							return this.percentage > 15 ? Math.round(this.percentage) + '%' : null;
 						},
-						style: {"color": "#fff", "fontSize": "20px", "fontWeight": "300", "textShadow": "none"},
+						useHTML: true,
+						style: {
+							'color': '#fff',
+							'fontSize': '16px',
+							'fontWeight': '300',
+							'textShadow': 'none',
+							'textOutline': 'none',
+							'textOverflow': 'none'
+						},
 						y: -6
 					},
 					showInLegend: true
@@ -107,12 +118,14 @@ AdminOrganizationOverviewPage = extending(AdminOrganizationPage, (function() {
 				verticalAlign: 'top',
 				layout: 'vertical',
 				width: 100,
+				symbolPadding: 15,
 				symbolHeight: 0,
 				symbolWidth: 0,
 				itemMarginBottom: 5,
 				labelFormatter: function() {
 					return '<span style="color: ' + this.color + '">' + this.name + '</span>'
 				},
+				useHTML: true,
 				itemStyle: {cursor: 'pointer', fontSize: '14px', fontWeight: '500'},
 				y: 12
 			}
