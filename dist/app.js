@@ -3181,6 +3181,57 @@ DateModelsCollection = extending(EntitiesCollection, (function() {
 /**
  * @requires ../../entities/Class.OneEntity.js
  */
+/**
+ *
+ * @class InterestModel
+ * @extends OneEntity
+ */
+InterestModel = extending(OneEntity, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs InterestModel
+	 *
+	 * @property {?number} topic_id
+	 * @property {?string} topic_name
+	 * @property {?float} value
+	 * @property {?timestamp} updated_at
+	 */
+	function InterestModel() {
+		this.topic_id = setDefaultValue(this.topic_id, 0);
+		this.topic_name = null;
+		this.value = null;
+		this.updated_at = null;
+	}
+	InterestModel.prototype.ID_PROP_NAME = 'topic_id';
+	
+	return InterestModel;
+}()));
+/**
+ * @requires ../../entities/Class.EntitiesCollection.js
+ * @requires Class.InterestModel.js
+ */
+/**
+ *
+ * @class InterestModelsCollection
+ * @extends EntitiesCollection
+ */
+InterestModelsCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs InterestModelsCollection
+	 */
+	function InterestModelsCollection() {
+		EntitiesCollection.call(this);
+	}
+	InterestModelsCollection.prototype.collection_of = InterestModel;
+	
+	return InterestModelsCollection;
+}()));
+/**
+ * @requires ../../entities/Class.OneEntity.js
+ */
 
 /**
  * @typedef {object} RegistrationFieldLike
@@ -4751,6 +4802,7 @@ OneUser = extending(OneEntity, (function() {
 	 * @property {OrganizationsCollection} subscriptions
 	 * @property {FavoredEventsCollection} favored
 	 * @property {UsersActivitiesCollection} actions
+	 * @property {InterestModelsCollection} interests
 	 */
 	function OneUser(user_id) {
 		var self = this;
@@ -4778,6 +4830,7 @@ OneUser = extending(OneEntity, (function() {
 		this.subscriptions = new OrganizationsCollection();
 		this.favored = new FavoredEventsCollection();
 		this.actions = new UsersActivitiesCollection(user_id);
+		this.interests = new InterestModelsCollection();
 		
 		Object.defineProperty(this, 'full_name', {
 			enumerable: true,
@@ -13030,122 +13083,6 @@ Builder = (function() {
 	return Builder;
 }());
 /**
- * @abstract
- * @class
- */
-AbstractSidebar = (function () {
-	/**
-	 *
-	 * @constructor
-	 * @constructs AbstractSidebar
-	 */
-	function AbstractSidebar() {
-		this.$sidebar = $('#main_sidebar');
-		this.$subscribed_orgs = $('.SidebarOrganizationsList');
-	}
-	
-	AbstractSidebar.prototype.init = function () {
-		this.$sidebar.find('.SidebarNav').addClass('-items_' + this.$sidebar.find('.SidebarNavItem').not('.-hidden').length);
-		this.$sidebar.find('.SidebarScroll').scrollbar({
-			disableBodyScroll: true
-		});
-	};
-	
-	AbstractSidebar.prototype.updateSubscriptions = function () {};
-	
-	return AbstractSidebar;
-}());
-/**
- * @requires Class.AbstractSidebar.js
- */
-/**
- * @class
- * @extends AbstractSidebar
- */
-Sidebar = extending(AbstractSidebar, (function () {
-	/**
-	 *
-	 * @constructor
-	 * @construct Sidebar
-	 */
-	function Sidebar() {
-		AbstractSidebar.call(this);
-	}
-	
-	Sidebar.prototype.init = function () {
-		var self = this;
-		self.updateSubscriptions();
-		$(window).on('subscribe unsubscribe', function() {
-			self.updateSubscriptions();
-		});
-		
-		AbstractSidebar.prototype.init.call(this);
-	};
-	
-	Sidebar.prototype.updateSubscriptions = function() {
-		var $subscribed_orgs = this.$subscribed_orgs,
-			timing = 0,
-			current_menu_items = $.map($subscribed_orgs.children(), function(el) {
-				return $(el).data('organization_id');
-			}),
-			to_add = __APP.USER.subscriptions.filter(function(item) {
-				return current_menu_items.indexOf(item.id) === -1;
-			}),
-			to_remove = current_menu_items.filter(function(item) {
-				return !(__APP.USER.subscriptions.has(item));
-			});
-		
-		if (to_add.length) {
-			__APP.BUILD.organizationItems(to_add, {
-				block_classes: ['animated'],
-				avatar_classes: ['-size_30x30']
-			})
-				[($subscribed_orgs.length ? 'prependTo' : 'appendTo')]($subscribed_orgs)
-				.each(function(i, org_block) {
-					setTimeout(function() {
-						$(org_block).addClass('-show');
-					}, timing += 100);
-				});
-			
-			bindPageLinks($subscribed_orgs);
-		}
-		if (to_remove.length) {
-			to_remove.forEach(function(id) {
-				var $organization_item = $subscribed_orgs.find('.organization_item[data-organization_id="' + id + '"]').removeClass('-show');
-				setTimeout(function() {
-					$organization_item.remove();
-				}, 500);
-			});
-		}
-	};
-	
-	return Sidebar;
-}()));
-/**
- * @requires Class.AbstractSidebar.js
- */
-/**
- * @class
- * @extends AbstractSidebar
- */
-SidebarNoAuth = extending(AbstractSidebar, (function () {
-	/**
-	 *
-	 * @constructor
-	 * @constructs SidebarNoAuth
-	 */
-	function SidebarNoAuth() {
-		AbstractSidebar.call(this);
-	}
-	
-	SidebarNoAuth.prototype.init = function () {
-		this.$sidebar.find('.SidebarOrganizationsScroll').addClass(__C.CLASSES.HIDDEN);
-		AbstractSidebar.prototype.init.call(this);
-	};
-	
-	return SidebarNoAuth;
-}()));
-/**
  *
  * @class AppInspectorComponents
  */
@@ -13422,6 +13359,122 @@ OrderAppInspector = extending(AbstractAppInspector, (function() {
 	
 	
 	return OrderAppInspector;
+}()));
+/**
+ * @abstract
+ * @class
+ */
+AbstractSidebar = (function () {
+	/**
+	 *
+	 * @constructor
+	 * @constructs AbstractSidebar
+	 */
+	function AbstractSidebar() {
+		this.$sidebar = $('#main_sidebar');
+		this.$subscribed_orgs = $('.SidebarOrganizationsList');
+	}
+	
+	AbstractSidebar.prototype.init = function () {
+		this.$sidebar.find('.SidebarNav').addClass('-items_' + this.$sidebar.find('.SidebarNavItem').not('.-hidden').length);
+		this.$sidebar.find('.SidebarScroll').scrollbar({
+			disableBodyScroll: true
+		});
+	};
+	
+	AbstractSidebar.prototype.updateSubscriptions = function () {};
+	
+	return AbstractSidebar;
+}());
+/**
+ * @requires Class.AbstractSidebar.js
+ */
+/**
+ * @class
+ * @extends AbstractSidebar
+ */
+Sidebar = extending(AbstractSidebar, (function () {
+	/**
+	 *
+	 * @constructor
+	 * @construct Sidebar
+	 */
+	function Sidebar() {
+		AbstractSidebar.call(this);
+	}
+	
+	Sidebar.prototype.init = function () {
+		var self = this;
+		self.updateSubscriptions();
+		$(window).on('subscribe unsubscribe', function() {
+			self.updateSubscriptions();
+		});
+		
+		AbstractSidebar.prototype.init.call(this);
+	};
+	
+	Sidebar.prototype.updateSubscriptions = function() {
+		var $subscribed_orgs = this.$subscribed_orgs,
+			timing = 0,
+			current_menu_items = $.map($subscribed_orgs.children(), function(el) {
+				return $(el).data('organization_id');
+			}),
+			to_add = __APP.USER.subscriptions.filter(function(item) {
+				return current_menu_items.indexOf(item.id) === -1;
+			}),
+			to_remove = current_menu_items.filter(function(item) {
+				return !(__APP.USER.subscriptions.has(item));
+			});
+		
+		if (to_add.length) {
+			__APP.BUILD.organizationItems(to_add, {
+				block_classes: ['animated'],
+				avatar_classes: ['-size_30x30']
+			})
+				[($subscribed_orgs.length ? 'prependTo' : 'appendTo')]($subscribed_orgs)
+				.each(function(i, org_block) {
+					setTimeout(function() {
+						$(org_block).addClass('-show');
+					}, timing += 100);
+				});
+			
+			bindPageLinks($subscribed_orgs);
+		}
+		if (to_remove.length) {
+			to_remove.forEach(function(id) {
+				var $organization_item = $subscribed_orgs.find('.organization_item[data-organization_id="' + id + '"]').removeClass('-show');
+				setTimeout(function() {
+					$organization_item.remove();
+				}, 500);
+			});
+		}
+	};
+	
+	return Sidebar;
+}()));
+/**
+ * @requires Class.AbstractSidebar.js
+ */
+/**
+ * @class
+ * @extends AbstractSidebar
+ */
+SidebarNoAuth = extending(AbstractSidebar, (function () {
+	/**
+	 *
+	 * @constructor
+	 * @constructs SidebarNoAuth
+	 */
+	function SidebarNoAuth() {
+		AbstractSidebar.call(this);
+	}
+	
+	SidebarNoAuth.prototype.init = function () {
+		this.$sidebar.find('.SidebarOrganizationsScroll').addClass(__C.CLASSES.HIDDEN);
+		AbstractSidebar.prototype.init.call(this);
+	};
+	
+	return SidebarNoAuth;
 }()));
 /**
  * @abstract
@@ -16845,7 +16898,11 @@ AdminOrganizationCRMPage = extending(AdminOrganizationPage, (function() {
 		AdminOrganizationPage.call(this, org_id);
 		
 		this.organization_fields = this.organization_fields.add('subscribed_count');
-		this.subscribers_fields = new Fields('email', 'accounts_links');
+		this.subscribers_fields = new Fields(
+			'email',
+			'accounts_links',
+			'interests'
+		);
 		this.organization_subscribers = new OrganizationSubscribersCollection(org_id);
 		this.CRMTable = null;
 		this.$loader = $();

@@ -25,7 +25,11 @@ AdminOrganizationCRMPage = extending(AdminOrganizationPage, (function() {
 		AdminOrganizationPage.call(this, org_id);
 		
 		this.organization_fields = this.organization_fields.add('subscribed_count');
-		this.subscribers_fields = new Fields('email', 'accounts_links');
+		this.subscribers_fields = new Fields(
+			'email',
+			'accounts_links',
+			'interests'
+		);
 		this.organization_subscribers = new OrganizationSubscribersCollection(org_id);
 		this.CRMTable = null;
 		this.$loader = $();
