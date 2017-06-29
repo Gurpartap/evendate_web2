@@ -76,6 +76,12 @@ AdminOrganizationCRMPage = extending(AdminOrganizationPage, (function() {
 		
 		this.CRMTable = this.$wrapper.find('.CRMTable').eq(0).DataTable({
 			paging: true,
+			select: {
+				style: 'single',
+				selector: 'td',
+				className: '-selected',
+				info: false
+			},
 			columnDefs: [
 				{
 					targets: 0,
@@ -162,6 +168,10 @@ AdminOrganizationCRMPage = extending(AdminOrganizationPage, (function() {
 				};
 			}));
 			
+			$rows.each(function(i) {
+				$(this).data('client', subscribers[i]);
+			});
+			
 			if (!self.CRMTable) {
 				self.initCRMTable();
 			}
@@ -171,6 +181,36 @@ AdminOrganizationCRMPage = extending(AdminOrganizationPage, (function() {
 			} catch (e) {
 				__APP.reload();
 			}
+			
+			self.CRMTable.on('deselect', function() {
+				AbstractAppInspector.hideCurrent();
+			});
+			
+			self.CRMTable.on('select', function(e, dt, type, indexes) {
+				var $row,
+					data;
+				
+				if (type === 'row') {
+					$row = $(dt.row(indexes).node());
+					data = $row.data();
+					
+					if (data.inspector && data.inspector.is_shown) {
+						data.inspector.hide();
+						
+						$('body').off('keyup.DeselectCurrent');
+					} else {
+						if (!(data.inspector instanceof ClientAppInspector)) {
+							data.inspector = new ClientAppInspector(data.client);
+							$row.data(data);
+						}
+						data.inspector.show();
+						
+						$('body').off('keyup.DeselectCurrent').one('keyup.DeselectCurrent', function() {
+							dt.row(indexes).deselect();
+						});
+					}
+				}
+			});
 			
 			self.$wrapper.find('.CRMTableWrapper').removeClass(__C.CLASSES.STATUS.DISABLED);
 			self.$loader.remove();

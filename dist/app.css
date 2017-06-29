@@ -4239,9 +4239,11 @@ body.-open_modal > .modal_wrapper {
 }
 
 .app_inspector_remover {
+	top: -3px;
 	margin-right: 12px;
 	padding: 8px 18px;
 	font-size: 2.5em;
+	font-weight: 100;
 	line-height: 1;
 	background-color: transparent;
 	border: 0;
