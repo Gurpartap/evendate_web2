@@ -47,6 +47,7 @@ class App
 	public static $__LENGTH;
 	public static $__OFFSET;
 	public static $__ORDER_BY;
+	public static $__LANG = 'ru';
 
 	private static $__USER;
 	private static $__DB;
@@ -58,6 +59,8 @@ class App
 	const DEFAULT_NODE_LOCATION = 'http://localhost:8000';
 
 	const DB_DATETIME_FORMAT = 'Y-m-d H:i:s';
+
+	const EXPORT_FORMATS = array('html', 'xlsx');
 
 	/*
 	 * init config options for deploy and visioning

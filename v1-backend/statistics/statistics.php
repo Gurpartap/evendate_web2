@@ -26,6 +26,24 @@ $__modules['statistics'] = array(
 			)->getParams($__user, $__fields);
 			return new Result($data->getStatus(), '', array($data->getData()));
 		},
+		'{/events/(id:[0-9]+)/tickets/export}' => function ($event_id) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
+
+			if ($__user instanceof User == false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
+
+			$__request['statistics_event'] = EventsCollection::one($__db, $__user, $event_id, array());
+
+			if (!$__user->hasRights($__request['statistics_event']->getOrganization(), array(Roles::ROLE_MODERATOR, Roles::ROLE_ADMIN)))
+				throw new PrivilegesException('NOT_ADMIN', $__db);
+
+			TicketsCollection::export($__db,
+				$__user,
+				$__request,
+				Fields::parseFields('ticket_type,user{fields:"link,email"},order{fields:"registration_fields,registration_status,status_name,canceled_at,payed_at,is_canceled"},created_at'),
+				array('length' => 10000, 'offset' => 0),
+				$__order_by ?? array()
+				, $__request['format'] ?? 'xlsx');
+		},
+
 		'{/events/(id:[0-9]+)}/participants' => function ($id) use ($__db, $__request, $__user, $__fields, $__pagination) {
 
 			if ($__user instanceof User == false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
@@ -50,6 +68,23 @@ $__modules['statistics'] = array(
 
 
 		},
+		'{/organizations/(id:[0-9]+)/subscribers/export}' => function ($id) use ($__db, $__request, $__user, $__fields,$__pagination) {
+			$__request['organization'] = OrganizationsCollection::one(
+				$__db,
+				$__user,
+				$id,
+				array()
+			);
+
+			if (!$__user->isAdmin($__request['organization'])) throw new PrivilegesException('NOT_ADMIN', $__db);
+			UsersCollection::export($__db,
+				$__user,
+				$__request,
+				Fields::parseFields('link,accounts_links,accounts,interests,email,subscriptions,favored{filters:"organization_id=' . $__request['organization']->getId() . '"}'),
+				array('length' => 10000, 'offset' => 0),
+				$__order_by ?? array()
+				, $__request['format'] ?? 'xlsx');
+		},
 		'{/organizations/(id:[0-9]+)}' => function ($id) use ($__db, $__request, $__user, $__fields) {
 			$organization = OrganizationsCollection::one(
 				$__db,
@@ -63,6 +98,20 @@ $__modules['statistics'] = array(
 				new DateTime($__request['since'] ?? null),
 				new DateTime($__request['till'] ?? null));
 		},
+		'{/events/(id:[0-9]+)/orders/export}' => function ($event_id) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
+			if ($__user instanceof User == false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
+			$__request['statistics_event'] = EventsCollection::one($__db, $__user, $event_id, array());
+			if (!$__user->isAdmin($__request['statistics_event']->getOrganization())) throw new PrivilegesException('NOT_ADMIN', $__db);
+
+			OrdersCollection::export($__db,
+				$__user,
+				$__request,
+				Fields::parseFields('registration_fields,tickets,registration_status,status_name,canceled_at,payed_at,is_canceled,created_at,user{fields:"link,email"}'),
+				array('length' => 10000, 'offset' => 0),
+				$__order_by ?? array()
+				, $__request['format'] ?? 'xlsx');
+		},
+
 		'{/events/(id:[0-9]+)}/orders' => function ($id) use ($__db, $__request, $__user, $__fields, $__pagination) {
 			if ($__user instanceof User == false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
 			$__request['statistics_event'] = EventsCollection::one($__db, $__user, $id, array());
