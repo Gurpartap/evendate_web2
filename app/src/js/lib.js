@@ -160,6 +160,12 @@ __C = {
 		PENDING: 'pending',
 		RESOLVED: 'resolved',
 		REJECTED: 'rejected'
+	},
+	/**
+	 * @enum {number}
+	 */
+	KEY_CODES: {
+		ESC: 27
 	}
 };
 /**
@@ -1688,6 +1694,16 @@ function isBase64(string) {
  */
 function isFunction(variable) {
 	return (variable && typeof variable === 'function');
+}
+/**
+ *
+ * @param {Event} event
+ * @param {__C.KEY_CODES} key
+ *
+ * @return {boolean}
+ */
+function isKeyPressed(event, key) {
+	return event.keyCode === key;
 }
 /**
  *

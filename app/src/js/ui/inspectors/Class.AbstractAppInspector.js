@@ -30,6 +30,10 @@ AbstractAppInspector = extendingJQuery((function() {
 		this.find('.AppInspectorRemoveButton').on('click.CloseInspector', function() {
 			self.hide();
 		});
+		
+		if (AbstractAppInspector.collection.length > 5) {
+			AbstractAppInspector.collection[0].destroy();
+		}
 	}
 	
 	AbstractAppInspector.$wrapper = $('.AppInspectorsWrapper');
@@ -64,8 +68,11 @@ AbstractAppInspector = extendingJQuery((function() {
 	AbstractAppInspector.prototype.render = function() {
 		AbstractAppInspector.$wrapper.append(this);
 		this.is_rendered = true;
+		this.initiate();
 		this.find('.AppInspectorScroll').scrollbar();
 	};
+	
+	AbstractAppInspector.prototype.initiate = function() {};
 	
 	AbstractAppInspector.prototype.show = function() {
 		var self = this;
@@ -98,8 +105,10 @@ AbstractAppInspector = extendingJQuery((function() {
 		this.remove();
 	};
 	
-	$('body').on('keyup.CloseCurrentAppInspector', function() {
-		AbstractAppInspector.hideCurrent();
+	$('body').on('keyup.CloseCurrentAppInspector', function(e) {
+		if (isKeyPressed(e, __C.KEY_CODES.ESC)) {
+			AbstractAppInspector.hideCurrent();
+		}
 	});
 	
 	Object.seal(AbstractAppInspector);

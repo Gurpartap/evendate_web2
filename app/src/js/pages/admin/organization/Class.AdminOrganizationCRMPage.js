@@ -187,6 +187,7 @@ AdminOrganizationCRMPage = extending(AdminOrganizationPage, (function() {
 			}
 			
 			self.CRMTable.on('deselect', function() {
+				$('body').off('keyup.DeselectCurrent');
 				AbstractAppInspector.hideCurrent();
 			});
 			
@@ -209,8 +210,10 @@ AdminOrganizationCRMPage = extending(AdminOrganizationPage, (function() {
 						}
 						data.inspector.show();
 						
-						$('body').off('keyup.DeselectCurrent').one('keyup.DeselectCurrent', function() {
-							dt.row(indexes).deselect();
+						$('body').off('keyup.DeselectCurrent').on('keyup.DeselectCurrent', function(e) {
+							if (isKeyPressed(e, __C.KEY_CODES.ESC)) {
+								dt.row(indexes).deselect();
+							}
 						});
 					}
 				}

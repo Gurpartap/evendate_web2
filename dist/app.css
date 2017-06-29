@@ -4222,7 +4222,7 @@ body.-open_modal > .modal_wrapper {
 
 .app_inspector {
 	position: absolute;
-	width: 354px;
+	width: 400px;
 	height: 100%;
 	transform: translateX(10%);
 	transition: transform .3s ease;
