@@ -113,7 +113,7 @@ class TicketsCollection extends AbstractCollection
 					AND users_organizations.status = TRUE
 					) > 0', $user->getId());
 		} else {
-			if (isset($filters['uuid'])){
+			if (isset($filters['uuid'])) {
 				$q_get_tickets->where('(SELECT COUNT(users_organizations.user_id) 
 					FROM users_organizations
 					INNER JOIN view_all_events ON view_all_events.id = view_tickets.event_id 
@@ -124,7 +124,7 @@ class TicketsCollection extends AbstractCollection
 					AND users_organizations.status = TRUE
 					AND view_tickets.uuid = ?
 					) > 0', $user->getId(), $filters['uuid']);
-			}else{
+			} else {
 				$q_get_tickets->where('user_id = ?', $user->getId());
 			}
 		}
@@ -159,6 +159,91 @@ class TicketsCollection extends AbstractCollection
 																	 array $fields = null): Ticket
 	{
 		return self::filter($db, $user, array('uuid' => $uuid), $fields);
+	}
+
+	public static function export(ExtendedPDO $db,
+																AbstractUser $user = null,
+																array $filters = null,
+																array $fields = null,
+																array $pagination = null,
+																array $order_by = array('created_at'),
+																$format)
+	{
+
+		$data = self::filter($db,
+			$user,
+			$filters,
+			$fields,
+			$pagination,
+			$order_by ?? array())->getData();
+
+		global $BACKEND_FULL_PATH;
+
+		$column_names = json_decode(file_get_contents($BACKEND_FULL_PATH . '/events/column_names.json'), true);
+
+		$index = 0;
+		$headers = array(
+			$column_names[App::$__LANG]['user']['first_name'],
+			$column_names[App::$__LANG]['user']['last_name'],
+			$column_names[App::$__LANG]['user']['middle_name'],
+			$column_names[App::$__LANG]['user']['gender'],
+			$column_names[App::$__LANG]['user']['avatar_url'],
+			$column_names[App::$__LANG]['user']['link'],
+			$column_names[App::$__LANG]['user']['email'],
+			$column_names[App::$__LANG]["ticket"]["number"],
+			$column_names[App::$__LANG]["ticket"]["ticket_type.name"],
+			$column_names[App::$__LANG]["ticket"]["price"],
+			$column_names[App::$__LANG]["ticket"]["checkout"],
+			$column_names[App::$__LANG]["order"]["number"],
+			$column_names[App::$__LANG]["order"]["status_name"],
+			$column_names[App::$__LANG]["order"]["status_type_code"],
+			$column_names[App::$__LANG]["order"]["payed_at"],
+			$column_names[App::$__LANG]["order"]["is_canceled"],
+			$column_names[App::$__LANG]["order"]["canceled_at"]);
+		$rows = array();
+		foreach ($data as &$ticket) {
+			$_row = array(
+				$column_names[App::$__LANG]['user']['first_name'] => $ticket['user']['first_name'],
+				$column_names[App::$__LANG]['user']['last_name'] => $ticket['user']['last_name'],
+				$column_names[App::$__LANG]['user']['middle_name'] => $ticket['user']['middle_name'] ?? '',
+				$column_names[App::$__LANG]['user']['gender'] => $ticket['user']['gender'] ?? '',
+				$column_names[App::$__LANG]['user']['avatar_url'] => $ticket['user']['avatar_url'],
+				$column_names[App::$__LANG]['user']['link'] => $ticket['user']['link'],
+				$column_names[App::$__LANG]['user']['email'] => $ticket['user']['email'] ?? '',
+				$column_names[App::$__LANG]["ticket"]["number"] => $ticket['number'],
+				$column_names[App::$__LANG]["ticket"]["ticket_type.name"] => $ticket['ticket_type']['name'],
+				$column_names[App::$__LANG]["ticket"]["price"] => $ticket['price'],
+				$column_names[App::$__LANG]["ticket"]["checkout"] => $ticket['checkout'],
+				$column_names[App::$__LANG]["order"]["number"] => $ticket['order']['number'],
+				$column_names[App::$__LANG]["order"]["status_name"] => $ticket['order']['status_name'],
+				$column_names[App::$__LANG]["order"]["status_type_code"] => $ticket['order']['status_type_code'],
+				$column_names[App::$__LANG]["order"]["payed_at"] => $ticket['order']['payed_at'] ? DateTime::createFromFormat('U', $ticket['order']['payed_at'])->format('Y-m-d H:i:s') : '',
+				$column_names[App::$__LANG]["order"]["is_canceled"] => $ticket['order']['is_canceled'] ? '+' : '-',
+				$column_names[App::$__LANG]["order"]["canceled_at"] => $ticket['order']['canceled_at'] ? DateTime::createFromFormat('U', $ticket['order']['canceled_at'])->format('Y-m-d H:i:s') : ''
+			);
+
+
+			if (is_array($ticket['order']['registration_fields'])) {
+				foreach ($ticket['order']['registration_fields'] as $field) {
+					$_row[$field['form_field_label']] = $field['value'];
+					if (!in_array($field['form_field_label'], $headers)){
+					$headers[] = $field['form_field_label'];
+					}
+				}
+				$index++;
+			}
+			$rows[] = $_row;
+		}
+		$res = array($headers);
+		foreach($rows as &$user){
+			$_row = array();
+			foreach($headers as $col){
+				$_row[] = $user[$col] ?? '';
+			}
+			$res[] = $_row;
+		}
+		parent::send($format, $res);
+		die();
 	}
 
 

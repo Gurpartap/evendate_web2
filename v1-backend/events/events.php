@@ -191,7 +191,7 @@ $__modules['events'] = array(
 				array_merge($__request, array('user' => $__user)),
 				$__fields,
 				array('length' => $__length, 'offset' => $__offset),
-				$__order_by ?? array('checked_out'));
+				$__order_by ?? array('checkout'));
 		},
 		'recommendations' => function () use ($__db, $__request, $__fields, $__user, $__order_by, $__pagination) { /*MY EVENTS!*/
 			return EventsCollection::filter(

@@ -236,4 +236,81 @@ class UsersCollection extends AbstractCollection
 	}
 
 
+	public static function export(ExtendedPDO $db,
+																AbstractUser $user = null,
+																array $filters = null,
+																array $fields = null,
+																array $pagination = null,
+																array $order_by = array('created_at'),
+																$format)
+	{
+
+		$data = self::filter($db,
+			$user,
+			$filters,
+			$fields,
+			$pagination,
+			$order_by ?? array())->getData();
+
+		global $BACKEND_FULL_PATH;
+
+		$column_names = json_decode(file_get_contents($BACKEND_FULL_PATH . '/events/column_names.json'), true);
+
+		$index = 0;
+		$headers = array(
+			$column_names[App::$__LANG]['user']['first_name'],
+			$column_names[App::$__LANG]['user']['last_name'],
+			$column_names[App::$__LANG]['user']['middle_name'],
+			$column_names[App::$__LANG]['user']['gender'],
+			$column_names[App::$__LANG]['user']['avatar_url'],
+			$column_names[App::$__LANG]['user']['link'],
+			$column_names[App::$__LANG]['user']['email'],
+			$column_names[App::$__LANG]["user"]["subscriptions_count"],
+			$column_names[App::$__LANG]["user"]["favored_count"],
+			$column_names[App::$__LANG]["user"]["vk_uid"],
+			$column_names[App::$__LANG]["user"]["facebook_uid"],
+			$column_names[App::$__LANG]["user"]["google_uid"]);
+		$rows = array();
+
+		foreach ($data as &$user) {
+			$_row = array(
+				$column_names[App::$__LANG]['user']['first_name'] => $user['first_name'],
+				$column_names[App::$__LANG]['user']['last_name'] => $user['last_name'],
+				$column_names[App::$__LANG]['user']['middle_name'] => $user['middle_name'] ?? '',
+				$column_names[App::$__LANG]['user']['gender'] => $user['gender'] ?? '',
+				$column_names[App::$__LANG]['user']['avatar_url'] => $user['avatar_url'],
+				$column_names[App::$__LANG]['user']['link'] => $user['link'],
+				$column_names[App::$__LANG]['user']['email'] => $user['email'] ?? '',
+				$column_names[App::$__LANG]["user"]["subscriptions_count"] => count($user['subscriptions']),
+				$column_names[App::$__LANG]["user"]["favored_count"] => count($user['favored']),
+				$column_names[App::$__LANG]["user"]["vk_uid"] => $user['vk_uid'],
+				$column_names[App::$__LANG]["user"]["facebook_uid"] => $user['facebook_uid'],
+				$column_names[App::$__LANG]["user"]["google_uid"] => $user['google_uid']
+			);
+
+
+			if (is_array($user['interests'])) {
+				foreach ($user['interests'] as $interest) {
+					$_row[$interest['topic_name']] = $interest['value'];
+					if (!in_array($interest['topic_name'], $headers)){
+						$headers[] = $interest['topic_name'];
+					}
+				}
+				$index++;
+			}
+			$rows[] = $_row;
+		}
+		$res = array($headers);
+		foreach($rows as &$user){
+			$_row = array();
+			foreach($headers as $col){
+				$_row[] = $user[$col] ?? '';
+			}
+			$res[] = $_row;
+		}
+		parent::send($format, $res);
+		die();
+	}
+
+
 }
