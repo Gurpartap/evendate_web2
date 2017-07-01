@@ -35,7 +35,7 @@ OneOrder = extending(OneEntity, (function() {
 	 * @property {?Moment} m_payed_at
 	 * @property {?Moment} m_canceled_at
 	 *
-	 * @property {EventsTicketsCollection} tickets
+	 * @property {AbstractEventTicketsCollection} tickets
 	 * @property {RegistrationFieldsCollection} registration_fields
 	 * @property {OneUser} user
 	 */
@@ -55,7 +55,7 @@ OneOrder = extending(OneEntity, (function() {
 		this.payed_at = null;
 		this.canceled_at = null;
 		
-		this.tickets = new EventsTicketsCollection();
+		this.tickets = new AbstractEventTicketsCollection();
 		this.registration_fields = new RegistrationFieldsCollection();
 		this.user_id = null;
 		this.user = new OneUser();

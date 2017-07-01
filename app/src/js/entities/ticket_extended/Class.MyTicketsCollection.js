@@ -57,7 +57,7 @@ MyTicketsCollection = extending(ExtendedTicketsCollection, (function() {
 				return collection;
 			}, []));
 			
-			if (success && typeof success === 'function') {
+			if (isFunction(success)) {
 				success.call(self, self.last_pushed);
 			}
 			return self.last_pushed;

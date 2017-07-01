@@ -14,7 +14,7 @@ AdminEventOrdersPage = extending(AdminEventPage, (function() {
 	 * @constructor
 	 * @constructs AdminEventOrdersPage
 	 *
-	 * @property {EventOrdersCollection} orders
+	 * @property {EventAllOrdersCollection} orders
 	 * @property {Fields} orders_fields
 	 * @property {jQuery} $loader
 	 * @property {DataTable.Api} ordersTable
@@ -24,7 +24,7 @@ AdminEventOrdersPage = extending(AdminEventPage, (function() {
 		
 		AdminEventPage.call(this, event_id);
 		
-		this.orders = new EventOrdersCollection(event_id);
+		this.orders = new EventAllOrdersCollection(event_id);
 		this.orders_fields = new Fields('created_at', 'registration_fields', {
 			user: {
 				fields: new Fields('email')

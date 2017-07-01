@@ -1,7 +1,4 @@
 /**
- * @requires Class.ServerConnection.js
- */
-/**
  *
  * @const __APP
  */
@@ -10,6 +7,7 @@ __APP = {
 	 * @type {ServerConnection}
 	 */
 	SERVER: new ServerConnection(),
+	EXPORT: new ServerExports(),
 	EVENDATE_BEGIN: '15-12-2015',
 	AUTH_URLS: {},
 	/**

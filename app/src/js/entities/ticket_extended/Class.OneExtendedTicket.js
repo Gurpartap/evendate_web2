@@ -144,7 +144,7 @@ OneExtendedTicket = extending(OneTicket, (function() {
 		return OneExtendedTicket.fetchTicket(this.event_id, this.uuid, fields, function(data) {
 			var ticket_data = OneExtendedTicket.extractTicketFromData(data);
 			self.setData(ticket_data);
-			if (success && typeof success === 'function') {
+			if (isFunction(success)) {
 				success.call(self, ticket_data);
 			}
 		});

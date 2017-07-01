@@ -1,31 +1,27 @@
 /**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneOrder.js
+ * @requires Class.OrdersCollection.js
  */
 /**
  *
  * @abstract
- * @class AbstractOrdersCollection
- * @extends EntitiesCollection
+ * @class AbstractEventOrdersCollection
+ * @extends OrdersCollection
  */
-AbstractOrdersCollection = extending(EntitiesCollection, (function() {
+AbstractEventOrdersCollection = extending(OrdersCollection, (function() {
 	/**
 	 *
 	 * @param {(string|number)} [event_id=0]
 	 *
 	 * @constructor
-	 * @constructs AbstractOrdersCollection
+	 * @constructs AbstractEventOrdersCollection
 	 *
 	 * @property {(string|number)} event_id
 	 */
-	function AbstractOrdersCollection(event_id) {
-		EntitiesCollection.call(this);
+	function AbstractEventOrdersCollection(event_id) {
+		OrdersCollection.call(this);
 		
 		this.event_id = setDefaultValue(event_id, 0);
 	}
-	
-	AbstractOrdersCollection.prototype.collection_of = OneOrder;
-	
 	/**
 	 *
 	 * @abstract
@@ -36,7 +32,7 @@ AbstractOrdersCollection = extending(EntitiesCollection, (function() {
 	 *
 	 * @return {jqPromise}
 	 */
-	AbstractOrdersCollection.fetchOrders = function(event_id, ajax_data, success) {
+	AbstractEventOrdersCollection.fetchOrders = function(event_id, ajax_data, success) {
 		return $.promise();
 	};
 	/**
@@ -48,7 +44,7 @@ AbstractOrdersCollection = extending(EntitiesCollection, (function() {
 	 *
 	 * @returns {jqPromise}
 	 */
-	AbstractOrdersCollection.prototype.fetchOrders = function(fields, length, order_by, success) {
+	AbstractEventOrdersCollection.prototype.fetchOrders = function(fields, length, order_by, success) {
 		var self = this;
 		
 		return this.constructor.fetchOrders(this.event_id, {
@@ -71,7 +67,7 @@ AbstractOrdersCollection = extending(EntitiesCollection, (function() {
 	 *
 	 * @returns {jqPromise}
 	 */
-	AbstractOrdersCollection.prototype.fetchAllOrders = function(fields, order_by, success) {
+	AbstractEventOrdersCollection.prototype.fetchAllOrders = function(fields, order_by, success) {
 		var self = this;
 		
 		this.empty();
@@ -92,5 +88,6 @@ AbstractOrdersCollection = extending(EntitiesCollection, (function() {
 		});
 	};
 	
-	return AbstractOrdersCollection;
+	
+	return AbstractEventOrdersCollection;
 }()));

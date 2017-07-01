@@ -52,15 +52,15 @@ AdminEventRequestsPage = extending(AdminEventPage, (function() {
 	/**
 	 *
 	 * @class RequestsCollection
-	 * @extends EventOrdersCollection
+	 * @extends EventAllOrdersCollection
 	 */
-	var RequestsCollection = extending(EventOrdersCollection, (function() {
+	var RequestsCollection = extending(EventAllOrdersCollection, (function() {
 		/**
 		 *
 		 * @param {(string|number)} [event_id=0]
 		 *
 		 * @constructor
-		 * @constructs EventOrdersCollection
+		 * @constructs EventAllOrdersCollection
 		 *
 		 * @property {(string|number)} event_id
 		 * @property {Array<OneRequest>} new_requests
@@ -70,7 +70,7 @@ AdminEventRequestsPage = extending(AdminEventPage, (function() {
 		function RequestsCollection(event_id) {
 			var self = this;
 			
-			EventOrdersCollection.call(this, event_id);
+			EventAllOrdersCollection.call(this, event_id);
 			
 			Object.defineProperties(this, {
 				new_requests: {
@@ -112,7 +112,7 @@ AdminEventRequestsPage = extending(AdminEventPage, (function() {
 		 *
 		 * @return {jqPromise}
 		 */
-		RequestsCollection.fetchOrders = RequestsCollection.fetchRequests = EventOrdersCollection.fetchOrders;
+		RequestsCollection.fetchOrders = RequestsCollection.fetchRequests = EventAllOrdersCollection.fetchOrders;
 		/**
 		 *
 		 * @param {(Fields|Array<string>|string)} [fields]
@@ -121,7 +121,7 @@ AdminEventRequestsPage = extending(AdminEventPage, (function() {
 		 *
 		 * @returns {jqPromise}
 		 */
-		RequestsCollection.prototype.fetchAllRequests = EventOrdersCollection.prototype.fetchAllOrders;
+		RequestsCollection.prototype.fetchAllRequests = EventAllOrdersCollection.prototype.fetchAllOrders;
 		
 		return RequestsCollection;
 	}()));

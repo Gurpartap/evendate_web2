@@ -245,7 +245,7 @@ OneOrganization = extending(OneEntity, (function() {
 		var self = this;
 		return OneOrganization.fetchOrganization(self.id, fields, function(data) {
 			self.setData(data);
-			if (success && typeof success === 'function') {
+			if (isFunction(success)) {
 				success.call(self, self);
 			}
 		});
@@ -262,7 +262,7 @@ OneOrganization = extending(OneEntity, (function() {
 		return OneOrganization.createOrganization(new_organization_data, function(response_data) {
 			self.setData(new_organization_data);
 			self.id = response_data.organization_id;
-			if (success && typeof success === 'function') {
+			if (isFunction(success)) {
 				success.call(self, self);
 			}
 		}, error);
@@ -278,7 +278,7 @@ OneOrganization = extending(OneEntity, (function() {
 		var self = this;
 		return OneOrganization.updateOrganization(self.id, organization_data, function(response_data) {
 			self.setData(organization_data);
-			if (success && typeof success === 'function') {
+			if (isFunction(success)) {
 				success.call(self, self);
 			}
 		}, error);
@@ -293,7 +293,7 @@ OneOrganization = extending(OneEntity, (function() {
 		return this.constructor.subscribeOrganization(this.id, function(data) {
 			this.is_subscribed = true;
 			this.subscribed_count++;
-			if (success && typeof success == 'function') {
+			if (isFunction(success)) {
 				success.call(self, data);
 			}
 		});
@@ -308,7 +308,7 @@ OneOrganization = extending(OneEntity, (function() {
 		return this.constructor.unsubscribeOrganization(this.id, function(data) {
 			this.is_subscribed = false;
 			this.subscribed_count = this.subscribed_count ? this.subscribed_count - 1 : this.subscribed_count;
-			if (success && typeof success == 'function') {
+			if (isFunction(success)) {
 				success.call(self, data);
 			}
 		});
@@ -326,7 +326,7 @@ OneOrganization = extending(OneEntity, (function() {
 		
 		return __APP.SERVER.multipleAjax(OneOrganization.addStaff(this.id, user_id, role), user.fetchUser(new Fields())).done(function(org_data, user_data) {
 			self.staff.setData(user);
-			if (success && typeof success === 'function') {
+			if (isFunction(success)) {
 				success.call(self, user);
 			}
 		}).promise();
@@ -342,11 +342,24 @@ OneOrganization = extending(OneEntity, (function() {
 		var self = this;
 		
 		return OneOrganization.removeStaff(this.id, user_id, role, function() {
-			if (success && typeof success === 'function') {
+			if (isFunction(success)) {
 				success.call(self, self.staff.remove(user_id));
 			}
 		});
 	};
+	/**
+	 *
+	 * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
+	 * @param {function} [success]
+	 * @param {function} [error]
+	 *
+	 * @return {jqPromise}
+	 */
+	OneOrganization.prototype.export = function(format, success, error) {
+		
+		return (new ServerExports()).organizationSubscribers(this.id, format, success, error);
+	};
+	
 	
 	return OneOrganization;
 }()));
