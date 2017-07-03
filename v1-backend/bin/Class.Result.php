@@ -1,6 +1,7 @@
 <?php
 
 require_once $BACKEND_FULL_PATH . '/bin/vendor/Class.Array2xml.php';
+require_once $BACKEND_FULL_PATH . '/vendor/xlsxwriter.class.php';
 
 /*
  *
@@ -102,7 +103,7 @@ class Result
 				);
 			}
 		}
-		if ($this->is_nude){
+		if ($this->is_nude) {
 			return $arr;
 		}
 		if ($this->format == 'json') {
@@ -182,4 +183,32 @@ class Result
 	}
 
 
+	public static function getHTMLTable(array $rows, $with_header = true)
+	{
+		$index = 0;
+		$lines = '';
+		foreach ($rows as $row) {
+			if ($index == 0 && $with_header) {
+				$tag = 'th';
+			} else {
+				$tag = 'td';
+			}
+			$line = '';
+			foreach ($row as $cell) {
+				$line .= "<{$tag}>{$cell}</{$tag}>";
+			}
+			$lines .= "<tr>{$line}</tr>";
+			$index++;
+		}
+		echo "<html><header><title>Evendate export file</title></header><body><table>{$lines}</table></body></html>";
+		die();
+	}
+
+	public static function getXLXSTable(array $rows, $with_header = true)
+	{
+		$writer = new XLSXWriter();
+		$writer->writeSheet($rows);
+		echo $writer->writeToString();
+		die();
+	}
 }

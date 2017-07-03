@@ -69,7 +69,7 @@ DatePicker = (function() {
 			self.selected_day = self.calendar.selected_days.toString();
 			self.formated_selected_day = self.calendar.selected_days.toString().split('-').reverse().join('.');
 			if(!self.$datepicker.is('input')){
-				self.$datepicker.find('label').text(self.formated_selected_day);
+				self.$datepicker.find('.DatePickerDisplayText').text(self.formated_selected_day);
 			}
 			self.$input.val(self.selected_day).trigger('change');
 			
@@ -77,6 +77,7 @@ DatePicker = (function() {
 				self.closeDialog();
 			}
 			self.$datepicker.trigger('date-picked');
+			self.$datepicker.trigger('change');
 		});
 		
 		return this;

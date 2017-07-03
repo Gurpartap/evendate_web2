@@ -56,7 +56,7 @@ AddStaffModal = extending(AbstractModal, (function() {
 			}).outerHTML();
 		}
 		
-		$search_by_name_input.select2({
+		initSelect2($search_by_name_input, {
 			width: '100%',
 			placeholder: $search_by_name_input.attr('placeholder'),
 			ajax: {
@@ -76,6 +76,7 @@ AddStaffModal = extending(AbstractModal, (function() {
 					};
 				}
 			},
+			containerCssClass: '',
 			dropdownCssClass: 'form_select2_drop',
 			formatResult: format,
 			formatSelection: format

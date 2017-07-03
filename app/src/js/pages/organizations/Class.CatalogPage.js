@@ -102,15 +102,14 @@ CatalogPage = extending(Page, (function() {
 		
 		PAGE.$view.find('.OrganizationsCategoriesScroll').scrollbar({disableBodyScroll: true});
 		
-		$organizations_cities_select.select2({
-			containerCssClass: 'form_select2',
-			dropdownCssClass: 'form_select2_drop'
-		}).off('change.SelectCity').on('change.SelectCity', function() {
+		initSelect2($organizations_cities_select);
+		$organizations_cities_select.off('change.SelectCity').on('change.SelectCity', function() {
 			var selected_city = PAGE.cities.getByID($(this).val());
 			
 			__APP.USER.selected_city = selected_city;
 			__APP.changeState('/organizations/at/' + selected_city.en_name, true, true);
 		});
+		
 		if (PAGE.selected_city_name) {
 			$organizations_cities_select.select2('val', PAGE.cities.getByName(PAGE.selected_city_name).id);
 		}

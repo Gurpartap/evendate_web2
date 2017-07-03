@@ -63,10 +63,7 @@ CityChooseModal = extending(AbstractModal, (function() {
 	 * @return {CityChooseModal}
 	 */
 	CityChooseModal.prototype.init = function() {
-		this.content.find('#city_choose_modal_select').select2({
-			containerCssClass: 'form_select2',
-			dropdownCssClass: 'form_select2_drop'
-		}).select2('val', 1);
+		initSelect2(this.content.find('#city_choose_modal_select')).select2('val', 1);
 		this.__init();
 		
 		return this;

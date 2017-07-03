@@ -2,8 +2,8 @@
  * @requires ../Class.OneEntity.js
  * @requires ../date/Class.DatesCollection.js
  * @requires ../tag/Class.TagsCollection.js
- * @requires ../order/Class.OrdersCollection.js
- * @requires ../ticket/Class.EventsTicketsCollection.js
+ * @requires ../order/Class.EventMyOrdersCollection.js
+ * @requires ../ticket/Class.AbstractEventTicketsCollection.js
  * @requires ../ticket_type/Class.TicketTypesCollection.js
  * @requires ../user/Class.UsersCollection.js
  * @requires ../notification/Class.NotificationsCollection.js
@@ -33,11 +33,11 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @property {?string} detail_info_url
 	 *
-	 * @property {OrdersCollection} orders
+	 * @property {EventMyOrdersCollection} orders
 	 * @property {?number} orders_count
 	 *
 	 * @property {?boolean} ticketing_locally
-	 * @property {EventsTicketsCollection} tickets
+	 * @property {AbstractEventTicketsCollection} tickets
 	 * @property {TicketTypesCollection} ticket_types
 	 *
 	 * @property {?boolean} registration_locally
@@ -77,8 +77,6 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @property {NotificationsCollection} notifications
 	 *
-	 * @property {timestamp} additional_notification_time
-	 *
 	 * @property {UsersCollection} favored
 	 * @property {?number} favored_users_count
 	 * @property {?number} favored_friends_count
@@ -108,11 +106,11 @@ OneEvent = extending(OneEntity, (function() {
 		
 		this.detail_info_url = null;
 		
-		this.orders = new OrdersCollection(event_id);
+		this.orders = new EventMyOrdersCollection(event_id);
 		this.orders_count = null;
 		
 		this.ticketing_locally = null;
-		this.tickets = new EventsTicketsCollection(event_id);
+		this.tickets = new AbstractEventTicketsCollection(event_id);
 		this.ticket_types = new TicketTypesCollection(event_id);
 		
 		this.registration_locally = null;
@@ -151,8 +149,6 @@ OneEvent = extending(OneEntity, (function() {
 		this.tags = new TagsCollection();
 		
 		this.notifications = new NotificationsCollection();
-		
-		this.additional_notification_time = null;
 		
 		this.favored = new UsersCollection();
 		this.favored_users_count = null;

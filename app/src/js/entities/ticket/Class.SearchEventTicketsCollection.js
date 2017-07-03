@@ -1,21 +1,21 @@
 /**
- * @requires Class.AdminEventsTicketsCollection.js
+ * @requires Class.EventAllTicketsCollection.js
  */
 /**
  *
- * @class SearchAdminEventsTicketsCollection
- * @extends AdminEventsTicketsCollection
+ * @class SearchEventTicketsCollection
+ * @extends EventAllTicketsCollection
  */
-SearchAdminEventsTicketsCollection = extending(AdminEventsTicketsCollection, (function() {
+SearchEventTicketsCollection = extending(EventAllTicketsCollection, (function() {
 	/**
 	 * @param {(string|number)} query_string
 	 * @param {(string|number)} event_id
 	 *
 	 * @constructor
-	 * @constructs SearchAdminEventsTicketsCollection
+	 * @constructs SearchEventTicketsCollection
 	 */
-	function SearchAdminEventsTicketsCollection(query_string, event_id) {
-		AdminEventsTicketsCollection.call(this, event_id);
+	function SearchEventTicketsCollection(query_string, event_id) {
+		EventAllTicketsCollection.call(this, event_id);
 		this.query_string = query_string;
 	}
 	
@@ -28,7 +28,7 @@ SearchAdminEventsTicketsCollection = extending(AdminEventsTicketsCollection, (fu
 	 *
 	 * @return {jqPromise}
 	 */
-	SearchAdminEventsTicketsCollection.fetchTickets = function(query_string, event_id, ajax_data, success) {
+	SearchEventTicketsCollection.fetchTickets = function(query_string, event_id, ajax_data, success) {
 		ajax_data = ajax_data ? ajax_data : {};
 		
 		if ($.isNumeric(query_string)) {
@@ -37,7 +37,7 @@ SearchAdminEventsTicketsCollection = extending(AdminEventsTicketsCollection, (fu
 			ajax_data.user_name = query_string;
 		}
 		
-		return AdminEventsTicketsCollection.fetchTickets(event_id, ajax_data, success);
+		return EventAllTicketsCollection.fetchTickets(event_id, ajax_data, success);
 	};
 	/**
 	 *
@@ -48,21 +48,21 @@ SearchAdminEventsTicketsCollection = extending(AdminEventsTicketsCollection, (fu
 	 *
 	 * @return {jqPromise}
 	 */
-	SearchAdminEventsTicketsCollection.prototype.fetchTickets = function(fields, length, order_by, success) {
+	SearchEventTicketsCollection.prototype.fetchTickets = function(fields, length, order_by, success) {
 		var self = this;
 		
-		return SearchAdminEventsTicketsCollection.fetchTickets(this.query_string, this.event_id, {
+		return SearchEventTicketsCollection.fetchTickets(this.query_string, this.event_id, {
 			fields: fields || undefined,
 			offset: this.length,
 			length: length || undefined,
 			order_by: order_by || undefined
 		}, function(data) {
 			self.setData(data);
-			if (success && typeof success === 'function') {
+			if (isFunction(success)) {
 				success.call(self, self.last_pushed);
 			}
 		});
 	};
 	
-	return SearchAdminEventsTicketsCollection;
+	return SearchEventTicketsCollection;
 }())); 

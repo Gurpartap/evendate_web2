@@ -13,6 +13,8 @@ OrganizationSubscribersCollection = extending(UsersCollection, (function() {
 	 *
 	 * @constructor
 	 * @constructs UsersCollection
+	 *
+	 * @property {(number|string)} organization_id
 	 */
 	function OrganizationSubscribersCollection(organization_id) {
 		UsersCollection.call(this);
@@ -47,6 +49,7 @@ OrganizationSubscribersCollection = extending(UsersCollection, (function() {
 	 * @param {(number|string)} [length]
 	 * @param {(Array<string>|string)} [order_by]
 	 * @param {AJAXCallback} [success]
+	 *
 	 * @returns {jqPromise}
 	 */
 	OrganizationSubscribersCollection.prototype.fetchSubscribers = function(fields, length, order_by, success) {
@@ -70,40 +73,40 @@ OrganizationSubscribersCollection = extending(UsersCollection, (function() {
 	};
 	/**
 	 *
-	 * @param {number} subscribed_count
 	 * @param {(Fields|Array<string>|string)} [fields]
 	 * @param {(Array<string>|string)} [order_by]
 	 * @param {AJAXCallback} [success]
+	 *
 	 * @returns {jqPromise}
 	 */
-	OrganizationSubscribersCollection.prototype.fetchAllSubscribers = function(subscribed_count, fields, order_by, success) {
-		var self = this,
-			subscribers = [],
-			laps = Math.ceil(subscribed_count / 100);
+	OrganizationSubscribersCollection.prototype.fetchAllSubscribers = function(fields, order_by, success) {
+		var self = this;
 		
-		this.empty();
-		
-		return __APP.SERVER.multipleAjax.apply(__APP.SERVER, (new Array(laps)).fill(true).map(function(el, i) {
+		return OrganizationSubscribersCollection.fetchSubscribers(this.organization_id, {
+			fields: fields || undefined,
+			offset: 0,
+			length: ServerConnection.MAX_ENTITIES_LENGTH,
+			order_by: order_by || undefined
+		}, function(subscribed) {
 			
-			return OrganizationSubscribersCollection.fetchSubscribers(self.organization_id, {
-				fields: fields || undefined,
-				offset: i * 100,
-				order_by: order_by || undefined
-			}).then(function(chunk) {
-				
-				subscribers = subscribers.concat(chunk);
-				
-				return chunk;
-			});
-		})).then(function() {
-			self.setData(subscribers);
-			
+			self.setData(subscribed);
 			if (isFunction(success)) {
 				success.call(self, self.last_pushed);
 			}
+		}).then(function() {
 			
 			return self.last_pushed;
 		});
+	};
+	/**
+	 *
+	 * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
+	 *
+	 * @return {jqPromise}
+	 */
+	OrganizationSubscribersCollection.prototype.export = function(format) {
+		
+		return (new ServerExports()).organizationSubscribers(this.organization_id, format);
 	};
 	
 	return OrganizationSubscribersCollection;

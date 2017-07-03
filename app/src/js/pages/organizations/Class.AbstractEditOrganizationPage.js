@@ -55,17 +55,14 @@ AbstractEditOrganizationPage = extending(Page, (function() {
 			var $select = PAGE.$wrapper.find('#add_organization_city');
 			
 			PAGE.cities.fetchCities(null, 0, 'local_name', function() {
-				$select
-					.append(tmpl('option', PAGE.cities.map(function(city) {
+				$select.append(tmpl('option', PAGE.cities.map(function(city) {
 						return {
 							val: city.id,
 							display_name: city.local_name
 						};
-					})))
-					.select2({
-						containerCssClass: 'form_select2',
-						dropdownCssClass: 'form_select2_drop'
-					});
+					})));
+				initSelect2($select);
+				
 				if (selected_id) {
 					$select.select2('val', selected_id);
 				}
@@ -76,17 +73,14 @@ AbstractEditOrganizationPage = extending(Page, (function() {
 			PAGE.categories.fetchCategories({}, 0, function(categories) {
 				var $select = PAGE.$wrapper.find('#add_organization_type');
 				
-				$select
-					.html(tmpl('option', categories.map(function(category) {
+				$select.html(tmpl('option', categories.map(function(category) {
 						return {
 							val: category.id,
 							display_name: category.name
 						};
-					})))
-					.select2({
-						containerCssClass: 'form_select2',
-						dropdownCssClass: 'form_select2_drop'
-					});
+					})));
+				initSelect2($select);
+				
 				if (selected_id) {
 					$select.select2('val', selected_id);
 				}

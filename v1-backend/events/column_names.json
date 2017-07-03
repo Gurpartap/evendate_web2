@@ -1,0 +1,76 @@
+{
+  "ru": {
+    "ticket": {
+      "number": "Номер билета",
+      "ticket_type.name": "Тип билета",
+      "type_code": "Шифр типа билета",
+      "price": "Цена",
+      "checkout": "Использован",
+      "type_uuid": "Идентификатор типа билета",
+      "order_uuid": "Идентификатор заказа",
+      "uuid": "Идентификатор билета",
+      "created_at": "Время создания"
+    },
+    "order": {
+      "number": "Номер заказа",
+      "status_name": "Статус заказа",
+      "status_type_code": "Идентификатор статуса заказа",
+      "payed_at": "Время оплаты",
+      "is_canceled": "Заказ отменен",
+      "canceled_at": "Время отмены заказа",
+      "tickets_count": "Количество билетов",
+      "tickets_price": "Стоимость билетов"
+    },
+    "user": {
+      "first_name": "Имя",
+      "last_name": "Фамилия",
+      "middle_name": "Отчество",
+      "gender": "Пол",
+      "avatar_url": "Ссылка на изображение",
+      "link": "Ссылка на профиль в социальной сети",
+      "email": "E-mail",
+      "subscriptions_count": "Количество подписок",
+      "favored_count": "Количество событий организации в избранном",
+      "vk_uid": "ВКонтакте ID",
+      "facebook_uid": "Facebook ID",
+      "google_uid": "Google ID"
+    }
+  },
+  "en": {
+    "ticket": {
+      "number": "Ticket number",
+      "ticket_type.name": "Ticket type",
+      "type_code": "Ticket type code",
+      "price": "Price",
+      "checkout": "Checked out",
+      "type_uuid": "Ticket type ID",
+      "order_uuid": "Order type ID",
+      "uuid": "Ticket ID",
+      "created_at": "Create time"
+    },
+    "order": {
+      "number": "Order number",
+      "status_name": "Order status",
+      "status_type_code": "Order status code",
+      "payed_at": "Payment time",
+      "is_canceled": "Order canceled",
+      "canceled_at": "Cancellation time",
+      "tickets_count": "Tickets count",
+      "tickets_price": "Стоимость билетов"
+    },
+    "user": {
+      "first_name": "First name",
+      "last_name": "Last name",
+      "middle_name": "Middle name",
+      "gender": "Gender",
+      "avatar_url": "User picture",
+      "link": "Social network URL",
+      "email": "E-mail",
+      "subscriptions_count": "Subscriptions count",
+      "favored_count": "Favored events in your organization",
+      "vk_uid": "Vk.com ID",
+      "facebook_uid": "Facebook ID",
+      "google_uid": "Google ID"
+    }
+  }
+}

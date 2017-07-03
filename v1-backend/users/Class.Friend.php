@@ -163,9 +163,9 @@ class Friend extends AbstractEntity implements UserInterface
 			$result_data[self::FAVORED_FIELD_NAME] = EventsCollection::filter(
 				App::DB(),
 				App::getCurrentUser(),
-				array(
+				array_merge(Fields::parseFilters($fields[self::FAVORED_FIELD_NAME]['filters'] ?? ''), array(
 					'favorites' => $this
-				),
+				)),
 				Fields::parseFields($fields[self::FAVORED_FIELD_NAME]['fields'] ?? ''),
 				array(
 					'length' => $fields[self::FAVORED_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,

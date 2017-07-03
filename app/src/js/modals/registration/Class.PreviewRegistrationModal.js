@@ -44,8 +44,7 @@ PreviewRegistrationModal = extending(AbstractModal, (function() {
 	 */
 	PreviewRegistrationModal.prototype.init = function() {
 		this.content.find('.RegisterButton').prop('disabled', true);
-		this.content.find('.ToSelect2').select2({
-			containerCssClass: 'form_select2',
+		initSelect2(this.content.find('.ToSelect2'), {
 			dropdownCssClass: 'form_select2_drop form_select2_drop_no_search'
 		});
 		this.__init();
@@ -132,7 +131,7 @@ PreviewRegistrationModal = extending(AbstractModal, (function() {
 			}
 			default: {
 				
-				return __APP.BUILD.formInput({
+				return __APP.BUILD.formUnit({
 					id: 'registration_form_' + this.id + '_' + field.uuid,
 					type: field.type === RegistrationFieldModel.TYPES.EXTENDED_CUSTOM ? 'textarea' : field.type,
 					name: field.uuid,

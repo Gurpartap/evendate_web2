@@ -41,7 +41,7 @@ AppInspectorComponents = (function() {
 	};
 	/**
 	 *
-	 * @param {(Array<OneTicket>|...OneTicket|EventsTicketsCollection)} ticket
+	 * @param {(Array<OneTicket>|...OneTicket|AbstractEventTicketsCollection)} ticket
 	 *
 	 * @return {jQuery}
 	 */

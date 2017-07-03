@@ -106,4 +106,91 @@ class OrdersCollection extends AbstractCollection
 	}
 
 
+	public static function export(ExtendedPDO $db,
+																AbstractUser $user = null,
+																array $filters = null,
+																array $fields = null,
+																array $pagination = null,
+																array $order_by = array('created_at'),
+																$format)
+	{
+
+		$data = self::filter($db,
+			$user,
+			$filters,
+			$fields,
+			$pagination,
+			$order_by ?? array())->getData();
+
+		global $BACKEND_FULL_PATH;
+
+		$column_names = json_decode(file_get_contents($BACKEND_FULL_PATH . '/events/column_names.json'), true);
+
+		$index = 0;
+		$headers = array(
+			$column_names[App::$__LANG]['user']['first_name'],
+			$column_names[App::$__LANG]['user']['last_name'],
+			$column_names[App::$__LANG]['user']['middle_name'],
+			$column_names[App::$__LANG]['user']['gender'],
+			$column_names[App::$__LANG]['user']['avatar_url'],
+			$column_names[App::$__LANG]['user']['link'],
+			$column_names[App::$__LANG]['user']['email'],
+			$column_names[App::$__LANG]["order"]["number"],
+			$column_names[App::$__LANG]["order"]["status_name"],
+			$column_names[App::$__LANG]["order"]["tickets_count"],
+			$column_names[App::$__LANG]["order"]["tickets_price"],
+			$column_names[App::$__LANG]["order"]["status_type_code"],
+			$column_names[App::$__LANG]["order"]["payed_at"],
+			$column_names[App::$__LANG]["order"]["is_canceled"],
+			$column_names[App::$__LANG]["order"]["canceled_at"]);
+		$rows = array();
+
+		foreach ($data as &$order) {
+			$tickets_price = 0;
+			foreach($order['tickets'] aS $ticket){
+				$tickets_price += (float) $ticket['price'];
+			}
+			$_row = array(
+				$column_names[App::$__LANG]['user']['first_name'] => $order['user']['first_name'],
+				$column_names[App::$__LANG]['user']['last_name'] => $order['user']['last_name'],
+				$column_names[App::$__LANG]['user']['middle_name'] => $order['user']['middle_name'] ?? '',
+				$column_names[App::$__LANG]['user']['gender'] => $order['user']['gender'] ?? '',
+				$column_names[App::$__LANG]['user']['avatar_url'] => $order['user']['avatar_url'],
+				$column_names[App::$__LANG]['user']['link'] => $order['user']['link'],
+				$column_names[App::$__LANG]['user']['email'] => $order['user']['email'] ?? '',
+				$column_names[App::$__LANG]["order"]["number"] => $order['number'],
+				$column_names[App::$__LANG]["order"]["status_name"] => $order['status_name'],
+				$column_names[App::$__LANG]["order"]["tickets_count"] => count($order['tickets']),
+				$column_names[App::$__LANG]["order"]["tickets_price"] => $tickets_price,
+				$column_names[App::$__LANG]["order"]["status_type_code"] => $order['status_type_code'],
+				$column_names[App::$__LANG]["order"]["payed_at"] => $order['payed_at'] ? DateTime::createFromFormat('U', $order['order']['payed_at'])->format('Y-m-d H:i:s') : '',
+				$column_names[App::$__LANG]["order"]["is_canceled"] => $order['is_canceled'] ? '+' : '-',
+				$column_names[App::$__LANG]["order"]["canceled_at"] => $order['canceled_at'] ? DateTime::createFromFormat('U', $order['order']['canceled_at'])->format('Y-m-d H:i:s') : ''
+			);
+
+
+			if (is_array($order['registration_fields'])) {
+				foreach ($order['registration_fields'] as $field) {
+					$_row[$field['form_field_label']] = $field['value'];
+					if (!in_array($field['form_field_label'], $headers)){
+						$headers[] = $field['form_field_label'];
+					}
+				}
+				$index++;
+			}
+			$rows[] = $_row;
+		}
+		$res = array($headers);
+		foreach($rows as &$user){
+			$_row = array();
+			foreach($headers as $col){
+				$_row[] = $user[$col] ?? '';
+			}
+			$res[] = $_row;
+		}
+		parent::send($format, $res);
+		die();
+	}
+
+
 }

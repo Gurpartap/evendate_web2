@@ -101,7 +101,8 @@ __C = {
 			PENCIL: 'fa-pencil',
 			EYE: 'fa-eye',
 			EYE_CLOSE: 'fa-eye-slash',
-			TICKET: 'fa-ticket'
+			TICKET: 'fa-ticket',
+			DOWNLOAD: 'fa-download'
 		},
 		ICON_CLASS: 'fa_icon'
 	},
@@ -111,6 +112,7 @@ __C = {
 		'facebook': 'fa-facebook-official'
 	},
 	DATE_FORMAT: 'YYYY-MM-DD',
+	TIME_FORMAT: 'HH:mm',
 	MODAL_TYPES: {
 		FAVORS: 'favors',
 		SUBSCRIBERS: 'subscribers',
@@ -159,6 +161,12 @@ __C = {
 		PENDING: 'pending',
 		RESOLVED: 'resolved',
 		REJECTED: 'rejected'
+	},
+	/**
+	 * @enum {number}
+	 */
+	KEY_CODES: {
+		ESC: 27
 	}
 };
 /**
@@ -1670,6 +1678,15 @@ function getFilenameFromURL(url) {
 }
 /**
  *
+ * @param {string} string
+ * @return {boolean}
+ */
+function isPercentageString(string) {
+	
+	return /^[1-9]\d*%$|^0%$/.search(string) === 0;
+}
+/**
+ *
  * Checks is the argument is base64 encoded string
  *
  * @param {string} string
@@ -1687,6 +1704,26 @@ function isBase64(string) {
  */
 function isFunction(variable) {
 	return (variable && typeof variable === 'function');
+}
+/**
+ *
+ * @param {Event} event
+ * @param {__C.KEY_CODES} key
+ *
+ * @return {boolean}
+ */
+function isKeyPressed(event, key) {
+	return event.keyCode === key;
+}
+/**
+ *
+ * @param {*} variable
+ *
+ * @return {boolean}
+ */
+function empty(variable) {
+	
+	return variable == null;
 }
 /**
  *
@@ -1719,6 +1756,31 @@ function localeFromNamespace(slug, namespace, locales) {
 			return locales[ prop ];
 	}
 	return '';
+}
+/**
+ *
+ * @param {jQuery} $element
+ * @param {object} [options]
+ *
+ * @return {jQuery}
+ */
+function initSelect2($element, options) {
+	var opt = {
+		placeholder: 'Выберите',
+		allowClear: true,
+		containerCssClass: 'form_select2',
+		dropdownCssClass: 'form_select2_drop'
+	};
+	
+	if ($element.hasClass('-Handled_ToSelect2')) {
+		$element.select2('destroy');
+	}
+	if (options) {
+		$.extend(true, opt, options);
+	}
+	$element.select2(opt).addClass('-Handled_ToSelect2');
+	
+	return $element;
 }
 /**
  *
@@ -1771,20 +1833,6 @@ function bindLimitInputSize($parent) {
 			$prompt.text(length + '/' + max);
 		})
 	}).addClass('-Handled_LimitSize');
-}
-
-function initSelect2($element, options) {
-	var opt = {
-		containerCssClass: 'form_select2',
-		dropdownCssClass: 'form_select2_drop'
-	};
-	if ($element.hasClass('-Handled_ToSelect2')) {
-		$element.select2('destroy');
-	}
-	if (options) {
-		$.extend(true, opt, options);
-	}
-	$element.select2(opt).addClass('-Handled_ToSelect2')
 }
 
 function trimAvatarsCollection($parent) {
@@ -1938,9 +1986,13 @@ function bindShareButtons($parent) {
 
 function bindSelect2($parent) {
 	$parent = $parent ? $parent : $('body');
-	$parent.find('.ToSelect2').not('.-Handled_ToSelect2').each(function(i, el) {
+	var $selects = $parent.is('.ToSelect2') ? $parent : $parent.find('.ToSelect2');
+	
+	$selects.not('.-Handled_ToSelect2').each(function(i, el) {
 		initSelect2($(el));
 	}).addClass('-Handled_ToSelect2');
+	
+	return $selects;
 }
 
 function bindRippleEffect($parent) {
@@ -1973,12 +2025,21 @@ function bindRippleEffect($parent) {
 
 function bindDropdown($parent) {
 	$parent = $parent ? $parent : $('body');
-	$parent.find('.DropdownButton').not('.-Handled_DropdownButton').each(function() {
+	var $dropdown_buttons = $parent.is('.DropdownButton') ? $parent : $parent.find('.DropdownButton');
+	
+	$dropdown_buttons.not('.-Handled_DropdownButton').each(function() {
 		var $button = $(this),
+			instance = $button.resolveInstance(),
 			data = $button.data(),
-			$dropbox = $('.DropdownBox').filter('[data-dropdown_id="' + data.dropdown + '"]');
+			$dropbox = $('.DropdownBox').filter('[data-dropdown_id="' + data.dropdown + '"]'),
+			button_pos;
+		
+		if (instance.initiate) {
+			return instance.initiate();
+		}
 		
 		$dropbox.data($.extend({}, $dropbox.data(), data));
+		
 		$dropbox.closeDropbox = function() {
 			$('body').off('mousedown.CloseDropdown');
 			$(document).off('keyup.CloseDropdown');
@@ -1986,55 +2047,76 @@ function bindDropdown($parent) {
 			$button.addClass('-dropdown_active');
 		};
 		
-		if (data.hasOwnProperty('ddWidth')) {
-			if (data.ddWidth == 'self') {
+		if (!empty(data.ddWidth)) {
+			if (data.ddWidth === 'self') {
 				$dropbox.width($button.outerWidth());
-			} else if ((isFinite(data.ddWidth)) || (data.ddWidth.search(/^[1-9]\d*%$|^0%$/) === 0)) {
+			} else if (isFinite(data.ddWidth) || isPercentageString(data.ddWidth)) {
 				$dropbox.width(data.ddWidth);
 			}
 		}
-		if (data.hasOwnProperty('ddPosX') || data.hasOwnProperty('ddPosY')) {
-			var button_pos = $button.position();
-			if (data.hasOwnProperty('ddPosX')) {
-				var xPos;
-				if (data.ddPosX == 'self.center') {
-					xPos = (button_pos.left + $button.outerWidth() / 2) - $dropbox.outerWidth() / 2;
-				} else if (data.ddPosX == 'center') {
-					xPos = $dropbox.parent().outerWidth() / 2 - $dropbox.outerWidth() / 2;
-				} else if (isFinite(data.ddPosX)) {
-					xPos = data.ddPosX;
-				}
-				$dropbox.css('left', xPos);
+		
+		if (!empty(data.ddPosX) || !empty(data.ddPosY)) {
+			button_pos = $button.position();
+			
+			if (!empty(data.ddPosX)) {
+				$dropbox.css('left', (function() {
+					
+					if (data.ddPosX === 'self.center') {
+						
+						return (button_pos.left + $button.outerWidth() / 2) - $dropbox.outerWidth() / 2;
+					} else if (data.ddPosX === 'center') {
+						
+						return $dropbox.parent().outerWidth() / 2 - $dropbox.outerWidth() / 2;
+					} else if (isFinite(data.ddPosX)) {
+						
+						return data.ddPosX;
+					}
+				}()));
+				
 			}
-			if (data.hasOwnProperty('ddPosY')) {
-				var yPos;
-				if (data.ddPosY == 'self.center') {
-					yPos = (button_pos.top + $button.outerHeight() / 2) - $dropbox.outerHeight() / 2;
-				} else if (data.ddPosY == 'center') {
-					yPos = $dropbox.parent().outerHeight() / 2 - $dropbox.outerHeight() / 2;
-				} else if (isFinite(data.ddPosY)) {
-					yPos = (button_pos.top + $button.outerHeight()) + data.ddPosY;
-				}
-				$dropbox.css('top', yPos);
+			
+			if (!empty(data.ddPosY)) {
+				
+				$dropbox.css('top', (function() {
+					if (data.ddPosY === 'self.center') {
+						
+						return (button_pos.top + $button.outerHeight() / 2) - $dropbox.outerHeight() / 2;
+					} else if (data.ddPosY === 'center') {
+						
+						return $dropbox.parent().outerHeight() / 2 - $dropbox.outerHeight() / 2;
+					} else if (isFinite(data.ddPosY)) {
+						
+						return (button_pos.top + $button.outerHeight()) + data.ddPosY;
+					}
+				}()));
+				
 			}
 		}
+		
 		$dropbox.find('.CloseDropdown').on('click.CloseDropdown', $dropbox.closeDropbox);
-		$button.on('click.Dropdown', function() {
+		
+		$button.on('click.OpenDropdown', function() {
 			$dropbox.addClass('-show');
 			$button.addClass('-dropdown_active');
+			
 			$('body').on('mousedown.CloseDropdown', function(e) {
-				if (!$(e.target).closest('.DropdownBox').length) {
+				if (!$(e.target).closest($dropbox).length) {
 					$dropbox.closeDropbox();
 				}
 			});
+			
 			$(document).on('keyup.CloseDropdown', function(e) {
-				if (e.keyCode == 27) {
+				if (isKeyPressed(e, __C.KEY_CODES.ESC)) {
 					$dropbox.closeDropbox();
 				}
 			});
 		});
 		
-	}).addClass('-Handled_DropdownButton')
+		$button.data('dropdown_box', $dropbox);
+		
+	}).addClass('-Handled_DropdownButton');
+	
+	return $dropdown_buttons;
 }
 
 function bindFileLoadButton($parent) {
@@ -2047,8 +2129,10 @@ function bindFileLoadButton($parent) {
 
 function bindCollapsing($parent) {
 	$parent = $parent ? $parent : $('body');
-	$parent.find('.Collapsing').not('.-Handled_Collapsing').each(function() {
+	$parent.find('.CollapsingWrapper').not('.-Handled_Collapsing').each(function() {
 		var $instance = $(this),
+			$wrapper = $instance,
+			$collapsing_parent = $wrapper.closest('.Collapsing'),
 			collapsing_id = $instance.data('collapsing_id'),
 			mutation_observer = new MutationObserver(function(records) {
 				var $target = $(records[records.length - 1].target),
@@ -2065,20 +2149,12 @@ function bindCollapsing($parent) {
 				});
 			}),
 			default_height,
-			$wrapper,
-			$content,
-			$trigger,
-			trigger_event;
+			$content = $wrapper.children('.CollapsingContent');
 		
-		if(collapsing_id){
-			$wrapper = $instance.find('.CollapsingWrapper[data-collapsing_id="'+collapsing_id+'"]');
-			$trigger = $instance.find('.CollapsingTrigger[data-collapsing_id="'+collapsing_id+'"]');
-		} else {
-			$wrapper = $instance.find('.CollapsingWrapper:first');
-			$trigger = $instance.find('.CollapsingTrigger:first');
-		}
-		$content = $wrapper.children('.CollapsingContent');
-		trigger_event = $trigger.is(':checkbox') || $trigger.is(':radio') ? 'change' : 'click';
+		$collapsing_parent = $collapsing_parent.length ? $collapsing_parent : $parent;
+		
+		$instance.$trigger = $collapsing_parent.find(collapsing_id ? '.CollapsingTrigger[data-collapsing_id="'+collapsing_id+'"]' : '.CollapsingTrigger:first');
+		
 		
 		if($wrapper.hasClass('-fading')){
 			default_height = $instance.data('defaultHeight') < $content.height() ? $instance.data('defaultHeight') : $content.height();
@@ -2092,7 +2168,9 @@ function bindCollapsing($parent) {
 		function toggleCollapsing(){
 			var parent_Tabs = $wrapper.parents('.Tabs').resolveInstance();
 			
-			parent_Tabs.disconnectMutationObserver();
+			if (parent_Tabs.length) {
+				parent_Tabs.disconnectMutationObserver();
+			}
 			$wrapper.addClass('-in_progress');
 			if ($instance.hasClass(__C.CLASSES.ACTIVE)) {
 				$wrapper.height(default_height);
@@ -2101,40 +2179,63 @@ function bindCollapsing($parent) {
 			}
 			$wrapper.toggleClass('-opened');
 			$instance.toggleClass(__C.CLASSES.ACTIVE);
-			parent_Tabs.connectMutationObserver();
-		}
-		
-		function changeProp(){
-			if (trigger_event === 'change') {
-				$trigger.prop('checked', !$trigger.prop('checked'));
+			if (parent_Tabs.length) {
+				parent_Tabs.connectMutationObserver();
 			}
 		}
 		
+		function changeProp(){
+			$instance.$trigger.each(function() {
+				var $trigger = $(this);
+				
+				if ($trigger.is(':checkbox')) {
+					$trigger.prop('checked', !$trigger.prop('checked'));
+				}
+			});
+		}
+		
+		$instance.toggleCollapsing = function() {
+			changeProp();
+			toggleCollapsing();
+		};
+		
 		$instance.openCollapsing = function() {
 			if(!$instance.hasClass(__C.CLASSES.ACTIVE)){
-				changeProp();
-				toggleCollapsing();
+				$instance.toggleCollapsing();
 			}
 		};
 		
 		$instance.closeCollapsing = function() {
 			if($instance.hasClass(__C.CLASSES.ACTIVE)){
-				changeProp();
-				toggleCollapsing();
+				$instance.toggleCollapsing();
 			}
 		};
 		
-		$trigger.on(trigger_event+'.toggleCollapsing', function() {
-			toggleCollapsing();
+		$instance.bindTrigger = function($trigger) {
+			var trigger_event = $trigger.is(':checkbox') || $trigger.is(':radio') ? 'change' : 'click';
+			
+			if ($trigger) {
+				$trigger.on(trigger_event+'.toggleCollapsing', toggleCollapsing);
+				$instance.$trigger = $instance.$trigger.add($trigger);
+			} else {
+				$instance.$trigger.on(trigger_event+'.toggleCollapsing', toggleCollapsing);
+			}
+			
+			$instance.$trigger.addClass('-Handled_CollapsingTrigger');
+		};
+		
+		$instance.bindTrigger($instance.$trigger);
+		
+		$wrapper.on('transitionend', function() {
+			$wrapper.removeClass('-in_progress');
 		});
 		
-		$wrapper
-			.on('click', function(){
+		if (default_height) {
+			$wrapper.on('click.OpenCollapsing', function() {
 				$instance.openCollapsing();
-			})
-			.on('transitionend', function() {
-				$wrapper.removeClass('-in_progress');
 			});
+		}
+		
 		
 		mutation_observer.observe($wrapper.get(0), {
 			childList: true,
