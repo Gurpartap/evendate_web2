@@ -31,55 +31,49 @@ ServerExports = extending(AsynchronousConnection, (function() {
 	 *
 	 * @param {string} url
 	 * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
-	 * @param {function} [success]
-	 * @param {function} [error]
 	 *
 	 * @return {jqPromise}
 	 */
-	ServerExports.prototype.export = function(url, format, success, error) {
+	ServerExports.prototype.export = function(url, format) {
 		
-		return this.dealAjax(AsynchronousConnection.HTTP_METHODS.GET, url, {
-			format: format || ServerExports.EXPORT_EXTENSION.XLSX
-		}, null, success, error);
+		return $.fileDownload(url, {
+			data: {
+				format: format || ServerExports.EXPORT_EXTENSION.XLSX
+			}
+		});
 	};
 	/**
 	 *
 	 * @param {number} organization_id
 	 * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
-	 * @param {function} [success]
-	 * @param {function} [error]
 	 *
 	 * @return {jqPromise}
 	 */
-	ServerExports.prototype.organizationSubscribers = function(organization_id, format, success, error) {
+	ServerExports.prototype.organizationSubscribers = function(organization_id, format) {
 	
-		return this.export('/api/v1/statistics/organizations/'+organization_id+'/subscribers/export', format, success, error);
+		return this.export('/api/v1/statistics/organizations/'+organization_id+'/subscribers/export', format);
 	};
 	/**
 	 *
 	 * @param {number} event_id
 	 * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
-	 * @param {function} [success]
-	 * @param {function} [error]
 	 *
 	 * @return {jqPromise}
 	 */
-	ServerExports.prototype.eventOrders = function(event_id, format, success, error) {
+	ServerExports.prototype.eventOrders = function(event_id, format) {
 		
-		return this.export('/api/v1/statistics/events/'+event_id+'/orders/export', format, success, error);
+		return this.export('/api/v1/statistics/events/'+event_id+'/orders/export', format);
 	};
 	/**
 	 *
 	 * @param {number} event_id
 	 * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
-	 * @param {function} [success]
-	 * @param {function} [error]
 	 *
 	 * @return {jqPromise}
 	 */
-	ServerExports.prototype.eventTickets = function(event_id, format, success, error) {
+	ServerExports.prototype.eventTickets = function(event_id, format) {
 		
-		return this.export('/api/v1/statistics/events/'+event_id+'/tickets/export', format, success, error);
+		return this.export('/api/v1/statistics/events/'+event_id+'/tickets/export', format);
 	};
 	
 	

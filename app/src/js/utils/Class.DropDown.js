@@ -21,6 +21,7 @@ DropDown = extendingJQuery((function() {
 	 * @param {Object<string, string>} [build_props.dataset]
 	 * @param {DropDownOptions} [options]
 	 * @param {object} [dropdown_variables]
+	 * @param {function} [afterInit]
 	 *
 	 * @constructor
 	 * @constructs DropDown
@@ -28,8 +29,14 @@ DropDown = extendingJQuery((function() {
 	 * @property {DropDownOptions} options
 	 * @property {jQuery} dropdown
 	 */
-	function DropDown(dropdown_id, title, build_props, options, dropdown_variables) {
-		this.options = options || {};
+	function DropDown(dropdown_id, title, build_props, options, dropdown_variables, afterInit) {
+		this.options = $.extend(true, {
+			position: {
+				x: 0,
+				y: 0
+			}
+		}, options);
+		this.afterInit = afterInit || function() {};
 		
 		build_props = Builder.normalizeBuildProps(build_props);
 		
@@ -57,6 +64,12 @@ DropDown = extendingJQuery((function() {
 		this.on('click.OpenDropDown', function() {
 			self.openDropdown();
 		});
+		
+		this.afterInit();
+		
+		this.dropdown.find('.CloseDropdown').on('click.CloseDropdown', function() {
+			self.closeDropdown();
+		});
 	};
 	
 	DropDown.prototype.openDropdown = function() {
@@ -74,31 +87,35 @@ DropDown = extendingJQuery((function() {
 			}
 		}
 		
-		if (!empty(this.options.position)) {
-			if (!empty(this.options.position.x)) {
-				this.dropdown.css('left', (function(pos, left_position, button_width, dropdow_width) {
-					if (pos === 'center') {
+		this.dropdown.css({
+			left: (function(pos, left_position, button_width, dropdow_width) {
+				switch (pos) {
+					case 'center': {
 						
 						return (left_position + button_width / 2) - dropdow_width / 2;
-					} else if (isFinite(pos)) {
-						
-						return (left_position + button_width) + pos;
 					}
-				}(this.options.position.x, button_pos.left, this.outerWidth(), this.dropdown.outerWidth())));
-			}
-			
-			if (!empty(this.options.position.y)) {
-				this.dropdown.css('top', (function(pos, top_position, button_height, dropdow_height) {
-					if (pos === 'center') {
+					case 'right': {
 						
-						return (top_position + button_height / 2) - dropdow_height / 2;
-					} else if (isFinite(pos)) {
-						
-						return (top_position + button_height) + pos;
+						return left_position + button_width - dropdow_width;
 					}
-				}(this.options.position.y, button_pos.top, this.outerHeight(), this.dropdown.outerHeight())));
-			}
-		}
+					default: {
+						if (isFinite(pos)) {
+							
+							return left_position + pos;
+						}
+					}
+				}
+			}(this.options.position.x, button_pos.left, this.outerWidth(), this.dropdown.outerWidth())),
+			top: (function(pos, top_position, button_height, dropdow_height) {
+				if (pos === 'center') {
+					
+					return (top_position + button_height / 2) - dropdow_height / 2;
+				} else if (isFinite(pos)) {
+					
+					return (top_position + button_height) + pos;
+				}
+			}(this.options.position.y, button_pos.top, this.outerHeight(), this.dropdown.outerHeight()))
+		});
 		
 		$('body').on('mousedown.CloseDropdown', function(e) {
 			if (!$(e.target).closest(self.dropdown).length) {

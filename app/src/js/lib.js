@@ -101,7 +101,8 @@ __C = {
 			PENCIL: 'fa-pencil',
 			EYE: 'fa-eye',
 			EYE_CLOSE: 'fa-eye-slash',
-			TICKET: 'fa-ticket'
+			TICKET: 'fa-ticket',
+			DOWNLOAD: 'fa-download'
 		},
 		ICON_CLASS: 'fa_icon'
 	},

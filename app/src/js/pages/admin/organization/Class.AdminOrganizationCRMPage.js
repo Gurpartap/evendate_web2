@@ -136,12 +136,35 @@ AdminOrganizationCRMPage = extending(AdminOrganizationPage, (function() {
 	
 	AdminOrganizationCRMPage.prototype.init = function() {
 		this.initCRMTable();
+		bindDropdown(this.$wrapper);
 	};
 	
 	AdminOrganizationCRMPage.prototype.render = function() {
-		var self = this;
+		var self = this,
+			$header_buttons = $();
+		
+		$header_buttons = $header_buttons.add(new DropDown('export-formats', 'Выгрузка', {
+			classes: [
+				__C.CLASSES.SIZES.LOW,
+				__C.CLASSES.ICON_CLASS,
+				__C.CLASSES.ICONS.DOWNLOAD,
+				__C.CLASSES.COLORS.MARGINAL_PRIMARY,
+				__C.CLASSES.HOOKS.RIPPLE,
+				__C.CLASSES.HOOKS.DROPDOWN_BUTTON
+			]
+		}, {
+			width: 'self',
+			position: {
+				x: 'right',
+				y: 5
+			}
+		}, {
+			xlsx_href: '/api/v1/statistics/organizations/'+this.organization.id+'/subscribers/export?format=xlsx',
+			html_href: '/api/v1/statistics/organizations/'+this.organization.id+'/subscribers/export?format=html'
+		}));
 		
 		this.$wrapper.html(tmpl('admin-organization-crm-page', {
+			header_buttons: $header_buttons,
 			loader: (this.$loader = __APP.BUILD.overlayLoader())
 		}));
 		this.$wrapper.find('.CRMTableWrapper').addClass(__C.CLASSES.STATUS.DISABLED);

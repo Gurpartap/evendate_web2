@@ -34,14 +34,12 @@ EventAllOrdersCollection = extending(AbstractEventOrdersCollection, (function() 
 	/**
 	 *
 	 * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
-	 * @param {function} [success]
-	 * @param {function} [error]
 	 *
 	 * @return {jqPromise}
 	 */
-	EventAllOrdersCollection.prototype.export = function(format, success, error) {
+	EventAllOrdersCollection.prototype.export = function(format) {
 		
-		return (new ServerExports()).eventOrders(this.event_id, format, success, error);
+		return (new ServerExports()).eventOrders(this.event_id, format);
 	};
 	
 	

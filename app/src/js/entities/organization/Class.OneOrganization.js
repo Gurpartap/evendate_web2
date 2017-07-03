@@ -347,18 +347,6 @@ OneOrganization = extending(OneEntity, (function() {
 			}
 		});
 	};
-	/**
-	 *
-	 * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
-	 * @param {function} [success]
-	 * @param {function} [error]
-	 *
-	 * @return {jqPromise}
-	 */
-	OneOrganization.prototype.export = function(format, success, error) {
-		
-		return (new ServerExports()).organizationSubscribers(this.id, format, success, error);
-	};
 	
 	
 	return OneOrganization;

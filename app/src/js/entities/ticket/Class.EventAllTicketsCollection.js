@@ -33,14 +33,12 @@ EventAllTicketsCollection = extending(AbstractEventTicketsCollection, (function(
 	/**
 	 *
 	 * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
-	 * @param {function} [success]
-	 * @param {function} [error]
 	 *
 	 * @return {jqPromise}
 	 */
-	EventAllTicketsCollection.prototype.export = function(format, success, error) {
+	EventAllTicketsCollection.prototype.export = function(format) {
 		
-		return (new ServerExports()).eventTickets(this.event_id, format, success, error);
+		return (new ServerExports()).eventTickets(this.event_id, format);
 	};
 	
 	return EventAllTicketsCollection;

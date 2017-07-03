@@ -13,6 +13,8 @@ OrganizationSubscribersCollection = extending(UsersCollection, (function() {
 	 *
 	 * @constructor
 	 * @constructs UsersCollection
+	 *
+	 * @property {(number|string)} organization_id
 	 */
 	function OrganizationSubscribersCollection(organization_id) {
 		UsersCollection.call(this);
@@ -95,6 +97,16 @@ OrganizationSubscribersCollection = extending(UsersCollection, (function() {
 			
 			return self.last_pushed;
 		});
+	};
+	/**
+	 *
+	 * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
+	 *
+	 * @return {jqPromise}
+	 */
+	OrganizationSubscribersCollection.prototype.export = function(format) {
+		
+		return (new ServerExports()).organizationSubscribers(this.organization_id, format);
 	};
 	
 	return OrganizationSubscribersCollection;

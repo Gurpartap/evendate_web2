@@ -72,10 +72,36 @@ AdminEventOrdersPage = extending(AdminEventPage, (function() {
 		});
 	};
 	
+	AdminEventOrdersPage.prototype.init = function() {
+		bindDropdown(this.$wrapper);
+	};
+	
 	AdminEventOrdersPage.prototype.render = function() {
-		var self = this;
+		var self = this,
+			$header_buttons = $();
+		
+		$header_buttons = $header_buttons.add(new DropDown('export-formats', 'Выгрузка', {
+			classes: [
+				__C.CLASSES.SIZES.LOW,
+				__C.CLASSES.ICON_CLASS,
+				__C.CLASSES.ICONS.DOWNLOAD,
+				__C.CLASSES.COLORS.MARGINAL_PRIMARY,
+				__C.CLASSES.HOOKS.RIPPLE,
+				__C.CLASSES.HOOKS.DROPDOWN_BUTTON
+			]
+		}, {
+			width: 'self',
+			position: {
+				x: 'right',
+				y: 5
+			}
+		}, {
+			xlsx_href: '/api/v1/statistics/events/'+this.event.id+'/orders/export?format=xlsx',
+			html_href: '/api/v1/statistics/events/'+this.event.id+'/orders/export?format=html'
+		}));
 		
 		this.$wrapper.html(tmpl('admin-event-orders-page', {
+			header_buttons: $header_buttons,
 			loader: (this.$loader = __APP.BUILD.overlayLoader())
 		}));
 		
@@ -150,16 +176,12 @@ AdminEventOrdersPage = extending(AdminEventPage, (function() {
 			if (!self.ordersTable) {
 				self.initOrdersTable();
 			}
-			self.ordersTable.rows.add($rows).draw();/*
-			 try {
-			 self.ordersTable.rows().recalcHeight().columns.adjust().fixedColumns().relayout().draw();
-			 } catch (e) {
-			 __APP.reload();
-			 }*/
+			self.ordersTable.rows.add($rows).draw();
 			
 			self.$loader.remove();
 			self.$wrapper.find('.OrdersTableWrapper').removeClass(__C.CLASSES.STATUS.DISABLED);
 		});
+		this.init();
 	};
 	
 	return AdminEventOrdersPage;
