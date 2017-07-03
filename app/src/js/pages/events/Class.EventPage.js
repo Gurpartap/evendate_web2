@@ -73,76 +73,88 @@ EventPage = extending(Page, (function() {
 	
 	/**
 	 *
-	 * @param {Array} raw_notifications
-	 * @param {(number|string)} event_id
-	 * @param {timestamp} last_date
+	 * @param {OneEvent} event
 	 * @return {jQuery}
 	 */
-	EventPage.buildNotifications = function(raw_notifications, event_id, last_date) {
+	EventPage.buildNotifications = function(event) {
 		var m_today = moment(),
-			all_notifications = {
-				'notification-before-quarter-of-hour': {
-					label: 'За 15 минут',
-					moment: moment.unix(last_date).subtract(15, 'minutes').unix()
-				},
-				'notification-before-three-hours': {
-					label: 'За 3 часа',
-					moment: moment.unix(last_date).subtract(3, 'hours').unix()
-				},
-				'notification-before-day': {
-					label: 'За день',
-					moment: moment.unix(last_date).subtract(1, 'days').unix()
-				},
-				'notification-before-three-days': {
-					label: 'За 3 дня',
-					moment: moment.unix(last_date).subtract(3, 'days').unix()
-				},
-				'notification-before-week': {
-					label: 'За неделю',
-					moment: moment.unix(last_date).subtract(1, 'week').unix()
-				}
-			},
-			$notifications = $(),
+			all_notifications = {},
 			current_notifications = {},
 			i = 0;
-		for (var notif in raw_notifications) {
-			if (raw_notifications.hasOwnProperty(notif)) {
-				current_notifications[raw_notifications[notif].notification_type] = raw_notifications[notif];
+		
+		all_notifications[OneNotification.NOTIFICATIN_TYPES.BEFORE_QUARTER_OF_HOUR] = {
+			label: 'За 15 минут',
+			moment: moment.unix(event.last_event_date).subtract(15, 'minutes').unix()
+		};
+		all_notifications[OneNotification.NOTIFICATIN_TYPES.BEFORE_THREE_HOURS] = {
+			label: 'За 3 часа',
+			moment: moment.unix(event.last_event_date).subtract(3, 'hours').unix()
+		};
+		all_notifications[OneNotification.NOTIFICATIN_TYPES.BEFORE_DAY] = {
+			label: 'За день',
+			moment: moment.unix(event.last_event_date).subtract(1, 'days').unix()
+		};
+		all_notifications[OneNotification.NOTIFICATIN_TYPES.BEFORE_THREE_DAYS] = {
+			label: 'За 3 дня',
+			moment: moment.unix(event.last_event_date).subtract(3, 'days').unix()
+		};
+		all_notifications[OneNotification.NOTIFICATIN_TYPES.BEFORE_WEEK] = {
+			label: 'За неделю',
+			moment: moment.unix(event.last_event_date).subtract(1, 'week').unix()
+		};
+		
+		for (var notif in event.notifications) {
+			if (event.notifications.hasOwnProperty(notif)) {
+				current_notifications[event.notifications[notif].notification_type] = event.notifications[notif];
 			}
 		}
 		
-		for (var notification in all_notifications) {
-			
-			if (all_notifications.hasOwnProperty(notification)) {
-				var is_disabled = moment.unix(all_notifications[notification].moment).isBefore(m_today),
-					data = {
-						id: 'event_notify_' + (++i),
-						classes: ['ToggleNotification'],
-						name: 'notification_time',
-						label: all_notifications[notification].label,
-						attributes: {
-							value: notification
-						},
-						dataset: {
-							event_id: event_id
-						}
-					};
-				
-				if (current_notifications[notification]) {
-					is_disabled = is_disabled || current_notifications[notification].done || !current_notifications[notification].uuid;
-					if (current_notifications[notification].uuid) {
-						data.dataset.uuid = current_notifications[notification].uuid;
+		return __APP.BUILD.checkbox(Object.keys(all_notifications).map(function(notification) {
+			var is_disabled = moment.unix(all_notifications[notification].moment).isBefore(m_today),
+				data = {
+					id: 'event_notify_' + (++i),
+					classes: ['ToggleNotification'],
+					name: 'notification_time',
+					label: all_notifications[notification].label,
+					attributes: {
+						value: notification
+					},
+					dataset: {
+						event_id: event.id
 					}
-					data.attributes.checked = true;
+				};
+			
+			if (current_notifications[notification]) {
+				is_disabled = is_disabled || current_notifications[notification].done || !current_notifications[notification].uuid;
+				if (current_notifications[notification].uuid) {
+					data.dataset.uuid = current_notifications[notification].uuid;
 				}
-				if (is_disabled) {
-					data.unit_classes = ['-status_disabled'];
-					data.attributes.disabled = true;
-				}
-				$notifications = $notifications.add(__APP.BUILD.checkbox(data))
+				data.attributes.checked = true;
 			}
-		}
-		return $notifications;
+			if (is_disabled) {
+				data.unit_classes = [__C.CLASSES.STATUS.DISABLED];
+				data.attributes.disabled = true;
+			}
+			
+			return data;
+		})).each(function() {
+			$(this).on('change', ':checkbox', function() {
+				var $this = $(this);
+				
+				$this.prop('disabled', true);
+				if ($this.prop('checked')) {
+					event.addNotification($this.val(), function(data) {
+						$this.data('uuid', data.uuid);
+						$this.prop('disabled', false);
+					});
+				} else {
+					event.deleteNotification($this.data('uuid'), function() {
+						$this.data('uuid', undefined);
+						$this.prop('disabled', false);
+					});
+				}
+			});
+		});
 	};
 	
 	EventPage.prototype.fetchData = function() {
@@ -200,6 +212,7 @@ EventPage = extending(Page, (function() {
 	};
 	
 	EventPage.prototype.render = function() {
+		
 		var PAGE = this,
 			cover_width = 630,
 			this_event = PAGE.event,
@@ -210,7 +223,7 @@ EventPage = extending(Page, (function() {
 				__C.CLASSES.HOOKS.ADD_AVATAR.COLLECTION,
 				__C.CLASSES.HOOKS.CALL_MODAL
 			],
-			$action_buttons = __APP.BUILD.button({
+			$action_buttons = new DropDown('event-edit-notifications', '', {
 				classes: [
 					__C.CLASSES.UNIVERSAL_STATES.EMPTY,
 					__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
@@ -220,13 +233,15 @@ EventPage = extending(Page, (function() {
 					__C.CLASSES.COLORS.NEUTRAL,
 					__C.CLASSES.HOOKS.RIPPLE,
 					__C.CLASSES.HOOKS.DROPDOWN_BUTTON
-				],
-				dataset: {
-					dropdown: 'edit_notification',
-					ddWidth: 190,
-					ddPosX: 'self.center',
-					ddPosY: 6
+				]
+			}, {
+				width: 190,
+				position: {
+					x: 'center',
+					y: 6
 				}
+			}, {
+				notifications: EventPage.buildNotifications(this.event)
 			}),
 			$event_additional_fields = $(),
 			$event_additional_information = $(),
@@ -357,7 +372,6 @@ EventPage = extending(Page, (function() {
 					__C.CLASSES.HOOKS.ADD_AVATAR.STATES.CASTABLE
 				]
 			}, this_event.favored_users_count),
-			notifications: EventPage.buildNotifications(this_event.notifications, this_event.id, this_event.last_event_date),
 			event_map: this_event.location ? tmpl('event-map', {location_sanitized: encodeURI(this_event.location)}) : '',
 			event_edit_functions: this_event.can_edit ? tmpl('event-edit-functions', this_event) : '',
 			event_additional_info: $event_additional_information,

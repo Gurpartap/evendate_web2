@@ -114,7 +114,7 @@ $url_parts = explode('/', $url);
 
 	<?php
 	if ($DEBUG_MODE) { ?>
-    <link rel="stylesheet" href="/dist/vendor.css?rev=0f8648604d5064289b9392b4f8539e6f">
+    <link rel="stylesheet" href="/dist/vendor.css?rev=3b6878c5b89f643e8d96b1b336b7d4fc">
     <link rel="stylesheet" href="/dist/app.css?rev=580d4cc00a0578c656351b697ca1ca03"><?php
 	} else { ?>
     <link rel="stylesheet" href="/dist/vendor.min.css?rev=4165c69f5d04ec431ab5bc41425847a5">
@@ -349,8 +349,8 @@ $url_parts = explode('/', $url);
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=edb6e19ba2620947703d9182c6c7975e" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=d99ed4fb86dbfc663f64631b1468db08" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=20f0e803364e286c8b1acb14e6db152a" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=2ebb703d1b916fed53a38a5f0a7c237a" charset="utf-8"></script><?php
 } else { ?>
 	<script type="text/javascript" src="/dist/vendor.min.js?rev=00d896111b33b132019c79dd16dc0f73" charset="utf-8"></script>
 	<script type="text/javascript" src="/dist/app.min.js?rev=a6d4a0b9a463da07c86f96eda8268dc2" charset="utf-8"></script><?php

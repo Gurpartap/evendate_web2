@@ -300,14 +300,15 @@ Builder = (function() {
 	};
 	/**
 	 *
-	 * @param {...buildProps} props
+	 * @param {(Array<buildProps>|...buildProps)} props
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.checkbox = function buildCheckbox(props) {
-		var self = this;
+		var self = this,
+			_props = props instanceof Array ? props : arguments;
 		
-		return $.makeSet([].map.call(arguments, function(arg) {
-			return self.radioCheckbox('checkbox', arg)
+		return $.makeSet([].map.call(_props, function(arg) {
+			return self.radioCheckbox('checkbox', arg);
 		}));
 	};
 	/**
