@@ -2504,5 +2504,7 @@ function isScrollRemain(left) {
  * @return {*}
  */
 function setDefaultValue(variable, default_value) {
-	return variable = typeof variable === 'undefined' ? default_value : variable;
+	if ((typeof variable === 'undefined') || $.isEmptyObject(variable))
+		return default_value;
+	return variable;
 }

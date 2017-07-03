@@ -722,6 +722,11 @@ small.-text_color_neutral,
 label.-text_color_default,
 label.-text_color_neutral {color: #fff; color: var(--color_page);}
 
+p.-text_color_dark_primary,
+span.-text_color_dark_primary,
+small.-text_color_dark_primary,
+label.-text_color_dark_primary {color: #3e4d66; color: var(--color_dark_primary);}
+
 p.-text_color_primary,
 span.-text_color_primary,
 small.-text_color_primary,

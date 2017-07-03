@@ -1,0 +1,43 @@
+<script type="javascript/template" id="tmpl-order-page">
+	<form class="order_page">
+		<h2>{page_title}</h2>
+		{tickets_selling}
+		{registration}
+		{main_action_button}
+	</form>
+</script>
+
+<script type="javascript/template" id="tmpl-order-tickets-selling">
+	<section class="order_ticket_types">
+		<h4>Выберите билет</h4>
+		{ticket_types}
+		<footer class="order_ticket_types_footer">
+			<span class="-text_color_primary_80">Общая стоимость:</span>
+			<span class="-text_color_dark_primary">{overall_price} ₽</span>
+		</footer>
+	</section>
+</script>
+
+<script type="javascript/template" id="tmpl-order-ticket-type">
+	<div class="order_ticket_type material">
+		<header class="order_ticket_type_header">
+			<span class="order_ticket_type_title">{name}</span>
+			{quantity_input}
+		</header>
+		<div class="order_ticket_type_description">{description}</div>
+		<footer class="order_ticket_type_footer">
+			{type_price} руб
+		</footer>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-order-registration">
+	<section class="order_ticket_types">
+		<h4>Выберите билет</h4>
+		{ticket_types}
+		<footer class="order_ticket_types_footer">
+			<span class="-text_color_primary_80">Общая стоимость:</span>
+			<span class="-text_color_dark_primary">{overall_price} ₽</span>
+		</footer>
+	</section>
+</script>
