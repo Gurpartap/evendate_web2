@@ -1073,7 +1073,7 @@ AbstractEditEventPage = extending(Page, (function() {
 		
 		(function checkVkPublicationAbility() {
 			if (__APP.USER.accounts.contains(OneUser.ACCOUNTS.VK)) {
-				__APP.SERVER.dealAjax(ServerConnection.HTTP_METHODS.GET, '/api/v1/organizations/vk_groups').done(function(groups) {
+				__APP.SERVER.dealAjax(AsynchronousConnection.HTTP_METHODS.GET, '/api/v1/organizations/vk_groups').done(function(groups) {
 					var $vk_group_select = PAGE.$wrapper.find('select.VkGroupsSelect');
 					
 					$vk_group_select.append(__APP.BUILD.option(groups.map(function(group) {

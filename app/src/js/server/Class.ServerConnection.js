@@ -1,12 +1,18 @@
 /**
+ * @requires Class.AsynchronousConnection.js
+ */
+/**
  * @singleton
+ * @extends AsynchronousConnection
  * @class ServerConnection
  */
-ServerConnection = (function() {
+ServerConnection = extending(AsynchronousConnection, (function() {
 	/**
 	 *
 	 * @constructor
 	 * @constructs ServerConnection
+	 *
+	 * @property {Array<ServerConnection>} current_connections
 	 */
 	function ServerConnection() {
 		if (typeof ServerConnection.instance === 'object') {
@@ -15,17 +21,8 @@ ServerConnection = (function() {
 		this.current_connections = [];
 		ServerConnection.instance = this;
 	}
-	/**
-	 *
-	 * @enum {string}
-	 */
-	ServerConnection.HTTP_METHODS = {
-		GET: 'GET',
-		POST: 'POST',
-		PUT: 'PUT',
-		DELETE: 'DELETE'
-	};
-	Object.freeze(ServerConnection.HTTP_METHODS);
+	
+	ServerConnection.MAX_ENTITIES_LENGTH = 10000;
 	
 	function ajaxHandler(result, success, error) {
 		error = typeof error !== 'undefined' ? error : function() {
@@ -90,12 +87,13 @@ ServerConnection = (function() {
 	
 	/**
 	 *
-	 * @param {ServerConnection.HTTP_METHODS} http_method
+	 * @param {AsynchronousConnection.HTTP_METHODS} http_method
 	 * @param {string} url
 	 * @param {(AJAXData|string)} [ajax_data]
 	 * @param {string} [content_type='application/x-www-form-urlencoded; charset=UTF-8']
 	 * @param {AJAXCallback} [success]
 	 * @param {function} [error]
+	 *
 	 * @returns {jqPromise}
 	 */
 	ServerConnection.prototype.dealAjax = function(http_method, url, ajax_data, content_type, success, error) {
@@ -125,22 +123,6 @@ ServerConnection = (function() {
 	};
 	
 	/**
-	 * @param {...(jqXHR|Deferred|jqPromise)} Deferreds
-	 * @param {function(..(Array|object))} [cb]
-	 * @return {jqPromise}
-	 */
-	ServerConnection.prototype.multipleAjax = function(){
-		var with_callback = (arguments[arguments.length - 1] instanceof Function),
-			promises = with_callback ? Array.prototype.splice.call(arguments, 0, arguments.length - 1) : Array.prototype.slice.call(arguments),
-			parallel_promise;
-		parallel_promise = $.when.apply($, promises);
-		if(with_callback) {
-			parallel_promise.done(Array.prototype.shift.call(arguments));
-		}
-		return parallel_promise.promise();
-	};
-	
-	/**
 	 *
 	 * @param {string} url
 	 * @param {(object|string)} ajax_data
@@ -149,11 +131,11 @@ ServerConnection = (function() {
 	 * @returns {jqPromise}
 	 */
 	ServerConnection.prototype.getData = function(url, ajax_data, success, error) {
-		return this.dealAjax(ServerConnection.HTTP_METHODS.GET, url, this.validateData(ajax_data), 'application/json', function(data) {
-			if (ajax_data.length != undefined && ajax_data.offset != undefined) {
+		return this.dealAjax(AsynchronousConnection.HTTP_METHODS.GET, url, this.validateData(ajax_data), 'application/json', function(data) {
+			if (!empty(ajax_data.length) && !empty(ajax_data.offset)) {
 				ajax_data.offset += ajax_data.length;
 			}
-			if (success && typeof success == 'function') {
+			if (isFunction(success)) {
 				success(data);
 			}
 		}, error);
@@ -169,9 +151,9 @@ ServerConnection = (function() {
 	 */
 	ServerConnection.prototype.updateData = function(url, ajax_data, is_payload, success, error) {
 		if(is_payload){
-			return this.dealAjax(ServerConnection.HTTP_METHODS.PUT, url, JSON.stringify(ajax_data), 'application/json', success, error);
+			return this.dealAjax(AsynchronousConnection.HTTP_METHODS.PUT, url, JSON.stringify(ajax_data), 'application/json', success, error);
 		}
-		return this.dealAjax(ServerConnection.HTTP_METHODS.PUT, url, ajax_data, 'application/x-www-form-urlencoded; charset=UTF-8', success, error);
+		return this.dealAjax(AsynchronousConnection.HTTP_METHODS.PUT, url, ajax_data, 'application/x-www-form-urlencoded; charset=UTF-8', success, error);
 	};
 	/**
 	 *
@@ -184,9 +166,9 @@ ServerConnection = (function() {
 	 */
 	ServerConnection.prototype.addData = function(url, ajax_data, is_payload, success, error) {
 		if(is_payload){
-			return this.dealAjax(ServerConnection.HTTP_METHODS.POST, url, JSON.stringify(ajax_data), 'application/json', success, error);
+			return this.dealAjax(AsynchronousConnection.HTTP_METHODS.POST, url, JSON.stringify(ajax_data), 'application/json', success, error);
 		}
-		return this.dealAjax(ServerConnection.HTTP_METHODS.POST, url, ajax_data, 'application/x-www-form-urlencoded; charset=UTF-8', success, error);
+		return this.dealAjax(AsynchronousConnection.HTTP_METHODS.POST, url, ajax_data, 'application/x-www-form-urlencoded; charset=UTF-8', success, error);
 	};
 	/**
 	 *
@@ -197,7 +179,7 @@ ServerConnection = (function() {
 	 * @returns {jqPromise}
 	 */
 	ServerConnection.prototype.deleteData = function(url, ajax_data, success, error) {
-		return this.dealAjax(ServerConnection.HTTP_METHODS.DELETE, url + '?' + $.param(ajax_data), {}, 'application/json', success, error);
+		return this.dealAjax(AsynchronousConnection.HTTP_METHODS.DELETE, url + '?' + $.param(ajax_data), {}, 'application/json', success, error);
 	};
 	/**
 	 *
@@ -248,4 +230,4 @@ ServerConnection = (function() {
 	
 	
 	return ServerConnection;
-}());
+}()));

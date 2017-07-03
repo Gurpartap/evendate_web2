@@ -10,9 +10,9 @@ AdminEventCheckInPage = extending(AdminEventPage, (function() {
 	/**
 	 *
 	 * @class CheckInTicketsCollection
-	 * @extends AdminEventsTicketsCollection
+	 * @extends EventAllTicketsCollection
 	 */
-	var CheckInTicketsCollection = extending(AdminEventsTicketsCollection, (function() {
+	var CheckInTicketsCollection = extending(EventAllTicketsCollection, (function() {
 		
 		/**
 		 * @param {(string|number)} event_id
@@ -29,7 +29,7 @@ AdminEventCheckInPage = extending(AdminEventPage, (function() {
 		function CheckInTicketsCollection(event_id) {
 			var self = this;
 			
-			AdminEventsTicketsCollection.call(this, event_id);
+			EventAllTicketsCollection.call(this, event_id);
 			
 			Object.defineProperties(this, {
 				awaiting: {
@@ -75,7 +75,7 @@ AdminEventCheckInPage = extending(AdminEventPage, (function() {
 	 *
 	 * @property {AdminEventCheckInPage.STATES} current_checkin_state
 	 * @property {CheckInTicketsCollection} tickets
-	 * @property {SearchAdminEventsTicketsCollection} searching_tickets
+	 * @property {SearchEventTicketsCollection} searching_tickets
 	 * @property {Fields} tickets_fields
 	 * @property {boolean} is_awaiting_state
 	 * @property {boolean} is_searching_state
@@ -91,7 +91,7 @@ AdminEventCheckInPage = extending(AdminEventPage, (function() {
 		this.current_checkin_state = AdminEventCheckInPage.STATES.AWAITING;
 		this.tickets_fields = new Fields('user', 'ticket_type', 'event_id');
 		this.tickets = new CheckInTicketsCollection(event_id);
-		this.searching_tickets = new SearchAdminEventsTicketsCollection('', event_id);
+		this.searching_tickets = new SearchEventTicketsCollection('', event_id);
 		this.is_searching_state = false;
 		this.is_fetching = false;
 		
@@ -266,7 +266,7 @@ AdminEventCheckInPage = extending(AdminEventPage, (function() {
 			if (value === '') {
 				self.deInitSearch();
 			} else {
-				self.searching_tickets = new SearchAdminEventsTicketsCollection(value, self.event.id);
+				self.searching_tickets = new SearchEventTicketsCollection(value, self.event.id);
 				
 				self.fetching_data_defer = self.searching_tickets.fetchTickets(self.tickets_fields, 0, 'created_at', function() {
 					self.table_body.html(self.buildTableRows(this.last_pushed));

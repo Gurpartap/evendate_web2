@@ -101,7 +101,8 @@ __C = {
 			PENCIL: 'fa-pencil',
 			EYE: 'fa-eye',
 			EYE_CLOSE: 'fa-eye-slash',
-			TICKET: 'fa-ticket'
+			TICKET: 'fa-ticket',
+			DOWNLOAD: 'fa-download'
 		},
 		ICON_CLASS: 'fa_icon'
 	},
@@ -160,6 +161,12 @@ __C = {
 		PENDING: 'pending',
 		RESOLVED: 'resolved',
 		REJECTED: 'rejected'
+	},
+	/**
+	 * @enum {number}
+	 */
+	KEY_CODES: {
+		ESC: 27
 	}
 };
 /**
@@ -1671,6 +1678,15 @@ function getFilenameFromURL(url) {
 }
 /**
  *
+ * @param {string} string
+ * @return {boolean}
+ */
+function isPercentageString(string) {
+	
+	return /^[1-9]\d*%$|^0%$/.search(string) === 0;
+}
+/**
+ *
  * Checks is the argument is base64 encoded string
  *
  * @param {string} string
@@ -1688,6 +1704,16 @@ function isBase64(string) {
  */
 function isFunction(variable) {
 	return (variable && typeof variable === 'function');
+}
+/**
+ *
+ * @param {Event} event
+ * @param {__C.KEY_CODES} key
+ *
+ * @return {boolean}
+ */
+function isKeyPressed(event, key) {
+	return event.keyCode === key;
 }
 /**
  *
@@ -1999,12 +2025,21 @@ function bindRippleEffect($parent) {
 
 function bindDropdown($parent) {
 	$parent = $parent ? $parent : $('body');
-	$parent.find('.DropdownButton').not('.-Handled_DropdownButton').each(function() {
+	var $dropdown_buttons = $parent.is('.DropdownButton') ? $parent : $parent.find('.DropdownButton');
+	
+	$dropdown_buttons.not('.-Handled_DropdownButton').each(function() {
 		var $button = $(this),
+			instance = $button.resolveInstance(),
 			data = $button.data(),
-			$dropbox = $('.DropdownBox').filter('[data-dropdown_id="' + data.dropdown + '"]');
+			$dropbox = $('.DropdownBox').filter('[data-dropdown_id="' + data.dropdown + '"]'),
+			button_pos;
+		
+		if (instance.initiate) {
+			return instance.initiate();
+		}
 		
 		$dropbox.data($.extend({}, $dropbox.data(), data));
+		
 		$dropbox.closeDropbox = function() {
 			$('body').off('mousedown.CloseDropdown');
 			$(document).off('keyup.CloseDropdown');
@@ -2012,55 +2047,76 @@ function bindDropdown($parent) {
 			$button.addClass('-dropdown_active');
 		};
 		
-		if (data.hasOwnProperty('ddWidth')) {
-			if (data.ddWidth == 'self') {
+		if (!empty(data.ddWidth)) {
+			if (data.ddWidth === 'self') {
 				$dropbox.width($button.outerWidth());
-			} else if ((isFinite(data.ddWidth)) || (data.ddWidth.search(/^[1-9]\d*%$|^0%$/) === 0)) {
+			} else if (isFinite(data.ddWidth) || isPercentageString(data.ddWidth)) {
 				$dropbox.width(data.ddWidth);
 			}
 		}
-		if (data.hasOwnProperty('ddPosX') || data.hasOwnProperty('ddPosY')) {
-			var button_pos = $button.position();
-			if (data.hasOwnProperty('ddPosX')) {
-				var xPos;
-				if (data.ddPosX == 'self.center') {
-					xPos = (button_pos.left + $button.outerWidth() / 2) - $dropbox.outerWidth() / 2;
-				} else if (data.ddPosX == 'center') {
-					xPos = $dropbox.parent().outerWidth() / 2 - $dropbox.outerWidth() / 2;
-				} else if (isFinite(data.ddPosX)) {
-					xPos = data.ddPosX;
-				}
-				$dropbox.css('left', xPos);
+		
+		if (!empty(data.ddPosX) || !empty(data.ddPosY)) {
+			button_pos = $button.position();
+			
+			if (!empty(data.ddPosX)) {
+				$dropbox.css('left', (function() {
+					
+					if (data.ddPosX === 'self.center') {
+						
+						return (button_pos.left + $button.outerWidth() / 2) - $dropbox.outerWidth() / 2;
+					} else if (data.ddPosX === 'center') {
+						
+						return $dropbox.parent().outerWidth() / 2 - $dropbox.outerWidth() / 2;
+					} else if (isFinite(data.ddPosX)) {
+						
+						return data.ddPosX;
+					}
+				}()));
+				
 			}
-			if (data.hasOwnProperty('ddPosY')) {
-				var yPos;
-				if (data.ddPosY == 'self.center') {
-					yPos = (button_pos.top + $button.outerHeight() / 2) - $dropbox.outerHeight() / 2;
-				} else if (data.ddPosY == 'center') {
-					yPos = $dropbox.parent().outerHeight() / 2 - $dropbox.outerHeight() / 2;
-				} else if (isFinite(data.ddPosY)) {
-					yPos = (button_pos.top + $button.outerHeight()) + data.ddPosY;
-				}
-				$dropbox.css('top', yPos);
+			
+			if (!empty(data.ddPosY)) {
+				
+				$dropbox.css('top', (function() {
+					if (data.ddPosY === 'self.center') {
+						
+						return (button_pos.top + $button.outerHeight() / 2) - $dropbox.outerHeight() / 2;
+					} else if (data.ddPosY === 'center') {
+						
+						return $dropbox.parent().outerHeight() / 2 - $dropbox.outerHeight() / 2;
+					} else if (isFinite(data.ddPosY)) {
+						
+						return (button_pos.top + $button.outerHeight()) + data.ddPosY;
+					}
+				}()));
+				
 			}
 		}
+		
 		$dropbox.find('.CloseDropdown').on('click.CloseDropdown', $dropbox.closeDropbox);
-		$button.on('click.Dropdown', function() {
+		
+		$button.on('click.OpenDropdown', function() {
 			$dropbox.addClass('-show');
 			$button.addClass('-dropdown_active');
+			
 			$('body').on('mousedown.CloseDropdown', function(e) {
-				if (!$(e.target).closest('.DropdownBox').length) {
+				if (!$(e.target).closest($dropbox).length) {
 					$dropbox.closeDropbox();
 				}
 			});
+			
 			$(document).on('keyup.CloseDropdown', function(e) {
-				if (e.keyCode == 27) {
+				if (isKeyPressed(e, __C.KEY_CODES.ESC)) {
 					$dropbox.closeDropbox();
 				}
 			});
 		});
 		
-	}).addClass('-Handled_DropdownButton')
+		$button.data('dropdown_box', $dropbox);
+		
+	}).addClass('-Handled_DropdownButton');
+	
+	return $dropdown_buttons;
 }
 
 function bindFileLoadButton($parent) {

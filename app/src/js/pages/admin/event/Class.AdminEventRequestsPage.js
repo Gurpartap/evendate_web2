@@ -52,15 +52,15 @@ AdminEventRequestsPage = extending(AdminEventPage, (function() {
 	/**
 	 *
 	 * @class RequestsCollection
-	 * @extends EventOrdersCollection
+	 * @extends EventAllOrdersCollection
 	 */
-	var RequestsCollection = extending(EventOrdersCollection, (function() {
+	var RequestsCollection = extending(EventAllOrdersCollection, (function() {
 		/**
 		 *
 		 * @param {(string|number)} [event_id=0]
 		 *
 		 * @constructor
-		 * @constructs EventOrdersCollection
+		 * @constructs EventAllOrdersCollection
 		 *
 		 * @property {(string|number)} event_id
 		 * @property {Array<OneRequest>} new_requests
@@ -70,7 +70,7 @@ AdminEventRequestsPage = extending(AdminEventPage, (function() {
 		function RequestsCollection(event_id) {
 			var self = this;
 			
-			EventOrdersCollection.call(this, event_id);
+			EventAllOrdersCollection.call(this, event_id);
 			
 			Object.defineProperties(this, {
 				new_requests: {
@@ -104,9 +104,24 @@ AdminEventRequestsPage = extending(AdminEventPage, (function() {
 		}
 		
 		RequestsCollection.prototype.collection_of = OneRequest;
-		
-		RequestsCollection.fetchOrders = RequestsCollection.fetchRequests = EventOrdersCollection.fetchOrders;
-		RequestsCollection.prototype.fetchAllRequests = EventOrdersCollection.prototype.fetchAllOrders;
+		/**
+		 *
+		 * @param {(string|number)} event_id
+		 * @param {AJAXData} [ajax_data]
+		 * @param {AJAXCallback} [success]
+		 *
+		 * @return {jqPromise}
+		 */
+		RequestsCollection.fetchOrders = RequestsCollection.fetchRequests = EventAllOrdersCollection.fetchOrders;
+		/**
+		 *
+		 * @param {(Fields|Array<string>|string)} [fields]
+		 * @param {(Array<string>|string)} [order_by]
+		 * @param {AJAXCallback} [success]
+		 *
+		 * @returns {jqPromise}
+		 */
+		RequestsCollection.prototype.fetchAllRequests = EventAllOrdersCollection.prototype.fetchAllOrders;
 		
 		return RequestsCollection;
 	}()));
@@ -388,7 +403,7 @@ AdminEventRequestsPage = extending(AdminEventPage, (function() {
 		
 		this.$requests_detail = this.$wrapper.find('.RequestDetail');
 		
-		this.requests.fetchAllRequests(this.event.orders_count, this.requests_fields).done(function() {
+		this.requests.fetchAllRequests(this.requests_fields).done(function() {
 			var $lists = tmpl('event-admin-requests-lists', {
 				new_requests: self.requestItemBuilder(self.requests.new_requests),
 				approved_requests: self.requestItemBuilder(self.requests.approved_requests),

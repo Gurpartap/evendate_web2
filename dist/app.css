@@ -620,6 +620,7 @@ body {
 }
 
 ::-webkit-scrollbar {
+	height: 8px;
 	width: 8px;
 	background-color: hsla(0,0%,0%,.001);
 }
@@ -1740,7 +1741,6 @@ fieldset:disabled .form_select {cursor: default}
 
 .form_radio + .form_label,
 .form_checkbox + .form_label {
-	display: inline-block;
 	margin-bottom: 0;
 	font-weight: normal;
 	white-space: nowrap;
@@ -2447,16 +2447,23 @@ a.button:hover {text-decoration: none}
 
 
 
-.button:not(:disabled).-color_default:hover:hover {background-color: #f1f1f1}
-.button:not(:disabled)[class*="-color_"]:hover {box-shadow: 0 1px 6px #b3b3b3}
+.button:not(:disabled).-color_default.-color_default:hover,
+.button:not(:disabled).-color_default.-color_default:focus {background-color: #f1f1f1}
+.button:not(:disabled)[class*="-color_"]:hover,
+.button:not(:disabled)[class*="-color_"]:focus {box-shadow: 0 1px 6px #b3b3b3}
 
 .button:not(:disabled).-color_default:hover,
 .button:not(:disabled).-color_marginal:hover,
-.button:not(:disabled).-color_accent_alt:hover {box-shadow: none}
+.button:not(:disabled).-color_accent_alt:hover,
+.button:not(:disabled).-color_default:focus,
+.button:not(:disabled).-color_marginal:focus,
+.button:not(:disabled).-color_accent_alt:focus {box-shadow: none}
 
-.button:not(:disabled).-color_accent_alt:hover {box-shadow: 0 1px 6px #e8b7b7}
+.button:not(:disabled).-color_accent_alt:hover,
+.button:not(:disabled).-color_accent_alt:focus {box-shadow: 0 1px 6px #e8b7b7}
 
-.button:not(:disabled).-color_marginal:hover {background-color: #ebedef}
+.button:not(:disabled).-color_marginal:hover,
+.button:not(:disabled).-color_marginal:focus {background-color: #ebedef}
 
 
 .button:disabled,
@@ -2810,7 +2817,7 @@ a.button:hover {text-decoration: none}
 	font-size: .88em;
 }
 
-.dropdown_list + .dropdown_list {border-top: 2px solid #ccc}
+.dropdown_li + .dropdown_li {border-top: 2px solid #ccc}
 
 .dropdown_button {
 	display: block;
@@ -4215,14 +4222,14 @@ body.-open_modal > .modal_wrapper {
 	position: fixed;
 	height: calc(100% - 54px);
 	right: 0;
-	z-index: 1;
+	z-index: 5;
 }
 
 #main_header.-with_tabs ~ #main_section .app_inspectors_wrapper {height: calc(100% - 90px)}
 
 .app_inspector {
 	position: absolute;
-	width: 354px;
+	width: 400px;
 	height: 100%;
 	transform: translateX(10%);
 	transition: transform .3s ease;
@@ -4239,9 +4246,11 @@ body.-open_modal > .modal_wrapper {
 }
 
 .app_inspector_remover {
+	top: -3px;
 	margin-right: 12px;
 	padding: 8px 18px;
 	font-size: 2.5em;
+	font-weight: 100;
 	line-height: 1;
 	background-color: transparent;
 	border: 0;
@@ -6353,6 +6362,12 @@ fieldset + .org_admin_settings_wrapper,
 	justify-content: space-between;
 	padding: 12px 18px;
 }
+
+.event_admin_orders_page_header_wrapper {
+	display: flex;
+}
+
+.event_admin_orders_page_header_wrapper > .button {margin-right: 12px}
 
 .event_admin_orders_page_table_search_block {
 	width: 250px;

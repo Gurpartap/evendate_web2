@@ -25,7 +25,11 @@ AdminOrganizationCRMPage = extending(AdminOrganizationPage, (function() {
 		AdminOrganizationPage.call(this, org_id);
 		
 		this.organization_fields = this.organization_fields.add('subscribed_count');
-		this.subscribers_fields = new Fields('email', 'accounts_links');
+		this.subscribers_fields = new Fields(
+			'email',
+			'accounts_links',
+			'interests'
+		);
 		this.organization_subscribers = new OrganizationSubscribersCollection(org_id);
 		this.CRMTable = null;
 		this.$loader = $();
@@ -76,6 +80,12 @@ AdminOrganizationCRMPage = extending(AdminOrganizationPage, (function() {
 		
 		this.CRMTable = this.$wrapper.find('.CRMTable').eq(0).DataTable({
 			paging: true,
+			select: {
+				style: 'single',
+				selector: 'td',
+				className: '-selected',
+				info: false
+			},
 			columnDefs: [
 				{
 					targets: 0,
@@ -126,25 +136,48 @@ AdminOrganizationCRMPage = extending(AdminOrganizationPage, (function() {
 	
 	AdminOrganizationCRMPage.prototype.init = function() {
 		this.initCRMTable();
+		bindDropdown(this.$wrapper);
 	};
 	
 	AdminOrganizationCRMPage.prototype.render = function() {
-		var self = this;
+		var self = this,
+			$header_buttons = $();
+		
+		$header_buttons = $header_buttons.add(new DropDown('export-formats', 'Выгрузка', {
+			classes: [
+				__C.CLASSES.SIZES.LOW,
+				__C.CLASSES.ICON_CLASS,
+				__C.CLASSES.ICONS.DOWNLOAD,
+				__C.CLASSES.COLORS.MARGINAL_PRIMARY,
+				__C.CLASSES.HOOKS.RIPPLE,
+				__C.CLASSES.HOOKS.DROPDOWN_BUTTON
+			]
+		}, {
+			width: 'self',
+			position: {
+				x: 'right',
+				y: 5
+			}
+		}, {
+			xlsx_href: '/api/v1/statistics/organizations/'+this.organization.id+'/subscribers/export?format=xlsx',
+			html_href: '/api/v1/statistics/organizations/'+this.organization.id+'/subscribers/export?format=html'
+		}));
 		
 		this.$wrapper.html(tmpl('admin-organization-crm-page', {
+			header_buttons: $header_buttons,
 			loader: (this.$loader = __APP.BUILD.overlayLoader())
 		}));
 		this.$wrapper.find('.CRMTableWrapper').addClass(__C.CLASSES.STATUS.DISABLED);
 		
 		this.init();
 		
-		this.organization_subscribers.fetchAllSubscribers(this.organization.subscribed_count, this.subscribers_fields).done(function(subscribers) {
+		this.organization_subscribers.fetchAllSubscribers(this.subscribers_fields).done(function(subscribers) {
 			var $rows = tmpl('admin-organization-crm-page-tr', subscribers.map(function(subscriber) {
 				
 				return {
-					name: __APP.BUILD.link({
-						title: subscriber.full_name,
-						page: '/user/' + subscriber.id
+					user_avatar_block: __APP.BUILD.avatarBlocks(subscriber, {
+						entity: __C.ENTITIES.USER,
+						avatar_classes: [__C.CLASSES.SIZES.X30, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]
 					}),
 					email: subscriber.email,
 					accounts: __APP.BUILD.socialLinks(subscriber.accounts_links),
@@ -162,6 +195,10 @@ AdminOrganizationCRMPage = extending(AdminOrganizationPage, (function() {
 				};
 			}));
 			
+			$rows.each(function(i) {
+				$(this).data('client', subscribers[i]);
+			});
+			
 			if (!self.CRMTable) {
 				self.initCRMTable();
 			}
@@ -171,6 +208,39 @@ AdminOrganizationCRMPage = extending(AdminOrganizationPage, (function() {
 			} catch (e) {
 				__APP.reload();
 			}
+			
+			self.CRMTable.on('deselect', function() {
+				$('body').off('keyup.DeselectCurrent');
+				AbstractAppInspector.hideCurrent();
+			});
+			
+			self.CRMTable.on('select', function(e, dt, type, indexes) {
+				var $row,
+					data;
+				
+				if (type === 'row') {
+					$row = $(dt.row(indexes).node());
+					data = $row.data();
+					
+					if (data.inspector && data.inspector.is_shown) {
+						data.inspector.hide();
+						
+						$('body').off('keyup.DeselectCurrent');
+					} else {
+						if (!(data.inspector instanceof ClientAppInspector)) {
+							data.inspector = new ClientAppInspector(data.client);
+							$row.data(data);
+						}
+						data.inspector.show();
+						
+						$('body').off('keyup.DeselectCurrent').on('keyup.DeselectCurrent', function(e) {
+							if (isKeyPressed(e, __C.KEY_CODES.ESC)) {
+								dt.row(indexes).deselect();
+							}
+						});
+					}
+				}
+			});
 			
 			self.$wrapper.find('.CRMTableWrapper').removeClass(__C.CLASSES.STATUS.DISABLED);
 			self.$loader.remove();

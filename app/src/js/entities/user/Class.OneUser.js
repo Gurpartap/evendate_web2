@@ -37,6 +37,7 @@ OneUser = extending(OneEntity, (function() {
 	 * @property {OrganizationsCollection} subscriptions
 	 * @property {FavoredEventsCollection} favored
 	 * @property {UsersActivitiesCollection} actions
+	 * @property {InterestModelsCollection} interests
 	 */
 	function OneUser(user_id) {
 		var self = this;
@@ -64,6 +65,7 @@ OneUser = extending(OneEntity, (function() {
 		this.subscriptions = new OrganizationsCollection();
 		this.favored = new FavoredEventsCollection();
 		this.actions = new UsersActivitiesCollection(user_id);
+		this.interests = new InterestModelsCollection();
 		
 		Object.defineProperty(this, 'full_name', {
 			enumerable: true,

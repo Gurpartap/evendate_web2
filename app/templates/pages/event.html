@@ -9,12 +9,6 @@
 					<div class="event_image_bottom_wrap">{avatars_collection}</div>
 					<div class="event_image_bottom_wrap">
 						{action_buttons}
-						<div class="dropdown_box DropdownBox" data-dropdown_id="edit_notification">
-							<header class="dropdown_header">Настройка напоминания</header>
-							<form class="dropdown_box_wrapper">
-								{notifications}
-							</form>
-						</div>
 					</div>
 				</div>
 			</header>
@@ -115,5 +109,14 @@
 	<div class="event_vulcan">
 		<header class="event_vulcan_header">Похожие мероприятия</header>
 		{event_cards}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-dropdown-event-edit-notifications">
+	<div class="dropdown_box DropdownBox">
+		<header class="dropdown_header">Настройка напоминания</header>
+		<form class="dropdown_box_wrapper">
+			{notifications}
+		</form>
 	</div>
 </script>
