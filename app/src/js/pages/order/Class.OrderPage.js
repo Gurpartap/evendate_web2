@@ -14,13 +14,30 @@ OrderPage = extending(Page, (function() {
 	 * @constructs OrderPage
 	 */
 	function OrderPage(event_id) {
+		var self = this;
+		
 		Page.call(this);
 		this.event = new OneEvent(event_id);
+		this.event_fields = EventPage.fields.copy().add(
+			'ticketing_locally',
+			'registration_locally', {
+				ticket_types: {
+					fields: new Fields('price')
+				}
+			}
+		);
+		
+		Object.defineProperty(this, 'page_title', {
+			get: function() {
+				
+				return (self.event.ticketing_locally ? 'Заказ билетов на событие ' : 'Регистрация на событие ') + self.event.title;
+			}
+		});
 	}
 	
 	OrderPage.prototype.fetchData = function() {
 		
-		return this.fetching_data_defer = this.event.fetchEvent(EventPage.fields);
+		return this.fetching_data_defer = this.event.fetchEvent(this.event_fields);
 	};
 	/**
 	 *
@@ -124,34 +141,56 @@ OrderPage = extending(Page, (function() {
 	};
 	
 	OrderPage.prototype.init = function() {
-	
+		bindControlSwitch(this.$wrapper);
+		initSelect2(this.$wrapper.find('.ToSelect2'), {
+			dropdownCssClass: 'form_select2_drop form_select2_drop_no_search'
+		});
 	};
 	
 	OrderPage.prototype.preRender = function() {
 		var common_main_button_props = {
-			classes: ['MainActionButton']
+			classes: [
+				,
+				__C.CLASSES.HOOKS.RIPPLE,
+				'MainActionButton',
+			  __C.CLASSES.SIZES.HUGE,
+			  __C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
+			]
 		};
 		
-		this.render_vars.title = (event.ticketing_locally ? 'Заказ билетов на событие ' : 'Регистрация на событие ') + this.event.title;
 		if (this.event.ticketing_locally) {
 			this.render_vars.tickets_selling = tmpl('order-tickets-selling', {
-				ticket_types: tmpl('order-ticket-type'),
-				overall_price: null
+				ticket_types: tmpl('order-ticket-type', this.event.ticket_types.map(function(ticket_type) {
+					
+					return {
+						name: ticket_type.name,
+						quantity_input: '',
+						description: ticket_type.comment,
+						type_price: ticket_type.price,
+						sum_price: 0
+					};
+				})),
+				overall_price: 0
 			});
 		}
+		
 		if (this.event.registration_locally) {
 			this.render_vars.registration = tmpl('order-registration', {
-				registration_fields: OrderPage.buildRegistrationField.apply(this, this.event.registration_fields)
+				registration_fields: $.makeSet(this.event.registration_fields.map(OrderPage.buildRegistrationField))
 			});
 		}
-		this.render_vars.main_action_button = event.ticketing_locally ? __APP.BUILD.button($.extend(true, {}, common_main_button_props, {
-			title: 'Заплатить через Яндекс'
+		
+		this.render_vars.main_action_button = this.event.ticketing_locally ? __APP.BUILD.button($.extend(true, {}, common_main_button_props, {
+			title: 'Заплатить через Яндекс',
+			classes: ['-color_yandex']
 		})) : __APP.BUILD.button($.extend(true, {}, common_main_button_props, {
-			title: 'Зарегистрироваться'
+			title: 'Зарегистрироваться',
+			classes: [__C.CLASSES.COLORS.ACCENT]
 		}));
 	};
 	
 	OrderPage.prototype.render = function() {
+		this.preRender();
 		
 		this.$wrapper.html(tmpl('order-page', this.render_vars));
 		

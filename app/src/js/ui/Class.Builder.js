@@ -65,11 +65,21 @@ Builder = (function() {
 	 */
 	Builder.prototype.button = function buildButton(/**props*/) {
 		var props = Array.prototype.slice.call(arguments);
+		
 		return tmpl('button', props.map(function(arg) {
+			
 			return Builder.normalizeBuildProps(arg);
 		})).each(function(i, button) {
-			if(props[i].dataset) {
-				$(button).data(props[i].dataset);
+			var prop = props[i],
+				$button = $(button);
+			
+			if (prop.dataset) {
+				$button.data(prop.dataset);
+			}
+			
+			if (prop.classes && prop.classes.contains(__C.CLASSES.HOOKS.RIPPLE)) {
+				bindRippleEffect($button);
+				$button.addClass(__C.CLASSES.HOOKS.HANDLED + __C.CLASSES.HOOKS.RIPPLE);
 			}
 		});
 	};

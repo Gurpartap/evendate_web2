@@ -37,7 +37,8 @@ __C = {
 			ROUNDED: '-rounded',
 			SHADOWED: '-shadowed',
 			BORDERED: '-bordered',
-			TRANSFORM_UPPERCASE: '-transform_uppercase'
+			UPPERCASE: '-transform_uppercase',
+			NO_UPPERCASE: '-no_uppercase'
 		},
 		STATUS: {
 			SUCCESS: '-status_success',
@@ -51,6 +52,7 @@ __C = {
 			X40: '-size_40x40',
 			X50: '-size_50x50',
 			X55: '-size_55x55',
+			HUGE: '-size_huge',
 			LOW: '-size_low',
 			WIDE: '-size_wide',
 			SMALL: '-size_small'
@@ -1997,10 +1999,17 @@ function bindSelect2($parent) {
 
 function bindRippleEffect($parent) {
 	$parent = $parent ? $parent : $('body');
-	$parent.find('.RippleEffect').not('.-Handled_RippleEffect').on('click.RippleEffect', function(e) {
-		var $this = $(this), $ripple, size, x, y;
+	var $buttons = $parent.is('.RippleEffect') ? $parent : $parent.find('.RippleEffect');
+	
+	$buttons.not('.-Handled_RippleEffect').on('click.RippleEffect', function(e) {
+		var $this = $(this),
+			$ripple = $(),
+			timeout,
+			size,
+			x,
+			y;
 		
-		if ($this.children('.Ripple').length == 0)
+		if ($this.children('.Ripple').length === 0)
 			$this.prepend('<span class="ripple Ripple"></span>');
 		
 		$ripple = $this.children('.Ripple');
@@ -2014,13 +2023,21 @@ function bindRippleEffect($parent) {
 		x = e.pageX - $this.offset().left - ($ripple.width() / 2);
 		y = e.pageY - $this.offset().top - ($ripple.height() / 2);
 		
-		$ripple
-			.css({top: y + 'px', left: x + 'px'})
-			.addClass('animate');
-		setTimeout(function() {
+		$ripple.css({top: y + 'px', left: x + 'px'}).addClass('animate');
+		
+		timeout = $ripple.data('timeout');
+		if (!empty(timeout)) {
+			clearTimeout(timeout);
+		}
+		
+		timeout = setTimeout(function() {
 			$ripple.removeClass('animate');
 		}, 650);
+		
+		$ripple.data('timeout', timeout);
 	}).addClass('-Handled_RippleEffect');
+	
+	return $buttons;
 }
 
 function bindDropdown($parent) {
