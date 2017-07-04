@@ -141,22 +141,42 @@ OrderPage = extending(Page, (function() {
 	};
 	
 	OrderPage.prototype.init = function() {
+		var self = this;
+		
 		bindControlSwitch(this.$wrapper);
 		initSelect2(this.$wrapper.find('.ToSelect2'), {
 			dropdownCssClass: 'form_select2_drop form_select2_drop_no_search'
 		});
+		
+		this.$wrapper.find('.QuantityInput').on('QuantityInput::change', function(e, value) {
+			var $wrapper = $(this).closest('.TicketType'),
+				$sum = $wrapper.find('.TicketTypeSum');
+			
+			if (value > 1) {
+				$sum.removeClass(__C.CLASSES.HIDDEN);
+			} else {
+				$sum.addClass(__C.CLASSES.HIDDEN);
+			}
+			
+			$wrapper.find('.TicketTypeSumText').text($wrapper.data('ticket_type').price * value);
+			self.$wrapper.find('.TicketsOverallSum').text(Array.prototype.reduce.call(self.$wrapper.find('.TicketTypeSumText'), function(sum, ticket_type_sum) {
+				
+				return sum + +ticket_type_sum.innerText;
+			}, 0));
+		});
 	};
 	
 	OrderPage.prototype.preRender = function() {
-		var common_main_button_props = {
-			classes: [
-				,
-				__C.CLASSES.HOOKS.RIPPLE,
-				'MainActionButton',
-			  __C.CLASSES.SIZES.HUGE,
-			  __C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
-			]
-		};
+		var self = this,
+			common_main_button_props = {
+				classes: [
+					,
+					__C.CLASSES.HOOKS.RIPPLE,
+					'MainActionButton',
+					__C.CLASSES.SIZES.HUGE,
+					__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
+				]
+			};
 		
 		if (this.event.ticketing_locally) {
 			this.render_vars.tickets_selling = tmpl('order-tickets-selling', {
@@ -164,12 +184,19 @@ OrderPage = extending(Page, (function() {
 					
 					return {
 						name: ticket_type.name,
-						quantity_input: '',
+						quantity_input: new QuantityInput({
+							name: ticket_type.uuid
+						}, {
+							min: ticket_type.min_count_per_user || 0,
+							max: ticket_type.max_count_per_user || ticket_type.amount || 99
+						}),
 						description: ticket_type.comment,
 						type_price: ticket_type.price,
 						sum_price: 0
 					};
-				})),
+				})).each(function(i) {
+					$(this).data('ticket_type', self.event.ticket_types[i]);
+				}),
 				overall_price: 0
 			});
 		}

@@ -5128,6 +5128,7 @@ body,
 .order_ticket_type_footer {
 	display: flex;
 	justify-content: space-between;
+	min-height: 1em;
 	margin-top: 12px;
 }
 

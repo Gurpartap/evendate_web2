@@ -22,13 +22,13 @@
 		{ticket_types}
 		<footer class="order_ticket_types_footer material">
 			<span class="-text_color_primary_80">Общая стоимость: </span>
-			<span class="-text_color_dark_primary">{overall_price} ₽</span>
+			<span class="-text_color_dark_primary"><span class="TicketsOverallSum">{overall_price}</span> ₽</span>
 		</footer>
 	</section>
 </script>
 
 <script type="javascript/template" id="tmpl-order-ticket-type">
-	<div class="order_ticket_type material">
+	<div class="order_ticket_type material TicketType">
 		<header class="order_ticket_type_header">
 			<span class="order_ticket_type_title">{name}</span>
 			{quantity_input}
