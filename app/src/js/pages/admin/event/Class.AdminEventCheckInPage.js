@@ -63,6 +63,8 @@ AdminEventCheckInPage = extending(AdminEventPage, (function() {
 			});
 		}
 		
+		CheckInTicketsCollection.fetchTickets = EventAllTicketsCollection.fetchTickets;
+		
 		return CheckInTicketsCollection;
 	}()));
 	

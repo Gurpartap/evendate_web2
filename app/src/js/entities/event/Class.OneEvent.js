@@ -33,7 +33,7 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @property {?string} detail_info_url
 	 *
-	 * @property {EventMyOrdersCollection} orders
+	 * @property {AbstractEventOrdersCollection} orders
 	 * @property {?number} orders_count
 	 *
 	 * @property {?boolean} ticketing_locally
@@ -106,7 +106,7 @@ OneEvent = extending(OneEntity, (function() {
 		
 		this.detail_info_url = null;
 		
-		this.orders = new EventMyOrdersCollection(event_id);
+		this.orders = new AbstractEventOrdersCollection(event_id);
 		this.orders_count = null;
 		
 		this.ticketing_locally = null;
@@ -334,19 +334,70 @@ OneEvent = extending(OneEntity, (function() {
 		return __APP.SERVER.deleteData('/api/v1/events/' + event_id + '/notifications/' + notification_uuid, {}, success);
 	};
 	/**
+	 * @typedef {object} OrderRegistrationField
+	 * @property {string} uuid
+	 * @property {string} value
+	 */
+	/**
 	 *
 	 * @param {(string|number)} event_id
-	 * @param {object} registration_fields
+	 * @param {Array<OrderRegistrationField>} registration_fields
 	 * @param {AJAXCallback} [success]
+	 *
 	 * @return {jqPromise}
 	 */
 	OneEvent.registerToEvent = function(event_id, registration_fields, success) {
+		
 		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/orders', {
 			registration_fields: registration_fields,
 			tickets: [{
 				uuid: null,
 				count: 1
 			}]
+		}, true, success);
+	};
+	/**
+	 * @typedef {object} OrderTicketType
+	 * @property {string} uuid
+	 * @property {number} count
+	 */
+	/**
+	 *
+	 * @param {(string|number)} event_id
+	 * @param {Array<OrderTicketType>} tickets
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	OneEvent.buyTickets = function(event_id, tickets, success) {
+		
+		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/orders', {
+			tickets: tickets
+		}, true, success);
+	};
+	/**
+	 *
+	 * @param {(string|number)} event_id
+	 * @param {Array<OrderTicketType>} [tickets]
+	 * @param {Array<OrderRegistrationField>} [registration_fields]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	OneEvent.makeOrder = function(event_id, tickets, registration_fields, success) {
+		if (empty(tickets)) {
+			
+			return OneEvent.registerToEvent(event_id, registration_fields, success);
+		}
+		
+		if (empty(registration_fields)) {
+			
+			return OneEvent.buyTickets(event_id, tickets, success);
+		}
+		
+		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/orders', {
+			registration_fields: registration_fields,
+			tickets: tickets
 		}, true, success);
 	};
 	/**
@@ -357,9 +408,10 @@ OneEvent = extending(OneEntity, (function() {
 	 */
 	OneEvent.prototype.fetchEvent = function(fields, success) {
 		var self = this;
+		
 		return OneEvent.fetchEvent(self.id, fields, function(data) {
 			self.setData(data[0]);
-			if (success && typeof success === 'function') {
+			if (isFunction(success)) {
 				success.call(self, data[0]);
 			}
 		});
@@ -373,10 +425,11 @@ OneEvent = extending(OneEntity, (function() {
 	 */
 	OneEvent.prototype.createEvent = function(data, success, error) {
 		var self = this;
+		
 		return this.constructor.createEvent(data, function(response_data) {
 			self.setData(data);
 			self.id = response_data.event_id;
-			if (success && typeof success == 'function') {
+			if (isFunction(success)) {
 				success.call(self, data);
 			}
 		}, error);
@@ -390,9 +443,10 @@ OneEvent = extending(OneEntity, (function() {
 	 */
 	OneEvent.prototype.updateEvent = function(data, success, error) {
 		var self = this;
+		
 		return this.constructor.updateEvent(self.id, data, function(response_data) {
 			self.setData(data);
-			if (success && typeof success == 'function') {
+			if (isFunction(success)) {
 				success.call(self, data);
 			}
 		}, error);
@@ -405,9 +459,10 @@ OneEvent = extending(OneEntity, (function() {
 	 */
 	OneEvent.prototype.changeEventStatus = function(status, success) {
 		var self = this;
+		
 		return this.constructor.changeEventStatus(self.id, status, function(data) {
 			self.setData(data);
-			if (success && typeof success == 'function') {
+			if (isFunction(success)) {
 				success.call(self, data);
 			}
 		});
@@ -419,6 +474,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @returns {jqPromise}
 	 */
 	OneEvent.prototype.addNotification = function(notification_type, success) {
+		
 		return this.constructor.addEventNotification(this.id, notification_type, success);
 	};
 	/**
@@ -428,16 +484,49 @@ OneEvent = extending(OneEntity, (function() {
 	 * @returns {jqPromise}
 	 */
 	OneEvent.prototype.deleteNotification = function(notification_uuid, success) {
+		
 		return this.constructor.deleteEventNotification(this.id, notification_uuid, success);
 	};
 	/**
 	 *
-	 * @param {object} registration_fields
+	 * @param {Array<OrderRegistrationField>} registration_fields
 	 * @param {AJAXCallback} [success]
+	 *
 	 * @return {jqPromise}
 	 */
 	OneEvent.prototype.registerToEvent = function(registration_fields, success) {
-		return this.constructor.registerToEvent(this.id, registration_fields, success);
+		var self = this;
+		
+		return this.constructor.registerToEvent(this.id, registration_fields, function(data) {
+			self.is_registered = true;
+			
+			if (isFunction(success)) {
+				success.call(self, data);
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {Array<OrderTicketType>} tickets
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	OneEvent.prototype.buyTickets = function(tickets, success) {
+		
+		return this.constructor.buyTickets(this.id, tickets, success);
+	};
+	/**
+	 *
+	 * @param {Array<OrderTicketType>} tickets
+	 * @param {Array<OrderRegistrationField>} registration_fields
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	OneEvent.prototype.makeOrder = function(tickets, registration_fields, success) {
+		
+		return this.constructor.makeOrder(this.id, tickets, registration_fields, success);
 	};
 	
 	return OneEvent;
