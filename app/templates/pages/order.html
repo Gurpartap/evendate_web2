@@ -1,0 +1,48 @@
+<script type="javascript/template" id="tmpl-order-page">
+	<form class="order_page">
+		{tickets_selling}
+		{registration}
+		<footer class="order_page_footer">
+			<div class="form_unit">
+				<input id="order_agreement" class="form_checkbox Switch" type="checkbox" data-switch_id="order_agreement" required>
+				<label class="form_label" for="order_agreement">
+					<span>Я согласен c условиями Пользовательского соглашения и Договором оказания услуг по организации мероприятия</span>
+				</label>
+			</div>
+			<fieldset class="Switching -align_center" data-switch_id="order_agreement" disabled>
+				{main_action_button}
+			</fieldset>
+		</footer>
+	</form>
+</script>
+
+<script type="javascript/template" id="tmpl-order-tickets-selling">
+	<section class="order_ticket_types">
+		<h4>Выберите билеты</h4>
+		{ticket_types}
+		<footer class="order_ticket_types_footer material">
+			<span class="-text_color_primary_80">Общая стоимость: </span>
+			<span class="-text_color_dark_primary"><span class="TicketsOverallSum">{overall_price}</span> ₽</span>
+		</footer>
+	</section>
+</script>
+
+<script type="javascript/template" id="tmpl-order-ticket-type">
+	<div class="order_ticket_type material TicketType">
+		<header class="order_ticket_type_header">
+			<span class="order_ticket_type_title">{name}</span>
+			{quantity_input}
+		</header>
+		<div class="order_ticket_type_description">{description}</div>
+		<footer class="order_ticket_type_footer">
+			<span class="order_ticket_type_price">{type_price} ₽</span>
+			<span class="order_ticket_type_sum TicketTypeSum -text_color_dark_primary -hidden"><span class="TicketTypeSumText">{sum_price}</span> ₽</span>
+		</footer>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-order-registration">
+	<div class="order_registration_fields material">
+		{registration_fields}
+	</div>
+</script>

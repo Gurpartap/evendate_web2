@@ -65,11 +65,21 @@ Builder = (function() {
 	 */
 	Builder.prototype.button = function buildButton(/**props*/) {
 		var props = Array.prototype.slice.call(arguments);
+		
 		return tmpl('button', props.map(function(arg) {
+			
 			return Builder.normalizeBuildProps(arg);
 		})).each(function(i, button) {
-			if(props[i].dataset) {
-				$(button).data(props[i].dataset);
+			var prop = props[i],
+				$button = $(button);
+			
+			if (prop.dataset) {
+				$button.data(prop.dataset);
+			}
+			
+			if (prop.classes && prop.classes.contains(__C.CLASSES.HOOKS.RIPPLE)) {
+				bindRippleEffect($button);
+				$button.addClass(__C.CLASSES.HOOKS.HANDLED + __C.CLASSES.HOOKS.RIPPLE);
 			}
 		});
 	};
@@ -98,10 +108,11 @@ Builder = (function() {
 	 * @param {HTMLAttributes} [attributes]
 	 * @param {(Array<string>|string)} [classes]
 	 * @param {HTMLDataset} [dataset]
+	 * @param {object} [inputmask_options]
 	 *
 	 * @returns {jQuery}
 	 */
-	Builder.prototype.inputNumber = function buildInput(attributes, classes, dataset) {
+	Builder.prototype.inputNumber = function buildInput(attributes, classes, dataset, inputmask_options) {
 		attributes = attributes ? attributes : {};
 		classes = classes ? classes instanceof Array ? classes : classes.split(',') : [];
 		dataset = dataset ? dataset : {};
@@ -110,7 +121,7 @@ Builder = (function() {
 			attributes,
 			classes.concat('form_input'),
 			dataset
-		).inputmask({
+		).inputmask($.extend({
 			alias: 'numeric',
 			autoGroup: false,
 			digits: 2,
@@ -118,7 +129,7 @@ Builder = (function() {
 			allowPlus: false,
 			allowMinus: false,
 			rightAlign: false
-		});
+		}, inputmask_options));
 	};
 	/**
 	 *

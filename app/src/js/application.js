@@ -84,6 +84,7 @@ __APP = {
 				'': AddEventPage
 			},
 			'^([0-9]+)': {
+				'order': OrderPage,
 				'edit': EditEventPage,
 				'': EventPage
 			},
