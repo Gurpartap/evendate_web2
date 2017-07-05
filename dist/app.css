@@ -2487,8 +2487,6 @@ a.button:hover {text-decoration: none}
 	cursor: default;
 	color: #9fa6b3;
 	color: var(--color_primary_50);
-	background-color: #f6f6f6;
-	background-color: var(--color_gray_material);
 	opacity: .4;
 	box-shadow: none;
 }

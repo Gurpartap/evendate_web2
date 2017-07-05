@@ -1,5 +1,5 @@
 <script type="javascript/template" id="tmpl-order-page">
-	<form class="order_page">
+	<form class="order_page OrderForm">
 		{tickets_selling}
 		{registration}
 		<footer class="order_page_footer">
@@ -17,14 +17,14 @@
 </script>
 
 <script type="javascript/template" id="tmpl-order-tickets-selling">
-	<section class="order_ticket_types">
+	<fieldset class="order_ticket_types OrderFields">
 		<h4>Выберите билеты</h4>
 		{ticket_types}
 		<footer class="order_ticket_types_footer material">
 			<span class="-text_color_primary_80">Общая стоимость: </span>
 			<span class="-text_color_dark_primary"><span class="TicketsOverallSum">{overall_price}</span> ₽</span>
 		</footer>
-	</section>
+	</fieldset>
 </script>
 
 <script type="javascript/template" id="tmpl-order-ticket-type">
@@ -42,7 +42,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-order-registration">
-	<div class="order_registration_fields material">
+	<fieldset class="order_registration_fields material RegistrationFields">
 		{registration_fields}
-	</div>
+	</fieldset>
 </script>
