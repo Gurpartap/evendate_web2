@@ -39,6 +39,8 @@ Page = (function() {
 		this.wrapper_tmpl = setDefaultValue(this.wrapper_tmpl, 'std');
 		this.with_header_tabs = setDefaultValue(this.with_header_tabs, false);
 		
+		this.render_vars = setDefaultValue(this.render_vars, {});
+		
 		this.rendering_defer = $.Deferred();
 		this.fetching_data_defer = $.Deferred();
 	}
