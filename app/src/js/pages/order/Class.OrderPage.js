@@ -45,16 +45,25 @@ OrderPage = extending(Page, (function() {
 	 * @return {jQuery}
 	 */
 	OrderPage.buildRegistrationField = function(field) {
+		var default_props = {
+			id: 'registration_form_' + field.uuid,
+			name: field.uuid,
+			unit_classes: ['Registration' + field.type.toCamelCase('_') + 'Field'],
+			label: $('<span>'+ field.label +'</span>').add((field.required ? tmpl('required-star') : $())),
+			required: field.required
+		};
+		
 		switch (field.type) {
 			case RegistrationFieldModel.TYPES.SELECT: {
 				
 				return (function(props, values) {
 					
-					return tmpl('form-unit', Builder.normalizeBuildProps($.extend(true, {}, props, {
-						label: tmpl('label', Builder.normalizeBuildProps({
+					return tmpl('form-unit', Builder.normalizeBuildProps({
+						unit_classes: props.unit_classes,
+						label: tmpl('label', {
 							id: props.id,
 							label: props.label
-						})),
+						}),
 						form_element: __APP.BUILD.select(
 							values.map(function(value) {
 								
@@ -68,18 +77,8 @@ OrderPage = extending(Page, (function() {
 								required: props.required
 							}, props.classes
 						)
-					})));
-				}({
-					id: 'registration_form_' + field.uuid,
-					name: field.uuid,
-					unit_classes: ['Registration' + field.type.toCamelCase('_') + 'Field'],
-					classes: [
-						'form_select2',
-						'ToSelect2'
-					],
-					label: $('<span>'+ field.label +'</span>').add((field.required ? tmpl('required-star') : $())),
-					required: field.required
-				}, field.values instanceof Array ? field.values : []));
+					}));
+				}($.extend({}, default_props, {classes: ['form_select2', 'ToSelect2']}), field.values instanceof Array ? field.values : []));
 			}
 			case RegistrationFieldModel.TYPES.SELECT_MULTI: {
 				
@@ -87,10 +86,10 @@ OrderPage = extending(Page, (function() {
 					
 					return tmpl('form-unit', Builder.normalizeBuildProps($.extend(true, {}, props, {
 						unit_classes: props.classes,
-						label: tmpl('label', Builder.normalizeBuildProps({
+						label: tmpl('label', {
 							id: props.id + '_label',
 							label: props.label
-						})),
+						}),
 						form_element: __APP.BUILD.checkbox.apply(__APP.BUILD, values.map(function(value) {
 							
 							return {
@@ -104,25 +103,13 @@ OrderPage = extending(Page, (function() {
 							};
 						}))
 					})));
-				}({
-					id: 'registration_form_' + field.uuid,
-					type: 'checkbox',
-					name: field.uuid,
-					classes: ['Registration' + field.type.toCamelCase('_') + 'Field'],
-					label: $('<span>'+ field.label +'</span>').add((field.required ? tmpl('required-star') : $())),
-					required: field.required
-				}, field.values instanceof Array ? field.values : []));
+				}($.extend({}, default_props, {type: 'checkbox'}), field.values instanceof Array ? field.values : []));
 			}
 			default: {
 				
-				return __APP.BUILD.formUnit({
-					id: 'registration_form_' + this.id + '_' + field.uuid,
+				return __APP.BUILD.formUnit($.extend({}, default_props, {
 					type: field.type === RegistrationFieldModel.TYPES.EXTENDED_CUSTOM ? 'textarea' : field.type,
-					name: field.uuid,
-					classes: ['Registration' + field.type.toCamelCase('_') + 'Field'],
-					label: $('<span>'+ field.label +'</span>').add((field.required ? tmpl('required-star') : $())),
 					placeholder: field.label,
-					required: field.required,
 					helptext: (function(type) {
 						switch (type) {
 							case RegistrationFieldModel.TYPES.EMAIL:
@@ -135,7 +122,7 @@ OrderPage = extending(Page, (function() {
 								return '';
 						}
 					})(field.type)
-				});
+				}));
 			}
 		}
 	};
@@ -147,6 +134,10 @@ OrderPage = extending(Page, (function() {
 		initSelect2(this.$wrapper.find('.ToSelect2'), {
 			dropdownCssClass: 'form_select2_drop form_select2_drop_no_search'
 		});
+		
+		this.$wrapper.find('.RegistrationFirstNameField').find('input').val(__APP.USER.first_name);
+		this.$wrapper.find('.RegistrationLastNameField').find('input').val(__APP.USER.last_name);
+		this.$wrapper.find('.RegistrationEmailField').find('input').val(__APP.USER.email);
 		
 		this.$wrapper.find('.QuantityInput').on('QuantityInput::change', function(e, value) {
 			var $wrapper = $(this).closest('.TicketType'),
@@ -163,6 +154,44 @@ OrderPage = extending(Page, (function() {
 				
 				return sum + +ticket_type_sum.innerText;
 			}, 0));
+		});
+		
+		
+		
+		this.$wrapper.find('.MainActionButton').on('click.Register', function() {
+			var $main_action_button = $(this),
+				$form = self.$wrapper.find('.OrderForm');
+			
+			$main_action_button.attr('disabled', true);
+			if (isFormValid($form)) {
+				
+				self.event.makeOrder(
+					self.$wrapper.find('.OrderFields').serializeForm('array').map(function(field) {
+						
+						return {
+							uuid: field.name,
+							count: field.value
+						};
+					}),
+					self.$wrapper.find('.RegistrationFields').serializeForm('array').map(function(field) {
+						
+						return {
+							uuid: field.name,
+							value: field.value
+						};
+					})
+				).always(function() {
+					$main_action_button.removeAttr('disabled');
+				}).done(function() {
+					if (self.event.ticketing_locally) {
+						// Some shit with Yandex
+					} else {
+						__APP.changeState('/event/'+self.event.id);
+					}
+				});
+			} else {
+				$main_action_button.removeAttr('disabled');
+			}
 		});
 	};
 	
