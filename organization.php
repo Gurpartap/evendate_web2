@@ -645,6 +645,7 @@
       <span>Публикация событий БЕСПЛАТНО</span>
     </div>
     <div class="row">
+      <div class="col-lg-2 col-md-2 col-sm-2"></div>
       <div class="col-lg-4 col-md-4 col-sm-4">
         <div class="pricing-plan">
           <div class="header">
@@ -654,6 +655,7 @@
           <div class="body">
             <ul>
               <li>Публикация событий</li>
+              <li>Продажа билетов</li>
               <li>Базовая аналитика по охвату</li>
               <li>1 push уведомление на событие</li>
             </ul>
@@ -670,48 +672,16 @@
           <div class="body">
             <ul>
               <li>Публикация событий</li>
-              <li>Расширенная аналитика интересов аудитории</li>
-              <li>Возможность создания ботов для Telegram, Slack</li>
-              <li>1 дополнительное push уведомление на событие</li>
-            </ul>
-            <!--<div class="buy-btn"><a class="btn btn-primary" href="#">Купить</a></div>-->
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-4 col-md-4 col-sm-4">
-        <div class="pricing-plan">
-          <div class="header">
-            <h3>Полный</h3>
-            <span class="price">1400 ₽/мес</span>
-          </div>
-          <div class="body">
-            <ul>
-              <li>Публикация событий</li>
               <li>Продажа билетов</li>
               <li>Расширенная аналитика интересов аудитории</li>
               <li>Возможность создания ботов для Telegram, Slack</li>
-              <li>1 дополнительное push уведомление на событие</li>
+              <li>+ дополнительное push уведомление на событие</li>
+              <li><strong>первые 30 дней БЕСПЛАТНО!</strong></li>
             </ul>
             <!--<div class="buy-btn"><a class="btn btn-primary" href="#">Купить</a></div>-->
           </div>
         </div>
       </div>
-      <!--<div class="col-lg-3 col-md-3 col-sm-3">-->
-      <!--<div class="pricing-plan">-->
-      <!--<div class="header">-->
-      <!--<h3>Приватные организации</h3>-->
-      <!--<span class="price">799 ₽/мес</span>-->
-      <!--</div>-->
-      <!--<div class="body">-->
-      <!--<ul>-->
-      <!--<li>Lots of Components</li>-->
-      <!--<li>Cool Icons</li>-->
-      <!--<li>Unlimited colors</li>-->
-      <!--</ul>-->
-      <!--<div class="buy-btn"><a class="btn btn-primary" href="#">Buy</a></div>-->
-      <!--</div>-->
-      <!--</div>-->
-      <!--</div>-->
     </div>
   </div>
 </section>
