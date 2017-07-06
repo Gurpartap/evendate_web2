@@ -516,29 +516,9 @@ AbstractEditEventPage = extending(Page, (function() {
 			
 			if (form_data.registration_fields && form_data.registration_fields.length) {
 				send_data.registration_fields = (new RegistrationFieldModelsCollection()).setData(form_data.registration_fields.map(function(id) {
-					var field;
+					var field = new RegistrationFieldModel();
 					
 					if (form_data['registration_' + id + '_field_type']) {
-						switch (form_data['registration_' + id + '_field_type']) {
-							case RegistrationFieldModel.TYPES.SELECT:
-							case RegistrationFieldModel.TYPES.SELECT_MULTI: {
-								field = new RegistrationSelectFieldModel();
-								
-								field.values = form_data['registration_' + id + '_field_values'].map(function(value_id) {
-									var value = new RegistrationSelectFieldValue();
-									
-									value.value = form_data['registration_' +id+ '_field_' +value_id+ '_value'];
-									value.uuid = setDefaultValue(form_data['registration_' +id+ '_field_' +value_id+ '_value_uuid'], null);
-									
-									return value;
-								});
-								break;
-							}
-							default: {
-								field = new RegistrationFieldModel();
-								break;
-							}
-						}
 						field.type = form_data['registration_' + id + '_field_type'];
 					}
 					
@@ -548,6 +528,17 @@ AbstractEditEventPage = extending(Page, (function() {
 					}
 					if (form_data['registration_' + id + '_field_label']) {
 						field.label = form_data['registration_' + id + '_field_label'].trim();
+					}
+					
+					if (form_data['registration_' + id + '_field_values']) {
+						field.values = form_data['registration_' + id + '_field_values'].map(function(value_id) {
+							var value = new RegistrationSelectFieldValue();
+							
+							value.value = form_data['registration_' +id+ '_field_' +value_id+ '_value'];
+							value.uuid = setDefaultValue(form_data['registration_' +id+ '_field_' +value_id+ '_value_uuid'], null);
+							
+							return value;
+						});
 					}
 					
 					return field;
