@@ -34,6 +34,7 @@ organizations.forEach(function (value, index) {
                 if (err) {
                     env.logger.error(err);
                 }
+                console.log(body);
 
                 if (value.payload.private) {
 
