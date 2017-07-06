@@ -14,9 +14,42 @@ EventPage = extending(Page, (function() {
 	 * @param {(string|number)} event_id
 	 */
 	function EventPage(event_id) {
-		Page.apply(this);
+		var self = this,
+			render_fields = [
+				'title',
+				'description',
+				'image_horizontal_url'
+			];
+		
+		Page.call(this);
 
 		this.event = new OneEvent(event_id);
+		
+		this.render_vars = {
+			cover_width: 630,
+			avatars_collection: null,
+			action_buttons: null,
+			event_map: null,
+			event_edit_functions: null,
+			event_additional_info: null,
+			organization_avatar_block: null,
+			event_additional_fields: null,
+			overlay_cap: null
+		};
+		
+		this.calendar = null;
+		
+		render_fields.forEach(function(field) {
+			Object.defineProperty(self.render_vars, field, {
+				enumerable: true,
+				get: function() {
+					
+					return self.event[field];
+				}
+			});
+		});
+		
+		this.$overlay_cap = $();
 	}
 	
 	EventPage.fields = new Fields([
@@ -192,13 +225,7 @@ EventPage = extending(Page, (function() {
 		
 		PAGE.$wrapper.find('.CancelEvent').on('click.CancelEvent', function() {
 			PAGE.event.changeEventStatus(OneEvent.STATUS.CANCEL, function() {
-				PAGE.$wrapper.find('.event_canceled_cap').removeClass(__C.CLASSES.HIDDEN);
-			});
-		});
-		
-		PAGE.$wrapper.find('.CancelCancellation').on('click.CancelCancellation', function() {
-			PAGE.event.changeEventStatus(OneEvent.STATUS.BRING_BACK, function() {
-				PAGE.$wrapper.find('.event_canceled_cap').addClass(__C.CLASSES.HIDDEN);
+				PAGE.$wrapper.find('.EventPage').append(PAGE.$overlay_cap);
 			});
 		});
 		
@@ -211,73 +238,109 @@ EventPage = extending(Page, (function() {
 		});
 	};
 	
-	EventPage.prototype.render = function() {
+	EventPage.prototype.preRender = function() {
+		var self = this,
+			add_to_favorite_button_props = {
+			is_add_avatar: true,
+			is_checked: this.event.is_favorite,
+			classes: [
+				__C.CLASSES.SIZES.LOW,
+				__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+				__C.CLASSES.HOOKS.RIPPLE
+			],
+			colors: {
+				unchecked: __C.CLASSES.COLORS.NEUTRAL_ACCENT,
+				unchecked_hover: __C.CLASSES.COLORS.NEUTRAL_ACCENT
+			}
+		},
+		$cancel_cancellation_button = $();
 		
-		var PAGE = this,
-			cover_width = 630,
-			this_event = PAGE.event,
-			avatars_collection_classes = [
+		if (this.event.registration_locally || this.event.ticketing_locally) {
+			add_to_favorite_button_props.labels = null;
+			add_to_favorite_button_props.classes.push(__C.CLASSES.UNIVERSAL_STATES.EMPTY);
+		} else {
+			add_to_favorite_button_props.classes.push('event_main_action_button');
+		}
+		
+		if (this.event.can_edit) {
+			$cancel_cancellation_button = __APP.BUILD.button({
+				title: 'Вернуть событие',
+				classes: [
+					__C.CLASSES.COLORS.PRIMARY,
+					__C.CLASSES.HOOKS.RIPPLE
+				]
+			});
+			
+			$cancel_cancellation_button.on('click.CancelCancellation', function() {
+				self.event.changeEventStatus(OneEvent.STATUS.BRING_BACK, function() {
+					self.$overlay_cap.detach();
+				});
+			});
+			
+			bindRippleEffect($cancel_cancellation_button);
+		}
+		
+		this.$overlay_cap = __APP.BUILD.overlayCap($('<p>Организатор отменил событие</p>').add($cancel_cancellation_button));
+		
+		
+		
+		
+		this.render_vars.avatars_collection = __APP.BUILD.avatarCollection(this.event.favored, 6, {
+			dataset: {
+				modal_type: 'favors',
+				modal_event_id: this.event.id
+			},
+			classes: [
 				__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
 				__C.CLASSES.UNIVERSAL_STATES.BORDERED,
 				__C.CLASSES.SIZES.SMALL,
 				__C.CLASSES.HOOKS.ADD_AVATAR.COLLECTION,
-				__C.CLASSES.HOOKS.CALL_MODAL
+				__C.CLASSES.HOOKS.CALL_MODAL,
+				this.event.is_favorite ? __C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED : ''
 			],
-			$action_buttons = new DropDown('event-edit-notifications', '', {
-				classes: [
-					__C.CLASSES.UNIVERSAL_STATES.EMPTY,
-					__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
-					__C.CLASSES.SIZES.LOW,
-					__C.CLASSES.ICON_CLASS,
-					__C.CLASSES.ICONS.BELL_O,
-					__C.CLASSES.COLORS.NEUTRAL,
-					__C.CLASSES.HOOKS.RIPPLE,
-					__C.CLASSES.HOOKS.DROPDOWN_BUTTON
-				]
-			}, {
-				width: 190,
-				position: {
-					x: 'center',
-					y: 6
-				}
-			}, {
-				notifications: EventPage.buildNotifications(this.event)
-			}),
-			$event_additional_fields = $(),
-			$event_additional_information = $(),
-			organization = new OneOrganization(this_event.organization_id);
-
-		organization.setData({
-			short_name: this_event.organization_short_name,
-			img_url: this_event.organization_logo_small_url
-		});
+			counter_classes: [
+				__C.CLASSES.SIZES.X30,
+				__C.CLASSES.UNIVERSAL_STATES.BORDERED,
+				__C.CLASSES.COLORS.MARGINAL,
+				__C.CLASSES.HOOKS.ADD_AVATAR.STATES.CASTABLE
+			]
+		}, this.event.favored_users_count);
 		
-		__APP.changeTitle(this_event.title);
-		if (this_event.is_favorite) {
-			avatars_collection_classes.push(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
+		
+		this.render_vars.action_buttons = $();
+		
+		if (!__APP.USER.isLoggedOut()) {
+			this.render_vars.action_buttons = this.render_vars.action_buttons.add(
+				new DropDown('event-edit-notifications', '', {
+					classes: [
+						__C.CLASSES.UNIVERSAL_STATES.EMPTY,
+						__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+						__C.CLASSES.SIZES.LOW,
+						__C.CLASSES.ICON_CLASS,
+						__C.CLASSES.ICONS.BELL_O,
+						__C.CLASSES.COLORS.NEUTRAL,
+						__C.CLASSES.HOOKS.RIPPLE,
+						__C.CLASSES.HOOKS.DROPDOWN_BUTTON
+					]
+				}, {
+					width: 190,
+					position: {
+						x: 'center',
+						y: 6
+					}
+				}, {
+					notifications: EventPage.buildNotifications(this.event)
+				})
+			);
 		}
-
-		if (this_event.registration_locally || this_event.ticketing_locally) {
-			$action_buttons = $action_buttons.add(new AddToFavoriteButton(this_event.id, {
-				is_add_avatar: true,
-				is_checked: this_event.is_favorite,
-				classes: [
-					__C.CLASSES.UNIVERSAL_STATES.EMPTY,
-					__C.CLASSES.SIZES.LOW,
-					__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
-					__C.CLASSES.HOOKS.RIPPLE
-				],
-				labels: null,
-				colors: {
-					unchecked: __C.CLASSES.COLORS.NEUTRAL_ACCENT,
-					unchecked_hover: __C.CLASSES.COLORS.NEUTRAL_ACCENT
-				}
-			}));
-			
-			if (this_event.ticketing_locally) {
-				
-			} else {
-				$action_buttons = $action_buttons.add(new RegisterButton(this_event, {
+		
+		this.render_vars.action_buttons = this.render_vars.action_buttons.add(new AddToFavoriteButton(this.event.id, add_to_favorite_button_props));
+		
+		if (this.event.ticketing_locally) {
+		
+		} else {
+			this.render_vars.action_buttons = this.render_vars.action_buttons.add(
+				new RegisterButton(this.event, {
 					classes: [
 						'event_main_action_button',
 						__C.CLASSES.SIZES.LOW,
@@ -288,109 +351,116 @@ EventPage = extending(Page, (function() {
 						unchecked: __C.CLASSES.COLORS.NEUTRAL_ACCENT,
 						unchecked_hover: __C.CLASSES.COLORS.NEUTRAL_ACCENT
 					}
-				}));
-			}
+				})
+			);
+		}
+		
+		
+		if (this.event.location) {
+			this.render_vars.event_map = tmpl('event-map', {location_sanitized: encodeURI(this.event.location)});
+		}
+		
+		if (this.event.can_edit) {
+			this.render_vars.event_edit_functions = tmpl('event-edit-functions', this.event);
+		}
+		
+		
+		this.render_vars.event_additional_info = $();
+		
+		if (this.event.registration_required) {
+			this.render_vars.event_additional_info = this.render_vars.event_additional_info.add(
+				tmpl('event-additional-info', {
+					classes: __C.CLASSES.TEXT_COLORS.ACCENT + ' ' + __C.CLASSES.UNIVERSAL_STATES.UPPERCASE,
+					text: (this.event.registration_till ? 'Регистрация до ' + moment.unix(this.event.registration_till).calendar(null, __LOCALES.ru_RU.DATE.CALENDAR_DATE_TIME) : 'Регистрация обязательна')
+				})
+			);
+		}
+		
+		if (!this.event.is_free) {
+			this.render_vars.event_additional_info = this.render_vars.event_additional_info.add(
+				tmpl('event-additional-info', {
+					classes: __C.CLASSES.TEXT_COLORS.ACCENT,
+					text: 'от ' + (this.event.min_price ? formatCurrency(this.event.min_price) : '0') + ' руб.'
+				})
+			);
+		}
+		
+		if (this.event.is_online) {
+			this.render_vars.event_additional_info = this.render_vars.event_additional_info.add(
+				tmpl('event-additional-info', {
+					classes: __C.CLASSES.TEXT_COLORS.ACCENT,
+					text: 'Online'
+				})
+			);
+		}
+		
+		
+		this.render_vars.event_additional_fields = $();
+		
+		if (this.event.is_same_time) {
+			this.render_vars.event_additional_fields = this.render_vars.event_additional_fields.add(
+				tmpl('event-additional-field', {
+					key: 'Время',
+					value: displayTimeRange(this.event.dates[0].start_time, this.event.dates[0].end_time)
+				})
+			);
 		} else {
-			$action_buttons = $action_buttons.add(new AddToFavoriteButton(this_event.id, {
-				is_add_avatar: true,
-				is_checked: this_event.is_favorite,
-				classes: [
-					'event_main_action_button',
-					__C.CLASSES.SIZES.LOW,
-					__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
-					__C.CLASSES.HOOKS.RIPPLE
-				],
-				colors: {
-					unchecked: __C.CLASSES.COLORS.NEUTRAL_ACCENT,
-					unchecked_hover: __C.CLASSES.COLORS.NEUTRAL_ACCENT
-				}
-			}));
+			this.render_vars.event_additional_fields = this.render_vars.event_additional_fields.add(
+				tmpl('event-date-time', {
+					date_times: tmpl('event-date-time-row', formatDates(this.event.dates, {
+						date: '{D} {MMMMs}',
+						time: '{T}'
+					}, this.event.is_same_time))
+				})
+			);
 		}
 		
-		if (this_event.registration_required) {
-			$event_additional_information = $event_additional_information.add(tmpl('event-additional-info', {
-				classes: __C.CLASSES.TEXT_COLORS.ACCENT + ' ' + __C.CLASSES.UNIVERSAL_STATES.UPPERCASE,
-				text: (this_event.registration_till ? 'Регистрация до ' + moment.unix(this_event.registration_till).calendar(null, __LOCALES.ru_RU.DATE.CALENDAR_DATE_TIME) : 'Регистрация обязательна')
-			}));
+		if (this.event.location) {
+			this.render_vars.event_additional_fields = this.render_vars.event_additional_fields.add(
+				tmpl('event-additional-field', {
+					key: 'Место',
+					value: this.event.location
+				})
+			);
 		}
 		
-		if (!this_event.is_free) {
-			$event_additional_information = $event_additional_information.add(tmpl('event-additional-info', {
-				classes: __C.CLASSES.TEXT_COLORS.ACCENT,
-				text: 'от ' + (this_event.min_price ? formatCurrency(this_event.min_price) : '0') + ' руб.'
-			}));
+		this.render_vars.event_additional_fields = this.render_vars.event_additional_fields.add(
+			tmpl('event-additional-field', {
+				key: 'Теги',
+				value: __APP.BUILD.tags(this.event.tags)
+			})
+		);
+		
+		if (this.event.detail_info_url) {
+			this.render_vars.event_additional_fields = this.render_vars.event_additional_fields.add(
+				tmpl('event-detail-link', {detail_info_url: this.event.detail_info_url})
+			);
 		}
 		
-		if (this_event.is_online) {
-			$event_additional_information = $event_additional_information.add(tmpl('event-additional-info', {
-				classes: __C.CLASSES.TEXT_COLORS.ACCENT,
-				text: 'Online'
-			}));
-		}
+		this.render_vars.organization_avatar_block = __APP.BUILD.avatarBlocks(this.event.organization, {
+			block_classes: [__C.CLASSES.SIZES.SMALL],
+			is_link: true,
+			entity: __C.ENTITIES.ORGANIZATION
+		});
 		
-		if (this_event.is_same_time) {
-			$event_additional_fields = $event_additional_fields.add(tmpl('event-additional-field', {
-				key: 'Время',
-				value: displayTimeRange(this_event.dates[0].start_time, this_event.dates[0].end_time)
-			}));
-		} else {
-			$event_additional_fields = $event_additional_fields.add(tmpl('event-date-time', {
-				date_times: tmpl('event-date-time-row', formatDates(this_event.dates, {
-					date: '{D} {MMMMs}',
-					time: '{T}'
-				}, this_event.is_same_time))
-			}));
+		if (this.event.canceled) {
+			this.render_vars.overlay_cap = this.$overlay_cap;
 		}
-		if (this_event.location) {
-			$event_additional_fields = $event_additional_fields.add(tmpl('event-additional-field', {
-				key: 'Место',
-				value: this_event.location
-			}));
-		}
-		$event_additional_fields = $event_additional_fields.add(tmpl('event-additional-field', {
-			key: 'Теги',
-			value: __APP.BUILD.tags(this_event.tags)
-		}));
+	};
+	
+	EventPage.prototype.render = function() {
+		var PAGE = this,
+			this_event = PAGE.event,
+			m_nearest_date = this.event.nearest_event_date ? moment.unix(this.event.nearest_event_date) : moment.unix(this.event.first_event_date);
 		
-		if (this_event.detail_info_url) {
-			$event_additional_fields = $event_additional_fields.add(tmpl('event-detail-link', {detail_info_url: this_event.detail_info_url}));
-		}
+		__APP.changeTitle(this_event.title);
 		
-		PAGE.$wrapper.html(tmpl('event-page', $.extend({}, this_event, {
-			cover_width: cover_width,
-			action_buttons: $action_buttons,
-			avatars_collection: __APP.BUILD.avatarCollection(this_event.favored, 6, {
-				dataset: {
-					modal_type: 'favors',
-					modal_event_id: this_event.id
-				},
-				classes: avatars_collection_classes,
-				counter_classes: [
-					__C.CLASSES.SIZES.X30,
-					__C.CLASSES.UNIVERSAL_STATES.BORDERED,
-					__C.CLASSES.COLORS.MARGINAL,
-					__C.CLASSES.HOOKS.ADD_AVATAR.STATES.CASTABLE
-				]
-			}, this_event.favored_users_count),
-			event_map: this_event.location ? tmpl('event-map', {location_sanitized: encodeURI(this_event.location)}) : '',
-			event_edit_functions: this_event.can_edit ? tmpl('event-edit-functions', this_event) : '',
-			event_additional_info: $event_additional_information,
-			canceled: this_event.canceled ? '' : __C.CLASSES.HIDDEN,
-			organization_avatar_block: __APP.BUILD.avatarBlocks(organization, {
-				block_classes: [__C.CLASSES.SIZES.SMALL],
-				is_link: true,
-				entity: __C.ENTITIES.ORGANIZATION
-			}),
-			event_additional_fields: $event_additional_fields,
-			cancel_cancellation: this_event.can_edit ? tmpl('button', {
-					classes: __C.CLASSES.COLORS.PRIMARY + ' ' + __C.CLASSES.HOOKS.RIPPLE + ' CancelCancellation',
-					title: 'Вернуть событие'
-				}) : ''
-		})));
+		this.preRender();
 		
-		if (this_event.is_same_time) {
-			var m_nearest_date = this_event.nearest_event_date ? moment.unix(this_event.nearest_event_date) : moment.unix(this_event.first_event_date);
-			PAGE.calendar = new Calendar(PAGE.$wrapper.find('.EventCalendar'), {
+		this.$wrapper.html(tmpl('event-page', this.render_vars));
+		
+		if (this.event.is_same_time) {
+			this.calendar = new Calendar(this.$wrapper.find('.EventCalendar'), {
 				classes: {
 					wrapper_class: 'feed_calendar_wrapper',
 					td_class: 'event_calendar_day',
@@ -399,21 +469,19 @@ EventPage = extending(Page, (function() {
 				selection_type: Calendar.SELECTION_TYPES.MULTI,
 				disable_selection: true
 			});
-			PAGE.calendar
+			this.calendar
 				.init()
 				.setMonth(m_nearest_date.format('M'), m_nearest_date.format('YYYY'))
 				.selectDays(
-					this_event.dates.map(function(date) {
+					this.event.dates.map(function(date) {
+						
 						return moment.unix(date.event_date).format(__C.DATE_FORMAT)
 					})
 				);
 		}
 		
-		if(__APP.USER.id === -1){
-			$('.DropdownButton, .DropdownBox').remove();
-		}
 		
-		PAGE.init();
+		this.init();
 	};
 	
 	return EventPage;

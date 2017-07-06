@@ -12,6 +12,9 @@ __C = {
 		MATERIAL: 'material',
 		FLOATING_MATERIAL: 'material -floating_material',
 		IMG_HOLDER: 'img_holder',
+		COMPONENT: {
+			BUTTON: 'button'
+		},
 		TEXT_COLORS: {
 			ACCENT: '-text_color_accent'
 		},
@@ -1725,7 +1728,7 @@ function isKeyPressed(event, key) {
  */
 function empty(variable) {
 	
-	return variable == null;
+	return variable == null || $.isEmptyObject(variable) || (variable instanceof Array && variable.length === 0);
 }
 /**
  *

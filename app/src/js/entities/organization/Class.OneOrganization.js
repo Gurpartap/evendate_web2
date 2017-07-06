@@ -27,6 +27,9 @@ OneOrganization = extending(OneEntity, (function() {
 	 * @property {?string} img_url
 	 * @property {?string} img_small_url
 	 * @property {?string} img_medium_url
+	 * @property {?string} logo_large_url
+	 * @property {?string} logo_small_url
+	 * @property {?string} logo_medium_url
 	 *
 	 * @property {?string} background_img_url
 	 * @property {?string} background_small_img_url
@@ -124,7 +127,38 @@ OneOrganization = extending(OneEntity, (function() {
 			},
 			'moderators': {
 				get: function() {
+					
 					return self.staff.getSpecificStaff(OneUser.ROLE.MODERATOR);
+				}
+			},
+			'logo_large_url': {
+				get: function() {
+					
+					return self.img_url;
+				},
+				set: function(val) {
+					
+					return self.img_url = val;
+				}
+			},
+			'logo_medium_url': {
+				get: function() {
+					
+					return self.img_medium_url;
+				},
+				set: function(val) {
+					
+					return self.img_medium_url = val;
+				}
+			},
+			'logo_small_url': {
+				get: function() {
+					
+					return self.img_small_url;
+				},
+				set: function(val) {
+					
+					return self.img_small_url = val;
 				}
 			}
 		});

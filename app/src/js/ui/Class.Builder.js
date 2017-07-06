@@ -211,6 +211,7 @@ Builder = (function() {
 	 *
 	 * @param {...buildProps} props
 	 * @param {string} props.page
+	 * @param {string} props.title
 	 *
 	 * @returns {jQuery}
 	 */
@@ -507,12 +508,19 @@ Builder = (function() {
 	 * @param {buildProps} [props]
 	 * @return {jQuery}
 	 */
-	Builder.prototype.cap = function buildTags(message, props) {
-		if(!props)
-			props = {};
-		props = Builder.normalizeBuildProps(props);
+	Builder.prototype.cap = function buildCap(message, props) {
 		
-		return tmpl('cap', $.extend({message: message}, props));
+		return tmpl('cap', $.extend({message: message}, Builder.normalizeBuildProps(props || {})));
+	};
+	/**
+	 *
+	 * @param {Element|jQuery} content
+	 * @param {buildProps} [props]
+	 * @return {jQuery}
+	 */
+	Builder.prototype.overlayCap = function buildOverlayCap(content, props) {
+		
+		return tmpl('overlay-cap', $.extend({content: content}, Builder.normalizeBuildProps(props || {})));
 	};
 	/**
 	 *
