@@ -197,20 +197,22 @@ AbstractModal = (function() {
 		
 		if (!this.is_rendered) {
 			console.error('Modal has not been rendered yet');
+			
 			return this;
 		}
 		
 		this.modal.find('.CloseModal').on('click.CloseModal', function() {
 			AbstractModal.hideCurrent();
 		});
+		
 		$(document).on('keyup.CloseModal', function(event) {
-			if (event.keyCode == 27) {
+			if (isKeyPressed(event, __C.KEY_CODES.ESC)) {
 				$(this).off('keyup.CloseModal');
 				AbstractModal.hideCurrent();
 			}
 		});
 		
-		if (this.wrapper_is_scrollable && this.onScrollToBottom != AbstractModal.prototype.onScrollToBottom) {
+		if (this.wrapper_is_scrollable && this.onScrollToBottom !== AbstractModal.prototype.onScrollToBottom) {
 			this.modal_wrapper.on('scroll', function() {
 				if (self.modal_wrapper.height() + self.modal_wrapper.scrollTop() >= self.modal.height()) {
 					handleScrollToBottom(self);
@@ -220,8 +222,8 @@ AbstractModal = (function() {
 		
 		if (this.content_is_scrollable) {
 			this.content.scrollbar({
-				onScroll: this.onScrollToBottom != AbstractModal.prototype.onScrollToBottom ? function(y) {
-					if (y.scroll == y.maxScroll) {
+				onScroll: this.onScrollToBottom !== AbstractModal.prototype.onScrollToBottom ? function(y) {
+					if (y.scroll === y.maxScroll) {
 						handleScrollToBottom(self);
 					}
 				} : undefined

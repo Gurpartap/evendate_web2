@@ -52,6 +52,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {UsersCollection} registered_users
 	 * @property {RegistrationFieldModelsCollection} registration_fields
 	 *
+	 * @property {OneOrganization} organization
 	 * @property {?number} organization_id
 	 * @property {?string} organization_short_name
 	 * @property {?string} organization_logo_large_url
@@ -95,6 +96,14 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {?number} updated_at
 	 */
 	function OneEvent(event_id, is_loading_continuous) {
+		var self = this,
+			org_fields = [
+				'organization_id',
+				'organization_short_name',
+				'organization_logo_large_url',
+				'organization_logo_medium_url',
+				'organization_logo_small_url'
+			];
 		this.id = event_id ? event_id : 0;
 		this.title = null;
 		this.description = null;
@@ -125,11 +134,12 @@ OneEvent = extending(OneEntity, (function() {
 		this.registered_users = new UsersCollection();
 		this.registration_fields = new RegistrationFieldModelsCollection();
 		
-		this.organization_id = null;
-		this.organization_short_name = null;
-		this.organization_logo_large_url = null;
-		this.organization_logo_medium_url = null;
-		this.organization_logo_small_url = null;
+		this.organization = new OneOrganization();
+		this._organization_id = null;
+		this._organization_short_name = null;
+		this._organization_logo_large_url = null;
+		this._organization_logo_medium_url = null;
+		this._organization_logo_small_url = null;
 		
 		this.image_vertical_url = null;
 		this.image_horizontal_url = null;
@@ -166,6 +176,21 @@ OneEvent = extending(OneEntity, (function() {
 		this.creator_id = null;
 		this.created_at = null;
 		this.updated_at = null;
+		
+		org_fields.forEach(function(field) {
+			Object.defineProperty(self, field, {
+				enumerable: true,
+				get: function() {
+					
+					return self['_' + field];
+				},
+				set: function(value) {
+					self.organization[field.replace('organization_', '')] = value;
+					
+					return self['_' + field] = value;
+				}
+			});
+		});
 		
 		this.loading = false;
 		if (event_id && is_loading_continuous) {

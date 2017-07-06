@@ -12,6 +12,9 @@ OrderPage = extending(Page, (function() {
 	 *
 	 * @constructor
 	 * @constructs OrderPage
+	 *
+	 * @property {OneEvent} event
+	 * @property {Fields} event_fields
 	 */
 	function OrderPage(event_id) {
 		var self = this;
@@ -127,6 +130,63 @@ OrderPage = extending(Page, (function() {
 		}
 	};
 	
+	OrderPage.prototype.disablePage = function(message) {
+		var self = this;
+		
+		this.$wrapper.find('.OrderFormWrapper').addClass(__C.CLASSES.DISABLED).attr('disabled', true);
+		
+		this.$wrapper.find('.OrderPage').append(__APP.BUILD.overlayCap(tmpl('order-overlay-cap-content', {
+			message: message,
+			return_button: __APP.BUILD.link({
+				page: '/event/' + this.event.id,
+				title: 'Вернуться на страницу события',
+				classes: [
+					__C.CLASSES.COMPONENT.BUTTON,
+					__C.CLASSES.COLORS.PRIMARY
+				]
+			}),
+			tickets_button: __APP.BUILD.button({
+				title: 'Показать билеты',
+				classes: [
+					__C.CLASSES.COLORS.ACCENT
+				]
+			}).on('click.ShowTickets', function() {
+				var $this = $(this),
+					tickets_fields = ['created_at', 'number', 'ticket_type', 'order'],
+					events_fields = ['dates', 'is_same_time', 'image_horizontal_medium_url', 'location'],
+					ticket,
+					promise;
+				
+				if ($this.modal && $this.modal instanceof TicketsModal) {
+					$this.modal.show();
+				} else {
+					if (self.event.tickets.length) {
+						ticket = new EventsExtendedTicketsCollection(self.event.id);
+						promise = ticket.fetchTickets(new Fields(tickets_fields, {
+							event: {
+								fields: new Fields(events_fields)
+							}
+						}));
+					} else {
+						promise = self.event.fetchEvent(new Fields(events_fields, {
+							tickets: {
+								fields: new Fields(tickets_fields)
+							}
+						})).done(function() {
+							
+							return ticket = ExtendedTicketsCollection.extractTicketsFromEvent(self.event);
+						});
+					}
+					
+					promise.done(function() {
+						$this.modal = new TicketsModal(ticket);
+						$this.modal.show();
+					});
+				}
+			})
+		})));
+	};
+	
 	OrderPage.prototype.init = function() {
 		var self = this;
 		
@@ -156,41 +216,43 @@ OrderPage = extending(Page, (function() {
 			}, 0));
 		});
 		
-		
-		
-		this.$wrapper.find('.MainActionButton').on('click.Register', function() {
+		this.$wrapper.find('.MainActionButton').on('click.MakeOrder', function() {
 			var $main_action_button = $(this),
 				$form = self.$wrapper.find('.OrderForm');
 			
-			$main_action_button.attr('disabled', true);
-			if (isFormValid($form)) {
-				
-				self.event.makeOrder(
-					self.$wrapper.find('.OrderFields').serializeForm('array').map(function(field) {
-						
-						return {
-							uuid: field.name,
-							count: field.value
-						};
-					}),
-					self.$wrapper.find('.RegistrationFields').serializeForm('array').map(function(field) {
-						
-						return {
-							uuid: field.name,
-							value: field.value
-						};
-					})
-				).always(function() {
-					$main_action_button.removeAttr('disabled');
-				}).done(function() {
-					if (self.event.ticketing_locally) {
-						// Some shit with Yandex
-					} else {
-						__APP.changeState('/event/'+self.event.id);
-					}
-				});
+			if (__APP.USER.isLoggedOut()) {
+				(new AuthModal(window.location.href)).show();
 			} else {
-				$main_action_button.removeAttr('disabled');
+				$main_action_button.attr('disabled', true);
+				if (isFormValid($form)) {
+					
+					self.event.makeOrder(
+						self.$wrapper.find('.OrderFields').serializeForm('array').map(function(field) {
+							
+							return {
+								uuid: field.name,
+								count: field.value
+							};
+						}),
+						self.$wrapper.find('.RegistrationFields').serializeForm('array').map(function(field) {
+							
+							return {
+								uuid: field.name,
+								value: field.value
+							};
+						})
+					).always(function() {
+						$main_action_button.removeAttr('disabled');
+					}).done(function() {
+						if (self.event.ticketing_locally) {
+							// Some shit with Yandex
+						} else {
+							__APP.changeState('/event/'+self.event.id);
+						}
+					});
+				} else {
+					$main_action_button.removeAttr('disabled');
+				}
 			}
 		});
 	};
@@ -246,9 +308,18 @@ OrderPage = extending(Page, (function() {
 	};
 	
 	OrderPage.prototype.render = function() {
+		if (__APP.USER.isLoggedOut()) {
+			return (new AuthModal(window.location.href, false)).show();
+		}
 		this.preRender();
 		
 		this.$wrapper.html(tmpl('order-page', this.render_vars));
+		
+		if (this.event.ticketing_locally && this.event.tickets.length) {
+			this.disablePage('Вы уже заказали билеты по этому событию');
+		} else if (this.event.is_registered) {
+			this.disablePage('Вы уже зарегистрированы на это событие');
+		}
 		
 		this.init();
 	};

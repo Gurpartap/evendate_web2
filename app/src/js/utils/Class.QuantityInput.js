@@ -33,7 +33,9 @@ QuantityInput = extendingJQuery((function() {
 		$plus_button = __APP.BUILD.button({
 			title: '+',
 			classes: [
-				'quantity_input_button'
+				'quantity_input_button',
+				__C.CLASSES.COLORS.DEFAULT,
+			  __C.CLASSES.HOOKS.RIPPLE
 			],
 			attributes: {
 				tabindex: -1
@@ -43,7 +45,9 @@ QuantityInput = extendingJQuery((function() {
 		$minus_button = __APP.BUILD.button({
 			title: '-',
 			classes: [
-				'quantity_input_button'
+				'quantity_input_button',
+				__C.CLASSES.COLORS.DEFAULT,
+				__C.CLASSES.HOOKS.RIPPLE
 			],
 			attributes: {
 				tabindex: -1
@@ -66,6 +70,9 @@ QuantityInput = extendingJQuery((function() {
 		}));
 		
 		this.options = options;
+		
+		bindRippleEffect($plus_button);
+		bindRippleEffect($minus_button);
 		
 		this.plus = $plus_button;
 		this.input = $input;
