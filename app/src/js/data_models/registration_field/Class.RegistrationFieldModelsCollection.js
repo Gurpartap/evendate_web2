@@ -65,5 +65,14 @@ RegistrationFieldModelsCollection = extending(EntitiesCollection, (function() {
 		return this;
 	};
 	
+	RegistrationFieldModelsCollection.prototype.sortByOrder = function() {
+		this.sort(function(a, b) {
+			
+			return a.order_number - b.order_number;
+		});
+		
+		return this;
+	};
+	
 	return RegistrationFieldModelsCollection;
 }()));

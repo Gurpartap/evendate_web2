@@ -417,12 +417,13 @@
 			<span class="fa_icon fa-reorder"></span>
 		</div>
 		<div class="form_unit form_accent_block">
-			<input id="edit_event_registration_{type}_field_enable" class="form_checkbox Switch" type="checkbox" name="registration_fields" value="{id}" data-switch_id="registration_{type}_field">
+			<input id="edit_event_registration_{type}_field_enable" class="form_checkbox Switch PredefinedFieldSwitch" type="checkbox" name="registration_fields" value="{id}" data-switch_id="registration_{type}_field">
 			<label class="form_label" for="edit_event_registration_{type}_field_enable"><span>{name}</span></label>
 		</div>
 		<input id="edit_event_registration_{type}_field_uuid" type="hidden" name="registration_{id}_field_uuid" value="{uuid}">
 		<p>{description}</p>
 		<fieldset class="Switching" data-switch_id="registration_{type}_field" disabled>
+			<input class="RegistrationFieldOrderNumber" type="hidden" name="registration_{id}_field_order_number" value="{order_number}">
 			<input type="hidden" name="registration_{id}_field_type" value="{type}">
 			<div class="form_unit">
 				<input id="edit_event_registration_{type}_field_required" class="form_checkbox" type="checkbox" name="registration_{id}_field_required">
@@ -440,7 +441,7 @@
 		<p class="form_text">В этом поле вы можете запросить у пользователей любые данные или задать вопрос.</p>
 		<input id="edit_event_registration_{id}_custom_field_enable" class="RegistrationFieldId" type="hidden" name="registration_fields" value="{id}">
 		<input id="edit_event_registration_{id}_custom_field_uuid" class="RegistrationCustomFieldUUID" type="hidden" name="registration_{id}_field_uuid" value="{uuid}">
-		<input id="edit_event_registration_{id}_custom_field_order_number" class="RegistrationFieldOrderNumber" type="hidden" name="order_number" value="{order_number}">
+		<input id="edit_event_registration_{id}_custom_field_order_number" class="RegistrationFieldOrderNumber" type="hidden" name="registration_{id}_field_order_number" value="{order_number}">
 		<button class="edit_event_registration_custom_field_remove_button RemoveRegistrationCustomField" type="button">&times;</button>
 
 		<div class="form_unit">

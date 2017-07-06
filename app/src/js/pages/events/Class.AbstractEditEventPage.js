@@ -123,7 +123,7 @@ AbstractEditEventPage = extending(Page, (function() {
 		});
 	}
 	
-	AbstractEditEventPage.lastRegistrationCustomFieldId = 0;
+	AbstractEditEventPage.lastRegistrationFieldId = 0;
 	AbstractEditEventPage.lastTicketTypeRowId = 0;
 	/**
 	 *
@@ -136,7 +136,7 @@ AbstractEditEventPage = extending(Page, (function() {
 		
 		$fields = tmpl('edit-event-registration-custom-field', registration_data.filter(function(data) {
 			if (RegistrationFieldModel.isCustomField(data)) {
-				data.id = data.id ? data.id : AbstractEditEventPage.lastRegistrationCustomFieldId++;
+				data.id = data.id ? data.id : AbstractEditEventPage.lastRegistrationFieldId++;
 				return true;
 			}
 			return false;
@@ -178,10 +178,6 @@ AbstractEditEventPage = extending(Page, (function() {
 				$fields.find('#edit_event_registration_'+data.id+'_field_type').select2('val', data.type);
 			}
 		});
-		/*
-		$fields.find('.RemoveRegistrationCustomField').on('click.RemoveRegistrationCustomField', function() {
-			$(this).closest('.RegistrationCustomField').remove();
-		});*/
 		$fields.find('.RegistrationCustomFieldLabel, .RegistrationCustomFieldType').on('change.RemoveRegistrationFieldUUID', function() {
 			$(this).closest('.RegistrationCustomField').find('.RegistrationCustomFieldUUID').val('');
 		});
@@ -529,6 +525,9 @@ AbstractEditEventPage = extending(Page, (function() {
 					if (form_data['registration_' + id + '_field_label']) {
 						field.label = form_data['registration_' + id + '_field_label'].trim();
 					}
+					if (form_data['registration_' + id + '_field_order_number']) {
+						field.order_number = form_data['registration_' + id + '_field_order_number'] || null;
+					}
 					
 					if (form_data['registration_' + id + '_field_values']) {
 						field.values = form_data['registration_' + id + '_field_values'].map(function(value_id) {
@@ -845,7 +844,8 @@ AbstractEditEventPage = extending(Page, (function() {
 			$bottom_nav_buttons = PAGE.$wrapper.find('.EditEventBottomButtons').children(),
 			$next_page_button = $bottom_nav_buttons.filter('.EditEventNextPageButton'),
 			$prev_page_button = $bottom_nav_buttons.filter('.EditEventPrevPageButton'),
-			$submit_button = $bottom_nav_buttons.filter('.EditEventSubmitButton');
+			$submit_button = $bottom_nav_buttons.filter('.EditEventSubmitButton'),
+			$sortable_custom_fields = PAGE.$wrapper.find('.RegistrationFields');
 		
 		bindDatePickers(PAGE.$wrapper);
 		bindSelect2(PAGE.$wrapper);
@@ -1106,35 +1106,51 @@ AbstractEditEventPage = extending(Page, (function() {
 			PAGE.$wrapper.find('#edit_event_placepicker').prop('required', !$(this).prop('checked'));
 		});
 		
-		PAGE.$wrapper.find('.RegistrationFields').sortable({
+		function reorder() {
+			$sortable_custom_fields.find('.RegistrationFieldOrderNumber').val('').filter(function(){
+				
+				return $(this).closest(':disabled').length === 0;
+			}).each(function(i) {
+				$(this).val(i+1);
+			});
+		}
+		
+		$sortable_custom_fields = PAGE.$wrapper.find('.RegistrationFields').sortable({
 			scroll : true,
+			animation: 150,
 			draggable: '.Draggable',
 			handle: '.DragHandle',
 			filter: '.RemoveRegistrationCustomField',
-			ghostClass: 'edit_event_registration_field_ghost',
 			onFilter: function(e) {
 				$(e.item).closest('.RegistrationCustomField').remove();
-			}
+				reorder();
+			},
+			onEnd: reorder
 		});
 		
+		$sortable_custom_fields.find('.PredefinedFieldSwitch').on('change', reorder);
+		
 		PAGE.$wrapper.find('.AddRegistrationCustomField').off('click.AddRegistrationCustomField').on('click.AddRegistrationCustomField', function() {
-			AbstractEditEventPage.registrationCustomFieldBuilder().insertBefore($(this));
+			$sortable_custom_fields.append(AbstractEditEventPage.registrationCustomFieldBuilder());
+			reorder();
 		});
 		
 		PAGE.$wrapper.find('.RegistrationPreview').on('click.RegistrationPreview', function() {
-			var form_data = $(this).closest('form').serializeForm(),
+			var $this = $(this),
+				form_data = $(this).closest('fieldset').serializeForm(),
 				registration_fields = new RegistrationFieldModelsCollection(),
 				event = new OneEvent(),
-				modal;
+				modal = $this.data('modal');
 			
 			if (form_data.registration_fields) {
-				registration_fields.setData(form_data.registration_fields.sort().map(function(field) {
+				registration_fields.setData(form_data.registration_fields.map(function(field) {
 					
 					return {
 						uuid: guid(),
 						type: form_data['registration_'+field+'_field_type'],
 						label: form_data['registration_'+field+'_field_label'] || RegistrationFieldModel.DEFAULT_LABEL[form_data['registration_'+field+'_field_type'].toUpperCase()],
 						required: form_data['registration_'+field+'_field_required'],
+						order_number: form_data['registration_'+field+'_field_order_number'],
 						values: form_data['registration_'+field+'_field_values'] ? form_data['registration_'+field+'_field_values'].map(function(value_id) {
 							var value = new RegistrationSelectFieldValue();
 							
@@ -1144,12 +1160,17 @@ AbstractEditEventPage = extending(Page, (function() {
 							return value;
 						}) : null
 					};
-				}))
+				})).sortByOrder();
 			}
 			form_data.registration_fields = registration_fields;
 			event.setData(form_data);
 			
+			if (modal instanceof PreviewRegistrationModal) {
+				modal.destroy();
+			}
+			
 			modal = new PreviewRegistrationModal(event);
+			$this.data('modal', modal);
 			modal.show();
 		});
 		
@@ -1268,10 +1289,34 @@ AbstractEditEventPage = extending(Page, (function() {
 		});
 		
 		this.render_vars.registration_predefined_fields = tmpl('edit-event-registration-predefined-field', [
-			{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'last_name', name: 'Фамилия', description: 'Текстовое поле для ввода фамилии'},
-			{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'first_name', name: 'Имя', description: 'Текстовое поле для ввода имени'},
-			{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'email', name: 'E-mail', description: 'Текстовое поле для ввода адреса электронной почты'},
-			{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'phone_number', name: 'Номер телефона', description: 'Текстовое поля для ввода номера телефона'}
+			{
+				id: AbstractEditEventPage.lastRegistrationFieldId++,
+				order_number: AbstractEditEventPage.lastRegistrationFieldId,
+				type: 'last_name',
+				name: 'Фамилия',
+				description: 'Текстовое поле для ввода фамилии'
+			},
+			{
+				id: AbstractEditEventPage.lastRegistrationFieldId++,
+				order_number: AbstractEditEventPage.lastRegistrationFieldId,
+				type: 'first_name',
+				name: 'Имя',
+				description: 'Текстовое поле для ввода имени'
+			},
+			{
+				id: AbstractEditEventPage.lastRegistrationFieldId++,
+				order_number: AbstractEditEventPage.lastRegistrationFieldId,
+				type: 'email',
+				name: 'E-mail',
+				description: 'Текстовое поле для ввода адреса электронной почты'
+			},
+			{
+				id: AbstractEditEventPage.lastRegistrationFieldId++,
+				order_number: AbstractEditEventPage.lastRegistrationFieldId,
+				type: 'phone_number',
+				name: 'Номер телефона',
+				description: 'Текстовое поля для ввода номера телефона'
+			}
 		]);
 		
 		this.render_vars.add_ticket_type_button = __APP.BUILD.actionButton({

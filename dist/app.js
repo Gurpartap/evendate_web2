@@ -3777,6 +3777,14 @@ RegistrationFieldModel = extending(OneEntity, (function() {
 			case RegistrationFieldModel.TYPES.SELECT_MULTI: return true;
 		}
 	};
+	/**
+	 *
+	 * @param {(RegistrationFieldModel|RegistrationFieldLike)} field
+	 * @return {boolean}
+	 */
+	RegistrationFieldModel.isPredefinedField = function(field) {
+		return !RegistrationFieldModel.isCustomField(field);
+	};
 	
 	RegistrationFieldModel.prototype.setData = function(data) {
 		var field;
@@ -3855,6 +3863,15 @@ RegistrationFieldModelsCollection = extending(EntitiesCollection, (function() {
 			}
 			
 			return 0;
+		});
+		
+		return this;
+	};
+	
+	RegistrationFieldModelsCollection.prototype.sortByOrder = function() {
+		this.sort(function(a, b) {
+			
+			return a.order_number - b.order_number;
 		});
 		
 		return this;
@@ -6985,6 +7002,156 @@ EventAllOrdersCollection = extending(AbstractEventOrdersCollection, (function() 
  * @requires ../Class.OneEntity.js
  */
 /**
+ * @class RegistrationField
+ * @extends OneEntity
+ */
+RegistrationField = extending(OneEntity, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs RegistrationField
+	 *
+	 * @property {?string} form_field_uuid
+	 * @property {?string} form_field_label
+	 * @property {?RegistrationField.TYPES} form_field_type
+	 * @property {?number} form_field_type_id
+	 * @property {?boolean} form_field_required
+	 * @property {?string} value
+	 * @property {?Array<RegistrationSelectFieldValue>} values
+	 *
+	 * @property {?string} uuid
+	 * @property {?string} label
+	 * @property {?RegistrationField.TYPES} type
+	 * @property {?boolean} required
+	 *
+	 * @property {?timestamp} created_at
+	 * @property {?timestamp} updated_at
+	 */
+	function RegistrationField() {
+		var self = this;
+		
+		this.form_field_uuid = null;
+		this.form_field_label = null;
+		this.form_field_type = null;
+		this.form_field_type_id = null;
+		this.form_field_required = null;
+		this.value = null;
+		this.values = [];
+		
+		this.created_at = null;
+		this.updated_at = null;
+		
+		Object.defineProperties(this, {
+			uuid: {
+				get: function() {
+					return self.form_field_uuid;
+				},
+				set: function(val) {
+					return self.form_field_uuid = val;
+				}
+			},
+			label: {
+				get: function() {
+					return self.form_field_label;
+				},
+				set: function(val) {
+					return self.form_field_label = val;
+				}
+			},
+			type: {
+				get: function() {
+					return self.form_field_type;
+				},
+				set: function(val) {
+					return self.form_field_type = val;
+				}
+			},
+			required: {
+				get: function() {
+					return self.form_field_required;
+				},
+				set: function(val) {
+					return self.form_field_required = val;
+				}
+			}
+		});
+	}
+	
+	RegistrationField.prototype.ID_PROP_NAME = 'form_field_uuid';
+	/**
+	 *
+	 * @alias RegistrationFieldModel.TYPES
+	 */
+	RegistrationField.TYPES = RegistrationFieldModel.TYPES;
+	/**
+	 *
+	 * @alias RegistrationFieldModel.DEFAULT_LABEL
+	 */
+	RegistrationField.DEFAULT_LABEL = RegistrationFieldModel.DEFAULT_LABEL;
+	/**
+	 *
+	 * @param {(RegistrationField|RegistrationFieldLike)} field
+	 *
+	 * @return {boolean}
+	 */
+	RegistrationField.isCustomField = RegistrationFieldModel.isCustomField;
+	
+	
+	return RegistrationField;
+}()));
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.RegistrationField.js
+ */
+/**
+ *
+ * @class RegistrationFieldsCollection
+ * @extends EntitiesCollection
+ */
+RegistrationFieldsCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs RegistrationFieldsCollection
+	 *
+	 * @property {Object<RegistrationFieldModel.TYPES, Array<RegistrationField>>} __types
+	 */
+	function RegistrationFieldsCollection() {
+		EntitiesCollection.call(this);
+		
+		Object.defineProperties(this, {
+			__types: {
+				value: {},
+				writable: true,
+				enumerable: false,
+				configurable: false
+			}
+		});
+		
+		for ( var type_name in RegistrationFieldModel.TYPES ) {
+			if (RegistrationFieldModel.TYPES.hasOwnProperty(type_name)) {
+				this.__types[RegistrationFieldModel.TYPES[type_name]] = [];
+			}
+		}
+		Object.freeze(this.__types);
+	}
+	RegistrationFieldsCollection.prototype.collection_of = RegistrationField;
+	/**
+	 *
+	 * @param {RegistrationField} entity
+	 */
+	RegistrationFieldsCollection.prototype.createAdditionalLookup = function(entity) {
+		if (entity instanceof RegistrationField) {
+			this.__types[entity.type].push(entity);
+		}
+	};
+	
+	return RegistrationFieldsCollection;
+}()));
+/**
+ * @requires ../Class.OneEntity.js
+ */
+/**
  * @typedef {object} Privilege
  * @property {number} role_id
  * @property {OneUser.ROLE} name
@@ -7463,156 +7630,6 @@ OrganizationsCollection = extending(EntitiesCollection, (function() {
 	};
 	
 	return OrganizationsCollection;
-}()));
-/**
- * @requires ../Class.OneEntity.js
- */
-/**
- * @class RegistrationField
- * @extends OneEntity
- */
-RegistrationField = extending(OneEntity, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs RegistrationField
-	 *
-	 * @property {?string} form_field_uuid
-	 * @property {?string} form_field_label
-	 * @property {?RegistrationField.TYPES} form_field_type
-	 * @property {?number} form_field_type_id
-	 * @property {?boolean} form_field_required
-	 * @property {?string} value
-	 * @property {?Array<RegistrationSelectFieldValue>} values
-	 *
-	 * @property {?string} uuid
-	 * @property {?string} label
-	 * @property {?RegistrationField.TYPES} type
-	 * @property {?boolean} required
-	 *
-	 * @property {?timestamp} created_at
-	 * @property {?timestamp} updated_at
-	 */
-	function RegistrationField() {
-		var self = this;
-		
-		this.form_field_uuid = null;
-		this.form_field_label = null;
-		this.form_field_type = null;
-		this.form_field_type_id = null;
-		this.form_field_required = null;
-		this.value = null;
-		this.values = [];
-		
-		this.created_at = null;
-		this.updated_at = null;
-		
-		Object.defineProperties(this, {
-			uuid: {
-				get: function() {
-					return self.form_field_uuid;
-				},
-				set: function(val) {
-					return self.form_field_uuid = val;
-				}
-			},
-			label: {
-				get: function() {
-					return self.form_field_label;
-				},
-				set: function(val) {
-					return self.form_field_label = val;
-				}
-			},
-			type: {
-				get: function() {
-					return self.form_field_type;
-				},
-				set: function(val) {
-					return self.form_field_type = val;
-				}
-			},
-			required: {
-				get: function() {
-					return self.form_field_required;
-				},
-				set: function(val) {
-					return self.form_field_required = val;
-				}
-			}
-		});
-	}
-	
-	RegistrationField.prototype.ID_PROP_NAME = 'form_field_uuid';
-	/**
-	 *
-	 * @alias RegistrationFieldModel.TYPES
-	 */
-	RegistrationField.TYPES = RegistrationFieldModel.TYPES;
-	/**
-	 *
-	 * @alias RegistrationFieldModel.DEFAULT_LABEL
-	 */
-	RegistrationField.DEFAULT_LABEL = RegistrationFieldModel.DEFAULT_LABEL;
-	/**
-	 *
-	 * @param {(RegistrationField|RegistrationFieldLike)} field
-	 *
-	 * @return {boolean}
-	 */
-	RegistrationField.isCustomField = RegistrationFieldModel.isCustomField;
-	
-	
-	return RegistrationField;
-}()));
-/**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.RegistrationField.js
- */
-/**
- *
- * @class RegistrationFieldsCollection
- * @extends EntitiesCollection
- */
-RegistrationFieldsCollection = extending(EntitiesCollection, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs RegistrationFieldsCollection
-	 *
-	 * @property {Object<RegistrationFieldModel.TYPES, Array<RegistrationField>>} __types
-	 */
-	function RegistrationFieldsCollection() {
-		EntitiesCollection.call(this);
-		
-		Object.defineProperties(this, {
-			__types: {
-				value: {},
-				writable: true,
-				enumerable: false,
-				configurable: false
-			}
-		});
-		
-		for ( var type_name in RegistrationFieldModel.TYPES ) {
-			if (RegistrationFieldModel.TYPES.hasOwnProperty(type_name)) {
-				this.__types[RegistrationFieldModel.TYPES[type_name]] = [];
-			}
-		}
-		Object.freeze(this.__types);
-	}
-	RegistrationFieldsCollection.prototype.collection_of = RegistrationField;
-	/**
-	 *
-	 * @param {RegistrationField} entity
-	 */
-	RegistrationFieldsCollection.prototype.createAdditionalLookup = function(entity) {
-		if (entity instanceof RegistrationField) {
-			this.__types[entity.type].push(entity);
-		}
-	};
-	
-	return RegistrationFieldsCollection;
 }()));
 /**
  * @requires ../Class.OneEntity.js
@@ -15613,7 +15630,7 @@ AbstractEditEventPage = extending(Page, (function() {
 		});
 	}
 	
-	AbstractEditEventPage.lastRegistrationCustomFieldId = 0;
+	AbstractEditEventPage.lastRegistrationFieldId = 0;
 	AbstractEditEventPage.lastTicketTypeRowId = 0;
 	/**
 	 *
@@ -15626,7 +15643,7 @@ AbstractEditEventPage = extending(Page, (function() {
 		
 		$fields = tmpl('edit-event-registration-custom-field', registration_data.filter(function(data) {
 			if (RegistrationFieldModel.isCustomField(data)) {
-				data.id = data.id ? data.id : AbstractEditEventPage.lastRegistrationCustomFieldId++;
+				data.id = data.id ? data.id : AbstractEditEventPage.lastRegistrationFieldId++;
 				return true;
 			}
 			return false;
@@ -15668,10 +15685,6 @@ AbstractEditEventPage = extending(Page, (function() {
 				$fields.find('#edit_event_registration_'+data.id+'_field_type').select2('val', data.type);
 			}
 		});
-		/*
-		$fields.find('.RemoveRegistrationCustomField').on('click.RemoveRegistrationCustomField', function() {
-			$(this).closest('.RegistrationCustomField').remove();
-		});*/
 		$fields.find('.RegistrationCustomFieldLabel, .RegistrationCustomFieldType').on('change.RemoveRegistrationFieldUUID', function() {
 			$(this).closest('.RegistrationCustomField').find('.RegistrationCustomFieldUUID').val('');
 		});
@@ -16019,6 +16032,9 @@ AbstractEditEventPage = extending(Page, (function() {
 					if (form_data['registration_' + id + '_field_label']) {
 						field.label = form_data['registration_' + id + '_field_label'].trim();
 					}
+					if (form_data['registration_' + id + '_field_order_number']) {
+						field.order_number = form_data['registration_' + id + '_field_order_number'] || null;
+					}
 					
 					if (form_data['registration_' + id + '_field_values']) {
 						field.values = form_data['registration_' + id + '_field_values'].map(function(value_id) {
@@ -16335,7 +16351,8 @@ AbstractEditEventPage = extending(Page, (function() {
 			$bottom_nav_buttons = PAGE.$wrapper.find('.EditEventBottomButtons').children(),
 			$next_page_button = $bottom_nav_buttons.filter('.EditEventNextPageButton'),
 			$prev_page_button = $bottom_nav_buttons.filter('.EditEventPrevPageButton'),
-			$submit_button = $bottom_nav_buttons.filter('.EditEventSubmitButton');
+			$submit_button = $bottom_nav_buttons.filter('.EditEventSubmitButton'),
+			$sortable_custom_fields = PAGE.$wrapper.find('.RegistrationFields');
 		
 		bindDatePickers(PAGE.$wrapper);
 		bindSelect2(PAGE.$wrapper);
@@ -16596,35 +16613,51 @@ AbstractEditEventPage = extending(Page, (function() {
 			PAGE.$wrapper.find('#edit_event_placepicker').prop('required', !$(this).prop('checked'));
 		});
 		
-		PAGE.$wrapper.find('.RegistrationFields').sortable({
+		function reorder() {
+			$sortable_custom_fields.find('.RegistrationFieldOrderNumber').val('').filter(function(){
+				
+				return $(this).closest(':disabled').length === 0;
+			}).each(function(i) {
+				$(this).val(i+1);
+			});
+		}
+		
+		$sortable_custom_fields = PAGE.$wrapper.find('.RegistrationFields').sortable({
 			scroll : true,
+			animation: 150,
 			draggable: '.Draggable',
 			handle: '.DragHandle',
 			filter: '.RemoveRegistrationCustomField',
-			ghostClass: 'edit_event_registration_field_ghost',
 			onFilter: function(e) {
 				$(e.item).closest('.RegistrationCustomField').remove();
-			}
+				reorder();
+			},
+			onEnd: reorder
 		});
 		
+		$sortable_custom_fields.find('.PredefinedFieldSwitch').on('change', reorder);
+		
 		PAGE.$wrapper.find('.AddRegistrationCustomField').off('click.AddRegistrationCustomField').on('click.AddRegistrationCustomField', function() {
-			AbstractEditEventPage.registrationCustomFieldBuilder().insertBefore($(this));
+			$sortable_custom_fields.append(AbstractEditEventPage.registrationCustomFieldBuilder());
+			reorder();
 		});
 		
 		PAGE.$wrapper.find('.RegistrationPreview').on('click.RegistrationPreview', function() {
-			var form_data = $(this).closest('form').serializeForm(),
+			var $this = $(this),
+				form_data = $(this).closest('fieldset').serializeForm(),
 				registration_fields = new RegistrationFieldModelsCollection(),
 				event = new OneEvent(),
-				modal;
+				modal = $this.data('modal');
 			
 			if (form_data.registration_fields) {
-				registration_fields.setData(form_data.registration_fields.sort().map(function(field) {
+				registration_fields.setData(form_data.registration_fields.map(function(field) {
 					
 					return {
 						uuid: guid(),
 						type: form_data['registration_'+field+'_field_type'],
 						label: form_data['registration_'+field+'_field_label'] || RegistrationFieldModel.DEFAULT_LABEL[form_data['registration_'+field+'_field_type'].toUpperCase()],
 						required: form_data['registration_'+field+'_field_required'],
+						order_number: form_data['registration_'+field+'_field_order_number'],
 						values: form_data['registration_'+field+'_field_values'] ? form_data['registration_'+field+'_field_values'].map(function(value_id) {
 							var value = new RegistrationSelectFieldValue();
 							
@@ -16634,12 +16667,17 @@ AbstractEditEventPage = extending(Page, (function() {
 							return value;
 						}) : null
 					};
-				}))
+				})).sortByOrder();
 			}
 			form_data.registration_fields = registration_fields;
 			event.setData(form_data);
 			
+			if (modal instanceof PreviewRegistrationModal) {
+				modal.destroy();
+			}
+			
 			modal = new PreviewRegistrationModal(event);
+			$this.data('modal', modal);
 			modal.show();
 		});
 		
@@ -16758,10 +16796,34 @@ AbstractEditEventPage = extending(Page, (function() {
 		});
 		
 		this.render_vars.registration_predefined_fields = tmpl('edit-event-registration-predefined-field', [
-			{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'last_name', name: 'Фамилия', description: 'Текстовое поле для ввода фамилии'},
-			{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'first_name', name: 'Имя', description: 'Текстовое поле для ввода имени'},
-			{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'email', name: 'E-mail', description: 'Текстовое поле для ввода адреса электронной почты'},
-			{id: AbstractEditEventPage.lastRegistrationCustomFieldId++, type: 'phone_number', name: 'Номер телефона', description: 'Текстовое поля для ввода номера телефона'}
+			{
+				id: AbstractEditEventPage.lastRegistrationFieldId++,
+				order_number: AbstractEditEventPage.lastRegistrationFieldId,
+				type: 'last_name',
+				name: 'Фамилия',
+				description: 'Текстовое поле для ввода фамилии'
+			},
+			{
+				id: AbstractEditEventPage.lastRegistrationFieldId++,
+				order_number: AbstractEditEventPage.lastRegistrationFieldId,
+				type: 'first_name',
+				name: 'Имя',
+				description: 'Текстовое поле для ввода имени'
+			},
+			{
+				id: AbstractEditEventPage.lastRegistrationFieldId++,
+				order_number: AbstractEditEventPage.lastRegistrationFieldId,
+				type: 'email',
+				name: 'E-mail',
+				description: 'Текстовое поле для ввода адреса электронной почты'
+			},
+			{
+				id: AbstractEditEventPage.lastRegistrationFieldId++,
+				order_number: AbstractEditEventPage.lastRegistrationFieldId,
+				type: 'phone_number',
+				name: 'Номер телефона',
+				description: 'Текстовое поля для ввода номера телефона'
+			}
 		]);
 		
 		this.render_vars.add_ticket_type_button = __APP.BUILD.actionButton({
@@ -16887,6 +16949,13 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 	};
 	
 	EditEventPage.prototype.preRender = function() {
+		var predefined_fields = {
+				last_name: {type: 'last_name', name: 'Фамилия', description: 'Текстовое поле для ввода фамилии'},
+				first_name: {type: 'first_name', name: 'Имя', description: 'Текстовое поле для ввода имени'},
+				email: {type: 'email', name: 'E-mail', description: 'Текстовое поле для ввода адреса электронной почты'},
+				phone_number: {type: 'phone_number', name: 'Номер телефона', description: 'Текстовое поля для ввода номера телефона'}
+			},
+			registration_fields = [];
 		AbstractEditEventPage.prototype.preRender.call(this);
 		
 		this.render_vars.button_text = 'Сохранить';
@@ -16903,6 +16972,24 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 			{},
 			{target: '_blank'}
 		) : '';
+		
+		if (this.event.registration_fields.length) {
+			this.event.registration_fields.filter(RegistrationFieldModel.isPredefinedField).sort(function(a, b) {
+			
+				return a.order_number - b.order_number;
+			}).forEach(function(field) {
+				predefined_fields[field.type].id = AbstractEditEventPage.lastRegistrationFieldId++;
+				predefined_fields[field.type].order_number = field.order_number;
+				registration_fields.push(predefined_fields[field.type]);
+				delete predefined_fields[field.type];
+			});
+			Object.values(predefined_fields).forEach(function(field) {
+				field.id = AbstractEditEventPage.lastRegistrationFieldId++;
+				registration_fields.push(field);
+			});
+			
+			this.render_vars.registration_predefined_fields = tmpl('edit-event-registration-predefined-field', registration_fields);
+		}
 	};
 	
 	EditEventPage.prototype.init = function() {
@@ -19446,91 +19533,6 @@ AdminOrganizationsPage = extending(AdminPage, (function() {
 	return AdminOrganizationsPage;
 }()));
 /**
- * @requires ../Class.Page.js
- */
-/**
- *
- * @class OnboardingPage
- * @extends Page
- */
-OnboardingPage = extending(Page, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs OnboardingPage
-	 */
-	function OnboardingPage() {
-		Page.apply(this, arguments);
-		this.ajax_data = {
-			length: 30,
-			offset: 0,
-			fields: 'img_small_url'
-		};
-		this.state_name = 'onboarding_page';
-		this.is_upload_disabled = false;
-		this.block_scroll = true;
-	}
-	
-	OnboardingPage.prototype.init = function() {
-		bindRippleEffect(this.$wrapper);
-		bindPageLinks(this.$wrapper);
-		this.$wrapper.find('.Link').on('click', function() {
-			if($(this).is('.SkipOnboarding')){
-				cookies.setItem('skip_onboarding', 1, moment().add(7, 'd')._d);
-			}
-			__APP.SIDEBAR.updateSubscriptions();
-		});
-	};
-	
-	OnboardingPage.prototype.bindSubscriptions = function() {
-		this.$wrapper.find(".OnboardingOrgItem").not('.-Handled_OnboardingOrgItem').on('click', function() {
-			var $this = $(this);
-			if ($this.hasClass(__C.CLASSES.ACTIVE)) {
-				__APP.USER.unsubscribeFromOrganization($this.data("organization_id"));
-			} else {
-				__APP.USER.subscribeToOrganization($this.data("organization_id"));
-			}
-			$this.toggleClass(__C.CLASSES.ACTIVE);
-		}).addClass('-Handled_OnboardingOrgItem');
-	};
-	
-	OnboardingPage.prototype.render = function() {
-		var PAGE = this,
-			$loader = tmpl('loader', {});
-		
-		if(__APP.USER.id === -1){
-			__APP.changeState('/feed/actual', true, true);
-			return null;
-		}
-		function appendRecommendations(organizations) {
-			$loader.detach();
-			if (organizations.length) {
-				PAGE.$wrapper.find(".RecommendationsWrapper").last().append(tmpl("onboarding-recommendation", organizations));
-				PAGE.bindSubscriptions();
-				PAGE.block_scroll = false;
-			} else {
-				PAGE.is_upload_disabled = true;
-			}
-		}
-		
-		PAGE.$wrapper.html(tmpl("onboarding-main", {}));
-		PAGE.init();
-		PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
-		OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
-		PAGE.$wrapper.find(".RecommendationsScrollbar").scrollbar({
-			onScroll: function(y, x) {
-				if (y.scroll == y.maxScroll && !PAGE.is_upload_disabled && !PAGE.block_scroll) {
-					PAGE.block_scroll = true;
-					PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
-					OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
-				}
-			}
-		});
-	};
-	
-	return OnboardingPage
-}()));
-/**
  * @requires Class.AbstractEditEventPage.js
  */
 /**
@@ -20048,6 +20050,91 @@ EventPage = extending(Page, (function() {
 	return EventPage;
 }()));
 
+/**
+ * @requires ../Class.Page.js
+ */
+/**
+ *
+ * @class OnboardingPage
+ * @extends Page
+ */
+OnboardingPage = extending(Page, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs OnboardingPage
+	 */
+	function OnboardingPage() {
+		Page.apply(this, arguments);
+		this.ajax_data = {
+			length: 30,
+			offset: 0,
+			fields: 'img_small_url'
+		};
+		this.state_name = 'onboarding_page';
+		this.is_upload_disabled = false;
+		this.block_scroll = true;
+	}
+	
+	OnboardingPage.prototype.init = function() {
+		bindRippleEffect(this.$wrapper);
+		bindPageLinks(this.$wrapper);
+		this.$wrapper.find('.Link').on('click', function() {
+			if($(this).is('.SkipOnboarding')){
+				cookies.setItem('skip_onboarding', 1, moment().add(7, 'd')._d);
+			}
+			__APP.SIDEBAR.updateSubscriptions();
+		});
+	};
+	
+	OnboardingPage.prototype.bindSubscriptions = function() {
+		this.$wrapper.find(".OnboardingOrgItem").not('.-Handled_OnboardingOrgItem').on('click', function() {
+			var $this = $(this);
+			if ($this.hasClass(__C.CLASSES.ACTIVE)) {
+				__APP.USER.unsubscribeFromOrganization($this.data("organization_id"));
+			} else {
+				__APP.USER.subscribeToOrganization($this.data("organization_id"));
+			}
+			$this.toggleClass(__C.CLASSES.ACTIVE);
+		}).addClass('-Handled_OnboardingOrgItem');
+	};
+	
+	OnboardingPage.prototype.render = function() {
+		var PAGE = this,
+			$loader = tmpl('loader', {});
+		
+		if(__APP.USER.id === -1){
+			__APP.changeState('/feed/actual', true, true);
+			return null;
+		}
+		function appendRecommendations(organizations) {
+			$loader.detach();
+			if (organizations.length) {
+				PAGE.$wrapper.find(".RecommendationsWrapper").last().append(tmpl("onboarding-recommendation", organizations));
+				PAGE.bindSubscriptions();
+				PAGE.block_scroll = false;
+			} else {
+				PAGE.is_upload_disabled = true;
+			}
+		}
+		
+		PAGE.$wrapper.html(tmpl("onboarding-main", {}));
+		PAGE.init();
+		PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
+		OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
+		PAGE.$wrapper.find(".RecommendationsScrollbar").scrollbar({
+			onScroll: function(y, x) {
+				if (y.scroll == y.maxScroll && !PAGE.is_upload_disabled && !PAGE.block_scroll) {
+					PAGE.block_scroll = true;
+					PAGE.$wrapper.find('.RecommendationsWrapper').last().append($loader);
+					OrganizationsCollection.fetchRecommendations(PAGE.ajax_data, appendRecommendations);
+				}
+			}
+		});
+	};
+	
+	return OnboardingPage
+}()));
 /**
  * @requires ../Class.Page.js
  */
