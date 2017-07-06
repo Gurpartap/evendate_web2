@@ -178,10 +178,10 @@ AbstractEditEventPage = extending(Page, (function() {
 				$fields.find('#edit_event_registration_'+data.id+'_field_type').select2('val', data.type);
 			}
 		});
-		
+		/*
 		$fields.find('.RemoveRegistrationCustomField').on('click.RemoveRegistrationCustomField', function() {
 			$(this).closest('.RegistrationCustomField').remove();
-		});
+		});*/
 		$fields.find('.RegistrationCustomFieldLabel, .RegistrationCustomFieldType').on('change.RemoveRegistrationFieldUUID', function() {
 			$(this).closest('.RegistrationCustomField').find('.RegistrationCustomFieldUUID').val('');
 		});
@@ -1104,6 +1104,17 @@ AbstractEditEventPage = extending(Page, (function() {
 		
 		PAGE.$wrapper.find('.EditEventIsOnline').off('change.OnlineEvent').on('change.OnlineEvent', function() {
 			PAGE.$wrapper.find('#edit_event_placepicker').prop('required', !$(this).prop('checked'));
+		});
+		
+		PAGE.$wrapper.find('.RegistrationFields').sortable({
+			scroll : true,
+			draggable: '.Draggable',
+			handle: '.DragHandle',
+			filter: '.RemoveRegistrationCustomField',
+			ghostClass: 'edit_event_registration_field_ghost',
+			onFilter: function(e) {
+				$(e.item).closest('.RegistrationCustomField').remove();
+			}
 		});
 		
 		PAGE.$wrapper.find('.AddRegistrationCustomField').off('click.AddRegistrationCustomField').on('click.AddRegistrationCustomField', function() {
