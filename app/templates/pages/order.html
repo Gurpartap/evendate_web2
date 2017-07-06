@@ -1,19 +1,24 @@
 <script type="javascript/template" id="tmpl-order-page">
-	<form class="order_page OrderForm">
-		{tickets_selling}
-		{registration}
-		<footer class="order_page_footer">
-			<div class="form_unit">
-				<input id="order_agreement" class="form_checkbox Switch" type="checkbox" data-switch_id="order_agreement" required>
-				<label class="form_label" for="order_agreement">
-					<span>Я согласен c условиями Пользовательского соглашения и Договором оказания услуг по организации мероприятия</span>
-				</label>
-			</div>
-			<fieldset class="Switching -align_center" data-switch_id="order_agreement" disabled>
-				{main_action_button}
-			</fieldset>
-		</footer>
-	</form>
+	<div class="order_page OrderPage">
+		<fieldset class="OrderFormWrapper">
+			<form class="order_form OrderForm">
+				{tickets_selling}
+				{registration}
+				<footer class="order_page_footer">
+					<div class="form_unit">
+						<input id="order_agreement" class="form_checkbox Switch" type="checkbox" data-switch_id="order_agreement" required>
+						<label class="form_label" for="order_agreement">
+							<span>Я согласен c условиями Пользовательского соглашения и Договором оказания услуг по организации мероприятия</span>
+						</label>
+					</div>
+					<fieldset class="Switching -align_center" data-switch_id="order_agreement" disabled>
+						{main_action_button}
+					</fieldset>
+				</footer>
+				{overlay_cap}
+			</form>
+		</fieldset>
+	</div>
 </script>
 
 <script type="javascript/template" id="tmpl-order-tickets-selling">
@@ -45,4 +50,10 @@
 	<fieldset class="order_registration_fields material RegistrationFields">
 		{registration_fields}
 	</fieldset>
+</script>
+
+<script type="javascript/template" id="tmpl-order-overlay-cap-content">
+	<p>{message}</p>
+	<div class="form_unit">{return_button}</div>
+	<div class="form_unit">{tickets_button}</div>
 </script>
