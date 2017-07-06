@@ -133,7 +133,7 @@ OrderPage = extending(Page, (function() {
 	OrderPage.prototype.disablePage = function(message) {
 		var self = this;
 		
-		this.$wrapper.find('.OrderForm').addClass(__C.CLASSES.DISABLED).attr('disabled', true);
+		this.$wrapper.find('.OrderFormWrapper').addClass(__C.CLASSES.DISABLED).attr('disabled', true);
 		
 		this.$wrapper.find('.OrderPage').append(__APP.BUILD.overlayCap(tmpl('order-overlay-cap-content', {
 			message: message,
