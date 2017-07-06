@@ -3,27 +3,27 @@
  */
 /**
  *
- * @class RegisterButton
+ * @class OrderButton
  * @extends ActionButton
  */
-RegisterButton = extending(ActionButton, (function() {
+OrderButton = extending(ActionButton, (function() {
 	/**
 	 *
 	 * @param {OneEvent} event
 	 * @param {object} [options]
 	 * @constructor
-	 * @constructs RegisterButton
+	 * @constructs OrderButton
 	 *
 	 * @property {OneEvent} event
-	 * @property {(RegistrationModal|TicketsModal)} modal
+	 * @property {TicketsModal} modal
 	 */
-	function RegisterButton(event, options) {
+	function OrderButton(event, options) {
 		this.options = {
 			labels: {
-				checked: 'Зарегистрирован',
-				unchecked: 'Регистрация',
+				checked: event.ticketing_locally ? 'Куплен' : 'Зарегистрирован',
+				unchecked: event.ticketing_locally ? 'Купить' : 'Регистрация',
 				checked_hover: 'Открыть билеты',
-				unchecked_hover: 'Регистрация'
+				unchecked_hover: event.ticketing_locally ? 'Купить' : 'Регистрация'
 			},
 			colors: {
 				checked: __C.CLASSES.COLORS.ACCENT,
@@ -33,56 +33,35 @@ RegisterButton = extending(ActionButton, (function() {
 			},
 			icons: {
 				checked: __C.CLASSES.ICONS.CHECK,
-				unchecked: __C.CLASSES.ICONS.PENCIL,
+				unchecked: event.ticketing_locally ? __C.CLASSES.ICONS.TICKET : __C.CLASSES.ICONS.PENCIL,
 				checked_hover: __C.CLASSES.ICONS.TICKET,
-				unchecked_hover: __C.CLASSES.ICONS.PENCIL
+				unchecked_hover: event.ticketing_locally ? __C.CLASSES.ICONS.TICKET : __C.CLASSES.ICONS.PENCIL
 			}
 		};
 		this.event = event;
 		this.modal = null;
-		options.is_checked = event.is_registered;
+		this.is_disabled = !this.event.registration_available && (!this.event.is_registered || (this.event.ticketing_locally && this.event.tickets.length === 0));
+		options.is_checked = event.is_registered || (event.ticketing_locally && event.tickets.length > 0);
 		ActionButton.call(this, options);
 	}
 	
-	RegisterButton.prototype.checked_state_class = '-Registered';
+	OrderButton.prototype.checked_state_class = '-Ordered';
 	
-	RegisterButton.prototype.onClick = function() {
+	OrderButton.prototype.onClick = function() {
 		var self = this,
 			tickets_fields = ['created_at', 'number', 'ticket_type', 'order'],
 			events_fields = ['dates', 'is_same_time', 'image_horizontal_medium_url', 'location'],
 			ticket,
 			promise;
 		
-		/**
-		 *
-		 * @param {RegistrationModal} modal
-		 * @param {RegisterButton} button
-		 */
-		function showRegistrationModal(modal, button) {
-			modal.show();
-			modal.modal.one('registration:success', function() {
-				modal.event.is_registered = true;
-				button.afterCheck();
-			});
-		}
-		
-		if (!this.event.registration_available && !this.event.is_registered) {
+		if (this.is_disabled) {
 			this.off('click.RippleEffect').addClass(__C.CLASSES.HOOKS.HANDLED + __C.CLASSES.HOOKS.RIPPLE);
+			
 			return false;
 		}
 		
-		if (!this.event.is_registered) {
-			if (this.modal && this.modal instanceof RegistrationModal) {
-				showRegistrationModal(this.modal, this);
-			} else if (this.event.registration_fields.length) {
-				this.modal = new RegistrationModal(this.event);
-				showRegistrationModal(this.modal, this)
-			} else {
-				this.event.fetchEvent(new Fields('registration_fields')).done(function() {
-					self.modal = new RegistrationModal(self.event);
-					showRegistrationModal(self.modal, self)
-				});
-			}
+		if (this.event.registration_available && !this.event.is_registered || this.event.ticketing_locally && this.event.tickets.length === 0) {
+			__APP.changeState('/event/' + this.event.id + '/order');
 		} else {
 			if (this.modal && this.modal instanceof TicketsModal) {
 				this.modal.show();
@@ -113,14 +92,13 @@ RegisterButton = extending(ActionButton, (function() {
 		
 	};
 	
-	RegisterButton.prototype.initiate = function() {
-		if (!this.event.registration_available && !this.event.is_registered) {
+	OrderButton.prototype.initiate = function() {
+		if (this.is_disabled) {
 			this.attr('disabled', true);
 		} else {
 			ActionButton.prototype.initiate.call(this);
 		}
 	};
 	
-	
-	return RegisterButton;
+	return OrderButton;
 }()));

@@ -1728,7 +1728,7 @@ function isKeyPressed(event, key) {
  */
 function empty(variable) {
 	
-	return variable == null || $.isEmptyObject(variable) || (variable instanceof Array && variable.length === 0);
+	return variable == null || (typeof variable === 'object' && $.isEmptyObject(variable)) || (variable instanceof Array && variable.length === 0);
 }
 /**
  *

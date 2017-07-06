@@ -1032,25 +1032,22 @@ Builder = (function() {
 				avatars_collection_classes.push(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
 			}
 			
-			if (event.is_favorite != null) {
+			if (!empty(event.is_favorite)) {
 				if (event.registration_locally || event.ticketing_locally) {
-					$action_buttons = $action_buttons.add(new AddToFavoriteButton(event.id, {
-						is_add_avatar: true,
-						is_checked: event.is_favorite,
-						classes: [
-							__C.CLASSES.UNIVERSAL_STATES.EMPTY,
-							__C.CLASSES.SIZES.LOW,
-							__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
-							__C.CLASSES.HOOKS.ADD_TO_FAVORITES,
-							__C.CLASSES.HOOKS.RIPPLE
-						],
-						labels: null
-					}));
-					
-					if (event.ticketing_locally) {
-					
-					} else {
-						$action_buttons = $action_buttons.add(new RegisterButton(event, {
+					$action_buttons = $action_buttons
+						.add(new AddToFavoriteButton(event.id, {
+							is_add_avatar: true,
+							is_checked: event.is_favorite,
+							classes: [
+								__C.CLASSES.UNIVERSAL_STATES.EMPTY,
+								__C.CLASSES.SIZES.LOW,
+								__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+								__C.CLASSES.HOOKS.ADD_TO_FAVORITES,
+								__C.CLASSES.HOOKS.RIPPLE
+							],
+							labels: null
+						}))
+						.add(new OrderButton(event, {
 							classes: [
 								'event_block_main_action_button',
 								__C.CLASSES.SIZES.LOW,
@@ -1059,7 +1056,6 @@ Builder = (function() {
 								__C.CLASSES.HOOKS.RIPPLE
 							]
 						}));
-					}
 				} else {
 					$action_buttons = new AddToFavoriteButton(event.id, {
 						is_add_avatar: true,
@@ -1216,18 +1212,14 @@ Builder = (function() {
 					}
 				});
 				
-				if (event.ticketing_locally) {
-				
-				} else {
-					$action_button = new RegisterButton(event, {
-						classes: [
-							__C.CLASSES.SIZES.LOW,
-							__C.CLASSES.SIZES.WIDE,
-							__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
-							__C.CLASSES.HOOKS.RIPPLE
-						]
-					});
-				}
+				$action_button = new OrderButton(event, {
+					classes: [
+						__C.CLASSES.SIZES.LOW,
+						__C.CLASSES.SIZES.WIDE,
+						__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+						__C.CLASSES.HOOKS.RIPPLE
+					]
+				});
 			} else {
 				$action_button = new AddToFavoriteButton(event.id, {
 					is_add_avatar: true,

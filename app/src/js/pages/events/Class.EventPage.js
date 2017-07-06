@@ -336,11 +336,9 @@ EventPage = extending(Page, (function() {
 		
 		this.render_vars.action_buttons = this.render_vars.action_buttons.add(new AddToFavoriteButton(this.event.id, add_to_favorite_button_props));
 		
-		if (this.event.ticketing_locally) {
-		
-		} else {
+		if (this.event.ticketing_locally || this.event.registration_locally) {
 			this.render_vars.action_buttons = this.render_vars.action_buttons.add(
-				new RegisterButton(this.event, {
+				new OrderButton(this.event, {
 					classes: [
 						'event_main_action_button',
 						__C.CLASSES.SIZES.LOW,
