@@ -245,12 +245,46 @@ class UsersCollection extends AbstractCollection
 																$format)
 	{
 
-		$data = self::filter($db,
-			$user,
-			$filters,
-			$fields,
-			$pagination,
-			$order_by ?? array())->getData();
+		$q_get_users = App::queryFactory()->newSelect();
+		$q_get_users->from('view_users')
+			->cols(array(
+				'first_name',
+				'last_name',
+				'middle_name',
+				'gender',
+				'avatar_url',
+				'(SELECT  CASE 
+					WHEN u.vk_uid IS NOT NULL THEN \'https://vk.com/id\' || u.vk_uid
+					WHEN u.facebook_uid IS NOT NULL THEN \'https://facebook.com/\' || u.facebook_uid
+					WHEN u.google_uid IS NOT NULL THEN \'https://plus.google.com/\' || u.google_uid
+					ELSE NULL
+				END
+				FROM users AS u
+				WHERE u.id = view_users.id) AS link',
+				'email',
+				'(SELECT COUNT(id) FROM subscriptions WHERE user_id = view_users.id AND status = TRUE) AS subscriptions_count',
+				'(SELECT COUNT(view_favorite_events.event_id) 
+					FROM view_favorite_events
+					 INNER JOIN events ON events.id = view_favorite_events.event_id 
+					WHERE user_id = view_users.id 
+					AND events.organization_id = :organization_id
+					AND status = TRUE) AS favored_count',
+				'vk_uid',
+				'facebook_uid',
+				'google_uid',
+				'(SELECT array_to_json(array_agg(row_to_json(t)))
+				FROM (
+					SELECT auditory_interests.tg_topic_id, tg_topics.keyword AS topic_name, auditory_interests.value
+					FROM auditory_interests
+					INNER JOIN tg_topics ON auditory_interests.tg_topic_id = tg_topics.id
+					WHERE auditory_interests.user_id = view_users.id
+					) t)  AS interests'
+			))
+			->join('INNER', 'subscriptions', 'view_users.id = subscriptions.user_id')
+			->where('subscriptions.status = TRUE')
+			->where('subscriptions.organization_id = :organization_id ');
+
+		$data = $db->prepareExecute($q_get_users, '', array(':organization_id' => $filters['organization']->getId()))->fetchAll();
 
 		global $BACKEND_FULL_PATH;
 
@@ -265,11 +299,11 @@ class UsersCollection extends AbstractCollection
 			$column_names[App::$__LANG]['user']['avatar_url'],
 			$column_names[App::$__LANG]['user']['link'],
 			$column_names[App::$__LANG]['user']['email'],
-			$column_names[App::$__LANG]["user"]["subscriptions_count"],
-			$column_names[App::$__LANG]["user"]["favored_count"],
-			$column_names[App::$__LANG]["user"]["vk_uid"],
-			$column_names[App::$__LANG]["user"]["facebook_uid"],
-			$column_names[App::$__LANG]["user"]["google_uid"]);
+			$column_names[App::$__LANG]['user']['subscriptions_count'],
+			$column_names[App::$__LANG]['user']['favored_count'],
+			$column_names[App::$__LANG]['user']['vk_uid'],
+			$column_names[App::$__LANG]['user']['facebook_uid'],
+			$column_names[App::$__LANG]['user']['google_uid']);
 		$rows = array();
 
 		foreach ($data as &$user) {
@@ -281,18 +315,23 @@ class UsersCollection extends AbstractCollection
 				$column_names[App::$__LANG]['user']['avatar_url'] => $user['avatar_url'],
 				$column_names[App::$__LANG]['user']['link'] => $user['link'],
 				$column_names[App::$__LANG]['user']['email'] => $user['email'] ?? '',
-				$column_names[App::$__LANG]["user"]["subscriptions_count"] => count($user['subscriptions']),
-				$column_names[App::$__LANG]["user"]["favored_count"] => count($user['favored']),
-				$column_names[App::$__LANG]["user"]["vk_uid"] => $user['vk_uid'],
-				$column_names[App::$__LANG]["user"]["facebook_uid"] => $user['facebook_uid'],
-				$column_names[App::$__LANG]["user"]["google_uid"] => $user['google_uid']
+				$column_names[App::$__LANG]['user']['subscriptions_count'] => $user['subscriptions_count'],
+				$column_names[App::$__LANG]['user']['favored_count'] => $user['favored_count'],
+				$column_names[App::$__LANG]['user']['vk_uid'] => $user['vk_uid'],
+				$column_names[App::$__LANG]['user']['facebook_uid'] => $user['facebook_uid'],
+				$column_names[App::$__LANG]['user']['google_uid'] => $user['google_uid']
 			);
 
+			try{
+				$user['interests'] = json_decode($user['interests'], true);
+			}catch (Exception $e){
+				$user['interests'] = array();
+			}
 
 			if (is_array($user['interests'])) {
 				foreach ($user['interests'] as $interest) {
 					$_row[$interest['topic_name']] = $interest['value'];
-					if (!in_array($interest['topic_name'], $headers)){
+					if (!in_array($interest['topic_name'], $headers)) {
 						$headers[] = $interest['topic_name'];
 					}
 				}
@@ -301,9 +340,9 @@ class UsersCollection extends AbstractCollection
 			$rows[] = $_row;
 		}
 		$res = array($headers);
-		foreach($rows as &$user){
+		foreach ($rows as &$user) {
 			$_row = array();
-			foreach($headers as $col){
+			foreach ($headers as $col) {
 				$_row[] = $user[$col] ?? '';
 			}
 			$res[] = $_row;
