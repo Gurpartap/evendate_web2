@@ -1783,10 +1783,17 @@ class Event extends AbstractEntity
 			}
 		}
 
+		$_tickets = TicketsCollection::filter($this->db, $user, array('order' => $order), array())->getData();
+		$sum = 0;
+		foreach($_tickets as $_ticket){
+			$sum += (float) $_ticket['price'];
+		}
+
 		return new Result(true, '', array(
 			'registration_fields' => $return_fields,
 			'order' => $order->getParams($user, Order::getDefaultCols())->getData(),
-			'tickets' => TicketsCollection::filter($this->db, $user, array('order' => $order), array())->getData()
+			'tickets' => $_tickets,
+			'sum' => $sum
 		));
 	}
 

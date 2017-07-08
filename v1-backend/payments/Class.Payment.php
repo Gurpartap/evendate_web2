@@ -92,7 +92,7 @@ class Payment
 		}
 	}
 
-	private static function getPayedTill(ExtendedPDO $db, $organization_id) : DateTime
+	private static function getPayedTill(ExtendedPDO $db, $organization_id): DateTime
 	{
 		$q_get = App::queryFactory()->newSelect();
 		$q_get->from('view_payments')
