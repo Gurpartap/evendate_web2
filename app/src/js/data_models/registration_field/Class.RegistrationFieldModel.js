@@ -17,6 +17,13 @@ RegistrationFieldModel = extending(OneEntity, (function() {
 	 *
 	 * @constructor
 	 * @constructs RegistrationFieldModel
+	 *
+	 * @property {?string} uuid
+	 * @property {?RegistrationFieldModel.TYPES} type
+	 * @property {?string} label
+	 * @property {?number} order_number
+	 * @property {boolean} required
+	 * @property {(Array|Array<RegistrationSelectFieldValue>)} values
 	 */
 	function RegistrationFieldModel() {
 		this.uuid = null;
@@ -26,7 +33,9 @@ RegistrationFieldModel = extending(OneEntity, (function() {
 		 */
 		this.type = null;
 		this.label = null;
-		this.required = false;
+		this.order_number = null;
+		this.required = setDefaultValue(null, false);
+		this.values = [];
 	}
 	/**
 	 *
@@ -77,6 +86,14 @@ RegistrationFieldModel = extending(OneEntity, (function() {
 			case RegistrationFieldModel.TYPES.SELECT:
 			case RegistrationFieldModel.TYPES.SELECT_MULTI: return true;
 		}
+	};
+	/**
+	 *
+	 * @param {(RegistrationFieldModel|RegistrationFieldLike)} field
+	 * @return {boolean}
+	 */
+	RegistrationFieldModel.isPredefinedField = function(field) {
+		return !RegistrationFieldModel.isCustomField(field);
 	};
 	
 	RegistrationFieldModel.prototype.setData = function(data) {

@@ -44,7 +44,7 @@ OrderPage = extending(Page, (function() {
 	};
 	/**
 	 *
-	 * @param {(RegistrationFieldModel|RegistrationSelectFieldModel)} field
+	 * @param {RegistrationFieldModel} field
 	 * @return {jQuery}
 	 */
 	OrderPage.buildRegistrationField = function(field) {

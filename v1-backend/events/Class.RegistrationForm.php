@@ -23,8 +23,11 @@ class RegistrationForm
 		return $p_get_field->fetch();
 	}
 
-	private static function addFormField(int $event_id, string $type, string $label = null, bool $required, ExtendedPDO $db, array $values = null)
+	private static function addFormField(int $event_id, string $type, string $label = null, bool $required, ExtendedPDO $db, array $values = null, $order_number = null)
 	{
+		if (!is_numeric($order_number)){
+			$order_number = null;
+		}
 		$q_ins_field = App::queryFactory()->newInsert();
 		$field_type_info = self::getFormFieldTypeInfo($type, $db);
 		if ($type == self::SELECT_FORM_FIELD_TYPE || $type == self::SELECT_MULTI_FORM_FIELD_TYPE) {
@@ -35,12 +38,14 @@ class RegistrationForm
 			->cols(array(
 				'event_id' => $event_id,
 				'field_type_id' => $field_type_info['id'],
+				'order_number' => $order_number,
 				'label' => $label == '' || $label == null ? $field_type_info['description'] : $label,
 				'required' => $required ? 'true' : 'false'
 			))
 			->onConflictUpdate(array('event_id', 'field_type_id', 'label'), array(
 				'status' => 'true',
-				'required' => $required ? 'true' : 'false'
+				'required' => $required ? 'true' : 'false',
+				'order_number' => $order_number
 			))
 			->returning(array('id'));
 
@@ -88,7 +93,7 @@ class RegistrationForm
 
 		foreach ($fields as $field) {
 			if (!isset($field['type'])) throw new InvalidArgumentException('BAD_FIELD_TYPE');
-			self::addFormField($event_id, $field['type'], $field['label'], filter_var($field['required'], FILTER_VALIDATE_BOOLEAN), $db, $field['values'] ?? null);
+			self::addFormField($event_id, $field['type'], $field['label'], filter_var($field['required'], FILTER_VALIDATE_BOOLEAN), $db, $field['values'] ?? null, $field['order_number'] ?? null);
 		}
 	}
 

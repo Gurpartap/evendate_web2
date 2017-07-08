@@ -4625,10 +4625,20 @@ body,
 	border: 1px dashed;
 }
 
-
-.edit_event_registration_custom_field {
-	padding: 12px 24px 30px;
+.edit_event_registration_field_draggable {
+	position: absolute;
+	top: 0;
+	right: 0;
+	left: 0;
+	padding: 6px;
+	color: #c5c9d1;
+	color: var(--color_primary_50);
+	cursor: move;
+	text-align: center;
 }
+
+
+.edit_event_registration_custom_field {padding: 36px 24px 24px}
 
 .edit_event_registration_custom_field > .form_unit {margin: 24px 0}
 
