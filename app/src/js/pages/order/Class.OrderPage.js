@@ -227,13 +227,16 @@ OrderPage = extending(Page, (function() {
 				if (isFormValid($form)) {
 					
 					self.event.makeOrder(
-						self.$wrapper.find('.OrderFields').serializeForm('array').map(function(field) {
+						self.$wrapper.find('.OrderFields').serializeForm('array').reduce(function(bundle, field) {
+							if (+field.value) {
+								bundle.push({
+									uuid: field.name,
+									count: +field.value
+								});
+							}
 							
-							return {
-								uuid: field.name,
-								count: field.value
-							};
-						}),
+							return bundle;
+						}, []),
 						self.$wrapper.find('.RegistrationFields').serializeForm('array').map(function(field) {
 							
 							return {
@@ -243,9 +246,9 @@ OrderPage = extending(Page, (function() {
 						})
 					).always(function() {
 						$main_action_button.removeAttr('disabled');
-					}).done(function() {
-						if (self.event.ticketing_locally) {
-							// Some shit with Yandex
+					}).done(function(data) {
+						if (self.event.ticketing_locally && data.sum !== 0) {
+							Payment.doPayment(data.order.uuid, data.sum, window.location.origin + '/event/' + self.event.id);
 						} else {
 							__APP.changeState('/event/'+self.event.id);
 						}

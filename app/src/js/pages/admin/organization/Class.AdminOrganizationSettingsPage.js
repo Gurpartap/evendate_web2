@@ -106,16 +106,8 @@ AdminOrganizationSettingsPage = extending(AdminOrganizationPage, (function() {
 		});
 		
 		this.$wrapper.find('.ActivatePayment').on('click', function() {
-			__APP.SERVER.addData('/api/v1/payments/organizations/', {
-				organization_id: self.organization.id
-			}, false, function(data) {
-				tmpl('admin-organization-payment-form', {
-					customer_id: __APP.USER.full_name,
-					cps_email: __APP.USER.email,
-					callback_url: location.href,
-					payment_uuid: data.uuid,
-					sum: data.sum
-				}, self.$wrapper).submit().remove();
+			Payment.payForTariff(self.organization.id, function(data) {
+				Payment.doPayment(data.uuid, data.sum);
 			});
 		});
 	};

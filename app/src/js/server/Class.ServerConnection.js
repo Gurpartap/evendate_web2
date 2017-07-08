@@ -96,7 +96,7 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 	 *
 	 * @returns {jqPromise}
 	 */
-	ServerConnection.prototype.dealAjax = function(http_method, url, ajax_data, content_type, success, error) {
+	ServerConnection.dealAjax = function(http_method, url, ajax_data, content_type, success, error) {
 		ajax_data = ajax_data || {};
 		var jqXHR;
 		
@@ -121,6 +121,18 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 			return response.data;
 		}).promise();
 	};
+	/**
+	 *
+	 * @param {AsynchronousConnection.HTTP_METHODS} http_method
+	 * @param {string} url
+	 * @param {(AJAXData|string)} [ajax_data]
+	 * @param {string} [content_type='application/x-www-form-urlencoded; charset=UTF-8']
+	 * @param {AJAXCallback} [success]
+	 * @param {function} [error]
+	 *
+	 * @returns {jqPromise}
+	 */
+	ServerConnection.prototype.dealAjax = ServerConnection.dealAjax;
 	
 	/**
 	 *
