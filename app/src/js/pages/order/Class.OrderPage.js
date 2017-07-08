@@ -203,7 +203,7 @@ OrderPage = extending(Page, (function() {
 			var $wrapper = $(this).closest('.TicketType'),
 				$sum = $wrapper.find('.TicketTypeSum');
 			
-			if (value > 1) {
+			if (value > 0) {
 				$sum.removeClass(__C.CLASSES.HIDDEN);
 			} else {
 				$sum.addClass(__C.CLASSES.HIDDEN);
@@ -248,7 +248,7 @@ OrderPage = extending(Page, (function() {
 						$main_action_button.removeAttr('disabled');
 					}).done(function(data) {
 						if (self.event.ticketing_locally && data.sum !== 0) {
-							Payment.doPayment(data.order.uuid, data.sum, window.location.origin + '/event/' + self.event.id);
+							Payment.doPayment('order-' + data.order.uuid, data.sum, window.location.origin + '/event/' + self.event.id);
 						} else {
 							__APP.changeState('/event/'+self.event.id);
 						}
@@ -317,12 +317,6 @@ OrderPage = extending(Page, (function() {
 		this.preRender();
 		
 		this.$wrapper.html(tmpl('order-page', this.render_vars));
-		
-		if (this.event.ticketing_locally && this.event.tickets.length) {
-			this.disablePage('Вы уже заказали билеты по этому событию');
-		} else if (this.event.is_registered) {
-			this.disablePage('Вы уже зарегистрированы на это событие');
-		}
 		
 		this.init();
 	};

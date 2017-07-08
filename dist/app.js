@@ -3991,6 +3991,115 @@ RegistrationSelectFieldValue = (function() {
  * @requires ../Class.OneEntity.js
  */
 /**
+ * @class OneCity
+ * @extends OneEntity
+ */
+OneCity = extending(OneEntity, (function() {
+	/**
+	 *
+	 * @param {(string|number)} [city_id]
+	 * @constructor
+	 * @constructs OneCity
+	 *
+	 * @property {(string|number)} id=0
+	 * @property {?string} en_name
+	 * @property {?number} country_id
+	 * @property {?string} local_name
+	 * @property {CategoriesCollection} organization_type
+	 * @property {?number} timediff_seconds
+	 */
+	function OneCity(city_id) {
+		this.id = setDefaultValue(city_id, 0);
+		
+		this.en_name = null;
+		this.country_id = null;
+		this.local_name = null;
+		this.organization_type = new CategoriesCollection();
+		this.timediff_seconds = null;
+	}
+	
+	return OneCity;
+}()));
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.OneCity.js
+ */
+/**
+ *
+ * @class CitiesCollection
+ * @extends EntitiesCollection
+ */
+CitiesCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs CitiesCollection
+	 */
+	function CitiesCollection() {
+		EntitiesCollection.call(this);
+	}
+	
+	CitiesCollection.prototype.collection_of = OneCity;
+	/**
+	 *
+	 * @param {AJAXData} data
+	 * @param {AJAXCallback} success
+	 * @return {jqPromise}
+	 */
+	CitiesCollection.fetchCities = function(data, success) {
+		return __APP.SERVER.getData('/api/v1/organizations/cities', data, success);
+	};
+	/**
+	 *
+	 * @param {string} name
+	 * @returns {(OneCity|null)}
+	 */
+	CitiesCollection.prototype.getByName = function(name) {
+		for (var i = 0; i < this.length; i++) {
+			if (this[i].en_name == name) {
+				return this[i];
+			}
+		}
+		return null;
+	};
+	/**
+	 *
+	 * @param {(string|number)} id
+	 * @returns {boolean}
+	 */
+	CitiesCollection.prototype.has = function(id) {
+		return ($.isNumeric(id) ? this.getByID(id) : this.getByName(id)) instanceof OneEntity;
+	};
+	/**
+	 *
+	 * @param {?(Fields|Array|string)} [fields]
+	 * @param {?number} [length]
+	 * @param {?string} [order_by]
+	 * @param {?function} [success]
+	 * @return {jqPromise}
+	 */
+	CitiesCollection.prototype.fetchCities = function(fields, length, order_by, success) {
+		var self = this;
+		
+		return CitiesCollection.fetchCities({
+			fields: fields || undefined,
+			offset: this.length,
+			length: length || undefined,
+			order_by: order_by || undefined
+		}, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, self.last_pushed);
+			}
+		});
+	};
+	
+	return CitiesCollection;
+}()));
+/**
+ * @requires ../Class.OneEntity.js
+ */
+/**
  * @abstract
  * @class OneAbstractActivity
  * @extends OneEntity
@@ -4317,115 +4426,6 @@ CategoriesCollection = extending(EntitiesCollection, (function() {
 	return CategoriesCollection;
 }()));
 /**
- * @requires ../Class.OneEntity.js
- */
-/**
- * @class OneCity
- * @extends OneEntity
- */
-OneCity = extending(OneEntity, (function() {
-	/**
-	 *
-	 * @param {(string|number)} [city_id]
-	 * @constructor
-	 * @constructs OneCity
-	 *
-	 * @property {(string|number)} id=0
-	 * @property {?string} en_name
-	 * @property {?number} country_id
-	 * @property {?string} local_name
-	 * @property {CategoriesCollection} organization_type
-	 * @property {?number} timediff_seconds
-	 */
-	function OneCity(city_id) {
-		this.id = setDefaultValue(city_id, 0);
-		
-		this.en_name = null;
-		this.country_id = null;
-		this.local_name = null;
-		this.organization_type = new CategoriesCollection();
-		this.timediff_seconds = null;
-	}
-	
-	return OneCity;
-}()));
-/**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneCity.js
- */
-/**
- *
- * @class CitiesCollection
- * @extends EntitiesCollection
- */
-CitiesCollection = extending(EntitiesCollection, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs CitiesCollection
-	 */
-	function CitiesCollection() {
-		EntitiesCollection.call(this);
-	}
-	
-	CitiesCollection.prototype.collection_of = OneCity;
-	/**
-	 *
-	 * @param {AJAXData} data
-	 * @param {AJAXCallback} success
-	 * @return {jqPromise}
-	 */
-	CitiesCollection.fetchCities = function(data, success) {
-		return __APP.SERVER.getData('/api/v1/organizations/cities', data, success);
-	};
-	/**
-	 *
-	 * @param {string} name
-	 * @returns {(OneCity|null)}
-	 */
-	CitiesCollection.prototype.getByName = function(name) {
-		for (var i = 0; i < this.length; i++) {
-			if (this[i].en_name == name) {
-				return this[i];
-			}
-		}
-		return null;
-	};
-	/**
-	 *
-	 * @param {(string|number)} id
-	 * @returns {boolean}
-	 */
-	CitiesCollection.prototype.has = function(id) {
-		return ($.isNumeric(id) ? this.getByID(id) : this.getByName(id)) instanceof OneEntity;
-	};
-	/**
-	 *
-	 * @param {?(Fields|Array|string)} [fields]
-	 * @param {?number} [length]
-	 * @param {?string} [order_by]
-	 * @param {?function} [success]
-	 * @return {jqPromise}
-	 */
-	CitiesCollection.prototype.fetchCities = function(fields, length, order_by, success) {
-		var self = this;
-		
-		return CitiesCollection.fetchCities({
-			fields: fields || undefined,
-			offset: this.length,
-			length: length || undefined,
-			order_by: order_by || undefined
-		}, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, self.last_pushed);
-			}
-		});
-	};
-	
-	return CitiesCollection;
-}()));
-/**
  * @requires ../../data_models/date/Class.DateModel.js
  */
 /**
@@ -4498,100 +4498,6 @@ DatesCollection = extending(EntitiesCollection, (function() {
 	};
 	
 	return DatesCollection;
-}()));
-/**
- * @requires ../Class.OneEntity.js
- */
-/**
- *
- * @class OneNotification
- * @extends OneEntity
- */
-OneNotification = extending(OneEntity, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs OneNotification
-	 *
-	 * @property {?string} guid
-	 * @property {?string} uuid
-	 * @property {?(string|number)} event_id
-	 * @property {?timestamp} notification_time
-	 *
-	 * @property {?string} notification_type
-	 * @property {?timestamp} sent_time
-	 * @property {?boolean} done
-	 * @property {?timestamp} created_at
-	 * @property {?timestamp} updated_at
-	 */
-	function OneNotification() {
-		var self = this;
-		
-		this.uuid = null;
-		this.event_id = null;
-		this.notification_time = null;
-		this.notification_type = null;
-		
-		this.sent_time = null;
-		this.done = null;
-		this.created_at = null;
-		this.updated_at = null;
-		
-		Object.defineProperty(this, OneNotification.prototype.ID_PROP_NAME, {
-			get: function() {
-				return self.uuid || self.notification_type;
-			}
-		});
-	}
-	
-	OneNotification.prototype.ID_PROP_NAME = 'guid';
-	
-	OneNotification.NOTIFICATIN_TYPES = {
-		NOW: 'notification-now',
-		CANCELED: 'notification-event-canceled',
-		CHANGED_DATES: 'notification-event-changed-dates',
-		CHANGED_LOCATION: 'notification-event-changed-location',
-		CHANGED_PRICE: 'notification-event-changed-price',
-		CHANGED_REGISTRATION: 'notification-event-changed-registration',
-		ONE_DAY_REGISTRATION_CLOSE: 'notification-one-day-registration-close',
-		BEFORE_THREE_HOURS: 'notification-before-three-hours',
-		BEFORE_DAY: 'notification-before-day',
-		BEFORE_THREE_DAYS: 'notification-before-three-days',
-		BEFORE_WEEK: 'notification-before-week',
-		BEFORE_QUARTER_OF_HOUR: 'notification-before-quarter-of-hour',
-		CUSTOM: 'notification-custom',
-		REGISTRATION_APPROVED: 'notification-registration-approved',
-		REGISTRATION_CHECKED_OUT: 'notification-registration-checked-out',
-		REGISTRATION_NOT_CHECKED_OUT: 'notification-registration-not-checked-out',
-		REGISTRATION_NOT_APPROVED: 'notification-registration-not-approved',
-		USERS: 'users-notification',
-		ADDITIONAL_FOR_ORGANIZATION: 'notification-additional-for-organization'
-	};
-	
-	
-	return OneNotification;
-}()));
-/**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneNotification.js
- */
-/**
- *
- * @class NotificationsCollection
- * @extends EntitiesCollection
- */
-NotificationsCollection = extending(EntitiesCollection, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs NotificationsCollection
-	 */
-	function NotificationsCollection() {
-		EntitiesCollection.call(this);
-	}
-	NotificationsCollection.prototype.collection_of = OneNotification;
-	
-	return NotificationsCollection;
 }()));
 /**
  * @requires ../Class.OneEntity.js
@@ -5850,6 +5756,100 @@ UsersCollection = extending(EntitiesCollection, (function() {
 
 /**
  * @requires ../Class.OneEntity.js
+ */
+/**
+ *
+ * @class OneNotification
+ * @extends OneEntity
+ */
+OneNotification = extending(OneEntity, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs OneNotification
+	 *
+	 * @property {?string} guid
+	 * @property {?string} uuid
+	 * @property {?(string|number)} event_id
+	 * @property {?timestamp} notification_time
+	 *
+	 * @property {?string} notification_type
+	 * @property {?timestamp} sent_time
+	 * @property {?boolean} done
+	 * @property {?timestamp} created_at
+	 * @property {?timestamp} updated_at
+	 */
+	function OneNotification() {
+		var self = this;
+		
+		this.uuid = null;
+		this.event_id = null;
+		this.notification_time = null;
+		this.notification_type = null;
+		
+		this.sent_time = null;
+		this.done = null;
+		this.created_at = null;
+		this.updated_at = null;
+		
+		Object.defineProperty(this, OneNotification.prototype.ID_PROP_NAME, {
+			get: function() {
+				return self.uuid || self.notification_type;
+			}
+		});
+	}
+	
+	OneNotification.prototype.ID_PROP_NAME = 'guid';
+	
+	OneNotification.NOTIFICATIN_TYPES = {
+		NOW: 'notification-now',
+		CANCELED: 'notification-event-canceled',
+		CHANGED_DATES: 'notification-event-changed-dates',
+		CHANGED_LOCATION: 'notification-event-changed-location',
+		CHANGED_PRICE: 'notification-event-changed-price',
+		CHANGED_REGISTRATION: 'notification-event-changed-registration',
+		ONE_DAY_REGISTRATION_CLOSE: 'notification-one-day-registration-close',
+		BEFORE_THREE_HOURS: 'notification-before-three-hours',
+		BEFORE_DAY: 'notification-before-day',
+		BEFORE_THREE_DAYS: 'notification-before-three-days',
+		BEFORE_WEEK: 'notification-before-week',
+		BEFORE_QUARTER_OF_HOUR: 'notification-before-quarter-of-hour',
+		CUSTOM: 'notification-custom',
+		REGISTRATION_APPROVED: 'notification-registration-approved',
+		REGISTRATION_CHECKED_OUT: 'notification-registration-checked-out',
+		REGISTRATION_NOT_CHECKED_OUT: 'notification-registration-not-checked-out',
+		REGISTRATION_NOT_APPROVED: 'notification-registration-not-approved',
+		USERS: 'users-notification',
+		ADDITIONAL_FOR_ORGANIZATION: 'notification-additional-for-organization'
+	};
+	
+	
+	return OneNotification;
+}()));
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.OneNotification.js
+ */
+/**
+ *
+ * @class NotificationsCollection
+ * @extends EntitiesCollection
+ */
+NotificationsCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs NotificationsCollection
+	 */
+	function NotificationsCollection() {
+		EntitiesCollection.call(this);
+	}
+	NotificationsCollection.prototype.collection_of = OneNotification;
+	
+	return NotificationsCollection;
+}()));
+/**
+ * @requires ../Class.OneEntity.js
  * @requires ../date/Class.DatesCollection.js
  * @requires ../tag/Class.TagsCollection.js
  * @requires ../order/Class.EventMyOrdersCollection.js
@@ -7056,6 +7056,326 @@ TimelineEventsCollection = extending(EventsCollection, (function() {
 	return TimelineEventsCollection;
 }()));
 /**
+ * @requires Class.AbstractEventOrdersCollection.js
+ */
+/**
+ *
+ * @class EventAllOrdersCollection
+ * @extends AbstractEventOrdersCollection
+ */
+EventAllOrdersCollection = extending(AbstractEventOrdersCollection, (function() {
+	/**
+	 *
+	 * @param {(string|number)} [event_id=0]
+	 *
+	 * @constructor
+	 * @constructs EventAllOrdersCollection
+	 *
+	 * @property {(string|number)} event_id
+	 */
+	function EventAllOrdersCollection(event_id) {
+		AbstractEventOrdersCollection.call(this, event_id);
+	}
+	
+	/**
+	 *
+	 * @param {(string|number)} event_id
+	 * @param {AJAXData} [ajax_data]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	EventAllOrdersCollection.fetchOrders = function(event_id, ajax_data, success) {
+		return __APP.SERVER.getData('/api/v1/statistics/events/' + event_id + '/orders', ajax_data, success);
+	};
+	/**
+	 *
+	 * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
+	 *
+	 * @return {jqPromise}
+	 */
+	EventAllOrdersCollection.prototype.export = function(format) {
+		
+		return (new ServerExports()).eventOrders(this.event_id, format);
+	};
+	
+	
+	return EventAllOrdersCollection;
+}()));
+/**
+ * @requires ../Class.OneEntity.js
+ */
+/**
+ * @class RegistrationField
+ * @extends OneEntity
+ */
+RegistrationField = extending(OneEntity, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs RegistrationField
+	 *
+	 * @property {?string} form_field_uuid
+	 * @property {?string} form_field_label
+	 * @property {?RegistrationField.TYPES} form_field_type
+	 * @property {?number} form_field_type_id
+	 * @property {?boolean} form_field_required
+	 * @property {?string} value
+	 * @property {?Array<RegistrationSelectFieldValue>} values
+	 *
+	 * @property {?string} uuid
+	 * @property {?string} label
+	 * @property {?RegistrationField.TYPES} type
+	 * @property {?boolean} required
+	 *
+	 * @property {?timestamp} created_at
+	 * @property {?timestamp} updated_at
+	 */
+	function RegistrationField() {
+		var self = this;
+		
+		this.form_field_uuid = null;
+		this.form_field_label = null;
+		this.form_field_type = null;
+		this.form_field_type_id = null;
+		this.form_field_required = null;
+		this.value = null;
+		this.values = [];
+		
+		this.created_at = null;
+		this.updated_at = null;
+		
+		Object.defineProperties(this, {
+			uuid: {
+				get: function() {
+					return self.form_field_uuid;
+				},
+				set: function(val) {
+					return self.form_field_uuid = val;
+				}
+			},
+			label: {
+				get: function() {
+					return self.form_field_label;
+				},
+				set: function(val) {
+					return self.form_field_label = val;
+				}
+			},
+			type: {
+				get: function() {
+					return self.form_field_type;
+				},
+				set: function(val) {
+					return self.form_field_type = val;
+				}
+			},
+			required: {
+				get: function() {
+					return self.form_field_required;
+				},
+				set: function(val) {
+					return self.form_field_required = val;
+				}
+			}
+		});
+	}
+	
+	RegistrationField.prototype.ID_PROP_NAME = 'form_field_uuid';
+	/**
+	 *
+	 * @alias RegistrationFieldModel.TYPES
+	 */
+	RegistrationField.TYPES = RegistrationFieldModel.TYPES;
+	/**
+	 *
+	 * @alias RegistrationFieldModel.DEFAULT_LABEL
+	 */
+	RegistrationField.DEFAULT_LABEL = RegistrationFieldModel.DEFAULT_LABEL;
+	/**
+	 *
+	 * @param {(RegistrationField|RegistrationFieldLike)} field
+	 *
+	 * @return {boolean}
+	 */
+	RegistrationField.isCustomField = RegistrationFieldModel.isCustomField;
+	
+	
+	return RegistrationField;
+}()));
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.RegistrationField.js
+ */
+/**
+ *
+ * @class RegistrationFieldsCollection
+ * @extends EntitiesCollection
+ */
+RegistrationFieldsCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs RegistrationFieldsCollection
+	 *
+	 * @property {Object<RegistrationFieldModel.TYPES, Array<RegistrationField>>} __types
+	 */
+	function RegistrationFieldsCollection() {
+		EntitiesCollection.call(this);
+		
+		Object.defineProperties(this, {
+			__types: {
+				value: {},
+				writable: true,
+				enumerable: false,
+				configurable: false
+			}
+		});
+		
+		for ( var type_name in RegistrationFieldModel.TYPES ) {
+			if (RegistrationFieldModel.TYPES.hasOwnProperty(type_name)) {
+				this.__types[RegistrationFieldModel.TYPES[type_name]] = [];
+			}
+		}
+		Object.freeze(this.__types);
+	}
+	RegistrationFieldsCollection.prototype.collection_of = RegistrationField;
+	/**
+	 *
+	 * @param {RegistrationField} entity
+	 */
+	RegistrationFieldsCollection.prototype.createAdditionalLookup = function(entity) {
+		if (entity instanceof RegistrationField) {
+			this.__types[entity.type].push(entity);
+		}
+	};
+	
+	return RegistrationFieldsCollection;
+}()));
+/**
+ * @requires ../Class.OneEntity.js
+ */
+/**
+ *
+ * @class SearchResults
+ * @extends OneEntity
+ */
+SearchResults = extending(OneEntity, (function() {
+	/**
+	 * @typedef {function({
+ *   [events]: Array<OneEvent>,
+ *   [organizations]: Array<OneOrganization>
+ * })} SearchResultsAJAXCallback
+	 */
+	/**
+	 *
+	 * @param {string} query_string
+	 * @constructor
+	 * @constructs SearchResults
+	 */
+	function SearchResults(query_string) {
+		this.query_string = query_string;
+		this.events = new EventsCollection();
+		this.organizations = new OrganizationsCollection();
+	}
+	/**
+	 *
+	 * @param {string} query_string
+	 * @returns {{ [q]: {string}, [tags]: {string} }}
+	 */
+	SearchResults.sanitizeQueryVar = function(query_string) {
+		var data = {};
+		if (query_string.indexOf('#') === 0) {
+			data.tags = query_string.replace('#', '');
+		} else {
+			data.q = query_string;
+		}
+		return data;
+	};
+	/**
+	 *
+	 * @param {string} query_string
+	 * @param {AJAXData} [ajax_data]
+	 * @param {SearchResultsAJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	SearchResults.fetchEventsAndOrganizations = function(query_string, ajax_data, success) {
+		return __APP.SERVER.getData('/api/v1/search/', $.extend({}, SearchResults.sanitizeQueryVar(query_string), ajax_data), success);
+	};
+	/**
+	 *
+	 * @param {AJAXData} [events_ajax_data]
+	 * @param {function(organizations: Array<OneEvent>)} [success]
+	 * @returns {jqPromise}
+	 */
+	SearchResults.prototype.fetchEvents = function(events_ajax_data, success) {
+		var self = this,
+			ajax_data = {
+				fields: 'events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length}))
+			};
+		
+		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data.events);
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {AJAXData} [organizations_ajax_data]
+	 * @param {function(organizations: Array<OneOrganization>)} [success]
+	 * @returns {jqPromise}
+	 */
+	SearchResults.prototype.fetchOrganizations = function(organizations_ajax_data, success) {
+		var self = this,
+			ajax_data = {
+				fields: 'organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length}))
+			};
+		
+		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data.organizations);
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {AJAXData} [events_ajax_data]
+	 * @param {AJAXData} [organizations_ajax_data]
+	 * @param {SearchResultsAJAXCallback} [success]
+	 * @returns {jqPromise}
+	 */
+	SearchResults.prototype.fetchEventsAndOrganizations = function(events_ajax_data, organizations_ajax_data, success) {
+		var self = this,
+			ajax_data = {
+				fields: new Fields('search_score'),
+				order: '-search_score'
+			};
+		
+		if (events_ajax_data) {
+			ajax_data.fields.push({
+				events: $.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length})
+			});
+		}
+		if (organizations_ajax_data && !SearchResults.sanitizeQueryVar(self.query_string).tags) {
+			ajax_data.fields.push({
+				organizations: $.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length})
+			});
+		}
+		
+		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
+			self.setData(data);
+			if (isFunction(success)) {
+				success.call(self, data);
+			}
+		});
+	};
+	
+	return SearchResults;
+}()));
+/**
  * @requires ../Class.OneEntity.js
  */
 /**
@@ -7539,53 +7859,6 @@ OrganizationsCollection = extending(EntitiesCollection, (function() {
 	return OrganizationsCollection;
 }()));
 /**
- * @requires Class.AbstractEventOrdersCollection.js
- */
-/**
- *
- * @class EventAllOrdersCollection
- * @extends AbstractEventOrdersCollection
- */
-EventAllOrdersCollection = extending(AbstractEventOrdersCollection, (function() {
-	/**
-	 *
-	 * @param {(string|number)} [event_id=0]
-	 *
-	 * @constructor
-	 * @constructs EventAllOrdersCollection
-	 *
-	 * @property {(string|number)} event_id
-	 */
-	function EventAllOrdersCollection(event_id) {
-		AbstractEventOrdersCollection.call(this, event_id);
-	}
-	
-	/**
-	 *
-	 * @param {(string|number)} event_id
-	 * @param {AJAXData} [ajax_data]
-	 * @param {AJAXCallback} [success]
-	 *
-	 * @return {jqPromise}
-	 */
-	EventAllOrdersCollection.fetchOrders = function(event_id, ajax_data, success) {
-		return __APP.SERVER.getData('/api/v1/statistics/events/' + event_id + '/orders', ajax_data, success);
-	};
-	/**
-	 *
-	 * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
-	 *
-	 * @return {jqPromise}
-	 */
-	EventAllOrdersCollection.prototype.export = function(format) {
-		
-		return (new ServerExports()).eventOrders(this.event_id, format);
-	};
-	
-	
-	return EventAllOrdersCollection;
-}()));
-/**
  * @typedef {object} StatisticsUnit
  * @property {number} time_value
  * @property {number} value
@@ -7827,129 +8100,6 @@ OrganizationsStatistics = extending(Statistics, (function() {
 	return OrganizationsStatistics;
 }()));
 /**
- * @requires ../Class.OneEntity.js
- */
-/**
- *
- * @class SearchResults
- * @extends OneEntity
- */
-SearchResults = extending(OneEntity, (function() {
-	/**
-	 * @typedef {function({
- *   [events]: Array<OneEvent>,
- *   [organizations]: Array<OneOrganization>
- * })} SearchResultsAJAXCallback
-	 */
-	/**
-	 *
-	 * @param {string} query_string
-	 * @constructor
-	 * @constructs SearchResults
-	 */
-	function SearchResults(query_string) {
-		this.query_string = query_string;
-		this.events = new EventsCollection();
-		this.organizations = new OrganizationsCollection();
-	}
-	/**
-	 *
-	 * @param {string} query_string
-	 * @returns {{ [q]: {string}, [tags]: {string} }}
-	 */
-	SearchResults.sanitizeQueryVar = function(query_string) {
-		var data = {};
-		if (query_string.indexOf('#') === 0) {
-			data.tags = query_string.replace('#', '');
-		} else {
-			data.q = query_string;
-		}
-		return data;
-	};
-	/**
-	 *
-	 * @param {string} query_string
-	 * @param {AJAXData} [ajax_data]
-	 * @param {SearchResultsAJAXCallback} [success]
-	 * @returns {jqPromise}
-	 */
-	SearchResults.fetchEventsAndOrganizations = function(query_string, ajax_data, success) {
-		return __APP.SERVER.getData('/api/v1/search/', $.extend({}, SearchResults.sanitizeQueryVar(query_string), ajax_data), success);
-	};
-	/**
-	 *
-	 * @param {AJAXData} [events_ajax_data]
-	 * @param {function(organizations: Array<OneEvent>)} [success]
-	 * @returns {jqPromise}
-	 */
-	SearchResults.prototype.fetchEvents = function(events_ajax_data, success) {
-		var self = this,
-			ajax_data = {
-				fields: 'events' + JSON.stringify($.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length}))
-			};
-		
-		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data.events);
-			}
-		});
-	};
-	/**
-	 *
-	 * @param {AJAXData} [organizations_ajax_data]
-	 * @param {function(organizations: Array<OneOrganization>)} [success]
-	 * @returns {jqPromise}
-	 */
-	SearchResults.prototype.fetchOrganizations = function(organizations_ajax_data, success) {
-		var self = this,
-			ajax_data = {
-				fields: 'organizations' + JSON.stringify($.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length}))
-			};
-		
-		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data.organizations);
-			}
-		});
-	};
-	/**
-	 *
-	 * @param {AJAXData} [events_ajax_data]
-	 * @param {AJAXData} [organizations_ajax_data]
-	 * @param {SearchResultsAJAXCallback} [success]
-	 * @returns {jqPromise}
-	 */
-	SearchResults.prototype.fetchEventsAndOrganizations = function(events_ajax_data, organizations_ajax_data, success) {
-		var self = this,
-			ajax_data = {
-				fields: new Fields('search_score'),
-				order: '-search_score'
-			};
-		
-		if (events_ajax_data) {
-			ajax_data.fields.push({
-				events: $.extend({}, __APP.SERVER.validateData(events_ajax_data), {offset: this.events.length})
-			});
-		}
-		if (organizations_ajax_data && !SearchResults.sanitizeQueryVar(self.query_string).tags) {
-			ajax_data.fields.push({
-				organizations: $.extend({}, __APP.SERVER.validateData(organizations_ajax_data), {offset: this.organizations.length})
-			});
-		}
-		
-		return SearchResults.fetchEventsAndOrganizations(self.query_string, ajax_data, function(data) {
-			self.setData(data);
-			if (isFunction(success)) {
-				success.call(self, data);
-			}
-		});
-	};
-	
-	return SearchResults;
-}()));
-/**
  * @requires Class.AbstractEventTicketsCollection.js
  */
 /**
@@ -8098,156 +8248,6 @@ SearchEventTicketsCollection = extending(EventAllTicketsCollection, (function() 
 	
 	return SearchEventTicketsCollection;
 }())); 
-/**
- * @requires ../Class.OneEntity.js
- */
-/**
- * @class RegistrationField
- * @extends OneEntity
- */
-RegistrationField = extending(OneEntity, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs RegistrationField
-	 *
-	 * @property {?string} form_field_uuid
-	 * @property {?string} form_field_label
-	 * @property {?RegistrationField.TYPES} form_field_type
-	 * @property {?number} form_field_type_id
-	 * @property {?boolean} form_field_required
-	 * @property {?string} value
-	 * @property {?Array<RegistrationSelectFieldValue>} values
-	 *
-	 * @property {?string} uuid
-	 * @property {?string} label
-	 * @property {?RegistrationField.TYPES} type
-	 * @property {?boolean} required
-	 *
-	 * @property {?timestamp} created_at
-	 * @property {?timestamp} updated_at
-	 */
-	function RegistrationField() {
-		var self = this;
-		
-		this.form_field_uuid = null;
-		this.form_field_label = null;
-		this.form_field_type = null;
-		this.form_field_type_id = null;
-		this.form_field_required = null;
-		this.value = null;
-		this.values = [];
-		
-		this.created_at = null;
-		this.updated_at = null;
-		
-		Object.defineProperties(this, {
-			uuid: {
-				get: function() {
-					return self.form_field_uuid;
-				},
-				set: function(val) {
-					return self.form_field_uuid = val;
-				}
-			},
-			label: {
-				get: function() {
-					return self.form_field_label;
-				},
-				set: function(val) {
-					return self.form_field_label = val;
-				}
-			},
-			type: {
-				get: function() {
-					return self.form_field_type;
-				},
-				set: function(val) {
-					return self.form_field_type = val;
-				}
-			},
-			required: {
-				get: function() {
-					return self.form_field_required;
-				},
-				set: function(val) {
-					return self.form_field_required = val;
-				}
-			}
-		});
-	}
-	
-	RegistrationField.prototype.ID_PROP_NAME = 'form_field_uuid';
-	/**
-	 *
-	 * @alias RegistrationFieldModel.TYPES
-	 */
-	RegistrationField.TYPES = RegistrationFieldModel.TYPES;
-	/**
-	 *
-	 * @alias RegistrationFieldModel.DEFAULT_LABEL
-	 */
-	RegistrationField.DEFAULT_LABEL = RegistrationFieldModel.DEFAULT_LABEL;
-	/**
-	 *
-	 * @param {(RegistrationField|RegistrationFieldLike)} field
-	 *
-	 * @return {boolean}
-	 */
-	RegistrationField.isCustomField = RegistrationFieldModel.isCustomField;
-	
-	
-	return RegistrationField;
-}()));
-/**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.RegistrationField.js
- */
-/**
- *
- * @class RegistrationFieldsCollection
- * @extends EntitiesCollection
- */
-RegistrationFieldsCollection = extending(EntitiesCollection, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs RegistrationFieldsCollection
-	 *
-	 * @property {Object<RegistrationFieldModel.TYPES, Array<RegistrationField>>} __types
-	 */
-	function RegistrationFieldsCollection() {
-		EntitiesCollection.call(this);
-		
-		Object.defineProperties(this, {
-			__types: {
-				value: {},
-				writable: true,
-				enumerable: false,
-				configurable: false
-			}
-		});
-		
-		for ( var type_name in RegistrationFieldModel.TYPES ) {
-			if (RegistrationFieldModel.TYPES.hasOwnProperty(type_name)) {
-				this.__types[RegistrationFieldModel.TYPES[type_name]] = [];
-			}
-		}
-		Object.freeze(this.__types);
-	}
-	RegistrationFieldsCollection.prototype.collection_of = RegistrationField;
-	/**
-	 *
-	 * @param {RegistrationField} entity
-	 */
-	RegistrationFieldsCollection.prototype.createAdditionalLookup = function(entity) {
-		if (entity instanceof RegistrationField) {
-			this.__types[entity.type].push(entity);
-		}
-	};
-	
-	return RegistrationFieldsCollection;
-}()));
 /**
  * @requires ../ticket/Class.OneTicket.js
  * @requires ../order/Class.OneOrder.js
@@ -10542,8 +10542,8 @@ OrderButton = extending(ActionButton, (function() {
 		};
 		this.event = event;
 		this.modal = null;
-		this.is_disabled = !this.event.registration_available && (!this.event.is_registered || (this.event.ticketing_locally && this.event.tickets.length === 0));
-		options.is_checked = event.is_registered || (event.ticketing_locally && event.tickets.length > 0);
+		this.is_disabled = !this.event.registration_available;
+		options.is_checked = false;
 		ActionButton.call(this, options);
 	}
 	
@@ -10561,7 +10561,8 @@ OrderButton = extending(ActionButton, (function() {
 			
 			return false;
 		}
-		
+		__APP.changeState('/event/' + this.event.id + '/order');
+		/*
 		if (this.event.registration_available && !this.event.is_registered || this.event.ticketing_locally && this.event.tickets.length === 0) {
 			__APP.changeState('/event/' + this.event.id + '/order');
 		} else {
@@ -10590,7 +10591,7 @@ OrderButton = extending(ActionButton, (function() {
 					self.modal.show();
 				});
 			}
-		}
+		}*/
 		
 	};
 	
@@ -11742,217 +11743,6 @@ TicketsModal = extending(AbstractModal, (function() {
  * @requires ../Class.AbstractModal.js
  */
 /**
- * @class
- * @abstract
- * @extends AbstractModal
- */
-AbstractListModal = extending(AbstractModal, (function() {
-	/**
-	 *
-	 * @param {OneEntity} entity
-	 * @constructor
-	 * @constructs AbstractListModal
-	 */
-	function AbstractListModal(entity) {
-		AbstractModal.call(this);
-		this.content = tmpl('modal-list-content');
-		this.entity = entity;
-		this.entities = new EntitiesCollection();
-		this.content_is_scrollable = true;
-	}
-	
-	/**
-	 *
-	 * @return {AbstractListModal}
-	 */
-	AbstractListModal.prototype.render = function() {
-		this.__render({
-			width: 384,
-			height: 'calc(100% - 140px)',
-			classes: ['material', '-floating', '-fixed'],
-			content_classes: ['list_modal_content']
-		});
-		
-		return this;
-	};
-	/**
-	 *
-	 * @abstract
-	 * @return {jqPromise}
-	 */
-	AbstractListModal.prototype.uploadEntities = function() {
-		return $.Deferred.resolve().promise();
-	};
-	/**
-	 *
-	 * @abstract
-	 * @param {EntitiesCollection} entities
-	 * @return {jQuery}
-	 */
-	AbstractListModal.prototype.buildEntities = function(entities) {
-		return $();
-	};
-	/**
-	 *
-	 * @return {AbstractListModal}
-	 */
-	AbstractListModal.prototype.show = function() {
-		var self = this;
-		
-		if(this.content.children().length) {
-			this.__show();
-			return this;
-		}
-		
-		this.render();
-		this.content.append(this.buildEntities(this.entities));
-		
-		if (this.entities.length < 5) {
-			this.uploadEntities().done(function() {
-				self.__show();
-			});
-		} else {
-			this.__show();
-		}
-		
-		return this;
-	};
-	/**
-	 *
-	 * @return {AbstractListModal}
-	 */
-	AbstractListModal.prototype.onScrollToBottom = function(callback) {
-		var self = this,
-			$loader = __APP.BUILD.loaderBlock(this.content);
-		
-		this.uploadEntities()
-			.fail(function() {
-				self.block_scroll = false;
-			})
-			.done(function(){
-				$loader.remove();
-				callback.call(self);
-			});
-		
-		return this;
-	};
-	
-	return AbstractListModal;
-}()));
-/**
- * @requires Class.AbstractListModal.js
- */
-/**
- * @class
- * @extends AbstractListModal
- */
-FriendsListModal = extending(AbstractListModal, (function() {
-	/**
-	 *
-	 * @param {CurrentUser} user
-	 * @constructor
-	 * @constructs FriendsListModal
-	 * @property {CurrentUser} entity
-	 */
-	function FriendsListModal(user) {
-		if (typeof FriendsListModal.instance === 'object') {
-			return FriendsListModal.instance;
-		}
-		AbstractListModal.call(this, user);
-		this.title = 'Подписки на пользователей';
-		this.entities = this.entity.friends;
-		FriendsListModal.instance = this;
-	}
-	/**
-	 *
-	 * @return {jqPromise}
-	 */
-	FriendsListModal.prototype.uploadEntities = function() {
-		var self = this;
-		
-		return __APP.USER.fetchFriends({length: 20}).done(function(friends) {
-			if(friends.length) {
-				self.content.append(self.buildEntities(friends));
-			} else {
-				self.is_upload_disabled = true;
-			}
-		}).promise();
-	};
-	/**
-	 *
-	 * @param {UsersCollection} entities
-	 * @return {jQuery}
-	 */
-	FriendsListModal.prototype.buildEntities = function(entities) {
-		var $blocks = __APP.BUILD.avatarBlocks(entities, {
-			is_link: true,
-			entity: __C.ENTITIES.USER,
-			avatar_classes: [__C.CLASSES.SIZES.X40, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]
-		});
-		bindPageLinks($blocks);
-		
-		return $blocks;
-	};
-	
-	return FriendsListModal;
-}()));
-/**
- * @requires Class.AbstractListModal.js
- */
-/**
- * @class
- * @extends AbstractListModal
- */
-SubscriptionsListModal = extending(AbstractListModal, (function() {
-	/**
-	 *
-	 * @param {OneUser} user
-	 * @constructor
-	 * @constructs SubscriptionsListModal
-	 * @property {OneUser} entity
-	 */
-	function SubscriptionsListModal(user) {
-		AbstractListModal.call(this, user);
-		this.title = 'Подписки на организации';
-		this.entities = this.entity.subscriptions;
-	}
-	/**
-	 *
-	 * @return {jqPromise}
-	 */
-	SubscriptionsListModal.prototype.uploadEntities = function() {
-		var self = this;
-		
-		return this.entity.fetchSubscriptions({length: 20}).done(function(organizations) {
-			if(organizations.length) {
-				self.content.append(self.buildEntities(organizations));
-			} else {
-				self.is_upload_disabled = true;
-			}
-		}).promise();
-	};
-	/**
-	 *
-	 * @param {UsersCollection} entities
-	 * @return {jQuery}
-	 */
-	SubscriptionsListModal.prototype.buildEntities = function(entities) {
-		var $blocks = __APP.BUILD.avatarBlocks(entities, {
-			is_link: true,
-			entity: __C.ENTITIES.ORGANIZATION,
-			avatar_classes: [__C.CLASSES.SIZES.X40, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]
-		});
-		bindPageLinks($blocks);
-		
-		return $blocks;
-	};
-	
-	return SubscriptionsListModal;
-}()));
-/**
- * @requires ../Class.AbstractModal.js
- */
-/**
  * @class PreviewRegistrationModal
  * @extends AbstractModal
  */
@@ -12485,6 +12275,217 @@ SubscribersModal = extending(AbstractUsersModal, (function() {
 	return SubscribersModal;
 }()));
 
+/**
+ * @requires ../Class.AbstractModal.js
+ */
+/**
+ * @class
+ * @abstract
+ * @extends AbstractModal
+ */
+AbstractListModal = extending(AbstractModal, (function() {
+	/**
+	 *
+	 * @param {OneEntity} entity
+	 * @constructor
+	 * @constructs AbstractListModal
+	 */
+	function AbstractListModal(entity) {
+		AbstractModal.call(this);
+		this.content = tmpl('modal-list-content');
+		this.entity = entity;
+		this.entities = new EntitiesCollection();
+		this.content_is_scrollable = true;
+	}
+	
+	/**
+	 *
+	 * @return {AbstractListModal}
+	 */
+	AbstractListModal.prototype.render = function() {
+		this.__render({
+			width: 384,
+			height: 'calc(100% - 140px)',
+			classes: ['material', '-floating', '-fixed'],
+			content_classes: ['list_modal_content']
+		});
+		
+		return this;
+	};
+	/**
+	 *
+	 * @abstract
+	 * @return {jqPromise}
+	 */
+	AbstractListModal.prototype.uploadEntities = function() {
+		return $.Deferred.resolve().promise();
+	};
+	/**
+	 *
+	 * @abstract
+	 * @param {EntitiesCollection} entities
+	 * @return {jQuery}
+	 */
+	AbstractListModal.prototype.buildEntities = function(entities) {
+		return $();
+	};
+	/**
+	 *
+	 * @return {AbstractListModal}
+	 */
+	AbstractListModal.prototype.show = function() {
+		var self = this;
+		
+		if(this.content.children().length) {
+			this.__show();
+			return this;
+		}
+		
+		this.render();
+		this.content.append(this.buildEntities(this.entities));
+		
+		if (this.entities.length < 5) {
+			this.uploadEntities().done(function() {
+				self.__show();
+			});
+		} else {
+			this.__show();
+		}
+		
+		return this;
+	};
+	/**
+	 *
+	 * @return {AbstractListModal}
+	 */
+	AbstractListModal.prototype.onScrollToBottom = function(callback) {
+		var self = this,
+			$loader = __APP.BUILD.loaderBlock(this.content);
+		
+		this.uploadEntities()
+			.fail(function() {
+				self.block_scroll = false;
+			})
+			.done(function(){
+				$loader.remove();
+				callback.call(self);
+			});
+		
+		return this;
+	};
+	
+	return AbstractListModal;
+}()));
+/**
+ * @requires Class.AbstractListModal.js
+ */
+/**
+ * @class
+ * @extends AbstractListModal
+ */
+FriendsListModal = extending(AbstractListModal, (function() {
+	/**
+	 *
+	 * @param {CurrentUser} user
+	 * @constructor
+	 * @constructs FriendsListModal
+	 * @property {CurrentUser} entity
+	 */
+	function FriendsListModal(user) {
+		if (typeof FriendsListModal.instance === 'object') {
+			return FriendsListModal.instance;
+		}
+		AbstractListModal.call(this, user);
+		this.title = 'Подписки на пользователей';
+		this.entities = this.entity.friends;
+		FriendsListModal.instance = this;
+	}
+	/**
+	 *
+	 * @return {jqPromise}
+	 */
+	FriendsListModal.prototype.uploadEntities = function() {
+		var self = this;
+		
+		return __APP.USER.fetchFriends({length: 20}).done(function(friends) {
+			if(friends.length) {
+				self.content.append(self.buildEntities(friends));
+			} else {
+				self.is_upload_disabled = true;
+			}
+		}).promise();
+	};
+	/**
+	 *
+	 * @param {UsersCollection} entities
+	 * @return {jQuery}
+	 */
+	FriendsListModal.prototype.buildEntities = function(entities) {
+		var $blocks = __APP.BUILD.avatarBlocks(entities, {
+			is_link: true,
+			entity: __C.ENTITIES.USER,
+			avatar_classes: [__C.CLASSES.SIZES.X40, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]
+		});
+		bindPageLinks($blocks);
+		
+		return $blocks;
+	};
+	
+	return FriendsListModal;
+}()));
+/**
+ * @requires Class.AbstractListModal.js
+ */
+/**
+ * @class
+ * @extends AbstractListModal
+ */
+SubscriptionsListModal = extending(AbstractListModal, (function() {
+	/**
+	 *
+	 * @param {OneUser} user
+	 * @constructor
+	 * @constructs SubscriptionsListModal
+	 * @property {OneUser} entity
+	 */
+	function SubscriptionsListModal(user) {
+		AbstractListModal.call(this, user);
+		this.title = 'Подписки на организации';
+		this.entities = this.entity.subscriptions;
+	}
+	/**
+	 *
+	 * @return {jqPromise}
+	 */
+	SubscriptionsListModal.prototype.uploadEntities = function() {
+		var self = this;
+		
+		return this.entity.fetchSubscriptions({length: 20}).done(function(organizations) {
+			if(organizations.length) {
+				self.content.append(self.buildEntities(organizations));
+			} else {
+				self.is_upload_disabled = true;
+			}
+		}).promise();
+	};
+	/**
+	 *
+	 * @param {UsersCollection} entities
+	 * @return {jQuery}
+	 */
+	SubscriptionsListModal.prototype.buildEntities = function(entities) {
+		var $blocks = __APP.BUILD.avatarBlocks(entities, {
+			is_link: true,
+			entity: __C.ENTITIES.ORGANIZATION,
+			avatar_classes: [__C.CLASSES.SIZES.X40, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]
+		});
+		bindPageLinks($blocks);
+		
+		return $blocks;
+	};
+	
+	return SubscriptionsListModal;
+}()));
 /**
  * @singleton
  * @class Builder
@@ -14011,117 +14012,107 @@ Builder = (function() {
  * @abstract
  * @class
  */
-AbstractSidebar = (function () {
+AbstractTopBar = (function () {
 	/**
 	 *
 	 * @constructor
-	 * @constructs AbstractSidebar
+	 * @constructs AbstractTopBar
+	 *
+	 * @property {jQuery} $main_header
 	 */
-	function AbstractSidebar() {
-		this.$sidebar = $('#main_sidebar');
-		this.$subscribed_orgs = $('.SidebarOrganizationsList');
+	function AbstractTopBar() {
+		this.$main_header = $('#main_header');
 	}
 	
-	AbstractSidebar.prototype.init = function () {
-		this.$sidebar.find('.SidebarNav').addClass('-items_' + this.$sidebar.find('.SidebarNavItem').not('.-hidden').length);
-		this.$sidebar.find('.SidebarScroll').scrollbar({
-			disableBodyScroll: true
+	AbstractTopBar.prototype.init = function () {
+		var $overlay = this.$main_header.find('.TopBarOverlay'),
+			$search_button = $overlay.find('.TopBarSearchButton'),
+			$search_input = $overlay.find('.TopBarSearchInput');
+			
+		$search_button.on('click.OpenSearchBar', function() {
+			if ($overlay.hasClass('-open_search_bar')) {
+				__APP.changeState('/search/' + encodeURIComponent($search_input.val()));
+			} else {
+				$overlay.addClass('-open_search_bar');
+				$search_input.focus();
+			}
 		});
+		
+		$search_input.on('keypress', function(e) {
+			if (e.which === 13) {
+				__APP.changeState('/search/' + encodeURIComponent($search_input.val()));
+			}
+		}).on('keydown', function(e) {
+			if (e.keyCode === 27) {
+				$overlay.removeClass('-open_search_bar');
+				$search_input.val('');
+			}
+		}).on('blur', function() {
+			if ($search_input.val() === '') {
+				$overlay.removeClass('-open_search_bar');
+			}
+		});
+		
+		this.$main_header.find('.SidebarBurger').add($('.MainSectionCap')).on('click', function() {
+			$('body').toggleClass('-open_sidebar');
+		});
+		
+		bindRippleEffect(this.$main_header);
+		bindPageLinks(this.$main_header);
 	};
 	
-	AbstractSidebar.prototype.updateSubscriptions = function () {};
-	
-	return AbstractSidebar;
+	return AbstractTopBar;
 }());
 /**
- * @requires Class.AbstractSidebar.js
+ * @requires Class.AbstractTopBar.js
  */
 /**
  * @class
- * @extends AbstractSidebar
+ * @extends AbstractTopBar
  */
-Sidebar = extending(AbstractSidebar, (function () {
+TopBar = extending(AbstractTopBar, (function () {
 	/**
 	 *
 	 * @constructor
-	 * @construct Sidebar
+	 * @constructs TopBar
 	 */
-	function Sidebar() {
-		AbstractSidebar.call(this);
+	function TopBar() {
+		AbstractTopBar.call(this);
 	}
 	
-	Sidebar.prototype.init = function () {
-		var self = this;
-		self.updateSubscriptions();
-		$(window).on('subscribe unsubscribe', function() {
-			self.updateSubscriptions();
-		});
-		
-		AbstractSidebar.prototype.init.call(this);
+	TopBar.prototype.init = function () {
+		AbstractTopBar.prototype.init.call(this);
 	};
 	
-	Sidebar.prototype.updateSubscriptions = function() {
-		var $subscribed_orgs = this.$subscribed_orgs,
-			timing = 0,
-			current_menu_items = $.map($subscribed_orgs.children(), function(el) {
-				return $(el).data('organization_id');
-			}),
-			to_add = __APP.USER.subscriptions.filter(function(item) {
-				return current_menu_items.indexOf(item.id) === -1;
-			}),
-			to_remove = current_menu_items.filter(function(item) {
-				return !(__APP.USER.subscriptions.has(item));
-			});
-		
-		if (to_add.length) {
-			__APP.BUILD.organizationItems(to_add, {
-				block_classes: ['animated'],
-				avatar_classes: ['-size_30x30']
-			})
-				[($subscribed_orgs.length ? 'prependTo' : 'appendTo')]($subscribed_orgs)
-				.each(function(i, org_block) {
-					setTimeout(function() {
-						$(org_block).addClass('-show');
-					}, timing += 100);
-				});
-			
-			bindPageLinks($subscribed_orgs);
-		}
-		if (to_remove.length) {
-			to_remove.forEach(function(id) {
-				var $organization_item = $subscribed_orgs.find('.organization_item[data-organization_id="' + id + '"]').removeClass('-show');
-				setTimeout(function() {
-					$organization_item.remove();
-				}, 500);
-			});
-		}
-	};
-	
-	return Sidebar;
+	return TopBar;
 }()));
 /**
- * @requires Class.AbstractSidebar.js
+ * @requires Class.AbstractTopBar.js
  */
 /**
  * @class
- * @extends AbstractSidebar
+ * @extends AbstractTopBar
  */
-SidebarNoAuth = extending(AbstractSidebar, (function () {
+TopBarNoAuth = extending(AbstractTopBar, (function () {
 	/**
 	 *
 	 * @constructor
-	 * @constructs SidebarNoAuth
+	 * @constructs TopBarNoAuth
 	 */
-	function SidebarNoAuth() {
-		AbstractSidebar.call(this);
+	function TopBarNoAuth() {
+		AbstractTopBar.call(this);
 	}
 	
-	SidebarNoAuth.prototype.init = function () {
-		this.$sidebar.find('.SidebarOrganizationsScroll').addClass(__C.CLASSES.HIDDEN);
-		AbstractSidebar.prototype.init.call(this);
+	TopBarNoAuth.prototype.init = function () {
+		this.$main_header.find('.LoginButton').on('click', function() {
+			cookies.removeItem('auth_command');
+			cookies.removeItem('auth_entity_id');
+			(new AuthModal(location.href)).show();
+		});
+		AbstractTopBar.prototype.init.call(this);
 	};
 	
-	return SidebarNoAuth;
+	return TopBarNoAuth;
 }()));
 /**
  *
@@ -14498,107 +14489,117 @@ OrderAppInspector = extending(AbstractAppInspector, (function() {
  * @abstract
  * @class
  */
-AbstractTopBar = (function () {
+AbstractSidebar = (function () {
 	/**
 	 *
 	 * @constructor
-	 * @constructs AbstractTopBar
-	 *
-	 * @property {jQuery} $main_header
+	 * @constructs AbstractSidebar
 	 */
-	function AbstractTopBar() {
-		this.$main_header = $('#main_header');
+	function AbstractSidebar() {
+		this.$sidebar = $('#main_sidebar');
+		this.$subscribed_orgs = $('.SidebarOrganizationsList');
 	}
 	
-	AbstractTopBar.prototype.init = function () {
-		var $overlay = this.$main_header.find('.TopBarOverlay'),
-			$search_button = $overlay.find('.TopBarSearchButton'),
-			$search_input = $overlay.find('.TopBarSearchInput');
-			
-		$search_button.on('click.OpenSearchBar', function() {
-			if ($overlay.hasClass('-open_search_bar')) {
-				__APP.changeState('/search/' + encodeURIComponent($search_input.val()));
-			} else {
-				$overlay.addClass('-open_search_bar');
-				$search_input.focus();
-			}
+	AbstractSidebar.prototype.init = function () {
+		this.$sidebar.find('.SidebarNav').addClass('-items_' + this.$sidebar.find('.SidebarNavItem').not('.-hidden').length);
+		this.$sidebar.find('.SidebarScroll').scrollbar({
+			disableBodyScroll: true
 		});
-		
-		$search_input.on('keypress', function(e) {
-			if (e.which === 13) {
-				__APP.changeState('/search/' + encodeURIComponent($search_input.val()));
-			}
-		}).on('keydown', function(e) {
-			if (e.keyCode === 27) {
-				$overlay.removeClass('-open_search_bar');
-				$search_input.val('');
-			}
-		}).on('blur', function() {
-			if ($search_input.val() === '') {
-				$overlay.removeClass('-open_search_bar');
-			}
-		});
-		
-		this.$main_header.find('.SidebarBurger').add($('.MainSectionCap')).on('click', function() {
-			$('body').toggleClass('-open_sidebar');
-		});
-		
-		bindRippleEffect(this.$main_header);
-		bindPageLinks(this.$main_header);
 	};
 	
-	return AbstractTopBar;
+	AbstractSidebar.prototype.updateSubscriptions = function () {};
+	
+	return AbstractSidebar;
 }());
 /**
- * @requires Class.AbstractTopBar.js
+ * @requires Class.AbstractSidebar.js
  */
 /**
  * @class
- * @extends AbstractTopBar
+ * @extends AbstractSidebar
  */
-TopBar = extending(AbstractTopBar, (function () {
+Sidebar = extending(AbstractSidebar, (function () {
 	/**
 	 *
 	 * @constructor
-	 * @constructs TopBar
+	 * @construct Sidebar
 	 */
-	function TopBar() {
-		AbstractTopBar.call(this);
+	function Sidebar() {
+		AbstractSidebar.call(this);
 	}
 	
-	TopBar.prototype.init = function () {
-		AbstractTopBar.prototype.init.call(this);
+	Sidebar.prototype.init = function () {
+		var self = this;
+		self.updateSubscriptions();
+		$(window).on('subscribe unsubscribe', function() {
+			self.updateSubscriptions();
+		});
+		
+		AbstractSidebar.prototype.init.call(this);
 	};
 	
-	return TopBar;
+	Sidebar.prototype.updateSubscriptions = function() {
+		var $subscribed_orgs = this.$subscribed_orgs,
+			timing = 0,
+			current_menu_items = $.map($subscribed_orgs.children(), function(el) {
+				return $(el).data('organization_id');
+			}),
+			to_add = __APP.USER.subscriptions.filter(function(item) {
+				return current_menu_items.indexOf(item.id) === -1;
+			}),
+			to_remove = current_menu_items.filter(function(item) {
+				return !(__APP.USER.subscriptions.has(item));
+			});
+		
+		if (to_add.length) {
+			__APP.BUILD.organizationItems(to_add, {
+				block_classes: ['animated'],
+				avatar_classes: ['-size_30x30']
+			})
+				[($subscribed_orgs.length ? 'prependTo' : 'appendTo')]($subscribed_orgs)
+				.each(function(i, org_block) {
+					setTimeout(function() {
+						$(org_block).addClass('-show');
+					}, timing += 100);
+				});
+			
+			bindPageLinks($subscribed_orgs);
+		}
+		if (to_remove.length) {
+			to_remove.forEach(function(id) {
+				var $organization_item = $subscribed_orgs.find('.organization_item[data-organization_id="' + id + '"]').removeClass('-show');
+				setTimeout(function() {
+					$organization_item.remove();
+				}, 500);
+			});
+		}
+	};
+	
+	return Sidebar;
 }()));
 /**
- * @requires Class.AbstractTopBar.js
+ * @requires Class.AbstractSidebar.js
  */
 /**
  * @class
- * @extends AbstractTopBar
+ * @extends AbstractSidebar
  */
-TopBarNoAuth = extending(AbstractTopBar, (function () {
+SidebarNoAuth = extending(AbstractSidebar, (function () {
 	/**
 	 *
 	 * @constructor
-	 * @constructs TopBarNoAuth
+	 * @constructs SidebarNoAuth
 	 */
-	function TopBarNoAuth() {
-		AbstractTopBar.call(this);
+	function SidebarNoAuth() {
+		AbstractSidebar.call(this);
 	}
 	
-	TopBarNoAuth.prototype.init = function () {
-		this.$main_header.find('.LoginButton').on('click', function() {
-			cookies.removeItem('auth_command');
-			cookies.removeItem('auth_entity_id');
-			(new AuthModal(location.href)).show();
-		});
-		AbstractTopBar.prototype.init.call(this);
+	SidebarNoAuth.prototype.init = function () {
+		this.$sidebar.find('.SidebarOrganizationsScroll').addClass(__C.CLASSES.HIDDEN);
+		AbstractSidebar.prototype.init.call(this);
 	};
 	
-	return TopBarNoAuth;
+	return SidebarNoAuth;
 }()));
 /**
  *
@@ -14748,6 +14749,361 @@ Page = (function() {
 	
 	return Page;
 }());
+/**
+ * @requires ../../Class.Page.js
+ */
+/**
+ *
+ * @abstract
+ * @class FeedPage
+ * @extends Page
+ */
+FeedPage = extending(Page, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs FeedPage
+	 */
+	function FeedPage() {
+		Page.call(this);
+		this.fields = new Fields(
+			'organization_short_name',
+			'organization_logo_small_url',
+			'dates',
+			'is_same_time',
+			'favored_users_count',
+			'is_favorite',
+			'is_registered',
+			'ticketing_locally',
+			'registration_locally',
+			'registration_available',
+			'registration_required',
+			'registration_till',
+			'registration_limit_count',
+			'is_free',
+			'min_price', {
+				favored: {
+					fields: 'is_friend',
+					order_by: '-is_friend',
+					length: 5
+				}
+			}
+		);
+		this.events = new EventsCollection();
+		this.next_events_length = 10;
+		this.cities = new CitiesCollection();
+		this.wrapper_tmpl = 'feed';
+		this.with_header_tabs = true;
+	}
+	
+	FeedPage.prototype.bindFeedEvents = function($parent) {
+		trimAvatarsCollection($parent);
+		bindRippleEffect($parent);
+		bindDropdown($parent);
+		__APP.MODALS.bindCallModal($parent);
+		bindPageLinks($parent);
+		
+		$parent.find('.HideEvent').not('.-Handled_HideEvent').each(function() {
+			var $this = $(this),
+				$event = $this.parents('.FeedEvent'),
+				event_id = $this.data("event-id");
+			
+			$this.on('click', function() {
+				$event.addClass('-cancel');
+				OneEvent.changeEventStatus(event_id, OneEvent.STATUS.HIDE, function() {
+					$event.after(tmpl('button', {
+						classes: '-color_neutral ReturnEvent',
+						title: 'Вернуть событие',
+						dataset: 'data-event-id="' + event_id + '"'
+					}));
+					$event.siblings('.ReturnEvent').not('.-Handled_ReturnEvent').on('click', function() {
+						var $remove_button = $(this);
+						OneEvent.changeEventStatus(event_id, OneEvent.STATUS.SHOW, function() {
+							$remove_button.remove();
+							$event.removeClass('-cancel');
+						});
+					}).addClass('-Handled_ReturnEvent');
+				});
+			});
+		}).addClass('-Handled_HideEvent');
+	};
+	
+	FeedPage.prototype.addNoEventsBlock = function() {
+		var $no_events_block = tmpl('feed-no-event', {
+			text: 'Как насчет того, чтобы подписаться на организации?',
+			button: __APP.BUILD.link({
+				title: 'Перейти к каталогу',
+				classes: ['button', '-color_neutral_accent', 'RippleEffect'],
+				page: '/organizations'
+			})
+		}, this.$wrapper);
+		bindPageLinks($no_events_block);
+		bindRippleEffect($no_events_block);
+	};
+	/**
+	 *
+	 * @param {function(jQuery)} [success]
+	 * @returns {jqPromise}
+	 */
+	FeedPage.prototype.appendEvents = function(success) {
+		var PAGE = this,
+			$loader = __APP.BUILD.loaderBlock(PAGE.$wrapper);
+		
+		PAGE.block_scroll = true;
+		
+		return PAGE.events.fetchFeed(this.fields, this.next_events_length, {city_id: __APP.USER.selected_city.id}, function(events) {
+			var $events = __APP.BUILD.eventCards(PAGE.events.last_pushed);
+			
+			PAGE.block_scroll = false;
+			if ($events.length) {
+				PAGE.$wrapper.append($events);
+				PAGE.bindFeedEvents($events);
+				if (isFunction(success)) {
+					success($events);
+				}
+			} else {
+				PAGE.addNoEventsBlock();
+				$(window).off('scroll.upload' + PAGE.constructor.name);
+			}
+			$loader.remove();
+		});
+	};
+	
+	FeedPage.prototype.initFeedCalendar = function() {
+		var PAGE = this,
+			selected_date = PAGE.events.date,
+			MainCalendar = new Calendar(PAGE.$view.find('.FeedCalendar'), {
+				classes: {
+					wrapper_class: 'feed_calendar_wrapper',
+					table_class: 'feed_calendar_table',
+					thead_class: 'feed_calendar_thead',
+					tbody_class: 'feed_calendar_tbody',
+					th_class: 'feed_calendar_th',
+					td_class: 'feed_calendar_td',
+					td_disabled: __C.CLASSES.DISABLED
+				}
+			});
+		
+		MainCalendar.init();
+		if (selected_date) {
+			MainCalendar.setMonth(selected_date.split('-')[1], selected_date.split('-')[0]).selectDays(selected_date);
+		}
+		MainCalendar.setDaysWithEvents();
+		MainCalendar.$calendar.on('change:month', function() {
+			bindPageLinks(MainCalendar.$calendar);
+			MainCalendar.setDaysWithEvents();
+		});
+	};
+	
+	FeedPage.prototype.initCitySelect = function() {
+		var PAGE = this;
+		
+		PAGE.cities.fetchCities(null, 0, 'distance,local_name').done(function() {
+			var $select = PAGE.$view.find('.FeedCitiesSelect');
+			
+			$select.html(tmpl('option', PAGE.cities.map(function(city) {
+				
+				return {
+					val: city.id,
+					display_name: city.local_name
+				};
+			})));
+			
+			initSelect2($select);
+			$select.select2('val', __APP.USER.selected_city.id).off('change.SelectCity').on('change.SelectCity', function() {
+					__APP.USER.selected_city = PAGE.cities.getByID($(this).val());
+					__APP.reload();
+				});
+		});
+	};
+	
+	FeedPage.prototype.render = function() {
+		var PAGE = this,
+			$window = $(window);
+		
+		if (!(__APP.PREVIOUS_PAGE instanceof FeedPage)) {
+			PAGE.initFeedCalendar();
+			PAGE.initCitySelect();
+		}
+		
+		if(__APP.USER.isLoggedOut()){
+			__APP.renderHeaderTabs([
+				{title: 'Актуальные', page: '/feed/actual'},
+				{title: 'По времени', page: '/feed/timeline'}
+			]);
+			
+			PAGE.$view.find('.BecomeOrg').on('click', function(e) {
+				cookies.removeItem('auth_command');
+				cookies.removeItem('auth_entity_id');
+				(new AuthModal(location.origin + '/add/organization')).show();
+				
+				return false;
+			});
+			if(window.location.pathname === '/feed/favored' || window.location.pathname === '/feed/recommendations'){
+				__APP.changeState('/feed/actual', true, true);
+				return null;
+			}
+		} else {
+			__APP.renderHeaderTabs([
+				{title: 'Актуальные', page: '/feed/actual'},
+				{title: 'По времени', page: '/feed/timeline'},
+				{title: 'Избранные', page: '/feed/favored'},
+				{title: 'Рекомендованные', page: '/feed/recommendations'}/*,
+				 {title: 'Друзья', page: '/feed/friends/'},*/
+			]);
+		}
+		
+		$window.off('scroll');
+		PAGE.appendEvents(function() {
+			if (isScrollRemain(1000)) {
+				PAGE.appendEvents();
+			}
+			$window.on('scroll.upload' + PAGE.constructor.name, function() {
+				if (isScrollRemain(1000) && !PAGE.block_scroll) {
+					PAGE.appendEvents();
+				}
+			})
+		});
+	};
+	
+	return FeedPage;
+}()));
+/**
+ * @requires Class.FeedPage.js
+ */
+/**
+ *
+ * @class ActualEventsPage
+ * @extends FeedPage
+ */
+ActualEventsPage = extending(FeedPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs ActualEventsPage
+	 */
+	function ActualEventsPage() {
+		FeedPage.apply(this);
+		this.events = new ActualEventsCollection();
+		this.page_title = 'Актуальные события';
+	}
+	
+	return ActualEventsPage
+}()));
+/**
+ * @requires Class.FeedPage.js
+ */
+/**
+ *
+ * @class DayEventsPage
+ * @extends FeedPage
+ */
+DayEventsPage = extending(FeedPage, (function() {
+	/**
+	 *
+	 * @param {string} date
+	 * @constructor
+	 * @constructs DayEventsPage
+	 */
+	function DayEventsPage(date) {
+		if (!date)
+			throw Error('DayEventsCollection must have date parameter');
+		FeedPage.apply(this);
+		this.date = date;
+		this.events = new DayEventsCollection(this.date);
+		this.page_title = 'События на ' + moment(this.date).format('D MMMM YYYY');
+	}
+	
+	return DayEventsPage
+}()));
+/**
+ * @requires Class.FeedPage.js
+ */
+/**
+ *
+ * @class FavoredEventsPage
+ * @extends FeedPage
+ */
+FavoredEventsPage = extending(FeedPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs FavoredEventsPage
+	 */
+	function FavoredEventsPage() {
+		FeedPage.apply(this);
+		this.events = new FavoredEventsCollection();
+		this.page_title = 'Избранные события';
+	}
+	
+	return FavoredEventsPage
+}()));
+/**
+ * @requires Class.FeedPage.js
+ */
+/**
+ *
+ * @class FriendsEventsPage
+ * @extends FeedPage
+ */
+FriendsEventsPage = extending(FeedPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs FriendsEventsPage
+	 */
+	function FriendsEventsPage() {
+		FeedPage.apply(this);
+		this.events = new FriendsEventsCollection();
+		this.page_title = 'События друзей';
+	}
+	
+	return FriendsEventsPage
+}()));
+/**
+ * @requires Class.FeedPage.js
+ */
+/**
+ *
+ * @class RecommendedEventsPage
+ * @extends FeedPage
+ */
+RecommendedEventsPage = extending(FeedPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs RecommendedEventsPage
+	 */
+	function RecommendedEventsPage() {
+		FeedPage.apply(this);
+		this.events = new RecommendedEventsCollection();
+		this.page_title = 'Рекомендованные события';
+	}
+	
+	return RecommendedEventsPage
+}()));
+/**
+ * @requires Class.FeedPage.js
+ */
+/**
+ *
+ * @class TimelineEventsPage
+ * @extends FeedPage
+ */
+TimelineEventsPage = extending(FeedPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs TimelineEventsPage
+	 */
+	function TimelineEventsPage() {
+		FeedPage.apply(this);
+		this.events = new TimelineEventsCollection();
+		this.page_title = 'События по времени';
+	}
+	
+	return TimelineEventsPage
+}()));
 /**
  * @requires ../Class.Page.js
  */
@@ -19110,361 +19466,6 @@ AdminOrganizationSupportPage = extending(AdminOrganizationPage, (function() {
 	return AdminOrganizationSupportPage;
 }()));
 /**
- * @requires ../../Class.Page.js
- */
-/**
- *
- * @abstract
- * @class FeedPage
- * @extends Page
- */
-FeedPage = extending(Page, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs FeedPage
-	 */
-	function FeedPage() {
-		Page.call(this);
-		this.fields = new Fields(
-			'organization_short_name',
-			'organization_logo_small_url',
-			'dates',
-			'is_same_time',
-			'favored_users_count',
-			'is_favorite',
-			'is_registered',
-			'ticketing_locally',
-			'registration_locally',
-			'registration_available',
-			'registration_required',
-			'registration_till',
-			'registration_limit_count',
-			'is_free',
-			'min_price', {
-				favored: {
-					fields: 'is_friend',
-					order_by: '-is_friend',
-					length: 5
-				}
-			}
-		);
-		this.events = new EventsCollection();
-		this.next_events_length = 10;
-		this.cities = new CitiesCollection();
-		this.wrapper_tmpl = 'feed';
-		this.with_header_tabs = true;
-	}
-	
-	FeedPage.prototype.bindFeedEvents = function($parent) {
-		trimAvatarsCollection($parent);
-		bindRippleEffect($parent);
-		bindDropdown($parent);
-		__APP.MODALS.bindCallModal($parent);
-		bindPageLinks($parent);
-		
-		$parent.find('.HideEvent').not('.-Handled_HideEvent').each(function() {
-			var $this = $(this),
-				$event = $this.parents('.FeedEvent'),
-				event_id = $this.data("event-id");
-			
-			$this.on('click', function() {
-				$event.addClass('-cancel');
-				OneEvent.changeEventStatus(event_id, OneEvent.STATUS.HIDE, function() {
-					$event.after(tmpl('button', {
-						classes: '-color_neutral ReturnEvent',
-						title: 'Вернуть событие',
-						dataset: 'data-event-id="' + event_id + '"'
-					}));
-					$event.siblings('.ReturnEvent').not('.-Handled_ReturnEvent').on('click', function() {
-						var $remove_button = $(this);
-						OneEvent.changeEventStatus(event_id, OneEvent.STATUS.SHOW, function() {
-							$remove_button.remove();
-							$event.removeClass('-cancel');
-						});
-					}).addClass('-Handled_ReturnEvent');
-				});
-			});
-		}).addClass('-Handled_HideEvent');
-	};
-	
-	FeedPage.prototype.addNoEventsBlock = function() {
-		var $no_events_block = tmpl('feed-no-event', {
-			text: 'Как насчет того, чтобы подписаться на организации?',
-			button: __APP.BUILD.link({
-				title: 'Перейти к каталогу',
-				classes: ['button', '-color_neutral_accent', 'RippleEffect'],
-				page: '/organizations'
-			})
-		}, this.$wrapper);
-		bindPageLinks($no_events_block);
-		bindRippleEffect($no_events_block);
-	};
-	/**
-	 *
-	 * @param {function(jQuery)} [success]
-	 * @returns {jqPromise}
-	 */
-	FeedPage.prototype.appendEvents = function(success) {
-		var PAGE = this,
-			$loader = __APP.BUILD.loaderBlock(PAGE.$wrapper);
-		
-		PAGE.block_scroll = true;
-		
-		return PAGE.events.fetchFeed(this.fields, this.next_events_length, {city_id: __APP.USER.selected_city.id}, function(events) {
-			var $events = __APP.BUILD.eventCards(PAGE.events.last_pushed);
-			
-			PAGE.block_scroll = false;
-			if ($events.length) {
-				PAGE.$wrapper.append($events);
-				PAGE.bindFeedEvents($events);
-				if (isFunction(success)) {
-					success($events);
-				}
-			} else {
-				PAGE.addNoEventsBlock();
-				$(window).off('scroll.upload' + PAGE.constructor.name);
-			}
-			$loader.remove();
-		});
-	};
-	
-	FeedPage.prototype.initFeedCalendar = function() {
-		var PAGE = this,
-			selected_date = PAGE.events.date,
-			MainCalendar = new Calendar(PAGE.$view.find('.FeedCalendar'), {
-				classes: {
-					wrapper_class: 'feed_calendar_wrapper',
-					table_class: 'feed_calendar_table',
-					thead_class: 'feed_calendar_thead',
-					tbody_class: 'feed_calendar_tbody',
-					th_class: 'feed_calendar_th',
-					td_class: 'feed_calendar_td',
-					td_disabled: __C.CLASSES.DISABLED
-				}
-			});
-		
-		MainCalendar.init();
-		if (selected_date) {
-			MainCalendar.setMonth(selected_date.split('-')[1], selected_date.split('-')[0]).selectDays(selected_date);
-		}
-		MainCalendar.setDaysWithEvents();
-		MainCalendar.$calendar.on('change:month', function() {
-			bindPageLinks(MainCalendar.$calendar);
-			MainCalendar.setDaysWithEvents();
-		});
-	};
-	
-	FeedPage.prototype.initCitySelect = function() {
-		var PAGE = this;
-		
-		PAGE.cities.fetchCities(null, 0, 'distance,local_name').done(function() {
-			var $select = PAGE.$view.find('.FeedCitiesSelect');
-			
-			$select.html(tmpl('option', PAGE.cities.map(function(city) {
-				
-				return {
-					val: city.id,
-					display_name: city.local_name
-				};
-			})));
-			
-			initSelect2($select);
-			$select.select2('val', __APP.USER.selected_city.id).off('change.SelectCity').on('change.SelectCity', function() {
-					__APP.USER.selected_city = PAGE.cities.getByID($(this).val());
-					__APP.reload();
-				});
-		});
-	};
-	
-	FeedPage.prototype.render = function() {
-		var PAGE = this,
-			$window = $(window);
-		
-		if (!(__APP.PREVIOUS_PAGE instanceof FeedPage)) {
-			PAGE.initFeedCalendar();
-			PAGE.initCitySelect();
-		}
-		
-		if(__APP.USER.isLoggedOut()){
-			__APP.renderHeaderTabs([
-				{title: 'Актуальные', page: '/feed/actual'},
-				{title: 'По времени', page: '/feed/timeline'}
-			]);
-			
-			PAGE.$view.find('.BecomeOrg').on('click', function(e) {
-				cookies.removeItem('auth_command');
-				cookies.removeItem('auth_entity_id');
-				(new AuthModal(location.origin + '/add/organization')).show();
-				
-				return false;
-			});
-			if(window.location.pathname === '/feed/favored' || window.location.pathname === '/feed/recommendations'){
-				__APP.changeState('/feed/actual', true, true);
-				return null;
-			}
-		} else {
-			__APP.renderHeaderTabs([
-				{title: 'Актуальные', page: '/feed/actual'},
-				{title: 'По времени', page: '/feed/timeline'},
-				{title: 'Избранные', page: '/feed/favored'},
-				{title: 'Рекомендованные', page: '/feed/recommendations'}/*,
-				 {title: 'Друзья', page: '/feed/friends/'},*/
-			]);
-		}
-		
-		$window.off('scroll');
-		PAGE.appendEvents(function() {
-			if (isScrollRemain(1000)) {
-				PAGE.appendEvents();
-			}
-			$window.on('scroll.upload' + PAGE.constructor.name, function() {
-				if (isScrollRemain(1000) && !PAGE.block_scroll) {
-					PAGE.appendEvents();
-				}
-			})
-		});
-	};
-	
-	return FeedPage;
-}()));
-/**
- * @requires Class.FeedPage.js
- */
-/**
- *
- * @class ActualEventsPage
- * @extends FeedPage
- */
-ActualEventsPage = extending(FeedPage, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs ActualEventsPage
-	 */
-	function ActualEventsPage() {
-		FeedPage.apply(this);
-		this.events = new ActualEventsCollection();
-		this.page_title = 'Актуальные события';
-	}
-	
-	return ActualEventsPage
-}()));
-/**
- * @requires Class.FeedPage.js
- */
-/**
- *
- * @class DayEventsPage
- * @extends FeedPage
- */
-DayEventsPage = extending(FeedPage, (function() {
-	/**
-	 *
-	 * @param {string} date
-	 * @constructor
-	 * @constructs DayEventsPage
-	 */
-	function DayEventsPage(date) {
-		if (!date)
-			throw Error('DayEventsCollection must have date parameter');
-		FeedPage.apply(this);
-		this.date = date;
-		this.events = new DayEventsCollection(this.date);
-		this.page_title = 'События на ' + moment(this.date).format('D MMMM YYYY');
-	}
-	
-	return DayEventsPage
-}()));
-/**
- * @requires Class.FeedPage.js
- */
-/**
- *
- * @class FavoredEventsPage
- * @extends FeedPage
- */
-FavoredEventsPage = extending(FeedPage, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs FavoredEventsPage
-	 */
-	function FavoredEventsPage() {
-		FeedPage.apply(this);
-		this.events = new FavoredEventsCollection();
-		this.page_title = 'Избранные события';
-	}
-	
-	return FavoredEventsPage
-}()));
-/**
- * @requires Class.FeedPage.js
- */
-/**
- *
- * @class FriendsEventsPage
- * @extends FeedPage
- */
-FriendsEventsPage = extending(FeedPage, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs FriendsEventsPage
-	 */
-	function FriendsEventsPage() {
-		FeedPage.apply(this);
-		this.events = new FriendsEventsCollection();
-		this.page_title = 'События друзей';
-	}
-	
-	return FriendsEventsPage
-}()));
-/**
- * @requires Class.FeedPage.js
- */
-/**
- *
- * @class RecommendedEventsPage
- * @extends FeedPage
- */
-RecommendedEventsPage = extending(FeedPage, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs RecommendedEventsPage
-	 */
-	function RecommendedEventsPage() {
-		FeedPage.apply(this);
-		this.events = new RecommendedEventsCollection();
-		this.page_title = 'Рекомендованные события';
-	}
-	
-	return RecommendedEventsPage
-}()));
-/**
- * @requires Class.FeedPage.js
- */
-/**
- *
- * @class TimelineEventsPage
- * @extends FeedPage
- */
-TimelineEventsPage = extending(FeedPage, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs TimelineEventsPage
-	 */
-	function TimelineEventsPage() {
-		FeedPage.apply(this);
-		this.events = new TimelineEventsCollection();
-		this.page_title = 'События по времени';
-	}
-	
-	return TimelineEventsPage
-}()));
-/**
  * @requires Class.Page.js
  */
 /**
@@ -19487,146 +19488,6 @@ NotFoundPage = extending(Page, (function() {
 	};
 	
 	return NotFoundPage;
-}()));
-/**
- * @requires Class.AdminPage.js
- */
-/**
- *
- * @class AdminOrganizationsPage
- * @extends AdminPage
- */
-AdminOrganizationsPage = extending(AdminPage, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs AdminOrganizationsPage
-	 */
-	function AdminOrganizationsPage() {
-		AdminPage.call(this);
-		
-		this.is_upload_disabled = false;
-		this.block_scroll = false;
-		this.my_organizations_fields = new Fields('img_medium_url', 'subscribed_count', 'staff');
-		this.page_title = 'Организации';
-		this.my_organizations = new OrganizationsCollection();
-	}
-	
-	/**
-	 *
-	 * @param {(OrganizationsCollection|Array<OneOrganization>)} organizations
-	 * @return {jQuery}
-	 */
-	AdminOrganizationsPage.buildMyOrganizationsBlocks = function(organizations) {
-		return tmpl('statistics-overview-organization', organizations.map(function(org) {
-			
-			var avatars_max_count = 2,
-				org_roles = [
-					{
-						name: OneUser.ROLE.ADMIN,
-						title: 'Администраторы',
-						staff: org.admins,
-						plural_name: OneUser.ROLE.ADMIN + 's_block'
-					}, {
-						name: OneUser.ROLE.MODERATOR,
-						title: 'Модераторы',
-						staff: org.moderators,
-						plural_name: OneUser.ROLE.MODERATOR + 's_block'
-					}
-				];
-			
-			return $.extend(true, {}, org, {
-				subscribers: org.subscribed_count + getUnitsText(org.subscribed_count, __LOCALES.ru_RU.TEXTS.SUBSCRIBERS),
-				buttons: __APP.BUILD.link({
-					title: 'Редактировать',
-					classes: ['button', 'fa_icon', 'fa-pencil', '-color_neutral', 'RippleEffect'],
-					page: '/admin/organization/' + org.id + '/edit'
-				}, {
-					title: 'Создать событие',
-					classes: ['button', 'fa_icon', 'fa-plus', '-color_accent', 'RippleEffect'],
-					page: '/add/event/to/' + org.id
-				})
-			}, org_roles.reduce(function(obj, role) {
-				obj[role.plural_name] = __APP.BUILD.avatarCollection(role.staff.map(function(staff) {
-					return $.extend({}, staff, {
-						is_link: true,
-						avatar_classes: ['-size_100x100', '-rounded']
-					});
-				}), avatars_max_count, {
-					dataset: {
-						modal_type: 'editors',
-						modal_specific_role: role.name,
-						modal_title: role.title,
-						modal_organization_id: org.id
-					},
-					classes: ['-size_30x30', '-rounded', '-shifted', 'CallModal'],
-					counter_classes: ['-size_30x30','-color_marginal_primary']
-				});
-				
-				return obj;
-			}, {}));
-		}));
-	};
-	
-	AdminOrganizationsPage.prototype.fetchData = function() {
-		return this.fetching_data_defer = this.my_organizations.fetchMyOrganizations([OneUser.ROLE.ADMIN, OneUser.ROLE.MODERATOR], this.my_organizations_fields, 10, '');
-	};
-	
-	AdminOrganizationsPage.prototype.bindOrganizationsEvents = function($parent) {
-		trimAvatarsCollection($parent);
-		bindPageLinks($parent);
-		__APP.MODALS.bindCallModal($parent);
-		bindRippleEffect($parent);
-		return $parent;
-	};
-	
-	AdminOrganizationsPage.prototype.init = function() {
-		var PAGE = this;
-		
-		this.bindOrganizationsEvents(this.$wrapper);
-		
-		
-		$(window).on('scroll.uploadOrganizations', function() {
-			var $loader,
-				$wrapper,
-				$organizations;
-			
-			if (isScrollRemain(200) && !PAGE.is_upload_disabled && !PAGE.block_scroll) {
-				PAGE.block_scroll = true;
-				$wrapper = PAGE.$wrapper.find('.StatOverviewOrganizations');
-				$loader = __APP.BUILD.loaderBlock($wrapper);
-				
-				PAGE.my_organizations.fetchMyOrganizations([OneUser.ROLE.ADMIN, OneUser.ROLE.MODERATOR], PAGE.my_organizations_fields, 10, '', function(organizations) {
-					PAGE.block_scroll = false;
-					$loader.remove();
-					$organizations = AdminOrganizationsPage.buildMyOrganizationsBlocks(organizations);
-					if (organizations.length) {
-						$wrapper.append($organizations);
-						PAGE.bindOrganizationsEvents($organizations);
-					} else {
-						PAGE.is_upload_disabled = true;
-					}
-				});
-			}
-		});
-	};
-	
-	AdminOrganizationsPage.prototype.render = function() {
-		if(__APP.USER.id === -1){
-			__APP.changeState('/feed/actual', true, true);
-			return null;
-		}
-		this.$wrapper.html(tmpl('statistics-overview-wrapper', {
-			organizations: AdminOrganizationsPage.buildMyOrganizationsBlocks(this.my_organizations)
-		}));
-		this.init();
-	};
-	
-	AdminOrganizationsPage.prototype.destroy = function() {
-		$(window).off('scroll.uploadOrganizations');
-	};
-	
-	return AdminOrganizationsPage;
 }()));
 /**
  * @requires Class.AbstractEditEventPage.js
@@ -19743,7 +19604,8 @@ EventPage = extending(Page, (function() {
 		'registration_available',
 		'registration_approved',
 		'registered_count',
-		'registered'
+		'registered',
+		'ticketing_locally'
 	], {
 		dates: {
 			length: 0,
@@ -20147,6 +20009,146 @@ EventPage = extending(Page, (function() {
 }()));
 
 /**
+ * @requires Class.AdminPage.js
+ */
+/**
+ *
+ * @class AdminOrganizationsPage
+ * @extends AdminPage
+ */
+AdminOrganizationsPage = extending(AdminPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs AdminOrganizationsPage
+	 */
+	function AdminOrganizationsPage() {
+		AdminPage.call(this);
+		
+		this.is_upload_disabled = false;
+		this.block_scroll = false;
+		this.my_organizations_fields = new Fields('img_medium_url', 'subscribed_count', 'staff');
+		this.page_title = 'Организации';
+		this.my_organizations = new OrganizationsCollection();
+	}
+	
+	/**
+	 *
+	 * @param {(OrganizationsCollection|Array<OneOrganization>)} organizations
+	 * @return {jQuery}
+	 */
+	AdminOrganizationsPage.buildMyOrganizationsBlocks = function(organizations) {
+		return tmpl('statistics-overview-organization', organizations.map(function(org) {
+			
+			var avatars_max_count = 2,
+				org_roles = [
+					{
+						name: OneUser.ROLE.ADMIN,
+						title: 'Администраторы',
+						staff: org.admins,
+						plural_name: OneUser.ROLE.ADMIN + 's_block'
+					}, {
+						name: OneUser.ROLE.MODERATOR,
+						title: 'Модераторы',
+						staff: org.moderators,
+						plural_name: OneUser.ROLE.MODERATOR + 's_block'
+					}
+				];
+			
+			return $.extend(true, {}, org, {
+				subscribers: org.subscribed_count + getUnitsText(org.subscribed_count, __LOCALES.ru_RU.TEXTS.SUBSCRIBERS),
+				buttons: __APP.BUILD.link({
+					title: 'Редактировать',
+					classes: ['button', 'fa_icon', 'fa-pencil', '-color_neutral', 'RippleEffect'],
+					page: '/admin/organization/' + org.id + '/edit'
+				}, {
+					title: 'Создать событие',
+					classes: ['button', 'fa_icon', 'fa-plus', '-color_accent', 'RippleEffect'],
+					page: '/add/event/to/' + org.id
+				})
+			}, org_roles.reduce(function(obj, role) {
+				obj[role.plural_name] = __APP.BUILD.avatarCollection(role.staff.map(function(staff) {
+					return $.extend({}, staff, {
+						is_link: true,
+						avatar_classes: ['-size_100x100', '-rounded']
+					});
+				}), avatars_max_count, {
+					dataset: {
+						modal_type: 'editors',
+						modal_specific_role: role.name,
+						modal_title: role.title,
+						modal_organization_id: org.id
+					},
+					classes: ['-size_30x30', '-rounded', '-shifted', 'CallModal'],
+					counter_classes: ['-size_30x30','-color_marginal_primary']
+				});
+				
+				return obj;
+			}, {}));
+		}));
+	};
+	
+	AdminOrganizationsPage.prototype.fetchData = function() {
+		return this.fetching_data_defer = this.my_organizations.fetchMyOrganizations([OneUser.ROLE.ADMIN, OneUser.ROLE.MODERATOR], this.my_organizations_fields, 10, '');
+	};
+	
+	AdminOrganizationsPage.prototype.bindOrganizationsEvents = function($parent) {
+		trimAvatarsCollection($parent);
+		bindPageLinks($parent);
+		__APP.MODALS.bindCallModal($parent);
+		bindRippleEffect($parent);
+		return $parent;
+	};
+	
+	AdminOrganizationsPage.prototype.init = function() {
+		var PAGE = this;
+		
+		this.bindOrganizationsEvents(this.$wrapper);
+		
+		
+		$(window).on('scroll.uploadOrganizations', function() {
+			var $loader,
+				$wrapper,
+				$organizations;
+			
+			if (isScrollRemain(200) && !PAGE.is_upload_disabled && !PAGE.block_scroll) {
+				PAGE.block_scroll = true;
+				$wrapper = PAGE.$wrapper.find('.StatOverviewOrganizations');
+				$loader = __APP.BUILD.loaderBlock($wrapper);
+				
+				PAGE.my_organizations.fetchMyOrganizations([OneUser.ROLE.ADMIN, OneUser.ROLE.MODERATOR], PAGE.my_organizations_fields, 10, '', function(organizations) {
+					PAGE.block_scroll = false;
+					$loader.remove();
+					$organizations = AdminOrganizationsPage.buildMyOrganizationsBlocks(organizations);
+					if (organizations.length) {
+						$wrapper.append($organizations);
+						PAGE.bindOrganizationsEvents($organizations);
+					} else {
+						PAGE.is_upload_disabled = true;
+					}
+				});
+			}
+		});
+	};
+	
+	AdminOrganizationsPage.prototype.render = function() {
+		if(__APP.USER.id === -1){
+			__APP.changeState('/feed/actual', true, true);
+			return null;
+		}
+		this.$wrapper.html(tmpl('statistics-overview-wrapper', {
+			organizations: AdminOrganizationsPage.buildMyOrganizationsBlocks(this.my_organizations)
+		}));
+		this.init();
+	};
+	
+	AdminOrganizationsPage.prototype.destroy = function() {
+		$(window).off('scroll.uploadOrganizations');
+	};
+	
+	return AdminOrganizationsPage;
+}()));
+/**
  * @requires ../Class.Page.js
  */
 /**
@@ -20436,7 +20438,7 @@ OrderPage = extending(Page, (function() {
 			var $wrapper = $(this).closest('.TicketType'),
 				$sum = $wrapper.find('.TicketTypeSum');
 			
-			if (value > 1) {
+			if (value > 0) {
 				$sum.removeClass(__C.CLASSES.HIDDEN);
 			} else {
 				$sum.addClass(__C.CLASSES.HIDDEN);
@@ -20481,7 +20483,7 @@ OrderPage = extending(Page, (function() {
 						$main_action_button.removeAttr('disabled');
 					}).done(function(data) {
 						if (self.event.ticketing_locally && data.sum !== 0) {
-							Payment.doPayment(data.order.uuid, data.sum, window.location.origin + '/event/' + self.event.id);
+							Payment.doPayment('order-' + data.order.uuid, data.sum, window.location.origin + '/event/' + self.event.id);
 						} else {
 							__APP.changeState('/event/'+self.event.id);
 						}
@@ -20551,16 +20553,404 @@ OrderPage = extending(Page, (function() {
 		
 		this.$wrapper.html(tmpl('order-page', this.render_vars));
 		
-		if (this.event.ticketing_locally && this.event.tickets.length) {
-			this.disablePage('Вы уже заказали билеты по этому событию');
-		} else if (this.event.is_registered) {
-			this.disablePage('Вы уже зарегистрированы на это событие');
-		}
-		
 		this.init();
 	};
 	
 	return OrderPage;
+}()));
+/**
+ * @requires ../Class.Page.js
+ */
+/**
+ * @class UserPage
+ * @extends Page
+ */
+UserPage = extending(Page, (function() {
+	/**
+	 *
+	 * @param {(number|string)} user_id
+	 * @constructs UserPage
+	 */
+	function UserPage(user_id) {
+		Page.apply(this);
+		this.user_id = user_id;
+		this.user = new OneUser(user_id);
+		this.events_metadata = {last_date: ''};
+		
+		this.disable_uploads = {
+			events: false,
+			activities: false
+		};
+		this.favored_fetch_data = {
+			fields: new Fields(
+				'image_horizontal_medium_url',
+				'favored',
+				'favored_users_count',
+				'is_favorite',
+				'is_registered',
+				'registration_available',
+				'registration_locally',
+				'ticketing_locally',
+				'dates'
+			),
+			order_by: 'nearest_event_date,-first_event_date',
+			length: 10
+		};
+	}
+	
+	UserPage.bindEvents = function($parent) {
+		bindRippleEffect($parent);
+		trimAvatarsCollection($parent);
+		__APP.MODALS.bindCallModal($parent);
+		bindPageLinks($parent);
+	};
+	
+	UserPage.prototype.fetchData = function() {
+		if(!(this.user_id == __APP.USER.id || this.user_id === 'me')){
+			return this.fetching_data_defer = this.user.fetchUser(new Fields('type', 'is_friend', 'link', 'accounts', 'accounts_links', {
+				friends: {
+					fields: ['is_friend'],
+					length: 4
+				},
+				favored: this.favored_fetch_data,
+				subscriptions: {
+					fields: ['img_small_url'],
+					length: 4,
+					order_by: ['organization_type_order', 'organization_type_id']
+				}
+			}));
+		}
+		return Page.prototype.fetchData.call(this);
+	};
+	
+	UserPage.prototype.uploadEntities = function(type) {
+		var self = this,
+			types = {
+				activities: {
+					fetch_method: this.user.actions.fetch,
+					fetch_context: this.user.actions,
+					fetch_arguments: [['organization', 'event', 'type_code', 'created_at'], 20, '-created_at'],
+					extra_function: function(entities) {
+						entities.forEach(function(activity) {
+							activity.user = self.user;
+						});
+					},
+					build_method: __APP.BUILD.activity,
+					build_extra_arguments: []
+				},
+				events: {
+					fetch_method: this.user.fetchFavored,
+					fetch_context: this.user,
+					fetch_arguments: [this.favored_fetch_data],
+					build_method: __APP.BUILD.eventBlocks,
+					build_extra_arguments: [this.events_metadata]
+				}
+			},
+			type_data = types[type],
+			$wrapper = self.$wrapper.find('.TabsBody').filter('[data-tab_body_type="'+type+'"]'),
+			$loader;
+		
+		if(!self.disable_uploads[type] && !self.block_scroll){
+			$loader = __APP.BUILD.loaderBlock($wrapper);
+			self.block_scroll = true;
+			
+			type_data.fetch_method.apply(type_data.fetch_context, type_data.fetch_arguments).done(function(entities) {
+				var $entities;
+				self.block_scroll = false;
+				$loader.remove();
+				if(entities.length){
+					if(type_data.extra_function && typeof type_data.extra_function === 'function'){
+						type_data.extra_function(entities);
+					}
+					$entities = type_data.build_method.apply(__APP.BUILD, [entities].concat(type_data.build_extra_arguments));
+					$wrapper.append($entities);
+					UserPage.bindEvents($entities);
+				} else {
+					if(!$wrapper.children().length){
+						$wrapper.append(__APP.BUILD.cap('Активности нет'));
+					}
+					self.disable_uploads[type] = true;
+				}
+			});
+		}
+	};
+	
+	UserPage.prototype.init = function() {
+		var self = this,
+			event_names = {
+				activities: 'scroll.uploadActivities',
+				events: 'scroll.uploadEvents'
+			};
+		
+		function bindScrollEvents(page, event_names) {
+			var active_type = page.$wrapper.find('.TabsBody').filter('.'+__C.CLASSES.ACTIVE).data('tab_body_type'),
+				$window = $(window);
+			
+			$window.off(Object.values(event_names).join(' '));
+			if ( isScrollRemain(1000) ) {
+				page.uploadEntities(active_type);
+			}
+			$window.on(event_names[active_type], function() {
+				if ( isScrollRemain(1000) ) {
+					page.uploadEntities(active_type);
+				}
+			});
+		}
+		
+		bindTabs(this.$wrapper);
+		UserPage.bindEvents(this.$wrapper);
+		
+		this.$wrapper.find('.Tabs').on('tabs:change', function() {
+			bindScrollEvents(self, event_names);
+		});
+		
+		bindScrollEvents(this, event_names);
+	};
+	
+	UserPage.prototype.render = function() {
+		var self = this,
+			$subscribed_orgs,
+			$favored_events;
+		
+		if(this.user_id == __APP.USER.id){
+			__APP.changeState('/my/profile', true, true);
+			return null;
+		}
+		__APP.changeTitle(this.user.full_name);
+		
+		this.user.actions.forEach(function(action) {
+			action.user = self.user;
+		});
+		
+		if(this.user.subscriptions.length) {
+			$subscribed_orgs = __APP.BUILD.avatarBlocks(this.user.subscriptions.slice(0,4), {
+				is_link: true,
+				entity: __C.ENTITIES.ORGANIZATION,
+				avatar_classes: [__C.CLASSES.SIZES.X30]
+			});
+		} else {
+			$subscribed_orgs = __APP.BUILD.cap('Нет подписок');
+		}
+		
+		if(this.user.favored.length) {
+			$favored_events = __APP.BUILD.eventBlocks(this.user.favored, this.events_metadata);
+		} else {
+			$favored_events = __APP.BUILD.cap('Событий нет');
+		}
+		
+		this.$wrapper.append(tmpl('user-page', {
+			wrapper_classes: '-another_user',
+			tombstone: __APP.BUILD.userTombstones(this.user, {avatar_classes: [__C.CLASSES.UNIVERSAL_STATES.BORDERED, __C.CLASSES.UNIVERSAL_STATES.SHADOWED]}),
+			links: __APP.BUILD.socialLinks(this.user.accounts_links, {
+				classes: __C.CLASSES.UNIVERSAL_STATES.ROUNDED
+			}),
+			subscribed_orgs: $subscribed_orgs,
+			show_all_subscribed_orgs_button: this.user.subscriptions.length ? __APP.BUILD.button({
+				classes: [__C.CLASSES.COLORS.NEUTRAL_ACCENT, __C.CLASSES.HOOKS.CALL_MODAL, __C.CLASSES.HOOKS.RIPPLE],
+				dataset: {
+					modal_type: 'subscribers_list',
+					modal_entity: this.user
+				},
+				title: 'Показать все'
+			}) : '',
+			friends_hidden: __C.CLASSES.HIDDEN,
+			favored_event_blocks: $favored_events
+		}));
+		this.uploadEntities('activities');
+		this.init();
+	};
+	
+	return UserPage;
+}()));
+/**
+ * @requires Class.UserPage.js
+ */
+/**
+ * @class MyProfilePage
+ * @extends UserPage
+ */
+MyProfilePage = extending(UserPage, (function() {
+	/**
+	 *
+	 * @constructs MyProfilePage
+	 */
+	function MyProfilePage() {
+		UserPage.call(this, __APP.USER.id);
+		this.page_title = 'Мой профиль';
+		this.favored_fetch_data.fields.push('is_favorite');
+		this.user = __APP.USER;
+	}
+	
+	MyProfilePage.prototype.fetchData = function() {
+		if(!this.user.favored.length){
+			return this.fetching_data_defer = this.user.fetchFavored(this.favored_fetch_data);
+		}
+		return Page.prototype.fetchData.call(this);
+	};
+	
+	MyProfilePage.prototype.render = function() {
+		var $activities,
+			$subscribed_orgs,
+			$favored_events,
+			$subscribed_users;
+		__APP.changeTitle('Мой профиль');
+		
+		this.user.actions.forEach(function(action) {
+			action.user = __APP.USER;
+		});
+		
+		if(this.user.subscriptions.length) {
+			$subscribed_orgs = __APP.BUILD.avatarBlocks(this.user.subscriptions.slice(0,4), {
+				is_link: true,
+				entity: __C.ENTITIES.ORGANIZATION,
+				avatar_classes: [__C.CLASSES.SIZES.X30]
+			});
+		} else {
+			$subscribed_orgs = __APP.BUILD.cap('Нет подписок');
+		}
+		
+		if(this.user.friends.length) {
+			$subscribed_users = __APP.BUILD.avatarBlocks(this.user.friends.slice(0,4), {
+				is_link: true,
+				entity: __C.ENTITIES.USER,
+				avatar_classes: [__C.CLASSES.SIZES.X30, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]
+			});
+		} else {
+			$subscribed_users = __APP.BUILD.cap('Нет друзей');
+		}
+		
+		if(this.user.favored.length) {
+			$favored_events = __APP.BUILD.eventBlocks(this.user.favored, this.events_metadata);
+		} else {
+			$favored_events = __APP.BUILD.cap('Событий нет');
+		}
+		
+		this.$wrapper.append(tmpl('user-page', {
+			wrapper_classes: '-this_user',
+			tombstone: __APP.BUILD.userTombstones(this.user, {avatar_classes: [__C.CLASSES.UNIVERSAL_STATES.BORDERED, __C.CLASSES.UNIVERSAL_STATES.SHADOWED]}),
+			links: __APP.BUILD.socialLinks(this.user.accounts_links, {
+				classes: __C.CLASSES.UNIVERSAL_STATES.ROUNDED
+			}),
+			subscribe_button: __APP.BUILD.button({
+				classes: [__C.CLASSES.COLORS.NEUTRAL_ACCENT, __C.CLASSES.HOOKS.RIPPLE, 'LogoutButton'],
+				title: 'Выйти'
+			}),
+			subscribed_orgs: $subscribed_orgs,
+			show_all_subscribed_orgs_button: this.user.subscriptions.length ? __APP.BUILD.button({
+				classes: [__C.CLASSES.COLORS.NEUTRAL_ACCENT, __C.CLASSES.HOOKS.CALL_MODAL, __C.CLASSES.HOOKS.RIPPLE],
+				dataset: {
+					modal_type: 'subscribers_list',
+					modal_entity: this.user
+				},
+				title: 'Показать все'
+			}) : '',
+			subscribed_users: $subscribed_users,
+			show_all_subscribed_users_button: this.user.friends.length ? __APP.BUILD.button({
+				classes: [__C.CLASSES.COLORS.NEUTRAL_ACCENT, __C.CLASSES.HOOKS.CALL_MODAL, __C.CLASSES.HOOKS.RIPPLE],
+				dataset: {
+					modal_type: 'friends_list',
+					modal_entity: this.user
+				},
+				title: 'Показать все'
+			}) : '',
+			favored_event_blocks: $favored_events
+		}));
+		
+		if(this.user.actions.length){
+			$activities = __APP.BUILD.activity(this.user.actions);
+			this.$wrapper.find('.TabsBody').filter('[data-tab_body_type="activities"]').append($activities);
+			UserPage.bindEvents($activities);
+		} else {
+			this.uploadEntities('activities');
+		}
+		this.$wrapper.find('.LogoutButton').on('click', __APP.USER.logout);
+		this.init();
+	};
+	
+	return MyProfilePage;
+}()));
+/**
+ * @requires ../Class.Page.js
+ */
+/**
+ *
+ * @class MyTicketsPage
+ * @extends Page
+ */
+MyTicketsPage = extending(Page, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs MyTicketsPage
+	 */
+	function MyTicketsPage() {
+		Page.call(this);
+		this.page_title = 'Мои билеты';
+		
+		this.tickets = new MyTicketsCollection();
+		
+		this.disable_uploads = false;
+		this.block_scroll = false;
+		
+		this.fetch_tickets_fields = new Fields('created_at', 'number', 'ticket_type', 'order', {
+			event: {
+				fields: new Fields('dates', 'is_same_time', 'image_horizontal_medium_url', 'location')
+			}
+		});
+		this.fetch_tickets_quantity = 30;
+	}
+	
+	MyTicketsPage.prototype.fetchData = function() {
+		return this.fetching_data_defer = this.tickets.fetchTickets(this.fetch_tickets_fields, this.fetch_tickets_quantity);
+	};
+	
+	MyTicketsPage.prototype.fetchAndAppendTickets = function() {
+		var self = this,
+			$loader;
+		
+		if (!self.disable_uploads && !self.block_scroll) {
+			$loader = __APP.BUILD.loaderBlock(self.$wrapper);
+			self.block_scroll = true;
+			self.tickets.fetchTickets(self.fetch_tickets_fields, self.fetch_tickets_quantity).done(function(tickets) {
+				self.block_scroll = false;
+				if (tickets.length) {
+					self.$wrapper.find('.TicketsWrapper').append(__APP.BUILD.ticketCards(tickets))
+				} else {
+					self.disable_uploads = true;
+				}
+				$loader.remove();
+			});
+		}
+	};
+	
+	MyTicketsPage.prototype.init = function() {
+		var self = this;
+		bindCallModal(this.$wrapper);
+		
+		if (isScrollRemain(1000)) {
+			self.fetchAndAppendTickets();
+		}
+		$(window).on('scroll.uploadTickets', function() {
+			if (isScrollRemain(1000)) {
+				self.fetchAndAppendTickets();
+			}
+		});
+	};
+	
+	MyTicketsPage.prototype.render = function() {
+		if(__APP.USER.isLoggedOut()){
+			__APP.changeState('/', true, true);
+			return null;
+		}
+		
+		this.$wrapper.html(tmpl('my-tickets-wrapper', {
+			tickets: __APP.BUILD.ticketCards(this.tickets)
+		}));
+		
+		this.init();
+	};
+	
+	return MyTicketsPage;
 }()));
 /**
  * @requires Class.AbstractEditOrganizationPage.js
@@ -21235,400 +21625,6 @@ SearchPage = extending(Page, (function() {
 	};
 	
 	return SearchPage;
-}()));
-/**
- * @requires ../Class.Page.js
- */
-/**
- * @class UserPage
- * @extends Page
- */
-UserPage = extending(Page, (function() {
-	/**
-	 *
-	 * @param {(number|string)} user_id
-	 * @constructs UserPage
-	 */
-	function UserPage(user_id) {
-		Page.apply(this);
-		this.user_id = user_id;
-		this.user = new OneUser(user_id);
-		this.events_metadata = {last_date: ''};
-		
-		this.disable_uploads = {
-			events: false,
-			activities: false
-		};
-		this.favored_fetch_data = {
-			fields: new Fields(
-				'image_horizontal_medium_url',
-				'favored',
-				'favored_users_count',
-				'is_favorite',
-				'is_registered',
-				'registration_available',
-				'registration_locally',
-				'ticketing_locally',
-				'dates'
-			),
-			order_by: 'nearest_event_date,-first_event_date',
-			length: 10
-		};
-	}
-	
-	UserPage.bindEvents = function($parent) {
-		bindRippleEffect($parent);
-		trimAvatarsCollection($parent);
-		__APP.MODALS.bindCallModal($parent);
-		bindPageLinks($parent);
-	};
-	
-	UserPage.prototype.fetchData = function() {
-		if(!(this.user_id == __APP.USER.id || this.user_id === 'me')){
-			return this.fetching_data_defer = this.user.fetchUser(new Fields('type', 'is_friend', 'link', 'accounts', 'accounts_links', {
-				friends: {
-					fields: ['is_friend'],
-					length: 4
-				},
-				favored: this.favored_fetch_data,
-				subscriptions: {
-					fields: ['img_small_url'],
-					length: 4,
-					order_by: ['organization_type_order', 'organization_type_id']
-				}
-			}));
-		}
-		return Page.prototype.fetchData.call(this);
-	};
-	
-	UserPage.prototype.uploadEntities = function(type) {
-		var self = this,
-			types = {
-				activities: {
-					fetch_method: this.user.actions.fetch,
-					fetch_context: this.user.actions,
-					fetch_arguments: [['organization', 'event', 'type_code', 'created_at'], 20, '-created_at'],
-					extra_function: function(entities) {
-						entities.forEach(function(activity) {
-							activity.user = self.user;
-						});
-					},
-					build_method: __APP.BUILD.activity,
-					build_extra_arguments: []
-				},
-				events: {
-					fetch_method: this.user.fetchFavored,
-					fetch_context: this.user,
-					fetch_arguments: [this.favored_fetch_data],
-					build_method: __APP.BUILD.eventBlocks,
-					build_extra_arguments: [this.events_metadata]
-				}
-			},
-			type_data = types[type],
-			$wrapper = self.$wrapper.find('.TabsBody').filter('[data-tab_body_type="'+type+'"]'),
-			$loader;
-		
-		if(!self.disable_uploads[type] && !self.block_scroll){
-			$loader = __APP.BUILD.loaderBlock($wrapper);
-			self.block_scroll = true;
-			
-			type_data.fetch_method.apply(type_data.fetch_context, type_data.fetch_arguments).done(function(entities) {
-				var $entities;
-				self.block_scroll = false;
-				$loader.remove();
-				if(entities.length){
-					if(type_data.extra_function && typeof type_data.extra_function === 'function'){
-						type_data.extra_function(entities);
-					}
-					$entities = type_data.build_method.apply(__APP.BUILD, [entities].concat(type_data.build_extra_arguments));
-					$wrapper.append($entities);
-					UserPage.bindEvents($entities);
-				} else {
-					if(!$wrapper.children().length){
-						$wrapper.append(__APP.BUILD.cap('Активности нет'));
-					}
-					self.disable_uploads[type] = true;
-				}
-			});
-		}
-	};
-	
-	UserPage.prototype.init = function() {
-		var self = this,
-			event_names = {
-				activities: 'scroll.uploadActivities',
-				events: 'scroll.uploadEvents'
-			};
-		
-		function bindScrollEvents(page, event_names) {
-			var active_type = page.$wrapper.find('.TabsBody').filter('.'+__C.CLASSES.ACTIVE).data('tab_body_type'),
-				$window = $(window);
-			
-			$window.off(Object.values(event_names).join(' '));
-			if ( isScrollRemain(1000) ) {
-				page.uploadEntities(active_type);
-			}
-			$window.on(event_names[active_type], function() {
-				if ( isScrollRemain(1000) ) {
-					page.uploadEntities(active_type);
-				}
-			});
-		}
-		
-		bindTabs(this.$wrapper);
-		UserPage.bindEvents(this.$wrapper);
-		
-		this.$wrapper.find('.Tabs').on('tabs:change', function() {
-			bindScrollEvents(self, event_names);
-		});
-		
-		bindScrollEvents(this, event_names);
-	};
-	
-	UserPage.prototype.render = function() {
-		var self = this,
-			$subscribed_orgs,
-			$favored_events;
-		
-		if(this.user_id == __APP.USER.id){
-			__APP.changeState('/my/profile', true, true);
-			return null;
-		}
-		__APP.changeTitle(this.user.full_name);
-		
-		this.user.actions.forEach(function(action) {
-			action.user = self.user;
-		});
-		
-		if(this.user.subscriptions.length) {
-			$subscribed_orgs = __APP.BUILD.avatarBlocks(this.user.subscriptions.slice(0,4), {
-				is_link: true,
-				entity: __C.ENTITIES.ORGANIZATION,
-				avatar_classes: [__C.CLASSES.SIZES.X30]
-			});
-		} else {
-			$subscribed_orgs = __APP.BUILD.cap('Нет подписок');
-		}
-		
-		if(this.user.favored.length) {
-			$favored_events = __APP.BUILD.eventBlocks(this.user.favored, this.events_metadata);
-		} else {
-			$favored_events = __APP.BUILD.cap('Событий нет');
-		}
-		
-		this.$wrapper.append(tmpl('user-page', {
-			wrapper_classes: '-another_user',
-			tombstone: __APP.BUILD.userTombstones(this.user, {avatar_classes: [__C.CLASSES.UNIVERSAL_STATES.BORDERED, __C.CLASSES.UNIVERSAL_STATES.SHADOWED]}),
-			links: __APP.BUILD.socialLinks(this.user.accounts_links, {
-				classes: __C.CLASSES.UNIVERSAL_STATES.ROUNDED
-			}),
-			subscribed_orgs: $subscribed_orgs,
-			show_all_subscribed_orgs_button: this.user.subscriptions.length ? __APP.BUILD.button({
-				classes: [__C.CLASSES.COLORS.NEUTRAL_ACCENT, __C.CLASSES.HOOKS.CALL_MODAL, __C.CLASSES.HOOKS.RIPPLE],
-				dataset: {
-					modal_type: 'subscribers_list',
-					modal_entity: this.user
-				},
-				title: 'Показать все'
-			}) : '',
-			friends_hidden: __C.CLASSES.HIDDEN,
-			favored_event_blocks: $favored_events
-		}));
-		this.uploadEntities('activities');
-		this.init();
-	};
-	
-	return UserPage;
-}()));
-/**
- * @requires Class.UserPage.js
- */
-/**
- * @class MyProfilePage
- * @extends UserPage
- */
-MyProfilePage = extending(UserPage, (function() {
-	/**
-	 *
-	 * @constructs MyProfilePage
-	 */
-	function MyProfilePage() {
-		UserPage.call(this, __APP.USER.id);
-		this.page_title = 'Мой профиль';
-		this.favored_fetch_data.fields.push('is_favorite');
-		this.user = __APP.USER;
-	}
-	
-	MyProfilePage.prototype.fetchData = function() {
-		if(!this.user.favored.length){
-			return this.fetching_data_defer = this.user.fetchFavored(this.favored_fetch_data);
-		}
-		return Page.prototype.fetchData.call(this);
-	};
-	
-	MyProfilePage.prototype.render = function() {
-		var $activities,
-			$subscribed_orgs,
-			$favored_events,
-			$subscribed_users;
-		__APP.changeTitle('Мой профиль');
-		
-		this.user.actions.forEach(function(action) {
-			action.user = __APP.USER;
-		});
-		
-		if(this.user.subscriptions.length) {
-			$subscribed_orgs = __APP.BUILD.avatarBlocks(this.user.subscriptions.slice(0,4), {
-				is_link: true,
-				entity: __C.ENTITIES.ORGANIZATION,
-				avatar_classes: [__C.CLASSES.SIZES.X30]
-			});
-		} else {
-			$subscribed_orgs = __APP.BUILD.cap('Нет подписок');
-		}
-		
-		if(this.user.friends.length) {
-			$subscribed_users = __APP.BUILD.avatarBlocks(this.user.friends.slice(0,4), {
-				is_link: true,
-				entity: __C.ENTITIES.USER,
-				avatar_classes: [__C.CLASSES.SIZES.X30, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]
-			});
-		} else {
-			$subscribed_users = __APP.BUILD.cap('Нет друзей');
-		}
-		
-		if(this.user.favored.length) {
-			$favored_events = __APP.BUILD.eventBlocks(this.user.favored, this.events_metadata);
-		} else {
-			$favored_events = __APP.BUILD.cap('Событий нет');
-		}
-		
-		this.$wrapper.append(tmpl('user-page', {
-			wrapper_classes: '-this_user',
-			tombstone: __APP.BUILD.userTombstones(this.user, {avatar_classes: [__C.CLASSES.UNIVERSAL_STATES.BORDERED, __C.CLASSES.UNIVERSAL_STATES.SHADOWED]}),
-			links: __APP.BUILD.socialLinks(this.user.accounts_links, {
-				classes: __C.CLASSES.UNIVERSAL_STATES.ROUNDED
-			}),
-			subscribe_button: __APP.BUILD.button({
-				classes: [__C.CLASSES.COLORS.NEUTRAL_ACCENT, __C.CLASSES.HOOKS.RIPPLE, 'LogoutButton'],
-				title: 'Выйти'
-			}),
-			subscribed_orgs: $subscribed_orgs,
-			show_all_subscribed_orgs_button: this.user.subscriptions.length ? __APP.BUILD.button({
-				classes: [__C.CLASSES.COLORS.NEUTRAL_ACCENT, __C.CLASSES.HOOKS.CALL_MODAL, __C.CLASSES.HOOKS.RIPPLE],
-				dataset: {
-					modal_type: 'subscribers_list',
-					modal_entity: this.user
-				},
-				title: 'Показать все'
-			}) : '',
-			subscribed_users: $subscribed_users,
-			show_all_subscribed_users_button: this.user.friends.length ? __APP.BUILD.button({
-				classes: [__C.CLASSES.COLORS.NEUTRAL_ACCENT, __C.CLASSES.HOOKS.CALL_MODAL, __C.CLASSES.HOOKS.RIPPLE],
-				dataset: {
-					modal_type: 'friends_list',
-					modal_entity: this.user
-				},
-				title: 'Показать все'
-			}) : '',
-			favored_event_blocks: $favored_events
-		}));
-		
-		if(this.user.actions.length){
-			$activities = __APP.BUILD.activity(this.user.actions);
-			this.$wrapper.find('.TabsBody').filter('[data-tab_body_type="activities"]').append($activities);
-			UserPage.bindEvents($activities);
-		} else {
-			this.uploadEntities('activities');
-		}
-		this.$wrapper.find('.LogoutButton').on('click', __APP.USER.logout);
-		this.init();
-	};
-	
-	return MyProfilePage;
-}()));
-/**
- * @requires ../Class.Page.js
- */
-/**
- *
- * @class MyTicketsPage
- * @extends Page
- */
-MyTicketsPage = extending(Page, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs MyTicketsPage
-	 */
-	function MyTicketsPage() {
-		Page.call(this);
-		this.page_title = 'Мои билеты';
-		
-		this.tickets = new MyTicketsCollection();
-		
-		this.disable_uploads = false;
-		this.block_scroll = false;
-		
-		this.fetch_tickets_fields = new Fields('created_at', 'number', 'ticket_type', 'order', {
-			event: {
-				fields: new Fields('dates', 'is_same_time', 'image_horizontal_medium_url', 'location')
-			}
-		});
-		this.fetch_tickets_quantity = 30;
-	}
-	
-	MyTicketsPage.prototype.fetchData = function() {
-		return this.fetching_data_defer = this.tickets.fetchTickets(this.fetch_tickets_fields, this.fetch_tickets_quantity);
-	};
-	
-	MyTicketsPage.prototype.fetchAndAppendTickets = function() {
-		var self = this,
-			$loader;
-		
-		if (!self.disable_uploads && !self.block_scroll) {
-			$loader = __APP.BUILD.loaderBlock(self.$wrapper);
-			self.block_scroll = true;
-			self.tickets.fetchTickets(self.fetch_tickets_fields, self.fetch_tickets_quantity).done(function(tickets) {
-				self.block_scroll = false;
-				if (tickets.length) {
-					self.$wrapper.find('.TicketsWrapper').append(__APP.BUILD.ticketCards(tickets))
-				} else {
-					self.disable_uploads = true;
-				}
-				$loader.remove();
-			});
-		}
-	};
-	
-	MyTicketsPage.prototype.init = function() {
-		var self = this;
-		bindCallModal(this.$wrapper);
-		
-		if (isScrollRemain(1000)) {
-			self.fetchAndAppendTickets();
-		}
-		$(window).on('scroll.uploadTickets', function() {
-			if (isScrollRemain(1000)) {
-				self.fetchAndAppendTickets();
-			}
-		});
-	};
-	
-	MyTicketsPage.prototype.render = function() {
-		if(__APP.USER.isLoggedOut()){
-			__APP.changeState('/', true, true);
-			return null;
-		}
-		
-		this.$wrapper.html(tmpl('my-tickets-wrapper', {
-			tickets: __APP.BUILD.ticketCards(this.tickets)
-		}));
-		
-		this.init();
-	};
-	
-	return MyTicketsPage;
 }()));
 /**
  *
