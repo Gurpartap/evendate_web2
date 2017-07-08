@@ -296,6 +296,7 @@ a.-odd:focus {text-decoration: none}
 .counter,
 .form_radio + .form_label,
 .form_checkbox + .form_label,
+form:disabled,
 fieldset:disabled,
 .-unselectable {
 	-webkit-touch-callout: none;
@@ -838,7 +839,10 @@ table.table.-data_table_override.-data_table_row_selection tr.-selected.-has_chi
 /* /Collapsing wrapper */
 /* Forms */
 
-input, select, textarea, button {
+input,
+select,
+textarea,
+button {
 	font-family: inherit;
 	color: inherit;
 }
@@ -850,15 +854,17 @@ fieldset {
 	margin: 0;
 	border: 0;
 }
-.-status_disabled.-status_disabled,
-fieldset:disabled {
+
+form:disabled,
+fieldset:disabled,
+.-status_disabled.-status_disabled {
 	opacity: .4;
 	pointer-events: none;
 }
 .-status_disabled .-status_disabled,
-fieldset:disabled .-status_disabled,
-.-status_disabled fieldset:disabled,
-fieldset:disabled fieldset:disabled {opacity: 1}
+:disabled .-status_disabled,
+.-status_disabled :disabled,
+:disabled :disabled {opacity: 1}
 
 fieldset:disabled input,
 fieldset:disabled select,
@@ -3373,7 +3379,25 @@ body.-open_modal > .modal_wrapper {
 .stamp.-color_marginal_accent {background-color: #e0e0e0}
 
 /* /Stamp */
-/* Cap */
+/* Overlay cap */
+
+.overlay_cap {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	font-size: 1rem;
+	z-index: 6;
+}
+
+.overlay_cap p {
+	margin-bottom: 12px;
+	font-size: 2em;
+	font-weight: 300;
+}
+
+/* /Overlay cap */
 
 .cap {
 	display: flex;
@@ -4601,10 +4625,20 @@ body,
 	border: 1px dashed;
 }
 
-
-.edit_event_registration_custom_field {
-	padding: 12px 24px 30px;
+.edit_event_registration_field_draggable {
+	position: absolute;
+	top: 0;
+	right: 0;
+	left: 0;
+	padding: 6px;
+	color: #c5c9d1;
+	color: var(--color_primary_50);
+	cursor: move;
+	text-align: center;
 }
+
+
+.edit_event_registration_custom_field {padding: 36px 24px 24px}
 
 .edit_event_registration_custom_field > .form_unit {margin: 24px 0}
 
@@ -5047,23 +5081,6 @@ body,
 	font-weight: 500;
 }
 
-.event_canceled_cap {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	font-size: 1rem;
-	font-weight: 300;
-	background-color: hsla(0,0%,100%,.9);
-	z-index: 1;
-}
-
-.event_canceled_cap p {
-	margin-bottom: 12px;
-	font-size: 2rem;
-}
-
 .event_vulcan {
 	width: 240px;
 	margin: 24px 0 0 24px;
@@ -5080,12 +5097,20 @@ body,
 	text-align: center;
 }
 
+.event_page > .overlay_cap {
+	background-color: hsla(0,0%,100%,.9);
+}
+
 /* ORDER */
 
 .order_page {
 	width: 600px;
 	margin: auto;
 	padding: 36px 0;
+}
+
+.order_form.-disabled {
+	opacity: .1;
 }
 
 
@@ -5313,7 +5338,9 @@ body,
 .feed_calendar_td.today > .day_num {color: #f82969; color: var(--color_accent)}
 .-state_admin .feed_calendar_td.today > .day_num {color: #00dc88}
 .feed_calendar_td.-active {background-color: transparent}
-.feed_calendar_td.-active > .day_num {
+.feed_calendar_td.-active > .day_num,
+.feed_calendar_td.-active > .day_num:hover,
+.feed_calendar_td.-active > .day_num:focus {
 	color: #fff;
 	border-radius: 50%;
 	background-color: #f82969;
