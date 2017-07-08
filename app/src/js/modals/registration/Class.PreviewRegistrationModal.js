@@ -10,6 +10,7 @@ PreviewRegistrationModal = extending(AbstractModal, (function() {
 	/**
 	 *
 	 * @param {OneEvent} event
+	 *
 	 * @constructor
 	 * @constructs PreviewRegistrationModal
 	 */
@@ -53,7 +54,7 @@ PreviewRegistrationModal = extending(AbstractModal, (function() {
 	};
 	/**
 	 *
-	 * @param {(RegistrationFieldModel|RegistrationSelectFieldModel)} field
+	 * @param {RegistrationFieldModel} field
 	 * @return {jQuery}
 	 */
 	PreviewRegistrationModal.prototype.buildRegistrationField = function(field) {

@@ -17,7 +17,8 @@ class RegistrationField extends AbstractEntity{
 		'label',
 		'required',
 		'values',
-		'uuid'
+		'uuid',
+		'order_number'
 	);
 
 	protected static $ADDITIONAL_COLS = array(

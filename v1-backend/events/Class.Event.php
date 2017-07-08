@@ -1485,7 +1485,6 @@ class Event extends AbstractEntity
 		return new Result(true, 'Событие успешно сохранено!', array('event_id' => $this->getId()));
 	}
 
-
 	private function disableNotificationByType($notification_type_id)
 	{
 		$q_upd = App::queryFactory();
