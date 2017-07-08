@@ -260,6 +260,7 @@ AbstractEditEventPage = extending(Page, (function() {
 				
 				return {
 					row_num: row_id,
+					comment: ticket_type.comment,
 					name_input: __APP.BUILD.formUnit({
 						id: 'event_edit_ticket_type_' + row_id + '_name',
 						classes: 'OnChangeRemoveUUID',
@@ -390,7 +391,7 @@ AbstractEditEventPage = extending(Page, (function() {
 						type: 'number',
 						label: 'Минимум',
 						name: 'ticket_type_' + row_id + '_min_count_per_user',
-						value: ticket_type.min_count_per_user || 1,
+						value: ticket_type.min_count_per_user || 0,
 						unit_classes: ['-inline'],
 						required: true,
 						attributes: {
@@ -406,7 +407,7 @@ AbstractEditEventPage = extending(Page, (function() {
 						type: 'number',
 						label: 'Максимум',
 						name: 'ticket_type_' + row_id + '_max_count_per_user',
-						value: ticket_type.max_count_per_user || 1,
+						value: ticket_type.max_count_per_user || 30,
 						unit_classes: ['-inline'],
 						attributes: {
 							size: 6
@@ -555,6 +556,7 @@ AbstractEditEventPage = extending(Page, (function() {
 				return {
 					uuid: form_data['ticket_type_' + id + '_uuid'] || null,
 					name: form_data['ticket_type_' + id + '_name'],
+					comment: form_data['ticket_type_' + id + '_comment'],
 					amount: form_data['ticket_type_' + id + '_amount'],
 					price: form_data['ticket_type_' + id + '_price'],
 					promocode: form_data['ticket_type_' + id + '_promocode'] || null,

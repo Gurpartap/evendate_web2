@@ -25,7 +25,14 @@ OrderPage = extending(Page, (function() {
 			'ticketing_locally',
 			'registration_locally', {
 				ticket_types: {
-					fields: new Fields('price')
+					fields: new Fields(
+						'comment',
+						'price',
+						'sell_start_date',
+						'sell_end_date',
+						'min_count_per_user',
+						'max_count_per_user'
+					)
 				}
 			}
 		);
@@ -282,7 +289,7 @@ OrderPage = extending(Page, (function() {
 							name: ticket_type.uuid
 						}, {
 							min: ticket_type.min_count_per_user || 0,
-							max: ticket_type.max_count_per_user || ticket_type.amount || 99
+							max: ticket_type.max_count_per_user || ticket_type.amount || 30
 						}),
 						description: ticket_type.comment,
 						type_price: ticket_type.price,
