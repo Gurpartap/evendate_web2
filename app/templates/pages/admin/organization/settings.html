@@ -109,17 +109,3 @@
 		</fieldset>
 	</div>
 </script>
-
-<script type="javascript/template" id="tmpl-admin-organization-payment-form">
-	<form id="org_admin_settings_tariff_{payment_uuid}" class="-hidden" action="https://money.yandex.ru/eshop.xml" method="post">
-		<input name="shopId" value="132896" type="hidden">
-		<input name="scid" value="97111" type="hidden">
-		<input name="customerNumber" value="{customer_id}" type="hidden">
-		<input name="cps_email" value="{cps_email}" type="hidden">
-		<input name="shopFailURL" value="{callback_url}" type="hidden">
-		<input name="shopSuccessURL" value="{callback_url}" type="hidden">
-		<input name="shopDefaultUrl" value="{callback_url}" type="hidden">
-		<input name="evendate_payment_id" value="{payment_uuid}" type="hidden">
-		<input name="sum" value="{sum}" type="hidden">
-	</form>
-</script>
