@@ -169,9 +169,8 @@ class Ticket extends AbstractEntity
 
 				$tickets_count = $tickets['count'] ?? 1;
 				for($k = 0; $k < $tickets_count; $k++){
-					self::create($event, $order_id, $db, $ticket);
+					$result[] = self::create($event, $order_id, $db, $ticket);
 				}
-				$result[] = self::create($event, $order_id, $db, $ticket);
 			} else {
 				// without uuid => registration
 				if ($ticketing_locally) throw new InvalidArgumentException('NULL_UUID');
