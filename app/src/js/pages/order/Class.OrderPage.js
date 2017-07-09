@@ -206,9 +206,9 @@ OrderPage = extending(Page, (function() {
 		this.$wrapper.find('.RegistrationLastNameField').find('input').val(__APP.USER.last_name);
 		this.$wrapper.find('.RegistrationEmailField').find('input').val(__APP.USER.email);
 		
-		this.$wrapper.find('.QuantityInput').on('QuantityInput::change', function(e, value) {
-			var $wrapper = $(this).closest('.TicketType'),
-				$sum = $wrapper.find('.TicketTypeSum');
+		function countTicketTypeSum($ticket_type) {
+			var $sum = $ticket_type.find('.TicketTypeSum'),
+				value = $ticket_type.find('.QuantityInput').resolveInstance().value;
 			
 			if (value > 0) {
 				$sum.removeClass(__C.CLASSES.HIDDEN);
@@ -216,12 +216,25 @@ OrderPage = extending(Page, (function() {
 				$sum.addClass(__C.CLASSES.HIDDEN);
 			}
 			
-			$wrapper.find('.TicketTypeSumText').text($wrapper.data('ticket_type').price * value);
+			$ticket_type.find('.TicketTypeSumText').text($ticket_type.data('ticket_type').price * value);
+		}
+		
+		function countTotalSum() {
 			self.$wrapper.find('.TicketsOverallSum').text(Array.prototype.reduce.call(self.$wrapper.find('.TicketTypeSumText'), function(sum, ticket_type_sum) {
 				
-				return sum + +ticket_type_sum.innerText;
+				return sum + +ticket_type_sum.innerHTML;
 			}, 0));
+		}
+		
+		this.$wrapper.find('.QuantityInput').on('QuantityInput::change', function(e, value) {
+			countTicketTypeSum($(this).closest('.TicketType'));
+			countTotalSum();
 		});
+		
+		this.$wrapper.find('.TicketType').each(function() {
+			countTicketTypeSum($(this));
+		});
+		countTotalSum();
 		
 		this.$wrapper.find('.MainActionButton').on('click.MakeOrder', function() {
 			var $main_action_button = $(this),

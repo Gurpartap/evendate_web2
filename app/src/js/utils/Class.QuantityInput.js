@@ -17,6 +17,7 @@ QuantityInput = extendingJQuery((function() {
 	 * @property {jQuery} plus
 	 * @property {jQuery} input
 	 * @property {jQuery} minus
+	 * @property {number} value
 	 * @property {object} [options]
 	 * @property {number} [options.max]
 	 * @property {number} [options.min]
@@ -28,6 +29,7 @@ QuantityInput = extendingJQuery((function() {
 		var $plus_button,
 			$minus_button,
 			$input,
+			self = this,
 			value = (options.min && options.min > 0) ? options.min : 0;
 		
 		$plus_button = __APP.BUILD.button({
@@ -87,6 +89,17 @@ QuantityInput = extendingJQuery((function() {
 			this.input.val(this.options.max);
 			this.disablePlus();
 		}
+		
+		Object.defineProperty(this, 'value', {
+			get: function() {
+			
+				return +self.input.val();
+			},
+			set: function(val) {
+				
+				return self.input.val(val);
+			}
+		});
 		
 		this.data('instance', this);
 		
