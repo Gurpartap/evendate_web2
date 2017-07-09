@@ -310,7 +310,7 @@ AbstractEditEventPage = extending(Page, (function() {
 					tickets_sell_start_date_select: __APP.BUILD.formUnit({
 						type: 'date',
 						name: 'ticket_type_' + row_id + '_sell_start_date',
-						value: unixTimestampToISO(ticket_type.sell_start_date),
+						value: ticket_type.sell_start_date ? unixTimestampToISO(ticket_type.sell_start_date) : undefined,
 						classes: 'OnChangeRemoveUUID',
 						dataset: {
 							row_number: row_id
@@ -340,7 +340,7 @@ AbstractEditEventPage = extending(Page, (function() {
 						label: 'Дата',
 						type: 'date',
 						name: 'ticket_type_' + row_id + '_sell_end_date',
-						value: unixTimestampToISO(ticket_type.sell_end_date),
+						value: ticket_type.sell_end_date ? unixTimestampToISO(ticket_type.sell_end_date) : undefined,
 						unit_classes: ['-inline'],
 						classes: 'OnChangeRemoveUUID',
 						dataset: {
