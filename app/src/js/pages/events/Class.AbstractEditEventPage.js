@@ -66,6 +66,7 @@ AbstractEditEventPage = extending(Page, (function() {
 			
 			ticket_types: null,
 			add_ticket_type_button: null,
+			booking_time_input: null,
 			
 			public_at_date_select: null,
 			public_at_time_input: null,
@@ -569,6 +570,7 @@ AbstractEditEventPage = extending(Page, (function() {
 				};
 			});
 			send_data.ticketing_locally = true;
+			send_data.booking_time = +form_data.booking_time === 0 ? 1 : form_data.booking_time;
 		}
 		
 		if (form_data.delayed_publication) {
@@ -1340,6 +1342,19 @@ AbstractEditEventPage = extending(Page, (function() {
 				$collapsings.each(function() {
 					$(this).resolveInstance().closeCollapsing();
 				});
+			}
+		});
+		
+		this.render_vars.booking_time_input = __APP.BUILD.formUnit({
+			label: 'Срок брони билета',
+			id: 'edit_event_booking_time',
+			name: 'booking_time',
+			type: 'number',
+			helptext: 'Колличество часов, в течении которых участник может оплатить свой заказ',
+			value: this.event.booking_time || 1,
+			required: true,
+			attributes: {
+				size: 2
 			}
 		});
 		

@@ -21,6 +21,7 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 	}
 	
 	EditEventPage.fields = new Fields(
+		'booking_time',
 		'vk_post_link', {
 			ticket_types: {
 				fields: new Fields(
