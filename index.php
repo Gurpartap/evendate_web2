@@ -349,11 +349,11 @@ $url_parts = explode('/', $url);
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=f884fd65b2c5e36d1441e8e202a671b1" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=ebbed15b4e113b940bbb04b6daaac896" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=f04185f970c69921ee99de35dcd832fe" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=fa734f90f1f27b23bdb17125e75cf3f4" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=f349a656be4edebeb27fe7a8929a60ea" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=a55ceee825a3bed5113c1709565a8347" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=886484ab99305c44ecae79cb8267101c" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=b0680b5537f835a079bb234401fdb074" charset="utf-8"></script><?php
 }
 
 foreach (glob("app/templates/{*/*/*/*,*/*/*,*/*,*}.html", GLOB_BRACE) as $filename) {
