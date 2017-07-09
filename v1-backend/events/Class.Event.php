@@ -1467,11 +1467,11 @@ class Event extends AbstractEntity
 				) {
 					self::saveNotifications(array(array(
 						'event_id' => $this->id,
-						'notification_type_id' => self::getNotificationTypeId(Notification::NOTIFICATION_TYPE_ADDITIONAL_FOR_ORGANIZATION, $db),
+						'notification_type_id' => self::getNotificationTypeId(Notification::NOTIFICATION_TYPE_ADDITIONAL_FOR_ORGANIZATION, $this->db),
 						'notification_time' => $data['additional_notification_time']->format('Y-m-d H:i:s'),
 						'status' => 'TRUE',
 						'done' => 'FALSE'
-					)), $db);
+					)), $this->db);
 				}
 			}
 

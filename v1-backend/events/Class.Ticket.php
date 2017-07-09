@@ -163,6 +163,14 @@ class Ticket extends AbstractEntity
 
 		foreach ($tickets as $ticket) {
 			if (isset($ticket['uuid']) && $ticket['uuid'] != null) {
+
+				$type = self::getTicketTypeInfo($event, $db, $ticket['uuid']);
+				self::checkTicketTypeData($type, $ticket, $db);
+
+				$tickets_count = $tickets['count'] ?? 1;
+				for($k = 0; $k < $tickets_count; $k++){
+					self::create($event, $order_id, $db, $ticket);
+				}
 				$result[] = self::create($event, $order_id, $db, $ticket);
 			} else {
 				// without uuid => registration

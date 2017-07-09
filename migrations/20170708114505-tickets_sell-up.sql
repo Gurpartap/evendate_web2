@@ -1,6 +1,8 @@
+DROP TABLE orders_payments;
+
 CREATE TABLE orders_payments (
   id          SERIAL PRIMARY KEY,
-  order_id    INT                NOT NULL REFERENCES ticket_orders (id),
+  ticket_order_id    INT                NOT NULL REFERENCES ticket_orders (id),
   uuid        TEXT UNIQUE        NOT NULL DEFAULT uuid_generate_v4(),
   sum         NUMERIC,
   finished    BOOLEAN                     DEFAULT FALSE,
@@ -9,6 +11,7 @@ CREATE TABLE orders_payments (
   payed_at    TIMESTAMP                   DEFAULT NULL,
   canceled_at TIMESTAMP                   DEFAULT NULL,
   created_at  TIMESTAMP                   DEFAULT NOW(),
-  updated_at  TIMESTAMP                   DEFAULT NULL
+  updated_at  TIMESTAMP                   DEFAULT NULL,
+  UNIQUE (ticket_order_id, finished, canceled)
 );
 

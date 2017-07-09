@@ -114,7 +114,6 @@ class Order extends AbstractEntity
 
 		return array('id' => $res['id'], 'uuid' => $res['uuid']);
 	}
-
 	/**
 	 * @return mixed
 	 */
@@ -201,6 +200,89 @@ class Order extends AbstractEntity
 		return new Result(true, 'Данные успешно обновлены');
 	}
 
+	private static function getPaymentInfo(array $request, ExtendedPDO $db){
+		$request['uuid'] = str_replace('order-', '', $request['evendate_payment_id']);
+		$q_get_order = App::queryFactory()->newSelect();
+		$q_get_order->cols(array(
+			'id',
+			'order_content',
+			'(SELECT SUM(price) FROM view_tickets WHERE status = TRUE AND is_canceled = FALSE AND ticket_order_id = view_tickets_orders.id)'
+		))
+			->from('view_tickets_orders')
+			->where('uuid = ?', $request['uuid'])
+			->where('is_canceled = FALSE')
+			->where('canceled_at IS NULL');
+		return $db->prepareExecute($q_get_order, 'CANT_GET_PAYMENT_INFO')->fetch();
+
+	}
+
+	public static function checkPayment(array $request, ExtendedPDO $db)
+	{
+		try{
+			if (!Payment::checkMd5($request)) throw new BadArgumentException('', $db);
+			$result = self::getPaymentInfo($request['uuid'], $db);
+			if ($result == false) throw new NoMethodException('', $db);
+			if ((float) $result['sum'] != (float) $request['orderSumAmount']) throw new InvalidArgumentException('', $db);
+
+
+			return Payment::buildResponse(Payment::ACTION_CHECK_ORDER, 0, 'ok', $request['invoiceId']);
+		} catch (NoMethodException $nmte) {
+			return Payment::buildResponse(Payment::ACTION_CHECK_ORDER, 100, 'PAYMENT NOT FOUND', $request['invoiceId']);
+		} catch (BadArgumentException $be) {
+			return Payment::buildResponse(Payment::ACTION_CHECK_ORDER, 1, 'MD5 ERROR', $request['invoiceId']);
+		} catch (InvalidArgumentException $ie) {
+			return Payment::buildResponse(Payment::ACTION_CHECK_ORDER, 100, 'WRONG SUM', $request['invoiceId']);
+		} catch (Exception $e) {
+			return Payment::buildResponse(Payment::ACTION_CHECK_ORDER, 100, $e->getMessage(), $request['invoiceId']);
+		}
+	}
+
+	public static function avisoPayment(array $request, ExtendedPDO $db)
+	{
+		try {
+
+			$result = self::getPaymentInfo($request, $db);
+
+			$q_get = App::queryFactory()->newSelect();
+			$q_get->from('orders_payments')
+				->cols(array('id'))
+				->where('ticket_order_id = ?', $result['id'])
+				->where('finished = TRUE');
+
+			$payments = $db->prepareExecute($q_get, '')->rowCount();
+			if ($payments > 0) throw new LogicException();
+
+
+			$q_ins = App::queryFactory()->newInsert();
+
+			$new_cols = array(
+				'finished' => 'true',
+				'sum' => $request['orderSumAmount'],
+				'ticket_order_id' => $result['id'],
+				'aviso_data' => json_encode($request)
+			);
+			$q_ins->into('orders_payments')
+				->cols($new_cols)
+				->onConflictUpdate(array('ticket_order_id', 'finished', 'canceled'), $new_cols)
+				->set('payed_at', 'NOW()');
+			$db->prepareExecute($q_ins, 'CANT_UPDATE_PAYMENT');
+
+
+			return Payment::buildResponse(Payment::ACTION_PAYMENT_AVISO, 0, 'ok', $request['invoiceId']);
+
+		} catch (NoMethodException $nmte) {
+			return Payment::buildResponse(Payment::ACTION_PAYMENT_AVISO, 100, 'PAYMENT NOT FOUND', $request['invoiceId']);
+		} catch (BadArgumentException $be) {
+			return Payment::buildResponse(Payment::ACTION_PAYMENT_AVISO, 1, 'MD5 ERROR', $request['invoiceId']);
+		} catch (InvalidArgumentException $ie) {
+			return Payment::buildResponse(Payment::ACTION_PAYMENT_AVISO, 100, 'WRONG SUM', $request['invoiceId']);
+		} catch (LogicException $le) {
+			return Payment::buildResponse(Payment::ACTION_PAYMENT_AVISO, 100, 'INVOICE PAYED', $request['invoiceId']);
+		} catch (Exception $e) {
+			return Payment::buildResponse(Payment::ACTION_PAYMENT_AVISO, 100, $e->getMessage(), $request['invoiceId']);
+		}
+
+	}
 
 
 }
