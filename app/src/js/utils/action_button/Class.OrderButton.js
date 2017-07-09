@@ -40,8 +40,8 @@ OrderButton = extending(ActionButton, (function() {
 		};
 		this.event = event;
 		this.modal = null;
-		this.is_disabled = !this.event.registration_available && (!this.event.is_registered || (this.event.ticketing_locally && this.event.tickets.length === 0));
-		options.is_checked = event.is_registered || (event.ticketing_locally && event.tickets.length > 0);
+		this.is_disabled = !this.event.registration_available;
+		options.is_checked = false;
 		ActionButton.call(this, options);
 	}
 	
@@ -59,7 +59,8 @@ OrderButton = extending(ActionButton, (function() {
 			
 			return false;
 		}
-		
+		__APP.changeState('/event/' + this.event.id + '/order');
+		/*
 		if (this.event.registration_available && !this.event.is_registered || this.event.ticketing_locally && this.event.tickets.length === 0) {
 			__APP.changeState('/event/' + this.event.id + '/order');
 		} else {
@@ -88,7 +89,7 @@ OrderButton = extending(ActionButton, (function() {
 					self.modal.show();
 				});
 			}
-		}
+		}*/
 		
 	};
 	

@@ -17,7 +17,20 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 		AbstractEditEventPage.call(this);
 		this.page_title = 'Редактирование события';
 		this.event = new OneEvent(event_id);
-		this.event_fields = EventPage.fields.copy().add('vk_post_link');
+		this.event_fields = EventPage.fields.copy().add(
+			'vk_post_link', {
+				ticket_types: {
+					fields: new Fields(
+						'comment',
+						'price',
+						'sell_start_date',
+						'sell_end_date',
+						'min_count_per_user',
+						'max_count_per_user'
+					)
+				}
+			}
+		);
 	}
 	
 	EditEventPage.prototype.fetchData = function() {
@@ -35,6 +48,7 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 				phone_number: {type: 'phone_number', name: 'Номер телефона', description: 'Текстовое поля для ввода номера телефона'}
 			},
 			registration_fields = [];
+		
 		AbstractEditEventPage.prototype.preRender.call(this);
 		
 		this.render_vars.button_text = 'Сохранить';

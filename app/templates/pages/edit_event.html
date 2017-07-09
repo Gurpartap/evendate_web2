@@ -263,7 +263,7 @@
 
 
 						<div class="tab_body TabsBody">
-							<fieldset disabled>
+							<fieldset>
 								<h2>Продажа билетов</h2>
 								<p class="form_text">Настройте продажу билетов на ваше событие через Evendate</p>
 								<table class="event_edit_ticket_types_table table -simple_table -full_page_width Collapsing">
@@ -495,6 +495,7 @@
 		<td>
 			<input class="TicketTypeId" type="hidden" name="ticket_types" value="{row_num}">
 			<input class="TicketType{row_num}UUID" type="hidden" name="ticket_type_{row_num}_uuid" value="{uuid}">
+			<input type="hidden" name="ticket_type_{row_num}_comment" value="{comment}">
 			<div class="edit_event_ticket_type_last_column form_group">
 				{price_input}
 				<button class="event_edit_ticket_type_expand_button action -color_marginal fa_icon fa-sliders TicketTypeExpandButton" type="button"></button>

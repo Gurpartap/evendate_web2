@@ -82,7 +82,8 @@ EventPage = extending(Page, (function() {
 		'registration_available',
 		'registration_approved',
 		'registered_count',
-		'registered'
+		'registered',
+		'ticketing_locally'
 	], {
 		dates: {
 			length: 0,

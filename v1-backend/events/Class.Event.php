@@ -1467,11 +1467,11 @@ class Event extends AbstractEntity
 				) {
 					self::saveNotifications(array(array(
 						'event_id' => $this->id,
-						'notification_type_id' => self::getNotificationTypeId(Notification::NOTIFICATION_TYPE_ADDITIONAL_FOR_ORGANIZATION, $db),
+						'notification_type_id' => self::getNotificationTypeId(Notification::NOTIFICATION_TYPE_ADDITIONAL_FOR_ORGANIZATION, $this->db),
 						'notification_time' => $data['additional_notification_time']->format('Y-m-d H:i:s'),
 						'status' => 'TRUE',
 						'done' => 'FALSE'
-					)), $db);
+					)), $this->db);
 				}
 			}
 
@@ -1783,10 +1783,17 @@ class Event extends AbstractEntity
 			}
 		}
 
+		$_tickets = TicketsCollection::filter($this->db, $user, array('order' => $order), array())->getData();
+		$sum = 0;
+		foreach($_tickets as $_ticket){
+			$sum += (float) $_ticket['price'];
+		}
+
 		return new Result(true, '', array(
 			'registration_fields' => $return_fields,
 			'order' => $order->getParams($user, Order::getDefaultCols())->getData(),
-			'tickets' => TicketsCollection::filter($this->db, $user, array('order' => $order), array())->getData()
+			'tickets' => $_tickets,
+			'sum' => $sum
 		));
 	}
 

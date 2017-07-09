@@ -123,7 +123,7 @@ class TicketType extends AbstractEntity
 			'event_id' => $event_id,
 			'type_code' => $ticket_type['type_code'] ?? null,
 			'name' => $ticket_type['name'],
-			'comment' => $ticket_type['comment'],
+			'comment' => $ticket_type['comment'] ?? null,
 			'price' => $ticket_type['price'],
 			'sell_start_date' => $ticket_type['sell_start_date'],
 			'sell_end_date' => $ticket_type['sell_end_date'],

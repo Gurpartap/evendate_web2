@@ -550,8 +550,26 @@ OneEvent = extending(OneEntity, (function() {
 	 * @return {jqPromise}
 	 */
 	OneEvent.prototype.makeOrder = function(tickets, registration_fields, success) {
+		var self = this;
 		
-		return this.constructor.makeOrder(this.id, tickets, registration_fields, success);
+		return this.constructor.makeOrder(this.id, tickets, registration_fields, success).then(function(data) {
+			var order = new OneOrder(self.id);
+			
+			order.setData($.extend({
+				registration_fields: data.registration_fields,
+				tickets: data.tickets,
+				user_id: __APP.USER.id,
+				user: __APP.USER
+			}, data.order));
+			
+			self.orders.push(order);
+			
+			return {
+				sum: data.sum,
+				order: order,
+				send_data: data
+			};
+		});
 	};
 	
 	return OneEvent;
