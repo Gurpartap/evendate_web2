@@ -21,21 +21,18 @@ OrderPage = extending(Page, (function() {
 		
 		Page.call(this);
 		this.event = new OneEvent(event_id);
-		this.event_fields = EventPage.fields.copy().add(
-			'ticketing_locally',
-			'registration_locally', {
-				ticket_types: {
-					fields: new Fields(
-						'comment',
-						'price',
-						'sell_start_date',
-						'sell_end_date',
-						'min_count_per_user',
-						'max_count_per_user'
-					)
-				}
+		this.event_fields = EventPage.fields.copy().add({
+			ticket_types: {
+				fields: new Fields(
+					'comment',
+					'price',
+					'sell_start_date',
+					'sell_end_date',
+					'min_count_per_user',
+					'max_count_per_user'
+				)
 			}
-		);
+		});
 		
 		Object.defineProperty(this, 'page_title', {
 			get: function() {
