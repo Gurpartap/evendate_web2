@@ -176,11 +176,11 @@ CREATE OR REPLACE VIEW view_all_events AS
     view_organizations.city_id,
     (events.ticketing_locally = TRUE
      AND events.status = TRUE
-     AND vtt.amount_sum > 0
-     AND (SELECT COUNT(id)
+     AND COALESCE(vtt.amount_sum::INT, 0) > 0
+     AND COALESCE((SELECT COUNT(id)
           FROM view_sold_tickets
-          WHERE view_sold_tickets.event_id = events.id)
-         > vtt.amount_sum)                                                             AS ticketing_available
+          WHERE view_sold_tickets.event_id = events.id), 0)
+         > COALESCE(vtt.amount_sum, 0)) ::BOOLEAN                                                            AS ticketing_available
   FROM events
     INNER JOIN view_organizations ON view_organizations.id = events.organization_id
     INNER JOIN organization_types ON organization_types.id = view_organizations.type_id
