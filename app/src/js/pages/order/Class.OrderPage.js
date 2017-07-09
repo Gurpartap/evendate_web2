@@ -151,45 +151,6 @@ OrderPage = extending(Page, (function() {
 					__C.CLASSES.COMPONENT.BUTTON,
 					__C.CLASSES.COLORS.PRIMARY
 				]
-			}),
-			tickets_button: __APP.BUILD.button({
-				title: 'Показать билеты',
-				classes: [
-					__C.CLASSES.COLORS.ACCENT
-				]
-			}).on('click.ShowTickets', function() {
-				var $this = $(this),
-					tickets_fields = ['created_at', 'number', 'ticket_type', 'order'],
-					events_fields = ['dates', 'is_same_time', 'image_horizontal_medium_url', 'location'],
-					ticket,
-					promise;
-				
-				if ($this.modal && $this.modal instanceof TicketsModal) {
-					$this.modal.show();
-				} else {
-					if (self.event.tickets.length) {
-						ticket = new EventsExtendedTicketsCollection(self.event.id);
-						promise = ticket.fetchTickets(new Fields(tickets_fields, {
-							event: {
-								fields: new Fields(events_fields)
-							}
-						}));
-					} else {
-						promise = self.event.fetchEvent(new Fields(events_fields, {
-							tickets: {
-								fields: new Fields(tickets_fields)
-							}
-						})).done(function() {
-							
-							return ticket = ExtendedTicketsCollection.extractTicketsFromEvent(self.event);
-						});
-					}
-					
-					promise.done(function() {
-						$this.modal = new TicketsModal(ticket);
-						$this.modal.show();
-					});
-				}
 			})
 		})));
 	};
@@ -337,6 +298,12 @@ OrderPage = extending(Page, (function() {
 		this.preRender();
 		
 		this.$wrapper.html(tmpl('order-page', this.render_vars));
+		
+		if (this.event.registration_locally && !this.event.registration_available) {
+			this.disablePage('Регистрация на событие не доступно');
+		} else if (this.event.ticketing_locally && !this.event.ticketing_available) {
+			this.disablePage('Заказ билетов на событие невозможен');
+		}
 		
 		this.init();
 	};
