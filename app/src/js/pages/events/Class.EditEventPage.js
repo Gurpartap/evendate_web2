@@ -17,21 +17,23 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 		AbstractEditEventPage.call(this);
 		this.page_title = 'Редактирование события';
 		this.event = new OneEvent(event_id);
-		this.event_fields = EventPage.fields.copy().add(
-			'vk_post_link', {
-				ticket_types: {
-					fields: new Fields(
-						'comment',
-						'price',
-						'sell_start_date',
-						'sell_end_date',
-						'min_count_per_user',
-						'max_count_per_user'
-					)
-				}
-			}
-		);
+		this.event_fields = EditEventPage.fields;
 	}
+	
+	EditEventPage.fields = new Fields(
+		'vk_post_link', {
+			ticket_types: {
+				fields: new Fields(
+					'comment',
+					'price',
+					'sell_start_date',
+					'sell_end_date',
+					'min_count_per_user',
+					'max_count_per_user'
+				)
+			}
+		}
+	);
 	
 	EditEventPage.prototype.fetchData = function() {
 		return this.fetching_data_defer = __APP.SERVER.multipleAjax(
@@ -56,7 +58,12 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 		
 		this.render_vars.registration_custom_fields = AbstractEditEventPage.registrationCustomFieldBuilder(this.event.registration_fields.filter(RegistrationFieldModel.isCustomField));
 		
-		this.render_vars.ticket_types = this.event.ticket_types.length ? AbstractEditEventPage.ticketTypeRowsBuilder(this.event.ticket_types) : tmpl('edit-event-tickets-row-empty');
+		this.render_vars.ticket_types = this.event.ticket_types.length ?
+		                                AbstractEditEventPage.ticketTypeRowsBuilder(this.event.ticket_types.filter(function(ticket_type) {
+			                                
+		                                	return ticket_type.type_code !== 'registration';
+		                                })) :
+		                                tmpl('edit-event-tickets-row-empty');
 		
 		this.render_vars.vk_post_link = this.event.vk_post_link ? __APP.BUILD.actionLink(
 			this.event.vk_post_link,
