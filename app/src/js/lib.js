@@ -1629,6 +1629,22 @@ function guid() {
 	return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 }
 /**
+ *
+ * Generates random string with custom length (by default length = 32)
+ *
+ * @param {number} [length=32]
+ *
+ * @return {string}
+ */
+function randomString(length) {
+	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	
+	return (new Array(length || 32)).fill('').map(function() {
+		
+		return possible.charAt(Math.floor(Math.random() * possible.length));
+	}).join('');
+}
+/**
  * Validating form or fieldset
  *
  * @param {(Element|jQuery)} $form

@@ -177,12 +177,6 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 			});
 		}
 		
-		if (this.event.ticket_types.length) {
-			this.$wrapper.find('.OnChangeRemoveUUID').one('change.RemoveUUID', function() {
-				self.$wrapper.find('.TicketType'+$(this).data('row_number')+'UUID').val('').trigger('change');
-			});
-		}
-		
 		if (this.event.notifications.has(OneNotification.NOTIFICATIN_TYPES.ADDITIONAL_FOR_ORGANIZATION)) {
 			this.$wrapper.find('.AdditionalNotificationSwitch').prop('disabled', false).trigger('change');
 		}

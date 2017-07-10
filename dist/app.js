@@ -1629,6 +1629,22 @@ function guid() {
 	return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 }
 /**
+ *
+ * Generates random string with custom length (by default length = 32)
+ *
+ * @param {number} [length=32]
+ *
+ * @return {string}
+ */
+function randomString(length) {
+	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	
+	return (new Array(length || 32)).fill('').map(function() {
+		
+		return possible.charAt(Math.floor(Math.random() * possible.length));
+	}).join('');
+}
+/**
  * Validating form or fieldset
  *
  * @param {(Element|jQuery)} $form
@@ -4000,147 +4016,6 @@ RegistrationSelectFieldValue = (function() {
  * @requires ../Class.OneEntity.js
  */
 /**
- *
- * @class OneCategory
- * @extends OneEntity
- */
-OneCategory = extending(OneEntity, (function() {
-	/**
-	 *
-	 * @param {(string|number)} [category_id]
-	 * @param {boolean} [is_loading_continuous]
-	 * @constructor
-	 * @constructs OneCategory
-	 *
-	 * @property {(number|string)} id
-	 * @property {string} ?name
-	 * @property {number} ?order_position
-	 * @property {OrganizationsCollection} organizations
-	 */
-	function OneCategory(category_id, is_loading_continuous) {
-		this.id = setDefaultValue(category_id, 0);
-		this.name = null;
-		this.order_position = null;
-		this.organizations = new OrganizationsCollection();
-		
-		this.loading = false;
-		if (category_id && is_loading_continuous) {
-			this.loading = true;
-			this.fetchCategory([], function() {
-				this.loading = false;
-				$(window).trigger('fetch.OneCategory');
-			});
-		}
-	}
-	/**
-	 *
-	 * @param {(string|number)} category_id
-	 * @param {AJAXData} data
-	 * @param {AJAXCallback} [success]
-	 * @return {jqPromise}
-	 */
-	OneCategory.fetchCategory = function(category_id, data, success) {
-		return __APP.SERVER.getData('/api/v1/organizations/types', $.extend({}, data, {id: category_id}), success);
-	};
-	/**
-	 *
-	 * @param {(Array|string)} fields
-	 * @param {AJAXCallback} [success]
-	 * @return {jqPromise}
-	 */
-	OneCategory.prototype.fetchCategory = function(fields, success) {
-		var self = this;
-		return this.constructor.fetchCategory(self.id, {fields: fields}, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data[0]);
-			}
-		});
-	};
-	
-	return OneCategory;
-}()));
-/**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneCategory.js
- */
-/**
- *
- * @class CategoriesCollection
- * @extends EntitiesCollection
- */
-CategoriesCollection = extending(EntitiesCollection, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs CategoriesCollection
-	 */
-	function CategoriesCollection() {
-		EntitiesCollection.call(this);
-	}
-	
-	CategoriesCollection.prototype.collection_of = OneCategory;
-	/**
-	 *
-	 * @param {AJAXData} data
-	 * @param {AJAXCallback} [success]
-	 */
-	CategoriesCollection.fetchCategories = function(data, success) {
-		return __APP.SERVER.getData('/api/v1/organizations/types', data, success);
-	};
-	/**
-	 *
-	 * @param {AJAXData} data
-	 * @param {(number|string)} [length]
-	 * @param {AJAXCallback} [success]
-	 */
-	CategoriesCollection.prototype.fetchCategories = function(data, length, success) {
-		var self = this,
-			ajax_data = $.extend({}, data, {
-				offset: this.length,
-				length: length
-			});
-		return this.constructor.fetchCategories(ajax_data, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data);
-			}
-		});
-	};
-	/**
-	 *
-	 * @param {AJAXData} categories_ajax_data
-	 * @param {AJAXData} orgs_ajax_data
-	 * @param {(number|string)} [length]
-	 * @param {AJAXCallback} [success]
-	 */
-	CategoriesCollection.prototype.fetchCategoriesWithOrganizations = function(categories_ajax_data, orgs_ajax_data, length, success) {
-		var self = this,
-			ajax_data = $.extend({}, categories_ajax_data, {
-				offset: this.length,
-				length: length
-			}),
-			org_field = 'organizations' + JSON.stringify(__APP.SERVER.validateData(orgs_ajax_data));
-		if (!ajax_data.fields) {
-			ajax_data.fields = [];
-		} else if (!Array.isArray(ajax_data.fields)) {
-			ajax_data.fields = ajax_data.fields.split(',');
-		}
-		ajax_data.fields.push(org_field);
-		return this.constructor.fetchCategories(ajax_data, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data);
-			}
-		});
-	};
-	
-	return CategoriesCollection;
-}()));
-/**
- * @requires ../Class.OneEntity.js
- */
-/**
  * @abstract
  * @class OneAbstractActivity
  * @extends OneEntity
@@ -4324,6 +4199,147 @@ UsersActivitiesCollection = extending(EntitiesCollection, (function() {
 	};
 	
 	return UsersActivitiesCollection;
+}()));
+/**
+ * @requires ../Class.OneEntity.js
+ */
+/**
+ *
+ * @class OneCategory
+ * @extends OneEntity
+ */
+OneCategory = extending(OneEntity, (function() {
+	/**
+	 *
+	 * @param {(string|number)} [category_id]
+	 * @param {boolean} [is_loading_continuous]
+	 * @constructor
+	 * @constructs OneCategory
+	 *
+	 * @property {(number|string)} id
+	 * @property {string} ?name
+	 * @property {number} ?order_position
+	 * @property {OrganizationsCollection} organizations
+	 */
+	function OneCategory(category_id, is_loading_continuous) {
+		this.id = setDefaultValue(category_id, 0);
+		this.name = null;
+		this.order_position = null;
+		this.organizations = new OrganizationsCollection();
+		
+		this.loading = false;
+		if (category_id && is_loading_continuous) {
+			this.loading = true;
+			this.fetchCategory([], function() {
+				this.loading = false;
+				$(window).trigger('fetch.OneCategory');
+			});
+		}
+	}
+	/**
+	 *
+	 * @param {(string|number)} category_id
+	 * @param {AJAXData} data
+	 * @param {AJAXCallback} [success]
+	 * @return {jqPromise}
+	 */
+	OneCategory.fetchCategory = function(category_id, data, success) {
+		return __APP.SERVER.getData('/api/v1/organizations/types', $.extend({}, data, {id: category_id}), success);
+	};
+	/**
+	 *
+	 * @param {(Array|string)} fields
+	 * @param {AJAXCallback} [success]
+	 * @return {jqPromise}
+	 */
+	OneCategory.prototype.fetchCategory = function(fields, success) {
+		var self = this;
+		return this.constructor.fetchCategory(self.id, {fields: fields}, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data[0]);
+			}
+		});
+	};
+	
+	return OneCategory;
+}()));
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.OneCategory.js
+ */
+/**
+ *
+ * @class CategoriesCollection
+ * @extends EntitiesCollection
+ */
+CategoriesCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs CategoriesCollection
+	 */
+	function CategoriesCollection() {
+		EntitiesCollection.call(this);
+	}
+	
+	CategoriesCollection.prototype.collection_of = OneCategory;
+	/**
+	 *
+	 * @param {AJAXData} data
+	 * @param {AJAXCallback} [success]
+	 */
+	CategoriesCollection.fetchCategories = function(data, success) {
+		return __APP.SERVER.getData('/api/v1/organizations/types', data, success);
+	};
+	/**
+	 *
+	 * @param {AJAXData} data
+	 * @param {(number|string)} [length]
+	 * @param {AJAXCallback} [success]
+	 */
+	CategoriesCollection.prototype.fetchCategories = function(data, length, success) {
+		var self = this,
+			ajax_data = $.extend({}, data, {
+				offset: this.length,
+				length: length
+			});
+		return this.constructor.fetchCategories(ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data);
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {AJAXData} categories_ajax_data
+	 * @param {AJAXData} orgs_ajax_data
+	 * @param {(number|string)} [length]
+	 * @param {AJAXCallback} [success]
+	 */
+	CategoriesCollection.prototype.fetchCategoriesWithOrganizations = function(categories_ajax_data, orgs_ajax_data, length, success) {
+		var self = this,
+			ajax_data = $.extend({}, categories_ajax_data, {
+				offset: this.length,
+				length: length
+			}),
+			org_field = 'organizations' + JSON.stringify(__APP.SERVER.validateData(orgs_ajax_data));
+		if (!ajax_data.fields) {
+			ajax_data.fields = [];
+		} else if (!Array.isArray(ajax_data.fields)) {
+			ajax_data.fields = ajax_data.fields.split(',');
+		}
+		ajax_data.fields.push(org_field);
+		return this.constructor.fetchCategories(ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data);
+			}
+		});
+	};
+	
+	return CategoriesCollection;
 }()));
 /**
  * @requires ../Class.OneEntity.js
@@ -5217,7 +5233,7 @@ OneTicketType = extending(OneEntity, (function() {
 	 * @property {?number} price
 	 * @property {?number} sell_start_date
 	 * @property {?number} sell_end_date
-	 * @property {?(string|number)} start_after_ticket_type_uuid
+	 * @property {?(string|number)} start_after_ticket_type_code
 	 * @property {?number} amount
 	 * @property {?number} min_count_per_user
 	 * @property {?number} max_count_per_user
@@ -5235,7 +5251,7 @@ OneTicketType = extending(OneEntity, (function() {
 		this.price = null;
 		this.sell_start_date = null;
 		this.sell_end_date = null;
-		this.start_after_ticket_type_uuid = null;
+		this.start_after_ticket_type_code = null;
 		this.amount = null;
 		this.min_count_per_user = null;
 		this.max_count_per_user = null;
@@ -5286,7 +5302,7 @@ OneTicketType = extending(OneEntity, (function() {
 		
 		return OneTicketType.fetchTicketType(this.event_id, this.uuid, fields, function(data) {
 			self.setData(data);
-			if (success && typeof success == 'function') {
+			if (isFunction(success)) {
 				success.call(self, data);
 			}
 		});
@@ -12768,6 +12784,10 @@ Builder = (function() {
 	/**
 	 *
 	 * @param {(...buildProps|Array<buildProps>)} props
+	 * @param {(number|string)} props.val
+	 * @param {string} props.display_name
+	 *
+	 *
 	 * @return {jQuery}
 	 */
 	Builder.prototype.option = function buildOption(props) {
@@ -15892,38 +15912,31 @@ AbstractEditEventPage = extending(Page, (function() {
 				return {
 					row_num: row_id,
 					comment: ticket_type.comment,
+					type_code: ticket_type.type_code || randomString(),
 					name_input: __APP.BUILD.formUnit({
 						id: 'event_edit_ticket_type_' + row_id + '_name',
-						classes: 'OnChangeRemoveUUID',
+						classes: ['TicketTypeName'],
 						name: 'ticket_type_' + row_id + '_name',
 						value: ticket_type.name || '',
 						placeholder: 'Название типа билета',
-						required: true,
-						dataset: {
-							row_number: row_id
-						}
+						required: true
+					}).on('input', function() {
+						
+						AbstractEditEventPage.checkTicketTypeSellAfter($(this).closest('.TicketTypes'));
 					}),
 					amount_input: __APP.BUILD.formUnit({
 						id: 'event_edit_ticket_type_' + row_id + '_amount',
-						classes: 'OnChangeRemoveUUID',
 						name: 'ticket_type_' + row_id + '_amount',
 						value: ticket_type.amount || '',
 						placeholder: 0,
-						required: true,
-						dataset: {
-							row_number: row_id
-						}
+						required: true
 					}),
 					price_input: __APP.BUILD.formUnit({
 						id: 'event_edit_ticket_type_' + row_id + '_price',
-						classes: 'OnChangeRemoveUUID',
 						name: 'ticket_type_' + row_id + '_price',
 						value: ticket_type.price || '',
 						placeholder: 0,
-						required: true,
-						dataset: {
-							row_number: row_id
-						}
+						required: true
 					}),
 					tickets_sell_start_date_checkbox: __APP.BUILD.formUnit({
 						id: 'event_edit_ticket_type_' + row_id + '_start_by_date',
@@ -15931,20 +15944,15 @@ AbstractEditEventPage = extending(Page, (function() {
 						type: 'checkbox',
 						name: 'ticket_type_' + row_id + '_start_by_date',
 						dataset: {
-							row_number: row_id,
 							switch_id: 'ticket_type_' + row_id + '_start_by_date'
 						},
-						classes: ['TicketTypeStartByDateSwitch', 'Switch', 'OnChangeRemoveUUID'],
+						classes: ['TicketTypeStartByDateSwitch', 'Switch'],
 						unit_classes: ['-inline']
 					}),
 					tickets_sell_start_date_select: __APP.BUILD.formUnit({
 						type: 'date',
 						name: 'ticket_type_' + row_id + '_sell_start_date',
-						value: ticket_type.sell_start_date ? unixTimestampToISO(ticket_type.sell_start_date) : undefined,
-						classes: 'OnChangeRemoveUUID',
-						dataset: {
-							row_number: row_id
-						}
+						value: ticket_type.sell_start_date ? unixTimestampToISO(ticket_type.sell_start_date) : undefined
 					}),
 					tickets_sell_start_after_checkbox: __APP.BUILD.formUnit({
 						id: 'event_edit_ticket_type_' + row_id + '_start_after',
@@ -15952,30 +15960,20 @@ AbstractEditEventPage = extending(Page, (function() {
 						type: 'checkbox',
 						name: 'ticket_type_' + row_id + '_start_after',
 						dataset: {
-							row_number: row_id,
 							switch_id: 'ticket_type_' + row_id + '_start_after'
 						},
-						classes: ['TicketTypeStartAfterSwitch', 'Switch', 'OnChangeRemoveUUID'],
+						classes: ['TicketTypeStartAfterSwitch', 'Switch'],
 						unit_classes: ['-inline']
 					}),
-					tickets_sell_start_after_select: initSelect2(__APP.BUILD.select([{
-						display_name: 'Выберите',
-						val: ''
-					}], {
-						name: 'ticket_type_' + row_id + '_start_after_uuid'
-					}, 'OnChangeRemoveUUID', {
-						row_number: row_id
-					})),
+					tickets_sell_start_after_select: __APP.BUILD.select([], {
+						name: 'ticket_type_' + row_id + '_start_after_code'
+					}, 'TicketTypeSellAfter', null, ticket_type.start_after_ticket_type_code),
 					tickets_sell_end_date_select: __APP.BUILD.formUnit({
 						label: 'Дата',
 						type: 'date',
 						name: 'ticket_type_' + row_id + '_sell_end_date',
 						value: ticket_type.sell_end_date ? unixTimestampToISO(ticket_type.sell_end_date) : undefined,
-						unit_classes: ['-inline'],
-						classes: 'OnChangeRemoveUUID',
-						dataset: {
-							row_number: row_id
-						}
+						unit_classes: ['-inline']
 					}),
 					promo_enable_checkbox: __APP.BUILD.formUnit({
 						id: 'event_edit_ticket_type_' + row_id + '_promo_checkbox',
@@ -15983,10 +15981,9 @@ AbstractEditEventPage = extending(Page, (function() {
 						type: 'checkbox',
 						name: 'ticket_type_' + row_id + '_promo_checkbox',
 						dataset: {
-							row_number: row_id,
 							switch_id: 'ticket_type_' + row_id + '_promo'
 						},
-						classes: ['TicketTypePromoSwitch', 'Switch', 'OnChangeRemoveUUID'],
+						classes: ['TicketTypePromoSwitch', 'Switch'],
 						unit_classes: ['form_accent_block', '-inline']
 					}),
 					promo_input: __APP.BUILD.formUnit({
@@ -15995,11 +15992,7 @@ AbstractEditEventPage = extending(Page, (function() {
 						name: 'ticket_type_' + row_id + '_promocode',
 						value: ticket_type.promocode,
 						unit_classes: ['-inline'],
-						required: true,
-						classes: 'OnChangeRemoveUUID',
-						dataset: {
-							row_number: row_id
-						}
+						required: true
 					}),
 					promo_effort_input: __APP.BUILD.formUnit({
 						id: 'event_edit_ticket_type_' + row_id + '_promocode_effort',
@@ -16011,10 +16004,6 @@ AbstractEditEventPage = extending(Page, (function() {
 						required: true,
 						attributes: {
 							size: 2
-						},
-						classes: 'OnChangeRemoveUUID',
-						dataset: {
-							row_number: row_id
 						}
 					}),
 					tickets_by_order_min_amount_input: __APP.BUILD.formUnit({
@@ -16027,10 +16016,6 @@ AbstractEditEventPage = extending(Page, (function() {
 						required: true,
 						attributes: {
 							size: 6
-						},
-						classes: 'OnChangeRemoveUUID',
-						dataset: {
-							row_number: row_id
 						}
 					}),
 					tickets_by_order_max_amount_input: __APP.BUILD.formUnit({
@@ -16042,10 +16027,6 @@ AbstractEditEventPage = extending(Page, (function() {
 						unit_classes: ['-inline'],
 						attributes: {
 							size: 6
-						},
-						classes: 'OnChangeRemoveUUID',
-						dataset: {
-							row_number: row_id
 						}
 					}),
 					close_expanded_button: __APP.BUILD.actionButton({
@@ -16067,6 +16048,9 @@ AbstractEditEventPage = extending(Page, (function() {
 			
 			$row.data('ticket_type', _ticket_types[i]);
 			$row.find('.TicketTypeExpandButton').on('click.ExpandTicketType', function() {
+				$expanded_row.siblings('.ExpandRow').find('.CollapsingWrapper').each(function() {
+					$(this).resolveInstance().closeCollapsing();
+				});
 				$expanded_row.find('.CollapsingWrapper').resolveInstance().toggleCollapsing();
 			});
 			
@@ -16079,6 +16063,7 @@ AbstractEditEventPage = extending(Page, (function() {
 				if (!$parent.children().length) {
 					$parent.append(tmpl('edit-event-tickets-row-empty'));
 				}
+				AbstractEditEventPage.checkTicketTypeSellAfter($parent.closest('.TicketTypes'));
 			});
 			
 		});
@@ -16098,6 +16083,46 @@ AbstractEditEventPage = extending(Page, (function() {
 		});
 		
 		return $rows;
+	};
+	/**
+	 *
+	 * @param {jQuery} $wrapper - .TicketTypes
+	 */
+	AbstractEditEventPage.checkTicketTypeSellAfter = function($wrapper) {
+		var $sell_after_selects = $wrapper.find('select.TicketTypeSellAfter'),
+			$ticket_types = $wrapper.children().not('.ExpandRow'),
+			options = [];
+		
+		$ticket_types.each(function(i) {
+			var $ticket_type = $(this);
+			
+			options.push({
+				display_name: $ticket_type.find('.TicketTypeName').val() || 'Тип билета ' + (i+1),
+				val: $ticket_type.find('.TicketTypeCode').val()
+			});
+		});
+		
+		$sell_after_selects.each(function() {
+			var $this = $(this),
+				this_type_code = $this.closest('tr').prev().find('.TicketTypeCode').val(),
+				selected = $this.select2('val');
+			
+			$this.select2('destroy');
+			$this.html(__APP.BUILD.option(options.filter(function(option) {
+				
+				return option.val !== this_type_code;
+			})));
+			
+			initSelect2($this);
+			
+			$this.select2('val', selected);
+		});
+		
+		if ($sell_after_selects.length < 2) {
+			$wrapper.find('.TicketTypeSellAfterFieldset').attr('disabled', true);
+		} else {
+			$wrapper.find('.TicketTypeSellAfterFieldset').removeAttr('disabled');
+		}
 	};
 	
 	AbstractEditEventPage.prototype.fetchData = function() {
@@ -16188,11 +16213,12 @@ AbstractEditEventPage = extending(Page, (function() {
 					uuid: form_data['ticket_type_' + id + '_uuid'] || null,
 					name: form_data['ticket_type_' + id + '_name'],
 					comment: form_data['ticket_type_' + id + '_comment'],
+					type_code: form_data['ticket_type_' + id + '_type_code'],
 					amount: form_data['ticket_type_' + id + '_amount'],
 					price: form_data['ticket_type_' + id + '_price'],
 					promocode: form_data['ticket_type_' + id + '_promocode'] || null,
 					promocode_effort: form_data['ticket_type_' + id + '_promocode_effort'] || null,
-					start_after_ticket_type_uuid: form_data['ticket_type_' + id + '_start_after_ticket_type_uuid'] || null,
+					start_after_ticket_type_code: form_data['ticket_type_' + id + '_start_after_ticket_type_code'] || null,
 					sell_start_date: form_data['ticket_type_' + id + '_start_by_date'] ? form_data['ticket_type_' + id + '_sell_start_date'] : null,
 					sell_end_date: form_data['ticket_type_' + id + '_sell_end_date'] || null,
 					min_count_per_user: form_data['ticket_type_' + id + '_min_count_per_user'],
@@ -16730,7 +16756,7 @@ AbstractEditEventPage = extending(Page, (function() {
 		$main_tabs = $main_tabs.resolveInstance();
 		
 		//TODO: perepilit' placepicker
-		PAGE.$wrapper.find(".Placepicker").placepicker();
+		PAGE.$wrapper.find('.Placepicker').placepicker();
 		
 		PAGE.$wrapper.find('.EditEventDefaultAddress').off('click.defaultAddress').on('click.defaultAddress', function() {
 			PAGE.$wrapper.find('.Placepicker').val(PAGE.my_organizations.getByID(PAGE.organization_id).default_address).trigger('input').trigger('change');
@@ -16807,6 +16833,8 @@ AbstractEditEventPage = extending(Page, (function() {
 			$this.data('modal', modal);
 			modal.show();
 		});
+		
+		AbstractEditEventPage.checkTicketTypeSellAfter(PAGE.$wrapper.find('.TicketTypes'));
 		
 		$main_tabs.on('tabs:change', function() {
 			if($main_tabs.currentTabsIndex === 0){
@@ -16967,6 +16995,7 @@ AbstractEditEventPage = extending(Page, (function() {
 			} else {
 				$table.append(AbstractEditEventPage.ticketTypeRowsBuilder());
 			}
+			AbstractEditEventPage.checkTicketTypeSellAfter($table);
 			
 			if ($collapsings.length) {
 				$collapsings.each(function() {
@@ -17235,12 +17264,6 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 						self.$wrapper.find('#edit_event_registration_'+field.type+'_field_required').prop('checked', true);
 					}
 				}
-			});
-		}
-		
-		if (this.event.ticket_types.length) {
-			this.$wrapper.find('.OnChangeRemoveUUID').one('change.RemoveUUID', function() {
-				self.$wrapper.find('.TicketType'+$(this).data('row_number')+'UUID').val('').trigger('change');
 			});
 		}
 		
