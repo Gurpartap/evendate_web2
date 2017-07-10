@@ -111,6 +111,12 @@ class TicketType extends AbstractEntity
 			$data['start_after_ticket_type_uuid'] = null;
 		};
 
+		if (isset($data['start_after_ticket_type_code']) && !is_null($data['start_after_ticket_type_code'])) {
+			//TODO: check existing
+		} else {
+			$data['start_after_ticket_type_code'] = null;
+		};
+
 		return $data;
 	}
 
@@ -125,9 +131,11 @@ class TicketType extends AbstractEntity
 			'name' => $ticket_type['name'],
 			'comment' => $ticket_type['comment'] ?? null,
 			'price' => $ticket_type['price'],
+			'status' => 'true',
 			'sell_start_date' => $ticket_type['sell_start_date'],
 			'sell_end_date' => $ticket_type['sell_end_date'],
 			'start_after_ticket_type_uuid' => $ticket_type['start_after_ticket_type_uuid'],
+			'start_after_ticket_type_code' => $ticket_type['start_after_ticket_type_code'],
 			'amount' => $ticket_type['amount'],
 			'min_count_per_user' => $ticket_type['min_count_per_user'],
 			'max_count_per_user' => $ticket_type['max_count_per_user'],
@@ -167,11 +175,6 @@ class TicketType extends AbstractEntity
 		}
 
 		return new Result(true, '', $result);
-	}
-
-
-	public static function removeTicketsByUUID(ExtendedPDO $db, array $types){
-
 	}
 
 }
