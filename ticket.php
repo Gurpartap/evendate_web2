@@ -115,7 +115,7 @@ $url_parts = explode('/', $url);
 	<?php
 	if ($DEBUG_MODE) { ?>
     <link rel="stylesheet" href="/dist/vendor.css?rev=3b6878c5b89f643e8d96b1b336b7d4fc">
-    <link rel="stylesheet" href="/dist/app.css?rev=60408d56b8cb046d79a73f0d77f52aaf"><?php
+    <link rel="stylesheet" href="/dist/app.css?rev=c90815d3e175cf32668b6c65800045a5"><?php
 	} else { ?>
     <link rel="stylesheet" href="/dist/vendor.min.css?rev=32eaf6bc652f6da46bdffad58e1f62d4">
     <link rel="stylesheet" href="/dist/app.min.css?rev=ea0da7b0d7d20af4bae634634569e54e"><?php
@@ -245,7 +245,6 @@ $url_parts = explode('/', $url);
 	</div>
 
 </aside>
-
 <div id="main_overlay">
   <header id="main_header">
     <div id="main_header_top">
@@ -318,8 +317,21 @@ $url_parts = explode('/', $url);
   </header>
   <div id="main_section">
 		<div class="app_inspectors_wrapper AppInspectorsWrapper"></div>
-    <div class="app_view -hidden PageView">
-      <div class="page_wrapper Content -fadeable"></div>
+    <div class="app_view PageView">
+			<div class="page_wrapper -fadeable">
+				<header class="ticket_page_header">
+					<h2>Электронный билет на событие</h2>
+					<h3>
+						<span>Вы можете распечатать этот билет, либо воспользоваться нашим приложением для</span>
+						<a class="-text_color_accent" href="https://itunes.apple.com/us/app/evendate/id1044975200?mt=8">iOS</a><span> или </span>
+						<a class="-text_color_accent" href="https://itunes.apple.com/us/app/evendate/id1044975200?mt=8">Android</a><span>.</span>
+					</h3>
+					<button class="button -size_huge -color_accent Print" type="button">Распечатать билет</button>
+				</header>
+				<div class="ticket_page print_page material -floating_material"><?php
+					require_once('print_ticket.php');	?>
+				</div>
+			</div>
     </div>
 		<div id="main_section_cap" class="MainSectionCap"></div>
 
@@ -349,8 +361,8 @@ $url_parts = explode('/', $url);
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=8f2ec5d6e173a54fb1ddca3c02c61121" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=805b14d3243c3337e22e9df81b232362" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=611e4595761fea4eb5142d6e6166ac30" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=f916650de9b68f170f3b21221f767cfa" charset="utf-8"></script><?php
 } else { ?>
 	<script type="text/javascript" src="/dist/vendor.min.js?rev=79acb69ba8e1ede7a2418514a3dc6ae8" charset="utf-8"></script>
 	<script type="text/javascript" src="/dist/app.min.js?rev=42d838ac5013028381f16d0d893aefd1" charset="utf-8"></script><?php

@@ -134,6 +134,10 @@ __APP = {
 			'^([0-9]+)': UserPage,
 			'': MyProfilePage
 		},
+		'ticket': {
+			'^([^/]+)': TicketPage,
+			'': TicketPage
+		},
 		'': ActualEventsPage
 	},
 	MODALS: new Modals(),
