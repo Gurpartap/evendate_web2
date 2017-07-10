@@ -236,7 +236,15 @@ CREATE OR REPLACE VIEW view_all_ticket_types AS
          OR (sell_end_date IS NULL AND sell_start_date < NOW())
          OR (sell_start_date IS NULL AND sell_end_date > NOW())
          OR (sell_start_date IS NULL AND sell_end_date IS NULL)
-        ) = FALSE OR sold.count >= ticket_types.amount)
+        ) = TRUE AND sold.count < ticket_types.amount
+        AND (SELECT ((NOW() < tt.sell_end_date AND NOW() > tt.sell_start_date)
+                     OR (tt.sell_end_date IS NULL AND tt.sell_start_date < NOW())
+                     OR (tt.sell_start_date IS NULL AND tt.sell_end_date > NOW())
+                     OR (tt.sell_start_date IS NULL AND tt.sell_end_date IS NULL)
+                    ) = FALSE OR sold.count > tt.amount
+             FROM ticket_types  tt
+             WHERE tt.type_code = ticket_types.start_after_ticket_type_code
+              AND tt.event_id = ticket_types.event_id)) -- checking parent type
     ELSE ((NOW() < sell_end_date AND NOW() > sell_start_date)
           OR (sell_end_date IS NULL AND sell_start_date < NOW())
           OR (sell_start_date IS NULL AND sell_end_date > NOW())
@@ -366,3 +374,21 @@ CREATE OR REPLACE VIEW view_actions AS SELECT
                                          stat_organizations.stat_type_id, stat_event_types.name,
                                          stat_event_types.entity,
                                          stat_event_types.type_code;
+
+CREATE OR REPLACE VIEW view_registration_field_values AS
+  SELECT
+    view_registration_form_fields.uuid AS form_field_uuid,
+    view_registration_form_fields.label AS form_field_label,
+    view_registration_form_fields.type AS form_field_type,
+    view_registration_form_fields.field_type_id AS form_field_type_id,
+    view_registration_form_fields.required AS form_field_required,
+    registration_field_values.value,
+    registration_field_values.values::JSONB,
+    DATE_PART('epoch', registration_field_values.created_at) :: INT AS created_at,
+    DATE_PART('epoch', registration_field_values.updated_at) :: INT AS updated_at,
+    registration_field_values.ticket_order_id,
+    view_tickets_orders.uuid AS ticket_order_uuid,
+    view_registration_form_fields.order_number
+  FROM registration_field_values
+    INNER JOIN view_registration_form_fields ON registration_field_values.registration_form_field_id = view_registration_form_fields.id
+    INNER JOIN view_tickets_orders ON registration_field_values.ticket_order_id = view_tickets_orders.id;
