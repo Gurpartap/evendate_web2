@@ -34,7 +34,9 @@ CREATE OR REPLACE VIEW view_tickets_orders AS
     tickets_orders_statuses.type_code                                                            AS status_type_code,
     tickets_orders_statuses.name                                                                 AS status_name,
     tickets_orders_statuses.id                                                                   AS status_id,
-    RPAD(ticket_orders.id :: TEXT || '00' || reverse((ticket_orders.id * 1610) :: TEXT), 9, '0') AS number
+    RPAD(ticket_orders.id :: TEXT || '00' || reverse((ticket_orders.id * 1610) :: TEXT), 9, '0') AS number,
+    money.sum,
+    st.payed
 
   FROM ticket_orders
     INNER JOIN events ON events.id = ticket_orders.event_id
@@ -65,19 +67,13 @@ CREATE OR REPLACE VIEW view_tickets_orders AS
                                              THEN 2 :: INT -- payed for tickets
 
                                            WHEN money.sum :: REAL > 0 :: REAL
-                                                AND st.payed = 0
+                                                AND (st.payed = 0 OR st.payed IS NULL)
                                                 AND NOW() - ticket_orders.created_at >
                                                     (SELECT e.booking_time * '1 hour' :: INTERVAL
                                                      FROM events AS e
                                                      WHERE e.id = ticket_orders.event_id)
                                              THEN 5 :: INT -- payment canceled auto
                                            ELSE ticket_orders.order_status_id END);
-
-CREATE OR REPLACE VIEW view_sold_tickets AS
-  SELECT *
-  FROM view_tickets
-  WHERE view_tickets.ticket_order_id NOT IN (3, 5, 6, 7);
-
 
 
 CREATE OR REPLACE VIEW view_all_events AS
@@ -176,11 +172,11 @@ CREATE OR REPLACE VIEW view_all_events AS
     view_organizations.city_id,
     (events.ticketing_locally = TRUE
      AND events.status = TRUE
-     AND COALESCE(vtt.amount_sum::INT, 0) > 0
+     AND COALESCE(vtt.amount_sum :: INT, 0) > 0
      AND COALESCE((SELECT COUNT(id)
-          FROM view_sold_tickets
-          WHERE view_sold_tickets.event_id = events.id), 0)
-         > COALESCE(vtt.amount_sum, 0)) ::BOOLEAN                                                            AS ticketing_available
+                   FROM view_sold_tickets
+                   WHERE view_sold_tickets.event_id = events.id), 0)
+         < COALESCE(vtt.amount_sum, 0)) :: BOOLEAN                                         AS ticketing_available
   FROM events
     INNER JOIN view_organizations ON view_organizations.id = events.organization_id
     INNER JOIN organization_types ON organization_types.id = view_organizations.type_id
@@ -190,8 +186,8 @@ CREATE OR REPLACE VIEW view_all_events AS
                  event_id
                FROM ticket_types
                WHERE ((NOW() < sell_end_date AND NOW() > sell_start_date)
-                      OR (sell_end_date IS NULL AND sell_start_date > NOW())
-                      OR (sell_start_date IS NULL AND sell_end_date < NOW())
+                      OR (sell_end_date IS NULL AND sell_start_date < NOW())
+                      OR (sell_start_date IS NULL AND sell_end_date > NOW())
                       OR (sell_start_date IS NULL AND sell_end_date IS NULL)
                      )
                      AND ticket_types.status = TRUE
@@ -199,8 +195,122 @@ CREATE OR REPLACE VIEW view_all_events AS
   WHERE view_organizations.status = TRUE;
 
 
-
 CREATE OR REPLACE VIEW view_events AS
   SELECT *
   FROM view_all_events
   WHERE status = TRUE;
+
+
+ALTER TABLE ticket_types
+  ADD UNIQUE (event_id, status, type_code);
+
+ALTER TABLE ticket_types
+  ADD COLUMN start_after_ticket_type_code VARCHAR(50);
+
+
+CREATE OR REPLACE VIEW view_all_ticket_types AS
+  SELECT
+    ticket_types.id,
+    ticket_types.event_id,
+    ticket_types.uuid,
+    ticket_types.type_code,
+    ticket_types.name,
+    ticket_types.comment,
+    ticket_types.price,
+    DATE_PART('epoch', ticket_types.sell_start_date) :: INT AS sell_start_date,
+    DATE_PART('epoch', ticket_types.sell_end_date) :: INT   AS sell_end_date,
+    ticket_types.start_after_ticket_type_uuid,
+    ticket_types.amount,
+    ticket_types.min_count_per_user,
+    ticket_types.max_count_per_user,
+    ticket_types.promocode,
+    ticket_types.promocode_effort,
+    DATE_PART('epoch', ticket_types.created_at) :: INT      AS created_at,
+    DATE_PART('epoch', ticket_types.updated_at) :: INT      AS updated_at,
+    sold.count                                              AS sold_count,
+    status,
+    CASE
+    WHEN start_after_ticket_type_code IS NOT NULL
+      THEN (((NOW() < sell_end_date AND NOW() > sell_start_date)
+             OR (sell_end_date IS NULL AND sell_start_date < NOW())
+             OR (sell_start_date IS NULL AND sell_end_date > NOW())
+             OR (sell_start_date IS NULL AND sell_end_date IS NULL)
+            ) = FALSE OR sold.count >= ticket_types.amount)
+    ELSE ((NOW() < sell_end_date AND NOW() > sell_start_date)
+          OR (sell_end_date IS NULL AND sell_start_date < NOW())
+          OR (sell_start_date IS NULL AND sell_end_date > NOW())
+          OR (sell_start_date IS NULL AND sell_end_date IS NULL)
+         )
+         AND (sold.count IS NULL OR sold.count < ticket_types.amount)
+    END                                                     AS is_selling,
+    ticket_types.start_after_ticket_type_code
+  FROM ticket_types
+    LEFT JOIN (SELECT
+                 COALESCE(COUNT(tickets.id), 0),
+                 tickets.ticket_type_id
+               FROM tickets
+                 INNER JOIN ticket_orders ON tickets.ticket_order_id = ticket_orders.id
+               WHERE tickets.ticket_order_id NOT IN (3, 5, 6, 7)
+               GROUP BY tickets.ticket_type_id) AS sold(count, ticket_type_id)
+      ON sold.ticket_type_id = ticket_types.id;
+
+
+CREATE OR REPLACE VIEW view_tickets AS
+  SELECT
+    tickets.id,
+    tickets.user_id,
+    tickets.ticket_type_id,
+    tickets.ticket_order_id,
+    tickets.status,
+    tickets.checked_out,
+    tickets.uuid,
+    view_all_ticket_types.uuid                                                                 AS ticket_type_uuid,
+    view_tickets_orders.uuid                                                                   AS ticket_order_uuid,
+    DATE_PART('epoch', tickets.created_at) :: INT                                              AS created_at,
+    DATE_PART('epoch', tickets.updated_at) :: INT                                              AS updated_at,
+    view_tickets_orders.event_id                                                               AS event_id,
+    (view_tickets_orders.status_type_code IN
+     ('returned_by_organization', 'payment_canceled_auto', 'payment_canceled_by_client', 'returned_by_user') =
+     TRUE) :: BOOLEAN                                                                          AS is_canceled,
+    (view_tickets_orders.status_type_code NOT IN
+     ('returned_by_organization', 'payment_canceled_auto', 'payment_canceled_by_client', 'returned_by_user') =
+     TRUE) :: BOOLEAN                                                                          AS is_active,
+    view_all_ticket_types.type_code,
+    view_all_ticket_types.price,
+    RPAD(tickets.id :: TEXT || '00' || reverse((view_tickets_orders.id * 16) :: TEXT), 9, '0')::TEXT || ' ' AS number,
+    tickets.checked_out AS checkout
+  FROM tickets
+    INNER JOIN view_tickets_orders ON view_tickets_orders.id = tickets.ticket_order_id
+    INNER JOIN view_all_ticket_types ON view_all_ticket_types.id = tickets.ticket_type_id;
+
+
+CREATE OR REPLACE VIEW view_sold_tickets AS
+  SELECT
+     tickets.id,
+     tickets.ticket_type_id,
+    ticket_orders.event_id
+   FROM tickets
+     INNER JOIN ticket_orders ON tickets.ticket_order_id = ticket_orders.id
+   WHERE tickets.ticket_order_id NOT IN (3, 5, 6, 7)
+   GROUP BY tickets.ticket_type_id, tickets.id, event_id;
+
+
+CREATE OR REPLACE VIEW view_ticket_types AS
+  SELECT
+    view_all_ticket_types.id,
+    view_all_ticket_types.event_id,
+    view_all_ticket_types.uuid,
+    view_all_ticket_types.type_code,
+    view_all_ticket_types.name,
+    view_all_ticket_types.comment,
+    view_all_ticket_types.price,
+    view_all_ticket_types.sell_start_date,
+    view_all_ticket_types.sell_end_date,
+    view_all_ticket_types.min_count_per_user,
+    view_all_ticket_types.max_count_per_user,
+    view_all_ticket_types.created_at,
+    view_all_ticket_types.updated_at
+  FROM view_all_ticket_types
+  WHERE status = TRUE
+        AND (type_code <> 'registration' OR type_code IS NULL)
+        AND view_all_ticket_types.is_selling = TRUE;
