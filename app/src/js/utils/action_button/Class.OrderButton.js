@@ -40,8 +40,7 @@ OrderButton = extending(ActionButton, (function() {
 		};
 		this.event = event;
 		this.modal = null;
-		this.is_disabled = (this.event.registration_locally && !this.event.registration_available)
-		                   || (this.event.ticketing_locally && !this.event.ticketing_available);
+		this.is_disabled = this.event.ticketing_locally ? !this.event.ticketing_available : (this.event.registration_locally && !this.event.registration_available);
 		options.is_checked = false;
 		ActionButton.call(this, options);
 	}

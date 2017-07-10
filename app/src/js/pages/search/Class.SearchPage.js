@@ -21,31 +21,7 @@ SearchPage = extending(Page, (function() {
 		this.search_string = decodeURIComponent(search);
 		this.events_ajax_data = {
 			length: 10,
-			fields: new Fields(
-				'image_horizontal_medium_url',
-				'detail_info_url',
-				'nearest_event_date',
-				'can_edit',
-				'location',
-				'is_favorite',
-				'is_registered',
-				'registration_available',
-				'registration_locally',
-				'registration_required',
-				'registration_till',
-				'ticketing_locally',
-				'is_free',
-				'min_price',
-				'favored_users_count',
-				'organization_name',
-				'organization_short_name',
-				'organization_logo_small_url',
-				'description',
-				'favored',
-				'is_same_time',
-				'tags',
-				'dates'
-			),
+			fields: FeedPage.fields.copy(),
 			order_by: 'nearest_event_date,-first_event_date'
 		};
 		this.organizations_ajax_data = {
