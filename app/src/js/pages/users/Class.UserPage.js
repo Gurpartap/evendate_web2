@@ -28,9 +28,10 @@ UserPage = extending(Page, (function() {
 				'favored_users_count',
 				'is_favorite',
 				'is_registered',
-				'registration_available',
 				'registration_locally',
+				'registration_available',
 				'ticketing_locally',
+				'ticketing_available',
 				'dates'
 			),
 			order_by: 'nearest_event_date,-first_event_date',

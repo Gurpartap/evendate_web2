@@ -139,11 +139,6 @@ OneEvent = extending(OneEntity, (function() {
 		this.registration_fields = new RegistrationFieldModelsCollection();
 		
 		this.organization = new OneOrganization();
-		this._organization_id = null;
-		this._organization_short_name = null;
-		this._organization_logo_large_url = null;
-		this._organization_logo_medium_url = null;
-		this._organization_logo_small_url = null;
 		
 		this.image_vertical_url = null;
 		this.image_horizontal_url = null;
@@ -186,12 +181,11 @@ OneEvent = extending(OneEntity, (function() {
 				enumerable: true,
 				get: function() {
 					
-					return self['_' + field];
+					return self.organization[field.replace('organization_', '')];
 				},
 				set: function(value) {
-					self.organization[field.replace('organization_', '')] = value;
 					
-					return self['_' + field] = value;
+					return self.organization[field.replace('organization_', '')] = value;
 				}
 			});
 		});
