@@ -229,6 +229,7 @@ OrderPage = extending(Page, (function() {
 							Payment.doPayment('order-' + data.order.uuid, data.sum, window.location.origin + '/event/' + self.event.id);
 						} else {
 							__APP.changeState('/event/'+self.event.id);
+							showNotifier({text: 'Регистрация прошла успешно', status: true});
 						}
 					});
 				} else {

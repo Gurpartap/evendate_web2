@@ -260,6 +260,10 @@ Builder = (function() {
 	/**
 	 *
 	 * @param {(...buildProps|Array<buildProps>)} props
+	 * @param {(number|string)} props.val
+	 * @param {string} props.display_name
+	 *
+	 *
 	 * @return {jQuery}
 	 */
 	Builder.prototype.option = function buildOption(props) {
