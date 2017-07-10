@@ -72,7 +72,7 @@ class Ticket extends AbstractEntity
 	{
 		$now = (new DateTime())->format('U');
 
-		if (!is_null($type['sold_count']) && $type['sold_count'] >= $type['amount'])
+		if (!is_null($type['sold_count']) && $type['sold_count'] >= $type['amount'] && !is_null($type['amount']))
 			throw new BadArgumentException('TICKETS_ALL_SOLD', App::DB(), $ticket_data['uuid']);
 		if (!is_null($type['sell_end_date']) && $now > $type['sell_end_date'])
 			throw new BadArgumentException('TICKETS_SELL_FINISHED', App::DB(), $ticket_data['uuid']);

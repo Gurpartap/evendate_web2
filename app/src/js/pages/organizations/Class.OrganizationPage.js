@@ -53,6 +53,7 @@ OrganizationPage = extending(Page, (function() {
 			'registration_available',
 			'registration_locally',
 			'ticketing_locally',
+			'ticketing_available',
 			'dates', {
 				favored: {
 					length: 5
