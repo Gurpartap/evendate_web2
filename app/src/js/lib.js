@@ -1672,13 +1672,16 @@ function isFormValid($form) {
 			if ($elements.length > 1) {
 				active_count = $elements.filter(function(i, el) {
 					
-					return !$(el).is(":disabled")
-					   && ((el.checked && el.value != "on") || el.type != "radio")
-					   && ((el.checked && el.value != "on") || el.value == "on" || el.type != "checkbox");
+					return !$(el).is(':disabled')
+					   && ((el.checked && el.value !== 'on') || el.type !== 'radio')
+					   && ((el.checked && el.value !== 'on') || el.value === 'on' || el.type !== 'checkbox');
 				}).length;
 				
 				if (!active_count) {
 					handleErrorField($elements);
+					scrollTo($elements, 400, function() {
+						showNotifier({text: $elements.data('error_message') || 'Заполнены не все обязательные поля', status: false});
+					});
 					is_valid = false;
 				}
 				
@@ -1689,6 +1692,10 @@ function isFormValid($form) {
 		$rest.each(function(i, el) {
 			if ( (el.required && (el.value.trim() === '' || !el.checkValidity())) || (el.value.trim() !== '' && !el.checkValidity()) ) {
 				handleErrorField(el);
+				
+				scrollTo(el, 400, function() {
+					showNotifier({text: $(el).data('error_message') || 'Заполнены не все обязательные поля', status: false});
+				});
 				is_valid = false;
 			}
 		});
@@ -2504,7 +2511,7 @@ function isNotDesktop() {
 
 /**
  *
- * @param {(jQuery|number)} $element
+ * @param {(jQuery|Element|number)} $element
  * @param {number} [duration=400]
  * @param {Function} [complete]
  *
@@ -2512,8 +2519,11 @@ function isNotDesktop() {
  */
 function scrollTo($element, duration, complete) {
 	var scroll_top;
+	
 	if ($element instanceof jQuery) {
 		scroll_top = $element.offset().top - 150;
+	} else if ($element instanceof Element) {
+		scroll_top = $($element).offset().top - 150;
 	} else {
 		scroll_top = $element - 150;
 	}
@@ -2521,13 +2531,12 @@ function scrollTo($element, duration, complete) {
 		complete = function() {};
 	}
 	$('body').stop().animate({
-			scrollTop: Math.ceil(scroll_top)
-		}, {
-			duration: duration ? duration : 400,
-			easing: 'swing',
-			complete: complete
-		}
-	);
+		scrollTop: Math.ceil(scroll_top)
+	}, {
+		duration: duration ? duration : 400,
+		easing: 'swing',
+		complete: complete
+	});
 	
 	return scroll_top;
 }
