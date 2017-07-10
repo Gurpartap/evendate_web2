@@ -1608,6 +1608,15 @@ function formatTicketNumber(number) {
 	return ('' + number).replace(/(\d{3})/g, '$1 ').trim();
 }
 /**
+ *
+ * @param {timestamp} timestamp
+ * @param {string} [format=__C.DATE_FORMAT]
+ */
+function unixTimestampToISO(timestamp, format) {
+	
+	return moment.unix(timestamp).format(format || __C.DATE_FORMAT);
+}
+/**
  * Generates guid-like string (actually, it`s not guid, just randomly compiled string)
  *
  * @return {string}

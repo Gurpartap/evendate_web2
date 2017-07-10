@@ -73,17 +73,18 @@ EventPage = extending(Page, (function() {
 		'canceled',
 		'public_at',
 		'is_registered',
+		'registration_locally',
+		'registration_available',
 		'registration_required',
 		'registration_approvement_required',
 		'registration_till',
 		'registration_limit_count',
-		'registration_locally',
 		'registration_fields',
-		'registration_available',
 		'registration_approved',
 		'registered_count',
 		'registered',
-		'ticketing_locally'
+		'ticketing_locally',
+		'ticketing_available'
 	], {
 		dates: {
 			length: 0,
