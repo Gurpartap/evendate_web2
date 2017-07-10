@@ -236,7 +236,15 @@ CREATE OR REPLACE VIEW view_all_ticket_types AS
          OR (sell_end_date IS NULL AND sell_start_date < NOW())
          OR (sell_start_date IS NULL AND sell_end_date > NOW())
          OR (sell_start_date IS NULL AND sell_end_date IS NULL)
-        ) = FALSE OR sold.count >= ticket_types.amount)
+        ) = TRUE AND sold.count < ticket_types.amount
+        AND (SELECT ((NOW() < tt.sell_end_date AND NOW() > tt.sell_start_date)
+                     OR (tt.sell_end_date IS NULL AND tt.sell_start_date < NOW())
+                     OR (tt.sell_start_date IS NULL AND tt.sell_end_date > NOW())
+                     OR (tt.sell_start_date IS NULL AND tt.sell_end_date IS NULL)
+                    ) = FALSE OR sold.count > tt.amount
+             FROM ticket_types  tt
+             WHERE tt.type_code = ticket_types.start_after_ticket_type_code
+              AND tt.event_id = ticket_types.event_id)) -- checking parent type
     ELSE ((NOW() < sell_end_date AND NOW() > sell_start_date)
           OR (sell_end_date IS NULL AND sell_start_date < NOW())
           OR (sell_start_date IS NULL AND sell_end_date > NOW())
