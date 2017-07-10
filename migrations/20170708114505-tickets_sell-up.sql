@@ -231,11 +231,12 @@ CREATE OR REPLACE VIEW view_all_ticket_types AS
     status,
     CASE
     WHEN start_after_ticket_type_code IS NOT NULL
-      THEN (((NOW() < sell_end_date AND NOW() > sell_start_date)
-             OR (sell_end_date IS NULL AND sell_start_date < NOW())
-             OR (sell_start_date IS NULL AND sell_end_date > NOW())
-             OR (sell_start_date IS NULL AND sell_end_date IS NULL)
-            ) = FALSE OR sold.count >= ticket_types.amount)
+      THEN (
+        ((NOW() < sell_end_date AND NOW() > sell_start_date)
+         OR (sell_end_date IS NULL AND sell_start_date < NOW())
+         OR (sell_start_date IS NULL AND sell_end_date > NOW())
+         OR (sell_start_date IS NULL AND sell_end_date IS NULL)
+        ) = FALSE OR sold.count >= ticket_types.amount)
     ELSE ((NOW() < sell_end_date AND NOW() > sell_start_date)
           OR (sell_end_date IS NULL AND sell_start_date < NOW())
           OR (sell_start_date IS NULL AND sell_end_date > NOW())
@@ -264,21 +265,23 @@ CREATE OR REPLACE VIEW view_tickets AS
     tickets.status,
     tickets.checked_out,
     tickets.uuid,
-    view_all_ticket_types.uuid                                                                 AS ticket_type_uuid,
-    view_tickets_orders.uuid                                                                   AS ticket_order_uuid,
-    DATE_PART('epoch', tickets.created_at) :: INT                                              AS created_at,
-    DATE_PART('epoch', tickets.updated_at) :: INT                                              AS updated_at,
-    view_tickets_orders.event_id                                                               AS event_id,
+    view_all_ticket_types.uuid                                                                                AS ticket_type_uuid,
+    view_tickets_orders.uuid                                                                                  AS ticket_order_uuid,
+    DATE_PART('epoch',
+              tickets.created_at) :: INT                                                                      AS created_at,
+    DATE_PART('epoch',
+              tickets.updated_at) :: INT                                                                      AS updated_at,
+    view_tickets_orders.event_id                                                                              AS event_id,
     (view_tickets_orders.status_type_code IN
      ('returned_by_organization', 'payment_canceled_auto', 'payment_canceled_by_client', 'returned_by_user') =
-     TRUE) :: BOOLEAN                                                                          AS is_canceled,
+     TRUE) :: BOOLEAN                                                                                         AS is_canceled,
     (view_tickets_orders.status_type_code NOT IN
      ('returned_by_organization', 'payment_canceled_auto', 'payment_canceled_by_client', 'returned_by_user') =
-     TRUE) :: BOOLEAN                                                                          AS is_active,
+     TRUE) :: BOOLEAN                                                                                         AS is_active,
     view_all_ticket_types.type_code,
     view_all_ticket_types.price,
-    RPAD(tickets.id :: TEXT || '00' || reverse((view_tickets_orders.id * 16) :: TEXT), 9, '0')::TEXT || ' ' AS number,
-    tickets.checked_out AS checkout
+    RPAD(tickets.id :: TEXT || '00' || reverse((view_tickets_orders.id * 16) :: TEXT), 9, '0') :: TEXT || ' ' AS number,
+    tickets.checked_out                                                                                       AS checkout
   FROM tickets
     INNER JOIN view_tickets_orders ON view_tickets_orders.id = tickets.ticket_order_id
     INNER JOIN view_all_ticket_types ON view_all_ticket_types.id = tickets.ticket_type_id;
@@ -286,13 +289,13 @@ CREATE OR REPLACE VIEW view_tickets AS
 
 CREATE OR REPLACE VIEW view_sold_tickets AS
   SELECT
-     tickets.id,
-     tickets.ticket_type_id,
+    tickets.id,
+    tickets.ticket_type_id,
     ticket_orders.event_id
-   FROM tickets
-     INNER JOIN ticket_orders ON tickets.ticket_order_id = ticket_orders.id
-   WHERE tickets.ticket_order_id NOT IN (3, 5, 6, 7)
-   GROUP BY tickets.ticket_type_id, tickets.id, event_id;
+  FROM tickets
+    INNER JOIN ticket_orders ON tickets.ticket_order_id = ticket_orders.id
+  WHERE tickets.ticket_order_id NOT IN (3, 5, 6, 7)
+  GROUP BY tickets.ticket_type_id, tickets.id, event_id;
 
 
 CREATE OR REPLACE VIEW view_ticket_types AS
@@ -314,3 +317,52 @@ CREATE OR REPLACE VIEW view_ticket_types AS
   WHERE status = TRUE
         AND (type_code <> 'registration' OR type_code IS NULL)
         AND view_all_ticket_types.is_selling = TRUE;
+
+
+CREATE OR REPLACE VIEW view_actions AS SELECT
+                                         stat_events.stat_type_id,
+                                         stat_events.event_id,
+                                         stat_event_types.name,
+                                         stat_event_types.entity,
+                                         stat_event_types.type_code,
+                                         tokens.user_id,
+                                         NULL                                                   AS organization_id,
+                                         DATE_PART('epoch', MAX(stat_events.created_at)) :: INT AS created_at
+                                       FROM stat_events
+                                         INNER JOIN stat_event_types ON stat_event_types.id = stat_events.stat_type_id
+                                         INNER JOIN tokens ON tokens.id = stat_events.token_id
+                                         INNER JOIN view_events ON view_events.id = stat_events.event_id
+                                       WHERE
+
+                                         view_events.status = TRUE
+                                         AND view_events.is_canceled = FALSE
+                                         AND view_events.organization_is_private = FALSE
+                                         AND (stat_event_types.type_code = 'fave'
+                                              OR stat_event_types.type_code = 'unfave')
+                                       GROUP BY stat_events.event_id, tokens.user_id, stat_events.stat_type_id,
+                                         stat_event_types.name,
+                                         stat_event_types.entity,
+                                         stat_event_types.type_code
+                                       UNION
+
+                                       SELECT
+                                         stat_organizations.stat_type_id,
+                                         NULL                                                          AS event_id,
+                                         stat_event_types.name,
+                                         stat_event_types.entity,
+                                         stat_event_types.type_code,
+                                         tokens.user_id,
+                                         stat_organizations.organization_id                            AS organization_id,
+                                         DATE_PART('epoch', MAX(stat_organizations.created_at)) :: INT AS created_at
+                                       FROM stat_organizations
+                                         INNER JOIN stat_event_types ON stat_event_types.id = stat_organizations.stat_type_id
+                                         INNER JOIN tokens ON tokens.id = stat_organizations.token_id
+                                         INNER JOIN view_organizations
+                                           ON view_organizations.id = stat_organizations.organization_id
+                                       WHERE (stat_event_types.type_code = 'subscribe'
+                                              OR stat_event_types.type_code = 'unsubscribe')
+                                             AND view_organizations.is_private = FALSE
+                                       GROUP BY stat_organizations.organization_id, tokens.user_id,
+                                         stat_organizations.stat_type_id, stat_event_types.name,
+                                         stat_event_types.entity,
+                                         stat_event_types.type_code;
