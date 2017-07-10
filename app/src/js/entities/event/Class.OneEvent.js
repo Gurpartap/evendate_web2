@@ -37,8 +37,10 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {?number} orders_count
 	 *
 	 * @property {?boolean} ticketing_locally
+	 * @property {?boolean} ticketing_available
 	 * @property {AbstractEventTicketsCollection} tickets
 	 * @property {TicketTypesCollection} ticket_types
+	 * @property {?number} booking_time
 	 *
 	 * @property {?boolean} registration_locally
 	 * @property {?boolean} registration_available
@@ -119,8 +121,10 @@ OneEvent = extending(OneEntity, (function() {
 		this.orders_count = null;
 		
 		this.ticketing_locally = null;
+		this.ticketing_available = null;
 		this.tickets = new AbstractEventTicketsCollection(event_id);
 		this.ticket_types = new TicketTypesCollection(event_id);
+		this.booking_time = null;
 		
 		this.registration_locally = null;
 		this.registration_available = null;

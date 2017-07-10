@@ -479,7 +479,7 @@ Builder = (function() {
 									
 									return self.inputNumber(
 										$.extend({}, props.attributes, defined_attributes, {
-											autocomplete: 'off', value: (props.value != null) ? props.value : undefined
+											autocomplete: 'off', value: !empty(props.value) ? props.value : undefined
 										}),
 										classes,
 										props.dataset

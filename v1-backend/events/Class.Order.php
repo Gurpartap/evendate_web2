@@ -220,7 +220,7 @@ class Order extends AbstractEntity
 	{
 		try{
 			if (!Payment::checkMd5($request)) throw new BadArgumentException('', $db);
-			$result = self::getPaymentInfo($request['uuid'], $db);
+			$result = self::getPaymentInfo($request, $db);
 			if ($result == false) throw new NoMethodException('', $db);
 			if ((float) $result['sum'] != (float) $request['orderSumAmount']) throw new InvalidArgumentException('', $db);
 
@@ -266,7 +266,6 @@ class Order extends AbstractEntity
 				->onConflictUpdate(array('ticket_order_id', 'finished', 'canceled'), $new_cols)
 				->set('payed_at', 'NOW()');
 			$db->prepareExecute($q_ins, 'CANT_UPDATE_PAYMENT');
-
 
 			return Payment::buildResponse(Payment::ACTION_PAYMENT_AVISO, 0, 'ok', $request['invoiceId']);
 

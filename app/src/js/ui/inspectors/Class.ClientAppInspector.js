@@ -43,7 +43,10 @@ ClientAppInspector = extending(AbstractAppInspector, (function() {
 				enabled: false
 			},
 			tooltip: {
-				enabled: false
+				pointFormatter: function() {
+					
+					return '<b>'+ Math.roundTo(this.y, 2) +'%</b>';
+				}
 			},
 			chart: {
 				backgroundColor: null,
@@ -73,12 +76,7 @@ ClientAppInspector = extending(AbstractAppInspector, (function() {
 					marker: {
 						enabled: false,
 						symbol: 'circle',
-						radius: 2,
-						states: {
-							hover: {
-								enabled: false
-							}
-						}
+						radius: 2
 					}
 				}
 			},

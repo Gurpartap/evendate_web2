@@ -43,6 +43,7 @@ class Payment
 			$request['orderSumBankPaycash'] . ";" . $request['shopId'] . ";" .
 			$request['invoiceId'] . ";" . trim($request['customerNumber']) . ";" . self::PASSWORD;
 		$md5 = strtoupper(md5($str));
+
 		return $md5 == strtoupper($request['md5']);
 
 	}

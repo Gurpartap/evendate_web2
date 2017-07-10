@@ -171,7 +171,7 @@
 									<div class="form_unit">
 										<div class="img_holder EventEditHorizontalImageHolder">
 											<img class="edit_event_img_preview_hor ImgPreview" src="{image_horizontal_url}">
-											<img src="/app/img/edit_event/edit_event_img_placeholder_hor.png" height="553">
+											<img class="edit_event_img_preview_mask" src="/app/img/edit_event/edit_event_img_placeholder_hor.png" height="574">
 											<input id="edit_event_image_horizontal_source" class="ImgSrc HorizontalImageSource" type="hidden" name="image_horizontal" value="{image_horizontal_base64}">
 											<input id="edit_event_image_horizontal_filename" class="FileName" type="hidden" name="filename_horizontal" value="{image_horizontal_filename}">
 										</div>
@@ -277,6 +277,7 @@
 									<tbody class="TicketTypes">{ticket_types}</tbody>
 								</table>
 								<div class="form_unit -align_center">{add_ticket_type_button}</div>
+								{booking_time_input}
 							</fieldset>
 						</div>
 
