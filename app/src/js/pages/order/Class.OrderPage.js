@@ -297,10 +297,14 @@ OrderPage = extending(Page, (function() {
 		
 		this.$wrapper.html(tmpl('order-page', this.render_vars));
 		
-		if (this.event.registration_locally && !this.event.registration_available) {
-			this.disablePage('Регистрация на событие не доступно');
-		} else if (this.event.ticketing_locally && !this.event.ticketing_available) {
-			this.disablePage('Заказ билетов на событие невозможен');
+		if (this.event.ticketing_locally) {
+			if (!this.event.ticketing_available) {
+				this.disablePage('Заказ билетов на событие невозможен');
+			}
+		} else {
+			if (this.event.registration_locally && !this.event.registration_available) {
+				this.disablePage('Регистрация на событие не доступно');
+			}
 		}
 		
 		this.init();

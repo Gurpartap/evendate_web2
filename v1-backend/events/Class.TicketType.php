@@ -24,6 +24,7 @@ class TicketType extends AbstractEntity
 		'updated_at',
 		'min_count_per_user',
 		'max_count_per_user',
+		'is_selling',
 	);
 
 	public static $FIELDS_FOR_ADMINISTRATOR = array(

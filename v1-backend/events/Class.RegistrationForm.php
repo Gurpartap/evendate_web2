@@ -170,8 +170,10 @@ class RegistrationForm
 				'value',
 				'values',
 				'created_at',
-				'updated_at'
-			))->where('ticket_order_uuid = ?', $order->getUUID());
+				'updated_at',
+				'order_number'
+			))->where('ticket_order_uuid = ?', $order->getUUID())
+		->orderBy(array('order_number'));
 
 		$result = $db->prepareExecute($q_get, 'CANT_GET_FILLED_FIELDS')->fetchAll();
 		foreach ($result as &$item) {
