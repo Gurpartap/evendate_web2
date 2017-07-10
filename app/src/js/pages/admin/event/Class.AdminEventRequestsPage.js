@@ -154,11 +154,13 @@ AdminEventRequestsPage = extending(AdminEventPage, (function() {
 		this.event_fields.add('orders_count');
 		
 		this.requests = new RequestsCollection(event_id);
-		this.requests_fields = new Fields('created_at', 'registration_fields', {
-			user: {
-				fields: new Fields('email')
-			}
-		});
+		this.requests_fields = new Fields(
+			'created_at',
+			'registration_fields', {
+				user: {
+					fields: new Fields('email')
+				}
+			});
 		
 		this.$loader = $();
 		this.$new_requests_list = $();

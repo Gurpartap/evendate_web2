@@ -61,7 +61,7 @@ AdminEventOrdersPage = extending(AdminEventPage, (function() {
 			paging: true,
 			columnDefs: [
 			],
-			dom: '<"data_tables_pagination"p>t<"data_tables_pagination"p>',
+			dom: 't<"data_tables_pagination"p>',
 			language: {
 				url: __LOCALE.DATATABLES_URL
 			}
