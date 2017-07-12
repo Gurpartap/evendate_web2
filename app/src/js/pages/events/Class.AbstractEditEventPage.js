@@ -473,6 +473,12 @@ AbstractEditEventPage = extending(Page, (function() {
 		} else {
 			$wrapper.find('.TicketTypeSellAfterFieldset').removeAttr('disabled');
 		}
+		
+		if ($sell_after_selects.length > 0) {
+			$wrapper.closest('.EditEventForm').find('.EmailTicketing').removeClass(__C.CLASSES.HIDDEN);
+		} else {
+			$wrapper.closest('.EditEventForm').find('.EmailTicketing').addClass(__C.CLASSES.HIDDEN);
+		}
 	};
 	
 	AbstractEditEventPage.prototype.fetchData = function() {
@@ -1149,6 +1155,10 @@ AbstractEditEventPage = extending(Page, (function() {
 		PAGE.$wrapper.find('.AddRegistrationCustomField').off('click.AddRegistrationCustomField').on('click.AddRegistrationCustomField', function() {
 			$sortable_custom_fields.append(AbstractEditEventPage.registrationCustomFieldBuilder());
 			reorder();
+		});
+		
+		PAGE.$wrapper.find('.RegistrationLocallySwitch').off('change.EmailRegistrationLocallySwitch').on('change.EmailRegistrationLocallySwitch', function() {
+			PAGE.$wrapper.find('.EmailRegistration').toggleClass(__C.CLASSES.HIDDEN);
 		});
 		
 		PAGE.$wrapper.find('.RegistrationPreview').on('click.RegistrationPreview', function() {
