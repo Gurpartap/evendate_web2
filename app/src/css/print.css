@@ -1,0 +1,17 @@
+@media print {
+
+	#main_sidebar,
+	#main_header,
+	#download_app_band,
+	.modal_wrapper,
+	.ticket_page_header {display: none}
+
+	#main_section,
+	#main_overlay {padding: 0}
+
+  .page_wrapper,
+  .print_page {width: auto}
+	.print_page {height: auto}
+
+  .ticket {padding: 0 0 64px}
+}
