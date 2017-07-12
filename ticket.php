@@ -34,58 +34,8 @@ App::buildGlobal($__db);
 
 try {
 	$user = new User($__db);
-
-	if (isset($_GET['logout']) && $_GET['logout'] == true) {
-		$user->logout();
-	}
-
-	if (isset($_REQUEST['redirect_to'])) {
-		header('Location: ' . $_REQUEST['redirect_to']);
-	} elseif (isset($_REQUEST['q']) && $_REQUEST['q'] != 'onboarding'
-		&& (!isset($_COOKIE['skip_onboarding']) || filter_var($_COOKIE['skip_onboarding'], FILTER_VALIDATE_BOOLEAN) == false)
-	) {
-		$subscriptions = OrganizationsCollection::filter(
-			$__db,
-			$user,
-			array('is_subscribed' => true),
-			array('created_at'),
-			array(),
-			array()
-		)->getData();
-		if (count($subscriptions) == 0) {
-			header('Location: /onboarding');
-		};
-	} else if (isset($_REQUEST['q']) && $_REQUEST['q'] == 'onboarding' && isset($_COOKIE['skip_onboarding'])) {
-		header('Location: /');
-	}
-
 } catch (Exception $e) {
 	$user = App::getCurrentUser();
-	if (isset($_REQUEST['redirect_to'])) {
-		header('Location: ' . $_REQUEST['redirect_to']);
-	}
-//    header('Location: /');
-}
-
-try {
-	if ($user instanceof User) {
-		if (isset($_COOKIE['auth_command']) && isset($_COOKIE['auth_entity_id'])) {
-			switch ($_COOKIE['auth_command']) {
-				case 'subscribe_to': {
-					OrganizationsCollection::one($__db, $user, $_COOKIE['auth_entity_id'], array())->addSubscription($user);
-					break;
-				}
-				case 'add_to_favorite': {
-					$user->addFavoriteEvent(EventsCollection::one($__db, $user, $_COOKIE['auth_entity_id'], array()));
-					break;
-				}
-			}
-
-			setcookie('auth_command');
-			setcookie('auth_entity_id');
-		}
-	}
-} catch (Exception $e) {
 }
 
 $is_user_not_auth = $user instanceof NotAuthorizedUser;
@@ -95,9 +45,6 @@ if ($is_user_not_auth) {
 } else {
 	$is_user_editor = $user->isEditor();
 	$user_full_name = $user->getLastName() . ' ' . $user->getFirstName();
-}
-if (App::$ENV == 'prod' || App::$ENV == 'test') {
-	$DEBUG_MODE = false;
 }
 $url = parse_url($_SERVER['REQUEST_URI'])['path'];
 $url_parts = explode('/', $url);
@@ -245,7 +192,6 @@ $url_parts = explode('/', $url);
 	</div>
 
 </aside>
-
 <div id="main_overlay">
   <header id="main_header">
     <div id="main_header_top">
@@ -318,8 +264,21 @@ $url_parts = explode('/', $url);
   </header>
   <div id="main_section">
 		<div class="app_inspectors_wrapper AppInspectorsWrapper"></div>
-    <div class="app_view -hidden PageView">
-      <div class="page_wrapper Content -fadeable"></div>
+    <div class="app_view PageView">
+			<div class="page_wrapper -fadeable">
+				<header class="ticket_page_header">
+					<h2 class="ticket_page_title">Электронный билет на событие</h2>
+					<h3 class="ticket_page_subtitle">
+						<span>Вы можете распечатать этот билет, либо воспользоваться нашим приложением для</span>
+						<a class="-text_color_accent" href="https://itunes.apple.com/us/app/evendate/id1044975200?mt=8" target="_blank">iOS</a><span> или </span>
+						<a class="-text_color_accent" href="https://play.google.com/store/apps/details?id=ru.evendate.android" target="_blank">Android</a><span>.</span>
+					</h3>
+					<button class="button -size_huge -color_accent Print" type="button">Распечатать билет</button>
+				</header>
+				<div class="ticket_page print_page material -floating_material"><?php
+					require_once('print_ticket.php');	?>
+				</div>
+			</div>
     </div>
 		<div id="main_section_cap" class="MainSectionCap"></div>
 

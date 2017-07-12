@@ -82,7 +82,7 @@ gulp.task('minify_css', ['css'], function() {
 });
 
 gulp.task('rev', function() {
-	return gulp.src('../index.php')
+	return gulp.src('../{index,ticket}.php')
 		.pipe(rev())
 		.pipe(gulp.dest('../'));
 });
