@@ -195,7 +195,28 @@ class Order extends AbstractEntity
 			->where('event_id = ?', $event->getId())
 			->where('uuid = ?', $this->uuid);
 
-		App::DB()->prepareExecute($q_upd_order, 'CANT_UPDATE_ORDER');
+		$result = App::DB()->prepareExecute($q_upd_order, 'CANT_UPDATE_ORDER');
+
+		if ($result->rowCount() > 0){
+			$notification_type = null;
+			switch($status_code){
+				case self::REGISTRATION_STATUS_APPROVED: {
+					$notification_type = Notification::NOTIFICATION_TYPE_REGISTRATION_APPROVED;
+					break;
+				}
+				case self::REGISTRATION_STATUS_REJECTED: {
+					$notification_type = Notification::NOTIFICATION_TYPE_REGISTRATION_NOT_APPROVED;
+					break;
+				}
+			}
+			if ($notification_type != null){
+				$event->addNotification(UsersCollection::one(App::DB(), $user, $this->user_id, array()),
+					array(
+						'notification_type' => $notification_type,
+						'notification_time' => (new DateTime())->add(new DateInterval('P1M'))->format(App::DB_DATETIME_FORMAT)
+					));
+			}
+		}
 
 		return new Result(true, 'Данные успешно обновлены');
 	}
@@ -241,6 +262,7 @@ class Order extends AbstractEntity
 	{
 		try {
 
+			$uuid = str_replace('order-', '', $request['evendate_payment_id']);
 			$result = self::getPaymentInfo($request, $db);
 
 			$q_get = App::queryFactory()->newSelect();
@@ -266,6 +288,14 @@ class Order extends AbstractEntity
 				->onConflictUpdate(array('ticket_order_id', 'finished', 'canceled'), $new_cols)
 				->set('payed_at', 'NOW()');
 			$db->prepareExecute($q_ins, 'CANT_UPDATE_PAYMENT');
+
+			$q_upd_order = App::queryFactory()->newUpdate();
+			$q_upd_order->table('ticket_orders')
+				->cols(array(
+					'order_status_id' => self::STATUSES[self::STATUS_PAYED]
+				))
+				->where('uuid = ?', $uuid);
+			$db->prepareExecute($q_upd_order, '');
 
 			return Payment::buildResponse(Payment::ACTION_PAYMENT_AVISO, 0, 'ok', $request['invoiceId']);
 

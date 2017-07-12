@@ -6,7 +6,7 @@ class TicketTypesCollection extends AbstractCollection{
 																array $filters = null,
 																array $fields = null,
 																array $pagination = null,
-																array $order_by = array('type_code'))
+																array $order_by = array('price'))
 	{
 
 		$q_get = App::queryFactory()->newSelect();
@@ -61,6 +61,10 @@ class TicketTypesCollection extends AbstractCollection{
 			->cols($cols)
 			->orderBy($order_by);
 
+		if ($from_table == 'view_all_ticket_types'){
+			$q_get->where('status = true');
+		}
+
 		$p_get_types = $db->prepareExecute($q_get, '', $statements)->fetchAll(PDO::FETCH_CLASS, 'TicketType');
 		$types = $p_get_types;
 		if (count($types) == 0 && $is_one_type) throw new LogicException('CANT_FIND_TYPE');
@@ -79,6 +83,15 @@ class TicketTypesCollection extends AbstractCollection{
 																	 array $fields = null) : TicketType
 	{
 		return self::filter($db, $user, array('uuid' => $uuid), $fields);
+	}
+
+	public static function disableAll(ExtendedPDO $db, $event_id)
+	{
+		$q_upd_all = App::queryFactory()->newUpdate();
+		$q_upd_all->table('ticket_types')
+			->cols(array('status' => 'false'))
+			->where('event_id = ?', $event_id);
+		$db->prepareExecute($q_upd_all, 'CANT_UPDATE_TICKET_TYPES');
 	}
 
 }

@@ -13,11 +13,13 @@ class TicketType extends AbstractEntity
 		'event_id',
 		'type_code',
 		'name',
+		'amount',
+		'price',
+		'start_after_ticket_type_code',
 	);
 
 	protected static $ADDITIONAL_COLS = array(
 		'comment',
-		'price',
 		'sell_start_date',
 		'sell_end_date',
 		'created_at',
@@ -29,7 +31,7 @@ class TicketType extends AbstractEntity
 
 	public static $FIELDS_FOR_ADMINISTRATOR = array(
 		self::START_AFTER_FIELD_NAME,
-		self::AMOUNT_FIELD_NAME,
+//		self::AMOUNT_FIELD_NAME,
 		self::PROMOCODE_FIELD_NAME,
 		self::PROMOCODE_EFFORT_FIELD_NAME,
 	);
@@ -132,10 +134,10 @@ class TicketType extends AbstractEntity
 			'name' => $ticket_type['name'],
 			'comment' => $ticket_type['comment'] ?? null,
 			'price' => $ticket_type['price'],
-			'status' => 'true',
+			'status' => isset($ticket_type['to_switch_off']) && $ticket_type['to_switch_off'] == true ? 'false' : 'true',
 			'sell_start_date' => $ticket_type['sell_start_date'],
 			'sell_end_date' => $ticket_type['sell_end_date'],
-			'start_after_ticket_type_uuid' => $ticket_type['start_after_ticket_type_uuid'],
+			'start_after_ticket_type_uuid' => null,
 			'start_after_ticket_type_code' => $ticket_type['start_after_ticket_type_code'],
 			'amount' => $ticket_type['amount'],
 			'min_count_per_user' => $ticket_type['min_count_per_user'],
@@ -146,7 +148,8 @@ class TicketType extends AbstractEntity
 
 		$q_ins
 			->into('ticket_types')
-			->cols($cols);
+			->cols($cols)
+		->onConflictUpdate(array('event_id', 'status', 'type_code'), $cols);
 
 		if (isset($ticket_type['uuid']) && !is_null($ticket_type['uuid']) && trim($ticket_type['uuid']) != '') {
 			$q_ins = App::queryFactory()->newUpdate();
@@ -170,7 +173,7 @@ class TicketType extends AbstractEntity
 		$result = parent::getParams($user, $fields)->getData();
 
 		foreach (self::$FIELDS_FOR_ADMINISTRATOR as $field) {
-			if (isset($fields[self::START_AFTER_FIELD_NAME]) && property_exists($this, $field)) {
+			if (property_exists($this, $field)) {
 				$result[$field] = $this->$field;
 			}
 		}

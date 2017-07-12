@@ -114,16 +114,16 @@ class TicketsCollection extends AbstractCollection
 					) > 0', $user->getId());
 		} else {
 			if (isset($filters['uuid'])) {
-				$q_get_tickets->where('(SELECT COUNT(users_organizations.user_id) 
-					FROM users_organizations
-					INNER JOIN view_all_events ON view_all_events.id = view_tickets.event_id 
-						AND users_organizations.organization_id = view_all_events.organization_id 
-					INNER JOIN view_tickets ON view_tickets.event_id = view_all_events.id
-					WHERE users_organizations.role_id = 1
-					AND users_organizations.user_id = ?
-					AND users_organizations.status = TRUE
-					AND view_tickets.uuid = ?
-					) > 0', $user->getId(), $filters['uuid']);
+//				$q_get_tickets->where('(SELECT COUNT(users_organizations.user_id)
+//					FROM users_organizations
+//					INNER JOIN view_all_events ON view_all_events.id = view_tickets.event_id
+//						AND users_organizations.organization_id = view_all_events.organization_id
+//					INNER JOIN view_tickets ON view_tickets.event_id = view_all_events.id
+//					WHERE users_organizations.role_id = 1
+//					AND users_organizations.user_id = ?
+//					AND users_organizations.status = TRUE
+//					AND view_tickets.uuid = ?
+//					) > 0', $user->getId(), $filters['uuid']);
 			} else {
 				$q_get_tickets->where('user_id = ?', $user->getId());
 			}
