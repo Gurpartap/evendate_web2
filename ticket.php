@@ -34,58 +34,8 @@ App::buildGlobal($__db);
 
 try {
 	$user = new User($__db);
-
-	if (isset($_GET['logout']) && $_GET['logout'] == true) {
-		$user->logout();
-	}
-
-	if (isset($_REQUEST['redirect_to'])) {
-		header('Location: ' . $_REQUEST['redirect_to']);
-	} elseif (isset($_REQUEST['q']) && $_REQUEST['q'] != 'onboarding'
-		&& (!isset($_COOKIE['skip_onboarding']) || filter_var($_COOKIE['skip_onboarding'], FILTER_VALIDATE_BOOLEAN) == false)
-	) {
-		$subscriptions = OrganizationsCollection::filter(
-			$__db,
-			$user,
-			array('is_subscribed' => true),
-			array('created_at'),
-			array(),
-			array()
-		)->getData();
-		if (count($subscriptions) == 0) {
-			header('Location: /onboarding');
-		};
-	} else if (isset($_REQUEST['q']) && $_REQUEST['q'] == 'onboarding' && isset($_COOKIE['skip_onboarding'])) {
-		header('Location: /');
-	}
-
 } catch (Exception $e) {
 	$user = App::getCurrentUser();
-	if (isset($_REQUEST['redirect_to'])) {
-		header('Location: ' . $_REQUEST['redirect_to']);
-	}
-//    header('Location: /');
-}
-
-try {
-	if ($user instanceof User) {
-		if (isset($_COOKIE['auth_command']) && isset($_COOKIE['auth_entity_id'])) {
-			switch ($_COOKIE['auth_command']) {
-				case 'subscribe_to': {
-					OrganizationsCollection::one($__db, $user, $_COOKIE['auth_entity_id'], array())->addSubscription($user);
-					break;
-				}
-				case 'add_to_favorite': {
-					$user->addFavoriteEvent(EventsCollection::one($__db, $user, $_COOKIE['auth_entity_id'], array()));
-					break;
-				}
-			}
-
-			setcookie('auth_command');
-			setcookie('auth_entity_id');
-		}
-	}
-} catch (Exception $e) {
 }
 
 $is_user_not_auth = $user instanceof NotAuthorizedUser;
@@ -95,9 +45,6 @@ if ($is_user_not_auth) {
 } else {
 	$is_user_editor = $user->isEditor();
 	$user_full_name = $user->getLastName() . ' ' . $user->getFirstName();
-}
-if (App::$ENV == 'prod' || App::$ENV == 'test') {
-	$DEBUG_MODE = false;
 }
 $url = parse_url($_SERVER['REQUEST_URI'])['path'];
 $url_parts = explode('/', $url);
@@ -115,10 +62,10 @@ $url_parts = explode('/', $url);
 	<?php
 	if ($DEBUG_MODE) { ?>
     <link rel="stylesheet" href="/dist/vendor.css?rev=3b6878c5b89f643e8d96b1b336b7d4fc">
-    <link rel="stylesheet" href="/dist/app.css?rev=c90815d3e175cf32668b6c65800045a5"><?php
+    <link rel="stylesheet" href="/dist/app.css?rev=7490534e8ed29d3d030f0adb6bb2bd3c"><?php
 	} else { ?>
-    <link rel="stylesheet" href="/dist/vendor.min.css?rev=32eaf6bc652f6da46bdffad58e1f62d4">
-    <link rel="stylesheet" href="/dist/app.min.css?rev=ea0da7b0d7d20af4bae634634569e54e"><?php
+    <link rel="stylesheet" href="/dist/vendor.min.css?rev=4165c69f5d04ec431ab5bc41425847a5">
+    <link rel="stylesheet" href="/dist/app.min.css?rev=a8c765b6104b8fb51ddb8e6b4c01dcd9"><?php
 	} ?>
 
 	<?php
@@ -320,11 +267,11 @@ $url_parts = explode('/', $url);
     <div class="app_view PageView">
 			<div class="page_wrapper -fadeable">
 				<header class="ticket_page_header">
-					<h2>Электронный билет на событие</h2>
-					<h3>
+					<h2 class="ticket_page_title">Электронный билет на событие</h2>
+					<h3 class="ticket_page_subtitle">
 						<span>Вы можете распечатать этот билет, либо воспользоваться нашим приложением для</span>
-						<a class="-text_color_accent" href="https://itunes.apple.com/us/app/evendate/id1044975200?mt=8">iOS</a><span> или </span>
-						<a class="-text_color_accent" href="https://itunes.apple.com/us/app/evendate/id1044975200?mt=8">Android</a><span>.</span>
+						<a class="-text_color_accent" href="https://itunes.apple.com/us/app/evendate/id1044975200?mt=8" target="_blank">iOS</a><span> или </span>
+						<a class="-text_color_accent" href="https://play.google.com/store/apps/details?id=ru.evendate.android" target="_blank">Android</a><span>.</span>
 					</h3>
 					<button class="button -size_huge -color_accent Print" type="button">Распечатать билет</button>
 				</header>
@@ -361,11 +308,11 @@ $url_parts = explode('/', $url);
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=611e4595761fea4eb5142d6e6166ac30" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=f916650de9b68f170f3b21221f767cfa" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=749eb14a689b7c03190ee0394747f94f" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=a344eff10b0e27002732a38e77b295a2" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=79acb69ba8e1ede7a2418514a3dc6ae8" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=42d838ac5013028381f16d0d893aefd1" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=7fe4f0d5997913b881ab68b44bab73aa" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=f91a210982276a76c2adaa18e88f3d49" charset="utf-8"></script><?php
 }
 
 foreach (glob("app/templates/{*/*/*/*,*/*/*,*/*,*}.html", GLOB_BRACE) as $filename) {

@@ -13,5 +13,12 @@ TicketPage = extending(Page, (function() {
 		Page.call(this);
 	}
 	
+	TicketPage.prototype.render = function() {
+		
+		this.$view.find('.Print').on('click', function() {
+			window.print();
+		});
+	};
+	
 	return TicketPage;
 }()));

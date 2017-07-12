@@ -365,6 +365,8 @@ hr[title]:before {
 	background-color: var(--color_gray_material);
 }
 
+.line_dashed {border: 1px dashed #ccc}
+
 table {
 	border-spacing: 0;
 	border-collapse: collapse;
@@ -5195,21 +5197,98 @@ body,
 /* /ORDER */
 /* TICKET */
 
+
+.ticket_page {
+	margin: auto auto 48px;
+}
+
 .ticket_page_header {
 	margin: 72px auto 24px;
 	text-align: center;
 }
 
-.ticket_page {
-	margin: auto;
+.ticket_page_title {
+
+}
+
+.ticket_page_subtitle {
+	color: var(--color_primary_50);
 }
 
 .print_page {
-	height: 842px;
-	width: 595px;
+	width: 750px;
 }
 
-/* /TICKET */
+.ticket {
+	max-width: 750px;
+	margin: auto;
+	padding: 30px 30px 64px;
+}
+
+.ticket_header {
+	display: flex;
+}
+
+.ticket_header_unit {
+	margin-right: 14px;
+	font-weight: 600;
+}
+
+.ticket_header_unit_key {
+	text-transform: uppercase;
+	color: #9b9b9b;
+}
+
+.ticket_header_unit_value {
+	color: #f82969;
+}
+
+.ticket_title {
+	margin: 10px 0;
+	color: #000;
+}
+
+.ticket_description {font-size: 10px}
+.ticket_description.-text_small {font-size: 8px}
+
+.ticket_qr {
+	float: right;
+	width: 150px;
+}
+
+.ticket_bottoms {margin: auto 18px}
+
+.ticket_footer {
+	position: absolute;
+	bottom: 12px;
+	display: flex;
+	align-items: center;
+	margin-top: 16px;
+	height: 36px;
+	font-size: 10px;
+	font-weight: 500;
+}
+
+.ticket_footer_brand {
+	max-width: 90px;
+}
+
+.ticket_footer_text {
+	margin: auto 10px auto 40px;
+}
+
+.ticket_mobile_app {
+	display: flex;
+	min-width: 110px;
+}
+
+.ticket_mobile_app + .ticket_mobile_app {margin-left: 20px}
+
+.ticket_mobile_app_aside {
+	margin-left: 10px;
+}
+
+	/* /TICKET */
 /* FEED */
 
 .feed_event_wrapper {
