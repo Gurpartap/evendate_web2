@@ -25,6 +25,7 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 		'vk_post_link', {
 			ticket_types: {
 				fields: new Fields(
+					'amount',
 					'comment',
 					'price',
 					'sell_start_date',

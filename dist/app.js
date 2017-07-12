@@ -3714,54 +3714,6 @@ TariffModel = extending(OneEntity, (function() {
  */
 /**
  *
- * @class DateModel
- * @extends OneEntity
- */
-DateModel = extending(OneEntity, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs DateModel
-	 *
-	 * @property {(string|timestamp)} event_date
-	 * @property {string} start_time
-	 * @property {string} end_time
-	 */
-	function DateModel() {
-		this.event_date = '';
-		this.start_time = '';
-		this.end_time = '';
-	}
-	
-	return DateModel;
-}()));
-/**
- * @requires ../../entities/Class.EntitiesCollection.js
- * @requires Class.DateModel.js
- */
-/**
- *
- * @class DateModelsCollection
- * @extends EntitiesCollection
- */
-DateModelsCollection = extending(EntitiesCollection, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs DateModelsCollection
-	 */
-	function DateModelsCollection() {
-		EntitiesCollection.call(this);
-	}
-	DateModelsCollection.prototype.collection_of = DateModel;
-	
-	return DateModelsCollection;
-}()));
-/**
- * @requires ../../entities/Class.OneEntity.js
- */
-/**
- *
  * @class InterestModel
  * @extends OneEntity
  */
@@ -3807,6 +3759,54 @@ InterestModelsCollection = extending(EntitiesCollection, (function() {
 	InterestModelsCollection.prototype.collection_of = InterestModel;
 	
 	return InterestModelsCollection;
+}()));
+/**
+ * @requires ../../entities/Class.OneEntity.js
+ */
+/**
+ *
+ * @class DateModel
+ * @extends OneEntity
+ */
+DateModel = extending(OneEntity, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs DateModel
+	 *
+	 * @property {(string|timestamp)} event_date
+	 * @property {string} start_time
+	 * @property {string} end_time
+	 */
+	function DateModel() {
+		this.event_date = '';
+		this.start_time = '';
+		this.end_time = '';
+	}
+	
+	return DateModel;
+}()));
+/**
+ * @requires ../../entities/Class.EntitiesCollection.js
+ * @requires Class.DateModel.js
+ */
+/**
+ *
+ * @class DateModelsCollection
+ * @extends EntitiesCollection
+ */
+DateModelsCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs DateModelsCollection
+	 */
+	function DateModelsCollection() {
+		EntitiesCollection.call(this);
+	}
+	DateModelsCollection.prototype.collection_of = DateModel;
+	
+	return DateModelsCollection;
 }()));
 /**
  * @requires ../../entities/Class.OneEntity.js
@@ -15920,6 +15920,7 @@ AbstractEditEventPage = extending(Page, (function() {
 				
 				return {
 					row_num: row_id,
+					uuid: ticket_type.uuid,
 					comment: ticket_type.comment,
 					type_code: ticket_type.type_code || randomString(),
 					name_input: __APP.BUILD.formUnit({
@@ -15936,14 +15937,14 @@ AbstractEditEventPage = extending(Page, (function() {
 					amount_input: __APP.BUILD.formUnit({
 						id: 'event_edit_ticket_type_' + row_id + '_amount',
 						name: 'ticket_type_' + row_id + '_amount',
-						value: ticket_type.amount || '',
+						value: empty(ticket_type.amount) ? '' : ticket_type.amount,
 						placeholder: 0,
 						required: true
 					}),
 					price_input: __APP.BUILD.formUnit({
 						id: 'event_edit_ticket_type_' + row_id + '_price',
 						name: 'ticket_type_' + row_id + '_price',
-						value: ticket_type.price || '',
+						value: empty(ticket_type.price) ? '' : ticket_type.price,
 						placeholder: 0,
 						required: true
 					}),
@@ -16099,9 +16100,8 @@ AbstractEditEventPage = extending(Page, (function() {
 	 */
 	AbstractEditEventPage.checkTicketTypeSellAfter = function($wrapper) {
 		var $sell_after_selects = $wrapper.find('select.TicketTypeSellAfter'),
-			$ticket_types = $wrapper.children().not('.ExpandRow'),
+			$ticket_types = $wrapper.children('tbody').children().not('.ExpandRow'),
 			options = [];
-		
 		$ticket_types.each(function(i) {
 			var $ticket_type = $(this);
 			
@@ -16997,7 +16997,11 @@ AbstractEditEventPage = extending(Page, (function() {
 			var $table = self.$wrapper.find('.TicketTypes'),
 				$collapsings = $table.find('.ExpandRow').find('.CollapsingWrapper');
 			
-			$table.siblings('tbody').remove();
+			if ($table.find('tbody').length === 0) {
+				$table.append($('tbody'));
+			}
+			
+			$table = $table.find('tbody');
 			
 			if ($table.children().length === 1 && $table.children().hasClass('EmptyRow')) {
 				$table.html(AbstractEditEventPage.ticketTypeRowsBuilder());
@@ -17124,6 +17128,7 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 		'vk_post_link', {
 			ticket_types: {
 				fields: new Fields(
+					'amount',
 					'comment',
 					'price',
 					'sell_start_date',
