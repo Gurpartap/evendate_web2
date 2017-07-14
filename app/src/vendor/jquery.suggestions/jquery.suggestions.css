@@ -15,7 +15,7 @@
   display: none;
 }
 .suggestions-wrapper {
-  display: inline-block;
+  display: block;
   position: relative;
   margin: 0;
   padding: 0;
@@ -52,7 +52,7 @@
  */
 .suggestions-suggestions {
   background: #fff;
-  border: 1px solid #999;
+  border: 0;
   -ms-box-sizing: border-box;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
@@ -60,6 +60,8 @@
   cursor: default;
   z-index: 9999;
   -webkit-text-size-adjust: 100%;
+  font-size: 14px;
+	box-shadow: 0 3px 6px var(--color_primary_30);
 }
 .suggestions-suggestions strong {
   font-weight: normal;
