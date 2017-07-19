@@ -18,6 +18,7 @@ OneOrder = extending(OneEntity, (function() {
 	 *
 	 * @property {?(string|number)} uuid
 	 * @property {?(string|number)} user_id
+	 * @property {?(string|number)} event_id
 	 * @property {?(string|number)} number
 	 * @property {?string} order_content
 	 * @property {?boolean} is_canceled
@@ -160,7 +161,7 @@ OneOrder = extending(OneEntity, (function() {
 	OneOrder.prototype.fetchOrder = function(fields, success) {
 		var self = this;
 		
-		return OneOrder.fetchOrder(this.event_id, this.uuid, fields, function(data) {
+		return this.constructor.fetchOrder(this.event_id, this.uuid, fields, function(data) {
 			self.setData(data);
 			if (isFunction(success)) {
 				success.call(self, data);
