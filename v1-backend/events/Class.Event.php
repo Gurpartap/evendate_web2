@@ -47,6 +47,7 @@ class Event extends AbstractEntity
 	const STATISTICS_FIELD_NAME = 'statistics';
 	const REGISTERED_USERS_FIELD_NAME = 'registered_users';
 	const ORDERS_COUNT_FIELD_NAME = 'orders_count';
+	const EMAIL_TEXTS_FIELD_NAME = 'email_texts';
 	/*ONLY FOR ADMINS*/
 
 	const REGISTRATION_FIELDS_FIELD_NAME = 'registration_fields';
@@ -385,11 +386,17 @@ class Event extends AbstractEntity
 
 	private static function saveEmailTexts(ExtendedPDO $db, $event_id, array $data)
 	{
+		if (!isset($data['email_texts']) || !is_array($data['email_texts'])){
+			return;
+		}else{
+			$_data = $data['email_texts'];
+		}
+
 		$data = array(
-			'payed' => $data['payed'] ?? null,
-			'approved' => $data['payed'] ?? null,
-			'not_approved' => $data['payed'] ?? null,
-			'after_event' => $data['payed'] ?? null,
+			'payed' => $_data['payed'] ?? null,
+			'approved' => $_data['approved'] ?? null,
+			'not_approved' => $_data['not_approved'] ?? null,
+			'after_event' => $_data['after_event'] ?? null,
 			'event_id' => $event_id
 		);
 		$q_ins = App::queryFactory()->newInsert();
@@ -1260,10 +1267,15 @@ class Event extends AbstractEntity
 			}
 		}
 
+		if (isset($fields[self::EMAIL_TEXTS_FIELD_NAME])) {
+			if ($user->isEventAdmin($this)) {
+				$result_data[self::EMAIL_TEXTS_FIELD_NAME] = $this->getEmailTexts();
+			}
+		}
+
 		if (isset($fields[self::REGISTRATION_FIELDS_FIELD_NAME])) {
 			$result_data[self::REGISTRATION_FIELDS_FIELD_NAME] = $this->getRegistrationFields($user,
 				Fields::parseFields($fields[self::REGISTRATION_FIELDS_FIELD_NAME]['fields'] ?? ''))->getData();
-
 		}
 
 		if (isset($fields[self::STATISTICS_FIELD_NAME])) {
@@ -1808,5 +1820,29 @@ class Event extends AbstractEntity
 			'sum' => $sum
 		));
 	}
+
+	public function getEmailTexts(array $cols = null)
+	{
+		if ($cols == null){
+			$cols = array('payed', 'approved', 'not_approved', 'after_event');
+		}
+		$q_get = App::queryFactory()->newSelect();
+		$q_get
+			->cols($cols)
+			->from('email_texts')
+			->where('event_id = ?', $this->id);
+
+		return $this->db->prepareExecute($q_get, 'CANT_GET_EMAILS')->fetch();
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getTitle()
+	{
+		return $this->title;
+	}
+
+
 
 }

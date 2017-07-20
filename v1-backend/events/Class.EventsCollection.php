@@ -85,7 +85,12 @@ class EventsCollection extends AbstractCollection
 					$_organization = OrganizationsCollection::onePrivate($db, $user, $org_id, null, array('privileges'));
 					$getting_personal_events = true;
 				} catch (Exception $e) {
-					$_organization = OrganizationsCollection::one($db, $user, $org_id, array('privileges'));
+					if (!isset($filters['ticket']) || $filters['ticket'] instanceof Ticket == false){
+						$_organization = OrganizationsCollection::one($db, $user, $org_id, array('privileges'));
+					}else{
+						$_organization = null;
+						$getting_personal_events = true;
+					}
 				}
 			}
 		}

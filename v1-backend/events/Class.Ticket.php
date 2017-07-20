@@ -209,18 +209,14 @@ class Ticket extends AbstractEntity
 		}
 
 		if (isset($fields[self::ORDER_FIELD_NAME])) {
-			if ($user instanceof User) {
-				$order_fields = Fields::parseFields($fields[self::ORDER_FIELD_NAME]['fields'] ?? '');
-				$result_data[self::ORDER_FIELD_NAME] = OrdersCollection::oneByUUID(
-					App::DB(),
-					$user,
-					$this->ticket_order_uuid,
-					$order_fields
-				)->getParams($user, $order_fields)
-					->getData();
-			} else {
-				$result_data[self::ORDER_FIELD_NAME] = null;
-			}
+			$order_fields = Fields::parseFields($fields[self::ORDER_FIELD_NAME]['fields'] ?? '');
+			$result_data[self::ORDER_FIELD_NAME] = OrdersCollection::oneByUUID(
+				App::DB(),
+				$user,
+				$this->ticket_order_uuid,
+				$order_fields
+			)->getParams($user, $order_fields)
+				->getData();
 		}
 
 		if (isset($fields[self::USER_FIELD_NAME])) {

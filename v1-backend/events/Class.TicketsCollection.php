@@ -113,7 +113,7 @@ class TicketsCollection extends AbstractCollection
 					AND users_organizations.status = TRUE
 					) > 0', $user->getId());
 		} else {
-			if (isset($filters['uuid'])) {
+			if (isset($filters['uuid']) || (isset($filters['order']) && $filters['order'] instanceof Order)) {
 //				$q_get_tickets->where('(SELECT COUNT(users_organizations.user_id)
 //					FROM users_organizations
 //					INNER JOIN view_all_events ON view_all_events.id = view_tickets.event_id

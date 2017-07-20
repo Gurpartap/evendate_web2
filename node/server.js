@@ -847,6 +847,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
         qr_svg.pipe(res);
     });
 
+
     app.get('/log', function (req, res) {
         console.log(req);
         res.json({status: true});

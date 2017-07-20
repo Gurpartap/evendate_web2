@@ -32,7 +32,6 @@ class OrdersCollection extends AbstractCollection
 		foreach ($filters as $name => $value) {
 			switch ($name) {
 				case 'uuid': {
-					$getting_statistics = true;
 					$q_get_orders->where('uuid = ?', $value);
 					$is_one_order = true;
 					break;
@@ -68,7 +67,7 @@ class OrdersCollection extends AbstractCollection
 					AND users_organizations.user_id = ?
 					AND users_organizations.status = TRUE
 					) > 0 OR (user_id = ?))', $user->getId(), $user->getId());
-		} else {
+		} elseif (!isset($filters['uuid'])) {
 			$q_get_orders->where('user_id = ?', $user->getId());
 		}
 
@@ -100,7 +99,7 @@ class OrdersCollection extends AbstractCollection
 	public static function oneByUUID(ExtendedPDO $db,
 																	 AbstractUser $user,
 																	 string $uuid,
-																	 array $fields = null) : Order
+																	 array $fields = null): Order
 	{
 		return self::filter($db, $user, array('uuid' => $uuid), $fields);
 	}
@@ -147,8 +146,8 @@ class OrdersCollection extends AbstractCollection
 
 		foreach ($data as &$order) {
 			$tickets_price = 0;
-			foreach($order['tickets'] aS $ticket){
-				$tickets_price += (float) $ticket['price'];
+			foreach ($order['tickets'] aS $ticket) {
+				$tickets_price += (float)$ticket['price'];
 			}
 			$_row = array(
 				$column_names[App::$__LANG]['user']['first_name'] => $order['user']['first_name'],
@@ -172,7 +171,7 @@ class OrdersCollection extends AbstractCollection
 			if (is_array($order['registration_fields'])) {
 				foreach ($order['registration_fields'] as $field) {
 					$_row[$field['form_field_label']] = $field['value'];
-					if (!in_array($field['form_field_label'], $headers)){
+					if (!in_array($field['form_field_label'], $headers)) {
 						$headers[] = $field['form_field_label'];
 					}
 				}
@@ -181,9 +180,9 @@ class OrdersCollection extends AbstractCollection
 			$rows[] = $_row;
 		}
 		$res = array($headers);
-		foreach($rows as &$user){
+		foreach ($rows as &$user) {
 			$_row = array();
-			foreach($headers as $col){
+			foreach ($headers as $col) {
 				$_row[] = $user[$col] ?? '';
 			}
 			$res[] = $_row;
