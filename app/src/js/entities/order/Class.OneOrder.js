@@ -25,6 +25,7 @@ OneOrder = extending(OneEntity, (function() {
 	 * @property {?number} status_id
 	 * @property {?(OneOrder.ORDER_STATUSES|OneOrder.EXTENDED_ORDER_STATUSES)} status_type_code
 	 * @property {?TEXTS.TICKET_STATUSES} status_name
+	 * @property {?(string|number)} sum
 	 *
 	 * @property {?timestamp} created_at
 	 * @property {?timestamp} updated_at
@@ -50,6 +51,7 @@ OneOrder = extending(OneEntity, (function() {
 		this.is_canceled = null;
 		this.status_id = null;
 		this.status_type_code = null;
+		this.sum = null;
 		
 		this.created_at = null;
 		this.updated_at = null;

@@ -67,6 +67,7 @@ __APP = {
 			'organization': AddOrganizationPage
 		},
 		'my': {
+			'orders': MyOrdersPage,
 			'tickets': MyTicketsPage,
 			'profile': MyProfilePage,
 			'': MyProfilePage

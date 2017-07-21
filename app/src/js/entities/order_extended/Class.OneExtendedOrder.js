@@ -24,6 +24,7 @@ OneExtendedOrder = extending(OneOrder, (function() {
 	 * @property {?number} status_id
 	 * @property {?(OneOrder.ORDER_STATUSES|OneOrder.EXTENDED_ORDER_STATUSES)} status_type_code
 	 * @property {?TEXTS.TICKET_STATUSES} status_name
+	 * @property {?(string|number)} sum
 	 *
 	 * @property {?timestamp} created_at
 	 * @property {?timestamp} updated_at

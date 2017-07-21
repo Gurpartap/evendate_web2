@@ -94,7 +94,8 @@ class Order extends AbstractEntity
 		'canceled_at',
 		'updated_at',
 		'status_name',
-		'status_id'
+		'status_id',
+		'sum'
 	);
 
 
