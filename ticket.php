@@ -184,9 +184,10 @@ $url_parts = explode('/', $url);
 		</div>
 		<div class="sidebar_links">
 			<a href="/landing.php" class="link">О нас</a>
+			<a href="//evendate.io/blog" class="link">Наш блог</a>
 			<a href="/organization.php" class="link">Стать организатором</a>
-			<a href="//evendate.ru/docs/terms.pdf" class="link">Условия пользования</a>
-			<a href="//evendate.ru/docs/useragreement.pdf" class="link">Пользовательское соглашение</a>
+			<a href="//evendate.io/docs/terms.pdf" class="link">Условия пользования</a>
+			<a href="//evendate.io/docs/useragreement.pdf" class="link">Пользовательское соглашение</a>
 			<p>Evendate 2015-<?= (new DateTimeImmutable())->format('Y'); ?></p>
 		</div>
 	</div>
