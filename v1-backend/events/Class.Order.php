@@ -19,6 +19,13 @@ class Order extends AbstractEntity
 	const REGISTRATION_STATUS_COMPLETED = 'completed';
 
 
+	const EMAIL_PAYED_TYPE_CODE = 'order_payed';
+	const EMAIL_APPROVED_TYPE_CODE = 'order_approved';
+	const EMAIL_NOT_APPROVED_TYPE_CODE = 'order_not_approved';
+	const EMAIL_AFTER_EVENT_TYPE_CODE = 'order_after_event';
+	const EMAIL_WAITING_FOR_PAYMENT = 'order_waiting_for_payment';
+
+
 	const STATUS_WAITING_PAYMENT_ID = 1;
 	const STATUS_PAYED_ID = 2;
 	const STATUS_RETURNED_ID = 3;
@@ -115,6 +122,7 @@ class Order extends AbstractEntity
 
 		return array('id' => $res['id'], 'uuid' => $res['uuid']);
 	}
+
 	/**
 	 * @return mixed
 	 */
@@ -196,20 +204,63 @@ class Order extends AbstractEntity
 			->where('event_id = ?', $event->getId())
 			->where('uuid = ?', $this->uuid);
 
-		App::DB()->prepareExecute($q_upd_order, 'CANT_UPDATE_ORDER');
+		$result = App::DB()->prepareExecute($q_upd_order, 'CANT_UPDATE_ORDER');
+
+		if ($result->rowCount() > 0) {
+			$notification_type = null;
+			$email_type = null;
+			switch ($status_code) {
+				case self::REGISTRATION_STATUS_APPROVED: {
+					$notification_type = Notification::NOTIFICATION_TYPE_REGISTRATION_APPROVED;
+					$email_type = self::EMAIL_APPROVED_TYPE_CODE;
+					$tickets = TicketsCollection::filter(App::DB(), $user, array('order' => $this), array(), array(), array())->getData();
+					break;
+				}
+				case self::REGISTRATION_STATUS_REJECTED: {
+					$notification_type = Notification::NOTIFICATION_TYPE_REGISTRATION_NOT_APPROVED;
+					$email_type = self::EMAIL_NOT_APPROVED_TYPE_CODE;
+					$tickets = array();
+					break;
+				}
+			}
+			if ($notification_type != null) {
+				$event->addNotification(UsersCollection::one(App::DB(), $user, $this->user_id, array()),
+					array(
+						'notification_type' => $notification_type,
+						'notification_time' => (new DateTime())->add(new DateInterval('P1M'))->format(App::DB_DATETIME_FORMAT)
+					));
+
+				$current_user = UsersCollection::one(App::DB(), $user, $this->user_id, array())
+					->getParams($user, array())->getData();
+
+				$user_email = self::getOrderEmail($this->uuid);
+
+				Emails::schedule($email_type, $user_email, array(
+					'first_name' => $current_user['first_name'],
+					'event_title' => $event->getTitle(),
+					$status_code . '_text' => $event->getEmailTexts()[$status_code] ?? '',
+					'tickets' => $tickets
+				));
+			}
+		}
 
 		return new Result(true, 'Данные успешно обновлены');
 	}
 
-	private static function getPaymentInfo(array $request, ExtendedPDO $db){
+	private static function getPaymentInfo(array $request, ExtendedPDO $db)
+	{
 		$request['uuid'] = str_replace('order-', '', $request['evendate_payment_id']);
 		$q_get_order = App::queryFactory()->newSelect();
 		$q_get_order->cols(array(
-			'id',
-			'order_content',
-			'(SELECT SUM(price) FROM view_tickets WHERE status = TRUE AND is_canceled = FALSE AND ticket_order_id = view_tickets_orders.id)'
+			'view_tickets_orders.id',
+			'view_tickets_orders.order_content',
+			'view_tickets_orders.uuid',
+			'users.first_name',
+			'users.last_name',
+			'(SELECT SUM(price) FROM view_tickets WHERE view_tickets.status = TRUE AND view_tickets.is_canceled = FALSE AND view_tickets.ticket_order_id = view_tickets_orders.id)'
 		))
 			->from('view_tickets_orders')
+			->join('inner', 'users', 'users.id = view_tickets_orders.user_id')
 			->where('uuid = ?', $request['uuid'])
 			->where('is_canceled = FALSE')
 			->where('canceled_at IS NULL');
@@ -219,11 +270,11 @@ class Order extends AbstractEntity
 
 	public static function checkPayment(array $request, ExtendedPDO $db)
 	{
-		try{
+		try {
 			if (!Payment::checkMd5($request)) throw new BadArgumentException('', $db);
 			$result = self::getPaymentInfo($request, $db);
 			if ($result == false) throw new NoMethodException('', $db);
-			if ((float) $result['sum'] != (float) $request['orderSumAmount']) throw new InvalidArgumentException('', $db);
+			if ((float)$result['sum'] != (float)$request['orderSumAmount']) throw new InvalidArgumentException('', $db);
 
 
 			return Payment::buildResponse(Payment::ACTION_CHECK_ORDER, 0, 'ok', $request['invoiceId']);
@@ -238,10 +289,37 @@ class Order extends AbstractEntity
 		}
 	}
 
+	private static function getOrderEmail($order_uuid)
+	{
+		$q_get_email = App::queryFactory()->newSelect();
+		$q_get_email->from('users')
+			->join('inner', 'ticket_orders', 'users.id = ticket_orders.user_id')
+			->cols(array('users.email',
+				'(SELECT value 
+					FROM view_registration_field_values 
+					WHERE view_registration_field_values.ticket_order_id = ticket_orders.id
+					AND view_registration_field_values.form_field_type = \'email\'
+					ORDER BY value DESC LIMIT 1) AS form_email'))
+			->where('ticket_orders.uuid = ?', $order_uuid);
+
+		$emails = App::DB()->prepareExecute($q_get_email)->fetch();
+
+		if (!filter_var($emails['email'], FILTER_VALIDATE_EMAIL)) {
+			if (!filter_var($emails['form_email'], FILTER_VALIDATE_EMAIL)) {
+				return null;
+			} else {
+				return $emails['form_email'];
+			}
+		} else {
+			return $emails['email'];
+		}
+
+	}
+
 	public static function avisoPayment(array $request, ExtendedPDO $db)
 	{
 		try {
-
+			$uuid = str_replace('order-', '', $request['evendate_payment_id']);
 			$result = self::getPaymentInfo($request, $db);
 
 			$q_get = App::queryFactory()->newSelect();
@@ -252,7 +330,6 @@ class Order extends AbstractEntity
 
 			$payments = $db->prepareExecute($q_get, '')->rowCount();
 			if ($payments > 0) throw new LogicException();
-
 
 			$q_ins = App::queryFactory()->newInsert();
 
@@ -267,6 +344,30 @@ class Order extends AbstractEntity
 				->onConflictUpdate(array('ticket_order_id', 'finished', 'canceled'), $new_cols)
 				->set('payed_at', 'NOW()');
 			$db->prepareExecute($q_ins, 'CANT_UPDATE_PAYMENT');
+
+			$q_upd_order = App::queryFactory()->newUpdate();
+			$q_upd_order->table('ticket_orders')
+				->cols(array(
+					'order_status_id' => self::STATUSES[self::STATUS_PAYED]
+				))
+				->where('uuid = ?', $uuid);
+			$db->prepareExecute($q_upd_order, '');
+
+			$event = EventsCollection::one($db, App::getCurrentUser(), $result['event_id'], Fields::parseFields('email_texts'));
+
+			$payed_text = $event->getEmailTexts(array('payed'))['payed'];
+
+			$tickets = TicketsCollection::filter($db, App::getCurrentUser(), array(
+				'order' => OrdersCollection::oneByUUID($db, App::getCurrentUser(), $uuid, array())
+			), array(), array(), array())->getData();
+
+			Emails::schedule(self::EMAIL_PAYED_TYPE_CODE, self::getOrderEmail($uuid), array(
+				'first_name' => $result['first_name'],
+				'event_title' => $event->getTitle(),
+				'payed_text' => $payed_text,
+				'tickets' => $tickets
+			));
+
 
 			return Payment::buildResponse(Payment::ACTION_PAYMENT_AVISO, 0, 'ok', $request['invoiceId']);
 

@@ -202,7 +202,7 @@
 									</div>
 
 									<div class="form_unit">
-										<input id="edit_event_registration_locally" class="form_checkbox Switch" name="registration_locally" type="checkbox" data-switch_id="registration_locally">
+										<input id="edit_event_registration_locally" class="form_checkbox RegistrationLocallySwitch Switch" name="registration_locally" type="checkbox" data-switch_id="registration_locally">
 										<label class="form_label" for="edit_event_registration_locally"><span>Регистрация через Evendate</span></label>
 									</div>
 
@@ -279,6 +279,21 @@
 								<div class="form_unit -align_center">{add_ticket_type_button}</div>
 								{booking_time_input}
 							</fieldset>
+						</div>
+
+
+						<div class="tab_body TabsBody">
+							<h2>Настройка email рассылок</h2>
+							<p class="form_text">Здесь вы можете добавить свои сообщения в email рассылку по событию</p>
+							<div class="EmailTicketing -hidden">
+								{email_payed_form_unit}
+							</div>
+							<div class="EmailRegistration -hidden">
+								{email_approved_form_unit}
+								{email_not_approved_form_unit}
+							</div>
+							{email_after_event_form_unit}
+							<p class="form_text">Поля не обязательны для заполнения, при их отсутствии будет отправляться типовое письмо</p>
 						</div>
 
 
@@ -388,7 +403,8 @@
 				<div class="event_edit_navigation_item Tab"><span>1. Описание</span></div>
 				<div class="event_edit_navigation_item Tab"><span>2. Регистрация на событие</span></div>
 				<div class="event_edit_navigation_item Tab"><span>3. Продажа билетов</span></div>
-				<div class="event_edit_navigation_item Tab"><span>4. Публикация</span></div>
+				<div class="event_edit_navigation_item Tab"><span>4. Email</span></div>
+				<div class="event_edit_navigation_item Tab"><span>5. Публикация</span></div>
 			</div><!--
 			<button class="button -color_bubblegum -size_wide RippleEffect">Отменить событие</button>-->
 		</div>

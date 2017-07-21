@@ -8,7 +8,7 @@
  * @class
  * @implements EntityInterface
  */
-OneEntity = (function() {
+OneEntity = extending(EntityInterface, (function() {
 	/**
 	 *
 	 * @constructor
@@ -24,6 +24,7 @@ OneEntity = (function() {
 	 */
 	OneEntity.prototype.setData = function(data) {
 		var field;
+		
 		if (Array.isArray(data)) {
 			data = data[0];
 		}
@@ -36,8 +37,9 @@ OneEntity = (function() {
 				}
 			}
 		}
+		
 		return this;
 	};
 	
 	return OneEntity;
-}());
+}()));

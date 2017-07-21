@@ -119,7 +119,7 @@ $__modules['events'] = array(
 				array('uuid' => $uuid),
 				$__fields ?? array(),
 				$__pagination,
-				$__order_by ?? array());
+				$__order_by ?? array('price'));
 
 			return new Result(true, '', array($result->getParams($__user, $__fields)->getData()));
 		},
@@ -138,7 +138,7 @@ $__modules['events'] = array(
 				array_merge($__request ?? array(), array('event' => $event)),
 				$__fields ?? array(),
 				$__pagination,
-				$__order_by ?? array());
+				$__order_by ?? array('price'));
 
 		},
 		'{{/(id:[0-9]+)}}' => function ($id) use ($__db, $__request, $__user, $__fields) {
