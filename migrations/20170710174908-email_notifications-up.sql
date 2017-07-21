@@ -82,6 +82,32 @@ CREATE OR REPLACE VIEW view_tickets_orders AS
                                              THEN 5 :: INT -- payment canceled auto
                                            ELSE ticket_orders.order_status_id END);
 
+
+CREATE OR REPLACE VIEW view_ticket_types AS
+  SELECT
+    view_all_ticket_types.id,
+    view_all_ticket_types.event_id,
+    view_all_ticket_types.uuid,
+    view_all_ticket_types.type_code,
+    view_all_ticket_types.name,
+    view_all_ticket_types.comment,
+    view_all_ticket_types.price,
+    view_all_ticket_types.sell_start_date,
+    view_all_ticket_types.sell_end_date,
+    view_all_ticket_types.min_count_per_user,
+    view_all_ticket_types.max_count_per_user,
+    view_all_ticket_types.created_at,
+    view_all_ticket_types.updated_at,
+    view_all_ticket_types.status,
+    view_all_ticket_types.is_selling
+  FROM view_all_ticket_types
+  WHERE status = TRUE
+        AND (type_code <> 'registration' OR type_code IS NULL)
+        AND view_all_ticket_types.is_selling = TRUE;
+
+
+
+CREATE OR REPLACE VIEW view_emails_after_event AS
 SELECT
   view_events.title       AS event_title,
   view_events.id          AS event_id,
@@ -94,7 +120,8 @@ WHERE view_events.last_event_date_dt BETWEEN (NOW() - INTERVAL '1 hour') AND (NO
                                  FROM emails
                                  WHERE emails.email_type_id = 15);
 
-SELECT
+CREATE OR REPLACE VIEW view_emails_after_event AS
+  SELECT
   events.title                                                                  AS event_title,
   events.id                                                                     AS event_id,
   events.organization_id,
@@ -103,7 +130,6 @@ SELECT
    (events.booking_time * 3600)) - date_part('epoch', NOW() AT TIME ZONE 'UTC') AS time_to_pay
 FROM view_tickets_orders
   INNER JOIN events ON view_tickets_orders.event_id = events.id
-  LEFT JOIN email_texts ON email_texts.event_id = events.id
 WHERE view_tickets_orders.status_type_code = 'waiting_for_payment'
       AND events.id NOT IN (SELECT (data ->> 'event_id') :: INT
                             FROM emails

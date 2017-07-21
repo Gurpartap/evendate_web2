@@ -50,16 +50,21 @@ class TicketTypesCollection extends AbstractCollection{
 					if ($value instanceof Event) {
 						$q_get->where('event_id = :event_id');
 						$statements[':event_id'] = $value->getId();
-						break;
 					}
+					break;
+				}
+				case 'is_selling': {
+					$q_get->where('is_selling = :is_selling');
+					$statements[':is_selling'] = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+					break;
 				}
 				case 'ticket': {
 					if ($value instanceof Ticket) {
 						$q_get->where('uuid = :uuid');
 						$statements[':uuid'] = $value->getTicketTypeUuid();
 						$from_table = 'view_all_ticket_types';
-						break;
 					}
+					break;
 				}
 			}
 		}
