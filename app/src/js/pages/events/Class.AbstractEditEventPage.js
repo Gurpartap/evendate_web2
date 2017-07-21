@@ -473,6 +473,12 @@ AbstractEditEventPage = extending(Page, (function() {
 		} else {
 			$wrapper.find('.TicketTypeSellAfterFieldset').removeAttr('disabled');
 		}
+		
+		if ($sell_after_selects.length > 0) {
+			$wrapper.closest('.EditEventForm').find('.EmailTicketing').removeClass(__C.CLASSES.HIDDEN);
+		} else {
+			$wrapper.closest('.EditEventForm').find('.EmailTicketing').addClass(__C.CLASSES.HIDDEN);
+		}
 	};
 	
 	AbstractEditEventPage.prototype.fetchData = function() {
@@ -504,7 +510,13 @@ AbstractEditEventPage = extending(Page, (function() {
 				delayed_publication: !!form_data.delayed_publication,
 				registration_required: !!form_data.registration_required,
 				registration_locally: !!form_data.registration_locally,
-				registration_approvement_required: !!form_data.registration_approvement_required
+				registration_approvement_required: !!form_data.registration_approvement_required,
+				email_texts: {
+					payed: form_data.email_payed_text || null,
+					approved: form_data.email_approved_text || null,
+					not_approved: form_data.email_not_approved_text || null,
+					after_event: form_data.email_after_event_text || null
+				}
 			};
 		
 		if (form_data.registration_required) {
@@ -1145,6 +1157,10 @@ AbstractEditEventPage = extending(Page, (function() {
 			reorder();
 		});
 		
+		PAGE.$wrapper.find('.RegistrationLocallySwitch').off('change.EmailRegistrationLocallySwitch').on('change.EmailRegistrationLocallySwitch', function() {
+			PAGE.$wrapper.find('.EmailRegistration').toggleClass(__C.CLASSES.HIDDEN);
+		});
+		
 		PAGE.$wrapper.find('.RegistrationPreview').on('click.RegistrationPreview', function() {
 			var $this = $(this),
 				form_data = $(this).closest('fieldset').serializeForm(),
@@ -1262,6 +1278,8 @@ AbstractEditEventPage = extending(Page, (function() {
 			placeholder: 'Минимальная цена'
 		});
 		
+		
+		
 		this.render_vars.registration_till_date_select = __APP.BUILD.formUnit({
 			label: 'Дата окончания регистрации',
 			name: 'registration_till_date',
@@ -1331,6 +1349,8 @@ AbstractEditEventPage = extending(Page, (function() {
 			}
 		]);
 		
+		
+		
 		this.render_vars.add_ticket_type_button = __APP.BUILD.actionButton({
 			title: 'Добавить билет',
 			classes: [__C.CLASSES.COLORS.ACCENT, __C.CLASSES.ICON_CLASS, __C.CLASSES.ICONS.PLUS]
@@ -1370,6 +1390,42 @@ AbstractEditEventPage = extending(Page, (function() {
 				size: 2
 			}
 		});
+		
+		
+		
+		this.render_vars.email_payed_form_unit = __APP.BUILD.formUnit({
+			label: 'Сообщение при успешной оплате заказа',
+			id: 'edit_event_email_payed_form_unit',
+			name: 'email_payed_text',
+			type: 'textarea',
+			value: this.event.email_texts.payed
+		});
+		
+		this.render_vars.email_approved_form_unit = __APP.BUILD.formUnit({
+			label: 'Сообщение при подтверждении заявки',
+			id: 'edit_event_email_approved_form_unit',
+			name: 'email_approved_text',
+			type: 'textarea',
+			value: this.event.email_texts.approved
+		});
+		
+		this.render_vars.email_not_approved_form_unit = __APP.BUILD.formUnit({
+			label: 'Сообщение при отказе в заявке',
+			id: 'edit_event_email_not_approved_form_unit',
+			name: 'email_not_approved_text',
+			type: 'textarea',
+			value: this.event.email_texts.not_approved
+		});
+		
+		this.render_vars.email_after_event_form_unit = __APP.BUILD.formUnit({
+			label: 'Сообщение после окончания события',
+			id: 'edit_event_email_after_event_form_unit',
+			name: 'email_after_event_text',
+			type: 'textarea',
+			value: this.event.email_texts.after_event
+		});
+		
+		
 		
 		this.render_vars.public_at_date_select = __APP.BUILD.formUnit({
 			label: 'Дата',

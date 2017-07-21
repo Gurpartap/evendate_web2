@@ -8,6 +8,7 @@
  * @requires ../user/Class.UsersCollection.js
  * @requires ../notification/Class.NotificationsCollection.js
  * @requires ../../data_models/registration_field/Class.RegistrationFieldModelsCollection.js
+ * @requires ../../data_models/Class.EventEmailTextsModel.js
  */
 /**
  * @class OneEvent
@@ -92,6 +93,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {?number} actuality
 	 *
 	 * @property {?string} vk_post_link
+	 * @property {EventEmailTextsModel} email_texts
 	 *
 	 * @property {?number} creator_id
 	 * @property {?number} created_at
@@ -106,6 +108,7 @@ OneEvent = extending(OneEntity, (function() {
 				'organization_logo_medium_url',
 				'organization_logo_small_url'
 			];
+		
 		this.id = event_id ? event_id : 0;
 		this.title = null;
 		this.description = null;
@@ -171,6 +174,7 @@ OneEvent = extending(OneEntity, (function() {
 		this.actuality = null;
 		
 		this.vk_post_link = null;
+		this.email_texts  = new EventEmailTextsModel();
 		
 		this.creator_id = null;
 		this.created_at = null;

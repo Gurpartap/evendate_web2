@@ -4,7 +4,7 @@ let path = require('path');
 let Utils = require('../../node/utils');
 
 module.exports = {
-    process: function(data){
+    process: function(data, cb){
         let user_avatar_tmpl = fs.readFileSync(path.resolve(__dirname, 'tmpl_user_avatar.html'), {encoding: 'utf8'});
         data.users_avatars = '';
         if (data.hasOwnProperty('subscribed')){
@@ -18,6 +18,6 @@ module.exports = {
         }
         if (!data.page_views) data.page_views = 0;
         if (!data.favored_count) data.favored_count = 0;
-        return data;
+        return cb(data);
     }
 };

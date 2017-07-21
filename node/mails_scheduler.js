@@ -358,9 +358,17 @@ class MailScheduler {
         });
     }
 
-
     scheduleEventFinished() {
 
+    }
+
+
+    scheduleOrderWaitingPayment(){
+        let q_get = 'SELECT * FROM ';
+    }
+
+    scheduleAfterEvent(){
+        let q_get = 'SELECT * FROM ';
     }
 }
 

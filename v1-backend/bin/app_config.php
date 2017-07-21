@@ -15,6 +15,7 @@ require_once "{$BACKEND_FULL_PATH}/exceptions/PrivilegesException.php";
 require_once "{$BACKEND_FULL_PATH}/exceptions/AuthorizationException.php";
 require_once "{$BACKEND_FULL_PATH}/bin/Class.RequestsParser.php";
 require_once "{$BACKEND_FULL_PATH}/bin/Class.Fields.php";
+require_once "{$BACKEND_FULL_PATH}/bin/Class.Emails.php";
 
 
 class App

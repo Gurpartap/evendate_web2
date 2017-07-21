@@ -47,6 +47,7 @@ class Event extends AbstractEntity
 	const STATISTICS_FIELD_NAME = 'statistics';
 	const REGISTERED_USERS_FIELD_NAME = 'registered_users';
 	const ORDERS_COUNT_FIELD_NAME = 'orders_count';
+	const EMAIL_TEXTS_FIELD_NAME = 'email_texts';
 	/*ONLY FOR ADMINS*/
 
 	const REGISTRATION_FIELDS_FIELD_NAME = 'registration_fields';
@@ -383,6 +384,27 @@ class Event extends AbstractEntity
 		}
 	}
 
+	private static function saveEmailTexts(ExtendedPDO $db, $event_id, array $data)
+	{
+		if (!isset($data['email_texts']) || !is_array($data['email_texts'])){
+			return;
+		}else{
+			$_data = $data['email_texts'];
+		}
+
+		$data = array(
+			'payed' => $_data['payed'] ?? null,
+			'approved' => $_data['approved'] ?? null,
+			'not_approved' => $_data['not_approved'] ?? null,
+			'after_event' => $_data['after_event'] ?? null,
+			'event_id' => $event_id
+		);
+		$q_ins = App::queryFactory()->newInsert();
+		$q_ins->into('email_texts')
+			->cols($data)->onConflictUpdate(array('event_id'), $data);
+		$db->prepareExecute($q_ins, 'CANT_INSERT_EMAIL_TEXTS');
+	}
+
 	private static function saveTicketingInfo(ExtendedPDO $db, $event_id, $data)
 	{
 
@@ -392,27 +414,19 @@ class Event extends AbstractEntity
 			array()
 		)->getData();
 
-		$tickets_by_uuid = array();
 		$registration_ticket = null;
 		foreach ($_ticket_types as $type) {
-			$tickets_by_uuid[$type['uuid']] = array(
-				'data' => $type,
-				'to_switch_off' => true,
-				'uuid' => $type['uuid']
-			);
 			if ($type['type_code'] == 'registration') {
 				$registration_ticket = $type;
 			}
 		}
 
+		TicketTypesCollection::disableAll($db, $event_id);
+
 		if (isset($data['ticketing_locally']) && filter_var($data['ticketing_locally'], FILTER_VALIDATE_BOOLEAN) == true) {
 			foreach ($data['ticket_types'] as $ticket_type) {
-				//it will auto update if ticket uuid is same
+
 				TicketType::create($event_id, $ticket_type, $db);
-				if (isset($ticket_type['uuid']) && isset($tickets_by_uuid[$ticket_type['uuid']])) {
-					$tickets_by_uuid[$ticket_type['uuid']]['to_switch_off'] = false;
-					TicketType::create($event_id, $ticket_type, $db);
-				}
 			}
 
 			//TODO: update start_after_ticket_type_uuid fields
@@ -730,6 +744,7 @@ class Event extends AbstractEntity
 			self::saveEventTags($db, $event_id, $data['tags']);
 			self::saveRegistrationInfo($db, $event_id, $data);
 			self::saveTicketingInfo($db, $event_id, $data);
+			self::saveEmailTexts($db, $event_id, $data);
 			$data['vk']['event_id'] = $event_id;
 			if (isset($data['vk_post']) && isset($data['vk']) && $data['vk_post'] === true) {
 				VkPost::create(
@@ -790,11 +805,12 @@ class Event extends AbstractEntity
 
 			$db->commit();
 
-			try{
+			try {
 				EventsCollection::reindexCollection($db, App::getCurrentUser(), array(
 					'id' => $event_id
 				));
-			}catch(Exception $e){}
+			} catch (Exception $e) {
+			}
 
 			@file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/events/' . $event_id . '?is_new=true');
 			return new Result(true, 'Событие успешно создано', array('event_id' => $event_id));
@@ -1251,10 +1267,15 @@ class Event extends AbstractEntity
 			}
 		}
 
+		if (isset($fields[self::EMAIL_TEXTS_FIELD_NAME])) {
+			if ($user->isEventAdmin($this)) {
+				$result_data[self::EMAIL_TEXTS_FIELD_NAME] = $this->getEmailTexts();
+			}
+		}
+
 		if (isset($fields[self::REGISTRATION_FIELDS_FIELD_NAME])) {
 			$result_data[self::REGISTRATION_FIELDS_FIELD_NAME] = $this->getRegistrationFields($user,
 				Fields::parseFields($fields[self::REGISTRATION_FIELDS_FIELD_NAME]['fields'] ?? ''))->getData();
-
 		}
 
 		if (isset($fields[self::STATISTICS_FIELD_NAME])) {
@@ -1319,7 +1340,7 @@ class Event extends AbstractEntity
 					'length' => $length ?? $fields[self::TICKETS_TYPES_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 					'offset' => $offset ?? $fields[self::TICKETS_TYPES_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
 				),
-				$order_by ?? Fields::parseOrderBy($fields[self::TICKETS_TYPES_FIELD_NAME]['order_by'] ?? '') ?? array()
+				$order_by ?? Fields::parseOrderBy($fields[self::TICKETS_TYPES_FIELD_NAME]['order_by'] ?? 'price') ?? array()
 			)->getData();
 		}
 
@@ -1448,16 +1469,18 @@ class Event extends AbstractEntity
 
 			self::saveRegistrationInfo($this->db, $this->getId(), $data);
 			self::saveTicketingInfo($this->db, $this->getId(), $data);
+			self::saveEmailTexts($this->db, $this->getId(), $data);
 			self::saveNotifications($this->generateNotifications($data), $this->db);
 
 			$this->db->commit();
 
 
-			try{
+			try {
 				EventsCollection::reindexCollection($this->db, App::getCurrentUser(), array(
 					'id' => $this->id
 				));
-			}catch(Exception $e){}
+			} catch (Exception $e) {
+			}
 
 			if ($tariff_info['available_additional_notifications'] > 0 &&
 				$data['additional_notification_time'] instanceof DateTime
@@ -1786,8 +1809,8 @@ class Event extends AbstractEntity
 
 		$_tickets = TicketsCollection::filter($this->db, $user, array('order' => $order), array())->getData();
 		$sum = 0;
-		foreach($_tickets as $_ticket){
-			$sum += (float) $_ticket['price'];
+		foreach ($_tickets as $_ticket) {
+			$sum += (float)$_ticket['price'];
 		}
 
 		return new Result(true, '', array(
@@ -1797,5 +1820,29 @@ class Event extends AbstractEntity
 			'sum' => $sum
 		));
 	}
+
+	public function getEmailTexts(array $cols = null)
+	{
+		if ($cols == null){
+			$cols = array('payed', 'approved', 'not_approved', 'after_event');
+		}
+		$q_get = App::queryFactory()->newSelect();
+		$q_get
+			->cols($cols)
+			->from('email_texts')
+			->where('event_id = ?', $this->id);
+
+		return $this->db->prepareExecute($q_get, 'CANT_GET_EMAILS')->fetch();
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getTitle()
+	{
+		return $this->title;
+	}
+
+
 
 }
