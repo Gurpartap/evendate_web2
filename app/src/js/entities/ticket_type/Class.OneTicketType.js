@@ -21,6 +21,7 @@ OneTicketType = extending(OneEntity, (function() {
 	 * @property {?string} name
 	 * @property {?string} comment
 	 * @property {?number} price
+	 * @property {?boolean} is_selling
 	 * @property {?number} sell_start_date
 	 * @property {?number} sell_end_date
 	 * @property {?(string|number)} start_after_ticket_type_code
@@ -39,6 +40,7 @@ OneTicketType = extending(OneEntity, (function() {
 		this.name = null;
 		this.comment = null;
 		this.price = null;
+		this.is_selling = null;
 		this.sell_start_date = null;
 		this.sell_end_date = null;
 		this.start_after_ticket_type_code = null;

@@ -3370,7 +3370,7 @@ Fields = (function() {
  * @class
  * @implements EntityInterface
  */
-OneEntity = (function() {
+OneEntity = extending(EntityInterface, (function() {
 	/**
 	 *
 	 * @constructor
@@ -3386,6 +3386,7 @@ OneEntity = (function() {
 	 */
 	OneEntity.prototype.setData = function(data) {
 		var field;
+		
 		if (Array.isArray(data)) {
 			data = data[0];
 		}
@@ -3398,11 +3399,12 @@ OneEntity = (function() {
 				}
 			}
 		}
+		
 		return this;
 	};
 	
 	return OneEntity;
-}());
+}()));
 
 /**
  * @requires Class.OneEntity.js
@@ -3560,6 +3562,36 @@ EntitiesCollection = extending(Array, (function() {
 	};
 	
 	return EntitiesCollection;
+}()));
+/**
+ * @requires ../entities/Class.OneEntity.js
+ */
+/**
+ *
+ * @class EventEmailTextsModel
+ * @extends OneEntity
+ */
+EventEmailTextsModel = extending(OneEntity, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs EventEmailTextsModel
+	 *
+	 * @property {?string} payed
+	 * @property {?string} approved
+	 * @property {?string} not_approved
+	 * @property {?string} after_event
+	 */
+	function EventEmailTextsModel() {
+		OneEntity.call(this);
+		
+		this.payed = null;
+		this.approved = null;
+		this.not_approved = null;
+		this.after_event = null;
+	}
+	
+	return EventEmailTextsModel;
 }()));
 /**
  * @requires ../entities/Class.OneEntity.js
@@ -4574,100 +4606,6 @@ DatesCollection = extending(EntitiesCollection, (function() {
  */
 /**
  *
- * @class OneNotification
- * @extends OneEntity
- */
-OneNotification = extending(OneEntity, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs OneNotification
-	 *
-	 * @property {?string} guid
-	 * @property {?string} uuid
-	 * @property {?(string|number)} event_id
-	 * @property {?timestamp} notification_time
-	 *
-	 * @property {?string} notification_type
-	 * @property {?timestamp} sent_time
-	 * @property {?boolean} done
-	 * @property {?timestamp} created_at
-	 * @property {?timestamp} updated_at
-	 */
-	function OneNotification() {
-		var self = this;
-		
-		this.uuid = null;
-		this.event_id = null;
-		this.notification_time = null;
-		this.notification_type = null;
-		
-		this.sent_time = null;
-		this.done = null;
-		this.created_at = null;
-		this.updated_at = null;
-		
-		Object.defineProperty(this, OneNotification.prototype.ID_PROP_NAME, {
-			get: function() {
-				return self.uuid || self.notification_type;
-			}
-		});
-	}
-	
-	OneNotification.prototype.ID_PROP_NAME = 'guid';
-	
-	OneNotification.NOTIFICATIN_TYPES = {
-		NOW: 'notification-now',
-		CANCELED: 'notification-event-canceled',
-		CHANGED_DATES: 'notification-event-changed-dates',
-		CHANGED_LOCATION: 'notification-event-changed-location',
-		CHANGED_PRICE: 'notification-event-changed-price',
-		CHANGED_REGISTRATION: 'notification-event-changed-registration',
-		ONE_DAY_REGISTRATION_CLOSE: 'notification-one-day-registration-close',
-		BEFORE_THREE_HOURS: 'notification-before-three-hours',
-		BEFORE_DAY: 'notification-before-day',
-		BEFORE_THREE_DAYS: 'notification-before-three-days',
-		BEFORE_WEEK: 'notification-before-week',
-		BEFORE_QUARTER_OF_HOUR: 'notification-before-quarter-of-hour',
-		CUSTOM: 'notification-custom',
-		REGISTRATION_APPROVED: 'notification-registration-approved',
-		REGISTRATION_CHECKED_OUT: 'notification-registration-checked-out',
-		REGISTRATION_NOT_CHECKED_OUT: 'notification-registration-not-checked-out',
-		REGISTRATION_NOT_APPROVED: 'notification-registration-not-approved',
-		USERS: 'users-notification',
-		ADDITIONAL_FOR_ORGANIZATION: 'notification-additional-for-organization'
-	};
-	
-	
-	return OneNotification;
-}()));
-/**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneNotification.js
- */
-/**
- *
- * @class NotificationsCollection
- * @extends EntitiesCollection
- */
-NotificationsCollection = extending(EntitiesCollection, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs NotificationsCollection
-	 */
-	function NotificationsCollection() {
-		EntitiesCollection.call(this);
-	}
-	NotificationsCollection.prototype.collection_of = OneNotification;
-	
-	return NotificationsCollection;
-}()));
-/**
- * @requires ../Class.OneEntity.js
- */
-/**
- *
  * @class OneTag
  * @extends OneEntity
  */
@@ -5373,6 +5311,7 @@ OneTicketType = extending(OneEntity, (function() {
 	 * @property {?string} name
 	 * @property {?string} comment
 	 * @property {?number} price
+	 * @property {?boolean} is_selling
 	 * @property {?number} sell_start_date
 	 * @property {?number} sell_end_date
 	 * @property {?(string|number)} start_after_ticket_type_code
@@ -5391,6 +5330,7 @@ OneTicketType = extending(OneEntity, (function() {
 		this.name = null;
 		this.comment = null;
 		this.price = null;
+		this.is_selling = null;
 		this.sell_start_date = null;
 		this.sell_end_date = null;
 		this.start_after_ticket_type_code = null;
@@ -5923,6 +5863,100 @@ UsersCollection = extending(EntitiesCollection, (function() {
 
 /**
  * @requires ../Class.OneEntity.js
+ */
+/**
+ *
+ * @class OneNotification
+ * @extends OneEntity
+ */
+OneNotification = extending(OneEntity, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs OneNotification
+	 *
+	 * @property {?string} guid
+	 * @property {?string} uuid
+	 * @property {?(string|number)} event_id
+	 * @property {?timestamp} notification_time
+	 *
+	 * @property {?string} notification_type
+	 * @property {?timestamp} sent_time
+	 * @property {?boolean} done
+	 * @property {?timestamp} created_at
+	 * @property {?timestamp} updated_at
+	 */
+	function OneNotification() {
+		var self = this;
+		
+		this.uuid = null;
+		this.event_id = null;
+		this.notification_time = null;
+		this.notification_type = null;
+		
+		this.sent_time = null;
+		this.done = null;
+		this.created_at = null;
+		this.updated_at = null;
+		
+		Object.defineProperty(this, OneNotification.prototype.ID_PROP_NAME, {
+			get: function() {
+				return self.uuid || self.notification_type;
+			}
+		});
+	}
+	
+	OneNotification.prototype.ID_PROP_NAME = 'guid';
+	
+	OneNotification.NOTIFICATIN_TYPES = {
+		NOW: 'notification-now',
+		CANCELED: 'notification-event-canceled',
+		CHANGED_DATES: 'notification-event-changed-dates',
+		CHANGED_LOCATION: 'notification-event-changed-location',
+		CHANGED_PRICE: 'notification-event-changed-price',
+		CHANGED_REGISTRATION: 'notification-event-changed-registration',
+		ONE_DAY_REGISTRATION_CLOSE: 'notification-one-day-registration-close',
+		BEFORE_THREE_HOURS: 'notification-before-three-hours',
+		BEFORE_DAY: 'notification-before-day',
+		BEFORE_THREE_DAYS: 'notification-before-three-days',
+		BEFORE_WEEK: 'notification-before-week',
+		BEFORE_QUARTER_OF_HOUR: 'notification-before-quarter-of-hour',
+		CUSTOM: 'notification-custom',
+		REGISTRATION_APPROVED: 'notification-registration-approved',
+		REGISTRATION_CHECKED_OUT: 'notification-registration-checked-out',
+		REGISTRATION_NOT_CHECKED_OUT: 'notification-registration-not-checked-out',
+		REGISTRATION_NOT_APPROVED: 'notification-registration-not-approved',
+		USERS: 'users-notification',
+		ADDITIONAL_FOR_ORGANIZATION: 'notification-additional-for-organization'
+	};
+	
+	
+	return OneNotification;
+}()));
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.OneNotification.js
+ */
+/**
+ *
+ * @class NotificationsCollection
+ * @extends EntitiesCollection
+ */
+NotificationsCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs NotificationsCollection
+	 */
+	function NotificationsCollection() {
+		EntitiesCollection.call(this);
+	}
+	NotificationsCollection.prototype.collection_of = OneNotification;
+	
+	return NotificationsCollection;
+}()));
+/**
+ * @requires ../Class.OneEntity.js
  * @requires ../date/Class.DatesCollection.js
  * @requires ../tag/Class.TagsCollection.js
  * @requires ../order/Class.EventMyOrdersCollection.js
@@ -5931,6 +5965,7 @@ UsersCollection = extending(EntitiesCollection, (function() {
  * @requires ../user/Class.UsersCollection.js
  * @requires ../notification/Class.NotificationsCollection.js
  * @requires ../../data_models/registration_field/Class.RegistrationFieldModelsCollection.js
+ * @requires ../../data_models/Class.EventEmailTextsModel.js
  */
 /**
  * @class OneEvent
@@ -6015,6 +6050,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {?number} actuality
 	 *
 	 * @property {?string} vk_post_link
+	 * @property {EventEmailTextsModel} email_texts
 	 *
 	 * @property {?number} creator_id
 	 * @property {?number} created_at
@@ -6029,6 +6065,7 @@ OneEvent = extending(OneEntity, (function() {
 				'organization_logo_medium_url',
 				'organization_logo_small_url'
 			];
+		
 		this.id = event_id ? event_id : 0;
 		this.title = null;
 		this.description = null;
@@ -6094,6 +6131,7 @@ OneEvent = extending(OneEntity, (function() {
 		this.actuality = null;
 		
 		this.vk_post_link = null;
+		this.email_texts  = new EventEmailTextsModel();
 		
 		this.creator_id = null;
 		this.created_at = null;
@@ -14754,6 +14792,112 @@ OrderAppInspector = extending(AbstractAppInspector, (function() {
  * @abstract
  * @class
  */
+AbstractTopBar = (function () {
+	/**
+	 *
+	 * @constructor
+	 * @constructs AbstractTopBar
+	 *
+	 * @property {jQuery} $main_header
+	 */
+	function AbstractTopBar() {
+		this.$main_header = $('#main_header');
+	}
+	
+	AbstractTopBar.prototype.init = function () {
+		var $overlay = this.$main_header.find('.TopBarOverlay'),
+			$search_button = $overlay.find('.TopBarSearchButton'),
+			$search_input = $overlay.find('.TopBarSearchInput');
+			
+		$search_button.on('click.OpenSearchBar', function() {
+			if ($overlay.hasClass('-open_search_bar')) {
+				__APP.changeState('/search/' + encodeURIComponent($search_input.val()));
+			} else {
+				$overlay.addClass('-open_search_bar');
+				$search_input.focus();
+			}
+		});
+		
+		$search_input.on('keypress', function(e) {
+			if (e.which === 13) {
+				__APP.changeState('/search/' + encodeURIComponent($search_input.val()));
+			}
+		}).on('keydown', function(e) {
+			if (e.keyCode === 27) {
+				$overlay.removeClass('-open_search_bar');
+				$search_input.val('');
+			}
+		}).on('blur', function() {
+			if ($search_input.val() === '') {
+				$overlay.removeClass('-open_search_bar');
+			}
+		});
+		
+		this.$main_header.find('.SidebarBurger').add($('.MainSectionCap')).on('click', function() {
+			$('body').toggleClass('-open_sidebar');
+		});
+		
+		bindRippleEffect(this.$main_header);
+		bindPageLinks(this.$main_header);
+	};
+	
+	return AbstractTopBar;
+}());
+/**
+ * @requires Class.AbstractTopBar.js
+ */
+/**
+ * @class
+ * @extends AbstractTopBar
+ */
+TopBar = extending(AbstractTopBar, (function () {
+	/**
+	 *
+	 * @constructor
+	 * @constructs TopBar
+	 */
+	function TopBar() {
+		AbstractTopBar.call(this);
+	}
+	
+	TopBar.prototype.init = function () {
+		AbstractTopBar.prototype.init.call(this);
+	};
+	
+	return TopBar;
+}()));
+/**
+ * @requires Class.AbstractTopBar.js
+ */
+/**
+ * @class
+ * @extends AbstractTopBar
+ */
+TopBarNoAuth = extending(AbstractTopBar, (function () {
+	/**
+	 *
+	 * @constructor
+	 * @constructs TopBarNoAuth
+	 */
+	function TopBarNoAuth() {
+		AbstractTopBar.call(this);
+	}
+	
+	TopBarNoAuth.prototype.init = function () {
+		this.$main_header.find('.LoginButton').on('click', function() {
+			cookies.removeItem('auth_command');
+			cookies.removeItem('auth_entity_id');
+			(new AuthModal(location.href)).show();
+		});
+		AbstractTopBar.prototype.init.call(this);
+	};
+	
+	return TopBarNoAuth;
+}()));
+/**
+ * @abstract
+ * @class
+ */
 AbstractSidebar = (function () {
 	/**
 	 *
@@ -14865,112 +15009,6 @@ SidebarNoAuth = extending(AbstractSidebar, (function () {
 	};
 	
 	return SidebarNoAuth;
-}()));
-/**
- * @abstract
- * @class
- */
-AbstractTopBar = (function () {
-	/**
-	 *
-	 * @constructor
-	 * @constructs AbstractTopBar
-	 *
-	 * @property {jQuery} $main_header
-	 */
-	function AbstractTopBar() {
-		this.$main_header = $('#main_header');
-	}
-	
-	AbstractTopBar.prototype.init = function () {
-		var $overlay = this.$main_header.find('.TopBarOverlay'),
-			$search_button = $overlay.find('.TopBarSearchButton'),
-			$search_input = $overlay.find('.TopBarSearchInput');
-			
-		$search_button.on('click.OpenSearchBar', function() {
-			if ($overlay.hasClass('-open_search_bar')) {
-				__APP.changeState('/search/' + encodeURIComponent($search_input.val()));
-			} else {
-				$overlay.addClass('-open_search_bar');
-				$search_input.focus();
-			}
-		});
-		
-		$search_input.on('keypress', function(e) {
-			if (e.which === 13) {
-				__APP.changeState('/search/' + encodeURIComponent($search_input.val()));
-			}
-		}).on('keydown', function(e) {
-			if (e.keyCode === 27) {
-				$overlay.removeClass('-open_search_bar');
-				$search_input.val('');
-			}
-		}).on('blur', function() {
-			if ($search_input.val() === '') {
-				$overlay.removeClass('-open_search_bar');
-			}
-		});
-		
-		this.$main_header.find('.SidebarBurger').add($('.MainSectionCap')).on('click', function() {
-			$('body').toggleClass('-open_sidebar');
-		});
-		
-		bindRippleEffect(this.$main_header);
-		bindPageLinks(this.$main_header);
-	};
-	
-	return AbstractTopBar;
-}());
-/**
- * @requires Class.AbstractTopBar.js
- */
-/**
- * @class
- * @extends AbstractTopBar
- */
-TopBar = extending(AbstractTopBar, (function () {
-	/**
-	 *
-	 * @constructor
-	 * @constructs TopBar
-	 */
-	function TopBar() {
-		AbstractTopBar.call(this);
-	}
-	
-	TopBar.prototype.init = function () {
-		AbstractTopBar.prototype.init.call(this);
-	};
-	
-	return TopBar;
-}()));
-/**
- * @requires Class.AbstractTopBar.js
- */
-/**
- * @class
- * @extends AbstractTopBar
- */
-TopBarNoAuth = extending(AbstractTopBar, (function () {
-	/**
-	 *
-	 * @constructor
-	 * @constructs TopBarNoAuth
-	 */
-	function TopBarNoAuth() {
-		AbstractTopBar.call(this);
-	}
-	
-	TopBarNoAuth.prototype.init = function () {
-		this.$main_header.find('.LoginButton').on('click', function() {
-			cookies.removeItem('auth_command');
-			cookies.removeItem('auth_entity_id');
-			(new AuthModal(location.href)).show();
-		});
-		AbstractTopBar.prototype.init.call(this);
-	};
-	
-	return TopBarNoAuth;
 }()));
 /**
  *
@@ -16456,6 +16494,12 @@ AbstractEditEventPage = extending(Page, (function() {
 		} else {
 			$wrapper.find('.TicketTypeSellAfterFieldset').removeAttr('disabled');
 		}
+		
+		if ($sell_after_selects.length > 0) {
+			$wrapper.closest('.EditEventForm').find('.EmailTicketing').removeClass(__C.CLASSES.HIDDEN);
+		} else {
+			$wrapper.closest('.EditEventForm').find('.EmailTicketing').addClass(__C.CLASSES.HIDDEN);
+		}
 	};
 	
 	AbstractEditEventPage.prototype.fetchData = function() {
@@ -16487,7 +16531,13 @@ AbstractEditEventPage = extending(Page, (function() {
 				delayed_publication: !!form_data.delayed_publication,
 				registration_required: !!form_data.registration_required,
 				registration_locally: !!form_data.registration_locally,
-				registration_approvement_required: !!form_data.registration_approvement_required
+				registration_approvement_required: !!form_data.registration_approvement_required,
+				email_texts: {
+					payed: form_data.email_payed_text || null,
+					approved: form_data.email_approved_text || null,
+					not_approved: form_data.email_not_approved_text || null,
+					after_event: form_data.email_after_event_text || null
+				}
 			};
 		
 		if (form_data.registration_required) {
@@ -17128,6 +17178,10 @@ AbstractEditEventPage = extending(Page, (function() {
 			reorder();
 		});
 		
+		PAGE.$wrapper.find('.RegistrationLocallySwitch').off('change.EmailRegistrationLocallySwitch').on('change.EmailRegistrationLocallySwitch', function() {
+			PAGE.$wrapper.find('.EmailRegistration').toggleClass(__C.CLASSES.HIDDEN);
+		});
+		
 		PAGE.$wrapper.find('.RegistrationPreview').on('click.RegistrationPreview', function() {
 			var $this = $(this),
 				form_data = $(this).closest('fieldset').serializeForm(),
@@ -17245,6 +17299,8 @@ AbstractEditEventPage = extending(Page, (function() {
 			placeholder: 'Минимальная цена'
 		});
 		
+		
+		
 		this.render_vars.registration_till_date_select = __APP.BUILD.formUnit({
 			label: 'Дата окончания регистрации',
 			name: 'registration_till_date',
@@ -17314,6 +17370,8 @@ AbstractEditEventPage = extending(Page, (function() {
 			}
 		]);
 		
+		
+		
 		this.render_vars.add_ticket_type_button = __APP.BUILD.actionButton({
 			title: 'Добавить билет',
 			classes: [__C.CLASSES.COLORS.ACCENT, __C.CLASSES.ICON_CLASS, __C.CLASSES.ICONS.PLUS]
@@ -17353,6 +17411,42 @@ AbstractEditEventPage = extending(Page, (function() {
 				size: 2
 			}
 		});
+		
+		
+		
+		this.render_vars.email_payed_form_unit = __APP.BUILD.formUnit({
+			label: 'Сообщение при успешной оплате заказа',
+			id: 'edit_event_email_payed_form_unit',
+			name: 'email_payed_text',
+			type: 'textarea',
+			value: this.event.email_texts.payed
+		});
+		
+		this.render_vars.email_approved_form_unit = __APP.BUILD.formUnit({
+			label: 'Сообщение при подтверждении заявки',
+			id: 'edit_event_email_approved_form_unit',
+			name: 'email_approved_text',
+			type: 'textarea',
+			value: this.event.email_texts.approved
+		});
+		
+		this.render_vars.email_not_approved_form_unit = __APP.BUILD.formUnit({
+			label: 'Сообщение при отказе в заявке',
+			id: 'edit_event_email_not_approved_form_unit',
+			name: 'email_not_approved_text',
+			type: 'textarea',
+			value: this.event.email_texts.not_approved
+		});
+		
+		this.render_vars.email_after_event_form_unit = __APP.BUILD.formUnit({
+			label: 'Сообщение после окончания события',
+			id: 'edit_event_email_after_event_form_unit',
+			name: 'email_after_event_text',
+			type: 'textarea',
+			value: this.event.email_texts.after_event
+		});
+		
+		
 		
 		this.render_vars.public_at_date_select = __APP.BUILD.formUnit({
 			label: 'Дата',
@@ -17448,6 +17542,7 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 	}
 	
 	EditEventPage.fields = new Fields(
+		'email_texts',
 		'booking_time',
 		'vk_post_link', {
 			ticket_types: {
@@ -17577,7 +17672,7 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 			this.$wrapper.find('#edit_event_registration_required').prop('checked', true).trigger('change');
 			
 			if (this.event.registration_locally) {
-				this.$wrapper.find('#edit_event_registration_locally').prop('checked', true).trigger('change');
+				this.$wrapper.find('.RegistrationLocallySwitch').prop('checked', true).trigger('change');
 			} else {
 				this.$wrapper.find('#edit_event_registration_side').prop('checked', true).trigger('change');
 			}
@@ -20711,6 +20806,7 @@ OrderPage = extending(Page, (function() {
 		this.event_fields = EventPage.fields.copy().add({
 			ticket_types: {
 				fields: new Fields(
+					'is_selling',
 					'comment',
 					'price',
 					'sell_start_date',
@@ -20955,7 +21051,13 @@ OrderPage = extending(Page, (function() {
 						sum_price: 0
 					};
 				})).each(function(i) {
-					$(this).data('ticket_type', self.event.ticket_types[i]);
+					var $this = $(this);
+					
+					$this.data('ticket_type', self.event.ticket_types[i]);
+					
+					if (!self.event.ticket_types[i].is_selling) {
+						$this.attr('disabled', true);
+					}
 				}),
 				overall_price: 0
 			});

@@ -24,6 +24,7 @@ OrderPage = extending(Page, (function() {
 		this.event_fields = EventPage.fields.copy().add({
 			ticket_types: {
 				fields: new Fields(
+					'is_selling',
 					'comment',
 					'price',
 					'sell_start_date',
@@ -268,7 +269,13 @@ OrderPage = extending(Page, (function() {
 						sum_price: 0
 					};
 				})).each(function(i) {
-					$(this).data('ticket_type', self.event.ticket_types[i]);
+					var $this = $(this);
+					
+					$this.data('ticket_type', self.event.ticket_types[i]);
+					
+					if (!self.event.ticket_types[i].is_selling) {
+						$this.attr('disabled', true);
+					}
 				}),
 				overall_price: 0
 			});
