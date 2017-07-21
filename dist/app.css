@@ -6421,6 +6421,10 @@ body,
 
 .orgstat_events_table td {font-weight: 500}
 
+.orgstat_events_no_events_wrapper {
+	padding: 18px;
+}
+
 
 /* Organization Admin Settings */
 

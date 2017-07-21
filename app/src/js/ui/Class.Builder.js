@@ -218,7 +218,9 @@ Builder = (function() {
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.link = function buildLink(props) {
+		
 		return bindPageLinks(tmpl('link', [].map.call(arguments, function(arg) {
+			
 			return Builder.normalizeBuildProps(arg);
 		})));
 	};

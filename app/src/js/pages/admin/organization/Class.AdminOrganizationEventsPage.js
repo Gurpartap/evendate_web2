@@ -60,12 +60,24 @@ AdminOrganizationEventsPage = extending(AdminOrganizationPage, (function() {
 		
 		this.$wrapper.html(tmpl('orgstat-events-page'));
 		
-		this.future_events.fetchOrganizationsEvents(this.organization.id, this.future_events_data, 0, function() {
-			if(this.length){
+		this.future_events.fetchOrganizationsEvents(this.organization.id, this.future_events_data, ServerConnection.MAX_ENTITIES_LENGTH, function() {
+			if (this.length) {
 				this_page.$wrapper.find('.OrgStatFutureEventsWrapper').html(tmpl('orgstat-events-wrapper', {
 					title: 'Предстоящие события',
 					rows: AdminOrganizationEventsPage.buildEventRows(this_page.future_events, 'nearest_event_date')
 				})).find('table').tablesort();
+			} else {
+				this_page.$wrapper.find('.OrgStatFutureEventsWrapper').html(tmpl('orgstat-no-events-wrapper', {
+					title: 'Предстоящие события',
+					call_to_action: __APP.BUILD.link({
+						title: 'Добавить событие',
+						page: '/add/event/to/' + this_page.organization.id,
+						classes: [
+							__C.CLASSES.COMPONENT.BUTTON,
+							__C.CLASSES.COLORS.ACCENT
+						]
+					})
+				}));
 			}
 		});
 		
