@@ -53,6 +53,14 @@ class TicketTypesCollection extends AbstractCollection{
 						break;
 					}
 				}
+				case 'ticket': {
+					if ($value instanceof Ticket) {
+						$q_get->where('uuid = :uuid');
+						$statements[':uuid'] = $value->getTicketTypeUuid();
+						$from_table = 'view_all_ticket_types';
+						break;
+					}
+				}
 			}
 		}
 

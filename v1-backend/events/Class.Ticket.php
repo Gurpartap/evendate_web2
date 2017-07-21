@@ -195,13 +195,11 @@ class Ticket extends AbstractEntity
 					);
 				} else {
 					$_fields = Fields::parseFields($fields[self::TYPE_FIELD_NAME]['fields'] ?? '');
-					$result_data[self::TYPE_FIELD_NAME] = TicketTypesCollection::oneByUUID(
+					$result_data[self::TYPE_FIELD_NAME] = TicketTypesCollection::filter(
 						App::DB(),
 						$user,
-						$this->ticket_type_uuid,
-						$_fields)
-						->getParams($user, $_fields)
-						->getData();
+						array('ticket' => $this),
+						$_fields)->getData()[0];
 				}
 			} else {
 				$result_data[self::TYPE_FIELD_NAME] = null;
@@ -257,5 +255,15 @@ class Ticket extends AbstractEntity
 	public function getUserId(){
 		return $this->user_id;
 	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getTicketTypeUuid()
+	{
+		return $this->ticket_type_uuid;
+	}
+
+
 
 }
