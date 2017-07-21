@@ -242,9 +242,9 @@ CREATE OR REPLACE VIEW view_all_ticket_types AS
                      OR (tt.sell_start_date IS NULL AND tt.sell_end_date > NOW())
                      OR (tt.sell_start_date IS NULL AND tt.sell_end_date IS NULL)
                     ) = FALSE OR sold.count > tt.amount
-             FROM ticket_types  tt
+             FROM ticket_types tt
              WHERE tt.type_code = ticket_types.start_after_ticket_type_code
-              AND tt.event_id = ticket_types.event_id)) -- checking parent type
+                   AND tt.event_id = ticket_types.event_id)) -- checking parent type
     ELSE ((NOW() < sell_end_date AND NOW() > sell_start_date)
           OR (sell_end_date IS NULL AND sell_start_date < NOW())
           OR (sell_start_date IS NULL AND sell_end_date > NOW())
@@ -261,7 +261,8 @@ CREATE OR REPLACE VIEW view_all_ticket_types AS
                  INNER JOIN ticket_orders ON tickets.ticket_order_id = ticket_orders.id
                WHERE tickets.ticket_order_id NOT IN (3, 5, 6, 7)
                GROUP BY tickets.ticket_type_id) AS sold(count, ticket_type_id)
-      ON sold.ticket_type_id = ticket_types.id;
+      ON sold.ticket_type_id = ticket_types.id
+AND ticket_types.status = TRUE;
 
 
 CREATE OR REPLACE VIEW view_tickets AS
@@ -320,7 +321,8 @@ CREATE OR REPLACE VIEW view_ticket_types AS
     view_all_ticket_types.min_count_per_user,
     view_all_ticket_types.max_count_per_user,
     view_all_ticket_types.created_at,
-    view_all_ticket_types.updated_at
+    view_all_ticket_types.updated_at,
+    view_all_ticket_types.status
   FROM view_all_ticket_types
   WHERE status = TRUE
         AND (type_code <> 'registration' OR type_code IS NULL)
@@ -363,7 +365,8 @@ CREATE OR REPLACE VIEW view_actions AS SELECT
                                          stat_organizations.organization_id                            AS organization_id,
                                          DATE_PART('epoch', MAX(stat_organizations.created_at)) :: INT AS created_at
                                        FROM stat_organizations
-                                         INNER JOIN stat_event_types ON stat_event_types.id = stat_organizations.stat_type_id
+                                         INNER JOIN stat_event_types
+                                           ON stat_event_types.id = stat_organizations.stat_type_id
                                          INNER JOIN tokens ON tokens.id = stat_organizations.token_id
                                          INNER JOIN view_organizations
                                            ON view_organizations.id = stat_organizations.organization_id
@@ -377,18 +380,63 @@ CREATE OR REPLACE VIEW view_actions AS SELECT
 
 CREATE OR REPLACE VIEW view_registration_field_values AS
   SELECT
-    view_registration_form_fields.uuid AS form_field_uuid,
-    view_registration_form_fields.label AS form_field_label,
-    view_registration_form_fields.type AS form_field_type,
-    view_registration_form_fields.field_type_id AS form_field_type_id,
-    view_registration_form_fields.required AS form_field_required,
+    view_registration_form_fields.uuid                              AS form_field_uuid,
+    view_registration_form_fields.label                             AS form_field_label,
+    view_registration_form_fields.type                              AS form_field_type,
+    view_registration_form_fields.field_type_id                     AS form_field_type_id,
+    view_registration_form_fields.required                          AS form_field_required,
     registration_field_values.value,
-    registration_field_values.values::JSONB,
+    registration_field_values.values :: JSONB,
     DATE_PART('epoch', registration_field_values.created_at) :: INT AS created_at,
     DATE_PART('epoch', registration_field_values.updated_at) :: INT AS updated_at,
     registration_field_values.ticket_order_id,
-    view_tickets_orders.uuid AS ticket_order_uuid,
+    view_tickets_orders.uuid                                        AS ticket_order_uuid,
     view_registration_form_fields.order_number
   FROM registration_field_values
-    INNER JOIN view_registration_form_fields ON registration_field_values.registration_form_field_id = view_registration_form_fields.id
+    INNER JOIN view_registration_form_fields
+      ON registration_field_values.registration_form_field_id = view_registration_form_fields.id
     INNER JOIN view_tickets_orders ON registration_field_values.ticket_order_id = view_tickets_orders.id;
+
+
+DROP VIEW view_ticket_types;
+
+CREATE OR REPLACE VIEW view_ticket_types AS
+  SELECT
+    view_all_ticket_types.id,
+    view_all_ticket_types.event_id,
+    view_all_ticket_types.uuid,
+    view_all_ticket_types.type_code,
+    view_all_ticket_types.name,
+    view_all_ticket_types.comment,
+    view_all_ticket_types.price,
+    view_all_ticket_types.sell_start_date,
+    view_all_ticket_types.sell_end_date,
+    view_all_ticket_types.min_count_per_user,
+    view_all_ticket_types.max_count_per_user,
+    view_all_ticket_types.created_at,
+    view_all_ticket_types.updated_at,
+    view_all_ticket_types.amount,
+    view_all_ticket_types.start_after_ticket_type_code,
+    view_all_ticket_types.status
+  FROM view_all_ticket_types
+  WHERE status = TRUE
+        AND (type_code <> 'registration' OR type_code IS NULL)
+        AND view_all_ticket_types.is_selling = TRUE;
+
+
+SELECT DISTINCT
+  uuid,
+  event_id,
+  type_code,
+  name,
+  amount,
+  start_after_ticket_type_code,
+  comment,
+  price,
+  sell_start_date,
+  sell_end_date,
+  min_count_per_user,
+  max_count_per_user
+FROM "view_ticket_types"
+WHERE event_id = :event_id
+LIMIT 100

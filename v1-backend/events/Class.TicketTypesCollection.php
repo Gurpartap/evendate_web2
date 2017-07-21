@@ -6,7 +6,7 @@ class TicketTypesCollection extends AbstractCollection{
 																array $filters = null,
 																array $fields = null,
 																array $pagination = null,
-																array $order_by = array('type_code'))
+																array $order_by = array('price'))
 	{
 
 		$q_get = App::queryFactory()->newSelect();
@@ -50,8 +50,21 @@ class TicketTypesCollection extends AbstractCollection{
 					if ($value instanceof Event) {
 						$q_get->where('event_id = :event_id');
 						$statements[':event_id'] = $value->getId();
-						break;
 					}
+					break;
+				}
+				case 'is_selling': {
+					$q_get->where('is_selling = :is_selling');
+					$statements[':is_selling'] = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+					break;
+				}
+				case 'ticket': {
+					if ($value instanceof Ticket) {
+						$q_get->where('uuid = :uuid');
+						$statements[':uuid'] = $value->getTicketTypeUuid();
+						$from_table = 'view_all_ticket_types';
+					}
+					break;
 				}
 			}
 		}
@@ -60,6 +73,10 @@ class TicketTypesCollection extends AbstractCollection{
 			->from($from_table)
 			->cols($cols)
 			->orderBy($order_by);
+
+		if ($from_table == 'view_all_ticket_types'){
+			$q_get->where('status = true');
+		}
 
 		$p_get_types = $db->prepareExecute($q_get, '', $statements)->fetchAll(PDO::FETCH_CLASS, 'TicketType');
 		$types = $p_get_types;
@@ -79,6 +96,15 @@ class TicketTypesCollection extends AbstractCollection{
 																	 array $fields = null) : TicketType
 	{
 		return self::filter($db, $user, array('uuid' => $uuid), $fields);
+	}
+
+	public static function disableAll(ExtendedPDO $db, $event_id)
+	{
+		$q_upd_all = App::queryFactory()->newUpdate();
+		$q_upd_all->table('ticket_types')
+			->cols(array('status' => 'false'))
+			->where('event_id = ?', $event_id);
+		$db->prepareExecute($q_upd_all, 'CANT_UPDATE_TICKET_TYPES');
 	}
 
 }

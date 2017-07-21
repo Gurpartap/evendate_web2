@@ -21,6 +21,7 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 	}
 	
 	EditEventPage.fields = new Fields(
+		'email_texts',
 		'booking_time',
 		'vk_post_link', {
 			ticket_types: {
@@ -150,7 +151,7 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 			this.$wrapper.find('#edit_event_registration_required').prop('checked', true).trigger('change');
 			
 			if (this.event.registration_locally) {
-				this.$wrapper.find('#edit_event_registration_locally').prop('checked', true).trigger('change');
+				this.$wrapper.find('.RegistrationLocallySwitch').prop('checked', true).trigger('change');
 			} else {
 				this.$wrapper.find('#edit_event_registration_side').prop('checked', true).trigger('change');
 			}
