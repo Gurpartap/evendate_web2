@@ -20,7 +20,7 @@ OneOrder = extending(OneEntity, (function() {
 	 * @property {?(string|number)} user_id
 	 * @property {?(string|number)} event_id
 	 * @property {?(string|number)} number
-	 * @property {?string} order_content
+	 * @property {?object} order_content
 	 * @property {?boolean} is_canceled
 	 * @property {?number} status_id
 	 * @property {?(OneOrder.ORDER_STATUSES|OneOrder.EXTENDED_ORDER_STATUSES)} status_type_code
@@ -47,7 +47,7 @@ OneOrder = extending(OneEntity, (function() {
 		this.uuid = setDefaultValue(uuid, 0);
 		this.event_id = setDefaultValue(event_id, 0);
 		this.number = null;
-		this.order_content = null;
+		this._order_content = null;
 		this.is_canceled = null;
 		this.status_id = null;
 		this.status_type_code = null;
@@ -92,6 +92,20 @@ OneOrder = extending(OneEntity, (function() {
 				get: function() {
 					
 					return moment.unix(self.canceled_at)
+				}
+			},
+			order_content: {
+				get: function() {
+					
+					return JSON.parse(self._order_content || '{}');
+				},
+				set: function(value) {
+					
+					if (typeof value === 'string') {
+						return self._order_content = value;
+					} else if (typeof value === 'object' && value !== null) {
+						return self._order_content = JSON.stringify(value);
+					}
 				}
 			}
 		});

@@ -6,6 +6,7 @@
     "access-control": "0.0.8",
     "async": "^2.0.1",
     "body-parser": "^1.15.2",
+    "chrome-headless-render-pdf": "^1.2.1",
     "cron": "^1.0.9",
     "easyimage": "~2.1.0",
     "elasticsearch": "^13.0.1",
