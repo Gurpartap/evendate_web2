@@ -99,7 +99,10 @@ EventPage = extending(Page, (function() {
 			fields: new Fields('notification_type', 'done')
 		},
 		orders: {
-			fields: new Fields('created_at')
+			fields: new Fields(
+				'created_at',
+				'order_content'
+			)
 		},
 		tickets: {
 			fields: new Fields('created_at', 'number', 'ticket_type')

@@ -42,6 +42,10 @@ OrderPage = extending(Page, (function() {
 		});
 	}
 	
+	OrderPage.magicCallbacks = {
+		5852: 'https://ekbconf.ru/?registration=free'
+	};
+	
 	OrderPage.prototype.fetchData = function() {
 		
 		return this.fetching_data_defer = this.event.fetchEvent(this.event_fields);
@@ -194,7 +198,7 @@ OrderPage = extending(Page, (function() {
 		});
 		countTotalSum();
 		
-		this.$wrapper.find('.MainActionButton').on('click.MakeOrder', function() {
+		this.render_vars.main_action_button.on('click.MakeOrder', function() {
 			var $main_action_button = $(this),
 				$form = self.$wrapper.find('.OrderForm');
 			
@@ -225,10 +229,15 @@ OrderPage = extending(Page, (function() {
 					).always(function() {
 						$main_action_button.removeAttr('disabled');
 					}).done(function(data) {
+						var custom_callback = !!OrderPage.magicCallbacks[self.event.id],
+							callback_url = OrderPage.magicCallbacks[self.event.id] || '/event/' + self.event.id;
+						
 						if (self.event.ticketing_locally && data.sum !== 0) {
-							Payment.doPayment('order-' + data.order.uuid, data.sum, window.location.origin + '/event/' + self.event.id);
+							Payment.doPayment('order-' + data.order.uuid, data.sum, custom_callback ? callback_url : (window.location.origin + callback_url));
+						} else if (custom_callback) {
+							window.location = callback_url;
 						} else {
-							__APP.changeState('/event/'+self.event.id);
+							__APP.changeState(callback_url);
 							showNotifier({text: 'Регистрация прошла успешно', status: true});
 						}
 					});
@@ -240,16 +249,7 @@ OrderPage = extending(Page, (function() {
 	};
 	
 	OrderPage.prototype.preRender = function() {
-		var self = this,
-			common_main_button_props = {
-				classes: [
-					,
-					__C.CLASSES.HOOKS.RIPPLE,
-					'MainActionButton',
-					__C.CLASSES.SIZES.HUGE,
-					__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
-				]
-			};
+		var self = this;
 		
 		if (this.event.ticketing_locally) {
 			this.render_vars.tickets_selling = tmpl('order-tickets-selling', {
@@ -280,13 +280,16 @@ OrderPage = extending(Page, (function() {
 			});
 		}
 		
-		this.render_vars.main_action_button = this.event.ticketing_locally ? __APP.BUILD.button($.extend(true, {}, common_main_button_props, {
-			title: 'Заплатить через Яндекс',
-			classes: ['-color_yandex']
-		})) : __APP.BUILD.button($.extend(true, {}, common_main_button_props, {
-			title: 'Зарегистрироваться',
-			classes: [__C.CLASSES.COLORS.ACCENT]
-		}));
+		this.render_vars.main_action_button = __APP.BUILD.button({
+			title: this.event.ticketing_locally ? 'Сделать заказ' : 'Зарегистрироваться',
+			classes: [
+				__C.CLASSES.COLORS.ACCENT,
+				__C.CLASSES.HOOKS.RIPPLE,
+				'MainActionButton',
+				__C.CLASSES.SIZES.HUGE,
+				__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
+			]
+		});
 	};
 	
 	OrderPage.prototype.render = function() {

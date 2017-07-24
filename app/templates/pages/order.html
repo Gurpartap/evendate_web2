@@ -4,16 +4,17 @@
 			<form class="order_form OrderForm">
 				{tickets_selling}
 				{registration}
-				<footer class="order_page_footer">
+				<footer class="order_page_footer -align_center">
 					<div class="form_unit">
 						<input id="order_agreement" class="form_checkbox Switch" type="checkbox" data-switch_id="order_agreement" required>
 						<label class="form_label" for="order_agreement">
 							<span>Я согласен c условиями Пользовательского соглашения и Договором оказания услуг по организации мероприятия</span>
 						</label>
 					</div>
-					<fieldset class="Switching -align_center" data-switch_id="order_agreement" disabled>
+					<fieldset class="Switching" data-switch_id="order_agreement" disabled>
 						{main_action_button}
 					</fieldset>
+					<small class="form_helptext">Для оплаты заказов используется система Яндекс.Деньги</small>
 				</footer>
 				{overlay_cap}
 			</form>
