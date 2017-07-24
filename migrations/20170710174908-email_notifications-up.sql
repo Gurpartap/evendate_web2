@@ -98,6 +98,8 @@ CREATE OR REPLACE VIEW view_ticket_types AS
     view_all_ticket_types.max_count_per_user,
     view_all_ticket_types.created_at,
     view_all_ticket_types.updated_at,
+    view_all_ticket_types.amount,
+    view_all_ticket_types.start_after_ticket_type_code,
     view_all_ticket_types.status,
     view_all_ticket_types.is_selling
   FROM view_all_ticket_types
@@ -106,34 +108,59 @@ CREATE OR REPLACE VIEW view_ticket_types AS
         AND view_all_ticket_types.is_selling = TRUE;
 
 
+CREATE OR REPLACE VIEW view_registration_field_values AS
+  SELECT
+    view_registration_form_fields.uuid                              AS form_field_uuid,
+    view_registration_form_fields.label                             AS form_field_label,
+    view_registration_form_fields.type                              AS form_field_type,
+    view_registration_form_fields.field_type_id                     AS form_field_type_id,
+    view_registration_form_fields.required                          AS form_field_required,
+    COALESCE(registration_field_values.value,
+             (SELECT string_agg
+             (a.a ->> 'value', ', ')
+              FROM (SELECT jsonb_array_elements((registration_field_values.values))) AS a(a)
+              WHERE registration_field_values.values IS NOT NULL
+                    AND registration_field_values.values != 'null')
+    )                                                               AS value,
+    registration_field_values.values :: JSONB,
+    DATE_PART('epoch', registration_field_values.created_at) :: INT AS created_at,
+    DATE_PART('epoch', registration_field_values.updated_at) :: INT AS updated_at,
+    registration_field_values.ticket_order_id,
+    view_tickets_orders.uuid                                        AS ticket_order_uuid,
+    view_registration_form_fields.order_number
+  FROM registration_field_values
+    INNER JOIN view_registration_form_fields
+      ON registration_field_values.registration_form_field_id = view_registration_form_fields.id
+    INNER JOIN view_tickets_orders ON registration_field_values.ticket_order_id = view_tickets_orders.id;
 
-CREATE OR REPLACE VIEW view_emails_after_event AS
-SELECT
-  view_events.title       AS event_title,
-  view_events.id          AS event_id,
-  view_events.organization_id,
-  email_texts.after_event AS after_event_text
-FROM view_events
-  LEFT JOIN email_texts ON email_texts.event_id = view_events.id
-WHERE view_events.last_event_date_dt BETWEEN (NOW() - INTERVAL '1 hour') AND (NOW() + INTERVAL '1 hour')
-      AND view_events.id NOT IN (SELECT (data ->> 'event_id') :: INT
-                                 FROM emails
-                                 WHERE emails.email_type_id = 15);
 
 CREATE OR REPLACE VIEW view_emails_after_event AS
   SELECT
-  events.title                                                                  AS event_title,
-  events.id                                                                     AS event_id,
-  events.organization_id,
-  view_tickets_orders.uuid                                                      AS order_uuid,
-  (view_tickets_orders.created_at +
-   (events.booking_time * 3600)) - date_part('epoch', NOW() AT TIME ZONE 'UTC') AS time_to_pay
-FROM view_tickets_orders
-  INNER JOIN events ON view_tickets_orders.event_id = events.id
-WHERE view_tickets_orders.status_type_code = 'waiting_for_payment'
-      AND events.id NOT IN (SELECT (data ->> 'event_id') :: INT
-                            FROM emails
-                            WHERE emails.email_type_id = 15 AND data ->> 'order_uuid' = view_tickets_orders.uuid);
+    view_events.title       AS event_title,
+    view_events.id          AS event_id,
+    view_events.organization_id,
+    email_texts.after_event AS after_event_text
+  FROM view_events
+    LEFT JOIN email_texts ON email_texts.event_id = view_events.id
+  WHERE view_events.last_event_date_dt BETWEEN (NOW() - INTERVAL '1 hour') AND (NOW() + INTERVAL '1 hour')
+        AND view_events.id NOT IN (SELECT (data ->> 'event_id') :: INT
+                                   FROM emails
+                                   WHERE emails.email_type_id = 15);
+
+CREATE OR REPLACE VIEW view_emails_waiting_for_payment AS
+  SELECT
+    events.title                                                                  AS event_title,
+    events.id                                                                     AS event_id,
+    events.organization_id,
+    view_tickets_orders.uuid                                                      AS order_uuid,
+    (view_tickets_orders.created_at +
+     (events.booking_time * 3600)) - date_part('epoch', NOW() AT TIME ZONE 'UTC') AS time_to_pay
+  FROM view_tickets_orders
+    INNER JOIN events ON view_tickets_orders.event_id = events.id
+  WHERE view_tickets_orders.status_type_code = 'waiting_for_payment'
+        AND events.id NOT IN (SELECT (data ->> 'event_id') :: INT
+                              FROM emails
+                              WHERE emails.email_type_id = 15 AND data ->> 'order_uuid' = view_tickets_orders.uuid);
 
 -- waiting_for_payment,
 -- returned_by_organization
