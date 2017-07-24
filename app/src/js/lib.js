@@ -2558,7 +2558,8 @@ function isScrollRemain(left) {
  * @return {*}
  */
 function setDefaultValue(variable, default_value) {
-	if ((typeof variable === 'undefined') || $.isEmptyObject(variable))
+	if ((typeof variable === 'undefined') || (typeof variable === 'object' && $.isEmptyObject(variable)))
 		return default_value;
+	
 	return variable;
 }

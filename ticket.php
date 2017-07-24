@@ -62,10 +62,10 @@ $url_parts = explode('/', $url);
 	<?php
 	if ($DEBUG_MODE) { ?>
     <link rel="stylesheet" href="/dist/vendor.css?rev=3b6878c5b89f643e8d96b1b336b7d4fc">
-    <link rel="stylesheet" href="/dist/app.css?rev=7490534e8ed29d3d030f0adb6bb2bd3c"><?php
+    <link rel="stylesheet" href="/dist/app.css?rev=fb871241012e2409908b2558eea2c486"><?php
 	} else { ?>
     <link rel="stylesheet" href="/dist/vendor.min.css?rev=4165c69f5d04ec431ab5bc41425847a5">
-    <link rel="stylesheet" href="/dist/app.min.css?rev=a8c765b6104b8fb51ddb8e6b4c01dcd9"><?php
+    <link rel="stylesheet" href="/dist/app.min.css?rev=bc59a05f4977fa739fc503d269daafc6"><?php
 	} ?>
 
 	<?php
@@ -184,9 +184,10 @@ $url_parts = explode('/', $url);
 		</div>
 		<div class="sidebar_links">
 			<a href="/landing.php" class="link">О нас</a>
+			<a href="//evendate.io/blog" class="link">Наш блог</a>
 			<a href="/organization.php" class="link">Стать организатором</a>
-			<a href="//evendate.ru/docs/terms.pdf" class="link">Условия пользования</a>
-			<a href="//evendate.ru/docs/useragreement.pdf" class="link">Пользовательское соглашение</a>
+			<a href="//evendate.io/docs/terms.pdf" class="link">Условия пользования</a>
+			<a href="//evendate.io/docs/useragreement.pdf" class="link">Пользовательское соглашение</a>
 			<p>Evendate 2015-<?= (new DateTimeImmutable())->format('Y'); ?></p>
 		</div>
 	</div>
@@ -308,11 +309,11 @@ $url_parts = explode('/', $url);
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=c342ffed76b601b8e918679735b6284a" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=50a1b55de442a63461289056d7ed05fc" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=3e1f821ba33291893ac96531be7e6b1b" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=c81b645927e1c425946c0c7a198a6018" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=172ace0ca98d928c2439d1e3761d7abc" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=5750bda6226b896f01a3940e901ad908" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=c463739fb549ae2b3b52490632a76884" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=085e592b9d1f3ed2a9b49fb1de87069f" charset="utf-8"></script><?php
 }
 
 foreach (glob("app/templates/{*/*/*/*,*/*/*,*/*,*}.html", GLOB_BRACE) as $filename) {
