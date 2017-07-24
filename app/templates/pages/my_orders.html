@@ -1,0 +1,54 @@
+<script type="javascript/template" id="tmpl-my-orders-page">
+	<div class="orders_page material">
+		<section class="orders_page_list scrollbar-outer Scroll">
+			{orders}
+		</section>
+		<div class="orders_page_wrapper scrollbar-outer Scroll">
+			<div class="orders_page_detail OrderDetailInfo">
+				{order_detail}
+			</div>
+		</div>
+		<div class="orders_page_wrapper scrollbar-outer Scroll">
+			<div class="orders_page_registration_fields OrderRegistrationFields">
+				{order_registration_fields}
+			</div>
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-my-orders-order-unit">
+	<article class="order_list_item extended_list_item">
+		<header class="extended_list_item_header">
+			<span>Заказ {order_number} от {order_datetime}</span>
+		</header>
+		<div class="extended_list_item_body">
+			<h5 class="extended_list_item_title">{event_title}</h5>
+		</div>
+		<footer class="extended_list_item_footer">
+			{order_footer}
+		</footer>
+	</article>
+</script>
+
+<script type="javascript/template" id="tmpl-my-orders-order-unit-paid-footer">
+	<span>Оплачен {paid_at_datetime} — {formatted_price} руб.</span>
+</script>
+
+<script type="javascript/template" id="tmpl-my-orders-order-unit-no-paid-footer">
+	<span class="-text_color_warning">Не оплачен</span>
+</script>
+
+<script type="javascript/template" id="tmpl-my-orders-order-detail-info">
+	<h3>Заказ {order_number}</h3>
+	{pain_info}
+	{pay_button}
+	{event_title}
+	{event}
+	{tickets_title}
+	{tickets}
+</script>
+
+<script type="javascript/template" id="tmpl-my-orders-order-registration-fields">
+	{registration_fields_title}
+	{registration_fields}
+</script>

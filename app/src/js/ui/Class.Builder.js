@@ -60,6 +60,7 @@ Builder = (function() {
 	/**
 	 *
 	 * @param {...buildProps} props
+	 * @param {string} props.title
 	 *
 	 * @returns {jQuery}
 	 */
@@ -196,6 +197,7 @@ Builder = (function() {
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.textarea = function buildTextarea(attributes, classes, value, dataset) {
+		
 		return tmpl('textarea', Builder.normalizeBuildProps({
 			value: value,
 			classes: classes,
@@ -216,7 +218,9 @@ Builder = (function() {
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.link = function buildLink(props) {
+		
 		return bindPageLinks(tmpl('link', [].map.call(arguments, function(arg) {
+			
 			return Builder.normalizeBuildProps(arg);
 		})));
 	};
@@ -486,7 +490,8 @@ Builder = (function() {
 											autocomplete: 'off', value: !empty(props.value) ? props.value : undefined
 										}),
 										classes,
-										props.dataset
+										props.dataset,
+										props.inputmask
 									);
 								}
 								default: {
@@ -602,6 +607,39 @@ Builder = (function() {
 			classes: '-loader_overlay',
 			loader: tmpl('loader')
 		}, $wrapper, direction);
+	};
+	/**
+	 * @typedef {object} fieldProps
+	 * @property {string} name
+	 * @property {string} value
+	 * @property {string} [classes]
+	 */
+	/**
+	 *
+	 * @param {...(Array<fieldProps>|fieldProps)} props
+	 *
+	 * @return {jQuery}
+	 */
+	Builder.prototype.fields = function(props) {
+		var batch;
+		
+		if (arguments.length === 1) {
+			batch = [props];
+		} else {
+			batch = [].slice.call(arguments);
+		}
+		
+		return $.makeSet(batch.map(function(field) {
+			if (field instanceof Array) {
+				
+				return tmpl('fields-wrapper', {
+					classes: '-columns_' + field.length,
+					fields: tmpl('field', field)
+				});
+			}
+			
+			return tmpl('field', field);
+		}));
 	};
 	/**
 	 *
