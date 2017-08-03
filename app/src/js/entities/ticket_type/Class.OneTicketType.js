@@ -34,8 +34,8 @@ OneTicketType = extending(OneEntity, (function() {
 	function OneTicketType(event_id, uuid) {
 		var self = this;
 		
-		this.uuid = setDefaultValue(uuid, 0);
-		this.event_id = setDefaultValue(event_id, 0);
+		this.uuid = setDefaultValue(uuid, null);
+		this.event_id = setDefaultValue(event_id, null);
 		this.type_code = null;
 		this.name = null;
 		this.comment = null;
