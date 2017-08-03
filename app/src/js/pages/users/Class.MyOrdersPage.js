@@ -21,6 +21,9 @@ MyOrdersPage = extending(Page, (function() {
 		this.fetch_order_fields = new Fields(
 			'registration_fields',
 			'sum', {
+				event: {
+					fields: new Fields('ticketing_locally')
+				},
 				tickets: {
 					fields: new Fields('ticket_type')
 				}
@@ -86,7 +89,7 @@ MyOrdersPage = extending(Page, (function() {
 			self.$detail_wrapper.html(tmpl('my-orders-order-detail-info', {
 				order_number: formatTicketNumber(order.number),
 				pain_info: MyOrdersPage.buildPayInfo(order),
-				pay_button: order.event.ticketing_locally ? __APP.BUILD.button({
+				pay_button: (order.event.ticketing_locally && order.payed_at === null) ? __APP.BUILD.button({
 					title: 'Заплатить через Яндекс',
 					classes: [
 						'-color_yandex',
