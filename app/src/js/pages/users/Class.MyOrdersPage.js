@@ -89,10 +89,10 @@ MyOrdersPage = extending(Page, (function() {
 			self.$detail_wrapper.html(tmpl('my-orders-order-detail-info', {
 				order_number: formatTicketNumber(order.number),
 				pain_info: MyOrdersPage.buildPayInfo(order),
-				pay_button: (order.event.ticketing_locally && order.payed_at === null) ? __APP.BUILD.button({
-					title: 'Заплатить через Яндекс',
+				pay_button: order.status_type_code === OneOrder.ORDER_STATUSES.WAITING_FOR_PAYMENT ? __APP.BUILD.button({
+					title: 'Оплатить',
 					classes: [
-						'-color_yandex',
+						'-color_accent',
 						__C.CLASSES.HOOKS.RIPPLE,
 						'PayButton',
 						__C.CLASSES.SIZES.HUGE,
