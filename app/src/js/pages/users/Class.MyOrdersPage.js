@@ -18,11 +18,14 @@ MyOrdersPage = extending(Page, (function() {
 		
 		this.orders = new MyOrdersCollection();
 		
-		this.fetch_order_fields = new Fields('registration_fields', {
-			tickets: {
-				fields: new Fields('ticket_type')
+		this.fetch_order_fields = new Fields(
+			'registration_fields',
+			'sum', {
+				tickets: {
+					fields: new Fields('ticket_type')
+				}
 			}
-		});
+		);
 		
 		this.$orders = $();
 		this.$detail_wrapper = $();
