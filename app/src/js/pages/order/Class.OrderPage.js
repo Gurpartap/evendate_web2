@@ -181,10 +181,12 @@ OrderPage = extending(Page, (function() {
 		}
 		
 		function countTotalSum() {
-			self.$wrapper.find('.TicketsOverallSum').text(formatCurrency(Array.prototype.reduce.call(self.$wrapper.find('.TicketTypeSumText'), function(sum, ticket_type_sum) {
+			var sum = Array.prototype.reduce.call(self.$wrapper.find('.TicketTypeSumText'), function(sum, ticket_type_sum) {
 				
-				return sum + +ticket_type_sum.innerHTML;
-			}, 0)));
+				return sum + +ticket_type_sum.innerHTML.replace(' ', '');
+			}, 0);
+			
+			self.$wrapper.find('.TicketsOverallSum').text(formatCurrency(sum));
 		}
 		
 		this.$wrapper.find('.QuantityInput').on('QuantityInput::change', function(e, value) {
