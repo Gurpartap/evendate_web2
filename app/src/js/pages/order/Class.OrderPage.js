@@ -155,7 +155,8 @@ OrderPage = extending(Page, (function() {
 	
 	OrderPage.prototype.init = function() {
 		var self = this,
-			parsed_uri = parseUri(location);
+			parsed_uri = parseUri(location),
+			$selected_type;
 		
 		bindControlSwitch(this.$wrapper);
 		initSelect2(this.$wrapper.find('.ToSelect2'), {
@@ -176,14 +177,14 @@ OrderPage = extending(Page, (function() {
 				$sum.addClass(__C.CLASSES.HIDDEN);
 			}
 			
-			$ticket_type.find('.TicketTypeSumText').text($ticket_type.data('ticket_type').price * value);
+			$ticket_type.find('.TicketTypeSumText').text(formatCurrency($ticket_type.data('ticket_type').price * value));
 		}
 		
 		function countTotalSum() {
-			self.$wrapper.find('.TicketsOverallSum').text(Array.prototype.reduce.call(self.$wrapper.find('.TicketTypeSumText'), function(sum, ticket_type_sum) {
+			self.$wrapper.find('.TicketsOverallSum').text(formatCurrency(Array.prototype.reduce.call(self.$wrapper.find('.TicketTypeSumText'), function(sum, ticket_type_sum) {
 				
 				return sum + +ticket_type_sum.innerHTML;
-			}, 0));
+			}, 0)));
 		}
 		
 		this.$wrapper.find('.QuantityInput').on('QuantityInput::change', function(e, value) {
@@ -197,10 +198,14 @@ OrderPage = extending(Page, (function() {
 		countTotalSum();
 		
 		if (parsed_uri.queryKey['ticket_selected']) {
-			this.$wrapper.find('.TicketType').filter(function() {
+			$selected_type = this.$wrapper.find('.TicketType').filter(function() {
 				
 				return $(this).data().ticket_type.name === parsed_uri.queryKey['ticket_selected']
-			}).find('.QuantityInput').resolveInstance().increment();
+			});
+			
+			if ($selected_type.length) {
+				$selected_type.find('.QuantityInput').resolveInstance().increment();
+			}
 		}
 		
 		this.render_vars.main_action_button.on('click.MakeOrder', function() {
@@ -270,7 +275,7 @@ OrderPage = extending(Page, (function() {
 							max: ticket_type.max_count_per_user || ticket_type.amount || 30
 						}),
 						description: ticket_type.comment,
-						type_price: ticket_type.price,
+						type_price: formatCurrency(ticket_type.price),
 						sum_price: 0
 					};
 				})).each(function(i) {
