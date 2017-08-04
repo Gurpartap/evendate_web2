@@ -35,6 +35,7 @@ QuantityInput = extendingJQuery((function() {
 		$plus_button = __APP.BUILD.button({
 			title: '+',
 			classes: [
+				'QuantityInputPlus',
 				'quantity_input_button',
 				__C.CLASSES.COLORS.DEFAULT,
 			  __C.CLASSES.HOOKS.RIPPLE
@@ -47,6 +48,7 @@ QuantityInput = extendingJQuery((function() {
 		$minus_button = __APP.BUILD.button({
 			title: '-',
 			classes: [
+				'QuantityInputMinus',
 				'quantity_input_button',
 				__C.CLASSES.COLORS.DEFAULT,
 				__C.CLASSES.HOOKS.RIPPLE
@@ -138,31 +140,39 @@ QuantityInput = extendingJQuery((function() {
 		}
 	};
 	
+	QuantityInput.prototype.decrement = function() {
+		var val = +this.input.val();
+		
+		this.check(val - 1);
+		if (!empty(this.options.min)) {
+			if (val - 1 < this.options.min) {
+				return false;
+			}
+		}
+		this.input.val(val - 1).trigger('QuantityInput::change', [val - 1, val]);
+	};
+	
+	QuantityInput.prototype.increment = function() {
+		var val = +this.input.val();
+		
+		this.check(val + 1);
+		if (!empty(this.options.max)) {
+			if (val + 1 > this.options.max) {
+				return false;
+			}
+		}
+		this.input.val(val + 1).trigger('QuantityInput::change', [val + 1, val]);
+	};
+	
 	QuantityInput.prototype.initiate = function() {
 		var self = this;
 		
 		this.plus.on('click.PlusQuantity', function() {
-			var val = +self.input.val();
-			
-			self.check(val + 1);
-			if (!empty(self.options.max)) {
-				if (val + 1 > self.options.max) {
-					return false;
-				}
-			}
-			self.input.val(val + 1).trigger('QuantityInput::change', [val + 1, val]);
+			self.increment();
 		});
 		
 		this.minus.on('click.MinusQuantity', function() {
-			var val = +self.input.val();
-			
-			self.check(val - 1);
-			if (!empty(self.options.min)) {
-				if (val - 1 < self.options.min) {
-					return false;
-				}
-			}
-			self.input.val(val - 1).trigger('QuantityInput::change', [val - 1, val]);
+			self.decrement();
 		});
 		
 		this.input.on('input', function() {

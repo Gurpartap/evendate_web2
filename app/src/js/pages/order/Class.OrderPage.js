@@ -43,10 +43,6 @@ OrderPage = extending(Page, (function() {
 		});
 	}
 	
-	OrderPage.magicCallbacks = {
-		5852: 'https://ekbconf.ru/?registration=free'
-	};
-	
 	OrderPage.prototype.fetchData = function() {
 		
 		return this.fetching_data_defer = this.event.fetchEvent(this.event_fields);
@@ -158,7 +154,8 @@ OrderPage = extending(Page, (function() {
 	};
 	
 	OrderPage.prototype.init = function() {
-		var self = this;
+		var self = this,
+			parsed_uri = parseUri(location);
 		
 		bindControlSwitch(this.$wrapper);
 		initSelect2(this.$wrapper.find('.ToSelect2'), {
@@ -199,6 +196,13 @@ OrderPage = extending(Page, (function() {
 		});
 		countTotalSum();
 		
+		if (parsed_uri.queryKey['ticket_selected']) {
+			this.$wrapper.find('.TicketType').filter(function() {
+				
+				return $(this).data().ticket_type.name === parsed_uri.queryKey['ticket_selected']
+			}).find('.QuantityInput').resolveInstance().increment();
+		}
+		
 		this.render_vars.main_action_button.on('click.MakeOrder', function() {
 			var $main_action_button = $(this),
 				$form = self.$wrapper.find('.OrderForm');
@@ -230,13 +234,13 @@ OrderPage = extending(Page, (function() {
 					).always(function() {
 						$main_action_button.removeAttr('disabled');
 					}).done(function(data) {
-						var custom_callback = !!OrderPage.magicCallbacks[self.event.id],
-							callback_url = OrderPage.magicCallbacks[self.event.id] || '/event/' + self.event.id;
+						var is_custom_callback = !!parsed_uri.queryKey['away_to'],
+							callback_url = parsed_uri.queryKey['away_to'] || '/event/' + self.event.id;
 						
 						if (self.event.ticketing_locally && data.sum !== 0) {
-							Payment.doPayment('order-' + data.order.uuid, data.sum, custom_callback ? callback_url : (window.location.origin + callback_url));
-						} else if (custom_callback) {
-							window.location = callback_url;
+							Payment.doPayment('order-' + data.order.uuid, data.sum, is_custom_callback ? callback_url : (window.location.origin + callback_url));
+						} else if (is_custom_callback) {
+							window.location = callback_url + '?registration=free';
 						} else {
 							__APP.changeState(callback_url);
 							showNotifier({text: 'Регистрация прошла успешно', status: true});
@@ -258,6 +262,7 @@ OrderPage = extending(Page, (function() {
 					
 					return {
 						name: ticket_type.name,
+						ticket_type_uuid: ticket_type.uuid,
 						quantity_input: new QuantityInput({
 							name: ticket_type.uuid
 						}, {
