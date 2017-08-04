@@ -197,7 +197,10 @@ OrderPage = extending(Page, (function() {
 		countTotalSum();
 		
 		if (parsed_uri.queryKey['ticket_selected']) {
-			this.$wrapper.find('.TicketType[data-ticket_type_uuid="4ba87852-68d4-4763-8515-5c14c01bf366"]').find('.QuantityInput').resolveInstance().increment();
+			this.$wrapper.find('.TicketType').filter(function() {
+				
+				return $(this).data().ticket_type.name === parsed_uri.queryKey['ticket_selected']
+			}).find('.QuantityInput').resolveInstance().increment();
 		}
 		
 		this.render_vars.main_action_button.on('click.MakeOrder', function() {
