@@ -335,7 +335,7 @@ __LOCALES = {
 				
 				TICKETS_ARE_OVER: 'Билеты закончились',
 				RETURNED_BY_ORGANIZATION: 'Возврат билета организатором',
-				PAYMENT_CANCELED_AUTO: 'Отмена транзакции',
+				PAYMENT_CANCELED_AUTO: 'Автоматическая отмена заказа',
 				PAYMENT_CANCELED_BY_CLIENT: 'Отменено клиентом',
 				RETURNED_BY_CLIENT: 'Возврат билета',
 				REJECTED: 'Отклонено'
