@@ -137,6 +137,37 @@ OneOrder = extending(OneEntity, (function() {
 		PAYMENT_CANCELED_AUTO: 'payment_canceled_auto',
 		PAYMENT_CANCELED_BY_CLIENT: 'payment_canceled_by_client'
 	}, OneOrder.ORDER_STATUSES);
+	
+	OneOrder.isGreenStatus = function(status) {
+		switch (status) {
+			case OneOrder.EXTENDED_ORDER_STATUSES.APPROVED:
+			case OneOrder.EXTENDED_ORDER_STATUSES.PAYED:
+			case OneOrder.EXTENDED_ORDER_STATUSES.WITHOUT_PAYMENT: return true;
+			
+			default: return false;
+		}
+	};
+	
+	OneOrder.isYellowStatus = function(status) {
+		switch (status) {
+			case OneOrder.EXTENDED_ORDER_STATUSES.WAITING_FOR_PAYMENT:
+			case OneOrder.EXTENDED_ORDER_STATUSES.IS_PENDING: return true;
+			
+			default: return false;
+		}
+	};
+	
+	OneOrder.isRedStatus = function(status) {
+		switch (status) {
+			case OneOrder.EXTENDED_ORDER_STATUSES.PAYMENT_CANCELED_BY_CLIENT:
+			case OneOrder.EXTENDED_ORDER_STATUSES.RETURNED_BY_ORGANIZATION:
+			case OneOrder.EXTENDED_ORDER_STATUSES.PAYMENT_CANCELED_AUTO:
+			case OneOrder.EXTENDED_ORDER_STATUSES.RETURNED_BY_CLIENT:
+			case OneOrder.EXTENDED_ORDER_STATUSES.REJECTED: return true;
+			
+			default: return false;
+		}
+	};
 	/**
 	 *
 	 * @param {(string|number)} event_id

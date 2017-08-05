@@ -30,12 +30,8 @@
 	</article>
 </script>
 
-<script type="javascript/template" id="tmpl-my-orders-order-unit-paid-footer">
-	<span>Оплачен {paid_at_datetime} — {formatted_price} руб.</span>
-</script>
-
-<script type="javascript/template" id="tmpl-my-orders-order-unit-no-paid-footer">
-	<span class="-text_color_warning">Ожидает оплаты</span>
+<script type="javascript/template" id="tmpl-my-orders-order-unit-footer">
+	<small class="-text_color_{color} -font_weight_bolder -transform_uppercase">{text}</small>
 </script>
 
 <script type="javascript/template" id="tmpl-my-orders-order-detail-info">

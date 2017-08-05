@@ -63,11 +63,27 @@ MyOrdersPage = extending(Page, (function() {
 	 * @return {(jQuery|string)}
 	 */
 	MyOrdersPage.buildPayInfo = function(order) {
+		var color = 'success',
+			text = localeFromNamespace(order.status_type_code, OneOrder.EXTENDED_ORDER_STATUSES, __LOCALE.TEXTS.TICKET_STATUSES);
+		
+		if (order.sum !== null) {
+			if (OneOrder.isRedStatus(order.status_type_code)) {
+				color = 'error';
+			} else if (OneOrder.isYellowStatus(order.status_type_code)) {
+				color = 'warning';
+			} else if (OneOrder.isGreenStatus(order.status_type_code)) {
+				color = 'default';
+			}
+			
+			if (order.payed_at) {
+				text = 'Оплачен '+moment.unix(order.payed_at).format(__LOCALE.DATE.DATE_TIME_FORMAT)+' — '+formatCurrency(order.sum)+' руб.'
+			}
+		}
 	
-		return order.sum ? order.payed_at ? tmpl('my-orders-order-unit-paid-footer', {
-			paid_at_datetime: moment.unix(order.payed_at).format(__LOCALE.DATE.DATE_TIME_FORMAT),
-			formatted_price: formatCurrency(order.sum)
-		}) : tmpl('my-orders-order-unit-no-paid-footer') : '';
+		return tmpl('my-orders-order-unit-footer', {
+			text: text,
+			color: color
+		});
 	};
 	
 	MyOrdersPage.prototype.fetchData = function() {
@@ -76,7 +92,9 @@ MyOrdersPage = extending(Page, (function() {
 	};
 	
 	MyOrdersPage.prototype.init = function() {
-		var self = this;
+		var self = this,
+		parsed_uri = parseUri(location),
+		$selected_order = $();
 		
 		this.$wrapper.find('.Scroll').scrollbar();
 		this.$orders.on('click.SelectOrder', function() {
@@ -92,10 +110,12 @@ MyOrdersPage = extending(Page, (function() {
 				pay_button: order.status_type_code === OneOrder.ORDER_STATUSES.WAITING_FOR_PAYMENT ? __APP.BUILD.button({
 					title: 'Оплатить',
 					classes: [
+						'orders_page_pay_button',
 						'-color_accent',
 						__C.CLASSES.HOOKS.RIPPLE,
 						'PayButton',
 						__C.CLASSES.SIZES.HUGE,
+						__C.CLASSES.SIZES.WIDE,
 						__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
 					]
 				}).on('click.Pay', function() {
@@ -113,12 +133,22 @@ MyOrdersPage = extending(Page, (function() {
 			}));
 		});
 		
+		if (parsed_uri.queryKey['uuid']) {
+			$selected_order = this.$orders.filter(function() {
+				
+				return $(this).data('order').uuid === parsed_uri.queryKey['uuid'];
+			});
+			
+			if ($selected_order.length) {
+				$selected_order.trigger('click.SelectOrder');
+			}
+		}
+		
 	};
 	
 	MyOrdersPage.prototype.render = function() {
-		if(__APP.USER.isLoggedOut()){
-			__APP.changeState('/', true, true);
-			return null;
+		if (__APP.USER.isLoggedOut()) {
+			return (new AuthModal(window.location.href, false)).show();
 		}
 		
 		this.orders.sortBy('created_at');
