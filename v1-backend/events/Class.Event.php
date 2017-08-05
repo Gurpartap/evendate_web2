@@ -386,9 +386,9 @@ class Event extends AbstractEntity
 
 	private static function saveEmailTexts(ExtendedPDO $db, $event_id, array $data)
 	{
-		if (!isset($data['email_texts']) || !is_array($data['email_texts'])){
+		if (!isset($data['email_texts']) || !is_array($data['email_texts'])) {
 			return;
-		}else{
+		} else {
 			$_data = $data['email_texts'];
 		}
 
@@ -1821,7 +1821,7 @@ class Event extends AbstractEntity
 
 	public function getEmailTexts(array $cols = null)
 	{
-		if ($cols == null){
+		if ($cols == null) {
 			$cols = array('payed', 'approved', 'not_approved', 'after_event');
 		}
 		$q_get = App::queryFactory()->newSelect();
@@ -1840,7 +1840,6 @@ class Event extends AbstractEntity
 	{
 		return $this->title;
 	}
-
 
 
 }
