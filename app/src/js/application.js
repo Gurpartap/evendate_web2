@@ -85,7 +85,10 @@ __APP = {
 				'': AddEventPage
 			},
 			'^([0-9]+)': {
-				'order': OrderPage,
+				'order': {
+					'from_legal_entity': LegalEntityPayment,
+					'': OrderPage
+				},
 				'edit': EditEventPage,
 				'': EventPage
 			},

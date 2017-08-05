@@ -996,10 +996,9 @@ fieldset:disabled .form_select {cursor: default}
 :not(.-status_disabled) .form_input:not(:disabled):not(.-status_disabled):focus,
 :not(.-status_disabled) .form_textarea:not(:disabled):not(.-status_disabled):focus {
 	background-color: #fff;
-	border: 1px solid #00dc88;
-	border: 1px solid var(--color_franklin);
-	box-shadow: 0 0 4px 0 #00dc88;
-	box-shadow: 0 0 4px 0 var(--color_franklin);
+	border-color: transparent;
+	box-shadow: 0 0 6px 0 #00dc88;
+	box-shadow: 0 0 6px 0 var(--color_franklin);
 }
 
 .form_input:-moz-placeholder,
@@ -5307,6 +5306,15 @@ body,
 }
 
 /* /ORDER */
+/* LEGAL ENTITY PAYMENT */
+
+.legal_entity_payment_page {
+	max-width: 800px;
+	margin: 48px auto;
+	padding: 24px 36px 48px;
+}
+
+/* /LEGAL ENTITY PAYMENT */
 /* TICKET */
 
 
@@ -5400,7 +5408,7 @@ body,
 	margin-left: 10px;
 }
 
-	/* /TICKET */
+/* /TICKET */
 /* FEED */
 
 .feed_event_wrapper {
