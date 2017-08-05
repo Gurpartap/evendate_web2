@@ -27,16 +27,16 @@
                 <h1
                   style="text-align: center;display: block;margin: 0;padding: 0;color: #202020;font-family: Helvetica;font-size: 26px;font-style: normal;font-weight: bold;line-height: 125%;letter-spacing: normal;">
                   <br>
-                  <span style="font-size:24px">Спасибо!</span> </h1>
+                  <span style="font-size:24px">Осталось меньше часа для оплаты</span> </h1>
 
                 <div
                   style="text-align: center;margin: 10px 0;padding: 0;mso-line-height-rule: exactly;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;color: #202020;font-family: Helvetica;font-size: 16px;line-height: 150%;">
-                  Здравствуйте, {first_name}. Мы хотим поблагодарить Вас за участие в <a href="https://evendate.io/event/{event_id}"
+                  Здравствуйте, {first_name}. Вы заказывали билеты на событие <a href="https://evendate.io/event/{event_id}"
                                                                                          target="_blank">{event_title}</a>.
 
                   <p
                     style="text-align: center;margin: 10px 0;padding: 0;mso-line-height-rule: exactly;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;color: #202020;font-family: Helvetica;font-size: 16px;line-height: 150%;">
-                    {after_event_text}</p>
+                    Но все ещё не оплатили заказ. В случае отмены </p>
 
                   Вы можете находить другие интересные события на <a href="https://evendate.io" target="_blank">https://evendate.io</a>
                   и в мобильныъ приложениях.<br>
@@ -60,8 +60,7 @@
 
                             <td valign="top" class="mcnTextContent" style="padding-top:0; padding-right:18px; padding-bottom:9px; padding-left:18px;">
 
-                              <div style="text-align: center;">Вы можете посмотреть полную аналитику по Вашей<br>
-                                организации в Evendate
+                              <div style="text-align: center;">Вы можете оплатить заказ удобным для Вас способом прямо сейчас<br>
                               </div>
 
                             </td>
@@ -84,7 +83,7 @@
                     <tbody>
                     <tr>
                       <td align="center" valign="middle" class="mcnButtonContent" style="font-family: Arial; font-size: 16px; padding: 15px;">
-                        <a class="mcnButton " title="Перейти" href="https://evendate.io/admin/organization/{organization_id}" target="_blank" style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">Перейти</a>
+                        <a class="mcnButton " title="Перейти" href="https://evendate.io/my/orders?uuid={order_uuid}" target="_blank" style="font-weight: bold;letter-spacing: normal;line-height: 100%;text-align: center;text-decoration: none;color: #FFFFFF;">Перейти к оплате</a>
                       </td>
                     </tr>
                     </tbody>

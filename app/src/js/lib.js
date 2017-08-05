@@ -8,6 +8,9 @@
  * @property {Object<string, string>} ENTITIES
  */
 __C = {
+	API_TOKENS: {
+		DADATA: '7f2a3dad57bdaefebcb6e26ef7600b62b9658467'
+	},
 	CLASSES: {
 		MATERIAL: 'material',
 		FLOATING_MATERIAL: 'material -floating_material',
@@ -1324,6 +1327,7 @@ function getGenderText(gender, cases) {
  * @param {(Array<OneDate>|DatesCollection)} dates
  * @param {(string|Array|jQuery|object)} format
  * @param {boolean} [is_same_time=false]
+ *
  * @returns {(Array<string>|Array<Array>|Array<jQuery>|Array<object>)}
  */
 function formatDates(dates, format, is_same_time) {

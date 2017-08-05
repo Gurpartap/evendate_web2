@@ -1245,17 +1245,15 @@ class Event extends AbstractEntity
 				Fields::parseOrderBy($fields[self::TAGS_FIELD_NAME]['order_by'] ?? ''))->getData();
 		}
 		if (isset($fields[self::ORDERS_FIELD_NAME]) && $user instanceof User) {
-			if ($user->isAdmin($this->getOrganization())) {
-				$result_data[self::ORDERS_FIELD_NAME] = OrdersCollection::filter($this->db,
-					$user,
-					array('event' => $this),
-					Fields::parseFields($fields[self::ORDERS_FIELD_NAME]['fields'] ?? ''),
-					array(
-						'length' => $fields[self::ORDERS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
-						'offset' => $fields[self::ORDERS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
-					),
-					Fields::parseOrderBy($fields[self::ORDERS_FIELD_NAME]['order_by'] ?? ''))->getData();
-			}
+			$result_data[self::ORDERS_FIELD_NAME] = OrdersCollection::filter($this->db,
+				$user,
+				array('event' => $this),
+				Fields::parseFields($fields[self::ORDERS_FIELD_NAME]['fields'] ?? ''),
+				array(
+					'length' => $fields[self::ORDERS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+					'offset' => $fields[self::ORDERS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
+				),
+				Fields::parseOrderBy($fields[self::ORDERS_FIELD_NAME]['order_by'] ?? ''))->getData();
 		}
 
 		if (isset($fields[self::NOTIFICATIONS_FIELD_NAME])) {
