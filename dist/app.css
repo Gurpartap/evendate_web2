@@ -771,6 +771,15 @@ span.-text_color_warning,
 small.-text_color_warning,
 label.-text_color_warning {color: #ff9f00}
 
+a.-text_color_error,
+p.-text_color_error,
+span.-text_color_error,
+small.-text_color_error,
+label.-text_color_error {
+	color: var(--color_error);
+	color: #fd7b6e;
+}
+
 :not(.-state_admin) a.-text_color_accent,
 :not(.-state_admin) p.-text_color_accent,
 :not(.-state_admin) span.-text_color_accent,
@@ -815,6 +824,18 @@ p.-transform_uppercase,
 span.-transform_uppercase,
 small.-transform_uppercase,
 label.-transform_uppercase {text-transform: uppercase}
+
+a.-font_weight_bolder,
+p.-font_weight_bolder,
+span.-font_weight_bolder,
+small.-font_weight_bolder,
+label.-font_weight_bolder {font-weight: 500}
+
+a.-font_weight_bold,
+p.-font_weight_bold,
+span.-font_weight_bold,
+small.-font_weight_bold,
+label.-font_weight_bold {font-weight: 500}
 
 
 /* /Typography */
@@ -2382,7 +2403,10 @@ fieldset:disabled .form_select {cursor: default}
 
 .button:not(.-empty):not(:empty) {padding: 0 1rem}
 
-.button.-size_wide {width: 100%}
+.button.-size_wide {
+	display: block;
+	width: 100%;
+}
 .button.-size_low {
 	height: 1.88rem;
 	min-width: 1.88rem;
@@ -5757,6 +5781,11 @@ body,
 	border-left: 1px solid #e2e4e8;
 	border-right: 1px solid #e2e4e8;
 }
+
+.orders_page_pay_button {
+	margin: 24px 0;
+}
+
 .orders_page_registration_fields {
 	padding: 0 24px;
 }
