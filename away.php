@@ -6,9 +6,10 @@
 	require_once "{$BACKEND_FULL_PATH}/bin/Class.Fields.php";
 	require_once "{$BACKEND_FULL_PATH}/statistics/Class.AwayRedirect.php";
 
-	App::buildGlobal($__db);
-	AwayRedirect::addAway($_REQUEST);
-
+	try{
+		App::buildGlobal($__db);
+		AwayRedirect::addAway($_REQUEST);
+	}catch (Exception $e){}
 
 	header("Location: {$_REQUEST['url']}");
 	die();

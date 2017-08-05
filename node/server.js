@@ -555,15 +555,28 @@ pg.connect(pg_conn_string, function (err, client, done) {
         let scheduler = new MailScheduler(client, handleError);
         scheduler.scheduleWeeklyEmails();
     }
+
     if (args.indexOf('--send-emails-force') !== -1) {
         let mailer = new Mailer(transporter);
         mailer.sendScheduled(client, handleError);
     }
+
     if (args.indexOf('--global-update-recommendations') !== -1) {
         globalUpdateRecommendations();
     }
+
     if (args.indexOf('--update-interests') !== -1) {
         updateAuditoryInterests();
+    }
+
+    if (args.indexOf('--schedule-after-event') !== -1) {
+        let scheduler = new MailScheduler(client, handleError);
+        scheduler.scheduleAfterEvent();
+    }
+
+    if (args.indexOf('--schedule-waiting-for-payment') !== -1) {
+        let scheduler = new MailScheduler(client, handleError);
+        scheduler.scheduleOrderWaitingPayment();
     }
 
     var ioHandlers = function (socket) {
