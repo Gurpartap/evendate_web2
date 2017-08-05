@@ -492,6 +492,25 @@ pg.connect(pg_conn_string, function (err, client, done) {
     } catch (ex) {
         logger.error(ex);
     }
+
+
+    try {
+        new CronJob('*/10 * * * *', function () {
+            let scheduler = new MailScheduler(client, handleError);
+            scheduler.scheduleAfterEvent();
+        }, null, true);
+    } catch (ex) {
+        logger.error(ex);
+    }
+
+    try {
+        new CronJob('*/10 * * * *', function () {
+            let scheduler = new MailScheduler(client, handleError);
+            scheduler.scheduleOrderWaitingPayment();
+        }, null, true);
+    } catch (ex) {
+        logger.error(ex);
+    }
 //every monday at 8:30 am
     try {
         new CronJob('30 5 * * 1', function () {
