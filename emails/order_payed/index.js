@@ -1,29 +1,31 @@
+const RenderPDF = require('../../node/node_modules/chrome-headless-render-pdf');
 
-let fs = require('fs');
-let path = require('path');
-let Utils = require('../../node/utils');
-let rest = require('../../node/restler');
-let async = require('../../node/async');
-let conversion = require('../../node/phantom-html-to-pdf');
 
 module.exports = {
-    process: function(data, cb){
-        console.log('Running file;');
+    process: function (data, cb) {
 
-        let ticket_htmls = [];
+        console.log(process.env.ENV);
+
+        let ticket_pdf = [],
+            attachments = [],
+            domain = process.env.ENV === 'prod' ? 'https://evendate.io/' : 'http://localhost/';
         data.tickets.forEach((ticket) => {
-            ticket_htmls.push((callback) => {
-                conversion({ url: 'htpps://localhost/print_ticket.php?uuid=' + ticket.uuid }, function(err, pdf) {
-                    console.log(pdf.logs);
-                    console.log(pdf.numberOfPages);
-                    pdf.stream.pipe(fs.createWriteStream('../../email_files/' + ticket.uuid + '.pdf'));
-                });
-            })
+            ticket_pdf.push({
+                    url: domain + 'print_ticket.php?uuid=' + ticket.uuid,
+                    pdf: '../email_files/' + ticket.uuid + '.pdf'
+                }
+            );
+            attachments.push({filename: ticket.uuid + '.pdf', path: '../email_files/' + ticket.uuid + '.pdf'});
         });
 
-        async.parallel(ticket_htmls);
-
-
-        return cb(data);
+        data.attachments = attachments;
+        console.log(ticket_pdf);
+        RenderPDF.generateMultiplePdf(ticket_pdf)
+            .then(() => {
+                cb(data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     }
 };

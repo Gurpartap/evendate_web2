@@ -119,7 +119,7 @@ MyOrdersPage = extending(Page, (function() {
 						__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
 					]
 				}).on('click.Pay', function() {
-					Payment.doPayment(order.uuid, order.sum);
+					Payment.doPayment('order-' + order.uuid, order.sum);
 				}) : '',
 				event_title: AbstractAppInspector.build.title('Событие'),
 				event: AbstractAppInspector.build.event(order.event),
