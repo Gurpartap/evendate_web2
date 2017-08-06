@@ -255,6 +255,7 @@ class Order extends AbstractEntity
 			'view_tickets_orders.id',
 			'view_tickets_orders.order_content',
 			'view_tickets_orders.uuid',
+			'view_tickets_orders.event_id',
 			'users.first_name',
 			'users.last_name',
 			'(SELECT SUM(price) FROM view_tickets WHERE view_tickets.status = TRUE AND view_tickets.is_canceled = FALSE AND view_tickets.ticket_order_id = view_tickets_orders.id)'
@@ -283,9 +284,9 @@ class Order extends AbstractEntity
 		} catch (BadArgumentException $be) {
 			return Payment::buildResponse(Payment::ACTION_CHECK_ORDER, 1, 'MD5 ERROR', $request['invoiceId']);
 		} catch (InvalidArgumentException $ie) {
-			return Payment::buildResponse(Payment::ACTION_CHECK_ORDER, 100, 'WRONG SUM', $request['invoiceId']);
+			return Payment::buildResponse(Payment::ACTION_CHECK_ORDER, 101, 'WRONG SUM', $request['invoiceId']);
 		} catch (Exception $e) {
-			return Payment::buildResponse(Payment::ACTION_CHECK_ORDER, 100, $e->getMessage(), $request['invoiceId']);
+			return Payment::buildResponse(Payment::ACTION_CHECK_ORDER, 102, $e->getMessage(), $request['invoiceId']);
 		}
 	}
 
@@ -328,6 +329,8 @@ class Order extends AbstractEntity
 				->where('ticket_order_id = ?', $result['id'])
 				->where('finished = TRUE');
 
+
+
 			$payments = $db->prepareExecute($q_get, '')->rowCount();
 			if ($payments > 0) throw new LogicException();
 
@@ -337,12 +340,12 @@ class Order extends AbstractEntity
 				'finished' => 'true',
 				'sum' => $request['orderSumAmount'],
 				'ticket_order_id' => $result['id'],
-				'aviso_data' => json_encode($request)
+				'aviso_data' => json_encode($request),
+				'payed_at' => (new DateTime())->format(App::DB_DATETIME_FORMAT)
 			);
 			$q_ins->into('orders_payments')
 				->cols($new_cols)
-				->onConflictUpdate(array('ticket_order_id', 'finished', 'canceled'), $new_cols)
-				->set('payed_at', 'NOW()');
+				->onConflictUpdate(array('ticket_order_id', 'finished', 'canceled'), $new_cols);
 			$db->prepareExecute($q_ins, 'CANT_UPDATE_PAYMENT');
 
 			$q_upd_order = App::queryFactory()->newUpdate();
@@ -351,6 +354,7 @@ class Order extends AbstractEntity
 					'order_status_id' => self::STATUSES[self::STATUS_PAYED]
 				))
 				->where('uuid = ?', $uuid);
+
 			$db->prepareExecute($q_upd_order, '');
 
 			$event = EventsCollection::one($db, App::getCurrentUser(), $result['event_id'], Fields::parseFields('email_texts'));

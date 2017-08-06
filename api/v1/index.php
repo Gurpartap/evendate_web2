@@ -15,6 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS'){
 }
 
 try {
+	require_once "{$BACKEND_FULL_PATH}/bin/errors/Errors.php";
 
 	require_once "{$BACKEND_FULL_PATH}/bin/Class.Result.php";
 	require_once "{$BACKEND_FULL_PATH}/bin/db.php";
@@ -22,7 +23,6 @@ try {
 	require_once "{$BACKEND_FULL_PATH}/bin/Class.Fields.php";
 	require_once "{$BACKEND_FULL_PATH}/bin/Class.AbstractEntity.php";
 	require_once "{$BACKEND_FULL_PATH}/bin/Class.AbstractCollection.php";
-	require_once "{$BACKEND_FULL_PATH}/bin/errors/Errors.php";
 	require_once "{$BACKEND_FULL_PATH}/users/Class.AbstractUser.php";
 	require_once "{$BACKEND_FULL_PATH}/users/Class.User.php";
 	require_once "{$BACKEND_FULL_PATH}/users/Class.NotAuthorizedUser.php";
