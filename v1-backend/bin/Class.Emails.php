@@ -5,6 +5,7 @@ class Emails
 
 	public static function schedule($type_code, $recipient, $data)
 	{
+		file_put_contents('php://stderr', print_r(array($type_code, $recipient, $data)));
 		$q_get_type_id = App::queryFactory()->newSelect();
 		$q_get_type_id->from('email_types')
 			->cols(array('id'))
@@ -19,6 +20,8 @@ class Emails
 				'data' => json_encode($data),
 				'status' => 'true'
 			));
+
+
 
 		App::DB()->prepareExecute($q_ins_email, 'CANT_INSERT_EMAIL');
 	}
