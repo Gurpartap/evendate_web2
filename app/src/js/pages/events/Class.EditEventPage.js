@@ -52,7 +52,11 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 				email: {type: 'email', name: 'E-mail', description: 'Текстовое поле для ввода адреса электронной почты'},
 				phone_number: {type: 'phone_number', name: 'Номер телефона', description: 'Текстовое поля для ввода номера телефона'}
 			},
-			registration_fields = [];
+			registration_fields = [],
+			ticket_types = this.event.ticket_types.filter(function(ticket_type) {
+				
+				return ticket_type.type_code !== 'registration';
+			});
 		
 		AbstractEditEventPage.prototype.preRender.call(this);
 		
@@ -61,11 +65,8 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 		
 		this.render_vars.registration_custom_fields = AbstractEditEventPage.registrationCustomFieldBuilder(this.event.registration_fields.filter(RegistrationFieldModel.isCustomField));
 		
-		this.render_vars.ticket_types = this.event.ticket_types.length ?
-		                                AbstractEditEventPage.ticketTypeRowsBuilder(this.event.ticket_types.filter(function(ticket_type) {
-			                                
-		                                	return ticket_type.type_code !== 'registration';
-		                                })) :
+		this.render_vars.ticket_types = ticket_types.length ?
+		                                AbstractEditEventPage.ticketTypeRowsBuilder(ticket_types) :
 		                                tmpl('edit-event-tickets-row-empty');
 		
 		this.render_vars.vk_post_link = this.event.vk_post_link ? __APP.BUILD.actionLink(

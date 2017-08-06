@@ -1359,7 +1359,7 @@ AbstractEditEventPage = extending(Page, (function() {
 				$collapsings = $table.find('.ExpandRow').find('.CollapsingWrapper');
 			
 			if ($table.find('tbody').length === 0) {
-				$table.append($('tbody'));
+				$table.append($('<tbody></tbody>'));
 			}
 			
 			$table = $table.find('tbody');
