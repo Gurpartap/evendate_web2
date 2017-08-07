@@ -139,7 +139,7 @@ class TicketType extends AbstractEntity
 			'sell_end_date' => $ticket_type['sell_end_date'],
 			'start_after_ticket_type_uuid' => null,
 			'start_after_ticket_type_code' => $ticket_type['start_after_ticket_type_code'],
-			'amount' => $ticket_type['amount'],
+			'amount' => isset($ticket_type['amount']) && is_numeric($ticket_type['amount']) ? (int) $ticket_type['amount'] : 1000000,
 			'min_count_per_user' => $ticket_type['min_count_per_user'],
 			'max_count_per_user' => $ticket_type['max_count_per_user'],
 			'promocode' => $ticket_type['promocode'],

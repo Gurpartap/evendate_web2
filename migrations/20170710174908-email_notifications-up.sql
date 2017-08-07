@@ -326,3 +326,6 @@ CREATE OR REPLACE VIEW view_emails_waiting_for_payment AS
         AND
         (view_tickets_orders.created_at +
          (view_events.booking_time * 3600)) - date_part('epoch', NOW() AT TIME ZONE 'UTC') BETWEEN 0 AND 3600;
+
+
+ALTER TABLE ticket_orders ADD COLUMN shop_sum_amount NUMERIC DEFAULT NULL;
