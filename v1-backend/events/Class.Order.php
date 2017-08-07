@@ -1,5 +1,7 @@
 <?php
 
+require_once "{$BACKEND_FULL_PATH}/events/Class.OrdersCollection.php";
+
 
 class Order extends AbstractEntity
 {
@@ -238,6 +240,7 @@ class Order extends AbstractEntity
 				Emails::schedule($email_type, $user_email, array(
 					'first_name' => $current_user['first_name'],
 					'event_title' => $event->getTitle(),
+					'event_id' => $event->getId(),
 					$status_code . '_text' => $event->getEmailTexts()[$status_code] ?? '',
 					'tickets' => $tickets
 				));
@@ -320,6 +323,7 @@ class Order extends AbstractEntity
 	public static function avisoPayment(array $request, ExtendedPDO $db)
 	{
 		try {
+			$db->beginTransaction();
 			$uuid = str_replace('order-', '', $request['evendate_payment_id']);
 			$result = self::getPaymentInfo($request, $db);
 
@@ -328,7 +332,6 @@ class Order extends AbstractEntity
 				->cols(array('id'))
 				->where('ticket_order_id = ?', $result['id'])
 				->where('finished = TRUE');
-
 
 
 			$payments = $db->prepareExecute($q_get, '')->rowCount();
@@ -351,15 +354,22 @@ class Order extends AbstractEntity
 			$q_upd_order = App::queryFactory()->newUpdate();
 			$q_upd_order->table('ticket_orders')
 				->cols(array(
-					'order_status_id' => self::STATUSES[self::STATUS_PAYED]
+					'order_status_id' => self::STATUSES[self::STATUS_PAYED],
+					'payed_at' => (new DateTime())->format(App::DB_DATETIME_FORMAT),
+					'shop_sum_amount' => $request['shopSumAmount']
 				))
 				->where('uuid = ?', $uuid);
 
 			$db->prepareExecute($q_upd_order, '');
+			$q_get_event = App::queryFactory()->newSelect();
+			$q_get_event->from('events')
+				->cols(array('events.title', 'events.id', 'email_texts.payed'))
+				->join('left', 'email_texts', 'events.id = email_texts.event_id')
+				->where('events.id = ?', $result['event_id']);
 
-			$event = EventsCollection::one($db, App::getCurrentUser(), $result['event_id'], Fields::parseFields('email_texts'));
+			$event = $db->prepareExecute($q_get_event, 'CANT_GET_EVENT')->fetch();
 
-			$payed_text = $event->getEmailTexts(array('payed'))['payed'];
+			$payed_text = $event['payed'];
 
 			$tickets = TicketsCollection::filter($db, App::getCurrentUser(), array(
 				'order' => OrdersCollection::oneByUUID($db, App::getCurrentUser(), $uuid, array())
@@ -367,23 +377,28 @@ class Order extends AbstractEntity
 
 			Emails::schedule(self::EMAIL_PAYED_TYPE_CODE, self::getOrderEmail($uuid), array(
 				'first_name' => $result['first_name'],
-				'event_title' => $event->getTitle(),
+				'event_title' => $event['title'],
+				'event_id' => $event['id'],
 				'payed_text' => $payed_text,
 				'tickets' => $tickets
 			));
-
-
+			$db->commit();
 			return Payment::buildResponse(Payment::ACTION_PAYMENT_AVISO, 0, 'ok', $request['invoiceId']);
 
 		} catch (NoMethodException $nmte) {
+			$db->rollBack();
 			return Payment::buildResponse(Payment::ACTION_PAYMENT_AVISO, 100, 'PAYMENT NOT FOUND', $request['invoiceId']);
 		} catch (BadArgumentException $be) {
+			$db->rollBack();
 			return Payment::buildResponse(Payment::ACTION_PAYMENT_AVISO, 1, 'MD5 ERROR', $request['invoiceId']);
 		} catch (InvalidArgumentException $ie) {
+			$db->rollBack();
 			return Payment::buildResponse(Payment::ACTION_PAYMENT_AVISO, 100, 'WRONG SUM', $request['invoiceId']);
 		} catch (LogicException $le) {
+			$db->rollBack();
 			return Payment::buildResponse(Payment::ACTION_PAYMENT_AVISO, 100, 'INVOICE PAYED', $request['invoiceId']);
 		} catch (Exception $e) {
+			$db->rollBack();
 			return Payment::buildResponse(Payment::ACTION_PAYMENT_AVISO, 100, $e->getMessage(), $request['invoiceId']);
 		}
 
