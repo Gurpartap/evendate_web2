@@ -122,6 +122,9 @@ class Errors
 			"UNEXPECTED_VALUES" => "Указаны недопустимые значения",
 			"REGISTERED_USERS_REQUIRED" => "Фильтр registered_users обязателен",
 			"BAD_REQUEST:NOT_IMPLEMENTED" => "Указанный метод не существует",
+			"CANT_SET_LEGAL_ENTITY_PAYMENT" => "Невозможно задать юрлицо для оплаты",
+			"CANT_GET_LEGAL_ENTITY_PAYMENT" => "Невозможно получить информацию об оплачивающем юрлице",
+			"CANT_MAKE_LEGAL_ENTITY" => "Данный заказ невозможно оплатить с помощью юрлица",
 			"ROLE_NAMES_ARE_REQUIRED" => "Небходимо указать роли"
 		);
 		if (isset($error_names[$error_name])) {

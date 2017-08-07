@@ -7,6 +7,7 @@ class Order extends AbstractEntity
 {
 
 	const STATUS_WAITING_PAYMENT = 'waiting_for_payment';
+	const STATUS_WAITING_PAYMENT_LEGAL_ENTITY = 'order_waiting_for_payment_legal_entity';
 	const STATUS_PAYED = 'payed';
 	const STATUS_RETURNED_BY_ORGANIZATION = 'returned_by_organization';
 	const STATUS_WITHOUT_PAYMENT = 'without_payment';
@@ -26,6 +27,7 @@ class Order extends AbstractEntity
 	const EMAIL_NOT_APPROVED_TYPE_CODE = 'order_not_approved';
 	const EMAIL_AFTER_EVENT_TYPE_CODE = 'order_after_event';
 	const EMAIL_WAITING_FOR_PAYMENT = 'order_waiting_for_payment';
+	const EMAIL_WAITING_FOR_PAYMENT_LEGAL_ENTITY = 'order_waiting_for_payment_legal_entity';
 
 
 	const STATUS_WAITING_PAYMENT_ID = 1;
@@ -40,6 +42,7 @@ class Order extends AbstractEntity
 	const REGISTRATION_STATUS_IS_PENDING_ID = 9;
 	const REGISTRATION_STATUS_APPROVED_ID = 10;
 	const REGISTRATION_STATUS_REJECTED_ID = 11;
+	const STATUS_WAITING_PAYMENT_LEGAL_ENTITY_ID = 12;
 
 
 	const REGISTRATION_STATUSES = array(
@@ -57,6 +60,8 @@ class Order extends AbstractEntity
 		self::STATUS_PAYMENT_CANCELED_AUTO => self::STATUS_PAYMENT_CANCELED_AUTO_ID,
 		self::STATUS_PAYMENT_CANCELED_BY_CLIENT => self::STATUS_PAYMENT_CANCELED_BY_CLIENT_ID,
 		self::STATUS_RETURNED_BY_CLIENT => self::STATUS_RETURNED_BY_CLIENT_ID,
+		self::STATUS_WAITING_PAYMENT_LEGAL_ENTITY => self::STATUS_WAITING_PAYMENT_LEGAL_ENTITY_ID,
+
 		self::REGISTRATION_STATUS_COMPLETED => self::REGISTRATION_STATUS_COMPLETED_ID,
 		self::REGISTRATION_STATUS_IS_PENDING => self::REGISTRATION_STATUS_IS_PENDING_ID,
 		self::REGISTRATION_STATUS_APPROVED => self::REGISTRATION_STATUS_APPROVED_ID,
@@ -73,10 +78,12 @@ class Order extends AbstractEntity
 	const STATUSES_FOR_CLIENT = array(
 		self::STATUS_PAYMENT_CANCELED_BY_CLIENT,
 		self::STATUS_RETURNED_BY_CLIENT,
+		self::STATUS_WAITING_PAYMENT_LEGAL_ENTITY,
 	);
 
 	const TICKETS_FIELD_NAME = 'tickets';
 	const USER_FIELD_NAME = 'user';
+	const PAYER_LEGAL_ENTITY_FIELD_NAME = 'payer_legal_entity';
 	const REGISTRATION_FIELDS_FIELD_NAME = 'registration_fields';
 	const REGISTRATION_STATUS_FIELD_NAME = 'registration_status';
 
@@ -102,7 +109,6 @@ class Order extends AbstractEntity
 		'payed_at',
 		'canceled_at',
 		'updated_at',
-		'status_name',
 		'status_id',
 		'sum'
 	);
@@ -130,7 +136,11 @@ class Order extends AbstractEntity
 	 */
 	public function getId(): int
 	{
-		return $this->id;
+		$q_get_id = App::queryFactory()->newSelect();
+		$q_get_id->from('ticket_orders')
+			->cols(array('id'))
+			->where('uuid = ?', $this->uuid);
+		return App::DB()->prepareExecute($q_get_id)->fetchColumn(0);
 	}
 
 	public function getUUID()
@@ -172,6 +182,9 @@ class Order extends AbstractEntity
 			$result[self::REGISTRATION_FIELDS_FIELD_NAME] = RegistrationForm::getFilledFields(App::DB(),
 				$this)->getData();
 		}
+		if (isset($fields[self::PAYER_LEGAL_ENTITY_FIELD_NAME]) && $user instanceof User) {
+			$result[self::PAYER_LEGAL_ENTITY_FIELD_NAME] = $this->getLegalEntityData();
+		}
 
 		return new Result(true, '', $result);
 	}
@@ -211,17 +224,23 @@ class Order extends AbstractEntity
 		if ($result->rowCount() > 0) {
 			$notification_type = null;
 			$email_type = null;
+			$data = array();
 			switch ($status_code) {
 				case self::REGISTRATION_STATUS_APPROVED: {
 					$notification_type = Notification::NOTIFICATION_TYPE_REGISTRATION_APPROVED;
 					$email_type = self::EMAIL_APPROVED_TYPE_CODE;
-					$tickets = TicketsCollection::filter(App::DB(), $user, array('order' => $this), array(), array(), array())->getData();
+					$data['tickets'] = TicketsCollection::filter(App::DB(), $user, array('order' => $this), array(), array(), array())->getData();
 					break;
 				}
 				case self::REGISTRATION_STATUS_REJECTED: {
 					$notification_type = Notification::NOTIFICATION_TYPE_REGISTRATION_NOT_APPROVED;
 					$email_type = self::EMAIL_NOT_APPROVED_TYPE_CODE;
-					$tickets = array();
+					$data['tickets'] = array();
+					break;
+				}
+				case self::STATUS_WAITING_PAYMENT_LEGAL_ENTITY: {
+					$email_type = self::EMAIL_WAITING_FOR_PAYMENT_LEGAL_ENTITY;
+					$data['tickets'] = $this->getLegalEntityFields();
 					break;
 				}
 			}
@@ -236,14 +255,12 @@ class Order extends AbstractEntity
 					->getParams($user, array())->getData();
 
 				$user_email = self::getOrderEmail($this->uuid);
+				$data['first_name'] = $current_user['first_name'];
+				$data['event_title'] = $event->getTitle();
+				$data['event_id'] = $event->getId();
+				$data[$status_code . '_text'] = $event->getEmailTexts()[$status_code] ?? '';
 
-				Emails::schedule($email_type, $user_email, array(
-					'first_name' => $current_user['first_name'],
-					'event_title' => $event->getTitle(),
-					'event_id' => $event->getId(),
-					$status_code . '_text' => $event->getEmailTexts()[$status_code] ?? '',
-					'tickets' => $tickets
-				));
+				Emails::schedule($email_type, $user_email, $data);
 			}
 		}
 
@@ -402,6 +419,65 @@ class Order extends AbstractEntity
 			return Payment::buildResponse(Payment::ACTION_PAYMENT_AVISO, 100, $e->getMessage(), $request['invoiceId']);
 		}
 
+	}
+
+	private function getLegalEntityFields()
+	{
+		return array(
+			'participants',
+			'company_name',
+			'company_inn',
+			'company_kpp',
+			'company_address',
+			'company_zipcode',
+			'bank_name',
+			'bank_bik',
+			'bank_correspondent_account',
+			'bank_payment_account',
+			'signer_full_name',
+			'signer_position',
+			'contact_full_name',
+			'contact_email',
+			'contact_phone_number'
+		);
+	}
+
+	public function getLegalEntityData()
+	{
+		$q_get = App::queryFactory()->newSelect();
+		$q_get->from('orders_legal_entities')
+			->cols($this->getLegalEntityFields())
+			->where('ticket_order_id = ? ', $this->getId());
+		$db = App::DB();
+		return $db->prepareExecute($q_get, 'CANT_GET_LEGAL_ENTITY_PAYMENT')->fetch();
+	}
+
+	public function makeLegalEntityPayment(array $data, Event $event)
+	{
+		if ($this->status_type_code != self::STATUS_WAITING_PAYMENT
+		&& $this->status_type_code != self::STATUS_WAITING_PAYMENT_LEGAL_ENTITY) throw new InvalidArgumentException('CANT_MAKE_LEGAL_ENTITY');
+		$check_fields = $this->getLegalEntityFields();
+		$field_names = App::loadColumnNames();
+		$cols = array();
+		foreach ($check_fields as $field) {
+			if (!isset($data[$field]) || empty(trim($data[$field]))) {
+				$field_name = $field_names[App::$__LANG]['legal_entity_fields'][$field];
+				throw new InvalidArgumentException(Errors::getDescription(App::$__LANG, 'UNEXPECTED_VALUES') . ': ' . $field_name);
+			} else {
+				$cols[$field] = $data[$field];
+			}
+		}
+		$cols['ticket_order_id'] = $this->getId();
+		$q_ins = App::queryFactory()->newInsert();
+		$q_ins->into('orders_legal_entities')
+			->cols($cols)
+			->onConflictUpdate(array('ticket_order_id'), $cols)
+			->returning(array('id'));
+		$db = App::DB();
+		$prep = $db->prepareExecute($q_ins, 'CANT_SET_LEGAL_ENTITY_PAYMENT');
+		if ($prep->rowCount() != 1) throw new LogicException('CANT_SET_LEGAL_ENTITY_PAYMENT');
+		$this->setStatus(self::STATUS_WAITING_PAYMENT_LEGAL_ENTITY, App::getCurrentUser(), $event);
+		return new Result(true, 'Данные успешно обновлены');
 	}
 
 
