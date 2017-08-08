@@ -10,13 +10,13 @@
 OneOrder = extending(OneEntity, (function() {
 	/**
 	 *
-	 * @param {(string|number)} [event_id]
-	 * @param {(string|number)} [uuid]
+	 * @param {(string|number)} [event_id=0]
+	 * @param {string} [uuid=null]
 	 *
 	 * @constructor
 	 * @constructs OneOrder
 	 *
-	 * @property {?(string|number)} uuid
+	 * @property {string}  uuid
 	 * @property {?(string|number)} user_id
 	 * @property {?(string|number)} event_id
 	 * @property {?(string|number)} number
@@ -44,7 +44,7 @@ OneOrder = extending(OneEntity, (function() {
 	function OneOrder(event_id, uuid) {
 		var self = this;
 		
-		this.uuid = setDefaultValue(uuid, 0);
+		this.uuid = setDefaultValue(uuid, null);
 		this.event_id = setDefaultValue(event_id, 0);
 		this.number = null;
 		this._order_content = null;
@@ -118,6 +118,7 @@ OneOrder = extending(OneEntity, (function() {
 	 * @enum {string}
 	 */
 	OneOrder.ORDER_STATUSES = {
+		WAITING_PAYMENT_LEGAL_ENTITY: 'order_waiting_for_payment_legal_entity',
 		WAITING_FOR_PAYMENT: 'waiting_for_payment',
 		IS_PENDING: 'is_pending',
 		
@@ -150,6 +151,7 @@ OneOrder = extending(OneEntity, (function() {
 	
 	OneOrder.isYellowStatus = function(status) {
 		switch (status) {
+			case OneOrder.EXTENDED_ORDER_STATUSES.WAITING_PAYMENT_LEGAL_ENTITY:
 			case OneOrder.EXTENDED_ORDER_STATUSES.WAITING_FOR_PAYMENT:
 			case OneOrder.EXTENDED_ORDER_STATUSES.IS_PENDING: return true;
 			
@@ -168,10 +170,25 @@ OneOrder = extending(OneEntity, (function() {
 			default: return false;
 		}
 	};
+	
+	OneOrder.isDisabledStatus = function(status) {
+		switch (status) {
+			case OneOrder.EXTENDED_ORDER_STATUSES.IS_PENDING:
+			case OneOrder.EXTENDED_ORDER_STATUSES.WAITING_PAYMENT_LEGAL_ENTITY:
+			case OneOrder.EXTENDED_ORDER_STATUSES.WAITING_FOR_PAYMENT:
+			case OneOrder.EXTENDED_ORDER_STATUSES.PAYMENT_CANCELED_AUTO:
+			case OneOrder.EXTENDED_ORDER_STATUSES.PAYMENT_CANCELED_BY_CLIENT:
+			case OneOrder.EXTENDED_ORDER_STATUSES.RETURNED_BY_ORGANIZATION:
+			case OneOrder.EXTENDED_ORDER_STATUSES.RETURNED_BY_CLIENT:
+			case OneOrder.EXTENDED_ORDER_STATUSES.REJECTED: return true;
+			
+			default: return false;
+		}
+	};
 	/**
 	 *
 	 * @param {(string|number)} event_id
-	 * @param {(string|number)} uuid
+	 * @param {string} uuid
 	 * @param {(Fields|string)} [fields]
 	 * @param {AJAXCallback} [success]
 	 *
@@ -186,7 +203,7 @@ OneOrder = extending(OneEntity, (function() {
 	/**
 	 *
 	 * @param {(string|number)} event_id
-	 * @param {(string|number)} uuid
+	 * @param {string} uuid
 	 * @param {(OneOrder.ORDER_STATUSES|OneOrder.EXTENDED_ORDER_STATUSES)} new_status
 	 * @param {AJAXCallback} [success]
 	 *
@@ -197,6 +214,50 @@ OneOrder = extending(OneEntity, (function() {
 		return __APP.SERVER.updateData('/api/v1/events/' + event_id + '/orders/' + uuid, {
 			status: new_status
 		}, false, success);
+	};
+	/**
+	 * @typedef {object} LegalEntitySendData
+	 * @property {string} participants
+	 * @property {string} company_name
+	 * @property {string} company_inn
+	 * @property {string} company_kpp
+	 * @property {string} company_address
+	 * @property {string} company_zipcode
+	 * @property {string} bank_name
+	 * @property {string} bank_bik
+	 * @property {string} bank_correspondent_account
+	 * @property {string} bank_payment_account
+	 * @property {string} signer_full_name
+	 * @property {string} signer_position
+	 * @property {string} contact_full_name
+	 * @property {string} contact_email
+	 * @property {string} contact_phone_number
+	 */
+	/**
+	 *
+	 * @param {(string|number)} event_id
+	 * @param {string} uuid
+	 * @param {LegalEntitySendData} data
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	OneOrder.makeLegalEntityPayment = function(event_id, uuid, data, success) {
+		
+		return __APP.SERVER.addData('/api/v1/events/'+event_id+'/orders/'+uuid+'/legal_entity', data, true, success);
+	};
+	/**
+	 *
+	 * @param {(string|number)} event_id
+	 * @param {string} uuid
+	 * @param {LegalEntitySendData} data
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	OneOrder.updateLegalEntityPayment = function(event_id, uuid, data, success) {
+		
+		return __APP.SERVER.updateData('/api/v1/events/'+event_id+'/orders/'+uuid+'/legal_entity', data, true, success);
 	};
 	/**
 	 *
@@ -227,6 +288,42 @@ OneOrder = extending(OneEntity, (function() {
 		
 		return OneOrder.changeStatus(this.event_id, this.uuid, new_status, function() {
 			self.status_type_code = new_status;
+			
+			if (isFunction(success)) {
+				success.call(self, self);
+			}
+		});
+	};
+	
+	/**
+	 *
+	 * @param {LegalEntitySendData} data
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	OneOrder.prototype.makeLegalEntityPayment = function(data, success) {
+		var self = this;
+		
+		return OneOrder.makeLegalEntityPayment(this.event_id, this.uuid, data, function() {
+			
+			if (isFunction(success)) {
+				success.call(self, self);
+			}
+		});
+	};
+	
+	/**
+	 *
+	 * @param {LegalEntitySendData} data
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	OneOrder.prototype.updateLegalEntityPayment = function(data, success) {
+		var self = this;
+		
+		return OneOrder.updateLegalEntityPayment(this.event_id, this.uuid, data, function() {
 			
 			if (isFunction(success)) {
 				success.call(self, self);

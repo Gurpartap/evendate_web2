@@ -10,19 +10,6 @@ __APP = {
 	EXPORT: new ServerExports(),
 	EVENDATE_BEGIN: '15-12-2015',
 	AUTH_URLS: {},
-	/**
-	 * @property {string} ip
-	 * @property {string} country_code
-	 * @property {string} country_name
-	 * @property {string} region_code
-	 * @property {string} region_name
-	 * @property {string} city
-	 * @property {string} zip_code
-	 * @property {string} time_zone
-	 * @property {number} latitude
-	 * @property {number} longitude
-	 * @property {number} metro_code
-	 */
 	TOP_BAR: new AbstractTopBar(),
 	SIDEBAR: new AbstractSidebar(),
 	USER: new CurrentUser(),
@@ -86,7 +73,9 @@ __APP = {
 			},
 			'^([0-9]+)': {
 				'order': {
-					'from_legal_entity': LegalEntityPayment,
+					'^([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})': {
+						'from_legal_entity': LegalEntityPayment
+					},
 					'': OrderPage
 				},
 				'edit': EditEventPage,
@@ -329,6 +318,7 @@ __LOCALES = {
 			TICKET_STATUSES: {
 				USED: 'Билет использован',
 				
+				WAITING_PAYMENT_LEGAL_ENTITY: 'Ожидает оплаты от юрлица',
 				WAITING_FOR_PAYMENT: 'Ожидает оплаты',
 				IS_PENDING: 'Ожидает подтверждения',
 				

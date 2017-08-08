@@ -66,20 +66,16 @@ MyOrdersPage = extending(Page, (function() {
 		var color = 'success',
 			text = localeFromNamespace(order.status_type_code, OneOrder.EXTENDED_ORDER_STATUSES, __LOCALE.TEXTS.TICKET_STATUSES);
 		
-		if (order.sum !== null) {
-			if (OneOrder.isRedStatus(order.status_type_code)) {
-				color = 'error';
-			} else if (OneOrder.isYellowStatus(order.status_type_code)) {
-				color = 'warning';
-			} else if (OneOrder.isGreenStatus(order.status_type_code)) {
-				color = 'default';
-			}
-			
-			if (order.payed_at) {
-				text = 'Оплачен '+moment.unix(order.payed_at).format(__LOCALE.DATE.DATE_TIME_FORMAT)+' — '+formatCurrency(order.sum)+' руб.'
-			}
+		if (OneOrder.isRedStatus(order.status_type_code)) {
+			color = 'error';
+		} else if (OneOrder.isYellowStatus(order.status_type_code)) {
+			color = 'warning';
 		}
-	
+		
+		if (order.sum !== null && order.payed_at) {
+			text = 'Оплачен '+moment.unix(order.payed_at).format(__LOCALE.DATE.DATE_TIME_FORMAT)+' — '+formatCurrency(order.sum)+' руб.'
+		}
+		
 		return tmpl('my-orders-order-unit-footer', {
 			text: text,
 			color: color
@@ -124,7 +120,7 @@ MyOrdersPage = extending(Page, (function() {
 				event_title: AbstractAppInspector.build.title('Событие'),
 				event: AbstractAppInspector.build.event(order.event),
 				tickets_title: AbstractAppInspector.build.title('Билеты'),
-				tickets: AbstractAppInspector.build.tickets(order.tickets)
+				tickets: order.tickets.length ? AbstractAppInspector.build.tickets(order.tickets) : 'Билетов нет'
 			}));
 			
 			self.$registration_fields_wrapper.html(tmpl('my-orders-order-registration-fields', {
