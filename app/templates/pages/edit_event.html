@@ -285,10 +285,10 @@
 						<div class="tab_body TabsBody">
 							<h2>Настройка email рассылок</h2>
 							<p class="form_text">Здесь вы можете добавить свои сообщения в email рассылку по событию</p>
-							<div class="EmailTicketing -hidden">
+							<div class="form_unit EmailTicketing -hidden">
 								{email_payed_form_unit}
 							</div>
-							<div class="EmailRegistration -hidden">
+							<div class="form_unit EmailRegistration -hidden">
 								{email_approved_form_unit}
 								{email_not_approved_form_unit}
 							</div>
@@ -536,7 +536,7 @@
 									{tickets_sell_start_date_select}
 								</fieldset>
 							</div>
-							<fieldset class="form_group -align_left TicketTypeSellAfterFieldset" disabled>
+							<fieldset class="-align_left TicketTypeSellAfterFieldset" disabled>
 								{tickets_sell_start_after_checkbox}
 								<fieldset class="form_unit Switching" data-switch_id="ticket_type_{row_num}_start_after" disabled>
 									{tickets_sell_start_after_select}
