@@ -81,6 +81,19 @@ $__modules['events'] = array(
 				$__order_by ?? array()
 			);
 		},
+		'{/(id:[0-9]+)/promocodes}' => function ($event_id) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
+
+			if ($__user instanceof User == false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
+			$__request['statistics_event'] = EventsCollection::one($__db, $__user, $event_id, array());
+
+			return PromocodesCollection::filter($__db,
+				$__user,
+				$__request,
+				$__fields,
+				$__pagination,
+				$__order_by ?? array()
+			);
+		},
 		'{/(id:[0-9]+)/orders/(uuid:\w+-\w+-\w+-\w+-\w+)}' => function ($event_id, $uuid) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
 
 			if ($__user instanceof User == false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);

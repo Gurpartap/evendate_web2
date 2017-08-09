@@ -134,8 +134,6 @@ CREATE OR REPLACE VIEW view_registration_field_values AS
     INNER JOIN view_tickets_orders ON registration_field_values.ticket_order_id = view_tickets_orders.id;
 
 
-
-
 CREATE OR REPLACE VIEW view_all_events AS
   SELECT DISTINCT
     events.id :: INT,
@@ -149,7 +147,7 @@ CREATE OR REPLACE VIEW view_all_events AS
     events.longitude :: REAL,
     events.location,
     events.min_price,
-    DATE_PART('epoch', events.public_at :: TIMESTAMPTZ) :: INT                             AS public_at,
+    DATE_PART('epoch', events.public_at :: TIMESTAMP) :: INT                               AS public_at,
     (events.status = FALSE AND events.public_at IS NOT
                                NULL)                                                       AS is_delayed,
     events.status,
@@ -159,7 +157,7 @@ CREATE OR REPLACE VIEW view_all_events AS
     vk_posts.image_path                                                                    AS vk_image_path,
     vk_posts.message                                                                       AS vk_message,
     events.registration_required,
-    DATE_PART('epoch', events.registration_till :: TIMESTAMPTZ) :: INT                     AS registration_till,
+    DATE_PART('epoch', events.registration_till :: TIMESTAMP) :: INT                       AS registration_till,
     events.is_free,
     ((SELECT SUM(counter)
       FROM (SELECT DISTINCT
@@ -226,7 +224,7 @@ CREATE OR REPLACE VIEW view_all_events AS
     view_organizations.is_private                                                          AS organization_is_private,
     events.first_event_date                                                                AS first_event_date_dt,
     events.last_event_date                                                                 AS last_event_date_dt,
-    DATE_PART('epoch', events.registration_since :: TIMESTAMPTZ) :: INT                    AS registration_since,
+    DATE_PART('epoch', events.registration_since :: TIMESTAMP) :: INT                      AS registration_since,
     events.ticketing_locally,
     events.is_online,
     view_organizations.city_id,
@@ -262,7 +260,6 @@ CREATE OR REPLACE VIEW view_events AS
   WHERE status = TRUE;
 
 
-
 CREATE OR REPLACE VIEW view_emails_after_event AS
   SELECT
     view_events.title       AS event_title,
@@ -295,11 +292,11 @@ DROP VIEW view_emails_waiting_for_payment;
 
 CREATE OR REPLACE VIEW view_emails_waiting_for_payment AS
   SELECT
-    view_events.title                                                             AS event_title,
-    view_events.id                                                                AS event_id,
+    view_events.title                                                                  AS event_title,
+    view_events.id                                                                     AS event_id,
     view_events.organization_id,
     view_events.image_horizontal_large_url,
-    view_tickets_orders.uuid                                                      AS order_uuid,
+    view_tickets_orders.uuid                                                           AS order_uuid,
     (view_tickets_orders.created_at +
      (view_events.booking_time * 3600)) - date_part('epoch', NOW() AT TIME ZONE 'UTC') AS time_to_pay,
     "users"."email",
@@ -308,13 +305,13 @@ CREATE OR REPLACE VIEW view_emails_waiting_for_payment AS
      FROM tokens
      WHERE user_id = users.id
      ORDER BY id DESC
-     LIMIT 1)                                                                     AS token,
+     LIMIT 1)                                                                          AS token,
     (SELECT value
      FROM view_registration_field_values
      WHERE "view_registration_field_values"."ticket_order_id" = "view_tickets_orders"."id"
            AND "view_registration_field_values"."form_field_type" = 'email'
      ORDER BY value DESC
-     LIMIT 1)                                                                     AS "form_email"
+     LIMIT 1)                                                                          AS "form_email"
   FROM view_tickets_orders
     INNER JOIN view_events ON view_tickets_orders.event_id = view_events.id
     INNER JOIN users ON view_tickets_orders.user_id = users.id
@@ -328,4 +325,5 @@ CREATE OR REPLACE VIEW view_emails_waiting_for_payment AS
          (view_events.booking_time * 3600)) - date_part('epoch', NOW() AT TIME ZONE 'UTC') BETWEEN 0 AND 3600;
 
 
-ALTER TABLE ticket_orders ADD COLUMN shop_sum_amount NUMERIC DEFAULT NULL;
+ALTER TABLE ticket_orders
+  ADD COLUMN shop_sum_amount NUMERIC DEFAULT NULL;
