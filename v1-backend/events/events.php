@@ -51,6 +51,22 @@ $__modules['events'] = array(
 			echo file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/qr/' . $event_id . '/' . $uuid . '?format=' . $format . '&size=' . $size);
 			die();
 		},
+		'{/(id:[0-9]+)/tickets/(uuid:\w+-\w+-\w+-\w+-\w+)/export}' => function ($event_id, $uuid) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+
+			global $ROOT_PATH;
+			header('Content-type: application/pdf');
+			header('Content-Disposition: attachment; filename=ticket-' . $uuid . '.pdf');
+			header('Pragma: no-cache');
+
+
+			if (file_exists($ROOT_PATH . 'email_files/' . $uuid . '.pdf')) {
+				echo file_get_contents($ROOT_PATH . '/email_files/' . $uuid . '.pdf');
+			} else {
+				file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/pdf/tickets/' . $uuid);
+				echo file_get_contents($ROOT_PATH . '/email_files/' . $uuid . '.pdf');
+			}
+			die();
+		},
 		'{/(id:[0-9]+)/tickets}' => function ($event_id) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
 
 			if ($__user instanceof User == false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
