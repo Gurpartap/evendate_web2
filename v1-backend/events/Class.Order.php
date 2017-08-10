@@ -110,12 +110,25 @@ class Order extends AbstractEntity
 		'canceled_at',
 		'updated_at',
 		'status_id',
-		'sum'
+		'sum',
+		'final_sum',
 	);
 
 
-	public static function create(Event $event, AbstractUser $user, ExtendedPDO $db, array $data)
+	public static function create(Event $event, AbstractUser $user, ExtendedPDO $db, array $data, $promocode = null)
 	{
+
+		if (isset($promocode)) {
+			try {
+				$promocode = PromocodesCollection::filter($db, $user, array('event_id' => $event->getId(), 'code' => $promocode), array('id'), array(), array());
+				$promocode_id = $promocode->getId();
+			} catch (Exception $e) {
+				$promocode_id = null;
+			}
+		} else {
+			$promocode_id = null;
+		}
+
 		$q_get = App::queryFactory()->newInsert();
 		$q_get->into('ticket_orders')
 			->cols(array(
@@ -123,12 +136,41 @@ class Order extends AbstractEntity
 				'user_id' => $user->getId(),
 				'order_content' => json_encode($data),
 				'sum' => 0,
-				'order_status_id' => $event->getTicketingLocally() ? self::STATUS_WAITING_PAYMENT_ID : self::STATUS_WITHOUT_PAYMENT_ID
+				'order_status_id' => $event->getTicketingLocally() ? self::STATUS_WAITING_PAYMENT_ID : self::STATUS_WITHOUT_PAYMENT_ID,
+				'promocode_id' => $promocode_id
 			))
 			->returning(array('uuid', 'id'));
 		$res = $db->prepareExecute($q_get, 'CANT_INSERT_ORDER')->fetch();
 
 		return array('id' => $res['id'], 'uuid' => $res['uuid']);
+	}
+
+	public static function updateSum($id, ExtendedPDO $db)
+	{
+		$q_upd = 'UPDATE ticket_orders SET sum = subquery.sum,
+			final_sum = subquery.final_sum
+			FROM (
+				SELECT 
+				COALESCE(view_tickets_orders.sum, 0) AS sum,
+				promocodes.effort,
+				promocodes.is_fixed, 
+				promocodes.is_percentage,
+				CASE 
+			WHEN promocodes.enabled = FALSE THEN COALESCE(view_tickets_orders.sum, 0) 
+			WHEN promocodes.enabled = TRUE AND promocodes.is_fixed = TRUE 
+				THEN (COALESCE(view_tickets_orders.sum, 0) - promocodes.effort)
+			WHEN promocodes.enabled = TRUE AND promocodes.is_percentage = TRUE 
+				THEN (COALESCE(view_tickets_orders.sum, 0) - (promocodes.effort / 100 * COALESCE(view_tickets_orders.sum, 0)))
+				END AS final_sum,
+				promocodes.enabled
+				FROM view_tickets_orders
+				LEFT JOIN promocodes ON promocodes.id = view_tickets_orders.promocode_id
+				WHERE view_tickets_orders.id = :order_id) AS subquery
+				WHERE ticket_orders.id = :order_id
+				RETURNING *';
+
+		$upd = $db->prepareExecuteRaw($q_upd, array(':order_id' => $id), 'CANT_INSERT_ORDER_SUM')->fetch();
+
 	}
 
 	/**
@@ -188,7 +230,6 @@ class Order extends AbstractEntity
 
 		return new Result(true, '', $result);
 	}
-
 
 	public function setStatus(string $status_code, User $user, Event $event)
 	{
@@ -278,7 +319,8 @@ class Order extends AbstractEntity
 			'view_tickets_orders.event_id',
 			'users.first_name',
 			'users.last_name',
-			'(SELECT SUM(price) FROM view_tickets WHERE view_tickets.status = TRUE AND view_tickets.is_canceled = FALSE AND view_tickets.ticket_order_id = view_tickets_orders.id)'
+			'view_tickets_orders.sum',
+			'view_tickets_orders.final_sum'
 		))
 			->from('view_tickets_orders')
 			->join('inner', 'users', 'users.id = view_tickets_orders.user_id')
@@ -295,7 +337,7 @@ class Order extends AbstractEntity
 			if (!Payment::checkMd5($request)) throw new BadArgumentException('', $db);
 			$result = self::getPaymentInfo($request, $db);
 			if ($result == false) throw new NoMethodException('', $db);
-			if ((float)$result['sum'] != (float)$request['orderSumAmount']) throw new InvalidArgumentException('', $db);
+			if ((float)$result['final_sum'] != (float)$request['orderSumAmount']) throw new InvalidArgumentException('', $db);
 
 
 			return Payment::buildResponse(Payment::ACTION_CHECK_ORDER, 0, 'ok', $request['invoiceId']);
@@ -455,7 +497,8 @@ class Order extends AbstractEntity
 	public function makeLegalEntityPayment(array $data, Event $event)
 	{
 		if ($this->status_type_code != self::STATUS_WAITING_PAYMENT
-		&& $this->status_type_code != self::STATUS_WAITING_PAYMENT_LEGAL_ENTITY) throw new InvalidArgumentException('CANT_MAKE_LEGAL_ENTITY');
+			&& $this->status_type_code != self::STATUS_WAITING_PAYMENT_LEGAL_ENTITY
+		) throw new InvalidArgumentException('CANT_MAKE_LEGAL_ENTITY');
 		$check_fields = $this->getLegalEntityFields();
 		$field_names = App::loadColumnNames();
 		$cols = array();

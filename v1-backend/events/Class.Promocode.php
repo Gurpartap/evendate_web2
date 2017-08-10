@@ -25,20 +25,77 @@ class Promocode extends AbstractEntity
 		self::USE_COUNT => '(SELECT COUNT(view_tickets_orders.id) 
 			FROM view_tickets_orders 
 			INNER JOIN events ON events.id = view_tickets_orders.event_id
-		 	INNER JOIN users_organizations ON users_organizations.organizations_id = events.organization_id 
+		 	INNER JOIN users_organizations ON users_organizations.organization_id = events.organization_id 
 		 		AND users_organizations.user_id = :user_id AND users_organizations.status = TRUE and users_organizations.role_id = 1
 			WHERE view_tickets_orders.event_id = view_promocodes.event_id
-			AND (view_tickets_orders.status_id = 2 OR view_tickets_orders.status_id = 13)) AS ' . self::USE_COUNT,
+			AND view_tickets_orders.status_id IN (1, 2, 8, 9, 10, 12, 13)) AS ' . self::USE_COUNT,
 
 		self::TOTAL_EFFORT => '(SELECT COUNT(view_tickets_orders.id) 
 			FROM view_tickets_orders
 			INNER JOIN events ON events.id = view_tickets_orders.event_id
-		 	INNER JOIN users_organizations ON users_organizations.organizations_id = events.organization_id 
+		 	INNER JOIN users_organizations ON users_organizations.organization_id = events.organization_id 
 		 		AND users_organizations.user_id = :user_id AND users_organizations.status = TRUE and users_organizations.role_id = 1
 			WHERE view_tickets_orders.event_id = view_promocodes.event_id
-			AND (view_tickets_orders.status_id = 2 OR view_tickets_orders.status_id = 13)) AS ' . self::TOTAL_EFFORT
+			AND view_tickets_orders.status_id IN (1, 2, 8, 9, 10, 12, 13)) AS ' . self::TOTAL_EFFORT
 	);
 
+
+
+	public static function checkData(array $data, $extremum_dates)
+	{
+		if (!isset($data['code']) || empty(trim($data['code']))) throw new InvalidArgumentException('PROMOCODE_NAME_REQUIRED');
+		$data['is_fixed'] = filter_var($data['is_fixed'], FILTER_VALIDATE_BOOLEAN);
+		$data['is_percentage'] = filter_var($data['is_percentage'], FILTER_VALIDATE_BOOLEAN);
+		$data['enabled'] = filter_var($data['enabled'], FILTER_VALIDATE_BOOLEAN);
+
+		if (($data['is_fixed'] == false && $data['is_percentage'] == false)
+			|| ($data['is_fixed'] == true && $data['is_percentage'] == true)
+		) throw new InvalidArgumentException('PROMOCODE_TYPE_ERROR');
+
+		if (!isset($data['effort']) || !is_numeric($data['effort']) || ((float)$data['effort'] <= 0))
+			throw new InvalidArgumentException('BAD_EFFORT_VALUE');
+
+		if ($data['is_percentage']){
+			if ($data['effort'] > 100 || $data['effort'] < 1) throw new InvalidArgumentException('BAD_EFFORT_VALUE');
+		}
+
+		if (isset($data['use_limit']) && (!is_numeric($data['use_limit']) || ((float)$data['effort'] <= 0)))
+			throw new InvalidArgumentException('BAD_USE_LIMITS');
+
+		if (isset($data['use_limit']) && (!is_numeric($data['use_limit']) || ((float)$data['effort'] <= 0)))
+			throw new InvalidArgumentException('BAD_USE_LIMITS');
+
+		if (isset($data['start_date'])) {
+			try {
+				$data['start_date'] = new DateTime($data['start_date']);
+				if ($data['start_date'] > $extremum_dates['last_event_date']) throw new InvalidArgumentException('');
+			} catch (Exception $e) {
+				throw new InvalidArgumentException('BAD_START_DATE');
+			}
+		} else {
+			$data['start_date'] = new DateTime();
+		}
+
+		if (isset($data['end_date'])) {
+			try {
+				$data['end_date'] = new DateTime($data['end_date']);
+				if ($data['end_date'] > $extremum_dates['last_event_date']) throw new InvalidArgumentException('');
+			} catch (Exception $e) {
+				throw new InvalidArgumentException('BAD_END_DATE');
+			}
+		} else {
+			$data['end_date'] = $extremum_dates['last_event_date'];
+		}
+		if ($data['end_date'] < $data['start_date']) throw new InvalidArgumentException('BAD_END_DATE');
+
+		$data['is_fixed'] = $data['is_fixed'] ? 'true' : 'false';
+		$data['is_percentage'] = $data['is_percentage'] ? 'true' : 'false';
+		$data['enabled'] = $data['enabled'] ? 'true' : 'false';
+
+
+		return $data;
+
+	}
 
 
 

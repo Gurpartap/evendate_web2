@@ -133,6 +133,22 @@ CREATE OR REPLACE VIEW view_events AS
   FROM view_all_events
   WHERE status = TRUE;
 
+DELETE FROM ticket_types
+WHERE
+  ticket_types.status = FALSE
+  AND type_code IN (SELECT type_code
+                    FROM ticket_types
+                    WHERE ticket_types.status = TRUE)
+  AND id NOT IN (SELECT ticket_type_id
+                 FROM tickets);
+
+ALTER TABLE "ticket_types"
+  DROP CONSTRAINT ticket_types_event_id_status_type_code_key;
+
+ALTER TABLE ticket_types
+  ADD UNIQUE (event_id, type_code);
+
+
 ALTER TABLE ticket_orders
   DROP COLUMN promocode_id;
 DROP VIEW view_promocodes;
@@ -151,7 +167,8 @@ CREATE TABLE promocodes (
   end_date      TIMESTAMP,
   enabled       BOOLEAN                             DEFAULT TRUE,
   created_at    TIMESTAMP                           DEFAULT NOW(),
-  updated_at    TIMESTAMP                  NOT NULL
+  updated_at    TIMESTAMP                           DEFAULT NULL,
+  UNIQUE (event_id, code)
 );
 
 CREATE OR REPLACE VIEW view_promocodes AS
@@ -163,16 +180,90 @@ CREATE OR REPLACE VIEW view_promocodes AS
     is_fixed,
     is_percentage,
     effort,
-    DATE_PART('epoch', promocodes.start_date :: TIMESTAMP) :: INT AS start_date,
-    DATE_PART('epoch', promocodes.end_date :: TIMESTAMP) :: INT   AS end_date,
+    DATE_PART('epoch', promocodes.start_date :: TIMESTAMP) :: INT                               AS start_date,
+    DATE_PART('epoch', promocodes.end_date :: TIMESTAMP) :: INT                                 AS end_date,
     enabled,
-    DATE_PART('epoch', promocodes.created_at :: TIMESTAMP) :: INT AS created_at,
-    DATE_PART('epoch', promocodes.updated_at :: TIMESTAMP) :: INT AS updated_at
+    DATE_PART('epoch', promocodes.created_at :: TIMESTAMP) :: INT                               AS created_at,
+    DATE_PART('epoch', promocodes.updated_at :: TIMESTAMP) :: INT                               AS updated_at,
+    ((NOW() BETWEEN promocodes.start_date AND promocodes.end_date) AND
+     (SELECT COUNT(view_tickets_orders.id)
+      FROM view_tickets_orders
+        INNER JOIN events ON events.id = view_tickets_orders.event_id
+      WHERE view_tickets_orders.event_id = promocodes.event_id
+        AND view_tickets_orders.promocode_id = promocodes.id
+            AND view_tickets_orders.status_id IN (2, 8, 9, 10, 12, 13)) < promocodes.use_limit) AS
+                                                                                                   is_active,
+    use_limit,
+    (SELECT COUNT(view_tickets_orders.id)
+     FROM view_tickets_orders
+       INNER JOIN events ON events.id = view_tickets_orders.event_id
+     WHERE view_tickets_orders.event_id = promocodes.event_id
+           AND view_tickets_orders.promocode_id = promocodes.id
+           AND view_tickets_orders.status_id IN (2, 8, 9, 10, 12, 13)) AS used_times
   FROM promocodes;
 
 ALTER TABLE ticket_orders
   ADD COLUMN promocode_id INT REFERENCES promocodes (id) DEFAULT NULL;
 
 ALTER TABLE ticket_orders
-  ADD COLUMN final_price NUMERIC DEFAULT NULL;
+  ADD COLUMN final_sum NUMERIC DEFAULT NULL;
 
+
+CREATE OR REPLACE VIEW view_tickets_orders AS
+  SELECT
+    ticket_orders.id,
+    ticket_orders.uuid,
+    ticket_orders.user_id,
+    ticket_orders.order_content,
+    ticket_orders.event_id :: INT,
+    ticket_orders.is_canceled,
+    DATE_PART('epoch', ticket_orders.payed_at) :: INT                                            AS payed_at,
+    DATE_PART('epoch', ticket_orders.canceled_at) :: INT                                         AS canceled_at,
+    DATE_PART('epoch', ticket_orders.created_at) :: INT                                          AS created_at,
+    DATE_PART('epoch', ticket_orders.updated_at) :: INT                                          AS updated_at,
+    tickets_orders_statuses.type_code                                                            AS status_type_code,
+    tickets_orders_statuses.name                                                                 AS status_name,
+    tickets_orders_statuses.id                                                                   AS status_id,
+    RPAD(ticket_orders.id :: TEXT || '00' || reverse((ticket_orders.id * 1610) :: TEXT), 9, '0') AS number,
+    money.sum,
+    st.payed,
+    CASE WHEN COALESCE(ticket_orders.final_sum, money.sum) < 0
+      THEN 0
+    ELSE COALESCE(ticket_orders.final_sum, money.sum) END                                        AS final_sum,
+    ticket_orders.promocode_id
+  FROM ticket_orders
+    INNER JOIN events ON events.id = ticket_orders.event_id
+    LEFT JOIN (SELECT
+                 SUM(tickets.price),
+                 tickets.ticket_order_id
+               FROM tickets
+               WHERE tickets.status = TRUE
+               GROUP BY tickets.ticket_order_id) AS money(sum, ticket_order_id)
+      ON money.ticket_order_id = ticket_orders.id
+    LEFT JOIN (SELECT
+                 COUNT(id),
+                 orders_payments.ticket_order_id
+               FROM orders_payments
+               WHERE orders_payments.canceled = FALSE AND
+                     orders_payments.finished = TRUE
+               GROUP BY orders_payments.ticket_order_id) AS st(payed, ticket_order_id)
+      ON st.ticket_order_id = ticket_orders.id
+    INNER JOIN tickets_orders_statuses ON tickets_orders_statuses.id =
+                                          (CASE
+                                           WHEN events.registration_approvement_required IS TRUE
+                                                AND money.sum :: REAL = 0 :: REAL
+                                                AND ticket_orders.order_status_id = 4
+                                             THEN 9 :: INT -- should not pay for tickets
+
+                                           WHEN money.sum :: REAL > 0 :: REAL
+                                                AND st.payed > 0
+                                             THEN 2 :: INT -- payed for tickets
+
+                                           WHEN money.sum :: REAL > 0 :: REAL
+                                                AND (st.payed = 0 OR st.payed IS NULL)
+                                                AND NOW() AT TIME ZONE 'UTC' - ticket_orders.created_at >
+                                                    (SELECT e.booking_time * '1 hour' :: INTERVAL
+                                                     FROM events AS e
+                                                     WHERE e.id = ticket_orders.event_id)
+                                             THEN 5 :: INT -- payment canceled auto
+                                           ELSE ticket_orders.order_status_id END);
