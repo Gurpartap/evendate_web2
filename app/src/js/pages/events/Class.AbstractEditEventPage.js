@@ -67,6 +67,8 @@ AbstractEditEventPage = extending(Page, (function() {
 			ticket_types: null,
 			add_ticket_type_button: null,
 			booking_time_input: null,
+			promocodes: null,
+			add_promocode_button: null,
 			
 			public_at_date_select: null,
 			public_at_time_input: null,
@@ -126,6 +128,7 @@ AbstractEditEventPage = extending(Page, (function() {
 	
 	AbstractEditEventPage.lastRegistrationFieldId = 0;
 	AbstractEditEventPage.lastTicketTypeRowId = 0;
+	AbstractEditEventPage.lastPromocodeRowId = 0;
 	/**
 	 *
 	 * @param {RegistrationFieldModel|Array<RegistrationFieldModel>|RegistrationFieldModelsCollection} [registration_data]
@@ -437,6 +440,58 @@ AbstractEditEventPage = extending(Page, (function() {
 	};
 	/**
 	 *
+	 * @param {(PromocodeModel|Array<PromocodeModel>|PromocodeModelsCollection)} [promocodes]
+	 *
+	 * @return {jQuery}
+	 */
+	AbstractEditEventPage.promocodeRowsBuilder = function(promocodes) {
+		var _promocodes = promocodes ? (promocodes instanceof Array ? promocodes : [promocodes]) : [new PromocodeModel()],
+			$rows;
+		
+		$rows = tmpl('edit-event-promocode-row', _promocodes.map(function(promocode) {
+			var row_id = ++AbstractEditEventPage.lastPromocodeRowId,
+				is_enabled = promocode.enabled !== false;
+			
+			return {
+				id: row_id,
+				uuid: promocode.uuid,
+				code_input: __APP.BUILD.formUnit({
+					name: 'promocode_'+row_id+'_code',
+					value: promocode.code,
+					placeholder: 'Введите промокод',
+					readonly: is_enabled ? undefined : true,
+					required: true
+				}),
+				effort_input: __APP.BUILD.inputNumber({
+					name: 'promocode_'+row_id+'_effort',
+					value: promocode.effort,
+					placeholder: '0',
+					readonly: is_enabled ? undefined : true,
+					required: true
+				}),
+				type_switch: __APP.BUILD.switch('event_edit_promocode_'+row_id+'_is_fixed', 'promocode_'+row_id+'_is_fixed', promocode.is_fixed),
+				service_control: promocode.uuid ?
+				                 __APP.BUILD.switch('event_edit_promocode_'+row_id+'_enabled', 'promocode_'+row_id+'_enabled', promocode.enabled) :
+				                 __APP.BUILD.button({
+					                 title: '×',
+					                 classes: [
+					                 	'event_edit_row_delete_button',
+					                  __C.CLASSES.COMPONENT.ACTION,
+					                  __C.CLASSES.UNIVERSAL_STATES.EMPTY,
+					                  'PromocodeDeleteButton'
+					                 ]
+				                 })
+			};
+		}));
+		
+		$rows.find('.PromocodeDeleteButton').on('click', function() {
+			$(this).closest('.PromocodeRow').remove();
+		});
+	
+		return $rows;
+	};
+	/**
+	 *
 	 * @param {jQuery} $wrapper - .TicketTypes
 	 */
 	AbstractEditEventPage.checkTicketTypeSellAfter = function($wrapper) {
@@ -589,6 +644,24 @@ AbstractEditEventPage = extending(Page, (function() {
 			});
 			send_data.ticketing_locally = true;
 			send_data.booking_time = +form_data.booking_time === 0 ? 1 : form_data.booking_time;
+		}
+		
+		if (form_data.promocodes) {
+			send_data.promocodes = (form_data.promocodes instanceof Array ? form_data.promocodes : [form_data.promocodes]).map(function(id) {
+				
+				return {
+					uuid: form_data['promocode_' + id + '_uuid'] || null,
+					code: form_data['promocode_' + id + '_code'],
+					effort: form_data['promocode_' + id + '_effort'],
+					is_fixed: form_data['promocode_' + id + '_is_fixed'],
+					is_percentage: !form_data['promocode_' + id + '_is_fixed'],
+					enabled: form_data['promocode_' + id + '_enabled'] !== false,
+					
+					use_limit: form_data['promocode_' + id + '_use_limit'] || null,
+					start_date: form_data['promocode_' + id + '_start_date'] || null,
+					end_date: form_data['promocode_' + id + '_end_date'] || null,
+				};
+			});
 		}
 		
 		if (form_data.delayed_publication) {
@@ -1388,6 +1461,25 @@ AbstractEditEventPage = extending(Page, (function() {
 			required: true,
 			attributes: {
 				size: 2
+			}
+		});
+		
+		this.render_vars.add_promocode_button = __APP.BUILD.actionButton({
+			title: 'Добавить промокод',
+			classes: [__C.CLASSES.COLORS.ACCENT, __C.CLASSES.ICON_CLASS, __C.CLASSES.ICONS.PLUS]
+		}).on('click.AddPromocodeRow', function() {
+			var $table = self.$wrapper.find('.Promocodes');
+			
+			if ($table.find('tbody').length === 0) {
+				$table.append($('<tbody></tbody>'));
+			}
+			
+			$table = $table.find('tbody');
+			
+			if ($table.children().length === 1 && $table.children().hasClass('EmptyRow')) {
+				$table.html(AbstractEditEventPage.promocodeRowsBuilder());
+			} else {
+				$table.append(AbstractEditEventPage.promocodeRowsBuilder());
 			}
 		});
 		

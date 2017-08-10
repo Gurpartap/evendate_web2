@@ -16,6 +16,7 @@ __C = {
 		FLOATING_MATERIAL: 'material -floating_material',
 		IMG_HOLDER: 'img_holder',
 		COMPONENT: {
+			ACTION: 'action',
 			BUTTON: 'button'
 		},
 		TEXT_COLORS: {

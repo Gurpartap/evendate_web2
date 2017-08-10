@@ -69,6 +69,10 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 		                                AbstractEditEventPage.ticketTypeRowsBuilder(ticket_types) :
 		                                tmpl('edit-event-tickets-row-empty');
 		
+		this.render_vars.promocodes = this.event.promocodes.length ?
+		                              AbstractEditEventPage.promocodeRowsBuilder(this.event.promocodes) :
+		                              tmpl('edit-event-promocode-row-empty');
+		
 		this.render_vars.vk_post_link = this.event.vk_post_link ? __APP.BUILD.actionLink(
 			this.event.vk_post_link,
 			'Страница публикации во Вконтакте',

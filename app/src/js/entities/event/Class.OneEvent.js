@@ -79,6 +79,8 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @property {TagsCollection} tags
 	 *
+	 * @property {PromocodeModelsCollection} promocodes
+	 *
 	 * @property {NotificationsCollection} notifications
 	 *
 	 * @property {UsersCollection} favored
@@ -159,6 +161,8 @@ OneEvent = extending(OneEntity, (function() {
 		this.nearest_event_date = null;
 		
 		this.tags = new TagsCollection();
+		
+		this.promocodes = new PromocodeModelsCollection();
 		
 		this.notifications = new NotificationsCollection();
 		

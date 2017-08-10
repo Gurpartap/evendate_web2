@@ -939,9 +939,9 @@ fieldset:disabled .form_select {cursor: default}
 }
 
 .form_label {
-	display: block;
+	display: inline-block;
 	font-weight: 500;
-	margin: 0 0 .5em;
+	margin: 0 .5em .5em 0;
 	text-align: left;
 }
 
@@ -1032,6 +1032,9 @@ fieldset:disabled .form_select {cursor: default}
 	padding: .25rem .5rem;
 	resize: none;
 }
+
+.form_textarea.-expanding:focus,
+.form_textarea.-expanding[required]:valid {height: 30em}
 
 .form_select {
 	-moz-appearance: none;
@@ -1383,6 +1386,75 @@ fieldset:disabled .form_select {cursor: default}
 .radio_group > .form_unit > .form_label:after {content: initial}
 
 /* /Form Radio Group */
+/* Form Switch */
+
+.form_switch {
+	display: inline-block;
+	vertical-align: middle;
+	width: 2.25em;
+	height: 0.875em;
+	margin: 0.1875em 0;
+	font-size: 1rem;
+	cursor: pointer;
+}
+
+.form_switch > input {display: none !important}
+
+.form_switch > .form_switch_road {
+	display: block;
+	height: 100%;
+	border-radius: 0.5em;
+	background-color: #657184;
+	opacity: .5;
+	transition: background-color .2s ease;
+}
+
+.form_switch > .form_switch_runner {
+	content: '';
+	position: absolute;
+	top: 0;
+	display: inline-block;
+	width: 1.25em;
+	height: 1.25em;
+	margin: -0.1875em;
+	border-radius: 50%;
+	background-color: #f1f1f1;
+	box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.24), 0 0 1px 0 rgba(0, 0, 0, 0.12);
+	transform: translateX(0%);
+	transition: transform .2s ease, background-color .2s ease;
+}
+
+.form_switch > input:checked ~ .form_switch_road {
+	background-color: #f82969;
+	background-color: var(--color_accent);
+}
+
+.-state_admin .form_switch > input:checked ~ .form_switch_road {
+	background-color: #00dc88;
+	background-color: var(--color_accent);
+}
+
+.form_switch > input:checked ~ .form_switch_runner {
+	background-color: #f82969;
+	background-color: var(--color_accent);
+	transform: translateX(calc(100% + 0.1875em));
+}
+
+.-state_admin .form_switch > input:checked ~ .form_switch_runner {
+	background-color: #00dc88;
+	background-color: var(--color_accent);
+}
+
+.form_unit > .form_switch + .form_label {
+	display: inline;
+	vertical-align: middle;
+	margin: 0 10px;
+	font-size: .9em;
+	text-align: left;
+	white-space: normal;
+}
+
+/* /Form Switch */
 /* Form -inline */
 
 .form_unit.-inline {
@@ -4786,7 +4858,7 @@ body,
 .edit_event_registration_custom_field_value:hover > .edit_event_registration_custom_field_value_remove_button,
 .edit_event_registration_custom_field_value_input:focus + .edit_event_registration_custom_field_value_remove_button {visibility: visible}
 
-.event_edit_ticket_types_table {
+.event_edit_table {
 	margin-bottom: 24px;
 }
 
@@ -4794,7 +4866,7 @@ body,
 	margin-bottom: 0;
 }
 
-.event_edit_ticket_type_delete_button,
+.event_edit_row_delete_button,
 .event_edit_ticket_type_expand_button {
 	flex: none;
 	width: 32px;
@@ -4803,7 +4875,7 @@ body,
 
 .event_edit_ticket_type_expand_button {}
 
-.event_edit_ticket_type_delete_button {
+.event_edit_row_delete_button {
 	font-size: 2em;
 	line-height: 1;
 	font-weight: 100;

@@ -22,6 +22,18 @@ Builder = (function() {
 	 * @typedef {(Array<string>|Object<string, (string|number)>)} HTMLAttributes
 	 */
 	/**
+	 * @typedef {Object<string, (string|number)>} FormElementAttributes
+	 * @property {string} [id]
+	 * @property {string} [name]
+	 * @property {string} [tabindex]
+	 * @property {string} [required]
+	 * @property {string} [value]
+	 */
+	/**
+	 * @typedef {FormElementAttributes} RadioCheckboxAttributes
+	 * @property {string} [checked]
+	 */
+	/**
 	 * @typedef {object} buildProps
 	 * @property {(Array<string>|string)} [classes]
 	 * @property {HTMLDataset} [dataset]
@@ -114,7 +126,7 @@ Builder = (function() {
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.inputNumber = function buildInput(attributes, classes, dataset, inputmask_options) {
-		attributes = attributes ? attributes : {};
+		attributes = $.extend({}, attributes);
 		classes = classes ? classes instanceof Array ? classes : classes.split(',') : [];
 		dataset = dataset ? dataset : {};
 		
@@ -229,8 +241,8 @@ Builder = (function() {
 	 * @param {string} href
 	 * @param {string} title
 	 * @param {(string|Array<string>)} [classes]
-	 * @param {(string|Object<string, string>|Array<string>)} [dataset]
-	 * @param {(string|Object<string, string>|Array<string>)} [attributes]
+	 * @param {HTMLDataset} [dataset]
+	 * @param {HTMLAttributes} [attributes]
 	 *
 	 * @returns {jQuery}
 	 */
@@ -284,15 +296,45 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @param {string} id
+	 * @param {string} [name]
+	 * @param {boolean} [checked]
+	 * @param {RadioCheckboxAttributes} [attributes]
+	 * @param {(string|Array<string>)} [classes]
+	 * @param {HTMLDataset} [dataset]
+	 *
+	 * @returns {jQuery}
+	 */
+	Builder.prototype.switch = function buildSwitch(id, name, checked, attributes, classes, dataset) {
+		var props = Builder.normalizeBuildProps({
+			id: id,
+			name: name,
+			attributes: attributes,
+			classes: classes,
+			dataset: dataset
+		});
+		
+		if (checked) {
+			props.attributes.checked = checked;
+		} else {
+			delete props.attributes.checked;
+		}
+		props.attributes.tabindex = props.attributes.tabindex ? props.attributes.tabindex : -1;
+		
+		return tmpl('switch', props);
+	};
+	/**
+	 *
 	 * @param {string} type - checkbox or radio
 	 * @param {buildProps} props
 	 * @param {(Array<string>|string)} [props.unit_classes]
+	 *
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.radioCheckbox = function buildRadioCheckbox(type, props) {
-		if (type == 'checkbox' || type == 'radio') {
+		if (type === 'checkbox' || type === 'radio') {
 			props = Builder.normalizeBuildProps(props, ['unit_classes']);
-			if (props.classes.indexOf('form_checkbox') == -1 && props.classes.indexOf('form_radio') == -1) {
+			if (props.classes.indexOf('form_checkbox') === -1 && props.classes.indexOf('form_radio') === -1) {
 				props.classes.unshift('form_' + type);
 			}
 			props.unit_classes.unshift('form_unit');
@@ -482,6 +524,14 @@ Builder = (function() {
 										greedy: false,
 										showMaskOnHover: false
 									});
+								}
+								case 'switch': {
+									
+									return self.switch(props.id, props.name, props.checked, $.extend({
+										required: props.required ? props.required : undefined,
+										placeholder: props.placeholder,
+										tabindex: props.tabindex
+									}, props.attributes), props.classes, props.dataset);
 								}
 								case 'number': {
 									

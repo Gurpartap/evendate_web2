@@ -18,6 +18,14 @@
 	<label class="form_label {label_classes}" for="{id}">{label}</label>
 </script>
 
+<script type="javascript/template" id="tmpl-switch">
+	<label for="{id}" class="form_switch FormSwitch {classes}">
+		<input id="{id}" class="FormSwitchInput" type="checkbox" name="{name}" {attributes} {dataset}>
+		<span class="form_switch_road"></span>
+		<span class="form_switch_runner"></span>
+	</label>
+</script>
+
 <script type="javascript/template" id="tmpl-radio-checkbox">
 	<div class="{unit_classes}">
 		<input id="{id}" class="{classes}" type="{type}" name="{name}" {attributes} {dataset}>
