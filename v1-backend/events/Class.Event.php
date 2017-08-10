@@ -8,6 +8,7 @@ require_once $BACKEND_FULL_PATH . '/events/Class.VkPost.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.RegistrationFieldsCollection.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.TicketType.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.TicketTypesCollection.php';
+require_once $BACKEND_FULL_PATH . '/events/Class.PromocodesCollection.php';
 
 class Event extends AbstractEntity
 {
@@ -48,6 +49,7 @@ class Event extends AbstractEntity
 	const REGISTERED_USERS_FIELD_NAME = 'registered_users';
 	const ORDERS_COUNT_FIELD_NAME = 'orders_count';
 	const EMAIL_TEXTS_FIELD_NAME = 'email_texts';
+	const PROMOCODES_FIELD_NAME = 'promocodes';
 	/*ONLY FOR ADMINS*/
 
 	const REGISTRATION_FIELDS_FIELD_NAME = 'registration_fields';
@@ -91,6 +93,7 @@ class Event extends AbstractEntity
 						FROM hidden_events
 						WHERE hidden_events.status = TRUE
 						AND hidden_events.user_id = :user_id))';
+
 
 	protected static $DEFAULT_COLS = array(
 		'id',
@@ -354,12 +357,30 @@ class Event extends AbstractEntity
 		return $dates;
 	}
 
+	private static function savePromocodes(ExtendedPDO $db, $id, array $data)
+	{
+		PromocodesCollection::updateForEvent($db, $id, $data['promocodes'] ?? array());
+	}
+
 	/**
 	 * @return mixed
 	 */
 	public function getOrganizationId()
 	{
 		return $this->organization_id;
+	}
+
+	public static function getExtremumDates($event_id, ExtendedPDO $db)
+	{
+		$q_get_dates = App::queryFactory()->newSelect();
+		$q_get_dates->cols(array('first_event_date', 'last_event_date'))
+			->from('events')
+			->where('id = ?', $event_id);
+		$data = $db->prepareExecute($q_get_dates)->fetch();
+		return array(
+			'first_event_date' => new DateTime($data['first_event_date']),
+			'last_event_date' => new DateTime($data['last_event_date'])
+		);
 	}
 
 	private static function updateExtremumDates($event_id, ExtendedPDO $db)
@@ -745,6 +766,9 @@ class Event extends AbstractEntity
 			self::saveRegistrationInfo($db, $event_id, $data);
 			self::saveTicketingInfo($db, $event_id, $data);
 			self::saveEmailTexts($db, $event_id, $data);
+			self::savePromocodes($db, $event_id, $data);
+
+
 			$data['vk']['event_id'] = $event_id;
 			if (isset($data['vk_post']) && isset($data['vk']) && $data['vk_post'] === true) {
 				VkPost::create(
@@ -1129,8 +1153,6 @@ class Event extends AbstractEntity
 		return $notifications_to_add;
 	}
 
-	//TODO: Припилить платные аккаунты и их типы уведомлений
-
 	private static function saveNotifications(array $notifications, ExtendedPDO $db)
 	{
 		$q_ins_notification = App::queryFactory()->newInsert();
@@ -1257,7 +1279,7 @@ class Event extends AbstractEntity
 				),
 				Fields::parseOrderBy($fields[self::ORDERS_FIELD_NAME]['order_by'] ?? ''));
 
-			if ($orders instanceof Order){
+			if ($orders instanceof Order) {
 				$result_data[self::ORDERS_FIELD_NAME] = array($orders->getParams($user, $orders_fields)->getData());
 			} else {
 				$result_data[self::ORDERS_FIELD_NAME] = $orders->getData();
@@ -1287,9 +1309,33 @@ class Event extends AbstractEntity
 		if (isset($fields[self::STATISTICS_FIELD_NAME])) {
 			if ($user instanceof User) {
 				$result_data[self::STATISTICS_FIELD_NAME] = $this->getStatistics($user,
-					Fields::parseFields($fields[self::NOTIFICATIONS_FIELD_NAME]['fields'] ?? ''))->getData();
+					Fields::parseFields($fields[self::STATISTICS_FIELD_NAME]['fields'] ?? ''))->getData();
 			} else {
 				$result_data[self::STATISTICS_FIELD_NAME] = null;
+			}
+		}
+
+
+		if (isset($fields[self::PROMOCODES_FIELD_NAME])) {
+			if ($user instanceof User && $user->isEventAdmin($this)) {
+				$promocode_fields = Fields::parseFields($fields[self::PROMOCODES_FIELD_NAME]['fields'] ?? '');
+				$promocodes = PromocodesCollection::filter(
+					$this->db,
+					$user,
+					array_merge(Fields::parseFilters($fields[self::PROMOCODES_FIELD_NAME]['filters'] ?? ''), array('statistics_event' => $this)),
+					$promocode_fields,
+					array(
+						'length' => $fields[self::PROMOCODES_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+						'offset' => $fields[self::PROMOCODES_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
+					),
+					Fields::parseOrderBy($fields[self::ORDERS_FIELD_NAME]['order_by'] ?? ''));
+				if ($promocodes instanceof Result) {
+					$result_data[self::PROMOCODES_FIELD_NAME] = $promocodes->getData();
+				} elseif ($promocodes instanceof Promocode){
+					$result_data[self::PROMOCODES_FIELD_NAME] = array($promocodes->getParams($user, $promocode_fields)->getData());
+				}
+			} else {
+				$result_data[self::PROMOCODES_FIELD_NAME] = null;
 			}
 		}
 
@@ -1475,8 +1521,9 @@ class Event extends AbstractEntity
 
 			self::saveRegistrationInfo($this->db, $this->getId(), $data);
 			self::saveTicketingInfo($this->db, $this->getId(), $data);
-			self::saveEmailTexts($this->db, $this->getId(), $data);
 			self::saveNotifications($this->generateNotifications($data), $this->db);
+			self::saveEmailTexts($this->db, $this->getId(), $data);
+			self::savePromocodes($this->db, $this->getId(), $data);
 
 			$this->db->commit();
 
@@ -1797,7 +1844,7 @@ class Event extends AbstractEntity
 			}
 		}
 
-		$order_info = RegistrationForm::processOrder($this, $user, $this->db, $request['tickets']);
+		$order_info = RegistrationForm::processOrder($this, $user, $this->db, $request['tickets'], $request['promocode'] ?? null);
 		$result = RegistrationForm::registerUser($order_info['order_info']['id'], $user, $this, $merged_fields, $approve_required);
 
 		$order = OrdersCollection::oneByUUID($this->db,
@@ -1848,6 +1895,5 @@ class Event extends AbstractEntity
 	{
 		return $this->title;
 	}
-
 
 }

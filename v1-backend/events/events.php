@@ -51,6 +51,22 @@ $__modules['events'] = array(
 			echo file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/qr/' . $event_id . '/' . $uuid . '?format=' . $format . '&size=' . $size);
 			die();
 		},
+		'{/(id:[0-9]+)/tickets/(uuid:\w+-\w+-\w+-\w+-\w+)/export}' => function ($event_id, $uuid) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+
+			global $ROOT_PATH;
+			header('Content-type: application/pdf');
+			header('Content-Disposition: attachment; filename=ticket-' . $uuid . '.pdf');
+			header('Pragma: no-cache');
+
+
+			if (file_exists($ROOT_PATH . 'email_files/' . $uuid . '.pdf')) {
+				echo file_get_contents($ROOT_PATH . '/email_files/' . $uuid . '.pdf');
+			} else {
+				file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/pdf/tickets/' . $uuid);
+				echo file_get_contents($ROOT_PATH . '/email_files/' . $uuid . '.pdf');
+			}
+			die();
+		},
 		'{/(id:[0-9]+)/tickets}' => function ($event_id) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
 
 			if ($__user instanceof User == false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
@@ -64,6 +80,20 @@ $__modules['events'] = array(
 				$__pagination,
 				$__order_by ?? array()
 			);
+		},
+		'{/(id:[0-9]+)/promocodes}' => function ($event_id) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
+
+			if ($__user instanceof User == false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
+			if (!isset($__request['code']) && !isset($__request['uuid'])) throw new PrivilegesException('BAD_PROMOCODE', $__db);
+			$__request['event_id'] = $event_id;
+
+			return PromocodesCollection::filter($__db,
+				$__user,
+				$__request,
+				$__fields,
+				$__pagination,
+				$__order_by ?? array()
+			)->getParams($__user, $__fields);
 		},
 		'{/(id:[0-9]+)/orders/(uuid:\w+-\w+-\w+-\w+-\w+)}' => function ($event_id, $uuid) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
 

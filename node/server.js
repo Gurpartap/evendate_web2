@@ -29,6 +29,7 @@ var
     bodyParser = require('body-parser'),
     UpdateQueries = require('./UpdateQueries'),
     __rooms = {},
+    pdf_render = require('chrome-headless-render-pdf'),
     logger = new (winston.Logger)({
         transports: [
             new (winston.transports.Console)(),
@@ -840,6 +841,19 @@ pg.connect(pg_conn_string, function (err, client, done) {
         });
         res.setHeader("content-type", headers[format]);
         qr_svg.pipe(res);
+    });
+
+    app.get('/utils/pdf/tickets/:uuid', function (req, res) {
+        let uuid = req.params.uuid;
+        let domain = process.env.ENV === 'prod' ? 'https://evendate.io/' : 'http://localhost/';
+
+        pdf_render.generateSinglePdf(domain + 'print_ticket.php?uuid=' + uuid, '../email_files/' + uuid + '.pdf')
+            .then(() => {
+                res.json({status: true});
+            })
+            .catch(() => {
+                res.json({status: false});
+            });
     });
 
     app.get('/utils/invitation-qr/:organization_id/:uuid', function (req, res) {

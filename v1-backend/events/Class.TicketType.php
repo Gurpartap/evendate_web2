@@ -36,7 +36,7 @@ class TicketType extends AbstractEntity
 		self::PROMOCODE_EFFORT_FIELD_NAME,
 	);
 
-	private static function checkData(array $data)
+	private static function checkData(array $data, $event_extremum_dates)
 	{
 		$num_price_options = array(
 			'options' => array(
@@ -63,6 +63,7 @@ class TicketType extends AbstractEntity
 			$data['sell_start_date'] = (new DateTime())->format('Y-m-d H:i:s');
 		}
 
+
 		if (isset($data['sell_end_date']) && !is_null($data['sell_end_date'])) {
 			if ($data['sell_end_date'] instanceof DateTime) {
 				$data['sell_end_date'] = $data['sell_end_date']->format('Y-m-d H:i:s');
@@ -70,7 +71,7 @@ class TicketType extends AbstractEntity
 				$data['sell_end_date'] = (new DateTime($data['sell_end_date']))->format('Y-m-d H:i:s');
 			}
 		} else {
-			$data['sell_end_date'] = (new DateTime())->format('Y-m-d H:i:s');
+			$data['sell_end_date'] = $event_extremum_dates['last_event_date']->format('Y-m-d H:i:s');
 		};
 
 		if (isset($data['amount'])) {
@@ -125,7 +126,9 @@ class TicketType extends AbstractEntity
 
 	public static function create($event_id, $ticket_type, ExtendedPDO $db)
 	{
-		$ticket_type = self::checkData($ticket_type);
+		$event_extremum_dates = Event::getExtremumDates($event_id, App::DB());
+
+		$ticket_type = self::checkData($ticket_type, $event_extremum_dates);
 		$q_ins = App::queryFactory()->newInsert();
 
 		$cols = array(
@@ -149,7 +152,7 @@ class TicketType extends AbstractEntity
 		$q_ins
 			->into('ticket_types')
 			->cols($cols)
-		->onConflictUpdate(array('event_id', 'status', 'type_code'), $cols);
+		->onConflictUpdate(array('event_id', 'type_code'), $cols);
 
 		if (isset($ticket_type['uuid']) && !is_null($ticket_type['uuid']) && trim($ticket_type['uuid']) != '') {
 			$q_ins = App::queryFactory()->newUpdate();
