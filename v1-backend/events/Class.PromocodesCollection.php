@@ -23,6 +23,7 @@ class PromocodesCollection extends AbstractCollection
 
 
 		$cols[] = 'id';
+		$cols[] = 'is_active';
 		if (isset($pagination['offset'])) {
 			$q_get_promocodes->offset($pagination['offset']);
 		}
@@ -40,6 +41,18 @@ class PromocodesCollection extends AbstractCollection
 					$is_checking = true;
 					break;
 				}
+				case 'id': {
+					$q_get_promocodes->where('id = :id');
+					$statements[':id'] = $value;
+					$is_one_code = true;
+					$is_checking = true;
+					break;
+				}
+				case 'is_active': {
+					$q_get_promocodes->where('is_active = :is_active');
+					$statements[':is_active'] = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+					break;
+				}
 				case 'uuid': {
 					$q_get_promocodes->where('uuid = :uuid');
 					$statements[':uuid'] = $value;
@@ -47,10 +60,12 @@ class PromocodesCollection extends AbstractCollection
 					$is_checking = true;
 					break;
 				}
-				case 'ticket_order_uuid': {
-					if ($value instanceof User == false) throw new PrivilegesException('', $db);
+				case 'ticket_order': {
+					if ($value instanceof Order == false) throw new PrivilegesException('', $db);
+					$q_get_promocodes->where('id = (SELECT promocode_id FROM view_tickets_orders WHERE uuid = :ticket_order_uuid)');
+					$statements[':ticket_order_uuid'] = $value->getUUID();
 					$is_one_code = true;
-					$is_checking = true;
+					$is_checking = false;
 					break;
 				}
 				case 'statistics_event': {
@@ -66,19 +81,20 @@ class PromocodesCollection extends AbstractCollection
 
 		if ($is_one_code && $is_checking) {
 			if (!isset($filters['event_id'])) throw new InvalidArgumentException('EVENT_ID_REQUIRED');
-			$q_get_promocodes->where('is_active = TRUE OR (
+			$q_get_promocodes->where('(is_active = TRUE OR (
 				SELECT COUNT(user_id) 
 				FROM events 
 				INNER JOIN users_organizations ON users_organizations.organization_id = events.organization_id 
 				WHERE user_id = :user_id AND events.id = view_promocodes.event_id
 				AND users_organizations.status = TRUE
-			) > 0');
+			) > 0)');
 			$q_get_promocodes->where('enabled = TRUE');
 			$q_get_promocodes->where('event_id = :event_id');
 			$statements[':event_id'] = $filters['event_id'];
 			$statements[':user_id'] = $user->getId();
 		} else {
-			if (!isset($filters['statistics_event']) && $filters['statistics_event'] instanceof Event == false)
+			if ((!isset($filters['statistics_event']) && !isset($filters['ticket_order']))
+				&& ($filters['statistics_event'] instanceof Event == false && $filters['ticket_order'] instanceof Order == false))
 				throw new InvalidArgumentException('EVENT_ID_REQUIRED');
 		}
 

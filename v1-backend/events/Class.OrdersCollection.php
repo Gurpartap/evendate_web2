@@ -72,6 +72,8 @@ class OrdersCollection extends AbstractCollection
 		}
 
 
+		// must get promocode_id
+		$cols[] = 'promocode_id';
 		$q_get_orders->distinct()
 			->from($from_table)
 			->cols($cols)

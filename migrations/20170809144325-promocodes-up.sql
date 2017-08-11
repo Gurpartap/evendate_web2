@@ -191,7 +191,7 @@ CREATE OR REPLACE VIEW view_promocodes AS
         INNER JOIN events ON events.id = view_tickets_orders.event_id
       WHERE view_tickets_orders.event_id = promocodes.event_id
         AND view_tickets_orders.promocode_id = promocodes.id
-            AND view_tickets_orders.status_id IN (2, 8, 9, 10, 12, 13)) < promocodes.use_limit) AS
+            AND view_tickets_orders.status_id IN (1, 2, 8, 9, 10, 12, 13)) < promocodes.use_limit) AS
                                                                                                    is_active,
     use_limit,
     (SELECT COUNT(view_tickets_orders.id)
@@ -199,7 +199,7 @@ CREATE OR REPLACE VIEW view_promocodes AS
        INNER JOIN events ON events.id = view_tickets_orders.event_id
      WHERE view_tickets_orders.event_id = promocodes.event_id
            AND view_tickets_orders.promocode_id = promocodes.id
-           AND view_tickets_orders.status_id IN (2, 8, 9, 10, 12, 13)) AS used_times
+           AND view_tickets_orders.status_id IN (1, 2, 8, 9, 10, 12, 13)) AS used_times
   FROM promocodes;
 
 ALTER TABLE ticket_orders

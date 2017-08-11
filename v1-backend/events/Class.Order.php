@@ -1,6 +1,7 @@
 <?php
 
 require_once "{$BACKEND_FULL_PATH}/events/Class.OrdersCollection.php";
+require_once "{$BACKEND_FULL_PATH}/events/Class.PromocodesCollection.php";
 
 
 class Order extends AbstractEntity
@@ -83,6 +84,7 @@ class Order extends AbstractEntity
 
 	const TICKETS_FIELD_NAME = 'tickets';
 	const USER_FIELD_NAME = 'user';
+	const PROMOCODE_FIELD_NAME = 'promocode';
 	const PAYER_LEGAL_ENTITY_FIELD_NAME = 'payer_legal_entity';
 	const REGISTRATION_FIELDS_FIELD_NAME = 'registration_fields';
 	const REGISTRATION_STATUS_FIELD_NAME = 'registration_status';
@@ -120,7 +122,7 @@ class Order extends AbstractEntity
 
 		if (isset($promocode)) {
 			try {
-				$promocode = PromocodesCollection::filter($db, $user, array('event_id' => $event->getId(), 'code' => $promocode), array('id'), array(), array());
+				$promocode = PromocodesCollection::filter($db, $user, array('event_id' => $event->getId(), 'code' => $promocode, 'is_active' => 'true'), array('id'), array(), array());
 				$promocode_id = $promocode->getId();
 			} catch (Exception $e) {
 				$promocode_id = null;
@@ -218,6 +220,26 @@ class Order extends AbstractEntity
 					'offset' => $fields[self::USER_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
 				),
 				Fields::parseOrderBy($fields[self::USER_FIELD_NAME]['order_by'] ?? ''))->getParams($user, $user_fields)->getData();
+		}
+
+		if (isset($fields[self::PROMOCODE_FIELD_NAME]) && $user instanceof User) {
+			$promocode_fields = Fields::parseFields($fields[self::PROMOCODE_FIELD_NAME]['fields'] ?? '');
+			try {
+				$promccode = PromocodesCollection::filter(App::DB(),
+					$user,
+					array('ticket_order' => $this),
+					$promocode_fields,
+					array(
+						'length' => $fields[self::PROMOCODE_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+						'offset' => $fields[self::PROMOCODE_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
+					),
+					Fields::parseOrderBy($fields[self::PROMOCODE_FIELD_NAME]['order_by'] ?? ''));
+				$result[self::PROMOCODE_FIELD_NAME] = $promccode->getParams($user, $promocode_fields)->getData();
+			} catch (Exception $e) {
+				$result[self::PROMOCODE_FIELD_NAME] = null;
+			}
+
+
 		}
 
 		if (isset($fields[self::REGISTRATION_FIELDS_FIELD_NAME]) && $user instanceof User) {

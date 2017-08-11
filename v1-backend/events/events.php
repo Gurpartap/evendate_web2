@@ -99,8 +99,6 @@ $__modules['events'] = array(
 
 			if ($__user instanceof User == false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
 			$__request['event'] = EventsCollection::one($__db, $__user, $event_id, array());
-			if ($__user->isAdmin($__request['event']->getOrganization()) == false) throw new PrivilegesException('NOT_ADMIN', $__db);
-
 
 			return OrdersCollection::oneByUUID($__db,
 				$__user,
