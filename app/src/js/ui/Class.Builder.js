@@ -482,6 +482,7 @@ Builder = (function() {
 									id: props.id,
 									name: props.name,
 									required: props.required ? props.required : undefined,
+									readonly: props.readonly ? props.readonly : undefined,
 									placeholder: props.placeholder,
 									tabindex: props.tabindex
 								};

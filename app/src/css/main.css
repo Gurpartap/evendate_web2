@@ -1022,7 +1022,12 @@ fieldset:disabled .form_select {cursor: default}
 :not(.-status_disabled) .form_textarea:not(:disabled):not(.-status_disabled):focus::-webkit-input-placeholder {color: transparent}
 
 .form_input:disabled,
-.form_textarea:disabled {opacity: .5}
+.form_input[readonly],
+.form_textarea:disabled,
+.form_textarea[readonly] {
+	opacity: .5;
+	pointer-events: none;
+}
 
 .form_input,
 .form_select {height: 32px}

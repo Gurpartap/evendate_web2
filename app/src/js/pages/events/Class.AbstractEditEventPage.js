@@ -460,6 +460,7 @@ AbstractEditEventPage = extending(Page, (function() {
 					value: promocode.code,
 					placeholder: 'Введите промокод',
 					readonly: is_enabled ? undefined : true,
+					classes: ['PromocodeFormInput'],
 					required: true
 				}),
 				effort_input: __APP.BUILD.inputNumber({
@@ -468,10 +469,10 @@ AbstractEditEventPage = extending(Page, (function() {
 					placeholder: '0',
 					readonly: is_enabled ? undefined : true,
 					required: true
-				}),
+				}, ['PromocodeFormInput']),
 				type_switch: __APP.BUILD.switch('event_edit_promocode_'+row_id+'_is_fixed', 'promocode_'+row_id+'_is_fixed', promocode.is_fixed),
 				service_control: promocode.uuid ?
-				                 __APP.BUILD.switch('event_edit_promocode_'+row_id+'_enabled', 'promocode_'+row_id+'_enabled', promocode.enabled) :
+				                 __APP.BUILD.switch('event_edit_promocode_'+row_id+'_enabled', 'promocode_'+row_id+'_enabled', promocode.enabled, null, ['PromocodeDisable']) :
 				                 __APP.BUILD.button({
 					                 title: '×',
 					                 classes: [
@@ -484,8 +485,18 @@ AbstractEditEventPage = extending(Page, (function() {
 			};
 		}));
 		
-		$rows.find('.PromocodeDeleteButton').on('click', function() {
+		$rows.find('.PromocodeDeleteButton').on('click.DeletePromocode', function() {
 			$(this).closest('.PromocodeRow').remove();
+		});
+		
+		$rows.find('.PromocodeDisable').on('click.DisablePromocode', '.FormSwitchInput', function() {
+			var $inputs = $(this).parents('.PromocodeRow').find('.PromocodeFormInput');
+			
+			if (this.checked) {
+				$inputs.removeAttr('readonly');
+			} else {
+				$inputs.attr('readonly', true);
+			}
 		});
 	
 		return $rows;
@@ -574,6 +585,33 @@ AbstractEditEventPage = extending(Page, (function() {
 				}
 			};
 		
+		if (form_data.different_time) {
+			if (!(form_data.event_date instanceof Array)) {
+				form_data.event_date = [form_data.event_date];
+				form_data.start_time = [form_data.start_time];
+				form_data.end_time = [form_data.end_time];
+			}
+			
+			send_data.dates.setData(form_data.event_date.map(function(date, i) {
+				
+				return {
+					event_date: date,
+					start_time: form_data.start_time[i],
+					end_time: form_data.end_time[i]
+				};
+			}));
+		} else {
+			send_data.dates.setData(this.MainCalendar.selected_days.map(function(day) {
+				
+				return {
+					event_date: day,
+					start_time: form_data.start_time,
+					end_time: form_data.end_time
+				};
+			}));
+		}
+		send_data.dates = send_data.dates.getArrayCopy();
+		
 		if (form_data.registration_required) {
 			
 			if (form_data.registration_limit_by_date) {
@@ -657,7 +695,7 @@ AbstractEditEventPage = extending(Page, (function() {
 					is_percentage: !form_data['promocode_' + id + '_is_fixed'],
 					enabled: form_data['promocode_' + id + '_enabled'] !== false,
 					
-					use_limit: form_data['promocode_' + id + '_use_limit'] || null,
+					use_limit: form_data['promocode_' + id + '_use_limit'] || 1000,
 					start_date: form_data['promocode_' + id + '_start_date'] || null,
 					end_date: form_data['promocode_' + id + '_end_date'] || null,
 				};
@@ -671,33 +709,6 @@ AbstractEditEventPage = extending(Page, (function() {
 		if (form_data.additional_notification) {
 			send_data.additional_notification_time = moment(form_data.additional_notification_date + ' ' + form_data.additional_notification_time).tz('UTC').format();
 		}
-		
-		if (form_data.different_time) {
-			if (!(form_data.event_date instanceof Array)) {
-				form_data.event_date = [form_data.event_date];
-				form_data.start_time = [form_data.start_time];
-				form_data.end_time = [form_data.end_time];
-			}
-			
-			send_data.dates.setData(form_data.event_date.map(function(date, i) {
-				
-				return {
-					event_date: date,
-					start_time: form_data.start_time[i],
-					end_time: form_data.end_time[i]
-				};
-			}));
-		} else {
-			send_data.dates.setData(this.MainCalendar.selected_days.map(function(day) {
-				
-				return {
-					event_date: day,
-					start_time: form_data.start_time,
-					end_time: form_data.end_time
-				};
-			}));
-		}
-		send_data.dates = send_data.dates.getArrayCopy();
 		
 		if (form_data.vk_post) {
 			send_data.vk = {
