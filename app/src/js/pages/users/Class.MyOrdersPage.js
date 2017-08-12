@@ -20,6 +20,7 @@ MyOrdersPage = extending(Page, (function() {
 		
 		this.fetch_order_fields = new Fields(
 			'registration_fields',
+			'final_sum',
 			'sum', {
 				event: {
 					fields: new Fields('ticketing_locally')
@@ -72,8 +73,8 @@ MyOrdersPage = extending(Page, (function() {
 			color = 'warning';
 		}
 		
-		if (order.sum !== null && order.payed_at) {
-			text = 'Оплачен '+moment.unix(order.payed_at).format(__LOCALE.DATE.DATE_TIME_FORMAT)+' — '+formatCurrency(order.sum)+' руб.'
+		if (order.final_sum !== null && order.payed_at) {
+			text = 'Оплачен '+moment.unix(order.payed_at).format(__LOCALE.DATE.DATE_TIME_FORMAT)+' — '+formatCurrency(order.final_sum)+' руб.'
 		}
 		
 		return tmpl('my-orders-order-unit-footer', {
@@ -115,7 +116,7 @@ MyOrdersPage = extending(Page, (function() {
 						__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
 					]
 				}).on('click.Pay', function() {
-					Payment.doPayment('order-' + order.uuid, order.sum);
+					Payment.doPayment('order-' + order.uuid, order.final_sum);
 				}) : '',
 				event_title: AbstractAppInspector.build.title('Событие'),
 				event: AbstractAppInspector.build.event(order.event),

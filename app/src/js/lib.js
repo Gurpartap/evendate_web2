@@ -175,6 +175,7 @@ __C = {
 	 * @enum {number}
 	 */
 	KEY_CODES: {
+		ENTER: 13,
 		ESC: 27
 	}
 };
@@ -2495,7 +2496,13 @@ function toDataUrl(url, callback) {
 	xhr.open('GET', url);
 	xhr.send();
 }
-
+/**
+ *
+ * @param {object} response
+ * @param {string} response.text
+ * @param {string} [response.pos = 'top-right]
+ * @param {boolean} [response.status]
+ */
 function showNotifier(response) {
 	$.notify({
 		'message': response.text,
