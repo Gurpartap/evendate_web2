@@ -25,6 +25,7 @@ var
     qr = require('qr-image'),
     sql = require('sql'),
     args = process.argv.slice(2),
+    BTCCheker = require('./check_bitcoin_payments'),
     crypto = require('crypto'),
     bodyParser = require('body-parser'),
     UpdateQueries = require('./UpdateQueries'),
@@ -150,6 +151,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 if (err) return logger.error(err);
             });
         },
+        btc_checker = new BTCCheker(),
         insertRecommendationsAccordance = function (data, callback) {
             var q_ins_user_upd_event = 'INSERT INTO recommendations_events (user_id, event_id, rating_favored_friends, ' +
                     ' rating_tags_in_favorites, rating_tags_in_hidden, rating_recent_created, ' +
@@ -219,6 +221,9 @@ pg.connect(pg_conn_string, function (err, client, done) {
                 callback();
             }
         };
+
+
+    btc_checker.init(client, rest);
 
     function publicDelayedEvents() {
         var q_upd_events = 'UPDATE events ' +
@@ -476,6 +481,14 @@ pg.connect(pg_conn_string, function (err, client, done) {
     }
 
     try {
+        new CronJob('*/1 * * * *', function () {
+            btc_checker.updateStatuses();
+        }, null, true);
+    } catch (ex) {
+        logger.error(ex);
+    }
+
+    try {
         new CronJob('*/3 * * * *', function () {
             updateEventsStats();
         }, null, true);
@@ -579,6 +592,10 @@ pg.connect(pg_conn_string, function (err, client, done) {
     if (args.indexOf('--send-emails-force') !== -1) {
         let mailer = new Mailer(transporter);
         mailer.sendScheduled(client, handleError);
+    }
+
+    if (args.indexOf('--check-btc') !== -1) {
+        btc_checker.updateStatuses();
     }
 
     if (args.indexOf('--global-update-recommendations') !== -1) {
@@ -836,6 +853,36 @@ pg.connect(pg_conn_string, function (err, client, done) {
             uuid: req.params.uuid,
             event_id: req.params.event_id,
         }), {
+            type: format,
+            size: size
+        });
+        res.setHeader("content-type", headers[format]);
+        qr_svg.pipe(res);
+    });
+
+    app.get('/utils/qr/bitcoin/', function (req, res) {
+        var format = 'png',
+            available_types = ['png', 'svg', 'pdf', 'eps'],
+            headers = {
+                png: 'image/png',
+                svg: 'image/svg+xml',
+                pdf: 'application/pdf',
+                eps: 'application/postscript'
+            },
+            size = 10;
+        if (checkNested(req, 'query', 'format')) {
+            console.log(req.query.format);
+            if (available_types.indexOf(req.query.format) != -1) {
+                format = req.query.format;
+            }
+        }
+        if (checkNested(req, 'query', 'size')) {
+            size = parseInt(req.query.size);
+            size = isNaN(size) ? 10 : size;
+        }
+
+
+        var qr_svg = qr.image('bitcoin:' + req.query.address + '?amount=' + req.query.amount, {
             type: format,
             size: size
         });

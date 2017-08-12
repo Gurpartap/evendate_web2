@@ -175,17 +175,28 @@ class Order extends AbstractEntity
 
 	}
 
-	/**
-	 * @return mixed
-	 */
-	public function getId(): int
+	private static function avisoBitcoin(array $request, ExtendedPDO $db)
 	{
-		$q_get_id = App::queryFactory()->newSelect();
-		$q_get_id->from('ticket_orders')
-			->cols(array('id'))
-			->where('uuid = ?', $this->uuid);
-		return App::DB()->prepareExecute($q_get_id)->fetchColumn(0);
+		$key_part = '4d0480efc15c10be631bceee3a36ebed8b101827df4f41009fc98b0672fa1153';
+		$key = implode('', array($request['address'], $request['waiting_amount'], $request['uuid'], $key_part));
+		if ($request['key'] == md5($key)) {
+			$payment_info = self::getPaymentInfo($request, $db);
+			$request['orderSumAmount'] = $request['waiting_amount'];
+			$request['shopSumAmount'] = $request['waiting_amount'];
+			$db->beginTransaction();
+			try{
+				self::setPaymentStatus($request, $db, $payment_info);
+				$db->commit();
+			}catch (Exception $e){
+				$db->rollBack();
+				return new Result(false, '');
+			}
+		} else {
+			throw new InvalidArgumentException('BAD_KEY_STOP_DUDE!');
+		}
+		return new Result(true, '');
 	}
+
 
 	public function getUUID()
 	{
@@ -332,7 +343,9 @@ class Order extends AbstractEntity
 
 	private static function getPaymentInfo(array $request, ExtendedPDO $db)
 	{
-		$request['uuid'] = str_replace('order-', '', $request['evendate_payment_id']);
+		if (!isset($request['uuid'])){
+			$request['uuid'] = str_replace('order-', '', $request['evendate_payment_id']);
+		}
 		$q_get_order = App::queryFactory()->newSelect();
 		$q_get_order->cols(array(
 			'view_tickets_orders.id',
@@ -401,68 +414,81 @@ class Order extends AbstractEntity
 
 	}
 
+	private static function setPaymentStatus(array $request, ExtendedPDO $db, array $payment_info)
+	{
+		$q_ins = App::queryFactory()->newInsert();
+
+		$new_cols = array(
+			'finished' => 'true',
+			'sum' => $request['orderSumAmount'],
+			'ticket_order_id' => $payment_info['id'],
+			'aviso_data' => json_encode($request),
+			'payed_at' => (new DateTime())->format(App::DB_DATETIME_FORMAT)
+		);
+
+		$q_ins->into('orders_payments')
+			->cols($new_cols)
+			->onConflictUpdate(array('ticket_order_id', 'finished', 'canceled'), $new_cols);
+		$db->prepareExecute($q_ins, 'CANT_UPDATE_PAYMENT');
+
+		$q_upd_order = App::queryFactory()->newUpdate();
+		$q_upd_order->table('ticket_orders')
+			->cols(array(
+				'order_status_id' => self::STATUSES[self::STATUS_PAYED],
+				'payed_at' => (new DateTime())->format(App::DB_DATETIME_FORMAT),
+				'shop_sum_amount' => $request['shopSumAmount']
+			))
+			->where('uuid = ?', $request['uuid']);
+
+
+		$db->prepareExecute($q_upd_order, '');
+		$q_get_event = App::queryFactory()->newSelect();
+		$q_get_event->from('events')
+			->cols(array('events.title', 'events.id', 'email_texts.payed'))
+			->join('left', 'email_texts', 'events.id = email_texts.event_id')
+			->where('events.id = ?', $payment_info['event_id']);
+
+		$event = $db->prepareExecute($q_get_event, 'CANT_GET_EVENT')->fetch();
+
+		$payed_text = $event['payed'];
+
+		$tickets = TicketsCollection::filter($db, App::getCurrentUser(), array(
+			'order' => OrdersCollection::oneByUUID($db, App::getCurrentUser(), $request['uuid'], array())
+		), array(), array(), array())->getData();
+
+
+		Emails::schedule(self::EMAIL_PAYED_TYPE_CODE, self::getOrderEmail($request['uuid']), array(
+			'first_name' => $payment_info['first_name'],
+			'event_title' => $event['title'],
+			'event_id' => $event['id'],
+			'payed_text' => $payed_text,
+			'tickets' => $tickets
+		));
+
+	}
+
 	public static function avisoPayment(array $request, ExtendedPDO $db)
 	{
+		if (isset($request['bitcoin']) && $request['bitcoin'] == true) {
+			return self::avisoBitcoin($request, $db);
+		}
 		try {
 			$db->beginTransaction();
-			$uuid = str_replace('order-', '', $request['evendate_payment_id']);
-			$result = self::getPaymentInfo($request, $db);
+			$request['uuid'] = str_replace('order-', '', $request['evendate_payment_id']);
+			$payment_info = self::getPaymentInfo($request, $db);
 
 			$q_get = App::queryFactory()->newSelect();
 			$q_get->from('orders_payments')
 				->cols(array('id'))
-				->where('ticket_order_id = ?', $result['id'])
+				->where('ticket_order_id = ?', $payment_info['id'])
 				->where('finished = TRUE');
 
 
 			$payments = $db->prepareExecute($q_get, '')->rowCount();
 			if ($payments > 0) throw new LogicException();
 
-			$q_ins = App::queryFactory()->newInsert();
+			self::setPaymentStatus($request, $db, $payment_info);
 
-			$new_cols = array(
-				'finished' => 'true',
-				'sum' => $request['orderSumAmount'],
-				'ticket_order_id' => $result['id'],
-				'aviso_data' => json_encode($request),
-				'payed_at' => (new DateTime())->format(App::DB_DATETIME_FORMAT)
-			);
-			$q_ins->into('orders_payments')
-				->cols($new_cols)
-				->onConflictUpdate(array('ticket_order_id', 'finished', 'canceled'), $new_cols);
-			$db->prepareExecute($q_ins, 'CANT_UPDATE_PAYMENT');
-
-			$q_upd_order = App::queryFactory()->newUpdate();
-			$q_upd_order->table('ticket_orders')
-				->cols(array(
-					'order_status_id' => self::STATUSES[self::STATUS_PAYED],
-					'payed_at' => (new DateTime())->format(App::DB_DATETIME_FORMAT),
-					'shop_sum_amount' => $request['shopSumAmount']
-				))
-				->where('uuid = ?', $uuid);
-
-			$db->prepareExecute($q_upd_order, '');
-			$q_get_event = App::queryFactory()->newSelect();
-			$q_get_event->from('events')
-				->cols(array('events.title', 'events.id', 'email_texts.payed'))
-				->join('left', 'email_texts', 'events.id = email_texts.event_id')
-				->where('events.id = ?', $result['event_id']);
-
-			$event = $db->prepareExecute($q_get_event, 'CANT_GET_EVENT')->fetch();
-
-			$payed_text = $event['payed'];
-
-			$tickets = TicketsCollection::filter($db, App::getCurrentUser(), array(
-				'order' => OrdersCollection::oneByUUID($db, App::getCurrentUser(), $uuid, array())
-			), array(), array(), array())->getData();
-
-			Emails::schedule(self::EMAIL_PAYED_TYPE_CODE, self::getOrderEmail($uuid), array(
-				'first_name' => $result['first_name'],
-				'event_title' => $event['title'],
-				'event_id' => $event['id'],
-				'payed_text' => $payed_text,
-				'tickets' => $tickets
-			));
 			$db->commit();
 			return Payment::buildResponse(Payment::ACTION_PAYMENT_AVISO, 0, 'ok', $request['invoiceId']);
 
@@ -521,6 +547,13 @@ class Order extends AbstractEntity
 		if ($this->status_type_code != self::STATUS_WAITING_PAYMENT
 			&& $this->status_type_code != self::STATUS_WAITING_PAYMENT_LEGAL_ENTITY
 		) throw new InvalidArgumentException('CANT_MAKE_LEGAL_ENTITY');
+
+		$current_user = App::getCurrentUser();
+		$db = App::DB();
+
+		if ($this->user_id != $current_user->getId() && !$current_user->isEventAdmin($event))
+			throw new PrivilegesException('', $db);
+
 		$check_fields = $this->getLegalEntityFields();
 		$field_names = App::loadColumnNames();
 		$cols = array();
@@ -538,12 +571,44 @@ class Order extends AbstractEntity
 			->cols($cols)
 			->onConflictUpdate(array('ticket_order_id'), $cols)
 			->returning(array('id'));
-		$db = App::DB();
 		$prep = $db->prepareExecute($q_ins, 'CANT_SET_LEGAL_ENTITY_PAYMENT');
 		if ($prep->rowCount() != 1) throw new LogicException('CANT_SET_LEGAL_ENTITY_PAYMENT');
 		$this->setStatus(self::STATUS_WAITING_PAYMENT_LEGAL_ENTITY, App::getCurrentUser(), $event);
 		return new Result(true, 'Данные успешно обновлены');
 	}
 
+
+	public function makeBitcoinPayment($fields, Event $event)
+	{
+		if ($this->status_type_code != self::STATUS_WAITING_PAYMENT
+			&& $this->status_type_code != self::STATUS_WAITING_PAYMENT_LEGAL_ENTITY
+		) throw new InvalidArgumentException('CANT_MAKE_BITCOIN_PAYMENT');
+
+		$current_user = App::getCurrentUser();
+		$db = App::DB();
+
+		if ($this->user_id != $current_user->getId() && !$current_user->isEventAdmin($event))
+			throw new PrivilegesException('', $db);
+
+		$order_details = $this->getParams(App::getCurrentUser(), $fields
+		)->getData();
+
+		$currency = json_decode(file_get_contents('https://blockchain.info/ticker'), true)['RUB']['buy'];
+		$btc_price = round($order_details['final_sum'] / $currency, 8);
+		$q_ins_bitcoin_address = 'UPDATE bitcoin_addresses SET 
+			waiting_amount = :waiting_amount,
+			is_used = TRUE,
+			ticket_order_id = :ticket_order_id
+			WHERE id = (SELECT id FROM bitcoin_addresses WHERE is_used = FALSE AND waiting_amount IS NULL ORDER BY id LIMIT 1)
+			RETURNING address';
+
+		$data = $db->prepareExecuteRaw($q_ins_bitcoin_address, array(
+			':waiting_amount' => $btc_price,
+			':ticket_order_id' => $this->getId()), 'CANT_ADD_BITCOIN_ADDRESS')->fetch();
+		return new Result(true, '', array(
+			'address' => $data['address'],
+			'amount' => $btc_price
+		));
+	}
 
 }

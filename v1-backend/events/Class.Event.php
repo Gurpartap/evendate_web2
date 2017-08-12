@@ -148,6 +148,7 @@ class Event extends AbstractEntity
 		'vk_image_url',
 		'registration_available',
 		'ticketing_available',
+		'accept_bitcoins',
 //		'registered_count',
 
 		self::IS_FAVORITE_FIELD_NAME => '(SELECT id IS NOT NULL
