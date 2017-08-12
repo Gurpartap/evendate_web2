@@ -15,6 +15,9 @@ OrderPage = extending(Page, (function() {
 	 *
 	 * @property {OneEvent} event
 	 * @property {Fields} event_fields
+	 * @property {OnePromocode} promocode
+	 * @property {Fields} promocode_fields
+	 * @property {boolean} is_promocode_active
 	 */
 	function OrderPage(event_id) {
 		var self = this;
@@ -34,6 +37,9 @@ OrderPage = extending(Page, (function() {
 				)
 			}
 		});
+		this.promocode = new OnePromocode(event_id);
+		this.promocode_fields = new Fields();
+		this.is_promocode_active = false;
 		
 		Object.defineProperty(this, 'page_title', {
 			get: function() {
@@ -156,16 +162,11 @@ OrderPage = extending(Page, (function() {
 	OrderPage.prototype.init = function() {
 		var self = this,
 			parsed_uri = parseUri(location),
+			$main_action_button = this.$wrapper.find('.MainActionButton'),
+			$activate_promocode_button = this.$wrapper.find('.ActivatePromocode'),
+			$promocode_input = this.$wrapper.find('.PromocodeInput'),
+			$pay_buttons = this.$wrapper.find('.PayButtons'),
 			$selected_type;
-		
-		bindControlSwitch(this.$wrapper);
-		initSelect2(this.$wrapper.find('.ToSelect2'), {
-			dropdownCssClass: 'form_select2_drop form_select2_drop_no_search'
-		});
-		
-		this.$wrapper.find('.RegistrationFirstNameField').find('input').val(__APP.USER.first_name);
-		this.$wrapper.find('.RegistrationLastNameField').find('input').val(__APP.USER.last_name);
-		this.$wrapper.find('.RegistrationEmailField').find('input').val(__APP.USER.email);
 		
 		function countTicketTypeSum($ticket_type) {
 			var $sum = $ticket_type.find('.TicketTypeSum'),
@@ -184,10 +185,84 @@ OrderPage = extending(Page, (function() {
 			var sum = Array.prototype.reduce.call(self.$wrapper.find('.TicketTypeSumText'), function(sum, ticket_type_sum) {
 				
 				return sum + +ticket_type_sum.innerHTML.replace(' ', '');
-			}, 0);
+			}, 0),
+				total_sum;
 			
 			self.$wrapper.find('.TicketsOverallSum').text(formatCurrency(sum));
+			
+			if (self.is_promocode_active) {
+				if (self.promocode.is_fixed) {
+					total_sum = sum - self.promocode.effort;
+				} else {
+					total_sum = sum - (sum * self.promocode.effort / 100);
+				}
+				
+				total_sum = total_sum <= 0 ? 0 : total_sum;
+				self.$wrapper.find('.TicketsTotalSum').text(formatCurrency(total_sum));
+			} else {
+				total_sum = sum;
+			}
+			
+			if (total_sum === 0) {
+				$main_action_button.removeClass(__C.CLASSES.COLORS.YANDEX).addClass(__C.CLASSES.COLORS.ACCENT).text('Зарегистрироваться');
+				$pay_buttons.addClass(__C.CLASSES.HIDDEN);
+			} else {
+				$main_action_button.removeClass(__C.CLASSES.COLORS.ACCENT).addClass(__C.CLASSES.COLORS.YANDEX).text('Заплатить через Яндекс');
+				$pay_buttons.removeClass(__C.CLASSES.HIDDEN);
+			}
 		}
+		
+		bindRippleEffect(this.$wrapper);
+		bindControlSwitch(this.$wrapper);
+		initSelect2(this.$wrapper.find('.ToSelect2'), {
+			dropdownCssClass: 'form_select2_drop form_select2_drop_no_search'
+		});
+		
+		$activate_promocode_button.on('click.ActivatePromocode', function() {
+			var $wrapper = self.$wrapper.find('.OrderFormWrapper'),
+				code = $promocode_input.val();
+			
+			if (code === '') {
+				showNotifier({
+					status: false,
+					text: 'Пожалуйста, введите промокод'
+				});
+			} else {
+				$wrapper.attr('disabled', true);
+				
+				self.promocode.fetchPromocodebyCodeName(code, self.promocode_fields, function() {
+					var $promocode_wrapper = $wrapper.find('.PromocodeWrapper');
+					
+					$wrapper.removeAttr('disabled');
+					
+					$promocode_wrapper.after(tmpl('order-tickets-selling-promocode', {
+						effort: self.promocode.effort + (self.promocode.is_fixed ? ' ₽' : '%')
+					}));
+					$promocode_wrapper.addClass(__C.CLASSES.HIDDEN);
+					
+					self.is_promocode_active = true;
+					countTotalSum();
+				}, function() {
+					showNotifier({
+						status: false,
+						text: 'Указанный промокод не существует или более не активен'
+					});
+					$wrapper.removeAttr('disabled');
+					
+					$promocode_input.focus().select();
+				});
+			}
+		});
+		
+		$promocode_input.on('keypress', function(e) {
+			if (isKeyPressed(e, __C.KEY_CODES.ENTER)) {
+				$activate_promocode_button.trigger('click.ActivatePromocode');
+			}
+		});
+		
+		this.$wrapper.find('.RegistrationFirstNameField').find('input').val(__APP.USER.first_name);
+		this.$wrapper.find('.RegistrationLastNameField').find('input').val(__APP.USER.last_name);
+		this.$wrapper.find('.RegistrationEmailField').find('input').val(__APP.USER.email);
 		
 		/**
 		 *
@@ -202,8 +277,8 @@ OrderPage = extending(Page, (function() {
 				
 				return false;
 			} else {
-				$main_action_button.attr('disabled', true);
 				if (isFormValid($form)) {
+					$main_action_button.attr('disabled', true);
 					
 					return self.event.makeOrder(
 						self.$wrapper.find('.OrderFields').serializeForm('array').reduce(function(bundle, field) {
@@ -222,14 +297,14 @@ OrderPage = extending(Page, (function() {
 								uuid: field.name,
 								value: field.value
 							};
-						})
+						}),
+						self.$wrapper.find('.PromocodeInput').val()
 					).always(function(data) {
 						$main_action_button.removeAttr('disabled');
 						
 						return data;
 					}).promise();
 				} else {
-					$main_action_button.removeAttr('disabled');
 					
 					return false;
 				}
@@ -265,8 +340,8 @@ OrderPage = extending(Page, (function() {
 					var is_custom_callback = !!parsed_uri.queryKey['away_to'],
 						callback_url = parsed_uri.queryKey['away_to'] || '/event/' + self.event.id;
 					
-					if (self.event.ticketing_locally && data.sum !== 0) {
-						Payment.doPayment('order-' + data.order.uuid, data.sum, is_custom_callback ? callback_url : (window.location.origin + callback_url));
+					if (self.event.ticketing_locally && data.final_sum !== 0) {
+						Payment.doPayment('order-' + data.order.uuid, data.final_sum, is_custom_callback ? callback_url : (window.location.origin + callback_url));
 					} else if (is_custom_callback) {
 						window.location = callback_url + '?registration=free';
 					} else {
@@ -316,16 +391,18 @@ OrderPage = extending(Page, (function() {
 						type_price: formatCurrency(ticket_type.price),
 						sum_price: 0
 					};
-				})).each(function(i) {
-					var $this = $(this);
-					
-					$this.data('ticket_type', self.event.ticket_types[i]);
-					
-					if (!self.event.ticket_types[i].is_selling) {
-						$this.attr('disabled', true);
-					}
-				}),
+				})),
 				overall_price: 0
+			});
+			
+			this.render_vars.tickets_selling.find('.TicketType').each(function(i) {
+				var $this = $(this);
+				
+				$this.data('ticket_type', self.event.ticket_types[i]);
+				
+				if (!self.event.ticket_types[i].is_selling) {
+					$this.attr('disabled', true);
+				}
 			});
 		}
 		
@@ -336,24 +413,41 @@ OrderPage = extending(Page, (function() {
 		}
 		
 		this.render_vars.main_action_button = __APP.BUILD.button({
-			title: this.event.ticketing_locally ? 'Приобрести билеты' : 'Зарегистрироваться',
+			title: 'Зарегистрироваться',
 			classes: [
 				__C.CLASSES.COLORS.ACCENT,
 				__C.CLASSES.HOOKS.RIPPLE,
+				__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE,
 				'MainActionButton',
+				__C.CLASSES.SIZES.WIDE,
 				__C.CLASSES.SIZES.HUGE
 			]
 		});
 		
 		if (this.event.ticketing_locally) {
-			this.render_vars.pay_button_helptext = $('<p class="form_helptext"><small>Для оплаты заказов используется система Яндекс.Деньги</small></p>');
-			
 			this.render_vars.legal_entity_payment_button = __APP.BUILD.button({
-				title: 'Оплата от юрлица',
+				title: 'Оплатить через юр. лицо',
 				classes: [
-					__C.CLASSES.COLORS.DEFAULT,
+					__C.CLASSES.COLORS.MARGINAL_PRIMARY,
+					__C.CLASSES.TEXT_WEIGHT.LIGHTER,
 					__C.CLASSES.HOOKS.RIPPLE,
 					'LegalEntityPaymentButton',
+					__C.CLASSES.SIZES.WIDE,
+					__C.CLASSES.SIZES.BIG,
+					__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
+				]
+			});
+			
+			this.render_vars.bitcoin_payment_button = __APP.BUILD.button({
+				title: 'Заплатить через Bitcoin',
+				classes: [
+					__C.CLASSES.COLORS.MARGINAL_PRIMARY,
+					__C.CLASSES.TEXT_WEIGHT.LIGHTER,
+					__C.CLASSES.HOOKS.RIPPLE,
+					'BitcoinPaymentButton',
+					__C.CLASSES.SIZES.WIDE,
+					__C.CLASSES.SIZES.BIG,
+					__C.CLASSES.STATUS.DISABLED,
 					__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
 				]
 			});

@@ -79,6 +79,8 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @property {TagsCollection} tags
 	 *
+	 * @property {PromocodeModelsCollection} promocodes
+	 *
 	 * @property {NotificationsCollection} notifications
 	 *
 	 * @property {UsersCollection} favored
@@ -159,6 +161,8 @@ OneEvent = extending(OneEntity, (function() {
 		this.nearest_event_date = null;
 		
 		this.tags = new TagsCollection();
+		
+		this.promocodes = new PromocodeModelsCollection();
 		
 		this.notifications = new NotificationsCollection();
 		
@@ -392,14 +396,16 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @param {(string|number)} event_id
 	 * @param {Array<OrderTicketType>} tickets
+	 * @param {string} [promocode]
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneEvent.buyTickets = function(event_id, tickets, success) {
+	OneEvent.buyTickets = function(event_id, tickets, promocode, success) {
 		
 		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/orders', {
-			tickets: tickets
+			tickets: tickets,
+			promocode: promocode || null
 		}, true, success);
 	};
 	/**
@@ -407,11 +413,12 @@ OneEvent = extending(OneEntity, (function() {
 	 * @param {(string|number)} event_id
 	 * @param {Array<OrderTicketType>} [tickets]
 	 * @param {Array<OrderRegistrationField>} [registration_fields]
+	 * @param {string} [promocode]
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneEvent.makeOrder = function(event_id, tickets, registration_fields, success) {
+	OneEvent.makeOrder = function(event_id, tickets, registration_fields, promocode, success) {
 		if (empty(tickets)) {
 			
 			return OneEvent.registerToEvent(event_id, registration_fields, success);
@@ -424,7 +431,8 @@ OneEvent = extending(OneEntity, (function() {
 		
 		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/orders', {
 			registration_fields: registration_fields,
-			tickets: tickets
+			tickets: tickets,
+			promocode: promocode || null
 		}, true, success);
 	};
 	/**
@@ -535,26 +543,28 @@ OneEvent = extending(OneEntity, (function() {
 	/**
 	 *
 	 * @param {Array<OrderTicketType>} tickets
+	 * @param {string} [promocode]
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneEvent.prototype.buyTickets = function(tickets, success) {
+	OneEvent.prototype.buyTickets = function(tickets, promocode, success) {
 		
-		return this.constructor.buyTickets(this.id, tickets, success);
+		return this.constructor.buyTickets(this.id, tickets, promocode, success);
 	};
 	/**
 	 *
 	 * @param {Array<OrderTicketType>} tickets
 	 * @param {Array<OrderRegistrationField>} registration_fields
+	 * @param {string} [promocode]
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneEvent.prototype.makeOrder = function(tickets, registration_fields, success) {
+	OneEvent.prototype.makeOrder = function(tickets, registration_fields, promocode, success) {
 		var self = this;
 		
-		return this.constructor.makeOrder(this.id, tickets, registration_fields, success).then(function(data) {
+		return this.constructor.makeOrder(this.id, tickets, registration_fields, promocode, success).then(function(data) {
 			var order = new OneOrder(self.id);
 			
 			order.setData($.extend({
