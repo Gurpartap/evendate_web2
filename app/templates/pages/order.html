@@ -11,10 +11,19 @@
 							<span>Я согласен c условиями Пользовательского соглашения и Договором оказания услуг по организации мероприятия</span>
 						</label>
 					</div>
-					<fieldset class="Switching" data-switch_id="order_agreement" disabled>
-						{main_action_button}
-						{pay_button_helptext}
-						{legal_entity_payment_button}
+					<fieldset class="order_page_buttons Switching" data-switch_id="order_agreement" disabled>
+						<div class="form_unit">
+							{main_action_button}
+						</div>
+						<div class="order_page_pay_buttons PayButtons -hidden">
+							<p><span class="-text_color_primary_50">или</span></p>
+							<div class="form_unit">
+								{legal_entity_payment_button}
+							</div>
+							<div class="form_unit">
+								{bitcoin_payment_button}
+							</div>
+						</div>
 					</fieldset>
 				</footer>
 				{overlay_cap}

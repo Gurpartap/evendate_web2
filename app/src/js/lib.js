@@ -22,6 +22,11 @@ __C = {
 		TEXT_COLORS: {
 			ACCENT: '-text_color_accent'
 		},
+		TEXT_WEIGHT: {
+			BOLD: '-font_weight_bold',
+			BOLDER: '-font_weight_bolder',
+			LIGHTER: '-font_weight_lighter'
+		},
 		COLORS: {
 			ACCENT: '-color_accent',
 			PRIMARY: '-color_primary',
@@ -32,7 +37,9 @@ __C = {
 			MARGINAL_ACCENT: '-color_marginal_accent',
 			MARGINAL_PRIMARY: '-color_marginal_primary',
 			MARGINAL_FRANKLIN: '-color_marginal_franklin',
-			MARGINAL_BUBBLEGUM: '-color_marginal_bubble_gum'
+			MARGINAL_BUBBLEGUM: '-color_marginal_bubble_gum',
+			
+			YANDEX: '-color_yandex'
 		},
 		ALIGN: {
 			LEFT: '-align_left',
@@ -60,6 +67,7 @@ __C = {
 			X50: '-size_50x50',
 			X55: '-size_55x55',
 			HUGE: '-size_huge',
+			BIG: '-size_big',
 			LOW: '-size_low',
 			WIDE: '-size_wide',
 			SMALL: '-size_small'

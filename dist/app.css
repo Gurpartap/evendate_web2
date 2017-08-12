@@ -560,6 +560,7 @@
 	--color_primary_80: #657184;
 	--color_primary_50: #9fa6b3;
 	--color_primary_30: #c5c9d1;
+	--color_marginal: #e2e4e8;
 	--color_secondary: #5379b8;
 	--color_bubblegum: #f82969;
 	--color_bubblegum_alt: #ff5f9e;
@@ -854,17 +855,26 @@ span.-transform_uppercase,
 small.-transform_uppercase,
 label.-transform_uppercase {text-transform: uppercase}
 
+a.-font_weight_lighter,
+p.-font_weight_lighter,
+span.-font_weight_lighter,
+small.-font_weight_lighter,
+label.-font_weight_lighter,
+button.-font_weight_lighter {font-weight: 400}
+
 a.-font_weight_bolder,
 p.-font_weight_bolder,
 span.-font_weight_bolder,
 small.-font_weight_bolder,
-label.-font_weight_bolder {font-weight: 500}
+label.-font_weight_bolder,
+button.-font_weight_bolder {font-weight: 500}
 
 a.-font_weight_bold,
 p.-font_weight_bold,
 span.-font_weight_bold,
 small.-font_weight_bold,
-label.-font_weight_bold {font-weight: 500}
+label.-font_weight_bold,
+button.-font_weight_bold {font-weight: 600}
 
 
 /* /Typography */
@@ -2524,7 +2534,12 @@ fieldset:disabled .form_select {cursor: default}
 .button.-size_huge {
 	height: 3rem;
 	min-width: 3rem;
-	font-size: 1.125em;
+	font-size: 1em;
+}
+.button.-size_big {
+	height: 2.25rem;
+	min-width: 2.25rem;
+	font-size: 1em;
 }
 .button.-size_huge:not(.-empty):not(:empty) {padding: 0 30px}
 .button.-rounded {
@@ -2536,6 +2551,7 @@ fieldset:disabled .form_select {cursor: default}
 a.button {line-height: 30px}
 a.button.-size_low {line-height: 1.88rem}
 a.button.-size_huge {line-height: 3rem}
+a.button.-size_big {line-height: 2.25rem}
 a.button,
 a.button:hover {text-decoration: none}
 
@@ -2608,7 +2624,7 @@ a.button:hover {text-decoration: none}
 
 .button.-color_marginal,
 .button.-color_marginal_primary,
-.button.-color_marginal_accent {background-color: #fff; background-color: var(--color_page);}
+.button.-color_marginal_accent {background-color: #e2e4e8; background-color: var(--color_marginal);}
 
 
 
@@ -2637,16 +2653,24 @@ a.button:hover {text-decoration: none}
 
 .button:not(:disabled).-color_default:hover,
 .button:not(:disabled).-color_marginal:hover,
+.button:not(:disabled).-color_marginal_primary:hover,
+.button:not(:disabled).-color_marginal_accent:hover,
 .button:not(:disabled).-color_accent_alt:hover,
 .button:not(:disabled).-color_default:focus,
 .button:not(:disabled).-color_marginal:focus,
+.button:not(:disabled).-color_marginal_primary:focus,
+.button:not(:disabled).-color_marginal_accent:focus,
 .button:not(:disabled).-color_accent_alt:focus {box-shadow: none}
 
 .button:not(:disabled).-color_accent_alt:hover,
 .button:not(:disabled).-color_accent_alt:focus {box-shadow: 0 1px 6px #e8b7b7}
 
 .button:not(:disabled).-color_marginal:hover,
-.button:not(:disabled).-color_marginal:focus {background-color: #ebedef}
+.button:not(:disabled).-color_marginal_primary:hover,
+.button:not(:disabled).-color_marginal_accent:hover,
+.button:not(:disabled).-color_marginal:focus,
+.button:not(:disabled).-color_marginal_primary:focus,
+.button:not(:disabled).-color_marginal_accent:focus {background-color: #ebedef}
 
 
 .button:disabled,
@@ -5894,7 +5918,7 @@ body,
 }
 
 .orders_page_pay_button {
-	margin: 24px 0;
+	margin: 16px 0;
 }
 
 .orders_page_registration_fields {
@@ -5975,6 +5999,10 @@ body,
 
 .order_page_footer {
 	margin-top: 24px;
+}
+
+.order_page_buttons {
+	display: inline-block;
 }
 
 .order_page_contact {

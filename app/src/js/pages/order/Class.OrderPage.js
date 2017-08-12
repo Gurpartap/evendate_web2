@@ -162,8 +162,10 @@ OrderPage = extending(Page, (function() {
 	OrderPage.prototype.init = function() {
 		var self = this,
 			parsed_uri = parseUri(location),
+			$main_action_button = this.$wrapper.find('.MainActionButton'),
 			$activate_promocode_button = this.$wrapper.find('.ActivatePromocode'),
 			$promocode_input = this.$wrapper.find('.PromocodeInput'),
+			$pay_buttons = this.$wrapper.find('.PayButtons'),
 			$selected_type;
 		
 		function countTicketTypeSum($ticket_type) {
@@ -197,6 +199,16 @@ OrderPage = extending(Page, (function() {
 				
 				total_sum = total_sum <= 0 ? 0 : total_sum;
 				self.$wrapper.find('.TicketsTotalSum').text(formatCurrency(total_sum));
+			} else {
+				total_sum = sum;
+			}
+			
+			if (total_sum === 0) {
+				$main_action_button.removeClass(__C.CLASSES.COLORS.YANDEX).addClass(__C.CLASSES.COLORS.ACCENT).text('Зарегистрироваться');
+				$pay_buttons.addClass(__C.CLASSES.HIDDEN);
+			} else {
+				$main_action_button.removeClass(__C.CLASSES.COLORS.ACCENT).addClass(__C.CLASSES.COLORS.YANDEX).text('Заплатить через Яндекс');
+				$pay_buttons.removeClass(__C.CLASSES.HIDDEN);
 			}
 		}
 		
@@ -401,24 +413,41 @@ OrderPage = extending(Page, (function() {
 		}
 		
 		this.render_vars.main_action_button = __APP.BUILD.button({
-			title: this.event.ticketing_locally ? 'Приобрести билеты' : 'Зарегистрироваться',
+			title: 'Зарегистрироваться',
 			classes: [
 				__C.CLASSES.COLORS.ACCENT,
 				__C.CLASSES.HOOKS.RIPPLE,
+				__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE,
 				'MainActionButton',
+				__C.CLASSES.SIZES.WIDE,
 				__C.CLASSES.SIZES.HUGE
 			]
 		});
 		
 		if (this.event.ticketing_locally) {
-			this.render_vars.pay_button_helptext = $('<p class="form_helptext"><small>Для оплаты заказов используется система Яндекс.Деньги</small></p>');
-			
 			this.render_vars.legal_entity_payment_button = __APP.BUILD.button({
-				title: 'Оплата от юрлица',
+				title: 'Оплатить через юр. лицо',
 				classes: [
-					__C.CLASSES.COLORS.DEFAULT,
+					__C.CLASSES.COLORS.MARGINAL_PRIMARY,
+					__C.CLASSES.TEXT_WEIGHT.LIGHTER,
 					__C.CLASSES.HOOKS.RIPPLE,
 					'LegalEntityPaymentButton',
+					__C.CLASSES.SIZES.WIDE,
+					__C.CLASSES.SIZES.BIG,
+					__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
+				]
+			});
+			
+			this.render_vars.bitcoin_payment_button = __APP.BUILD.button({
+				title: 'Заплатить через Bitcoin',
+				classes: [
+					__C.CLASSES.COLORS.MARGINAL_PRIMARY,
+					__C.CLASSES.TEXT_WEIGHT.LIGHTER,
+					__C.CLASSES.HOOKS.RIPPLE,
+					'BitcoinPaymentButton',
+					__C.CLASSES.SIZES.WIDE,
+					__C.CLASSES.SIZES.BIG,
+					__C.CLASSES.STATUS.DISABLED,
 					__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
 				]
 			});
