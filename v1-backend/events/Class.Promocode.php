@@ -59,10 +59,10 @@ class Promocode extends AbstractEntity
 			if ($data['effort'] > 100 || $data['effort'] < 1) throw new InvalidArgumentException('BAD_EFFORT_VALUE');
 		}
 
-		if (isset($data['use_limit']) && (!is_numeric($data['use_limit']) || ((float)$data['effort'] <= 0)))
+		if (isset($data['use_limit']) && ($data['use_limit'] != null) && (!is_numeric($data['use_limit']) || ((float) $data['use_limit'] <= 0)))
 			throw new InvalidArgumentException('BAD_USE_LIMITS');
 
-		if (isset($data['use_limit']) && (!is_numeric($data['use_limit']) || ((float)$data['effort'] <= 0)))
+		if (isset($data['effort']) && (!is_numeric($data['effort']) || ((float)$data['effort'] <= 0)))
 			throw new InvalidArgumentException('BAD_USE_LIMITS');
 
 		if (isset($data['start_date'])) {
