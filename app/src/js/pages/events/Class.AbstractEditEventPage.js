@@ -682,6 +682,8 @@ AbstractEditEventPage = extending(Page, (function() {
 			});
 			send_data.ticketing_locally = true;
 			send_data.booking_time = +form_data.booking_time === 0 ? 1 : form_data.booking_time;
+			
+			send_data.accept_bitcoins = form_data.accept_bitcoins;
 		}
 		
 		if (form_data.promocodes) {

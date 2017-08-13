@@ -149,7 +149,6 @@ MyOrdersPage = extending(Page, (function() {
 						'BitcoinPaymentButton',
 						__C.CLASSES.SIZES.WIDE,
 						__C.CLASSES.SIZES.BIG,
-						__C.CLASSES.STATUS.DISABLED,
 						__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
 					]
 				}) : '',
@@ -181,6 +180,18 @@ MyOrdersPage = extending(Page, (function() {
 			
 			self.$detail_wrapper.find('.LegalEntityPaymentButton').on('click.PayByLegalEntity', function() {
 				__APP.changeState('event/' + order.event.id + '/order/' + order.uuid + '/from_legal_entity');
+			});
+			
+			self.$detail_wrapper.find('.BitcoinPaymentButton').on('click.BitcoinPayment', function() {
+				var $this = $(this),
+					modal = $this.data('modal');
+				
+				if (!modal) {
+					modal = new BitcoinModal(order.event, order);
+					$this.data('modal', modal);
+				}
+				
+				modal.show();
 			});
 		});
 		

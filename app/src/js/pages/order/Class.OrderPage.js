@@ -368,6 +368,23 @@ OrderPage = extending(Page, (function() {
 					});
 				}
 			});
+			
+			this.render_vars.bitcoin_payment_button.on('click.BitcoinPayment', function() {
+				var $this = $(this),
+					modal;
+				
+				if (!$this.data('modal')) {
+					makeOrder().done(function(data) {
+						modal = new BitcoinModal(self.event, data.order.uuid);
+						$this.data('modal', modal);
+						
+						modal.show();
+					});
+				} else {
+					modal = $this.data('modal');
+					modal.show();
+				}
+			});
 		}
 	};
 	
@@ -447,7 +464,6 @@ OrderPage = extending(Page, (function() {
 					'BitcoinPaymentButton',
 					__C.CLASSES.SIZES.WIDE,
 					__C.CLASSES.SIZES.BIG,
-					__C.CLASSES.STATUS.DISABLED,
 					__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
 				]
 			});
