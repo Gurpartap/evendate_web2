@@ -80,6 +80,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {TagsCollection} tags
 	 *
 	 * @property {PromocodeModelsCollection} promocodes
+	 * @property {?boolean} accept_bitcoins
 	 *
 	 * @property {NotificationsCollection} notifications
 	 *
@@ -163,6 +164,7 @@ OneEvent = extending(OneEntity, (function() {
 		this.tags = new TagsCollection();
 		
 		this.promocodes = new PromocodeModelsCollection();
+		this.accept_bitcoins = null;
 		
 		this.notifications = new NotificationsCollection();
 		
@@ -437,7 +439,7 @@ OneEvent = extending(OneEntity, (function() {
 	};
 	/**
 	 *
-	 * @param {(Fields|string|Array)} fields
+	 * @param {(Fields|string|Array)} [fields]
 	 * @param {AJAXCallback} [success]
 	 * @returns {jqPromise}
 	 */

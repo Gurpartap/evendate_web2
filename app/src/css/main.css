@@ -2865,25 +2865,28 @@ body.-open_modal > .modal_wrapper {
 }
 
 .modal_header {
-	min-height: 40px;
-	padding: 12px 25px 12px 16px;
-	font-size: .875em;
-	text-align: left;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	min-height: 60px;
+	padding-left: 18px;
+	font-size: 1em;
+	font-weight: 500;
+	line-height: 1.5;
+	color: #3e4d66;
+	color: var(--color_primary);
 }
 
 .-modal_destroyer {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	right: 0;
-	margin: auto 4px;
-	font-size: 1.6em;
+	width: 60px;
+	height: 60px;
+	font-size: 2.4em;
 	font-weight: 100;
 }
 .-modal_destroyer:hover {background-color: transparent !important}
 .-modal_destroyer > * {top: -1px}
 
-.modal_content {padding: 1.5em}
+.modal_content {padding: 18px}
 .modal_content.-no_padding {padding: 0}
 
 .modal_content + .modal_content {margin-top: 36px}
@@ -2900,8 +2903,6 @@ body.-open_modal > .modal_wrapper {
 .modal_footer {
 	padding: 12px 18px;
 	text-align: right;
-	background-color: #f6f6f6;
-	background-color: var(--color_gray_material);
 }
 
 .modal_footer > .button + .button {margin-left: .5em}
@@ -2957,6 +2958,40 @@ body.-open_modal > .modal_wrapper {
 }
 
 .add_staff_modal_form .button {margin-top: 20px}
+
+
+.bitcoin_modal_title {
+	padding: 0 18px;
+	font-size: 1em;
+	font-weight: 500;
+	line-height: 1.25;
+	color: #3e4d66;
+	color: var(--color_primary);
+}
+
+.bitcoin_modal_helptext {
+	padding: 15px 18px;
+	font-weight: 500;
+	line-height: 1.5;
+	color: #657184;
+	color: var(--color_primary_80);
+	background-color: #f6f6f6;
+	background-color: var(--color_gray_material);
+}
+
+.bitcoin_modal_bottom {
+	display: flex;
+	padding: 18px;
+}
+
+.bitcoin_modal_qr {
+	flex: none;
+	margin-right: 18px;
+}
+
+.bitcoin_modal_address {
+	width: 100%;
+}
 
 	/* /Modal */
 /* Calendar */
