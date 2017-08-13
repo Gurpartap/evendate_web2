@@ -56,6 +56,12 @@ try {
 	$order_date = DateTime::createFromFormat('U', $order_info['created_at']);
 	$order_date_str = $order_date->format('d ') . $months[$order_date->format('n')] . $order_date->format(' Y');
 
+	$dates_text = array();
+	foreach($event_info['dates'] as $date){
+	  $_date = DateTime::createFromFormat('U', $date['event_date']);
+		$dates_text[] = $_date->format('d.m.Y');
+  }
+
 } catch (Exception $e) {
 	var_dump($e);
 }
@@ -1277,7 +1283,7 @@ margin-left:1.25pt'><span style='color:#666666'>4.2. </span>Описание
 
   <p class=MsoNormal style='margin-top:0cm;margin-right:0cm;margin-bottom:4.2pt;
 margin-left:1.25pt'><span style='color:#666666'>4.3. </span>Даты проведения
-    Мероприятия: <?= $event_info['dates_text'] ?>.</p>
+    Мероприятия: <?= implode(', ', $dates_text) ?>.</p>
 
   <p class=MsoNormal style='margin-top:0cm;margin-right:0cm;margin-bottom:23.6pt;
 margin-left:1.25pt'><span style='color:#666666'>4.4. </span>Место проведения Мероприятия:
