@@ -31,7 +31,7 @@
 
 								<h2><label for="edit_event_description">Описание <span class="required_star">*</span></label></h2>
 								<div class="form_unit">
-									<textarea id="edit_event_description" class="form_textarea LimitSize OnChangeCrossPost" data-maxlength="1000" name="description" placeholder="Не более 1000 символов" required>{description}</textarea>
+									<textarea id="edit_event_description" class="form_textarea -expanding LimitSize OnChangeCrossPost" data-maxlength="1000" name="description" placeholder="Не более 1000 символов" required>{description}</textarea>
 								</div>
 
 								<!--Date Picker-->
@@ -266,7 +266,7 @@
 							<fieldset>
 								<h2>Продажа билетов</h2>
 								<p class="form_text">Настройте продажу билетов на ваше событие через Evendate</p>
-								<table class="event_edit_ticket_types_table table -simple_table -full_page_width TicketTypes Collapsing">
+								<table class="event_edit_table table -simple_table -full_page_width TicketTypes Collapsing">
 									<thead>
 										<tr>
 											<th width="55%" align="left">Название</th>
@@ -277,7 +277,25 @@
 									{ticket_types}
 								</table>
 								<div class="form_unit -align_center">{add_ticket_type_button}</div>
+
+								<div class="form_unit form_accent_block">
+									<input id="edit_event_accept_bitcoins" class="form_checkbox" type="checkbox" name="accept_bitcoins">
+									<label class="form_label" for="edit_event_accept_bitcoins"><span>Принимать биткоины</span></label>
+								</div>
 								{booking_time_input}
+								<h3>Промокоды</h3>
+								<table class="event_edit_table table -simple_table -full_page_width Promocodes">
+									<thead>
+										<tr>
+											<th width="60%" align="left">Код</th>
+											<th width="20%" align="left">Размер скидки</th>
+											<th width="10%" align="left">%/₽</th>
+											<th width="10%" align="left"></th>
+										</tr>
+									</thead>
+									{promocodes}
+								</table>
+								<div class="form_unit -align_center">{add_promocode_button}</div>
 							</fieldset>
 						</div>
 
@@ -285,10 +303,10 @@
 						<div class="tab_body TabsBody">
 							<h2>Настройка email рассылок</h2>
 							<p class="form_text">Здесь вы можете добавить свои сообщения в email рассылку по событию</p>
-							<div class="EmailTicketing -hidden">
+							<div class="form_unit EmailTicketing -hidden">
 								{email_payed_form_unit}
 							</div>
-							<div class="EmailRegistration -hidden">
+							<div class="form_unit EmailRegistration -hidden">
 								{email_approved_form_unit}
 								{email_not_approved_form_unit}
 							</div>
@@ -517,7 +535,7 @@
 			<div class="edit_event_ticket_type_last_column form_group">
 				{price_input}
 				<button class="event_edit_ticket_type_expand_button action -color_marginal fa_icon fa-sliders TicketTypeExpandButton" type="button"></button>
-				<button class="event_edit_ticket_type_delete_button action -color_marginal TicketTypeDeleteButton" type="button">&times;</button>
+				<button class="event_edit_row_delete_button action -color_marginal TicketTypeDeleteButton" type="button">&times;</button>
 			</div>
 		</td>
 	</tr>
@@ -536,7 +554,7 @@
 									{tickets_sell_start_date_select}
 								</fieldset>
 							</div>
-							<fieldset class="form_group -align_left TicketTypeSellAfterFieldset" disabled>
+							<fieldset class="-align_left TicketTypeSellAfterFieldset" disabled>
 								{tickets_sell_start_after_checkbox}
 								<fieldset class="form_unit Switching" data-switch_id="ticket_type_{row_num}_start_after" disabled>
 									{tickets_sell_start_after_select}
@@ -586,5 +604,24 @@
 <script type="javascript/template" id="tmpl-edit-event-tickets-row-empty">
 	<tr class="EmptyRow">
 		<td colspan="3" align="center"><p class="form_text">Вы не добавили ни одного билета</p></td>
+	</tr>
+</script>
+
+<script type="javascript/template" id="tmpl-edit-event-promocode-row">
+	<tr class="PromocodeRow">
+		<td>{code_input}</td>
+		<td>{effort_input}</td>
+		<td>{type_switch}</td>
+		<td>
+			{service_control}
+			<input type="hidden" name="promocodes" value="{id}">
+			<input type="hidden" name="promocode_{id}_uuid" value="{uuid}">
+		</td>
+	</tr>
+</script>
+
+<script type="javascript/template" id="tmpl-edit-event-promocode-row-empty">
+	<tr class="EmptyRow">
+		<td colspan="4" align="center"><p class="form_text">Вы не добавили ни одного промокода</p></td>
 	</tr>
 </script>

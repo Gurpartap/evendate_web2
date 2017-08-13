@@ -344,7 +344,7 @@ $__modules['events'] = array(
 				intval($id),
 				$event_fields);
 
-			if ($event->getParams($__user, $event_fields)->getData()['accept_bitcoin'] == false)
+			if ($event->getParams($__user, $event_fields)->getData()['accept_bitcoins'] == false)
 				throw new LogicException('BITCOINS_NOT_ACCEPTABLE');
 
 			$fields = Fields::parseFields('final_sum,number,promocode,tickets{fields:"ticket_type"}');

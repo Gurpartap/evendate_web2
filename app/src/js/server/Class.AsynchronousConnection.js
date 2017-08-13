@@ -37,7 +37,7 @@ AsynchronousConnection = (function() {
 	 *
 	 * @returns {jqPromise}
 	 */
-	AsynchronousConnection.dealAjax = function(http_method, url, ajax_data, content_type, success, error) {
+	AsynchronousConnection.prototype.dealAjax = AsynchronousConnection.dealAjax = function(http_method, url, ajax_data, content_type, success, error) {
 		
 		return $.ajax({
 			url: url,
@@ -47,23 +47,11 @@ AsynchronousConnection = (function() {
 		}).fail(error).done(success).promise();
 	};
 	/**
-	 *
-	 * @param {AsynchronousConnection.HTTP_METHODS} http_method
-	 * @param {string} url
-	 * @param {(object|string)} [ajax_data]
-	 * @param {string} [content_type='application/x-www-form-urlencoded; charset=UTF-8']
-	 * @param {function} [success]
-	 * @param {function} [error]
-	 *
-	 * @returns {jqPromise}
-	 */
-	AsynchronousConnection.prototype.dealAjax = AsynchronousConnection.dealAjax;
-	/**
 	 * @param {...(jqXHR|Deferred|jqPromise)} Deferreds
 	 * @param {function(..(Array|object))} [cb]
 	 * @return {jqPromise}
 	 */
-	AsynchronousConnection.multipleAjax = function(){
+	AsynchronousConnection.prototype.multipleAjax = AsynchronousConnection.multipleAjax = function(){
 		var with_callback = (arguments[arguments.length - 1] instanceof Function),
 			promises = with_callback ? Array.prototype.splice.call(arguments, 0, arguments.length - 1) : Array.prototype.slice.call(arguments),
 			parallel_promise;
@@ -73,12 +61,6 @@ AsynchronousConnection = (function() {
 		}
 		return parallel_promise.promise();
 	};
-	/**
-	 * @param {...(jqXHR|Deferred|jqPromise)} Deferreds
-	 * @param {function(..(Array|object))} [cb]
-	 * @return {jqPromise}
-	 */
-	AsynchronousConnection.prototype.multipleAjax = AsynchronousConnection.multipleAjax;
 	
 	
 	return AsynchronousConnection;

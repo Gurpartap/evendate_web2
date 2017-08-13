@@ -26,6 +26,7 @@ OneOrder = extending(OneEntity, (function() {
 	 * @property {?(OneOrder.ORDER_STATUSES|OneOrder.EXTENDED_ORDER_STATUSES)} status_type_code
 	 * @property {?TEXTS.TICKET_STATUSES} status_name
 	 * @property {?(string|number)} sum
+	 * @property {?(string|number)} final_sum
 	 *
 	 * @property {?timestamp} created_at
 	 * @property {?timestamp} updated_at
@@ -37,6 +38,7 @@ OneOrder = extending(OneEntity, (function() {
 	 * @property {?Moment} m_payed_at
 	 * @property {?Moment} m_canceled_at
 	 *
+	 * @property {PromocodeModel} promocode
 	 * @property {TicketsCollection} tickets
 	 * @property {RegistrationFieldsCollection} registration_fields
 	 * @property {OneUser} user
@@ -52,12 +54,14 @@ OneOrder = extending(OneEntity, (function() {
 		this.status_id = null;
 		this.status_type_code = null;
 		this.sum = null;
+		this.final_sum = null;
 		
 		this.created_at = null;
 		this.updated_at = null;
 		this.payed_at = null;
 		this.canceled_at = null;
 		
+		this.promocode = new PromocodeModel();
 		this.tickets = new TicketsCollection();
 		this.registration_fields = new RegistrationFieldsCollection();
 		this.user_id = null;
@@ -261,6 +265,18 @@ OneOrder = extending(OneEntity, (function() {
 	};
 	/**
 	 *
+	 * @param {(string|number)} event_id
+	 * @param {string} order_uuid
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	OneOrder.fetchBitcoinData = function(event_id, order_uuid, success) {
+		
+		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/orders/' + order_uuid + '/bitcoin', null, false, success);
+	};
+	/**
+	 *
 	 * @param {(Fields|string)} [fields]
 	 * @param {AJAXCallback} [success]
 	 *
@@ -327,6 +343,28 @@ OneOrder = extending(OneEntity, (function() {
 			
 			if (isFunction(success)) {
 				success.call(self, self);
+			}
+		});
+	};
+	/**
+	 * @callback BitcoinDataCB
+	 * @param {object} data
+	 * @param {number} data.amount
+	 * @param {string} data.address
+	 */
+	/**
+	 *
+	 * @param {BitcoinDataCB} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	OneOrder.prototype.fetchBitcoinData = function(success) {
+		var self = this;
+		
+		return OneOrder.fetchBitcoinData(this.event_id, this.uuid, function(data) {
+			
+			if (isFunction(success)) {
+				success.call(self, data);
 			}
 		});
 	};

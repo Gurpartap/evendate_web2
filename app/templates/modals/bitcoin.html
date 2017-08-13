@@ -1,0 +1,24 @@
+<script type="javascript/template" id="tmpl-modal-bitcoin-content">
+	<h6 class="bitcoin_modal_title">Заказ № {order_number}</h6>
+	{ticket_types}
+	<div class="bitcoin_modal_helptext">
+		<span>В течение 2 минут после оплаты заказа ваши билеты будут высланы на Email</span>
+	</div>
+
+	<div class="bitcoin_modal_bottom">
+		<aside class="bitcoin_modal_qr img_holder">
+			<img src="/api/v1/events/{event_id}/orders/{order_uuid}/bitcoin/qr?address={bitcoin_address}&amount={bitcoin_amount}" width="102.5" height="102.5">
+		</aside>
+		<div class="bitcoin_modal_address form_unit">
+			<label for="bitcoin_address" class="form_label">Отправьте <span class="-text_color_accent">{bitcoin_amount} BTC</span> на адрес:</label>
+			<input id="bitcoin_address" class="form_input" value="{bitcoin_address}">
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-modal-bitcoin-ticket-type-row">
+	<div class="bitcoin_modal_ticket_type_row">
+		<span class="bitcoin_modal_ticket_type_name">{name}</span>
+		<span class="bitcoin_modal_ticket_type_amount">{number} ед.</span>
+	</div>
+</script>
