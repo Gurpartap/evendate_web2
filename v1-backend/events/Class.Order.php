@@ -88,6 +88,8 @@ class Order extends AbstractEntity
 	const PAYER_LEGAL_ENTITY_FIELD_NAME = 'payer_legal_entity';
 	const REGISTRATION_FIELDS_FIELD_NAME = 'registration_fields';
 	const REGISTRATION_STATUS_FIELD_NAME = 'registration_status';
+	const BITCOIN_ADDRESS_FIELD_NAME = 'bitcoin_address';
+	const BITCOIN_AMOUNT_FIELD_NAME = 'bitcoin_amount';
 
 	protected $id;
 	protected $uuid;
@@ -114,6 +116,8 @@ class Order extends AbstractEntity
 		'status_id',
 		'sum',
 		'final_sum',
+		self::BITCOIN_ADDRESS_FIELD_NAME => '(SELECT address FROM bitcoin_addresses WHERE ticket_order_id = view_tickets_orders.id ORDER BY id DESC LIMIT 1) AS ' . self::BITCOIN_ADDRESS_FIELD_NAME,
+		self::BITCOIN_AMOUNT_FIELD_NAME => '(SELECT waiting_amount FROM bitcoin_addresses WHERE ticket_order_id = view_tickets_orders.id ORDER BY id DESC LIMIT 1) AS ' . self::BITCOIN_AMOUNT_FIELD_NAME,
 	);
 
 
@@ -184,10 +188,10 @@ class Order extends AbstractEntity
 			$request['orderSumAmount'] = $request['waiting_amount'];
 			$request['shopSumAmount'] = $request['waiting_amount'];
 			$db->beginTransaction();
-			try{
+			try {
 				self::setPaymentStatus($request, $db, $payment_info);
 				$db->commit();
-			}catch (Exception $e){
+			} catch (Exception $e) {
 				$db->rollBack();
 				return new Result(false, '');
 			}
@@ -343,7 +347,7 @@ class Order extends AbstractEntity
 
 	private static function getPaymentInfo(array $request, ExtendedPDO $db)
 	{
-		if (!isset($request['uuid'])){
+		if (!isset($request['uuid'])) {
 			$request['uuid'] = str_replace('order-', '', $request['evendate_payment_id']);
 		}
 		$q_get_order = App::queryFactory()->newSelect();
@@ -590,8 +594,7 @@ class Order extends AbstractEntity
 		if ($this->user_id != $current_user->getId() && !$current_user->isEventAdmin($event))
 			throw new PrivilegesException('', $db);
 
-		$order_details = $this->getParams(App::getCurrentUser(), $fields
-		)->getData();
+		$order_details = $this->getParams(App::getCurrentUser(), $fields)->getData();
 
 		$currency = json_decode(file_get_contents('https://blockchain.info/ticker'), true)['RUB']['buy'];
 		$btc_price = round($order_details['final_sum'] / $currency, 8);

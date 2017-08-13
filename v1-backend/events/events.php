@@ -352,11 +352,13 @@ $__modules['events'] = array(
 			return $order->makeBitcoinPayment($fields, $event);
 		},
 		'{{/(id:[0-9]+)}/orders}' => function ($id) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+			$event_fields = Fields::parseFields('accept_bitcoins');
+
 			$event = EventsCollection::one(
 				$__db,
 				$__user,
 				intval($id),
-				$__fields);
+				$event_fields);
 
 			if (!isset($__request['payload']) || !isset($__request['payload']['registration_fields']))
 				throw new InvalidArgumentException('REGISTRATION_FIELDS_NOT_FOUND');

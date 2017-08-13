@@ -1824,6 +1824,7 @@ class Event extends AbstractEntity
 			$merged_fields[$key] = $final_field;
 			$return_fields[] = $final_field;
 		}
+
 		if (count($errors) > 0) return new Result(false, 'Возникла ошибка во время регистрации', array('registration_fields' => $return_fields));
 
 		if (isset($this->registration_approvement_required)) {
@@ -1853,6 +1854,22 @@ class Event extends AbstractEntity
 			$order_info['order_info']['uuid'],
 			array());
 
+		$order_cols = Order::getDefaultCols();
+		if (isset($request['bitcoin']) && filter_var($request['bitcoin']) == true){
+			if ($this->accept_bitcoin == false)
+				throw new LogicException('BITCOINS_NOT_ACCEPTABLE');
+			$fields = Fields::parseFields('final_sum,number,promocode,tickets{fields:"ticket_type"}');
+
+			$order->makeBitcoinPayment($fields, $this);
+
+			$order = OrdersCollection::oneByUUID($this->db,
+				$user,
+				$order_info['order_info']['uuid'],
+				Fields::parseFields('bitcoin_address', 'bitcoin_amount'));
+			$order_cols[] = 'bitcoin_address';
+			$order_cols[] = 'bitcoin_amount';
+		}
+
 		if ($result->getStatus()) {
 			try {
 				$user->addFavoriteEvent($this);
@@ -1869,7 +1886,7 @@ class Event extends AbstractEntity
 
 		return new Result(true, '', array(
 			'registration_fields' => $return_fields,
-			'order' => $order->getParams($user, Order::getDefaultCols())->getData(),
+			'order' => $order->getParams($user, $order_cols)->getData(),
 			'tickets' => $_tickets,
 			'sum' => $sum
 		));
