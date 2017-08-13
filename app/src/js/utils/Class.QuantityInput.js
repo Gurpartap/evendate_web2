@@ -46,7 +46,7 @@ QuantityInput = extendingJQuery((function() {
 		});
 		
 		$minus_button = __APP.BUILD.button({
-			title: '-',
+			title: '–',
 			classes: [
 				'QuantityInputMinus',
 				'quantity_input_button',

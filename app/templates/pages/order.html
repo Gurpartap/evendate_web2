@@ -1,5 +1,5 @@
 <script type="javascript/template" id="tmpl-order-page">
-	<div class="order_page OrderPage">
+	<div class="order_page material OrderPage">
 		<fieldset class="OrderFormWrapper">
 			<form class="order_form OrderForm">
 				{tickets_selling}
@@ -11,30 +11,58 @@
 							<span>Я согласен c условиями Пользовательского соглашения и Договором оказания услуг по организации мероприятия</span>
 						</label>
 					</div>
-					<fieldset class="Switching" data-switch_id="order_agreement" disabled>
-						{main_action_button}
+					<fieldset class="order_page_buttons Switching" data-switch_id="order_agreement" disabled>
+						<div class="form_unit">
+							{main_action_button}
+						</div>
+						<div class="order_page_pay_buttons PayButtons -hidden">
+							<p><span class="-text_color_primary_50">или</span></p>
+							<div class="form_unit">
+								{legal_entity_payment_button}
+							</div>
+							<div class="form_unit">
+								{bitcoin_payment_button}
+							</div>
+						</div>
 					</fieldset>
-					<small class="form_helptext">Для оплаты заказов используется система Яндекс.Деньги</small>
 				</footer>
 				{overlay_cap}
 			</form>
 		</fieldset>
+		<h4>Связь с техподдержкой:</h4>
+		<p><small><span>Email: </span><a href="mailto:support@evendate.ru">support@evendate.ru</a></small></p>
 	</div>
 </script>
 
 <script type="javascript/template" id="tmpl-order-tickets-selling">
 	<fieldset class="order_ticket_types OrderFields">
-		<h4>Выберите билеты</h4>
+		<h3 class="order_page_subtitle">Выберите билеты</h3>
 		{ticket_types}
-		<footer class="order_ticket_types_footer material">
-			<span class="-text_color_primary_80">Общая стоимость: </span>
-			<span class="-text_color_dark_primary"><span class="TicketsOverallSum">{overall_price}</span> ₽</span>
+		<footer class="order_ticket_types_footer">
+			<p class="-text_size_big">
+				<b class="-text_color_primary_80">Общая стоимость: </b>
+				<b class="-text_color_dark_primary"><span class="TicketsOverallSum">{overall_price}</span> ₽</b>
+			</p>
+			<div class="form_group -align_right -parts_2_1 PromocodeWrapper">
+				<div class="form_unit -unite -parts_e_3">
+					<input class="form_input PromocodeInput" placeholder="Промокод" name="promocode">
+					<button class="button -color_accent ActivatePromocode RippleEffect" type="button">Применить</button>
+				</div>
+			</div>
 		</footer>
 	</fieldset>
 </script>
 
+<script type="javascript/template" id="tmpl-order-tickets-selling-promocode">
+	<b>Скидка с промокода: {effort}</b>
+	<p class="-text_size_big">
+		<b class="-text_color_primary_80">Итоговоая стоимость: </b>
+		<b class="-text_color_dark_primary"><span class="TicketsTotalSum">{total_sum}</span> ₽</b>
+	</p>
+</script>
+
 <script type="javascript/template" id="tmpl-order-ticket-type">
-	<fieldset class="order_ticket_type material TicketType" data-ticket_type_uuid="{ticket_type_uuid}">
+	<fieldset class="order_ticket_type TicketType" data-ticket_type_uuid="{ticket_type_uuid}">
 		<header class="order_ticket_type_header">
 			<span class="order_ticket_type_title">{name}</span>
 			{quantity_input}
@@ -45,10 +73,12 @@
 			<span class="order_ticket_type_sum TicketTypeSum -text_color_dark_primary -hidden"><span class="TicketTypeSumText">{sum_price}</span> ₽</span>
 		</footer>
 	</fieldset>
+	<hr class="order_ticket_type_divider">
 </script>
 
 <script type="javascript/template" id="tmpl-order-registration">
-	<fieldset class="order_registration_fields material RegistrationFields">
+	<fieldset class="order_registration_fields RegistrationFields">
+		<h3 class="order_page_subtitle">Заполните поля</h3>
 		{registration_fields}
 	</fieldset>
 </script>

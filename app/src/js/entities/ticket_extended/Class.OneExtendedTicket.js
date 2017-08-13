@@ -61,6 +61,22 @@ OneExtendedTicket = extending(OneTicket, (function() {
 	}, OneOrder.EXTENDED_ORDER_STATUSES);
 	/**
 	 *
+	 * @param {OneTicket} ticket
+	 * @param {OneEvent} event
+	 *
+	 * @return OneExtendedTicket
+	 */
+	OneExtendedTicket.createFrom = function(ticket, event) {
+		var ext_ticket = new OneExtendedTicket();
+		
+		ext_ticket.setData($.extend(true, {
+			event: event
+		}, ticket));
+		
+		return ext_ticket;
+	};
+	/**
+	 *
 	 * @param {Array} data
 	 * @return {Array}
 	 */

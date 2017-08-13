@@ -72,6 +72,9 @@ class OrdersCollection extends AbstractCollection
 		}
 
 
+		// must get promocode_id
+		$cols[] = 'promocode_id';
+		$cols[] = 'id';
 		$q_get_orders->distinct()
 			->from($from_table)
 			->cols($cols)
@@ -121,9 +124,8 @@ class OrdersCollection extends AbstractCollection
 			$pagination,
 			$order_by ?? array())->getData();
 
-		global $BACKEND_FULL_PATH;
 
-		$column_names = json_decode(file_get_contents($BACKEND_FULL_PATH . '/events/column_names.json'), true);
+		$column_names = App::loadColumnNames();
 
 		$index = 0;
 		$headers = array(

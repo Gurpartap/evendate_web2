@@ -19,6 +19,7 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 			return ServerConnection.instance;
 		}
 		this.current_connections = [];
+		this.error_log = [];
 		ServerConnection.instance = this;
 	}
 	
@@ -41,22 +42,62 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 		}
 	}
 	
-	ServerConnection.ajaxErrorHandler = function(event, jqxhr, settings, thrownError) {
+	/**
+	 *
+	 * @param {jQuery.Event} [event]
+	 * @param {jqXHR} [jqxhr]
+	 * @param {object} [settings]
+	 * @param {string} [thrownError]
+	 */
+	ServerConnection.prototype.ajaxErrorHandler = function(event, jqxhr, settings, thrownError) {
 		var args = Array.prototype.slice.call(arguments),
+			/**
+			 *
+			 * @type {object}
+			 * @property {jQuery.Event} [event]
+			 * @property {jqXHR} [jqxhr]
+			 * @property {object} [settings]
+			 * @property {string} [thrownError]
+			 * @property {string} [text]
+			 * @property {string} [name]
+			 * @property {string} [message]
+			 * @property {string} [stack]
+			 */
 			debug = {},
 			fields;
-		if (args.length == 4) {
-			fields = ['event', 'jqxhr', 'settings', 'thrownError'];
-			args.forEach(function(arg, i) {
-				debug[fields[i]] = arg;
-			});
-		} else if (args.length == 1) {
-			debug = args[0];
-		} else {
-			args.forEach(function(arg, i) {
-				debug[i] = arg;
-			});
+		
+		switch (args.length) {
+			case 4: {
+				fields = ['event', 'jqxhr', 'settings', 'thrownError'];
+				args.forEach(function(arg, i) {
+					debug[fields[i]] = arg;
+				});
+				
+				break;
+			}
+			case 3: {
+				fields = ['jqxhr', 'text', 'thrownError'];
+				args.forEach(function(arg, i) {
+					debug[fields[i]] = arg;
+				});
+				
+				
+				break;
+			}
+			case 1: {
+				debug = args[0];
+				
+				break;
+			}
+			default: {
+				args.forEach(function(arg, i) {
+					debug[i] = arg;
+				});
+				
+				break;
+			}
 		}
+		
 		console.groupCollapsed('AJAX error');
 		if (debug.thrownError)
 			console.log('Thrown error:', debug.thrownError);
@@ -66,7 +107,10 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 			console.log('Description:', debug.event.text);
 		if (debug.jqxhr && debug.jqxhr.responseJSON && debug.jqxhr.responseJSON.text) {
 			console.log('Response:', debug.jqxhr.responseJSON.text);
-			showNotifier({text: debug.jqxhr.responseJSON.text, status: false});
+			showNotifier({
+				text: debug.jqxhr.responseJSON.text,
+				status: false
+			});
 		}
 		if (debug.settings) {
 			console.log('URL:', debug.settings.url);
@@ -81,8 +125,7 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 		}
 		console.groupEnd();
 		
-		if (!window.errors_array)  window.errors_array = [];
-		window.errors_array.push(debug);
+		this.error_log.push(debug);
 	};
 	
 	/**
@@ -96,9 +139,10 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 	 *
 	 * @returns {jqPromise}
 	 */
-	ServerConnection.dealAjax = function(http_method, url, ajax_data, content_type, success, error) {
+	ServerConnection.prototype.dealAjax = ServerConnection.dealAjax = function(http_method, url, ajax_data, content_type, success, error) {
 		ajax_data = ajax_data || {};
-		var jqXHR;
+		var self = this,
+			jqXHR;
 		
 		if (ajax_data.fields instanceof Fields){
 			ajax_data.fields = ajax_data.fields.toString();
@@ -111,29 +155,22 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 		});
 		this.current_connections.push(jqXHR);
 		
-		return jqXHR.fail(error).then(function(response, status_text, jqXHR) {
+		return jqXHR.fail(function(jqXHR, status_text, thrownError) {
+			if (isFunction(error)) {
+				error(null, jqXHR, this, thrownError);
+			} else {
+				self.ajaxErrorHandler(null, jqXHR, this, thrownError);
+			}
+		}).then(function(response, status_text, jqXHR) {
 			ajaxHandler(response, function(data, text) {
 				if (isFunction(success)) {
 					success(data);
 				}
-			}, ServerConnection.ajaxErrorHandler);
+			});
 			
 			return response.data;
 		}).promise();
 	};
-	/**
-	 *
-	 * @param {AsynchronousConnection.HTTP_METHODS} http_method
-	 * @param {string} url
-	 * @param {(AJAXData|string)} [ajax_data]
-	 * @param {string} [content_type='application/x-www-form-urlencoded; charset=UTF-8']
-	 * @param {AJAXCallback} [success]
-	 * @param {function} [error]
-	 *
-	 * @returns {jqPromise}
-	 */
-	ServerConnection.prototype.dealAjax = ServerConnection.dealAjax;
-	
 	/**
 	 *
 	 * @param {string} url
@@ -156,7 +193,7 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 	 *
 	 * @param {string} url
 	 * @param {(object|string)} ajax_data
-	 * @param {boolean} [is_payload]
+	 * @param {boolean} [is_payload=false]
 	 * @param {AJAXCallback} [success]
 	 * @param {function} [error]
 	 * @returns {jqPromise}
@@ -171,7 +208,7 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 	 *
 	 * @param {string} url
 	 * @param {(object|string)} ajax_data
-	 * @param {boolean} [is_payload]
+	 * @param {boolean} [is_payload=false]
 	 * @param {AJAXCallback} [success]
 	 * @param {function} [error]
 	 * @returns {jqPromise}

@@ -12,7 +12,7 @@
 				{kpp_form_field}
 			</div>
 			{real_address_form_field}
-			{post_address_form_field}
+			<input name="company_zipcode" value="-" type="hidden">
 		</fieldset>
 		<h2>Банковские данные</h2>
 		{bank_name_form_field}
@@ -32,8 +32,8 @@
 			{self_email_form_field}
 			{self_phone_form_field}
 		</div>
-		<div class="-align_center">
-			{submit_button}
-		</div>
 	</form>
+	<footer class="legal_entity_payment_footer -align_center">
+		{submit_button}
+	</footer>
 </script>

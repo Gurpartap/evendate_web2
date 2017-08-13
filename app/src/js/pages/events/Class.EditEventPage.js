@@ -23,6 +23,7 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 	EditEventPage.fields = new Fields(
 		'email_texts',
 		'booking_time',
+		'promocodes',
 		'vk_post_link', {
 			ticket_types: {
 				fields: new Fields(
@@ -68,6 +69,10 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 		this.render_vars.ticket_types = ticket_types.length ?
 		                                AbstractEditEventPage.ticketTypeRowsBuilder(ticket_types) :
 		                                tmpl('edit-event-tickets-row-empty');
+		
+		this.render_vars.promocodes = this.event.promocodes.length ?
+		                              AbstractEditEventPage.promocodeRowsBuilder(this.event.promocodes) :
+		                              tmpl('edit-event-promocode-row-empty');
 		
 		this.render_vars.vk_post_link = this.event.vk_post_link ? __APP.BUILD.actionLink(
 			this.event.vk_post_link,

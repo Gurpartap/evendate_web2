@@ -51,6 +51,22 @@ $__modules['events'] = array(
 			echo file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/qr/' . $event_id . '/' . $uuid . '?format=' . $format . '&size=' . $size);
 			die();
 		},
+		'{/(id:[0-9]+)/tickets/(uuid:\w+-\w+-\w+-\w+-\w+)/export}' => function ($event_id, $uuid) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+
+			global $ROOT_PATH;
+			header('Content-type: application/pdf');
+			header('Content-Disposition: attachment; filename=ticket-' . $uuid . '.pdf');
+			header('Pragma: no-cache');
+
+
+			if (file_exists($ROOT_PATH . 'email_files/' . $uuid . '.pdf')) {
+				echo file_get_contents($ROOT_PATH . '/email_files/' . $uuid . '.pdf');
+			} else {
+				file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/pdf/tickets/' . $uuid);
+				echo file_get_contents($ROOT_PATH . '/email_files/' . $uuid . '.pdf');
+			}
+			die();
+		},
 		'{/(id:[0-9]+)/tickets}' => function ($event_id) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
 
 			if ($__user instanceof User == false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
@@ -65,12 +81,54 @@ $__modules['events'] = array(
 				$__order_by ?? array()
 			);
 		},
+		'{/(id:[0-9]+)/promocodes}' => function ($event_id) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
+
+			if ($__user instanceof User == false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
+			if (!isset($__request['code']) && !isset($__request['uuid'])) throw new PrivilegesException('BAD_PROMOCODE', $__db);
+			$__request['event_id'] = $event_id;
+
+			return PromocodesCollection::filter($__db,
+				$__user,
+				$__request,
+				$__fields,
+				$__pagination,
+				$__order_by ?? array()
+			)->getParams($__user, $__fields);
+		},
+		'{/(id:[0-9]+)/orders/(uuid:\w+-\w+-\w+-\w+-\w+)/bitcoin/qr}' => function ($event_id, $uuid) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+
+			$event = EventsCollection::one($__db, $__user, $event_id, array());
+			$order = OrdersCollection::oneByUUID($__db, $__user, $uuid, array());
+
+			$format = 'png';
+			$available_types = ['png', 'svg', 'pdf', 'eps'];
+			$headers = array(
+				'png' => 'image/png',
+				'svg' => 'image/svg+xml',
+				'pdf' => 'application/pdf',
+				'eps' => 'application/postscript',
+			);
+			$size = 10;
+			if (isset($__request['format'])) {
+				if (isset($available_types[$__request['format']])) {
+					$format = $__request['format'];
+
+				}
+			}
+			$mime_type = $headers[$format];
+			if (isset($__request['size'])) {
+				$size = filter_var($__request['size'], FILTER_VALIDATE_INT);
+			}
+
+			header("Content-type: " . $mime_type);
+
+			echo file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/qr/bitcoin/?format=' . $format . '&size=' . $size . '&address=' . ($__request['address'] ?? '') . '&amount=' . ($__request['amount'] ?? ''));
+			die();
+		},
 		'{/(id:[0-9]+)/orders/(uuid:\w+-\w+-\w+-\w+-\w+)}' => function ($event_id, $uuid) use ($__db, $__request, $__offset, $__pagination, $__length, $__user, $__fields, $__order_by) {
 
 			if ($__user instanceof User == false) throw new PrivilegesException('NOT_AUTHORIZED', $__db);
 			$__request['event'] = EventsCollection::one($__db, $__user, $event_id, array());
-			if ($__user->isAdmin($__request['event']->getOrganization()) == false) throw new PrivilegesException('NOT_ADMIN', $__db);
-
 
 			return OrdersCollection::oneByUUID($__db,
 				$__user,
@@ -266,12 +324,41 @@ $__modules['events'] = array(
 			Statistics::Event($event, $__user, $__db, Statistics::EVENT_FAVE);
 			return $__user->addFavoriteEvent($event);
 		},
-		'{{/(id:[0-9]+)}/orders}' => function ($id) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+		'{/(id:[0-9]+)/orders/(uuid:\w+-\w+-\w+-\w+-\w+)/legal_entity}' => function ($id, $uuid) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
 			$event = EventsCollection::one(
 				$__db,
 				$__user,
 				intval($id),
 				$__fields);
+
+			$order = OrdersCollection::oneByUUID($__db, $__user, $uuid, array());
+
+			return $order->makeLegalEntityPayment($__request['payload'] ?? $__request, $event);
+		},
+		'{/(id:[0-9]+)/orders/(uuid:\w+-\w+-\w+-\w+-\w+)/bitcoin}' => function ($id, $uuid) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+
+			$event_fields = Fields::parseFields('accept_bitcoins');
+			$event = EventsCollection::one(
+				$__db,
+				$__user,
+				intval($id),
+				$event_fields);
+
+			if ($event->getParams($__user, $event_fields)->getData()['accept_bitcoins'] == false)
+				throw new LogicException('BITCOINS_NOT_ACCEPTABLE');
+
+			$fields = Fields::parseFields('final_sum,number,promocode,tickets{fields:"ticket_type"}');
+			$order = OrdersCollection::oneByUUID($__db, $__user, $uuid, $fields);
+			return $order->makeBitcoinPayment($fields, $event);
+		},
+		'{{/(id:[0-9]+)}/orders}' => function ($id) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+			$event_fields = Fields::parseFields('accept_bitcoins');
+
+			$event = EventsCollection::one(
+				$__db,
+				$__user,
+				intval($id),
+				$event_fields);
 
 			if (!isset($__request['payload']) || !isset($__request['payload']['registration_fields']))
 				throw new InvalidArgumentException('REGISTRATION_FIELDS_NOT_FOUND');

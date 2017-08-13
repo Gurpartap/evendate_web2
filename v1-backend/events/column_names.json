@@ -34,6 +34,23 @@
       "vk_uid": "ВКонтакте ID",
       "facebook_uid": "Facebook ID",
       "google_uid": "Google ID"
+    },
+    "legal_entity_fields": {
+      "participants" : "Участники",
+      "company_name" : "Название компании",
+      "company_inn" : "ИНН",
+      "company_kpp" : "КПП",
+      "company_address" : "Юридический адрес",
+      "company_zipcode" : "Индекс",
+      "bank_name" : "Название банка",
+      "bank_bik" : "БИК",
+      "bank_correspondent_account" : "Коррекспондетский счет",
+      "bank_payment_account" : "Рассчетный счет",
+      "signer_full_name" : "ФИО подписывающего лица",
+      "signer_position" : "Должность подписывающего лица",
+      "contact_full_name" : "Ваши имя и фамилия",
+      "contact_email" : "Ваш e-mail",
+      "contact_phone_number" : "Контактный телефон"
     }
   },
   "en": {
@@ -71,6 +88,23 @@
       "vk_uid": "Vk.com ID",
       "facebook_uid": "Facebook ID",
       "google_uid": "Google ID"
+    },
+    "legal_entity_fields": {
+      "participants" : "Participants",
+      "company_name" : "Company name",
+      "company_inn" : "Company inn",
+      "company_kpp" : "Company kpp",
+      "company_address" : "Company address",
+      "company_zipcode" : "Company zipcode",
+      "bank_name" : "Bank name",
+      "bank_bik" : "Bank bik",
+      "bank_correspondent_account" : "Bank correspondent account",
+      "bank_payment_account" : "Bank payment account",
+      "signer_full_name" : "Signer full name",
+      "signer_position" : "Signer position",
+      "contact_full_name" : "Contact full name",
+      "contact_email" : "Contact email",
+      "contact_phone_number" : "Contact phone number"
     }
   }
 }

@@ -4,26 +4,33 @@
 /**
  *
  * @class LegalEntityPayment
- * @extends OrderPage
+ * @extends Page
  */
-LegalEntityPayment = extending(OrderPage, (function() {
+LegalEntityPayment = extending(Page, (function() {
 	/**
 	 *
 	 * @param {(number|string)} event_id
+	 * @param {(number|string)} uuid
 	 *
 	 * @constructor
 	 * @constructs LegalEntityPayment
+	 *
+	 * @property {OneExtendedOrder} order
+	 * @property {OneEvent} event
 	 */
-	function LegalEntityPayment(event_id) {
+	function LegalEntityPayment(event_id, uuid) {
 		var self = this;
 		
+		Page.call(this);
+		
 		try {
-			this.order_info = JSON.parse(window.sessionStorage.getItem(this.event.id + '_order_info'));
+			this.order_info = JSON.parse(window.localStorage.getItem(event_id + '_order_info'));
 		} catch (e) {
-			this.order_info = null;
+			this.order_info = {};
 		}
 		
-		OrderPage.call(this, event_id);
+		this.order = new OneExtendedOrder(event_id, uuid);
+		this.order_fields = new Fields('sum');
 		
 		this.render_vars = {
 			event_info: null,
@@ -44,13 +51,28 @@ LegalEntityPayment = extending(OrderPage, (function() {
 			self_phone_form_field: null
 		};
 		
-		Object.defineProperty(this, 'page_title', {
-			get: function() {
-				
-				return 'Оплата участия на событие ' + self.event.title + ' от юридического лица';
+		this.$submit_button = $();
+		
+		Object.defineProperties(this, {
+			event: {
+				get: function() {
+					
+					return self.order.event;
+				}
+			},
+			page_title: {
+				get: function() {
+					
+					return 'Оплата участия на событие ' + self.event.title + ' от юридического лица';
+				}
 			}
 		});
 	}
+	
+	LegalEntityPayment.prototype.fetchData = function() {
+		
+		return this.fetching_data_defer = this.order.fetchOrder(this.order_fields);
+	};
 	
 	LegalEntityPayment.prototype.init = function() {
 		var self = this,
@@ -73,15 +95,15 @@ LegalEntityPayment = extending(OrderPage, (function() {
 			type: 'PARTY',
 			count: 5,
 			onSelect: function(suggestion) {
-				$company_name.val(suggestion.unrestricted_value);
+				$company_name.val(suggestion.unrestricted_value).trigger('change');
 				if (!suggestion.data) {
 					return void 0;
 				}
-				$inn.val(suggestion.data.inn);
-				$kpp.val(suggestion.data.kpp);
+				$inn.val(suggestion.data.inn).trigger('change');
+				$kpp.val(suggestion.data.kpp).trigger('change');
 				
 				if (suggestion.data.address) {
-					$address.val(suggestion.data.address.value);
+					$address.val(suggestion.data.address.value).trigger('change');
 				}
 			}
 		});
@@ -97,20 +119,32 @@ LegalEntityPayment = extending(OrderPage, (function() {
 			type: 'BANK',
 			count: 5,
 			onSelect: function(suggestion) {
-				$bank_name.val(suggestion.unrestricted_value);
+				$bank_name.val(suggestion.unrestricted_value).trigger('change');
 				if (!suggestion.data) {
 					return void 0;
 				}
-				$bic.val(suggestion.data.bic);
-				$correspondent_account.val(suggestion.data.correspondent_account);
+				$bic.val(suggestion.data.bic).trigger('change');
+				$correspondent_account.val(suggestion.data.correspondent_account).trigger('change');
 			}
 		});
 		
-		this.$wrapper.find('.LegalEntityPaymentSubmit').on('click.SubmitForm', function() {
-			var form_data = self.$wrapper.find('.LegalEntityPaymentForm').serializeForm();
+		this.$submit_button.on('click.SubmitForm', function() {
+			var $form = self.$wrapper.find('.LegalEntityPaymentForm');
 			
+			if (isFormValid($form)) {
+				self.order.makeLegalEntityPayment($form.serializeForm()).done(function() {
+					window.localStorage.removeItem(self.event.id + '_order_info');
+					showNotifier({text: 'Форма отправлена успешно<br>' +
+					                    'В скором времени на указанную почту придет договор-счет для оплаты от юрлица', status: true});
+					
+					if (self.order_info['away_to']) {
+						window.location = self.order_info['away_to']
+					} else {
+						__APP.changeState('/event/' + self.event.id);
+					}
+				});
+			}
 			
-			// send some data to somewhere
 		});
 		
 	};
@@ -125,13 +159,16 @@ LegalEntityPayment = extending(OrderPage, (function() {
 			}, {
 				name: 'Дата события:',
 				value: displayDateRange(this.event.first_event_date, this.event.last_event_date)
+			}, {
+				name: 'Сумма платежа:',
+				value: formatCurrency(this.order.sum) + ' руб.'
 			}
 		]);
 		
 		this.render_vars.receivers_form_field = __APP.BUILD.formUnit({
 			label: 'Перечислите ФИО участников от компании',
 			id: 'legal_entity_payment_receivers',
-			name: 'receivers',
+			name: 'participants',
 			type: 'textarea',
 			helptext: 'По одному участнику на каждой строке',
 			required: true
@@ -150,7 +187,7 @@ LegalEntityPayment = extending(OrderPage, (function() {
 		this.render_vars.inn_form_field = __APP.BUILD.formUnit({
 			label: 'ИНН',
 			id: 'legal_entity_payment_inn',
-			name: 'inn',
+			name: 'company_inn',
 			classes: 'InnInput',
 			placeholder: 'Попробуйте найти организацию через ИНН',
 			helptext: '10 или 12 знаков в зависимости от организационной формы',
@@ -163,7 +200,7 @@ LegalEntityPayment = extending(OrderPage, (function() {
 		this.render_vars.kpp_form_field = __APP.BUILD.formUnit({
 			label: 'КПП',
 			id: 'legal_entity_payment_kpp',
-			name: 'kpp',
+			name: 'company_kpp',
 			classes: 'KppInput',
 			helptext: '9 знаков, если у вас нет КПП - поставьте прочерк',
 			required: true,
@@ -175,17 +212,10 @@ LegalEntityPayment = extending(OrderPage, (function() {
 		this.render_vars.real_address_form_field = __APP.BUILD.formUnit({
 			label: 'Юридический адрес',
 			id: 'legal_entity_payment_real_address',
-			name: 'real_address',
+			name: 'company_address',
 			classes: 'AddressInput',
 			helptext: 'Например: 150000, Россия, Москыв, ул. Ленина, д. 108, корп. 1, кв. 8',
 			required: true
-		});
-		
-		this.render_vars.post_address_form_field = __APP.BUILD.formUnit({
-			label: 'Почтовый адрес',
-			id: 'legal_entity_payment_post_address',
-			name: 'post_address',
-			helptext: 'Например: 150000, Россия, Москыв, ул. Ленина, д. 108, корп. 1, кв. 8'
 		});
 		
 		this.render_vars.bank_name_form_field = __APP.BUILD.formUnit({
@@ -201,7 +231,7 @@ LegalEntityPayment = extending(OrderPage, (function() {
 		this.render_vars.bic_form_field = __APP.BUILD.formUnit({
 			label: 'БИК',
 			id: 'legal_entity_payment_bic',
-			name: 'bic',
+			name: 'bank_bik',
 			classes: 'BikInput',
 			placeholder: 'Попробуйте найти банк через БИК',
 			helptext: '9 знаков',
@@ -214,7 +244,7 @@ LegalEntityPayment = extending(OrderPage, (function() {
 		this.render_vars.correspondent_account_form_field = __APP.BUILD.formUnit({
 			label: 'Корреспондентский счет',
 			id: 'legal_entity_payment_correspondent_account',
-			name: 'correspondent_account',
+			name: 'bank_correspondent_account',
 			classes: 'CorrespondentAccountInput',
 			helptext: '20 знаков',
 			required: true,
@@ -229,7 +259,7 @@ LegalEntityPayment = extending(OrderPage, (function() {
 		this.render_vars.checking_account_form_field = __APP.BUILD.formUnit({
 			label: 'Расчетный счет',
 			id: 'legal_entity_payment_checking_account',
-			name: 'checking_account',
+			name: 'bank_payment_account',
 			type: 'number',
 			helptext: '20 знаков',
 			required: true,
@@ -241,7 +271,7 @@ LegalEntityPayment = extending(OrderPage, (function() {
 		this.render_vars.signer_name_form_field = __APP.BUILD.formUnit({
 			label: 'ФИО подписывающего лица',
 			id: 'legal_entity_payment_signer_name',
-			name: 'signer_name',
+			name: 'signer_full_name',
 			helptext: 'ФИО лица, подписывающего договор (полностью). Например, Иванов Иван Иванович',
 			required: true
 		});
@@ -257,7 +287,7 @@ LegalEntityPayment = extending(OrderPage, (function() {
 		this.render_vars.self_name_form_field = __APP.BUILD.formUnit({
 			label: 'Ваши имя и фамилия',
 			id: 'legal_entity_payment_self_name',
-			name: 'self_name',
+			name: 'contact_full_name',
 			value: __APP.USER.full_name,
 			required: true
 		});
@@ -265,7 +295,7 @@ LegalEntityPayment = extending(OrderPage, (function() {
 		this.render_vars.self_email_form_field = __APP.BUILD.formUnit({
 			label: 'Ваш e-mail',
 			id: 'legal_entity_payment_self_email',
-			name: 'self_email',
+			name: 'contact_email',
 			value: __APP.USER.email,
 			helptext: 'На него мы вышлем заполненный договор',
 			required: true
@@ -274,12 +304,12 @@ LegalEntityPayment = extending(OrderPage, (function() {
 		this.render_vars.self_phone_form_field = __APP.BUILD.formUnit({
 			label: 'Контактный телефон',
 			id: 'legal_entity_payment_self_phone',
-			name: 'self_phone',
+			name: 'contact_phone_number',
 			helptext: 'В формате: +7 (xxx) xxx-xx-xx',
 			required: true
 		});
 		
-		this.render_vars.submit_button = __APP.BUILD.button({
+		this.render_vars.submit_button = this.$submit_button = __APP.BUILD.button({
 			classes: [
 				__C.CLASSES.SIZES.HUGE,
 				__C.CLASSES.COLORS.ACCENT,

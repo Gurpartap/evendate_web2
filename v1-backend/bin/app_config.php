@@ -293,6 +293,11 @@ class App
 		}
 	}
 
+	public static function loadColumnNames(){
+		global $BACKEND_FULL_PATH;
+		return json_decode(file_get_contents($BACKEND_FULL_PATH . '/events/column_names.json'), true);
+	}
+
 	public static function getSocialUrls()
 	{
 		return array(

@@ -41,20 +41,20 @@ AppInspectorComponents = (function() {
 	};
 	/**
 	 *
-	 * @param {(Array<OneTicket>|...OneTicket|TicketsCollection)} ticket
+	 * @param {(Array<OneTicket>|...OneTicket|TicketsCollection)} tickets
 	 *
 	 * @return {jQuery}
 	 */
-	AppInspectorComponents.prototype.tickets = function(ticket) {
-		var tickets;
+	AppInspectorComponents.prototype.tickets = function(tickets) {
+		var _tickets;
 		
 		if (arguments.length > 1) {
-			tickets = [].slice.call(arguments)
+			_tickets = [].slice.call(arguments)
 		} else {
-			tickets = ticket instanceof Array ? ticket : [ticket]
+			_tickets = tickets instanceof Array ? tickets : [tickets]
 		}
 		
-		return tmpl('app-inspector-ticket', tickets.map(function(ticket) {
+		return tmpl('app-inspector-ticket', _tickets.map(function(ticket) {
 			
 			return {
 				fields: tmpl('fields-wrapper', [
@@ -72,7 +72,9 @@ AppInspectorComponents = (function() {
 				]),
 				footer: !ticket.checkout ? '' : tmpl('app-inspector-ticket-footer')
 			};
-		}));
+		})).each(function(i, el) {
+			$(el).data('ticket', _tickets[i]);
+		});
 	};
 	/**
 	 *

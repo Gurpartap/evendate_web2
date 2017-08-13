@@ -20,12 +20,24 @@ MyOrdersPage = extending(Page, (function() {
 		
 		this.fetch_order_fields = new Fields(
 			'registration_fields',
+			'final_sum',
 			'sum', {
 				event: {
-					fields: new Fields('ticketing_locally')
+					fields: new Fields(
+						'dates',
+						'nearest_event_date',
+						'is_same_time',
+						'location',
+						'ticketing_locally'
+					)
 				},
 				tickets: {
-					fields: new Fields('ticket_type')
+					fields: new Fields(
+						'ticket_type',
+						'created_at',
+						'number',
+						'order'
+					)
 				}
 			}
 		);
@@ -66,20 +78,16 @@ MyOrdersPage = extending(Page, (function() {
 		var color = 'success',
 			text = localeFromNamespace(order.status_type_code, OneOrder.EXTENDED_ORDER_STATUSES, __LOCALE.TEXTS.TICKET_STATUSES);
 		
-		if (order.sum !== null) {
-			if (OneOrder.isRedStatus(order.status_type_code)) {
-				color = 'error';
-			} else if (OneOrder.isYellowStatus(order.status_type_code)) {
-				color = 'warning';
-			} else if (OneOrder.isGreenStatus(order.status_type_code)) {
-				color = 'default';
-			}
-			
-			if (order.payed_at) {
-				text = 'Оплачен '+moment.unix(order.payed_at).format(__LOCALE.DATE.DATE_TIME_FORMAT)+' — '+formatCurrency(order.sum)+' руб.'
-			}
+		if (OneOrder.isRedStatus(order.status_type_code)) {
+			color = 'error';
+		} else if (OneOrder.isYellowStatus(order.status_type_code)) {
+			color = 'warning';
 		}
-	
+		
+		if (order.final_sum !== null && order.payed_at) {
+			text = 'Оплачен '+moment.unix(order.payed_at).format(__LOCALE.DATE.DATE_TIME_FORMAT)+' — '+formatCurrency(order.final_sum)+' руб.'
+		}
+		
 		return tmpl('my-orders-order-unit-footer', {
 			text: text,
 			color: color
@@ -99,7 +107,8 @@ MyOrdersPage = extending(Page, (function() {
 		this.$wrapper.find('.Scroll').scrollbar();
 		this.$orders.on('click.SelectOrder', function() {
 			var $this = $(this),
-				order = $this.data('order');
+				order = $this.data('order'),
+				$tickets = AbstractAppInspector.build.tickets(order.tickets);
 			
 			self.$orders.not($this).removeClass('-item_selected');
 			$this.addClass('-item_selected');
@@ -108,29 +117,82 @@ MyOrdersPage = extending(Page, (function() {
 				order_number: formatTicketNumber(order.number),
 				pain_info: MyOrdersPage.buildPayInfo(order),
 				pay_button: order.status_type_code === OneOrder.ORDER_STATUSES.WAITING_FOR_PAYMENT ? __APP.BUILD.button({
-					title: 'Оплатить',
+					title: 'Заплатить через Яндекс',
 					classes: [
 						'orders_page_pay_button',
-						'-color_accent',
+						__C.CLASSES.COLORS.YANDEX,
 						__C.CLASSES.HOOKS.RIPPLE,
 						'PayButton',
 						__C.CLASSES.SIZES.HUGE,
 						__C.CLASSES.SIZES.WIDE,
 						__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
 					]
-				}).on('click.Pay', function() {
-					Payment.doPayment('order-' + order.uuid, order.sum);
+				}, {
+					title: 'Оплатить через юр. лицо',
+					classes: [
+						'orders_page_pay_button',
+						__C.CLASSES.COLORS.MARGINAL_PRIMARY,
+						__C.CLASSES.TEXT_WEIGHT.LIGHTER,
+						__C.CLASSES.HOOKS.RIPPLE,
+						'LegalEntityPaymentButton',
+						__C.CLASSES.SIZES.WIDE,
+						__C.CLASSES.SIZES.BIG,
+						__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
+					]
+				}, {
+					title: 'Заплатить через Bitcoin',
+					classes: [
+						'orders_page_pay_button',
+						__C.CLASSES.COLORS.MARGINAL_PRIMARY,
+						__C.CLASSES.TEXT_WEIGHT.LIGHTER,
+						__C.CLASSES.HOOKS.RIPPLE,
+						'BitcoinPaymentButton',
+						__C.CLASSES.SIZES.WIDE,
+						__C.CLASSES.SIZES.BIG,
+						__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
+					]
 				}) : '',
 				event_title: AbstractAppInspector.build.title('Событие'),
 				event: AbstractAppInspector.build.event(order.event),
 				tickets_title: AbstractAppInspector.build.title('Билеты'),
-				tickets: AbstractAppInspector.build.tickets(order.tickets)
+				tickets: order.tickets.length ? $tickets : 'Билетов нет'
 			}));
+			
+			$tickets.on('click.OpenTicket', function() {
+				var $this = $(this),
+					ticket = OneExtendedTicket.createFrom($this.data('ticket'), order.event);
+				
+				if (!$this.data('modal')) {
+					$this.data('modal', new TicketsModal(ticket));
+				}
+				$this.data('modal').show();
+				
+			});
 			
 			self.$registration_fields_wrapper.html(tmpl('my-orders-order-registration-fields', {
 				registration_fields_title: AbstractAppInspector.build.title('Анкета'),
 				registration_fields: __APP.BUILD.registrationFields(order.registration_fields)
 			}));
+			
+			self.$detail_wrapper.find('.PayButton').on('click.Pay', function() {
+				Payment.doPayment('order-' + order.uuid, order.final_sum);
+			});
+			
+			self.$detail_wrapper.find('.LegalEntityPaymentButton').on('click.PayByLegalEntity', function() {
+				__APP.changeState('event/' + order.event.id + '/order/' + order.uuid + '/from_legal_entity');
+			});
+			
+			self.$detail_wrapper.find('.BitcoinPaymentButton').on('click.BitcoinPayment', function() {
+				var $this = $(this),
+					modal = $this.data('modal');
+				
+				if (!modal) {
+					modal = new BitcoinModal(order.event, order);
+					$this.data('modal', modal);
+				}
+				
+				modal.show();
+			});
 		});
 		
 		if (parsed_uri.queryKey['uuid']) {
