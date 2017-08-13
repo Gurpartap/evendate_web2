@@ -699,6 +699,12 @@ class Event extends AbstractEntity
 			$data['is_free'] = filter_var($data['is_free'], FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
 		}
 
+		if (!isset($data['accept_bitcoins'])) {
+			$data['accept_bitcoins'] = 'false';
+		} else {
+			$data['accept_bitcoins'] = filter_var($data['accept_bitcoins'], FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+		}
+
 		$data['min_price'] = $data['is_free'] == 'false' && is_numeric($data['min_price']) ? (int)$data['min_price'] : null;
 
 		/*VK posting data*/
@@ -744,6 +750,7 @@ class Event extends AbstractEntity
 					'detail_info_url' => $data['detail_info_url'],
 					'registration_required' => $data['registration_required'],
 					'registration_locally' => $data['registration_locally'],
+					'accept_bitcoins' => $data['accept_bitcoins'],
 					'ticketing_locally' => $data['ticketing_locally'],
 					'registration_limit_count' => $data['registration_limit_count'],
 					'registration_approvement_required' => $data['registration_approvement_required'],
@@ -1459,6 +1466,7 @@ class Event extends AbstractEntity
 					'latitude' => $data['latitude'],
 					'longitude' => $data['longitude'],
 					'location_updates' => 0,
+					'accept_bitcoins' => $data['accept_bitcoins'],
 					'detail_info_url' => $data['detail_info_url'],
 					'registration_required' => $data['registration_required'],
 					'registration_locally' => $data['registration_locally'],
