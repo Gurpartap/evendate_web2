@@ -25,6 +25,9 @@ class RegistrationForm
 
 	private static function addFormField(int $event_id, string $type, string $label = null, bool $required, ExtendedPDO $db, array $values = null, $order_number = null)
 	{
+		if (!is_numeric($order_number)){
+			$order_number = null;
+		}
 		$q_ins_field = App::queryFactory()->newInsert();
 		$field_type_info = self::getFormFieldTypeInfo($type, $db);
 		if ($type == self::SELECT_FORM_FIELD_TYPE || $type == self::SELECT_MULTI_FORM_FIELD_TYPE) {
@@ -90,7 +93,7 @@ class RegistrationForm
 
 		foreach ($fields as $field) {
 			if (!isset($field['type'])) throw new InvalidArgumentException('BAD_FIELD_TYPE');
-			self::addFormField($event_id, $field['type'], $field['label'], filter_var($field['required'], FILTER_VALIDATE_BOOLEAN), $db, $field['values'] ?? null);
+			self::addFormField($event_id, $field['type'], $field['label'], filter_var($field['required'], FILTER_VALIDATE_BOOLEAN), $db, $field['values'] ?? null, $field['order_number'] ?? null);
 		}
 	}
 
@@ -137,13 +140,14 @@ class RegistrationForm
 		return new Result(true, $text);
 	}
 
-	public static function processOrder(Event $event, AbstractUser $user, ExtendedPDO $db, array $tickets)
+	public static function processOrder(Event $event, AbstractUser $user, ExtendedPDO $db, array $tickets, $promocode = null)
 	{
 		try {
 			$db->beginTransaction();
 
-			$order_info = Order::create($event, $user, $db, $tickets);
+			$order_info = Order::create($event, $user, $db, $tickets, $promocode);
 			$tickets = Ticket::createBatch($event, $order_info['id'], $db, $tickets);
+			Order::updateSum($order_info['id'], $db);
 
 			$db->commit();
 
@@ -167,8 +171,10 @@ class RegistrationForm
 				'value',
 				'values',
 				'created_at',
-				'updated_at'
-			))->where('ticket_order_uuid = ?', $order->getUUID());
+				'updated_at',
+				'order_number'
+			))->where('ticket_order_uuid = ?', $order->getUUID())
+		->orderBy(array('order_number'));
 
 		$result = $db->prepareExecute($q_get, 'CANT_GET_FILLED_FIELDS')->fetchAll();
 		foreach ($result as &$item) {

@@ -9,23 +9,28 @@ AuthModal = extending(AbstractModal, (function() {
 	/**
 	 *
 	 * @param {string} [redirect_to]
+	 * @param {boolean} [is_hideable]
 	 *
 	 * @constructor
 	 * @constructs AuthModal
 	 */
-	function AuthModal(redirect_to) {
+	function AuthModal(redirect_to, is_hideable) {
 		AbstractModal.call(this);
 		this.content = tmpl('modal-auth-content', {
 			heading: 'Войдите через социальную сеть, чтобы совершить это действие'
 		});
 		this.redirect_to = redirect_to;
+		
+		if (is_hideable === false) {
+			this.hide = function() {};
+		}
 	}
 	
 	/**
 	 *
 	 * @return {AuthModal}
 	 */
-	AuthModal.prototype.render = function() {
+	AuthModal.prototype.render = function(props) {
 		this.__render({
 			classes: [__C.CLASSES.FLOATING_MATERIAL, __C.CLASSES.MODAL_STATES.SIZE.TINY],
 			content_classes: [__C.CLASSES.ALIGN.CENTER]
@@ -60,6 +65,8 @@ AuthModal = extending(AbstractModal, (function() {
 				e.preventDefault();
 			});
 		});
+		
+		this.__init();
 		
 		bindRippleEffect(this.modal);
 		

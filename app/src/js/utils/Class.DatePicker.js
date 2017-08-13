@@ -35,8 +35,8 @@ DatePicker = (function() {
 				min_date: this.options.min_date,
 				max_date: this.options.max_date
 			});
-			this.prev_selected_day = (typeof this.options.selected_day !== 'undefined') ? this.options.selected_day : '';
-			this.selected_day = (typeof this.options.selected_day !== 'undefined') ? this.options.selected_day : '';
+			this.prev_selected_day = (typeof this.options.selected_day !== 'undefined') ? this.options.selected_day : this.$input.val() || '';
+			this.selected_day = (typeof this.options.selected_day !== 'undefined') ? this.options.selected_day : this.$input.val() || '';
 			this.formated_selected_day = this.selected_day.toString().split('-').reverse().join('.');
 		} else {
 			throw new TypeError('Аргумент должен быть экземпляром jQuery, элементом DOM, либо CSS селектором');

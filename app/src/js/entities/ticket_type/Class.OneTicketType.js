@@ -21,9 +21,10 @@ OneTicketType = extending(OneEntity, (function() {
 	 * @property {?string} name
 	 * @property {?string} comment
 	 * @property {?number} price
+	 * @property {?boolean} is_selling
 	 * @property {?number} sell_start_date
 	 * @property {?number} sell_end_date
-	 * @property {?(string|number)} start_after_ticket_type_uuid
+	 * @property {?(string|number)} start_after_ticket_type_code
 	 * @property {?number} amount
 	 * @property {?number} min_count_per_user
 	 * @property {?number} max_count_per_user
@@ -33,15 +34,16 @@ OneTicketType = extending(OneEntity, (function() {
 	function OneTicketType(event_id, uuid) {
 		var self = this;
 		
-		this.uuid = setDefaultValue(uuid, 0);
-		this.event_id = setDefaultValue(event_id, 0);
+		this.uuid = setDefaultValue(uuid, null);
+		this.event_id = setDefaultValue(event_id, null);
 		this.type_code = null;
 		this.name = null;
 		this.comment = null;
 		this.price = null;
+		this.is_selling = null;
 		this.sell_start_date = null;
 		this.sell_end_date = null;
-		this.start_after_ticket_type_uuid = null;
+		this.start_after_ticket_type_code = null;
 		this.amount = null;
 		this.min_count_per_user = null;
 		this.max_count_per_user = null;
@@ -92,7 +94,7 @@ OneTicketType = extending(OneEntity, (function() {
 		
 		return OneTicketType.fetchTicketType(this.event_id, this.uuid, fields, function(data) {
 			self.setData(data);
-			if (success && typeof success == 'function') {
+			if (isFunction(success)) {
 				success.call(self, data);
 			}
 		});

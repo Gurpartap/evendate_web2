@@ -280,9 +280,9 @@ class MailScheduler {
                                         handleError(err);
                                         callback(null, 0);
                                     }
-                                    if (result.rows.length == 1){
+                                    if (result.rows.length == 1) {
                                         callback(null, result.rows[0].events_added);
-                                    }else{
+                                    } else {
                                         callback(null, 0);
                                     }
                                 });
@@ -293,11 +293,12 @@ class MailScheduler {
                                         handleError(err);
                                         callback(null, []);
                                     }
-                                    if (result.rows.length == 1){
+                                    if (result.rows.length == 1) {
                                         callback(null, result.rows[0].notifications_sent);
-                                    }else{
+                                    } else {
                                         callback(null, 0);
-                                    }                                });
+                                    }
+                                });
                             },
                             emails_to_send: (callback) => {
                                 _client.query(q_get_admins, [org.id], function (err, result) {
@@ -359,8 +360,61 @@ class MailScheduler {
     }
 
 
-    scheduleEventFinished() {
+    scheduleOrderWaitingPayment() {
+        let q_get = 'SELECT * FROM view_emails_waiting_for_payment',
+            q_ins_email = 'INSERT INTO emails(email_type_id, recipient, data)' +
+                ' VALUES (16, $1, $2)',
+            _client = this.client;
 
+        _client.query(q_get, (err, res) => {
+            res.rows.forEach((row) => {
+                let recipient;
+                if (MailScheduler.validateEmail(row.form_email)) {
+                    recipient = row.form_email
+                } else if (MailScheduler.validateEmail(row.email)) {
+                    recipient = row.email;
+                } else return;
+
+                _client.query(q_ins_email, [recipient, JSON.stringify(row)], MailScheduler.handleError);
+            })
+
+        })
+
+    }
+
+    scheduleAfterEvent() {
+        let q_get = 'SELECT * FROM view_emails_after_event',
+            q_ins_email = 'INSERT INTO emails(email_type_id, recipient, data)' +
+                ' VALUES (15, $1, $2)',
+            _client = this.client;
+
+        _client.query(q_get, (err, res) => {
+            res.rows.forEach((row) => {
+                let recipient;
+                if (MailScheduler.validateEmail(row.form_email)) {
+                    recipient = row.form_email
+                } else if (MailScheduler.validateEmail(row.email)) {
+                    recipient = row.email;
+                } else return;
+
+                restler.get('http://localhost/api/v1/events/recommendations?order_by=-rating&length=4&fields=link', {
+                    headers: {
+                        Authorization: row.token,
+                    }
+                }).on('complete', (recs) => {
+                    let _data = row;
+                    recs.data.forEach((event, index) => {
+                        _data['event_' + index + '_title'] = event.title;
+                        _data['event_' + index + '_url'] = event.link;
+                        _data['event_' + index + '_image_url'] = event.image_horizontal_url + '?width=250';
+                    });
+
+                    _client.query(q_ins_email, [recipient, JSON.stringify(_data)], MailScheduler.handleError);
+
+                });
+            })
+
+        })
     }
 }
 

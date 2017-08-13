@@ -37,7 +37,7 @@ AsynchronousConnection = (function() {
 	 *
 	 * @returns {jqPromise}
 	 */
-	AsynchronousConnection.prototype.dealAjax = function(http_method, url, ajax_data, content_type, success, error) {
+	AsynchronousConnection.prototype.dealAjax = AsynchronousConnection.dealAjax = function(http_method, url, ajax_data, content_type, success, error) {
 		
 		return $.ajax({
 			url: url,
@@ -51,7 +51,7 @@ AsynchronousConnection = (function() {
 	 * @param {function(..(Array|object))} [cb]
 	 * @return {jqPromise}
 	 */
-	AsynchronousConnection.prototype.multipleAjax = function(){
+	AsynchronousConnection.prototype.multipleAjax = AsynchronousConnection.multipleAjax = function(){
 		var with_callback = (arguments[arguments.length - 1] instanceof Function),
 			promises = with_callback ? Array.prototype.splice.call(arguments, 0, arguments.length - 1) : Array.prototype.slice.call(arguments),
 			parallel_promise;

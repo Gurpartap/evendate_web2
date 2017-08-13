@@ -85,7 +85,12 @@ class EventsCollection extends AbstractCollection
 					$_organization = OrganizationsCollection::onePrivate($db, $user, $org_id, null, array('privileges'));
 					$getting_personal_events = true;
 				} catch (Exception $e) {
-					$_organization = OrganizationsCollection::one($db, $user, $org_id, array('privileges'));
+					if (!isset($filters['ticket']) || $filters['ticket'] instanceof Ticket == false){
+						$_organization = OrganizationsCollection::one($db, $user, $org_id, array('privileges'));
+					}else{
+						$_organization = null;
+						$getting_personal_events = true;
+					}
 				}
 			}
 		}
@@ -232,7 +237,7 @@ class EventsCollection extends AbstractCollection
 					if ($val) {
 						$from_view = self::VIEW_ALL_EVENTS_WITH_ALIAS;
 						$operand = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'IN' : 'NOT IN';
-						$q_get_events->where('id ' . $operand . ' (SELECT event_id FROM view_tickets WHERE user_id = :user_id AND is_active = TRUE)');
+						$q_get_events->where('id ' . $operand . ' (SELECT event_id FROM view_tickets WHERE user_id = :user_id)');
 						$statement_array[':user_id'] = $user->getId();
 						$getting_personal_events = true;
 					}

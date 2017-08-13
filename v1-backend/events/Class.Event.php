@@ -8,6 +8,7 @@ require_once $BACKEND_FULL_PATH . '/events/Class.VkPost.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.RegistrationFieldsCollection.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.TicketType.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.TicketTypesCollection.php';
+require_once $BACKEND_FULL_PATH . '/events/Class.PromocodesCollection.php';
 
 class Event extends AbstractEntity
 {
@@ -47,6 +48,8 @@ class Event extends AbstractEntity
 	const STATISTICS_FIELD_NAME = 'statistics';
 	const REGISTERED_USERS_FIELD_NAME = 'registered_users';
 	const ORDERS_COUNT_FIELD_NAME = 'orders_count';
+	const EMAIL_TEXTS_FIELD_NAME = 'email_texts';
+	const PROMOCODES_FIELD_NAME = 'promocodes';
 	/*ONLY FOR ADMINS*/
 
 	const REGISTRATION_FIELDS_FIELD_NAME = 'registration_fields';
@@ -90,6 +93,7 @@ class Event extends AbstractEntity
 						FROM hidden_events
 						WHERE hidden_events.status = TRUE
 						AND hidden_events.user_id = :user_id))';
+
 
 	protected static $DEFAULT_COLS = array(
 		'id',
@@ -143,6 +147,8 @@ class Event extends AbstractEntity
 		'min_price',
 		'vk_image_url',
 		'registration_available',
+		'ticketing_available',
+		'accept_bitcoins',
 //		'registered_count',
 
 		self::IS_FAVORITE_FIELD_NAME => '(SELECT id IS NOT NULL
@@ -352,12 +358,30 @@ class Event extends AbstractEntity
 		return $dates;
 	}
 
+	private static function savePromocodes(ExtendedPDO $db, $id, array $data)
+	{
+		PromocodesCollection::updateForEvent($db, $id, $data['promocodes'] ?? array());
+	}
+
 	/**
 	 * @return mixed
 	 */
 	public function getOrganizationId()
 	{
 		return $this->organization_id;
+	}
+
+	public static function getExtremumDates($event_id, ExtendedPDO $db)
+	{
+		$q_get_dates = App::queryFactory()->newSelect();
+		$q_get_dates->cols(array('first_event_date', 'last_event_date'))
+			->from('events')
+			->where('id = ?', $event_id);
+		$data = $db->prepareExecute($q_get_dates)->fetch();
+		return array(
+			'first_event_date' => new DateTime($data['first_event_date']),
+			'last_event_date' => new DateTime($data['last_event_date'])
+		);
 	}
 
 	private static function updateExtremumDates($event_id, ExtendedPDO $db)
@@ -382,6 +406,27 @@ class Event extends AbstractEntity
 		}
 	}
 
+	private static function saveEmailTexts(ExtendedPDO $db, $event_id, array $data)
+	{
+		if (!isset($data['email_texts']) || !is_array($data['email_texts'])) {
+			return;
+		} else {
+			$_data = $data['email_texts'];
+		}
+
+		$data = array(
+			'payed' => $_data['payed'] ?? null,
+			'approved' => $_data['approved'] ?? null,
+			'not_approved' => $_data['not_approved'] ?? null,
+			'after_event' => $_data['after_event'] ?? null,
+			'event_id' => $event_id
+		);
+		$q_ins = App::queryFactory()->newInsert();
+		$q_ins->into('email_texts')
+			->cols($data)->onConflictUpdate(array('event_id'), $data);
+		$db->prepareExecute($q_ins, 'CANT_INSERT_EMAIL_TEXTS');
+	}
+
 	private static function saveTicketingInfo(ExtendedPDO $db, $event_id, $data)
 	{
 
@@ -391,27 +436,19 @@ class Event extends AbstractEntity
 			array()
 		)->getData();
 
-		$tickets_by_uuid = array();
 		$registration_ticket = null;
 		foreach ($_ticket_types as $type) {
-			$tickets_by_uuid[$type['uuid']] = array(
-				'data' => $type,
-				'to_switch_off' => true,
-				'uuid' => $type['uuid']
-			);
 			if ($type['type_code'] == 'registration') {
 				$registration_ticket = $type;
 			}
 		}
 
+		TicketTypesCollection::disableAll($db, $event_id);
+
 		if (isset($data['ticketing_locally']) && filter_var($data['ticketing_locally'], FILTER_VALIDATE_BOOLEAN) == true) {
 			foreach ($data['ticket_types'] as $ticket_type) {
-				//it will auto update if ticket uuid is same
+
 				TicketType::create($event_id, $ticket_type, $db);
-				if (isset($ticket_type['uuid']) && isset($tickets_by_uuid[$ticket_type['uuid']])) {
-					$tickets_by_uuid[$ticket_type['uuid']]['to_switch_off'] = false;
-					TicketType::create($event_id, $ticket_type, $db);
-				}
 			}
 
 			//TODO: update start_after_ticket_type_uuid fields
@@ -662,6 +699,12 @@ class Event extends AbstractEntity
 			$data['is_free'] = filter_var($data['is_free'], FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
 		}
 
+		if (!isset($data['accept_bitcoins'])) {
+			$data['accept_bitcoins'] = 'false';
+		} else {
+			$data['accept_bitcoins'] = filter_var($data['accept_bitcoins'], FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
+		}
+
 		$data['min_price'] = $data['is_free'] == 'false' && is_numeric($data['min_price']) ? (int)$data['min_price'] : null;
 
 		/*VK posting data*/
@@ -707,6 +750,7 @@ class Event extends AbstractEntity
 					'detail_info_url' => $data['detail_info_url'],
 					'registration_required' => $data['registration_required'],
 					'registration_locally' => $data['registration_locally'],
+					'accept_bitcoins' => $data['accept_bitcoins'],
 					'ticketing_locally' => $data['ticketing_locally'],
 					'registration_limit_count' => $data['registration_limit_count'],
 					'registration_approvement_required' => $data['registration_approvement_required'],
@@ -729,6 +773,10 @@ class Event extends AbstractEntity
 			self::saveEventTags($db, $event_id, $data['tags']);
 			self::saveRegistrationInfo($db, $event_id, $data);
 			self::saveTicketingInfo($db, $event_id, $data);
+			self::saveEmailTexts($db, $event_id, $data);
+			self::savePromocodes($db, $event_id, $data);
+
+
 			$data['vk']['event_id'] = $event_id;
 			if (isset($data['vk_post']) && isset($data['vk']) && $data['vk_post'] === true) {
 				VkPost::create(
@@ -789,11 +837,12 @@ class Event extends AbstractEntity
 
 			$db->commit();
 
-			try{
+			try {
 				EventsCollection::reindexCollection($db, App::getCurrentUser(), array(
 					'id' => $event_id
 				));
-			}catch(Exception $e){}
+			} catch (Exception $e) {
+			}
 
 			@file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/events/' . $event_id . '?is_new=true');
 			return new Result(true, 'Событие успешно создано', array('event_id' => $event_id));
@@ -1112,8 +1161,6 @@ class Event extends AbstractEntity
 		return $notifications_to_add;
 	}
 
-	//TODO: Припилить платные аккаунты и их типы уведомлений
-
 	private static function saveNotifications(array $notifications, ExtendedPDO $db)
 	{
 		$q_ins_notification = App::queryFactory()->newInsert();
@@ -1228,16 +1275,22 @@ class Event extends AbstractEntity
 				Fields::parseOrderBy($fields[self::TAGS_FIELD_NAME]['order_by'] ?? ''))->getData();
 		}
 		if (isset($fields[self::ORDERS_FIELD_NAME]) && $user instanceof User) {
-			if ($user->isAdmin($this->getOrganization())) {
-				$result_data[self::ORDERS_FIELD_NAME] = OrdersCollection::filter($this->db,
-					$user,
-					array('event' => $this),
-					Fields::parseFields($fields[self::ORDERS_FIELD_NAME]['fields'] ?? ''),
-					array(
-						'length' => $fields[self::ORDERS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
-						'offset' => $fields[self::ORDERS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
-					),
-					Fields::parseOrderBy($fields[self::ORDERS_FIELD_NAME]['order_by'] ?? ''))->getData();
+			$orders_fields = Fields::parseFields($fields[self::ORDERS_FIELD_NAME]['fields'] ?? '');
+			$orders_filters = Fields::parseFilters($fields[self::ORDERS_FIELD_NAME]['filters'] ?? '');
+			$orders = OrdersCollection::filter($this->db,
+				$user,
+				array_merge($orders_filters, array('event' => $this)),
+				$orders_fields,
+				array(
+					'length' => $fields[self::ORDERS_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+					'offset' => $fields[self::ORDERS_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
+				),
+				Fields::parseOrderBy($fields[self::ORDERS_FIELD_NAME]['order_by'] ?? ''));
+
+			if ($orders instanceof Order) {
+				$result_data[self::ORDERS_FIELD_NAME] = array($orders->getParams($user, $orders_fields)->getData());
+			} else {
+				$result_data[self::ORDERS_FIELD_NAME] = $orders->getData();
 			}
 		}
 
@@ -1250,18 +1303,47 @@ class Event extends AbstractEntity
 			}
 		}
 
+		if (isset($fields[self::EMAIL_TEXTS_FIELD_NAME])) {
+			if ($user->isEventAdmin($this)) {
+				$result_data[self::EMAIL_TEXTS_FIELD_NAME] = $this->getEmailTexts();
+			}
+		}
+
 		if (isset($fields[self::REGISTRATION_FIELDS_FIELD_NAME])) {
 			$result_data[self::REGISTRATION_FIELDS_FIELD_NAME] = $this->getRegistrationFields($user,
 				Fields::parseFields($fields[self::REGISTRATION_FIELDS_FIELD_NAME]['fields'] ?? ''))->getData();
-
 		}
 
 		if (isset($fields[self::STATISTICS_FIELD_NAME])) {
 			if ($user instanceof User) {
 				$result_data[self::STATISTICS_FIELD_NAME] = $this->getStatistics($user,
-					Fields::parseFields($fields[self::NOTIFICATIONS_FIELD_NAME]['fields'] ?? ''))->getData();
+					Fields::parseFields($fields[self::STATISTICS_FIELD_NAME]['fields'] ?? ''))->getData();
 			} else {
 				$result_data[self::STATISTICS_FIELD_NAME] = null;
+			}
+		}
+
+
+		if (isset($fields[self::PROMOCODES_FIELD_NAME])) {
+			if ($user instanceof User && $user->isEventAdmin($this)) {
+				$promocode_fields = Fields::parseFields($fields[self::PROMOCODES_FIELD_NAME]['fields'] ?? '');
+				$promocodes = PromocodesCollection::filter(
+					$this->db,
+					$user,
+					array_merge(Fields::parseFilters($fields[self::PROMOCODES_FIELD_NAME]['filters'] ?? ''), array('statistics_event' => $this)),
+					$promocode_fields,
+					array(
+						'length' => $fields[self::PROMOCODES_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
+						'offset' => $fields[self::PROMOCODES_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
+					),
+					Fields::parseOrderBy($fields[self::ORDERS_FIELD_NAME]['order_by'] ?? ''));
+				if ($promocodes instanceof Result) {
+					$result_data[self::PROMOCODES_FIELD_NAME] = $promocodes->getData();
+				} elseif ($promocodes instanceof Promocode){
+					$result_data[self::PROMOCODES_FIELD_NAME] = array($promocodes->getParams($user, $promocode_fields)->getData());
+				}
+			} else {
+				$result_data[self::PROMOCODES_FIELD_NAME] = null;
 			}
 		}
 
@@ -1318,7 +1400,7 @@ class Event extends AbstractEntity
 					'length' => $length ?? $fields[self::TICKETS_TYPES_FIELD_NAME]['length'] ?? App::DEFAULT_LENGTH,
 					'offset' => $offset ?? $fields[self::TICKETS_TYPES_FIELD_NAME]['offset'] ?? App::DEFAULT_OFFSET
 				),
-				$order_by ?? Fields::parseOrderBy($fields[self::TICKETS_TYPES_FIELD_NAME]['order_by'] ?? '') ?? array()
+				$order_by ?? Fields::parseOrderBy($fields[self::TICKETS_TYPES_FIELD_NAME]['order_by'] ?? 'price') ?? array()
 			)->getData();
 		}
 
@@ -1384,6 +1466,7 @@ class Event extends AbstractEntity
 					'latitude' => $data['latitude'],
 					'longitude' => $data['longitude'],
 					'location_updates' => 0,
+					'accept_bitcoins' => $data['accept_bitcoins'],
 					'detail_info_url' => $data['detail_info_url'],
 					'registration_required' => $data['registration_required'],
 					'registration_locally' => $data['registration_locally'],
@@ -1448,15 +1531,18 @@ class Event extends AbstractEntity
 			self::saveRegistrationInfo($this->db, $this->getId(), $data);
 			self::saveTicketingInfo($this->db, $this->getId(), $data);
 			self::saveNotifications($this->generateNotifications($data), $this->db);
+			self::saveEmailTexts($this->db, $this->getId(), $data);
+			self::savePromocodes($this->db, $this->getId(), $data);
 
 			$this->db->commit();
 
 
-			try{
+			try {
 				EventsCollection::reindexCollection($this->db, App::getCurrentUser(), array(
 					'id' => $this->id
 				));
-			}catch(Exception $e){}
+			} catch (Exception $e) {
+			}
 
 			if ($tariff_info['available_additional_notifications'] > 0 &&
 				$data['additional_notification_time'] instanceof DateTime
@@ -1467,11 +1553,11 @@ class Event extends AbstractEntity
 				) {
 					self::saveNotifications(array(array(
 						'event_id' => $this->id,
-						'notification_type_id' => self::getNotificationTypeId(Notification::NOTIFICATION_TYPE_ADDITIONAL_FOR_ORGANIZATION, $db),
+						'notification_type_id' => self::getNotificationTypeId(Notification::NOTIFICATION_TYPE_ADDITIONAL_FOR_ORGANIZATION, $this->db),
 						'notification_time' => $data['additional_notification_time']->format('Y-m-d H:i:s'),
 						'status' => 'TRUE',
 						'done' => 'FALSE'
-					)), $db);
+					)), $this->db);
 				}
 			}
 
@@ -1746,6 +1832,7 @@ class Event extends AbstractEntity
 			$merged_fields[$key] = $final_field;
 			$return_fields[] = $final_field;
 		}
+
 		if (count($errors) > 0) return new Result(false, 'Возникла ошибка во время регистрации', array('registration_fields' => $return_fields));
 
 		if (isset($this->registration_approvement_required)) {
@@ -1767,13 +1854,29 @@ class Event extends AbstractEntity
 			}
 		}
 
-		$order_info = RegistrationForm::processOrder($this, $user, $this->db, $request['tickets']);
+		$order_info = RegistrationForm::processOrder($this, $user, $this->db, $request['tickets'], $request['promocode'] ?? null);
 		$result = RegistrationForm::registerUser($order_info['order_info']['id'], $user, $this, $merged_fields, $approve_required);
 
 		$order = OrdersCollection::oneByUUID($this->db,
 			$user,
 			$order_info['order_info']['uuid'],
 			array());
+
+		$order_cols = Order::getDefaultCols();
+		if (isset($request['bitcoin']) && filter_var($request['bitcoin']) == true){
+			if ($this->accept_bitcoin == false)
+				throw new LogicException('BITCOINS_NOT_ACCEPTABLE');
+			$fields = Fields::parseFields('final_sum,number,promocode,tickets{fields:"ticket_type"}');
+
+			$order->makeBitcoinPayment($fields, $this);
+
+			$order = OrdersCollection::oneByUUID($this->db,
+				$user,
+				$order_info['order_info']['uuid'],
+				Fields::parseFields('bitcoin_address', 'bitcoin_amount'));
+			$order_cols[] = 'bitcoin_address';
+			$order_cols[] = 'bitcoin_amount';
+		}
 
 		if ($result->getStatus()) {
 			try {
@@ -1783,11 +1886,40 @@ class Event extends AbstractEntity
 			}
 		}
 
+		$_tickets = TicketsCollection::filter($this->db, $user, array('order' => $order), array())->getData();
+		$sum = 0;
+		foreach ($_tickets as $_ticket) {
+			$sum += (float)$_ticket['price'];
+		}
+
 		return new Result(true, '', array(
 			'registration_fields' => $return_fields,
-			'order' => $order->getParams($user, Order::getDefaultCols())->getData(),
-			'tickets' => TicketsCollection::filter($this->db, $user, array('order' => $order), array())->getData()
+			'order' => $order->getParams($user, $order_cols)->getData(),
+			'tickets' => $_tickets,
+			'sum' => $sum
 		));
+	}
+
+	public function getEmailTexts(array $cols = null)
+	{
+		if ($cols == null) {
+			$cols = array('payed', 'approved', 'not_approved', 'after_event');
+		}
+		$q_get = App::queryFactory()->newSelect();
+		$q_get
+			->cols($cols)
+			->from('email_texts')
+			->where('event_id = ?', $this->id);
+
+		return $this->db->prepareExecute($q_get, 'CANT_GET_EMAILS')->fetch();
+	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getTitle()
+	{
+		return $this->title;
 	}
 
 }

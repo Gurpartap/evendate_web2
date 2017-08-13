@@ -72,7 +72,7 @@ class Ticket extends AbstractEntity
 	{
 		$now = (new DateTime())->format('U');
 
-		if (!is_null($type['sold_count']) && $type['sold_count'] >= $type['amount'])
+		if (!is_null($type['sold_count']) && $type['sold_count'] >= $type['amount'] && !is_null($type['amount']))
 			throw new BadArgumentException('TICKETS_ALL_SOLD', App::DB(), $ticket_data['uuid']);
 		if (!is_null($type['sell_end_date']) && $now > $type['sell_end_date'])
 			throw new BadArgumentException('TICKETS_SELL_FINISHED', App::DB(), $ticket_data['uuid']);
@@ -163,7 +163,14 @@ class Ticket extends AbstractEntity
 
 		foreach ($tickets as $ticket) {
 			if (isset($ticket['uuid']) && $ticket['uuid'] != null) {
-				$result[] = self::create($event, $order_id, $db, $ticket);
+
+				$type = self::getTicketTypeInfo($event, $db, $ticket['uuid']);
+				self::checkTicketTypeData($type, $ticket, $db);
+
+				$tickets_count = $tickets['count'] ?? 1;
+				for($k = 0; $k < $tickets_count; $k++){
+					$result[] = self::create($event, $order_id, $db, $ticket);
+				}
 			} else {
 				// without uuid => registration
 				if ($ticketing_locally) throw new InvalidArgumentException('NULL_UUID');
@@ -188,13 +195,11 @@ class Ticket extends AbstractEntity
 					);
 				} else {
 					$_fields = Fields::parseFields($fields[self::TYPE_FIELD_NAME]['fields'] ?? '');
-					$result_data[self::TYPE_FIELD_NAME] = TicketTypesCollection::oneByUUID(
+					$result_data[self::TYPE_FIELD_NAME] = TicketTypesCollection::filter(
 						App::DB(),
 						$user,
-						$this->ticket_type_uuid,
-						$_fields)
-						->getParams($user, $_fields)
-						->getData();
+						array('ticket' => $this),
+						$_fields)->getData()[0];
 				}
 			} else {
 				$result_data[self::TYPE_FIELD_NAME] = null;
@@ -202,18 +207,14 @@ class Ticket extends AbstractEntity
 		}
 
 		if (isset($fields[self::ORDER_FIELD_NAME])) {
-			if ($user instanceof User) {
-				$order_fields = Fields::parseFields($fields[self::ORDER_FIELD_NAME]['fields'] ?? '');
-				$result_data[self::ORDER_FIELD_NAME] = OrdersCollection::oneByUUID(
-					App::DB(),
-					$user,
-					$this->ticket_order_uuid,
-					$order_fields
-				)->getParams($user, $order_fields)
-					->getData();
-			} else {
-				$result_data[self::ORDER_FIELD_NAME] = null;
-			}
+			$order_fields = Fields::parseFields($fields[self::ORDER_FIELD_NAME]['fields'] ?? '');
+			$result_data[self::ORDER_FIELD_NAME] = OrdersCollection::oneByUUID(
+				App::DB(),
+				$user,
+				$this->ticket_order_uuid,
+				$order_fields
+			)->getParams($user, $order_fields)
+				->getData();
 		}
 
 		if (isset($fields[self::USER_FIELD_NAME])) {
@@ -254,5 +255,15 @@ class Ticket extends AbstractEntity
 	public function getUserId(){
 		return $this->user_id;
 	}
+
+	/**
+	 * @return mixed
+	 */
+	public function getTicketTypeUuid()
+	{
+		return $this->ticket_type_uuid;
+	}
+
+
 
 }

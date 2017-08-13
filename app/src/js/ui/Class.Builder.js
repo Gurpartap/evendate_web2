@@ -22,6 +22,18 @@ Builder = (function() {
 	 * @typedef {(Array<string>|Object<string, (string|number)>)} HTMLAttributes
 	 */
 	/**
+	 * @typedef {Object<string, (string|number)>} FormElementAttributes
+	 * @property {string} [id]
+	 * @property {string} [name]
+	 * @property {string} [tabindex]
+	 * @property {string} [required]
+	 * @property {string} [value]
+	 */
+	/**
+	 * @typedef {FormElementAttributes} RadioCheckboxAttributes
+	 * @property {string} [checked]
+	 */
+	/**
 	 * @typedef {object} buildProps
 	 * @property {(Array<string>|string)} [classes]
 	 * @property {HTMLDataset} [dataset]
@@ -60,6 +72,7 @@ Builder = (function() {
 	/**
 	 *
 	 * @param {...buildProps} props
+	 * @param {string} props.title
 	 *
 	 * @returns {jQuery}
 	 */
@@ -113,7 +126,7 @@ Builder = (function() {
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.inputNumber = function buildInput(attributes, classes, dataset, inputmask_options) {
-		attributes = attributes ? attributes : {};
+		attributes = $.extend({}, attributes);
 		classes = classes ? classes instanceof Array ? classes : classes.split(',') : [];
 		dataset = dataset ? dataset : {};
 		
@@ -196,6 +209,7 @@ Builder = (function() {
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.textarea = function buildTextarea(attributes, classes, value, dataset) {
+		
 		return tmpl('textarea', Builder.normalizeBuildProps({
 			value: value,
 			classes: classes,
@@ -211,11 +225,14 @@ Builder = (function() {
 	 *
 	 * @param {...buildProps} props
 	 * @param {string} props.page
+	 * @param {string} props.title
 	 *
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.link = function buildLink(props) {
+		
 		return bindPageLinks(tmpl('link', [].map.call(arguments, function(arg) {
+			
 			return Builder.normalizeBuildProps(arg);
 		})));
 	};
@@ -224,8 +241,8 @@ Builder = (function() {
 	 * @param {string} href
 	 * @param {string} title
 	 * @param {(string|Array<string>)} [classes]
-	 * @param {(string|Object<string, string>|Array<string>)} [dataset]
-	 * @param {(string|Object<string, string>|Array<string>)} [attributes]
+	 * @param {HTMLDataset} [dataset]
+	 * @param {HTMLAttributes} [attributes]
 	 *
 	 * @returns {jQuery}
 	 */
@@ -259,6 +276,10 @@ Builder = (function() {
 	/**
 	 *
 	 * @param {(...buildProps|Array<buildProps>)} props
+	 * @param {(number|string)} props.val
+	 * @param {string} props.display_name
+	 *
+	 *
 	 * @return {jQuery}
 	 */
 	Builder.prototype.option = function buildOption(props) {
@@ -275,15 +296,45 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @param {string} id
+	 * @param {string} [name]
+	 * @param {boolean} [checked]
+	 * @param {RadioCheckboxAttributes} [attributes]
+	 * @param {(string|Array<string>)} [classes]
+	 * @param {HTMLDataset} [dataset]
+	 *
+	 * @returns {jQuery}
+	 */
+	Builder.prototype.switch = function buildSwitch(id, name, checked, attributes, classes, dataset) {
+		var props = Builder.normalizeBuildProps({
+			id: id,
+			name: name,
+			attributes: attributes,
+			classes: classes,
+			dataset: dataset
+		});
+		
+		if (checked) {
+			props.attributes.checked = checked;
+		} else {
+			delete props.attributes.checked;
+		}
+		props.attributes.tabindex = props.attributes.tabindex ? props.attributes.tabindex : -1;
+		
+		return tmpl('switch', props);
+	};
+	/**
+	 *
 	 * @param {string} type - checkbox or radio
 	 * @param {buildProps} props
 	 * @param {(Array<string>|string)} [props.unit_classes]
+	 *
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.radioCheckbox = function buildRadioCheckbox(type, props) {
-		if (type == 'checkbox' || type == 'radio') {
+		if (type === 'checkbox' || type === 'radio') {
 			props = Builder.normalizeBuildProps(props, ['unit_classes']);
-			if (props.classes.indexOf('form_checkbox') == -1 && props.classes.indexOf('form_radio') == -1) {
+			if (props.classes.indexOf('form_checkbox') === -1 && props.classes.indexOf('form_radio') === -1) {
 				props.classes.unshift('form_' + type);
 			}
 			props.unit_classes.unshift('form_unit');
@@ -431,6 +482,7 @@ Builder = (function() {
 									id: props.id,
 									name: props.name,
 									required: props.required ? props.required : undefined,
+									readonly: props.readonly ? props.readonly : undefined,
 									placeholder: props.placeholder,
 									tabindex: props.tabindex
 								};
@@ -474,14 +526,23 @@ Builder = (function() {
 										showMaskOnHover: false
 									});
 								}
+								case 'switch': {
+									
+									return self.switch(props.id, props.name, props.checked, $.extend({
+										required: props.required ? props.required : undefined,
+										placeholder: props.placeholder,
+										tabindex: props.tabindex
+									}, props.attributes), props.classes, props.dataset);
+								}
 								case 'number': {
 									
 									return self.inputNumber(
 										$.extend({}, props.attributes, defined_attributes, {
-											autocomplete: 'off', value: (props.value != null) ? props.value : undefined
+											autocomplete: 'off', value: !empty(props.value) ? props.value : undefined
 										}),
 										classes,
-										props.dataset
+										props.dataset,
+										props.inputmask
 									);
 								}
 								default: {
@@ -507,12 +568,19 @@ Builder = (function() {
 	 * @param {buildProps} [props]
 	 * @return {jQuery}
 	 */
-	Builder.prototype.cap = function buildTags(message, props) {
-		if(!props)
-			props = {};
-		props = Builder.normalizeBuildProps(props);
+	Builder.prototype.cap = function buildCap(message, props) {
 		
-		return tmpl('cap', $.extend({message: message}, props));
+		return tmpl('cap', $.extend({message: message}, Builder.normalizeBuildProps(props || {})));
+	};
+	/**
+	 *
+	 * @param {Element|jQuery} content
+	 * @param {buildProps} [props]
+	 * @return {jQuery}
+	 */
+	Builder.prototype.overlayCap = function buildOverlayCap(content, props) {
+		
+		return tmpl('overlay-cap', $.extend({content: content}, Builder.normalizeBuildProps(props || {})));
 	};
 	/**
 	 *
@@ -547,23 +615,17 @@ Builder = (function() {
 		return tmpl('order-status', {
 			name: localeFromNamespace(order_status, OneOrder.EXTENDED_ORDER_STATUSES, __LOCALE.TEXTS.TICKET_STATUSES),
 			status: (function(order_status){
-				switch (order_status) {
-					case OneOrder.EXTENDED_ORDER_STATUSES.PAYED:
-					case OneOrder.EXTENDED_ORDER_STATUSES.APPROVED:
-					case OneOrder.EXTENDED_ORDER_STATUSES.WITHOUT_PAYMENT: {
+				switch (true) {
+					case OneOrder.isGreenStatus(order_status): {
+						
 						return 'success';
 					}
-					
-					case OneOrder.EXTENDED_ORDER_STATUSES.IS_PENDING:
-					case OneOrder.EXTENDED_ORDER_STATUSES.WAITING_FOR_PAYMENT: {
+					case OneOrder.isYellowStatus(order_status): {
+						
 						return 'warning';
 					}
-					
-					case OneOrder.EXTENDED_ORDER_STATUSES.REJECTED:
-					case OneOrder.EXTENDED_ORDER_STATUSES.RETURNED_BY_CLIENT:
-					case OneOrder.EXTENDED_ORDER_STATUSES.PAYMENT_CANCELED_AUTO:
-					case OneOrder.EXTENDED_ORDER_STATUSES.RETURNED_BY_ORGANIZATION:
-					case OneOrder.EXTENDED_ORDER_STATUSES.PAYMENT_CANCELED_BY_CLIENT: {
+					case OneOrder.isRedStatus(order_status): {
+						
 						return 'error';
 					}
 				}
@@ -590,6 +652,39 @@ Builder = (function() {
 			classes: '-loader_overlay',
 			loader: tmpl('loader')
 		}, $wrapper, direction);
+	};
+	/**
+	 * @typedef {object} fieldProps
+	 * @property {string} name
+	 * @property {string} value
+	 * @property {string} [classes]
+	 */
+	/**
+	 *
+	 * @param {...(Array<fieldProps>|fieldProps)} props
+	 *
+	 * @return {jQuery}
+	 */
+	Builder.prototype.fields = function(props) {
+		var batch;
+		
+		if (arguments.length === 1) {
+			batch = [props];
+		} else {
+			batch = [].slice.call(arguments);
+		}
+		
+		return $.makeSet(batch.map(function(field) {
+			if (field instanceof Array) {
+				
+				return tmpl('fields-wrapper', {
+					classes: '-columns_' + field.length,
+					fields: tmpl('field', field)
+				});
+			}
+			
+			return tmpl('field', field);
+		}));
 	};
 	/**
 	 *
@@ -1024,25 +1119,22 @@ Builder = (function() {
 				avatars_collection_classes.push(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
 			}
 			
-			if (event.is_favorite != null) {
+			if (!empty(event.is_favorite)) {
 				if (event.registration_locally || event.ticketing_locally) {
-					$action_buttons = $action_buttons.add(new AddToFavoriteButton(event.id, {
-						is_add_avatar: true,
-						is_checked: event.is_favorite,
-						classes: [
-							__C.CLASSES.UNIVERSAL_STATES.EMPTY,
-							__C.CLASSES.SIZES.LOW,
-							__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
-							__C.CLASSES.HOOKS.ADD_TO_FAVORITES,
-							__C.CLASSES.HOOKS.RIPPLE
-						],
-						labels: null
-					}));
-					
-					if (event.ticketing_locally) {
-					
-					} else {
-						$action_buttons = $action_buttons.add(new RegisterButton(event, {
+					$action_buttons = $action_buttons
+						.add(new AddToFavoriteButton(event.id, {
+							is_add_avatar: true,
+							is_checked: event.is_favorite,
+							classes: [
+								__C.CLASSES.UNIVERSAL_STATES.EMPTY,
+								__C.CLASSES.SIZES.LOW,
+								__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+								__C.CLASSES.HOOKS.ADD_TO_FAVORITES,
+								__C.CLASSES.HOOKS.RIPPLE
+							],
+							labels: null
+						}))
+						.add(new OrderButton(event, {
 							classes: [
 								'event_block_main_action_button',
 								__C.CLASSES.SIZES.LOW,
@@ -1051,7 +1143,6 @@ Builder = (function() {
 								__C.CLASSES.HOOKS.RIPPLE
 							]
 						}));
-					}
 				} else {
 					$action_buttons = new AddToFavoriteButton(event.id, {
 						is_add_avatar: true,
@@ -1208,18 +1299,14 @@ Builder = (function() {
 					}
 				});
 				
-				if (event.ticketing_locally) {
-				
-				} else {
-					$action_button = new RegisterButton(event, {
-						classes: [
-							__C.CLASSES.SIZES.LOW,
-							__C.CLASSES.SIZES.WIDE,
-							__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
-							__C.CLASSES.HOOKS.RIPPLE
-						]
-					});
-				}
+				$action_button = new OrderButton(event, {
+					classes: [
+						__C.CLASSES.SIZES.LOW,
+						__C.CLASSES.SIZES.WIDE,
+						__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+						__C.CLASSES.HOOKS.RIPPLE
+					]
+				});
 			} else {
 				$action_button = new AddToFavoriteButton(event.id, {
 					is_add_avatar: true,
@@ -1384,51 +1471,34 @@ Builder = (function() {
 		
 		return (tickets instanceof Array ? tickets : [tickets]).map(function(ticket) {
 			var props = Builder.normalizeBuildProps({
-				card_classes: [],
-				title: ticket.event.title,
-				location: ticket.event.location,
-				status_name: ticket.status_name,
-				status_type_code: ticket.status_type_code,
-				ticket_type_name: ticket.ticket_type.name,
-				image_horizontal_url: ticket.event.image_horizontal_url,
-				image_horizontal_large_url: ticket.event.image_horizontal_large_url || ticket.event.image_horizontal_url,
-				image_horizontal_medium_url: ticket.event.image_horizontal_medium_url
-			}, ['card_classes']),	event_date;
+					card_classes: [],
+					title: ticket.event.title,
+					location: ticket.event.location,
+					status_name: ticket.status_name,
+					status_type_code: ticket.status_type_code,
+					ticket_type_name: ticket.ticket_type.name,
+					image_horizontal_url: ticket.event.image_horizontal_url,
+					image_horizontal_large_url: ticket.event.image_horizontal_large_url || ticket.event.image_horizontal_url,
+					image_horizontal_medium_url: ticket.event.image_horizontal_medium_url
+				}, ['card_classes']),
+				event_date;
 			
-			switch (props.status_type_code) {
-				case OneExtendedTicket.TICKET_STATUSES.PAYED:
-				case OneExtendedTicket.TICKET_STATUSES.APPROVED:
-				case OneExtendedTicket.TICKET_STATUSES.WITHOUT_PAYMENT: {
+			switch (true) {
+				case OneOrder.isGreenStatus(props.status_type_code): {
 					props.card_classes.push(__C.CLASSES.STATUS.SUCCESS);
 					break;
 				}
-				case OneExtendedTicket.TICKET_STATUSES.IS_PENDING:
-				case OneExtendedTicket.TICKET_STATUSES.WAITING_FOR_PAYMENT: {
+				case OneOrder.isYellowStatus(props.status_type_code): {
 					props.card_classes.push(__C.CLASSES.STATUS.PENDING);
 					break;
 				}
-				case OneExtendedTicket.TICKET_STATUSES.REJECTED:
-				case OneExtendedTicket.TICKET_STATUSES.RETURNED_BY_CLIENT:
-				case OneExtendedTicket.TICKET_STATUSES.RETURNED_BY_ORGANIZATION: {
+				case OneOrder.isRedStatus(props.status_type_code): {
 					props.card_classes.push(__C.CLASSES.STATUS.ERROR);
 					break;
 				}
 			}
 			
-			switch (props.status_type_code) {
-				case OneExtendedTicket.TICKET_STATUSES.IS_PENDING:
-				case OneExtendedTicket.TICKET_STATUSES.WAITING_FOR_PAYMENT:
-				case OneExtendedTicket.TICKET_STATUSES.RETURNED_BY_ORGANIZATION:
-				case OneExtendedTicket.TICKET_STATUSES.RETURNED_BY_CLIENT:
-				case OneExtendedTicket.TICKET_STATUSES.REJECTED: {
-					props.card_classes.push(__C.CLASSES.DISABLED);
-					break;
-				}
-				default: {
-					props.card_classes.push(__C.CLASSES.HOOKS.CALL_MODAL);
-					break;
-				}
-			}
+			props.card_classes.push(OneOrder.isDisabledStatus(props.status_type_code) ? __C.CLASSES.DISABLED : __C.CLASSES.HOOKS.CALL_MODAL);
 			
 			if (ticket.event.is_same_time) {
 				event_date = ticket.event.dates[0];

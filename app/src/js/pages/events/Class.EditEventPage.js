@@ -17,8 +17,27 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 		AbstractEditEventPage.call(this);
 		this.page_title = 'Редактирование события';
 		this.event = new OneEvent(event_id);
-		this.event_fields = EventPage.fields.copy().add('vk_post_link');
+		this.event_fields = EditEventPage.fields;
 	}
+	
+	EditEventPage.fields = new Fields(
+		'email_texts',
+		'booking_time',
+		'promocodes',
+		'vk_post_link', {
+			ticket_types: {
+				fields: new Fields(
+					'amount',
+					'comment',
+					'price',
+					'sell_start_date',
+					'sell_end_date',
+					'min_count_per_user',
+					'max_count_per_user'
+				)
+			}
+		}
+	);
 	
 	EditEventPage.prototype.fetchData = function() {
 		return this.fetching_data_defer = __APP.SERVER.multipleAjax(
@@ -28,6 +47,18 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 	};
 	
 	EditEventPage.prototype.preRender = function() {
+		var predefined_fields = {
+				last_name: {type: 'last_name', name: 'Фамилия', description: 'Текстовое поле для ввода фамилии'},
+				first_name: {type: 'first_name', name: 'Имя', description: 'Текстовое поле для ввода имени'},
+				email: {type: 'email', name: 'E-mail', description: 'Текстовое поле для ввода адреса электронной почты'},
+				phone_number: {type: 'phone_number', name: 'Номер телефона', description: 'Текстовое поля для ввода номера телефона'}
+			},
+			registration_fields = [],
+			ticket_types = this.event.ticket_types.filter(function(ticket_type) {
+				
+				return ticket_type.type_code !== 'registration';
+			});
+		
 		AbstractEditEventPage.prototype.preRender.call(this);
 		
 		this.render_vars.button_text = 'Сохранить';
@@ -35,7 +66,13 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 		
 		this.render_vars.registration_custom_fields = AbstractEditEventPage.registrationCustomFieldBuilder(this.event.registration_fields.filter(RegistrationFieldModel.isCustomField));
 		
-		this.render_vars.ticket_types = this.event.ticket_types.length ? AbstractEditEventPage.ticketTypeRowsBuilder(this.event.ticket_types) : tmpl('edit-event-tickets-row-empty');
+		this.render_vars.ticket_types = ticket_types.length ?
+		                                AbstractEditEventPage.ticketTypeRowsBuilder(ticket_types) :
+		                                tmpl('edit-event-tickets-row-empty');
+		
+		this.render_vars.promocodes = this.event.promocodes.length ?
+		                              AbstractEditEventPage.promocodeRowsBuilder(this.event.promocodes) :
+		                              tmpl('edit-event-promocode-row-empty');
 		
 		this.render_vars.vk_post_link = this.event.vk_post_link ? __APP.BUILD.actionLink(
 			this.event.vk_post_link,
@@ -44,6 +81,24 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 			{},
 			{target: '_blank'}
 		) : '';
+		
+		if (this.event.registration_fields.length) {
+			this.event.registration_fields.filter(RegistrationFieldModel.isPredefinedField).sort(function(a, b) {
+			
+				return a.order_number - b.order_number;
+			}).forEach(function(field) {
+				predefined_fields[field.type].id = AbstractEditEventPage.lastRegistrationFieldId++;
+				predefined_fields[field.type].order_number = field.order_number;
+				registration_fields.push(predefined_fields[field.type]);
+				delete predefined_fields[field.type];
+			});
+			Object.values(predefined_fields).forEach(function(field) {
+				field.id = AbstractEditEventPage.lastRegistrationFieldId++;
+				registration_fields.push(field);
+			});
+			
+			this.render_vars.registration_predefined_fields = tmpl('edit-event-registration-predefined-field', registration_fields);
+		}
 	};
 	
 	EditEventPage.prototype.init = function() {
@@ -102,7 +157,7 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 			this.$wrapper.find('#edit_event_registration_required').prop('checked', true).trigger('change');
 			
 			if (this.event.registration_locally) {
-				this.$wrapper.find('#edit_event_registration_locally').prop('checked', true).trigger('change');
+				this.$wrapper.find('.RegistrationLocallySwitch').prop('checked', true).trigger('change');
 			} else {
 				this.$wrapper.find('#edit_event_registration_side').prop('checked', true).trigger('change');
 			}
@@ -127,12 +182,6 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 						self.$wrapper.find('#edit_event_registration_'+field.type+'_field_required').prop('checked', true);
 					}
 				}
-			});
-		}
-		
-		if (this.event.ticket_types.length) {
-			this.$wrapper.find('.OnChangeRemoveUUID').one('change.RemoveUUID', function() {
-				self.$wrapper.find('.TicketType'+$(this).data('row_number')+'UUID').val('').trigger('change');
 			});
 		}
 		

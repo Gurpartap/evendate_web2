@@ -1,20 +1,21 @@
 <?php
 
-	$request_time = new DateTime();
+$request_time = new DateTime();
 
-	$_function_called = false;
+$_function_called = false;
 
 
-	require_once '../../v1-backend/bin/env_variables.php';
+require_once '../../v1-backend/bin/env_variables.php';
 
-	@session_start();
+@session_start();
 
-if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS'){
+if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
 	http_response_code(200);
 	return;
 }
 
 try {
+	require_once "{$BACKEND_FULL_PATH}/bin/errors/Errors.php";
 
 	require_once "{$BACKEND_FULL_PATH}/bin/Class.Result.php";
 	require_once "{$BACKEND_FULL_PATH}/bin/db.php";
@@ -22,7 +23,6 @@ try {
 	require_once "{$BACKEND_FULL_PATH}/bin/Class.Fields.php";
 	require_once "{$BACKEND_FULL_PATH}/bin/Class.AbstractEntity.php";
 	require_once "{$BACKEND_FULL_PATH}/bin/Class.AbstractCollection.php";
-	require_once "{$BACKEND_FULL_PATH}/bin/errors/Errors.php";
 	require_once "{$BACKEND_FULL_PATH}/users/Class.AbstractUser.php";
 	require_once "{$BACKEND_FULL_PATH}/users/Class.User.php";
 	require_once "{$BACKEND_FULL_PATH}/users/Class.NotAuthorizedUser.php";
@@ -38,7 +38,7 @@ try {
 
 	if (App::$ENV == 'prod') {
 		$DEBUG_MODE = false;
-	}else{
+	} else {
 		ini_set("display_errors", 1);
 		error_reporting(E_ALL);
 	}
@@ -56,8 +56,8 @@ try {
 	$_method_name = isset($act[2]) ? $act[2] : '';
 	$_args = array();
 
-	if (count($act) > 3){
-		for ($i = 3; $i < count($act); $i++){
+	if (count($act) > 3) {
+		for ($i = 3; $i < count($act); $i++) {
 			$_args[] = $act[$i];
 		}
 	}
@@ -68,14 +68,14 @@ try {
 	$_internal_code = 200;
 	$_error_name = null;
 
-	$__page    = App::$__PAGE;
-	$__length  = App::$__LENGTH;
-	$__offset  = App::$__OFFSET;
-	$__order_by  = App::$__ORDER_BY;
-	$__pagination  = array('length' => $__length, 'offset' => $__offset);
+	$__page = App::$__PAGE;
+	$__length = App::$__LENGTH;
+	$__offset = App::$__OFFSET;
+	$__order_by = App::$__ORDER_BY;
+	$__pagination = array('length' => $__length, 'offset' => $__offset);
 	$__modules = array();
 
-	if (isset($__request['tz']) && $_request_method == 'GET'){
+	if (isset($__request['tz']) && $_request_method == 'GET') {
 		App::setSessionTimezone($__request['tz']);
 	}
 
@@ -84,19 +84,19 @@ try {
 	if (isset($__modules[$_class_name]) && isset($__modules[$_class_name][$_request_method]) && isset($__modules[$_class_name][$_request_method][$_method_name])) {
 		$_result = call_user_func_array($__modules[$_class_name][$_request_method][$_method_name], $_args);
 		$_function_called = true;
-	}else{
-		if (isset($__modules[$_class_name]) && $__modules[$_class_name][$_request_method]){
-			foreach ($__modules[$_class_name][$_request_method] as $key => $function){
-                if ($_result != null) break;
-				if (preg_match('/{.*?}.*?/', $key)){ // is regexp
+	} else {
+		if (isset($__modules[$_class_name]) && $__modules[$_class_name][$_request_method]) {
+			foreach ($__modules[$_class_name][$_request_method] as $key => $function) {
+				if ($_result != null) break;
+				if (preg_match('/{.*?}.*?/', $key)) { // is regexp
 					$pattern = preg_replace('#\((.*?):(.*?)\)#', '(?<$1>$2)', $key); // change names to PHP RegExp named groups format
 					$pattern = str_replace(array('{', '}'), '', $pattern); //remove {}
 					$pattern = '#' . $pattern . '#';
-					preg_match_all($pattern , $_url, $matches); // store all groups (we need named groups to add to args function)
-					if (preg_match($pattern, $_url)){
+					preg_match_all($pattern, $_url, $matches); // store all groups (we need named groups to add to args function)
+					if (preg_match($pattern, $_url)) {
 						$matches = array_reverse($matches); // reverse to add named groups left ro right, as in url
-						foreach($matches as $group_name => $match){
-							if (is_string($group_name)){ // use only named variables, coz preg_match stores all with names and indexes
+						foreach ($matches as $group_name => $match) {
+							if (is_string($group_name)) { // use only named variables, coz preg_match stores all with names and indexes
 								array_unshift($_args, $match[0]);
 							}
 						}
@@ -108,52 +108,52 @@ try {
 		}
 	}
 
-}catch(InvalidArgumentException $iae){
+} catch (InvalidArgumentException $iae) {
 	$_http_code = BadArgumentException::HTTP_CODE;
 	$_internal_code = BadArgumentException::ERROR_CODE;
 	$_error_name = $iae->getMessage();
 	$_function_called = true;
 	$_exception = $iae;
-}catch(BadMethodCallException $bmce){
+} catch (BadMethodCallException $bmce) {
 	$_http_code = BadArgumentException::HTTP_CODE;
 	$_internal_code = BadArgumentException::ERROR_CODE;
 	$_error_name = $bmce->getMessage();
 	$_function_called = true;
 	$_exception = $bmce;
-}catch(AuthorizationException $authe){
+} catch (AuthorizationException $authe) {
 	$_http_code = AuthorizationException::HTTP_CODE;
 	$_internal_code = AuthorizationException::ERROR_CODE;
 	$_error_name = $authe->getMessage();
 	$_function_called = true;
 	$_exception = $authe;
-}catch(PrivilegesException $pe){
+} catch (PrivilegesException $pe) {
 	$_http_code = PrivilegesException::HTTP_CODE;
 	$_internal_code = PrivilegesException::ERROR_CODE;
 	$_error_name = $pe->getMessage();
 	$_function_called = true;
 	$_exception = $pe;
-}catch(DBQueryException $dbe){
+} catch (DBQueryException $dbe) {
 	$_http_code = DBQueryException::HTTP_CODE;
 	$_internal_code = DBQueryException::ERROR_CODE;
 	$_error_name = $dbe->getMessage();
 	$_function_called = true;
 	$_exception = $dbe;
 	$_db_query = array('query' => $__db->getQueryInfo(), 'info' => $dbe->getInternalMessage());
-}catch(AbstractException $ae){
+} catch (AbstractException $ae) {
 	$_http_code = $ae->getHttpCode();
 	$_internal_code = $ae->getInternalCode();
 	$_error_name = $ae->getMessage();
 	$_function_called = true;
 	$_exception = $ae;
-}catch(Exception $e){
+} catch (Exception $e) {
 	$_http_code = AbstractException::HTTP_CODE;
 	$_internal_code = AbstractException::ERROR_CODE;
 	$_error_name = $e->getMessage();
 	$_function_called = true;
 	$_exception = $e;
-}finally{
-	if (!isset($_result) || $_result instanceof Result == false){
-		if (!$_function_called){
+} finally {
+	if (!isset($_result) || $_result instanceof Result == false) {
+		if (!$_function_called) {
 			$_http_code = 404;
 			$_internal_code = 10404;
 			$_error_name = 'BAD_REQUEST:NOT_IMPLEMENTED';
@@ -168,7 +168,7 @@ try {
 
 	$_result->setText(Errors::getDescription($__request['lang'] ?? 'ru', $_result->getText()));
 
-	if(App::$RESPONSE_NUDE){
+	if (App::$RESPONSE_NUDE) {
 		$__request['response'] = $_result->__toString();
 	}
 
@@ -197,13 +197,13 @@ try {
 	$p_ins_log = $__db->prepareExecute($q_ins_log);
 	$log_res = $p_ins_log->fetch(PDO::FETCH_ASSOC);
 
-	if ($log_res != FALSE){
+	if ($log_res != FALSE) {
 		$_result->setRequestUUID($log_res['uuid']);
 	}
 
-	if (($_SERVER['ENV'] == 'local' || $_SERVER['ENV'] == 'dev' || $_SERVER['ENV'] == 'test') && isset($e)){
+	if (($_SERVER['ENV'] == 'local' || $_SERVER['ENV'] == 'dev' || $_SERVER['ENV'] == 'test') && isset($e)) {
 		$_result->setException($_exception);
-	}elseif(isset($__request['show_debug']) && isset($_exception)){
+	} elseif (isset($__request['show_debug']) && isset($_exception)) {
 		$_result->setException($_exception);
 	}
 	echo $_result;

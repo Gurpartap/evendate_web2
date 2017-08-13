@@ -15,6 +15,7 @@ require_once "{$BACKEND_FULL_PATH}/exceptions/PrivilegesException.php";
 require_once "{$BACKEND_FULL_PATH}/exceptions/AuthorizationException.php";
 require_once "{$BACKEND_FULL_PATH}/bin/Class.RequestsParser.php";
 require_once "{$BACKEND_FULL_PATH}/bin/Class.Fields.php";
+require_once "{$BACKEND_FULL_PATH}/bin/Class.Emails.php";
 
 
 class App
@@ -290,6 +291,11 @@ class App
 		} else {
 			return null;
 		}
+	}
+
+	public static function loadColumnNames(){
+		global $BACKEND_FULL_PATH;
+		return json_decode(file_get_contents($BACKEND_FULL_PATH . '/events/column_names.json'), true);
 	}
 
 	public static function getSocialUrls()

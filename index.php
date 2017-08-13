@@ -114,11 +114,11 @@ $url_parts = explode('/', $url);
 
 	<?php
 	if ($DEBUG_MODE) { ?>
-    <link rel="stylesheet" href="/dist/vendor.css?rev=3b6878c5b89f643e8d96b1b336b7d4fc">
-    <link rel="stylesheet" href="/dist/app.css?rev=4ad613f7abe455a2d379ba294596d752"><?php
+    <link rel="stylesheet" href="/dist/vendor.css?rev=cebea49deb64bb31a48e0ee93329b6a1">
+    <link rel="stylesheet" href="/dist/app.css?rev=bb96c66649175200c33dccbc7ccce5f8"><?php
 	} else { ?>
-    <link rel="stylesheet" href="/dist/vendor.min.css?rev=4165c69f5d04ec431ab5bc41425847a5">
-    <link rel="stylesheet" href="/dist/app.min.css?rev=722bad8a61afb41597ba964eb637daf9"><?php
+    <link rel="stylesheet" href="/dist/vendor.min.css?rev=d40524d997c556958613585e05f65cc9">
+    <link rel="stylesheet" href="/dist/app.min.css?rev=3d7695a3dcafaa01cbbb2c1368b8dbb8"><?php
 	} ?>
 
 	<?php
@@ -223,7 +223,8 @@ $url_parts = explode('/', $url);
 				 class="sidebar_navigation_item SidebarNavItem link Link"><span>Организаторы</span></a><?php
 			if (!$is_user_not_auth) { ?>
 				<a href="/my/profile" class="sidebar_navigation_item SidebarNavItem link Link"><span>Мой профиль</span></a>
-				<a href="/my/tickets" class="sidebar_navigation_item SidebarNavItem link Link"><span>Мои билеты</span></a><?php
+				<a href="/my/tickets" class="sidebar_navigation_item SidebarNavItem link Link"><span>Мои билеты</span></a>
+				<a href="/my/orders" class="sidebar_navigation_item SidebarNavItem link Link"><span>Мои заказы</span></a><?php
 			} ?>
 		</nav>
 		<hr class="sidebar_divider">
@@ -237,9 +238,10 @@ $url_parts = explode('/', $url);
 		</div>
 		<div class="sidebar_links">
 			<a href="/landing.php" class="link">О нас</a>
+			<a href="//evendate.io/blog" class="link">Наш блог</a>
 			<a href="/organization.php" class="link">Стать организатором</a>
-			<a href="//evendate.ru/docs/terms.pdf" class="link">Условия пользования</a>
-			<a href="//evendate.ru/docs/useragreement.pdf" class="link">Пользовательское соглашение</a>
+			<a href="//evendate.io/docs/terms.pdf" class="link">Условия пользования</a>
+			<a href="//evendate.io/docs/useragreement.pdf" class="link">Пользовательское соглашение</a>
 			<p>Evendate 2015-<?= (new DateTimeImmutable())->format('Y'); ?></p>
 		</div>
 	</div>
@@ -349,11 +351,11 @@ $url_parts = explode('/', $url);
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=7efa8ee8a1c3d23cda1edc02edf53c36" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=899b055d8c1c886eae9c27045c7e7caf" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=d9ed8c11f5a8e3937782defd171aeba3" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=ff8ed8835870d9226e1757eac7354f10" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=c022d29fcd05492368e5f5f6e0021e97" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=6b8e2a3e13c711c80a0c1b97982a074c" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=538ef9200dcaaf709add3071383bcc27" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=a93e14581aa8a987ba7e1ef77b400f08" charset="utf-8"></script><?php
 }
 
 foreach (glob("app/templates/{*/*/*/*,*/*/*,*/*,*}.html", GLOB_BRACE) as $filename) {

@@ -31,7 +31,7 @@
 
 								<h2><label for="edit_event_description">Описание <span class="required_star">*</span></label></h2>
 								<div class="form_unit">
-									<textarea id="edit_event_description" class="form_textarea LimitSize OnChangeCrossPost" data-maxlength="1000" name="description" placeholder="Не более 1000 символов" required>{description}</textarea>
+									<textarea id="edit_event_description" class="form_textarea -expanding LimitSize OnChangeCrossPost" data-maxlength="1000" name="description" placeholder="Не более 1000 символов" required>{description}</textarea>
 								</div>
 
 								<!--Date Picker-->
@@ -171,7 +171,7 @@
 									<div class="form_unit">
 										<div class="img_holder EventEditHorizontalImageHolder">
 											<img class="edit_event_img_preview_hor ImgPreview" src="{image_horizontal_url}">
-											<img src="/app/img/edit_event/edit_event_img_placeholder_hor.png" height="553">
+											<img class="edit_event_img_preview_mask" src="/app/img/edit_event/edit_event_img_placeholder_hor.png" height="574">
 											<input id="edit_event_image_horizontal_source" class="ImgSrc HorizontalImageSource" type="hidden" name="image_horizontal" value="{image_horizontal_base64}">
 											<input id="edit_event_image_horizontal_filename" class="FileName" type="hidden" name="filename_horizontal" value="{image_horizontal_filename}">
 										</div>
@@ -202,7 +202,7 @@
 									</div>
 
 									<div class="form_unit">
-										<input id="edit_event_registration_locally" class="form_checkbox Switch" name="registration_locally" type="checkbox" data-switch_id="registration_locally">
+										<input id="edit_event_registration_locally" class="form_checkbox RegistrationLocallySwitch Switch" name="registration_locally" type="checkbox" data-switch_id="registration_locally">
 										<label class="form_label" for="edit_event_registration_locally"><span>Регистрация через Evendate</span></label>
 									</div>
 
@@ -236,9 +236,10 @@
 
 										<h3 id="edit_event_registration_fields">Анкета регистрации</h3>
 
-										{registration_predefined_fields}
-
-										{registration_custom_fields}
+										<div class="RegistrationFields">
+											{registration_predefined_fields}
+											{registration_custom_fields}
+										</div>
 
 										<button class="button -color_neutral -size_low -rounded fa_icon fa-plus-circle AddRegistrationCustomField RippleEffect" type="button"><span class="Text">Добавить поле</span></button>
 
@@ -262,10 +263,10 @@
 
 
 						<div class="tab_body TabsBody">
-							<fieldset disabled>
+							<fieldset>
 								<h2>Продажа билетов</h2>
 								<p class="form_text">Настройте продажу билетов на ваше событие через Evendate</p>
-								<table class="event_edit_ticket_types_table table -simple_table -full_page_width Collapsing">
+								<table class="event_edit_table table -simple_table -full_page_width TicketTypes Collapsing">
 									<thead>
 										<tr>
 											<th width="55%" align="left">Название</th>
@@ -273,10 +274,44 @@
 											<th width="35%" align="left">Цена, ₽</th>
 										</tr>
 									</thead>
-									<tbody class="TicketTypes">{ticket_types}</tbody>
+									{ticket_types}
 								</table>
 								<div class="form_unit -align_center">{add_ticket_type_button}</div>
+
+								<div class="form_unit form_accent_block">
+									<input id="edit_event_accept_bitcoins" class="form_checkbox" type="checkbox" name="accept_bitcoins">
+									<label class="form_label" for="edit_event_accept_bitcoins"><span>Принимать биткоины</span></label>
+								</div>
+								{booking_time_input}
+								<h3>Промокоды</h3>
+								<table class="event_edit_table table -simple_table -full_page_width Promocodes">
+									<thead>
+										<tr>
+											<th width="60%" align="left">Код</th>
+											<th width="20%" align="left">Размер скидки</th>
+											<th width="10%" align="left">%/₽</th>
+											<th width="10%" align="left"></th>
+										</tr>
+									</thead>
+									{promocodes}
+								</table>
+								<div class="form_unit -align_center">{add_promocode_button}</div>
 							</fieldset>
+						</div>
+
+
+						<div class="tab_body TabsBody">
+							<h2>Настройка email рассылок</h2>
+							<p class="form_text">Здесь вы можете добавить свои сообщения в email рассылку по событию</p>
+							<div class="form_unit EmailTicketing -hidden">
+								{email_payed_form_unit}
+							</div>
+							<div class="form_unit EmailRegistration -hidden">
+								{email_approved_form_unit}
+								{email_not_approved_form_unit}
+							</div>
+							{email_after_event_form_unit}
+							<p class="form_text">Поля не обязательны для заполнения, при их отсутствии будет отправляться типовое письмо</p>
 						</div>
 
 
@@ -386,7 +421,8 @@
 				<div class="event_edit_navigation_item Tab"><span>1. Описание</span></div>
 				<div class="event_edit_navigation_item Tab"><span>2. Регистрация на событие</span></div>
 				<div class="event_edit_navigation_item Tab"><span>3. Продажа билетов</span></div>
-				<div class="event_edit_navigation_item Tab"><span>4. Публикация</span></div>
+				<div class="event_edit_navigation_item Tab"><span>4. Email</span></div>
+				<div class="event_edit_navigation_item Tab"><span>5. Публикация</span></div>
 			</div><!--
 			<button class="button -color_bubblegum -size_wide RippleEffect">Отменить событие</button>-->
 		</div>
@@ -411,14 +447,18 @@
 </script>
 
 <script type="javascript/template" id="tmpl-edit-event-registration-predefined-field">
-	<div class="form_unit form_accent_block">
-		<input id="edit_event_registration_{type}_field_enable" class="form_checkbox Switch" type="checkbox" name="registration_fields" value="{id}" data-switch_id="registration_{type}_field">
-		<label class="form_label" for="edit_event_registration_{type}_field_enable"><span>{name}</span></label>
-	</div>
-	<input id="edit_event_registration_{type}_field_uuid" type="hidden" name="registration_{id}_field_uuid" value="{uuid}">
-	<div class="form_fieldset -color_marginal">
+	<div class="form_fieldset -color_marginal Draggable">
+		<div class="edit_event_registration_field_draggable DragHandle">
+			<span class="fa_icon fa-reorder"></span>
+		</div>
+		<div class="form_unit form_accent_block">
+			<input id="edit_event_registration_{type}_field_enable" class="form_checkbox Switch PredefinedFieldSwitch" type="checkbox" name="registration_fields" value="{id}" data-switch_id="registration_{type}_field">
+			<label class="form_label" for="edit_event_registration_{type}_field_enable"><span>{name}</span></label>
+		</div>
+		<input id="edit_event_registration_{type}_field_uuid" type="hidden" name="registration_{id}_field_uuid" value="{uuid}">
 		<p>{description}</p>
 		<fieldset class="Switching" data-switch_id="registration_{type}_field" disabled>
+			<input class="RegistrationFieldOrderNumber" type="hidden" name="registration_{id}_field_order_number" value="{order_number}">
 			<input type="hidden" name="registration_{id}_field_type" value="{type}">
 			<div class="form_unit">
 				<input id="edit_event_registration_{type}_field_required" class="form_checkbox" type="checkbox" name="registration_{id}_field_required">
@@ -429,10 +469,14 @@
 </script>
 
 <script type="javascript/template" id="tmpl-edit-event-registration-custom-field">
-	<fieldset class="edit_event_registration_custom_field form_fieldset -color_marginal RegistrationCustomField">
+	<div class="edit_event_registration_custom_field form_fieldset -color_marginal RegistrationCustomField Draggable">
+		<div class="edit_event_registration_field_draggable DragHandle">
+			<span class="fa_icon fa-reorder"></span>
+		</div>
 		<p class="form_text">В этом поле вы можете запросить у пользователей любые данные или задать вопрос.</p>
 		<input id="edit_event_registration_{id}_custom_field_enable" class="RegistrationFieldId" type="hidden" name="registration_fields" value="{id}">
 		<input id="edit_event_registration_{id}_custom_field_uuid" class="RegistrationCustomFieldUUID" type="hidden" name="registration_{id}_field_uuid" value="{uuid}">
+		<input id="edit_event_registration_{id}_custom_field_order_number" class="RegistrationFieldOrderNumber" type="hidden" name="registration_{id}_field_order_number" value="{order_number}">
 		<button class="edit_event_registration_custom_field_remove_button RemoveRegistrationCustomField" type="button">&times;</button>
 
 		<div class="form_unit">
@@ -456,7 +500,7 @@
 			<input id="edit_event_registration_{id}_custom_field_required" class="form_checkbox" type="checkbox" name="registration_{id}_field_required">
 			<label class="form_label" for="edit_event_registration_{id}_custom_field_required"><span>Обязательное поле</span></label>
 		</div>
-	</fieldset>
+	</div>
 </script>
 
 <script type="javascript/template" id="tmpl-edit-event-registration-custom-field-values">
@@ -485,11 +529,13 @@
 		<td>{amount_input}</td>
 		<td>
 			<input class="TicketTypeId" type="hidden" name="ticket_types" value="{row_num}">
-			<input class="TicketType{row_num}UUID" type="hidden" name="ticket_type_{row_num}_uuid" value="{uuid}">
+			<input class="TicketTypeUUID" type="hidden" name="ticket_type_{row_num}_uuid" value="{uuid}">
+			<input type="hidden" name="ticket_type_{row_num}_comment" value="{comment}">
+			<input class="TicketTypeCode" type="hidden" name="ticket_type_{row_num}_type_code" value="{type_code}">
 			<div class="edit_event_ticket_type_last_column form_group">
 				{price_input}
 				<button class="event_edit_ticket_type_expand_button action -color_marginal fa_icon fa-sliders TicketTypeExpandButton" type="button"></button>
-				<button class="event_edit_ticket_type_delete_button action -color_marginal TicketTypeDeleteButton" type="button">&times;</button>
+				<button class="event_edit_row_delete_button action -color_marginal TicketTypeDeleteButton" type="button">&times;</button>
 			</div>
 		</td>
 	</tr>
@@ -508,9 +554,9 @@
 									{tickets_sell_start_date_select}
 								</fieldset>
 							</div>
-							<fieldset class="form_group -align_left" title="Эта функция доступна только с полным тарифом" disabled>
+							<fieldset class="-align_left TicketTypeSellAfterFieldset" disabled>
 								{tickets_sell_start_after_checkbox}
-								<fieldset class="form_unit Switching" data-switch_id="ticket_type_{row_num}_start_after">
+								<fieldset class="form_unit Switching" data-switch_id="ticket_type_{row_num}_start_after" disabled>
 									{tickets_sell_start_after_select}
 								</fieldset>
 							</fieldset>
@@ -558,5 +604,24 @@
 <script type="javascript/template" id="tmpl-edit-event-tickets-row-empty">
 	<tr class="EmptyRow">
 		<td colspan="3" align="center"><p class="form_text">Вы не добавили ни одного билета</p></td>
+	</tr>
+</script>
+
+<script type="javascript/template" id="tmpl-edit-event-promocode-row">
+	<tr class="PromocodeRow">
+		<td>{code_input}</td>
+		<td>{effort_input}</td>
+		<td>{type_switch}</td>
+		<td>
+			{service_control}
+			<input type="hidden" name="promocodes" value="{id}">
+			<input type="hidden" name="promocode_{id}_uuid" value="{uuid}">
+		</td>
+	</tr>
+</script>
+
+<script type="javascript/template" id="tmpl-edit-event-promocode-row-empty">
+	<tr class="EmptyRow">
+		<td colspan="4" align="center"><p class="form_text">Вы не добавили ни одного промокода</p></td>
 	</tr>
 </script>

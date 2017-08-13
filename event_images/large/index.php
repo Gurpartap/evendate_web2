@@ -142,7 +142,8 @@ $headers = array(
 if (file_exists('./' . $_path)) {
 	$image->load('./' . $_path);
 	$image->resizeToWidth($size);
-	$type_str = strtolower(end(explode('.', $_path)));
+	$exploded_path = explode('.', $_path);
+	$type_str = strtolower(end($exploded_path));
 	if ($type_str == 'jpeg' || $type_str == 'jpg') {
 		$type = IMAGETYPE_JPEG;
 	} elseif ($type_str == 'png') {

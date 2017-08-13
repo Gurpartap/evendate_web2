@@ -154,11 +154,13 @@ AdminEventRequestsPage = extending(AdminEventPage, (function() {
 		this.event_fields.add('orders_count');
 		
 		this.requests = new RequestsCollection(event_id);
-		this.requests_fields = new Fields('created_at', 'registration_fields', {
-			user: {
-				fields: new Fields('email')
-			}
-		});
+		this.requests_fields = new Fields(
+			'created_at',
+			'registration_fields', {
+				user: {
+					fields: new Fields('email')
+				}
+			});
 		
 		this.$loader = $();
 		this.$new_requests_list = $();
@@ -404,7 +406,11 @@ AdminEventRequestsPage = extending(AdminEventPage, (function() {
 		this.$requests_detail = this.$wrapper.find('.RequestDetail');
 		
 		this.requests.fetchAllRequests(this.requests_fields).done(function() {
-			var $lists = tmpl('event-admin-requests-lists', {
+			var $lists;
+			
+			self.requests.sortBy('created_at');
+			
+			$lists = tmpl('event-admin-requests-lists', {
 				new_requests: self.requestItemBuilder(self.requests.new_requests),
 				approved_requests: self.requestItemBuilder(self.requests.approved_requests),
 				rejected_requests: self.requestItemBuilder(self.requests.rejected_requests)

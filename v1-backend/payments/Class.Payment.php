@@ -26,7 +26,7 @@ class Payment
 		return new Result(true, '', array('uuid' => $uuid, 'sum' => Tariff::FULL_PRICE));
 	}
 
-	private static function buildResponse($type, $result_code, $message, $invoiceId)
+	public static function buildResponse($type, $result_code, $message, $invoiceId)
 	{
 		$date = new DateTime();
 		$performedDatetime = $date->format("Y-m-d") . "T" . $date->format("H:i:s") . ".000" . $date->format("P");
@@ -36,13 +36,14 @@ class Payment
 		return $response;
 	}
 
-	private static function checkMd5(array $request)
+	public static function checkMd5(array $request)
 	{
 		$str = $request['action'] . ";" .
 			$request['orderSumAmount'] . ";" . $request['orderSumCurrencyPaycash'] . ";" .
 			$request['orderSumBankPaycash'] . ";" . $request['shopId'] . ";" .
 			$request['invoiceId'] . ";" . trim($request['customerNumber']) . ";" . self::PASSWORD;
 		$md5 = strtoupper(md5($str));
+
 		return $md5 == strtoupper($request['md5']);
 
 	}
@@ -76,7 +77,7 @@ class Payment
 
 	public static function checkPayment(array $request, ExtendedPDO $db)
 	{
-		try {
+			try {
 
 			$payment = self::getPaymentInfo($db, $request);
 			return self::buildResponse(self::ACTION_CHECK_ORDER, 0, 'ok', $request['invoiceId']);
@@ -92,7 +93,7 @@ class Payment
 		}
 	}
 
-	private static function getPayedTill(ExtendedPDO $db, $organization_id) : DateTime
+	private static function getPayedTill(ExtendedPDO $db, $organization_id): DateTime
 	{
 		$q_get = App::queryFactory()->newSelect();
 		$q_get->from('view_payments')
@@ -114,7 +115,6 @@ class Payment
 		try {
 
 			$payment = self::getPaymentInfo($db, $request);
-
 
 			$q_upd = App::queryFactory()->newUpdate();
 

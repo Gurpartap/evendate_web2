@@ -8,12 +8,24 @@
  * @property {Object<string, string>} ENTITIES
  */
 __C = {
+	API_TOKENS: {
+		DADATA: '7f2a3dad57bdaefebcb6e26ef7600b62b9658467'
+	},
 	CLASSES: {
 		MATERIAL: 'material',
 		FLOATING_MATERIAL: 'material -floating_material',
 		IMG_HOLDER: 'img_holder',
+		COMPONENT: {
+			ACTION: 'action',
+			BUTTON: 'button'
+		},
 		TEXT_COLORS: {
 			ACCENT: '-text_color_accent'
+		},
+		TEXT_WEIGHT: {
+			BOLD: '-font_weight_bold',
+			BOLDER: '-font_weight_bolder',
+			LIGHTER: '-font_weight_lighter'
 		},
 		COLORS: {
 			ACCENT: '-color_accent',
@@ -25,7 +37,9 @@ __C = {
 			MARGINAL_ACCENT: '-color_marginal_accent',
 			MARGINAL_PRIMARY: '-color_marginal_primary',
 			MARGINAL_FRANKLIN: '-color_marginal_franklin',
-			MARGINAL_BUBBLEGUM: '-color_marginal_bubble_gum'
+			MARGINAL_BUBBLEGUM: '-color_marginal_bubble_gum',
+			
+			YANDEX: '-color_yandex'
 		},
 		ALIGN: {
 			LEFT: '-align_left',
@@ -53,6 +67,7 @@ __C = {
 			X50: '-size_50x50',
 			X55: '-size_55x55',
 			HUGE: '-size_huge',
+			BIG: '-size_big',
 			LOW: '-size_low',
 			WIDE: '-size_wide',
 			SMALL: '-size_small'
@@ -168,6 +183,7 @@ __C = {
 	 * @enum {number}
 	 */
 	KEY_CODES: {
+		ENTER: 13,
 		ESC: 27
 	}
 };
@@ -1218,6 +1234,7 @@ function tmpl(template_type, items, addTo, direction) {
  * }}
  */
 function parseUri(str, options) {
+	str = decodeURIComponent(str);
 	var o = {
 			strictMode: false,
 			key: ["source","protocol","authority","userInfo","user","password","host","port","relative","path","directory","file","query","anchor"],
@@ -1320,6 +1337,7 @@ function getGenderText(gender, cases) {
  * @param {(Array<OneDate>|DatesCollection)} dates
  * @param {(string|Array|jQuery|object)} format
  * @param {boolean} [is_same_time=false]
+ *
  * @returns {(Array<string>|Array<Array>|Array<jQuery>|Array<object>)}
  */
 function formatDates(dates, format, is_same_time) {
@@ -1605,6 +1623,15 @@ function formatTicketNumber(number) {
 	return ('' + number).replace(/(\d{3})/g, '$1 ').trim();
 }
 /**
+ *
+ * @param {timestamp} timestamp
+ * @param {string} [format=__C.DATE_FORMAT]
+ */
+function unixTimestampToISO(timestamp, format) {
+	
+	return moment.unix(timestamp).format(format || __C.DATE_FORMAT);
+}
+/**
  * Generates guid-like string (actually, it`s not guid, just randomly compiled string)
  *
  * @return {string}
@@ -1615,6 +1642,22 @@ function guid() {
 	}
 	
 	return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+}
+/**
+ *
+ * Generates random string with custom length (by default length = 32)
+ *
+ * @param {number} [length=32]
+ *
+ * @return {string}
+ */
+function randomString(length) {
+	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	
+	return (new Array(length || 32)).fill('').map(function() {
+		
+		return possible.charAt(Math.floor(Math.random() * possible.length));
+	}).join('');
 }
 /**
  * Validating form or fieldset
@@ -1644,13 +1687,16 @@ function isFormValid($form) {
 			if ($elements.length > 1) {
 				active_count = $elements.filter(function(i, el) {
 					
-					return !$(el).is(":disabled")
-					   && ((el.checked && el.value != "on") || el.type != "radio")
-					   && ((el.checked && el.value != "on") || el.value == "on" || el.type != "checkbox");
+					return !$(el).is(':disabled')
+					   && ((el.checked && el.value !== 'on') || el.type !== 'radio')
+					   && ((el.checked && el.value !== 'on') || el.value === 'on' || el.type !== 'checkbox');
 				}).length;
 				
 				if (!active_count) {
 					handleErrorField($elements);
+					scrollTo($elements, 400, function() {
+						showNotifier({text: $elements.data('error_message') || 'Заполнены не все обязательные поля', status: false});
+					});
 					is_valid = false;
 				}
 				
@@ -1661,6 +1707,10 @@ function isFormValid($form) {
 		$rest.each(function(i, el) {
 			if ( (el.required && (el.value.trim() === '' || !el.checkValidity())) || (el.value.trim() !== '' && !el.checkValidity()) ) {
 				handleErrorField(el);
+				
+				scrollTo(el, 400, function() {
+					showNotifier({text: $(el).data('error_message') || 'Заполнены не все обязательные поля', status: false});
+				});
 				is_valid = false;
 			}
 		});
@@ -1725,7 +1775,7 @@ function isKeyPressed(event, key) {
  */
 function empty(variable) {
 	
-	return variable == null;
+	return variable == null || (typeof variable === 'object' && $.isEmptyObject(variable)) || (variable instanceof Array && variable.length === 0);
 }
 /**
  *
@@ -2454,7 +2504,13 @@ function toDataUrl(url, callback) {
 	xhr.open('GET', url);
 	xhr.send();
 }
-
+/**
+ *
+ * @param {object} response
+ * @param {string} response.text
+ * @param {string} [response.pos = 'top-right]
+ * @param {boolean} [response.status]
+ */
 function showNotifier(response) {
 	$.notify({
 		'message': response.text,
@@ -2476,7 +2532,7 @@ function isNotDesktop() {
 
 /**
  *
- * @param {(jQuery|number)} $element
+ * @param {(jQuery|Element|number)} $element
  * @param {number} [duration=400]
  * @param {Function} [complete]
  *
@@ -2484,8 +2540,11 @@ function isNotDesktop() {
  */
 function scrollTo($element, duration, complete) {
 	var scroll_top;
+	
 	if ($element instanceof jQuery) {
 		scroll_top = $element.offset().top - 150;
+	} else if ($element instanceof Element) {
+		scroll_top = $($element).offset().top - 150;
 	} else {
 		scroll_top = $element - 150;
 	}
@@ -2493,13 +2552,12 @@ function scrollTo($element, duration, complete) {
 		complete = function() {};
 	}
 	$('body').stop().animate({
-			scrollTop: Math.ceil(scroll_top)
-		}, {
-			duration: duration ? duration : 400,
-			easing: 'swing',
-			complete: complete
-		}
-	);
+		scrollTop: Math.ceil(scroll_top)
+	}, {
+		duration: duration ? duration : 400,
+		easing: 'swing',
+		complete: complete
+	});
 	
 	return scroll_top;
 }
@@ -2521,7 +2579,8 @@ function isScrollRemain(left) {
  * @return {*}
  */
 function setDefaultValue(variable, default_value) {
-	if ((typeof variable === 'undefined') || $.isEmptyObject(variable))
+	if ((typeof variable === 'undefined') || (typeof variable === 'object' && $.isEmptyObject(variable)))
 		return default_value;
+	
 	return variable;
 }

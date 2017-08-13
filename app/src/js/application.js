@@ -10,19 +10,6 @@ __APP = {
 	EXPORT: new ServerExports(),
 	EVENDATE_BEGIN: '15-12-2015',
 	AUTH_URLS: {},
-	/**
-	 * @property {string} ip
-	 * @property {string} country_code
-	 * @property {string} country_name
-	 * @property {string} region_code
-	 * @property {string} region_name
-	 * @property {string} city
-	 * @property {string} zip_code
-	 * @property {string} time_zone
-	 * @property {number} latitude
-	 * @property {number} longitude
-	 * @property {number} metro_code
-	 */
 	TOP_BAR: new AbstractTopBar(),
 	SIDEBAR: new AbstractSidebar(),
 	USER: new CurrentUser(),
@@ -67,6 +54,7 @@ __APP = {
 			'organization': AddOrganizationPage
 		},
 		'my': {
+			'orders': MyOrdersPage,
 			'tickets': MyTicketsPage,
 			'profile': MyProfilePage,
 			'': MyProfilePage
@@ -84,7 +72,12 @@ __APP = {
 				'': AddEventPage
 			},
 			'^([0-9]+)': {
-				'order': OrderPage,
+				'order': {
+					'^([0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12})': {
+						'from_legal_entity': LegalEntityPayment
+					},
+					'': OrderPage
+				},
 				'edit': EditEventPage,
 				'': EventPage
 			},
@@ -133,6 +126,10 @@ __APP = {
 			'me': MyProfilePage,
 			'^([0-9]+)': UserPage,
 			'': MyProfilePage
+		},
+		'ticket': {
+			'^([^/]+)': TicketPage,
+			'': TicketPage
 		},
 		'': ActualEventsPage
 	},
@@ -321,6 +318,7 @@ __LOCALES = {
 			TICKET_STATUSES: {
 				USED: 'Билет использован',
 				
+				WAITING_PAYMENT_LEGAL_ENTITY: 'Ожидает оплаты от юрлица',
 				WAITING_FOR_PAYMENT: 'Ожидает оплаты',
 				IS_PENDING: 'Ожидает подтверждения',
 				
@@ -330,10 +328,10 @@ __LOCALES = {
 				
 				TICKETS_ARE_OVER: 'Билеты закончились',
 				RETURNED_BY_ORGANIZATION: 'Возврат билета организатором',
-				PAYMENT_CANCELED_AUTO: 'Отмена транзакции',
-				PAYMENT_CANCELED_BY_CLIENT: 'Отменено клиентом',
+				PAYMENT_CANCELED_AUTO: 'Истек срок оплаты',
+				PAYMENT_CANCELED_BY_CLIENT: 'Отменен клиентом',
 				RETURNED_BY_CLIENT: 'Возврат билета',
-				REJECTED: 'Отклонено'
+				REJECTED: 'Отклонен'
 			}
 		},
 		DATE: {

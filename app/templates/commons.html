@@ -18,6 +18,14 @@
 	<label class="form_label {label_classes}" for="{id}">{label}</label>
 </script>
 
+<script type="javascript/template" id="tmpl-switch">
+	<label for="{id}" class="form_switch FormSwitch {classes}">
+		<input id="{id}" class="FormSwitchInput" type="checkbox" name="{name}" {attributes} {dataset}>
+		<span class="form_switch_road"></span>
+		<span class="form_switch_runner"></span>
+	</label>
+</script>
+
 <script type="javascript/template" id="tmpl-radio-checkbox">
 	<div class="{unit_classes}">
 		<input id="{id}" class="{classes}" type="{type}" name="{name}" {attributes} {dataset}>
@@ -320,6 +328,12 @@
 	<div class="cap {classes}" {dataset} {attributes}><span class="cap_message">{message}</span></div>
 </script>
 
+<script type="javascript/template" id="tmpl-overlay-cap">
+	<div class="overlay_cap -unselectable -centering OverlayCap {classes}" {dataset} {attributes}>
+		<div class="overlay_cap_wrapper">{content}</div>
+	</div>
+</script>
+
 <script type="javascript/template" id="tmpl-required-star">
 	<span class="-text_color_accent"> * </span>
 </script>
@@ -335,4 +349,18 @@
 			</div>
 		</div>
 	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-payment-form">
+	<form id="payment_{payment_uuid}" class="-hidden" action="https://money.yandex.ru/eshop.xml" method="post">
+		<input name="shopId" value="132896" type="hidden">
+		<input name="scid" value="97111" type="hidden">
+		<input name="customerNumber" value="{customer_id}" type="hidden">
+		<input name="cps_email" value="{cps_email}" type="hidden">
+		<input name="shopFailURL" value="{callback_url}" type="hidden">
+		<input name="shopSuccessURL" value="{callback_url}" type="hidden">
+		<input name="shopDefaultUrl" value="{callback_url}" type="hidden">
+		<input name="evendate_payment_id" value="{payment_uuid}" type="hidden">
+		<input name="sum" value="{sum}" type="hidden">
+	</form>
 </script>

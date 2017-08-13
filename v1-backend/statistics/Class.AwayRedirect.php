@@ -6,7 +6,7 @@ class AwayRedirect{
 		$q_ins_away = App::queryFactory()->newInsert();
 		$q_ins_away->into('stat_external_link_opens')
 			->cols(array(
-				'user_id' => $request['user_id'] ?? null,
+				'user_id' => !isset($request['user_id']) || !is_numeric($request['user_id']) ? null : $request['user_id'],
 				'url' => $request['url'] ?? null,
 				'params' => json_encode($request)
 			));

@@ -17,6 +17,7 @@ QuantityInput = extendingJQuery((function() {
 	 * @property {jQuery} plus
 	 * @property {jQuery} input
 	 * @property {jQuery} minus
+	 * @property {number} value
 	 * @property {object} [options]
 	 * @property {number} [options.max]
 	 * @property {number} [options.min]
@@ -28,12 +29,16 @@ QuantityInput = extendingJQuery((function() {
 		var $plus_button,
 			$minus_button,
 			$input,
+			self = this,
 			value = (options.min && options.min > 0) ? options.min : 0;
 		
 		$plus_button = __APP.BUILD.button({
 			title: '+',
 			classes: [
-				'quantity_input_button'
+				'QuantityInputPlus',
+				'quantity_input_button',
+				__C.CLASSES.COLORS.DEFAULT,
+			  __C.CLASSES.HOOKS.RIPPLE
 			],
 			attributes: {
 				tabindex: -1
@@ -41,9 +46,12 @@ QuantityInput = extendingJQuery((function() {
 		});
 		
 		$minus_button = __APP.BUILD.button({
-			title: '-',
+			title: '–',
 			classes: [
-				'quantity_input_button'
+				'QuantityInputMinus',
+				'quantity_input_button',
+				__C.CLASSES.COLORS.DEFAULT,
+				__C.CLASSES.HOOKS.RIPPLE
 			],
 			attributes: {
 				tabindex: -1
@@ -67,6 +75,9 @@ QuantityInput = extendingJQuery((function() {
 		
 		this.options = options;
 		
+		bindRippleEffect($plus_button);
+		bindRippleEffect($minus_button);
+		
 		this.plus = $plus_button;
 		this.input = $input;
 		this.minus = $minus_button;
@@ -80,6 +91,17 @@ QuantityInput = extendingJQuery((function() {
 			this.input.val(this.options.max);
 			this.disablePlus();
 		}
+		
+		Object.defineProperty(this, 'value', {
+			get: function() {
+			
+				return +self.input.val();
+			},
+			set: function(val) {
+				
+				return self.input.val(val);
+			}
+		});
 		
 		this.data('instance', this);
 		
@@ -118,31 +140,39 @@ QuantityInput = extendingJQuery((function() {
 		}
 	};
 	
+	QuantityInput.prototype.decrement = function() {
+		var val = +this.input.val();
+		
+		this.check(val - 1);
+		if (!empty(this.options.min)) {
+			if (val - 1 < this.options.min) {
+				return false;
+			}
+		}
+		this.input.val(val - 1).trigger('QuantityInput::change', [val - 1, val]);
+	};
+	
+	QuantityInput.prototype.increment = function() {
+		var val = +this.input.val();
+		
+		this.check(val + 1);
+		if (!empty(this.options.max)) {
+			if (val + 1 > this.options.max) {
+				return false;
+			}
+		}
+		this.input.val(val + 1).trigger('QuantityInput::change', [val + 1, val]);
+	};
+	
 	QuantityInput.prototype.initiate = function() {
 		var self = this;
 		
 		this.plus.on('click.PlusQuantity', function() {
-			var val = +self.input.val();
-			
-			self.check(val + 1);
-			if (!empty(self.options.max)) {
-				if (val + 1 > self.options.max) {
-					return false;
-				}
-			}
-			self.input.val(val + 1).trigger('QuantityInput::change', [val + 1, val]);
+			self.increment();
 		});
 		
 		this.minus.on('click.MinusQuantity', function() {
-			var val = +self.input.val();
-			
-			self.check(val - 1);
-			if (!empty(self.options.min)) {
-				if (val - 1 < self.options.min) {
-					return false;
-				}
-			}
-			self.input.val(val - 1).trigger('QuantityInput::change', [val - 1, val]);
+			self.decrement();
 		});
 		
 		this.input.on('input', function() {

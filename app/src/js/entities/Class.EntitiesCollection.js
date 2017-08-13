@@ -117,6 +117,41 @@ EntitiesCollection = extending(Array, (function() {
 		
 		return this;
 	};
+	/**
+	 *
+	 * @param {string} key
+	 * @param {boolean} [ascending=false]
+	 */
+	EntitiesCollection.prototype.sortBy = function(key, ascending) {
+		var key_spliced = key.split('.');
+		
+		this.sort(function(a, b) {
+			var cur_a = Object.assign({}, a),
+				cur_b = Object.assign({}, b);
+			
+			key_spliced.forEach(function(key) {
+				cur_a = typeof cur_a[key] === 'object' ? Object.assign({}, cur_a[key]) : cur_a[key];
+				cur_b = typeof cur_b[key] === 'object' ? Object.assign({}, cur_b[key]) : cur_b[key];
+			});
+			
+			if (isFinite(cur_a) && isFinite(cur_b)) {
+				
+				return ascending ? cur_a - cur_b : cur_b - cur_a;
+			} else {
+				
+				if (cur_a.name > cur_b.name) {
+					
+					return ascending ? 1 : -1;
+				}
+				if (cur_a.name < cur_b.name) {
+					
+					return ascending ? -1 : 1;
+				}
+				
+				return 0;
+			}
+		});
+	};
 	
 	return EntitiesCollection;
 }()));

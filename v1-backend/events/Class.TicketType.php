@@ -13,27 +13,30 @@ class TicketType extends AbstractEntity
 		'event_id',
 		'type_code',
 		'name',
+		'amount',
+		'price',
+		'start_after_ticket_type_code',
 	);
 
 	protected static $ADDITIONAL_COLS = array(
 		'comment',
-		'price',
 		'sell_start_date',
 		'sell_end_date',
 		'created_at',
 		'updated_at',
 		'min_count_per_user',
 		'max_count_per_user',
+		'is_selling',
 	);
 
 	public static $FIELDS_FOR_ADMINISTRATOR = array(
 		self::START_AFTER_FIELD_NAME,
-		self::AMOUNT_FIELD_NAME,
+//		self::AMOUNT_FIELD_NAME,
 		self::PROMOCODE_FIELD_NAME,
 		self::PROMOCODE_EFFORT_FIELD_NAME,
 	);
 
-	private static function checkData(array $data)
+	private static function checkData(array $data, $event_extremum_dates)
 	{
 		$num_price_options = array(
 			'options' => array(
@@ -60,6 +63,7 @@ class TicketType extends AbstractEntity
 			$data['sell_start_date'] = (new DateTime())->format('Y-m-d H:i:s');
 		}
 
+
 		if (isset($data['sell_end_date']) && !is_null($data['sell_end_date'])) {
 			if ($data['sell_end_date'] instanceof DateTime) {
 				$data['sell_end_date'] = $data['sell_end_date']->format('Y-m-d H:i:s');
@@ -67,7 +71,7 @@ class TicketType extends AbstractEntity
 				$data['sell_end_date'] = (new DateTime($data['sell_end_date']))->format('Y-m-d H:i:s');
 			}
 		} else {
-			$data['sell_end_date'] = (new DateTime())->format('Y-m-d H:i:s');
+			$data['sell_end_date'] = $event_extremum_dates['last_event_date']->format('Y-m-d H:i:s');
 		};
 
 		if (isset($data['amount'])) {
@@ -111,24 +115,34 @@ class TicketType extends AbstractEntity
 			$data['start_after_ticket_type_uuid'] = null;
 		};
 
+		if (isset($data['start_after_ticket_type_code']) && !is_null($data['start_after_ticket_type_code'])) {
+			//TODO: check existing
+		} else {
+			$data['start_after_ticket_type_code'] = null;
+		};
+
 		return $data;
 	}
 
 	public static function create($event_id, $ticket_type, ExtendedPDO $db)
 	{
-		$ticket_type = self::checkData($ticket_type);
+		$event_extremum_dates = Event::getExtremumDates($event_id, App::DB());
+
+		$ticket_type = self::checkData($ticket_type, $event_extremum_dates);
 		$q_ins = App::queryFactory()->newInsert();
 
 		$cols = array(
 			'event_id' => $event_id,
 			'type_code' => $ticket_type['type_code'] ?? null,
 			'name' => $ticket_type['name'],
-			'comment' => $ticket_type['comment'],
+			'comment' => $ticket_type['comment'] ?? null,
 			'price' => $ticket_type['price'],
+			'status' => isset($ticket_type['to_switch_off']) && $ticket_type['to_switch_off'] == true ? 'false' : 'true',
 			'sell_start_date' => $ticket_type['sell_start_date'],
 			'sell_end_date' => $ticket_type['sell_end_date'],
-			'start_after_ticket_type_uuid' => $ticket_type['start_after_ticket_type_uuid'],
-			'amount' => $ticket_type['amount'],
+			'start_after_ticket_type_uuid' => null,
+			'start_after_ticket_type_code' => $ticket_type['start_after_ticket_type_code'],
+			'amount' => isset($ticket_type['amount']) && is_numeric($ticket_type['amount']) ? (int) $ticket_type['amount'] : 1000000,
 			'min_count_per_user' => $ticket_type['min_count_per_user'],
 			'max_count_per_user' => $ticket_type['max_count_per_user'],
 			'promocode' => $ticket_type['promocode'],
@@ -137,7 +151,8 @@ class TicketType extends AbstractEntity
 
 		$q_ins
 			->into('ticket_types')
-			->cols($cols);
+			->cols($cols)
+		->onConflictUpdate(array('event_id', 'type_code'), $cols);
 
 		if (isset($ticket_type['uuid']) && !is_null($ticket_type['uuid']) && trim($ticket_type['uuid']) != '') {
 			$q_ins = App::queryFactory()->newUpdate();
@@ -161,17 +176,12 @@ class TicketType extends AbstractEntity
 		$result = parent::getParams($user, $fields)->getData();
 
 		foreach (self::$FIELDS_FOR_ADMINISTRATOR as $field) {
-			if (isset($fields[self::START_AFTER_FIELD_NAME]) && property_exists($this, $field)) {
+			if (property_exists($this, $field)) {
 				$result[$field] = $this->$field;
 			}
 		}
 
 		return new Result(true, '', $result);
-	}
-
-
-	public static function removeTicketsByUUID(ExtendedPDO $db, array $types){
-
 	}
 
 }
