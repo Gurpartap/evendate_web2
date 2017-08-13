@@ -564,23 +564,17 @@ Builder = (function() {
 		return tmpl('order-status', {
 			name: localeFromNamespace(order_status, OneOrder.EXTENDED_ORDER_STATUSES, __LOCALE.TEXTS.TICKET_STATUSES),
 			status: (function(order_status){
-				switch (order_status) {
-					case OneOrder.EXTENDED_ORDER_STATUSES.PAYED:
-					case OneOrder.EXTENDED_ORDER_STATUSES.APPROVED:
-					case OneOrder.EXTENDED_ORDER_STATUSES.WITHOUT_PAYMENT: {
+				switch (true) {
+					case OneOrder.isGreenStatus(order_status): {
+						
 						return 'success';
 					}
-					
-					case OneOrder.EXTENDED_ORDER_STATUSES.IS_PENDING:
-					case OneOrder.EXTENDED_ORDER_STATUSES.WAITING_FOR_PAYMENT: {
+					case OneOrder.isYellowStatus(order_status): {
+						
 						return 'warning';
 					}
-					
-					case OneOrder.EXTENDED_ORDER_STATUSES.REJECTED:
-					case OneOrder.EXTENDED_ORDER_STATUSES.RETURNED_BY_CLIENT:
-					case OneOrder.EXTENDED_ORDER_STATUSES.PAYMENT_CANCELED_AUTO:
-					case OneOrder.EXTENDED_ORDER_STATUSES.RETURNED_BY_ORGANIZATION:
-					case OneOrder.EXTENDED_ORDER_STATUSES.PAYMENT_CANCELED_BY_CLIENT: {
+					case OneOrder.isRedStatus(order_status): {
+						
 						return 'error';
 					}
 				}
@@ -1437,40 +1431,22 @@ Builder = (function() {
 				image_horizontal_medium_url: ticket.event.image_horizontal_medium_url
 			}, ['card_classes']),	event_date;
 			
-			switch (props.status_type_code) {
-				case OneExtendedTicket.TICKET_STATUSES.PAYED:
-				case OneExtendedTicket.TICKET_STATUSES.APPROVED:
-				case OneExtendedTicket.TICKET_STATUSES.WITHOUT_PAYMENT: {
+			switch (true) {
+				case OneOrder.isGreenStatus(props.status_type_code): {
 					props.card_classes.push(__C.CLASSES.STATUS.SUCCESS);
 					break;
 				}
-				case OneExtendedTicket.TICKET_STATUSES.IS_PENDING:
-				case OneExtendedTicket.TICKET_STATUSES.WAITING_FOR_PAYMENT: {
+				case OneOrder.isYellowStatus(props.status_type_code): {
 					props.card_classes.push(__C.CLASSES.STATUS.PENDING);
 					break;
 				}
-				case OneExtendedTicket.TICKET_STATUSES.REJECTED:
-				case OneExtendedTicket.TICKET_STATUSES.RETURNED_BY_CLIENT:
-				case OneExtendedTicket.TICKET_STATUSES.RETURNED_BY_ORGANIZATION: {
+				case OneOrder.isRedStatus(props.status_type_code): {
 					props.card_classes.push(__C.CLASSES.STATUS.ERROR);
 					break;
 				}
 			}
 			
-			switch (props.status_type_code) {
-				case OneExtendedTicket.TICKET_STATUSES.IS_PENDING:
-				case OneExtendedTicket.TICKET_STATUSES.WAITING_FOR_PAYMENT:
-				case OneExtendedTicket.TICKET_STATUSES.RETURNED_BY_ORGANIZATION:
-				case OneExtendedTicket.TICKET_STATUSES.RETURNED_BY_CLIENT:
-				case OneExtendedTicket.TICKET_STATUSES.REJECTED: {
-					props.card_classes.push(__C.CLASSES.DISABLED);
-					break;
-				}
-				default: {
-					props.card_classes.push(__C.CLASSES.HOOKS.CALL_MODAL);
-					break;
-				}
-			}
+			props.card_classes.push(OneOrder.isDisabledStatus(props.status_type_code) ? __C.CLASSES.DISABLED : __C.CLASSES.HOOKS.CALL_MODAL);
 			
 			if (ticket.event.is_same_time) {
 				event_date = ticket.event.dates[0];

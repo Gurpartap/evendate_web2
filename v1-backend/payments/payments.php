@@ -35,6 +35,9 @@ $__modules['payments'] = array(
 			}
 		},
 		// is using by yandex.kassa
+		'{bitcoin/aviso}' => function () use ($__db, $__request) {
+			return Order::avisoPayment($__request, $__db);
+		},
 		'aviso' => function () use ($__db, $__request) {
 			if (isset($__request['evendate_payment_id']) && strstr($__request['evendate_payment_id'], 'order-')) {
 				$result = new Result(true, '', array(), 0, 'xml');

@@ -1804,6 +1804,11 @@ fieldset:disabled .form_select {cursor: default}
 	max-width: 50%;
 }
 
+.fields_wrapper.-columns_3 > .field {
+	flex: none;
+	max-width: calc(100%/3);
+}
+
 .fields_wrapper.-field_big > .field > .field_value {
 	font-size: 1.2857em;
 	color: #2e3b50;
@@ -5305,6 +5310,10 @@ body,
 	margin-top: 24px;
 }
 
+.order_page_contact {
+
+}
+
 /* /ORDER */
 /* LEGAL ENTITY PAYMENT */
 
@@ -5312,6 +5321,10 @@ body,
 	max-width: 800px;
 	margin: 48px auto;
 	padding: 24px 36px 48px;
+}
+
+.legal_entity_payment_footer {
+	margin: 48px auto;
 }
 
 /* /LEGAL ENTITY PAYMENT */

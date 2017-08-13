@@ -140,13 +140,14 @@ class RegistrationForm
 		return new Result(true, $text);
 	}
 
-	public static function processOrder(Event $event, AbstractUser $user, ExtendedPDO $db, array $tickets)
+	public static function processOrder(Event $event, AbstractUser $user, ExtendedPDO $db, array $tickets, $promocode = null)
 	{
 		try {
 			$db->beginTransaction();
 
-			$order_info = Order::create($event, $user, $db, $tickets);
+			$order_info = Order::create($event, $user, $db, $tickets, $promocode);
 			$tickets = Ticket::createBatch($event, $order_info['id'], $db, $tickets);
+			Order::updateSum($order_info['id'], $db);
 
 			$db->commit();
 

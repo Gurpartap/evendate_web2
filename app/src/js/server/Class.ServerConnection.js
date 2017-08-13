@@ -156,7 +156,7 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 	 *
 	 * @param {string} url
 	 * @param {(object|string)} ajax_data
-	 * @param {boolean} [is_payload]
+	 * @param {boolean} [is_payload=false]
 	 * @param {AJAXCallback} [success]
 	 * @param {function} [error]
 	 * @returns {jqPromise}
@@ -171,7 +171,7 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 	 *
 	 * @param {string} url
 	 * @param {(object|string)} ajax_data
-	 * @param {boolean} [is_payload]
+	 * @param {boolean} [is_payload=false]
 	 * @param {AJAXCallback} [success]
 	 * @param {function} [error]
 	 * @returns {jqPromise}

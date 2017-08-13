@@ -189,6 +189,53 @@ OrderPage = extending(Page, (function() {
 			self.$wrapper.find('.TicketsOverallSum').text(formatCurrency(sum));
 		}
 		
+		/**
+		 *
+		 * @return {(boolean|jqPromise)}
+		 */
+		function makeOrder() {
+			var $main_action_button = $(this),
+				$form = self.$wrapper.find('.OrderForm');
+			
+			if (__APP.USER.isLoggedOut()) {
+				(new AuthModal(window.location.href)).show();
+				
+				return false;
+			} else {
+				$main_action_button.attr('disabled', true);
+				if (isFormValid($form)) {
+					
+					return self.event.makeOrder(
+						self.$wrapper.find('.OrderFields').serializeForm('array').reduce(function(bundle, field) {
+							if (+field.value) {
+								bundle.push({
+									uuid: field.name,
+									count: +field.value
+								});
+							}
+							
+							return bundle;
+						}, []),
+						self.$wrapper.find('.RegistrationFields').serializeForm('array').map(function(field) {
+							
+							return {
+								uuid: field.name,
+								value: field.value
+							};
+						})
+					).always(function(data) {
+						$main_action_button.removeAttr('disabled');
+						
+						return data;
+					}).promise();
+				} else {
+					$main_action_button.removeAttr('disabled');
+					
+					return false;
+				}
+			}
+		}
+		
 		this.$wrapper.find('.QuantityInput').on('QuantityInput::change', function(e, value) {
 			countTicketTypeSum($(this).closest('.TicketType'));
 			countTotalSum();
@@ -211,53 +258,42 @@ OrderPage = extending(Page, (function() {
 		}
 		
 		this.render_vars.main_action_button.on('click.MakeOrder', function() {
-			var $main_action_button = $(this),
-				$form = self.$wrapper.find('.OrderForm');
+			var result = makeOrder();
 			
-			if (__APP.USER.isLoggedOut()) {
-				(new AuthModal(window.location.href)).show();
-			} else {
-				$main_action_button.attr('disabled', true);
-				if (isFormValid($form)) {
+			if (result !== false) {
+				result.done(function(data) {
+					var is_custom_callback = !!parsed_uri.queryKey['away_to'],
+						callback_url = parsed_uri.queryKey['away_to'] || '/event/' + self.event.id;
 					
-					self.event.makeOrder(
-						self.$wrapper.find('.OrderFields').serializeForm('array').reduce(function(bundle, field) {
-							if (+field.value) {
-								bundle.push({
-									uuid: field.name,
-									count: +field.value
-								});
-							}
-							
-							return bundle;
-						}, []),
-						self.$wrapper.find('.RegistrationFields').serializeForm('array').map(function(field) {
-							
-							return {
-								uuid: field.name,
-								value: field.value
-							};
-						})
-					).always(function() {
-						$main_action_button.removeAttr('disabled');
-					}).done(function(data) {
-						var is_custom_callback = !!parsed_uri.queryKey['away_to'],
-							callback_url = parsed_uri.queryKey['away_to'] || '/event/' + self.event.id;
-						
-						if (self.event.ticketing_locally && data.sum !== 0) {
-							Payment.doPayment('order-' + data.order.uuid, data.sum, is_custom_callback ? callback_url : (window.location.origin + callback_url));
-						} else if (is_custom_callback) {
-							window.location = callback_url + '?registration=free';
-						} else {
-							__APP.changeState(callback_url);
-							showNotifier({text: 'Регистрация прошла успешно', status: true});
-						}
-					});
-				} else {
-					$main_action_button.removeAttr('disabled');
-				}
+					if (self.event.ticketing_locally && data.sum !== 0) {
+						Payment.doPayment('order-' + data.order.uuid, data.sum, is_custom_callback ? callback_url : (window.location.origin + callback_url));
+					} else if (is_custom_callback) {
+						window.location = callback_url + '?registration=free';
+					} else {
+						__APP.changeState(callback_url);
+						showNotifier({text: 'Регистрация прошла успешно', status: true});
+					}
+				})
 			}
 		});
+		
+		if (this.event.ticketing_locally) {
+			this.render_vars.legal_entity_payment_button.on('click.LegalEntityPayment', function() {
+				var result = makeOrder();
+				
+				if (result !== false) {
+					result.done(function(data) {
+						var parsed_uri = parseUri(location);
+						
+						try {
+							window.localStorage.setItem(self.event.id + '_order_info', JSON.stringify(parsed_uri.queryKey));
+						} catch (e) {}
+						
+						__APP.changeState(parsed_uri.path + '/' + data.order.uuid + '/from_legal_entity');
+					});
+				}
+			});
+		}
 	};
 	
 	OrderPage.prototype.preRender = function() {
@@ -300,15 +336,28 @@ OrderPage = extending(Page, (function() {
 		}
 		
 		this.render_vars.main_action_button = __APP.BUILD.button({
-			title: this.event.ticketing_locally ? 'Сделать заказ' : 'Зарегистрироваться',
+			title: this.event.ticketing_locally ? 'Приобрести билеты' : 'Зарегистрироваться',
 			classes: [
 				__C.CLASSES.COLORS.ACCENT,
 				__C.CLASSES.HOOKS.RIPPLE,
 				'MainActionButton',
-				__C.CLASSES.SIZES.HUGE,
-				__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
+				__C.CLASSES.SIZES.HUGE
 			]
 		});
+		
+		if (this.event.ticketing_locally) {
+			this.render_vars.pay_button_helptext = $('<p class="form_helptext"><small>Для оплаты заказов используется система Яндекс.Деньги</small></p>');
+			
+			this.render_vars.legal_entity_payment_button = __APP.BUILD.button({
+				title: 'Оплата от юрлица',
+				classes: [
+					__C.CLASSES.COLORS.DEFAULT,
+					__C.CLASSES.HOOKS.RIPPLE,
+					'LegalEntityPaymentButton',
+					__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
+				]
+			});
+		}
 	};
 	
 	OrderPage.prototype.render = function() {

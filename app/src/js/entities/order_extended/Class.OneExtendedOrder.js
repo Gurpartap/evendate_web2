@@ -51,19 +51,25 @@ OneExtendedOrder = extending(OneOrder, (function() {
 	 *
 	 * @param event
 	 * @param uuid
-	 * @return {*}
+	 * @return {(OneExtendedOrder|null)}
 	 */
 	OneExtendedOrder.convertToExtended = function(event, uuid) {
-		var order = event.orders.reduce(function(maybe_right_order, current_order) {
-			if (!empty(maybe_right_order)) {
-				
-				return maybe_right_order;
-			}
-			
-			return current_order.uuid === uuid ? current_order : maybe_right_order;
-		}, {});
+		var order;
 		
-		order.event = event;
+		if (event.orders && event.orders instanceof Array) {
+			order = event.orders.reduce(function(maybe_right_order, current_order) {
+				if (!empty(maybe_right_order)) {
+					
+					return maybe_right_order;
+				}
+				
+				return current_order.uuid === uuid ? current_order : maybe_right_order;
+			}, {});
+			
+			order.event = event;
+		} else {
+			order = null;
+		}
 		
 		return order;
 	};
@@ -79,14 +85,13 @@ OneExtendedOrder = extending(OneOrder, (function() {
 	OneExtendedOrder.fetchOrder = function(event_id, uuid, fields, success) {
 		fields = Fields.parseFields(fields);
 		
-		return OneEvent.fetchEvent(event_id, $.extend(true, {}, fields.pull('event'), {
-			fields: new Fields({
-				orders: {
-					filters: 'uuid=' + uuid,
-					fields: fields
-				}
-			})
-		}), function(events) {
+		
+		return OneEvent.fetchEvent(event_id, new Fields($.extend(true, {}, fields.pull('event'), {
+			orders: {
+				filters: 'uuid=' + uuid,
+				fields: fields
+			}
+		})), function(events) {
 			if (isFunction(success)) {
 				success(OneExtendedOrder.convertToExtended(events[0], uuid));
 			}

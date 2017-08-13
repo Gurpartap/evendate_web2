@@ -9,7 +9,7 @@
  * @property {(string|undefined)} [order_by]
  */
 /**
- * @typedef {function(({}|Array<{}>))} AJAXCallback
+ * @typedef {function((object|Array<object>))} AJAXCallback
  */
 /**
  * @interface
