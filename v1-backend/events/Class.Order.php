@@ -318,7 +318,6 @@ class Order extends AbstractEntity
 				}
 				case self::STATUS_WAITING_PAYMENT_LEGAL_ENTITY: {
 					$email_type = self::EMAIL_WAITING_FOR_PAYMENT_LEGAL_ENTITY;
-					$data['tickets'] = $this->getLegalEntityFields();
 					break;
 				}
 			}
@@ -328,7 +327,8 @@ class Order extends AbstractEntity
 						'notification_type' => $notification_type,
 						'notification_time' => (new DateTime())->add(new DateInterval('P1M'))->format(App::DB_DATETIME_FORMAT)
 					));
-
+			}
+			if ($email_type != null) {
 				$current_user = UsersCollection::one(App::DB(), $user, $this->user_id, array())
 					->getParams($user, array())->getData();
 
@@ -336,8 +336,8 @@ class Order extends AbstractEntity
 				$data['first_name'] = $current_user['first_name'];
 				$data['event_title'] = $event->getTitle();
 				$data['event_id'] = $event->getId();
+				$data['uuid'] = $this->uuid;
 				$data[$status_code . '_text'] = $event->getEmailTexts()[$status_code] ?? '';
-
 				Emails::schedule($email_type, $user_email, $data);
 			}
 		}
