@@ -340,8 +340,8 @@ OrderPage = extending(Page, (function() {
 					var is_custom_callback = !!parsed_uri.queryKey['away_to'],
 						callback_url = parsed_uri.queryKey['away_to'] || '/event/' + self.event.id;
 					
-					if (self.event.ticketing_locally && data.final_sum !== 0) {
-						Payment.doPayment('order-' + data.order.uuid, data.final_sum, is_custom_callback ? callback_url : (window.location.origin + callback_url));
+					if (self.event.ticketing_locally && data.sum !== 0) {
+						Payment.doPayment('order-' + data.order.uuid, data.sum, is_custom_callback ? callback_url : (window.location.origin + callback_url));
 					} else if (is_custom_callback) {
 						window.location = callback_url + '?registration=free';
 					} else {
