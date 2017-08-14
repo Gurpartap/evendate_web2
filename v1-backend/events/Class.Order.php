@@ -105,6 +105,8 @@ class Order extends AbstractEntity
 		'created_at',
 		'number',
 		'status_name',
+		'sum',
+		'final_sum',
 	);
 
 	protected static $ADDITIONAL_COLS = array(
@@ -114,8 +116,6 @@ class Order extends AbstractEntity
 		'canceled_at',
 		'updated_at',
 		'status_id',
-		'sum',
-		'final_sum',
 		self::BITCOIN_ADDRESS_FIELD_NAME => '(SELECT address FROM bitcoin_addresses WHERE ticket_order_id = view_tickets_orders.id ORDER BY id DESC LIMIT 1) AS ' . self::BITCOIN_ADDRESS_FIELD_NAME,
 		self::BITCOIN_AMOUNT_FIELD_NAME => '(SELECT waiting_amount FROM bitcoin_addresses WHERE ticket_order_id = view_tickets_orders.id ORDER BY id DESC LIMIT 1) AS ' . self::BITCOIN_AMOUNT_FIELD_NAME,
 	);
