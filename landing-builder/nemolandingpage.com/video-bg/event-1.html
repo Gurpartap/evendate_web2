@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="css/angular-gridster.css"/>
   <!--<script src="bower_components/javascript-detect-element-resize/jquery.resize.js"></script>-->
   <script src="js/angular-gridster.min.js"></script>
+  <script src="js/tinymce.min.js"></script>
 
 
   <script src="js/app.js"></script>
@@ -114,10 +115,12 @@
           <img src="images/logo-white.png" alt="Your Logo">
         </div>
 
-        <p class="heading-pre-suf text-center text-uppercase" contenteditable="true" ng-model="data.header.title">{{data.header.title}}</p>
+        <p class="heading-pre-suf text-center text-uppercase" contenteditable="true" ng-model="data.header.title">
+          {{data.header.title}}</p>
 
         <h1 class="heading-text" contenteditable ng-model="data.header.subtitle">{{data.header.subtitle}}</h1>
-        <p class="sub-heading" contenteditable ng-model="data.header.location_addresses">{{data.header.location_addresses}}</p>
+        <p class="sub-heading" contenteditable ng-model="data.header.location_addresses">
+          {{data.header.location_addresses}}</p>
 
         <div class="home-download-btn">
 
@@ -163,9 +166,10 @@
     <div class="row">
       <!-- Nav tabs -->
       <ul class="hero-tabs speakers-nav" gridster="data.speakers.gridOptions">
-        <li role="presentation" class="col-md-3 col-sm-6 active" gridster-item="speaker"  ng-repeat="(uuid, speaker) in data.speakers.items">
+        <li role="presentation" class="col-md-3 col-sm-6 active" gridster-item="speaker"
+            ng-repeat="(uuid, speaker) in data.speakers.items">
           <div class="item-remover">
-            <span class="fa fa-list drag-icon"></span>
+            <span class="fa fa-bars drag-icon"></span>
             <span class="fa fa-remove remove-icon" ng-click="speaker.remove();"></span>
           </div>
           <!-- THUMBNAIL -->
@@ -217,7 +221,7 @@
           </div>
         </li>
         <!--Add item placeholder-->
-        <div ng-click="data.speakers.addItem();" ng-hide="row.items.length > 3" class="text-center add-new-speaker">
+        <div ng-click="data.speakers.addItem();" class="text-center add-new-speaker">
           <i class="fa fa-plus add-icon" aria-hidden="true"></i>
           <strong>ДОБАВИТЬ СПИКЕРА</strong>
         </div>
@@ -249,9 +253,10 @@
       <div class="col-md-12">
         <!-- TAB NAVIGATION -->
         <ul class="tab-btn" role="tablist" gridster="data.schedule.gridOptions">
-          <li role="presentation" class="schedule-tab-title" gridster-item="day" ng-repeat="(uuid, day) in data.schedule.days track by day.uuid">
+          <li role="presentation" class="schedule-tab-title" gridster-item="day"
+              ng-repeat="(uuid, day) in data.schedule.days track by day.uuid">
             <div class="item-remover">
-              <span class="fa fa-list drag-icon"></span>
+              <span class="fa fa-bars drag-icon"></span>
               <span class="fa fa-remove remove-icon" ng-click="day.remove();"></span>
             </div>
             <a class="days-tab-link" href="#day-{{day.uuid}}"
@@ -263,11 +268,16 @@
         <!-- TAB PANES -->
         <div class="schedule-content tab-content">
           <!-- DAY 1 -->
-          <div role="tabpanel" class="tab-pane fade in schedule-tab" id="day-{{day.uuid}}"
-               ng-repeat="day in data.schedule.days track by $index">
+          <div role="tabpanel" class="tab-pane fade in schedule-tab" id="day-{{_uuid}}"
+               ng-repeat="(_uuid, _day) in data.schedule.days track by _uuid"
+               gridster="data.schedule.itemsGridOptions">
 
-            <div class="row" ng-repeat="objective in day.items" gridster-item="objective" gridster="data.schedule.itemsGridOptions"> <!-- OBJECTIVE -->
-              <div class="item-remover"><span class="fa fa-remove remove-icon" ng-click="objective.remove();"></span></div>
+            <div class="row" ng-repeat="(objective_uuid, objective) in _day.items" gridster-item="objective">
+              <!-- OBJECTIVE -->
+              <div class="item-remover">
+                <span class="fa fa-bars drag-icon"></span>
+                <span class="fa fa-remove remove-icon" ng-click="objective.remove();"></span>
+              </div>
               <div class="col-md-2 col-sm-3 col-md-offset-1 mb30">
                 <div class="objective-time">
 
@@ -295,11 +305,7 @@
             </div> <!-- /END OBJECTIVE -->
 
             <div class="row"> <!-- OBJECTIVE -->
-              <div class="col-md-2 col-sm-3 col-md-offset-1 mb30">
-                <div class="objective-time">
-                </div>
-              </div>
-              <div class="col-md-8 col-sm-9 mb50 add-new-objective" ng-click="day.addItem();">
+              <div class="col-sm-offset-3 col-md-8 col-sm-8 mb50 add-new-objective" ng-click="_day.addItem()">
                 <div class="objective">
                   <i class="fa fa-plus add-icon" aria-hidden="true"></i>
                   <strong style="margin-top: 50px;">ДОБАВИТЬ ПУНКТ</strong>
@@ -316,7 +322,32 @@
 
 
 <!-- =========================
-     TESTIMONIALS 
+     CUSTOM BLOCK
+============================== -->
+<section class="testimonials testimonials-4 secondary-bg padding-120-75" id="custom-html">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-6 col-md-8 col-sm-10 col-lg-offset-3 col-md-offset-2 col-sm-offset-1">
+        <div class="section-heading text-center">
+
+          <h2 class="heading-text" contenteditable ng-model="data.custom.title">{{data.custom.title}}</h2>
+          <hr class="lines">
+          <p class="sub-heading" contenteditable ng-model="data.custom.subtitle">
+            {{data.custom.subtitle}}</p>
+
+        </div> <!-- /.section-heading -->
+      </div>
+    </div>  <!-- /.row -->
+
+    <div class="row">
+      <textarea class="textarea-html"></textarea>
+    </div>  <!-- /.row -->
+  </div>
+</section>
+
+
+<!-- =========================
+     TESTIMONIALS
 ============================== -->
 <section class="testimonials testimonials-4 secondary-bg padding-120-75" id="testimonials">
   <div class="container">
@@ -326,17 +357,24 @@
 
           <h2 class="heading-text" contenteditable ng-model="data.testimonials.title">{{data.testimonials.title}}</h2>
           <hr class="lines">
-          <p class="sub-heading" contenteditable ng-model="data.testimonials.subtitle">{{data.testimonials.subtitle}}</p>
+          <p class="sub-heading" contenteditable ng-model="data.testimonials.subtitle">
+            {{data.testimonials.subtitle}}</p>
 
         </div> <!-- /.section-heading -->
       </div>
     </div>  <!-- /.row -->
 
-    <div class="row">
+    <div class="row" gridster="data.testimonials.gridOptions">
 
-      <div ng-repeat="item in data.testimonials.items" class="col-md-4 col-sm-8 col-xs-12 col-md-offset-0 col-sm-offset-2"> <!-- TESTIMONIAL ITEM -->
+      <div
+        gridster-item="item"
+        ng-repeat="(key, item) in data.testimonials.items"
+        class="col-md-4 col-sm-8 col-xs-12 col-md-offset-0 col-sm-offset-2"> <!-- TESTIMONIAL ITEM -->
+        <div class="item-remover">
+          <span class="fa fa-bars drag-icon"></span>
+          <span class="fa fa-remove remove-icon" ng-click="item.remove();"></span>
+        </div>
         <div class="testimonial-item secondary-color-bg text-center">
-
           <img
             ngf-select=""
             ngf-drop=""
@@ -371,12 +409,10 @@
         </div>
       </div> <!-- /END TESTIMONIAL ITEM -->
 
-
-      <div class="col-md-4 col-sm-8 col-xs-12 col-md-offset-0 col-sm-offset-2" ng-click="data.testimonials.addItem()"> <!-- TESTIMONIAL ITEM -->
-        <div class="testimonial-item secondary-color-bg text-center add-new-testimonial">
-          <div class="thumb"></div>
+      <div class="row"> <!-- OBJECTIVE -->
+        <div ng-click="data.testimonials.addItem();" class="text-center add-new-speaker">
           <i class="fa fa-plus add-icon" aria-hidden="true"></i>
-          <strong style="margin-top: 50px;">ДОБАВИТЬ ЭЛЕМЕНТ</strong>
+          <strong>ДОБАВИТЬ ЭЛЕМЕНТ</strong>
         </div>
       </div> <!-- /END TESTIMONIAL ITEM -->
 
@@ -397,24 +433,65 @@
           <h2 class="heading-text" contenteditable ng-model="data.gallery.title">{{data.gallery.title}}</h2>
           <hr class="lines">
           <p class="sub-heading" contenteditable ng-model="data.gallery.subtitle">{{data.gallery.subtitle}}</p>
-
         </div> <!-- /.section-heading -->
       </div>
+
     </div>  <!-- /.row -->
+    <div class="row" style="margin-bottom: 20px"> <!-- OBJECTIVE -->
+      <div ng-click="data.gallery.addItem();" class="text-center add-new-image">
+        <i class="fa fa-plus add-icon" aria-hidden="true"></i>
+        <strong>ДОБАВИТЬ ЭЛЕМЕНТ</strong>
+      </div>
+    </div> <!-- /END TESTIMONIAL ITEM -->
 
     <div class="row">
-      <div class="col-md-12">
-        <a href="images/gallery/event-1.jpg" class="lightbox" data-lightbox-gallery="recap" title="John Doe on SVG">
+      <div class="col-md-12" gridster="data.gallery.gridOptions">
+        <!--<a
+          ng-repeat="(key, image) in data.gallery.items"
+          href="{{item.image.$ngfBlobUrl ? item.image.$ngfBlobUrl : item.image}}" class="lightbox" data-lightbox-gallery="recap" title="John Doe on SVG">-->
+        <div ng-repeat="(key, image) in data.gallery.items" gridster-item="image">
           <!-- EVENT RECAP -->
+          <div class="item-remover">
+            <span class="fa fa-bars drag-icon"></span>
+            <span class="fa fa-remove remove-icon" ng-click="image.remove();"></span>
+          </div>
+
           <figure class="recap-gallery-item">
             <div class="img-scale">
-              <img src="images/gallery/event-1.jpg" alt="" class="img-responsive">
+              <img
+                ngf-select=""
+                ngf-drop=""
+                ng-model="image.image"
+                ngf-model-invalid="invalidFiles"
+                ngf-model-options="modelOptionsObj"
+                ngf-multiple="multiple"
+                ngf-pattern="pattern"
+                ngf-accept="acceptSelect"
+                ng-disabled="disabled"
+                ngf-capture="capture"
+                ngf-drag-over-class="dragOverClassObj"
+                ngf-validate="validateObj"
+                ngf-resize="resizeObj"
+                ngf-resize-if="resizeIfFn($file, $width, $height)"
+                ngf-dimensions="dimensionsFn($file, $width, $height)"
+                ngf-duration="durationFn($file, $duration)"
+                ngf-keep="keepDistinct ? 'distinct' : keep"
+                ngf-fix-orientation="orientation"
+                ngf-max-files="maxFiles"
+                ngf-ignore-invalid="ignoreInvalid"
+                ngf-run-all-validations="runAllValidations"
+                ngf-allow-dir="allowDir"
+                class="drop-box ng-pristine ng-valid img-responsive"
+                ngf-drop-available="dropAvailable"
+                ng-src="{{image.image.$ngfBlobUrl ? image.image.$ngfBlobUrl : image.image}}"
+                alt="{{image.title}}">
+              <!--<img src="images/gallery/event-1.jpg" alt="" class="">-->
             </div>
             <figcaption class="recap-title">
-              <h5 class="title-text text-center">John Doe on SVG</h5>
+              <h5 class="title-text text-center" contenteditable ng-model="image.title">{{image.title}}</h5>
             </figcaption>
           </figure>
-        </a> <!-- /END EVENT RECAP -->
+        </div> <!-- /END EVENT RECAP -->
 
       </div>
     </div>  <!-- /.row -->
@@ -434,7 +511,7 @@
           <h2 class="heading-text">БИЛЕТЫ</h2>
           <hr class="lines">
           <!--<p class="sub-heading">User story ideate thought leader thought leader physical computing user centered design-->
-            <!--viral ship it earned media</p>-->
+          <!--viral ship it earned media</p>-->
 
         </div> <!-- /.section-heading -->
       </div>
@@ -448,12 +525,12 @@
 ============================== -->
 <div class="sponsors-1 secondary-bg text-center">
   <div class="container">
-    <p class="heading-pre-suf mb50">Our Sponsors</p>
+    <p class="heading-pre-suf mb50">Наши партнеры</p>
     <ul class="client-logo">
       <li><img src="images/clients/logo-1-dark.png" alt=""></li>
     </ul>
 
-    <a href="" class="btn btn-trans btn-lg" ng-hide="!data.sponsors.become_a_sponsor_enabled">Become a Sponsor</a>
+    <a href="" class="btn btn-trans btn-lg" ng-hide="!data.sponsors.become_a_sponsor_enabled">Стать партнером</a>
 
   </div>
 </div>
@@ -474,18 +551,22 @@
 
         </div> <!-- /.section-heading -->
       </div>
-    </div>  <!-- /.row -->
-
-    <div class="row faqs-2-items">
-      <div class="col-md-6 mb60" ng-repeat="item in data.faq.items track by item.uuid">
-        <h5 class="title-text" contenteditable ng-model="item.question">{{item.question}}</h5>
-        <p contenteditable ng-model="item.answer">{{item.answer}}</p>
-      </div>
-      <div class="col-md-6 mb60 add-new-faq-question" ng-click="data.faq.addItem()">
+      <div class="col-md-offset-3 col-md-6 mb60 add-new-faq-question" ng-click="data.faq.addItem()">
         <h5 class="title-text">
           <i class="fa fa-plus add-icon" aria-hidden="true"></i>
-          <strong style="margin-top: 50px;">ДОБАВИТЬ ЭЛЕМЕНТ</strong>
+          <strong style="margin-top: 50px;">ДОБАВИТЬ ВОПРОС</strong>
         </h5>
+      </div>
+    </div>  <!-- /.row -->
+
+    <div class="row faqs-2-items" gridster="data.faq.gridOptions">
+      <div class="col-md-6 mb60" gridster-item="item" ng-repeat="(key,item) in data.faq.items track by item.uuid">
+        <div class="item-remover">
+          <span class="fa fa-bars drag-icon"></span>
+          <span class="fa fa-remove remove-icon" ng-click="item.remove();"></span>
+        </div>
+        <h5 class="title-text" contenteditable ng-model="item.question">{{item.question}}</h5>
+        <p contenteditable ng-model="item.answer">{{item.answer}}</p>
       </div>
     </div>  <!-- /.row -->
 

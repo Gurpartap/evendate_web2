@@ -15,6 +15,9 @@ function guid() {
 __app.controller('WholeWorldController', function ($scope) {
 
 
+    $scope.logger = function (data) {
+        console.log(data);
+    };
     $scope.data = {
         main_description: '17 - 19 декабря в Москве соберутся представители event индустрии, чтобы поделиться друг с другом опытом и рассказать, как же зарабатывать больше на своих событиях с помощью платформы Evendate. Кроме продажи билетов за биткоины мы теперь даже умеем генерировать лендинги для событий, где в принципе больше уже ничего не надо.',
         header: {
@@ -111,7 +114,7 @@ __app.controller('WholeWorldController', function ($scope) {
                     addItem: function () {
                         var item_uuid = guid(),
                             _day = this;
-                        this.items[item_uuid] = {
+                        _day.items[item_uuid] = {
                             time: '00:00',
                             text_1: 'Зал #0',
                             text_2: 'Спикер #0',
@@ -135,7 +138,7 @@ __app.controller('WholeWorldController', function ($scope) {
                 $event.preventDefault();
             },
             enabled: true,
-            itemsGridOtions:{
+            itemsGridOptions: {
                 columns: 1,
                 rowHeight: '200', // can be an integer or 'match'.  Match uses the colWidth, giving you square widgets.
                 pushing: true, // whether to push other items out of the way on move or resize
@@ -143,7 +146,7 @@ __app.controller('WholeWorldController', function ($scope) {
                 swapping: false, // whether or not to have items of the same size switch places instead of pushing down if they are the same size
                 width: 'auto', // can be an integer or 'auto'. 'auto' scales gridster to be the full width of its containing element
                 colWidth: 'auto', // can be an integer or 'auto'.  'auto' uses the pixel width of the element divided by 'columns'
-                margins: [80, 10], // the pixel distance between each widget
+                margins: [10, 10], // the pixel distance between each widget
                 outerMargin: true, // whether margins apply to outer edges of the grid
                 sparse: false, // "true" can increase performance of dragging and resizing for big grid (e.g. 20x50)
                 isMobile: false, // stacks the grid items if true
@@ -160,10 +163,6 @@ __app.controller('WholeWorldController', function ($scope) {
                 maxSizeY: null, // maximum row height of an item
                 resizable: {
                     enabled: false,
-                    // handles: ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'],
-                    // start: function(event, $element, widget) {}, // optional callback fired when resize is started,
-                    // resize: function(event, $element, widget) {}, // optional callback fired when item is resized,
-                    // stop: function(event, $element, widget) {} // optional callback fired when item is finished resizing
                 },
                 draggable: {
                     enabled: true, // whether dragging items is supported
@@ -188,7 +187,7 @@ __app.controller('WholeWorldController', function ($scope) {
                 width: 'auto', // can be an integer or 'auto'. 'auto' scales gridster to be the full width of its containing element
                 colWidth: 'auto', // can be an integer or 'auto'.  'auto' uses the pixel width of the element divided by 'columns'
                 rowHeight: '85', // can be an integer or 'match'.  Match uses the colWidth, giving you square widgets.
-                margins: [80, 10], // the pixel distance between each widget
+                margins: [10, 10], // the pixel distance between each widget
                 outerMargin: true, // whether margins apply to outer edges of the grid
                 sparse: false, // "true" can increase performance of dragging and resizing for big grid (e.g. 20x50)
                 isMobile: false, // stacks the grid items if true
@@ -227,24 +226,132 @@ __app.controller('WholeWorldController', function ($scope) {
         },
         testimonials: {
             title: 'Отзывы',
-            subtitle: 'Добавляйте отзывы ваших клиентов и их фотографии, например',
-            items: [],
+            subtitle: 'Добавляйте отзывы ваших клиентов и их фотографии',
+            items: {},
             addItem: function () {
-                this.items.push({
+                var item_uuid = guid(),
+                    _scope = this;
+                _scope.items[item_uuid] = {
                     text: 'Отзыв',
                     name: 'Имя',
                     image: './images/default.jpg',
                     details: 'Компания',
-                    uuid: guid()
-                })
+                    uuid: item_uuid,
+                    remove: function () {
+                        delete _scope.items[item_uuid];
+                    }
+                };
+            },
+            gridOptions: {
+                columns: 3, // the width of the grid, in columns
+                pushing: true, // whether to push other items out of the way on move or resize
+                floating: true, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
+                swapping: false, // whether or not to have items of the same size switch places instead of pushing down if they are the same size
+                width: 'auto', // can be an integer or 'auto'. 'auto' scales gridster to be the full width of its containing element
+                colWidth: 'auto', // can be an integer or 'auto'.  'auto' uses the pixel width of the element divided by 'columns'
+                rowHeight: '430', // can be an integer or 'match'.  Match uses the colWidth, giving you square widgets.
+                margins: [10, 10], // the pixel distance between each widget
+                outerMargin: true, // whether margins apply to outer edges of the grid
+                sparse: false, // "true" can increase performance of dragging and resizing for big grid (e.g. 20x50)
+                isMobile: false, // stacks the grid items if true
+                mobileBreakPoint: 600, // if the screen is not wider that this, remove the grid layout and stack the items
+                mobileModeEnabled: true, // whether or not to toggle mobile mode when screen width is less than mobileBreakPoint
+                minColumns: 1, // the minimum columns the grid must have
+                minRows: 1, // the minimum height of the grid, in rows
+                maxRows: 100,
+                defaultSizeX: 1, // the default width of a gridster item, if not specifed
+                defaultSizeY: 1, // the default height of a gridster item, if not specified
+                minSizeX: 1, // minimum column width of an item
+                maxSizeX: null, // maximum column width of an item
+                minSizeY: 1, // minumum row height of an item
+                maxSizeY: null, // maximum row height of an item
+                resizable: {
+                    enabled: false,
+                    // handles: ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'],
+                    // start: function(event, $element, widget) {}, // optional callback fired when resize is started,
+                    // resize: function(event, $element, widget) {}, // optional callback fired when item is resized,
+                    // stop: function(event, $element, widget) {} // optional callback fired when item is finished resizing
+                },
+                draggable: {
+                    enabled: true, // whether dragging items is supported
+                    handle: '.drag-icon', // optional selector for drag handle
+                    start: function (event, $element, widget) {
+                        console.log(event, $element, widget)
+                    }, // optional callback fired when drag is started,
+                    drag: function (event, $element, widget) {
+                        console.log(event, $element, widget)
+                    }, // optional callback fired when item is moved,
+                    stop: function (event, $element, widget) {
+                        console.log(event, $element, widget)
+                    } // optional callback fired when item is finished dragging
+                }
             }
+        },
+        custom: {
+            title: 'Свой блок',
+            subtitle: 'Добавляйте любой HTML, кроме тегов script',
+
         },
         gallery: {
             title: 'Галлерея',
             subtitle: 'Добавляйте фотографии за прошлые года или фотографии помещений',
-            items: [],
+            items: {},
             addItem: function () {
+                var item_uuid = guid(),
+                    _scope = this;
+                _scope.items[item_uuid] = {
+                    title: 'Описание изображения',
+                    image: './images/default.jpg',
+                    uuid: item_uuid,
+                    remove: function () {
+                        delete _scope.items[item_uuid];
+                    }
+                };
 
+            },
+            gridOptions: {
+                columns: 3, // the width of the grid, in columns
+                pushing: true, // whether to push other items out of the way on move or resize
+                floating: true, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
+                swapping: false, // whether or not to have items of the same size switch places instead of pushing down if they are the same size
+                width: 'auto', // can be an integer or 'auto'. 'auto' scales gridster to be the full width of its containing element
+                colWidth: 'auto', // can be an integer or 'auto'.  'auto' uses the pixel width of the element divided by 'columns'
+                rowHeight: 'match', // can be an integer or 'match'.  Match uses the colWidth, giving you square widgets.
+                margins: [10, 40], // the pixel distance between each widget
+                outerMargin: true, // whether margins apply to outer edges of the grid
+                sparse: false, // "true" can increase performance of dragging and resizing for big grid (e.g. 20x50)
+                isMobile: false, // stacks the grid items if true
+                mobileBreakPoint: 600, // if the screen is not wider that this, remove the grid layout and stack the items
+                mobileModeEnabled: true, // whether or not to toggle mobile mode when screen width is less than mobileBreakPoint
+                minColumns: 1, // the minimum columns the grid must have
+                minRows: 1, // the minimum height of the grid, in rows
+                maxRows: 100,
+                defaultSizeX: 1, // the default width of a gridster item, if not specifed
+                defaultSizeY: 1, // the default height of a gridster item, if not specified
+                minSizeX: 1, // minimum column width of an item
+                maxSizeX: null, // maximum column width of an item
+                minSizeY: 1, // minumum row height of an item
+                maxSizeY: null, // maximum row height of an item
+                resizable: {
+                    enabled: false,
+                    // handles: ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'],
+                    // start: function(event, $element, widget) {}, // optional callback fired when resize is started,
+                    // resize: function(event, $element, widget) {}, // optional callback fired when item is resized,
+                    // stop: function(event, $element, widget) {} // optional callback fired when item is finished resizing
+                },
+                draggable: {
+                    enabled: true, // whether dragging items is supported
+                    handle: '.drag-icon', // optional selector for drag handle
+                    start: function (event, $element, widget) {
+                        console.log(event, $element, widget)
+                    }, // optional callback fired when drag is started,
+                    drag: function (event, $element, widget) {
+                        console.log(event, $element, widget)
+                    }, // optional callback fired when item is moved,
+                    stop: function (event, $element, widget) {
+                        console.log(event, $element, widget)
+                    } // optional callback fired when item is finished dragging
+                }
             }
 
         },
@@ -259,14 +366,63 @@ __app.controller('WholeWorldController', function ($scope) {
         faq: {
             title: 'FAQ',
             subtitle: 'Ответы на часто задаваемые вопросы',
-            items: [],
+            items: {},
             addItem: function () {
-                this.items.push({
+                var item_uuid = guid(),
+                    _this = this;
+
+                _this.items[item_uuid] = ({
                     question: 'Вопрос?',
                     answer: 'Ответ на вопрос.',
-                    uuid: guid()
+                    uuid: guid(),
+                    sizeX: 2
                 });
+            },
+            gridOptions: {
+                columns: 4, // the width of the grid, in columns
+                pushing: true, // whether to push other items out of the way on move or resize
+                floating: true, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
+                swapping: false, // whether or not to have items of the same size switch places instead of pushing down if they are the same size
+                width: 'auto', // can be an integer or 'auto'. 'auto' scales gridster to be the full width of its containing element
+                colWidth: 'auto', // can be an integer or 'auto'.  'auto' uses the pixel width of the element divided by 'columns'
+                rowHeight: '140', // can be an integer or 'match'.  Match uses the colWidth, giving you square widgets.
+                margins: [10, 10], // the pixel distance between each widget
+                outerMargin: true, // whether margins apply to outer edges of the grid
+                sparse: false, // "true" can increase performance of dragging and resizing for big grid (e.g. 20x50)
+                isMobile: false, // stacks the grid items if true
+                mobileBreakPoint: 600, // if the screen is not wider that this, remove the grid layout and stack the items
+                mobileModeEnabled: true, // whether or not to toggle mobile mode when screen width is less than mobileBreakPoint
+                minColumns: 1, // the minimum columns the grid must have
+                minRows: 1, // the minimum height of the grid, in rows
+                maxRows: 100,
+                defaultSizeX: 1, // the default width of a gridster item, if not specifed
+                defaultSizeY: 1, // the default height of a gridster item, if not specified
+                minSizeX: 1, // minimum column width of an item
+                maxSizeX: null, // maximum column width of an item
+                minSizeY: 1, // minumum row height of an item
+                maxSizeY: null, // maximum row height of an item
+                resizable: {
+                    enabled: true,
+                    handles: ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'],
+                    // start: function(event, $element, widget) {}, // optional callback fired when resize is started,
+                    // resize: function(event, $element, widget) {}, // optional callback fired when item is resized,
+                    // stop: function(event, $element, widget) {} // optional callback fired when item is finished resizing
+                },
+                draggable: {
+                    enabled: true, // whether dragging items is supported
+                    handle: '.drag-icon', // optional selector for drag handle
+                    start: function (event, $element, widget) {
+                        console.log(event, $element, widget)
+                    }, // optional callback fired when drag is started,
+                    drag: function (event, $element, widget) {
+                        console.log(event, $element, widget)
+                    }, // optional callback fired when item is moved,
+                    stop: function (event, $element, widget) {
+                        console.log(event, $element, widget)
+                    } // optional callback fired when item is finished dragging
+                }
             }
+
 
         },
         map: {},
@@ -297,3 +453,22 @@ __app.directive("contenteditable", function () {
         }
     };
 });
+
+tinymce.init({
+    selector: '.textarea-html',
+    language: 'ru',
+    language_url: 'js/langs/ru.js',
+    theme: 'modern',
+    invalid_elements: 'script',
+    plugins: [
+        'advlist autolink lists link image charmap preview hr anchor pagebreak',
+        'searchreplace wordcount visualblocks visualchars code fullscreen',
+        'media nonbreaking save table contextmenu',
+        'template paste textcolor colorpicker textpattern imagetools codesample toc'
+    ],
+    toolbar1: 'preview media | undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image| forecolor backcolor | codesample',
+    image_advtab: true,
+
+});
+
+tinymce.init({selector: '.'});

@@ -192,10 +192,11 @@
     cursor: pointer;
     width: 240px;
     position: absolute;
-    height: 40px;
-    margin-top: -65px;
-    line-height: 40px;
-    left: calc((100% - 240px)/2);
+    height: 60px;
+    margin-top: -45px;
+    line-height: 60px;
+    left: calc((100% - 240px) / 2);
+    background-color: #FFF;
 }
 
 .fa.add-icon {
@@ -232,6 +233,10 @@
     background-color: transparent
 }
 
+.add-new-objective .objective {
+    padding: 15px 30px;
+}
+
 .add-new-objective {
     cursor: pointer;
     background-image: linear-gradient(to right, var(--base) 50%, transparent 50%), linear-gradient(to right, var(--base) 50%, transparent 50%), linear-gradient(to bottom, var(--base) 50%, transparent 50%), linear-gradient(to bottom, var(--base) 50%, transparent 50%);
@@ -240,6 +245,7 @@
     background-size: 20px 3px, 20px 3px, 3px 20px, 3px 20px;
     text-align: center;
     background-color: transparent;
+    margin-bottom: 20px;
 }
 
 .add-new-faq-question {
@@ -253,6 +259,21 @@
     padding-top: 15px;
 }
 
+.add-new-image {
+    background-image: linear-gradient(to right, var(--base) 50%, transparent 50%), linear-gradient(to right, var(--base) 50%, transparent 50%), linear-gradient(to bottom, var(--base) 50%, transparent 50%), linear-gradient(to bottom, var(--base) 50%, transparent 50%);
+    background-position: left top, left bottom, left top, right top;
+    background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+    background-size: 20px 3px, 20px 3px, 3px 20px, 3px 20px;
+    cursor: pointer;
+    width: 240px;
+    position: absolute;
+    height: 60px;
+    margin-top: -45px;
+    line-height: 60px;
+    left: calc((100% - 240px) / 2);
+}
+
+
 .item-remover {
     float: right;
     top: -20px;
@@ -260,10 +281,16 @@
     position: static;
 }
 
-.fa.remove-icon{
+.fa.remove-icon {
     cursor: pointer;
 }
 
-.drag-icon{
+.drag-icon {
     cursor: move;
+}
+
+.recap-gallery-item {
+    float: left;
+     width: 100% !important;
+    margin-bottom: 0;
 }
