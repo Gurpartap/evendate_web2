@@ -260,7 +260,6 @@ LegalEntityPayment = extending(Page, (function() {
 			label: 'Расчетный счет',
 			id: 'legal_entity_payment_checking_account',
 			name: 'bank_payment_account',
-			type: 'number',
 			helptext: '20 знаков',
 			required: true,
 			attributes: {
