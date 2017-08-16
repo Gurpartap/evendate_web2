@@ -22,6 +22,8 @@ html{
   --base-transparent-02: rgba(var(--base-num), 0.2);
   --accent-transparent-02: rgba(var(-accent-num), 0.2);
   --transparent: rgba(0, 205, 175, 0);
+
+  --overlay-opacity: 0.4;
 }
 
 a {

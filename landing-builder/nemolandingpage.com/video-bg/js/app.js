@@ -14,10 +14,32 @@ function guid() {
 
 __app.controller('WholeWorldController', function ($scope) {
 
+    $scope.color_scheme = [0, 205, 175];
+    $scope.accent_color_scheme = [0, 205, 145];
+    $scope.overlay_opacity = 40;
 
     $scope.logger = function (data) {
         console.log(data);
     };
+
+    $scope.setHeaderImage = function(url){
+        $('.polygon-bg').css('background-image', 'url(' + url + ')');
+    };
+
+    $scope.setGlobalColor = function (val) {
+        var color_scheme = [val.r, val.g, val.b];
+        var accent_color_scheme = [val.r, val.g, val.b - 30];
+        var html = document.getElementsByTagName('html')[0];
+        html.style.setProperty("--base-num", color_scheme.join(', '));
+        html.style.setProperty("--accent-num", accent_color_scheme.join(', '));
+    };
+
+    $scope.setOverlayOpacity = function () {
+        var html = document.getElementsByTagName('html')[0];
+        console.log($scope.overlay_opacity);
+        html.style.setProperty("--overlay-opacity", (100 - $scope.overlay_opacity) / 100);
+    };
+
     $scope.data = {
         main_description: '17 - 19 декабря в Москве соберутся представители event индустрии, чтобы поделиться друг с другом опытом и рассказать, как же зарабатывать больше на своих событиях с помощью платформы Evendate. Кроме продажи билетов за биткоины мы теперь даже умеем генерировать лендинги для событий, где в принципе больше уже ничего не надо.',
         header: {
@@ -427,9 +449,7 @@ __app.controller('WholeWorldController', function ($scope) {
         },
         map: {},
     };
-    $scope.setGlobalColor = function (val) {
-        console.log(val);
-    }
+
 });
 
 
@@ -471,4 +491,45 @@ tinymce.init({
 
 });
 
-tinymce.init({selector: '.'});
+$("#html5colorpicker").spectrum({
+    allowEmpty:true,
+    showInitial: true,
+    showInput: true,
+    chooseText: "Применить",
+    cancelText: "Отмена",
+    change: function(color) {
+        var scope = angular.element(document.body).scope();
+        scope.setGlobalColor(color.toRgb());
+
+    }
+
+});
+
+/* =================================
+ ===  EXPAND COLLAPSE            ====
+ =================================== */
+$(document).ready(function(){
+    $('#toggle-switcher').click(function(){
+        if($(this).hasClass('open')){
+            $(this).removeClass('open');
+            $('#switch-style').animate({'left':'-220px'});
+        }else{
+            $(this).addClass('open');
+            $('#switch-style').animate({'left':'0'});
+        }
+    });
+
+    $('.panel-close').on('click', function(){
+        var $panel = $(this).parents('.board-menu');
+        $panel.removeClass('open');
+        $panel.animate({'right':'-340'});
+
+    });
+
+    $('.board-header-btn').on('click', function(){
+        $('.board-menu.open .panel-close').click();
+        var $panel = $('#' + $(this).data('panel-id'));
+        $panel.addClass('open').animate({'right':'0'})
+    });
+
+});

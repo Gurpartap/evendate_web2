@@ -128,7 +128,7 @@
     position: absolute;
     overflow: hidden;
     right: -44px;
-    top: -10px;
+    top: 0px;
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
 }
@@ -293,4 +293,195 @@
     float: left;
      width: 100% !important;
     margin-bottom: 0;
+}
+
+.board-menu {
+    background-color: #EDEFF0;
+    -webkit-transition-property: -webkit-transform, width;
+    transition-property: transform, width;
+    -webkit-transition-duration: .1s;
+    transition-duration: .1s;
+    -webkit-transition-timing-function: ease-in;
+    transition-timing-function: ease-in;
+    -webkit-transform: translateX(339px);
+    transform: translateX(339px);
+    width: 339px;
+    z-index: 5;
+    box-shadow: 0 0 6px rgba(0, 0, 0, .4);
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
+    position: fixed;
+    top: 0;
+    right: -340px;
+    bottom: 0;
+    z-index: 99999;
+}
+
+.board-menu-container {
+    display: flex;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -webkit-box-align: start;
+    -webkit-align-items: flex-start;
+    -ms-flex-align: start;
+    align-items: flex-start;
+    -webkit-flex-wrap: nowrap;
+    -ms-flex-wrap: nowrap;
+    flex-wrap: nowrap;
+    -webkit-box-pack: start;
+    -webkit-justify-content: flex-start;
+    -ms-flex-pack: start;
+    justify-content: flex-start;
+    overflow: hidden;
+    left: 0;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    -webkit-box-orient: vertical;
+    -webkit-box-direction: normal;
+}
+
+.board-menu-header {
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    -webkit-box-flex: 0;
+    -webkit-flex: 0 0 auto;
+    -ms-flex: 0 0 auto;
+    flex: 0 0 auto;
+    height: 46px;
+    opacity: 0;
+    overflow: hidden;
+    padding: 0 6px 0 9pt;
+    position: relative;
+    -webkit-transition: opacity .2s ease-in;
+    transition: opacity .2s ease-in;
+    width: 100%;
+    opacity: 1;
+    overflow: visible;
+
+    margin-bottom: 15px;
+}
+
+.board-menu-content {
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-flex: 1 1 auto;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 9pt 6px 9pt 9pt;
+    width: 100%;
+    height: 100%;
+    -webkit-box-flex: 1;
+    overflow-x: hidden;
+}
+
+.board-menu-content-frame {
+    -webkit-transition-property: -webkit-transform, opacity;
+    transition-property: transform, opacity;
+    -webkit-transition-duration: 120ms;
+    transition-duration: 120ms;
+    -webkit-transition-timing-function: ease-in;
+    transition-timing-function: ease-in;
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
+    -webkit-box-flex: 1;
+    -webkit-flex: 1 auto;
+    -ms-flex: 1 auto;
+    flex: 1 auto;
+    width: 100%;
+    -webkit-box-direction: normal;
+}
+
+.board-backgrounds-section-tile {
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    cursor: pointer;
+    float: left;
+    padding: 0 4px;
+    position: relative;
+    text-align: center;
+    width: 50%;
+}
+
+.board-backgrounds-section-tile .image {
+    background-image: url(https://a.trellocdn.com/images/864f4df…/colors%402x.jpg);
+    background-color: #ddd;
+    background-size: cover;
+    border-radius: 10px;
+    height: 7pc;
+    margin-bottom: 8px;
+    width: 100%;
+}
+
+.board-backgrounds-section-tile .title {
+    margin-top: 9pt;
+}
+
+.board-menu-header-title .fa {
+    float: right;
+    top: 0;
+    color: #646464;
+    cursor: pointer;
+}
+
+.board-menu-header-divider{
+    background: #D6DADC;
+    border: 0;
+    color: #D6DADC;
+    height: 1px;
+    margin: 9pt 0;
+    width: 100%;
+}
+
+.event-home-1.polygon-bg::before{
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    background-color: rgba(var(--base-num), var(--overlay-opacity));
+    content: ' ';
+
+    left: 0;
+}
+
+.board-header-btn {
+    background: 0 0;
+    border-radius: 3px;
+    color: #f6f6f6;
+    cursor: default;
+    float: right;
+    font-size: 11pt;
+    height: 30px;
+    line-height: 30px;
+    margin: 0 4px 0 0;
+    overflow: hidden;
+    padding-left: 10px;
+    position: relative;
+    text-decoration: none;
+    color: rgb(255, 255, 255);
+    -webkit-transition-duration: .1s;
+    transition-duration: .1s;
+    -webkit-transition-property: margin;
+    transition-property: margin;
+    -webkit-transition-timing-function: ease-in;
+    transition-timing-function: ease-in;
+    right: 60px;
+    top: -80px;
+    padding-right: 10px;
+}
+
+.board-header-btn:hover{
+    background: rgba(0,0,0,.1);
+    color: rgb(255, 255, 255);
+    cursor: pointer;
+}
+
+.u-text-underline {
+    text-decoration: underline;
 }
