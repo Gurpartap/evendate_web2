@@ -1762,14 +1762,25 @@ margin-left:1.25pt'><b style='mso-bidi-font-weight:normal'>Внимание!</b>
     оплате в графе &quot;Назначение платежа&quot; обязательно нужно указать номер
     счета, по которому производится платеж</p>
 
-  <p class=MsoNormal style='margin-top:0cm;margin-right:0cm;margin-bottom:17.9pt;
+  <table>
+    <tr>
+      <td>Генеральный
+        директор</td>
+      <td rowspan="2">
+        <p class=MsoNormal style='margin-top:0cm;margin-right:0cm;margin-bottom:17.9pt;
 margin-left:1.25pt'>
-    <img width=250 height=179
-         src="Bill_B548694-20719312_Trening-intensiv_'Klyuchevye_sekrety_oratora'.files/image001.jpg"
-         align=left hspace=12 v:shapes="Picture_x0020_309"><![endif]>Генеральный
-    директор(Карданов И.Р.)</p>
+          <img width=200
+               src="print2.png"
+               align=left hspace=12 v:shapes="Picture_x0020_309"><![endif]></p>
+      </td>
+      <td>Карданов И.Р.</td>
+    </tr>
+    <tr style="height: 88px;">
+      <td>Главный бухгалтер</td>
+      <td>Карданов И.Р.</td>
+    </tr>
+  </table>
 
-  <p class=MsoNormal style='margin-left:1.25pt'>Главный бухгалтер(Карданов И.Р.)</p>
 
 </div>
 

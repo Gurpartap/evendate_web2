@@ -1596,6 +1596,7 @@ button:focus {
 |----------------------------------------------------------------------------
 */
 .home {
+  position: relative;
   color: #fff;
   text-align: center;
 }
