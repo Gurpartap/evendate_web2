@@ -268,7 +268,7 @@ class Order extends AbstractEntity
 		return new Result(true, '', $result);
 	}
 
-	public function setStatus(string $status_code, User $user, Event $event)
+	public function setStatus(string $status_code, User $user, Event $event, string $email = null)
 	{
 
 		$available_codes = array();
@@ -332,7 +332,7 @@ class Order extends AbstractEntity
 				$current_user = UsersCollection::one(App::DB(), $user, $this->user_id, array())
 					->getParams($user, array())->getData();
 
-				$user_email = self::getOrderEmail($this->uuid);
+				$user_email = $email ?? self::getOrderEmail($this->uuid);
 				$data['first_name'] = $current_user['first_name'];
 				$data['event_title'] = $event->getTitle();
 				$data['event_id'] = $event->getId();
@@ -577,7 +577,7 @@ class Order extends AbstractEntity
 			->returning(array('id'));
 		$prep = $db->prepareExecute($q_ins, 'CANT_SET_LEGAL_ENTITY_PAYMENT');
 		if ($prep->rowCount() != 1) throw new LogicException('CANT_SET_LEGAL_ENTITY_PAYMENT');
-		$this->setStatus(self::STATUS_WAITING_PAYMENT_LEGAL_ENTITY, App::getCurrentUser(), $event);
+		$this->setStatus(self::STATUS_WAITING_PAYMENT_LEGAL_ENTITY, App::getCurrentUser(), $event, $data['contact_email']);
 		return new Result(true, 'Данные успешно обновлены');
 	}
 

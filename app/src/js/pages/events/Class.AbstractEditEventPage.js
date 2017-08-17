@@ -800,9 +800,8 @@ AbstractEditEventPage = extending(Page, (function() {
 		
 		this.$wrapper.find('.OnChangeCrossPost').on('change.crossPostingToVK', formatVKPost);
 		this.MainCalendar.$calendar.on('change:days.crossPostingToVK', formatVKPost);
-		this.$wrapper.find('.VKPostText').one('dblclick', function() {
+		this.$wrapper.find('.VKPostText').one('click', function() {
 			self.deInitCrossPosting();
-			$(this).removeAttr('readonly');
 		});
 		
 		(function initVKImageCoping() {
