@@ -578,7 +578,9 @@ class Order extends AbstractEntity
 		$prep = $db->prepareExecute($q_ins, 'CANT_SET_LEGAL_ENTITY_PAYMENT');
 		if ($prep->rowCount() != 1) throw new LogicException('CANT_SET_LEGAL_ENTITY_PAYMENT');
 		$this->setStatus(self::STATUS_WAITING_PAYMENT_LEGAL_ENTITY, App::getCurrentUser(), $event, $data['contact_email']);
-		return new Result(true, 'Данные успешно обновлены');
+		return new Result(true, 'Данные успешно обновлены', array(
+			'doc_url' => 'https://evendate.io/api/v1/events/' . $event->getId() . '/orders/' . $this->uuid . '/legal_entity/contract'
+		));
 	}
 
 
