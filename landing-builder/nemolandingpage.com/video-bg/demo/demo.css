@@ -452,26 +452,28 @@
 }
 
 .board-header-btn {
-    position: fixed;
-    right: 60px;
-    top: 22px;
     background: 0 0;
     border-radius: 3px;
-    color: #000;
+    color: #f6f6f6;
     cursor: default;
+    float: right;
     font-size: 11pt;
     height: 30px;
     line-height: 30px;
     margin: 0 4px 0 0;
     overflow: hidden;
     padding-left: 10px;
+    position: relative;
     text-decoration: none;
+    color: rgb(255, 255, 255);
     -webkit-transition-duration: .1s;
     transition-duration: .1s;
     -webkit-transition-property: margin;
     transition-property: margin;
     -webkit-transition-timing-function: ease-in;
     transition-timing-function: ease-in;
+    right: 60px;
+    top: -80px;
     padding-right: 10px;
 }
 
