@@ -1916,12 +1916,10 @@ fieldset:disabled .form_select {cursor: default}
 
 
 .fields_wrapper.-columns_2 > .field {
-	flex: none;
 	max-width: 50%;
 }
 
 .fields_wrapper.-columns_3 > .field {
-	flex: none;
 	max-width: calc(100%/3);
 }
 
@@ -5408,7 +5406,7 @@ body,
 /* ORDER */
 
 .order_page {
-	width: 600px;
+	max-width: 600px;
 	padding: 18px;
 	margin: 42px auto;
 }
