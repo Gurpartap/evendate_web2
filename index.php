@@ -41,7 +41,8 @@ try {
 
 	if (isset($_REQUEST['redirect_to'])) {
 		header('Location: ' . $_REQUEST['redirect_to']);
-	} elseif (isset($_REQUEST['q']) && $_REQUEST['q'] != 'onboarding'
+	} elseif (
+		isset($_REQUEST['q']) && $_REQUEST['q'] != 'onboarding'
 		&& (!isset($_COOKIE['skip_onboarding']) || filter_var($_COOKIE['skip_onboarding'], FILTER_VALIDATE_BOOLEAN) == false)
 	) {
 		$subscriptions = OrganizationsCollection::filter(
@@ -114,11 +115,11 @@ $url_parts = explode('/', $url);
 
 	<?php
 	if ($DEBUG_MODE) { ?>
-    <link rel="stylesheet" href="/dist/vendor.css?rev=cebea49deb64bb31a48e0ee93329b6a1">
-    <link rel="stylesheet" href="/dist/app.css?rev=e3607743e5951e0d93e82ceeb54d9a30"><?php
+    <link rel="stylesheet" href="/dist/vendor.css?rev=01feabcd912d2c75bf7978b2298fc88b">
+    <link rel="stylesheet" href="/dist/app.css?rev=e6add6ab2d551ad2b871e037f4adb56a"><?php
 	} else { ?>
-    <link rel="stylesheet" href="/dist/vendor.min.css?rev=d40524d997c556958613585e05f65cc9">
-    <link rel="stylesheet" href="/dist/app.min.css?rev=e7ca2399d5a98b775fcefd35bc1736c7"><?php
+    <link rel="stylesheet" href="/dist/vendor.min.css?rev=062385092d9e8d80ffb46e75c6944622">
+    <link rel="stylesheet" href="/dist/app.min.css?rev=0667e6740bdd07f53103c26181e00bc3"><?php
 	} ?>
 
 	<?php
@@ -351,11 +352,11 @@ $url_parts = explode('/', $url);
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=7d6f8a50ebff19f420f6e5118eae3dab" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=23484eba72d863040653e274c00027bc" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=051a4566a585faba7d2649de8deed4d1" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=a1a980e93941903c4b0fa846c3e9b912" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=31e3ec358c49919c5b4fcef82228abad" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=5f833325cd0051cefc42ba4b196b664c" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=9ff5b8a224a407a2688c56dfef8d1a86" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=1476cb44a1a066265e448c938c859af3" charset="utf-8"></script><?php
 }
 
 foreach (glob("app/templates/{*/*/*/*,*/*/*,*/*,*}.html", GLOB_BRACE) as $filename) {
