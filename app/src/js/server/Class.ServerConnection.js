@@ -28,7 +28,7 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 	function ajaxHandler(result, success, error) {
 		error = typeof error !== 'undefined' ? error : function() {
 				console.log(result);
-				showNotifier({text: 'Упс, что-то пошло не так', status: false});
+				//showNotifier({text: 'Упс, что-то пошло не так', status: false});
 			};
 		success = typeof success !== 'function' ? function() {} : success;
 		try {
