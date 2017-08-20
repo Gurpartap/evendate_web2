@@ -24,6 +24,7 @@ MyOrdersPage = extending(Page, (function() {
 			'sum', {
 				event: {
 					fields: new Fields(
+						'accept_bitcoins',
 						'dates',
 						'nearest_event_date',
 						'is_same_time',
@@ -116,42 +117,57 @@ MyOrdersPage = extending(Page, (function() {
 			self.$detail_wrapper.html(tmpl('my-orders-order-detail-info', {
 				order_number: formatTicketNumber(order.number),
 				pain_info: MyOrdersPage.buildPayInfo(order),
-				pay_button: order.status_type_code === OneOrder.ORDER_STATUSES.WAITING_FOR_PAYMENT ? __APP.BUILD.button({
-					title: 'Заплатить через Яндекс',
-					classes: [
-						'orders_page_pay_button',
-						__C.CLASSES.COLORS.YANDEX,
-						__C.CLASSES.HOOKS.RIPPLE,
-						'PayButton',
-						__C.CLASSES.SIZES.HUGE,
-						__C.CLASSES.SIZES.WIDE,
-						__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
-					]
-				}, {
-					title: 'Оплатить через юр. лицо',
-					classes: [
-						'orders_page_pay_button',
-						__C.CLASSES.COLORS.MARGINAL_PRIMARY,
-						__C.CLASSES.TEXT_WEIGHT.LIGHTER,
-						__C.CLASSES.HOOKS.RIPPLE,
-						'LegalEntityPaymentButton',
-						__C.CLASSES.SIZES.WIDE,
-						__C.CLASSES.SIZES.BIG,
-						__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
-					]
-				}, {
-					title: 'Заплатить через Bitcoin',
-					classes: [
-						'orders_page_pay_button',
-						__C.CLASSES.COLORS.MARGINAL_PRIMARY,
-						__C.CLASSES.TEXT_WEIGHT.LIGHTER,
-						__C.CLASSES.HOOKS.RIPPLE,
-						'BitcoinPaymentButton',
-						__C.CLASSES.SIZES.WIDE,
-						__C.CLASSES.SIZES.BIG,
-						__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
-					]
-				}) : '',
+				pay_button: (function(order) {
+					var $buttons;
+					
+					if (order.status_type_code !== OneOrder.ORDER_STATUSES.WAITING_FOR_PAYMENT) {
+						
+						return '';
+					}
+					
+					$buttons = __APP.BUILD.button({
+						title: 'Заплатить через Яндекс',
+						classes: [
+							'orders_page_pay_button',
+							__C.CLASSES.COLORS.YANDEX,
+							__C.CLASSES.HOOKS.RIPPLE,
+							'PayButton',
+							__C.CLASSES.SIZES.HUGE,
+							__C.CLASSES.SIZES.WIDE,
+							__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
+						]
+					}, {
+						title: 'Оплатить через юр. лицо',
+						classes: [
+							'orders_page_pay_button',
+							__C.CLASSES.COLORS.MARGINAL_PRIMARY,
+							__C.CLASSES.TEXT_WEIGHT.LIGHTER,
+							__C.CLASSES.HOOKS.RIPPLE,
+							'LegalEntityPaymentButton',
+							__C.CLASSES.SIZES.WIDE,
+							__C.CLASSES.SIZES.BIG,
+							__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
+						]
+					});
+					
+					if (order.event.accept_bitcoins) {
+						$buttons = $buttons.add(__APP.BUILD.button({
+							title: 'Заплатить через Bitcoin',
+							classes: [
+								'orders_page_pay_button',
+								__C.CLASSES.COLORS.MARGINAL_PRIMARY,
+								__C.CLASSES.TEXT_WEIGHT.LIGHTER,
+								__C.CLASSES.HOOKS.RIPPLE,
+								'BitcoinPaymentButton',
+								__C.CLASSES.SIZES.WIDE,
+								__C.CLASSES.SIZES.BIG,
+								__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
+							]
+						}));
+					}
+					
+					return $buttons;
+				})(order),
 				event_title: AbstractAppInspector.build.title('Событие'),
 				event: AbstractAppInspector.build.event(order.event),
 				tickets_title: AbstractAppInspector.build.title('Билеты'),

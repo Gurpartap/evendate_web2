@@ -27,6 +27,7 @@ OrderPage = extending(Page, (function() {
 		this.event_fields = EventPage.fields.copy().add({
 			ticket_types: {
 				fields: new Fields(
+					'accept_bitcoins',
 					'is_selling',
 					'comment',
 					'price',
@@ -454,7 +455,9 @@ OrderPage = extending(Page, (function() {
 					__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
 				]
 			});
-			
+		}
+		
+		if (this.event.accept_bitcoins) {
 			this.render_vars.bitcoin_payment_button = __APP.BUILD.button({
 				title: 'Заплатить через Bitcoin',
 				classes: [
