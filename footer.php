@@ -3,7 +3,7 @@ if (isset( $DEBUG_MODE ) && $DEBUG_MODE === false) { ?>
 	<!-- Yandex.Metrika counter -->
 	<script src="https://mc.yandex.ru/metrika/tag.js" type="text/javascript"></script>
 	<script type="text/javascript"> try {
-			var yaCounter32442130 = new Ya.Metrika2({
+			window.yaCounter32442130 = new Ya.Metrika2({
 				id: 32442130,
 				clickmap: true,
 				trackLinks: true,
@@ -63,24 +63,24 @@ if (isset( $DEBUG_MODE ) && $DEBUG_MODE === false) { ?>
 		}
 
 		$('.vk-auth-btn').on('click', function (e) {
-			if (yaCounter32442130) {
-				yaCounter32442130.reachGoal('VkAuthStart');
+			if (window.yaCounter32442130) {
+				window.yaCounter32442130.reachGoal('VkAuthStart');
 			}
 			openAuthLink('vk');
 			e.preventDefault();
 		});
 
 		$('.google-plus-btn').on('click', function (e) {
-			if (yaCounter32442130) {
-				yaCounter32442130.reachGoal('GoogleAuthStart');
+			if (window.yaCounter32442130) {
+				window.yaCounter32442130.reachGoal('GoogleAuthStart');
 			}
 			openAuthLink('google');
 			e.preventDefault();
 		});
 
 		$('.facebook-btn').on('click', function (e) {
-			if (yaCounter32442130) {
-				yaCounter32442130.reachGoal('FacebookAuthStart');
+			if (window.yaCounter32442130) {
+				window.yaCounter32442130.reachGoal('FacebookAuthStart');
 			}
 			openAuthLink('facebook');
 			e.preventDefault();

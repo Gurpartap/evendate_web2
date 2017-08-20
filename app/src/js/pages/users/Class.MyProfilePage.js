@@ -18,10 +18,20 @@ MyProfilePage = extending(UserPage, (function() {
 	}
 	
 	MyProfilePage.prototype.fetchData = function() {
+		var promises = [];
+		
 		if(!this.user.favored.length){
-			return this.fetching_data_defer = this.user.fetchFavored(this.favored_fetch_data);
+			promises.push(this.user.fetchFavored(this.favored_fetch_data));
 		}
-		return Page.prototype.fetchData.call(this);
+		
+		if(!this.user.friends.length){
+			promises.push(this.user.fetchFriends({
+				fields: ['is_friend'],
+				length: 4
+			}));
+		}
+		
+		return promises.length ? this.fetching_data_defer = AsynchronousConnection.multipleAjax.apply(null, promises) : Page.prototype.fetchData.call(this);
 	};
 	
 	MyProfilePage.prototype.render = function() {
@@ -29,6 +39,7 @@ MyProfilePage = extending(UserPage, (function() {
 			$subscribed_orgs,
 			$favored_events,
 			$subscribed_users;
+		
 		__APP.changeTitle('Мой профиль');
 		
 		this.user.actions.forEach(function(action) {

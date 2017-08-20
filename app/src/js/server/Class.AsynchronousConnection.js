@@ -67,6 +67,7 @@ AsynchronousConnection = (function() {
 		var with_callback = (arguments[arguments.length - 1] instanceof Function),
 			promises = with_callback ? Array.prototype.splice.call(arguments, 0, arguments.length - 1) : Array.prototype.slice.call(arguments),
 			parallel_promise;
+		
 		parallel_promise = $.when.apply($, promises);
 		if(with_callback) {
 			parallel_promise.done(Array.prototype.shift.call(arguments));

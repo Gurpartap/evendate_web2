@@ -4505,7 +4505,7 @@ body.-open_modal > .modal_wrapper {
 	margin: 3px 6px;
 }
 
-.sidebar_links {
+.sidebar_footer {
 	padding: 12px;
 	text-align: center;
 	font-size: .8125em;
@@ -4516,6 +4516,10 @@ body.-open_modal > .modal_wrapper {
 .sidebar_links > .link {
 	display: inline-block;
 	margin: 5px 6px;
+}
+
+.sidebar_download_app_buttons {
+	margin: 24px 0 36px;
 }
 
 #main_sidebar,

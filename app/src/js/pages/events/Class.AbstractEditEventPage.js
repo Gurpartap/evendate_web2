@@ -916,8 +916,8 @@ AbstractEditEventPage = extending(Page, (function() {
 		}
 		
 		function always() {
-			//PAGE.$wrapper.removeClass(__C.CLASSES.STATUS.DISABLED);
-			//$loader.remove();
+			PAGE.$wrapper.removeClass(__C.CLASSES.STATUS.DISABLED);
+			$loader.remove();
 		}
 		
 		if (is_form_valid) {

@@ -27,9 +27,9 @@ OrderButton = extending(ActionButton, (function() {
 			},
 			colors: {
 				checked: __C.CLASSES.COLORS.ACCENT,
-				unchecked: __C.CLASSES.COLORS.MARGINAL_ACCENT,
+				unchecked: __C.CLASSES.COLORS.DEFAULT,
 				checked_hover: __C.CLASSES.COLORS.ACCENT,
-				unchecked_hover: __C.CLASSES.COLORS.MARGINAL_ACCENT
+				unchecked_hover: __C.CLASSES.COLORS.NEUTRAL_ACCENT
 			},
 			icons: {
 				checked: __C.CLASSES.ICONS.CHECK,

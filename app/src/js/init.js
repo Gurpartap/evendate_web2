@@ -147,10 +147,6 @@ if (checkRedirect()) {
 				'email',
 				'accounts',
 				'accounts_links', {
-					friends: {
-						fields: ['is_friend'],
-						length: 4
-					},
 					subscriptions: {
 						fields: ['img_small_url', 'subscribed_count', 'new_events_count', 'actual_events_count']
 					}
