@@ -56,7 +56,7 @@ body {
 	background-color: var(--color_gray_material);
 	-webkit-font-smoothing: antialiased;
 	cursor: default;
-	overflow: scroll;
+	overflow-y: scroll;
 }
 .-state_admin,
 .-state_edit_event,

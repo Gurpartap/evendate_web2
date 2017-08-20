@@ -1468,7 +1468,7 @@ AbstractEditEventPage = extending(Page, (function() {
 			id: 'edit_event_booking_time',
 			name: 'booking_time',
 			type: 'number',
-			helptext: 'Колличество часов, в течении которых участник может оплатить свой заказ',
+			helptext: 'Количество часов, в течении которых участник может оплатить свой заказ',
 			value: this.event.booking_time || 1,
 			required: true,
 			attributes: {
