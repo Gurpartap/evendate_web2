@@ -155,7 +155,7 @@ if (checkRedirect()) {
 						fields: ['img_small_url', 'subscribed_count', 'new_events_count', 'actual_events_count']
 					}
 				}));
-			auth_urls_jqxhr = __APP.SERVER.getData('/auth.php', {
+			auth_urls_jqxhr = AsynchronousConnection.dealAjax(AsynchronousConnection.HTTP_METHODS.GET, '/auth.php', {
 				action: 'get_urls',
 				mobile: isNotDesktop()
 			});

@@ -26,10 +26,7 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 	ServerConnection.MAX_ENTITIES_LENGTH = 10000;
 	
 	function ajaxHandler(result, success, error) {
-		error = typeof error !== 'undefined' ? error : function() {
-				console.log(result);
-				//showNotifier({text: 'Упс, что-то пошло не так', status: false});
-			};
+		error = typeof error !== 'undefined' ? error : ServerConnection.stdErrorHandler;
 		success = typeof success !== 'function' ? function() {} : success;
 		try {
 			if (result.status) {
@@ -42,6 +39,10 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 		}
 	}
 	
+	ServerConnection.stdErrorHandler = function(res) {
+		console.error('Exorcizamus te, omnis immundus spiritus, omnis satanica potestas, omnis incursio infernalis adversarii, omnis legio, omnis congregatio et secta diabolica, in nomine et virtute Domini Nostri Jesu Christi, eradicare et effugare a Dei Ecclesia, ab animabus ad imaginem Dei conditis ac pretioso divini Agni sanguine redemptis!\n', res);
+		showNotifier({text: 'Упс, что-то пошло не так', status: false});
+	};
 	/**
 	 *
 	 * @param {jQuery.Event} [event]
@@ -105,12 +106,19 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 			console.log('Error type:', debug.event.type);
 		if (debug.event && debug.event.text)
 			console.log('Description:', debug.event.text);
-		if (debug.jqxhr && debug.jqxhr.responseJSON && debug.jqxhr.responseJSON.text) {
-			console.log('Response:', debug.jqxhr.responseJSON.text);
-			showNotifier({
-				text: debug.jqxhr.responseJSON.text,
-				status: false
-			});
+		if (debug.jqxhr) {
+			if (debug.jqxhr.responseJSON && debug.jqxhr.responseJSON.text) {
+				console.log('Response:', debug.jqxhr.responseJSON.text);
+				showNotifier({
+					text: debug.jqxhr.responseJSON.text,
+					status: false
+				});
+			} else if (debug.jqxhr.statusText) {
+				showNotifier({
+					text: debug.jqxhr.statusText,
+					status: false
+				});
+			}
 		}
 		if (debug.settings) {
 			console.log('URL:', debug.settings.url);
@@ -147,6 +155,9 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 		if (ajax_data.fields instanceof Fields){
 			ajax_data.fields = ajax_data.fields.toString();
 		}
+		
+		url = url.contains('/api/v1') ? url : '/api/v1' + url;
+		
 		jqXHR = $.ajax({
 			url: url,
 			data: ajax_data,
@@ -156,10 +167,12 @@ ServerConnection = extending(AsynchronousConnection, (function() {
 		this.current_connections.push(jqXHR);
 		
 		return jqXHR.fail(function(jqXHR, status_text, thrownError) {
-			if (isFunction(error)) {
-				error(null, jqXHR, this, thrownError);
-			} else {
-				self.ajaxErrorHandler(null, jqXHR, this, thrownError);
+			if (thrownError !== 'abort') {
+				if (isFunction(error)) {
+					error(null, jqXHR, this, thrownError);
+				} else {
+					self.ajaxErrorHandler(null, jqXHR, this, thrownError);
+				}
 			}
 		}).then(function(response, status_text, jqXHR) {
 			ajaxHandler(response, function(data, text) {

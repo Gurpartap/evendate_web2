@@ -912,20 +912,12 @@ AbstractEditEventPage = extending(Page, (function() {
 		})($form, PAGE.MainCalendar);
 		
 		function afterSubmit() {
-			PAGE.$wrapper.removeClass(__C.CLASSES.STATUS.DISABLED);
-			$loader.remove();
 			__APP.changeState('/event/' + PAGE.event.id);
 		}
 		
-		function onError(e) {
-			PAGE.$wrapper.removeClass(__C.CLASSES.STATUS.DISABLED);
-			$loader.remove();
-			console.error(e);
-			console.log({
-				MainCalendar: PAGE.MainCalendar,
-				send_data: send_data,
-				form_data: form_data
-			});
+		function always() {
+			//PAGE.$wrapper.removeClass(__C.CLASSES.STATUS.DISABLED);
+			//$loader.remove();
 		}
 		
 		if (is_form_valid) {
@@ -934,12 +926,12 @@ AbstractEditEventPage = extending(Page, (function() {
 			try {
 				send_data = this.gatherSendData();
 				if (is_edit) {
-					PAGE.event.updateEvent(send_data, afterSubmit, onError);
+					PAGE.event.updateEvent(send_data, afterSubmit).always(always);
 				} else {
-					PAGE.event.createEvent(send_data, afterSubmit, onError);
+					PAGE.event.createEvent(send_data, afterSubmit).always(always);
 				}
 			} catch (e) {
-				onError(e);
+				ServerConnection.stdErrorHandler(e);
 			}
 		}
 	};
