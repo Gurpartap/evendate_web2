@@ -110,17 +110,9 @@ $url_parts = explode('/', $url);
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <title>Evendate</title>
-  <!-- =============== VENDOR STYLES ===============-->
-  <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i" rel="stylesheet">
-
 	<?php
-	if ($DEBUG_MODE) { ?>
-    <link rel="stylesheet" href="/dist/vendor.css?rev=01feabcd912d2c75bf7978b2298fc88b">
-    <link rel="stylesheet" href="/dist/app.css?rev=48e0f995c08c520bc1180c1219559c03"><?php
-	} else { ?>
-    <link rel="stylesheet" href="/dist/vendor.min.css?rev=062385092d9e8d80ffb46e75c6944622">
-    <link rel="stylesheet" href="/dist/app.min.css?rev=aa1652ea85f3e7691c8b55de7136175c"><?php
-	} ?>
+	require_once( 'parts/styles.php' );
+	?>
 
 	<?php
 	try {
@@ -203,7 +195,7 @@ $url_parts = explode('/', $url);
 <body>
 
 <?php
-require_once('sidebar.php');
+require_once( 'parts/sidebar.php' );
 ?>
 <div id="main_overlay">
   <header id="main_header">
@@ -298,28 +290,10 @@ require_once('sidebar.php');
   <div class="modal_destroyer"></div>
 </div>
 
-
-<!-- =============== VENDOR SCRIPTS ===============-->
-<!-- Google MAPS -->
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg&libraries=places" async
-        defer type="text/javascript"></script>
-<!-- SOCKET.IO -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js" type="text/javascript"></script>
-
 <?php
-if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=d1d0bf7b483dc28d5af88ede61096aa5" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=b78834af7ea1b9e5ebdf956a8ed87829" charset="utf-8"></script><?php
-} else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=b6009a4bc5fda19ebddbc4ef11edebab" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=76f90f1be86dceb87bbe4a62b2667f39" charset="utf-8"></script><?php
-}
-
-foreach (glob("app/templates/{*/*/*/*,*/*/*,*/*,*}.html", GLOB_BRACE) as $filename) {
-	// ¯\_(ツ)_/¯
-	require_once($filename);
-}
-require 'footer.php';
+require_once( 'parts/scripts.php' );
+require_once( 'dist/templates.html' );
+require_once( 'footer.php' );
 ?>
 
 </body>

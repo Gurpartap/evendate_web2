@@ -9,6 +9,7 @@ var gulp = require('gulp'),
 	csso = require('gulp-csso'),
 	rev = require('gulp-rev-append'),
 	rename = require('gulp-rename'),
+	clean = require('gulp-clean'),
 	runSequence = require('run-sequence').use(gulp),
 	srcs = {
 		vendor_js: [
@@ -41,6 +42,7 @@ var gulp = require('gulp'),
 	};
 
 gulp.task('js', function() {
+	
 	return merge(
 		gulp.src(srcs.vendor_js)
 			.pipe(resolveDependencies())
@@ -55,6 +57,7 @@ gulp.task('js', function() {
 });
 
 gulp.task('css', function() {
+	
 	return merge(
 		gulp.src(srcs.vendor_css)
 			.pipe(concat('vendor.css'))
@@ -66,7 +69,15 @@ gulp.task('css', function() {
 	);
 });
 
+gulp.task('tmpl', function() {
+	
+	return gulp.src('../app/templates/**/*.html')
+	           .pipe(concat('templates.html'))
+	           .pipe(gulp.dest('../dist/'));
+});
+
 gulp.task('minify_js', ['js'], function() {
+	
 	return gulp.src('../dist/{app,vendor}.js')
 		.pipe(uglify())
 		.pipe(rename({extname: '.min.js'}))
@@ -74,6 +85,7 @@ gulp.task('minify_js', ['js'], function() {
 });
 
 gulp.task('minify_css', ['css'], function() {
+	
 	return gulp.src('../dist/{app,vendor}.css')
 		.pipe(autoprefixer())
 		.pipe(csso())
@@ -81,20 +93,34 @@ gulp.task('minify_css', ['css'], function() {
 		.pipe(gulp.dest('../dist/'));
 });
 
-gulp.task('rev', function() {
-	return gulp.src('../{index,ticket}.php')
-		.pipe(rev())
-		.pipe(gulp.dest('../'));
+gulp.task('rev_append', function() {
+	
+	return gulp.src('../parts/{styles,scripts}.php')
+	           .pipe(gulp.dest('../'))
+	           .pipe(rev())
+	           .pipe(gulp.dest('../parts/'));
 });
 
+gulp.task('rev_clean', ['rev_append'], function() {
+	
+	return gulp.src('../{styles,scripts}.php', {read: false})
+	           .pipe(clean({force: true}))
+	           .pipe(gulp.dest('../'));
+});
+
+gulp.task('rev', ['rev_append', 'rev_clean']);
+
 gulp.task('build_dev', function(cb) {
-	runSequence(['css', 'js'], 'rev', cb);
+	
+	return runSequence(['css', 'js', 'tmpl'], 'rev', cb);
 });
 
 gulp.task('watch', function() {
-	gulp.watch('../app/src/**/*.{js,css}', ['build_dev']);
+	
+	return gulp.watch('../app/{src,templates}/**/*.{js,css,html}', ['build_dev']);
 });
 
 gulp.task('build', function(cb) {
-	runSequence(['minify_css', 'minify_js'], 'rev', cb);
+	
+	return runSequence(['minify_css', 'minify_js'], 'rev', cb);
 });
