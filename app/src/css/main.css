@@ -5449,12 +5449,16 @@ body,
 	font-weight: bold;
 }
 
-.order_ticket_type_price,
+.order_ticket_type_sum,
+.order_ticket_type_title,
 .order_ticket_type_description {
-	font-size: 0.875em;
+	color: #2e3b50;
+	color: var(--color_dark_primary);
+
 }
 
 .order_ticket_type_price {
+	font-size: 0.875em;
 	font-weight: bold;
 	color: #f82969;
 	color: var(--color_accent);
@@ -5462,8 +5466,6 @@ body,
 
 .order_ticket_type_sum {
 	font-weight: 500;
-	color: #2e3b50;
-	color: var(--color_dark_primary);
 }
 
 .order_ticket_type_footer {

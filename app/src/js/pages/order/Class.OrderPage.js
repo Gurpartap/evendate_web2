@@ -369,7 +369,8 @@ OrderPage = extending(Page, (function() {
 					});
 				}
 			});
-			
+		}
+		if (this.event.accept_bitcoins) {
 			this.render_vars.bitcoin_payment_button.on('click.BitcoinPayment', function() {
 				var $this = $(this),
 					modal;
