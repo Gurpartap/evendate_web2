@@ -24,7 +24,7 @@ LegalEntityPayment = extending(Page, (function() {
 		Page.call(this);
 		
 		try {
-			this.order_info = JSON.parse(window.localStorage.getItem(event_id + '_order_info'));
+			this.order_info = JSON.parse(window.localStorage.getItem(event_id + '_order_info')) || {};
 		} catch (e) {
 			this.order_info = {};
 		}
@@ -33,6 +33,8 @@ LegalEntityPayment = extending(Page, (function() {
 		this.order_fields = new Fields('sum');
 		
 		this.render_vars = {
+			event_id: event_id,
+			order_uuid: uuid,
 			event_info: null,
 			receivers_form_field: null,
 			company_form_field: null,
@@ -48,7 +50,8 @@ LegalEntityPayment = extending(Page, (function() {
 			signer_position_form_field: null,
 			self_name_form_field: null,
 			self_email_form_field: null,
-			self_phone_form_field: null
+			self_phone_form_field: null,
+			back_to_link: null
 		};
 		
 		this.$submit_button = $();
@@ -129,19 +132,25 @@ LegalEntityPayment = extending(Page, (function() {
 		});
 		
 		this.$submit_button.on('click.SubmitForm', function() {
-			var $form = self.$wrapper.find('.LegalEntityPaymentForm');
+			var $form = self.$wrapper.find('.LegalEntityPaymentForm'),
+				$loader;
 			
 			if (isFormValid($form)) {
+				$loader = __APP.BUILD.overlayLoader(self.$wrapper);
 				self.order.makeLegalEntityPayment($form.serializeForm()).done(function() {
-					window.localStorage.removeItem(self.event.id + '_order_info');
-					showNotifier({text: 'Форма отправлена успешно<br>' +
-					                    'В скором времени на указанную почту придет договор-счет для оплаты от юрлица', status: true});
+					var $contract_wrapper = self.$wrapper.find('.LegalEntityPaymentContract');
 					
-					if (self.order_info['away_to']) {
-						window.location = self.order_info['away_to']
-					} else {
-						__APP.changeState('/event/' + self.event.id);
-					}
+					try {
+						window.localStorage.removeItem(self.event.id + '_order_info');
+					} catch (e) {}
+					
+					$loader.remove();
+					showNotifier({text: 'Договор-счет сформирован, вы можете его открыть, либо скачать', status: true});
+					
+					$form.attr('disabled', true);
+					self.$wrapper.find('.LegalEntityPaymentFooter').addClass(__C.CLASSES.HIDDEN);
+					$contract_wrapper.removeClass(__C.CLASSES.HIDDEN);
+					scrollTo($contract_wrapper, 400);
 				});
 			}
 			
@@ -314,7 +323,12 @@ LegalEntityPayment = extending(Page, (function() {
 				__C.CLASSES.COLORS.ACCENT,
 			  'LegalEntityPaymentSubmit'
 			],
-			title: 'Отправить'
+			title: 'Сформировать договор-счет'
+		});
+		
+		this.render_vars.back_to_link = __APP.BUILD.link({
+			title: 'Назад к событию',
+			page: '/event/{event_id}'.format({event_id: this.event.id})
 		});
 		
 	};

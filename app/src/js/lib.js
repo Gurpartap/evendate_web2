@@ -2441,8 +2441,11 @@ function bindPageLinks($parent) {
 	
 	return $links.not('.-Handled_Link').on('click.pageRender', function(e) {
 		var $this = $(this);
-		if ($this.hasClass(__C.CLASSES.DISABLED))
+		
+		if ($this.hasClass(__C.CLASSES.DISABLED)) {
+			
 			return false;
+		}
 		if (e.which === 1) {
 			e.preventDefault();
 			__APP.changeState($this.attr('href'));

@@ -115,11 +115,11 @@ $url_parts = explode('/', $url);
 
 	<?php
 	if ($DEBUG_MODE) { ?>
-    <link rel="stylesheet" href="/dist/vendor.css?rev=6d4da3ef58f1872e9f8994faba56a5bc">
-    <link rel="stylesheet" href="/dist/app.css?rev=13526125567dcc6574b1fe214c57fb8b"><?php
+    <link rel="stylesheet" href="/dist/vendor.css?rev=cebea49deb64bb31a48e0ee93329b6a1">
+    <link rel="stylesheet" href="/dist/app.css?rev=c9ee7c33132ce196340152072ec077b4"><?php
 	} else { ?>
-    <link rel="stylesheet" href="/dist/vendor.min.css?rev=cddf9122f7f5a7af206d58f32ef7f6df">
-    <link rel="stylesheet" href="/dist/app.min.css?rev=8cc633ff65bf32500f7e1909cf885d8f"><?php
+    <link rel="stylesheet" href="/dist/vendor.min.css?rev=d40524d997c556958613585e05f65cc9">
+    <link rel="stylesheet" href="/dist/app.min.css?rev=c6021e24a3c2b6ff086e5156738db056"><?php
 	} ?>
 
 	<?php
@@ -308,11 +308,11 @@ require_once('sidebar.php');
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=31d1ceba859dc9a747bb9d81d56eea52" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=319ee76805939fcd02131558f281e86c" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=cffd4b9c8e618ebda5cd53878b1275bc" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=b690c23aed840fb6586fba1dd9c15bef" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=1fd0a15bc2ed6861a275078f609a66fc" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=f2107ac8927a2a227863bbc5fe4c9c61" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=63d3c531124a9ddec1fe6f86fea5f707" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=df84fd872161bc1af1b65b31e2fcd3d3" charset="utf-8"></script><?php
 }
 
 foreach (glob("app/templates/{*/*/*/*,*/*/*,*/*,*}.html", GLOB_BRACE) as $filename) {
