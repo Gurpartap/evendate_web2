@@ -5,17 +5,30 @@
 				<img src="{image_horizontal_url}?width={cover_width}" title="{title}" width="{cover_width}" height="{cover_height}">
 			</div>
 			<div class="ticket_card_content">
-				<p class="ticket_card_event_title">{title}</p>
+				<p class="ticket_card_event_title -text_color_primary_80">{title}</p>
 				<p class="ticket_card_type_name">{ticket_type_name}</p>
 				<p class="ticket_card_dates">{formatted_dates}</p>
 				<p class="ticket_card_location">{location}</p>
 				<div class="ticket_card_additional_field">
-					<span>Билет №{number_formatted}</span>
-					<span>{price_formatted}</span>
+					<span class="-text_color_primary_80">Билет № </span>
+					<span class="-text_color_accent">{number_formatted}</span>
 				</div>
 				<div class="ticket_card_additional_field">
-					<span>{payed_at_formatted}</span>
-					<span></span>
+					<span class="-text_color_primary_80">Приобретён </span>
+					<span class="-text_color_accent">{payed_at_formatted}</span>
+				</div>
+				<div class="ticket_card_additional_field">
+					<span class="-text_color_primary_80">Стоимость </span>
+					<span class="-text_color_accent">{price_formatted}</span>
+				</div>
+
+				<div class="ticket_card_buttons form_group -align_left">
+					<div class="form_unit">
+						<a class="button -bordered fa_icon fa-external-link" href="/ticket/{ticket_uuid}" target="_blank">Открыть билет</a>
+					</div>
+					<div class="form_unit">
+						<a class="button -bordered fa_icon fa-download" href="/api/v1/events/{event_id}/tickets/{ticket_uuid}/export">pdf</a>
+					</div>
 				</div>
 			</div>
 			<div class="ticket_card_status">

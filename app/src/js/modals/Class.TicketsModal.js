@@ -33,20 +33,22 @@ TicketsModal = extending(AbstractModal, (function() {
 	 *
 	 * @return {TicketsModal}
 	 */
-	TicketsModal.prototype.render = function(){
+	TicketsModal.prototype.render = function(props){
 		var self = this;
 		
 		this.content = tmpl('modal-ticket-content', Builder.normalizeTicketProps(this.tickets).map(function(props, i) {
 			var data = self.tickets[i].order.payed_at || self.tickets[i].created_at;
 			
-			props.cover_width = 450;
+			props.cover_width = 480;
 			props.card_classes.push('-ticket_extended', __C.CLASSES.FLOATING_MATERIAL);
 			
 			return $.extend(props, {
-				cover_height: 253,
+				cover_height: 269,
+				event_id: self.tickets[i].event.id,
+				ticket_uuid: self.tickets[i].uuid,
 				number_formatted: formatTicketNumber(self.tickets[i].number),
-				payed_at_formatted: (self.tickets[i].order.payed_at ? 'Куплен ' : 'Приобретен ') + moment.unix(data).format(__LOCALES.ru_RU.DATE.DATE_TIME_FORMAT),
-				price_formatted: +self.tickets[i].price ? formatCurrency(self.tickets[i].price, ' ', '.', '', 'руб.') : 'Бесплатно'
+				payed_at_formatted: moment.unix(data).format(__LOCALES.ru_RU.DATE.DATE_TIME_FORMAT),
+				price_formatted: +self.tickets[i].price ? formatCurrency(self.tickets[i].price, ' ', '.', '', '₽') : 'Бесплатно'
 			});
 		}));
 		

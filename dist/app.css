@@ -1062,9 +1062,12 @@ a.social_link.-color_facebook {color: #3b5998}
 
 .social_link.-rounded {
 	font-size: .8125em;
+	line-height: 1;
 	border: 1px solid;
 	border-radius: 50%;
 }
+
+.social_link > .fa_icon {width: 1em}
 
 /* /Social Link */
 /* Old Table */
@@ -2671,6 +2674,8 @@ a.button:hover {text-decoration: none}
 .button:not(:disabled).-color_marginal_primary:focus,
 .button:not(:disabled).-color_marginal_accent:focus {background-color: #ebedef}
 
+
+.button.-bordered {border: 1px solid}
 
 .button:disabled,
 .button.-status_disabled {
@@ -4380,7 +4385,7 @@ body.-open_modal > .modal_wrapper {
 .ticket_card {margin-bottom: 36px}
 
 .ticket_card:not(.-ticket_extended) {width: 260px}
-.ticket_card.-ticket_extended {max-width: 450px}
+.ticket_card.-ticket_extended {max-width: 480px}
 
 .ticket_card:not(.-ticket_extended):before,
 .ticket_card:not(.-ticket_extended):after {
@@ -4388,41 +4393,39 @@ body.-open_modal > .modal_wrapper {
 	position: absolute;
 	left: 0;
 	right: 0;
-	width: 36px;
 	margin: auto;
 	background-color: #f6f6f6;
 	z-index: 1;
 }
 
 .ticket_card:not(.-ticket_extended):before {
-	bottom: calc(100% - 10px);
+	bottom: calc(100% - 15px);
 	height: 24px;
+	width: 36px;
 	border-radius: 50%;
+	border: 4px solid #fff;
 	box-shadow: inset 0 0 4px hsla(0,0%,0%,.08);
 	box-shadow: inset var(--material_shadow);
 }
 
 .ticket_card:not(.-ticket_extended):after {
 	bottom: 100%;
-	height: 14px;
+	height: 20px;
+	width: 50px;
 }
 
-.ticket_card_cover > img {
-	width: 100%;
-}
-
-.ticket_card_content {padding: 12px}
+.ticket_card_content {padding: 18px}
 .ticket_card:not(.-ticket_extended) .ticket_card_content {padding-bottom: 40px}
 
 .ticket_card_event_title,
 .ticket_card_type_name,
 .ticket_card_dates,
-.ticket_card_location {line-height: 1.2}
+.ticket_card_location,
+.ticket_card_additional_field {line-height: 1.25}
 
 .ticket_card_event_title {
-	font-size: .875em;
+	font-size: 1em;
 	font-weight: 500;
-	margin-bottom: 24px;
 }
 
 .ticket_card_type_name {
@@ -4433,52 +4436,64 @@ body.-open_modal > .modal_wrapper {
 
 .ticket_card.-ticket_extended .ticket_card_type_name {
 	font-size: 1.5em;
+	line-height: 1.33;
 	height: auto;
+	margin: 12px 0 24px;
 }
+
+
+.ticket_card:not(.-ticket_extended) .ticket_card_cover {padding: 4px}
 
 .ticket_card_dates {
 	font-size: 1em;
 	font-weight: bold;
-	margin: 12px 0;
+	margin: 9px 0;
 }
 
 .ticket_card_location {
-	margin-bottom: 60px;
-	font-size: .875em;
+	margin: 9px 0 36px;
+	font-size: 1em;
 	font-weight: 500;
-	color: #657184;
-	color: var(--color_primary_80);
 }
 .ticket_card_location:last-child {margin-bottom: 0}
 
 .ticket_card_additional_field {
-	display: flex;
-	justify-content: space-between;
-	font-size: .875em;
+	font-size: 1em;
 	font-weight: 500;
-	color: #3e4d66;
-	color: var(--color_primary);
 }
 .ticket_card_additional_field + .ticket_card_additional_field {margin-top: 6px}
+
+.ticket_card_buttons {
+	margin-top: 24px;
+}
 
 .ticket_card_status {
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	height: 40px;
-	font-size: 12px;
-	font-weight: bold;
-	line-height: 15px;
+	line-height: 1.25;
 	color: #fff;
 	text-transform: uppercase;
 	background-color: #3e4d66;
 	background-color: var(--color_primary);
 }
 
+.ticket_card:not(.-ticket_extended) .ticket_card_status {
+	height: 40px;
+	font-size: .75em;
+	font-weight: bold;
+}
+
+.ticket_card.-ticket_extended .ticket_card_status {
+	height: 55px;
+	font-size: 1em;
+	font-weight: 400;
+	letter-spacing: .5px;
+}
+
 .ticket_card:not(.-ticket_extended):not(.-disabled) > .ticket_card_wrapper {cursor: pointer}
 
 
-.ticket_card.-ticket_extended .ticket_card_event_title,
 .ticket_card:not(.-ticket_extended):not(.-disabled) > .ticket_card_wrapper:hover .ticket_card_type_name {
 	color: #f82969;
 	color: var(--color_accent);
@@ -7022,7 +7037,6 @@ fieldset + .org_admin_settings_wrapper,
 	width: 100%;
 	height: 100%;
 	border-radius: 100px;
-	overflow: hidden;
 	text-align: right;
 }
 
@@ -7057,7 +7071,7 @@ fieldset + .org_admin_settings_wrapper,
 .-open_search_bar .event_admin_requests_search_bar_input {opacity: 1}
 
 .event_admin_requests_lists {
-	height: calc(100% - 118px);
+	height: calc(100% - 126px);
 	margin: 0;
 	box-shadow: inset 0 5px 8px -5px #e2e4e8, inset 0 -5px 8px -5px #e2e4e8;
 }
