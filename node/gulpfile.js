@@ -11,9 +11,11 @@ var gulp = require('gulp'),
 	rename = require('gulp-rename'),
 	clean = require('gulp-clean'),
 	runSequence = require('run-sequence').use(gulp),
+	
 	js_path = '../app/src/js/',
 	css_path = '../app/src/css/',
 	vendor_path = '../app/src/vendor/',
+	dest_path = '../dist/',
 	srcs = {
 		vendor_js: [
 			vendor_path + 'jquery/jquery.js',
@@ -32,15 +34,14 @@ var gulp = require('gulp'),
 			js_path + 'ui/**/*.js',
 			js_path + 'pages/**/*.js',
 			js_path + 'application.js',
-			js_path + 'init.js'
+			js_path + 'locales.js',
+			js_path + 'app_init.js'
 		],
 		vendor_css: [
 			vendor_path + 'jquery.dataTables/css/jquery.dataTables.css',
 			vendor_path + '**/*.css'
 		],
 		app_css: [
-			css_path + 'govnokod.css',
-			
 			css_path + 'vars.css',
 			css_path + 'typography.css',
 			css_path + 'common.css',
@@ -71,12 +72,12 @@ gulp.task('js', function() {
 		gulp.src(srcs.vendor_js)
 		    .pipe(resolveDependencies())
 		    .pipe(concat('vendor.js'))
-		    .pipe(gulp.dest('../dist/')),
+		    .pipe(gulp.dest(dest_path)),
 		
 		gulp.src(srcs.app_js)
 		    .pipe(resolveDependencies())
 		    .pipe(concat('app.js'))
-		    .pipe(gulp.dest('../dist/'))
+		    .pipe(gulp.dest(dest_path))
 	);
 });
 
@@ -85,12 +86,12 @@ gulp.task('css', function() {
 	return merge(
 		gulp.src(srcs.vendor_css)
 		    .pipe(concat('vendor.css'))
-		    .pipe(gulp.dest('../dist/')),
+		    .pipe(gulp.dest(dest_path)),
 		
 		gulp.src(srcs.app_css)
 		    .pipe(resolveDependencies())
 		    .pipe(concat('app.css'))
-		    .pipe(gulp.dest('../dist/'))
+		    .pipe(gulp.dest(dest_path))
 	);
 });
 
@@ -98,24 +99,24 @@ gulp.task('tmpl', function() {
 	
 	return gulp.src('../app/templates/**/*.html')
 	           .pipe(concat('templates.html'))
-	           .pipe(gulp.dest('../dist/'));
+	           .pipe(gulp.dest(dest_path));
 });
 
 gulp.task('minify_js', ['js'], function() {
 	
-	return gulp.src('../dist/{app,vendor}.js')
+	return gulp.src(dest_path + '{app,vendor}.js')
 		.pipe(uglify())
 		.pipe(rename({extname: '.min.js'}))
-		.pipe(gulp.dest('../dist/'));
+		.pipe(gulp.dest(dest_path));
 });
 
 gulp.task('minify_css', ['css'], function() {
 	
-	return gulp.src('../dist/{app,vendor}.css')
+	return gulp.src(dest_path + '{app,vendor}.css')
 		.pipe(autoprefixer())
 		.pipe(csso())
 		.pipe(rename({extname: '.min.css'}))
-		.pipe(gulp.dest('../dist/'));
+		.pipe(gulp.dest(dest_path));
 });
 
 gulp.task('rev_append', function() {

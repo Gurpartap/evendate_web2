@@ -24,15 +24,19 @@ OrderPage = extending(Page, (function() {
 		
 		Page.call(this);
 		this.event = new OneEvent(event_id);
-		this.event_fields = EventPage.fields.copy().add({
+		this.event_fields = new Fields(
+			'accept_bitcoins',
+			'ticketing_locally',
+			'ticketing_available',
+			'registration_locally',
+			'registration_required',
+			'registration_available',
+			'registration_fields', {
 			ticket_types: {
 				fields: new Fields(
-					'accept_bitcoins',
 					'is_selling',
 					'comment',
 					'price',
-					'sell_start_date',
-					'sell_end_date',
 					'min_count_per_user',
 					'max_count_per_user'
 				)

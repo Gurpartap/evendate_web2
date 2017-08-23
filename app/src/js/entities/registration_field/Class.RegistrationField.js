@@ -1,5 +1,6 @@
 /**
  * @requires ../Class.OneEntity.js
+ * @requires ../../data_models/registration_field/Class.RegistrationFieldModel.js
  */
 /**
  * @class RegistrationField

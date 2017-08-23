@@ -180,7 +180,7 @@ table {
 
 
 .-unite {
-	display: flex;
+	display: flex !important;
 	font-size: 0;
 }
 

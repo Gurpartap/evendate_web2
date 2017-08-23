@@ -2,13 +2,14 @@
  * @requires ../Class.OneEntity.js
  * @requires ../date/Class.DatesCollection.js
  * @requires ../tag/Class.TagsCollection.js
- * @requires ../order/Class.EventMyOrdersCollection.js
+ * @requires ../order/Class.AbstractEventOrdersCollection.js
  * @requires ../ticket/Class.AbstractEventTicketsCollection.js
  * @requires ../ticket_type/Class.TicketTypesCollection.js
  * @requires ../user/Class.UsersCollection.js
  * @requires ../notification/Class.NotificationsCollection.js
  * @requires ../../data_models/registration_field/Class.RegistrationFieldModelsCollection.js
  * @requires ../../data_models/Class.EventEmailTextsModel.js
+ * @requires ../../data_models/promocode/Class.PromocodeModelsCollection.js
  */
 /**
  * @class OneEvent

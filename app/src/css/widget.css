@@ -1,0 +1,17 @@
+.widget_view {
+	background-color: #fff;
+}
+
+.widget_view .material {
+	box-shadow: none;
+}
+
+.widget_view .order_page {
+	padding: 12px;
+	margin: 16px auto;
+}
+
+.widget_view .legal_entity_payment_page {
+	margin: 24px auto;
+	padding: 12px 12px 0;
+}

@@ -187,6 +187,7 @@ __C = {
 		ESC: 27
 	}
 };
+Object.freeze(__C);
 /**
  * Extending class
  *
