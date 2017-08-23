@@ -1,0 +1,56 @@
+.org_admin_settings_page {
+	margin: 18px 0;
+	padding: 42px 0;
+	width: 660px;
+}
+
+.org_admin_settings_wrapper {padding: 0 36px}
+
+fieldset + .org_admin_settings_wrapper,
+.org_admin_settings_wrapper + fieldset,
+.org_admin_settings_wrapper + .org_admin_settings_wrapper {margin-top: 42px}
+
+.org_admin_settings_staff {
+	display: flex;
+	justify-content: space-around;
+	align-items: stretch;
+}
+
+.org_admin_settings_staff_wrapper {
+	flex: none;
+	max-width: 45%;
+	margin-right: auto;
+}
+
+.org_admin_settings_admins_collection > .avatar_block,
+.org_admin_settings_admins_collection > .staff_avatar_block {
+	margin: 12px 0;
+	font-size: .875em;
+}
+
+.org_admin_settings_admins_collection .avatar_block {font-weight: normal}
+
+.org_admin_settings_domain_table {
+	width: 100%;
+}
+
+.org_admin_settings_domain_table td {
+	padding: 5px;
+}
+
+.org_admin_settings_tariff_head {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.org_admin_settings_tariff_title,
+.org_admin_settings_tariff_price {
+	font-size: 16px;
+	font-weight: 500;
+	color: #657184;
+	color: var(--color_primary_30);
+}
+
+.org_admin_settings_tariff_title {flex-grow: 1}
+.org_admin_settings_tariff_button {margin-left: 1em}

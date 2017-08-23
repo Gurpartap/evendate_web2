@@ -1,0 +1,19 @@
+.add_organization_page {
+	max-width: 700px;
+	margin: 40px 0;
+	padding: 15px 30px;
+}
+
+.add_organization_img_preview_background {
+	position: absolute;
+	top: 21px;
+}
+
+.add_organization_img_preview_logo {
+	width: 56px;
+	position: absolute;
+	left: 131px;
+	top: 84px;
+	z-index: 9;
+	border-radius: 100px;
+}

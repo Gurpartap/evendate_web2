@@ -1,0 +1,42 @@
+.fields_wrapper {
+	display: flex;
+}
+
+.field {
+	margin-bottom: 12px;
+	margin-right: 36px;
+	font-size: .875em;
+}
+
+.field_name,
+.field_value {
+	display: block;
+	font-weight: 500;
+	line-height: 1.2;
+}
+
+.field_name {
+	margin: 6px 0;
+	color: #9fa6b3;
+	color: var(--color_primary_50);
+}
+
+.field_value {
+	color: #3e4d66;
+	color: var(--color_primary);
+}
+
+
+.fields_wrapper.-columns_2 > .field {
+	max-width: 50%;
+}
+
+.fields_wrapper.-columns_3 > .field {
+	max-width: calc(100%/3);
+}
+
+.fields_wrapper.-field_big > .field > .field_value {
+	font-size: 1.2857em;
+	color: #2e3b50;
+	color: var(--color_dark_primary);
+}

@@ -1,0 +1,20 @@
+.table.-simple_table > thead {
+	border-bottom: 2px solid #e2e4e8;
+}
+
+.table.-simple_table th {
+	font-weight: 500;
+	color: #657184;
+	color: var(--color_primary_80);
+}
+
+.table.-simple_table th,
+.table.-simple_table td {padding: 12px}
+
+.table.-simple_table th:first-child,
+.table.-simple_table td:first-child {padding-left: 24px}
+
+.table.-simple_table th:last-child,
+.table.-simple_table td:last-child {padding-right: 24px}
+
+.table.-simple_table td.-no_padding {padding: 0}

@@ -1,0 +1,250 @@
+.button {
+	display: inline-block;
+	vertical-align: bottom;
+	height: 30px;
+	min-width: 30px;
+	font-family: inherit;
+	font-size: .81em;
+	font-weight: 500;
+	color: inherit;
+	border: 0;
+	border-radius: 2px;
+	background-color: transparent;
+	text-align: center;
+	text-transform: uppercase;
+	overflow: hidden;
+	cursor: pointer;
+	word-wrap: normal;
+	z-index: 1;
+	transition:
+		box-shadow .3s ease,
+		background-color .3s ease,
+		color .3s ease,
+		opacity .3s ease;
+
+	-webkit-transform: translate3d(0, 0, 0);
+	-moz-transform: translate3d(0, 0, 0);
+	-ms-transform: translate3d(0, 0, 0);
+	-o-transform: translate3d(0, 0, 0);
+	transform: translate3d(0, 0, 0);
+}
+
+.button:not(.-empty):not(:empty) {padding: 0 1rem}
+
+.button.-size_wide {
+	display: block;
+	width: 100%;
+}
+.button.-size_low {
+	height: 1.88rem;
+	min-width: 1.88rem;
+}
+.button.-size_huge {
+	height: 3rem;
+	min-width: 3rem;
+	font-size: 1em;
+}
+.button.-size_big {
+	height: 2.25rem;
+	min-width: 2.25rem;
+	font-size: 1em;
+}
+.button.-size_huge:not(.-empty):not(:empty) {padding: 0 30px}
+.button.-rounded {
+	font-size: 0.8em;
+	border-radius: 50px;
+}
+.button.-no_uppercase {text-transform: none}
+
+a.button {line-height: 30px}
+a.button.-size_low {line-height: 1.88rem}
+a.button.-size_huge {line-height: 3rem}
+a.button.-size_big {line-height: 2.25rem}
+a.button,
+a.button:hover {text-decoration: none}
+
+
+
+.button.-color_primary,
+.button.-color_accent,
+.button.-color_franklin,
+.button.-color_franklin_alt,
+.button.-color_bubblegum,
+.button.-color_bubblegum_alt,
+.button.-color_telegram,
+.button.-color_vk,
+.button.-color_google,
+.button.-color_facebook {color: #fff}
+.button.-color_yandex {color: #000}
+
+.button.-color_neutral,
+.button.-color_default,
+.button.-color_marginal,
+.button.-text_color_neutral,
+.button.-text_color_default,
+.button.-text_color_marginal {color: #4a4a4a; color: var(--color_text);}
+
+.button.-color_neutral_alt {color: #9fa6b3; color: var(--color_primary_50);}
+
+.button.-color_primary_alt,
+.button.-text_color_primary,
+.button.-color_neutral_primary,
+.button.-color_marginal_primary {color: #3e4d66; color: var(--color_primary);}
+
+.button.-color_bubblegum_alt,
+.button.-text_color_bubble_gum,
+.button.-color_neutral_bubble_gum,
+.button.-color_marginal_bubble_gum {color: #f82969; color: var(--color_bubblegum);}
+
+.button.-color_franklin_alt,
+.button.-text_color_franklin,
+.button.-color_neutral_franklin,
+.button.-color_marginal_franklin {color: #00dc88; color: var(--color_franklin);}
+
+.button.-color_accent_alt,
+.button.-text_color_accent,
+.button.-color_neutral_accent,
+.button.-color_marginal_accent {color: #f82969; color: var(--color_accent);}
+
+.-state_admin .button.-color_accent_alt,
+.-state_admin .button.-text_color_accent,
+.-state_admin .button.-color_neutral_accent,
+.-state_admin .button.-color_marginal_accent {color: #00dc88}
+
+
+
+.button.-color_default,
+.button.-color_neutral_alt {background-color: transparent}
+
+.button.-color_primary {background-color: #3e4d66; background-color: var(--color_primary);}
+
+.button.-color_accent {background-color: #f82969; background-color: var(--color_accent);}
+.button.-color_bubblegum {background-color: #f82969; background-color: var(--color_bubblegum);}
+.button.-color_franklin {background-color: #00dc88; background-color: var(--color_franklin);}
+.-state_admin .button.-color_accent {background-color: #00dc88}
+
+.button.-color_primary_alt {background-color: rgba(83,121,184,0.24)}
+.button.-color_accent_alt {background-color: #ffdeeb}
+
+.button.-color_neutral,
+.button.-color_neutral_primary,
+.button.-color_neutral_accent {background-color: #fff; background-color: var(--color_page);}
+
+.button.-color_marginal,
+.button.-color_marginal_primary,
+.button.-color_marginal_accent {background-color: #e2e4e8; background-color: var(--color_marginal);}
+
+
+
+.button.-color_neutral,
+.button.-color_neutral_primary,
+.button.-color_neutral_accent {box-shadow: 0 1px 2px #b3b3b3, 0 0 3px #ccc}
+
+
+.button.-color_telegram {
+	font-size: 13px;
+	background-image: radial-gradient(circle at 50% 0, #38b0e3, #1d93d2);
+	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.22);
+}
+
+.button.-color_vk {background-color: #4c75a3}
+.button.-color_google {background-color: #dd4b39}
+.button.-color_facebook {background-color: #3b5999}
+.button.-color_yandex {background-color: #ffdb4d}
+
+
+
+.button:not(:disabled).-color_default.-color_default:hover,
+.button:not(:disabled).-color_default.-color_default:focus {background-color: #f1f1f1}
+.button:not(:disabled)[class*="-color_"]:hover,
+.button:not(:disabled)[class*="-color_"]:focus {box-shadow: 0 1px 6px #b3b3b3}
+
+.button:not(:disabled).-color_default:hover,
+.button:not(:disabled).-color_marginal:hover,
+.button:not(:disabled).-color_marginal_primary:hover,
+.button:not(:disabled).-color_marginal_accent:hover,
+.button:not(:disabled).-color_accent_alt:hover,
+.button:not(:disabled).-color_default:focus,
+.button:not(:disabled).-color_marginal:focus,
+.button:not(:disabled).-color_marginal_primary:focus,
+.button:not(:disabled).-color_marginal_accent:focus,
+.button:not(:disabled).-color_accent_alt:focus {box-shadow: none}
+
+.button:not(:disabled).-color_accent_alt:hover,
+.button:not(:disabled).-color_accent_alt:focus {box-shadow: 0 1px 6px #e8b7b7}
+
+.button:not(:disabled).-color_marginal:hover,
+.button:not(:disabled).-color_marginal_primary:hover,
+.button:not(:disabled).-color_marginal_accent:hover,
+.button:not(:disabled).-color_marginal:focus,
+.button:not(:disabled).-color_marginal_primary:focus,
+.button:not(:disabled).-color_marginal_accent:focus {background-color: #ebedef}
+
+
+.button.-bordered {border: 1px solid}
+
+.button:disabled,
+.button.-status_disabled {
+	pointer-events: none;
+	cursor: default;
+	color: #9fa6b3;
+	color: var(--color_primary_50);
+	opacity: .4;
+	box-shadow: none;
+}
+.button:disabled.-color_accent,
+.button:disabled.-color_bubblegum,
+.button:disabled.-color_franklin,
+.button.-status_disabled.-color_accent,
+.button.-status_disabled.-color_bubblegum,
+.button.-status_disabled.-color_franklin {color: #fff}
+
+/* TODO: Ripple on checkboxes and radios */
+
+.ripple {
+	position: absolute;
+	display: block;
+	border-radius: 100%;
+	background-color: hsla(0,0%,100%,.7);
+	-webkit-transform: scale(0);
+	-moz-transform: scale(0);
+	-ms-transform: scale(0);
+	-o-transform: scale(0);
+	transform: scale(0);
+	z-index: -1;
+}
+.ripple.animate {animation: ripple .65s linear;}
+@keyframes ripple {
+	100% {
+		opacity: 0;
+		-webkit-transform: scale(2.5);
+		-moz-transform: scale(2.5);
+		-ms-transform: scale(2.5);
+		-o-transform: scale(2.5);
+		transform: scale(2.5);
+	}
+}
+
+.button.-color_primary > .ripple,
+.button.-color_accent > .ripple,
+.button.-color_default > .ripple,
+.button.-color_neutral_alt > .ripple {background-color: #fff}
+
+.button.-color_primary_alt > .ripple,
+.button.-color_accent_alt > .ripple,
+.button.-color_neutral > .ripple,
+.button.-color_marginal > .ripple,
+.button.-color_neutral_primary > .ripple,
+.button.-color_marginal_primary > .ripple {background-color: #c5c9d1; background-color: var(--color_primary_30)}
+
+.button.-color_neutral_accent > .ripple,
+.button.-color_marginal_accent > .ripple {background-color: #ff5f9e; background-color: var(--color_accent_alt)}
+
+.-state_admin .button.-color_neutral_accent > .ripple,
+.-state_admin .button.-color_marginal_accent > .ripple {background-color: #23d792}
+
+
+.button.-state_unselectable {cursor: default}
+.button.-state_unselectable[class*="-color_"]:hover {box-shadow: none}
+.button.-state_unselectable > .ripple,
+.-state_admin .button.-state_unselectable > .ripple {background-color: transparent}

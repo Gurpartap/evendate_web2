@@ -1,0 +1,25 @@
+.org_admin_crm_page {
+	margin: 18px 0;
+}
+
+.org_admin_crm_page_table_wrapper.-status_disabled {opacity: .3}
+
+.org_admin_crm_page_header {
+	display: flex;
+	justify-content: space-between;
+	padding: 16px 24px;
+}
+
+.org_admin_crm_page_header_wrapper {
+	display: flex;
+	align-items: center;
+}
+
+.org_admin_crm_page_title {
+	margin: 0;
+}
+
+.org_admin_crm_page_table_search_block {
+	margin-left: 36px;
+	width: 250px;
+}

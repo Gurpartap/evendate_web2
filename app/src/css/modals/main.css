@@ -1,0 +1,119 @@
+body.-open_modal {overflow: hidden}
+html.-noscroll {
+	position: fixed;
+	overflow-y: scroll;
+	width: 100%;
+}
+
+.modal_wrapper {
+	position: fixed;
+	top: 0;
+	left: 0;
+	display: block;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	outline: 0;
+	text-align: center;
+	-webkit-overflow-scrolling: touch;
+	background-color: hsla(218,24%,32%,.6);
+	z-index: 1050;
+}
+
+.modal_destroyer {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+}
+
+.modal_unit {
+	/*display: block;*/
+	/*width: 800px;*/
+	display: inline-block;
+	max-width: 80%;
+	margin: 100px auto;
+	text-align: left;
+}
+
+.modal_unit.-fixed {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	margin: auto;
+	overflow: hidden;
+}
+
+.modal_unit.-size_wide {width: 80%}
+.modal_unit.-size_narrow {width: 400px}
+.modal_unit.-size_tiny {width: 280px}
+.modal_unit.-size_responsive {
+	display: inline-block;
+	width: auto;
+	max-width: 80%;
+}
+
+.modal_wrapper,
+.modal_unit {
+	-webkit-transition: opacity .2s ease, visibility .2s ease;
+	-moz-transition: opacity .2s ease, visibility .2s ease;
+	-o-transition: opacity .2s ease, visibility .2s ease;
+	transition: opacity .2s ease, visibility .2s ease;
+}
+
+.modal_wrapper,
+.modal_unit.-faded {
+	opacity: 0;
+	visibility: hidden;
+}
+
+.modal_unit,
+body.-open_modal > .modal_wrapper {
+	opacity: 1;
+	visibility: visible;
+}
+
+.modal_header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	min-height: 60px;
+	padding-left: 18px;
+	font-size: 1em;
+	font-weight: 500;
+	line-height: 1.5;
+	color: #3e4d66;
+	color: var(--color_primary);
+}
+
+.-modal_destroyer {
+	width: 60px;
+	height: 60px;
+	font-size: 2.4em;
+	font-weight: 100;
+}
+.-modal_destroyer:hover {background-color: transparent !important}
+.-modal_destroyer > * {top: -1px}
+
+.modal_content {padding: 18px}
+.modal_content.-no_padding {padding: 0}
+
+.modal_content + .modal_content {margin-top: 36px}
+
+.modal_divider {
+	margin-bottom: 15px;
+	font-size: .88em;
+	font-weight: 500;
+	color: #9fa6b3;
+	color: var(--color_primary_50);
+	text-transform: uppercase;
+}
+
+.modal_footer {
+	padding: 12px 18px;
+	text-align: right;
+}
+
+.modal_footer > .button + .button {margin-left: .5em}

@@ -1,0 +1,46 @@
+.search_wrapper {
+	display: flex;
+	width: 100%;
+}
+
+.search_organizations {
+	position: fixed;
+	height: -webkit-calc(100% - 54px);
+	height: calc(100% - 54px);
+	border-right: 1px solid #B9BDC3;
+	width: 240px;
+}
+
+.search_organizations > .search_organizations_wrapper {
+	height: 100%;
+}
+
+.search_organizations_content {
+	padding: 30px 0;
+}
+
+.search_events {
+	max-height: 100%;
+	margin-left: 264px;
+	padding-top: 1px;
+}
+
+.search_organizations.-hidden + .search_events {
+	margin-left: 0;
+	margin-right: auto;
+}
+
+.search_result_block {
+	padding: 24px;
+	font-size: 14px;
+}
+
+.no_events {
+	padding-top: 50px;
+	text-align: center;
+}
+
+.search_organizations_content > .organization_item > .avatar_block > .avatar_name {
+	font-size: 1rem;
+	font-weight: 500;
+}

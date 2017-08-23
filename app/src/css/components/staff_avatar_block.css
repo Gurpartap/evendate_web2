@@ -1,0 +1,45 @@
+/**
+ * @requires avatar_block.css
+ */
+.staff_avatar_block {
+	display: flex;
+	align-items: stretch;
+	justify-content: space-between;
+}
+
+.staff_avatar_remove {
+	display: none;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	font-size: 1.3em;
+	color: #9fa6b3;
+	color: var(--color_primary_50);
+	opacity: 0;
+	cursor: pointer;
+}
+
+.staff_avatar_block.-can_edit > .staff_avatar_remove {display: flex}
+
+
+.staff_avatar_block:hover > .staff_avatar_remove {opacity: 1}
+
+.staff_avatar_remove:hover {
+	color: #00dc88;
+	color: var(--color_franklin);
+}
+
+
+
+.staff_avatar_block.-in_progress {
+	display: block;
+	width: 100%;
+	overflow: hidden;
+}
+
+.staff_avatar_block_shuttle {
+	display: flex;
+	align-items: center;
+	width: 200%;
+}

@@ -1,0 +1,93 @@
+.organization_info_page {
+	display: inline-block;
+	vertical-align: top;
+	width: 600px;
+	margin: 36px 0;
+	border-radius: 4px;
+	overflow: hidden;
+}
+
+.organization_background_image {cursor: pointer}
+.organization_background_image > img {width: 100%}
+
+.organization_description_block {padding: 24px 24px 12px}
+
+.organization_header {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	margin-bottom: 1em;
+}
+
+.organization_title_block {margin-right: 1em}
+.organization_title_block > .avatar.organization_avatar + .avatar_name {
+	font-size: 1.14rem;
+	font-weight: 700;
+}
+
+.organization_header_button {
+	height: 1.88rem;
+	flex: 0 0 130px;
+}
+
+.organization_description {margin-bottom: 1em}
+.organization_address {margin-top: .2rem}
+
+.organization_metas {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+.organization_meta {margin-right: 1.5em}
+.organization_meta:last-child {margin-right: 0}
+
+.organization_feed > .tabs_header {padding: 0 24px}
+
+.organization_feed_text {
+	border-top: 1px solid #eee;
+	margin-top: 24px;
+	padding: 36px 24px 12px;
+}
+
+
+
+.organization_subscribers_page {
+	display: inline-block;
+	vertical-align: top;
+	width: 300px;
+	margin: 36px 0 0 60px;
+	border-radius: 4px;
+}
+
+.organization_subscribers_page.-fixed {
+	position: fixed;
+	height: -webkit-calc(100% - 140px);
+	height: calc(100% - 140px);
+	overflow: hidden;
+}
+
+.organization_subscribers_header {
+	height: 45px;
+	padding: 10px 12px;
+	border-bottom: 1px solid #ddd;
+}
+
+.organization_subscribers_header_text {
+	vertical-align: middle;
+	font-size: 0.85em;
+	font-weight: 500;
+}
+
+.organization_subscribers_wrapper {
+	height: -webkit-calc(100% - 45px);
+	height: calc(100% - 45px);
+	overflow-y: auto;
+}
+
+.organization_subscribers_divider {
+	display: block;
+	padding: 12px 18px;
+	margin: 0;
+	font-size: .85em;
+	font-weight: 500;
+}

@@ -1,0 +1,82 @@
+.order_page {
+	max-width: 600px;
+	padding: 18px;
+	margin: 42px auto;
+}
+
+.order_page_subtitle {
+	margin-bottom: 36px;
+	font-size: 1.5em;
+	font-weight: 500;
+	color: #f82969;
+	color: var(--color_accent);
+	text-align: left;
+}
+
+.order_form.-disabled {
+	opacity: .1;
+}
+
+
+.order_ticket_type_divider {
+	margin: 16px 0 24px;
+}
+
+.order_ticket_type_header {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	margin-bottom: 6px;
+}
+
+.order_ticket_type_title {
+	font-weight: bold;
+}
+
+.order_ticket_type_sum,
+.order_ticket_type_title,
+.order_ticket_type_description {
+	color: #2e3b50;
+	color: var(--color_dark_primary);
+
+}
+
+.order_ticket_type_price {
+	font-size: 0.875em;
+	font-weight: bold;
+	color: #f82969;
+	color: var(--color_accent);
+}
+
+.order_ticket_type_sum {
+	font-weight: 500;
+}
+
+.order_ticket_type_footer {
+	display: flex;
+	justify-content: space-between;
+	min-height: 1.3em;
+	margin-top: 12px;
+}
+
+.order_ticket_types_footer {
+	margin: 12px 0 42px;
+	text-align: right;
+}
+
+.order_registration_fields {
+	padding: 24px 0;
+	margin: 12px 0;
+}
+
+.order_page_footer {
+	margin-top: 24px;
+}
+
+.order_page_buttons {
+	display: inline-block;
+}
+
+.order_page_contact {
+
+}

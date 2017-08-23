@@ -1,0 +1,33 @@
+#download_app_band {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	padding: 54px;
+	text-align: center;
+	z-index: 20;
+
+	transform: translateY(-110%);
+	transition: transform .4s ease;
+}
+
+#download_app_band.-open_band {transform: translateY(0)}
+
+#download_app_wrapper > * {
+	vertical-align: middle;
+}
+
+#download_app_wrapper > span {
+	display: inline-block;
+}
+
+#download_app_close_button {
+	position: absolute;
+	top: 0;
+	right: 0;
+	font-size: 2em;
+	width: 54px;
+	height: 54px;
+	border: 0;
+	background-color: transparent;
+}

@@ -1,0 +1,111 @@
+.orgstat_overview {
+	display: flex;
+	margin: 20px 0;
+}
+
+.orgstat_overview_sidebar {
+	flex: 0 0 300px;
+	width: 300px;
+	padding: 0 24px;
+	border-right: 1px solid #d6d6d6;
+	background-color: #fcfcfc;
+}
+
+.orgstat_overview_content {
+	width: -webkit-calc(100% - 300px);
+	width: calc(100% - 300px);
+	margin-left: -1px;
+	border-left: 1px solid #d6d6d6;
+}
+
+.orgstat_overview_sidebar_header {
+	padding: 12px 0;
+}
+
+.orgstat_overview_sidebar_header > .stamp {
+	position: absolute;
+	right: 0;
+}
+
+.orgstat_overview_sidebar_top > .avatar_block {margin-bottom: 12px}
+
+.orgstat_overview_sidebar_top > .avatar_block > .avatar_name {
+	margin-top: 24px;
+	font-size: 1.125em;
+	font-weight: bold;
+}
+
+.orgstat_overview_sidebar_wrapper {padding: 24px 0}
+.orgstat_overview_sidebar_wrapper + .orgstat_overview_sidebar_wrapper {border-top: 2px solid #d6d6d6}
+
+.orgstat_overview_sidebar_about .user_tombstone_title {
+	margin-top: 24px;
+	font-size: 18px;
+	font-weight: 700;
+}
+
+.orgstat_overview_sidebar_about > .user_tombstone {
+	margin-bottom: 0;
+}
+
+.orgstat_overview_sidebar_description,
+.orgstat_overview_sidebar_location {
+	margin: 24px 0;
+	font-size: 13px;
+	line-height: 1.4;
+	font-weight: 400;
+}
+
+.orgstat_overview_sidebar_wrapper > .staff_avatar_block {
+	padding: 6px 0;
+	font-weight: 400;
+}
+
+.orgstat_event_block {
+	display: flex;
+	margin: 24px 0;
+	font-size: 14px;
+}
+
+.orgstat_event_block_date {
+	width: 60px;
+	flex-shrink: 0;
+	font-size: 14px;
+	font-weight: 700;
+	color: #9fa6b3;
+	color: var(--color_primary_50);
+	text-align: center;
+	text-transform: uppercase;
+}
+
+.orgstat_event_block_badge {
+	padding: 4px 12px;
+	font-size: 12px;
+	font-weight: 500;
+	color: #fff;
+	border-radius: 2px;
+	background-color: #9fa6b3;
+	background-color: var(--color_primary_50);
+}
+
+.orgstat_overview_header {
+	display: flex;
+	align-items: center;
+	height: 145px;
+	border-bottom: 1px solid #d6d6d6;
+}
+
+.orgstat_overview_header > .scoreboard {
+	flex: 1 25%;
+	height: 100px;
+	text-align: center;
+}
+
+.orgstat_overview_header > .scoreboard + .scoreboard {margin-left: 12px}
+
+.orgstat_overview_charts {padding: 48px 24px}
+
+.orgstat_overview_chart {
+	height: 460px;
+	margin-bottom: 60px;
+}

@@ -1,0 +1,9 @@
+.tag_unit {
+	display: inline-block;
+	vertical-align: middle;
+	padding: 4px 6px;
+	margin: 0 6px 6px 0;
+	border-radius: 2px;
+	background-color: #fff;
+	box-shadow: 0 0 4px 0 hsla(0,0%,0%,.2);
+}

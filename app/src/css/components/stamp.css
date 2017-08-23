@@ -1,0 +1,42 @@
+.stamp {
+	display: inline-block;
+	vertical-align: middle;
+	padding: 4px 12px;
+	font-size: 12px;
+	font-weight: 500;
+	text-transform: uppercase;
+	border-radius: 50px;
+	-webkit-transition: color .4s ease, background-color .4s ease;
+	-moz-transition: color .4s ease, background-color .4s ease;
+	-ms-transition: color .4s ease, background-color .4s ease;
+	-o-transition: color .4s ease, background-color .4s ease;
+	transition: color .4s ease, background-color .4s ease;
+}
+
+.stamp.-color_primary,
+.stamp.-color_accent,
+.stamp.-color_accent_alt {color: #fff}
+
+.stamp.-color_primary {background-color: #3e4d66; background-color: var(--color_primary);}
+.stamp.-color_accent {background-color: #f82969; background-color: var(--color_accent);}
+.stamp.-color_accent_alt {background-color: #ff5f9e; background-color: var(--color_accent_alt);}
+.-state_admin .stamp.-color_accent {background-color: #00dc88}
+.-state_admin .stamp.-color_accent_alt {background-color: #23d792}
+
+
+.stamp.-color_marginal,
+.stamp.-color_neutral {color: #657184; color: var(--color_primary_80);}
+.stamp.-color_neutral_primary,
+.stamp.-color_marginal_primary {color: #3e4d66; color: var(--color_primary);}
+.stamp.-color_neutral_accent,
+.stamp.-color_marginal_accent {color: #f82969; color: var(--color_accent);}
+.-state_admin .stamp.-color_neutral_accent,
+.-state_admin .stamp.-color_marginal_accent {color: #00dc88}
+
+.stamp.-color_neutral,
+.stamp.-color_neutral_primary,
+.stamp.-color_neutral_accent {background-color: #fff}
+
+.stamp.-color_marginal,
+.stamp.-color_marginal_primary,
+.stamp.-color_marginal_accent {background-color: #e0e0e0}

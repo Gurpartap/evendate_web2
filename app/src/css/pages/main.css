@@ -1,0 +1,19 @@
+.page_wrapper {
+	width: 1062px;
+	margin: auto;
+	padding-top: 1px;
+}
+
+.page {
+	background-color: #fff;
+	background-color: var(--color_page);
+	box-shadow: 0 2px 6px hsla(0,0%,0%,.28);
+	border-radius: 2px;
+}
+
+.side_page {
+	display: inline-block;
+	vertical-align: top;
+	width: 300px;
+}
+.page + .side_page {margin-left: 60px}

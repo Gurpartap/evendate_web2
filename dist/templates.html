@@ -77,6 +77,10 @@
 	<a href="{page}" class="link {classes} Link" {dataset} {attributes}>{title}</a>
 </script>
 
+<script type="javascript/template" id="tmpl-link-button">
+	<a href="{page}" class="button {classes} Link" {dataset} {attributes}>{title}</a>
+</script>
+
 <script type="javascript/template" id="tmpl-action-link">
 	<a href="{href}" class="action {classes}" {dataset} {attributes}>{title}</a>
 </script>
@@ -2121,7 +2125,7 @@
 					{dates_block}
 				</div>
 				<div class="eventstat_overview_buttons">
-					<a href="/event/{id}" class="button -size_low -color_neutral RippleEffect link Link">Перейти на страницу</a>
+					<a href="/event/{id}" class="button -size_low -color_neutral RippleEffect Link">Перейти на страницу</a>
 				</div>
 			</div>
 			<div class="eventstat_overview_header_block eventstat_overview_scoreboards_wrapper">
@@ -2394,7 +2398,7 @@
 				<p class="small_title">{name}</p>
 				<p class="orgstat_overview_sidebar_description">{description}</p>
 				<p class="orgstat_overview_sidebar_location">{default_address}</p>
-				<a href="/admin/organization/{id}/edit" class="button -color_neutral -size_low fa_icon fa-pencil RippleEffect link Link"><span class="Text">Редактировать</span></a>
+				<a href="/admin/organization/{id}/edit" class="button -color_neutral -size_low fa_icon fa-pencil RippleEffect Link"><span class="Text">Редактировать</span></a>
 			</div>
 			<div class="orgstat_overview_sidebar_wrapper -align_center -hidden">
 				<button class="button -color_telegram -size_low fa_icon fa-send RippleEffect" type="button"><span class="Text">Создать Telegram бота</span></button>

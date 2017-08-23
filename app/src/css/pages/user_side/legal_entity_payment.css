@@ -1,0 +1,10 @@
+.legal_entity_payment_page {
+	max-width: 800px;
+	margin: 48px auto;
+	padding: 24px 36px 48px;
+}
+
+.legal_entity_payment_footer {
+	text-align: center;
+	margin: 48px auto;
+}

@@ -1,0 +1,42 @@
+.event_admin_orders_page {
+	margin: 18px 0;
+}
+
+.event_admin_orders_page_header {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	padding: 12px 18px;
+}
+
+.event_admin_orders_page_header_wrapper {
+	display: flex;
+}
+
+.event_admin_orders_page_header_wrapper > .button {margin-right: 12px}
+
+.event_admin_orders_page_table_search_block {
+	width: 250px;
+}
+
+
+.event_admin_orders_page_table_child_row {
+	padding-left: 50px;
+	font-size: .875em;
+}
+
+.event_admin_orders_page_table_child_row .child_ladder.child_ladder {padding-left: 0}
+
+.event_admin_orders_page_table_child_row .child_ladder:before {
+	content: '';
+	position: absolute;
+	display: block;
+	height: 100%;
+	width: 15px;
+	border-left: 1px solid;
+	border-bottom: 1px solid;
+	border-color: #9fa6b3;
+	border-color: var(--color_primary_50);
+	transform: translate(-24.5px, -85%);
+	z-index: 40;
+}

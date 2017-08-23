@@ -238,6 +238,21 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @param {...buildProps} props
+	 * @param {string} props.page
+	 * @param {string} props.title
+	 *
+	 * @returns {jQuery}
+	 */
+	Builder.prototype.linkButton = function buildLinkButton(props) {
+		
+		return bindPageLinks(tmpl('link-button', [].map.call(arguments, function(arg) {
+			
+			return Builder.normalizeBuildProps(arg);
+		})));
+	};
+	/**
+	 *
 	 * @param {string} href
 	 * @param {string} title
 	 * @param {(string|Array<string>)} [classes]

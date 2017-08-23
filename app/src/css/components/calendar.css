@@ -1,0 +1,75 @@
+.calendar_wrapper {
+	min-height: -webkit-calc(2.4em * 7 + 3em); /* To make calendar with similar height either with 5 or 6 weeks */
+	min-height: calc((2.4em * 7) + 3em); /* 2.4em - cell height, 5px - cell spacing and 3em for header height */
+	cursor: default;
+}
+
+.calendar_wrapper {
+	display: inline-block;
+	font-size: 0.8rem;
+}
+
+.calendar_header {
+	padding: 0 7px;
+	font-weight: 500;
+	color: #f82969;
+	color: var(--color_accent);
+	text-align: center;
+}
+
+.-state_admin .calendar_header {color: #00dc88}
+
+.calendar_prev_btn,
+.calendar_next_btn {
+	display: inline-block;
+	vertical-align: middle;
+	width: 2em;
+	height: 2em;
+	font-size: 1em;
+	color: inherit;
+	border: 0;
+	border-radius: 2px;
+	background-color: transparent;
+	cursor: pointer;
+}
+
+.calendar_month_name {
+	display: inline-block;
+	vertical-align: middle;
+	width: -webkit-calc(100% - 5em);
+	width: calc(100% - 5em);
+	padding: .5em;
+	margin: 0 .5em;
+	font-size: 1.1em;
+	border-radius: 2px;
+	text-transform: uppercase;
+
+}
+.-month_selection .calendar_month_name {cursor: pointer}
+
+
+
+.calendar_month {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+
+.calendar_cell {
+	width: 2.4em;
+	height: 2.4em;
+	text-align: center;
+}
+
+.calendar_cell.-active {
+	color: #fff;
+	background-color: #657184;
+	background-color: var(--color_primary_80);
+}
+.-weekday_selection .calendar_weekday {cursor: pointer}
+
+.calendar_day:not(.-disabled) {cursor: pointer}
+.calendar_day.not_this_month,
+.calendar_day.-disabled,
+.event_calendar_day.not_this_month,
+.event_calendar_day.-disabled {opacity: .5}
