@@ -97,7 +97,7 @@ if( vidContainer2 != null ) {
 
 
 /******************** GOOGLE MAP ********************/
-var initMapBig = function() {
+var initMapBig = function(data) {
    var where = {lat: -37.8174061, lng: 144.956432};
    var map = new google.maps.Map(document.getElementById('mapBig'), {
       zoom: 17,
@@ -346,37 +346,7 @@ function validateEmail(email) {
 | SUBSCRIBE OR CONTACT FORMS
 |----------------------------------------------------------------------------
 */
-/******************** AJAX SUBSCRIBE LOCAL STORAGE ********************/
-$("#subscribe-local").on('submit', function(e) {
-   e.preventDefault();
-   var data = {
-      email: $(this).find('input[name="email"]').val()
-   };
 
-   if ( validateEmail(data.email) ) {
-      $.ajax({
-         type: "POST",
-         url: $(this).attr('action'),
-         data: data,
-         success: function() {
-            $('.success-msg').fadeIn(1000);
-            $('.error-msg').fadeOut(500);
-         }
-      });
-   } else {
-      $('.error-msg').fadeIn(1000);
-      $('.success-msg').fadeOut(500);
-   }
-
-return false;
-});
-
-
-/******************** AJAX MAILCHIMP SUBSCRIBE ********************/
-$("#subscribe-mailchimp").ajaxChimp({
-    callback: mailchimpCallback,
-    url: "http://bdpark.us7.list-manage1.com/subscribe/post?u=d6649e6cfae99f3bc710a85a5&id=07db0b4bd6" // Replace your mailchimp post url inside double quote "".  
-});
 
 function mailchimpCallback(resp) {
    var error_msg = $('#subscribe-mailchimp').find('.error-msg');
@@ -756,3 +726,23 @@ $(".food-order").on('submit', function () {
 });
 
 });
+
+
+
+function searchToObject() {
+    var pairs = window.location.search.substring(1).split("&"),
+        obj = {},
+        pair,
+        i;
+
+    for (i in pairs) {
+        if (pairs.hasOwnProperty(i)) {
+            if (pairs[i] === "") continue;
+
+            pair = pairs[i].split("=");
+            obj[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
+        }
+    }
+
+    return obj;
+}

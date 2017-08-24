@@ -53,15 +53,15 @@ CREATE OR REPLACE VIEW view_tickets_orders AS
     INNER JOIN tickets_orders_statuses ON tickets_orders_statuses.id =
                                           (CASE
                                            WHEN events.registration_approvement_required IS TRUE
-                                                AND ticket_orders.final_sum :: REAL = 0 :: REAL
+                                                AND COALESCE(ticket_orders.final_sum, money.sum) :: REAL = 0 :: REAL
                                                 AND ticket_orders.order_status_id = 4
                                              THEN 9 :: INT -- should not pay for tickets
 
-                                           WHEN ticket_orders.final_sum :: REAL > 0 :: REAL
+                                           WHEN COALESCE(ticket_orders.final_sum, money.sum) :: REAL > 0 :: REAL
                                                 AND st.payed > 0
                                              THEN 2 :: INT -- payed for tickets
 
-                                           WHEN ticket_orders.final_sum :: REAL > 0 :: REAL
+                                           WHEN COALESCE(ticket_orders.final_sum, money.sum) :: REAL > 0 :: REAL
                                                 AND (st.payed = 0 OR st.payed IS NULL)
                                                 AND NOW() AT TIME ZONE 'UTC' - ticket_orders.created_at >
                                                     (SELECT e.booking_time * '1 hour' :: INTERVAL

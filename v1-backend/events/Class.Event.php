@@ -149,6 +149,7 @@ class Event extends AbstractEntity
 		'registration_available',
 		'ticketing_available',
 		'accept_bitcoins',
+		'booking_time',
 //		'registered_count',
 
 		self::IS_FAVORITE_FIELD_NAME => '(SELECT id IS NOT NULL
@@ -1887,16 +1888,11 @@ class Event extends AbstractEntity
 		}
 
 		$_tickets = TicketsCollection::filter($this->db, $user, array('order' => $order), array())->getData();
-		$sum = 0;
-		foreach ($_tickets as $_ticket) {
-			$sum += (float)$_ticket['price'];
-		}
 
 		return new Result(true, '', array(
 			'registration_fields' => $return_fields,
 			'order' => $order->getParams($user, $order_cols)->getData(),
-			'tickets' => $_tickets,
-			'sum' => $sum
+			'tickets' => $_tickets
 		));
 	}
 

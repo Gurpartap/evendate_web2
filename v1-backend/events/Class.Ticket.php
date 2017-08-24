@@ -167,7 +167,7 @@ class Ticket extends AbstractEntity
 				$type = self::getTicketTypeInfo($event, $db, $ticket['uuid']);
 				self::checkTicketTypeData($type, $ticket, $db);
 
-				$tickets_count = $tickets['count'] ?? 1;
+				$tickets_count = $ticket['count'] ?? 1;
 				for($k = 0; $k < $tickets_count; $k++){
 					$result[] = self::create($event, $order_id, $db, $ticket);
 				}

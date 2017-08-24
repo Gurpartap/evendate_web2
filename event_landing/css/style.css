@@ -3326,7 +3326,7 @@ button:focus {
 /******************** SPEAKERS 1 ********************/
 .speakers-1 {
   padding-top: 120px;
-  padding-bottom: 100px;
+  padding-bottom: 80px;
 }
 .speakers-1 .hero-tabs {
   position: relative;
@@ -3549,7 +3549,7 @@ button:focus {
 }
 /******************** SPONSORS ********************/
 .sponsors-1 {
-  padding-top: 95px;
+  padding-top: 125px;
   padding-bottom: 100px;
 }
 .sponsors-1 .client-logo {

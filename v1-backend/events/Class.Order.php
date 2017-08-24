@@ -106,7 +106,7 @@ class Order extends AbstractEntity
 		'number',
 		'status_name',
 		'sum',
-		'final_sum',
+		'final_sum'
 	);
 
 	protected static $ADDITIONAL_COLS = array(

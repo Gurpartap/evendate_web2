@@ -1,28 +1,3 @@
-.demo-style-switch {
-    font-family: inherit !important;
-    font-family: "Helvetica Neue", Helvetica, sans-serif !important;
-    font-family: opacity: 1;
-    position: fixed;
-    z-index: 9999;
-    top: 85px;
-    left: -222px;
-    background: #FFFFFF;
-    -webkit-backface-visibility: hidden;
-}
-
-.demo-style-switch:hover {
-    opacity: 1 !important;
-}
-
-.demo-style-switch .switched-options {
-    position: relative;
-    width: 220px;
-    text-align: left;
-    padding: 20px;
-    -webkit-box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.3);
-    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.3);
-}
-
 .demo-style-switch .config-title {
     font-family: "Helvetica Neue", Helvetica, sans-serif !important;
     text-transform: uppercase;
@@ -181,7 +156,7 @@
 }
 
 [contenteditable]:focus {
-    outline: 1px dashed #00cdaf;
+    outline: 1px dashed var(--base);
 }
 
 .add-new-speaker {
@@ -273,7 +248,6 @@
     left: calc((100% - 240px) / 2);
 }
 
-
 .item-remover {
     float: right;
     top: -20px;
@@ -291,7 +265,7 @@
 
 .recap-gallery-item {
     float: left;
-     width: 100% !important;
+    width: 100% !important;
     margin-bottom: 0;
 }
 
@@ -315,7 +289,7 @@
     right: -340px;
     bottom: 0;
     z-index: 99999;
-	overflow: auto;
+    overflow: auto;
 }
 
 .board-menu-container {
@@ -431,7 +405,7 @@
     cursor: pointer;
 }
 
-.board-menu-header-divider{
+.board-menu-header-divider {
     background: #D6DADC;
     border: 0;
     color: #D6DADC;
@@ -440,18 +414,17 @@
     width: 100%;
 }
 
-.event-home-1.polygon-bg::before{
+.event-home-1.polygon-bg::before {
     position: absolute;
     width: 100%;
     height: 100%;
     top: 0;
     background-color: rgba(var(--base-num), var(--overlay-opacity));
     content: ' ';
-
     left: 0;
 }
 
-.board-header-btn {
+.board-settings-btn {
     background: 0 0;
     border-radius: 3px;
     color: #f6f6f6;
@@ -473,16 +446,140 @@
     -webkit-transition-timing-function: ease-in;
     transition-timing-function: ease-in;
     right: 60px;
-    top: -80px;
+    top: -110px;
     padding-right: 10px;
 }
 
-.board-header-btn:hover{
-    background: rgba(0,0,0,.1);
+.board-settings-btn.mod-add-block {
+    float: right;
+    right: 60px;
+}
+
+.board-settings-btn:hover {
+    background: rgba(0, 0, 0, .1);
     color: rgb(255, 255, 255);
+    cursor: pointer;
+}
+
+.not-main.board-settings-btn {
+    color: #fff;
+    background-color: var(--base);
+    font-size: 15px;
+}
+
+.not-main.board-settings-btn:hover {
+    background-color: var(--base-transparent-07);
+    color: #fff;
     cursor: pointer;
 }
 
 .u-text-underline {
     text-decoration: underline;
+}
+
+/**/
+.speakers-1 .hero-tabs li.active .speaker-intro:after {
+    display: none;
+}
+
+.schedule-items-wrapper {
+    margin-top: 50px;
+}
+
+.show-hide-btn {
+    z-index: 100;
+}
+
+.hidden-overlay {
+    text-align: center;
+    display: none;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    clear: both;
+}
+
+.disabled .hidden-overlay {
+    display: block;
+}
+
+.disabled .container {
+    display: none;
+}
+
+section.disabled {
+    padding-top: 20px;
+    padding-bottom: 25px;
+}
+
+.disabled .board-settings-btn {
+    top: -10px;
+}
+
+.map-container .container {
+    width: 100%;
+    padding: 0;
+}
+
+.footers {
+    background-color: var(--base);
+    color: #fff;
+}
+
+.footers .copyright {
+    color: #fff;
+}
+
+.footers .copyright a {
+    color: #fff;
+}
+
+.footers .socialize a {
+    font-size: 30px;
+}
+
+.footers a {
+    color: #fff !important;;
+}
+
+.footers a:hover {
+    color: #e0e0e0 !important;
+}
+
+.board-settings-btn.footer-btn {
+    top: -60px;
+}
+
+.main-settings-btn {
+    opacity: 1 !important;
+    background: #FFF;
+    padding: 10px;
+    font-size: 27px;
+    padding-bottom: 5px;
+    color: #272727;
+    position: absolute;
+    overflow: hidden;
+    left: 0;
+    top: 143px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    position: fixed;
+    color: var(--base);
+    padding-top: 12px;
+    padding-bottom: 9px;
+    cursor: pointer;
+}
+
+.navbar-brand img {
+    height: 44px;
+    filter: progid:DXImageTransform.Microsoft.BasicImage(grayscale=1);
+    -webkit-filter: grayscale(1);
+    filter: grayscale(1);
+}
+
+.sponsors-1 .client-logo img{
+    opacity: 1;
+    max-height: 100%;
+    max-width: 100%;
+    cursor: pointer;
 }
