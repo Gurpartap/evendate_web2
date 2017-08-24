@@ -271,11 +271,27 @@ OrderPage = extending(Page, (function() {
 		
 		/**
 		 *
+		 * @param {boolean} [redirect_to_payment]
+		 * @param {string} [callback_url]
+		 *
 		 * @return {(boolean|jqPromise)}
 		 */
-		function makeOrder() {
+		function makeOrder(redirect_to_payment, callback_url) {
 			var $main_action_button = $(this),
-				$form = self.$wrapper.find('.OrderForm');
+				$form = self.$wrapper.find('.OrderForm'),
+				sum = self.$wrapper.find('.TicketsTotalSum'),
+				parsed_callback;
+			
+			if (!sum.length) {
+				sum = self.$wrapper.find('.TicketsOverallSum').text();
+			} else {
+				sum = sum.text();
+			}
+			
+			if (callback_url && sum == 0) {
+				parsed_callback = parseUri(callback_url);
+				callback_url = parsed_callback.wo_query + '?' + 'registration=free&' + parsed_callback.query
+			}
 			
 			if (__APP.USER.isLoggedOut()) {
 				(new AuthModal(window.location.href)).show();
@@ -283,6 +299,7 @@ OrderPage = extending(Page, (function() {
 				return false;
 			} else {
 				if (isFormValid($form)) {
+					
 					$main_action_button.attr('disabled', true);
 					
 					return self.event.makeOrder(
@@ -303,7 +320,9 @@ OrderPage = extending(Page, (function() {
 								value: field.value
 							};
 						}),
-						self.$wrapper.find('.PromocodeInput').val()
+						self.$wrapper.find('.PromocodeInput').val(),
+						redirect_to_payment && sum != 0,
+						callback_url
 					).always(function(data) {
 						$main_action_button.removeAttr('disabled');
 						
@@ -338,22 +357,27 @@ OrderPage = extending(Page, (function() {
 		}
 		
 		this.render_vars.main_action_button.on('click.MakeOrder', function() {
-			var result = makeOrder();
+			var result;
 			
-			if (result !== false) {
-				result.done(function(data) {
-					var is_custom_callback = !!parsed_uri.queryKey['away_to'],
-						callback_url = parsed_uri.queryKey['away_to'] || '/event/' + self.event.id;
-					
-					if (self.event.ticketing_locally && data.sum !== 0) {
-						Payment.doPayment('order-' + data.order.uuid, data.sum, is_custom_callback ? callback_url : (window.location.origin + callback_url));
-					} else if (is_custom_callback) {
-						window.location = callback_url + '?registration=free';
-					} else {
-						__APP.changeState(callback_url);
-						showNotifier({text: 'Регистрация прошла успешно', status: true});
-					}
-				})
+			if (__APP.IS_WIDGET) {
+				makeOrder(self.event.ticketing_locally ? __APP.IS_WIDGET : false, parsed_uri.queryKey['away_to'] || location.hostname + '/event/' + self.event.id);
+			} else {
+				result = makeOrder();
+				if (result !== false) {
+					result.done(function(data) {
+						var is_custom_callback = !!parsed_uri.queryKey['away_to'],
+							callback_url = parsed_uri.queryKey['away_to'] || '/event/' + self.event.id;
+						
+						if (self.event.ticketing_locally && data.sum !== 0) {
+							Payment.doPayment('order-' + data.order.uuid, data.sum, is_custom_callback ? callback_url : (window.location.origin + callback_url));
+						} else if (is_custom_callback) {
+							window.location = callback_url + '?registration=free';
+						} else {
+							__APP.changeState(callback_url);
+							showNotifier({text: 'Регистрация прошла успешно', status: true});
+						}
+					})
+				}
 			}
 		});
 		

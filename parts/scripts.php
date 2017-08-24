@@ -6,9 +6,9 @@
 
 <?php
 if($DEBUG_MODE) { ?>
-	<script type="text/javascript" src="/dist/vendor.js?rev=ce329e452da318ccf5010f6a48949e03" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=b3e3e6da30f2700c242cfa7cab201a3a" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.js?rev=001417e40c91373add200e40150eab85" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.js?rev=4f633a3473c23cec497006842d96fcad" charset="utf-8"></script><?php
 } else { ?>
-	<script type="text/javascript" src="/dist/vendor.min.js?rev=7c41b0cde76839bc57caef45734b5396" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=55a97862dd911ff115579357fafe5512" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/vendor.min.js?rev=51bddeef87fb9dc89bbbfb7e333f579c" charset="utf-8"></script>
+	<script type="text/javascript" src="/dist/app.min.js?rev=eb48273613e9cb551f5be2a8b225469b" charset="utf-8"></script><?php
 } ?>

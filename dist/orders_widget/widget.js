@@ -43095,15 +43095,19 @@ OneEvent = extending(OneEntity, (function() {
 	 * @param {(string|number)} event_id
 	 * @param {Array<OrderTicketType>} tickets
 	 * @param {string} [promocode]
+	 * @param {boolean} [redirect_to_payment]
+	 * @param {string} [callback_url]
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneEvent.buyTickets = function(event_id, tickets, promocode, success) {
+	OneEvent.buyTickets = function(event_id, tickets, promocode, redirect_to_payment, callback_url, success) {
 		
 		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/orders', {
 			tickets: tickets,
-			promocode: promocode || null
+			promocode: promocode || null,
+			callback_url: callback_url,
+			redirect_to_payment: redirect_to_payment
 		}, true, success);
 	};
 	/**
@@ -43112,11 +43116,13 @@ OneEvent = extending(OneEntity, (function() {
 	 * @param {Array<OrderTicketType>} [tickets]
 	 * @param {Array<OrderRegistrationField>} [registration_fields]
 	 * @param {string} [promocode]
+	 * @param {boolean} [redirect_to_payment]
+	 * @param {string} [callback_url]
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneEvent.makeOrder = function(event_id, tickets, registration_fields, promocode, success) {
+	OneEvent.makeOrder = function(event_id, tickets, registration_fields, promocode, redirect_to_payment, callback_url, success) {
 		if (empty(tickets)) {
 			
 			return OneEvent.registerToEvent(event_id, registration_fields, success);
@@ -43124,13 +43130,15 @@ OneEvent = extending(OneEntity, (function() {
 		
 		if (empty(registration_fields)) {
 			
-			return OneEvent.buyTickets(event_id, tickets, success);
+			return OneEvent.buyTickets(event_id, tickets, promocode, redirect_to_payment, callback_url, success);
 		}
 		
 		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/orders', {
 			registration_fields: registration_fields,
 			tickets: tickets,
-			promocode: promocode || null
+			promocode: promocode || null,
+			callback_url: callback_url,
+			redirect_to_payment: redirect_to_payment
 		}, true, success);
 	};
 	/**
@@ -43242,27 +43250,31 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @param {Array<OrderTicketType>} tickets
 	 * @param {string} [promocode]
+	 * @param {boolean} [redirect_to_payment]
+	 * @param {string} [callback_url]
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneEvent.prototype.buyTickets = function(tickets, promocode, success) {
+	OneEvent.prototype.buyTickets = function(tickets, promocode, redirect_to_payment, callback_url, success) {
 		
-		return this.constructor.buyTickets(this.id, tickets, promocode, success);
+		return this.constructor.buyTickets(this.id, tickets, promocode, redirect_to_payment, callback_url, success);
 	};
 	/**
 	 *
 	 * @param {Array<OrderTicketType>} tickets
 	 * @param {Array<OrderRegistrationField>} registration_fields
 	 * @param {string} [promocode]
+	 * @param {boolean} [redirect_to_payment]
+	 * @param {string} [callback_url]
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneEvent.prototype.makeOrder = function(tickets, registration_fields, promocode, success) {
+	OneEvent.prototype.makeOrder = function(tickets, registration_fields, promocode, redirect_to_payment, callback_url, success) {
 		var self = this;
 		
-		return this.constructor.makeOrder(this.id, tickets, registration_fields, promocode, success).then(function(data) {
+		return this.constructor.makeOrder(this.id, tickets, registration_fields, promocode, redirect_to_payment, callback_url, success).then(function(data) {
 			var order = new OneOrder(self.id);
 			
 			order.setData($.extend({
@@ -46765,11 +46777,27 @@ OrderPage = extending(Page, (function() {
 		
 		/**
 		 *
+		 * @param {boolean} [redirect_to_payment]
+		 * @param {string} [callback_url]
+		 *
 		 * @return {(boolean|jqPromise)}
 		 */
-		function makeOrder() {
+		function makeOrder(redirect_to_payment, callback_url) {
 			var $main_action_button = $(this),
-				$form = self.$wrapper.find('.OrderForm');
+				$form = self.$wrapper.find('.OrderForm'),
+				sum = self.$wrapper.find('.TicketsTotalSum'),
+				parsed_callback;
+			
+			if (!sum.length) {
+				sum = self.$wrapper.find('.TicketsOverallSum').text();
+			} else {
+				sum = sum.text();
+			}
+			
+			if (callback_url && sum == 0) {
+				parsed_callback = parseUri(callback_url);
+				callback_url = parsed_callback.wo_query + '?' + 'registration=free&' + parsed_callback.query
+			}
 			
 			if (__APP.USER.isLoggedOut()) {
 				(new AuthModal(window.location.href)).show();
@@ -46777,6 +46805,7 @@ OrderPage = extending(Page, (function() {
 				return false;
 			} else {
 				if (isFormValid($form)) {
+					
 					$main_action_button.attr('disabled', true);
 					
 					return self.event.makeOrder(
@@ -46797,7 +46826,9 @@ OrderPage = extending(Page, (function() {
 								value: field.value
 							};
 						}),
-						self.$wrapper.find('.PromocodeInput').val()
+						self.$wrapper.find('.PromocodeInput').val(),
+						redirect_to_payment && sum != 0,
+						callback_url
 					).always(function(data) {
 						$main_action_button.removeAttr('disabled');
 						
@@ -46832,22 +46863,27 @@ OrderPage = extending(Page, (function() {
 		}
 		
 		this.render_vars.main_action_button.on('click.MakeOrder', function() {
-			var result = makeOrder();
+			var result;
 			
-			if (result !== false) {
-				result.done(function(data) {
-					var is_custom_callback = !!parsed_uri.queryKey['away_to'],
-						callback_url = parsed_uri.queryKey['away_to'] || '/event/' + self.event.id;
-					
-					if (self.event.ticketing_locally && data.sum !== 0) {
-						Payment.doPayment('order-' + data.order.uuid, data.sum, is_custom_callback ? callback_url : (window.location.origin + callback_url));
-					} else if (is_custom_callback) {
-						window.location = callback_url + '?registration=free';
-					} else {
-						__APP.changeState(callback_url);
-						showNotifier({text: 'Регистрация прошла успешно', status: true});
-					}
-				})
+			if (__APP.IS_WIDGET) {
+				makeOrder(self.event.ticketing_locally ? __APP.IS_WIDGET : false, parsed_uri.queryKey['away_to'] || location.hostname + '/event/' + self.event.id);
+			} else {
+				result = makeOrder();
+				if (result !== false) {
+					result.done(function(data) {
+						var is_custom_callback = !!parsed_uri.queryKey['away_to'],
+							callback_url = parsed_uri.queryKey['away_to'] || '/event/' + self.event.id;
+						
+						if (self.event.ticketing_locally && data.sum !== 0) {
+							Payment.doPayment('order-' + data.order.uuid, data.sum, is_custom_callback ? callback_url : (window.location.origin + callback_url));
+						} else if (is_custom_callback) {
+							window.location = callback_url + '?registration=free';
+						} else {
+							__APP.changeState(callback_url);
+							showNotifier({text: 'Регистрация прошла успешно', status: true});
+						}
+					})
+				}
 			}
 		});
 		
