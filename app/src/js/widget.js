@@ -28,6 +28,7 @@ __APP = {
 	},
 	MODALS: new Modals(),
 	BUILD: new Builder(),
+	IS_WIDGET: true,
 	/**
 	 * Changes title of the page
 	 * @param {(string|Array<{page: {string}, title: {string}}>|jQuery)} new_title

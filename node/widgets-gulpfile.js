@@ -18,6 +18,7 @@ var gulp = require('gulp'),
 		templates: [
 			templates_path + 'wrappers.html',
 			templates_path + 'commons.html',
+			templates_path + 'modals/commons.html',
 			templates_path + 'modals/auth.html',
 			templates_path + 'modals/bitcoin.html',
 			templates_path + 'pages/order.html',
@@ -66,6 +67,7 @@ var gulp = require('gulp'),
 			js_path + 'widget_init.js'
 		],
 		vendor_css: [
+			vendor_path + 'fontawesome/font-awesome.min.css',
 			vendor_path + 'pace/pace.css',
 			vendor_path + 'select2v3/select2.css',
 			vendor_path + 'jquery.suggestions/jquery.suggestions.css'

@@ -135,6 +135,7 @@ __APP = {
 	},
 	MODALS: new Modals(),
 	BUILD: new Builder(),
+	IS_WIDGET: false,
 	/**
 	 * Rendering header tabs
 	 * @param {(buildProps|Array<buildProps>)} tabs

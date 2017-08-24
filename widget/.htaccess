@@ -2,5 +2,6 @@
 	RewriteEngine On
 	RewriteCond %{REQUEST_FILENAME} !-d
 	RewriteCond %{REQUEST_FILENAME} !-f
-	RewriteRule ^([^/]*)/(.*)$ $1.php?q=$2
+	RewriteRule builder/(.*)/(.*)$ builder.js.php?type=$1&id=$2 [QSA,L]
+	RewriteRule ^([^/]*)/(.*)$ $1.php?q=$2 [QSA]
 </IfModule>

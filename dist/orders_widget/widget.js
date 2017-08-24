@@ -38609,13 +38609,18 @@ Payment = extending(AsynchronousConnection, (function() {
 	 * @param {string} [callback_url]
 	 */
 	Payment.doPayment = function(uuid, sum, callback_url) {
-		tmpl('payment-form', {
+		var $payment_form = tmpl('payment-form', {
 			customer_id: __APP.USER.full_name,
 			cps_email: __APP.USER.email,
 			callback_url: callback_url || location.href,
 			payment_uuid: uuid,
 			sum: sum
-		}, __APP.CURRENT_PAGE.$wrapper).submit().remove();
+		}, __APP.CURRENT_PAGE.$wrapper);
+		
+		if (__APP.IS_WIDGET) {
+			$payment_form.attr('target', '__blank');
+		}
+		$payment_form.submit().remove();
 	};
 	
 	return Payment;
@@ -47397,6 +47402,7 @@ __APP = {
 	},
 	MODALS: new Modals(),
 	BUILD: new Builder(),
+	IS_WIDGET: true,
 	/**
 	 * Changes title of the page
 	 * @param {(string|Array<{page: {string}, title: {string}}>|jQuery)} new_title
