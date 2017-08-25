@@ -11,6 +11,23 @@ function guid() {
         s4() + '-' + s4() + s4() + s4();
 }
 
+function getBase64(file, cb) {
+    var reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function () {
+        cb(null, reader.result);
+    };
+    reader.onerror = function (error) {
+        cb(error, null);
+        handleFileLoadErr(error);
+    };
+}
+
+function handleFileLoadErr(err){
+    console.log(err);
+    alert('Ошибка загрузки изображения');
+}
+
 var backgrounds = [
     {
         title: 'Без фона',
@@ -126,7 +143,16 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
             title: '',
             subtitle: '',
             location_addresses: '',
-            description: ''
+            description: '',
+            background_base64: null,
+            imageChange: function($files, $file){
+                var _header = this;
+                getBase64($file, function(err, res){
+                    if (res){
+                        _header.background_base64 = res;
+                    }
+                });
+            }
         },
         speakers: {
             title: 'Спикеры',
@@ -375,6 +401,15 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
             subtitle: 'Добавляйте фотографии за прошлые года или фотографии помещений',
             items: {},
             enabled: true,
+            background_base64: null,
+            imageChange: function($files, $file){
+                var _gallery = this;
+                getBase64($file, function(err, res){
+                    if (res){
+                        _gallery.background_base64 = res;
+                    }
+                });
+            },
             addItem: function () {
                 var item_uuid = guid(),
                     _scope = this;
@@ -612,7 +647,7 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
         console.log(data);
     };
 
-    $scope.setHeaderImage = function (url) {
+    $scope.setHeaderImage = function (url, file) {
         $('.polygon-bg').css('background-image', 'url(' + url + ')');
         $scope.data.main_background = url;
     };

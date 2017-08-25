@@ -153,6 +153,7 @@ switch ($_REQUEST['type']) {
 	iframe.setAttribute('width', props['width'] || '100%');
 	iframe.setAttribute('height', props['height'] || '500');
 
+	debugger;
 	document.currentScript.parentElement.insertBefore(iframe, document.currentScript);
 
 	evendateWidget = new EvendateWidgetBuilder(iframe);
