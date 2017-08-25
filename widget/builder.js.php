@@ -117,11 +117,12 @@ EvendateWidgetBuilder = (function() {
 	 * @param {string} color
 	 */
 	EvendateWidgetBuilder.prototype.setColor = function(color) {
+		color = '' + color;
 		if (color.indexOf('#') === -1) {
 			color = '#' + color;
 		}
 
-		this.window.document.style.setProperty('--color_accent', color);
+		this.window.document.body.style.setProperty('--color_accent', color);
 	};
 
 	return EvendateWidgetBuilder;
@@ -145,7 +146,6 @@ switch ($_REQUEST['type']) {
 		heightObserver;
 
 	iframe.setAttribute('src', '//<?=App::$DOMAIN?>/widget/order/event/' + id);
-	iframe.setAttribute('onLoad', 'alert(this.contentWindow.location);');
 	iframe.setAttribute('frameborder', '0');
 	iframe.setAttribute('scrolling', 'no');
 	iframe.style.display = 'block';
