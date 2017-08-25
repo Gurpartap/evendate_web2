@@ -459,20 +459,6 @@ return false;
 
 
 /******************** RESERVATION FORM ********************/
-if( $('#reservation-date') !== null ) {
-   $('#reservation-date').datetimepicker({
-      timepicker: false,
-      format: 'Y-m-d'
-   });
-}
-
-if( $('#reservation-time') !== null ) {
-   $('#reservation-time').datetimepicker({
-      datepicker: false,
-      format: 'h:i A'
-   });
-}
-
 $("#reservation form").on('submit', function(e) {
    e.preventDefault();
    var success_msg = $(this).find('.success-msg'),
@@ -536,12 +522,6 @@ $('.video-player').fitVids();
 
 /******************** PHOTOGRAPHY PORTFOLIO ********************/
 $('#photography-portfolio').mixItUp();
-
-
-/******************** COUNTDOWN TIMER ********************/
-$('#launch-timer').countdown('2016/02/21', function(event) {
-   $(this).html(event.strftime('<ul><li><span>%-D</span> day%!D</li><li><span>%H</span> hour%!H</li><li><span>%M</span> minute%!M</li></ul>'));
-});
 
 
 /******************** FOOD ORDER PROCESS ********************/

@@ -1,7 +1,7 @@
 <?php
 
 
-require_once '../v1-backend/bin/env_variables.php';
+require_once '../../../v1-backend/bin/env_variables.php';
 require_once "{$BACKEND_FULL_PATH}/bin/Class.Result.php";
 require_once "{$BACKEND_FULL_PATH}/bin/db.php";
 require_once "{$BACKEND_FULL_PATH}/bin/Class.RequestsParser.php";
@@ -44,8 +44,8 @@ if (App::$ENV == 'prod' || App::$ENV == 'test') {
 $url = parse_url($_SERVER['REQUEST_URI'])['path'];
 $url_parts = explode('/', $url);
 
-$event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description', 'organization_id', 'organization_logo_medium_url', 'organization_short_name'))
-	->getParams($user, array('description', 'organization_id', 'organization_logo_medium_url', 'organization_short_name'))->getData();
+$event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description'))
+  ->getParams($user, array('description'))->getData();
 
 ?>
 
@@ -63,10 +63,10 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
   <meta charset="utf-8">
 
   <!-- TITLE OF SITE -->
-  <title><?= $event['title'] ?></title>
+  <title><?=$event['title']?></title>
 
   <!-- META DATA -->
-  <meta name="description" content="<?= htmlentities($event['description']) ?>"/>
+  <meta name="description" content="<?=htmlentities($event['description'])?>"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
   <!-- =========================
@@ -130,7 +130,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 
       <!-- YOUR LOGO -->
       <a class="navbar-brand" href="#">
-        <img src="<?=$event['organization_logo_medium_url']?>" alt="">
+        <img src="images/logo-alt.png" alt="">
       </a>
     </div>
 
@@ -155,7 +155,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
      EVENT HOME 1
 ============================== -->
 <section class="home event-home-1 polygon-bg cover-bg" id="home">
-  <div ng-if="edit_mode" class="board-settings-btn mod-show-menu js-show-sidebar main-btn" href="#" data-panel-id="header-panel">
+  <div class="board-settings-btn mod-show-menu js-show-sidebar main-btn" href="#" data-panel-id="header-panel">
     <span class="fa fa-ellipsis-h"></span>
     <span class="board-header-btn-text u-text-underline">Настройки</span></div>
   <div class="container">
@@ -163,7 +163,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
       <div class="col-lg-8 col-md-10 col-lg-offset-2 col-md-offset-1 text-center">
         <div class="logo-home">
           <!-- REPLACE WITH YOUR LOGO -->
-<!--          <img src="" alt="">-->
+          <img src="images/logo-white.png" alt="Your Logo">
         </div>
 
         <p class="heading-pre-suf text-center text-uppercase" contenteditable="true" ng-model="data.header.title">
@@ -175,7 +175,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 
         <div class="home-download-btn">
 
-          <a href="" class="btn btn-white btn-lg" ng-if="data.tickets.enabled"><span>{{data.tickets.title}}</span></a>
+          <a href="" class="btn btn-white btn-lg"><span>Купить билеты</span></a>
           <!--<div class="stores-on text-center">-->
           <!--Hurry up!!! Only <strong>29</strong> left-->
           <!--</div>-->
@@ -200,8 +200,8 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 <!-- =========================
      SPEAKERS 
 ============================== -->
-<section ng-hide="!edit_mode && !data.speakers.enabled" class="speakers speakers-1 secondary-bg" id="speakers" ng-class="{'disabled': data.speakers.enabled == false}">
-  <div ng-if="edit_mode" ng-click="data.speakers.toggleEnabled();"
+<section class="speakers speakers-1 secondary-bg" id="speakers" ng-class="{'disabled': data.speakers.enabled == false}">
+  <div ng-click="data.speakers.toggleEnabled();"
        ng-title="data.speakers.enabled == true ? 'Скрыть блок' : 'Показать блок'"
        class="board-settings-btn mod-show-menu js-show-sidebar not-main show-hide-btn" href="#">
     <span class="board-header-btn-text">
@@ -209,16 +209,13 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
             ng-class="{'fa-eye-slash': data.speakers.enabled, 'fa-eye': data.speakers.enabled == false}"></span>
     </span>
   </div>
-  <div ng-if="edit_mode" ng-click="data.speakers.addItem();" title="Добавить блок"
+  <div ng-click="data.speakers.addItem();" title="Добавить блок"
        class="not-main board-settings-btn mod-add-block js-show-sidebar not-main" href="#">
     <span class="board-header-btn-text">
       <span class="fa fa-plus"></span> Добавить спикера
     </span>
   </div>
-  <div class="hidden-overlay">Блок <strong>{{data.speakers.title}}</strong> скрыт, <a href="#"
-                                                                                      ng-click="data.speakers.toggleEnabled();">нажмите
-      здесь</a>, чтобы сделать блок видимым для пользователей
-  </div>
+  <div class="hidden-overlay">Блок <strong>{{data.speakers.title}}</strong> скрыт, <a href="#" ng-click="data.speakers.toggleEnabled();">нажмите здесь</a>, чтобы сделать блок видимым для пользователей</div>
   <div class="container">
     <div class="row">
       <div class="col-lg-6 col-md-8 col-sm-10 col-lg-offset-3 col-md-offset-2 col-sm-offset-1">
@@ -247,7 +244,6 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
               <img
                 ngf-select=""
                 ngf-drop=""
-                ngf-no-object-url="true"
                 ng-model="speaker.image"
                 ngf-model-invalid="invalidFiles"
                 ngf-model-options="modelOptionsObj"
@@ -299,9 +295,8 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 <!-- =========================
      SCHEDULE 
 ============================== -->
-<section ng-hide="!edit_mode && !data.schedule.enabled" class="descriptions schedule white-bg padding-120-75" id="schedule"
-         ng-class="{'disabled': data.schedule.enabled == false}">
-  <div ng-if="edit_mode" ng-click="data.schedule.toggleEnabled();"
+<section class="descriptions schedule white-bg padding-120-75" id="schedule" ng-class="{'disabled': data.schedule.enabled == false}">
+  <div ng-click="data.schedule.toggleEnabled();"
        ng-title="data.schedule.enabled == true ? 'Скрыть блок' : 'Показать блок'"
        class="board-settings-btn mod-show-menu js-show-sidebar not-main" href="#">
     <span class="board-header-btn-text">
@@ -309,16 +304,13 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
             ng-class="{'fa-eye-slash': data.schedule.enabled, 'fa-eye': data.schedule.enabled == false}"></span>
     </span>
   </div>
-  <div ng-if="edit_mode" ng-click="data.schedule.addDay($event)" title="Добавить блок"
+  <div ng-click="data.schedule.addDay($event)" title="Добавить блок"
        class="not-main board-settings-btn mod-add-block js-show-sidebar not-main" href="#">
     <span class="board-header-btn-text">
       <span class="fa fa-plus"></span> Добавить день
     </span>
   </div>
-  <div class="hidden-overlay">Блок <strong>{{data.schedule.title}}</strong> скрыт, <a href="#"
-                                                                                      ng-click="data.schedule.toggleEnabled();">нажмите
-      здесь</a>, чтобы сделать блок видимым для пользователей
-  </div>
+  <div class="hidden-overlay">Блок <strong>{{data.schedule.title}}</strong> скрыт, <a href="#" ng-click="data.schedule.toggleEnabled();">нажмите здесь</a>, чтобы сделать блок видимым для пользователей</div>
   <div class="container">
     <div class="row">
       <div class="col-lg-6 col-md-8 col-sm-10 col-lg-offset-3 col-md-offset-2 col-sm-offset-1">
@@ -353,7 +345,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
           <div role="tabpanel" class="tab-pane fade in schedule-tab" id="day-{{_uuid}}"
                ng-repeat="(_uuid, _day) in data.schedule.days track by _uuid">
 
-            <div class="row" ng-if="edit_mode"> <!-- OBJECTIVE -->
+            <div class="row"> <!-- OBJECTIVE -->
               <div class="col-sm-offset-3 col-md-8 col-sm-8 mb50 add-new-objective" ng-click="_day.addItem()">
                 <div class="objective">
                   <i class="fa fa-plus add-icon" aria-hidden="true"></i>
@@ -408,19 +400,15 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 <!-- =========================
      CUSTOM BLOCK
 ============================== -->
-<section ng-hide="!edit_mode && !data.custom.enabled" class="testimonials testimonials-4 padding-120-75" id="custom-html"
-         ng-class="{'disabled': data.custom.enabled == false}">
-  <div ng-if="edit_mode" ng-click="data.custom.toggleEnabled();" ng-title="data.custom.enabled == true ? 'Скрыть блок' : 'Показать блок'"
+<section class="testimonials testimonials-4 padding-120-75" id="custom-html" ng-class="{'disabled': data.custom.enabled == false}">
+  <div ng-click="data.custom.toggleEnabled();" ng-title="data.custom.enabled == true ? 'Скрыть блок' : 'Показать блок'"
        class="board-settings-btn mod-show-menu js-show-sidebar not-main" href="#">
     <span class="board-header-btn-text">
       <span class="fa" ng-class="{'fa-eye-slash': data.custom.enabled, 'fa-eye': data.custom.enabled == false}"></span>
     </span>
   </div>
 
-  <div class="hidden-overlay">Блок <strong>{{data.custom.title}}</strong> скрыт, <a href="#"
-                                                                                    ng-click="data.custom.toggleEnabled();">нажмите
-      здесь</a>, чтобы сделать блок видимым для пользователей
-  </div>
+  <div class="hidden-overlay">Блок <strong>{{data.custom.title}}</strong> скрыт, <a href="#" ng-click="data.custom.toggleEnabled();">нажмите здесь</a>, чтобы сделать блок видимым для пользователей</div>
   <div class="container">
     <div class="row">
       <div class="col-lg-6 col-md-8 col-sm-10 col-lg-offset-3 col-md-offset-2 col-sm-offset-1">
@@ -436,7 +424,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
     </div>  <!-- /.row -->
 
     <div class="row">
-      <textarea class="textarea-html" ui-tinymce="tinymce_options" ng-model="data.custom.html" ng-if="edit_mode"></textarea>
+      <textarea class="textarea-html"></textarea>
     </div>  <!-- /.row -->
   </div>
 </section>
@@ -444,9 +432,8 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 <!-- =========================
      TESTIMONIALS
 ============================== -->
-<section ng-hide="!edit_mode && !data.testimonials.enabled" class="testimonials testimonials-4 secondary-bg padding-120-75" id="testimonials"
-         ng-class="{'disabled': data.testimonials.enabled == false}">
-  <div ng-if="edit_mode" ng-click="data.testimonials.toggleEnabled();"
+<section class="testimonials testimonials-4 secondary-bg padding-120-75" id="testimonials" ng-class="{'disabled': data.testimonials.enabled == false}">
+  <div ng-click="data.testimonials.toggleEnabled();"
        ng-title="data.testimonials.enabled == true ? 'Скрыть блок' : 'Показать блок'"
        class="board-settings-btn mod-show-menu js-show-sidebar not-main" href="#">
     <span class="board-header-btn-text">
@@ -454,16 +441,13 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
             ng-class="{'fa-eye-slash': data.testimonials.enabled, 'fa-eye': data.testimonials.enabled == false}"></span>
     </span>
   </div>
-  <div ng-if="edit_mode" ng-click="data.testimonials.addItem();" title="Добавить блок"
+  <div ng-click="data.testimonials.addItem();" title="Добавить блок"
        class="not-main board-settings-btn mod-add-block js-show-sidebar not-main" href="#">
     <span class="board-header-btn-text">
       <span class="fa fa-plus"></span> Добавить отзыв
     </span>
   </div>
-  <div class="hidden-overlay">Блок <strong>{{data.testimonials.title}}</strong> скрыт, <a href="#"
-                                                                                          ng-click="data.testimonials.toggleEnabled();">нажмите
-      здесь</a>, чтобы сделать блок видимым для пользователей
-  </div>
+  <div class="hidden-overlay">Блок <strong>{{data.testimonials.title}}</strong> скрыт, <a href="#" ng-click="data.testimonials.toggleEnabled();">нажмите здесь</a>, чтобы сделать блок видимым для пользователей</div>
 
   <div class="container">
     <div class="row">
@@ -492,7 +476,6 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
           <img
             ngf-select=""
             ngf-drop=""
-            ngf-no-object-url="true"
             ng-model="item.image"
             ngf-model-invalid="invalidFiles"
             ngf-model-options="modelOptionsObj"
@@ -531,9 +514,8 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 <!-- =========================
      PHOTO GALLERY 
 ============================== -->
-<section ng-hide="!edit_mode && !data.gallery.enabled" class="recap-gallery dark-image-bg gradient-overlay" id="gallery"
-         ng-class="{'disabled': data.gallery.enabled == false}">
-  <div ng-if="edit_mode" ng-click="data.gallery.toggleEnabled();"
+<section class="recap-gallery dark-image-bg gradient-overlay" id="gallery" ng-class="{'disabled': data.gallery.enabled == false}">
+  <div ng-click="data.gallery.toggleEnabled();"
        ng-title="data.gallery.enabled == true ? 'Скрыть блок' : 'Показать блок'"
        class="board-settings-btn mod-show-menu js-show-sidebar not-main" href="#">
     <span class="board-header-btn-text">
@@ -541,20 +523,17 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
             ng-class="{'fa-eye-slash': data.gallery.enabled, 'fa-eye': data.gallery.enabled == false}"></span>
     </span>
   </div>
-  <div ng-if="edit_mode" ng-click="data.gallery.addItem();" title="Добавить блок"
+  <div ng-click="data.gallery.addItem();" title="Добавить блок"
        class="not-main board-settings-btn mod-add-block js-show-sidebar not-main" href="#">
     <span class="board-header-btn-text">
       <span class="fa fa-plus"></span> Добавить фото
     </span>
   </div>
-  <div ng-if="edit_mode" class="board-settings-btn mod-show-menu js-show-sidebar gallery-btn" href="#" data-panel-id="gallery-panel">
+  <div class="board-settings-btn mod-show-menu js-show-sidebar gallery-btn" href="#" data-panel-id="gallery-panel">
     <span class="fa fa-ellipsis-h"></span>
     <span class="board-header-btn-text u-text-underline">Настройки</span></div>
 
-  <div class="hidden-overlay">Блок <strong>{{data.gallery.title}}</strong> скрыт, <a href="#"
-                                                                                     ng-click="data.gallery.toggleEnabled();">нажмите
-      здесь</a>, чтобы сделать блок видимым для пользователей
-  </div>
+  <div class="hidden-overlay">Блок <strong>{{data.gallery.title}}</strong> скрыт, <a href="#" ng-click="data.gallery.toggleEnabled();">нажмите здесь</a>, чтобы сделать блок видимым для пользователей</div>
 
   <div class="container">
     <div class="row">
@@ -586,8 +565,6 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
                 ngf-select=""
                 ngf-drop=""
                 ng-model="image.image"
-                ngf-no-object-url="true"
-                disallowObjectUrl
                 ngf-model-invalid="invalidFiles"
                 ngf-model-options="modelOptionsObj"
                 ngf-multiple="multiple"
@@ -628,16 +605,16 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 <!-- =========================
      TICKET BOOKING - 1
 ============================== -->
-<section class="ticket-booking-1 padding-120-125 white-bg" ng-if="data.tickets.enabled" id="ticket-booking-1">
+<section class="ticket-booking-1 padding-120-125 white-bg" id="ticket-booking-1">
   <div class="container">
     <div class="row">
       <div class="col-lg-6 col-md-8 col-sm-10 col-lg-offset-3 col-md-offset-2 col-sm-offset-1">
         <div class="section-heading text-center">
 
-          <h2 class="heading-text">{{data.tickets.title}}</h2>
+          <h2 class="heading-text">БИЛЕТЫ</h2>
           <hr class="lines">
-
-          <script src="/widget/builder/order/<?=$event['id']?>"></script>
+          <!--<p class="sub-heading">User story ideate thought leader thought leader physical computing user centered design-->
+          <!--viral ship it earned media</p>-->
 
         </div> <!-- /.section-heading -->
       </div>
@@ -649,68 +626,14 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 <!-- =========================
      SPONSORS  1
 ============================== -->
-<div ng-hide="!edit_mode && !data.sponsors.enabled" class="sponsors-1 secondary-bg text-center" id="sponsors">
-  <div ng-if="edit_mode" ng-click="data.sponsors.toggleEnabled();"
-       ng-title="data.sponsors.enabled == true ? 'Скрыть блок' : 'Показать блок'"
-       class="board-settings-btn mod-show-menu js-show-sidebar not-main" href="#">
-    <span class="board-header-btn-text">
-      <span class="fa"
-            ng-class="{'fa-eye-slash': data.sponsors.enabled, 'fa-eye': data.sponsors.enabled == false}"></span>
-    </span>
-  </div>
-  <div ng-if="edit_mode" ng-click="data.sponsors.addItem();" title="Добавить лого"
-       class="not-main board-settings-btn mod-add-block js-show-sidebar not-main" href="#">
-    <span class="board-header-btn-text">
-      <span class="fa fa-plus"></span> Добавить логотип
-    </span>
-  </div>
-  <div class="hidden-overlay">Блок <strong>{{data.testimonials.title}}</strong> скрыт,
-    <a href="#" ng-click="data.sponsors.toggleEnabled();">нажмите здесь</a>,
-    чтобы сделать блок видимым для пользователей
-  </div>
-
+<div class="sponsors-1 secondary-bg text-center" id="sponsors">
   <div class="container">
-    <p class="heading-pre-suf mb50" contenteditable ng-model="data.sponsors.title">{{data.sponsors.title}}</p>
-    <ul class="client-logo" gridster="data.sponsors.gridOptions">
-      <li
-        gridster-item="item"
-        ng-repeat="(key, item) in data.sponsors.items"> <!-- TESTIMONIAL ITEM -->
-        <div class="item-remover">
-          <span class="fa fa-bars drag-icon"></span>
-          <span class="fa fa-remove remove-icon" ng-click="item.remove();"></span>
-        </div>
-        <img
-          ngf-select=""
-          ngf-drop=""
-          ng-model="item.image"
-          ngf-no-object-url="true"
-          ngf-model-invalid="invalidFiles"
-          ngf-model-options="modelOptionsObj"
-          ngf-multiple="multiple"
-          ngf-pattern="pattern"
-          ngf-accept="acceptSelect"
-          ng-disabled="disabled"
-          ngf-capture="capture"
-          ngf-drag-over-class="dragOverClassObj"
-          ngf-validate="validateObj"
-          ngf-resize="resizeObj"
-          ngf-resize-if="resizeIfFn($file, $width, $height)"
-          ngf-dimensions="dimensionsFn($file, $width, $height)"
-          ngf-duration="durationFn($file, $duration)"
-          ngf-keep="keepDistinct ? 'distinct' : keep"
-          ngf-fix-orientation="orientation"
-          ngf-max-files="maxFiles"
-          ngf-ignore-invalid="ignoreInvalid"
-          ngf-run-all-validations="runAllValidations"
-          ngf-allow-dir="allowDir"
-          class="drop-box ng-pristine ng-valid thumb"
-          ngf-drop-available="dropAvailable"
-          ng-src="{{item.image.$ngfBlobUrl ? item.image.$ngfBlobUrl : item.image}}"
-          alt="{{item.name}}">
-      </li>
+    <p class="heading-pre-suf mb50">Наши партнеры</p>
+    <ul class="client-logo">
+      <li><img src="images/clients/logo-1-dark.png" alt=""></li>
     </ul>
 
-    <a href="" class="btn btn-trans btn-lg" ng-hide="!data.sponsors.become_a_sponsor_enabled" contenteditable ng-model="data.sponsors.become_a_sponsor">{{data.sponsors.become_a_sponsor}}</a>
+    <a href="" class="btn btn-trans btn-lg" ng-hide="!data.sponsors.become_a_sponsor_enabled">Стать партнером</a>
 
   </div>
 </div>
@@ -719,23 +642,20 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 <!-- =========================
      FAQ 
 ============================== -->
-<section ng-hide="!edit_mode && !data.faq.enabled" class="faqs faqs-2 padding-120-60" id="faq" ng-class="{'disabled': data.faq.enabled == false}">
-  <div ng-if="edit_mode" ng-click="data.faq.toggleEnabled();" ng-title="data.faq.enabled == true ? 'Скрыть блок' : 'Показать блок'"
+<section class="faqs faqs-2 padding-120-60" id="faq" ng-class="{'disabled': data.faq.enabled == false}">
+  <div ng-click="data.faq.toggleEnabled();" ng-title="data.faq.enabled == true ? 'Скрыть блок' : 'Показать блок'"
        class="board-settings-btn mod-show-menu js-show-sidebar not-main" href="#">
     <span class="board-header-btn-text">
       <span class="fa" ng-class="{'fa-eye-slash': data.faq.enabled, 'fa-eye': data.faq.enabled == false}"></span>
     </span>
   </div>
-  <div ng-if="edit_mode" ng-click="data.faq.addItem();" title="Добавить вопрос"
+  <div ng-click="data.faq.addItem();" title="Добавить вопрос"
        class="not-main board-settings-btn mod-add-block js-show-sidebar not-main" href="#">
     <span class="board-header-btn-text">
       <span class="fa fa-plus"></span> Добавить вопрос
     </span>
   </div>
-  <div class="hidden-overlay">Блок <strong>{{data.faq.title}}</strong> скрыт, <a href="#"
-                                                                                 ng-click="data.faq.toggleEnabled();">нажмите
-      здесь</a>, чтобы сделать блок видимым для пользователей
-  </div>
+  <div class="hidden-overlay">Блок <strong>{{data.faq.title}}</strong> скрыт, <a href="#" ng-click="data.faq.toggleEnabled();">нажмите здесь</a>, чтобы сделать блок видимым для пользователей</div>
 
 
   <div class="container">
@@ -769,47 +689,59 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 <!-- =========================
      OUR LOCATION 
 ============================== -->
-<section ng-hide="!edit_mode && !data.map.enabled" class="map-container padding-120-60" ng-class="{'disabled': data.map.enabled == false}">
-  <div ng-if="edit_mode" ng-click="data.map.toggleEnabled();" ng-title="data.map.enabled == true ? 'Скрыть блок' : 'Показать блок'"
+<section class="map-container padding-120-60" ng-class="{'disabled': data.map.enabled == false}">
+  <div ng-click="data.map.toggleEnabled();" ng-title="data.map.enabled == true ? 'Скрыть блок' : 'Показать блок'"
        class="board-settings-btn mod-show-menu js-show-sidebar not-main" href="#">
     <span class="board-header-btn-text">
       <span class="fa" ng-class="{'fa-eye-slash': data.map.enabled, 'fa-eye': data.map.enabled == false}"></span>
     </span>
   </div>
-  <div class="hidden-overlay">Блок <strong>{{data.map.title}}</strong> скрыт, <a href="#"
-                                                                                 ng-click="data.map.toggleEnabled();">нажмите
-      здесь</a>, чтобы сделать блок видимым для пользователей
-  </div>
+  <div class="hidden-overlay">Блок <strong>{{data.map.title}}</strong> скрыт, <a href="#" ng-click="data.map.toggleEnabled();">нажмите здесь</a>, чтобы сделать блок видимым для пользователей</div>
   <div class="container">
     <div id="mapBig" class="map cover-map"></div>
   </div>
 </section>
 
 <footer class="footers footer-1">
-
   <div class="container text-center">
-    <p class="contact-help"><a href="#" data-toggle="modal" class="accent" data-target="#myModal">Возникли вопросы?
-        Свяжитесь с нами</a>
+
+    <p class="contact-help">Возникли вопросы? <a href="#" data-toggle="modal" data-target="#myModal">Свяжитесь с нами</a>
     </p>
 
     <ul class="socialize">
       <li><a href="#">
-          <span class="fa fa-vk"></span>
-        </a></li>
+        <i class="icon svg-social-facebook-square"><!--?xml version="1.0" encoding="utf-8"?-->
+          <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32"
+               height="32" viewBox="0 0 32 32">
+            <path
+              d="M26 0h-20c-3.313 0-6 2.688-6 6v20c0 3.313 2.688 6 6 6h20c3.313 0 6-2.688 6-6v-20c0-3.313-2.688-6-6-6zM20.125 16h-2.625v9.625h-3.563v-9.625h-2.438v-3.313h2.438v-1.938c0-2.688 0.688-4.375 3.875-4.375h2.625v3.313h-1.625c-1.25 0-1.313 0.5-1.313 1.375v1.625h3z"></path>
+          </svg>
+        </i>
+      </a></li>
 
       <li><a href="#">
-          <span class="fa fa-facebook-official"></span>
-        </a></li>
+        <i class="icon svg-social-twitter-square"><!--?xml version="1.0" encoding="utf-8"?-->
+          <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32"
+               height="32" viewBox="0 0 32 32">
+            <path
+              d="M26 0h-20c-3.313 0-6 2.688-6 6v20c0 3.313 2.688 6 6 6h20c3.313 0 6-2.688 6-6v-20c0-3.313-2.688-6-6-6zM23.938 12.438c0 0.125 0.063 0.313 0.063 0.5 0 5.188-4 11.188-11.25 11.188-2.188 0-4.25-0.625-6-1.75 0.313 0 0.625 0.063 0.938 0.063 1.813 0 3.5-0.625 4.875-1.688-1.75-0.063-3.188-1.188-3.688-2.75 0.25 0.063 0.5 0.063 0.75 0.063 0.375 0 0.688-0.063 1.063-0.125-1.813-0.375-3.188-2-3.188-3.875 0 0 0-0.063 0-0.063 0.5 0.313 1.125 0.5 1.813 0.5-1.063-0.688-1.813-1.938-1.813-3.25 0-0.75 0.25-1.438 0.563-2 1.938 2.375 4.875 3.938 8.125 4.125-0.063-0.313-0.125-0.625-0.125-0.938 0-2.125 1.813-3.938 3.938-3.938 1.125 0 2.188 0.5 2.875 1.25 0.938-0.188 1.75-0.5 2.5-0.938-0.25 0.938-0.875 1.688-1.688 2.188 0.75-0.125 1.563-0.313 2.25-0.625-0.563 0.813-1.188 1.5-2 2.063z"></path>
+          </svg>
+        </i>
+      </a></li>
 
       <li><a href="#">
-          <span class="fa fa-instagram"></span>
-        </a></li>
+        <i class="icon svg-social-instagram-square"><!--?xml version="1.0" encoding="utf-8"?-->
+          <svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="32"
+               height="32" viewBox="0 0 32 32">
+            <path
+              d="M26 0h-20c-3.313 0-6 2.688-6 6v20c0 3.313 2.688 6 6 6h20c3.313 0 6-2.688 6-6v-20c0-3.313-2.688-6-6-6zM26 25.25c0 0.438-0.313 0.75-0.75 0.75h-18.5c-0.438 0-0.75-0.313-0.75-0.75v-18.5c0-0.438 0.313-0.75 0.75-0.75h18.5c0.438 0 0.75 0.313 0.75 0.75zM20 8h4v4h-4zM12 16c0 2.188 1.813 4 4 4s4-1.813 4-4c0-2.188-1.813-4-4-4s-4 1.813-4 4zM21.938 16c0 3.313-2.688 5.938-5.938 5.938s-5.938-2.625-5.938-5.938c0-0.438 0.063-0.625 0.125-1h-2.188v9h16v-9h-2.188c0.063 0.375 0.125 0.563 0.125 1z"></path>
+          </svg>
+        </i>
+      </a></li>
     </ul>
 
-    <p class="copyright">© <a target="_blank"
-                              href="https://evendate.io/organization/<?= $event['organization_id'] ?>"><?= $event['organization_short_name'] ?></a>
-    </p>
-    <p class="copyright">© <a target="_blank" href="https://evendate.io">Evendate</a></p>
+    <p class="copyright">© <a href="https://evendate.io"><?=$organization['name']?></a></p>
+    <p class="copyright">© <a href="https://evendate.io">Evendate</a></p>
   </div>
 </footer>
 
@@ -824,141 +756,13 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
     <div class="board-menu-content u-fancy-scrollbar js-board-menu-content-wrapper">
       <div class="board-menu-content-frame">
         <div>Прозрачность наложения:</div>
-        <input type="range" ng-model="data.overlay_opacity" ng-change="setOverlayOpacity()" min="0" max="100">
+        <input type="range" ng-model="overlay_opacity" ng-change="setOverlayOpacity()" min="0" max="100">
         <hr class="board-menu-header-divider">
         <div class="board-backgrounds-section-tiles u-clearfix">
           <div ng-click="setHeaderImage(background.image)" ng-repeat="background in backgrounds"
                class="board-backgrounds-section-tile board-backgrounds-photos-tile js-bg-photos">
-            <div class="image" style="background-image: url({{background.thumb || background.image}})"></div>
-            <div class="title" style="">{{background.title}} <a ng-if="background.user"
-                                                                ng-href="{{background.user.links.html}}?utm_source=Evendate&utm_medium=referral&utm_campaign=api-credit"
-                                                                target="_blank">{{background.user.name}}</a></div>
-          </div>
-          <div class="board-backgrounds-section-tile board-backgrounds-photos-tile js-bg-photos">
-            <div ngf-select=""
-                 ngf-drop=""
-                 ng-model="data.main_background"
-                 ngf-no-object-url="true"
-                 ngf-model-invalid="invalidFiles"
-                 ngf-model-options="modelOptionsObj"
-                 ngf-multiple="multiple"
-                 ngf-pattern="pattern"
-                 ngf-accept="acceptSelect"
-                 ng-disabled="disabled"
-                 ngf-capture="capture"
-                 ngf-drag-over-class="dragOverClassObj"
-                 ngf-validate="validateObj"
-                 ngf-resize="resizeObj"
-                 ngf-resize-if="resizeIfFn($file, $width, $height)"
-                 ngf-dimensions="dimensionsFn($file, $width, $height)"
-                 ngf-duration="durationFn($file, $duration)"
-                 ngf-keep="keepDistinct ? 'distinct' : keep"
-                 ngf-fix-orientation="orientation"
-                 ngf-max-files="maxFiles"
-                 ngf-ignore-invalid="ignoreInvalid"
-                 ngf-run-all-validations="runAllValidations"
-                 ngf-allow-dir="allowDir"
-                 class="image drop-box ng-pristine ng-valid thumb"
-                 ngf-drop-available="dropAvailable"
-                 style="background-image: url({{data.main_background.$ngfBlobUrl ? data.main_background.$ngfBlobUrl : data.default_img}})">
-            </div>
-            <div class="title" style="">Загрузить</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div style="display: block;">Background recommendations by <a
-        href="https://unsplash.com/?utm_source=Evendate&utm_medium=referral&utm_campaign=api-credit" target="_blank">Unsplash.com</a>
-    </div>
-  </div>
-</div>
-
-<div class="main-settings-btn" ng-if="edit_mode" data-panel-id="main-settings-panel">
-  <span class="fa fa-cog"></span>
-</div>
-
-<div class="board-menu js-fill-board-menu left-menu" style="left: -340px;" id="main-settings-panel">
-  <div class="board-menu-container">
-    <div class="board-menu-header js-board-menu-title is-in-frame">
-      <h3 class="board-menu-header-title js-board-menu-title-text">Общие настройки
-        <span class="fa fa-close panel-close"></span>
-      </h3>
-    </div>
-    <div class="board-menu-content u-fancy-scrollbar js-board-menu-content-wrapper">
-      <div class="board-menu-content-frame">
-        <div class="demo-style-switch" id="switch-style" style="left: 0px;">
-          <div class="switched-options">
-            <div class="config-title">Цветовая тема:</div>
-            <ul class="styles">
-              <li>
-                <div class="green color" id="green" ng-click="setGlobalColor({r: 0, g: 205, b: 175})">
-                </div>
-              </li>
-
-              <li>
-                <div class="red color" id="red" ng-click="setGlobalColor({r: 252, g: 95, b: 69})">
-                </div>
-              </li>
-
-              <li>
-                <div class="purple color" id="purple" ng-click="setGlobalColor({r: 178, g: 124, b: 245})">
-                </div>
-              </li>
-
-              <li>
-                <div class="yellow color" id="yellow" ng-click="setGlobalColor({r: 254, g: 185, b: 96})">
-                </div>
-              </li>
-
-              <li>
-                <div class="green-2 color" id="green-2" ng-click="setGlobalColor({r: 117, g: 169, b: 50})">
-                </div>
-              </li>
-
-              <li>
-                <div class="blue color" id="blue" ng-click="setGlobalColor({r: 0, g: 142, b: 214})">
-                </div>
-              </li>
-
-              <li>
-                <div class="gold color" id="gold" ng-click="setGlobalColor({r: 186, g: 173, b: 124})">
-                </div>
-              </li>
-
-              <li>
-                <div class="pink color" id="pink" ng-click="setGlobalColor({r: 254, g: 55, b: 162})">
-                </div>
-              </li>
-
-              <li>
-                <div class="violet color" id="violet" ng-click="setGlobalColor({r: 120, g: 92, b: 180})">
-                </div>
-              </li>
-              <li>
-                <input type="color" id="html5colorpicker" ng-model="data.color_scheme" ng-change="setGlobalColor()"
-                       value="#ff0000" style="width: 100%; display: none;"
-                       class="ng-pristine ng-untouched ng-valid ng-not-empty">
-                <div class="sp-replacer sp-light">
-              </li>
-            </ul>
-            <div class="config-title">Ссылки на социальные сети:</div>
-            <ul>
-              <li><input placeholder="Вконтакте" name="vk_url" class="social-link-input form-control"></li>
-              <li><input placeholder="Facebook" name="facebook_url" class="social-link-input form-control"></li>
-              <li><input placeholder="Instagram" name="instagram_url" class="social-link-input form-control"></li>
-            </ul>
-            <div class="config-title">Идентификаторы для аналитики:</div>
-            <ul>
-              <li><input placeholder="Яндекс.Метрика" name="metrica_id" class="social-link-input form-control"></li>
-              <li><input placeholder="Google Analytics" name="analytics_id" class="social-link-input form-control"></li>
-            </ul>
-            <div class="config-title">Идентификаторы ретаргетинга:</div>
-
-            <ul>
-              <li><input placeholder="ВКонтакте" name="vk_retargeting_id" class="social-link-input form-control"></li>
-              <li><input placeholder="Facebook" name="facebook_retargeting_id" class="social-link-input form-control">
-              </li>
-            </ul>
+            <div class="image" style="background-image: url({{background.image}})"></div>
+            <div class="title" style="">{{background.title}}</div>
           </div>
         </div>
       </div>
@@ -977,50 +781,86 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
     <div class="board-menu-content u-fancy-scrollbar js-board-menu-content-wrapper">
       <div class="board-menu-content-frame">
         <div>Прозрачность наложения:</div>
-        <input type="range" ng-model="data.gallery_overlay_opacity" ng-change="setGalleryOverlayOpacity()" min="0" max="100">
+        <input type="range" ng-model="gallery_overlay_opacity" ng-change="setGalleryOverlayOpacity()" min="0" max="100">
         <hr class="board-menu-header-divider">
         <div class="board-backgrounds-section-tiles u-clearfix">
-
-          <div ng-click="setHeaderImage(background.image)" ng-repeat="background in backgrounds"
+          <div ng-click="setGalleryImage(background.image)" ng-repeat="background in backgrounds"
                class="board-backgrounds-section-tile board-backgrounds-photos-tile js-bg-photos">
-            <div class="image" style="background-image: url({{background.thumb || background.image}})"></div>
-            <div class="title" style="">{{background.title}} <a ng-if="background.user"
-                                                                ng-href="{{background.user.links.html}}?utm_source=Evendate&utm_medium=referral&utm_campaign=api-credit"
-                                                                target="_blank">{{background.user.name}}</a></div>
-          </div>
-          <div class="board-backgrounds-section-tile board-backgrounds-photos-tile js-bg-photos">
-            <div ngf-select=""
-                 ngf-drop=""
-                 ngf-no-object-url="true"
-                 ng-model="data.gallery_background"
-                 ngf-model-invalid="invalidFiles"
-                 ngf-model-options="modelOptionsObj"
-                 ngf-multiple="multiple"
-                 ngf-pattern="pattern"
-                 ngf-accept="acceptSelect"
-                 ng-disabled="disabled"
-                 ngf-capture="capture"
-                 ngf-drag-over-class="dragOverClassObj"
-                 ngf-validate="validateObj"
-                 ngf-resize="resizeObj"
-                 ngf-resize-if="resizeIfFn($file, $width, $height)"
-                 ngf-dimensions="dimensionsFn($file, $width, $height)"
-                 ngf-duration="durationFn($file, $duration)"
-                 ngf-keep="keepDistinct ? 'distinct' : keep"
-                 ngf-fix-orientation="orientation"
-                 ngf-max-files="maxFiles"
-                 ngf-ignore-invalid="ignoreInvalid"
-                 ngf-run-all-validations="runAllValidations"
-                 ngf-allow-dir="allowDir"
-                 class="image drop-box ng-pristine ng-valid thumb"
-                 ngf-drop-available="dropAvailable"
-                 style="background-image: url({{data.gallery_background.$ngfBlobUrl ? data.gallery_background.$ngfBlobUrl : data.default_img}})">
-            </div>
-            <div class="title" style="">Загрузить</div>
+            <div class="image" style="background-image: url({{background.image}})"></div>
+            <div class="title" style="">{{background.title}}</div>
           </div>
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+
+<div class="demo-style-switch" id="switch-style">
+  <a id="toggle-switcher" class="switch-button" title="Изменение цветовой схемы"><span
+    class="icon svg-adjust-vert"></span></a>
+
+  <div class="switched-options">
+    <div class="config-title">
+      ССЫЛКИ НА СОЦИАЛЬНЫЕ СЕТИ :
+    </div>
+    <ul>
+      <li><input placeholder="Вконтакте" name="vk_url" class="social-link-input form-control"> </li>
+      <li><input placeholder="Facebook" name="facebook_url" class="social-link-input form-control"> </li>
+      <li><input placeholder="Instagram" name="instagram_url" class="social-link-input form-control"> </li>
+    </ul>
+    <div class="config-title">
+      Цветовая тема :
+    </div>
+    <ul class="styles">
+      <li>
+        <div class="green color" id="green" ng-click="setGlobalColor({r: 0, g: 205, b: 175})">
+        </div>
+      </li>
+
+      <li>
+        <div class="red color" id="red" ng-click="setGlobalColor({r: 252, g: 95, b: 69})">
+        </div>
+      </li>
+
+      <li>
+        <div class="purple color" id="purple" ng-click="setGlobalColor({r: 178, g: 124, b: 245})">
+        </div>
+      </li>
+
+      <li>
+        <div class="yellow color" id="yellow" ng-click="setGlobalColor({r: 254, g: 185, b: 96})">
+        </div>
+      </li>
+
+      <li>
+        <div class="green-2 color" id="green-2" ng-click="setGlobalColor({r: 117, g: 169, b: 50})">
+        </div>
+      </li>
+
+      <li>
+        <div class="blue color" id="blue" ng-click="setGlobalColor({r: 0, g: 142, b: 214})">
+        </div>
+      </li>
+
+      <li>
+        <div class="gold color" id="gold" ng-click="setGlobalColor({r: 186, g: 173, b: 124})">
+        </div>
+      </li>
+
+      <li>
+        <div class="pink color" id="pink" ng-click="setGlobalColor({r: 254, g: 55, b: 162})">
+        </div>
+      </li>
+
+      <li>
+        <div class="violet color" id="violet" ng-click="setGlobalColor({r: 120, g: 92, b: 180})">
+        </div>
+      </li>
+    </ul>
+    <input type="color" id="html5colorpicker" ng-model="color_scheme" ng-change="setGlobalColor()" value="#ff0000"
+           style="width: 100%;">
+
   </div>
 </div>
 
@@ -1031,20 +871,21 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 <script src="js/spectrum.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/tinymce.min.js"></script>
-<script src="js/color-thief.min.js"></script>
 <script src="js/app.js"></script>
 <script src="js/nivo-lightbox.min.js"></script>
 <script src="js/jquery.scrollTo.min.js"></script>
 <script src="js/jquery.localScroll.min.js"></script>
 <script src="js/jquery.nav.js"></script>
+<script src="js/jquery.ajaxchimp.min.js"></script>
 <script src="js/jquery.fitvids.js"></script>
 <script src="js/matchMedia.js"></script>
 <script src="js/jquery.mixitup.js"></script>
 <script src="js/swiper.jquery.min.js"></script>
 <script src="js/SVGinject.js"></script>
 <script src="js/smoothscroll.js"></script>
+<script src="js/jquery.datetimepicker.full.min.js"></script>
 <script src="http://maps.google.com/maps/api/js?sensor=true"></script>
-<script src="js/angular-tinymce.min.js"></script>
+<script src="js/jquery.countdown.min.js"></script>
 <script src="js/application.js"></script>
 
 </body>

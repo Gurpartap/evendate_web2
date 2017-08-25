@@ -1,4 +1,4 @@
-var __app = angular.module('LandingApp', ['ngFileUpload', 'gridster']);
+var __app = angular.module('LandingApp', ['ngFileUpload', 'gridster', 'ui.tinymce']);
 
 function guid() {
     function s4() {
@@ -82,121 +82,55 @@ var backgrounds = [
         title: 'Спирали',
         image: 'images/polygon-bg/spirals.png'
     }
-]
+];
 
-__app.controller('WholeWorldController', function ($scope) {
+__app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope, $timeout) {
 
     var search_data = searchToObject();
-
-
-    $scope.color_scheme = [0, 205, 175];
-    $scope.accent_color_scheme = [0, 205, 145];
-    $scope.overlay_opacity = 60;
-    $scope.gallery_overlay_opacity = 60;
-
     $scope.edit_mode = search_data.edit;
-
-    $scope.default_img = './images/default.jpg';
-
     $scope.backgrounds = backgrounds;
-    $scope.main_background = null;
-    $scope.gallery_background = null;
+    var initializing = true;
 
-    $scope.selected_bgs = {
-        main: '',
-        gallery: ''
-    };
-
-    $scope.$watch('main_background', function () {
-        console.log($scope.main_background);
-        if ($scope.main_background && $scope.main_background.$ngfBlobUrl) {
-            $scope.setHeaderImage($scope.main_background.$ngfBlobUrl);
-        }
-    });
-
-    $scope.$watch('gallery_background', function () {
-        console.log($scope.main_background);
-        if ($scope.main_background && $scope.main_background.$ngfBlobUrl) {
-            $scope.setGalleryImage($scope.main_background.$ngfBlobUrl);
-        }
-    });
-
-    $scope.updateBackgroundSuggests = function (tags) {
-        var tag_names = [];
-        tags.forEach(function (tag) {
-            tag_names.push(tag.name);
-        });
-
-        $.ajax({
-            url: 'https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20170823T192011Z.3984130a921181f9.56b3c6ebe6a18a055a69c8075b8561332f4163bd&lang=en&text=' + tag_names.join('%0A'),
-            success: function (data) {
-                if (data.text) {
-                    var keywords = data.text[0].split('\n');
-                    keywords.forEach(function (keyword) {
-                        $.ajax({
-                            url: 'https://api.unsplash.com/search/photos?page=1&per_page=5&client_id=9176ef748f4aece74e3532d1d706c8f4b9884cc5e85453bc68517df1f00f2e2d&query=' + keyword,
-                            success: function (unsplash) {
-                                if (unsplash.results && unsplash.results.length !== 0) {
-                                    unsplash.results.forEach(function (image) {
-                                        var __image = image.urls;
-                                        __image.title = keyword;
-                                        __image.image = __image.full;
-                                        __image.user = image.user;
-                                        $scope.backgrounds.push(__image);
-                                        $scope.$apply();
-                                    });
-                                }
-                            }
-                        });
-                    })
-                }
-            }
-        })
-    };
-
-    $scope.logger = function (data) {
-        console.log(data);
-    };
-
-    $scope.setHeaderImage = function (url) {
-        $('.polygon-bg').css('background-image', 'url(' + url + ')');
+    $scope.tinymce_options = {
+        selector: '.textarea-html',
+        language: 'ru',
+        language_url: 'js/langs/ru.js',
+        theme: 'modern',
+        invalid_elements: 'script',
+        plugins: [
+            'advlist autolink lists link image charmap preview hr anchor pagebreak',
+            'searchreplace wordcount visualblocks visualchars code fullscreen',
+            'media nonbreaking save table contextmenu',
+            'template paste textcolor colorpicker textpattern imagetools codesample toc'
+        ],
+        toolbar1: 'preview media | undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image| forecolor backcolor | codesample',
+        image_advtab: true,
 
     };
 
-    $scope.setGalleryImage = function (url) {
-        $('.recap-gallery.dark-image-bg').css('background-image', 'url(' + url + ')');
-    };
-
-    $scope.setGlobalColor = function (val) {
-        console.log(val);
-        $scope.color_scheme = [val.r, val.g, val.b];
-        $scope.accent_color_scheme = [val.r, val.g, val.b - 30];
-        var html = document.getElementsByTagName('html')[0];
-        html.style.setProperty("--base-num", $scope.color_scheme.join(', '));
-        html.style.setProperty("--accent-num", $scope.accent_color_scheme.join(', '));
-    };
-
-    $scope.setOverlayOpacity = function () {
-        var html = document.getElementsByTagName('html')[0];
-        html.style.setProperty("--overlay-opacity", (100 - $scope.overlay_opacity) / 100);
-    };
-
-    $scope.setGalleryOverlayOpacity = function () {
-        var html = document.getElementsByTagName('html')[0];
-        html.style.setProperty("--gallery-overlay-opacity", (100 - $scope.gallery_overlay_opacity) / 100);
-    };
 
     $scope.data = {
-        main_description: '17 - 19 декабря в Москве соберутся представители event индустрии, чтобы поделиться друг с другом опытом и рассказать, как же зарабатывать больше на своих событиях с помощью платформы Evendate. Кроме продажи билетов за биткоины мы теперь даже умеем генерировать лендинги для событий, где в принципе больше уже ничего не надо.',
+        color_scheme: [0, 205, 175],
+        accent_color_scheme: [0, 205, 145],
+        overlay_opacity: 60,
+        gallery_overlay_opacity: 60,
+        default_img: './images/default.jpg',
+        main_background: null,
+        gallery_background: null,
+        selected_bgs: {
+            main: '',
+            gallery: ''
+        },
+        main_description: '',
         header: {
-            title: 'Узнай будущее event индустрии от тех, кто уже в будущем',
-            subtitle: 'Продавай больше билетов с Evendate',
-            location_addresses: '17 - 19 декабря, 2017, Москва, Сколково',
+            title: '',
+            subtitle: '',
+            location_addresses: '',
             description: ''
         },
         speakers: {
             title: 'Спикеры',
-            subtitle: 'Только лидеры индустрии, только самые крутые разработчики (все из Evendate) и самые крутые event-менеджеры.',
+            subtitle: '',
             items: {},
             addItem: function () {
                 var uuid = guid(),
@@ -433,6 +367,7 @@ __app.controller('WholeWorldController', function ($scope) {
                 this.enabled = !this.enabled;
                 return false;
             },
+            html: '',
             enabled: true
         },
         gallery: {
@@ -495,7 +430,7 @@ __app.controller('WholeWorldController', function ($scope) {
 
         },
         tickets: {
-            title: 'Билеты',
+            title: 'Купить билеты',
             enabled: true
         },
         sponsors: {
@@ -628,11 +563,88 @@ __app.controller('WholeWorldController', function ($scope) {
         },
     };
 
+    $scope.$watch('data.main_background', function () {
+        if ($scope.data.main_background && $scope.data.main_background.$ngfBlobUrl) {
+            $scope.setHeaderImage($scope.data.main_background.$ngfBlobUrl);
+        }
+    });
+
+    $scope.$watch('data.gallery_background', function () {
+        if ($scope.data.gallery_background && $scope.data.gallery_background.$ngfBlobUrl) {
+            $scope.setGalleryImage($scope.data.gallery_background.$ngfBlobUrl);
+        }
+    });
+
+    $scope.updateBackgroundSuggests = function (tags) {
+        var tag_names = [];
+        tags.forEach(function (tag) {
+            tag_names.push(tag.name);
+        });
+
+        $.ajax({
+            url: 'https://translate.yandex.net/api/v1.5/tr.json/translate?key=trnsl.1.1.20170823T192011Z.3984130a921181f9.56b3c6ebe6a18a055a69c8075b8561332f4163bd&lang=en&text=' + tag_names.join('%0A'),
+            success: function (data) {
+                if (data.text) {
+                    var keywords = data.text[0].split('\n');
+                    keywords.forEach(function (keyword) {
+                        $.ajax({
+                            url: 'https://api.unsplash.com/search/photos?page=1&per_page=5&client_id=9176ef748f4aece74e3532d1d706c8f4b9884cc5e85453bc68517df1f00f2e2d&query=' + keyword,
+                            success: function (unsplash) {
+                                if (unsplash.results && unsplash.results.length !== 0) {
+                                    unsplash.results.forEach(function (image) {
+                                        var __image = image.urls;
+                                        __image.title = keyword;
+                                        __image.image = __image.full;
+                                        __image.user = image.user;
+                                        $scope.backgrounds.push(__image);
+                                        $scope.$apply();
+                                    });
+                                }
+                            }
+                        });
+                    })
+                }
+            }
+        })
+    };
+
+    $scope.logger = function (data) {
+        console.log(data);
+    };
+
+    $scope.setHeaderImage = function (url) {
+        $('.polygon-bg').css('background-image', 'url(' + url + ')');
+        $scope.data.main_background = url;
+    };
+
+    $scope.setGalleryImage = function (url) {
+        $('.recap-gallery.dark-image-bg').css('background-image', 'url(' + url + ')');
+        $scope.data.gallery_background = url;
+    };
+
+    $scope.setGlobalColor = function (val) {
+        $scope.data.color_scheme = [val.r, val.g, val.b];
+        $scope.data.accent_color_scheme = [val.r, val.g, val.b - 30];
+        var html = document.getElementsByTagName('html')[0];
+        html.style.setProperty("--base-num", $scope.data.color_scheme.join(', '));
+        html.style.setProperty("--accent-num", $scope.data.accent_color_scheme.join(', '));
+    };
+
+    $scope.setOverlayOpacity = function () {
+        var html = document.getElementsByTagName('html')[0];
+        html.style.setProperty("--overlay-opacity", (100 - $scope.data.overlay_opacity) / 100);
+    };
+
+    $scope.setGalleryOverlayOpacity = function () {
+        var html = document.getElementsByTagName('html')[0];
+        html.style.setProperty("--gallery-overlay-opacity", (100 - $scope.data.gallery_overlay_opacity) / 100);
+    };
 
     $.ajax({
-        url: '/api/v1/events/' + search_data['id'] + '?fields=tags,description,landing_data,location,image_horizontal_url,registration_required,registration_locally,organization_name,ticketing_available,registration_available',
+        url: '/api/v1/events/' + search_data['id'] + '?fields=tags,description,ticketing_available,registration_available,landing_data,location,image_horizontal_url,registration_required,registration_locally,organization_name,ticketing_available,registration_available',
         success: function (res) {
             var event = res.data[0];
+            console.log(event);
             if (!event.landing_data) {
                 var colorThief = new ColorThief(),
                     colorSync = colorThief.getColorAsync(event.image_horizontal_url, function (color) {
@@ -643,9 +655,18 @@ __app.controller('WholeWorldController', function ($scope) {
                 $scope.data.header.location_addresses = event.location;
                 $scope.data.main_description = event.description;
                 $scope.data.main_description = event.description;
+
+                if (event.ticketing_available) {
+                    $scope.data.tickets.title = 'Купить билеты';
+                } else if (event.registration_available) {
+                    $scope.data.tickets.title = 'Регистрация'
+                } else {
+                    $scope.data.tickets.enabled = false;
+                }
+
                 $scope.$apply();
                 $scope.updateBackgroundSuggests(event.tags);
-            } else {
+            } else if (event.landing_data) {
                 $scope.data = event.landing_data;
             }
         }
@@ -655,7 +676,7 @@ __app.controller('WholeWorldController', function ($scope) {
         $('[contenteditable]').prop('contenteditable', 'false');
     }
 
-});
+}]);
 
 
 __app.directive("contenteditable", function () {
@@ -679,23 +700,6 @@ __app.directive("contenteditable", function () {
     };
 });
 
-tinymce.init({
-    selector: '.textarea-html',
-    language: 'ru',
-    language_url: 'js/langs/ru.js',
-    theme: 'modern',
-    invalid_elements: 'script',
-    plugins: [
-        'advlist autolink lists link image charmap preview hr anchor pagebreak',
-        'searchreplace wordcount visualblocks visualchars code fullscreen',
-        'media nonbreaking save table contextmenu',
-        'template paste textcolor colorpicker textpattern imagetools codesample toc'
-    ],
-    toolbar1: 'preview media | undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image| forecolor backcolor | codesample',
-    image_advtab: true,
-
-});
-
 $("#html5colorpicker").spectrum({
     allowEmpty: true,
     showInitial: true,
@@ -705,9 +709,7 @@ $("#html5colorpicker").spectrum({
     change: function (color) {
         var scope = angular.element(document.body).scope();
         scope.setGlobalColor(color.toRgb());
-
     }
-
 });
 
 /* =================================
