@@ -1,4 +1,6 @@
 <?php
+require_once '../v1-backend/bin/env_variables.php';
+require_once "{$BACKEND_FULL_PATH}/bin/db.php";
 header("Content-type: application/javascript");
 
 function wrongInitError() { ?>
@@ -142,7 +144,7 @@ switch ($_REQUEST['type']) {
 	var iframe = document.createElement('iframe'),
 		heightObserver;
 
-	iframe.setAttribute('src', 'http://dev.evendate.io/widget/order/event/' + id);
+	iframe.setAttribute('src', '//<?=App::$DOMAIN?>/widget/order/event/' + id);
 	iframe.setAttribute('onLoad', 'alert(this.contentWindow.location);');
 	iframe.setAttribute('frameborder', '0');
 	iframe.setAttribute('scrolling', 'no');
