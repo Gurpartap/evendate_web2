@@ -7,142 +7,166 @@ function wrongInitError() { ?>
 	console.error('Widget wrongly initialised'); <?php
 	exit();
 } ?>
-/**
- * @class
- */
-EvendateWidgetBuilder = (function() {
+
+!function(w) {
 	/**
-	 *
-	 * @param {HTMLIFrameElement} [iframe]
-	 *
-	 * @constructor
-	 * @constructs EvendateWidgetBuilder
-	 *
-	 * @property {?number} id
-	 * @property {?Window} window
+	 * @class
 	 */
-	function EvendateWidgetBuilder(id) {
-	    this.id = id;
+	EvendateWidgetBuilder = (function() {
+		/**
+		 *
+		 * @param {number} [id]
+		 *
+		 * @constructor
+		 * @constructs EvendateWidgetBuilder
+		 *
+		 * @property {?number} id
+		 * @property {?HTMLIFrameElement} iframe
+		 * @property {?Window} window
+		 */
+		function EvendateWidgetBuilder(id) {
+			var self = this;
 
-		Object.defineProperties(this, {
-            iframe: {
-                get: function(){
+			this.id = id;
 
-                    return document.getElementById('evendate-widget-' + id);
-                }
-            },
-            window: {
-                get: function(){
+			Object.defineProperties(this, {
+				iframe: {
+					get: function() {
 
-                    return this.iframe ? this.iframe.contentWindow : null;
-                }
-            }
-        });
-	}
-	/**
-	 *
-	 * @return {boolean}
-	 */
-	EvendateWidgetBuilder.prototype.isLoaded = function() {
+						return document.getElementById('evendate-widget-' + self.id);
+					}
+				},
+				window: {
+					get: function() {
 
-		return !!this.window && this.window.document.readyState === "complete";
-	};
-	/**
-	 *
-	 * @param {function} callback
-	 */
-	EvendateWidgetBuilder.prototype.onLoad = function(callback) {
-		var iframe = this.iframe,
-			fired = false,
-			timer;
-
-		function ready() {
-			if (!fired) {
-				fired = true;
-				clearTimeout(timer);
-				callback.call(this);
-			}
+						return self.id ? self.iframe.contentWindow : null;
+					}
+				}
+			});
 		}
+		/**
+		 *
+		 * @param {number} id
+		 *
+		 * @return {number}
+		 */
+		EvendateWidgetBuilder.prototype.setId = function(id) {
 
-		function readyState() {
-			if (this.readyState === "complete") {
-				ready.call(this);
+			return this.id = id;
+		};
+		/**
+		 *
+		 * @return {boolean}
+		 */
+		EvendateWidgetBuilder.prototype.isLoaded = function() {
+
+			return !!this.id && this.window.document.readyState === "complete";
+		};
+		/**
+		 *
+		 * @param {function} callback
+		 */
+		EvendateWidgetBuilder.prototype.onLoad = function(callback) {
+			var self = this,
+				iframe = this.iframe,
+				fired = false,
+				timer;
+
+			function ready() {
+				if (!fired) {
+					fired = true;
+					clearTimeout(timer);
+					callback.call(self);
+				}
 			}
-		}
 
-		function addEvent(elem, event, fn) {
-			if (elem.addEventListener) {
-
-				return elem.addEventListener(event, fn);
-			} else {
-
-				return elem.attachEvent("on" + event, function () {
-
-					return fn.call(elem, window.event);
-				});
+			function readyState() {
+				if (this.readyState === "complete") {
+					ready.call(this);
+				}
 			}
-		}
 
-		function checkLoaded() {
-			var doc = iframe.contentDocument || iframe.contentWindow.document;
+			function addEvent(elem, event, fn) {
+				if (elem.addEventListener) {
 
-			if (doc.URL.indexOf("about:") !== 0) {
-				if (doc.readyState === "complete") {
-					ready.call(doc);
+					return elem.addEventListener(event, fn);
 				} else {
-					addEvent(doc, "DOMContentLoaded", ready);
-					addEvent(doc, "readystatechange", readyState);
-				}
-			} else {
-				timer = setTimeout(checkLoaded, 1);
-			}
-		}
 
-		addEvent(iframe, "load", ready.bind(iframe.contentDocument || iframe.contentWindow.document));
+					return elem.attachEvent("on" + event, function () {
 
-		checkLoaded();
-	};
-	/**
-	 *
-	 * @param {(number|string)} [height]
-	 *
-	 * @return {string}
-	 */
-	EvendateWidgetBuilder.prototype.setHeight = function(height) {
-
-		height = function calcHeight(height) {
-			if (height) {
-				if (+height == height) {
-
-					return height + 'px';
-				} else if (!isNaN(parseInt(height))) {
-
-					return height;
+						return fn.call(elem, window.event);
+					});
 				}
 			}
 
-			return this.window.document.scrollingElement.scrollHeight + 'px';
-		}.call(this, height);
+			function checkLoaded() {
+				var doc = iframe.contentDocument || iframe.contentWindow.document;
 
-		return this.iframe.style.height = height;
-	};
+				if (doc.URL.indexOf("about:") !== 0) {
+					if (doc.readyState === "complete") {
+						ready();
+					} else {
+						addEvent(doc, "DOMContentLoaded", ready);
+						addEvent(doc, "readystatechange", readyState);
+					}
+				} else {
+					timer = setTimeout(checkLoaded, 1);
+				}
+			}
 
-	/**
-	 * @param {string} color
-	 */
-	EvendateWidgetBuilder.prototype.setColor = function(color) {
-		color = '' + color;
-		if (color.indexOf('#') === -1) {
-			color = '#' + color;
-		}
+			addEvent(iframe, "load", ready);
 
-		this.window.document.body.style.setProperty('--color_accent', color);
-	};
+			checkLoaded();
+		};
+		/**
+		 *
+		 * @param {(number|string)} [height]
+		 *
+		 * @return {string}
+		 */
+		EvendateWidgetBuilder.prototype.setHeight = function(height) {
+			if (!this.isLoaded()) {
+				return this.onLoad(this.setHeight.bind(this, height));
+			}
 
-	return EvendateWidgetBuilder;
-}());
+			height = function calcHeight(height) {
+				if (height) {
+					if (+height == height) {
 
-var evendateWidget = new EvendateWidgetBuilder();
+						return height + 'px';
+					} else if (!isNaN(parseInt(height))) {
+
+						return height;
+					}
+				}
+
+				return this.window.document.scrollingElement.scrollHeight + 'px';
+			}.call(this, height);
+
+			return this.iframe.style.height = height;
+		};
+
+		/**
+		 * @param {string} color
+		 */
+		EvendateWidgetBuilder.prototype.setColor = function(color) {
+			if (!this.isLoaded()) {
+				return this.onLoad(this.setColor.bind(this, color));
+			}
+
+			color = '' + color;
+			if (color.indexOf('#') === -1) {
+				color = '#' + color;
+			}
+
+			this.window.document.body.style.setProperty('--color_accent', color);
+		};
+
+		return EvendateWidgetBuilder;
+	}());
+
+	w.evendateWidget = new EvendateWidgetBuilder();
+}(window);
 
 <?php
 
@@ -159,6 +183,7 @@ switch ($_REQUEST['type']) {
 	var iframe = document.createElement('iframe'),
 		heightObserver;
 
+	iframe.id = 'evendate-widget-' + id;
 	iframe.setAttribute('src', '//<?=App::$DOMAIN?>/widget/order/event/' + id);
 	iframe.setAttribute('frameborder', '0');
 	iframe.setAttribute('scrolling', 'no');
@@ -166,27 +191,36 @@ switch ($_REQUEST['type']) {
 	iframe.style.border = '0';
 	iframe.setAttribute('width', props['width'] || '100%');
 	iframe.setAttribute('height', props['height'] || '500');
-	iframe.id = 'evendate-widget-' + id;
 
 	document.currentScript.parentElement.insertBefore(iframe, document.currentScript);
 
-	evendateWidget = new EvendateWidgetBuilder(id);
+	evendateWidget.setId(id);
 
 	heightObserver = new MutationObserver(function() {
 		evendateWidget.setHeight();
 	});
 
-	evendateWidget.iframe.onload = function() {
-		heightObserver.disconnect();
+	evendateWidget.onLoad(function() {
 		evendateWidget.setHeight();
+
 		if (props['color']) {
 			evendateWidget.setColor(props['color']);
 		}
-		heightObserver.observe(evendateWidget.iframe.contentWindow.document.body, {
+
+		heightObserver.observe(evendateWidget.window.document.body, {
 			childList: true,
 			subtree: true
 		});
-	}
+
+		evendateWidget.iframe.onload = function() {
+			heightObserver.disconnect();
+			evendateWidget.setHeight();
+			heightObserver.observe(evendateWidget.window.document.body, {
+				childList: true,
+				subtree: true
+			});
+		}
+	});
 }(<?=$_REQUEST['id']?>, <?=json_encode( $_REQUEST )?>);<?php
 		break;
 	}
