@@ -1,0 +1,250 @@
+.edit_event_overlay {
+	margin: 40px 0;
+}
+
+.event_edit_navigation,
+.edit_event_page_wrapper {
+	display: inline-block;
+	vertical-align: top;
+}
+
+.edit_event_page_wrapper {
+	width: 700px;
+}
+
+.event_edit_navigation {
+	position: fixed;
+	width: 300px;
+	margin-left: 24px;
+}
+
+.event_edit_navigation_material {
+	padding: 6px 0;
+	margin-bottom: 24px;
+}
+
+.event_edit_navigation_item {
+	display: flex;
+	align-items: center;
+	height: 48px;
+	padding: 0 12px;
+	cursor: pointer;
+}
+
+.event_edit_navigation_item.-active {
+	color: #fff;
+	background-color: #f82969;
+	background-color: var(--color_accent);
+}
+
+.edit_event_buttons {
+	display: flex;
+	flex-direction: row-reverse;
+	justify-content: space-between;
+	margin-top: 24px;
+}
+
+.edit_event_page_tab_bodies {
+	margin: 0;
+}
+
+.edit_event_page_tab_bodies > .tab_body {
+	padding: 24px 24px 36px;
+}
+
+.selected_days {
+	font-size: .8em;
+	margin-bottom: 10px;
+}
+
+.event_datepicker_form,
+.event_datepicker_calendar {
+	display: inline-block;
+	vertical-align: middle;
+}
+.event_datepicker_form {
+	width: -webkit-calc(100% - 270px);
+	width: calc(100% - 270px);
+}
+.event_datepicker_calendar {
+	width: 240px;
+	margin-right: 20px;
+}
+
+.event_datepicker_calendar .calendar_wrapper {padding-right: 20px}
+.event_datepicker_calendar .calendar_wrapper:after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 100%;
+	height: 80%;
+	margin: 10% 0;
+	border-right: 1px solid #c5c9d1;
+	border-right: 1px solid var(--color_primary_30);
+}
+
+.edit_event_page_wrapper .-full_page_width {
+	width: -webkit-calc(100% + 48px);
+	width: calc(100% + 48px);
+	margin-left: -24px;
+	margin-right: -24px;
+}
+
+#edit_event_selected_days_wrapper {text-align: center}
+
+#edit_event_vk_publication {margin-bottom: 20px}
+#edit_event_vk_publication > .collapsing_content {padding: 0 30px}
+
+.event_selected_days_table {width: 100%}
+
+.event_selected_days_table > thead > tr,
+.event_selected_days_table > tbody > tr {border-bottom: 1px solid #ccc}
+
+.event_selected_days_table > thead > tr > th {
+	padding: 15px 5px;
+	font-weight: 500;
+}
+
+.event_selected_days_table > tbody > tr > td {
+	padding: 15px 0;
+}
+
+.event_selected_days_table .remove_date {
+	display: block;
+	width: 100%;
+	height: 100%;
+	font-size: 1.3em;
+	border: 0;
+	background-color: transparent;
+}
+
+.event_selected_days_add_date {margin: 10px 0}
+
+.edit_event_img_preview_hor,
+.edit_event_img_preview_vert {position: absolute}
+
+.edit_event_img_preview_hor {
+	top: 0;
+	left: 0;
+	width: 100%;
+}
+
+.edit_event_vk_img {
+	margin-bottom: 24px;
+}
+
+.edit_event_vk_img_preview {
+	width: 400px;
+	height: 225px;
+	border-radius: 3px;
+	overflow: hidden;
+}
+
+.edit_event_vk_img_preview > img {width: 100%}
+
+.edit_event_vk_img_preview > img[src=''] + .edit_event_vk_img_preview_dash_border,
+.edit_event_vk_img_preview > img:not([src]) + .edit_event_vk_img_preview_dash_border {display: block}
+
+.edit_event_vk_img_preview_dash_border {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	display: none;
+	border: 1px dashed;
+}
+
+.edit_event_registration_field_draggable {
+	position: absolute;
+	top: 0;
+	right: 0;
+	left: 0;
+	padding: 6px;
+	color: #c5c9d1;
+	color: var(--color_primary_50);
+	cursor: move;
+	text-align: center;
+}
+
+
+.edit_event_registration_custom_field {padding: 36px 24px 24px}
+
+.edit_event_registration_custom_field > .form_unit {margin: 24px 0}
+
+.edit_event_registration_custom_field_remove_button {
+	position: absolute;
+	top: 0;
+	right: 0;
+	height: 46px;
+	width: 46px;
+	line-height: 1;
+	font-size: 34px;
+	color: #c5c9d1;
+	color: var(--color_primary_30);
+	background-color: transparent;
+	border: 0;
+	z-index: 1;
+}
+
+.edit_event_registration_custom_field_remove_button:hover {
+	color: #9fa6b3;
+	color: var(--color_primary_50);
+}
+
+.edit_event_registration_custom_field_values {
+	margin: 36px 0;
+}
+
+.edit_event_registration_custom_field_value {
+	display: flex;
+	align-items: center;
+	margin-bottom: 12px;
+}
+
+.edit_event_registration_custom_field_value > .form_unit {margin-bottom: 0}
+
+.edit_event_registration_custom_field_value_remove_button {
+	width: 30px;
+	height: 30px;
+	font-size: 1.4em;
+	line-height: 1;
+	background-color: transparent;
+	border: 0;
+	visibility: hidden;
+}
+
+.edit_event_registration_custom_field_value:hover > .edit_event_registration_custom_field_value_remove_button,
+.edit_event_registration_custom_field_value_input:focus + .edit_event_registration_custom_field_value_remove_button {visibility: visible}
+
+.event_edit_table {
+	margin-bottom: 24px;
+}
+
+.edit_event_ticket_type_last_column {
+	margin-bottom: 0;
+}
+
+.event_edit_row_delete_button,
+.event_edit_ticket_type_expand_button {
+	flex: none;
+	width: 32px;
+	margin-left: 12px;
+}
+
+.event_edit_ticket_type_expand_button {}
+
+.event_edit_row_delete_button {
+	font-size: 2em;
+	line-height: 1;
+	font-weight: 100;
+	opacity: .5;
+}
+
+.edit_event_ticket_type_expanded {
+	padding: 24px;
+}
+
+.edit_event_ticket_type_expanded_footer {
+	margin-top: 36px;
+}

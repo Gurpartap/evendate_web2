@@ -1,0 +1,89 @@
+.event_admin_check_in {
+	margin: 18px 0;
+	overflow: hidden;
+}
+
+.event_admin_check_in_header {
+	display: flex;
+	align-items: baseline;
+	padding: 12px 18px;
+}
+
+.event_admin_check_in_title {
+	width: 25%;
+	margin: 0;
+	font-size: 1.5em;
+}
+
+.event_admin_check_in_progress_bar {
+	flex: 1;
+	margin-left: 24px;
+}
+
+.event_admin_check_in_search_bar {
+	width: 20%;
+	margin-right: 24px;
+}
+
+.event_admin_check_in_search_bar > .event_admin_check_in_search {
+	padding-right: 35px;
+	font-size: .875em;
+	font-weight: 500;
+	background-color: #f9f9fa;
+	border: 1px solid #f6f6f6;
+}
+
+.event_admin_check_in_search_clear,
+.event_admin_check_in_search::-webkit-input-placeholder {
+	color: #9fa6b3;
+	color: var(--color_primary_50);
+}
+
+.event_admin_check_in_search_clear {
+	position: absolute;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	display: none;
+	width: 35px;
+	height: 35px;
+	margin: auto;
+	font-size: 1.2em;
+	line-height: 35px;
+	text-align: center;
+	border-radius: 50%;
+	cursor: pointer;
+	opacity: .6;
+}
+
+.event_admin_check_in_search:valid + .event_admin_check_in_search_clear {display: block}
+
+.event_admin_check_in_search_clear:hover {
+	color: #f82969;
+	color: var(--color_bubblegum);
+	opacity: 1;
+}
+
+
+.event_admin_check_in_table td {font-weight: 500}
+.event_admin_check_in_table .avatar_name.avatar_name.avatar_name {font-size: 1em}
+
+.event_admin_check_in_table td:last-child {
+	color: #c5c9d1;
+	color: var(--color_primary_30);
+	font-size: .75em;
+	text-transform: uppercase;
+}
+
+.event_admin_check_in_table tr:not(:hover) .check_in_ticket_action {display: none}
+.event_admin_check_in_table tr:hover .check_in_ticket_status {display: none}
+
+.event_admin_check_in_table tr.-ticket_status_awaiting:hover > td:not(:only-child):last-child {
+	color: #00dc88;
+	color: var(--color_franklin);
+}
+
+.event_admin_check_in_table tr.-ticket_status_checked:hover > td:not(:only-child):last-child {
+	color: #f82969;
+	color: var(--color_bubblegum);
+}

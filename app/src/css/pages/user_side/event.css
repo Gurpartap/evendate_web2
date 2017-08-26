@@ -1,0 +1,136 @@
+.event_page {
+	display: inline-flex;
+	vertical-align: top;
+	min-width: 750px;
+	width: 75%;
+	margin: 24px 0;
+	border-radius: 2px;
+	overflow: hidden;
+}
+
+.event_main_content {
+	flex-shrink: 0;
+	width: 70%;
+}
+
+.event_image {
+	border-bottom: 1px solid #c5c9d1;
+	border-bottom: 1px solid var(--color_primary_30);
+	cursor: pointer;
+}
+.event_image > img {width: 100%}
+
+.event_image_bottom {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: -15px;
+	display: flex;
+	justify-content: space-between;
+	padding: 0 24px;
+	z-index: 1;
+}
+
+.event_image_bottom .avatars_collection {cursor: pointer}
+
+.event_image_bottom .button + .button {margin-left: .88em}
+
+.event_main_action_button {width: 200px}
+
+.event_content {padding: 42px 24px 24px}
+
+.event_title {
+	display: block;
+	font-size: 1.6em;
+	font-weight: 500;
+	margin: 0 0 1em;
+}
+.event_description {
+	font-size: 0.88em;
+	line-height: 1.3;
+	white-space: pre-line;
+}
+
+.event_map {
+	height: 300px;
+	margin-top: 3em;
+	background-size: 100% auto;
+	background-position: 50%;
+	cursor: pointer;
+}
+
+.event_additional_content {
+	flex-shrink: 0;
+	width: 30%;
+	padding: 24px;
+	border-left: 1px solid #c5c9d1;
+	border-left: 1px solid var(--color_primary_30);
+}
+.event_calendar:not(:empty) {height: 265px}
+
+.event_additional_field {
+	font-size: .88rem;
+	margin: 2em 0 .5em;
+}
+.event_additional_field > p {margin: .4em 0}
+.event_additional_field_split {font-size: 0}
+.event_additional_field_split > .event_additional_field {
+	display: inline-block;
+	vertical-align: top;
+	width: 50%;
+	margin: 0 0 .4em;
+}
+
+.event_additional_field > .external_link {
+	display: block;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.event_date {
+	display: block;
+	margin-bottom: 6px;
+}
+
+.event_additional_field_label {
+	display: block;
+	margin-bottom: .5em;
+	font-weight: 500;
+	color: #3e4d66;
+	color: var(--color_primary);
+}
+.event_additional_content > .event_additional_field:first-child {margin-top: 0}
+
+.event_additional_info {
+	margin: 0;
+	font-size: .88rem;
+	font-weight: 500;
+}
+
+.event_additional_content > .button:first-child {margin-bottom: 1em}
+
+.event_additional_content > .share_block {
+	font-size: .75em;
+	font-weight: 500;
+}
+
+.event_vulcan {
+	width: 240px;
+	margin: 24px 0 0 24px;
+}
+
+.event_vulcan_header {
+	margin-bottom: 12px;
+	font-weight: 500;
+	font-size: .88em;
+	line-height: 1.4;
+	color: #3e4d66;
+	color: var(--color_primary);
+	text-transform: uppercase;
+	text-align: center;
+}
+
+.event_page > .overlay_cap {
+	background-color: hsla(0,0%,100%,.9);
+}

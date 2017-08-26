@@ -49,8 +49,8 @@ AuthModal = extending(AbstractModal, (function() {
 			$(this).on('click', function (e) {
 				var network = $(this).data('auth_network');
 				
-				if (yaCounter32442130) {
-					yaCounter32442130.reachGoal(network.toUpperCase() + 'AuthStart');
+				if (window.yaCounter32442130) {
+					window.yaCounter32442130.reachGoal(network.toUpperCase() + 'AuthStart');
 				}
 				
 				try {

@@ -1,5 +1,7 @@
 /**
  * @requires ../Class.OneEntity.js
+ *
+ * @requires ../../data_models/Class.TariffModel.js
  */
 /**
  * @typedef {object} Privilege

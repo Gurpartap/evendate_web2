@@ -1,0 +1,76 @@
+.statistics_table {width: 100%}
+.statistics_table.-table_fixed {table-layout: fixed}
+
+.statistics_table > thead {box-shadow: 0 4px 8px 0 rgba(0,0,0,0.06)}
+.statistics_table tr:nth-child(even) {background-color: #f9f9fa; background-color: var(--color_background_gray);}
+
+.statistics_table th,
+.statistics_table td {
+	height: 48px;
+	padding: 9px 12px;
+}
+
+.statistics_table th {
+	font-size: .9375em;
+	font-weight: 600;
+	color: #657184;
+	color: var(--color_primary_80);
+}
+
+.statistics_table td {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.statistics_table th:first-child,
+.statistics_table td:first-child {padding-left: 18px}
+
+.statistics_table th:last-child,
+.statistics_table td:last-child {padding-right: 18px}
+
+.statistics_table .-text_small {font-size: 0.875em}
+.statistics_table .-text_big {font-size: 1.125em}
+
+.statistics_table .sort-up,
+.statistics_table .sort-down,
+.statistics_table .-highlighted {color: #2e3b50; color: var(--color_dark_primary);}
+
+.statistics_table .sort-header {cursor: pointer}
+
+.statistics_table .sort-header > span:before {
+	content: '';
+	position: absolute;
+	top: -2px;
+	left: -12px;
+	bottom: 0;
+	height: 0;
+	margin: auto;
+	border-left: 4px solid transparent;
+	border-right: 4px solid transparent;
+	visibility: hidden;
+}
+.statistics_table .sort-up > span:before,
+.statistics_table .sort-down > span:before {
+	color: #00dc88;
+	color: var(--color_franklin);
+}
+.statistics_table .sort-up > span:before,
+.statistics_table .sort-down > span:before,
+.statistics_table .sort-down:hover > span:before,
+.statistics_table .sort-header:hover > span:before {visibility: visible}
+
+.statistics_table .sort-header > span:before,
+.statistics_table .sort-header.sort-down > span:before,
+.statistics_table .sort-header.sort-up[data-sort-order="asc"] > span:before,
+.statistics_table .sort-header.sort-up[data-sort-order="desc"] > span:before {
+	border-top: 4px solid;
+	border-bottom: 0 solid;
+}
+
+.statistics_table .sort-header.sort-up > span:before,
+.statistics_table .sort-header.sort-down[data-sort-order="asc"] > span:before,
+.statistics_table .sort-header.sort-down[data-sort-order="desc"] > span:before {
+	border-top: 0 solid;
+	border-bottom: 4px solid;
+}

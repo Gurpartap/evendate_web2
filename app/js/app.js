@@ -711,55 +711,6 @@ if (window.location.hostname.indexOf('.test.evendate.ru') == -1) {
     window.socket = io({path: '/node/socket.io'});
 }
 
-
-socket.on('auth', function (data) {
-    console.log(data);
-    $.ajax({
-        url: 'auth.php',
-        type: 'POST',
-        data: data,
-        success: function (res) {
-
-            if (yaCounter32442130) {
-                switch (data.type) {
-                    case 'vk': {
-                        yaCounter32442130.reachGoal('VkAuthDone');
-                        break;
-                    }
-                    case 'facebook': {
-                        yaCounter32442130.reachGoal('FacebookAuthDone');
-                        break;
-                    }
-                    case 'google': {
-                        yaCounter32442130.reachGoal('GoogleAuthDone');
-                        break;
-                    }
-                }
-            }
-
-            if (res.status) {
-                var search_data = searchToObject();
-                if (search_data.redirect_to) {
-                    window.parent.location = search_data.redirect_to;
-                } else if (data.hasOwnProperty('mobile') && data.mobile == true) {
-                    window.location.href = '/mobileAuthDone.php?token=' + data.token + '&email=' + data.email;
-                } else {
-                    if (sessionStorage.getItem('organization_info')) {
-                        window.parent.location = '/add/organization';
-                    } else if (data.subscriptions_count == 0) {
-                        window.parent.location = '/onboarding';
-                    } else {
-                        window.parent.location = '/';
-                    }
-                }
-            } else {
-                $('.panel-body.loader-demo').text(res.text);
-                $('.panel-heading').hide();
-            }
-        }
-    });
-});
-
 socket.on('log', function (data) {
     console.log(data);
 });

@@ -1,6 +1,9 @@
 /**
  * @requires ../Class.OneEntity.js
+ *
  * @requires ../activity/Class.UsersActivitiesCollection.js
+ * @requires ../organization/Class.OrganizationsCollection.js
+ * @requires ../../data_models/interest/Class.InterestModelsCollection.js
  */
 /**
  * @class OneUser

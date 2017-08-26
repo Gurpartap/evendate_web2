@@ -47,13 +47,22 @@ AdminOrganizationsPage = extending(AdminPage, (function() {
 			
 			return $.extend(true, {}, org, {
 				subscribers: org.subscribed_count + getUnitsText(org.subscribed_count, __LOCALES.ru_RU.TEXTS.SUBSCRIBERS),
-				buttons: __APP.BUILD.link({
+				buttons: __APP.BUILD.linkButton({
 					title: 'Редактировать',
-					classes: ['button', 'fa_icon', 'fa-pencil', '-color_neutral', 'RippleEffect'],
+					classes: [
+						__C.CLASSES.ICON_CLASS,
+						__C.CLASSES.ICONS.PENCIL,
+						__C.CLASSES.COLORS.NEUTRAL,
+						__C.CLASSES.HOOKS.RIPPLE
+					],
 					page: '/admin/organization/' + org.id + '/edit'
 				}, {
 					title: 'Создать событие',
-					classes: ['button', 'fa_icon', 'fa-plus', '-color_accent', 'RippleEffect'],
+					classes: [
+						__C.CLASSES.ICON_CLASS,
+						__C.CLASSES.ICONS.PLUS,
+						__C.CLASSES.COLORS.ACCENT,
+						__C.CLASSES.HOOKS.RIPPLE],
 					page: '/add/event/to/' + org.id
 				})
 			}, org_roles.reduce(function(obj, role) {

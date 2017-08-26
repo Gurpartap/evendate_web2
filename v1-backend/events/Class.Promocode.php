@@ -14,7 +14,7 @@ class Promocode extends AbstractEntity
 		'effort',
 		'start_date',
 		'end_date',
-		'enabled',
+		'enabled'
 	);
 
 	protected static $ADDITIONAL_COLS = array(

@@ -1,0 +1,8 @@
+.registration_modal_form > .form_unit {margin-top: 1.5em}
+
+.registration_modal_form .form_label {
+	font-size: .875em;
+	font-weight: 400;
+	color: #657184;
+	color: var(--color_primary_80);
+}

@@ -44,7 +44,19 @@ AsynchronousConnection = (function() {
 			data: ajax_data,
 			method: http_method,
 			contentType: content_type || 'application/x-www-form-urlencoded; charset=UTF-8'
-		}).fail(error).done(success).promise();
+		}).then((function(response, status_text, jqXHR) {
+			if (
+				response.hasOwnProperty('status') &&
+				response.hasOwnProperty('data') &&
+				response.hasOwnProperty('code') &&
+				response.hasOwnProperty('text')
+			) {
+				
+				return response.data;
+			}
+			
+			return response;
+		})).fail(error).done(success);
 	};
 	/**
 	 * @param {...(jqXHR|Deferred|jqPromise)} Deferreds
@@ -55,6 +67,7 @@ AsynchronousConnection = (function() {
 		var with_callback = (arguments[arguments.length - 1] instanceof Function),
 			promises = with_callback ? Array.prototype.splice.call(arguments, 0, arguments.length - 1) : Array.prototype.slice.call(arguments),
 			parallel_promise;
+		
 		parallel_promise = $.when.apply($, promises);
 		if(with_callback) {
 			parallel_promise.done(Array.prototype.shift.call(arguments));

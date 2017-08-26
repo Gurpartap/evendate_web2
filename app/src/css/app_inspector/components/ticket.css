@@ -1,0 +1,26 @@
+.app_inspector_ticket {
+	border-radius: 3px;
+	background-color: #f9f9fa;
+	background-color: var(--color_background_gray);
+}
+
+.app_inspector_ticket + .app_inspector_ticket {margin-top: 12px}
+
+.app_inspector_ticket_body {padding: 12px}
+
+.app_inspector_ticket_footer {
+	display: flex;
+	height: 24px;
+	justify-content: center;
+	align-items: center;
+	background-color: #e2e4e8;
+	border-radius: 0 0 3px 3px;
+}
+
+.app_inspector_ticket_footer > span {
+	color: #9fa6b3;
+	color: var(--color_primary_50);
+	font-size: .6875em;
+	font-weight: bold;
+	text-transform: uppercase;
+}

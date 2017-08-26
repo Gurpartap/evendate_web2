@@ -40,7 +40,8 @@
 	<button class="button -color_neutral -size_wide RippleEffect DropdownButton" data-dropdown="redact_event" data-dd-width="self" type="button">Редактирование события</button>
 	<div class="dropdown_box DropdownBox" data-dropdown_id="redact_event">
 		<div class="dropdown_list"><button class="dropdown_button -size_wide -color_accent RippleEffect CloseDropdown DropdownButton" data-dropdown="cancel_event" data-dd-width="self" type="button">Отменить событие</button></div>
-		<div class="dropdown_list"><a href="/admin/event/{id}/edit" class="dropdown_button link -size_wide -color_neutral RippleEffect CloseDropdown Link">Редактировать</a></div>
+		<div class="dropdown_list"><a href="/event_landing/?id={id}&edit=true" target="_blank" class="dropdown_button link -size_wide -color_franklin RippleEffect CloseDropdown">Создать лендинг</a></div>
+		<div class="dropdown_list"><a href="/admin/event/{id}/edit" class="dropdown_button link -size_wide -color_default RippleEffect CloseDropdown Link">Редактировать</a></div>
 	</div>
 	<div class="dropdown_box DropdownBox" data-dropdown_id="cancel_event">
 		<div class="dropdown_box_wrapper">

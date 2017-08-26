@@ -238,6 +238,21 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @param {...buildProps} props
+	 * @param {string} props.page
+	 * @param {string} props.title
+	 *
+	 * @returns {jQuery}
+	 */
+	Builder.prototype.linkButton = function buildLinkButton(props) {
+		
+		return bindPageLinks(tmpl('link-button', [].map.call(arguments, function(arg) {
+			
+			return Builder.normalizeBuildProps(arg);
+		})));
+	};
+	/**
+	 *
 	 * @param {string} href
 	 * @param {string} title
 	 * @param {(string|Array<string>)} [classes]
@@ -1105,57 +1120,17 @@ Builder = (function() {
 		return tmpl('event-block', events.map(function(event) {
 			var sort_date_type = type.sort_date_type ? type.sort_date_type : 'nearest_event_date',
 				m_event_date = moment.unix(event[sort_date_type] ? event[sort_date_type] : event['first_event_date']),
-				different_day = type.last_date != m_event_date.format(__C.DATE_FORMAT),
+				different_day = type.last_date !== m_event_date.format(__C.DATE_FORMAT),
 				avatars_collection_classes = [
 					__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
 					__C.CLASSES.UNIVERSAL_STATES.BORDERED,
 					__C.CLASSES.SIZES.SMALL,
 					__C.CLASSES.HOOKS.ADD_AVATAR.COLLECTION,
 					__C.CLASSES.HOOKS.CALL_MODAL
-				],
-				$action_buttons = $();
+				];
 			
 			if(event.is_favorite) {
 				avatars_collection_classes.push(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
-			}
-			
-			if (!empty(event.is_favorite)) {
-				if (event.registration_locally || event.ticketing_locally) {
-					$action_buttons = $action_buttons
-						.add(new AddToFavoriteButton(event.id, {
-							is_add_avatar: true,
-							is_checked: event.is_favorite,
-							classes: [
-								__C.CLASSES.UNIVERSAL_STATES.EMPTY,
-								__C.CLASSES.SIZES.LOW,
-								__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
-								__C.CLASSES.HOOKS.ADD_TO_FAVORITES,
-								__C.CLASSES.HOOKS.RIPPLE
-							],
-							labels: null
-						}))
-						.add(new OrderButton(event, {
-							classes: [
-								'event_block_main_action_button',
-								__C.CLASSES.SIZES.LOW,
-								__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
-								__C.CLASSES.HOOKS.ADD_TO_FAVORITES,
-								__C.CLASSES.HOOKS.RIPPLE
-							]
-						}));
-				} else {
-					$action_buttons = new AddToFavoriteButton(event.id, {
-						is_add_avatar: true,
-						is_checked: event.is_favorite,
-						classes: [
-							'event_block_main_action_button',
-							__C.CLASSES.SIZES.LOW,
-							__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
-							__C.CLASSES.HOOKS.ADD_TO_FAVORITES,
-							__C.CLASSES.HOOKS.RIPPLE
-						]
-					});
-				}
 			}
 			
 			type.last_date = m_event_date.format(__C.DATE_FORMAT);
@@ -1165,7 +1140,17 @@ Builder = (function() {
 				divider: different_day ? tmpl('divider', {
 					title: m_event_date.calendar().capitalize()
 				}) : '',
-				action_buttons: $action_buttons,
+				action_buttons: new AddToFavoriteButton(event.id, {
+					is_add_avatar: true,
+					is_checked: event.is_favorite,
+					classes: [
+						'event_block_main_action_button',
+						__C.CLASSES.SIZES.LOW,
+						__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+						__C.CLASSES.HOOKS.ADD_TO_FAVORITES,
+						__C.CLASSES.HOOKS.RIPPLE
+					]
+				}),
 				date: m_event_date.format(__C.DATE_FORMAT),
 				avatars_collection: self.avatarCollection(event.favored, 3, {
 					dataset: {
@@ -1176,7 +1161,7 @@ Builder = (function() {
 					counter_classes: [__C.CLASSES.SIZES.X30, __C.CLASSES.UNIVERSAL_STATES.BORDERED, __C.CLASSES.COLORS.MARGINAL, __C.CLASSES.HOOKS.ADD_AVATAR.STATES.CASTABLE]
 				}, event.favored_users_count),
 				time: event.dates.reduce(function(times, date) {
-					if (moment.unix(date.event_date).format(__C.DATE_FORMAT) == m_event_date.format(__C.DATE_FORMAT)) {
+					if (moment.unix(date.event_date).format(__C.DATE_FORMAT) === m_event_date.format(__C.DATE_FORMAT)) {
 						times.push(displayTimeRange(date.start_time, date.end_time));
 					}
 					return times;
@@ -1268,71 +1253,12 @@ Builder = (function() {
 					__C.CLASSES.HOOKS.CALL_MODAL
 				],
 				feed_event_infos = [],
-				organization = new OneOrganization(event.organization_id),
-				$action_button,
-				$header_buttons = $();
+				organization = new OneOrganization(event.organization_id);
 			
 			organization.setData({
 				short_name: event.organization_short_name,
 				img_url: event.organization_logo_small_url
 			});
-			
-			
-			if (event.registration_locally || event.ticketing_locally) {
-				$header_buttons = new AddToFavoriteButton(event.id, {
-					is_add_avatar: true,
-					is_checked: event.is_favorite,
-					classes: [
-						'feed_event_header_button',
-						__C.CLASSES.SIZES.LOW,
-						__C.CLASSES.UNIVERSAL_STATES.EMPTY
-					],
-					labels: null,
-					icons: {
-						checked_hover: __C.CLASSES.ICONS.STAR
-					},
-					colors: {
-						checked: __C.CLASSES.TEXT_COLORS.ACCENT,
-						unchecked: '',
-						checked_hover: __C.CLASSES.TEXT_COLORS.ACCENT,
-						unchecked_hover: ''
-					}
-				});
-				
-				$action_button = new OrderButton(event, {
-					classes: [
-						__C.CLASSES.SIZES.LOW,
-						__C.CLASSES.SIZES.WIDE,
-						__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
-						__C.CLASSES.HOOKS.RIPPLE
-					]
-				});
-			} else {
-				$action_button = new AddToFavoriteButton(event.id, {
-					is_add_avatar: true,
-					is_checked: event.is_favorite,
-					classes: [
-						__C.CLASSES.SIZES.LOW,
-						__C.CLASSES.SIZES.WIDE,
-						__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
-						__C.CLASSES.HOOKS.RIPPLE
-					]
-				})
-			}
-			
-			$header_buttons = $header_buttons.add(self.button({
-				classes: [
-					'feed_event_header_button',
-					'feed_event_header_button_hide_event',
-					__C.CLASSES.SIZES.LOW,
-					__C.CLASSES.UNIVERSAL_STATES.EMPTY,
-					'HideEvent'
-				],
-				dataset: {
-					'event-id': event.id
-				},
-				title: '×'
-			}));
 			
 			if (event.is_favorite) {
 				avatars_collection_classes.push(__C.CLASSES.HOOKS.ADD_AVATAR.STATES.SHIFTED);
@@ -1357,7 +1283,16 @@ Builder = (function() {
 					is_link: true,
 					entity: __C.ENTITIES.ORGANIZATION
 				}),
-				action_button: $action_button,
+				action_button: new AddToFavoriteButton(event.id, {
+					is_add_avatar: true,
+					is_checked: event.is_favorite,
+					classes: [
+						__C.CLASSES.SIZES.LOW,
+						__C.CLASSES.SIZES.WIDE,
+						__C.CLASSES.UNIVERSAL_STATES.ROUNDED,
+						__C.CLASSES.HOOKS.RIPPLE
+					]
+				}),
 				avatars_collection: self.avatarCollection(event.favored, 4, {
 					dataset: {
 						modal_type: 'favors',
@@ -1372,7 +1307,19 @@ Builder = (function() {
 					]
 				}, event.favored_users_count),
 				feed_event_infos: tmpl('event-card-info', feed_event_infos),
-				header_buttons: $header_buttons
+				header_buttons: __APP.USER.isLoggedOut() ? '' : self.button({
+					classes: [
+						'feed_event_header_button',
+						'feed_event_header_button_hide_event',
+						__C.CLASSES.SIZES.LOW,
+						__C.CLASSES.UNIVERSAL_STATES.EMPTY,
+						'HideEvent'
+					],
+					dataset: {
+						'event-id': event.id
+					},
+					title: '×'
+				})
 			}, event);
 		}));
 		
@@ -1381,10 +1328,6 @@ Builder = (function() {
 				storeStat(event.id, __C.STATS.EVENT_ENTITY, __C.STATS.EVENT_VIEW);
 			}, {accY: 100})
 		});
-		
-		if(__APP.USER.isLoggedOut()){
-			$events.find('.HideEvent').remove();
-		}
 		
 		return $events;
 	};

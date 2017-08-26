@@ -34,6 +34,7 @@ DatesCollection = extending(EntitiesCollection, (function() {
 	 * @returns {jqPromise}
 	 */
 	DatesCollection.fetchDates = function(ajax_data, success) {
+		
 		return __APP.SERVER.getData('/api/v1/events/dates', ajax_data, success);
 	};
 	

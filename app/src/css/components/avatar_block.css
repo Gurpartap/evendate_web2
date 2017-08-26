@@ -1,0 +1,54 @@
+/**
+ * @requires avatar.css
+ */
+.avatar_block {
+	display: flex;
+	align-items: center;
+	font-weight: 500;
+}
+
+.avatar_block > .avatar_name {
+	display: inline-block;
+	margin: 0 0 0 1.1em;
+}
+
+.avatar_block > .avatar {
+	flex-grow: 0;
+	flex-shrink: 0;
+}
+
+.avatar_block.-size_small > .avatar_name,
+.avatar_block.-size_30x30 > .avatar_name,
+.avatar_block > .avatar.-size_small + .avatar_name,
+.avatar_block > .avatar.-size_30x30 + .avatar_name {
+	margin: 0 0 0 .5em;
+	font-size: 0.88rem;
+}
+
+
+.avatar_block.-align_right {text-align: right}
+.avatar_block.-align_right > .avatar_name {margin: 0 1.1em 0 0}
+
+
+.avatar_block.-align_right.-size_small > .avatar_name,
+.avatar_block.-align_right.-size_30x30 > .avatar_name {margin: 0 .5em 0 0}
+
+.avatar_block.-stack {
+	display: inline-flex;
+	flex-direction: column;
+	width: 150px;
+	padding: 0 6px;
+	margin-bottom: 24px;
+}
+.avatar_block.-stack > .avatar_name {
+	margin: 12px 0 0 0;
+	font-weight: 400;
+	font-size: .88em;
+}
+
+.avatar_block.-color_primary {color: #3e4d66; color: var(--color_primary);}
+.avatar_block.-color_marginal {color: #9fa6b3; color: var(--color_primary_50);}
+.avatar_block.-color_accent {color: #f82969; color: var(--color_accent);}
+.avatar_block.-color_accent_alt {color: #ff5f9e; color: var(--color_accent_alt);}
+.-state_admin .avatar_block.-color_accent {color: #00dc88}
+.-state_admin .avatar_block.-color_accent_alt {color: #23d792}

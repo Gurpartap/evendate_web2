@@ -187,6 +187,7 @@ __C = {
 		ESC: 27
 	}
 };
+Object.freeze(__C);
 /**
  * Extending class
  *
@@ -2441,8 +2442,11 @@ function bindPageLinks($parent) {
 	
 	return $links.not('.-Handled_Link').on('click.pageRender', function(e) {
 		var $this = $(this);
-		if ($this.hasClass(__C.CLASSES.DISABLED))
+		
+		if ($this.hasClass(__C.CLASSES.DISABLED)) {
+			
 			return false;
+		}
 		if (e.which === 1) {
 			e.preventDefault();
 			__APP.changeState($this.attr('href'));
@@ -2583,4 +2587,38 @@ function setDefaultValue(variable, default_value) {
 		return default_value;
 	
 	return variable;
+}
+
+function searchToObject() {
+	var pairs = window.location.search.substring(1).split("&"),
+		obj = {},
+		pair,
+		i;
+	
+	for (i in pairs) {
+		if (pairs.hasOwnProperty(i)) {
+			if (pairs[i] === "") continue;
+			
+			pair = pairs[i].split("=");
+			obj[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
+		}
+	}
+	
+	return obj;
+}
+
+function hashToObject() {
+	var pairs = window.location.hash.substring(1).split("&"),
+		obj = {},
+		pair,
+		i;
+	for (i in pairs) {
+		if (pairs.hasOwnProperty(i)) {
+			if (pairs[i] === '') continue;
+			
+			pair = pairs[i].split("=");
+			obj[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
+		}
+	}
+	return obj;
 }

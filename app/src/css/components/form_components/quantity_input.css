@@ -1,0 +1,30 @@
+/**
+ * @requires form_elements.css
+ */
+.quantity_input_component {
+	display: flex;
+	width: 107px;
+}
+
+.quantity_input_button.quantity_input_button.quantity_input_button {
+	padding: 0;
+	font-size: 1.5em;
+	line-height: 0;
+	font-weight: 100;
+	color: #c5c9d1;
+}
+.quantity_input_button:first-child {
+	border: 1px solid #c5c9d1;
+	border-right: 0;
+	border-radius: 3px 0 0 3px;
+}
+.quantity_input_button:last-child {
+	border: 1px solid #c5c9d1;
+	border-left: 0;
+	border-radius: 0 3px 3px 0;
+}
+
+.quantity_input {
+	text-align: center;
+	border-radius: 0;
+}

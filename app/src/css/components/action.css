@@ -1,0 +1,19 @@
+.action {
+	font-weight: 500;
+	text-transform: uppercase;
+	border: 0;
+	background-color: transparent;
+	cursor: pointer;
+	opacity: .9;
+}
+.action.-no_uppercase {text-transform: none}
+.action.-color_primary {color: #3e4d66; color: var(--color_primary);}
+.action.-color_accent {color: #f82969; color: var(--color_accent);}
+.-state_admin .action.-color_accent {color: #00dc88}
+.action.-color_error {color: #ff5f9e; color: var(--color_bubblegum_alt);}
+.action.-color_neutral {color: #9fa6b3; color: var(--color_primary_50);}
+
+.action:hover {
+	text-decoration: none;
+	opacity: 1;
+}

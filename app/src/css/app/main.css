@@ -1,0 +1,40 @@
+html,
+body,
+#main_overlay,
+#main_section,
+.app_view,
+.page_wrapper {height: 100%}
+
+#main_overlay {
+	transition: padding .4s ease;
+	padding-left: 228px;
+}
+
+#main_overlay,
+#main_sidebar,
+#main_section {height: 100%}
+
+#main_header,
+#main_sidebar {
+	position: fixed;
+	top: 0;
+}
+
+#main_section {padding-top: 54px}
+#main_header.-with_tabs + #main_section {padding-top: 90px}
+
+#main_section_cap {
+	position: fixed;
+	display: none;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: -1;
+
+	background-color: hsla(0,0%,0%,.4);
+}
+.-open_sidebar #main_section_cap {
+	display: block;
+	z-index: 10;
+}

@@ -1,0 +1,30 @@
+.link {
+	color: inherit;
+	outline: none !important;
+	text-decoration: none !important;
+	cursor: pointer;
+}
+
+.link.-color_accent,
+.link.-text_color_accent {color: #f82969; color: var(--color_accent);}
+
+.link.-color_bubblegum,
+.link.-text_color_bubble_gum {color: #f82969; color: var(--color_bubblegum);}
+
+.link.-color_bubblegum_alt,
+.link.-text_color_bubble_gum_alt {color: #ff5f9e; color: var(--color_bubblegum_alt);}
+
+.link.-color_franklin,
+.link.-text_color_franklin {color: #00dc88; color: var(--color_franklin);}
+
+.link.-color_franklin_alt,
+.link.-text_color_franklin_alt {color: #23d792; color: var(--color_franklin_alt);}
+
+.link.-color_marginal,
+.link.-text_color_marginal {color: #9fa6b3;	color: var(--color_primary_50);}
+
+.link.-color_neutral,
+.link.-text_color_neutral {color: #c5c9d1;	color: var(--color_primary_30);}
+
+.link:not(.button):not([class*="color"]):hover,
+.link:not(.button):not([class*="color"]):focus {color: #f82969;	color: var(--color_accent);}

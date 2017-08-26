@@ -1,0 +1,23 @@
+/**
+ * @requires avatar_block.css
+ */
+.subscriber {
+	display: block;
+	padding: 6px 12px;
+	cursor: pointer;
+}
+
+.subscriber + .subscriber {margin-top: 0}
+
+.subscriber:hover {
+	background-color: #f6f6f6;
+	background-color: var(--color_gray_material);
+}
+
+.subscriber.-active {
+	background-color: #f82969;
+	background-color: var(--color_accent);
+	color: #fff;
+}
+
+.-state_admin .subscriber.-active {background-color: #00dc88}

@@ -1,0 +1,65 @@
+.app_inspectors_wrapper {
+	position: fixed;
+	height: calc(100% - 54px);
+	right: 0;
+	z-index: 5;
+}
+
+#main_header.-with_tabs ~ #main_section .app_inspectors_wrapper {height: calc(100% - 90px)}
+
+.app_inspector {
+	position: absolute;
+	width: 400px;
+	height: 100%;
+	transform: translateX(10%);
+	transition: transform .3s ease;
+}
+
+.app_inspector.-show {
+	transform: translateX(-100%);
+}
+
+.app_inspector_header {
+	display: flex;
+	align-items: center;
+	box-shadow: 0 0 4px 0 hsla(0,0%,0%,.12);
+}
+
+.app_inspector_remover {
+	top: -3px;
+	margin-right: 12px;
+	padding: 8px 18px;
+	font-size: 2.5em;
+	font-weight: 100;
+	line-height: 1;
+	background-color: transparent;
+	border: 0;
+}
+
+.app_inspector_title {
+	font-size: 1.5em;
+	font-weight: bold;
+}
+
+.app_inspector_content_wrapper {
+	height: calc(100% - 56px);
+}
+
+.app_inspector_content {padding: 12px 18px}
+
+.app_inspector_subtitle {
+	display: block;
+	margin: 36px 0 18px;
+	font-size: .8125em;
+	font-weight: bold;
+	color: #9fa6b3;
+	color: var(--color_primary_50);
+	text-transform: uppercase;
+}
+
+.app_inspector_wrapper {
+	display: flex;
+	justify-content: flex-end;
+	align-items: baseline;
+	margin: 36px 0;
+}

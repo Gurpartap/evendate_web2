@@ -1,0 +1,16 @@
+.user_tombstone {
+	display: inline-block;
+	vertical-align: top;
+	width: 150px;
+	padding: 0 6px;
+	margin-bottom: 24px;
+	text-align: center;
+}
+
+.user_tombstone_title {
+	margin-top: 12px;
+	font-weight: 400;
+	font-size: .88em;
+	color: #4a4a4a;
+	color: var(--color_text);
+}

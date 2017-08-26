@@ -1,0 +1,66 @@
+.collapsing_wrapper {
+	height: 0;
+	overflow: hidden;
+}
+
+.collapsing_wrapper.-inset {
+	background-color: #f9f9fa;
+	background-color: var(--color_background_gray);
+	box-shadow: inset 0 5px 3px -3px #ccc, inset 0 -5px 3px -3px #ccc;
+}
+.collapsing_wrapper.-inset,
+.collapsing_wrapper.-fading,
+.collapsing_wrapper.-smooth_hiding {transition: height .3s ease}
+
+.collapsing_wrapper.-fading:after {
+	content: "";
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 100%;
+	background-image: linear-gradient(to bottom, hsla(0,0%,100%,0), #fff);
+	transition: height .3s ease;
+	cursor: pointer;
+}
+
+.collapsing_wrapper.-fading.-opened:after {height: 0}
+
+.collapsing_wrapper.-inset > .collapsing_content {border: 1px solid transparent}
+
+.collapsing_content {border: 1px solid transparent}
+
+.collapsing_wrapper.-smooth_hiding > .collapsing_content {
+	transform: translateY(-20px);
+	opacity: 0;
+	visibility: hidden;
+
+	transition: transform .2s ease, opacity .2s ease, visibility .2s ease;
+}
+
+.collapsing_wrapper.-opened.-smooth_hiding > .collapsing_content {
+	transform: translateY(0);
+	opacity: 1;
+	visibility: visible;
+}
+
+.collapsing_button {
+	width: 100%;
+	height: 2em;
+	font-size: 0.88em;
+	border: 0;
+	background-color: transparent;
+	text-align: center;
+	transition: transform .3s ease;
+	cursor: pointer;
+}
+.collapsing_button:hover,
+.collapsing_wrapper.-fading:not(.-opened):hover + .collapsing_button {color: #f82969; color: var(--color_bubblegum);}
+
+.collapsing_wrapper.-fading.-opened + .collapsing_button {
+	-webkit-transform: rotateZ(180deg);
+	-moz-transform: rotateZ(180deg);
+	-ms-transform: rotateZ(180deg);
+	-o-transform: rotateZ(180deg);
+	transform: rotateZ(180deg);
+}

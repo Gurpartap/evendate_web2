@@ -1,0 +1,108 @@
+.tabs_header {
+	text-align: left;
+}
+
+.tab {
+	display: inline-block;
+	padding: 6px 1px;
+	margin-right: .8em;
+	font-size: .9em;
+	font-weight: 500;
+	text-transform: uppercase;
+	border-bottom: 2px solid transparent;
+	opacity: .8;
+	cursor: pointer;
+
+	-webkit-transition: color .5s ease, border-color .5s ease;
+	-moz-transition: color .5s ease, border-color .5s ease;
+	-o-transition: color .5s ease, border-color .5s ease;
+	transition: color .5s ease, border-color .5s ease;
+}
+
+.tab:hover {opacity: 1}
+
+.tab.-active {
+	border-color: inherit;
+	opacity: 1;
+	cursor: default;
+}
+
+.-color_primary .tab.-active,
+.tab.-color_primary.-active {/*
+	color: #3e4d66;
+	color: var(--color_primary);*/
+	border-color: #3e4d66;
+	border-color: var(--color_primary);
+}
+
+.-color_accent .tab.-active,
+.tab.-color_accent.-active {/*
+	color: #f82969;
+	color: var(--color_accent);*/
+	border-color: #f82969;
+	border-color: var(--color_accent);
+}
+
+.-state_admin .-color_accent .tab.-active,
+.-state_admin .tab.-color_accent.-active {/*
+	color: #00dc88;*/
+	border-color: #00dc88;
+}
+
+.-color_default .tab.-active,
+.tab.-color_default.-active {/*
+	color: #fff;*/
+	border-color: #fff;
+}
+
+.tab_bodies_wrap {
+	margin: 20px 0;
+	overflow: hidden;
+
+	-webkit-transition: height .4s ease;
+	-moz-transition: height .4s ease;
+	-o-transition: height .4s ease;
+	transition: height .4s ease;
+}
+
+.tab_body {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	padding: 1px;
+
+	-webkit-transform: translateX(-100%);
+	-moz-transform: translateX(-100%);
+	-ms-transform: translateX(-100%);
+	-o-transform: translateX(-100%);
+	transform: translateX(-100%);
+
+	-webkit-transition: transform .5s ease, visibility .5s ease, opacity .5s ease;
+	-moz-transition: transform .5s ease, visibility .5s ease, opacity .5s ease;
+	-o-transition: transform .5s ease, visibility .5s ease, opacity .5s ease;
+	transition: transform .5s ease, visibility .5s ease, opacity .5s ease;
+
+	visibility: hidden;
+	opacity: 0;
+}
+.tab_body.-active {
+	position: relative;
+
+	-webkit-transform: translateX(0);
+	-moz-transform: translateX(0);
+	-ms-transform: translateX(0);
+	-o-transform: translateX(0);
+	transform: translateX(0);
+
+	visibility: visible;
+	opacity: 1;
+}
+
+.tab_body.-active ~ .tab_body {
+	-webkit-transform: translateX(100%);
+	-moz-transform: translateX(100%);
+	-ms-transform: translateX(100%);
+	-o-transform: translateX(100%);
+	transform: translateX(100%);
+}

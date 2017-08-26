@@ -1,0 +1,24 @@
+.material {
+	background-color: #fff;
+	background-color: var(--color_page);
+	box-shadow: 0 0 4px hsla(0,0%,0%,.08);
+	box-shadow: var(--material_shadow);
+	border-radius: 3px;
+	border-radius: var(--material_border_radius);
+}
+
+.material.-level_2_material {
+	box-shadow: 0 1px 7px hsla(0,0%,0%,.2);
+	--material_shadow: var(--material2_shadow);
+}
+
+.material.-floating_material {
+	box-shadow: 0 2px 15px hsla(0,0%,0%,.2);
+	--material_shadow: var(--floating_material_shadow);
+}
+
+.material.-dark_material {
+	background-color: #3e4d66;
+	background-color: var(--color_primary);
+	color: #fff;
+}

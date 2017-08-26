@@ -1,0 +1,11 @@
+.date_picker {
+	position: absolute;
+	right: 0;
+	min-width: 260px;
+	padding: 20px;
+	font-size: 1rem;
+	background-color: #fff;
+	background-color: var(--color_page);
+	box-shadow: 0 2px 6px hsla(0,0%,0%,.28);
+	z-index: 10;
+}

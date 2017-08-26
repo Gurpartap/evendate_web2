@@ -265,7 +265,6 @@ AbstractEditEventPage = extending(Page, (function() {
 				return {
 					row_num: row_id,
 					uuid: ticket_type.uuid,
-					comment: ticket_type.comment,
 					type_code: ticket_type.type_code || randomString(),
 					name_input: __APP.BUILD.formUnit({
 						id: 'event_edit_ticket_type_' + row_id + '_name',
@@ -291,6 +290,14 @@ AbstractEditEventPage = extending(Page, (function() {
 						value: empty(ticket_type.price) ? '' : ticket_type.price,
 						placeholder: 0,
 						required: true
+					}),
+					comment_form_unit: __APP.BUILD.formUnit({
+						label: 'Описание типа билетов',
+						type: 'textarea',
+						name: 'ticket_type_{row_num}_comment'.format({row_num: row_id}),
+						value: ticket_type.comment,
+						placeholder: 'Описание типа билетов (опционально)',
+						helptext: 'Краткое описание типа билетов, объясняющее пользователям отличие этого типа от других'
 					}),
 					tickets_sell_start_date_checkbox: __APP.BUILD.formUnit({
 						id: 'event_edit_ticket_type_' + row_id + '_start_by_date',
@@ -328,37 +335,6 @@ AbstractEditEventPage = extending(Page, (function() {
 						name: 'ticket_type_' + row_id + '_sell_end_date',
 						value: ticket_type.sell_end_date ? unixTimestampToISO(ticket_type.sell_end_date) : undefined,
 						unit_classes: ['-inline']
-					}),
-					promo_enable_checkbox: __APP.BUILD.formUnit({
-						id: 'event_edit_ticket_type_' + row_id + '_promo_checkbox',
-						label: 'Промокод',
-						type: 'checkbox',
-						name: 'ticket_type_' + row_id + '_promo_checkbox',
-						dataset: {
-							switch_id: 'ticket_type_' + row_id + '_promo'
-						},
-						classes: ['TicketTypePromoSwitch', 'Switch'],
-						unit_classes: ['form_accent_block', '-inline']
-					}),
-					promo_input: __APP.BUILD.formUnit({
-						id: 'event_edit_ticket_type_' + row_id + '_promocode',
-						label: 'Слово',
-						name: 'ticket_type_' + row_id + '_promocode',
-						value: ticket_type.promocode,
-						unit_classes: ['-inline'],
-						required: true
-					}),
-					promo_effort_input: __APP.BUILD.formUnit({
-						id: 'event_edit_ticket_type_' + row_id + '_promocode_effort',
-						type: 'number',
-						label: 'снизит стоимость на',
-						name: 'ticket_type_' + row_id + '_promocode_effort',
-						value: ticket_type.promocode_effort,
-						unit_classes: ['-inline'],
-						required: true,
-						attributes: {
-							size: 2
-						}
 					}),
 					tickets_by_order_min_amount_input: __APP.BUILD.formUnit({
 						id: 'event_edit_ticket_type_' + row_id + '_min_count_per_user',
@@ -671,8 +647,6 @@ AbstractEditEventPage = extending(Page, (function() {
 					type_code: form_data['ticket_type_' + id + '_type_code'],
 					amount: form_data['ticket_type_' + id + '_amount'],
 					price: form_data['ticket_type_' + id + '_price'],
-					promocode: form_data['ticket_type_' + id + '_promocode'] || null,
-					promocode_effort: form_data['ticket_type_' + id + '_promocode_effort'] || null,
 					start_after_ticket_type_code: form_data['ticket_type_' + id + '_start_after_ticket_type_code'] || null,
 					sell_start_date: form_data['ticket_type_' + id + '_start_by_date'] ? form_data['ticket_type_' + id + '_sell_start_date'] : null,
 					sell_end_date: form_data['ticket_type_' + id + '_sell_end_date'] || null,
@@ -912,20 +886,12 @@ AbstractEditEventPage = extending(Page, (function() {
 		})($form, PAGE.MainCalendar);
 		
 		function afterSubmit() {
-			PAGE.$wrapper.removeClass(__C.CLASSES.STATUS.DISABLED);
-			$loader.remove();
 			__APP.changeState('/event/' + PAGE.event.id);
 		}
 		
-		function onError(e) {
+		function always() {
 			PAGE.$wrapper.removeClass(__C.CLASSES.STATUS.DISABLED);
 			$loader.remove();
-			console.error(e);
-			console.log({
-				MainCalendar: PAGE.MainCalendar,
-				send_data: send_data,
-				form_data: form_data
-			});
 		}
 		
 		if (is_form_valid) {
@@ -934,12 +900,12 @@ AbstractEditEventPage = extending(Page, (function() {
 			try {
 				send_data = this.gatherSendData();
 				if (is_edit) {
-					PAGE.event.updateEvent(send_data, afterSubmit, onError);
+					PAGE.event.updateEvent(send_data, afterSubmit).always(always);
 				} else {
-					PAGE.event.createEvent(send_data, afterSubmit, onError);
+					PAGE.event.createEvent(send_data, afterSubmit).always(always);
 				}
 			} catch (e) {
-				onError(e);
+				ServerConnection.stdErrorHandler(e);
 			}
 		}
 	};
@@ -1468,7 +1434,7 @@ AbstractEditEventPage = extending(Page, (function() {
 			id: 'edit_event_booking_time',
 			name: 'booking_time',
 			type: 'number',
-			helptext: 'Колличество часов, в течении которых участник может оплатить свой заказ',
+			helptext: 'Количество часов, в течении которых участник может оплатить свой заказ',
 			value: this.event.booking_time || 1,
 			required: true,
 			attributes: {

@@ -316,6 +316,7 @@ CREATE OR REPLACE VIEW view_emails_waiting_for_payment AS
     INNER JOIN view_events ON view_tickets_orders.event_id = view_events.id
     INNER JOIN users ON view_tickets_orders.user_id = users.id
   WHERE view_tickets_orders.status_type_code = 'waiting_for_payment'
+    AND view_tickets_orders.final_sum > 0
         AND view_tickets_orders.uuid NOT IN (SELECT (data ->> 'order_uuid')
                                              FROM emails
                                              WHERE emails.email_type_id = 16 AND

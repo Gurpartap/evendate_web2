@@ -21,6 +21,7 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 	}
 	
 	EditEventPage.fields = new Fields(
+		'accept_bitcoins',
 		'email_texts',
 		'booking_time',
 		'promocodes',
@@ -183,6 +184,10 @@ EditEventPage = extending(AbstractEditEventPage, (function() {
 					}
 				}
 			});
+		}
+		
+		if (this.event.accept_bitcoins) {
+			this.$wrapper.find('.AcceptBitcoinsCheckbox').prop('checked', true).trigger('change');
 		}
 		
 		if (this.event.notifications.has(OneNotification.NOTIFICATIN_TYPES.ADDITIONAL_FOR_ORGANIZATION)) {

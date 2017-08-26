@@ -140,10 +140,10 @@ FeedPage = extending(Page, (function() {
 		if (selected_date) {
 			MainCalendar.setMonth(selected_date.split('-')[1], selected_date.split('-')[0]).selectDays(selected_date);
 		}
-		MainCalendar.setDaysWithEvents();
+		MainCalendar.setDaysWithEvents({city_id: __APP.USER.selected_city.id});
 		MainCalendar.$calendar.on('change:month', function() {
 			bindPageLinks(MainCalendar.$calendar);
-			MainCalendar.setDaysWithEvents();
+			MainCalendar.setDaysWithEvents({city_id: __APP.USER.selected_city.id});
 		});
 	};
 	
@@ -163,9 +163,10 @@ FeedPage = extending(Page, (function() {
 			
 			initSelect2($select);
 			$select.select2('val', __APP.USER.selected_city.id).off('change.SelectCity').on('change.SelectCity', function() {
-					__APP.USER.selected_city = PAGE.cities.getByID($(this).val());
-					__APP.reload();
-				});
+				__APP.USER.selected_city = PAGE.cities.getByID($(this).val());
+				__APP.reload();
+				PAGE.initFeedCalendar();
+			});
 		});
 	};
 	

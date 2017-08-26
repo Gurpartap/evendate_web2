@@ -1,0 +1,80 @@
+.eventstat_overview {
+	margin: 18px 0;
+}
+
+.eventstat_overview_header {
+	display: flex;
+	flex-wrap: wrap;
+	min-height: 157px;
+	border-bottom: 1px solid #d6d6d6;
+}
+
+.eventstat_overview_header_block.img_holder {
+	flex: 0 0 280px;
+	cursor: pointer;
+}
+
+.eventstat_overview_info {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	padding: 12px;
+}
+
+.eventstat_overview_event_title {
+	font-size: 1.12em;
+	font-weight: 500;
+	color: #3e4d66;
+	color: var(--color_primary);
+}
+
+.eventstat_overview_datetime {display: flex}
+
+.eventstat_overview_date,
+.eventstat_overview_time {padding: 6px 0}
+.eventstat_overview_date {padding-right: 12px}
+.eventstat_overview_time {padding-left: 12px}
+.eventstat_overview_time {border-left: 1px solid #d6d6d6}
+
+.eventstat_overview_scoreboards_wrapper {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	padding: 12px 8px 24px;
+	border-left: 1px solid #d6d6d6;
+}
+.eventstat_overview_scoreboards_wrapper,
+.eventstat_overview_big_scoreboards {
+	flex: 0 0 340px;
+	text-align: center;
+}
+
+.eventstat_overview_scoreboards {
+	display: flex;
+	justify-content: space-between;
+}
+
+.eventstat_overview_scoreboards > .scoreboard {padding: 0 12px}
+
+.eventstat_overview_content {
+	display: flex;
+	padding: 36px 0;
+}
+
+.eventstat_overview_charts {
+	flex: 1;
+	padding-left: 36px;
+}
+
+.eventstat_overview_chart,
+.eventstat_overview_big_scoreboards > .scoreboard.-size_big {
+	height: 460px;
+	margin-bottom: 60px;
+}
+
+.eventstat_overview_big_scoreboards > .scoreboard.-size_big {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
