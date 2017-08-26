@@ -47619,10 +47619,7 @@ sendPostMessage = (function(w) {
 			}
 			case 'getHeight': {
 				
-				return !function(current_height){
-					
-					return sendMessage.setHeight(calcHeight(current_height));
-				}(resp.data);
+				return sendMessage.setHeight(calcHeight());
 			}
 		}
 	}
@@ -47636,14 +47633,19 @@ sendPostMessage = (function(w) {
 	return sendMessage;
 }(window));
 
-function calcHeight(current_height) {
-	if (current_height && current_height > document.scrollingElement.scrollHeight) {
+function calcHeight() {
+	var $content = $('.Content');
+	
+	if ($content.children().length) {
 		
-		return $('.Content').children().outerHeight() + 150;
-	} else {
+		if (document.scrollingElement.scrollHeight > $content.children().outerHeight() + 150) {
+			
+			return $content.children().outerHeight() + 150;
+		}
 		
-		return document.scrollingElement.scrollHeight;
 	}
+	
+	return document.scrollingElement.scrollHeight;
 }
 
 $(document)
