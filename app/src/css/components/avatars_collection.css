@@ -1,0 +1,82 @@
+/**
+ * @requires avatar.css
+ */
+.avatars_collection {
+	display: inline-block;
+	vertical-align: middle;
+	font-size: 0;
+}
+.avatars_collection > .avatar + .avatar {margin-left: -6px}
+
+.avatars_collection.-rounded > .avatar,
+.avatars_collection.-rounded > .avatar > img {
+	border-radius: 50%;
+	overflow: hidden;
+}
+.avatars_collection.-bordered > .avatar > img {border: 2px solid #fff}
+
+.avatars_collection.-trimmed {
+	width: 0;
+	white-space: nowrap;
+	-webkit-transition: width .5s ease;
+	-moz-transition: width .5s ease;
+	-o-transition: width .5s ease;
+	transition: width .5s ease;
+}
+
+.avatars_collection.-trimmed > .avatar:last-child {
+	-webkit-transition: opacity .3s ease, visibility .3s ease, left .5s ease;
+	-moz-transition: opacity .3s ease, visibility .3s ease, left .5s ease;
+	-o-transition: opacity .3s ease, visibility .3s ease, left .5s ease;
+	transition: opacity .3s ease, visibility .3s ease, left .5s ease;
+}
+
+.avatars_collection.-trimmed > .avatar:first-child {
+	-webkit-transition: opacity .3s ease, visibility .3s ease, margin-left .5s ease, left .5s ease;
+	-moz-transition: opacity .3s ease, visibility .3s ease, margin-left .5s ease, left .5s ease;
+	-o-transition: opacity .3s ease, visibility .3s ease, margin-left .5s ease, left .5s ease;
+	transition: opacity .3s ease, visibility .3s ease, margin-left .5s ease, left .5s ease;
+}
+
+.avatars_collection.-trimmed > .avatar {left: 0}
+
+/**
+-shifted is an alias to -subscribed
+ */
+
+.avatars_collection.-trimmed > .avatar:last-child,
+.avatars_collection.-trimmed.-subscribed > .avatar:first-child,
+.avatars_collection.-trimmed.-shifted > .avatar:first-child {opacity: 1}
+
+.avatars_collection.-trimmed:not(.-shifted):not(.-subscribed) > .avatar:first-child {
+	left: -6px;
+	opacity: 0;
+}
+
+.avatars_collection.-trimmed.-size_small > .avatar:first-child,
+.avatars_collection.-trimmed.-size_30x30 > .avatar:first-child {margin-left: -24px}
+.avatars_collection.-trimmed.-size_40x40 > .avatar:first-child {margin-left: -34px}
+.avatars_collection.-trimmed.-size_50x50 > .avatar:first-child {margin-left: -44px}
+
+.avatars_collection.-trimmed.-shifted > .avatar:first-child,
+.avatars_collection.-trimmed.-subscribed > .avatar:first-child {margin-left: 0}
+
+
+.avatars_collection.-trimmed.-subscribed.-max_1 > .avatar:nth-child(2),
+.avatars_collection.-trimmed.-subscribed.-max_2 > .avatar:nth-child(3),
+.avatars_collection.-trimmed.-subscribed.-max_3 > .avatar:nth-child(4),
+.avatars_collection.-trimmed.-subscribed.-max_4 > .avatar:nth-child(5),
+.avatars_collection.-trimmed.-subscribed.-max_5 > .avatar:nth-child(6),
+.avatars_collection.-trimmed.-subscribed.-max_6 > .avatar:nth-child(7),
+.avatars_collection.-trimmed.-subscribed.-max_7 > .avatar:nth-child(8),
+
+.avatars_collection.-trimmed.-shifted.-max_1 > .avatar:nth-child(2),
+.avatars_collection.-trimmed.-shifted.-max_2 > .avatar:nth-child(3),
+.avatars_collection.-trimmed.-shifted.-max_3 > .avatar:nth-child(4),
+.avatars_collection.-trimmed.-shifted.-max_4 > .avatar:nth-child(5),
+.avatars_collection.-trimmed.-shifted.-max_5 > .avatar:nth-child(6),
+.avatars_collection.-trimmed.-shifted.-max_6 > .avatar:nth-child(7),
+.avatars_collection.-trimmed.-shifted.-max_7 > .avatar:nth-child(8) {
+	left: 6px;
+	opacity: 0;
+}

@@ -1,0 +1,81 @@
+.counter {
+	display: inline-block;
+	vertical-align: baseline;
+	padding: 6px;
+	color: #9fa6b3;
+	color: var(--color_primary_50);
+	font-size: .8em;
+	line-height: 1;
+	font-weight: 500;
+	border-radius: 2em;
+	background-color: #f6f6f6;
+	background-color: var(--color_gray_material);
+	white-space: nowrap;
+	text-align: center;
+}
+
+.counter.-size_30x30 {
+	padding: 9px 8px;
+}
+
+.counter.-size_40x40 {
+	padding: 10px 9px;
+	font-size: 16px;
+}
+
+.counter.-bordered {border: 2px solid #fff}
+.counter.-size_30x30.-bordered {padding: 7px}
+
+.counter:not(:only-child) {margin: 0 .5em}
+
+.counter.-color_primary {background-color: #3e4d66; background-color: var(--color_primary);}
+.counter.-color_accent {background-color: #f82969; background-color: var(--color_accent);}
+.counter.-color_accent_alt {background-color: #ff5f9e; background-color: var(--color_accent_alt);}
+.-state_admin .counter.-color_accent {background-color: #00dc88}
+.-state_admin .counter.-color_accent_alt {background-color: #23d792}
+
+.counter.-color_neutral,
+.counter.-color_neutral_primary,
+.counter.-color_neutral_accent {background-color: #fff}
+
+.counter.-color_marginal,
+.counter.-color_marginal_primary,
+.counter.-color_marginal_accent {background-color: #e0e0e0}
+
+.counter.-color_primary,
+.counter.-color_accent,
+.counter.-color_accent_alt {color: #fff}
+
+.counter.-color_marginal {color: #4a4a4a; color: var(--color_text);}
+.counter.-color_neutral_primary,
+.counter.-color_marginal_primary {color: #3e4d66; color: var(--color_primary);}
+.counter.-color_neutral_accent,
+.counter.-color_marginal_accent {color: #f82969; color: var(--color_accent);}
+.-state_admin .counter.-color_neutral_accent,
+.-state_admin .counter.-color_marginal_accent {color: #00dc88}
+
+.counter.-castable {
+	opacity: 1;
+	visibility: visible;
+
+	-webkit-transform: translate(0);
+	-moz-transform: translate(0);
+	-ms-transform: translate(0);
+	-o-transform: translate(0);
+	transform: translate(0);
+
+	-webkit-transition: transform .5s ease, opacity .5s ease, visibility .5s ease;
+	-moz-transition: transform .5s ease, opacity .5s ease, visibility .5s ease;
+	-o-transition: transform .5s ease, opacity .5s ease, visibility .5s ease;
+	transition: transform .5s ease, opacity .5s ease, visibility .5s ease;
+}
+
+.counter.-cast {
+	opacity: 0;
+	visibility: hidden;
+	-webkit-transform: translate(-30px);
+	-moz-transform: translate(-30px);
+	-ms-transform: translate(-30px);
+	-o-transform: translate(-30px);
+	transform: translate(-30px);
+}

@@ -1,0 +1,22 @@
+.event_card {
+	width: 100%;
+	height: 170px;
+	border-radius: 2px;
+	background-color: #fff;
+	background-color: var(--color_page);
+	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+	cursor: pointer;
+}
+
+.event_card + .event_card {margin-top: 12px}
+
+.event_card_img {
+	height: 130px;
+	background-size: cover;
+	background-position: center center;
+}
+
+.event_card_description {
+	padding: 6px;
+	font-size: .88em;
+}

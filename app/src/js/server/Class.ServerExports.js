@@ -75,6 +75,20 @@ ServerExports = extending(AsynchronousConnection, (function() {
 		
 		return this.export('/api/v1/statistics/events/'+event_id+'/tickets/export', format);
 	};
+	/**
+	 *
+	 * @param {number} event_id
+	 * @param {string} uuid
+	 *
+	 * @return {jqPromise}
+	 */
+	ServerExports.prototype.eventTicket = function(event_id, uuid) {
+		
+		return this.export('/events/{event_id}/tickets/{ticket_uuid}/export'.format({
+			event_id: event_id,
+			ticket_uuid: uuid
+		}));
+	};
 	
 	
 	return ServerExports;

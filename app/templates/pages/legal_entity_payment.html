@@ -1,39 +1,51 @@
 <script type="javascript/template" id="tmpl-legal-entity-payment-page">
-	<form class="material legal_entity_payment_page LegalEntityPaymentForm">
-		<h2>Информация о заказе</h2>
-		{event_info}
-		<h3>Участники</h3>
-		{receivers_form_field}
-		<h2>Информация о компании</h2>
-		{company_form_field}
-		<fieldset class="CompanyAdditionalInfo -hidden">
+	<form class="material legal_entity_payment_page">
+		<fieldset class="LegalEntityPaymentForm">
+			<h2>Информация о заказе</h2>
+			{event_info}
+			<h3>Участники</h3>
+			{receivers_form_field}
+			<h2>Информация о компании</h2>
+			{company_form_field}
+			<fieldset class="CompanyAdditionalInfo -hidden">
+				<div class="form_group -parts_e_e -valign_baseline">
+					{inn_form_field}
+					{kpp_form_field}
+				</div>
+				{real_address_form_field}
+				<input name="company_zipcode" value="-" type="hidden">
+			</fieldset>
+			<h2>Банковские данные</h2>
+			{bank_name_form_field}
+			<fieldset class="BankAdditionalInfo -hidden">
+				<div class="form_group -parts_e_e -valign_baseline">
+					{bic_form_field}
+					{correspondent_account_form_field}
+				</div>
+			</fieldset>
+			{checking_account_form_field}
+			<h2>Подписывающее лицо</h2>
+			{signer_name_form_field}
+			{signer_position_form_field}
+			<h2>Контактная информация</h2>
+			{self_name_form_field}
 			<div class="form_group -parts_e_e -valign_baseline">
-				{inn_form_field}
-				{kpp_form_field}
-			</div>
-			{real_address_form_field}
-			<input name="company_zipcode" value="-" type="hidden">
-		</fieldset>
-		<h2>Банковские данные</h2>
-		{bank_name_form_field}
-		<fieldset class="BankAdditionalInfo -hidden">
-			<div class="form_group -parts_e_e -valign_baseline">
-				{bic_form_field}
-				{correspondent_account_form_field}
+				{self_email_form_field}
+				{self_phone_form_field}
 			</div>
 		</fieldset>
-		{checking_account_form_field}
-		<h2>Подписывающее лицо</h2>
-		{signer_name_form_field}
-		{signer_position_form_field}
-		<h2>Контактная информация</h2>
-		{self_name_form_field}
-		<div class="form_group -parts_e_e -valign_baseline">
-			{self_email_form_field}
-			{self_phone_form_field}
-		</div>
 	</form>
-	<footer class="legal_entity_payment_footer -align_center">
+	<footer class="legal_entity_payment_footer LegalEntityPaymentFooter">
 		{submit_button}
+	</footer>
+	<footer class="legal_entity_payment_footer -hidden LegalEntityPaymentContract">
+		<div class="form_unit">
+			<a class="button -no_uppercase -size_huge -color_accent RippleEffect" href="/api/v1/events/{event_id}/orders/{order_uuid}/legal_entity/contract" target="_blank">Открыть договор-счет</a>
+		</div>
+		<p><span class="-text_color_primary_50">или</span></p>
+		<div class="form_unit">
+			<a class="button -no_uppercase -color_marginal RippleEffect" href="/api/v1/events/{event_id}/orders/{order_uuid}/legal_entity/contract?download=true">Скачать договор-счет</a>
+		</div>
+		{back_to_link}
 	</footer>
 </script>

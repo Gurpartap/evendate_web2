@@ -90,6 +90,27 @@ OneTicket = extending(OneEntity, (function() {
 	};
 	/**
 	 *
+	 * @param {(string|number)} event_id
+	 * @param {(string|number)} uuid
+	 *
+	 * @return {jqPromise}
+	 */
+	OneTicket.exportTicket = function(event_id, uuid) {
+		
+		return (new ServerExports()).eventTicket(event_id, uuid);
+	};
+	/**
+	 *
+	 * @param {(string|number)} uuid
+	 *
+	 * @return {boolean} false
+	 */
+	OneTicket.openTicketPage = function(uuid) {
+		
+		return __APP.changeState('/ticket/{ticket_uuid}'.format({ticket_uuid: uuid}));
+	};
+	/**
+	 *
 	 * @param {(Fields|string)} [fields]
 	 * @param {AJAXCallback} [success]
 	 *
@@ -136,6 +157,23 @@ OneTicket = extending(OneEntity, (function() {
 				success.call(self, self);
 			}
 		});
+	};
+	/**
+	 *
+	 * @return {jqPromise}
+	 */
+	OneTicket.prototype.export = function() {
+		
+		return OneTicket.exportTicket(this.event_id, this.uuid);
+	};
+	/**
+	 *
+	 *
+	 * @return {boolean} false
+	 */
+	OneTicket.prototype.openPage = function() {
+		
+		return OneTicket.openTicketPage(this.uuid);
 	};
 	
 	return OneTicket;

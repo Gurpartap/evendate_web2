@@ -1,0 +1,135 @@
+.-state_onboarding_page #main_section .page_wrapper {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	text-align: center;
+	background-color: #3e4d66;
+	background-color: var(--color_primary);
+	z-index: 200;
+}
+
+.-state_onboarding_page #main_section .page_wrapper:before {
+	content: "";
+	height: 100%;
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.page_onboarding {
+	display: inline-block;
+	vertical-align: middle;
+	width: 360px;
+	height: 526px;
+	background-color: #f9f9fa;
+	background-color: var(--color_background_gray);
+	border-radius: 4px;
+}
+
+/* header */
+.text_onboarding_container {
+	text-align: center;
+	padding: 12px;
+}
+
+.text_onboarding_container + .text_onboarding_container {padding: 0 12px 12px}
+
+.header_text_onboarding {
+	font-size: 24px;
+	font-weight: 500;
+	color: #4a4a4a;
+	color: var(--color_text);
+	line-height: 32px;
+}
+
+.text_onboarding {
+	font-size: .88em;
+	color: #4a4a4a;
+	color: var(--color_text);
+	line-height:20px;
+}
+
+.line_onboarding {
+	border:1px solid #d7d7d7;
+	height:1px;
+}
+/* /header */
+/* recommendations */
+
+.recommendation_scroll {
+	height: 380px;
+	overflow-y: scroll;
+}
+
+.recommendations_item_onboarding_inside {
+	padding: 0 12px 0 12px;
+	margin: 15px 0 0 0;
+	text-align: left;
+}
+
+.recommendations_item_onboarding_inside + .recommendations_item_onboarding_inside {margin: 6px 0 0 0}
+
+.recommendations_item_onboarding_inside:hover {
+	cursor: pointer;
+	background: #d7d7d7;
+}
+
+
+.img_container_recommendation_onboarding {
+	display: inline-block;
+	vertical-align: middle;
+	padding: 8px 32px 8px 0;
+}
+
+.img_recommendation_onboarding {
+	border-radius: 50%;
+	height: 40px;
+}
+
+.text_container_recommendation_onboarding {
+	display: inline-block;
+	vertical-align: middle;
+	margin: 0 36px 0 0;
+	width: 180px;
+}
+
+.check_box_img_container_onboarding {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.check_box_img_onboarding {
+	height: 32px;
+	width: 32px;
+	border-radius: 50%;
+	background-color: #c5c9d1;
+	background-color: var(--color_primary_30);
+	border: none;
+}
+.recommendations_item_onboarding_inside.-active .check_box_img_onboarding {
+	color: #fff;
+	background-color: #f82969;
+	background-color: var(--color_bubblegum);
+}
+.recommendations_item_onboarding_inside.-active .fa-plus:before {content: "\f00c"}
+
+/* /recommendations */
+/* bot_part */
+
+.bot_part_onboarding_page>.button+.button {
+	margin-left: 32px;
+	margin-right: 10px;
+}
+
+.bot_part_onboarding_page {
+	box-shadow: 0 0 4px 0 rgba(0,0,0,0.12), 0 4px 4px 0 rgba(0,0,0,0.24);
+	height: 50px;
+	width: 100%;
+	margin-top: 5px;
+	padding: 8px;
+	text-align: right;
+}
+
+/* /bot_part */

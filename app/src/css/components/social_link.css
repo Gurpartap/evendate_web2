@@ -1,0 +1,25 @@
+.social_link_wrapper {
+	display: flex;
+	justify-content: space-around;
+}
+
+.social_link {
+	width: 30px;
+	height: 30px;
+	color: #9fa6b3;
+	color: var(--color_primary_50);
+	text-align: center;
+}
+
+a.social_link.-color_vk {color: #567ca4}
+a.social_link.-color_google {color: #dd4b39}
+a.social_link.-color_facebook {color: #3b5998}
+
+.social_link.-rounded {
+	font-size: .8125em;
+	line-height: 1;
+	border: 1px solid;
+	border-radius: 50%;
+}
+
+.social_link > .fa_icon {width: 1em}

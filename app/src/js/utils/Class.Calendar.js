@@ -19,6 +19,7 @@ Calendar = (function() {
 	 * @param     {string} [options.classes.head_tr_class = 'calendar_weekdays_row']
 	 * @param     {string} [options.classes.th_class = 'calendar_weekday']
 	 * @param     {string} [options.classes.td_class = 'calendar_day']
+	 * @param     {string} [options.classes.day_class = 'day_num']
 	 * @param     {Array} [options.classes.td_additional_classes]
 	 * @param     {string} [options.classes.td_disabled_class = '-disabled']
 	 * @param     {string} [options.classes.table_cell_class = 'calendar_cell']
@@ -51,6 +52,7 @@ Calendar = (function() {
 				head_tr_class: 'calendar_weekdays_row',
 				th_class: 'calendar_weekday',
 				td_class: 'calendar_day',
+				day_class: 'day_num',
 				td_additional_classes: [],
 				td_disabled_class: '-disabled',
 				table_cell_class: 'calendar_cell',
@@ -67,15 +69,19 @@ Calendar = (function() {
 			labels: {}
 		};
 		
-		if ($calendar instanceof Element || typeof $calendar == "string") {
+		if ($calendar)
+		
+		if ($calendar instanceof Element || typeof $calendar === "string") {
 			$calendar = $($calendar);
 			if($calendar.length === 0)
 				throw new Error("Такого элемента не существует");
 			else if($calendar.length > 1)
 				throw new Error("Элементов с заданным аргументов найдено несколько");
 		}
+		
 		if ($calendar instanceof jQuery) {
 			$.extend(true, this.options, options, $calendar.data());
+			
 			if(this.options.min_date !== false && this.options.max_date !== false && moment(this.options.max_date).diff(this.options.min_date, 'days') <= 0){
 				this.options.max_date = false;
 			}
@@ -610,31 +616,37 @@ Calendar = (function() {
 		return this;
 	};
 	
-	Calendar.prototype.setDaysWithEvents = function(){
+	Calendar.prototype.setDaysWithEvents = function(params){
 		var calendar = this,
-			ajax_data = {
+			ajax_data = Object.assign({
 				since: calendar.current_month.startOf('month').format(__C.DATE_FORMAT),
 				till: calendar.current_month.endOf('month').format(__C.DATE_FORMAT),
 				length: 500,
 				my: true,
 				unique: true
-			};
+			}, params);
+		
 		calendar.$calendar.find('.feed_calendar_td').removeClass('Controller has_favorites').addClass(__C.CLASSES.DISABLED);
+		
 		DatesCollection.fetchDates(ajax_data, function(data) {
 			data.forEach(function(day){
 				var $tr = calendar.$calendar.find('.Day_' + moment.unix(day.event_date).format(__C.DATE_FORMAT));
-				$tr
-					.html(tmpl('link', {
-						title: $tr.children().text(),
-						classes: $tr.children().get(0).classList,
-						page: '/feed/day/'+$tr.data('date')
-					}))
-					.addClass(day.favorites_count > 0 ? 'has_favorites' : '')
-					.removeClass(__C.CLASSES.DISABLED);
+				
+				if ($tr.length) {
+					$tr
+						.html(tmpl('link', {
+							title: $tr.children().text(),
+							classes: calendar.options.classes.day_class,
+							page: '/feed/day/'+$tr.data('date')
+						}))
+						.addClass(day.favorites_count > 0 ? 'has_favorites' : '')
+						.removeClass(__C.CLASSES.DISABLED);
+				}
 			});
 			calendar.bindDaySelection();
 			bindPageLinks(calendar.$calendar);
 		});
+		
 		return this;
 	};
 	

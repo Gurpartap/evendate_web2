@@ -232,9 +232,15 @@ OrganizationPage = extending(Page, (function() {
 				classes: [__C.CLASSES.SIZES.LOW, __C.CLASSES.SIZES.WIDE, __C.CLASSES.HOOKS.RIPPLE]
 			}),
 			has_address: organization.default_address ? '' : __C.CLASSES.HIDDEN,
-			redact_org_button: (organization.role === OneUser.ROLE.ADMIN) ? __APP.BUILD.link({
+			redact_org_button: (organization.role === OneUser.ROLE.ADMIN) ? __APP.BUILD.linkButton({
 					title: __LOCALES.ru_RU.TEXTS.BUTTON.EDIT,
-					classes: ['button', __C.CLASSES.SIZES.WIDE, __C.CLASSES.COLORS.NEUTRAL, __C.CLASSES.ICON_CLASS, __C.CLASSES.ICONS.PENCIL, __C.CLASSES.HOOKS.RIPPLE],
+					classes: [
+						__C.CLASSES.SIZES.WIDE,
+						__C.CLASSES.COLORS.NEUTRAL,
+						__C.CLASSES.ICON_CLASS,
+						__C.CLASSES.ICONS.PENCIL,
+						__C.CLASSES.HOOKS.RIPPLE
+					],
 					page: '/admin/organization/' + organization.id + '/edit/'
 				}) : '',
 			hidden_for_users: PAGE.is_admin ? '' : __C.CLASSES.HIDDEN,

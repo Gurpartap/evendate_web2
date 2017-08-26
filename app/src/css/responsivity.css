@@ -1,0 +1,247 @@
+@media (max-width: 1060px) {
+	.search_organizations {display: none}
+	.search_events {margin-left: auto}
+	.event_edit_navigation {display: none}
+
+	.organization_info_page {
+		width: 100%;
+	}
+	.organization_subscribers_page {display: none}
+}
+
+
+
+
+@media (min-width: 1024px) {
+
+	.-open_sidebar #main_overlay {
+		padding-left: 228px;
+	}
+
+	.-open_sidebar #main_header {
+		width: -webkit-calc(100% - 228px);
+		width: calc(100% - 228px);
+	}
+}
+
+
+@media (max-width: 1330px) {
+	#main_sidebar {
+		transform: translateX(-110%);
+	}
+	#main_overlay {
+		padding-left: 0;
+	}
+	#main_header {
+		width: 100%;
+	}
+  #sidebar_burger {display: block}
+  #page_title {
+	  width: -webkit-calc(100% - 54px);
+	  width: calc(100% - 54px);
+  }
+}
+
+
+
+@media (min-width: 1601px) {
+	.page_wrapper {width: 1200px}
+}
+
+@media (min-width: 1130px) and (max-width: 1600px){
+	.page_wrapper {width: 1062px}
+}
+
+@media (max-width: 1130px) {
+	.page_wrapper {width: auto}
+}
+
+@media (min-width: 846px) and (max-width: 1130px) {
+	.page_wrapper {margin: 0 24px}
+}
+
+@media (max-width: 845px) {
+	.page_wrapper {margin: 0 12px}
+}
+
+
+
+
+
+@media (max-width: 1128px) {
+	.feed_event_wrapper {
+		width: auto;
+		flex-direction: column-reverse;
+	}
+
+	.event_vulcan {
+		position: relative;
+		right: auto;
+		display: flex;
+		margin: 24px 0 0;
+		flex-direction: row-reverse;
+		justify-content: space-around;
+		align-items: center;
+		width: auto;
+	}
+	.become_org_wrapper {
+		margin-right: 24px;
+	}
+}
+
+@media (max-width: 1000px) {
+	.statistics_table col {
+		width: auto;
+	}
+
+	.statistics_table th {
+		vertical-align: bottom;
+		white-space: nowrap;
+		padding: 0 !important;
+		text-align: center;
+	}
+
+	.statistics_table th:before {
+		content: '';
+		display: inline-block;
+		vertical-align: middle;
+		padding-top: -webkit-calc(100% + 24px);
+		padding-top: calc(100% + 24px);
+	}
+
+	.statistics_table th span {
+		transform: rotateZ(-90deg);
+		display: inline-block;
+		white-space: normal;
+	}
+}
+
+@media (max-width: 926px) {
+	.user_page_wrapper {
+		flex-direction: column;
+	}
+
+	.user_page_sidebar {
+		display: flex;
+		width: 100%;
+		margin-bottom: 24px;
+	}
+
+	.user_page_content {
+		width: 100%;
+		margin-left: 0;
+	}
+}
+
+@media (max-width: 767px) {
+	.feed_event {
+		height: auto;
+		flex-direction: column;
+	}
+	.feed_event_img_side > img {width: 100%}
+	.feed_event_footer {position: relative}
+
+	.organization_card {
+		flex-direction: column;
+		text-align: center;
+	}
+	.organization_card_side {
+		margin: 0 0 12px;
+	}
+	.organization_card_bottom {
+		justify-content: center;
+	}
+	.organization_card_buttons {
+		justify-content: center;
+		margin-top: 12px;
+	}
+
+	.orgstat_overview {
+		flex-direction: column;
+	}
+	.orgstat_overview_sidebar,
+	.orgstat_overview_content {
+		width: 100%;
+	}
+	.orgstat_overview_content {
+		border-left: 0;
+		border-top: 1px solid #d6d6d6;
+	}
+	.orgstat_overview_header {
+		flex-wrap: wrap;
+		height: auto;
+	}
+	.orgstat_overview_header > .scoreboard {
+		height: auto;
+		padding: 24px;
+	}
+
+	.eventstat_overview_charts {
+		display: none;
+	}
+
+	.event_page {
+		min-width: unset;
+		flex-direction: column;
+	}
+	.event_page,
+	.event_main_content,
+	.event_additional_content {width: 100%}
+	.event_image_bottom {
+		position: relative;
+		bottom: 0;
+		align-items: flex-end;
+		flex-direction: column;
+	}
+}
+
+@media (min-width: 600px) and (max-width: 926px) {
+	.user_page_sidebar_header,
+	.user_page_sidebar_wrapper {flex: 1}
+	.user_page_sidebar_wrapper {
+		border-top: 0;
+		border-left: 2px solid #e4eaec;
+	}
+}
+
+@media (max-width: 600px) {
+	.user_page_sidebar {
+		flex-direction: column;
+	}
+
+	.event_block {
+		flex-direction: column;
+		height: auto;
+	}
+
+	.event_block_info,
+	.event_block_img,
+	.event_block_img > img {width: 100%}
+
+	.event_block_title {margin-top: 6px}
+
+
+	.activity_block {
+		flex-direction: column-reverse;
+		align-items: center;
+	}
+
+	.activity_block .avatar {
+		display: none;
+	}
+	.activity_block_image {
+		height: auto;
+		width: 100%;
+	}
+	.activity_block_image > img {
+		height: 100%;
+		width: 100%;
+	}
+}
+
+@media (max-width: 500px) {
+
+	.event_vulcan {flex-direction: column-reverse}
+	.become_org_wrapper {margin-right: auto}
+
+}

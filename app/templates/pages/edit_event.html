@@ -279,7 +279,7 @@
 								<div class="form_unit -align_center">{add_ticket_type_button}</div>
 
 								<div class="form_unit form_accent_block">
-									<input id="edit_event_accept_bitcoins" class="form_checkbox" type="checkbox" name="accept_bitcoins">
+									<input id="edit_event_accept_bitcoins" class="form_checkbox AcceptBitcoinsCheckbox" type="checkbox" name="accept_bitcoins">
 									<label class="form_label" for="edit_event_accept_bitcoins"><span>Принимать биткоины</span></label>
 								</div>
 								{booking_time_input}
@@ -530,7 +530,6 @@
 		<td>
 			<input class="TicketTypeId" type="hidden" name="ticket_types" value="{row_num}">
 			<input class="TicketTypeUUID" type="hidden" name="ticket_type_{row_num}_uuid" value="{uuid}">
-			<input type="hidden" name="ticket_type_{row_num}_comment" value="{comment}">
 			<input class="TicketTypeCode" type="hidden" name="ticket_type_{row_num}_type_code" value="{type_code}">
 			<div class="edit_event_ticket_type_last_column form_group">
 				{price_input}
@@ -545,6 +544,9 @@
 				<div class="collapsing_content CollapsingContent">
 					<div class="edit_event_ticket_type_expanded">
 						<h3>Дополнительные настройки</h3>
+
+						{comment_form_unit}
+
 						<h4>Начало продажи билета</h4>
 						<p class="form_text">Момент времени, после которого начнутся продажи билетов этого типа</p>
 						<div class="form_fieldset">
@@ -567,20 +569,6 @@
 						<div class="form_fieldset form_group -align_left">
 							{tickets_sell_end_date_select}
 						</div>
-
-						<fieldset title="Эта функция доступна только с полным тарифом" disabled>
-							{promo_enable_checkbox}
-							<fieldset class="Switching" data-switch_id="ticket_type_{row_num}_promo" disabled>
-								<p class="form_text">При вводе этого слова подписчики получат скидку на стоимость билета этого типа</p>
-								<div class="form_group -align_left">
-									{promo_input}
-									{promo_effort_input}
-									<div class="form_unit -inline">
-										<label class="form_label">%</label>
-									</div>
-								</div>
-							</fieldset>
-						</fieldset>
 
 						<h4>Количество билетов за заказ</h4>
 						<p class="form_text">Задайте минимальное и максимальное число билетов этого типа в «одни руки»</p>

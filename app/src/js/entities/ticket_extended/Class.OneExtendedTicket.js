@@ -147,6 +147,8 @@ OneExtendedTicket = extending(OneTicket, (function() {
 		
 		return __APP.SERVER.getData('/api/v1/events/' + event_id, event_ajax_data, success);
 	};
+	
+	OneExtendedTicket.exportTicket = OneTicket.exportTicket;
 	/**
 	 *
 	 * @param {(Fields|string)} [fields]

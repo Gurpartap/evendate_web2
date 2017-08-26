@@ -1,0 +1,28 @@
+.app_view {
+	padding-top: 1px;
+	opacity: 1;
+	visibility: visible;
+	-webkit-transition: opacity .2s ease, visibility .2s ease;
+	-moz-transition: opacity .2s ease, visibility .2s ease;
+	-o-transition: opacity .2s ease, visibility .2s ease;
+	transition: opacity .2s ease, visibility .2s ease;
+}
+
+.app_view.-faded {
+	opacity: 0;
+	visibility: hidden;
+}
+
+.-fadeable {
+	opacity: 1;
+	visibility: visible;
+	-webkit-transition: opacity .2s ease, visibility .2s ease;
+	-moz-transition: opacity .2s ease, visibility .2s ease;
+	-o-transition: opacity .2s ease, visibility .2s ease;
+	transition: opacity .2s ease, visibility .2s ease;
+}
+
+.-fadeable.-faded {
+	opacity: 0;
+	visibility: hidden;
+}

@@ -1,0 +1,642 @@
+<script type="javascript/template" id="tmpl-std-wrapper">
+	<div class="page_wrapper Content -fadeable"></div>
+</script>
+
+<script type="javascript/template" id="tmpl-feed-wrapper">
+	<div class="page_wrapper">
+		<div class="feed_event_wrapper">
+			<div class="feed_event_cards_wrapper feed_events FeedEvents Content -fadeable"></div>
+			<div class="event_vulcan EventVulcan">
+				<div class="form_unit">
+					<select id="feed_city_select" class="FeedCitiesSelect" name="city" title=""></select>
+				</div>
+				<div class="page feed_calendar FeedCalendar"></div>
+				<div class="become_org_wrapper material -dark_material -level_2_material BecomeOrgBlock">
+					<h3>Увеличивайте количество посетителей</h3>
+					<p>Публикуйте мероприятия, оповещайте свою аудиторию и анализируйте отдачу</p>
+					<div class="become_org_buttons_wrapper">
+						<a href="/add/organization" class="button -color_franklin Link BecomeOrg">Опубликовать событие</a>
+						<a href="/to-organization" class="link -color_marginal">Подробнее о платформе</a>
+					</div>
+				</div>
+				<div class="FeedVulcanEvents"></div>
+			</div>
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-organizations-wrapper">
+	<div class="page_wrapper -organizations_wrapper">
+		<aside class="organizations_aside">
+			<div class="form_unit">
+				<select id="organizations_cities_select" class="OrganizationsCities" name="city" title=""></select>
+			</div>
+			<div class="page organizations_categories">
+				<header class="organizations_categories_header">
+					<span class="organizations_categories_title -unselectable">Рубрики</span>
+					<span class="action -color_accent ShowAllOrganizations">Все</span>
+				</header>
+				<div class="organizations_categories_container scrollbar-outer OrganizationsCategoriesScroll">{organization_categories}</div>
+			</div>
+			<!--<button class="button -low -fill -color_neutral_accent RippleEffect" type="button">Предложить организатора</button>-->
+		</aside>
+
+		<div class="organizations_wrapper Content OrganizationsWrapper -fadeable">{organization_units}</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-friends-wrapper">
+	<div class="page_wrapper -fadeable" style="padding-top: 100px;">
+
+		<div class="no-friends-block hidden">
+			<div class="no-friends-text">Ваших друзей пока нет в Evendate</div>
+		</div>
+		<div class="friends-main-content hidden">
+
+			<div class="load-more-btn hidden" data-page-number="0">
+				<button class="btn btn-lg disabled btn-pink-empty"> Загрузить еще...</button>
+			</div>
+		</div>
+		<div class="one-friend-profile one-friend-main-content"></div>
+
+		<div class="friends-right-bar hidden">
+			<div class="friends-bar-header"> Друзья <span class="label label-blue friends-count"></span>
+			</div>
+			<div class="friends-list"></div>
+		</div>
+	</div>
+</script>
+<script type="javascript/template" id="tmpl-input">
+	<input class="{classes}" {attributes} {dataset}>
+</script>
+
+<script type="javascript/template" id="tmpl-textarea">
+	<textarea class="{classes}" {attributes} {dataset}>{value}</textarea>
+</script>
+
+<script type="javascript/template" id="tmpl-select">
+	<select class="{classes}" {attributes} {dataset}>{options}</select>
+</script>
+
+<script type="javascript/template" id="tmpl-divider">
+	<hr title="{title}" {dataset}>
+</script>
+
+<script type="javascript/template" id="tmpl-label">
+	<label class="form_label {label_classes}" for="{id}">{label}</label>
+</script>
+
+<script type="javascript/template" id="tmpl-switch">
+	<label for="{id}" class="form_switch FormSwitch {classes}">
+		<input id="{id}" class="FormSwitchInput" type="checkbox" name="{name}" {attributes} {dataset}>
+		<span class="form_switch_road"></span>
+		<span class="form_switch_runner"></span>
+	</label>
+</script>
+
+<script type="javascript/template" id="tmpl-radio-checkbox">
+	<div class="{unit_classes}">
+		<input id="{id}" class="{classes}" type="{type}" name="{name}" {attributes} {dataset}>
+		<label class="form_label" for="{id}"><span>{label}</span></label>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-radio-group">
+	<div class="radio_group {classes} RadioGroup" {dataset} {attributes}>
+		{units}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-date-select">
+	<div class="form_datepicker DatePicker {classes}" {dataset}>
+		<span class="DatePickerDisplayText">{label}</span>
+		<input type="hidden" name="{name}" value="{value}" {attributes}>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-form-unit">
+	<div class="form_unit {unit_classes}">
+		{label}
+		{form_element}
+		{helptext}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-form-helptext">
+	<p class="form_helptext" {attributes} {dataset}>{text}</p>
+</script>
+
+<script type="javascript/template" id="tmpl-fields-wrapper">
+	<div class="fields_wrapper {classes}">{fields}</div>
+</script>
+
+<script type="javascript/template" id="tmpl-field">
+	<div class="field {classes}">
+		<span class="field_name">{name}</span>
+		<span class="field_value">{value}</span>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-button">
+	<button class="button {classes}" type="button" {attributes}><span class="Text">{title}</span></button>
+</script>
+
+<script type="javascript/template" id="tmpl-link">
+	<a href="{page}" class="link {classes} Link" {dataset} {attributes}>{title}</a>
+</script>
+
+<script type="javascript/template" id="tmpl-link-button">
+	<a href="{page}" class="button {classes} Link" {dataset} {attributes}>{title}</a>
+</script>
+
+<script type="javascript/template" id="tmpl-action-link">
+	<a href="{href}" class="action {classes}" {dataset} {attributes}>{title}</a>
+</script>
+
+<script type="javascript/template" id="tmpl-action-button">
+	<button class="action {classes}" type="button" {attributes}><span class="Text">{title}</span></button>
+</script>
+
+<script type="javascript/template" id="tmpl-tag">
+	<a class="tag_unit link Link {classes}" href="{page}" {dataset} {attributes}>{name}</a>
+</script>
+
+<script type="javascript/template" id="tmpl-user-tombstone">
+	<{html_tag} class="user_tombstone {tombstone_classes}" {attributes} {dataset}>
+	{avatar}
+	<p class="user_tombstone_title">{name}</p>
+	</{html_tag}>
+</script>
+
+<script type="javascript/template" id="tmpl-option">
+	<option class="{classes}" value="{val}" {attributes} {dataset}>{display_name}</option>
+</script>
+
+<script type="javascript/template" id="tmpl-order-status">
+	<div class="order_status -order_status_{status}">
+		<span class="order_status_name">{name}</span>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-user-social-links-wrapper">
+	<div class="social_link_wrapper">{links}</div>
+</script>
+
+<script type="javascript/template" id="tmpl-user-social-link">
+	<{html_tag} class="social_link -color_{slug} -valign_center {classes}" {attributes}><i class="fa_icon fa-{icon_slug}"></i></{html_tag}>
+</script>
+
+<script type="javascript/template" id="tmpl-subscriber-divider">
+	<span class="organization_subscribers_divider -text_color_accent">{label}</span>
+</script>
+
+<script type="javascript/template" id="tmpl-subscriber">
+	{divider}
+	{avatar_block}
+</script>
+
+<script type="javascript/template" id="tmpl-avatar-block">
+	<{html_tag} class="avatar_block User{id} {block_classes}" {attributes} {dataset}>
+	{avatar}
+	<span class="avatar_name">{name}</span>
+	</{html_tag}>
+</script>
+
+<script type="javascript/template" id="tmpl-staff-avatar-block">
+	<div class="staff_avatar_block {can_edit} StaffAvatarBlock">
+		{avatar_block}
+		<span class="staff_avatar_remove RemoveStaff">×</span>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-staff-avatar-block-removing">
+	<div class="staff_avatar_block">
+		<span class="staff_avatar_block_return">{username} удален(а) из списка. Хотите <span class="action -color_accent -no_uppercase ReturnStaff">вернуть</span>?</span>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-avatars-collection">
+	<div class="avatars_collection AvatarsCollection {classes}" {dataset}>{avatars}</div>
+	<span class="counter {counter_classes}">+<span class="FavoredCount">{more_avatars_count}</span></span>
+</script>
+
+<script type="javascript/template" id="tmpl-avatar">
+	<div class="avatar {classes}" title="{name}" {dataset} {attributes}>
+		<img src="{avatar_url}" onerror="this.onerror=null;this.src='/app/img/brand_logo.png'">
+		{badge}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-avatar-badge">
+	<span class="avatar_badge"><i class="fa fa-{icon_class}"></i></span>
+</script>
+
+<script type="javascript/template" id="tmpl-organization-item">
+	<a href="/organization/{id}" class="organization_item {block_classes} link Link" data-organization_id="{id}" {dataset}>
+		{avatar_block}
+		<span class="counter organization_counter OrganizationCounter {counter_classes}">{new_events_count}</span>
+	</a>
+</script>
+
+<script type="javascript/template" id="tmpl-activity-block">
+	<div class="activity_block -type_{type_code} -entity_{entity}">
+		{creator_avatar}
+		<div class="activity_block_content">
+			<p class="activity_block_top"><a href="{creator_url}" class="activity_block_creator link Link">{creator_name}</a> {additional_info}</p>
+			<p class="activity_block_middle"><a href="{entity_url}" class="link Link">{hero_text}</a></p>
+			<p class="activity_block_bottom">{date}</p>
+		</div>
+		<a class="activity_block_image img_holder link Link" href="{entity_url}">
+			<img src="{img_url}" height="48" onerror="this.onerror=null;this.src='/app/img/brand_logo.png'">
+		</a>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-tabs-header">
+	<header class="tabs_header HeaderTabs -color_{color}">
+		{tabs}
+	</header>
+</script>
+
+<script type="javascript/template" id="tmpl-tab">
+	<span class="tab Tab {classes}" {dataset}>{label}</span>
+</script>
+
+<script type="javascript/template" id="tmpl-progress-bar">
+	<div class="progress_bar {classes} ProgressBar" {dataset} {attributes}>
+		<div class="progress_bar_strip">
+			<div class="progress_bar_strip_complete ProgressBarComplete"></div>
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-quantity-input">
+	<div class="quantity_input_component {classes} QuantityInput" {dataset}>
+		{minus_button}
+		{input}
+		{plus_button}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-loader">
+	<div class="loader">
+		<div class="loader_dot"></div>
+		<div class="loader_dot"></div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-loader-block">
+	<div class="loader_block {classes}">{loader}</div>
+</script>
+
+<script type="javascript/template" id="tmpl-vk-share-button">
+	<button class="ShareButton share_icon {classes}" data-title="VK" data-href="http://vk.com/share.php?url=http://evendate.ru/event/{id}?title={title}&description={description}&image={image_horizontal_url}&noparse=false"></button>
+</script>
+
+<script type="javascript/template" id="tmpl-facebook-share-button">
+	<button class="ShareButton share_icon {classes}" data-title="Facebook" data-href="http://www.facebook.com/dialog/share?app_id=1692270867652630&display=popup&title={title}&quote={description}&href=http://evendate.ru/event/{id}&redirect_uri=http://evendate.ru/event/{id}image[0][url]={image_horizontal_large_url}&image[0][user_generated]=true"></button>
+</script>
+
+<script type="javascript/template" id="tmpl-twitter-share-button">
+	<button class="ShareButton share_icon twitter {classes}" data-title="Twitter" data-href="https://twitter.com/share?url=http://evendate.ru/event/{id}?text={title}&via=evendate.ru&hashtags=#evendate"></button>
+</script>
+<!--
+<script type="javascript/template" id="tmpl-event-card">
+	<div class="event_card">
+		<div class="event_card_img" style="background-image: url('{image_horizontal_small_url}')"></div>
+		<div class="event_card_description">
+			<span>{title}</span>
+		</div>
+	</div>
+</script>-->
+
+<script type="javascript/template" id="tmpl-event-card">
+	<div class="page feed_event FeedEvent">
+		<a href="/event/{id}" class="feed_event_img_side img_holder link Link">
+			<img src="{image_horizontal_url}?width={cover_width}" width="{cover_width}">
+		</a>
+		<aside class="feed_event_info_side AddAvatarWrapper">
+			<header class="feed_event_header">
+				{organization_avatar_block}
+				<div class="feed_event_header_buttons">
+					{header_buttons}
+				</div>
+			</header>
+			<h3 class="feed_event_title"><a href="/event/{id}" class="link Link">{title}</a></h3>
+			<footer class="feed_event_footer">
+				{feed_event_infos}
+				<div class="form_group -parts_e_2">
+					<div class="form_unit">{avatars_collection}</div>
+					<div class="form_unit">{action_button}</div>
+				</div>
+			</footer>
+		</aside>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-event-card-info">
+	<p class="feed_event_info">{text}</p>
+</script>
+
+<script type="javascript/template" id="tmpl-event-block">
+	{divider}
+	<div class="event_block" data-event-id="{id}" data-event_date="{date}">
+		<a href="/event/{id}" class="event_block_img img_holder link Link">
+			<img src="{image_horizontal_url}?width={cover_width}" title="{title}" width="{cover_width}">
+		</a>
+		<div class="event_block_info">
+			<header class="event_block_title">
+				<a href="/event/{id}" class="link Link">{title}</a>
+			</header>
+			<div class="event_block_service">
+				<p><small>{time}</small></p>
+				<div class="event_block_action_buttons AddAvatarWrapper">
+					<div class="event_block_add_avatar_wrapper">{avatars_collection}</div>
+					<div class="event_block_action_buttons_wrapper">{action_buttons}</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-ticket-card">
+	<div class="ticket_card {card_classes}">
+		<div class="material ticket_card_wrapper">
+			<div class="ticket_card_cover img_holder">
+				<img src="{image_horizontal_url}?width={cover_width}" title="{title}" width="{cover_width}">
+			</div>
+			<div class="ticket_card_content">
+				<p class="ticket_card_event_title">{title}</p>
+				<p class="ticket_card_type_name">{ticket_type_name}</p>
+				<p class="ticket_card_dates">{formatted_dates}</p>
+				<p class="ticket_card_location">{location}</p>
+			</div>
+			<div class="ticket_card_status">
+				<span>{status_name}</span>
+			</div>
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-scoreboard">
+	<div class="scoreboard {size} {type}">
+		<span class="scoreboard_number ScoreboardNumber">{number}</span>
+		<span class="scoreboard_title">{title}</span>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-scoreboard-with-dynamics">
+	<div class="scoreboard {size} {type}">
+		<span class="scoreboard_number ScoreboardNumber">{number}</span>
+		<p class="scoreboard_dynamic">
+			<label class="scoreboard_dynamic_icon fa_icon {icon_classes}"></label>
+			<span class="ScoreboardDynamic">{dynamic_by_week}</span><span> за неделю</span>
+		</p>
+		<span class="scoreboard_title">{title}</span>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-cap">
+	<div class="cap {classes}" {dataset} {attributes}><span class="cap_message">{message}</span></div>
+</script>
+
+<script type="javascript/template" id="tmpl-overlay-cap">
+	<div class="overlay_cap -unselectable -centering OverlayCap {classes}" {dataset} {attributes}>
+		<div class="overlay_cap_wrapper">{content}</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-required-star">
+	<span class="-text_color_accent"> * </span>
+</script>
+
+<script type="javascript/template" id="tmpl-dropdown-export-formats">
+	<div class="dropdown_box">
+		<div class="dropdown_list DropDownList">
+			<div class="dropdown_li">
+				<a class="dropdown_button -size_wide -color_neutral RippleEffect" href="{xlsx_href}" target="_blank">Excel</a>
+			</div>
+			<div class="dropdown_li">
+				<a class="dropdown_button -size_wide -color_neutral RippleEffect" href="{html_href}" target="_blank">HTML</a>
+			</div>
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-payment-form">
+	<form id="payment_{payment_uuid}" class="-hidden" action="https://money.yandex.ru/eshop.xml" method="post">
+		<input name="shopId" value="132896" type="hidden">
+		<input name="scid" value="97111" type="hidden">
+		<input name="customerNumber" value="{customer_id}" type="hidden">
+		<input name="cps_email" value="{cps_email}" type="hidden">
+		<input name="shopFailURL" value="{callback_url}" type="hidden">
+		<input name="shopSuccessURL" value="{callback_url}" type="hidden">
+		<input name="shopDefaultUrl" value="{callback_url}" type="hidden">
+		<input name="evendate_payment_id" value="{payment_uuid}" type="hidden">
+		<input name="sum" value="{sum}" type="hidden">
+	</form>
+</script>
+
+<script type="javascript/template" id="tmpl-modal">
+	<div class="modal_unit {modal_type} {modal_classes} -hidden -faded">
+		{modal_header}
+		<div class="modal_content ModalContent {modal_content_classes}">
+			{modal_content}
+		</div>
+		{modal_footer}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-modal-header">
+	<header class="modal_header">
+		<span>{title}</span>
+		{close_button}
+	</header>
+</script>
+
+<script type="javascript/template" id="tmpl-modal-footer">
+	<footer class="modal_footer">
+		{footer_buttons}
+	</footer>
+</script>
+<script type="javascript/template" id="tmpl-modal-auth-content">
+	<h4 class="auth_modal_heading">{heading}</h4>
+	<div class="auth_buttons_wrapper">
+		<a href="#" data-auth_network="vk" class="button -size_wide -rounded -no_uppercase -align_left -color_vk RippleEffect AuthButton">
+			<span class="Text"><i class="fa fa-vk fa-lg"></i><span>Войти через ВКонтакте</span></span>
+		</a>
+		<a href="#" data-auth_network="google" class="button -size_wide -rounded -no_uppercase -align_left -color_google RippleEffect AuthButton">
+			<span class="Text"><i class="fa fa-google-plus fa-lg"></i><span>Войти через Google+</span></span>
+		</a>
+		<a href="#" data-auth_network="facebook" class="button -size_wide -rounded -no_uppercase -align_left -color_facebook RippleEffect AuthButton">
+			<span class="Text"><i class="fa fa-facebook-official fa-lg"></i><span>Войти через Facebook</span></span>
+		</a>
+	</div>
+	<p class="auth_modal_bottom">{bottom}</p>
+</script>
+<script type="javascript/template" id="tmpl-modal-bitcoin-content">
+	<h6 class="bitcoin_modal_title">Заказ № {order_number}</h6>
+	{ticket_types}
+	<div class="bitcoin_modal_helptext">
+		<span>В течение 2 минут после оплаты заказа ваши билеты будут высланы на Email</span>
+	</div>
+
+	<div class="bitcoin_modal_bottom">
+		<aside class="bitcoin_modal_qr img_holder">
+			<img src="/api/v1/events/{event_id}/orders/{order_uuid}/bitcoin/qr?address={bitcoin_address}&amount={bitcoin_amount}" width="102.5" height="102.5">
+		</aside>
+		<div class="bitcoin_modal_address form_unit">
+			<label for="bitcoin_address" class="form_label">Отправьте <span class="-text_color_accent">{bitcoin_amount} BTC</span> на адрес:</label>
+			<input id="bitcoin_address" class="form_input" value="{bitcoin_address}">
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-modal-bitcoin-ticket-type-row">
+	<div class="bitcoin_modal_ticket_type_row">
+		<span class="bitcoin_modal_ticket_type_name">{name}</span>
+		<span class="bitcoin_modal_ticket_type_amount">{number} ед.</span>
+	</div>
+</script>
+<script type="javascript/template" id="tmpl-order-page">
+	<div class="order_page material OrderPage">
+		<fieldset class="OrderFormWrapper">
+			<form class="order_form OrderForm">
+				{tickets_selling}
+				{registration}
+				<footer class="order_page_footer -align_center">
+					<div class="form_unit">
+						<input id="order_agreement" class="form_checkbox Switch" type="checkbox" data-switch_id="order_agreement" required>
+						<label class="form_label" for="order_agreement">
+							<span>Я согласен c условиями Пользовательского соглашения и Договором оказания услуг по организации мероприятия</span>
+						</label>
+					</div>
+					<fieldset class="order_page_buttons Switching" data-switch_id="order_agreement" disabled>
+						<div class="form_unit">
+							{main_action_button}
+						</div>
+						<div class="order_page_pay_buttons PayButtons -hidden">
+							<p><span class="-text_color_primary_50">или</span></p>
+							<div class="form_unit">
+								{legal_entity_payment_button}
+							</div>
+							<div class="form_unit">
+								{bitcoin_payment_button}
+							</div>
+						</div>
+					</fieldset>
+				</footer>
+				{overlay_cap}
+			</form>
+		</fieldset>
+		<footer class="-align_center">
+			<h4>Связь с техподдержкой:</h4>
+			<p><small><span>Email: </span><a href="mailto:support@evendate.ru">support@evendate.io</a></small></p>
+		</footer>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-order-tickets-selling">
+	<fieldset class="order_ticket_types OrderFields">
+		<h3 class="order_page_subtitle">Выберите билеты</h3>
+		{ticket_types}
+		<footer class="order_ticket_types_footer">
+			<p class="-text_size_big">
+				<b class="-text_color_primary_80">Общая стоимость: </b>
+				<b class="-text_color_dark_primary"><span class="TicketsOverallSum">{overall_price}</span> ₽</b>
+			</p>
+			<div class="form_group -align_right -parts_2_1 PromocodeWrapper">
+				<div class="form_unit -unite -parts_e_3">
+					<input class="form_input PromocodeInput" placeholder="Промокод" name="promocode">
+					<button class="button -color_accent ActivatePromocode RippleEffect" type="button">Применить</button>
+				</div>
+			</div>
+		</footer>
+	</fieldset>
+</script>
+
+<script type="javascript/template" id="tmpl-order-tickets-selling-promocode">
+	<b>Скидка с промокода: {effort}</b>
+	<p class="-text_size_big">
+		<b class="-text_color_primary_80">Итоговоая стоимость: </b>
+		<b class="-text_color_dark_primary"><span class="TicketsTotalSum">{total_sum}</span> ₽</b>
+	</p>
+</script>
+
+<script type="javascript/template" id="tmpl-order-ticket-type">
+	<fieldset class="order_ticket_type TicketType" data-ticket_type_uuid="{ticket_type_uuid}">
+		<header class="order_ticket_type_header">
+			<span class="order_ticket_type_title">{name}</span>
+			{quantity_input}
+		</header>
+		<div class="order_ticket_type_description">{description}</div>
+		<footer class="order_ticket_type_footer">
+			<span class="order_ticket_type_price">{type_price} ₽</span>
+			<span class="order_ticket_type_sum TicketTypeSum -text_color_dark_primary -hidden"><span class="TicketTypeSumText">{sum_price}</span> ₽</span>
+		</footer>
+	</fieldset>
+	<hr class="order_ticket_type_divider">
+</script>
+
+<script type="javascript/template" id="tmpl-order-registration">
+	<fieldset class="order_registration_fields RegistrationFields">
+		{registration_fields}
+	</fieldset>
+</script>
+
+<script type="javascript/template" id="tmpl-order-overlay-cap-content">
+	<p>{message}</p>
+	<div class="form_unit">{return_button}</div>
+	<div class="form_unit">{tickets_button}</div>
+</script>
+<script type="javascript/template" id="tmpl-legal-entity-payment-page">
+	<form class="material legal_entity_payment_page">
+		<fieldset class="LegalEntityPaymentForm">
+			<h2>Информация о заказе</h2>
+			{event_info}
+			<h3>Участники</h3>
+			{receivers_form_field}
+			<h2>Информация о компании</h2>
+			{company_form_field}
+			<fieldset class="CompanyAdditionalInfo -hidden">
+				<div class="form_group -parts_e_e -valign_baseline">
+					{inn_form_field}
+					{kpp_form_field}
+				</div>
+				{real_address_form_field}
+				<input name="company_zipcode" value="-" type="hidden">
+			</fieldset>
+			<h2>Банковские данные</h2>
+			{bank_name_form_field}
+			<fieldset class="BankAdditionalInfo -hidden">
+				<div class="form_group -parts_e_e -valign_baseline">
+					{bic_form_field}
+					{correspondent_account_form_field}
+				</div>
+			</fieldset>
+			{checking_account_form_field}
+			<h2>Подписывающее лицо</h2>
+			{signer_name_form_field}
+			{signer_position_form_field}
+			<h2>Контактная информация</h2>
+			{self_name_form_field}
+			<div class="form_group -parts_e_e -valign_baseline">
+				{self_email_form_field}
+				{self_phone_form_field}
+			</div>
+		</fieldset>
+	</form>
+	<footer class="legal_entity_payment_footer LegalEntityPaymentFooter">
+		{submit_button}
+	</footer>
+	<footer class="legal_entity_payment_footer -hidden LegalEntityPaymentContract">
+		<div class="form_unit">
+			<a class="button -no_uppercase -size_huge -color_accent RippleEffect" href="/api/v1/events/{event_id}/orders/{order_uuid}/legal_entity/contract" target="_blank">Открыть договор-счет</a>
+		</div>
+		<p><span class="-text_color_primary_50">или</span></p>
+		<div class="form_unit">
+			<a class="button -no_uppercase -color_marginal RippleEffect" href="/api/v1/events/{event_id}/orders/{order_uuid}/legal_entity/contract?download=true">Скачать договор-счет</a>
+		</div>
+		{back_to_link}
+	</footer>
+</script>

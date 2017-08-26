@@ -1,0 +1,37 @@
+.orders_page {
+	display: flex;
+	height: calc(100% - 96px);
+	margin: 48px 0;
+}
+
+.orders_page_list,
+.orders_page_wrapper {flex: none}
+
+.orders_page_detail,
+.orders_page_registration_fields {height: 100%}
+
+.orders_page_list {
+	max-width: 316px;
+}
+.orders_page_wrapper {
+	width: 100%;
+	max-width: calc((100% - 316px) / 2);
+}
+
+.order_list_item {
+	cursor: pointer;
+}
+
+.orders_page_detail {
+	padding: 24px 32px;
+	border-left: 1px solid #e2e4e8;
+	border-right: 1px solid #e2e4e8;
+}
+
+.orders_page_pay_button {
+	margin: 16px 0;
+}
+
+.orders_page_registration_fields {
+	padding: 0 24px;
+}

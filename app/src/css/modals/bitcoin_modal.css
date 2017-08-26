@@ -1,0 +1,32 @@
+.bitcoin_modal_title {
+	padding: 0 18px;
+	font-size: 1em;
+	font-weight: 500;
+	line-height: 1.25;
+	color: #3e4d66;
+	color: var(--color_primary);
+}
+
+.bitcoin_modal_helptext {
+	padding: 15px 18px;
+	font-weight: 500;
+	line-height: 1.5;
+	color: #657184;
+	color: var(--color_primary_80);
+	background-color: #f6f6f6;
+	background-color: var(--color_gray_material);
+}
+
+.bitcoin_modal_bottom {
+	display: flex;
+	padding: 18px;
+}
+
+.bitcoin_modal_qr {
+	flex: none;
+	margin-right: 18px;
+}
+
+.bitcoin_modal_address {
+	width: 100%;
+}

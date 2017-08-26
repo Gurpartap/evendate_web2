@@ -87,13 +87,18 @@ $__modules['events'] = array(
 			if (!isset($__request['code']) && !isset($__request['uuid'])) throw new PrivilegesException('BAD_PROMOCODE', $__db);
 			$__request['event_id'] = $event_id;
 
-			return PromocodesCollection::filter($__db,
-				$__user,
-				$__request,
-				$__fields,
-				$__pagination,
-				$__order_by ?? array()
-			)->getParams($__user, $__fields);
+			try{
+				$result = PromocodesCollection::filter($__db,
+					$__user,
+					$__request,
+					$__fields,
+					$__pagination,
+					$__order_by ?? array()
+				)->getParams($__user, $__fields);
+				return $result;
+			}catch (Exception $e){
+				return new Result(false, 'CANT_FIND_PROMOCODE', null);
+			}
 		},
 		'{/(id:[0-9]+)/orders/(uuid:\w+-\w+-\w+-\w+-\w+)/legal_entity/contract}' => function ($id, $uuid) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
 			$event = EventsCollection::one(
@@ -113,12 +118,8 @@ $__modules['events'] = array(
 			header('Pragma: no-cache');
 
 
-			if (file_exists($ROOT_PATH . 'email_files/' . $uuid . '.pdf')) {
-				echo file_get_contents($ROOT_PATH . '/email_files/' . $filename);
-			} else {
-				file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/pdf/events/' . $event->getId() .'/orders/' . $uuid);
-				echo file_get_contents($ROOT_PATH . '/email_files/' . $filename);
-			}
+			file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/pdf/events/' . $event->getId() .'/orders/' . $uuid);
+			echo file_get_contents($ROOT_PATH . '/email_files/' . $filename);
 			die();
 		},
 		'{/(id:[0-9]+)/orders/(uuid:\w+-\w+-\w+-\w+-\w+)/bitcoin/qr}' => function ($event_id, $uuid) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
@@ -177,7 +178,6 @@ $__modules['events'] = array(
 				$__order_by ?? array()
 			);
 		},
-
 		'{{/(id:[0-9]+)}/notifications}' => function ($id) use ($__db, $__order_by, $__request, $__offset, $__length, $__user, $__fields) {
 			$event = EventsCollection::one(
 				$__db,
@@ -187,7 +187,6 @@ $__modules['events'] = array(
 
 			return $event->getNotifications($__user, $__fields, $__length, $__offset, $__order_by);
 		},
-
 		'{{/(id:[0-9]+)}/ticket_types/(uuid:\w+-\w+-\w+-\w+-\w+)}' => function ($id, $uuid) use ($__db, $__request, $__user, $__fields, $__pagination, $__order_by) {
 
 			$event = EventsCollection::one(

@@ -1,0 +1,64 @@
+.user_page_wrapper {
+	display: flex;
+	align-items: flex-start;
+	padding: 18px 0;
+}
+
+.user_page_sidebar {
+	width: 240px;
+}
+
+.user_page_sidebar_header {
+	text-align: center;
+	padding: 24px;
+}
+
+.user_page_sidebar_header .user_tombstone_title {
+	margin-top: 24px;
+	font-size: 20px;
+	font-weight: 500;
+}
+
+.user_page_social_links {
+	padding: 0 24px;
+	margin-bottom: 24px;
+}
+
+.user_page_sidebar_wrapper {
+	padding: 12px;
+	border-top: 2px solid #e4eaec;
+}
+
+.user_page_sidebar_wrapper > .avatar_block {
+	font-size: .875em;
+	font-weight: 400;
+}
+
+.user_page_sidebar_wrapper > .avatar_block + .avatar_block {margin-top: 18px}
+
+.user_page_sidebar_footer {
+	margin-top: 16px;
+	text-align: center;
+}
+
+
+.user_page_content {
+	width: 700px;
+	margin-left: 18px;
+}
+
+.user_page_content_header {
+	padding: 6px 24px 0;
+	border-bottom: 1px solid #e4eaec;
+}
+
+.user_page_content_header > .tab {top: 1px}
+
+.user_page_content > .tab_bodies_wrap {margin: 0}
+
+.user_page_content .activity_block {
+	margin: 12px;
+	padding: 12px;
+}
+
+.-another_user .event_block_action_buttons_wrapper {display: none}

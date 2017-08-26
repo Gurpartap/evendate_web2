@@ -149,6 +149,7 @@ class Event extends AbstractEntity
 		'registration_available',
 		'ticketing_available',
 		'accept_bitcoins',
+		'booking_time',
 //		'registered_count',
 
 		self::IS_FAVORITE_FIELD_NAME => '(SELECT id IS NOT NULL
@@ -1339,7 +1340,7 @@ class Event extends AbstractEntity
 					Fields::parseOrderBy($fields[self::ORDERS_FIELD_NAME]['order_by'] ?? ''));
 				if ($promocodes instanceof Result) {
 					$result_data[self::PROMOCODES_FIELD_NAME] = $promocodes->getData();
-				} elseif ($promocodes instanceof Promocode){
+				} elseif ($promocodes instanceof Promocode) {
 					$result_data[self::PROMOCODES_FIELD_NAME] = array($promocodes->getParams($user, $promocode_fields)->getData());
 				}
 			} else {
@@ -1863,7 +1864,7 @@ class Event extends AbstractEntity
 			array());
 
 		$order_cols = Order::getDefaultCols();
-		if (isset($request['bitcoin']) && filter_var($request['bitcoin']) == true){
+		if (isset($request['bitcoin']) && filter_var($request['bitcoin']) == true) {
 			if ($this->accept_bitcoin == false)
 				throw new LogicException('BITCOINS_NOT_ACCEPTABLE');
 			$fields = Fields::parseFields('final_sum,number,promocode,tickets{fields:"ticket_type"}');
@@ -1887,16 +1888,11 @@ class Event extends AbstractEntity
 		}
 
 		$_tickets = TicketsCollection::filter($this->db, $user, array('order' => $order), array())->getData();
-		$sum = 0;
-		foreach ($_tickets as $_ticket) {
-			$sum += (float)$_ticket['price'];
-		}
 
 		return new Result(true, '', array(
 			'registration_fields' => $return_fields,
 			'order' => $order->getParams($user, $order_cols)->getData(),
-			'tickets' => $_tickets,
-			'sum' => $sum
+			'tickets' => $_tickets
 		));
 	}
 
@@ -1920,6 +1916,32 @@ class Event extends AbstractEntity
 	public function getTitle()
 	{
 		return $this->title;
+	}
+
+
+	public function checkLandingAlias(string $alias)
+	{
+		$reserved_names = array(
+			'admin',
+			'add',
+			'my',
+			'event',
+			'feed',
+			'organizations',
+			'organization',
+			'onboarding',
+			'search',
+			'friends',
+			'friend',
+			'user',
+			'ticket'
+		);
+		if (in_array($alias, $reserved_names)) throw new InvalidArgumentException('USES_RESERVED_URL');
+		if (preg_match('/[a-zA-Zа-яА-ЯёЁ\-_0-9]+/', $alias) == false) {
+			throw new InvalidArgumentException('BAD_URL');
+		}
+		$q_ins_url = App::queryFactory()->newSelect();
+		$q_ins_url->from('');
 	}
 
 }

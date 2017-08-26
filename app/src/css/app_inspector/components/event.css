@@ -1,0 +1,24 @@
+.app_inspector_event {
+	display: flex;
+	align-items: center;
+	margin-bottom: 36px;
+	border-radius: 3px;
+	box-shadow: 0 0 4px 0 hsla(0,0%,0%,.12);
+	overflow: hidden;
+}
+
+.app_inspector_event_body {
+	padding: 6px;
+}
+
+.app_inspector_event_title {
+	font-size: .875em;
+	font-weight: 500;
+	color: #3e4d66;
+	color: var(--color_primary);
+}
+
+.app_inspector_event:hover .app_inspector_event_title {
+	color: #00dc88;
+	color: var(--color_accent);
+}

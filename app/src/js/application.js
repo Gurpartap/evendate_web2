@@ -135,6 +135,7 @@ __APP = {
 	},
 	MODALS: new Modals(),
 	BUILD: new Builder(),
+	IS_WIDGET: false,
 	/**
 	 * Rendering header tabs
 	 * @param {(buildProps|Array<buildProps>)} tabs
@@ -204,6 +205,7 @@ __APP = {
 	 * @param {string} page_name
 	 * @param {boolean} [soft_change=false]
 	 * @param {boolean} [reload=false]
+	 *
 	 * @return {boolean} false
 	 */
 	changeState: function changeState(page_name, soft_change, reload) {
@@ -337,7 +339,7 @@ __LOCALES = {
 		DATE: {
 			DATE_FORMAT: 'DD.MM.YYYY',
 			TIME_FORMAT: 'HH:mm',
-			DATE_TIME_FORMAT: 'DD.MM.YYYY HH:mm',
+			DATE_TIME_FORMAT: 'DD.MM.YYYY, HH:mm',
 			MONTH_SHORT_NAMES: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'],
 			MONTH_NAMES: ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'],
 			CALENDAR_DATE_TIME: {
