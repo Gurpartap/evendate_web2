@@ -12,7 +12,7 @@ function wrongInitError() { ?>
 	/**
 	 * @class
 	 */
-	EvendateWidgetBuilder = (function() {
+	var EvendateWidgetBuilder = (function() {
 		/**
 		 *
 		 * @param {number} [id]
@@ -28,6 +28,7 @@ function wrongInitError() { ?>
 			var self = this;
 
 			this.id = id;
+			this.is_loaded = false;
 
 			Object.defineProperties(this, {
 				iframe: {
@@ -43,7 +44,65 @@ function wrongInitError() { ?>
 					}
 				}
 			});
+
+			this.sendPostMessage = {
+				setColor: this.postMessageFactory('setColor'),
+				getHeight: this.postMessageFactory('getHeight')
+			};
 		}
+
+		EvendateWidgetBuilder.prototype.postMessageHandler = function(command, data) {
+			switch (command) {
+				case 'ready': {
+
+					return this.is_loaded = true;
+				}
+				case 'setHeight': {
+
+					return this.setHeight(data);
+				}
+			}
+		};
+
+		/**
+		 *
+		 * @param {string} command
+		 *
+		 * @return {function}
+		 */
+		EvendateWidgetBuilder.prototype.postMessageFactory = function(command) {
+			var self = this;
+
+			return function(data) {
+
+				return self.window.postMessage(JSON.stringify({
+					command: command,
+					data: data
+				}), '*');
+			};
+		};
+		
+		EvendateWidgetBuilder.prototype.addPostMessageListener = function() {
+			/**
+			 *
+			 * @param {object} event
+			 * @param {string} event.data
+			 * @param {string} event.origin
+			 * @param {Window} event.source
+			 */
+			var listener = function(event) {
+				var data = JSON.parse(event.data);
+				
+				return this.postMessageHandler(data.command, data.data);
+			}.bind(this);
+			
+			if (this.window.parent.addEventListener) {
+				this.window.parent.addEventListener("message", listener);
+			} else {
+				this.window.parent.attachEvent("onmessage", listener);
+			}
+		};
+
 		/**
 		 *
 		 * @param {number} id
@@ -51,16 +110,10 @@ function wrongInitError() { ?>
 		 * @return {number}
 		 */
 		EvendateWidgetBuilder.prototype.setId = function(id) {
+			this.id = id;
+			this.addPostMessageListener();
 
-			return this.id = id;
-		};
-		/**
-		 *
-		 * @return {boolean}
-		 */
-		EvendateWidgetBuilder.prototype.isLoaded = function() {
-
-			return !!this.id && this.window.document.readyState === "complete";
+			return id;
 		};
 		/**
 		 *
@@ -68,55 +121,20 @@ function wrongInitError() { ?>
 		 */
 		EvendateWidgetBuilder.prototype.onLoad = function(callback) {
 			var self = this,
-				iframe = this.iframe,
 				fired = false,
 				timer;
 
-			function ready() {
-				if (!fired) {
-					fired = true;
-					clearTimeout(timer);
-					callback.call(self);
-				}
-			}
-
-			function readyState() {
-				if (this.readyState === "complete") {
-					ready.call(this);
-				}
-			}
-
-			function addEvent(elem, event, fn) {
-				if (elem.addEventListener) {
-
-					return elem.addEventListener(event, fn);
-				} else {
-
-					return elem.attachEvent("on" + event, function () {
-
-						return fn.call(elem, window.event);
-					});
-				}
-			}
-
-			function checkLoaded() {
-				var doc = iframe.contentDocument || iframe.contentWindow.document;
-
-				if (doc.URL.indexOf("about:") !== 0) {
-					if (doc.readyState === "complete") {
-						ready();
-					} else {
-						addEvent(doc, "DOMContentLoaded", ready);
-						addEvent(doc, "readystatechange", readyState);
+			!function checkLoaded() {
+				if (self.is_loaded) {
+					if (!fired) {
+						fired = true;
+						clearTimeout(timer);
+						callback.call(self);
 					}
 				} else {
 					timer = setTimeout(checkLoaded, 1);
 				}
-			}
-
-			addEvent(iframe, "load", ready);
-
-			checkLoaded();
+			}();
 		};
 		/**
 		 *
@@ -125,7 +143,7 @@ function wrongInitError() { ?>
 		 * @return {string}
 		 */
 		EvendateWidgetBuilder.prototype.setHeight = function(height) {
-			if (!this.isLoaded()) {
+			if (!this.is_loaded) {
 				return this.onLoad(this.setHeight.bind(this, height));
 			}
 
@@ -140,8 +158,12 @@ function wrongInitError() { ?>
 					}
 				}
 
-				return this.window.document.scrollingElement.scrollHeight + 'px';
+				return null;
 			}.call(this, height);
+
+			if (height == null) {
+				return this.sendPostMessage.getHeight(this.iframe.style.height);
+			}
 
 			return this.iframe.style.height = height;
 		};
@@ -150,7 +172,7 @@ function wrongInitError() { ?>
 		 * @param {string} color
 		 */
 		EvendateWidgetBuilder.prototype.setColor = function(color) {
-			if (!this.isLoaded()) {
+			if (!this.is_loaded) {
 				return this.onLoad(this.setColor.bind(this, color));
 			}
 
@@ -159,7 +181,7 @@ function wrongInitError() { ?>
 				color = '#' + color;
 			}
 
-			this.window.document.body.style.setProperty('--color_accent', color);
+			return this.sendPostMessage.setColor(color);
 		};
 
 		return EvendateWidgetBuilder;
@@ -180,8 +202,7 @@ switch ($_REQUEST['type']) {
 			wrongInitError();
 		} ?>
 !function appendOrderWidget(id, props) {
-	var iframe = document.createElement('iframe'),
-		heightObserver;
+	var iframe = document.createElement('iframe');
 
 	iframe.id = 'evendate-widget-' + id;
 	iframe.setAttribute('src', '//<?=App::$DOMAIN?>/widget/order/event/' + id);
@@ -196,10 +217,6 @@ switch ($_REQUEST['type']) {
 
 	evendateWidget.setId(id);
 
-	heightObserver = new MutationObserver(function() {
-		evendateWidget.setHeight();
-	});
-
 	evendateWidget.onLoad(function() {
 		evendateWidget.setHeight();
 
@@ -207,21 +224,13 @@ switch ($_REQUEST['type']) {
 			evendateWidget.setColor(props['color']);
 		}
 
-		heightObserver.observe(evendateWidget.window.document.body, {
-			childList: true,
-			subtree: true
-		});
-
 		evendateWidget.iframe.onload = function() {
-			heightObserver.disconnect();
+			evendateWidget.addPostMessageListener();
+
 			if (props['color']) {
 				evendateWidget.setColor(props['color']);
 			}
 			evendateWidget.setHeight();
-			heightObserver.observe(evendateWidget.window.document.body, {
-				childList: true,
-				subtree: true
-			});
 		}
 	});
 }(<?=$_REQUEST['id']?>, <?=json_encode( $_REQUEST )?>);<?php
