@@ -214,6 +214,9 @@ switch ($_REQUEST['type']) {
 
 		evendateWidget.iframe.onload = function() {
 			heightObserver.disconnect();
+			if (props['color']) {
+				evendateWidget.setColor(props['color']);
+			}
 			evendateWidget.setHeight();
 			heightObserver.observe(evendateWidget.window.document.body, {
 				childList: true,
