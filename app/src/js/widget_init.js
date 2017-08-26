@@ -1,3 +1,69 @@
+sendPostMessage = (function(w) {
+	var sendMessage = (function() {
+		function postMessageFactory(command) {
+			
+			return function(data) {
+				
+				return w.parent.postMessage(JSON.stringify({
+					command: command,
+					data: data
+				}), '*')
+			};
+		}
+		
+		return {
+			ready: postMessageFactory('ready'),
+			setHeight: postMessageFactory('setHeight')
+		};
+	}());
+	
+	/**
+	 *
+	 * @param {object} event
+	 * @param {string} event.data
+	 * @param {string} event.origin
+	 * @param {Window} event.source
+	 */
+	function listener(event) {
+		var resp = JSON.parse(event.data);
+		
+		switch (resp.command) {
+			case 'setColor': {
+				
+				return !function(color){
+					
+					return w.document.body.style.setProperty('--color_accent', color);
+				}(resp.data);
+			}
+			case 'getHeight': {
+				
+				return !function(current_height){
+					
+					return sendMessage.setHeight(calcHeight(current_height));
+				}(resp.data);
+			}
+		}
+	}
+	
+	if (w.addEventListener) {
+		w.addEventListener("message", listener);
+	} else {
+		w.attachEvent("onmessage", listener);
+	}
+	
+	return sendMessage;
+}(window));
+
+function calcHeight(current_height) {
+	if (current_height && current_height > document.scrollingElement.scrollHeight) {
+		
+		return $('.Content').children().outerHeight() + 150;
+	} else {
+		
+		return document.scrollingElement.scrollHeight;
+	}
+}
+
 $(document)
 	.ajaxStart(function() {
 		Pace.restart()
@@ -6,6 +72,15 @@ $(document)
 		var user_jqhxr,
 			auth_urls_jqxhr,
 			cities_jqxhr;
+		
+		sendPostMessage.ready();
+		
+		(new MutationObserver(function() {
+			sendPostMessage.setHeight(calcHeight());
+		})).observe(document.body, {
+			childList: true,
+			subtree: true
+		});
 		
 		if (window.moment !== undefined) {
 			moment.locale(navigator.language);
