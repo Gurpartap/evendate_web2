@@ -130,7 +130,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 
       <!-- YOUR LOGO -->
       <a class="navbar-brand" href="#">
-        <img src="<?=$event['organization_logo_medium_url']?>" alt="">
+        <img src="<?= $event['organization_logo_medium_url'] ?>" alt="">
       </a>
     </div>
 
@@ -155,7 +155,8 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
      EVENT HOME 1
 ============================== -->
 <section class="home event-home-1 polygon-bg cover-bg" id="home">
-  <div ng-if="edit_mode" class="board-settings-btn mod-show-menu js-show-sidebar main-btn" href="#" data-panel-id="header-panel">
+  <div ng-if="edit_mode" class="board-settings-btn mod-show-menu js-show-sidebar main-btn" href="#"
+       data-panel-id="header-panel">
     <span class="fa fa-ellipsis-h"></span>
     <span class="board-header-btn-text u-text-underline">Настройки</span></div>
   <div class="container">
@@ -163,7 +164,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
       <div class="col-lg-8 col-md-10 col-lg-offset-2 col-md-offset-1 text-center">
         <div class="logo-home">
           <!-- REPLACE WITH YOUR LOGO -->
-<!--          <img src="" alt="">-->
+          <!--          <img src="" alt="">-->
         </div>
 
         <p class="heading-pre-suf text-center text-uppercase" contenteditable="true" ng-model="data.header.title">
@@ -200,7 +201,8 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 <!-- =========================
      SPEAKERS 
 ============================== -->
-<section ng-hide="!edit_mode && !data.speakers.enabled" class="speakers speakers-1 secondary-bg" id="speakers" ng-class="{'disabled': data.speakers.enabled == false}">
+<section ng-hide="!edit_mode && !data.speakers.enabled" class="speakers speakers-1 secondary-bg" id="speakers"
+         ng-class="{'disabled': data.speakers.enabled == false}">
   <div ng-if="edit_mode" ng-click="data.speakers.toggleEnabled();"
        ng-title="data.speakers.enabled == true ? 'Скрыть блок' : 'Показать блок'"
        class="board-settings-btn mod-show-menu js-show-sidebar not-main show-hide-btn" href="#">
@@ -299,7 +301,8 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 <!-- =========================
      SCHEDULE 
 ============================== -->
-<section ng-hide="!edit_mode && !data.schedule.enabled" class="descriptions schedule white-bg padding-120-75" id="schedule"
+<section ng-hide="!edit_mode && !data.schedule.enabled" class="descriptions schedule white-bg padding-120-75"
+         id="schedule"
          ng-class="{'disabled': data.schedule.enabled == false}">
   <div ng-if="edit_mode" ng-click="data.schedule.toggleEnabled();"
        ng-title="data.schedule.enabled == true ? 'Скрыть блок' : 'Показать блок'"
@@ -408,9 +411,11 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 <!-- =========================
      CUSTOM BLOCK
 ============================== -->
-<section ng-hide="!edit_mode && !data.custom.enabled" class="testimonials testimonials-4 padding-120-75" id="custom-html"
+<section ng-hide="!edit_mode && !data.custom.enabled" class="testimonials testimonials-4 padding-120-75"
+         id="custom-html"
          ng-class="{'disabled': data.custom.enabled == false}">
-  <div ng-if="edit_mode" ng-click="data.custom.toggleEnabled();" ng-title="data.custom.enabled == true ? 'Скрыть блок' : 'Показать блок'"
+  <div ng-if="edit_mode" ng-click="data.custom.toggleEnabled();"
+       ng-title="data.custom.enabled == true ? 'Скрыть блок' : 'Показать блок'"
        class="board-settings-btn mod-show-menu js-show-sidebar not-main" href="#">
     <span class="board-header-btn-text">
       <span class="fa" ng-class="{'fa-eye-slash': data.custom.enabled, 'fa-eye': data.custom.enabled == false}"></span>
@@ -436,7 +441,8 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
     </div>  <!-- /.row -->
 
     <div class="row">
-      <textarea ui-tinymce="data.custom.tinymce_options" class="textarea-html" ng-model="data.custom.html" ng-if="edit_mode"></textarea>
+      <textarea ui-tinymce="data.custom.tinymce_options" class="textarea-html" ng-model="data.custom.html"
+                ng-if="edit_mode"></textarea>
     </div>  <!-- /.row -->
   </div>
 </section>
@@ -444,7 +450,8 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 <!-- =========================
      TESTIMONIALS
 ============================== -->
-<section ng-hide="!edit_mode && !data.testimonials.enabled" class="testimonials testimonials-4 secondary-bg padding-120-75" id="testimonials"
+<section ng-hide="!edit_mode && !data.testimonials.enabled"
+         class="testimonials testimonials-4 secondary-bg padding-120-75" id="testimonials"
          ng-class="{'disabled': data.testimonials.enabled == false}">
   <div ng-if="edit_mode" ng-click="data.testimonials.toggleEnabled();"
        ng-title="data.testimonials.enabled == true ? 'Скрыть блок' : 'Показать блок'"
@@ -547,7 +554,8 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
       <span class="fa fa-plus"></span> Добавить фото
     </span>
   </div>
-  <div ng-if="edit_mode" class="board-settings-btn mod-show-menu js-show-sidebar gallery-btn" href="#" data-panel-id="gallery-panel">
+  <div ng-if="edit_mode" class="board-settings-btn mod-show-menu js-show-sidebar gallery-btn" href="#"
+       data-panel-id="gallery-panel">
     <span class="fa fa-ellipsis-h"></span>
     <span class="board-header-btn-text u-text-underline">Настройки</span></div>
 
@@ -637,7 +645,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
           <h2 class="heading-text">{{data.tickets.title}}</h2>
           <hr class="lines">
           <br>
-          <script src="/widget/builder/order/<?=$event['id']?>"></script>
+          <script src="/widget/builder/order/<?= $event['id'] ?>"></script>
 
         </div> <!-- /.section-heading -->
       </div>
@@ -710,7 +718,8 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
       </li>
     </ul>
 
-    <a href="" class="btn btn-trans btn-lg" ng-hide="!data.sponsors.become_a_sponsor_enabled" contenteditable ng-model="data.sponsors.become_a_sponsor">{{data.sponsors.become_a_sponsor}}</a>
+    <a href="" class="btn btn-trans btn-lg" ng-hide="!data.sponsors.become_a_sponsor_enabled" contenteditable
+       ng-model="data.sponsors.become_a_sponsor">{{data.sponsors.become_a_sponsor}}</a>
 
   </div>
 </div>
@@ -719,8 +728,10 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 <!-- =========================
      FAQ 
 ============================== -->
-<section ng-hide="!edit_mode && !data.faq.enabled" class="faqs faqs-2 padding-120-60" id="faq" ng-class="{'disabled': data.faq.enabled == false}">
-  <div ng-if="edit_mode" ng-click="data.faq.toggleEnabled();" ng-title="data.faq.enabled == true ? 'Скрыть блок' : 'Показать блок'"
+<section ng-hide="!edit_mode && !data.faq.enabled" class="faqs faqs-2 padding-120-60" id="faq"
+         ng-class="{'disabled': data.faq.enabled == false}">
+  <div ng-if="edit_mode" ng-click="data.faq.toggleEnabled();"
+       ng-title="data.faq.enabled == true ? 'Скрыть блок' : 'Показать блок'"
        class="board-settings-btn mod-show-menu js-show-sidebar not-main" href="#">
     <span class="board-header-btn-text">
       <span class="fa" ng-class="{'fa-eye-slash': data.faq.enabled, 'fa-eye': data.faq.enabled == false}"></span>
@@ -769,8 +780,10 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 <!-- =========================
      OUR LOCATION 
 ============================== -->
-<section ng-hide="!edit_mode && !data.map.enabled" class="map-container padding-120-60" ng-class="{'disabled': data.map.enabled == false}">
-  <div ng-if="edit_mode" ng-click="data.map.toggleEnabled();" ng-title="data.map.enabled == true ? 'Скрыть блок' : 'Показать блок'"
+<section ng-hide="!edit_mode && !data.map.enabled" class="map-container padding-120-60"
+         ng-class="{'disabled': data.map.enabled == false}">
+  <div ng-if="edit_mode" ng-click="data.map.toggleEnabled();"
+       ng-title="data.map.enabled == true ? 'Скрыть блок' : 'Показать блок'"
        class="board-settings-btn mod-show-menu js-show-sidebar not-main" href="#">
     <span class="board-header-btn-text">
       <span class="fa" ng-class="{'fa-eye-slash': data.map.enabled, 'fa-eye': data.map.enabled == false}"></span>
@@ -889,6 +902,14 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
       <div class="board-menu-content-frame">
         <div class="demo-style-switch" id="switch-style" style="left: 0px;">
           <div class="switched-options">
+            <div class="config-title">Адрес страницы:</div>
+            <div class="input-group mb-2 mb-sm-0">
+              <div class="input-group-addon" style="font-size: 12px;">https://evendate.io/</div>
+              <input type="text" class="form-control" placeholder="">
+              <span class="input-group-btn">
+                <button class="btn btn-primary btn-apply-url" type="button"><span class="fa fa-check"></span></button>
+              </span>
+            </div>
             <div class="config-title">Цветовая тема:</div>
             <ul class="styles">
               <li>
@@ -978,7 +999,8 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
     <div class="board-menu-content u-fancy-scrollbar js-board-menu-content-wrapper">
       <div class="board-menu-content-frame">
         <div>Прозрачность наложения:</div>
-        <input type="range" ng-model="data.gallery_overlay_opacity" ng-change="setGalleryOverlayOpacity()" min="0" max="100">
+        <input type="range" ng-model="data.gallery_overlay_opacity" ng-change="setGalleryOverlayOpacity()" min="0"
+               max="100">
         <hr class="board-menu-header-divider">
         <div class="board-backgrounds-section-tiles u-clearfix">
 

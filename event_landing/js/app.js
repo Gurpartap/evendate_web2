@@ -28,6 +28,17 @@ function handleFileLoadErr(err) {
     alert('Ошибка загрузки изображения');
 }
 
+
+function rgbToHex(r, g, b) {
+    function componentToHex(c) {
+        var hex = c.toString(16);
+        return hex.length == 1 ? "0" + hex : hex;
+    }
+    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+}
+
+
+
 var backgrounds = [
     {
         title: 'Без фона',
@@ -661,6 +672,7 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
         var html = document.getElementsByTagName('html')[0];
         html.style.setProperty("--base-num", $scope.data.color_scheme.join(', '));
         html.style.setProperty("--accent-num", $scope.data.accent_color_scheme.join(', '));
+        evendateWidget.setColor(rgbToHex(val.r, val.g, val.b));
     };
 
     $scope.setOverlayOpacity = function () {
