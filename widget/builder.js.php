@@ -148,7 +148,7 @@ function wrongInitError() { ?>
 			}
 
 			height = function calcHeight(height) {
-				if (height) {
+				if (height != null) {
 					if (+height == height) {
 
 						return height + 'px';
@@ -162,7 +162,7 @@ function wrongInitError() { ?>
 			}.call(this, height);
 
 			if (height == null) {
-				return this.sendPostMessage.getHeight(this.iframe.style.height);
+				return this.sendPostMessage.getHeight();
 			}
 
 			return this.iframe.style.height = height;
