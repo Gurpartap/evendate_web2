@@ -23,7 +23,7 @@ function getBase64(file, cb) {
     };
 }
 
-function handleFileLoadErr(err){
+function handleFileLoadErr(err) {
     console.log(err);
     alert('Ошибка загрузки изображения');
 }
@@ -108,23 +108,6 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
     $scope.backgrounds = backgrounds;
     var initializing = true;
 
-    $scope.tinymce_options = {
-        selector: '.textarea-html',
-        language: 'ru',
-        language_url: 'js/langs/ru.js',
-        theme: 'modern',
-        invalid_elements: 'script',
-        plugins: [
-            'advlist autolink lists link image charmap preview hr anchor pagebreak',
-            'searchreplace wordcount visualblocks visualchars code fullscreen',
-            'media nonbreaking save table contextmenu',
-            'template paste textcolor colorpicker textpattern imagetools codesample toc'
-        ],
-        toolbar1: 'preview media | undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image| forecolor backcolor | codesample',
-        image_advtab: true,
-
-    };
-
 
     $scope.data = {
         color_scheme: [0, 205, 175],
@@ -145,10 +128,10 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
             location_addresses: '',
             description: '',
             background_base64: null,
-            imageChange: function($files, $file){
+            imageChange: function ($files, $file) {
                 var _header = this;
-                getBase64($file, function(err, res){
-                    if (res){
+                getBase64($file, function (err, res) {
+                    if (res) {
                         _header.background_base64 = res;
                     }
                 });
@@ -393,6 +376,21 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
                 this.enabled = !this.enabled;
                 return false;
             },
+            tinymce_options: {
+                selector: '.textarea-html',
+                language: 'ru',
+                language_url: 'js/langs/ru.js',
+                theme: 'modern',
+                invalid_elements: 'script',
+                plugins: [
+                    'advlist autolink lists link image charmap preview hr anchor pagebreak',
+                    'searchreplace wordcount visualblocks visualchars code fullscreen',
+                    'media nonbreaking save table contextmenu',
+                    'template paste textcolor colorpicker textpattern imagetools codesample toc'
+                ],
+                toolbar1: 'preview media | undo redo | insert | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image| forecolor backcolor | codesample',
+                image_advtab: true
+            },
             html: '',
             enabled: true
         },
@@ -402,10 +400,10 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
             items: {},
             enabled: true,
             background_base64: null,
-            imageChange: function($files, $file){
+            imageChange: function ($files, $file) {
                 var _gallery = this;
-                getBase64($file, function(err, res){
-                    if (res){
+                getBase64($file, function (err, res) {
+                    if (res) {
                         _gallery.background_base64 = res;
                     }
                 });
@@ -711,8 +709,11 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
         $('[contenteditable]').prop('contenteditable', 'false');
     }
 
-}]);
+    $timeout(function () {
+        evendateWidget.setHeight()
+    });
 
+}]);
 
 __app.directive("contenteditable", function () {
     return {

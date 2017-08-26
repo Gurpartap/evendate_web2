@@ -436,7 +436,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
     </div>  <!-- /.row -->
 
     <div class="row">
-      <textarea class="textarea-html" ui-tinymce="tinymce_options" ng-model="data.custom.html" ng-if="edit_mode"></textarea>
+      <textarea ui-tinymce="data.custom.tinymce_options" class="textarea-html" ng-model="data.custom.html" ng-if="edit_mode"></textarea>
     </div>  <!-- /.row -->
   </div>
 </section>
@@ -636,7 +636,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 
           <h2 class="heading-text">{{data.tickets.title}}</h2>
           <hr class="lines">
-
+          <br>
           <script src="/widget/builder/order/<?=$event['id']?>"></script>
 
         </div> <!-- /.section-heading -->
@@ -992,7 +992,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
           <div class="board-backgrounds-section-tile board-backgrounds-photos-tile js-bg-photos">
             <div ngf-select=""
                  ngf-drop=""
-                 ngf-change="data.header.imageChange($files, $file, $newFiles, $duplicateFiles, $invalidFiles, $event)"
+                 ngf-no-object-url="true"
                  ng-model="data.gallery_background"
                  ngf-model-invalid="invalidFiles"
                  ngf-model-options="modelOptionsObj"
@@ -1032,6 +1032,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 <script src="js/spectrum.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/tinymce.min.js"></script>
+<script src="js/angular-tinymce.js"></script>
 <script src="js/color-thief.min.js"></script>
 <script src="js/app.js"></script>
 <script src="js/nivo-lightbox.min.js"></script>
@@ -1045,7 +1046,6 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 <script src="js/SVGinject.js"></script>
 <script src="js/smoothscroll.js"></script>
 <script src="http://maps.google.com/maps/api/js?sensor=true"></script>
-<script src="js/angular-tinymce.min.js"></script>
 <script src="js/application.js"></script>
 
 </body>

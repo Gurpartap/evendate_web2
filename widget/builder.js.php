@@ -18,12 +18,26 @@ EvendateWidgetBuilder = (function() {
 	 * @constructor
 	 * @constructs EvendateWidgetBuilder
 	 *
-	 * @property {?HTMLIFrameElement} iframe
+	 * @property {?number} id
 	 * @property {?Window} window
 	 */
-	function EvendateWidgetBuilder(iframe) {
-		this.iframe = iframe ? iframe : null;
-		this.window = iframe ? iframe.contentWindow : null;
+	function EvendateWidgetBuilder(id) {
+	    this.id = id;
+
+		Object.defineProperties(this, {
+            iframe: {
+                get: function(){
+
+                    return document.getElementById('evendate-widget-' + id);
+                }
+            },
+            window: {
+                get: function(){
+
+                    return this.iframe ? this.iframe.contentWindow : null;
+                }
+            }
+        });
 	}
 	/**
 	 *
@@ -152,11 +166,11 @@ switch ($_REQUEST['type']) {
 	iframe.style.border = '0';
 	iframe.setAttribute('width', props['width'] || '100%');
 	iframe.setAttribute('height', props['height'] || '500');
+	iframe.id = 'evendate-widget-' + id;
 
-	debugger;
 	document.currentScript.parentElement.insertBefore(iframe, document.currentScript);
 
-	evendateWidget = new EvendateWidgetBuilder(iframe);
+	evendateWidget = new EvendateWidgetBuilder(id);
 
 	heightObserver = new MutationObserver(function() {
 		evendateWidget.setHeight();
