@@ -46524,6 +46524,17 @@ OrderPage = extending(Page, (function() {
 		
 		this.overall_sum = 0;
 		
+		this.render_vars = {
+			event_id: event_id,
+			tickets_selling: null,
+			registration: null,
+			pay_button: null,
+			register_button: null,
+			main_action_button: null,
+			legal_entity_payment_button: null,
+			bitcoin_payment_button: null
+		};
+		
 		Object.defineProperties(this, {
 			page_title: {
 				get: function() {
@@ -46660,6 +46671,33 @@ OrderPage = extending(Page, (function() {
 			})
 		})));
 	};
+	/**
+	 *
+	 * @return {{ticket_types: Array<{uuid: string, count: string}>, registration_fields: Array<{uuid: string, value: string}>, promocode: string}}
+	 */
+	OrderPage.prototype.gatherSendData = function() {
+		
+		return {
+			ticket_types: this.$wrapper.find('.OrderFields').serializeForm('array').reduce(function(bundle, field) {
+				if (+field.value) {
+					bundle.push({
+						uuid: field.name,
+						count: +field.value
+					});
+				}
+				
+				return bundle;
+			}, []),
+			registration_fields: this.$wrapper.find('.RegistrationFields').serializeForm('array').map(function(field) {
+				
+				return {
+					uuid: field.name,
+					value: field.value
+				};
+			}),
+			promocode: this.$wrapper.find('.PromocodeInput').val()
+		};
+	};
 	
 	OrderPage.prototype.init = function() {
 		var self = this,
@@ -46669,6 +46707,8 @@ OrderPage = extending(Page, (function() {
 			$quantity_inputs = this.$wrapper.find('.QuantityInput'),
 			$pay_buttons = this.$wrapper.find('.PayButtons'),
 			$footer = this.$wrapper.find('.OrderFormFooter'),
+			$main_action_button = this.render_vars.register_button,
+			$payload,
 			$selected_type;
 		
 		function countTicketTypeSum($ticket_type) {
@@ -46700,12 +46740,14 @@ OrderPage = extending(Page, (function() {
 				if ($.contains(self.$wrapper[0], self.render_vars.pay_button[0])) {
 					self.render_vars.pay_button.after(self.render_vars.register_button);
 					self.render_vars.pay_button.detach();
+					$main_action_button = self.render_vars.register_button;
 					$pay_buttons.addClass(__C.CLASSES.HIDDEN);
 				}
 			} else {
 				if ($.contains(self.$wrapper[0], self.render_vars.register_button[0])) {
 					self.render_vars.register_button.after(self.render_vars.pay_button);
 					self.render_vars.register_button.detach();
+					$main_action_button = self.render_vars.pay_button;
 					$pay_buttons.removeClass(__C.CLASSES.HIDDEN);
 				}
 			}
@@ -46771,9 +46813,9 @@ OrderPage = extending(Page, (function() {
 		 *
 		 * @return {(boolean|jqPromise)}
 		 */
-		function makeOrder() {
-			var $main_action_button = $(this),
-				$form = self.$wrapper.find('.OrderForm');
+		function makeOrder(cb) {
+			var $form = self.$wrapper.find('.OrderForm'),
+				send_data;
 			
 			if (__APP.USER.isLoggedOut()) {
 				(new AuthModal(window.location.href)).show();
@@ -46781,29 +46823,16 @@ OrderPage = extending(Page, (function() {
 				return false;
 			} else {
 				if (isFormValid($form)) {
+					send_data = self.gatherSendData();
+					
+					if (isFunction(cb)) {
+						
+						return cb(send_data);
+					}
 					
 					$main_action_button.attr('disabled', true);
 					
-					return self.event.makeOrder(
-						self.$wrapper.find('.OrderFields').serializeForm('array').reduce(function(bundle, field) {
-							if (+field.value) {
-								bundle.push({
-									uuid: field.name,
-									count: +field.value
-								});
-							}
-							
-							return bundle;
-						}, []),
-						self.$wrapper.find('.RegistrationFields').serializeForm('array').map(function(field) {
-							
-							return {
-								uuid: field.name,
-								value: field.value
-							};
-						}),
-						self.$wrapper.find('.PromocodeInput').val()
-					).always(function(data) {
+					return self.event.makeOrder(send_data.ticket_types, send_data.registration_fields, send_data.promocode).always(function(data) {
 						$main_action_button.removeAttr('disabled');
 						
 						return data;
@@ -46847,16 +46876,25 @@ OrderPage = extending(Page, (function() {
 		}
 		
 		this.render_vars.pay_button.on('click.MakeOrder', function() {
-			var result;
+			var result,
+				callback_url = parsed_uri.queryKey['away_to'] || (window.location.origin + '/event/' + self.event.id);
 			
 			if (__APP.IS_WIDGET) {
-				// gather data and submit
+				makeOrder(function(send_data) {
+					$payload = self.$wrapper.find('.OrderFormPayload');
+					$payload.val(JSON.stringify(Object.assign({
+						redirect_to_payment: true,
+						callback_url: callback_url
+					}, send_data)));
+					
+					self.$wrapper.find('.OrderForm').submit();
+				});
 			} else {
 				result = makeOrder();
 				if (result !== false) {
 					result.done(function(data) {
 						
-						Payment.doPayment('order-' + data.order.uuid, data.sum, parsed_uri.queryKey['away_to'] || (window.location.origin + '/event/' + self.event.id));
+						Payment.doPayment('order-' + data.order.uuid, callback_url);
 					})
 				}
 			}
