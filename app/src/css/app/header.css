@@ -147,6 +147,7 @@
 	border: 0;
 	background-color: transparent;
 	box-shadow: none;
+	outline: none;
 
 	-webkit-transition: color .3s ease, background-color .3s ease;
 	-moz-transition: color .3s ease, background-color .3s ease;

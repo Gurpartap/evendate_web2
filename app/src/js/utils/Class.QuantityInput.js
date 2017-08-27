@@ -93,14 +93,24 @@ QuantityInput = extendingJQuery((function() {
 			this.disablePlus();
 		}
 		
-		Object.defineProperty(this, 'value', {
+		Object.defineProperty(this[0], 'value', {
 			get: function() {
 			
 				return +self.input.val();
 			},
 			set: function(val) {
+				var old_val = self.input.val();
 				
-				return self.input.val(val);
+				if (parseInt(old_val) !== parseInt(val)) {
+					self.input.val(val);
+					self.check();
+					
+					if (parseInt(self.input.val()) === parseInt(val)) {
+						self.input.trigger('QuantityInput::change', [val, old_val]);
+					}
+				}
+				
+				return val;
 			}
 		});
 		

@@ -2744,9 +2744,8 @@ fieldset:disabled .form_select {cursor: default}
 :not(.-status_disabled) .form_input:not(:disabled):not(.-status_disabled):focus,
 :not(.-status_disabled) .form_textarea:not(:disabled):not(.-status_disabled):focus {
 	background-color: #fff;
-	border-color: transparent;
-	box-shadow: 0 0 6px 0 #00dc88;
-	box-shadow: 0 0 6px 0 var(--color_franklin);
+	border-color: var(--color_franklin);
+	outline: 1px solid var(--color_franklin);
 }
 
 .form_input:-moz-placeholder,
@@ -3622,6 +3621,7 @@ fieldset:disabled .form_select {cursor: default}
 .quantity_input {
 	text-align: center;
 	border-radius: 0;
+	z-index: 2;
 }
 #notification {
 	position: absolute;
@@ -6163,6 +6163,7 @@ body,
 	border: 0;
 	background-color: transparent;
 	box-shadow: none;
+	outline: none;
 
 	-webkit-transition: color .3s ease, background-color .3s ease;
 	-moz-transition: color .3s ease, background-color .3s ease;

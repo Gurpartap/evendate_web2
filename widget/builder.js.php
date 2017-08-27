@@ -91,9 +91,15 @@ function wrongInitError() { ?>
 			 * @param {Window} event.source
 			 */
 			var listener = function(event) {
-				var data = JSON.parse(event.data);
-				
-				return this.postMessageHandler(data.command, data.data);
+				var data;
+
+				if (event.origin.indexOf('evendate') !== -1) {
+					data = JSON.parse(event.data);
+
+					return this.postMessageHandler(data.command, data.data);
+				}
+
+				return null;
 			}.bind(this);
 			
 			if (this.window.parent.addEventListener) {

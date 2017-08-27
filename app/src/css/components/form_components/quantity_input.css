@@ -27,4 +27,5 @@
 .quantity_input {
 	text-align: center;
 	border-radius: 0;
+	z-index: 2;
 }
