@@ -199,12 +199,12 @@ OrderPage = extending(Page, (function() {
 	};
 	/**
 	 *
-	 * @return {{ticket_types: Array<{uuid: string, count: string}>, registration_fields: Array<{uuid: string, value: string}>, promocode: string}}
+	 * @return {{tickets: Array<{uuid: string, count: string}>, registration_fields: Array<{uuid: string, value: string}>, promocode: string}}
 	 */
 	OrderPage.prototype.gatherSendData = function() {
 		
 		return {
-			ticket_types: this.$wrapper.find('.OrderFields').serializeForm('array').reduce(function(bundle, field) {
+			tickets: this.$wrapper.find('.OrderFields').serializeForm('array').reduce(function(bundle, field) {
 				if (+field.value) {
 					bundle.push({
 						uuid: field.name,
@@ -358,7 +358,7 @@ OrderPage = extending(Page, (function() {
 					
 					$main_action_button.attr('disabled', true);
 					
-					return self.event.makeOrder(send_data.ticket_types, send_data.registration_fields, send_data.promocode).always(function(data) {
+					return self.event.makeOrder(send_data.tickets, send_data.registration_fields, send_data.promocode).always(function(data) {
 						$main_action_button.removeAttr('disabled');
 						
 						return data;
