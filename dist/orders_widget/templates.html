@@ -501,10 +501,11 @@
 <script type="javascript/template" id="tmpl-order-page">
 	<div class="order_page material OrderPage">
 		<fieldset class="OrderFormWrapper">
-			<form class="order_form OrderForm">
+			<form class="order_form OrderForm" action="/api/v1/events/{event_id}/orders" method="post" target="_blank">
 				{tickets_selling}
 				{registration}
-				<footer class="order_page_footer -align_center">
+				<input class="OrderFormPayload" type="hidden" name="payload">
+				<footer class="order_page_footer OrderFormFooter -align_center -hidden">
 					<div class="form_unit">
 						<input id="order_agreement" class="form_checkbox Switch" type="checkbox" data-switch_id="order_agreement" required>
 						<label class="form_label" for="order_agreement">
@@ -512,7 +513,7 @@
 						</label>
 					</div>
 					<fieldset class="order_page_buttons Switching" data-switch_id="order_agreement" disabled>
-						<div class="form_unit">
+						<div class="form_unit MainActionButtonWrapper">
 							{main_action_button}
 						</div>
 						<div class="order_page_pay_buttons PayButtons -hidden">

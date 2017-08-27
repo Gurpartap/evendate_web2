@@ -437,60 +437,6 @@
 		</div>
 	</div>
 </script>
-<script type="javascript/template" id="tmpl-app-inspector">
-	<div class="app_inspector material -floating_material AppInspector">
-		<header class="app_inspector_header">
-			<button class="app_inspector_remover AppInspectorRemoveButton" type="button">&times;</button>
-			<span class="app_inspector_title AppInspectorTitle">{title}</span>
-		</header>
-		<div class="app_inspector_content_wrapper scrollbar-outer AppInspectorScroll">
-			<div class="app_inspector_content AppInspectorContent">{content}</div>
-		</div>
-	</div>
-</script>
-<script type="javascript/template" id="tmpl-order-app-inspector">
-	{orderer}
-	<div class="app_inspector_wrapper">
-		{status_block}
-	</div>
-	{tickets_title}
-	{tickets}
-	{registration_form_title}
-	{registration_fields}
-	{event_title}
-	{event}
-</script>
-
-<script type="javascript/template" id="tmpl-client-app-inspector">
-	{client}
-	{interests_title}
-	{interests_spiderweb_chart}
-</script>
-<script type="javascript/template" id="tmpl-app-inspector-title">
-	<h6 class="app_inspector_subtitle">{title}</h6>
-</script>
-
-<script type="javascript/template" id="tmpl-app-inspector-ticket">
-	<div class="app_inspector_ticket">
-		<div class="app_inspector_ticket_body">
-			{fields}
-		</div>
-		{footer}
-	</div>
-</script>
-
-<script type="javascript/template" id="tmpl-app-inspector-ticket-footer">
-	<footer class="app_inspector_ticket_footer"><span>Билет использован</span></footer>
-</script>
-
-<script type="javascript/template" id="tmpl-app-inspector-event">
-	<a class="app_inspector_event Link" href="/event/{id}">
-		<img src="{image_horizontal_url}?width=108" width="108" height="60">
-		<div class="app_inspector_event_body">
-			<span class="app_inspector_event_title">{title}</span>
-		</div>
-	</a>
-</script>
 <script type="javascript/template" id="tmpl-modal-add-staff-content">
 	<form id="add_staff_form_{modal_id}" class="add_staff_modal_form">
 		<input type="hidden" name="role" value="{role}">
@@ -1725,10 +1671,11 @@
 <script type="javascript/template" id="tmpl-order-page">
 	<div class="order_page material OrderPage">
 		<fieldset class="OrderFormWrapper">
-			<form class="order_form OrderForm">
+			<form class="order_form OrderForm" action="/api/v1/events/{event_id}/orders" method="post" target="_blank">
 				{tickets_selling}
 				{registration}
-				<footer class="order_page_footer -align_center">
+				<input class="OrderFormPayload" type="hidden" name="payload">
+				<footer class="order_page_footer OrderFormFooter -align_center -hidden">
 					<div class="form_unit">
 						<input id="order_agreement" class="form_checkbox Switch" type="checkbox" data-switch_id="order_agreement" required>
 						<label class="form_label" for="order_agreement">
@@ -1736,7 +1683,7 @@
 						</label>
 					</div>
 					<fieldset class="order_page_buttons Switching" data-switch_id="order_agreement" disabled>
-						<div class="form_unit">
+						<div class="form_unit MainActionButtonWrapper">
 							{main_action_button}
 						</div>
 						<div class="order_page_pay_buttons PayButtons -hidden">
@@ -1924,6 +1871,60 @@
 			</div>
 		</div>
 	</div>
+</script>
+<script type="javascript/template" id="tmpl-app-inspector">
+	<div class="app_inspector material -floating_material AppInspector">
+		<header class="app_inspector_header">
+			<button class="app_inspector_remover AppInspectorRemoveButton" type="button">&times;</button>
+			<span class="app_inspector_title AppInspectorTitle">{title}</span>
+		</header>
+		<div class="app_inspector_content_wrapper scrollbar-outer AppInspectorScroll">
+			<div class="app_inspector_content AppInspectorContent">{content}</div>
+		</div>
+	</div>
+</script>
+<script type="javascript/template" id="tmpl-order-app-inspector">
+	{orderer}
+	<div class="app_inspector_wrapper">
+		{status_block}
+	</div>
+	{tickets_title}
+	{tickets}
+	{registration_form_title}
+	{registration_fields}
+	{event_title}
+	{event}
+</script>
+
+<script type="javascript/template" id="tmpl-client-app-inspector">
+	{client}
+	{interests_title}
+	{interests_spiderweb_chart}
+</script>
+<script type="javascript/template" id="tmpl-app-inspector-title">
+	<h6 class="app_inspector_subtitle">{title}</h6>
+</script>
+
+<script type="javascript/template" id="tmpl-app-inspector-ticket">
+	<div class="app_inspector_ticket">
+		<div class="app_inspector_ticket_body">
+			{fields}
+		</div>
+		{footer}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-app-inspector-ticket-footer">
+	<footer class="app_inspector_ticket_footer"><span>Билет использован</span></footer>
+</script>
+
+<script type="javascript/template" id="tmpl-app-inspector-event">
+	<a class="app_inspector_event Link" href="/event/{id}">
+		<img src="{image_horizontal_url}?width=108" width="108" height="60">
+		<div class="app_inspector_event_body">
+			<span class="app_inspector_event_title">{title}</span>
+		</div>
+	</a>
 </script>
 <script type="javascript/template" id="tmpl-calendar">
 	<div class="{wrapper_class} -unselectable">
