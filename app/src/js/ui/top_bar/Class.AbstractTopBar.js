@@ -30,7 +30,11 @@ AbstractTopBar = (function () {
 		
 		$search_input.on('keypress', function(e) {
 			if (e.which === 13) {
-				__APP.changeState('/search/' + encodeURIComponent($search_input.val()));
+				if ($search_input.val().indexOf('#') === 0) {
+					__APP.changeState('/search/tag/' + encodeURIComponent($search_input.val().replace('#', '')));
+				} else {
+					__APP.changeState('/search/' + encodeURIComponent($search_input.val()));
+				}
 			}
 		}).on('keydown', function(e) {
 			if (e.keyCode === 27) {
