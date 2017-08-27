@@ -578,7 +578,7 @@ section.disabled {
     filter: grayscale(1);
 }
 
-.sponsors-1 .client-logo img{
+.sponsors-1 .client-logo img {
     opacity: 1;
     max-height: 100%;
     max-width: 100%;
@@ -594,9 +594,86 @@ section.disabled {
     background-color: #00cdaf;
     border-color: #00cdaf;
 }
+
 .btn-apply-url span:active,
 .btn-apply-url span:focus,
 .btn-apply-url:active,
-.btn-apply-url:focus{
+.btn-apply-url:focus {
     outline: none;
+}
+
+.input-group {
+    margin-bottom: 7px;
+}
+
+/*FAB BUTTONS*/
+.fab {
+    display: inline-block;
+    position: relative;
+    outline: none;
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: pointer;
+    width: 60px;
+    height: 60px;
+    /*  line-height: 60px;*/
+    text-align: center;
+    font-size: 32px;
+    z-index: 999;
+    background: var(--accent);
+    color: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.15);
+    transition: 0.2s opacity ease-in-out;
+    -webkit-transition: 0.2s opacity ease-in-out;
+    border: 0;
+    overflow: hidden;
+}
+
+.fab:after {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 120px;
+    height: 120px;
+    margin-left: -60px;
+    margin-top: -60px;
+    background: #aaa;
+    border-radius: 100%;
+    opacity: .6;
+    transform: scale(0);
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0);
+    }
+    20% {
+        transform: scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: scale(1);
+    }
+}
+
+.fab:not(:active):after {
+    animation: ripple 3s ease-out;
+}
+
+/* fixes initial animation run, without user input, on page load.
+ */
+.fab:after {
+    visibility: hidden;
+    background-color: #fff;
+}
+
+.fab:focus:after {
+    visibility: visible;
+}
+
+.btn-sponsors.disabled:after {
+    display: none;
 }

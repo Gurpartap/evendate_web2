@@ -141,7 +141,7 @@ class EventsDatesCollection extends AbstractCollection
 				case 'city_id': {
 					$q_get_dates->where('view_dates.event_id IN (
 				 	SELECT id FROM view_events WHERE city_id = :city_id)');
-					$statement_array[':user_id'] = $value;
+					$statement_array[':city_id'] = $value;
 					break;
 				}
 			}

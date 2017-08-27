@@ -63,19 +63,11 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
   <meta charset="utf-8">
 
   <!-- TITLE OF SITE -->
-  <title><?= $event['title'] ?></title>
+  <title><?= htmlentities($event['title']) ?></title>
 
   <!-- META DATA -->
   <meta name="description" content="<?= htmlentities($event['description']) ?>"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-
-  <!-- =========================
-  FAV AND TOUCH ICONS
-  ============================== -->
-  <link rel="icon" href="images/favicon.ico">
-  <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
-  <link rel="apple-touch-icon" sizes="72x72" href="images/apple-touch-icon-72x72.png">
-  <link rel="apple-touch-icon" sizes="114x114" href="images/apple-touch-icon-114x114.png">
 
   <!-- =========================
   STYLESHEETS
@@ -88,6 +80,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
   <link rel="stylesheet" href="css/swiper.min.css"> <!-- Screenshot Slider -->
   <link rel="stylesheet" href="css/themes/default/default.css"> <!-- Nivo Lightbox -->
   <link rel="stylesheet" href="css/nivo-lightbox.css"> <!-- Nivo Lightbox Theme -->
+  <link rel="stylesheet" href="../app/src/vendor/pace/pace.css"> <!-- Nivo Lightbox Theme -->
 
   <!-- TYPOGRAPHY -->
   <link rel="stylesheet" id="font-switch" href="css/typography/typography-1.css">
@@ -110,6 +103,8 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
   <!--[if lt IE 9]>
   <script src="js/html5shiv.js"></script>
   <script src="js/respond.min.js"></script>
+  <script src="../app/src/vendor/pace/pace.min.js"></script>
+  <script src="../app/src/vendor/notify/notify.js"></script>
   <![endif]-->
 
 </head>
@@ -176,7 +171,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 
         <div class="home-download-btn">
 
-          <a href="" class="btn btn-white btn-lg" ng-if="data.tickets.enabled"><span>{{data.tickets.title}}</span></a>
+          <a href="#ticket-booking-1" class="btn btn-white btn-lg" ng-if="data.tickets.enabled"><span>{{data.tickets.title}}</span></a>
           <!--<div class="stores-on text-center">-->
           <!--Hurry up!!! Only <strong>29</strong> left-->
           <!--</div>-->
@@ -672,6 +667,10 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
       <span class="fa fa-plus"></span> Добавить логотип
     </span>
   </div>
+  <div ng-if="edit_mode" style="background-color: var(--accent);" class="board-settings-btn mod-show-menu js-show-sidebar" ng-click="data.sponsors.toggleBecomeASponsor()" href="#">
+    <span class="fa" ng-class="{'fa-eye-slash': data.sponsors.become_a_sponsor_enabled, 'fa-eye': !data.sponsors.become_a_sponsor_enabled}"></span>
+    <span class="board-header-btn-text u-text-underline">{{data.sponsors.toggler_text}}</span></div>
+
   <div class="hidden-overlay">Блок <strong>{{data.testimonials.title}}</strong> скрыт,
     <a href="#" ng-click="data.sponsors.toggleEnabled();">нажмите здесь</a>,
     чтобы сделать блок видимым для пользователей
@@ -718,7 +717,8 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
       </li>
     </ul>
 
-    <a href="" class="btn btn-trans btn-lg" ng-hide="!data.sponsors.become_a_sponsor_enabled" contenteditable
+    <a href="#" class="btn btn-trans btn-lg btn-sponsors" ng-hide="!data.sponsors.become_a_sponsor_enabled"
+       contenteditable
        ng-model="data.sponsors.become_a_sponsor">{{data.sponsors.become_a_sponsor}}</a>
 
   </div>
@@ -798,6 +798,11 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
   </div>
 </section>
 
+<button type="button" ng-click="saveLandingData();" class="fab" id="fab-save"
+        style="position: fixed; bottom: 50px; right: 50px; border-radius: 500px; background-color: var(--accent)">
+  <span class="fa fa-save"></span>
+</button>
+
 <footer class="footers footer-1">
 
   <div class="container text-center">
@@ -806,15 +811,15 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
     </p>
 
     <ul class="socialize">
-      <li><a href="#">
+      <li ng-if="data.main.vk_url"><a href="#" target="_blank" ng-href="{{data.main.vk_url}}">
           <span class="fa fa-vk"></span>
         </a></li>
 
-      <li><a href="#">
+      <li ng-if="data.main.facebook_url"><a href="#" target="_blank" ng-href="{{data.main.facebook_url}}">
           <span class="fa fa-facebook-official"></span>
         </a></li>
 
-      <li><a href="#">
+      <li ng-if="data.main.instagram_url"><a href="#" target="_blank" ng-href="{{data.main.instagram_url}}">
           <span class="fa fa-instagram"></span>
         </a></li>
     </ul>
@@ -903,13 +908,21 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
         <div class="demo-style-switch" id="switch-style" style="left: 0px;">
           <div class="switched-options">
             <div class="config-title">Адрес страницы:</div>
-            <div class="input-group mb-2 mb-sm-0">
-              <div class="input-group-addon" style="font-size: 12px;">https://evendate.io/</div>
-              <input type="text" class="form-control" placeholder="">
-              <span class="input-group-btn">
-                <button class="btn btn-primary btn-apply-url" type="button"><span class="fa fa-check"></span></button>
+            <div class="form-group" ng-class="{'has-success': data.main.bad_url === false}">
+              <div class="input-group">
+                <div class="input-group-addon" style="font-size: 12px;">https://evendate.io/</div>
+                <input type="text" class="form-control" placeholder="" ng-model="data.main.url">
+                <span class="input-group-btn">
+                <button class="btn btn-primary btn-apply-url" type="button" ng-click="checkAlias()"><span
+                    class="fa fa-check"></span></button>
               </span>
+              </div>
+              <div class="alert" ng-class="{'alert-danger': data.main.bad_url === true}"
+                   ng-show="data.main.bad_url === true" id="url-check" role="alert">
+                {{data.main.bad_url_text}}
+              </div>
             </div>
+
             <div class="config-title">Цветовая тема:</div>
             <ul class="styles">
               <li>
@@ -963,24 +976,44 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
                 <div class="sp-replacer sp-light">
               </li>
             </ul>
-            <div class="config-title">Ссылки на социальные сети:</div>
-            <ul>
-              <li><input placeholder="Вконтакте" name="vk_url" class="social-link-input form-control"></li>
-              <li><input placeholder="Facebook" name="facebook_url" class="social-link-input form-control"></li>
-              <li><input placeholder="Instagram" name="instagram_url" class="social-link-input form-control"></li>
-            </ul>
-            <div class="config-title">Идентификаторы для аналитики:</div>
-            <ul>
-              <li><input placeholder="Яндекс.Метрика" name="metrica_id" class="social-link-input form-control"></li>
-              <li><input placeholder="Google Analytics" name="analytics_id" class="social-link-input form-control"></li>
-            </ul>
-            <div class="config-title">Идентификаторы ретаргетинга:</div>
 
-            <ul>
-              <li><input placeholder="ВКонтакте" name="vk_retargeting_id" class="social-link-input form-control"></li>
-              <li><input placeholder="Facebook" name="facebook_retargeting_id" class="social-link-input form-control">
-              </li>
-            </ul>
+            <div class="config-title">Ссылки на социальные сети:</div>
+            <div class="input-group">
+              <div class="input-group-addon" style="font-size: 12px;"><span class="fa fa-vk"></span></div>
+              <input type="text" class="form-control" placeholder="Вконтакте" ng-model="data.main.vk_url">
+            </div>
+            <div class="input-group">
+              <div class="input-group-addon" style="font-size: 14px; padding: 0 14px;"><span
+                  class="fa fa-facebook"></span></div>
+              <input type="text" class="form-control" placeholder="Facebook" ng-model="data.main.facebook_url">
+            </div>
+            <div class="input-group">
+              <div class="input-group-addon" style="font-size: 12px;"><span class="fa fa-instagram"></span></div>
+              <input type="text" class="form-control" placeholder="Instagram" ng-model="data.main.instagram_url">
+            </div>
+
+            <div class="config-title">Идентификаторы для аналитики:</div>
+            <div class="input-group">
+              <div class="input-group-addon" style="font-size: 12px;"><span class="fa fa-yahoo"></span></div>
+              <input type="text" class="form-control" placeholder="Яндекс.Метрика"
+                     ng-model="data.main.yandex_metrica_id">
+            </div>
+            <div class="input-group">
+              <div class="input-group-addon" style="font-size: 12px;"><span class="fa fa-google"></span></div>
+              <input type="text" class="form-control" placeholder="Google Analytics"
+                     ng-model="data.main.google_analytics_id">
+            </div>
+            <div class="config-title">Идентификаторы ретаргетинга:</div>
+            <div class="input-group">
+              <div class="input-group-addon" style="font-size: 12px;"><span class="fa fa-vk"></span></div>
+              <input type="text" class="form-control" placeholder="ВКонтакте" ng-model="data.main.vk_retargeting_id">
+            </div>
+            <div class="input-group">
+              <div class="input-group-addon" style="font-size: 14px; padding: 0 14px;"><span
+                  class="fa fa-facebook"></span></div>
+              <input type="text" class="form-control" placeholder="Facebook"
+                     ng-model="data.main.facebook_retargeting_id">
+            </div>
           </div>
         </div>
       </div>
@@ -1004,7 +1037,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
         <hr class="board-menu-header-divider">
         <div class="board-backgrounds-section-tiles u-clearfix">
 
-          <div ng-click="setHeaderImage(background.image)" ng-repeat="background in backgrounds"
+          <div ng-click="setGalleryImage(background.image)" ng-repeat="background in backgrounds"
                class="board-backgrounds-section-tile board-backgrounds-photos-tile js-bg-photos">
             <div class="image" style="background-image: url({{background.thumb || background.image}})"></div>
             <div class="title" style="">{{background.title}} <a ng-if="background.user"

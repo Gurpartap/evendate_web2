@@ -1937,11 +1937,20 @@ class Event extends AbstractEntity
 			'ticket'
 		);
 		if (in_array($alias, $reserved_names)) throw new InvalidArgumentException('USES_RESERVED_URL');
-		if (preg_match('/[a-zA-Zа-яА-ЯёЁ\-_0-9]+/', $alias) == false) {
-			throw new InvalidArgumentException('BAD_URL');
+		if (preg_match('/^([a-zA-Z\-_0-9]+)$/mi', $alias) == false) {
+			return new Result(false, Errors::getDescription(App::$__LANG, 'BAD_URL'));
 		}
 		$q_ins_url = App::queryFactory()->newSelect();
-		$q_ins_url->from('');
+		$q_ins_url->from('event_landings')
+			->cols(array('url', 'event_id'))
+			->where('url = ?', $alias)
+			->where('event_id <> ?', $this->id);
+
+		if ($this->db->prepareExecute($q_ins_url)->rowCount() != 0 )
+			return new Result(false, Errors::getDescription(App::$__LANG, 'USES_RESERVED_URL'));
+
+		return new Result(true, 'URL валиден и может быть использован');
+
 	}
 
 }

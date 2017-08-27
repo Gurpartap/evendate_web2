@@ -1,5 +1,13 @@
 var __app = angular.module('LandingApp', ['ngFileUpload', 'gridster', 'ui.tinymce']);
 
+
+window.paceOptions = {
+    ajax: true, // disabled
+    document: true, // disabled
+    eventLag: true, // disabled
+    search_is_active: false
+};
+
 function guid() {
     function s4() {
         return Math.floor((1 + Math.random()) * 0x10000)
@@ -11,13 +19,18 @@ function guid() {
         s4() + '-' + s4() + s4() + s4();
 }
 
+window.base64_in_progress = 0;
+
 function getBase64(file, cb) {
     var reader = new FileReader();
     reader.readAsDataURL(file);
+    window.base64_in_progress++;
     reader.onload = function () {
+        window.base64_in_progress--;
         cb(null, reader.result);
     };
     reader.onerror = function (error) {
+        window.base64_in_progress--;
         cb(error, null);
         handleFileLoadErr(error);
     };
@@ -34,9 +47,9 @@ function rgbToHex(r, g, b) {
         var hex = c.toString(16);
         return hex.length == 1 ? "0" + hex : hex;
     }
+
     return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
-
 
 
 var backgrounds = [
@@ -133,6 +146,17 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
             gallery: ''
         },
         main_description: '',
+        main: {
+            url: search_data.id,
+            bad_url: null,
+            vk_url: null,
+            facebook_url: null,
+            instagram_url: null,
+            yandex_metrica_id: null,
+            google_analytics_id: null,
+            vk_retargeting_id: null,
+            facebook_retargeting_id: null
+        },
         header: {
             title: '',
             subtitle: '',
@@ -480,11 +504,16 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
         sponsors: {
             title: 'Партнеры',
             become_a_sponsor: 'Стать партнером',
+            toggler_text: 'Убрать кнопку',
             toggleEnabled: function () {
                 this.enabled = !this.enabled;
                 return false;
             },
             items: {},
+            toggleBecomeASponsor: function(){
+                this.become_a_sponsor_enabled = !this.become_a_sponsor_enabled;
+                this.toggler_text = this.become_a_sponsor_enabled ? 'Убрать кнопку' : 'Показать кнопку';
+            },
             enabled: true,
             addItem: function () {
                 var item_uuid = guid(),
@@ -497,9 +526,6 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
                     }
                 };
 
-            },
-            toggleBecomeASponsor: function () {
-                this.become_a_sponsor_enabled = !this.become_a_sponsor_enabled;
             },
             become_a_sponsor_enabled: true,
             gridOptions: {
@@ -613,6 +639,36 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
         }
     });
 
+    $scope.checkAlias = function () {
+        if (/^([a-zA-Z\-_0-9]+)$/gmi.test($scope.data.main.url) === false) {
+            $scope.data.main.bad_url = true;
+            $scope.data.main.bad_url_text = 'В URL допускаются только цифры, латинские буквы, знаки тире и нижнее подчеркивание';
+        } else {
+            $scope.data.main.bad_url = null;
+            $.ajax({
+                url: '/api/v1/events/' + search_data.id + '/landing/url',
+                data: {url: $scope.data.main.url},
+                success: function (res) {
+                    $scope.data.main.bad_url = !res.status;
+                    $scope.data.main.bad_url_text = res.text;
+                    $scope.$apply();
+                }
+            })
+        }
+    };
+
+    $scope.saveLandingData = function () {
+        if (window.base64_in_progress !== 0) {
+            console.log('Making base 64');
+            window.save_interval = setInterval(function () {
+                if (window.base64_in_progress !== 0) return;
+
+                clearInterval(window.save_interval);
+            }, 500);
+        }
+        console.log($scope.data);
+    };
+
     $scope.$watch('data.gallery_background', function () {
         if ($scope.data.gallery_background && $scope.data.gallery_background.$ngfBlobUrl) {
             $scope.setGalleryImage($scope.data.gallery_background.$ngfBlobUrl);
@@ -722,7 +778,10 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
     }
 
     $timeout(function () {
-        evendateWidget.setHeight()
+        evendateWidget.setHeight();
+        $('#evendate-widget-' + search_data.id).get(0).onload = function () {
+            evendateWidget.setColor(rgbToHex($scope.data.color_scheme[0], $scope.data.color_scheme[1], $scope.data.color_scheme[2]));
+        };
     });
 
 }]);
@@ -783,18 +842,23 @@ $(document).ready(function () {
             $panel.animate({'right': '-340'});
         }
 
+        $('#fab-save').animate({right: 50});
+
     });
 
     $('.board-settings-btn.main-btn').on('click', function () {
         $('.board-menu.open .panel-close').click();
         var $panel = $('#' + $(this).data('panel-id'));
         $panel.addClass('open').animate({'right': '0'})
+        $('#fab-save').animate({right: 390});
     });
 
     $('.board-settings-btn.gallery-btn').on('click', function () {
         $('.board-menu.open .panel-close').click();
         var $panel = $('#' + $(this).data('panel-id'));
-        $panel.addClass('open').animate({'right': '0'})
+        $panel.addClass('open').animate({'right': '0'});
+        $('#fab-save').animate({right: 390});
+
     });
 
     $('.main-settings-btn').on('click', function () {
