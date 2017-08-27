@@ -43064,19 +43064,15 @@ OneEvent = extending(OneEntity, (function() {
 	 * @param {(string|number)} event_id
 	 * @param {Array<OrderTicketType>} tickets
 	 * @param {string} [promocode]
-	 * @param {boolean} [redirect_to_payment]
-	 * @param {string} [callback_url]
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneEvent.buyTickets = function(event_id, tickets, promocode, redirect_to_payment, callback_url, success) {
+	OneEvent.buyTickets = function(event_id, tickets, promocode, success) {
 		
 		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/orders', {
 			tickets: tickets,
-			promocode: promocode || null,
-			callback_url: callback_url,
-			redirect_to_payment: redirect_to_payment
+			promocode: promocode || null
 		}, true, success);
 	};
 	/**
@@ -43085,13 +43081,11 @@ OneEvent = extending(OneEntity, (function() {
 	 * @param {Array<OrderTicketType>} [tickets]
 	 * @param {Array<OrderRegistrationField>} [registration_fields]
 	 * @param {string} [promocode]
-	 * @param {boolean} [redirect_to_payment]
-	 * @param {string} [callback_url]
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneEvent.makeOrder = function(event_id, tickets, registration_fields, promocode, redirect_to_payment, callback_url, success) {
+	OneEvent.makeOrder = function(event_id, tickets, registration_fields, promocode, success) {
 		if (empty(tickets)) {
 			
 			return OneEvent.registerToEvent(event_id, registration_fields, success);
@@ -43099,15 +43093,13 @@ OneEvent = extending(OneEntity, (function() {
 		
 		if (empty(registration_fields)) {
 			
-			return OneEvent.buyTickets(event_id, tickets, promocode, redirect_to_payment, callback_url, success);
+			return OneEvent.buyTickets(event_id, tickets, promocode, success);
 		}
 		
 		return __APP.SERVER.addData('/api/v1/events/' + event_id + '/orders', {
 			registration_fields: registration_fields,
 			tickets: tickets,
-			promocode: promocode || null,
-			callback_url: callback_url,
-			redirect_to_payment: redirect_to_payment
+			promocode: promocode || null
 		}, true, success);
 	};
 	/**
@@ -43219,31 +43211,27 @@ OneEvent = extending(OneEntity, (function() {
 	 *
 	 * @param {Array<OrderTicketType>} tickets
 	 * @param {string} [promocode]
-	 * @param {boolean} [redirect_to_payment]
-	 * @param {string} [callback_url]
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneEvent.prototype.buyTickets = function(tickets, promocode, redirect_to_payment, callback_url, success) {
+	OneEvent.prototype.buyTickets = function(tickets, promocode, success) {
 		
-		return this.constructor.buyTickets(this.id, tickets, promocode, redirect_to_payment, callback_url, success);
+		return this.constructor.buyTickets(this.id, tickets, promocode, success);
 	};
 	/**
 	 *
 	 * @param {Array<OrderTicketType>} tickets
 	 * @param {Array<OrderRegistrationField>} registration_fields
 	 * @param {string} [promocode]
-	 * @param {boolean} [redirect_to_payment]
-	 * @param {string} [callback_url]
 	 * @param {AJAXCallback} [success]
 	 *
 	 * @return {jqPromise}
 	 */
-	OneEvent.prototype.makeOrder = function(tickets, registration_fields, promocode, redirect_to_payment, callback_url, success) {
+	OneEvent.prototype.makeOrder = function(tickets, registration_fields, promocode, success) {
 		var self = this;
 		
-		return this.constructor.makeOrder(this.id, tickets, registration_fields, promocode, redirect_to_payment, callback_url, success).then(function(data) {
+		return this.constructor.makeOrder(this.id, tickets, registration_fields, promocode, success).then(function(data) {
 			var order = new OneOrder(self.id);
 			
 			order.setData($.extend({
@@ -44010,14 +43998,24 @@ QuantityInput = extendingJQuery((function() {
 			this.disablePlus();
 		}
 		
-		Object.defineProperty(this, 'value', {
+		Object.defineProperty(this[0], 'value', {
 			get: function() {
 			
 				return +self.input.val();
 			},
 			set: function(val) {
+				var old_val = self.input.val();
 				
-				return self.input.val(val);
+				if (parseInt(old_val) !== parseInt(val)) {
+					self.input.val(val);
+					self.check();
+					
+					if (parseInt(self.input.val()) === parseInt(val)) {
+						self.input.trigger('QuantityInput::change', [val, old_val]);
+					}
+				}
+				
+				return val;
 			}
 		});
 		
@@ -46494,6 +46492,8 @@ OrderPage = extending(Page, (function() {
 	 * @property {OnePromocode} promocode
 	 * @property {Fields} promocode_fields
 	 * @property {boolean} is_promocode_active
+	 * @property {number} overall_sum
+	 * @property {number} total_sum
 	 */
 	function OrderPage(event_id) {
 		var self = this;
@@ -46522,10 +46522,42 @@ OrderPage = extending(Page, (function() {
 		this.promocode_fields = new Fields();
 		this.is_promocode_active = false;
 		
-		Object.defineProperty(this, 'page_title', {
-			get: function() {
-				
-				return (self.event.ticketing_locally ? 'Заказ билетов на событие ' : 'Регистрация на событие ') + self.event.title;
+		this.overall_sum = 0;
+		
+		this.render_vars = {
+			event_id: event_id,
+			tickets_selling: null,
+			registration: null,
+			pay_button: null,
+			register_button: null,
+			main_action_button: null,
+			legal_entity_payment_button: null,
+			bitcoin_payment_button: null
+		};
+		
+		Object.defineProperties(this, {
+			page_title: {
+				get: function() {
+					
+					return (self.event.ticketing_locally ? 'Заказ билетов на событие ' : 'Регистрация на событие ') + self.event.title;
+				}
+			},
+			total_sum: {
+				get: function() {
+					var total_sum = 0;
+					
+					if (self.is_promocode_active) {
+						if (self.promocode.is_fixed) {
+							total_sum = self.overall_sum - self.promocode.effort;
+						} else {
+							total_sum = self.overall_sum - (self.overall_sum * self.promocode.effort / 100);
+						}
+						
+						return total_sum <= 0 ? 0 : total_sum;
+					}
+					
+					return self.overall_sum;
+				}
 			}
 		});
 	}
@@ -46639,19 +46671,49 @@ OrderPage = extending(Page, (function() {
 			})
 		})));
 	};
+	/**
+	 *
+	 * @return {{ticket_types: Array<{uuid: string, count: string}>, registration_fields: Array<{uuid: string, value: string}>, promocode: string}}
+	 */
+	OrderPage.prototype.gatherSendData = function() {
+		
+		return {
+			ticket_types: this.$wrapper.find('.OrderFields').serializeForm('array').reduce(function(bundle, field) {
+				if (+field.value) {
+					bundle.push({
+						uuid: field.name,
+						count: +field.value
+					});
+				}
+				
+				return bundle;
+			}, []),
+			registration_fields: this.$wrapper.find('.RegistrationFields').serializeForm('array').map(function(field) {
+				
+				return {
+					uuid: field.name,
+					value: field.value
+				};
+			}),
+			promocode: this.$wrapper.find('.PromocodeInput').val()
+		};
+	};
 	
 	OrderPage.prototype.init = function() {
 		var self = this,
 			parsed_uri = parseUri(location),
-			$main_action_button = this.$wrapper.find('.MainActionButton'),
 			$activate_promocode_button = this.$wrapper.find('.ActivatePromocode'),
 			$promocode_input = this.$wrapper.find('.PromocodeInput'),
+			$quantity_inputs = this.$wrapper.find('.QuantityInput'),
 			$pay_buttons = this.$wrapper.find('.PayButtons'),
+			$footer = this.$wrapper.find('.OrderFormFooter'),
+			$main_action_button = this.render_vars.register_button,
+			$payload,
 			$selected_type;
 		
 		function countTicketTypeSum($ticket_type) {
 			var $sum = $ticket_type.find('.TicketTypeSum'),
-				value = $ticket_type.find('.QuantityInput').resolveInstance().value;
+				value = $ticket_type.find('.QuantityInput').val();
 			
 			if (value > 0) {
 				$sum.removeClass(__C.CLASSES.HIDDEN);
@@ -46663,34 +46725,36 @@ OrderPage = extending(Page, (function() {
 		}
 		
 		function countTotalSum() {
-			var sum = Array.prototype.reduce.call(self.$wrapper.find('.TicketTypeSumText'), function(sum, ticket_type_sum) {
+			self.overall_sum = Array.prototype.reduce.call(self.$wrapper.find('.TicketTypeSumText'), function(sum, ticket_type_sum) {
 				
-				return sum + +ticket_type_sum.innerHTML.replace(' ', '');
-			}, 0),
-				total_sum;
+				return sum + parseInt(ticket_type_sum.innerHTML.replace(' ', ''));
+			}, 0);
 			
-			self.$wrapper.find('.TicketsOverallSum').text(formatCurrency(sum));
+			self.$wrapper.find('.TicketsOverallSum').text(formatCurrency(self.overall_sum));
 			
 			if (self.is_promocode_active) {
-				if (self.promocode.is_fixed) {
-					total_sum = sum - self.promocode.effort;
-				} else {
-					total_sum = sum - (sum * self.promocode.effort / 100);
-				}
-				
-				total_sum = total_sum <= 0 ? 0 : total_sum;
-				self.$wrapper.find('.TicketsTotalSum').text(formatCurrency(total_sum));
-			} else {
-				total_sum = sum;
+				self.$wrapper.find('.TicketsTotalSum').text(formatCurrency(self.total_sum));
 			}
 			
-			if (total_sum === 0) {
-				$main_action_button.removeClass(__C.CLASSES.COLORS.YANDEX).addClass(__C.CLASSES.COLORS.ACCENT).text('Зарегистрироваться');
-				$pay_buttons.addClass(__C.CLASSES.HIDDEN);
+			if (self.total_sum === 0) {
+				if ($.contains(self.$wrapper[0], self.render_vars.pay_button[0])) {
+					self.render_vars.pay_button.after(self.render_vars.register_button);
+					self.render_vars.pay_button.detach();
+					$main_action_button = self.render_vars.register_button;
+					$pay_buttons.addClass(__C.CLASSES.HIDDEN);
+				}
 			} else {
-				$main_action_button.removeClass(__C.CLASSES.COLORS.ACCENT).addClass(__C.CLASSES.COLORS.YANDEX).text('Заплатить через Яндекс');
-				$pay_buttons.removeClass(__C.CLASSES.HIDDEN);
+				if ($.contains(self.$wrapper[0], self.render_vars.register_button[0])) {
+					self.render_vars.register_button.after(self.render_vars.pay_button);
+					self.render_vars.register_button.detach();
+					$main_action_button = self.render_vars.pay_button;
+					$pay_buttons.removeClass(__C.CLASSES.HIDDEN);
+				}
 			}
+		}
+		
+		if (!this.event.ticketing_locally) {
+			$footer.removeClass(__C.CLASSES.HIDDEN);
 		}
 		
 		bindRippleEffect(this.$wrapper);
@@ -46747,27 +46811,11 @@ OrderPage = extending(Page, (function() {
 		
 		/**
 		 *
-		 * @param {boolean} [redirect_to_payment]
-		 * @param {string} [callback_url]
-		 *
 		 * @return {(boolean|jqPromise)}
 		 */
-		function makeOrder(redirect_to_payment, callback_url) {
-			var $main_action_button = $(this),
-				$form = self.$wrapper.find('.OrderForm'),
-				sum = self.$wrapper.find('.TicketsTotalSum'),
-				parsed_callback;
-			
-			if (!sum.length) {
-				sum = self.$wrapper.find('.TicketsOverallSum').text();
-			} else {
-				sum = sum.text();
-			}
-			
-			if (callback_url && sum == 0) {
-				parsed_callback = parseUri(callback_url);
-				callback_url = parsed_callback.wo_query + '?' + 'registration=free&' + parsed_callback.query
-			}
+		function makeOrder(cb) {
+			var $form = self.$wrapper.find('.OrderForm'),
+				send_data;
 			
 			if (__APP.USER.isLoggedOut()) {
 				(new AuthModal(window.location.href)).show();
@@ -46775,31 +46823,16 @@ OrderPage = extending(Page, (function() {
 				return false;
 			} else {
 				if (isFormValid($form)) {
+					send_data = self.gatherSendData();
+					
+					if (isFunction(cb)) {
+						
+						return cb(send_data);
+					}
 					
 					$main_action_button.attr('disabled', true);
 					
-					return self.event.makeOrder(
-						self.$wrapper.find('.OrderFields').serializeForm('array').reduce(function(bundle, field) {
-							if (+field.value) {
-								bundle.push({
-									uuid: field.name,
-									count: +field.value
-								});
-							}
-							
-							return bundle;
-						}, []),
-						self.$wrapper.find('.RegistrationFields').serializeForm('array').map(function(field) {
-							
-							return {
-								uuid: field.name,
-								value: field.value
-							};
-						}),
-						self.$wrapper.find('.PromocodeInput').val(),
-						redirect_to_payment && sum != 0,
-						callback_url
-					).always(function(data) {
+					return self.event.makeOrder(send_data.ticket_types, send_data.registration_fields, send_data.promocode).always(function(data) {
 						$main_action_button.removeAttr('disabled');
 						
 						return data;
@@ -46811,7 +46844,17 @@ OrderPage = extending(Page, (function() {
 			}
 		}
 		
-		this.$wrapper.find('.QuantityInput').on('QuantityInput::change', function(e, value) {
+		$quantity_inputs.on('QuantityInput::change', function(e, value) {
+			var is_selected = Array.prototype.reduce.call($quantity_inputs, function(accumulator, input) {
+				
+				return accumulator || input.value !== 0;
+			}, false);
+			
+			if (is_selected) {
+				$footer.removeClass(__C.CLASSES.HIDDEN);
+			} else {
+				$footer.addClass(__C.CLASSES.HIDDEN);
+			}
 			countTicketTypeSum($(this).closest('.TicketType'));
 			countTotalSum();
 		});
@@ -46832,28 +46875,49 @@ OrderPage = extending(Page, (function() {
 			}
 		}
 		
-		this.render_vars.main_action_button.on('click.MakeOrder', function() {
-			var result;
+		this.render_vars.pay_button.on('click.MakeOrder', function() {
+			var result,
+				callback_url = parsed_uri.queryKey['away_to'] || (window.location.origin + '/event/' + self.event.id);
 			
 			if (__APP.IS_WIDGET) {
-				makeOrder(self.event.ticketing_locally ? __APP.IS_WIDGET : false, parsed_uri.queryKey['away_to'] || location.hostname + '/event/' + self.event.id);
+				makeOrder(function(send_data) {
+					$payload = self.$wrapper.find('.OrderFormPayload');
+					$payload.val(JSON.stringify(Object.assign({
+						redirect_to_payment: true,
+						callback_url: callback_url
+					}, send_data)));
+					
+					self.$wrapper.find('.OrderForm').submit();
+				});
 			} else {
 				result = makeOrder();
 				if (result !== false) {
 					result.done(function(data) {
-						var is_custom_callback = !!parsed_uri.queryKey['away_to'],
-							callback_url = parsed_uri.queryKey['away_to'] || '/event/' + self.event.id;
 						
-						if (self.event.ticketing_locally && data.sum !== 0) {
-							Payment.doPayment('order-' + data.order.uuid, data.sum, is_custom_callback ? callback_url : (window.location.origin + callback_url));
-						} else if (is_custom_callback) {
-							window.location = callback_url + '?registration=free';
-						} else {
-							__APP.changeState(callback_url);
-							showNotifier({text: 'Регистрация прошла успешно', status: true});
-						}
+						Payment.doPayment('order-' + data.order.uuid, callback_url);
 					})
 				}
+			}
+		});
+		
+		this.render_vars.register_button.on('click.Register', function() {
+			var result = makeOrder();
+			
+			if (result !== false) {
+				result.done(function(data) {
+					var is_custom_callback = !!parsed_uri.queryKey['away_to'],
+						callback_url = parsed_uri.queryKey['away_to'] || '/event/' + self.event.id,
+						parsed_callback;
+					
+					
+					if (is_custom_callback) {
+						parsed_callback = parseUri(callback_url);
+						window.location = parsed_callback.wo_query + '?' + 'registration=free&' + parsed_callback.query;
+					} else {
+						__APP.changeState(callback_url);
+						showNotifier({text: 'Регистрация прошла успешно', status: true});
+					}
+				})
 			}
 		});
 		
@@ -46935,7 +46999,19 @@ OrderPage = extending(Page, (function() {
 			});
 		}
 		
-		this.render_vars.main_action_button = __APP.BUILD.button({
+		this.render_vars.pay_button = __APP.BUILD.button({
+			title: 'Заплатить через Яндекс',
+			classes: [
+				__C.CLASSES.COLORS.YANDEX,
+				__C.CLASSES.HOOKS.RIPPLE,
+				__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE,
+				'MainActionButton',
+				__C.CLASSES.SIZES.WIDE,
+				__C.CLASSES.SIZES.HUGE
+			]
+		});
+		
+		this.render_vars.register_button = __APP.BUILD.button({
 			title: 'Зарегистрироваться',
 			classes: [
 				__C.CLASSES.COLORS.ACCENT,
@@ -46946,6 +47022,8 @@ OrderPage = extending(Page, (function() {
 				__C.CLASSES.SIZES.HUGE
 			]
 		});
+		
+		this.render_vars.main_action_button = this.render_vars.register_button;
 		
 		if (this.event.ticketing_locally) {
 			this.render_vars.legal_entity_payment_button = __APP.BUILD.button({
