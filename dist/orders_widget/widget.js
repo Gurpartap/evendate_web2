@@ -46678,7 +46678,7 @@ OrderPage = extending(Page, (function() {
 	OrderPage.prototype.gatherSendData = function() {
 		
 		return {
-			ticket_types: this.$wrapper.find('.OrderFields').serializeForm('array').reduce(function(bundle, field) {
+			tickets: this.$wrapper.find('.OrderFields').serializeForm('array').reduce(function(bundle, field) {
 				if (+field.value) {
 					bundle.push({
 						uuid: field.name,
