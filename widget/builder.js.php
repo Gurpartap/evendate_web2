@@ -124,15 +124,26 @@ function wrongInitError() { ?>
 				fired = false,
 				timer;
 
-			!function checkLoaded() {
-				if (self.is_loaded) {
-					if (!fired) {
-						fired = true;
-						clearTimeout(timer);
-						callback.call(self);
-					}
+			!function checkVisibility() {
+				if (self.iframe.offsetParent === null) {
+
+					return timer = setTimeout(checkVisibility, 1);
 				} else {
-					timer = setTimeout(checkLoaded, 1);
+					clearTimeout(timer);
+
+					return !function checkLoaded() {
+						if (self.is_loaded) {
+							if (!fired) {
+								fired = true;
+								clearTimeout(timer);
+
+								return callback.call(self);
+							}
+						} else {
+
+							return timer = setTimeout(checkLoaded, 1);
+						}
+					}();
 				}
 			}();
 		};

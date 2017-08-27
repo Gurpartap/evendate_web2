@@ -43976,7 +43976,8 @@ QuantityInput = extendingJQuery((function() {
 		});
 		
 		$input = __APP.BUILD.inputNumber($.extend({
-			value: value
+			value: value,
+			size: 2
 		}, attributes), [
 			'quantity_input'
 		], null, {
