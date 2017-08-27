@@ -1937,6 +1937,7 @@ class Event extends AbstractEntity
 			'ticket'
 		);
 		if (in_array($alias, $reserved_names)) throw new InvalidArgumentException('USES_RESERVED_URL');
+		if (is_int($alias)) throw new InvalidArgumentException('USES_RESERVED_URL');
 		if (preg_match('/^([a-zA-Z\-_0-9]+)$/mi', $alias) == false) {
 			return new Result(false, Errors::getDescription(App::$__LANG, 'BAD_URL'));
 		}
@@ -1946,11 +1947,36 @@ class Event extends AbstractEntity
 			->where('url = ?', $alias)
 			->where('event_id <> ?', $this->id);
 
-		if ($this->db->prepareExecute($q_ins_url)->rowCount() != 0 )
+		if ($this->db->prepareExecute($q_ins_url)->rowCount() != 0)
 			return new Result(false, Errors::getDescription(App::$__LANG, 'USES_RESERVED_URL'));
 
 		return new Result(true, 'URL валиден и может быть использован');
 
+	}
+
+	public function saveLandingData(array $data)
+	{
+		$url_check = $this->checkLandingAlias($data['main']['url']);
+		if ($url_check->getStatus() == false) return $url_check;
+
+		$cols = array(
+			'data' => $data,
+			'url' => $data['main']['url'],
+			'event_id' => $this->id
+		);
+
+		$q_ins_data = App::queryFactory()->newInsert();
+		$q_ins_data->into('event_landings')
+			->cols($cols)
+			->onConflictUpdate(array('event_id', 'url'), $cols)
+		->returning(array('id'));
+
+		$result = $this->db->prepareExecute($q_ins_data);
+		if ($result->rowCount() == 1){
+			return new Result(true, '');
+		}else{
+			return new Result(false, 'Не удалось сохранить данные');
+		}
 	}
 
 }

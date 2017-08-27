@@ -6,6 +6,7 @@ CREATE TABLE event_landings (
   url        TEXT      DEFAULT uuid_generate_v4(),
   data       JSONB     DEFAULT NULL,
   created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NULL
+  updated_at TIMESTAMP DEFAULT NULL,
+  UNIQUE (event_id, url)
 );
 

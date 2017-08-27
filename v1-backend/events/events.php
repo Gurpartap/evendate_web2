@@ -397,16 +397,30 @@ $__modules['events'] = array(
 				intval($id),
 				$event_fields);
 
+			if ((!isset($__request['payload']) || !is_array($__request['payload'])) && isset($__request['post_data'])) {
+				$__request['payload'] = json_decode($__request['post_data'], true);
+			}
+
 			if (!isset($__request['payload']) || !isset($__request['payload']['registration_fields']))
 				throw new InvalidArgumentException('REGISTRATION_FIELDS_NOT_FOUND');
 
 			$result = $event->registerUser($__user, $__request['payload']);
-			if (isset($__request['redirect_to_payment']) && $__request['redirect_to_payment'] == true) {
-				require './payment-form.php';
+			if (isset($__request['payload']['redirect_to_payment']) && $__request['payload']['redirect_to_payment'] == true) {
+				global $BACKEND_FULL_PATH;
+				require "{$BACKEND_FULL_PATH}/events/payment-form.php";
 				die();
 			} else {
 				return $result;
 			}
+		},
+		'{{/(id:[0-9]+)}/landing}' => function ($id) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+			$event = EventsCollection::one(
+				$__db,
+				$__user,
+				intval($id),
+				$__fields);
+			$request_data = json_decode($__request['data'], true);
+			return $event->saveLandingData($request_data);
 		},
 		'' => function () use ($__db, $__request, $__user) {
 			if ($__user instanceof User) {

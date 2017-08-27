@@ -80,7 +80,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
   <link rel="stylesheet" href="css/swiper.min.css"> <!-- Screenshot Slider -->
   <link rel="stylesheet" href="css/themes/default/default.css"> <!-- Nivo Lightbox -->
   <link rel="stylesheet" href="css/nivo-lightbox.css"> <!-- Nivo Lightbox Theme -->
-  <link rel="stylesheet" href="../app/src/vendor/pace/pace.css"> <!-- Nivo Lightbox Theme -->
+  <link rel="stylesheet" href="css/nprogress.css">
 
   <!-- TYPOGRAPHY -->
   <link rel="stylesheet" id="font-switch" href="css/typography/typography-1.css">
@@ -103,8 +103,6 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
   <!--[if lt IE 9]>
   <script src="js/html5shiv.js"></script>
   <script src="js/respond.min.js"></script>
-  <script src="../app/src/vendor/pace/pace.min.js"></script>
-  <script src="../app/src/vendor/notify/notify.js"></script>
   <![endif]-->
 
 </head>
@@ -1084,6 +1082,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
      SCRIPTS
 ============================== -->
 <script src="js/jquery-1.11.3.min.js"></script>
+<script src="js/nprogress.js"></script>
 <script src="js/spectrum.js"></script>
 <script src="js/bootstrap.min.js"></script>
 <script src="js/tinymce.min.js"></script>

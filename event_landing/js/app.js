@@ -22,6 +22,7 @@ function guid() {
 window.base64_in_progress = 0;
 
 function getBase64(file, cb) {
+    if (file instanceof Blob === false) return cb(null, null);
     var reader = new FileReader();
     reader.readAsDataURL(file);
     window.base64_in_progress++;
@@ -510,7 +511,7 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
                 return false;
             },
             items: {},
-            toggleBecomeASponsor: function(){
+            toggleBecomeASponsor: function () {
                 this.become_a_sponsor_enabled = !this.become_a_sponsor_enabled;
                 this.toggler_text = this.become_a_sponsor_enabled ? 'Убрать кнопку' : 'Показать кнопку';
             },
@@ -640,7 +641,9 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
     });
 
     $scope.checkAlias = function () {
-        if (/^([a-zA-Z\-_0-9]+)$/gmi.test($scope.data.main.url) === false) {
+        if ((/^([a-zA-Z\-_0-9]+)$/gmi.test($scope.data.main.url) === false)
+            || (parseInt($scope.data.main.url) == $scope.data.main.url && $scope.data.main.url != search_data.id)
+        ) {
             $scope.data.main.bad_url = true;
             $scope.data.main.bad_url_text = 'В URL допускаются только цифры, латинские буквы, знаки тире и нижнее подчеркивание';
         } else {
@@ -658,15 +661,28 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
     };
 
     $scope.saveLandingData = function () {
+        NProgress.start();
+        var ajaxData = function () {
+            $.ajax({
+                url: '/api/v1/events/' + search_data.id + '/landing/',
+                type: 'POST',
+                data: JSON.stringify($scope.data),
+                complete: function () {
+                    NProgress.done();
+                }
+            })
+        };
+
         if (window.base64_in_progress !== 0) {
-            console.log('Making base 64');
             window.save_interval = setInterval(function () {
                 if (window.base64_in_progress !== 0) return;
-
+                NProgress.inc();
+                ajaxData();
                 clearInterval(window.save_interval);
             }, 500);
+        } else {
+            ajaxData();
         }
-        console.log($scope.data);
     };
 
     $scope.$watch('data.gallery_background', function () {
