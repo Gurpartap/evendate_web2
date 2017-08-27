@@ -7,8 +7,8 @@
 <?php
 if($DEBUG_MODE) { ?>
 	<script type="text/javascript" src="/dist/vendor.js?rev=cffd4b9c8e618ebda5cd53878b1275bc" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.js?rev=45e5eca3ab27c51c28b0ff90c750da4f" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/app.js?rev=240c87ee0e04a56178e76d5153b2f177" charset="utf-8"></script><?php
 } else { ?>
 	<script type="text/javascript" src="/dist/vendor.min.js?rev=63d3c531124a9ddec1fe6f86fea5f707" charset="utf-8"></script>
-	<script type="text/javascript" src="/dist/app.min.js?rev=e51ceeb6f3af35898455e42d6e3c3686" charset="utf-8"></script><?php
+	<script type="text/javascript" src="/dist/app.min.js?rev=e1624a462faebb4a0301813bc9fb742b" charset="utf-8"></script><?php
 } ?>
