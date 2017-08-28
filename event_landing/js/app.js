@@ -1,12 +1,7 @@
-var __app = angular.module('LandingApp', ['ngFileUpload', 'gridster', 'ui.tinymce']);
+ var __app = angular.module('LandingApp', ['ngFileUpload', 'gridster', 'ui.tinymce', 'ngSanitize']);
 
 
-window.paceOptions = {
-    ajax: true, // disabled
-    document: true, // disabled
-    eventLag: true, // disabled
-    search_is_active: false
-};
+var search_data = searchToObject();
 
 function guid() {
     function s4() {
@@ -20,22 +15,6 @@ function guid() {
 }
 
 window.base64_in_progress = 0;
-
-function getBase64(file, cb) {
-    if (file instanceof Blob === false) return cb(null, null);
-    var reader = new FileReader();
-    reader.readAsDataURL(file);
-    window.base64_in_progress++;
-    reader.onload = function () {
-        window.base64_in_progress--;
-        cb(null, reader.result);
-    };
-    reader.onerror = function (error) {
-        window.base64_in_progress--;
-        cb(error, null);
-        handleFileLoadErr(error);
-    };
-}
 
 function handleFileLoadErr(err) {
     console.log(err);
@@ -126,9 +105,8 @@ var backgrounds = [
     }
 ];
 
-__app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope, $timeout) {
+__app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', function ($scope, Upload, $timeout) {
 
-    var search_data = searchToObject();
     $scope.edit_mode = search_data.edit;
     $scope.backgrounds = backgrounds;
     var initializing = true;
@@ -177,22 +155,24 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
             title: 'Спикеры',
             subtitle: '',
             items: {},
+            imageChange: function ($files, $file, $newFiles, $duplicateFiles, $invalidFiles, $event, item_uuid) {
+                getBase64($file, function (err, res) {
+                    $scope.data.speakers.items[item_uuid].base64_image = res;
+                    $scope.data.speakers.items[item_uuid].image = null;
+                });
+            },
             addItem: function () {
-                var uuid = guid(),
-                    _this = this;
+                var uuid = guid();
                 this.items[uuid] = {
                     name: 'Имя',
                     company_name: 'Название компании',
                     description: 'Описание',
                     image: './images/default.jpg',
-                    uuid: uuid,
-                    remove: function () {
-                        delete _this.items[uuid];
-                    }
+                    uuid: uuid
                 };
-                setTimeout(function () {
-                    updateHeroTabs()
-                }, 200);
+            },
+            removeItem: function (uuid) {
+                delete this.items[uuid];
             },
             enabled: true,
             toggleEnabled: function () {
@@ -241,37 +221,36 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
             days: {},
             days_count: 0,
             addDay: function ($event) {
-                var day_uuid = guid(),
-                    _this = this;
-                _this.days[day_uuid] = {
+                var day_uuid = guid();
+                this.days[day_uuid] = {
                     name: 'День ' + (++this.days_count),
                     items: {},
-                    uuid: day_uuid,
-                    addItem: function () {
-                        var item_uuid = guid(),
-                            _day = this;
-                        _day.items[item_uuid] = {
-                            time: '00:00',
-                            text_1: 'Зал #0',
-                            text_2: 'Спикер #0',
-                            title: 'Заголовок',
-                            description: '',
-                            uuid: item_uuid,
-                            remove: function () {
-                                delete _day.items[item_uuid];
-                            }
-                        };
-                    },
-                    remove: function () {
-                        delete _this.days[day_uuid];
-                        _this.days_count--;
-                    }
+                    uuid: day_uuid
                 };
 
                 setTimeout(function () {
                     $('.days-tab-link:last').click();
                 }, 200);
                 $event.preventDefault();
+            },
+            removeDay: function (uuid) {
+                delete this.days[uuid];
+                this.days_count--;
+            },
+            addDayItem: function (day_uuid) {
+                var item_uuid = guid(),
+                    _day = this.days[day_uuid];
+                _day.items[item_uuid] = {
+                    time: '00:00',
+                    text_1: 'Зал #0',
+                    text_2: 'Спикер #0',
+                    title: 'Заголовок',
+                    description: '',
+                    uuid: item_uuid
+                };
+            },
+            removeDayItem: function (day_uuid, uuid) {
+                delete this.days[day_uuid].items[uuid];
             },
             enabled: true,
             toggleEnabled: function () {
@@ -350,19 +329,25 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
             title: 'Отзывы',
             subtitle: 'Добавляйте отзывы ваших клиентов и их фотографии',
             items: {},
+            imageChange: function ($files, $file, $newFiles, $duplicateFiles, $invalidFiles, $event, item_uuid) {
+                getBase64($file, function (err, res) {
+                    $scope.data.testimonials.items[item_uuid].base64_image = res;
+                    $scope.data.testimonials.items[item_uuid].image = null;
+                });
+            },
             addItem: function () {
-                var item_uuid = guid(),
-                    _scope = this;
-                _scope.items[item_uuid] = {
+                var item_uuid = guid();
+                this.items[item_uuid] = {
                     text: 'Отзыв',
                     name: 'Имя',
                     image: './images/default.jpg',
                     details: 'Компания',
-                    uuid: item_uuid,
-                    remove: function () {
-                        delete _scope.items[item_uuid];
-                    }
+                    uuid: item_uuid
                 };
+            },
+            removeItem: function (uuid) {
+                delete this.items[uuid];
+
             },
             toggleEnabled: function () {
                 this.enabled = !this.enabled;
@@ -377,7 +362,7 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
                 width: 'auto', // can be an integer or 'auto'. 'auto' scales gridster to be the full width of its containing element
                 colWidth: 'auto', // can be an integer or 'auto'.  'auto' uses the pixel width of the element divided by 'columns'
                 rowHeight: '430', // can be an integer or 'match'.  Match uses the colWidth, giving you square widgets.
-                margins: [10, 10], // the pixel distance between each widget
+                margins: [40, 10], // the pixel distance between each widget
                 outerMargin: true, // whether margins apply to outer edges of the grid
                 sparse: false, // "true" can increase performance of dragging and resizing for big grid (e.g. 20x50)
                 isMobile: false, // stacks the grid items if true
@@ -434,6 +419,12 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
             title: 'Галлерея',
             subtitle: 'Добавляйте фотографии за прошлые года или фотографии помещений',
             items: {},
+            itemImageChange: function ($files, $file, $newFiles, $duplicateFiles, $invalidFiles, $event, item_uuid) {
+                getBase64($file, function (err, res) {
+                    $scope.data.gallery.items[item_uuid].base64_image = res;
+                    $scope.data.gallery.items[item_uuid].image = null;
+                });
+            },
             enabled: true,
             background_base64: null,
             imageChange: function ($files, $file) {
@@ -445,17 +436,15 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
                 });
             },
             addItem: function () {
-                var item_uuid = guid(),
-                    _scope = this;
-                _scope.items[item_uuid] = {
+                var item_uuid = guid();
+                this.items[item_uuid] = {
                     title: 'Описание изображения',
                     image: './images/default.jpg',
-                    uuid: item_uuid,
-                    remove: function () {
-                        delete _scope.items[item_uuid];
-                    }
+                    uuid: item_uuid
                 };
-
+            },
+            removeItem: function (item_uuid) {
+                delete this.items[item_uuid];
             },
             toggleEnabled: function () {
                 this.enabled = !this.enabled;
@@ -506,6 +495,12 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
             title: 'Партнеры',
             become_a_sponsor: 'Стать партнером',
             toggler_text: 'Убрать кнопку',
+            imageChange: function ($files, $file, $newFiles, $duplicateFiles, $invalidFiles, $event, item_uuid) {
+                getBase64($file, function (err, res) {
+                    $scope.data.sponsors.items[item_uuid].base64_image = res;
+                    $scope.data.sponsors.items[item_uuid].image = null;
+                });
+            },
             toggleEnabled: function () {
                 this.enabled = !this.enabled;
                 return false;
@@ -517,16 +512,14 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
             },
             enabled: true,
             addItem: function () {
-                var item_uuid = guid(),
-                    _scope = this;
-                _scope.items[item_uuid] = {
+                var item_uuid = guid();
+                this.items[item_uuid] = {
                     image: 'images/clients/logo-1-dark.png',
-                    uuid: item_uuid,
-                    remove: function () {
-                        delete _scope.items[item_uuid];
-                    }
+                    uuid: item_uuid
                 };
-
+            },
+            removeItem: function (item_uuid) {
+                delete this.items[item_uuid];
             },
             become_a_sponsor_enabled: true,
             gridOptions: {
@@ -553,7 +546,7 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
                 minSizeY: 1, // minumum row height of an item
                 maxSizeY: null, // maximum row height of an item
                 resizable: {
-                    enabled: true,
+                    enabled: $scope.edit_mode,
                     // handles: ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'],
                     // start: function(event, $element, widget) {}, // optional callback fired when resize is started,
                     // resize: function(event, $element, widget) {}, // optional callback fired when item is resized,
@@ -570,18 +563,16 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
             subtitle: 'Ответы на часто задаваемые вопросы',
             items: {},
             addItem: function () {
-                var item_uuid = guid(),
-                    _this = this;
-
-                _this.items[item_uuid] = ({
+                var item_uuid = guid();
+                this.items[item_uuid] = ({
                     question: 'Вопрос?',
                     answer: 'Ответ на вопрос.',
                     uuid: guid(),
-                    sizeX: 2,
-                    remove: function () {
-                        delete _this.items[item_uuid];
-                    }
+                    sizeX: 2
                 });
+            },
+            removeItem: function (item_uuid) {
+                delete this.items[item_uuid];
             },
             toggleEnabled: function () {
                 this.enabled = !this.enabled;
@@ -612,11 +603,7 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
                 minSizeY: 1, // minumum row height of an item
                 maxSizeY: null, // maximum row height of an item
                 resizable: {
-                    enabled: true,
-                    handles: ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'],
-                    // start: function(event, $element, widget) {}, // optional callback fired when resize is started,
-                    // resize: function(event, $element, widget) {}, // optional callback fired when item is resized,
-                    // stop: function(event, $element, widget) {} // optional callback fired when item is finished resizing
+                    enabled: $scope.edit_mode,
                 },
                 draggable: {
                     enabled: true, // whether dragging items is supported
@@ -666,7 +653,7 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
             $.ajax({
                 url: '/api/v1/events/' + search_data.id + '/landing/',
                 type: 'POST',
-                data: JSON.stringify($scope.data),
+                data: {data: JSON.stringify($scope.data)},
                 complete: function () {
                     NProgress.done();
                 }
@@ -754,14 +741,39 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
 
     $scope.setGalleryOverlayOpacity = function () {
         var html = document.getElementsByTagName('html')[0];
-        html.style.setProperty("--gallery-overlay-opacity", (100 - $scope.data.gallery_overlay_opacity) / 100);
+        html.style.setProperty("--gallery-opacity", (100 - $scope.data.gallery_overlay_opacity) / 100);
     };
 
+    function getBase64(file, cb) {
+        if (file instanceof Blob === false) return cb(null, null);
+        file.upload = Upload.upload({
+            url: '/event_images/landings/',
+            data: {file: file, event_id: search_data.id}
+        });
+
+        file.upload.then(function (response) {
+            $timeout(function () {
+                cb(null, response.data);
+            });
+        }, function (response) {
+            if (response.status > 0)
+                alert(response.status + ': ' + response.data);
+        }, function (evt) {
+            file.progress = Math.min(100, parseInt(100.0 *
+                evt.loaded / evt.total));
+            console.log(file.progress);
+        });
+
+
+
+    }
+
     $.ajax({
-        url: '/api/v1/events/' + search_data['id'] + '?fields=tags,description,ticketing_available,registration_available,landing_data,location,image_horizontal_url,registration_required,registration_locally,organization_name,ticketing_available,registration_available',
+        url: '/api/v1/events/' + search_data['id'] + '?fields=tags,latitude,longitude,description,ticketing_available,registration_available,landing_data,location,image_horizontal_url,registration_required,registration_locally,organization_name,ticketing_available,registration_available',
         success: function (res) {
             var event = res.data[0];
             console.log(event);
+            initMapBig(event);
             if (!event.landing_data) {
                 var colorThief = new ColorThief(),
                     colorSync = colorThief.getColorAsync(event.image_horizontal_url, function (color) {
@@ -771,7 +783,6 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
                 $scope.data.header.title = event.organization_name;
                 $scope.data.header.location_addresses = event.location;
                 $scope.data.main_description = event.description;
-                $scope.data.main_description = event.description;
 
                 if (event.ticketing_available) {
                     $scope.data.tickets.title = 'Купить билеты';
@@ -780,12 +791,41 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
                 } else {
                     $scope.data.tickets.enabled = false;
                 }
-
                 $scope.$apply();
                 $scope.updateBackgroundSuggests(event.tags);
             } else if (event.landing_data) {
-                $scope.data = event.landing_data;
+                var _data = JSON.parse(event.landing_data);
+                $.each(_data, function (key, value) {
+                    if ($.type(value) === 'object') {
+                        $.each(value, function (key_l2, val_l2) {
+                            if ($.type($scope.data[key][key_l2]) !== 'function' &&
+                                !Array.isArray(val_l2)) {
+                                $scope.data[key][key_l2] = val_l2;
+                            }
+                        });
+                    } else {
+                        $scope.data[key] = value;
+                    }
+                });
+                $scope.setGalleryOverlayOpacity();
+                $scope.setOverlayOpacity();
+                var color = $scope.data.color_scheme;
+                $scope.setGlobalColor({r: color[0], g: color[1], b: color[2]});
+                if ($scope.data.main_background){
+                    $scope.setHeaderImage($scope.data.main_background);
+                }if ($scope.data.gallery_background){
+                    $scope.setHeaderImage($scope.data.gallery_background);
+                }
+                $scope.$apply();
             }
+            if (!$scope.edit_mode) {
+                $('[contenteditable]').prop('contenteditable', 'false');
+                $('a[href="#"]').on('click', function (e) {
+                    e.preventDefault();
+                    return false;
+                });
+            }
+
         }
     });
 
@@ -885,3 +925,4 @@ $(document).ready(function () {
 
 
 });
+

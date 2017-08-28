@@ -55,7 +55,6 @@
   </button>
 </form>
 <script>
-    debugger;
 //    document.getElementById('payment').submit();
 </script>
 </body>

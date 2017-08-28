@@ -232,9 +232,9 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
       <ul class="hero-tabs speakers-nav" gridster="data.speakers.gridOptions">
         <li role="presentation" class="col-md-3 col-sm-6 active" gridster-item="speaker"
             ng-repeat="(uuid, speaker) in data.speakers.items">
-          <div class="item-remover">
+          <div class="item-remover" ng-show="edit_mode">
             <span class="fa fa-bars drag-icon"></span>
-            <span class="fa fa-remove remove-icon" ng-click="speaker.remove();"></span>
+            <span class="fa fa-remove remove-icon" ng-click="data.speakers.removeItem(uuid);"></span>
           </div>
           <!-- THUMBNAIL -->
           <figure class="speaker-intro secondary-color-bg" data-target="#speaker-{{speaker.uuid}}">
@@ -242,6 +242,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
               <img
                 ngf-select=""
                 ngf-drop=""
+                ngf-change="data.speakers.imageChange($files, $file, $newFiles, $duplicateFiles, $invalidFiles, $event, speaker.uuid)"
                 ngf-no-object-url="true"
                 ng-model="speaker.image"
                 ngf-model-invalid="invalidFiles"
@@ -265,7 +266,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
                 ngf-allow-dir="allowDir"
                 class="drop-box ng-pristine ng-valid"
                 ngf-drop-available="dropAvailable"
-                ng-src="{{speaker.image.$ngfBlobUrl ? speaker.image.$ngfBlobUrl : speaker.image}}"
+                ng-src="{{speaker.base64_image || (speaker.image.$ngfBlobUrl ? speaker.image.$ngfBlobUrl : speaker.image)}}"
                 alt="{{speaker.name}}"
                 class="thumb">
             </div>
@@ -334,9 +335,9 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
         <ul class="tab-btn" role="tablist" gridster="data.schedule.gridOptions">
           <li role="presentation" class="schedule-tab-title" gridster-item="day"
               ng-repeat="(uuid, day) in data.schedule.days track by day.uuid">
-            <div class="item-remover">
+            <div class="item-remover" ng-show="edit_mode">
               <span class="fa fa-bars drag-icon"></span>
-              <span class="fa fa-remove remove-icon" ng-click="day.remove();"></span>
+              <span class="fa fa-remove remove-icon" ng-click="data.schedule.removeDay(uuid);"></span>
             </div>
             <a class="days-tab-link" href="#day-{{day.uuid}}"
                aria-controls="day-{{day.uuid}}" role="tab" data-toggle="tab"><span ng-model="day.name" contenteditable>{{day.name}}</span></a>
@@ -350,7 +351,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
                ng-repeat="(_uuid, _day) in data.schedule.days track by _uuid">
 
             <div class="row" ng-if="edit_mode"> <!-- OBJECTIVE -->
-              <div class="col-sm-offset-3 col-md-8 col-sm-8 mb50 add-new-objective" ng-click="_day.addItem()">
+              <div class="col-sm-offset-3 col-md-8 col-sm-8 mb50 add-new-objective" ng-click="data.schedule.addDayItem(_uuid)">
                 <div class="objective">
                   <i class="fa fa-plus add-icon" aria-hidden="true"></i>
                   <strong style="margin-top: 50px;">ДОБАВИТЬ ПУНКТ</strong>
@@ -361,14 +362,14 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
             <div class="schedule-items-wrapper" gridster="data.schedule.itemsGridOptions">
               <div class="row" ng-repeat="(objective_uuid, objective) in _day.items" gridster-item="objective">
                 <!-- OBJECTIVE -->
-                <div class="item-remover">
+                <div class="item-remover" ng-show="edit_mode">
                   <span class="fa fa-bars drag-icon"></span>
-                  <span class="fa fa-remove remove-icon" ng-click="objective.remove();"></span>
+                  <span class="fa fa-remove remove-icon" ng-click="data.schedule.removeDayItem(_uuid, objective_uuid);"></span>
                 </div>
                 <div class="col-md-2 col-sm-3 col-md-offset-1 mb30">
                   <div class="objective-time">
 
-                    <p ng-model="objective.time" contenteditable>{{objective.time}}</p>
+                    <p ng-model="objective.time" contenteditable="{{edit_mode}}">{{objective.time}}</p>
 
                   </div>
                 </div>
@@ -376,17 +377,16 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
                   <div class="objective secondary-color-bg">
                     <ul class="category">
                       <li>
-                        <a href="#" ng-model="objective.text_1" contenteditable>{{objective.text_1}}
+                        <a href="#" ng-model="objective.text_1" contenteditable="{{edit_mode}}">{{objective.text_1}}
                         </a>
                       </li>
                       <li>
-                        <a href="#" ng-model="objective.text_2" contenteditable>{{objective.text_2}}
+                        <a href="#" ng-model="objective.text_2" contenteditable="{{edit_mode}}">{{objective.text_2}}
                         </a>
                       </li>
                     </ul>
-                    <h3 class="title-text"><a href="" ng-model="objective.title" contenteditable>{{objective.title}}</a>
-                    </h3>
-                    <p><a href="#" ng-model="objective.description" contenteditable>{{objective.description}}</a></p>
+                    <h3 class="title-text"><a href="#" ng-model="objective.title" contenteditable>{{objective.title}}</a></h3>
+                    <p><a href="#" ng-model="objective.description" contenteditable="{{edit_mode}}">{{objective.description}}</a></p>
                   </div>
                 </div>
               </div> <!-- /END OBJECTIVE -->
@@ -436,6 +436,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
     <div class="row">
       <textarea ui-tinymce="data.custom.tinymce_options" class="textarea-html" ng-model="data.custom.html"
                 ng-if="edit_mode"></textarea>
+      <div ng-if="!edit_mode" ng-bind-html="data.custom.html"></div>
     </div>  <!-- /.row -->
   </div>
 </section>
@@ -484,14 +485,15 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
         gridster-item="item"
         ng-repeat="(key, item) in data.testimonials.items"
         class="col-md-4 col-sm-8 col-xs-12 col-md-offset-0 col-sm-offset-2"> <!-- TESTIMONIAL ITEM -->
-        <div class="item-remover">
+        <div class="item-remover" ng-show="edit_mode">
           <span class="fa fa-bars drag-icon"></span>
-          <span class="fa fa-remove remove-icon" ng-click="item.remove();"></span>
+          <span class="fa fa-remove remove-icon" ng-click="data.testimonials.removeItem(key);"></span>
         </div>
         <div class="testimonial-item secondary-color-bg text-center">
           <img
             ngf-select=""
             ngf-drop=""
+            ngf-change="data.testimonials.imageChange($files, $file, $newFiles, $duplicateFiles, $invalidFiles, $event, key)"
             ngf-no-object-url="true"
             ng-model="item.image"
             ngf-model-invalid="invalidFiles"
@@ -515,7 +517,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
             ngf-allow-dir="allowDir"
             class="drop-box ng-pristine ng-valid thumb"
             ngf-drop-available="dropAvailable"
-            ng-src="{{item.image.$ngfBlobUrl ? item.image.$ngfBlobUrl : item.image}}"
+            ng-src="{{item.base64_image || (item.image.$ngfBlobUrl ? item.image.$ngfBlobUrl : item.image)}}"
             alt="{{item.name}}">
           <blockquote contenteditable ng-model="item.text">{{item.text}}</blockquote>
           <p class="client-name" contenteditable ng-model="item.name">{{item.name}}</p>
@@ -576,9 +578,9 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
           href="{{item.image.$ngfBlobUrl ? item.image.$ngfBlobUrl : item.image}}" class="lightbox" data-lightbox-gallery="recap" title="John Doe on SVG">-->
         <div ng-repeat="(key, image) in data.gallery.items" gridster-item="image">
           <!-- EVENT RECAP -->
-          <div class="item-remover">
+          <div class="item-remover" ng-show="edit_mode">
             <span class="fa fa-bars drag-icon"></span>
-            <span class="fa fa-remove remove-icon" ng-click="image.remove();"></span>
+            <span class="fa fa-remove remove-icon" ng-click="data.gallery.removeItem(key);"></span>
           </div>
 
           <figure class="recap-gallery-item">
@@ -586,6 +588,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
               <img
                 ngf-select=""
                 ngf-drop=""
+                ngf-change="data.gallery.itemImageChange($files, $file, $newFiles, $duplicateFiles, $invalidFiles, $event, key)"
                 ng-model="image.image"
                 ngf-no-object-url="true"
                 disallowObjectUrl
@@ -610,7 +613,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
                 ngf-allow-dir="allowDir"
                 class="drop-box ng-pristine ng-valid img-responsive"
                 ngf-drop-available="dropAvailable"
-                ng-src="{{image.image.$ngfBlobUrl ? image.image.$ngfBlobUrl : image.image}}"
+                ng-src="{{image.base64_image || (image.image.$ngfBlobUrl ? image.image.$ngfBlobUrl : image.image)}}"
                 alt="{{image.title}}">
               <!--<img src="images/gallery/event-1.jpg" alt="" class="">-->
             </div>
@@ -680,13 +683,14 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
       <li
         gridster-item="item"
         ng-repeat="(key, item) in data.sponsors.items"> <!-- TESTIMONIAL ITEM -->
-        <div class="item-remover">
+        <div class="item-remover" ng-show="edit_mode">
           <span class="fa fa-bars drag-icon"></span>
-          <span class="fa fa-remove remove-icon" ng-click="item.remove();"></span>
+          <span class="fa fa-remove remove-icon" ng-click="data.sponsors.removeItem(key);"></span>
         </div>
         <img
           ngf-select=""
           ngf-drop=""
+          ngf-change="data.gallery.imageChange($files, $file, $newFiles, $duplicateFiles, $invalidFiles, $event, key)"
           ng-model="item.image"
           ngf-no-object-url="true"
           ngf-model-invalid="invalidFiles"
@@ -710,7 +714,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
           ngf-allow-dir="allowDir"
           class="drop-box ng-pristine ng-valid thumb"
           ngf-drop-available="dropAvailable"
-          ng-src="{{item.image.$ngfBlobUrl ? item.image.$ngfBlobUrl : item.image}}"
+          ng-src="{{item.base64_image || (item.image.$ngfBlobUrl ? item.image.$ngfBlobUrl : item.image)}}"
           alt="{{item.name}}">
       </li>
     </ul>
@@ -762,9 +766,9 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 
     <div class="row faqs-2-items" gridster="data.faq.gridOptions">
       <div class="col-md-6 mb60" gridster-item="item" ng-repeat="(key,item) in data.faq.items track by item.uuid">
-        <div class="item-remover">
+        <div class="item-remover" ng-show="edit_mode">
           <span class="fa fa-bars drag-icon"></span>
-          <span class="fa fa-remove remove-icon" ng-click="item.remove();"></span>
+          <span class="fa fa-remove remove-icon" ng-click="data.faq.removeItem(key);"></span>
         </div>
         <h5 class="title-text" contenteditable ng-model="item.question">{{item.question}}</h5>
         <p contenteditable ng-model="item.answer">{{item.answer}}</p>
@@ -796,7 +800,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
   </div>
 </section>
 
-<button type="button" ng-click="saveLandingData();" class="fab" id="fab-save"
+<button type="button" ng-click="saveLandingData();" class="fab" id="fab-save" ng-show="edit_mode"
         style="position: fixed; bottom: 50px; right: 50px; border-radius: 500px; background-color: var(--accent)">
   <span class="fa fa-save"></span>
 </button>
@@ -840,7 +844,10 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
     <div class="board-menu-content u-fancy-scrollbar js-board-menu-content-wrapper">
       <div class="board-menu-content-frame">
         <div>Прозрачность наложения:</div>
-        <input type="range" ng-model="data.overlay_opacity" ng-change="setOverlayOpacity()" min="0" max="100">
+        <div class="range-slider">
+          <input type="range" ng-model="data.overlay_opacity" ng-change="setOverlayOpacity()" class="range-slider__range" min="0" max="100">
+          <span class="range-slider__value">{{data.overlay_opacity}} %</span>
+        </div>
         <hr class="board-menu-header-divider">
         <div class="board-backgrounds-section-tiles u-clearfix">
           <div ng-click="setHeaderImage(background.image)" ng-repeat="background in backgrounds"
@@ -1030,8 +1037,10 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
     <div class="board-menu-content u-fancy-scrollbar js-board-menu-content-wrapper">
       <div class="board-menu-content-frame">
         <div>Прозрачность наложения:</div>
-        <input type="range" ng-model="data.gallery_overlay_opacity" ng-change="setGalleryOverlayOpacity()" min="0"
-               max="100">
+        <div class="range-slider">
+          <input type="range" ng-model="data.gallery_overlay_opacity" ng-change="setGalleryOverlayOpacity()" class="range-slider__range" min="0" max="100">
+          <span class="range-slider__value">{{data.gallery_overlay_opacity}} %</span>
+        </div>
         <hr class="board-menu-header-divider">
         <div class="board-backgrounds-section-tiles u-clearfix">
 
@@ -1081,6 +1090,8 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 <!-- =========================
      SCRIPTS
 ============================== -->
+<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-sanitize.js"></script>
+<script src="js/md5.min.js"></script>
 <script src="js/jquery-1.11.3.min.js"></script>
 <script src="js/nprogress.js"></script>
 <script src="js/spectrum.js"></script>
@@ -1088,6 +1099,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 <script src="js/tinymce.min.js"></script>
 <script src="js/angular-tinymce.js"></script>
 <script src="js/color-thief.min.js"></script>
+<script src="js/application.js"></script>
 <script src="js/app.js"></script>
 <script src="js/nivo-lightbox.min.js"></script>
 <script src="js/jquery.scrollTo.min.js"></script>
@@ -1099,8 +1111,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 <script src="js/swiper.jquery.min.js"></script>
 <script src="js/SVGinject.js"></script>
 <script src="js/smoothscroll.js"></script>
-<script src="http://maps.google.com/maps/api/js?sensor=true"></script>
-<script src="js/application.js"></script>
+<script src="http://maps.google.com/maps/api/js?sensor=true&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg"></script>
 
 </body>
 </html>

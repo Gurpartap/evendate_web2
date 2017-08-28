@@ -59,6 +59,7 @@ class Event extends AbstractEntity
 	const ORDERS_FIELD_NAME = 'orders';
 	const MY_TICKETS_COUNT_FIELD_NAME = 'my_tickets_count';
 	const SOLD_TICKETS_COUNT_FIELD_NAME = 'sold_tickets_count';
+	const LANDING_DATA_FIELD_NAME = 'landing_data';
 
 
 	const RANDOM_FIELD_NAME = 'random';
@@ -230,6 +231,7 @@ class Event extends AbstractEntity
 //			AND view_tickets.user_id = :user_id)::INT AS ' . self::ORDERS_COUNT_FIELD_NAME,
 
 		self::SEARCH_SCORE_FIELD_NAME => '(SELECT get_event_search_score(view_events.id)) AS ' . self::SEARCH_SCORE_FIELD_NAME,
+		self::LANDING_DATA_FIELD_NAME => '(SELECT data FROM event_landings WHERE event_id = view_events.id) AS ' . self::LANDING_DATA_FIELD_NAME,
 		self::IS_SEEN_FIELD_NAME => '(
 		SELECT
 			COUNT(ve.id)
@@ -1960,7 +1962,7 @@ class Event extends AbstractEntity
 		if ($url_check->getStatus() == false) return $url_check;
 
 		$cols = array(
-			'data' => $data,
+			'data' => json_encode($data),
 			'url' => $data['main']['url'],
 			'event_id' => $this->id
 		);
