@@ -115,6 +115,9 @@ __APP = {
 		},
 		'onboarding': OnboardingPage,
 		'search': {
+			'tag': {
+				'^([^/]+)': SearchByTagPage
+			},
 			'^([^/]+)': SearchPage
 		},
 		'friends': MyProfilePage,
