@@ -1,7 +1,9 @@
 <?php
 
+if (!isset($BACKEND_FULL_PATH)) {
+	require_once '../v1-backend/bin/env_variables.php';
+}
 
-require_once '../v1-backend/bin/env_variables.php';
 require_once "{$BACKEND_FULL_PATH}/bin/Class.Result.php";
 require_once "{$BACKEND_FULL_PATH}/bin/db.php";
 require_once "{$BACKEND_FULL_PATH}/bin/Class.RequestsParser.php";
@@ -44,22 +46,46 @@ if (App::$ENV == 'prod' || App::$ENV == 'test') {
 $url = parse_url($_SERVER['REQUEST_URI'])['path'];
 $url_parts = explode('/', $url);
 
-$event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description', 'organization_id', 'organization_logo_medium_url', 'organization_short_name'))
-	->getParams($user, array('description', 'organization_id', 'organization_logo_medium_url', 'organization_short_name'))->getData();
+if (count($url_parts) == 2 && !isset($_REQUEST['id'])) {
+	$_REQUEST['id'] = EventsCollection::getIdByAlias($__db, $url_parts[1]);
+}
+
+
+$event_instance = EventsCollection::one($__db, $user, $_REQUEST['id'], Fields::parseFields('description,landing_data,organization_id,organization_logo_medium_url,organization_short_name'));
+$event = $event_instance->getParams($user, array('description', 'organization_id', 'landing_data', 'organization_logo_medium_url', 'organization_short_name'))->getData();
+
+$bckg_color = '';
+$path_url = $event['id'];
+$l_data = null;
+if ($event['landing_data'] && !is_null($event['landing_data'])) {
+	$event['landing_data'] = json_decode($event['landing_data'], true);
+	$l_data = $event['landing_data'];
+	if (isset($event['landing_data']['color_scheme']) && is_array($event['landing_data']['color_scheme'])) {
+		$bckg_color = "background-color: rgb({$event['landing_data']['color_scheme'][0]}, {$event['landing_data']['color_scheme'][1]},{$event['landing_data']['color_scheme'][2]})";
+	}
+}
+
+if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
+	if ($user instanceof User == false || !$user->isEventAdmin($event_instance)) {
+		header('Location: ' . '/' . $path_url);
+	}
+}
 
 ?>
-
 <!doctype html>
 <html lang="en" ng-app="LandingApp">
 <head>
-  <script src="js/angular.min.js"></script>
-  <script src="js/ng-file-upload-shim.min.js"></script>
-  <script src="js/ng-file-upload-all.min.js"></script>
+	<?php
+	echo "<script>window.event_id = {$_REQUEST['id']};</script>\n";
+	?>
 
+  <script src="/event_landing/js/angular.min.js"></script>
+  <script src="/event_landing/js/ng-file-upload-shim.min.js"></script>
+  <script src="/event_landing/js/ng-file-upload-all.min.js"></script>
 
-  <link rel="stylesheet" href="css/angular-gridster.css"/>
+  <link rel="stylesheet" href="/event_landing/css/angular-gridster.css"/>
   <!--<script src="bower_components/javascript-detect-element-resize/jquery.resize.js"></script>-->
-  <script src="js/angular-gridster.min.js"></script>
+  <script src="/event_landing/js/angular-gridster.min.js"></script>
   <meta charset="utf-8">
 
   <!-- TITLE OF SITE -->
@@ -73,40 +99,58 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
   STYLESHEETS
   ============================== -->
   <!-- BOOTSTRAP -->
-  <link rel="stylesheet" href="css/bootstrap.css">
-  <link rel="stylesheet" href="css/font-awesome.min.css">
+  <link rel="stylesheet" href="/event_landing/css/bootstrap.css">
+  <link rel="stylesheet" href="/event_landing/css/font-awesome.min.css">
 
   <!-- FOR EXTERNAL PLUGINS -->
-  <link rel="stylesheet" href="css/swiper.min.css"> <!-- Screenshot Slider -->
-  <link rel="stylesheet" href="css/themes/default/default.css"> <!-- Nivo Lightbox -->
-  <link rel="stylesheet" href="css/nivo-lightbox.css"> <!-- Nivo Lightbox Theme -->
-  <link rel="stylesheet" href="css/nprogress.css">
+  <link rel="stylesheet" href="/event_landing/css/swiper.min.css"> <!-- Screenshot Slider -->
+  <link rel="stylesheet" href="/event_landing/css/themes/default/default.css"> <!-- Nivo Lightbox -->
+  <link rel="stylesheet" href="/event_landing/css/nivo-lightbox.css"> <!-- Nivo Lightbox Theme -->
+  <link rel="stylesheet" href="/event_landing/css/nprogress.css">
 
   <!-- TYPOGRAPHY -->
-  <link rel="stylesheet" id="font-switch" href="css/typography/typography-1.css">
+  <link rel="stylesheet" id="font-switch" href="/event_landing/css/typography/typography-1.css">
 
   <!-- MAIN -->
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="/event_landing/css/style.css">
 
   <!-- TEMPLATE COLORS -->
-  <link rel="stylesheet" id="color-switch" href="css/colors/green.css">
+  <link rel="stylesheet" id="color-switch" href="/event_landing/css/colors/green.css">
 
   <!-- TEMPLATE COLORS -->
-  <link rel="stylesheet" href="css/spectrum.css">
+  <link rel="stylesheet" href="/event_landing/css/spectrum.css">
+  <link href="/app/css/loader.css" rel="stylesheet">
 
   <!-- RESPONSIVE FIXES -->
   <!-- <link rel="stylesheet" href="css/responsive.css"> -->
 
   <!-- CSS FOR DEMO - NOT INCLUDED IN MAIN FILES -->
-  <link rel="stylesheet" href="demo/demo.css">
+  <link rel="stylesheet" href="/event_landing/demo/demo.css">
 
   <!--[if lt IE 9]>
-  <script src="js/html5shiv.js"></script>
-  <script src="js/respond.min.js"></script>
+  <script src="/event_landing/js/html5shiv.js"></script>
+  <script src="/event_landing/js/respond.min.js"></script>
   <![endif]-->
 
 </head>
 <body class="body-container" ng-controller="WholeWorldController">
+<div
+  ng-hide="hide_loader"
+  class="mask-loading" style="
+    position: fixed;
+    background-color: #fff;
+    z-index: 99999999;
+    width: 100%;
+    height: 100%;
+    display: block">
+  <div class="spinner">
+    <div class="double-bounce1" style="<?= $bckg_color ?>"></div>
+    <div class="double-bounce2" style="<?= $bckg_color ?>"></div>
+  </div>
+  <div id="progress-text"
+       style="color: rgb(0, 0, 0); width: 100%; position: absolute; top: calc(50% + 55px); margin-top: -25px; text-align: center;">
+  </div>
+</div>
 <!-- =========================
      NAVBAR 
 ============================== -->
@@ -196,7 +240,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 ============================== -->
 <section ng-hide="!edit_mode && !data.speakers.enabled" class="speakers speakers-1 secondary-bg" id="speakers"
          ng-class="{'disabled': data.speakers.enabled == false}">
-  <div ng-if="edit_mode" ng-click="data.speakers.toggleEnabled();"
+  <div ng-if="edit_mode" ng-click="data.speakers.toggleEnabled($event);"
        ng-title="data.speakers.enabled == true ? 'Скрыть блок' : 'Показать блок'"
        class="board-settings-btn mod-show-menu js-show-sidebar not-main show-hide-btn" href="#">
     <span class="board-header-btn-text">
@@ -211,7 +255,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
     </span>
   </div>
   <div class="hidden-overlay">Блок <strong>{{data.speakers.title}}</strong> скрыт, <a href="#"
-                                                                                      ng-click="data.speakers.toggleEnabled();">нажмите
+                                                                                      ng-click="data.speakers.toggleEnabled($event);">нажмите
       здесь</a>, чтобы сделать блок видимым для пользователей
   </div>
   <div class="container">
@@ -242,6 +286,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
               <img
                 ngf-select=""
                 ngf-drop=""
+                ng-disabled="!edit_mode"
                 ngf-change="data.speakers.imageChange($files, $file, $newFiles, $duplicateFiles, $invalidFiles, $event, speaker.uuid)"
                 ngf-no-object-url="true"
                 ng-model="speaker.image"
@@ -250,7 +295,6 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
                 ngf-multiple="multiple"
                 ngf-pattern="pattern"
                 ngf-accept="acceptSelect"
-                ng-disabled="disabled"
                 ngf-capture="capture"
                 ngf-drag-over-class="dragOverClassObj"
                 ngf-validate="validateObj"
@@ -298,7 +342,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 <section ng-hide="!edit_mode && !data.schedule.enabled" class="descriptions schedule white-bg padding-120-75"
          id="schedule"
          ng-class="{'disabled': data.schedule.enabled == false}">
-  <div ng-if="edit_mode" ng-click="data.schedule.toggleEnabled();"
+  <div ng-if="edit_mode" ng-click="data.schedule.toggleEnabled($event);"
        ng-title="data.schedule.enabled == true ? 'Скрыть блок' : 'Показать блок'"
        class="board-settings-btn mod-show-menu js-show-sidebar not-main" href="#">
     <span class="board-header-btn-text">
@@ -313,7 +357,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
     </span>
   </div>
   <div class="hidden-overlay">Блок <strong>{{data.schedule.title}}</strong> скрыт, <a href="#"
-                                                                                      ng-click="data.schedule.toggleEnabled();">нажмите
+                                                                                      ng-click="data.schedule.toggleEnabled($event);">нажмите
       здесь</a>, чтобы сделать блок видимым для пользователей
   </div>
   <div class="container">
@@ -351,7 +395,8 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
                ng-repeat="(_uuid, _day) in data.schedule.days track by _uuid">
 
             <div class="row" ng-if="edit_mode"> <!-- OBJECTIVE -->
-              <div class="col-sm-offset-3 col-md-8 col-sm-8 mb50 add-new-objective" ng-click="data.schedule.addDayItem(_uuid)">
+              <div class="col-sm-offset-3 col-md-8 col-sm-8 mb50 add-new-objective"
+                   ng-click="data.schedule.addDayItem(_uuid)">
                 <div class="objective">
                   <i class="fa fa-plus add-icon" aria-hidden="true"></i>
                   <strong style="margin-top: 50px;">ДОБАВИТЬ ПУНКТ</strong>
@@ -364,7 +409,8 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
                 <!-- OBJECTIVE -->
                 <div class="item-remover" ng-show="edit_mode">
                   <span class="fa fa-bars drag-icon"></span>
-                  <span class="fa fa-remove remove-icon" ng-click="data.schedule.removeDayItem(_uuid, objective_uuid);"></span>
+                  <span class="fa fa-remove remove-icon"
+                        ng-click="data.schedule.removeDayItem(_uuid, objective_uuid);"></span>
                 </div>
                 <div class="col-md-2 col-sm-3 col-md-offset-1 mb30">
                   <div class="objective-time">
@@ -385,8 +431,10 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
                         </a>
                       </li>
                     </ul>
-                    <h3 class="title-text"><a href="#" ng-model="objective.title" contenteditable>{{objective.title}}</a></h3>
-                    <p><a href="#" ng-model="objective.description" contenteditable="{{edit_mode}}">{{objective.description}}</a></p>
+                    <h3 class="title-text"><a href="#" ng-model="objective.title"
+                                              contenteditable>{{objective.title}}</a></h3>
+                    <p><a href="#" ng-model="objective.description" contenteditable="{{edit_mode}}">{{objective.description}}</a>
+                    </p>
                   </div>
                 </div>
               </div> <!-- /END OBJECTIVE -->
@@ -407,7 +455,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 <section ng-hide="!edit_mode && !data.custom.enabled" class="testimonials testimonials-4 padding-120-75"
          id="custom-html"
          ng-class="{'disabled': data.custom.enabled == false}">
-  <div ng-if="edit_mode" ng-click="data.custom.toggleEnabled();"
+  <div ng-if="edit_mode" ng-click="data.custom.toggleEnabled($event);"
        ng-title="data.custom.enabled == true ? 'Скрыть блок' : 'Показать блок'"
        class="board-settings-btn mod-show-menu js-show-sidebar not-main" href="#">
     <span class="board-header-btn-text">
@@ -416,7 +464,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
   </div>
 
   <div class="hidden-overlay">Блок <strong>{{data.custom.title}}</strong> скрыт, <a href="#"
-                                                                                    ng-click="data.custom.toggleEnabled();">нажмите
+                                                                                    ng-click="data.custom.toggleEnabled($event);">нажмите
       здесь</a>, чтобы сделать блок видимым для пользователей
   </div>
   <div class="container">
@@ -447,7 +495,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 <section ng-hide="!edit_mode && !data.testimonials.enabled"
          class="testimonials testimonials-4 secondary-bg padding-120-75" id="testimonials"
          ng-class="{'disabled': data.testimonials.enabled == false}">
-  <div ng-if="edit_mode" ng-click="data.testimonials.toggleEnabled();"
+  <div ng-if="edit_mode" ng-click="data.testimonials.toggleEnabled($event);"
        ng-title="data.testimonials.enabled == true ? 'Скрыть блок' : 'Показать блок'"
        class="board-settings-btn mod-show-menu js-show-sidebar not-main" href="#">
     <span class="board-header-btn-text">
@@ -462,7 +510,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
     </span>
   </div>
   <div class="hidden-overlay">Блок <strong>{{data.testimonials.title}}</strong> скрыт, <a href="#"
-                                                                                          ng-click="data.testimonials.toggleEnabled();">нажмите
+                                                                                          ng-click="data.testimonials.toggleEnabled($event);">нажмите
       здесь</a>, чтобы сделать блок видимым для пользователей
   </div>
 
@@ -493,6 +541,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
           <img
             ngf-select=""
             ngf-drop=""
+            ng-disabled="!edit_mode"
             ngf-change="data.testimonials.imageChange($files, $file, $newFiles, $duplicateFiles, $invalidFiles, $event, key)"
             ngf-no-object-url="true"
             ng-model="item.image"
@@ -501,7 +550,6 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
             ngf-multiple="multiple"
             ngf-pattern="pattern"
             ngf-accept="acceptSelect"
-            ng-disabled="disabled"
             ngf-capture="capture"
             ngf-drag-over-class="dragOverClassObj"
             ngf-validate="validateObj"
@@ -535,7 +583,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 ============================== -->
 <section ng-hide="!edit_mode && !data.gallery.enabled" class="recap-gallery dark-image-bg gradient-overlay" id="gallery"
          ng-class="{'disabled': data.gallery.enabled == false}">
-  <div ng-if="edit_mode" ng-click="data.gallery.toggleEnabled();"
+  <div ng-if="edit_mode" ng-click="data.gallery.toggleEnabled($event);"
        ng-title="data.gallery.enabled == true ? 'Скрыть блок' : 'Показать блок'"
        class="board-settings-btn mod-show-menu js-show-sidebar not-main" href="#">
     <span class="board-header-btn-text">
@@ -555,7 +603,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
     <span class="board-header-btn-text u-text-underline">Настройки</span></div>
 
   <div class="hidden-overlay">Блок <strong>{{data.gallery.title}}</strong> скрыт, <a href="#"
-                                                                                     ng-click="data.gallery.toggleEnabled();">нажмите
+                                                                                     ng-click="data.gallery.toggleEnabled($event);">нажмите
       здесь</a>, чтобы сделать блок видимым для пользователей
   </div>
 
@@ -583,11 +631,12 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
             <span class="fa fa-remove remove-icon" ng-click="data.gallery.removeItem(key);"></span>
           </div>
 
-          <figure class="recap-gallery-item">
+          <figure class="recap-gallery-item" ng-if="edit_mode">
             <div class="img-scale">
               <img
                 ngf-select=""
                 ngf-drop=""
+                ng-disabled="!edit_mode"
                 ngf-change="data.gallery.itemImageChange($files, $file, $newFiles, $duplicateFiles, $invalidFiles, $event, key)"
                 ng-model="image.image"
                 ngf-no-object-url="true"
@@ -597,7 +646,6 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
                 ngf-multiple="multiple"
                 ngf-pattern="pattern"
                 ngf-accept="acceptSelect"
-                ng-disabled="disabled"
                 ngf-capture="capture"
                 ngf-drag-over-class="dragOverClassObj"
                 ngf-validate="validateObj"
@@ -621,6 +669,22 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
               <h5 class="title-text text-center" contenteditable ng-model="image.title">{{image.title}}</h5>
             </figcaption>
           </figure>
+          <a ng-href="{{image.base64_image || (image.image.$ngfBlobUrl ? image.image.$ngfBlobUrl : image.image)}}"
+             ng-if="!edit_mode" class="lightbox" data-lightbox-gallery="recap" title="{{image.title}}">
+            <figure class="recap-gallery-item">
+              <div class="img-scale">
+                <img
+                  class="drop-box ng-pristine ng-valid img-responsive"
+                  ngf-drop-available="dropAvailable"
+                  ng-src="{{image.base64_image || (image.image.$ngfBlobUrl ? image.image.$ngfBlobUrl : image.image)}}"
+                  alt="{{image.title}}">
+                <!--<img src="images/gallery/event-1.jpg" alt="" class="">-->
+              </div>
+              <figcaption class="recap-title">
+                <h5 class="title-text text-center" contenteditable ng-model="image.title">{{image.title}}</h5>
+              </figcaption>
+            </figure>
+          </a>
         </div> <!-- /END EVENT RECAP -->
 
       </div>
@@ -653,8 +717,10 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 <!-- =========================
      SPONSORS  1
 ============================== -->
-<div ng-hide="!edit_mode && !data.sponsors.enabled" class="sponsors-1 secondary-bg text-center" id="sponsors">
-  <div ng-if="edit_mode" ng-click="data.sponsors.toggleEnabled();"
+<section ng-hide="!edit_mode && !data.sponsors.enabled" class="sponsors-1 secondary-bg text-center"
+         ng-class="{'disabled': data.sponsors.enabled == false}"
+         id="sponsors">
+  <div ng-if="edit_mode" ng-click="data.sponsors.toggleEnabled($event);"
        ng-title="data.sponsors.enabled == true ? 'Скрыть блок' : 'Показать блок'"
        class="board-settings-btn mod-show-menu js-show-sidebar not-main" href="#">
     <span class="board-header-btn-text">
@@ -668,12 +734,14 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
       <span class="fa fa-plus"></span> Добавить логотип
     </span>
   </div>
-  <div ng-if="edit_mode" style="background-color: var(--accent);" class="board-settings-btn mod-show-menu js-show-sidebar" ng-click="data.sponsors.toggleBecomeASponsor()" href="#">
-    <span class="fa" ng-class="{'fa-eye-slash': data.sponsors.become_a_sponsor_enabled, 'fa-eye': !data.sponsors.become_a_sponsor_enabled}"></span>
+  <div ng-if="edit_mode" style="background-color: var(--accent);"
+       class="board-settings-btn mod-show-menu js-show-sidebar" ng-click="data.sponsors.toggleBecomeASponsor()">
+    <span class="fa"
+          ng-class="{'fa-eye-slash': data.sponsors.become_a_sponsor_enabled, 'fa-eye': !data.sponsors.become_a_sponsor_enabled}"></span>
     <span class="board-header-btn-text u-text-underline">{{data.sponsors.toggler_text}}</span></div>
 
-  <div class="hidden-overlay">Блок <strong>{{data.testimonials.title}}</strong> скрыт,
-    <a href="#" ng-click="data.sponsors.toggleEnabled();">нажмите здесь</a>,
+  <div class="hidden-overlay">Блок <strong>{{data.sponsors.title}}</strong> скрыт,
+    <a href="#" ng-click="data.sponsors.toggleEnabled($event);">нажмите здесь</a>,
     чтобы сделать блок видимым для пользователей
   </div>
 
@@ -690,7 +758,8 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
         <img
           ngf-select=""
           ngf-drop=""
-          ngf-change="data.gallery.imageChange($files, $file, $newFiles, $duplicateFiles, $invalidFiles, $event, key)"
+          ng-disabled="!edit_mode"
+          ngf-change="data.sponsors.imageChange($files, $file, $newFiles, $duplicateFiles, $invalidFiles, $event, key)"
           ng-model="item.image"
           ngf-no-object-url="true"
           ngf-model-invalid="invalidFiles"
@@ -698,7 +767,6 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
           ngf-multiple="multiple"
           ngf-pattern="pattern"
           ngf-accept="acceptSelect"
-          ng-disabled="disabled"
           ngf-capture="capture"
           ngf-drag-over-class="dragOverClassObj"
           ngf-validate="validateObj"
@@ -724,7 +792,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
        ng-model="data.sponsors.become_a_sponsor">{{data.sponsors.become_a_sponsor}}</a>
 
   </div>
-</div>
+</section>
 
 
 <!-- =========================
@@ -732,7 +800,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 ============================== -->
 <section ng-hide="!edit_mode && !data.faq.enabled" class="faqs faqs-2 padding-120-60" id="faq"
          ng-class="{'disabled': data.faq.enabled == false}">
-  <div ng-if="edit_mode" ng-click="data.faq.toggleEnabled();"
+  <div ng-if="edit_mode" ng-click="data.faq.toggleEnabled($event);"
        ng-title="data.faq.enabled == true ? 'Скрыть блок' : 'Показать блок'"
        class="board-settings-btn mod-show-menu js-show-sidebar not-main" href="#">
     <span class="board-header-btn-text">
@@ -746,7 +814,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
     </span>
   </div>
   <div class="hidden-overlay">Блок <strong>{{data.faq.title}}</strong> скрыт, <a href="#"
-                                                                                 ng-click="data.faq.toggleEnabled();">нажмите
+                                                                                 ng-click="data.faq.toggleEnabled($event);">нажмите
       здесь</a>, чтобы сделать блок видимым для пользователей
   </div>
 
@@ -784,7 +852,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
 ============================== -->
 <section ng-hide="!edit_mode && !data.map.enabled" class="map-container padding-120-60"
          ng-class="{'disabled': data.map.enabled == false}">
-  <div ng-if="edit_mode" ng-click="data.map.toggleEnabled();"
+  <div ng-if="edit_mode" ng-click="data.map.toggleEnabled($event);"
        ng-title="data.map.enabled == true ? 'Скрыть блок' : 'Показать блок'"
        class="board-settings-btn mod-show-menu js-show-sidebar not-main" href="#">
     <span class="board-header-btn-text">
@@ -792,7 +860,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
     </span>
   </div>
   <div class="hidden-overlay">Блок <strong>{{data.map.title}}</strong> скрыт, <a href="#"
-                                                                                 ng-click="data.map.toggleEnabled();">нажмите
+                                                                                 ng-click="data.map.toggleEnabled($event);">нажмите
       здесь</a>, чтобы сделать блок видимым для пользователей
   </div>
   <div class="container">
@@ -813,15 +881,16 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
     </p>
 
     <ul class="socialize">
-      <li ng-if="data.main.vk_url"><a href="#" target="_blank" ng-href="{{data.main.vk_url}}">
+      <li ng-if="data.main.vk_url"><a href="#" target="_blank" ng-href="/away.php?url={{data.main.vk_url}}">
           <span class="fa fa-vk"></span>
         </a></li>
 
-      <li ng-if="data.main.facebook_url"><a href="#" target="_blank" ng-href="{{data.main.facebook_url}}">
+      <li ng-if="data.main.facebook_url"><a href="#" target="_blank" ng-href="/away.php?url={{data.main.facebook_url}}">
           <span class="fa fa-facebook-official"></span>
         </a></li>
 
-      <li ng-if="data.main.instagram_url"><a href="#" target="_blank" ng-href="{{data.main.instagram_url}}">
+      <li ng-if="data.main.instagram_url"><a href="#" target="_blank"
+                                             ng-href="/away.php?url={{data.main.instagram_url}}">
           <span class="fa fa-instagram"></span>
         </a></li>
     </ul>
@@ -845,7 +914,8 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
       <div class="board-menu-content-frame">
         <div>Прозрачность наложения:</div>
         <div class="range-slider">
-          <input type="range" ng-model="data.overlay_opacity" ng-change="setOverlayOpacity()" class="range-slider__range" min="0" max="100">
+          <input type="range" ng-model="data.overlay_opacity" ng-change="setOverlayOpacity()"
+                 class="range-slider__range" min="0" max="100">
           <span class="range-slider__value">{{data.overlay_opacity}} %</span>
         </div>
         <hr class="board-menu-header-divider">
@@ -868,7 +938,6 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
                  ngf-multiple="multiple"
                  ngf-pattern="pattern"
                  ngf-accept="acceptSelect"
-                 ng-disabled="disabled"
                  ngf-capture="capture"
                  ngf-drag-over-class="dragOverClassObj"
                  ngf-validate="validateObj"
@@ -891,7 +960,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
         </div>
       </div>
     </div>
-    <div style="display: block;">Background recommendations by <a
+    <div style="display: block; font-size: 15px;">Background recommendations by <a
         href="https://unsplash.com/?utm_source=Evendate&utm_medium=referral&utm_campaign=api-credit" target="_blank">Unsplash.com</a>
     </div>
   </div>
@@ -1038,7 +1107,8 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
       <div class="board-menu-content-frame">
         <div>Прозрачность наложения:</div>
         <div class="range-slider">
-          <input type="range" ng-model="data.gallery_overlay_opacity" ng-change="setGalleryOverlayOpacity()" class="range-slider__range" min="0" max="100">
+          <input type="range" ng-model="data.gallery_overlay_opacity" ng-change="setGalleryOverlayOpacity()"
+                 class="range-slider__range" min="0" max="100">
           <span class="range-slider__value">{{data.gallery_overlay_opacity}} %</span>
         </div>
         <hr class="board-menu-header-divider">
@@ -1054,6 +1124,7 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
           <div class="board-backgrounds-section-tile board-backgrounds-photos-tile js-bg-photos">
             <div ngf-select=""
                  ngf-drop=""
+                 ng-disabled="!edit_mode"
                  ngf-no-object-url="true"
                  ng-model="data.gallery_background"
                  ngf-model-invalid="invalidFiles"
@@ -1061,7 +1132,6 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
                  ngf-multiple="multiple"
                  ngf-pattern="pattern"
                  ngf-accept="acceptSelect"
-                 ng-disabled="disabled"
                  ngf-capture="capture"
                  ngf-drag-over-class="dragOverClassObj"
                  ngf-validate="validateObj"
@@ -1091,27 +1161,110 @@ $event = EventsCollection::one($__db, $user, $_REQUEST['id'], array('description
      SCRIPTS
 ============================== -->
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular-sanitize.js"></script>
-<script src="js/md5.min.js"></script>
-<script src="js/jquery-1.11.3.min.js"></script>
-<script src="js/nprogress.js"></script>
-<script src="js/spectrum.js"></script>
-<script src="js/bootstrap.min.js"></script>
-<script src="js/tinymce.min.js"></script>
-<script src="js/angular-tinymce.js"></script>
-<script src="js/color-thief.min.js"></script>
-<script src="js/application.js"></script>
-<script src="js/app.js"></script>
-<script src="js/nivo-lightbox.min.js"></script>
-<script src="js/jquery.scrollTo.min.js"></script>
-<script src="js/jquery.localScroll.min.js"></script>
-<script src="js/jquery.nav.js"></script>
-<script src="js/jquery.fitvids.js"></script>
-<script src="js/matchMedia.js"></script>
-<script src="js/jquery.mixitup.js"></script>
-<script src="js/swiper.jquery.min.js"></script>
-<script src="js/SVGinject.js"></script>
-<script src="js/smoothscroll.js"></script>
+<script src="/event_landing/js/md5.min.js"></script>
+<script src="/event_landing/js/jquery-1.11.3.min.js"></script>
+<script src="/event_landing/js/nprogress.js"></script>
+<script src="/event_landing/js/spectrum.js"></script>
+<script src="/event_landing/js/bootstrap.min.js"></script>
+<script src="/event_landing/js/tinymce.min.js"></script>
+<script src="/event_landing/js/angular-tinymce.js"></script>
+<script src="/event_landing/js/color-thief.min.js"></script>
+<script src="/event_landing/js/application.js"></script>
+<script src="/event_landing/js/app.js"></script>
+<script src="/event_landing/js/nivo-lightbox.min.js"></script>
+<script src="/event_landing/js/jquery.scrollTo.min.js"></script>
+<script src="/event_landing/js/jquery.localScroll.min.js"></script>
+<script src="/event_landing/js/jquery.nav.js"></script>
+<script src="/event_landing/js/jquery.fitvids.js"></script>
+<script src="/event_landing/js/matchMedia.js"></script>
+<script src="/event_landing/js/jquery.mixitup.js"></script>
+<script src="/event_landing/js/swiper.jquery.min.js"></script>
+<script src="/event_landing/js/SVGinject.js"></script>
+<script src="/event_landing/js/smoothscroll.js"></script>
 <script src="http://maps.google.com/maps/api/js?sensor=true&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg"></script>
+
+<!-- Yandex.Metrika counter -->
+<script src="https://mc.yandex.ru/metrika/tag.js" type="text/javascript"></script>
+<script type="text/javascript"> try {
+        window.yaCounter32442130 = new Ya.Metrika2({
+            id: 32442130,
+            clickmap: true,
+            trackLinks: true,
+            accurateTrackBounce: true,
+            webvisor: true,
+            trackHash: true
+        });
+    } catch (e) {
+    } </script>
+<noscript>
+  <div><img src="https://mc.yandex.ru/watch/32442130" style="position:absolute; left:-9999px;" alt=""/></div>
+</noscript> <!-- /Yandex.Metrika counter -->
+
+<?php
+if (isset($l_data['main']['yandex_metrica_id'])) {
+	$ym_id = htmlspecialchars($l_data['main']['yandex_metrica_id']);
+	echo '	<!-- Yandex.Metrika counter -->
+	<script src="https://mc.yandex.ru/metrika/tag.js" type="text/javascript"></script>
+	<script type="text/javascript"> try {
+			window.yaCounter' . $ym_id . ' = new Ya.Metrika2({
+				id: ' . $ym_id . ',
+				clickmap: true,
+				trackLinks: true,
+				accurateTrackBounce: true,
+				webvisor: true,
+				trackHash: true
+			});
+		} catch (e) {
+		} </script>
+	<noscript>
+		<div><img src="https://mc.yandex.ru/watch/' . $ym_id . '" style="position:absolute; left:-9999px;" alt=""/></div>
+	</noscript> <!-- /Yandex.Metrika counter -->';
+}
+if (isset($l_data['main']['google_analytics_id'])) {
+	$ga_id = htmlspecialchars($l_data['main']['google_analytics_id']);
+	echo "<script>
+		(function (i, s, o, g, r, a, m) {
+			i['GoogleAnalyticsObject'] = r;
+			i[r] = i[r] || function () {
+				(i[r].q = i[r].q || []).push(arguments)
+			}, i[r].l = 1 * new Date();
+			a = s.createElement(o),
+				m = s.getElementsByTagName(o)[0];
+			a.async = 1;
+			a.src = g;
+			m.parentNode.insertBefore(a, m)
+		})(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+
+		if (ga) {
+			ga('create', '{$ga_id}', 'auto');
+			ga('send', 'pageview');
+		}
+
+	</script>";
+}
+if (isset($l_data['main']['vk_retargeting_id'])) {
+	$vk_ret_id = htmlspecialchars($l_data['main']['vk_retargeting_id']);
+	echo "<script type=\"text/javascript\">(window.Image ? (new Image()) : document.createElement('img')).src = 'https://vk.com/rtrg?p={$vk_ret_id}';</script>";
+}
+if (isset($l_data['main']['facebook_retargeting_id'])) {
+	$fb_ret_id = htmlspecialchars($l_data['main']['facebook_retargeting_id']);
+	echo "<!-- Facebook Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
+n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
+document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '{$fb_ret_id}'); // Insert your pixel ID here.
+fbq('track', 'PageView');
+</script>
+<noscript><img height=\"1\" width=\"1\" style=\"display:none\"
+src=\"https://www.facebook.com/tr?id={$fb_ret_id}&ev=PageView&noscript=1\"
+/></noscript>
+<!-- DO NOT MODIFY -->
+<!-- End Facebook Pixel Code -->";
+}
+?>
 
 </body>
 </html>

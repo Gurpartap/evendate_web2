@@ -303,6 +303,11 @@ function searchToObject() {
         }
     }
 
+    //if url with alis, not event_id
+    if (!obj.id) {
+        obj.id = window.event_id;
+    }
+
     return obj;
 }
 

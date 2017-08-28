@@ -231,7 +231,7 @@ class Event extends AbstractEntity
 //			AND view_tickets.user_id = :user_id)::INT AS ' . self::ORDERS_COUNT_FIELD_NAME,
 
 		self::SEARCH_SCORE_FIELD_NAME => '(SELECT get_event_search_score(view_events.id)) AS ' . self::SEARCH_SCORE_FIELD_NAME,
-		self::LANDING_DATA_FIELD_NAME => '(SELECT data FROM event_landings WHERE event_id = view_events.id) AS ' . self::LANDING_DATA_FIELD_NAME,
+		self::LANDING_DATA_FIELD_NAME => '(SELECT data FROM event_landings WHERE event_id = view_events.id ORDER BY id, updated_at DESC LIMIT 1 ) AS ' . self::LANDING_DATA_FIELD_NAME,
 		self::IS_SEEN_FIELD_NAME => '(
 		SELECT
 			COUNT(ve.id)
@@ -1938,6 +1938,8 @@ class Event extends AbstractEntity
 			'user',
 			'ticket'
 		);
+		global $ROOT_PATH;
+		if (file_exists($ROOT_PATH . $alias)) throw new InvalidArgumentException('USES_RESERVED_URL');
 		if (in_array($alias, $reserved_names)) throw new InvalidArgumentException('USES_RESERVED_URL');
 		if (is_int($alias)) throw new InvalidArgumentException('USES_RESERVED_URL');
 		if (preg_match('/^([a-zA-Z\-_0-9]+)$/mi', $alias) == false) {
@@ -1970,13 +1972,13 @@ class Event extends AbstractEntity
 		$q_ins_data = App::queryFactory()->newInsert();
 		$q_ins_data->into('event_landings')
 			->cols($cols)
-			->onConflictUpdate(array('event_id', 'url'), $cols)
-		->returning(array('id'));
+			->onConflictUpdate(array('event_id'), $cols)
+			->returning(array('id'));
 
 		$result = $this->db->prepareExecute($q_ins_data);
-		if ($result->rowCount() == 1){
+		if ($result->rowCount() == 1) {
 			return new Result(true, '');
-		}else{
+		} else {
 			return new Result(false, 'Не удалось сохранить данные');
 		}
 	}

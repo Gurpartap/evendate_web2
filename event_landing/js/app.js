@@ -1,4 +1,4 @@
- var __app = angular.module('LandingApp', ['ngFileUpload', 'gridster', 'ui.tinymce', 'ngSanitize']);
+var __app = angular.module('LandingApp', ['ngFileUpload', 'gridster', 'ui.tinymce', 'ngSanitize']);
 
 
 var search_data = searchToObject();
@@ -15,6 +15,7 @@ function guid() {
 }
 
 window.base64_in_progress = 0;
+window.no_saved_data = false;
 
 function handleFileLoadErr(err) {
     console.log(err);
@@ -108,9 +109,13 @@ var backgrounds = [
 __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', function ($scope, Upload, $timeout) {
 
     $scope.edit_mode = search_data.edit;
+    $scope.hide_loader = false;
     $scope.backgrounds = backgrounds;
     var initializing = true;
 
+    $scope.$watch('data', function () {
+        window.no_saved_data = true;
+    }, true);
 
     $scope.data = {
         color_scheme: [0, 205, 175],
@@ -175,18 +180,19 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                 delete this.items[uuid];
             },
             enabled: true,
-            toggleEnabled: function () {
+            toggleEnabled: function ($event) {
                 this.enabled = !this.enabled;
+                $event.preventDefault();
                 return false;
             },
             gridOptions: {
-                columns: 4, // the width of the grid, in columns
-                pushing: true, // whether to push other items out of the way on move or resize
-                floating: true, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
+                columns: 12, // the width of the grid, in columns
+                pushing: false, // whether to push other items out of the way on move or resize
+                floating: false, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
                 swapping: false, // whether or not to have items of the same size switch places instead of pushing down if they are the same size
                 width: 'auto', // can be an integer or 'auto'. 'auto' scales gridster to be the full width of its containing element
                 colWidth: 'auto', // can be an integer or 'auto'.  'auto' uses the pixel width of the element divided by 'columns'
-                rowHeight: '370', // can be an integer or 'match'.  Match uses the colWidth, giving you square widgets.
+                rowHeight: '55', // can be an integer or 'match'.  Match uses the colWidth, giving you square widgets.
                 margins: [50, 10], // the pixel distance between each widget
                 outerMargin: true, // whether margins apply to outer edges of the grid
                 sparse: false, // "true" can increase performance of dragging and resizing for big grid (e.g. 20x50)
@@ -198,16 +204,12 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                 maxRows: 100,
                 defaultSizeX: 1, // the default width of a gridster item, if not specifed
                 defaultSizeY: 1, // the default height of a gridster item, if not specified
-                minSizeX: 1, // minimum column width of an item
+                minSizeX: 3, // minimum column width of an item
                 maxSizeX: null, // maximum column width of an item
-                minSizeY: 1, // minumum row height of an item
+                minSizeY: 7, // minumum row height of an item
                 maxSizeY: null, // maximum row height of an item
                 resizable: {
-                    enabled: false,
-                    // handles: ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'],
-                    // start: function(event, $element, widget) {}, // optional callback fired when resize is started,
-                    // resize: function(event, $element, widget) {}, // optional callback fired when item is resized,
-                    // stop: function(event, $element, widget) {} // optional callback fired when item is finished resizing
+                    enabled: true,
                 },
                 draggable: {
                     enabled: true, // whether dragging items is supported
@@ -253,8 +255,9 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                 delete this.days[day_uuid].items[uuid];
             },
             enabled: true,
-            toggleEnabled: function () {
+            toggleEnabled: function ($event) {
                 this.enabled = !this.enabled;
+                $event.preventDefault();
                 return false;
             },
             itemsGridOptions: {
@@ -290,9 +293,9 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
 
             },
             gridOptions: {
-                columns: 5, // the width of the grid, in columns
-                pushing: true, // whether to push other items out of the way on move or resize
-                floating: true, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
+                columns: 12, // the width of the grid, in columns
+                pushing: false, // whether to push other items out of the way on move or resize
+                floating: false, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
                 swapping: false, // whether or not to have items of the same size switch places instead of pushing down if they are the same size
                 width: 'auto', // can be an integer or 'auto'. 'auto' scales gridster to be the full width of its containing element
                 colWidth: 'auto', // can be an integer or 'auto'.  'auto' uses the pixel width of the element divided by 'columns'
@@ -308,16 +311,12 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                 maxRows: 100,
                 defaultSizeX: 1, // the default width of a gridster item, if not specifed
                 defaultSizeY: 1, // the default height of a gridster item, if not specified
-                minSizeX: 1, // minimum column width of an item
+                minSizeX: 3, // minimum column width of an item
                 maxSizeX: null, // maximum column width of an item
                 minSizeY: 1, // minumum row height of an item
                 maxSizeY: null, // maximum row height of an item
                 resizable: {
-                    enabled: false,
-                    // handles: ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'],
-                    // start: function(event, $element, widget) {}, // optional callback fired when resize is started,
-                    // resize: function(event, $element, widget) {}, // optional callback fired when item is resized,
-                    // stop: function(event, $element, widget) {} // optional callback fired when item is finished resizing
+                    enabled: false
                 },
                 draggable: {
                     enabled: true, // whether dragging items is supported
@@ -349,19 +348,20 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                 delete this.items[uuid];
 
             },
-            toggleEnabled: function () {
+            toggleEnabled: function ($event) {
                 this.enabled = !this.enabled;
+                $event.preventDefault();
                 return false;
             },
             enabled: true,
             gridOptions: {
-                columns: 3, // the width of the grid, in columns
-                pushing: true, // whether to push other items out of the way on move or resize
-                floating: true, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
+                columns: 12, // the width of the grid, in columns
+                pushing: false, // whether to push other items out of the way on move or resize
+                floating: false, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
                 swapping: false, // whether or not to have items of the same size switch places instead of pushing down if they are the same size
                 width: 'auto', // can be an integer or 'auto'. 'auto' scales gridster to be the full width of its containing element
                 colWidth: 'auto', // can be an integer or 'auto'.  'auto' uses the pixel width of the element divided by 'columns'
-                rowHeight: '430', // can be an integer or 'match'.  Match uses the colWidth, giving you square widgets.
+                rowHeight: '55', // can be an integer or 'match'.  Match uses the colWidth, giving you square widgets.
                 margins: [40, 10], // the pixel distance between each widget
                 outerMargin: true, // whether margins apply to outer edges of the grid
                 sparse: false, // "true" can increase performance of dragging and resizing for big grid (e.g. 20x50)
@@ -373,16 +373,12 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                 maxRows: 100,
                 defaultSizeX: 1, // the default width of a gridster item, if not specifed
                 defaultSizeY: 1, // the default height of a gridster item, if not specified
-                minSizeX: 1, // minimum column width of an item
+                minSizeX: 3, // minimum column width of an item
                 maxSizeX: null, // maximum column width of an item
-                minSizeY: 1, // minumum row height of an item
+                minSizeY: 8, // minumum row height of an item
                 maxSizeY: null, // maximum row height of an item
                 resizable: {
-                    enabled: false,
-                    // handles: ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'],
-                    // start: function(event, $element, widget) {}, // optional callback fired when resize is started,
-                    // resize: function(event, $element, widget) {}, // optional callback fired when item is resized,
-                    // stop: function(event, $element, widget) {} // optional callback fired when item is finished resizing
+                    enabled: true
                 },
                 draggable: {
                     enabled: true, // whether dragging items is supported
@@ -393,8 +389,9 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
         custom: {
             title: 'Свой блок',
             subtitle: 'Добавляйте любой HTML, кроме тегов script',
-            toggleEnabled: function () {
+            toggleEnabled: function ($event) {
                 this.enabled = !this.enabled;
+                $event.preventDefault();
                 return false;
             },
             tinymce_options: {
@@ -446,8 +443,9 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
             removeItem: function (item_uuid) {
                 delete this.items[item_uuid];
             },
-            toggleEnabled: function () {
+            toggleEnabled: function ($event) {
                 this.enabled = !this.enabled;
+                $event.preventDefault();
                 return false;
             },
             gridOptions: {
@@ -501,7 +499,8 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                     $scope.data.sponsors.items[item_uuid].image = null;
                 });
             },
-            toggleEnabled: function () {
+            toggleEnabled: function ($event) {
+                $event.preventDefault();
                 this.enabled = !this.enabled;
                 return false;
             },
@@ -523,13 +522,13 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
             },
             become_a_sponsor_enabled: true,
             gridOptions: {
-                columns: 6, // the width of the grid, in columns
+                columns: 12, // the width of the grid, in columns
                 pushing: true, // whether to push other items out of the way on move or resize
                 floating: true, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
                 swapping: false, // whether or not to have items of the same size switch places instead of pushing down if they are the same size
                 width: 'auto', // can be an integer or 'auto'. 'auto' scales gridster to be the full width of its containing element
                 colWidth: 'auto', // can be an integer or 'auto'.  'auto' uses the pixel width of the element divided by 'columns'
-                rowHeight: '100', // can be an integer or 'match'.  Match uses the colWidth, giving you square widgets.
+                rowHeight: '55', // can be an integer or 'match'.  Match uses the colWidth, giving you square widgets.
                 margins: [40, 40], // the pixel distance between each widget
                 outerMargin: true, // whether margins apply to outer edges of the grid
                 sparse: false, // "true" can increase performance of dragging and resizing for big grid (e.g. 20x50)
@@ -543,14 +542,10 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                 defaultSizeY: 1, // the default height of a gridster item, if not specified
                 minSizeX: 1, // minimum column width of an item
                 maxSizeX: null, // maximum column width of an item
-                minSizeY: 1, // minumum row height of an item
+                minSizeY: 2, // minumum row height of an item
                 maxSizeY: null, // maximum row height of an item
                 resizable: {
                     enabled: $scope.edit_mode,
-                    // handles: ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'],
-                    // start: function(event, $element, widget) {}, // optional callback fired when resize is started,
-                    // resize: function(event, $element, widget) {}, // optional callback fired when item is resized,
-                    // stop: function(event, $element, widget) {} // optional callback fired when item is finished resizing
                 },
                 draggable: {
                     enabled: true, // whether dragging items is supported
@@ -574,7 +569,8 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
             removeItem: function (item_uuid) {
                 delete this.items[item_uuid];
             },
-            toggleEnabled: function () {
+            toggleEnabled: function ($event) {
+                $event.preventDefault();
                 this.enabled = !this.enabled;
                 return false;
             },
@@ -656,6 +652,7 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                 data: {data: JSON.stringify($scope.data)},
                 complete: function () {
                     NProgress.done();
+                    window.no_saved_data = false;
                 }
             })
         };
@@ -746,6 +743,8 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
 
     function getBase64(file, cb) {
         if (file instanceof Blob === false) return cb(null, null);
+        window.base64_in_progress++;
+        NProgress.start();
         file.upload = Upload.upload({
             url: '/event_images/landings/',
             data: {file: file, event_id: search_data.id}
@@ -753,6 +752,9 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
 
         file.upload.then(function (response) {
             $timeout(function () {
+                if (--window.base64_in_progress === 0) {
+                    NProgress.done();
+                }
                 cb(null, response.data);
             });
         }, function (response) {
@@ -761,9 +763,8 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
         }, function (evt) {
             file.progress = Math.min(100, parseInt(100.0 *
                 evt.loaded / evt.total));
-            console.log(file.progress);
+            NProgress.set(file.progress / 100);
         });
-
 
 
     }
@@ -792,7 +793,6 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                     $scope.data.tickets.enabled = false;
                 }
                 $scope.$apply();
-                $scope.updateBackgroundSuggests(event.tags);
             } else if (event.landing_data) {
                 var _data = JSON.parse(event.landing_data);
                 $.each(_data, function (key, value) {
@@ -811,9 +811,10 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                 $scope.setOverlayOpacity();
                 var color = $scope.data.color_scheme;
                 $scope.setGlobalColor({r: color[0], g: color[1], b: color[2]});
-                if ($scope.data.main_background){
+                if ($scope.data.main_background) {
                     $scope.setHeaderImage($scope.data.main_background);
-                }if ($scope.data.gallery_background){
+                }
+                if ($scope.data.gallery_background) {
                     $scope.setHeaderImage($scope.data.gallery_background);
                 }
                 $scope.$apply();
@@ -824,8 +825,20 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                     e.preventDefault();
                     return false;
                 });
+                $('.lightbox').nivoLightbox();
+                $scope.data.sponsors.gridOptions.resizable.enabled = false;
+                $scope.data.faq.gridOptions.resizable.enabled = false;
+                $scope.data.speakers.gridOptions.resizable.enabled = false;
+            } else {
+                window.no_saved_data = false;
+                $scope.updateBackgroundSuggests(event.tags);
+                $scope.$apply();
             }
 
+
+            $timeout(function(){
+                $scope.hide_loader = true;
+            });
         }
     });
 
@@ -923,6 +936,14 @@ $(document).ready(function () {
         $panel.addClass('open').animate({'left': '0'})
     });
 
+
+    $(window).on("beforeunload", function (e) {
+        var res = (search_data.edit === 'true' &&  window.no_saved_data)
+            ? "Вы уверены, что хотите закрыть вкладку? Несохраненные данные будут потеряны."
+            : undefined;
+        e.returnValue = res;
+        return res;
+    });
 
 });
 
