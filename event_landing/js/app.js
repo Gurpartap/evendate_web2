@@ -113,6 +113,18 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
     $scope.backgrounds = backgrounds;
     var initializing = true;
 
+    $scope.intro = {
+        steps: [
+            'Добро пожаловать в редактор страницы события. Основная информация о событии уже представлена на странице. Информацию в любом блоке можно редактировать после нажатия на текст.',
+            'Кнопки управления расположены в правом верхнем углу каждой из секций.',
+            'При необходимости секцию с информацией можно скрыть.',
+            'Добавьте блок в секцию.',
+            'Общие настройки страницы расположены в левой панели.',
+            'Цветовое оформление можно выбрать из заранее предопределенных или выбрать любой цвет в палитре',
+            'Изменения вступают в силу для пользователей только после сохранения.'
+        ]
+    };
+
     $scope.$watch('data', function () {
         window.no_saved_data = true;
     }, true);
@@ -152,6 +164,7 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                 getBase64($file, function (err, res) {
                     if (res) {
                         _header.background_base64 = res;
+                        $scope.data.main_background = res;
                     }
                 });
             }
@@ -429,6 +442,7 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                 getBase64($file, function (err, res) {
                     if (res) {
                         _gallery.background_base64 = res;
+                        $scope.data.gallery_background = res;
                     }
                 });
             },
@@ -450,8 +464,8 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
             },
             gridOptions: {
                 columns: 3, // the width of the grid, in columns
-                pushing: true, // whether to push other items out of the way on move or resize
-                floating: true, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
+                pushing: false, // whether to push other items out of the way on move or resize
+                floating: false, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
                 swapping: false, // whether or not to have items of the same size switch places instead of pushing down if they are the same size
                 width: 'auto', // can be an integer or 'auto'. 'auto' scales gridster to be the full width of its containing element
                 colWidth: 'auto', // can be an integer or 'auto'.  'auto' uses the pixel width of the element divided by 'columns'
@@ -793,6 +807,22 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                     $scope.data.tickets.enabled = false;
                 }
                 $scope.$apply();
+                if ($scope.edit_mode) {
+                    $scope.intro_instance = introJs();
+                    $scope.intro_instance.onchange(function (targetElement) {
+                        var current_step = $(targetElement).data('step');
+                        if (current_step == 6 ) {
+                            $('.main-settings-btn').click();
+                        }
+
+                    });
+                    $scope.intro_instance.setOptions({
+                        'nextLabel': 'Вперед',
+                        'prevLabel': 'Назад',
+                        'skipLabel': 'Пропустить',
+                        'doneLabel': 'Закрыть',
+                    });
+                }
             } else if (event.landing_data) {
                 var _data = JSON.parse(event.landing_data);
                 $.each(_data, function (key, value) {
@@ -815,7 +845,7 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                     $scope.setHeaderImage($scope.data.main_background);
                 }
                 if ($scope.data.gallery_background) {
-                    $scope.setHeaderImage($scope.data.gallery_background);
+                    $scope.setGalleryImage($scope.data.gallery_background);
                 }
                 $scope.$apply();
             }
@@ -836,8 +866,9 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
             }
 
 
-            $timeout(function(){
+            $timeout(function () {
                 $scope.hide_loader = true;
+                $scope.intro_instance.start();
             });
         }
     });
@@ -938,7 +969,7 @@ $(document).ready(function () {
 
 
     $(window).on("beforeunload", function (e) {
-        var res = (search_data.edit === 'true' &&  window.no_saved_data)
+        var res = (search_data.edit === 'true' && window.no_saved_data)
             ? "Вы уверены, что хотите закрыть вкладку? Несохраненные данные будут потеряны."
             : undefined;
         e.returnValue = res;

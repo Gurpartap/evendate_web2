@@ -107,6 +107,7 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
   <link rel="stylesheet" href="/event_landing/css/themes/default/default.css"> <!-- Nivo Lightbox -->
   <link rel="stylesheet" href="/event_landing/css/nivo-lightbox.css"> <!-- Nivo Lightbox Theme -->
   <link rel="stylesheet" href="/event_landing/css/nprogress.css">
+  <link rel="stylesheet" href="/event_landing/css/introjs.min.css">
 
   <!-- TYPOGRAPHY -->
   <link rel="stylesheet" id="font-switch" href="/event_landing/css/typography/typography-1.css">
@@ -192,7 +193,7 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
      EVENT HOME 1
 ============================== -->
 <section class="home event-home-1 polygon-bg cover-bg" id="home">
-  <div ng-if="edit_mode" class="board-settings-btn mod-show-menu js-show-sidebar main-btn" href="#"
+  <div data-intro='{{intro.steps[1]}}' data-step="2"  ng-if="edit_mode" class="board-settings-btn mod-show-menu js-show-sidebar main-btn" href="#"
        data-panel-id="header-panel">
     <span class="fa fa-ellipsis-h"></span>
     <span class="board-header-btn-text u-text-underline">Настройки</span></div>
@@ -207,7 +208,7 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
         <p class="heading-pre-suf text-center text-uppercase" contenteditable="true" ng-model="data.header.title">
           {{data.header.title}}</p>
 
-        <h1 class="heading-text" contenteditable ng-model="data.header.subtitle">{{data.header.subtitle}}</h1>
+        <h1 data-intro='{{intro.steps[0]}}' data-step="1" class="heading-text" contenteditable ng-model="data.header.subtitle">{{data.header.subtitle}}</h1>
         <p class="sub-heading" contenteditable ng-model="data.header.location_addresses">
           {{data.header.location_addresses}}</p>
 
@@ -240,7 +241,7 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
 ============================== -->
 <section ng-hide="!edit_mode && !data.speakers.enabled" class="speakers speakers-1 secondary-bg" id="speakers"
          ng-class="{'disabled': data.speakers.enabled == false}">
-  <div ng-if="edit_mode" ng-click="data.speakers.toggleEnabled($event);"
+  <div data-intro='{{intro.steps[2]}}' data-step="3" ng-if="edit_mode" ng-click="data.speakers.toggleEnabled($event);"
        ng-title="data.speakers.enabled == true ? 'Скрыть блок' : 'Показать блок'"
        class="board-settings-btn mod-show-menu js-show-sidebar not-main show-hide-btn" href="#">
     <span class="board-header-btn-text">
@@ -248,7 +249,7 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
             ng-class="{'fa-eye-slash': data.speakers.enabled, 'fa-eye': data.speakers.enabled == false}"></span>
     </span>
   </div>
-  <div ng-if="edit_mode" ng-click="data.speakers.addItem();" title="Добавить блок"
+  <div data-intro='{{intro.steps[3]}}' data-step="4" ng-if="edit_mode" ng-click="data.speakers.addItem();" title="Добавить блок"
        class="not-main board-settings-btn mod-add-block js-show-sidebar not-main" href="#">
     <span class="board-header-btn-text">
       <span class="fa fa-plus"></span> Добавить спикера
@@ -274,7 +275,7 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
     <div class="row">
       <!-- Nav tabs -->
       <ul class="hero-tabs speakers-nav" gridster="data.speakers.gridOptions">
-        <li role="presentation" class="col-md-3 col-sm-6 active" gridster-item="speaker"
+        <li role="presentation" class="col-md-3 col-sm-6 active speaker-item" gridster-item="speaker"
             ng-repeat="(uuid, speaker) in data.speakers.items">
           <div class="item-remover" ng-show="edit_mode">
             <span class="fa fa-bars drag-icon"></span>
@@ -868,7 +869,7 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
   </div>
 </section>
 
-<button type="button" ng-click="saveLandingData();" class="fab" id="fab-save" ng-show="edit_mode"
+<button type="button" ng-click="saveLandingData();" class="fab" id="fab-save" data-intro="{{intro.steps[6]}}" data-step="7" ng-show="edit_mode"
         style="position: fixed; bottom: 50px; right: 50px; border-radius: 500px; background-color: var(--accent)">
   <span class="fa fa-save"></span>
 </button>
@@ -966,7 +967,7 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
   </div>
 </div>
 
-<div class="main-settings-btn" ng-if="edit_mode" data-panel-id="main-settings-panel">
+<div class="main-settings-btn" data-intro="{{intro.steps[4]}}" data-step="5" ng-if="edit_mode" data-panel-id="main-settings-panel">
   <span class="fa fa-cog"></span>
 </div>
 
@@ -998,7 +999,7 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
             </div>
 
             <div class="config-title">Цветовая тема:</div>
-            <ul class="styles">
+            <ul class="styles"  data-intro="{{intro.steps[5]}}" data-step="6">
               <li>
                 <div class="green color" id="green" ng-click="setGlobalColor({r: 0, g: 205, b: 175})">
                 </div>
@@ -1181,6 +1182,7 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
 <script src="/event_landing/js/swiper.jquery.min.js"></script>
 <script src="/event_landing/js/SVGinject.js"></script>
 <script src="/event_landing/js/smoothscroll.js"></script>
+<script src="/event_landing/js/intro.min.js"></script>
 <script src="http://maps.google.com/maps/api/js?sensor=true&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg"></script>
 
 <!-- Yandex.Metrika counter -->
