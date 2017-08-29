@@ -24,6 +24,7 @@ html{
   --transparent: rgba(0, 205, 175, 0);
 
   --overlay-opacity: 0.4;
+  --gallery-opacity: 0.23;
 }
 
 a {
@@ -88,7 +89,7 @@ a {
 }
 /******************** SECTION STYLES ********************/
 .gradient-overlay:before {
-  background-image: linear-gradient(to bottom right, rgba(40, 40, 40, 0.23), rgba(0, 205, 175, 0.23));
+  background-image: linear-gradient(to bottom right, rgba(var(--base-num), var(--gallery-opacity)), rgba(var(--accent-num), var(--gallery-opacity)));
 }
 .transparent-overlay:before {
   background-image: linear-gradient(to bottom right, var(--base-transparent), var(--base-transparent));

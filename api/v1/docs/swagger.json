@@ -3577,6 +3577,9 @@
         "[brand_color]": {
           "type": "string"
         },
+        "[brand_color_accent]": {
+          "type": "string"
+        },
         "[subscription_id]": {
           "type": "integer",
           "format": "int32"

@@ -1,4 +1,7 @@
-var __app = angular.module('LandingApp', ['ngFileUpload', 'gridster', 'ui.tinymce']);
+var __app = angular.module('LandingApp', ['ngFileUpload', 'gridster', 'ui.tinymce', 'ngSanitize']);
+
+
+var search_data = searchToObject();
 
 function guid() {
     function s4() {
@@ -11,17 +14,8 @@ function guid() {
         s4() + '-' + s4() + s4() + s4();
 }
 
-function getBase64(file, cb) {
-    var reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = function () {
-        cb(null, reader.result);
-    };
-    reader.onerror = function (error) {
-        cb(error, null);
-        handleFileLoadErr(error);
-    };
-}
+window.base64_in_progress = 0;
+window.no_saved_data = false;
 
 function handleFileLoadErr(err) {
     console.log(err);
@@ -34,9 +28,9 @@ function rgbToHex(r, g, b) {
         var hex = c.toString(16);
         return hex.length == 1 ? "0" + hex : hex;
     }
+
     return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
-
 
 
 var backgrounds = [
@@ -112,13 +106,28 @@ var backgrounds = [
     }
 ];
 
-__app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope, $timeout) {
+__app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', function ($scope, Upload, $timeout) {
 
-    var search_data = searchToObject();
     $scope.edit_mode = search_data.edit;
+    $scope.hide_loader = false;
     $scope.backgrounds = backgrounds;
     var initializing = true;
 
+    $scope.intro = {
+        steps: [
+            'Добро пожаловать в редактор страницы события. Основная информация о событии уже представлена на странице. Информацию в любом блоке можно редактировать после нажатия на текст.',
+            'Кнопки управления расположены в правом верхнем углу каждой из секций.',
+            'При необходимости секцию с информацией можно скрыть.',
+            'Добавьте блок в секцию.',
+            'Общие настройки страницы расположены в левой панели.',
+            'Цветовое оформление можно выбрать из заранее предопределенных или выбрать любой цвет в палитре',
+            'Изменения вступают в силу для пользователей только после сохранения.'
+        ]
+    };
+
+    $scope.$watch('data', function () {
+        window.no_saved_data = true;
+    }, true);
 
     $scope.data = {
         color_scheme: [0, 205, 175],
@@ -133,6 +142,17 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
             gallery: ''
         },
         main_description: '',
+        main: {
+            url: search_data.id,
+            bad_url: null,
+            vk_url: null,
+            facebook_url: null,
+            instagram_url: null,
+            yandex_metrica_id: null,
+            google_analytics_id: null,
+            vk_retargeting_id: null,
+            facebook_retargeting_id: null
+        },
         header: {
             title: '',
             subtitle: '',
@@ -144,6 +164,7 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
                 getBase64($file, function (err, res) {
                     if (res) {
                         _header.background_base64 = res;
+                        $scope.data.main_background = res;
                     }
                 });
             }
@@ -152,36 +173,39 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
             title: 'Спикеры',
             subtitle: '',
             items: {},
+            imageChange: function ($files, $file, $newFiles, $duplicateFiles, $invalidFiles, $event, item_uuid) {
+                getBase64($file, function (err, res) {
+                    $scope.data.speakers.items[item_uuid].base64_image = res;
+                    $scope.data.speakers.items[item_uuid].image = null;
+                });
+            },
             addItem: function () {
-                var uuid = guid(),
-                    _this = this;
+                var uuid = guid();
                 this.items[uuid] = {
                     name: 'Имя',
                     company_name: 'Название компании',
                     description: 'Описание',
                     image: './images/default.jpg',
-                    uuid: uuid,
-                    remove: function () {
-                        delete _this.items[uuid];
-                    }
+                    uuid: uuid
                 };
-                setTimeout(function () {
-                    updateHeroTabs()
-                }, 200);
+            },
+            removeItem: function (uuid) {
+                delete this.items[uuid];
             },
             enabled: true,
-            toggleEnabled: function () {
+            toggleEnabled: function ($event) {
                 this.enabled = !this.enabled;
+                $event.preventDefault();
                 return false;
             },
             gridOptions: {
-                columns: 4, // the width of the grid, in columns
-                pushing: true, // whether to push other items out of the way on move or resize
-                floating: true, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
+                columns: 12, // the width of the grid, in columns
+                pushing: false, // whether to push other items out of the way on move or resize
+                floating: false, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
                 swapping: false, // whether or not to have items of the same size switch places instead of pushing down if they are the same size
                 width: 'auto', // can be an integer or 'auto'. 'auto' scales gridster to be the full width of its containing element
                 colWidth: 'auto', // can be an integer or 'auto'.  'auto' uses the pixel width of the element divided by 'columns'
-                rowHeight: '370', // can be an integer or 'match'.  Match uses the colWidth, giving you square widgets.
+                rowHeight: '55', // can be an integer or 'match'.  Match uses the colWidth, giving you square widgets.
                 margins: [50, 10], // the pixel distance between each widget
                 outerMargin: true, // whether margins apply to outer edges of the grid
                 sparse: false, // "true" can increase performance of dragging and resizing for big grid (e.g. 20x50)
@@ -193,16 +217,12 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
                 maxRows: 100,
                 defaultSizeX: 1, // the default width of a gridster item, if not specifed
                 defaultSizeY: 1, // the default height of a gridster item, if not specified
-                minSizeX: 1, // minimum column width of an item
+                minSizeX: 3, // minimum column width of an item
                 maxSizeX: null, // maximum column width of an item
-                minSizeY: 1, // minumum row height of an item
+                minSizeY: 7, // minumum row height of an item
                 maxSizeY: null, // maximum row height of an item
                 resizable: {
-                    enabled: false,
-                    // handles: ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'],
-                    // start: function(event, $element, widget) {}, // optional callback fired when resize is started,
-                    // resize: function(event, $element, widget) {}, // optional callback fired when item is resized,
-                    // stop: function(event, $element, widget) {} // optional callback fired when item is finished resizing
+                    enabled: true,
                 },
                 draggable: {
                     enabled: true, // whether dragging items is supported
@@ -216,31 +236,11 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
             days: {},
             days_count: 0,
             addDay: function ($event) {
-                var day_uuid = guid(),
-                    _this = this;
-                _this.days[day_uuid] = {
+                var day_uuid = guid();
+                this.days[day_uuid] = {
                     name: 'День ' + (++this.days_count),
                     items: {},
-                    uuid: day_uuid,
-                    addItem: function () {
-                        var item_uuid = guid(),
-                            _day = this;
-                        _day.items[item_uuid] = {
-                            time: '00:00',
-                            text_1: 'Зал #0',
-                            text_2: 'Спикер #0',
-                            title: 'Заголовок',
-                            description: '',
-                            uuid: item_uuid,
-                            remove: function () {
-                                delete _day.items[item_uuid];
-                            }
-                        };
-                    },
-                    remove: function () {
-                        delete _this.days[day_uuid];
-                        _this.days_count--;
-                    }
+                    uuid: day_uuid
                 };
 
                 setTimeout(function () {
@@ -248,9 +248,29 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
                 }, 200);
                 $event.preventDefault();
             },
+            removeDay: function (uuid) {
+                delete this.days[uuid];
+                this.days_count--;
+            },
+            addDayItem: function (day_uuid) {
+                var item_uuid = guid(),
+                    _day = this.days[day_uuid];
+                _day.items[item_uuid] = {
+                    time: '00:00',
+                    text_1: 'Зал #0',
+                    text_2: 'Спикер #0',
+                    title: 'Заголовок',
+                    description: '',
+                    uuid: item_uuid
+                };
+            },
+            removeDayItem: function (day_uuid, uuid) {
+                delete this.days[day_uuid].items[uuid];
+            },
             enabled: true,
-            toggleEnabled: function () {
+            toggleEnabled: function ($event) {
                 this.enabled = !this.enabled;
+                $event.preventDefault();
                 return false;
             },
             itemsGridOptions: {
@@ -286,9 +306,9 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
 
             },
             gridOptions: {
-                columns: 5, // the width of the grid, in columns
-                pushing: true, // whether to push other items out of the way on move or resize
-                floating: true, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
+                columns: 12, // the width of the grid, in columns
+                pushing: false, // whether to push other items out of the way on move or resize
+                floating: false, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
                 swapping: false, // whether or not to have items of the same size switch places instead of pushing down if they are the same size
                 width: 'auto', // can be an integer or 'auto'. 'auto' scales gridster to be the full width of its containing element
                 colWidth: 'auto', // can be an integer or 'auto'.  'auto' uses the pixel width of the element divided by 'columns'
@@ -304,16 +324,12 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
                 maxRows: 100,
                 defaultSizeX: 1, // the default width of a gridster item, if not specifed
                 defaultSizeY: 1, // the default height of a gridster item, if not specified
-                minSizeX: 1, // minimum column width of an item
+                minSizeX: 3, // minimum column width of an item
                 maxSizeX: null, // maximum column width of an item
                 minSizeY: 1, // minumum row height of an item
                 maxSizeY: null, // maximum row height of an item
                 resizable: {
-                    enabled: false,
-                    // handles: ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'],
-                    // start: function(event, $element, widget) {}, // optional callback fired when resize is started,
-                    // resize: function(event, $element, widget) {}, // optional callback fired when item is resized,
-                    // stop: function(event, $element, widget) {} // optional callback fired when item is finished resizing
+                    enabled: false
                 },
                 draggable: {
                     enabled: true, // whether dragging items is supported
@@ -325,34 +341,41 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
             title: 'Отзывы',
             subtitle: 'Добавляйте отзывы ваших клиентов и их фотографии',
             items: {},
+            imageChange: function ($files, $file, $newFiles, $duplicateFiles, $invalidFiles, $event, item_uuid) {
+                getBase64($file, function (err, res) {
+                    $scope.data.testimonials.items[item_uuid].base64_image = res;
+                    $scope.data.testimonials.items[item_uuid].image = null;
+                });
+            },
             addItem: function () {
-                var item_uuid = guid(),
-                    _scope = this;
-                _scope.items[item_uuid] = {
+                var item_uuid = guid();
+                this.items[item_uuid] = {
                     text: 'Отзыв',
                     name: 'Имя',
                     image: './images/default.jpg',
                     details: 'Компания',
-                    uuid: item_uuid,
-                    remove: function () {
-                        delete _scope.items[item_uuid];
-                    }
+                    uuid: item_uuid
                 };
             },
-            toggleEnabled: function () {
+            removeItem: function (uuid) {
+                delete this.items[uuid];
+
+            },
+            toggleEnabled: function ($event) {
                 this.enabled = !this.enabled;
+                $event.preventDefault();
                 return false;
             },
             enabled: true,
             gridOptions: {
-                columns: 3, // the width of the grid, in columns
-                pushing: true, // whether to push other items out of the way on move or resize
-                floating: true, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
+                columns: 12, // the width of the grid, in columns
+                pushing: false, // whether to push other items out of the way on move or resize
+                floating: false, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
                 swapping: false, // whether or not to have items of the same size switch places instead of pushing down if they are the same size
                 width: 'auto', // can be an integer or 'auto'. 'auto' scales gridster to be the full width of its containing element
                 colWidth: 'auto', // can be an integer or 'auto'.  'auto' uses the pixel width of the element divided by 'columns'
-                rowHeight: '430', // can be an integer or 'match'.  Match uses the colWidth, giving you square widgets.
-                margins: [10, 10], // the pixel distance between each widget
+                rowHeight: '55', // can be an integer or 'match'.  Match uses the colWidth, giving you square widgets.
+                margins: [40, 10], // the pixel distance between each widget
                 outerMargin: true, // whether margins apply to outer edges of the grid
                 sparse: false, // "true" can increase performance of dragging and resizing for big grid (e.g. 20x50)
                 isMobile: false, // stacks the grid items if true
@@ -363,16 +386,12 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
                 maxRows: 100,
                 defaultSizeX: 1, // the default width of a gridster item, if not specifed
                 defaultSizeY: 1, // the default height of a gridster item, if not specified
-                minSizeX: 1, // minimum column width of an item
+                minSizeX: 3, // minimum column width of an item
                 maxSizeX: null, // maximum column width of an item
-                minSizeY: 1, // minumum row height of an item
+                minSizeY: 8, // minumum row height of an item
                 maxSizeY: null, // maximum row height of an item
                 resizable: {
-                    enabled: false,
-                    // handles: ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'],
-                    // start: function(event, $element, widget) {}, // optional callback fired when resize is started,
-                    // resize: function(event, $element, widget) {}, // optional callback fired when item is resized,
-                    // stop: function(event, $element, widget) {} // optional callback fired when item is finished resizing
+                    enabled: true
                 },
                 draggable: {
                     enabled: true, // whether dragging items is supported
@@ -383,8 +402,9 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
         custom: {
             title: 'Свой блок',
             subtitle: 'Добавляйте любой HTML, кроме тегов script',
-            toggleEnabled: function () {
+            toggleEnabled: function ($event) {
                 this.enabled = !this.enabled;
+                $event.preventDefault();
                 return false;
             },
             tinymce_options: {
@@ -409,6 +429,12 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
             title: 'Галлерея',
             subtitle: 'Добавляйте фотографии за прошлые года или фотографии помещений',
             items: {},
+            itemImageChange: function ($files, $file, $newFiles, $duplicateFiles, $invalidFiles, $event, item_uuid) {
+                getBase64($file, function (err, res) {
+                    $scope.data.gallery.items[item_uuid].base64_image = res;
+                    $scope.data.gallery.items[item_uuid].image = null;
+                });
+            },
             enabled: true,
             background_base64: null,
             imageChange: function ($files, $file) {
@@ -416,30 +442,30 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
                 getBase64($file, function (err, res) {
                     if (res) {
                         _gallery.background_base64 = res;
+                        $scope.data.gallery_background = res;
                     }
                 });
             },
             addItem: function () {
-                var item_uuid = guid(),
-                    _scope = this;
-                _scope.items[item_uuid] = {
+                var item_uuid = guid();
+                this.items[item_uuid] = {
                     title: 'Описание изображения',
                     image: './images/default.jpg',
-                    uuid: item_uuid,
-                    remove: function () {
-                        delete _scope.items[item_uuid];
-                    }
+                    uuid: item_uuid
                 };
-
             },
-            toggleEnabled: function () {
+            removeItem: function (item_uuid) {
+                delete this.items[item_uuid];
+            },
+            toggleEnabled: function ($event) {
                 this.enabled = !this.enabled;
+                $event.preventDefault();
                 return false;
             },
             gridOptions: {
                 columns: 3, // the width of the grid, in columns
-                pushing: true, // whether to push other items out of the way on move or resize
-                floating: true, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
+                pushing: false, // whether to push other items out of the way on move or resize
+                floating: false, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
                 swapping: false, // whether or not to have items of the same size switch places instead of pushing down if they are the same size
                 width: 'auto', // can be an integer or 'auto'. 'auto' scales gridster to be the full width of its containing element
                 colWidth: 'auto', // can be an integer or 'auto'.  'auto' uses the pixel width of the element divided by 'columns'
@@ -480,36 +506,43 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
         sponsors: {
             title: 'Партнеры',
             become_a_sponsor: 'Стать партнером',
-            toggleEnabled: function () {
+            toggler_text: 'Убрать кнопку',
+            imageChange: function ($files, $file, $newFiles, $duplicateFiles, $invalidFiles, $event, item_uuid) {
+                getBase64($file, function (err, res) {
+                    $scope.data.sponsors.items[item_uuid].base64_image = res;
+                    $scope.data.sponsors.items[item_uuid].image = null;
+                });
+            },
+            toggleEnabled: function ($event) {
+                $event.preventDefault();
                 this.enabled = !this.enabled;
                 return false;
             },
             items: {},
-            enabled: true,
-            addItem: function () {
-                var item_uuid = guid(),
-                    _scope = this;
-                _scope.items[item_uuid] = {
-                    image: 'images/clients/logo-1-dark.png',
-                    uuid: item_uuid,
-                    remove: function () {
-                        delete _scope.items[item_uuid];
-                    }
-                };
-
-            },
             toggleBecomeASponsor: function () {
                 this.become_a_sponsor_enabled = !this.become_a_sponsor_enabled;
+                this.toggler_text = this.become_a_sponsor_enabled ? 'Убрать кнопку' : 'Показать кнопку';
+            },
+            enabled: true,
+            addItem: function () {
+                var item_uuid = guid();
+                this.items[item_uuid] = {
+                    image: 'images/clients/logo-1-dark.png',
+                    uuid: item_uuid
+                };
+            },
+            removeItem: function (item_uuid) {
+                delete this.items[item_uuid];
             },
             become_a_sponsor_enabled: true,
             gridOptions: {
-                columns: 6, // the width of the grid, in columns
+                columns: 12, // the width of the grid, in columns
                 pushing: true, // whether to push other items out of the way on move or resize
                 floating: true, // whether to automatically float items up so they stack (you can temporarily disable if you are adding unsorted items with ng-repeat)
                 swapping: false, // whether or not to have items of the same size switch places instead of pushing down if they are the same size
                 width: 'auto', // can be an integer or 'auto'. 'auto' scales gridster to be the full width of its containing element
                 colWidth: 'auto', // can be an integer or 'auto'.  'auto' uses the pixel width of the element divided by 'columns'
-                rowHeight: '100', // can be an integer or 'match'.  Match uses the colWidth, giving you square widgets.
+                rowHeight: '55', // can be an integer or 'match'.  Match uses the colWidth, giving you square widgets.
                 margins: [40, 40], // the pixel distance between each widget
                 outerMargin: true, // whether margins apply to outer edges of the grid
                 sparse: false, // "true" can increase performance of dragging and resizing for big grid (e.g. 20x50)
@@ -523,14 +556,10 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
                 defaultSizeY: 1, // the default height of a gridster item, if not specified
                 minSizeX: 1, // minimum column width of an item
                 maxSizeX: null, // maximum column width of an item
-                minSizeY: 1, // minumum row height of an item
+                minSizeY: 2, // minumum row height of an item
                 maxSizeY: null, // maximum row height of an item
                 resizable: {
-                    enabled: true,
-                    // handles: ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'],
-                    // start: function(event, $element, widget) {}, // optional callback fired when resize is started,
-                    // resize: function(event, $element, widget) {}, // optional callback fired when item is resized,
-                    // stop: function(event, $element, widget) {} // optional callback fired when item is finished resizing
+                    enabled: $scope.edit_mode,
                 },
                 draggable: {
                     enabled: true, // whether dragging items is supported
@@ -543,20 +572,19 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
             subtitle: 'Ответы на часто задаваемые вопросы',
             items: {},
             addItem: function () {
-                var item_uuid = guid(),
-                    _this = this;
-
-                _this.items[item_uuid] = ({
+                var item_uuid = guid();
+                this.items[item_uuid] = ({
                     question: 'Вопрос?',
                     answer: 'Ответ на вопрос.',
                     uuid: guid(),
-                    sizeX: 2,
-                    remove: function () {
-                        delete _this.items[item_uuid];
-                    }
+                    sizeX: 2
                 });
             },
-            toggleEnabled: function () {
+            removeItem: function (item_uuid) {
+                delete this.items[item_uuid];
+            },
+            toggleEnabled: function ($event) {
+                $event.preventDefault();
                 this.enabled = !this.enabled;
                 return false;
             },
@@ -585,11 +613,7 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
                 minSizeY: 1, // minumum row height of an item
                 maxSizeY: null, // maximum row height of an item
                 resizable: {
-                    enabled: true,
-                    handles: ['n', 'e', 's', 'w', 'ne', 'se', 'sw', 'nw'],
-                    // start: function(event, $element, widget) {}, // optional callback fired when resize is started,
-                    // resize: function(event, $element, widget) {}, // optional callback fired when item is resized,
-                    // stop: function(event, $element, widget) {} // optional callback fired when item is finished resizing
+                    enabled: $scope.edit_mode,
                 },
                 draggable: {
                     enabled: true, // whether dragging items is supported
@@ -612,6 +636,52 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
             $scope.setHeaderImage($scope.data.main_background.$ngfBlobUrl);
         }
     });
+
+    $scope.checkAlias = function () {
+        if ((/^([a-zA-Z\-_0-9]+)$/gmi.test($scope.data.main.url) === false)
+            || (parseInt($scope.data.main.url) == $scope.data.main.url && $scope.data.main.url != search_data.id)
+        ) {
+            $scope.data.main.bad_url = true;
+            $scope.data.main.bad_url_text = 'В URL допускаются только цифры, латинские буквы, знаки тире и нижнее подчеркивание';
+        } else {
+            $scope.data.main.bad_url = null;
+            $.ajax({
+                url: '/api/v1/events/' + search_data.id + '/landing/url',
+                data: {url: $scope.data.main.url},
+                success: function (res) {
+                    $scope.data.main.bad_url = !res.status;
+                    $scope.data.main.bad_url_text = res.text;
+                    $scope.$apply();
+                }
+            })
+        }
+    };
+
+    $scope.saveLandingData = function () {
+        NProgress.start();
+        var ajaxData = function () {
+            $.ajax({
+                url: '/api/v1/events/' + search_data.id + '/landing/',
+                type: 'POST',
+                data: {data: JSON.stringify($scope.data)},
+                complete: function () {
+                    NProgress.done();
+                    window.no_saved_data = false;
+                }
+            })
+        };
+
+        if (window.base64_in_progress !== 0) {
+            window.save_interval = setInterval(function () {
+                if (window.base64_in_progress !== 0) return;
+                NProgress.inc();
+                ajaxData();
+                clearInterval(window.save_interval);
+            }, 500);
+        } else {
+            ajaxData();
+        }
+    };
 
     $scope.$watch('data.gallery_background', function () {
         if ($scope.data.gallery_background && $scope.data.gallery_background.$ngfBlobUrl) {
@@ -682,14 +752,43 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
 
     $scope.setGalleryOverlayOpacity = function () {
         var html = document.getElementsByTagName('html')[0];
-        html.style.setProperty("--gallery-overlay-opacity", (100 - $scope.data.gallery_overlay_opacity) / 100);
+        html.style.setProperty("--gallery-opacity", (100 - $scope.data.gallery_overlay_opacity) / 100);
     };
 
+    function getBase64(file, cb) {
+        if (file instanceof Blob === false) return cb(null, null);
+        window.base64_in_progress++;
+        NProgress.start();
+        file.upload = Upload.upload({
+            url: '/event_images/landings/',
+            data: {file: file, event_id: search_data.id}
+        });
+
+        file.upload.then(function (response) {
+            $timeout(function () {
+                if (--window.base64_in_progress === 0) {
+                    NProgress.done();
+                }
+                cb(null, response.data);
+            });
+        }, function (response) {
+            if (response.status > 0)
+                alert(response.status + ': ' + response.data);
+        }, function (evt) {
+            file.progress = Math.min(100, parseInt(100.0 *
+                evt.loaded / evt.total));
+            NProgress.set(file.progress / 100);
+        });
+
+
+    }
+
     $.ajax({
-        url: '/api/v1/events/' + search_data['id'] + '?fields=tags,description,ticketing_available,registration_available,landing_data,location,image_horizontal_url,registration_required,registration_locally,organization_name,ticketing_available,registration_available',
+        url: '/api/v1/events/' + search_data['id'] + '?fields=tags,latitude,longitude,description,ticketing_available,registration_available,landing_data,location,image_horizontal_url,registration_required,registration_locally,organization_name,ticketing_available,registration_available',
         success: function (res) {
             var event = res.data[0];
             console.log(event);
+            initMapBig(event);
             if (!event.landing_data) {
                 var colorThief = new ColorThief(),
                     colorSync = colorThief.getColorAsync(event.image_horizontal_url, function (color) {
@@ -699,7 +798,6 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
                 $scope.data.header.title = event.organization_name;
                 $scope.data.header.location_addresses = event.location;
                 $scope.data.main_description = event.description;
-                $scope.data.main_description = event.description;
 
                 if (event.ticketing_available) {
                     $scope.data.tickets.title = 'Купить билеты';
@@ -708,12 +806,70 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
                 } else {
                     $scope.data.tickets.enabled = false;
                 }
-
                 $scope.$apply();
-                $scope.updateBackgroundSuggests(event.tags);
+                if ($scope.edit_mode) {
+                    $scope.intro_instance = introJs();
+                    $scope.intro_instance.onchange(function (targetElement) {
+                        var current_step = $(targetElement).data('step');
+                        if (current_step == 6 ) {
+                            $('.main-settings-btn').click();
+                        }
+
+                    });
+                    $scope.intro_instance.setOptions({
+                        'nextLabel': 'Вперед',
+                        'prevLabel': 'Назад',
+                        'skipLabel': 'Пропустить',
+                        'doneLabel': 'Закрыть',
+                    });
+                }
             } else if (event.landing_data) {
-                $scope.data = event.landing_data;
+                var _data = JSON.parse(event.landing_data);
+                $.each(_data, function (key, value) {
+                    if ($.type(value) === 'object') {
+                        $.each(value, function (key_l2, val_l2) {
+                            if ($.type($scope.data[key][key_l2]) !== 'function' &&
+                                !Array.isArray(val_l2)) {
+                                $scope.data[key][key_l2] = val_l2;
+                            }
+                        });
+                    } else {
+                        $scope.data[key] = value;
+                    }
+                });
+                $scope.setGalleryOverlayOpacity();
+                $scope.setOverlayOpacity();
+                var color = $scope.data.color_scheme;
+                $scope.setGlobalColor({r: color[0], g: color[1], b: color[2]});
+                if ($scope.data.main_background) {
+                    $scope.setHeaderImage($scope.data.main_background);
+                }
+                if ($scope.data.gallery_background) {
+                    $scope.setGalleryImage($scope.data.gallery_background);
+                }
+                $scope.$apply();
             }
+            if (!$scope.edit_mode) {
+                $('[contenteditable]').prop('contenteditable', 'false');
+                $('a[href="#"]').on('click', function (e) {
+                    e.preventDefault();
+                    return false;
+                });
+                $('.lightbox').nivoLightbox();
+                $scope.data.sponsors.gridOptions.resizable.enabled = false;
+                $scope.data.faq.gridOptions.resizable.enabled = false;
+                $scope.data.speakers.gridOptions.resizable.enabled = false;
+            } else {
+                window.no_saved_data = false;
+                $scope.updateBackgroundSuggests(event.tags);
+                $scope.$apply();
+            }
+
+
+            $timeout(function () {
+                $scope.hide_loader = true;
+                $scope.intro_instance.start();
+            });
         }
     });
 
@@ -722,7 +878,10 @@ __app.controller('WholeWorldController', ['$scope', '$timeout', function ($scope
     }
 
     $timeout(function () {
-        evendateWidget.setHeight()
+        evendateWidget.setHeight();
+        $('#evendate-widget-' + search_data.id).get(0).onload = function () {
+            evendateWidget.setColor(rgbToHex($scope.data.color_scheme[0], $scope.data.color_scheme[1], $scope.data.color_scheme[2]));
+        };
     });
 
 }]);
@@ -783,18 +942,23 @@ $(document).ready(function () {
             $panel.animate({'right': '-340'});
         }
 
+        $('#fab-save').animate({right: 50});
+
     });
 
     $('.board-settings-btn.main-btn').on('click', function () {
         $('.board-menu.open .panel-close').click();
         var $panel = $('#' + $(this).data('panel-id'));
         $panel.addClass('open').animate({'right': '0'})
+        $('#fab-save').animate({right: 390});
     });
 
     $('.board-settings-btn.gallery-btn').on('click', function () {
         $('.board-menu.open .panel-close').click();
         var $panel = $('#' + $(this).data('panel-id'));
-        $panel.addClass('open').animate({'right': '0'})
+        $panel.addClass('open').animate({'right': '0'});
+        $('#fab-save').animate({right: 390});
+
     });
 
     $('.main-settings-btn').on('click', function () {
@@ -804,4 +968,13 @@ $(document).ready(function () {
     });
 
 
+    $(window).on("beforeunload", function (e) {
+        var res = (search_data.edit === 'true' && window.no_saved_data)
+            ? "Вы уверены, что хотите закрыть вкладку? Несохраненные данные будут потеряны."
+            : undefined;
+        e.returnValue = res;
+        return res;
+    });
+
 });
+

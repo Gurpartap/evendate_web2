@@ -102,6 +102,15 @@ if (App::$ENV == 'prod' || App::$ENV == 'test') {
 }
 $url = parse_url($_SERVER['REQUEST_URI'])['path'];
 $url_parts = explode('/', $url);
+
+if (count($url_parts) == 2){
+  try{
+    $event_id = EventsCollection::getIdByAlias($__db, $url_parts[1]);
+    require_once './event_landing/index.php';
+    die();
+	}catch(Exception $e){}
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="ru">

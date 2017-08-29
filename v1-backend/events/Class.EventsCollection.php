@@ -85,9 +85,9 @@ class EventsCollection extends AbstractCollection
 					$_organization = OrganizationsCollection::onePrivate($db, $user, $org_id, null, array('privileges'));
 					$getting_personal_events = true;
 				} catch (Exception $e) {
-					if (!isset($filters['ticket']) || $filters['ticket'] instanceof Ticket == false){
+					if (!isset($filters['ticket']) || $filters['ticket'] instanceof Ticket == false) {
 						$_organization = OrganizationsCollection::one($db, $user, $org_id, array('privileges'));
-					}else{
+					} else {
 						$_organization = null;
 						$getting_personal_events = true;
 					}
@@ -743,6 +743,23 @@ class EventsCollection extends AbstractCollection
 		}
 
 		return new Result(true, '', $responses);
+	}
+
+	public static function getIdByAlias(ExtendedPDO $db, string $alias) : int
+	{
+		$q_get_event_id = App::queryFactory()->newSelect();
+		$q_get_event_id->from('event_landings')
+			->cols(array('event_id'))
+			->where('url = ?', $alias)
+			->orderBy(array('updated_at DESC', 'id DESC'))
+			->limit(1);
+
+		if (is_int($alias)){
+			$q_get_event_id->orWhere('event_id = ?', $alias);
+		}
+
+		return $db->prepareExecute($q_get_event_id)->fetchColumn(0);
+
 	}
 
 
