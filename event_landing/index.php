@@ -896,7 +896,7 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
         </a></li>
     </ul>
 
-    <p class="copyright">© <a target="_blank"
+    <p class="copyright"><a target="_blank"
                               href="https://evendate.io/organization/<?= $event['organization_id'] ?>"><?= $event['organization_short_name'] ?></a>
     </p>
     <p class="copyright">© <a target="_blank" href="https://evendate.io">Evendate</a></p>

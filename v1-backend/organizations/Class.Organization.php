@@ -96,6 +96,7 @@ class Organization extends AbstractEntity
 		'city_id',
 		'is_private',
 		'brand_color',
+		'brand_color_accent',
 		'country_id',
 		'city_en_name',
 		'city_local_name',
@@ -590,6 +591,16 @@ class Organization extends AbstractEntity
 		} else {
 			$data['brand_color'] = null;
 		}
+		if (isset($data['brand_color_accent'])) {
+			if (preg_match('/^#[a-f0-9]{6}$/i', $data['brand_color_accent'])) //hex color is valid
+			{
+				//color is valid
+			} else {
+				$data['brand_color_accent'] = null;
+			}
+		} else {
+			$data['brand_color_accent'] = null;
+		}
 
 		if (!isset($data['description'])) throw new InvalidArgumentException('ORGANIZATION_DESCRIPTION_REQUIRED');
 		if (mb_strlen($data['description']) <= 50) throw new InvalidArgumentException('TOO_SHORT_DESCRIPTION');
@@ -683,6 +694,7 @@ class Organization extends AbstractEntity
 				'facebook_url' => $data['facebook_url'],
 				'is_private' => $data['is_private'],
 				'brand_color' => $data['brand_color'],
+				'brand_color_accent' => $data['brand_color_accent'],
 				'email' => $data['email']
 			)
 		);
@@ -816,6 +828,7 @@ class Organization extends AbstractEntity
 				'email' => $data['email'],
 				'is_private' => $data['is_private'],
 				'brand_color' => $data['brand_color'],
+				'brand_color_accent' => $data['brand_color_accent'],
 				'state_id' => self::ORGANIZATION_STATE_SHOWN
 			)
 		);
