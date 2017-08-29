@@ -1,10 +1,10 @@
 <script type="javascript/template" id="tmpl-order-page">
 	<div class="order_page material OrderPage">
 		<fieldset class="OrderFormWrapper">
-			<form class="order_form OrderForm" action="/api/v1/events/{event_id}/orders" method="post">
+			<form class="order_form OrderForm" action="/api/v1/events/{event_id}/orders" method="post" target="_blank">
 				{tickets_selling}
 				{registration}
-				<input class="OrderFormPayload" type="hidden" name="payload">
+				<input class="OrderFormPayload" type="hidden" name="post_data">
 				<footer class="order_page_footer OrderFormFooter -align_center -hidden">
 					<div class="form_unit">
 						<input id="order_agreement" class="form_checkbox Switch" type="checkbox" data-switch_id="order_agreement" required>
@@ -32,7 +32,7 @@
 		</fieldset>
 		<footer class="-align_center">
 			<h4>Связь с техподдержкой:</h4>
-			<p><small><span>Email: </span><a href="mailto:support@evendate.ru">support@evendate.io</a></small></p>
+			<p><small><span>Email: </span><a href="mailto:support@evendate.io">support@evendate.io</a></small></p>
 		</footer>
 	</div>
 </script>
@@ -59,7 +59,7 @@
 <script type="javascript/template" id="tmpl-order-tickets-selling-promocode">
 	<b>Скидка с промокода: {effort}</b>
 	<p class="-text_size_big">
-		<b class="-text_color_primary_80">Итоговоая стоимость: </b>
+		<b class="-text_color_primary_80">Итоговая стоимость: </b>
 		<b class="-text_color_dark_primary"><span class="TicketsTotalSum">{total_sum}</span> ₽</b>
 	</p>
 </script>

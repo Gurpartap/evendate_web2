@@ -14,7 +14,7 @@ SearchPage = extending(Page, (function() {
 	 * @constructs SearchPage
 	 */
 	function SearchPage(search) {
-		Page.apply(this, arguments);
+		Page.call(this);
 		
 		this.page_title = 'Поиск';
 		this.$search_bar_input = $('#search_bar_input');

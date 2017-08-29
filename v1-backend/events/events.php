@@ -87,7 +87,7 @@ $__modules['events'] = array(
 			if (!isset($__request['code']) && !isset($__request['uuid'])) throw new PrivilegesException('BAD_PROMOCODE', $__db);
 			$__request['event_id'] = $event_id;
 
-			try{
+			try {
 				$result = PromocodesCollection::filter($__db,
 					$__user,
 					$__request,
@@ -96,7 +96,7 @@ $__modules['events'] = array(
 					$__order_by ?? array()
 				)->getParams($__user, $__fields);
 				return $result;
-			}catch (Exception $e){
+			} catch (Exception $e) {
 				return new Result(false, 'CANT_FIND_PROMOCODE', null);
 			}
 		},
@@ -112,13 +112,13 @@ $__modules['events'] = array(
 			global $ROOT_PATH;
 			header('Content-type: application/pdf');
 			$filename = 'Evendate-Bill-' . $order->getUUID() . '.pdf';
-			if (isset($__request['download']) && filter_var($__request['download']) == true){
+			if (isset($__request['download']) && filter_var($__request['download']) == true) {
 				header('Content-Disposition: attachment; filename=' . $filename);
 			}
 			header('Pragma: no-cache');
 
 
-			file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/pdf/events/' . $event->getId() .'/orders/' . $uuid);
+			file_get_contents(App::DEFAULT_NODE_LOCATION . '/utils/pdf/events/' . $event->getId() . '/orders/' . $uuid);
 			echo file_get_contents($ROOT_PATH . '/email_files/' . $filename);
 			die();
 		},
@@ -222,6 +222,18 @@ $__modules['events'] = array(
 				$__fields ?? array(),
 				$__pagination,
 				$__order_by ?? array('price'));
+
+		},
+		'{{/(id:[0-9]+)}/landing/url}' => function ($id) use ($__db, $__request, $__user, $__fields, $__pagination, $__order_by) {
+
+			$event = EventsCollection::one(
+				$__db,
+				$__user,
+				intval($id),
+				$__fields);
+
+
+			return $event->checkLandingAlias($__request['url']);
 
 		},
 		'{{/(id:[0-9]+)}}' => function ($id) use ($__db, $__request, $__user, $__fields) {
@@ -385,10 +397,30 @@ $__modules['events'] = array(
 				intval($id),
 				$event_fields);
 
+			if ((!isset($__request['payload']) || !is_array($__request['payload'])) && isset($__request['post_data'])) {
+				$__request['payload'] = json_decode($__request['post_data'], true);
+			}
+
 			if (!isset($__request['payload']) || !isset($__request['payload']['registration_fields']))
 				throw new InvalidArgumentException('REGISTRATION_FIELDS_NOT_FOUND');
 
-			return $event->registerUser($__user, $__request['payload']);
+			$result = $event->registerUser($__user, $__request['payload']);
+			if (isset($__request['payload']['redirect_to_payment']) && $__request['payload']['redirect_to_payment'] == true) {
+				global $BACKEND_FULL_PATH;
+				require "{$BACKEND_FULL_PATH}/events/payment-form.php";
+				die();
+			} else {
+				return $result;
+			}
+		},
+		'{{/(id:[0-9]+)}/landing}' => function ($id) use ($__db, $__request, $__offset, $__length, $__user, $__fields) {
+			$event = EventsCollection::one(
+				$__db,
+				$__user,
+				intval($id),
+				$__fields);
+			$request_data = json_decode($__request['data'], true);
+			return $event->saveLandingData($request_data);
 		},
 		'' => function () use ($__db, $__request, $__user) {
 			if ($__user instanceof User) {
