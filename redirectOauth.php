@@ -40,10 +40,17 @@ require_once 'footer.php';
 
 		link = '/oAuthDone.php?' + params.join('&');
 
-		if (data.mobile == 'true'){
+		if (data.mobile == 'true') {
 			window.location.href = link;
-		}else{
-			window.opener.location.href = link;
+		} else {
+			try {
+				window.opener.location.href = link;
+			} catch (e) {
+				window.opener.postMessage(JSON.stringify({
+					command: 'authDone',
+					data: link
+				}), '*');
+			}
 			window.close();
 		}
 	});

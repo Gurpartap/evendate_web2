@@ -47700,6 +47700,13 @@ sendPostMessage = (function(w) {
 				
 				return sendMessage.setHeight(calcHeight());
 			}
+			case 'authDone': {
+				
+				return !function(auth_done_link) {
+					
+					return w.location.href = auth_done_link;
+				}(resp.data);
+			}
 		}
 	}
 	
