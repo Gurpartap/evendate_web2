@@ -29,15 +29,6 @@ require_once 'footer.php';
 			}
 		}
 
-		try {
-			redirect_to = window.localStorage.getItem('redirect_to');
-			window.localStorage.removeItem('redirect_to');
-		} catch (e) {}
-
-		if (redirect_to) {
-			params.push('redirect_to=' + redirect_to);
-		}
-
 		link = '/oAuthDone.php?' + params.join('&');
 
 		if (data.mobile == 'true') {

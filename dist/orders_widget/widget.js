@@ -37097,7 +37097,6 @@ function tmpl(template_type, items, addTo, direction) {
  * }}
  */
 function parseUri(str, options) {
-	str = decodeURIComponent(str);
 	var o = {
 			strictMode: false,
 			key: ["source","protocol","authority","userInfo","user","password","host","port","relative","path","directory","file","query","anchor"],
@@ -38258,7 +38257,7 @@ function bindCallModal($parent) {
 									}
 								}
 							}
-							modal = new MediaModal(parseUri(url).wo_query, type);
+							modal = new MediaModal(parseUri(decodeURIComponent(url)).wo_query, type);
 							break;
 						}
 						case __C.MODAL_TYPES.CROPPER: {
@@ -44647,20 +44646,43 @@ AuthModal = extending(AbstractModal, (function() {
 		
 		this.modal.find('.AuthButton').each(function() {
 			$(this).on('click', function (e) {
-				var network = $(this).data('auth_network');
+				var network = $(this).data('auth_network'),
+					parsed_url,
+					parsed_redirect,
+					redirect_query,
+					query,
+					url;
+				
 				
 				if (window.yaCounter32442130) {
 					window.yaCounter32442130.reachGoal(network.toUpperCase() + 'AuthStart');
 				}
 				
-				try {
-					window.localStorage.setItem('redirect_to', encodeURIComponent(self.redirect_to));
-				} catch (e) {}
+				if (self.redirect_to) {
+					parsed_url = parseUri(__APP.AUTH_URLS[network]);
+					parsed_redirect = parseUri(decodeURIComponent(parsed_url.queryKey['redirect_uri']));
+					
+					query = Object.keys(parsed_url.queryKey).reduce(function(query, key) {
+						if (key !== 'redirect_uri') {
+							query.push(key + '=' + parsed_url.queryKey[key]);
+						}
+						
+						return query;
+					}, []);
+					redirect_query = parsed_redirect.query.split('&');
+					redirect_query.push('redirect_to=' + self.redirect_to);
+					
+					query.push('redirect_uri=' + encodeURIComponent(parsed_redirect.wo_query + '?' + redirect_query.join('&')));
+					
+					url = parsed_url.wo_query + '?' + query.join('&');
+				} else {
+					url = __APP.AUTH_URLS[network];
+				}
 				
 				if (isNotDesktop()) {
-					window.location.href = __APP.AUTH_URLS[network];
+					window.location.href = url;
 				} else {
-					window.open(__APP.AUTH_URLS[network], network.toUpperCase() + '_AUTH_WINDOW', 'status=1,toolbar=0,menubar=0&height=500,width=700');
+					window.open(url, network.toUpperCase() + '_AUTH_WINDOW', 'status=1,toolbar=0,menubar=0&height=500,width=700');
 				}
 				e.preventDefault();
 			});
@@ -46911,7 +46933,7 @@ OrderPage = extending(Page, (function() {
 					
 					
 					if (is_custom_callback) {
-						parsed_callback = parseUri(callback_url);
+						parsed_callback = parseUri(decodeURIComponent(callback_url));
 						window.location = parsed_callback.wo_query + '?' + 'registration=free&' + parsed_callback.query;
 					} else {
 						__APP.changeState(callback_url);
@@ -47511,7 +47533,7 @@ __APP = {
 		if (page_name) {
 			page_name = page_name.indexOf(base_url) === 0 ? page_name : page_name.indexOf('/') === 0 ? base_url.slice(0,-1) + page_name : base_url + page_name;
 			
-			parsed_uri = parseUri(page_name);
+			parsed_uri = parseUri(decodeURIComponent(page_name));
 			if (soft_change) {
 				History.replaceState({parsed_page_uri: parsed_uri}, '', parsed_uri.path);
 			} else {
