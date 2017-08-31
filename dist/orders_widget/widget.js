@@ -46894,7 +46894,7 @@ OrderPage = extending(Page, (function() {
 				if (result !== false) {
 					result.done(function(data) {
 						
-						Payment.doPayment('order-' + data.order.uuid, callback_url);
+						Payment.doPayment('order-' + data.order.uuid, data.sum, callback_url);
 					})
 				}
 			}
