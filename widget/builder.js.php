@@ -165,6 +165,11 @@ function wrongInitError() { ?>
 			}
 
 			height = function calcHeight(height) {
+				if (parseInt(height) === 0) {
+
+					return 0;
+				}
+
 				if (height != null) {
 					if (+height == height) {
 
@@ -177,6 +182,10 @@ function wrongInitError() { ?>
 
 				return null;
 			}.call(this, height);
+
+			if (height === 0) {
+				return '0px';
+			}
 
 			if (height == null) {
 				return this.sendPostMessage.getHeight();

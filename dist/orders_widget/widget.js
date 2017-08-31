@@ -45400,7 +45400,7 @@ Builder = (function() {
 		function normalizeTag(tag) {
 			return $.extend(true, {}, {
 				name: tag.name.toLowerCase(),
-				page: '/search/' + encodeURIComponent('#' + tag.name.toLowerCase())
+				page: '/search/tag/' + encodeURIComponent(tag.name.toLowerCase())
 			}, props);
 		}
 		

@@ -47,6 +47,20 @@ OrderButton = extending(ActionButton, (function() {
 	
 	OrderButton.prototype.checked_state_class = '-Ordered';
 	
+	OrderButton.prototype.showAuthModal = function() {
+		var modal;
+		
+		if (!(modal = this.data('modal'))) {
+			modal = new AuthModal(location.origin + '/event/' + this.event.id + '/order');
+			this.data('modal', modal);
+		}
+		
+		cookies.removeItem('auth_command');
+		cookies.removeItem('auth_entity_id');
+		
+		return modal.show();
+	};
+	
 	OrderButton.prototype.onClick = function() {
 		var self = this,
 			tickets_fields = ['created_at', 'number', 'ticket_type', 'order'],

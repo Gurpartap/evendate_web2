@@ -41,6 +41,20 @@ SubscribeButton = extending(ActionButton, (function() {
 	
 	SubscribeButton.prototype.checked_state_class = '-Subscribed';
 	
+	SubscribeButton.prototype.showAuthModal = function() {
+		var modal;
+		
+		if (!(modal = this.data('modal'))) {
+			modal = new AuthModal(location.origin + '/organization/' + this.org_id);
+			this.data('modal', modal);
+		}
+		
+		cookies.setItem('auth_command', 'subscribe_to');
+		cookies.setItem('auth_entity_id', this.org_id);
+		
+		return modal.show();
+	};
+	
 	SubscribeButton.prototype.onClick = function() {
 		var self = this;
 		if (self.is_checked) {
