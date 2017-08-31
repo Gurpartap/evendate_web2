@@ -38,7 +38,11 @@
 .order_ticket_type_description {
 	color: #2e3b50;
 	color: var(--color_dark_primary);
+}
 
+.order_ticket_type_description {
+	font-size: 0.875em;
+	white-space: pre-wrap;
 }
 
 .order_ticket_type_price {

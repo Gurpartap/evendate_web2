@@ -41,6 +41,20 @@ AddToFavoriteButton = extending(ActionButton, (function() {
 	
 	AddToFavoriteButton.prototype.checked_state_class = '-Favored';
 	
+	AddToFavoriteButton.prototype.showAuthModal = function() {
+		var modal;
+		
+		if (!(modal = this.data('modal'))) {
+			modal = new AuthModal(location.origin + '/event/' + this.event_id);
+			this.data('modal', modal);
+		}
+		
+		cookies.setItem('auth_command', 'add_to_favorite');
+		cookies.setItem('auth_entity_id', this.event_id);
+		
+		return modal.show();
+	};
+	
 	AddToFavoriteButton.prototype.onClick = function() {
 		var self = this;
 		
