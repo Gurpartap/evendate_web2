@@ -217,7 +217,7 @@ __APP = {
 		History.stateChangeHandled = true;
 		if (page_name) {
 			page_name = page_name.indexOf('/') === 0 ? page_name : '/' + page_name;
-			parsed_uri = parseUri(page_name);
+			parsed_uri = parseUri(decodeURIComponent(page_name));
 			if (soft_change) {
 				History.replaceState({parsed_page_uri: parsed_uri}, '', parsed_uri.path);
 			} else {
