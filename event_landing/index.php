@@ -1183,7 +1183,7 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
 <script src="/event_landing/js/SVGinject.js"></script>
 <script src="/event_landing/js/smoothscroll.js"></script>
 <script src="/event_landing/js/intro.min.js"></script>
-<script src="http://maps.google.com/maps/api/js?sensor=true&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg"></script>
+<script src="https://maps.google.com/maps/api/js?sensor=true&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg"></script>
 
 <!-- Yandex.Metrika counter -->
 <script src="https://mc.yandex.ru/metrika/tag.js" type="text/javascript"></script>
