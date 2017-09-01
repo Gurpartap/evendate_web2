@@ -429,6 +429,18 @@
             "type": "string"
           },
           {
+            "name": "new_separated",
+            "in": "query",
+            "description": "Add type for new organizations",
+            "required": false,
+            "type": "boolean",
+            "enum": [
+              "true",
+              "false"
+            ]
+
+          },
+          {
             "name": "id",
             "in": "query",
             "description": "Organization type ID",

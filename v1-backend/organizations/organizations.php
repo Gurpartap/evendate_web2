@@ -160,7 +160,7 @@ $__modules['organizations'] = array(
 			);
 		},
 		'types' => function () use ($__db, $__request, $__request, $__pagination, $__user, $__fields, $__order_by) {
-			return OrganizationTypesCollection::filter(
+			$result = OrganizationTypesCollection::filter(
 				$__db,
 				$__user,
 				$__request,
@@ -168,6 +168,43 @@ $__modules['organizations'] = array(
 				$__pagination,
 				$__order_by ?? array('order_position', 'id')
 			);
+
+			if (isset($__request['new_separated']) && $result->getStatus() == true) {
+				$data = $result->getData();
+
+				$fields_data = array(
+					'created_at' => 1,
+					'updated_at' => null,
+					'random' => 0,
+					'organizations' => OrganizationsCollection::filter(
+						$__db,
+						$__user,
+						array_merge($__request, array('is_new' => true)),
+						$__fields,
+						$__pagination,
+						Fields::parseOrderBy($__fields['order_by'] ?? 'id')
+					)->getData()
+				);
+				$new_orgs = array(
+					'id' => 0,
+					'name' => 'Новые организации',
+					'order_position' => 0
+				);
+				if (count($fields_data['organizations']) > 0){
+					foreach ($__fields as $key => $field) {
+						if (isset($fields_data[$key])) {
+							$new_orgs[$key] = $fields_data[$key];
+						} elseif (is_string($field) && isset($fields_data[$field])) {
+							$new_orgs[$field] = $fields_data[$field];
+						}
+					}
+					array_unshift($data, $new_orgs);
+				}
+
+				return new Result(true, '', $data);
+			} else {
+				return $result;
+			}
 		},
 		'countries' => function () use ($__db, $__request, $__request, $__pagination, $__user, $__fields, $__order_by) {
 			return CountriesCollection::filter(
@@ -191,13 +228,13 @@ $__modules['organizations'] = array(
 					} else {
 						$ip = $_SERVER['REMOTE_ADDR'];
 					}
-					try{
+					try {
 						$geo_data = @file_get_contents('https://freegeoip.net/json/' . $ip);
 						$geo_data = json_decode($geo_data, true);
 						if (!isset($geo_data['latitude']) || !isset($geo_data['longitude'])) throw new InvalidArgumentException('CANT_GET_GEO_FROM_IP');
 						$__request['latitude'] = $geo_data['latitude'];
 						$__request['longitude'] = $geo_data['longitude'];
-					}catch (Exception $e){
+					} catch (Exception $e) {
 						throw new InvalidArgumentException('CANT_GET_GEO_FROM_IP');
 					}
 				}
