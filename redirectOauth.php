@@ -29,21 +29,19 @@ require_once 'footer.php';
 			}
 		}
 
-		try {
-			redirect_to = window.localStorage.getItem('redirect_to');
-			window.localStorage.removeItem('redirect_to');
-		} catch (e) {}
-
-		if (redirect_to) {
-			params.push('redirect_to=' + redirect_to);
-		}
-
 		link = '/oAuthDone.php?' + params.join('&');
 
-		if (data.mobile == 'true'){
+		if (data.mobile == 'true') {
 			window.location.href = link;
-		}else{
-			window.opener.location.href = link;
+		} else {
+			try {
+				window.opener.location.href = link;
+			} catch (e) {
+				window.opener.postMessage(JSON.stringify({
+					command: 'authDone',
+					data: link
+				}), '*');
+			}
 			window.close();
 		}
 	});

@@ -420,7 +420,7 @@ OrderPage = extending(Page, (function() {
 				if (result !== false) {
 					result.done(function(data) {
 						
-						Payment.doPayment('order-' + data.order.uuid, callback_url);
+						Payment.doPayment('order-' + data.order.uuid, data.order.sum, callback_url);
 					})
 				}
 			}
@@ -437,7 +437,7 @@ OrderPage = extending(Page, (function() {
 					
 					
 					if (is_custom_callback) {
-						parsed_callback = parseUri(callback_url);
+						parsed_callback = parseUri(decodeURIComponent(callback_url));
 						window.location = parsed_callback.wo_query + '?' + 'registration=free&' + parsed_callback.query;
 					} else {
 						__APP.changeState(callback_url);

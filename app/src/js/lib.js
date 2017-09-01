@@ -1235,7 +1235,6 @@ function tmpl(template_type, items, addTo, direction) {
  * }}
  */
 function parseUri(str, options) {
-	str = decodeURIComponent(str);
 	var o = {
 			strictMode: false,
 			key: ["source","protocol","authority","userInfo","user","password","host","port","relative","path","directory","file","query","anchor"],
@@ -2396,7 +2395,7 @@ function bindCallModal($parent) {
 									}
 								}
 							}
-							modal = new MediaModal(parseUri(url).wo_query, type);
+							modal = new MediaModal(parseUri(decodeURIComponent(url)).wo_query, type);
 							break;
 						}
 						case __C.MODAL_TYPES.CROPPER: {
