@@ -66,7 +66,7 @@ CREATE OR REPLACE VIEW view_organizations AS
     organizations.vk_url,
     organizations.email,
     organizations.is_private,
-    organizations.brand_color,
+    organizations.brand_color::VARCHAR,
     organizations.city_id,
     cities.country_id,
     cities.en_name                          AS city_en_name,
@@ -76,7 +76,7 @@ CREATE OR REPLACE VIEW view_organizations AS
     countries.local_name                    AS country_local_name,
     countries.language                      AS country_language,
     countries.language_short                AS country_language_short,
-    organizations.brand_color_accent
+    organizations.brand_color_accent::TEXT
   FROM organizations
     INNER JOIN organization_types ON organization_types.id = organizations.type_id AND organizations.status = TRUE
     INNER JOIN cities ON cities.id = organizations.city_id

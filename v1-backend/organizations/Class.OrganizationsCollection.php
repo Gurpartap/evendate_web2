@@ -174,6 +174,16 @@ class OrganizationsCollection extends AbstractCollection
 					$statement_array[':id'] = $value;
 					break;
 				}
+				case Organization::IS_NEW_FIELD_NAME: {
+					if (filter_var($value, FILTER_VALIDATE_BOOLEAN) == true) {
+						$q_get_organizations->where('(SELECT 
+						id IS NOT NULL AS is_new
+						FROM view_organizations vo
+						WHERE vo.created_at > DATE_PART(\'epoch\', NOW() - INTERVAL \'7 DAY\') 
+						AND vo.id = view_organizations.id) IS NOT NULL');
+					}
+					break;
+				}
 				case (Organization::IS_SUBSCRIBED_FIELD_NAME): {
 					if ($return_one) break;
 					if (!isset($fields[Organization::IS_SUBSCRIBED_FIELD_NAME])) {
@@ -282,7 +292,7 @@ class OrganizationsCollection extends AbstractCollection
 		$organizations = $p_search = $db
 			->prepareExecute($q_get_organizations, '', $statement_array)
 			->fetchAll(PDO::FETCH_CLASS, $instance_class_name);
-		if (isset($should_end_transaction) && $should_end_transaction){
+		if (isset($should_end_transaction) && $should_end_transaction) {
 			$db->commit();
 		}
 
