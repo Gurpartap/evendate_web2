@@ -3916,75 +3916,6 @@ InterestModelsCollection = extending(EntitiesCollection, (function() {
 /**
  * @requires ../../entities/Class.OneEntity.js
  */
-/**
- *
- * @class PromocodeModel
- * @extends OneEntity
- */
-PromocodeModel = extending(OneEntity, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs PromocodeModel
-	 *
-	 * @property {string} ?uuid
-	 * @property {(number|string)} ?event_id
-	 * @property {string} ?code
-	 * @property {boolean} ?is_fixed
-	 * @property {boolean} ?is_percentage
-	 * @property {(number|string)} ?effort
-	 * @property {(number|string)} ?use_limit
-	 * @property {timestamp} ?start_date
-	 * @property {timestamp} ?end_date
-	 * @property {boolean} ?enabled
-	 *
-	 * @property {timestamp} ?created_at
-	 * @property {timestamp} ?updated_at
-	 */
-	function PromocodeModel() {
-		this.uuid = null;
-		this.event_id = null;
-		this.code = null;
-		this.is_fixed = null;
-		this.is_percentage = null;
-		this.effort = null;
-		this.use_limit = null;
-		this.start_date = null;
-		this.end_date = null;
-		this.enabled = null;
-		
-		this.created_at = null;
-		this.updated_at = null;
-	}
-	PromocodeModel.prototype.ID_PROP_NAME = 'uuid';
-	
-	return PromocodeModel;
-}()));
-/**
- * @requires ../../entities/Class.EntitiesCollection.js
- * @requires Class.PromocodeModel.js
- */
-/**
- *
- * @class PromocodeModelsCollection
- * @extends EntitiesCollection
- */
-PromocodeModelsCollection = extending(EntitiesCollection, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs PromocodeModelsCollection
-	 */
-	function PromocodeModelsCollection() {
-		EntitiesCollection.call(this);
-	}
-	PromocodeModelsCollection.prototype.collection_of = PromocodeModel;
-	
-	return PromocodeModelsCollection;
-}()));
-/**
- * @requires ../../entities/Class.OneEntity.js
- */
 
 /**
  * @typedef {object} RegistrationFieldLike
@@ -4196,6 +4127,75 @@ RegistrationSelectFieldValue = (function() {
 	return RegistrationSelectFieldValue;
 }());
 /**
+ * @requires ../../entities/Class.OneEntity.js
+ */
+/**
+ *
+ * @class PromocodeModel
+ * @extends OneEntity
+ */
+PromocodeModel = extending(OneEntity, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs PromocodeModel
+	 *
+	 * @property {string} ?uuid
+	 * @property {(number|string)} ?event_id
+	 * @property {string} ?code
+	 * @property {boolean} ?is_fixed
+	 * @property {boolean} ?is_percentage
+	 * @property {(number|string)} ?effort
+	 * @property {(number|string)} ?use_limit
+	 * @property {timestamp} ?start_date
+	 * @property {timestamp} ?end_date
+	 * @property {boolean} ?enabled
+	 *
+	 * @property {timestamp} ?created_at
+	 * @property {timestamp} ?updated_at
+	 */
+	function PromocodeModel() {
+		this.uuid = null;
+		this.event_id = null;
+		this.code = null;
+		this.is_fixed = null;
+		this.is_percentage = null;
+		this.effort = null;
+		this.use_limit = null;
+		this.start_date = null;
+		this.end_date = null;
+		this.enabled = null;
+		
+		this.created_at = null;
+		this.updated_at = null;
+	}
+	PromocodeModel.prototype.ID_PROP_NAME = 'uuid';
+	
+	return PromocodeModel;
+}()));
+/**
+ * @requires ../../entities/Class.EntitiesCollection.js
+ * @requires Class.PromocodeModel.js
+ */
+/**
+ *
+ * @class PromocodeModelsCollection
+ * @extends EntitiesCollection
+ */
+PromocodeModelsCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs PromocodeModelsCollection
+	 */
+	function PromocodeModelsCollection() {
+		EntitiesCollection.call(this);
+	}
+	PromocodeModelsCollection.prototype.collection_of = PromocodeModel;
+	
+	return PromocodeModelsCollection;
+}()));
+/**
  * @requires ../Class.OneEntity.js
  */
 /**
@@ -4387,6 +4387,147 @@ UsersActivitiesCollection = extending(EntitiesCollection, (function() {
  * @requires ../Class.OneEntity.js
  */
 /**
+ *
+ * @class OneCategory
+ * @extends OneEntity
+ */
+OneCategory = extending(OneEntity, (function() {
+	/**
+	 *
+	 * @param {(string|number)} [category_id]
+	 * @param {boolean} [is_loading_continuous]
+	 * @constructor
+	 * @constructs OneCategory
+	 *
+	 * @property {(number|string)} id
+	 * @property {string} ?name
+	 * @property {number} ?order_position
+	 * @property {OrganizationsCollection} organizations
+	 */
+	function OneCategory(category_id, is_loading_continuous) {
+		this.id = setDefaultValue(category_id, 0);
+		this.name = null;
+		this.order_position = null;
+		this.organizations = new OrganizationsCollection();
+		
+		this.loading = false;
+		if (category_id && is_loading_continuous) {
+			this.loading = true;
+			this.fetchCategory([], function() {
+				this.loading = false;
+				$(window).trigger('fetch.OneCategory');
+			});
+		}
+	}
+	/**
+	 *
+	 * @param {(string|number)} category_id
+	 * @param {AJAXData} data
+	 * @param {AJAXCallback} [success]
+	 * @return {jqPromise}
+	 */
+	OneCategory.fetchCategory = function(category_id, data, success) {
+		return __APP.SERVER.getData('/api/v1/organizations/types', $.extend({}, data, {id: category_id}), success);
+	};
+	/**
+	 *
+	 * @param {(Array|string)} fields
+	 * @param {AJAXCallback} [success]
+	 * @return {jqPromise}
+	 */
+	OneCategory.prototype.fetchCategory = function(fields, success) {
+		var self = this;
+		return this.constructor.fetchCategory(self.id, {fields: fields}, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data[0]);
+			}
+		});
+	};
+	
+	return OneCategory;
+}()));
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.OneCategory.js
+ */
+/**
+ *
+ * @class CategoriesCollection
+ * @extends EntitiesCollection
+ */
+CategoriesCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs CategoriesCollection
+	 */
+	function CategoriesCollection() {
+		EntitiesCollection.call(this);
+	}
+	
+	CategoriesCollection.prototype.collection_of = OneCategory;
+	/**
+	 *
+	 * @param {AJAXData} data
+	 * @param {AJAXCallback} [success]
+	 */
+	CategoriesCollection.fetchCategories = function(data, success) {
+		return __APP.SERVER.getData('/api/v1/organizations/types', data, success);
+	};
+	/**
+	 *
+	 * @param {AJAXData} data
+	 * @param {(number|string)} [length]
+	 * @param {AJAXCallback} [success]
+	 */
+	CategoriesCollection.prototype.fetchCategories = function(data, length, success) {
+		var self = this,
+			ajax_data = $.extend({}, data, {
+				offset: this.length,
+				length: length
+			});
+		return this.constructor.fetchCategories(ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data);
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {AJAXData} categories_ajax_data
+	 * @param {AJAXData} orgs_ajax_data
+	 * @param {(number|string)} [length]
+	 * @param {AJAXCallback} [success]
+	 */
+	CategoriesCollection.prototype.fetchCategoriesWithOrganizations = function(categories_ajax_data, orgs_ajax_data, length, success) {
+		var self = this,
+			ajax_data = $.extend({}, categories_ajax_data, {
+				offset: this.length,
+				length: length
+			}),
+			org_field = 'organizations' + JSON.stringify(__APP.SERVER.validateData(orgs_ajax_data));
+		if (!ajax_data.fields) {
+			ajax_data.fields = [];
+		} else if (!Array.isArray(ajax_data.fields)) {
+			ajax_data.fields = ajax_data.fields.split(',');
+		}
+		ajax_data.fields.push(org_field);
+		return this.constructor.fetchCategories(ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data);
+			}
+		});
+	};
+	
+	return CategoriesCollection;
+}()));
+/**
+ * @requires ../Class.OneEntity.js
+ */
+/**
  * @class OneCity
  * @extends OneEntity
  */
@@ -4572,141 +4713,94 @@ DatesCollection = extending(EntitiesCollection, (function() {
  */
 /**
  *
- * @class OneCategory
+ * @class OneNotification
  * @extends OneEntity
  */
-OneCategory = extending(OneEntity, (function() {
+OneNotification = extending(OneEntity, (function() {
 	/**
 	 *
-	 * @param {(string|number)} [category_id]
-	 * @param {boolean} [is_loading_continuous]
 	 * @constructor
-	 * @constructs OneCategory
+	 * @constructs OneNotification
 	 *
-	 * @property {(number|string)} id
-	 * @property {string} ?name
-	 * @property {number} ?order_position
-	 * @property {OrganizationsCollection} organizations
-	 */
-	function OneCategory(category_id, is_loading_continuous) {
-		this.id = setDefaultValue(category_id, 0);
-		this.name = null;
-		this.order_position = null;
-		this.organizations = new OrganizationsCollection();
-		
-		this.loading = false;
-		if (category_id && is_loading_continuous) {
-			this.loading = true;
-			this.fetchCategory([], function() {
-				this.loading = false;
-				$(window).trigger('fetch.OneCategory');
-			});
-		}
-	}
-	/**
+	 * @property {?string} guid
+	 * @property {?string} uuid
+	 * @property {?(string|number)} event_id
+	 * @property {?timestamp} notification_time
 	 *
-	 * @param {(string|number)} category_id
-	 * @param {AJAXData} data
-	 * @param {AJAXCallback} [success]
-	 * @return {jqPromise}
+	 * @property {?string} notification_type
+	 * @property {?timestamp} sent_time
+	 * @property {?boolean} done
+	 * @property {?timestamp} created_at
+	 * @property {?timestamp} updated_at
 	 */
-	OneCategory.fetchCategory = function(category_id, data, success) {
-		return __APP.SERVER.getData('/api/v1/organizations/types', $.extend({}, data, {id: category_id}), success);
-	};
-	/**
-	 *
-	 * @param {(Array|string)} fields
-	 * @param {AJAXCallback} [success]
-	 * @return {jqPromise}
-	 */
-	OneCategory.prototype.fetchCategory = function(fields, success) {
+	function OneNotification() {
 		var self = this;
-		return this.constructor.fetchCategory(self.id, {fields: fields}, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data[0]);
+		
+		this.uuid = null;
+		this.event_id = null;
+		this.notification_time = null;
+		this.notification_type = null;
+		
+		this.sent_time = null;
+		this.done = null;
+		this.created_at = null;
+		this.updated_at = null;
+		
+		Object.defineProperty(this, OneNotification.prototype.ID_PROP_NAME, {
+			get: function() {
+				return self.uuid || self.notification_type;
 			}
 		});
+	}
+	
+	OneNotification.prototype.ID_PROP_NAME = 'guid';
+	
+	OneNotification.NOTIFICATIN_TYPES = {
+		NOW: 'notification-now',
+		CANCELED: 'notification-event-canceled',
+		CHANGED_DATES: 'notification-event-changed-dates',
+		CHANGED_LOCATION: 'notification-event-changed-location',
+		CHANGED_PRICE: 'notification-event-changed-price',
+		CHANGED_REGISTRATION: 'notification-event-changed-registration',
+		ONE_DAY_REGISTRATION_CLOSE: 'notification-one-day-registration-close',
+		BEFORE_THREE_HOURS: 'notification-before-three-hours',
+		BEFORE_DAY: 'notification-before-day',
+		BEFORE_THREE_DAYS: 'notification-before-three-days',
+		BEFORE_WEEK: 'notification-before-week',
+		BEFORE_QUARTER_OF_HOUR: 'notification-before-quarter-of-hour',
+		CUSTOM: 'notification-custom',
+		REGISTRATION_APPROVED: 'notification-registration-approved',
+		REGISTRATION_CHECKED_OUT: 'notification-registration-checked-out',
+		REGISTRATION_NOT_CHECKED_OUT: 'notification-registration-not-checked-out',
+		REGISTRATION_NOT_APPROVED: 'notification-registration-not-approved',
+		USERS: 'users-notification',
+		ADDITIONAL_FOR_ORGANIZATION: 'notification-additional-for-organization'
 	};
 	
-	return OneCategory;
+	
+	return OneNotification;
 }()));
 /**
  * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneCategory.js
+ * @requires Class.OneNotification.js
  */
 /**
  *
- * @class CategoriesCollection
+ * @class NotificationsCollection
  * @extends EntitiesCollection
  */
-CategoriesCollection = extending(EntitiesCollection, (function() {
+NotificationsCollection = extending(EntitiesCollection, (function() {
 	/**
 	 *
 	 * @constructor
-	 * @constructs CategoriesCollection
+	 * @constructs NotificationsCollection
 	 */
-	function CategoriesCollection() {
+	function NotificationsCollection() {
 		EntitiesCollection.call(this);
 	}
+	NotificationsCollection.prototype.collection_of = OneNotification;
 	
-	CategoriesCollection.prototype.collection_of = OneCategory;
-	/**
-	 *
-	 * @param {AJAXData} data
-	 * @param {AJAXCallback} [success]
-	 */
-	CategoriesCollection.fetchCategories = function(data, success) {
-		return __APP.SERVER.getData('/api/v1/organizations/types', data, success);
-	};
-	/**
-	 *
-	 * @param {AJAXData} data
-	 * @param {(number|string)} [length]
-	 * @param {AJAXCallback} [success]
-	 */
-	CategoriesCollection.prototype.fetchCategories = function(data, length, success) {
-		var self = this,
-			ajax_data = $.extend({}, data, {
-				offset: this.length,
-				length: length
-			});
-		return this.constructor.fetchCategories(ajax_data, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data);
-			}
-		});
-	};
-	/**
-	 *
-	 * @param {AJAXData} categories_ajax_data
-	 * @param {AJAXData} orgs_ajax_data
-	 * @param {(number|string)} [length]
-	 * @param {AJAXCallback} [success]
-	 */
-	CategoriesCollection.prototype.fetchCategoriesWithOrganizations = function(categories_ajax_data, orgs_ajax_data, length, success) {
-		var self = this,
-			ajax_data = $.extend({}, categories_ajax_data, {
-				offset: this.length,
-				length: length
-			}),
-			org_field = 'organizations' + JSON.stringify(__APP.SERVER.validateData(orgs_ajax_data));
-		if (!ajax_data.fields) {
-			ajax_data.fields = [];
-		} else if (!Array.isArray(ajax_data.fields)) {
-			ajax_data.fields = ajax_data.fields.split(',');
-		}
-		ajax_data.fields.push(org_field);
-		return this.constructor.fetchCategories(ajax_data, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data);
-			}
-		});
-	};
-	
-	return CategoriesCollection;
+	return NotificationsCollection;
 }()));
 /**
  * @requires ../Class.OneEntity.js
@@ -6639,100 +6733,6 @@ UsersCollection = extending(EntitiesCollection, (function() {
 
 /**
  * @requires ../Class.OneEntity.js
- */
-/**
- *
- * @class OneNotification
- * @extends OneEntity
- */
-OneNotification = extending(OneEntity, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs OneNotification
-	 *
-	 * @property {?string} guid
-	 * @property {?string} uuid
-	 * @property {?(string|number)} event_id
-	 * @property {?timestamp} notification_time
-	 *
-	 * @property {?string} notification_type
-	 * @property {?timestamp} sent_time
-	 * @property {?boolean} done
-	 * @property {?timestamp} created_at
-	 * @property {?timestamp} updated_at
-	 */
-	function OneNotification() {
-		var self = this;
-		
-		this.uuid = null;
-		this.event_id = null;
-		this.notification_time = null;
-		this.notification_type = null;
-		
-		this.sent_time = null;
-		this.done = null;
-		this.created_at = null;
-		this.updated_at = null;
-		
-		Object.defineProperty(this, OneNotification.prototype.ID_PROP_NAME, {
-			get: function() {
-				return self.uuid || self.notification_type;
-			}
-		});
-	}
-	
-	OneNotification.prototype.ID_PROP_NAME = 'guid';
-	
-	OneNotification.NOTIFICATIN_TYPES = {
-		NOW: 'notification-now',
-		CANCELED: 'notification-event-canceled',
-		CHANGED_DATES: 'notification-event-changed-dates',
-		CHANGED_LOCATION: 'notification-event-changed-location',
-		CHANGED_PRICE: 'notification-event-changed-price',
-		CHANGED_REGISTRATION: 'notification-event-changed-registration',
-		ONE_DAY_REGISTRATION_CLOSE: 'notification-one-day-registration-close',
-		BEFORE_THREE_HOURS: 'notification-before-three-hours',
-		BEFORE_DAY: 'notification-before-day',
-		BEFORE_THREE_DAYS: 'notification-before-three-days',
-		BEFORE_WEEK: 'notification-before-week',
-		BEFORE_QUARTER_OF_HOUR: 'notification-before-quarter-of-hour',
-		CUSTOM: 'notification-custom',
-		REGISTRATION_APPROVED: 'notification-registration-approved',
-		REGISTRATION_CHECKED_OUT: 'notification-registration-checked-out',
-		REGISTRATION_NOT_CHECKED_OUT: 'notification-registration-not-checked-out',
-		REGISTRATION_NOT_APPROVED: 'notification-registration-not-approved',
-		USERS: 'users-notification',
-		ADDITIONAL_FOR_ORGANIZATION: 'notification-additional-for-organization'
-	};
-	
-	
-	return OneNotification;
-}()));
-/**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneNotification.js
- */
-/**
- *
- * @class NotificationsCollection
- * @extends EntitiesCollection
- */
-NotificationsCollection = extending(EntitiesCollection, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs NotificationsCollection
-	 */
-	function NotificationsCollection() {
-		EntitiesCollection.call(this);
-	}
-	NotificationsCollection.prototype.collection_of = OneNotification;
-	
-	return NotificationsCollection;
-}()));
-/**
- * @requires ../Class.OneEntity.js
  * @requires ../date/Class.DatesCollection.js
  * @requires ../tag/Class.TagsCollection.js
  * @requires ../order/Class.AbstractEventOrdersCollection.js
@@ -8521,6 +8521,247 @@ RegistrationFieldsCollection = extending(EntitiesCollection, (function() {
 	return RegistrationFieldsCollection;
 }()));
 /**
+ * @typedef {object} StatisticsUnit
+ * @property {number} time_value
+ * @property {number} value
+ */
+/**
+ * @typedef {StatisticsUnit} StatisticsConversionUnit
+ * @property {number} to
+ * @property {number} with
+ */
+/**
+ * @typedef {object} StatisticsAudience
+ * @property {Array<{name: {string}, count: {number}}>} devices
+ * @property {Array<{gender: {?string}, count: {number}}>} gender
+ */
+/**
+ * @typedef {object} StatisticsStdData
+ * @property {Statistics.SCALES} [scale]
+ * @property {string} [since]
+ * @property {string} [till]
+ */
+/**
+ * @abstract
+ * @class Statistics
+ * @implements EntityInterface
+ */
+Statistics = (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs Statistics
+	 *
+	 * @property {(number|string)} id
+	 * @property {Statistics.ENTITIES} entity
+	 * @property {Array<StatisticsUnit>} view
+	 * @property {Array<StatisticsUnit>} fave
+	 * @property {Array<StatisticsUnit>} unfave
+	 * @property {Array<StatisticsUnit>} notifications_sent
+	 * @property {Array<StatisticsUnit>} notifications_sent
+	 * @property {Object} dynamics
+	 * @property  {Array<StatisticsUnit>} dynamics.view
+	 * @property  {Array<StatisticsUnit>} dynamics.fave
+	 */
+	function Statistics() {
+		this.id = 0;
+		this.entity = null;
+		this.view = [];
+		this.fave = [];
+		this.unfave = [];
+		this.notifications_sent = [];
+		
+		this.dynamics = {
+			view: [],
+			fave: []
+		};
+	}
+	/**
+	 *
+	 * @param {(Array|object)} data
+	 * @returns {Statistics}
+	 */
+	Statistics.prototype.setData = function(data) {
+		return $.extend(true, this, (data instanceof Array) ? data[0] : data);
+	};
+	/**
+	 * @const
+	 * @enum {string}
+	 */
+	Statistics.SCALES = {
+		MINUTE: 'minute',
+		HOUR: 'hour',
+		DAY: 'day',
+		WEEK: 'week',
+		MONTH: 'month',
+		YEAR: 'year',
+		OVERALL: 'overall'
+	};
+	/**
+	 * @const
+	 * @enum {string}
+	 */
+	Statistics.ENTITIES = {
+		EVENT: 'events',
+		ORGANIZATION: 'organizations'
+	};
+	/**
+	 * @static
+	 * @param {Statistics.ENTITIES} entity
+	 * @param {(string|number)} id
+	 * @param {Statistics.SCALES} scale
+	 * @param {(string|object|boolean)} range
+	 * @param {string} range.since
+	 * @param {string} [range.till]
+	 * @param {(Array<string>|object<string, StatisticsStdData>)} statistics_fields
+	 * @param {?StatisticsStdData} [dynamics_ajax_data]
+	 * @param {(Array<string>|string)} [dynamics_ajax_data.fields]
+	 * @param {function} [success]
+	 * @return {jqPromise}
+	 */
+	Statistics.fetchStatistics = function(entity, id, scale, range, statistics_fields, dynamics_ajax_data, success) {
+		var data = {
+			scale: scale,
+			fields: []
+		};
+		if (statistics_fields instanceof Array) {
+			data.fields = data.fields.concat(statistics_fields);
+		} else {
+			$.each(statistics_fields, function(field, options) {
+				if (Object.getOwnPropertyNames(options).length) {
+					data.fields.push(field + JSON.stringify(options));
+				} else {
+					data.fields.push(field);
+				}
+			});
+		}
+		if (dynamics_ajax_data) {
+			data.fields.push('dynamics' + JSON.stringify(__APP.SERVER.validateData(dynamics_ajax_data)));
+		}
+		
+		switch (typeof range) {
+			case 'string': {
+				if (range) data.since = range;
+				break;
+			}
+			case 'object': {
+				if (range.since) data.since = range.since;
+				if (range.till) data.till = range.till;
+				break;
+			}
+			default:
+			case 'boolean': break;
+		}
+		
+		return __APP.SERVER.getData('/api/v1/statistics/' + entity + '/' + id, data, success);
+	};
+	/**
+	 *
+	 * @param {Statistics.SCALES} scale
+	 * @param {(string|object|boolean)} range
+	 * @param {string} range.since
+	 * @param {string} [range.till]
+	 * @param {object<string, StatisticsStdData>} statistics_fields
+	 * @param {?object} dynamics_ajax_data
+	 * @param {Statistics.SCALES} [dynamics_ajax_data.scale]
+	 * @param {string} [dynamics_ajax_data.since]
+	 * @param {string} [dynamics_ajax_data.till]
+	 * @param {function} [success]
+	 * @return {jqPromise}
+	 */
+	Statistics.prototype.fetchStatistics = function(scale, range, statistics_fields, dynamics_ajax_data, success) {
+		var self = this;
+		return Statistics.fetchStatistics(this.entity, this.id, scale, range, statistics_fields, dynamics_ajax_data, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, data);
+			}
+		});
+	};
+	
+	return Statistics;
+}());
+/**
+ * @requires Class.Statistics.js
+ */
+/**
+ *
+ * @class EventStatistics
+ * @extends Statistics
+ */
+EventStatistics = extending(Statistics, (function() {
+	/**
+	 *
+	 * @param {(string|number)} event_id
+	 * @constructor
+	 * @constructs EventStatistics
+	 *
+	 * @property {Array<StatisticsUnit>} open_site
+	 * @property {Array<StatisticsUnit>} view_detail
+	 * @property {Array<StatisticsConversionUnit>} open_conversion
+	 * @property {Array<StatisticsConversionUnit>} fave_conversion
+	 * @property {Object} dynamics
+	 * @property  {Array<StatisticsConversionUnit>} dynamics.fave_conversion
+	 * @property  {Array<StatisticsConversionUnit>} dynamics.open_conversion
+	 */
+	function EventStatistics(event_id) {
+		Statistics.apply(this);
+		
+		this.id = event_id;
+		this.entity = Statistics.ENTITIES.EVENT;
+		
+		this.open_site = [];
+		this.view_detail = [];
+		
+		this.open_conversion = [];
+		this.fave_conversion = [];
+		this.dynamics.fave_conversion = [];
+		this.dynamics.open_conversion = [];
+	}
+	
+	return EventStatistics;
+}()));
+/**
+ * @requires Class.Statistics.js
+ */
+/**
+ *
+ * @class OrganizationsStatistics
+ * @extends Statistics
+ */
+OrganizationsStatistics = extending(Statistics, (function() {
+	/**
+	 *
+	 * @param {(string|number)} organization_id
+	 * @constructor
+	 * @constructs OrganizationsStatistics
+	 *
+	 * @property {Array<StatisticsUnit>} subscribe
+	 * @property {Array<StatisticsUnit>} unsubscribe
+	 * @property {Array<StatisticsConversionUnit>} conversion
+	 * @property {StatisticsAudience} audience
+	 * @property {Object} dynamics
+	 * @property  {Array<StatisticsUnit>} dynamics.subscribe
+	 * @property  {Array<StatisticsConversionUnit>} dynamics.conversion
+	 */
+	function OrganizationsStatistics(organization_id) {
+		Statistics.apply(this);
+		
+		this.id = organization_id;
+		this.entity = Statistics.ENTITIES.ORGANIZATION;
+		
+		this.subscribe = [];
+		this.unsubscribe = [];
+		this.conversion = [];
+		this.audience = {};
+		
+		this.dynamics.subscribe = [];
+		this.dynamics.conversion = [];
+	}
+	
+	return OrganizationsStatistics;
+}()));
+/**
  * @requires ../Class.OneEntity.js
  */
 /**
@@ -9016,247 +9257,6 @@ MyTicketsCollection = extending(ExtendedTicketsCollection, (function() {
 	
 	return MyTicketsCollection;
 }())); 
-/**
- * @typedef {object} StatisticsUnit
- * @property {number} time_value
- * @property {number} value
- */
-/**
- * @typedef {StatisticsUnit} StatisticsConversionUnit
- * @property {number} to
- * @property {number} with
- */
-/**
- * @typedef {object} StatisticsAudience
- * @property {Array<{name: {string}, count: {number}}>} devices
- * @property {Array<{gender: {?string}, count: {number}}>} gender
- */
-/**
- * @typedef {object} StatisticsStdData
- * @property {Statistics.SCALES} [scale]
- * @property {string} [since]
- * @property {string} [till]
- */
-/**
- * @abstract
- * @class Statistics
- * @implements EntityInterface
- */
-Statistics = (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs Statistics
-	 *
-	 * @property {(number|string)} id
-	 * @property {Statistics.ENTITIES} entity
-	 * @property {Array<StatisticsUnit>} view
-	 * @property {Array<StatisticsUnit>} fave
-	 * @property {Array<StatisticsUnit>} unfave
-	 * @property {Array<StatisticsUnit>} notifications_sent
-	 * @property {Array<StatisticsUnit>} notifications_sent
-	 * @property {Object} dynamics
-	 * @property  {Array<StatisticsUnit>} dynamics.view
-	 * @property  {Array<StatisticsUnit>} dynamics.fave
-	 */
-	function Statistics() {
-		this.id = 0;
-		this.entity = null;
-		this.view = [];
-		this.fave = [];
-		this.unfave = [];
-		this.notifications_sent = [];
-		
-		this.dynamics = {
-			view: [],
-			fave: []
-		};
-	}
-	/**
-	 *
-	 * @param {(Array|object)} data
-	 * @returns {Statistics}
-	 */
-	Statistics.prototype.setData = function(data) {
-		return $.extend(true, this, (data instanceof Array) ? data[0] : data);
-	};
-	/**
-	 * @const
-	 * @enum {string}
-	 */
-	Statistics.SCALES = {
-		MINUTE: 'minute',
-		HOUR: 'hour',
-		DAY: 'day',
-		WEEK: 'week',
-		MONTH: 'month',
-		YEAR: 'year',
-		OVERALL: 'overall'
-	};
-	/**
-	 * @const
-	 * @enum {string}
-	 */
-	Statistics.ENTITIES = {
-		EVENT: 'events',
-		ORGANIZATION: 'organizations'
-	};
-	/**
-	 * @static
-	 * @param {Statistics.ENTITIES} entity
-	 * @param {(string|number)} id
-	 * @param {Statistics.SCALES} scale
-	 * @param {(string|object|boolean)} range
-	 * @param {string} range.since
-	 * @param {string} [range.till]
-	 * @param {(Array<string>|object<string, StatisticsStdData>)} statistics_fields
-	 * @param {?StatisticsStdData} [dynamics_ajax_data]
-	 * @param {(Array<string>|string)} [dynamics_ajax_data.fields]
-	 * @param {function} [success]
-	 * @return {jqPromise}
-	 */
-	Statistics.fetchStatistics = function(entity, id, scale, range, statistics_fields, dynamics_ajax_data, success) {
-		var data = {
-			scale: scale,
-			fields: []
-		};
-		if (statistics_fields instanceof Array) {
-			data.fields = data.fields.concat(statistics_fields);
-		} else {
-			$.each(statistics_fields, function(field, options) {
-				if (Object.getOwnPropertyNames(options).length) {
-					data.fields.push(field + JSON.stringify(options));
-				} else {
-					data.fields.push(field);
-				}
-			});
-		}
-		if (dynamics_ajax_data) {
-			data.fields.push('dynamics' + JSON.stringify(__APP.SERVER.validateData(dynamics_ajax_data)));
-		}
-		
-		switch (typeof range) {
-			case 'string': {
-				if (range) data.since = range;
-				break;
-			}
-			case 'object': {
-				if (range.since) data.since = range.since;
-				if (range.till) data.till = range.till;
-				break;
-			}
-			default:
-			case 'boolean': break;
-		}
-		
-		return __APP.SERVER.getData('/api/v1/statistics/' + entity + '/' + id, data, success);
-	};
-	/**
-	 *
-	 * @param {Statistics.SCALES} scale
-	 * @param {(string|object|boolean)} range
-	 * @param {string} range.since
-	 * @param {string} [range.till]
-	 * @param {object<string, StatisticsStdData>} statistics_fields
-	 * @param {?object} dynamics_ajax_data
-	 * @param {Statistics.SCALES} [dynamics_ajax_data.scale]
-	 * @param {string} [dynamics_ajax_data.since]
-	 * @param {string} [dynamics_ajax_data.till]
-	 * @param {function} [success]
-	 * @return {jqPromise}
-	 */
-	Statistics.prototype.fetchStatistics = function(scale, range, statistics_fields, dynamics_ajax_data, success) {
-		var self = this;
-		return Statistics.fetchStatistics(this.entity, this.id, scale, range, statistics_fields, dynamics_ajax_data, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, data);
-			}
-		});
-	};
-	
-	return Statistics;
-}());
-/**
- * @requires Class.Statistics.js
- */
-/**
- *
- * @class EventStatistics
- * @extends Statistics
- */
-EventStatistics = extending(Statistics, (function() {
-	/**
-	 *
-	 * @param {(string|number)} event_id
-	 * @constructor
-	 * @constructs EventStatistics
-	 *
-	 * @property {Array<StatisticsUnit>} open_site
-	 * @property {Array<StatisticsUnit>} view_detail
-	 * @property {Array<StatisticsConversionUnit>} open_conversion
-	 * @property {Array<StatisticsConversionUnit>} fave_conversion
-	 * @property {Object} dynamics
-	 * @property  {Array<StatisticsConversionUnit>} dynamics.fave_conversion
-	 * @property  {Array<StatisticsConversionUnit>} dynamics.open_conversion
-	 */
-	function EventStatistics(event_id) {
-		Statistics.apply(this);
-		
-		this.id = event_id;
-		this.entity = Statistics.ENTITIES.EVENT;
-		
-		this.open_site = [];
-		this.view_detail = [];
-		
-		this.open_conversion = [];
-		this.fave_conversion = [];
-		this.dynamics.fave_conversion = [];
-		this.dynamics.open_conversion = [];
-	}
-	
-	return EventStatistics;
-}()));
-/**
- * @requires Class.Statistics.js
- */
-/**
- *
- * @class OrganizationsStatistics
- * @extends Statistics
- */
-OrganizationsStatistics = extending(Statistics, (function() {
-	/**
-	 *
-	 * @param {(string|number)} organization_id
-	 * @constructor
-	 * @constructs OrganizationsStatistics
-	 *
-	 * @property {Array<StatisticsUnit>} subscribe
-	 * @property {Array<StatisticsUnit>} unsubscribe
-	 * @property {Array<StatisticsConversionUnit>} conversion
-	 * @property {StatisticsAudience} audience
-	 * @property {Object} dynamics
-	 * @property  {Array<StatisticsUnit>} dynamics.subscribe
-	 * @property  {Array<StatisticsConversionUnit>} dynamics.conversion
-	 */
-	function OrganizationsStatistics(organization_id) {
-		Statistics.apply(this);
-		
-		this.id = organization_id;
-		this.entity = Statistics.ENTITIES.ORGANIZATION;
-		
-		this.subscribe = [];
-		this.unsubscribe = [];
-		this.conversion = [];
-		this.audience = {};
-		
-		this.dynamics.subscribe = [];
-		this.dynamics.conversion = [];
-	}
-	
-	return OrganizationsStatistics;
-}()));
 /**
  * @requires Class.AbstractEventTicketsCollection.js
  */
@@ -12985,6 +12985,231 @@ SubscriptionsListModal = extending(AbstractListModal, (function() {
  * @requires ../Class.AbstractModal.js
  */
 /**
+ * @class PreviewRegistrationModal
+ * @extends AbstractModal
+ */
+PreviewRegistrationModal = extending(AbstractModal, (function() {
+	
+	/**
+	 *
+	 * @param {OneEvent} event
+	 *
+	 * @constructor
+	 * @constructs PreviewRegistrationModal
+	 */
+	function PreviewRegistrationModal(event) {
+		AbstractModal.call(this);
+		this.event = event;
+		this.title = 'Регистрация';
+	}
+	/**
+	 *
+	 * @return {PreviewRegistrationModal}
+	 */
+	PreviewRegistrationModal.prototype.render = function() {
+		var self = this;
+		
+		this.__render({
+			classes: ['material', '-floating'],
+			width: 400,
+			content: tmpl('modal-registration-content', {
+				modal_id: this.id,
+				required_star: tmpl('required-star'),
+				event_title: this.event.title,
+				fields: $.makeSet(this.event.registration_fields.map(self.buildRegistrationField.bind(self)))
+			})
+		});
+		
+		return this;
+	};
+	/**
+	 *
+	 * @return {PreviewRegistrationModal}
+	 */
+	PreviewRegistrationModal.prototype.init = function() {
+		this.content.find('.RegisterButton').prop('disabled', true);
+		initSelect2(this.content.find('.ToSelect2'), {
+			dropdownCssClass: 'form_select2_drop form_select2_drop_no_search'
+		});
+		this.__init();
+		
+		return this;
+	};
+	/**
+	 *
+	 * @param {RegistrationFieldModel} field
+	 * @return {jQuery}
+	 */
+	PreviewRegistrationModal.prototype.buildRegistrationField = function(field) {
+		var self = this;
+		
+		switch (field.type) {
+			case RegistrationFieldModel.TYPES.SELECT: {
+				
+				return (function(props, values) {
+					
+					return tmpl('form-unit', Builder.normalizeBuildProps($.extend(true, {}, props, {
+						label: tmpl('label', Builder.normalizeBuildProps({
+							id: props.id,
+							label: props.label
+						})),
+						form_element: __APP.BUILD.select(
+							values.map(function(value) {
+								
+								return {
+									display_name: value.value,
+									val: value.uuid || guid()
+								}
+							}), {
+								id: props.id,
+								name: props.name,
+								required: props.required
+							}, props.classes
+						)
+					})));
+					
+				}({
+					id: 'registration_form_' + self.id + '_' + field.uuid,
+					name: field.uuid,
+					unit_classes: ['Registration' + field.type.toCamelCase('_') + 'Field'],
+					classes: [
+						'form_select2',
+						'ToSelect2'
+					],
+					label: $('<span>'+ field.label +'</span>').add((field.required ? tmpl('required-star') : $())),
+					required: field.required
+				}, field.values instanceof Array ? field.values : []));
+			}
+			case RegistrationFieldModel.TYPES.SELECT_MULTI: {
+				
+				return (function(props, values) {
+					
+					return tmpl('form-unit', Builder.normalizeBuildProps($.extend(true, {}, props, {
+						unit_classes: props.classes,
+						label: tmpl('label', Builder.normalizeBuildProps({
+							id: props.id + '_label',
+							label: props.label
+						})),
+						form_element: __APP.BUILD.checkbox.apply(__APP.BUILD, values.map(function(value) {
+							
+							return {
+								id: 'registration_field_value_' + (value.uuid || guid()),
+								name: props.name,
+								label: value.value,
+								attributes: {
+									value: value.uuid || guid(),
+									required: props.required
+								}
+							};
+						}))
+					})));
+					
+				}({
+					id: 'registration_form_' + self.id + '_' + field.uuid,
+					type: 'checkbox',
+					name: field.uuid,
+					classes: ['Registration' + field.type.toCamelCase('_') + 'Field'],
+					label: $('<span>'+ field.label +'</span>').add((field.required ? tmpl('required-star') : $())),
+					required: field.required
+				}, field.values instanceof Array ? field.values : []));
+			}
+			default: {
+				
+				return __APP.BUILD.formUnit({
+					id: 'registration_form_' + this.id + '_' + field.uuid,
+					type: field.type === RegistrationFieldModel.TYPES.EXTENDED_CUSTOM ? 'textarea' : field.type,
+					name: field.uuid,
+					classes: ['Registration' + field.type.toCamelCase('_') + 'Field'],
+					label: $('<span>'+ field.label +'</span>').add((field.required ? tmpl('required-star') : $())),
+					placeholder: field.label,
+					required: field.required,
+					helptext: (function(type) {
+						switch (type) {
+							case RegistrationFieldModel.TYPES.EMAIL:
+								return 'На почту Вам поступит сообщение с подтверждением регистрации';
+							case RegistrationFieldModel.TYPES.FIRST_NAME:
+								return 'Используйте настоящее имя для регистрации';
+							case RegistrationFieldModel.TYPES.LAST_NAME:
+								return 'Используйте настоящюю фамилию для регистрации';
+							default:
+								return '';
+						}
+					})(field.type)
+				});
+			}
+		}
+	};
+	
+	return PreviewRegistrationModal;
+}()));
+/**
+ * @requires Class.PreviewRegistrationModal.js
+ */
+/**
+ * @class RegistrationModal
+ * @extends PreviewRegistrationModal
+ */
+RegistrationModal = extending(PreviewRegistrationModal, (function() {
+	
+	/**
+	 *
+	 * @param {OneEvent} event
+	 * @constructor
+	 * @constructs RegistrationModal
+	 */
+	function RegistrationModal(event) {
+		PreviewRegistrationModal.call(this, event);
+	}
+	/**
+	 *
+	 * @return {RegistrationModal}
+	 */
+	RegistrationModal.prototype.init = function() {
+		var self = this;
+		
+		this.content.find('.RegisterButton').on('click.Register', function() {
+			var $register_button = $(this),
+				$form = $register_button.closest('.RegistrationModalForm');
+			
+			$register_button.attr('disabled', true);
+			if (isFormValid($form)) {
+				OneEvent.registerToEvent(self.event.id, $form.serializeForm('array').map(function(field) {
+					
+					return {
+						uuid: field.name,
+						value: field.value
+					};
+				}))
+					.always(function() {
+						$register_button.removeAttr('disabled');
+					})
+					.done(function() {
+						self.modal.trigger('registration:success');
+						self.hide();
+					});
+			} else {
+				$register_button.removeAttr('disabled');
+			}
+		});
+		this.content.find('.RegistrationFirstNameField').val(__APP.USER.first_name);
+		this.content.find('.RegistrationLastNameField').val(__APP.USER.last_name);
+		this.content.find('.RegistrationEmailField').val(__APP.USER.email);
+		
+		bindRippleEffect(this.content);
+		initSelect2(this.content.find('.ToSelect2'), {
+			dropdownCssClass: 'form_select2_drop form_select2_drop_no_search'
+		});
+		this.__init();
+		
+		return this;
+	};
+	
+	return RegistrationModal;
+}()));
+/**
+ * @requires ../Class.AbstractModal.js
+ */
+/**
  * @class
  * @abstract
  * @extends AbstractModal
@@ -13292,231 +13517,6 @@ SubscribersModal = extending(AbstractUsersModal, (function() {
 	return SubscribersModal;
 }()));
 
-/**
- * @requires ../Class.AbstractModal.js
- */
-/**
- * @class PreviewRegistrationModal
- * @extends AbstractModal
- */
-PreviewRegistrationModal = extending(AbstractModal, (function() {
-	
-	/**
-	 *
-	 * @param {OneEvent} event
-	 *
-	 * @constructor
-	 * @constructs PreviewRegistrationModal
-	 */
-	function PreviewRegistrationModal(event) {
-		AbstractModal.call(this);
-		this.event = event;
-		this.title = 'Регистрация';
-	}
-	/**
-	 *
-	 * @return {PreviewRegistrationModal}
-	 */
-	PreviewRegistrationModal.prototype.render = function() {
-		var self = this;
-		
-		this.__render({
-			classes: ['material', '-floating'],
-			width: 400,
-			content: tmpl('modal-registration-content', {
-				modal_id: this.id,
-				required_star: tmpl('required-star'),
-				event_title: this.event.title,
-				fields: $.makeSet(this.event.registration_fields.map(self.buildRegistrationField.bind(self)))
-			})
-		});
-		
-		return this;
-	};
-	/**
-	 *
-	 * @return {PreviewRegistrationModal}
-	 */
-	PreviewRegistrationModal.prototype.init = function() {
-		this.content.find('.RegisterButton').prop('disabled', true);
-		initSelect2(this.content.find('.ToSelect2'), {
-			dropdownCssClass: 'form_select2_drop form_select2_drop_no_search'
-		});
-		this.__init();
-		
-		return this;
-	};
-	/**
-	 *
-	 * @param {RegistrationFieldModel} field
-	 * @return {jQuery}
-	 */
-	PreviewRegistrationModal.prototype.buildRegistrationField = function(field) {
-		var self = this;
-		
-		switch (field.type) {
-			case RegistrationFieldModel.TYPES.SELECT: {
-				
-				return (function(props, values) {
-					
-					return tmpl('form-unit', Builder.normalizeBuildProps($.extend(true, {}, props, {
-						label: tmpl('label', Builder.normalizeBuildProps({
-							id: props.id,
-							label: props.label
-						})),
-						form_element: __APP.BUILD.select(
-							values.map(function(value) {
-								
-								return {
-									display_name: value.value,
-									val: value.uuid || guid()
-								}
-							}), {
-								id: props.id,
-								name: props.name,
-								required: props.required
-							}, props.classes
-						)
-					})));
-					
-				}({
-					id: 'registration_form_' + self.id + '_' + field.uuid,
-					name: field.uuid,
-					unit_classes: ['Registration' + field.type.toCamelCase('_') + 'Field'],
-					classes: [
-						'form_select2',
-						'ToSelect2'
-					],
-					label: $('<span>'+ field.label +'</span>').add((field.required ? tmpl('required-star') : $())),
-					required: field.required
-				}, field.values instanceof Array ? field.values : []));
-			}
-			case RegistrationFieldModel.TYPES.SELECT_MULTI: {
-				
-				return (function(props, values) {
-					
-					return tmpl('form-unit', Builder.normalizeBuildProps($.extend(true, {}, props, {
-						unit_classes: props.classes,
-						label: tmpl('label', Builder.normalizeBuildProps({
-							id: props.id + '_label',
-							label: props.label
-						})),
-						form_element: __APP.BUILD.checkbox.apply(__APP.BUILD, values.map(function(value) {
-							
-							return {
-								id: 'registration_field_value_' + (value.uuid || guid()),
-								name: props.name,
-								label: value.value,
-								attributes: {
-									value: value.uuid || guid(),
-									required: props.required
-								}
-							};
-						}))
-					})));
-					
-				}({
-					id: 'registration_form_' + self.id + '_' + field.uuid,
-					type: 'checkbox',
-					name: field.uuid,
-					classes: ['Registration' + field.type.toCamelCase('_') + 'Field'],
-					label: $('<span>'+ field.label +'</span>').add((field.required ? tmpl('required-star') : $())),
-					required: field.required
-				}, field.values instanceof Array ? field.values : []));
-			}
-			default: {
-				
-				return __APP.BUILD.formUnit({
-					id: 'registration_form_' + this.id + '_' + field.uuid,
-					type: field.type === RegistrationFieldModel.TYPES.EXTENDED_CUSTOM ? 'textarea' : field.type,
-					name: field.uuid,
-					classes: ['Registration' + field.type.toCamelCase('_') + 'Field'],
-					label: $('<span>'+ field.label +'</span>').add((field.required ? tmpl('required-star') : $())),
-					placeholder: field.label,
-					required: field.required,
-					helptext: (function(type) {
-						switch (type) {
-							case RegistrationFieldModel.TYPES.EMAIL:
-								return 'На почту Вам поступит сообщение с подтверждением регистрации';
-							case RegistrationFieldModel.TYPES.FIRST_NAME:
-								return 'Используйте настоящее имя для регистрации';
-							case RegistrationFieldModel.TYPES.LAST_NAME:
-								return 'Используйте настоящюю фамилию для регистрации';
-							default:
-								return '';
-						}
-					})(field.type)
-				});
-			}
-		}
-	};
-	
-	return PreviewRegistrationModal;
-}()));
-/**
- * @requires Class.PreviewRegistrationModal.js
- */
-/**
- * @class RegistrationModal
- * @extends PreviewRegistrationModal
- */
-RegistrationModal = extending(PreviewRegistrationModal, (function() {
-	
-	/**
-	 *
-	 * @param {OneEvent} event
-	 * @constructor
-	 * @constructs RegistrationModal
-	 */
-	function RegistrationModal(event) {
-		PreviewRegistrationModal.call(this, event);
-	}
-	/**
-	 *
-	 * @return {RegistrationModal}
-	 */
-	RegistrationModal.prototype.init = function() {
-		var self = this;
-		
-		this.content.find('.RegisterButton').on('click.Register', function() {
-			var $register_button = $(this),
-				$form = $register_button.closest('.RegistrationModalForm');
-			
-			$register_button.attr('disabled', true);
-			if (isFormValid($form)) {
-				OneEvent.registerToEvent(self.event.id, $form.serializeForm('array').map(function(field) {
-					
-					return {
-						uuid: field.name,
-						value: field.value
-					};
-				}))
-					.always(function() {
-						$register_button.removeAttr('disabled');
-					})
-					.done(function() {
-						self.modal.trigger('registration:success');
-						self.hide();
-					});
-			} else {
-				$register_button.removeAttr('disabled');
-			}
-		});
-		this.content.find('.RegistrationFirstNameField').val(__APP.USER.first_name);
-		this.content.find('.RegistrationLastNameField').val(__APP.USER.last_name);
-		this.content.find('.RegistrationEmailField').val(__APP.USER.email);
-		
-		bindRippleEffect(this.content);
-		initSelect2(this.content.find('.ToSelect2'), {
-			dropdownCssClass: 'form_select2_drop form_select2_drop_no_search'
-		});
-		this.__init();
-		
-		return this;
-	};
-	
-	return RegistrationModal;
-}()));
 /**
  * @singleton
  * @class Builder
@@ -21919,7 +21919,7 @@ OrderPage = extending(Page, (function() {
 				if (result !== false) {
 					result.done(function(data) {
 						
-						Payment.doPayment('order-' + data.order.uuid, data.order.sum, callback_url);
+						Payment.doPayment('order-' + data.order.uuid, data.order.final_sum, callback_url);
 					})
 				}
 			}
@@ -22973,6 +22973,174 @@ OrganizationPage = extending(Page, (function() {
  */
 /**
  *
+ * @class SearchPage
+ * @extends Page
+ */
+SearchPage = extending(Page, (function() {
+	/**
+	 *
+	 * @param {string} search
+	 * @constructor
+	 * @constructs SearchPage
+	 */
+	function SearchPage(search) {
+		Page.call(this);
+		
+		this.page_title = 'Поиск';
+		this.$search_bar_input = $('#search_bar_input');
+		this.search_string = decodeURIComponent(search);
+		this.events_ajax_data = {
+			length: 10,
+			fields: FeedPage.fields.copy(),
+			order_by: 'nearest_event_date,-first_event_date'
+		};
+		this.organizations_ajax_data = {
+			length: 30,
+			fields: new Fields([
+				'subscribed_count',
+				'img_small_url'
+			])
+		};
+		this.past_events = false;
+		this.search_results = new SearchResults(this.search_string);
+	}
+	/**
+	 *
+	 * @param {(OneOrganization|Array<OneOrganization>|OrganizationsCollection)} organizations
+	 * @returns {jQuery}
+	 */
+	SearchPage.buildOrganizationItems = function(organizations) {
+		return __APP.BUILD.organizationItems(organizations, {
+			block_classes: ['-show'],
+			avatar_classes: ['-size_50x50', '-rounded'],
+			counter_classes: [__C.CLASSES.HIDDEN]
+		})
+	};
+	/**
+	 *
+	 * @param {(OneEvent|Array<OneEvent>|EventsCollection)} events
+	 * @returns {jQuery}
+	 */
+	SearchPage.buildEventCards = function(events) {
+		var $events = $();
+		if (events.length == 0) {
+			$events = tmpl('search-no-events', {});
+		} else {
+			events.forEach(function(event) {
+				if(event.nearest_event_date == undefined && !this.past_events){
+					$events = $events.add(tmpl('divider', {title: 'Прошедшие события'}));
+					this.past_events = true;
+				}
+				$events = $events.add(__APP.BUILD.eventCards(event));
+			});
+		}
+		return $events
+	};
+	
+	SearchPage.prototype.fetchData = function() {
+		return this.fetching_data_defer = this.search_results.fetchEventsAndOrganizations(this.events_ajax_data, this.organizations_ajax_data);
+	};
+	
+	SearchPage.prototype.init = function() {
+		var PAGE = this,
+			$window = $(window),
+			$organizations_scrollbar;
+		
+		function bindFeedEvents($parent) {
+			trimAvatarsCollection($parent);
+			bindRippleEffect($parent);
+			__APP.MODALS.bindCallModal($parent);
+			bindPageLinks($parent);
+			
+			$parent.find('.HideEvent').remove();
+		}
+		
+		$organizations_scrollbar = this.$wrapper.find('.SearchOrganizationsScrollbar').scrollbar({
+			disableBodyScroll: true,
+			onScroll: function(y) {
+				if (y.scroll == y.maxScroll) {
+					PAGE.search_results.fetchOrganizations(PAGE.organizations_ajax_data, function(organizations) {
+						if (organizations.length) {
+							$organizations_scrollbar.append(SearchPage.buildOrganizationItems(organizations));
+						} else {
+							$organizations_scrollbar.off('scroll.onScroll');
+						}
+						bindPageLinks($organizations_scrollbar);
+					});
+				}
+			}
+		});
+		$window.off('scroll.upload' + PAGE.constructor.name);
+		$window.on('scroll.upload' + PAGE.constructor.name, function() {
+			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.block_scroll) {
+				PAGE.block_scroll = true;
+				PAGE.search_results.fetchEvents(PAGE.events_ajax_data, function(events) {
+					var $events;
+					if(events.length){
+						$events = SearchPage.buildEventCards(PAGE.search_results.events.last_pushed);
+						PAGE.$wrapper.find('.SearchEvents').append($events);
+						bindFeedEvents($events);
+						PAGE.block_scroll = false;
+					} else {
+						$window.off('scroll.upload' + PAGE.constructor.name);
+					}
+				});
+			}
+		});
+		bindFeedEvents(this.$wrapper);
+	};
+	
+	SearchPage.prototype.render = function() {
+		var data = {};
+		
+		$('.TopBarOverlay').addClass('-open_search_bar');
+		this.$search_bar_input.val(this.search_string);
+		
+		data.events = SearchPage.buildEventCards(this.search_results.events);
+		if (this.search_results.organizations.length == 0) {
+			data.no_organizations = __C.CLASSES.HIDDEN;
+		} else {
+			data.organizations = SearchPage.buildOrganizationItems(this.search_results.organizations);
+		}
+		
+		this.$wrapper.append(tmpl('search-wrapper', data));
+		this.init();
+	};
+	
+	SearchPage.prototype.destroy = function() {
+		$('.TopBarOverlay').removeClass('-open_search_bar');
+		this.$search_bar_input.val('');
+	};
+	
+	return SearchPage;
+}()));
+/**
+ * @requires Class.SearchPage.js
+ */
+/**
+ *
+ * @class SearchByTagPage
+ * @extends SearchPage
+ */
+SearchByTagPage = extending(SearchPage, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs SearchByTagPage
+	 */
+	function SearchByTagPage(search) {
+		SearchPage.call(this, search);
+		this.search_string = '#' + decodeURIComponent(search);
+		this.search_results = new SearchResults(this.search_string);
+	}
+	
+	return SearchByTagPage;
+}()));
+/**
+ * @requires ../Class.Page.js
+ */
+/**
+ *
  * @class MyOrdersPage
  * @extends Page
  */
@@ -23645,174 +23813,6 @@ TicketPage = extending(Page, (function() {
 	};
 	
 	return TicketPage;
-}()));
-/**
- * @requires ../Class.Page.js
- */
-/**
- *
- * @class SearchPage
- * @extends Page
- */
-SearchPage = extending(Page, (function() {
-	/**
-	 *
-	 * @param {string} search
-	 * @constructor
-	 * @constructs SearchPage
-	 */
-	function SearchPage(search) {
-		Page.call(this);
-		
-		this.page_title = 'Поиск';
-		this.$search_bar_input = $('#search_bar_input');
-		this.search_string = decodeURIComponent(search);
-		this.events_ajax_data = {
-			length: 10,
-			fields: FeedPage.fields.copy(),
-			order_by: 'nearest_event_date,-first_event_date'
-		};
-		this.organizations_ajax_data = {
-			length: 30,
-			fields: new Fields([
-				'subscribed_count',
-				'img_small_url'
-			])
-		};
-		this.past_events = false;
-		this.search_results = new SearchResults(this.search_string);
-	}
-	/**
-	 *
-	 * @param {(OneOrganization|Array<OneOrganization>|OrganizationsCollection)} organizations
-	 * @returns {jQuery}
-	 */
-	SearchPage.buildOrganizationItems = function(organizations) {
-		return __APP.BUILD.organizationItems(organizations, {
-			block_classes: ['-show'],
-			avatar_classes: ['-size_50x50', '-rounded'],
-			counter_classes: [__C.CLASSES.HIDDEN]
-		})
-	};
-	/**
-	 *
-	 * @param {(OneEvent|Array<OneEvent>|EventsCollection)} events
-	 * @returns {jQuery}
-	 */
-	SearchPage.buildEventCards = function(events) {
-		var $events = $();
-		if (events.length == 0) {
-			$events = tmpl('search-no-events', {});
-		} else {
-			events.forEach(function(event) {
-				if(event.nearest_event_date == undefined && !this.past_events){
-					$events = $events.add(tmpl('divider', {title: 'Прошедшие события'}));
-					this.past_events = true;
-				}
-				$events = $events.add(__APP.BUILD.eventCards(event));
-			});
-		}
-		return $events
-	};
-	
-	SearchPage.prototype.fetchData = function() {
-		return this.fetching_data_defer = this.search_results.fetchEventsAndOrganizations(this.events_ajax_data, this.organizations_ajax_data);
-	};
-	
-	SearchPage.prototype.init = function() {
-		var PAGE = this,
-			$window = $(window),
-			$organizations_scrollbar;
-		
-		function bindFeedEvents($parent) {
-			trimAvatarsCollection($parent);
-			bindRippleEffect($parent);
-			__APP.MODALS.bindCallModal($parent);
-			bindPageLinks($parent);
-			
-			$parent.find('.HideEvent').remove();
-		}
-		
-		$organizations_scrollbar = this.$wrapper.find('.SearchOrganizationsScrollbar').scrollbar({
-			disableBodyScroll: true,
-			onScroll: function(y) {
-				if (y.scroll == y.maxScroll) {
-					PAGE.search_results.fetchOrganizations(PAGE.organizations_ajax_data, function(organizations) {
-						if (organizations.length) {
-							$organizations_scrollbar.append(SearchPage.buildOrganizationItems(organizations));
-						} else {
-							$organizations_scrollbar.off('scroll.onScroll');
-						}
-						bindPageLinks($organizations_scrollbar);
-					});
-				}
-			}
-		});
-		$window.off('scroll.upload' + PAGE.constructor.name);
-		$window.on('scroll.upload' + PAGE.constructor.name, function() {
-			if ($window.height() + $window.scrollTop() + 200 >= $(document).height() && !PAGE.block_scroll) {
-				PAGE.block_scroll = true;
-				PAGE.search_results.fetchEvents(PAGE.events_ajax_data, function(events) {
-					var $events;
-					if(events.length){
-						$events = SearchPage.buildEventCards(PAGE.search_results.events.last_pushed);
-						PAGE.$wrapper.find('.SearchEvents').append($events);
-						bindFeedEvents($events);
-						PAGE.block_scroll = false;
-					} else {
-						$window.off('scroll.upload' + PAGE.constructor.name);
-					}
-				});
-			}
-		});
-		bindFeedEvents(this.$wrapper);
-	};
-	
-	SearchPage.prototype.render = function() {
-		var data = {};
-		
-		$('.TopBarOverlay').addClass('-open_search_bar');
-		this.$search_bar_input.val(this.search_string);
-		
-		data.events = SearchPage.buildEventCards(this.search_results.events);
-		if (this.search_results.organizations.length == 0) {
-			data.no_organizations = __C.CLASSES.HIDDEN;
-		} else {
-			data.organizations = SearchPage.buildOrganizationItems(this.search_results.organizations);
-		}
-		
-		this.$wrapper.append(tmpl('search-wrapper', data));
-		this.init();
-	};
-	
-	SearchPage.prototype.destroy = function() {
-		$('.TopBarOverlay').removeClass('-open_search_bar');
-		this.$search_bar_input.val('');
-	};
-	
-	return SearchPage;
-}()));
-/**
- * @requires Class.SearchPage.js
- */
-/**
- *
- * @class SearchByTagPage
- * @extends SearchPage
- */
-SearchByTagPage = extending(SearchPage, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs SearchByTagPage
-	 */
-	function SearchByTagPage(search) {
-		SearchPage.call(this, search);
-		this.search_string = '#' + decodeURIComponent(search);
-		this.search_results = new SearchResults(this.search_string);
-	}
-	
-	return SearchByTagPage;
 }()));
 /**
  *
