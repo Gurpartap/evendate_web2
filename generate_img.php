@@ -14,7 +14,12 @@ if (isset($_FILES['image']['tmp_name'])) {
 }
 
 $src1 = new \Imagick($filename);
-$src2 = new \Imagick('./tickets_images/template.png');
+if(isset($_REQUEST['from'])){
+	$tmpl_name = $_REQUEST['from'] . '_template.png';
+}else{
+	$tmpl_name = 'template.png';
+}
+$src2 = new \Imagick('./tickets_images/' . $tmpl_name);
 //$src2->readImageFile($bottom_file);
 
 $image_info = $src1->getImageGeometry();
