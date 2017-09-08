@@ -201,6 +201,28 @@ class Order extends AbstractEntity
 		return new Result(true, '');
 	}
 
+	private static function avisoLegalEntity(array $request, ExtendedPDO $db)
+	{
+		$key_part = '4d0480efc15c10be631bceee3a36ebed8b101827df4f41009fc98b0672fa1153';
+		$key = implode('', array($request['order_number'], $request['waiting_amount'], $request['uuid'], $key_part));
+		if ($request['key'] == md5($key)) {
+			$payment_info = self::getPaymentInfo($request, $db);
+			$request['orderSumAmount'] = $request['waiting_amount'];
+			$request['shopSumAmount'] = $request['waiting_amount'];
+			$db->beginTransaction();
+			try {
+				self::setPaymentStatus($request, $db, $payment_info);
+				$db->commit();
+			} catch (Exception $e) {
+				$db->rollBack();
+				return new Result(false, '');
+			}
+		} else {
+			throw new InvalidArgumentException('BAD_KEY_STOP_DUDE!');
+		}
+		return new Result(true, '');
+	}
+
 
 	public function getUUID()
 	{
@@ -475,6 +497,8 @@ class Order extends AbstractEntity
 	{
 		if (isset($request['bitcoin']) && $request['bitcoin'] == true) {
 			return self::avisoBitcoin($request, $db);
+		}elseif (isset($request['legal_entity']) && $request['legal_entity'] == true){
+			return self::avisoLegalEntity($request, $db);
 		}
 		try {
 			$db->beginTransaction();

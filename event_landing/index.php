@@ -79,6 +79,7 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
 	echo "<script>window.event_id = {$_REQUEST['id']};</script>\n";
 	?>
 
+
   <script src="/event_landing/js/angular.min.js"></script>
   <script src="/event_landing/js/ng-file-upload-shim.min.js"></script>
   <script src="/event_landing/js/ng-file-upload-all.min.js"></script>

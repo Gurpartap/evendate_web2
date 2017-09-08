@@ -1,4 +1,4 @@
-@import url(https://fonts.googleapis.com/css?family=Hind:400,300,500);
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&amp;subset=cyrillic);
 
 /******************** TYPOGRAPHY ********************/
 html, body {
@@ -6,7 +6,7 @@ html, body {
 }
 
 body {
-    font-family: 'Hind', sans-serif;
+    font-family: 'Open Sans', sans-serif;
 	font-weight: 300;
 	line-height: 25px;
 }
@@ -17,7 +17,7 @@ h3,
 h4,
 h5,
 h6 {
-	font-family: 'Hind', sans-serif;
+	font-family: 'Open Sans', sans-serif;
 }
 
 h1 {
