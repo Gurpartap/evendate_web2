@@ -48,7 +48,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {?boolean} registration_available
 	 * @property {?boolean} registration_required
 	 * @property {?number} registration_limit_count
-	 * @property {?string} registration_till
+	 * @property {?timestamp} registration_till
 	 * @property {?string} registration_approve_status
 	 * @property {?boolean} registration_approvement_required
 	 * @property {?boolean} is_registered
@@ -90,7 +90,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {?number} favored_friends_count
 	 * @property {?boolean} is_favorite
 	 *
-	 * @property {?number} public_at
+	 * @property {?timestamp} public_at
 	 * @property {?boolean} canceled
 	 * @property {?boolean} can_edit
 	 *
@@ -100,8 +100,8 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {EventEmailTextsModel} email_texts
 	 *
 	 * @property {?number} creator_id
-	 * @property {?number} created_at
-	 * @property {?number} updated_at
+	 * @property {?timestamp} created_at
+	 * @property {?timestamp} updated_at
 	 */
 	function OneEvent(event_id, is_loading_continuous) {
 		var self = this,

@@ -1,0 +1,99 @@
+<script type="javascript/template" id="tmpl-admin-event-sales-page">
+	<div class="event_admin_sales_page material -level_2_material">
+		<header class="event_admin_sales_header">
+			<div class="event_admin_sales_header_main">
+				<h3 class="event_admin_sales_title">{title}</h3>
+				<div class="event_admin_sales_header_bottom">
+					<aside class="event_admin_sales_big_date scoreboard -size_huge -color_accent -align_center">
+						<span class="scoreboard_number">{first_event_date_day}</span>
+						<span class="scoreboard_title">{first_event_date_month}</span>
+					</aside>
+					<div class="event_admin_sales_header_info">
+						<p class="-text_color_primary_80 -font_weight_bolder">{formatted_dates}</p>
+						<p class="-text_color_primary_80 -font_weight_bolder"><span>Регистрация {registration_dates}</span></p>
+						<div class="form_group -parts_e_e">
+							<div class="form_unit">
+								{sales_settings_button}
+							</div>
+							<div class="form_unit">
+								{promotion_button}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<aside class="event_admin_sales_header_side">
+				<div class="event_admin_sales_brief_block">
+					<div class="scoreboard -size_normal">
+						<span class="scoreboard_title">Билеты</span>
+						<span class="scoreboard_number">273/300</span>
+					</div>
+				</div>
+				<div class="event_admin_sales_brief_block">
+					<div class="scoreboard -size_normal">
+						<span class="scoreboard_title">Заявки</span>
+						<span class="scoreboard_number">1 392</span>
+					</div>
+				</div>
+				<div class="event_admin_sales_brief_block">
+					<div class="scoreboard -size_normal">
+						<span class="scoreboard_title">Контроль входа</span>
+						<span class="scoreboard_number">0/273</span>
+					</div>
+				</div>
+				<div class="event_admin_sales_brief_block">
+					<div class="scoreboard -size_normal">
+						<span class="scoreboard_title">Возвраты</span>
+						<span class="scoreboard_number">14</span>
+					</div>
+				</div>
+			</aside>
+		</header>
+		<div class="event_admin_sales_page_main">
+			<div class="flex_grid -parts_2_1_2 -strict_width">
+				<div class="grid_box">
+					<h4>Типы билетов</h4>
+					{ticket_types}
+				</div>
+				<div class="grid_box"></div>
+				<div class="grid_box">
+					<h4>Финансы</h4>
+					<div class="scoreboard -size_big">
+						<span class="scoreboard_title">Выручка</span>
+						<span class="scoreboard_number -text_color_accent">88 000₽</span>
+					</div>
+					<div class="flex_grid -parts_equal_2">
+						<div class="grid_box">
+							<div class="scoreboard -size_normal">
+								<span class="scoreboard_title">Возвраты</span>
+								<span class="scoreboard_number">0₽</span>
+							</div>
+						</div>
+						<div class="grid_box">
+							<div class="scoreboard -size_normal">
+								<span class="scoreboard_title">Коммиссия</span>
+								<span class="scoreboard_number">2 640₽</span>
+							</div>
+						</div>
+					</div>
+					<div class="scoreboard -size_normal">
+						<span class="scoreboard_title">Затраты на продвижение</span>
+						<span class="scoreboard_number">13 400₽</span>
+					</div>
+					{withdraw_funds_button}
+				</div>
+			</div>
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-admin-event-sales-ticket-type">
+	<div class="event_admin_sales_ticket_type">
+		<h5 class="event_admin_sales_ticket_type_title">{name} {stamp}</h5>
+		<p class="event_admin_sales_ticket_type_info">
+			<span class="event_admin_sales_ticket_type_dates">{dates}</span>
+			<span class="event_admin_sales_ticket_type_price">{price}</span>
+		</p>
+		{progress_bar}
+	</div>
+</script>

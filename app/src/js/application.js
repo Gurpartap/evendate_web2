@@ -34,6 +34,7 @@ __APP = {
 			'event': {
 				'^([0-9]+)': {
 					'overview': AdminEventOverviewPage,
+					'sales': AdminEventSalesPage,
 					'orders': AdminEventOrdersPage,
 					'requests': AdminEventRequestsPage,
 					'check_in': AdminEventCheckInPage,

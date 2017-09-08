@@ -290,6 +290,19 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @param {string} name
+	 * @param {buildProps} [props]
+	 *
+	 * @returns {jQuery}
+	 */
+	Builder.prototype.stamp = function(name, props) {
+		
+		return tmpl('stamp', Object.assign({
+			text: name
+		}, Builder.normalizeBuildProps(props)));
+	};
+	/**
+	 *
 	 * @param {(...buildProps|Array<buildProps>)} props
 	 * @param {(number|string)} props.val
 	 * @param {string} props.display_name

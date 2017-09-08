@@ -1,8 +1,12 @@
+.scoreboard {
+	margin: 1em 0;
+}
+
+
 .scoreboard_number {
 	display: block;
-	margin-bottom: 6px;
 	font-size: 2.3em;
-	font-weight: 700;
+	font-weight: bold;
 	white-space: nowrap;
 }
 
@@ -30,14 +34,22 @@
 }
 
 
-.scoreboard.-size_big > .scoreboard_number {
-	font-size: 4.2em;
-	font-weight: bold;
-	color: #3e4d66;
-	color: var(--color_primary);
+.scoreboard.-size_normal > .scoreboard_number {font-size: 1.75em}
+
+.scoreboard.-size_big > .scoreboard_number {font-size: 2.75em}
+.scoreboard.-size_big > .scoreboard_title {font-size: 1.25em}
+
+.scoreboard.-size_huge > .scoreboard_number {font-size: 4.2em}
+.scoreboard.-size_huge > .scoreboard_title {font-size: 1.5em}
+
+.scoreboard.-color_accent > .scoreboard_title,
+.scoreboard.-color_accent > .scoreboard_number {
+	color: #f82969;
+	color: var(--color_accent);
 }
 
-.scoreboard.-size_big > .scoreboard_title {
-	font-size: 1.25em;
-	font-weight: 500;
+.-state_admin .scoreboard.-color_accent > .scoreboard_title,
+.-state_admin .scoreboard.-color_accent > .scoreboard_number {
+	color: #00dc88;
+	color: var(--color_accent);
 }

@@ -178,6 +178,71 @@ table {
 }
 
 
+.flex_grid {
+	display: flex;
+}
+
+.flex_grid.-flex_wrap {flex-wrap: wrap}
+.flex_grid > .grid_box {width: 100%}
+.flex_grid.-float > .grid_box {width: auto}
+.flex_grid.-strict_width > .grid_box {flex: none}
+
+.flex_grid.-align_left {justify-content: flex-start}
+.flex_grid.-align_center {justify-content: center}
+.flex_grid.-align_right {justify-content: flex-end}
+.flex_grid.-align_space_around {justify-content: space-around}
+.flex_grid.-align_space_between {justify-content: space-between}
+
+.flex_grid.-valign_baseline {align-items: baseline}
+.flex_grid.-valign_center {align-items: center}
+.flex_grid.-valign_top {align-items: flex-start}
+.flex_grid.-valign_bottom {align-items: flex-end}
+
+
+.flex_grid.-parts_equal_2 > .grid_box {width: calc(100% / 2)}
+.flex_grid.-parts_equal_3 > .grid_box {width: calc(100% / 3)}
+.flex_grid.-parts_equal_4 > .grid_box {width: calc(100% / 4)}
+.flex_grid.-parts_equal_5 > .grid_box {width: calc(100% / 5)}
+
+.flex_grid.-parts_1_2 > .grid_box:nth-child(1),
+.flex_grid.-parts_2_1 > .grid_box:nth-child(2) {width: calc((100% / 3) * 1)}
+.flex_grid.-parts_1_2 > .grid_box:nth-child(2),
+.flex_grid.-parts_2_1 > .grid_box:nth-child(1) {width: calc((100% / 3) * 2)}
+
+.flex_grid.-parts_1_3 > .grid_box:nth-child(1),
+.flex_grid.-parts_3_1 > .grid_box:nth-child(2) {width: calc((100% / 4) * 1)}
+.flex_grid.-parts_1_3 > .grid_box:nth-child(2),
+.flex_grid.-parts_3_1 > .grid_box:nth-child(1) {width: calc((100% / 4) * 3)}
+
+.flex_grid.-parts_1_4 > .grid_box:nth-child(1),
+.flex_grid.-parts_4_1 > .grid_box:nth-child(2) {width: calc((100% / 5) * 1)}
+.flex_grid.-parts_1_4 > .grid_box:nth-child(2),
+.flex_grid.-parts_4_1 > .grid_box:nth-child(1) {width: calc((100% / 5) * 4)}
+
+
+.flex_grid.-parts_1_1_2 > .grid_box:nth-child(1),
+.flex_grid.-parts_1_1_2 > .grid_box:nth-child(2),
+.flex_grid.-parts_1_2_1 > .grid_box:nth-child(1),
+.flex_grid.-parts_1_2_1 > .grid_box:nth-child(3),
+.flex_grid.-parts_2_1_1 > .grid_box:nth-child(2),
+.flex_grid.-parts_2_1_1 > .grid_box:nth-child(3) {width: calc((100% / 4) * 1)}
+
+.flex_grid.-parts_1_1_2 > .grid_box:nth-child(3),
+.flex_grid.-parts_1_2_1 > .grid_box:nth-child(2),
+.flex_grid.-parts_2_1_1 > .grid_box:nth-child(1) {width: calc((100% / 4) * 2)}
+
+.flex_grid.-parts_1_2_2 > .grid_box:nth-child(2),
+.flex_grid.-parts_1_2_2 > .grid_box:nth-child(3),
+.flex_grid.-parts_2_1_2 > .grid_box:nth-child(1),
+.flex_grid.-parts_2_1_2 > .grid_box:nth-child(3),
+.flex_grid.-parts_2_2_1 > .grid_box:nth-child(1),
+.flex_grid.-parts_2_2_1 > .grid_box:nth-child(2) {width: calc((100% / 5) * 2)}
+
+.flex_grid.-parts_1_2_2 > .grid_box:nth-child(1),
+.flex_grid.-parts_2_1_2 > .grid_box:nth-child(2),
+.flex_grid.-parts_2_2_1 > .grid_box:nth-child(3) {width: calc((100% / 5) * 1)}
+
+
 
 .-unite {
 	display: flex !important;

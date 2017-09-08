@@ -70,6 +70,20 @@ OneTicketType = extending(OneEntity, (function() {
 	
 	/**
 	 *
+	 * @param {string} [after = руб.]
+	 * @param {string} [before]
+	 * @param {string} [separator =  ]
+	 * @param {string} [decimal_separator = .]
+	 *
+	 * @return {string}
+	 */
+	OneTicketType.prototype.formatPrice = function(after, before, separator, decimal_separator) {
+		
+		return parseInt(this.price) === 0 ? 'Бесплатно' : formatCurrency(this.price, separator, decimal_separator, before, after || 'руб.');
+	};
+	
+	/**
+	 *
 	 * @param {(string|number)} event_id
 	 * @param {(string|number)} uuid
 	 * @param {(Fields|string)} [fields]

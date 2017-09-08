@@ -45,8 +45,8 @@ font-weight: 700    bold    Roboto-Bold
 h1,
 h2 {margin: 1.5em 0 .7em}
 h3,
-h4 {margin: 1.5em 0 .5em}
-h5,
+h4,
+h5 {margin: 1.5em 0 .5em}
 h6,
 .small_title {margin: 1.5em 0 1em}
 
@@ -70,8 +70,8 @@ h2 {
 }
 
 h3 {font-size: 1.5rem}
-h4 {font-size: 1.125rem}
-h5 {font-size: 1.25rem}
+h4 {font-size: 1.25rem}
+h5 {font-size: 1.125rem}
 h6 {font-size: 1rem}
 
 .small_title {
@@ -446,6 +446,71 @@ table {
 	opacity: 0;
 	visibility: hidden;
 }
+
+
+.flex_grid {
+	display: flex;
+}
+
+.flex_grid.-flex_wrap {flex-wrap: wrap}
+.flex_grid > .grid_box {width: 100%}
+.flex_grid.-float > .grid_box {width: auto}
+.flex_grid.-strict_width > .grid_box {flex: none}
+
+.flex_grid.-align_left {justify-content: flex-start}
+.flex_grid.-align_center {justify-content: center}
+.flex_grid.-align_right {justify-content: flex-end}
+.flex_grid.-align_space_around {justify-content: space-around}
+.flex_grid.-align_space_between {justify-content: space-between}
+
+.flex_grid.-valign_baseline {align-items: baseline}
+.flex_grid.-valign_center {align-items: center}
+.flex_grid.-valign_top {align-items: flex-start}
+.flex_grid.-valign_bottom {align-items: flex-end}
+
+
+.flex_grid.-parts_equal_2 > .grid_box {width: calc(100% / 2)}
+.flex_grid.-parts_equal_3 > .grid_box {width: calc(100% / 3)}
+.flex_grid.-parts_equal_4 > .grid_box {width: calc(100% / 4)}
+.flex_grid.-parts_equal_5 > .grid_box {width: calc(100% / 5)}
+
+.flex_grid.-parts_1_2 > .grid_box:nth-child(1),
+.flex_grid.-parts_2_1 > .grid_box:nth-child(2) {width: calc((100% / 3) * 1)}
+.flex_grid.-parts_1_2 > .grid_box:nth-child(2),
+.flex_grid.-parts_2_1 > .grid_box:nth-child(1) {width: calc((100% / 3) * 2)}
+
+.flex_grid.-parts_1_3 > .grid_box:nth-child(1),
+.flex_grid.-parts_3_1 > .grid_box:nth-child(2) {width: calc((100% / 4) * 1)}
+.flex_grid.-parts_1_3 > .grid_box:nth-child(2),
+.flex_grid.-parts_3_1 > .grid_box:nth-child(1) {width: calc((100% / 4) * 3)}
+
+.flex_grid.-parts_1_4 > .grid_box:nth-child(1),
+.flex_grid.-parts_4_1 > .grid_box:nth-child(2) {width: calc((100% / 5) * 1)}
+.flex_grid.-parts_1_4 > .grid_box:nth-child(2),
+.flex_grid.-parts_4_1 > .grid_box:nth-child(1) {width: calc((100% / 5) * 4)}
+
+
+.flex_grid.-parts_1_1_2 > .grid_box:nth-child(1),
+.flex_grid.-parts_1_1_2 > .grid_box:nth-child(2),
+.flex_grid.-parts_1_2_1 > .grid_box:nth-child(1),
+.flex_grid.-parts_1_2_1 > .grid_box:nth-child(3),
+.flex_grid.-parts_2_1_1 > .grid_box:nth-child(2),
+.flex_grid.-parts_2_1_1 > .grid_box:nth-child(3) {width: calc((100% / 4) * 1)}
+
+.flex_grid.-parts_1_1_2 > .grid_box:nth-child(3),
+.flex_grid.-parts_1_2_1 > .grid_box:nth-child(2),
+.flex_grid.-parts_2_1_1 > .grid_box:nth-child(1) {width: calc((100% / 4) * 2)}
+
+.flex_grid.-parts_1_2_2 > .grid_box:nth-child(2),
+.flex_grid.-parts_1_2_2 > .grid_box:nth-child(3),
+.flex_grid.-parts_2_1_2 > .grid_box:nth-child(1),
+.flex_grid.-parts_2_1_2 > .grid_box:nth-child(3),
+.flex_grid.-parts_2_2_1 > .grid_box:nth-child(1),
+.flex_grid.-parts_2_2_1 > .grid_box:nth-child(2) {width: calc((100% / 5) * 2)}
+
+.flex_grid.-parts_1_2_2 > .grid_box:nth-child(1),
+.flex_grid.-parts_2_1_2 > .grid_box:nth-child(2),
+.flex_grid.-parts_2_2_1 > .grid_box:nth-child(3) {width: calc((100% / 5) * 1)}
 
 
 
@@ -2005,13 +2070,13 @@ table.table.-data_table_override.-data_table_row_selection tr.-selected.-has_chi
 }
 .order_status.-order_status_error:before {background-color: #fd7b6e}
 .progress_bar {
-
+	color: #657184;
+	color: var(--color_primary_80);
 }
 
 .progress_bar_strip {
 	width: 100%;
 	height: 8px;
-	border-radius: 100px;
 	background-color: #e2e4e8;
 	overflow: hidden;
 }
@@ -2019,13 +2084,19 @@ table.table.-data_table_override.-data_table_row_selection tr.-selected.-has_chi
 .progress_bar_strip_complete {
 	width: 0;
 	height: 100%;
-	border-radius: 100px;
-	background-color: #00dc88;
-	background-color: var(--color_franklin);
+	background-color: currentColor;
 
-	-webkit-transition: width .2s ease;
-	transition: width .2s ease;
+	-webkit-transition: width .2s ease, background-color .4s ease;
+	transition: width .2s ease, background-color .4s ease;
 }
+
+.progress_bar.-size_tall .progress_bar_strip {height: 22px}
+
+.progress_bar.-slightly_rounded .progress_bar_strip,
+.progress_bar.-slightly_rounded .progress_bar_strip_complete {border-radius: 3px}
+
+.progress_bar.-rounded .progress_bar_strip,
+.progress_bar.-rounded .progress_bar_strip_complete {border-radius: 100px}
 
 .progress_bar.-with_label {
 	display: flex;
@@ -2036,19 +2107,30 @@ table.table.-data_table_override.-data_table_row_selection tr.-selected.-has_chi
 	margin: 0 12px;
 	font-size: .875em;
 	font-weight: 500;
-	color: #9fa6b3;
-	color: var(--color_primary_50);
+
+	-webkit-transition: color .4s ease;
+	transition: color .4s ease;
 }
 
 .progress_bar.-with_label[data-abs_number][data-abs_of]:not([data-abs_number=""]):not([data-abs_of=""]):after {content: attr(data-abs_number) '/' attr(data-abs_of)}
 .progress_bar.-with_label[data-abs_of=""][data-percentage]:after,
 .progress_bar.-with_label[data-abs_number=""][data-percentage]:after,
 .progress_bar.-with_label:not([data-abs_number]):not([data-abs_of])[data-percentage]:after {content: attr(data-percentage) '/100%'}
+
+.progress_bar.-color_primary {color: #3e4d66; color: var(--color_primary);}
+.progress_bar.-color_accent {color: #f82969; color: var(--color_accent);}
+.-state_admin .progress_bar.-color_accent {color: #00dc88}
+.progress_bar.-color_error {color: #ff5f9e; color: var(--color_bubblegum_alt);}
+.progress_bar.-color_neutral {color: #9fa6b3; color: var(--color_primary_50);}
+.scoreboard {
+	margin: 1em 0;
+}
+
+
 .scoreboard_number {
 	display: block;
-	margin-bottom: 6px;
 	font-size: 2.3em;
-	font-weight: 700;
+	font-weight: bold;
 	white-space: nowrap;
 }
 
@@ -2076,17 +2158,26 @@ table.table.-data_table_override.-data_table_row_selection tr.-selected.-has_chi
 }
 
 
-.scoreboard.-size_big > .scoreboard_number {
-	font-size: 4.2em;
-	font-weight: bold;
-	color: #3e4d66;
-	color: var(--color_primary);
+.scoreboard.-size_normal > .scoreboard_number {font-size: 1.75em}
+
+.scoreboard.-size_big > .scoreboard_number {font-size: 2.75em}
+.scoreboard.-size_big > .scoreboard_title {font-size: 1.25em}
+
+.scoreboard.-size_huge > .scoreboard_number {font-size: 4.2em}
+.scoreboard.-size_huge > .scoreboard_title {font-size: 1.5em}
+
+.scoreboard.-color_accent > .scoreboard_title,
+.scoreboard.-color_accent > .scoreboard_number {
+	color: #f82969;
+	color: var(--color_accent);
 }
 
-.scoreboard.-size_big > .scoreboard_title {
-	font-size: 1.25em;
-	font-weight: 500;
+.-state_admin .scoreboard.-color_accent > .scoreboard_title,
+.-state_admin .scoreboard.-color_accent > .scoreboard_number {
+	color: #00dc88;
+	color: var(--color_accent);
 }
+
 .share_block {
 	margin: 30px 0;
 	font-size: .75em;
@@ -2745,7 +2836,6 @@ fieldset:disabled .form_select {cursor: default}
 :not(.-status_disabled) .form_textarea:not(:disabled):not(.-status_disabled):focus {
 	background-color: #fff;
 	border-color: var(--color_franklin);
-	outline: 1px solid var(--color_franklin);
 }
 
 .form_input:-moz-placeholder,
@@ -4645,6 +4735,81 @@ body.-open_modal > .modal_wrapper {
 	font-size: 1.125em;
 	font-weight: 500;
 }
+.event_admin_sales_page {
+	margin: 18px 0;
+}
+
+.event_admin_sales_header {
+	display: flex;
+}
+
+.event_admin_sales_header_main {
+	width: 100%;
+	padding: 24px 24px 0;
+	border-bottom: 1px solid #e2e4e8;
+	border-bottom: 1px solid var(--color_marginal);
+}
+
+.event_admin_sales_header_bottom {
+	display: flex;
+}
+
+.event_admin_sales_big_date  {margin: 0}
+
+.event_admin_sales_header_info {
+	width: 100%;
+	margin: 16px 24px;
+}
+
+.event_admin_sales_header_side {
+	display: flex;
+	flex-wrap: wrap;
+	flex: none;
+	width: 372px;
+}
+
+.event_admin_sales_brief_block {
+	display: flex;
+	align-items: center;
+	padding: 0 18px;
+	width: 50%;
+	height: 50%;
+	border-width: 0 0 1px 1px;
+	border-style: solid;
+	border-color: #e2e4e8;
+	border-color: var(--color_marginal);
+}
+
+.event_admin_sales_brief_block_title,
+.event_admin_sales_brief_block_numbers {
+	display: block;
+}
+
+.event_admin_sales_page_main {
+	padding: 24px;
+}
+
+.event_admin_sales_ticket_type {
+	margin: 26px 0;
+}
+
+.event_admin_sales_ticket_type_title {
+	margin: 0;
+}
+
+.event_admin_sales_ticket_type_info {
+	margin: 0 0 12px;
+}
+
+.event_admin_sales_ticket_type_dates,
+.event_admin_sales_ticket_type_price {
+	display: inline-block;
+	color: #657184;
+	color: var(--color_primary_80);
+	font-weight: 500;
+}
+
+.event_admin_sales_ticket_type_dates {width: 200px}
 .add_organization_page {
 	max-width: 700px;
 	margin: 40px 0;

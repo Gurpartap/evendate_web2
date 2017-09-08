@@ -48,6 +48,7 @@ __C = {
 		},
 		UNIVERSAL_STATES: {
 			EMPTY: '-empty',
+			SLIGHTLY_ROUNDED: '-slightly_rounded',
 			ROUNDED: '-rounded',
 			SHADOWED: '-shadowed',
 			BORDERED: '-bordered',
@@ -1335,7 +1336,7 @@ function getGenderText(gender, cases) {
  * Returns formatted array of format variable
  *
  * @param {(Array<OneDate>|DatesCollection)} dates
- * @param {(string|Array|jQuery|object)} format
+ * @param {(string|Array|jQuery|object)} [format]
  * @param {boolean} [is_same_time=false]
  *
  * @returns {(Array<string>|Array<Array>|Array<jQuery>|Array<object>)}
@@ -1415,7 +1416,7 @@ function formatDates(dates, format, is_same_time) {
 		}
 	}
 	
-	if (typeof format == 'string') {
+	if (typeof format === 'string') {
 		is_with_time = format.contains((/\{T\}|\{t\}/)) && dates[0]['start_time'] !== undefined;
 	} else {
 		is_with_time = dates[0]['start_time'] !== undefined;
@@ -1546,6 +1547,7 @@ function trimSeconds(time) {
  *
  * @param {timestamp} first_date
  * @param {timestamp} last_date
+ *
  * @returns {string}
  */
 function displayDateRange(first_date, last_date) {
@@ -1556,16 +1558,17 @@ function displayDateRange(first_date, last_date) {
 	if (m_first.isSame(m_last, 'year')) {
 		if (m_first.isSame(m_last, 'month')) {
 			if (m_first.isSame(m_last, 'day')) {
-				return m_first.format(m_first.isSame(m_today, 'year') ? 'D MMM' : 'D MMM YYYY');
-			} else {
-				return m_first.format('D') + '-' + m_last.format(m_first.isSame(m_today, 'year') ? 'D MMM' : 'D MMM YYYY');
+				
+				return m_first.format(m_first.isSame(m_today, 'year') ? 'D MMMM' : 'D MMMM YYYY');
 			}
-		} else {
-			return m_first.format('D MMM') + ' - ' + m_last.format(m_first.isSame(m_today, 'year') ? 'D MMM' : 'D MMM YYYY');
+			
+			return m_first.format('D') + '-' + m_last.format(m_first.isSame(m_today, 'year') ? 'D MMMM' : 'D MMMM YYYY');
 		}
-	} else {
-		return m_first.format('MMM YYYY') + ' - ' + m_last.format('MMM YYYY');
+		
+		return m_first.format('D MMMM') + ' - ' + m_last.format(m_first.isSame(m_today, 'year') ? 'D MMMM' : 'D MMMM YYYY');
 	}
+	
+	return m_first.format('MMMM YYYY') + ' - ' + m_last.format('MMMM YYYY');
 }
 /**
  * Returns formatted times range
