@@ -24,7 +24,10 @@ CatalogPage = extending(Page, (function() {
 		
 		this.wrapper_tmpl = 'organizations';
 		
-		this.categories_ajax_data = {order_by: 'order_position'};
+		this.categories_ajax_data = {
+			new_separated: true,
+			order_by: 'order_position'
+		};
 		this.organizations_ajax_data = {
 			fields: [
 				'background_small_img_url',
@@ -55,6 +58,7 @@ CatalogPage = extending(Page, (function() {
 				self.categories_ajax_data.city_id = self.selected_city.id;
 			}
 		}).then(function() {
+			
 			return self.categories.fetchCategoriesWithOrganizations(self.categories_ajax_data, self.organizations_ajax_data, 0).done(function() {
 				self.all_organizations = self.categories
 					.reduce(function(collection, cat) {
