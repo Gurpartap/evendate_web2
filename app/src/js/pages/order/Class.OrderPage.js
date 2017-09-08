@@ -422,7 +422,7 @@ OrderPage = extending(Page, (function() {
 				if (result !== false) {
 					result.done(function(data) {
 						
-						Payment.doPayment('order-' + data.order.uuid, data.order.sum, callback_url);
+						Payment.doPayment('order-' + data.order.uuid, data.order.final_sum, callback_url);
 					})
 				}
 			}

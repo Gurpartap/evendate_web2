@@ -42,7 +42,7 @@
 	</div>
 </form>
 <script>
-//    document.getElementById('payment').submit();
+	document.getElementById('payment').submit();
 </script>
 </body>
 </html>

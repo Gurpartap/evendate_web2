@@ -4390,6 +4390,115 @@ UsersActivitiesCollection = extending(EntitiesCollection, (function() {
  * @requires ../Class.OneEntity.js
  */
 /**
+ * @class OneCity
+ * @extends OneEntity
+ */
+OneCity = extending(OneEntity, (function() {
+	/**
+	 *
+	 * @param {(string|number)} [city_id]
+	 * @constructor
+	 * @constructs OneCity
+	 *
+	 * @property {(string|number)} id=0
+	 * @property {?string} en_name
+	 * @property {?number} country_id
+	 * @property {?string} local_name
+	 * @property {CategoriesCollection} organization_type
+	 * @property {?number} timediff_seconds
+	 */
+	function OneCity(city_id) {
+		this.id = setDefaultValue(city_id, 0);
+		
+		this.en_name = null;
+		this.country_id = null;
+		this.local_name = null;
+		this.organization_type = new CategoriesCollection();
+		this.timediff_seconds = null;
+	}
+	
+	return OneCity;
+}()));
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.OneCity.js
+ */
+/**
+ *
+ * @class CitiesCollection
+ * @extends EntitiesCollection
+ */
+CitiesCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs CitiesCollection
+	 */
+	function CitiesCollection() {
+		EntitiesCollection.call(this);
+	}
+	
+	CitiesCollection.prototype.collection_of = OneCity;
+	/**
+	 *
+	 * @param {AJAXData} data
+	 * @param {AJAXCallback} success
+	 * @return {jqPromise}
+	 */
+	CitiesCollection.fetchCities = function(data, success) {
+		return __APP.SERVER.getData('/api/v1/organizations/cities', data, success);
+	};
+	/**
+	 *
+	 * @param {string} name
+	 * @returns {(OneCity|null)}
+	 */
+	CitiesCollection.prototype.getByName = function(name) {
+		for (var i = 0; i < this.length; i++) {
+			if (this[i].en_name == name) {
+				return this[i];
+			}
+		}
+		return null;
+	};
+	/**
+	 *
+	 * @param {(string|number)} id
+	 * @returns {boolean}
+	 */
+	CitiesCollection.prototype.has = function(id) {
+		return ($.isNumeric(id) ? this.getByID(id) : this.getByName(id)) instanceof OneEntity;
+	};
+	/**
+	 *
+	 * @param {?(Fields|Array|string)} [fields]
+	 * @param {?number} [length]
+	 * @param {?string} [order_by]
+	 * @param {?function} [success]
+	 * @return {jqPromise}
+	 */
+	CitiesCollection.prototype.fetchCities = function(fields, length, order_by, success) {
+		var self = this;
+		
+		return CitiesCollection.fetchCities({
+			fields: fields || undefined,
+			offset: this.length,
+			length: length || undefined,
+			order_by: order_by || undefined
+		}, function(data) {
+			self.setData(data);
+			if (success && typeof success == 'function') {
+				success.call(self, self.last_pushed);
+			}
+		});
+	};
+	
+	return CitiesCollection;
+}()));
+/**
+ * @requires ../Class.OneEntity.js
+ */
+/**
  *
  * @class OneCategory
  * @extends OneEntity
@@ -4526,115 +4635,6 @@ CategoriesCollection = extending(EntitiesCollection, (function() {
 	};
 	
 	return CategoriesCollection;
-}()));
-/**
- * @requires ../Class.OneEntity.js
- */
-/**
- * @class OneCity
- * @extends OneEntity
- */
-OneCity = extending(OneEntity, (function() {
-	/**
-	 *
-	 * @param {(string|number)} [city_id]
-	 * @constructor
-	 * @constructs OneCity
-	 *
-	 * @property {(string|number)} id=0
-	 * @property {?string} en_name
-	 * @property {?number} country_id
-	 * @property {?string} local_name
-	 * @property {CategoriesCollection} organization_type
-	 * @property {?number} timediff_seconds
-	 */
-	function OneCity(city_id) {
-		this.id = setDefaultValue(city_id, 0);
-		
-		this.en_name = null;
-		this.country_id = null;
-		this.local_name = null;
-		this.organization_type = new CategoriesCollection();
-		this.timediff_seconds = null;
-	}
-	
-	return OneCity;
-}()));
-/**
- * @requires ../Class.EntitiesCollection.js
- * @requires Class.OneCity.js
- */
-/**
- *
- * @class CitiesCollection
- * @extends EntitiesCollection
- */
-CitiesCollection = extending(EntitiesCollection, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs CitiesCollection
-	 */
-	function CitiesCollection() {
-		EntitiesCollection.call(this);
-	}
-	
-	CitiesCollection.prototype.collection_of = OneCity;
-	/**
-	 *
-	 * @param {AJAXData} data
-	 * @param {AJAXCallback} success
-	 * @return {jqPromise}
-	 */
-	CitiesCollection.fetchCities = function(data, success) {
-		return __APP.SERVER.getData('/api/v1/organizations/cities', data, success);
-	};
-	/**
-	 *
-	 * @param {string} name
-	 * @returns {(OneCity|null)}
-	 */
-	CitiesCollection.prototype.getByName = function(name) {
-		for (var i = 0; i < this.length; i++) {
-			if (this[i].en_name == name) {
-				return this[i];
-			}
-		}
-		return null;
-	};
-	/**
-	 *
-	 * @param {(string|number)} id
-	 * @returns {boolean}
-	 */
-	CitiesCollection.prototype.has = function(id) {
-		return ($.isNumeric(id) ? this.getByID(id) : this.getByName(id)) instanceof OneEntity;
-	};
-	/**
-	 *
-	 * @param {?(Fields|Array|string)} [fields]
-	 * @param {?number} [length]
-	 * @param {?string} [order_by]
-	 * @param {?function} [success]
-	 * @return {jqPromise}
-	 */
-	CitiesCollection.prototype.fetchCities = function(fields, length, order_by, success) {
-		var self = this;
-		
-		return CitiesCollection.fetchCities({
-			fields: fields || undefined,
-			offset: this.length,
-			length: length || undefined,
-			order_by: order_by || undefined
-		}, function(data) {
-			self.setData(data);
-			if (success && typeof success == 'function') {
-				success.call(self, self.last_pushed);
-			}
-		});
-	};
-	
-	return CitiesCollection;
 }()));
 /**
  * @requires ../../data_models/date/Class.DateModel.js
@@ -7971,6 +7971,168 @@ TimelineEventsCollection = extending(EventsCollection, (function() {
 	return TimelineEventsCollection;
 }()));
 /**
+ * @requires Class.AbstractEventOrdersCollection.js
+ */
+/**
+ *
+ * @class EventAllOrdersCollection
+ * @extends AbstractEventOrdersCollection
+ */
+EventAllOrdersCollection = extending(AbstractEventOrdersCollection, (function() {
+	/**
+	 *
+	 * @param {(string|number)} [event_id=0]
+	 *
+	 * @constructor
+	 * @constructs EventAllOrdersCollection
+	 *
+	 * @property {(string|number)} event_id
+	 */
+	function EventAllOrdersCollection(event_id) {
+		AbstractEventOrdersCollection.call(this, event_id);
+	}
+	
+	/**
+	 *
+	 * @param {(string|number)} event_id
+	 * @param {AJAXData} [ajax_data]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	EventAllOrdersCollection.fetchOrders = function(event_id, ajax_data, success) {
+		return __APP.SERVER.getData('/api/v1/statistics/events/' + event_id + '/orders', ajax_data, success);
+	};
+	/**
+	 *
+	 * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
+	 *
+	 * @return {jqPromise}
+	 */
+	EventAllOrdersCollection.prototype.export = function(format) {
+		
+		return (new ServerExports()).eventOrders(this.event_id, format);
+	};
+	
+	
+	return EventAllOrdersCollection;
+}()));
+/**
+ * @requires Class.AbstractEventOrdersCollection.js
+ */
+/**
+ *
+ * @class EventMyOrdersCollection
+ * @extends AbstractEventOrdersCollection
+ */
+EventMyOrdersCollection = extending(AbstractEventOrdersCollection, (function() {
+	/**
+	 *
+	 * @param {(string|number)} [event_id=0]
+	 *
+	 * @constructor
+	 * @constructs EventMyOrdersCollection
+	 *
+	 * @property {(string|number)} event_id
+	 */
+	function EventMyOrdersCollection(event_id) {
+		AbstractEventOrdersCollection.call(this, event_id);
+	}
+	
+	/**
+	 *
+	 * @param {(string|number)} event_id
+	 * @param {AJAXData} [ajax_data]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	EventMyOrdersCollection.fetchOrders = function(event_id, ajax_data, success) {
+		
+		return __APP.SERVER.getData('/api/v1/events/' + event_id + '/orders', ajax_data, success);
+	};
+	
+	return EventMyOrdersCollection;
+}()));
+/**
+ * @requires ../../data_models/promocode/Class.PromocodeModel.js
+ */
+/**
+ *
+ * @class OnePromocode
+ * @extends PromocodeModel
+ */
+OnePromocode = extending(PromocodeModel, (function() {
+	/**
+	 *
+	 * @param {number} [event_id]
+	 * @param {string} [uuid]
+	 *
+	 * @constructor
+	 * @constructs OnePromocode
+	 *
+	 * @property {string} ?uuid
+	 * @property {(number|string)} ?event_id
+	 * @property {string} ?code
+	 * @property {boolean} ?is_fixed
+	 * @property {boolean} ?is_percentage
+	 * @property {(number|string)} ?effort
+	 * @property {(number|string)} ?use_limit
+	 * @property {timestamp} ?start_date
+	 * @property {timestamp} ?end_date
+	 * @property {boolean} ?enabled
+	 *
+	 * @property {timestamp} ?created_at
+	 * @property {timestamp} ?updated_at
+	 */
+	function OnePromocode(event_id, uuid) {
+		PromocodeModel.call(this);
+		
+		this.event_id = setDefaultValue(event_id, null);
+		this.uuid = setDefaultValue(uuid, null);
+	}
+	
+	/**
+	 *
+	 * @param {number} event_id
+	 * @param {string} code
+	 * @param {Fields} [fields]
+	 * @param {AJAXCallback} [success]
+	 * @param {function} [error]
+	 *
+	 * @return {jqPromise}
+	 */
+	OnePromocode.fetchPromocodebyCodeName = function(event_id, code, fields, success, error) {
+		
+		return __APP.SERVER.getData('/api/v1/events/'+event_id+'/promocodes', {
+			code: code,
+			fields: fields
+		}, success, error);
+	};
+	/**
+	 *
+	 * @param {string} code
+	 * @param {Fields} [fields]
+	 * @param {AJAXCallback} [success]
+	 * @param {function} [error]
+	 *
+	 * @return {jqPromise}
+	 */
+	OnePromocode.prototype.fetchPromocodebyCodeName = function(code, fields, success, error) {
+		var self = this;
+	
+		return OnePromocode.fetchPromocodebyCodeName(this.event_id, code, fields, function(data) {
+			self.setData(data);
+			
+			if (isFunction(success)) {
+				success.call(self, data);
+			}
+		}, error);
+	};
+	
+	return OnePromocode;
+}()));
+/**
  * @requires ../order/Class.OneOrder.js
  */
 /**
@@ -8223,168 +8385,6 @@ MyOrdersCollection = extending(ExtendedOrdersCollection, (function() {
 	
 	
 	return MyOrdersCollection;
-}()));
-/**
- * @requires Class.AbstractEventOrdersCollection.js
- */
-/**
- *
- * @class EventAllOrdersCollection
- * @extends AbstractEventOrdersCollection
- */
-EventAllOrdersCollection = extending(AbstractEventOrdersCollection, (function() {
-	/**
-	 *
-	 * @param {(string|number)} [event_id=0]
-	 *
-	 * @constructor
-	 * @constructs EventAllOrdersCollection
-	 *
-	 * @property {(string|number)} event_id
-	 */
-	function EventAllOrdersCollection(event_id) {
-		AbstractEventOrdersCollection.call(this, event_id);
-	}
-	
-	/**
-	 *
-	 * @param {(string|number)} event_id
-	 * @param {AJAXData} [ajax_data]
-	 * @param {AJAXCallback} [success]
-	 *
-	 * @return {jqPromise}
-	 */
-	EventAllOrdersCollection.fetchOrders = function(event_id, ajax_data, success) {
-		return __APP.SERVER.getData('/api/v1/statistics/events/' + event_id + '/orders', ajax_data, success);
-	};
-	/**
-	 *
-	 * @param {ServerExports.EXPORT_EXTENSION} [format=xlsx]
-	 *
-	 * @return {jqPromise}
-	 */
-	EventAllOrdersCollection.prototype.export = function(format) {
-		
-		return (new ServerExports()).eventOrders(this.event_id, format);
-	};
-	
-	
-	return EventAllOrdersCollection;
-}()));
-/**
- * @requires Class.AbstractEventOrdersCollection.js
- */
-/**
- *
- * @class EventMyOrdersCollection
- * @extends AbstractEventOrdersCollection
- */
-EventMyOrdersCollection = extending(AbstractEventOrdersCollection, (function() {
-	/**
-	 *
-	 * @param {(string|number)} [event_id=0]
-	 *
-	 * @constructor
-	 * @constructs EventMyOrdersCollection
-	 *
-	 * @property {(string|number)} event_id
-	 */
-	function EventMyOrdersCollection(event_id) {
-		AbstractEventOrdersCollection.call(this, event_id);
-	}
-	
-	/**
-	 *
-	 * @param {(string|number)} event_id
-	 * @param {AJAXData} [ajax_data]
-	 * @param {AJAXCallback} [success]
-	 *
-	 * @return {jqPromise}
-	 */
-	EventMyOrdersCollection.fetchOrders = function(event_id, ajax_data, success) {
-		
-		return __APP.SERVER.getData('/api/v1/events/' + event_id + '/orders', ajax_data, success);
-	};
-	
-	return EventMyOrdersCollection;
-}()));
-/**
- * @requires ../../data_models/promocode/Class.PromocodeModel.js
- */
-/**
- *
- * @class OnePromocode
- * @extends PromocodeModel
- */
-OnePromocode = extending(PromocodeModel, (function() {
-	/**
-	 *
-	 * @param {number} [event_id]
-	 * @param {string} [uuid]
-	 *
-	 * @constructor
-	 * @constructs OnePromocode
-	 *
-	 * @property {string} ?uuid
-	 * @property {(number|string)} ?event_id
-	 * @property {string} ?code
-	 * @property {boolean} ?is_fixed
-	 * @property {boolean} ?is_percentage
-	 * @property {(number|string)} ?effort
-	 * @property {(number|string)} ?use_limit
-	 * @property {timestamp} ?start_date
-	 * @property {timestamp} ?end_date
-	 * @property {boolean} ?enabled
-	 *
-	 * @property {timestamp} ?created_at
-	 * @property {timestamp} ?updated_at
-	 */
-	function OnePromocode(event_id, uuid) {
-		PromocodeModel.call(this);
-		
-		this.event_id = setDefaultValue(event_id, null);
-		this.uuid = setDefaultValue(uuid, null);
-	}
-	
-	/**
-	 *
-	 * @param {number} event_id
-	 * @param {string} code
-	 * @param {Fields} [fields]
-	 * @param {AJAXCallback} [success]
-	 * @param {function} [error]
-	 *
-	 * @return {jqPromise}
-	 */
-	OnePromocode.fetchPromocodebyCodeName = function(event_id, code, fields, success, error) {
-		
-		return __APP.SERVER.getData('/api/v1/events/'+event_id+'/promocodes', {
-			code: code,
-			fields: fields
-		}, success, error);
-	};
-	/**
-	 *
-	 * @param {string} code
-	 * @param {Fields} [fields]
-	 * @param {AJAXCallback} [success]
-	 * @param {function} [error]
-	 *
-	 * @return {jqPromise}
-	 */
-	OnePromocode.prototype.fetchPromocodebyCodeName = function(code, fields, success, error) {
-		var self = this;
-	
-		return OnePromocode.fetchPromocodebyCodeName(this.event_id, code, fields, function(data) {
-			self.setData(data);
-			
-			if (isFunction(success)) {
-				success.call(self, data);
-			}
-		}, error);
-	};
-	
-	return OnePromocode;
 }()));
 /**
  * @requires ../Class.OneEntity.js
@@ -15168,120 +15168,6 @@ Builder = (function() {
 	return Builder;
 }());
 /**
- * @abstract
- * @class
- */
-AbstractSidebar = (function () {
-	/**
-	 *
-	 * @constructor
-	 * @constructs AbstractSidebar
-	 */
-	function AbstractSidebar() {
-		this.$sidebar = $('#main_sidebar');
-		this.$subscribed_orgs = $('.SidebarOrganizationsList');
-	}
-	
-	AbstractSidebar.prototype.init = function () {
-		this.$sidebar.find('.SidebarNav').addClass('-items_' + this.$sidebar.find('.SidebarNavItem').not('.-hidden').length);
-		this.$sidebar.find('.SidebarScroll').scrollbar();
-	};
-	
-	AbstractSidebar.prototype.updateSubscriptions = function () {};
-	
-	return AbstractSidebar;
-}());
-/**
- * @requires Class.AbstractSidebar.js
- */
-/**
- * @class
- * @extends AbstractSidebar
- */
-Sidebar = extending(AbstractSidebar, (function () {
-	/**
-	 *
-	 * @constructor
-	 * @construct Sidebar
-	 */
-	function Sidebar() {
-		AbstractSidebar.call(this);
-	}
-	
-	Sidebar.prototype.init = function () {
-		var self = this;
-		self.updateSubscriptions();
-		$(window).on('subscribe unsubscribe', function() {
-			self.updateSubscriptions();
-		});
-		
-		AbstractSidebar.prototype.init.call(this);
-	};
-	
-	Sidebar.prototype.updateSubscriptions = function() {
-		var $subscribed_orgs = this.$subscribed_orgs,
-			timing = 0,
-			current_menu_items = $.map($subscribed_orgs.children(), function(el) {
-				return $(el).data('organization_id');
-			}),
-			to_add = __APP.USER.subscriptions.filter(function(item) {
-				return current_menu_items.indexOf(item.id) === -1;
-			}),
-			to_remove = current_menu_items.filter(function(item) {
-				return !(__APP.USER.subscriptions.has(item));
-			});
-		
-		if (to_add.length) {
-			__APP.BUILD.organizationItems(to_add, {
-				block_classes: ['animated'],
-				avatar_classes: ['-size_30x30']
-			})
-				[($subscribed_orgs.length ? 'prependTo' : 'appendTo')]($subscribed_orgs)
-				.each(function(i, org_block) {
-					setTimeout(function() {
-						$(org_block).addClass('-show');
-					}, timing += 100);
-				});
-			
-			bindPageLinks($subscribed_orgs);
-		}
-		if (to_remove.length) {
-			to_remove.forEach(function(id) {
-				var $organization_item = $subscribed_orgs.find('.organization_item[data-organization_id="' + id + '"]').removeClass('-show');
-				setTimeout(function() {
-					$organization_item.remove();
-				}, 500);
-			});
-		}
-	};
-	
-	return Sidebar;
-}()));
-/**
- * @requires Class.AbstractSidebar.js
- */
-/**
- * @class
- * @extends AbstractSidebar
- */
-SidebarNoAuth = extending(AbstractSidebar, (function () {
-	/**
-	 *
-	 * @constructor
-	 * @constructs SidebarNoAuth
-	 */
-	function SidebarNoAuth() {
-		AbstractSidebar.call(this);
-	}
-	
-	SidebarNoAuth.prototype.init = function () {
-		this.$sidebar.find('.SidebarOrganizationsScroll').addClass(__C.CLASSES.HIDDEN);
-		AbstractSidebar.prototype.init.call(this);
-	};
-	
-	return SidebarNoAuth;
-}()));
-/**
  *
  * @class AppInspectorComponents
  */
@@ -15651,6 +15537,120 @@ OrderAppInspector = extending(AbstractAppInspector, (function() {
 	
 	
 	return OrderAppInspector;
+}()));
+/**
+ * @abstract
+ * @class
+ */
+AbstractSidebar = (function () {
+	/**
+	 *
+	 * @constructor
+	 * @constructs AbstractSidebar
+	 */
+	function AbstractSidebar() {
+		this.$sidebar = $('#main_sidebar');
+		this.$subscribed_orgs = $('.SidebarOrganizationsList');
+	}
+	
+	AbstractSidebar.prototype.init = function () {
+		this.$sidebar.find('.SidebarNav').addClass('-items_' + this.$sidebar.find('.SidebarNavItem').not('.-hidden').length);
+		this.$sidebar.find('.SidebarScroll').scrollbar();
+	};
+	
+	AbstractSidebar.prototype.updateSubscriptions = function () {};
+	
+	return AbstractSidebar;
+}());
+/**
+ * @requires Class.AbstractSidebar.js
+ */
+/**
+ * @class
+ * @extends AbstractSidebar
+ */
+Sidebar = extending(AbstractSidebar, (function () {
+	/**
+	 *
+	 * @constructor
+	 * @construct Sidebar
+	 */
+	function Sidebar() {
+		AbstractSidebar.call(this);
+	}
+	
+	Sidebar.prototype.init = function () {
+		var self = this;
+		self.updateSubscriptions();
+		$(window).on('subscribe unsubscribe', function() {
+			self.updateSubscriptions();
+		});
+		
+		AbstractSidebar.prototype.init.call(this);
+	};
+	
+	Sidebar.prototype.updateSubscriptions = function() {
+		var $subscribed_orgs = this.$subscribed_orgs,
+			timing = 0,
+			current_menu_items = $.map($subscribed_orgs.children(), function(el) {
+				return $(el).data('organization_id');
+			}),
+			to_add = __APP.USER.subscriptions.filter(function(item) {
+				return current_menu_items.indexOf(item.id) === -1;
+			}),
+			to_remove = current_menu_items.filter(function(item) {
+				return !(__APP.USER.subscriptions.has(item));
+			});
+		
+		if (to_add.length) {
+			__APP.BUILD.organizationItems(to_add, {
+				block_classes: ['animated'],
+				avatar_classes: ['-size_30x30']
+			})
+				[($subscribed_orgs.length ? 'prependTo' : 'appendTo')]($subscribed_orgs)
+				.each(function(i, org_block) {
+					setTimeout(function() {
+						$(org_block).addClass('-show');
+					}, timing += 100);
+				});
+			
+			bindPageLinks($subscribed_orgs);
+		}
+		if (to_remove.length) {
+			to_remove.forEach(function(id) {
+				var $organization_item = $subscribed_orgs.find('.organization_item[data-organization_id="' + id + '"]').removeClass('-show');
+				setTimeout(function() {
+					$organization_item.remove();
+				}, 500);
+			});
+		}
+	};
+	
+	return Sidebar;
+}()));
+/**
+ * @requires Class.AbstractSidebar.js
+ */
+/**
+ * @class
+ * @extends AbstractSidebar
+ */
+SidebarNoAuth = extending(AbstractSidebar, (function () {
+	/**
+	 *
+	 * @constructor
+	 * @constructs SidebarNoAuth
+	 */
+	function SidebarNoAuth() {
+		AbstractSidebar.call(this);
+	}
+	
+	SidebarNoAuth.prototype.init = function () {
+		this.$sidebar.find('.SidebarOrganizationsScroll').addClass(__C.CLASSES.HIDDEN);
+		AbstractSidebar.prototype.init.call(this);
+	};
+	
+	return SidebarNoAuth;
 }()));
 /**
  * @abstract
@@ -21640,968 +21640,6 @@ EventPage = extending(Page, (function() {
  */
 /**
  *
- * @class OrderPage
- */
-OrderPage = extending(Page, (function() {
-	/**
-	 *
-	 * @param {(number|string)} event_id
-	 *
-	 * @constructor
-	 * @constructs OrderPage
-	 *
-	 * @property {OneEvent} event
-	 * @property {Fields} event_fields
-	 * @property {OnePromocode} promocode
-	 * @property {Fields} promocode_fields
-	 * @property {boolean} is_promocode_active
-	 * @property {number} overall_sum
-	 * @property {number} total_sum
-	 */
-	function OrderPage(event_id) {
-		var self = this;
-		
-		Page.call(this);
-		this.event = new OneEvent(event_id);
-		this.event_fields = new Fields(
-			'accept_bitcoins',
-			'ticketing_locally',
-			'ticketing_available',
-			'registration_locally',
-			'registration_required',
-			'registration_available',
-			'registration_fields', {
-			ticket_types: {
-				fields: new Fields(
-					'is_selling',
-					'comment',
-					'price',
-					'min_count_per_user',
-					'max_count_per_user'
-				)
-			}
-		});
-		this.promocode = new OnePromocode(event_id);
-		this.promocode_fields = new Fields();
-		this.is_promocode_active = false;
-		
-		this.overall_sum = 0;
-		
-		this.render_vars = {
-			event_id: event_id,
-			tickets_selling: null,
-			registration: null,
-			pay_button: null,
-			register_button: null,
-			main_action_button: null,
-			legal_entity_payment_button: null,
-			bitcoin_payment_button: null
-		};
-		
-		Object.defineProperties(this, {
-			page_title: {
-				get: function() {
-					
-					return (self.event.ticketing_locally ? 'Заказ билетов на событие ' : 'Регистрация на событие ') + self.event.title;
-				}
-			},
-			total_sum: {
-				get: function() {
-					var total_sum = 0;
-					
-					if (self.is_promocode_active) {
-						if (self.promocode.is_fixed) {
-							total_sum = self.overall_sum - self.promocode.effort;
-						} else {
-							total_sum = self.overall_sum - (self.overall_sum * self.promocode.effort / 100);
-						}
-						
-						return total_sum <= 0 ? 0 : total_sum;
-					}
-					
-					return self.overall_sum;
-				}
-			}
-		});
-	}
-	
-	OrderPage.prototype.fetchData = function() {
-		
-		return this.fetching_data_defer = this.event.fetchEvent(this.event_fields);
-	};
-	/**
-	 *
-	 * @param {RegistrationFieldModel} field
-	 * @return {jQuery}
-	 */
-	OrderPage.buildRegistrationField = function(field) {
-		var default_props = {
-			id: 'registration_form_' + field.uuid,
-			name: field.uuid,
-			unit_classes: ['Registration' + field.type.toCamelCase('_') + 'Field'],
-			label: $('<span>'+ field.label +'</span>').add((field.required ? tmpl('required-star') : $())),
-			required: field.required
-		};
-		
-		switch (field.type) {
-			case RegistrationFieldModel.TYPES.SELECT: {
-				
-				return (function(props, values) {
-					
-					return tmpl('form-unit', Builder.normalizeBuildProps({
-						unit_classes: props.unit_classes,
-						label: tmpl('label', {
-							id: props.id,
-							label: props.label
-						}),
-						form_element: __APP.BUILD.select(
-							values.map(function(value) {
-								
-								return {
-									display_name: value.value,
-									val: value.uuid || guid()
-								}
-							}), {
-								id: props.id,
-								name: props.name,
-								required: props.required
-							}, props.classes
-						)
-					}));
-				}($.extend({}, default_props, {classes: ['form_select2', 'ToSelect2']}), field.values instanceof Array ? field.values : []));
-			}
-			case RegistrationFieldModel.TYPES.SELECT_MULTI: {
-				
-				return (function(props, values) {
-					
-					return tmpl('form-unit', Builder.normalizeBuildProps($.extend(true, {}, props, {
-						unit_classes: props.classes,
-						label: tmpl('label', {
-							id: props.id + '_label',
-							label: props.label
-						}),
-						form_element: __APP.BUILD.checkbox.apply(__APP.BUILD, values.map(function(value) {
-							
-							return {
-								id: 'registration_field_value_' + (value.uuid || guid()),
-								name: props.name,
-								label: value.value,
-								attributes: {
-									value: value.uuid || guid(),
-									required: props.required
-								}
-							};
-						}))
-					})));
-				}($.extend({}, default_props, {type: 'checkbox'}), field.values instanceof Array ? field.values : []));
-			}
-			default: {
-				
-				return __APP.BUILD.formUnit($.extend({}, default_props, {
-					type: field.type === RegistrationFieldModel.TYPES.EXTENDED_CUSTOM ? 'textarea' : field.type,
-					placeholder: field.label,
-					helptext: (function(type) {
-						switch (type) {
-							case RegistrationFieldModel.TYPES.EMAIL:
-								return 'На почту Вам поступит сообщение с подтверждением регистрации';
-							case RegistrationFieldModel.TYPES.FIRST_NAME:
-								return 'Используйте настоящее имя для регистрации';
-							case RegistrationFieldModel.TYPES.LAST_NAME:
-								return 'Используйте настоящюю фамилию для регистрации';
-							default:
-								return '';
-						}
-					})(field.type)
-				}));
-			}
-		}
-	};
-	
-	OrderPage.prototype.disablePage = function(message) {
-		var self = this;
-		
-		this.$wrapper.find('.OrderFormWrapper').addClass(__C.CLASSES.DISABLED).attr('disabled', true);
-		
-		this.$wrapper.find('.OrderPage').append(__APP.BUILD.overlayCap(tmpl('order-overlay-cap-content', {
-			message: message,
-			return_button: __APP.BUILD.link({
-				page: '/event/' + this.event.id,
-				title: 'Вернуться на страницу события',
-				classes: [
-					__C.CLASSES.COMPONENT.BUTTON,
-					__C.CLASSES.COLORS.PRIMARY
-				]
-			})
-		})));
-	};
-	/**
-	 *
-	 * @return {{tickets: Array<{uuid: string, count: string}>, registration_fields: Array<{uuid: string, value: string}>, promocode: string}}
-	 */
-	OrderPage.prototype.gatherSendData = function() {
-		
-		return {
-			tickets: this.$wrapper.find('.OrderFields').serializeForm('array').reduce(function(bundle, field) {
-				if (+field.value) {
-					bundle.push({
-						uuid: field.name,
-						count: +field.value
-					});
-				}
-				
-				return bundle;
-			}, []),
-			registration_fields: this.$wrapper.find('.RegistrationFields').serializeForm('array').map(function(field) {
-				
-				return {
-					uuid: field.name,
-					value: field.value
-				};
-			}),
-			promocode: this.$wrapper.find('.PromocodeInput').val()
-		};
-	};
-	
-	OrderPage.prototype.init = function() {
-		var self = this,
-			parsed_uri = parseUri(location),
-			$activate_promocode_button = this.$wrapper.find('.ActivatePromocode'),
-			$promocode_input = this.$wrapper.find('.PromocodeInput'),
-			$quantity_inputs = this.$wrapper.find('.QuantityInput'),
-			$pay_buttons = this.$wrapper.find('.PayButtons'),
-			$footer = this.$wrapper.find('.OrderFormFooter'),
-			$main_action_button = this.render_vars.register_button,
-			ticket_selected = parsed_uri.queryKey['ticket_selected'],
-			$payload,
-			$selected_type;
-		
-		function countTicketTypeSum($ticket_type) {
-			var $sum = $ticket_type.find('.TicketTypeSum'),
-				value = $ticket_type.find('.QuantityInput').val();
-			
-			if (value > 0) {
-				$sum.removeClass(__C.CLASSES.HIDDEN);
-			} else {
-				$sum.addClass(__C.CLASSES.HIDDEN);
-			}
-			
-			$ticket_type.find('.TicketTypeSumText').text(formatCurrency($ticket_type.data('ticket_type').price * value));
-		}
-		
-		function countTotalSum() {
-			self.overall_sum = Array.prototype.reduce.call(self.$wrapper.find('.TicketTypeSumText'), function(sum, ticket_type_sum) {
-				
-				return sum + parseInt(ticket_type_sum.innerHTML.replace(' ', ''));
-			}, 0);
-			
-			self.$wrapper.find('.TicketsOverallSum').text(formatCurrency(self.overall_sum));
-			
-			if (self.is_promocode_active) {
-				self.$wrapper.find('.TicketsTotalSum').text(formatCurrency(self.total_sum));
-			}
-			
-			if (self.total_sum === 0) {
-				if ($.contains(self.$wrapper[0], self.render_vars.pay_button[0])) {
-					self.render_vars.pay_button.after(self.render_vars.register_button);
-					self.render_vars.pay_button.detach();
-					$main_action_button = self.render_vars.register_button;
-					$pay_buttons.addClass(__C.CLASSES.HIDDEN);
-				}
-			} else {
-				if ($.contains(self.$wrapper[0], self.render_vars.register_button[0])) {
-					self.render_vars.register_button.after(self.render_vars.pay_button);
-					self.render_vars.register_button.detach();
-					$main_action_button = self.render_vars.pay_button;
-					$pay_buttons.removeClass(__C.CLASSES.HIDDEN);
-				}
-			}
-		}
-		
-		if (!this.event.ticketing_locally) {
-			$footer.removeClass(__C.CLASSES.HIDDEN);
-		}
-		
-		bindRippleEffect(this.$wrapper);
-		bindControlSwitch(this.$wrapper);
-		initSelect2(this.$wrapper.find('.ToSelect2'), {
-			dropdownCssClass: 'form_select2_drop form_select2_drop_no_search'
-		});
-		
-		$activate_promocode_button.on('click.ActivatePromocode', function() {
-			var $wrapper = self.$wrapper.find('.OrderFormWrapper'),
-				code = $promocode_input.val();
-			
-			if (code === '') {
-				showNotifier({
-					status: false,
-					text: 'Пожалуйста, введите промокод'
-				});
-			} else {
-				$wrapper.attr('disabled', true);
-				
-				self.promocode.fetchPromocodebyCodeName(code, self.promocode_fields, function() {
-					var $promocode_wrapper = $wrapper.find('.PromocodeWrapper');
-					
-					$wrapper.removeAttr('disabled');
-					
-					$promocode_wrapper.after(tmpl('order-tickets-selling-promocode', {
-						effort: self.promocode.effort + (self.promocode.is_fixed ? ' ₽' : '%')
-					}));
-					$promocode_wrapper.addClass(__C.CLASSES.HIDDEN);
-					
-					self.is_promocode_active = true;
-					countTotalSum();
-				}, function() {
-					showNotifier({
-						status: false,
-						text: 'Указанный промокод не существует или более не активен'
-					});
-					$wrapper.removeAttr('disabled');
-					
-					$promocode_input.focus().select();
-				});
-			}
-		});
-		
-		$promocode_input.on('keypress', function(e) {
-			if (isKeyPressed(e, __C.KEY_CODES.ENTER)) {
-				$activate_promocode_button.trigger('click.ActivatePromocode');
-			}
-		});
-		
-		this.$wrapper.find('.RegistrationFirstNameField').find('input').val(__APP.USER.first_name);
-		this.$wrapper.find('.RegistrationLastNameField').find('input').val(__APP.USER.last_name);
-		this.$wrapper.find('.RegistrationEmailField').find('input').val(__APP.USER.email);
-		
-		/**
-		 *
-		 * @return {(boolean|jqPromise)}
-		 */
-		function makeOrder(cb) {
-			var $form = self.$wrapper.find('.OrderForm'),
-				send_data;
-			
-			if (__APP.USER.isLoggedOut()) {
-				(new AuthModal(window.location.href)).show();
-				
-				return false;
-			} else {
-				if (isFormValid($form)) {
-					send_data = self.gatherSendData();
-					
-					if (isFunction(cb)) {
-						
-						return cb(send_data);
-					}
-					
-					$main_action_button.attr('disabled', true);
-					
-					return self.event.makeOrder(send_data.tickets, send_data.registration_fields, send_data.promocode).always(function(data) {
-						$main_action_button.removeAttr('disabled');
-						
-						return data;
-					}).promise();
-				} else {
-					
-					return false;
-				}
-			}
-		}
-		
-		$quantity_inputs.on('QuantityInput::change', function(e, value) {
-			var is_selected = Array.prototype.reduce.call($quantity_inputs, function(accumulator, input) {
-				
-				return accumulator || input.value !== 0;
-			}, false);
-			
-			if (is_selected) {
-				$footer.removeClass(__C.CLASSES.HIDDEN);
-			} else {
-				$footer.addClass(__C.CLASSES.HIDDEN);
-			}
-			countTicketTypeSum($(this).closest('.TicketType'));
-			countTotalSum();
-		});
-		
-		this.$wrapper.find('.TicketType').each(function() {
-			countTicketTypeSum($(this));
-		});
-		countTotalSum();
-		
-		if (ticket_selected) {
-			ticket_selected = decodeURIComponent(ticket_selected);
-			$selected_type = this.$wrapper.find('.TicketType').filter(function() {
-				
-				return $(this).data().ticket_type.name === ticket_selected;
-			});
-			
-			if ($selected_type.length) {
-				$selected_type.find('.QuantityInput').resolveInstance().increment();
-			}
-		}
-		
-		this.render_vars.pay_button.on('click.MakeOrder', function() {
-			var result,
-				callback_url = parsed_uri.queryKey['away_to'] || (window.location.origin + '/event/' + self.event.id);
-			
-			if (__APP.IS_WIDGET) {
-				makeOrder(function(send_data) {
-					$payload = self.$wrapper.find('.OrderFormPayload');
-					$payload.val(JSON.stringify(Object.assign({
-						redirect_to_payment: true,
-						callback_url: callback_url
-					}, send_data)));
-					
-					self.$wrapper.find('.OrderForm').submit();
-				});
-			} else {
-				result = makeOrder();
-				if (result !== false) {
-					result.done(function(data) {
-						
-						Payment.doPayment('order-' + data.order.uuid, data.order.sum, callback_url);
-					})
-				}
-			}
-		});
-		
-		this.render_vars.register_button.on('click.Register', function() {
-			var result = makeOrder();
-			
-			if (result !== false) {
-				result.done(function(data) {
-					var is_custom_callback = !!parsed_uri.queryKey['away_to'],
-						callback_url = parsed_uri.queryKey['away_to'] || '/event/' + self.event.id,
-						parsed_callback;
-					
-					
-					if (is_custom_callback) {
-						parsed_callback = parseUri(decodeURIComponent(callback_url));
-						window.location = parsed_callback.wo_query + '?' + 'registration=free&' + parsed_callback.query;
-					} else {
-						__APP.changeState(callback_url);
-						showNotifier({text: 'Регистрация прошла успешно', status: true});
-					}
-				})
-			}
-		});
-		
-		if (this.event.ticketing_locally) {
-			this.render_vars.legal_entity_payment_button.on('click.LegalEntityPayment', function() {
-				var result = makeOrder();
-				
-				if (result !== false) {
-					result.done(function(data) {
-						var parsed_uri = parseUri(location);
-						
-						try {
-							window.localStorage.setItem(self.event.id + '_order_info', JSON.stringify(parsed_uri.queryKey));
-						} catch (e) {}
-						
-						__APP.changeState(parsed_uri.path + '/' + data.order.uuid + '/from_legal_entity');
-					});
-				}
-			});
-		}
-		if (this.event.accept_bitcoins) {
-			this.render_vars.bitcoin_payment_button.on('click.BitcoinPayment', function() {
-				var $this = $(this),
-					modal;
-				
-				if (!$this.data('modal')) {
-					makeOrder().done(function(data) {
-						modal = new BitcoinModal(self.event, data.order.uuid);
-						$this.data('modal', modal);
-						
-						modal.show();
-					});
-				} else {
-					modal = $this.data('modal');
-					modal.show();
-				}
-			});
-		}
-	};
-	
-	OrderPage.prototype.preRender = function() {
-		var self = this;
-		
-		if (this.event.ticketing_locally) {
-			this.render_vars.tickets_selling = tmpl('order-tickets-selling', {
-				ticket_types: tmpl('order-ticket-type', this.event.ticket_types.map(function(ticket_type) {
-					
-					return {
-						name: ticket_type.name,
-						ticket_type_uuid: ticket_type.uuid,
-						quantity_input: new QuantityInput({
-							name: ticket_type.uuid
-						}, {
-							min: ticket_type.min_count_per_user || 0,
-							max: ticket_type.max_count_per_user || ticket_type.amount || 30
-						}),
-						description: ticket_type.comment,
-						type_price: formatCurrency(ticket_type.price),
-						sum_price: 0
-					};
-				})),
-				overall_price: 0
-			});
-			
-			this.render_vars.tickets_selling.find('.TicketType').each(function(i) {
-				var $this = $(this);
-				
-				$this.data('ticket_type', self.event.ticket_types[i]);
-				
-				if (!self.event.ticket_types[i].is_selling) {
-					$this.attr('disabled', true);
-				}
-			});
-		}
-		
-		if (this.event.registration_locally) {
-			this.render_vars.registration = tmpl('order-registration', {
-				registration_fields: $.makeSet(this.event.registration_fields.map(OrderPage.buildRegistrationField))
-			});
-		}
-		
-		this.render_vars.pay_button = __APP.BUILD.button({
-			title: 'Заплатить через Яндекс',
-			classes: [
-				__C.CLASSES.COLORS.YANDEX,
-				__C.CLASSES.HOOKS.RIPPLE,
-				__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE,
-				'MainActionButton',
-				__C.CLASSES.SIZES.WIDE,
-				__C.CLASSES.SIZES.HUGE
-			]
-		});
-		
-		this.render_vars.register_button = __APP.BUILD.button({
-			title: 'Зарегистрироваться',
-			classes: [
-				__C.CLASSES.COLORS.ACCENT,
-				__C.CLASSES.HOOKS.RIPPLE,
-				__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE,
-				'MainActionButton',
-				__C.CLASSES.SIZES.WIDE,
-				__C.CLASSES.SIZES.HUGE
-			]
-		});
-		
-		this.render_vars.main_action_button = this.render_vars.register_button;
-		
-		if (this.event.ticketing_locally) {
-			this.render_vars.legal_entity_payment_button = __APP.BUILD.button({
-				title: 'Оплатить через юр. лицо',
-				classes: [
-					__C.CLASSES.COLORS.MARGINAL_PRIMARY,
-					__C.CLASSES.TEXT_WEIGHT.LIGHTER,
-					__C.CLASSES.HOOKS.RIPPLE,
-					'LegalEntityPaymentButton',
-					__C.CLASSES.SIZES.WIDE,
-					__C.CLASSES.SIZES.BIG,
-					__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
-				]
-			});
-		}
-		
-		if (this.event.accept_bitcoins) {
-			this.render_vars.bitcoin_payment_button = __APP.BUILD.button({
-				title: 'Заплатить через Bitcoin',
-				classes: [
-					__C.CLASSES.COLORS.MARGINAL_PRIMARY,
-					__C.CLASSES.TEXT_WEIGHT.LIGHTER,
-					__C.CLASSES.HOOKS.RIPPLE,
-					'BitcoinPaymentButton',
-					__C.CLASSES.SIZES.WIDE,
-					__C.CLASSES.SIZES.BIG,
-					__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
-				]
-			});
-		}
-	};
-	
-	OrderPage.prototype.render = function() {
-		if (__APP.USER.isLoggedOut()) {
-			return (new AuthModal(window.location.href, false)).show();
-		}
-		this.preRender();
-		
-		this.$wrapper.html(tmpl('order-page', this.render_vars));
-		
-		if (this.event.ticketing_locally) {
-			if (!this.event.ticketing_available) {
-				this.disablePage('Заказ билетов на событие невозможен');
-			}
-		} else {
-			if (this.event.registration_locally && !this.event.registration_available) {
-				this.disablePage('Регистрация на событие не доступно');
-			}
-		}
-		
-		this.init();
-	};
-	
-	return OrderPage;
-}()));
-/**
- * @requires Class.OrderPage.js
- */
-/**
- *
- * @class LegalEntityPayment
- * @extends Page
- */
-LegalEntityPayment = extending(Page, (function() {
-	/**
-	 *
-	 * @param {(number|string)} event_id
-	 * @param {(number|string)} uuid
-	 *
-	 * @constructor
-	 * @constructs LegalEntityPayment
-	 *
-	 * @property {OneExtendedOrder} order
-	 * @property {OneEvent} event
-	 */
-	function LegalEntityPayment(event_id, uuid) {
-		var self = this;
-		
-		Page.call(this);
-		
-		try {
-			this.order_info = JSON.parse(window.localStorage.getItem(event_id + '_order_info')) || {};
-		} catch (e) {
-			this.order_info = {};
-		}
-		
-		this.order = new OneExtendedOrder(event_id, uuid);
-		this.order_fields = new Fields('sum');
-		
-		this.render_vars = {
-			event_id: event_id,
-			order_uuid: uuid,
-			event_info: null,
-			receivers_form_field: null,
-			company_form_field: null,
-			inn_form_field: null,
-			kpp_form_field: null,
-			real_address_form_field: null,
-			post_address_form_field: null,
-			bank_name_form_field: null,
-			bic_form_field: null,
-			correspondent_account_form_field: null,
-			checking_account_form_field: null,
-			signer_name_form_field: null,
-			signer_position_form_field: null,
-			self_name_form_field: null,
-			self_email_form_field: null,
-			self_phone_form_field: null,
-			back_to_link: null
-		};
-		
-		this.$submit_button = $();
-		
-		Object.defineProperties(this, {
-			event: {
-				get: function() {
-					
-					return self.order.event;
-				}
-			},
-			page_title: {
-				get: function() {
-					
-					return 'Оплата участия на событие ' + self.event.title + ' от юридического лица';
-				}
-			}
-		});
-	}
-	
-	LegalEntityPayment.prototype.fetchData = function() {
-		
-		return this.fetching_data_defer = this.order.fetchOrder(this.order_fields);
-	};
-	
-	LegalEntityPayment.prototype.init = function() {
-		var self = this,
-			$company_name = this.$wrapper.find('.CompanyNameInput'),
-			$inn = this.$wrapper.find('.InnInput'),
-			$kpp = this.$wrapper.find('.KppInput'),
-			$address = this.$wrapper.find('.AddressInput'),
-			$bank_name = this.$wrapper.find('.BankNameInput'),
-			$bic = this.$wrapper.find('.BikInput'),
-			$correspondent_account = this.$wrapper.find('.CorrespondentAccountInput');
-		
-		$company_name.on('input.ToggleCompanyInfo', function() {
-			if ($(this).val().trim() !== '') {
-				self.$wrapper.find('.CompanyAdditionalInfo').removeClass(__C.CLASSES.HIDDEN);
-			}
-		});
-		
-		$company_name.add($inn).suggestions({
-			token: __C.API_TOKENS.DADATA,
-			type: 'PARTY',
-			count: 5,
-			onSelect: function(suggestion) {
-				$company_name.val(suggestion.unrestricted_value).trigger('change');
-				if (!suggestion.data) {
-					return void 0;
-				}
-				$inn.val(suggestion.data.inn).trigger('change');
-				$kpp.val(suggestion.data.kpp).trigger('change');
-				
-				if (suggestion.data.address) {
-					$address.val(suggestion.data.address.value).trigger('change');
-				}
-			}
-		});
-		
-		$bank_name.on('input.ToggleBankInfo', function() {
-			if ($(this).val().trim() !== '') {
-				self.$wrapper.find('.BankAdditionalInfo').removeClass(__C.CLASSES.HIDDEN);
-			}
-		});
-		
-		$bank_name.add($bic).suggestions({
-			token: __C.API_TOKENS.DADATA,
-			type: 'BANK',
-			count: 5,
-			onSelect: function(suggestion) {
-				$bank_name.val(suggestion.unrestricted_value).trigger('change');
-				if (!suggestion.data) {
-					return void 0;
-				}
-				$bic.val(suggestion.data.bic).trigger('change');
-				$correspondent_account.val(suggestion.data.correspondent_account).trigger('change');
-			}
-		});
-		
-		this.$submit_button.on('click.SubmitForm', function() {
-			var $form = self.$wrapper.find('.LegalEntityPaymentForm'),
-				$loader;
-			
-			if (isFormValid($form)) {
-				$loader = __APP.BUILD.overlayLoader(self.$wrapper);
-				self.order.makeLegalEntityPayment($form.serializeForm()).done(function() {
-					var $contract_wrapper = self.$wrapper.find('.LegalEntityPaymentContract');
-					
-					try {
-						window.localStorage.removeItem(self.event.id + '_order_info');
-					} catch (e) {}
-					
-					$loader.remove();
-					showNotifier({text: 'Договор-счет сформирован, вы можете его открыть, либо скачать', status: true});
-					
-					$form.attr('disabled', true);
-					self.$wrapper.find('.LegalEntityPaymentFooter').addClass(__C.CLASSES.HIDDEN);
-					$contract_wrapper.removeClass(__C.CLASSES.HIDDEN);
-					scrollTo($contract_wrapper, 400);
-				});
-			}
-			
-		});
-		
-	};
-	
-	
-	LegalEntityPayment.prototype.preRender = function() {
-		
-		this.render_vars.event_info = __APP.BUILD.fields([
-			{
-				name: 'Название события:',
-				value: this.event.title
-			}, {
-				name: 'Дата события:',
-				value: displayDateRange(this.event.first_event_date, this.event.last_event_date)
-			}, {
-				name: 'Сумма платежа:',
-				value: formatCurrency(this.order.sum) + ' руб.'
-			}
-		]);
-		
-		this.render_vars.receivers_form_field = __APP.BUILD.formUnit({
-			label: 'Перечислите ФИО участников от компании',
-			id: 'legal_entity_payment_receivers',
-			name: 'participants',
-			type: 'textarea',
-			helptext: 'По одному участнику на каждой строке',
-			required: true
-		});
-		
-		this.render_vars.company_form_field = __APP.BUILD.formUnit({
-			label: 'Название компании',
-			id: 'legal_entity_payment_company_name',
-			name: 'company_name',
-			classes: 'CompanyNameInput',
-			placeholder: 'Начните вводить чтобы появились предложения',
-			helptext: 'Полное наименование организации, включая форму предприятия',
-			required: true
-		});
-		
-		this.render_vars.inn_form_field = __APP.BUILD.formUnit({
-			label: 'ИНН',
-			id: 'legal_entity_payment_inn',
-			name: 'company_inn',
-			classes: 'InnInput',
-			placeholder: 'Попробуйте найти организацию через ИНН',
-			helptext: '10 или 12 знаков в зависимости от организационной формы',
-			required: true,
-			attributes: {
-				maxlength: 12
-			}
-		});
-		
-		this.render_vars.kpp_form_field = __APP.BUILD.formUnit({
-			label: 'КПП',
-			id: 'legal_entity_payment_kpp',
-			name: 'company_kpp',
-			classes: 'KppInput',
-			helptext: '9 знаков, если у вас нет КПП - поставьте прочерк',
-			required: true,
-			attributes: {
-				maxlength: 9
-			}
-		});
-		
-		this.render_vars.real_address_form_field = __APP.BUILD.formUnit({
-			label: 'Юридический адрес',
-			id: 'legal_entity_payment_real_address',
-			name: 'company_address',
-			classes: 'AddressInput',
-			helptext: 'Например: 150000, Россия, Москыв, ул. Ленина, д. 108, корп. 1, кв. 8',
-			required: true
-		});
-		
-		this.render_vars.bank_name_form_field = __APP.BUILD.formUnit({
-			label: 'Наименование банка',
-			id: 'legal_entity_payment_bank_name',
-			name: 'bank_name',
-			classes: 'BankNameInput',
-			placeholder: 'Начните вводить чтобы появились предложения',
-			helptext: 'Полное наименование банка, включая отделение (если есть)',
-			required: true
-		});
-		
-		this.render_vars.bic_form_field = __APP.BUILD.formUnit({
-			label: 'БИК',
-			id: 'legal_entity_payment_bic',
-			name: 'bank_bik',
-			classes: 'BikInput',
-			placeholder: 'Попробуйте найти банк через БИК',
-			helptext: '9 знаков',
-			required: true,
-			attributes: {
-				maxlength: 9
-			}
-		});
-		
-		this.render_vars.correspondent_account_form_field = __APP.BUILD.formUnit({
-			label: 'Корреспондентский счет',
-			id: 'legal_entity_payment_correspondent_account',
-			name: 'bank_correspondent_account',
-			classes: 'CorrespondentAccountInput',
-			helptext: '20 знаков',
-			required: true,
-			attributes: {
-				maxlength: 20
-			},
-			inputmask: {
-			
-			}
-		});
-		
-		this.render_vars.checking_account_form_field = __APP.BUILD.formUnit({
-			label: 'Расчетный счет',
-			id: 'legal_entity_payment_checking_account',
-			name: 'bank_payment_account',
-			helptext: '20 знаков',
-			required: true,
-			attributes: {
-				maxlength: 20
-			}
-		});
-		
-		this.render_vars.signer_name_form_field = __APP.BUILD.formUnit({
-			label: 'ФИО подписывающего лица',
-			id: 'legal_entity_payment_signer_name',
-			name: 'signer_full_name',
-			helptext: 'ФИО лица, подписывающего договор (полностью). Например, Иванов Иван Иванович',
-			required: true
-		});
-		
-		this.render_vars.signer_position_form_field = __APP.BUILD.formUnit({
-			label: 'Должность подписывающего лица',
-			id: 'legal_entity_payment_signer_position',
-			name: 'signer_position',
-			helptext: 'Должность директора или ответственного лица, подписывающего договор',
-			required: true
-		});
-		
-		this.render_vars.self_name_form_field = __APP.BUILD.formUnit({
-			label: 'Ваши имя и фамилия',
-			id: 'legal_entity_payment_self_name',
-			name: 'contact_full_name',
-			value: __APP.USER.full_name,
-			required: true
-		});
-		
-		this.render_vars.self_email_form_field = __APP.BUILD.formUnit({
-			label: 'Ваш e-mail',
-			id: 'legal_entity_payment_self_email',
-			name: 'contact_email',
-			value: __APP.USER.email,
-			helptext: 'На него мы вышлем заполненный договор',
-			required: true
-		});
-		
-		this.render_vars.self_phone_form_field = __APP.BUILD.formUnit({
-			label: 'Контактный телефон',
-			id: 'legal_entity_payment_self_phone',
-			name: 'contact_phone_number',
-			helptext: 'В формате: +7 (xxx) xxx-xx-xx',
-			required: true
-		});
-		
-		this.render_vars.submit_button = this.$submit_button = __APP.BUILD.button({
-			classes: [
-				__C.CLASSES.SIZES.HUGE,
-				__C.CLASSES.COLORS.ACCENT,
-			  'LegalEntityPaymentSubmit'
-			],
-			title: 'Сформировать договор-счет'
-		});
-		
-		this.render_vars.back_to_link = __APP.BUILD.link({
-			title: 'Назад к событию',
-			page: '/event/{event_id}'.format({event_id: this.event.id})
-		});
-		
-	};
-	
-	
-	LegalEntityPayment.prototype.render = function() {
-		if (empty(this.order_info)) {
-			//return __APP.changeState('/event/'+this.event.id+'/order');
-		}
-		
-		if (__APP.USER.isLoggedOut()) {
-			return (new AuthModal(window.location.href, false)).show();
-		}
-		this.preRender();
-		
-		this.$wrapper.html(tmpl('legal-entity-payment-page', this.render_vars));
-		
-		this.init();
-	};
-	
-	return LegalEntityPayment;
-}()));
-/**
- * @requires ../Class.Page.js
- */
-/**
- *
  * @class OnboardingPage
  * @extends Page
  */
@@ -23198,6 +22236,968 @@ OrganizationPage = extending(Page, (function() {
  */
 /**
  *
+ * @class OrderPage
+ */
+OrderPage = extending(Page, (function() {
+	/**
+	 *
+	 * @param {(number|string)} event_id
+	 *
+	 * @constructor
+	 * @constructs OrderPage
+	 *
+	 * @property {OneEvent} event
+	 * @property {Fields} event_fields
+	 * @property {OnePromocode} promocode
+	 * @property {Fields} promocode_fields
+	 * @property {boolean} is_promocode_active
+	 * @property {number} overall_sum
+	 * @property {number} total_sum
+	 */
+	function OrderPage(event_id) {
+		var self = this;
+		
+		Page.call(this);
+		this.event = new OneEvent(event_id);
+		this.event_fields = new Fields(
+			'accept_bitcoins',
+			'ticketing_locally',
+			'ticketing_available',
+			'registration_locally',
+			'registration_required',
+			'registration_available',
+			'registration_fields', {
+			ticket_types: {
+				fields: new Fields(
+					'is_selling',
+					'comment',
+					'price',
+					'min_count_per_user',
+					'max_count_per_user'
+				)
+			}
+		});
+		this.promocode = new OnePromocode(event_id);
+		this.promocode_fields = new Fields();
+		this.is_promocode_active = false;
+		
+		this.overall_sum = 0;
+		
+		this.render_vars = {
+			event_id: event_id,
+			tickets_selling: null,
+			registration: null,
+			pay_button: null,
+			register_button: null,
+			main_action_button: null,
+			legal_entity_payment_button: null,
+			bitcoin_payment_button: null
+		};
+		
+		Object.defineProperties(this, {
+			page_title: {
+				get: function() {
+					
+					return (self.event.ticketing_locally ? 'Заказ билетов на событие ' : 'Регистрация на событие ') + self.event.title;
+				}
+			},
+			total_sum: {
+				get: function() {
+					var total_sum = 0;
+					
+					if (self.is_promocode_active) {
+						if (self.promocode.is_fixed) {
+							total_sum = self.overall_sum - self.promocode.effort;
+						} else {
+							total_sum = self.overall_sum - (self.overall_sum * self.promocode.effort / 100);
+						}
+						
+						return total_sum <= 0 ? 0 : total_sum;
+					}
+					
+					return self.overall_sum;
+				}
+			}
+		});
+	}
+	
+	OrderPage.prototype.fetchData = function() {
+		
+		return this.fetching_data_defer = this.event.fetchEvent(this.event_fields);
+	};
+	/**
+	 *
+	 * @param {RegistrationFieldModel} field
+	 * @return {jQuery}
+	 */
+	OrderPage.buildRegistrationField = function(field) {
+		var default_props = {
+			id: 'registration_form_' + field.uuid,
+			name: field.uuid,
+			unit_classes: ['Registration' + field.type.toCamelCase('_') + 'Field'],
+			label: $('<span>'+ field.label +'</span>').add((field.required ? tmpl('required-star') : $())),
+			required: field.required
+		};
+		
+		switch (field.type) {
+			case RegistrationFieldModel.TYPES.SELECT: {
+				
+				return (function(props, values) {
+					
+					return tmpl('form-unit', Builder.normalizeBuildProps({
+						unit_classes: props.unit_classes,
+						label: tmpl('label', {
+							id: props.id,
+							label: props.label
+						}),
+						form_element: __APP.BUILD.select(
+							values.map(function(value) {
+								
+								return {
+									display_name: value.value,
+									val: value.uuid || guid()
+								}
+							}), {
+								id: props.id,
+								name: props.name,
+								required: props.required
+							}, props.classes
+						)
+					}));
+				}($.extend({}, default_props, {classes: ['form_select2', 'ToSelect2']}), field.values instanceof Array ? field.values : []));
+			}
+			case RegistrationFieldModel.TYPES.SELECT_MULTI: {
+				
+				return (function(props, values) {
+					
+					return tmpl('form-unit', Builder.normalizeBuildProps($.extend(true, {}, props, {
+						unit_classes: props.classes,
+						label: tmpl('label', {
+							id: props.id + '_label',
+							label: props.label
+						}),
+						form_element: __APP.BUILD.checkbox.apply(__APP.BUILD, values.map(function(value) {
+							
+							return {
+								id: 'registration_field_value_' + (value.uuid || guid()),
+								name: props.name,
+								label: value.value,
+								attributes: {
+									value: value.uuid || guid(),
+									required: props.required
+								}
+							};
+						}))
+					})));
+				}($.extend({}, default_props, {type: 'checkbox'}), field.values instanceof Array ? field.values : []));
+			}
+			default: {
+				
+				return __APP.BUILD.formUnit($.extend({}, default_props, {
+					type: field.type === RegistrationFieldModel.TYPES.EXTENDED_CUSTOM ? 'textarea' : field.type,
+					placeholder: field.label,
+					helptext: (function(type) {
+						switch (type) {
+							case RegistrationFieldModel.TYPES.EMAIL:
+								return 'На почту Вам поступит сообщение с подтверждением регистрации';
+							case RegistrationFieldModel.TYPES.FIRST_NAME:
+								return 'Используйте настоящее имя для регистрации';
+							case RegistrationFieldModel.TYPES.LAST_NAME:
+								return 'Используйте настоящюю фамилию для регистрации';
+							default:
+								return '';
+						}
+					})(field.type)
+				}));
+			}
+		}
+	};
+	
+	OrderPage.prototype.disablePage = function(message) {
+		var self = this;
+		
+		this.$wrapper.find('.OrderFormWrapper').addClass(__C.CLASSES.DISABLED).attr('disabled', true);
+		
+		this.$wrapper.find('.OrderPage').append(__APP.BUILD.overlayCap(tmpl('order-overlay-cap-content', {
+			message: message,
+			return_button: __APP.BUILD.link({
+				page: '/event/' + this.event.id,
+				title: 'Вернуться на страницу события',
+				classes: [
+					__C.CLASSES.COMPONENT.BUTTON,
+					__C.CLASSES.COLORS.PRIMARY
+				]
+			})
+		})));
+	};
+	/**
+	 *
+	 * @return {{tickets: Array<{uuid: string, count: string}>, registration_fields: Array<{uuid: string, value: string}>, promocode: string}}
+	 */
+	OrderPage.prototype.gatherSendData = function() {
+		
+		return {
+			tickets: this.$wrapper.find('.OrderFields').serializeForm('array').reduce(function(bundle, field) {
+				if (+field.value) {
+					bundle.push({
+						uuid: field.name,
+						count: +field.value
+					});
+				}
+				
+				return bundle;
+			}, []),
+			registration_fields: this.$wrapper.find('.RegistrationFields').serializeForm('array').map(function(field) {
+				
+				return {
+					uuid: field.name,
+					value: field.value
+				};
+			}),
+			promocode: this.$wrapper.find('.PromocodeInput').val()
+		};
+	};
+	
+	OrderPage.prototype.init = function() {
+		var self = this,
+			parsed_uri = parseUri(location),
+			$activate_promocode_button = this.$wrapper.find('.ActivatePromocode'),
+			$promocode_input = this.$wrapper.find('.PromocodeInput'),
+			$quantity_inputs = this.$wrapper.find('.QuantityInput'),
+			$pay_buttons = this.$wrapper.find('.PayButtons'),
+			$footer = this.$wrapper.find('.OrderFormFooter'),
+			$main_action_button = this.render_vars.register_button,
+			ticket_selected = parsed_uri.queryKey['ticket_selected'],
+			$payload,
+			$selected_type;
+		
+		function countTicketTypeSum($ticket_type) {
+			var $sum = $ticket_type.find('.TicketTypeSum'),
+				value = $ticket_type.find('.QuantityInput').val();
+			
+			if (value > 0) {
+				$sum.removeClass(__C.CLASSES.HIDDEN);
+			} else {
+				$sum.addClass(__C.CLASSES.HIDDEN);
+			}
+			
+			$ticket_type.find('.TicketTypeSumText').text(formatCurrency($ticket_type.data('ticket_type').price * value));
+		}
+		
+		function countTotalSum() {
+			self.overall_sum = Array.prototype.reduce.call(self.$wrapper.find('.TicketTypeSumText'), function(sum, ticket_type_sum) {
+				
+				return sum + parseInt(ticket_type_sum.innerHTML.replace(' ', ''));
+			}, 0);
+			
+			self.$wrapper.find('.TicketsOverallSum').text(formatCurrency(self.overall_sum));
+			
+			if (self.is_promocode_active) {
+				self.$wrapper.find('.TicketsTotalSum').text(formatCurrency(self.total_sum));
+			}
+			
+			if (self.total_sum === 0) {
+				if ($.contains(self.$wrapper[0], self.render_vars.pay_button[0])) {
+					self.render_vars.pay_button.after(self.render_vars.register_button);
+					self.render_vars.pay_button.detach();
+					$main_action_button = self.render_vars.register_button;
+					$pay_buttons.addClass(__C.CLASSES.HIDDEN);
+				}
+			} else {
+				if ($.contains(self.$wrapper[0], self.render_vars.register_button[0])) {
+					self.render_vars.register_button.after(self.render_vars.pay_button);
+					self.render_vars.register_button.detach();
+					$main_action_button = self.render_vars.pay_button;
+					$pay_buttons.removeClass(__C.CLASSES.HIDDEN);
+				}
+			}
+		}
+		
+		if (!this.event.ticketing_locally) {
+			$footer.removeClass(__C.CLASSES.HIDDEN);
+		}
+		
+		bindRippleEffect(this.$wrapper);
+		bindControlSwitch(this.$wrapper);
+		initSelect2(this.$wrapper.find('.ToSelect2'), {
+			dropdownCssClass: 'form_select2_drop form_select2_drop_no_search'
+		});
+		
+		$activate_promocode_button.on('click.ActivatePromocode', function() {
+			var $wrapper = self.$wrapper.find('.OrderFormWrapper'),
+				code = $promocode_input.val();
+			
+			if (code === '') {
+				showNotifier({
+					status: false,
+					text: 'Пожалуйста, введите промокод'
+				});
+			} else {
+				$wrapper.attr('disabled', true);
+				
+				self.promocode.fetchPromocodebyCodeName(code, self.promocode_fields, function() {
+					var $promocode_wrapper = $wrapper.find('.PromocodeWrapper');
+					
+					$wrapper.removeAttr('disabled');
+					
+					$promocode_wrapper.after(tmpl('order-tickets-selling-promocode', {
+						effort: self.promocode.effort + (self.promocode.is_fixed ? ' ₽' : '%')
+					}));
+					$promocode_wrapper.addClass(__C.CLASSES.HIDDEN);
+					
+					self.is_promocode_active = true;
+					countTotalSum();
+				}, function() {
+					showNotifier({
+						status: false,
+						text: 'Указанный промокод не существует или более не активен'
+					});
+					$wrapper.removeAttr('disabled');
+					
+					$promocode_input.focus().select();
+				});
+			}
+		});
+		
+		$promocode_input.on('keypress', function(e) {
+			if (isKeyPressed(e, __C.KEY_CODES.ENTER)) {
+				$activate_promocode_button.trigger('click.ActivatePromocode');
+			}
+		});
+		
+		this.$wrapper.find('.RegistrationFirstNameField').find('input').val(__APP.USER.first_name);
+		this.$wrapper.find('.RegistrationLastNameField').find('input').val(__APP.USER.last_name);
+		this.$wrapper.find('.RegistrationEmailField').find('input').val(__APP.USER.email);
+		
+		/**
+		 *
+		 * @return {(boolean|jqPromise)}
+		 */
+		function makeOrder(cb) {
+			var $form = self.$wrapper.find('.OrderForm'),
+				send_data;
+			
+			if (__APP.USER.isLoggedOut()) {
+				(new AuthModal(window.location.href)).show();
+				
+				return false;
+			} else {
+				if (isFormValid($form)) {
+					send_data = self.gatherSendData();
+					
+					if (isFunction(cb)) {
+						
+						return cb(send_data);
+					}
+					
+					$main_action_button.attr('disabled', true);
+					
+					return self.event.makeOrder(send_data.tickets, send_data.registration_fields, send_data.promocode).always(function(data) {
+						$main_action_button.removeAttr('disabled');
+						
+						return data;
+					}).promise();
+				} else {
+					
+					return false;
+				}
+			}
+		}
+		
+		$quantity_inputs.on('QuantityInput::change', function(e, value) {
+			var is_selected = Array.prototype.reduce.call($quantity_inputs, function(accumulator, input) {
+				
+				return accumulator || input.value !== 0;
+			}, false);
+			
+			if (is_selected) {
+				$footer.removeClass(__C.CLASSES.HIDDEN);
+			} else {
+				$footer.addClass(__C.CLASSES.HIDDEN);
+			}
+			countTicketTypeSum($(this).closest('.TicketType'));
+			countTotalSum();
+		});
+		
+		this.$wrapper.find('.TicketType').each(function() {
+			countTicketTypeSum($(this));
+		});
+		countTotalSum();
+		
+		if (ticket_selected) {
+			ticket_selected = decodeURIComponent(ticket_selected);
+			$selected_type = this.$wrapper.find('.TicketType').filter(function() {
+				
+				return $(this).data().ticket_type.name === ticket_selected;
+			});
+			
+			if ($selected_type.length) {
+				$selected_type.find('.QuantityInput').resolveInstance().increment();
+			}
+		}
+		
+		this.render_vars.pay_button.on('click.MakeOrder', function() {
+			var result,
+				callback_url = parsed_uri.queryKey['away_to'] || (window.location.origin + '/event/' + self.event.id);
+			
+			if (__APP.IS_WIDGET) {
+				makeOrder(function(send_data) {
+					$payload = self.$wrapper.find('.OrderFormPayload');
+					$payload.val(JSON.stringify(Object.assign({
+						redirect_to_payment: true,
+						callback_url: callback_url
+					}, send_data)));
+					
+					self.$wrapper.find('.OrderForm').submit();
+				});
+			} else {
+				result = makeOrder();
+				if (result !== false) {
+					result.done(function(data) {
+						
+						Payment.doPayment('order-' + data.order.uuid, data.order.final_sum, callback_url);
+					})
+				}
+			}
+		});
+		
+		this.render_vars.register_button.on('click.Register', function() {
+			var result = makeOrder();
+			
+			if (result !== false) {
+				result.done(function(data) {
+					var is_custom_callback = !!parsed_uri.queryKey['away_to'],
+						callback_url = parsed_uri.queryKey['away_to'] || '/event/' + self.event.id,
+						parsed_callback;
+					
+					
+					if (is_custom_callback) {
+						parsed_callback = parseUri(decodeURIComponent(callback_url));
+						window.location = parsed_callback.wo_query + '?' + 'registration=free&' + parsed_callback.query;
+					} else {
+						__APP.changeState(callback_url);
+						showNotifier({text: 'Регистрация прошла успешно', status: true});
+					}
+				})
+			}
+		});
+		
+		if (this.event.ticketing_locally) {
+			this.render_vars.legal_entity_payment_button.on('click.LegalEntityPayment', function() {
+				var result = makeOrder();
+				
+				if (result !== false) {
+					result.done(function(data) {
+						var parsed_uri = parseUri(location);
+						
+						try {
+							window.localStorage.setItem(self.event.id + '_order_info', JSON.stringify(parsed_uri.queryKey));
+						} catch (e) {}
+						
+						__APP.changeState(parsed_uri.path + '/' + data.order.uuid + '/from_legal_entity');
+					});
+				}
+			});
+		}
+		if (this.event.accept_bitcoins) {
+			this.render_vars.bitcoin_payment_button.on('click.BitcoinPayment', function() {
+				var $this = $(this),
+					modal;
+				
+				if (!$this.data('modal')) {
+					makeOrder().done(function(data) {
+						modal = new BitcoinModal(self.event, data.order.uuid);
+						$this.data('modal', modal);
+						
+						modal.show();
+					});
+				} else {
+					modal = $this.data('modal');
+					modal.show();
+				}
+			});
+		}
+	};
+	
+	OrderPage.prototype.preRender = function() {
+		var self = this;
+		
+		if (this.event.ticketing_locally) {
+			this.render_vars.tickets_selling = tmpl('order-tickets-selling', {
+				ticket_types: tmpl('order-ticket-type', this.event.ticket_types.map(function(ticket_type) {
+					
+					return {
+						name: ticket_type.name,
+						ticket_type_uuid: ticket_type.uuid,
+						quantity_input: new QuantityInput({
+							name: ticket_type.uuid
+						}, {
+							min: ticket_type.min_count_per_user || 0,
+							max: ticket_type.max_count_per_user || ticket_type.amount || 30
+						}),
+						description: ticket_type.comment,
+						type_price: formatCurrency(ticket_type.price),
+						sum_price: 0
+					};
+				})),
+				overall_price: 0
+			});
+			
+			this.render_vars.tickets_selling.find('.TicketType').each(function(i) {
+				var $this = $(this);
+				
+				$this.data('ticket_type', self.event.ticket_types[i]);
+				
+				if (!self.event.ticket_types[i].is_selling) {
+					$this.attr('disabled', true);
+				}
+			});
+		}
+		
+		if (this.event.registration_locally) {
+			this.render_vars.registration = tmpl('order-registration', {
+				registration_fields: $.makeSet(this.event.registration_fields.map(OrderPage.buildRegistrationField))
+			});
+		}
+		
+		this.render_vars.pay_button = __APP.BUILD.button({
+			title: 'Заплатить через Яндекс',
+			classes: [
+				__C.CLASSES.COLORS.YANDEX,
+				__C.CLASSES.HOOKS.RIPPLE,
+				__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE,
+				'MainActionButton',
+				__C.CLASSES.SIZES.WIDE,
+				__C.CLASSES.SIZES.HUGE
+			]
+		});
+		
+		this.render_vars.register_button = __APP.BUILD.button({
+			title: 'Зарегистрироваться',
+			classes: [
+				__C.CLASSES.COLORS.ACCENT,
+				__C.CLASSES.HOOKS.RIPPLE,
+				__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE,
+				'MainActionButton',
+				__C.CLASSES.SIZES.WIDE,
+				__C.CLASSES.SIZES.HUGE
+			]
+		});
+		
+		this.render_vars.main_action_button = this.render_vars.register_button;
+		
+		if (this.event.ticketing_locally) {
+			this.render_vars.legal_entity_payment_button = __APP.BUILD.button({
+				title: 'Оплатить через юр. лицо',
+				classes: [
+					__C.CLASSES.COLORS.MARGINAL_PRIMARY,
+					__C.CLASSES.TEXT_WEIGHT.LIGHTER,
+					__C.CLASSES.HOOKS.RIPPLE,
+					'LegalEntityPaymentButton',
+					__C.CLASSES.SIZES.WIDE,
+					__C.CLASSES.SIZES.BIG,
+					__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
+				]
+			});
+		}
+		
+		if (this.event.accept_bitcoins) {
+			this.render_vars.bitcoin_payment_button = __APP.BUILD.button({
+				title: 'Заплатить через Bitcoin',
+				classes: [
+					__C.CLASSES.COLORS.MARGINAL_PRIMARY,
+					__C.CLASSES.TEXT_WEIGHT.LIGHTER,
+					__C.CLASSES.HOOKS.RIPPLE,
+					'BitcoinPaymentButton',
+					__C.CLASSES.SIZES.WIDE,
+					__C.CLASSES.SIZES.BIG,
+					__C.CLASSES.UNIVERSAL_STATES.NO_UPPERCASE
+				]
+			});
+		}
+	};
+	
+	OrderPage.prototype.render = function() {
+		if (__APP.USER.isLoggedOut()) {
+			return (new AuthModal(window.location.href, false)).show();
+		}
+		this.preRender();
+		
+		this.$wrapper.html(tmpl('order-page', this.render_vars));
+		
+		if (this.event.ticketing_locally) {
+			if (!this.event.ticketing_available) {
+				this.disablePage('Заказ билетов на событие невозможен');
+			}
+		} else {
+			if (this.event.registration_locally && !this.event.registration_available) {
+				this.disablePage('Регистрация на событие не доступно');
+			}
+		}
+		
+		this.init();
+	};
+	
+	return OrderPage;
+}()));
+/**
+ * @requires Class.OrderPage.js
+ */
+/**
+ *
+ * @class LegalEntityPayment
+ * @extends Page
+ */
+LegalEntityPayment = extending(Page, (function() {
+	/**
+	 *
+	 * @param {(number|string)} event_id
+	 * @param {(number|string)} uuid
+	 *
+	 * @constructor
+	 * @constructs LegalEntityPayment
+	 *
+	 * @property {OneExtendedOrder} order
+	 * @property {OneEvent} event
+	 */
+	function LegalEntityPayment(event_id, uuid) {
+		var self = this;
+		
+		Page.call(this);
+		
+		try {
+			this.order_info = JSON.parse(window.localStorage.getItem(event_id + '_order_info')) || {};
+		} catch (e) {
+			this.order_info = {};
+		}
+		
+		this.order = new OneExtendedOrder(event_id, uuid);
+		this.order_fields = new Fields('sum');
+		
+		this.render_vars = {
+			event_id: event_id,
+			order_uuid: uuid,
+			event_info: null,
+			receivers_form_field: null,
+			company_form_field: null,
+			inn_form_field: null,
+			kpp_form_field: null,
+			real_address_form_field: null,
+			post_address_form_field: null,
+			bank_name_form_field: null,
+			bic_form_field: null,
+			correspondent_account_form_field: null,
+			checking_account_form_field: null,
+			signer_name_form_field: null,
+			signer_position_form_field: null,
+			self_name_form_field: null,
+			self_email_form_field: null,
+			self_phone_form_field: null,
+			back_to_link: null
+		};
+		
+		this.$submit_button = $();
+		
+		Object.defineProperties(this, {
+			event: {
+				get: function() {
+					
+					return self.order.event;
+				}
+			},
+			page_title: {
+				get: function() {
+					
+					return 'Оплата участия на событие ' + self.event.title + ' от юридического лица';
+				}
+			}
+		});
+	}
+	
+	LegalEntityPayment.prototype.fetchData = function() {
+		
+		return this.fetching_data_defer = this.order.fetchOrder(this.order_fields);
+	};
+	
+	LegalEntityPayment.prototype.init = function() {
+		var self = this,
+			$company_name = this.$wrapper.find('.CompanyNameInput'),
+			$inn = this.$wrapper.find('.InnInput'),
+			$kpp = this.$wrapper.find('.KppInput'),
+			$address = this.$wrapper.find('.AddressInput'),
+			$bank_name = this.$wrapper.find('.BankNameInput'),
+			$bic = this.$wrapper.find('.BikInput'),
+			$correspondent_account = this.$wrapper.find('.CorrespondentAccountInput');
+		
+		$company_name.on('input.ToggleCompanyInfo', function() {
+			if ($(this).val().trim() !== '') {
+				self.$wrapper.find('.CompanyAdditionalInfo').removeClass(__C.CLASSES.HIDDEN);
+			}
+		});
+		
+		$company_name.add($inn).suggestions({
+			token: __C.API_TOKENS.DADATA,
+			type: 'PARTY',
+			count: 5,
+			onSelect: function(suggestion) {
+				$company_name.val(suggestion.unrestricted_value).trigger('change');
+				if (!suggestion.data) {
+					return void 0;
+				}
+				$inn.val(suggestion.data.inn).trigger('change');
+				$kpp.val(suggestion.data.kpp).trigger('change');
+				
+				if (suggestion.data.address) {
+					$address.val(suggestion.data.address.value).trigger('change');
+				}
+			}
+		});
+		
+		$bank_name.on('input.ToggleBankInfo', function() {
+			if ($(this).val().trim() !== '') {
+				self.$wrapper.find('.BankAdditionalInfo').removeClass(__C.CLASSES.HIDDEN);
+			}
+		});
+		
+		$bank_name.add($bic).suggestions({
+			token: __C.API_TOKENS.DADATA,
+			type: 'BANK',
+			count: 5,
+			onSelect: function(suggestion) {
+				$bank_name.val(suggestion.unrestricted_value).trigger('change');
+				if (!suggestion.data) {
+					return void 0;
+				}
+				$bic.val(suggestion.data.bic).trigger('change');
+				$correspondent_account.val(suggestion.data.correspondent_account).trigger('change');
+			}
+		});
+		
+		this.$submit_button.on('click.SubmitForm', function() {
+			var $form = self.$wrapper.find('.LegalEntityPaymentForm'),
+				$loader;
+			
+			if (isFormValid($form)) {
+				$loader = __APP.BUILD.overlayLoader(self.$wrapper);
+				self.order.makeLegalEntityPayment($form.serializeForm()).done(function() {
+					var $contract_wrapper = self.$wrapper.find('.LegalEntityPaymentContract');
+					
+					try {
+						window.localStorage.removeItem(self.event.id + '_order_info');
+					} catch (e) {}
+					
+					$loader.remove();
+					showNotifier({text: 'Договор-счет сформирован, вы можете его открыть, либо скачать', status: true});
+					
+					$form.attr('disabled', true);
+					self.$wrapper.find('.LegalEntityPaymentFooter').addClass(__C.CLASSES.HIDDEN);
+					$contract_wrapper.removeClass(__C.CLASSES.HIDDEN);
+					scrollTo($contract_wrapper, 400);
+				});
+			}
+			
+		});
+		
+	};
+	
+	
+	LegalEntityPayment.prototype.preRender = function() {
+		
+		this.render_vars.event_info = __APP.BUILD.fields([
+			{
+				name: 'Название события:',
+				value: this.event.title
+			}, {
+				name: 'Дата события:',
+				value: displayDateRange(this.event.first_event_date, this.event.last_event_date)
+			}, {
+				name: 'Сумма платежа:',
+				value: formatCurrency(this.order.sum) + ' руб.'
+			}
+		]);
+		
+		this.render_vars.receivers_form_field = __APP.BUILD.formUnit({
+			label: 'Перечислите ФИО участников от компании',
+			id: 'legal_entity_payment_receivers',
+			name: 'participants',
+			type: 'textarea',
+			helptext: 'По одному участнику на каждой строке',
+			required: true
+		});
+		
+		this.render_vars.company_form_field = __APP.BUILD.formUnit({
+			label: 'Название компании',
+			id: 'legal_entity_payment_company_name',
+			name: 'company_name',
+			classes: 'CompanyNameInput',
+			placeholder: 'Начните вводить чтобы появились предложения',
+			helptext: 'Полное наименование организации, включая форму предприятия',
+			required: true
+		});
+		
+		this.render_vars.inn_form_field = __APP.BUILD.formUnit({
+			label: 'ИНН',
+			id: 'legal_entity_payment_inn',
+			name: 'company_inn',
+			classes: 'InnInput',
+			placeholder: 'Попробуйте найти организацию через ИНН',
+			helptext: '10 или 12 знаков в зависимости от организационной формы',
+			required: true,
+			attributes: {
+				maxlength: 12
+			}
+		});
+		
+		this.render_vars.kpp_form_field = __APP.BUILD.formUnit({
+			label: 'КПП',
+			id: 'legal_entity_payment_kpp',
+			name: 'company_kpp',
+			classes: 'KppInput',
+			helptext: '9 знаков, если у вас нет КПП - поставьте прочерк',
+			required: true,
+			attributes: {
+				maxlength: 9
+			}
+		});
+		
+		this.render_vars.real_address_form_field = __APP.BUILD.formUnit({
+			label: 'Юридический адрес',
+			id: 'legal_entity_payment_real_address',
+			name: 'company_address',
+			classes: 'AddressInput',
+			helptext: 'Например: 150000, Россия, Москыв, ул. Ленина, д. 108, корп. 1, кв. 8',
+			required: true
+		});
+		
+		this.render_vars.bank_name_form_field = __APP.BUILD.formUnit({
+			label: 'Наименование банка',
+			id: 'legal_entity_payment_bank_name',
+			name: 'bank_name',
+			classes: 'BankNameInput',
+			placeholder: 'Начните вводить чтобы появились предложения',
+			helptext: 'Полное наименование банка, включая отделение (если есть)',
+			required: true
+		});
+		
+		this.render_vars.bic_form_field = __APP.BUILD.formUnit({
+			label: 'БИК',
+			id: 'legal_entity_payment_bic',
+			name: 'bank_bik',
+			classes: 'BikInput',
+			placeholder: 'Попробуйте найти банк через БИК',
+			helptext: '9 знаков',
+			required: true,
+			attributes: {
+				maxlength: 9
+			}
+		});
+		
+		this.render_vars.correspondent_account_form_field = __APP.BUILD.formUnit({
+			label: 'Корреспондентский счет',
+			id: 'legal_entity_payment_correspondent_account',
+			name: 'bank_correspondent_account',
+			classes: 'CorrespondentAccountInput',
+			helptext: '20 знаков',
+			required: true,
+			attributes: {
+				maxlength: 20
+			},
+			inputmask: {
+			
+			}
+		});
+		
+		this.render_vars.checking_account_form_field = __APP.BUILD.formUnit({
+			label: 'Расчетный счет',
+			id: 'legal_entity_payment_checking_account',
+			name: 'bank_payment_account',
+			helptext: '20 знаков',
+			required: true,
+			attributes: {
+				maxlength: 20
+			}
+		});
+		
+		this.render_vars.signer_name_form_field = __APP.BUILD.formUnit({
+			label: 'ФИО подписывающего лица',
+			id: 'legal_entity_payment_signer_name',
+			name: 'signer_full_name',
+			helptext: 'ФИО лица, подписывающего договор (полностью). Например, Иванов Иван Иванович',
+			required: true
+		});
+		
+		this.render_vars.signer_position_form_field = __APP.BUILD.formUnit({
+			label: 'Должность подписывающего лица',
+			id: 'legal_entity_payment_signer_position',
+			name: 'signer_position',
+			helptext: 'Должность директора или ответственного лица, подписывающего договор',
+			required: true
+		});
+		
+		this.render_vars.self_name_form_field = __APP.BUILD.formUnit({
+			label: 'Ваши имя и фамилия',
+			id: 'legal_entity_payment_self_name',
+			name: 'contact_full_name',
+			value: __APP.USER.full_name,
+			required: true
+		});
+		
+		this.render_vars.self_email_form_field = __APP.BUILD.formUnit({
+			label: 'Ваш e-mail',
+			id: 'legal_entity_payment_self_email',
+			name: 'contact_email',
+			value: __APP.USER.email,
+			helptext: 'На него мы вышлем заполненный договор',
+			required: true
+		});
+		
+		this.render_vars.self_phone_form_field = __APP.BUILD.formUnit({
+			label: 'Контактный телефон',
+			id: 'legal_entity_payment_self_phone',
+			name: 'contact_phone_number',
+			helptext: 'В формате: +7 (xxx) xxx-xx-xx',
+			required: true
+		});
+		
+		this.render_vars.submit_button = this.$submit_button = __APP.BUILD.button({
+			classes: [
+				__C.CLASSES.SIZES.HUGE,
+				__C.CLASSES.COLORS.ACCENT,
+			  'LegalEntityPaymentSubmit'
+			],
+			title: 'Сформировать договор-счет'
+		});
+		
+		this.render_vars.back_to_link = __APP.BUILD.link({
+			title: 'Назад к событию',
+			page: '/event/{event_id}'.format({event_id: this.event.id})
+		});
+		
+	};
+	
+	
+	LegalEntityPayment.prototype.render = function() {
+		if (empty(this.order_info)) {
+			//return __APP.changeState('/event/'+this.event.id+'/order');
+		}
+		
+		if (__APP.USER.isLoggedOut()) {
+			return (new AuthModal(window.location.href, false)).show();
+		}
+		this.preRender();
+		
+		this.$wrapper.html(tmpl('legal-entity-payment-page', this.render_vars));
+		
+		this.init();
+	};
+	
+	return LegalEntityPayment;
+}()));
+/**
+ * @requires ../Class.Page.js
+ */
+/**
+ *
  * @class SearchPage
  * @extends Page
  */
@@ -23360,6 +23360,30 @@ SearchByTagPage = extending(SearchPage, (function() {
 	}
 	
 	return SearchByTagPage;
+}()));
+/**
+ *
+ * @class TicketPage
+ * @extends Page
+ */
+TicketPage = extending(Page, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs TicketPage
+	 */
+	function TicketPage() {
+		Page.call(this);
+	}
+	
+	TicketPage.prototype.render = function() {
+		
+		this.$view.find('.Print').on('click', function() {
+			window.print();
+		});
+	};
+	
+	return TicketPage;
 }()));
 /**
  * @requires ../Class.Page.js
@@ -24014,30 +24038,6 @@ MyTicketsPage = extending(Page, (function() {
 	};
 	
 	return MyTicketsPage;
-}()));
-/**
- *
- * @class TicketPage
- * @extends Page
- */
-TicketPage = extending(Page, (function() {
-	/**
-	 *
-	 * @constructor
-	 * @constructs TicketPage
-	 */
-	function TicketPage() {
-		Page.call(this);
-	}
-	
-	TicketPage.prototype.render = function() {
-		
-		this.$view.find('.Print').on('click', function() {
-			window.print();
-		});
-	};
-	
-	return TicketPage;
 }()));
 /**
  *
