@@ -605,10 +605,13 @@ $.fn.extend({
 			yb = /^(?:submit|button|image|reset|file)$/i,
 			T = /^(?:checkbox|radio)$/i,
 			xb = /\r?\n/g,
-			elements = this.map(function() {
-				var a = $.prop(this, "elements");
-				return a ? $.makeArray(a) : this
+			$elements = this.map(function() {
+				var a = $.prop(this, 'elements');
+				
+				return a ? $.makeArray(a) : this;
 			});
+		
+		$elements = $elements.length ? $elements : this.find('input,select,textarea,keygen,button');
 		
 		switch (output_type) {
 			case 'array': {
@@ -616,7 +619,7 @@ $.fn.extend({
 					array = [],
 					lookup = {};
 				
-				$checkboxes = elements.filter(function() {
+				$checkboxes = $elements.filter(function() {
 					
 					return this.name && !$(this).is(":disabled") && this.type === 'checkbox';
 				});
@@ -649,7 +652,7 @@ $.fn.extend({
 					});
 				});
 				
-				elements.not($checkboxes).filter(function() {
+				$elements.not($checkboxes).filter(function() {
 					var a = this.type;
 					
 					return this.name
@@ -684,7 +687,8 @@ $.fn.extend({
 			case 'object':
 			default: {
 				var output = {};
-				elements.filter(function() {
+				
+				$elements.filter(function() {
 					
 					return this.name && !$(this).is(':disabled') && zb.test(this.nodeName) && !yb.test(this.type) && !T.test(this.type)
 				}).each(function(i, el) {
@@ -697,7 +701,7 @@ $.fn.extend({
 							return $el.is(':enabled') && $el.is('[name="' + name + '"]')
 						};
 					
-					if (elements.filter(hasSameName).length > 1) {
+					if ($elements.filter(hasSameName).length > 1) {
 						output[name] = typeof(output[name]) === "undefined" ? [] : output[name];
 						output[name].push(value ? value.replace(xb, "\r\n") : value)
 					}
@@ -715,7 +719,7 @@ $.fn.extend({
 						output[name] = value || value === 0 ? value.replace(xb, "\r\n") : null;
 					}
 				});
-				elements.filter(function() {
+				$elements.filter(function() {
 					
 					return this.name && !$(this).is(":disabled") && T.test(this.type) && ((this.checked && this.value !== "on") || (this.value === "on" && this.type === "checkbox"))
 				}).each(function(i, el) {
@@ -728,7 +732,7 @@ $.fn.extend({
 							break;
 						}
 						case 'checkbox': {
-							if (elements.filter("[name='" + name + "']").length > 1 && value !== "on") {
+							if ($elements.filter("[name='" + name + "']").length > 1 && value !== "on") {
 								output[name] = typeof(output[name]) === "undefined" ? [] : output[name];
 								output[name].push(value)
 							}
@@ -740,6 +744,7 @@ $.fn.extend({
 						}
 					}
 				});
+				
 				return output;
 			}
 		}

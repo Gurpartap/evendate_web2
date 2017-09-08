@@ -4389,7 +4389,7 @@ body.-open_modal > .modal_wrapper {
 .event_edit_ticket_type_expand_button {
 	flex: none;
 	width: 32px;
-	margin-left: 12px;
+	margin: 0 12px;
 }
 
 .event_edit_ticket_type_expand_button {}
@@ -4401,7 +4401,8 @@ body.-open_modal > .modal_wrapper {
 	opacity: .5;
 }
 
-.edit_event_ticket_type_expanded {
+.edit_event_ticket_type_expanded,
+.edit_event_promocode_expanded {
 	padding: 24px;
 }
 
