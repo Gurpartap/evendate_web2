@@ -88,6 +88,22 @@ class Notifications {
                 view_auto_favored_devices.notify_in_browser
             ).where(view_auto_favored_devices.event_id.equals(data.event_id))
                 .toQuery()
+        } else if (data.user_id) { // get devices of one user
+            q_get_to_send_devices = Entities.tokens.select(
+                Entities.tokens.id.distinct(),
+                Entities.tokens.token,
+                Entities.tokens.user_id,
+                Entities.tokens.created_at,
+                Entities.tokens.updated_at,
+                Entities.tokens.token_type,
+                Entities.tokens.expires_on,
+                Entities.tokens.device_token,
+                Entities.tokens.client_type,
+                Entities.tokens.device_name,
+                Entities.tokens.refresh_token,
+                Entities.tokens.uuid
+            ).where(Entities.tokens.user_id.equals(data.user_id))
+                .toQuery()
         }
 
         this.settings.client.query(q_get_to_send_devices, function (err, result) {
@@ -194,7 +210,7 @@ class Notifications {
             ' INNER JOIN organizations ON organizations.id = view_events.organization_id' +
             ' WHERE notification_time::TIMESTAMPTZ <= NOW() AND done = FALSE LIMIT 5', function (err, result) {
 
-            if (err){
+            if (err) {
                 console.log('HERE IS ERROR');
                 _this.logger.error(err);
             }
@@ -253,6 +269,174 @@ class Notifications {
 
 
             });
+        });
+    }
+
+
+    sendRecommendationsOrganizations() {
+        let _this = this,
+            q_get_notifications = `SELECT 
+            notifications_recommendations.id,
+        notifications_recommendations.user_id,
+        notifications_recommendations.notification_type_id,
+        users.first_name, 
+        users.last_name,
+        notification_types.text
+        FROM notifications_recommendations
+        INNER JOIN notification_types ON notifications_recommendations.notification_type_id = notification_types.id
+        INNER JOIN users ON users.id = notifications_recommendations.user_id
+        WHERE done = FALSE AND notifications_recommendations.notification_type_id = 50`;
+
+        _this.settings.client.query(q_get_notifications, function (err, result) {
+            if (err) {
+                _this.logger.error(errors);
+                return
+            }
+
+            result.rows.forEach(function (notification) {
+                _this.getDevicesToSend({user_id: notification.user_id}, function (errors, devices) {
+                    if (errors) {
+                        _this.logger.error(errors);
+                        return
+                    }
+
+                    devices.forEach(function (device) {
+
+                        if (device.device_token == null) return true;
+
+                        let note = _this.notifications_manager.create(notification, device, 'recommendations_organizations');
+
+                        console.log(note);
+                        return;
+                        note.send(function (err, message_id) {
+                            if (err) return _this.logger.error(err);
+
+
+                            let q_upd_events_notifications = Entities.notifications_recommendations
+                                .update({
+                                    done: true
+                                })
+                                .where(Entities.notifications_recommendations.id.equals(notification.id))
+                                .toQuery();
+
+                            _this.settings.client.query(q_upd_events_notifications, function (err) {
+                                if (err) _this.logger.error(errors);
+                            });
+
+                            let q_ins_notification = Entities.stat_notifications_recommendations.insert({
+                                notifications_recommendation_id: notification.id,
+                                message_id: message_id,
+                                token_id: device.id
+                            }).toQuery();
+
+                            _this.settings.client.query(q_ins_notification, function (err) {
+                                if (err) {
+                                    _this.logger.error(err);
+                                }
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    }
+
+    sendFriendInterestedIn() {
+        let _this = this,
+            q_get_notifications = `SELECT 
+            notifications_recommendations.id,
+        notifications_recommendations.user_id,
+        notifications_recommendations.data,
+        notifications_recommendations.notification_type_id,
+        users.first_name, 
+        users.last_name,
+        notification_types.text
+        FROM notifications_recommendations
+        INNER JOIN notification_types ON notifications_recommendations.notification_type_id = notification_types.id
+        INNER JOIN users ON users.id = notifications_recommendations.user_id
+        WHERE done = FALSE AND notifications_recommendations.notification_type_id = 50`;
+
+        _this.settings.client.query(q_get_notifications, function (err, result) {
+            if (err) {
+                _this.logger.error(errors);
+                return
+            }
+
+            result.rows.forEach(function (notification) {
+                console.log(notification);
+                _this.getDevicesToSend({user_id: notification.user_id}, function (errors, devices) {
+                    if (errors) {
+                        _this.logger.error(errors);
+                        return
+                    }
+
+                    devices.forEach(function (device) {
+
+                        if (device.device_token == null) return true;
+
+                        let note = _this.notifications_manager.create(notification, device, 'recommendations_organizations');
+
+                        console.log(note);
+
+                        return ; //TODO: REMOVE IT BEFORE PUSH!
+                        note.send(function (err, message_id) {
+                            if (err) return _this.logger.error(err);
+
+
+                            let q_upd_events_notifications = Entities.notifications_recommendations
+                                .update({
+                                    done: true
+                                })
+                                .where(Entities.notifications_recommendations.id.equals(notification.id))
+                                .toQuery();
+
+                            _this.settings.client.query(q_upd_events_notifications, function (err) {
+                                if (err) _this.logger.error(errors);
+                            });
+
+                            let q_ins_notification = Entities.stat_notifications_recommendations.insert({
+                                notifications_recommendation_id: notification.id,
+                                message_id: message_id,
+                                token_id: device.id
+                            }).toQuery();
+
+                            _this.settings.client.query(q_ins_notification, function (err) {
+                                if (err) {
+                                    _this.logger.error(err);
+                                }
+                            });
+                        });
+                    });
+                });
+            });
+        });
+    }
+
+    scheduleRecommendationsOrganizations() {
+        let _this = this,
+            q_ins_notifications = 'INSERT INTO notifications_recommendations(user_id, notification_type_id) ' +
+                'SELECT user_id, notification_type_id FROM view_recommendations_organizations_notifications';
+
+        _this.settings.client.query(q_ins_notifications, function (err) {
+            if (err) {
+                _this.logger.error(errors);
+            }
+        });
+    }
+
+    scheduleFriendInterestedIn() {
+        let _this = this,
+            q_ins_notifications = `INSERT INTO notifications_recommendations (user_id, notification_type_id, data)
+            SELECT
+            user_id,
+            notification_type_id,
+            ('{"event_id": ' || event_id || ', "friends_count": ' || favored_friends_count || '}') :: JSONB AS data
+            FROM view_recommendations_friend_interests_notifications;`;
+
+        _this.settings.client.query(q_ins_notifications, function (err) {
+            if (err) {
+                _this.logger.error(errors);
+            }
         });
     }
 }
