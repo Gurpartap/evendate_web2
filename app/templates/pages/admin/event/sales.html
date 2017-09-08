@@ -60,30 +60,37 @@
 					<h4>Финансы</h4>
 					<div class="scoreboard -size_big">
 						<span class="scoreboard_title">Выручка</span>
-						<span class="scoreboard_number -text_color_accent">88 000₽</span>
+						<span class="scoreboard_number">88 000₽</span>
 					</div>
 					<div class="flex_grid -parts_equal_2">
 						<div class="grid_box">
 							<div class="scoreboard -size_normal">
-								<span class="scoreboard_title">Возвраты</span>
-								<span class="scoreboard_number">0₽</span>
+								<span class="scoreboard_title">Комиссия Evendate</span>
+								<span class="scoreboard_number">0₽ (1%)</span>
 							</div>
 						</div>
 						<div class="grid_box">
 							<div class="scoreboard -size_normal">
-								<span class="scoreboard_title">Коммиссия</span>
-								<span class="scoreboard_number">2 640₽</span>
+								<span class="scoreboard_title">Комиссия за эквайринг</span>
+								<span class="scoreboard_number">2 640₽ (~4.5%)</span>
 							</div>
 						</div>
 					</div>
-					<div class="scoreboard -size_normal">
-						<span class="scoreboard_title">Затраты на продвижение</span>
-						<span class="scoreboard_number">13 400₽</span>
+					<div class="scoreboard -size_big">
+						<span class="scoreboard_title">Доступно для вывода</span>
+						<span class="scoreboard_number -text_color_accent">88 000₽</span>
 					</div>
 					{withdraw_funds_button}
 				</div>
 			</div>
+			{charts}
 		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-admin-event-sales-chart">
+	<div class="event_admin_sales_chart {classes} AreaChart">
+
 	</div>
 </script>
 
