@@ -675,6 +675,18 @@ Builder = (function() {
 	 * @param {string} [direction]
 	 * @return {jQuery}
 	 */
+	Builder.prototype.floatingLoader = function buildLoaderBlock($wrapper, direction) {
+		return tmpl('loader-block', {
+			classes: '-loader_floating',
+			loader: tmpl('loader')
+		}, $wrapper, direction);
+	};
+	/**
+	 *
+	 * @param {jQuery} [$wrapper]
+	 * @param {string} [direction]
+	 * @return {jQuery}
+	 */
 	Builder.prototype.overlayLoader = function buildLoaderBlock($wrapper, direction) {
 		return tmpl('loader-block', {
 			classes: '-loader_overlay',

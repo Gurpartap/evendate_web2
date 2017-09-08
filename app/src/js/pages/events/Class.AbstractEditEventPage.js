@@ -1582,7 +1582,6 @@ AbstractEditEventPage = extending(Page, (function() {
 	};
 	
 	AbstractEditEventPage.prototype.render = function() {
-		
 		if (__APP.USER.isLoggedOut()) {
 			__APP.changeState('/feed/actual', true, true);
 			return null;
@@ -1597,8 +1596,6 @@ AbstractEditEventPage = extending(Page, (function() {
 		}
 		
 		this.organization_id = this.organization_id ? this.organization_id : this.my_organizations[0].id;
-		
-		this.preRender();
 		
 		this.$wrapper.html(tmpl('edit-event-page', this.render_vars));
 		

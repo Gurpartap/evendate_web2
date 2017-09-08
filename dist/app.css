@@ -1892,6 +1892,15 @@ table.table.-data_table_override.-data_table_row_selection tr.-selected.-has_chi
 	z-index: 5;
 }
 
+.loader_block.-loader_floating {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 5;
+}
+
 .loader_dot,
 .loader:only-child {
 	width: 50px;
@@ -4869,6 +4878,13 @@ body.-open_modal > .modal_wrapper {
 
 .orgstat_events_no_events_wrapper {
 	padding: 18px;
+}
+.org_admin_finances_page {
+	margin: 18px 0;
+}
+
+.org_admin_finances_head {
+	padding: 18px 24px;
 }
 .orgstat_overview {
 	display: flex;

@@ -588,7 +588,6 @@ OrderPage = extending(Page, (function() {
 		if (__APP.USER.isLoggedOut()) {
 			return (new AuthModal(window.location.href, false)).show();
 		}
-		this.preRender();
 		
 		this.$wrapper.html(tmpl('order-page', this.render_vars));
 		
