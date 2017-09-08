@@ -20,12 +20,17 @@ OrderAppInspector = extending(AbstractAppInspector, (function() {
 	 *
 	 */
 	function OrderAppInspector(order, event) {
+		var payed_by_string = 'Оплата: {payed_by} (Комиссия: {interest}%)';
 		
 		this.order = order;
 		this.event = event;
 		this.title = 'Заказ ' + formatTicketNumber(this.order.number);
 		this.$content = tmpl('order-app-inspector', {
 			orderer: AbstractAppInspector.build.avatarBlock(this.order.user),
+			payed_by: (this.order.sum > 0 && this.order.payed_by) ? payed_by_string.format({
+				payed_by: this.order.payed_by,
+				interest: this.order.interest
+			}) : '',
 			status_block: __APP.BUILD.orderStatusBlock(this.order.status_type_code),
 			tickets_title: AbstractAppInspector.build.title('Билеты'),
 			tickets: AbstractAppInspector.build.tickets(this.order.tickets),
