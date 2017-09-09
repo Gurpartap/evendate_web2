@@ -31,6 +31,8 @@ if ($image_info['width'] > $tmpl_info['width']) {
 	$src2->scaleImage($image_info['width'], 0);
 	$tmpl_info = $src2->getImageGeometry();
 }
+$src1->setImageFormat("png");
+//$src1->setImageColorspace($src2->getImageColorspace());
 $src1->setImageExtent($image_info['width'], $image_info['height'] + $tmpl_info['height'] - 20);
 $src1->compositeImage($src2, Imagick::COMPOSITE_DEFAULT, 0, $image_info['height'] - 20);
 
@@ -38,7 +40,6 @@ $src1->compositeImage($src2, Imagick::COMPOSITE_DEFAULT, 0, $image_info['height'
 //$combined = $src1->appendImages(true);
 $path = "./tickets_images/{$sess_id}.png";
 
-$src1->setImageFormat("png");
 
 $src1->writeImage($path);
 
