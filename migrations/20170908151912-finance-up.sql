@@ -54,7 +54,10 @@ CREATE OR REPLACE VIEW view_tickets_orders AS
               AND ticket_orders.shop_sum_amount > 0
               AND COALESCE(ticket_orders.final_sum, money.sum) > 0
       THEN FLOOR(COALESCE(ticket_orders.final_sum, money.sum) * 0.01)
-    ELSE NULL END                                                                                AS evendate_commission_value
+    ELSE NULL END                                                                                AS evendate_commission_value,
+    (SELECT COUNT(*)
+     FROM tickets
+     WHERE tickets.ticket_order_id = ticket_orders.id)                                           AS tickets_count
   FROM ticket_orders
     INNER JOIN events ON events.id = ticket_orders.event_id
     LEFT JOIN (SELECT
@@ -192,13 +195,71 @@ CREATE OR REPLACE VIEW view_ticket_types AS
         AND view_all_ticket_types.is_selling = TRUE;
 
 
+CREATE TABLE organizations_withdraws_statuses (
+  id          SERIAL PRIMARY KEY,
+  type_code   TEXT      NOT NULL UNIQUE,
+  description TEXT      NULL     DEFAULT NULL,
+  created_at  TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_at  TIMESTAMP          DEFAULT NULL
+);
 
-SELECT
-  SUM(view_tickets_orders.final_sum)::INT AS value,
-  DATE_PART('epoch', ts.time_value)::INT AS time_value
-FROM view_tickets_orders
-  RIGHT OUTER JOIN (SELECT *
-                    FROM generate_series(to_timestamp(:till), to_timestamp(:since), '-1 days')) AS ts(time_value)
-    ON to_timestamp(view_tickets_orders.created_at) <= ts.time_value AND view_tickets_orders.payed > 0
-GROUP BY ts.time_value
-ORDER BY ts.time_value;
+INSERT INTO organizations_withdraws_statuses (id, type_code, description)
+VALUES (1, 'pending', 'Ожидает обработки'),
+  (2, 'in_progress', 'Обрабатывается'),
+  (3, 'bank_charging', 'Отправлено в банк на исполнение'),
+  (4, 'completed', 'Выполнено'),
+  (5, 'rejected', 'Отказано'),
+  (6, 'rejected_by_organization', 'Отозвано организаторов');
+
+DROP TABLE IF EXISTS organizations_withdraws CASCADE;
+
+CREATE TABLE organizations_withdraws (
+  id                              SERIAL PRIMARY KEY,
+  organization_withdraw_status_id INT       NOT NULL REFERENCES organizations_withdraws (id) DEFAULT 1,
+  sum                             NUMERIC                                                    DEFAULT 0,
+  number                          INT       NULL                                             DEFAULT NULL,
+  user_id                         INT       NOT NULL REFERENCES users (id),
+  organization_id                 INT       NOT NULL REFERENCES organizations (id),
+  comment                         TEXT      NULL                                             DEFAULT NULL,
+  response                        TEXT      NULL                                             DEFAULT NULL,
+  created_at                      TIMESTAMP NOT NULL                                         DEFAULT NOW(),
+  updated_at                      TIMESTAMP                                                  DEFAULT NULL
+);
+
+CREATE OR REPLACE VIEW view_organization_finance AS
+  SELECT
+    organizations.id                                    AS organization_id,
+    COALESCE(SUM(view_event_finance.total_income), 0)   AS total_income,
+    COALESCE((SUM(view_event_finance.withdraw_available)
+              - (SELECT COALESCE(SUM(sum), 0)
+                 FROM organizations_withdraws
+                 WHERE organizations_withdraws.organization_id = organizations.id
+                       AND organizations_withdraws.organization_withdraw_status_id IN (1, 2, 3, 4))
+             ), 0)                                      AS withdraw_available,
+    SUM(view_event_finance.processing_commission_value) AS processing_commission_value,
+    AVG(view_event_finance.processing_commission)       AS processing_commission,
+    SUM(view_event_finance.evendate_commission_value)   AS evendate_commission_value
+  FROM organizations
+    LEFT JOIN events ON organizations.id = events.organization_id
+    LEFT JOIN view_event_finance ON view_event_finance.event_id = events.id
+  GROUP BY organizations.id;
+
+CREATE OR REPLACE VIEW view_organizations_withdraws
+AS
+  SELECT
+    organizations_withdraws.id,
+    organizations_withdraws.sum,
+    organizations_withdraws.user_id,
+    organizations_withdraws.organization_id,
+    organizations_withdraws.comment,
+    organizations_withdraws.response,
+    COALESCE(organizations_withdraws.number :: TEXT,
+             RPAD(organizations_withdraws.id :: TEXT || '00' || reverse((organizations_withdraws.id * 161097) :: TEXT),
+                  9, '0'))                                        AS number,
+    organizations_withdraws_statuses.type_code                    AS status_type_code,
+    organizations_withdraws_statuses.description                  AS status_description,
+    DATE_PART('epoch', organizations_withdraws.created_at) :: INT AS created_at,
+    DATE_PART('epoch', organizations_withdraws.updated_at) :: INT AS updated_at
+  FROM organizations_withdraws
+    INNER JOIN organizations_withdraws_statuses
+      ON organizations_withdraws.organization_withdraw_status_id = organizations_withdraws_statuses.id;
