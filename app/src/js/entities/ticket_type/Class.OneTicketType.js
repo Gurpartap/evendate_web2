@@ -26,6 +26,7 @@ OneTicketType = extending(OneEntity, (function() {
 	 * @property {?number} sell_end_date
 	 * @property {?(string|number)} start_after_ticket_type_code
 	 * @property {?number} amount
+	 * @property {?number} sold_count
 	 * @property {?number} min_count_per_user
 	 * @property {?number} max_count_per_user
 	 * @property {?number} promocode
@@ -45,6 +46,7 @@ OneTicketType = extending(OneEntity, (function() {
 		this.sell_end_date = null;
 		this.start_after_ticket_type_code = null;
 		this.amount = null;
+		this.sold_count = null;
 		this.min_count_per_user = null;
 		this.max_count_per_user = null;
 		this.promocode = null;

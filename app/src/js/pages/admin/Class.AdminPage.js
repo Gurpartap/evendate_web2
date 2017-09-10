@@ -25,26 +25,241 @@ AdminPage = extending(Page, (function() {
 			YEAR: 'year',
 			OVERALL: 'overall'
 		};
-		this.highchart_defaults = {
-			chart: {
-				backgroundColor: null,
-				plotBorderWidth: null,
-				plotShadow: false,
-				style: {
-					fontFamily: 'inherit',
-					fontSize: 'inherit'
-				}
-			},
-			title: {
-				text: false
-			},
-			credits: {
-				enabled: false
-			}
-		};
+		this.highchart_defaults = AdminPage.HIGHCHART_DEFAULT_OPTIONS;
 	}
+	
 	/**
 	 *
+	 * @const
+	 */
+	AdminPage.HIGHCHART_DEFAULT_OPTIONS = Object.freeze({
+		chart: {
+			backgroundColor: null,
+			plotBorderWidth: null,
+			plotShadow: false,
+			style: {
+				fontFamily: 'inherit',
+				fontSize: 'inherit'
+			}
+		},
+		title: {
+			text: false
+		},
+		credits: {
+			enabled: false
+		}
+	});
+	/**
+	 *
+	 * @const
+	 */
+	AdminPage.HIGHSTOCK_AREA_OPTIONS = Object.freeze($.extend(true, {}, AdminPage.HIGHCHART_DEFAULT_OPTIONS, {
+		chart: {
+			type: 'areaspline',
+			plotBackgroundColor: '#fcfcfc',
+			plotBorderColor: '#ebebeb',
+			plotBorderWidth: 1,
+			spacingBottom: 25
+		},
+		colors: [__C.COLORS.FRANKLIN, __C.COLORS.MUTED_80, __C.COLORS.ACCENT, __C.COLORS.MUTED, __C.COLORS.MUTED_50, __C.COLORS.MUTED_30],
+		title: {
+			align: 'left',
+			margin: 20
+		},
+		legend: {
+			enabled: true,
+			align: 'left',
+			itemStyle: {color: __C.COLORS.TEXT, cursor: 'pointer', fontSize: '14px', fontWeight: '500', y: 0},
+			itemMarginTop: 24,
+			itemMarginBottom: 5,
+			symbolHeight: 18,
+			symbolWidth: 18,
+			symbolRadius: 9,
+			itemDistance: 42,
+			x: 30
+		},
+		plotOptions: {
+			series: {
+				states: {
+					hover: {
+						lineWidth: 2
+					}
+				}
+			},
+			areaspline: {
+				fillOpacity: 0.5,
+				marker: {
+					enabled: false,
+					symbol: 'circle',
+					radius: 2,
+					states: {
+						hover: {
+							enabled: true
+						}
+					}
+				},
+				dataGrouping: {
+					dateTimeLabelFormats: {
+						millisecond: ['%b %e, %H:%M:%S.%L', '%b %e, %H:%M:%S.%L', '-%H:%M:%S.%L'],
+						second: ['%b %e, %H:%M:%S', '%b %e, %H:%M:%S', '-%H:%M:%S'],
+						minute: ['%b %e, %H:%M', '%b %e, %H:%M', '-%H:%M'],
+						hour: ['%b %e, %H:%M', '%b %e, %H:%M', '-%H:%M'],
+						day: ['%b %e, %Y', '%b %e', '-%b %e, %Y'],
+						week: ['%b %e, %Y', '%b %e', '-%b %e, %Y'],
+						month: ['%B %Y', '%B', '-%B %Y'],
+						year: ['%Y', '%Y', '-%Y']
+					}
+				}
+			}
+		},
+		tooltip: {
+			headerFormat: '<b>{point.key}</b><br/>',
+			positioner: function(labelWidth, labelHeight) {
+				return {
+					x: this.chart.plotLeft,
+					y: this.chart.plotTop
+				};
+			},
+			shadow: false,
+			shape: 'square',
+			valueDecimals: 0,
+			xDateFormat: '%e %b %Y',
+			shared: true
+		},
+		scrollbar: {enabled: false},
+		navigator: {
+			outlineColor: '#ebebeb',
+			outlineWidth: 0,
+			maskInside: false,
+			maskFill: 'rgba(245, 245, 245, 0.66)',
+			handles: {
+				backgroundColor: '#9fa7b6',
+				borderColor: '#fff'
+			},
+			xAxis: {
+				gridLineWidth: 0,
+				labels: {
+					align: 'left',
+					reserveSpace: true,
+					style: {
+						color: '#888'
+					},
+					x: 0,
+					y: null
+				}
+			}
+		},
+		rangeSelector: {
+			buttonTheme: {
+				width: null,
+				height: 22,
+				fill: 'none',
+				stroke: 'none',
+				r: 14,
+				style: {
+					color: __C.COLORS.MUTED_80,
+					fontSize: '13px',
+					fontWeight: '400',
+					textTransform: 'uppercase',
+					dominantBaseline: 'middle'
+				},
+				states: {
+					hover: {
+						fill: __C.COLORS.MUTED_50,
+						style: {
+							color: '#fff'
+						}
+					},
+					select: {
+						fill: __C.COLORS.MUTED_80,
+						style: {
+							color: '#fff',
+							fontWeight: '400'
+						}
+					}
+				}
+			},
+			buttons: [{
+				type: 'day',
+				count: 7,
+				text: "\xa0\xa0\xa0Неделя\xa0\xa0\xa0"
+			}, {
+				type: 'month',
+				count: 1,
+				text: "\xa0\xa0\xa0Месяц\xa0\xa0\xa0"
+			}, {
+				type: 'year',
+				count: 1,
+				text: "\xa0\xa0\xa0Год\xa0\xa0\xa0"
+			}, {
+				type: 'all',
+				text: "\xa0\xa0\xa0Все\xa0время\xa0\xa0\xa0"
+			}],
+			allButtonsEnabled: true,
+			selected: 2,
+			labelStyle: {
+				display: 'none'
+			},
+			inputEnabled: false
+		},
+		xAxis: {
+			gridLineWidth: 1,
+			gridLineDashStyle: 'dash',
+			type: 'datetime',
+			showEmpty: false,
+			tickPosition: 'inside',
+			dateTimeLabelFormats: {
+				minute: '%H:%M',
+				hour: '%H:%M',
+				day: '%e %b',
+				week: '%e %b',
+				month: '%b %y',
+				year: '%Y'
+			}
+		},
+		yAxis: {
+			allowDecimals: false,
+			floor: 0,
+			min: 0,
+			gridLineDashStyle: 'dash',
+			opposite: false,
+			title: {
+				text: false
+			}
+		}
+	}));
+	/**
+	 *
+	 * @param {StatisticsCollection} raw_data
+	 *
+	 * @returns Array<Array>
+	 */
+	AdminPage.areaChartSeriesNormalize = function(raw_data) {
+		
+		return raw_data.map(function(point) {
+			
+			return [moment.unix(point.time_value).valueOf(), point.value];
+		});
+	};
+	/**
+	 *
+	 * @param {jQuery} $wrapper
+	 * @param {string} title
+	 * @param {object} series
+	 * @param {object} [additional_options]
+	 */
+	AdminPage.buildStockChart = function($wrapper, title, series, additional_options) {
+		
+		$wrapper.highcharts('StockChart', $.extend(true, {}, AdminPage.HIGHSTOCK_AREA_OPTIONS, additional_options, {
+			title: {
+				text: title
+			},
+			series: series
+		}));
+	};
+	/**
+	 *
+	 * @deprecated
 	 * @param {object} raw_data
 	 * @returns {object}
 	 */
@@ -125,6 +340,7 @@ AdminPage = extending(Page, (function() {
 	};
 	/**
 	 *
+	 * @deprecated
 	 * @param {object} data
 	 * @param {object} [additional_options]
 	 */

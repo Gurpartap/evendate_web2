@@ -227,6 +227,23 @@ function extendingJQuery(children){
 	
 	return children;
 }
+
+/**
+ *
+ * @param {Function} Class
+ * @param {(function|Object<string, function>)} methods
+ *
+ * @return {void}
+ */
+function classEscalation(Class, methods) {
+	methods = isFunction(methods) ? methods() : methods;
+	
+	return Object.keys(methods).forEach(function(method_name) {
+		Object.defineProperty(Class.prototype, method_name, {
+			value: methods[method_name]
+		});
+	});
+}
 /**
  * Returns capitalized string
  *
@@ -407,82 +424,95 @@ Array.newFrom = function(original, additional_values) {
 Array.toSpaceSeparatedString = function() {
 	return this.join(' ');
 };
-/**
- * Cleans array from specific values. If no delete_value is passed, deletes undefined values,
- *
- * @param {*} [delete_value]
- * @return {Array}
- */
-Array.prototype.clean = function(delete_value) {
-	for (var i = 0; i < this.length; i++) {
-		if (this[i] == delete_value) {
-			this.splice(i, 1);
-			i--;
-		}
-	}
-	return this;
-};
-/**
- * Merges arrays without duplicates
- *
- * @param {...Array} array
- * @return {Array}
- */
-Array.prototype.merge = function(array) {
-	var args = Array.prototype.slice.call(arguments),
-		hash = {},
-		arr = [],
-		i = 0,
-		j = 0;
-	args.unshift(this);
-	for (i = 0; i < args.length; i++) {
-		for (j = 0; j < args[i].length; j++) {
-			if (hash[args[i][j]] !== true) {
-				arr[arr.length] = args[i][j];
-				hash[args[i][j]] = true;
-			}
-		}
-	}
-	return arr;
-};
-/**
- * Checks if array contains some element
- *
- * @param {*} it
- * @return {boolean}
- */
-Array.prototype.contains = function(it) {return this.indexOf(it) !== -1;};
 
-if (![].includes) {
-	Array.prototype.includes = function(searchElement/*, fromIndex*/) {
-		'use strict';
-		var O = Object(this);
-		var len = parseInt(O.length) || 0;
-		if (len === 0) {
-			return false;
-		}
-		var n = parseInt(arguments[1]) || 0;
-		var k;
-		if (n >= 0) {
-			k = n;
-		} else {
-			k = len + n;
-			if (k < 0) {
-				k = 0;
+classEscalation(Array, function() {
+	/**
+	 *
+	 * @lends Array.prototype
+	 */
+	var methods = {
+		/**
+		 * Cleans array from specific values. If no delete_value is passed, deletes undefined values,
+		 *
+		 * @param {*} [delete_value]
+		 *
+		 * @return {Array}
+		 */
+		clean: function(delete_value) {
+			for (var i = 0; i < this.length; i++) {
+				if (this[i] == delete_value) {
+					this.splice(i, 1);
+					i--;
+				}
 			}
-		}
-		while (k < len) {
-			var currentElement = O[k];
-			if (searchElement === currentElement ||
-			    (searchElement !== searchElement && currentElement !== currentElement)
-			) {
-				return true;
+			return this;
+		},
+		/**
+		 * Merges arrays without duplicates
+		 *
+		 * @param {...Array} array
+		 * @return {Array}
+		 */
+		merge: function(array) {
+			var args = Array.prototype.slice.call(arguments),
+				hash = {},
+				arr = [],
+				i = 0,
+				j = 0;
+			args.unshift(this);
+			for (i = 0; i < args.length; i++) {
+				for (j = 0; j < args[i].length; j++) {
+					if (hash[args[i][j]] !== true) {
+						arr[arr.length] = args[i][j];
+						hash[args[i][j]] = true;
+					}
+				}
 			}
-			k++;
-		}
-		return false;
+			return arr;
+		},
+		/**
+		 * Checks if array contains some element
+		 *
+		 * @param {*} it
+		 * @return {boolean}
+		 */
+		contains: function(it) {return this.indexOf(it) !== -1;}
 	};
-}
+	
+	if (![].includes) {
+		methods.includes = function(searchElement/*, fromIndex*/) {
+			'use strict';
+			var O = Object(this);
+			var len = parseInt(O.length) || 0;
+			if (len === 0) {
+				return false;
+			}
+			var n = parseInt(arguments[1]) || 0;
+			var k;
+			if (n >= 0) {
+				k = n;
+			} else {
+				k = len + n;
+				if (k < 0) {
+					k = 0;
+				}
+			}
+			while (k < len) {
+				var currentElement = O[k];
+				if (searchElement === currentElement ||
+				    (searchElement !== searchElement && currentElement !== currentElement)
+				) {
+					return true;
+				}
+				k++;
+			}
+			return false;
+		};
+	}
+	
+	return methods;
+});
+
 /**
  * Returns rounded num to specific count of decimals
  *

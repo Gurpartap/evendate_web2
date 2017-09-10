@@ -447,10 +447,12 @@ OneEvent = extending(OneEntity, (function() {
 	OneEvent.prototype.fetchEvent = function(fields, success) {
 		var self = this;
 		
-		return OneEvent.fetchEvent(self.id, fields, function(data) {
-			self.setData(data[0]);
+		return this.constructor.fetchEvent(this.id, fields, function(data) {
+			var event_data = data instanceof Array ? data[0] : data;
+			
+			self.setData(event_data);
 			if (isFunction(success)) {
-				success.call(self, data[0]);
+				success.call(self, event_data);
 			}
 		});
 	};

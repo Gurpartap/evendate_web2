@@ -157,6 +157,22 @@ hr[title]:before {
 
 .line_dashed {border: 1px dashed #ccc}
 
+.tooltip {cursor: help}
+
+.tooltip:after {
+	content: '\f059';
+	display: inline;
+	vertical-align: super;
+	padding: 0.2em;
+	font-family: FontAwesome;
+	font-size: 0.68em;
+}
+
+.tooltip:hover:after {
+	color: #00dc88;
+	color: var(--color_accent);
+}
+
 table {
 	border-spacing: 0;
 	border-collapse: collapse;

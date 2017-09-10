@@ -15,13 +15,25 @@ AdminEventSalesPage = extending(AdminEventPage, (function() {
 	 * @constructs AdminEventSalesPage
 	 *
 	 * @property {(string|number)} id
-	 * @property {OneEvent} event
+	 * @property {OneEventWithFinances} event
 	 * @property {Fields} event_fields
 	 */
 	function AdminEventSalesPage(event_id) {
 		AdminEventPage.call(this, event_id);
 		
+		this.event = new OneEventWithFinances(event_id);
+		
 		this.event_fields.add(
+			'sum_amount',
+			'sold_count',
+			'checked_out_count',
+			'total_income',
+			'withdraw_available',
+			'processing_commission_value',
+			'processing_commission',
+			'evendate_commission_value',
+			'ticket_dynamics',
+			'income_dynamics',
 			'dates',
 			'orders_count',
 			'tickets_count',
@@ -31,6 +43,7 @@ AdminEventSalesPage = extending(AdminEventPage, (function() {
 			'created_at', {
 				ticket_types: {
 					fields: new Fields(
+						'sold_count',
 						'price',
 						'sell_start_date',
 						'sell_end_date',
@@ -55,205 +68,32 @@ AdminEventSalesPage = extending(AdminEventPage, (function() {
 			}
 		});
 	}
-	/**
-	 *
-	 * @param {jQuery} $wrapper
-	 * @param {string} title
-	 * @param {object} data
-	 * @param {object} [additional_options]
-	 */
-	AdminEventSalesPage.prototype.buildCharts = function($wrapper, title, data, additional_options) {
-		var area_chart_options = $.extend(true, {}, this.highchart_defaults, {
-				chart: {
-					type: 'areaspline',
-					plotBackgroundColor: '#fcfcfc',
-					plotBorderColor: '#ebebeb',
-					plotBorderWidth: 1
-				},
-				colors: [__C.COLORS.FRANKLIN, __C.COLORS.MUTED_80, __C.COLORS.ACCENT, __C.COLORS.MUTED, __C.COLORS.MUTED_50, __C.COLORS.MUTED_30],
-				title: {
-					align: 'left',
-					margin: 20
-				},
-				legend: {
-					enabled: true,
-					align: 'left',
-					itemStyle: {color: __C.COLORS.TEXT, cursor: 'pointer', fontSize: '14px', fontWeight: '500', y: 0},
-					itemMarginTop: 24,
-					itemMarginBottom: 5,
-					symbolHeight: 18,
-					symbolWidth: 18,
-					symbolRadius: 9,
-					itemDistance: 42,
-					x: 30
-				},
-				plotOptions: {
-					series: {
-						states: {
-							hover: {
-								lineWidth: 2
-							}
-						}
-					},
-					areaspline: {
-						fillOpacity: 0.5,
-						marker: {
-							enabled: false,
-							symbol: 'circle',
-							radius: 2,
-							states: {
-								hover: {
-									enabled: true
-								}
-							}
-						},
-						dataGrouping: {
-							dateTimeLabelFormats: {
-								millisecond: ['%b %e, %H:%M:%S.%L', '%b %e, %H:%M:%S.%L', '-%H:%M:%S.%L'],
-								second: ['%b %e, %H:%M:%S', '%b %e, %H:%M:%S', '-%H:%M:%S'],
-								minute: ['%b %e, %H:%M', '%b %e, %H:%M', '-%H:%M'],
-								hour: ['%b %e, %H:%M', '%b %e, %H:%M', '-%H:%M'],
-								day: ['%b %e, %Y', '%b %e', '-%b %e, %Y'],
-								week: ['%b %e, %Y', '%b %e', '-%b %e, %Y'],
-								month: ['%B %Y', '%B', '-%B %Y'],
-								year: ['%Y', '%Y', '-%Y']
-							}
-						}
-					}
-				},
-				tooltip: {
-					headerFormat: '<b>{point.key}</b><br/>',
-					positioner: function(labelWidth, labelHeight) {
-						return {
-							x: this.chart.plotLeft,
-							y: this.chart.plotTop
-						};
-					},
-					shadow: false,
-					shape: 'square',
-					valueDecimals: 0,
-					xDateFormat: '%e %b %Y',
-					shared: true
-				},
-				scrollbar: {enabled: false},
-				navigator: {
-					outlineColor: '#ebebeb',
-					outlineWidth: 1,
-					maskInside: false,
-					maskFill: 'rgba(245, 245, 245, 0.66)',
-					handles: {
-						backgroundColor: '#9fa7b6',
-						borderColor: '#fff'
-					},
-					xAxis: {
-						gridLineWidth: 0,
-						labels: {
-							align: 'left',
-							reserveSpace: true,
-							style: {
-								color: '#888'
-							},
-							x: 0,
-							y: null
-						}
-					}
-				},
-				rangeSelector: {
-					buttonTheme: {
-						width: null,
-						height: 22,
-						fill: 'none',
-						stroke: 'none',
-						r: 14,
-						style: {
-							color: __C.COLORS.MUTED_80,
-							fontSize: '13px',
-							fontWeight: '400',
-							textTransform: 'uppercase',
-							dominantBaseline: 'middle'
-						},
-						states: {
-							hover: {
-								fill: __C.COLORS.MUTED_50,
-								style: {
-									color: '#fff'
-								}
-							},
-							select: {
-								fill: __C.COLORS.MUTED_80,
-								style: {
-									color: '#fff',
-									fontWeight: '400'
-								}
-							}
-						}
-					},
-					buttons: [{
-						type: 'day',
-						count: 7,
-						text: "\xa0\xa0\xa0Неделя\xa0\xa0\xa0"
-					}, {
-						type: 'month',
-						count: 1,
-						text: "\xa0\xa0\xa0Месяц\xa0\xa0\xa0"
-					}, {
-						type: 'year',
-						count: 1,
-						text: "\xa0\xa0\xa0Год\xa0\xa0\xa0"
-					}, {
-						type: 'all',
-						text: "\xa0\xa0\xa0Все\xa0время\xa0\xa0\xa0"
-					}],
-					allButtonsEnabled: true,
-					selected: 2,
-					labelStyle: {
-						display: 'none'
-					},
-					inputEnabled: false
-				},
-				xAxis: {
-					gridLineWidth: 1,
-					gridLineDashStyle: 'dash',
-					type: 'datetime',
-					showEmpty: false,
-					tickPosition: 'inside',
-					dateTimeLabelFormats: {
-						minute: '%H:%M',
-						hour: '%H:%M',
-						day: '%e %b',
-						week: '%e %b',
-						month: '%b %y',
-						year: '%Y'
-					}
-				},
-				yAxis: {
-					allowDecimals: false,
-					floor: 0,
-					min: 0,
-					gridLineDashStyle: 'dash',
-					opposite: false,
-					title: {
-						text: false
-					}
-				}
-			}, additional_options),
-			field_data = {
-				title: {text: title}
-			};
-		
-		field_data.series = data;
-		
-		$wrapper.highcharts('StockChart', $.extend(true, {}, area_chart_options, field_data));
-	};
 	
 	AdminEventSalesPage.prototype.render = function() {
-		var first_event_date_split = moment(this.event.first_event_date).calendar().split(' '),
+		var self = this,
+			first_event_date_split = moment(this.event.first_event_date).calendar().split(' '),
 			formatted_dates = formatDates(this.event.dates),
+			dynamics_filters = {
+				scale: AbstractStatisticsCollection.SCALES.DAY,
+				since: moment(__APP.EVENDATE_BEGIN, 'DD-MM-YYYY').format(__C.DATE_FORMAT),
+				till: moment().format(__C.DATE_FORMAT)
+			},
+			dynamics_fields = new Fields({
+				ticket_dynamics: dynamics_filters
+			}),
+			additional_chart_options = {
+				legend: {
+					enabled: false
+				}
+			},
 			$charts;
 		
 		if (this.event.ticketing_locally) {
 			$charts = tmpl('admin-event-sales-chart', {
 				classes: 'TicketsSellingChart'
+			});
+			dynamics_fields.push({
+				income_dynamics: dynamics_filters
 			});
 		}
 		
@@ -263,11 +103,17 @@ AdminEventSalesPage = extending(AdminEventPage, (function() {
 		
 		$charts.html(__APP.BUILD.loaderBlock());
 		
-		this.buildCharts($charts.filter('.TicketsSellingChart'), 'Выручка', {});
-		this.buildCharts($charts.filter('.RegisteredChart'), 'Динамика заказов', {});
-		
 		this.$wrapper.html(tmpl('admin-event-sales-page', {
 			title: this.event.title,
+			sum_amount: formatCurrency(this.event.sum_amount),
+			sold_count: formatCurrency(this.event.sold_count),
+			orders_count: formatCurrency(this.event.orders_count),
+			checked_out_count: formatCurrency(this.event.checked_out_count),
+			total_income: formatCurrency(this.event.total_income, ' ', '.', '', '₽'),
+			withdraw_available: formatCurrency(this.event.withdraw_available, ' ', '.', '', '₽'),
+			processing_commission_value: formatCurrency(this.event.processing_commission_value, ' ', '.', '', '₽'),
+			processing_commission: this.event.processing_commission || 4,
+			evendate_commission_value: formatCurrency(this.event.evendate_commission_value, ' ', '.', '', '₽'),
 			first_event_date_day: first_event_date_split[0],
 			first_event_date_month: first_event_date_split[1].capitalize(),
 			charts: $charts,
@@ -290,8 +136,8 @@ AdminEventSalesPage = extending(AdminEventPage, (function() {
 					name: ticket_type.name,
 					dates: displayDateRange(ticket_type.sell_start_date, ticket_type.sell_end_date),
 					price: ticket_type.formatPrice(),
-					stamp: ticket_type.sold >= ticket_type.amount ? __APP.BUILD.stamp('Распродано') : null,
-					progress_bar: new ProgressBar(ticket_type.amount, ticket_type.sold, {
+					stamp: ticket_type.sold_count >= ticket_type.amount ? __APP.BUILD.stamp('Распродано') : null,
+					progress_bar: new ProgressBar(ticket_type.amount, ticket_type.sold_count, {
 						classes: [
 							AbstractProgressBar.MODIFICATORS.WITH_LABEL,
 							AbstractProgressBar.MODIFICATORS.SIZE.TALL,
@@ -299,8 +145,26 @@ AdminEventSalesPage = extending(AdminEventPage, (function() {
 						]
 					})
 				};
-			}))
+			})),
+			withdraw_funds_button: __APP.BUILD.linkButton({
+				title: 'Финансы организации',
+				page: '/admin/organization/{org_id}/finances'.format({org_id: this.event.organization_id}),
+				classes: [
+					__C.CLASSES.COLORS.NEUTRAL_ACCENT
+				]
+			})
 		}));
+		
+		this.event.fetchEvent(dynamics_fields, function() {
+			AdminPage.buildStockChart($charts.filter('.TicketsSellingChart'), 'Выручка', [{
+				name: 'Выручка',
+				data: AdminPage.areaChartSeriesNormalize(self.event.income_dynamics)
+			}], additional_chart_options);
+			AdminPage.buildStockChart($charts.filter('.RegisteredChart'), 'Динамика заказов', [{
+				name: 'Колличество заказов',
+				data: AdminPage.areaChartSeriesNormalize(self.event.ticket_dynamics)
+			}], additional_chart_options);
+		});
 	};
 	
 	return AdminEventSalesPage;

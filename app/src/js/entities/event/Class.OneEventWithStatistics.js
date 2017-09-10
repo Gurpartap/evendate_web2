@@ -24,5 +24,7 @@ OneEventWithStatistics = extending(OneEvent, (function() {
 		this.notifications_sent = 0;
 	}
 	
+	OneEventWithStatistics.fetchEvent = OneEvent.fetchEvent;
+	
 	return OneEventWithStatistics;
 }()));

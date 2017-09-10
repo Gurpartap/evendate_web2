@@ -73,3 +73,8 @@
 .organization_card_buttons > .button {
 	margin: 6px;
 }
+
+.chart_wrapper {
+	height: 460px;
+	margin-bottom: 60px;
+}

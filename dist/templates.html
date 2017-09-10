@@ -2315,25 +2315,25 @@
 				<div class="event_admin_sales_brief_block">
 					<div class="scoreboard -size_normal">
 						<span class="scoreboard_title">Билеты</span>
-						<span class="scoreboard_number">273/300</span>
+						<span class="scoreboard_number">{sold_count}/{sum_amount}</span>
 					</div>
 				</div>
 				<div class="event_admin_sales_brief_block">
 					<div class="scoreboard -size_normal">
 						<span class="scoreboard_title">Заявки</span>
-						<span class="scoreboard_number">1 392</span>
+						<span class="scoreboard_number">{orders_count}</span>
 					</div>
 				</div>
 				<div class="event_admin_sales_brief_block">
 					<div class="scoreboard -size_normal">
 						<span class="scoreboard_title">Контроль входа</span>
-						<span class="scoreboard_number">0/273</span>
+						<span class="scoreboard_number">{checked_out_count}/{sold_count}</span>
 					</div>
 				</div>
 				<div class="event_admin_sales_brief_block">
 					<div class="scoreboard -size_normal">
 						<span class="scoreboard_title">Возвраты</span>
-						<span class="scoreboard_number">14</span>
+						<span class="scoreboard_number">0</span>
 					</div>
 				</div>
 			</aside>
@@ -2349,25 +2349,25 @@
 					<h4>Финансы</h4>
 					<div class="scoreboard -size_big">
 						<span class="scoreboard_title">Выручка</span>
-						<span class="scoreboard_number">88 000₽</span>
+						<span class="scoreboard_number">{total_income}</span>
 					</div>
 					<div class="flex_grid -parts_equal_2">
 						<div class="grid_box">
 							<div class="scoreboard -size_normal">
 								<span class="scoreboard_title">Комиссия Evendate</span>
-								<span class="scoreboard_number">0₽ (1%)</span>
+								<span class="scoreboard_number">{evendate_commission_value} (1%)</span>
 							</div>
 						</div>
 						<div class="grid_box">
 							<div class="scoreboard -size_normal">
 								<span class="scoreboard_title">Комиссия за эквайринг</span>
-								<span class="scoreboard_number">2 640₽ (~4.5%)</span>
+								<span class="scoreboard_number">{processing_commission_value} <span class="tooltip" title="Комиссия зависит от способа оплаты участниками. Процент высчитывается как округленное среднее со всех заказов.">({processing_commission}%)</span></span>
 							</div>
 						</div>
 					</div>
 					<div class="scoreboard -size_big">
 						<span class="scoreboard_title">Доступно для вывода</span>
-						<span class="scoreboard_number -text_color_accent">88 000₽</span>
+						<span class="scoreboard_number -text_color_accent">{withdraw_available}</span>
 					</div>
 					{withdraw_funds_button}
 				</div>
@@ -2378,7 +2378,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-admin-event-sales-chart">
-	<div class="event_admin_sales_chart {classes} AreaChart"></div>
+	<div class="event_admin_sales_chart chart_wrapper {classes} AreaChart"></div>
 </script>
 
 <script type="javascript/template" id="tmpl-admin-event-sales-ticket-type">
