@@ -115,6 +115,8 @@ class Order extends AbstractEntity
 		'payed_at',
 		'canceled_at',
 		'updated_at',
+		'shop_sum_amount',
+		'payment_type',
 		'status_id',
 		self::BITCOIN_ADDRESS_FIELD_NAME => '(SELECT address FROM bitcoin_addresses WHERE ticket_order_id = view_tickets_orders.id ORDER BY id DESC LIMIT 1) AS ' . self::BITCOIN_ADDRESS_FIELD_NAME,
 		self::BITCOIN_AMOUNT_FIELD_NAME => '(SELECT waiting_amount FROM bitcoin_addresses WHERE ticket_order_id = view_tickets_orders.id ORDER BY id DESC LIMIT 1) AS ' . self::BITCOIN_AMOUNT_FIELD_NAME,

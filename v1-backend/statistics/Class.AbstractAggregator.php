@@ -3,11 +3,11 @@
 class AbstractAggregator
 {
 
-	const SCALE_HOUR = 'hours';
-	const SCALE_DAY = 'days';
-	const SCALE_WEEK = 'weeks';
-	const SCALE_MONTH = 'months';
-	const SCALE_YEAR = 'years';
+	const SCALE_HOUR = 'hour';
+	const SCALE_DAY = 'day';
+	const SCALE_WEEK = 'week';
+	const SCALE_MONTH = 'month';
+	const SCALE_YEAR = 'year';
 	const SCALE_OVERALL = 'overall';
 
 	public static $scales = array(

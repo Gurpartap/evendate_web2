@@ -69,7 +69,7 @@ $__modules['statistics'] = array(
 
 
 		},
-		'{/organizations/(id:[0-9]+)/subscribers/export}' => function ($id) use ($__db, $__request, $__user, $__fields,$__pagination) {
+		'{/organizations/(id:[0-9]+)/subscribers/export}' => function ($id) use ($__db, $__request, $__user, $__fields, $__pagination) {
 			$__request['organization'] = OrganizationsCollection::one(
 				$__db,
 				$__user,
@@ -150,11 +150,17 @@ $__modules['statistics'] = array(
 				array()
 			);
 			$finance = new EventFinance($__db, $event, $__user);
-			return $finance->getFields($__fields,
-				$__request['scale'] ?? Statistics::SCALE_MONTH,
-				new DateTime($__request['since'] ?? null),
-				new DateTime($__request['till'] ?? null)
+			return $finance->getFields($__fields);
+		},
+		'{/organizations/(id:[0-9]+)/finance}' => function ($id) use ($__db, $__request, $__user, $__fields) {
+			$organization = OrganizationsCollection::one(
+				$__db,
+				$__user,
+				$id,
+				array()
 			);
+			$finance = new OrganizationFinance($__db, $organization, $__user);
+			return $finance->getFields($__fields);
 		},
 		'{/events/(id:[0-9]+)}' => function ($id) use ($__db, $__request, $__user, $__fields) {
 			$event = EventsCollection::one(

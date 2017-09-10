@@ -190,7 +190,7 @@ $__modules['organizations'] = array(
 					'name' => 'Новые организации',
 					'order_position' => 0
 				);
-				if (count($fields_data['organizations']) > 0){
+				if (count($fields_data['organizations']) > 0) {
 					foreach ($__fields as $key => $field) {
 						if (isset($fields_data[$key])) {
 							$new_orgs[$key] = $fields_data[$key];
@@ -316,6 +316,16 @@ $__modules['organizations'] = array(
 			$result = $organization->addSubscription($__user);
 			Statistics::Organization($organization, $__user, $__db, Statistics::ORGANIZATION_SUBSCRIBE);
 			return $result;
+		},
+		'{(id:[0-9]+)/withdraws}' => function ($organization_id) use ($__db, $__request, $__user, $__fields) {
+			$organization = OrganizationsCollection::one(
+				$__db,
+				$__user,
+				intval($organization_id),
+				$__fields
+			);
+			if (!$__user->isAdmin($organization)) throw new PrivilegesException('', $__db);
+			return $organization->withdraw($__request, $__user);
 		},
 		'' => function () use ($__db, $__request, $__user, $__fields) {
 			return $organization = Organization::create(
