@@ -584,7 +584,7 @@ button:focus {
   margin-bottom: 0;
 }
 .map-info-window {
-  font-family: Hind;
+  font-family: 'Open Sans';
   font-size: 16px;
   color: #616161;
   padding: 30px;
@@ -4110,7 +4110,7 @@ button:focus {
 }
 .launch-countdown li {
   display: inline-block;
-  font-family: 'Hind', sans-serif;
+  font-family: 'Open Sans', sans-serif;
   position: relative;
   margin-left: 30px;
   margin-right: 30px;

@@ -46,6 +46,7 @@ class Event extends AbstractEntity
 
 	/*ONLY FOR ADMINS*/
 	const STATISTICS_FIELD_NAME = 'statistics';
+	const FINANCE_FIELD_NAME = 'finance';
 	const REGISTERED_USERS_FIELD_NAME = 'registered_users';
 	const ORDERS_COUNT_FIELD_NAME = 'orders_count';
 	const EMAIL_TEXTS_FIELD_NAME = 'email_texts';
@@ -1326,6 +1327,15 @@ class Event extends AbstractEntity
 			}
 		}
 
+		if (isset($fields[self::FINANCE_FIELD_NAME])) {
+			if ($user instanceof User) {
+				$result_data[self::FINANCE_FIELD_NAME] = $this->getFinance($user,
+					Fields::parseFields($fields[self::FINANCE_FIELD_NAME]['fields'] ?? ''))->getData();
+			} else {
+				$result_data[self::FINANCE_FIELD_NAME] = null;
+			}
+		}
+
 
 		if (isset($fields[self::PROMOCODES_FIELD_NAME])) {
 			if ($user instanceof User && $user->isEventAdmin($this)) {
@@ -1981,6 +1991,13 @@ class Event extends AbstractEntity
 		} else {
 			return new Result(false, 'Не удалось сохранить данные');
 		}
+	}
+
+	private function getFinance(User $user, $fields){
+		global $BACKEND_FULL_PATH;
+		require_once $BACKEND_FULL_PATH . '/statistics/Class.EventFinance.php';
+		$finance = new EventFinance($this->db, $this, $user);
+		return $finance->getFields($fields);
 	}
 
 }

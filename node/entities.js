@@ -205,6 +205,17 @@ module.exports = {
             'message_id'
         ]
     }),
+    stat_notifications_recommendations: sql.define({
+        name: 'stat_notifications_recommendations',
+        columns: [
+            'id',
+            'notifications_recommendation_id',
+            'message_id',
+            'token_id',
+            'created_at',
+            'updated_at'
+        ]
+    }),
     view_notifications: sql.define({
         name: 'view_notifications',
         columns: [
@@ -408,6 +419,18 @@ module.exports = {
             'created_at',
             'updated_at',
             'favored_users_count'
+        ]
+    }),
+    notifications_recommendations: sql.define({
+        name: 'notifications_recommendations',
+        columns: [
+            'id',
+            'user_id',
+            'notification_type_id',
+            'is_sending',
+            'is_sent',
+            'created_at',
+            'updated_at',
         ]
     }),
     events: sql.define({

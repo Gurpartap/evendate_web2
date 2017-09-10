@@ -458,37 +458,6 @@ pg.connect(pg_conn_string, function (err, client, done) {
     }
 
     try {
-        new CronJob('*/1 * * * *', function () {
-            if (config_index == 'prod' || args.indexOf('--resize-images') !== -1) {
-                cropper.resizeNew({
-                    images: real_config.images,
-                    client: client
-                });
-                cropper.downloadNew({
-                    client: client,
-                    images: real_config.images
-                });
-            }
-            if (config_index == 'prod') {
-                var notifications = new Notifications(real_config, client, logger);
-                notifications.sendAutoNotifications();
-                notifications.sendUsersNotifications();
-            }
-            publicDelayedEvents();
-        }, null, true);
-    } catch (ex) {
-        logger.error(ex);
-    }
-
-    try {
-        new CronJob('*/1 * * * *', function () {
-            btc_checker.updateStatuses();
-        }, null, true);
-    } catch (ex) {
-        logger.error(ex);
-    }
-
-    try {
         new CronJob('*/3 * * * *', function () {
             updateEventsStats();
         }, null, true);
@@ -525,6 +494,22 @@ pg.connect(pg_conn_string, function (err, client, done) {
     } catch (ex) {
         logger.error(ex);
     }
+    try {
+        new CronJob('0 */1 * * *', function () {
+            let notifications = new Notifications(real_config, client, logger);
+            notifications.scheduleFriendInterestedIn();
+        }, null, true);
+    } catch (ex) {
+        logger.error(ex);
+    }
+    try {
+        new CronJob('30 */1 * * *', function () {
+            let notifications = new Notifications(real_config, client, logger);
+            notifications.send();
+        }, null, true);
+    } catch (ex) {
+        logger.error(ex);
+    }
 //every monday at 8:30 am
     try {
         new CronJob('30 5 * * 1', function () {
@@ -544,6 +529,25 @@ pg.connect(pg_conn_string, function (err, client, done) {
         logger.error(ex);
     }
 
+//every day at 4:00 am
+    try {
+        new CronJob('00 1 * * *', function () {
+            let notifications = new Notifications(real_config, client, logger);
+            notifications.scheduleRecommendationsOrganizations();
+        }, null, true);
+    } catch (ex) {
+        logger.error(ex);
+    }
+
+    try {
+        new CronJob('30 14 * * *', function () {
+            let notifications = new Notifications(real_config, client, logger);
+            notifications.sendRecommendationsOrganizations();
+        }, null, true);
+    } catch (ex) {
+        logger.error(ex);
+    }
+
 //every day at 3:30 am
     try {
         new CronJob('30 0 * * *', function () {
@@ -553,7 +557,7 @@ pg.connect(pg_conn_string, function (err, client, done) {
         logger.error(ex);
     }
 
-//every day at 3:30 am
+//every day at 5:30 am
     try {
         new CronJob('30 2 * * *', function () {
             updateSearchIndexes();
@@ -562,10 +566,21 @@ pg.connect(pg_conn_string, function (err, client, done) {
         logger.error(ex);
     }
 
+
+    /*Every minute BEGIN*/
+
+    try {
+        new CronJob('*/1 * * * *', function () {
+            btc_checker.updateStatuses();
+        }, null, true);
+    } catch (ex) {
+        logger.error(ex);
+    }
+
     try {
         new CronJob('*/1 * * * *', function () {
             let mailer = new Mailer(transporter, logger);
-            if (config_index == 'prod' || args.indexOf('--send-emails-force') !== -1) {
+            if (config_index === 'prod' || args.indexOf('--send-emails-force') !== -1) {
                 mailer.sendScheduled(client, handleError);
             }
         }, null, true);
@@ -573,6 +588,31 @@ pg.connect(pg_conn_string, function (err, client, done) {
         logger.error(ex);
     }
 
+
+    try {
+        new CronJob('*/1 * * * *', function () {
+            if (config_index === 'prod' || args.indexOf('--resize-images') !== -1) {
+                cropper.resizeNew({
+                    images: real_config.images,
+                    client: client
+                });
+                cropper.downloadNew({
+                    client: client,
+                    images: real_config.images
+                });
+            }
+            if (config_index === 'prod') {
+                var notifications = new Notifications(real_config, client, logger);
+                notifications.sendAutoNotifications();
+                notifications.sendUsersNotifications();
+            }
+            publicDelayedEvents();
+        }, null, true);
+    } catch (ex) {
+        logger.error(ex);
+    }
+
+    /*Every minute END*/
 
     if (args.indexOf('--schedule-emails-failed') !== -1) {
         let scheduler = new MailScheduler(client, handleError);
@@ -609,6 +649,25 @@ pg.connect(pg_conn_string, function (err, client, done) {
     if (args.indexOf('--schedule-after-event') !== -1) {
         let scheduler = new MailScheduler(client, handleError);
         scheduler.scheduleAfterEvent();
+    }
+    if (args.indexOf('--schedule-notification-new-orgs') !== -1) {
+        let notifications = new Notifications(real_config, client, logger);
+        notifications.scheduleRecommendationsOrganizations();
+    }
+
+    if (args.indexOf('--schedule-friend-interested-in') !== -1) {
+        let notifications = new Notifications(real_config, client, logger);
+        notifications.scheduleFriendInterestedIn();
+    }
+
+    if (args.indexOf('--send-notification-new-orgs') !== -1) {
+        let notifications = new Notifications(real_config, client, logger);
+        notifications.sendRecommendationsOrganizations();
+    }
+
+    if (args.indexOf('--send-friend-interested-in') !== -1) {
+        let notifications = new Notifications(real_config, client, logger);
+        notifications.sendFriendInterestedIn();
     }
 
     if (args.indexOf('--schedule-waiting-for-payment') !== -1) {

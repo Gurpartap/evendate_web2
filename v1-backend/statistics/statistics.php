@@ -4,6 +4,7 @@
 require_once $BACKEND_FULL_PATH . '/statistics/Class.AbstractAggregator.php';
 require_once $BACKEND_FULL_PATH . '/statistics/Class.OrganizationsStatistics.php';
 require_once $BACKEND_FULL_PATH . '/statistics/Class.EventsStatistics.php';
+require_once $BACKEND_FULL_PATH . '/statistics/Class.EventFinance.php';
 require_once $BACKEND_FULL_PATH . '/statistics/Class.Statistics.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.OrdersCollection.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.TicketsCollection.php';
@@ -139,6 +140,20 @@ $__modules['statistics'] = array(
 				$__fields,
 				$__pagination,
 				$__order_by ?? array()
+			);
+		},
+		'{/events/(id:[0-9]+)/finance}' => function ($id) use ($__db, $__request, $__user, $__fields) {
+			$event = EventsCollection::one(
+				$__db,
+				$__user,
+				$id,
+				array()
+			);
+			$finance = new EventFinance($__db, $event, $__user);
+			return $finance->getFields($__fields,
+				$__request['scale'] ?? Statistics::SCALE_MONTH,
+				new DateTime($__request['since'] ?? null),
+				new DateTime($__request['till'] ?? null)
 			);
 		},
 		'{/events/(id:[0-9]+)}' => function ($id) use ($__db, $__request, $__user, $__fields) {
