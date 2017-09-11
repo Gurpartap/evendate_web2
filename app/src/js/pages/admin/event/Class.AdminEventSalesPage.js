@@ -71,7 +71,7 @@ AdminEventSalesPage = extending(AdminEventPage, (function() {
 	
 	AdminEventSalesPage.prototype.render = function() {
 		var self = this,
-			first_event_date_split = moment(this.event.first_event_date).calendar().split(' '),
+			first_event_date_split = moment.unix(this.event.first_event_date).calendar().split(' '),
 			formatted_dates = formatDates(this.event.dates),
 			dynamics_filters = {
 				scale: AbstractStatisticsCollection.SCALES.DAY,
