@@ -6,6 +6,7 @@ class Withdraw extends AbstractEntity
 	const USER_FIELD_NAME = 'user';
 
 	protected static $DEFAULT_COLS = array(
+		'id',
 		'sum',
 		'user_id',
 		'organization_id',

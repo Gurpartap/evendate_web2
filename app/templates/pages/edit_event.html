@@ -284,7 +284,7 @@
 								</div>
 								{booking_time_input}
 								<h3>Промокоды</h3>
-								<table class="event_edit_table table -simple_table -full_page_width Promocodes">
+								<table class="event_edit_table table -simple_table -full_page_width Promocodes Collapsing">
 									<thead>
 										<tr>
 											<th width="60%" align="left">Код</th>
@@ -601,9 +601,37 @@
 		<td>{effort_input}</td>
 		<td>{type_switch}</td>
 		<td>
-			{service_control}
+			<div class="flex_grid">
+				<button class="event_edit_ticket_type_expand_button action -color_marginal fa_icon fa-sliders PromocodeExpandButton" type="button"></button>
+				{service_control}
+			</div>
 			<input type="hidden" name="promocodes" value="{id}">
 			<input type="hidden" name="promocode_{id}_uuid" value="{uuid}">
+		</td>
+	</tr>
+	<tr class="ExpandedPromocodeRow">
+		<td class="-no_padding" colspan="4">
+			<div class="collapsing_wrapper -inset CollapsingWrapper">
+				<div class="collapsing_content CollapsingContent">
+					<div class="edit_event_promocode_expanded">
+						<h3>Дополнительные настройки</h3>
+
+						{use_limit_form_unit}
+
+						<h4>Начало периода активности промокода</h4>
+						<p class="form_text">Момент времени, после которого промокод может быть использован</p>
+						<div class="form_fieldset -align_left">
+							{promocode_start_date_select}
+						</div>
+
+						<h4>Конец периода активности промокода</h4>
+						<p class="form_text">Момент времени, после которого промокод нельзя будет использовать</p>
+						<div class="form_fieldset -align_left">
+							{promocode_end_date_select}
+						</div>
+					</div>
+				</div>
+			</div>
 		</td>
 	</tr>
 </script>

@@ -48,6 +48,7 @@ __C = {
 		},
 		UNIVERSAL_STATES: {
 			EMPTY: '-empty',
+			SLIGHTLY_ROUNDED: '-slightly_rounded',
 			ROUNDED: '-rounded',
 			SHADOWED: '-shadowed',
 			BORDERED: '-bordered',
@@ -225,6 +226,23 @@ function extendingJQuery(children){
 	
 	
 	return children;
+}
+
+/**
+ *
+ * @param {Function} Class
+ * @param {(function|Object<string, function>)} methods
+ *
+ * @return {void}
+ */
+function classEscalation(Class, methods) {
+	methods = isFunction(methods) ? methods() : methods;
+	
+	return Object.keys(methods).forEach(function(method_name) {
+		Object.defineProperty(Class.prototype, method_name, {
+			value: methods[method_name]
+		});
+	});
 }
 /**
  * Returns capitalized string
@@ -406,82 +424,95 @@ Array.newFrom = function(original, additional_values) {
 Array.toSpaceSeparatedString = function() {
 	return this.join(' ');
 };
-/**
- * Cleans array from specific values. If no delete_value is passed, deletes undefined values,
- *
- * @param {*} [delete_value]
- * @return {Array}
- */
-Array.prototype.clean = function(delete_value) {
-	for (var i = 0; i < this.length; i++) {
-		if (this[i] == delete_value) {
-			this.splice(i, 1);
-			i--;
-		}
-	}
-	return this;
-};
-/**
- * Merges arrays without duplicates
- *
- * @param {...Array} array
- * @return {Array}
- */
-Array.prototype.merge = function(array) {
-	var args = Array.prototype.slice.call(arguments),
-		hash = {},
-		arr = [],
-		i = 0,
-		j = 0;
-	args.unshift(this);
-	for (i = 0; i < args.length; i++) {
-		for (j = 0; j < args[i].length; j++) {
-			if (hash[args[i][j]] !== true) {
-				arr[arr.length] = args[i][j];
-				hash[args[i][j]] = true;
-			}
-		}
-	}
-	return arr;
-};
-/**
- * Checks if array contains some element
- *
- * @param {*} it
- * @return {boolean}
- */
-Array.prototype.contains = function(it) {return this.indexOf(it) !== -1;};
 
-if (![].includes) {
-	Array.prototype.includes = function(searchElement/*, fromIndex*/) {
-		'use strict';
-		var O = Object(this);
-		var len = parseInt(O.length) || 0;
-		if (len === 0) {
-			return false;
-		}
-		var n = parseInt(arguments[1]) || 0;
-		var k;
-		if (n >= 0) {
-			k = n;
-		} else {
-			k = len + n;
-			if (k < 0) {
-				k = 0;
+classEscalation(Array, function() {
+	/**
+	 *
+	 * @lends Array.prototype
+	 */
+	var methods = {
+		/**
+		 * Cleans array from specific values. If no delete_value is passed, deletes undefined values,
+		 *
+		 * @param {*} [delete_value]
+		 *
+		 * @return {Array}
+		 */
+		clean: function(delete_value) {
+			for (var i = 0; i < this.length; i++) {
+				if (this[i] == delete_value) {
+					this.splice(i, 1);
+					i--;
+				}
 			}
-		}
-		while (k < len) {
-			var currentElement = O[k];
-			if (searchElement === currentElement ||
-			    (searchElement !== searchElement && currentElement !== currentElement)
-			) {
-				return true;
+			return this;
+		},
+		/**
+		 * Merges arrays without duplicates
+		 *
+		 * @param {...Array} array
+		 * @return {Array}
+		 */
+		merge: function(array) {
+			var args = Array.prototype.slice.call(arguments),
+				hash = {},
+				arr = [],
+				i = 0,
+				j = 0;
+			args.unshift(this);
+			for (i = 0; i < args.length; i++) {
+				for (j = 0; j < args[i].length; j++) {
+					if (hash[args[i][j]] !== true) {
+						arr[arr.length] = args[i][j];
+						hash[args[i][j]] = true;
+					}
+				}
 			}
-			k++;
-		}
-		return false;
+			return arr;
+		},
+		/**
+		 * Checks if array contains some element
+		 *
+		 * @param {*} it
+		 * @return {boolean}
+		 */
+		contains: function(it) {return this.indexOf(it) !== -1;}
 	};
-}
+	
+	if (![].includes) {
+		methods.includes = function(searchElement/*, fromIndex*/) {
+			'use strict';
+			var O = Object(this);
+			var len = parseInt(O.length) || 0;
+			if (len === 0) {
+				return false;
+			}
+			var n = parseInt(arguments[1]) || 0;
+			var k;
+			if (n >= 0) {
+				k = n;
+			} else {
+				k = len + n;
+				if (k < 0) {
+					k = 0;
+				}
+			}
+			while (k < len) {
+				var currentElement = O[k];
+				if (searchElement === currentElement ||
+				    (searchElement !== searchElement && currentElement !== currentElement)
+				) {
+					return true;
+				}
+				k++;
+			}
+			return false;
+		};
+	}
+	
+	return methods;
+});
+
 /**
  * Returns rounded num to specific count of decimals
  *
@@ -604,10 +635,13 @@ $.fn.extend({
 			yb = /^(?:submit|button|image|reset|file)$/i,
 			T = /^(?:checkbox|radio)$/i,
 			xb = /\r?\n/g,
-			elements = this.map(function() {
-				var a = $.prop(this, "elements");
-				return a ? $.makeArray(a) : this
+			$elements = this.map(function() {
+				var a = $.prop(this, 'elements');
+				
+				return a ? $.makeArray(a) : this;
 			});
+		
+		$elements = $elements.length ? $elements : this.find('input,select,textarea,keygen,button');
 		
 		switch (output_type) {
 			case 'array': {
@@ -615,7 +649,7 @@ $.fn.extend({
 					array = [],
 					lookup = {};
 				
-				$checkboxes = elements.filter(function() {
+				$checkboxes = $elements.filter(function() {
 					
 					return this.name && !$(this).is(":disabled") && this.type === 'checkbox';
 				});
@@ -648,7 +682,7 @@ $.fn.extend({
 					});
 				});
 				
-				elements.not($checkboxes).filter(function() {
+				$elements.not($checkboxes).filter(function() {
 					var a = this.type;
 					
 					return this.name
@@ -683,7 +717,8 @@ $.fn.extend({
 			case 'object':
 			default: {
 				var output = {};
-				elements.filter(function() {
+				
+				$elements.filter(function() {
 					
 					return this.name && !$(this).is(':disabled') && zb.test(this.nodeName) && !yb.test(this.type) && !T.test(this.type)
 				}).each(function(i, el) {
@@ -696,7 +731,7 @@ $.fn.extend({
 							return $el.is(':enabled') && $el.is('[name="' + name + '"]')
 						};
 					
-					if (elements.filter(hasSameName).length > 1) {
+					if ($elements.filter(hasSameName).length > 1) {
 						output[name] = typeof(output[name]) === "undefined" ? [] : output[name];
 						output[name].push(value ? value.replace(xb, "\r\n") : value)
 					}
@@ -714,7 +749,7 @@ $.fn.extend({
 						output[name] = value || value === 0 ? value.replace(xb, "\r\n") : null;
 					}
 				});
-				elements.filter(function() {
+				$elements.filter(function() {
 					
 					return this.name && !$(this).is(":disabled") && T.test(this.type) && ((this.checked && this.value !== "on") || (this.value === "on" && this.type === "checkbox"))
 				}).each(function(i, el) {
@@ -727,7 +762,7 @@ $.fn.extend({
 							break;
 						}
 						case 'checkbox': {
-							if (elements.filter("[name='" + name + "']").length > 1 && value !== "on") {
+							if ($elements.filter("[name='" + name + "']").length > 1 && value !== "on") {
 								output[name] = typeof(output[name]) === "undefined" ? [] : output[name];
 								output[name].push(value)
 							}
@@ -739,6 +774,7 @@ $.fn.extend({
 						}
 					}
 				});
+				
 				return output;
 			}
 		}
@@ -1335,7 +1371,7 @@ function getGenderText(gender, cases) {
  * Returns formatted array of format variable
  *
  * @param {(Array<OneDate>|DatesCollection)} dates
- * @param {(string|Array|jQuery|object)} format
+ * @param {(string|Array|jQuery|object)} [format]
  * @param {boolean} [is_same_time=false]
  *
  * @returns {(Array<string>|Array<Array>|Array<jQuery>|Array<object>)}
@@ -1415,7 +1451,7 @@ function formatDates(dates, format, is_same_time) {
 		}
 	}
 	
-	if (typeof format == 'string') {
+	if (typeof format === 'string') {
 		is_with_time = format.contains((/\{T\}|\{t\}/)) && dates[0]['start_time'] !== undefined;
 	} else {
 		is_with_time = dates[0]['start_time'] !== undefined;
@@ -1546,6 +1582,7 @@ function trimSeconds(time) {
  *
  * @param {timestamp} first_date
  * @param {timestamp} last_date
+ *
  * @returns {string}
  */
 function displayDateRange(first_date, last_date) {
@@ -1556,16 +1593,17 @@ function displayDateRange(first_date, last_date) {
 	if (m_first.isSame(m_last, 'year')) {
 		if (m_first.isSame(m_last, 'month')) {
 			if (m_first.isSame(m_last, 'day')) {
-				return m_first.format(m_first.isSame(m_today, 'year') ? 'D MMM' : 'D MMM YYYY');
-			} else {
-				return m_first.format('D') + '-' + m_last.format(m_first.isSame(m_today, 'year') ? 'D MMM' : 'D MMM YYYY');
+				
+				return m_first.format(m_first.isSame(m_today, 'year') ? 'D MMMM' : 'D MMMM YYYY');
 			}
-		} else {
-			return m_first.format('D MMM') + ' - ' + m_last.format(m_first.isSame(m_today, 'year') ? 'D MMM' : 'D MMM YYYY');
+			
+			return m_first.format('D') + '-' + m_last.format(m_first.isSame(m_today, 'year') ? 'D MMMM' : 'D MMMM YYYY');
 		}
-	} else {
-		return m_first.format('MMM YYYY') + ' - ' + m_last.format('MMM YYYY');
+		
+		return m_first.format('D MMMM') + ' - ' + m_last.format(m_first.isSame(m_today, 'year') ? 'D MMMM' : 'D MMMM YYYY');
 	}
+	
+	return m_first.format('MMMM YYYY') + ' - ' + m_last.format('MMMM YYYY');
 }
 /**
  * Returns formatted times range

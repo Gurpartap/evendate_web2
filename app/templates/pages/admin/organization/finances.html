@@ -1,0 +1,106 @@
+<script type="javascript/template" id="tmpl-admin-organization-finances-page">
+	<div class="org_admin_finances_page material -level_2_material">
+		<div class="org_admin_finances_wrapper">
+			<h3>Финансы организации</h3>
+			<div class="flex_grid -parts_equal_3">
+				<div class="grid_box">
+					<div class="scoreboard -size_big">
+						<span class="scoreboard_title">Выручка</span>
+						<span class="scoreboard_number">{total_income}</span>
+					</div>
+				</div>
+				<div class="grid_box">
+					<div class="scoreboard -size_normal">
+						<span class="scoreboard_title">Комиссия Evendate</span>
+						<span class="scoreboard_number">{evendate_commission_value} (1%)</span>
+					</div>
+				</div>
+				<div class="grid_box">
+					<div class="scoreboard -size_normal">
+						<span class="scoreboard_title">Комиссия за эквайринг</span>
+						<span class="scoreboard_number">{processing_commission_value} <span class="tooltip" title="Комиссия зависит от способа оплаты участниками. Процент высчитывается как округленное среднее со всех заказов.">({processing_commission}%)</span></span>
+					</div>
+				</div>
+			</div>
+			<div class="flex_grid -valign_center -parts_1_2">
+				<div class="grid_box">
+					<div class="scoreboard -size_big">
+						<span class="scoreboard_title">Доступно для вывода</span>
+						<span class="scoreboard_number -text_color_accent">{withdraw_available}</span>
+					</div>
+				</div>
+				<div class="grid_box">
+					{withdraw_funds_button}
+				</div>
+			</div>
+		</div>
+		<div class="TransactionStory">
+			<div class="org_admin_finances_wrapper">
+				<h4>История вывода средств</h4>
+			</div>
+			<table class="table -data_table_override TransactionStoryTable">
+				<colgroup>
+					<col width="100px">
+					<col>
+					<col>
+					<col>
+					<col>
+				</colgroup>
+				<thead>
+					<tr>
+						<th>Дата</th>
+						<th>Сотрудник</th>
+						<th>Сумма</th>
+						<th>Статус</th>
+						<th>Примечание</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+			{transactions_loader}
+		</div>
+
+		<div class="org_admin_finances_wrapper">
+			{charts}
+		</div>
+
+		<div class="EventsFinances">
+			<div class="org_admin_finances_wrapper">
+				<h4>События</h4>
+			</div>
+			<table class="table -data_table_override EventsFinancesTable">
+				<thead>
+					<tr>
+						<th>Название</th>
+						<th>Выручка</th>
+						<th>Доступно для вывода</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+			{events_loader}
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-admin-organization-finances-chart">
+	<div class="org_admin_finances_chart chart_wrapper {classes} AreaChart"></div>
+</script>
+
+<script type="javascript/template" id="tmpl-admin-organization-finances-transaction-row">
+	<tr>
+		<td>{date}</td>
+		<td>{staff_block}</td>
+		<td>{sum}</td>
+		<td>{status}</td>
+		<td>{comment}</td>
+	</tr>
+</script>
+
+<script type="javascript/template" id="tmpl-admin-organization-finances-event-row">
+	<tr>
+		<td>{title}</td>
+		<td>{sum}</td>
+		<td>{total_sum}</td>
+	</tr>
+</script>

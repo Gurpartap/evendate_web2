@@ -110,7 +110,6 @@ fieldset:disabled .form_select {cursor: default}
 :not(.-status_disabled) .form_textarea:not(:disabled):not(.-status_disabled):focus {
 	background-color: #fff;
 	border-color: var(--color_franklin);
-	outline: 1px solid var(--color_franklin);
 }
 
 .form_input:-moz-placeholder,

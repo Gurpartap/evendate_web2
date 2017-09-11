@@ -142,6 +142,28 @@ OneOrder = extending(OneEntity, (function() {
 		PAYMENT_CANCELED_AUTO: 'payment_canceled_auto',
 		PAYMENT_CANCELED_BY_CLIENT: 'payment_canceled_by_client'
 	}, OneOrder.ORDER_STATUSES);
+	/**
+	 *
+	 * @enum {string}
+	 */
+	OneOrder.PAYMENT_PROVIDERS = {
+		PC: 'Яндекс.Деньги',
+		AC: 'Банковская карта',
+		MC: 'Баланс телефона',
+		GP: 'Наличные',
+		EP: 'ЕРИП (Беларусь)',
+		WM: 'WebMoney',
+		SB: 'Сбербанк Онлайн',
+		MP: 'Мобильный терминал (mPOS)',
+		AB: 'Альфа-Клик',
+		MA: 'MasterPass',
+		PB: 'Интернет-банк Промсвязьбанка',
+		QW: 'QIWI Wallet',
+		KV: 'КупиВкредит',
+		BTC: 'Bitcoin',
+		LEP: 'Через юрлицо',
+		OTH: 'Иное'
+	};
 	
 	OneOrder.isGreenStatus = function(status) {
 		switch (status) {

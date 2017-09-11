@@ -234,6 +234,7 @@ OrderPage = extending(Page, (function() {
 			$pay_buttons = this.$wrapper.find('.PayButtons'),
 			$footer = this.$wrapper.find('.OrderFormFooter'),
 			$main_action_button = this.render_vars.register_button,
+			ticket_selected = parsed_uri.queryKey['ticket_selected'],
 			$payload,
 			$selected_type;
 		
@@ -390,10 +391,11 @@ OrderPage = extending(Page, (function() {
 		});
 		countTotalSum();
 		
-		if (parsed_uri.queryKey['ticket_selected']) {
+		if (ticket_selected) {
+			ticket_selected = decodeURIComponent(ticket_selected);
 			$selected_type = this.$wrapper.find('.TicketType').filter(function() {
 				
-				return $(this).data().ticket_type.name === parsed_uri.queryKey['ticket_selected']
+				return $(this).data().ticket_type.name === ticket_selected;
 			});
 			
 			if ($selected_type.length) {
@@ -586,7 +588,6 @@ OrderPage = extending(Page, (function() {
 		if (__APP.USER.isLoggedOut()) {
 			return (new AuthModal(window.location.href, false)).show();
 		}
-		this.preRender();
 		
 		this.$wrapper.html(tmpl('order-page', this.render_vars));
 		

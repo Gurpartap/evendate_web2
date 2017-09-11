@@ -27,6 +27,7 @@ __APP = {
 					'overview': AdminOrganizationOverviewPage,
 					'events': AdminOrganizationEventsPage,
 					'crm': AdminOrganizationCRMPage,
+					'finances': AdminOrganizationFinancesPage,
 					'settings': AdminOrganizationSettingsPage,
 					'': AdminOrganizationOverviewPage
 				}
@@ -34,6 +35,7 @@ __APP = {
 			'event': {
 				'^([0-9]+)': {
 					'overview': AdminEventOverviewPage,
+					'sales': AdminEventSalesPage,
 					'orders': AdminEventOrdersPage,
 					'requests': AdminEventRequestsPage,
 					'check_in': AdminEventCheckInPage,
