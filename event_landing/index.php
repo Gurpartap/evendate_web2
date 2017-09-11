@@ -158,23 +158,22 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
 ============================== -->
 <div class="navbar navbar-nemo appear-onscroll navbar-fixed-top">
   <div class="container">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#nemo-navigation"
-              aria-expanded="false">
-        <span class="sr-only">Toggle navigation</span>
-        <span class="icon-bar icon-bar-top"></span>
-        <span class="icon-bar icon-bar-middle"></span>
-        <span class="icon-bar icon-bar-bottom"></span>
-      </button>
+<!--    <div class="navbar-header">-->
+<!--      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#nemo-navigation"-->
+<!--              aria-expanded="false">-->
+<!--        <span class="sr-only">Toggle navigation</span>-->
+<!--        <span class="icon-bar icon-bar-top"></span>-->
+<!--        <span class="icon-bar icon-bar-middle"></span>-->
+<!--        <span class="icon-bar icon-bar-bottom"></span>-->
+<!--      </button>-->
+<!--      <!-- YOUR LOGO -->
+<!--      <a class="navbar-brand" href="#">-->
+<!--        <img src="$event['organization_logo_medium_url']" alt="">-->
+<!--      </a>-->
+<!--    </div>-->
 
-      <!-- YOUR LOGO -->
-      <a class="navbar-brand" href="#">
-        <img src="<?= $event['organization_logo_medium_url'] ?>" alt="">
-      </a>
-    </div>
-
-    <div class="collapse navbar-collapse" id="nemo-navigation">
-      <ul class="nav navbar-nav navbar-right">
+    <div class="collapse navbar-collapse navbar-center" id="nemo-navigation">
+      <ul class="nav navbar-nav">
         <li class="active"><a href="#home">Главное</a></li>
         <li ng-hide="!data.speakers.enabled"><a href="#speakers">{{data.speakers.title}}</a></li>
         <li ng-hide="!data.schedule.enabled"><a href="#schedule">{{data.schedule.title}}</a></li>
@@ -1158,6 +1157,38 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">Обратная связь с организатором</h4>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="sender-name" class="control-label">ФИО:</label>
+            <input type="text" class="form-control" id="sender-name">
+          </div>
+          <div class="form-group">
+            <label for="sender-phone" class="control-label">Номер телефона:</label>
+            <input type="text" class="form-control" id="sender-phone">
+          </div>
+          <div class="form-group">
+            <label for="message-text" class="control-label">Сообщение:</label>
+            <textarea class="form-control" id="message-text"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
+        <button type="button" class="btn btn-primary">Отправить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <!-- =========================
      SCRIPTS
