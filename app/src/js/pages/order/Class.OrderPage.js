@@ -440,7 +440,12 @@ OrderPage = extending(Page, (function() {
 					
 					if (is_custom_callback) {
 						parsed_callback = parseUri(decodeURIComponent(callback_url));
-						window.location = parsed_callback.wo_query + '?' + 'registration=free&' + parsed_callback.query;
+						callback_url = parsed_callback.wo_query + '?registration=free' + (parsed_callback.query ? ('&' + parsed_callback.query) : '');
+						if (__APP.IS_WIDGET) {
+							sendPostMessage.redirect(callback_url);
+						} else {
+							window.location = callback_url;
+						}
 					} else {
 						__APP.changeState(callback_url);
 						showNotifier({text: 'Регистрация прошла успешно', status: true});

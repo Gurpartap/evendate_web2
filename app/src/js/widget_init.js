@@ -12,6 +12,7 @@ sendPostMessage = (function(w) {
 		}
 		
 		return {
+			redirect: postMessageFactory('redirect'),
 			ready: postMessageFactory('ready'),
 			setHeight: postMessageFactory('setHeight')
 		};
