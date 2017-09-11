@@ -1833,19 +1833,39 @@ function range(end, start, step) {
 	
 	return array;
 }
+
+/**
+ *
+ * @template T
+ * @template T2
+ *
+ * @param {T2} value
+ * @param {Object<string, T2>} of
+ * @param {Object<string, T>} from
+ *
+ * @return {T|null}
+ */
+function getByValue(value, of, from) {
+	for( var prop in of ) {
+		if( of.hasOwnProperty(prop) && of[ prop ] === value ) {
+			
+			return from[ prop ];
+		}
+	}
+	
+	return null;
+}
 /**
  *
  * @param {string} slug
  * @param {object} namespace
  * @param {object} locales
+ *
  * @return {string}
  */
 function localeFromNamespace(slug, namespace, locales) {
-	for( var prop in namespace ) {
-		if( namespace.hasOwnProperty(prop) && namespace[ prop ] === slug )
-			return locales[ prop ];
-	}
-	return '';
+	
+	return getByValue(slug, namespace, locales) || '';
 }
 /**
  *

@@ -40,19 +40,19 @@
 			</div>
 			<table class="table -data_table_override TransactionStoryTable">
 				<colgroup>
-					<col width="100px">
+					<col width="120">
 					<col>
 					<col>
 					<col>
-					<col>
+					<col width="200">
 				</colgroup>
 				<thead>
 					<tr>
 						<th>Дата</th>
 						<th>Сотрудник</th>
-						<th>Сумма</th>
 						<th>Статус</th>
 						<th>Примечание</th>
+						<th align="right">Сумма</th>
 					</tr>
 				</thead>
 				<tbody></tbody>
@@ -72,8 +72,8 @@
 				<thead>
 					<tr>
 						<th>Название</th>
-						<th>Выручка</th>
-						<th>Доступно для вывода</th>
+						<th align="right">Выручка</th>
+						<th align="right">Доступно для вывода</th>
 					</tr>
 				</thead>
 				<tbody></tbody>
@@ -89,18 +89,18 @@
 
 <script type="javascript/template" id="tmpl-admin-organization-finances-transaction-row">
 	<tr>
-		<td>{date}</td>
+		<td data-order="{date_timestamp}">{date}</td>
 		<td>{staff_block}</td>
-		<td>{sum}</td>
 		<td>{status}</td>
-		<td>{comment}</td>
+		<td class="-preformatted_text">{comment}</td>
+		<td align="right">{sum}</td>
 	</tr>
 </script>
 
 <script type="javascript/template" id="tmpl-admin-organization-finances-event-row">
 	<tr>
 		<td>{title}</td>
-		<td>{sum}</td>
-		<td>{total_sum}</td>
+		<td align="right">{sum}</td>
+		<td align="right">{total_sum}</td>
 	</tr>
 </script>

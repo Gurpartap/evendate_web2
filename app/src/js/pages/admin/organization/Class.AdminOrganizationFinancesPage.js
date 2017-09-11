@@ -17,6 +17,8 @@ AdminOrganizationFinancesPage = extending(AdminOrganizationPage, (function() {
 	 * @property {(number|string)} id
 	 * @property {Fields} organization_fields
 	 * @property {OneOrganization} organization
+	 * @property {?DataTable.Api} transactionsTable
+	 * @property {?DataTable.Api} eventsTable
 	 */
 	function AdminOrganizationFinancesPage(org_id) {
 		AdminOrganizationPage.call(this, org_id);
@@ -67,21 +69,34 @@ AdminOrganizationFinancesPage = extending(AdminOrganizationPage, (function() {
 		return tmpl('admin-organization-finances-transaction-row', (withdraws instanceof Array ? withdraws : [withdraws]).map(function(withdraw) {
 			
 			return {
-				date: moment.unix(withdraw.created_at).calendar(),
+				date_timestamp: withdraw.created_at,
+				date: moment.unix(withdraw.created_at).format(__LOCALE.DATE.DATE_FORMAT),
 				staff_block: __APP.BUILD.avatarBlocks(withdraw.user, {
 					entity: __C.ENTITIES.USER,
 					avatar_classes: [__C.CLASSES.SIZES.X30, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]
 				}),
-				sum: withdraw.sum,
+				sum: formatCurrency(withdraw.sum, ' ', '.', '', '₽'),
 				status: withdraw.status_description,
 				comment: withdraw.comment
 			};
 		}));
 	};
+	/**
+	 *
+	 * @param {(WithdrawModelsCollection|Array<WithdrawModel>|WithdrawModel)} withdraws
+	 *
+	 * @return {DataTable.Api}
+	 */
+	AdminOrganizationFinancesPage.prototype.appendWithdraw = function(withdraws) {
+		
+		return this.transactionsTable.rows.add(AdminOrganizationFinancesPage.transactionRowBuilder(withdraws)).draw();
+	};
 	
 	AdminOrganizationFinancesPage.prototype.init = function() {
-		this.render_vars.withdraw_funds_button.on('click.ShowAddTransactionModal', function() {
+		var self = this;
 		
+		this.render_vars.withdraw_funds_button.on('click.ShowAddTransactionModal', function() {
+			(new WithdrawModal(self.organization)).show();
 		});
 	};
 	
@@ -150,9 +165,9 @@ AdminOrganizationFinancesPage = extending(AdminOrganizationPage, (function() {
 		this.eventsTable = this.$wrapper.find('.EventsFinancesTable').eq(0).DataTable(data_tables_opts);
 		
 		this.organization.finance.withdraws.fetch(withdraw_fields).done(function() {
-			self.transactionsTable.rows.add(AdminOrganizationFinancesPage.transactionRowBuilder(self.organization.finance.withdraws)).draw();
+			self.appendWithdraw(self.organization.finance.withdraws);
 			
-			self.render_vars.events_loader.remove();
+			self.render_vars.transactions_loader.remove();
 		});
 		
 		this.organization.finance.income_dynamics.fetch(dynamics_filters.scale, dynamics_filters.since, dynamics_filters.till).done(function() {
@@ -184,6 +199,8 @@ AdminOrganizationFinancesPage = extending(AdminOrganizationPage, (function() {
 			
 			self.render_vars.events_loader.remove();
 		});
+		
+		this.init();
 	};
 	
 	return AdminOrganizationFinancesPage;

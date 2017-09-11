@@ -43,14 +43,8 @@ WithdrawModel = extending(OneEntity, (function() {
 		
 		Object.defineProperty(this, 'status_description', {
 			get: function() {
-				for (var key in Statistics.SCALES) {
-					if (Statistics.SCALES.hasOwnProperty(key) && this.status_type_code === Statistics.SCALES[key]) {
-						
-						return WithdrawModel.STATUS_DESCRIPTION[key];
-					}
-				}
 				
-				return null;
+				return getByValue(this.status_type_code, WithdrawModel.STATUS, WithdrawModel.STATUS_DESCRIPTION);
 			}
 		});
 	}

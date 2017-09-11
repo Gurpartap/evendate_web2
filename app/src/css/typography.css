@@ -82,6 +82,8 @@ label {font-weight: inherit}
 
 .-uppercase {text-transform: uppercase}
 
+.-preformatted_text {white-space: pre-wrap}
+
 
 a.-text_color_default,
 a.-text_color_neutral,

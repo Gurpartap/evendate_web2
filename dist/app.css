@@ -116,6 +116,8 @@ label {font-weight: inherit}
 
 .-uppercase {text-transform: uppercase}
 
+.-preformatted_text {white-space: pre-wrap}
+
 
 a.-text_color_default,
 a.-text_color_neutral,
@@ -1462,6 +1464,9 @@ table.table.-data_table_override td {
 	height: 30px;
 	padding: 9px 18px;
 }
+table.table.-data_table_override th {
+	padding-right: 28px;
+}
 
 table.table.-data_table_override tbody tr.even.-has_child + tr {
 	background-color: #f9f9fa;
@@ -1482,10 +1487,13 @@ table.table.-data_table_override thead td {
 	font-weight: bold;
 	font-size: .9375em;
 	border-bottom: 0;
-	text-align: left;
 	vertical-align: bottom;
 	word-wrap: normal;
 }
+
+table.table.-data_table_override thead th:not([align]),
+table.table.-data_table_override thead td:not([align]) {text-align: left}
+
 table.table.-data_table_override tbody td {
 	color: inherit;
 	font-weight: 500;
@@ -4900,7 +4908,7 @@ body.-open_modal > .modal_wrapper {
 }
 
 .org_admin_finances_wrapper {
-	padding: 18px 24px;
+	padding: 18px;
 }
 .orgstat_overview {
 	display: flex;
