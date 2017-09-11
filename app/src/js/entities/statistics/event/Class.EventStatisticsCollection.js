@@ -51,7 +51,8 @@ EventStatisticsCollection = extending(StatisticsCollection, (function() {
 	 * @inheritDoc
 	 */
 	EventStatisticsCollection.prototype.fetch = function(scale, since, till, success) {
-		var fields_obj = {};
+		var self = this,
+			fields_obj = {};
 		
 		fields_obj[this.field] = Object.assign({
 			scale: scale,
@@ -59,7 +60,13 @@ EventStatisticsCollection = extending(StatisticsCollection, (function() {
 			till: till
 		});
 		
-		return this.constructor.fetchStatistics(this.event_id, new Fields(fields_obj), success);
+		return this.constructor.fetchStatistics(this.event_id, new Fields(fields_obj), function(data) {
+			self.setData(data[self.field]);
+			
+			if (isFunction(success)) {
+				success.call(self, self.last_pushed);
+			}
+		});
 	};
 	
 	return EventStatisticsCollection;

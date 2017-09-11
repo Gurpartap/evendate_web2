@@ -99,6 +99,8 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {?string} vk_post_link
 	 * @property {EventEmailTextsModel} email_texts
 	 *
+	 * @property {EventFinanceModel} finance
+	 *
 	 * @property {?number} creator_id
 	 * @property {?timestamp} created_at
 	 * @property {?timestamp} updated_at
@@ -182,6 +184,8 @@ OneEvent = extending(OneEntity, (function() {
 		
 		this.vk_post_link = null;
 		this.email_texts  = new EventEmailTextsModel();
+		
+		this.finance = new EventFinanceModel(event_id);
 		
 		this.creator_id = null;
 		this.created_at = null;

@@ -52,6 +52,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 * @property {Array<Privilege>} privileges
 	 * @property {?OneUser.ROLE} role
 	 * @property {TariffModel} tariff
+	 * @property {OrganizationFinanceModel} finance
 	 *
 	 * @property {UsersCollection} staff
 	 * @property {Array<OneUser>} admins
@@ -71,6 +72,9 @@ OneOrganization = extending(OneEntity, (function() {
 	 * @property {?string} facebook_url
 	 *
 	 * @property {?boolean} status
+	 *
+	 * @property {?timestamp} created_at
+	 * @property {?timestamp} updated_at
 	 *
 	 * @property {boolean} loading
 	 */
@@ -98,6 +102,7 @@ OneOrganization = extending(OneEntity, (function() {
 		this.subscribed_count = null;
 		this.subscribed = new UsersCollection();
 		this.privileges = [];
+		this.finance = new OrganizationFinanceModel(organization_id);
 		
 		this.is_private = null;
 		this.brand_color = null;
@@ -115,6 +120,9 @@ OneOrganization = extending(OneEntity, (function() {
 		
 		this.vk_url = null;
 		this.facebook_url = null;
+		
+		this.created_at = null;
+		this.updated_at = null;
 		
 		Object.defineProperties(this, {
 			'role': {

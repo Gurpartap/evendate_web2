@@ -1,24 +1,24 @@
 <script type="javascript/template" id="tmpl-admin-organization-finances-page">
 	<div class="org_admin_finances_page material -level_2_material">
-		<div class="org_admin_finances_head">
+		<div class="org_admin_finances_wrapper">
 			<h3>Финансы организации</h3>
 			<div class="flex_grid -parts_equal_3">
 				<div class="grid_box">
 					<div class="scoreboard -size_big">
 						<span class="scoreboard_title">Выручка</span>
-						<span class="scoreboard_number">88 000₽</span>
+						<span class="scoreboard_number">{total_income}</span>
 					</div>
 				</div>
 				<div class="grid_box">
 					<div class="scoreboard -size_normal">
 						<span class="scoreboard_title">Комиссия Evendate</span>
-						<span class="scoreboard_number">0₽ (1%)</span>
+						<span class="scoreboard_number">{evendate_commission_value} (1%)</span>
 					</div>
 				</div>
 				<div class="grid_box">
 					<div class="scoreboard -size_normal">
 						<span class="scoreboard_title">Комиссия за эквайринг</span>
-						<span class="scoreboard_number">2 640₽ (~4.5%)</span>
+						<span class="scoreboard_number">{processing_commission_value} <span class="tooltip" title="Комиссия зависит от способа оплаты участниками. Процент высчитывается как округленное среднее со всех заказов.">({processing_commission}%)</span></span>
 					</div>
 				</div>
 			</div>
@@ -26,7 +26,7 @@
 				<div class="grid_box">
 					<div class="scoreboard -size_big">
 						<span class="scoreboard_title">Доступно для вывода</span>
-						<span class="scoreboard_number -text_color_accent">88 000₽</span>
+						<span class="scoreboard_number -text_color_accent">{withdraw_available}</span>
 					</div>
 				</div>
 				<div class="grid_box">
@@ -35,6 +35,9 @@
 			</div>
 		</div>
 		<div class="TransactionStory">
+			<div class="org_admin_finances_wrapper">
+				<h4>История вывода средств</h4>
+			</div>
 			<table class="table -data_table_override TransactionStoryTable">
 				<colgroup>
 					<col width="100px">
@@ -57,11 +60,14 @@
 			{transactions_loader}
 		</div>
 
-		<div class="OrdersChart">
-			{orders_loader}
+		<div class="org_admin_finances_wrapper">
+			{charts}
 		</div>
 
 		<div class="EventsFinances">
+			<div class="org_admin_finances_wrapper">
+				<h4>События</h4>
+			</div>
 			<table class="table -data_table_override EventsFinancesTable">
 				<thead>
 					<tr>
@@ -75,6 +81,10 @@
 			{events_loader}
 		</div>
 	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-admin-organization-finances-chart">
+	<div class="org_admin_finances_chart chart_wrapper {classes} AreaChart"></div>
 </script>
 
 <script type="javascript/template" id="tmpl-admin-organization-finances-transaction-row">

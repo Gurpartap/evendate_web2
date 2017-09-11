@@ -5,6 +5,7 @@ require_once $BACKEND_FULL_PATH . '/statistics/Class.AbstractAggregator.php';
 require_once $BACKEND_FULL_PATH . '/statistics/Class.OrganizationsStatistics.php';
 require_once $BACKEND_FULL_PATH . '/statistics/Class.EventsStatistics.php';
 require_once $BACKEND_FULL_PATH . '/statistics/Class.EventFinance.php';
+require_once $BACKEND_FULL_PATH . '/statistics/Class.OrganizationFinance.php';
 require_once $BACKEND_FULL_PATH . '/statistics/Class.Statistics.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.OrdersCollection.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.TicketsCollection.php';
@@ -86,6 +87,16 @@ $__modules['statistics'] = array(
 				$__order_by ?? array()
 				, $__request['format'] ?? 'xlsx');
 		},
+		'{/organizations/(id:[0-9]+)/finance}' => function ($id) use ($__db, $__request, $__user, $__fields) {
+			$organization = OrganizationsCollection::one(
+				$__db,
+				$__user,
+				$id,
+				array()
+			);
+			$finance = new OrganizationFinance($__db, $organization, $__user);
+			return $finance->getFields($__fields);
+		},
 		'{/organizations/(id:[0-9]+)}' => function ($id) use ($__db, $__request, $__user, $__fields) {
 			$organization = OrganizationsCollection::one(
 				$__db,
@@ -150,16 +161,6 @@ $__modules['statistics'] = array(
 				array()
 			);
 			$finance = new EventFinance($__db, $event, $__user);
-			return $finance->getFields($__fields);
-		},
-		'{/organizations/(id:[0-9]+)/finance}' => function ($id) use ($__db, $__request, $__user, $__fields) {
-			$organization = OrganizationsCollection::one(
-				$__db,
-				$__user,
-				$id,
-				array()
-			);
-			$finance = new OrganizationFinance($__db, $organization, $__user);
 			return $finance->getFields($__fields);
 		},
 		'{/events/(id:[0-9]+)}' => function ($id) use ($__db, $__request, $__user, $__fields) {

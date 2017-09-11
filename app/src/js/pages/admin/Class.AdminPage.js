@@ -64,7 +64,10 @@ AdminPage = extending(Page, (function() {
 		colors: [__C.COLORS.FRANKLIN, __C.COLORS.MUTED_80, __C.COLORS.ACCENT, __C.COLORS.MUTED, __C.COLORS.MUTED_50, __C.COLORS.MUTED_30],
 		title: {
 			align: 'left',
-			margin: 20
+			style: {
+				'font-size': '1.25rem',
+				'font-weight': 500
+			},
 		},
 		legend: {
 			enabled: true,
@@ -236,7 +239,7 @@ AdminPage = extending(Page, (function() {
 	 */
 	AdminPage.areaChartSeriesNormalize = function(raw_data) {
 		
-		return raw_data.map(function(point) {
+		return raw_data.sortBy('time_value', true).map(function(point) {
 			
 			return [moment.unix(point.time_value).valueOf(), point.value];
 		});
@@ -250,12 +253,12 @@ AdminPage = extending(Page, (function() {
 	 */
 	AdminPage.buildStockChart = function($wrapper, title, series, additional_options) {
 		
-		$wrapper.highcharts('StockChart', $.extend(true, {}, AdminPage.HIGHSTOCK_AREA_OPTIONS, additional_options, {
+		$wrapper.highcharts('StockChart', $.extend(true, {}, AdminPage.HIGHSTOCK_AREA_OPTIONS, {
 			title: {
 				text: title
 			},
 			series: series
-		}));
+		}, additional_options));
 	};
 	/**
 	 *

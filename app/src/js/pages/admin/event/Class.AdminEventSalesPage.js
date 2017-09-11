@@ -75,7 +75,7 @@ AdminEventSalesPage = extending(AdminEventPage, (function() {
 			formatted_dates = formatDates(this.event.dates),
 			dynamics_filters = {
 				scale: AbstractStatisticsCollection.SCALES.DAY,
-				since: moment(__APP.EVENDATE_BEGIN, 'DD-MM-YYYY').format(__C.DATE_FORMAT),
+				since: moment.unix(this.event.created_at).format(__C.DATE_FORMAT),
 				till: moment().format(__C.DATE_FORMAT)
 			},
 			dynamics_fields = new Fields({
@@ -161,7 +161,7 @@ AdminEventSalesPage = extending(AdminEventPage, (function() {
 				data: AdminPage.areaChartSeriesNormalize(self.event.income_dynamics)
 			}], additional_chart_options);
 			AdminPage.buildStockChart($charts.filter('.RegisteredChart'), 'Динамика заказов', [{
-				name: 'Колличество заказов',
+				name: 'Количество заказов',
 				data: AdminPage.areaChartSeriesNormalize(self.event.ticket_dynamics)
 			}], additional_chart_options);
 		});

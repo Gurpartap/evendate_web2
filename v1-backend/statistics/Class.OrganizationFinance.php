@@ -160,7 +160,7 @@ class OrganizationFinance extends AbstractAggregator
 		return $this->db->prepareExecuteRaw($this->replaceScale($q_get_data, $params['scale'] ?? ''), array(
 			':till' => $dates['till']->getTimestamp(),
 			':since' => $dates['since']->getTimestamp(),
-			':event_id' => $this->organization->getId()
+			':organization_id' => $this->organization->getId()
 		))->fetchAll();
 	}
 
