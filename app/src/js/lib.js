@@ -635,13 +635,7 @@ $.fn.extend({
 			yb = /^(?:submit|button|image|reset|file)$/i,
 			T = /^(?:checkbox|radio)$/i,
 			xb = /\r?\n/g,
-			$elements = this.map(function() {
-				var a = $.prop(this, 'elements');
-				
-				return a ? $.makeArray(a) : this;
-			});
-		
-		$elements = $elements.length ? $elements : this.find('input,select,textarea,keygen,button');
+			$elements = this.find('input,select,textarea,keygen,button');
 		
 		switch (output_type) {
 			case 'array': {

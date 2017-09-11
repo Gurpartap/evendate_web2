@@ -37,6 +37,20 @@ AdminOrganizationFinancesPage = extending(AdminOrganizationPage, (function() {
 			}
 		);
 		
+		this.events_fields = new Fields({
+			finance: {
+				fields: new Fields(
+					'total_income',
+					'withdraw_available'
+				)
+			}
+		});
+		
+		this.withdraw_fields = new Fields(
+			'user',
+			'created_at'
+		);
+		
 		this.transactionsTable = null;
 		this.eventsTable = null;
 		
@@ -75,9 +89,10 @@ AdminOrganizationFinancesPage = extending(AdminOrganizationPage, (function() {
 					entity: __C.ENTITIES.USER,
 					avatar_classes: [__C.CLASSES.SIZES.X30, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]
 				}),
-				sum: formatCurrency(withdraw.sum, ' ', '.', '', '₽'),
 				status: withdraw.status_description,
-				comment: withdraw.comment
+				comment: withdraw.comment,
+				response: withdraw.response,
+				sum: formatCurrency(withdraw.sum, ' ', '.', '', '₽')
 			};
 		}));
 	};
@@ -124,18 +139,6 @@ AdminOrganizationFinancesPage = extending(AdminOrganizationPage, (function() {
 	
 	AdminOrganizationFinancesPage.prototype.render = function() {
 		var self = this,
-			events_fields = new Fields({
-				finance: {
-					fields: new Fields(
-						'total_income',
-						'withdraw_available'
-					)
-				}
-			}),
-			withdraw_fields = new Fields(
-				'user',
-				'created_at'
-			),
 			dynamics_filters = {
 				scale: AbstractStatisticsCollection.SCALES.DAY,
 				since: moment.unix(this.organization.created_at).format(__C.DATE_FORMAT),
@@ -164,7 +167,7 @@ AdminOrganizationFinancesPage = extending(AdminOrganizationPage, (function() {
 		
 		this.eventsTable = this.$wrapper.find('.EventsFinancesTable').eq(0).DataTable(data_tables_opts);
 		
-		this.organization.finance.withdraws.fetch(withdraw_fields).done(function() {
+		this.organization.finance.withdraws.fetch(this.withdraw_fields).done(function() {
 			self.appendWithdraw(self.organization.finance.withdraws);
 			
 			self.render_vars.transactions_loader.remove();
@@ -184,7 +187,7 @@ AdminOrganizationFinancesPage = extending(AdminOrganizationPage, (function() {
 			}], additional_chart_options);
 		});
 		
-		this.organization.events.fetchOrganizationsFeed(this.organization.id, events_fields, ServerConnection.MAX_ENTITIES_LENGTH).done(function() {
+		this.organization.events.fetchOrganizationsFeed(this.organization.id, this.events_fields, ServerConnection.MAX_ENTITIES_LENGTH).done(function() {
 			self.eventsTable.rows.add(tmpl('admin-organization-finances-event-row', self.organization.events.map(function(event) {
 				
 				return {
