@@ -172,7 +172,7 @@ class OrganizationFinance extends AbstractAggregator
 			$this->db,
 			$this->user,
 			$filters,
-			$params,
+			Fields::parseFields($params['fields'] ?? ''),
 			array('length' => 10000),
 			$order_by ?? array('id')
 		)->getData();
