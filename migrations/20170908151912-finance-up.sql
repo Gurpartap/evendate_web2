@@ -105,7 +105,7 @@ CREATE OR REPLACE VIEW view_event_finance AS
     SUM(view_tickets_orders.final_sum)                                            AS total_income,
     SUM(view_tickets_orders.withdraw_available)                                   AS withdraw_available,
     SUM(view_tickets_orders.processing_commission_value)                          AS processing_commission_value,
-    ROUND(AVG(view_tickets_orders.processing_commission), 2)                                AS processing_commission,
+    ROUND(AVG(view_tickets_orders.processing_commission), 2)                      AS processing_commission,
     SUM(view_tickets_orders.evendate_commission_value)                            AS evendate_commission_value,
     COUNT(view_tickets_orders.id)                                                 AS orders_count
   FROM events
@@ -226,6 +226,7 @@ CREATE TABLE organizations_withdraws (
   updated_at                      TIMESTAMP                                                  DEFAULT NULL
 );
 
+
 CREATE OR REPLACE VIEW view_organization_finance AS
   SELECT
     organizations.id                                        AS organization_id,
@@ -263,3 +264,11 @@ AS
   FROM organizations_withdraws
     INNER JOIN organizations_withdraws_statuses
       ON organizations_withdraws.organization_withdraw_status_id = organizations_withdraws_statuses.id;
+
+
+ALTER TABLE organizations_withdraws
+  DROP CONSTRAINT organizations_withdraws_organization_withdraw_status_id_fkey;
+
+ALTER TABLE organizations_withdraws
+  ADD CONSTRAINT organizations_withdraws_organization_withdraw_status_id_fkey
+FOREIGN KEY (organization_withdraw_status_id) REFERENCES organizations_withdraws_statuses(id);
