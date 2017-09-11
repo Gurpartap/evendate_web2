@@ -86,9 +86,11 @@ class OrganizationFinance extends AbstractAggregator
 		foreach ($fields as $key => $params) {
 			if (!in_array($key, $this->finance_fields)
 				&& !in_array($key, $this->subentites)
-			)
+			){
 				continue;
-			$result[$key] = $this->getField($key, $params);
+			}else{
+				$result[$key] = $this->getField($key, $params);
+			}
 		}
 		return new Result(true, '', $result);
 	}
@@ -168,7 +170,7 @@ class OrganizationFinance extends AbstractAggregator
 		$filters['organization_id'] = $this->organization->getId();
 		return WithdrawsCollection::filter(
 			$this->db,
-			App::getCurrentUser(),
+			$this->user,
 			$filters,
 			$params,
 			array('length' => 10000),

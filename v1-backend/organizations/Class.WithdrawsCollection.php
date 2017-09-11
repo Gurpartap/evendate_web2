@@ -33,20 +33,17 @@ class WithdrawsCollection extends AbstractCollection
 		foreach ($filters as $name => $value) {
 			switch ($name) {
 				case 'id': {
-					$q_get_withdraws->where('id = :id');
-					$statements[':id'] = $value;
+					$q_get_withdraws->where('id = ?', $value);
 					$is_one_withdraw = true;
 					break;
 				}
 				case 'number': {
-					$q_get_withdraws->where('number = :number');
-					$statements[':number'] = $value;
+					$q_get_withdraws->where('number = ?', $value);
 					$is_one_withdraw = true;
 					break;
 				}
 				case 'organization_id': {
-					$q_get_withdraws->where('organization_id = :organization_id');
-					$statements[':organization_id'] = $value;
+					$q_get_withdraws->where('organization_id = ?', $value);
 					break;
 				}
 			}
