@@ -49,7 +49,6 @@ class OrganizationFinance extends AbstractAggregator
 
 	}
 
-
 	private function getFinanceInfo(): array
 	{
 		if ($this->finance_info) return $this->finance_info;
@@ -67,14 +66,13 @@ class OrganizationFinance extends AbstractAggregator
 		return $this->finance_info;
 	}
 
-
 	private function getField(string $field, $params = null)
 	{
 		$finance_info = $this->getFinanceInfo();
 		if (in_array($field, $this->finance_fields)) {
 			return $finance_info[$field] ?? null;
 		} elseif ($field == self::WITHDRAWS_FIELD_NAME) {
-			return $this->getWithdraws();
+			return $this->getWithdraws($params);
 		} elseif ($field == self::TICKETS_DYNAMICS_FIELD_NAME) {
 			return $this->getTicketsCountDynamics($params);
 		} elseif ($field == self::INCOME_DYNAMICS_FIELD_NAME) {
@@ -113,7 +111,6 @@ class OrganizationFinance extends AbstractAggregator
 		}
 		return $result;
 	}
-
 
 	private function getSellDynamics(array $params)
 	{
@@ -164,9 +161,19 @@ class OrganizationFinance extends AbstractAggregator
 		))->fetchAll();
 	}
 
-	private function getWithdraws()
+	private function getWithdraws($params)
 	{
-
+		global $BACKEND_FULL_PATH;
+		require_once $BACKEND_FULL_PATH . '/organizations/Class.WithdrawsCollection.php';
+		$filters['organization_id'] = $this->organization->getId();
+		return WithdrawsCollection::filter(
+			$this->db,
+			App::getCurrentUser(),
+			$filters,
+			Fields::parseFields($params),
+			array('length' => 10000),
+			$order_by ?? array('id')
+		)->getData();
 	}
 
 }

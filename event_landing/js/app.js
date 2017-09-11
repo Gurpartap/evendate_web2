@@ -171,7 +171,7 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
         },
         speakers: {
             title: 'Спикеры',
-            subtitle: '',
+            subtitle: 'Подзаголовок',
             items: {},
             imageChange: function ($files, $file, $newFiles, $duplicateFiles, $invalidFiles, $event, item_uuid) {
                 getBase64($file, function (err, res) {
@@ -232,7 +232,7 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
         },
         schedule: {
             title: 'Расписание',
-            subtitle: 'Можно редактирование расписание на любое количество дней',
+            subtitle: 'Подзаголовок',
             days: {},
             days_count: 0,
             addDay: function ($event) {
@@ -339,7 +339,7 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
         },
         testimonials: {
             title: 'Отзывы',
-            subtitle: 'Добавляйте отзывы ваших клиентов и их фотографии',
+            subtitle: 'Подзаголовок',
             items: {},
             imageChange: function ($files, $file, $newFiles, $duplicateFiles, $invalidFiles, $event, item_uuid) {
                 getBase64($file, function (err, res) {
@@ -401,7 +401,7 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
         },
         custom: {
             title: 'Свой блок',
-            subtitle: 'Добавляйте любой HTML, кроме тегов script',
+            subtitle: 'Подзаголовок',
             toggleEnabled: function ($event) {
                 this.enabled = !this.enabled;
                 $event.preventDefault();
@@ -427,7 +427,7 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
         },
         gallery: {
             title: 'Галлерея',
-            subtitle: 'Добавляйте фотографии за прошлые года или фотографии помещений',
+            subtitle: 'Подзаголовок',
             items: {},
             itemImageChange: function ($files, $file, $newFiles, $duplicateFiles, $invalidFiles, $event, item_uuid) {
                 getBase64($file, function (err, res) {
@@ -569,7 +569,7 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
         },
         faq: {
             title: 'FAQ',
-            subtitle: 'Ответы на часто задаваемые вопросы',
+            subtitle: 'Подзаголовок',
             items: {},
             addItem: function () {
                 var item_uuid = guid();
