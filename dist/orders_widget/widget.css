@@ -884,8 +884,8 @@ font-weight: 700    bold    Roboto-Bold
 h1,
 h2 {margin: 1.5em 0 .7em}
 h3,
-h4 {margin: 1.5em 0 .5em}
-h5,
+h4,
+h5 {margin: 1.5em 0 .5em}
 h6,
 .small_title {margin: 1.5em 0 1em}
 
@@ -909,8 +909,8 @@ h2 {
 }
 
 h3 {font-size: 1.5rem}
-h4 {font-size: 1.125rem}
-h5 {font-size: 1.25rem}
+h4 {font-size: 1.25rem}
+h5 {font-size: 1.125rem}
 h6 {font-size: 1rem}
 
 .small_title {
@@ -954,6 +954,8 @@ label {font-weight: inherit}
 :first-child {margin-top: initial}
 
 .-uppercase {text-transform: uppercase}
+
+.-preformatted_text {white-space: pre-wrap}
 
 
 a.-text_color_default,
@@ -1266,6 +1268,22 @@ hr[title]:before {
 
 .line_dashed {border: 1px dashed #ccc}
 
+.tooltip {cursor: help}
+
+.tooltip:after {
+	content: '\f059';
+	display: inline;
+	vertical-align: super;
+	padding: 0.2em;
+	font-family: FontAwesome;
+	font-size: 0.68em;
+}
+
+.tooltip:hover:after {
+	color: #00dc88;
+	color: var(--color_accent);
+}
+
 table {
 	border-spacing: 0;
 	border-collapse: collapse;
@@ -1285,6 +1303,71 @@ table {
 	opacity: 0;
 	visibility: hidden;
 }
+
+
+.flex_grid {
+	display: flex;
+}
+
+.flex_grid.-flex_wrap {flex-wrap: wrap}
+.flex_grid > .grid_box {width: 100%}
+.flex_grid.-float > .grid_box {width: auto}
+.flex_grid.-strict_width > .grid_box {flex: none}
+
+.flex_grid.-align_left {justify-content: flex-start}
+.flex_grid.-align_center {justify-content: center}
+.flex_grid.-align_right {justify-content: flex-end}
+.flex_grid.-align_space_around {justify-content: space-around}
+.flex_grid.-align_space_between {justify-content: space-between}
+
+.flex_grid.-valign_baseline {align-items: baseline}
+.flex_grid.-valign_center {align-items: center}
+.flex_grid.-valign_top {align-items: flex-start}
+.flex_grid.-valign_bottom {align-items: flex-end}
+
+
+.flex_grid.-parts_equal_2 > .grid_box {width: calc(100% / 2)}
+.flex_grid.-parts_equal_3 > .grid_box {width: calc(100% / 3)}
+.flex_grid.-parts_equal_4 > .grid_box {width: calc(100% / 4)}
+.flex_grid.-parts_equal_5 > .grid_box {width: calc(100% / 5)}
+
+.flex_grid.-parts_1_2 > .grid_box:nth-child(1),
+.flex_grid.-parts_2_1 > .grid_box:nth-child(2) {width: calc((100% / 3) * 1)}
+.flex_grid.-parts_1_2 > .grid_box:nth-child(2),
+.flex_grid.-parts_2_1 > .grid_box:nth-child(1) {width: calc((100% / 3) * 2)}
+
+.flex_grid.-parts_1_3 > .grid_box:nth-child(1),
+.flex_grid.-parts_3_1 > .grid_box:nth-child(2) {width: calc((100% / 4) * 1)}
+.flex_grid.-parts_1_3 > .grid_box:nth-child(2),
+.flex_grid.-parts_3_1 > .grid_box:nth-child(1) {width: calc((100% / 4) * 3)}
+
+.flex_grid.-parts_1_4 > .grid_box:nth-child(1),
+.flex_grid.-parts_4_1 > .grid_box:nth-child(2) {width: calc((100% / 5) * 1)}
+.flex_grid.-parts_1_4 > .grid_box:nth-child(2),
+.flex_grid.-parts_4_1 > .grid_box:nth-child(1) {width: calc((100% / 5) * 4)}
+
+
+.flex_grid.-parts_1_1_2 > .grid_box:nth-child(1),
+.flex_grid.-parts_1_1_2 > .grid_box:nth-child(2),
+.flex_grid.-parts_1_2_1 > .grid_box:nth-child(1),
+.flex_grid.-parts_1_2_1 > .grid_box:nth-child(3),
+.flex_grid.-parts_2_1_1 > .grid_box:nth-child(2),
+.flex_grid.-parts_2_1_1 > .grid_box:nth-child(3) {width: calc((100% / 4) * 1)}
+
+.flex_grid.-parts_1_1_2 > .grid_box:nth-child(3),
+.flex_grid.-parts_1_2_1 > .grid_box:nth-child(2),
+.flex_grid.-parts_2_1_1 > .grid_box:nth-child(1) {width: calc((100% / 4) * 2)}
+
+.flex_grid.-parts_1_2_2 > .grid_box:nth-child(2),
+.flex_grid.-parts_1_2_2 > .grid_box:nth-child(3),
+.flex_grid.-parts_2_1_2 > .grid_box:nth-child(1),
+.flex_grid.-parts_2_1_2 > .grid_box:nth-child(3),
+.flex_grid.-parts_2_2_1 > .grid_box:nth-child(1),
+.flex_grid.-parts_2_2_1 > .grid_box:nth-child(2) {width: calc((100% / 5) * 2)}
+
+.flex_grid.-parts_1_2_2 > .grid_box:nth-child(1),
+.flex_grid.-parts_2_1_2 > .grid_box:nth-child(2),
+.flex_grid.-parts_2_2_1 > .grid_box:nth-child(3) {width: calc((100% / 5) * 1)}
 
 
 
@@ -1794,7 +1877,6 @@ fieldset:disabled .form_select {cursor: default}
 :not(.-status_disabled) .form_textarea:not(:disabled):not(.-status_disabled):focus {
 	background-color: #fff;
 	border-color: var(--color_franklin);
-	outline: 1px solid var(--color_franklin);
 }
 
 .form_input:-moz-placeholder,
@@ -2764,6 +2846,15 @@ fieldset:disabled .form_select {cursor: default}
 
 .loader_block.-loader_overlay {
 	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 5;
+}
+
+.loader_block.-loader_floating {
+	position: absolute;
 	top: 0;
 	left: 0;
 	right: 0;

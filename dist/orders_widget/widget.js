@@ -35910,6 +35910,7 @@ __C = {
 		},
 		UNIVERSAL_STATES: {
 			EMPTY: '-empty',
+			SLIGHTLY_ROUNDED: '-slightly_rounded',
 			ROUNDED: '-rounded',
 			SHADOWED: '-shadowed',
 			BORDERED: '-bordered',
@@ -36087,6 +36088,23 @@ function extendingJQuery(children){
 	
 	
 	return children;
+}
+
+/**
+ *
+ * @param {Function} Class
+ * @param {(function|Object<string, function>)} methods
+ *
+ * @return {void}
+ */
+function classEscalation(Class, methods) {
+	methods = isFunction(methods) ? methods() : methods;
+	
+	return Object.keys(methods).forEach(function(method_name) {
+		Object.defineProperty(Class.prototype, method_name, {
+			value: methods[method_name]
+		});
+	});
 }
 /**
  * Returns capitalized string
@@ -36268,82 +36286,95 @@ Array.newFrom = function(original, additional_values) {
 Array.toSpaceSeparatedString = function() {
 	return this.join(' ');
 };
-/**
- * Cleans array from specific values. If no delete_value is passed, deletes undefined values,
- *
- * @param {*} [delete_value]
- * @return {Array}
- */
-Array.prototype.clean = function(delete_value) {
-	for (var i = 0; i < this.length; i++) {
-		if (this[i] == delete_value) {
-			this.splice(i, 1);
-			i--;
-		}
-	}
-	return this;
-};
-/**
- * Merges arrays without duplicates
- *
- * @param {...Array} array
- * @return {Array}
- */
-Array.prototype.merge = function(array) {
-	var args = Array.prototype.slice.call(arguments),
-		hash = {},
-		arr = [],
-		i = 0,
-		j = 0;
-	args.unshift(this);
-	for (i = 0; i < args.length; i++) {
-		for (j = 0; j < args[i].length; j++) {
-			if (hash[args[i][j]] !== true) {
-				arr[arr.length] = args[i][j];
-				hash[args[i][j]] = true;
-			}
-		}
-	}
-	return arr;
-};
-/**
- * Checks if array contains some element
- *
- * @param {*} it
- * @return {boolean}
- */
-Array.prototype.contains = function(it) {return this.indexOf(it) !== -1;};
 
-if (![].includes) {
-	Array.prototype.includes = function(searchElement/*, fromIndex*/) {
-		'use strict';
-		var O = Object(this);
-		var len = parseInt(O.length) || 0;
-		if (len === 0) {
-			return false;
-		}
-		var n = parseInt(arguments[1]) || 0;
-		var k;
-		if (n >= 0) {
-			k = n;
-		} else {
-			k = len + n;
-			if (k < 0) {
-				k = 0;
+classEscalation(Array, function() {
+	/**
+	 *
+	 * @lends Array.prototype
+	 */
+	var methods = {
+		/**
+		 * Cleans array from specific values. If no delete_value is passed, deletes undefined values,
+		 *
+		 * @param {*} [delete_value]
+		 *
+		 * @return {Array}
+		 */
+		clean: function(delete_value) {
+			for (var i = 0; i < this.length; i++) {
+				if (this[i] == delete_value) {
+					this.splice(i, 1);
+					i--;
+				}
 			}
-		}
-		while (k < len) {
-			var currentElement = O[k];
-			if (searchElement === currentElement ||
-			    (searchElement !== searchElement && currentElement !== currentElement)
-			) {
-				return true;
+			return this;
+		},
+		/**
+		 * Merges arrays without duplicates
+		 *
+		 * @param {...Array} array
+		 * @return {Array}
+		 */
+		merge: function(array) {
+			var args = Array.prototype.slice.call(arguments),
+				hash = {},
+				arr = [],
+				i = 0,
+				j = 0;
+			args.unshift(this);
+			for (i = 0; i < args.length; i++) {
+				for (j = 0; j < args[i].length; j++) {
+					if (hash[args[i][j]] !== true) {
+						arr[arr.length] = args[i][j];
+						hash[args[i][j]] = true;
+					}
+				}
 			}
-			k++;
-		}
-		return false;
+			return arr;
+		},
+		/**
+		 * Checks if array contains some element
+		 *
+		 * @param {*} it
+		 * @return {boolean}
+		 */
+		contains: function(it) {return this.indexOf(it) !== -1;}
 	};
-}
+	
+	if (![].includes) {
+		methods.includes = function(searchElement/*, fromIndex*/) {
+			'use strict';
+			var O = Object(this);
+			var len = parseInt(O.length) || 0;
+			if (len === 0) {
+				return false;
+			}
+			var n = parseInt(arguments[1]) || 0;
+			var k;
+			if (n >= 0) {
+				k = n;
+			} else {
+				k = len + n;
+				if (k < 0) {
+					k = 0;
+				}
+			}
+			while (k < len) {
+				var currentElement = O[k];
+				if (searchElement === currentElement ||
+				    (searchElement !== searchElement && currentElement !== currentElement)
+				) {
+					return true;
+				}
+				k++;
+			}
+			return false;
+		};
+	}
+	
+	return methods;
+});
+
 /**
  * Returns rounded num to specific count of decimals
  *
@@ -36466,10 +36497,7 @@ $.fn.extend({
 			yb = /^(?:submit|button|image|reset|file)$/i,
 			T = /^(?:checkbox|radio)$/i,
 			xb = /\r?\n/g,
-			elements = this.map(function() {
-				var a = $.prop(this, "elements");
-				return a ? $.makeArray(a) : this
-			});
+			$elements = this.find('input,select,textarea,keygen,button');
 		
 		switch (output_type) {
 			case 'array': {
@@ -36477,7 +36505,7 @@ $.fn.extend({
 					array = [],
 					lookup = {};
 				
-				$checkboxes = elements.filter(function() {
+				$checkboxes = $elements.filter(function() {
 					
 					return this.name && !$(this).is(":disabled") && this.type === 'checkbox';
 				});
@@ -36510,7 +36538,7 @@ $.fn.extend({
 					});
 				});
 				
-				elements.not($checkboxes).filter(function() {
+				$elements.not($checkboxes).filter(function() {
 					var a = this.type;
 					
 					return this.name
@@ -36545,7 +36573,8 @@ $.fn.extend({
 			case 'object':
 			default: {
 				var output = {};
-				elements.filter(function() {
+				
+				$elements.filter(function() {
 					
 					return this.name && !$(this).is(':disabled') && zb.test(this.nodeName) && !yb.test(this.type) && !T.test(this.type)
 				}).each(function(i, el) {
@@ -36558,7 +36587,7 @@ $.fn.extend({
 							return $el.is(':enabled') && $el.is('[name="' + name + '"]')
 						};
 					
-					if (elements.filter(hasSameName).length > 1) {
+					if ($elements.filter(hasSameName).length > 1) {
 						output[name] = typeof(output[name]) === "undefined" ? [] : output[name];
 						output[name].push(value ? value.replace(xb, "\r\n") : value)
 					}
@@ -36576,7 +36605,7 @@ $.fn.extend({
 						output[name] = value || value === 0 ? value.replace(xb, "\r\n") : null;
 					}
 				});
-				elements.filter(function() {
+				$elements.filter(function() {
 					
 					return this.name && !$(this).is(":disabled") && T.test(this.type) && ((this.checked && this.value !== "on") || (this.value === "on" && this.type === "checkbox"))
 				}).each(function(i, el) {
@@ -36589,7 +36618,7 @@ $.fn.extend({
 							break;
 						}
 						case 'checkbox': {
-							if (elements.filter("[name='" + name + "']").length > 1 && value !== "on") {
+							if ($elements.filter("[name='" + name + "']").length > 1 && value !== "on") {
 								output[name] = typeof(output[name]) === "undefined" ? [] : output[name];
 								output[name].push(value)
 							}
@@ -36601,6 +36630,7 @@ $.fn.extend({
 						}
 					}
 				});
+				
 				return output;
 			}
 		}
@@ -37197,7 +37227,7 @@ function getGenderText(gender, cases) {
  * Returns formatted array of format variable
  *
  * @param {(Array<OneDate>|DatesCollection)} dates
- * @param {(string|Array|jQuery|object)} format
+ * @param {(string|Array|jQuery|object)} [format]
  * @param {boolean} [is_same_time=false]
  *
  * @returns {(Array<string>|Array<Array>|Array<jQuery>|Array<object>)}
@@ -37277,7 +37307,7 @@ function formatDates(dates, format, is_same_time) {
 		}
 	}
 	
-	if (typeof format == 'string') {
+	if (typeof format === 'string') {
 		is_with_time = format.contains((/\{T\}|\{t\}/)) && dates[0]['start_time'] !== undefined;
 	} else {
 		is_with_time = dates[0]['start_time'] !== undefined;
@@ -37408,6 +37438,7 @@ function trimSeconds(time) {
  *
  * @param {timestamp} first_date
  * @param {timestamp} last_date
+ *
  * @returns {string}
  */
 function displayDateRange(first_date, last_date) {
@@ -37418,16 +37449,17 @@ function displayDateRange(first_date, last_date) {
 	if (m_first.isSame(m_last, 'year')) {
 		if (m_first.isSame(m_last, 'month')) {
 			if (m_first.isSame(m_last, 'day')) {
-				return m_first.format(m_first.isSame(m_today, 'year') ? 'D MMM' : 'D MMM YYYY');
-			} else {
-				return m_first.format('D') + '-' + m_last.format(m_first.isSame(m_today, 'year') ? 'D MMM' : 'D MMM YYYY');
+				
+				return m_first.format(m_first.isSame(m_today, 'year') ? 'D MMMM' : 'D MMMM YYYY');
 			}
-		} else {
-			return m_first.format('D MMM') + ' - ' + m_last.format(m_first.isSame(m_today, 'year') ? 'D MMM' : 'D MMM YYYY');
+			
+			return m_first.format('D') + '-' + m_last.format(m_first.isSame(m_today, 'year') ? 'D MMMM' : 'D MMMM YYYY');
 		}
-	} else {
-		return m_first.format('MMM YYYY') + ' - ' + m_last.format('MMM YYYY');
+		
+		return m_first.format('D MMMM') + ' - ' + m_last.format(m_first.isSame(m_today, 'year') ? 'D MMMM' : 'D MMMM YYYY');
 	}
+	
+	return m_first.format('MMMM YYYY') + ' - ' + m_last.format('MMMM YYYY');
 }
 /**
  * Returns formatted times range
@@ -37657,19 +37689,39 @@ function range(end, start, step) {
 	
 	return array;
 }
+
+/**
+ *
+ * @template T
+ * @template T2
+ *
+ * @param {T2} value
+ * @param {Object<string, T2>} of
+ * @param {Object<string, T>} from
+ *
+ * @return {T|null}
+ */
+function getByValue(value, of, from) {
+	for( var prop in of ) {
+		if( of.hasOwnProperty(prop) && of[ prop ] === value ) {
+			
+			return from[ prop ];
+		}
+	}
+	
+	return null;
+}
 /**
  *
  * @param {string} slug
  * @param {object} namespace
  * @param {object} locales
+ *
  * @return {string}
  */
 function localeFromNamespace(slug, namespace, locales) {
-	for( var prop in namespace ) {
-		if( namespace.hasOwnProperty(prop) && namespace[ prop ] === slug )
-			return locales[ prop ];
-	}
-	return '';
+	
+	return getByValue(slug, namespace, locales) || '';
 }
 /**
  *
@@ -39112,37 +39164,35 @@ Fields = (function() {
 	}());
 	/**
 	 *
-	 * @constructs Fields
 	 * @param {...(Object|Array|string)} [obj]
+	 *
+	 * @constructor
+	 * @constructs Fields
 	 */
 	function Fields(obj) {
-		this.add.apply(this, arguments);
+		this.push.apply(this, arguments);
+		
+		Object.defineProperty(this, 'length', {
+			configurable: true,
+			enumerable: false,
+			writable: true,
+			value: 0
+		});
 	}
-	
-	Object.defineProperty(Fields.prototype, 'toString', {
-		value: function() {
-			var self = this,
-				fields = Object.props(this);
-			
-			if (fields.length === 0)
-				return undefined;
-			
-			return fields.map(function(field_name) {
-				return field_name + self[field_name];
-			}).join(',');
-		}
-	});
 	
 	/**
 	 *
 	 * @param {(string|Array)} fields
+	 *
 	 * @return {{}}
 	 */
 	function parseFields(fields){
 		var parsed_fields = {};
+		
 		if(!(fields instanceof Array)){
 			fields = fields.replace(/\s+/g, '').match(/(\w+\{[^}]+}|\w+)/g);
 		}
+		
 		fields.forEach(function(field) {
 			var split = field.split('{'),
 				subset = {};
@@ -39164,98 +39214,173 @@ Fields = (function() {
 	/**
 	 *
 	 * @param {(string|Array|Fields)} fields
+	 *
 	 * @return {Fields}
 	 */
 	Fields.parseFields = function(fields){
-		if (fields instanceof Fields)
+		if (fields instanceof Fields) {
+			
 			return fields.copy();
-		return new Fields(parseFields(fields));
-	};
-	/**
-	 * Getting field by name
-	 *
-	 * @param {string} field_name
-	 * @return {(FieldsProps|null)}
-	 */
-	Fields.prototype.get = function(field_name) {
-		if (this.has(field_name))
-			return this[field_name];
-		return null;
-	};
-	/**
-	 *
-	 * @param {...(string|Array<string>|Object<string, *>)} field_name
-	 * @return {Fields}
-	 */
-	Fields.prototype.push = Fields.prototype.add = function() {
-		var args = Array.prototype.splice.call(arguments, 0),
-			field,
-			parsed_obj = {};
-		
-		args.forEach(function(arg) {
-			if(typeof arg === 'string'){
-				parsed_obj[arg] = {};
-			} else if (arg instanceof Array) {
-				arg.forEach(function(field) {
-					parsed_obj[field] = {};
-				});
-			} else if (arg instanceof Object) {
-				Object.props(arg).forEach(function(field) {
-					parsed_obj[field] = arg[field];
-				});
-			}
-		});
-		
-		for(field in parsed_obj){
-			if (this.has(field)) {
-				this[field].merge(parsed_obj[field]);
-			} else {
-				this[field] = new FieldsProps(parsed_obj[field]);
-			}
 		}
 		
-		return this;
+		return new Fields(parseFields(fields));
 	};
-	/**
-	 * Pulling out field by name
-	 *
-	 * @param {string} field_name
-	 * @return {(FieldsProps|null)}
-	 */
-	Fields.prototype.pull = function(field_name) {
-		var field = this.get(field_name);
-		this.delete(field_name);
+	
+	classEscalation(Fields, function() {
+		/**
+		 *
+		 * @lends Fields.prototype
+		 */
+		var methods = {
+			/**
+			 * Getting field by name
+			 *
+			 * @param {string} field_name
+			 *
+			 * @return {(FieldsProps|null)}
+			 */
+			get: function(field_name) {
+				if (this.has(field_name)) {
+					
+					return this[field_name];
+				}
+				
+				return null;
+			},
+			/**
+			 *
+			 * @param {...(string|Array<string>|Object<string, *>)} field_name
+			 * @param {...FieldsProps} [field_props]
+			 *
+			 * @return {Fields}
+			 */
+			push: function(field_name, field_props) {
+				var args = Array.prototype.splice.call(arguments, 0),
+					field,
+					parsed_obj = {};
+				
+				if (typeof field_name === 'string' && field_props instanceof FieldsProps) {
+					if (this.has(field_name)) {
+						this[field_name].merge(field_props);
+					} else {
+						this[field_name] = field_props;
+						this.length++;
+					}
+				} else {
+					args.forEach(function(arg) {
+						if(typeof arg === 'string'){
+							parsed_obj[arg] = {};
+						} else if (arg instanceof Array) {
+							arg.forEach(function(field) {
+								parsed_obj[field] = {};
+							});
+						} else if (arg instanceof Object) {
+							Object.props(arg).forEach(function(field) {
+								parsed_obj[field] = arg[field];
+							});
+						}
+					});
+					
+					for(field in parsed_obj){
+						if (this.has(field)) {
+							this[field].merge(parsed_obj[field]);
+						} else {
+							this[field] = new FieldsProps(parsed_obj[field]);
+							this.length++;
+						}
+					}
+				}
+				
+				return this;
+			},
+			/**
+			 * Pulling out field by name
+			 *
+			 * @param {string} field_name
+			 *
+			 * @return {(FieldsProps|null)}
+			 */
+			pull: function(field_name) {
+				var field = this.get(field_name);
+				
+				this.delete(field_name);
+				
+				return field;
+			},
+			/**
+			 * Checks if field exists by field`s name
+			 *
+			 * @param {string} field_name
+			 *
+			 * @return {boolean}
+			 */
+			has: function(field_name) {
+				
+				return typeof this[field_name] !== 'undefined';
+			},
+			/**
+			 * Deleting field by name
+			 *
+			 * @param {string} field_name
+			 *
+			 * @return {boolean}
+			 */
+			delete: function(field_name) {
+				if (this.has(field_name)) {
+					this.length--;
+					
+					return delete this[field_name];
+				}
+				
+				return false;
+			},
+			/**
+			 * Returns copy of current object
+			 *
+			 * @return {Fields}
+			 */
+			copy: function() {
+				
+				return new Fields(this);
+			},
+			/**
+			 *
+			 * @param {function(field_name: string, filters: FieldsProps, fields: Fields)} callback
+			 *
+			 * @return {Fields}
+			 */
+			forEach: function(callback) {
+				var field_name;
+				
+				for (field_name in this) {
+					if (this.hasOwnProperty(field_name) && !isFunction(this[field_name])) {
+						callback(field_name, this[field_name], this);
+					}
+				}
+				
+				return this;
+			},
+			/**
+			 *
+			 * @return {?string}
+			 */
+			toString: function() {
+				var self = this,
+					fields = Object.props(this);
+				
+				if (fields.length === 0)
+					return undefined;
+				
+				return fields.map(function(field_name) {
+					return field_name + self[field_name];
+				}).join(',');
+			}
+		};
 		
-		return field;
-	};
-	/**
-	 * Checks if field exists by field`s name
-	 *
-	 * @param {string} field_name
-	 * @return {boolean}
-	 */
-	Fields.prototype.has = function(field_name) {
-		return typeof this[field_name] !== 'undefined';
-	};
-	/**
-	 * Deleting field by name
-	 *
-	 * @param {string} field_name
-	 * @return {boolean}
-	 */
-	Fields.prototype.delete = function(field_name) {
-		if (this.has(field_name))
-			return delete this[field_name];
-		return false;
-	};
-	/**
-	 * Returns copy of current object
-	 *
-	 * @return {Fields}
-	 */
-	Fields.prototype.copy = function() {
-		return new Fields(this);
-	};
+		methods.add = methods.push;
+		
+		return methods;
+	});
 	
 	return Fields;
 }());
@@ -39458,6 +39583,8 @@ EntitiesCollection = extending(Array, (function() {
 				return 0;
 			}
 		});
+		
+		return this;
 	};
 	
 	return EntitiesCollection;
@@ -40417,6 +40544,8 @@ OneOrder = extending(OneEntity, (function() {
 	 * @property {?TEXTS.TICKET_STATUSES} status_name
 	 * @property {?(string|number)} sum
 	 * @property {?(string|number)} final_sum
+	 * @property {?number} shop_sum_amount
+	 * @property {?string} payment_type
 	 *
 	 * @property {?timestamp} created_at
 	 * @property {?timestamp} updated_at
@@ -40445,6 +40574,8 @@ OneOrder = extending(OneEntity, (function() {
 		this.status_type_code = null;
 		this.sum = null;
 		this.final_sum = null;
+		this.shop_sum_amount = null;
+		this.payment_type = null;
 		
 		this.created_at = null;
 		this.updated_at = null;
@@ -40532,6 +40663,28 @@ OneOrder = extending(OneEntity, (function() {
 		PAYMENT_CANCELED_AUTO: 'payment_canceled_auto',
 		PAYMENT_CANCELED_BY_CLIENT: 'payment_canceled_by_client'
 	}, OneOrder.ORDER_STATUSES);
+	/**
+	 *
+	 * @enum {string}
+	 */
+	OneOrder.PAYMENT_PROVIDERS = {
+		PC: 'Яндекс.Деньги',
+		AC: 'Банковская карта',
+		MC: 'Баланс телефона',
+		GP: 'Наличные',
+		EP: 'ЕРИП (Беларусь)',
+		WM: 'WebMoney',
+		SB: 'Сбербанк Онлайн',
+		MP: 'Мобильный терминал (mPOS)',
+		AB: 'Альфа-Клик',
+		MA: 'MasterPass',
+		PB: 'Интернет-банк Промсвязьбанка',
+		QW: 'QIWI Wallet',
+		KV: 'КупиВкредит',
+		BTC: 'Bitcoin',
+		LEP: 'Через юрлицо',
+		OTH: 'Иное'
+	};
 	
 	OneOrder.isGreenStatus = function(status) {
 		switch (status) {
@@ -41176,6 +41329,7 @@ OneTicketType = extending(OneEntity, (function() {
 	 * @property {?number} sell_end_date
 	 * @property {?(string|number)} start_after_ticket_type_code
 	 * @property {?number} amount
+	 * @property {?number} sold_count
 	 * @property {?number} min_count_per_user
 	 * @property {?number} max_count_per_user
 	 * @property {?number} promocode
@@ -41195,6 +41349,7 @@ OneTicketType = extending(OneEntity, (function() {
 		this.sell_end_date = null;
 		this.start_after_ticket_type_code = null;
 		this.amount = null;
+		this.sold_count = null;
 		this.min_count_per_user = null;
 		this.max_count_per_user = null;
 		this.promocode = null;
@@ -41217,6 +41372,20 @@ OneTicketType = extending(OneEntity, (function() {
 	}
 	
 	OneTicketType.prototype.ID_PROP_NAME = 'uuid';
+	
+	/**
+	 *
+	 * @param {string} [after = руб.]
+	 * @param {string} [before]
+	 * @param {string} [separator =  ]
+	 * @param {string} [decimal_separator = .]
+	 *
+	 * @return {string}
+	 */
+	OneTicketType.prototype.formatPrice = function(after, before, separator, decimal_separator) {
+		
+		return parseInt(this.price) === 0 ? 'Бесплатно' : formatCurrency(this.price, separator, decimal_separator, before, after || 'руб.');
+	};
 	
 	/**
 	 *
@@ -41626,6 +41795,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 * @property {Array<Privilege>} privileges
 	 * @property {?OneUser.ROLE} role
 	 * @property {TariffModel} tariff
+	 * @property {OrganizationFinanceModel} finance
 	 *
 	 * @property {UsersCollection} staff
 	 * @property {Array<OneUser>} admins
@@ -41645,6 +41815,9 @@ OneOrganization = extending(OneEntity, (function() {
 	 * @property {?string} facebook_url
 	 *
 	 * @property {?boolean} status
+	 *
+	 * @property {?timestamp} created_at
+	 * @property {?timestamp} updated_at
 	 *
 	 * @property {boolean} loading
 	 */
@@ -41672,6 +41845,7 @@ OneOrganization = extending(OneEntity, (function() {
 		this.subscribed_count = null;
 		this.subscribed = new UsersCollection();
 		this.privileges = [];
+		this.finance = new OrganizationFinanceModel(organization_id);
 		
 		this.is_private = null;
 		this.brand_color = null;
@@ -41689,6 +41863,9 @@ OneOrganization = extending(OneEntity, (function() {
 		
 		this.vk_url = null;
 		this.facebook_url = null;
+		
+		this.created_at = null;
+		this.updated_at = null;
 		
 		Object.defineProperties(this, {
 			'role': {
@@ -41748,6 +41925,10 @@ OneOrganization = extending(OneEntity, (function() {
 			});
 		}
 	}
+	
+	OneOrganization.ENDPOINT = Object.freeze({
+		WITHDRAW: '/organizations/{org_id}/withdraws'
+	});
 	/**
 	 *
 	 * @param {(string|number)} org_id
@@ -41844,6 +42025,22 @@ OneOrganization = extending(OneEntity, (function() {
 	 */
 	OneOrganization.unsubscribeOrganization = function(org_id, success) {
 		return __APP.SERVER.deleteData('/api/v1/organizations/' + org_id + '/subscriptions', {}, success);
+	};
+	/**
+	 *
+	 * @param {number} org_id
+	 * @param {number} amount
+	 * @param {string} [comment]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	OneOrganization.requestWithdrawFunds = function(org_id, amount, comment, success) {
+		
+		return __APP.SERVER.addData(OneOrganization.ENDPOINT.WITHDRAW.format({org_id: org_id}), {
+			sum: amount,
+			comment: comment
+		}, false, success);
 	};
 	/**
 	 *
@@ -41954,6 +42151,25 @@ OneOrganization = extending(OneEntity, (function() {
 		return OneOrganization.removeStaff(this.id, user_id, role, function() {
 			if (isFunction(success)) {
 				success.call(self, self.staff.remove(user_id));
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {number} amount
+	 * @param {string} [comment]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	OneOrganization.prototype.requestWithdrawFunds = function(amount, comment, success) {
+		var self = this;
+		
+		return OneOrganization.requestWithdrawFunds(this.id, amount, comment, function(data) {
+			self.finance.withdraws.setData(data);
+			
+			if (isFunction(success)) {
+				success.call(self, self.finance.withdraws.last_pushed);
 			}
 		});
 	};
@@ -42711,7 +42927,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {?boolean} registration_available
 	 * @property {?boolean} registration_required
 	 * @property {?number} registration_limit_count
-	 * @property {?string} registration_till
+	 * @property {?timestamp} registration_till
 	 * @property {?string} registration_approve_status
 	 * @property {?boolean} registration_approvement_required
 	 * @property {?boolean} is_registered
@@ -42753,7 +42969,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {?number} favored_friends_count
 	 * @property {?boolean} is_favorite
 	 *
-	 * @property {?number} public_at
+	 * @property {?timestamp} public_at
 	 * @property {?boolean} canceled
 	 * @property {?boolean} can_edit
 	 *
@@ -42762,9 +42978,11 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {?string} vk_post_link
 	 * @property {EventEmailTextsModel} email_texts
 	 *
+	 * @property {EventFinanceModel} finance
+	 *
 	 * @property {?number} creator_id
-	 * @property {?number} created_at
-	 * @property {?number} updated_at
+	 * @property {?timestamp} created_at
+	 * @property {?timestamp} updated_at
 	 */
 	function OneEvent(event_id, is_loading_continuous) {
 		var self = this,
@@ -42845,6 +43063,8 @@ OneEvent = extending(OneEntity, (function() {
 		
 		this.vk_post_link = null;
 		this.email_texts  = new EventEmailTextsModel();
+		
+		this.finance = new EventFinanceModel(event_id);
 		
 		this.creator_id = null;
 		this.created_at = null;
@@ -43110,10 +43330,12 @@ OneEvent = extending(OneEntity, (function() {
 	OneEvent.prototype.fetchEvent = function(fields, success) {
 		var self = this;
 		
-		return OneEvent.fetchEvent(self.id, fields, function(data) {
-			self.setData(data[0]);
+		return this.constructor.fetchEvent(this.id, fields, function(data) {
+			var event_data = data instanceof Array ? data[0] : data;
+			
+			self.setData(event_data);
 			if (isFunction(success)) {
-				success.call(self, data[0]);
+				success.call(self, event_data);
 			}
 		});
 	};
@@ -45103,6 +45325,19 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @param {string} name
+	 * @param {buildProps} [props]
+	 *
+	 * @returns {jQuery}
+	 */
+	Builder.prototype.stamp = function(name, props) {
+		
+		return tmpl('stamp', Object.assign({
+			text: name
+		}, Builder.normalizeBuildProps(props)));
+	};
+	/**
+	 *
 	 * @param {(...buildProps|Array<buildProps>)} props
 	 * @param {(number|string)} props.val
 	 * @param {string} props.display_name
@@ -45468,6 +45703,18 @@ Builder = (function() {
 	 */
 	Builder.prototype.loaderBlock = function buildLoaderBlock($wrapper, direction) {
 		return tmpl('loader-block', {loader: tmpl('loader')}, $wrapper, direction);
+	};
+	/**
+	 *
+	 * @param {jQuery} [$wrapper]
+	 * @param {string} [direction]
+	 * @return {jQuery}
+	 */
+	Builder.prototype.floatingLoader = function buildLoaderBlock($wrapper, direction) {
+		return tmpl('loader-block', {
+			classes: '-loader_floating',
+			loader: tmpl('loader')
+		}, $wrapper, direction);
 	};
 	/**
 	 *
@@ -46464,11 +46711,17 @@ Page = (function() {
 		}, 200);
 		
 		$.when(PAGE.rendering_defer, PAGE.fetching_data_defer).done(function pageRender(){
+			var header_tabs;
+			
 			if (PAGE.page_title_obj || PAGE.page_title) {
 				__APP.changeTitle(PAGE.page_title_obj ? PAGE.page_title_obj : PAGE.page_title);
 			}
-			PAGE.renderHeaderTabs();
+			header_tabs = PAGE.renderHeaderTabs();
+			if (header_tabs) {
+				__APP.renderHeaderTabs(header_tabs);
+			}
 			$(window).scrollTop(0);
+			PAGE.preRender();
 			PAGE.render();
 			$scroll_to = (state.data.parsed_page_uri && state.data.parsed_page_uri.anchor) ? PAGE.$wrapper.find('#' + state.data.parsed_page_uri.anchor) : $();
 			bindPageLinks();
@@ -46487,6 +46740,8 @@ Page = (function() {
 	Page.prototype.fetchData = function() {
 		return this.fetching_data_defer.resolve().promise();
 	};
+	
+	Page.prototype.preRender = function() {};
 	
 	Page.prototype.render = function() {};
 	
@@ -46730,6 +46985,7 @@ OrderPage = extending(Page, (function() {
 			$pay_buttons = this.$wrapper.find('.PayButtons'),
 			$footer = this.$wrapper.find('.OrderFormFooter'),
 			$main_action_button = this.render_vars.register_button,
+			ticket_selected = parsed_uri.queryKey['ticket_selected'],
 			$payload,
 			$selected_type;
 		
@@ -46886,10 +47142,11 @@ OrderPage = extending(Page, (function() {
 		});
 		countTotalSum();
 		
-		if (parsed_uri.queryKey['ticket_selected']) {
+		if (ticket_selected) {
+			ticket_selected = decodeURIComponent(ticket_selected);
 			$selected_type = this.$wrapper.find('.TicketType').filter(function() {
 				
-				return $(this).data().ticket_type.name === parsed_uri.queryKey['ticket_selected']
+				return $(this).data().ticket_type.name === ticket_selected;
 			});
 			
 			if ($selected_type.length) {
@@ -46916,7 +47173,7 @@ OrderPage = extending(Page, (function() {
 				if (result !== false) {
 					result.done(function(data) {
 						
-						Payment.doPayment('order-' + data.order.uuid, data.order.sum, callback_url);
+						Payment.doPayment('order-' + data.order.uuid, data.order.final_sum, callback_url);
 					})
 				}
 			}
@@ -46934,7 +47191,12 @@ OrderPage = extending(Page, (function() {
 					
 					if (is_custom_callback) {
 						parsed_callback = parseUri(decodeURIComponent(callback_url));
-						window.location = parsed_callback.wo_query + '?' + 'registration=free&' + parsed_callback.query;
+						callback_url = parsed_callback.wo_query + '?registration=free' + (parsed_callback.query ? ('&' + parsed_callback.query) : '');
+						if (__APP.IS_WIDGET) {
+							sendPostMessage.redirect(callback_url);
+						} else {
+							window.location = callback_url;
+						}
 					} else {
 						__APP.changeState(callback_url);
 						showNotifier({text: 'Регистрация прошла успешно', status: true});
@@ -47082,7 +47344,6 @@ OrderPage = extending(Page, (function() {
 		if (__APP.USER.isLoggedOut()) {
 			return (new AuthModal(window.location.href, false)).show();
 		}
-		this.preRender();
 		
 		this.$wrapper.html(tmpl('order-page', this.render_vars));
 		
@@ -47445,7 +47706,6 @@ LegalEntityPayment = extending(Page, (function() {
 		if (__APP.USER.isLoggedOut()) {
 			return (new AuthModal(window.location.href, false)).show();
 		}
-		this.preRender();
 		
 		this.$wrapper.html(tmpl('legal-entity-payment-page', this.render_vars));
 		
@@ -47695,6 +47955,7 @@ sendPostMessage = (function(w) {
 		}
 		
 		return {
+			redirect: postMessageFactory('redirect'),
 			ready: postMessageFactory('ready'),
 			setHeight: postMessageFactory('setHeight')
 		};

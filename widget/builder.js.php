@@ -53,6 +53,10 @@ function wrongInitError() { ?>
 
 		EvendateWidgetBuilder.prototype.postMessageHandler = function(command, data) {
 			switch (command) {
+				case 'redirect': {
+
+					return window.location = data;
+				}
 				case 'ready': {
 
 					return this.is_loaded = true;
@@ -231,7 +235,10 @@ switch ($_REQUEST['type']) {
 	var iframe = document.createElement('iframe');
 
 	iframe.id = 'evendate-widget-' + id;
-	iframe.setAttribute('src', '//<?=App::$DOMAIN?>/widget/order/event/' + id);
+	iframe.setAttribute('src', '//<?=App::$DOMAIN?>/widget/order/event/' + id + '?' + Object.keys(props).map(function(key, i, props) {
+
+		return key + '=' + encodeURIComponent(props[key]);
+	}).join('&'));
 	iframe.setAttribute('frameborder', '0');
 	iframe.setAttribute('scrolling', 'no');
 	iframe.style.display = 'block';
