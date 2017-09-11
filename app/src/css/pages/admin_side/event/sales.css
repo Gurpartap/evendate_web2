@@ -1,0 +1,75 @@
+.event_admin_sales_page {
+	margin: 18px 0;
+}
+
+.event_admin_sales_header {
+	display: flex;
+}
+
+.event_admin_sales_header_main {
+	width: 100%;
+	padding: 24px 24px 0;
+	border-bottom: 1px solid #e2e4e8;
+	border-bottom: 1px solid var(--color_marginal);
+}
+
+.event_admin_sales_header_bottom {
+	display: flex;
+}
+
+.event_admin_sales_big_date  {margin: 0}
+
+.event_admin_sales_header_info {
+	width: 100%;
+	margin: 16px 24px;
+}
+
+.event_admin_sales_header_side {
+	display: flex;
+	flex-wrap: wrap;
+	flex: none;
+	width: 372px;
+}
+
+.event_admin_sales_brief_block {
+	display: flex;
+	align-items: center;
+	padding: 0 18px;
+	width: 50%;
+	height: 50%;
+	border-width: 0 0 1px 1px;
+	border-style: solid;
+	border-color: #e2e4e8;
+	border-color: var(--color_marginal);
+}
+
+.event_admin_sales_brief_block_title,
+.event_admin_sales_brief_block_numbers {
+	display: block;
+}
+
+.event_admin_sales_page_main {
+	padding: 24px;
+}
+
+.event_admin_sales_ticket_type {
+	margin: 26px 0;
+}
+
+.event_admin_sales_ticket_type_title {
+	margin: 0;
+}
+
+.event_admin_sales_ticket_type_info {
+	margin: 0 0 12px;
+}
+
+.event_admin_sales_ticket_type_dates,
+.event_admin_sales_ticket_type_price {
+	display: inline-block;
+	color: #657184;
+	color: var(--color_primary_80);
+	font-weight: 500;
+}
+
+.event_admin_sales_ticket_type_dates {width: 200px}

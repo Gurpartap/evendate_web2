@@ -97,11 +97,11 @@ AdminEventCheckInPage = extending(AdminEventPage, (function() {
 		this.is_searching_state = false;
 		this.is_fetching = false;
 		
-		this.progress_bar = new ProgressBar({
-			NUMBER: this.tickets.checked.length,
-			OVERALL: this.tickets.length
-		}, {
-			classes: ['-with_label']
+		this.progress_bar = new ProgressBar(this.tickets.length, this.tickets.checked.length, {
+			classes: [
+				AbstractProgressBar.MODIFICATORS.WITH_LABEL,
+				__C.CLASSES.UNIVERSAL_STATES.ROUNDED
+			]
 		});
 		
 		this.table_body = $();

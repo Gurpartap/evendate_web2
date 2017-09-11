@@ -52,6 +52,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 * @property {Array<Privilege>} privileges
 	 * @property {?OneUser.ROLE} role
 	 * @property {TariffModel} tariff
+	 * @property {OrganizationFinanceModel} finance
 	 *
 	 * @property {UsersCollection} staff
 	 * @property {Array<OneUser>} admins
@@ -71,6 +72,9 @@ OneOrganization = extending(OneEntity, (function() {
 	 * @property {?string} facebook_url
 	 *
 	 * @property {?boolean} status
+	 *
+	 * @property {?timestamp} created_at
+	 * @property {?timestamp} updated_at
 	 *
 	 * @property {boolean} loading
 	 */
@@ -98,6 +102,7 @@ OneOrganization = extending(OneEntity, (function() {
 		this.subscribed_count = null;
 		this.subscribed = new UsersCollection();
 		this.privileges = [];
+		this.finance = new OrganizationFinanceModel(organization_id);
 		
 		this.is_private = null;
 		this.brand_color = null;
@@ -115,6 +120,9 @@ OneOrganization = extending(OneEntity, (function() {
 		
 		this.vk_url = null;
 		this.facebook_url = null;
+		
+		this.created_at = null;
+		this.updated_at = null;
 		
 		Object.defineProperties(this, {
 			'role': {
@@ -174,6 +182,10 @@ OneOrganization = extending(OneEntity, (function() {
 			});
 		}
 	}
+	
+	OneOrganization.ENDPOINT = Object.freeze({
+		WITHDRAW: '/organizations/{org_id}/withdraws'
+	});
 	/**
 	 *
 	 * @param {(string|number)} org_id
@@ -270,6 +282,22 @@ OneOrganization = extending(OneEntity, (function() {
 	 */
 	OneOrganization.unsubscribeOrganization = function(org_id, success) {
 		return __APP.SERVER.deleteData('/api/v1/organizations/' + org_id + '/subscriptions', {}, success);
+	};
+	/**
+	 *
+	 * @param {number} org_id
+	 * @param {number} amount
+	 * @param {string} [comment]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	OneOrganization.requestWithdrawFunds = function(org_id, amount, comment, success) {
+		
+		return __APP.SERVER.addData(OneOrganization.ENDPOINT.WITHDRAW.format({org_id: org_id}), {
+			sum: amount,
+			comment: comment
+		}, false, success);
 	};
 	/**
 	 *
@@ -380,6 +408,25 @@ OneOrganization = extending(OneEntity, (function() {
 		return OneOrganization.removeStaff(this.id, user_id, role, function() {
 			if (isFunction(success)) {
 				success.call(self, self.staff.remove(user_id));
+			}
+		});
+	};
+	/**
+	 *
+	 * @param {number} amount
+	 * @param {string} [comment]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	OneOrganization.prototype.requestWithdrawFunds = function(amount, comment, success) {
+		var self = this;
+		
+		return OneOrganization.requestWithdrawFunds(this.id, amount, comment, function(data) {
+			self.finance.withdraws.setData(data);
+			
+			if (isFunction(success)) {
+				success.call(self, self.finance.withdraws.last_pushed);
 			}
 		});
 	};

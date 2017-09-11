@@ -3,6 +3,7 @@
  */
 /**
  *
+ * @deprecated
  * @class EventStatistics
  * @extends Statistics
  */

@@ -57,9 +57,4 @@
 	text-transform: uppercase;
 }
 
-.app_inspector_wrapper {
-	display: flex;
-	justify-content: flex-end;
-	align-items: baseline;
-	margin: 36px 0;
-}
+.app_inspector_wrapper {margin: 36px 0}

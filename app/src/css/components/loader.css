@@ -25,6 +25,15 @@
 	z-index: 5;
 }
 
+.loader_block.-loader_floating {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 5;
+}
+
 .loader_dot,
 .loader:only-child {
 	width: 50px;

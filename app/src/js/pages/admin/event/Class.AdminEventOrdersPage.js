@@ -25,14 +25,18 @@ AdminEventOrdersPage = extending(AdminEventPage, (function() {
 		AdminEventPage.call(this, event_id);
 		
 		this.orders = new EventAllOrdersCollection(event_id);
-		this.orders_fields = new Fields('created_at', 'registration_fields', {
-			user: {
-				fields: new Fields('email')
-			},
-			tickets: {
-				fields: new Fields('ticket_type')
-			}
-		});
+		this.orders_fields = new Fields(
+			'created_at',
+			'payment_type',
+			'shop_sum_amount',
+			'registration_fields', {
+				user: {
+					fields: new Fields('email')
+				},
+				tickets: {
+					fields: new Fields('ticket_type')
+				}
+			});
 		
 		this.event_fields.add('orders_count');
 		this.$loader = $();

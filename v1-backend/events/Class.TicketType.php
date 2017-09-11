@@ -7,6 +7,7 @@ class TicketType extends AbstractEntity
 	const AMOUNT_FIELD_NAME = 'amount';
 	const PROMOCODE_FIELD_NAME = 'promocode';
 	const PROMOCODE_EFFORT_FIELD_NAME = 'promocode_effort';
+	const SOLD_COUNT_FIELD_NAME = 'sold_count';
 
 	protected static $DEFAULT_COLS = array(
 		'uuid',
@@ -31,9 +32,9 @@ class TicketType extends AbstractEntity
 
 	public static $FIELDS_FOR_ADMINISTRATOR = array(
 		self::START_AFTER_FIELD_NAME,
-//		self::AMOUNT_FIELD_NAME,
+		self::AMOUNT_FIELD_NAME,
 		self::PROMOCODE_FIELD_NAME,
-		self::PROMOCODE_EFFORT_FIELD_NAME,
+		self::SOLD_COUNT_FIELD_NAME,
 	);
 
 	private static function checkData(array $data, $event_extremum_dates)
@@ -142,7 +143,7 @@ class TicketType extends AbstractEntity
 			'sell_end_date' => $ticket_type['sell_end_date'],
 			'start_after_ticket_type_uuid' => null,
 			'start_after_ticket_type_code' => $ticket_type['start_after_ticket_type_code'],
-			'amount' => isset($ticket_type['amount']) && is_numeric($ticket_type['amount']) ? (int) $ticket_type['amount'] : 1000000,
+			'amount' => isset($ticket_type['amount']) && is_numeric($ticket_type['amount']) ? (int)$ticket_type['amount'] : 1000000,
 			'min_count_per_user' => $ticket_type['min_count_per_user'],
 			'max_count_per_user' => $ticket_type['max_count_per_user'],
 			'promocode' => $ticket_type['promocode'],
@@ -152,14 +153,14 @@ class TicketType extends AbstractEntity
 		$q_ins
 			->into('ticket_types')
 			->cols($cols)
-		->onConflictUpdate(array('event_id', 'type_code'), $cols);
+			->onConflictUpdate(array('event_id', 'type_code'), $cols);
 
 		if (isset($ticket_type['uuid']) && !is_null($ticket_type['uuid']) && trim($ticket_type['uuid']) != '') {
 			$q_ins = App::queryFactory()->newUpdate();
 			$cols['updated_at'] = (new DateTime())->format('Y-m-d H:i:s');
 			$q_ins->table('ticket_types')
-			->cols($cols)
-			->where('uuid = ?', $ticket_type['uuid']);
+				->cols($cols)
+				->where('uuid = ?', $ticket_type['uuid']);
 		}
 		return $db->prepareExecute($q_ins, 'CANT_INSERT_TICKET_TYPES');
 	}

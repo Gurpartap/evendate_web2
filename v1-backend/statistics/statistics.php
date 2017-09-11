@@ -4,6 +4,8 @@
 require_once $BACKEND_FULL_PATH . '/statistics/Class.AbstractAggregator.php';
 require_once $BACKEND_FULL_PATH . '/statistics/Class.OrganizationsStatistics.php';
 require_once $BACKEND_FULL_PATH . '/statistics/Class.EventsStatistics.php';
+require_once $BACKEND_FULL_PATH . '/statistics/Class.EventFinance.php';
+require_once $BACKEND_FULL_PATH . '/statistics/Class.OrganizationFinance.php';
 require_once $BACKEND_FULL_PATH . '/statistics/Class.Statistics.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.OrdersCollection.php';
 require_once $BACKEND_FULL_PATH . '/events/Class.TicketsCollection.php';
@@ -68,7 +70,7 @@ $__modules['statistics'] = array(
 
 
 		},
-		'{/organizations/(id:[0-9]+)/subscribers/export}' => function ($id) use ($__db, $__request, $__user, $__fields,$__pagination) {
+		'{/organizations/(id:[0-9]+)/subscribers/export}' => function ($id) use ($__db, $__request, $__user, $__fields, $__pagination) {
 			$__request['organization'] = OrganizationsCollection::one(
 				$__db,
 				$__user,
@@ -84,6 +86,16 @@ $__modules['statistics'] = array(
 				array('length' => 10000, 'offset' => 0),
 				$__order_by ?? array()
 				, $__request['format'] ?? 'xlsx');
+		},
+		'{/organizations/(id:[0-9]+)/finance}' => function ($id) use ($__db, $__request, $__user, $__fields) {
+			$organization = OrganizationsCollection::one(
+				$__db,
+				$__user,
+				$id,
+				array()
+			);
+			$finance = new OrganizationFinance($__db, $organization, $__user);
+			return $finance->getFields($__fields);
 		},
 		'{/organizations/(id:[0-9]+)}' => function ($id) use ($__db, $__request, $__user, $__fields) {
 			$organization = OrganizationsCollection::one(
@@ -140,6 +152,16 @@ $__modules['statistics'] = array(
 				$__pagination,
 				$__order_by ?? array()
 			);
+		},
+		'{/events/(id:[0-9]+)/finance}' => function ($id) use ($__db, $__request, $__user, $__fields) {
+			$event = EventsCollection::one(
+				$__db,
+				$__user,
+				$id,
+				array()
+			);
+			$finance = new EventFinance($__db, $event, $__user);
+			return $finance->getFields($__fields);
 		},
 		'{/events/(id:[0-9]+)}' => function ($id) use ($__db, $__request, $__user, $__fields) {
 			$event = EventsCollection::one(

@@ -69,11 +69,10 @@ AdminOrganizationEventsPage = extending(AdminOrganizationPage, (function() {
 			} else {
 				this_page.$wrapper.find('.OrgStatFutureEventsWrapper').html(tmpl('orgstat-no-events-wrapper', {
 					title: 'Предстоящие события',
-					call_to_action: __APP.BUILD.link({
+					call_to_action: __APP.BUILD.linkButton({
 						title: 'Добавить событие',
 						page: '/add/event/to/' + this_page.organization.id,
 						classes: [
-							__C.CLASSES.COMPONENT.BUTTON,
 							__C.CLASSES.COLORS.ACCENT
 						]
 					})

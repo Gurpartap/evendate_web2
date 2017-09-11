@@ -24,6 +24,8 @@ class Organization extends AbstractEntity
 	const TARIFF_FIELD_NAME = 'tariff';
 	const INTERESTS_FIELD_NAME = 'interests';
 	const SEARCH_SCORE_FIELD_NAME = 'search_score';
+	const WITHDRAWS_FIELD_NAME = 'withdraws';
+	const FINANCE_FIELD_NAME = 'finance';
 
 	const IMAGES_PATH = 'organizations_images/';
 	const IMAGE_SIZE_LARGE = '/large/';
@@ -266,7 +268,6 @@ class Organization extends AbstractEntity
 	}
 
 
-
 	/**
 	 * @return mixed
 	 */
@@ -356,7 +357,6 @@ class Organization extends AbstractEntity
 	}
 
 
-
 	/**
 	 * @return mixed
 	 */
@@ -422,6 +422,29 @@ class Organization extends AbstractEntity
 				)
 			);
 		}
+
+		$withdraws_field = $fields[Organization::WITHDRAWS_FIELD_NAME] ?? null;
+		if (is_array($withdraws_field)) {
+			$result_data[Organization::WITHDRAWS_FIELD_NAME] = $this->getWithdraws(
+				Fields::parseFields($withdraws_field['fields'] ?? ''),
+				Fields::parseFilters($withdraws_field['filters'] ?? ''),
+				Fields::parseOrderBy($withdraws_field['order_by'] ?? ''),
+				array(
+					'length' => $withdraws_field['length'] ?? App::DEFAULT_LENGTH,
+					'offset' => $withdraws_field['offset'] ?? App::DEFAULT_OFFSET
+				)
+			);
+		}
+
+		if (isset($fields[self::FINANCE_FIELD_NAME])) {
+			if ($user instanceof User) {
+				$result_data[self::FINANCE_FIELD_NAME] = $this->getFinance($user,
+					Fields::parseFields($fields[self::FINANCE_FIELD_NAME]['fields'] ?? ''))->getData();
+			} else {
+				$result_data[self::FINANCE_FIELD_NAME] = null;
+			}
+		}
+
 
 		if (isset($fields[Organization::PRIVILEGES_FIELD_NAME])) {
 			if ($user instanceof User) {
@@ -514,6 +537,21 @@ class Organization extends AbstractEntity
 	{
 		$filters['organization'] = $this;
 		return EventsCollection::filter(
+			$this->db,
+			App::getCurrentUser(),
+			$filters,
+			$fields,
+			$pagination,
+			$order_by ?? array('id')
+		)->getData();
+	}
+
+	private function getWithdraws(array $fields = null, array $filters, array $order_by = null, array $pagination = null)
+	{
+		global $BACKEND_FULL_PATH;
+		require_once $BACKEND_FULL_PATH . '/organizations/Class.WithdrawsCollection.php';
+		$filters['organization_id'] = $this->getId();
+		return WithdrawsCollection::filter(
 			$this->db,
 			App::getCurrentUser(),
 			$filters,
@@ -715,11 +753,12 @@ class Organization extends AbstractEntity
 			->where('id = ?', $this->id);
 
 
-		try{
+		try {
 			OrganizationsCollection::reindexCollection($this->db, App::getCurrentUser(), array(
 				'id' => $this->id
 			));
-		}catch(Exception $e){}
+		} catch (Exception $e) {
+		}
 
 		$this->db->prepareExecute($q_upd_organization, 'CANT_UPDATE_ORGANIZATION');
 		@file_get_contents(App::DEFAULT_NODE_LOCATION . '/recommendations/organizations/' . $this->id);
@@ -841,14 +880,33 @@ class Organization extends AbstractEntity
 		self::addMailInfo($user, $data, $result['id'], $db);
 
 
-		try{
+		try {
 			OrganizationsCollection::reindexCollection($db, App::getCurrentUser(), array(
 				'id' => $result['id']
 			));
-		}catch(Exception $e){}
+		} catch (Exception $e) {
+		}
 
 		@file_get_contents(App::DEFAULT_NODE_LOCATION . '/recommendations/organizations/' . $result['id']);
 		return new Result(true, '', array('organization_id' => $result['id']));
+	}
+
+	private function getFinance(User $user, $fields)
+	{
+		global $BACKEND_FULL_PATH;
+		require_once $BACKEND_FULL_PATH . '/statistics/Class.OrganizationFinance.php';
+		$finance = new OrganizationFinance($this->db, $this, $user);
+		return $finance->getFields($fields);
+	}
+
+	public function withdraw(array $data, User $user)
+	{
+		global $BACKEND_FULL_PATH;
+		require_once $BACKEND_FULL_PATH . '/organizations/Class.Withdraw.php';
+		$finance_info = $this->getFinance($user, Fields::parseFields('withdraw_available'))->getData();
+		if (!isset($data['sum'])) throw new InvalidArgumentException('BAD_SUM');
+		if ((float)$data['sum'] > (float)$finance_info['withdraw_available']) throw new InvalidArgumentException('TOO_BIG_SUM');
+		return Withdraw::create($this, $user, $data);
 	}
 
 }

@@ -457,16 +457,55 @@ AbstractEditEventPage = extending(Page, (function() {
 					                  __C.CLASSES.UNIVERSAL_STATES.EMPTY,
 					                  'PromocodeDeleteButton'
 					                 ]
-				                 })
+				                 }),
+				
+				use_limit_form_unit: __APP.BUILD.formUnit({
+					label: 'Лимит использований',
+					name: 'promocode_' + row_id + '_use_limit',
+					value: promocode.use_limit,
+					placeholder: 0,
+					helptext: 'Укажите здесь сколько раз можно использовать этот промокод. Оставьте поле пустым, если не хотите ставить ограничений'
+				}),
+				promocode_start_date_select: __APP.BUILD.formUnit({
+					type: 'date',
+					name: 'promocode_' + row_id + '_start_date',
+					value: promocode.start_date ? unixTimestampToISO(promocode.start_date) : undefined
+				}),
+				promocode_end_date_select: __APP.BUILD.formUnit({
+					type: 'date',
+					name: 'promocode_' + row_id + '_end_date',
+					value: promocode.end_date ? unixTimestampToISO(promocode.end_date) : undefined
+				})
 			};
 		}));
 		
+		bindControlSwitch($rows);
+		bindCollapsing($rows);
+		
 		$rows.find('.PromocodeDeleteButton').on('click.DeletePromocode', function() {
-			$(this).closest('.PromocodeRow').remove();
+			var $row = $(this).closest('.PromocodeRow');
+			
+			$row = $row.add($row.next('.ExpandedPromocodeRow'));
+			$row.remove();
+		});
+		
+		$rows.find('.PromocodeExpandButton').on('click.ExpandPromocode', function() {
+			var $row = $(this).closest('.PromocodeRow'),
+				$expand_row = $row.next('.ExpandedPromocodeRow');
+			
+			$rows.filter('.ExpandedPromocodeRow').not($expand_row).find('.CollapsingWrapper').each(function() {
+				$(this).resolveInstance().closeCollapsing();
+			});
+			
+			$expand_row.find('.CollapsingWrapper').resolveInstance().toggleCollapsing();
 		});
 		
 		$rows.find('.PromocodeDisable').on('click.DisablePromocode', '.FormSwitchInput', function() {
-			var $inputs = $(this).parents('.PromocodeRow').find('.PromocodeFormInput');
+			var $row = $(this).closest('.PromocodeRow'),
+				$inputs;
+			
+			$row = $row.add($row.next('.ExpandedPromocodeRow'));
+			$inputs = $row.find('.PromocodeFormInput');
 			
 			if (this.checked) {
 				$inputs.removeAttr('readonly');
@@ -671,7 +710,7 @@ AbstractEditEventPage = extending(Page, (function() {
 					is_percentage: !form_data['promocode_' + id + '_is_fixed'],
 					enabled: form_data['promocode_' + id + '_enabled'] !== false,
 					
-					use_limit: form_data['promocode_' + id + '_use_limit'] || 1000,
+					use_limit: form_data['promocode_' + id + '_use_limit'] || 100000,
 					start_date: form_data['promocode_' + id + '_start_date'] || null,
 					end_date: form_data['promocode_' + id + '_end_date'] || null,
 				};
@@ -1543,7 +1582,6 @@ AbstractEditEventPage = extending(Page, (function() {
 	};
 	
 	AbstractEditEventPage.prototype.render = function() {
-		
 		if (__APP.USER.isLoggedOut()) {
 			__APP.changeState('/feed/actual', true, true);
 			return null;
@@ -1558,8 +1596,6 @@ AbstractEditEventPage = extending(Page, (function() {
 		}
 		
 		this.organization_id = this.organization_id ? this.organization_id : this.my_organizations[0].id;
-		
-		this.preRender();
 		
 		this.$wrapper.html(tmpl('edit-event-page', this.render_vars));
 		

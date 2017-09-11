@@ -27,6 +27,8 @@ OneOrder = extending(OneEntity, (function() {
 	 * @property {?TEXTS.TICKET_STATUSES} status_name
 	 * @property {?(string|number)} sum
 	 * @property {?(string|number)} final_sum
+	 * @property {?number} shop_sum_amount
+	 * @property {?string} payment_type
 	 *
 	 * @property {?timestamp} created_at
 	 * @property {?timestamp} updated_at
@@ -55,6 +57,8 @@ OneOrder = extending(OneEntity, (function() {
 		this.status_type_code = null;
 		this.sum = null;
 		this.final_sum = null;
+		this.shop_sum_amount = null;
+		this.payment_type = null;
 		
 		this.created_at = null;
 		this.updated_at = null;
@@ -142,6 +146,28 @@ OneOrder = extending(OneEntity, (function() {
 		PAYMENT_CANCELED_AUTO: 'payment_canceled_auto',
 		PAYMENT_CANCELED_BY_CLIENT: 'payment_canceled_by_client'
 	}, OneOrder.ORDER_STATUSES);
+	/**
+	 *
+	 * @enum {string}
+	 */
+	OneOrder.PAYMENT_PROVIDERS = {
+		PC: 'Яндекс.Деньги',
+		AC: 'Банковская карта',
+		MC: 'Баланс телефона',
+		GP: 'Наличные',
+		EP: 'ЕРИП (Беларусь)',
+		WM: 'WebMoney',
+		SB: 'Сбербанк Онлайн',
+		MP: 'Мобильный терминал (mPOS)',
+		AB: 'Альфа-Клик',
+		MA: 'MasterPass',
+		PB: 'Интернет-банк Промсвязьбанка',
+		QW: 'QIWI Wallet',
+		KV: 'КупиВкредит',
+		BTC: 'Bitcoin',
+		LEP: 'Через юрлицо',
+		OTH: 'Иное'
+	};
 	
 	OneOrder.isGreenStatus = function(status) {
 		switch (status) {

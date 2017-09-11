@@ -115,6 +115,8 @@ class Order extends AbstractEntity
 		'payed_at',
 		'canceled_at',
 		'updated_at',
+		'shop_sum_amount',
+		'payment_type',
 		'status_id',
 		self::BITCOIN_ADDRESS_FIELD_NAME => '(SELECT address FROM bitcoin_addresses WHERE ticket_order_id = view_tickets_orders.id ORDER BY id DESC LIMIT 1) AS ' . self::BITCOIN_ADDRESS_FIELD_NAME,
 		self::BITCOIN_AMOUNT_FIELD_NAME => '(SELECT waiting_amount FROM bitcoin_addresses WHERE ticket_order_id = view_tickets_orders.id ORDER BY id DESC LIMIT 1) AS ' . self::BITCOIN_AMOUNT_FIELD_NAME,
@@ -183,6 +185,28 @@ class Order extends AbstractEntity
 	{
 		$key_part = '4d0480efc15c10be631bceee3a36ebed8b101827df4f41009fc98b0672fa1153';
 		$key = implode('', array($request['address'], $request['waiting_amount'], $request['uuid'], $key_part));
+		if ($request['key'] == md5($key)) {
+			$payment_info = self::getPaymentInfo($request, $db);
+			$request['orderSumAmount'] = $request['waiting_amount'];
+			$request['shopSumAmount'] = $request['waiting_amount'];
+			$db->beginTransaction();
+			try {
+				self::setPaymentStatus($request, $db, $payment_info);
+				$db->commit();
+			} catch (Exception $e) {
+				$db->rollBack();
+				return new Result(false, '');
+			}
+		} else {
+			throw new InvalidArgumentException('BAD_KEY_STOP_DUDE!');
+		}
+		return new Result(true, '');
+	}
+
+	private static function avisoLegalEntity(array $request, ExtendedPDO $db)
+	{
+		$key_part = '4d0480efc15c10be631bceee3a36ebed8b101827df4f41009fc98b0672fa1153';
+		$key = implode('', array($request['order_number'], $request['waiting_amount'], $request['uuid'], $key_part));
 		if ($request['key'] == md5($key)) {
 			$payment_info = self::getPaymentInfo($request, $db);
 			$request['orderSumAmount'] = $request['waiting_amount'];
@@ -475,6 +499,8 @@ class Order extends AbstractEntity
 	{
 		if (isset($request['bitcoin']) && $request['bitcoin'] == true) {
 			return self::avisoBitcoin($request, $db);
+		}elseif (isset($request['legal_entity']) && $request['legal_entity'] == true){
+			return self::avisoLegalEntity($request, $db);
 		}
 		try {
 			$db->beginTransaction();
