@@ -20,6 +20,8 @@
  * @property {string} [till]
  */
 /**
+ *
+ * @deprecated
  * @abstract
  * @class Statistics
  * @implements EntityInterface

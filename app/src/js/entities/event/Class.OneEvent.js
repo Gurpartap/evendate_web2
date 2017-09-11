@@ -48,7 +48,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {?boolean} registration_available
 	 * @property {?boolean} registration_required
 	 * @property {?number} registration_limit_count
-	 * @property {?string} registration_till
+	 * @property {?timestamp} registration_till
 	 * @property {?string} registration_approve_status
 	 * @property {?boolean} registration_approvement_required
 	 * @property {?boolean} is_registered
@@ -90,7 +90,7 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {?number} favored_friends_count
 	 * @property {?boolean} is_favorite
 	 *
-	 * @property {?number} public_at
+	 * @property {?timestamp} public_at
 	 * @property {?boolean} canceled
 	 * @property {?boolean} can_edit
 	 *
@@ -99,9 +99,11 @@ OneEvent = extending(OneEntity, (function() {
 	 * @property {?string} vk_post_link
 	 * @property {EventEmailTextsModel} email_texts
 	 *
+	 * @property {EventFinanceModel} finance
+	 *
 	 * @property {?number} creator_id
-	 * @property {?number} created_at
-	 * @property {?number} updated_at
+	 * @property {?timestamp} created_at
+	 * @property {?timestamp} updated_at
 	 */
 	function OneEvent(event_id, is_loading_continuous) {
 		var self = this,
@@ -182,6 +184,8 @@ OneEvent = extending(OneEntity, (function() {
 		
 		this.vk_post_link = null;
 		this.email_texts  = new EventEmailTextsModel();
+		
+		this.finance = new EventFinanceModel(event_id);
 		
 		this.creator_id = null;
 		this.created_at = null;
@@ -447,10 +451,12 @@ OneEvent = extending(OneEntity, (function() {
 	OneEvent.prototype.fetchEvent = function(fields, success) {
 		var self = this;
 		
-		return OneEvent.fetchEvent(self.id, fields, function(data) {
-			self.setData(data[0]);
+		return this.constructor.fetchEvent(this.id, fields, function(data) {
+			var event_data = data instanceof Array ? data[0] : data;
+			
+			self.setData(event_data);
 			if (isFunction(success)) {
-				success.call(self, data[0]);
+				success.call(self, event_data);
 			}
 		});
 	};

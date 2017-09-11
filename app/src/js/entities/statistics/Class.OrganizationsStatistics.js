@@ -3,6 +3,7 @@
  */
 /**
  *
+ * @deprecated
  * @class OrganizationsStatistics
  * @extends Statistics
  */

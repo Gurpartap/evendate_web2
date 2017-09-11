@@ -11,7 +11,7 @@
 .order_status:before {
 	content: '';
 	display: inline-block;
-	vertical-align: bottom;
+	vertical-align: middle;
 	width: 12px;
 	height: 12px;
 	margin-right: 8px;

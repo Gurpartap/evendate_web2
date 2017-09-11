@@ -290,6 +290,19 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @param {string} name
+	 * @param {buildProps} [props]
+	 *
+	 * @returns {jQuery}
+	 */
+	Builder.prototype.stamp = function(name, props) {
+		
+		return tmpl('stamp', Object.assign({
+			text: name
+		}, Builder.normalizeBuildProps(props)));
+	};
+	/**
+	 *
 	 * @param {(...buildProps|Array<buildProps>)} props
 	 * @param {(number|string)} props.val
 	 * @param {string} props.display_name
@@ -655,6 +668,18 @@ Builder = (function() {
 	 */
 	Builder.prototype.loaderBlock = function buildLoaderBlock($wrapper, direction) {
 		return tmpl('loader-block', {loader: tmpl('loader')}, $wrapper, direction);
+	};
+	/**
+	 *
+	 * @param {jQuery} [$wrapper]
+	 * @param {string} [direction]
+	 * @return {jQuery}
+	 */
+	Builder.prototype.floatingLoader = function buildLoaderBlock($wrapper, direction) {
+		return tmpl('loader-block', {
+			classes: '-loader_floating',
+			loader: tmpl('loader')
+		}, $wrapper, direction);
 	};
 	/**
 	 *

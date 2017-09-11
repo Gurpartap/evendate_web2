@@ -116,11 +116,17 @@ Page = (function() {
 		}, 200);
 		
 		$.when(PAGE.rendering_defer, PAGE.fetching_data_defer).done(function pageRender(){
+			var header_tabs;
+			
 			if (PAGE.page_title_obj || PAGE.page_title) {
 				__APP.changeTitle(PAGE.page_title_obj ? PAGE.page_title_obj : PAGE.page_title);
 			}
-			PAGE.renderHeaderTabs();
+			header_tabs = PAGE.renderHeaderTabs();
+			if (header_tabs) {
+				__APP.renderHeaderTabs(header_tabs);
+			}
 			$(window).scrollTop(0);
+			PAGE.preRender();
 			PAGE.render();
 			$scroll_to = (state.data.parsed_page_uri && state.data.parsed_page_uri.anchor) ? PAGE.$wrapper.find('#' + state.data.parsed_page_uri.anchor) : $();
 			bindPageLinks();
@@ -139,6 +145,8 @@ Page = (function() {
 	Page.prototype.fetchData = function() {
 		return this.fetching_data_defer.resolve().promise();
 	};
+	
+	Page.prototype.preRender = function() {};
 	
 	Page.prototype.render = function() {};
 	

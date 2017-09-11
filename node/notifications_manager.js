@@ -1,7 +1,5 @@
 var rest = require('restler'),
-    gcm,
-    Utils = require('./utils'),
-    GCM = require('gcm').GCM;
+    Utils = require('./utils');
 
 var DEVICE_TYPES = {
         IOS: 'ios',
@@ -15,7 +13,6 @@ var DEVICE_TYPES = {
 
 function NotificationsManager(settings) {
     this.settings = settings;
-    gcm = new GCM(settings.GCM.api_key);
 }
 
 
@@ -28,7 +25,7 @@ NotificationsManager.prototype.create = function (notification, device, type) {
         body: _text,
         icon: notification.image,
         payload: {
-            type: type != undefined ? type : null,
+            type: type !== undefined ? type : null,
             title: notification.title,
             event_id: notification.event_id,
             body: _text,
@@ -38,124 +35,53 @@ NotificationsManager.prototype.create = function (notification, device, type) {
         notification_id: notification.id
     };
 
-    if (device.client_type == DEVICE_TYPES.IOS) {
-        if (note.payload.event_id) {
-            note.payload.type = 'events';
-        } else if (note.payload.organization_id) {
-            note.payload.type = 'organizations';
-        } else if (note.payload.user_id) {
-            note.payload.type = 'users';
-        }
-        note.send = function (callback) {
+    if (note.payload.recommendations_organizations) {
+        note.payload.type = 'recommendations_organizations';
+    }else if (note.payload.event_id) {
+        note.payload.type = 'events';
+    } else if (note.payload.organization_id) {
+        note.payload.type = 'organizations';
+    } else if (note.payload.user_id) {
+        note.payload.type = 'users';
+    }
 
-            rest
-                .postJson(ONE_SIGNAL_URL.CREATE, {
-                    app_id: _this.settings.one_signal.app_id,
-                    contents: {
-                        en: note.alert,
-                        ru: note.alert
-                    },
-                    ios_badgeType: 'Increase',
-                    ios_badgeCount: 1,
-                    isIos: true,
-                    include_player_ids: [device.device_token],
-                    data: note.payload
-                })
-                .on('complete', function (res) {
-                    if (res instanceof Error) {
-                        callback(res, null);
-                    } else {
-                        callback(null, res.id);
-                    }
-                });
-        };
-    } else if (device.client_type == DEVICE_TYPES.BROWSER) {
-        if (note.payload.event_id) {
-            note.payload.type = 'events';
-        } else if (note.payload.organization_id) {
-            note.payload.type = 'organizations';
-        } else if (note.payload.user_id) {
-            note.payload.type = 'users';
-        }
-        note.send = function (callback) {
-            rest
-                .postJson(ONE_SIGNAL_URL.CREATE, {
-                    app_id: _this.settings.one_signal.app_id,
-                    contents: {
-                        en: note.alert,
-                        ru: note.alert
-                    },
-                    url: 'https://evendate.io/event/' + note.payload.event_id,
-                    isChromeWeb: true,
-                    include_player_ids: [device.device_token],
-                    data: note.payload
-                })
-                .on('complete', function (res) {
-                    if (res instanceof Error) {
-                        callback(res, null);
-                    } else {
-                        callback(null, res.id);
-                    }
-                });
-        };
-    } else if (device.client_type == DEVICE_TYPES.ANDROID) {
-        note.send = function (callback) {
-            var type;
-            if (note.payload.event_id) {
-                type = 'events';
-            } else if (note.payload.organization_id) {
-                type = 'organizations';
-            } else if (note.payload.user_id) {
-                type = 'users';
-            }
+    let send_data = {
+        app_id: _this.settings.one_signal.app_id,
+        contents: {
+            en: note.alert,
+            ru: note.alert
+        },
+        include_player_ids: [device.device_token],
+        data: note.payload
+    };
 
-            if (device.device_token.length == 36 && (device.device_token.match(/-/g) || []).length == 4) { // is UUID
-                rest
-                    .postJson(ONE_SIGNAL_URL.CREATE, {
-                        app_id: _this.settings.one_signal.app_id,
-                        contents: {
-                            en: note.alert,
-                            ru: note.alert
-                        },
-                        url: 'https://evendate.io/event/' + note.payload.event_id,
-                        isAndroid: true,
-                        include_player_ids: [device.device_token],
-                        data: note.payload
-                    })
-                    .on('complete', function (res) {
-                        if (res instanceof Error) {
-                            callback(res, null);
-                        } else {
-                            callback(null, res.id);
-                        }
-                    });
-            } else {
-                var send_data = {
-                    'data.message': note.body,
-                    'data.event_id': note.payload.event_id,
-                    'data.image_url': note.payload.organization_logo,
-                    'data.organization_id': note.payload.organization_id,
-                    'data.type': type,
-                    registration_id: device.device_token
-                };
-
-                // send_data['data.to'] = '';
-
-                send_data.registration_id = device.device_token;
-                gcm.send(send_data, function (err, messageId) {
-                    if (err) {
-                        callback(err, null);
-                    } else {
-                        callback(null, messageId);
-                    }
-                });
-            }
-        };
+    if (device.client_type === DEVICE_TYPES.IOS) {
+        send_data['ios_badgeType'] = 'Increase';
+        send_data['ios_badgeCount'] = 1;
+        send_data['isIos'] = true;
+    } else if (device.client_type === DEVICE_TYPES.BROWSER) {
+        send_data['isChromeWeb'] = true;
+    } else if (device.client_type === DEVICE_TYPES.ANDROID) {
+        send_data['isAndroid'] = true;
     } else {
         note.send = function (callback) {
             callback(null, null);
-        }
+        };
+        return;
     }
+
+    note.send = function (callback) {
+        rest
+            .postJson(ONE_SIGNAL_URL.CREATE, send_data)
+            .on('complete', function (res) {
+                if (res instanceof Error) {
+                    callback(res, null);
+                } else {
+                    callback(null, res.id);
+                }
+            });
+    };
+
 
     return note;
 };

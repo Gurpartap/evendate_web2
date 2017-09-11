@@ -151,6 +151,8 @@ EntitiesCollection = extending(Array, (function() {
 				return 0;
 			}
 		});
+		
+		return this;
 	};
 	
 	return EntitiesCollection;

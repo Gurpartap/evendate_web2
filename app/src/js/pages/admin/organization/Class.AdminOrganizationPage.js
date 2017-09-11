@@ -33,13 +33,15 @@ AdminOrganizationPage = extending(AdminPage, (function() {
 	};
 	
 	AdminOrganizationPage.prototype.renderHeaderTabs = function(){
-		__APP.renderHeaderTabs([
+		
+		return [
 			{title: 'Обзор', page: '/admin/organization/'+this.id+'/overview'},
 			{title: 'События', page: '/admin/organization/'+this.id+'/events'},
+			{title: 'Финансы', page: '/admin/organization/'+this.id+'/finances'},
 			{title: 'CRM', page: '/admin/organization/'+this.id+'/crm'},
 			{title: 'Настройки', page: '/admin/organization/'+this.id+'/settings'},
 			{title: 'Редактирование', page: '/admin/organization/'+this.id+'/edit'}
-		]);
+		];
 	};
 	
 	return AdminOrganizationPage;

@@ -11,8 +11,8 @@ font-weight: 700    bold    Roboto-Bold
 h1,
 h2 {margin: 1.5em 0 .7em}
 h3,
-h4 {margin: 1.5em 0 .5em}
-h5,
+h4,
+h5 {margin: 1.5em 0 .5em}
 h6,
 .small_title {margin: 1.5em 0 1em}
 
@@ -36,8 +36,8 @@ h2 {
 }
 
 h3 {font-size: 1.5rem}
-h4 {font-size: 1.125rem}
-h5 {font-size: 1.25rem}
+h4 {font-size: 1.25rem}
+h5 {font-size: 1.125rem}
 h6 {font-size: 1rem}
 
 .small_title {
@@ -81,6 +81,8 @@ label {font-weight: inherit}
 :first-child {margin-top: initial}
 
 .-uppercase {text-transform: uppercase}
+
+.-preformatted_text {white-space: pre-wrap}
 
 
 a.-text_color_default,

@@ -458,8 +458,6 @@ EventPage = extending(Page, (function() {
 		
 		__APP.changeTitle(this_event.title);
 		
-		this.preRender();
-		
 		this.$wrapper.html(tmpl('event-page', this.render_vars));
 		
 		if (this.event.is_same_time) {
