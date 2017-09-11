@@ -27,6 +27,8 @@ OneOrder = extending(OneEntity, (function() {
 	 * @property {?TEXTS.TICKET_STATUSES} status_name
 	 * @property {?(string|number)} sum
 	 * @property {?(string|number)} final_sum
+	 * @property {?number} shop_sum_amount
+	 * @property {?string} payment_type
 	 *
 	 * @property {?timestamp} created_at
 	 * @property {?timestamp} updated_at
@@ -55,6 +57,8 @@ OneOrder = extending(OneEntity, (function() {
 		this.status_type_code = null;
 		this.sum = null;
 		this.final_sum = null;
+		this.shop_sum_amount = null;
+		this.payment_type = null;
 		
 		this.created_at = null;
 		this.updated_at = null;
