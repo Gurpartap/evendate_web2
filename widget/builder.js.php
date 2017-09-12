@@ -235,7 +235,7 @@ switch ($_REQUEST['type']) {
 	var iframe = document.createElement('iframe');
 
 	iframe.id = 'evendate-widget-' + id;
-	iframe.setAttribute('src', '//<?=App::$DOMAIN?>/widget/order/event/' + id + '?' + Object.keys(props).map(function(key, i, props) {
+	iframe.setAttribute('src', '//<?=App::$DOMAIN?>/widget/order/event/' + id + '?' + Object.keys(props).map(function(key) {
 
 		return key + '=' + encodeURIComponent(props[key]);
 	}).join('&'));
