@@ -2,6 +2,7 @@
  * @requires ../Class.OneEntity.js
  *
  * @requires ../../data_models/Class.TariffModel.js
+ * @requires ../../data_models/finance/Class.OrganizationFinanceModel.js
  */
 /**
  * @typedef {object} Privilege

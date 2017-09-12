@@ -1,5 +1,6 @@
 /**
  * @requires Class.AbstractFinanceModel.js
+ * @requires ../../entities/statistics/event/Class.EventFinanceStatisticsCollection.js
  */
 /**
  *
