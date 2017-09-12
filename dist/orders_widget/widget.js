@@ -41742,9 +41742,496 @@ TariffModel = extending(OneEntity, (function() {
 	return TariffModel;
 }()));
 /**
+ * @requires ../../entities/Class.OneEntity.js
+ */
+/**
+ *
+ * @abstract
+ * @class AbstractFinanceModel
+ * @extends OneEntity
+ */
+AbstractFinanceModel = extending(OneEntity, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs AbstractFinanceModel
+	 *
+	 * @property {?number} total_income
+	 * @property {?number} withdraw_available
+	 * @property {?number} processing_commission_value
+	 * @property {?number} processing_commission
+	 * @property {?number} evendate_commission_value
+	 * @property {StatisticsCollection} ticket_dynamics
+	 * @property {StatisticsCollection} income_dynamics
+	 */
+	function AbstractFinanceModel() {
+		OneEntity.call(this);
+		
+		this.total_income = null;
+		this.withdraw_available = null;
+		this.processing_commission_value = null;
+		this.processing_commission = null;
+		this.evendate_commission_value = null;
+		this.ticket_dynamics = new StatisticsCollection('ticket_dynamics');
+		this.income_dynamics = new StatisticsCollection('ticket_dynamics');
+	}
+	
+	return AbstractFinanceModel;
+}()));
+/**
+ * @requires ../../entities/Class.OneEntity.js
+ */
+/**
+ *
+ * @class WithdrawModel
+ * @extends OneEntity
+ */
+WithdrawModel = extending(OneEntity, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs WithdrawModel
+	 *
+	 * @property {?number} id
+	 * @property {?number} sum
+	 * @property {?number} user_id
+	 * @property {OneUser} user
+	 * @property {?number} organization_id
+	 * @property {?string} comment
+	 * @property {?string} response
+	 * @property {?number} number
+	 * @property {?WithdrawModel.STATUS} status_type_code
+	 * @property {?string} status_description
+	 * @property {?timestamp} created_at
+	 * @property {?timestamp} updated_at
+	 */
+	function WithdrawModel() {
+		OneEntity.call(this);
+		
+		this.id = null;
+		this.sum = null;
+		this.user_id = null;
+		this.user = new OneUser(this.user_id);
+		this.organization_id = null;
+		this.comment = null;
+		this.response = null;
+		this.number = null;
+		this.status_type_code = null;
+		
+		this.created_at = null;
+		this.updated_at = null;
+		
+		Object.defineProperty(this, 'status_description', {
+			get: function() {
+				
+				return getByValue(this.status_type_code, WithdrawModel.STATUS, WithdrawModel.STATUS_DESCRIPTION);
+			}
+		});
+	}
+	
+	/**
+	 *
+	 * @enum {string}
+	 */
+	WithdrawModel.STATUS = {
+		PENDING: 'pending',
+		IN_PROGRESS: 'in_progress',
+		BANK_CHARGING: 'bank_charging',
+		COMPLETED: 'completed',
+		REJECTED: 'rejected',
+		REJECTED_BY_ORGANIZATION: 'rejected_by_organization'
+	};
+	/**
+	 *
+	 * @enum {string}
+	 */
+	WithdrawModel.STATUS_DESCRIPTION = {
+		PENDING: 'Ожидает обработки',
+		IN_PROGRESS: 'Обрабатывается',
+		BANK_CHARGING: 'Отправлено в банк на исполнение',
+		COMPLETED: 'Выполнено',
+		REJECTED: 'Отказано',
+		REJECTED_BY_ORGANIZATION: 'Отозвано организаторов'
+	};
+	
+	return WithdrawModel;
+}()));
+/**
+ * @requires ../../entities/Class.EntitiesCollection.js
+ * @requires Class.WithdrawModel.js
+ */
+/**
+ *
+ * @class WithdrawModelsCollection
+ * @extends EntitiesCollection
+ */
+WithdrawModelsCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs WithdrawModelsCollection
+	 */
+	function WithdrawModelsCollection(organization_id) {
+		EntitiesCollection.call(this);
+		
+		Object.defineProperty(this, 'org_id', {
+			get: function() {
+				
+				return organization_id;
+			}
+		});
+	}
+	
+	WithdrawModelsCollection.prototype.collection_of = WithdrawModel;
+	
+	/**
+	 *
+	 * @param {number} organization_id
+	 * @param {Fields} [fields]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @returns jqPromise
+	 */
+	WithdrawModelsCollection.fetchWithdraws = function(organization_id, fields, success) {
+		
+		return __APP.SERVER.getData(OrganizationStatisticsCollection.ENDPOINT.FINANCE.format({org_id: organization_id}), {
+			fields: new Fields({
+				withdraws: {
+					fields: new Fields(fields)
+				}
+			})
+		}, success);
+	};
+	/**
+	 *
+	 * @param {Fields} [fields]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @returns jqPromise
+	 */
+	WithdrawModelsCollection.prototype.fetch = function(fields, success) {
+		var self = this;
+		
+		return WithdrawModelsCollection.fetchWithdraws(this.org_id, fields, function(data) {
+			self.setData(data['withdraws']);
+			
+			if (isFunction(success)) {
+				success.call(self, self.last_pushed);
+			}
+		});
+	};
+	
+	return WithdrawModelsCollection;
+}()));
+/**
+ * @requires ../Class.OneEntity.js
+ */
+/**
+ *
+ * @abstract
+ * @class OneAbstractStatistic
+ * @extends OneEntity
+ */
+OneAbstractStatistic = extending(OneEntity, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs OneAbstractStatistic
+	 *
+	 * @property {?number} value
+	 * @property {?timestamp} time_value
+	 */
+	function OneAbstractStatistic() {
+		OneEntity.call(this);
+		
+		this.value = null;
+		this.time_value = null;
+	}
+	
+	return OneAbstractStatistic;
+}()));
+/**
+ * @requires ../Class.EntitiesCollection.js
+ * @requires Class.OneAbstractStatistic.js
+ */
+/**
+ *
+ * @abstract
+ * @class AbstractStatisticsCollection
+ * @extends EntitiesCollection
+ */
+AbstractStatisticsCollection = extending(EntitiesCollection, (function() {
+	/**
+	 *
+	 * @param {string} field
+	 *
+	 * @constructor
+	 * @constructs AbstractStatisticsCollection
+	 *
+	 * @property {string} field
+	 */
+	function AbstractStatisticsCollection(field) {
+		EntitiesCollection.call(this);
+		
+		Object.defineProperty(this, 'field', {
+			get: function() {
+				
+				return field;
+			}
+		});
+	}
+	
+	AbstractStatisticsCollection.prototype.collection_of = OneAbstractStatistic;
+	/**
+	 * @const
+	 * @enum {string}
+	 */
+	AbstractStatisticsCollection.SCALES = {
+		MINUTE: 'minute',
+		HOUR: 'hour',
+		DAY: 'day',
+		WEEK: 'week',
+		MONTH: 'month',
+		YEAR: 'year',
+		OVERALL: 'overall'
+	};
+	/**
+	 *
+	 * @abstract
+	 *
+	 * @param {Fields} fields
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @returns jqPromise
+	 */
+	AbstractStatisticsCollection.fetchStatistics = function(fields, success) {};
+	/**
+	 *
+	 * @abstract
+	 *
+	 * @param {AbstractStatisticsCollection.SCALES} [scale]
+	 * @param {string} [since]
+	 * @param {string} [till]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @returns jqPromise
+	 */
+	AbstractStatisticsCollection.prototype.fetch = function(scale, since, till, success) {};
+	
+	return AbstractStatisticsCollection;
+}()));
+/**
+ * @requires Class.OneAbstractStatistic.js
+ */
+/**
+ *
+ * @class OneStatistic
+ * @extends OneAbstractStatistic
+ */
+OneStatistic = extending(OneAbstractStatistic, (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs OneStatistic
+	 *
+	 * @property {?number} value
+	 * @property {?timestamp} time_value
+	 */
+	function OneStatistic() {
+		OneAbstractStatistic.call(this);
+	}
+	
+	return OneStatistic;
+}()));
+/**
+ * @requires Class.AbstractStatisticsCollection.js
+ * @requires Class.OneStatistic.js
+ */
+/**
+ *
+ * @abstract
+ * @class StatisticsCollection
+ * @extends AbstractStatisticsCollection
+ */
+StatisticsCollection = extending(AbstractStatisticsCollection, (function() {
+	/**
+	 *
+	 * @param {string} field
+	 *
+	 * @constructor
+	 * @constructs StatisticsCollection
+	 *
+	 * @property {string} field
+	 */
+	function StatisticsCollection(field) {
+		AbstractStatisticsCollection.call(this, field);
+	}
+	
+	StatisticsCollection.prototype.collection_of = OneStatistic;
+	/**
+	 * @abstract
+	 * @inheritDoc
+	 */
+	StatisticsCollection.prototype.fetch = function(scale, since, till, success) {};
+	
+	return StatisticsCollection;
+}()));
+/**
+ * @requires ../Class.StatisticsCollection.js
+ */
+/**
+ *
+ * @class OrganizationStatisticsCollection
+ * @extends StatisticsCollection
+ */
+OrganizationStatisticsCollection = extending(StatisticsCollection, (function() {
+	/**
+	 *
+	 * @param {number} org_id
+	 * @param {string} field
+	 *
+	 * @constructor
+	 * @constructs OrganizationStatisticsCollection
+	 *
+	 * @property {number} org_id
+	 * @property {string} field
+	 */
+	function OrganizationStatisticsCollection(org_id, field) {
+		StatisticsCollection.call(this, field);
+		
+		Object.defineProperty(this, 'org_id', {
+			get: function() {
+				
+				return org_id;
+			}
+		});
+	}
+	
+	OrganizationStatisticsCollection.ENDPOINT = Object.freeze({
+		ORGANIZATION: '/statistics/organizations/{org_id}',
+		FINANCE: '/statistics/organizations/{org_id}/finance'
+	});
+	
+	/**
+	 *
+	 * @param {number} org_id
+	 * @param {Fields} fields
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @returns jqPromise
+	 */
+	OrganizationStatisticsCollection.fetchStatistics = function(org_id, fields, success) {
+		
+		return __APP.SERVER.getData(OrganizationStatisticsCollection.ENDPOINT.ORGANIZATION.format({org_id: org_id}), {
+			fields: fields
+		}, success);
+	};
+	/**
+	 *
+	 * @inheritDoc
+	 */
+	OrganizationStatisticsCollection.prototype.fetch = function(scale, since, till, success) {
+		var self = this,
+			fields_obj = {};
+		
+		fields_obj[this.field] = Object.assign({
+			scale: scale,
+			since: since,
+			till: till
+		});
+		
+		return this.constructor.fetchStatistics(this.org_id, new Fields(fields_obj), function(data) {
+			self.setData(data[self.field]);
+			
+			if (isFunction(success)) {
+				success.call(self, self.last_pushed);
+			}
+		});
+	};
+	
+	return OrganizationStatisticsCollection;
+}()));
+/**
+ * @requires Class.OrganizationStatisticsCollection.js
+ */
+/**
+ *
+ * @class OrganizationFinanceStatisticsCollection
+ * @extends OrganizationStatisticsCollection
+ */
+OrganizationFinanceStatisticsCollection = extending(OrganizationStatisticsCollection, (function() {
+	/**
+	 *
+	 * @param {number} org_id
+	 * @param {string} field
+	 *
+	 * @constructor
+	 * @constructs OrganizationFinanceStatisticsCollection
+	 *
+	 * @property {number} org_id
+	 * @property {string} field
+	 */
+	function OrganizationFinanceStatisticsCollection(org_id, field) {
+		OrganizationStatisticsCollection.call(this, org_id, field);
+	}
+	
+	/**
+	 *
+	 * @param {number} org_id
+	 * @param {Fields} fields
+	 * @param {AJAXCallback} [success]
+	 */
+	OrganizationFinanceStatisticsCollection.fetchStatistics = function(org_id, fields, success) {
+		
+		return __APP.SERVER.getData(OrganizationStatisticsCollection.ENDPOINT.FINANCE.format({org_id: org_id}), {
+			fields: fields
+		}, success);
+	};
+	
+	return OrganizationFinanceStatisticsCollection;
+}()));
+/**
+ * @requires Class.AbstractFinanceModel.js
+ * @requires Class.WithdrawModelsCollection.js
+ * @requires ../../entities/statistics/organization/Class.OrganizationFinanceStatisticsCollection.js
+ */
+/**
+ *
+ * @class OrganizationFinanceModel
+ * @extends AbstractFinanceModel
+ */
+OrganizationFinanceModel = extending(AbstractFinanceModel, (function() {
+	/**
+	 *
+	 * @param {number} organization_id
+	 *
+	 * @constructor
+	 * @constructs OrganizationFinanceModel
+	 *
+	 * @property {?number} total_income
+	 * @property {?number} withdraw_available
+	 * @property {?number} processing_commission_value
+	 * @property {?number} processing_commission
+	 * @property {?number} evendate_commission_value
+	 * @property {?WithdrawModelsCollection} withdraws
+	 * @property {OrganizationFinanceStatisticsCollection} ticket_dynamics
+	 * @property {OrganizationFinanceStatisticsCollection} income_dynamics
+	 */
+	function OrganizationFinanceModel(organization_id) {
+		AbstractFinanceModel.call(this);
+		
+		this.withdraws = new WithdrawModelsCollection(organization_id);
+		this.ticket_dynamics = new OrganizationFinanceStatisticsCollection(organization_id, 'ticket_dynamics');
+		this.income_dynamics = new OrganizationFinanceStatisticsCollection(organization_id, 'income_dynamics');
+	}
+	
+	return OrganizationFinanceModel;
+}()));
+/**
  * @requires ../Class.OneEntity.js
  *
  * @requires ../../data_models/Class.TariffModel.js
+ * @requires ../../data_models/finance/Class.OrganizationFinanceModel.js
  */
 /**
  * @typedef {object} Privilege
@@ -42826,6 +43313,158 @@ NotificationsCollection = extending(EntitiesCollection, (function() {
 	return NotificationsCollection;
 }()));
 /**
+ * @requires ../Class.StatisticsCollection.js
+ */
+/**
+ *
+ * @class EventStatisticsCollection
+ * @extends StatisticsCollection
+ */
+EventStatisticsCollection = extending(StatisticsCollection, (function() {
+	/**
+	 *
+	 * @param {number} event_id
+	 * @param {string} field
+	 *
+	 * @constructor
+	 * @constructs EventStatisticsCollection
+	 *
+	 * @property {number} event_id
+	 * @property {string} field
+	 */
+	function EventStatisticsCollection(event_id, field) {
+		StatisticsCollection.call(this, field);
+		
+		Object.defineProperty(this, 'event_id', {
+			get: function() {
+				
+				return event_id;
+			}
+		});
+	}
+	
+	EventStatisticsCollection.ENDPOINT = Object.freeze({
+		EVENT: '/statistics/events/{event_id}',
+		FINANCE: '/statistics/events/{event_id}/finance'
+	});
+	
+	/**
+	 *
+	 * @param {number} event_id
+	 * @param {Fields} fields
+	 * @param {AJAXCallback} [success]
+	 */
+	EventStatisticsCollection.fetchStatistics = function(event_id, fields, success) {
+		
+		return __APP.SERVER.getData(EventStatisticsCollection.ENDPOINT.EVENT.format({event_id: event_id}), {
+			fields: fields
+		}, success);
+	};
+	/**
+	 *
+	 * @inheritDoc
+	 */
+	EventStatisticsCollection.prototype.fetch = function(scale, since, till, success) {
+		var self = this,
+			fields_obj = {};
+		
+		fields_obj[this.field] = Object.assign({
+			scale: scale,
+			since: since,
+			till: till
+		});
+		
+		return this.constructor.fetchStatistics(this.event_id, new Fields(fields_obj), function(data) {
+			self.setData(data[self.field]);
+			
+			if (isFunction(success)) {
+				success.call(self, self.last_pushed);
+			}
+		});
+	};
+	
+	return EventStatisticsCollection;
+}()));
+/**
+ * @requires Class.EventStatisticsCollection.js
+ */
+/**
+ *
+ * @class EventFinanceStatisticsCollection
+ * @extends EventStatisticsCollection
+ */
+EventFinanceStatisticsCollection = extending(EventStatisticsCollection, (function() {
+	/**
+	 *
+	 * @param {number} event_id
+	 * @param {string} field
+	 *
+	 * @constructor
+	 * @constructs EventFinanceStatisticsCollection
+	 *
+	 * @property {number} event_id
+	 * @property {string} field
+	 */
+	function EventFinanceStatisticsCollection(event_id, field) {
+		EventStatisticsCollection.call(this, event_id, field);
+	}
+	
+	/**
+	 *
+	 * @param {number} event_id
+	 * @param {Fields} fields
+	 * @param {AJAXCallback} [success]
+	 */
+	EventFinanceStatisticsCollection.fetchStatistics = function(event_id, fields, success) {
+		
+		return __APP.SERVER.getData(EventStatisticsCollection.ENDPOINT.FINANCE.format({event_id: event_id}), {
+			fields: fields
+		}, success);
+	};
+	
+	return EventFinanceStatisticsCollection;
+}()));
+/**
+ * @requires Class.AbstractFinanceModel.js
+ * @requires ../../entities/statistics/event/Class.EventFinanceStatisticsCollection.js
+ */
+/**
+ *
+ * @class EventFinanceModel
+ * @extends AbstractFinanceModel
+ */
+EventFinanceModel = extending(AbstractFinanceModel, (function() {
+	/**
+	 *
+	 * @param {number} event_id
+	 *
+	 * @constructor
+	 * @constructs EventFinanceModel
+	 *
+	 * @property {?number} sum_amount
+	 * @property {?number} sold_count
+	 * @property {?number} checked_out_count
+	 * @property {?number} total_income
+	 * @property {?number} withdraw_available
+	 * @property {?number} processing_commission_value
+	 * @property {?number} processing_commission
+	 * @property {?number} evendate_commission_value
+	 * @property {EventFinanceStatisticsCollection} ticket_dynamics
+	 * @property {EventFinanceStatisticsCollection} income_dynamics
+	 */
+	function EventFinanceModel(event_id) {
+		AbstractFinanceModel.call(this);
+		
+		this.sum_amount = null;
+		this.sold_count = null;
+		this.checked_out_count = null;
+		this.ticket_dynamics = new EventFinanceStatisticsCollection(event_id, 'ticket_dynamics');
+		this.income_dynamics = new EventFinanceStatisticsCollection(event_id, 'income_dynamics');
+	}
+	
+	return EventFinanceModel;
+}()));
+/**
  * @requires ../entities/Class.OneEntity.js
  */
 /**
@@ -42887,6 +43526,7 @@ PromocodeModelsCollection = extending(EntitiesCollection, (function() {
  * @requires ../user/Class.UsersCollection.js
  * @requires ../notification/Class.NotificationsCollection.js
  * @requires ../../data_models/registration_field/Class.RegistrationFieldModelsCollection.js
+ * @requires ../../data_models/finance/Class.EventFinanceModel.js
  * @requires ../../data_models/Class.EventEmailTextsModel.js
  * @requires ../../data_models/promocode/Class.PromocodeModelsCollection.js
  */
@@ -43062,7 +43702,7 @@ OneEvent = extending(OneEntity, (function() {
 		this.actuality = null;
 		
 		this.vk_post_link = null;
-		this.email_texts  = new EventEmailTextsModel();
+		this.email_texts = new EventEmailTextsModel();
 		
 		this.finance = new EventFinanceModel(event_id);
 		

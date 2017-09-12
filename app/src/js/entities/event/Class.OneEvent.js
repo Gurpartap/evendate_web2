@@ -8,6 +8,7 @@
  * @requires ../user/Class.UsersCollection.js
  * @requires ../notification/Class.NotificationsCollection.js
  * @requires ../../data_models/registration_field/Class.RegistrationFieldModelsCollection.js
+ * @requires ../../data_models/finance/Class.EventFinanceModel.js
  * @requires ../../data_models/Class.EventEmailTextsModel.js
  * @requires ../../data_models/promocode/Class.PromocodeModelsCollection.js
  */
@@ -183,7 +184,7 @@ OneEvent = extending(OneEntity, (function() {
 		this.actuality = null;
 		
 		this.vk_post_link = null;
-		this.email_texts  = new EventEmailTextsModel();
+		this.email_texts = new EventEmailTextsModel();
 		
 		this.finance = new EventFinanceModel(event_id);
 		

@@ -1,5 +1,7 @@
 /**
  * @requires Class.AbstractFinanceModel.js
+ * @requires Class.WithdrawModelsCollection.js
+ * @requires ../../entities/statistics/organization/Class.OrganizationFinanceStatisticsCollection.js
  */
 /**
  *
