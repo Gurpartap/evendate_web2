@@ -15,13 +15,7 @@ require_once "{$BACKEND_FULL_PATH}/events/Class.EventsCollection.php";
 require_once "{$BACKEND_FULL_PATH}/events/Class.Event.php";
 require_once "{$BACKEND_FULL_PATH}/users/Class.NotAuthorizedUser.php";
 require_once "{$BACKEND_FULL_PATH}/users/Class.User.php";
-/*
-require_once "{$BACKEND_FULL_PATH}/vendor/Mobile_Detect/Mobile_Detect.php";
-$detect = new Mobile_Detect();
 
-if ($detect->isMobile() && !isset($_GET['full_version'])){
-	header('Location: /mobile?from=' . urlencode($_SERVER['REQUEST_URI']));
-}*/
 
 if (App::$ENV == 'prod' || App::$ENV == 'test') {
 	$DEBUG_MODE = isset( $_GET['debug'] ) ? true : false;
@@ -65,7 +59,6 @@ try {
 	if (isset($_REQUEST['redirect_to'])) {
 		header('Location: ' . $_REQUEST['redirect_to']);
 	}
-//    header('Location: /');
 }
 
 try {

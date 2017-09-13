@@ -7,6 +7,7 @@ __APP = {
 	 * @type {ServerConnection}
 	 */
 	SERVER: new ServerConnection(),
+	POST_MESSAGE: new WidgetPostMessageConnection(window),
 	EVENDATE_BEGIN: '15-12-2015',
 	AUTH_URLS: {},
 	USER: new CurrentUser(),
