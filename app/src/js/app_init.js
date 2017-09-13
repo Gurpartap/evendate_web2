@@ -39,6 +39,12 @@ function checkRedirect(path_part, redirect_to, contains_not) {
 }
 
 if (checkRedirect()) {
+	
+	__APP.POST_MESSAGE.listen(PostMessageConnection.AVAILABLE_COMMANDS.REDIRECT, function(redirect_uri) {
+		
+		return this.location.href = redirect_uri;
+	});
+	
 	$(document)
 		.ajaxStart(function() {
 			Pace.restart()

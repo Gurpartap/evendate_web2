@@ -2,6 +2,8 @@
 <head>
   <title>Перенаправление на страницу оплаты</title>
 	<style type="text/css">
+		html,
+		body {height: 100%}
 		<?php
 		require_once($_SERVER['DOCUMENT_ROOT'] . '/app/src/css/vars.css');
 		require_once($_SERVER['DOCUMENT_ROOT'] . '/app/src/css/common.css');
@@ -14,7 +16,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-<form id='payment' action='https://money.yandex.ru/eshop.xml' method='post'>
+<form id='payment' action='https://money.yandex.ru/eshop.xml' method='post' style="height: 100%">
   <input name='shopId' value='132896' type='hidden'>
   <input name='scid' value='97111' type='hidden'>
   <input name='customerNumber' value='<?= $__user->getFirstName() . ' ' . $__user->getLastName() ?>' type='hidden'>
