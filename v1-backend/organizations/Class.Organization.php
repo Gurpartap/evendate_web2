@@ -926,7 +926,7 @@ class Organization extends AbstractEntity
 													AND users_organizations.role_id = 1
 													AND users_organizations.status = TRUE
 													AND users_organizations.organization_id = :organization_id)';
-		$this->db->prepareExecuteRaw($q_get_emails, array(':organization_id' => $this->getId()))->fetchAll();
+		return $this->db->prepareExecuteRaw($q_get_emails, array(':organization_id' => $this->getId()))->fetchAll();
 	}
 
 	public function sendFeedback(array $user_data)
@@ -934,10 +934,12 @@ class Organization extends AbstractEntity
 		if (!isset($user_data['name'])) throw new InvalidArgumentException('BAD_USER_NAME');
 		if (!isset($user_data['email'])) throw new InvalidArgumentException('BAD_USER_EMAIL');
 		if (!isset($user_data['message'])) throw new InvalidArgumentException('BAD_USER_MESSAGE');
+		if (!filter_var($user_data['email'], FILTER_VALIDATE_EMAIL)) throw new InvalidArgumentException('BAD_USER_EMAIL');
 
 		$user_data['organization'] = $this->getShortName();
 		$text = '';
 		foreach($user_data as $key => $input){
+			if ($key[0] == '_') continue;
 			$text .= $key . ': ' . $input . "\n <br>";
 		}
 

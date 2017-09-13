@@ -158,19 +158,19 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
 ============================== -->
 <div class="navbar navbar-nemo appear-onscroll navbar-fixed-top">
   <div class="container">
-<!--    <div class="navbar-header">-->
-<!--      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#nemo-navigation"-->
-<!--              aria-expanded="false">-->
-<!--        <span class="sr-only">Toggle navigation</span>-->
-<!--        <span class="icon-bar icon-bar-top"></span>-->
-<!--        <span class="icon-bar icon-bar-middle"></span>-->
-<!--        <span class="icon-bar icon-bar-bottom"></span>-->
-<!--      </button>-->
-<!--      <!-- YOUR LOGO -->
-<!--      <a class="navbar-brand" href="#">-->
-<!--        <img src="$event['organization_logo_medium_url']" alt="">-->
-<!--      </a>-->
-<!--    </div>-->
+    <!--    <div class="navbar-header">-->
+    <!--      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#nemo-navigation"-->
+    <!--              aria-expanded="false">-->
+    <!--        <span class="sr-only">Toggle navigation</span>-->
+    <!--        <span class="icon-bar icon-bar-top"></span>-->
+    <!--        <span class="icon-bar icon-bar-middle"></span>-->
+    <!--        <span class="icon-bar icon-bar-bottom"></span>-->
+    <!--      </button>-->
+    <!--      <!-- YOUR LOGO -->
+    <!--      <a class="navbar-brand" href="#">-->
+    <!--        <img src="$event['organization_logo_medium_url']" alt="">-->
+    <!--      </a>-->
+    <!--    </div>-->
 
     <div class="collapse navbar-collapse navbar-center" id="nemo-navigation">
       <ul class="nav navbar-nav">
@@ -193,7 +193,8 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
      EVENT HOME 1
 ============================== -->
 <section class="home event-home-1 polygon-bg cover-bg" id="home">
-  <div data-intro='{{intro.steps[1]}}' data-step="2"  ng-if="edit_mode" class="board-settings-btn mod-show-menu js-show-sidebar main-btn" href="#"
+  <div data-intro='{{intro.steps[1]}}' data-step="2" ng-if="edit_mode"
+       class="board-settings-btn mod-show-menu js-show-sidebar main-btn" href="#"
        data-panel-id="header-panel">
     <span class="fa fa-ellipsis-h"></span>
     <span class="board-header-btn-text u-text-underline">Настройки</span></div>
@@ -208,7 +209,8 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
         <p class="heading-pre-suf text-center text-uppercase" contenteditable="true" ng-model="data.header.title">
           {{data.header.title}}</p>
 
-        <h1 data-intro='{{intro.steps[0]}}' data-step="1" class="heading-text" contenteditable ng-model="data.header.subtitle">{{data.header.subtitle}}</h1>
+        <h1 data-intro='{{intro.steps[0]}}' data-step="1" class="heading-text" contenteditable
+            ng-model="data.header.subtitle">{{data.header.subtitle}}</h1>
         <p class="sub-heading" contenteditable ng-model="data.header.location_addresses">
           {{data.header.location_addresses}}</p>
 
@@ -249,7 +251,8 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
             ng-class="{'fa-eye-slash': data.speakers.enabled, 'fa-eye': data.speakers.enabled == false}"></span>
     </span>
   </div>
-  <div data-intro='{{intro.steps[3]}}' data-step="4" ng-if="edit_mode" ng-click="data.speakers.addItem();" title="Добавить блок"
+  <div data-intro='{{intro.steps[3]}}' data-step="4" ng-if="edit_mode" ng-click="data.speakers.addItem();"
+       title="Добавить блок"
        class="not-main board-settings-btn mod-add-block js-show-sidebar not-main" href="#">
     <span class="board-header-btn-text">
       <span class="fa fa-plus"></span> Добавить спикера
@@ -870,7 +873,8 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
   </div>
 </section>
 
-<button type="button" ng-click="saveLandingData();" class="fab" id="fab-save" data-intro="{{intro.steps[6]}}" data-step="7" ng-show="edit_mode"
+<button type="button" ng-click="saveLandingData();" class="fab" id="fab-save" data-intro="{{intro.steps[6]}}"
+        data-step="7" ng-show="edit_mode"
         style="position: fixed; bottom: 50px; right: 50px; border-radius: 500px; background-color: var(--accent)">
   <span class="fa fa-save"></span>
 </button>
@@ -879,7 +883,8 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
 
   <div class="container text-center">
     <p class="contact-help">Возникли вопросы?</p>
-    <p><a href="#" class="btn btn-primary feedback-btn">Свяжитесь с нами</a></p>
+    <p><a href="#" ng-click="data.sponsors.openFeedbackModal();" class="btn btn-primary feedback-btn">Свяжитесь с
+        нами</a></p>
 
     <ul class="socialize">
       <li ng-if="data.main.vk_url"><a href="#" target="_blank" ng-href="/away.php?url={{data.main.vk_url}}">
@@ -897,7 +902,7 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
     </ul>
 
     <p class="copyright"><a target="_blank"
-                              href="https://evendate.io/organization/<?= $event['organization_id'] ?>"><?= $event['organization_short_name'] ?></a>
+                            href="https://evendate.io/organization/<?= $event['organization_id'] ?>"><?= $event['organization_short_name'] ?></a>
     </p>
     <p class="copyright">© <a target="_blank" href="https://evendate.io">Evendate</a></p>
   </div>
@@ -967,7 +972,8 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
   </div>
 </div>
 
-<div class="main-settings-btn" data-intro="{{intro.steps[4]}}" data-step="5" ng-if="edit_mode" data-panel-id="main-settings-panel">
+<div class="main-settings-btn" data-intro="{{intro.steps[4]}}" data-step="5" ng-if="edit_mode"
+     data-panel-id="main-settings-panel">
   <span class="fa fa-cog"></span>
 </div>
 
@@ -999,7 +1005,7 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
             </div>
 
             <div class="config-title">Цветовая тема:</div>
-            <ul class="styles"  data-intro="{{intro.steps[5]}}" data-step="6">
+            <ul class="styles" data-intro="{{intro.steps[5]}}" data-step="6">
               <li>
                 <div class="green color" id="green" ng-click="setGlobalColor({r: 0, g: 205, b: 175})">
                 </div>
@@ -1162,28 +1168,40 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Закрыть"><span aria-hidden="true">&times;</span></button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Закрыть"><span
+            aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" id="myModalLabel">Обратная связь с организатором</h4>
       </div>
       <div class="modal-body">
-        <form>
+        <div class="alert alert-danger feedback-modal-error hidden" role="alert"><strong>Ошибка</strong>
+          <span class="text"></span>
+        </div>
+        <form class="feedback-form">
           <div class="form-group">
             <label for="sender-name" class="control-label">ФИО:</label>
-            <input type="text" class="form-control" id="sender-name">
+            <input type="text" name="name" class="form-control" id="sender-name">
+          </div>
+          <div class="form-group">
+            <label for="sender-email" class="control-label">Email:</label>
+            <input type="text" name="email" class="form-control" id="sender-email">
           </div>
           <div class="form-group">
             <label for="sender-phone" class="control-label">Номер телефона:</label>
-            <input type="text" class="form-control" id="sender-phone">
+            <input type="text" name="phone" class="form-control" id="sender-phone">
           </div>
           <div class="form-group">
             <label for="message-text" class="control-label">Сообщение:</label>
-            <textarea class="form-control" id="message-text" style=""></textarea>
+            <textarea class="form-control" name="message" id="message-text" style=""></textarea>
           </div>
+          <input type="hidden" name="URL" id="current-url">
         </form>
+        <div class="alert alert-success feedback-modal-success hidden" role="alert"><strong>Ура!</strong>
+          <span class="text"></span>
+        </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Отмена</button>
-        <button type="button" class="btn btn-primary">Отправить</button>
+        <button type="button" class="btn btn-default feedback-modal-btn" data-dismiss="modal">Отмена</button>
+        <button type="button" class="btn btn-primary feedback-modal-btn send-btn" ng-click="sendFeedback();">Отправить</button>
       </div>
     </div>
   </div>
