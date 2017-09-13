@@ -80,7 +80,7 @@ PostMessageConnection = (function() {
 				return null;
 			}
 			
-			if (!isFunction(callback) || (secure_origin && event.origin !== secure_origin)) {
+			if (resp.command !== command || !isFunction(callback) || (secure_origin && event.origin !== secure_origin)) {
 				
 				return null;
 			}
