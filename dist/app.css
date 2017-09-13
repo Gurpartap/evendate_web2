@@ -5077,86 +5077,6 @@ fieldset + .org_admin_settings_wrapper,
 
 .org_admin_settings_tariff_title {flex-grow: 1}
 .org_admin_settings_tariff_button {margin-left: 1em}
-.statistics_overview_activity {
-	position: fixed;
-	right: 0;
-	width: 270px;
-	height: calc(100% - 54px);
-}
-
-.statistics_overview_heading {
-	margin-bottom: 18px;
-	font-size: 18px;
-	font-weight: 500;
-}
-
-.statistics_overview_wrapper {
-	padding: 12px 0;
-	max-width: 720px;
-}
-
-.organization_card {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	padding: 26px 12px;
-}
-
-.organization_card + .organization_card {margin-top: 12px}
-
-.organization_card_side {
-	width: 100px;
-	margin-right: 24px;
-}
-
-.organization_card_content {
-	flex: 1;
-}
-
-.organization_card_title {
-	display: block;
-	font-size: 20px;
-	font-weight: 500;
-	margin-bottom: 12px;
-}
-
-.organization_card_field {
-	font-size: 14px;
-	font-weight: 500;
-	color: #9fa6b3;
-	color: var(--color_primary_50);
-}
-
-.organization_card_bottom {
-	display: flex;
-	justify-content: space-between;
-	flex-wrap: wrap;
-	align-items: center;
-	margin-top: 22px;
-}
-
-.organization_card_avatars {white-space: nowrap}
-
-.organization_card_avatars:nth-child(odd) {padding-right: 12px}
-.organization_card_avatars:nth-child(even) {padding-left: 12px}
-
-.organization_card_avatars + .organization_card_avatars {border-left: 2px solid #e5e5e5}
-
-.organization_card_avatars > .avatars_collection {cursor: pointer}
-
-.organization_card_buttons {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: flex-end;
-}
-.organization_card_buttons > .button {
-	margin: 6px;
-}
-
-.chart_wrapper {
-	height: 460px;
-	margin-bottom: 60px;
-}
 .event_page {
 	display: inline-flex;
 	vertical-align: top;
@@ -6184,6 +6104,86 @@ fieldset + .org_admin_settings_wrapper,
 }
 
 .-another_user .event_block_action_buttons_wrapper {display: none}
+.statistics_overview_activity {
+	position: fixed;
+	right: 0;
+	width: 270px;
+	height: calc(100% - 54px);
+}
+
+.statistics_overview_heading {
+	margin-bottom: 18px;
+	font-size: 18px;
+	font-weight: 500;
+}
+
+.statistics_overview_wrapper {
+	padding: 12px 0;
+	max-width: 720px;
+}
+
+.organization_card {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 26px 12px;
+}
+
+.organization_card + .organization_card {margin-top: 12px}
+
+.organization_card_side {
+	width: 100px;
+	margin-right: 24px;
+}
+
+.organization_card_content {
+	flex: 1;
+}
+
+.organization_card_title {
+	display: block;
+	font-size: 20px;
+	font-weight: 500;
+	margin-bottom: 12px;
+}
+
+.organization_card_field {
+	font-size: 14px;
+	font-weight: 500;
+	color: #9fa6b3;
+	color: var(--color_primary_50);
+}
+
+.organization_card_bottom {
+	display: flex;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	align-items: center;
+	margin-top: 22px;
+}
+
+.organization_card_avatars {white-space: nowrap}
+
+.organization_card_avatars:nth-child(odd) {padding-right: 12px}
+.organization_card_avatars:nth-child(even) {padding-left: 12px}
+
+.organization_card_avatars + .organization_card_avatars {border-left: 2px solid #e5e5e5}
+
+.organization_card_avatars > .avatars_collection {cursor: pointer}
+
+.organization_card_buttons {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+}
+.organization_card_buttons > .button {
+	margin: 6px;
+}
+
+.chart_wrapper {
+	height: 460px;
+	margin-bottom: 60px;
+}
 html,
 body,
 #main_overlay,

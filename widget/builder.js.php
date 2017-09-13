@@ -29,6 +29,7 @@ function wrongInitError() { ?>
 
 			this.id = id;
 			this.is_loaded = false;
+			this.listener = null;
 
 			Object.defineProperties(this, {
 				iframe: {
@@ -87,6 +88,13 @@ function wrongInitError() { ?>
 		};
 		
 		EvendateWidgetBuilder.prototype.addPostMessageListener = function() {
+			if (this.listener) {
+				if (this.window.parent.removeEventListener) {
+					this.window.parent.removeEventListener("message", this.listener);
+				} else {
+					this.window.parent.detachEvent("onmessage", this.listener);
+				}
+			}
 			/**
 			 *
 			 * @param {object} event
@@ -94,7 +102,7 @@ function wrongInitError() { ?>
 			 * @param {string} event.origin
 			 * @param {Window} event.source
 			 */
-			var listener = function(event) {
+			this.listener = function(event) {
 				var data;
 
 				if (event.origin.indexOf('evendate') !== -1) {
@@ -105,11 +113,11 @@ function wrongInitError() { ?>
 
 				return null;
 			}.bind(this);
-			
+
 			if (this.window.parent.addEventListener) {
-				this.window.parent.addEventListener("message", listener);
+				this.window.parent.addEventListener("message", this.listener);
 			} else {
-				this.window.parent.attachEvent("onmessage", listener);
+				this.window.parent.attachEvent("onmessage", this.listener);
 			}
 		};
 
