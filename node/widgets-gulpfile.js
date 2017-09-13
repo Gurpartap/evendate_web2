@@ -40,6 +40,8 @@ var gulp = require('gulp'),
 		app_js: [
 			js_path + 'lib.js',
 			
+			js_path + 'connections/Class.WidgetPostMessageConnection.js',
+			
 			js_path + 'server/*.js',
 			
 			js_path + 'entities/city/*.js',

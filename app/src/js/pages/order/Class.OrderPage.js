@@ -442,7 +442,7 @@ OrderPage = extending(Page, (function() {
 						parsed_callback = parseUri(decodeURIComponent(callback_url));
 						callback_url = parsed_callback.wo_query + '?registration=free' + (parsed_callback.query ? ('&' + parsed_callback.query) : '');
 						if (__APP.IS_WIDGET) {
-							sendPostMessage.redirect(callback_url);
+							__APP.POST_MESSAGE.redirect(callback_url);
 						} else {
 							window.location = callback_url;
 						}

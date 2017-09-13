@@ -38502,6 +38502,20 @@ function setDefaultValue(variable, default_value) {
 	return variable;
 }
 
+/**
+ *
+ * @param {Object} obj
+ *
+ * @return {string}
+ */
+function objectToQueryString(obj) {
+	
+	return Object.keys(obj).map(function(key) {
+		
+		return key + '=' + encodeURIComponent(obj[key]);
+	}).join('&');
+}
+
 function searchToObject() {
 	var pairs = window.location.search.substring(1).split("&"),
 		obj = {},
@@ -38535,6 +38549,162 @@ function hashToObject() {
 	}
 	return obj;
 }
+/**
+ *
+ * @class PostMessageConnection
+ */
+PostMessageConnection = (function() {
+	/**
+	 *
+	 * @param {Window} window
+	 *
+	 * @constructor
+	 * @constructs PostMessageConnection
+	 *
+	 * @property {Window} window
+	 */
+	function PostMessageConnection(window) {
+		this.window = window;
+	}
+	/**
+	 *
+	 * @final
+	 * @protected
+	 *
+	 * @param {string} command
+	 * @param {*} data
+	 * @param {Window} [send_to_window]
+	 *
+	 * @return void
+	 */
+	PostMessageConnection.prototype.postMessageFactory = function(command, data, send_to_window) {
+		var self = this;
+		
+		return (send_to_window ? send_to_window : self.window.parent).postMessage(JSON.stringify({
+			command: command,
+			data: data
+		}), '*');
+	};
+	
+	/**
+	 *
+	 * @enum {string}
+	 */
+	PostMessageConnection.AVAILABLE_COMMANDS = {
+		SET_COLOR: 'setColor',
+		GET_HEIGHT: 'getHeight',
+		REDIRECT: 'redirect'
+	};
+	/**
+	 * @callback postMessageListenerCallback
+	 * @this Window
+	 * @param {*} data
+	 * @param {Window} source
+	 * @param {string} origin
+	 */
+	/**
+	 *
+	 * @final
+	 *
+	 * @param {PostMessageConnection.AVAILABLE_COMMANDS} command
+	 * @param {postMessageListenerCallback} callback
+	 * @param {string} [secure_origin]
+	 *
+	 * @return void
+	 */
+	PostMessageConnection.prototype.listen = function(command, callback, secure_origin) {
+		var self = this;
+		/**
+		 *
+		 * @param {object} event
+		 * @param {string} event.data
+		 * @param {string} event.origin
+		 * @param {Window} event.source
+		 */
+		function listener(event) {
+			var resp;
+			
+			try {
+				resp = JSON.parse(event.data);
+			} catch (e) {
+				
+				return null;
+			}
+			
+			if (!isFunction(callback) || (secure_origin && event.origin !== secure_origin)) {
+				
+				return null;
+			}
+			
+			return callback.call(self.window, resp.data, event.source, event.origin);
+		}
+		
+		if (this.window.addEventListener) {
+			this.window.addEventListener('message', listener);
+		} else {
+			this.window.attachEvent('onmessage', listener);
+		}
+	};
+	
+	
+	return PostMessageConnection;
+}());
+/**
+ * @requires Class.PostMessageConnection.js
+ */
+/**
+ *
+ * @class WidgetPostMessageConnection
+ * @extends PostMessageConnection
+ */
+WidgetPostMessageConnection = extending(PostMessageConnection, (function() {
+	/**
+	 *
+	 * @param {Window} window
+	 *
+	 * @constructor
+	 * @constructs WidgetPostMessageConnection
+	 *
+	 * @property {Window} window
+	 */
+	function WidgetPostMessageConnection(window) {
+		PostMessageConnection.call(this, window);
+	}
+	/**
+	 *
+	 * @param {string} redirect_uri
+	 * @param {Window} [send_to_window]
+	 *
+	 * @return void
+	 */
+	WidgetPostMessageConnection.prototype.redirect = function(redirect_uri, send_to_window) {
+		
+		return this.postMessageFactory('redirect', redirect_uri, send_to_window);
+	};
+	/**
+	 *
+	 * @param {Window} [send_to_window]
+	 *
+	 * @return void
+	 */
+	WidgetPostMessageConnection.prototype.ready = function(send_to_window) {
+		
+		return this.postMessageFactory('ready', null, send_to_window);
+	};
+	/**
+	 *
+	 * @param {string} height
+	 * @param {Window} [send_to_window]
+	 *
+	 * @return void
+	 */
+	WidgetPostMessageConnection.prototype.setHeight = function(height, send_to_window) {
+		
+		return this.postMessageFactory('setHeight', height, send_to_window);
+	};
+	
+	return WidgetPostMessageConnection;
+}()));
 /**
  * @singleton
  * @class AsynchronousConnection
@@ -45508,43 +45678,22 @@ AuthModal = extending(AbstractModal, (function() {
 		
 		this.modal.find('.AuthButton').each(function() {
 			$(this).on('click', function (e) {
-				var network = $(this).data('auth_network'),
-					parsed_url,
-					parsed_redirect,
-					redirect_query,
-					query,
-					url;
-				
+				var network = $(this).data('auth_network');
 				
 				if (window.yaCounter32442130) {
 					window.yaCounter32442130.reachGoal(network.toUpperCase() + 'AuthStart');
 				}
 				
 				if (self.redirect_to) {
-					parsed_url = parseUri(__APP.AUTH_URLS[network]);
-					parsed_redirect = parseUri(decodeURIComponent(parsed_url.queryKey['redirect_uri']));
-					
-					query = Object.keys(parsed_url.queryKey).reduce(function(query, key) {
-						if (key !== 'redirect_uri') {
-							query.push(key + '=' + parsed_url.queryKey[key]);
-						}
-						
-						return query;
-					}, []);
-					redirect_query = parsed_redirect.query.split('&');
-					redirect_query.push('redirect_to=' + self.redirect_to);
-					
-					query.push('redirect_uri=' + encodeURIComponent(parsed_redirect.wo_query + '?' + redirect_query.join('&')));
-					
-					url = parsed_url.wo_query + '?' + query.join('&');
-				} else {
-					url = __APP.AUTH_URLS[network];
+					try {
+						window.sessionStorage.setItem('redirect_after_auth', self.redirect_to);
+					} catch (e) {}
 				}
 				
 				if (isNotDesktop()) {
-					window.location.href = url;
+					window.location.href = __APP.AUTH_URLS[network];
 				} else {
-					window.open(url, network.toUpperCase() + '_AUTH_WINDOW', 'status=1,toolbar=0,menubar=0&height=500,width=700');
+					window.open(__APP.AUTH_URLS[network], network.toUpperCase() + '_AUTH_WINDOW', 'status=1,toolbar=0,menubar=0&height=500,width=700');
 				}
 				e.preventDefault();
 			});
@@ -47833,7 +47982,7 @@ OrderPage = extending(Page, (function() {
 						parsed_callback = parseUri(decodeURIComponent(callback_url));
 						callback_url = parsed_callback.wo_query + '?registration=free' + (parsed_callback.query ? ('&' + parsed_callback.query) : '');
 						if (__APP.IS_WIDGET) {
-							sendPostMessage.redirect(callback_url);
+							__APP.POST_MESSAGE.redirect(callback_url);
 						} else {
 							window.location = callback_url;
 						}
@@ -48387,6 +48536,7 @@ __APP = {
 	 * @type {ServerConnection}
 	 */
 	SERVER: new ServerConnection(),
+	POST_MESSAGE: new WidgetPostMessageConnection(window),
 	EVENDATE_BEGIN: '15-12-2015',
 	AUTH_URLS: {},
 	USER: new CurrentUser(),
@@ -48581,67 +48731,6 @@ __LOCALES = {
 
 __LOCALE = __LOCALES.ru_RU;
 Object.freeze(__LOCALES);
-sendPostMessage = (function(w) {
-	var sendMessage = (function() {
-		function postMessageFactory(command) {
-			
-			return function(data) {
-				
-				return w.parent.postMessage(JSON.stringify({
-					command: command,
-					data: data
-				}), '*')
-			};
-		}
-		
-		return {
-			redirect: postMessageFactory('redirect'),
-			ready: postMessageFactory('ready'),
-			setHeight: postMessageFactory('setHeight')
-		};
-	}());
-	
-	/**
-	 *
-	 * @param {object} event
-	 * @param {string} event.data
-	 * @param {string} event.origin
-	 * @param {Window} event.source
-	 */
-	function listener(event) {
-		var resp = JSON.parse(event.data);
-		
-		switch (resp.command) {
-			case 'setColor': {
-				
-				return !function(color){
-					
-					return w.document.body.style.setProperty('--color_accent', color);
-				}(resp.data);
-			}
-			case 'getHeight': {
-				
-				return sendMessage.setHeight(calcHeight());
-			}
-			case 'authDone': {
-				
-				return !function(auth_done_link) {
-					
-					return w.location.href = auth_done_link;
-				}(resp.data);
-			}
-		}
-	}
-	
-	if (w.addEventListener) {
-		w.addEventListener("message", listener);
-	} else {
-		w.attachEvent("onmessage", listener);
-	}
-	
-	return sendMessage;
-}(window));
-
 function calcHeight() {
 	var $content = $('.Content');
 	
@@ -48657,6 +48746,22 @@ function calcHeight() {
 	return document.scrollingElement.scrollHeight;
 }
 
+__APP.POST_MESSAGE.listen(PostMessageConnection.AVAILABLE_COMMANDS.SET_COLOR, function(color) {
+	
+	return this.document.body.style.setProperty('--color_accent', color, '');
+});
+
+__APP.POST_MESSAGE.listen(PostMessageConnection.AVAILABLE_COMMANDS.GET_HEIGHT, function() {
+	
+	return __APP.POST_MESSAGE.setHeight(calcHeight());
+});
+
+__APP.POST_MESSAGE.listen(PostMessageConnection.AVAILABLE_COMMANDS.REDIRECT, function(redirect_uri) {
+	
+	return this.location.href = redirect_uri;
+});
+
+
 $(document)
 	.ajaxStart(function() {
 		Pace.restart()
@@ -48666,10 +48771,10 @@ $(document)
 			auth_urls_jqxhr,
 			cities_jqxhr;
 		
-		sendPostMessage.ready();
+		__APP.POST_MESSAGE.ready();
 		
 		(new MutationObserver(function() {
-			sendPostMessage.setHeight(calcHeight());
+			__APP.POST_MESSAGE.setHeight(calcHeight());
 		})).observe(document.body, {
 			childList: true,
 			subtree: true
