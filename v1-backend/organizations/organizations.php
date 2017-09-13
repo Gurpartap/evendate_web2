@@ -327,6 +327,15 @@ $__modules['organizations'] = array(
 			if (!$__user->isAdmin($organization)) throw new PrivilegesException('', $__db);
 			return $organization->withdraw($__request, $__user);
 		},
+		'{(id:[0-9]+)/feedback}' => function ($organization_id) use ($__db, $__request, $__user, $__fields) {
+			$organization = OrganizationsCollection::one(
+				$__db,
+				$__user,
+				intval($organization_id),
+				$__fields
+			);
+			return $organization->sendFeedback($__request);
+		},
 		'' => function () use ($__db, $__request, $__user, $__fields) {
 			return $organization = Organization::create(
 				$__request['payload'],

@@ -8,6 +8,7 @@ __APP = {
 	 */
 	SERVER: new ServerConnection(),
 	EXPORT: new ServerExports(),
+	POST_MESSAGE: new AppPostMessageConnection(window),
 	EVENDATE_BEGIN: '15-12-2015',
 	AUTH_URLS: {},
 	TOP_BAR: new AbstractTopBar(),

@@ -45,6 +45,10 @@ class Organization extends AbstractEntity
 	const ORGANIZATION_STATE_ON_MODERATION = 0;
 	const ORGANIZATION_STATE_SHOWN = 1;
 
+
+	// emails
+	const EMAIL_ORGANIZATION_FEEDBACK_TYPE = 'organization_feedback';
+
 	protected $description;
 	protected $background_medium_img_url;
 	protected $background_small_img_url;
@@ -907,6 +911,46 @@ class Organization extends AbstractEntity
 		if (!isset($data['sum'])) throw new InvalidArgumentException('BAD_SUM');
 		if ((float)$data['sum'] > (float)$finance_info['withdraw_available']) throw new InvalidArgumentException('TOO_BIG_SUM');
 		return Withdraw::create($this, $user, $data);
+	}
+
+	private function getAdminEmails()
+	{
+		$q_get_emails = '(SELECT email
+												FROM organizations
+												WHERE id = :organization_id)
+												UNION
+												(SELECT email
+													FROM users
+														INNER JOIN users_organizations ON users_organizations.user_id = users.id
+													WHERE email IS NOT NULL
+													AND users_organizations.role_id = 1
+													AND users_organizations.status = TRUE
+													AND users_organizations.organization_id = :organization_id)';
+		return $this->db->prepareExecuteRaw($q_get_emails, array(':organization_id' => $this->getId()))->fetchAll();
+	}
+
+	public function sendFeedback(array $user_data)
+	{
+		if (!isset($user_data['name'])) throw new InvalidArgumentException('BAD_USER_NAME');
+		if (!isset($user_data['email'])) throw new InvalidArgumentException('BAD_USER_EMAIL');
+		if (!isset($user_data['message'])) throw new InvalidArgumentException('BAD_USER_MESSAGE');
+		if (!filter_var($user_data['email'], FILTER_VALIDATE_EMAIL)) throw new InvalidArgumentException('BAD_USER_EMAIL');
+
+		$user_data['organization'] = $this->getShortName();
+		$text = '';
+		foreach($user_data as $key => $input){
+			if ($key[0] == '_') continue;
+			$text .= $key . ': ' . $input . "\n <br>";
+		}
+
+		foreach($this->getAdminEmails() as $index => $row){
+			Emails::schedule(self::EMAIL_ORGANIZATION_FEEDBACK_TYPE, $row['email'], array(
+				'message_text' => $text
+			));
+		}
+
+		return new Result(true, 'Сообщение успешно отправлено.');
+
 	}
 
 }

@@ -2640,6 +2640,20 @@ function setDefaultValue(variable, default_value) {
 	return variable;
 }
 
+/**
+ *
+ * @param {Object} obj
+ *
+ * @return {string}
+ */
+function objectToQueryString(obj) {
+	
+	return Object.keys(obj).map(function(key) {
+		
+		return key + '=' + encodeURIComponent(obj[key]);
+	}).join('&');
+}
+
 function searchToObject() {
 	var pairs = window.location.search.substring(1).split("&"),
 		obj = {},

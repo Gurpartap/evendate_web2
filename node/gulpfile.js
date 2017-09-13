@@ -25,6 +25,7 @@ var gulp = require('gulp'),
 		],
 		app_js: [
 			js_path + 'lib.js',
+			js_path + 'connections/*.js',
 			js_path + 'server/*.js',
 			js_path + 'entities/*.js',
 			js_path + 'data_models/**/*.js',
