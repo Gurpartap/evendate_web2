@@ -518,6 +518,11 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                 this.enabled = !this.enabled;
                 return false;
             },
+            openFeedbackModal: function () {
+                if (!$scope.edit_mode) {
+                    $('#myModal').modal();
+                }
+            },
             items: {},
             toggleBecomeASponsor: function () {
                 this.become_a_sponsor_enabled = !this.become_a_sponsor_enabled;
@@ -630,6 +635,34 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
             enabled: true,
         },
     };
+
+    $scope.sendFeedback = function () {
+        $('.feedback-modal-btn').addClass('disabled').prop('disabled', 'disabled');
+        var showError = function (err) {
+            $('.feedback-modal-error').removeClass('hidden');
+            $('.feedback-modal-error .text').text(err.responseJSON.text);
+        };
+        $('.feedback-modal-error, .feedback-modal-success').addClass('hidden');
+        $.ajax({
+            url: '/api/v1/organizations/' + $scope.event.organization_id + '/feedback',
+            type: 'POST',
+            data: $('.feedback-form').serializeArray(),
+            success: function (res) {
+                if (res.status) {
+                    $('.feedback-form, .feedback-modal-btn.send-btn').addClass('hidden');
+                    $('.feedback-modal-success').removeClass('hidden');
+                    $('.feedback-modal-success .text').text(res.text);
+                } else {
+                    showError(res);
+                }
+            },
+            error: showError,
+            complete: function () {
+                $('.feedback-modal-btn').removeClass('disabled').removeProp('disabled');
+            }
+        });
+    };
+
 
     $scope.$watch('data.main_background', function () {
         if ($scope.data.main_background && $scope.data.main_background.$ngfBlobUrl) {
@@ -787,7 +820,7 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
         url: '/api/v1/events/' + search_data['id'] + '?fields=tags,latitude,longitude,description,ticketing_available,registration_available,landing_data,location,image_horizontal_url,registration_required,registration_locally,organization_name,ticketing_available,registration_available',
         success: function (res) {
             var event = res.data[0];
-            console.log(event);
+            $scope.event = event;
             initMapBig(event);
             if (!event.landing_data) {
                 var colorThief = new ColorThief(),
@@ -811,7 +844,7 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                     $scope.intro_instance = introJs();
                     $scope.intro_instance.onchange(function (targetElement) {
                         var current_step = $(targetElement).data('step');
-                        if (current_step == 6 ) {
+                        if (current_step == 6) {
                             $('.main-settings-btn').click();
                         }
 
@@ -882,6 +915,14 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
         $('#evendate-widget-' + search_data.id).get(0).onload = function () {
             evendateWidget.setColor(rgbToHex($scope.data.color_scheme[0], $scope.data.color_scheme[1], $scope.data.color_scheme[2]));
         };
+        $('#current-url').val(window.location.href);
+
+
+        $('#myModal').on('show.bs.modal', function () {
+            $('.feedback-modal-error, .feedback-modal-success').addClass('hidden');
+            $('.feedback-form, .feedback-modal-btn.send-btn').removeClass('hidden');
+
+        });
     });
 
 }]);
