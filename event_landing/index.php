@@ -790,6 +790,7 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
 
     <a href="#" class="btn btn-trans btn-lg btn-sponsors" ng-hide="!data.sponsors.become_a_sponsor_enabled"
        contenteditable
+       ng-click="data.sponsors.openFeedbackModal()"
        ng-model="data.sponsors.become_a_sponsor">{{data.sponsors.become_a_sponsor}}</a>
 
   </div>
@@ -877,9 +878,8 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
 <footer class="footers footer-1">
 
   <div class="container text-center">
-    <p class="contact-help"><a href="#" data-toggle="modal" class="accent" data-target="#myModal">Возникли вопросы?
-        Свяжитесь с нами</a>
-    </p>
+    <p class="contact-help">Возникли вопросы?</p>
+    <p><a href="#" class="btn btn-primary feedback-btn">Свяжитесь с нами</a></p>
 
     <ul class="socialize">
       <li ng-if="data.main.vk_url"><a href="#" target="_blank" ng-href="/away.php?url={{data.main.vk_url}}">
@@ -1162,7 +1162,7 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Закрыть"><span aria-hidden="true">&times;</span></button>
         <h4 class="modal-title" id="myModalLabel">Обратная связь с организатором</h4>
       </div>
       <div class="modal-body">
@@ -1177,7 +1177,7 @@ if (isset($_REQUEST['edit']) && $_REQUEST['edit'] == true) {
           </div>
           <div class="form-group">
             <label for="message-text" class="control-label">Сообщение:</label>
-            <textarea class="form-control" id="message-text"></textarea>
+            <textarea class="form-control" id="message-text" style=""></textarea>
           </div>
         </form>
       </div>

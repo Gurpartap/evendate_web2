@@ -518,6 +518,11 @@ __app.controller('WholeWorldController', ['$scope', 'Upload', '$timeout', functi
                 this.enabled = !this.enabled;
                 return false;
             },
+            openFeedbackModal: function(){
+                if (!$scope.edit_mode){
+                    $('#myModal').modal();
+                }
+            },
             items: {},
             toggleBecomeASponsor: function () {
                 this.become_a_sponsor_enabled = !this.become_a_sponsor_enabled;

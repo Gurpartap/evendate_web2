@@ -127,7 +127,11 @@ class Errors
 			"CANT_MAKE_LEGAL_ENTITY" => "Данный заказ невозможно оплатить с помощью юрлица",
 			"BAD_URL" => "Адрес может содержать только латинские буквы, цифры, знаки тире и нижнее подчеркивание",
 			"USES_RESERVED_URL" => "Данный заказ невозможно оплатить с помощью юрлица",
-			"ROLE_NAMES_ARE_REQUIRED" => "Небходимо указать роли"
+			"ROLE_NAMES_ARE_REQUIRED" => "Небходимо указать роли",
+			"BAD_USER_NAME" => "Небходимо указать имя",
+			"BAD_USER_EMAIL" => "Небходимо указать email",
+			"BAD_USER_MESSAGE" => "Небходимо указать сообщение",
+			"TOO_BIG_SUM" => "Указано слишком большое значение для вывода"
 		);
 		if (isset($error_names[$error_name])) {
 			return $error_names[$error_name];

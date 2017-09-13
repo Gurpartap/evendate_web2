@@ -775,3 +775,22 @@ input::-moz-focus-outer {
     display: table ! important;
     margin: 0 auto;
 }
+
+#message-text {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.modal-content button.btn,
+.feedback-btn {
+    font-size: 15px;
+    outline: none;
+}
+
+.modal-content button.btn.btn-primary{
+    background-color: var(--base);
+}
+
+.feedback-btn{
+    background-color: var(--accent);
+}
