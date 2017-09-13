@@ -1,64 +1,3 @@
-sendPostMessage = (function(w) {
-	var sendMessage = (function() {
-		function postMessageFactory(command) {
-			
-			return function(data) {
-				
-				return w.parent.postMessage(JSON.stringify({
-					command: command,
-					data: data
-				}), '*')
-			};
-		}
-		
-		return {
-			redirect: postMessageFactory('redirect'),
-			ready: postMessageFactory('ready'),
-			setHeight: postMessageFactory('setHeight')
-		};
-	}());
-	
-	/**
-	 *
-	 * @param {object} event
-	 * @param {string} event.data
-	 * @param {string} event.origin
-	 * @param {Window} event.source
-	 */
-	function listener(event) {
-		var resp = JSON.parse(event.data);
-		
-		switch (resp.command) {
-			case 'setColor': {
-				
-				return !function(color){
-					
-					return w.document.body.style.setProperty('--color_accent', color);
-				}(resp.data);
-			}
-			case 'getHeight': {
-				
-				return sendMessage.setHeight(calcHeight());
-			}
-			case 'authDone': {
-				
-				return !function(auth_done_link) {
-					
-					return w.location.href = auth_done_link;
-				}(resp.data);
-			}
-		}
-	}
-	
-	if (w.addEventListener) {
-		w.addEventListener("message", listener);
-	} else {
-		w.attachEvent("onmessage", listener);
-	}
-	
-	return sendMessage;
-}(window));
-
 function calcHeight() {
 	var $content = $('.Content');
 	
@@ -74,6 +13,22 @@ function calcHeight() {
 	return document.scrollingElement.scrollHeight;
 }
 
+__APP.POST_MESSAGE.listen(PostMessageConnection.AVAILABLE_COMMANDS.SET_COLOR, function(color) {
+	
+	return this.document.body.style.setProperty('--color_accent', color, '');
+});
+
+__APP.POST_MESSAGE.listen(PostMessageConnection.AVAILABLE_COMMANDS.GET_HEIGHT, function() {
+	
+	return __APP.POST_MESSAGE.setHeight(calcHeight());
+});
+
+__APP.POST_MESSAGE.listen(PostMessageConnection.AVAILABLE_COMMANDS.REDIRECT, function(redirect_uri) {
+	
+	return this.location.href = redirect_uri;
+});
+
+
 $(document)
 	.ajaxStart(function() {
 		Pace.restart()
@@ -83,10 +38,10 @@ $(document)
 			auth_urls_jqxhr,
 			cities_jqxhr;
 		
-		sendPostMessage.ready();
+		__APP.POST_MESSAGE.ready();
 		
 		(new MutationObserver(function() {
-			sendPostMessage.setHeight(calcHeight());
+			__APP.POST_MESSAGE.setHeight(calcHeight());
 		})).observe(document.body, {
 			childList: true,
 			subtree: true
