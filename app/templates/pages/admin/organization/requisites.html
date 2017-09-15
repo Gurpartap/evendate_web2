@@ -1,0 +1,75 @@
+<script type="javascript/template" id="tmpl-admin-organization-requisites-page">
+	<form class="page org_admin_requisites_page material -level_2_material Tabs RequisitesForm">
+		<div class="tabs_header HeaderTabs -color_accent">
+			<span class="tab Tab -active" data-type="legal_entity">Юридическое лицо</span>
+			<span class="tab Tab" data-type="natural_person">Физическое лицо</span>
+		</div>
+		<div class="tab_bodies_wrap TabsBodyWrapper">
+			<fieldset class="tab_body TabsBody -active">
+				<h3>Информация о компании</h3>
+				{l_company_form_field}
+				<fieldset class="CompanyAdditionalInfo -hidden">
+					<div class="form_group -parts_e_e -valign_baseline">
+						{l_inn_form_field}
+						{l_kpp_form_field}
+					</div>
+					{l_real_address_form_field}
+				</fieldset>
+
+				<h3>Банковские данные</h3>
+				{l_bank_name_form_field}
+				<fieldset class="LegalEntityBankAdditionalInfo -hidden">
+					<div class="form_group -parts_e_e -valign_baseline">
+						{l_bic_form_field}
+						{l_correspondent_account_form_field}
+					</div>
+				</fieldset>
+				{l_checking_account_form_field}
+
+				<h3>Подписывающее лицо</h3>
+				{l_signer_name_form_field}
+				{l_signer_position_form_field}
+
+				<h3>Контактная информация</h3>
+				{l_self_name_form_field}
+				<div class="form_group -parts_e_e -valign_baseline">
+					{l_self_email_form_field}
+					{l_self_phone_form_field}
+				</div>
+			</fieldset>
+			<fieldset class="tab_body TabsBody">
+				<h3>Информация об организаторе</h3>
+				{n_self_name_form_field}
+				{n_inn_form_field}
+				<div class="form_group -parts_e_e -valign_baseline">
+					{n_id_number_field}
+					{n_id_when_field}
+				</div>
+				{n_id_who_field}
+
+				{n_register_address_field}
+				{n_post_address_field}
+
+				<h3>Банковские данные</h3>
+				{n_bank_name_form_field}
+				<fieldset class="NaturalPersonBankAdditionalInfo -hidden">
+					<div class="form_group -parts_e_e -valign_baseline">
+						{n_bic_form_field}
+						{n_correspondent_account_form_field}
+					</div>
+				</fieldset>
+				{n_checking_account_form_field}
+
+				<h3>Контактная информация</h3>
+				<div class="form_group -parts_e_e -valign_baseline">
+					{n_self_email_form_field}
+					{n_self_phone_form_field}
+				</div>
+
+			</fieldset>
+		</div>
+		<div class="-align_center">
+			{submit_button}
+		</div>
+	</form>
+</script>

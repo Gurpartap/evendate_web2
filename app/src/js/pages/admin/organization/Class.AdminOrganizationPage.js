@@ -39,6 +39,7 @@ AdminOrganizationPage = extending(AdminPage, (function() {
 			{title: 'События', page: '/admin/organization/'+this.id+'/events'},
 			{title: 'Финансы', page: '/admin/organization/'+this.id+'/finances'},
 			{title: 'CRM', page: '/admin/organization/'+this.id+'/crm'},
+			//{title: 'Реквизиты', page: '/admin/organization/'+this.id+'/requisites'},
 			{title: 'Настройки', page: '/admin/organization/'+this.id+'/settings'},
 			{title: 'Редактирование', page: '/admin/organization/'+this.id+'/edit'}
 		];

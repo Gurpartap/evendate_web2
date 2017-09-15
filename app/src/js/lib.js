@@ -1740,10 +1740,12 @@ function isFormValid($form) {
 			if ( (el.required && (el.value.trim() === '' || !el.checkValidity())) || (el.value.trim() !== '' && !el.checkValidity()) ) {
 				handleErrorField(el);
 				
-				scrollTo(el, 400, function() {
-					showNotifier({text: $(el).data('error_message') || 'Заполнены не все обязательные поля', status: false});
-				});
-				is_valid = false;
+				if (is_valid) {
+					scrollTo(el, 400, function() {
+						showNotifier({text: $(el).data('error_message') || 'Заполнены не все обязательные поля', status: false});
+					});
+					is_valid = false;
+				}
 			}
 		});
 	}
@@ -2606,7 +2608,7 @@ function scrollTo($element, duration, complete) {
 	if (complete && !(complete instanceof Function)) {
 		complete = function() {};
 	}
-	$('body').stop().animate({
+	$(document.scrollingElement).stop().animate({
 		scrollTop: Math.ceil(scroll_top)
 	}, {
 		duration: duration ? duration : 400,
