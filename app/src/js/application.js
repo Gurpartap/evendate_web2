@@ -28,6 +28,7 @@ __APP = {
 					'overview': AdminOrganizationOverviewPage,
 					'events': AdminOrganizationEventsPage,
 					'crm': AdminOrganizationCRMPage,
+					'requisites': AdminOrganizationRequisitesPage,
 					'finances': AdminOrganizationFinancesPage,
 					'settings': AdminOrganizationSettingsPage,
 					'': AdminOrganizationOverviewPage

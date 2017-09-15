@@ -433,21 +433,26 @@ OrderPage = extending(Page, (function() {
 			
 			if (result !== false) {
 				result.done(function(data) {
-					var is_custom_callback = !!parsed_uri.queryKey['away_to'],
-						callback_url = parsed_uri.queryKey['away_to'] || '/event/' + self.event.id,
+					var callback_url,
 						parsed_callback;
 					
-					
-					if (is_custom_callback) {
-						parsed_callback = parseUri(decodeURIComponent(callback_url));
-						callback_url = parsed_callback.wo_query + '?registration=free' + (parsed_callback.query ? ('&' + parsed_callback.query) : '');
+					if (!!parsed_uri.queryKey['away_to']) {
+						callback_url = parsed_uri.queryKey['away_to'];
+						
+						if (self.overall_sum <= 0) {
+							parsed_callback = parseUri(decodeURIComponent(callback_url));
+							callback_url = parsed_callback.wo_query + objectToQueryString(Object.assign({
+								registration: 'free'
+							}, parsed_callback.query));
+						}
+						
 						if (__APP.IS_WIDGET) {
 							__APP.POST_MESSAGE.redirect(callback_url);
 						} else {
 							window.location = callback_url;
 						}
 					} else {
-						__APP.changeState(callback_url);
+						__APP.changeState('/event/{event_id}'.format({event_id: self.event.id}));
 						showNotifier({text: 'Регистрация прошла успешно', status: true});
 					}
 				})
