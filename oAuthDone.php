@@ -115,7 +115,7 @@ require_once('footer.php');
 										return data.redirect_to || redirect_to;
 									} else if (data.mobile === 'true') {
 
-										return '/mobileAuthDone.php?' + objectToQueryString(data);
+										return '/mobileAuthDone.php?' + objectToQueryString(auth_res.data);
 									} else if (organization_info) {
 
 										return '/add/organization';
