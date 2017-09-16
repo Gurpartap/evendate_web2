@@ -51,6 +51,7 @@ WithdrawModal = extending(AbstractModal, (function() {
 		
 		this.modal.find('.WithdrawFunds').on('click.WithdrawFunds', requestWithdrawFunds);
 		this.content.on('submit', requestWithdrawFunds);
+		this.__init();
 		
 		return this;
 	};
