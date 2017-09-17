@@ -47422,6 +47422,214 @@ Builder = (function() {
 }());
 /**
  *
+ * @class AppInspectorComponents
+ */
+AppInspectorComponents = (function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs AppInspectorComponents
+	 */
+	function AppInspectorComponents() {
+		if (typeof AppInspectorComponents.instance === 'object')
+			return AppInspectorComponents.instance;
+		
+		AppInspectorComponents.instance = this;
+	}
+	
+	/**
+	 *
+	 * @param {OneUser} user
+	 *
+	 * @return {jQuery}
+	 */
+	AppInspectorComponents.prototype.avatarBlock = function(user) {
+		return bindPageLinks(__APP.BUILD.avatarBlocks(user, {
+			is_link: true,
+			entity: __C.ENTITIES.USER,
+			avatar_classes: [__C.CLASSES.SIZES.X50, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]
+		}));
+	};
+	/**
+	 *
+	 * @param {(*|string)} title
+	 *
+	 * @return {jQuery}
+	 */
+	AppInspectorComponents.prototype.title = function(title) {
+		return tmpl('app-inspector-title', {
+			title: title
+		});
+	};
+	/**
+	 *
+	 * @param {(Array<OneTicket>|...OneTicket|TicketsCollection)} tickets
+	 *
+	 * @return {jQuery}
+	 */
+	AppInspectorComponents.prototype.tickets = function(tickets) {
+		var _tickets;
+		
+		if (arguments.length > 1) {
+			_tickets = [].slice.call(arguments)
+		} else {
+			_tickets = tickets instanceof Array ? tickets : [tickets]
+		}
+		
+		return tmpl('app-inspector-ticket', _tickets.map(function(ticket) {
+			
+			return {
+				fields: tmpl('fields-wrapper', [
+					{
+						classes: '-columns_2',
+						fields: tmpl('field', [
+							{name: 'Номер', value: formatTicketNumber(ticket.number)},
+							{name: 'Цена', value: ticket.price ? ticket.price : 'Бесплатно'}
+						])
+					},
+					{
+						classes: '-field_big',
+						fields: tmpl('field', {name: 'Название', value: ticket.ticket_type.name})
+					}
+				]),
+				footer: !ticket.checkout ? '' : tmpl('app-inspector-ticket-footer')
+			};
+		})).each(function(i, el) {
+			$(el).data('ticket', _tickets[i]);
+		});
+	};
+	/**
+	 *
+	 * @param {OneEvent} event
+	 *
+	 * @return {jQuery}
+	 */
+	AppInspectorComponents.prototype.event = function(event) {
+		
+		return bindPageLinks(tmpl('app-inspector-event', event));
+	};
+	
+	return AppInspectorComponents;
+}());
+/**
+ * @requires Class.AppInspectorComponents.js
+ */
+/**
+ *
+ * @class AbstractAppInspector
+ * @extends jQuery
+ */
+AbstractAppInspector = extendingJQuery((function() {
+	/**
+	 *
+	 * @constructor
+	 * @constructs AbstractAppInspector
+	 */
+	function AbstractAppInspector() {
+		var self = this;
+		
+		this.id = AbstractAppInspector.collection.push(this) - 1;
+		this.title = setDefaultValue(this.title, null);
+		this.$content = setDefaultValue(this.$content, $());
+		this.is_shown = false;
+		this.is_rendered = false;
+		
+		jQuery.fn.init.call(this, tmpl('app-inspector', {
+			id: this.id,
+			title: this.title,
+			content: this.$content
+		}));
+		
+		this.find('.AppInspectorRemoveButton').on('click.CloseInspector', function() {
+			self.hide();
+		});
+		
+		if (AbstractAppInspector.collection.length > 5) {
+			AbstractAppInspector.collection[0].destroy();
+		}
+	}
+	
+	AbstractAppInspector.$wrapper = $('.AppInspectorsWrapper');
+	/**
+	 *
+	 * @type {Array<AbstractAppInspector>}
+	 */
+	AbstractAppInspector.collection = [];
+	/**
+	 *
+	 * @type {AbstractAppInspector}
+	 */
+	AbstractAppInspector.currentInspector = null;
+	/**
+	 *
+	 * @type {AppInspectorComponents}
+	 */
+	AbstractAppInspector.build = new AppInspectorComponents();
+	
+	AbstractAppInspector.hideCurrent = function() {
+		if (AbstractAppInspector.currentInspector) {
+			AbstractAppInspector.currentInspector.hide();
+		}
+	};
+	
+	AbstractAppInspector.destroyAll = function() {
+		AbstractAppInspector.collection.forEach(function(inspector) {
+			inspector.destroy();
+		});
+	};
+	
+	AbstractAppInspector.prototype.render = function() {
+		AbstractAppInspector.$wrapper.append(this);
+		this.is_rendered = true;
+		this.initiate();
+		this.find('.AppInspectorScroll').scrollbar();
+	};
+	
+	AbstractAppInspector.prototype.initiate = function() {};
+	
+	AbstractAppInspector.prototype.show = function() {
+		var self = this;
+		
+		if (AbstractAppInspector.currentInspector) {
+			AbstractAppInspector.currentInspector.hide();
+		}
+		if (!this.is_rendered) {
+			this.render();
+		}
+		setTimeout(function() {
+			self.addClass(__C.CLASSES.SHOW);
+		}, 100);
+		AbstractAppInspector.currentInspector = this;
+		this.is_shown = true;
+	};
+	
+	AbstractAppInspector.prototype.hide = function() {
+		this.removeClass(__C.CLASSES.SHOW);
+		AbstractAppInspector.currentInspector = null;
+		this.is_shown = false;
+	};
+	
+	AbstractAppInspector.prototype.destroy = function() {
+		if(this.is_shown) {
+			this.hide();
+		}
+		AbstractAppInspector.collection.splice(this.id, 1);
+		this.is_rendered = false;
+		this.remove();
+	};
+	
+	$('body').on('keyup.CloseCurrentAppInspector', function(e) {
+		if (isKeyPressed(e, __C.KEY_CODES.ESC)) {
+			AbstractAppInspector.hideCurrent();
+		}
+	});
+	
+	Object.seal(AbstractAppInspector);
+	
+	return AbstractAppInspector;
+}()));
+/**
+ *
  * @abstract
  * @class
  */
