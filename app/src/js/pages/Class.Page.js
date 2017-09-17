@@ -125,11 +125,13 @@ Page = (function() {
 				__APP.changeTitle(PAGE.page_title_obj ? PAGE.page_title_obj : PAGE.page_title);
 			}
 			
-			if (PAGE.with_header_tabs) {
-				__APP.TOP_BAR.renderHeaderTabs(PAGE.renderHeaderTabs());
-				__APP.TOP_BAR.showTabs();
-			} else {
-				__APP.TOP_BAR.hideTabs();
+			if (!__APP.IS_WIDGET) {
+				if (PAGE.with_header_tabs) {
+					__APP.TOP_BAR.renderHeaderTabs(PAGE.renderHeaderTabs());
+					__APP.TOP_BAR.showTabs();
+				} else {
+					__APP.TOP_BAR.hideTabs();
+				}
 			}
 			
 			$(document.scrollingElement).scrollTop(0);
