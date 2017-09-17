@@ -53,7 +53,7 @@ AdminEventPage = extending(AdminPage, (function() {
 		}
 		tabs.push({title: 'Редактирование', page: '/admin/event/'+this.id+'/edit'});
 		
-		__APP.renderHeaderTabs(tabs);
+		return tabs;
 	};
 	
 	return AdminEventPage;

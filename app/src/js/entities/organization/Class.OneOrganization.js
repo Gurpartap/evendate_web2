@@ -185,6 +185,7 @@ OneOrganization = extending(OneEntity, (function() {
 	}
 	
 	OneOrganization.ENDPOINT = Object.freeze({
+		FEEDBACK: '/organizations/{org_id}/feedback',
 		WITHDRAW: '/organizations/{org_id}/withdraws'
 	});
 	/**
@@ -299,6 +300,23 @@ OneOrganization = extending(OneEntity, (function() {
 			sum: amount,
 			comment: comment
 		}, false, success);
+	};
+	/**
+	 *
+	 * @param {number} org_id
+	 * @param {object} data
+	 * @param {string} data.name
+	 * @param {string} data.email
+	 * @param {string} data.message
+	 * @param {string} [data.phone]
+	 * @param {string} [data.url]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	OneOrganization.sendFeedback = function(org_id, data, success) {
+	
+		return __APP.SERVER.addData(OneOrganization.ENDPOINT.FEEDBACK.format({org_id: org_id}), data, false, success);
 	};
 	/**
 	 *
@@ -430,6 +448,22 @@ OneOrganization = extending(OneEntity, (function() {
 				success.call(self, self.finance.withdraws.last_pushed);
 			}
 		});
+	};
+	/**
+	 *
+	 * @param {object} data
+	 * @param {string} data.name
+	 * @param {string} data.email
+	 * @param {string} data.message
+	 * @param {string} [data.phone]
+	 * @param {string} [data.url]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	OneOrganization.prototype.sendFeedback = function(data, success) {
+		
+		return OneOrganization.sendFeedback(this.id, data, success);
 	};
 	
 	

@@ -138,7 +138,7 @@ if (checkRedirect()) {
 			 */
 			History.Adapter.bind(window, 'statechange', function() {
 				if (!History.stateChangeHandled) {
-					__APP.reInit();
+					__APP.init();
 				}
 			});
 			

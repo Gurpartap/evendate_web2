@@ -61,7 +61,7 @@ __APP = {
 				History.pushState({parsed_page_uri: parsed_uri}, '', parsed_uri.path);
 			}
 			if (!soft_change || (soft_change && reload)) {
-				__APP.reInit();
+				__APP.init();
 			}
 		} else {
 			console.error('Need to pass page name');
@@ -75,28 +75,25 @@ __APP = {
 		
 		return __APP.changeState(location.pathname, true, true);
 	},
-	init: function appInit() {
-		var $sidebar_nav_items = $('.SidebarNavItem'),
-			pathname = window.location.pathname;
-		
-		__APP.CURRENT_PAGE = Page.routeNewPage(pathname);
-		__APP.CURRENT_PAGE.fetchData();
-		__APP.CURRENT_PAGE.show();
-		
-		$sidebar_nav_items
-			.removeClass(__C.CLASSES.ACTIVE)
-			.filter(function() {
-				return pathname.indexOf(this.getAttribute('href')) === 0;
-			})
-			.addClass(__C.CLASSES.ACTIVE);
-	},
-	reInit: function appReInit() {
+	openPage: function(page) {
 		$(window).off('scroll');
 		
+		AbstractAppInspector.hideCurrent();
 		__APP.SERVER.abortAllConnections();
 		__APP.PREVIOUS_PAGE = __APP.CURRENT_PAGE;
 		__APP.PREVIOUS_PAGE.destroy();
-		__APP.init();
+		
+		__APP.CURRENT_PAGE = page;
+		__APP.CURRENT_PAGE.fetchData();
+		__APP.CURRENT_PAGE.show();
+		
+		return __APP.CURRENT_PAGE;
+	},
+	init: function appInit() {
+		var pathname = window.location.pathname;
+		
+		__APP.openPage(Page.routeNewPage(pathname));
+		__APP.SIDEBAR.activateNavItem(pathname);
 	}
 };
 
