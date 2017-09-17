@@ -60,6 +60,7 @@ var gulp = require('gulp'),
 			js_path + 'modals/Class.BitcoinModal.js',
 			
 			js_path + 'ui/Class.Builder.js',
+			js_path + 'ui/inspectors/Class.AbstractAppInspector.js',
 			
 			js_path + 'pages/order/*.js',
 			js_path + 'pages/Class.NotFoundPage.js',
