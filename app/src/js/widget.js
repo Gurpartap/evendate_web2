@@ -78,7 +78,6 @@ __APP = {
 	openPage: function(page) {
 		$(window).off('scroll');
 		
-		AbstractAppInspector.hideCurrent();
 		__APP.SERVER.abortAllConnections();
 		__APP.PREVIOUS_PAGE = __APP.CURRENT_PAGE;
 		__APP.PREVIOUS_PAGE.destroy();
@@ -90,10 +89,7 @@ __APP = {
 		return __APP.CURRENT_PAGE;
 	},
 	init: function appInit() {
-		var pathname = window.location.pathname;
-		
-		__APP.openPage(Page.routeNewPage(pathname));
-		__APP.SIDEBAR.activateNavItem(pathname);
+		__APP.openPage(Page.routeNewPage(window.location.pathname));
 	}
 };
 
