@@ -73,13 +73,19 @@ Page = (function() {
 			
 		}, __APP.ROUTING);
 		
-		PageClass = (PageClass.prototype instanceof Page) ? PageClass : ((PageClass[''] && PageClass[''].prototype instanceof Page) ? PageClass[''] : NotFoundPage); // Open default page
+		if (!(PageClass.prototype instanceof Page)) {
+			if (PageClass[''] && PageClass[''].prototype instanceof Page) {
+				PageClass = PageClass[''];
+			} else {
+				PageClass = NotFoundPage;
+			}
+		}
+		
 		return new (Function.prototype.bind.apply(PageClass, [null].concat(args)))(); // new Page(...args)
 	};
 	
 	Page.prototype.show = function() {
 		var PAGE = this,
-			$main_header = $('#main_header'),
 			is_other_page = __APP.PREVIOUS_PAGE.wrapper_tmpl !== PAGE.wrapper_tmpl,
 			wrapper_field = is_other_page ? '$view' : '$wrapper',
 			$prev = __APP.PREVIOUS_PAGE[wrapper_field].length ? __APP.PREVIOUS_PAGE[wrapper_field] : is_other_page ? $('.PageView') : $('.PageView').find('.Content'),
@@ -91,12 +97,6 @@ Page = (function() {
 		
 		setTimeout(function() {
 			$prev.addClass(__C.CLASSES.HIDDEN);
-			
-			if (PAGE.with_header_tabs) {
-				$main_header.addClass('-with_tabs');
-			} else {
-				$main_header.removeClass('-with_tabs');
-			}
 			
 			$('body').removeClass(function(index, css) {
 				return (css.match(/(^|\s)-state_\S+/g) || []).join(' ');
@@ -116,16 +116,23 @@ Page = (function() {
 		}, 200);
 		
 		$.when(PAGE.rendering_defer, PAGE.fetching_data_defer).done(function pageRender(){
-			var header_tabs;
+			if (PAGE.checkRedirect()) {
+				
+				return PAGE.redirect();
+			}
 			
 			if (PAGE.page_title_obj || PAGE.page_title) {
 				__APP.changeTitle(PAGE.page_title_obj ? PAGE.page_title_obj : PAGE.page_title);
 			}
-			header_tabs = PAGE.renderHeaderTabs();
-			if (header_tabs) {
-				__APP.renderHeaderTabs(header_tabs);
+			
+			if (PAGE.with_header_tabs) {
+				__APP.TOP_BAR.renderHeaderTabs(PAGE.renderHeaderTabs());
+				__APP.TOP_BAR.showTabs();
+			} else {
+				__APP.TOP_BAR.hideTabs();
 			}
-			$(window).scrollTop(0);
+			
+			$(document.scrollingElement).scrollTop(0);
 			PAGE.preRender();
 			PAGE.render();
 			$scroll_to = (state.data.parsed_page_uri && state.data.parsed_page_uri.anchor) ? PAGE.$wrapper.find('#' + state.data.parsed_page_uri.anchor) : $();
@@ -133,9 +140,7 @@ Page = (function() {
 			$('body').trigger('Page:change/end', [__APP.CURRENT_PAGE, __APP.PREVIOUS_PAGE]);
 			setTimeout(function() {
 				PAGE[wrapper_field].removeClass('-faded');
-				if ($scroll_to.length) {
-					scrollTo($scroll_to, 400);
-				}
+				scrollTo($scroll_to, 400);
 			}, 200);
 		});
 	};
@@ -143,8 +148,18 @@ Page = (function() {
 	Page.prototype.renderHeaderTabs = function() {};
 	
 	Page.prototype.fetchData = function() {
+		
 		return this.fetching_data_defer.resolve().promise();
 	};
+	
+	Page.prototype.checkRedirect = function() {
+		
+		return false;
+	};
+	
+	Page.prototype.redirect = function() {};
+	
+	Page.prototype.init = function() {};
 	
 	Page.prototype.preRender = function() {};
 	

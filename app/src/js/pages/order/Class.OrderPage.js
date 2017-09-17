@@ -179,24 +179,6 @@ OrderPage = extending(Page, (function() {
 			}
 		}
 	};
-	
-	OrderPage.prototype.disablePage = function(message) {
-		var self = this;
-		
-		this.$wrapper.find('.OrderFormWrapper').addClass(__C.CLASSES.DISABLED).attr('disabled', true);
-		
-		this.$wrapper.find('.OrderPage').append(__APP.BUILD.overlayCap(tmpl('order-overlay-cap-content', {
-			message: message,
-			return_button: __APP.BUILD.link({
-				page: '/event/' + this.event.id,
-				title: 'Вернуться на страницу события',
-				classes: [
-					__C.CLASSES.COMPONENT.BUTTON,
-					__C.CLASSES.COLORS.PRIMARY
-				]
-			})
-		})));
-	};
 	/**
 	 *
 	 * @return {{tickets: Array<{uuid: string, count: string}>, registration_fields: Array<{uuid: string, value: string}>, promocode: string}}
@@ -223,6 +205,17 @@ OrderPage = extending(Page, (function() {
 			}),
 			promocode: this.$wrapper.find('.PromocodeInput').val()
 		};
+	};
+	
+	OrderPage.prototype.checkRedirect = function() {
+		
+		return (this.event.ticketing_locally && !this.event.ticketing_available)
+		       || (this.event.registration_locally && !this.event.registration_available);
+	};
+	
+	OrderPage.prototype.redirect = function() {
+		
+		return __APP.openPage(new NotAvailableOrderPage(this.event));
 	};
 	
 	OrderPage.prototype.init = function() {
@@ -441,7 +434,7 @@ OrderPage = extending(Page, (function() {
 						
 						if (self.overall_sum <= 0) {
 							parsed_callback = parseUri(decodeURIComponent(callback_url));
-							callback_url = parsed_callback.wo_query + objectToQueryString(Object.assign({
+							callback_url = parsed_callback.wo_query + '?' + objectToQueryString(Object.assign({
 								registration: 'free'
 							}, parsed_callback.query));
 						}
@@ -596,20 +589,11 @@ OrderPage = extending(Page, (function() {
 	
 	OrderPage.prototype.render = function() {
 		if (__APP.USER.isLoggedOut()) {
+			
 			return (new AuthModal(window.location.href, false)).show();
 		}
 		
 		this.$wrapper.html(tmpl('order-page', this.render_vars));
-		
-		if (this.event.ticketing_locally) {
-			if (!this.event.ticketing_available) {
-				this.disablePage('Заказ билетов на событие невозможен');
-			}
-		} else {
-			if (this.event.registration_locally && !this.event.registration_available) {
-				this.disablePage('Регистрация на событие не доступно');
-			}
-		}
 		
 		this.init();
 	};
