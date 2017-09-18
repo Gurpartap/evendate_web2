@@ -60,13 +60,10 @@ CatalogPage = extending(Page, (function() {
 		}).then(function() {
 			
 			return self.categories.fetchCategoriesWithOrganizations(self.categories_ajax_data, self.organizations_ajax_data, 0).done(function() {
-				self.all_organizations = self.categories
-					.reduce(function(collection, cat) {
-						return collection.setData(cat.organizations);
-					}, new OrganizationsCollection())
-					.sort(function(a, b) {
-						return b.subscribed_count - a.subscribed_count;
-					});
+				self.all_organizations.setData(self.categories.reduce(function(collection, cat) {
+					
+					return collection.concat.apply(collection, cat.organizations);
+				}, [])).sortBy('subscribed_count');
 			});
 		}).promise();
 	};
