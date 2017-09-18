@@ -45724,7 +45724,7 @@ AuthModal = extending(AbstractModal, (function() {
 				
 				if (self.redirect_to) {
 					try {
-						window.sessionStorage.setItem('redirect_after_auth', self.redirect_to);
+						window.localStorage.setItem('redirect_after_auth', self.redirect_to);
 					} catch (e) {}
 				}
 				
