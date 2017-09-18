@@ -28,6 +28,11 @@ __APP.POST_MESSAGE.listen(PostMessageConnection.AVAILABLE_COMMANDS.REDIRECT, fun
 	return this.location.href = redirect_uri;
 });
 
+__APP.POST_MESSAGE.listen(PostMessageConnection.AVAILABLE_COMMANDS.FETCH_REDIRECT_PARAM, function(data, source) {
+	
+	return __APP.POST_MESSAGE.passRedirectToParam(window.location, source);
+});
+
 
 $(document)
 	.ajaxStart(function() {
