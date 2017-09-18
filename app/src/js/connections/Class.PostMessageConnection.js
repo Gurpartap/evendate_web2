@@ -42,7 +42,8 @@ PostMessageConnection = (function() {
 	PostMessageConnection.AVAILABLE_COMMANDS = {
 		SET_COLOR: 'setColor',
 		GET_HEIGHT: 'getHeight',
-		REDIRECT: 'redirect'
+		REDIRECT: 'redirect',
+		FETCH_REDIRECT_PARAM: 'fetchRedirectToParam'
 	};
 	/**
 	 * @callback postMessageListenerCallback

@@ -38597,7 +38597,8 @@ PostMessageConnection = (function() {
 	PostMessageConnection.AVAILABLE_COMMANDS = {
 		SET_COLOR: 'setColor',
 		GET_HEIGHT: 'getHeight',
-		REDIRECT: 'redirect'
+		REDIRECT: 'redirect',
+		FETCH_REDIRECT_PARAM: 'fetchRedirectToParam'
 	};
 	/**
 	 * @callback postMessageListenerCallback
@@ -38705,6 +38706,17 @@ WidgetPostMessageConnection = extending(PostMessageConnection, (function() {
 	WidgetPostMessageConnection.prototype.setHeight = function(height, send_to_window) {
 		
 		return this.postMessageFactory('setHeight', height, send_to_window);
+	};
+	/**
+	 *
+	 * @param {string} redirect_uri
+	 * @param {Window} [send_to_window]
+	 *
+	 * @return void
+	 */
+	WidgetPostMessageConnection.prototype.passRedirectToParam = function(redirect_uri, send_to_window) {
+		
+		return this.postMessageFactory('passRedirectToParam', redirect_uri, send_to_window);
 	};
 	
 	return WidgetPostMessageConnection;
@@ -48939,6 +48951,11 @@ __APP.POST_MESSAGE.listen(PostMessageConnection.AVAILABLE_COMMANDS.GET_HEIGHT, f
 __APP.POST_MESSAGE.listen(PostMessageConnection.AVAILABLE_COMMANDS.REDIRECT, function(redirect_uri) {
 	
 	return this.location.href = redirect_uri;
+});
+
+__APP.POST_MESSAGE.listen(PostMessageConnection.AVAILABLE_COMMANDS.FETCH_REDIRECT_PARAM, function(data, source) {
+	
+	return __APP.POST_MESSAGE.passRedirectToParam(window.location, source);
 });
 
 
