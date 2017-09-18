@@ -48995,7 +48995,7 @@ $(document)
 		user_jqhxr = __APP.USER.fetchUser(new Fields('email'));
 		auth_urls_jqxhr = AsynchronousConnection.dealAjax(AsynchronousConnection.HTTP_METHODS.GET, '/auth.php', {
 			action: 'get_urls',
-			mobile: isNotDesktop()
+			mobile: false
 		});
 		cities_jqxhr = (new CitiesCollection()).fetchCities(new Fields('timediff_seconds', 'distance'), 1, 'distance');
 		
