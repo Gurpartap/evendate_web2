@@ -30,9 +30,42 @@ require_once 'footer.php';
 			try {
 				window.opener.location.href = link;
 			} catch (e) {
+				// IS WIDGET
+				function goToOAuthDone(event) {
+					var data;
+
+					if (event.origin.indexOf('evendate') !== -1) {
+						data = JSON.parse(event.data);
+
+						switch (data.command) {
+							case 'redirect': {
+
+								return window.location = data.data;
+							}
+						}
+
+						if (data.command === 'passRedirectToParam') {
+							link += '&redirect_to=' + data.data;
+
+							window.opener.postMessage(JSON.stringify({
+								command: 'redirect',
+								data: link
+							}), '*');
+						}
+					}
+
+					return null;
+				}
+
+				if (window.addEventListener) {
+					window.addEventListener('message', goToOAuthDone);
+				} else {
+					window.attachEvent('onmessage', goToOAuthDone);
+				}
+
 				window.opener.postMessage(JSON.stringify({
-					command: 'redirect',
-					data: link
+					command: 'fetchRedirectToParam',
+					data: null
 				}), '*');
 			}
 			window.close();

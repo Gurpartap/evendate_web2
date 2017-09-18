@@ -51,6 +51,17 @@ WidgetPostMessageConnection = extending(PostMessageConnection, (function() {
 		
 		return this.postMessageFactory('setHeight', height, send_to_window);
 	};
+	/**
+	 *
+	 * @param {string} redirect_uri
+	 * @param {Window} [send_to_window]
+	 *
+	 * @return void
+	 */
+	WidgetPostMessageConnection.prototype.passRedirectToParam = function(redirect_uri, send_to_window) {
+		
+		return this.postMessageFactory('passRedirectToParam', redirect_uri, send_to_window);
+	};
 	
 	return WidgetPostMessageConnection;
 }()));
