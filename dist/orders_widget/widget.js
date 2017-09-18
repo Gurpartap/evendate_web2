@@ -45728,7 +45728,7 @@ AuthModal = extending(AbstractModal, (function() {
 					} catch (e) {}
 				}
 				
-				if (isNotDesktop()) {
+				if (isNotDesktop() && !__APP.IS_WIDGET) {
 					window.location.href = __APP.AUTH_URLS[network];
 				} else {
 					window.open(__APP.AUTH_URLS[network], network.toUpperCase() + '_AUTH_WINDOW', 'status=1,toolbar=0,menubar=0&height=500,width=700');
