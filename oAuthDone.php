@@ -106,8 +106,8 @@ require_once('footer.php');
 
 									try {
 										organization_info = window.sessionStorage.getItem('organization_info');
-										redirect_to = window.sessionStorage.getItem('redirect_after_auth');
-										window.sessionStorage.removeItem('redirect_after_auth');
+										redirect_to = window.localStorage.getItem('redirect_after_auth');
+										window.localStorage.removeItem('redirect_after_auth');
 
 									} catch (e) {}
 									if (data.redirect_to || redirect_to) {
