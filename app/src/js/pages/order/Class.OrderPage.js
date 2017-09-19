@@ -460,10 +460,6 @@ OrderPage = extending(Page, (function() {
 					result.done(function(data) {
 						var parsed_uri = parseUri(location);
 						
-						try {
-							window.localStorage.setItem(self.event.id + '_order_info', JSON.stringify(parsed_uri.queryKey));
-						} catch (e) {}
-						
 						__APP.changeState(parsed_uri.path + '/' + data.order.uuid + '/from_legal_entity');
 					});
 				}
