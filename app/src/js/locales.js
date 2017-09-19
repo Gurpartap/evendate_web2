@@ -65,6 +65,7 @@ __LOCALES = {
 				
 				APPROVED: 'Подтверждено',
 				PAYED: 'Оплачено',
+				PAYED_LEGAL_ENTITY: 'Оплачено юрлицом',
 				WITHOUT_PAYMENT: 'Без оплаты',
 				
 				TICKETS_ARE_OVER: 'Билеты закончились',

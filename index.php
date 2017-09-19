@@ -35,9 +35,10 @@ try {
 
 	function isSkipOnboarding() {
 
-		return isset( $_REQUEST['skip_onboarding'] ) ||
-					 isset($_COOKIE['skip_onboarding']) ||
-					 filter_var($_COOKIE['skip_onboarding'], FILTER_VALIDATE_BOOLEAN) === true;
+		return isset( $_REQUEST['skip_onboarding'] ) || (
+				isset( $_COOKIE['skip_onboarding'] )
+				&& filter_var( $_COOKIE['skip_onboarding'], FILTER_VALIDATE_BOOLEAN ) === true
+			);
 	}
 
 	function isOnboardingPage() {
