@@ -131,14 +131,16 @@ LegalEntityPayment = extending(Page, (function() {
 			
 			if (isFormValid($form)) {
 				$loader = __APP.BUILD.overlayLoader(self.$wrapper);
-				self.order.makeLegalEntityPayment($form.serializeForm()).done(function() {
+				
+				self.order.makeLegalEntityPayment($form.serializeForm()).always(function() {
+					$loader.remove();
+				}).done(function() {
 					var $contract_wrapper = self.$wrapper.find('.LegalEntityPaymentContract');
 					
 					try {
 						window.localStorage.removeItem(self.event.id + '_order_info');
 					} catch (e) {}
 					
-					$loader.remove();
 					showNotifier({text: 'Договор-счет сформирован, вы можете его открыть, либо скачать', status: true});
 					
 					$form.attr('disabled', true);

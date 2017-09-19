@@ -40824,6 +40824,10 @@ OneOrder = extending(OneEntity, (function() {
 	
 	OneOrder.prototype.ID_PROP_NAME = 'uuid';
 	
+	OneOrder.ENDPOINT = Object.freeze({
+		LEGAL_ENTITY_CONTRACT: '/events/{event_id}/orders/{order_uuid}/legal_entity/contract'
+	});
+	
 	/**
 	 *
 	 * @enum {string}
@@ -40835,6 +40839,7 @@ OneOrder = extending(OneEntity, (function() {
 		
 		APPROVED: 'approved',
 		PAYED: 'payed',
+		PAYED_LEGAL_ENTITY: 'payed_legal_entity',
 		WITHOUT_PAYMENT: 'without_payment',
 		
 		RETURNED_BY_ORGANIZATION: 'returned_by_organization',
@@ -40876,6 +40881,7 @@ OneOrder = extending(OneEntity, (function() {
 		switch (status) {
 			case OneOrder.EXTENDED_ORDER_STATUSES.APPROVED:
 			case OneOrder.EXTENDED_ORDER_STATUSES.PAYED:
+			case OneOrder.EXTENDED_ORDER_STATUSES.PAYED_LEGAL_ENTITY:
 			case OneOrder.EXTENDED_ORDER_STATUSES.WITHOUT_PAYMENT: return true;
 			
 			default: return false;
@@ -46103,6 +46109,21 @@ Builder = (function() {
 	 *
 	 * @returns {jQuery}
 	 */
+	Builder.prototype.externalLink = function buildLink(props) {
+		
+		return tmpl('external-link', [].map.call(arguments, function(arg) {
+			
+			return Builder.normalizeBuildProps(arg);
+		}));
+	};
+	/**
+	 *
+	 * @param {...buildProps} props
+	 * @param {string} props.page
+	 * @param {string} props.title
+	 *
+	 * @returns {jQuery}
+	 */
 	Builder.prototype.link = function buildLink(props) {
 		
 		return bindPageLinks(tmpl('link', [].map.call(arguments, function(arg) {
@@ -47880,10 +47901,6 @@ OrderPage = extending(Page, (function() {
 			}
 		}
 		
-		if (!this.event.ticketing_locally) {
-			$footer.removeClass(__C.CLASSES.HIDDEN);
-		}
-		
 		bindRippleEffect(this.$wrapper);
 		bindControlSwitch(this.$wrapper);
 		initSelect2(this.$wrapper.find('.ToSelect2'), {
@@ -47971,17 +47988,7 @@ OrderPage = extending(Page, (function() {
 			}
 		}
 		
-		$quantity_inputs.on('QuantityInput::change', function(e, value) {
-			var is_selected = Array.prototype.reduce.call($quantity_inputs, function(accumulator, input) {
-				
-				return accumulator || input.value !== 0;
-			}, false);
-			
-			if (is_selected) {
-				$footer.removeClass(__C.CLASSES.HIDDEN);
-			} else {
-				$footer.addClass(__C.CLASSES.HIDDEN);
-			}
+		$quantity_inputs.on('QuantityInput::change', function() {
 			countTicketTypeSum($(this).closest('.TicketType'));
 			countTotalSum();
 		});
@@ -48005,26 +48012,39 @@ OrderPage = extending(Page, (function() {
 		
 		this.render_vars.pay_button.on('click.MakeOrder', function() {
 			var result,
-				callback_url = parsed_uri.queryKey['away_to'] || (window.location.origin + '/event/' + self.event.id);
+				callback_url = parsed_uri.queryKey['away_to'] || (window.location.origin + '/event/' + self.event.id),
+				is_type_selected;
 			
-			if (__APP.IS_WIDGET) {
-				makeOrder(function(send_data) {
-					$payload = self.$wrapper.find('.OrderFormPayload');
-					$payload.val(JSON.stringify(Object.assign({
-						redirect_to_payment: true,
-						callback_url: callback_url
-					}, send_data)));
-					
-					self.$wrapper.find('.OrderForm').submit();
-				});
-			} else {
-				result = makeOrder();
-				if (result !== false) {
-					result.done(function(data) {
+			is_type_selected = Array.prototype.reduce.call($quantity_inputs, function(accumulator, input) {
+				
+				return accumulator || input.value !== 0;
+			}, false);
+			
+			if (is_type_selected) {
+				if (__APP.IS_WIDGET) {
+					makeOrder(function(send_data) {
+						$payload = self.$wrapper.find('.OrderFormPayload');
+						$payload.val(JSON.stringify(Object.assign({
+							redirect_to_payment: true,
+							callback_url: callback_url
+						}, send_data)));
 						
-						Payment.doPayment('order-' + data.order.uuid, data.order.final_sum, callback_url);
-					})
+						self.$wrapper.find('.OrderForm').submit();
+					});
+				} else {
+					result = makeOrder();
+					if (result !== false) {
+						result.done(function(data) {
+							
+							Payment.doPayment('order-' + data.order.uuid, data.order.final_sum, callback_url);
+						})
+					}
 				}
+			} else {
+				showNotifier({
+					status: false,
+					text: 'Сначала выберите тип билета, который хотите приобрести'
+				});
 			}
 		});
 		
@@ -48066,10 +48086,6 @@ OrderPage = extending(Page, (function() {
 				if (result !== false) {
 					result.done(function(data) {
 						var parsed_uri = parseUri(location);
-						
-						try {
-							window.localStorage.setItem(self.event.id + '_order_info', JSON.stringify(parsed_uri.queryKey));
-						} catch (e) {}
 						
 						__APP.changeState(parsed_uri.path + '/' + data.order.uuid + '/from_legal_entity');
 					});
@@ -48232,12 +48248,6 @@ LegalEntityPayment = extending(Page, (function() {
 		
 		Page.call(this);
 		
-		try {
-			this.order_info = JSON.parse(window.localStorage.getItem(event_id + '_order_info')) || {};
-		} catch (e) {
-			this.order_info = {};
-		}
-		
 		this.order = new OneExtendedOrder(event_id, uuid);
 		this.order_fields = new Fields('sum');
 		
@@ -48346,14 +48356,16 @@ LegalEntityPayment = extending(Page, (function() {
 			
 			if (isFormValid($form)) {
 				$loader = __APP.BUILD.overlayLoader(self.$wrapper);
-				self.order.makeLegalEntityPayment($form.serializeForm()).done(function() {
+				
+				self.order.makeLegalEntityPayment($form.serializeForm()).always(function() {
+					$loader.remove();
+				}).done(function() {
 					var $contract_wrapper = self.$wrapper.find('.LegalEntityPaymentContract');
 					
 					try {
 						window.localStorage.removeItem(self.event.id + '_order_info');
 					} catch (e) {}
 					
-					$loader.remove();
 					showNotifier({text: 'Договор-счет сформирован, вы можете его открыть, либо скачать', status: true});
 					
 					$form.attr('disabled', true);
@@ -48544,10 +48556,6 @@ LegalEntityPayment = extending(Page, (function() {
 	
 	
 	LegalEntityPayment.prototype.render = function() {
-		if (empty(this.order_info)) {
-			//return __APP.changeState('/event/'+this.event.id+'/order');
-		}
-		
 		if (__APP.USER.isLoggedOut()) {
 			return (new AuthModal(window.location.href, false)).show();
 		}
@@ -48893,6 +48901,7 @@ __LOCALES = {
 				
 				APPROVED: 'Подтверждено',
 				PAYED: 'Оплачено',
+				PAYED_LEGAL_ENTITY: 'Оплачено юрлицом',
 				WITHOUT_PAYMENT: 'Без оплаты',
 				
 				TICKETS_ARE_OVER: 'Билеты закончились',
