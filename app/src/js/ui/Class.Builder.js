@@ -229,6 +229,21 @@ Builder = (function() {
 	 *
 	 * @returns {jQuery}
 	 */
+	Builder.prototype.externalLink = function buildLink(props) {
+		
+		return tmpl('external-link', [].map.call(arguments, function(arg) {
+			
+			return Builder.normalizeBuildProps(arg);
+		}));
+	};
+	/**
+	 *
+	 * @param {...buildProps} props
+	 * @param {string} props.page
+	 * @param {string} props.title
+	 *
+	 * @returns {jQuery}
+	 */
 	Builder.prototype.link = function buildLink(props) {
 		
 		return bindPageLinks(tmpl('link', [].map.call(arguments, function(arg) {
