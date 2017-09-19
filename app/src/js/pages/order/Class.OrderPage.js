@@ -273,10 +273,6 @@ OrderPage = extending(Page, (function() {
 			}
 		}
 		
-		if (!this.event.ticketing_locally) {
-			$footer.removeClass(__C.CLASSES.HIDDEN);
-		}
-		
 		bindRippleEffect(this.$wrapper);
 		bindControlSwitch(this.$wrapper);
 		initSelect2(this.$wrapper.find('.ToSelect2'), {
@@ -364,17 +360,7 @@ OrderPage = extending(Page, (function() {
 			}
 		}
 		
-		$quantity_inputs.on('QuantityInput::change', function(e, value) {
-			var is_selected = Array.prototype.reduce.call($quantity_inputs, function(accumulator, input) {
-				
-				return accumulator || input.value !== 0;
-			}, false);
-			
-			if (is_selected) {
-				$footer.removeClass(__C.CLASSES.HIDDEN);
-			} else {
-				$footer.addClass(__C.CLASSES.HIDDEN);
-			}
+		$quantity_inputs.on('QuantityInput::change', function() {
 			countTicketTypeSum($(this).closest('.TicketType'));
 			countTotalSum();
 		});
@@ -398,26 +384,39 @@ OrderPage = extending(Page, (function() {
 		
 		this.render_vars.pay_button.on('click.MakeOrder', function() {
 			var result,
-				callback_url = parsed_uri.queryKey['away_to'] || (window.location.origin + '/event/' + self.event.id);
+				callback_url = parsed_uri.queryKey['away_to'] || (window.location.origin + '/event/' + self.event.id),
+				is_type_selected;
 			
-			if (__APP.IS_WIDGET) {
-				makeOrder(function(send_data) {
-					$payload = self.$wrapper.find('.OrderFormPayload');
-					$payload.val(JSON.stringify(Object.assign({
-						redirect_to_payment: true,
-						callback_url: callback_url
-					}, send_data)));
-					
-					self.$wrapper.find('.OrderForm').submit();
-				});
-			} else {
-				result = makeOrder();
-				if (result !== false) {
-					result.done(function(data) {
+			is_type_selected = Array.prototype.reduce.call($quantity_inputs, function(accumulator, input) {
+				
+				return accumulator || input.value !== 0;
+			}, false);
+			
+			if (is_type_selected) {
+				if (__APP.IS_WIDGET) {
+					makeOrder(function(send_data) {
+						$payload = self.$wrapper.find('.OrderFormPayload');
+						$payload.val(JSON.stringify(Object.assign({
+							redirect_to_payment: true,
+							callback_url: callback_url
+						}, send_data)));
 						
-						Payment.doPayment('order-' + data.order.uuid, data.order.final_sum, callback_url);
-					})
+						self.$wrapper.find('.OrderForm').submit();
+					});
+				} else {
+					result = makeOrder();
+					if (result !== false) {
+						result.done(function(data) {
+							
+							Payment.doPayment('order-' + data.order.uuid, data.order.final_sum, callback_url);
+						})
+					}
 				}
+			} else {
+				showNotifier({
+					status: false,
+					text: 'Сначала выберите тип билета, который хотите приобрести'
+				});
 			}
 		});
 		

@@ -141,6 +141,10 @@
 	<button class="button {classes}" type="button" {attributes}><span class="Text">{title}</span></button>
 </script>
 
+<script type="javascript/template" id="tmpl-external-link">
+	<a href="{page}" class="{classes}" {dataset} {attributes}>{title}</a>
+</script>
+
 <script type="javascript/template" id="tmpl-link">
 	<a href="{page}" class="link {classes} Link" {dataset} {attributes}>{title}</a>
 </script>
@@ -509,7 +513,7 @@
 				{tickets_selling}
 				{registration}
 				<input class="OrderFormPayload" type="hidden" name="post_data">
-				<footer class="order_page_footer OrderFormFooter -align_center -hidden">
+				<footer class="order_page_footer OrderFormFooter -align_center">
 					<div class="form_unit">
 						<input id="order_agreement" class="form_checkbox Switch" type="checkbox" data-switch_id="order_agreement" required>
 						<label class="form_label" for="order_agreement">
