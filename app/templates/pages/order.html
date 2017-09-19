@@ -41,19 +41,19 @@
 	<fieldset class="order_ticket_types OrderFields">
 		<h3 class="order_page_subtitle">Выберите билеты</h3>
 		{ticket_types}
-		<footer class="order_ticket_types_footer">
-			<p class="-text_size_big">
-				<b class="-text_color_primary_80">Общая стоимость: </b>
-				<b class="-text_color_dark_primary"><span class="TicketsOverallSum">{overall_price}</span> ₽</b>
-			</p>
-			<div class="form_group -align_right -parts_2_1 PromocodeWrapper">
-				<div class="form_unit -unite -parts_e_3">
-					<input class="form_input PromocodeInput" placeholder="Промокод" name="promocode">
-					<button class="button -color_accent ActivatePromocode RippleEffect" type="button">Применить</button>
-				</div>
-			</div>
-		</footer>
 	</fieldset>
+	<footer class="order_ticket_types_footer">
+		<p class="-text_size_big">
+			<b class="-text_color_primary_80">Общая стоимость: </b>
+			<b class="-text_color_dark_primary"><span class="TicketsOverallSum">{overall_price}</span> ₽</b>
+		</p>
+		<div class="form_group -align_right -parts_2_1 PromocodeWrapper">
+			<div class="form_unit -unite -parts_e_3">
+				<input class="form_input PromocodeInput" placeholder="Промокод" name="promocode">
+				<button class="button -color_accent ActivatePromocode RippleEffect" type="button">Применить</button>
+			</div>
+		</div>
+	</footer>
 </script>
 
 <script type="javascript/template" id="tmpl-order-tickets-selling-promocode">
