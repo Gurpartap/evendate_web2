@@ -170,7 +170,10 @@ MyOrdersPage = extending(Page, (function() {
 							
 							return __APP.BUILD.externalLink({
 								title: 'Договор-счет',
-								page: '/email_files/Evendate-Bill-{uuid}.pdf'.format({uuid: order.uuid}),
+								page: '/api/v1' + OneOrder.ENDPOINT.LEGAL_ENTITY_CONTRACT.format({
+									event_id: order.event.id,
+									order_uuid: order.uuid
+								}),
 								classes: [
 									'orders_page_pay_button',
 									__C.CLASSES.COMPONENT.BUTTON,
