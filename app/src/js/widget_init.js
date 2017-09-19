@@ -28,6 +28,11 @@ __APP.POST_MESSAGE.listen(PostMessageConnection.AVAILABLE_COMMANDS.REDIRECT, fun
 	return this.location.href = redirect_uri;
 });
 
+__APP.POST_MESSAGE.listen(PostMessageConnection.AVAILABLE_COMMANDS.FETCH_REDIRECT_PARAM, function(data, source) {
+	
+	return __APP.POST_MESSAGE.passRedirectToParam(window.location.href, source);
+});
+
 
 $(document)
 	.ajaxStart(function() {
@@ -75,14 +80,14 @@ $(document)
 		 */
 		History.Adapter.bind(window, 'statechange', function() {
 			if (!History.stateChangeHandled) {
-				__APP.reInit();
+				__APP.init();
 			}
 		});
 		
 		user_jqhxr = __APP.USER.fetchUser(new Fields('email'));
 		auth_urls_jqxhr = AsynchronousConnection.dealAjax(AsynchronousConnection.HTTP_METHODS.GET, '/auth.php', {
 			action: 'get_urls',
-			mobile: isNotDesktop()
+			mobile: false
 		});
 		cities_jqxhr = (new CitiesCollection()).fetchCities(new Fields('timediff_seconds', 'distance'), 1, 'distance');
 		

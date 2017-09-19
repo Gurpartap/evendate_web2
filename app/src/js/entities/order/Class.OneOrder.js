@@ -121,6 +121,10 @@ OneOrder = extending(OneEntity, (function() {
 	
 	OneOrder.prototype.ID_PROP_NAME = 'uuid';
 	
+	OneOrder.ENDPOINT = Object.freeze({
+		LEGAL_ENTITY_CONTRACT: '/events/{event_id}/orders/{order_uuid}/legal_entity/contract'
+	});
+	
 	/**
 	 *
 	 * @enum {string}
@@ -132,6 +136,7 @@ OneOrder = extending(OneEntity, (function() {
 		
 		APPROVED: 'approved',
 		PAYED: 'payed',
+		PAYED_LEGAL_ENTITY: 'payed_legal_entity',
 		WITHOUT_PAYMENT: 'without_payment',
 		
 		RETURNED_BY_ORGANIZATION: 'returned_by_organization',
@@ -173,6 +178,7 @@ OneOrder = extending(OneEntity, (function() {
 		switch (status) {
 			case OneOrder.EXTENDED_ORDER_STATUSES.APPROVED:
 			case OneOrder.EXTENDED_ORDER_STATUSES.PAYED:
+			case OneOrder.EXTENDED_ORDER_STATUSES.PAYED_LEGAL_ENTITY:
 			case OneOrder.EXTENDED_ORDER_STATUSES.WITHOUT_PAYMENT: return true;
 			
 			default: return false;

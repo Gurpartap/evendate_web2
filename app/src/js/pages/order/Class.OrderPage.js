@@ -179,24 +179,6 @@ OrderPage = extending(Page, (function() {
 			}
 		}
 	};
-	
-	OrderPage.prototype.disablePage = function(message) {
-		var self = this;
-		
-		this.$wrapper.find('.OrderFormWrapper').addClass(__C.CLASSES.DISABLED).attr('disabled', true);
-		
-		this.$wrapper.find('.OrderPage').append(__APP.BUILD.overlayCap(tmpl('order-overlay-cap-content', {
-			message: message,
-			return_button: __APP.BUILD.link({
-				page: '/event/' + this.event.id,
-				title: 'Вернуться на страницу события',
-				classes: [
-					__C.CLASSES.COMPONENT.BUTTON,
-					__C.CLASSES.COLORS.PRIMARY
-				]
-			})
-		})));
-	};
 	/**
 	 *
 	 * @return {{tickets: Array<{uuid: string, count: string}>, registration_fields: Array<{uuid: string, value: string}>, promocode: string}}
@@ -223,6 +205,17 @@ OrderPage = extending(Page, (function() {
 			}),
 			promocode: this.$wrapper.find('.PromocodeInput').val()
 		};
+	};
+	
+	OrderPage.prototype.checkRedirect = function() {
+		
+		return (this.event.ticketing_locally && !this.event.ticketing_available)
+		       || (this.event.registration_locally && !this.event.registration_available);
+	};
+	
+	OrderPage.prototype.redirect = function() {
+		
+		return __APP.openPage(new NotAvailableOrderPage(this.event));
 	};
 	
 	OrderPage.prototype.init = function() {
@@ -278,10 +271,6 @@ OrderPage = extending(Page, (function() {
 					$pay_buttons.removeClass(__C.CLASSES.HIDDEN);
 				}
 			}
-		}
-		
-		if (!this.event.ticketing_locally) {
-			$footer.removeClass(__C.CLASSES.HIDDEN);
 		}
 		
 		bindRippleEffect(this.$wrapper);
@@ -371,17 +360,7 @@ OrderPage = extending(Page, (function() {
 			}
 		}
 		
-		$quantity_inputs.on('QuantityInput::change', function(e, value) {
-			var is_selected = Array.prototype.reduce.call($quantity_inputs, function(accumulator, input) {
-				
-				return accumulator || input.value !== 0;
-			}, false);
-			
-			if (is_selected) {
-				$footer.removeClass(__C.CLASSES.HIDDEN);
-			} else {
-				$footer.addClass(__C.CLASSES.HIDDEN);
-			}
+		$quantity_inputs.on('QuantityInput::change', function() {
 			countTicketTypeSum($(this).closest('.TicketType'));
 			countTotalSum();
 		});
@@ -405,26 +384,39 @@ OrderPage = extending(Page, (function() {
 		
 		this.render_vars.pay_button.on('click.MakeOrder', function() {
 			var result,
-				callback_url = parsed_uri.queryKey['away_to'] || (window.location.origin + '/event/' + self.event.id);
+				callback_url = parsed_uri.queryKey['away_to'] || (window.location.origin + '/event/' + self.event.id),
+				is_type_selected;
 			
-			if (__APP.IS_WIDGET) {
-				makeOrder(function(send_data) {
-					$payload = self.$wrapper.find('.OrderFormPayload');
-					$payload.val(JSON.stringify(Object.assign({
-						redirect_to_payment: true,
-						callback_url: callback_url
-					}, send_data)));
-					
-					self.$wrapper.find('.OrderForm').submit();
-				});
-			} else {
-				result = makeOrder();
-				if (result !== false) {
-					result.done(function(data) {
+			is_type_selected = Array.prototype.reduce.call($quantity_inputs, function(accumulator, input) {
+				
+				return accumulator || input.value !== 0;
+			}, false);
+			
+			if (is_type_selected) {
+				if (__APP.IS_WIDGET) {
+					makeOrder(function(send_data) {
+						$payload = self.$wrapper.find('.OrderFormPayload');
+						$payload.val(JSON.stringify(Object.assign({
+							redirect_to_payment: true,
+							callback_url: callback_url
+						}, send_data)));
 						
-						Payment.doPayment('order-' + data.order.uuid, data.order.final_sum, callback_url);
-					})
+						self.$wrapper.find('.OrderForm').submit();
+					});
+				} else {
+					result = makeOrder();
+					if (result !== false) {
+						result.done(function(data) {
+							
+							Payment.doPayment('order-' + data.order.uuid, data.order.final_sum, callback_url);
+						})
+					}
 				}
+			} else {
+				showNotifier({
+					status: false,
+					text: 'Сначала выберите тип билета, который хотите приобрести'
+				});
 			}
 		});
 		
@@ -433,21 +425,26 @@ OrderPage = extending(Page, (function() {
 			
 			if (result !== false) {
 				result.done(function(data) {
-					var is_custom_callback = !!parsed_uri.queryKey['away_to'],
-						callback_url = parsed_uri.queryKey['away_to'] || '/event/' + self.event.id,
+					var callback_url,
 						parsed_callback;
 					
-					
-					if (is_custom_callback) {
-						parsed_callback = parseUri(decodeURIComponent(callback_url));
-						callback_url = parsed_callback.wo_query + '?registration=free' + (parsed_callback.query ? ('&' + parsed_callback.query) : '');
+					if (!!parsed_uri.queryKey['away_to']) {
+						callback_url = parsed_uri.queryKey['away_to'];
+						
+						if (self.overall_sum <= 0) {
+							parsed_callback = parseUri(decodeURIComponent(callback_url));
+							callback_url = parsed_callback.wo_query + '?' + objectToQueryString(Object.assign({
+								registration: 'free'
+							}, parsed_callback.query));
+						}
+						
 						if (__APP.IS_WIDGET) {
 							__APP.POST_MESSAGE.redirect(callback_url);
 						} else {
 							window.location = callback_url;
 						}
 					} else {
-						__APP.changeState(callback_url);
+						__APP.changeState('/event/{event_id}'.format({event_id: self.event.id}));
 						showNotifier({text: 'Регистрация прошла успешно', status: true});
 					}
 				})
@@ -461,10 +458,6 @@ OrderPage = extending(Page, (function() {
 				if (result !== false) {
 					result.done(function(data) {
 						var parsed_uri = parseUri(location);
-						
-						try {
-							window.localStorage.setItem(self.event.id + '_order_info', JSON.stringify(parsed_uri.queryKey));
-						} catch (e) {}
 						
 						__APP.changeState(parsed_uri.path + '/' + data.order.uuid + '/from_legal_entity');
 					});
@@ -591,20 +584,11 @@ OrderPage = extending(Page, (function() {
 	
 	OrderPage.prototype.render = function() {
 		if (__APP.USER.isLoggedOut()) {
+			
 			return (new AuthModal(window.location.href, false)).show();
 		}
 		
 		this.$wrapper.html(tmpl('order-page', this.render_vars));
-		
-		if (this.event.ticketing_locally) {
-			if (!this.event.ticketing_available) {
-				this.disablePage('Заказ билетов на событие невозможен');
-			}
-		} else {
-			if (this.event.registration_locally && !this.event.registration_available) {
-				this.disablePage('Регистрация на событие не доступно');
-			}
-		}
 		
 		this.init();
 	};

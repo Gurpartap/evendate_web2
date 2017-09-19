@@ -1740,10 +1740,12 @@ function isFormValid($form) {
 			if ( (el.required && (el.value.trim() === '' || !el.checkValidity())) || (el.value.trim() !== '' && !el.checkValidity()) ) {
 				handleErrorField(el);
 				
-				scrollTo(el, 400, function() {
-					showNotifier({text: $(el).data('error_message') || 'Заполнены не все обязательные поля', status: false});
-				});
-				is_valid = false;
+				if (is_valid) {
+					scrollTo(el, 400, function() {
+						showNotifier({text: $(el).data('error_message') || 'Заполнены не все обязательные поля', status: false});
+					});
+					is_valid = false;
+				}
 			}
 		});
 	}
@@ -2591,27 +2593,29 @@ function isNotDesktop() {
  * @param {number} [duration=400]
  * @param {Function} [complete]
  *
- * @return {number} New scrollTop value
+ * @return {?number} New scrollTop value
  */
 function scrollTo($element, duration, complete) {
 	var scroll_top;
 	
 	if ($element instanceof jQuery) {
+		if (!$element.length) {
+			
+			return null;
+		}
 		scroll_top = $element.offset().top - 150;
 	} else if ($element instanceof Element) {
 		scroll_top = $($element).offset().top - 150;
 	} else {
 		scroll_top = $element - 150;
 	}
-	if (complete && !(complete instanceof Function)) {
-		complete = function() {};
-	}
-	$('body').stop().animate({
+	
+	$(document.scrollingElement).stop().animate({
 		scrollTop: Math.ceil(scroll_top)
 	}, {
 		duration: duration ? duration : 400,
 		easing: 'swing',
-		complete: complete
+		complete: isFunction(complete) ? complete : function() {}
 	});
 	
 	return scroll_top;

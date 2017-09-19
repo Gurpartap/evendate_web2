@@ -106,8 +106,8 @@ require_once('footer.php');
 
 									try {
 										organization_info = window.sessionStorage.getItem('organization_info');
-										redirect_to = window.sessionStorage.getItem('redirect_after_auth');
-										window.sessionStorage.removeItem('redirect_after_auth');
+										redirect_to = window.localStorage.getItem('redirect_after_auth');
+										window.localStorage.removeItem('redirect_after_auth');
 
 									} catch (e) {}
 									if (data.redirect_to || redirect_to) {
@@ -115,7 +115,7 @@ require_once('footer.php');
 										return data.redirect_to || redirect_to;
 									} else if (data.mobile === 'true') {
 
-										return '/mobileAuthDone.php?' + objectToQueryString(auth_res);
+										return '/mobileAuthDone.php?' + objectToQueryString(auth_res.data);
 									} else if (organization_info) {
 
 										return '/add/organization';

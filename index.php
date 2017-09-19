@@ -33,12 +33,22 @@ try {
 		$user->logout();
 	}
 
+	function isSkipOnboarding() {
+
+		return isset( $_REQUEST['skip_onboarding'] ) || (
+				isset( $_COOKIE['skip_onboarding'] )
+				&& filter_var( $_COOKIE['skip_onboarding'], FILTER_VALIDATE_BOOLEAN ) === true
+			);
+	}
+
+	function isOnboardingPage() {
+
+		return isset($_REQUEST['q']) && $_REQUEST['q'] != 'onboarding';
+	}
+
 	if (isset($_REQUEST['redirect_to'])) {
 		header('Location: ' . $_REQUEST['redirect_to']);
-	} elseif (
-		isset($_REQUEST['q']) && $_REQUEST['q'] != 'onboarding'
-		&& (!isset($_COOKIE['skip_onboarding']) || filter_var($_COOKIE['skip_onboarding'], FILTER_VALIDATE_BOOLEAN) == false)
-	) {
+	} elseif (!isOnboardingPage() && !isSkipOnboarding()) {
 		$subscriptions = OrganizationsCollection::filter(
 			$__db,
 			$user,
@@ -50,7 +60,7 @@ try {
 		if (count($subscriptions) == 0) {
 			header('Location: /onboarding');
 		};
-	} else if (isset($_REQUEST['q']) && $_REQUEST['q'] == 'onboarding' && isset($_COOKIE['skip_onboarding'])) {
+	} else if (isOnboardingPage() && isSkipOnboarding()) {
 		header('Location: /');
 	}
 

@@ -37602,10 +37602,12 @@ function isFormValid($form) {
 			if ( (el.required && (el.value.trim() === '' || !el.checkValidity())) || (el.value.trim() !== '' && !el.checkValidity()) ) {
 				handleErrorField(el);
 				
-				scrollTo(el, 400, function() {
-					showNotifier({text: $(el).data('error_message') || 'Заполнены не все обязательные поля', status: false});
-				});
-				is_valid = false;
+				if (is_valid) {
+					scrollTo(el, 400, function() {
+						showNotifier({text: $(el).data('error_message') || 'Заполнены не все обязательные поля', status: false});
+					});
+					is_valid = false;
+				}
 			}
 		});
 	}
@@ -38453,27 +38455,29 @@ function isNotDesktop() {
  * @param {number} [duration=400]
  * @param {Function} [complete]
  *
- * @return {number} New scrollTop value
+ * @return {?number} New scrollTop value
  */
 function scrollTo($element, duration, complete) {
 	var scroll_top;
 	
 	if ($element instanceof jQuery) {
+		if (!$element.length) {
+			
+			return null;
+		}
 		scroll_top = $element.offset().top - 150;
 	} else if ($element instanceof Element) {
 		scroll_top = $($element).offset().top - 150;
 	} else {
 		scroll_top = $element - 150;
 	}
-	if (complete && !(complete instanceof Function)) {
-		complete = function() {};
-	}
-	$('body').stop().animate({
+	
+	$(document.scrollingElement).stop().animate({
 		scrollTop: Math.ceil(scroll_top)
 	}, {
 		duration: duration ? duration : 400,
 		easing: 'swing',
-		complete: complete
+		complete: isFunction(complete) ? complete : function() {}
 	});
 	
 	return scroll_top;
@@ -38593,7 +38597,8 @@ PostMessageConnection = (function() {
 	PostMessageConnection.AVAILABLE_COMMANDS = {
 		SET_COLOR: 'setColor',
 		GET_HEIGHT: 'getHeight',
-		REDIRECT: 'redirect'
+		REDIRECT: 'redirect',
+		FETCH_REDIRECT_PARAM: 'fetchRedirectToParam'
 	};
 	/**
 	 * @callback postMessageListenerCallback
@@ -38631,7 +38636,7 @@ PostMessageConnection = (function() {
 				return null;
 			}
 			
-			if (!isFunction(callback) || (secure_origin && event.origin !== secure_origin)) {
+			if (resp.command !== command || !isFunction(callback) || (secure_origin && event.origin !== secure_origin)) {
 				
 				return null;
 			}
@@ -38701,6 +38706,17 @@ WidgetPostMessageConnection = extending(PostMessageConnection, (function() {
 	WidgetPostMessageConnection.prototype.setHeight = function(height, send_to_window) {
 		
 		return this.postMessageFactory('setHeight', height, send_to_window);
+	};
+	/**
+	 *
+	 * @param {string} redirect_uri
+	 * @param {Window} [send_to_window]
+	 *
+	 * @return void
+	 */
+	WidgetPostMessageConnection.prototype.passRedirectToParam = function(redirect_uri, send_to_window) {
+		
+		return this.postMessageFactory('passRedirectToParam', redirect_uri, send_to_window);
 	};
 	
 	return WidgetPostMessageConnection;
@@ -40808,6 +40824,10 @@ OneOrder = extending(OneEntity, (function() {
 	
 	OneOrder.prototype.ID_PROP_NAME = 'uuid';
 	
+	OneOrder.ENDPOINT = Object.freeze({
+		LEGAL_ENTITY_CONTRACT: '/events/{event_id}/orders/{order_uuid}/legal_entity/contract'
+	});
+	
 	/**
 	 *
 	 * @enum {string}
@@ -40819,6 +40839,7 @@ OneOrder = extending(OneEntity, (function() {
 		
 		APPROVED: 'approved',
 		PAYED: 'payed',
+		PAYED_LEGAL_ENTITY: 'payed_legal_entity',
 		WITHOUT_PAYMENT: 'without_payment',
 		
 		RETURNED_BY_ORGANIZATION: 'returned_by_organization',
@@ -40860,6 +40881,7 @@ OneOrder = extending(OneEntity, (function() {
 		switch (status) {
 			case OneOrder.EXTENDED_ORDER_STATUSES.APPROVED:
 			case OneOrder.EXTENDED_ORDER_STATUSES.PAYED:
+			case OneOrder.EXTENDED_ORDER_STATUSES.PAYED_LEGAL_ENTITY:
 			case OneOrder.EXTENDED_ORDER_STATUSES.WITHOUT_PAYMENT: return true;
 			
 			default: return false;
@@ -42584,6 +42606,7 @@ OneOrganization = extending(OneEntity, (function() {
 	}
 	
 	OneOrganization.ENDPOINT = Object.freeze({
+		FEEDBACK: '/organizations/{org_id}/feedback',
 		WITHDRAW: '/organizations/{org_id}/withdraws'
 	});
 	/**
@@ -42698,6 +42721,23 @@ OneOrganization = extending(OneEntity, (function() {
 			sum: amount,
 			comment: comment
 		}, false, success);
+	};
+	/**
+	 *
+	 * @param {number} org_id
+	 * @param {object} data
+	 * @param {string} data.name
+	 * @param {string} data.email
+	 * @param {string} data.message
+	 * @param {string} [data.phone]
+	 * @param {string} [data.url]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	OneOrganization.sendFeedback = function(org_id, data, success) {
+	
+		return __APP.SERVER.addData(OneOrganization.ENDPOINT.FEEDBACK.format({org_id: org_id}), data, false, success);
 	};
 	/**
 	 *
@@ -42829,6 +42869,22 @@ OneOrganization = extending(OneEntity, (function() {
 				success.call(self, self.finance.withdraws.last_pushed);
 			}
 		});
+	};
+	/**
+	 *
+	 * @param {object} data
+	 * @param {string} data.name
+	 * @param {string} data.email
+	 * @param {string} data.message
+	 * @param {string} [data.phone]
+	 * @param {string} [data.url]
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @return {jqPromise}
+	 */
+	OneOrganization.prototype.sendFeedback = function(data, success) {
+		
+		return OneOrganization.sendFeedback(this.id, data, success);
 	};
 	
 	
@@ -45686,11 +45742,11 @@ AuthModal = extending(AbstractModal, (function() {
 				
 				if (self.redirect_to) {
 					try {
-						window.sessionStorage.setItem('redirect_after_auth', self.redirect_to);
+						window.localStorage.setItem('redirect_after_auth', self.redirect_to);
 					} catch (e) {}
 				}
 				
-				if (isNotDesktop()) {
+				if (isNotDesktop() && !__APP.IS_WIDGET) {
 					window.location.href = __APP.AUTH_URLS[network];
 				} else {
 					window.open(__APP.AUTH_URLS[network], network.toUpperCase() + '_AUTH_WINDOW', 'status=1,toolbar=0,menubar=0&height=500,width=700');
@@ -46044,6 +46100,21 @@ Builder = (function() {
 				$(input).data(dataset);
 			}
 		});
+	};
+	/**
+	 *
+	 * @param {...buildProps} props
+	 * @param {string} props.page
+	 * @param {string} props.title
+	 *
+	 * @returns {jQuery}
+	 */
+	Builder.prototype.externalLink = function buildLink(props) {
+		
+		return tmpl('external-link', [].map.call(arguments, function(arg) {
+			
+			return Builder.normalizeBuildProps(arg);
+		}));
 	};
 	/**
 	 *
@@ -47457,13 +47528,19 @@ Page = (function() {
 			
 		}, __APP.ROUTING);
 		
-		PageClass = (PageClass.prototype instanceof Page) ? PageClass : ((PageClass[''] && PageClass[''].prototype instanceof Page) ? PageClass[''] : NotFoundPage); // Open default page
+		if (!(PageClass.prototype instanceof Page)) {
+			if (PageClass[''] && PageClass[''].prototype instanceof Page) {
+				PageClass = PageClass[''];
+			} else {
+				PageClass = NotFoundPage;
+			}
+		}
+		
 		return new (Function.prototype.bind.apply(PageClass, [null].concat(args)))(); // new Page(...args)
 	};
 	
 	Page.prototype.show = function() {
 		var PAGE = this,
-			$main_header = $('#main_header'),
 			is_other_page = __APP.PREVIOUS_PAGE.wrapper_tmpl !== PAGE.wrapper_tmpl,
 			wrapper_field = is_other_page ? '$view' : '$wrapper',
 			$prev = __APP.PREVIOUS_PAGE[wrapper_field].length ? __APP.PREVIOUS_PAGE[wrapper_field] : is_other_page ? $('.PageView') : $('.PageView').find('.Content'),
@@ -47475,12 +47552,6 @@ Page = (function() {
 		
 		setTimeout(function() {
 			$prev.addClass(__C.CLASSES.HIDDEN);
-			
-			if (PAGE.with_header_tabs) {
-				$main_header.addClass('-with_tabs');
-			} else {
-				$main_header.removeClass('-with_tabs');
-			}
 			
 			$('body').removeClass(function(index, css) {
 				return (css.match(/(^|\s)-state_\S+/g) || []).join(' ');
@@ -47500,16 +47571,25 @@ Page = (function() {
 		}, 200);
 		
 		$.when(PAGE.rendering_defer, PAGE.fetching_data_defer).done(function pageRender(){
-			var header_tabs;
+			if (PAGE.checkRedirect()) {
+				
+				return PAGE.redirect();
+			}
 			
 			if (PAGE.page_title_obj || PAGE.page_title) {
 				__APP.changeTitle(PAGE.page_title_obj ? PAGE.page_title_obj : PAGE.page_title);
 			}
-			header_tabs = PAGE.renderHeaderTabs();
-			if (header_tabs) {
-				__APP.renderHeaderTabs(header_tabs);
+			
+			if (!__APP.IS_WIDGET) {
+				if (PAGE.with_header_tabs) {
+					__APP.TOP_BAR.renderHeaderTabs(PAGE.renderHeaderTabs());
+					__APP.TOP_BAR.showTabs();
+				} else {
+					__APP.TOP_BAR.hideTabs();
+				}
 			}
-			$(window).scrollTop(0);
+			
+			$(document.scrollingElement).scrollTop(0);
 			PAGE.preRender();
 			PAGE.render();
 			$scroll_to = (state.data.parsed_page_uri && state.data.parsed_page_uri.anchor) ? PAGE.$wrapper.find('#' + state.data.parsed_page_uri.anchor) : $();
@@ -47517,9 +47597,7 @@ Page = (function() {
 			$('body').trigger('Page:change/end', [__APP.CURRENT_PAGE, __APP.PREVIOUS_PAGE]);
 			setTimeout(function() {
 				PAGE[wrapper_field].removeClass('-faded');
-				if ($scroll_to.length) {
-					scrollTo($scroll_to, 400);
-				}
+				scrollTo($scroll_to, 400);
 			}, 200);
 		});
 	};
@@ -47527,8 +47605,18 @@ Page = (function() {
 	Page.prototype.renderHeaderTabs = function() {};
 	
 	Page.prototype.fetchData = function() {
+		
 		return this.fetching_data_defer.resolve().promise();
 	};
+	
+	Page.prototype.checkRedirect = function() {
+		
+		return false;
+	};
+	
+	Page.prototype.redirect = function() {};
+	
+	Page.prototype.init = function() {};
 	
 	Page.prototype.preRender = function() {};
 	
@@ -47719,24 +47807,6 @@ OrderPage = extending(Page, (function() {
 			}
 		}
 	};
-	
-	OrderPage.prototype.disablePage = function(message) {
-		var self = this;
-		
-		this.$wrapper.find('.OrderFormWrapper').addClass(__C.CLASSES.DISABLED).attr('disabled', true);
-		
-		this.$wrapper.find('.OrderPage').append(__APP.BUILD.overlayCap(tmpl('order-overlay-cap-content', {
-			message: message,
-			return_button: __APP.BUILD.link({
-				page: '/event/' + this.event.id,
-				title: 'Вернуться на страницу события',
-				classes: [
-					__C.CLASSES.COMPONENT.BUTTON,
-					__C.CLASSES.COLORS.PRIMARY
-				]
-			})
-		})));
-	};
 	/**
 	 *
 	 * @return {{tickets: Array<{uuid: string, count: string}>, registration_fields: Array<{uuid: string, value: string}>, promocode: string}}
@@ -47763,6 +47833,17 @@ OrderPage = extending(Page, (function() {
 			}),
 			promocode: this.$wrapper.find('.PromocodeInput').val()
 		};
+	};
+	
+	OrderPage.prototype.checkRedirect = function() {
+		
+		return (this.event.ticketing_locally && !this.event.ticketing_available)
+		       || (this.event.registration_locally && !this.event.registration_available);
+	};
+	
+	OrderPage.prototype.redirect = function() {
+		
+		return __APP.openPage(new NotAvailableOrderPage(this.event));
 	};
 	
 	OrderPage.prototype.init = function() {
@@ -47818,10 +47899,6 @@ OrderPage = extending(Page, (function() {
 					$pay_buttons.removeClass(__C.CLASSES.HIDDEN);
 				}
 			}
-		}
-		
-		if (!this.event.ticketing_locally) {
-			$footer.removeClass(__C.CLASSES.HIDDEN);
 		}
 		
 		bindRippleEffect(this.$wrapper);
@@ -47911,17 +47988,7 @@ OrderPage = extending(Page, (function() {
 			}
 		}
 		
-		$quantity_inputs.on('QuantityInput::change', function(e, value) {
-			var is_selected = Array.prototype.reduce.call($quantity_inputs, function(accumulator, input) {
-				
-				return accumulator || input.value !== 0;
-			}, false);
-			
-			if (is_selected) {
-				$footer.removeClass(__C.CLASSES.HIDDEN);
-			} else {
-				$footer.addClass(__C.CLASSES.HIDDEN);
-			}
+		$quantity_inputs.on('QuantityInput::change', function() {
 			countTicketTypeSum($(this).closest('.TicketType'));
 			countTotalSum();
 		});
@@ -47945,26 +48012,39 @@ OrderPage = extending(Page, (function() {
 		
 		this.render_vars.pay_button.on('click.MakeOrder', function() {
 			var result,
-				callback_url = parsed_uri.queryKey['away_to'] || (window.location.origin + '/event/' + self.event.id);
+				callback_url = parsed_uri.queryKey['away_to'] || (window.location.origin + '/event/' + self.event.id),
+				is_type_selected;
 			
-			if (__APP.IS_WIDGET) {
-				makeOrder(function(send_data) {
-					$payload = self.$wrapper.find('.OrderFormPayload');
-					$payload.val(JSON.stringify(Object.assign({
-						redirect_to_payment: true,
-						callback_url: callback_url
-					}, send_data)));
-					
-					self.$wrapper.find('.OrderForm').submit();
-				});
-			} else {
-				result = makeOrder();
-				if (result !== false) {
-					result.done(function(data) {
+			is_type_selected = Array.prototype.reduce.call($quantity_inputs, function(accumulator, input) {
+				
+				return accumulator || input.value !== 0;
+			}, false);
+			
+			if (is_type_selected) {
+				if (__APP.IS_WIDGET) {
+					makeOrder(function(send_data) {
+						$payload = self.$wrapper.find('.OrderFormPayload');
+						$payload.val(JSON.stringify(Object.assign({
+							redirect_to_payment: true,
+							callback_url: callback_url
+						}, send_data)));
 						
-						Payment.doPayment('order-' + data.order.uuid, data.order.final_sum, callback_url);
-					})
+						self.$wrapper.find('.OrderForm').submit();
+					});
+				} else {
+					result = makeOrder();
+					if (result !== false) {
+						result.done(function(data) {
+							
+							Payment.doPayment('order-' + data.order.uuid, data.order.final_sum, callback_url);
+						})
+					}
 				}
+			} else {
+				showNotifier({
+					status: false,
+					text: 'Сначала выберите тип билета, который хотите приобрести'
+				});
 			}
 		});
 		
@@ -47973,21 +48053,26 @@ OrderPage = extending(Page, (function() {
 			
 			if (result !== false) {
 				result.done(function(data) {
-					var is_custom_callback = !!parsed_uri.queryKey['away_to'],
-						callback_url = parsed_uri.queryKey['away_to'] || '/event/' + self.event.id,
+					var callback_url,
 						parsed_callback;
 					
-					
-					if (is_custom_callback) {
-						parsed_callback = parseUri(decodeURIComponent(callback_url));
-						callback_url = parsed_callback.wo_query + '?registration=free' + (parsed_callback.query ? ('&' + parsed_callback.query) : '');
+					if (!!parsed_uri.queryKey['away_to']) {
+						callback_url = parsed_uri.queryKey['away_to'];
+						
+						if (self.overall_sum <= 0) {
+							parsed_callback = parseUri(decodeURIComponent(callback_url));
+							callback_url = parsed_callback.wo_query + '?' + objectToQueryString(Object.assign({
+								registration: 'free'
+							}, parsed_callback.query));
+						}
+						
 						if (__APP.IS_WIDGET) {
 							__APP.POST_MESSAGE.redirect(callback_url);
 						} else {
 							window.location = callback_url;
 						}
 					} else {
-						__APP.changeState(callback_url);
+						__APP.changeState('/event/{event_id}'.format({event_id: self.event.id}));
 						showNotifier({text: 'Регистрация прошла успешно', status: true});
 					}
 				})
@@ -48001,10 +48086,6 @@ OrderPage = extending(Page, (function() {
 				if (result !== false) {
 					result.done(function(data) {
 						var parsed_uri = parseUri(location);
-						
-						try {
-							window.localStorage.setItem(self.event.id + '_order_info', JSON.stringify(parsed_uri.queryKey));
-						} catch (e) {}
 						
 						__APP.changeState(parsed_uri.path + '/' + data.order.uuid + '/from_legal_entity');
 					});
@@ -48131,20 +48212,11 @@ OrderPage = extending(Page, (function() {
 	
 	OrderPage.prototype.render = function() {
 		if (__APP.USER.isLoggedOut()) {
+			
 			return (new AuthModal(window.location.href, false)).show();
 		}
 		
 		this.$wrapper.html(tmpl('order-page', this.render_vars));
-		
-		if (this.event.ticketing_locally) {
-			if (!this.event.ticketing_available) {
-				this.disablePage('Заказ билетов на событие невозможен');
-			}
-		} else {
-			if (this.event.registration_locally && !this.event.registration_available) {
-				this.disablePage('Регистрация на событие не доступно');
-			}
-		}
 		
 		this.init();
 	};
@@ -48175,12 +48247,6 @@ LegalEntityPayment = extending(Page, (function() {
 		var self = this;
 		
 		Page.call(this);
-		
-		try {
-			this.order_info = JSON.parse(window.localStorage.getItem(event_id + '_order_info')) || {};
-		} catch (e) {
-			this.order_info = {};
-		}
 		
 		this.order = new OneExtendedOrder(event_id, uuid);
 		this.order_fields = new Fields('sum');
@@ -48290,14 +48356,16 @@ LegalEntityPayment = extending(Page, (function() {
 			
 			if (isFormValid($form)) {
 				$loader = __APP.BUILD.overlayLoader(self.$wrapper);
-				self.order.makeLegalEntityPayment($form.serializeForm()).done(function() {
+				
+				self.order.makeLegalEntityPayment($form.serializeForm()).always(function() {
+					$loader.remove();
+				}).done(function() {
 					var $contract_wrapper = self.$wrapper.find('.LegalEntityPaymentContract');
 					
 					try {
 						window.localStorage.removeItem(self.event.id + '_order_info');
 					} catch (e) {}
 					
-					$loader.remove();
 					showNotifier({text: 'Договор-счет сформирован, вы можете его открыть, либо скачать', status: true});
 					
 					$form.attr('disabled', true);
@@ -48488,10 +48556,6 @@ LegalEntityPayment = extending(Page, (function() {
 	
 	
 	LegalEntityPayment.prototype.render = function() {
-		if (empty(this.order_info)) {
-			//return __APP.changeState('/event/'+this.event.id+'/order');
-		}
-		
 		if (__APP.USER.isLoggedOut()) {
 			return (new AuthModal(window.location.href, false)).show();
 		}
@@ -48502,6 +48566,149 @@ LegalEntityPayment = extending(Page, (function() {
 	};
 	
 	return LegalEntityPayment;
+}()));
+/**
+ * @requires ../Class.Page.js
+ */
+/**
+ *
+ * @class NotAvailableOrderPage
+ * @extends Page
+ */
+NotAvailableOrderPage = extending(Page, (function() {
+	/**
+	 *
+	 * @param {OneEvent} event
+	 *
+	 * @constructor
+	 * @constructs NotAvailableOrderPage
+	 *
+	 * @property {OneEvent} event
+	 */
+	function NotAvailableOrderPage(event) {
+		var self = this;
+		
+		Page.call(this);
+		
+		this.event = event;
+		
+		this.render_vars = {
+			name_field: null,
+			email_field: null,
+			phone_field: null,
+			message_field: null,
+			submit_button: null
+		};
+		
+		Object.defineProperties(this, {
+			page_title: {
+				get: function() {
+					
+					return (self.event.ticketing_locally ? 'Заказ билетов на событие ' : 'Регистрация на событие ') + self.event.title;
+				}
+			}
+		});
+	}
+	
+	NotAvailableOrderPage.prototype.disablePage = function(message) {
+		this.$wrapper.find('.OrderForm').remove();
+		
+		this.$wrapper.find('.OrderFormWrapper').append(__APP.BUILD.cap(tmpl('order-overlay-cap-content', {
+			message: message,
+			return_button: __APP.BUILD.link({
+				page: '/event/' + this.event.id,
+				title: 'Вернуться на страницу события',
+				classes: [
+					__C.CLASSES.COMPONENT.BUTTON,
+					__C.CLASSES.COLORS.PRIMARY
+				]
+			})
+		})));
+	};
+	
+	NotAvailableOrderPage.prototype.init = function() {
+		var self = this,
+			$form = this.$wrapper.find('.FeedbackForm'),
+			$form_wrapper = this.$wrapper.find('.FeedbackFormWrapper'),
+			$loader;
+		
+		this.render_vars.submit_button.on('click.SendFeedback', function() {
+			if (isFormValid($form)) {
+				$form_wrapper.addClass(__C.CLASSES.HIDDEN);
+				$loader = __APP.BUILD.loaderBlock();
+				$form_wrapper.after($loader);
+				self.event.organization.sendFeedback($form.serializeForm()).always(function() {
+					$loader.remove();
+				}).done(function() {
+					showNotifier({text: 'Сообщение успешно отправлено', status: true});
+					$form_wrapper.html(__APP.BUILD.linkButton({
+						title: 'Вернуться к событию',
+						page: '/event/{event_id}'.format({event_id: self.event.id}),
+						classes: [
+							__C.CLASSES.COLORS.ACCENT
+						]
+					}));
+					$form_wrapper.removeClass(__C.CLASSES.HIDDEN);
+				});
+			}
+		});
+	};
+	
+	NotAvailableOrderPage.prototype.preRender = function() {
+		this.render_vars.name_field = __APP.BUILD.formUnit({
+			label: 'Ваше имя',
+			id: 'order_page_feedback_form_name',
+			name: 'name',
+			value: __APP.USER.full_name,
+			placeholder: 'Имя',
+			helptext: 'Чтобы мы знали как в вам обращаться',
+			required: true
+		});
+		
+		this.render_vars.email_field = __APP.BUILD.formUnit({
+			label: 'Ваш e-mail',
+			id: 'order_page_feedback_form_email',
+			name: 'email',
+			value: __APP.USER.email,
+			placeholder: 'E-mail',
+			helptext: 'Чтобы мы знали как с вами связаться',
+			required: true
+		});
+		
+		this.render_vars.phone_field = __APP.BUILD.formUnit({
+			label: 'Ваш телефон',
+			id: 'order_page_feedback_form_phone',
+			name: 'phone',
+			placeholder: 'Номер телефона',
+			helptext: 'Будем звонить только в экстренных случаях!'
+		});
+		
+		this.render_vars.message_field = __APP.BUILD.formUnit({
+			label: 'Сообщение',
+			id: 'order_page_feedback_form_message',
+			name: 'message',
+			type: 'textarea',
+			placeholder: 'Сообщите нам, если что-то пошло не так, либо если у вас есть какие-то пожелания',
+			required: true
+		});
+		
+		this.render_vars.submit_button = __APP.BUILD.button({
+			title: 'Отправить',
+			classes: [
+				__C.CLASSES.COLORS.ACCENT,
+				'SendFeedbackButton'
+			]
+		});
+	};
+	
+	NotAvailableOrderPage.prototype.render = function() {
+		
+		this.$wrapper.html(tmpl('order-page-disabled', this.render_vars));
+		
+		this.init();
+	};
+	
+	return NotAvailableOrderPage;
 }()));
 /**
  * @requires Class.Page.js
@@ -48590,7 +48797,7 @@ __APP = {
 				History.pushState({parsed_page_uri: parsed_uri}, '', parsed_uri.path);
 			}
 			if (!soft_change || (soft_change && reload)) {
-				__APP.reInit();
+				__APP.init();
 			}
 		} else {
 			console.error('Need to pass page name');
@@ -48604,28 +48811,21 @@ __APP = {
 		
 		return __APP.changeState(location.pathname, true, true);
 	},
-	init: function appInit() {
-		var $sidebar_nav_items = $('.SidebarNavItem'),
-			pathname = window.location.pathname;
-		
-		__APP.CURRENT_PAGE = Page.routeNewPage(pathname);
-		__APP.CURRENT_PAGE.fetchData();
-		__APP.CURRENT_PAGE.show();
-		
-		$sidebar_nav_items
-			.removeClass(__C.CLASSES.ACTIVE)
-			.filter(function() {
-				return pathname.indexOf(this.getAttribute('href')) === 0;
-			})
-			.addClass(__C.CLASSES.ACTIVE);
-	},
-	reInit: function appReInit() {
+	openPage: function(page) {
 		$(window).off('scroll');
 		
 		__APP.SERVER.abortAllConnections();
 		__APP.PREVIOUS_PAGE = __APP.CURRENT_PAGE;
 		__APP.PREVIOUS_PAGE.destroy();
-		__APP.init();
+		
+		__APP.CURRENT_PAGE = page;
+		__APP.CURRENT_PAGE.fetchData();
+		__APP.CURRENT_PAGE.show();
+		
+		return __APP.CURRENT_PAGE;
+	},
+	init: function appInit() {
+		__APP.openPage(Page.routeNewPage(window.location.pathname));
 	}
 };
 
@@ -48701,6 +48901,7 @@ __LOCALES = {
 				
 				APPROVED: 'Подтверждено',
 				PAYED: 'Оплачено',
+				PAYED_LEGAL_ENTITY: 'Оплачено юрлицом',
 				WITHOUT_PAYMENT: 'Без оплаты',
 				
 				TICKETS_ARE_OVER: 'Билеты закончились',
@@ -48761,6 +48962,11 @@ __APP.POST_MESSAGE.listen(PostMessageConnection.AVAILABLE_COMMANDS.REDIRECT, fun
 	return this.location.href = redirect_uri;
 });
 
+__APP.POST_MESSAGE.listen(PostMessageConnection.AVAILABLE_COMMANDS.FETCH_REDIRECT_PARAM, function(data, source) {
+	
+	return __APP.POST_MESSAGE.passRedirectToParam(window.location.href, source);
+});
+
 
 $(document)
 	.ajaxStart(function() {
@@ -48808,14 +49014,14 @@ $(document)
 		 */
 		History.Adapter.bind(window, 'statechange', function() {
 			if (!History.stateChangeHandled) {
-				__APP.reInit();
+				__APP.init();
 			}
 		});
 		
 		user_jqhxr = __APP.USER.fetchUser(new Fields('email'));
 		auth_urls_jqxhr = AsynchronousConnection.dealAjax(AsynchronousConnection.HTTP_METHODS.GET, '/auth.php', {
 			action: 'get_urls',
-			mobile: isNotDesktop()
+			mobile: false
 		});
 		cities_jqxhr = (new CitiesCollection()).fetchCities(new Fields('timediff_seconds', 'distance'), 1, 'distance');
 		

@@ -23,12 +23,6 @@ LegalEntityPayment = extending(Page, (function() {
 		
 		Page.call(this);
 		
-		try {
-			this.order_info = JSON.parse(window.localStorage.getItem(event_id + '_order_info')) || {};
-		} catch (e) {
-			this.order_info = {};
-		}
-		
 		this.order = new OneExtendedOrder(event_id, uuid);
 		this.order_fields = new Fields('sum');
 		
@@ -137,14 +131,16 @@ LegalEntityPayment = extending(Page, (function() {
 			
 			if (isFormValid($form)) {
 				$loader = __APP.BUILD.overlayLoader(self.$wrapper);
-				self.order.makeLegalEntityPayment($form.serializeForm()).done(function() {
+				
+				self.order.makeLegalEntityPayment($form.serializeForm()).always(function() {
+					$loader.remove();
+				}).done(function() {
 					var $contract_wrapper = self.$wrapper.find('.LegalEntityPaymentContract');
 					
 					try {
 						window.localStorage.removeItem(self.event.id + '_order_info');
 					} catch (e) {}
 					
-					$loader.remove();
 					showNotifier({text: 'Договор-счет сформирован, вы можете его открыть, либо скачать', status: true});
 					
 					$form.attr('disabled', true);
@@ -335,10 +331,6 @@ LegalEntityPayment = extending(Page, (function() {
 	
 	
 	LegalEntityPayment.prototype.render = function() {
-		if (empty(this.order_info)) {
-			//return __APP.changeState('/event/'+this.event.id+'/order');
-		}
-		
 		if (__APP.USER.isLoggedOut()) {
 			return (new AuthModal(window.location.href, false)).show();
 		}

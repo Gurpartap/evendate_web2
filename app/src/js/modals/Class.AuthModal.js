@@ -55,11 +55,11 @@ AuthModal = extending(AbstractModal, (function() {
 				
 				if (self.redirect_to) {
 					try {
-						window.sessionStorage.setItem('redirect_after_auth', self.redirect_to);
+						window.localStorage.setItem('redirect_after_auth', self.redirect_to);
 					} catch (e) {}
 				}
 				
-				if (isNotDesktop()) {
+				if (isNotDesktop() && !__APP.IS_WIDGET) {
 					window.location.href = __APP.AUTH_URLS[network];
 				} else {
 					window.open(__APP.AUTH_URLS[network], network.toUpperCase() + '_AUTH_WINDOW', 'status=1,toolbar=0,menubar=0&height=500,width=700');

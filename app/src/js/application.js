@@ -28,6 +28,7 @@ __APP = {
 					'overview': AdminOrganizationOverviewPage,
 					'events': AdminOrganizationEventsPage,
 					'crm': AdminOrganizationCRMPage,
+					'requisites': AdminOrganizationRequisitesPage,
 					'finances': AdminOrganizationFinancesPage,
 					'settings': AdminOrganizationSettingsPage,
 					'': AdminOrganizationOverviewPage
@@ -143,67 +144,38 @@ __APP = {
 	BUILD: new Builder(),
 	IS_WIDGET: false,
 	/**
-	 * Rendering header tabs
-	 * @param {(buildProps|Array<buildProps>)} tabs
-	 */
-	renderHeaderTabs: function renderHeaderTabs(tabs) {
-		var $wrapper = $('#main_header_bottom').find('.HeaderTabsWrapper');
-		
-		tabs = tabs instanceof Array ? tabs : [tabs];
-		tabs.forEach(function(tab) {
-			tab = Builder.normalizeBuildProps(tab);
-			tab.classes.push('tab', 'Tab');
-			if (window.location.pathname.contains(tab.page)) {
-				tab.classes.push(__C.CLASSES.ACTIVE);
-			}
-		});
-		$wrapper.html(tmpl('tabs-header', {
-			color: 'default',
-			tabs: tmpl('link', tabs)
-		}));
-		bindTabs($wrapper, false);
-		bindPageLinks($wrapper);
-	},
-	/**
 	 * Changes title of the page
 	 * @param {(string|Array<{page: {string}, title: {string}}>|jQuery)} new_title
 	 */
 	changeTitle: function changeTitle(new_title) {
-		var $new_title = $(),
-			title_str;
-		if(typeof new_title === 'string') {
-			title_str = new_title;
-			new_title = new_title.split(' > ');
-		}
-		switch (true) {
-			case (new_title instanceof Array): {
-				new_title.forEach(function(title_chunk, i) {
-					if (i) {
-						$new_title = $new_title.add('<span class="title_chunk fa_icon fa-angle-right -empty"></span>');
-					}
-					if (typeof title_chunk == 'object') {
-						title_chunk.toString = (Array.isArray(title_chunk)) ? Array.toSpaceSeparatedString : Object.toHtmlDataSet;
-						$new_title = $new_title.add('<a href="' + title_chunk.page + '" class="title_chunk link Link">' + title_chunk.title + '</a>');
-						new_title[i] = title_chunk.title;
-					} else {
-						$new_title = $new_title.add('<span class="title_chunk">' + title_chunk + '</span>');
-					}
-				});
-				if (!title_str) {
-					title_str = new_title.join(' > ');
+		var title_str;
+		
+		title_str = (function() {
+			if (typeof new_title === 'string') {
+				
+				return new_title;
+			} else if (new_title instanceof Array) {
+				if (typeof new_title[0] === 'object') {
+					
+					return new_title.map(function(title_chunk) {
+						if (typeof title_chunk === 'object') {
+							return title_chunk.title;
+						}
+						
+						return title_chunk;
+					}).join(' > ');
 				}
-				break;
+				
+				return new_title.join(' > ');
+			} else if (new_title instanceof jQuery) {
+				
+				return new_title.text();
 			}
-			case (new_title instanceof jQuery): {
-				$new_title = new_title;
-				new_title.each(function() {
-					if (this.text())
-						title_str += this.text() + ' ';
-				});
-				break;
-			}
-		}
-		bindPageLinks($('#page_title').html($new_title));
+			
+			return '';
+		}());
+		
+		__APP.TOP_BAR.changeTitle(new_title);
 		$('title').text(title_str ? title_str : 'Evendate');
 	},
 	/**
@@ -227,7 +199,7 @@ __APP = {
 				History.pushState({parsed_page_uri: parsed_uri}, '', parsed_uri.path);
 			}
 			if (!soft_change || (soft_change && reload)) {
-				__APP.reInit();
+				__APP.init();
 			}
 		} else {
 			console.error('Need to pass page name');
@@ -237,30 +209,28 @@ __APP = {
 		return false;
 	},
 	reload: function() {
+		
 		return __APP.changeState(location.pathname, true, true);
 	},
-	init: function appInit() {
-		var $sidebar_nav_items = $('.SidebarNavItem'),
-			pathname = window.location.pathname;
-		
-		__APP.CURRENT_PAGE = Page.routeNewPage(pathname);
-		__APP.CURRENT_PAGE.fetchData();
-		__APP.CURRENT_PAGE.show();
-		$sidebar_nav_items
-			.removeClass(__C.CLASSES.ACTIVE)
-			.filter(function() {
-				return pathname.indexOf(this.getAttribute('href')) === 0;
-			})
-			.addClass(__C.CLASSES.ACTIVE);
-	},
-	reInit: function appReInit() {
+	openPage: function(page) {
 		$(window).off('scroll');
 		
 		AbstractAppInspector.hideCurrent();
 		__APP.SERVER.abortAllConnections();
 		__APP.PREVIOUS_PAGE = __APP.CURRENT_PAGE;
 		__APP.PREVIOUS_PAGE.destroy();
-		__APP.init();
+		
+		__APP.CURRENT_PAGE = page;
+		__APP.CURRENT_PAGE.fetchData();
+		__APP.CURRENT_PAGE.show();
+		
+		return __APP.CURRENT_PAGE;
+	},
+	init: function appInit() {
+		var pathname = window.location.pathname;
+		
+		__APP.openPage(Page.routeNewPage(pathname));
+		__APP.SIDEBAR.activateNavItem(pathname);
 	}
 };
 
