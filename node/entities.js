@@ -216,6 +216,21 @@ module.exports = {
             'updated_at'
         ]
     }),
+    view_notifications_send_devices_for_user: sql.define({
+        name: 'view_notifications_send_devices_for_user',
+        columns: [
+            'device_token',
+            'id',
+            'token',
+            'user_id',
+            'created_at',
+            'updated_at',
+            'token_type',
+            'expires_on',
+            'client_type',
+            'device_name'
+        ]
+    }),
     view_notifications: sql.define({
         name: 'view_notifications',
         columns: [
@@ -428,7 +443,7 @@ module.exports = {
             'user_id',
             'notification_type_id',
             'is_sending',
-            'is_sent',
+            'done',
             'created_at',
             'updated_at',
         ]

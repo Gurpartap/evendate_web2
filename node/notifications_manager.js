@@ -52,7 +52,8 @@ NotificationsManager.prototype.create = function (notification, device, type) {
             ru: note.alert
         },
         include_player_ids: [device.device_token],
-        data: note.payload
+        data: note.payload,
+        __client_type: device.client_type
     };
 
     if (device.client_type === DEVICE_TYPES.IOS) {
@@ -67,7 +68,7 @@ NotificationsManager.prototype.create = function (notification, device, type) {
         note.send = function (callback) {
             callback(null, null);
         };
-        return;
+        return note;
     }
 
     note.send = function (callback) {

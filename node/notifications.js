@@ -89,20 +89,18 @@ class Notifications {
             ).where(view_auto_favored_devices.event_id.equals(data.event_id))
                 .toQuery()
         } else if (data.user_id) { // get devices of one user
-            q_get_to_send_devices = Entities.tokens.select(
-                Entities.tokens.id.distinct(),
-                Entities.tokens.token,
-                Entities.tokens.user_id,
-                Entities.tokens.created_at,
-                Entities.tokens.updated_at,
-                Entities.tokens.token_type,
-                Entities.tokens.expires_on,
-                Entities.tokens.device_token,
-                Entities.tokens.client_type,
-                Entities.tokens.device_name,
-                Entities.tokens.refresh_token,
-                Entities.tokens.uuid
-            ).where(Entities.tokens.user_id.equals(data.user_id))
+            q_get_to_send_devices = Entities.view_notifications_send_devices_for_user.select(
+                Entities.view_notifications_send_devices_for_user.id.distinct(),
+                Entities.view_notifications_send_devices_for_user.token,
+                Entities.view_notifications_send_devices_for_user.user_id,
+                Entities.view_notifications_send_devices_for_user.created_at,
+                Entities.view_notifications_send_devices_for_user.updated_at,
+                Entities.view_notifications_send_devices_for_user.token_type,
+                Entities.view_notifications_send_devices_for_user.expires_on,
+                Entities.view_notifications_send_devices_for_user.device_token,
+                Entities.view_notifications_send_devices_for_user.client_type,
+                Entities.view_notifications_send_devices_for_user.device_name
+            ).where(Entities.view_notifications_send_devices_for_user.user_id.equals(data.user_id))
                 .toQuery()
         }
 
@@ -281,7 +279,8 @@ class Notifications {
         notifications_recommendations.notification_type_id,
         users.first_name, 
         users.last_name,
-        notification_types.text
+        notification_types.text AS notification_type_text,
+        notification_types.text AS title
         FROM notifications_recommendations
         INNER JOIN notification_types ON notifications_recommendations.notification_type_id = notification_types.id
         INNER JOIN users ON users.id = notifications_recommendations.user_id
@@ -289,7 +288,7 @@ class Notifications {
 
         _this.settings.client.query(q_get_notifications, function (err, result) {
             if (err) {
-                _this.logger.error(errors);
+                _this.logger.error(err);
                 return
             }
 
@@ -303,11 +302,14 @@ class Notifications {
                     devices.forEach(function (device) {
 
                         if (device.device_token == null) return true;
+                        // console.log('NOTIFICATION!: ', notification);
+
+                        notification.title = 'Evendate';
 
                         let note = _this.notifications_manager.create(notification, device, 'recommendations_organizations');
 
-                        console.log(note);
-                        return;
+                        if (notification.user_id != 23 && notification.user_id != 14) return;
+                        console.log(device);
                         note.send(function (err, message_id) {
                             if (err) return _this.logger.error(err);
 
@@ -320,7 +322,7 @@ class Notifications {
                                 .toQuery();
 
                             _this.settings.client.query(q_upd_events_notifications, function (err) {
-                                if (err) _this.logger.error(errors);
+                                if (err) _this.logger.error(err);
                             });
 
                             let q_ins_notification = Entities.stat_notifications_recommendations.insert({
@@ -343,42 +345,63 @@ class Notifications {
 
     sendFriendInterestedIn() {
         let _this = this,
-            q_get_notifications = `SELECT 
-            notifications_recommendations.id,
-        notifications_recommendations.user_id,
-        notifications_recommendations.data,
-        notifications_recommendations.notification_type_id,
-        users.first_name, 
-        users.last_name,
-        notification_types.text
-        FROM notifications_recommendations
-        INNER JOIN notification_types ON notifications_recommendations.notification_type_id = notification_types.id
-        INNER JOIN users ON users.id = notifications_recommendations.user_id
-        WHERE done = FALSE AND notifications_recommendations.notification_type_id = 50`;
+            q_get_notifications = `SELECT
+  notifications_recommendations.id,
+  notifications_recommendations.user_id,
+  notifications_recommendations.data,
+  notifications_recommendations.data -> 'event_id' AS event_id,
+  notifications_recommendations.notification_type_id,
+  users.first_name,
+  users.last_name,
+  notification_types.text AS notification_type_text,
+  notification_types.text AS title,
+  events.title AS event_title
+FROM notifications_recommendations
+  INNER JOIN notification_types ON notifications_recommendations.notification_type_id = notification_types.id
+  INNER JOIN users ON users.id = notifications_recommendations.user_id
+  INNER JOIN events ON (notifications_recommendations.data ->> 'event_id')::BIGINT = events.id
+WHERE done = FALSE AND notifications_recommendations.notification_type_id = 51`;
 
         _this.settings.client.query(q_get_notifications, function (err, result) {
             if (err) {
-                _this.logger.error(errors);
+                _this.logger.error(err);
                 return
             }
 
             result.rows.forEach(function (notification) {
-                console.log(notification);
                 _this.getDevicesToSend({user_id: notification.user_id}, function (errors, devices) {
                     if (errors) {
                         _this.logger.error(errors);
                         return
                     }
 
+
                     devices.forEach(function (device) {
 
-                        if (device.device_token == null) return true;
+                        if (device.device_token == null || device.device_token.length != 36) return true;
 
-                        let note = _this.notifications_manager.create(notification, device, 'recommendations_organizations');
 
-                        console.log(note);
+                        notification.title = 'Evendate';
+                        let json_data = notification.data;
+                        if (json_data.hasOwnProperty('friends_count')
+                            && parseInt(json_data.friends_count) !== NaN
+                            && parseInt(json_data.friends_count) > 0) {
+                            notification.friends_count = ' и еще ' + json_data.friends_count + ' друзей';
+                        } else {
+                            notification.friends_count = '';
+                        }
 
-                        return ; //TODO: REMOVE IT BEFORE PUSH!
+                        let note = _this.notifications_manager.create(notification, device, 'events');
+
+
+                        if (notification.user_id != 23 && notification.user_id != 14) return;
+
+                        if (device.device_token.indexOf('35fe42ee-ee5f-472f-b629-4d34d0f08c30') !== -1) {
+                            console.log(device.device_token);
+                            console.log('FOUND!!!!!');
+                            console.log(notification);
+                        }
+
                         note.send(function (err, message_id) {
                             if (err) return _this.logger.error(err);
 

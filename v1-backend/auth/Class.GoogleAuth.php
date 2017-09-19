@@ -48,11 +48,16 @@ class GoogleAuth extends AbstractAuth
 
 	public function fillToInsData()
 	{
+		if (isset($this->user_info['image']['url'])) {
+			$avatar_url = $this->user_info['image']['url'];
+		} else {
+			$avatar_url = isset($this->user_info['cover']['coverPhoto']['url']) ? $this->user_info['cover']['coverPhoto']['url'] : null;
+		}
 
 		$this->to_ins_data = array(
 			'first_name' => $this->user_info['name']['givenName'],
 			'last_name' => $this->user_info['name']['familyName'],
-			'avatar_url' => isset($this->user_info['cover']['coverPhoto']['url']) ? $this->user_info['cover']['coverPhoto']['url'] : null,
+			'avatar_url' => $avatar_url,
 			'gender' => $this->getSex(),
 			'token' => $this->getUserToken(),
 			'email' => null,
@@ -94,7 +99,7 @@ class GoogleAuth extends AbstractAuth
 					'friend_uid' => $friend['uid'],
 				))
 				->set('updated_at', 'NOW()')
-			->bind;
+				->bind;
 		}
 		$q_ins->onConflictDoNothing();
 		App::DB()->prepareExecute($q_ins, 'CANT_INSERT_GOOGLE_DATA');

@@ -68,7 +68,6 @@ class Promocode extends AbstractEntity
 		if (isset($data['start_date'])) {
 			try {
 				$data['start_date'] = new DateTime($data['start_date']);
-				if ($data['start_date'] > $extremum_dates['last_event_date']) throw new InvalidArgumentException('');
 			} catch (Exception $e) {
 				throw new InvalidArgumentException('BAD_START_DATE');
 			}
@@ -79,7 +78,6 @@ class Promocode extends AbstractEntity
 		if (isset($data['end_date'])) {
 			try {
 				$data['end_date'] = new DateTime($data['end_date']);
-				if ($data['end_date'] > $extremum_dates['last_event_date']) throw new InvalidArgumentException('');
 			} catch (Exception $e) {
 				throw new InvalidArgumentException('BAD_END_DATE');
 			}
