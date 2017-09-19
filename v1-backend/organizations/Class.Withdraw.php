@@ -56,6 +56,14 @@ class Withdraw extends AbstractEntity
 				'comment' => $data['comment'] ?? null,
 			))
 		->returning(array('*'));
+		Emails::schedule('send_withdraw_email', 'withdraws@evendate.io', array(
+			'sum' => $data['sum'],
+			'number' => $data['number'] ?? null,
+			'user' => $user->getLastName() . ' ' . $user->getFirstName(),
+			'organization' => $organization->getShortName(),
+			'organization_id' => $organization->getId(),
+			'comment' => $data['comment'] ?? null
+		));
 		return new Result(true, '', App::DB()->prepareExecute($q_ins)->fetchAll());
 	}
 }

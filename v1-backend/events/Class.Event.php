@@ -1308,7 +1308,7 @@ class Event extends AbstractEntity
 		}
 
 		if (isset($fields[self::EMAIL_TEXTS_FIELD_NAME])) {
-			if ($user->isEventAdmin($this)) {
+			if ($user->hasRights($this->getOrganization(), array(Roles::ROLE_MODERATOR, Roles::ROLE_ADMIN))) {
 				$result_data[self::EMAIL_TEXTS_FIELD_NAME] = $this->getEmailTexts();
 			}
 		}
@@ -1338,7 +1338,9 @@ class Event extends AbstractEntity
 
 
 		if (isset($fields[self::PROMOCODES_FIELD_NAME])) {
-			if ($user instanceof User && $user->isEventAdmin($this)) {
+			if ($user instanceof User &&
+				$user->hasRights($this->getOrganization(), array(Roles::ROLE_MODERATOR, Roles::ROLE_ADMIN))
+			) {
 				$promocode_fields = Fields::parseFields($fields[self::PROMOCODES_FIELD_NAME]['fields'] ?? '');
 				$promocodes = PromocodesCollection::filter(
 					$this->db,
@@ -1993,7 +1995,8 @@ class Event extends AbstractEntity
 		}
 	}
 
-	private function getFinance(User $user, $fields){
+	private function getFinance(User $user, $fields)
+	{
 		global $BACKEND_FULL_PATH;
 		require_once $BACKEND_FULL_PATH . '/statistics/Class.EventFinance.php';
 		$finance = new EventFinance($this->db, $this, $user);
