@@ -106,8 +106,3 @@ CREATE OR REPLACE VIEW view_sold_tickets AS
   WHERE tickets.ticket_order_id IN (1, 2, 4, 8, 9,
                                     10, 13)
   GROUP BY tickets.ticket_type_id, tickets.id, event_id;
-
-
-UPDATE users_organizations SET role_id = 2 WHERE user_id = 23 AND organization_id = 1;
-
-SELECT * FROM log_requests ORDER BY id DESC LIMIT 10;
