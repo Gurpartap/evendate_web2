@@ -71,7 +71,7 @@ class PromocodesCollection extends AbstractCollection
 				case 'statistics_event': {
 					if ($value instanceof Event == false) throw new InvalidArgumentException('BAD_EVENT');
 					if ($user instanceof User == false) throw new PrivilegesException('', $db);
-					if ($user->isEventAdmin($value) == false) throw new PrivilegesException('', $db);
+					if ($user->hasRights($value->getOrganization(), array(Roles::ROLE_ADMIN, Roles::ROLE_MODERATOR)) == false) throw new PrivilegesException('', $db);
 					$q_get_promocodes->where('event_id = :event_id');
 					$statements[':event_id'] = $value->getId();
 					break;

@@ -59,10 +59,12 @@ class VkPost
 				'query' => array(
 					'owner_id' => '-' . $data['guid'],
 					'from_group' => '1',
-					'message' => $data['description'],
 					'access_token' => $access_token,
 					'guid' => $data['event_id'],
 					'attachments' => implode(',', array($image_res['response'][0]['id'], $data['link'] ?? 'https://evendate.io/event/' . $data['event_id'])),
+				),
+				'form_params' => array(
+					'message' => $data['description'],
 				)
 			));
 

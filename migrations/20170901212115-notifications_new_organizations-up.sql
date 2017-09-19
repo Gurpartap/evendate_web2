@@ -5,10 +5,10 @@ ON CONFLICT (id)
     text = '{first_name}, новые и интересные места появились в каталоге';
 
 INSERT INTO notification_types (id, type, timediff, text)
-VALUES (51, 'notification-friend-interests', -1, 'Ваш друг {first_name} {last_name} интересутеся событием {title}')
+VALUES (51, 'notification-friend-interests', -1, '{first_name} {last_name}{friends_count} интересуется {event_title}')
 ON CONFLICT (id)
   DO UPDATE SET
-    text = 'Ваш друг {first_name} {last_name} интересутеся событием {title}';
+    text = '{first_name} {last_name}{friends_count} интересуется {event_title}';
 
 DROP TABLE notifications_recommendations CASCADE;
 DROP TABLE stat_notifications_recommendations CASCADE;
@@ -70,7 +70,7 @@ CREATE OR REPLACE VIEW view_recommendations_friend_interests_notifications AS
          AND notifications_recommendations.user_id = view_friends.friend_id
          AND (notifications_recommendations.data ->> 'event_id') :: INT = stat_events.event_id
   WHERE stat_event_types.type_code = 'fave' AND stat_event_types.entity = 'event'
-        AND stat_events.created_at > (NOW() - INTERVAL '4 hours')
+        AND stat_events.created_at > (NOW() - INTERVAL '2 hours')
         AND notifications_recommendations.id IS NULL;
 
 INSERT INTO notifications_recommendations (user_id, notification_type_id, data)
@@ -79,3 +79,30 @@ INSERT INTO notifications_recommendations (user_id, notification_type_id, data)
     notification_type_id,
     ('{"event_id": ' || event_id || ', "friends_count": ' || favored_friends_count || '}') :: JSONB AS data
   FROM view_recommendations_friend_interests_notifications;
+
+
+CREATE OR REPLACE VIEW view_notifications_send_devices_for_user AS
+  SELECT device_token,
+    id,
+    token,
+    user_id,
+    created_at,
+    updated_at,
+    token_type,
+    expires_on,
+    client_type,
+    device_name
+  FROM tokens
+    WHERE id IN (SELECT MAX(id) FROM tokens AS tks GROUP BY tks.device_token, user_id);
+
+
+CREATE OR REPLACE VIEW view_sold_tickets AS
+  SELECT
+    tickets.id,
+    tickets.ticket_type_id,
+    ticket_orders.event_id
+  FROM tickets
+    INNER JOIN ticket_orders ON tickets.ticket_order_id = ticket_orders.id
+  WHERE tickets.ticket_order_id IN (1, 2, 4, 8, 9,
+                                    10, 13)
+  GROUP BY tickets.ticket_type_id, tickets.id, event_id;

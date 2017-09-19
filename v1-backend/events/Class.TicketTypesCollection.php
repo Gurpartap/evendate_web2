@@ -1,6 +1,7 @@
 <?php
 
-class TicketTypesCollection extends AbstractCollection{
+class TicketTypesCollection extends AbstractCollection
+{
 	public static function filter(ExtendedPDO $db,
 																AbstractUser $user = null,
 																array $filters = null,
@@ -12,18 +13,25 @@ class TicketTypesCollection extends AbstractCollection{
 		$q_get = App::queryFactory()->newSelect();
 		$statements = array();
 		$is_one_type = false;
+		$check_status = true;
 
 		$additional_cols = TicketType::getAdditionalCols();
 
 		//For administrators there are additional fields
 
 		$from_table = 'view_ticket_types';
-		if (isset($filters['event']) && $user instanceof User){
-			if ($filters['event'] instanceof Event){
-				if ($user->isAdmin($filters['event']->getOrganization())){
+		if (isset($filters['event']) && $user instanceof User) {
+			if ($filters['event'] instanceof Event) {
+				if ($user->isAdmin($filters['event']->getOrganization())) {
 					$additional_cols = array_merge(TicketType::getAdditionalCols(), TicketType::$FIELDS_FOR_ADMINISTRATOR);
 					$from_table = 'view_all_ticket_types';
 				}
+			}
+		}
+		if (isset($filters['ticket']) && $user instanceof User) {
+			if ($filters['ticket'] instanceof Ticket) {
+				$from_table = 'view_all_ticket_types';
+				$check_status = false;
 			}
 		}
 
@@ -74,7 +82,7 @@ class TicketTypesCollection extends AbstractCollection{
 			->cols($cols)
 			->orderBy($order_by);
 
-		if ($from_table == 'view_all_ticket_types'){
+		if ($from_table == 'view_all_ticket_types' && $check_status) {
 			$q_get->where('status = true');
 		}
 
@@ -93,7 +101,7 @@ class TicketTypesCollection extends AbstractCollection{
 	public static function oneByUUID(ExtendedPDO $db,
 																	 AbstractUser $user,
 																	 string $uuid,
-																	 array $fields = null) : TicketType
+																	 array $fields = null): TicketType
 	{
 		return self::filter($db, $user, array('uuid' => $uuid), $fields);
 	}
