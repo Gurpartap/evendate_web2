@@ -29,7 +29,8 @@ AdminEventOrdersPage = extending(AdminEventPage, (function() {
 			'created_at',
 			'payment_type',
 			'shop_sum_amount',
-			'registration_fields', {
+			'registration_fields',
+			'promocode', {
 				user: {
 					fields: new Fields('email')
 				},
@@ -63,7 +64,26 @@ AdminEventOrdersPage = extending(AdminEventPage, (function() {
 		
 		this.ordersTable = this.$wrapper.find('.OrdersTable').eq(0).DataTable({
 			paging: true,
-			columnDefs: [
+			select: true,
+			columns: [
+				{
+					data: 'number',
+					render: function(data, type, row) {
+						
+						return tmpl('admin-event-orders-page-row-expand-wrapper', {
+							number: data
+						}).outerHTML();
+					}
+				},
+				{data: 'status'},
+				{data: 'orderer'},
+				{data: 'email'},
+				{
+					data: {
+						_: 'buy_time.display',
+						sort: 'buy_time.timestamp'
+					}
+				}
 			],
 			dom: 't<"data_tables_pagination"p>',
 			language: {
@@ -110,19 +130,57 @@ AdminEventOrdersPage = extending(AdminEventPage, (function() {
 		}));
 		
 		this.orders.fetchAllOrders(this.orders_fields).done(function() {
-			var $rows = tmpl('admin-event-orders-page-tr', self.orders.map(function(order) {
+			if (!self.ordersTable) {
+				self.initOrdersTable();
+			}
+			
+			self.ordersTable.rows.add(self.orders.map(function(order) {
 				
 				return {
 					uuid: order.uuid,
 					number: formatTicketNumber(order.number),
-					status: __APP.BUILD.orderStatusBlock(order.status_type_code),
+					status: __APP.BUILD.orderStatusBlock(order.status_type_code).outerHTML(),
 					orderer: order.user.full_name,
 					email: order.user.email,
-					buy_time: moment.unix(order.created_at).format(__LOCALE.DATE.DATE_TIME_FORMAT)
-				};
-			}));
+					buy_time: {
+						display: moment.unix(order.created_at).format(__LOCALE.DATE.DATE_TIME_FORMAT),
+						timestamp: order.created_at
+					}
+				}
+			})).draw();
 			
-			$rows.find('.DataTableRowExpand').on('click.ExpandRow', function() {
+			AbstractAppInspector.$wrapper.on('inspector:hide', function() {
+				self.ordersTable.rows().deselect();
+			});
+			
+			self.ordersTable.on('deselect', function(e, dt, type, indexes) {
+				dt.rows(indexes).nodes().to$().removeClass('-selected');
+				AbstractAppInspector.hideCurrent();
+			});
+			
+			self.ordersTable.on('select', function(e, dt, type, indexes) {
+				var row = dt.row(indexes[0]);
+				
+				(new OrderAppInspector(self.orders.getByID(row.data().uuid), self.event)).show();
+				row.nodes().to$().addClass('-selected');
+			});
+			
+			self.ordersTable.on('user-select', function(e, dt, type, indexes, original_event) {
+				var row = dt.row(indexes[0][0][type]);
+				
+				if (!$(original_event.target).hasClass('DataTableRowExpand')) {
+					if (row.nodes().to$().hasClass('-selected')) {
+						row.deselect();
+					} else {
+						dt.rows().deselect();
+						row.select();
+					}
+				}
+				
+				return false;
+			});
+			
+			self.ordersTable.rows().nodes().to$().find('.DataTableRowExpand').on('click.ExpandRow', function() {
 				var $this = $(this),
 					$tr = $this.closest('tr'),
 					row = self.ordersTable.row( $tr ),
@@ -130,9 +188,10 @@ AdminEventOrdersPage = extending(AdminEventPage, (function() {
 					$collapsing_wrapper,
 					$collapsing_content;
 				
+				
 				if (!row.child.isShown()) {
 					row.child( tmpl('admin-event-orders-page-table-child-row', {
-						ticket_rows: tmpl('admin-event-orders-page-ticket-row', self.orders.getByID($tr.data('order_uuid')).tickets.map(function(ticket) {
+						ticket_rows: tmpl('admin-event-orders-page-ticket-row', self.orders.getByID(row.data().uuid).tickets.map(function(ticket) {
 							
 							return $.extend({}, ticket, {
 								number: formatTicketNumber(ticket.number),
@@ -158,31 +217,8 @@ AdminEventOrdersPage = extending(AdminEventPage, (function() {
 				$this.toggleClass([__C.CLASSES.ACTIVE, __C.CLASSES.ICONS.PLUS, __C.CLASSES.ICONS.MINUS].join(' '));
 			});
 			
-			$rows.on('click.SelectRow', function(e) {
-				var $this = $(this),
-					data = $this.data();
-				
-				if (!$(e.target).hasClass('DataTableRowExpand')) {
-					if (data.inspector && data.inspector.is_shown) {
-						data.inspector.hide();
-					} else {
-						if (!(data.inspector instanceof OrderAppInspector)) {
-							data.inspector = new OrderAppInspector(self.orders.getByID($this.data('order_uuid')), self.event);
-							$this.data(data);
-						}
-						data.inspector.show();
-					}
-					$rows.not($this).removeClass('-selected');
-					$this.toggleClass('-selected');
-				}
-			});
-			
-			if (!self.ordersTable) {
-				self.initOrdersTable();
-			}
-			self.ordersTable.rows.add($rows).draw();
-			
 			self.$loader.remove();
+			
 			self.$wrapper.find('.OrdersTableWrapper').removeClass(__C.CLASSES.STATUS.DISABLED);
 		});
 		this.init();

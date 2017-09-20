@@ -193,6 +193,29 @@ table {
 	visibility: hidden;
 }
 
+.pair_list {
+	width: 100%;
+	display: table;
+	text-align: right;
+	border-spacing: 0 .5em;
+}
+
+.pair {display: table-row}
+
+.pair_key,
+.pair_value {display: table-cell}
+
+.pair_key {
+	vertical-align: top;
+	font-weight: 500;
+}
+
+.pair_value {
+	padding-left: .5em;
+	text-align: left;
+}
+
+.pair_key:after {content: ':'}
 
 .flex_grid {
 	display: flex;
