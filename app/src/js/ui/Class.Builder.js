@@ -743,6 +743,32 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @param {(Array<{key: string, value: string}>|Object<string, string>)} pairs
+	 *
+	 * @return {jQuery}
+	 */
+	Builder.prototype.pairList = function(pairs) {
+		
+		return tmpl('pair-list', {
+			pairs: tmpl('pair-list-unit', (function() {
+				if (pairs instanceof Array) {
+					
+					return pairs;
+				}
+				
+				return Object.keys(pairs).reduce(function(collection, key) {
+					collection.push({
+						key: key,
+						value: pairs[key]
+					});
+					
+					return collection;
+				}, []);
+			})())
+		});
+	};
+	/**
+	 *
 	 * @param {Object<OneUser.ACCOUNTS, string>} [accounts_links]
 	 * @param {buildProps} [props]
 	 * @returns {jQuery}

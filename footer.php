@@ -1,22 +1,5 @@
 <?php
 if (isset( $DEBUG_MODE ) && $DEBUG_MODE === false) { ?>
-	<!-- Yandex.Metrika counter -->
-	<script src="https://mc.yandex.ru/metrika/tag.js" type="text/javascript"></script>
-	<script type="text/javascript"> try {
-			window.yaCounter32442130 = new Ya.Metrika2({
-				id: 32442130,
-				clickmap: true,
-				trackLinks: true,
-				accurateTrackBounce: true,
-				webvisor: true,
-				trackHash: true
-			});
-		} catch (e) {
-		} </script>
-	<noscript>
-		<div><img src="https://mc.yandex.ru/watch/32442130" style="position:absolute; left:-9999px;" alt=""/></div>
-	</noscript> <!-- /Yandex.Metrika counter -->
-
 	<script>
 		(function (i, s, o, g, r, a, m) {
 			i['GoogleAnalyticsObject'] = r;
