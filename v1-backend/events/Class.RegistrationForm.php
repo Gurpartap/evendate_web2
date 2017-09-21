@@ -147,7 +147,7 @@ class RegistrationForm
 
 			$order_info = Order::create($event, $user, $db, $tickets, $promocode);
 			$tickets = Ticket::createBatch($event, $order_info['id'], $db, $tickets);
-			Order::updateSum($order_info['id'], $db);
+			Order::updateSum($order_info['id'], $db, $event);
 
 			$db->commit();
 

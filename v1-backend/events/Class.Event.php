@@ -549,7 +549,7 @@ class Event extends AbstractEntity
 	{
 		if (isset($data['description'])) {
 			if (mb_strlen($data['description']) <= 50) throw new InvalidArgumentException('TOO_SHORT_DESCRIPTION');
-			if (mb_strlen($data['description']) > 1000) throw new InvalidArgumentException('TOO_LARGE_DESCRIPTION');
+			if (mb_strlen($data['description']) > 2000) throw new InvalidArgumentException('TOO_LARGE_DESCRIPTION');
 		}
 
 		if (isset($data['title'])) {
