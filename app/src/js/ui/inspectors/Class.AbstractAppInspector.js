@@ -93,6 +93,7 @@ AbstractAppInspector = extendingJQuery((function() {
 	AbstractAppInspector.prototype.hide = function() {
 		this.removeClass(__C.CLASSES.SHOW);
 		AbstractAppInspector.currentInspector = null;
+		AbstractAppInspector.$wrapper.trigger('inspector:hide');
 		this.is_shown = false;
 	};
 	

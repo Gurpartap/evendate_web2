@@ -31,6 +31,13 @@
 	</div>
 </script>
 
+<script type="javascript/template" id="tmpl-admin-event-orders-page-row-expand-wrapper">
+	<div class="data_tables_row_expand_wrapper">
+		<span class="data_tables_row_expand fa_icon DataTableRowExpand fa-plus"></span>
+		<span class="Text">{number}</span>
+	</div>
+</script>
+
 <script type="javascript/template" id="tmpl-admin-event-orders-page-tr">
 	<tr data-order_uuid="{uuid}">
 		<td>
@@ -42,7 +49,7 @@
 		<td>{status}</td>
 		<td>{orderer}</td>
 		<td>{email}</td>
-		<td>{buy_time}</td>
+		<td data-order="{buy_timestamp}" data-sort="{buy_timestamp}">{buy_time}</td>
 	</tr>
 </script>
 

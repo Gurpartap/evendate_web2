@@ -12,19 +12,19 @@ PromocodeModel = extending(OneEntity, (function() {
 	 * @constructor
 	 * @constructs PromocodeModel
 	 *
-	 * @property {string} ?uuid
-	 * @property {(number|string)} ?event_id
-	 * @property {string} ?code
-	 * @property {boolean} ?is_fixed
-	 * @property {boolean} ?is_percentage
-	 * @property {(number|string)} ?effort
-	 * @property {(number|string)} ?use_limit
-	 * @property {timestamp} ?start_date
-	 * @property {timestamp} ?end_date
-	 * @property {boolean} ?enabled
+	 * @property {?string} uuid
+	 * @property {?number} event_id
+	 * @property {?string} code
+	 * @property {?boolean} is_fixed
+	 * @property {?boolean} is_percentage
+	 * @property {?number} effort
+	 * @property {?number| use_limit
+	 * @property {?timestamp} start_date
+	 * @property {?timestamp} end_date
+	 * @property {?boolean} enabled
 	 *
-	 * @property {timestamp} ?created_at
-	 * @property {timestamp} ?updated_at
+	 * @property {?timestamp} created_at
+	 * @property {?timestamp} updated_at
 	 */
 	function PromocodeModel() {
 		this.uuid = null;
