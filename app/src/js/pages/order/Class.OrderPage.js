@@ -384,7 +384,7 @@ OrderPage = extending(Page, (function() {
 		
 		this.render_vars.pay_button.on('click.MakeOrder', function() {
 			var result,
-				callback_url = parsed_uri.queryKey['away_to'] || (window.location.origin + '/event/' + self.event.id),
+				callback_url = decodeURIComponent(parsed_uri.queryKey['away_to']) || (window.location.origin + '/event/' + self.event.id),
 				is_type_selected;
 			
 			is_type_selected = Array.prototype.reduce.call($quantity_inputs, function(accumulator, input) {
