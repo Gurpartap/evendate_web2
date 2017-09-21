@@ -21,9 +21,9 @@
   <input name='scid' value='97111' type='hidden'>
   <input name='customerNumber' value='<?= $__user->getFirstName() . ' ' . $__user->getLastName() ?>' type='hidden'>
   <input name='cps_email' value='<?= $__user->getEmail() ?>' type='hidden'>
-  <input name='shopFailURL' value='<?= $__request['payload']['callback_url'] ?>' type='hidden'>
-  <input name='shopSuccessURL' value='<?= $__request['payload']['callback_url'] ?>' type='hidden'>
-  <input name='shopDefaultUrl' value='<?= $__request['payload']['callback_url'] ?>' type='hidden'>
+  <input name='shopFailURL' value='<?= $__request['payload']['post_data']['callback_url'] ?? ''?>' type='hidden'>
+  <input name='shopSuccessURL' value='<?= $__request['payload']['post_data']['callback_url'] ?? ''?>' type='hidden'>
+  <input name='shopDefaultUrl' value='<?= $__request['payload']['post_data']['callback_url'] ?? ''?>' type='hidden'>
   <input name='evendate_payment_id' value='order-<?= $result->getData()['order']['uuid'] ?>' type='hidden'>
   <input name='sum' value='<?= $result->getData()['order']['final_sum'] ?>' type='hidden'>
 
