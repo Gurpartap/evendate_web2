@@ -206,7 +206,7 @@ $__modules['organizations'] = array(
 				return $result;
 			}
 		},
-		'countries' => function () use ($__db, $__request, $__request, $__pagination, $__user, $__fields, $__order_by) {
+		'countries' => function () use ($__db, $__request, $__pagination, $__user, $__fields, $__order_by) {
 			return CountriesCollection::filter(
 				$__db,
 				$__user,
@@ -216,7 +216,7 @@ $__modules['organizations'] = array(
 				$__order_by ?? array('id')
 			);
 		},
-		'cities' => function () use ($__db, $__request, $__request, $__pagination, $__user, $__fields, $__order_by) {
+		'cities' => function () use ($__db, $__request, $__pagination, $__user, $__fields, $__order_by) {
 			if (isset($__fields) && isset($__fields['distance'])) {
 				if (!isset($__request['latitude']) || !isset($__request['longitude'])) {
 					if (!empty($_SERVER['HTTP_CLIENT_IP']))   //check ip from share internet

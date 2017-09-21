@@ -153,7 +153,7 @@ class Order extends AbstractEntity
 		return array('id' => $res['id'], 'uuid' => $res['uuid']);
 	}
 
-	public static function updateSum($id, ExtendedPDO $db)
+	public static function updateSum($id, ExtendedPDO $db, Event $event)
 	{
 		$q_upd = 'UPDATE ticket_orders SET sum = subquery.sum,
 			final_sum = subquery.final_sum
@@ -179,6 +179,36 @@ class Order extends AbstractEntity
 
 		$upd = $db->prepareExecuteRaw($q_upd, array(':order_id' => $id), 'CANT_INSERT_ORDER_SUM')->fetch();
 
+		$q_get_event_info = 'SELECT 
+			view_tickets_orders.final_sum,
+			view_tickets_orders.sum,
+			ticketing_locally,
+ 			registration_approvement_required,
+			registration_locally,
+			view_tickets_orders.promocode_id
+			FROM
+			 view_tickets_orders
+			INNER JOIN view_all_events ON view_all_events.id = view_tickets_orders.event_id   
+			WHERE view_tickets_orders.uuid = :uuid';
+
+		$event_info = $db->prepareExecuteRaw($q_get_event_info, array(':uuid' => $upd['uuid']))->fetch();
+
+		if ($event_info['registration_locally'] && $event_info['ticketing_locally']) {
+			if ($event_info['final_sum'] == 0 AND
+				($event_info['promocode_id'] != null || $event_info['registration_approvement_required'] == false)
+			) {
+				self::setPaymentStatus(array(
+					'orderSumAmount' => $event_info['final_sum'],
+					'shopSumAmount' => $event_info['final_sum'],
+					'uuid' => $upd['uuid']
+				), $db,
+					array(
+						'id' => $id,
+						'event_id' => $event->getId(),
+						'first_name' => App::getCurrentUser()->getFirstName()
+					));
+			}
+		}
 	}
 
 	private static function avisoBitcoin(array $request, ExtendedPDO $db)
@@ -499,7 +529,7 @@ class Order extends AbstractEntity
 	{
 		if (isset($request['bitcoin']) && $request['bitcoin'] == true) {
 			return self::avisoBitcoin($request, $db);
-		}elseif (isset($request['legal_entity']) && $request['legal_entity'] == true){
+		} elseif (isset($request['legal_entity']) && $request['legal_entity'] == true) {
 			return self::avisoLegalEntity($request, $db);
 		}
 		try {
