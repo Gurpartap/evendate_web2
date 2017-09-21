@@ -2,7 +2,7 @@ INSERT INTO notification_types (id, type, timediff, text)
 VALUES (50, 'notification-new-organizations', -1, '{first_name}, мы подобрали для вас интересные огранизации')
 ON CONFLICT (id)
   DO UPDATE SET
-    text = '{first_name}, новые и интересные места появились в каталоге';
+    text = '{first_name}, мы подобрали для вас интересные огранизации';
 
 INSERT INTO notification_types (id, type, timediff, text)
 VALUES (51, 'notification-friend-interests', -1, '{first_name} {last_name}{friends_count} интересуется {event_title}')

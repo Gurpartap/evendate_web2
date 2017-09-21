@@ -308,8 +308,6 @@ class Notifications {
 
                         let note = _this.notifications_manager.create(notification, device, 'recommendations_organizations');
 
-                        if (notification.user_id != 23 && notification.user_id != 14) return;
-                        console.log(device);
                         note.send(function (err, message_id) {
                             if (err) return _this.logger.error(err);
 
@@ -392,15 +390,6 @@ WHERE done = FALSE AND notifications_recommendations.notification_type_id = 51`;
                         }
 
                         let note = _this.notifications_manager.create(notification, device, 'events');
-
-
-                        if (notification.user_id != 23 && notification.user_id != 14) return;
-
-                        if (device.device_token.indexOf('35fe42ee-ee5f-472f-b629-4d34d0f08c30') !== -1) {
-                            console.log(device.device_token);
-                            console.log('FOUND!!!!!');
-                            console.log(notification);
-                        }
 
                         note.send(function (err, message_id) {
                             if (err) return _this.logger.error(err);
