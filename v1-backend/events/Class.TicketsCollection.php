@@ -99,6 +99,10 @@ class TicketsCollection extends AbstractCollection
 				case 'checkout': {
 					$val = filter_var($value, FILTER_VALIDATE_BOOLEAN) ? 'true' : 'false';
 					$q_get_tickets->where('checked_out = ?', $val);
+					break;
+				}
+				case 'order_status_type': {
+					$q_get_tickets->join('order_status_type = ?', $value);
 				}
 			}
 		}

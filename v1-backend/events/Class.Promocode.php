@@ -28,7 +28,7 @@ class Promocode extends AbstractEntity
 		 	INNER JOIN users_organizations ON users_organizations.organization_id = events.organization_id 
 		 		AND users_organizations.user_id = :user_id AND users_organizations.status = TRUE and users_organizations.role_id = 1
 			WHERE view_tickets_orders.event_id = view_promocodes.event_id
-			AND view_tickets_orders.status_id IN (1, 2, 8, 9, 10, 12, 13)) AS ' . self::USE_COUNT,
+			AND view_tickets_orders.ticket_order_status_type = \'green\') AS ' . self::USE_COUNT,
 
 		self::TOTAL_EFFORT => '(SELECT COUNT(view_tickets_orders.id) 
 			FROM view_tickets_orders
@@ -36,7 +36,7 @@ class Promocode extends AbstractEntity
 		 	INNER JOIN users_organizations ON users_organizations.organization_id = events.organization_id 
 		 		AND users_organizations.user_id = :user_id AND users_organizations.status = TRUE and users_organizations.role_id = 1
 			WHERE view_tickets_orders.event_id = view_promocodes.event_id
-			AND view_tickets_orders.status_id IN (1, 2, 8, 9, 10, 12, 13)) AS ' . self::TOTAL_EFFORT
+			AND view_tickets_orders.ticket_order_status_type = \'green\') AS ' . self::TOTAL_EFFORT
 	);
 
 
