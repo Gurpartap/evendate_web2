@@ -72,10 +72,9 @@ class PromocodesCollection extends AbstractCollection
 					if ($value instanceof Event == false) throw new InvalidArgumentException('BAD_EVENT');
 					if ($user instanceof User == false) throw new PrivilegesException('', $db);
 					if ($user->hasRights($value->getOrganization(), array(Roles::ROLE_ADMIN, Roles::ROLE_MODERATOR)) == false) throw new PrivilegesException('', $db);
-					$cols[] = '(SELECT )';
-					$cols[] = '';
 					$q_get_promocodes->where('event_id = :event_id');
 					$statements[':event_id'] = $value->getId();
+					$is_checking = false;
 					break;
 				}
 			}
@@ -100,9 +99,11 @@ class PromocodesCollection extends AbstractCollection
 				throw new InvalidArgumentException('EVENT_ID_REQUIRED');
 		}
 
+		$statements[':user_id'] = $user->getId();
 		$q_get_promocodes->distinct()
 			->from('view_promocodes')
 			->cols($cols)
+			->where(':user_id = :user_id')
 			->orderBy($order_by);
 
 		$p_get_tags = $db->prepareExecute($q_get_promocodes, 'CANT_FIND_PROMOCODE', $statements);
