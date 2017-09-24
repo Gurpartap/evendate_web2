@@ -151,7 +151,7 @@ class OrganizationFinance extends AbstractAggregator
 		      RIGHT OUTER JOIN (SELECT *
 		      						FROM generate_series(to_timestamp(:till), to_timestamp(:since), '-1 {SCALE}')) AS ts(time_value)
 		      						ON to_timestamp(view_tickets_orders.created_at) <= ts.time_value 
-		      						AND view_tickets_orders.status_id IN (2, 4, 8, 10, 13)
+		      						AND view_tickets_orders.ticket_order_status_type = 'green'
 		      						AND events.organization_id = :organization_id
 		      GROUP BY ts.time_value
         	ORDER BY ts.time_value

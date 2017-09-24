@@ -12,6 +12,7 @@ class EventFinance extends AbstractAggregator
 	private $tickets_count;
 	private $ticket_types;
 	private $finance_info;
+	private $promocodes;
 
 
 	//ticket types fields
@@ -31,6 +32,7 @@ class EventFinance extends AbstractAggregator
 	const TICKET_TYPES_FIELD_NAME = 'ticket_types';
 	const TICKETS_DYNAMICS_FIELD_NAME = 'ticket_dynamics';
 	const INCOME_DYNAMICS_FIELD_NAME = 'income_dynamics';
+	const PROMOCODES_FIELD_NAME = 'promocodes';
 
 	private $tickets_numbers_fields = array(
 		self::SUM_AMOUNT_FIELD_NAME,
@@ -41,6 +43,7 @@ class EventFinance extends AbstractAggregator
 		self::TICKET_TYPES_FIELD_NAME,
 		self::TICKETS_DYNAMICS_FIELD_NAME,
 		self::INCOME_DYNAMICS_FIELD_NAME,
+		self::PROMOCODES_FIELD_NAME
 	);
 
 	private $finance_fields = array(
@@ -114,6 +117,8 @@ class EventFinance extends AbstractAggregator
 			return $this->getTicketsCountDynamics($params);
 		} elseif ($field == self::INCOME_DYNAMICS_FIELD_NAME) {
 			return $this->getSellDynamics($params);
+		} elseif ($field == self::PROMOCODES_FIELD_NAME) {
+			return $this->getPromocodes($params);
 		} else return null;
 	}
 
@@ -140,6 +145,15 @@ class EventFinance extends AbstractAggregator
 		return $this->ticket_types;
 	}
 
+	private function getPromocodes($params): array
+	{
+		if ($this->promocodes) return $this->promocodes;
+		$this->promocodes = PromocodesCollection::filter($this->db, $this->user, array(
+			'statistics_event' => $this->event,
+		), Fields::parseFields($params['fields']))->getData();
+		return $this->promocodes;
+	}
+
 	private function getDateTimes(array $params)
 	{
 		$result = array(
@@ -158,7 +172,6 @@ class EventFinance extends AbstractAggregator
 		}
 		return $result;
 	}
-
 
 	private function getSellDynamics(array $params)
 	{
@@ -195,7 +208,7 @@ class EventFinance extends AbstractAggregator
 		      RIGHT OUTER JOIN (SELECT *
 		      						FROM generate_series(to_timestamp(:till), to_timestamp(:since), '-1 {SCALE}')) AS ts(time_value)
 		      						ON to_timestamp(view_tickets_orders.created_at) <= ts.time_value 
-		      						AND view_tickets_orders.status_id IN (2, 4, 8, 10, 13)
+		      						AND view_tickets_orders.ticket_order_status_type = 'green'
 		      						AND view_tickets_orders.event_id = :event_id
 		      GROUP BY ts.time_value
         	ORDER BY ts.time_value
