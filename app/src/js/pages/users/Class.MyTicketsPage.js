@@ -21,15 +21,25 @@ MyTicketsPage = extending(Page, (function() {
 		this.disable_uploads = false;
 		this.block_scroll = false;
 		
-		this.fetch_tickets_fields = new Fields('created_at', 'number', 'ticket_type', 'order', {
-			event: {
-				fields: new Fields('dates', 'is_same_time', 'image_horizontal_medium_url', 'location')
-			}
-		});
+		this.fetch_tickets_fields = new Fields(
+			'created_at',
+			'number',
+			'ticket_type',
+			'order', {
+				event: {
+					fields: new Fields(
+						'dates',
+						'is_same_time',
+						'image_horizontal_medium_url',
+						'location'
+					)
+				}
+			});
 		this.fetch_tickets_quantity = 30;
 	}
 	
 	MyTicketsPage.prototype.fetchData = function() {
+		
 		return this.fetching_data_defer = this.tickets.fetchTickets(this.fetch_tickets_fields, this.fetch_tickets_quantity);
 	};
 	
@@ -37,13 +47,19 @@ MyTicketsPage = extending(Page, (function() {
 		var self = this,
 			$loader;
 		
-		if (!self.disable_uploads && !self.block_scroll) {
-			$loader = __APP.BUILD.loaderBlock(self.$wrapper);
-			self.block_scroll = true;
-			self.tickets.fetchTickets(self.fetch_tickets_fields, self.fetch_tickets_quantity).done(function(tickets) {
+		if (!this.disable_uploads && !this.block_scroll) {
+			$loader = __APP.BUILD.loaderBlock(this.$wrapper);
+			this.block_scroll = true;
+			this.tickets.fetchTickets(this.fetch_tickets_fields, this.fetch_tickets_quantity).done(function(tickets) {
+				var green_tickets = ExtendedTicketsCollection.getGreenTickets(tickets);
+				
 				self.block_scroll = false;
 				if (tickets.length) {
-					self.$wrapper.find('.TicketsWrapper').append(__APP.BUILD.ticketCards(tickets))
+					if (green_tickets.length) {
+						self.$wrapper.find('.TicketsWrapper').append(__APP.BUILD.ticketCards(tickets));
+					} else {
+						self.fetchAndAppendTickets();
+					}
 				} else {
 					self.disable_uploads = true;
 				}
@@ -67,13 +83,21 @@ MyTicketsPage = extending(Page, (function() {
 	};
 	
 	MyTicketsPage.prototype.render = function() {
+		var green_tickets;
+		
 		if(__APP.USER.isLoggedOut()){
 			__APP.changeState('/', true, true);
 			return null;
 		}
 		
+		green_tickets = ExtendedTicketsCollection.getGreenTickets(this.tickets.last_pushed);
+		
+		if (!green_tickets.length) {
+			this.fetchAndAppendTickets();
+		}
+		
 		this.$wrapper.html(tmpl('my-tickets-wrapper', {
-			tickets: __APP.BUILD.ticketCards(this.tickets)
+			tickets: __APP.BUILD.ticketCards(green_tickets)
 		}));
 		
 		this.init();
