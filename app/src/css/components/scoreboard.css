@@ -1,7 +1,7 @@
 .scoreboard {margin: 1em 0}
 
 .scoreboard_number {
-	display: block;
+	display: inline-block;
 	font-size: 2.3em;
 	font-weight: bold;
 	white-space: nowrap;
@@ -24,6 +24,7 @@
 }
 
 .scoreboard_title {
+	display: block;
 	font-size: .88em;
 	font-weight: 500;
 	color: #9fa6b3;
