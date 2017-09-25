@@ -56,14 +56,20 @@ hr {
 	border-top: 1px solid #c5c9d1;
 }
 
+ol,
+ul {
+	margin: 1em 0;
+	padding-left: 40px;
+}
+
 p,
 .text {
 	margin: .875em 0;
-	font-size: 0.875rem;
 	font-weight: normal;
 	line-height: 1.43;
 	letter-spacing: 0.1px;
 }
+.text {font-size: 0.875rem}
 
 small,
 .text.-mini {

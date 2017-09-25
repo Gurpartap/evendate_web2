@@ -1,6 +1,7 @@
 .calendar_wrapper {
-	min-height: -webkit-calc(2.4em * 7 + 3em); /* To make calendar with similar height either with 5 or 6 weeks */
-	min-height: calc((2.4em * 7) + 3em); /* 2.4em - cell height, 5px - cell spacing and 3em for header height */
+	/* min-height: -webkit-calc(2.4em * 7 + 3em);  To make calendar with similar height either with 5 or 6 weeks */
+	/* min-height: calc((2.4em * 7) + 3em); 2.4em - cell height, 5px - cell spacing and 3em for header height */
+	margin-bottom: 6px;
 	cursor: default;
 }
 

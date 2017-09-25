@@ -1730,7 +1730,7 @@ function randomString(length) {
 function isFormValid($form) {
 	$form = $form instanceof Element ? $($form) : $form;
 	var is_valid = true,
-		$elements = $form.find('input, textarea'),
+		$elements = $form.find('input, textarea, select'),
 		$rest = $elements,
 		lookup = {};
 	
@@ -1790,6 +1790,36 @@ function isFormValid($form) {
  */
 function getFilenameFromURL(url) {
 	return url ? url.split('\\').pop().split('/').pop() : '';
+}
+
+/**
+ *
+ * @param {?string} string
+ * @return {?string}
+ */
+function escapeHtml(string) {
+	var html_escapes = {
+		'&': '&amp;',
+		'<': '&lt;',
+		'>': '&gt;',
+		'"': '&quot;',
+		"'": '&#x27;',
+		'/': '&#x2F;'
+	};
+
+	// Regex containing the keys listed immediately above.
+	var html_escaper = /[&<>"'\/]/g;
+	
+	if (!string) {
+		
+		return string;
+	}
+
+	// Escape a string for HTML interpolation.
+	return ('' + string).replace(html_escaper, function(match) {
+		
+		return html_escapes[match];
+	});
 }
 /**
  *

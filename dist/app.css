@@ -89,14 +89,20 @@ hr {
 	border-top: 1px solid #c5c9d1;
 }
 
+ol,
+ul {
+	margin: 1em 0;
+	padding-left: 40px;
+}
+
 p,
 .text {
 	margin: .875em 0;
-	font-size: 0.875rem;
 	font-weight: normal;
 	line-height: 1.43;
 	letter-spacing: 0.1px;
 }
+.text {font-size: 0.875rem}
 
 small,
 .text.-mini {
@@ -1475,8 +1481,9 @@ a.button:hover {text-decoration: none}
 	.button.-color_marginal_accent {background-color: #e2e4e8}
 }
 .calendar_wrapper {
-	min-height: -webkit-calc(2.4em * 7 + 3em); /* To make calendar with similar height either with 5 or 6 weeks */
-	min-height: calc((2.4em * 7) + 3em); /* 2.4em - cell height, 5px - cell spacing and 3em for header height */
+	/* min-height: -webkit-calc(2.4em * 7 + 3em);  To make calendar with similar height either with 5 or 6 weeks */
+	/* min-height: calc((2.4em * 7) + 3em); 2.4em - cell height, 5px - cell spacing and 3em for header height */
+	margin-bottom: 6px;
 	cursor: default;
 }
 
@@ -3632,6 +3639,11 @@ fieldset:disabled .form_select {cursor: default}
 .radio_group > .form_unit > .form_label:before,
 .radio_group > .form_unit > .form_label:after {content: initial}
 
+.radio_group.-size_big > .form_unit > .form_label {
+	padding: 12px 18px;
+	font-size: 1.125em;
+}
+
 /* /Form Radio Group */
 /* Form Switch */
 
@@ -3982,11 +3994,8 @@ fieldset:disabled .form_select {cursor: default}
 .form_unit.-status_error > .form_textarea::-webkit-input-placeholder {color: #fd7b6e}
 
 .form_unit.-status_error > .form_input,
-.form_unit.-status_error > .form_select,
-.form_unit.-status_error > .form_textarea  {
-	border-color: #fd7b6e;
-	box-shadow: 0 0 3px rgba(255, 53, 0, 0.6);
-}
+.form_unit.-status_error > .form_textarea  {border-color: #fd7b6e}
+.form_unit.-status_error > .form_select {box-shadow: 0 1px 2px #fd7b6e}
 
 
 .form_input.-status_disabled,
@@ -5714,7 +5723,6 @@ fieldset + .org_admin_settings_wrapper,
 	padding: 24px;
 	border-left: 1px solid #c5c9d1;
 }
-.event_calendar:not(:empty) {height: 265px}
 
 .event_additional_field {
 	font-size: .88rem;

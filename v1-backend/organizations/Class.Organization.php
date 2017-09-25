@@ -990,11 +990,11 @@ class Organization extends AbstractEntity
 	public function updateRequisites(User $user, array $requisites)
 	{
 		if (!$user->isAdmin($this)) throw new PrivilegesException('', $this->db);
+		print_r( $requisites['agent_type']);
 		if (!isset($requisites['agent_type'])
-			|| ($requisites['agent_type'] != self::AGENT_TYPE_LEGAL_ENTITY && $requisites['agent_type'] != self::AGENT_TYPE_INDIVIDUAL)
-		) {
-
-		} else throw new InvalidArgumentException('AGENT_TYPE_IS_REQUIRED');
+			|| !($requisites['agent_type'] === self::AGENT_TYPE_LEGAL_ENTITY || $requisites['agent_type'] === self::AGENT_TYPE_INDIVIDUAL)) {
+			throw new InvalidArgumentException('AGENT_TYPE_IS_REQUIRED');
+		}
 
 		$q_upd_organization = App::queryFactory()->newUpdate();
 		$q_upd_organization->table('organizations')

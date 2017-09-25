@@ -466,6 +466,11 @@ fieldset:disabled .form_select {cursor: default}
 .radio_group > .form_unit > .form_label:before,
 .radio_group > .form_unit > .form_label:after {content: initial}
 
+.radio_group.-size_big > .form_unit > .form_label {
+	padding: 12px 18px;
+	font-size: 1.125em;
+}
+
 /* /Form Radio Group */
 /* Form Switch */
 
@@ -816,11 +821,8 @@ fieldset:disabled .form_select {cursor: default}
 .form_unit.-status_error > .form_textarea::-webkit-input-placeholder {color: #fd7b6e}
 
 .form_unit.-status_error > .form_input,
-.form_unit.-status_error > .form_select,
-.form_unit.-status_error > .form_textarea  {
-	border-color: #fd7b6e;
-	box-shadow: 0 0 3px rgba(255, 53, 0, 0.6);
-}
+.form_unit.-status_error > .form_textarea  {border-color: #fd7b6e}
+.form_unit.-status_error > .form_select {box-shadow: 0 1px 2px #fd7b6e}
 
 
 .form_input.-status_disabled,

@@ -64,7 +64,6 @@
 	padding: 24px;
 	border-left: 1px solid #c5c9d1;
 }
-.event_calendar:not(:empty) {height: 265px}
 
 .event_additional_field {
 	font-size: .88rem;
