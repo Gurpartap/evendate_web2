@@ -2086,6 +2086,509 @@
 		</div>
 	</div>
 </script>
+<script type="javascript/template" id="tmpl-admin-organization-crm-page">
+	<div class="org_admin_crm_page material -level_2_material">
+		<div class="org_admin_crm_page_table_wrapper CRMTableWrapper">
+			<header class="org_admin_crm_page_header">
+				<div class="org_admin_crm_page_header_wrapper">
+					<h3 class="org_admin_crm_page_title">CRM</h3>
+					<div class="org_admin_crm_page_table_search_block">
+						<input class="form_input -rounded -search_bar CRMTableSearch" placeholder="Поиск клиентов">
+					</div>
+				</div>
+				<div class="org_admin_crm_page_header_wrapper"><!--
+					<button class="action fa_icon fa-columns" type="button">Колонки</button>-->
+					{header_buttons}
+				</div>
+			</header>
+
+			<table class="table -data_table_override -data_table_row_selection CRMTable">
+				<thead>
+					<tr>
+						<th>Имя клиента</th>
+						<th>E-mail</th>
+						<th>Аккаунты</th>
+						<th>Пол</th>
+
+						<th>Страна</th>
+						<th>Город</th>
+						<th>Дата авторизации</th>
+						<th>Дата подписки</th>
+						<th>Дата отписки</th>
+						<th>Заходы на организатора</th>
+						<th>Заходы на события</th>
+						<th>Получил уведомлений</th>
+						<th>Открыл уведомлений</th>
+						<th>Скрыл уведомлений</th>
+						<th>Регистраций на события</th>
+						<th>Добавил в избранное</th>
+						<th>Поделился событием</th>
+						<th>Средний чек</th>
+						<th>Общий средний чек</th>
+						<th>Затраты на мои билеты</th>
+						<th>Затраты на билеты всех организаторов</th>
+						<th>Друзья из соц. сетей</th>
+						<th>Лояльность</th>
+						<th>Платёжеспособность</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</div>
+
+		{loader}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-admin-organization-crm-page-tr">
+	<tr>
+		<td>{user_avatar_block}</td>
+		<td>{email}</td>
+		<td>{accounts}</td>
+		<td>{gender}</td>
+
+		<td>Страна</td>
+		<td>Город</td>
+		<td>Дата авторизации</td>
+		<td>Дата подписки</td>
+		<td>Дата отписки</td>
+		<td>Заходы на организатора</td>
+		<td>Заходы на события</td>
+		<td>Получил уведомлений</td>
+		<td>Открыл уведомлений</td>
+		<td>Скрыл уведомлений</td>
+		<td>Регистраций на события</td>
+		<td>Добавил в избранное</td>
+		<td>Поделился событием</td>
+		<td>Средний чек</td>
+		<td>Общий средний чек</td>
+		<td>Затраты на мои билеты</td>
+		<td>Затраты на билеты всех организаторов</td>
+		<td>Друзья из соц. сетей</td>
+		<td>Лояльность</td>
+		<td>Платёжеспособность</td>
+	</tr>
+</script>
+<script type="javascript/template" id="tmpl-orgstat-events-page">
+	<div class="page orgstat_events_page">
+		<header class="orgstat_events_page_header"></header>
+		<div class="OrgStatFutureEventsWrapper"></div>
+		<div class="OrgStatPastEventsWrapper"></div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-orgstat-events-wrapper">
+	<h3 class="orgstat_events_title">{title}</h3>
+	<table class="orgstat_events_table statistics_table -table_fixed">
+		<colgroup>
+			<col>
+			<col width="144px">
+			<col width="120px">
+			<col width="100px">
+			<col width="160px">
+			<col width="110px">
+			<col width="144px">
+		</colgroup>
+		<thead>
+			<tr>
+				<th class="-unselectable" align="left"><span class="Text">Название события</span></th>
+				<th class="-unselectable" data-sort-order="desc"><span class="Text">Дата события</span></th>
+				<th class="-unselectable" data-sort-order="desc"><span class="Text">Просмотров</span></th>
+				<th class="-unselectable" data-sort-order="desc"><span class="Text">Открытий</span></th>
+				<th class="-unselectable" data-sort-order="desc"><span class="Text">Доб. в избранное</span></th>
+				<th class="-unselectable" data-sort-order="desc"><span class="Text">Конверсия</span></th>
+				<th class="-unselectable" data-sort-order="desc"><span class="Text">Уведомлений</span></th>
+			</tr>
+		</thead>
+		{rows}
+	</table>
+</script>
+
+<script type="javascript/template" id="tmpl-orgstat-no-events-wrapper">
+	<h3 class="orgstat_events_title">{title}</h3>
+	<div class="orgstat_events_no_events_wrapper">
+		<p>Предстоящих событий нет. Хотите добавить новое событие?</p>
+		{call_to_action}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-orgstat-events-row">
+	<tr>
+		<td><a href="/admin/event/{id}" class="link Link Text">{title}</a></td>
+		<td align="center" data-sort="{timestamp}"><span class="Text">{date}</span></td>
+		<td align="center" class="-text_big -highlighted"><span class="Text">{view}</span></td>
+		<td align="center" class="-text_big -highlighted"><span class="Text">{view_detail}</span></td>
+		<td align="center" class="-text_big -highlighted"><span class="Text">{fave}</span></td>
+		<td align="center" class="-text_big -highlighted"><span class="Text">{conversion}</span></td>
+		<td align="center" class="-text_big -highlighted"><span class="Text">{notifications_sent}</span></td>
+	</tr>
+</script>
+<script type="javascript/template" id="tmpl-admin-organization-finances-page">
+	<div class="org_admin_finances_page material -level_2_material">
+		<div class="org_admin_finances_wrapper">
+			<h3>Финансы организации</h3>
+			<div class="flex_grid -parts_equal_3">
+				<div class="grid_box">
+					<div class="scoreboard -size_big">
+						<span class="scoreboard_title">Выручка</span>
+						<span class="scoreboard_number">{total_income}</span>
+					</div>
+				</div>
+				<div class="grid_box">
+					<div class="scoreboard -size_normal">
+						<span class="scoreboard_title">Комиссия Evendate</span>
+						<span class="scoreboard_number">{evendate_commission_value} (1%)</span>
+					</div>
+				</div>
+				<div class="grid_box">
+					<div class="scoreboard -size_normal">
+						<span class="scoreboard_title">Комиссия за эквайринг</span>
+						<span class="scoreboard_number">{processing_commission_value} <span class="tooltip" title="Комиссия зависит от способа оплаты участниками. Процент высчитывается как округленное среднее со всех заказов.">({processing_commission}%)</span></span>
+					</div>
+				</div>
+			</div>
+			<div class="flex_grid -valign_center -parts_1_2">
+				<div class="grid_box">
+					<div class="scoreboard -size_big">
+						<span class="scoreboard_title">Доступно для вывода</span>
+						<span class="scoreboard_number -text_color_accent">{withdraw_available}</span>
+					</div>
+				</div>
+				<div class="grid_box">
+					{withdraw_funds_button}
+				</div>
+			</div>
+		</div>
+		<div class="TransactionStory">
+			<div class="org_admin_finances_wrapper">
+				<h4>История вывода средств</h4>
+			</div>
+			<table class="table -data_table_override TransactionStoryTable">
+				<colgroup>
+					<col width="12%">
+					<col width="17%">
+					<col width="15%">
+					<col width="23%">
+					<col width="18%">
+					<col width="15%">
+				</colgroup>
+				<thead>
+					<tr>
+						<th>Дата</th>
+						<th>Сотрудник</th>
+						<th>Статус</th>
+						<th>Примечание</th>
+						<th>Ответ</th>
+						<th align="right">Сумма</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+			{transactions_loader}
+		</div>
+
+		<div class="org_admin_finances_wrapper">
+			{charts}
+		</div>
+
+		<div class="EventsFinances">
+			<div class="org_admin_finances_wrapper">
+				<h4>События</h4>
+			</div>
+			<table class="table -data_table_override EventsFinancesTable">
+				<colgroup>
+					<col width="70%">
+					<col width="15%">
+					<col width="15%">
+				</colgroup>
+				<thead>
+					<tr>
+						<th>Название</th>
+						<th align="right">Выручка</th>
+						<th align="right">Заработано</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+			{events_loader}
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-admin-organization-finances-chart">
+	<div class="org_admin_finances_chart chart_wrapper {classes} AreaChart"></div>
+</script>
+
+<script type="javascript/template" id="tmpl-admin-organization-finances-transaction-row">
+	<tr>
+		<td data-order="{date_timestamp}">{date}</td>
+		<td>{staff_block}</td>
+		<td>{status}</td>
+		<td class="-preformatted_text">{comment}</td>
+		<td class="-preformatted_text">{response}</td>
+		<td align="right">{sum}</td>
+	</tr>
+</script>
+
+<script type="javascript/template" id="tmpl-admin-organization-finances-event-row">
+	<tr>
+		<td>{title}</td>
+		<td align="right">{sum}</td>
+		<td align="right">{total_sum}</td>
+	</tr>
+</script>
+<script type="javascript/template" id="tmpl-orgstat-overview">
+	<div class="page orgstat_overview">
+		<aside class="orgstat_overview_sidebar">
+			<header class="orgstat_overview_sidebar_header">
+				<span class="small_title">Об организаторе</span>
+				<!--<span class="stamp -color_accent">Starter</span>-->
+			</header>
+			<div class="orgstat_overview_sidebar_wrapper orgstat_overview_sidebar_top -align_center">
+				{avatar_block}
+				<p class="small_title">{name}</p>
+				<p class="orgstat_overview_sidebar_description">{description}</p>
+				<p class="orgstat_overview_sidebar_location">{default_address}</p>
+				<a href="/admin/organization/{id}/edit" class="button -color_neutral -size_low fa_icon fa-pencil RippleEffect Link"><span class="Text">Редактировать</span></a>
+			</div>
+			<div class="orgstat_overview_sidebar_wrapper -align_center -hidden">
+				<button class="button -color_telegram -size_low fa_icon fa-send RippleEffect" type="button"><span class="Text">Создать Telegram бота</span></button>
+			</div>
+			<div class="orgstat_overview_sidebar_wrapper">
+				{staff_block}
+			</div>
+			{event_blocks}
+			<div class="orgstat_overview_sidebar_wrapper">
+				<p class="small_title">Аудитория</p>
+				<div class="GenderPieChart"></div>
+				<div class="DevicePieChart"></div>
+			</div>
+		</aside>
+		<div class="orgstat_overview_content OrgstatOverviewContent">
+			<header class="orgstat_overview_header Scoreboards">{scoreboards}</header>
+			<div class="orgstat_overview_charts OrgStatAreaCharts">
+				<div class="orgstat_overview_chart AreaChart SubscriberAreaChart"></div>
+				<div class="orgstat_overview_chart AreaChart ViewAreaChart"></div>
+				<div class="orgstat_overview_chart AreaChart ConversionAreaChart"></div>
+			</div>
+		</div>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-orgstat-overview-sidebar-wrapper">
+	<div class="orgstat_overview_sidebar_wrapper">
+		{content}
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-orgstat-overview-sidebar-wrapper-title">
+	<p class="small_title">{title}</p>
+</script>
+
+<script type="javascript/template" id="tmpl-orgstat-event-block">
+	<a href="/admin/event/{id}" class="orgstat_event_block link Link">
+		<aside class="orgstat_event_block_date">
+			<span>{day}</span><br>
+			<span>{month}</span>
+		</aside>
+		<div class="orgstat_event_block_body">
+			<p class="orgstat_event_block_name">{title}</p>
+			{badges}
+		</div>
+	</a>
+</script>
+
+<script type="javascript/template" id="tmpl-orgstat-event-block-badge">
+	<span class="orgstat_event_block_badge">{title}</span>
+</script>
+<script type="javascript/template" id="tmpl-admin-organization-requisites-page">
+	<form class="page org_admin_requisites_page material -level_2_material Tabs RequisitesForm">
+		<div class="tabs_header HeaderTabs -color_accent">
+			<span class="tab Tab -active" data-type="legal_entity">Юридическое лицо</span>
+			<span class="tab Tab" data-type="natural_person">Физическое лицо</span>
+		</div>
+		<div class="tab_bodies_wrap TabsBodyWrapper">
+			<fieldset class="tab_body TabsBody -active">
+				<h3>Информация о компании</h3>
+				{l_company_form_field}
+				<fieldset class="CompanyAdditionalInfo -hidden">
+					<div class="form_group -parts_e_e -valign_baseline">
+						{l_inn_form_field}
+						{l_kpp_form_field}
+					</div>
+					{l_real_address_form_field}
+				</fieldset>
+
+				<h3>Банковские данные</h3>
+				{l_bank_name_form_field}
+				<fieldset class="LegalEntityBankAdditionalInfo -hidden">
+					<div class="form_group -parts_e_e -valign_baseline">
+						{l_bic_form_field}
+						{l_correspondent_account_form_field}
+					</div>
+				</fieldset>
+				{l_checking_account_form_field}
+
+				<h3>Подписывающее лицо</h3>
+				{l_signer_name_form_field}
+				{l_signer_position_form_field}
+
+				<h3>Контактная информация</h3>
+				{l_self_name_form_field}
+				<div class="form_group -parts_e_e -valign_baseline">
+					{l_self_email_form_field}
+					{l_self_phone_form_field}
+				</div>
+			</fieldset>
+			<fieldset class="tab_body TabsBody">
+				<h3>Информация об организаторе</h3>
+				{n_self_name_form_field}
+				{n_inn_form_field}
+				<div class="form_group -parts_e_e -valign_baseline">
+					{n_id_number_field}
+					{n_id_when_field}
+				</div>
+				{n_id_who_field}
+
+				{n_register_address_field}
+				{n_post_address_field}
+
+				<h3>Банковские данные</h3>
+				{n_bank_name_form_field}
+				<fieldset class="NaturalPersonBankAdditionalInfo -hidden">
+					<div class="form_group -parts_e_e -valign_baseline">
+						{n_bic_form_field}
+						{n_correspondent_account_form_field}
+					</div>
+				</fieldset>
+				{n_checking_account_form_field}
+
+				<h3>Контактная информация</h3>
+				<div class="form_group -parts_e_e -valign_baseline">
+					{n_self_email_form_field}
+					{n_self_phone_form_field}
+				</div>
+
+			</fieldset>
+		</div>
+		<div class="-align_center">
+			{submit_button}
+		</div>
+	</form>
+</script>
+<script type="javascript/template" id="tmpl-admin-organization-settings-page">
+	<div class="org_admin_settings_page material -level_2_material">
+		<div class="org_admin_settings_wrapper">
+			<h3>Редактирование организации</h3>
+			<p class="-text_color_marginal">Перейдите в раздел редактирования, чтобы изменить данные организации</p>
+			<a href="/admin/organization/{id}/edit" class="button -color_neutral_accent -size_low fa_icon fa-pencil Link RippleEffect"><span class="Text">Редактировать</span></a>
+		</div>
+
+		<div class="org_admin_settings_wrapper">
+			<h3>Права доступа</h3>
+			<div class="org_admin_settings_staff">
+				<div class="org_admin_settings_staff_wrapper">
+					<span class="small_title">Администраторы</span>
+					<div class="org_admin_settings_admins_collection StaffCollection" data-staff_type="admin">
+						{admin_avatar_blocks}
+					</div>
+				</div>
+				<div class="org_admin_settings_staff_wrapper">
+					<span class="small_title">Модераторы</span>
+					<div class="org_admin_settings_admins_collection StaffCollection" data-staff_type="moderator">
+						{moderator_avatar_blocks}
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<fieldset class="org_admin_settings_wrapper SaveLocalWrapper">
+			<h3><label for="org_admin_settings_email">Электронная почта</label></h3>
+			<p class="-text_color_marginal">Вы можете изменить электронную почту для связи</p>
+			<div class="form_group -unite -parts_e_4">
+				<input id="org_admin_settings_email" class="form_input" name="email" value="{email}" placeholder="E-mail" required>
+				<button class="button -color_accent SaveLocal RippleEffect" type="button"><span class="Text">Сохранить</span></button>
+			</div>
+		</fieldset>
+
+		<fieldset class="org_admin_settings_wrapper">
+			<h3>Приватность</h3>
+			<p class="-text_color_marginal">Закрытые организации с доступом по приглашениям</p>
+			{private_checkbox}
+			<p class="-text_color_marginal">Закрытые организации могут публиковать непубличные мероприятия и предоставлять доступ для просмотра по приглашениям. Рекомендуется использовать для внутренних корпоративных мероприятий, где организатор может выслать приглашение конкретным сотрудникам.</p>
+		</fieldset>
+
+		<fieldset class="org_admin_settings_wrapper SaveLocalWrapper" disabled title="Эта функция временно недоступна">
+			<h3>Интеграция с сервисами</h3>
+			<p class="-text_color_marginal">Публикуйте события сразу в Evendate, Facebook и Вконтакте</p>
+			{fb_vk_integration_checkboxes}
+			<fieldset class="Switching" data-switch_id="facebook_integration" disabled>
+				<div class="form_group -unite -parts_e_4">
+					<input id="org_admin_settings_facebook_integration" class="form_input" name="facebook_profile" value="{facebook_profile}" placeholder="Ссылка на профиль Facebook" title="Ссылка на профиль Facebook" required>
+					<button class="button -color_accent SaveLocal RippleEffect" type="button"><span class="Text">Сохранить</span></button>
+				</div>
+			</fieldset>
+			<p class="-text_color_marginal">Интегрируйтесь с Telegram и Slack</p>
+			{slack_telegram_integration_checkboxes}
+		</fieldset>
+
+		<fieldset class="SaveLocalWrapper">
+			<div class="org_admin_settings_wrapper">
+				<h3>Брендирование</h3>
+				<p class="-text_color_marginal">Вы можете изменить цвет элементов страницы организации в соответствии с вашей стилистикой</p>
+				<div class="form_group -parts_e_2">
+					{brand_color_field}
+					{brand_color_accent_field}
+				</div>
+				<div class="form_unit -align_center">
+					{save_colors_button}
+				</div>
+			</div>
+		</fieldset>
+
+		<fieldset class="org_admin_settings_wrapper" disabled title="Эта функция временно недоступна">
+			<h3>Домен</h3>
+			<p class="-text_color_marginal">Измените домен своей организации или создайте собственный домен. По этому адресу будет доступна страница вашей организации.</p>
+			<table class="org_admin_settings_domain_table">
+				<tbody>
+					<tr>
+						<td>{subdomain_radio}</td>
+						<td><input class="form_input" name="domain" value="{subdomain}" required></td>
+						<td>.evendate.io</td>
+						<td align="right"><button class="button -color_accent -size_low RippleEffect" type="button"><span class="Text">Подключить</span></button></td>
+					</tr>
+					<tr>
+						<td>{other_domain_radio}</td>
+						<td><input class="form_input" name="domain" value="{other_domain}" disabled required></td>
+						<td></td>
+						<td align="right"><button class="button -color_accent -size_low RippleEffect" type="button"><span class="Text">Подключить</span></button></td>
+					</tr>
+				</tbody>
+			</table>
+		</fieldset>
+
+		<fieldset class="org_admin_settings_wrapper">
+			<h3 id="change_tariff">Сменить тариф</h3>
+			<div class="org_admin_settings_tariff">
+				<div class="org_admin_settings_tariff_head">
+					<span class="org_admin_settings_tariff_title">Базовый</span>
+					<span class="org_admin_settings_tariff_price">0 руб./мес.</span>
+				</div>
+				<p class="-text_color_marginal"></p>
+			</div>
+			<div class="org_admin_settings_tariff">
+				<div class="org_admin_settings_tariff_head">
+					<span class="org_admin_settings_tariff_title -text_color_accent">Полный</span>
+					<span class="org_admin_settings_tariff_price -text_color_accent">800 руб./мес.</span>
+					<div class="org_admin_settings_tariff_button">
+						{tariff_button}
+					</div>
+				</div>
+				<p class="-text_color_marginal -align_right">{tariff_service_info}</p>
+			</div>
+		</fieldset>
+	</div>
+</script>
 <script type="javascript/template" id="tmpl-event-admin-check-in-page">
 	<div class="event_admin_check_in material">
 		<header class="event_admin_check_in_header">
@@ -2441,507 +2944,5 @@
 			<span class="event_admin_sales_ticket_type_price">{price}</span>
 		</p>
 		{progress_bar}
-	</div>
-</script>
-<script type="javascript/template" id="tmpl-admin-organization-crm-page">
-	<div class="org_admin_crm_page material -level_2_material">
-		<div class="org_admin_crm_page_table_wrapper CRMTableWrapper">
-			<header class="org_admin_crm_page_header">
-				<div class="org_admin_crm_page_header_wrapper">
-					<h3 class="org_admin_crm_page_title">CRM</h3>
-					<div class="org_admin_crm_page_table_search_block">
-						<input class="form_input -rounded -search_bar CRMTableSearch" placeholder="Поиск клиентов">
-					</div>
-				</div>
-				<div class="org_admin_crm_page_header_wrapper"><!--
-					<button class="action fa_icon fa-columns" type="button">Колонки</button>-->
-					{header_buttons}
-				</div>
-			</header>
-
-			<table class="table -data_table_override -data_table_row_selection CRMTable">
-				<thead>
-					<tr>
-						<th>Имя клиента</th>
-						<th>E-mail</th>
-						<th>Аккаунты</th>
-						<th>Пол</th>
-
-						<th>Страна</th>
-						<th>Город</th>
-						<th>Дата авторизации</th>
-						<th>Дата подписки</th>
-						<th>Дата отписки</th>
-						<th>Заходы на организатора</th>
-						<th>Заходы на события</th>
-						<th>Получил уведомлений</th>
-						<th>Открыл уведомлений</th>
-						<th>Скрыл уведомлений</th>
-						<th>Регистраций на события</th>
-						<th>Добавил в избранное</th>
-						<th>Поделился событием</th>
-						<th>Средний чек</th>
-						<th>Общий средний чек</th>
-						<th>Затраты на мои билеты</th>
-						<th>Затраты на билеты всех организаторов</th>
-						<th>Друзья из соц. сетей</th>
-						<th>Лояльность</th>
-						<th>Платёжеспособность</th>
-					</tr>
-				</thead>
-				<tbody></tbody>
-			</table>
-		</div>
-
-		{loader}
-	</div>
-</script>
-
-<script type="javascript/template" id="tmpl-admin-organization-crm-page-tr">
-	<tr>
-		<td>{user_avatar_block}</td>
-		<td>{email}</td>
-		<td>{accounts}</td>
-		<td>{gender}</td>
-
-		<td>Страна</td>
-		<td>Город</td>
-		<td>Дата авторизации</td>
-		<td>Дата подписки</td>
-		<td>Дата отписки</td>
-		<td>Заходы на организатора</td>
-		<td>Заходы на события</td>
-		<td>Получил уведомлений</td>
-		<td>Открыл уведомлений</td>
-		<td>Скрыл уведомлений</td>
-		<td>Регистраций на события</td>
-		<td>Добавил в избранное</td>
-		<td>Поделился событием</td>
-		<td>Средний чек</td>
-		<td>Общий средний чек</td>
-		<td>Затраты на мои билеты</td>
-		<td>Затраты на билеты всех организаторов</td>
-		<td>Друзья из соц. сетей</td>
-		<td>Лояльность</td>
-		<td>Платёжеспособность</td>
-	</tr>
-</script>
-<script type="javascript/template" id="tmpl-orgstat-events-page">
-	<div class="page orgstat_events_page">
-		<header class="orgstat_events_page_header"></header>
-		<div class="OrgStatFutureEventsWrapper"></div>
-		<div class="OrgStatPastEventsWrapper"></div>
-	</div>
-</script>
-
-<script type="javascript/template" id="tmpl-orgstat-events-wrapper">
-	<h3 class="orgstat_events_title">{title}</h3>
-	<table class="orgstat_events_table statistics_table -table_fixed">
-		<colgroup>
-			<col>
-			<col width="144px">
-			<col width="120px">
-			<col width="100px">
-			<col width="160px">
-			<col width="110px">
-			<col width="144px">
-		</colgroup>
-		<thead>
-			<tr>
-				<th class="-unselectable" align="left"><span class="Text">Название события</span></th>
-				<th class="-unselectable" data-sort-order="desc"><span class="Text">Дата события</span></th>
-				<th class="-unselectable" data-sort-order="desc"><span class="Text">Просмотров</span></th>
-				<th class="-unselectable" data-sort-order="desc"><span class="Text">Открытий</span></th>
-				<th class="-unselectable" data-sort-order="desc"><span class="Text">Доб. в избранное</span></th>
-				<th class="-unselectable" data-sort-order="desc"><span class="Text">Конверсия</span></th>
-				<th class="-unselectable" data-sort-order="desc"><span class="Text">Уведомлений</span></th>
-			</tr>
-		</thead>
-		{rows}
-	</table>
-</script>
-
-<script type="javascript/template" id="tmpl-orgstat-no-events-wrapper">
-	<h3 class="orgstat_events_title">{title}</h3>
-	<div class="orgstat_events_no_events_wrapper">
-		<p>Предстоящих событий нет. Хотите добавить новое событие?</p>
-		{call_to_action}
-	</div>
-</script>
-
-<script type="javascript/template" id="tmpl-orgstat-events-row">
-	<tr>
-		<td><a href="/admin/event/{id}" class="link Link Text">{title}</a></td>
-		<td align="center" data-sort="{timestamp}"><span class="Text">{date}</span></td>
-		<td align="center" class="-text_big -highlighted"><span class="Text">{view}</span></td>
-		<td align="center" class="-text_big -highlighted"><span class="Text">{view_detail}</span></td>
-		<td align="center" class="-text_big -highlighted"><span class="Text">{fave}</span></td>
-		<td align="center" class="-text_big -highlighted"><span class="Text">{conversion}</span></td>
-		<td align="center" class="-text_big -highlighted"><span class="Text">{notifications_sent}</span></td>
-	</tr>
-</script>
-<script type="javascript/template" id="tmpl-admin-organization-finances-page">
-	<div class="org_admin_finances_page material -level_2_material">
-		<div class="org_admin_finances_wrapper">
-			<h3>Финансы организации</h3>
-			<div class="flex_grid -parts_equal_3">
-				<div class="grid_box">
-					<div class="scoreboard -size_big">
-						<span class="scoreboard_title">Выручка</span>
-						<span class="scoreboard_number">{total_income}</span>
-					</div>
-				</div>
-				<div class="grid_box">
-					<div class="scoreboard -size_normal">
-						<span class="scoreboard_title">Комиссия Evendate</span>
-						<span class="scoreboard_number">{evendate_commission_value} (1%)</span>
-					</div>
-				</div>
-				<div class="grid_box">
-					<div class="scoreboard -size_normal">
-						<span class="scoreboard_title">Комиссия за эквайринг</span>
-						<span class="scoreboard_number">{processing_commission_value} <span class="tooltip" title="Комиссия зависит от способа оплаты участниками. Процент высчитывается как округленное среднее со всех заказов.">({processing_commission}%)</span></span>
-					</div>
-				</div>
-			</div>
-			<div class="flex_grid -valign_center -parts_1_2">
-				<div class="grid_box">
-					<div class="scoreboard -size_big">
-						<span class="scoreboard_title">Доступно для вывода</span>
-						<span class="scoreboard_number -text_color_accent">{withdraw_available}</span>
-					</div>
-				</div>
-				<div class="grid_box">
-					{withdraw_funds_button}
-				</div>
-			</div>
-		</div>
-		<div class="TransactionStory">
-			<div class="org_admin_finances_wrapper">
-				<h4>История вывода средств</h4>
-			</div>
-			<table class="table -data_table_override TransactionStoryTable">
-				<colgroup>
-					<col width="120">
-					<col>
-					<col>
-					<col>
-					<col width="200">
-				</colgroup>
-				<thead>
-					<tr>
-						<th>Дата</th>
-						<th>Сотрудник</th>
-						<th>Статус</th>
-						<th>Примечание</th>
-						<th>Ответ</th>
-						<th align="right">Сумма</th>
-					</tr>
-				</thead>
-				<tbody></tbody>
-			</table>
-			{transactions_loader}
-		</div>
-
-		<div class="org_admin_finances_wrapper">
-			{charts}
-		</div>
-
-		<div class="EventsFinances">
-			<div class="org_admin_finances_wrapper">
-				<h4>События</h4>
-			</div>
-			<table class="table -data_table_override EventsFinancesTable">
-				<colgroup>
-					<col>
-					<col width="150">
-					<col width="150">
-				</colgroup>
-				<thead>
-					<tr>
-						<th>Название</th>
-						<th align="right">Выручка</th>
-						<th align="right">Заработано</th>
-					</tr>
-				</thead>
-				<tbody></tbody>
-			</table>
-			{events_loader}
-		</div>
-	</div>
-</script>
-
-<script type="javascript/template" id="tmpl-admin-organization-finances-chart">
-	<div class="org_admin_finances_chart chart_wrapper {classes} AreaChart"></div>
-</script>
-
-<script type="javascript/template" id="tmpl-admin-organization-finances-transaction-row">
-	<tr>
-		<td data-order="{date_timestamp}">{date}</td>
-		<td>{staff_block}</td>
-		<td>{status}</td>
-		<td class="-preformatted_text">{comment}</td>
-		<td class="-preformatted_text">{response}</td>
-		<td align="right">{sum}</td>
-	</tr>
-</script>
-
-<script type="javascript/template" id="tmpl-admin-organization-finances-event-row">
-	<tr>
-		<td>{title}</td>
-		<td align="right">{sum}</td>
-		<td align="right">{total_sum}</td>
-	</tr>
-</script>
-<script type="javascript/template" id="tmpl-orgstat-overview">
-	<div class="page orgstat_overview">
-		<aside class="orgstat_overview_sidebar">
-			<header class="orgstat_overview_sidebar_header">
-				<span class="small_title">Об организаторе</span>
-				<!--<span class="stamp -color_accent">Starter</span>-->
-			</header>
-			<div class="orgstat_overview_sidebar_wrapper orgstat_overview_sidebar_top -align_center">
-				{avatar_block}
-				<p class="small_title">{name}</p>
-				<p class="orgstat_overview_sidebar_description">{description}</p>
-				<p class="orgstat_overview_sidebar_location">{default_address}</p>
-				<a href="/admin/organization/{id}/edit" class="button -color_neutral -size_low fa_icon fa-pencil RippleEffect Link"><span class="Text">Редактировать</span></a>
-			</div>
-			<div class="orgstat_overview_sidebar_wrapper -align_center -hidden">
-				<button class="button -color_telegram -size_low fa_icon fa-send RippleEffect" type="button"><span class="Text">Создать Telegram бота</span></button>
-			</div>
-			<div class="orgstat_overview_sidebar_wrapper">
-				{staff_block}
-			</div>
-			{event_blocks}
-			<div class="orgstat_overview_sidebar_wrapper">
-				<p class="small_title">Аудитория</p>
-				<div class="GenderPieChart"></div>
-				<div class="DevicePieChart"></div>
-			</div>
-		</aside>
-		<div class="orgstat_overview_content OrgstatOverviewContent">
-			<header class="orgstat_overview_header Scoreboards">{scoreboards}</header>
-			<div class="orgstat_overview_charts OrgStatAreaCharts">
-				<div class="orgstat_overview_chart AreaChart SubscriberAreaChart"></div>
-				<div class="orgstat_overview_chart AreaChart ViewAreaChart"></div>
-				<div class="orgstat_overview_chart AreaChart ConversionAreaChart"></div>
-			</div>
-		</div>
-	</div>
-</script>
-
-<script type="javascript/template" id="tmpl-orgstat-overview-sidebar-wrapper">
-	<div class="orgstat_overview_sidebar_wrapper">
-		{content}
-	</div>
-</script>
-
-<script type="javascript/template" id="tmpl-orgstat-overview-sidebar-wrapper-title">
-	<p class="small_title">{title}</p>
-</script>
-
-<script type="javascript/template" id="tmpl-orgstat-event-block">
-	<a href="/admin/event/{id}" class="orgstat_event_block link Link">
-		<aside class="orgstat_event_block_date">
-			<span>{day}</span><br>
-			<span>{month}</span>
-		</aside>
-		<div class="orgstat_event_block_body">
-			<p class="orgstat_event_block_name">{title}</p>
-			{badges}
-		</div>
-	</a>
-</script>
-
-<script type="javascript/template" id="tmpl-orgstat-event-block-badge">
-	<span class="orgstat_event_block_badge">{title}</span>
-</script>
-<script type="javascript/template" id="tmpl-admin-organization-requisites-page">
-	<form class="page org_admin_requisites_page material -level_2_material Tabs RequisitesForm">
-		<div class="tabs_header HeaderTabs -color_accent">
-			<span class="tab Tab -active" data-type="legal_entity">Юридическое лицо</span>
-			<span class="tab Tab" data-type="natural_person">Физическое лицо</span>
-		</div>
-		<div class="tab_bodies_wrap TabsBodyWrapper">
-			<fieldset class="tab_body TabsBody -active">
-				<h3>Информация о компании</h3>
-				{l_company_form_field}
-				<fieldset class="CompanyAdditionalInfo -hidden">
-					<div class="form_group -parts_e_e -valign_baseline">
-						{l_inn_form_field}
-						{l_kpp_form_field}
-					</div>
-					{l_real_address_form_field}
-				</fieldset>
-
-				<h3>Банковские данные</h3>
-				{l_bank_name_form_field}
-				<fieldset class="LegalEntityBankAdditionalInfo -hidden">
-					<div class="form_group -parts_e_e -valign_baseline">
-						{l_bic_form_field}
-						{l_correspondent_account_form_field}
-					</div>
-				</fieldset>
-				{l_checking_account_form_field}
-
-				<h3>Подписывающее лицо</h3>
-				{l_signer_name_form_field}
-				{l_signer_position_form_field}
-
-				<h3>Контактная информация</h3>
-				{l_self_name_form_field}
-				<div class="form_group -parts_e_e -valign_baseline">
-					{l_self_email_form_field}
-					{l_self_phone_form_field}
-				</div>
-			</fieldset>
-			<fieldset class="tab_body TabsBody">
-				<h3>Информация об организаторе</h3>
-				{n_self_name_form_field}
-				{n_inn_form_field}
-				<div class="form_group -parts_e_e -valign_baseline">
-					{n_id_number_field}
-					{n_id_when_field}
-				</div>
-				{n_id_who_field}
-
-				{n_register_address_field}
-				{n_post_address_field}
-
-				<h3>Банковские данные</h3>
-				{n_bank_name_form_field}
-				<fieldset class="NaturalPersonBankAdditionalInfo -hidden">
-					<div class="form_group -parts_e_e -valign_baseline">
-						{n_bic_form_field}
-						{n_correspondent_account_form_field}
-					</div>
-				</fieldset>
-				{n_checking_account_form_field}
-
-				<h3>Контактная информация</h3>
-				<div class="form_group -parts_e_e -valign_baseline">
-					{n_self_email_form_field}
-					{n_self_phone_form_field}
-				</div>
-
-			</fieldset>
-		</div>
-		<div class="-align_center">
-			{submit_button}
-		</div>
-	</form>
-</script>
-<script type="javascript/template" id="tmpl-admin-organization-settings-page">
-	<div class="org_admin_settings_page material -level_2_material">
-		<div class="org_admin_settings_wrapper">
-			<h3>Редактирование организации</h3>
-			<p class="-text_color_marginal">Перейдите в раздел редактирования, чтобы изменить данные организации</p>
-			<a href="/admin/organization/{id}/edit" class="button -color_neutral_accent -size_low fa_icon fa-pencil Link RippleEffect"><span class="Text">Редактировать</span></a>
-		</div>
-
-		<div class="org_admin_settings_wrapper">
-			<h3>Права доступа</h3>
-			<div class="org_admin_settings_staff">
-				<div class="org_admin_settings_staff_wrapper">
-					<span class="small_title">Администраторы</span>
-					<div class="org_admin_settings_admins_collection StaffCollection" data-staff_type="admin">
-						{admin_avatar_blocks}
-					</div>
-				</div>
-				<div class="org_admin_settings_staff_wrapper">
-					<span class="small_title">Модераторы</span>
-					<div class="org_admin_settings_admins_collection StaffCollection" data-staff_type="moderator">
-						{moderator_avatar_blocks}
-					</div>
-				</div>
-			</div>
-		</div>
-
-		<fieldset class="org_admin_settings_wrapper SaveLocalWrapper">
-			<h3><label for="org_admin_settings_email">Электронная почта</label></h3>
-			<p class="-text_color_marginal">Вы можете изменить электронную почту для связи</p>
-			<div class="form_group -unite -parts_e_4">
-				<input id="org_admin_settings_email" class="form_input" name="email" value="{email}" placeholder="E-mail" required>
-				<button class="button -color_accent SaveLocal RippleEffect" type="button"><span class="Text">Сохранить</span></button>
-			</div>
-		</fieldset>
-
-		<fieldset class="org_admin_settings_wrapper">
-			<h3>Приватность</h3>
-			<p class="-text_color_marginal">Закрытые организации с доступом по приглашениям</p>
-			{private_checkbox}
-			<p class="-text_color_marginal">Закрытые организации могут публиковать непубличные мероприятия и предоставлять доступ для просмотра по приглашениям. Рекомендуется использовать для внутренних корпоративных мероприятий, где организатор может выслать приглашение конкретным сотрудникам.</p>
-		</fieldset>
-
-		<fieldset class="org_admin_settings_wrapper SaveLocalWrapper" disabled title="Эта функция временно недоступна">
-			<h3>Интеграция с сервисами</h3>
-			<p class="-text_color_marginal">Публикуйте события сразу в Evendate, Facebook и Вконтакте</p>
-			{fb_vk_integration_checkboxes}
-			<fieldset class="Switching" data-switch_id="facebook_integration" disabled>
-				<div class="form_group -unite -parts_e_4">
-					<input id="org_admin_settings_facebook_integration" class="form_input" name="facebook_profile" value="{facebook_profile}" placeholder="Ссылка на профиль Facebook" title="Ссылка на профиль Facebook" required>
-					<button class="button -color_accent SaveLocal RippleEffect" type="button"><span class="Text">Сохранить</span></button>
-				</div>
-			</fieldset>
-			<p class="-text_color_marginal">Интегрируйтесь с Telegram и Slack</p>
-			{slack_telegram_integration_checkboxes}
-		</fieldset>
-
-		<fieldset class="SaveLocalWrapper">
-			<div class="org_admin_settings_wrapper">
-				<h3>Брендирование</h3>
-				<p class="-text_color_marginal">Вы можете изменить цвет элементов страницы организации в соответствии с вашей стилистикой</p>
-				<div class="form_group -parts_e_2">
-					{brand_color_field}
-					{brand_color_accent_field}
-				</div>
-				<div class="form_unit -align_center">
-					{save_colors_button}
-				</div>
-			</div>
-		</fieldset>
-
-		<fieldset class="org_admin_settings_wrapper" disabled title="Эта функция временно недоступна">
-			<h3>Домен</h3>
-			<p class="-text_color_marginal">Измените домен своей организации или создайте собственный домен. По этому адресу будет доступна страница вашей организации.</p>
-			<table class="org_admin_settings_domain_table">
-				<tbody>
-					<tr>
-						<td>{subdomain_radio}</td>
-						<td><input class="form_input" name="domain" value="{subdomain}" required></td>
-						<td>.evendate.io</td>
-						<td align="right"><button class="button -color_accent -size_low RippleEffect" type="button"><span class="Text">Подключить</span></button></td>
-					</tr>
-					<tr>
-						<td>{other_domain_radio}</td>
-						<td><input class="form_input" name="domain" value="{other_domain}" disabled required></td>
-						<td></td>
-						<td align="right"><button class="button -color_accent -size_low RippleEffect" type="button"><span class="Text">Подключить</span></button></td>
-					</tr>
-				</tbody>
-			</table>
-		</fieldset>
-
-		<fieldset class="org_admin_settings_wrapper">
-			<h3 id="change_tariff">Сменить тариф</h3>
-			<div class="org_admin_settings_tariff">
-				<div class="org_admin_settings_tariff_head">
-					<span class="org_admin_settings_tariff_title">Базовый</span>
-					<span class="org_admin_settings_tariff_price">0 руб./мес.</span>
-				</div>
-				<p class="-text_color_marginal"></p>
-			</div>
-			<div class="org_admin_settings_tariff">
-				<div class="org_admin_settings_tariff_head">
-					<span class="org_admin_settings_tariff_title -text_color_accent">Полный</span>
-					<span class="org_admin_settings_tariff_price -text_color_accent">800 руб./мес.</span>
-					<div class="org_admin_settings_tariff_button">
-						{tariff_button}
-					</div>
-				</div>
-				<p class="-text_color_marginal -align_right">{tariff_service_info}</p>
-			</div>
-		</fieldset>
 	</div>
 </script>

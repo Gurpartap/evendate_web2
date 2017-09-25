@@ -1759,7 +1759,6 @@ a.button:hover {text-decoration: none}
 table.table.-data_table_override {
 	width: 100%;
 	margin: 0;
-	table-layout: fixed;
 	border-bottom: 0;
 }
 table.table.-data_table_override thead {box-shadow: 0 3px 8px -1px hsla(0,0%,0%,.06)}
