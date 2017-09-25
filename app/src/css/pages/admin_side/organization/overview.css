@@ -73,7 +73,6 @@
 	font-size: 14px;
 	font-weight: 700;
 	color: #9fa6b3;
-	color: var(--color_primary_50);
 	text-align: center;
 	text-transform: uppercase;
 }
@@ -85,7 +84,6 @@
 	color: #fff;
 	border-radius: 2px;
 	background-color: #9fa6b3;
-	background-color: var(--color_primary_50);
 }
 
 .orgstat_overview_header {
@@ -108,4 +106,9 @@
 .orgstat_overview_chart {
 	height: 460px;
 	margin-bottom: 60px;
+}
+
+@supports (--custom_properties: 1) {
+	.orgstat_event_block_date {color: var(--color_primary_50)}
+	.orgstat_event_block_badge {background-color: var(--color_primary_50)}
 }

@@ -36,6 +36,8 @@ OrganizationPage = extending(Page, (function() {
 			'site_url',
 			'is_subscribed',
 			'privileges',
+			'brand_color',
+			'brand_color_accent',
 			'default_address',
 			'subscribed_count', {
 				subscribed: {
@@ -155,6 +157,13 @@ OrganizationPage = extending(Page, (function() {
 		var PAGE = this,
 			$subscribers_scroll = PAGE.$wrapper.find('.SubscribersScroll');
 		
+		if (this.organization.brand_color || this.organization.brand_color_accent) {
+			__APP.repaint({
+				header: this.organization.brand_color,
+				accent: this.organization.brand_color_accent
+			});
+		}
+		
 		bindTabs(PAGE.$wrapper);
 		bindCallModal(PAGE.$wrapper);
 		
@@ -255,6 +264,12 @@ OrganizationPage = extending(Page, (function() {
 		if (PAGE.is_admin) {
 			PAGE.fetchAndAppendFeed(PAGE.event_types.delayed);
 			PAGE.fetchAndAppendFeed(PAGE.event_types.canceled);
+		}
+	};
+	
+	OrganizationPage.prototype.destroy = function() {
+		if (__APP.IS_REPAINTED) {
+			__APP.setDefaultColors();
 		}
 	};
 	

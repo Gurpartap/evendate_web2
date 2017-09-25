@@ -143,6 +143,42 @@ __APP = {
 	MODALS: new Modals(),
 	BUILD: new Builder(),
 	IS_WIDGET: false,
+	IS_REPAINTED: false,
+	/**
+	 *
+	 * @param {object} colors
+	 * @param {string} [colors.header]
+	 * @param {string} [colors.accent]
+	 */
+	repaint: function(colors) {
+		__APP.IS_REPAINTED = true;
+		
+		if (colors.header) {
+			(function(hex) {
+				var main_header = __APP.TOP_BAR.$main_header.get(0),
+					contrast_hex = getContrastColor(hex);
+				
+				main_header.style.setProperty('--color_primary', hex);
+				main_header.style.setProperty('color', contrast_hex);
+			})(colors.header);
+		}
+		
+		if (colors.accent) {
+			(function(hex) {
+				$('#main_overlay').get(0).style.setProperty('--color_accent', hex);
+			})(colors.accent);
+		}
+	},
+	
+	setDefaultColors: function() {
+		var main_header = __APP.TOP_BAR.$main_header.get(0),
+			main_overlay = $('#main_overlay').get(0);
+		
+		main_header.style.removeProperty('--color_primary');
+		main_header.style.removeProperty('color');
+		
+		main_overlay.style.removeProperty('--color_accent');
+	},
 	/**
 	 * Changes title of the page
 	 * @param {(string|Array<{page: {string}, title: {string}}>|jQuery)} new_title

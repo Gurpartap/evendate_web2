@@ -15,7 +15,6 @@
 
 .event_image {
 	border-bottom: 1px solid #c5c9d1;
-	border-bottom: 1px solid var(--color_primary_30);
 	cursor: pointer;
 }
 .event_image > img {width: 100%}
@@ -64,7 +63,6 @@
 	width: 30%;
 	padding: 24px;
 	border-left: 1px solid #c5c9d1;
-	border-left: 1px solid var(--color_primary_30);
 }
 .event_calendar:not(:empty) {height: 265px}
 
@@ -98,7 +96,6 @@
 	margin-bottom: .5em;
 	font-weight: 500;
 	color: #3e4d66;
-	color: var(--color_primary);
 }
 .event_additional_content > .event_additional_field:first-child {margin-top: 0}
 
@@ -126,11 +123,17 @@
 	font-size: .88em;
 	line-height: 1.4;
 	color: #3e4d66;
-	color: var(--color_primary);
 	text-transform: uppercase;
 	text-align: center;
 }
 
 .event_page > .overlay_cap {
 	background-color: hsla(0,0%,100%,.9);
+}
+
+@supports (--custom_properties: 1) {
+	.event_image {border-bottom-color: 1var(--color_primary_30)}
+	.event_additional_content {border-left-color: var(--color_primary_30)}
+	.event_additional_field_label {color: var(--color_primary)}
+	.event_vulcan_header {color: var(--color_primary)}
 }

@@ -63,7 +63,6 @@ fieldset:disabled .form_select {cursor: default}
 	font-size: 14px;
 	line-height: 20px;
 	color: #657184;
-	color: var(--color_primary_80);
 	font-weight: 500;
 }
 
@@ -71,7 +70,6 @@ fieldset:disabled .form_select {cursor: default}
 	margin: 0;
 	font-size: .8125em;
 	color: #9fa6b3;
-	color: var(--color_primary_50);
 }
 
 .form_prompt {
@@ -108,13 +106,12 @@ fieldset:disabled .form_select {cursor: default}
 :not(.-status_disabled) .form_input:not(:disabled):not(.-status_disabled):focus,
 :not(.-status_disabled) .form_textarea:not(:disabled):not(.-status_disabled):focus {
 	background-color: #fff;
-	border-color: var(--color_franklin);
+	border-color: #00dc88;
 }
 
 .form_input:-moz-placeholder,
 .form_textarea:-moz-placeholder {
 	color: #9fa6b3;
-	color: var(--color_primary_50);
 	-webkit-transition: color .2s ease;
 	transition: color .2s ease;
 }
@@ -122,7 +119,6 @@ fieldset:disabled .form_select {cursor: default}
 .form_input::-webkit-input-placeholder,
 .form_textarea::-webkit-input-placeholder {
 	color: #9fa6b3;
-	color: var(--color_primary_50);
 	-webkit-transition: color .2s ease;
 	transition: color .2s ease;
 }
@@ -154,7 +150,6 @@ fieldset:disabled .form_select {cursor: default}
 	-moz-appearance: none;
 	padding-right: 24px;
 	background-color: #fff;
-	background-color: var(--color_page);
 	border: 0;
 	box-shadow: 0 1px 2px #b3b3b3;
 	cursor: pointer;
@@ -167,7 +162,6 @@ fieldset:disabled .form_select {cursor: default}
 .form_fieldset.-color_marginal {
 	margin: 24px 0 36px;
 	background-color: #f6f6f6;
-	background-color: var(--color_gray_material);
 	border-radius: 2px;
 }
 
@@ -232,12 +226,10 @@ fieldset:disabled .form_select {cursor: default}
 	height: 2.2em;
 	padding: 0;
 	background-color: #fff;
-	background-color: var(--color_page);
 	border: 0;
 	border-radius: 2px;
 	box-shadow: 0 1px 2px #b3b3b3;
 	color: #4a4a4a;
-	color: var(--color_text);
 }
 
 .form_select2.select2-dropdown-open > .select2-choice {border-radius: 3px 3px 0 0}
@@ -252,7 +244,6 @@ fieldset:disabled .form_select {cursor: default}
 .form_select2.select2-container.select2-container-disabled > .select2-choice {
 	border-color: #ddd;
 	background-color: #f9f9fa;
-	background-color: var(--color_background_gray);
 	box-shadow: none;
 }
 .form_select2.select2-container > .select2-choice > .select2-arrow {top: 0}
@@ -277,10 +268,7 @@ fieldset:disabled .form_select {cursor: default}
 	border: 0;
 	box-shadow: 0 1px 2px #d9d9d9;
 }
-.select2-drop.select2-drop-above.select2-drop-active {
-	border-color: #c5c9d1;
-	border-color: var(--color_primary_30);
-}
+.select2-drop.select2-drop-above.select2-drop-active {border-color: #c5c9d1}
 
 .form_select2_drop > .select2-results {
 	margin: 5px 0;
@@ -290,7 +278,6 @@ fieldset:disabled .form_select {cursor: default}
 .form_select2_drop > .select2-results .select2-highlighted {
 	color: inherit;
 	background-color: #c5c9d1;
-	background-color: var(--color_primary_30);
 }
 
 .form_select2_drop_no_search > .select2-search {display: none}
@@ -349,9 +336,7 @@ fieldset:disabled .form_select {cursor: default}
 
 .form_select2.form_input.select2-container-multi .select2-choices .select2-search-choice {
 	background-color: #f82969;
-	background-color: var(--color_accent);
 	border: 1px solid #f82969;
-	border: 1px solid var(--color_accent);
 }
 
 /* /Form Select2 */
@@ -439,19 +424,6 @@ fieldset:disabled .form_select {cursor: default}
 .form_unit > .form_radio:checked + .form_label:after,
 .form_unit > .form_checkbox:checked + .form_label:after {border-color: #fff}
 
-
-.form_unit > .form_radio:checked + .form_label:after,
-.form_unit > .form_checkbox:checked + .form_label:before {background-color: #f82969; background-color: var(--color_accent);}
-.form_unit > .form_radio:checked + .form_label:before,
-.form_unit:not(.-status_disabled) > .form_radio:not(:disabled) + .form_label:hover:before,
-.form_unit:not(.-status_disabled) > .form_checkbox:not(:disabled) + .form_label:hover:before {border-color: #f82969; border-color: var(--color_accent);}
-
-.-state_admin .form_unit > .form_radio:checked + .form_label:after,
-.-state_admin .form_unit > .form_checkbox:checked + .form_label:before {background-color: #00dc88}
-.-state_admin .form_unit > .form_radio:checked + .form_label:before,
-.-state_admin .form_unit:not(.-status_disabled) > .form_radio:not(:disabled) + .form_label:hover:before,
-.-state_admin .form_unit:not(.-status_disabled) > .form_checkbox:not(:disabled) + .form_label:hover:before {border-color: #00dc88}
-
 /* /Form Radio & Checkbox */
 /* Form Radio Group */
 
@@ -469,7 +441,6 @@ fieldset:disabled .form_select {cursor: default}
 	padding: 4px 8px;
 	word-wrap: normal;
 	border: 1px solid #c5c9d1;
-	border: 1px solid var(--color_primary_30);
 }
 
 .radio_group > .form_unit + .form_unit > .form_label {border-left: 0}
@@ -477,16 +448,11 @@ fieldset:disabled .form_select {cursor: default}
 .radio_group > .form_unit:first-child > .form_label {border-radius: 3px 0 0 3px}
 .radio_group > .form_unit:last-child > .form_label {border-radius: 0 3px 3px 0}
 
-.radio_group > .form_unit > .form_radio:not(:checked) + .form_label {
-	color: #9fa6b3;
-	color: var(--color_primary_50);
-}
+.radio_group > .form_unit > .form_radio:not(:checked) + .form_label {color: #9fa6b3}
 
 .radio_group > .form_unit > .form_radio:checked + .form_label {
 	color: #3e4d66;
-	color: var(--color_primary);
 	background-color: #f9f9fa;
-	background-color: var(--color_background_gray);
 }
 
 .radio_group > .form_unit > .form_label > span {
@@ -539,26 +505,7 @@ fieldset:disabled .form_select {cursor: default}
 	transition: transform .2s ease, background-color .2s ease;
 }
 
-.form_switch > input:checked ~ .form_switch_road {
-	background-color: #f82969;
-	background-color: var(--color_accent);
-}
-
-.-state_admin .form_switch > input:checked ~ .form_switch_road {
-	background-color: #00dc88;
-	background-color: var(--color_accent);
-}
-
-.form_switch > input:checked ~ .form_switch_runner {
-	background-color: #f82969;
-	background-color: var(--color_accent);
-	transform: translateX(calc(100% + 0.1875em));
-}
-
-.-state_admin .form_switch > input:checked ~ .form_switch_runner {
-	background-color: #00dc88;
-	background-color: var(--color_accent);
-}
+.form_switch > input:checked ~ .form_switch_runner {transform: translateX(calc(100% + 0.1875em))}
 
 .form_unit > .form_switch + .form_label {
 	display: inline;
@@ -601,9 +548,7 @@ fieldset:disabled .form_select {cursor: default}
 :not(.-status_disabled) .form_input.-flat:not(:disabled):not(.-status_disabled):focus {
 	background-color: transparent;
 	border: 0;
-	border-bottom: 2px solid;
-	border-color: #c5c9d1;
-	border-color: var(--color_primary_30);
+	border-bottom: 2px solid #c5c9d1;
 	box-shadow: none;
 }
 
@@ -623,7 +568,7 @@ fieldset:disabled .form_select {cursor: default}
 	vertical-align: top;
 	margin-bottom: 0;
 }
-.form_group > .form_unit + .form_unit {margin-left: 12px}
+.form_group > .form_unit + .form_unit {margin-left: 16px}
 .form_group > .form_unit.-inline {display: inline-flex}
 
 .form_group.-parts_e_2 > .form_unit,
@@ -650,7 +595,7 @@ fieldset:disabled .form_select {cursor: default}
 .form_group.-parts_1_3 > .form_unit:not(:nth-child(2n+1)),
 .form_group.-parts_3_1 > .form_unit:not(:nth-child(2n+1)),
 .form_group.-parts_2_3 > .form_unit:not(:nth-child(2n+1)),
-.form_group.-parts_3_2 > .form_unit:not(:nth-child(2n+1)) {margin-left: 1%}
+.form_group.-parts_3_2 > .form_unit:not(:nth-child(2n+1)) {margin-left: 16px}
 
 .form_group.-parts_e_2 > .form_unit:nth-child(n+3),
 .form_group.-parts_e_e > .form_unit:nth-child(n+3),
@@ -659,7 +604,7 @@ fieldset:disabled .form_select {cursor: default}
 .form_group.-parts_1_3 > .form_unit:nth-child(n+3),
 .form_group.-parts_3_1 > .form_unit:nth-child(n+3),
 .form_group.-parts_2_3 > .form_unit:nth-child(n+3),
-.form_group.-parts_3_2 > .form_unit:nth-child(n+3) {margin-top: 1em}
+.form_group.-parts_3_2 > .form_unit:nth-child(n+3) {margin-top: 16px}
 
 
 .form_group.-parts_e_2 > .form_unit.-offset_1,
@@ -716,7 +661,7 @@ fieldset:disabled .form_select {cursor: default}
 .form_group.-parts_2_2_1 > .form_unit:not(:nth-child(3n+1)),
 .form_group.-parts_1_1_3 > .form_unit:not(:nth-child(3n+1)),
 .form_group.-parts_1_3_1 > .form_unit:not(:nth-child(3n+1)),
-.form_group.-parts_3_1_1 > .form_unit:not(:nth-child(3n+1)) {margin-left: 1%}
+.form_group.-parts_3_1_1 > .form_unit:not(:nth-child(3n+1)) {margin-left: 16px}
 
 .form_group.-parts_e_3   > .form_unit.-offset_1,
 .form_group.-parts_e_e_e > .form_unit.-offset_1 {margin-left: 33.6666667%}
@@ -765,7 +710,7 @@ fieldset:disabled .form_select {cursor: default}
 .form_group.-parts_2_2_1 > .form_unit:nth-child(n+4),
 .form_group.-parts_1_1_3 > .form_unit:nth-child(n+4),
 .form_group.-parts_1_3_1 > .form_unit:nth-child(n+4),
-.form_group.-parts_3_1_1 > .form_unit:nth-child(n+4) {margin-top: 1em}
+.form_group.-parts_3_1_1 > .form_unit:nth-child(n+4) {margin-top: 16px}
 
 
 
@@ -815,14 +760,14 @@ fieldset:disabled .form_select {cursor: default}
 .form_group.-parts_1_1_1_2 > .form_unit:not(:nth-child(4n+1)),
 .form_group.-parts_1_1_2_1 > .form_unit:not(:nth-child(4n+1)),
 .form_group.-parts_1_2_1_1 > .form_unit:not(:nth-child(4n+1)),
-.form_group.-parts_2_1_1_1 > .form_unit:not(:nth-child(4n+1)) {margin-left: 1%}
+.form_group.-parts_2_1_1_1 > .form_unit:not(:nth-child(4n+1)) {margin-left: 16px}
 
 .form_group.-parts_e_4     > .form_unit:nth-child(n+5),
 .form_group.-parts_e_e_e_e > .form_unit:nth-child(n+5),
 .form_group.-parts_1_1_1_2 > .form_unit:nth-child(n+5),
 .form_group.-parts_1_1_2_1 > .form_unit:nth-child(n+5),
 .form_group.-parts_1_2_1_1 > .form_unit:nth-child(n+5),
-.form_group.-parts_2_1_1_1 > .form_unit:nth-child(n+5) {margin-top: 1em}
+.form_group.-parts_2_1_1_1 > .form_unit:nth-child(n+5) {margin-top: 16px}
 
 
 
@@ -831,10 +776,10 @@ fieldset:disabled .form_select {cursor: default}
 
 
 .form_group.-parts_e_5       > .form_unit:not(:nth-child(5n+1)),
-.form_group.-parts_e_e_e_e_e > .form_unit:not(:nth-child(5n+1)) {margin-left: 1%}
+.form_group.-parts_e_e_e_e_e > .form_unit:not(:nth-child(5n+1)) {margin-left: 16px}
 
 .form_group.-parts_e_5       > .form_unit:nth-child(n+6),
-.form_group.-parts_e_e_e_e_e > .form_unit:nth-child(n+6) {margin-top: 1em}
+.form_group.-parts_e_e_e_e_e > .form_unit:nth-child(n+6) {margin-top: 16px}
 
 
 
@@ -864,17 +809,16 @@ fieldset:disabled .form_select {cursor: default}
 
 .form_unit.-status_error,
 .form_unit.-status_error > .form_label,
-.form_unit.-status_error > .form_helptext {color: #fd7b6e; color: var(--color_error);}
+.form_unit.-status_error > .form_helptext {color: #fd7b6e}
 .form_unit.-status_error > .form_input:-moz-placeholder,
-.form_unit.-status_error > .form_textarea:-moz-placeholder {color: #fd7b6e; color: var(--color_error);}
+.form_unit.-status_error > .form_textarea:-moz-placeholder {color: #fd7b6e}
 .form_unit.-status_error > .form_input::-webkit-input-placeholder,
-.form_unit.-status_error > .form_textarea::-webkit-input-placeholder {color: #fd7b6e; color: var(--color_error);}
+.form_unit.-status_error > .form_textarea::-webkit-input-placeholder {color: #fd7b6e}
 
 .form_unit.-status_error > .form_input,
 .form_unit.-status_error > .form_select,
 .form_unit.-status_error > .form_textarea  {
 	border-color: #fd7b6e;
-	border-color: var(--color_error);
 	box-shadow: 0 0 3px rgba(255, 53, 0, 0.6);
 }
 
@@ -932,12 +876,10 @@ fieldset:disabled .form_select {cursor: default}
 .form_input.-search_bar:-moz-placeholder {
 	font-weight: 500;
 	color: #9fa6b3;
-	color: var(--color_primary_50);
 }
 .form_input.-search_bar::-webkit-input-placeholder {
 	font-weight: 500;
 	color: #9fa6b3;
-	color: var(--color_primary_50);
 }
 
 .search_icon {
@@ -953,3 +895,97 @@ fieldset:disabled .form_select {cursor: default}
 }
 
 /* /Form -status */
+
+
+@supports (--custom_properties: 1) {
+
+	.form_text {color: var(--color_primary_80)}
+
+	.form_helptext {color: var(--color_primary_50)}
+
+	:not(.-status_disabled) .form_input:not(:disabled):not(.-status_disabled):focus,
+	:not(.-status_disabled) .form_textarea:not(:disabled):not(.-status_disabled):focus {border-color: var(--color_franklin)}
+
+	.form_input:-moz-placeholder,
+	.form_textarea:-moz-placeholder {color: var(--color_primary_50)}
+
+	.form_input::-webkit-input-placeholder,
+	.form_textarea::-webkit-input-placeholder {color: var(--color_primary_50)}
+
+	.form_select {background-color: var(--color_page)}
+
+	.form_fieldset.-color_marginal {background-color: var(--color_gray_material)}
+
+	.form_select2 > .select2-choice {
+		background-color: #fff;
+		color: #4a4a4a;
+	}
+
+	.form_select2.select2-container.select2-container-disabled > .select2-choice {background-color: var(--color_background_gray)}
+
+	.select2-drop.select2-drop-above.select2-drop-active {border-color: var(--color_primary_30)}
+
+	.form_select2_drop > .select2-results .select2-highlighted {background-color: var(--color_primary_30)}
+
+	.form_select2.form_input.select2-container-multi .select2-choices .select2-search-choice {
+		background-color: var(--color_accent);
+		border-color: var(--color_accent);
+	}
+
+	.form_unit > .form_radio:checked + .form_label:after,
+	.form_unit > .form_checkbox:checked + .form_label:before {background-color: var(--color_accent)}
+	.form_unit > .form_radio:checked + .form_label:before,
+	.form_unit:not(.-status_disabled) > .form_radio:not(:disabled) + .form_label:hover:before,
+	.form_unit:not(.-status_disabled) > .form_checkbox:not(:disabled) + .form_label:hover:before {border-color: var(--color_accent)}
+
+
+	.radio_group > .form_unit > .form_label {border-color: var(--color_primary_30)}
+	.radio_group > .form_unit > .form_radio:not(:checked) + .form_label {color: var(--color_primary_50)}
+
+	.radio_group > .form_unit > .form_radio:checked + .form_label {
+		color: var(--color_primary);
+		background-color: var(--color_background_gray);
+	}
+
+	.form_switch > input:checked ~ .form_switch_road,
+	.form_switch > input:checked ~ .form_switch_runner {background-color: var(--color_accent)}
+
+	:not(.-status_disabled) .form_input.-flat:not(:disabled):not(.-status_disabled):focus {border-color: var(--color_primary_30)}
+
+	.form_unit.-status_error,
+	.form_unit.-status_error > .form_label,
+	.form_unit.-status_error > .form_helptext {color: var(--color_error)}
+	.form_unit.-status_error > .form_input:-moz-placeholder,
+	.form_unit.-status_error > .form_textarea:-moz-placeholder {color: var(--color_error)}
+	.form_unit.-status_error > .form_input::-webkit-input-placeholder,
+	.form_unit.-status_error > .form_textarea::-webkit-input-placeholder {color: var(--color_error)}
+
+	.form_unit.-status_error > .form_input,
+	.form_unit.-status_error > .form_select,
+	.form_unit.-status_error > .form_textarea  {border-color: var(--color_error)}
+
+	.form_input.-search_bar:-moz-placeholder {color: var(--color_primary_50)}
+	.form_input.-search_bar::-webkit-input-placeholder {color: var(--color_primary_50)}
+}
+
+@supports not (--custom_properties: 0) {
+
+
+	.form_unit > .form_radio:checked + .form_label:after,
+	.form_unit > .form_checkbox:checked + .form_label:before {background-color: #f82969}
+	.form_unit > .form_radio:checked + .form_label:before,
+	.form_unit:not(.-status_disabled) > .form_radio:not(:disabled) + .form_label:hover:before,
+	.form_unit:not(.-status_disabled) > .form_checkbox:not(:disabled) + .form_label:hover:before {border-color: #f82969}
+
+	.-state_admin .form_unit > .form_radio:checked + .form_label:after,
+	.-state_admin .form_unit > .form_checkbox:checked + .form_label:before {background-color: #00dc88}
+	.-state_admin .form_unit > .form_radio:checked + .form_label:before,
+	.-state_admin .form_unit:not(.-status_disabled) > .form_radio:not(:disabled) + .form_label:hover:before,
+	.-state_admin .form_unit:not(.-status_disabled) > .form_checkbox:not(:disabled) + .form_label:hover:before {border-color: #00dc88}
+
+	.form_switch > input:checked ~ .form_switch_road,
+	.form_switch > input:checked ~ .form_switch_runner {background-color: #f82969}
+
+	.-state_admin .form_switch > input:checked ~ .form_switch_road,
+	.-state_admin .form_switch > input:checked ~ .form_switch_runner {background-color: #00dc88}
+}

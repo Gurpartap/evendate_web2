@@ -77,62 +77,13 @@ a.button:hover {text-decoration: none}
 .button.-color_facebook {color: #fff}
 .button.-color_yandex {color: #000}
 
-.button.-color_neutral,
-.button.-color_default,
-.button.-color_marginal,
-.button.-text_color_neutral,
-.button.-text_color_default,
-.button.-text_color_marginal {color: #4a4a4a; color: var(--color_text);}
-
-.button.-color_neutral_alt {color: #9fa6b3; color: var(--color_primary_50);}
-
-.button.-color_primary_alt,
-.button.-text_color_primary,
-.button.-color_neutral_primary,
-.button.-color_marginal_primary {color: #3e4d66; color: var(--color_primary);}
-
-.button.-color_bubblegum_alt,
-.button.-text_color_bubble_gum,
-.button.-color_neutral_bubble_gum,
-.button.-color_marginal_bubble_gum {color: #f82969; color: var(--color_bubblegum);}
-
-.button.-color_franklin_alt,
-.button.-text_color_franklin,
-.button.-color_neutral_franklin,
-.button.-color_marginal_franklin {color: #00dc88; color: var(--color_franklin);}
-
-.button.-color_accent_alt,
-.button.-text_color_accent,
-.button.-color_neutral_accent,
-.button.-color_marginal_accent {color: #f82969; color: var(--color_accent);}
-
-.-state_admin .button.-color_accent_alt,
-.-state_admin .button.-text_color_accent,
-.-state_admin .button.-color_neutral_accent,
-.-state_admin .button.-color_marginal_accent {color: #00dc88}
-
 
 
 .button.-color_default,
 .button.-color_neutral_alt {background-color: transparent}
 
-.button.-color_primary {background-color: #3e4d66; background-color: var(--color_primary);}
-
-.button.-color_accent {background-color: #f82969; background-color: var(--color_accent);}
-.button.-color_bubblegum {background-color: #f82969; background-color: var(--color_bubblegum);}
-.button.-color_franklin {background-color: #00dc88; background-color: var(--color_franklin);}
-.-state_admin .button.-color_accent {background-color: #00dc88}
-
 .button.-color_primary_alt {background-color: rgba(83,121,184,0.24)}
 .button.-color_accent_alt {background-color: #ffdeeb}
-
-.button.-color_neutral,
-.button.-color_neutral_primary,
-.button.-color_neutral_accent {background-color: #fff; background-color: var(--color_page);}
-
-.button.-color_marginal,
-.button.-color_marginal_primary,
-.button.-color_marginal_accent {background-color: #e2e4e8; background-color: var(--color_marginal);}
 
 
 
@@ -188,7 +139,6 @@ a.button:hover {text-decoration: none}
 	pointer-events: none;
 	cursor: default;
 	color: #9fa6b3;
-	color: var(--color_primary_50);
 	opacity: .4;
 	box-shadow: none;
 }
@@ -235,10 +185,10 @@ a.button:hover {text-decoration: none}
 .button.-color_neutral > .ripple,
 .button.-color_marginal > .ripple,
 .button.-color_neutral_primary > .ripple,
-.button.-color_marginal_primary > .ripple {background-color: #c5c9d1; background-color: var(--color_primary_30)}
+.button.-color_marginal_primary > .ripple {background-color: #c5c9d1}
 
 .button.-color_neutral_accent > .ripple,
-.button.-color_marginal_accent > .ripple {background-color: #ff5f9e; background-color: var(--color_accent_alt)}
+.button.-color_marginal_accent > .ripple {background-color: #ff5f9e}
 
 .-state_admin .button.-color_neutral_accent > .ripple,
 .-state_admin .button.-color_marginal_accent > .ripple {background-color: #23d792}
@@ -248,3 +198,115 @@ a.button:hover {text-decoration: none}
 .button.-state_unselectable[class*="-color_"]:hover {box-shadow: none}
 .button.-state_unselectable > .ripple,
 .-state_admin .button.-state_unselectable > .ripple {background-color: transparent}
+
+@supports (--custom_properties: 1) {
+
+	.button.-color_neutral,
+	.button.-color_default,
+	.button.-color_marginal,
+	.button.-text_color_neutral,
+	.button.-text_color_default,
+	.button.-text_color_marginal {color: var(--color_text)}
+
+	.button.-color_neutral_alt {color: var(--color_primary_50)}
+
+	.button.-color_primary_alt,
+	.button.-text_color_primary,
+	.button.-color_neutral_primary,
+	.button.-color_marginal_primary {color: var(--color_primary)}
+
+	.button.-color_bubblegum_alt,
+	.button.-text_color_bubble_gum,
+	.button.-color_neutral_bubble_gum,
+	.button.-color_marginal_bubble_gum {color: var(--color_bubblegum)}
+
+	.button.-color_franklin_alt,
+	.button.-text_color_franklin,
+	.button.-color_neutral_franklin,
+	.button.-color_marginal_franklin {color: var(--color_franklin)}
+
+	.button.-color_accent_alt,
+	.button.-text_color_accent,
+	.button.-color_neutral_accent,
+	.button.-color_marginal_accent {color: var(--color_accent)}
+
+	.button.-color_primary {background-color: var(--color_primary)}
+
+	.button.-color_accent {background-color: var(--color_accent)}
+	.button.-color_bubblegum {background-color: var(--color_bubblegum)}
+	.button.-color_franklin {background-color: var(--color_franklin)}
+
+	.button.-color_neutral,
+	.button.-color_neutral_primary,
+	.button.-color_neutral_accent {background-color: var(--color_page)}
+
+	.button.-color_marginal,
+	.button.-color_marginal_primary,
+	.button.-color_marginal_accent {background-color: var(--color_marginal)}
+
+
+	.button:disabled,
+	.button.-status_disabled {color: var(--color_primary_50)}
+
+	.button.-color_primary_alt > .ripple,
+	.button.-color_accent_alt > .ripple,
+	.button.-color_neutral > .ripple,
+	.button.-color_marginal > .ripple,
+	.button.-color_neutral_primary > .ripple,
+	.button.-color_marginal_primary > .ripple {background-color: var(--color_primary_30)}
+
+	.button.-color_neutral_accent > .ripple,
+	.button.-color_marginal_accent > .ripple {background-color: var(--color_accent_alt)}
+}
+
+@supports not (--custom_properties: 0) {
+
+	.button.-color_neutral,
+	.button.-color_default,
+	.button.-color_marginal,
+	.button.-text_color_neutral,
+	.button.-text_color_default,
+	.button.-text_color_marginal {color: #4a4a4a}
+
+	.button.-color_neutral_alt {color: #9fa6b3}
+
+	.button.-color_primary_alt,
+	.button.-text_color_primary,
+	.button.-color_neutral_primary,
+	.button.-color_marginal_primary {color: #3e4d66}
+
+	.button.-color_bubblegum_alt,
+	.button.-text_color_bubble_gum,
+	.button.-color_neutral_bubble_gum,
+	.button.-color_marginal_bubble_gum {color: #f82969}
+
+	.button.-color_franklin_alt,
+	.button.-text_color_franklin,
+	.button.-color_neutral_franklin,
+	.button.-color_marginal_franklin {color: #00dc88}
+
+	.button.-color_accent_alt,
+	.button.-text_color_accent,
+	.button.-color_neutral_accent,
+	.button.-color_marginal_accent {color: #f82969}
+
+	.-state_admin .button.-color_accent_alt,
+	.-state_admin .button.-text_color_accent,
+	.-state_admin .button.-color_neutral_accent,
+	.-state_admin .button.-color_marginal_accent {color: #00dc88}
+
+	.button.-color_primary {background-color: #3e4d66}
+
+	.button.-color_accent {background-color: #f82969}
+	.button.-color_bubblegum {background-color: #f82969}
+	.button.-color_franklin {background-color: #00dc88}
+	.-state_admin .button.-color_accent {background-color: #00dc88}
+
+	.button.-color_neutral,
+	.button.-color_neutral_primary,
+	.button.-color_neutral_accent {background-color: #fff}
+
+	.button.-color_marginal,
+	.button.-color_marginal_primary,
+	.button.-color_marginal_accent {background-color: #e2e4e8}
+}

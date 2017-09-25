@@ -2,7 +2,6 @@
 	left: 0;
 	width: 228px;
 	background-color: #fff;
-	background-color: var(--color_page);
 	box-shadow: 0 0 5px rgba(0,0,0,0.25);
 	transition: transform .4s ease;
 	z-index: 11;
@@ -36,15 +35,9 @@
 	transition: fill .4s ease;
 }
 
-.brand_block:hover #evendate_logo_text {
-	fill: #3e4d66;
-	fill: var(--color_primary);
-}
+.brand_block:hover #evendate_logo_text {fill: #3e4d66}
 
-.-state_admin #evendate_logo_dot {
-	fill: #00dc88;
-	fill: var(--color_franklin);
-}
+.-state_admin #evendate_logo_dot {fill: #00dc88}
 
 .sidebar_main_wrapper {
 	height: -webkit-calc(100% - 56px);
@@ -59,7 +52,6 @@
 	font-size: 0.88em;
 	font-weight: 500;
 	color: #4a4a4a;
-	color: var(--color_text);
 	letter-spacing: .14px;
 }
 
@@ -73,16 +65,13 @@
 
 .sidebar_navigation_item:hover,
 .sidebar_navigation_item.-active,
-.sidebar_navigation_item.-active > .sidebar_navigation_counter {
-	color: #f82969;
-	color: var(--color_accent);
-}
+.sidebar_navigation_item.-active > .sidebar_navigation_counter {color: #f82969}
 
 .-state_admin .sidebar_navigation_item:hover,
 .-state_admin .sidebar_navigation_item.-active,
 .-state_admin .sidebar_navigation_item.-active > .sidebar_navigation_counter {color: #00dc88}
 
-.sidebar_navigation_item.-active {background-color: #f6f6f6; background-color: var(--color_gray_material);}
+.sidebar_navigation_item.-active {background-color: #f6f6f6}
 .sidebar_navigation_item.-active > .sidebar_navigation_counter {background-color: transparent}
 
 .sidebar_divider {
@@ -98,7 +87,6 @@
 	font-size: .78em;
 	font-weight: 500;
 	color: #9fa6b3;
-	color: var(--color_primary_50);
 	text-transform: uppercase;
 }
 
@@ -140,7 +128,6 @@
 	text-align: center;
 	font-size: .8125em;
 	color: #9fa6b3;
-	color: var(--color_primary_50);
 }
 
 .sidebar_links > .link {
@@ -155,4 +142,20 @@
 #main_sidebar,
 .-open_sidebar #main_sidebar {
 	transform: translateX(0);
+}
+
+@supports (--custom_properties: 1) {
+
+	.brand_block:hover #evendate_logo_text {fill: var(--color_primary)}
+	.-state_admin #evendate_logo_dot {fill: var(--color_franklin)}
+
+	.sidebar_navigation_item {color: var(--color_text)}
+
+	.sidebar_navigation_item:hover,
+	.sidebar_navigation_item.-active,
+	.sidebar_navigation_item.-active > .sidebar_navigation_counter {color: var(--color_accent)}
+
+	.sidebar_navigation_item.-active {background-color: var(--color_gray_material);}
+	.sidebar_section_heading {color: var(--color_primary_50)}
+	.sidebar_footer {color: var(--color_primary_50)}
 }

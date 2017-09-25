@@ -1664,6 +1664,35 @@ function unixTimestampToISO(timestamp, format) {
 	return moment.unix(timestamp).format(format || __C.DATE_FORMAT);
 }
 /**
+ *
+ * @param {string} hex
+ * @param {number} [threshold]
+ * @return {string}
+ */
+function getContrastColor(hex, threshold){
+	threshold = threshold || 128;
+	var hRed,
+		hGreen,
+		hBlue;
+	
+	function cutHex(hex) {
+		
+		return (hex.charAt(0) === '#') ? hex.substring(1, 7) : hex;
+	}
+	
+	
+	hRed = parseInt((cutHex(hex)).substring(0,2),16);
+	hGreen = parseInt((cutHex(hex)).substring(2,4),16);
+	hBlue = parseInt((cutHex(hex)).substring(4,6),16);
+	
+	if (((hRed * 299) + (hGreen * 587) + (hBlue * 114)) / 1000 > threshold) {
+		
+		return '#000';
+	}
+	
+	return '#fff';
+}
+/**
  * Generates guid-like string (actually, it`s not guid, just randomly compiled string)
  *
  * @return {string}

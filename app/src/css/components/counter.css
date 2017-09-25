@@ -3,13 +3,11 @@
 	vertical-align: baseline;
 	padding: 6px;
 	color: #9fa6b3;
-	color: var(--color_primary_50);
 	font-size: .8em;
 	line-height: 1;
 	font-weight: 500;
 	border-radius: 2em;
 	background-color: #f6f6f6;
-	background-color: var(--color_gray_material);
 	white-space: nowrap;
 	text-align: center;
 }
@@ -28,12 +26,6 @@
 
 .counter:not(:only-child) {margin: 0 .5em}
 
-.counter.-color_primary {background-color: #3e4d66; background-color: var(--color_primary);}
-.counter.-color_accent {background-color: #f82969; background-color: var(--color_accent);}
-.counter.-color_accent_alt {background-color: #ff5f9e; background-color: var(--color_accent_alt);}
-.-state_admin .counter.-color_accent {background-color: #00dc88}
-.-state_admin .counter.-color_accent_alt {background-color: #23d792}
-
 .counter.-color_neutral,
 .counter.-color_neutral_primary,
 .counter.-color_neutral_accent {background-color: #fff}
@@ -45,14 +37,6 @@
 .counter.-color_primary,
 .counter.-color_accent,
 .counter.-color_accent_alt {color: #fff}
-
-.counter.-color_marginal {color: #4a4a4a; color: var(--color_text);}
-.counter.-color_neutral_primary,
-.counter.-color_marginal_primary {color: #3e4d66; color: var(--color_primary);}
-.counter.-color_neutral_accent,
-.counter.-color_marginal_accent {color: #f82969; color: var(--color_accent);}
-.-state_admin .counter.-color_neutral_accent,
-.-state_admin .counter.-color_marginal_accent {color: #00dc88}
 
 .counter.-castable {
 	opacity: 1;
@@ -78,4 +62,38 @@
 	-ms-transform: translate(-30px);
 	-o-transform: translate(-30px);
 	transform: translate(-30px);
+}
+
+@supports (--custom_properties: 1) {
+	.counter {
+		color: var(--color_primary_50);
+		background-color: var(--color_gray_material);
+	}
+
+	.counter.-color_primary {background-color: var(--color_primary)}
+	.counter.-color_accent {background-color: var(--color_accent)}
+	.counter.-color_accent_alt {background-color: var(--color_accent_alt)}
+
+	.counter.-color_marginal {color: var(--color_text)}
+	.counter.-color_neutral_primary,
+	.counter.-color_marginal_primary {color: var(--color_primary)}
+	.counter.-color_neutral_accent,
+	.counter.-color_marginal_accent {color: var(--color_accent)}
+}
+
+@supports not (--custom_properties: 0) {
+
+	.counter.-color_primary {background-color: #3e4d66}
+	.counter.-color_accent {background-color: #f82969}
+	.counter.-color_accent_alt {background-color: #ff5f9e}
+	.-state_admin .counter.-color_accent {background-color: #00dc88}
+	.-state_admin .counter.-color_accent_alt {background-color: #23d792}
+
+	.counter.-color_marginal {color: #4a4a4a}
+	.counter.-color_neutral_primary,
+	.counter.-color_marginal_primary {color: #3e4d66}
+	.counter.-color_neutral_accent,
+	.counter.-color_marginal_accent {color: #f82969}
+	.-state_admin .counter.-color_neutral_accent,
+	.-state_admin .counter.-color_marginal_accent {color: #00dc88}
 }

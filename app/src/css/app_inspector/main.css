@@ -53,8 +53,11 @@
 	font-size: .8125em;
 	font-weight: bold;
 	color: #9fa6b3;
-	color: var(--color_primary_50);
 	text-transform: uppercase;
 }
 
 .app_inspector_wrapper {margin: 36px 0}
+
+@supports (--custom_properties: 1) {
+	.app_inspector_subtitle {color: var(--color_primary_50)}
+}

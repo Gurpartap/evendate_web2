@@ -34,10 +34,7 @@
 }
 
 .event_admin_check_in_search_clear,
-.event_admin_check_in_search::-webkit-input-placeholder {
-	color: #9fa6b3;
-	color: var(--color_primary_50);
-}
+.event_admin_check_in_search::-webkit-input-placeholder {color: #9fa6b3}
 
 .event_admin_check_in_search_clear {
 	position: absolute;
@@ -60,7 +57,6 @@
 
 .event_admin_check_in_search_clear:hover {
 	color: #f82969;
-	color: var(--color_bubblegum);
 	opacity: 1;
 }
 
@@ -70,7 +66,6 @@
 
 .event_admin_check_in_table td:last-child {
 	color: #c5c9d1;
-	color: var(--color_primary_30);
 	font-size: .75em;
 	text-transform: uppercase;
 }
@@ -78,12 +73,16 @@
 .event_admin_check_in_table tr:not(:hover) .check_in_ticket_action {display: none}
 .event_admin_check_in_table tr:hover .check_in_ticket_status {display: none}
 
-.event_admin_check_in_table tr.-ticket_status_awaiting:hover > td:not(:only-child):last-child {
-	color: #00dc88;
-	color: var(--color_franklin);
-}
+.event_admin_check_in_table tr.-ticket_status_awaiting:hover > td:not(:only-child):last-child {color: #00dc88}
+.event_admin_check_in_table tr.-ticket_status_checked:hover > td:not(:only-child):last-child {color: #f82969}
 
-.event_admin_check_in_table tr.-ticket_status_checked:hover > td:not(:only-child):last-child {
-	color: #f82969;
-	color: var(--color_bubblegum);
+@supports (--custom_properties: 1) {
+	.event_admin_check_in_search_clear,
+	.event_admin_check_in_search::-webkit-input-placeholder {color: var(--color_primary_50)}
+
+	.event_admin_check_in_search_clear:hover {color: var(--color_bubblegum)}
+
+	.event_admin_check_in_table td:last-child {color: var(--color_primary_30)}
+	.event_admin_check_in_table tr.-ticket_status_awaiting:hover > td:not(:only-child):last-child {color: var(--color_franklin)}
+	.event_admin_check_in_table tr.-ticket_status_checked:hover > td:not(:only-child):last-child {color: var(--color_bubblegum)}
 }

@@ -43,7 +43,7 @@ try {
 
 	function isOnboardingPage() {
 
-		return isset($_REQUEST['q']) && $_REQUEST['q'] != 'onboarding';
+		return isset($_REQUEST['q']) && $_REQUEST['q'] === 'onboarding';
 	}
 
 	if (isset($_REQUEST['redirect_to'])) {

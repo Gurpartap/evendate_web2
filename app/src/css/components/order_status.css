@@ -1,10 +1,6 @@
 .order_status {
-	--order_status_color: var(--color_primary_50);
-
 	font-size: .6875rem;
 	font-weight: bold;
-	color: #9fa6b3;
-	color: var(--order_status_color);
 	text-transform: uppercase;
 }
 
@@ -16,23 +12,29 @@
 	height: 12px;
 	margin-right: 8px;
 	border-radius: 50%;
-	background-color: var(--order_status_color);
 }
 
-.order_status.-order_status_success {
-	--order_status_color: var(--color_franklin);
-	color: #00dc88;
-}
-.order_status.-order_status_success:before {background-color: #00dc88}
+@supports (--custom_properties: 1) {
+	.order_status {
+		--order_status_color: var(--color_primary_50);
+		color: var(--order_status_color);
+	}
+	.order_status:before {background-color: var(--order_status_color)}
 
-.order_status.-order_status_warning {
-	--order_status_color: var(--color_warning);
-	color: #ff9f00;
+	.order_status.-order_status_success {--order_status_color: var(--color_franklin)}
+	.order_status.-order_status_warning {--order_status_color: var(--color_warning)}
+	.order_status.-order_status_error {--order_status_color: var(--color_error)}
 }
-.order_status.-order_status_warning:before {background-color: #ff9f00}
 
-.order_status.-order_status_error {
-	--order_status_color: var(--color_error);
-	color: #fd7b6e;
+@supports not (--custom_properties: 0) {
+	.order_status {color: #9fa6b3}
+
+	.order_status.-order_status_success {color: #00dc88}
+	.order_status.-order_status_success:before {background-color: #00dc88}
+
+	.order_status.-order_status_warning {color: #ff9f00}
+	.order_status.-order_status_warning:before {background-color: #ff9f00}
+
+	.order_status.-order_status_error {color: #fd7b6e}
+	.order_status.-order_status_error:before {background-color: #fd7b6e}
 }
-.order_status.-order_status_error:before {background-color: #fd7b6e}

@@ -54,14 +54,16 @@
 			{slack_telegram_integration_checkboxes}
 		</fieldset>
 
-		<fieldset class="SaveLocalWrapper" disabled title="Эта функция временно недоступна">
+		<fieldset class="SaveLocalWrapper">
 			<div class="org_admin_settings_wrapper">
 				<h3>Брендирование</h3>
 				<p class="-text_color_marginal">Вы можете изменить цвет элементов страницы организации в соответствии с вашей стилистикой</p>
-				<label class="form_label" for="org_admin_settings_brand_color">Фирменный цвет</label>
-				<div class="form_unit -unite -parts_e_4">
-					<input id="org_admin_settings_brand_color" class="form_input" name="brand_color" value="{brand_color}" placeholder="#3e4d66">
-					<button class="button -color_accent SaveLocal RippleEffect" type="button"><span class="Text">Сохранить</span></button>
+				<div class="form_group -parts_e_2">
+					{brand_color_field}
+					{brand_color_accent_field}
+				</div>
+				<div class="form_unit -align_center">
+					{save_colors_button}
 				</div>
 			</div>
 		</fieldset>

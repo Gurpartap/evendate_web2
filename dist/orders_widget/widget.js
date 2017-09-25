@@ -37525,6 +37525,36 @@ function unixTimestampToISO(timestamp, format) {
 	
 	return moment.unix(timestamp).format(format || __C.DATE_FORMAT);
 }
+
+/**
+ *
+ * @param {string} hex
+ * @param {number} [threshold]
+ * @return {string}
+ */
+function getContrastColor(hex, threshold){
+	threshold = threshold || 128;
+	var hRed,
+		hGreen,
+		hBlue;
+	
+	function cutHex(hex) {
+		
+		return (hex.charAt(0) === '#') ? hex.substring(1, 7) : hex;
+	}
+	
+	
+	hRed = parseInt((cutHex(hex)).substring(0,2),16);
+	hGreen = parseInt((cutHex(hex)).substring(2,4),16);
+	hBlue = parseInt((cutHex(hex)).substring(4,6),16);
+	
+	if (((hRed * 299) + (hGreen * 587) + (hBlue * 114)) / 1000 > threshold) {
+		
+		return '#000';
+	}
+	
+	return '#fff';
+}
 /**
  * Generates guid-like string (actually, it`s not guid, just randomly compiled string)
  *
@@ -40039,19 +40069,19 @@ PromocodeModel = extending(OneEntity, (function() {
 	 * @constructor
 	 * @constructs PromocodeModel
 	 *
-	 * @property {string} ?uuid
-	 * @property {(number|string)} ?event_id
-	 * @property {string} ?code
-	 * @property {boolean} ?is_fixed
-	 * @property {boolean} ?is_percentage
-	 * @property {(number|string)} ?effort
-	 * @property {(number|string)} ?use_limit
-	 * @property {timestamp} ?start_date
-	 * @property {timestamp} ?end_date
-	 * @property {boolean} ?enabled
+	 * @property {?string} uuid
+	 * @property {?number} event_id
+	 * @property {?string} code
+	 * @property {?boolean} is_fixed
+	 * @property {?boolean} is_percentage
+	 * @property {?number} effort
+	 * @property {?number| use_limit
+	 * @property {?timestamp} start_date
+	 * @property {?timestamp} end_date
+	 * @property {?boolean} enabled
 	 *
-	 * @property {timestamp} ?created_at
-	 * @property {timestamp} ?updated_at
+	 * @property {?timestamp} created_at
+	 * @property {?timestamp} updated_at
 	 */
 	function PromocodeModel() {
 		this.uuid = null;
@@ -42487,6 +42517,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 *
 	 * @property {?boolean} is_private
 	 * @property {?string} brand_color
+	 * @property {?string} brand_color_accent
 	 * @property {?OneCity} city
 	 * @property {?} country
 	 *
@@ -42528,6 +42559,7 @@ OneOrganization = extending(OneEntity, (function() {
 		
 		this.is_private = null;
 		this.brand_color = null;
+		this.brand_color_accent = null;
 		this.tariff = new TariffModel();
 		this.city = new OneCity();
 		this.country = null;
@@ -46623,6 +46655,32 @@ Builder = (function() {
 	};
 	/**
 	 *
+	 * @param {(Array<{key: string, value: string}>|Object<string, string>)} pairs
+	 *
+	 * @return {jQuery}
+	 */
+	Builder.prototype.pairList = function(pairs) {
+		
+		return tmpl('pair-list', {
+			pairs: tmpl('pair-list-unit', (function() {
+				if (pairs instanceof Array) {
+					
+					return pairs;
+				}
+				
+				return Object.keys(pairs).reduce(function(collection, key) {
+					collection.push({
+						key: key,
+						value: pairs[key]
+					});
+					
+					return collection;
+				}, []);
+			})())
+		});
+	};
+	/**
+	 *
 	 * @param {Object<OneUser.ACCOUNTS, string>} [accounts_links]
 	 * @param {buildProps} [props]
 	 * @returns {jQuery}
@@ -48012,7 +48070,7 @@ OrderPage = extending(Page, (function() {
 		
 		this.render_vars.pay_button.on('click.MakeOrder', function() {
 			var result,
-				callback_url = parsed_uri.queryKey['away_to'] || (window.location.origin + '/event/' + self.event.id),
+				callback_url = decodeURIComponent(parsed_uri.queryKey['away_to']) || (window.location.origin + '/event/' + self.event.id),
 				is_type_selected;
 			
 			is_type_selected = Array.prototype.reduce.call($quantity_inputs, function(accumulator, input) {
@@ -48766,6 +48824,42 @@ __APP = {
 	MODALS: new Modals(),
 	BUILD: new Builder(),
 	IS_WIDGET: true,
+	IS_REPAINTED: false,
+	/**
+	 *
+	 * @param {object} colors
+	 * @param {string} [colors.header]
+	 * @param {string} [colors.accent]
+	 */
+	repaint: function(colors) {
+		__APP.IS_REPAINTED = true;
+		
+		if (colors.header) {
+			(function(hex) {
+				var main_header = __APP.TOP_BAR.$main_header.get(0),
+					contrast_hex = getContrastColor(hex);
+				
+				main_header.style.setProperty('--color_primary', hex);
+				main_header.style.setProperty('color', contrast_hex);
+			})(colors.header);
+		}
+		
+		if (colors.accent) {
+			(function(hex) {
+				$('#main_overlay').get(0).style.setProperty('--color_accent', hex);
+			})(colors.accent);
+		}
+	},
+	
+	setDefaultColors: function() {
+		var main_header = __APP.TOP_BAR.$main_header.get(0),
+			main_overlay = $('#main_overlay').get(0);
+		
+		main_header.style.removeProperty('--color_primary');
+		main_header.style.removeProperty('color');
+		
+		main_overlay.style.removeProperty('--color_accent');
+	},
 	/**
 	 * Changes title of the page
 	 * @param {(string|Array<{page: {string}, title: {string}}>|jQuery)} new_title

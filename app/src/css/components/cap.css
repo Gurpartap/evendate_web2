@@ -10,7 +10,6 @@
 	font-weight: 500;
 	font-size: .875em;
 	color: #9fa6b3;
-	color: var(--color_primary_50);
 }
 
 .overlay_cap {
@@ -27,4 +26,8 @@
 	margin-bottom: 12px;
 	font-size: 2em;
 	font-weight: 300;
+}
+
+@supports (--custom_properties: 1) {
+	.cap_message {color: var(--color_primary_50)}
 }

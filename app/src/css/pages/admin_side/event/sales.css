@@ -10,7 +10,6 @@
 	width: 100%;
 	padding: 24px 24px 0;
 	border-bottom: 1px solid #e2e4e8;
-	border-bottom: 1px solid var(--color_marginal);
 }
 
 .event_admin_sales_header_bottom {
@@ -40,7 +39,6 @@
 	border-width: 0 0 1px 1px;
 	border-style: solid;
 	border-color: #e2e4e8;
-	border-color: var(--color_marginal);
 }
 
 .event_admin_sales_brief_block_title,
@@ -68,8 +66,16 @@
 .event_admin_sales_ticket_type_price {
 	display: inline-block;
 	color: #657184;
-	color: var(--color_primary_80);
 	font-weight: 500;
 }
 
 .event_admin_sales_ticket_type_dates {width: 200px}
+
+@supports (--custom_properties: 1) {
+	.event_admin_sales_header_main {border-bottom-color: var(--color_marginal)}
+
+	.event_admin_sales_brief_block {border-color: var(--color_marginal)}
+
+	.event_admin_sales_ticket_type_dates,
+	.event_admin_sales_ticket_type_price {color: var(--color_primary_80)}
+}

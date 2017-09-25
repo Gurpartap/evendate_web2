@@ -11,9 +11,7 @@
 
 }
 
-.ticket_page_subtitle {
-	color: var(--color_primary_50);
-}
+.ticket_page_subtitle {color: #9fa6b3}
 
 .print_page {
 	width: 750px;
@@ -86,4 +84,8 @@
 
 .ticket_mobile_app_aside {
 	margin-left: 10px;
+}
+
+@supports (--custom_properties: 1) {
+	.ticket_page_subtitle {color: var(--color_primary_50)}
 }

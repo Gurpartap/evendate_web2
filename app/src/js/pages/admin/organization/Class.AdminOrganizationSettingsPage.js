@@ -26,6 +26,7 @@ AdminOrganizationSettingsPage = extending(AdminOrganizationPage, (function() {
 			'default_address',
 			'description',
 			'brand_color',
+			'brand_color_accent',
 			'is_private',
 			'email',
 			'privileges',
@@ -46,6 +47,51 @@ AdminOrganizationSettingsPage = extending(AdminOrganizationPage, (function() {
 				}
 			}
 		);
+		
+		this.render_vars = {
+			id: null,
+			email: null,
+			admin_avatar_blocks: null,
+			moderator_avatar_blocks: null,
+			private_checkbox: null,
+			fb_vk_integration_checkboxes: null,
+			facebook_profile: null,
+			slack_telegram_integration_checkboxes: null,
+			brand_color_field: null,
+			brand_color_accent_field: null,
+			save_colors_button: null,
+			subdomain_radio: null,
+			subdomain: null,
+			other_domain_radio: null,
+			other_domain: null,
+			tariff_button: null,
+			tariff_service_info: null
+		};
+		
+		Object.defineProperty(this, 'page_title_obj', {
+			get: function() {
+				
+				return [{
+					title: 'Организации',
+					page: '/admin'
+				}, this.organization.short_name + ' - настройки'];
+			}
+		});
+		
+		Object.defineProperties(this.render_vars, {
+			id: {
+				get: function() {
+					
+					return self.organization.id;
+				}
+			},
+			email: {
+				get: function() {
+					
+					return self.organization.email;
+				}
+			}
+		});
 	}
 	
 	/**
@@ -70,6 +116,7 @@ AdminOrganizationSettingsPage = extending(AdminOrganizationPage, (function() {
 	 * @returns {jqPromise}
 	 */
 	AdminOrganizationSettingsPage.prototype.updateOrganizationData = function() {
+		
 		return this.organization.updateOrganization(new OrganizationModel(this.organization));
 	};
 	
@@ -110,58 +157,135 @@ AdminOrganizationSettingsPage = extending(AdminOrganizationPage, (function() {
 				Payment.doPayment(data.uuid, data.sum);
 			});
 		});
+		
+		(function initSpectrum($wrapper) {
+			var $fields = $wrapper.find('.ColorPicker'),
+				$brand_color = $fields.filter('.BrandColor'),
+				$brand_color_accent = $fields.filter('.BrandAccentColor'),
+				options = {
+					allowEmpty: true,
+					preferredFormat: 'hex',
+					showInitial: true,
+					showInput: true,
+					showButtons: false,
+					replacerClassName: '-spectrum_replacer_override',
+					containerClassName: '-spectrum_container_override'
+				};
+			
+			$brand_color.on('move.spectrum change.spectrum', function(e, color) {
+				if (color) {
+					__APP.repaint({
+						header: color.toHexString()
+					});
+				} else {
+					__APP.setDefaultColors();
+				}
+			});
+			$brand_color.spectrum(Object.assign({color: $brand_color.val() || __C.COLORS.MUTED}, options));
+			
+			$brand_color_accent.on('move.spectrum change.spectrum', function(e, color) {
+				if (color) {
+					__APP.repaint({
+						accent: color.toHexString()
+					});
+				} else {
+					__APP.setDefaultColors();
+				}
+			});
+			$brand_color_accent.spectrum(Object.assign({color: $brand_color_accent.val() || __C.COLORS.ACCENT}, options));
+			
+		}(this.$wrapper));
 	};
 	
-	AdminOrganizationSettingsPage.prototype.render = function() {
-		var self = this,
-			staffs_additional_fields = {
-				is_link: true,
-				avatar_classes: [__C.CLASSES.SIZES.X40, __C.CLASSES.UNIVERSAL_STATES.ROUNDED]
-			};
+	AdminOrganizationSettingsPage.prototype.preRender = function() {
+		var service_info_string = this.organization.tariff.is_full ? 'Оплачен до {date}' : '';
 		
-		this.renderHeaderTabs();
+		this.render_vars.admin_avatar_blocks = AdminOrganizationSettingsPage.buildStaffBlock(this.organization.id, this.organization.admins, OneUser.ROLE.ADMIN, this.organization.role);
 		
-		__APP.changeTitle([{
-			title: 'Организации',
-			page: '/admin'
-		}, this.organization.short_name + ' - настройки']);
+		this.render_vars.moderator_avatar_blocks = AdminOrganizationSettingsPage.buildStaffBlock(this.organization.id, this.organization.moderators, OneUser.ROLE.MODERATOR, this.organization.role);
 		
-		this.$wrapper.html(tmpl('admin-organization-settings-page', $.extend({}, this.organization, {
-			admin_avatar_blocks: AdminOrganizationSettingsPage.buildStaffBlock(this.organization.id, this.organization.admins, OneUser.ROLE.ADMIN, this.organization.role),
-			moderator_avatar_blocks: AdminOrganizationSettingsPage.buildStaffBlock(this.organization.id, this.organization.moderators, OneUser.ROLE.MODERATOR, this.organization.role),
-			private_checkbox: __APP.BUILD.checkbox({
-				id: 'org_admin_settings_is_private',
-				name: 'is_private',
-				label: 'Закрытая организация',
-				attributes: {
-					checked: self.organization.is_private
-				}
-			}),
-			subdomain_radio: __APP.BUILD.radio({
-				id: 'org_admin_settings_subdomain_enabled',
-				name: 'domains'
-			}),
-			other_domain_radio: __APP.BUILD.radio({
-				id: 'org_admin_settings_other_domain_enabled',
-				name: 'domains'
-			}),
-			tariff_button: __APP.BUILD.button({
-				title: 'Оплатить',
-				classes: [__C.CLASSES.COLORS.ACCENT, __C.CLASSES.HOOKS.RIPPLE, 'ActivatePayment']
-			}),
-			tariff_service_info: !self.organization.tariff.is_full ? '' : 'Оплачен до ' + moment.unix(self.organization.tariff.till).calendar(null, {
+		this.render_vars.private_checkbox = __APP.BUILD.checkbox({
+			id: 'org_admin_settings_is_private',
+			name: 'is_private',
+			label: 'Закрытая организация',
+			attributes: {
+				checked: this.organization.is_private
+			}
+		});
+		
+		this.render_vars.fb_vk_integration_checkboxes = null;
+		this.render_vars.facebook_profile = null;
+		this.render_vars.slack_telegram_integration_checkboxes = null;
+		
+		this.render_vars.brand_color_field = __APP.BUILD.formUnit({
+			id: 'org_admin_settings_brand_color',
+			label: 'Основной фирменный цвет',
+			name: 'brand_color',
+			classes: ['ColorPicker', 'BrandColor'],
+			value: this.organization.brand_color,
+			placeholder: __C.COLORS.MUTED
+		});
+		
+		this.render_vars.brand_color_accent_field = __APP.BUILD.formUnit({
+			id: 'org_admin_settings_brand_color_accent',
+			label: 'Акцентирующий фирменный цвет',
+			name: 'brand_color_accent',
+			classes: ['ColorPicker', 'BrandAccentColor'],
+			value: this.organization.brand_color_accent,
+			placeholder: __C.COLORS.ACCENT
+		});
+		
+		this.render_vars.save_colors_button = __APP.BUILD.button({
+			title: 'Сохранить',
+			classes: [
+				__C.CLASSES.COLORS.ACCENT,
+				__C.CLASSES.HOOKS.RIPPLE,
+				'SaveLocal'
+			]
+		});
+		
+		this.render_vars.subdomain_radio = __APP.BUILD.radio({
+			id: 'org_admin_settings_subdomain_enabled',
+			name: 'domains'
+		});
+		
+		this.render_vars.subdomain = null;
+		
+		this.render_vars.other_domain_radio = __APP.BUILD.radio({
+			id: 'org_admin_settings_other_domain_enabled',
+			name: 'domains'
+		});
+		
+		this.render_vars.other_domain = null;
+		
+		this.render_vars.tariff_button = __APP.BUILD.button({
+			title: 'Оплатить',
+			classes: [__C.CLASSES.COLORS.ACCENT, __C.CLASSES.HOOKS.RIPPLE, 'ActivatePayment']
+		});
+		
+		this.render_vars.tariff_service_info = service_info_string.format({
+			date: moment.unix(this.organization.tariff.till).calendar(null, {
 				sameDay: '[Сегодня]',
 				nextDay: '[Завтра]',
 				nextWeek: 'D MMMM YYYY',
 				lastWeek: 'D MMMM YYYY',
 				sameElse: 'D MMMM YYYY'
 			})
-		})));
+		});
+	};
+	
+	AdminOrganizationSettingsPage.prototype.render = function() {
+		this.renderHeaderTabs();
+		
+		this.$wrapper.html(tmpl('admin-organization-settings-page', this.render_vars));
 		
 		this.init();
 	};
 	
 	AdminOrganizationSettingsPage.prototype.destroy = function() {
+		if (__APP.IS_REPAINTED) {
+			__APP.setDefaultColors();
+		}
 		this.$view.off('staff:add');
 	};
 	

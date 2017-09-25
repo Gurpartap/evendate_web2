@@ -42,7 +42,6 @@ h6 {font-size: 1rem}
 
 .small_title {
 	color: #9fa7b6;
-	color: var(--color_primary_50);
 	font-size: .875rem;
 }
 
@@ -53,10 +52,8 @@ a {
 
 hr {
 	margin: 1em auto;
-	border-width: 1px 0 0 0;
-	border-style: solid;
-	border-color: #c5c9d1;
-	border-color: var(--color_primary_30);
+	border: 0;
+	border-top: 1px solid #c5c9d1;
 }
 
 p,
@@ -84,67 +81,31 @@ label {font-weight: inherit}
 
 .-preformatted_text {white-space: pre-wrap}
 
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+	a.-text_color_contrast,
+	b.-text_color_contrast,
+	p.-text_color_contrast,
+	span.-text_color_contrast,
+	small.-text_color_contrast,
+	label.-text_color_contrast {
+		display: initial;
+		background-image: inherit;
+		background-color: inherit;
+		-webkit-background-clip: text;
+		background-clip: text;
+		color: transparent;
+		filter: contrast(20000%) invert(1) grayscale(1);
+	}
+}
 
-a.-text_color_default,
-a.-text_color_neutral,
-b.-text_color_default,
-b.-text_color_neutral,
-p.-text_color_default,
-p.-text_color_neutral,
-span.-text_color_default,
-span.-text_color_neutral,
-small.-text_color_default,
-small.-text_color_neutral,
-label.-text_color_default,
-label.-text_color_neutral {color: #fff; color: var(--color_page);}
-
-a.-text_color_dark_primary,
-b.-text_color_dark_primary,
-p.-text_color_dark_primary,
-span.-text_color_dark_primary,
-small.-text_color_dark_primary,
-label.-text_color_dark_primary {color: #3e4d66; color: var(--color_dark_primary);}
-
-a.-text_color_primary,
-b.-text_color_primary,
-p.-text_color_primary,
-span.-text_color_primary,
-small.-text_color_primary,
-label.-text_color_primary {color: #3e4d66; color: var(--color_primary);}
-
-a.-text_color_primary_80,
-b.-text_color_primary_80,
-p.-text_color_primary_80,
-span.-text_color_primary_80,
-small.-text_color_primary_80,
-label.-text_color_primary_80 {color: #657184; color: var(--color_primary_80);}
-
-
-a.-text_color_marginal,
-a.-text_color_primary_50,
-b.-text_color_marginal,
-b.-text_color_primary_50,
-p.-text_color_marginal,
-p.-text_color_primary_50,
-span.-text_color_marginal,
-span.-text_color_primary_50,
-small.-text_color_marginal,
-small.-text_color_primary_50,
-label.-text_color_marginal,
-label.-text_color_primary_50 {color: #9fa6b3; color: var(--color_primary_50);}
-
-a.-text_color_primary_30,
-b.-text_color_primary_30,
-p.-text_color_primary_30,
-span.-text_color_primary_30,
-small.-text_color_primary_30,
-label.-text_color_primary_30 {color: #c5c9d1; color: var(--color_primary_30);}
-
-a.-text_color_bubblegum,
-b.-text_color_bubblegum,
-p.-text_color_bubblegum,
-small.-text_color_bubblegum,
-label.-text_color_bubblegum {color: #f82969; color: var(--color_bubblegum);}
+@supports not ((background-clip: text) or (-webkit-background-clip: text)) {
+	a.-text_color_contrast,
+	b.-text_color_contrast,
+	p.-text_color_contrast,
+	span.-text_color_contrast,
+	small.-text_color_contrast,
+	label.-text_color_contrast {display: none}
+}
 
 a.-text_color_warning,
 b.-text_color_warning,
@@ -152,62 +113,6 @@ p.-text_color_warning,
 span.-text_color_warning,
 small.-text_color_warning,
 label.-text_color_warning {color: #ff9f00}
-
-a.-text_color_error,
-b.-text_color_error,
-p.-text_color_error,
-span.-text_color_error,
-small.-text_color_error,
-label.-text_color_error {
-	color: var(--color_error);
-	color: #fd7b6e;
-}
-
-:not(.-state_admin) a.-text_color_accent,
-:not(.-state_admin) b.-text_color_accent,
-:not(.-state_admin) p.-text_color_accent,
-:not(.-state_admin) span.-text_color_accent,
-:not(.-state_admin) small.-text_color_accent,
-:not(.-state_admin) label.-text_color_accent {color: #f82969; color: var(--color_accent);}
-
-a.-text_color_bubblegum_alt,
-b.-text_color_bubblegum_alt,
-p.-text_color_bubblegum_alt,
-small.-text_color_bubblegum_alt,
-label.-text_color_bubblegum_alt {color: #ff5f9e; color: var(--color_bubblegum_alt);}
-
-:not(.-state_admin) a.-text_color_accent_alt,
-:not(.-state_admin) b.-text_color_accent_alt,
-:not(.-state_admin) p.-text_color_accent_alt,
-:not(.-state_admin) span.-text_color_accent_alt,
-:not(.-state_admin) small.-text_color_accent_alt,
-:not(.-state_admin) label.-text_color_accent_alt {color: #ff5f9e; color: var(--color_accent_alt);}
-
-a.-text_color_franklin,
-b.-text_color_franklin,
-p.-text_color_franklin,
-small.-text_color_franklin,
-label.-text_color_franklin {color: #00dc88; color: var(--color_franklin)}
-
-.-state_admin a.-text_color_accent,
-.-state_admin b.-text_color_accent,
-.-state_admin p.-text_color_accent,
-.-state_admin span.-text_color_accent,
-.-state_admin small.-text_color_accent,
-.-state_admin label.-text_color_accent {color: #00dc88}
-
-a.-text_color_franklin_alt,
-b.-text_color_franklin_alt,
-p.-text_color_franklin_alt,
-small.-text_color_franklin_alt,
-label.-text_color_franklin_alt {color: #23d792; color: var(--color_franklin_alt);}
-
-.-state_admin a.-text_color_accent_alt,
-.-state_admin b.-text_color_accent_alt,
-.-state_admin p.-text_color_accent_alt,
-.-state_admin span.-text_color_accent_alt,
-.-state_admin small.-text_color_accent_alt,
-.-state_admin label.-text_color_accent_alt {color: #23d792}
 
 a.-transform_uppercase,
 b.-transform_uppercase,
@@ -236,3 +141,221 @@ span.-font_weight_bold,
 small.-font_weight_bold,
 label.-font_weight_bold,
 button.-font_weight_bold {font-weight: 600}
+
+
+@supports (--custom_properties: 1) {
+	.small_title {color: var(--color_primary_50)}
+	hr {border-color: var(--color_primary_30)}
+
+	a.-text_color_default,
+	a.-text_color_neutral,
+	b.-text_color_default,
+	b.-text_color_neutral,
+	p.-text_color_default,
+	p.-text_color_neutral,
+	span.-text_color_default,
+	span.-text_color_neutral,
+	small.-text_color_default,
+	small.-text_color_neutral,
+	label.-text_color_default,
+	label.-text_color_neutral {color: var(--color_page)}
+
+	a.-text_color_dark_primary,
+	b.-text_color_dark_primary,
+	p.-text_color_dark_primary,
+	span.-text_color_dark_primary,
+	small.-text_color_dark_primary,
+	label.-text_color_dark_primary {color: var(--color_dark_primary)}
+
+	a.-text_color_primary,
+	b.-text_color_primary,
+	p.-text_color_primary,
+	span.-text_color_primary,
+	small.-text_color_primary,
+	label.-text_color_primary {color: var(--color_primary)}
+
+	a.-text_color_primary_80,
+	b.-text_color_primary_80,
+	p.-text_color_primary_80,
+	span.-text_color_primary_80,
+	small.-text_color_primary_80,
+	label.-text_color_primary_80 {color: var(--color_primary_80)}
+
+	a.-text_color_marginal,
+	a.-text_color_primary_50,
+	b.-text_color_marginal,
+	b.-text_color_primary_50,
+	p.-text_color_marginal,
+	p.-text_color_primary_50,
+	span.-text_color_marginal,
+	span.-text_color_primary_50,
+	small.-text_color_marginal,
+	small.-text_color_primary_50,
+	label.-text_color_marginal,
+	label.-text_color_primary_50 {color: var(--color_primary_50)}
+
+	a.-text_color_primary_30,
+	b.-text_color_primary_30,
+	p.-text_color_primary_30,
+	span.-text_color_primary_30,
+	small.-text_color_primary_30,
+	label.-text_color_primary_30 {color: var(--color_primary_30)}
+
+	a.-text_color_error,
+	b.-text_color_error,
+	p.-text_color_error,
+	span.-text_color_error,
+	small.-text_color_error,
+	label.-text_color_error {color: var(--color_error)}
+
+	a.-text_color_bubblegum,
+	b.-text_color_bubblegum,
+	p.-text_color_bubblegum,
+	small.-text_color_bubblegum,
+	label.-text_color_bubblegum {color: var(--color_bubblegum)}
+
+	a.-text_color_accent,
+	b.-text_color_accent,
+	p.-text_color_accent,
+	span.-text_color_accent,
+	small.-text_color_accent,
+	label.-text_color_accent {color: var(--color_accent)}
+
+	a.-text_color_bubblegum_alt,
+	b.-text_color_bubblegum_alt,
+	p.-text_color_bubblegum_alt,
+	small.-text_color_bubblegum_alt,
+	label.-text_color_bubblegum_alt {color: var(--color_bubblegum_alt)}
+
+	a.-text_color_accent_alt,
+	b.-text_color_accent_alt,
+	p.-text_color_accent_alt,
+	span.-text_color_accent_alt,
+	small.-text_color_accent_alt,
+	label.-text_color_accent_alt {color: var(--color_accent_alt)}
+
+	a.-text_color_franklin,
+	b.-text_color_franklin,
+	p.-text_color_franklin,
+	small.-text_color_franklin,
+	label.-text_color_franklin {color: var(--color_franklin)}
+
+	a.-text_color_franklin_alt,
+	b.-text_color_franklin_alt,
+	p.-text_color_franklin_alt,
+	small.-text_color_franklin_alt,
+	label.-text_color_franklin_alt {color: var(--color_franklin_alt)}
+}
+
+@supports not (--custom_properties: 0) {
+
+	a.-text_color_default,
+	a.-text_color_neutral,
+	b.-text_color_default,
+	b.-text_color_neutral,
+	p.-text_color_default,
+	p.-text_color_neutral,
+	span.-text_color_default,
+	span.-text_color_neutral,
+	small.-text_color_default,
+	small.-text_color_neutral,
+	label.-text_color_default,
+	label.-text_color_neutral {color: #fff}
+
+	a.-text_color_dark_primary,
+	b.-text_color_dark_primary,
+	p.-text_color_dark_primary,
+	span.-text_color_dark_primary,
+	small.-text_color_dark_primary,
+	label.-text_color_dark_primary {color: #3e4d66}
+
+	a.-text_color_primary,
+	b.-text_color_primary,
+	p.-text_color_primary,
+	span.-text_color_primary,
+	small.-text_color_primary,
+	label.-text_color_primary {color: #3e4d66}
+
+	a.-text_color_primary_80,
+	b.-text_color_primary_80,
+	p.-text_color_primary_80,
+	span.-text_color_primary_80,
+	small.-text_color_primary_80,
+	label.-text_color_primary_80 {color: #657184}
+
+	a.-text_color_marginal,
+	a.-text_color_primary_50,
+	b.-text_color_marginal,
+	b.-text_color_primary_50,
+	p.-text_color_marginal,
+	p.-text_color_primary_50,
+	span.-text_color_marginal,
+	span.-text_color_primary_50,
+	small.-text_color_marginal,
+	small.-text_color_primary_50,
+	label.-text_color_marginal,
+	label.-text_color_primary_50 {color: #9fa6b3}
+
+	a.-text_color_primary_30,
+	b.-text_color_primary_30,
+	p.-text_color_primary_30,
+	span.-text_color_primary_30,
+	small.-text_color_primary_30,
+	label.-text_color_primary_30 {color: #c5c9d1}
+
+	a.-text_color_error,
+	b.-text_color_error,
+	p.-text_color_error,
+	span.-text_color_error,
+	small.-text_color_error,
+	label.-text_color_error {color: #fd7b6e}
+
+	a.-text_color_bubblegum,
+	b.-text_color_bubblegum,
+	p.-text_color_bubblegum,
+	small.-text_color_bubblegum,
+	label.-text_color_bubblegum,
+	:not(.-state_admin) a.-text_color_accent,
+	:not(.-state_admin) b.-text_color_accent,
+	:not(.-state_admin) p.-text_color_accent,
+	:not(.-state_admin) span.-text_color_accent,
+	:not(.-state_admin) small.-text_color_accent,
+	:not(.-state_admin) label.-text_color_accent {color: #f82969}
+
+	a.-text_color_bubblegum_alt,
+	b.-text_color_bubblegum_alt,
+	p.-text_color_bubblegum_alt,
+	small.-text_color_bubblegum_alt,
+	label.-text_color_bubblegum_alt,
+	:not(.-state_admin) a.-text_color_accent_alt,
+	:not(.-state_admin) b.-text_color_accent_alt,
+	:not(.-state_admin) p.-text_color_accent_alt,
+	:not(.-state_admin) span.-text_color_accent_alt,
+	:not(.-state_admin) small.-text_color_accent_alt,
+	:not(.-state_admin) label.-text_color_accent_alt {color: #ff5f9e}
+
+	a.-text_color_franklin,
+	b.-text_color_franklin,
+	p.-text_color_franklin,
+	small.-text_color_franklin,
+	label.-text_color_franklin,
+	.-state_admin a.-text_color_accent,
+	.-state_admin b.-text_color_accent,
+	.-state_admin p.-text_color_accent,
+	.-state_admin span.-text_color_accent,
+	.-state_admin small.-text_color_accent,
+	.-state_admin label.-text_color_accent {color: #00dc88}
+
+	a.-text_color_franklin_alt,
+	b.-text_color_franklin_alt,
+	p.-text_color_franklin_alt,
+	small.-text_color_franklin_alt,
+	label.-text_color_franklin_alt,
+	.-state_admin a.-text_color_accent_alt,
+	.-state_admin b.-text_color_accent_alt,
+	.-state_admin p.-text_color_accent_alt,
+	.-state_admin span.-text_color_accent_alt,
+	.-state_admin small.-text_color_accent_alt,
+	.-state_admin label.-text_color_accent_alt {color: #23d792}
+
+}

@@ -66,6 +66,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 *
 	 * @property {?boolean} is_private
 	 * @property {?string} brand_color
+	 * @property {?string} brand_color_accent
 	 * @property {?OneCity} city
 	 * @property {?} country
 	 *
@@ -107,6 +108,7 @@ OneOrganization = extending(OneEntity, (function() {
 		
 		this.is_private = null;
 		this.brand_color = null;
+		this.brand_color_accent = null;
 		this.tariff = new TariffModel();
 		this.city = new OneCity();
 		this.country = null;

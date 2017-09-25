@@ -18,10 +18,6 @@
 	margin: 24px auto;
 	overflow: hidden;
 	text-align: left;
-
-	-webkit-transition: height .3s ease, margin .3s ease;
-	-moz-transition: height .3s ease, margin .3s ease;
-	-o-transition: height .3s ease, margin .3s ease;
 	transition: height .3s ease, margin .3s ease;
 }
 
@@ -65,12 +61,7 @@
 	font-size: 1em;
 	line-height: 1;
 	color: #9fa6b3;
-	color: var(--color_primary_50);
 	opacity: .4;
-	-webkit-transition: opacity .4s ease;
-	-moz-transition: opacity .4s ease;
-	-ms-transition: opacity .4s ease;
-	-o-transition: opacity .4s ease;
 	transition: opacity .4s ease;
 }
 
@@ -131,7 +122,6 @@
 
 .feed_calendar_wrapper > .calendar_header {
 	color: #657184;
-	color: var(--color_primary_80);
 	opacity: .6;
 }
 
@@ -141,7 +131,7 @@
 	border-spacing: 0;
 }
 
-.feed_calendar_thead {border-bottom: 1px solid #f6f6f6; border-bottom: 1px solid var(--color_gray_material);}
+.feed_calendar_thead {border-bottom: 1px solid #f6f6f6}
 
 .feed_calendar_td,
 .feed_calendar_th {font-weight: 500}
@@ -158,7 +148,7 @@
 	line-height: 24px;
 }
 
-.feed_calendar_td.today > .day_num {color: #f82969; color: var(--color_accent)}
+.feed_calendar_td.today > .day_num {color: #f82969}
 .-state_admin .feed_calendar_td.today > .day_num {color: #00dc88}
 .feed_calendar_td.-active {background-color: transparent}
 .feed_calendar_td.-active > .day_num,
@@ -167,7 +157,6 @@
 	color: #fff;
 	border-radius: 50%;
 	background-color: #f82969;
-	background-color: var(--color_accent);
 }
 .-state_admin .feed_calendar_td.-active > .day_num {background-color: #00dc88}
 
@@ -185,4 +174,16 @@
 	display: block;
 	width: 200px;
 	margin: 0 auto 18px;
+}
+
+@supports (--custom_properties: 1) {
+	.feed_event_header_button {color: var(--color_primary_50)}
+
+	.feed_calendar_wrapper > .calendar_header {color: var(--color_primary_80)}
+
+	.feed_calendar_thead {border-bottom-color: var(--color_gray_material);}
+	.feed_calendar_td.today > .day_num {color: var(--color_accent)}
+	.feed_calendar_td.-active > .day_num,
+	.feed_calendar_td.-active > .day_num:hover,
+	.feed_calendar_td.-active > .day_num:focus {background-color: var(--color_accent)}
 }

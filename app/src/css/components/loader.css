@@ -44,7 +44,6 @@
 	margin: auto;
 	border-radius: 50%;
 	background-color: #f82969;
-	background-color: var(--color_accent);
 	opacity: 0.6;
 
 	-webkit-animation: loader-bounce 2.4s infinite ease-in-out;
@@ -72,4 +71,8 @@
 		transform: scale(1);
 		-webkit-transform: scale(1);
 	}
+}
+
+@supports (--custom_properties: 1) {
+	.loader_dot {background-color: var(--color_accent)}
 }

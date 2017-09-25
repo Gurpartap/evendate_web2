@@ -28,8 +28,6 @@ html.-noscroll {
 }
 
 .modal_unit {
-	/*display: block;*/
-	/*width: 800px;*/
 	display: inline-block;
 	max-width: 80%;
 	margin: 100px auto;
@@ -85,7 +83,6 @@ body.-open_modal > .modal_wrapper {
 	font-weight: 500;
 	line-height: 1.5;
 	color: #3e4d66;
-	color: var(--color_primary);
 }
 
 .-modal_destroyer {
@@ -107,7 +104,6 @@ body.-open_modal > .modal_wrapper {
 	font-size: .88em;
 	font-weight: 500;
 	color: #9fa6b3;
-	color: var(--color_primary_50);
 	text-transform: uppercase;
 }
 
@@ -117,3 +113,8 @@ body.-open_modal > .modal_wrapper {
 }
 
 .modal_footer > .button + .button {margin-left: .5em}
+
+@supports (--custom_properties: 1) {
+	.modal_header {color: var(--color_primary)}
+	.modal_divider {color: var(--color_primary_50)}
+}
