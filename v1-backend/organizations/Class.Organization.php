@@ -977,11 +977,11 @@ class Organization extends AbstractEntity
 			->cols(array('agent_approved', 'agent_info'))
 			->where('id = ?', $this->getId());
 		$result = $this->db->prepareExecute($q_get_type)->fetch();
-		$result['agent_info'] = array('approved' => 'false', 'agent_info' => array());
 		if (isset($result['agent_info'])) {
 			try {
 				$result['agent_info'] = json_decode($result['agent_info'], true);
 			} catch (Exception $e) {
+				$result['agent_info'] = array('approved' => 'false', 'agent_info' => array());
 			}
 		}
 		return new Result(true, '', $result);
