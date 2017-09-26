@@ -168,9 +168,9 @@ class OrdersCollection extends AbstractCollection
 				$column_names[App::$__LANG]["order"]["tickets_count"] => count($order['tickets']),
 				$column_names[App::$__LANG]["order"]["tickets_price"] => $tickets_price,
 				$column_names[App::$__LANG]["order"]["status_type_code"] => $order['status_type_code'],
-				$column_names[App::$__LANG]["order"]["payed_at"] => $order['payed_at'] ? DateTime::createFromFormat('U', $order['order']['payed_at'])->format('Y-m-d H:i:s') : '',
+				$column_names[App::$__LANG]["order"]["payed_at"] => $order['payed_at'] ? DateTime::createFromFormat('U', $order['payed_at'])->format('Y-m-d H:i:s') : '',
 				$column_names[App::$__LANG]["order"]["is_canceled"] => $order['is_canceled'] ? '+' : '-',
-				$column_names[App::$__LANG]["order"]["canceled_at"] => $order['canceled_at'] ? DateTime::createFromFormat('U', $order['order']['canceled_at'])->format('Y-m-d H:i:s') : ''
+				$column_names[App::$__LANG]["order"]["canceled_at"] => $order['canceled_at'] ? DateTime::createFromFormat('U', $order['canceled_at'])->format('Y-m-d H:i:s') : ''
 			);
 
 
