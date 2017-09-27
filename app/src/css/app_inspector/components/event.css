@@ -15,10 +15,13 @@
 	font-size: .875em;
 	font-weight: 500;
 	color: #3e4d66;
-	color: var(--color_primary);
 }
 
 .app_inspector_event:hover .app_inspector_event_title {
 	color: #00dc88;
-	color: var(--color_accent);
+}
+
+@supports (--custom_properties: 1) {
+	.app_inspector_event_title {color: var(--color_primary)}
+	.app_inspector_event:hover .app_inspector_event_title {color: var(--color_accent)}
 }

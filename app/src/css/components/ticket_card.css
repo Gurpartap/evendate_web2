@@ -9,7 +9,6 @@
 .ticket_card_wrapper {
 	overflow: hidden;
 	border-radius: 3px;
-	border-radius: var(--material_border_radius);
 }
 
 .ticket_card {margin-bottom: 36px}
@@ -35,7 +34,6 @@
 	border-radius: 50%;
 	border: 4px solid #fff;
 	box-shadow: inset 0 0 4px hsla(0,0%,0%,.08);
-	box-shadow: inset var(--material_shadow);
 }
 
 .ticket_card:not(.-ticket_extended):after {
@@ -105,7 +103,6 @@
 	color: #fff;
 	text-transform: uppercase;
 	background-color: #3e4d66;
-	background-color: var(--color_primary);
 }
 
 .ticket_card:not(.-ticket_extended) .ticket_card_status {
@@ -124,10 +121,7 @@
 .ticket_card:not(.-ticket_extended):not(.-disabled) > .ticket_card_wrapper {cursor: pointer}
 
 
-.ticket_card:not(.-ticket_extended):not(.-disabled) > .ticket_card_wrapper:hover .ticket_card_type_name {
-	color: #f82969;
-	color: var(--color_accent);
-}
+.ticket_card:not(.-ticket_extended):not(.-disabled) > .ticket_card_wrapper:hover .ticket_card_type_name {color: #f82969}
 
 .ticket_card.-disabled {
 	cursor: default;
@@ -136,17 +130,17 @@
 
 .ticket_card.-disabled .ticket_card_content {opacity: .5}
 
-.ticket_card.-status_success .ticket_card_status {
-	background-color: #00dc88;
-	background-color: var(--color_franklin);
-}
+.ticket_card.-status_success .ticket_card_status {background-color: #00dc88}
+.ticket_card.-status_pending .ticket_card_status {background-color: #ff9f00}
+.ticket_card.-status_error .ticket_card_status {background-color: #fd7b6e}
 
-.ticket_card.-status_pending .ticket_card_status {
-	background-color: #ff9f00;
-	background-color: var(--color_warning);
-}
+@supports (--custom_properties: 1) {
+	.ticket_card_wrapper {border-radius: var(--material_border_radius)}
+	.ticket_card:not(.-ticket_extended):before {box-shadow: inset var(--material_shadow)}
+	.ticket_card_status {background-color: var(--color_primary)}
+	.ticket_card:not(.-ticket_extended):not(.-disabled) > .ticket_card_wrapper:hover .ticket_card_type_name {color: var(--color_accent)}
 
-.ticket_card.-status_error .ticket_card_status {
-	background-color: #fd7b6e;
-	background-color: var(--color_error);
+	.ticket_card.-status_success .ticket_card_status {background-color: var(--color_franklin)}
+	.ticket_card.-status_pending .ticket_card_status {background-color: var(--color_warning)}
+	.ticket_card.-status_error .ticket_card_status {background-color: var(--color_error)}
 }

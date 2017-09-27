@@ -27,7 +27,7 @@
 </script>
 
 <script type="javascript/template" id="tmpl-radio-checkbox">
-	<div class="{unit_classes}">
+	<div class="{unit_classes}" {unit_dataset}>
 		<input id="{id}" class="{classes}" type="{type}" name="{name}" {attributes} {dataset}>
 		<label class="form_label" for="{id}"><span>{label}</span></label>
 	</div>
@@ -455,169 +455,6 @@
 			<div class="friends-list"></div>
 		</div>
 	</div>
-</script>
-<script type="javascript/template" id="tmpl-modal-add-staff-content">
-	<form id="add_staff_form_{modal_id}" class="add_staff_modal_form">
-		<input type="hidden" name="role" value="{role}">
-		<input type="hidden" name="id" value="{org_id}">
-		<div class="form_unit">
-			<label class="form_label -align_center" for="add_staff_search_by_name_{modal_id}">Выберете пользователя Evendate, которого вы хотите сделать участником</label>
-			<input id="add_staff_search_by_name_{modal_id}" class="SearchByName -align_left" type="text" name="user_id" autocomplete="off" placeholder="Имя пользователя">
-		</div>
-		<div class="form_unit">
-			<button class="button -color_accent AddStaff" type="button"><span class="Text">Сделать участником</span></button>
-		</div>
-	</form>
-</script>
-<script type="javascript/template" id="tmpl-modal-auth-content">
-	<h4 class="auth_modal_heading">{heading}</h4>
-	<div class="auth_buttons_wrapper">
-		<a href="#" data-auth_network="vk" class="button -size_wide -rounded -no_uppercase -align_left -color_vk RippleEffect AuthButton">
-			<span class="Text"><i class="fa fa-vk fa-lg"></i><span>Войти через ВКонтакте</span></span>
-		</a>
-		<a href="#" data-auth_network="google" class="button -size_wide -rounded -no_uppercase -align_left -color_google RippleEffect AuthButton">
-			<span class="Text"><i class="fa fa-google-plus fa-lg"></i><span>Войти через Google+</span></span>
-		</a>
-		<a href="#" data-auth_network="facebook" class="button -size_wide -rounded -no_uppercase -align_left -color_facebook RippleEffect AuthButton">
-			<span class="Text"><i class="fa fa-facebook-official fa-lg"></i><span>Войти через Facebook</span></span>
-		</a>
-	</div>
-	<p class="auth_modal_bottom">{bottom}</p>
-</script>
-<script type="javascript/template" id="tmpl-modal-bitcoin-content">
-	<h6 class="bitcoin_modal_title">Заказ № {order_number}</h6>
-	{ticket_types}
-	<div class="bitcoin_modal_helptext">
-		<span>В течение 2 минут после оплаты заказа ваши билеты будут высланы на Email</span>
-	</div>
-
-	<div class="bitcoin_modal_bottom">
-		<aside class="bitcoin_modal_qr img_holder">
-			<img src="/api/v1/events/{event_id}/orders/{order_uuid}/bitcoin/qr?address={bitcoin_address}&amount={bitcoin_amount}" width="102.5" height="102.5">
-		</aside>
-		<div class="bitcoin_modal_address form_unit">
-			<label for="bitcoin_address" class="form_label">Отправьте <span class="-text_color_accent">{bitcoin_amount} BTC</span> на адрес:</label>
-			<input id="bitcoin_address" class="form_input" value="{bitcoin_address}">
-		</div>
-	</div>
-</script>
-
-<script type="javascript/template" id="tmpl-modal-bitcoin-ticket-type-row">
-	<div class="bitcoin_modal_ticket_type_row">
-		<span class="bitcoin_modal_ticket_type_name">{name}</span>
-		<span class="bitcoin_modal_ticket_type_amount">{number} ед.</span>
-	</div>
-</script>
-<script type="javascript/template" id="tmpl-modal-city-choose-content">
-	<div class="form_unit -inline">
-		<label class="form_label">Ваш город</label>
-		<div class="form_unit">
-			<select id="city_choose_modal_select" class="CityChooseModalSelect" name="city" title="">{cities}</select>
-		</div>
-	</div>
-</script>
-<script type="javascript/template" id="tmpl-modal">
-	<div class="modal_unit {modal_type} {modal_classes} -hidden -faded">
-		{modal_header}
-		<div class="modal_content ModalContent {modal_content_classes}">
-			{modal_content}
-		</div>
-		{modal_footer}
-	</div>
-</script>
-
-<script type="javascript/template" id="tmpl-modal-header">
-	<header class="modal_header">
-		<span>{title}</span>
-		{close_button}
-	</header>
-</script>
-
-<script type="javascript/template" id="tmpl-modal-footer">
-	<footer class="modal_footer">
-		{footer_buttons}
-	</footer>
-</script>
-<script type="javascript/template" id="tmpl-modal-cropper-content">
-	<img class="Cropper" src="{image_src}">
-</script>
-<script type="javascript/template" id="tmpl-modal-image-media-content">
-	<img src="{src}">
-</script>
-<script type="javascript/template" id="tmpl-modal-list-content">
-	<div class="list_modal_wrapper ListModalWrapper scrollbar-outer"></div>
-</script>
-
-<script type="javascript/template" id="tmpl-modal-users-divider">
-	<p class="modal_divider">{label}</p>
-</script>
-<script type="javascript/template" id="tmpl-modal-map-content">
-	<iframe width="100%" height="{iframe_height}" class="MapModalFrame" frameborder="0" style="display:block;border:0" src="https://www.google.com/maps/embed/v1/place?q={location}&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg" allowfullscreen></iframe>
-</script>
-<script type="javascript/template" id="tmpl-modal-registration-content">
-	<form class="form registration_modal_form RegistrationModalForm">
-		<h4>{event_title}</h4>
-		<p class="form_helptext">Чтобы зарегистрироваться на событие, заполните поля.</p>
-		<p class="form_helptext">Поля со звёздочкой ({required_star}) обязательны для заполнения.</p>
-		{fields}
-		<div class="form_unit">
-			<input id="registration_form_{modal_id}_agreement" class="form_checkbox" type="checkbox" required>
-			<label class="form_label" for="registration_form_{modal_id}_agreement"><span>Я согласен c условиями Пользовательского соглашения и Договором оказания услуг по организации мероприятия</span></label>
-		</div>
-
-		<div class="-align_center">
-			<button class="button -color_accent -rounded RippleEffect RegisterButton" type="button"><span class="Text">Зарегистрироваться</span></button>
-		</div>
-	</form>
-</script>
-<script type="javascript/template" id="tmpl-modal-ticket-content">
-	<div class="ticket_card {card_classes}">
-		<div class="ticket_card_wrapper">
-			<div class="ticket_card_cover img_holder">
-				<img src="{image_horizontal_url}?width={cover_width}" title="{title}" width="{cover_width}" height="{cover_height}">
-			</div>
-			<div class="ticket_card_content">
-				<p class="ticket_card_event_title -text_color_primary_80">{title}</p>
-				<p class="ticket_card_type_name">{ticket_type_name}</p>
-				<p class="ticket_card_dates">{formatted_dates}</p>
-				<p class="ticket_card_location">{location}</p>
-				<div class="ticket_card_additional_field">
-					<span class="-text_color_primary_80">Билет № </span>
-					<span class="-text_color_accent">{number_formatted}</span>
-				</div>
-				<div class="ticket_card_additional_field">
-					<span class="-text_color_primary_80">Приобретён </span>
-					<span class="-text_color_accent">{payed_at_formatted}</span>
-				</div>
-				<div class="ticket_card_additional_field">
-					<span class="-text_color_primary_80">Стоимость </span>
-					<span class="-text_color_accent">{price_formatted}</span>
-				</div>
-
-				<div class="ticket_card_buttons form_group -align_left">
-					<div class="form_unit">
-						<a class="button -bordered fa_icon fa-external-link" href="/ticket/{ticket_uuid}" target="_blank">Открыть билет</a>
-					</div>
-					<div class="form_unit">
-						<a class="button -bordered fa_icon fa-download" href="/api/v1/events/{event_id}/tickets/{ticket_uuid}/export">pdf</a>
-					</div>
-				</div>
-			</div>
-			<div class="ticket_card_status">
-				<span>{status_name}</span>
-			</div>
-		</div>
-	</div>
-</script>
-<script type="javascript/template" id="tmpl-modal-withdraw-content">
-	<form class="form WithdrawFundsForm">
-		<div class="form_unit">
-			<label class="form_label">Запрос от сотрудника</label>
-			{avatar_block}
-		</div>
-		{amount_form_unit}
-		{comment_form_unit}
-	</form>
 </script>
 <script type="javascript/template" id="tmpl-add-organization-page">
 
@@ -1949,51 +1786,168 @@
 		</div>
 	</div>
 </script>
-<script type="javascript/template" id="tmpl-calendar">
-	<div class="{wrapper_class} -unselectable">
-		<div class="{header_class}">
-			<button class="PrevMonth {prev_btn_class} fa_icon fa-chevron-left" type="button" tabindex="-1"></button>
-			<span class="MonthName {month_name_class}"></span>
-			<button class="NextMonth {next_btn_class} fa_icon fa-chevron-right" type="button" tabindex="-1"></button>
+<script type="javascript/template" id="tmpl-modal-add-staff-content">
+	<form id="add_staff_form_{modal_id}" class="add_staff_modal_form">
+		<input type="hidden" name="role" value="{role}">
+		<input type="hidden" name="id" value="{org_id}">
+		<div class="form_unit">
+			<label class="form_label -align_center" for="add_staff_search_by_name_{modal_id}">Выберете пользователя Evendate, которого вы хотите сделать участником</label>
+			<input id="add_staff_search_by_name_{modal_id}" class="SearchByName -align_left" type="text" name="user_id" autocomplete="off" placeholder="Имя пользователя">
 		</div>
-		<table class="CalendarTable {table_class}">
-			<colgroup>
-				<col valign="middle">
-				<col valign="middle">
-				<col valign="middle">
-				<col valign="middle">
-				<col valign="middle">
-				<col valign="middle">
-				<col valign="middle">
-			</colgroup>
-			<thead class="{thead_class}">
-				<tr class="{head_tr_class}">
-					<th class="{table_cell_class} {th_class} Week_1" data-weekday="1"><span>Пн</span></th>
-					<th class="{table_cell_class} {th_class} Week_2" data-weekday="2"><span>Вт</span></th>
-					<th class="{table_cell_class} {th_class} Week_3" data-weekday="3"><span>Ср</span></th>
-					<th class="{table_cell_class} {th_class} Week_4" data-weekday="4"><span>Чт</span></th>
-					<th class="{table_cell_class} {th_class} Week_5" data-weekday="5"><span>Пт</span></th>
-					<th class="{table_cell_class} {th_class} Week_6" data-weekday="6"><span>Сб</span></th>
-					<th class="{table_cell_class} {th_class} Week_0" data-weekday="0"><span>Вс</span></th>
-				</tr>
-			</thead>
-			<tbody class="CalendarTableBody {tbody_class}"></tbody>
-		</table>
+		<div class="form_unit">
+			<button class="button -color_accent AddStaff" type="button"><span class="Text">Сделать участником</span></button>
+		</div>
+	</form>
+</script>
+<script type="javascript/template" id="tmpl-modal-auth-content">
+	<h4 class="auth_modal_heading">{heading}</h4>
+	<div class="auth_buttons_wrapper">
+		<a href="#" data-auth_network="vk" class="button -size_wide -rounded -no_uppercase -align_left -color_vk RippleEffect AuthButton">
+			<span class="Text"><i class="fa fa-vk fa-lg"></i><span>Войти через ВКонтакте</span></span>
+		</a>
+		<a href="#" data-auth_network="google" class="button -size_wide -rounded -no_uppercase -align_left -color_google RippleEffect AuthButton">
+			<span class="Text"><i class="fa fa-google-plus fa-lg"></i><span>Войти через Google+</span></span>
+		</a>
+		<a href="#" data-auth_network="facebook" class="button -size_wide -rounded -no_uppercase -align_left -color_facebook RippleEffect AuthButton">
+			<span class="Text"><i class="fa fa-facebook-official fa-lg"></i><span>Войти через Facebook</span></span>
+		</a>
+	</div>
+	<p class="auth_modal_bottom">{bottom}</p>
+</script>
+<script type="javascript/template" id="tmpl-modal-bitcoin-content">
+	<h6 class="bitcoin_modal_title">Заказ № {order_number}</h6>
+	{ticket_types}
+	<div class="bitcoin_modal_helptext">
+		<span>В течение 2 минут после оплаты заказа ваши билеты будут высланы на Email</span>
+	</div>
+
+	<div class="bitcoin_modal_bottom">
+		<aside class="bitcoin_modal_qr img_holder">
+			<img src="/api/v1/events/{event_id}/orders/{order_uuid}/bitcoin/qr?address={bitcoin_address}&amount={bitcoin_amount}" width="102.5" height="102.5">
+		</aside>
+		<div class="bitcoin_modal_address form_unit">
+			<label for="bitcoin_address" class="form_label">Отправьте <span class="-text_color_accent">{bitcoin_amount} BTC</span> на адрес:</label>
+			<input id="bitcoin_address" class="form_input" value="{bitcoin_address}">
+		</div>
 	</div>
 </script>
 
-<script type="javascript/template" id="tmpl-calendar-row">
-	<tr class="{tr_class}"></tr>
+<script type="javascript/template" id="tmpl-modal-bitcoin-ticket-type-row">
+	<div class="bitcoin_modal_ticket_type_row">
+		<span class="bitcoin_modal_ticket_type_name">{name}</span>
+		<span class="bitcoin_modal_ticket_type_amount">{number} ед.</span>
+	</div>
+</script>
+<script type="javascript/template" id="tmpl-modal-city-choose-content">
+	<div class="form_unit -inline">
+		<label class="form_label">Ваш город</label>
+		<div class="form_unit">
+			<select id="city_choose_modal_select" class="CityChooseModalSelect" name="city" title="">{cities}</select>
+		</div>
+	</div>
+</script>
+<script type="javascript/template" id="tmpl-modal">
+	<div class="modal_unit {modal_type} {modal_classes} -hidden -faded">
+		{modal_header}
+		<div class="modal_content ModalContent {modal_content_classes}">
+			{modal_content}
+		</div>
+		{modal_footer}
+	</div>
 </script>
 
-<script type="javascript/template" id="tmpl-calendar-div">
-	<td class="{td_classes}" data-weekday="{day_number}" data-date="{date}" data-title="{date_text}" {dataset}><span class="{day_class}">{number}</span></td>
+<script type="javascript/template" id="tmpl-modal-header">
+	<header class="modal_header">
+		<span>{title}</span>
+		{close_button}
+	</header>
 </script>
-<script type="javascript/template" id="tmpl-datepicker">
-	<div class="date_picker">
-		<div class="DatePickerCalendar"></div>
-		<button class="button -color_primary SubmitDatePicker" type="button">Готово</button>
+
+<script type="javascript/template" id="tmpl-modal-footer">
+	<footer class="modal_footer">
+		{footer_buttons}
+	</footer>
+</script>
+<script type="javascript/template" id="tmpl-modal-cropper-content">
+	<img class="Cropper" src="{image_src}">
+</script>
+<script type="javascript/template" id="tmpl-modal-image-media-content">
+	<img src="{src}">
+</script>
+<script type="javascript/template" id="tmpl-modal-list-content">
+	<div class="list_modal_wrapper ListModalWrapper scrollbar-outer"></div>
+</script>
+
+<script type="javascript/template" id="tmpl-modal-users-divider">
+	<p class="modal_divider">{label}</p>
+</script>
+<script type="javascript/template" id="tmpl-modal-map-content">
+	<iframe width="100%" height="{iframe_height}" class="MapModalFrame" frameborder="0" style="display:block;border:0" src="https://www.google.com/maps/embed/v1/place?q={location}&key=AIzaSyCKu_xeHhtme8b1awA_rHjpfV3wVg1fZDg" allowfullscreen></iframe>
+</script>
+<script type="javascript/template" id="tmpl-modal-registration-content">
+	<form class="form registration_modal_form RegistrationModalForm">
+		<h4>{event_title}</h4>
+		<p class="form_helptext">Чтобы зарегистрироваться на событие, заполните поля.</p>
+		<p class="form_helptext">Поля со звёздочкой ({required_star}) обязательны для заполнения.</p>
+		{fields}
+		<div class="form_unit">
+			<input id="registration_form_{modal_id}_agreement" class="form_checkbox" type="checkbox" required>
+			<label class="form_label" for="registration_form_{modal_id}_agreement"><span>Я согласен c условиями Пользовательского соглашения и Договором оказания услуг по организации мероприятия</span></label>
+		</div>
+
+		<div class="-align_center">
+			<button class="button -color_accent -rounded RippleEffect RegisterButton" type="button"><span class="Text">Зарегистрироваться</span></button>
+		</div>
+	</form>
+</script>
+<script type="javascript/template" id="tmpl-modal-ticket-content">
+	<div class="ticket_card {card_classes}">
+		<div class="ticket_card_wrapper">
+			<div class="ticket_card_cover img_holder">
+				<img src="{image_horizontal_url}?width={cover_width}" title="{title}" width="{cover_width}" height="{cover_height}">
+			</div>
+			<div class="ticket_card_content">
+				<p class="ticket_card_event_title -text_color_primary_80">{title}</p>
+				<p class="ticket_card_type_name">{ticket_type_name}</p>
+				<p class="ticket_card_dates">{formatted_dates}</p>
+				<p class="ticket_card_location">{location}</p>
+				<div class="ticket_card_additional_field">
+					<span class="-text_color_primary_80">Билет № </span>
+					<span class="-text_color_accent">{number_formatted}</span>
+				</div>
+				<div class="ticket_card_additional_field">
+					<span class="-text_color_primary_80">Приобретён </span>
+					<span class="-text_color_accent">{payed_at_formatted}</span>
+				</div>
+				<div class="ticket_card_additional_field">
+					<span class="-text_color_primary_80">Стоимость </span>
+					<span class="-text_color_accent">{price_formatted}</span>
+				</div>
+
+				<div class="ticket_card_buttons form_group -align_left">
+					<div class="form_unit">
+						<a class="button -bordered fa_icon fa-external-link" href="/ticket/{ticket_uuid}" target="_blank">Открыть билет</a>
+					</div>
+					<div class="form_unit">
+						<a class="button -bordered fa_icon fa-download" href="/api/v1/events/{event_id}/tickets/{ticket_uuid}/export">pdf</a>
+					</div>
+				</div>
+			</div>
+			<div class="ticket_card_status">
+				<span>{status_name}</span>
+			</div>
+		</div>
 	</div>
+</script>
+<script type="javascript/template" id="tmpl-modal-withdraw-content">
+	<form class="form WithdrawFundsForm">
+		<div class="form_unit">
+			<label class="form_label">Запрос от сотрудника</label>
+			{avatar_block}
+		</div>
+		{amount_form_unit}
+		{comment_form_unit}
+	</form>
 </script>
 <script type="javascript/template" id="tmpl-app-inspector">
 	<div class="app_inspector material -floating_material AppInspector">
@@ -2051,6 +2005,52 @@
 			<span class="app_inspector_event_title">{title}</span>
 		</div>
 	</a>
+</script>
+<script type="javascript/template" id="tmpl-calendar">
+	<div class="{wrapper_class} -unselectable">
+		<div class="{header_class}">
+			<button class="PrevMonth {prev_btn_class} fa_icon fa-chevron-left" type="button" tabindex="-1"></button>
+			<span class="MonthName {month_name_class}"></span>
+			<button class="NextMonth {next_btn_class} fa_icon fa-chevron-right" type="button" tabindex="-1"></button>
+		</div>
+		<table class="CalendarTable {table_class}">
+			<colgroup>
+				<col valign="middle">
+				<col valign="middle">
+				<col valign="middle">
+				<col valign="middle">
+				<col valign="middle">
+				<col valign="middle">
+				<col valign="middle">
+			</colgroup>
+			<thead class="{thead_class}">
+				<tr class="{head_tr_class}">
+					<th class="{table_cell_class} {th_class} Week_1" data-weekday="1"><span>Пн</span></th>
+					<th class="{table_cell_class} {th_class} Week_2" data-weekday="2"><span>Вт</span></th>
+					<th class="{table_cell_class} {th_class} Week_3" data-weekday="3"><span>Ср</span></th>
+					<th class="{table_cell_class} {th_class} Week_4" data-weekday="4"><span>Чт</span></th>
+					<th class="{table_cell_class} {th_class} Week_5" data-weekday="5"><span>Пт</span></th>
+					<th class="{table_cell_class} {th_class} Week_6" data-weekday="6"><span>Сб</span></th>
+					<th class="{table_cell_class} {th_class} Week_0" data-weekday="0"><span>Вс</span></th>
+				</tr>
+			</thead>
+			<tbody class="CalendarTableBody {tbody_class}"></tbody>
+		</table>
+	</div>
+</script>
+
+<script type="javascript/template" id="tmpl-calendar-row">
+	<tr class="{tr_class}"></tr>
+</script>
+
+<script type="javascript/template" id="tmpl-calendar-div">
+	<td class="{td_classes}" data-weekday="{day_number}" data-date="{date}" data-title="{date_text}" {dataset}><span class="{day_class}">{number}</span></td>
+</script>
+<script type="javascript/template" id="tmpl-datepicker">
+	<div class="date_picker">
+		<div class="DatePickerCalendar"></div>
+		<button class="button -color_primary SubmitDatePicker" type="button">Готово</button>
+	</div>
 </script>
 <script type="javascript/template" id="tmpl-statistics-overview-wrapper">
 	<div class="statistics_overview_wrapper StatOverviewOrganizations">
@@ -2367,7 +2367,7 @@
 				<div class="event_admin_sales_brief_block">
 					<div class="scoreboard -size_normal">
 						<span class="scoreboard_title">Билеты</span>
-						<span class="scoreboard_number">{sold_count}/{sum_amount}</span>
+						<span class="scoreboard_number">{sold_count} / {sum_amount}</span>
 					</div>
 				</div>
 				<div class="event_admin_sales_brief_block">
@@ -2379,7 +2379,7 @@
 				<div class="event_admin_sales_brief_block">
 					<div class="scoreboard -size_normal">
 						<span class="scoreboard_title">Контроль входа</span>
-						<span class="scoreboard_number">{checked_out_count}/{sold_count}</span>
+						<span class="scoreboard_number">{checked_out_count} / {sold_count}</span>
 					</div>
 				</div>
 				<div class="event_admin_sales_brief_block">
@@ -2413,7 +2413,8 @@
 						<div class="grid_box">
 							<div class="scoreboard -size_normal">
 								<span class="scoreboard_title">Комиссия за эквайринг</span>
-								<span class="scoreboard_number">{processing_commission_value} <span class="tooltip" title="Комиссия зависит от способа оплаты участниками. Процент высчитывается как округленное среднее со всех заказов.">({processing_commission}%)</span></span>
+								<span class="scoreboard_number">{processing_commission_value}</span>
+								<span class="scoreboard_number tooltip" title="Комиссия зависит от способа оплаты участниками. Процент высчитывается как округленное среднее со всех заказов.">({processing_commission}%)</span>
 							</div>
 						</div>
 					</div>
@@ -2622,11 +2623,12 @@
 			</div>
 			<table class="table -data_table_override TransactionStoryTable">
 				<colgroup>
-					<col width="120">
-					<col>
-					<col>
-					<col>
-					<col width="200">
+					<col width="12%">
+					<col width="17%">
+					<col width="15%">
+					<col width="23%">
+					<col width="18%">
+					<col width="15%">
 				</colgroup>
 				<thead>
 					<tr>
@@ -2653,9 +2655,9 @@
 			</div>
 			<table class="table -data_table_override EventsFinancesTable">
 				<colgroup>
-					<col>
-					<col width="150">
-					<col width="150">
+					<col width="70%">
+					<col width="15%">
+					<col width="15%">
 				</colgroup>
 				<thead>
 					<tr>
@@ -2759,20 +2761,33 @@
 </script>
 <script type="javascript/template" id="tmpl-admin-organization-requisites-page">
 	<form class="page org_admin_requisites_page material -level_2_material Tabs RequisitesForm">
-		<div class="tabs_header HeaderTabs -color_accent">
-			<span class="tab Tab -active" data-type="legal_entity">Юридическое лицо</span>
-			<span class="tab Tab" data-type="natural_person">Физическое лицо</span>
-		</div>
+		{radio_group}
+		<p class="text -mini">Заключение договора дает возможность продавать билеты через Интернет. Договор можно заключить одним из следующих способов:</p>
 		<div class="tab_bodies_wrap TabsBodyWrapper">
 			<fieldset class="tab_body TabsBody -active">
+				<ol class="text -mini">
+					<li>Авансовый платеж в размере 10 рублей с расчетного счета вашей организации или ИП</li>
+					<li>Предоставление копий ваших уставных документов</li>
+				</ol>
 				<h3>Информация о компании</h3>
 				{l_company_form_field}
 				<fieldset class="CompanyAdditionalInfo -hidden">
-					<div class="form_group -parts_e_e -valign_baseline">
+					<div class="form_group -parts_e_e_e -valign_baseline">
 						{l_inn_form_field}
 						{l_kpp_form_field}
+						{l_ogrn_form_field}
 					</div>
 					{l_real_address_form_field}
+
+					<div class="form_unit">
+						<label class="form_label" for="legal_entity_requisites_taxation_type">Информация об НДС</label>
+						<select id="legal_entity_requisites_taxation_type" class="form_select" name="taxation_type" required>
+							<option select hidden value="">Выберите</option>
+							<option value="value_added_tax">Обычная система налогообложения (с НДС)</option>
+							<option value="no_value_added_tax">Упрощенная система налогообложения (без НДС)</option>
+						</select>
+						<p class="form_helptext">Укажите, является ли ваша компания налогоплательщиком НДС</p>
+					</div>
 				</fieldset>
 
 				<h3>Банковские данные</h3>
@@ -2797,6 +2812,11 @@
 				</div>
 			</fieldset>
 			<fieldset class="tab_body TabsBody">
+				<ol class="text -mini">
+					<li>Перевести нам 15 рублей с вашего личного банковского счета</li>
+					<li>Прислать нам нотариально заверенное заявление</li>
+					<li>Приехать к нам в офис с паспортом и подписать заявление в офисе</li>
+				</ol>
 				<h3>Информация об организаторе</h3>
 				{n_self_name_form_field}
 				{n_inn_form_field}
@@ -2818,6 +2838,7 @@
 					</div>
 				</fieldset>
 				{n_checking_account_form_field}
+				{n_withdraw_comments_form_field}
 
 				<h3>Контактная информация</h3>
 				<div class="form_group -parts_e_e -valign_baseline">
@@ -2888,14 +2909,16 @@
 			{slack_telegram_integration_checkboxes}
 		</fieldset>
 
-		<fieldset class="SaveLocalWrapper" disabled title="Эта функция временно недоступна">
+		<fieldset class="SaveLocalWrapper">
 			<div class="org_admin_settings_wrapper">
 				<h3>Брендирование</h3>
 				<p class="-text_color_marginal">Вы можете изменить цвет элементов страницы организации в соответствии с вашей стилистикой</p>
-				<label class="form_label" for="org_admin_settings_brand_color">Фирменный цвет</label>
-				<div class="form_unit -unite -parts_e_4">
-					<input id="org_admin_settings_brand_color" class="form_input" name="brand_color" value="{brand_color}" placeholder="#3e4d66">
-					<button class="button -color_accent SaveLocal RippleEffect" type="button"><span class="Text">Сохранить</span></button>
+				<div class="form_group -parts_e_2">
+					{brand_color_field}
+					{brand_color_accent_field}
+				</div>
+				<div class="form_unit -align_center">
+					{save_colors_button}
 				</div>
 			</div>
 		</fieldset>

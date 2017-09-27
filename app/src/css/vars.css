@@ -11,10 +11,9 @@
 	--color_franklin: #00dc88;
 	--color_franklin_alt: #23d792;
 
-	--color_accent: var(--color_bubblegum);;
-	--color_accent_alt: var(--color_bubblegum_alt);;
+	--color_accent: var(--color_bubblegum);
+	--color_accent_alt: var(--color_bubblegum_alt);
 
-	/*--color_error: #ff6b00;*/
 	--color_error: #fd7b6e;
 
 	--color_warning: #ff9f00;

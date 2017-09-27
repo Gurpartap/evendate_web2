@@ -4,5 +4,8 @@
 	font-size: .875em;
 	font-weight: 400;
 	color: #657184;
-	color: var(--color_primary_80);
+}
+
+@supports (--custom_properties: 1) {
+	.registration_modal_form .form_label {color: var(--color_primary_80)}
 }

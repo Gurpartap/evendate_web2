@@ -66,6 +66,7 @@ OneOrganization = extending(OneEntity, (function() {
 	 *
 	 * @property {?boolean} is_private
 	 * @property {?string} brand_color
+	 * @property {?string} brand_color_accent
 	 * @property {?OneCity} city
 	 * @property {?} country
 	 *
@@ -107,6 +108,7 @@ OneOrganization = extending(OneEntity, (function() {
 		
 		this.is_private = null;
 		this.brand_color = null;
+		this.brand_color_accent = null;
 		this.tariff = new TariffModel();
 		this.city = new OneCity();
 		this.country = null;
@@ -186,7 +188,8 @@ OneOrganization = extending(OneEntity, (function() {
 	
 	OneOrganization.ENDPOINT = Object.freeze({
 		FEEDBACK: '/organizations/{org_id}/feedback',
-		WITHDRAW: '/organizations/{org_id}/withdraws'
+		WITHDRAW: '/organizations/{org_id}/withdraws',
+		REQUISITES: '/organizations/{org_id}/requisites'
 	});
 	/**
 	 *
@@ -317,6 +320,29 @@ OneOrganization = extending(OneEntity, (function() {
 	OneOrganization.sendFeedback = function(org_id, data, success) {
 	
 		return __APP.SERVER.addData(OneOrganization.ENDPOINT.FEEDBACK.format({org_id: org_id}), data, false, success);
+	};
+	/**
+	 *
+	 * @param {(string|number)} org_id
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @returns {jqPromise}
+	 */
+	OneOrganization.fetchRequisites = function(org_id, success) {
+		
+		return __APP.SERVER.getData(OneOrganization.ENDPOINT.REQUISITES.format({org_id: org_id}), {}, success);
+	};
+	/**
+	 *
+	 * @param {(string|number)} org_id
+	 * @param {object} requisites
+	 * @param {AJAXCallback} [success]
+	 *
+	 * @returns {jqPromise}
+	 */
+	OneOrganization.saveRequisites = function(org_id, requisites, success) {
+		
+		return __APP.SERVER.addData(OneOrganization.ENDPOINT.REQUISITES.format({org_id: org_id}), requisites, success);
 	};
 	/**
 	 *

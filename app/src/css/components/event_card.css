@@ -3,7 +3,6 @@
 	height: 170px;
 	border-radius: 2px;
 	background-color: #fff;
-	background-color: var(--color_page);
 	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
 	cursor: pointer;
 }
@@ -19,4 +18,8 @@
 .event_card_description {
 	padding: 6px;
 	font-size: .88em;
+}
+
+@supports (--custom_properties: 1) {
+	.event_card {background-color: var(--color_page)}
 }

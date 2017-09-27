@@ -12,5 +12,8 @@
 	font-weight: 400;
 	font-size: .88em;
 	color: #4a4a4a;
-	color: var(--color_text);
+}
+
+@supports (--custom_properties: 1) {
+	.user_tombstone_title {color: var(--color_text)}
 }

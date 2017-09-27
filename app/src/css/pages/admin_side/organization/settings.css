@@ -49,8 +49,12 @@ fieldset + .org_admin_settings_wrapper,
 	font-size: 16px;
 	font-weight: 500;
 	color: #657184;
-	color: var(--color_primary_30);
 }
 
 .org_admin_settings_tariff_title {flex-grow: 1}
 .org_admin_settings_tariff_button {margin-left: 1em}
+
+@supports (--custom_properties: 1) {
+	.org_admin_settings_tariff_title,
+	.org_admin_settings_tariff_price {color: var(--color_primary_30)}
+}

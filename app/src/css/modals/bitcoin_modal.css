@@ -4,7 +4,6 @@
 	font-weight: 500;
 	line-height: 1.25;
 	color: #3e4d66;
-	color: var(--color_primary);
 }
 
 .bitcoin_modal_helptext {
@@ -12,9 +11,7 @@
 	font-weight: 500;
 	line-height: 1.5;
 	color: #657184;
-	color: var(--color_primary_80);
 	background-color: #f6f6f6;
-	background-color: var(--color_gray_material);
 }
 
 .bitcoin_modal_bottom {
@@ -29,4 +26,13 @@
 
 .bitcoin_modal_address {
 	width: 100%;
+}
+
+@supports (--custom_properties: 1) {
+	.bitcoin_modal_title {color: var(--color_primary)}
+
+	.bitcoin_modal_helptext {
+		color: var(--color_primary_80);
+		background-color: var(--color_gray_material);
+	}
 }

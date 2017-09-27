@@ -36,7 +36,10 @@
 	border-left: 1px solid;
 	border-bottom: 1px solid;
 	border-color: #9fa6b3;
-	border-color: var(--color_primary_50);
 	transform: translate(-24.5px, -85%);
 	z-index: 40;
+}
+
+@supports (--custom_properties: 1) {
+	.event_admin_orders_page_table_child_row .child_ladder:before {border-color: var(--color_primary_50)}
 }

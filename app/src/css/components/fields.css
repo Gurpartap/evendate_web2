@@ -18,13 +18,9 @@
 .field_name {
 	margin: 6px 0;
 	color: #9fa6b3;
-	color: var(--color_primary_50);
 }
 
-.field_value {
-	color: #3e4d66;
-	color: var(--color_primary);
-}
+.field_value {color: #3e4d66}
 
 
 .fields_wrapper.-columns_2 > .field {
@@ -38,5 +34,10 @@
 .fields_wrapper.-field_big > .field > .field_value {
 	font-size: 1.2857em;
 	color: #2e3b50;
-	color: var(--color_dark_primary);
+}
+
+@supports (--custom_properties: 1) {
+	.field_name {color: var(--color_primary_50)}
+	.field_value {color: var(--color_primary)}
+	.fields_wrapper.-field_big > .field > .field_value {color: var(--color_dark_primary)}
 }

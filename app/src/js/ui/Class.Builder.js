@@ -371,12 +371,13 @@ Builder = (function() {
 	 * @param {string} type - checkbox or radio
 	 * @param {buildProps} props
 	 * @param {(Array<string>|string)} [props.unit_classes]
+	 * @param {(Array<string>|string)} [props.unit_dataset]
 	 *
 	 * @returns {jQuery}
 	 */
 	Builder.prototype.radioCheckbox = function buildRadioCheckbox(type, props) {
 		if (type === 'checkbox' || type === 'radio') {
-			props = Builder.normalizeBuildProps(props, ['unit_classes']);
+			props = Builder.normalizeBuildProps(props, ['unit_classes'], ['unit_dataset']);
 			if (props.classes.indexOf('form_checkbox') === -1 && props.classes.indexOf('form_radio') === -1) {
 				props.classes.unshift('form_' + type);
 			}

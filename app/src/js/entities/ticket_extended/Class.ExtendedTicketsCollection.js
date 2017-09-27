@@ -63,6 +63,19 @@ ExtendedTicketsCollection = extending(EntitiesCollection, (function() {
 		
 		return tickets;
 	};
+	/**
+	 *
+	 * @param {(ExtendedTicketsCollection|Array<OneExtendedTicket>)} tickets
+	 *
+	 * @return {Array<OneExtendedTicket>}
+	 */
+	ExtendedTicketsCollection.getGreenTickets = function(tickets) {
+		
+		return tickets.filter(function(ticket) {
+			
+			return OneOrder.isGreenStatus(ticket.status_type_code);
+		});
+	};
 	
 	
 	return ExtendedTicketsCollection;

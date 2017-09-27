@@ -1,19 +1,32 @@
 <script type="javascript/template" id="tmpl-admin-organization-requisites-page">
 	<form class="page org_admin_requisites_page material -level_2_material Tabs RequisitesForm">
-		<div class="tabs_header HeaderTabs -color_accent">
-			<span class="tab Tab -active" data-type="legal_entity">Юридическое лицо</span>
-			<span class="tab Tab" data-type="natural_person">Физическое лицо</span>
-		</div>
+		{radio_group}
+		<p class="text -mini">Заключение договора дает возможность продавать билеты через Интернет. Договор можно заключить одним из следующих способов:</p>
 		<div class="tab_bodies_wrap TabsBodyWrapper">
 			<fieldset class="tab_body TabsBody -active">
+				<ol class="text -mini">
+					<li>Авансовый платеж в размере 10 рублей с расчетного счета вашей организации или ИП</li>
+					<li>Предоставление копий ваших уставных документов</li>
+				</ol>
 				<h3>Информация о компании</h3>
 				{l_company_form_field}
 				<fieldset class="CompanyAdditionalInfo -hidden">
-					<div class="form_group -parts_e_e -valign_baseline">
+					<div class="form_group -parts_e_e_e -valign_baseline">
 						{l_inn_form_field}
 						{l_kpp_form_field}
+						{l_ogrn_form_field}
 					</div>
 					{l_real_address_form_field}
+
+					<div class="form_unit">
+						<label class="form_label" for="legal_entity_requisites_taxation_type">Информация об НДС</label>
+						<select id="legal_entity_requisites_taxation_type" class="form_select" name="taxation_type" required>
+							<option select hidden value="">Выберите</option>
+							<option value="value_added_tax">Обычная система налогообложения (с НДС)</option>
+							<option value="no_value_added_tax">Упрощенная система налогообложения (без НДС)</option>
+						</select>
+						<p class="form_helptext">Укажите, является ли ваша компания налогоплательщиком НДС</p>
+					</div>
 				</fieldset>
 
 				<h3>Банковские данные</h3>
@@ -38,6 +51,11 @@
 				</div>
 			</fieldset>
 			<fieldset class="tab_body TabsBody">
+				<ol class="text -mini">
+					<li>Перевести нам 15 рублей с вашего личного банковского счета</li>
+					<li>Прислать нам нотариально заверенное заявление</li>
+					<li>Приехать к нам в офис с паспортом и подписать заявление в офисе</li>
+				</ol>
 				<h3>Информация об организаторе</h3>
 				{n_self_name_form_field}
 				{n_inn_form_field}
@@ -59,6 +77,7 @@
 					</div>
 				</fieldset>
 				{n_checking_account_form_field}
+				{n_withdraw_comments_form_field}
 
 				<h3>Контактная информация</h3>
 				<div class="form_group -parts_e_e -valign_baseline">
